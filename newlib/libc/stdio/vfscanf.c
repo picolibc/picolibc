@@ -182,7 +182,7 @@ static void * get_arg (int, va_list *, int *, void **);
 
 /*
  * The following are used in numeric conversions only:
- * SIGNOK, NDIGITS, DPTOK, and EXPOK are for floating point;
+ * SIGNOK, NDIGITS, DPTOK, EXPOK and HEXFLT are for floating point;
  * SIGNOK, NDIGITS, PFXOK, and NZDIGITS are for integral.
  */
 
@@ -191,6 +191,7 @@ static void * get_arg (int, va_list *, int *, void **);
 
 #define	DPTOK		0x200	/* (float) decimal point is still legal */
 #define	EXPOK		0x400	/* (float) exponent (e+3, etc) still legal */
+#define	HEXFLT		0x800	/* (float) hex prefix found, expect hex float */
 
 #define	PFXOK		0x200	/* 0x prefix is (still) legal */
 #define	NZDIGITS	0x400	/* no zero digits detected */
@@ -1605,6 +1606,37 @@ __SVFSCANF_R (struct _reent *rptr,
 		    }
 		  break;
 
+		/* Chars a, e and f have various special meanings apart from
+		   their hex value.  They are handled separately, see below. */
+		case 'b':
+		case 'B':
+		case 'c':
+		case 'C':
+		case 'd':
+		case 'D':
+		  if ((flags & HEXFLT) && nancount + infcount == 0)
+		    {
+		      flags &= ~(SIGNOK | NDIGITS);
+		      goto fok;
+		    }
+		  break;
+
+		case 'x':
+		case 'X':
+		  /* Did we have exactly one leading zero yet? */
+		  if ((flags & (SIGNOK | NDIGITS | HEXFLT)) == NDIGITS
+		      && zeroes == 1)
+		    {
+		      flags |= HEXFLT;
+		      /* We skipped the first zero, so we have to add
+			 it now to the buffer. */
+		      *p++ = '0';
+		      width--;
+		      zeroes = 0;
+		      goto fok;
+		    }
+		  break;
+
 		case '+':
 		case '-':
 		  if (flags & SIGNOK)
@@ -1636,6 +1668,11 @@ __SVFSCANF_R (struct _reent *rptr,
 		  break;
 		case 'a':
 		case 'A':
+		  if ((flags & HEXFLT) && nancount + infcount == 0)
+		    {
+		      flags &= ~(SIGNOK | NDIGITS);
+		      goto fok;
+		    }
 		  if (nancount == 1)
 		    {
 		      nancount = 2;
@@ -1660,6 +1697,11 @@ __SVFSCANF_R (struct _reent *rptr,
 		  break;
 		case 'f':
 		case 'F':
+		  if ((flags & HEXFLT) && nancount + infcount == 0)
+		    {
+		      flags &= ~(SIGNOK | NDIGITS);
+		      goto fok;
+		    }
 		  if (infcount == 2)
 		    {
 		      infcount = 3;
@@ -1682,8 +1724,27 @@ __SVFSCANF_R (struct _reent *rptr,
 		      goto fok;
 		    }
 		  break;
+
+		case 'p':
+		case 'P':
+		  /* p is the exponent marker in hex case. */
+		  if (!(flags & HEXFLT))
+		    break;
+		  goto fexp;
 		case 'e':
 		case 'E':
+		  /* e is just a digit in hex case, not the exponent marker. */
+		  if (flags & HEXFLT)
+		    {
+		      if (nancount + infcount == 0)
+			{
+			  flags &= ~(SIGNOK | NDIGITS);
+			  goto fok;
+			}
+		      break;
+		    }
+
+		fexp:
 		  /* no exponent without some digits */
 		  if ((flags & (NDIGITS | EXPOK)) == EXPOK
 		      || ((flags & EXPOK) && zeroes))
@@ -1694,7 +1755,7 @@ __SVFSCANF_R (struct _reent *rptr,
 			  exp_start = p;
 			}
 		      flags =
-			(flags & ~(EXPOK | DPTOK)) |
+			(flags & ~(EXPOK | DPTOK | HEXFLT)) |
 			SIGNOK | NDIGITS;
 		      zeroes = 0;
 		      goto fok;
