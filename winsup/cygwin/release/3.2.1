@@ -1,0 +1,27 @@
+What's new:
+-----------
+
+
+What changed:
+-------------
+
+
+Bug Fixes
+---------
+
+- Fix values returned by select(2) for shutdown sockets.
+  Addresses: https://cygwin.com/pipermail/cygwin-developers/2021-April/012092.html
+
+- Introduce a new hypotl(3) function not suffering unnecesswry overflows.
+  Addresses: https://cygwin.com/pipermail/cygwin/2021-April/248302.html
+
+- Fix path handling for paths spanning native symlinks.
+  Addresses: https://cygwin.com/pipermail/cygwin/2021-April/248307.html
+
+- Fix tab position evaluation after console window resize.
+
+- Fix a regression in pseudo console handling, resulting in rlwrap not
+  being able to start a new pseudo console.
+
+- Handle two race conditions in pseudo console usage.
+  Addresses: https://cygwin.com/pipermail/cygwin/2021-April/248292.html
