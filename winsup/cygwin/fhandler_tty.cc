@@ -3226,15 +3226,15 @@ fhandler_pty_slave::setup_pseudoconsole (bool nopcon)
 	  if (wait_result == WAIT_OBJECT_0)
 	    break;
 	  if (wait_result != WAIT_TIMEOUT)
-	    goto cleanup_helper_process;
+	    goto cleanup_helper_with_hello;
 	  DWORD exit_code;
 	  if (!GetExitCodeProcess (pi.hProcess, &exit_code))
-	    goto cleanup_helper_process;
+	    goto cleanup_helper_with_hello;
 	  if (exit_code == STILL_ACTIVE)
 	    continue;
 	  if (exit_code != 0 ||
 	      WaitForSingleObject (hello, 500) != WAIT_OBJECT_0)
-	    goto cleanup_helper_process;
+	    goto cleanup_helper_with_hello;
 	  break;
 	}
       CloseHandle (hello);
@@ -3349,6 +3349,10 @@ skip_create:
 
   return true;
 
+cleanup_helper_with_hello:
+  CloseHandle (hello);
+  CloseHandle (pi.hThread);
+  goto cleanup_helper_process;
 cleanup_pcon_in:
   CloseHandle (hpConIn);
 cleanup_helper_process:
@@ -3358,10 +3362,10 @@ cleanup_helper_process:
   goto skip_close_hello;
 cleanup_event_and_pipes:
   CloseHandle (hello);
+skip_close_hello:
   get_ttyp ()->pcon_start = false;
   get_ttyp ()->pcon_start_pid = 0;
   get_ttyp ()->pcon_activated = false;
-skip_close_hello:
   CloseHandle (goodbye);
   CloseHandle (hr);
   CloseHandle (hw);
