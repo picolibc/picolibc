@@ -3187,9 +3187,31 @@ restart:
 	     forces path_conv::check to backtrack inner path components. */
 	  if (!fs.is_remote_drive ())
 	    {
-	      PFILE_NAME_INFORMATION pfni = (PFILE_NAME_INFORMATION)
-					    tp.c_get ();
+#ifdef __i386__
+	      /* On WOW64, ignore any potential problems if the path is inside
+		 the Windows dir to avoid false positives for stuff under
+		 File System Redirector control. */
+	      if (wincap.is_wow64 ())
+		{
+		  static UNICODE_STRING wpath;
+		  UNICODE_STRING udpath;
 
+		  /* Create UNICODE_STRING for Windows dir. */
+		  RtlInitCountedUnicodeString (&wpath, windows_directory,
+				windows_directory_length * sizeof (WCHAR));
+		  /* Create a UNICODE_STRING from incoming path, splitting
+		     off the leading "\\??\\" */
+		  RtlInitCountedUnicodeString (&udpath, upath.Buffer + 4,
+				upath.Length - 4 * sizeof (WCHAR));
+		  /* Are we below Windows dir?  Skip the check for inner
+		     symlinks. */
+		  if (RtlEqualUnicodePathPrefix (&udpath, &wpath, TRUE))
+		    goto skip_inner_syml_check;
+		}
+#endif /* __i386__ */
+	      PFILE_NAME_INFORMATION pfni;
+
+	      pfni = (PFILE_NAME_INFORMATION) tp.c_get ();
 	      if (NT_SUCCESS (NtQueryInformationFile (h, &io, pfni, NT_MAX_PATH,
 						      FileNameInformation)))
 		{
@@ -3204,6 +3226,10 @@ restart:
 		      break;
 		    }
 		}
+#ifdef __i386__
+	      skip_inner_syml_check:
+	        ;
+#endif /* __i386__ */
 	    }
 	}
       if (!NT_SUCCESS (status))

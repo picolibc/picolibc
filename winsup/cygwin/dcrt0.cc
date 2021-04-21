@@ -730,6 +730,12 @@ init_windows_system_directory ()
 	  system_wow64_directory[system_wow64_directory_length++] = L'\\';
 	  system_wow64_directory[system_wow64_directory_length] = L'\0';
 	}
+      /* We need the Windows dir in path.cc. */
+      wcscpy (windows_directory, windows_system_directory);
+      windows_directory_length = windows_system_directory_length - 1;
+      windows_directory[windows_directory_length] = L'\0';
+      while (windows_directory[windows_directory_length - 1] != L'\\')
+	windows_directory[--windows_directory_length] = L'\0';
 #endif /* __i386__ */
     }
 }

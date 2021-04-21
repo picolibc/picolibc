@@ -26,6 +26,8 @@ UINT windows_system_directory_length;
 #ifdef __i386__
 WCHAR system_wow64_directory[MAX_PATH];
 UINT system_wow64_directory_length;
+WCHAR windows_directory[MAX_PATH];
+UINT windows_directory_length;
 #endif /* __i386__ */
 WCHAR global_progname[NT_MAX_PATH];
 
