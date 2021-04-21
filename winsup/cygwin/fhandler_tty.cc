@@ -177,7 +177,9 @@ atexit_func (void)
 						    input_available_event);
 		ReleaseMutex (ptys->input_mutex);
 	      }
+	    WaitForSingleObject (ptys->pcon_mutex, INFINITE);
 	    ptys->close_pseudoconsole (ttyp, force_switch_to);
+	    ReleaseMutex (ptys->pcon_mutex);
 	    break;
 	  }
       CloseHandle (h_gdb_process);
