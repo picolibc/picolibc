@@ -64,6 +64,8 @@ struct pipe_reply {
 
 extern HANDLE attach_mutex; /* Defined in fhandler_console.cc */
 
+inline static bool pcon_pid_alive (DWORD pid);
+
 DWORD
 fhandler_pty_common::get_console_process_id (DWORD pid, bool match,
 					     bool cygwin, bool stub_only)
@@ -90,20 +92,18 @@ fhandler_pty_common::get_console_process_id (DWORD pid, bool match,
 	else
 	  {
 	    pinfo p (cygwin_pid (list[i]));
-	    if (!!p && p->dwProcessId && p->exec_dwProcessId
-		&& p->dwProcessId != p->exec_dwProcessId)
+	    if (!!p && p->exec_dwProcessId)
 	      {
-		res_pri = list[i];
+		res_pri = stub_only ? p->exec_dwProcessId : list[i];
 		break;
 	      }
-	    if (!!p && !res)
+	    if (!p && !res && pcon_pid_alive (list[i]) && stub_only)
+	      res = list[i];
+	    if (!!p && !res && !stub_only)
 	      res = list[i];
 	  }
       }
-  if (stub_only)
-    return res_pri;
-  else
-    return res_pri ?: res;
+  return res_pri ?: res;
 }
 
 static bool isHybrid;
@@ -3384,35 +3384,17 @@ fallback:
 void
 fhandler_pty_slave::close_pseudoconsole (tty *ttyp, DWORD force_switch_to)
 {
-  DWORD switch_to_stub = 0, switch_to = 0;
-  DWORD new_pcon_pid = 0;
+  DWORD switch_to = 0;
   if (force_switch_to)
     {
-      switch_to_stub = force_switch_to;
-      new_pcon_pid = force_switch_to;
+      switch_to = force_switch_to;
       ttyp->setpgid (force_switch_to + MAX_PID);
     }
   else if (pcon_pid_self (ttyp->pcon_pid))
     {
       /* Search another process which attaches to the pseudo console */
       DWORD current_pid = myself->exec_dwProcessId ?: myself->dwProcessId;
-      switch_to = get_console_process_id (current_pid, false, true);
-      if (switch_to)
-	{
-	  pinfo p (cygwin_pid (switch_to));
-	  if (p)
-	    {
-	      if (p->exec_dwProcessId)
-		switch_to_stub = p->exec_dwProcessId;
-	      new_pcon_pid = p->exec_dwProcessId;
-	    }
-	}
-      else
-	{
-	  switch_to = get_console_process_id (current_pid, false, false);
-	  if (switch_to)
-	    new_pcon_pid = switch_to;
-	}
+      switch_to = get_console_process_id (current_pid, false, true, true);
     }
   if (ttyp->pcon_activated)
     {
@@ -3420,7 +3402,6 @@ fhandler_pty_slave::close_pseudoconsole (tty *ttyp, DWORD force_switch_to)
       ttyp->previous_output_code_page = GetConsoleOutputCP ();
       if (pcon_pid_self (ttyp->pcon_pid))
 	{
-	  switch_to = switch_to_stub ?: switch_to;
 	  if (switch_to)
 	    {
 	      /* Change pseudo console owner to another process */
@@ -3454,7 +3435,7 @@ fhandler_pty_slave::close_pseudoconsole (tty *ttyp, DWORD force_switch_to)
 	      CloseHandle (ttyp->h_pcon_conhost_process);
 	      CloseHandle (ttyp->h_pcon_in);
 	      CloseHandle (ttyp->h_pcon_out);
-	      ttyp->pcon_pid = new_pcon_pid;
+	      ttyp->pcon_pid = switch_to;
 	      ttyp->h_pcon_write_pipe = new_write_pipe;
 	      ttyp->h_pcon_condrv_reference = new_condrv_reference;
 	      ttyp->h_pcon_conhost_process = new_conhost_process;
@@ -3513,8 +3494,8 @@ fhandler_pty_slave::close_pseudoconsole (tty *ttyp, DWORD force_switch_to)
     }
   else if (pcon_pid_self (ttyp->pcon_pid))
     {
-      if (switch_to_stub)
-	ttyp->pcon_pid = new_pcon_pid;
+      if (switch_to)
+	ttyp->pcon_pid = switch_to;
       else
 	{
 	  ttyp->pcon_pid = 0;
