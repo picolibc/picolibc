@@ -84,6 +84,9 @@ typedef unsigned long ioctl_command_t;
 #define	IOCPARM_IVAL(x)	((int)(intptr_t)(void *)*(caddr_t *)(void *)(x))
 #endif
 
+#define	_IOC_INVALID	(_IOC_VOID|_IOC_INOUT)	/* Never valid cmd value,
+						   use as filler */
+
 #endif
 
 __BEGIN_DECLS
