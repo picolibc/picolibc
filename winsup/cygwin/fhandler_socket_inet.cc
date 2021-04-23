@@ -781,8 +781,20 @@ int
 fhandler_socket_inet::connect (const struct sockaddr *name, int namelen)
 {
   struct sockaddr_storage sst;
+  bool reset = (name->sa_family == AF_UNSPEC
+		&& get_socket_type () == SOCK_DGRAM);
 
-  if (get_inet_addr_inet (name, namelen, &sst, &namelen) == SOCKET_ERROR)
+  if (reset)
+    {
+      if (connect_state () == unconnected)
+	return 0;
+      /* To reset a connected DGRAM socket, call Winsock's connect
+	 function with the address member of the sockaddr structure
+	 filled with zeroes. */
+      memset (&sst, 0, sizeof sst);
+      sst.ss_family = get_addr_family ();
+    }
+  else if (get_inet_addr_inet (name, namelen, &sst, &namelen) == SOCKET_ERROR)
     return SOCKET_ERROR;
 
   /* Initialize connect state to "connect_pending".  In the SOCK_STREAM
@@ -804,7 +816,12 @@ fhandler_socket_inet::connect (const struct sockaddr *name, int namelen)
 
   int res = ::connect (get_socket (), (struct sockaddr *) &sst, namelen);
   if (!res)
-    connect_state (connected);
+    {
+      if (reset)
+	connect_state (unconnected);
+      else
+	connect_state (connected);
+    }
   else if (!is_nonblocking ()
       && res == SOCKET_ERROR
       && WSAGetLastError () == WSAEWOULDBLOCK)

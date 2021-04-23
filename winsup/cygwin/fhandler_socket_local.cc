@@ -894,19 +894,34 @@ fhandler_socket_local::connect (const struct sockaddr *name, int namelen)
 {
   struct sockaddr_storage sst;
   int type = 0;
+  bool reset = (name->sa_family == AF_UNSPEC
+		&& get_socket_type () == SOCK_DGRAM);
 
-  if (get_inet_addr_local (name, namelen, &sst, &namelen, &type, connect_secret)
-      == SOCKET_ERROR)
+  if (reset)
+    {
+      if (connect_state () == unconnected)
+	return 0;
+      /* To reset a connected DGRAM socket, call Winsock's connect
+	 function with the address member of the sockaddr structure
+	 filled with zeroes. */
+      memset (&sst, 0, sizeof sst);
+      sst.ss_family = get_addr_family ();
+    }
+  else if (get_inet_addr_local (name, namelen, &sst, &namelen, &type,
+				connect_secret) == SOCKET_ERROR)
     return SOCKET_ERROR;
 
-  if (get_socket_type () != type)
+  if (get_socket_type () != type && !reset)
     {
       WSASetLastError (WSAEPROTOTYPE);
       set_winsock_errno ();
       return SOCKET_ERROR;
     }
 
-  set_peer_sun_path (name->sa_data);
+  if (reset)
+    set_peer_sun_path (NULL);
+  else
+    set_peer_sun_path (name->sa_data);
 
   /* Don't move af_local_set_cred into af_local_connect which may be called
      via select, possibly running under another identity.  Call early here,
@@ -933,7 +948,12 @@ fhandler_socket_local::connect (const struct sockaddr *name, int namelen)
 
   int res = ::connect (get_socket (), (struct sockaddr *) &sst, namelen);
   if (!res)
-    connect_state (connected);
+    {
+      if (reset)
+	connect_state (unconnected);
+      else
+	connect_state (connected);
+    }
   else if (!is_nonblocking ()
       && res == SOCKET_ERROR
       && WSAGetLastError () == WSAEWOULDBLOCK)

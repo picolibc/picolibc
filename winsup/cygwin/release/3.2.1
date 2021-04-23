@@ -28,3 +28,8 @@ Bug Fixes
 
 - Fix a bug in recognizing a successful completion of connect(2) on a
   datagram socket.
+
+- Fix connect(2) when called with an address structure whose family is
+  AF_UNSPEC.  As specified by POSIX and Linux, this is allowed on
+  datagram sockets, and its effect is to reset the socket's peer
+  address.

@@ -1696,6 +1696,13 @@ fhandler_socket_unix::connect (const struct sockaddr *name, int namelen)
       conn_unlock ();
       return -1;
     }
+  if (name->sa_family == AF_UNSPEC && get_socket_type () == SOCK_DGRAM)
+    {
+      connect_state (unconnected);
+      peer_sun_path (NULL);
+      conn_unlock ();
+      return 0;
+    }
   connect_state (connect_pending);
   conn_unlock ();
   /* Check validity of name */
