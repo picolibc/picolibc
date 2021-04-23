@@ -914,11 +914,13 @@ fhandler_socket_local::connect (const struct sockaddr *name, int namelen)
   if (get_socket_type () == SOCK_STREAM)
     af_local_set_cred ();
 
-  /* Initialize connect state to "connect_pending".  State is ultimately set
-     to "connected" or "connect_failed" in wait_for_events when the FD_CONNECT
-     event occurs.  Note that the underlying OS sockets are always non-blocking
-     and a successfully initiated non-blocking Winsock connect always returns
-     WSAEWOULDBLOCK.  Thus it's safe to rely on event handling.
+  /* Initialize connect state to "connect_pending".  In the SOCK_STREAM
+     case, the state is ultimately set to "connected" or "connect_failed" in
+     wait_for_events when the FD_CONNECT event occurs.  Note that the
+     underlying OS sockets are always non-blocking in this case and a
+     successfully initiated non-blocking Winsock connect always returns
+     WSAEWOULDBLOCK.  Thus it's safe to rely on event handling.  For DGRAM
+     sockets, however, connect can return immediately.
 
      Check for either unconnected or connect_failed since in both cases it's
      allowed to retry connecting the socket.  It's also ok (albeit ugly) to
@@ -930,7 +932,9 @@ fhandler_socket_local::connect (const struct sockaddr *name, int namelen)
     connect_state (connect_pending);
 
   int res = ::connect (get_socket (), (struct sockaddr *) &sst, namelen);
-  if (!is_nonblocking ()
+  if (!res)
+    connect_state (connected);
+  else if (!is_nonblocking ()
       && res == SOCKET_ERROR
       && WSAGetLastError () == WSAEWOULDBLOCK)
     res = wait_for_events (FD_CONNECT | FD_CLOSE, 0);
@@ -953,8 +957,7 @@ fhandler_socket_local::connect (const struct sockaddr *name, int namelen)
 	 Convert to POSIX/Linux compliant EISCONN. */
       else if (err == WSAEINVAL && connect_state () == listener)
 	WSASetLastError (WSAEISCONN);
-      /* Any other error except WSAEALREADY during connect_pending means the
-         connect failed. */
+      /* Any other error except WSAEALREADY means the connect failed. */
       else if (connect_state () == connect_pending && err != WSAEALREADY)
 	connect_state (connect_failed);
       set_winsock_errno ();

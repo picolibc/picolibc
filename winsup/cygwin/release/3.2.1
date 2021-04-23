@@ -12,7 +12,7 @@ Bug Fixes
 - Fix values returned by select(2) for shutdown sockets.
   Addresses: https://cygwin.com/pipermail/cygwin-developers/2021-April/012092.html
 
-- Introduce a new hypotl(3) function not suffering unnecesswry overflows.
+- Introduce a new hypotl(3) function not suffering unnecessary overflows.
   Addresses: https://cygwin.com/pipermail/cygwin/2021-April/248302.html
 
 - Fix path handling for paths spanning native symlinks.
@@ -25,3 +25,6 @@ Bug Fixes
 
 - Handle two race conditions in pseudo console usage.
   Addresses: https://cygwin.com/pipermail/cygwin/2021-April/248292.html
+
+- Fix a bug in recognizing a successful completion of connect(2) on a
+  datagram socket.
