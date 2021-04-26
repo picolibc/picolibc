@@ -264,11 +264,22 @@ void * nano_malloc(RARG malloc_size_t s)
         {
             if (rem >= MALLOC_MINCHUNK)
             {
-                /* Find a chunk that much larger than required size, break
-                * it into two chunks and return the second one */
-                r->size = rem;
-                r = (chunk *)((char *)r + rem);
-                r->size = alloc_size;
+                if (p == r)
+                {
+                    /* First item in the list, break it into two chunks
+                    *  and return the first one */
+                    r->size = alloc_size;
+                    free_list = (chunk *)((char *)r + alloc_size);
+                    free_list->size = rem;
+                    free_list->next = r->next;
+                } else {
+                    /* Any other item in the list. Split and return
+                    * the first one */
+                    r->size = alloc_size;
+                    p->next = (chunk *)((char *)r + alloc_size);
+                    p->next->size = rem;
+                    p->next->next = r->next;
+                }
             }
             /* Find a chunk that is exactly the size or slightly bigger
              * than requested size, just return this chunk */
@@ -297,11 +308,52 @@ void * nano_malloc(RARG malloc_size_t s)
         /* sbrk returns -1 if fail to allocate */
         if (r == (void *)-1)
         {
-            RERRNO = ENOMEM;
-            MALLOC_UNLOCK;
-            return NULL;
+            /* sbrk didn't have the requested amount. Let's check
+             * if the last item in the free list is adjacent to the
+             * current heap end (sbrk(0)). In that case, only ask
+             * for the difference in size and merge them */
+            p = free_list;
+            r = p;
+
+            while (r)
+            {
+                p=r;
+                r=r->next;
+            }
+
+            if ((char *)p + p->size == (char *)_SBRK_R(RCALL 0))
+            {
+               /* The last free item has the heap end as neighbour.
+                * Let's ask for a smaller amount and merge */
+               alloc_size -= p->size;
+               alloc_size = ALIGN_SIZE(alloc_size, CHUNK_ALIGN); /* size of aligned data load */
+               alloc_size += MALLOC_PADDING; /* padding */
+               alloc_size += CHUNK_OFFSET; /* size of chunk head */
+               alloc_size = MAX(alloc_size, MALLOC_MINCHUNK);
+
+               if (sbrk_aligned(RCALL alloc_size) != (void *)-1)
+               {
+                   p->size += alloc_size;
+                   r = p;
+               }
+               else
+               {
+                   RERRNO = ENOMEM;
+                   MALLOC_UNLOCK;
+                   return NULL;
+               }
+            }
+            else
+            {
+                RERRNO = ENOMEM;
+                MALLOC_UNLOCK;
+                return NULL;
+            }
         }
-        r->size = alloc_size;
+        else
+        {
+            r->size = alloc_size;
+        }
     }
     MALLOC_UNLOCK;
 
