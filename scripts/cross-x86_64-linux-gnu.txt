@@ -16,3 +16,4 @@ endian='little'
 [properties]
 skip_sanity_check = true
 needs_exe_wrapper = true
+link_spec = '--build-id=none'
