@@ -25,26 +25,29 @@ bin_PROGRAMS = \
 	strace
 
 cygcheck_SOURCES = \
-	../bloda.cc \
-	../cygcheck.cc \
-	../dump_setup.cc \
-	../path.cc
+	bloda.cc \
+	cygcheck.cc \
+	dump_setup.cc \
+	path.cc
+cygcheck_CPPFLAGS=-I$(srcdir)/..
 cygcheck_LDADD = -lz -lwininet -lpsapi -lntdll
 
-cygwin_console_helper_SOURCES = ../cygwin-console-helper.cc
+cygwin_console_helper_SOURCES = cygwin-console-helper.cc
 
-ldh_SOURCES = ../ldh.cc
+ldh_SOURCES = ldh.cc
 
 strace_SOURCES = \
-	../path.cc \
-	../strace.cc
+	path.cc \
+	strace.cc
+strace_CPPFLAGS=-I$(srcdir)/..
 strace_LDADD = -lntdll
 
 noinst_PROGRAMS = path-testsuite
 
 path_testsuite_SOURCES = \
-	../path.cc \
-	../testsuite.cc
+	path.cc \
+	testsuite.cc
+path_testsuite_CPPFLAGS=-I$(srcdir)/..
 path_testsuite_CXXFLAGS = -DTESTSUITE
 
 TESTS = path-testsuite
