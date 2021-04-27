@@ -32,7 +32,7 @@ details. */
 
 typedef void *HPCON;
 
-#include <devices.h>
+#include "devices.h"
 class tty_min
 {
   pid_t sid;	/* Session ID of tty */
