@@ -414,12 +414,12 @@ struct itimerval {
 #include <time.h>
 
 __BEGIN_DECLS
-int utimes (const char *__path, const struct timeval *__tvp);
+int utimes (const char *, const struct timeval [2]);
 
 #if __BSD_VISIBLE
 int adjtime (const struct timeval *, struct timeval *);
-int futimes (int, const struct timeval *);
-int lutimes (const char *, const struct timeval *);
+int futimes (int, const struct timeval [2]);
+int lutimes (const char *, const struct timeval [2]);
 int settimeofday (const struct timeval *, const struct timezone *);
 #endif
 
