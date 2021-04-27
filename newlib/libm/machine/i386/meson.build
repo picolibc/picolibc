@@ -64,7 +64,6 @@ srcs_libm_machine_real = [
 ]
 
 srcs_libm_machine = srcs_libm_machine_real + [
-  'fe_dfl_env.c',
   'feclearexcept.c',
   'fegetenv.c',
   'fegetexceptflag.c',

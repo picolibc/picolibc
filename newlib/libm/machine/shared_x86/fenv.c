@@ -452,8 +452,6 @@ fesetprec (int prec)
 static void
 _feinitialise (void)
 {
-  extern fenv_t __fe_dfl_env;
-
   /* Reset FPU: extended prec, all exceptions cleared and masked off.  */
   __asm__ volatile ("fninit");
   /* The default cw value, 0x37f, is rounding mode zero.  The MXCSR has
@@ -473,5 +471,5 @@ _feinitialise (void)
   fedisableexcept (FE_ALL_EXCEPT);
 
   /* Finally cache state as default environment. */
-  fegetenv (&__fe_dfl_env);
+  fegetenv (&_fe_dfl_env);
 }

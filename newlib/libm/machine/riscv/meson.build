@@ -35,7 +35,6 @@
 srcs_libm_machine = [
   'e_sqrt.c',
   'ef_sqrt.c',
-  'fe_dfl_env.c',
   'feclearexcept.c',
   'fegetenv.c',
   'fegetexceptflag.c',

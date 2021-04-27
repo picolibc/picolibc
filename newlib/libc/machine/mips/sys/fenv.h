@@ -69,8 +69,8 @@ typedef	int	fexcept_t;
 
 
 /* Default floating-point environment */
-extern const fenv_t	*_fe_dfl_env;
-#define	FE_DFL_ENV	(_fe_dfl_env)
+extern fenv_t		_fe_dfl_env;
+#define	FE_DFL_ENV	((const fenv_t *) &_fe_dfl_env)
 
 /* We need to be able to map status flag positions to mask flag positions */
 #define	_ENABLE_SHIFT	5

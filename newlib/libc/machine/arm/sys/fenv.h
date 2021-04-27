@@ -63,8 +63,8 @@ typedef int fexcept_t;
 #define	FE_TOWARDZERO		0x00c00000
 
 /* Default floating-point environment */
-extern const fenv_t	*_fe_dfl_env;
-#define	FE_DFL_ENV	(_fe_dfl_env)
+extern fenv_t		_fe_dfl_env;
+#define	FE_DFL_ENV	((const fent_v *) &_fe_dfl_env)
 
 int feclearexcept(int);
 int fegetexceptflag(fexcept_t *, int);

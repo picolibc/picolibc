@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2020 Keith Packard, 
+# Copyright © 2021 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,10 +32,4 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-inc_sys_headers_machine = [
-  'fenv.h'
-]
-
-install_headers(inc_sys_headers_machine,
-		subdir:'sys'
-	       )
+subdir('sys')

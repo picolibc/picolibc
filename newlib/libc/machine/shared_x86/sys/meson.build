@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2020 Keith Packard, 
+# Copyright © 2021 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -39,3 +39,4 @@ inc_sys_headers_machine = [
 install_headers(inc_sys_headers_machine,
 		subdir:'sys'
 	       )
+
