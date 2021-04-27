@@ -1519,6 +1519,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  ftcprint (features1, 13, "avic");             /* virt int control */
 	  ftcprint (features1, 15, "v_vmsave_vmload");  /* virt vmsave vmload */
 	  ftcprint (features1, 16, "vgif");             /* virt glb int flag */
+	  ftcprint (features1, 20, "v_spec_ctrl");	/* virt spec ctrl support */
 /*	  ftcprint (features1, 28, "svme_addr_chk");  *//* secure vmexit addr check */
         }
 
@@ -1542,6 +1543,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  ftcprint (features1, 14, "avx512_vpopcntdq"); /* vec popcnt dw/qw */
 	  ftcprint (features1, 16, "la57");             /* 5 level paging */
 	  ftcprint (features1, 22, "rdpid");            /* rdpid instruction */
+	  ftcprint (features1, 24, "bus_lock_detect");	/* bus lock detect dbg excptn */
 	  ftcprint (features1, 25, "cldemote");         /* cldemote instr */
 	  ftcprint (features1, 27, "movdiri");          /* movdiri instr */
 	  ftcprint (features1, 28, "movdir64b");        /* movdir64b instr */
