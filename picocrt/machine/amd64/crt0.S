@@ -136,35 +136,35 @@ level3pt:
 	.balign	4096, 0
 level2pt:
 #define page1(base) \
-	((0x00000000000000E7) | ((base) << 21)),
+	((0x00000000000000E7) | ((base) << 21))
 #define page2(base) \
-	page1(base) \
+	page1(base), \
 	page1((base)+1)
 #define page4(base) \
-	page2(base) \
+	page2(base), \
 	page2((base)+2)
 #define page8(base) \
-	page4(base) \
+	page4(base), \
 	page4((base)+4)
 #define page16(base) \
-	page8(base) \
+	page8(base), \
 	page8((base)+8)
 #define page32(base) \
-	page16(base) \
+	page16(base), \
 	page16((base)+16)
 #define page32(base) \
-	page16(base) \
+	page16(base), \
 	page16((base)+16)
 #define page64(base) \
-	page32(base) \
+	page32(base), \
 	page32((base)+32)
 #define page128(base) \
-	page64(base) \
+	page64(base), \
 	page64((base)+64)
 #define page256(base) \
-	page128(base) \
+	page128(base), \
 	page128((base)+128)
 #define page512(base) \
-	page256(base) \
+	page256(base), \
 	page256((base)+256)
 	.quad page512(0)
