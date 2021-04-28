@@ -32,8 +32,8 @@ newlib_build=$(target_builddir)/newlib
 # installed there by newlib.
 #
 
-toollibdir=$(prefix)/$(target_alias)/lib
-toolincludedir=$(prefix)/$(target_alias)/include
+toollibdir=$(tooldir)/lib
+toolincludedir=$(tooldir)/include
 
 # Parameters used in building the cygwin.dll.
 
