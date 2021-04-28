@@ -6,15 +6,16 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "path.h"
+#include "../cygwin/include/cygwin/bits.h"
+#include "../cygwin/include/sys/mount.h"
+
 /* This file implements a test harness for the MinGW implementation of
    POSIX path translation in utils/path.cc.  This code is used by strace
    and cygcheck which cannot depend on the Cygwin DLL.  The tests below
    are a basic set of sanity checks for translating relative and
    absolute paths from POSIX form to Win32 form based on the contents of
    a mount table.  */
-
-/* Including this file should be a no-op if TESTSUITE is not defined.  */
-#ifdef TESTSUITE
 
 /* These definitions are common to both the testsuite mount table
    as well as the testsuite definitions themselves, so define them
@@ -26,9 +27,7 @@ details. */
    This is used in place of actually reading the host mount
    table from the registry for the duration of the testsuite.  This
    table should match the battery of tests below.  */
-
-#if defined(TESTSUITE_MOUNT_TABLE)
-static mnt_t mount_table[] = {
+static mnt_t test_mount_table[] = {
 /* native                 posix               flags */
  { (char*)TESTSUITE_ROOT,        (char*)"/",                MOUNT_SYSTEM},
  { (char*)"O:\\other",           (char*)"/otherdir",        MOUNT_SYSTEM},
@@ -39,12 +38,16 @@ static mnt_t mount_table[] = {
  { NULL,                  (char*)NULL,               0}
 };
 
+typedef struct
+  {
+    const char *cwd;    /* in win32 form, as if by GetCurrentDirectory */
+    const char *posix;  /* input */
+    const char *win32;  /* expected output */
+  } test_t;
 
 /* Define the main set of tests.  This is defined here instead of in
    testsuite.cc so that all test harness data is in one place and not
    spread over several files.  */
-
-#elif defined(TESTSUITE_TESTS)
 #define NO_CWD "N/A"
 static test_t testsuite_tests[] = {
  { NO_CWD,                     "/file.ext",              TESTSUITE_ROOT"\\file.ext" },
@@ -112,18 +115,3 @@ static test_t testsuite_tests[] = {
  { NO_CWD,                     "//server/share/foo/bar", "\\\\server\\share\\foo\\bar" },
  { NO_CWD,                     NULL,                     NULL }
 };
-
-#else
-
-/* Redirect calls to GetCurrentDirectory() to the testsuite instead.  */
-#ifdef GetCurrentDirectory
-#undef GetCurrentDirectory
-#endif
-#define GetCurrentDirectory testsuite_getcwd
-
-DWORD testsuite_getcwd (DWORD, LPSTR);
-
-#endif
-
-#endif /* TESTSUITE */
-

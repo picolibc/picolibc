@@ -25,7 +25,6 @@ details. */
 #include "../cygwin/include/sys/mount.h"
 #define _NOMNTENT_MACROS
 #include "../cygwin/include/mntent.h"
-#include "testsuite.h"
 #ifdef FSTAB_ONLY
 #include <sys/cygwin.h>
 #endif
@@ -255,14 +254,8 @@ readlink (HANDLE fh, char *path, size_t maxlen)
 }
 #endif /* !FSTAB_ONLY */
 
-#ifndef TESTSUITE
 mnt_t mount_table[255];
 int max_mount_entry;
-#else
-#  define TESTSUITE_MOUNT_TABLE
-#  include "testsuite.h"
-#  undef TESTSUITE_MOUNT_TABLE
-#endif
 
 inline void
 unconvert_slashes (char* name)
@@ -271,9 +264,6 @@ unconvert_slashes (char* name)
     *name++ = '\\';
 }
 
-/* These functions aren't called when defined(TESTSUITE) which results
-   in a compiler warning.  */
-#ifndef TESTSUITE
 inline char *
 skip_ws (char *in)
 {
@@ -555,11 +545,8 @@ from_fstab (bool user, PWCHAR path, PWCHAR path_end)
   CloseHandle (h);
 }
 #endif /* !FSTAB_ONLY */
-#endif /* !TESTSUITE */
 
 #ifndef FSTAB_ONLY
-
-#ifndef TESTSUITE
 static int
 mnt_sort (const void *a, const void *b)
 {
@@ -653,7 +640,11 @@ read_mounts ()
   from_fstab (true, path, path_end);
   qsort (mount_table, max_mount_entry, sizeof (mnt_t), mnt_sort);
 }
-#endif /* !defined(TESTSUITE) */
+
+#ifdef TESTSUITE
+#define read_mounts testsuite_read_mounts
+#endif
+
 
 /* Return non-zero if PATH1 is a prefix of PATH2.
    Both are assumed to be of the same path style and / vs \ usage.
@@ -757,6 +748,11 @@ concat (const char *s, ...)
   return vconcat (s, v);
 }
 
+#ifdef TESTSUITE
+#undef GetCurrentDirectory
+#define GetCurrentDirectory testsuite_getcwd
+#endif
+
 /* This is a helper function for when vcygpath is passed what appears
    to be a relative POSIX path.  We take a Win32 CWD (either as specified
    in 'cwd' or as retrieved with GetCurrentDirectory() if 'cwd' is NULL)
@@ -822,10 +818,9 @@ vcygpath (const char *cwd, const char *s, va_list v)
   size_t max_len = 0;
   mnt_t *m, *match = NULL;
 
-#ifndef TESTSUITE
   if (!max_mount_entry)
     read_mounts ();
-#endif
+
   char *path;
   if (s[0] == '.' && isslash (s[1]))
     s += 2;
@@ -912,10 +907,10 @@ extern "C" FILE *
 setmntent (const char *, const char *)
 {
   m = mount_table;
-#ifndef TESTSUITE
+
   if (!max_mount_entry)
     read_mounts ();
-#endif
+
   return NULL;
 }
 

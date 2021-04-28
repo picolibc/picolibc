@@ -15,21 +15,8 @@ details. */
 #include <unistd.h>
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#ifndef TESTSUITE
-#define TESTSUITE
-#endif
+#include "path.h"
 #include "testsuite.h"
-
-typedef struct
-  {
-    const char *cwd;    /* in win32 form, as if by GetCurrentDirectory */
-    const char *posix;  /* input */
-    const char *win32;  /* expected output */
-  } test_t;
-
-#define TESTSUITE_TESTS
-#include "testsuite.h"
-#undef TESTSUITE_TESTS
 
 static int curtest;
 
@@ -55,7 +42,21 @@ testsuite_getcwd (DWORD nBufferLength, LPSTR lpBuffer)
   return len;
 }
 
-extern char *cygpath (const char *s, ...);
+/*
+  A replacement for read_mounts that installs the test mount table
+ */
+void
+testsuite_read_mounts (void)
+{
+  int i;
+  for (i = 0; test_mount_table[i].posix; i++)
+    {
+      mount_table[i] = test_mount_table[i];
+    }
+  max_mount_entry = i;
+}
+
+WCHAR cygwin_dll_path[32768];
 
 int
 main (int argc, char **argv)
