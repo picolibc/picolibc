@@ -11,7 +11,7 @@
 # language in the same Makefile.
 
 override CXX = @MINGW_CXX@
-INCLUDES =
+AM_CPPFLAGS =
 
 include $(top_srcdir)/Makefile.am.common
 

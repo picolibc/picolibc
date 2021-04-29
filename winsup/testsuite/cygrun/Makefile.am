@@ -13,7 +13,7 @@
 # language in the same Makefile.
 
 override CC = @MINGW_CC@
-INCLUDES =
+AM_CPPFLAGS =
 
 noinst_PROGRAMS = cygrun
 
