@@ -677,12 +677,12 @@ rewriting the runtime library in question from specs...
 
 <para>First, you need to make sure you have the necessary build tools
 installed; you at least need <literal>gcc-g++</literal>,
-<literal>make</literal>, <literal>patch</literal>, <literal>perl</literal>,
+<literal>make</literal>, <literal>automake</literal>,
+<literal>autoconf</literal>, <literal>git</literal>, <literal>perl</literal>,
 <literal>gettext-devel</literal>, <literal>libiconv-devel</literal> and
-<literal>zlib-devel</literal>.  Installing <literal>git</literal> to fetch
-the sources from the
-<ulink url="https://cygwin.com/git/newlib-cygwin.git">source repository</ulink>
-helps, too.  If you change a certain core part of Cygwin, namely the layout
+<literal>zlib-devel</literal>.  Fetch the sources from the
+<ulink url="https://cygwin.com/git/newlib-cygwin.git">Cygwin GIT source repository</ulink>.
+If you change a certain core part of Cygwin, namely the layout
 of the Cygwin TLS area, you also have to install <literal>cocom</literal>.
 Building for 32-bit Cygwin also requires
 <literal>mingw64-i686-gcc-g++</literal> and <literal>mingw64-i686-zlib</literal>.
@@ -697,36 +697,49 @@ which requires the <literal>dblatex</literal>, <literal>docbook2X</literal>,
 documentation, see the README included in the <literal>cygwin-doc</literal> package.
 </para>
 
-<para>Next, get the Cygwin source.  Ideally, you should check out what you
-need from Git (<ulink url="https://cygwin.com/git.html"/>).  This is the
-<emphasis>preferred method</emphasis> for acquiring the sources.  Otherwise,
-if you are trying to duplicate a cygwin release then you should download the
-corresponding source package
+<para>Next, check out the Cygwin sources from the
+<ulink url="https://cygwin.com/git.html">Cygwin GIT source repository</ulink>).
+This is the <emphasis>preferred method</emphasis> for acquiring the sources.
+Otherwise, if you are trying to duplicate a cygwin release then you should
+download the corresponding source package
 (<literal>cygwin-x.y.z-n-src.tar.bz2</literal>). </para> 
 
 <para>You <emphasis>must</emphasis> build cygwin in a separate directory from
 the source, so create something like a <literal>build/</literal> directory.
-Assuming you checked out the source in <literal>/oss/src/</literal>, and you
-also want to install to the temporary location <literal>install</literal>:
+Assuming you checked out the source to
+<literal>/oss/src/newlib-cygwin/</literal>, and you want to install to the
+temporary location <literal>/oss/install/</literal>, these are the required
+steps to build Cygwin:
 </para>
 <screen>
-mkdir /oss/build
-mkdir /oss/install 
-cd build
-(/oss/src/configure --prefix=/oss/install -v; make) &gt;&amp; make.out
-make install &gt; install.log 2&gt;&amp;1
+$ mkdir -p /oss/src/newlib-cygwin/build    # create build dir
+$ mkdir -p /oss/install                    # create install dir
+$ cd /oss/src/newlib-cygwin/winsup         # chdir into Cygwin source dir and...
+$ ./autogen.sh                             # create config files
+$ cd /oss/src/newlib-cygwin/build          # chdir into build dir
+$                                          # create makefiles...
+$ /oss/src/newlib-cygwin/configure --prefix=/oss/install
+$ make                                     # build Cygwin
+$ make install                             # install Cygwin into install dir
 </screen>
 
 <para>
-If the build works, install everything <emphasis>except</emphasis> the dll (if
-you can).  Then, close down all cygwin programs (including bash windows,
-inetd, etc.), save your old dll, and copy the new dll to the correct
-place.  Then start up a bash window, or  run a cygwin program from the
-Windows command prompt, and see what happens.
+If the build worked, you can install everything you like into the currently
+running system, <emphasis>except</emphasis> the Cygwin DLL
+<command>cygwin1.dll</command> itself.  For installing the DLL, close down
+all Cygwin programs (including bash windows, any servers like
+<command>cygserver</command>, etc.), save your old dll, and copy the new dll
+to the correct place.  Then, for first testing, start up a Cygwin program
+from the Windows command prompt and see what happens.
 </para>
-<para>If you get the error "shared region is corrupted" it means that two
-different versions of cygwin1.dll are running on your machine at the
-same time. Remove all but one. 
+<para>If you get a lengthy error messages like
+<literal>"user shared memory version mismatch detected"</literal>, it's
+very likely a Cygwin process still running using the old DLL.  Kill it
+in Windows' Task Manager or <command>taskkill</command> and try again.
+If it's still not working, and if you're sure there's no older Cygwin
+process still running, it's probably a bug you introduced with your changes.
+From here on, you're on your own or discuss problems on the
+<ulink url="https://cygwin.com/lists.html">Cygwin-developers mailing list</ulink>.
 </para>
 </answer></qandaentry>
 
