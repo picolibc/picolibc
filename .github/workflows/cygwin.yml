@@ -46,3 +46,67 @@ jobs:
     - run: make -C build/*/newlib info man
     - run: make -C build install
     - run: make -C build/*/newlib install-info install-man
+
+  windows-build:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - pkgarch: x86_64
+        - pkgarch: i686
+    name: Windows native ${{ matrix.pkgarch }}
+
+    steps:
+    # checkout action uses the native git (we can avoid this messing up line
+    # endings, but this could still be dangerous e.g if we need symlinks in the
+    # repo)
+    - run: git config --global core.autocrlf input
+    - uses: actions/checkout@v2
+
+    # install cygwin and build tools
+    - name: Install Cygwin
+      uses: cygwin/cygwin-install-action@master
+      with:
+        platform: ${{ matrix.pkgarch }}
+        packages: >-
+          autoconf,
+          automake,
+          cocom,
+          dblatex,
+          dejagnu,
+          docbook-xml45,
+          docbook-xsl,
+          docbook2X,
+          gcc-g++,
+          gettext-devel,
+          libiconv,
+          libiconv-devel,
+          make,
+          mingw64-${{ matrix.pkgarch }}-gcc-g++,
+          mingw64-${{ matrix.pkgarch }}-zlib,
+          patch,
+          perl,
+          python38-lxml,
+          python38-ply,
+          texlive-collection-fontsrecommended,
+          texlive-collection-latexrecommended,
+          texlive-collection-pictures,
+          xmlto,
+          zlib-devel
+
+    # build
+    - name: Build Cygwin
+      run: >-
+        export PATH=/usr/bin:$(cygpath ${SYSTEMROOT})/system32 &&
+        mkdir build install &&
+        (cd winsup; ./autogen.sh) &&
+        cd build &&
+        ../configure --prefix=$(realpath $(pwd)/../install) -v &&
+        export MAKEFLAGS=-j$(ncores) &&
+        make &&
+        make install &&
+        (cd */newlib; make info man) &&
+        (cd */newlib; make install-info install-man) &&
+        (cd */winsup; test "${{ matrix.pkgarch }}" != 'x86_64' || make check || true)
+      shell: C:\cygwin\bin\bash.exe --noprofile --norc -eo pipefail '{0}'
