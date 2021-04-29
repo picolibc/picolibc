@@ -798,7 +798,7 @@ _mq_send (mqd_t mqd, const char *ptr, size_t len, unsigned int prio,
 	  set_errno (EBADF);
 	  __leave;
 	}
-      if (prio > MQ_PRIO_MAX)
+      if (prio >= MQ_PRIO_MAX)
 	{
 	  set_errno (EINVAL);
 	  __leave;
