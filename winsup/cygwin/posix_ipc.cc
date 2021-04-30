@@ -23,6 +23,8 @@ details. */
 #include <mqueue.h>
 #include <semaphore.h>
 
+extern "C" int ftruncate64 (int fd, off_t length);
+
 /* The prefix_len is the length of the path prefix ncluding trailing "/"
    (or "/sem." for semaphores) as well as the trailing NUL. */
 static struct
@@ -471,9 +473,7 @@ mq_open (const char *name, int oflag, ...)
 	  msgsize = MSGSIZE (attr->mq_msgsize);
 	  filesize = sizeof (struct mq_hdr)
 		     + (attr->mq_maxmsg * (sizeof (struct msg_hdr) + msgsize));
-	  if (lseek64 (fd, filesize - 1, SEEK_SET) == -1)
-	    __leave;
-	  if (write (fd, "", 1) == -1)
+	  if (ftruncate64 (fd, filesize) == -1)
 	    __leave;
 
 	  /* Memory map the file */
