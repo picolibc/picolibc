@@ -886,7 +886,6 @@ _mq_send (mqd_t mqd, const char *ptr, size_t len, unsigned int prio,
 	ipc_cond_signal (mqinfo->mqi_waitrecv);
       attr->mq_curmsgs++;
 
-      ipc_mutex_unlock (mqinfo->mqi_lock);
       ret = 0;
     }
   __except (EBADF) {}
@@ -986,8 +985,6 @@ _mq_receive (mqd_t mqd, char *ptr, size_t maxlen, unsigned int *priop,
       if (attr->mq_curmsgs == attr->mq_maxmsg)
 	ipc_cond_signal (mqinfo->mqi_waitsend);
       attr->mq_curmsgs--;
-
-      ipc_mutex_unlock (mqinfo->mqi_lock);
     }
   __except (EBADF) {}
   __endtry
