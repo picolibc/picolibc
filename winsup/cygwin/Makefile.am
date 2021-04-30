@@ -733,6 +733,7 @@ install-data-local: install-headers install-ldif
 install-libs:
 	@$(MKDIR_P) $(DESTDIR)$(bindir)
 	$(INSTALL_PROGRAM) $(TEST_DLL_NAME) $(DESTDIR)$(bindir)/$(DLL_NAME)
+	@$(MKDIR_P) $(DESTDIR)$(toollibdir)
 	(cd $(DESTDIR)$(toollibdir) && ln -sf $(LIB_NAME) libg.a)
 
 install-headers:
