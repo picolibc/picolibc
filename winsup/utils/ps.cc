@@ -21,7 +21,6 @@ details. */
 #include <cygwin/version.h>
 #include <ntdef.h>
 #include <ntdll.h>
-#include "loadlib.h"
 
 /* Maximum possible path length under NT.  There's no official define
    for that value.  Note that PATH_MAX is only 4K. */

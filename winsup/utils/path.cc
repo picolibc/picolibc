@@ -28,7 +28,6 @@ details. */
 #ifdef FSTAB_ONLY
 #include <sys/cygwin.h>
 #endif
-#include "loadlib.h"
 
 #ifndef FSTAB_ONLY
 /* Used when treating / and \ as equivalent. */

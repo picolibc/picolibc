@@ -12,7 +12,6 @@ details. */
 #include <windows.h>
 #define PSAPI_VERSION 1
 #include <psapi.h>
-#include "loadlib.h"
 
 /* Returns full name of Dll, which is loaded by hProcess at BaseAddress.
    Uses psapi.dll. */

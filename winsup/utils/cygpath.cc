@@ -29,7 +29,6 @@ details. */
 #include <ntdll.h>
 
 #include "wide_path.h"
-#include "loadlib.h"
 
 static char *prog_name;
 static char *file_arg, *output_arg;
