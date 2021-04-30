@@ -1920,7 +1920,7 @@ format_proc_swaps (void *, char *&destbuf)
     }
 
   bufptr += __small_sprintf (bufptr,
-			     "Filename\t\t\t\tType\t\tSize\tUsed\tPriority\n");
+			"Filename\t\t\t\tType\t\tSize\t\tUsed\t\tPriority\n");
 
   if (spi && NT_SUCCESS (status))
     {
@@ -1932,8 +1932,17 @@ format_proc_swaps (void *, char *&destbuf)
 	  used = (unsigned long long) spp->TotalUsed * wincap.page_size ();
 	  cygwin_conv_path (CCP_WIN_W_TO_POSIX, spp->FileName.Buffer,
 			    filename, NT_MAX_PATH);
-	  bufptr += sprintf (bufptr, "%-40s%-16s%-8llu%-8llu%-8d\n",
-			     filename, "file", total >> 10, used >> 10, 0);
+	  /* ensure space between fields for clarity */
+	  size_t tabo = strlen (filename) / 8;	/* offset tabs to space name */
+	  bufptr += sprintf (bufptr, "%s%s%s\t\t%llu%s\t%llu%s\t%d\n",
+				    filename,
+				    tabo < 5 ? "\t\t\t\t\t" + tabo : " ",
+					"file",
+					    total >> 10,
+					    total < 10000000000 ? "\t" : "",
+						used  >> 10,
+						used  < 10000000000 ? "\t" : "",
+								0);
 	}
       while (spp->NextEntryOffset
 	     && (spp = (PSYSTEM_PAGEFILE_INFORMATION)
