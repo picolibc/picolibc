@@ -55,15 +55,19 @@ xmlto,\
 python38-lxml,\
 python38-ply"
 
-build_script:
-- '%CYGWIN_ROOT%/bin/bash -lc "cd $APPVEYOR_BUILD_FOLDER; mkdir build install"'
-- '%CYGWIN_ROOT%/bin/bash -lc "cd $APPVEYOR_BUILD_FOLDER; cd winsup; ./autogen.sh"'
-- '%CYGWIN_ROOT%/bin/bash -lc "cd $APPVEYOR_BUILD_FOLDER/build; ../configure --prefix=$(realpath $(pwd)/../install) -v"'
-- '%CYGWIN_ROOT%/bin/bash -lc "cd $APPVEYOR_BUILD_FOLDER/build; make"'
-- '%CYGWIN_ROOT%/bin/bash -lc "cd $APPVEYOR_BUILD_FOLDER/build; make install"'
-- '%CYGWIN_ROOT%/bin/bash -lc "cd $APPVEYOR_BUILD_FOLDER/build; cd */newlib; make info man"'
-- '%CYGWIN_ROOT%/bin/bash -lc "cd $APPVEYOR_BUILD_FOLDER/build; cd */newlib; make install-info install-man"'
-- '%CYGWIN_ROOT%/bin/bash -lc "cd $APPVEYOR_BUILD_FOLDER/build; cd */winsup; make check || true"'
+build_script: >-
+    %CYGWIN_ROOT%/bin/bash -lc "
+    cd $APPVEYOR_BUILD_FOLDER &&
+    mkdir build install &&
+    (cd winsup; ./autogen.sh) &&
+    cd build &&
+    ../configure --prefix=$(realpath $(pwd)/../install) -v &&
+    export MAKEFLAGS=-j$(nproc) &&
+    make &&
+    make install &&
+    (cd */newlib; make info man) &&
+    (cd */newlib; make install-info install-man) &&
+    (cd */winsup; test "${BUILD}" != 'x86_64-pc-cygwin' || make check || true)"
 
 test: off
 deploy: off
