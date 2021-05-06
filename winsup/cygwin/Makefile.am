@@ -8,7 +8,7 @@
 
 # This makefile requires GNU make.
 
-#AUTOMAKE_OPTIONS=-Wno-override
+AUTOMAKE_OPTIONS=-Wno-override
 
 include $(top_srcdir)/Makefile.am.common
 
@@ -24,10 +24,6 @@ if TARGET_X86_64
 # Needed by mcountFunc.S to choose the right code path and symbol names
 AM_CCASFLAGS=-D_WIN64
 endif
-
-AM_CTAGSFLAGS=-R -f $(srcdir)/tags --c++-kinds=+p --fields=+iaS --extra=+q \
-	--regex-C++='/EXPORT_ALIAS *\([a-zA-Z0-9_]*, *([a-zA-Z0-9_]*)\)/\1/' \
-	--regex-C++='/__ASMNAME *\("([a-zA-Z0-9_]+)"\)/\1/'
 
 target_builddir=@target_builddir@
 newlib_build=$(target_builddir)/newlib
@@ -776,11 +772,11 @@ uninstall-headers:
 uninstall-ldif:
 	rm -f $(DESTDIR)$(datarootdir)/cygwin/cygwin.ldif
 
-#ctags: CTAGS
-#tags:  CTAGS
-#CTAGS:
-#	-cd $(srcdir) && \
-#	ctags -R --c++-kinds=+p --fields=+iaS --extra=+q \
-#	--regex-C++='/EXPORT_ALIAS *\([a-zA-Z0-9_]*, *([a-zA-Z0-9_]*)\)/\1/' \
-#	--regex-C++='/__ASMNAME *\("([a-zA-Z0-9_]+)"\)/\1/' \
-#	.
+ctags: CTAGS
+tags:  CTAGS
+CTAGS:
+	-cd $(srcdir) && \
+	ctags -R --c++-kinds=+p --fields=+iaS --extra=+q \
+	--regex-C++='/EXPORT_ALIAS *\([a-zA-Z0-9_]*, *([a-zA-Z0-9_]*)\)/\1/' \
+	--regex-C++='/__ASMNAME *\("([a-zA-Z0-9_]+)"\)/\1/' \
+	.
