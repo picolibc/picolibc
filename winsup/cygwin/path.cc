@@ -1010,17 +1010,25 @@ path_conv::check (const char *src, unsigned opt,
 		    }
 		  goto out;	// file found
 		}
-	      /* Found a symlink if symlen > 0.  If component == 0, then the
-		 src path itself was a symlink.  If !follow_mode then
-		 we're done.  Otherwise we have to insert the path found
-		 into the full path that we are building and perform all of
-		 these operations again on the newly derived path. */
-	      else if (symlen > 0)
+	      /* Found a symlink if symlen > 0 or short-circuited a native
+		 symlink or junction point if symlen < 0.
+		 If symlen > 0 and component == 0, then the src path itself
+		 was a symlink.  If !follow_mode then we're done.  Otherwise
+		 we have to insert the path found into the full path that we
+		 are building and perform all of these operations again on the
+		 newly derived path. */
+	      else if (symlen)
 		{
-		  if (component == 0
-		      && (!(opt & PC_SYM_FOLLOW)
-			  || (is_winapi_reparse_point ()
-			      && (opt & PC_SYM_NOFOLLOW_REP))))
+		  /* if symlen is negativ, the actual native symlink or
+		      junction point is an inner path component.  Just fix up
+		      symlen to be positive and don't try any PC_SYM_FOLLOW
+		      handling. */
+		  if (symlen < 0)
+		    symlen = -symlen;
+		  else if (component == 0
+			   && (!(opt & PC_SYM_FOLLOW)
+			       || (is_winapi_reparse_point ()
+				   && (opt & PC_SYM_NOFOLLOW_REP))))
 		    {
 		      /* Usually a trailing slash requires to follow a symlink,
 			 even with PC_SYM_NOFOLLOW.  The reason is that "foo/"
@@ -3179,58 +3187,6 @@ restart:
 	  status = conv_hdl.get_finfo (h, fs.is_nfs ());
 	  if (NT_SUCCESS (status))
 	    fileattr = conv_hdl.get_dosattr (fs.is_nfs ());
-
-	  /* For local paths, check if the inner path components contain
-	     native symlinks or junctions.  Compare incoming path with
-	     path returned by NtQueryInformationFile(FileNameInformation).
-	     If they differ, bail out as if the file doesn't exist.  This
-	     forces path_conv::check to backtrack inner path components. */
-	  if (!fs.is_remote_drive ())
-	    {
-#ifdef __i386__
-	      /* On WOW64, ignore any potential problems if the path is inside
-		 the Windows dir to avoid false positives for stuff under
-		 File System Redirector control. */
-	      if (wincap.is_wow64 ())
-		{
-		  static UNICODE_STRING wpath;
-		  UNICODE_STRING udpath;
-
-		  /* Create UNICODE_STRING for Windows dir. */
-		  RtlInitCountedUnicodeString (&wpath, windows_directory,
-				windows_directory_length * sizeof (WCHAR));
-		  /* Create a UNICODE_STRING from incoming path, splitting
-		     off the leading "\\??\\" */
-		  RtlInitCountedUnicodeString (&udpath, upath.Buffer + 4,
-				upath.Length - 4 * sizeof (WCHAR));
-		  /* Are we below Windows dir?  Skip the check for inner
-		     symlinks. */
-		  if (RtlEqualUnicodePathPrefix (&udpath, &wpath, TRUE))
-		    goto skip_inner_syml_check;
-		}
-#endif /* __i386__ */
-	      PFILE_NAME_INFORMATION pfni;
-
-	      pfni = (PFILE_NAME_INFORMATION) tp.c_get ();
-	      if (NT_SUCCESS (NtQueryInformationFile (h, &io, pfni, NT_MAX_PATH,
-						      FileNameInformation)))
-		{
-		  UNICODE_STRING npath;
-
-		  RtlInitCountedUnicodeString (&npath, pfni->FileName,
-					      pfni->FileNameLength);
-		  if (!RtlEqualUnicodePathSuffix (&upath, &npath, !!ci_flag))
-		    {
-		      fileattr = INVALID_FILE_ATTRIBUTES;
-		      set_error (ENOENT);
-		      break;
-		    }
-		}
-#ifdef __i386__
-	      skip_inner_syml_check:
-	        ;
-#endif /* __i386__ */
-	    }
 	}
       if (!NT_SUCCESS (status))
 	{
@@ -3485,6 +3441,85 @@ restart:
 	  if (res)
 	    break;
 	}
+
+      /* Check if the inner path components contain native symlinks or
+	 junctions, or if the drive is a virtual drive.  Compare incoming
+	 path with path returned by GetFinalPathNameByHandleA.  If they
+	 differ, return the final path as symlink content and set symlen
+	 to a negative value.  This forces path_conv::check to restart
+	 symlink evaluation with the new path. */
+#ifdef __i386__
+      /* On WOW64, ignore any potential problems if the path is inside
+	 the Windows dir to avoid false positives for stuff under File
+	 System Redirector control.  Believe it or not, but even
+	 GetFinalPathNameByHandleA returns the converted path for the
+	 Sysnative dir.  I. e.
+
+	     C:\Windows\Sysnative --> C:\Windows\System32
+
+	 This is obviously wrong when using this path for further
+	 file manipulation because the non-final path points to another
+	 file than the final path.  Oh well... */
+      if (!fs.is_remote_drive () && wincap.is_wow64 ())
+	{
+	  static UNICODE_STRING wpath;
+	  UNICODE_STRING udpath;
+
+	  /* Create UNICODE_STRING for Windows dir. */
+	  RtlInitCountedUnicodeString (&wpath, windows_directory,
+			windows_directory_length * sizeof (WCHAR));
+	  /* Create a UNICODE_STRING from incoming path, splitting
+	     off the leading "\\??\\" */
+	  RtlInitCountedUnicodeString (&udpath, upath.Buffer + 4,
+			upath.Length - 4 * sizeof (WCHAR));
+	  /* Are we below Windows dir?  Skip the check for inner
+	     symlinks. */
+	  if (RtlEqualUnicodePathPrefix (&udpath, &wpath, TRUE))
+	    goto file_not_symlink;
+	}
+#endif /* __i386__ */
+      {
+	PWCHAR fpbuf = tp.w_get ();
+	DWORD ret;
+
+	ret = GetFinalPathNameByHandleW (h, fpbuf, NT_MAX_PATH, 0);
+	if (ret)
+	  {
+	    UNICODE_STRING fpath;
+
+	    RtlInitCountedUnicodeString (&fpath, fpbuf, ret * sizeof (WCHAR));
+	    fpbuf[1] = L'?';	/* \\?\ --> \??\ */
+	    if (!RtlEqualUnicodeString (&upath, &fpath, !!ci_flag))
+	      {
+		issymlink = true;
+		/* upath.Buffer is big enough and unused from this point on.
+		   Reuse it here, avoiding yet another buffer allocation. */
+		char *nfpath = (char *) upath.Buffer;
+		sys_wcstombs (nfpath, NT_MAX_PATH, fpbuf);
+		res = posixify (nfpath);
+
+		/* If the incoming path consisted of a drive prefix only,
+		   we just handle a virtual drive, created with, e.g.
+
+		     subst X: C:\foo\bar
+
+		   Treat it like a symlink.  This is required to tell an
+		   lstat caller that the "drive" is actually pointing
+		   somewhere else, thus, it's a symlink in POSIX speak. */
+		if (upath.Length == 14)	/* \??\X:\ */
+		  {
+		    fileattr &= ~FILE_ATTRIBUTE_DIRECTORY;
+		    path_flags |= PATH_SYMLINK;
+		  }
+		/* For final paths differing in inner path components return
+		   length as negative value.  This informs path_conv::check
+		   to skip realpath handling on the last path component. */
+		else
+		  res = -res;
+		break;
+	      }
+	  }
+      }
 
     /* Normal file. */
     file_not_symlink:
