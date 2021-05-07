@@ -23,12 +23,12 @@ HMODULE NO_COPY hntdll;
 int NO_COPY sigExeced;
 WCHAR windows_system_directory[MAX_PATH];
 UINT windows_system_directory_length;
-#ifdef __i386__
 WCHAR system_wow64_directory[MAX_PATH];
 UINT system_wow64_directory_length;
-WCHAR windows_directory[MAX_PATH];
+WCHAR windows_directory_buf[MAX_PATH];
+PWCHAR windows_directory = windows_directory_buf + 4;
 UINT windows_directory_length;
-#endif /* __i386__ */
+UNICODE_STRING windows_directory_path;
 WCHAR global_progname[NT_MAX_PATH];
 
 /* program exit the program */

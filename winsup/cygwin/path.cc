@@ -3462,19 +3462,11 @@ restart:
 	 file than the final path.  Oh well... */
       if (!fs.is_remote_drive () && wincap.is_wow64 ())
 	{
-	  static UNICODE_STRING wpath;
-	  UNICODE_STRING udpath;
-
-	  /* Create UNICODE_STRING for Windows dir. */
-	  RtlInitCountedUnicodeString (&wpath, windows_directory,
-			windows_directory_length * sizeof (WCHAR));
-	  /* Create a UNICODE_STRING from incoming path, splitting
-	     off the leading "\\??\\" */
-	  RtlInitCountedUnicodeString (&udpath, upath.Buffer + 4,
-			upath.Length - 4 * sizeof (WCHAR));
-	  /* Are we below Windows dir?  Skip the check for inner
-	     symlinks. */
-	  if (RtlEqualUnicodePathPrefix (&udpath, &wpath, TRUE))
+	  /* windows_directory_path is stored without trailing backslash,
+	     so we have to check this explicitely. */
+	  if (RtlEqualUnicodePathPrefix (&upath, &windows_directory_path, TRUE)
+	      && upath.Buffer[windows_directory_path.Length / sizeof (WCHAR)]
+		 == L'\\')
 	    goto file_not_symlink;
 	}
 #endif /* __i386__ */

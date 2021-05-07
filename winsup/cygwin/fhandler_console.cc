@@ -112,12 +112,11 @@ beep ()
 	     L"Apps", L".Default", L".Default", L".Current", NULL);
   if (r.created ())
     {
-      PWCHAR buf = NULL;
-      UINT len = GetSystemWindowsDirectoryW (buf, 0) * sizeof (WCHAR);
-      buf = (PWCHAR) alloca (len += sizeof (ding));
-      UINT res = GetSystemWindowsDirectoryW (buf, len);
-      if (res && res <= len)
-	r.set_string (L"", wcscat (buf, ding));
+      tmp_pathbuf tp;
+
+      PWCHAR ding_path = tp.w_get ();
+      wcpcpy (wcpcpy (ding_path, windows_directory), ding);
+      r.set_string (L"", ding_path);
     }
   MessageBeep (MB_OK);
 }

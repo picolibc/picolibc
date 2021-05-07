@@ -564,18 +564,7 @@ const char *
 cygheap_user::env_systemroot (const char *name, size_t namelen)
 {
   if (!psystemroot)
-    {
-      int size = GetSystemWindowsDirectoryW (NULL, 0);
-      if (size > 0)
-	{
-	  WCHAR wsystemroot[size];
-	  size = GetSystemWindowsDirectoryW (wsystemroot, size);
-	  if (size > 0)
-	    sys_wcstombs_alloc (&psystemroot, HEAP_STR, wsystemroot);
-	}
-      if (size <= 0)
-	debug_printf ("GetSystemWindowsDirectoryW(), %E");
-    }
+    sys_wcstombs_alloc (&psystemroot, HEAP_STR, windows_directory);
   return psystemroot;
 }
 
