@@ -21,11 +21,11 @@ details. */
 #include <time.h>
 #include <signal.h>
 #include <errno.h>
-#include "../../cygwin/include/sys/strace.h"
-#include "../../cygwin/include/sys/cygwin.h"
-#include "../../cygwin/include/cygwin/version.h"
-#include "../../cygwin/cygtls_padsize.h"
-#include "../../cygwin/gcc_seh.h"
+#include "sys/strace.h"
+#include "sys/cygwin.h"
+#include "cygwin/version.h"
+#include "cygtls_padsize.h"
+#include "gcc_seh.h"
 #include "path.h"
 #undef cygwin_internal
 #include "loadlib.h"
