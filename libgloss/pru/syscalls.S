@@ -32,6 +32,7 @@
 	.extern _impure_ptr
 
 	/* Handle return from syscall.  */
+	.section .text.__SC_ret, "ax"
 	.global	__SC_ret
 	.type	__SC_ret,@function
 	.func
@@ -52,6 +53,7 @@ __SC_ret_skip_errno_set:
 	.endfunc
 
 .macro	SC	fname, id
+	.section .text.\fname, "ax"
 	.global	\fname
 	.type	\fname,@function
 	.func
@@ -61,8 +63,6 @@ __SC_ret_skip_errno_set:
 	jmp	__SC_ret
 	.endfunc
 .endm
-
-	.text
 
 	/* Syscalls are used only by simulator.  Real HW
 	   users use other methods for communicating with
