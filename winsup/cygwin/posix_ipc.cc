@@ -410,6 +410,31 @@ struct mq_attr defattr = { 0, 10, 8192, 0 };	/* Linux defaults. */
 extern "C" off_t lseek64 (int, off_t, int);
 extern "C" void *mmap64 (void *, size_t, int, int, int, off_t);
 
+static inline int
+_mq_ipc_init (struct mq_info *mqinfo, const char *name)
+{
+  int ret;
+
+  /* Initialize mutex & condition variable */
+  ret = ipc_mutex_init (&mqinfo->mqi_lock, name);
+  if (ret)
+    return ret;
+  ret = ipc_cond_init (&mqinfo->mqi_waitsend, name, 'S');
+  if (ret)
+    {
+      ipc_mutex_close (mqinfo->mqi_lock);
+      return ret;
+    }
+  ret = ipc_cond_init (&mqinfo->mqi_waitrecv, name, 'R');
+  if (ret)
+    {
+      ipc_cond_close (mqinfo->mqi_waitsend);
+      ipc_mutex_close (mqinfo->mqi_lock);
+      return ret;
+    }
+  return 0;
+}
+
 extern "C" mqd_t
 mq_open (const char *name, int oflag, ...)
 {
@@ -517,19 +542,7 @@ mq_open (const char *name, int oflag, ...)
 	  msghdr->msg_next = 0;		/* end of free list */
 
 	  /* Initialize mutex & condition variables */
-	  i = ipc_mutex_init (&mqinfo->mqi_lock, mqhdr->mqh_uname);
-	  if (i != 0)
-	    {
-	      set_errno (i);
-	      __leave;
-	    }
-	  i = ipc_cond_init (&mqinfo->mqi_waitsend, mqhdr->mqh_uname, 'S');
-	  if (i != 0)
-	    {
-	      set_errno (i);
-	      __leave;
-	    }
-	  i = ipc_cond_init (&mqinfo->mqi_waitrecv, mqhdr->mqh_uname, 'R');
+	  i = _mq_ipc_init (mqinfo, mqhdr->mqh_uname);
 	  if (i != 0)
 	    {
 	      set_errno (i);
@@ -598,19 +611,7 @@ mq_open (const char *name, int oflag, ...)
       mqinfo->mqi_flags = nonblock;
 
       /* Initialize mutex & condition variable */
-      i = ipc_mutex_init (&mqinfo->mqi_lock, mqhdr->mqh_uname);
-      if (i != 0)
-	{
-	  set_errno (i);
-	  __leave;
-	}
-      i = ipc_cond_init (&mqinfo->mqi_waitsend, mqhdr->mqh_uname, 'S');
-      if (i != 0)
-	{
-	  set_errno (i);
-	  __leave;
-	}
-      i = ipc_cond_init (&mqinfo->mqi_waitrecv, mqhdr->mqh_uname, 'R');
+      i = _mq_ipc_init (mqinfo, mqhdr->mqh_uname);
       if (i != 0)
 	{
 	  set_errno (i);
