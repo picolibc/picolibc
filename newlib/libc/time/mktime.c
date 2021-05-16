@@ -27,6 +27,7 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  * represented, returns the value (time_t) -1.
  *
  * Modifications:	Fixed tm_isdst usage - 27 August 2008 Craig Howland.
+ * 			Added timegm - 15 May 2021 R. Diez.
  */
 
 /*
@@ -76,6 +77,13 @@ static const int _DAYS_BEFORE_MONTH[12] =
 
 #define _ISLEAP(y) (((y) % 4) == 0 && (((y) % 100) != 0 || (((y)+1900) % 400) == 0))
 #define _DAYS_IN_YEAR(year) (_ISLEAP(year) ? 366 : 365)
+
+static void
+set_tm_wday (long days, struct tm *tim_p)
+{
+  if ((tim_p->tm_wday = (days + 4) % 7) < 0)
+    tim_p->tm_wday += 7;
+}
 
 static void 
 validate_structure (struct tm *tim_p)
@@ -163,13 +171,12 @@ validate_structure (struct tm *tim_p)
     }
 }
 
-time_t 
-mktime (struct tm *tim_p)
+static time_t
+mktime_utc (struct tm *tim_p, long *days_p)
 {
   time_t tim = 0;
   long days = 0;
-  int year, isdst=0;
-  __tzinfo_type *tz = __gettzinfo ();
+  int year;
 
   /* validate structure */
   validate_structure (tim_p);
@@ -205,6 +212,28 @@ mktime (struct tm *tim_p)
 
   /* compute total seconds */
   tim += (time_t)days * _SEC_IN_DAY;
+
+  *days_p = days;
+  return tim;
+}
+
+time_t
+mktime (struct tm *tim_p)
+{
+  long days;
+  time_t tim;
+  int year;
+  int isdst=0;
+  __tzinfo_type *tz;
+
+  tim = mktime_utc (tim_p, &days);
+
+  if (tim == (time_t) -1)
+    return tim;
+
+  year = tim_p->tm_year;
+
+  tz = __gettzinfo ();
 
   TZ_LOCK;
 
@@ -290,9 +319,24 @@ mktime (struct tm *tim_p)
   /* reset isdst flag to what we have calculated */
   tim_p->tm_isdst = isdst;
 
-  /* compute day of the week */
-  if ((tim_p->tm_wday = (days + 4) % 7) < 0)
-    tim_p->tm_wday += 7;
+  set_tm_wday(days, tim_p);
 	
+  return tim;
+}
+
+time_t
+timegm (struct tm *tim_p)
+{
+  long days;
+  time_t tim = mktime_utc (tim_p, &days);
+
+  if (tim == (time_t) -1)
+    return tim;
+
+  /* The time is always UTC, so there is no daylight saving time. */
+  tim_p->tm_isdst = 0;
+
+  set_tm_wday(days, tim_p);
+
   return tim;
 }
