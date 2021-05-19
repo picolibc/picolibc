@@ -587,6 +587,7 @@ LoadDLLfuncEx (GetLogicalProcessorInformationEx, 12, kernel32, 1)
 LoadDLLfuncEx (GetProcessGroupAffinity, 12, kernel32, 1)
 LoadDLLfunc (GetSystemTimePreciseAsFileTime, 4, kernel32)
 LoadDLLfuncEx (GetThreadGroupAffinity, 8, kernel32, 1)
+LoadDLLfuncEx (IsWow64Process2, 12, kernel32, 1)
 LoadDLLfuncEx (PrefetchVirtualMemory, 16, kernel32, 1)
 LoadDLLfunc (SetThreadGroupAffinity, 12, kernel32)
 

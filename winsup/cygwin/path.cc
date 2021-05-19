@@ -4702,30 +4702,15 @@ find_fast_cwd ()
   if (!f_cwd_ptr)
     {
       bool warn = 1;
+      USHORT emulated, hosted;
 
-#ifndef __x86_64__
-      #ifndef PROCESSOR_ARCHITECTURE_ARM64
-      #define PROCESSOR_ARCHITECTURE_ARM64 12
-      #endif
-
-      SYSTEM_INFO si;
-
-      /* Check if we're running in WOW64 on ARM64.  Skip the warning as long as
-	 there's no solution for finding the FAST_CWD pointer on that system.
-
-	 2018-07-12: Apparently current ARM64 WOW64 has a bug:
-	 It's GetNativeSystemInfo returns PROCESSOR_ARCHITECTURE_INTEL in
-	 wProcessorArchitecture.  Since that's an invalid value (a 32 bit
-	 host system hosting a 32 bit emulator for itself?) we can use this
-	 value as an indicator to skip the message as well. */
-      if (wincap.is_wow64 ())
-	{
-	  GetNativeSystemInfo (&si);
-	  if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_ARM64
-	      || si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL)
-	    warn = 0;
-	}
-#endif /* !__x86_64__ */
+      /* Check if we're running in WOW64 on ARM64.  Check on 64 bit as well,
+	 given that ARM64 Windows 10 provides a x86_64 emulation soon.  Skip
+	 warning as long as there's no solution for finding the FAST_CWD
+	 pointer on that system. */
+      if (IsWow64Process2 (GetCurrentProcess (), &emulated, &hosted)
+	  && hosted == IMAGE_FILE_MACHINE_ARM64)
+	warn = 0;
 
       if (warn)
 	small_printf ("Cygwin WARNING:\n"
