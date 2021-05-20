@@ -56,7 +56,6 @@ struct option longopts[] =
 const char *opts = "dhruvV";
 
 static int process_file (const wchar_t *);
-static void *drive_map;
 
 static int
 error (const char *fmt, ...)
@@ -153,32 +152,6 @@ get_module_filename (HANDLE hp, HMODULE hm)
       buf = NULL;
     }
   return buf;
-}
-
-static BOOL
-GetFileNameFromHandle(HANDLE hFile, WCHAR pszFilename[MAX_PATH+1])
-{
-  BOOL result = FALSE;
-  ULONG len = 0;
-  OBJECT_NAME_INFORMATION *ntfn = (OBJECT_NAME_INFORMATION *) alloca (65536);
-  NTSTATUS status = NtQueryObject (hFile, ObjectNameInformation,
-                                   ntfn, 65536, &len);
-  if (NT_SUCCESS (status))
-    {
-      PWCHAR win32path = ntfn->Name.Buffer;
-      win32path[ntfn->Name.Length / sizeof (WCHAR)] = L'\0';
-
-      /* NtQueryObject returns a native NT path.  (Try to) convert to Win32. */
-      if (!drive_map)
-	 drive_map = (void *) cygwin_internal (CW_ALLOC_DRIVE_MAP);
-      if (drive_map)
-        win32path = (PWCHAR) cygwin_internal (CW_MAP_DRIVE_MAP, drive_map,
-                                              win32path);
-      pszFilename[0] = L'\0';
-      wcsncat (pszFilename, win32path, MAX_PATH);
-      result = TRUE;
-    }
-  return result;
 }
 
 static wchar_t *
@@ -288,8 +261,8 @@ print_dlls (dlls *dll, const wchar_t *dllfn, const wchar_t *process_fn)
       if (!fullpath)
 	{
 	  // if no path found yet, try getting it from an open handle to the DLL
-	  wchar_t dllname[MAX_PATH+1];
-	  if (GetFileNameFromHandle (dll->hFile, dllname))
+	  wchar_t dllname[PATH_MAX];
+	  if (GetFinalPathNameByHandleW (dll->hFile, dllname, PATH_MAX, 0))
 	    {
 	      fn = tocyg (dllname);
 	      saw_file (basename (fn));
@@ -465,8 +438,6 @@ main (int argc, char **argv)
   while ((fn = *argv++))
     if (report (fn, multiple))
       ret = 1;
-  if (drive_map)
-    cygwin_internal (CW_FREE_DRIVE_MAP, drive_map);
   exit (ret);
 }
 
