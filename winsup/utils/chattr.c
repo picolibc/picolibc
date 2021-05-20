@@ -320,12 +320,9 @@ next:
   if (sanity_check ())
     return 1;
   if (optind > argc - 1)
-    {
-      chattr (".");
-      if (Ropt)
-	chattr_dir (".");
-    }
-  else for (; optind < argc; ++optind)
+    usage (stderr);
+
+  for (; optind < argc; ++optind)
     {
       struct stat st;
 
