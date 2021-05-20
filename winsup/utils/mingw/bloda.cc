@@ -13,6 +13,7 @@
 			   ntstatus.h for extended status codes below. */
 #include <windows.h>
 #undef WIN32_NO_STATUS
+#define PSAPI_VERSION 1
 #include <psapi.h>
 #include <winternl.h>
 #include <ntstatus.h>

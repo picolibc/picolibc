@@ -14,7 +14,6 @@ details. */
 #include <unistd.h>
 #include <sys/param.h>
 #include "pinfo.h"
-#include "psapi.h"
 #include "cygtls.h"
 #include "path.h"
 #include "fhandler.h"

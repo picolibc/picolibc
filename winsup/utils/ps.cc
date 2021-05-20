@@ -19,7 +19,6 @@ details. */
 #include <limits.h>
 #include <sys/cygwin.h>
 #include <cygwin/version.h>
-#include <psapi.h>
 #include <ntdef.h>
 #include <ntdll.h>
 #include "loadlib.h"

@@ -37,10 +37,10 @@
 #include <unistd.h>
 #include <libgen.h>
 
-#define PSAPI_VERSION 1
 #include <windows.h>
 #include <winternl.h>
 #include <imagehlp.h>
+#define PSAPI_VERSION 1
 #include <psapi.h>
 
 struct option longopts[] =
