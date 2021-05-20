@@ -547,6 +547,9 @@ from_fstab (bool user, PWCHAR path, PWCHAR path_end)
 #endif /* !FSTAB_ONLY */
 
 #ifndef FSTAB_ONLY
+#ifdef TESTSUITE
+#define read_mounts testsuite_read_mounts
+#else
 static int
 mnt_sort (const void *a, const void *b)
 {
@@ -640,11 +643,7 @@ read_mounts ()
   from_fstab (true, path, path_end);
   qsort (mount_table, max_mount_entry, sizeof (mnt_t), mnt_sort);
 }
-
-#ifdef TESTSUITE
-#define read_mounts testsuite_read_mounts
 #endif
-
 
 /* Return non-zero if PATH1 is a prefix of PATH2.
    Both are assumed to be of the same path style and / vs \ usage.
