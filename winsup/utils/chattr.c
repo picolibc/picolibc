@@ -28,12 +28,12 @@ struct option longopts[] = {
   { "recursive", no_argument, NULL, 'R' },
   { "verbose", no_argument, NULL, 'V' },
   { "force", no_argument, NULL, 'f' },
-  { "help", no_argument, NULL, 'h' },
+  { "help", no_argument, NULL, 'H' },
   { "version", no_argument, NULL, 'v' },
   { NULL, no_argument, NULL, 0}
 };
 
-const char *opts = "+RVfhv";
+const char *opts = "+RVfHv";
 
 struct
 {
@@ -211,7 +211,7 @@ static void
 print_version ()
 {
   printf ("%s (cygwin) %d.%d.%d\n"
-	  "Get POSIX ACL information\n"
+	  "Change file attributes\n"
 	  "Copyright (C) 2018 - %s Cygwin Authors\n"
 	  "This is free software; see the source for copying conditions.  "
 	  "There is NO\n"
@@ -227,7 +227,7 @@ print_version ()
 static void __attribute__ ((__noreturn__))
 usage (FILE *stream)
 {
-  fprintf (stream, "Usage: %s [-RVfhv] [+-=mode]... [file]...\n",
+  fprintf (stream, "Usage: %s [-RVfHv] [+-=mode]... [file]...\n",
 	   program_invocation_short_name);
   if (stream == stderr)
     fprintf (stream, "Try '%s --help' for more information\n",
@@ -236,11 +236,11 @@ usage (FILE *stream)
     fprintf (stream, "\n"
       "Change file attributes\n"
       "\n"
-      "  -R, --recursive     recursively list attributes of directories and their \n"
+      "  -R, --recursive     recursively apply the changes to directories and their\n"
       "                      contents\n"
       "  -V, --verbose       Be verbose during operation\n"
       "  -f, --force         suppress error messages\n"
-      "  -h, --help          this help text\n"
+      "  -H, --help          this help text\n"
       "  -v, --version       display the program version\n"
       "\n"
       "The format of 'mode' is {+-=}[acCehnrsSt]\n"
@@ -251,7 +251,7 @@ usage (FILE *stream)
       "\n"
       "Supported attributes:\n"
       "\n"
-      "  'r', 'Readonly':     file is read-only\n"
+      "  'r', 'Readonly':      file is read-only\n"
       "  'h', 'Hidden':        file or directory is hidden\n"
       "  's', 'System':        file or directory that the operating system uses\n"
       "  'a', 'Archive':       file or directory has the archive marker set\n"
@@ -271,7 +271,7 @@ int
 main (int argc, char **argv)
 {
   int c, ret = 0;
-  int lastoptind = 0;
+  int lastoptind = 1;
   char *opt;
 
   opterr = 0;
@@ -281,15 +281,15 @@ main (int argc, char **argv)
 	{
 	case 'R':
 	  Ropt = 1;
-	  lastoptind = optind;
 	  break;
 	case 'V':
 	  Vopt = 1;
-	  lastoptind = optind;
 	  break;
 	case 'f':
 	  fopt = 1;
-	  lastoptind = optind;
+	  break;
+	case 'H':
+	  usage (stdout);
 	  break;
 	case 'v':
 	  print_version ();
@@ -297,14 +297,10 @@ main (int argc, char **argv)
 	  break;
 	default:
 	  if (optind > lastoptind)
-	    {
-	      --optind;
-	      goto next;
-	    }
-	  /*FALLTHRU*/
-	case 'h':
-	  usage (c == 'h' ? stdout : stderr);
+	    --optind;
+	  goto next;
 	}
+      lastoptind = optind;
     }
 next:
   while (optind < argc)

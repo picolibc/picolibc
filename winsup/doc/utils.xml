@@ -27,18 +27,18 @@
 
     <refsynopsisdiv>
       <screen>
-chattr [-RVfhv] [+-=mode]... [file]...
+chattr [-RVfHv] [+-=mode]... [file]...
       </screen>
     </refsynopsisdiv>
 
     <refsect1 id="chattr-options">
       <title>Options</title>
       <screen>
-  -R, --recursive     recursively list attributes of directories and their
-                      contents
+  -R, --recursive     recursively apply the changes to directories and
+                      their contents
   -V, --verbose       Be verbose during operation
   -f, --force         suppress error messages
-  -h, --help          this help text
+  -H, --help          this help text
   -v, --version       display the program version
 </screen>
     </refsect1>
@@ -60,7 +60,7 @@ chattr [-RVfhv] [+-=mode]... [file]...
     <para>Supported attributes:</para>
 
     <screen>
-  'r', 'Readonly':     file is read-only
+  'r', 'Readonly':      file is read-only
   'h', 'Hidden':        file or directory is hidden
   's', 'System':        file or directory that the operating system uses
   'a', 'Archive':       file or directory has the archive marker set
