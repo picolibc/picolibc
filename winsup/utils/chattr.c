@@ -347,7 +347,7 @@ next:
 	{
 	  if (chattr (argv[optind]))
 	    ret = 1;
-	  if (S_ISDIR (st.st_mode) && chattr_dir (argv[optind]))
+	  if (S_ISDIR (st.st_mode) && Ropt && chattr_dir (argv[optind]))
 	    ret = 1;
 	}
     }
