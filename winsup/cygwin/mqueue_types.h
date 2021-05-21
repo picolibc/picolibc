@@ -25,18 +25,18 @@ struct mq_fattr
 
 struct mq_hdr
 {
-  struct mq_fattr mqh_attr;	 /* the queue's attributes */
-  int32_t         mqh_head;	 /* index of first message */
-  int32_t         mqh_free;	 /* index of first free message */
-  int32_t         mqh_nwait;	 /* #threads blocked in mq_receive() */
-  pid_t           mqh_pid;	 /* nonzero PID if mqh_event set */
-  char            __mqh_ext[36]; /* free for extensions */
+  struct mq_fattr   mqh_attr;	 /* the queue's attributes */
+  int32_t           mqh_head;	 /* index of first message */
+  int32_t           mqh_free;	 /* index of first free message */
+  int32_t           mqh_nwait;	 /* #threads blocked in mq_receive() */
+  pid_t             mqh_pid;	 /* nonzero PID if mqh_event set */
+  uint32_t        __mqh_ext[36]; /* free for extensions */
   union {
     struct sigevent mqh_event;	 /* for mq_notify() */
-    uint64_t        __mqh_dummy[4];
+    uint64_t      __mqh_dummy[4];
   };
-  uint64_t	  __mgh_ext2[4]; /* free for extensions */
-  uint32_t        mqh_magic;	 /* Expect MQI_MAGIC here, otherwise it's
+  uint64_t        __mqh_ext2[4]; /* free for extensions */
+  uint32_t          mqh_magic;	 /* Expect MQI_MAGIC here, otherwise it's
 				    an old-style message queue. */
 };
 #pragma pack (pop)
