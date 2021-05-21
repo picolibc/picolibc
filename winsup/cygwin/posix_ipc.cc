@@ -102,7 +102,7 @@ ipc_mutex_init (HANDLE *pmtx, const char *name)
   OBJECT_ATTRIBUTES attr;
   NTSTATUS status;
 
-  __small_swprintf (buf, L"mqueue/mtx_%s", name);
+  __small_swprintf (buf, L"mqueue/mtx%s", name);
   RtlInitUnicodeString (&uname, buf);
   InitializeObjectAttributes (&attr, &uname, OBJ_OPENIF | OBJ_CASE_INSENSITIVE,
 			      get_shared_parent_dir (),
@@ -148,7 +148,7 @@ ipc_cond_init (HANDLE *pevt, const char *name, char sr)
   OBJECT_ATTRIBUTES attr;
   NTSTATUS status;
 
-  __small_swprintf (buf, L"mqueue/evt_%s%c", name, sr);
+  __small_swprintf (buf, L"mqueue/evt%s%c", name, sr);
   RtlInitUnicodeString (&uname, buf);
   InitializeObjectAttributes (&attr, &uname, OBJ_OPENIF | OBJ_CASE_INSENSITIVE,
 			      get_shared_parent_dir (),
@@ -422,7 +422,6 @@ mq_open (const char *name, int oflag, ...)
   struct msg_hdr *msghdr;
   struct mq_attr *attr;
   struct mq_info *mqinfo = NULL;
-  LUID luid;
 
   size_t len = strlen (name);
   char mqname[ipc_names[mqueue].prefix_len + len];
@@ -492,7 +491,7 @@ mq_open (const char *name, int oflag, ...)
 	  mqinfo = fh->mqinfo (name, mptr, secth, filesize, mode, nonblock);
 
 	  /* Initialize mutex & condition variables */
-	  i = _mq_ipc_init (mqinfo, mqhdr->mqh_uname);
+	  i = _mq_ipc_init (mqinfo, fh->get_name ());
 	  if (i != 0)
 	    {
 	      set_errno (i);
@@ -508,10 +507,6 @@ mq_open (const char *name, int oflag, ...)
 	  mqhdr->mqh_attr.mq_curmsgs = 0;
 	  mqhdr->mqh_nwait = 0;
 	  mqhdr->mqh_pid = 0;
-	  NtAllocateLocallyUniqueId (&luid);
-	  __small_sprintf (mqhdr->mqh_uname, "%016X%08x%08x",
-			   hash_path_name (0, mqname),
-			   luid.HighPart, luid.LowPart);
 	  mqhdr->mqh_head = 0;
 	  mqhdr->mqh_magic = MQI_MAGIC;
 	  index = sizeof (struct mq_hdr);
@@ -596,7 +591,7 @@ mq_open (const char *name, int oflag, ...)
 			   nonblock);
 
       /* Initialize mutex & condition variable */
-      i = _mq_ipc_init (mqinfo, mqhdr->mqh_uname);
+      i = _mq_ipc_init (mqinfo, fh->get_name ());
       if (i != 0)
 	{
 	  set_errno (i);
