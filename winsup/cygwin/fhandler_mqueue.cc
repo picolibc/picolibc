@@ -7,6 +7,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include "shared_info.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
@@ -22,14 +23,54 @@ struct mq_info *
 fhandler_mqueue::mqinfo (const char *name, int8_t *mptr, HANDLE sect,
 			 size_t size, mode_t mode, int flags)
 {
+  WCHAR buf[MAX_PATH];
+  UNICODE_STRING uname;
+  OBJECT_ATTRIBUTES attr;
+  NTSTATUS status;
+
   set_name (name);
   mqinfo ()->mqi_hdr = (struct mq_hdr *) mptr;
   mqinfo ()->mqi_sect = sect;
   mqinfo ()->mqi_sectsize = size;
   mqinfo ()->mqi_mode = mode;
-  mqinfo ()->mqi_magic = MQI_MAGIC;
   mqinfo ()->mqi_flags = flags;
+
+  __small_swprintf (buf, L"mqueue/mtx%s", name);
+  RtlInitUnicodeString (&uname, buf);
+  InitializeObjectAttributes (&attr, &uname, OBJ_OPENIF | OBJ_CASE_INSENSITIVE,
+                              get_shared_parent_dir (),
+                              everyone_sd (CYG_MUTANT_ACCESS));
+  status = NtCreateMutant (&mqinfo ()->mqi_lock, CYG_MUTANT_ACCESS, &attr,
+			   FALSE);
+  if (!NT_SUCCESS (status))
+    goto err;
+
+  wcsncpy (buf + 7, L"snd", 3);
+  /* same length, no RtlInitUnicodeString required */
+  InitializeObjectAttributes (&attr, &uname, OBJ_OPENIF | OBJ_CASE_INSENSITIVE,
+                              get_shared_parent_dir (),
+                              everyone_sd (CYG_EVENT_ACCESS));
+  status = NtCreateEvent (&mqinfo ()->mqi_waitsend, CYG_EVENT_ACCESS, &attr,
+			  NotificationEvent, FALSE);
+  if (!NT_SUCCESS (status))
+    goto err;
+  wcsncpy (buf + 7, L"rcv", 3);
+  /* same length, same attributes, no more init required */
+  status = NtCreateEvent (&mqinfo ()->mqi_waitrecv, CYG_EVENT_ACCESS, &attr,
+			  NotificationEvent, FALSE);
+  if (!NT_SUCCESS (status))
+    goto err;
+
+  mqinfo ()->mqi_magic = MQI_MAGIC;
   return mqinfo ();
+
+err:
+  if (mqinfo ()->mqi_waitsend)
+    NtClose (mqinfo ()->mqi_waitsend);
+  if (mqinfo ()->mqi_lock)
+    NtClose (mqinfo ()->mqi_lock);
+  __seterrno_from_nt_status (status);
+  return NULL;
 }
 
 char *

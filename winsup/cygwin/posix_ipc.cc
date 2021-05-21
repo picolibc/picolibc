@@ -95,28 +95,6 @@ check_path (char *res_name, ipc_type_t type, const char *name, size_t len)
 }
 
 static int
-ipc_mutex_init (HANDLE *pmtx, const char *name)
-{
-  WCHAR buf[MAX_PATH];
-  UNICODE_STRING uname;
-  OBJECT_ATTRIBUTES attr;
-  NTSTATUS status;
-
-  __small_swprintf (buf, L"mqueue/mtx%s", name);
-  RtlInitUnicodeString (&uname, buf);
-  InitializeObjectAttributes (&attr, &uname, OBJ_OPENIF | OBJ_CASE_INSENSITIVE,
-			      get_shared_parent_dir (),
-			      everyone_sd (CYG_MUTANT_ACCESS));
-  status = NtCreateMutant (pmtx, CYG_MUTANT_ACCESS, &attr, FALSE);
-  if (!NT_SUCCESS (status))
-    {
-      debug_printf ("NtCreateMutant: %y", status);
-      return geterrno_from_win_error (RtlNtStatusToDosError (status));
-    }
-  return 0;
-}
-
-static int
 ipc_mutex_lock (HANDLE mtx, bool eintr)
 {
   switch (cygwait (mtx, cw_infinite, cw_cancel | cw_cancel_self
@@ -138,29 +116,6 @@ static inline int
 ipc_mutex_unlock (HANDLE mtx)
 {
   return ReleaseMutex (mtx) ? 0 : geterrno_from_win_error ();
-}
-
-static int
-ipc_cond_init (HANDLE *pevt, const char *name, char sr)
-{
-  WCHAR buf[MAX_PATH];
-  UNICODE_STRING uname;
-  OBJECT_ATTRIBUTES attr;
-  NTSTATUS status;
-
-  __small_swprintf (buf, L"mqueue/evt%s%c", name, sr);
-  RtlInitUnicodeString (&uname, buf);
-  InitializeObjectAttributes (&attr, &uname, OBJ_OPENIF | OBJ_CASE_INSENSITIVE,
-			      get_shared_parent_dir (),
-			      everyone_sd (CYG_EVENT_ACCESS));
-  status = NtCreateEvent (pevt, CYG_EVENT_ACCESS, &attr,
-			  NotificationEvent, FALSE);
-  if (!NT_SUCCESS (status))
-    {
-      debug_printf ("NtCreateEvent: %y", status);
-      return geterrno_from_win_error (RtlNtStatusToDosError (status));
-    }
-  return 0;
 }
 
 static int
@@ -352,31 +307,6 @@ struct mq_attr defattr = { 0, 10, 8192, 0 };	/* Linux defaults. */
 extern "C" off_t lseek64 (int, off_t, int);
 extern "C" void *mmap64 (void *, size_t, int, int, int, off_t);
 
-static inline int
-_mq_ipc_init (struct mq_info *mqinfo, const char *name)
-{
-  int ret;
-
-  /* Initialize mutex & condition variable */
-  ret = ipc_mutex_init (&mqinfo->mqi_lock, name);
-  if (ret)
-    return ret;
-  ret = ipc_cond_init (&mqinfo->mqi_waitsend, name, 'S');
-  if (ret)
-    {
-      NtClose (mqinfo->mqi_lock);
-      return ret;
-    }
-  ret = ipc_cond_init (&mqinfo->mqi_waitrecv, name, 'R');
-  if (ret)
-    {
-      NtClose (mqinfo->mqi_waitsend);
-      NtClose (mqinfo->mqi_lock);
-      return ret;
-    }
-  return 0;
-}
-
 static int8_t *
 _map_file (int fd, SIZE_T filesize, HANDLE &secth)
 {
@@ -489,14 +419,8 @@ mq_open (const char *name, int oflag, ...)
 	  fdm = fh;
 
 	  mqinfo = fh->mqinfo (name, mptr, secth, filesize, mode, nonblock);
-
-	  /* Initialize mutex & condition variables */
-	  i = _mq_ipc_init (mqinfo, fh->get_name ());
-	  if (i != 0)
-	    {
-	      set_errno (i);
-	      __leave;
-	    }
+	  if (!mqinfo)
+	    __leave;
 
 	  /* Initialize header at beginning of file */
 	  /* Create free list with all messages on it */
@@ -589,14 +513,8 @@ mq_open (const char *name, int oflag, ...)
 
       mqinfo = fh->mqinfo (name, mptr, secth, filesize, statbuff.st_mode,
 			   nonblock);
-
-      /* Initialize mutex & condition variable */
-      i = _mq_ipc_init (mqinfo, fh->get_name ());
-      if (i != 0)
-	{
-	  set_errno (i);
-	  __leave;
-	}
+      if (!mqinfo)
+	__leave;
 
       return (mqd_t) fdm;
     }
@@ -610,15 +528,6 @@ mq_open (const char *name, int oflag, ...)
     {
       NtUnmapViewOfSection (NtCurrentProcess (), mptr);
       NtClose (secth);
-    }
-  if (mqinfo)
-    {
-      if (mqinfo->mqi_lock)
-	NtClose (mqinfo->mqi_lock);
-      if (mqinfo->mqi_waitsend)
-	NtClose (mqinfo->mqi_waitsend);
-      if (mqinfo->mqi_waitrecv)
-	NtClose (mqinfo->mqi_waitrecv);
     }
   if (fd >= 0)
     close (fd);
