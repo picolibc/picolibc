@@ -392,7 +392,6 @@ mq_open (const char *name, int oflag, ...)
 	  fh = (fhandler_mqueue *) build_fh_dev (*mqueue_dev, name);
 	  if (!fh)
 	    __leave;
-	  fdm = fh;
 
 	  mqinfo = fh->mqinfo_create ((HANDLE) _get_osfhandle (fd), filesize,
 				      mode, nonblock);
@@ -426,6 +425,7 @@ mq_open (const char *name, int oflag, ...)
 	  if (fchmod (fd, mode) == -1)
 	    __leave;
 	  close (fd);
+	  fdm = fh;
 	  return (mqd_t) fdm;
 	}
 
@@ -468,7 +468,6 @@ mq_open (const char *name, int oflag, ...)
       fh = (fhandler_mqueue *) build_fh_dev (*mqueue_dev, name);
       if (!fh)
 	__leave;
-      fdm = fh;
 
       mqinfo = fh->mqinfo_open ((HANDLE) _get_osfhandle (fd), statbuff.st_size,
 				statbuff.st_mode, nonblock);
@@ -476,6 +475,7 @@ mq_open (const char *name, int oflag, ...)
 	__leave;
 
       close (fd);
+      fdm = fh;
       return (mqd_t) fdm;
     }
   __except (EFAULT) {}
@@ -486,6 +486,11 @@ mq_open (const char *name, int oflag, ...)
     unlink (mqname);
   if (fd >= 0)
     close (fd);
+  if (fh)
+    {
+      fh->close ();
+      delete fh;
+    }
   return (mqd_t) -1;
 }
 
