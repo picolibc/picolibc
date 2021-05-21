@@ -10,6 +10,7 @@ details. */
 #include "pinfo.h"
 
 #include "tty.h"
+#include "mqueue_types.h"
 #include <cygwin/_socketflags.h>
 #include <cygwin/_ucred.h>
 #include <sys/un.h>
@@ -448,6 +449,7 @@ public:
   virtual class fhandler_console *is_console () { return 0; }
   virtual class fhandler_signalfd *is_signalfd () { return NULL; }
   virtual class fhandler_timerfd *is_timerfd () { return NULL; }
+  virtual class fhandler_mqueue *is_mqueue () { return NULL; }
   virtual int is_windows () {return 0; }
 
   virtual void __reg3 raw_read (void *ptr, size_t& ulen);
@@ -3101,6 +3103,44 @@ class fhandler_timerfd : public fhandler_base
   }
 };
 
+class fhandler_mqueue: public fhandler_base
+{
+  struct mq_info mqi;
+
+public:
+  fhandler_mqueue ();
+  fhandler_mqueue (void *) {}
+  ~fhandler_mqueue () {}
+
+  fhandler_mqueue *is_mqueue () { return this; }
+
+  char *get_proc_fd_name (char *);
+
+  struct mq_info *mqinfo (const char *, int8_t *, HANDLE, size_t, mode_t, int);
+  struct mq_info *mqinfo () { return &mqi; }
+
+  void fixup_after_fork (HANDLE);
+
+  int __reg2 fstat (struct stat *buf);
+  int dup (fhandler_base *child, int);
+  int close ();
+
+  void copy_from (fhandler_base *x)
+  {
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_mqueue *> (x);
+    _copy_from_reset_helper ();
+  }
+
+  fhandler_mqueue *clone (cygheap_types malloc_type = HEAP_FHANDLER)
+  {
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_mqueue));
+    fhandler_mqueue *fh = new (ptr) fhandler_mqueue (ptr);
+    fh->copy_from (this);
+    return fh;
+  }
+};
+
 struct fhandler_nodevice: public fhandler_base
 {
   fhandler_nodevice ();
@@ -3142,6 +3182,7 @@ typedef union
   char __serial[sizeof (fhandler_serial)];
   char __signalfd[sizeof (fhandler_signalfd)];
   char __timerfd[sizeof (fhandler_timerfd)];
+  char __mqueue[sizeof (fhandler_mqueue)];
   char __socket_inet[sizeof (fhandler_socket_inet)];
   char __socket_local[sizeof (fhandler_socket_local)];
 #ifdef __WITH_AF_UNIX

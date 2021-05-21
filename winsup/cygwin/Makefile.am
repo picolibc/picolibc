@@ -234,6 +234,7 @@ DLL_FILES= \
 	fhandler_dsp.cc \
 	fhandler_fifo.cc \
 	fhandler_floppy.cc \
+	fhandler_mqueue.cc \
 	fhandler_netdrive.cc \
 	fhandler_nodevice.cc \
 	fhandler_pipe.cc \

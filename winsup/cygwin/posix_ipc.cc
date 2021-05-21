@@ -16,6 +16,7 @@ details. */
 #include "cygheap.h"
 #include "sigproc.h"
 #include "ntdll.h"
+#include <io.h>
 #include <sys/mman.h>
 #include <sys/param.h>
 #include <stdlib.h>
@@ -103,8 +104,7 @@ ipc_mutex_init (HANDLE *pmtx, const char *name)
 
   __small_swprintf (buf, L"mqueue/mtx_%s", name);
   RtlInitUnicodeString (&uname, buf);
-  InitializeObjectAttributes (&attr, &uname,
-			      OBJ_INHERIT | OBJ_OPENIF | OBJ_CASE_INSENSITIVE,
+  InitializeObjectAttributes (&attr, &uname, OBJ_OPENIF | OBJ_CASE_INSENSITIVE,
 			      get_shared_parent_dir (),
 			      everyone_sd (CYG_MUTANT_ACCESS));
   status = NtCreateMutant (pmtx, CYG_MUTANT_ACCESS, &attr, FALSE);
@@ -140,12 +140,6 @@ ipc_mutex_unlock (HANDLE mtx)
   return ReleaseMutex (mtx) ? 0 : geterrno_from_win_error ();
 }
 
-static inline int
-ipc_mutex_close (HANDLE mtx)
-{
-  return CloseHandle (mtx) ? 0 : geterrno_from_win_error ();
-}
-
 static int
 ipc_cond_init (HANDLE *pevt, const char *name, char sr)
 {
@@ -156,8 +150,7 @@ ipc_cond_init (HANDLE *pevt, const char *name, char sr)
 
   __small_swprintf (buf, L"mqueue/evt_%s%c", name, sr);
   RtlInitUnicodeString (&uname, buf);
-  InitializeObjectAttributes (&attr, &uname,
-			      OBJ_INHERIT | OBJ_OPENIF | OBJ_CASE_INSENSITIVE,
+  InitializeObjectAttributes (&attr, &uname, OBJ_OPENIF | OBJ_CASE_INSENSITIVE,
 			      get_shared_parent_dir (),
 			      everyone_sd (CYG_EVENT_ACCESS));
   status = NtCreateEvent (pevt, CYG_EVENT_ACCESS, &attr,
@@ -275,12 +268,6 @@ ipc_cond_signal (HANDLE evt)
   SetEvent (evt);
 }
 
-static inline void
-ipc_cond_close (HANDLE evt)
-{
-  CloseHandle (evt);
-}
-
 class ipc_flock
 {
   struct flock fl;
@@ -347,40 +334,7 @@ shm_unlink (const char *name)
    files are created under /dev/mqueue.  mq_timedsend and mq_timedreceive
    are implemented additionally. */
 
-/* The mq_attr structure is defined using long datatypes per POSIX.
-   For interoperability reasons between 32 and 64 bit processes, we have
-   to make sure to use a unified structure layout in the message queue file.
-   That's what the mq_fattr is, the in-file representation of the mq_attr
-   struct. */
 #pragma pack (push, 4)
-struct mq_fattr
-{
-  uint32_t mq_flags;
-  uint32_t mq_maxmsg;
-  uint32_t mq_msgsize;
-  uint32_t mq_curmsgs;
-};
-
-struct mq_hdr
-{
-  struct mq_fattr mqh_attr;	 /* the queue's attributes */
-  int32_t         mqh_head;	 /* index of first message */
-  int32_t         mqh_free;	 /* index of first free message */
-  int32_t         mqh_nwait;	 /* #threads blocked in mq_receive() */
-  pid_t           mqh_pid;	 /* nonzero PID if mqh_event set */
-  char            mqh_uname[36]; /* unique name used to identify synchronization
-				    objects connected to this queue */
-  union {
-    struct sigevent mqh_event;	 /* for mq_notify() */
-    /* Make sure sigevent takes the same space on 32 and 64 bit systems.
-       Other than that, it doesn't need to be compatible since only
-       one process can be notified at a time. */
-    uint64_t        mqh_placeholder[8];
-  };
-  uint32_t        mqh_magic;	/* Expect MQI_MAGIC here, otherwise it's
-				   an old-style message queue. */
-};
-
 struct msg_hdr
 {
   int32_t         msg_next;	 /* index of next on linked list */
@@ -388,18 +342,6 @@ struct msg_hdr
   unsigned int    msg_prio;	 /* priority */
 };
 #pragma pack (pop)
-
-struct mq_info
-{
-  struct mq_hdr  *mqi_hdr;	 /* start of mmap'ed region */
-  uint32_t        mqi_magic;	 /* magic number if open */
-  int             mqi_flags;	 /* flags for this process */
-  HANDLE          mqi_lock;	 /* mutex lock */
-  HANDLE          mqi_waitsend;	 /* and condition variable for full queue */
-  HANDLE          mqi_waitrecv;	 /* and condition variable for empty queue */
-};
-
-#define MQI_MAGIC	0x98765432UL
 
 #define MSGSIZE(i)	roundup((i), sizeof(long))
 
@@ -422,17 +364,46 @@ _mq_ipc_init (struct mq_info *mqinfo, const char *name)
   ret = ipc_cond_init (&mqinfo->mqi_waitsend, name, 'S');
   if (ret)
     {
-      ipc_mutex_close (mqinfo->mqi_lock);
+      NtClose (mqinfo->mqi_lock);
       return ret;
     }
   ret = ipc_cond_init (&mqinfo->mqi_waitrecv, name, 'R');
   if (ret)
     {
-      ipc_cond_close (mqinfo->mqi_waitsend);
-      ipc_mutex_close (mqinfo->mqi_lock);
+      NtClose (mqinfo->mqi_waitsend);
+      NtClose (mqinfo->mqi_lock);
       return ret;
     }
   return 0;
+}
+
+static int8_t *
+_map_file (int fd, SIZE_T filesize, HANDLE &secth)
+{
+  OBJECT_ATTRIBUTES oa;
+  LARGE_INTEGER fsiz = { QuadPart: (LONGLONG) filesize };
+  NTSTATUS status;
+  PVOID addr = NULL;
+
+  secth = NULL;
+  InitializeObjectAttributes (&oa, NULL, 0, NULL, NULL);
+  status = NtCreateSection (&secth, SECTION_ALL_ACCESS, &oa, &fsiz,
+			    PAGE_READWRITE, SEC_COMMIT,
+			    (HANDLE) _get_osfhandle (fd));
+  if (NT_SUCCESS (status))
+    {
+      status = NtMapViewOfSection (secth, NtCurrentProcess (), &addr, 0,
+				   filesize, NULL, &filesize,
+				   ViewShare, 0, PAGE_READWRITE);
+      if (!NT_SUCCESS (status))
+	{
+	  NtClose (secth);
+	  secth = NULL;
+	}
+    }
+  if (!NT_SUCCESS (status))
+    __seterrno_from_nt_status (status);
+  return (int8_t *) addr;
 }
 
 extern "C" mqd_t
@@ -443,7 +414,9 @@ mq_open (const char *name, int oflag, ...)
   off_t filesize = 0;
   va_list ap;
   mode_t mode;
-  int8_t *mptr = (int8_t *) MAP_FAILED;
+  HANDLE secth;
+  int8_t *mptr = NULL;
+  fhandler_mqueue *fh;
   struct stat statbuff;
   struct mq_hdr *mqhdr;
   struct msg_hdr *msghdr;
@@ -502,22 +475,33 @@ mq_open (const char *name, int oflag, ...)
 	    __leave;
 
 	  /* Memory map the file */
-	  mptr = (int8_t *) mmap64 (NULL, (size_t) filesize,
-				    PROT_READ | PROT_WRITE,
-				    MAP_SHARED, fd, 0);
-	  if (mptr == (int8_t *) MAP_FAILED)
+	  mptr = _map_file (fd, filesize, secth);
+	  if (!mptr)
 	    __leave;
 
-	  /* Allocate one mq_info{} for the queue */
-	  if (!(mqinfo = (struct mq_info *)
-			 calloc (1, sizeof (struct mq_info))))
+	  /* Create file descriptor for mqueue */
+	  cygheap_fdnew fdm;
+
+	  if (fdm < 0)
 	    __leave;
-	  mqinfo->mqi_hdr = mqhdr = (struct mq_hdr *) mptr;
-	  mqinfo->mqi_magic = MQI_MAGIC;
-	  mqinfo->mqi_flags = nonblock;
+	  fh = (fhandler_mqueue *) build_fh_dev (*mqueue_dev);
+	  if (!fh)
+	    __leave;
+	  fdm = fh;
+
+	  mqinfo = fh->mqinfo (name, mptr, secth, filesize, mode, nonblock);
+
+	  /* Initialize mutex & condition variables */
+	  i = _mq_ipc_init (mqinfo, mqhdr->mqh_uname);
+	  if (i != 0)
+	    {
+	      set_errno (i);
+	      __leave;
+	    }
 
 	  /* Initialize header at beginning of file */
 	  /* Create free list with all messages on it */
+	  mqhdr = mqinfo->mqi_hdr;
 	  mqhdr->mqh_attr.mq_flags = 0;
 	  mqhdr->mqh_attr.mq_maxmsg = attr->mq_maxmsg;
 	  mqhdr->mqh_attr.mq_msgsize = attr->mq_msgsize;
@@ -526,7 +510,7 @@ mq_open (const char *name, int oflag, ...)
 	  mqhdr->mqh_pid = 0;
 	  NtAllocateLocallyUniqueId (&luid);
 	  __small_sprintf (mqhdr->mqh_uname, "%016X%08x%08x",
-			   hash_path_name (0,mqname),
+			   hash_path_name (0, mqname),
 			   luid.HighPart, luid.LowPart);
 	  mqhdr->mqh_head = 0;
 	  mqhdr->mqh_magic = MQI_MAGIC;
@@ -541,18 +525,11 @@ mq_open (const char *name, int oflag, ...)
 	  msghdr = (struct msg_hdr *) &mptr[index];
 	  msghdr->msg_next = 0;		/* end of free list */
 
-	  /* Initialize mutex & condition variables */
-	  i = _mq_ipc_init (mqinfo, mqhdr->mqh_uname);
-	  if (i != 0)
-	    {
-	      set_errno (i);
-	      __leave;
-	    }
 	  /* Initialization complete, turn off user-execute bit */
 	  if (fchmod (fd, mode) == -1)
 	    __leave;
 	  close (fd);
-	  return ((mqd_t) mqinfo);
+	  return (mqd_t) fdm;
 	}
 
     exists:
@@ -587,17 +564,14 @@ mq_open (const char *name, int oflag, ...)
 	}
 
       filesize = statbuff.st_size;
-      mptr = (int8_t *) mmap64 (NULL, (size_t) filesize, PROT_READ | PROT_WRITE,
-				MAP_SHARED, fd, 0);
-      if (mptr == (int8_t *) MAP_FAILED)
+      mptr = _map_file (fd, filesize, secth);
+      if (!mptr)
 	__leave;
+
       close (fd);
       fd = -1;
 
-      /* Allocate one mq_info{} for each open */
-      if (!(mqinfo = (struct mq_info *) calloc (1, sizeof (struct mq_info))))
-	__leave;
-      mqinfo->mqi_hdr = mqhdr = (struct mq_hdr *) mptr;
+      mqhdr = (struct mq_hdr *) mptr;
       if (mqhdr->mqh_magic != MQI_MAGIC)
 	{
 	  system_printf (
@@ -607,8 +581,19 @@ mq_open (const char *name, int oflag, ...)
 	  set_errno (EACCES);
 	  __leave;
 	}
-      mqinfo->mqi_magic = MQI_MAGIC;
-      mqinfo->mqi_flags = nonblock;
+
+      /* Create file descriptor for mqueue */
+      cygheap_fdnew fdm;
+
+      if (fdm < 0)
+	__leave;
+      fh = (fhandler_mqueue *) build_fh_dev (*mqueue_dev);
+      if (!fh)
+	__leave;
+      fdm = fh;
+
+      mqinfo = fh->mqinfo (name, mptr, secth, filesize, statbuff.st_mode,
+			   nonblock);
 
       /* Initialize mutex & condition variable */
       i = _mq_ipc_init (mqinfo, mqhdr->mqh_uname);
@@ -617,7 +602,8 @@ mq_open (const char *name, int oflag, ...)
 	  set_errno (i);
 	  __leave;
 	}
-      return (mqd_t) mqinfo;
+
+      return (mqd_t) fdm;
     }
   __except (EFAULT) {}
   __endtry
@@ -625,21 +611,37 @@ mq_open (const char *name, int oflag, ...)
   save_errno save;
   if (created)
     unlink (mqname);
-  if (mptr != (int8_t *) MAP_FAILED)
-    munmap((void *) mptr, (size_t) filesize);
+  if (mptr)
+    {
+      NtUnmapViewOfSection (NtCurrentProcess (), mptr);
+      NtClose (secth);
+    }
   if (mqinfo)
     {
       if (mqinfo->mqi_lock)
-	ipc_mutex_close (mqinfo->mqi_lock);
+	NtClose (mqinfo->mqi_lock);
       if (mqinfo->mqi_waitsend)
-	ipc_cond_close (mqinfo->mqi_waitsend);
+	NtClose (mqinfo->mqi_waitsend);
       if (mqinfo->mqi_waitrecv)
-	ipc_cond_close (mqinfo->mqi_waitrecv);
-      free (mqinfo);
+	NtClose (mqinfo->mqi_waitrecv);
     }
   if (fd >= 0)
     close (fd);
   return (mqd_t) -1;
+}
+
+static struct mq_info *
+get_mqinfo (cygheap_fdget &fd)
+{
+  if (fd >= 0)
+    {
+      fhandler_mqueue *fh = fd->is_mqueue ();
+      if (!fh)
+	set_errno (EINVAL);
+      else
+	return fh->mqinfo ();
+    }
+  return NULL;
 }
 
 extern "C" int
@@ -652,7 +654,8 @@ mq_getattr (mqd_t mqd, struct mq_attr *mqstat)
 
   __try
     {
-      mqinfo = (struct mq_info *) mqd;
+      cygheap_fdget fd ((int) mqd, true);
+      mqinfo = get_mqinfo (fd);
       if (mqinfo->mqi_magic != MQI_MAGIC)
 	{
 	  set_errno (EBADF);
@@ -688,7 +691,8 @@ mq_setattr (mqd_t mqd, const struct mq_attr *mqstat, struct mq_attr *omqstat)
 
   __try
     {
-      mqinfo = (struct mq_info *) mqd;
+      cygheap_fdget fd ((int) mqd, true);
+      mqinfo = get_mqinfo (fd);
       if (mqinfo->mqi_magic != MQI_MAGIC)
 	{
 	  set_errno (EBADF);
@@ -733,7 +737,8 @@ mq_notify (mqd_t mqd, const struct sigevent *notification)
 
   __try
     {
-      mqinfo = (struct mq_info *) mqd;
+      cygheap_fdget fd ((int) mqd, true);
+      mqinfo = get_mqinfo (fd);
       if (mqinfo->mqi_magic != MQI_MAGIC)
 	{
 	  set_errno (EBADF);
@@ -793,7 +798,8 @@ _mq_send (mqd_t mqd, const char *ptr, size_t len, unsigned int prio,
 
   __try
     {
-      mqinfo = (struct mq_info *) mqd;
+      cygheap_fdget fd ((int) mqd);
+      mqinfo = get_mqinfo (fd);
       if (mqinfo->mqi_magic != MQI_MAGIC)
 	{
 	  set_errno (EBADF);
@@ -920,13 +926,15 @@ _mq_receive (mqd_t mqd, char *ptr, size_t maxlen, unsigned int *priop,
   struct mq_hdr *mqhdr;
   struct mq_fattr *attr;
   struct msg_hdr *msghdr;
-  struct mq_info *mqinfo = (struct mq_info *) mqd;
+  struct mq_info *mqinfo;
   bool ipc_mutex_locked = false;
 
   pthread_testcancel ();
 
   __try
     {
+      cygheap_fdget fd ((int) mqd);
+      mqinfo = get_mqinfo (fd);
       if (mqinfo->mqi_magic != MQI_MAGIC)
 	{
 	  set_errno (EBADF);
@@ -1010,36 +1018,24 @@ mq_timedreceive (mqd_t mqd, char *ptr, size_t maxlen, unsigned int *priop,
 extern "C" int
 mq_close (mqd_t mqd)
 {
-  long msgsize, filesize;
-  struct mq_hdr *mqhdr;
-  struct mq_fattr *attr;
   struct mq_info *mqinfo;
 
   __try
     {
-      mqinfo = (struct mq_info *) mqd;
+      cygheap_fdget fd ((int) mqd, true);
+      mqinfo = get_mqinfo (fd);
       if (mqinfo->mqi_magic != MQI_MAGIC)
 	{
 	  set_errno (EBADF);
 	  __leave;
 	}
-      mqhdr = mqinfo->mqi_hdr;
-      attr = &mqhdr->mqh_attr;
 
       if (mq_notify (mqd, NULL))	/* unregister calling process */
 	__leave;
 
-      msgsize = MSGSIZE (attr->mq_msgsize);
-      filesize = sizeof (struct mq_hdr)
-		 + (attr->mq_maxmsg * (sizeof (struct msg_hdr) + msgsize));
-      if (munmap (mqinfo->mqi_hdr, filesize) == -1)
-	__leave;
-
-      mqinfo->mqi_magic = 0;          /* just in case */
-      ipc_cond_close (mqinfo->mqi_waitsend);
-      ipc_cond_close (mqinfo->mqi_waitrecv);
-      ipc_mutex_close (mqinfo->mqi_lock);
-      free (mqinfo);
+      fd->isclosed (true);
+      fd->close ();
+      fd.release ();
       return 0;
     }
   __except (EBADF) {}

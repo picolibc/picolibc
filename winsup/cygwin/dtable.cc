@@ -581,6 +581,9 @@ fh_alloc (path_conv& pc)
 	case FH_TIMERFD:
 	  fh = cnew (fhandler_timerfd);
 	  break;
+	case FH_MQUEUE:
+	  fh = cnew (fhandler_mqueue);
+	  break;
 	case FH_TTY:
 	  if (!pc.isopen ())
 	    {

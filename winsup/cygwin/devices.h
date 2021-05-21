@@ -73,6 +73,7 @@ enum fh_devices
 
   FH_SIGNALFD= FHDEV (DEV_VIRTFS_MAJOR, 13),
   FH_TIMERFD = FHDEV (DEV_VIRTFS_MAJOR, 14),
+  FH_MQUEUE  = FHDEV (DEV_VIRTFS_MAJOR, 15),
 
   DEV_FLOPPY_MAJOR = 2,
   FH_FLOPPY  = FHDEV (DEV_FLOPPY_MAJOR, 0),
@@ -406,6 +407,8 @@ extern const _device dev_signalfd_storage;
 #define signalfd_dev ((device *) &dev_signalfd_storage)
 extern const _device dev_timerfd_storage;
 #define timerfd_dev ((device *) &dev_timerfd_storage)
+extern const _device dev_mqueue_storage;
+#define mqueue_dev ((device *) &dev_mqueue_storage)
 extern const _device dev_piper_storage;
 #define piper_dev ((device *) &dev_piper_storage)
 extern const _device dev_pipew_storage;
