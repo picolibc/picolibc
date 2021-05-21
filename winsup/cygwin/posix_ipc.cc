@@ -318,35 +318,6 @@ struct mq_attr defattr = { 0, 10, 8192, 0 };	/* Linux defaults. */
 extern "C" off_t lseek64 (int, off_t, int);
 extern "C" void *mmap64 (void *, size_t, int, int, int, off_t);
 
-static int8_t *
-_map_file (int fd, SIZE_T filesize, HANDLE &secth)
-{
-  OBJECT_ATTRIBUTES oa;
-  LARGE_INTEGER fsiz = { QuadPart: (LONGLONG) filesize };
-  NTSTATUS status;
-  PVOID addr = NULL;
-
-  secth = NULL;
-  InitializeObjectAttributes (&oa, NULL, 0, NULL, NULL);
-  status = NtCreateSection (&secth, SECTION_ALL_ACCESS, &oa, &fsiz,
-			    PAGE_READWRITE, SEC_COMMIT,
-			    (HANDLE) _get_osfhandle (fd));
-  if (NT_SUCCESS (status))
-    {
-      status = NtMapViewOfSection (secth, NtCurrentProcess (), &addr, 0,
-				   filesize, NULL, &filesize,
-				   ViewShare, 0, PAGE_READWRITE);
-      if (!NT_SUCCESS (status))
-	{
-	  NtClose (secth);
-	  secth = NULL;
-	}
-    }
-  if (!NT_SUCCESS (status))
-    __seterrno_from_nt_status (status);
-  return (int8_t *) addr;
-}
-
 extern "C" mqd_t
 mq_open (const char *name, int oflag, ...)
 {
@@ -355,10 +326,9 @@ mq_open (const char *name, int oflag, ...)
   off_t filesize = 0;
   va_list ap;
   mode_t mode;
-  HANDLE secth;
-  int8_t *mptr = NULL;
-  fhandler_mqueue *fh;
+  fhandler_mqueue *fh = NULL;
   struct stat statbuff;
+  int8_t *mptr = NULL;
   struct mq_hdr *mqhdr;
   struct msg_hdr *msghdr;
   struct mq_attr *attr;
@@ -414,11 +384,6 @@ mq_open (const char *name, int oflag, ...)
 	  if (ftruncate64 (fd, filesize) == -1)
 	    __leave;
 
-	  /* Memory map the file */
-	  mptr = _map_file (fd, filesize, secth);
-	  if (!mptr)
-	    __leave;
-
 	  /* Create file descriptor for mqueue */
 	  cygheap_fdnew fdm;
 
@@ -429,12 +394,14 @@ mq_open (const char *name, int oflag, ...)
 	    __leave;
 	  fdm = fh;
 
-	  mqinfo = fh->mqinfo (mptr, secth, filesize, mode, nonblock);
+	  mqinfo = fh->mqinfo_create ((HANDLE) _get_osfhandle (fd), filesize,
+				      mode, nonblock);
 	  if (!mqinfo)
 	    __leave;
 
 	  /* Initialize header at beginning of file */
 	  /* Create free list with all messages on it */
+	  mptr = (int8_t *) mqinfo->mqi_hdr;
 	  mqhdr = mqinfo->mqi_hdr;
 	  mqhdr->mqh_attr.mq_flags = 0;
 	  mqhdr->mqh_attr.mq_maxmsg = attr->mq_maxmsg;
@@ -493,25 +460,6 @@ mq_open (const char *name, int oflag, ...)
 	  __leave;
 	}
 
-      filesize = statbuff.st_size;
-      mptr = _map_file (fd, filesize, secth);
-      if (!mptr)
-	__leave;
-
-      close (fd);
-      fd = -1;
-
-      mqhdr = (struct mq_hdr *) mptr;
-      if (mqhdr->mqh_magic != MQI_MAGIC)
-	{
-	  system_printf (
-    "Old message queue \"%s\" detected!\n"
-    "This file is not usable as message queue anymore due to changes in the "
-    "internal file layout.  Please remove the file and try again.", mqname);
-	  set_errno (EACCES);
-	  __leave;
-	}
-
       /* Create file descriptor for mqueue */
       cygheap_fdnew fdm;
 
@@ -522,11 +470,12 @@ mq_open (const char *name, int oflag, ...)
 	__leave;
       fdm = fh;
 
-      mqinfo = fh->mqinfo (mptr, secth, filesize, statbuff.st_mode,
-			   nonblock);
+      mqinfo = fh->mqinfo_open ((HANDLE) _get_osfhandle (fd), statbuff.st_size,
+				statbuff.st_mode, nonblock);
       if (!mqinfo)
 	__leave;
 
+      close (fd);
       return (mqd_t) fdm;
     }
   __except (EFAULT) {}
@@ -535,11 +484,6 @@ mq_open (const char *name, int oflag, ...)
   save_errno save;
   if (created)
     unlink (mqname);
-  if (mptr)
-    {
-      NtUnmapViewOfSection (NtCurrentProcess (), mptr);
-      NtClose (secth);
-    }
   if (fd >= 0)
     close (fd);
   return (mqd_t) -1;

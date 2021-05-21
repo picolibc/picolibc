@@ -20,17 +20,19 @@ fhandler_mqueue::fhandler_mqueue () :
 }
 
 struct mq_info *
-fhandler_mqueue::mqinfo (int8_t *mptr, HANDLE sect, size_t size, mode_t mode,
-			 int flags)
+fhandler_mqueue::_mqinfo (HANDLE fh, SIZE_T filesize, mode_t mode, int flags,
+			  bool just_open)
 {
-  WCHAR buf[MAX_PATH];
+  WCHAR buf[NAME_MAX + sizeof ("mqueue/XXX")];
   UNICODE_STRING uname;
   OBJECT_ATTRIBUTES attr;
   NTSTATUS status;
+  LARGE_INTEGER fsiz = { QuadPart: (LONGLONG) filesize };
+  PVOID mptr = NULL;
 
-  mqinfo ()->mqi_hdr = (struct mq_hdr *) mptr;
-  mqinfo ()->mqi_sect = sect;
-  mqinfo ()->mqi_sectsize = size;
+  /* Set sectsize prior to using filesize in NtMapViewOfSection.  It will
+     get pagesize aligned, which breaks the next NtMapViewOfSection in fork. */
+  mqinfo ()->mqi_sectsize = filesize;
   mqinfo ()->mqi_mode = mode;
   mqinfo ()->mqi_flags = flags;
 
@@ -60,10 +62,36 @@ fhandler_mqueue::mqinfo (int8_t *mptr, HANDLE sect, size_t size, mode_t mode,
   if (!NT_SUCCESS (status))
     goto err;
 
+  InitializeObjectAttributes (&attr, NULL, 0, NULL, NULL);
+  status = NtCreateSection (&mqinfo ()->mqi_sect, SECTION_ALL_ACCESS, &attr,
+			    &fsiz, PAGE_READWRITE, SEC_COMMIT, fh);
+  if (!NT_SUCCESS (status))
+    goto err;
+
+  status = NtMapViewOfSection (mqinfo ()->mqi_sect, NtCurrentProcess (),
+			       &mptr, 0, filesize, NULL, &filesize,
+			       ViewShare, 0, PAGE_READWRITE);
+  if (!NT_SUCCESS (status))
+    goto err;
+
+  mqinfo ()->mqi_hdr = (struct mq_hdr *) mptr;
+
+  /* Special problem on Cygwin.  /dev/mqueue is just a simple dir,
+     so there's a chance normal files are created in there. */
+  if (just_open && mqinfo ()->mqi_hdr->mqh_magic != MQI_MAGIC)
+    {
+      status = STATUS_ACCESS_DENIED;
+      goto err;
+    }
+
   mqinfo ()->mqi_magic = MQI_MAGIC;
   return mqinfo ();
 
 err:
+  if (mqinfo ()->mqi_sect)
+    NtClose (mqinfo ()->mqi_sect);
+  if (mqinfo ()->mqi_waitrecv)
+    NtClose (mqinfo ()->mqi_waitrecv);
   if (mqinfo ()->mqi_waitsend)
     NtClose (mqinfo ()->mqi_waitsend);
   if (mqinfo ()->mqi_lock)

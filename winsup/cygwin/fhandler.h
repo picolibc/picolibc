@@ -3107,6 +3107,8 @@ class fhandler_mqueue: public fhandler_base
 {
   struct mq_info mqi;
 
+  struct mq_info *_mqinfo (HANDLE, SIZE_T, mode_t, int, bool);
+
 public:
   fhandler_mqueue ();
   fhandler_mqueue (void *) {}
@@ -3116,7 +3118,14 @@ public:
 
   char *get_proc_fd_name (char *);
 
-  struct mq_info *mqinfo (int8_t *, HANDLE, size_t, mode_t, int);
+  struct mq_info *mqinfo_create (HANDLE _h, SIZE_T _s, mode_t _m, int _f)
+  {
+    return _mqinfo (_h, _s, _m, _f, false);
+  }
+  struct mq_info *mqinfo_open (HANDLE _h, SIZE_T _s, mode_t _m, int _f)
+  {
+    return _mqinfo (_h, _s, _m, _f, true);
+  }
   struct mq_info *mqinfo () { return &mqi; }
 
   void fixup_after_fork (HANDLE);
