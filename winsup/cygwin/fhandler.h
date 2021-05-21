@@ -3116,7 +3116,7 @@ public:
 
   char *get_proc_fd_name (char *);
 
-  struct mq_info *mqinfo (const char *, int8_t *, HANDLE, size_t, mode_t, int);
+  struct mq_info *mqinfo (int8_t *, HANDLE, size_t, mode_t, int);
   struct mq_info *mqinfo () { return &mqi; }
 
   void fixup_after_fork (HANDLE);

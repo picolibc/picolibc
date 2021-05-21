@@ -20,22 +20,21 @@ fhandler_mqueue::fhandler_mqueue () :
 }
 
 struct mq_info *
-fhandler_mqueue::mqinfo (const char *name, int8_t *mptr, HANDLE sect,
-			 size_t size, mode_t mode, int flags)
+fhandler_mqueue::mqinfo (int8_t *mptr, HANDLE sect, size_t size, mode_t mode,
+			 int flags)
 {
   WCHAR buf[MAX_PATH];
   UNICODE_STRING uname;
   OBJECT_ATTRIBUTES attr;
   NTSTATUS status;
 
-  set_name (name);
   mqinfo ()->mqi_hdr = (struct mq_hdr *) mptr;
   mqinfo ()->mqi_sect = sect;
   mqinfo ()->mqi_sectsize = size;
   mqinfo ()->mqi_mode = mode;
   mqinfo ()->mqi_flags = flags;
 
-  __small_swprintf (buf, L"mqueue/mtx%s", name);
+  __small_swprintf (buf, L"mqueue/mtx%s", get_name ());
   RtlInitUnicodeString (&uname, buf);
   InitializeObjectAttributes (&attr, &uname, OBJ_OPENIF | OBJ_CASE_INSENSITIVE,
                               get_shared_parent_dir (),

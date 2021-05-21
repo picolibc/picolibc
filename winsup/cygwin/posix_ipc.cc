@@ -413,12 +413,12 @@ mq_open (const char *name, int oflag, ...)
 
 	  if (fdm < 0)
 	    __leave;
-	  fh = (fhandler_mqueue *) build_fh_dev (*mqueue_dev);
+	  fh = (fhandler_mqueue *) build_fh_dev (*mqueue_dev, name);
 	  if (!fh)
 	    __leave;
 	  fdm = fh;
 
-	  mqinfo = fh->mqinfo (name, mptr, secth, filesize, mode, nonblock);
+	  mqinfo = fh->mqinfo (mptr, secth, filesize, mode, nonblock);
 	  if (!mqinfo)
 	    __leave;
 
@@ -506,12 +506,12 @@ mq_open (const char *name, int oflag, ...)
 
       if (fdm < 0)
 	__leave;
-      fh = (fhandler_mqueue *) build_fh_dev (*mqueue_dev);
+      fh = (fhandler_mqueue *) build_fh_dev (*mqueue_dev, name);
       if (!fh)
 	__leave;
       fdm = fh;
 
-      mqinfo = fh->mqinfo (name, mptr, secth, filesize, statbuff.st_mode,
+      mqinfo = fh->mqinfo (mptr, secth, filesize, statbuff.st_mode,
 			   nonblock);
       if (!mqinfo)
 	__leave;
