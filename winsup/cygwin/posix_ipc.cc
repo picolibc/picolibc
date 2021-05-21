@@ -67,22 +67,33 @@ check_path (char *res_name, ipc_type_t type, const char *name, size_t len)
       set_errno (EINVAL);
       return false;
     }
-  /* Name must not be empty, or just be a single slash, or start with more
-     than one slash.  Same for backslash.
-     Apart from handling backslash like slash, the naming rules are identical
+  /* Apart from handling backslash like slash, the naming rules are identical
      to Linux, including the names and requirements for subdirectories, if
      the name contains further slashes. */
-  if (!name || (strchr ("/\\", name[0])
-		&& (!name[1] || strchr ("/\\", name[1]))))
+  /* Name must not be empty and has to start with a slash (or backslash) */
+  if (!name || !strchr ("/\\", name[0]))
     {
       debug_printf ("Invalid %s name '%s'", ipc_names[type].description, name);
       set_errno (EINVAL);
       return false;
     }
-  /* Skip leading (back-)slash. */
-  if (strchr ("/\\", name[0]))
-    ++name;
-  if (len > PATH_MAX - ipc_names[type].prefix_len)
+  /* Name must not consist of just a single slash (or backslash) */
+  if (!name[1])
+    {
+      debug_printf ("Invalid %s name '%s'", ipc_names[type].description, name);
+      set_errno (ENOENT);
+      return false;
+    }
+  /* Name must not contain slashes after the leading one */
+  if (strpbrk (name + 1, "/\\"))
+    {
+      debug_printf ("Invalid %s name '%s'", ipc_names[type].description, name);
+      set_errno (EACCES);
+      return false;
+    }
+  /* Length must be less than or equal to NAME_MAX, or NAME_MAX - 4 in
+     case of semaphores, due to the leading "sem." prefix */
+  if (len > NAME_MAX - (type == semaphore ? strlen ("sem.") : 0))
     {
       debug_printf ("%s name '%s' too long", ipc_names[type].description, name);
       set_errno (ENAMETOOLONG);
@@ -90,7 +101,7 @@ check_path (char *res_name, ipc_type_t type, const char *name, size_t len)
     }
   __small_sprintf (res_name, "%s/%s%s", ipc_names[type].prefix,
 					type == semaphore ? "sem." : "",
-					name);
+					name + 1);
   return true;
 }
 
