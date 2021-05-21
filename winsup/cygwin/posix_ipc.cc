@@ -26,7 +26,7 @@ details. */
 
 extern "C" int ftruncate64 (int fd, off_t length);
 
-/* The prefix_len is the length of the path prefix ncluding trailing "/"
+/* The prefix_len is the length of the path prefix including trailing "/"
    (or "/sem." for semaphores) as well as the trailing NUL. */
 static struct
 {
