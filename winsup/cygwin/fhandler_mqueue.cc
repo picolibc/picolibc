@@ -136,28 +136,35 @@ fhandler_mqueue::fixup_after_fork (HANDLE parent)
       SIZE_T filesize = mqinfo ()->mqi_sectsize;
       NTSTATUS status;
 
-      DuplicateHandle (parent, mqinfo ()->mqi_sect,
-		       GetCurrentProcess (), &mqinfo ()->mqi_sect,
-		       0, FALSE, DUPLICATE_SAME_ACCESS);
+      if (!DuplicateHandle (parent, mqinfo ()->mqi_sect,
+			    GetCurrentProcess (), &mqinfo ()->mqi_sect,
+			    0, FALSE, DUPLICATE_SAME_ACCESS))
+	__leave;
       status = NtMapViewOfSection (mqinfo ()->mqi_sect, NtCurrentProcess (),
 				   &mptr, 0, filesize, NULL, &filesize,
 				   ViewShare, 0, PAGE_READWRITE);
       if (!NT_SUCCESS (status))
-	api_fatal ("Mapping message queue failed in fork\n");
-      else
-	mqinfo ()->mqi_hdr = (struct mq_hdr *) mptr;
-      DuplicateHandle (parent, mqinfo ()->mqi_waitsend,
-		       GetCurrentProcess (), &mqinfo ()->mqi_waitsend,
-		       0, FALSE, DUPLICATE_SAME_ACCESS);
-      DuplicateHandle (parent, mqinfo ()->mqi_waitrecv,
-		       GetCurrentProcess (), &mqinfo ()->mqi_waitrecv,
-		       0, FALSE, DUPLICATE_SAME_ACCESS);
-      DuplicateHandle (parent, mqinfo ()->mqi_lock,
-		       GetCurrentProcess (), &mqinfo ()->mqi_lock,
-		       0, FALSE, DUPLICATE_SAME_ACCESS);
+	api_fatal ("Mapping message queue failed in fork, status 0x%x\n",
+		   status);
+
+      mqinfo ()->mqi_hdr = (struct mq_hdr *) mptr;
+      if (!DuplicateHandle (parent, mqinfo ()->mqi_waitsend,
+			    GetCurrentProcess (), &mqinfo ()->mqi_waitsend,
+			    0, FALSE, DUPLICATE_SAME_ACCESS))
+	__leave;
+      if (!DuplicateHandle (parent, mqinfo ()->mqi_waitrecv,
+			    GetCurrentProcess (), &mqinfo ()->mqi_waitrecv,
+			    0, FALSE, DUPLICATE_SAME_ACCESS))
+	__leave;
+      if (!DuplicateHandle (parent, mqinfo ()->mqi_lock,
+			    GetCurrentProcess (), &mqinfo ()->mqi_lock,
+			    0, FALSE, DUPLICATE_SAME_ACCESS))
+	__leave;
+      return;
     }
   __except (EFAULT) {}
   __endtry
+  api_fatal ("Creating IPC object failed in fork, %E");
 }
 
 int
