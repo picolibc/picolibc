@@ -23,6 +23,7 @@ details. */
 
 int Ropt, Vopt, fopt;
 uint64_t add, del, set;
+int set_used;
 
 struct option longopts[] = {
   { "recursive", no_argument, NULL, 'R' },
@@ -83,6 +84,7 @@ get_flags (const char *opt)
       break;
     case '=':
       mode = &set;
+      set_used = 1;
       break;
     default:
       return 1;
@@ -104,10 +106,10 @@ int
 sanity_check ()
 {
   int ret = -1;
-  if (!set && !add && !del)
+  if (!set_used && !add && !del)
     fprintf (stderr, "%s: Must use at least one of =, + or -\n",
 	     program_invocation_short_name);
-  else if (set && (add | del))
+  else if (set_used && (add | del))
     fprintf (stderr, "%s: = is incompatible with + and -\n",
 	     program_invocation_short_name);
   else if ((add & del) != 0)
@@ -138,7 +140,7 @@ chattr (const char *path)
 	       program_invocation_short_name, strerror (errno), path);
       return 1;
     }
-  if (set)
+  if (set_used)
     newflags = set;
   else
     {
@@ -245,9 +247,10 @@ usage (FILE *stream)
       "\n"
       "The format of 'mode' is {+-=}[acCehnrsSt]\n"
       "\n"
-      "The  operator '+' causes the selected attributes to be added to the\n"
+      "The operator '+' causes the selected attributes to be added to the\n"
       "existing attributes of the files; '-' causes them to be removed; and\n"
       "'=' causes them to be the only attributes that the files have.\n"
+      "A single '=' causes all attributes to be removed.\n"
       "\n"
       "Supported attributes:\n"
       "\n"
@@ -313,7 +316,7 @@ next:
       opt = strchr ("+-=", argv[optind][0]);
       if (!opt)
 	break;
-      if (argv[optind][1] == '\0' || get_flags (argv[optind]))
+      if ((*opt != '=' && argv[optind][1] == '\0') || get_flags (argv[optind]))
 	usage (stderr);
       ++optind;
     }

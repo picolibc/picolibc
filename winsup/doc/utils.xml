@@ -53,9 +53,10 @@ chattr [-RVfHv] [+-=mode]... [file]...
 
     <para>The format of 'mode' is {+-=}[acCehnrsSt]</para>
 
-    <para>The  operator '+' causes the selected attributes to be added to the
+    <para>The operator '+' causes the selected attributes to be added to the
       existing attributes of the files; '-' causes them to be removed; and
-      '=' causes them to be the only attributes that the files have.</para>
+      '=' causes them to be the only attributes that the files have.
+      A single '=' causes all attributes to be removed.</para>
 
     <para>Supported attributes:</para>
 
