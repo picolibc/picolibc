@@ -32,14 +32,17 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 /*
 FUNCTION
-<<mktime>>---convert time to arithmetic representation
+<<mktime>>, <<timegm>>---convert time to arithmetic representation
 
 INDEX
 	mktime
+INDEX
+	timegm
 
 SYNOPSIS
 	#include <time.h>
 	time_t mktime(struct tm *<[timp]>);
+	time_t timegm(struct tm *<[timp]>);
 
 DESCRIPTION
 <<mktime>> assumes the time at <[timp]> is a local time, and converts
@@ -47,6 +50,17 @@ its representation from the traditional representation defined by
 <<struct tm>> into a representation suitable for arithmetic.
 
 <<localtime>> is the inverse of <<mktime>>.
+
+<<timegm>> is similar to <<mktime>>, but assumes that the time at
+<[timp]> is Coordinated Universal Time (UTC).
+
+<<timegm>> could be emulated by setting the TZ environment variable to UTC,
+calling <<mktime>> and restoring the value of TZ. However, other concurrent
+threads could be affected by the temporary change to TZ.
+
+<<timegm>> is the inverse of <<gmtime>>.
+
+<<timegm>> is available if _BSD_SOURCE || _SVID_SOURCE || _GNU_SOURCE.
 
 RETURNS
 If the contents of the structure at <[timp]> do not form a valid
@@ -56,7 +70,9 @@ result is the time, converted to a <<time_t>> value.
 PORTABILITY
 ANSI C requires <<mktime>>.
 
-<<mktime>> requires no supporting OS subroutines.
+<<timegm>> is a nonstandard GNU extension that is also present on the BSDs.
+
+<<mktime>> and <<timegm>> require no supporting OS subroutines.
 */
 
 #include <stdlib.h>
