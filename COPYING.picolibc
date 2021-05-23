@@ -222,7 +222,6 @@ Copyright: 2004 David Schultz <das@FreeBSD.ORG>
 License: BSD2-1
 
 Files: newlib/libm/machine/arm/_fenv.h
- newlib/libm/machine/arm/fe_dfl_env.c
  newlib/libm/machine/arm/feclearexcept.c
  newlib/libm/machine/arm/fedisableexcept.c
  newlib/libm/machine/arm/feenableexcept.c
@@ -641,10 +640,8 @@ Files: hello-world/hello-world++.c++
  newlib/libc/machine/arm/sys/meson.build
  newlib/libc/machine/csky/meson.build
  newlib/libc/machine/i386/machine/meson.build
- newlib/libc/machine/i386/sys/meson.build
  newlib/libc/machine/riscv/machine/math.h
  newlib/libc/machine/riscv/machine/meson.build
- newlib/libc/machine/x86_64/sys/meson.build
  newlib/libc/machine/xtensa/sys/meson.build
  newlib/libc/picolib/getauxval.c
  newlib/libc/picolib/machine/aarch64/tls.c
@@ -773,12 +770,9 @@ Files: newlib/libc/machine/powerpc/meson.build
 Copyright: 2019 Ash Logan, Keith Packard
 License: BSD3-1
 
-Files: newlib/libc/machine/xtensa/meson.build
- newlib/libm/machine/xtensa/meson.build
-Copyright: 2019 Jonathan McDowell
-License: BSD3-1
-
-Files: newlib/libc/stdlib/pico-atexit.c
+Files: newlib/libc/machine/shared_x86/meson.build
+ newlib/libc/machine/shared_x86/sys/meson.build
+ newlib/libc/stdlib/pico-atexit.c
  newlib/libc/stdlib/pico-exit.c
  newlib/libc/stdlib/pico-onexit.c
  newlib/libm/common/dreml.c
@@ -798,6 +792,11 @@ Files: newlib/libc/stdlib/pico-atexit.c
  test/math-funcs.c
  test/on_exit.c
 Copyright: 2021 Keith Packard
+License: BSD3-1
+
+Files: newlib/libc/machine/xtensa/meson.build
+ newlib/libm/machine/xtensa/meson.build
+Copyright: 2019 Jonathan McDowell
 License: BSD3-1
 
 Files: newlib/libm/machine/riscv/s_copysign.c
@@ -1647,7 +1646,6 @@ Files: newlib/libc/machine/spu/memcpy.c
  newlib/libc/machine/spu/strspn.c
  newlib/libc/machine/spu/strxfrm.c
  newlib/libc/machine/spu/vec_literal.h
- newlib/libm/machine/spu/fe_dfl_env.c
  newlib/libm/machine/spu/headers/atanf.h
  newlib/libm/machine/spu/headers/cbrt.h
  newlib/libm/machine/spu/headers/cbrtf.h
@@ -1982,8 +1980,7 @@ Files: newlib/libm/common/log2l.c
 Copyright: 2014 Mentor Graphics, Inc.
 License: BSD3-34
 
-Files: newlib/libm/machine/riscv/fe_dfl_env.c
- newlib/libm/machine/riscv/feclearexcept.c
+Files: newlib/libm/machine/riscv/feclearexcept.c
  newlib/libm/machine/riscv/fegetenv.c
  newlib/libm/machine/riscv/fegetexceptflag.c
  newlib/libm/machine/riscv/fegetround.c
