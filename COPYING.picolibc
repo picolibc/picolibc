@@ -775,6 +775,7 @@ Files: newlib/libc/machine/shared_x86/meson.build
  newlib/libc/stdlib/pico-atexit.c
  newlib/libc/stdlib/pico-exit.c
  newlib/libc/stdlib/pico-onexit.c
+ newlib/libc/tinystdio/matchcaseprefix.c
  newlib/libm/common/dreml.c
  newlib/libm/common/exp10l.c
  newlib/libm/common/pow10l.c
@@ -791,6 +792,8 @@ Files: newlib/libc/machine/shared_x86/meson.build
  test/hosted-exit.c
  test/math-funcs.c
  test/on_exit.c
+ test/timegm.c
+ test/timegm.h
 Copyright: 2021 Keith Packard
 License: BSD3-1
 
@@ -2387,7 +2390,6 @@ Files: newlib/libc/include/limits.h
  newlib/libc/string/strndup_r.c
  newlib/libc/string/strnlen.c
  newlib/libc/time/local.h
- newlib/libc/time/tzlock.c
  newlib/libc/time/tzset.c
  newlib/testsuite/newlib.wctype/tiswctype.c
  newlib/testsuite/newlib.wctype/twctrans.c
@@ -2603,7 +2605,6 @@ Files: newlib/libc/stdlib/abort.c
  newlib/libc/stdlib/calloc.c
  newlib/libc/stdlib/ecvtbuf.c
  newlib/libc/stdlib/efgcvt.c
- newlib/libc/stdlib/envlock.c
  newlib/libc/stdlib/eprintf.c
  newlib/libc/stdlib/exit.c
  newlib/libc/stdlib/labs.c
@@ -2616,7 +2617,6 @@ Files: newlib/libc/stdlib/abort.c
  newlib/libc/stdlib/mbstowcs.c
  newlib/libc/stdlib/mbtowc.c
  newlib/libc/stdlib/mbtowc_r.c
- newlib/libc/stdlib/mlock.c
  newlib/libc/stdlib/msize.c
  newlib/libc/stdlib/mstats.c
  newlib/libc/stdlib/mtrim.c
