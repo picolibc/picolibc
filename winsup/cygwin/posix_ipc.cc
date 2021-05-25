@@ -882,13 +882,10 @@ mq_timedreceive (mqd_t mqd, char *ptr, size_t maxlen, unsigned int *priop,
 extern "C" int
 mq_close (mqd_t mqd)
 {
-  struct mq_info *mqinfo;
-
   __try
     {
       cygheap_fdget fd ((int) mqd, true);
-      mqinfo = get_mqinfo (fd);
-      if (mqinfo->mqi_magic != MQI_MAGIC)
+      if (!fd->is_mqueue ())
 	{
 	  set_errno (EBADF);
 	  __leave;

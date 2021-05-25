@@ -180,9 +180,8 @@ fhandler_mqueue::close ()
       NtClose (mqinfo ()->mqi_waitsend);
       NtClose (mqinfo ()->mqi_waitrecv);
       NtClose (mqinfo ()->mqi_lock);
-      ret = 0;
     }
-  __except (EFAULT) {}
+  __except (0) {}
   __endtry
-  return ret;
+  return 0;
 }
