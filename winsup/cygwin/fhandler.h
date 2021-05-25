@@ -3115,6 +3115,11 @@ class fhandler_mqueue: public fhandler_disk_file
 
   int _dup (HANDLE parent, fhandler_mqueue *child);
 
+  int mutex_lock (HANDLE mtx, bool eintr);
+  int mutex_unlock (HANDLE mtx);
+  int cond_timedwait (HANDLE evt, HANDLE mtx, const struct timespec *abstime);
+  void cond_signal (HANDLE evt);
+
 public:
   fhandler_mqueue ();
   fhandler_mqueue (void *) {}
@@ -3126,6 +3131,13 @@ public:
 
   int open (int, mode_t);
   int mq_open (int, mode_t, struct mq_attr *);
+  int mq_getattr (struct mq_attr *);
+  int mq_setattr (const struct mq_attr *, struct mq_attr *);
+  int mq_notify (const struct sigevent *);
+  int mq_timedsend (const char *, size_t, unsigned int,
+		    const struct timespec *);
+  ssize_t mq_timedrecv (char *, size_t, unsigned int *,
+			const struct timespec *);
 
   struct mq_info *mqinfo () { return &mqi; }
 

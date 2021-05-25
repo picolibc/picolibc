@@ -58,7 +58,6 @@ struct mq_info
   HANDLE          mqi_waitsend;	 /* and condition variable for full queue */
   HANDLE          mqi_waitrecv;	 /* and condition variable for empty queue */
   uint32_t        mqi_magic;	 /* magic number if open */
-  int             mqi_flags;	 /* flags for this process */
 };
 
 
