@@ -502,8 +502,10 @@ path_conv::set_nt_native_path (PUNICODE_STRING new_path)
   uni_path.Buffer = wide_path;
 }
 
+/* If suffix is not NULL, append the suffix string verbatim.
+   This is used by fhandler_mqueue::mq_open to append an NTFS stream suffix. */
 PUNICODE_STRING
-path_conv::get_nt_native_path ()
+path_conv::get_nt_native_path (PUNICODE_STRING suffix)
 {
   PUNICODE_STRING res;
   if (wide_path)
@@ -514,9 +516,13 @@ path_conv::get_nt_native_path ()
     {
       uni_path.Length = 0;
       uni_path.MaximumLength = (strlen (path) + 10) * sizeof (WCHAR);
+      if (suffix)
+	uni_path.MaximumLength += suffix->Length;
       wide_path = (PWCHAR) cmalloc_abort (HEAP_STR, uni_path.MaximumLength);
       uni_path.Buffer = wide_path;
       ::get_nt_native_path (path, uni_path, has_dos_filenames_only ());
+      if (suffix)
+	RtlAppendUnicodeStringToString (&uni_path, suffix);
       res = &uni_path;
     }
   return res;

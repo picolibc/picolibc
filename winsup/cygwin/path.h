@@ -282,7 +282,7 @@ class path_conv
   ~path_conv ();
   inline const char *get_win32 () const { return path; }
   void set_nt_native_path (PUNICODE_STRING);
-  PUNICODE_STRING get_nt_native_path ();
+  PUNICODE_STRING get_nt_native_path (PUNICODE_STRING = NULL);
   inline POBJECT_ATTRIBUTES get_object_attr (OBJECT_ATTRIBUTES &attr,
 					     SECURITY_ATTRIBUTES &sa)
   {
