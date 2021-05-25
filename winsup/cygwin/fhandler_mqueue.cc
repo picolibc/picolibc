@@ -173,7 +173,7 @@ fhandler_mqueue::_mqinfo (SIZE_T filesize, mode_t mode, int flags,
 
   status = NtMapViewOfSection (mqinfo ()->mqi_sect, NtCurrentProcess (),
 			       &mptr, 0, filesize, NULL, &filesize,
-			       ViewShare, 0, PAGE_READWRITE);
+			       ViewShare, MEM_TOP_DOWN, PAGE_READWRITE);
   if (!NT_SUCCESS (status))
     goto err;
 
@@ -367,7 +367,7 @@ fhandler_mqueue::_dup (HANDLE parent, fhandler_mqueue *fhc)
 	__leave;
       status = NtMapViewOfSection (mqinfo ()->mqi_sect, NtCurrentProcess (),
 				   &mptr, 0, filesize, NULL, &filesize,
-				   ViewShare, 0, PAGE_READWRITE);
+				   ViewShare, MEM_TOP_DOWN, PAGE_READWRITE);
       if (!NT_SUCCESS (status))
 	api_fatal ("Mapping message queue failed in fork, status 0x%x\n",
 		   status);
