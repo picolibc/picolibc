@@ -4886,6 +4886,7 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
 {
   NTSTATUS status;
   UNICODE_STRING upath;
+  OBJECT_ATTRIBUTES attr;
   PEB &peb = *NtCurrentTeb ()->Peb;
   bool virtual_path = false;
   bool unc_path = false;
@@ -4927,7 +4928,23 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
     {
       upath = *nat_cwd->get_nt_native_path ();
       if (nat_cwd->isspecial ())
-	virtual_path = true;
+	{
+	  virtual_path = true;
+	  /* But allow starting of native apps from /dev if /dev actually
+	     exists on disk. */
+	  if (isdev_dev (nat_cwd->dev))
+	    {
+	      FILE_BASIC_INFORMATION fbi;
+
+	      InitializeObjectAttributes (&attr, &upath,
+					  OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+					  NULL, NULL);
+	      status = NtQueryAttributesFile (&attr, &fbi);
+	      if (status != STATUS_OBJECT_NAME_NOT_FOUND
+		  && status != STATUS_OBJECT_PATH_NOT_FOUND)
+		virtual_path = false;
+	    }
+	}
     }
 
   /* Memorize old DismountCount before opening the dir.  This value is
@@ -4944,7 +4961,6 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
   if (!virtual_path)
     {
       IO_STATUS_BLOCK io;
-      OBJECT_ATTRIBUTES attr;
 
       if (!nat_cwd)
 	{
