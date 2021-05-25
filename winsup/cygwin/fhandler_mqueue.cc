@@ -26,7 +26,6 @@ fhandler_mqueue::fhandler_mqueue () :
   fhandler_disk_file ()
 {
   filebuf = (char *) ccalloc_abort (HEAP_BUF, 1, FILESIZE);
-  close_on_exec (true);
 }
 
 fhandler_mqueue::~fhandler_mqueue ()
@@ -144,6 +143,14 @@ out:
   else
     mqinfo = mqinfo_open (oflags & O_NONBLOCK);
   mq_open_finish (mqinfo != NULL, created);
+  /* Set fhandler open flags */
+  if (mqinfo)
+    {
+      set_access (GENERIC_READ | SYNCHRONIZE);
+      close_on_exec (true);
+      set_flags (oflags | O_CLOEXEC, O_BINARY);
+      set_open_status ();
+    }
   return mqinfo ? 1 : 0;
 }
 
