@@ -500,10 +500,9 @@ get_mqinfo (cygheap_fdget &fd)
   if (fd >= 0)
     {
       fhandler_mqueue *fh = fd->is_mqueue ();
-      if (!fh)
-	set_errno (EINVAL);
-      else
+      if (fh)
 	return fh->mqinfo ();
+      set_errno (EINVAL);
     }
   return NULL;
 }
