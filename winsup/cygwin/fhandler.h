@@ -3113,6 +3113,8 @@ class fhandler_mqueue: public fhandler_disk_file
   struct mq_info *mqinfo_open (int);
   void mq_open_finish (bool success, bool created);
 
+  int _dup (HANDLE parent, fhandler_mqueue *child);
+
 public:
   fhandler_mqueue ();
   fhandler_mqueue (void *) {}

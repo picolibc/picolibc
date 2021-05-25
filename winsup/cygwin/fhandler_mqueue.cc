@@ -353,15 +353,7 @@ fhandler_mqueue::fstat (struct stat *buf)
 }
 
 int
-fhandler_mqueue::dup (fhandler_base *child, int flags)
-{
-  /* FIXME */
-  set_errno (EBADF);
-  return -1;
-}
-
-void
-fhandler_mqueue::fixup_after_fork (HANDLE parent)
+fhandler_mqueue::_dup (HANDLE parent, fhandler_mqueue *fhc)
 {
   __try
     {
@@ -370,7 +362,7 @@ fhandler_mqueue::fixup_after_fork (HANDLE parent)
       NTSTATUS status;
 
       if (!DuplicateHandle (parent, mqinfo ()->mqi_sect,
-			    GetCurrentProcess (), &mqinfo ()->mqi_sect,
+			    GetCurrentProcess (), &fhc->mqinfo ()->mqi_sect,
 			    0, FALSE, DUPLICATE_SAME_ACCESS))
 	__leave;
       status = NtMapViewOfSection (mqinfo ()->mqi_sect, NtCurrentProcess (),
@@ -380,31 +372,47 @@ fhandler_mqueue::fixup_after_fork (HANDLE parent)
 	api_fatal ("Mapping message queue failed in fork, status 0x%x\n",
 		   status);
 
-      mqinfo ()->mqi_hdr = (struct mq_hdr *) mptr;
+      fhc->mqinfo ()->mqi_hdr = (struct mq_hdr *) mptr;
       if (!DuplicateHandle (parent, mqinfo ()->mqi_waitsend,
-			    GetCurrentProcess (), &mqinfo ()->mqi_waitsend,
+			    GetCurrentProcess (), &fhc->mqinfo ()->mqi_waitsend,
 			    0, FALSE, DUPLICATE_SAME_ACCESS))
 	__leave;
       if (!DuplicateHandle (parent, mqinfo ()->mqi_waitrecv,
-			    GetCurrentProcess (), &mqinfo ()->mqi_waitrecv,
+			    GetCurrentProcess (), &fhc->mqinfo ()->mqi_waitrecv,
 			    0, FALSE, DUPLICATE_SAME_ACCESS))
 	__leave;
       if (!DuplicateHandle (parent, mqinfo ()->mqi_lock,
-			    GetCurrentProcess (), &mqinfo ()->mqi_lock,
+			    GetCurrentProcess (), &fhc->mqinfo ()->mqi_lock,
 			    0, FALSE, DUPLICATE_SAME_ACCESS))
 	__leave;
-      return;
+      return 0;
     }
   __except (EFAULT) {}
   __endtry
-  api_fatal ("Creating IPC object failed in fork, %E");
+  return -1;
+}
+
+int
+fhandler_mqueue::dup (fhandler_base *child, int flags)
+{
+  fhandler_mqueue *fhc = (fhandler_mqueue *) child;
+
+  int ret = fhandler_disk_file::dup (child, flags);
+  if (!ret)
+    ret = _dup (GetCurrentProcess (), fhc);
+  return ret;
+}
+
+void
+fhandler_mqueue::fixup_after_fork (HANDLE parent)
+{
+  if (_dup (parent, this))
+    api_fatal ("Creating IPC object failed in fork, %E");
 }
 
 int
 fhandler_mqueue::close ()
 {
-  int ret = -1;
-
   __try
     {
       mqinfo ()->mqi_magic = 0;          /* just in case */
