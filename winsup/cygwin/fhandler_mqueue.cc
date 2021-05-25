@@ -368,6 +368,13 @@ fhandler_mqueue::get_proc_fd_name (char *buf)
   return strcpy (buf, strrchr (get_name (), '/'));
 }
 
+int
+fhandler_mqueue::mkdir (mode_t mode)
+{
+  set_errno (EPERM);
+  return -1;
+}
+
 /* Do what fhandler_virtual does for read/lseek */
 bool
 fhandler_mqueue::fill_filebuf ()

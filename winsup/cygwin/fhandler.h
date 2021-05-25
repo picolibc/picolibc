@@ -3151,6 +3151,7 @@ public:
 
   void fixup_after_fork (HANDLE);
 
+  int mkdir (mode_t);
   void __reg3 read (void *, size_t&);
   off_t lseek (off_t, int);
   int __reg2 fstat (struct stat *);
