@@ -3106,6 +3106,10 @@ class fhandler_timerfd : public fhandler_base
 class fhandler_mqueue: public fhandler_disk_file
 {
   struct mq_info mqi;
+  /* Duplicate filebuf usage of fhandler_virtual */
+  char *filebuf;
+  off_t filesize;
+  off_t position;
 
   struct mq_info *_mqinfo (SIZE_T, mode_t, int, bool);
 
@@ -3115,6 +3119,8 @@ class fhandler_mqueue: public fhandler_disk_file
 
   int _dup (HANDLE parent, fhandler_mqueue *child);
 
+  bool fill_filebuf ();
+
   int mutex_lock (HANDLE mtx, bool eintr);
   int mutex_unlock (HANDLE mtx);
   int cond_timedwait (HANDLE evt, HANDLE mtx, const struct timespec *abstime);
@@ -3123,7 +3129,7 @@ class fhandler_mqueue: public fhandler_disk_file
 public:
   fhandler_mqueue ();
   fhandler_mqueue (void *) {}
-  ~fhandler_mqueue () {}
+  ~fhandler_mqueue ();
 
   fhandler_mqueue *is_mqueue () { return this; }
 
@@ -3143,8 +3149,10 @@ public:
 
   void fixup_after_fork (HANDLE);
 
-  int __reg2 fstat (struct stat *buf);
-  int dup (fhandler_base *child, int);
+  void __reg3 read (void *, size_t&);
+  off_t lseek (off_t, int);
+  int __reg2 fstat (struct stat *);
+  int dup (fhandler_base *, int);
   int ioctl (unsigned int, void *);
   int close ();
 

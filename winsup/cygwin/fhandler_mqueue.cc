@@ -12,17 +12,26 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "clock.h"
+#include <stdio.h>
 #include <mqueue.h>
 #include <sys/param.h>
 
 #define MSGSIZE(i)      roundup((i), sizeof(long))
+
+#define FILESIZE	80
 
 struct mq_attr defattr = { 0, 10, 8192, 0 };	/* Linux defaults. */
 
 fhandler_mqueue::fhandler_mqueue () :
   fhandler_disk_file ()
 {
+  filebuf = (char *) ccalloc_abort (HEAP_BUF, 1, FILESIZE);
   close_on_exec (true);
+}
+
+fhandler_mqueue::~fhandler_mqueue ()
+{
+  cfree (filebuf);
 }
 
 int
@@ -344,12 +353,97 @@ fhandler_mqueue::get_proc_fd_name (char *buf)
   return strcpy (buf, strrchr (get_name (), '/'));
 }
 
+/* Do what fhandler_virtual does for read/lseek */
+bool
+fhandler_mqueue::fill_filebuf ()
+{
+  unsigned long qsize = 0;
+  int notify = 0;
+  int signo = 0;
+  int notify_pid = 0;
+
+  if (mutex_lock (mqinfo ()->mqi_lock, true) == 0)
+    {
+      struct mq_hdr *mqhdr = mqinfo ()->mqi_hdr;
+      int8_t *mptr = (int8_t *) mqhdr;
+      struct msg_hdr *msghdr;
+      for (long index = mqhdr->mqh_head; index; index = msghdr->msg_next)
+	{
+	  msghdr = (struct msg_hdr *) &mptr[index];
+	  qsize += msghdr->msg_len;
+	}
+      if (mqhdr->mqh_pid)
+	{
+	  notify = mqhdr->mqh_event.sigev_notify;
+	  if (notify == SIGEV_SIGNAL)
+	    signo = mqhdr->mqh_event.sigev_signo;
+	  notify_pid = mqhdr->mqh_pid;
+	}
+      mutex_unlock (mqinfo ()->mqi_lock);
+    }
+  /* QSIZE:      bytes of all current msgs
+     NOTIFY:     sigev_notify if there's a notifier
+     SIGNO:      signal number if NOTIFY && sigev_notify == SIGEV_SIGNAL
+     NOTIFY_PID: if NOTIFY pid */
+  snprintf (filebuf, FILESIZE,
+	    "QSIZE:%-10lu NOTIFY:%-5d SIGNO:%-5d NOTIFY_PID:%-6d\n",
+	    qsize, notify, signo, notify_pid);
+  filesize = strlen (filebuf);
+  return true;
+}
+
+void __reg3
+fhandler_mqueue::read (void *in_ptr, size_t& len)
+{
+  if (len == 0)
+    return;
+  if (!filebuf[0] && !fill_filebuf ())
+    {
+      len = (size_t) -1;
+      return;
+    }
+  if ((ssize_t) len > filesize - position)
+    len = (size_t) (filesize - position);
+  if ((ssize_t) len < 0)
+    len = 0;
+  else
+    memcpy (in_ptr, filebuf + position, len);
+  position += len;
+}
+
+off_t
+fhandler_mqueue::lseek (off_t offset, int whence)
+{
+  if (!fill_filebuf ())
+    return (off_t) -1;
+  switch (whence)
+    {
+    case SEEK_SET:
+      position = offset;
+      break;
+    case SEEK_CUR:
+      position += offset;
+      break;
+    case SEEK_END:
+      position = filesize + offset;
+      break;
+    default:
+      set_errno (EINVAL);
+      return (off_t) -1;
+    }
+  return position;
+}
+
+
 int __reg2
 fhandler_mqueue::fstat (struct stat *buf)
 {
   int ret = fhandler_disk_file::fstat (buf);
   if (!ret)
-    buf->st_dev = FH_MQUEUE;
+    {
+      buf->st_size = FILESIZE;
+      buf->st_dev = FH_MQUEUE;
+    }
   return ret;
 }
 
@@ -400,7 +494,10 @@ fhandler_mqueue::dup (fhandler_base *child, int flags)
 
   int ret = fhandler_disk_file::dup (child, flags);
   if (!ret)
-    ret = _dup (GetCurrentProcess (), fhc);
+    {
+      memcpy (fhc->filebuf, filebuf, FILESIZE);
+      ret = _dup (GetCurrentProcess (), fhc);
+    }
   return ret;
 }
 
