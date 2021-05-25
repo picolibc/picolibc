@@ -412,6 +412,12 @@ fhandler_mqueue::fixup_after_fork (HANDLE parent)
 }
 
 int
+fhandler_mqueue::ioctl (unsigned int cmd, void *buf)
+{
+  return fhandler_base::ioctl (cmd, buf);
+}
+
+int
 fhandler_mqueue::close ()
 {
   __try

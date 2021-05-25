@@ -3145,6 +3145,7 @@ public:
 
   int __reg2 fstat (struct stat *buf);
   int dup (fhandler_base *child, int);
+  int ioctl (unsigned int, void *);
   int close ();
 
   void copy_from (fhandler_base *x)
