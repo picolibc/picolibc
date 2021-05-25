@@ -39,6 +39,13 @@ struct mq_hdr
   uint32_t          mqh_magic;	 /* Expect MQI_MAGIC here, otherwise it's
 				    an old-style message queue. */
 };
+
+struct msg_hdr
+{
+  int32_t         msg_next;	 /* index of next on linked list */
+  int32_t         msg_len;	 /* actual length */
+  unsigned int    msg_prio;	 /* priority */
+};
 #pragma pack (pop)
 
 struct mq_info
