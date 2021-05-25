@@ -3151,11 +3151,23 @@ public:
 
   void fixup_after_fork (HANDLE);
 
-  int mkdir (mode_t);
+#define NO_IMPL		{ set_errno (EPERM); return -1; }
+
+  ssize_t __reg3 fgetxattr (const char *, void *, size_t) NO_IMPL;
+  int __reg3 fsetxattr (const char *, const void *, size_t, int) NO_IMPL;
+  int __reg3 fadvise (off_t, off_t, int) NO_IMPL;
+  int __reg3 ftruncate (off_t, bool) NO_IMPL;
+  int link (const char *) NO_IMPL;
+  int mkdir (mode_t) NO_IMPL;
+  ssize_t __reg3 pread (void *, size_t, off_t, void *aio = NULL) NO_IMPL;
+  ssize_t __reg3 pwrite (void *, size_t, off_t, void *aio = NULL) NO_IMPL;
+  int lock (int, struct flock *) NO_IMPL;
+  int mand_lock (int, struct flock *) NO_IMPL;
   void __reg3 read (void *, size_t&);
   off_t lseek (off_t, int);
   int __reg2 fstat (struct stat *);
   int dup (fhandler_base *, int);
+  int fcntl (int cmd, intptr_t);
   int ioctl (unsigned int, void *);
   int close ();
 

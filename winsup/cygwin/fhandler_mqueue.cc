@@ -376,10 +376,25 @@ fhandler_mqueue::get_proc_fd_name (char *buf)
 }
 
 int
-fhandler_mqueue::mkdir (mode_t mode)
+fhandler_mqueue::fcntl (int cmd, intptr_t arg)
 {
-  set_errno (EPERM);
-  return -1;
+  int res;
+
+  switch (cmd)
+    {
+    case F_GETFD:
+      res = close_on_exec () ? FD_CLOEXEC : 0;
+      break;
+    case F_GETFL:
+      res = get_flags ();
+      debug_printf ("GETFL: %y", res);
+      break;
+    default:
+      set_errno (EINVAL);
+      res = -1;
+      break;
+    }
+  return res;
 }
 
 /* Do what fhandler_virtual does for read/lseek */
