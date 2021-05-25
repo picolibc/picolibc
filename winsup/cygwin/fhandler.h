@@ -3111,6 +3111,8 @@ class fhandler_mqueue: public fhandler_disk_file
   off_t filesize;
   off_t position;
 
+  bool valid_path ();
+
   struct mq_info *_mqinfo (SIZE_T, mode_t, int, bool);
 
   struct mq_info *mqinfo_create (struct mq_attr *, mode_t, int);

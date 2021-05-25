@@ -10,6 +10,9 @@ details. */
 
 #define MQI_MAGIC	0x98765432UL
 
+#define MQ_PATH "/dev/mqueue/"
+#define MQ_LEN  (sizeof (MQ_PATH) - 1)
+
 /* The mq_attr structure is defined using long datatypes per POSIX.
    The mq_fattr is the in-file representation of the mq_attr struct.
    Originally created this way for 32/64 bit interoperability, this

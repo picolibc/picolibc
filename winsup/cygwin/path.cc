@@ -1188,6 +1188,10 @@ path_conv::check (const char *src, unsigned opt,
 	  return;
 	}
 
+      /* Restore last path component */
+      if (tail < path_end && tail > path_copy + 1)
+	*tail = '/';
+
       if (dev.isfs ())
 	{
 	  /* If FS hasn't been checked already in symlink_info::check,
@@ -1227,16 +1231,8 @@ path_conv::check (const char *src, unsigned opt,
 	    set_exec (0);
 
 	  /* FIXME: bad hack alert!!!  We need a better solution */
-
-#define MQ_PATH "/dev/mqueue/"
-#define MQ_LEN  (sizeof (MQ_PATH) - 1)
-
-	  if (!strncmp (src, MQ_PATH, MQ_LEN))
-	    {
-	      size_t len = strlen (src + MQ_LEN);
-	      if (len > 0 && len <= NAME_MAX && !strpbrk (src + MQ_LEN, "/\\"))
-		dev.parse (FH_MQUEUE);
-	    }
+	  if (!strncmp (path_copy, MQ_PATH, MQ_LEN) && path_copy[MQ_LEN])
+	    dev.parse (FH_MQUEUE);
 	}
 
       if (opt & PC_NOFULL)
@@ -1270,11 +1266,7 @@ path_conv::check (const char *src, unsigned opt,
 	path_flags |= PATH_CTTY;
 
       if (opt & PC_POSIX)
-	{
-	  if (tail < path_end && tail > path_copy + 1)
-	    *tail = '/';
-	  set_posix (path_copy);
-	}
+	set_posix (path_copy);
 
 #if 0
       if (!error)

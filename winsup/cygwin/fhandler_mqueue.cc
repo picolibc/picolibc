@@ -34,9 +34,24 @@ fhandler_mqueue::~fhandler_mqueue ()
   cfree (filebuf);
 }
 
+bool
+fhandler_mqueue::valid_path ()
+{
+  const char *posix_basename = get_name () + MQ_LEN;
+  size_t len = strlen (posix_basename);
+  if (len > 0 && len <= NAME_MAX && !strpbrk (posix_basename, "/\\"))
+    return true;
+  return false;
+}
+
 int
 fhandler_mqueue::open (int flags, mode_t mode)
 {
+  if (!valid_path ())
+    {
+      set_errno (EINVAL);
+      return 0;
+    }
   /* FIXME: reopen by handle semantics missing yet */
   flags &= ~(O_NOCTTY | O_PATH | O_BINARY | O_TEXT);
   return mq_open (flags, mode, NULL);
