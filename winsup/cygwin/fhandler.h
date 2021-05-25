@@ -3117,16 +3117,16 @@ class fhandler_mqueue: public fhandler_disk_file
 
   struct mq_info *mqinfo_create (struct mq_attr *, mode_t, int);
   struct mq_info *mqinfo_open (int);
-  void mq_open_finish (bool success, bool created);
+  void mq_open_finish (bool, bool);
 
-  int _dup (HANDLE parent, fhandler_mqueue *child);
+  int _dup (HANDLE, fhandler_mqueue *);
 
   bool fill_filebuf ();
 
-  int mutex_lock (HANDLE mtx, bool eintr);
-  int mutex_unlock (HANDLE mtx);
-  int cond_timedwait (HANDLE evt, HANDLE mtx, const struct timespec *abstime);
-  void cond_signal (HANDLE evt);
+  int mutex_lock (HANDLE, bool);
+  int mutex_unlock (HANDLE);
+  int cond_timedwait (HANDLE, HANDLE, const struct timespec *);
+  void cond_signal (HANDLE);
 
 public:
   fhandler_mqueue ();
