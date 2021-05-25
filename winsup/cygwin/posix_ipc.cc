@@ -16,6 +16,7 @@ details. */
 #include "cygheap.h"
 #include "sigproc.h"
 #include "ntdll.h"
+#include "tls_pbuf.h"
 #include <io.h>
 #include <sys/mman.h>
 #include <sys/param.h>
@@ -23,8 +24,6 @@ details. */
 #include <unistd.h>
 #include <mqueue.h>
 #include <semaphore.h>
-
-extern "C" int ftruncate64 (int fd, off_t length);
 
 /* The prefix_len is the length of the path prefix including trailing "/"
    (or "/sem." for semaphores) as well as the trailing NUL. */
@@ -300,39 +299,13 @@ shm_unlink (const char *name)
    files are created under /dev/mqueue.  mq_timedsend and mq_timedreceive
    are implemented additionally. */
 
-#pragma pack (push, 4)
-struct msg_hdr
-{
-  int32_t         msg_next;	 /* index of next on linked list */
-  int32_t         msg_len;	 /* actual length */
-  unsigned int    msg_prio;	 /* priority */
-};
-#pragma pack (pop)
-
-#define MSGSIZE(i)	roundup((i), sizeof(long))
-
-#define	 MAX_TRIES	10	/* for waiting for initialization */
-
-struct mq_attr defattr = { 0, 10, 8192, 0 };	/* Linux defaults. */
-
-extern "C" off_t lseek64 (int, off_t, int);
-extern "C" void *mmap64 (void *, size_t, int, int, int, off_t);
-
 extern "C" mqd_t
 mq_open (const char *name, int oflag, ...)
 {
-  int i, fd = -1, nonblock, created = 0;
-  long msgsize, index;
-  off_t filesize = 0;
   va_list ap;
-  mode_t mode;
+  mode_t mode = 0;
   fhandler_mqueue *fh = NULL;
-  struct stat statbuff;
-  int8_t *mptr = NULL;
-  struct mq_hdr *mqhdr;
-  struct msg_hdr *msghdr;
-  struct mq_attr *attr;
-  struct mq_info *mqinfo = NULL;
+  struct mq_attr *attr = NULL;
 
   size_t len = strlen (name);
   char mqname[ipc_names[mqueue].prefix_len + len];
@@ -342,155 +315,36 @@ mq_open (const char *name, int oflag, ...)
 
   __try
     {
-      oflag &= (O_CREAT | O_EXCL | O_NONBLOCK);
-      nonblock = oflag & O_NONBLOCK;
-      oflag &= ~O_NONBLOCK;
-
-    again:
       if (oflag & O_CREAT)
 	{
 	  va_start (ap, oflag);		/* init ap to final named argument */
 	  mode = va_arg (ap, mode_t) & ~S_IXUSR;
 	  attr = va_arg (ap, struct mq_attr *);
 	  va_end (ap);
-
-	  /* Open and specify O_EXCL and user-execute */
-	  fd = open (mqname, oflag | O_EXCL | O_RDWR | O_CLOEXEC,
-		     mode | S_IXUSR);
-	  if (fd < 0)
-	    {
-	      if (errno == EEXIST && (oflag & O_EXCL) == 0)
-		goto exists;		/* already exists, OK */
-	      return (mqd_t) -1;
-	    }
-	  created = 1;
-	  /* First one to create the file initializes it */
-	  if (attr == NULL)
-	    attr = &defattr;
-	  /* Check minimum and maximum values.  The max values are pretty much
-	     arbitrary, taken from the linux mq_overview man page.  However,
-	     these max values make sure that the internal mq_fattr structure
-	     can use 32 bit types. */
-	  else if (attr->mq_maxmsg <= 0 || attr->mq_maxmsg > 32768
-		   || attr->mq_msgsize <= 0 || attr->mq_msgsize > 1048576)
-	    {
-	      set_errno (EINVAL);
-	      __leave;
-	    }
-	  /* Calculate and set the file size */
-	  msgsize = MSGSIZE (attr->mq_msgsize);
-	  filesize = sizeof (struct mq_hdr)
-		     + (attr->mq_maxmsg * (sizeof (struct msg_hdr) + msgsize));
-	  if (ftruncate64 (fd, filesize) == -1)
-	    __leave;
-
-	  /* Create file descriptor for mqueue */
-	  cygheap_fdnew fdm;
-
-	  if (fdm < 0)
-	    __leave;
-	  fh = (fhandler_mqueue *) build_fh_dev (*mqueue_dev, name);
-	  if (!fh)
-	    __leave;
-
-	  mqinfo = fh->mqinfo_create ((HANDLE) _get_osfhandle (fd), filesize,
-				      mode, nonblock);
-	  if (!mqinfo)
-	    __leave;
-
-	  /* Initialize header at beginning of file */
-	  /* Create free list with all messages on it */
-	  mptr = (int8_t *) mqinfo->mqi_hdr;
-	  mqhdr = mqinfo->mqi_hdr;
-	  mqhdr->mqh_attr.mq_flags = 0;
-	  mqhdr->mqh_attr.mq_maxmsg = attr->mq_maxmsg;
-	  mqhdr->mqh_attr.mq_msgsize = attr->mq_msgsize;
-	  mqhdr->mqh_attr.mq_curmsgs = 0;
-	  mqhdr->mqh_nwait = 0;
-	  mqhdr->mqh_pid = 0;
-	  mqhdr->mqh_head = 0;
-	  mqhdr->mqh_magic = MQI_MAGIC;
-	  index = sizeof (struct mq_hdr);
-	  mqhdr->mqh_free = index;
-	  for (i = 0; i < attr->mq_maxmsg - 1; i++)
-	    {
-	      msghdr = (struct msg_hdr *) &mptr[index];
-	      index += sizeof (struct msg_hdr) + msgsize;
-	      msghdr->msg_next = index;
-	    }
-	  msghdr = (struct msg_hdr *) &mptr[index];
-	  msghdr->msg_next = 0;		/* end of free list */
-
-	  /* Initialization complete, turn off user-execute bit */
-	  if (fchmod (fd, mode) == -1)
-	    __leave;
-	  close (fd);
-	  fdm = fh;
-	  return (mqd_t) fdm;
-	}
-
-    exists:
-      /* Open the file then memory map */
-      if ((fd = open (mqname, O_RDWR | O_CLOEXEC)) < 0)
-	{
-	  if (errno == ENOENT && (oflag & O_CREAT))
-	    goto again;
-	  __leave;
-	}
-      /* Make certain initialization is complete */
-      for (i = 0; i < MAX_TRIES; i++)
-	{
-	  if (stat64 (mqname, &statbuff) == -1)
-	    {
-	      if (errno == ENOENT && (oflag & O_CREAT))
-		{
-		  close (fd);
-		  fd = -1;
-		  goto again;
-		}
-	      __leave;
-	    }
-	  if ((statbuff.st_mode & S_IXUSR) == 0)
-	    break;
-	  sleep (1);
-	}
-      if (i == MAX_TRIES)
-	{
-	  set_errno (ETIMEDOUT);
-	  __leave;
 	}
 
       /* Create file descriptor for mqueue */
-      cygheap_fdnew fdm;
+      cygheap_fdnew fd;
 
-      if (fdm < 0)
+      if (fd < 0)
 	__leave;
-      fh = (fhandler_mqueue *) build_fh_dev (*mqueue_dev, name);
+      fh = (fhandler_mqueue *) build_fh_name (mqname,
+					      PC_OPEN | PC_POSIX
+					      | PC_SYM_NOFOLLOW | PC_NULLEMPTY,
+					      NULL);
       if (!fh)
 	__leave;
 
-      mqinfo = fh->mqinfo_open ((HANDLE) _get_osfhandle (fd), statbuff.st_size,
-				statbuff.st_mode, nonblock);
-      if (!mqinfo)
-	__leave;
-
-      close (fd);
-      fdm = fh;
-      return (mqd_t) fdm;
+      if (fh->mq_open (oflag, mode, attr))
+	{
+	  fd = fh;
+	  return (mqd_t) fd;
+	}
     }
   __except (EFAULT) {}
   __endtry
-  /* Don't let following function calls change errno */
-  save_errno save;
-  if (created)
-    unlink (mqname);
-  if (fd >= 0)
-    close (fd);
   if (fh)
-    {
-      fh->close ();
-      delete fh;
-    }
+    delete fh;
   return (mqd_t) -1;
 }
 
@@ -921,6 +775,8 @@ mq_unlink (const char *name)
    the already existing semaphore class in thread.cc.  Using a file backed
    solution allows to implement kernel persistent named semaphores.  */
 
+#define	 MAX_TRIES	10	/* for waiting for initialization */
+
 struct sem_finfo
 {
   unsigned int       value;
@@ -1048,6 +904,8 @@ sem_open (const char *name, int oflag, ...)
     close (fd);
   return SEM_FAILED;
 }
+
+extern "C" off_t lseek64 (int, off_t, int);
 
 int
 _sem_close (sem_t *sem, bool do_close)

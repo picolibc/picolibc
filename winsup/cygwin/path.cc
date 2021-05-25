@@ -1225,6 +1225,18 @@ path_conv::check (const char *src, unsigned opt,
 	    set_exec (1);
 	  else if (issymlink () || issocket ())
 	    set_exec (0);
+
+	  /* FIXME: bad hack alert!!!  We need a better solution */
+
+#define MQ_PATH "/dev/mqueue/"
+#define MQ_LEN  (sizeof (MQ_PATH) - 1)
+
+	  if (!strncmp (src, MQ_PATH, MQ_LEN))
+	    {
+	      size_t len = strlen (src + MQ_LEN);
+	      if (len > 0 && len <= NAME_MAX && !strpbrk (src + MQ_LEN, "/\\"))
+		dev.parse (FH_MQUEUE);
+	    }
 	}
 
       if (opt & PC_NOFULL)

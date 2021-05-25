@@ -3103,11 +3103,15 @@ class fhandler_timerfd : public fhandler_base
   }
 };
 
-class fhandler_mqueue: public fhandler_base
+class fhandler_mqueue: public fhandler_disk_file
 {
   struct mq_info mqi;
 
-  struct mq_info *_mqinfo (HANDLE, SIZE_T, mode_t, int, bool);
+  struct mq_info *_mqinfo (SIZE_T, mode_t, int, bool);
+
+  struct mq_info *mqinfo_create (struct mq_attr *, mode_t, int);
+  struct mq_info *mqinfo_open (int);
+  void mq_open_finish (bool success, bool created);
 
 public:
   fhandler_mqueue ();
@@ -3118,14 +3122,9 @@ public:
 
   char *get_proc_fd_name (char *);
 
-  struct mq_info *mqinfo_create (HANDLE _h, SIZE_T _s, mode_t _m, int _f)
-  {
-    return _mqinfo (_h, _s, _m, _f, false);
-  }
-  struct mq_info *mqinfo_open (HANDLE _h, SIZE_T _s, mode_t _m, int _f)
-  {
-    return _mqinfo (_h, _s, _m, _f, true);
-  }
+  int open (int, mode_t);
+  int mq_open (int, mode_t, struct mq_attr *);
+
   struct mq_info *mqinfo () { return &mqi; }
 
   void fixup_after_fork (HANDLE);

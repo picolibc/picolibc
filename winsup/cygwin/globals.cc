@@ -153,6 +153,7 @@ const int __collate_load_error = 0;
   extern UNICODE_STRING _RDATA ro_u_natsyml = _ROU (L"SymbolicLink");
   extern UNICODE_STRING _RDATA ro_u_natdev = _ROU (L"Device");
   extern UNICODE_STRING _RDATA ro_u_npfs = _ROU (L"\\Device\\NamedPipe\\");
+  extern UNICODE_STRING _RDATA ro_u_mq_suffix = _ROU (L":mqueue");
   #undef _ROU
 
   /* This is an exported copy of environ which can be used by DLLs
