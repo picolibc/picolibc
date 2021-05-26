@@ -15,7 +15,7 @@ AM_CPPFLAGS =
 
 include $(top_srcdir)/Makefile.am.common
 
-CFLAGS_COMMON=-Wimplicit-fallthrough=4 -Werror
+CFLAGS_COMMON=-Wimplicit-fallthrough=4 -Werror -D_WIN32_WINNT=0x0a00 -DNTDDI_VERSION=WDK_NTDDI_VERSION
 AM_CXXFLAGS=-fno-exceptions -fno-rtti -fno-use-cxa-atexit $(flags_common) $(CFLAGS_COMMON)
 
 bin_PROGRAMS = \

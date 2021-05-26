@@ -37,7 +37,6 @@
 #include <unistd.h>
 #include <libgen.h>
 
-#define _WIN32_WINNT 0x0a00
 #define PSAPI_VERSION 1
 #include <windows.h>
 #include <winternl.h>

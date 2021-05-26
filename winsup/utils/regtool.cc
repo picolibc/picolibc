@@ -13,7 +13,6 @@ details. */
 #include <wchar.h>
 #include <getopt.h>
 #include <locale.h>
-#define WINVER 0x0502
 #include <windows.h>
 #include <sys/cygwin.h>
 #include <cygwin/version.h>

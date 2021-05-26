@@ -21,8 +21,6 @@ details. */
 #include <wctype.h>
 #include <errno.h>
 
-#define _WIN32_WINNT 0x0a00
-#define WINVER 0x0a00
 #define NOCOMATTRIBUTE
 #include <windows.h>
 #include <userenv.h>

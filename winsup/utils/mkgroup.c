@@ -6,7 +6,6 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
-#define _WIN32_WINNT 0x0a00
 #include <errno.h>
 #include <ctype.h>
 #include <stdlib.h>
