@@ -117,7 +117,7 @@ exists:
       if (status != STATUS_SHARING_VIOLATION)
 	{
 	  __seterrno_from_nt_status (status);
-	  return -1;
+	  return 0;
 	}
       Sleep (100L);
     }
