@@ -3157,7 +3157,7 @@ public:
   int __reg3 fsetxattr (const char *, const void *, size_t, int) NO_IMPL;
   int __reg3 fadvise (off_t, off_t, int) NO_IMPL;
   int __reg3 ftruncate (off_t, bool) NO_IMPL;
-  int link (const char *) NO_IMPL;
+  int __reg2 link (const char *) NO_IMPL;
   int mkdir (mode_t) NO_IMPL;
   ssize_t __reg3 pread (void *, size_t, off_t, void *aio = NULL) NO_IMPL;
   ssize_t __reg3 pwrite (void *, size_t, off_t, void *aio = NULL) NO_IMPL;
