@@ -298,14 +298,15 @@ extern "C" {
 #ifdef INTERNAL_NEWLIB
 
 #include <sys/config.h>
+#include <sys/lock.h>
 
 #define POINTER_UINT unsigned _POINTER_INT
 #define SEPARATE_OBJECTS
 #define HAVE_MMAP 0
 #define MORECORE(size) sbrk((size))
 #define MORECORE_CLEARS 0
-#define MALLOC_LOCK __malloc_lock()
-#define MALLOC_UNLOCK __malloc_unlock()
+#define MALLOC_LOCK __LIBC_LOCK()
+#define MALLOC_UNLOCK __LIBC_UNLOCK()
 
 #ifdef __CYGWIN__
 # undef _WIN32
@@ -389,20 +390,6 @@ extern void __malloc_unlock();
 #define STATIC static
 #else
 #define STATIC
-#endif
-
-/*
-   Define MALLOC_LOCK and MALLOC_UNLOCK to C expressions to run to
-   lock and unlock the malloc data structures.  MALLOC_LOCK may be
-   called recursively.
- */
-
-#ifndef MALLOC_LOCK
-#define MALLOC_LOCK
-#endif
-
-#ifndef MALLOC_UNLOCK
-#define MALLOC_UNLOCK
 #endif
 
 /*

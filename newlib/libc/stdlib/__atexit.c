@@ -49,10 +49,6 @@ void * malloc(size_t) _ATTRIBUTE((__weak__));
 const void * __atexit_dummy = &__call_exitprocs;
 #endif
 
-#ifndef __SINGLE_THREAD__
-extern _LOCK_RECURSIVE_T __atexit_recursive_mutex;
-#endif
-
 NEWLIB_THREAD_LOCAL_ATEXIT struct _atexit _atexit0;
 NEWLIB_THREAD_LOCAL_ATEXIT struct _atexit *_atexit;
 
@@ -69,9 +65,7 @@ __register_exitproc (int type,
   struct _on_exit_args * args;
   register struct _atexit *p;
 
-#ifndef __SINGLE_THREAD__
-  __lock_acquire_recursive(__atexit_recursive_mutex);
-#endif
+  __LIBC_LOCK();
 
   p = _atexit;
   if (p == NULL)
@@ -81,17 +75,13 @@ __register_exitproc (int type,
   if (p->_ind >= _ATEXIT_SIZE)
     {
 #if !defined (_ATEXIT_DYNAMIC_ALLOC) || !defined (MALLOC_PROVIDED)
-#ifndef __SINGLE_THREAD__
-      __lock_release_recursive(__atexit_recursive_mutex);
-#endif
+      __LIBC_UNLOCK();
       return -1;
 #else
       p = (struct _atexit *) malloc (sizeof *p);
       if (p == NULL)
 	{
-#ifndef __SINGLE_THREAD__
-	  __lock_release_recursive(__atexit_recursive_mutex);
-#endif
+	  __LIBC_UNLOCK();
 	  return -1;
 	}
       p->_ind = 0;
@@ -112,8 +102,6 @@ __register_exitproc (int type,
 	args->_is_cxa |= (1 << p->_ind);
     }
   p->_fns[p->_ind++] = fn;
-#ifndef __SINGLE_THREAD__
-  __lock_release_recursive(__atexit_recursive_mutex);
-#endif
+  __LIBC_UNLOCK();
   return 0;
 }

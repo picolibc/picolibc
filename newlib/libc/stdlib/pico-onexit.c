@@ -43,18 +43,12 @@ struct _on_exit {
 
 static struct _on_exit on_exits[ATEXIT_MAX];
 
-#ifndef __SINGLE_THREAD__
-__LOCK_INIT(static, __on_exit_mutex);
-#endif
-
 int
 on_exit (void (*func)(int, void *),void *arg)
 {
 	int	ret = -1;
 	int	o;
-#ifndef __SINGLE_THREAD__
-	__lock_acquire(__on_exit_mutex);
-#endif
+	__LIBC_LOCK();
 	for (o = 0; o < ATEXIT_MAX; o++) {
 		if (!on_exits[o].func) {
 			on_exits[o].func = func;
@@ -63,9 +57,7 @@ on_exit (void (*func)(int, void *),void *arg)
 			break;
 		}
 	}
-#ifndef __SINGLE_THREAD__
-	__lock_release(__on_exit_mutex);
-#endif
+	__LIBC_UNLOCK();
 	return ret;
 }
 
@@ -77,9 +69,7 @@ __call_exitprocs(int code, void *param)
 		void	(*func)(int, void *) = NULL;
 		void	*arg;
 
-#ifndef __SINGLE_THREAD__
-		__lock_acquire(__on_exit_mutex);
-#endif
+		__LIBC_LOCK();
 		for (i = ATEXIT_MAX - 1; i >= 0; i--) {
 			if ((func = on_exits[i].func) != NULL) {
 				arg = on_exits[i].arg;
@@ -88,9 +78,7 @@ __call_exitprocs(int code, void *param)
 				break;
 			}
 		}
-#ifndef __SINGLE_THREAD__
-		__lock_release(__on_exit_mutex);
-#endif
+		__LIBC_UNLOCK();
 		if (func == NULL)
 			break;
 		func(code, arg);

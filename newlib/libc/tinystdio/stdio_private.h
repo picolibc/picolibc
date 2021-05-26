@@ -125,43 +125,23 @@ struct __file_posix {
 };
 
 static inline void __posix_lock_init(FILE *f) {
-#ifndef __SINGLE_THREAD__
-	struct __file_posix *fp = (struct __file_posix *) f;
-	(void) fp;
-	__lock_init(fp->lock);
-#else
 	(void) f;
-#endif
+	__lock_init(((struct __file_posix *) f)->lock);
 }
 
 static inline void __posix_lock_close(FILE *f) {
-#ifndef __SINGLE_THREAD__
-	struct __file_posix *fp = (struct __file_posix *) f;
-	(void) fp;
-	__lock_close(fp->lock);
-#else
 	(void) f;
-#endif
+	__lock_close(((struct __file_posix *) f)->lock);
 }
 
 static inline void __posix_lock(FILE *f) {
-#ifndef __SINGLE_THREAD__
-	struct __file_posix *fp = (struct __file_posix *) f;
-	(void) fp;
-	__lock_acquire(fp->lock);
-#else
 	(void) f;
-#endif
+	__lock_acquire(((struct __file_posix *) f)->lock);
 }
 
 static inline void __posix_unlock(FILE *f) {
-#ifndef __SINGLE_THREAD__
-	struct __file_posix *fp = (struct __file_posix *) f;
-	(void) fp;
-	__lock_release(fp->lock);
-#else
 	(void) f;
-#endif
+	__lock_release(((struct __file_posix *) f)->lock);
 }
 
 int	__d_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);

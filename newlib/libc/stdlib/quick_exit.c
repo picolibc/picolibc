@@ -42,12 +42,6 @@ struct quick_exit_handler {
 };
 
 /**
- * Lock protecting the handlers list.
- */
-#ifndef __SINGLE_THREAD__
-__LOCK_INIT(static, __at_quick_exit_mutex);
-#endif
-/**
  * Stack of cleanup handlers.  These will be invoked in reverse order when
  */
 static struct quick_exit_handler *handlers;
@@ -62,14 +56,10 @@ at_quick_exit(void (*func)(void))
 	if (NULL == h)
 		return (1);
 	h->cleanup = func;
-#ifndef __SINGLE_THREAD__
-	__lock_acquire(__at_quick_exit_mutex);
-#endif
+	__LIBC_LOCK();
 	h->next = handlers;
 	handlers = h;
-#ifndef __SINGLE_THREAD__
-	__lock_release(__at_quick_exit_mutex);
-#endif
+	__LIBC_UNLOCK();
 	return (0);
 }
 

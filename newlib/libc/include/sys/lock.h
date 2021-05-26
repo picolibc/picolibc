@@ -12,8 +12,8 @@
 typedef int _LOCK_T;
 typedef int _LOCK_RECURSIVE_T;
 
-#define __LOCK_INIT(class,lock)
-#define __LOCK_INIT_RECURSIVE(class,lock)
+#define __LOCK_INIT(lock)
+#define __LOCK_INIT_RECURSIVE(lock)
 #define __lock_init(lock) ((void) 0)
 #define __lock_init_recursive(lock) ((void) 0)
 #define __lock_close(lock) ((void) 0)
@@ -35,9 +35,8 @@ struct __lock;
 typedef struct __lock * _LOCK_T;
 #define _LOCK_RECURSIVE_T _LOCK_T
 
-#define __LOCK_INIT(class,lock) extern struct __lock __lock_ ## lock; \
-	class _LOCK_T lock = &__lock_ ## lock
-#define __LOCK_INIT_RECURSIVE(class,lock) __LOCK_INIT(class,lock)
+#define __LOCK_INIT(lock) extern struct __lock __lock_ ## lock;
+#define __LOCK_INIT_RECURSIVE(lock) __LOCK_INIT(lock)
 
 extern void __retarget_lock_init(_LOCK_T *lock);
 #define __lock_init(lock) __retarget_lock_init(&lock)
@@ -66,5 +65,9 @@ extern void __retarget_lock_release_recursive(_LOCK_T lock);
 #endif
 
 #endif /* !defined(_RETARGETABLE_LOCKING) */
+
+#define __LIBC_LOCK()	__lock_acquire_recursive(&__lock___libc_recursive_mutex)
+#define __LIBC_UNLOCK()	__lock_release_recursive(&__lock___libc_recursive_mutex)
+__LOCK_INIT_RECURSIVE(__libc_recursive_mutex)
 
 #endif /* __SYS_LOCK_H__ */
