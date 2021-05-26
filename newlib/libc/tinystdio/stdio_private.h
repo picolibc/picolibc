@@ -64,6 +64,15 @@ __file_str_put(char c, FILE *stream);
 int
 __file_str_put_alloc(char c, FILE *stream);
 
+extern const char __match_inf[];
+extern const char __match_inity[];
+extern const char __match_nan[];
+
+/* Returns 'true' if prefix of input matches pattern, independent of
+ * case. pattern is only upper case letters.
+ */
+bool __matchcaseprefix(const char *input, const char *pattern);
+
 /*
  * It is OK to discard the "const" qualifier here.  f.buf is
  * non-const as in the generic case, this buffer is obtained

@@ -50,11 +50,6 @@ static const long double pwr_m10 [NPOW_10] = {
     1e-1L, 1e-2L, 1e-4L, 1e-8L, 1e-16L, 1e-32L, 1e-64L, 1e-128L, 1e-256L, 1e-512L, 1e-1024L, 1e-2048L, 1e-4096L
 };
 
-/* PSTR() is not used to save 1 byte per string: '\0' at the tail.	*/
-static const char pstr_inf[] = {'I','N','F'};
-static const char pstr_inity[] = {'I','N','I','T','Y'};
-static const char pstr_nan[] = {'N','A','N'};
-
 /**  The strtold() function converts the initial portion of the string pointed
      to by \a nptr to long double representation.
 
@@ -147,6 +142,7 @@ _u128_oflow(_u128 a)
     return a.hi >= (0xffffffffffffffffULL - 9) / 10;
 }
 #endif
+#include "stdio_private.h"
 
 long double
 strtold (const char * nptr, char ** endptr)
@@ -178,18 +174,18 @@ strtold (const char * nptr, char ** endptr)
 	c = *nptr++;
     }
 
-    if (!strncmp (nptr - 1, pstr_inf, 3)) {
+    if (__matchcaseprefix(nptr - 1, __match_inf)) {
 	nptr += 2;
-	if (!strncmp (nptr, pstr_inity, 5))
+	if (__matchcaseprefix(nptr, __match_inity))
 	    nptr += 5;
 	if (endptr)
 	    *endptr = (char *)nptr;
-	return flag & FL_MINUS ? (long double) -INFINITY : (long double) +INFINITY;
+	return flag & FL_MINUS ? -(long double)INFINITY : +(long double)INFINITY;
     }
 
     /* NAN() construction is not realised.
        Length would be 3 characters only.	*/
-    if (!strncmp (nptr - 1, pstr_nan, 3)) {
+    if (__matchcaseprefix(nptr - 1, __match_nan)) {
 	if (endptr)
 	    *endptr = (char *)nptr + 2;
 	return (long double) NAN;
