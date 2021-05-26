@@ -35,12 +35,6 @@ details. */
 
 extern "C" int sscanf (const char *, const char *, ...);
 
-extern "C" {
-  HRESULT WINAPI CreatePseudoConsole (COORD, HANDLE, HANDLE, DWORD, HPCON *);
-  HRESULT WINAPI ResizePseudoConsole (HPCON, COORD);
-  VOID WINAPI ClosePseudoConsole (HPCON);
-}
-
 #define close_maybe(h) \
   do { \
     if (h && h != INVALID_HANDLE_VALUE) \

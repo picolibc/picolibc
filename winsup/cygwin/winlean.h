@@ -104,12 +104,6 @@ extern "C" {
 #error "Version >= 8 of the w32api headers is required"
 #endif
 
-/* VirtualAlloc2 is declared in <w32api/memoryapi.h> if NTDDI_VERSION
-   >= NTDDI_WIN10_RS4 (a compile-time condition).  But we need the
-   declaration unconditionally, even though the function will only be
-   executed on systems that support it (a run-time condition). */
-PVOID WINAPI VirtualAlloc2 (HANDLE, PVOID, SIZE_T, ULONG, ULONG,
-			    PMEM_EXTENDED_PARAMETER, ULONG);
 /* IsWow64Process2 should be declared in <w32api/wow64apiset.h> but
    isn't yet. */
 BOOL WINAPI IsWow64Process2(HANDLE, USHORT *, USHORT *);

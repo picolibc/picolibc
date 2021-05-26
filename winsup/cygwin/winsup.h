@@ -24,6 +24,7 @@ details. */
 
 #define _WIN32_WINNT 0x0a00
 #define WINVER 0x0a00
+#define NTDDI_VERSION WDK_NTDDI_VERSION
 
 #define _NO_W32_PSEUDO_MODIFIERS
 
