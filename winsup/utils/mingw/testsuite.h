@@ -7,8 +7,8 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "path.h"
-#include "../cygwin/include/cygwin/bits.h"
-#include "../cygwin/include/sys/mount.h"
+#include <cygwin/bits.h>
+#include <sys/mount.h>
 
 /* This file implements a test harness for the MinGW implementation of
    POSIX path translation in utils/path.cc.  This code is used by strace

@@ -29,7 +29,7 @@ cygcheck_SOURCES = \
 	cygcheck.cc \
 	dump_setup.cc \
 	path.cc
-cygcheck_CPPFLAGS=-I$(srcdir)/..
+cygcheck_CPPFLAGS=-I$(srcdir)/.. -idirafter ${top_srcdir}/cygwin/include
 cygcheck_LDADD = -lz -lwininet -lpsapi -lntdll
 
 cygwin_console_helper_SOURCES = cygwin-console-helper.cc
@@ -47,7 +47,7 @@ noinst_PROGRAMS = path-testsuite
 path_testsuite_SOURCES = \
 	path.cc \
 	testsuite.cc
-path_testsuite_CPPFLAGS=-I$(srcdir)/..
+path_testsuite_CPPFLAGS=-I$(srcdir)/.. -idirafter ${top_srcdir}/cygwin/include
 path_testsuite_CXXFLAGS = -DTESTSUITE
 
 TESTS = path-testsuite

@@ -20,10 +20,10 @@
 #include "path.h"
 #include "wide_path.h"
 #include <getopt.h>
-#include "../cygwin/include/cygwin/version.h"
-#include "../cygwin/include/sys/cygwin.h"
+#include <cygwin/version.h>
+#include <sys/cygwin.h>
 #define _NOMNTENT_MACROS
-#include "../cygwin/include/mntent.h"
+#include <mntent.h>
 #undef cygwin_internal
 #include "loadlib.h"
 
