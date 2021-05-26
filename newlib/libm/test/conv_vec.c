@@ -3650,6 +3650,17 @@ __LINE__, "    1.234*",    1.2340000000e+00, 9,
 __LINE__, "  87.23*",    8.7230000000e+01, 7,
 __LINE__, " 1267*abc",    1.2670000000e+03, 5,
 __LINE__, " 1267*abc",    1.2670000000e+03, 5,
+__LINE__, "inf", (double) INFINITY, 3,
+__LINE__, "INF", (double) INFINITY, 3,
+__LINE__, "InF", (double) INFINITY, 3,
+__LINE__, "infinity", (double) INFINITY, 8,
+__LINE__, "INFINITY", (double)  INFINITY, 8,
+__LINE__, "-InfinitY", -(double) INFINITY, 9,
+__LINE__, "infamous", (double) INFINITY, 3,
+__LINE__, "-infamous", -(double) INFINITY, 4,
+__LINE__, "NAN", (double) NAN, 3,
+__LINE__, "nan", (double) NAN, 3,
+__LINE__, "NaN", (double) NAN, 3,
 0
 };
 
