@@ -178,9 +178,9 @@ strtold (const char * nptr, char ** endptr)
 	c = *nptr++;
     }
 
-    if (!strncmp (nptr - 1, pstr_inf, 3)) {
+    if (!strncasecmp (nptr - 1, pstr_inf, 3)) {
 	nptr += 2;
-	if (!strncmp (nptr, pstr_inity, 5))
+	if (!strncasecmp (nptr, pstr_inity, 5))
 	    nptr += 5;
 	if (endptr)
 	    *endptr = (char *)nptr;
@@ -189,7 +189,7 @@ strtold (const char * nptr, char ** endptr)
 
     /* NAN() construction is not realised.
        Length would be 3 characters only.	*/
-    if (!strncmp (nptr - 1, pstr_nan, 3)) {
+    if (!strncasecmp (nptr - 1, pstr_nan, 3)) {
 	if (endptr)
 	    *endptr = (char *)nptr + 2;
 	return (long double) NAN;
