@@ -184,7 +184,7 @@ foreach target : targets
   plain_tests = ['rand', 'regex', 'ungetc', 'fenv',
 		 'math_errhandling', 'malloc', 'tls',
 		 'ffs', 'setjmp', 'atexit', 'on_exit',
-		 'math-funcs'
+		 'math-funcs', 'strtox'
 		]
 
   if have_attr_ctor_dtor
