@@ -64,72 +64,84 @@ int (*_reference_scanf_float)() = _scanf_float;
 #define inf_ld __builtin_infl()
 #endif
 
+// count errors
 int ecnt = 0;
 
-void test_ld (int exp_errno, long double exp_result, const char* str) {
-    errno = 0;
-    long double result = strtold(str, (char**)0);
-    if (errno == exp_errno && result == exp_result)
-        return;
-
-    ecnt++;
-    printf("strtold(\"%s\"):\n  result=%Lf (expected=%Lf)\n  errno=%i (expected=%i)\n\n",
-            str,
-            result, exp_result,
-            errno, exp_errno);
+// see `main` for documentation on the test_XX parameters.
+#define TEST_TMPL(_NAME_, _STRTOXX_, _TYPE_, _FMT_, _PRINTF_FLOAT_) \
+void _NAME_ (int exp_errno, _TYPE_ exp_result, int exp_chars_consumed, const char *str) { \
+    errno = 0; \
+    char *endptr = NULL; \
+\
+    _TYPE_ result = _STRTOXX_(str, exp_chars_consumed >= 0 ? &endptr : (char**)0); \
+    if (errno == exp_errno && result == exp_result) { \
+        if (exp_chars_consumed < 0) \
+            return; \
+        if (str + exp_chars_consumed == endptr) \
+            return; \
+    } \
+\
+    ecnt++; \
+    printf(# _STRTOXX_ "(\"%s\"):\n  result=" _FMT_ " (expected=" _FMT_ ")\n  errno=%i (expected=%i)\n", \
+            str, \
+            _PRINTF_FLOAT_(result), _PRINTF_FLOAT_(exp_result), \
+            errno, exp_errno); \
+    if (exp_chars_consumed >= 0 && endptr) \
+        printf("  endptr='%s'\n  chars_consumed=%i (expected=%i)\n\n", \
+                endptr, \
+                endptr - str, \
+                exp_chars_consumed \
+        ); \
+    else if (exp_chars_consumed >= 0) \
+        printf("  endptr=(NULL)\n  chars_consumed=0 (expected=%i)\n\n", exp_chars_consumed); \
+    else \
+        printf("\n"); \
 }
 
-void test_d (int exp_errno, double exp_result, const char* str) {
-    errno = 0;
-    double result = strtod(str, (char**)0);
-    if (errno == exp_errno && result == exp_result)
-        return;
-
-    ecnt++;
-    printf("strtod(\"%s\"):\n  result=%f (expected=%f)\n  errno=%i (expected=%i)\n\n",
-            str,
-            result, exp_result,
-            errno, exp_errno);
-}
-
-void test_f (int exp_errno, float exp_result, const char* str) {
-    errno = 0;
-    float result = strtof(str, (char**)0);
-    if (errno == exp_errno && result == exp_result)
-        return;
-
-    ecnt++;
-    printf("strtof(\"%s\"):\n  result=%f (expected=%f)\n  errno=%i (expected=%i)\n\n",
-            str,
-            printf_float(result), printf_float(exp_result),
-            errno, exp_errno);
-}
+TEST_TMPL(test_f, strtof, float, "%f", printf_float)
+TEST_TMPL(test_d, strtod, double, "%f", )
+TEST_TMPL(test_ld, strtold, long double, "%Lf", )
 
 int main (void) {
+
     /**
-     * Careful when using another libc as a reference here!
-     * For example GLIBC cheats a little bit:
-     *  As long as the string is prefixed with "inf" (case insensitive),
-     *  the result is +/-inf. So "information" would also parse as "inf".
+     * The test_XX take four parameters:
+     *  `exp_errno` is the expected errno
+     *  `exp_result` is the expected result
+     *  `exp_chars_consumed` is the number of characters that should be read
+     *  `str` is the input string to the function under test
+     *
+     * The third parameter `exp_chars_consumed` is a bit special:
+     *  strtoXX has an optional parameter `char **endptr`. If `exp_chars_consumed` is negative,
+     *  the `endptr` is set to `(char**)0`. If a non-negative number (including 0) is passed,
+     *  the `endptr` is expected to point to `str + exp_chars_consumed`.
+     * So for `str`="information", `endptr` should point to the postfix "ormation", hence
+     * the correct value for `exp_chars_consumed` would be 3.
      */
 
-    test_f(0,  inf_f, "inf");
-    test_f(0,  inf_f, "INF");
-    test_f(0,  inf_f, "infinity");
-    test_f(0,  inf_f, "INFINITY");
-    test_f(0, -inf_f, "-InfinitY");
+    test_f(0,  inf_f,  3, "iNformation");
+    test_f(0,  inf_f, -1, "INF");
+    test_f(0,  inf_f,  8, "infinity");
+    test_f(0,  inf_f, -1, "INFINITY");
+    test_f(0, -inf_f, -1, "-InfinitY");
+    test_f(0, -inf_f,  9, "-InfinitY and beyond");
+    test_f(0,  inf_f,  9, " InfinitY and beyond");
 
-    test_d(0,  inf_d, "inf");
-    test_d(0,  inf_d, "INF");
-    test_d(0,  inf_d, "infinity");
-    test_d(0,  inf_d, "INFINITY");
-    test_d(0, -inf_d, "-InfinitY");
+    test_d(0,  inf_d,  3, "iNformation");
+    test_d(0,  inf_d, -1, "INF");
+    test_d(0,  inf_d,  8, "infinity");
+    test_d(0,  inf_d, -1, "INFINITY");
+    test_d(0, -inf_d, -1, "-InfinitY");
+    test_d(0, -inf_d,  9, "-InfinitY and Beyond");
+    test_d(0,  inf_d,  9, " InfinitY and BEyond");
 
-    test_ld(0,  inf_ld, "inf");
-    test_ld(0,  inf_ld, "INF");
-    test_ld(0,  inf_ld, "infinity");
-    test_ld(0,  inf_ld, "INFINITY");
-    test_ld(0, -inf_ld, "-InfinitY");
+    test_ld(0,  inf_ld,  3, "iNformation");
+    test_ld(0,  inf_ld, -1, "INF");
+    test_ld(0,  inf_ld,  8, "infinity");
+    test_ld(0,  inf_ld, -1, "INFINITY");
+    test_ld(0, -inf_ld, -1, "-InfinitY");
+    test_ld(0, -inf_ld,  9, "-InfinitY and beyoND");
+    test_ld(0,  inf_ld,  9, " InfinitY and beyonD");
 
     if (ecnt > 0) {
         printf("Errors: %i\n", ecnt);
