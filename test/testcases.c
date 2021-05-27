@@ -466,7 +466,6 @@
     result |= test(438, "10", "%.6g", 10.0);
     result |= test(439, "10.00000000000000000000", "%#.22g", 10.0);
 
-#ifdef TINY_STDIO
     // Regression test for wrong behavior with negative precision in tinystdio
     // this might fail for configurations not using tinystdio, so for a first
     // PR, only run these test for tinystdio.
@@ -479,4 +478,3 @@
     result |= test(446,        "0", "%.*f",  0, 0.123);
     result |= test(447,      "0.1", "%.*f",  1, 0.123);
     result |= test(448, "0.123000", "%.*f", -1, 0.123);
-#endif
