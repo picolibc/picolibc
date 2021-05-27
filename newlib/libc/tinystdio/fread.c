@@ -39,7 +39,7 @@ fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
 	uint8_t *cp;
 	int c;
 
-	if ((stream->flags & __SRD) == 0)
+	if ((stream->flags & __SRD) == 0 || size == 0)
 		return 0;
 
 	for (i = 0, cp = (uint8_t *)ptr; i < nmemb; i++)
