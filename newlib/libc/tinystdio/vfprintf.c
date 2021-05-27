@@ -389,10 +389,6 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		if (c == '*') {
 		    if (flags & FL_PREC) {
 			prec = va_arg(ap, int);
-			if (prec < 0) {
-			    prec = 0;
-			    flags &= ~(FL_PREC);
-		    }
 		    } else {
 			width = va_arg(ap, int);
 			flags |= FL_WIDTH;
@@ -458,6 +454,16 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 
 	    break;
 	} while ( (c = *fmt++) != 0);
+
+	/* This can happen only when prec is set via a '*'
+	 * specifier, in which case it works as if no precision
+	 * was specified. Set the precision to zero and clear the
+	 * flag.
+	 */
+	if (prec < 0) {
+	    prec = 0;
+	    flags &= ~FL_PREC;
+	}
 
 	/* Only a format character is valid.	*/
 
