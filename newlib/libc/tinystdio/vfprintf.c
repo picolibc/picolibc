@@ -439,7 +439,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 #define CHECK_INT_SIZE(letter, type) do {			\
 		if (c == letter) {				\
 		    if (sizeof(type) == sizeof(int))		\
-			continue;				\
+			goto is_int;				\
 		    if (sizeof(type) == sizeof(long))		\
 			goto is_long;				\
 		    if (sizeof(type) == sizeof(long long))	\
@@ -453,8 +453,12 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    CHECK_INT_SIZE('z', size_t);
 	    CHECK_INT_SIZE('t', ptrdiff_t);
 #endif
-
 	    break;
+
+#ifdef _WANT_IO_C99_FORMATS
+	    is_int:
+	    continue;
+#endif
 	} while ( (c = *fmt++) != 0);
 
 	/* Only a format character is valid.	*/

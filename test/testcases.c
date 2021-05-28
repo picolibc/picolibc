@@ -465,3 +465,11 @@
     result |= test(437, "10.0000", "%#.6g", 10.0);
     result |= test(438, "10", "%.6g", 10.0);
     result |= test(439, "10.00000000000000000000", "%#.22g", 10.0);
+#ifdef _WANT_IO_C99_FORMATS
+{
+    char c[64];
+    result |= test(440, "  42", "%4jd", (intmax_t)42L);
+    result |= test(441, "64", "%zu", sizeof c);
+    result |= test(442, "12", "%td", (c+12) - c);
+}
+#endif
