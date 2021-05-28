@@ -434,18 +434,17 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    }
 
 #ifdef _WANT_IO_C99_FORMATS
-#define CHECK_INT_SIZE(letter, type) do {			\
-		if (c == letter) {				\
-		    if (sizeof(type) == sizeof(int))		\
-			continue;				\
-		    if (sizeof(type) == sizeof(long))		\
-			goto is_long;				\
-		    if (sizeof(type) == sizeof(long long))	\
-			goto is_long_long;			\
-		    if (sizeof(type) == sizeof(short))		\
-			goto is_short;				\
-		} \
-	    } while(0)
+#define CHECK_INT_SIZE(letter, type)			\
+	    if (c == letter) {				\
+		if (sizeof(type) == sizeof(int))	\
+		    continue;				\
+		if (sizeof(type) == sizeof(long))	\
+		    goto is_long;			\
+		if (sizeof(type) == sizeof(long long))	\
+		    goto is_long_long;			\
+		if (sizeof(type) == sizeof(short))	\
+		    goto is_short;			\
+	    }
 
 	    CHECK_INT_SIZE('j', intmax_t);
 	    CHECK_INT_SIZE('z', size_t);
