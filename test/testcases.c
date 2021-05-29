@@ -478,3 +478,14 @@
     result |= test(446,        "0", "%.*f",  0, 0.123);
     result |= test(447,      "0.1", "%.*f",  1, 0.123);
     result |= test(448, "0.123000", "%.*f", -1, 0.123);
+#ifdef _WANT_IO_C99_FORMATS
+{
+    char c[64];
+#ifndef _WANT_IO_LONG_LONG
+    if (sizeof (intmax_t) <= sizeof(long))
+#endif
+    result |= test(449, "  42", "%4jd", (intmax_t)42L);
+    result |= test(450, "64", "%zu", sizeof c);
+    result |= test(451, "12", "%td", (c+12) - c);
+}
+#endif
