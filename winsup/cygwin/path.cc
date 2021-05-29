@@ -3505,9 +3505,14 @@ restart:
 
 		     subst X: C:\foo\bar
 
-		   Treat it as a normal file. */
+		   Treat it like a symlink.  This is required to tell an
+		   lstat caller that the "drive" is actually pointing
+		   somewhere else, thus, it's a symlink in POSIX speak. */
 		if (upath.Length == 14)	/* \??\X:\ */
-		  goto file_not_symlink;
+		  {
+		    fileattr &= ~FILE_ATTRIBUTE_DIRECTORY;
+		    path_flags |= PATH_SYMLINK;
+		  }
 		/* For final paths differing in inner path components return
 		   length as negative value.  This informs path_conv::check
 		   to skip realpath handling on the last path component. */
