@@ -722,9 +722,10 @@ path_conv::check (const char *src, unsigned opt,
 	  int symlen = 0;
 
 	  /* Make sure to check certain flags on last component only. */
-	  for (unsigned pc_flags = opt & (PC_NO_ACCESS_CHECK | PC_KEEP_HANDLE);
+	  for (unsigned pc_flags = opt & (PC_NO_ACCESS_CHECK | PC_KEEP_HANDLE
+					 | PC_SYM_FOLLOW | PC_SYM_NOFOLLOW_REP);
 	       ;
-	       pc_flags = 0)
+	       pc_flags = opt & (PC_SYM_FOLLOW | PC_SYM_NOFOLLOW_REP))
 	    {
 	      const suffix_info *suff;
 	      char *full_path;
@@ -3480,48 +3481,49 @@ restart:
 	    goto file_not_symlink;
 	}
 #endif /* __i386__ */
-      {
-	PWCHAR fpbuf = tp.w_get ();
-	DWORD ret;
+      if ((pc_flags & (PC_SYM_FOLLOW | PC_SYM_NOFOLLOW_REP)) == PC_SYM_FOLLOW)
+	{
+	  PWCHAR fpbuf = tp.w_get ();
+	  DWORD ret;
 
-	ret = GetFinalPathNameByHandleW (h, fpbuf, NT_MAX_PATH, 0);
-	if (ret)
-	  {
-	    UNICODE_STRING fpath;
+	  ret = GetFinalPathNameByHandleW (h, fpbuf, NT_MAX_PATH, 0);
+	  if (ret)
+	    {
+	      UNICODE_STRING fpath;
 
-	    RtlInitCountedUnicodeString (&fpath, fpbuf, ret * sizeof (WCHAR));
-	    fpbuf[1] = L'?';	/* \\?\ --> \??\ */
-	    if (!RtlEqualUnicodeString (&upath, &fpath, !!ci_flag))
-	      {
-		issymlink = true;
-		/* upath.Buffer is big enough and unused from this point on.
-		   Reuse it here, avoiding yet another buffer allocation. */
-		char *nfpath = (char *) upath.Buffer;
-		sys_wcstombs (nfpath, NT_MAX_PATH, fpbuf);
-		res = posixify (nfpath);
+	      RtlInitCountedUnicodeString (&fpath, fpbuf, ret * sizeof (WCHAR));
+	      fpbuf[1] = L'?';	/* \\?\ --> \??\ */
+	      if (!RtlEqualUnicodeString (&upath, &fpath, !!ci_flag))
+	        {
+		  issymlink = true;
+		  /* upath.Buffer is big enough and unused from this point on.
+		     Reuse it here, avoiding yet another buffer allocation. */
+		  char *nfpath = (char *) upath.Buffer;
+		  sys_wcstombs (nfpath, NT_MAX_PATH, fpbuf);
+		  res = posixify (nfpath);
 
-		/* If the incoming path consisted of a drive prefix only,
-		   we just handle a virtual drive, created with, e.g.
+		  /* If the incoming path consisted of a drive prefix only,
+		     we just handle a virtual drive, created with, e.g.
 
-		     subst X: C:\foo\bar
+		       subst X: C:\foo\bar
 
-		   Treat it like a symlink.  This is required to tell an
-		   lstat caller that the "drive" is actually pointing
-		   somewhere else, thus, it's a symlink in POSIX speak. */
-		if (upath.Length == 14)	/* \??\X:\ */
-		  {
-		    fileattr &= ~FILE_ATTRIBUTE_DIRECTORY;
-		    path_flags |= PATH_SYMLINK;
-		  }
-		/* For final paths differing in inner path components return
-		   length as negative value.  This informs path_conv::check
-		   to skip realpath handling on the last path component. */
-		else
-		  res = -res;
-		break;
-	      }
-	  }
-      }
+		     Treat it like a symlink.  This is required to tell an
+		     lstat caller that the "drive" is actually pointing
+		     somewhere else, thus, it's a symlink in POSIX speak. */
+		  if (upath.Length == 14)	/* \??\X:\ */
+		    {
+		      fileattr &= ~FILE_ATTRIBUTE_DIRECTORY;
+		      path_flags |= PATH_SYMLINK;
+		    }
+		  /* For final paths differing in inner path components return
+		     length as negative value.  This informs path_conv::check
+		     to skip realpath handling on the last path component. */
+		  else
+		    res = -res;
+		  break;
+	        }
+	    }
+	}
 
     /* Normal file. */
     file_not_symlink:
