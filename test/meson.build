@@ -40,16 +40,10 @@ foreach target : targets
     _libs_base += [get_variable('lib_semihost' + target)]
   endif
 
-  if is_variable('lib_crt' + target)
-    _libs = [get_variable('lib_crt'+ target)] + _libs_base
+  if is_variable('lib_crt_hosted' + target)
+    _libs = [get_variable('lib_crt_hosted'+ target)] + _libs_base
   else
     _libs = _libs_base
-  endif
-
-  if is_variable('lib_crt_hosted' + target)
-    _libs_hosted = [get_variable('lib_crt_hosted'+ target)] + _libs_base
-  else
-    _libs_hosted = _libs_base
   endif
 
   have_crt_minimal = is_variable('lib_crt_minimal' + target)
@@ -150,7 +144,7 @@ foreach target : targets
        executable(t1_name, 'hosted-exit.c',
 		  c_args: float_printf_compile_args + _c_args,
 		  link_args:  float_printf_link_args + _link_args,
-		  link_with: _libs_hosted,
+		  link_with: _libs,
 		  include_directories: inc),
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
@@ -158,7 +152,7 @@ foreach target : targets
        executable(t1_name + '-fail', 'hosted-exit.c',
 		  c_args: float_printf_compile_args + _c_args + ['-DRETVAL=1'],
 		  link_args:  float_printf_link_args + _link_args,
-		  link_with: _libs_hosted,
+		  link_with: _libs,
 		  include_directories: inc),
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()],
        should_fail: true

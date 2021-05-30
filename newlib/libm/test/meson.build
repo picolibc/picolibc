@@ -136,8 +136,8 @@ foreach target : targets
   if is_variable('lib_semihost' + target)
     libs += [get_variable('lib_semihost' + target)]
   endif
-  if is_variable('lib_crt' + target)
-    libs += [get_variable('lib_crt'+ target)]
+  if is_variable('lib_crt_hosted' + target)
+    libs += [get_variable('lib_crt_hosted'+ target)]
   endif
 
   if target == ''
