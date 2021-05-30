@@ -127,5 +127,5 @@ main(void)
 		ret += check(xl, ffsl(xl), slow_ffsl(xl), "ffsl");
 		ret += check(xll, ffsll(xll), slow_ffsll(xll), "ffsll");
 	}
-	exit(ret);
+	return ret;
 }

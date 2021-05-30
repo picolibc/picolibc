@@ -152,5 +152,5 @@ main(int argc, char **argv)
     (void) conjl(l1);
     (void) cprojl(l1);
 
-    exit(0);
+    return 0;
 }

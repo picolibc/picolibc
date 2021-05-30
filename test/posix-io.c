@@ -57,23 +57,23 @@ main(int argc, char **argv)
 	f = fopen(file_name, "w");
 	if (!f) {
 		printf("failed to open \"%s\" for writing\n", file_name);
-		exit(1);
+		return 1;
 	}
 
 	if (fprintf(f, "%s", test_string) != strlen(test_string)) {
 		printf("failed to fprintf test string %s\n", test_string);
-		exit(1);
+		return 1;
 	}
 
 	if (fclose(f) != 0) {
 		printf("fclose failed\n");
-		exit(1);
+		return 1;
 	}
 
 	f = fopen(file_name, "r");
 	if (!f) {
 		printf("failed to open \"%s\" for reading\n", file_name);
-		exit(1);
+		return 1;
 	}
 
 	t = test_string;
@@ -81,10 +81,10 @@ main(int argc, char **argv)
 	while ((c = getc(f)) != EOF) {
 		if ((char) c != *t) {
 			printf("read incorrect byte %c != %c\n", c, *t);
-			exit(1);
+			return 1;
 		}
 		t++;
 	}
 	printf("success\n");
-	exit(0);
+	return 0;
 }

@@ -56,19 +56,19 @@ main(int argc, char **argv)
 	if (!ret) {
 		func(env, 1);
 		printf("func returned\n");
-		exit(1);
+		return 1;
 	}
 	ret = setjmp(env);
 	printf("setjmp 2 returns %d\n", ret);
 	if (!ret) {
 		if (been_here) {
 			printf("already been here (longjmp(env, 0) returned 0?)\n");
-			exit(2);
+			return 2;
 		}
 		been_here++;
 		func(env, 0);
 		printf("func returned\n");
-		exit(1);
+		return 1;
 	}
-	exit(0);
+	return 0;
 }

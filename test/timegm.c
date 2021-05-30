@@ -123,5 +123,5 @@ int main(void)
 			ret++;
 		}
 	}
-	exit(ret);
+	return ret;
 }

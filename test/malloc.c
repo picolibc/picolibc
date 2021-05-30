@@ -127,5 +127,5 @@ main(void)
 
 	malloc_stats();
 
-	exit(result);
+	return result;
 }

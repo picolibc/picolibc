@@ -197,5 +197,5 @@ int main()
 		TEST_CASE(test_sqrt(-two), FE_INVALID);
 #endif
 	}
-	exit(result);
+	return result;
 }

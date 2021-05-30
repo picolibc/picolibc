@@ -338,5 +338,5 @@ main(int argc, char **argv)
     l1 = pow10l (l1);
 #endif
 
-    exit(0);
+    return 0;
 }

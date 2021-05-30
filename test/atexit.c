@@ -54,5 +54,8 @@ int main(void)
 {
 	atexit(fail);
 	atexit(success);
+	/* Need to call exit explicitly so that native
+	 * tests (which use glibc crt0) get picolibc exit
+	 */
 	exit(1);
 }

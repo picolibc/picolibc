@@ -89,5 +89,5 @@ int main()
 #endif
 	printf("Float tests:\n");
 	result += run_testsf();
-	exit(result);
+	return result;
 }

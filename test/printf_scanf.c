@@ -220,5 +220,5 @@ main(int argc, char **argv)
 	}
 #endif
 	fflush(stdout);
-	exit(errors);
+	return errors;
 }

@@ -51,5 +51,6 @@ crt_startup(void)
 
 int main(void)
 {
-	_exit(REGULAR_RET);
+	/* Must use exit as this test is linked with minimal crt0 */
+	exit(REGULAR_RET);
 }

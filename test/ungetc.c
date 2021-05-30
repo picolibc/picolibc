@@ -44,12 +44,12 @@ main(int argc, char **argv)
 	ret = ungetc('u', stdin);
 	if (ret != 'u') {
 		printf("ungetc unexpectedly returned %d instead of %d\n", ret, 'u');
-		exit(1);
+		return 1;
 	}
 	ret = getc(stdin);
 	if (ret != 'u') {
 		printf("getc unexpectedly returned %d instead of %d\n", ret, 'u');
-		exit(1);
+		return 1;
 	}
-	exit(0);
+	return 0;
 }
