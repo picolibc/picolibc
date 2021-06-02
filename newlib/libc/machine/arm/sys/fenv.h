@@ -41,20 +41,17 @@ extern "C" {
 typedef int fenv_t;
 typedef int fexcept_t;
 
+#ifndef __SOFTFP__
+
 /* Exception flags */
 #define	FE_INVALID	0x0001
 #define	FE_DIVBYZERO	0x0002
 #define	FE_OVERFLOW	0x0004
 #define	FE_UNDERFLOW	0x0008
 #define	FE_INEXACT	0x0010
-#ifndef __SOFTFP__
 #define	FE_DENORMAL	0x0080
 #define	FE_ALL_EXCEPT	(FE_DIVBYZERO | FE_INEXACT | \
 			 FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW | FE_DENORMAL)
-#else
-#define	FE_ALL_EXCEPT	(FE_DIVBYZERO | FE_INEXACT | \
-			 FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW)
-#endif
 
 /* Rounding modes */
 #define	FE_TONEAREST		0x00000000
