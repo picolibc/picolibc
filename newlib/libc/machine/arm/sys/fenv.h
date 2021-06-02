@@ -41,6 +41,16 @@ extern "C" {
 typedef int fenv_t;
 typedef int fexcept_t;
 
+#if defined(__SOFTFP__) || (__ARM_FP & 0x8) == 0
+#define PICOLIBC_DOUBLE_NOROUND
+#define PICOLIBC_DOUBLE_NOEXCEPT
+#endif
+
+#if defined(__SOFTFP__) || (__ARM_FP & 0x4) == 0
+#define PICOLIBC_DOUBLE_NOROUND
+#define PICOLIBC_DOUBLE_NOEXCEPT
+#endif
+
 #ifndef __SOFTFP__
 
 /* Exception flags */
