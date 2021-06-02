@@ -171,6 +171,7 @@ int main()
 {
 	int result = 0;
 
+	(void) report;
 	(void) e_to_str;
 	if (math_errhandling & MATH_ERREXCEPT) {
 #if FE_DIVBYZERO
