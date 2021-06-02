@@ -39,7 +39,10 @@ srcs_libm_machine_real = [
 
 srcs_libm_machine = srcs_libm_machine_real + [
   'feclearexcept.c',
+  'fedisableexcept.c',
+  'feenableexcept.c',
   'fegetenv.c',
+  'fegetexcept.c',
   'fegetexceptflag.c',
   'fegetround.c',
   'feholdexcept.c',

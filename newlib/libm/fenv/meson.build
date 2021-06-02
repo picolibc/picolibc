@@ -35,7 +35,10 @@
 srcs_fenv = [
   'feclearexcept.c',
   'fe_dfl_env.c',
+  'fedisableexcept.c',
+  'feenableexcept.c',
   'fegetenv.c',
+  'fegetexcept.c',
   'fegetexceptflag.c',
   'fegetround.c',
   'feholdexcept.c',
