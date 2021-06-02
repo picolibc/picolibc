@@ -366,7 +366,10 @@ License: BSD2-4
 
 Files: newlib/libm/fenv/fe_dfl_env.c
  newlib/libm/fenv/feclearexcept.c
+ newlib/libm/fenv/fedisableexcept.c
+ newlib/libm/fenv/feenableexcept.c
  newlib/libm/fenv/fegetenv.c
+ newlib/libm/fenv/fegetexcept.c
  newlib/libm/fenv/fegetexceptflag.c
  newlib/libm/fenv/fegetround.c
  newlib/libm/fenv/feholdexcept.c
@@ -411,12 +414,17 @@ License: BSD2-8
 
 Files: newlib/libc/machine/xtensa/sys/fenv.h
  newlib/libm/machine/xtensa/feclearexcept.c
+ newlib/libm/machine/xtensa/fedisableexcept.c
+ newlib/libm/machine/xtensa/feenableexcept.c
  newlib/libm/machine/xtensa/fegetenv.c
  newlib/libm/machine/xtensa/fegetexcept.c
  newlib/libm/machine/xtensa/fegetexceptflag.c
  newlib/libm/machine/xtensa/fegetround.c
  newlib/libm/machine/xtensa/feholdexcept.c
  newlib/libm/machine/xtensa/feraiseexcept.c
+ newlib/libm/machine/xtensa/fesetenv.c
+ newlib/libm/machine/xtensa/fesetexceptflag.c
+ newlib/libm/machine/xtensa/fesetround.c
  newlib/libm/machine/xtensa/fetestexcept.c
  newlib/libm/machine/xtensa/feupdateenv.c
 Copyright: 2011 Tensilica Inc.
@@ -772,6 +780,7 @@ License: BSD3-1
 
 Files: newlib/libc/machine/shared_x86/meson.build
  newlib/libc/machine/shared_x86/sys/meson.build
+ newlib/libc/machine/xtensa/machine/meson.build
  newlib/libc/stdlib/pico-atexit.c
  newlib/libc/stdlib/pico-exit.c
  newlib/libc/stdlib/pico-onexit.c
@@ -792,6 +801,8 @@ Files: newlib/libc/machine/shared_x86/meson.build
  test/hosted-exit.c
  test/math-funcs.c
  test/on_exit.c
+ test/rounding-mode-sub.c
+ test/rounding-mode.c
  test/timegm.c
  test/timegm.h
 Copyright: 2021 Keith Packard
