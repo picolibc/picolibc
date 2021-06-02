@@ -31,15 +31,17 @@
 
 #include "_fenv.h"
 
+#ifdef __SOFTFP__
+#include "../../fenv/fegetexceptflag.c"
+#else
 int fegetexceptflag(fexcept_t *flagp, int excepts)
 {
-#ifndef __SOFTFP__
 	fexcept_t __fpsr;
 
 	vmrs_fpscr(__fpsr);
 	__fpsr &= ~excepts;
 	__fpsr |= *flagp & excepts;
 	vmsr_fpscr(__fpsr);
-#endif
 	return (0);
 }
+#endif

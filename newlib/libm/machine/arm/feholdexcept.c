@@ -31,15 +31,17 @@
 
 #include "_fenv.h"
 
+#ifdef __SOFTFP__
+#include "../../fenv/feholdexcept.c"
+#else
 int feholdexcept(fenv_t *envp)
 {
-#ifndef __SOFTFP__
 	fenv_t __env;
 
 	vmrs_fpscr(__env);
 	*envp = __env;
 	__env &= ~(FE_ALL_EXCEPT);
 	vmsr_fpscr(__env);
-#endif
 	return (0);
 }
+#endif

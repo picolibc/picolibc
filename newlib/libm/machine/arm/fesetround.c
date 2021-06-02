@@ -31,15 +31,17 @@
 
 #include "_fenv.h"
 
+#ifdef __SOFTFP__
+#include "../../fenv/fesetround.c"
+#else
 int fesetround(int round)
 {
-#ifndef __SOFTFP__
 	fenv_t __fpsr;
 
 	vmrs_fpscr(__fpsr);
 	__fpsr &= ~(_ROUND_MASK);
 	__fpsr |= round;
 	vmsr_fpscr(__fpsr);
-#endif
 	return (0);
 }
+#endif

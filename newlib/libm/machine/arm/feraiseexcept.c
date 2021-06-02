@@ -31,12 +31,14 @@
 
 #include "_fenv.h"
 
+#ifdef __SOFTFP__
+#include "../../fenv/feraiseexcept.c"
+#else
 int feraiseexcept(int excepts)
 {
-#ifndef __SOFTFP__
 	fexcept_t __ex = excepts;
 
 	fesetexceptflag(&__ex, excepts);
-#endif
 	return (0);
 }
+#endif
