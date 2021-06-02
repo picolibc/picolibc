@@ -71,8 +71,5 @@
 
 typedef size_t fenv_t;
 typedef size_t fexcept_t;
-extern fenv_t _fe_dfl_env;
-
-#define FE_DFL_ENV ((const fenv_t *) &_fe_dfl_env)
 
 #endif /* _SYS_FENV_H */

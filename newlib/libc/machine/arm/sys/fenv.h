@@ -62,26 +62,7 @@ typedef int fexcept_t;
 #define	FE_DOWNWARD		0x00800000
 #define	FE_TOWARDZERO		0x00c00000
 
-/* Default floating-point environment */
-extern fenv_t		_fe_dfl_env;
-#define	FE_DFL_ENV	((const fent_v *) &_fe_dfl_env)
-
-int feclearexcept(int);
-int fegetexceptflag(fexcept_t *, int);
-int fesetexceptflag(const fexcept_t *, int);
-int feraiseexcept(int);
-int fetestexcept(int);
-int fegetround(void);
-int fesetround(int);
-int fegetenv(fenv_t *);
-int feholdexcept(fenv_t *);
-int fesetenv(const fenv_t *);
-int feupdateenv(const fenv_t *);
-#if __BSD_VISIBLE
-int feenableexcept(int);
-int fedisableexcept(int);
-int fegetexcept(void);
-#endif /* __BSD_VISIBLE */
+#endif
 
 #ifdef __cplusplus
 }

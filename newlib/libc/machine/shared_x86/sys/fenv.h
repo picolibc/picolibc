@@ -134,16 +134,6 @@ typedef __uint32_t fexcept_t;
 #define FE_DBLPREC	(2)
 #define FE_LDBLPREC	(3)
 #endif
-
-/*  The <fenv.h> header shall define the following constant, which
-   represents the default floating-point environment (that is, the one
-   installed at program startup) and has type pointer to const-qualified
-   fenv_t. It can be used as an argument to the functions within the
-   <fenv.h> header that manage the floating-point environment.  */
-
-extern fenv_t _fe_dfl_env;
-#define FE_DFL_ENV ((const fenv_t *) &_fe_dfl_env)
-
 /*  Additional implementation-defined environments, with macro
    definitions beginning with FE_ and an uppercase letter,and having
    type "pointer to const-qualified fenv_t",may also be specified by
@@ -156,12 +146,7 @@ extern fenv_t _fe_dfl_env;
    if _GNU_SOURCE is defined.  */
 extern const fenv_t *_fe_nomask_env;
 #define FE_NOMASK_ENV (_fe_nomask_env)
-
-/* These are GNU extensions defined in glibc.  */
-int feenableexcept (int __excepts);
-int fedisableexcept (int __excepts);
-int fegetexcept (void);
-#endif /* __GNU_VISIBLE */
+#endif
 
 #ifdef __CYGWIN__
 

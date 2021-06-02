@@ -35,6 +35,23 @@ int feholdexcept(fenv_t *envp);
 int fesetenv(const fenv_t *envp);
 int feupdateenv(const fenv_t *envp);
 
+int feenableexcept(int);
+int fedisableexcept(int);
+int fegetexcept(void);
+
+/*
+ * Lastly, a FE_DFL_ENV macro must be defined, representing a pointer
+ * to const fenv_t that contains the value of the default floating point
+ * environment.
+ *
+ * NOTE: The extern'ed variable fe_default_env_p is an implementation
+ *       detail of this stub.  FE_DFL_ENV must point to an instance of
+ *       fenv_t with the default fenv_t. The format of fenv_t and where
+ *       FE_DFL_ENV is are implementation specific.
+ */
+extern fenv_t _fe_dfl_env;
+#define FE_DFL_ENV ((const fenv_t *) &_fe_dfl_env)
+
 #ifdef __cplusplus
 }
 #endif
