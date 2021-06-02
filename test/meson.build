@@ -168,12 +168,27 @@ foreach target : targets
 
     test(t1 + target,
 	 executable(t1_name, 'constructor-skip.c',
-		    c_args: float_printf_compile_args + _c_args,
-		    link_args:  float_printf_link_args + _link_args,
+		    c_args: _c_args,
+		    link_args:  _link_args,
 		    link_with: _libs_minimal,
 		    include_directories: inc),
 	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
   endif
+
+  t1 = 'rounding-mode'
+  if target == ''
+    t1_name = t1
+  else
+    t1_name = join_paths(target, t1)
+  endif
+
+  test(t1 + target,
+       executable(t1_name, ['rounding-mode.c', 'rounding-mode-sub.c'],
+		  c_args: _c_args,
+		  link_args: _link_args,
+		  link_with: _libs,
+		  include_directories: inc),
+       env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
   plain_tests = ['rand', 'regex', 'ungetc', 'fenv',
 		 'math_errhandling', 'malloc', 'tls',
