@@ -82,6 +82,9 @@ c_args = ['-include', '@0@/@1@'.format(meson.current_build_dir(), 'picolibc.h')]
 if meson.get_compiler('c').has_argument('-fno-common')
   c_args += '-fno-common'
 endif
+if meson.get_compiler('c').has_argument('-frounding-math')
+  c_args += '-frounding-math'
+endif
 if meson.get_compiler('c').symbols_have_underscore_prefix()
   global_prefix = '_'
 else
