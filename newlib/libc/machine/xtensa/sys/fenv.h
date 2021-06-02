@@ -36,6 +36,10 @@ extern "C" {
 typedef unsigned long fenv_t;
 typedef unsigned long fexcept_t;
 
+#include <machine/core-isa.h>
+
+#if XCHAL_HAVE_FP || XCHAL_HAVE_DFP
+
 #define FE_DIVBYZERO   0x08
 #define FE_INEXACT     0x01
 #define FE_INVALID     0x10
@@ -61,6 +65,8 @@ typedef unsigned long fexcept_t;
 #define _FE_ROUND_MODE_OFFSET 0
 #define _FE_ROUND_MODE_MASK (0x3 << _FE_ROUND_MODE_OFFSET)
 #define _FE_FLOATING_ENV_MASK (_FE_EXCEPTION_FLAG_MASK | _FE_EXCEPTION_ENABLE_MASK | _FE_ROUND_MODE_MASK)
+
+#endif
 
 #ifdef __cplusplus
 }
