@@ -43,4 +43,6 @@ int feclearexcept(int except)
   asm ("wur.fsr %0" : : "a"(fsr));
   return 0;
 }
+#else
+#include "../../fenv/feclearexcept.c"
 #endif

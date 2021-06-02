@@ -25,19 +25,28 @@
    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
    OF THE POSSIBILITY OF SUCH DAMAGE.  */
 
+
 #include <machine/core-isa.h>
 
 #if XCHAL_HAVE_FP || XCHAL_HAVE_DFP
 
 #include <fenv.h>
 
-int fegetround(void)
+int fesetexceptflag(const fexcept_t *flagp, int excepts)
 {
-  fexcept_t current;
-  asm ("rur.fcr %0" : "=a"(current));
-  return (current & _FE_ROUND_MODE_MASK) >> _FE_ROUND_MODE_OFFSET;
+  if (excepts & ~FE_ALL_EXCEPT)
+    return -1;
+
+  unsigned int fsr;
+
+  asm ("rur.fsr %0" : "=a"(fsr));
+
+  fsr &= ~(excepts << _FE_EXCEPTION_FLAGS_OFFSET);
+  fsr |= ((*flagp & excepts) << _FE_EXCEPTION_FLAGS_OFFSET);
+  asm ("wur.fsr %0" : : "a"(fsr));
+  return 0;
 }
 
 #else
-#include "../../fenv/fegetround.c"
+#include "../../fenv/fesetexceptflag.c"
 #endif

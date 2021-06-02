@@ -42,4 +42,6 @@ int feupdateenv(const fenv_t * envp)
   return feraiseexcept (current);
 }
 
+#else
+#include "../../fenv/feupdateenv.c"
 #endif

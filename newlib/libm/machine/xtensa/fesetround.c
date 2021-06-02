@@ -31,13 +31,14 @@
 
 #include <fenv.h>
 
-int fegetround(void)
+int fesetround(int round)
 {
-  fexcept_t current;
-  asm ("rur.fcr %0" : "=a"(current));
-  return (current & _FE_ROUND_MODE_MASK) >> _FE_ROUND_MODE_OFFSET;
+  if (round & ~_FE_ROUND_MODE_MASK)
+    return -1;
+  asm ("wur.fcr %0" : : "a"(round));
+  return 0;
 }
 
 #else
-#include "../../fenv/fegetround.c"
+#include "../../fenv/fesetround.c"
 #endif

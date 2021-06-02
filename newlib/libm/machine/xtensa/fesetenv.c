@@ -25,19 +25,23 @@
    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
    OF THE POSSIBILITY OF SUCH DAMAGE.  */
 
+
 #include <machine/core-isa.h>
 
 #if XCHAL_HAVE_FP || XCHAL_HAVE_DFP
 
 #include <fenv.h>
 
-int fegetround(void)
+int fesetenv(const fenv_t * env_ptr)
 {
-  fexcept_t current;
-  asm ("rur.fcr %0" : "=a"(current));
-  return (current & _FE_ROUND_MODE_MASK) >> _FE_ROUND_MODE_OFFSET;
+  fenv_t env = *env_ptr;
+  if (env & ~(_FE_FLOATING_ENV_MASK))
+    return -1;
+  asm ("wur.fsr %0" : : "a"(*env_ptr));
+  asm ("wur.fcr %0" : : "a"(*env_ptr));
+  return 0;
 }
 
 #else
-#include "../../fenv/fegetround.c"
+#include "../../fenv/fesetenv.c"
 #endif

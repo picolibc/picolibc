@@ -45,19 +45,6 @@ int fegetexceptflag(fexcept_t *flagp, int excepts)
   return 0;
 }
 
-int fesetexceptflag(const fexcept_t *flagp, int excepts)
-{
-  if (excepts & ~FE_ALL_EXCEPT)
-    return -1;
-
-  unsigned int fsr;
-
-  asm ("rur.fsr %0" : "=a"(fsr));
-
-  fsr &= ~(excepts << _FE_EXCEPTION_FLAGS_OFFSET);
-  fsr |= ((*flagp & excepts) << _FE_EXCEPTION_FLAGS_OFFSET);
-  asm ("wur.fsr %0" : : "a"(fsr));
-  return 0;
-}
-
+#else
+#include "../../fenv/fegetexceptflag.c"
 #endif

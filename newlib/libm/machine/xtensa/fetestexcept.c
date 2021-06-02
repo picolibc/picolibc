@@ -38,4 +38,6 @@ int fetestexcept(int excepts)
   return (current >> _FE_EXCEPTION_FLAGS_OFFSET) & excepts;
 }
 
+#else
+#include "../../fenv/fetestexcept.c"
 #endif

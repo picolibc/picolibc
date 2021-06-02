@@ -29,15 +29,21 @@
 
 #if XCHAL_HAVE_FP || XCHAL_HAVE_DFP
 
+/* These functions are glibc extensions.  */
+
 #include <fenv.h>
 
-int fegetround(void)
+int feenableexcept(int excepts)
 {
   fexcept_t current;
+  if (excepts & ~FE_ALL_EXCEPT)
+    return -1;
   asm ("rur.fcr %0" : "=a"(current));
-  return (current & _FE_ROUND_MODE_MASK) >> _FE_ROUND_MODE_OFFSET;
+  current |= excepts << _FE_EXCEPTION_ENABLE_OFFSET;
+  asm ("wur.fcr %0" : "=a"(current));
+  return 0;
 }
 
 #else
-#include "../../fenv/fegetround.c"
+#include "../../fenv/feenableexcept.c"
 #endif
