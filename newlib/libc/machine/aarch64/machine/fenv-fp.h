@@ -154,3 +154,34 @@ feupdateenv(const fenv_t *__envp)
 	return (0);
 }
 
+__fenv_static inline int
+feenableexcept(int __mask)
+{
+	fenv_t __old_r, __new_r;
+
+	__mrs_fpcr(__old_r);
+	__new_r = __old_r | ((__mask & FE_ALL_EXCEPT) << _FPUSW_SHIFT);
+	__msr_fpcr(__new_r);
+	return ((__old_r >> _FPUSW_SHIFT) & FE_ALL_EXCEPT);
+}
+
+__fenv_static inline int
+fedisableexcept(int __mask)
+{
+	fenv_t __old_r, __new_r;
+
+	__mrs_fpcr(__old_r);
+	__new_r = __old_r & ~((__mask & FE_ALL_EXCEPT) << _FPUSW_SHIFT);
+	__msr_fpcr(__new_r);
+	return ((__old_r >> _FPUSW_SHIFT) & FE_ALL_EXCEPT);
+}
+
+__fenv_static inline int
+fegetexcept(void)
+{
+	fenv_t __r;
+
+	__mrs_fpcr(__r);
+	return ((__r & _ENABLE_MASK) >> _FPUSW_SHIFT);
+}
+
