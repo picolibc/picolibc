@@ -127,8 +127,8 @@ foreach target : targets
 
   test(t1 + target,
        executable(t1_name, ['try-ilp32.c', 'try-ilp32-sub.c'],
-		  c_args: float_printf_compile_args + _c_args,
-		  link_args: float_printf_link_args + _link_args,
+		  c_args: _c_args,
+		  link_args: _link_args,
 		  link_with: _libs,
 		  include_directories: inc),
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
@@ -142,16 +142,16 @@ foreach target : targets
 
   test(t1 + target,
        executable(t1_name, 'hosted-exit.c',
-		  c_args: float_printf_compile_args + _c_args,
-		  link_args:  float_printf_link_args + _link_args,
+		  c_args: _c_args,
+		  link_args:  _link_args,
 		  link_with: _libs,
 		  include_directories: inc),
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
   test(t1 + '-fail' + target,
        executable(t1_name + '-fail', 'hosted-exit.c',
-		  c_args: float_printf_compile_args + _c_args + ['-DRETVAL=1'],
-		  link_args:  float_printf_link_args + _link_args,
+		  c_args: _c_args + ['-DRETVAL=1'],
+		  link_args:  _link_args,
 		  link_with: _libs,
 		  include_directories: inc),
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()],
@@ -211,7 +211,7 @@ foreach target : targets
 
     test(t1 + target,
 	 executable(t1_name, [t1_src],
-		    c_args: test_c_warnings + _c_args,
+		    c_args: _c_args,
 		    link_args: _link_args,
 		    link_with: _libs,
 		    link_depends:  test_link_depends,
