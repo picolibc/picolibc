@@ -42,10 +42,10 @@
  * "The fegetround() function shall get the current rounding direction."
  */
 
+#if __riscv_flen
+
 int fegetround()
 {
-
-#if __riscv_flen
 
   /* Get current rounding mode */
 
@@ -64,16 +64,8 @@ int fegetround()
 
   return frm;
 
-#else
-
-  /* For soft float */
-
-#ifdef FE_TONEAREST
-  return FE_TONEAREST;
-#else
-  return 0;
-#endif
-
-#endif
-
 }
+#else
+#include "../../fenv/fegetround.c"
+#endif
+

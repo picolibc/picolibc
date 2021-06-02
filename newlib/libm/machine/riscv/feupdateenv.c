@@ -47,10 +47,10 @@
  * floating-point environment macro."
  */
 
+#if __riscv_flen
+
 int feupdateenv(const fenv_t *envp)
 {
-
-#if __riscv_flen
 
   /* Get current exception flags */
 
@@ -72,18 +72,7 @@ int feupdateenv(const fenv_t *envp)
 
   return 0;
 
-#else
-
-  /* For soft float */
-
-#if defined FE_NOMASK_ENV && FE_ALL_EXCEPT != 0
-
-  if (envp == FE_NOMASK_ENV)
-      return 1;
-
-#endif
-
-  return 0;
-
-#endif
 }
+#else
+#include "../../fenv/feupdateenv.c"
+#endif

@@ -51,14 +51,14 @@
  * underflow floating-point exception is implementation-defined."
  */
 
+#if __riscv_flen
+
 int feraiseexcept(int excepts)
 {
 
   /* Mask excepts to be sure only supported flag bits are set */
 
   excepts &= FE_ALL_EXCEPT;
-
-#if __riscv_flen
 
   /* Set the requested exception flags */
 
@@ -79,7 +79,9 @@ int feraiseexcept(int excepts)
    *
    */
 
-#endif
-
   return (excepts != 0);
 }
+#else
+#include "../../fenv/feraiseexcept.c"
+#endif
+

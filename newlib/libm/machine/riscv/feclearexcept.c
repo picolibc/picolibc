@@ -44,10 +44,10 @@
  * floating-point exceptions represented by excepts."
  */
 
+#if __riscv_flen
 int feclearexcept(int excepts)
 {
 
-#if __riscv_flen
 
   /* Mask excepts to be sure only supported flag bits are set */
 
@@ -75,7 +75,8 @@ int feclearexcept(int excepts)
    * it shall return a non-zero value."
    */
 
-#endif
-
   return 0;
 }
+#else
+#include "../../fenv/feclearexcept.c"
+#endif
