@@ -36,7 +36,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-#include <../newlib/libc/time/local.h>  // For YEAR_BASE.
+
+
+#define TIME_TM_YEAR_BASE 1900
 
 
 static void
@@ -80,7 +82,7 @@ main(void)
   // This is some arbitrary point in time.
   dtForTimegm1.tm_mday  = 3;  // 3rd
   dtForTimegm1.tm_mon   = 1;  // of February
-  dtForTimegm1.tm_year  = 1970 - YEAR_BASE;
+  dtForTimegm1.tm_year  = 1970 - TIME_TM_YEAR_BASE;
 
   // Make a copy, because mktime() and friends modify the fields of the tm structure passed as an argument.
   struct tm dtForMktime2 = dtForTimegm1;
@@ -126,7 +128,7 @@ main(void)
   // This is some arbitrary point in time with daylight saving time.
   dtForTimegm3.tm_mday  = 1;   // 1st
   dtForTimegm3.tm_mon   = 4;   // of May
-  dtForTimegm3.tm_year  = 2021 - YEAR_BASE;
+  dtForTimegm3.tm_year  = 2021 - TIME_TM_YEAR_BASE;
   dtForTimegm3.tm_isdst = 1;  // Daylight saving time is in effect. That only affects local time.
 
   struct tm dtForMktime4 = dtForTimegm3;
@@ -149,6 +151,93 @@ main(void)
        dtForMktime4.tm_isdst != 1  )  // mktime() should leave the daylight saving time flag set.
   {
     puts("Test t4 failed.");
+    exit(1);
+  }
+
+
+  // Test the first non-negative time_t value of 0,
+  // which is the "UNIX Epoch time" of 1st Januar 1970 00:00:00.
+
+  struct tm dtForTimegm5;
+  init_struct_tm( &dtForTimegm5 );
+
+  dtForTimegm5.tm_mday  = 1;   // 1st day of the month.
+  dtForTimegm5.tm_year  = 1970 - TIME_TM_YEAR_BASE;
+  dtForTimegm5.tm_isdst = -123;  // A negative value makes mktime() calculate this flag,
+                                 // but timegm() should unconditionally reset it.
+
+  time_t t5 = timegm( &dtForTimegm5 );
+
+  if ( t5 != 0                    ||
+       dtForTimegm5.tm_wday  != 4 ||  // 4 means Thursday.
+       dtForTimegm5.tm_isdst != 0  )
+  {
+    puts("Test t5 failed.");
+    exit(1);
+  }
+
+
+  // Test the last time_t value of 0x7FFFFFFF before the 32-bit signed integer overflow,
+  // aka "year 2038 problem". That corresponds to 2038-01-19 03:14:07.
+
+  struct tm dtForTimegm6;
+  init_struct_tm( &dtForTimegm6 );
+
+  dtForTimegm6.tm_sec  =  7;
+  dtForTimegm6.tm_min  = 14;
+  dtForTimegm6.tm_hour =  3,
+  dtForTimegm6.tm_mon   = 0;  // January.
+  dtForTimegm6.tm_mday  = 19;
+  dtForTimegm6.tm_year  = 2038 - TIME_TM_YEAR_BASE;
+  dtForTimegm6.tm_isdst = 123;  // Some value that should be reset.
+
+  struct tm dtForTimegm7 = dtForTimegm6;  // Reuse the date for the next test.
+
+  time_t t6 = timegm( &dtForTimegm6 );
+
+  if ( t6 != 0x7FFFFFFF            ||
+       dtForTimegm6.tm_wday  != 2  ||  // 2 means Tuesday.
+       dtForTimegm6.tm_yday  != 18 ||
+       dtForTimegm6.tm_isdst != 0   )
+  {
+    puts("Test t6 failed.");
+    exit(1);
+  }
+
+
+  // Test the next time_t value of 0x80000000 right after
+  // the 32-bit signed integer overflow, aka "year 2038 problem".
+
+  dtForTimegm7.tm_sec++;
+
+  time_t t7 = timegm( &dtForTimegm7 );
+
+  if ( t7 != 0x80000000            ||
+       dtForTimegm7.tm_wday  != 2  ||  // 2 means Tuesday.
+       dtForTimegm7.tm_yday  != 18 ||
+       dtForTimegm7.tm_isdst != 0   )
+  {
+    puts("Test t7 failed.");
+    exit(1);
+  }
+
+
+  // Test the 29th of February in a leap year far in the future.
+
+  struct tm dtForTimegm8;
+  init_struct_tm( &dtForTimegm8 );
+
+  dtForTimegm8.tm_mon   = 1;  // February.
+  dtForTimegm8.tm_mday  = 29;
+  dtForTimegm8.tm_year  = 2104 - TIME_TM_YEAR_BASE;
+
+  time_t t8 = timegm( &dtForTimegm8 );
+
+  if ( t8 != 4233686400           ||  // That is much higher than INT32_MAX.
+       dtForTimegm8.tm_wday != 5  ||  // 5 means Friday.
+       dtForTimegm8.tm_yday != 59  )
+  {
+    puts("Test t8 failed.");
     exit(1);
   }
 
