@@ -93,9 +93,9 @@ main(void)
 		goto bail1;
 	}
 	buf[TEST_STRING_LEN - TEST_SEEK_POS] = '\0';
-	if (memcmp(buf, TEST_STRING + TEST_SEEK_POS, TEST_STRING_LEN - TEST_SEEK_POS) != 0) {
+	if (memcmp(buf, &TEST_STRING[0] + TEST_SEEK_POS, TEST_STRING_LEN - TEST_SEEK_POS) != 0) {
 		printf("read bad contents got %s wanted %s\n",
-		       buf, TEST_STRING + TEST_SEEK_POS);
+		       buf, &TEST_STRING[0] + TEST_SEEK_POS);
 		code = 7;
 		goto bail1;
 	}
