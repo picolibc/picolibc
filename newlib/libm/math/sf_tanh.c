@@ -16,9 +16,9 @@
 #include "fdlibm.h"
 
 #ifdef __STDC__
-static const float one=1.0, two=2.0, tiny = 1.0e-30;
+static const volatile float one=1.0, two=2.0, tiny = 1.0e-30;
 #else
-static float one=1.0, two=2.0, tiny = 1.0e-30;
+static volatile float one=1.0, two=2.0, tiny = 1.0e-30;
 #endif
 
 #ifdef __STDC__
