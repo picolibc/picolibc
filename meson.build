@@ -79,6 +79,11 @@ newlib_supplied_syscalls = get_option('newlib-supplied-syscalls')
 newlib_elix_level = get_option('newlib-elix-level')
 target_optspace = get_option('optimization') == 's'
 c_args = ['-include', '@0@/@1@'.format(meson.current_build_dir(), 'picolibc.h')]
+
+# Disable ssp and fortify source while building picolibc (it's enabled
+# by default by the ubuntu native compiler)
+c_args += ['-fno-stack-protector', '-U_FORTIFY_SOURCE']
+
 if meson.get_compiler('c').has_argument('-fno-common')
   c_args += '-fno-common'
 endif
