@@ -15,9 +15,11 @@ picolibc:
  2. Test on architectures that can do so
 
     * native
-    * 32-bit x86 (requires x86 host)
+    * 64-bit x86
+    * 32-bit x86
     * RISC-V, all targets (qemu)
-    * ARM, almost all targets (qemu)
+    * ARM 32-bit, almost all targets (qemu)
+    * ARM 64-bit
 
  3. Verify that COPYING.picolibc includes information
     about the current source files
