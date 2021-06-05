@@ -1,3 +1,45 @@
+picolibc (1.6-1) unstable; urgency=medium
+
+  * Bugfix for snprintf(buf, 0) and vsnprintf(buf, 0) to avoid
+    smashing memory
+
+  * Support building libstdc++ on top of picolibc
+
+  * Add 'hosted' crt0 variant that calls exit when main
+    returns. This makes testing easier without burdening embedded apps
+    with unused exit processing code.
+
+  * Add 'minimal' crt0 variant that skips constructors to
+    save space on systems known to not use any.
+
+  * Fix HW floating point initialization on 32-bit ARM processors to
+    perform 'dsb' and 'isb' instructions to ensure the FPU enabling
+    write is complete before executing any FPU instructions.
+
+  * Create a new '--picolibc-prefix' GCC command line parameter that
+    sets the base of all picolibc file names.
+
+  * Add bare-metal i386 and x86_64 initializatiton code (thanks to
+    Mike Haertel). These initialize the processor from power up to
+    running code without requiring any BIOS.
+
+  * Merge newlib as of late April, 2021
+
+  * Add 'timegm' function (thanks to R. Diez).
+
+  * Fix a number of tinystdio bugs: handle fread with size==0, parse
+    'NAN' and 'INF' in fscanf in a case-insensitive manner, fix
+    negative precision to '*' arguments in printf, fix handling of
+    'j', 'z' and 't' argument size specifiers (thanks to Sebastian
+    Meyer).
+
+  * Make the fenv API more consistent and more conformant with the
+    spec. All architectures now fall back to the default code
+    for soft float versions, which avoids having the various exception
+    and rounding modes get defined when not supported.
+
+ -- Keith Packard <keithp@keithp.com>  Fri, 04 Jun 2021 18:46:30 -0700
+
 picolibc (1.5.1-3) unstable; urgency=medium
 
   * Change how test architecures are selected (thanks to Paul Gevers).
