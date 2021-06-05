@@ -64,6 +64,15 @@ __file_str_put(char c, FILE *stream);
 int
 __file_str_put_alloc(char c, FILE *stream);
 
+extern const char __match_inf[];
+extern const char __match_inity[];
+extern const char __match_nan[];
+
+/* Returns 'true' if prefix of input matches pattern, independent of
+ * case. pattern is only upper case letters.
+ */
+bool __matchcaseprefix(const char *input, const char *pattern);
+
 /*
  * It is OK to discard the "const" qualifier here.  f.buf is
  * non-const as in the generic case, this buffer is obtained
@@ -116,50 +125,27 @@ struct __file_posix {
 };
 
 static inline void __posix_lock_init(FILE *f) {
-#ifndef __SINGLE_THREAD__
-	struct __file_posix *fp = (struct __file_posix *) f;
-	(void) fp;
-	__lock_init(fp->lock);
-#else
 	(void) f;
-#endif
+	__lock_init(((struct __file_posix *) f)->lock);
 }
 
 static inline void __posix_lock_close(FILE *f) {
-#ifndef __SINGLE_THREAD__
-	struct __file_posix *fp = (struct __file_posix *) f;
-	(void) fp;
-	__lock_close(fp->lock);
-#else
 	(void) f;
-#endif
+	__lock_close(((struct __file_posix *) f)->lock);
 }
 
 static inline void __posix_lock(FILE *f) {
-#ifndef __SINGLE_THREAD__
-	struct __file_posix *fp = (struct __file_posix *) f;
-	(void) fp;
-	__lock_acquire(fp->lock);
-#else
 	(void) f;
-#endif
+	__lock_acquire(((struct __file_posix *) f)->lock);
 }
 
 static inline void __posix_unlock(FILE *f) {
-#ifndef __SINGLE_THREAD__
-	struct __file_posix *fp = (struct __file_posix *) f;
-	(void) fp;
-	__lock_release(fp->lock);
-#else
 	(void) f;
-#endif
+	__lock_release(((struct __file_posix *) f)->lock);
 }
 
 int	__d_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 int	__f_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
-
-int	__d_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
-int	__f_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 
 int
 __posix_sflags (const char *mode, int *optr);
@@ -177,6 +163,9 @@ int
 __posix_close(FILE *f);
 
 #endif
+
+int	__d_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int	__f_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 
 double
 __atod_engine(uint64_t m10, int e10);

@@ -44,6 +44,7 @@ srcs_machine = [
 ]
 
 subdir('sys')
+subdir('machine')
 
 foreach target : targets
 	value = get_variable('target_' + target)

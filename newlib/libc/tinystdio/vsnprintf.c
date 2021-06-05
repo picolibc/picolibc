@@ -53,9 +53,7 @@ vsnprintf(char *s, size_t n, const char *fmt, va_list ap)
 
 	i = vfprintf(&f.file, fmt, ap);
 
-	/* We use f.size (not 'n') as this is more effective: two 'ld'
-	   instructions vs. two 'push+pop' and 'movw'.	*/
-	if (n >= 0 && i >= 0)
+	if ((int) n >= 0 && i >= 0)
 		s[i < n ? i : n] = 0;
 
 	return i;

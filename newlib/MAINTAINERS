@@ -36,6 +36,7 @@ well as cpu-specific portions of the build system, without approval.
 
 arm                     Nick Clifton            nickc@redhat.com
 			Richard Earnshaw	richard.earnshaw@arm.com
+bfin			Mike Frysinger		vapier@gentoo.org
 mn10300			Nick Clifton		nickc@redhat.com
 moxie			Anthony Green		green@moxielogic.com
 risc-v			Kito Cheng		kito.cheng@gmail.com

@@ -431,7 +431,7 @@
 #endif
 
 /* XXX: should use `#if __STDC_VERSION__ < 199901'. */
-#if !__GNUC_PREREQ__(2, 7) && !defined(__INTEL_COMPILER)
+#if !__GNUC_PREREQ__(2, 7) && !defined(__INTEL_COMPILER) && !defined(__COMPCERT__)
 #define	__func__	NULL
 #endif
 

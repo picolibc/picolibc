@@ -31,14 +31,14 @@
 
 #include "_fenv.h"
 
+#ifdef __SOFTFP__
+#include "../../fenv/fegetexcept.c"
+#else
 int fegetexcept(void)
 {
-#ifndef __SOFTFP__
 	fenv_t __fpsr;
 
 	vmrs_fpscr(__fpsr);
 	return (__fpsr & FE_ALL_EXCEPT);
-#else
-	return (0);
-#endif
 }
+#endif

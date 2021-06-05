@@ -14,6 +14,7 @@
 
 #include <stddef.h>
 
+#ifdef __riscv_flen
 /* Per "The RISC-V Instruction Set Manual: Volume I: User-Level ISA:
  * Version 2.1", Section 8.2, "Floating-Point Control and Status
  * Register":
@@ -59,6 +60,7 @@
 #define FE_TONEAREST  	0x00000000
 
 #define FE_RMODE_MASK   0x7
+#endif
 
 /* Per "The RISC-V Instruction Set Manual: Volume I: User-Level ISA:
  * Version 2.1":
@@ -71,8 +73,5 @@
 
 typedef size_t fenv_t;
 typedef size_t fexcept_t;
-extern fenv_t _fe_dfl_env;
-
-#define FE_DFL_ENV ((const fenv_t *) &_fe_dfl_env)
 
 #endif /* _SYS_FENV_H */

@@ -45,10 +45,10 @@
  * not changed."
  */
 
+#if __riscv_flen
+
 int fesetround(int round)
 {
-
-#if __riscv_flen
 
   /* Mask round to be sure only valid rounding bits are set */
 
@@ -64,7 +64,8 @@ int fesetround(int round)
    * if the requested rounding direction was established."
    */
 
-#endif
-
   return 0;
 }
+#else
+#include ".././fenv/fesetround.c"
+#endif

@@ -32,11 +32,9 @@ SUCH DAMAGE.
 #define _INCLUDE_ENVLOCK_H_
 
 #include <_ansi.h>
+#include <sys/lock.h>
 
-#define ENV_LOCK __env_lock()
-#define ENV_UNLOCK __env_unlock()
-
-void __env_lock (void);
-void __env_unlock (void);
+#define ENV_LOCK __LIBC_LOCK()
+#define ENV_UNLOCK __LIBC_UNLOCK()
 
 #endif /* _INCLUDE_ENVLOCK_H_ */

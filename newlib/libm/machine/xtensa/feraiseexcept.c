@@ -47,4 +47,6 @@ int feraiseexcept(int excepts)
   return 0;
 }
 
+#else
+#include "../../fenv/feraiseexcept.c"
 #endif

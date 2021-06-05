@@ -256,7 +256,7 @@ fcvtbuf (double invalue,
       if (_cvtlen <= ndigit + 35)
 	{
 	  if  (!_cvtbuf)
-	    if (__register_exitproc(__et_atexit, _cvtcleanup, NULL, NULL) != 0)
+	    if (atexit(_cvtcleanup) != 0)
 	      return NULL;
 	  if ((fcvt_buf = (char *) realloc (_cvtbuf,
 					    ndigit + 36)) == NULL)

@@ -63,5 +63,5 @@ the file <<sys/fenv.h>> to see the status for your target.
  */
 int fesetround(int round)
 {
-  return -ENOTSUP;
+  return round == FE_TONEAREST ? 0 : -1;
 }

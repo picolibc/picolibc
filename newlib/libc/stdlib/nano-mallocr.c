@@ -39,14 +39,15 @@
 #include <malloc.h>
 #include <unistd.h>
 #include <sys/config.h>
+#include <sys/lock.h>
 
 #if MALLOC_DEBUG
 #include <assert.h>
-#define MALLOC_LOCK do { __malloc_lock(); __malloc_validate(); } while(0)
-#define MALLOC_UNLOCK do { __malloc_validate(); __malloc_unlock(); } while(0)
+#define MALLOC_LOCK do { __LIBC_LOCK(); __malloc_validate(); } while(0)
+#define MALLOC_UNLOCK do { __malloc_validate(); __LIBC_UNLOCK(); } while(0)
 #else
-#define MALLOC_LOCK __malloc_lock()
-#define MALLOC_UNLOCK __malloc_unlock()
+#define MALLOC_LOCK __LIBC_LOCK()
+#define MALLOC_UNLOCK __LIBC_UNLOCK()
 #define assert(x) ((void)0)
 #endif
 

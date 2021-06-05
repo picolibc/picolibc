@@ -99,6 +99,22 @@ FLOAT_T makemathname(test_y1_neg)(void) { return makemathname(y1)(-makemathname(
 FLOAT_T makemathname(test_yn_0)(void) { return makemathname(yn)(2, makemathname(zero)); }
 FLOAT_T makemathname(test_yn_neg)(void) { return makemathname(yn)(2, -makemathname(one)); }
 
+#ifndef FE_DIVBYZERO
+#define FE_DIVBYZERO 0
+#endif
+#ifndef FE_INEXACT
+#define FE_INEXACT 0
+#endif
+#ifndef FE_INVALID
+#define FE_INVALID 0
+#endif
+#ifndef FE_OVERFLOW
+#define FE_OVERFLOW 0
+#endif
+#ifndef FE_UNDERFLOW
+#define FE_UNDERFLOW 0
+#endif
+
 struct {
 	FLOAT_T	(*func)(void);
 	char	*name;

@@ -50,10 +50,10 @@
  *
  */
 
+#if __riscv_flen
+
 int fesetexceptflag(const fexcept_t *flagp, int excepts)
 {
-
-#if __riscv_flen
 
   /* Mask excepts to be sure only supported flag bits are set */
 
@@ -74,7 +74,8 @@ int fesetexceptflag(const fexcept_t *flagp, int excepts)
    * zero. Otherwise, it shall return a non-zero value."
    */
 
-#endif
-
   return 0;
 }
+#else
+#include "../../fenv/fesetexceptflag.c"
+#endif

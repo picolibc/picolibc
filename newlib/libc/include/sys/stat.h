@@ -107,7 +107,7 @@ struct	stat
 #endif
 };
 
-#if !(defined(__svr4__) && !defined(__PPC__) && !defined(__sun__)) && !defined(__cris__)
+#if !(defined(__svr4__) && !defined(__PPC__) && !defined(__sun__))
 #define st_atime st_atim.tv_sec
 #define st_ctime st_ctim.tv_sec
 #define st_mtime st_mtim.tv_sec
@@ -210,10 +210,10 @@ int	fstatat (int, const char *__restrict , struct stat *__restrict, int);
 int	mkdirat (int, const char *, mode_t);
 int	mkfifoat (int, const char *, mode_t);
 int	mknodat (int, const char *, mode_t, dev_t);
-int	utimensat (int, const char *, const struct timespec *, int);
+int	utimensat (int, const char *, const struct timespec [2], int);
 #endif
 #if __POSIX_VISIBLE >= 200809 && !defined(__INSIDE_CYGWIN__)
-int	futimens (int, const struct timespec *);
+int	futimens (int, const struct timespec [2]);
 #endif
 
 /* Provide prototypes for most of the _<systemcall> names that are

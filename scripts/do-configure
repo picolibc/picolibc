@@ -75,8 +75,9 @@ case "$*" in
 		:
 		;;
 	    *)
-		SYSROOT=`${ARCH}-gcc -print-sysroot`
-		PREFIX=-Dprefix="`readlink -f "$SYSROOT"`"
+		SYSROOT_ORIG=`${ARCH}-gcc -print-sysroot`
+		SYSROOT=`readlink -f "$SYSROOT_ORIG"`
+		PREFIX="-Dprefix=$SYSROOT"
 		;;
 	esac
 	;;
@@ -84,8 +85,19 @@ esac
 
 # Run meson
 
-meson "$DIR"/.. \
-	-Dincludedir=picolibc/$ARCH/include \
-	-Dlibdir=picolibc/$ARCH/lib \
-	--cross-file "$CROSS" \
-	$PREFIX "$@"
+case "$PREFIX" in
+    "")
+	meson "$DIR"/.. \
+	      -Dincludedir=picolibc/$ARCH/include \
+	      -Dlibdir=picolibc/$ARCH/lib \
+	      --cross-file "$CROSS" \
+	      "$@"
+	;;
+    *)
+	meson "$DIR"/.. \
+	      -Dincludedir=picolibc/$ARCH/include \
+	      -Dlibdir=picolibc/$ARCH/lib \
+	      --cross-file "$CROSS" \
+	      "$PREFIX" "$@"
+	;;
+esac

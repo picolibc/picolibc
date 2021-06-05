@@ -60,9 +60,19 @@ case "$elf" in
 	cpu=cortex-m0
 	;;
 
+    # v7-a/v7ve - Cortex-A7
+    */thumb_v7_a*|*/thumb_v7ve_*)
+	cpu=cortex-a7
+	;;
+
     # v7-m - Cortex-M3
     */thumb_v7_m_nofp/*)
 	cpu=cortex-m3
+	;;
+
+    # v7-r - Cortex-R5
+    */thumb_v7_r*)
+	cpu=cortex-r5f
 	;;
 
     # v7e-m - Cortex-M4
@@ -82,6 +92,16 @@ case "$elf" in
 	;;
     */thumb_v7e_m_dp_softfp/*)
 	cpu=cortex-m7
+	;;
+
+    # v8-a - unknown
+    */thumb_v8_a*)
+	cpu=unknown
+	;;
+
+    # v8.1 - unknown
+    */thumb_v8_1*)
+	cpu=unknown
 	;;
 
     # v8-m with single-precision FPU - Cortex-M33
@@ -140,9 +160,12 @@ case $cpu in
 	machine=virtm
 	;;
 
+    cortex-a53)
+	;;
+
     # The 'none' machine supports all non-M
     # processors
-    ti925t|arm946|cortex-a*)
+    ti925t|arm946|cortex-a*|cortex-r*)
 	machine=none
 	memory="-m 1G"
 	;;
@@ -198,3 +221,22 @@ echo "$input" | $qemu $memory \
       -device loader,file=$elf,cpu-num=0 \
       -nographic \
       "$@"
+
+result=$?
+
+if [ $result != 0 ]; then
+    case $cpu in
+	# Cortex-a8 qemu has minor floating point errors
+	# when run on i686 processors
+	cortex-a8)
+	    test=`uname -m`"-$elf"
+	    case "$test" in
+		i?86-*math_test)
+		    echo "fp imprecise for $cpu on" `uname -m`
+		    result=77
+		    ;;
+	    esac
+	    ;;
+    esac
+fi
+exit $result

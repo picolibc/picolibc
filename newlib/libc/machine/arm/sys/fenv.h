@@ -41,20 +41,27 @@ extern "C" {
 typedef int fenv_t;
 typedef int fexcept_t;
 
+#if defined(__SOFTFP__) || (__ARM_FP & 0x8) == 0
+#define PICOLIBC_DOUBLE_NOROUND
+#define PICOLIBC_DOUBLE_NOEXCEPT
+#endif
+
+#if defined(__SOFTFP__) || (__ARM_FP & 0x4) == 0
+#define PICOLIBC_DOUBLE_NOROUND
+#define PICOLIBC_DOUBLE_NOEXCEPT
+#endif
+
+#ifndef __SOFTFP__
+
 /* Exception flags */
 #define	FE_INVALID	0x0001
 #define	FE_DIVBYZERO	0x0002
 #define	FE_OVERFLOW	0x0004
 #define	FE_UNDERFLOW	0x0008
 #define	FE_INEXACT	0x0010
-#ifndef __SOFTFP__
 #define	FE_DENORMAL	0x0080
 #define	FE_ALL_EXCEPT	(FE_DIVBYZERO | FE_INEXACT | \
 			 FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW | FE_DENORMAL)
-#else
-#define	FE_ALL_EXCEPT	(FE_DIVBYZERO | FE_INEXACT | \
-			 FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW)
-#endif
 
 /* Rounding modes */
 #define	FE_TONEAREST		0x00000000
@@ -62,26 +69,7 @@ typedef int fexcept_t;
 #define	FE_DOWNWARD		0x00800000
 #define	FE_TOWARDZERO		0x00c00000
 
-/* Default floating-point environment */
-extern const fenv_t	*_fe_dfl_env;
-#define	FE_DFL_ENV	(_fe_dfl_env)
-
-int feclearexcept(int);
-int fegetexceptflag(fexcept_t *, int);
-int fesetexceptflag(const fexcept_t *, int);
-int feraiseexcept(int);
-int fetestexcept(int);
-int fegetround(void);
-int fesetround(int);
-int fegetenv(fenv_t *);
-int feholdexcept(fenv_t *);
-int fesetenv(const fenv_t *);
-int feupdateenv(const fenv_t *);
-#if __BSD_VISIBLE
-int feenableexcept(int);
-int fedisableexcept(int);
-int fegetexcept(void);
-#endif /* __BSD_VISIBLE */
+#endif
 
 #ifdef __cplusplus
 }

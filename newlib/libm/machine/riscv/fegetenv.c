@@ -44,10 +44,10 @@
  *
  */
 
+#if __riscv_flen
 int fegetenv(fenv_t *envp)
 {
 
-#if __riscv_flen
 
   /* Get the current environment (FCSR) */
 
@@ -64,7 +64,8 @@ int fegetenv(fenv_t *envp)
    * return zero. Otherwise, it shall return a non-zero value.
    */
 
-#endif
-
   return 0;
 }
+#else
+#include "../../fenv/fegetenv.c"
+#endif

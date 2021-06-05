@@ -35,7 +35,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#ifdef HAVE_SEMIHOST_
+#ifdef HAVE_SEMIHOST
 #include <semihost.h>
 #endif
 
@@ -44,7 +44,7 @@ main(void)
 {
 	printf("hello, world\n");
 
-#ifdef HAVE_SEMIHOST_
+#ifdef HAVE_SEMIHOST
 	char	cmdline[128];
 	if (sys_semihost_get_cmdline(cmdline, sizeof(cmdline)) == 0) {
 		printf("Command line %s\n", cmdline);
@@ -56,6 +56,5 @@ main(void)
 		}
 	}
 #endif
-
-	exit(0);
+	return 0;
 }

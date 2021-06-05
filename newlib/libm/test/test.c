@@ -14,6 +14,7 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
+#include <stdlib.h>
 #include <signal.h>
 #include  "test.h"
 #include <math.h>
@@ -88,7 +89,7 @@ main (int ac,
    test_ieee();
 #endif
   printf("Tested %d functions, %d errors detected\n", count, inacc);
-  return inacc != 0;
+  exit(inacc != 0);
 }
 
 static const char *iname = "foo";

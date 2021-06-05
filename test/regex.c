@@ -121,6 +121,5 @@ main(int argc, char **argv)
 		++run;
 	}
 	printf("regex: %d tests %d errors\n", run, errors);
-	fflush(stdout);
 	return errors;
 }

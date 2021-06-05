@@ -1,7 +1,8 @@
+#!/bin/bash
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2020 Keith Packard, 
+# Copyright © 2020 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,10 +33,43 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-inc_sys_headers_machine = [
-  'fenv.h'
-]
 
-install_headers(inc_sys_headers_machine,
-		subdir:'sys'
-	       )
+dir=`dirname "$0"`
+
+qemu=qemu-system-i386
+
+# select the program
+elf="$1"
+shift
+
+# Map stdio to a multiplexed character device so we can use it
+# for the monitor and semihosting output
+
+chardev=stdio,mux=on,id=stdio0
+
+# Point the semihosting driver at our new chardev
+
+semi=enable=on,chardev=stdio0
+
+input=""
+
+case "$1" in
+    -*|"")
+	;;
+    *)
+	semi="$semi",arg="$1"
+	input="$1"
+	shift
+	;;
+esac
+
+$dir/monitor-e9 $qemu \
+	-cpu core2duo \
+	-bios semihost/machine/i386/bios.bin \
+	-monitor none \
+	-serial none \
+	-debugcon stdio \
+	-nic none \
+	-device loader,file="$elf" \
+	-nographic \
+	"$@" < /dev/null

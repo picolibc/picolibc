@@ -47,6 +47,8 @@ jobs:
           "./.github/do-test do-aarch64-configure build-aarch64",
           "./.github/do-build do-lx106-configure build-lx106",
           "./.github/do-test do-rv32imac-configure build-rv32imac",
+          "./.github/do-test do-i686-configure build-i686",
+          "./.github/do-test do-amd64-configure build-amd64",
           "./.github/do-build do-clang-riscv-configure build-riscv-clang",
           "./.github/do-test do-clang-thumbv7e+fp-configure build-clang-thumbv7e+fp",
           "./.github/do-test do-clang-thumbv7m-configure build-clang-thumbv7m",

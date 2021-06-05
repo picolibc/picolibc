@@ -1,0 +1,22 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+import subprocess
+
+status = 1
+
+with subprocess.Popen(sys.argv[1:], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL) as proc:
+    while True:
+        c = proc.stdout.read(1)
+        if c == b'\xe9':
+            c = proc.stdout.readline().decode('utf-8')
+            words = c.split()
+            if len(words) > 0:
+                if words[0] == 'exit':
+                    proc.send_signal(1)
+                    status = int(words[1])
+                    break
+        sys.stdout.write(c.decode('utf-8'))
+
+exit(status)

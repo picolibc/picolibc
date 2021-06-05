@@ -35,6 +35,10 @@
 
 #include <picolibc.h>	
 
+#ifndef CONSTRUCTORS
+#define CONSTRUCTORS 1
+#endif
+
 	/**
 	 * seems clang has no option "nopic". Now this could be problematic,
 	 * since according to the clang devs at [0], that option has an effect
@@ -88,7 +92,7 @@ _start:
 	call	_set_tls
 #endif
 
-#ifdef HAVE_INITFINI_ARRAY
+#if defined(HAVE_INITFINI_ARRAY) && CONSTRUCTORS
 	call	__libc_init_array
 #endif
 
@@ -97,25 +101,9 @@ _start:
 	li	a1, 0
 	call	main
 
-#ifdef HAVE_INITFINI_ARRAY
-	// save return value a0 in saved register s1
-	mv	s1, a0
-	call	__libc_fini_array
-	mv	a0, s1
+#ifdef CRT0_EXIT
+	call exit
+#else
+.L1:	
+	j	.L1
 #endif
-
-	la	t0, _exit
-	beqz	t0, .SKIP_EXIT
-	call	_exit
-
-.SKIP_EXIT:
-	/**
-	 * TODO what to do after main and exit return?
-	 * AFAI understood a hardware reset would be good,
-	 *  but there seems to be no reset instruction in riscv
-	 * So for now, just jump to _start again
-	 * (This makes sure the stack is correctly set, as opposed to _cstart)
-	 */
-	j	_start
-	.size	_start, .-_start
-	.weak	_exit

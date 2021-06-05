@@ -41,7 +41,7 @@ project('picolibc', 'c',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.50',
-	version: '1.5.1'
+	version: '1.6'
        )
 
 targets = []
@@ -50,10 +50,12 @@ enable_multilib = get_option('multilib')
 multilib_list = get_option('multilib-list')
 enable_picolib = get_option('picolib')
 enable_picocrt = get_option('picocrt')
+enable_semihost = get_option('semihost')
 enable_tests = get_option('tests')
 enable_native_tests = get_option('native-tests')
 tests_enable_stack_protector = get_option('tests-enable-stack-protector')
-tests_disable_full_malloc_stress = get_option('tests-disable-full-malloc-stress')
+tests_enable_full_malloc_stress = get_option('tests-enable-full-malloc-stress')
+tests_enable_posix_io = get_option('tests-enable-posix-io')
 have_alias_attribute_option = get_option('have-alias-attribute')
 have_format_attribute_option = get_option('have-format-attribute')
 newlib_register_fini = get_option('newlib-register-fini')
@@ -76,9 +78,12 @@ newlib_multithread = get_option('newlib-multithread')
 newlib_supplied_syscalls = get_option('newlib-supplied-syscalls')
 newlib_elix_level = get_option('newlib-elix-level')
 target_optspace = get_option('optimization') == 's'
-c_args = ['-include', 'picolibc.h']
+c_args = ['-include', '@0@/@1@'.format(meson.current_build_dir(), 'picolibc.h')]
 if meson.get_compiler('c').has_argument('-fno-common')
   c_args += '-fno-common'
+endif
+if meson.get_compiler('c').has_argument('-frounding-math')
+  c_args += '-frounding-math'
 endif
 if meson.get_compiler('c').symbols_have_underscore_prefix()
   global_prefix = '_'
@@ -113,6 +118,9 @@ check_duplicate_names = nm.found()
 if nm.found()
   duplicate_names = find_program('scripts/duplicate-names', required : true)
 endif
+
+# Select exit code
+picoexit = get_option('picoexit')
 
 # Select stdio implementation
 tinystdio = get_option('tinystdio')
@@ -274,15 +282,9 @@ else
 endif
 
 specs_data = configuration_data()
-specs_data.set(
-  'INCLUDEDIR',
-  join_paths(sysroot_install? '%R' : prefix, get_option('includedir'))
-)
-
-specs_data.set(
-  'LIBDIR',
-  sysroot_install? join_paths('%R', get_option('libdir')) : lib_dir
-)
+specs_data.set('PREFIX', sysroot_install? '%R' : prefix)
+specs_data.set('INCLUDEDIR', get_option('includedir'))
+specs_data.set('LIBDIR', get_option('libdir'))
 
 if tls_model != ''
   specs_data.set(
@@ -408,7 +410,7 @@ picolibcpp_ld = configure_file(input: 'picolibc.ld.in',
 
 # Not all compilers necessarily support all warnings used by the tests; only use these which are:
 test_c_warnings = []
-foreach arg : ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type']
+foreach arg : ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-Wimplicit-function-declaration']
   if meson.get_compiler('c').has_argument(arg)
     test_c_warnings += [arg]
   endif
@@ -474,7 +476,14 @@ alloc_size_code = '''
 void *foobar(size_t) __attribute__((__alloc_size__(1)));
 void *foobar2(size_t, size_t) __attribute__((__alloc_size__(1, 2)));
 '''
-have_alloc_size = meson.get_compiler('c').compiles(alloc_size_code, name : 'attribute __alloc_size__')
+have_alloc_size = meson.get_compiler('c').compiles(alloc_size_code, name : 'attribute __alloc_size__', args : (meson.get_compiler('c').has_argument('-Werror') ? '-Werror' : ''))
+
+# attributes constructor/destructor are a GNU extension - if the compiler doesn't have them, don't test them.
+attr_ctor_dtor_code = '''
+void __attribute__((constructor(101))) ctor (void) {}
+void __attribute__((destructor(101))) dtor (void) {}
+'''
+have_attr_ctor_dtor = meson.get_compiler('c').compiles(attr_ctor_dtor_code, name : 'attributes constructor/destructor', args : (meson.get_compiler('c').has_argument('-Werror') ? '-Werror' : ''))
 
 if enable_multilib
   used_libs = []
@@ -556,6 +565,10 @@ builtins = [
   ['builtin_ctz', '__builtin_ctz((unsigned int)42);'],
   ['builtin_ctzl', '__builtin_ctzl((unsigned long)42);'],
   ['builtin_ctzll', '__builtin_ctzll((unsigned long long)42);'],
+  ['builtin_copysignl', '__builtin_copysignl((long double)42);'],
+  ['builtin_isinfl', '__builtin_isinfl((long double)42);'],
+  ['builtin_isnanl', '__builtin_isnanl((long double)42);'],
+  ['builtin_finitel', '__builtin_finitel((long double)42);'],
 ]
 foreach builtin : builtins
   have_current_builtin = meson.get_compiler('c').links('int main(void) { ' + builtin[1] + ' return 0; }', name : 'test for __' + builtin[0])
@@ -759,10 +772,18 @@ add_project_arguments(arguments, language: 'c')
 # libc will adjust this if supported
 has_ieeefp_funcs = false
 
-# semihost will adjust this if supported
+# semihost will adjust these if supported
+
+# any kind of semihosting support, enough to run general
 has_semihost = false
 
-subdir('semihost')
+# arm compatible semihosting, enough to run arm semihost tests
+has_arm_semihost = false
+
+# make sure to include semihost BEFORE picocrt!
+if enable_semihost
+  subdir('semihost')
+endif
 if tinystdio
   subdir('dummyhost')
 endif
@@ -783,6 +804,12 @@ endif
 test_link_args = test_c_args
 test_link_depends = []
 
+# CompCert needs the '-WUl,' prefix to correctly pass the --spec parameters to the linker
+specs_prefix = ''
+if meson.get_compiler('c').get_id() == 'ccomp'
+  specs_prefix = '-WUl,'
+endif
+
 if has_semihost
 
   # If we're using semihosting, we assume that there's a
@@ -799,12 +826,12 @@ if has_semihost
   picolibc_link_path = 'picolibc.ld'
 
   if meson.get_compiler('c').get_id() != 'clang'
-    test_c_args += ['--specs', '@0@/@1@'.format(meson.current_build_dir(), picolibc_specs)]
+    test_c_args += [specs_prefix + '--specs', specs_prefix + '@0@/@1@'.format(meson.current_build_dir(), picolibc_specs)]
   endif
 
   # Undefine _exit as that's in libsemihost and needs to replace the weak _exit
 
-  test_link_args += test_c_args + ['-nostartfiles', '-nostdlib', '-T', test_link_path, '-T', 'picolibc.ld', '-Wl,--undefined=_exit', '-lgcc']
+  test_link_args += test_c_args + ['-nostartfiles', '-nostdlib', '-T', test_link_path, '-T', 'picolibc.ld', '-lgcc']
 
   # Make sure all of the tests get re-linked if the linker scripts change
 
@@ -813,12 +840,13 @@ elif meson.get_compiler('c').get_id() == 'clang'
   # Clang does not support spec files
 else
   test_link_depends += test_specs
-  test_c_args += ['--specs', '@0@/@1@'.format(meson.current_build_dir(), test_specs)]
+  test_c_args += [specs_prefix + '--specs', specs_prefix + '@0@/@1@'.format(meson.current_build_dir(), test_specs)]
   test_link_args += test_c_args
 endif
 
 has_picolibc_tls_api = false
 
+# make sure to include semihost BEFORE picocrt!
 if enable_picocrt
   subdir('picocrt')
 endif

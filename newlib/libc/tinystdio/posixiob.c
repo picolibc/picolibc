@@ -60,3 +60,13 @@ static struct __file_posix __stdout = {
 
 FILE *const __posix_iob[3] = { &__stdin.cfile.file, &__stdout.cfile.file, &__stdout.cfile.file };
 __weak_reference(__posix_iob,__iob);
+
+/*
+ * Add a destructor function to get stdout flushed on
+ * exit
+ */
+__attribute__((destructor (101)))
+static void posix_exit(void)
+{
+	fflush(stdout);
+}

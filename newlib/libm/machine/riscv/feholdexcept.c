@@ -46,10 +46,10 @@
  * floating-point exceptions."
  */
 
+#if __riscv_flen
+
 int feholdexcept(fenv_t *envp)
 {
-
-#if __riscv_flen
 
   /* Store the current FP environment in envp*/
 
@@ -70,7 +70,8 @@ int feholdexcept(fenv_t *envp)
    * installed."
    */
 
-#endif
-
   return 0;
 }
+#else
+#include "../../fenv/feholdexcept.c"
+#endif

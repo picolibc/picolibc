@@ -8,4 +8,4 @@ mkdir $DIR
 cd $DIR
 ../scripts/$CONFIGURE "$@"
 cat meson-logs/*
-ninja test
+ninja && meson test -v

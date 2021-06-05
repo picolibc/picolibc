@@ -44,7 +44,6 @@ srcs_machine = [
   'i386mach.h'
 ]
 
-subdir('sys')
 subdir('machine')
 
 foreach target : targets

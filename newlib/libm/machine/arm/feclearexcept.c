@@ -31,14 +31,16 @@
 
 #include "_fenv.h"
 
+#ifdef __SOFTFP__
+#include "../../fenv/feclearexcept.c"
+#else
 int feclearexcept(int excepts)
 {
-#ifndef __SOFTFP__
 	fexcept_t __fpsr;
 
 	vmrs_fpscr(__fpsr);
 	__fpsr &= ~excepts;
 	vmsr_fpscr(__fpsr);
-#endif
 	return (0);
 }
+#endif

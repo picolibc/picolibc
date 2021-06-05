@@ -107,6 +107,11 @@ machine_dirs = {
 		 'spu': 'spu',
 	       }
 
+shared_dirs = {
+		'i386': 'shared_x86',
+		'x86_64': 'shared_x86'
+	      }
+
 libdirs = ['argz', 'ctype', 'errno', 'iconv', 'misc',
 	   'posix', 'search', 'signal', 'ssp', 'stdlib',
 	   'string', 'time', 'xdr', 'locale']
@@ -131,6 +136,19 @@ inc_machine_headers_machine = []
 srcs_machine = []
 
 if machine_dirs.has_key(host_cpu_family)
+
+  if shared_dirs.has_key(machine_dirs[host_cpu_family])
+    shared_dir = join_paths('machine', shared_dirs[machine_dirs[host_cpu_family]])
+    shared_inc_dir = join_paths(shared_dir, 'include')
+    if run_command('ls', shared_inc_dir).returncode() == 0
+      inc = [include_directories(shared_inc_dir), inc]
+    endif
+
+    inc = [include_directories(shared_dir), inc]
+
+    libdirs = [shared_dir] + libdirs
+  endif
+
   machine_dir = join_paths('machine', machine_dirs[host_cpu_family])
   machine_inc_dir = join_paths(machine_dir, 'include')
 
@@ -142,6 +160,7 @@ if machine_dirs.has_key(host_cpu_family)
 
   libdirs = [machine_dir] + libdirs
   libnames = ['machine'] + libnames
+
 endif
 
 foreach libdir : libdirs

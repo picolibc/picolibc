@@ -296,10 +296,10 @@ char *_llicvt (char *, long long, char);
 #define __sinit_lock_acquire()
 #define __sinit_lock_release()
 #else
-void __sfp_lock_acquire (void);
-void __sfp_lock_release (void);
-void __sinit_lock_acquire (void);
-void __sinit_lock_release (void);
+#define __sfp_lock_acquire() __LIBC_LOCK()
+#define __sfp_lock_release() __LIBC_UNLOCK()
+#define __sinit_lock_acquire() __LIBC_LOCK()
+#define __sinit_lock_release() __LIBC_UNLOCK()
 #endif
 
 /* Types used in positional argument support in vfprinf/vfwprintf.

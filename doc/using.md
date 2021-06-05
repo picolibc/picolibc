@@ -48,36 +48,47 @@ you can plug your own code into:
     variables while ARM with hardware floating point needs to have the
     FPSCR register set up to match C semantics for rounding.
     
- 2) Data initialization. Here's the code inside Picocrt:
-```
-memcpy(__data_start, __data_source, (uintptr_t) __data_size);
-```
-For this to work, the linker script must assign correct values to
-each of these symbols:
+ 2) Data initialization. Here's the code inside Picocrt:\
+    \
+    `memcpy(__data_start, __data_source, (uintptr_t) __data_size);`\
+    \
+    For this to work, the linker script must assign correct values to
+    each of these symbols:
 
- * __data_start points to the RAM location where the .data segment
-   starts.
- * __data_source points to the Flash location where the .data segment
-   initialization values are stored.
- * __data_size is an absolute symbol noting the size of the
-   initialized data segment
+    * __data_start points to the RAM location where the .data segment
+      starts.
+    * __data_source points to the Flash location where the .data segment
+      initialization values are stored.
+    * __data_size is an absolute symbol noting the size of the
+      initialized data segment
 
- 3) BSS initialization. Here's the code inside Picocrt:
-```
-memset(__bss_start, '\0', (uintptr_t) __bss_size);
-```
-Assign these symbols in the linker script as follows:
+ 3) BSS initialization. Here's the code inside Picocrt:\
+    \
+    `memset(__bss_start, '\0', (uintptr_t) __bss_size);`\
+    \
+    Assign these symbols in the linker script as follows:
 
- * __bss_start points to the RAM location where the .bss segment
-   starts.
- * __bss_size is an absolute symbol noting the size of the cleared
-   data segment
+    * __bss_start points to the RAM location where the .bss segment
+      starts.
+    * __bss_size is an absolute symbol noting the size of the cleared
+      data segment
 
- 4) Call [initializers/constructors](init.md) using `__libc_init_array()`
+ 4) Optionally call constructors:
+
+    * The default and hosted crt0 variants call
+      [initializers/constructors](init.md) using `__libc_init_array()`
+
+    * The minimal crt0 variant doesn't call any constructors
 
  5) Call `main()`
 
- 6) Call [finalizers/destructors](init.md) using `__libc_fini_array()`
+ 6) After main returns:
+
+    * The default and minimal crt0 variants run an infinite
+      loop if main returns.
+
+    * The hosted crt0 variant calls `exit`, passing it the value
+      returned from main.
 
 ## Semihosting
 
@@ -100,7 +111,26 @@ command line flag defined by picolibc.specs:
 You can also list libc and libsemihost in the correct order
 explicitly:
 
-	$ gcc --specs=picolibc.specs -o program.elf -lc -lsemihost
+	$ gcc --specs=picolibc.specs -o program.elf program.o -lc -lsemihost
 
-This second form doesn't force using the version of _exit from
-libsemihost.a, and so isn't quite as useful.
+## Crt0 variants
+
+The default `crt0` version provided by Picolibc calls any constructors
+before it calls main and then goes into an infinite loop after main
+returns to avoid requiring an `_exit` function.
+
+In an environment which provides a useful `_exit` implementation, applications
+may want to use the `crt0-hosted` variant that calls `exit` when main
+returns, resulting in a clean return to the hosting environment (this
+conforms to a hosted execution environment as per the C
+specification). Select this using the `--crt0=hosted` flag:
+
+	$ gcc --specs=picolibc.specs --crt0=hosted -o program.elf program.o
+
+In a smaller environment which is not using any constructors (or any
+Picolibc code which requires constructors) may want to use the
+`crt0-minimal` variant that removes the call to
+`__libc_init_array()`. This variant also runs an infinite loop in case
+main returns. Select this using the `--crt0=minimal` flag:
+
+	$ gcc --specs=picolibc.specs --crt0=minimal -o program.elf program.o

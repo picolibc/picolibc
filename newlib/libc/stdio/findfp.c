@@ -300,32 +300,6 @@ __sinit (struct _reent *s)
 
 #ifndef __SINGLE_THREAD__
 
-__LOCK_INIT_RECURSIVE(static, __sfp_recursive_mutex);
-__LOCK_INIT_RECURSIVE(static, __sinit_recursive_mutex);
-
-void
-__sfp_lock_acquire (void)
-{
-  __lock_acquire_recursive (__sfp_recursive_mutex);
-}
-
-void
-__sfp_lock_release (void)
-{
-  __lock_release_recursive (__sfp_recursive_mutex);
-}
-
-void
-__sinit_lock_acquire (void)
-{
-  __lock_acquire_recursive (__sinit_recursive_mutex);
-}
-
-void
-__sinit_lock_release (void)
-{
-  __lock_release_recursive (__sinit_recursive_mutex);
-}
 
 /* Walkable file locking routine.  */
 static int

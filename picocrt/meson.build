@@ -37,7 +37,9 @@ src_picocrt_machine = {
 			'riscv32' : 'riscv/crt0.S',
 			'riscv64' : 'riscv/crt0.S',
 			'arm' : 'arm/crt0.c',
-			'aarch64' : 'aarch64/crt0.c'
+			'aarch64' : 'aarch64/crt0.c',
+			'x86' : 'i386/crt0.S',
+			'x86_64' : 'amd64/crt0.S',
 		      }
 
 if src_picocrt_machine.has_key(host_cpu_family)
@@ -53,12 +55,21 @@ foreach target : targets
 
   if target == ''
     crt_name = 'crt0.o'
+    crt_hosted_name = 'crt0-hosted.o'
+    crt_minimal_name = 'crt0-minimal.o'
     libcrt_name = 'crt'
+    libcrt_hosted_name = 'crt-hosted'
+    libcrt_minimal_name = 'crt-minimal'
   else
     crt_name = join_paths(target, 'crt0.o')
+    crt_hosted_name = join_paths(target, 'crt0-hosted.o')
+    crt_minimal_name = join_paths(target, 'crt0-minimal.o')
     libcrt_name = join_paths(target, 'libcrt')
+    libcrt_hosted_name = join_paths(target, 'libcrt-hosted')
+    libcrt_minimal_name = join_paths(target, 'libcrt-minimal')
   endif
 
+  # The normal variant does not call 'exit' after return from main (c lingo: freestanding execution environment)
   executable(crt_name,
 	     srcs_picocrt,
 	     include_directories : inc,
@@ -74,4 +85,38 @@ foreach target : targets
 			      install : false,
 			      include_directories : inc,
 			      c_args : value[1]))
+
+  # The 'hosted' variant calls 'exit' after return from main (c lingo: hosted execution environment)
+  executable(crt_hosted_name,
+             srcs_picocrt,
+             include_directories : inc,
+             install : true,
+             install_dir : instdir,
+             c_args : value[1] + arg_fnobuiltin + ['-ffreestanding', '-DCRT0_EXIT'],
+             link_args : value[1] + ['-r', '-ffreestanding', '-nostdlib'])
+
+  # Tests link against this because using the .o isn't supported under meson
+  set_variable('lib_crt_hosted' + target,
+	       static_library(libcrt_hosted_name,
+			      srcs_picocrt,
+			      install : false,
+			      include_directories : inc,
+			      c_args : value[1] + ['-DCRT0_EXIT']))
+
+  # The 'minimal' variant doesn't call exit, nor does it invoke any constructors
+  executable(crt_minimal_name,
+             srcs_picocrt,
+             include_directories : inc,
+             install : true,
+             install_dir : instdir,
+             c_args : value[1] + arg_fnobuiltin + ['-ffreestanding', '-DCONSTRUCTORS=0'],
+             link_args : value[1] + ['-r', '-ffreestanding', '-nostdlib'])
+
+  # Tests link against this because using the .o isn't supported under meson
+  set_variable('lib_crt_minimal' + target,
+	       static_library(libcrt_minimal_name,
+			      srcs_picocrt,
+			      install : false,
+			      include_directories : inc,
+			      c_args : value[1] + ['-DCONSTRUCTORS=0']))
 endforeach

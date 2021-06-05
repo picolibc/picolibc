@@ -38,11 +38,6 @@
 #include <stdint.h>
 #include <string.h>
 
-/* PSTR() is not used to save 1 byte per string: '\0' at the tail.	*/
-static const char pstr_inf[] = {'I','N','F'};
-static const char pstr_inity[] = {'I','N','I','T','Y'};
-static const char pstr_nan[] = {'N','A','N'};
-
 /**  The strtof() function converts the initial portion of the string pointed
      to by \a nptr to float representation.
 
@@ -102,9 +97,9 @@ strtof (const char * nptr, char ** endptr)
 	c = *nptr++;
     }
 
-    if (!strncmp (nptr - 1, pstr_inf, 3)) {
+    if (__matchcaseprefix(nptr - 1, __match_inf)) {
 	nptr += 2;
-	if (!strncmp (nptr, pstr_inity, 5))
+	if (__matchcaseprefix(nptr, __match_inity))
 	    nptr += 5;
 	if (endptr)
 	    *endptr = (char *)nptr;
@@ -113,7 +108,7 @@ strtof (const char * nptr, char ** endptr)
 
     /* NAN() construction is not realised.
        Length would be 3 characters only.	*/
-    if (!strncmp (nptr - 1, pstr_nan, 3)) {
+    if (__matchcaseprefix(nptr - 1, __match_nan)) {
 	if (endptr)
 	    *endptr = (char *)nptr + 2;
 	return NAN;

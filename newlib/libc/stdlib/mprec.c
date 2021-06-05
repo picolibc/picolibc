@@ -131,7 +131,7 @@ __mprec_register_exit(void)
 {
   if (!_mprec_exit_registered) {
     _mprec_exit_registered = 1;
-    return __register_exitproc(__et_atexit, __mprec_exit, NULL, NULL);
+    return atexit(__mprec_exit);
   }
   return 0;
 }

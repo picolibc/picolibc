@@ -90,29 +90,40 @@ lsrc_complex = [
   'cabsl.c',
   'creall.c',
   'cimagl.c',
-  'ccoshl.c',
-  'cacoshl.c',
-  'clogl.c',
-  'csqrtl.c',
-  'cargl.c',
+  'conjl.c',
   'cprojl.c',
-  'cexpl.c',
-  'cephes_subrl.c',
+  'csqrtl.c',
+]
+
+lsrc_complex_long_double_equal_double = [
+  'cacoshl.c',
   'cacosl.c',
-  'ccosl.c',
+  'cargl.c',
+  'casinhl.c',
   'casinl.c',
   'catanhl.c',
-  'conjl.c',
+  'catanl.c',
+  'cephes_subrl.c',
+  'ccoshl.c',
+  'ccosl.c',
+  'cexpl.c',
+  'clog10l.c',
+  'clogl.c',
   'cpowl.c',
-  'ctanhl.c',
-  'ctanl.c',
-  'casinhl.c',
   'csinhl.c',
   'csinl.c',
-  'catanl.c',
+  'ctanhl.c',
+  'ctanl.c',
 ]
 
 srcs_complex = dsrc_complex + fsrc_complex
+
+if have_long_double
+  if long_double_equals_double
+    lsrc_complex += lsrc_complex_long_double_equal_double
+  endif
+  srcs_complex += lsrc_complex
+endif
 
 hdrs_complex = [
     'cephes_subrf.h',

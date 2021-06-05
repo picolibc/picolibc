@@ -58,17 +58,17 @@
  *
  * FE_ALL_EXCEPT must be defined as the logical OR of all exceptions.
  */
-//#define FE_DIVBYZERO 0x00000001
-//#define FE_INEXACT   0x00000002
-//#define FE_INVALID   0x00000004
-//#define FE_OVERFLOW  0x00000008
-//#define FE_UNDERFLOW 0x00000010
 
 /*
-//#define FE_ALL_EXCEPT \
-          //(FE_DIVBYZERO|FE_INEXACT|FE_INVALID|FE_OVERFLOW|FE_UNDERFLOW)
-	  */
-#define FE_ALL_EXCEPT 0	/* NONE SUPPORTED IN PLACEHOLDER TEMPLATE */
+#define FE_DIVBYZERO 0x00000001
+#define FE_INEXACT   0x00000002
+#define FE_INVALID   0x00000004
+#define FE_OVERFLOW  0x00000008
+#define FE_UNDERFLOW 0x00000010
+
+#define FE_ALL_EXCEPT \
+          (FE_DIVBYZERO|FE_INEXACT|FE_INVALID|FE_OVERFLOW|FE_UNDERFLOW)
+*/
 
 /*
  * The following macros are to be defined if the respective rounding
@@ -83,10 +83,12 @@
  * Other implementation-specific rounding modes may be defined, and must start
  * with FE_ followed by a capital letter.
  */
-//#define FE_DOWNWARD   	1
-//#define FE_TONEAREST  	2
-//#define FE_TOWARDZERO 	3
-//#define FE_UPWARD     	4
+/*
+#define FE_DOWNWARD   	1
+#define FE_TONEAREST  	2
+#define FE_TOWARDZERO 	3
+#define FE_UPWARD     	4
+*/
 
 /*
  * The following typedefs are required. These should be defined properly
@@ -98,18 +100,5 @@
  */
 typedef int fenv_t;
 typedef int fexcept_t;
-
-/*
- * Lastly, a FE_DFL_ENV macro must be defined, representing a pointer
- * to const fenv_t that contains the value of the default floating point
- * environment.
- *
- * NOTE: The extern'ed variable fe_default_env_p is an implementation
- *       detail of this stub.  FE_DFL_ENV must point to an instance of
- *       fenv_t with the default fenv_t. The format of fenv_t and where
- *       FE_DFL_ENV is are implementation specific.
- */
-extern fenv_t _fe_dfl_env;
-#define FE_DFL_ENV ((const fenv_t *) &_fe_dfl_env)
 
 #endif /* _SYS_FENV_H_ */

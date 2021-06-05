@@ -51,10 +51,10 @@
  * status flags represented through its argument."
  */
 
+#if __riscv_flen
+
 int fesetenv(const fenv_t *envp)
 {
-
-#if __riscv_flen
 
   /* Set environment (FCSR) */
 
@@ -67,7 +67,8 @@ int fesetenv(const fenv_t *envp)
    * shall return zero. Otherwise, it shall return a non-zero value.
    */
 
-#endif
-
   return 0;
 }
+#else
+#include "../../fenv/fesetenv.c"
+#endif

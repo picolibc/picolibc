@@ -38,6 +38,7 @@
 #include <errno.h>
 #include <string.h>
 #include <malloc.h>
+#include <stdlib.h>
 
 #pragma GCC diagnostic ignored "-Walloc-size-larger-than="
 

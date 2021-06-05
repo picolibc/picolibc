@@ -35,15 +35,25 @@
 foreach target : targets
   value = get_variable('target_' + target)
 
-  _libs = [get_variable('lib_m' + target), get_variable('lib_c' + target)]
+  _libs_base = [get_variable('lib_m' + target), get_variable('lib_c' + target)]
   if is_variable('lib_semihost' + target)
-    _libs += [get_variable('lib_semihost' + target)]
+    _libs_base += [get_variable('lib_semihost' + target)]
   endif
-  if is_variable('lib_crt' + target)
-    _libs += [get_variable('lib_crt'+ target)]
+
+  if is_variable('lib_crt_hosted' + target)
+    _libs = [get_variable('lib_crt_hosted'+ target)] + _libs_base
+  else
+    _libs = _libs_base
   endif
-  
-  _c_args = value[1] + test_c_args
+
+  have_crt_minimal = is_variable('lib_crt_minimal' + target)
+  if have_crt_minimal
+    _libs_minimal = [get_variable('lib_crt_minimal'+ target)] + _libs_base
+  else
+    _libs_minimal = _libs_base
+  endif
+
+  _c_args = value[1] + test_c_args + test_c_warnings
   _link_args = value[1] + test_link_args
 
   t1 = 'printf_scanf'
@@ -117,19 +127,88 @@ foreach target : targets
 
   test(t1 + target,
        executable(t1_name, ['try-ilp32.c', 'try-ilp32-sub.c'],
-		  c_args: float_printf_compile_args + _c_args,
-		  link_args: float_printf_link_args + _link_args,
+		  c_args: _c_args,
+		  link_args: _link_args,
 		  link_with: _libs,
 		  include_directories: inc),
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
-  plain_tests = ['rand', 'regex', 'ungetc', 'fenv', 'math_errhandling', 'malloc', 'tls', 'ffs', 'setjmp']
+  t1 = 'hosted-exit'
+  if target == ''
+    t1_name = t1
+  else
+    t1_name = join_paths(target, t1)
+  endif
 
-  if newlib_nano_malloc or not tests_disable_full_malloc_stress
+  test(t1 + target,
+       executable(t1_name, 'hosted-exit.c',
+		  c_args: _c_args,
+		  link_args:  _link_args,
+		  link_with: _libs,
+		  include_directories: inc),
+       env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+
+  test(t1 + '-fail' + target,
+       executable(t1_name + '-fail', 'hosted-exit.c',
+		  c_args: _c_args + ['-DRETVAL=1'],
+		  link_args:  _link_args,
+		  link_with: _libs,
+		  include_directories: inc),
+       env: ['MESON_SOURCE_ROOT=' + meson.source_root()],
+       should_fail: true
+      )
+
+  if have_crt_minimal
+    t1 = 'constructor-skip'
+    if target == ''
+      t1_name = t1
+    else
+      t1_name = join_paths(target, t1)
+    endif
+
+    test(t1 + target,
+	 executable(t1_name, 'constructor-skip.c',
+		    c_args: _c_args,
+		    link_args:  _link_args,
+		    link_with: _libs_minimal,
+		    include_directories: inc),
+	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+  endif
+
+  t1 = 'rounding-mode'
+  if target == ''
+    t1_name = t1
+  else
+    t1_name = join_paths(target, t1)
+  endif
+
+  test(t1 + target,
+       executable(t1_name, ['rounding-mode.c', 'rounding-mode-sub.c'],
+		  c_args: _c_args,
+		  link_args: _link_args,
+		  link_with: _libs,
+		  include_directories: inc),
+       env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+
+  plain_tests = ['rand', 'regex', 'ungetc', 'fenv',
+		 'math_errhandling', 'malloc', 'tls',
+		 'ffs', 'setjmp', 'atexit', 'on_exit',
+		 'math-funcs', 'timegm', 'time-tests',
+		]
+
+  if have_attr_ctor_dtor
+    plain_tests += 'constructor'
+  endif
+
+  if have_complex
+    plain_tests += 'complex-funcs'
+  endif
+
+  if newlib_nano_malloc or tests_enable_full_malloc_stress
     plain_tests += 'malloc_stress'
   endif
 
-  if posix_io or not tinystdio
+  if (posix_io or not tinystdio) and tests_enable_posix_io
     plain_tests += 'posix-io'
   endif
 
@@ -169,6 +248,6 @@ if enable_native_tests
   endif
 endif
 
-if has_semihost
+if has_arm_semihost
   subdir('semihost')
 endif

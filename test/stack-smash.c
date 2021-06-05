@@ -87,12 +87,12 @@ int main(void)
 	smash_array(source, dest);
 	expect_smash = false;
 	printf("missed expected stack smash\n");
-	exit(1);
+	return 1;
 }
 #else
 int main(void)
 {
 	printf("stack protector disabled for tests\n");
-	exit(0);
+	return 0;
 }
 #endif

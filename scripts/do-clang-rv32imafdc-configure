@@ -36,5 +36,5 @@
 exec `dirname $0`/do-configure clang-rv32imafdc-unknown-elf \
      -Dtests=true \
      -Dtests-enable-stack-protector=false \
-     -Dtests-disable-full-malloc-stress=true \
+     -Dtests-enable-full-malloc-stress=false \
      -Dmultilib=false "$@"

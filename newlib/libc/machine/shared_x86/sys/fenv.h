@@ -134,16 +134,6 @@ typedef __uint32_t fexcept_t;
 #define FE_DBLPREC	(2)
 #define FE_LDBLPREC	(3)
 #endif
-
-/*  The <fenv.h> header shall define the following constant, which
-   represents the default floating-point environment (that is, the one
-   installed at program startup) and has type pointer to const-qualified
-   fenv_t. It can be used as an argument to the functions within the
-   <fenv.h> header that manage the floating-point environment.  */
-
-extern fenv_t _fe_dfl_env;
-#define FE_DFL_ENV ((const fenv_t *) &_fe_dfl_env)
-
 /*  Additional implementation-defined environments, with macro
    definitions beginning with FE_ and an uppercase letter,and having
    type "pointer to const-qualified fenv_t",may also be specified by
@@ -154,14 +144,18 @@ extern fenv_t _fe_dfl_env;
    represents an environment where every exception raised causes a trap
    to occur. You can test for this macro using #ifdef. It is only defined
    if _GNU_SOURCE is defined.  */
-extern fenv_t _fe_nomask_env;
-#define FE_NOMASK_ENV ((const fenv_t *) &_fe_nomask_env)
-#endif /* __GNU_VISIBLE */
-
-#ifdef __INSIDE_CYGWIN__
-/* This is Cygwin-custom, not from the standard, for use in the Cygwin CRT.  */
-extern void _feinitialise ();
+extern const fenv_t *_fe_nomask_env;
+#define FE_NOMASK_ENV (_fe_nomask_env)
 #endif
+
+#ifdef __CYGWIN__
+
+#if __MISC_VISIBLE
+int fegetprec (void);
+int fesetprec (int __prec);
+#endif
+
+#endif /* __CYGWIN__ */
 
 #ifdef __cplusplus
 }

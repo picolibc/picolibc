@@ -47,10 +47,6 @@ LITE_EXIT.
 void free(void *) _ATTRIBUTE((__weak__));
 #endif
 
-#ifndef __SINGLE_THREAD__
-__LOCK_INIT_RECURSIVE(, __atexit_recursive_mutex);
-#endif
-
 #ifdef _WANT_REGISTER_FINI
 
 /* If "__libc_fini" is defined, finalizers (either
@@ -107,9 +103,7 @@ __call_exitprocs (int code, void *d)
   void (*fn) (void);
 
 
-#ifndef __SINGLE_THREAD__
-  __lock_acquire_recursive(__atexit_recursive_mutex);
-#endif
+  __LIBC_LOCK();
 
  restart:
 
@@ -176,8 +170,5 @@ __call_exitprocs (int code, void *d)
 	}
 #endif
     }
-#ifndef __SINGLE_THREAD__
-  __lock_release_recursive(__atexit_recursive_mutex);
-#endif
-
+    __LIBC_UNLOCK();
 }

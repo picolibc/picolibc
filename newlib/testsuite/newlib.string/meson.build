@@ -42,8 +42,8 @@ foreach target : targets
   if is_variable('lib_semihost' + target)
     _libs += [get_variable('lib_semihost' + target)]
   endif
-  if is_variable('lib_crt' + target)
-    _libs += [get_variable('lib_crt'+ target)]
+  if is_variable('lib_crt_hosted' + target)
+    _libs += [get_variable('lib_crt_hosted'+ target)]
   endif
   
   _c_args = value[1] + test_c_args

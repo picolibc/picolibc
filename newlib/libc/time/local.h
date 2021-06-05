@@ -3,6 +3,7 @@
 #include <_ansi.h>
 #include <time.h>
 #include <sys/_tz_structs.h>
+#include <sys/lock.h>
 
 #define SECSPERMIN	60L
 #define MINSPERHOUR	60L
@@ -28,14 +29,6 @@ extern const int __month_lengths[2][MONSPERYEAR];
 void _tzset_unlocked (void);
 
 /* locks for multi-threading */
-#ifdef __SINGLE_THREAD__
-#define TZ_LOCK
-#define TZ_UNLOCK
-#else
-#define TZ_LOCK __tz_lock()
-#define TZ_UNLOCK __tz_unlock()
-#endif
-
-void __tz_lock (void);
-void __tz_unlock (void);
+#define TZ_LOCK		__LIBC_LOCK()
+#define TZ_UNLOCK	__LIBC_UNLOCK()
 

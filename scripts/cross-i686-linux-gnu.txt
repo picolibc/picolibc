@@ -1,10 +1,11 @@
 [binaries]
-c = 'i686-linux-gnu-gcc'
+c = ['i686-linux-gnu-gcc', '-march=core2', '-mfpmath=sse', '-msse2', '-nostdlib', '-fno-pic', '-fno-PIE', '-static']
 ar = 'i686-linux-gnu-ar'
 as = 'i686-linux-gnu-as'
+ld = ['i686-linux-gnu-gcc', '-march=core2', '-mfpmath=sse', '-msse2', '-nostdlib', '-fno-pic', '-fno-PIE', '-static']
 nm = 'i686-linux-gnu-nm'
 strip = 'i686-linux-gnu-strip'
-exe_wrapper = 'env'
+exe_wrapper = ['sh', '-c', 'test -z "$MESON_SOURCE_ROOT" || "$MESON_SOURCE_ROOT"/scripts/run-i686 "$@"', 'run-i686']
 
 [host_machine]
 system='linux'
@@ -13,5 +14,6 @@ cpu='i686'
 endian='little'
 
 [properties]
-c_args = ['-march=core2', '-mfpmath=sse', '-msse2']
+skip_sanity_check = true
 needs_exe_wrapper = true
+link_spec = '--build-id=none'

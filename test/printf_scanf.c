@@ -60,9 +60,22 @@ static const double test_vals[] = { 1.234567, 1.1, M_PI };
 #endif
 
 int
+check_vsnprintf(char *str, size_t size, const char *format, ...)
+{
+	int i;
+	va_list ap;
+
+	va_start(ap, format);
+	i = vsnprintf(str, size, format, ap);
+	va_end(ap);
+	return i;
+}
+
+int
 main(int argc, char **argv)
 {
 	int x = -35;
+	int y;
 	char	buf[256];
 	int	errors = 0;
 
@@ -96,6 +109,41 @@ main(int argc, char **argv)
 		fflush(stdout);
 	}
 #endif
+
+	/*
+	 * test snprintf and vsnprintf to make sure they don't
+	 * overwrite the specified buffer length (even if that is
+	 * zero)
+	 */
+	for (x = 0; x <= 6; x++) {
+		for (y = 0; y < 2; y++) {
+			char tbuf[10] = "xxxxxxxxx";
+			const char ref[10] = "xxxxxxxxx";
+			const char *name = (y == 0 ? "snprintf" : "vsnprintf");
+			int i = (y == 0 ? snprintf : check_vsnprintf) (tbuf, x, "%s", "123");
+			int y = x <= 4 ? x : 4;
+			if (i != 3) {
+				printf("%s(tbuf, %d, \"%%s\", \"123\") return %d instead of %d\n", name,
+				       x, i, 3);
+				errors++;
+			}
+			int l = strlen(tbuf);
+			if (y > 0 && l != y - 1) {
+				printf("%s: returned buffer len want %d got %d\n", name, y - 1, l);
+				errors++;
+			}
+			if (y > 0 && strncmp(tbuf, "123", y - 1) != 0) {
+				strncpy(buf, "123", y - 1);
+				buf[y-1] = '\0';
+				printf("%s: returned buffer want %s got %s\n", name, buf, tbuf);
+				errors++;
+			}
+			if (memcmp(tbuf + y, ref + y, sizeof(tbuf) - y) != 0) {
+				printf("%s: tail of buf mangled %s\n", name, tbuf + y);
+				errors++;
+			}
+		}
+	}
 	for (x = 0; x < 32; x++) {
 		unsigned int v = 0x12345678 >> x;
 		unsigned int r;
@@ -189,5 +237,5 @@ main(int argc, char **argv)
 	}
 #endif
 	fflush(stdout);
-	exit(errors);
+	return errors;
 }

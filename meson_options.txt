@@ -53,11 +53,17 @@ option('picolib', type: 'boolean', value: true,
 option('picocrt', type: 'boolean', value: true,
        description: 'Include pico crt bits')
 
+option('semihost', type: 'boolean', value: true,
+       description: 'Include semihost bits')
+
 option('specsdir', type: 'string',
        description: 'Installation directory for .specs file')
 
 option('sysroot-install', type: 'boolean', value: false,
        description: 'Install in gcc sysroot')
+
+option('picoexit', type: 'boolean', value: true,
+       description: 'Smaller exit/atexit/onexit code')
 
 #
 # Testing options
@@ -68,8 +74,10 @@ option('tests', type: 'boolean', value: false,
        description: 'Enable tests')
 option('tests-enable-stack-protector', type: 'boolean', value: true,
        description: 'tests enable stack protector')
-option('tests-disable-full-malloc-stress', type: 'boolean', value: true,
-       description: 'tests disable stress test for full malloc')
+option('tests-enable-full-malloc-stress', type: 'boolean', value: false,
+       description: 'tests enable stress test for full malloc')
+option('tests-enable-posix-io', type: 'boolean', value: true,
+       description: 'tests enable posix-io when available')
 
 option('newlib-tinystdio', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
        description: 'Use tiny stdio from avr libc')

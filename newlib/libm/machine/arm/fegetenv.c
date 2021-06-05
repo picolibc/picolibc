@@ -31,11 +31,12 @@
 
 #include "_fenv.h"
 
+#ifdef __SOFTFP__
+#include "../../fenv/fegetenv.c"
+#else
 int fegetenv(fenv_t *envp)
 {
-
-#ifndef __SOFTFP__
 	vmrs_fpscr(*envp);
-#endif
 	return (0);
 }
+#endif

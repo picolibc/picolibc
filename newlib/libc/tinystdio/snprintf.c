@@ -56,7 +56,7 @@ snprintf(char *s, size_t n, const char *fmt, ...)
 	i = vfprintf(&f.file, fmt, ap);
 	va_end(ap);
 
-	if (n >= 0 && i >= 0)
+	if ((int) n >= 0 && i >= 0)
 		s[i < n ? i : n] = 0;
 
 	return i;

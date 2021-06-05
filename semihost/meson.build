@@ -91,9 +91,11 @@ if src_semihost_machine.has_key(host_cpu_family)
     'semihost.h'
   )
 
-  semihost_inc = [include_directories('.'), inc]
+  inc = [inc, include_directories('.')]
 
   has_semihost = true
+
+  has_arm_semihost = true
 
   foreach target : targets
     value = get_variable('target_' + target)
@@ -111,8 +113,22 @@ if src_semihost_machine.has_key(host_cpu_family)
 				srcs_semihost,
 				install : true,
 				install_dir : instdir,
-				include_directories : semihost_inc,
+				include_directories : inc,
 				c_args : value[1]))
     
   endforeach
+endif
+
+#
+# Systems with non-arm semihosting support
+#
+semihost_custom = {
+		    'x86' : 'i386',
+		    'x86_64' : 'i386',
+		  }
+
+message('host_cpu_family ' + host_cpu_family)
+
+if semihost_custom.has_key(host_cpu_family)
+  subdir(join_paths('machine', semihost_custom[host_cpu_family]))
 endif

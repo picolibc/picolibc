@@ -24,6 +24,7 @@
  * SUCH DAMAGE.
  */
 
+#define _GNU_SOURCE
 #include <sys/cdefs.h>
 #if 0
 __FBSDID("$FreeBSD: head/lib/msun/src/s_csqrtl.c 181402 2008-08-08 00:15:16Z das $");
@@ -47,7 +48,7 @@ __RCSID("$NetBSD: csqrtl.c,v 1.2 2014/10/11 00:43:51 christos Exp $");
 /* We risk spurious overflow for components >= LDBL_MAX / (1 + sqrt(2)). */
 #define	THRESH	(LDBL_MAX / 2.414213562373095048801688724209698L)
 
-#define cpackl(r, i) ((r) + (i) * (double complex) I)
+#define cpackl(r, i) ((r) + (i) * (long double complex) I)
 
 long double complex
 csqrtl(long double complex z)
@@ -62,9 +63,9 @@ csqrtl(long double complex z)
 
 	/* Handle special cases. */
 	if (z == 0.0L)
-		return (cpackl(0.0L, b));
+		return (cpackl((long double) 0.0L, b));
 	if (isinf(b))
-		return (cpackl(INFINITY, b));
+		return (cpackl((long double) INFINITY, b));
 	if (isnan(a)) {
 		t = (b - b) / (b - b);	/* raise invalid if b is not a NaN */
 		return (cpackl(a, t));	/* return NaN + NaN i */

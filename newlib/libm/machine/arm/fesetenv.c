@@ -31,11 +31,13 @@
 
 #include "_fenv.h"
 
+#ifdef __SOFTFP__
+#include "../../fenv/fesetenv.c"
+#else
 int fesetenv(const fenv_t *envp)
 {
 
-#ifndef __SOFTFP__
 	vmsr_fpscr(*envp);
-#endif
 	return (0);
 }
+#endif

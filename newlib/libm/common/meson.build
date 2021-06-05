@@ -150,7 +150,20 @@ fsrc_common = [
   'math_errf_invalidf.c'
 ]
 
-lsrc_common = [
+# These have full implementations
+lsrc_full = [
+  'copysignl.c',
+  'hypotl.c',
+  'isinfl.c',
+  'isnanl.c',
+  'nanl.c',
+  'sl_finite.c',
+  'sl_issignaling.c',
+  'sqrtl.c',
+  ]
+
+# These are only valid when long double is the same as double
+lsrc_wrap = [
   'atanl.c',
   'cosl.c',
   'sinl.c',
@@ -173,11 +186,7 @@ lsrc_common = [
   'logl.c',
   'log10l.c',
   'powl.c',
-  'sqrtl.c',
   'fmodl.c',
-  'hypotl.c',
-  'copysignl.c',
-  'nanl.c',
   'ilogbl.c',
   'asinhl.c',
   'cbrtl.c',
@@ -210,14 +219,19 @@ lsrc_common = [
   'nexttoward.c',
   'nexttowardl.c',
   'log2l.c',
-  'sl_finite.c',
-  'sl_issignaling.c'
+  'dreml.c',
+  'exp10l.c',
+  'pow10l.c',
+  'sincosl.c',
 ]
 
 srcs_common = src_common + dsrc_common + fsrc_common
 
 if have_long_double
-  srcs_common += lsrc_common
+  srcs_common += lsrc_full
+  if long_double_equals_double
+    srcs_common += lsrc_wrap
+  endif
 endif
 
 srcs_common_use = []

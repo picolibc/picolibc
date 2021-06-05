@@ -44,10 +44,10 @@
  * queried."
  */
 
+#if __riscv_flen
+
 int fetestexcept(int excepts)
 {
-
-#if __riscv_flen
 
   /* Mask excepts to be sure only supported flag bits are set */
 
@@ -65,13 +65,7 @@ int fetestexcept(int excepts)
    */
 
   return (flags & excepts);
-
-#else
-
-  /* For soft float */
-
-  return 0;
-
-#endif
-
 }
+#else
+#include "../../fenv/fetestexcept.c"
+#endif

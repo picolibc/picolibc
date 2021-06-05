@@ -39,8 +39,6 @@ srcs_machine = [
   'x86_64mach.h'
 ]
 
-subdir('sys')
-
 foreach target : targets
 	value = get_variable('target_' + target)
 	set_variable('lib_machine' + target,

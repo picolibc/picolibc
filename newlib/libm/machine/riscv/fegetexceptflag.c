@@ -45,10 +45,10 @@
  * the object pointed to by the argument flagp."
  */
 
+#if __riscv_flen
+
 int fegetexceptflag(fexcept_t *flagp, int excepts)
 {
-
-#if __riscv_flen
 
   /* Mask excepts to be sure only supported flag bits are set */
 
@@ -70,7 +70,8 @@ int fegetexceptflag(fexcept_t *flagp, int excepts)
    * value."
    */
 
-#endif
-
   return 0;
 }
+#else
+#include "../../fenv/fegetexceptflag.c"
+#endif
