@@ -79,10 +79,6 @@ ANSI C requires <<mktime>>.
 #include <time.h>
 #include "local.h"
 
-#define _SEC_IN_MINUTE 60L
-#define _SEC_IN_HOUR 3600L
-#define _SEC_IN_DAY 86400L
-
 static const int8_t DAYS_IN_MONTH[12] =
 {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
@@ -91,7 +87,7 @@ static const int8_t DAYS_IN_MONTH[12] =
 static const int16_t _DAYS_BEFORE_MONTH[12] =
 {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
 
-#define _ISLEAP(y) (((y) % 4) == 0 && (((y) % 100) != 0 || (((y)+1900) % 400) == 0))
+#define _ISLEAP(y) (((y) % 4) == 0 && (((y) % 100) != 0 || (((y)+YEAR_BASE) % 400) == 0))
 #define _DAYS_IN_YEAR(year) (_ISLEAP(year) ? 366 : 365)
 
 static void
@@ -198,8 +194,8 @@ mktime_utc (struct tm *tim_p, long *days_p)
   validate_structure (tim_p);
 
   /* compute hours, minutes, seconds */
-  tim += tim_p->tm_sec + (tim_p->tm_min * _SEC_IN_MINUTE) +
-    (tim_p->tm_hour * _SEC_IN_HOUR);
+  tim += tim_p->tm_sec + (tim_p->tm_min * SECSPERMIN) +
+    (tim_p->tm_hour * SECSPERHOUR);
 
   /* compute days in year */
   days += tim_p->tm_mday - 1;
@@ -227,7 +223,7 @@ mktime_utc (struct tm *tim_p, long *days_p)
     }
 
   /* compute total seconds */
-  tim += (time_t)days * _SEC_IN_DAY;
+  tim += (time_t)days * SECSPERDAY;
 
   *days_p = days;
   return tim;
