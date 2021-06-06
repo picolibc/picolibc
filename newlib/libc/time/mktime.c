@@ -152,7 +152,7 @@ validate_structure (struct tm *tim_p)
         }
     }
 
-  if (_DAYS_IN_YEAR (tim_p->tm_year) == 366)
+  if (_ISLEAP (tim_p->tm_year))
     days_in_feb = 29;
 
   if (tim_p->tm_mday <= 0)
@@ -164,7 +164,7 @@ validate_structure (struct tm *tim_p)
 	      tim_p->tm_year--;
 	      tim_p->tm_mon = 11;
 	      days_in_feb =
-		((_DAYS_IN_YEAR (tim_p->tm_year) == 366) ?
+		(_ISLEAP (tim_p->tm_year) ?
 		 29 : 28);
 	    }
 	  tim_p->tm_mday += _DAYS_IN_MONTH (tim_p->tm_mon);
@@ -180,7 +180,7 @@ validate_structure (struct tm *tim_p)
 	      tim_p->tm_year++;
 	      tim_p->tm_mon = 0;
 	      days_in_feb =
-		((_DAYS_IN_YEAR (tim_p->tm_year) == 366) ?
+		(_ISLEAP (tim_p->tm_year) ?
 		 29 : 28);
 	    }
 	}
@@ -204,7 +204,7 @@ mktime_utc (struct tm *tim_p, long *days_p)
   /* compute days in year */
   days += tim_p->tm_mday - 1;
   days += _DAYS_BEFORE_MONTH[tim_p->tm_mon];
-  if (tim_p->tm_mon > 1 && _DAYS_IN_YEAR (tim_p->tm_year) == 366)
+  if (tim_p->tm_mon > 1 && _ISLEAP (tim_p->tm_year))
     days++;
 
   /* compute day of the year */
