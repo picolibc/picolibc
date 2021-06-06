@@ -87,7 +87,7 @@ static const int8_t DAYS_IN_MONTH[12] =
 static const int16_t _DAYS_BEFORE_MONTH[12] =
 {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
 
-#define _ISLEAP(y) (((y) % 4) == 0 && (((y) % 100) != 0 || (((y)+YEAR_BASE) % 400) == 0))
+#define _ISLEAP(y) isleap((y)+YEAR_BASE)
 #define _DAYS_IN_YEAR(year) (_ISLEAP(year) ? 366 : 365)
 
 static void
