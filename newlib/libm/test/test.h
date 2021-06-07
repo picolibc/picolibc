@@ -227,6 +227,9 @@ typedef struct
   int endscan;
 } double_type;
 
+#define ENDSCAN_MASK	0x7f
+#define ENDSCAN_IS_ZERO	0x80
+#define ENDSCAN_IS_INF	0x80
 
 typedef struct {
   long int value;
@@ -292,6 +295,7 @@ void test_cvt (void);
 void line (int);
 
 void test_mok (double, double, int);
+void test_mfok (float, float, int);
 void test_iok (int, int);
 void test_eok (int, int);
 void test_sok (char *, char*);

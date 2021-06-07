@@ -383,6 +383,37 @@ test_mok (double value,
   }
 }
 
+void
+test_mfok (float value,
+	   float shouldbe,
+	   int okmag)
+{
+  __ieee_float_shape_type a,b;
+  int mag = fmag_of_error(value, shouldbe);
+  if (mag == 0) 
+  {
+    /* error in the first bit is ok if the numbers are both 0 */
+    if (value == 0.0f && shouldbe == 0.0f)
+     return;
+    
+  }
+  a.value = shouldbe;
+  b.value = value;
+  
+  if (mag < okmag) 
+  {
+    printf("%s:%d, wrong answer: bit %d ",
+	   iname, 
+	   theline,
+	   mag);
+     printf("%08lx %08lx) ",
+	    (unsigned long) a.p1,
+	    (unsigned long) b.p1);
+     printf("(%g %g)\n",   (double) a.value, (double) b.value);
+    inacc++;
+  }
+}
+
 #ifdef __PCCNECV70__
 kill() {}
 getpid() {}
