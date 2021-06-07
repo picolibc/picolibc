@@ -174,8 +174,16 @@ void	setkey (const char *__key);
 #endif
 void	srand (unsigned __seed);
 double	strtod (const char *__restrict __n, char **__restrict __end_PTR);
+#ifdef TINY_STDIO
+int strfromd(char *restrict str, size_t n,
+	     const char *restrict format, double fp);
+#endif
 #if __ISO_C_VISIBLE >= 1999
 float	strtof (const char *__restrict __n, char **__restrict __end_PTR);
+#ifdef TINY_STDIO
+int strfromf(char *restrict str, size_t n,
+	     const char *restrict format, float fp);
+#endif
 #endif
 #if __MISC_VISIBLE
 /* the following strtodf interface is deprecated...use strtof instead */
