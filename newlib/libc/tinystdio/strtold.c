@@ -268,8 +268,8 @@ strtold (const char * nptr, char ** endptr)
 	    }
 	    pptr--;
 	}
-//	if (!isfinite(flt) || flt == 0)
-//	    errno = ERANGE;
+	if (flt == (long double) INFINITY || flt == 0.0L)
+	    errno = ERANGE;
     }
 
     return flt;

@@ -179,18 +179,20 @@ strtof (const char * nptr, char ** endptr)
 
     if (u32 == 0) {
 	flt = 0;
+    } else {
+	if (u32digits + exp <= -46 || (u32 == 0)) {
+	    // Number is less than 1e-46, which should be rounded down to 0; return 0.0.
+	    flt = 0;
+	}
+	else if (u32digits + exp >= 40) {
+	    // Number is larger than 1e+39, which should be rounded to +/-Infinity.
+	    flt = INFINITY;
+	}
+	else
+	    flt = __atof_engine(u32, exp);
+	if (flt == 0.0f || flt == INFINITY)
+	    errno = ERANGE;
     }
-    else if (u32digits + exp <= -46 || (u32 == 0)) {
-	// Number is less than 1e-46, which should be rounded down to 0; return 0.0.
-	flt = 0;
-    }
-    else if (u32digits + exp >= 40) {
-	// Number is larger than 1e+39, which should be rounded to +/-Infinity.
-	flt = INFINITY;
-    }
-    else
-	flt = __atof_engine(u32, exp);
-
     if (flag & FL_MINUS)
 	flt = -flt;
 
