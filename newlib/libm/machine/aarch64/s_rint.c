@@ -30,6 +30,6 @@ double
 rint (double x)
 {
   double result;
-  asm ("frintx\t%d0, %d1" : "=w" (result) : "w" (x));
+  __asm__("frintx\t%d0, %d1" : "=w" (result) : "w" (x));
   return result;
 }

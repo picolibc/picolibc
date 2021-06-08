@@ -41,9 +41,9 @@ int feraiseexcept(int excepts)
 
   if (excepts & ~FE_ALL_EXCEPT)
     return -1;
-  asm ("rur.fsr %0" : "=a"(current));
+  __asm__("rur.fsr %0" : "=a"(current));
   current |= excepts << _FE_EXCEPTION_FLAGS_OFFSET;
-  asm ("wur.fsr %0" : : "a"(current));
+  __asm__("wur.fsr %0" : : "a"(current));
   return 0;
 }
 

@@ -41,7 +41,7 @@ static int
 e9_putc(char c, FILE *file)
 {
 	(void) file;
-	asm("out %%al, $0xe9" : : "a" ((int) c));
+	__asm__("out %%al, $0xe9" : : "a" ((int) c));
 	return c;
 }
 

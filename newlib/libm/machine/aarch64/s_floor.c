@@ -30,6 +30,6 @@ double
 floor (double x)
 {
   double result;
-  asm ("frintm\t%d0, %d1" : "=w" (result) : "w" (x));
+  __asm__("frintm\t%d0, %d1" : "=w" (result) : "w" (x));
   return result;
 }

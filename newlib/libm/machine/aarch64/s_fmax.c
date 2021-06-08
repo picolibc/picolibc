@@ -30,6 +30,6 @@ double
 fmax (double x, double y)
 {
   double result;
-  asm ("fmaxnm\t%d0, %d1, %d2" : "=w" (result) : "w" (x), "w" (y));
+  __asm__("fmaxnm\t%d0, %d1, %d2" : "=w" (result) : "w" (x), "w" (y));
   return result;
 }

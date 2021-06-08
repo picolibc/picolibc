@@ -30,6 +30,6 @@ double
 round (double x)
 {
   double result;
-  asm ("frinta\t%d0, %d1" : "=w" (result) : "w" (x));
+  __asm__("frinta\t%d0, %d1" : "=w" (result) : "w" (x));
   return result;
 }

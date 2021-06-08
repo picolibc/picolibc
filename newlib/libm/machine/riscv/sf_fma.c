@@ -42,7 +42,7 @@ float
 fmaf (float x, float y, float z)
 {
 	float result;
-	asm ("fmadd.s %0, %1, %2, %3" : "=f" (result) : "f" (x), "f" (y), "f" (z));
+	__asm__("fmadd.s %0, %1, %2, %3" : "=f" (result) : "f" (x), "f" (y), "f" (z));
 	return result;
 }
 

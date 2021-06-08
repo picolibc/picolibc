@@ -43,7 +43,7 @@ sbrk (ptrdiff_t nbytes)
          The kernargs pointer is in s[8:9].
 	 This will break if the enable_sgpr_* flags are ever changed.  */
       char *kernargs;
-      asm ("s_mov_b64 %0, s[8:9]" : "=Sg"(kernargs));
+      __asm__("s_mov_b64 %0, s[8:9]" : "=Sg"(kernargs));
 
       /* The heap data is at kernargs[3].  */
       struct heap *heap = *(struct heap **)(kernargs + 24);

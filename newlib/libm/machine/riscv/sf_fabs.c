@@ -41,7 +41,7 @@ float
 fabsf (float x)
 {
   float result;
-  asm ("fabs.s\t%0, %1" : "=f"(result) : "f"(x));
+  __asm__("fabs.s\t%0, %1" : "=f"(result) : "f"(x));
   return result;
 }
 

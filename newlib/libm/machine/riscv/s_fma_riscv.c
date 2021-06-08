@@ -42,7 +42,7 @@ double
 fma (double x, double y, double z)
 {
 	double result;
-	asm ("fmadd.d %0, %1, %2, %3" : "=f" (result) : "f" (x), "f" (y), "f" (z));
+	__asm__("fmadd.d %0, %1, %2, %3" : "=f" (result) : "f" (x), "f" (y), "f" (z));
 	return result;
 }
 

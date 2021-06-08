@@ -14,7 +14,7 @@ char *
 strchr (const char *s, int c)
 {
   unsigned int c2;
-  asm (PRELOADSTR ("%0") : : "r" (s));
+  __asm__(PRELOADSTR ("%0") : : "r" (s));
 
   c &= 0xff;
 
@@ -41,7 +41,7 @@ strchr (const char *s, int c)
      R6 = 0xfefefeff [ == ~(0x80808080 << 1) ]
      R5 = 0x80808080  */
 
-  asm (PRELOADSTR ("%0") "\n\
+  __asm__(PRELOADSTR ("%0") "\n\
 	mov	r5, #0x80\n\
 	add	r5, r5, #0x8000\n\
 	add	r5, r5, r5, lsl #16\n\

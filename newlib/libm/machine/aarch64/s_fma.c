@@ -30,6 +30,6 @@ double
 fma (double x, double y, double z)
 {
   double result;
-  asm ("fmadd\t%d0, %d1, %d2, %d3" : "=w" (result) : "w" (x), "w" (y), "w" (z));
+  __asm__("fmadd\t%d0, %d1, %d2, %d3" : "=w" (result) : "w" (x), "w" (y), "w" (z));
   return result;
 }

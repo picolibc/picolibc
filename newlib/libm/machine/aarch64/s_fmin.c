@@ -30,6 +30,6 @@ double
 fmin (double x, double y)
 {
   double result;
-  asm ("fminnm\t%d0, %d1, %d2" : "=w" (result) : "w" (x), "w" (y));
+  __asm__("fminnm\t%d0, %d1, %d2" : "=w" (result) : "w" (x), "w" (y));
   return result;
 }

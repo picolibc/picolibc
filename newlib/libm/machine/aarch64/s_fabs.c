@@ -30,6 +30,6 @@ double
 fabs (double x)
 {
   double result;
-  asm ("fabs\t%d0, %d1" : "=w" (result) : "w" (x));
+  __asm__("fabs\t%d0, %d1" : "=w" (result) : "w" (x));
   return result;
 }

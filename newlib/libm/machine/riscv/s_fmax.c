@@ -41,7 +41,7 @@ double
 fmax (double x, double y)
 {
   double result;
-  asm ("fmax.d\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
+  __asm__("fmax.d\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
   return result;
 }
 #else

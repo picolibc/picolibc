@@ -35,7 +35,7 @@ int fesetround(int round)
 {
   if (round & ~_FE_ROUND_MODE_MASK)
     return -1;
-  asm ("wur.fcr %0" : : "a"(round));
+  __asm__("wur.fcr %0" : : "a"(round));
   return 0;
 }
 

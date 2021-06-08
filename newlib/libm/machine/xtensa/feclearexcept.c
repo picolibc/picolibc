@@ -38,9 +38,9 @@ int feclearexcept(int except)
   if (except & ~FE_ALL_EXCEPT)
     return -1;
   except <<= _FE_EXCEPTION_FLAGS_OFFSET;
-  asm ("rur.fsr %0" : "=a"(fsr));
+  __asm__("rur.fsr %0" : "=a"(fsr));
   fsr = fsr & ~except;
-  asm ("wur.fsr %0" : : "a"(fsr));
+  __asm__("wur.fsr %0" : : "a"(fsr));
   return 0;
 }
 #else

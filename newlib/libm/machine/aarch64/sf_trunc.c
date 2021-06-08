@@ -30,6 +30,6 @@ float
 truncf (float x)
 {
   float result;
-  asm ("frintz\t%s0, %s1" : "=w" (result) : "w" (x));
+  __asm__("frintz\t%s0, %s1" : "=w" (result) : "w" (x));
   return result;
 }

@@ -51,10 +51,10 @@ __ieee754_sqrt(double x)
 {
 	double result;
 #if __ARM_ARCH >= 6
-	asm ("vsqrt.f64 %P0, %P1" : "=w" (result) : "w" (x));
+	__asm__("vsqrt.f64 %P0, %P1" : "=w" (result) : "w" (x));
 #else
 	/* VFP9 Erratum 760019, see GCC sources "gcc/config/arm/vfp.md" */
-	asm ("vsqrt.f64 %P0, %P1" : "=&w" (result) : "w" (x));
+	__asm__("vsqrt.f64 %P0, %P1" : "=&w" (result) : "w" (x));
 #endif
 	return result;
 }
@@ -121,7 +121,7 @@ trunc (double x)
 __declare_arm_macro(double)
 fma (double x, double y, double z)
 {
-  asm ("vfma.f64 %P0, %P1, %P2" : "+w" (z) : "w" (x), "w" (y));
+  __asm__("vfma.f64 %P0, %P1, %P2" : "+w" (z) : "w" (x), "w" (y));
   return z;
 }
 #endif
@@ -139,10 +139,10 @@ __ieee754_sqrtf(float x)
 {
 	float result;
 #if __ARM_ARCH >= 6
-	asm ("vsqrt.f32 %0, %1" : "=w" (result) : "w" (x));
+	__asm__("vsqrt.f32 %0, %1" : "=w" (result) : "w" (x));
 #else
 	/* VFP9 Erratum 760019, see GCC sources "gcc/config/arm/vfp.md" */
-	asm ("vsqrt.f32 %0, %1" : "=&w" (result) : "w" (x));
+	__asm__("vsqrt.f32 %0, %1" : "=&w" (result) : "w" (x));
 #endif
 	return result;
 }
@@ -210,7 +210,7 @@ truncf (float x)
 __declare_arm_macro(float)
 fmaf (float x, float y, float z)
 {
-  asm ("vfma.f32 %0, %1, %2" : "+t" (z) : "t" (x), "t" (y));
+  __asm__("vfma.f32 %0, %1, %2" : "+t" (z) : "t" (x), "t" (y));
   return z;
 }
 #endif

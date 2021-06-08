@@ -13,8 +13,8 @@ Copyright (c) 2000 Nick Clifton <nickc@redhat.com>
 int
 strcmp (const char *s1, const char *s2)
 {
-  asm (PRELOADSTR ("%0") : : "r" (s1));
-  asm (PRELOADSTR ("%0") : : "r" (s2));
+  __asm__(PRELOADSTR ("%0") : : "r" (s1));
+  __asm__(PRELOADSTR ("%0") : : "r" (s2));
 
 #ifndef __OPTIMIZE_SIZE__
   if (((long)s1 & 3) == ((long)s2 & 3))
@@ -34,7 +34,7 @@ strcmp (const char *s1, const char *s2)
      lr = 0xfefefeff [ == ~(0x80808080 << 1) ]
      ip = 0x80808080  */
 
-      asm (
+      __asm__(
        "ldr	r2, [%1, #0]\n\
 	ldr	r3, [%2, #0]\n\
 	cmp	r2, r3\n\
@@ -98,8 +98,8 @@ strcmp (const char *s1, const char *s2)
 
   while (*s1 != '\0' && *s1 == *s2)
     {
-      asm (PRELOADSTR("%0") : : "r" (s1));
-      asm (PRELOADSTR("%0") : : "r" (s2));
+      __asm__(PRELOADSTR("%0") : : "r" (s1));
+      __asm__(PRELOADSTR("%0") : : "r" (s2));
       s1++;
       s2++;
     }

@@ -37,17 +37,17 @@ int feholdexcept(fenv_t * envp)
   fexcept_t fsr;
   fenv_t fcr;
   /* Get the environment.  */
-  asm ("rur.fcr %0" : "=a"(fcr));
-  asm ("rur.fsr %0" : "=a"(fsr));
+  __asm__("rur.fcr %0" : "=a"(fcr));
+  __asm__("rur.fsr %0" : "=a"(fsr));
   *envp = fsr | fcr;
 
   /* Clear the exception enable flags.  */
   fcr &= _FE_ROUND_MODE_MASK;
-  asm ("wur.fcr %0" : :"a"(fcr));
+  __asm__("wur.fcr %0" : :"a"(fcr));
 
   /* Clear the exception happened flags.  */
   fsr = 0;
-  asm ("wur.fsr %0" : :"a"(fsr));
+  __asm__("wur.fsr %0" : :"a"(fsr));
 
   return 0;
 }

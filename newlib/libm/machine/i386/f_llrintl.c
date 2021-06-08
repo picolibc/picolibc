@@ -34,7 +34,7 @@ distribute this software is freely granted.
 long long int _f_llrintl (long double x)
 {
   long long int _result;
-  asm ("fistpll %0" : "=m" (_result) : "t" (x) : "st");
+  __asm__("fistpll %0" : "=m" (_result) : "t" (x) : "st");
   return _result;
 }
 

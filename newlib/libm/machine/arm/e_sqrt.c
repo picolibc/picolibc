@@ -44,10 +44,10 @@ __ieee754_sqrt(double x)
 {
 	double result;
 #if __ARM_ARCH >= 6
-	asm ("vsqrt.f64 %P0, %P1" : "=w" (result) : "w" (x));
+	__asm__("vsqrt.f64 %P0, %P1" : "=w" (result) : "w" (x));
 #else
 	/* VFP9 Erratum 760019, see GCC sources "gcc/config/arm/vfp.md" */
-	asm ("vsqrt.f64 %P0, %P1" : "=&w" (result) : "w" (x));
+	__asm__("vsqrt.f64 %P0, %P1" : "=&w" (result) : "w" (x));
 #endif
 	return result;
 }

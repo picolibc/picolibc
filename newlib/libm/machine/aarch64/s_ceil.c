@@ -30,6 +30,6 @@ double
 ceil (double x)
 {
   double result;
-  asm ( "frintp\t%d0, %d1" : "=w" (result) : "w" (x) );
+  __asm__( "frintp\t%d0, %d1" : "=w" (result) : "w" (x) );
   return result;
 }

@@ -36,10 +36,10 @@ __ieee754_sqrtf(float x)
 {
 	float result;
 #if __ARM_ARCH >= 6
-	asm ("vsqrt.f32 %0, %1" : "=w" (result) : "w" (x));
+	__asm__("vsqrt.f32 %0, %1" : "=w" (result) : "w" (x));
 #else
 	/* VFP9 Erratum 760019, see GCC sources "gcc/config/arm/vfp.md" */
-	asm ("vsqrt.f32 %0, %1" : "=&w" (result) : "w" (x));
+	__asm__("vsqrt.f32 %0, %1" : "=&w" (result) : "w" (x));
 #endif
 	return result;
 }

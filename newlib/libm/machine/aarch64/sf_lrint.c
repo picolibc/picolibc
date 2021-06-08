@@ -31,7 +31,7 @@ lrintf (float x)
 {
   long int result;
   float temp;
-  asm ("frintx\t%s1, %s2\n\t"
+  __asm__("frintx\t%s1, %s2\n\t"
        "fcvtzs\t%x0, %s1"
        : "=r" (result), "=w" (temp) : "w" (x));
   return result;

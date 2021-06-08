@@ -40,7 +40,7 @@ long long int
 llrint (double x)
 {
   long long result;
-  asm (
+  __asm__(
 #if __riscv_xlen == 64
        "fcvt.l.d"
 #else

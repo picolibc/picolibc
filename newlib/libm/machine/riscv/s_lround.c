@@ -40,7 +40,7 @@ long int
 lround (double x)
 {
   long result;
-  asm (
+  __asm__(
 #if __riscv_xlen == 32
        "fcvt.w.d"
 #elif __riscv_xlen == 64

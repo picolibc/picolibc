@@ -41,7 +41,7 @@ double
 fabs (double x)
 {
   double result;
-  asm ("fabs.d\t%0, %1" : "=f"(result) : "f"(x));
+  __asm__("fabs.d\t%0, %1" : "=f"(result) : "f"(x));
   return result;
 }
 

@@ -41,7 +41,7 @@ double
 copysign (double x, double y)
 {
   double result;
-  asm ("fsgnj.d\t%0, %1, %2" : "=f"(result) : "f"(x), "f"(y));
+  __asm__("fsgnj.d\t%0, %1, %2" : "=f"(result) : "f"(x), "f"(y));
   return result;
 }
 

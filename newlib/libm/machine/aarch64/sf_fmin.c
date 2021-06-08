@@ -30,6 +30,6 @@ float
 fminf (float x, float y)
 {
   float result;
-  asm ("fminnm\t%s0, %s1, %s2" : "=w" (result) : "w" (x), "w" (y));
+  __asm__("fminnm\t%s0, %s1, %s2" : "=w" (result) : "w" (x), "w" (y));
   return result;
 }

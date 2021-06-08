@@ -44,7 +44,7 @@ double
 __ieee754_sqrt (double x)
 {
 	double result;
-	asm ("fsqrt.d %0, %1" : "=f" (result) : "f" (x));
+	__asm__("fsqrt.d %0, %1" : "=f" (result) : "f" (x));
 	return result;
 }
 

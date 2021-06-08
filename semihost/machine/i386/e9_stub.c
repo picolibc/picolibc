@@ -52,7 +52,7 @@ write(int fd, const void *buf, size_t count)
 	const uint8_t *b = buf;
 	size_t c = count;
 	while (c--) {
-		asm("out %%al, $0xe9" : : "a" ((int) *b++));
+		__asm__("out %%al, $0xe9" : : "a" ((int) *b++));
 	}
 	return count;
 }
