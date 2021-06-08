@@ -82,7 +82,10 @@ c_args = ['-include', '@0@/@1@'.format(meson.current_build_dir(), 'picolibc.h')]
 
 # Disable ssp and fortify source while building picolibc (it's enabled
 # by default by the ubuntu native compiler)
-c_args += ['-fno-stack-protector', '-U_FORTIFY_SOURCE']
+if meson.get_compiler('c').has_argument('-fno-stack-protector')
+  c_args += '-fno-stack-protector'
+endif
+c_args += '-U_FORTIFY_SOURCE'
 
 if meson.get_compiler('c').has_argument('-fno-common')
   c_args += '-fno-common'
