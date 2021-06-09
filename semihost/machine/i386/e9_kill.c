@@ -40,4 +40,4 @@
 
 pid_t getpid(void) { return 1; }
 
-int kill(pid_t pid, int sig) { if (pid == 1) _exit(sig << 8); errno = ESRCH; return -1; }
+int kill(pid_t pid, int sig) { if (pid == 1) _exit(128 + sig); errno = ESRCH; return -1; }
