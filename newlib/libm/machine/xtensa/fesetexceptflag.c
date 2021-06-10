@@ -39,11 +39,11 @@ int fesetexceptflag(const fexcept_t *flagp, int excepts)
 
   unsigned int fsr;
 
-  asm ("rur.fsr %0" : "=a"(fsr));
+  __asm__("rur.fsr %0" : "=a"(fsr));
 
   fsr &= ~(excepts << _FE_EXCEPTION_FLAGS_OFFSET);
   fsr |= ((*flagp & excepts) << _FE_EXCEPTION_FLAGS_OFFSET);
-  asm ("wur.fsr %0" : : "a"(fsr));
+  __asm__("wur.fsr %0" : : "a"(fsr));
   return 0;
 }
 

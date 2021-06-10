@@ -30,6 +30,6 @@ float
 ceilf (float x)
 {
   float result;
-  asm ( "frintp\t%s0, %s1" : "=w" (result) : "w" (x) );
+  __asm__( "frintp\t%s0, %s1" : "=w" (result) : "w" (x) );
   return result;
 }

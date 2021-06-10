@@ -30,6 +30,6 @@ float
 rintf (float x)
 {
   float result;
-  asm ("frintx\t%s0, %s1" : "=w" (result) : "w" (x));
+  __asm__("frintx\t%s0, %s1" : "=w" (result) : "w" (x));
   return result;
 }

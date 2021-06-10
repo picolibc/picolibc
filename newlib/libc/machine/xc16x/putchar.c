@@ -12,6 +12,6 @@
  */
 void putchar (int c)
 {
-  asm("trap #1");
+  __asm__("trap #1");
 }
 

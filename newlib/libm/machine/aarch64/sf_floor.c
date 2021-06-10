@@ -30,6 +30,6 @@ float
 floorf (float x)
 {
   float result;
-  asm ( "frintm\t%s0, %s1" : "=w" (result) : "w" (x) );
+  __asm__( "frintm\t%s0, %s1" : "=w" (result) : "w" (x) );
   return result;
 }

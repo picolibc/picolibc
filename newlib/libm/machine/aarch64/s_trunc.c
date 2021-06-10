@@ -30,6 +30,6 @@ double
 trunc (double x)
 {
   double result;
-  asm ("frintz\t%d0, %d1" : "=w" (result) : "w" (x));
+  __asm__("frintz\t%d0, %d1" : "=w" (result) : "w" (x));
   return result;
 }

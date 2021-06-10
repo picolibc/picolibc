@@ -28,5 +28,5 @@ exit (int status)
   if (__exitval_ptr)
     *__exitval_ptr = status;
   for (;;)
-    asm ("exit;" ::: "memory");
+    __asm__("exit;" ::: "memory");
 }

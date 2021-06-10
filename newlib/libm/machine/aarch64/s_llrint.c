@@ -31,7 +31,7 @@ llrint (double x)
 {
   long long int result;
   double temp;
-  asm ("frintx\t%d1, %d2\n\t"
+  __asm__("frintx\t%d1, %d2\n\t"
        "fcvtzs\t%x0, %d1"
        : "=r" (result), "=w" (temp) : "w" (x));
   return result;

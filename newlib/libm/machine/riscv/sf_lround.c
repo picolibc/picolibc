@@ -40,7 +40,7 @@ long int
 lroundf(float x)
 {
   long result;
-  asm (
+  __asm__(
 #if __riscv_xlen == 32
        "fcvt.w.s"
 #elif __riscv_xlen == 64

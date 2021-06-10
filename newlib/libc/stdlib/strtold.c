@@ -51,7 +51,7 @@ __flt_rounds(void)
         int x;
 
         /* Assume that the x87 and the SSE unit agree on the rounding mode. */
-        __asm("fnstcw %0" : "=m" (x));
+        __asm__("fnstcw %0" : "=m" (x));
         return (map[(x >> 10) & 0x03]);
 }
 #define FLT_ROUNDS __flt_rounds()

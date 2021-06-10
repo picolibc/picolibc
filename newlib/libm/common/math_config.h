@@ -125,7 +125,7 @@ asuint (float f)
 {
 #if defined(__riscv_flen) && __riscv_flen >= 32
   uint32_t result;
-  asm("fmv.x.w\t%0, %1" : "=r" (result) : "f" (f));
+  __asm__("fmv.x.w\t%0, %1" : "=r" (result) : "f" (f));
   return result;
 #else
   union
@@ -142,7 +142,7 @@ asfloat (uint32_t i)
 {
 #if defined(__riscv_flen) && __riscv_flen >= 32
   float result;
-  asm("fmv.w.x\t%0, %1" : "=f" (result) : "r" (i));
+  __asm__("fmv.w.x\t%0, %1" : "=f" (result) : "r" (i));
   return result;
 #else
   union
@@ -159,7 +159,7 @@ asuint64 (double f)
 {
 #if defined(__riscv_flen) && __riscv_flen >= 64 && __riscv_xlen >= 64
   uint64_t result;
-  asm("fmv.x.d\t%0, %1" : "=r" (result) : "f" (f));
+  __asm__("fmv.x.d\t%0, %1" : "=r" (result) : "f" (f));
   return result;
 #else
   union
@@ -176,7 +176,7 @@ asdouble (uint64_t i)
 {
 #if defined(__riscv_flen) && __riscv_flen >= 64 && __riscv_xlen >= 64
   double result;
-  asm("fmv.d.x\t%0, %1" : "=f" (result) : "r" (i));
+  __asm__("fmv.d.x\t%0, %1" : "=f" (result) : "r" (i));
   return result;
 #else
   union

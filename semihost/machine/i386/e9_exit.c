@@ -42,5 +42,5 @@ _exit(int code)
 {
 	printf("%cexit %d\n", 0xe9, code);
 	while(1)
-		asm("hlt");
+		__asm__("hlt");
 }

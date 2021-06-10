@@ -41,7 +41,7 @@ project('picolibc', 'c',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.50',
-	version: '1.6'
+	version: '1.6.1'
        )
 
 targets = []
@@ -79,6 +79,14 @@ newlib_supplied_syscalls = get_option('newlib-supplied-syscalls')
 newlib_elix_level = get_option('newlib-elix-level')
 target_optspace = get_option('optimization') == 's'
 c_args = ['-include', '@0@/@1@'.format(meson.current_build_dir(), 'picolibc.h')]
+
+# Disable ssp and fortify source while building picolibc (it's enabled
+# by default by the ubuntu native compiler)
+if meson.get_compiler('c').has_argument('-fno-stack-protector')
+  c_args += '-fno-stack-protector'
+endif
+c_args += '-U_FORTIFY_SOURCE'
+
 if meson.get_compiler('c').has_argument('-fno-common')
   c_args += '-fno-common'
 endif

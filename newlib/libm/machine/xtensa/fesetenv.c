@@ -37,8 +37,8 @@ int fesetenv(const fenv_t * env_ptr)
   fenv_t env = *env_ptr;
   if (env & ~(_FE_FLOATING_ENV_MASK))
     return -1;
-  asm ("wur.fsr %0" : : "a"(*env_ptr));
-  asm ("wur.fcr %0" : : "a"(*env_ptr));
+  __asm__("wur.fsr %0" : : "a"(*env_ptr));
+  __asm__("wur.fcr %0" : : "a"(*env_ptr));
   return 0;
 }
 

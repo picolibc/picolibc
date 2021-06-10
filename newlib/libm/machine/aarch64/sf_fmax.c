@@ -30,6 +30,6 @@ float
 fmaxf (float x, float y)
 {
   float result;
-  asm ("fmaxnm\t%s0, %s1, %s2" : "=w" (result) : "w" (x), "w" (y));
+  __asm__("fmaxnm\t%s0, %s1, %s2" : "=w" (result) : "w" (x), "w" (y));
   return result;
 }

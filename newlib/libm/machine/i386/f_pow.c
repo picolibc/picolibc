@@ -35,7 +35,7 @@ double _f_pow (double x, double y)
       /* calculate x ** y as 2 ** (y log2(x)).  On Intel, can only
          raise 2 to an integer or a small fraction, thus, we have
          to perform two steps 2**integer portion * 2**fraction. */
-      asm ("fyl2x; fld %%st; frndint; fsub %%st,%%st(1);"\
+      __asm__("fyl2x; fld %%st; frndint; fsub %%st,%%st(1);"\
            "fxch; fchs; f2xm1; fld1; faddp; fxch; fld1; fscale; fstp %%st(1);"\
            "fmulp" : "=t" (result) : "0" (x), "u" (y) : "st(1)" );
       return result;

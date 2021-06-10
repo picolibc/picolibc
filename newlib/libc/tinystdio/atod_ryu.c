@@ -64,9 +64,8 @@ double
 __atod_engine(uint64_t m10, int e10)
 {
 #ifdef RYU_DEBUG
-    printf("Input=%s\n", buffer);
-    printf("m10digits = %d\n", m10digits);
-    printf("e10digits = %d\n", e10digits);
+    printf("m10 = %ld\n", m10);
+    printf("e10 = %d\n", e10);
     printf("m10 * 10^e10 = %" PRIu64 " * 10^%d\n", m10, e10);
 #endif
 
@@ -108,6 +107,9 @@ __atod_engine(uint64_t m10, int e10)
 	__double_computeInvPow5(-e10, pow5);
 	m2 = mulShift64(m10, pow5, j);
 	trailingZeros = multipleOfPowerOf5(m10, -e10);
+#ifdef RYU_DEBUG
+	printf("pow5 %016lx_%016lx j %d trailingZeros %d\n", pow5[0], pow5[1], j, trailingZeros);
+#endif
     }
 
 #ifdef RYU_DEBUG

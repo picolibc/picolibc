@@ -100,7 +100,7 @@ extern void __malloc_start;
 #define MALLOC_MINIMUM_GAP 32
 
 #ifdef __xstormy16__
-register void * stack_pointer asm ("r15");
+register void * stack_pointer __asm__("r15");
 #define MALLOC_LIMIT stack_pointer
 #else
 #define MALLOC_LIMIT __builtin_frame_address (0)

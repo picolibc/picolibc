@@ -179,18 +179,20 @@ strtod (const char * nptr, char ** endptr)
 
     if (u64 == 0) {
 	flt = 0;
+    } else {
+	if ((u64digits + exp <= -324)) {
+	    // Number is less than 1e-324, which should be rounded down to 0; return +/-0.0.
+	    flt = 0;
+	}
+	else if (u64digits + exp >= 310) {
+	    // Number is larger than 1e+309, which should be rounded to +/-Infinity.
+	    flt = (double) INFINITY;
+	}
+	else
+	    flt = __atod_engine(u64, exp);
+	if (flt == 0.0 || flt == (double) INFINITY)
+	    errno = ERANGE;
     }
-
-    else if ((u64digits + exp <= -324) || (u64 == 0)) {
-	// Number is less than 1e-324, which should be rounded down to 0; return +/-0.0.
-	flt = 0;
-    }
-    else if (u64digits + exp >= 310) {
-	// Number is larger than 1e+309, which should be rounded to +/-Infinity.
-	flt = (double) INFINITY;
-    }
-    else
-	flt = __atod_engine(u64, exp);
     if (flag & FL_MINUS)
 	flt = -flt;
     return flt;

@@ -97,6 +97,25 @@ sync has not been difficult so far.
 
 ## Releases
 
+### Picolibc version 1.6.1
+
+ 1. Code cleanups for time conversion funcs (Thanks to R. Diez)
+
+ 2. Add '-fno-stack-protector' when supported by the C compiler
+    to avoid trouble building with native Ubuntu GCC.
+
+ 3. Bug fix for converting denorms with sscanf and strto{d,f,ld}.
+
+ 4. Use __asm__ for inline asm code to allow building applications
+    with --std=c18
+
+ 5. Fix exit code for semihosting 'abort' call to make it visible
+    to the hosting system.
+
+ 6. Add strfromf and strfromd implementations. These are simple
+    wrappers around sscanf, but strfromf handles float conversions
+    without requiring a pass through 'double' or special linker hacks.
+
 ### Picolibc version 1.6
 
  1. Bugfix for snprintf(buf, 0) and vsnprintf(buf, 0) to avoid

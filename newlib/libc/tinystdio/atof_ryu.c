@@ -63,9 +63,8 @@ float
 __atof_engine(uint32_t m10, int e10)
 {
 #ifdef RYU_DEBUG
-	printf("Input=%s\n", buffer);
-	printf("m10digits = %d\n", m10digits);
-	printf("e10digits = %d\n", e10digits);
+	printf("m10digits = %d\n", m10);
+	printf("e10digits = %d\n", e10);
 	printf("m10 * 10^e10 = %u * 10^%d\n", m10, e10);
 #endif
 

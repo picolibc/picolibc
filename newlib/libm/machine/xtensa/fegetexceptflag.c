@@ -37,7 +37,7 @@ int fegetexceptflag(fexcept_t *flagp, int excepts)
   unsigned int fsr;
   if (excepts & ~FE_ALL_EXCEPT)
     return -1;
-  asm ("rur.fsr %0" : "=a"(fsr));
+  __asm__("rur.fsr %0" : "=a"(fsr));
   fsr >>= _FE_EXCEPTION_FLAGS_OFFSET;
   excepts &= fsr;
   *flagp = excepts;

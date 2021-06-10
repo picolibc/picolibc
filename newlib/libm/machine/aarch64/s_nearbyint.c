@@ -30,6 +30,6 @@ double
 nearbyint (double x)
 {
   double result;
-  asm ("frinti\t%d0, %d1" : "=w" (result) : "w" (x));
+  __asm__("frinti\t%d0, %d1" : "=w" (result) : "w" (x));
   return result;
 }

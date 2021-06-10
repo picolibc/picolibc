@@ -48,8 +48,14 @@ test_strtod (void)
   double v;
   /* On average we'll loose 1/2 a bit, so the test is for within 1 bit  */
   v = strtod(pd->string, &tail);
+  if (tail - pd->string) {
+    if (v == 0.0 && !(pd->endscan & ENDSCAN_IS_ZERO))
+      test_eok(errno, ERANGE);
+    if (v == (double) INFINITY && !(pd->endscan & ENDSCAN_IS_INF))
+      test_eok(errno, ERANGE);
+  }
   test_mok(v, pd->value, CONVERT_BITS_DOUBLE);
-  test_iok(tail - pd->string, pd->endscan);
+  test_iok(tail - pd->string, pd->endscan & ENDSCAN_MASK);
 }
 
 void
@@ -59,8 +65,17 @@ test_strtof (void)
   float v;
   /* On average we'll loose 1/2 a bit, so the test is for within 1 bit  */
   v = strtof(pd->string, &tail);
-  test_mok((double) v, pd->value, CONVERT_BITS_FLOAT);
-  test_iok(tail - pd->string, pd->endscan);
+  if (tail - pd->string) {
+    int e = errno;
+    if (v == 0.0f && !(pd->endscan & ENDSCAN_IS_ZERO)) {
+      printf("%s is zero errno is %d\n", pd->string, e);
+      test_eok(e, ERANGE);
+    }
+    if (v == INFINITY && !(pd->endscan & ENDSCAN_IS_INF))
+      test_eok(errno, ERANGE);
+  }
+  test_mfok((double) v, pd->value, CONVERT_BITS_FLOAT);
+  test_iok(tail - pd->string, pd->endscan & ENDSCAN_MASK);
 }
 
 #if defined(_HAVE_LONG_DOUBLE) && (__LDBL_MANT_DIG__ == 64 || defined(TINY_STDIO))
@@ -75,8 +90,17 @@ test_strtold (void)
   long double v;
   /* On average we'll loose 1/2 a bit, so the test is for within 1 bit  */
   v = strtold(pd->string, &tail);
+  if (tail - pd->string) {
+    int e = errno;
+    if (v == 0.0L && !(pd->endscan & ENDSCAN_IS_ZERO)) {
+      printf("%s is zero errno is %d\n", pd->string, e);
+      test_eok(e, ERANGE);
+    }
+    if (v == (long double) INFINITY && !(pd->endscan & ENDSCAN_IS_INF))
+      test_eok(e, ERANGE);
+  }
   test_mok(v, pd->value, CONVERT_BITS_DOUBLE);
-  test_iok(tail - pd->string, pd->endscan);
+  test_iok(tail - pd->string, pd->endscan & ENDSCAN_MASK);
 }
 #endif
 
@@ -91,7 +115,7 @@ void
 test_atoff (void)
 {
   float v = atoff(pd->string);
-  test_mok((double) v, pd->value, 30);
+  test_mfok(v, (float) pd->value, CONVERT_BITS_FLOAT);
 }
 #endif
 

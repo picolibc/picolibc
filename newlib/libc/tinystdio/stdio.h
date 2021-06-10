@@ -925,4 +925,4 @@ __printf_float(float f)
 #define printf_float(x) ((double) (x))
 #endif
 
-#endif /* _STDLIB_H_ */
+#endif /* _STDIO_H_ */

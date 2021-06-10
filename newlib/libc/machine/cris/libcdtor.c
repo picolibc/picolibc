@@ -42,8 +42,8 @@ __asm__
  ".text\n\t.global .$global.lib.dtors\n.$global.lib.dtors:\n\t.dword 0"
 );
 
-extern vfnp * const _Ctors asm(".$global.lib.ctors");
-extern vfnp * const _Dtors asm(".$global.lib.dtors");
+extern vfnp * const _Ctors __asm__(".$global.lib.ctors");
+extern vfnp * const _Dtors __asm__(".$global.lib.dtors");
 
 /* We better provide weak empty ctor and dtor lists, since they are
    not created if the main program does not have ctor/dtors.  Because

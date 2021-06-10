@@ -67,7 +67,7 @@ floating point support is available and when compiling with GCC.
 long int _f_lrint (double x)
 {
   long int _result;
-  asm ("fistpl %0" : "=m" (_result) : "t" (x) : "st");
+  __asm__("fistpl %0" : "=m" (_result) : "t" (x) : "st");
   return _result;
 }
 

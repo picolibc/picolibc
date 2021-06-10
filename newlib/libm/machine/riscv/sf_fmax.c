@@ -41,7 +41,7 @@ float
 fmaxf (float x, float y)
 {
   float result;
-  asm ("fmax.s\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
+  __asm__("fmax.s\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
   return result;
 }
 

@@ -34,6 +34,28 @@ As Picolibc is designed to be used for embedded systems, getting that
 configured correctly can be a challenge. Learn more about that in the
 [build](doc/build.md) page.
 
+## Formatting Source Code
+
+Picolibc code comes from a multitude of sources using an enormous
+range of styles. As picolibc tries to retain compatibility with newlib
+so that bug fixes can be shared between projects, we can't easily
+reformat all of the existing code. Here are suggestions on how to
+preserve compatibility while still being able to write readable code:
+
+ 1. Whitespace-only changes are not helpful, please don't submit
+    changes that are only fixing formatting.
+
+ 2. Try to adopt local coding styles as much as you can manage by
+    matching code within the same files.
+
+ 3. For brand-new files, please use the global .editorconfig settings
+    if possible:
+
+     * no literal tab characters, only spaces
+     * 4-space indentation for nested elements
+     * no trailing whitespace
+     * utf-8 encoding
+
 ## Patch Submission
 
 You can submit patches in a couple of ways:

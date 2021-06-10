@@ -33,7 +33,7 @@ distribute this software is freely granted.
 float _f_rintf (float x)
 {
   float _result;
-  asm ("frndint" : "=t" (_result) : "0" (x));
+  __asm__("frndint" : "=t" (_result) : "0" (x));
   return _result;
 }
 

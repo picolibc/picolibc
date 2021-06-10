@@ -34,7 +34,7 @@
 int fegetround(void)
 {
   fexcept_t current;
-  asm ("rur.fcr %0" : "=a"(current));
+  __asm__("rur.fcr %0" : "=a"(current));
   return (current & _FE_ROUND_MODE_MASK) >> _FE_ROUND_MODE_OFFSET;
 }
 

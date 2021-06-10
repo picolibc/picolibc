@@ -15,7 +15,7 @@ strcpy (char *dest, const char *src)
 {
   char *dest0 = dest;
 
-  asm (PRELOADSTR ("%0") : : "r" (src));
+  __asm__(PRELOADSTR ("%0") : : "r" (src));
 
 #ifndef __OPTIMIZE_SIZE__
   if (((long)src & 3) == ((long)dest & 3))
@@ -31,7 +31,7 @@ strcpy (char *dest, const char *src)
      R4 = 0xfefefeff [ == ~(0x80808080 << 1) ]
      R5 = 0x80808080  */
 
-  asm ("mov	r5, #0x80\n\
+  __asm__("mov	r5, #0x80\n\
 	ldr	r1, [%1, #0]\n\
 	add	r5, r5, #0x8000\n\
 	add	r5, r5, r5, lsl #16\n\
@@ -58,7 +58,7 @@ strcpy (char *dest, const char *src)
 #endif
 
   while (*dest++ = *src++)
-    asm (PRELOADSTR ("%0") : : "r" (src));
+    __asm__(PRELOADSTR ("%0") : : "r" (src));
   return dest0;
 }
 

@@ -54,7 +54,7 @@
 size_t __attribute__((naked))
 strlen (const char* str)
 {
-  asm ("len .req r0\n\t"
+  __asm__("len .req r0\n\t"
        "data .req r3\n\t"
        "addr .req r1\n\t"
 

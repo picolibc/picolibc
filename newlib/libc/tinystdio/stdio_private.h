@@ -166,6 +166,8 @@ __posix_close(FILE *f);
 
 int	__d_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 int	__f_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int	__d_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
+int	__f_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
 
 double
 __atod_engine(uint64_t m10, int e10);

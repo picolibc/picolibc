@@ -79,19 +79,15 @@ ANSI C requires <<mktime>>.
 #include <time.h>
 #include "local.h"
 
-#define _SEC_IN_MINUTE 60L
-#define _SEC_IN_HOUR 3600L
-#define _SEC_IN_DAY 86400L
-
-static const int DAYS_IN_MONTH[12] =
+static const int8_t DAYS_IN_MONTH[12] =
 {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 #define _DAYS_IN_MONTH(x) ((x == 1) ? days_in_feb : DAYS_IN_MONTH[x])
 
-static const int _DAYS_BEFORE_MONTH[12] =
+static const int16_t _DAYS_BEFORE_MONTH[12] =
 {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
 
-#define _ISLEAP(y) (((y) % 4) == 0 && (((y) % 100) != 0 || (((y)+1900) % 400) == 0))
+#define _ISLEAP(y) isleap((y)+YEAR_BASE)
 #define _DAYS_IN_YEAR(year) (_ISLEAP(year) ? 366 : 365)
 
 static void
@@ -152,7 +148,7 @@ validate_structure (struct tm *tim_p)
         }
     }
 
-  if (_DAYS_IN_YEAR (tim_p->tm_year) == 366)
+  if (_ISLEAP (tim_p->tm_year))
     days_in_feb = 29;
 
   if (tim_p->tm_mday <= 0)
@@ -164,7 +160,7 @@ validate_structure (struct tm *tim_p)
 	      tim_p->tm_year--;
 	      tim_p->tm_mon = 11;
 	      days_in_feb =
-		((_DAYS_IN_YEAR (tim_p->tm_year) == 366) ?
+		(_ISLEAP (tim_p->tm_year) ?
 		 29 : 28);
 	    }
 	  tim_p->tm_mday += _DAYS_IN_MONTH (tim_p->tm_mon);
@@ -180,7 +176,7 @@ validate_structure (struct tm *tim_p)
 	      tim_p->tm_year++;
 	      tim_p->tm_mon = 0;
 	      days_in_feb =
-		((_DAYS_IN_YEAR (tim_p->tm_year) == 366) ?
+		(_ISLEAP (tim_p->tm_year) ?
 		 29 : 28);
 	    }
 	}
@@ -198,13 +194,13 @@ mktime_utc (struct tm *tim_p, long *days_p)
   validate_structure (tim_p);
 
   /* compute hours, minutes, seconds */
-  tim += tim_p->tm_sec + (tim_p->tm_min * _SEC_IN_MINUTE) +
-    (tim_p->tm_hour * _SEC_IN_HOUR);
+  tim += tim_p->tm_sec + (tim_p->tm_min * SECSPERMIN) +
+    (tim_p->tm_hour * SECSPERHOUR);
 
   /* compute days in year */
   days += tim_p->tm_mday - 1;
   days += _DAYS_BEFORE_MONTH[tim_p->tm_mon];
-  if (tim_p->tm_mon > 1 && _DAYS_IN_YEAR (tim_p->tm_year) == 366)
+  if (tim_p->tm_mon > 1 && _ISLEAP (tim_p->tm_year))
     days++;
 
   /* compute day of the year */
@@ -227,7 +223,7 @@ mktime_utc (struct tm *tim_p, long *days_p)
     }
 
   /* compute total seconds */
-  tim += (time_t)days * _SEC_IN_DAY;
+  tim += (time_t)days * SECSPERDAY;
 
   *days_p = days;
   return tim;

@@ -41,7 +41,7 @@
 char* __attribute__((naked))
 strcpy (char* dst, const char* src)
 {
-  asm (
+  __asm__(
       ".syntax unified\n\t"
 #if !(defined(__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED) || \
       (defined (__thumb__) && !defined (__thumb2__)))

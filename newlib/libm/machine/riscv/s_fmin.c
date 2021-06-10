@@ -41,7 +41,7 @@ double
 fmin (double x, double y)
 {
   double result;
-  asm ("fmin.d\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
+  __asm__("fmin.d\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
   return result;
 }
 

@@ -30,6 +30,6 @@ long int
 lround (double x)
 {
   long int result;
-  asm ("fcvtas\t%x0, %d1" : "=r" (result) : "w" (x));
+  __asm__("fcvtas\t%x0, %d1" : "=r" (result) : "w" (x));
   return result;
 }

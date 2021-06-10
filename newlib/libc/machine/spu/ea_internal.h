@@ -66,9 +66,9 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /* Macro that generates an __ea alias.  */
 #ifdef __EA64__
-#define COMPAT_EA_ALIAS(name) asm (".global\t__" #name "64\n\t.set\t__" #name "64," #name)
+#define COMPAT_EA_ALIAS(name) __asm__(".global\t__" #name "64\n\t.set\t__" #name "64," #name)
 #else
-#define COMPAT_EA_ALIAS(name) asm (".global\t__" #name "32\n\t.set\t__" #name "32," #name)
+#define COMPAT_EA_ALIAS(name) __asm__(".global\t__" #name "32\n\t.set\t__" #name "32," #name)
 #endif
 
 static inline __ea void* round_down_128_ea(__ea void* x)

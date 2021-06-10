@@ -34,7 +34,7 @@ distribute this software is freely granted.
 long double _f_rintl (long double x)
 {
   long double _result;
-  asm ("frndint" : "=t" (_result) : "0" (x));
+  __asm__("frndint" : "=t" (_result) : "0" (x));
   return _result;
 }
 

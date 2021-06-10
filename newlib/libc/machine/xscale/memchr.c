@@ -16,7 +16,7 @@ memchr (const void *start, int c, size_t len)
   if (len == 0)
     return 0;
 
-  asm (PRELOADSTR ("%0") : : "r" (start));
+  __asm__(PRELOADSTR ("%0") : : "r" (start));
 
   c &= 0xff;
 
@@ -42,7 +42,7 @@ memchr (const void *start, int c, size_t len)
          R7 = 0xfefefeff [ == ~(0x80808080 << 1) ]
          R6 = 0x80808080  */
 
-      asm (
+      __asm__(
        "mov	r6, #0x80\n\
 	add	r6, r6, #0x8000\n\
 	add	r6, r6, r6, lsl #16\n\

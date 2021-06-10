@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2020 Keith Packard
+ * Copyright © 2021 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,21 +33,11 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if defined(__riscv_fsqrt) && __riscv_flen >= 64
-#include "fdlibm.h"
+#include <stdlib.h>
+#include "stdio_private.h"
 
-#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
-__strong_reference(__ieee754_sqrt, sqrt);
-#endif
-
-double
-__ieee754_sqrt (double x)
+int strfromf(char *restrict str, size_t n,
+	     const char *restrict format, float fp)
 {
-	double result;
-	__asm__("fsqrt.d %0, %1" : "=f" (result) : "f" (x));
-	return result;
+	return __f_snprintf(str, n, format, __printf_float(fp));
 }
-
-#else
-#include "../../math/e_sqrt.c"
-#endif

@@ -12,7 +12,7 @@ int
 memcmp (const void * s1, const void * s2, size_t len)
 {
   int result;
-  asm (
+  __asm__(
 #ifndef __OPTIMIZE_SIZE__ 
 "\n\
 	cmp	%2, #0x3	@ Is the length a multiple of four ?\n\

@@ -36,8 +36,8 @@ int fegetenv(fenv_t * env_ptr)
 {
   unsigned int fsr;
   unsigned int fcr;
-  asm ("rur.fsr %0" : "=a"(fsr));
-  asm ("rur.fcr %0" : "=a"(fcr));
+  __asm__("rur.fsr %0" : "=a"(fsr));
+  __asm__("rur.fcr %0" : "=a"(fcr));
   *env_ptr = fsr | fcr;
   return 0;
 }

@@ -85,7 +85,7 @@ __declare_riscv_macro(double)
 copysign(double x, double y)
 {
 	double result;
-	asm ("fsgnj.d\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
+	__asm__("fsgnj.d\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
 	return result;
 }
 
@@ -93,7 +93,7 @@ __declare_riscv_macro(double)
 fabs(double x)
 {
 	double result;
-	asm ("fabs.d\t%0, %1" : "=f"(result) : "f"(x));
+	__asm__("fabs.d\t%0, %1" : "=f"(result) : "f"(x));
 	return result;
 }
 
@@ -101,7 +101,7 @@ __declare_riscv_macro(double)
 fmax (double x, double y)
 {
 	double result;
-	asm ("fmax.d\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
+	__asm__("fmax.d\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
 	return result;
 }
 
@@ -109,7 +109,7 @@ __declare_riscv_macro(double)
 fmin (double x, double y)
 {
 	double result;
-	asm ("fmin.d\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
+	__asm__("fmin.d\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
 	return result;
 }
 
@@ -159,7 +159,7 @@ __declare_riscv_macro(double)
 __ieee754_sqrt (double x)
 {
 	double result;
-	asm ("fsqrt.d %0, %1" : "=f" (result) : "f" (x));
+	__asm__("fsqrt.d %0, %1" : "=f" (result) : "f" (x));
 	return result;
 }
 
@@ -176,7 +176,7 @@ __declare_riscv_macro(double)
 fma (double x, double y, double z)
 {
 	double result;
-	asm ("fmadd.d %0, %1, %2, %3" : "=f" (result) : "f" (x), "f" (y), "f" (z));
+	__asm__("fmadd.d %0, %1, %2, %3" : "=f" (result) : "f" (x), "f" (y), "f" (z));
 	return result;
 }
 #endif
@@ -200,7 +200,7 @@ __declare_riscv_macro(float)
 copysignf(float x, float y)
 {
 	float result;
-	asm ("fsgnj.s\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
+	__asm__("fsgnj.s\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
 	return result;
 }
 
@@ -208,7 +208,7 @@ __declare_riscv_macro(float)
 fabsf (float x)
 {
 	float result;
-	asm ("fabs.s\t%0, %1" : "=f"(result) : "f"(x));
+	__asm__("fabs.s\t%0, %1" : "=f"(result) : "f"(x));
 	return result;
 }
 
@@ -216,7 +216,7 @@ __declare_riscv_macro(float)
 fmaxf (float x, float y)
 {
 	float result;
-	asm ("fmax.s\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
+	__asm__("fmax.s\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
 	return result;
 }
 
@@ -224,7 +224,7 @@ __declare_riscv_macro(float)
 fminf (float x, float y)
 {
 	float result;
-	asm ("fmin.s\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
+	__asm__("fmin.s\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
 	return result;
 }
 
@@ -270,7 +270,7 @@ __declare_riscv_macro(float)
 __ieee754_sqrtf (float x)
 {
 	float result;
-	asm ("fsqrt.s %0, %1" : "=f" (result) : "f" (x));
+	__asm__("fsqrt.s %0, %1" : "=f" (result) : "f" (x));
 	return result;
 }
 
@@ -289,7 +289,7 @@ __declare_riscv_macro(float)
 fmaf (float x, float y, float z)
 {
 	float result;
-	asm ("fmadd.s %0, %1, %2, %3" : "=f" (result) : "f" (x), "f" (y), "f" (z));
+	__asm__("fmadd.s %0, %1, %2, %3" : "=f" (result) : "f" (x), "f" (y), "f" (z));
 	return result;
 }
 #endif

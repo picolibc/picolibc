@@ -34,7 +34,7 @@ float
 __ieee754_sqrtf (float x)
 {
   float result;
-  asm ("fsqrt\t%s0, %s1" : "=w" (result) : "w" (x));
+  __asm__("fsqrt\t%s0, %s1" : "=w" (result) : "w" (x));
   return result;
 }
 
