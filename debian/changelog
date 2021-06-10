@@ -1,3 +1,24 @@
+picolibc (1.6.1-1) unstable; urgency=medium
+
+  * Code cleanups for time conversion funcs (Thanks to R. Diez)
+
+  * Add '-fno-stack-protector' when supported by the C compiler
+    to avoid trouble building with native Ubuntu GCC.
+
+  * Bug fix for converting denorms with sscanf and strto{d,f,ld}.
+
+  * Use __asm__ for inline asm code to allow building applications
+    with --std=c18
+
+  * Fix exit code for semihosting 'abort' call to make it visible
+    to the hosting system.
+
+  * Add strfromf and strfromd implementations. These are simple
+    wrappers around sscanf, but strfromf handles float conversions
+    without requiring a pass through 'double' or special linker hacks.
+
+ -- Keith Packard <keithp@keithp.com>  Thu, 10 Jun 2021 12:34:19 -0700
+
 picolibc (1.6-1) unstable; urgency=medium
 
   * Bugfix for snprintf(buf, 0) and vsnprintf(buf, 0) to avoid

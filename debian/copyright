@@ -785,6 +785,8 @@ Files: newlib/libc/machine/shared_x86/meson.build
  newlib/libc/stdlib/pico-exit.c
  newlib/libc/stdlib/pico-onexit.c
  newlib/libc/tinystdio/matchcaseprefix.c
+ newlib/libc/tinystdio/strfromd.c
+ newlib/libc/tinystdio/strfromf.c
  newlib/libm/common/dreml.c
  newlib/libm/common/exp10l.c
  newlib/libm/common/pow10l.c
@@ -851,6 +853,10 @@ License: BSD3-1
 
 Files: scripts/do-freedom-tools-package
 Copyright: 2020 SiFive Inc.
+License: BSD3-1
+
+Files: test/time-tests.c
+Copyright: 2021 R. Diez
 License: BSD3-1
 
 Files: newlib/libc/ctype/ctype_.c
@@ -1948,6 +1954,11 @@ License: BSD3-32
 Files: newlib/libc/tinystdio/ftoa_engine.h
  newlib/libc/tinystdio/xtoa_fast.h
 Copyright: 2005, Dmitry Xmelkov
+License: BSD3-32
+
+Files: newlib/libc/tinystdio/snprintfd.c
+ newlib/libc/tinystdio/snprintff.c
+Copyright: 2021 Keith Packard
 License: BSD3-32
 
 Files: newlib/libc/tinystdio/stdio.h
