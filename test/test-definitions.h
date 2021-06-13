@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2020 Keith Packard
+ * Copyright © 2020 R. Diez
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,15 +33,9 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdlib.h>
-#include <semihost.h>
-#include "../test-definitions.h"
 
-int
-main(void)
-{
-	if (sys_semihost_feature(SH_EXT_EXIT_EXTENDED))
-		sys_semihost_exit_extended(0);
-	printf("SYS_EXIT_EXTENDED not supported, skipping\n");
-	exit(TEST_EXIT_CODE_SKIPPED);
-}
+// The Meson test() routine checks for some special exit status codes.
+
+#define TEST_EXIT_CODE_SUCCESS  0
+#define TEST_EXIT_CODE_SKIPPED  77
+#define TEST_EXIT_CODE_UNEXPECTED_FAILURE  99
