@@ -46,7 +46,7 @@ __tzcalc_limits (int year)
 	{
 	  const int yleap = isleap(year);
 	  int m_day, m_wday, wday_diff;
-	  const int *const ip = __month_lengths[yleap];
+	  const uint8_t *const ip = __month_lengths[yleap];
 
 	  days = year_days;
 
