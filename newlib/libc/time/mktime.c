@@ -87,8 +87,7 @@ static const int8_t DAYS_IN_MONTH[12] =
 static const int16_t _DAYS_BEFORE_MONTH[12] =
 {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
 
-#define _ISLEAP(y) isleap((y)+YEAR_BASE)
-#define _DAYS_IN_YEAR(year) (_ISLEAP(year) ? 366 : 365)
+#define _DAYS_IN_YEAR(year) (isleap(year+YEAR_BASE) ? 366 : 365)
 
 static void
 set_tm_wday (long days, struct tm *tim_p)
@@ -148,7 +147,7 @@ validate_structure (struct tm *tim_p)
         }
     }
 
-  if (_ISLEAP (tim_p->tm_year))
+  if (isleap (tim_p->tm_year+YEAR_BASE))
     days_in_feb = 29;
 
   if (tim_p->tm_mday <= 0)
@@ -160,7 +159,7 @@ validate_structure (struct tm *tim_p)
 	      tim_p->tm_year--;
 	      tim_p->tm_mon = 11;
 	      days_in_feb =
-		(_ISLEAP (tim_p->tm_year) ?
+		(isleap (tim_p->tm_year+YEAR_BASE) ?
 		 29 : 28);
 	    }
 	  tim_p->tm_mday += _DAYS_IN_MONTH (tim_p->tm_mon);
@@ -176,7 +175,7 @@ validate_structure (struct tm *tim_p)
 	      tim_p->tm_year++;
 	      tim_p->tm_mon = 0;
 	      days_in_feb =
-		(_ISLEAP (tim_p->tm_year) ?
+		(isleap (tim_p->tm_year+YEAR_BASE) ?
 		 29 : 28);
 	    }
 	}
@@ -200,7 +199,7 @@ mktime_utc (struct tm *tim_p, long *days_p)
   /* compute days in year */
   days += tim_p->tm_mday - 1;
   days += _DAYS_BEFORE_MONTH[tim_p->tm_mon];
-  if (tim_p->tm_mon > 1 && _ISLEAP (tim_p->tm_year))
+  if (tim_p->tm_mon > 1 && isleap (tim_p->tm_year+YEAR_BASE))
     days++;
 
   /* compute day of the year */
