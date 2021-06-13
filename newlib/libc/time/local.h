@@ -29,7 +29,7 @@ static inline int isleap (int y)
 
 int         __tzcalc_limits (int __year);
 
-extern const int __month_lengths[2][MONSPERYEAR];
+extern const uint8_t __month_lengths[2][MONSPERYEAR];
 
 void _tzset_unlocked (void);
 
