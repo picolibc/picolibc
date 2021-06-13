@@ -148,12 +148,6 @@ check_malloc(size_t in_use)
 	return result;
 }
 
-void
-abort(void)
-{
-	exit(127);
-}
-
 #ifdef _NANO_MALLOC
 extern size_t __malloc_minsize, __malloc_align, __malloc_head;
 #endif
