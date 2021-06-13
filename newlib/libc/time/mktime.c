@@ -79,10 +79,8 @@ ANSI C requires <<mktime>>.
 #include <time.h>
 #include "local.h"
 
-static const int8_t DAYS_IN_MONTH[12] =
-{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-#define _DAYS_IN_MONTH(x) ((x == 1) ? days_in_feb : DAYS_IN_MONTH[x])
+#define _DAYS_IN_MONTH(x) ((x == 1) ? days_in_feb : __month_lengths[0][x])
 
 static const int16_t _DAYS_BEFORE_MONTH[12] =
 {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
