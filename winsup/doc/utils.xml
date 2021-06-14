@@ -1167,13 +1167,11 @@ mkgroup [OPTION]...
     <refsect1 id="mkgroup-options">
       <title>Options</title>
       <screen>
-Options:
-
    -l,--local [machine]    Print local group accounts of \"machine\",
                            from local machine if no machine specified.
                            Automatically adding machine prefix for local
                            machine depends on settings in /etc/nsswitch.conf.
-   -L,--Local machine      Ditto, but generate groupname with machine prefix.
+   -L,--Local [machine]    Ditto, but generate groupname with machine prefix.
    -d,--domain [domain]    Print domain groups,
                            from current domain if no domain specified.
    -c,--current            Print current group.
@@ -1271,13 +1269,11 @@ mkpasswd [OPTIONS]...
     <refsect1 id="mkpasswd-options">
       <title>Options</title>
       <screen>
-    Options:
-
    -l,--local [machine]    Print local user accounts of \"machine\",
                            from local machine if no machine specified.
                            Automatically adding machine prefix for local
                            machine depends on settings in /etc/nsswitch.conf.
-   -L,--Local machine      Ditto, but generate username with machine prefix.
+   -L,--Local [machine]    Ditto, but generate username with machine prefix.
    -d,--domain [domain]    Print domain accounts,
                            from current domain if no domain specified.
    -c,--current            Print current user.
@@ -1637,7 +1633,7 @@ D: on /d type fat (binary,user,noumount)
 
     <refnamediv>
       <refname>passwd</refname>
-      <refpurpose>Change USER's password or password attributes.</refpurpose>
+      <refpurpose>Change password or password attributes</refpurpose>
     </refnamediv>
 
     <refsynopsisdiv>
@@ -2111,19 +2107,19 @@ setfacl [-n] {[-bk]|[-x acl_entries] [-m acl_entries]} FILE...
     <refsect1 id="setfacl-options">
       <title>Options</title>
       <screen>
-  -b, --remove-all       remove all extended ACL entries\n"
-  -x, --delete           delete one or more specified ACL entries\n"
-  -f, --set-file         set ACL entries for FILE to ACL entries read\n"
-                         from ACL_FILE\n"
-  -k, --remove-default   remove all default ACL entries\n"
-  -m, --modify           modify one or more specified ACL entries\n"
-  -n, --no-mask          don't recalculate the effective rights mask\n"
-      --mask             do recalculate the effective rights mask\n"
-  -s, --set              set specified ACL entries on FILE\n"
-  -V, --version          print version and exit\n"
-  -h, --help             this help text\n"
+  -b, --remove-all       remove all extended ACL entries
+  -x, --delete           delete one or more specified ACL entries
+  -f, --set-file         set ACL entries for FILE to ACL entries read
+                         from ACL_FILE
+  -k, --remove-default   remove all default ACL entries
+  -m, --modify           modify one or more specified ACL entries
+  -n, --no-mask          don't recalculate the effective rights mask
+      --mask             do recalculate the effective rights mask
+  -s, --set              set specified ACL entries on FILE
+  -V, --version          print version and exit
+  -h, --help             this help text
 
-At least one of (-b, -x, -f, -k, -m, -s) must be specified\n"
+At least one of (-b, -x, -f, -k, -m, -s) must be specified
 </screen>
     </refsect1>
 
@@ -2285,9 +2281,17 @@ Other options:
       <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
     </refmeta>
 
+    <refentryinfo>
+      <author>
+	<firstname>DJ</firstname>
+	<surname>Delorie</surname>
+	<contrib>Original Author</contrib>
+      </author>
+    </refentryinfo>
+
     <refnamediv>
       <refname>ssp</refname>
-      <refpurpose>Single-step profile COMMAND</refpurpose>
+      <refpurpose>The Single Step Profiler</refpurpose>
     </refnamediv>
 
     <refsynopsisdiv>
@@ -2320,9 +2324,6 @@ Example: ssp 0x401000 0x403000 hello.exe
 
     <refsect1 id="ssp-desc">
       <title>Description</title>
-    <para> SSP - The Single Step Profiler </para>
-
-    <para> Original Author: DJ Delorie </para>
 
     <para> The SSP is a program that uses the Win32 debug API to run a program
       one ASM instruction at a time. It records the location of each
@@ -2576,6 +2577,7 @@ Options:
 
     <refsect1 id="tzset-desc">
       <title>Description</title>
+      <para>
       Use tzset to set your TZ variable. In POSIX-compatible shells like bash,
       dash, mksh, or zsh:
       <screen>
@@ -2585,6 +2587,7 @@ export TZ=$(tzset)
       <screen>
 setenv TZ `tzset`
       </screen>
+      </para>
 
     <para>The <command>tzset</command> tool reads the current timezone from
       Windows and generates a POSIX-compatible timezone information for the TZ
