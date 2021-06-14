@@ -837,8 +837,6 @@ if has_semihost
     test_c_args += [specs_prefix + '--specs', specs_prefix + '@0@/@1@'.format(meson.current_build_dir(), picolibc_specs)]
   endif
 
-  # Undefine _exit as that's in libsemihost and needs to replace the weak _exit
-
   test_link_args += test_c_args + ['-nostartfiles', '-nostdlib', '-T', test_link_path, '-T', 'picolibc.ld', '-lgcc']
 
   # Make sure all of the tests get re-linked if the linker scripts change
