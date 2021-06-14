@@ -37,21 +37,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "stdio_private.h"
+#include "../../libm/common/math_config.h"
 
 #ifdef PICOLIBC_FLOAT_PRINTF_SCANF
 static inline float
 printf_float_get(uint32_t u)
 {
-	union {
-		float		f;
-		uint32_t	u;
-	} un = { .u = u };
-	return un.f;
+    return asfloat(u);
 }
 
 #define PRINTF_FLOAT_ARG(ap) (printf_float_get(va_arg(ap, uint32_t)))
 typedef float printf_float_t;
+typedef int32_t printf_float_int_t;
+#define ASUINT(a) asuint(a)
+#define EXP_BIAS 127
 
 #define dtoa ftoa
 #define DTOA_MINUS FTOA_MINUS
@@ -67,6 +68,9 @@ typedef float printf_float_t;
 
 #define PRINTF_FLOAT_ARG(ap) va_arg(ap, double)
 typedef double printf_float_t;
+typedef int64_t printf_float_int_t;
+#define ASUINT(a) asuint64(a)
+#define EXP_BIAS 1023
 #include "dtoa_engine.h"
 
 #endif
@@ -308,7 +312,9 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
 #define FL_ALTUPP	0x0800
 #define FL_ALTHEX	0x1000
 
-#define	FL_FLTUPP	0x2000
+#ifdef _WANT_IO_C99_FORMATS
+#define FL_FLTHEX       0x2000
+#endif
 #define FL_FLTEXP	0x4000
 #define	FL_FLTFIX	0x8000
 
@@ -353,7 +359,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	flags = 0;
 	width = 0;
 	prec = 0;
-	
+
 	do {
 	    if (flags < FL_WIDTH) {
 		switch (c) {
@@ -470,56 +476,131 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 # error
 #endif
 
+#define CASE_CONVERT    ('a' - 'A')
+#define TOLOW(c)        ((c) | CASE_CONVERT)
+#define TOCASE(c)       ((c) - case_convert)
 #if PRINTF_LEVEL >= PRINTF_FLT
-	if (c >= 'E' && c <= 'G') {
-	    flags |= FL_FLTUPP;
-	    c += 'e' - 'E';
-	    goto flt_oper;
 
-	} else if (c >= 'e' && c <= 'g') {
+	if ((TOLOW(c) >= 'e' && TOLOW(c) <= 'g')
+#ifdef _WANT_IO_C99_FORMATS
+            || TOLOW(c) == 'a'
+#endif
+            ) {
+            printf_float_t fval;        /* value to print */
+            uint8_t sign;		/* sign character (or 0)	*/
+            uint8_t ndigs;		/* number of digits to convert */
+            unsigned char case_convert; /* subtract to correct case */
 	    int exp;			/* exponent of most significant decimal digit */
-	    int n;
-	    uint8_t sign;		/* sign character (or 0)	*/
-	    uint8_t ndigs;		/* number of digits to convert */
+	    int n;                      /* total width */
 	    uint8_t ndigs_exp;		/* number of digis in exponent */
 
-	    flags &= ~FL_FLTUPP;
+            fval = PRINTF_FLOAT_ARG(ap);
 
-	  flt_oper:
+            /* deal with upper vs lower case */
+            case_convert = TOLOW(c) - c;
+            c = TOLOW(c);
+
 	    ndigs = 0;
-	    if (!(flags & FL_PREC))
-		prec = 6;
-	    flags &= ~(FL_FLTEXP | FL_FLTFIX);
 
-	    uint8_t ndecimal;	/* digits after decimal (for 'f' format), 0 if no limit */
+#ifdef _WANT_IO_C99_FORMATS
+            if (c == 'a') {
+                printf_float_int_t fi;
+                ultoa_signed_t      s;
 
-	    if (c == 'e') {
-		ndigs = prec + 1;
-		ndecimal = 0;
-		flags |= FL_FLTEXP;
-	    } else if (c == 'f') {
-		ndigs = DTOA_MAX_DIG;
-		ndecimal = prec + 1;
-		flags |= FL_FLTFIX;
-	    } else {
-		ndigs = prec;
-		if (ndigs < 1) ndigs = 1;
-		ndecimal = 0;
-	    }
+                c = 'p';
+                flags |= FL_FLTEXP | FL_FLTHEX;
 
-	    if (ndigs > DTOA_MAX_DIG)
-		ndigs = DTOA_MAX_DIG;
+#ifdef PICOLIBC_FLOAT_PRINTF_SCANF
+                ndigs = 7;
+#else
+                ndigs = 14;
+#endif
+                if (!(flags & FL_PREC))
+                    prec = ndigs - 1;
+                else if (prec > ndigs)
+                    prec = ndigs - 1;
+                fi = ASUINT(fval);
 
-	    ndigs = __dtoa_engine (PRINTF_FLOAT_ARG(ap), &_dtoa, ndigs, ndecimal);
-	    exp = _dtoa.exp;
-	    ndigs_exp = 2;
-#ifndef PICOLIBC_FLOAT_PRINTF_SCANF
+#ifdef PICOLIBC_FLOAT_PRINTF_SCANF
+                exp = ((fi >> 23) & 0xff);
+                s = (fi & 0x7fffff) << 1;
+#else
+                exp = ((fi >> 52) & 0x7ff);
+                s = fi & 0xfffffffffffffLL;
+#endif
+                _dtoa.flags = 0;
+                if (fi < 0)
+                    _dtoa.flags = DTOA_MINUS;
+
+                if (exp == 2 * EXP_BIAS + 1) {
+                    if (s)
+                        _dtoa.flags |= DTOA_NAN;
+                    else
+                        _dtoa.flags |= DTOA_INF;
+                } else {
+                    if (exp) {
+                        _dtoa.digits[0] = '1';
+                    } else {
+                        _dtoa.digits[0] = '0';
+                        exp++;
+                    }
+
+                    uint8_t d;
+                    for (d = ndigs - 1; d; d--) {
+                        char dig = s & 0xf;
+                        s >>= 4;
+                        if (dig <= 9)
+                            dig += '0';
+                        else
+                            dig += TOCASE('a' - 10);
+                        _dtoa.digits[d] = dig;
+                    }
+                }
+                if (fval)
+                    exp -= EXP_BIAS;
+                else
+                    exp = 0;
+                ndigs_exp = 1;
+            } else
+#endif /* _WANT_IO_C99_FORMATS */
+            {
+                uint8_t ndecimal;	        /* digits after decimal (for 'f' format), 0 if no limit */
+
+                if (!(flags & FL_PREC))
+                    prec = 6;
+                if (c == 'e') {
+                    ndigs = prec + 1;
+                    ndecimal = 0;
+                    flags |= FL_FLTEXP;
+                } else if (c == 'f') {
+                    ndigs = DTOA_MAX_DIG;
+                    ndecimal = prec + 1;
+                    flags |= FL_FLTFIX;
+                } else {
+                    c += 'e' - 'g';
+                    ndigs = prec;
+                    if (ndigs < 1) ndigs = 1;
+                    ndecimal = 0;
+                }
+
+                if (ndigs > DTOA_MAX_DIG)
+                    ndigs = DTOA_MAX_DIG;
+
+                ndigs = __dtoa_engine (fval, &_dtoa, ndigs, ndecimal);
+                exp = _dtoa.exp;
+                ndigs_exp = 2;
+            }
+	    if (exp < -9 || 9 < exp)
+		    ndigs_exp = 2;
 	    if (exp < -99 || 99 < exp)
 		    ndigs_exp = 3;
+#ifndef PICOLIBC_FLOAT_PRINTF_SCANF
+	    if (exp < -999 || 999 < exp)
+		    ndigs_exp = 4;
 #endif
 
 	    sign = 0;
-	    if ((_dtoa.flags & DTOA_MINUS) && !(_dtoa.flags & DTOA_NAN))
+	    if (_dtoa.flags & DTOA_MINUS)
 		sign = '-';
 	    else if (flags & FL_PLUS)
 		sign = '+';
@@ -548,10 +629,8 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 # if ('I'-'i' != 'N'-'n') || ('I'-'i' != 'F'-'f') || ('I'-'i' != 'A'-'a')
 #  error
 # endif
-		while ( (ndigs = *p) != 0) {
-		    if (flags & FL_FLTUPP)
-			ndigs += 'I' - 'i';
-		    my_putc (ndigs, stream);
+		while ( (sign = *p) != 0) {
+		    my_putc (TOCASE(sign), stream);
 		    p++;
 		}
 		goto tail;
@@ -591,7 +670,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		/*
 		 * Figure out whether to use 'f' or 'e' format. The spec
 		 * says to use 'f' if the exponent is >= -4 and < requested
-		 * precision. 
+		 * precision.
 		 */
 		if (-4 <= exp && exp < req_prec)
 		{
@@ -626,8 +705,14 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    /* Conversion result length, width := free space length	*/
 	    if (flags & FL_FLTFIX)
 		n = (exp>0 ? exp+1 : 1);
-	    else
-		n = 3 + ndigs_exp;		/* 1e+00 */
+	    else {
+                n = 3;                  /* 1e+ */
+#ifdef _WANT_IO_C99_FORMATS
+                if (flags & FL_FLTHEX)
+                    n += 2;             /* or 0x1p+ */
+#endif
+		n += ndigs_exp;		/* add exponent */
+            }
 	    if (sign)
 		n += 1;
 	    if (prec)
@@ -695,6 +780,13 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 			my_putc('.', stream);
 	    } else {				/* 'e(E)' format	*/
 
+#ifdef _WANT_IO_C99_FORMATS
+                if ((flags & FL_FLTHEX)) {
+                    my_putc('0', stream);
+                    my_putc(TOCASE('x'), stream);
+                }
+#endif
+
 		/* mantissa	*/
 		if (_dtoa.digits[0] != '1')
 		    _dtoa.flags &= ~DTOA_CARRY;
@@ -708,21 +800,27 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		    my_putc ('.', stream);
 
 		/* exponent	*/
-		my_putc (flags & FL_FLTUPP ? 'E' : 'e', stream);
-		ndigs = '+';
+		my_putc (TOCASE(c), stream);
+		sign = '+';
 		if (exp < 0 || (exp == 0 && (_dtoa.flags & DTOA_CARRY) != 0)) {
 		    exp = -exp;
-		    ndigs = '-';
+		    sign = '-';
 		}
-		my_putc (ndigs, stream);
+		my_putc (sign, stream);
 #ifndef PICOLIBC_FLOAT_PRINTF_SCANF
+		if (ndigs_exp > 3) {
+			my_putc(exp / 1000 + '0', stream);
+			exp %= 1000;
+		}
+#endif
 		if (ndigs_exp > 2) {
 			my_putc(exp / 100 + '0', stream);
 			exp %= 100;
 		}
-#endif
-		my_putc(exp / 10 + '0', stream);
-		exp %= 10;
+		if (ndigs_exp > 1) {
+                    my_putc(exp / 10 + '0', stream);
+                    exp %= 10;
+                }
 		my_putc ('0' + exp, stream);
 	    }
 
@@ -730,7 +828,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	}
 
 #else		/* to: PRINTF_LEVEL >= PRINTF_FLT */
-	if ((c >= 'E' && c <= 'G') || (c >= 'e' && c <= 'g')) {
+	if ((TOLOW(c) >= 'e' && TOLOW(c) <= 'g') || TOLOW(c) == 'a') {
 	    (void) PRINTF_FLOAT_ARG(ap);
 	    pnt = "*float*";
 	    size = sizeof ("*float*") - 1;
