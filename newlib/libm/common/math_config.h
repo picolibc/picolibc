@@ -154,6 +154,36 @@ asfloat (uint32_t i)
 #endif
 }
 
+static inline int32_t
+_asint32 (float f)
+{
+    return (int32_t) asuint(f);
+}
+
+static inline int
+_sign32(int32_t ix)
+{
+    return ((uint32_t) ix) >> 31;
+}
+
+static inline int
+_exponent32(int32_t ix)
+{
+    return (ix >> 23) & 0xff;
+}
+
+static inline int32_t
+_significand32(int32_t ix)
+{
+    return ix & 0x7fffff;
+}
+
+static inline float
+_asfloat(int32_t i)
+{
+    return asfloat((uint32_t) i);
+}
+
 static inline uint64_t
 asuint64 (double f)
 {
@@ -186,6 +216,36 @@ asdouble (uint64_t i)
   } u = {i};
   return u.f;
 #endif
+}
+
+static inline int64_t
+_asint64(double f)
+{
+    return (int64_t) asuint64(f);
+}
+
+static inline int
+_sign64(int64_t ix)
+{
+    return ((uint64_t) ix) >> 63;
+}
+
+static inline int
+_exponent64(int64_t ix)
+{
+    return (ix >> 52) & 0x7ff;
+}
+
+static inline int64_t
+_significand64(int64_t ix)
+{
+    return ix & 0xfffffffffffffLL;
+}
+
+static inline double
+_asdouble(int64_t i)
+{
+    return asdouble((uint64_t) i);
 }
 
 #ifndef IEEE_754_2008_SNAN
