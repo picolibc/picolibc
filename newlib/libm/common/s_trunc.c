@@ -4,7 +4,7 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
@@ -49,50 +49,26 @@ ANSI C, POSIX
 	double x;
 #endif
 {
-  int signbit;
-  /* Most significant word, least significant word. */
-  int msw;
-  unsigned int lsw;
-  int exponent_less_1023;
+    int64_t ix = _asint64(x);
+    int64_t mask;
+    int exp;
 
-  EXTRACT_WORDS(msw, lsw, x);
+    /* Un-biased exponent */
+    exp = _exponent64(ix) - 1023;
 
-  /* Extract sign bit. */
-  signbit = msw & 0x80000000;
+    /* Inf/NaN, evaluate value */
+    if (unlikely(exp == 1024))
+        return x + x;
 
-  /* Extract exponent field. */
-  exponent_less_1023 = ((msw & 0x7ff00000) >> 20) - 1023;
+    /* compute portion of value with useful bits */
+    if (exp < 0)
+        /* less than one, save sign bit */
+        mask = 0x8000000000000000LL;
+    else
+        /* otherwise, save sign, exponent and any useful bits */
+        mask = ~(0x000fffffffffffffLL >> exp);
 
-  if (exponent_less_1023 < 20)
-    {
-      /* All significant digits are in msw. */
-      if (exponent_less_1023 < 0)
-        {
-          /* -1 < x < 1, so result is +0 or -0. */
-          INSERT_WORDS(x, signbit, 0);
-        }
-      else
-        {
-          /* All relevant fraction bits are in msw, so lsw of the result is 0. */
-          INSERT_WORDS(x, signbit | (msw & ~(0x000fffff >> exponent_less_1023)), 0);
-        }
-    }
-  else if (exponent_less_1023 > 51)
-    {
-      if (exponent_less_1023 == 1024)
-        {
-          /* x is infinite, or not a number, so trigger an exception. */
-          return x + x;
-        }
-      /* All bits in the fraction fields of the msw and lsw are needed in the result. */
-    }
-  else
-    {
-      /* All fraction bits in msw are relevant.  Truncate irrelevant
-         bits from lsw. */
-      INSERT_WORDS(x, msw, lsw & ~(0xffffffffu >> (exponent_less_1023 - 20)));
-    }
-  return x;
+    return _asdouble(ix & mask);
 }
 
 #endif /* _DOUBLE_IS_32BITS */
