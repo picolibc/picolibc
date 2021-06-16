@@ -60,6 +60,21 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap) __attribute__((weak));
 # error	 "Not a known scanf level."
 #endif
 
+#define CASE_CONVERT    ('a' - 'A')
+#define TOLOWER(c)        ((c) | CASE_CONVERT)
+
+static inline int
+ISSPACE(int c)
+{
+    return ('\011' <= c && c <= '\015') || c == ' ';
+}
+
+static inline int
+ISDIGIT(int c)
+{
+    return '0' <= c && c <= '9';
+}
+
 typedef unsigned int width_t;
 
 #define FL_STAR	    0x01	/* '*': skip assignment		*/
@@ -215,12 +230,12 @@ conv_brk (FILE *stream, int *lenp, width_t width, char *addr, const char *fmt)
     unsigned char frange;
     unsigned char cabove;
     int i;
-    
+
     memset (msk, 0, sizeof(msk));
     fnegate = 0;
     frange = 0;
     cabove = 0;			/* init to avoid compiler warning	*/
-    
+
     for (i = 0; ; i++) {
 	unsigned char c = *fmt++;
 
@@ -236,9 +251,9 @@ conv_brk (FILE *stream, int *lenp, width_t width, char *addr, const char *fmt)
 		continue;
 	    }
 	}
-	
+
 	if (!frange) cabove = c;
-	
+
 	for (;;) {
 	    msk[c >> 3] |= 1 << (c & 7);
 	    if (c == cabove) break;
@@ -276,7 +291,7 @@ conv_brk (FILE *stream, int *lenp, width_t width, char *addr, const char *fmt)
 	if (addr) *addr++ = i;
 	fnegate = 0;
     } while (--width);
-    
+
     if (fnegate) {
 	return 0;
     } else {
@@ -322,7 +337,7 @@ conv_flt (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
 	    goto err;
     }
 
-    switch (tolower (i)) {
+    switch (TOLOWER (i)) {
 
       case 'n':
 	p = pstr_an;
@@ -333,13 +348,13 @@ conv_flt (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
       operate_pstr:
         {
 	    unsigned char c;
-	    
+
 	    while ((c = *p++) != 0) {
 		if (!--width
 		    || (i = scanf_getc (stream, lenp)) < 0
-		    || ((unsigned char)tolower(i) != c
+		    || ((unsigned char)TOLOWER(i) != c
 			&& (scanf_ungetc (i, stream, lenp), 1)))
-		{	
+		{
 		    if (p == pstr_nfinity + 3)
 			break;
 		    goto err;
@@ -355,7 +370,7 @@ conv_flt (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
 	do {
 
 	    unsigned char c = i - '0';
-    
+
 	    if (c <= 9) {
 		flag |= FL_ANY;
 		if (flag & FL_OVFL) {
@@ -387,11 +402,11 @@ conv_flt (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
 		break;
 	    }
 	} while (--width && (i = scanf_getc (stream, lenp)) >= 0);
-    
+
 	if (!(flag & FL_ANY))
 	    goto err;
-    
-	if ((unsigned char)i == 'e' || (unsigned char)i == 'E')
+
+	if (TOLOWER(i) == 'e')
 	{
 	    int expacc;
 
@@ -405,12 +420,12 @@ conv_flt (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
 		i = scanf_getc (stream, lenp);		/* test EOF will below	*/
 	    }
 
-	    if (!isdigit (i)) goto err;
+	    if (!ISDIGIT (i)) goto err;
 
 	    expacc = 0;
 	    do {
 		expacc = expacc * 10 + (i - '0');
-	    } while (--width && isdigit (i = scanf_getc(stream, lenp)));
+	    } while (--width && ISDIGIT (i = scanf_getc(stream, lenp)));
 	    if (flag & FL_MEXP)
 		expacc = -expacc;
 	    exp += expacc;
@@ -479,7 +494,7 @@ static int skip_spaces (FILE *stream, int *lenp)
     do {
 	if ((i = scanf_getc (stream, lenp)) < 0)
 	    return i;
-    } while (isspace (i));
+    } while (ISSPACE (i));
     scanf_ungetc (i, stream, lenp);
     return i;
 }
@@ -635,7 +650,7 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
        to the begin.	*/
     while ((c = *fmt++) != 0) {
 
-	if (isspace (c)) {
+	if (ISSPACE (c)) {
 	    skip_spaces (stream, lenp);
 
 	} else if (c != '%'
@@ -648,7 +663,7 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 		scanf_ungetc (i, stream, lenp);
 		break;
 	    }
-	
+
 	} else {
 	    flags = 0;
 
@@ -753,7 +768,7 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 
 		if (skip_spaces (stream, lenp) < 0)
 		    goto eof;
-		
+
 		switch (c) {
 
 		  case 's':
@@ -761,7 +776,7 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 		    do {
 			if ((i = scanf_getc (stream, lenp)) < 0)
 			    break;
-			if (isspace (i)) {
+			if (ISSPACE (i)) {
 			    scanf_ungetc (i, stream, lenp);
 			    break;
 			}
