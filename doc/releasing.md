@@ -39,19 +39,32 @@ picolibc:
         $ ../../scripts/do-native-configure
 	$ ninja dist
 
- 8. Tag release
+ 8. Use arm configuration to build bits for the Arm embedded toolkit:
+
+        $ mkdir -p builds/build-arm
+        $ cd builds/build-arm
+        $ PATH=$ARM_TK/bin:$PATH ../../scripts/do-arm-configure -Dsysroot-install=true
+        $ PATH=$ARM_TK/bin:$PATH DESTDIR=$PWD/dist ninja install
+        $ cd dist/$ARM_TK
+        $ zip -r picolibc-<version>-<arm-et-version>.zip .
+        $ scp picolibc-<version>-<arm-et-version>.zip keithp.com:/var/www/picolibc/dist/gnu-arm-embedded
+
+ 9. Tag release
 
 	$ git tag -m'Version <version>' <version> main
 
- 9. Push tag and branch to repositories
+ 10. Push tag and branch to repositories
 
 	$ git push origin main <version>
 
- 10. Upload release to web site:
+ 11. Upload release to web site:
 
 	$ scp build-native/meson-dist/* keithp.com:/var/www/picolibc/dist
 
- 11. Email release message to mailing list. Paste in README.md section
+ 12. Create new release on github site, pasting in relevant README.md
+     section. Upload release tar and arm embedded toolkit zip files.
+
+ 13. Email release message to mailing list. Paste in README.md section
      about the new release.
 
 ## Debian Packages

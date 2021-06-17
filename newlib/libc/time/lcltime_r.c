@@ -39,7 +39,7 @@ localtime_r (const time_t *__restrict tim_p,
   int hours, mins, secs;
   int year;
   __tzinfo_type *const tz = __gettzinfo ();
-  const int *ip;
+  const uint8_t *ip;
 
   res = gmtime_r (tim_p, res);
 

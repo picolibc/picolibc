@@ -97,6 +97,13 @@ sync has not been difficult so far.
 
 ## Releases
 
+### Picolibc version 1.6.2
+
+ 1. Change `restrict` keyword in published headers to `__restrict` to
+    restore compatibility with applications building with --std=c18.
+
+ 2. Additional cleanups in time conversion funcs (Thanks to R. Riez)
+
 ### Picolibc version 1.6.1
 
  1. Code cleanups for time conversion funcs (Thanks to R. Diez)

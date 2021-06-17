@@ -20,11 +20,16 @@
 #define EPOCH_YEARS_SINCE_CENTURY 70
 #define EPOCH_YEARS_SINCE_LEAP_CENTURY 370
 
-#define isleap(y) ((((y) % 4) == 0 && ((y) % 100) != 0) || ((y) % 400) == 0)
+static inline int isleap (int y)
+{
+  // This routine must return exactly 0 or 1, because the result is used to index on __month_lengths[].
+  // The order of checks below is the fastest for a random year.
+  return y % 4 == 0 && (y % 100 != 0 || y % 400 == 0);
+}
 
 int         __tzcalc_limits (int __year);
 
-extern const int __month_lengths[2][MONSPERYEAR];
+extern const uint8_t __month_lengths[2][MONSPERYEAR];
 
 void _tzset_unlocked (void);
 

@@ -41,7 +41,7 @@ project('picolibc', 'c',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.50',
-	version: '1.6.1'
+	version: '1.6.2'
        )
 
 targets = []
@@ -836,8 +836,6 @@ if has_semihost
   if meson.get_compiler('c').get_id() != 'clang'
     test_c_args += [specs_prefix + '--specs', specs_prefix + '@0@/@1@'.format(meson.current_build_dir(), picolibc_specs)]
   endif
-
-  # Undefine _exit as that's in libsemihost and needs to replace the weak _exit
 
   test_link_args += test_c_args + ['-nostartfiles', '-nostdlib', '-T', test_link_path, '-T', 'picolibc.ld', '-lgcc']
 
