@@ -55,6 +55,8 @@ static int test(int serial, char *expect, char *fmt, ...) {
     case 'F':
     case 'g':
     case 'G':
+    case 'a':
+    case 'A':
 #ifdef NO_FLOATING_POINT
 	    return 0;
 #else
