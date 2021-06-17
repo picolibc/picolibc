@@ -1278,7 +1278,8 @@ compile (char *string)
 	}	    
     }
 
-return(ret);
+    free(word);
+    return(ret);
 }
 
  
