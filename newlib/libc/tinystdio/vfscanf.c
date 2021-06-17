@@ -41,6 +41,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "stdio_private.h"
+#include "../../libm/common/math_config.h"
 
 #if	!defined (SCANF_LEVEL)
 #define SCANF_LEVEL SCANF_FLT
@@ -324,6 +325,7 @@ conv_flt (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
 #define FL_OVFL	    0x400	/* overflow was		*/
 #define FL_DOT	    0x800	/* decimal '.' was	*/
 #define FL_MEXP	    0x1000 	/* exponent 'e' is neg.	*/
+#define FL_FHEX     0x2000      /* hex significand */
 
     i = scanf_getc (stream, lenp);		/* after scanf_ungetc()	*/
 
@@ -367,11 +369,25 @@ conv_flt (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
       default:
         exp = 0;
 	uint = 0;
+#ifdef _WANT_IO_C99_FORMATS
+        int base = 10;
+        int uintdigitsmax = 8;
+#else
+#define base 10
+#define uintdigitsmax 8
+#endif
 	do {
 
-	    unsigned char c = i - '0';
+	    unsigned char c;
 
-	    if (c <= 9) {
+#ifdef _WANT_IO_C99_FORMATS
+            if ((flag & FL_FHEX) && (c = TOLOWER(i) - 'a') <= 5)
+                c += 10;
+            else
+#endif
+                c = i - '0';
+
+	    if (c < base) {
 		flag |= FL_ANY;
 		if (flag & FL_OVFL) {
 		    if (!(flag & FL_DOT))
@@ -379,7 +395,7 @@ conv_flt (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
 		} else {
 		    if (flag & FL_DOT)
 			exp -= 1;
-		    uint = uint * 10 + c;
+		    uint = uint * base + c;
 		    if (uint) {
 			uintdigits++;
 #ifndef PICOLIBC_FLOAT_PRINTF_SCANF
@@ -390,7 +406,7 @@ conv_flt (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
 			else
 #endif
 			{
-			    if (uintdigits > 8)
+			    if (uintdigits > uintdigitsmax)
 				flag |= FL_OVFL;
 			}
 		    }
@@ -398,6 +414,12 @@ conv_flt (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
 
 	    } else if (c == (('.'-'0') & 0xff) && !(flag & FL_DOT)) {
 		flag |= FL_DOT;
+#ifdef _WANT_IO_C99_FORMATS
+            } else if (TOLOWER(i) == 'x' && (flag & FL_ANY) && uint == 0) {
+                flag |= FL_FHEX;
+                base = 16;
+                uintdigitsmax = 7;
+#endif
 	    } else {
 		break;
 	    }
@@ -406,7 +428,12 @@ conv_flt (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
 	if (!(flag & FL_ANY))
 	    goto err;
 
-	if (TOLOWER(i) == 'e')
+#ifdef _WANT_IO_C99_FORMATS
+        int exp_match = (flag & FL_FHEX) ? 'p' : 'e';
+#else
+#define exp_match 'e'
+#endif
+	if (TOLOWER(i) == exp_match)
 	{
 	    int expacc;
 
@@ -428,7 +455,11 @@ conv_flt (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
 	    } while (--width && ISDIGIT (i = scanf_getc(stream, lenp)));
 	    if (flag & FL_MEXP)
 		expacc = -expacc;
-	    exp += expacc;
+#ifdef _WANT_IO_C99_FORMATS
+            if (flag & FL_FHEX)
+                exp *= 4;
+#endif
+            exp += expacc;
 	}
 
 	if (width && i >= 0) scanf_ungetc (i, stream, lenp);
@@ -438,6 +469,57 @@ conv_flt (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
 	    break;
 	}
 
+#ifdef _WANT_IO_C99_FORMATS
+        if (flag & FL_FHEX)
+        {
+#define MAX_EXP_32      127
+#define SIG_BITS_32     23
+#define MAX_EXP_64      1023
+#define SIG_BITS_64     52
+#ifndef PICOLIBC_FLOAT_PRINTF_SCANF
+            if (flags & FL_LONG) {
+                int64_t fi = _asint64((double) uint);
+                int64_t s = _significand64(fi);
+                exp += _exponent64(fi);
+                if (exp > MAX_EXP_64 + MAX_EXP_64)
+                    flt = (double) INFINITY;
+                else if (exp < -SIG_BITS_64)
+                    flt = 0.0;
+                else {
+                    if (exp < 0) {
+                        int shift = -exp;
+                        s >>= shift;
+                        exp = 0;
+                    }
+                    if (s == 0)
+                        exp = 0;
+                    flt = _asdouble(((int64_t)exp << SIG_BITS_64) | s);
+                }
+            }
+            else
+#endif
+            {
+                int32_t fi = _asint32((float) uint);
+                int32_t s = _significand32(fi);
+                exp += _exponent32(fi);
+                if (exp > MAX_EXP_32 + MAX_EXP_32)
+                    flt = (double) INFINITY;
+                else if (exp < -SIG_BITS_32)
+                    flt = 0.0;
+                else {
+                    if (exp < 0) {
+                        int shift = -exp;
+                        s >>= shift;
+                        exp = 0;
+                    }
+                    if (s == 0)
+                        exp = 0;
+                    flt = (FLOAT) _asfloat(((int32_t)exp << SIG_BITS_32) | s);
+                }
+            }
+        }
+        else
+#endif
 #ifndef PICOLIBC_FLOAT_PRINTF_SCANF
 	if (flags & FL_LONG)
 	{
