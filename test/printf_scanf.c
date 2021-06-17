@@ -79,6 +79,15 @@ main(int argc, char **argv)
 	char	buf[256];
 	int	errors = 0;
 
+        float v;
+        double dv;
+
+#define STR "0x1.7a27cc3ed6cf7p+124"
+        sscanf(STR, "%f", &v);
+        printf("%s = %.17e %.17a\n", STR, printf_float(v), printf_float(v));
+        sscanf(STR, "%lf", &dv);
+        printf("%s = %.17e %.17a\n", STR, printf_float(dv), printf_float(dv));
+
 #if 0
 	double	a;
 
@@ -172,10 +181,6 @@ main(int argc, char **argv)
 	}
 
 #if defined(TINY_STDIO) || !defined(NO_FLOATING_POINT)
-	for (x = -37; x <= 37; x++)
-	{
-		int t;
-		for (t = 0; t < sizeof(test_vals)/sizeof(test_vals[0]); t++) {
 #ifdef PICOLIBC_FLOAT_PRINTF_SCANF
 #define float_type float
 #define pow(a,b) powf((float) a, (float) b)
@@ -195,9 +200,13 @@ main(int argc, char **argv)
 #define ERROR_MAX 0
 #endif
 #endif
+	for (x = -37; x <= 37; x++)
+	{
+                float_type r;
+		int t;
+		for (t = 0; t < sizeof(test_vals)/sizeof(test_vals[0]); t++) {
 
 			float_type v = (float_type) test_vals[t] * pow(10.0, (float_type) x);
-			float_type r;
 			float_type e;
 
 			sprintf(buf, "%.55f", printf_float(v));
@@ -233,7 +242,32 @@ main(int argc, char **argv)
 				errors++;
 				fflush(stdout);
 			}
+
+#ifdef _WANT_IO_C99_FORMATS
+			sprintf(buf, "%.20a", printf_float(v));
+			sscanf(buf, scanf_format, &r);
+			e = fabs(v-r) / v;
+			if (e > (float_type) ERROR_MAX)
+			{
+				printf("\tg %3d: wanted %.7e got %.7e (error %.7e, buf %s)\n", x,
+				       printf_float(v), printf_float(r), printf_float(e), buf);
+				errors++;
+				fflush(stdout);
+			}
+#endif
+
 		}
+#ifdef _WANT_IO_C99_FORMATS
+                sprintf(buf, "0x0.0p%+d", x);
+                sscanf(buf, scanf_format, &r);
+                if (r != (float_type) 0.0)
+                {
+                    printf("\tg %3d: wanted 0.0 got %.7e (buf %s)\n", x,
+                           printf_float(r), buf);
+                    errors++;
+                    fflush(stdout);
+                }
+#endif
 	}
 #endif
 	fflush(stdout);
