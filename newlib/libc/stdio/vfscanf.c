@@ -1627,6 +1627,7 @@ __SVFSCANF_R (struct _reent *rptr,
 		      && zeroes == 1)
 		    {
 		      flags |= HEXFLT;
+                      flags &= ~NDIGITS;
 		      /* We skipped the first zero, so we have to add
 			 it now to the buffer. */
 		      *p++ = '0';
