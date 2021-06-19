@@ -65,26 +65,24 @@ SECTIONS
 	} >flash AT>flash :text
 
 	.text : {
+
+                /* code */
 		*(.text.unlikely .text.unlikely.*)
 		*(.text.startup .text.startup.*)
 		*(.text .text.*)
 		*(.gnu.linkonce.t.*)
-	} >flash AT>flash :text
-
-	.fini : {
 		KEEP (*(.fini))
 		__text_end = .;
-	} >flash AT>flash :text
 
-	PROVIDE (__etext = __text_end);
-	PROVIDE (_etext = __text_end);
-	PROVIDE (etext = __text_end);
+	        PROVIDE (__etext = __text_end);
+	        PROVIDE (_etext = __text_end);
+	        PROVIDE (etext = __text_end);
 
-	.rodata : {
+                /* read-only data */
 		*(.rdata)
 		*(.rodata .rodata.*)
 		*(.gnu.linkonce.r.*)
-		. = ALIGN(8);
+
 		*(.srodata.cst16)
 		*(.srodata.cst8)
 		*(.srodata.cst4)
@@ -92,68 +90,40 @@ SECTIONS
 		*(.srodata .srodata.*)
 		*(.data.rel.ro .data.rel.ro.*)
 		*(.got .got.*)
-	} >flash AT>flash :text
 
-	/*
-	 * Additional sections when compiling with C++ exception support
-	 */
+                /* Need to pre-align so that the symbols come after padding */
+		. = ALIGN(8);
 
-	@CPP_START@
-
-	.gcc_except_table : {
-		*(.gcc_except_table *.gcc_except_table.*)
-		KEEP (*(.eh_frame .eh_frame.*))
-	} >flash AT>flash :text
-
-	.ARM.extab : {
-		*(.ARM.extab* .gnu.linkonce.armextab.*)
-	} >flash AT>flash :text
-
-	PROVIDE (__exidx_start = .);
-	.ARM.exidx : {
-		*(.ARM.exidx*)
-	} >flash AT>flash :text
-	PROVIDE(__exidx_end = .);
-
-	@CPP_END@
-
-	. = ALIGN(8);
-
-	.preinit_array : {
+                /* lists of constructors and destructors */
 		PROVIDE_HIDDEN ( __preinit_array_start = . );
 		KEEP (*(.preinit_array))
 		PROVIDE_HIDDEN ( __preinit_array_end = . );
-	} >flash AT>flash :text
 
-	.init_array : {
 		PROVIDE_HIDDEN ( __init_array_start = . );
 		KEEP (*(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*)))
-		KEEP (*(.init_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .ctors))
+		KEEP (*(.init_array .ctors))
 		PROVIDE_HIDDEN ( __init_array_end = . );
-	} >flash AT>flash :text
 
-	.fini_array : {
 		PROVIDE_HIDDEN ( __fini_array_start = . );
 		KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
-		KEEP (*(.fini_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .dtors))
+		KEEP (*(.fini_array .dtors))
 		PROVIDE_HIDDEN ( __fini_array_end = . );
 	} >flash AT>flash :text
 
-	.ctors : {
-		KEEP (*crtbegin.o(.ctors))
-		KEEP (*crtbegin?.o(.ctors))
-		KEEP (*(EXCLUDE_FILE (*crtend.o *crtend?.o ) .ctors))
-		KEEP (*(SORT_BY_INIT_PRIORITY(.ctors.*)))
-		KEEP (*(.ctors))
-	} >flash AT>flash :text
+        /* additional sections when compiling with C++ exception support */
+	@CPP_START@
+        .except : {
+		*(.gcc_except_table *.gcc_except_table.*)
+		KEEP (*(.eh_frame .eh_frame.*))
+		*(.ARM.extab* .gnu.linkonce.armextab.*)
 
-	.dtors : {
-		KEEP (*crtbegin.o(.dtors))
-		KEEP (*crtbegin?.o(.dtors))
-		KEEP (*(EXCLUDE_FILE (*crtend.o *crtend?.o ) .dtors))
-		KEEP (*(SORT_BY_INIT_PRIORITY(.dtors.*)))
-		KEEP (*(.dtors))
-	} >flash AT>flash :text
+                . = ALIGN(8);
+
+        	PROVIDE(__exidx_start = .);
+		*(.ARM.exidx*)
+        	PROVIDE(__exidx_end = .);
+        } >flash AT>flash :text
+	@CPP_END@
 
 	/*
 	 * Data values which are preserved across reset
@@ -166,14 +136,17 @@ SECTIONS
 	} >ram AT>ram :ram
 
 	.data : ALIGN_WITH_INPUT {
-		PROVIDE(__data_start = .);
 		*(.data .data.*)
 		*(.gnu.linkonce.d.*)
+
+                /* Need to pre-align so that the symbols come after padding */
  		. = ALIGN(8);
+
 		PROVIDE( __global_pointer$ = . + 0x800 );
 		*(.sdata .sdata.* .sdata2.*)
 		*(.gnu.linkonce.s.*)
 	} >ram AT>flash :ram_init
+	PROVIDE(__data_start = ADDR(.data));
 	PROVIDE(__data_source = LOADADDR(.data));
 
 	/* Thread local initialized data. This gets
@@ -185,10 +158,10 @@ SECTIONS
 	 * data initialization code in crt0
 	 */
 	.tdata : ALIGN_WITH_INPUT {
-		PROVIDE( __tls_base = .);
 		*(.tdata .tdata.* .gnu.linkonce.td.*)
 		PROVIDE(__data_end = .);
 	} >ram AT>flash :tls :ram_init
+	PROVIDE( __tls_base = ADDR(.tdata));
 	PROVIDE( __tdata_source = LOADADDR(.tdata) );
 	PROVIDE( __tdata_size = SIZEOF(.tdata) );
 
@@ -198,11 +171,11 @@ SECTIONS
 	PROVIDE( __data_size = __data_end - __data_start );
 
 	.tbss (NOLOAD) : {
-		PROVIDE( __bss_start = . );
 		*(.tbss .tbss.* .gnu.linkonce.tb.*)
 		*(.tcommon)
 		PROVIDE( __tls_end = . );
 	} >ram AT>ram :tls :ram
+	PROVIDE( __bss_start = ADDR(.tbss));
 	PROVIDE( __tbss_size = SIZEOF(.tbss) );
 	PROVIDE( __tls_size = __tls_end - __tls_base );
 
@@ -225,6 +198,8 @@ SECTIONS
 		*(.bss .bss.*)
 		*(.gnu.linkonce.b.*)
 		*(COMMON)
+
+                /* Align the heap */
 		. = ALIGN(8);
 		__bss_end = .;
 	} >ram AT>ram :ram
@@ -248,8 +223,10 @@ SECTIONS
 	@C_START@
 
 	/DISCARD/ : {
-		*(.eh_frame .eh_frame.*)
 		*(.note .note.*)
+		*(.eh_frame .eh_frame.*)
+		*(.ARM.extab* .gnu.linkonce.armextab.*)
+		*(.ARM.exidx*)
 	}
 
 	@C_END@
