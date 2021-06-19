@@ -67,134 +67,27 @@
 
 #include "stdio_private.h"
 
+#define STRTOD
+
+#include "conv_flt.c"
+
 double
 strtod (const char * nptr, char ** endptr)
 {
-    uint64_t u64;
+    int len = 0;
     double flt;
-    int u64digits = 0;
-    unsigned char c;
-    int exp;
+    unsigned char ret;
 
-    unsigned char flag;
-#define FL_MINUS    0x01	/* number is negative	*/
-#define FL_ANY	    0x02	/* any digit was readed	*/
-#define FL_OVFL	    0x04	/* overflow was		*/
-#define FL_DOT	    0x08	/* decimal '.' was	*/
-#define FL_MEXP	    0x10	/* exponent 'e' is neg.	*/
+    while (ISSPACE(nptr[len]))
+        len++;
 
+    ret = conv_flt(nptr, &len, INT_MAX, &flt, FL_LONG);
+    if (!ret) {
+        flt = 0.0;
+        len = 0;
+    }
     if (endptr)
-	*endptr = (char *)nptr;
-
-    do {
-	c = *nptr++;
-    } while (isspace (c));
-
-    flag = 0;
-    if (c == '-') {
-	flag = FL_MINUS;
-	c = *nptr++;
-    } else if (c == '+') {
-	c = *nptr++;
-    }
-
-    if (__matchcaseprefix(nptr - 1, __match_inf)) {
-	nptr += 2;
-	if (__matchcaseprefix(nptr, __match_inity))
-	    nptr += 5;
-	if (endptr)
-	    *endptr = (char *)nptr;
-	return flag & FL_MINUS ? -(double)INFINITY : +(double)INFINITY;
-    }
-
-    /* NAN() construction is not realised.
-       Length would be 3 characters only.	*/
-    if (__matchcaseprefix(nptr - 1, __match_nan)) {
-	if (endptr)
-	    *endptr = (char *)nptr + 2;
-	return (double) NAN;
-    }
-
-    u64 = 0;
-    exp = 0;
-    while (1) {
-
-	c -= '0';
-
-	if (c <= 9) {
-	    flag |= FL_ANY;
-	    if (flag & FL_OVFL) {
-		if (!(flag & FL_DOT))
-		    exp += 1;
-	    } else {
-		if (flag & FL_DOT)
-		    exp -= 1;
-		u64 = u64 * 10 + c;
-		if (u64) {
-		    u64digits++;
-		    if (u64digits > 16)
-			flag |= FL_OVFL;
-		}
-	    }
-
-	} else if (c == (('.'-'0') & 0xff)  &&  !(flag & FL_DOT)) {
-	    flag |= FL_DOT;
-	} else {
-	    break;
-	}
-	c = *nptr++;
-    }
-
-    if (c == (('e'-'0') & 0xff) || c == (('E'-'0') & 0xff))
-    {
-	int i;
-	c = *nptr++;
-	i = 2;
-	if (c == '-') {
-	    flag |= FL_MEXP;
-	    c = *nptr++;
-	} else if (c == '+') {
-	    c = *nptr++;
-	} else {
-	    i = 1;
-	}
-	c -= '0';
-	if (c > 9) {
-	    nptr -= i;
-	} else {
-	    i = 0;
-	    do {
-		if (i < 3200)
-		    i = (((i << 2) + i) << 1) + c;	/* i = 10*i + c	*/
-		c = *nptr++ - '0';
-	    } while (c <= 9);
-	    if (flag & FL_MEXP)
-		i = -i;
-	    exp += i;
-	}
-    }
-
-    if ((flag & FL_ANY) && endptr)
-	*endptr = (char *)nptr - 1;
-
-    if (u64 == 0) {
-	flt = 0;
-    } else {
-	if ((u64digits + exp <= -324)) {
-	    // Number is less than 1e-324, which should be rounded down to 0; return +/-0.0.
-	    flt = 0;
-	}
-	else if (u64digits + exp >= 310) {
-	    // Number is larger than 1e+309, which should be rounded to +/-Infinity.
-	    flt = (double) INFINITY;
-	}
-	else
-	    flt = __atod_engine(u64, exp);
-	if (flt == 0.0 || flt == (double) INFINITY)
-	    errno = ERANGE;
-    }
-    if (flag & FL_MINUS)
-	flt = -flt;
+        *endptr = (char *) nptr + len;
     return flt;
 }
 
