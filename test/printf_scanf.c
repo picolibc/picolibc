@@ -267,6 +267,16 @@ main(int argc, char **argv)
                     errors++;
                     fflush(stdout);
                 }
+
+                sprintf(buf, "0x1p%+d", x);
+                sscanf(buf, scanf_format, &r);
+                if (r != (float_type) ldexp(1.0, x))
+                {
+                    printf("\tg %3d: wanted 1 got %.7e (buf %s)\n", x,
+                           printf_float(r), buf);
+                    errors++;
+                    fflush(stdout);
+                }
 #endif
 	}
 #endif
