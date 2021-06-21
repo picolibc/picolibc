@@ -34,6 +34,54 @@
 #
 subdir('libc')
 subdir('libm')
+
+libnames = ['cpart', 'mpart']
+
+foreach target : targets
+  value = get_variable('target_' + target)
+  libobjs = []
+
+  foreach libname : libnames
+    libobjs += get_variable('lib_' + libname + target).extract_all_objects(recursive:true)
+  endforeach
+
+  instdir = join_paths(get_option('libdir'), value[0])
+
+  if target == ''
+    libc_name = 'c'
+    libm_name = 'm'
+  else
+    libc_name = join_paths(target, 'libc')
+    libm_name = join_paths(target, 'libm')
+  endif
+
+  local_lib_c_target = static_library(libc_name,
+				      install : true,
+				      install_dir : instdir,
+				      pic: false,
+				      objects : libobjs)
+
+  set_variable('lib_c' + target, local_lib_c_target)
+
+  local_lib_m_target = static_library(libm_name,
+                                      ['empty.c'],
+                                      install : true,
+                                      install_dir : instdir,
+                                      pic: false,
+                                      objects : [])
+
+  set_variable('lib_m' + target, local_lib_m_target)
+
+  if check_duplicate_names
+    custom_target('libc_duplicates' + target,
+		  build_by_default: true,
+		  input: local_lib_c_target,
+		  output: 'libc_duplicates' + target,
+		  command: [duplicate_names, nm, '@INPUT@', '@OUTPUT@'],
+		  install: false)
+  endif
+endforeach
+
 if enable_tests
   subdir('testsuite')
 endif
