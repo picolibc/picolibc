@@ -144,6 +144,10 @@ check_malloc(size_t in_use)
 		printf("expected at least %zu in use (%zu)\n", in_use, info.uordblks);
 		result++;
 	}
+        if (in_use == 0 && info.uordblks != 0) {
+                printf("expected all free but %zu still reported in use\n", info.uordblks);
+                result++;
+        }
 #endif
 	return result;
 }
