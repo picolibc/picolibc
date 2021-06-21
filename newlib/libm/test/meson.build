@@ -132,7 +132,7 @@ endif
 foreach target : targets
   value = get_variable('target_' + target)
 
-  libs = [get_variable('lib_m' + target), get_variable('lib_c' + target)]
+  libs = [get_variable('lib_mpart' + target), get_variable('lib_cpart' + target)]
   if is_variable('lib_semihost' + target)
     libs += [get_variable('lib_semihost' + target)]
   endif

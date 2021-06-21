@@ -81,26 +81,15 @@ foreach target : targets
   instdir = join_paths(get_option('libdir'), value[0])
 
   if target == ''
-    libm_name = 'm'
+    libmpart_name = 'mpart'
   else
-    libm_name = join_paths(target, 'libm')
+    libmpart_name = join_paths(target, 'libmpart')
   endif
 
-  local_lib_m_target = static_library(libm_name,
-				      install : true,
-				      install_dir : instdir,
+  local_lib_mpart_target = static_library(libmpart_name,
 				      pic: false,
 				      objects : libobjs)
-  set_variable('lib_m' + target, local_lib_m_target)
-
-  if check_duplicate_names
-    custom_target('libm_duplicates' + target,
-		  build_by_default: true,
-		  input: local_lib_m_target,
-		  output: 'libm_duplicates' + target,
-		  command: [duplicate_names, nm, '@INPUT@', '@OUTPUT@'],
-		  install: false)
-  endif
+  set_variable('lib_mpart' + target, local_lib_mpart_target)
 endforeach
 
 if enable_tests
