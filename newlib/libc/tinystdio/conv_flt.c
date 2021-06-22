@@ -36,17 +36,28 @@
 static const char pstr_nfinity[] = "nfinity";
 static const char pstr_an[] = "an";
 
-#if defined(STRTOD) || defined(STRTOF)
+#if defined(STRTOD) || defined(STRTOF) || defined(STRTOLD)
 # define CHECK_WIDTH()   1
 # define CHECK_RANGE(flt) do {                                  \
-        if (flt == (FLOAT) 0.0 || flt == (FLOAT) INFINITY)      \
+        if (flt < FLOAT_MIN || flt == (FLOAT) INFINITY)         \
             errno = ERANGE;                                     \
     } while (0);
 # ifdef STRTOD
-#  define CHECK_LONG()    1
+#  define CHECK_LONG()          1
+#  define CHECK_LONG_LONG()     0
+#  define FLOAT_MIN DBL_MIN
+# elif defined(STRTOLD)
+#  define CHECK_LONG()          0
+#  define CHECK_LONG_LONG()     1
+#  define FLOAT_MIN LDBL_MIN
+typedef long double FLOAT;
+typedef _u128 UINTFLOAT;
+#define UINTFLOAT_128
 # else
-#  define CHECK_LONG()    0
+#  define CHECK_LONG()          0
+#  define CHECK_LONG_LONG()     0
 #  define PICOLIBC_FLOAT_PRINTF_SCANF
+#  define FLOAT_MIN FLT_MIN
 # endif
 
 #define FLT_STREAM const char
@@ -75,9 +86,34 @@ static inline void scanf_ungetc(int c, const char *s, int *lenp)
 # else
 #  define CHECK_LONG()    (flags & FL_LONG)
 # endif
+# define CHECK_LONG_LONG()      0
 #endif
 
+#ifdef UINTFLOAT_128
+#define U32_TO_UF(x)    to_u128(x)
+#define U64_TO_UF(x)    to_u128(x)
+#define U128_TO_UF(x)   (x)
+#define UF_TO_U32(x)    from_u128(x)
+#define UF_TO_U64(x)    from_u128(x)
+#define UF_TO_U128(x)   (x)
+#define UF_IS_ZERO(x)   _u128_is_zero(x)
+#define UF_TIMES_BASE(a,b)      _u128_times_base(a,b)
+#define UF_PLUS_DIGIT(a,b)      _u128_plus_64(a,b)
+#else
+#define U32_TO_UF(x)    (x)
+#define U64_TO_UF(x)    (x)
+#define U128_TO_UF(x)   from_u128(x)
+#define UF_TO_U32(x)    (x)
+#define UF_TO_U64(x)    (x)
+#define UF_TO_U128(x)   to_u128(x)
+#define UF_IS_ZERO(x)   ((x) == 0)
+#define UF_TIMES_BASE(a,b)      ((a) * (b))
+#define UF_PLUS_DIGIT(a,b)      ((a) + (b))
+#endif
+
+#ifndef STRTOLD
 #include "dtoa_engine.h"
+#endif
 
 static unsigned char
 conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t flags)
@@ -130,7 +166,7 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 
     default:
         exp = 0;
-	uint = 0;
+	uint = U32_TO_UF(0);
 #ifdef _WANT_IO_C99_FORMATS
         int base = 10;
         int uintdigitsmax = 8;
@@ -157,15 +193,16 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 		} else {
 		    if (flags & FL_DOT)
 			exp -= 1;
-		    uint = uint * base + c;
-		    if (uint) {
+                    uint = UF_PLUS_DIGIT(UF_TIMES_BASE(uint, base), c);
+		    if (!UF_IS_ZERO(uint)) {
 			uintdigits++;
 			if (CHECK_LONG()) {
 			    if (uintdigits > 16)
 				flags |= FL_OVFL;
-			}
-			else
-			{
+			} else if (CHECK_LONG_LONG()) {
+                            if (uintdigits > 32)
+                                flags |= FL_OVFL;
+                        } else {
 			    if (uintdigits > uintdigitsmax)
 				flags |= FL_OVFL;
 			}
@@ -175,7 +212,7 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 	    } else if (c == (('.'-'0') & 0xff) && !(flags & FL_DOT)) {
 		flags |= FL_DOT;
 #ifdef _WANT_IO_C99_FORMATS
-            } else if (TOLOWER(i) == 'x' && (flags & FL_ANY) && uint == 0) {
+            } else if (TOLOWER(i) == 'x' && (flags & FL_ANY) && UF_IS_ZERO(uint)) {
                 flags |= FL_FHEX;
                 base = 16;
                 uintdigitsmax = 7;
@@ -246,8 +283,8 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 	if (width)
             scanf_ungetc (i, stream, lenp);
 
-	if (uint == 0) {
-	    flt = 0;
+	if (UF_IS_ZERO(uint)) {
+	    flt = (FLOAT) 0;
 	    break;
 	}
 
@@ -259,25 +296,29 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 #define MAX_EXP_64      1023
 #define SIG_BITS_64     52
             if (CHECK_LONG()) {
-                int64_t fi = _asint64((double) uint);
+                int64_t fi = _asint64((double) UF_TO_U64(uint));
                 int64_t s = _significand64(fi);
                 exp += _exponent64(fi);
                 if (exp > MAX_EXP_64 + MAX_EXP_64)
-                    flt = (double) INFINITY;
+                    flt = (FLOAT) INFINITY;
                 else if (exp < -SIG_BITS_64)
-                    flt = 0.0;
+                    flt = (FLOAT) 0.0;
                 else {
                     if (exp < 0) {
-                        int shift = -exp;
-                        s >>= shift;
+                        int shift = 1 - exp;
+                        if (shift < 64) {
+                            s |= ((int64_t) 1 << 52);
+                            s >>= shift;
+                        } else
+                            s = 0;
                         exp = 0;
                     }
-                    flt = _asdouble(((int64_t)exp << SIG_BITS_64) | s);
+                    flt = (FLOAT) _asdouble(((int64_t)exp << SIG_BITS_64) | s);
                 }
-            }
-            else
-            {
-                int32_t fi = _asint32((float) uint);
+            } else if (CHECK_LONG_LONG()) {
+                flt = (FLOAT) scalbln(_u128_to_ld(UF_TO_U128(uint)), exp);
+            } else {
+                int32_t fi = _asint32((float) UF_TO_U32(uint));
                 int32_t s = _significand32(fi);
                 exp += _exponent32(fi);
                 if (exp > MAX_EXP_32 + MAX_EXP_32)
@@ -286,8 +327,12 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
                     flt = (FLOAT) 0.0;
                 else {
                     if (exp < 0) {
-                        int shift = -exp;
-                        s >>= shift;
+                        int shift = 1 - exp;
+                        if (shift < 32) {
+                            s |= (1 << 23);
+                            s >>= shift;
+                        } else
+                            s = 0;
                         exp = 0;
                     }
                     flt = (FLOAT) _asfloat(((int32_t)exp << SIG_BITS_32) | s);
@@ -298,26 +343,30 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 #endif
             if (CHECK_LONG())
             {
-		if ((uintdigits + exp <= -324) || (uint == 0)) {
+		if (uintdigits + exp <= -324) {
                     // Number is less than 1e-324, which should be rounded down to 0; return +/-0.0.
-                    flt = 0.0;
+                    flt = (FLOAT) 0.0;
 		} else if (uintdigits + exp >= 310) {
                     // Number is larger than 1e+309, which should be rounded to +/-Infinity.
                     flt = (FLOAT) INFINITY;
 		} else {
-                    flt = __atod_engine(uint, exp);
+                    flt = (FLOAT) __atod_engine(UF_TO_U64(uint), exp);
                 }
+            }
+            else if (CHECK_LONG_LONG())
+            {
+                flt = (FLOAT) __atold_engine(UF_TO_U128(uint), exp);
             }
             else
             {
-		if ((uintdigits + exp <= -46) || (uint == 0)) {
+		if (uintdigits + exp <= -46) {
                     // Number is less than 1e-46, which should be rounded down to 0; return 0.0.
                     flt = (FLOAT) 0.0f;
 		} else if (uintdigits + exp >= 40) {
                     // Number is larger than 1e+39, which should be rounded to +/-Infinity.
                     flt = (FLOAT) INFINITY;
 		} else {
-                    flt = (FLOAT) __atof_engine(uint, exp);
+                    flt = (FLOAT) __atof_engine(UF_TO_U32(uint), exp);
                 }
             }
         CHECK_RANGE(flt)
@@ -329,8 +378,10 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
     if (addr) {
 	if (CHECK_LONG())
 	    *((double *) addr) = (double) flt;
-	else
-	    *((float *) addr) = flt;
+	else if (CHECK_LONG_LONG())
+            *((long double *) addr) = (long double) flt;
+        else
+	    *((float *) addr) = (float) flt;
     }
     return 1;
 }
