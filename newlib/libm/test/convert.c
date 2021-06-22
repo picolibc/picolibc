@@ -47,12 +47,15 @@ test_strtod (void)
   char *tail;
   double v;
   /* On average we'll loose 1/2 a bit, so the test is for within 1 bit  */
+  errno = 0;
   v = strtod(pd->string, &tail);
   if (tail - pd->string) {
-    if (v == 0.0 && !(pd->endscan & ENDSCAN_IS_ZERO))
+    if (fabs(v) < DBL_MIN && !(pd->endscan & ENDSCAN_IS_ZERO))
       test_eok(errno, ERANGE);
-    if (v == (double) INFINITY && !(pd->endscan & ENDSCAN_IS_INF))
+    else if (v == (double) INFINITY && !(pd->endscan & ENDSCAN_IS_INF))
       test_eok(errno, ERANGE);
+    else
+      test_eok(errno, 0);
   }
   test_mok(v, pd->value, CONVERT_BITS_DOUBLE);
   test_iok(tail - pd->string, pd->endscan & ENDSCAN_MASK);
@@ -64,15 +67,16 @@ test_strtof (void)
   char *tail;
   float v;
   /* On average we'll loose 1/2 a bit, so the test is for within 1 bit  */
+  errno = 0;
   v = strtof(pd->string, &tail);
   if (tail - pd->string) {
     int e = errno;
-    if (v == 0.0f && !(pd->endscan & ENDSCAN_IS_ZERO)) {
-      printf("%s is zero errno is %d\n", pd->string, e);
+    if (fabsf(v) < FLT_MIN && !(pd->endscan & ENDSCAN_IS_ZERO))
       test_eok(e, ERANGE);
-    }
-    if (v == INFINITY && !(pd->endscan & ENDSCAN_IS_INF))
+    else if (v == INFINITY && !(pd->endscan & ENDSCAN_IS_INF))
       test_eok(errno, ERANGE);
+    else
+      test_eok(errno, 0);
   }
   test_mfok((double) v, pd->value, CONVERT_BITS_FLOAT);
   test_iok(tail - pd->string, pd->endscan & ENDSCAN_MASK);
@@ -87,17 +91,21 @@ void
 test_strtold (void)
 {
   char *tail;
-  long double v;
+  long double v, av;
   /* On average we'll loose 1/2 a bit, so the test is for within 1 bit  */
+  errno = 0;
   v = strtold(pd->string, &tail);
   if (tail - pd->string) {
     int e = errno;
-    if (v == 0.0L && !(pd->endscan & ENDSCAN_IS_ZERO)) {
-      printf("%s is zero errno is %d\n", pd->string, e);
+    av = v;
+    if (av < 0)
+      av = -av;
+    if (av < LDBL_MIN && !(pd->endscan & ENDSCAN_IS_ZERO))
       test_eok(e, ERANGE);
-    }
-    if (v == (long double) INFINITY && !(pd->endscan & ENDSCAN_IS_INF))
+    else if (v == (long double) INFINITY && !(pd->endscan & ENDSCAN_IS_INF))
       test_eok(e, ERANGE);
+    else
+      test_eok(e, 0);
   }
   test_mok(v, pd->value, CONVERT_BITS_DOUBLE);
   test_iok(tail - pd->string, pd->endscan & ENDSCAN_MASK);
@@ -121,7 +129,7 @@ test_atoff (void)
 
 
 static
-void 
+void
 iterate (void (*func) (void),
        char *name)
 {
@@ -258,9 +266,9 @@ test_gcvt (void)
 {
   char *s = check_null(gcvt(pdd->value, pdd->g1, buffer));
   test_scok(s, pdd->gstring, 9);
-  
+
 #ifndef NO_NEWLIB
-  s = check_null(gcvtf(pdd->value, pdd->g1, buffer)); 
+  s = check_null(gcvtf(pdd->value, pdd->g1, buffer));
   test_scok2(s, pdd->gstring, pdd->gfstring, 6);
 #endif
 }
@@ -284,6 +292,7 @@ test_fcvt (void)
   /* Test the float version by converting and inspecting the numbers 3
    after reconverting */
   sf =  check_null(fcvtf(pdd->value, pdd->f1, &a2, &a3));
+  errno = 0;
   v1 = strtod(sd, &sde);
   v2 = strtod(sf, &sfe);
   /* float version may return fewer digits; expand to match */
@@ -341,13 +350,13 @@ deltest (void)
   line(5);
   sprintf(buffer,"%.0e",1e1);
   test_sok(buffer,"1e+01");
-  line(6);  
+  line(6);
   sprintf(buffer, "%f", 12.3456789);
   test_sok(buffer, "12.345679");
-  line(7);  
+  line(7);
   sprintf(buffer, "%6.3f", 12.3456789);
   test_sok(buffer, "12.346");
-  line(8);  
+  line(8);
   sprintf(buffer,"%.0f", 12.3456789);
   test_sok(buffer,"12");
 #endif
@@ -366,11 +375,11 @@ test_sprint (void)
   sprint_int_type *si = sprint_ints;
 
 
-  newfunc( "sprintf");  
+  newfunc( "sprintf");
 
 
 #if defined(TINY_STDIO) || !defined(NO_FLOATING_POINT)
-  while (s->line) 
+  while (s->line)
   {
     line( s->line);
     sprintf(buffer, s->format_string, s->value);
@@ -389,7 +398,7 @@ test_sprint (void)
   }
 #endif
 
-  while (si->line) 
+  while (si->line)
   {
     line( si->line);
     if (strchr(si->format_string, 'l'))
@@ -407,7 +416,7 @@ test_sprint (void)
     test_sok(buffer, si->result);
 #endif
     si++;
-  }  
+  }
 }
 
 /* Scanf calls strtod etc tested elsewhere, but also has some pattern matching skills */
@@ -422,13 +431,13 @@ test_scan (void)
   extern sprint_int_type sprint_ints[];
   sprint_int_type *si = sprint_ints;
 
-  newfunc( "scanf");  
-  
+  newfunc( "scanf");
+
 #if defined(TINY_STDIO) || !defined(NO_FLOATING_POINT)
   /* Test scanf by converting all the numbers in the sprint vectors
      to and from their source and making sure nothing breaks */
 
-  while (s->line) 
+  while (s->line)
   {
 
     double d0,d1;
@@ -445,11 +454,11 @@ test_scan (void)
 #endif
 
   /* And integers too */
-  while (si->line) 
+  while (si->line)
   {
 
     long d0,d1;
-    
+
     line(si->line);
     sscanf(si->result, "%ld", &d0);
     sprintf(buffer, "%ld", d0);
@@ -465,7 +474,7 @@ test_scan (void)
   sscanf("foo bar 123 zap 456","foo bar %d zap %d", &i, &j);
   test_iok(i, 123);
   test_iok(j, 456);
-  
+
   sscanf("magicXYZZYfoobar","magic%[XYZ]", buffer);
   test_sok("XYZZY", buffer);
   sscanf("magicXYZZYfoobar","%[^XYZ]", buffer);
@@ -521,7 +530,7 @@ test_cvt (void)
 #endif
 
   test_scan();
-  test_sprint();  
+  test_sprint();
   iterate(test_atof, "atof");
 #ifndef NO_NEWLIB
   iterate(test_atoff, "atoff");
