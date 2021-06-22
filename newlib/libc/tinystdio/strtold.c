@@ -39,16 +39,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <stdbool.h>
-
-#define NPOW_10	13
-
-static const long double pwr_p10 [NPOW_10] = {
-    1e+1L, 1e+2L, 1e+4L, 1e+8L, 1e+16L, 1e+32L, 1e+64L, 1e+128L, 1e+256L, 1e+512L, 1e+1024L, 1e+2048L, 1e+4096L
-};
-
-static const long double pwr_m10 [NPOW_10] = {
-    1e-1L, 1e-2L, 1e-4L, 1e-8L, 1e-16L, 1e-32L, 1e-64L, 1e-128L, 1e-256L, 1e-512L, 1e-1024L, 1e-2048L, 1e-4096L
-};
+#include "stdio_private.h"
 
 /**  The strtold() function converts the initial portion of the string pointed
      to by \a nptr to long double representation.
@@ -77,200 +68,28 @@ static const long double pwr_m10 [NPOW_10] = {
  */
 
 #ifdef __SIZEOF_INT128__
-typedef __uint128_t _u128;
-#define _u128_plus_64(a,b) ((a) + (b))
-#define _u128_plus(a,b) ((a) + (b))
-#define _u128_times_10(a) ((a) * 10)
-#define _u128_to_ld(a) ((long double) (a))
-#define _u128_oflow(a)	((a) >= (((((_u128) 0xffffffffffffffffULL) << 64) | 0xffffffffffffffffULL) - 9 / 10))
-#define _u128_zero	(_u128) 0
 #else
-typedef struct {
-    uint64_t	hi, lo;
-} _u128;
-#define _u128_zero	(_u128) { 0, 0 }
-
-static _u128
-_u128_plus_64(_u128 a, uint64_t b)
-{
-    _u128 v;
-
-    v.lo = a.lo + b;
-    v.hi = a.hi;
-    if (v.lo < a.lo)
-	v.hi++;
-    return v;
-}
-
-static _u128
-_u128_plus(_u128 a, _u128 b)
-{
-    _u128 v;
-
-    v.lo = a.lo + b.lo;
-    v.hi = a.hi + b.hi;
-    if (v.lo < a.lo)
-	v.hi++;
-    return v;
-}
-
-static _u128
-_u128_lshift(_u128 a, int amt)
-{
-    _u128	v;
-
-    v.lo = a.lo << amt;
-    v.hi = (a.lo >> (64 - amt)) | (a.hi << amt);
-    return v;
-}
-
-static _u128
-_u128_times_10(_u128 a)
-{
-    return _u128_plus(_u128_lshift(a, 3), _u128_lshift(a, 1));
-}
-
-static long double
-_u128_to_ld(_u128 a)
-{
-    return (long double) a.hi * ((long double) (1LL << 32) * (long double) (1LL << 32)) + (long double) a.lo;
-}
-
-static bool
-_u128_oflow(_u128 a)
-{
-    return a.hi >= (0xffffffffffffffffULL - 9) / 10;
-}
 #endif
-#include "stdio_private.h"
+
+#define STRTOLD
+#include "conv_flt.c"
 
 long double
 strtold (const char * nptr, char ** endptr)
 {
-    _u128 u128;
+    int len = 0;
     long double flt;
-    unsigned char c;
-    int exp;
+    unsigned char ret;
 
-    unsigned char flag;
-#define FL_MINUS    0x01	/* number is negative	*/
-#define FL_ANY	    0x02	/* any digit was readed	*/
-#define FL_OVFL	    0x04	/* overflow was		*/
-#define FL_DOT	    0x08	/* decimal '.' was	*/
-#define FL_MEXP	    0x10	/* exponent 'e' is neg.	*/
+    while (ISSPACE(nptr[len]))
+        len++;
 
+    ret = conv_flt(nptr, &len, INT_MAX, &flt, FL_LONG);
+    if (!ret) {
+        flt = (long double) 0.0;
+        len = 0;
+    }
     if (endptr)
-	*endptr = (char *)nptr;
-
-    do {
-	c = *nptr++;
-    } while (isspace (c));
-
-    flag = 0;
-    if (c == '-') {
-	flag = FL_MINUS;
-	c = *nptr++;
-    } else if (c == '+') {
-	c = *nptr++;
-    }
-
-    if (__matchcaseprefix(nptr - 1, __match_inf)) {
-	nptr += 2;
-	if (__matchcaseprefix(nptr, __match_inity))
-	    nptr += 5;
-	if (endptr)
-	    *endptr = (char *)nptr;
-	return flag & FL_MINUS ? -(long double)INFINITY : +(long double)INFINITY;
-    }
-
-    /* NAN() construction is not realised.
-       Length would be 3 characters only.	*/
-    if (__matchcaseprefix(nptr - 1, __match_nan)) {
-	if (endptr)
-	    *endptr = (char *)nptr + 2;
-	return (long double) NAN;
-    }
-
-    u128 = _u128_zero;
-    exp = 0;
-    while (1) {
-
-	c -= '0';
-
-	if (c <= 9) {
-	    flag |= FL_ANY;
-	    if (flag & FL_OVFL) {
-		if (!(flag & FL_DOT))
-		    exp += 1;
-	    } else {
-		if (flag & FL_DOT)
-		    exp -= 1;
-		u128 = _u128_plus_64(_u128_times_10(u128), c);
-		if (_u128_oflow(u128))
-		    flag |= FL_OVFL;
-	    }
-
-	} else if (c == (('.'-'0') & 0xff)  &&  !(flag & FL_DOT)) {
-	    flag |= FL_DOT;
-	} else {
-	    break;
-	}
-	c = *nptr++;
-    }
-
-    if (c == (('e'-'0') & 0xff) || c == (('E'-'0') & 0xff))
-    {
-	int i;
-	c = *nptr++;
-	i = 2;
-	if (c == '-') {
-	    flag |= FL_MEXP;
-	    c = *nptr++;
-	} else if (c == '+') {
-	    c = *nptr++;
-	} else {
-	    i = 1;
-	}
-	c -= '0';
-	if (c > 9) {
-	    nptr -= i;
-	} else {
-	    i = 0;
-	    do {
-		i = i * 10 + c;
-		c = *nptr++ - '0';
-	    } while (c <= 9);
-	    if (flag & FL_MEXP)
-		i = -i;
-	    exp += i;
-	}
-    }
-
-    if ((flag & FL_ANY) && endptr)
-	*endptr = (char *)nptr - 1;
-
-    flt = _u128_to_ld(u128);
-    if ((flag & FL_MINUS) && (flag & FL_ANY))
-	flt = -flt;
-
-    if (flt != 0) {
-	int pwr;
-	const long double *pptr;
-	if (exp < 0) {
-	    pptr = (pwr_m10 + NPOW_10 - 1);
-	    exp = -exp;
-	} else {
-	    pptr = (pwr_p10 + NPOW_10 - 1);
-	}
-	for (pwr = 1 << (NPOW_10 - 1); pwr; pwr >>= 1) {
-	    for (; exp >= pwr; exp -= pwr) {
-		flt *= *pptr;
-	    }
-	    pptr--;
-	}
-	if (flt == (long double) INFINITY || flt == 0.0L)
-	    errno = ERANGE;
-    }
-
+        *endptr = (char *) nptr + len;
     return flt;
 }
