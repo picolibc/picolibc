@@ -213,7 +213,7 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
       switch (cygwait (p->input_handle, (DWORD) 0))
 	{
 	case WAIT_OBJECT_0:
-	  ReadConsoleInputA (p->input_handle,
+	  ReadConsoleInputW (p->input_handle,
 			     input_rec, INREC_SIZE, &total_read);
 	  break;
 	case WAIT_TIMEOUT:
@@ -326,7 +326,7 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 	}
       if (total_read)
 	/* Write back input records other than interrupt. */
-	WriteConsoleInput (p->input_handle, input_rec, total_read, &n);
+	WriteConsoleInputW (p->input_handle, input_rec, total_read, &n);
 skip_writeback:
       ReleaseMutex (p->input_mutex);
       cygwait (40);
