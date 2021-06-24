@@ -205,7 +205,7 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
   DWORD output_stopped_at = 0;
   while (con.owner == myself->pid)
     {
-      DWORD total_read, n, i, j;
+      DWORD total_read, n, i;
       INPUT_RECORD input_rec[INREC_SIZE];
 
       WaitForSingleObject (p->input_mutex, INFINITE);
@@ -213,7 +213,7 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
       switch (cygwait (p->input_handle, (DWORD) 0))
 	{
 	case WAIT_OBJECT_0:
-	  ReadConsoleInputA (p->input_handle,
+	  ReadConsoleInputW (p->input_handle,
 			     input_rec, INREC_SIZE, &total_read);
 	  break;
 	case WAIT_TIMEOUT:
@@ -241,7 +241,10 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 	}
       for (i = 0; i < total_read; i++)
 	{
-	  const char c = input_rec[i].Event.KeyEvent.uChar.AsciiChar;
+	  const wchar_t wc = input_rec[i].Event.KeyEvent.uChar.UnicodeChar;
+	  if ((wint_t) wc >= 0x80)
+	    continue;
+	  char c = (char) wc;
 	  bool processed = false;
 	  termios &ti = ttyp->ti;
 	  switch (input_rec[i].EventType)
@@ -318,15 +321,15 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 	    }
 	  if (processed)
 	    { /* Remove corresponding record. */
-	      for (j = i; j < total_read - 1; j++)
-		input_rec[j] = input_rec[j + 1];
+	      memmove (input_rec + i, input_rec + i + 1,
+		       sizeof (INPUT_RECORD) * (total_read - i - 1));
 	      total_read--;
 	      i--;
 	    }
 	}
       if (total_read)
 	/* Write back input records other than interrupt. */
-	WriteConsoleInput (p->input_handle, input_rec, total_read, &n);
+	WriteConsoleInputW (p->input_handle, input_rec, total_read, &n);
 skip_writeback:
       ReleaseMutex (p->input_mutex);
       cygwait (40);
