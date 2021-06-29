@@ -78,17 +78,14 @@ typedef int64_t printf_float_int_t;
 /*
  * This file can be compiled into more than one flavour.  The default
  * is to offer the usual modifiers and integer formatting support
- * (level 2).  Level 1 maintains a minimal version that just offers
- * integer formatting, but no modifier support whatsoever.  Level 3 is
- * intented for floating point support.
+ * (level 1).  Level 2 includes floating point support.
  */
 
 #ifndef PRINTF_LEVEL
 # define PRINTF_LEVEL PRINTF_FLT
 #endif
 
-#if PRINTF_LEVEL == PRINTF_MIN || PRINTF_LEVEL == PRINTF_STD \
-    || PRINTF_LEVEL == PRINTF_FLT
+#if PRINTF_LEVEL == PRINTF_STD || PRINTF_LEVEL == PRINTF_FLT
 /* OK */
 #else
 # error "Not a known printf level."
@@ -140,157 +137,6 @@ typedef long ultoa_signed_t;
 #define arg_to_signed(flags, result_var) arg_to_t((flags), signed, (result_var))
 
 #include "ultoa_invert.c"
-
-/* --------------------------------------------------------------------	*/
-#if  PRINTF_LEVEL <= PRINTF_MIN
-
-#define FL_ALTHEX	0x04
-#define FL_ALT		0x10
-#define FL_ALTLWR	0x20
-#define FL_NEGATIVE	0x40
-#define FL_LONG 	0x80
-
-int
-vfprintf (FILE * stream, const char *fmt, va_list ap)
-{
-    unsigned char c;		/* holds a char from the format string */
-    unsigned char flags;
-    unsigned char buf[PRINTF_BUF_SIZE];	/* size for -1 in octal, without '\0'	*/
-
-    int stream_len = 0;
-
-#define my_putc(c, stream) do { ++stream_len; putc(c, stream); } while(0)
-
-    if ((stream->flags & __SWR) == 0)
-	return EOF;
-
-    for (;;) {
-
-	for (;;) {
-	    c = *fmt++;
-	    if (!c) goto ret;
-	    if (c == '%') {
-		c = *fmt++;
-		if (c != '%') break;
-	    }
-	    my_putc (c, stream);
-	}
-
-	for (flags = 0;
-	     !(flags & FL_LONG);	/* 'll' will detect as error	*/
-	     c = *fmt++)
-	{
-	    if (c && strchr(" +-.0123456789h", c))
-		continue;
-	    if (c == '#') {
-		flags |= FL_ALT;
-		continue;
-	    }
-	    if (c == 'l') {
-		flags |= FL_LONG;
-		continue;
-	    }
-	    break;
-	}
-
-	/* Only a format character is valid.	*/
-
-	if (c && strchr("EFGefg", c)) {
-		(void) PRINTF_FLOAT_ARG(ap);
-	    my_putc ('?', stream);
-	    continue;
-	}
-
-	{
-	    const char * pnt;
-
-	    switch (c) {
-
-	      case 'c':
-		my_putc (va_arg (ap, int), stream);
-		continue;
-
-	      case 'S':
-		/* FALLTHROUGH */
-	      case 's':
-		pnt = va_arg (ap, char *);
-	        while ( (c = *pnt++) != 0)
-		    my_putc (c, stream);
-		continue;
-	    }
-	}
-
-	if (c == 'd' || c == 'i') {
-	    ultoa_signed_t x;
-	    arg_to_signed(flags, &x);
-
-	    flags &= ~FL_ALT;
-	    if (x < 0) {
-		x = -x;
-		/* `my_putc ('-', stream)' will considarably inlarge stack size.
-		   So flag is used.	*/
-		flags |= FL_NEGATIVE;
-	    }
-	    c = __ultoa_invert (x, (char *)buf, 10) - (char *)buf;
-
-	} else {
-	    int base;
-
-	    switch (c) {
-	      case 'u':
-		flags &= ~FL_ALT;
-	        base = 10;
-		goto ultoa;
-	      case 'o':
-	        base = 8;
-		goto ultoa;
-	      case 'p':
-	        flags |= FL_ALT;
-		/* no break */
-	      case 'x':
-		flags |= (FL_ALTHEX | FL_ALTLWR);
-	        base = 16;
-		goto ultoa;
-	      case 'X':
-		flags |= FL_ALTHEX;
-	        base = 16 | XTOA_UPPER;
-	      ultoa:
-		{
-		    ultoa_unsigned_t x;
-		    arg_to_unsigned(flags, &x);
-		    c = __ultoa_invert (x, (char *)buf, base) - (char *)buf;
-		}
-		break;
-
-	      default:
-	        goto ret;
-	    }
-	}
-
-	/* Integer number output.	*/
-	if (flags & FL_NEGATIVE)
-	    my_putc ('-', stream);
-	if ((flags & FL_ALT) && (buf[c-1] != '0')) {
-	    my_putc ('0', stream);
-	    if (flags & FL_ALTHEX)
-#if  FL_ALTLWR != 'x' - 'X'
-# error
-#endif
-		my_putc ('X' + (flags & FL_ALTLWR), stream);
-	}
-	do {
-	    my_putc (buf[--c], stream);
-	} while (c);
-
-    } /* for (;;) */
-
-  ret:
-    return stream_len;
-#undef my_putc
-}
-
-/* --------------------------------------------------------------------	*/
-#else	/* i.e. PRINTF_LEVEL > PRINTF_MIN */
 
 /* Order is relevant here and matches order in format string */
 
@@ -997,5 +843,3 @@ __strong_reference(vfprintf, __d_vfprintf);
 int __d_vfprintf (FILE * stream, const char *fmt, va_list ap) { return vfprintf(stream, fmt, ap); }
 #endif
 #endif
-
-#endif	/* PRINTF_LEVEL > PRINTF_MIN */
