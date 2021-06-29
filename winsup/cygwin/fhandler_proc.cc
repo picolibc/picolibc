@@ -1165,6 +1165,14 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  ftcprint (features1,  0, "aperfmperf");   /* P state hw coord fb */
 	}
 
+      /* cpuid 0x80000007 edx Advanced power management */
+      if (maxe >= 0x80000007)
+	{
+	  cpuid (&unused, &unused, &unused, &features2, 0x80000007);
+
+	  ftcprint (features2, 14, "rapl"); /* runtime avg power limit */
+	}
+
       /* Penwell, Cloverview, ... TSC doesn't sleep on S3 */
       if (is_intel && family == 6)
 	switch (model)
