@@ -43,6 +43,18 @@
 #include "stdio_private.h"
 #include "scanf_private.h"
 
+#ifndef SCANF_LONGLONG
+# define SCANF_LONGLONG	(SCANF_FLOAT || defined(_WANT_IO_LONG_LONG))
+#endif
+
+#ifdef SCANF_LONGLONG
+typedef unsigned long long uint_scanf_t;
+typedef long long int_scanf_t;
+#else
+typedef unsigned long uint_scanf_t;
+typedef long int_scanf_t;
+#endif
+
 static int
 scanf_getc(FILE *stream, int *lenp)
 {
@@ -62,11 +74,15 @@ scanf_ungetc(int c, FILE *stream, int *lenp)
 }
 
 static void
-putval (void *addr, long val, uint16_t flags)
+putval (void *addr, int_scanf_t val, uint16_t flags)
 {
     if (!(flags & FL_STAR)) {
 	if (flags & FL_CHAR)
 	    *(char *)addr = val;
+#ifdef SCANF_LONGLONG
+        else if (flags & FL_LONGLONG)
+            *(long long *)addr = val;
+#endif
 	else if (flags & FL_LONG)
 	    *(long *)addr = val;
 	else if (flags & FL_SHORT)
@@ -76,8 +92,8 @@ putval (void *addr, long val, uint16_t flags)
     }
 }
 
-static unsigned long
-mulacc (unsigned long val, uint16_t flags, unsigned char c)
+static uint_scanf_t
+mulacc (uint_scanf_t val, uint16_t flags, unsigned char c)
 {
     unsigned char cnt;
 
@@ -97,7 +113,7 @@ mulacc (unsigned long val, uint16_t flags, unsigned char c)
 static unsigned char
 conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
 {
-    unsigned long val;
+    uint_scanf_t val;
     int i;
 
     i = scanf_getc (stream, lenp);			/* after scanf_ungetc()	*/
@@ -451,31 +467,40 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 
 	    switch (c) {
 	      case 'h':
-		if ((c = *fmt++) != 'h') {
-#ifdef _WANT_IO_C99_FORMATS
-		is_short:
-#endif
-		    flags |= FL_SHORT;
-		    break;
-		}
-		flags |= FL_CHAR;
+                flags |= FL_SHORT;
 		c = *fmt++;
+                if (c == 'h') {
+                    flags |= FL_CHAR;
+                    c = *fmt++;
+                }
 		break;
 	      case 'l':
-#ifdef _WANT_IO_C99_FORMATS
-	    is_long:
-#endif
 		flags |= FL_LONG;
 		c = *fmt++;
+#ifdef SCANF_LONGLONG
+                if (c == 'l') {
+                    flags |= FL_LONGLONG;
+                    c = *fmt++;
+                }
+#endif
 		break;
 #ifdef _WANT_IO_C99_FORMATS
+#ifdef SCANF_LONGLONG
+#define CHECK_LONGLONG(type)                                    \
+                else if (sizeof(type) == sizeof(long long))     \
+                    flags |= FL_LONGLONG
+#else
+#define CHECK_LONGLONG(type
+#endif
+
 #define CHECK_INT_SIZE(letter, type)				\
 	    case letter:					\
 		if (sizeof(type) != sizeof(int)) {		\
 		    if (sizeof(type) == sizeof(long))		\
-			goto is_long;				\
-		    if (sizeof(type) == sizeof(short))		\
-			goto is_short;				\
+			flags |= FL_LONG;                       \
+		    else if (sizeof(type) == sizeof(short))     \
+			flags |= FL_SHORT;                      \
+                    CHECK_LONGLONG(type);                       \
 		}						\
 		c = *fmt++;					\
 		break;

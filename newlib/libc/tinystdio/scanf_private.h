@@ -71,17 +71,18 @@ typedef unsigned int width_t;
 #define FL_STAR	    0x01	/* '*': skip assignment		*/
 #define FL_WIDTH    0x02	/* width is present		*/
 #define FL_LONG	    0x04	/* 'long' type modifier		*/
-#define FL_CHAR	    0x08	/* 'char' type modifier		*/
-#define FL_SHORT    0x10	/* 'short' type modifier	*/
-#define FL_OCT	    0x20	/* octal number			*/
-#define FL_DEC	    0x40	/* decimal number		*/
-#define FL_HEX	    0x80	/* hexidecimal number		*/
-#define FL_MINUS    0x100	/* minus flag (field or value)	*/
-#define FL_ANY	    0x200	/* any digit was read	        */
-#define FL_OVFL	    0x400	/* significand overflowed       */
-#define FL_DOT	    0x800	/* decimal '.' was	        */
-#define FL_MEXP	    0x1000 	/* exponent 'e' is neg.	        */
-#define FL_FHEX     0x2000      /* hex significand              */
+#define FL_LONGLONG 0x08        /* 'long long' type modifier    */
+#define FL_CHAR	    0x10	/* 'char' type modifier		*/
+#define FL_SHORT    0x20	/* 'short' type modifier	*/
+#define FL_OCT	    0x40	/* octal number			*/
+#define FL_DEC	    0x80	/* decimal number		*/
+#define FL_HEX	    0x100	/* hexidecimal number		*/
+#define FL_MINUS    0x200	/* minus flag (field or value)	*/
+#define FL_ANY	    0x400	/* any digit was read	        */
+#define FL_OVFL	    0x800	/* significand overflowed       */
+#define FL_DOT	    0x1000	/* decimal '.' was	        */
+#define FL_MEXP	    0x2000 	/* exponent 'e' is neg.	        */
+#define FL_FHEX     0x4000      /* hex significand              */
 
 #ifndef	__AVR_HAVE_LPMX__
 # if  defined(__AVR_ENHANCED__) && __AVR_ENHANCED__
