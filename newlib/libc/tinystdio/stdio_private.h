@@ -34,14 +34,12 @@
 #include <sys/lock.h>
 
 /* values for PRINTF_LEVEL */
-#define PRINTF_MIN 1
-#define PRINTF_STD 2
-#define PRINTF_FLT 3
+#define PRINTF_STD 1
+#define PRINTF_FLT 2
 
 /* values for SCANF_LEVEL */
-#define SCANF_MIN 1
-#define SCANF_STD 2
-#define SCANF_FLT 3
+#define SCANF_STD 1
+#define SCANF_FLT 2
 
 /* This is OR'd into the char stored in unget to make it non-zero to
  * flag the unget buffer as being full
