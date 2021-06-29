@@ -379,8 +379,8 @@ _VFWPRINTF_R (struct _reent *data,
 	register int n, m;	/* handy integers (short term usage) */
 	register wchar_t *cp;	/* handy char pointer (short term usage) */
 	register int flags;	/* flags as above */
-	wchar_t *fmt_anchor;    /* current format spec being processed */
 #ifndef _NO_POS_ARGS
+	wchar_t *fmt_anchor;    /* current format spec being processed */
 	int N;                  /* arg number */
 	int arg_index;          /* index into args processed directly */
 	int numargs;            /* number of varargs read */
@@ -642,7 +642,9 @@ _VFWPRINTF_R (struct _reent *data,
 		}
                 if (*fmt == L'\0')
                     goto done;
+#ifndef _NO_POS_ARGS
 		fmt_anchor = fmt;
+#endif
 		fmt++;		/* skip over '%' */
 
 		flags = 0;
