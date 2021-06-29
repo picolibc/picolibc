@@ -98,7 +98,7 @@ typedef int64_t printf_float_int_t;
 # define PRINTF_LONGLONG	((PRINTF_LEVEL >= PRINTF_FLT) || defined(_WANT_IO_LONG_LONG))
 #endif
 
-#ifdef PRINTF_LONGLONG
+#if PRINTF_LONGLONG
 typedef unsigned long long ultoa_unsigned_t;
 typedef long long ultoa_signed_t;
 #define SIZEOF_ULTOA __SIZEOF_LONG_LONG__
