@@ -79,15 +79,6 @@ main(int argc, char **argv)
 	char	buf[256];
 	int	errors = 0;
 
-        float v;
-        double dv;
-
-#define STR "0x1.7a27cc3ed6cf7p+124"
-        sscanf(STR, "%f", &v);
-        printf("%s = %.17e %.17a\n", STR, printf_float(v), printf_float(v));
-        sscanf(STR, "%lf", &dv);
-        printf("%s = %.17e %.17a\n", STR, printf_float(dv), printf_float(dv));
-
 #if 0
 	double	a;
 
@@ -153,32 +144,45 @@ main(int argc, char **argv)
 			}
 		}
 	}
-	for (x = 0; x < 32; x++) {
-		unsigned int v = 0x12345678 >> x;
-		unsigned int r;
 
-		sprintf(buf, "%u", v);
-		sscanf(buf, "%u", &r);
-		if (v != r) {
-			printf("\t%3d: wanted %u got %u\n", x, v, r);
-			errors++;
-			fflush(stdout);
-		}
-		sprintf(buf, "%x", v);
-		sscanf(buf, "%x", &r);
-		if (v != r) {
-			printf("\t%3d: wanted %u got %u\n", x, v, r);
-			errors++;
-			fflush(stdout);
-		}
-		sprintf(buf, "%o", v);
-		sscanf(buf, "%o", &r);
-		if (v != r) {
-			printf("\t%3d: wanted %u got %u\n", x, v, r);
-			errors++;
-			fflush(stdout);
-		}
+#define FMT(prefix,conv) "%" prefix conv
+
+#define VERIFY(prefix, conv) do {                                       \
+        sprintf(buf, FMT(prefix, conv), v);                             \
+        sscanf(buf, FMT(prefix, conv), &r);                             \
+        if (v != r) {                                                   \
+                printf("\t%3d: " prefix " " conv " wanted " FMT(prefix, conv) " got " FMT(prefix, conv) "\n", x, v, r); \
+                errors++;                                               \
+                fflush(stdout);                                         \
+        }                                                               \
+} while(0)
+
+#define CHECK_RT(type, prefix) do {                                     \
+        for (x = 0; x < sizeof(type) * 8; x++) {                        \
+                type v = (type) (0x123456789abcdef0LL >> (64 - sizeof(type) * 8)) >> x; \
+                type r;                                                 \
+                VERIFY(prefix, "d");                                    \
+                VERIFY(prefix, "u");                                    \
+                VERIFY(prefix, "x");                                    \
+                VERIFY(prefix, "o");                                    \
+        }                                                               \
+        } while(0)
+
+	CHECK_RT(unsigned char, "hh");
+	CHECK_RT(unsigned short, "h");
+        CHECK_RT(unsigned int, "");
+        CHECK_RT(unsigned long, "l");
+#if defined(_WANT_IO_LONG_LONG) || defined(TINY_STDIO)
+        CHECK_RT(unsigned long long, "ll");
+#endif
+#if !defined(_WANT_IO_LONG_LONG) && !defined(TINY_STDIO)
+	if (sizeof(intmax_t) <= sizeof(long))
+#endif
+	{
+	        CHECK_RT(intmax_t, "j");
 	}
+        CHECK_RT(size_t, "z");
+        CHECK_RT(ptrdiff_t, "t");
 
 #if defined(TINY_STDIO) || !defined(NO_FLOATING_POINT)
 #ifdef PICOLIBC_FLOAT_PRINTF_SCANF
