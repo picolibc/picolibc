@@ -97,6 +97,22 @@ sync has not been difficult so far.
 
 ## Releases
 
+### Picolibc version 1.7
+
+ 1. Merge libc and libm into a single library. Having them split
+    doesn't offer any advantages while requiring that applications add
+    '-lm' to link successfully. Having them merged allows use of libm
+    calls from libc code.
+
+ 2. Add hex float format to *printf, *scanf and strto{d,f,ld}. This is
+    required for C99 support.
+
+ 3. Unify strto{d,f,ld} and *scanf floating point parsing code. This
+    ensures that the library is consistent in how floats are parsed.
+
+ 4. Make strto{d,f,ld} set errno to ERANGE on overflow/underflow,
+    including when the result is a subnormal number.
+
 ### Picolibc version 1.6.2
 
  1. Change `restrict` keyword in published headers to `__restrict` to
