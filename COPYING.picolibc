@@ -762,28 +762,14 @@ Files: meson.build
 Copyright: 2019-2021 Keith Packard
 License: BSD3-1
 
-Files: newlib/libc/machine/aarch64/meson.build
- newlib/libm/machine/aarch64/meson.build
-Copyright: 2019 Keith Packard,
- 2020 Anthony Anderson
-License: BSD3-1
-
-Files: newlib/libc/machine/arm/machine/math.h
-Copyright: 2020 Keith Packard
- 2017 embedded brains GmbH.
- 2011, 2012 ARM Ltd.
-License: BSD3-1
-
-Files: newlib/libc/machine/powerpc/meson.build
-Copyright: 2019 Ash Logan, Keith Packard
-License: BSD3-1
-
-Files: newlib/libc/machine/shared_x86/meson.build
+Files: newlib/empty.c
+ newlib/libc/machine/shared_x86/meson.build
  newlib/libc/machine/shared_x86/sys/meson.build
  newlib/libc/machine/xtensa/machine/meson.build
  newlib/libc/stdlib/pico-atexit.c
  newlib/libc/stdlib/pico-exit.c
  newlib/libc/stdlib/pico-onexit.c
+ newlib/libc/tinystdio/atold_engine.c
  newlib/libc/tinystdio/matchcaseprefix.c
  newlib/libc/tinystdio/strfromd.c
  newlib/libc/tinystdio/strfromf.c
@@ -808,6 +794,22 @@ Files: newlib/libc/machine/shared_x86/meson.build
  test/timegm.c
  test/timegm.h
 Copyright: 2021 Keith Packard
+License: BSD3-1
+
+Files: newlib/libc/machine/aarch64/meson.build
+ newlib/libm/machine/aarch64/meson.build
+Copyright: 2019 Keith Packard,
+ 2020 Anthony Anderson
+License: BSD3-1
+
+Files: newlib/libc/machine/arm/machine/math.h
+Copyright: 2020 Keith Packard
+ 2017 embedded brains GmbH.
+ 2011, 2012 ARM Ltd.
+License: BSD3-1
+
+Files: newlib/libc/machine/powerpc/meson.build
+Copyright: 2019 Ash Logan, Keith Packard
 License: BSD3-1
 
 Files: newlib/libc/machine/xtensa/meson.build
@@ -1900,6 +1902,8 @@ License: BSD3-31
 
 Files: newlib/libc/tinystdio/atod_engine.c
  newlib/libc/tinystdio/atof_engine.c
+ newlib/libc/tinystdio/conv_flt.c
+ newlib/libc/tinystdio/scanf_private.h
  newlib/libc/tinystdio/vfscanf.c
 Copyright: 2002,2004,2005 Joerg Wunsch
  2008  Dmitry Xmelkov
