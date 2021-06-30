@@ -45,7 +45,7 @@ iconv_test_c_args = ['-DTEST_NLSPATH="' + meson.current_build_dir() + '"']
 foreach target : targets
   value = get_variable('target_' + target)
 
-  _libs = [get_variable('lib_m' + target), get_variable('lib_c' + target)]
+  _libs = [get_variable('lib_c' + target)]
   if is_variable('lib_semihost' + target)
     _libs += [get_variable('lib_semihost' + target)]
   endif

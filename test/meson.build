@@ -35,7 +35,7 @@
 foreach target : targets
   value = get_variable('target_' + target)
 
-  _libs_base = [get_variable('lib_m' + target), get_variable('lib_c' + target)]
+  _libs_base = [get_variable('lib_c' + target)]
   if is_variable('lib_semihost' + target)
     _libs_base += [get_variable('lib_semihost' + target)]
   endif
