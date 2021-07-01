@@ -1797,17 +1797,17 @@
 #define OR1K_SPR_IMMU_ITLBW_TR_D_GET(X) (((X) >> 5) & 0x1)
 #define OR1K_SPR_IMMU_ITLBW_TR_D_SET(X, Y) (((X) & OR1K_UNSIGNED(0xffffffdf)) | ((!!(Y)) << 5))
 
-/* User Execute Enable */
-#define OR1K_SPR_IMMU_ITLBW_TR_UXE_OFFSET 6
-#define OR1K_SPR_IMMU_ITLBW_TR_UXE_MASK   0x00000040
-#define OR1K_SPR_IMMU_ITLBW_TR_UXE_GET(X) (((X) >> 6) & 0x1)
-#define OR1K_SPR_IMMU_ITLBW_TR_UXE_SET(X, Y) (((X) & OR1K_UNSIGNED(0xffffffbf)) | ((!!(Y)) << 6))
-
 /* Supervisor Execute Enable */
-#define OR1K_SPR_IMMU_ITLBW_TR_SXE_OFFSET 7
-#define OR1K_SPR_IMMU_ITLBW_TR_SXE_MASK   0x00000080
-#define OR1K_SPR_IMMU_ITLBW_TR_SXE_GET(X) (((X) >> 7) & 0x1)
-#define OR1K_SPR_IMMU_ITLBW_TR_SXE_SET(X, Y) (((X) & OR1K_UNSIGNED(0xffffff7f)) | ((!!(Y)) << 7))
+#define OR1K_SPR_IMMU_ITLBW_TR_SXE_OFFSET 6
+#define OR1K_SPR_IMMU_ITLBW_TR_SXE_MASK   0x00000040
+#define OR1K_SPR_IMMU_ITLBW_TR_SXE_GET(X) (((X) >> 6) & 0x1)
+#define OR1K_SPR_IMMU_ITLBW_TR_SXE_SET(X, Y) (((X) & OR1K_UNSIGNED(0xffffffbf)) | ((!!(Y)) << 6))
+
+/* User Execute Enable */
+#define OR1K_SPR_IMMU_ITLBW_TR_UXE_OFFSET 7
+#define OR1K_SPR_IMMU_ITLBW_TR_UXE_MASK   0x00000080
+#define OR1K_SPR_IMMU_ITLBW_TR_UXE_GET(X) (((X) >> 7) & 0x1)
+#define OR1K_SPR_IMMU_ITLBW_TR_UXE_SET(X, Y) (((X) & OR1K_UNSIGNED(0xffffff7f)) | ((!!(Y)) << 7))
 
 /* Physical Page Number */
 #define OR1K_SPR_IMMU_ITLBW_TR_PPN_LSB    13
