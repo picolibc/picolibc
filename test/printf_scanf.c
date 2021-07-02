@@ -144,38 +144,47 @@ main(int argc, char **argv)
 			}
 		}
 	}
-	for (x = 0; x < 32; x++) {
-		unsigned int v = 0x12345678 >> x;
-		unsigned int r;
 
-		sprintf(buf, "%u", v);
-		sscanf(buf, "%u", &r);
-		if (v != r) {
-			printf("\t%3d: wanted %u got %u\n", x, v, r);
-			errors++;
-			fflush(stdout);
-		}
-		sprintf(buf, "%x", v);
-		sscanf(buf, "%x", &r);
-		if (v != r) {
-			printf("\t%3d: wanted %u got %u\n", x, v, r);
-			errors++;
-			fflush(stdout);
-		}
-		sprintf(buf, "%o", v);
-		sscanf(buf, "%o", &r);
-		if (v != r) {
-			printf("\t%3d: wanted %u got %u\n", x, v, r);
-			errors++;
-			fflush(stdout);
-		}
+#define FMT(prefix,conv) "%" prefix conv
+
+#define VERIFY(prefix, conv) do {                                       \
+        sprintf(buf, FMT(prefix, conv), v);                             \
+        sscanf(buf, FMT(prefix, conv), &r);                             \
+        if (v != r) {                                                   \
+                printf("\t%3d: " prefix " " conv " wanted " FMT(prefix, conv) " got " FMT(prefix, conv) "\n", x, v, r); \
+                errors++;                                               \
+                fflush(stdout);                                         \
+        }                                                               \
+} while(0)
+
+#define CHECK_RT(type, prefix) do {                                     \
+        for (x = 0; x < sizeof(type) * 8; x++) {                        \
+                type v = (type) (0x123456789abcdef0LL >> (64 - sizeof(type) * 8)) >> x; \
+                type r;                                                 \
+                VERIFY(prefix, "d");                                    \
+                VERIFY(prefix, "u");                                    \
+                VERIFY(prefix, "x");                                    \
+                VERIFY(prefix, "o");                                    \
+        }                                                               \
+        } while(0)
+
+	CHECK_RT(unsigned char, "hh");
+	CHECK_RT(unsigned short, "h");
+        CHECK_RT(unsigned int, "");
+        CHECK_RT(unsigned long, "l");
+#if defined(_WANT_IO_LONG_LONG) || defined(TINY_STDIO)
+        CHECK_RT(unsigned long long, "ll");
+#endif
+#if !defined(_WANT_IO_LONG_LONG) && !defined(TINY_STDIO)
+	if (sizeof(intmax_t) <= sizeof(long))
+#endif
+	{
+	        CHECK_RT(intmax_t, "j");
 	}
+        CHECK_RT(size_t, "z");
+        CHECK_RT(ptrdiff_t, "t");
 
 #if defined(TINY_STDIO) || !defined(NO_FLOATING_POINT)
-	for (x = -37; x <= 37; x++)
-	{
-		int t;
-		for (t = 0; t < sizeof(test_vals)/sizeof(test_vals[0]); t++) {
 #ifdef PICOLIBC_FLOAT_PRINTF_SCANF
 #define float_type float
 #define pow(a,b) powf((float) a, (float) b)
@@ -195,9 +204,13 @@ main(int argc, char **argv)
 #define ERROR_MAX 0
 #endif
 #endif
+	for (x = -37; x <= 37; x++)
+	{
+                float_type r;
+		int t;
+		for (t = 0; t < sizeof(test_vals)/sizeof(test_vals[0]); t++) {
 
 			float_type v = (float_type) test_vals[t] * pow(10.0, (float_type) x);
-			float_type r;
 			float_type e;
 
 			sprintf(buf, "%.55f", printf_float(v));
@@ -233,7 +246,42 @@ main(int argc, char **argv)
 				errors++;
 				fflush(stdout);
 			}
+
+#ifdef _WANT_IO_C99_FORMATS
+			sprintf(buf, "%.20a", printf_float(v));
+			sscanf(buf, scanf_format, &r);
+			e = fabs(v-r) / v;
+			if (e > (float_type) ERROR_MAX)
+			{
+				printf("\tg %3d: wanted %.7e got %.7e (error %.7e, buf %s)\n", x,
+				       printf_float(v), printf_float(r), printf_float(e), buf);
+				errors++;
+				fflush(stdout);
+			}
+#endif
+
 		}
+#ifdef _WANT_IO_C99_FORMATS
+                sprintf(buf, "0x0.0p%+d", x);
+                sscanf(buf, scanf_format, &r);
+                if (r != (float_type) 0.0)
+                {
+                    printf("\tg %3d: wanted 0.0 got %.7e (buf %s)\n", x,
+                           printf_float(r), buf);
+                    errors++;
+                    fflush(stdout);
+                }
+
+                sprintf(buf, "0x1p%+d", x);
+                sscanf(buf, scanf_format, &r);
+                if (r != (float_type) ldexp(1.0, x))
+                {
+                    printf("\tg %3d: wanted 1 got %.7e (buf %s)\n", x,
+                           printf_float(r), buf);
+                    errors++;
+                    fflush(stdout);
+                }
+#endif
 	}
 #endif
 	fflush(stdout);

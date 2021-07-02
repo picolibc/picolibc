@@ -85,32 +85,33 @@ Here's an example program to experiment with these options:
 
 Now we can build and run it with the default options:
 
-	$ riscv64-unknown-elf-gcc -Os -march=rv32imac -mabi=ilp32 --specs=picolibc.specs --oslib=semihost -Wl,--defsym=__flash=0x80000000 -Wl,--defsym=__flash_size=0x00200000 -Wl,--defsym=__ram=0x80200000 -Wl,--defsym=__ram_size=0x200000 -o printf.elf printf.c
-	$ riscv64-unknown-elf-size printf.elf
+	$ arm-none-eabi-gcc -Os -march=armv7-m --specs=picolibc.specs --oslib=semihost --crt0=hosted -Wl,--defsym=__flash=0 -Wl,--defsym=__flash_size=0x00200000 -Wl,--defsym=__ram=0x20000000 -Wl,--defsym=__ram_size=0x200000 -o printf.elf printf.c
+	$ arm-none-eabi-size printf.elf
 	   text	   data	    bss	    dec	    hex	filename
-	   8998	     24	      8	   9030	   2346	printf.elf
-	$ qemu-system-riscv32 -chardev stdio,mux=on,id=stdio0 -semihosting-config enable=on,chardev=stdio0 -monitor none -serial none -machine virt,accel=tcg -kernel printf.elf -nographic -bios none
+           7920	     80	   2056	  10056	   2748	printf.elf
+	$ qemu-system-arm -chardev stdio,id=stdio0 -semihosting-config enable=on,chardev=stdio0 -monitor none -serial none -machine mps2-an385,accel=tcg -kernel printf.elf -nographic
 	 2⁶¹ = 2305843009213693952 π ≃ 3.141592653589793
 
 Switching to float-only reduces the size but lets this still work,
 although the floating point value has reduced precision:
 
-	$ riscv64-unknown-elf-gcc -DPICOLIBC_FLOAT_PRINTF_SCANF -Os -march=rv32imac -mabi=ilp32 --specs=picolibc.specs --oslib=semihost -Wl,--defsym=__flash=0x80000000 -Wl,--defsym=__flash_size=0x00200000 -Wl,--defsym=__ram=0x80200000 -Wl,--defsym=__ram_size=0x200000 -o printf-float.elf printf.c
-	$ riscv64-unknown-elf-size printf-float.elf
+	$ arm-none-eabi-gcc -DPICOLIBC_FLOAT_PRINTF_SCANF -Os -march=armv7-m --specs=picolibc.specs --oslib=semihost --crt0=hosted -Wl,--defsym=__flash=0 -Wl,--defsym=__flash_size=0x00200000 -Wl,--defsym=__ram=0x20000000 -Wl,--defsym=__ram_size=0x200000 -o printf-float.elf printf.c
+	$ arm-none-eabi-size printf-float.elf
 	   text	   data	    bss	    dec	    hex	filename
-	   6214	     24	      8	   6246	   1866	printf-float.elf
-	$ qemu-system-riscv32 -chardev stdio,mux=on,id=stdio0 -semihosting-config enable=on,chardev=stdio0 -monitor none -serial none -machine virt,accel=tcg -kernel printf-float.elf -nographic -bios none
+           6360	     80	   2056	   8496	   2130	printf-float.elf
+
+	$ qemu-system-arm -chardev stdio,id=stdio0 -semihosting-config enable=on,chardev=stdio0 -monitor none -serial none -machine mps2-an385,accel=tcg -kernel printf-float.elf -nographic
 	 2⁶¹ = 2305843009213693952 π ≃ 3.1415927
 
 Going to integer-only reduces the size even further, but now it doesn't output
 the values correctly:
 
-	$ riscv64-unknown-elf-gcc -DPICOLIBC_INTEGER_PRINTF_SCANF -Os -march=rv32imac -mabi=ilp32 --specs=picolibc.specs --oslib=semihost -Wl,--defsym=__flash=0x80000000 -Wl,--defsym=__flash_size=0x00200000 -Wl,--defsym=__ram=0x80200000 -Wl,--defsym=__ram_size=0x200000 -o printf-int.elf printf.c
-	$ riscv64-unknown-elf-size printf-int.elf
+	$ arm-none-eabi-gcc -DPICOLIBC_INTEGER_PRINTF_SCANF -Os -march=armv7-m --specs=picolibc.specs --oslib=semihost --crt0=hosted -Wl,--defsym=__flash=0 -Wl,--defsym=__flash_size=0x00200000 -Wl,--defsym=__ram=0x20000000 -Wl,--defsym=__ram_size=0x200000 -o printf-int.elf printf.c
+	$ arm-none-eabi-size printf-int.elf
 	   text	   data	    bss	    dec	    hex	filename
-	   2266	     24	      8	   2298	    8fa	printf-int.elf
-	$ qemu-system-riscv32 -chardev stdio,mux=on,id=stdio0 -semihosting-config enable=on,chardev=stdio0 -monitor none -serial none -machine virt,accel=tcg -kernel printf-int.elf -nographic -bios none
-	 2⁶¹ = 0 π ≃ *float*
+           1872	     80	   2056	   4552	   11c8	printf-int.elf
+	$ qemu-system-arm -chardev stdio,id=stdio0 -semihosting-config enable=on,chardev=stdio0 -monitor none -serial none -machine mps2-an385,accel=tcg -kernel printf-int.elf -nographic
+         2⁶¹ = 0 π ≃ *float*
 
 ## Picolibc build options for printf and scanf options 
 
@@ -119,9 +120,10 @@ number of picolibc build-time options to control the feature set (and
 hence the size) of the library:
 
  * `-Dio-c99-formats=true` This option controls whether support for
-   the C99 type-specific format modifiers 'j', 'z' and 't' is included
-   in the library. Support for the C99 format specifiers like PRId8 is
-   always provided.  This option is enabled by default.
+   the C99 type-specific format modifiers 'j', 'z' and 't' and the hex
+   float format 'a' are included in the library. Support for the C99
+   format specifiers like PRId8 is always provided.  This option is
+   enabled by default.
 
  * `-Dio-long-long=true` This option controls whether support for long
    long types is included in the integer-only version of printf and
@@ -141,10 +143,11 @@ hence the size) of the library:
    make them re-entrant. Without this option, multiple threads using
    getc and ungetc may corrupt the state of the input buffer.
 
-For even more printf and scanf functionality, picolibc can be compiled
-with the original newlib stdio code. That greatly increases the code
-and data sizes of the library, including adding a requirement for heap
-support in the run time system. Here are the picolibc build options for that code:
+For compatibility with newlib printf and scanf functionality, picolibc
+can be compiled with the original newlib stdio code. That greatly
+increases the code and data sizes of the library, including adding a
+requirement for heap support in the run time system. Here are the
+picolibc build options for that code:
 
  * `-Dtinystdio=false` This disables the tinystdio code and uses
    original newlib stdio code.
@@ -161,3 +164,28 @@ support in the run time system. Here are the picolibc build options for that cod
    to use 64 bit values for file sizes and offsets. It also adds
    64-bit versions of stdio interfaces which are defined with types
    which may be 32-bits (like 'long'). This option is enabled by default.
+
+### Newlib floating point printf
+
+To build the `printf` sample program using the original newlib stdio
+code, the first step is to build picolibc with the right options.  The
+'nano' printf code doesn't support long-long integer output, so we
+can't use that, and we need to enable long-long and floating point
+support in the full newlib stdio code:
+
+        $ mkdir build-arm; cd build-arm
+        $ ../scripts/do-arm-configure -Dtinystdio=false -Dio-long-long=true -Dnewlib-io-float=true
+        $ ninja install
+
+Now we can build the example with the library:
+
+        $ arm-none-eabi-gcc -Os -march=armv7-m --specs=picolibc.specs --oslib=semihost --crt0=hosted -Wl,--defsym=__flash=0 -Wl,--defsym=__flash_size=0x00200000 -Wl,--defsym=__ram=0x20000000 -Wl,--defsym=__ram_size=0x200000 -o printf.elf printf.c
+	$ arm-none-eabi-size printf.elf
+           text	   data	    bss	    dec	    hex	filename
+          16008	    824	   2376	  19208	   4b08	printf.elf
+        $ qemu-system-arm -chardev stdio,id=stdio0 -semihosting-config enable=on,chardev=stdio0 -monitor none -serial none -machine mps2-an385,accel=tcg -kernel printf.elf -nographic
+         2⁶¹ = 2305843009213693952 π ≃ 3.1415926535897931
+
+This also uses 2332 bytes of space from the heap at runtime. Tinystdio
+saves 8088 bytes of text space and a total of 3396 bytes of data
+space.

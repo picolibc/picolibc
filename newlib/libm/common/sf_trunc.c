@@ -4,7 +4,7 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
@@ -18,37 +18,24 @@
 	float x;
 #endif
 {
-  __int32_t signbit, w, exponent_less_127;
+    int32_t ix = _asint32 (x);
+    int32_t mask;
+    int exp;
 
-  GET_FLOAT_WORD(w,x);
+    exp = _exponent32(ix) - 127;
 
-  /* Extract sign bit. */
-  signbit = w & 0x80000000;
-
-  /* Extract exponent field. */
-  exponent_less_127 = ((w & 0x7f800000) >> 23) - 127;
-
-  if (exponent_less_127 < 23)
-    {
-      if (exponent_less_127 < 0)
-        {
-          /* -1 < x < 1, so result is +0 or -0. */
-          SET_FLOAT_WORD(x, signbit);
-        }
-      else
-        {
-          SET_FLOAT_WORD(x, signbit | (w & ~(0x007fffff >> exponent_less_127)));
-        }
-    }
-  else
-    {
-      if (exponent_less_127 == 128)
-        /* x is NaN or infinite. */
+    if (unlikely(exp == 128))
         return x + x;
 
-      /* All bits in the fraction field are relevant. */
-    }
-  return x;
+    /* compute portion of value with useful bits */
+    if (exp < 0)
+        /* less than one, save sign bit */
+        mask = 0x80000000;
+    else
+        /* otherwise, save sign, exponent and any useful bits */
+        mask = ~(0x007fffff >> exp);
+
+    return _asfloat(ix & mask);
 }
 
 #ifdef _DOUBLE_IS_32BITS
@@ -60,7 +47,7 @@
 	double x;
 #endif
 {
-	return (double) truncf((float) x);
+    return (double) truncf((float) x);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

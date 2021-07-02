@@ -225,9 +225,6 @@ void* __malloc_sbrk_aligned(size_t s)
 {
     char *p, *align_p;
 
-    if (__malloc_sbrk_start == NULL)
-	__malloc_sbrk_start = sbrk(0);
-
 #ifdef __APPLE__
     /* Mac OS X 'emulates' sbrk, but the
      * parameter is int, not intptr_t or ptrdiff_t,
@@ -269,6 +266,8 @@ void* __malloc_sbrk_aligned(size_t s)
             return (void *) -1;
 	__malloc_sbrk_top = extra + adjust;
     }
+    if (__malloc_sbrk_start == NULL)
+	__malloc_sbrk_start = align_p;
 
     return align_p;
 }

@@ -654,8 +654,8 @@ _VFPRINTF_R (struct _reent *data,
 	register int n, m;	/* handy integers (short term usage) */
 	register char *cp;	/* handy char pointer (short term usage) */
 	register int flags;	/* flags as above */
-	char *fmt_anchor;       /* current format spec being processed */
 #ifndef _NO_POS_ARGS
+	char *fmt_anchor;       /* current format spec being processed */
 	int N;                  /* arg number */
 	int arg_index;          /* index into args processed directly */
 	int numargs;            /* number of varargs read */
@@ -919,7 +919,9 @@ _VFPRINTF_R (struct _reent *data,
                 if (*fmt == '\0')
                     goto done;
 #endif
+#ifndef _NO_POS_ARGS
 		fmt_anchor = fmt;
+#endif
 		fmt++;		/* skip over '%' */
 
 		flags = 0;

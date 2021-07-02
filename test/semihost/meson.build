@@ -72,7 +72,7 @@ command_line = 'command-line'
 foreach target : targets
   value = get_variable('target_' + target)
 
-  _libs = [get_variable('lib_m' + target), get_variable('lib_c' + target)]
+  _libs = [get_variable('lib_c' + target)]
   _libs += [get_variable('lib_semihost' + target)]
   if is_variable('lib_crt_hosted' + target)
     _libs += [get_variable('lib_crt_hosted'+ target)]

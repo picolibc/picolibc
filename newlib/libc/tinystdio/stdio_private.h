@@ -34,14 +34,12 @@
 #include <sys/lock.h>
 
 /* values for PRINTF_LEVEL */
-#define PRINTF_MIN 1
-#define PRINTF_STD 2
-#define PRINTF_FLT 3
+#define PRINTF_STD 1
+#define PRINTF_FLT 2
 
 /* values for SCANF_LEVEL */
-#define SCANF_MIN 1
-#define SCANF_STD 2
-#define SCANF_FLT 3
+#define SCANF_STD 1
+#define SCANF_FLT 2
 
 /* This is OR'd into the char stored in unget to make it non-zero to
  * flag the unget buffer as being full
@@ -174,6 +172,106 @@ __atod_engine(uint64_t m10, int e10);
 
 float
 __atof_engine(uint32_t m10, int e10);
+
+#ifdef __SIZEOF_INT128__
+typedef __uint128_t _u128;
+#define to_u128(x)              (x)
+#define from_u128(x)            (x)
+#define _u128_to_ld(a)          ((long double) (a))
+#define _u128_is_zero(a)        ((a) == 0)
+#define _u128_plus_64(a,b) ((a) + (b))
+#define _u128_plus(a,b) ((a) + (b))
+#define _u128_times_10(a) ((a) * 10)
+#define _u128_times_base(a,b)   ((a) * (b))
+#define _u128_to_ld(a) ((long double) (a))
+#define _u128_oflow(a)	((a) >= (((((_u128) 0xffffffffffffffffULL) << 64) | 0xffffffffffffffffULL) - 9 / 10))
+#define _u128_zero	(_u128) 0
+#else
+typedef struct {
+    uint64_t	hi, lo;
+} _u128;
+#define _u128_zero	(_u128) { 0, 0 }
+
+static inline _u128 to_u128(uint64_t x)
+{
+    _u128 a = { .hi = 0, .lo = x };
+    return a;
+}
+
+static inline uint64_t from_u128(_u128 a)
+{
+    return a.lo;
+}
+
+static inline long double
+_u128_to_ld(_u128 a)
+{
+    return (long double) a.hi * ((long double) (1LL << 32) * (long double) (1LL << 32)) + (long double) a.lo;
+}
+
+static inline bool
+_u128_is_zero(_u128 a)
+{
+    return a.hi == 0 && a.lo == 0;
+}
+
+static inline _u128
+_u128_plus_64(_u128 a, uint64_t b)
+{
+    _u128 v;
+
+    v.lo = a.lo + b;
+    v.hi = a.hi;
+    if (v.lo < a.lo)
+	v.hi++;
+    return v;
+}
+
+static inline _u128
+_u128_plus(_u128 a, _u128 b)
+{
+    _u128 v;
+
+    v.lo = a.lo + b.lo;
+    v.hi = a.hi + b.hi;
+    if (v.lo < a.lo)
+	v.hi++;
+    return v;
+}
+
+static inline _u128
+_u128_lshift(_u128 a, int amt)
+{
+    _u128	v;
+
+    v.lo = a.lo << amt;
+    v.hi = (a.lo >> (64 - amt)) | (a.hi << amt);
+    return v;
+}
+
+static inline _u128
+_u128_times_10(_u128 a)
+{
+    return _u128_plus(_u128_lshift(a, 3), _u128_lshift(a, 1));
+}
+
+static inline _u128
+_u128_times_base(_u128 a, int base)
+{
+    if (base == 10)
+        return _u128_times_10(a);
+    return _u128_lshift(a, 4);
+}
+
+static inline bool
+_u128_oflow(_u128 a)
+{
+    return a.hi >= (0xffffffffffffffffULL - 9) / 10;
+}
+#endif
+
+long double
+__atold_engine(_u128 m10, int e10);
 
 static inline uint16_t
 __non_atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v)

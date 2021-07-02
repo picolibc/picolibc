@@ -41,47 +41,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include "stdio_private.h"
+#include "scanf_private.h"
 
-#if	!defined (SCANF_LEVEL)
-#define SCANF_LEVEL SCANF_FLT
+#ifndef SCANF_LONGLONG
+# define SCANF_LONGLONG	(SCANF_FLOAT || defined(_WANT_IO_LONG_LONG))
 #endif
 
-#if	SCANF_LEVEL == SCANF_MIN
-# define SCANF_BRACKET	0
-# define SCANF_FLOAT	0
-#elif	SCANF_LEVEL == SCANF_STD
-# define SCANF_BRACKET	1
-# define SCANF_FLOAT	0
-int vfscanf (FILE * stream, const char *fmt, va_list ap) __attribute__((weak));
-#elif	SCANF_LEVEL == SCANF_FLT
-# define SCANF_BRACKET	1
-# define SCANF_FLOAT	1
+#ifdef SCANF_LONGLONG
+typedef unsigned long long uint_scanf_t;
+typedef long long int_scanf_t;
 #else
-# error	 "Not a known scanf level."
-#endif
-
-typedef unsigned int width_t;
-
-#define FL_STAR	    0x01	/* '*': skip assignment		*/
-#define FL_WIDTH    0x02	/* width is present		*/
-#define FL_LONG	    0x04	/* 'long' type modifier		*/
-#define FL_CHAR	    0x08	/* 'char' type modifier		*/
-#define FL_SHORT    0x10	/* 'short' type modifier	*/
-#define FL_OCT	    0x20	/* octal number			*/
-#define FL_DEC	    0x40	/* decimal number		*/
-#define FL_HEX	    0x80	/* hexidecimal number		*/
-#define FL_MINUS    0x100	/* minus flag (field or value)	*/
-
-#ifndef	__AVR_HAVE_LPMX__
-# if  defined(__AVR_ENHANCED__) && __AVR_ENHANCED__
-#  define __AVR_HAVE_LPMX__	1
-# endif
-#endif
-
-#ifndef	__AVR_HAVE_MOVW__
-# if  defined(__AVR_ENHANCED__) && __AVR_ENHANCED__
-#  define __AVR_HAVE_MOVW__	1
-# endif
+typedef unsigned long uint_scanf_t;
+typedef long int_scanf_t;
 #endif
 
 static int
@@ -103,11 +74,15 @@ scanf_ungetc(int c, FILE *stream, int *lenp)
 }
 
 static void
-putval (void *addr, long val, uint16_t flags)
+putval (void *addr, int_scanf_t val, uint16_t flags)
 {
     if (!(flags & FL_STAR)) {
 	if (flags & FL_CHAR)
 	    *(char *)addr = val;
+#ifdef SCANF_LONGLONG
+        else if (flags & FL_LONGLONG)
+            *(long long *)addr = val;
+#endif
 	else if (flags & FL_LONG)
 	    *(long *)addr = val;
 	else if (flags & FL_SHORT)
@@ -117,8 +92,8 @@ putval (void *addr, long val, uint16_t flags)
     }
 }
 
-static unsigned long
-mulacc (unsigned long val, uint16_t flags, unsigned char c)
+static uint_scanf_t
+mulacc (uint_scanf_t val, uint16_t flags, unsigned char c)
 {
     unsigned char cnt;
 
@@ -138,7 +113,7 @@ mulacc (unsigned long val, uint16_t flags, unsigned char c)
 static unsigned char
 conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
 {
-    unsigned long val;
+    uint_scanf_t val;
     int i;
 
     i = scanf_getc (stream, lenp);			/* after scanf_ungetc()	*/
@@ -215,12 +190,12 @@ conv_brk (FILE *stream, int *lenp, width_t width, char *addr, const char *fmt)
     unsigned char frange;
     unsigned char cabove;
     int i;
-    
+
     memset (msk, 0, sizeof(msk));
     fnegate = 0;
     frange = 0;
     cabove = 0;			/* init to avoid compiler warning	*/
-    
+
     for (i = 0; ; i++) {
 	unsigned char c = *fmt++;
 
@@ -236,9 +211,9 @@ conv_brk (FILE *stream, int *lenp, width_t width, char *addr, const char *fmt)
 		continue;
 	    }
 	}
-	
+
 	if (!frange) cabove = c;
-	
+
 	for (;;) {
 	    msk[c >> 3] |= 1 << (c & 7);
 	    if (c == cabove) break;
@@ -276,7 +251,7 @@ conv_brk (FILE *stream, int *lenp, width_t width, char *addr, const char *fmt)
 	if (addr) *addr++ = i;
 	fnegate = 0;
     } while (--width);
-    
+
     if (fnegate) {
 	return 0;
     } else {
@@ -287,190 +262,8 @@ conv_brk (FILE *stream, int *lenp, width_t width, char *addr, const char *fmt)
 #endif	/* SCANF_BRACKET */
 
 #if  SCANF_FLOAT
-
-#include "dtoa_engine.h"
-
-static const char pstr_nfinity[] = "nfinity";
-static const char pstr_an[] = "an";
-
-static unsigned char
-conv_flt (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
-{
-    UINTFLOAT uint;
-    int uintdigits = 0;
-    FLOAT flt;
-    int i;
-    const char *p;
-    int exp;
-
-    uint16_t flag;
-
-#define FL_ANY	    0x200	/* any digit was readed	*/
-#define FL_OVFL	    0x400	/* overflow was		*/
-#define FL_DOT	    0x800	/* decimal '.' was	*/
-#define FL_MEXP	    0x1000 	/* exponent 'e' is neg.	*/
-
-    i = scanf_getc (stream, lenp);		/* after scanf_ungetc()	*/
-
-    flag = 0;
-    switch ((unsigned char)i) {
-      case '-':
-        flag = FL_MINUS;
-	/* FALLTHROUGH */
-      case '+':
-	if (!--width || (i = scanf_getc (stream, lenp)) < 0)
-	    goto err;
-    }
-
-    switch (tolower (i)) {
-
-      case 'n':
-	p = pstr_an;
-	goto operate_pstr;
-
-      case 'i':
-	p = pstr_nfinity;
-      operate_pstr:
-        {
-	    unsigned char c;
-	    
-	    while ((c = *p++) != 0) {
-		if (!--width
-		    || (i = scanf_getc (stream, lenp)) < 0
-		    || ((unsigned char)tolower(i) != c
-			&& (scanf_ungetc (i, stream, lenp), 1)))
-		{	
-		    if (p == pstr_nfinity + 3)
-			break;
-		    goto err;
-		}
-	    }
-        }
-	flt = (p == pstr_an + 3) ? (FLOAT) NAN : (FLOAT) INFINITY;
-	break;
-
-      default:
-        exp = 0;
-	uint = 0;
-	do {
-
-	    unsigned char c = i - '0';
-    
-	    if (c <= 9) {
-		flag |= FL_ANY;
-		if (flag & FL_OVFL) {
-		    if (!(flag & FL_DOT))
-			exp += 1;
-		} else {
-		    if (flag & FL_DOT)
-			exp -= 1;
-		    uint = uint * 10 + c;
-		    if (uint) {
-			uintdigits++;
-#ifndef PICOLIBC_FLOAT_PRINTF_SCANF
-			if (flags & FL_LONG) {
-			    if (uintdigits > 16)
-				flag |= FL_OVFL;
-			}
-			else
-#endif
-			{
-			    if (uintdigits > 8)
-				flag |= FL_OVFL;
-			}
-		    }
-	        }
-
-	    } else if (c == (('.'-'0') & 0xff) && !(flag & FL_DOT)) {
-		flag |= FL_DOT;
-	    } else {
-		break;
-	    }
-	} while (--width && (i = scanf_getc (stream, lenp)) >= 0);
-    
-	if (!(flag & FL_ANY))
-	    goto err;
-    
-	if ((unsigned char)i == 'e' || (unsigned char)i == 'E')
-	{
-	    int expacc;
-
-	    if (!--width || (i = scanf_getc (stream, lenp)) < 0) goto err;
-	    switch ((unsigned char)i) {
-	      case '-':
-		flag |= FL_MEXP;
-		/* FALLTHROUGH */
-	      case '+':
-		if (!--width) goto err;
-		i = scanf_getc (stream, lenp);		/* test EOF will below	*/
-	    }
-
-	    if (!isdigit (i)) goto err;
-
-	    expacc = 0;
-	    do {
-		expacc = expacc * 10 + (i - '0');
-	    } while (--width && isdigit (i = scanf_getc(stream, lenp)));
-	    if (flag & FL_MEXP)
-		expacc = -expacc;
-	    exp += expacc;
-	}
-
-	if (width && i >= 0) scanf_ungetc (i, stream, lenp);
-
-	if (uint == 0) {
-	    flt = 0;
-	    break;
-	}
-
-#ifndef PICOLIBC_FLOAT_PRINTF_SCANF
-	if (flags & FL_LONG)
-	{
-		if ((uintdigits + exp <= -324) || (uint == 0)) {
-			// Number is less than 1e-324, which should be rounded down to 0; return +/-0.0.
-			flt = 0.0;
-			break;
-		}
-		if (uintdigits + exp >= 310) {
-			// Number is larger than 1e+309, which should be rounded to +/-Infinity.
-			flt = (FLOAT) INFINITY;
-			break;
-		}
-		flt = __atod_engine(uint, exp);
-	}
-	else
-#endif
-	{
-		if ((uintdigits + exp <= -46) || (uint == 0)) {
-			// Number is less than 1e-46, which should be rounded down to 0; return 0.0.
-			flt = (FLOAT) 0.0f;
-			break;
-		}
-		if (uintdigits + exp >= 40) {
-			// Number is larger than 1e+39, which should be rounded to +/-Infinity.
-			flt = (FLOAT) INFINITY;
-			break;
-		}
-		flt = (FLOAT) __atof_engine(uint, exp);
-	}
-	break;
-    } /* switch */
-
-    if (flag & FL_MINUS)
-	flt = -flt;
-    if (addr) {
-#ifndef PICOLIBC_FLOAT_PRINTF_SCANF
-	if (flags & FL_LONG)
-	    *((double *) addr) = flt;
-	else
-#endif
-	    *((float *) addr) = flt;
-    }
-    return 1;
-
-  err:
-    return 0;
-}
+#define FLT_STREAM      FILE
+#include "conv_flt.c"
 #endif	/* SCANF_FLOAT	*/
 
 static int skip_spaces (FILE *stream, int *lenp)
@@ -479,7 +272,7 @@ static int skip_spaces (FILE *stream, int *lenp)
     do {
 	if ((i = scanf_getc (stream, lenp)) < 0)
 	    return i;
-    } while (isspace (i));
+    } while (ISSPACE (i));
     scanf_ungetc (i, stream, lenp);
     return i;
 }
@@ -635,7 +428,7 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
        to the begin.	*/
     while ((c = *fmt++) != 0) {
 
-	if (isspace (c)) {
+	if (ISSPACE (c)) {
 	    skip_spaces (stream, lenp);
 
 	} else if (c != '%'
@@ -648,7 +441,7 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 		scanf_ungetc (i, stream, lenp);
 		break;
 	    }
-	
+
 	} else {
 	    flags = 0;
 
@@ -674,31 +467,40 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 
 	    switch (c) {
 	      case 'h':
-		if ((c = *fmt++) != 'h') {
-#ifdef _WANT_IO_C99_FORMATS
-		is_short:
-#endif
-		    flags |= FL_SHORT;
-		    break;
-		}
-		flags |= FL_CHAR;
+                flags |= FL_SHORT;
 		c = *fmt++;
+                if (c == 'h') {
+                    flags |= FL_CHAR;
+                    c = *fmt++;
+                }
 		break;
 	      case 'l':
-#ifdef _WANT_IO_C99_FORMATS
-	    is_long:
-#endif
 		flags |= FL_LONG;
 		c = *fmt++;
+#ifdef SCANF_LONGLONG
+                if (c == 'l') {
+                    flags |= FL_LONGLONG;
+                    c = *fmt++;
+                }
+#endif
 		break;
 #ifdef _WANT_IO_C99_FORMATS
+#ifdef SCANF_LONGLONG
+#define CHECK_LONGLONG(type)                                    \
+                else if (sizeof(type) == sizeof(long long))     \
+                    flags |= FL_LONGLONG
+#else
+#define CHECK_LONGLONG(type
+#endif
+
 #define CHECK_INT_SIZE(letter, type)				\
 	    case letter:					\
 		if (sizeof(type) != sizeof(int)) {		\
 		    if (sizeof(type) == sizeof(long))		\
-			goto is_long;				\
-		    if (sizeof(type) == sizeof(short))		\
-			goto is_short;				\
+			flags |= FL_LONG;                       \
+		    else if (sizeof(type) == sizeof(short))     \
+			flags |= FL_SHORT;                      \
+                    CHECK_LONGLONG(type);                       \
 		}						\
 		c = *fmt++;					\
 		break;
@@ -753,7 +555,7 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 
 		if (skip_spaces (stream, lenp) < 0)
 		    goto eof;
-		
+
 		switch (c) {
 
 		  case 's':
@@ -761,7 +563,7 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 		    do {
 			if ((i = scanf_getc (stream, lenp)) < 0)
 			    break;
-			if (isspace (i)) {
+			if (ISSPACE (i)) {
 			    scanf_ungetc (i, stream, lenp);
 			    break;
 			}

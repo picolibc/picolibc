@@ -326,6 +326,11 @@ strtod_l (const char *__restrict s00, char **__restrict se,
 					Bfree(bb);
 					}
 				ULtod(rv.i, bits, exp, i);
+#ifndef NO_ERRNO
+                                /* try to avoid the bug of testing an 8087 register value */
+                                if ((dword0(rv)&Exp_mask) == 0)
+                                    errno = ERANGE;
+#endif
 			  }}
 			goto ret;
 		  }
@@ -1238,7 +1243,7 @@ strtod_l (const char *__restrict s00, char **__restrict se,
 		dval(rv) *= dval(rv0);
 #ifndef NO_ERRNO
 		/* try to avoid the bug of testing an 8087 register value */
-		if (dword0(rv) == 0 && dword1(rv) == 0)
+		if ((dword0(rv) & Exp_mask) == 0)
 			errno = ERANGE;
 #endif
 		}
@@ -1281,6 +1286,28 @@ strtold (const char * nptr, char ** endptr)
 #endif
 #endif
 
+/*
+ * These two functions are not quite correct as they return true for
+ * zero, however they are 'good enough' for the test in strtof below
+ * as we only need to know whether the double test is false when
+ * the float test is true.
+ */
+static inline int
+isdenorm(double d)
+{
+    U u;
+    dval(u) = d;
+    return (dword0(u) & Exp_mask) == 0;
+}
+
+static inline int
+isdenormf(float f)
+{
+    union { float f; __uint32_t i; } u;
+    u.f = f;
+    return (u.i & 0x7f800000) == 0;
+}
+
 float
 strtof (const char *__restrict s00,
 	char **__restrict se)
@@ -1290,7 +1317,7 @@ strtof (const char *__restrict s00,
     return signbit (val) ? -nanf ("") : nanf ("");
   float retval = (float) val;
 #ifndef NO_ERRNO
-  if (isinf (retval) && !isinf (val))
+  if ((isinf (retval) && !isinf (val)) || (isdenormf(retval) && !isdenorm(val)))
     errno = ERANGE;
 #endif
   return retval;

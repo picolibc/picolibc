@@ -188,7 +188,7 @@
     /* 166: excluded for C */
     /* 167: excluded for C */
 #ifdef TINY_STDIO
-    result |= test(168, "(null)", "%s", NULL); 
+    result |= test(168, "(null)", "%s", NULL);
 #endif
     result |= test(169, "%%%%", "%s", "%%%%");
     result |= test(170, "4294967295", "%u", -1);
@@ -487,5 +487,26 @@
     result |= test(449, "  42", "%4jd", (intmax_t)42L);
     result |= test(450, "64", "%zu", sizeof c);
     result |= test(451, "12", "%td", (c+12) - c);
+#if defined(PICOLIBC_FLOAT_PRINTF_SCANF) && defined(TINY_STDIO)
+    result |= test(452, "0x1.000000p+0", "%a", (double) 0x1.0p+0f);
+    result |= test(453, "0x0.000002p-126", "%a", (double) 0x1.000000p-149f);
+    result |= test(454, "0x0.000000p+0", "%a", (double) 0.0f);
+    result |= test(455, "0x1.fffffep+126", "%a", (double) 0x1.fffffep+126f);
+    result |= test(456, "0x1.234564p-126", "%a", (double) 0x1.234564p-126f);
+    result |= test(457, "0x1.234566p-126", "%a", (double) 0x1.234566p-126f);
+#else
+#ifdef TINY_STDIO
+    result |= test(452, "0x1.0000000000000p+0", "%a", 0x1.0p+0);
+    result |= test(453, "0x0.0000000000001p-1022", "%a", 0x1.0000000000000p-1074);
+    result |= test(454, "0x0.0000000000000p+0", "%a", 0.0);
+#else
+    result |= test(452, "0x1p+0", "%a", 0x1.0p+0);
+    result |= test(453, "0x1p-1074", "%a", 0x1.0000000000000p-1074);
+    result |= test(454, "0x0p+0", "%a", 0.0);
+#endif
+    result |= test(455, "0x1.fffffffffffffp+1022", "%a", 0x1.fffffffffffffp+1022);
+    result |= test(456, "0x1.23456789abcdep-1022", "%a", 0x1.23456789abcdep-1022);
+    result |= test(457, "0x1.23456789abcdfp-1022", "%a", 0x1.23456789abcdfp-1022);
+#endif
 }
 #endif
