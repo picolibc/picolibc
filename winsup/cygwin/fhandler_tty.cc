@@ -1687,7 +1687,10 @@ fhandler_pty_slave::ioctl (unsigned int cmd, void *arg)
       break;
     case TIOCSWINSZ:
       if (get_ttyp ()->winsize.ws_row != ((struct winsize *) arg)->ws_row
-	  || get_ttyp ()->winsize.ws_col != ((struct winsize *) arg)->ws_col)
+	  || get_ttyp ()->winsize.ws_col != ((struct winsize *) arg)->ws_col
+	  || get_ttyp ()->winsize.ws_ypixel != ((struct winsize *) arg)->ws_ypixel
+	  || get_ttyp ()->winsize.ws_xpixel != ((struct winsize *) arg)->ws_xpixel
+	 )
 	{
 	  if (get_ttyp ()->pcon_activated && get_ttyp ()->pcon_pid)
 	    resize_pseudo_console ((struct winsize *) arg);
@@ -2279,7 +2282,10 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
       break;
     case TIOCSWINSZ:
       if (get_ttyp ()->winsize.ws_row != ((struct winsize *) arg)->ws_row
-	  || get_ttyp ()->winsize.ws_col != ((struct winsize *) arg)->ws_col)
+	  || get_ttyp ()->winsize.ws_col != ((struct winsize *) arg)->ws_col
+	  || get_ttyp ()->winsize.ws_ypixel != ((struct winsize *) arg)->ws_ypixel
+	  || get_ttyp ()->winsize.ws_xpixel != ((struct winsize *) arg)->ws_xpixel
+	 )
 	{
 	  if (get_ttyp ()->pcon_activated && get_ttyp ()->pcon_pid)
 	    resize_pseudo_console ((struct winsize *) arg);
