@@ -91,44 +91,51 @@ typedef int64_t printf_float_int_t;
 # error "Not a known printf level."
 #endif
 
-#ifndef PRINTF_LONGLONG
-# define PRINTF_LONGLONG	((PRINTF_LEVEL >= PRINTF_FLT) || defined(_WANT_IO_LONG_LONG))
+#if ((PRINTF_LEVEL >= PRINTF_FLT) || defined(_WANT_IO_LONG_LONG))
+#define PRINTF_LONGLONG
 #endif
 
-#if PRINTF_LONGLONG
+#ifdef PRINTF_LONGLONG
 typedef unsigned long long ultoa_unsigned_t;
 typedef long long ultoa_signed_t;
 #define SIZEOF_ULTOA __SIZEOF_LONG_LONG__
-#define PRINTF_BUF_SIZE 22
-#define arg_to_t(flags, _s_, _result_)	{				\
-	    if ((flags) & FL_LONG) {					\
-		if ((flags) & FL_REPD_TYPE)				\
-		    *(_result_) = va_arg(ap, _s_ long long);		\
-		else							\
-		    *(_result_) = va_arg(ap, _s_ long);			\
-	    } else if ((flags) & FL_SHORT) {				\
-		if ((flags) & FL_REPD_TYPE)				\
-		    *(_result_) = (_s_ char) va_arg(ap, _s_ int);	\
-		else							\
-		    *(_result_) = (_s_ short) va_arg(ap, _s_ int);	\
-	    } else {							\
-		*(_result_) = va_arg(ap, _s_ int);			\
-	    }								\
-	}
+#define arg_to_t(flags, _s_, _result_)                  \
+    if ((flags) & FL_LONG) {                            \
+        if ((flags) & FL_REPD_TYPE)                     \
+            (_result_) = va_arg(ap, _s_ long long);     \
+        else                                            \
+            (_result_) = va_arg(ap, _s_ long);          \
+    } else {                                            \
+        (_result_) = va_arg(ap, _s_ int);               \
+        if ((flags) & FL_SHORT) {                       \
+            if ((flags) & FL_REPD_TYPE)                 \
+                (_result_) = (_s_ char) (_result_);     \
+            else                                        \
+                (_result_) = (_s_ short) (_result_);    \
+        }                                               \
+    }
 #else
 typedef unsigned long ultoa_unsigned_t;
 typedef long ultoa_signed_t;
 #define SIZEOF_ULTOA __SIZEOF_LONG__
+#define arg_to_t(flags, _s_, _result_)                  \
+    if ((flags) & FL_LONG) {                            \
+        (_result_) = va_arg(ap, _s_ long);              \
+    } else {                                            \
+        (_result_) = va_arg(ap, _s_ int);               \
+        if ((flags) & FL_SHORT) {                       \
+            if ((flags) & FL_REPD_TYPE)                 \
+                (_result_) = (_s_ char) (_result_);     \
+            else                                        \
+                (_result_) = (_s_ short) (_result_);    \
+        }                                               \
+    }
+#endif
+
+#if SIZEOF_ULTOA <= 4
 #define PRINTF_BUF_SIZE 11
-#define arg_to_t(flags, _s_, _result_)	{				\
-	    if ((flags) & FL_LONG) {					\
-		*(_result_) = va_arg(ap, _s_ long);			\
-	    } else if ((flags) & FL_SHORT) {				\
-		*(_result_) = (_s_ short) va_arg(ap, _s_ int);		\
-	    } else {							\
-		*(_result_) = va_arg(ap, _s_ int);			\
-	    }								\
-	}
+#else
+#define PRINTF_BUF_SIZE 22
 #endif
 
 // At the call site the address of the result_var is taken (e.g. "&ap")
@@ -171,14 +178,13 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
     int width;
     int prec;
     union {
-	unsigned char __buf[PRINTF_BUF_SIZE];	/* size for -1 in octal, without '\0'	*/
+	char __buf[PRINTF_BUF_SIZE];	/* size for -1 in octal, without '\0'	*/
 #if PRINTF_LEVEL >= PRINTF_FLT
 	struct dtoa __dtoa;
 #endif
     } u;
     const char * pnt;
     size_t size;
-    unsigned char len;
 
 #define buf	(u.__buf)
 #define _dtoa	(u.__dtoa)
@@ -260,42 +266,39 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    }
 
 	    if (c == 'l') {
-		if (flags & FL_LONG) {
-#ifdef _WANT_IO_C99_FORMATS
-		is_long_long:
-#endif
+#ifdef PRINTF_LONGLONG
+		if (flags & FL_LONG)
 		    flags |= FL_REPD_TYPE;
-		}
-#ifdef _WANT_IO_C99_FORMATS
-	    is_long:
 #endif
 		flags |= FL_LONG;
-		flags &= ~FL_SHORT;
 		continue;
 	    }
 
 	    if (c == 'h') {
 		if (flags & FL_SHORT)
 		    flags |= FL_REPD_TYPE;
-#ifdef _WANT_IO_C99_FORMATS
-	    is_short:
-#endif
 		flags |= FL_SHORT;
-		flags &= ~FL_LONG;
 		continue;
 	    }
 
 #ifdef _WANT_IO_C99_FORMATS
+
+#ifdef PRINTF_LONGLONG
+#define CHECK_LONGLONG(type) else if (sizeof(type) == sizeof(long long)) flags |= FL_LONG|FL_REPD_TYPE;
+#else
+#define CHECK_LONGLONG(type)
+#endif
+
 #define CHECK_INT_SIZE(letter, type)			\
 	    if (c == letter) {				\
 		if (sizeof(type) == sizeof(int))	\
-		    continue;				\
-		if (sizeof(type) == sizeof(long))	\
-		    goto is_long;			\
-		if (sizeof(type) == sizeof(long long))	\
-		    goto is_long_long;			\
-		if (sizeof(type) == sizeof(short))	\
-		    goto is_short;			\
+		    ;                                   \
+		else if (sizeof(type) == sizeof(long))	\
+		    flags |= FL_LONG;                   \
+                CHECK_LONGLONG(type)                    \
+		else if (sizeof(type) == sizeof(short))	\
+		    flags |= FL_SHORT;			\
+                continue;                               \
 	    }
 
 	    CHECK_INT_SIZE('j', intmax_t);
@@ -325,13 +328,14 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 #define CASE_CONVERT    ('a' - 'A')
 #define TOLOW(c)        ((c) | CASE_CONVERT)
 #define TOCASE(c)       ((c) - case_convert)
-#if PRINTF_LEVEL >= PRINTF_FLT
 
 	if ((TOLOW(c) >= 'e' && TOLOW(c) <= 'g')
 #ifdef _WANT_IO_C99_FORMATS
             || TOLOW(c) == 'a'
 #endif
-            ) {
+            )
+        {
+#if PRINTF_LEVEL >= PRINTF_FLT
             printf_float_t fval;        /* value to print */
             uint8_t sign;		/* sign character (or 0)	*/
             uint8_t ndigs;		/* number of digits to convert */
@@ -455,7 +459,6 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 
 	    if (_dtoa.flags & (DTOA_NAN | DTOA_INF))
 	    {
-		const char *p;
 		ndigs = sign ? 4 : 3;
 		if (width > ndigs) {
 		    width -= ndigs;
@@ -469,365 +472,370 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		}
 		if (sign)
 		    my_putc (sign, stream);
-		p = "inf";
+		pnt = "inf";
 		if (_dtoa.flags & DTOA_NAN)
-		    p = "nan";
-# if ('I'-'i' != 'N'-'n') || ('I'-'i' != 'F'-'f') || ('I'-'i' != 'A'-'a')
-#  error
-# endif
-		while ( (sign = *p) != 0) {
-		    my_putc (TOCASE(sign), stream);
-		    p++;
-		}
-		goto tail;
+		    pnt = "nan";
+		while ( (c = *pnt++) )
+		    my_putc (TOCASE(c), stream);
 	    }
+            else
+            {
 
-	    if (!(flags & (FL_FLTEXP|FL_FLTFIX))) {
+                if (!(flags & (FL_FLTEXP|FL_FLTFIX))) {
 
-		/* 'g(G)' format */
+                    /* 'g(G)' format */
 
-		/*
-		 * On entry to this block, prec is
-		 * the number of digits to display.
-		 *
-		 * On exit, prec is the number of digits
-		 * to display after the decimal point
-		 */
+                    /*
+                     * On entry to this block, prec is
+                     * the number of digits to display.
+                     *
+                     * On exit, prec is the number of digits
+                     * to display after the decimal point
+                     */
 
-		/* Always show at least one digit */
-		if (prec == 0)
-		    prec = 1;
+                    /* Always show at least one digit */
+                    if (prec == 0)
+                        prec = 1;
 
-		/*
-		 * Remove trailing zeros. The ryu code can emit them
-		 * when rounding to fewer digits than required for
-		 * exact output, the imprecise code often emits them
-		 */
-		while (ndigs > 0 && _dtoa.digits[ndigs-1] == '0')
-		    ndigs--;
+                    /*
+                     * Remove trailing zeros. The ryu code can emit them
+                     * when rounding to fewer digits than required for
+                     * exact output, the imprecise code often emits them
+                     */
+                    while (ndigs > 0 && _dtoa.digits[ndigs-1] == '0')
+                        ndigs--;
 
-		/* Save requested precision */
-		int req_prec = prec;
+                    /* Save requested precision */
+                    int req_prec = prec;
 
-		/* Limit output precision to ndigs unless '#' */
-		if (!(flags & FL_ALT))
-		    prec = ndigs;
+                    /* Limit output precision to ndigs unless '#' */
+                    if (!(flags & FL_ALT))
+                        prec = ndigs;
 
-		/*
-		 * Figure out whether to use 'f' or 'e' format. The spec
-		 * says to use 'f' if the exponent is >= -4 and < requested
-		 * precision.
-		 */
-		if (-4 <= exp && exp < req_prec)
-		{
-		    flags |= FL_FLTFIX;
+                    /*
+                     * Figure out whether to use 'f' or 'e' format. The spec
+                     * says to use 'f' if the exponent is >= -4 and < requested
+                     * precision.
+                     */
+                    if (-4 <= exp && exp < req_prec)
+                    {
+                        flags |= FL_FLTFIX;
 
-		    /* Compute how many digits to show after the decimal.
-		     *
-		     * If exp is negative, then we need to show that
-		     * many leading zeros plus the requested precision
-		     *
-		     * If exp is less than prec, then we need to show a
-		     * number of digits past the decimal point,
-		     * including (potentially) some trailing zeros
-		     *
-		     * (these two cases end up computing the same value,
-		     * and are both caught by the exp < prec test,
-		     * so they share the same branch of the 'if')
-		     *
-		     * If exp is at least 'prec', then we don't show
-		     * any digits past the decimal point.
-		     */
-		    if (exp < prec)
-			prec = prec - (exp + 1);
-		    else
-			prec = 0;
-		} else {
-		    /* Compute how many digits to show after the decimal */
-		    prec = prec - 1;
-		}
-	    }
-
-	    /* Conversion result length, width := free space length	*/
-	    if (flags & FL_FLTFIX)
-		n = (exp>0 ? exp+1 : 1);
-	    else {
-                n = 3;                  /* 1e+ */
-#ifdef _WANT_IO_C99_FORMATS
-                if (flags & FL_FLTHEX)
-                    n += 2;             /* or 0x1p+ */
-#endif
-		n += ndigs_exp;		/* add exponent */
-            }
-	    if (sign)
-		n += 1;
-	    if (prec)
-		n += prec + 1;
-	    else if (flags & FL_ALT)
-		n += 1;
-
-	    width = width > n ? width - n : 0;
-
-	    /* Output before first digit	*/
-	    if (!(flags & (FL_LPAD | FL_ZFILL))) {
-		while (width) {
-		    my_putc (' ', stream);
-		    width--;
-		}
-	    }
-	    if (sign)
-		my_putc (sign, stream);
-
-	    if (!(flags & FL_LPAD)) {
-		while (width) {
-		    my_putc ('0', stream);
-		    width--;
-		}
-	    }
-
-	    if (flags & FL_FLTFIX) {		/* 'f' format		*/
-		char out;
-
-		/* At this point, we should have
-		 *
-		 *	exp	exponent of leftmost digit in _dtoa.digits
-		 *	ndigs	number of buffer digits to print
-		 *	prec	number of digits after decimal
-		 *
-		 * In the loop, 'n' walks over the exponent value
-		 */
-		n = exp > 0 ? exp : 0;		/* exponent of left digit */
-		do {
-
-		    /* Insert decimal point at correct place */
-		    if (n == -1)
-			my_putc ('.', stream);
-
-		    /* Pull digits from buffer when in-range,
-		     * otherwise use 0
-		     */
-		    if (0 <= exp - n && exp - n < ndigs)
-			out = _dtoa.digits[exp - n];
-		    else
-			out = '0';
-		    if (--n < -prec) {
-			break;
-		    }
-		    my_putc (out, stream);
-		} while (1);
-		if (n == exp
-		    && (_dtoa.digits[0] > '5'
-		        || (_dtoa.digits[0] == '5' && !(_dtoa.flags & DTOA_CARRY))) )
-		{
-		    out = '1';
-		}
-		my_putc (out, stream);
-		if ((flags & FL_ALT) && n == -1)
-			my_putc('.', stream);
-	    } else {				/* 'e(E)' format	*/
-
-#ifdef _WANT_IO_C99_FORMATS
-                if ((flags & FL_FLTHEX)) {
-                    my_putc('0', stream);
-                    my_putc(TOCASE('x'), stream);
+                        /* Compute how many digits to show after the decimal.
+                         *
+                         * If exp is negative, then we need to show that
+                         * many leading zeros plus the requested precision
+                         *
+                         * If exp is less than prec, then we need to show a
+                         * number of digits past the decimal point,
+                         * including (potentially) some trailing zeros
+                         *
+                         * (these two cases end up computing the same value,
+                         * and are both caught by the exp < prec test,
+                         * so they share the same branch of the 'if')
+                         *
+                         * If exp is at least 'prec', then we don't show
+                         * any digits past the decimal point.
+                         */
+                        if (exp < prec)
+                            prec = prec - (exp + 1);
+                        else
+                            prec = 0;
+                    } else {
+                        /* Compute how many digits to show after the decimal */
+                        prec = prec - 1;
+                    }
                 }
+
+                /* Conversion result length, width := free space length	*/
+                if (flags & FL_FLTFIX)
+                    n = (exp>0 ? exp+1 : 1);
+                else {
+                    n = 3;                  /* 1e+ */
+#ifdef _WANT_IO_C99_FORMATS
+                    if (flags & FL_FLTHEX)
+                        n += 2;             /* or 0x1p+ */
+#endif
+                    n += ndigs_exp;		/* add exponent */
+                }
+                if (sign)
+                    n += 1;
+                if (prec)
+                    n += prec + 1;
+                else if (flags & FL_ALT)
+                    n += 1;
+
+                width = width > n ? width - n : 0;
+
+                /* Output before first digit	*/
+                if (!(flags & (FL_LPAD | FL_ZFILL))) {
+                    while (width) {
+                        my_putc (' ', stream);
+                        width--;
+                    }
+                }
+                if (sign)
+                    my_putc (sign, stream);
+
+                if (!(flags & FL_LPAD)) {
+                    while (width) {
+                        my_putc ('0', stream);
+                        width--;
+                    }
+                }
+
+                if (flags & FL_FLTFIX) {		/* 'f' format		*/
+                    char out;
+
+                    /* At this point, we should have
+                     *
+                     *	exp	exponent of leftmost digit in _dtoa.digits
+                     *	ndigs	number of buffer digits to print
+                     *	prec	number of digits after decimal
+                     *
+                     * In the loop, 'n' walks over the exponent value
+                     */
+                    n = exp > 0 ? exp : 0;		/* exponent of left digit */
+                    do {
+
+                        /* Insert decimal point at correct place */
+                        if (n == -1)
+                            my_putc ('.', stream);
+
+                        /* Pull digits from buffer when in-range,
+                         * otherwise use 0
+                         */
+                        if (0 <= exp - n && exp - n < ndigs)
+                            out = _dtoa.digits[exp - n];
+                        else
+                            out = '0';
+                        if (--n < -prec) {
+                            break;
+                        }
+                        my_putc (out, stream);
+                    } while (1);
+                    if (n == exp
+                        && (_dtoa.digits[0] > '5'
+                            || (_dtoa.digits[0] == '5' && !(_dtoa.flags & DTOA_CARRY))) )
+                    {
+                        out = '1';
+                    }
+                    my_putc (out, stream);
+                    if ((flags & FL_ALT) && n == -1)
+			my_putc('.', stream);
+                } else {				/* 'e(E)' format	*/
+
+#ifdef _WANT_IO_C99_FORMATS
+                    if ((flags & FL_FLTHEX)) {
+                        my_putc('0', stream);
+                        my_putc(TOCASE('x'), stream);
+                    }
 #endif
 
-		/* mantissa	*/
-		if (_dtoa.digits[0] != '1')
-		    _dtoa.flags &= ~DTOA_CARRY;
-		my_putc (_dtoa.digits[0], stream);
-		if (prec > 0) {
-		    my_putc ('.', stream);
-		    uint8_t pos = 1;
-		    for (pos = 1; pos < 1 + prec; pos++)
-			my_putc (pos < ndigs ? _dtoa.digits[pos] : '0', stream);
-		} else if (flags & FL_ALT)
-		    my_putc ('.', stream);
+                    /* mantissa	*/
+                    if (_dtoa.digits[0] != '1')
+                        _dtoa.flags &= ~DTOA_CARRY;
+                    my_putc (_dtoa.digits[0], stream);
+                    if (prec > 0) {
+                        my_putc ('.', stream);
+                        uint8_t pos = 1;
+                        for (pos = 1; pos < 1 + prec; pos++)
+                            my_putc (pos < ndigs ? _dtoa.digits[pos] : '0', stream);
+                    } else if (flags & FL_ALT)
+                        my_putc ('.', stream);
 
-		/* exponent	*/
-		my_putc (TOCASE(c), stream);
-		sign = '+';
-		if (exp < 0 || (exp == 0 && (_dtoa.flags & DTOA_CARRY) != 0)) {
-		    exp = -exp;
-		    sign = '-';
-		}
-		my_putc (sign, stream);
+                    /* exponent	*/
+                    my_putc (TOCASE(c), stream);
+                    sign = '+';
+                    if (exp < 0 || (exp == 0 && (_dtoa.flags & DTOA_CARRY) != 0)) {
+                        exp = -exp;
+                        sign = '-';
+                    }
+                    my_putc (sign, stream);
 #ifndef PICOLIBC_FLOAT_PRINTF_SCANF
-		if (ndigs_exp > 3) {
+                    if (ndigs_exp > 3) {
 			my_putc(exp / 1000 + '0', stream);
 			exp %= 1000;
-		}
+                    }
 #endif
-		if (ndigs_exp > 2) {
+                    if (ndigs_exp > 2) {
 			my_putc(exp / 100 + '0', stream);
 			exp %= 100;
-		}
-		if (ndigs_exp > 1) {
-                    my_putc(exp / 10 + '0', stream);
-                    exp %= 10;
+                    }
+                    if (ndigs_exp > 1) {
+                        my_putc(exp / 10 + '0', stream);
+                        exp %= 10;
+                    }
+                    my_putc ('0' + exp, stream);
                 }
-		my_putc ('0' + exp, stream);
 	    }
-
-	    goto tail;
-	}
-
 #else		/* to: PRINTF_LEVEL >= PRINTF_FLT */
-	if ((TOLOW(c) >= 'e' && TOLOW(c) <= 'g') || TOLOW(c) == 'a') {
 	    (void) PRINTF_FLOAT_ARG(ap);
 	    pnt = "*float*";
 	    size = sizeof ("*float*") - 1;
 	    goto str_lpad;
-	}
 #endif
+        } else {
+            int len, buf_len;
 
-	switch (c) {
+            if (c == 'c') {
+                buf[0] = va_arg (ap, int);
+                pnt = buf;
+                size = 1;
+                goto str_lpad;
+            } else if (c == 's') {
+                pnt = va_arg (ap, char *);
+                if (!pnt)
+                    pnt = "(null)";
+                size = strnlen (pnt, (flags & FL_PREC) ? prec : ~0);
 
-	case 'c':
-	    buf[0] = va_arg (ap, int);
-	    pnt = (char *)buf;
-	    size = 1;
-	    goto str_lpad;
+            str_lpad:
+                if (!(flags & FL_LPAD)) {
+                    while (width > size) {
+                        my_putc (' ', stream);
+                        width--;
+                    }
+                }
+                width -= size;
+                while (size--) {
+                    my_putc (*pnt++, stream);
+                }
 
-	case 's':
-	case 'S':
-	    pnt = va_arg (ap, char *);
-	    if (!pnt)
-		pnt = "(null)";
-	    size = strnlen (pnt, (flags & FL_PREC) ? prec : ~0);
+            } else {
+                if (c == 'd' || c == 'i') {
+                    ultoa_signed_t x_s;
 
-	str_lpad:
-	    if (!(flags & FL_LPAD)) {
-		while (size < width) {
-		    my_putc (' ', stream);
-		    width--;
-		}
-	    }
-	    while (size) {
-		my_putc (*pnt++, stream);
-		if (width) width -= 1;
-		size -= 1;
-	    }
-	    goto tail;
-	}
+                    arg_to_signed(flags, x_s);
 
-	if (c == 'd' || c == 'i') {
-	    ultoa_signed_t x;
-	    arg_to_signed(flags, &x);
+                    if (x_s < 0) {
+                        x_s = -x_s;
+                        flags |= FL_NEGATIVE;
+                    }
 
-	    flags &= ~(FL_NEGATIVE | FL_ALT);
-	    if (x < 0) {
-		x = -x;
-		flags |= FL_NEGATIVE;
-	    }
+                    flags &= ~FL_ALT;
 
-	    if ((flags & FL_PREC) && prec == 0 && x == 0)
-		c = 0;
-	    else
-		c = __ultoa_invert (x, (char *)buf, 10) - (char *)buf;
-	} else {
-	    int base;
-	    ultoa_unsigned_t x;
-	    arg_to_unsigned(flags, &x);
+                    if ((flags & FL_PREC) && prec == 0 && x_s == 0)
+                        buf_len = 0;
+                    else
+                        buf_len = __ultoa_invert (x_s, buf, 10) - buf;
+                } else {
+                    int base;
+                    ultoa_unsigned_t x;
 
-	    flags &= ~(FL_PLUS | FL_SPACE);
+                    if (c == 'u') {
+                        flags &= ~FL_ALT;
+                        base = 10;
+                    } else if (c == 'o') {
+                        base = 8;
+                    } else if (c == 'p') {
+                        flags |= FL_ALT | FL_ALTHEX;
+                        base = 16;
+                    } else if (TOLOW(c) == 'x') {
+                        flags |= FL_ALTHEX;
+                        base = 16;
+                        if (c == 'X') {
+                            base = 16 | XTOA_UPPER;
+                            flags |= (FL_ALTHEX | FL_ALTUPP);
+                        }
+                    } else {
+                        my_putc('%', stream);
+                        my_putc(c, stream);
+                        continue;
+                    }
 
-	    switch (c) {
-	      case 'u':
-		flags &= ~FL_ALT;
-		base = 10;
-		break;
-	      case 'o':
-	        base = 8;
-		break;
-	      case 'p':
-	        flags |= FL_ALT;
-		/* no break */
-	      case 'x':
-		if (flags & FL_ALT)
-		    flags |= FL_ALTHEX;
-	        base = 16;
-		break;
-	      case 'X':
-		if (flags & FL_ALT)
-		    flags |= (FL_ALTHEX | FL_ALTUPP);
-	        base = 16 | XTOA_UPPER;
-		break;
-	      default:
-		my_putc('%', stream);
-		my_putc(c, stream);
-		continue;
-	    }
-	    if ((flags & FL_PREC) && prec == 0 && x == 0)
-		c = 0;
-	    else
-		c = __ultoa_invert (x, (char *)buf, base) - (char *)buf;
-	    flags &= ~FL_NEGATIVE;
-	}
+                    arg_to_unsigned(flags, x);
 
-	len = c;
+                    flags &= ~(FL_PLUS | FL_SPACE);
 
-	if (flags & FL_PREC) {
-	    flags &= ~FL_ZFILL;
-	    if (len < prec) {
-		len = prec;
-		if ((flags & FL_ALT) && !(flags & FL_ALTHEX))
-		    flags &= ~FL_ALT;
-	    }
-	}
-	if (flags & FL_ALT) {
-	    if (buf[c-1] == '0') {
-		flags &= ~(FL_ALT | FL_ALTHEX | FL_ALTUPP);
-	    } else {
-		len += 1;
-		if (flags & FL_ALTHEX)
-		    len += 1;
-	    }
-	} else if (flags & (FL_NEGATIVE | FL_PLUS | FL_SPACE)) {
-	    len += 1;
-	}
+                    if ((flags & FL_PREC) && prec == 0 && x == 0)
+                        buf_len = 0;
+                    else
+                        buf_len = __ultoa_invert (x, buf, base) - buf;
+                }
 
-	if (!(flags & FL_LPAD)) {
-	    if (flags & FL_ZFILL) {
-		prec = c;
-		if (len < width) {
-		    prec += width - len;
-		    len = width;
-		}
-	    }
-	    while (len < width) {
-		my_putc (' ', stream);
-		len++;
-	    }
-	}
+                len = buf_len;
 
-	width =  (len < width) ? width - len : 0;
+                /* Specified precision */
+                if (flags & FL_PREC) {
 
-	if (flags & FL_ALT) {
-	    my_putc ('0', stream);
-	    if (flags & FL_ALTHEX)
-		my_putc (flags & FL_ALTUPP ? 'X' : 'x', stream);
-	} else if (flags & (FL_NEGATIVE | FL_PLUS | FL_SPACE)) {
-	    unsigned char z = ' ';
-	    if (flags & FL_PLUS) z = '+';
-	    if (flags & FL_NEGATIVE) z = '-';
-	    my_putc (z, stream);
-	}
+                    /* Zfill ignored when precision specified */
+                    flags &= ~FL_ZFILL;
 
-	while (prec > c) {
-	    my_putc ('0', stream);
-	    prec--;
-	}
+                    /* If the number is shorter than the precision, pad
+                     * on the left with zeros */
+                    if (len < prec) {
+                        len = prec;
 
-	while (c)
-	    my_putc (buf[--c], stream);
+                        /* Don't add the leading '0' for alternate octal mode */
+                        if (!(flags & FL_ALTHEX))
+                            flags &= ~FL_ALT;
+                    }
+                }
 
-      tail:
+                /* Alternate mode for octal/hex */
+                if (flags & FL_ALT) {
+
+                    /* Zero gets no special alternate treatment */
+                    if (buf[buf_len-1] == '0') {
+                        flags &= ~FL_ALT;
+                    } else {
+                        len += 1;
+                        if (flags & FL_ALTHEX)
+                            len += 1;
+                    }
+                } else if (flags & (FL_NEGATIVE | FL_PLUS | FL_SPACE)) {
+                    len += 1;
+                }
+
+                /* Pad on the left ? */
+                if (!(flags & FL_LPAD)) {
+
+                    /* Pad with zeros, using the same loop as the
+                     * precision modifier
+                     */
+                    if (flags & FL_ZFILL) {
+                        prec = buf_len;
+                        if (len < width) {
+                            prec += width - len;
+                            len = width;
+                        }
+                    }
+                    while (len < width) {
+                        my_putc (' ', stream);
+                        len++;
+                    }
+                }
+
+                /* Width remaining on right after value */
+                width -= len;
+
+                /* Output leading characters */
+                if (flags & FL_ALT) {
+                    my_putc ('0', stream);
+                    if (flags & FL_ALTHEX)
+                        my_putc (flags & FL_ALTUPP ? 'X' : 'x', stream);
+                } else if (flags & (FL_NEGATIVE | FL_PLUS | FL_SPACE)) {
+                    unsigned char z = ' ';
+                    if (flags & FL_PLUS) z = '+';
+                    if (flags & FL_NEGATIVE) z = '-';
+                    my_putc (z, stream);
+                }
+
+                /* Output leading zeros */
+                while (prec > buf_len) {
+                    my_putc ('0', stream);
+                    prec--;
+                }
+
+                /* Output value */
+                while (buf_len)
+                    my_putc (buf[--buf_len], stream);
+            }
+        }
+
 	/* Tail is possible.	*/
-	while (width) {
+	while (width-- > 0) {
 	    my_putc (' ', stream);
-	    width--;
 	}
     } /* for (;;) */
 
