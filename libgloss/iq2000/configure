@@ -2520,6 +2520,7 @@ test "${CCASFLAGS+set}" = set || CCASFLAGS=$CFLAGS
 
 
 host_makefile_frag=${srcdir}/../config/default.mh
+target_makefile_frag=${srcdir}/../config/default.mt
 
 if test "${with_multisubdir}" = "m32"; then
   LD_TYPE="m32"

@@ -33,6 +33,7 @@ AC_PROG_RANLIB
 LIB_AM_PROG_AS
 
 host_makefile_frag=${srcdir}/../config/default.mh
+target_makefile_frag=${srcdir}/../config/default.mt
 
 dnl We have to assign the same value to other variables because autoconf
 dnl doesn't provide a mechanism to substitute a replacement keyword with

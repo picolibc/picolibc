@@ -1946,6 +1946,7 @@ test "${CCASFLAGS+set}" = set || CCASFLAGS=$CFLAGS
 
 
 host_makefile_frag=${srcdir}/../config/default.mh
+target_makefile_frag=${srcdir}/../config/default.mt
 
 host_makefile_frag_path=$host_makefile_frag
 
