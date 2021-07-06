@@ -14,7 +14,7 @@ cpu = 'aarch64'
 endian = 'little'
 
 [properties]
-c_args = ['-mpc-relative-literal-loads', '-nostdlib', '-fno-pic', '-static']
+c_args = ['-mpc-relative-literal-loads', '-nostdlib', '-fno-pic', '-static', '-std=c18']
 needs_exe_wrapper = true
 skip_sanity_check = true
 link_spec = '--build-id=none'

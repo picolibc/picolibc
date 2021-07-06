@@ -20,12 +20,14 @@ c_args = [
 	'-mfloat-abi=soft',
 	'-Wdouble-promotion',
 	'-Werror=double-promotion',
+        '-Wno-unsupported-floating-point-opt',
+        '-std=c17',
 	]
 c_link_args = [
 	'-m32',
 	'-target', 'thumbv7m-none-eabi',
 	'-mfloat-abi=soft',
 	'-nostdlib',
-	'-L/usr/lib/gcc/arm-none-eabi/8.3.1/thumb/v7-m/nofp/'
+	'-L/usr/lib/gcc/arm-none-eabi/8.3.1/thumb/v7-m/nofp/',
 	]
 needs_exe_wrapper = true

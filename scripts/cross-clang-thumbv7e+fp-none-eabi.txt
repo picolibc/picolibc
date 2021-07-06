@@ -21,6 +21,8 @@ c_args = [
 	'-mfloat-abi=hard',
 	'-Wdouble-promotion',
 	'-Werror=double-promotion',
+        '-Wno-unsupported-floating-point-opt',
+        '-std=c17',
 	]
 c_link_args = [
 	'-m32',

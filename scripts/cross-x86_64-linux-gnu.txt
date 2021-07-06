@@ -1,5 +1,6 @@
 [binaries]
-c = ['x86_64-linux-gnu-gcc', '-march=core2', '-mfpmath=sse', '-msse2', '-nostdlib', '-fno-pic', '-fno-PIE', '-static']
+c = ['x86_64-linux-gnu-gcc', '-march=core2', '-mfpmath=sse', '-msse2',
+        '-nostdlib', '-fno-pic', '-fno-PIE', '-static', '-std=c18']
 ar = 'x86_64-linux-gnu-ar'
 as = 'x86_64-linux-gnu-as'
 ld = ['x86_64-linux-gnu-gcc', '-march=core2', '-mfpmath=sse', '-msse2', '-nostdlib', '-fno-pic', '-fno-PIE', '-static']

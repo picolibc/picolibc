@@ -13,7 +13,7 @@ cpu = 'riscv32'
 endian = 'little'
 
 [properties]
-c_args = [ '-nostdlib', '-msave-restore', '-march=rv32imac', '-mabi=ilp32']
+c_args = [ '-nostdlib', '-msave-restore', '-march=rv32imac', '-mabi=ilp32', '-std=c18']
 c_link_args = [ '-nostdlib', '-msave-restore', '-march=rv32imac', '-mabi=ilp32']
 needs_exe_wrapper = true
 skip_sanity_check = true

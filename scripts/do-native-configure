@@ -49,5 +49,5 @@ meson "$DIR"/.. \
 	-Dlibdir=lib/picolibc/lib \
 	-Dspecsdir=none \
 	-Dtests=true \
-	-Dc_args="-Warray-bounds -fsanitize=bounds -fsanitize-undefined-trap-on-error" \
+	-Dc_args="-Warray-bounds -fsanitize=bounds -fsanitize-undefined-trap-on-error -std=c18" \
 	"$@"

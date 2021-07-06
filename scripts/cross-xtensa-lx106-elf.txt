@@ -12,5 +12,5 @@ cpu = 'xtensa'
 endian = 'little'
 
 [properties]
-c_args = ['-nostdlib', '-mlongcalls']
+c_args = ['-nostdlib', '-mlongcalls', '-std=c18']
 skip_sanity_check = true
