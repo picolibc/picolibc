@@ -33,12 +33,13 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include "pico-onexit.h"
 
 int
-atexit (void (*func)(void))
+__cxa_atexit (void (*func) (void *), void *arg, void *d)
 {
-        union on_exit_func func_u = { .atexit = func };
-	return _on_exit(PICO_ONEXIT_ATEXIT, func_u, NULL);
+        union on_exit_func func_u = { .cxa_atexit = func };
+        return _on_exit(PICO_ONEXIT_CXA_ATEXIT, func_u, arg);
 }

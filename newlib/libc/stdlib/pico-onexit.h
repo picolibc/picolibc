@@ -33,12 +33,16 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdlib.h>
-#include "pico-onexit.h"
+#define PICO_ONEXIT_EMPTY       0
+#define PICO_ONEXIT_ONEXIT      1
+#define PICO_ONEXIT_ATEXIT      2
+#define PICO_ONEXIT_CXA_ATEXIT  3
+
+union on_exit_func {
+    void        (*on_exit)(int, void *);
+    void        (*atexit)(void);
+    void        (*cxa_atexit)(void *);
+};
 
 int
-atexit (void (*func)(void))
-{
-        union on_exit_func func_u = { .atexit = func };
-	return _on_exit(PICO_ONEXIT_ATEXIT, func_u, NULL);
-}
+_on_exit(int kind, union on_exit_func func, void *arg);
