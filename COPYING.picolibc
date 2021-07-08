@@ -767,8 +767,10 @@ Files: newlib/empty.c
  newlib/libc/machine/shared_x86/sys/meson.build
  newlib/libc/machine/xtensa/machine/meson.build
  newlib/libc/stdlib/pico-atexit.c
+ newlib/libc/stdlib/pico-cxa-atexit.c
  newlib/libc/stdlib/pico-exit.c
  newlib/libc/stdlib/pico-onexit.c
+ newlib/libc/stdlib/pico-onexit.h
  newlib/libc/tinystdio/atold_engine.c
  newlib/libc/tinystdio/matchcaseprefix.c
  newlib/libc/tinystdio/strfromd.c
