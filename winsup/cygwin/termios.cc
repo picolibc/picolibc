@@ -325,12 +325,71 @@ cfsetispeed (struct termios *in_tp, speed_t speed)
   return res;
 }
 
+struct speed_struct
+{
+  speed_t value;
+  speed_t internal;
+};
+
+static const struct speed_struct speeds[] =
+  {
+    { 0, B0 },
+    { 50, B50 },
+    { 75, B75 },
+    { 110, B110 },
+    { 134, B134 },
+    { 150, B150 },
+    { 200, B200 },
+    { 300, B300 },
+    { 600, B600 },
+    { 1200, B1200 },
+    { 1800, B1800 },
+    { 2400, B2400 },
+    { 4800, B4800 },
+    { 9600, B9600 },
+    { 19200, B19200 },
+    { 38400, B38400 },
+    { 57600, B57600 },
+    { 115200, B115200 },
+    { 128000, B128000 },
+    { 230400, B230400 },
+    { 256000, B256000 },
+    { 460800, B460800 },
+    { 500000, B500000 },
+    { 576000, B576000 },
+    { 921600, B921600 },
+    { 1000000, B1000000 },
+    { 1152000, B1152000 },
+    { 1500000, B1500000 },
+    { 2000000, B2000000 },
+    { 2500000, B2500000 },
+    { 3000000, B3000000 },
+  };
+
+/* Given a numerical baud rate (e.g., 9600), convert it to a Bnnn
+   constant (e.g., B9600). */
+static speed_t
+convert_speed (speed_t speed)
+{
+  for (size_t i = 0; i < sizeof speeds / sizeof speeds[0]; i++)
+    {
+      if (speed == speeds[i].internal)
+	return speed;
+      else if (speed == speeds[i].value)
+	return speeds[i].internal;
+    }
+  return speed;
+}
+
 /* cfsetspeed: 4.4BSD */
+/* Following Linux (undocumented), allow speed to be a numerical baud rate. */
 extern "C" int
 cfsetspeed (struct termios *in_tp, speed_t speed)
 {
   struct termios *tp = __tonew_termios (in_tp);
   int res;
+
+  speed = convert_speed (speed);
   /* errors come only from unsupported baud rates, so setspeed() would return
      identical results in both calls */
   if ((res = setspeed (tp->c_ospeed, speed)) == 0)
