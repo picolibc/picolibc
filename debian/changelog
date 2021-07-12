@@ -1,3 +1,14 @@
+picolibc (1.7.1-1) unstable; urgency=medium
+
+  *  1. Add __cxa_atexit implementation to 'picoexit' path as required by
+    C++
+
+  * Fix lack of 'hh' support in integer-only tinystdio printf path.
+
+  * Fix tinystdio __file flag initialization for C++ apps
+
+ -- Keith Packard <keithp@keithp.com>  Mon, 12 Jul 2021 14:16:57 -0700
+
 picolibc (1.7-1) unstable; urgency=medium
 
   * Merge libc and libm into a single library. Having them split
