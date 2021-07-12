@@ -97,6 +97,15 @@ sync has not been difficult so far.
 
 ## Releases
 
+### Picolibc version 1.7.1
+
+ 1. Add __cxa_atexit implementation to 'picoexit' path as required by
+    C++
+
+ 2. Fix lack of 'hh' support in integer-only tinystdio printf path.
+
+ 3. Fix tinystdio __file flag initialization for C++ apps
+
 ### Picolibc version 1.7
 
  1. Merge libc and libm into a single library. Having them split

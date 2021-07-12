@@ -118,6 +118,21 @@ foreach target : targets
 		  include_directories: inc),
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
+  t1 = 'printfi-tests'
+  if target == ''
+    t1_name = t1
+  else
+    t1_name = join_paths(target, t1)
+  endif
+
+  test(t1 + target,
+       executable(t1_name, ['printf-tests.c'],
+		  c_args: int_printf_compile_args + _c_args,
+		  link_args: int_printf_link_args + _link_args,
+		  link_with: _libs,
+		  include_directories: inc),
+       env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+
   t1 = 'try-ilp32'
   if target == ''
     t1_name = t1

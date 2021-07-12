@@ -17,11 +17,32 @@
 
 */
 
+#ifdef TINY_STDIO
+# ifdef PICOLIBC_FLOAT_PRINTF_SCANF
+#  define LOW_FLOAT
+# endif
+# ifdef PICOLIBC_INTEGER_PRINTF_SCANF
+#  define NO_FLOAT
+#  ifndef _WANT_IO_LONG_LONG
+#   define NO_LONGLONG
+#  endif
+# endif
+#else
+# ifdef NO_FLOATING_POINT
+#  define NO_FLOAT
+# endif
+# ifndef _WANT_IO_LONG_LONG
+#  define NO_LONGLONG
+# endif
+#endif
+
 /* XXX This code generated automatically by gen-testcases.hs
    from ../../printf-tests.txt . You probably do not want to
    manually edit this file. */
+#ifndef NO_FLOAT
     result |= test(0, "0", "%.7g", 0.0);
     result |= test(1, "0.33", "%.*f", 2, 0.33333333);
+#endif
     result |= test(2, "foo", "%.3s", "foobar");
     result |= test(3, "     00004", "%10.5d", 4);
     result |= test(4, " 42", "% d", 42);
@@ -60,9 +81,10 @@
     result |= test(37, "-42  ", "%0-5d", -42);
     result |= test(38, "42             ", "%0-15d", 42);
     result |= test(39, "-42            ", "%0-15d", -42);
+#ifndef NO_FLOAT
     result |= test(43, "42.90", "%.2f", 42.8952);
     result |= test(44, "42.90", "%.2F", 42.8952);
-#ifdef PICOLIBC_FLOAT_PRINTF_SCANF
+#ifdef LOW_FLOAT
     result |= test(45, "42.89520", "%.5f", 42.8952);
 #else
     result |= test(45, "42.8952000000", "%.10f", 42.8952);
@@ -70,11 +92,12 @@
     result |= test(46, "42.90", "%1.2f", 42.8952);
     result |= test(47, " 42.90", "%6.2f", 42.8952);
     result |= test(49, "+42.90", "%+6.2f", 42.8952);
-#ifdef PICOLIBC_FLOAT_PRINTF_SCANF
+#ifdef LOW_FLOAT
     result |= test(50, "42.89520", "%5.5f", 42.8952);
 #else
     result |= test(50, "42.8952000000", "%5.10f", 42.8952);
 #endif
+#endif /* NO_FLOAT */
     /* 51: anti-test */
     /* 52: anti-test */
     /* 53: excluded for C */
@@ -85,8 +108,10 @@
     result |= test(59, "%(foo", "%(foo");
 #endif
     result |= test(60, " foo", "%*s", 4, "foo");
+#ifndef NO_FLOAT
     result |= test(61, "      3.14", "%*.*f", 10, 2, 3.14159265);
     result |= test(63, "3.14      ", "%-*.*f", 10, 2, 3.14159265);
+#endif
     /* 64: anti-test */
     /* 65: anti-test */
     result |= test(66, "+hello+", "+%s+", "hello");
@@ -99,7 +124,8 @@
     /* 73: anti-test */
     /* 74: excluded for C */
     /* 75: excluded for C */
-#ifdef PICOLIBC_FLOAT_PRINTF_SCANF
+#ifndef NO_FLOAT
+#ifdef LOW_FLOAT
     result |= test(76, "         +7.894561e+08", "%+#22.6e", 7.89456123e8);
     result |= test(77, "7.894561e+08          ", "%-#22.6e", 7.89456123e8);
     result |= test(78, "          7.894561e+08", "%#22.6e", 7.89456123e8);
@@ -109,7 +135,8 @@
     result |= test(78, " 7.894561230000000e+08", "%#22.15e", 7.89456123e8);
 #endif
     result |= test(79, "8.e+08", "%#1.1g", 7.89456123e8);
-#if defined(TINY_STDIO) || defined(_WANT_IO_LONG_LONG)
+#endif
+#ifndef NO_LONGLONG
     result |= test(81, "    +100", "%+8lld", 100LL);
     result |= test(82, "+00000100", "%+.8lld", 100LL);
     result |= test(83, " +00000100", "%+10.8lld", 100LL);
@@ -173,6 +200,7 @@
     result |= test(149, "1234", "%3d", 1234);
     /* 150: excluded for C */
     result |= test(152, "2", "%-1d", 2);
+#ifndef NO_FLOAT
     result |= test(153, "8.6000", "%2.4f", 8.6);
     result |= test(154, "0.600000", "%0f", 0.6);
     result |= test(155, "1", "%.0f", 0.6);
@@ -181,6 +209,7 @@
     result |= test(159, "-8.6000e+00", "% 2.4e", -8.6);
     result |= test(160, "+8.6000e+00", "%+2.4e", 8.6);
     result |= test(161, "8.6", "%2.4g", 8.6);
+#endif
     result |= test(162, "-1", "%-i", -1);
     result |= test(163, "1", "%-i", 1);
     result |= test(164, "+1", "%+i", 1);
@@ -440,11 +469,14 @@
     result |= test(414, "1234ABCD            ", "% -+0*.*X", 20, 5, 305441741);
     result |= test(415, "00EDCB5433          ", "% -+0*.*X", 20, 10, 3989525555U);
     result |= test(416, "hi x", "%*sx", -3, "hi");
+#ifndef NO_FLOAT
     result |= test(417, "1.000e-38", "%.3e", 1e-38);
-#ifndef PICOLIBC_FLOAT_PRINTF_SCANF
+#ifndef LOW_FLOAT
     result |= test(418, "1.000e-308", "%.3e", 1e-308);
 #endif
+#endif
     result |= test(419, "1, 1", "%-*.llu, %-*.llu",1,(int64_t)1,1,(int64_t)1);
+#ifndef NO_FLOAT
     result |= test(420, "1e-09", "%g", 0.000000001);
     result |= test(421, "1e-08", "%g", 0.00000001);
     result |= test(422, "1e-07", "%g", 0.0000001);
@@ -465,6 +497,7 @@
     result |= test(437, "10.0000", "%#.6g", 10.0);
     result |= test(438, "10", "%.6g", 10.0);
     result |= test(439, "10.00000000000000000000", "%#.22g", 10.0);
+#endif
 
     // Regression test for wrong behavior with negative precision in tinystdio
     // this might fail for configurations not using tinystdio, so for a first
@@ -475,9 +508,11 @@
     result |= test(443,       "42", "%.*d",  0, 42);
     result |= test(444,   "000042", "%.*d",  6, 42);
     result |= test(445,       "42", "%.*d", -6, 42);
+#ifndef NO_FLOAT
     result |= test(446,        "0", "%.*f",  0, 0.123);
     result |= test(447,      "0.1", "%.*f",  1, 0.123);
     result |= test(448, "0.123000", "%.*f", -1, 0.123);
+#endif
 #ifdef _WANT_IO_C99_FORMATS
 {
     char c[64];
@@ -487,7 +522,8 @@
     result |= test(449, "  42", "%4jd", (intmax_t)42L);
     result |= test(450, "64", "%zu", sizeof c);
     result |= test(451, "12", "%td", (c+12) - c);
-#if defined(PICOLIBC_FLOAT_PRINTF_SCANF) && defined(TINY_STDIO)
+#ifndef NO_FLOAT
+#ifdef LOW_FLOAT
     result |= test(452, "0x1.000000p+0", "%a", (double) 0x1.0p+0f);
     result |= test(453, "0x0.000002p-126", "%a", (double) 0x1.000000p-149f);
     result |= test(454, "0x0.000000p+0", "%a", (double) 0.0f);
@@ -507,6 +543,7 @@
     result |= test(455, "0x1.fffffffffffffp+1022", "%a", 0x1.fffffffffffffp+1022);
     result |= test(456, "0x1.23456789abcdep-1022", "%a", 0x1.23456789abcdep-1022);
     result |= test(457, "0x1.23456789abcdfp-1022", "%a", 0x1.23456789abcdfp-1022);
+#endif
 #endif
 }
 #endif

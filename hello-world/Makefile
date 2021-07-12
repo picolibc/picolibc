@@ -33,7 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-CFLAGS=--oslib=semihost --crt0=hosted -O -g -Wl,-gc-sections
+CFLAGS=--oslib=semihost --crt0=hosted -Os -g
 
 CPP_RISCV=riscv64-unknown-elf-g++ -specs=picolibcpp.specs 
 CC_RISCV=riscv64-unknown-elf-gcc -specs=picolibc.specs 
@@ -47,7 +47,7 @@ CPP_AARCH64=aarch64-linux-gnu-g++ -specs=picolibcpp.specs
 CC_AARCH64=aarch64-linux-gnu-gcc -specs=picolibc.specs 
 CFLAGS_AARCH64=$(CFLAGS) -Wl,-Thello-world-aarch64.ld
 
-all: hello-world-riscv.elf hello-world-arm.elf hello-world-aarch64.elf \
+all: hello-world-riscv.elf hello-world-arm.elf hello-world-aarch64.elf printf.elf printf-int.elf printf-float.elf \
 	hello-world++-riscv.elf hello-world++-arm.elf hello-world++-aarch64.elf
 
 
@@ -74,3 +74,12 @@ hello-world++-riscv.elf:  hello-world++.c++
 
 hello-world++-aarch64.elf:  hello-world++.c++
 	$(CPP_AARCH64) $(CFLAGS_AARCH64) -Wl,-Map=hello-world++-aarch64.map -o $@ $^
+
+printf.elf: printf.c
+	$(CC_ARM) $(CFLAGS_ARM) -o $@ $^ -Wl,-Map=printf.map
+
+printf-int.elf: printf.c
+	$(CC_ARM) $(CFLAGS_ARM) -DPICOLIBC_INTEGER_PRINTF_SCANF -o $@ $^ -Wl,-Map=printf-int.map
+
+printf-float.elf: printf.c
+	$(CC_ARM) $(CFLAGS_ARM) -DPICOLIBC_FLOAT_PRINTF_SCANF -o $@ $^ -Wl,-Map=printf-float.map

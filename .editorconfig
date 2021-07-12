@@ -6,4 +6,6 @@ insert_final_newline = true
 
 [*.{c,h}]
 indent_size = 4
-trim_trailing_whitespace = true
+
+[Makefile]
+indent_style = tab

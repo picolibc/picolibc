@@ -41,7 +41,7 @@ project('picolibc', 'c',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.50',
-	version: '1.7'
+	version: '1.7.1'
        )
 
 targets = []
@@ -142,17 +142,25 @@ has_link_alias=meson.get_compiler('c').has_link_argument('-Wl,-alias,' + global_
 
 float_printf_compile_args=['-DPICOLIBC_FLOAT_PRINTF_SCANF']
 float_printf_link_args=float_printf_compile_args
+int_printf_compile_args=['-DPICOLIBC_INTEGER_PRINTF_SCANF']
+int_printf_link_args=int_printf_compile_args
 if tinystdio
   vfprintf_symbol = global_prefix + 'vfprintf'
   __f_vfprintf_symbol = global_prefix + '__f_vfprintf'
+  __i_vfprintf_symbol = global_prefix + '__i_vfprintf'
   vfscanf_symbol = global_prefix + 'vfscanf'
   __f_vfscanf_symbol = global_prefix + '__f_vfscanf'
+  __i_vfscanf_symbol = global_prefix + '__i_vfscanf'
   if has_link_defsym
     float_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __f_vfprintf_symbol
     float_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __f_vfscanf_symbol
+    int_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __i_vfprintf_symbol
+    int_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __i_vfscanf_symbol
   elif has_link_alias
     float_printf_link_args += '-Wl,-alias,' + __f_vfprintf_symbol +  ',' + vfprintf_symbol
     float_printf_link_args += '-Wl,-alias,' + __f_vfscanf_symbol + ',' + vfscanf_symbol
+    int_printf_link_args += '-Wl,-alias,' + __i_vfprintf_symbol +  ',' + vfprintf_symbol
+    int_printf_link_args += '-Wl,-alias,' + __i_vfscanf_symbol + ',' + vfscanf_symbol
   endif
 endif
 
@@ -418,7 +426,7 @@ picolibcpp_ld = configure_file(input: 'picolibc.ld.in',
 
 # Not all compilers necessarily support all warnings used by the tests; only use these which are:
 test_c_warnings = []
-foreach arg : ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-Wimplicit-function-declaration']
+foreach arg : ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-Wimplicit-function-declaration', '-Werror=vla']
   if meson.get_compiler('c').has_argument(arg)
     test_c_warnings += [arg]
   endif

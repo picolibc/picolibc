@@ -88,7 +88,7 @@ Now we can build and run it with the default options:
 	$ arm-none-eabi-gcc -Os -march=armv7-m --specs=picolibc.specs --oslib=semihost --crt0=hosted -Wl,--defsym=__flash=0 -Wl,--defsym=__flash_size=0x00200000 -Wl,--defsym=__ram=0x20000000 -Wl,--defsym=__ram_size=0x200000 -o printf.elf printf.c
 	$ arm-none-eabi-size printf.elf
 	   text	   data	    bss	    dec	    hex	filename
-           7920	     80	   2056	  10056	   2748	printf.elf
+           7760	     80	   2056	   9896	   26a8	printf.elf
 	$ qemu-system-arm -chardev stdio,id=stdio0 -semihosting-config enable=on,chardev=stdio0 -monitor none -serial none -machine mps2-an385,accel=tcg -kernel printf.elf -nographic
 	 2⁶¹ = 2305843009213693952 π ≃ 3.141592653589793
 
@@ -98,8 +98,7 @@ although the floating point value has reduced precision:
 	$ arm-none-eabi-gcc -DPICOLIBC_FLOAT_PRINTF_SCANF -Os -march=armv7-m --specs=picolibc.specs --oslib=semihost --crt0=hosted -Wl,--defsym=__flash=0 -Wl,--defsym=__flash_size=0x00200000 -Wl,--defsym=__ram=0x20000000 -Wl,--defsym=__ram_size=0x200000 -o printf-float.elf printf.c
 	$ arm-none-eabi-size printf-float.elf
 	   text	   data	    bss	    dec	    hex	filename
-           6360	     80	   2056	   8496	   2130	printf-float.elf
-
+           6232	     80	   2056	   8368	   20b0	printf-float.elf
 	$ qemu-system-arm -chardev stdio,id=stdio0 -semihosting-config enable=on,chardev=stdio0 -monitor none -serial none -machine mps2-an385,accel=tcg -kernel printf-float.elf -nographic
 	 2⁶¹ = 2305843009213693952 π ≃ 3.1415927
 
@@ -109,7 +108,7 @@ the values correctly:
 	$ arm-none-eabi-gcc -DPICOLIBC_INTEGER_PRINTF_SCANF -Os -march=armv7-m --specs=picolibc.specs --oslib=semihost --crt0=hosted -Wl,--defsym=__flash=0 -Wl,--defsym=__flash_size=0x00200000 -Wl,--defsym=__ram=0x20000000 -Wl,--defsym=__ram_size=0x200000 -o printf-int.elf printf.c
 	$ arm-none-eabi-size printf-int.elf
 	   text	   data	    bss	    dec	    hex	filename
-           1872	     80	   2056	   4552	   11c8	printf-int.elf
+           1856	     80	   2056	   3992	    f98	printf-int.elf
 	$ qemu-system-arm -chardev stdio,id=stdio0 -semihosting-config enable=on,chardev=stdio0 -monitor none -serial none -machine mps2-an385,accel=tcg -kernel printf-int.elf -nographic
          2⁶¹ = 0 π ≃ *float*
 
