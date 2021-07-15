@@ -110,19 +110,19 @@ SECTIONS
 		PROVIDE_HIDDEN ( __fini_array_end = . );
 	} >flash AT>flash :text
 
-        /* additional sections when compiling with C++ exception support */
+	/* additional sections when compiling with C++ exception support */
 	@CPP_START@
-        .except : {
+	.except_ordered : {
 		*(.gcc_except_table *.gcc_except_table.*)
 		KEEP (*(.eh_frame .eh_frame.*))
 		*(.ARM.extab* .gnu.linkonce.armextab.*)
-
-                . = ALIGN(8);
-
-        	PROVIDE(__exidx_start = .);
+	}
+	.except_unordered : {
+		. = ALIGN(8);
+		PROVIDE(__exidx_start = .);
 		*(.ARM.exidx*)
-        	PROVIDE(__exidx_end = .);
-        } >flash AT>flash :text
+		PROVIDE(__exidx_end = .);
+	} >flash AT>flash :text
 	@CPP_END@
 
 	/*
