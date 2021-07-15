@@ -7,11 +7,13 @@ ARCH=xtensa-lx106-elf
 case "$1" in
     remove)
 	if which $ARCH-gcc > /dev/null; then
-	    target=`$ARCH-gcc -print-search-dirs | sed -n '/^install:/s/^install: //p'`/picolibc.specs
-	    source=/usr/lib/$ARCH/picolibc.specs
-	    if cmp -s "$target" "$source"; then
-		rm -f "$target"
-	    fi
+            for source in /usr/lib/picolibc/$ARCH/*.specs; do
+                base=`basename "$source"`
+	        target=`$ARCH-gcc -print-search-dirs | sed -n '/^install:/s/^install: //p'`/"$base"
+	        if cmp -s "$target" "$source"; then
+		    rm -f "$target"
+	        fi
+            done
 	fi
 	;;
 esac
