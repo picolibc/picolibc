@@ -793,6 +793,56 @@ line separates the ACLs for each file.
     </refsect1>
   </refentry>
 
+  <refentry id="gmondump">
+    <refmeta>
+      <refentrytitle>gmondump</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+    </refmeta>
+
+    <refnamediv>
+      <refname>gmondump</refname>
+      <refpurpose>Display formatted contents of profile data files</refpurpose>
+    </refnamediv>
+
+    <refsynopsisdiv>
+    <screen>
+gmondump [OPTION]... FILENAME...
+    </screen>
+    </refsynopsisdiv>
+
+    <refsect1 id="gmondump-options">
+      <title>Options</title>
+      <screen>
+  -h, --help             Display usage information and exit
+  -v, --verbose          Display more file details (toggle: default false)
+  -V, --version          Display version information and exit
+</screen>
+    </refsect1>
+
+    <refsect1 id="gmondump-desc">
+      <title>Description</title>
+    <para>The <command>gmondump</command> utility displays the contents of
+      one or more profile data files. Such files usually have names starting
+      with "gmon.out" and are created by a profiling program such as
+      <command>profiler</command> or <command>ssp</command>. Compiling your
+      gcc/g++ programs with option <literal>-pg</literal> also works.</para>
+    <para> By default, summary information is shown. You can use the
+      option <literal>-v</literal> to get more detailed displays.</para>
+    <para>Note that <command>gmondump</command> just displays the raw data;
+      one would usually use <command>gprof</command> to display the data in
+      a useful form incorporating symbolic info such as function names and
+      source line numbers.</para>
+    <para>Here is an example of <command>gmondump</command> operation:</para>
+<screen>
+$ gmondump gmon.out.21900.zstd.exe
+file gmon.out.21900.zstd.exe, gmon version 0x51879, sample rate 100
+  address range 0x0x100401000..0x0x1004cc668
+  numbuckets 208282, hitbuckets 1199, hitcount 12124, numrawarcs 0
+</screen>
+    </refsect1>
+  </refentry>
+
   <refentry id="kill">
     <refmeta>
       <refentrytitle>kill</refentrytitle>
@@ -2127,6 +2177,75 @@ specifying an empty password.
     </refsect1>
   </refentry>
 
+  <refentry id="profiler">
+    <refmeta>
+      <refentrytitle>profiler</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+    </refmeta>
+
+    <refnamediv>
+      <refname>profiler</refname>
+      <refpurpose>Sampling profiler of Cygwin programs with their DLLs</refpurpose>
+    </refnamediv>
+
+    <refsynopsisdiv>
+    <screen>
+profiler [OPTION]... PROGRAM [ARG]...
+profiler [OPTION]... -p PID
+    </screen>
+    </refsynopsisdiv>
+
+    <refsect1 id="profiler-options">
+      <title>Options</title>
+      <screen>
+  -d, --debug            Display debugging messages (toggle: default false)
+  -e, --events           Display Windows DEBUG_EVENTS (toggle: default false)
+  -f, --fork-profile     Profiles child processes (toggle: default false)
+  -h, --help             Display usage information and exit
+  -o, --output=FILENAME  Write output to file FILENAME rather than stdout
+  -p, --pid=N            Attach to running program with Cygwin pid N
+                         ...                    or with Windows pid -N
+  -s, --sample-rate=N    Set IP sampling rate to N Hz (default 100)
+  -v, --verbose          Display more status messages (toggle: default false)
+  -V, --version          Display version information and exit
+  -w, --new-window       Launch given command in a new window
+</screen>
+    </refsect1>
+
+    <refsect1 id="profiler-desc">
+      <title>Description</title>
+    <para>The <command>profiler</command> utility executes a given program, and
+      optionally the children of that program, collecting the location of the
+      CPU instruction pointer (IP) many times per second. This gives a profile
+      of the program's execution, showing where the most time is being spent.
+      This profiling technique is called "IP sampling".</para>
+
+    <para>A novel feature of <command>profiler</command> is that time spent in
+      DLLs loaded with or by your program is profiled too. You use
+      <command>gprof</command> to process and display the resulting profile
+      information. In this fashion you can determine whether your own code,
+      the Cygwin DLL, or another DLL has "hot spots" that might benefit from
+      tuning.</para>
+
+    <para>(See also <command>ssp</command>, another profiler that
+      operates in a different fashion: stepping by instruction. This can
+      provide a different view on your program's operation.)</para>
+
+    <para>Here is an example of <command>profiler</command> operation:</para>
+<screen>
+$ profiler du -khs .
+22G     .
+97 samples across 83 buckets written to gmon.out.5908.cygwin1.dll
+4 samples across 4 buckets written to gmon.out.5908.KernelBase.dll
+1 sample across 1 bucket written to gmon.out.5908.kernel32.dll
+7318 samples across 42 buckets written to gmon.out.5908.ntdll.dll
+5 samples across 4 buckets written to gmon.out.5908.du.exe
+</screen>
+    </refsect1>
+
+  </refentry>
+
   <refentry id="ps">
     <refmeta>
       <refentrytitle>ps</refentrytitle>
@@ -2774,6 +2893,10 @@ Example: ssp 0x401000 0x403000 hello.exe
       profiling program <command>gprof</command>, although
       <command>gprof</command> will claim the values are seconds, they really
       are instruction counts. More on that later. </para>
+
+    <para>(See also <command>profiler</command>, another profiler that
+      operates in a different fashion: IP sampling. This can provide a
+      different view on your program's operation.)</para>
 
     <para> Because the SSP was originally designed to profile the Cygwin DLL,
       it does not automatically select a block of code to report statistics on.

@@ -21,6 +21,7 @@ bin_PROGRAMS = \
 	gencat \
 	getconf \
 	getfacl \
+	gmondump \
 	kill \
 	ldd \
 	locale \
@@ -31,6 +32,7 @@ bin_PROGRAMS = \
 	mount \
 	passwd \
 	pldd \
+	profiler \
 	regtool \
 	setfacl \
 	setmetamode \
@@ -54,6 +56,7 @@ ldd_SOURCES = ldd.cc
 locale_SOURCES = locale.cc
 minidumper_SOURCES = minidumper.cc
 mount_SOURCES = mount.cc path.cc
+profiler_SOURCES = profiler.cc path.cc
 cygps_SOURCES = ps.cc
 regtool_SOURCES = regtool.cc
 umount_SOURCES = umount.cc
@@ -79,6 +82,8 @@ ldd_LDADD = $(LDADD) -lpsapi -lntdll
 mount_CXXFLAGS = -DFSTAB_ONLY $(AM_CXXFLAGS)
 minidumper_LDADD = $(LDADD) -ldbghelp
 pldd_LDADD = $(LDADD) -lpsapi
+profiler_CXXFLAGS = -I$(srcdir) -idirafter ${top_srcdir}/cygwin -idirafter ${top_srcdir}/cygwin/include $(AM_CXXFLAGS)
+profiler_LDADD = $(LDADD) -lntdll
 cygps_LDADD = $(LDADD) -lpsapi -lntdll
 
 if CROSS_BOOTSTRAP
