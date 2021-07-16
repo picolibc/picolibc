@@ -1992,6 +1992,7 @@ License: BSD3-32
 
 Files: newlib/libc/tinystdio/vprintf.c
  newlib/libc/tinystdio/vscanf.c
+ newlib/libc/tinystdio/vsscanf.c
 Copyright: 2005, Joerg Wunsch
 License: BSD3-32
 

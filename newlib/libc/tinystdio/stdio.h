@@ -858,6 +858,14 @@ extern int	vscanf(const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 1
 extern int	sscanf(const char *__buf, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 2, 3);
 
 /**
+   The function \c vscanf performs formatted input, reading the
+   input data from the buffer pointed to by \c buf.
+
+   See vfscanf() for details.
+ */
+extern int	vsscanf(const char *__buf, const char *__fmt, va_list ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+
+/**
    Flush \c stream.
 
    If the stream provides a flush hook, use that. Otherwise return 0.
