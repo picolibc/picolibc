@@ -97,6 +97,16 @@ sync has not been difficult so far.
 
 ## Releases
 
+### Picolibc version 1.7.2
+
+ 1. Fix picolibc.ld to split C++ exceptions back apart (thanks to
+    Khalil Estell)
+
+ 2. Add vsscanf to tinystdio (required for libstdc++).
+
+ 3. Also stick -isystem in C++ compile command to try and get
+    picolibc headers to be used instead of newlib.
+
 ### Picolibc version 1.7.1
 
  1. Add __cxa_atexit implementation to 'picoexit' path as required by
