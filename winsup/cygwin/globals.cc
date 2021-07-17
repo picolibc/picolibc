@@ -53,7 +53,7 @@ enum exit_states
    "winsymlinks" setting of the CYGWIN environment variable. */
 enum winsym_t
 {
-  WSYM_sysfile = 0,
+  WSYM_default = 0,
   WSYM_lnk,
   WSYM_native,
   WSYM_nativestrict,
@@ -71,7 +71,7 @@ bool ignore_case_with_glob;
 bool pipe_byte;
 bool reset_com;
 bool wincmdln;
-winsym_t allow_winsymlinks = WSYM_sysfile;
+winsym_t allow_winsymlinks = WSYM_default;
 bool disable_pcon;
 
 bool NO_COPY in_forkee;
