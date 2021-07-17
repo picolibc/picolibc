@@ -2071,6 +2071,7 @@ symlink_worker (const char *oldpath, path_conv &win32_newpath, bool isdevice)
 	  /* On FSes not supporting reparse points, or in case of an error
 	     creating the WSL symlink, fall back to creating the plain old
 	     SYSTEM file symlink. */
+	  wsym_type = WSYM_sysfile;
 	  break;
 	default:
 	  break;
@@ -2211,7 +2212,7 @@ symlink_worker (const char *oldpath, path_conv &win32_newpath, bool isdevice)
 		  * sizeof (WCHAR);
 	  cp += *plen;
 	}
-      else
+      else /* wsym_type == WSYM_sysfile */
 	{
 	  /* Default technique creating a symlink. */
 	  buf = tp.t_get ();

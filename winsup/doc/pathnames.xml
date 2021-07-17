@@ -389,16 +389,25 @@ ways.</para>
 <itemizedlist mark="bullet">
 
 <listitem>
-<para>The default symlinks created by Cygwin are either special reparse
-points shared with WSL on Windows 10, or plain files containing a magic
-cookie followed by the path to which the link points.  The reparse point
-is used on NTFS, the plain file on almost any other filesystem.</para>
+  <para>The default symlinks created by Cygwin are:</para>
 
-<note><para>Symlinks created by really old Cygwin releases (prior to
-Cygwin 1.7.0) are usually readable.  However, you could run into problems
-if you're now using another character set than the one you used when
-creating these symlinks (see <xref linkend="setup-locale-problems"></xref>).
-</para></note>
+  <itemizedlist mark="square">
+    <listitem>
+      <para>special reparse points shared with WSL (on NTFS on Windows 10 1607
+      or later)</para>
+    </listitem>
+    <listitem>
+      <para>plain files with the <literal>system</literal> attribute, containing
+      a magic cookie followed by the path to which the link points.
+      </para>
+      <note><para>Symlinks of this type created by really old Cygwin releases
+      (prior to Cygwin 1.7.0) are usually readable.  However, you could run into
+      problems if you're now using another character set than the one you used
+      when creating these symlinks (see <xref
+      linkend="setup-locale-problems"></xref>).
+      </para></note>
+    </listitem>
+  </itemizedlist>
 </listitem>
 
 <listitem>

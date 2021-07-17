@@ -57,7 +57,8 @@ enum winsym_t
   WSYM_lnk,
   WSYM_native,
   WSYM_nativestrict,
-  WSYM_nfs
+  WSYM_nfs,
+  WSYM_sysfile,
 };
 
 exit_states NO_COPY exit_state;

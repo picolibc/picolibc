@@ -76,11 +76,17 @@ in addition to the normal UNIX argv list.  Defaults to not set.</para>
 </listitem>
 
 <listitem>
-<para><envar>winsymlinks:{lnk,native,nativestrict}</envar> - if set to just
+<para><envar>winsymlinks:{lnk,native,nativestrict,sys}</envar></para>
+
+<itemizedlist mark="square">
+<listitem>
+<para>If set to just
 <literal>winsymlinks</literal> or <literal>winsymlinks:lnk</literal>,
 Cygwin creates symlinks as Windows shortcuts with a special header and
 the R/O attribute set.</para>
+</listitem>
 
+<listitem>
 <para>If set to <literal>winsymlinks:native</literal> or
 <literal>winsymlinks:nativestrict</literal>, Cygwin creates symlinks as
 native Windows symlinks on filesystems and OS versions supporting them.</para>
@@ -92,9 +98,21 @@ some reason, it will fall back to creating Cygwin default symlinks
 with <literal>winsymlinks:native</literal>, while with
 <literal>winsymlinks:nativestrict</literal> the <literal>symlink(2)</literal>
 system call will immediately fail.</para>
+</listitem>
+
+<listitem>
+<para>If set to <literal>winsymlinks:sys</literal>, Cygwin creates symlinks as
+plain files with the <literal>system</literal> attribute, containing a magic
+cookie followed by the path to which the link points.</para>
+</listitem>
+</itemizedlist>
+
+<para>Note that this setting has no effect where Cygwin knows that the
+filesystem only supports a creating symlinks in a specific way.</para>
 
 <para>For more information on symbolic links, see
 <xref linkend="pathnames-symlinks"></xref>.</para>
+
 </listitem>
 
 <listitem>
