@@ -1,3 +1,15 @@
+picolibc (1.7.2-1) unstable; urgency=medium
+
+  * Fix picolibc.ld to split C++ exceptions back apart (thanks to
+    Khalil Estell)
+
+  * Add vsscanf to tinystdio (required for libstdc++).
+
+  * Also stick -isystem in C++ compile command to try and get
+    picolibc headers to be used instead of newlib.
+
+ -- Keith Packard <keithp@keithp.com>  Fri, 16 Jul 2021 17:57:26 -0700
+
 picolibc (1.7.1-1) unstable; urgency=medium
 
   *  1. Add __cxa_atexit implementation to 'picoexit' path as required by
