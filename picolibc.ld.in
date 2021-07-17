@@ -112,11 +112,13 @@ SECTIONS
 
         /* additional sections when compiling with C++ exception support */
 	@CPP_START@
-        .except : {
+        .except_ordered : {
 		*(.gcc_except_table *.gcc_except_table.*)
 		KEEP (*(.eh_frame .eh_frame.*))
 		*(.ARM.extab* .gnu.linkonce.armextab.*)
+	} >flash AT>flash :text
 
+	.except_unordered : {
                 . = ALIGN(8);
 
         	PROVIDE(__exidx_start = .);

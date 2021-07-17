@@ -100,6 +100,7 @@ srcs_tinystdio = [
     'vfscanff.c',
     'vprintf.c',
     'vscanf.c',
+    'vsscanf.c',
     'vsnprintf.c',
     'vsprintf.c',
 ]
