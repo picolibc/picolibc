@@ -56,15 +56,14 @@ tiny   = 1.0e-30;
 	    k = ((ix&0x7f800000)>>23) - 25; 
             if (n< -50000) return tiny*x; 	/*underflow*/
         }
+        if (n > OVERFLOW_INT) 	/* in case integer overflow in n+k */
+	    return huge*copysignf(huge,x);	/*overflow*/
         k = k+n; 
         if (k > FLT_LARGEST_EXP) return huge*copysignf(huge,x); /* overflow  */
         if (k > 0) 				/* normal result */
 	    {SET_FLOAT_WORD(x,(ix&0x807fffff)|(k<<23)); return x;}
-        if (k < FLT_SMALLEST_EXP) {
-            if (n > OVERFLOW_INT) 	/* in case integer overflow in n+k */
-		return huge*copysignf(huge,x);	/*overflow*/
-	    else return tiny*copysignf(tiny,x);	/*underflow*/
-        }
+        if (k < FLT_SMALLEST_EXP)
+	    return tiny*copysignf(tiny,x);	/*underflow*/
         k += 25;				/* subnormal result */
 	SET_FLOAT_WORD(x,(ix&0x807fffff)|(k<<23));
         return x*twom25;
