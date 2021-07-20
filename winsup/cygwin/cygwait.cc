@@ -104,8 +104,10 @@ cygwait (HANDLE object, PLARGE_INTEGER timeout, unsigned mask)
 		    sizeof tbi, NULL);
       /* if timer expired, TimeRemaining is negative and represents the
 	  system uptime when signalled */
-      if (timeout->QuadPart < 0LL)
-	timeout->QuadPart = tbi.SignalState ? 0LL : tbi.TimeRemaining.QuadPart;
+      if (timeout->QuadPart < 0LL) {
+	timeout->QuadPart = tbi.SignalState || tbi.TimeRemaining.QuadPart < 0LL
+                            ? 0LL : tbi.TimeRemaining.QuadPart;
+      }
       NtCancelTimer (_my_tls.locals.cw_timer, NULL);
     }
 

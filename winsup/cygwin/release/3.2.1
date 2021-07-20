@@ -44,3 +44,7 @@ Bug Fixes
   AF_UNSPEC.  As specified by POSIX and Linux, this is allowed on
   datagram sockets, and its effect is to reset the socket's peer
   address.
+
+- Fix nanosleep(2) returning negative rem. NtQueryTimer appears to be able to
+  return a negative remaining time (less than the timer resolution) for
+  unsignalled timers.
