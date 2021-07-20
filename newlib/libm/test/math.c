@@ -588,6 +588,20 @@ run_vector_1 (int vector,
        fresult = (float) ((pdblfunc)(func))(arg1, &result2);
        ffinish2(f, vector, fresult, result2, p, args, name);
      }
+     else if (strcmp(args,"ddi") == 0)
+     {
+       typedef double (*pdblfunc)(double, int);
+
+       result = ((pdblfunc)func) (arg1, (int) arg2);
+       finish(f, vector, result, p, args, name);
+     }
+     else if (strcmp(args,"ffi") == 0)
+     {
+       typedef float (*pdblfunc)(float, int);
+
+       fresult = ((pdblfunc)func) (arg1, (int) arg2);
+       ffinish(f, vector, fresult, p, args, name);
+     }
     p++;
   }
   if (vector)
@@ -656,6 +670,8 @@ test_math (int vector)
   test_modff(vector);
   test_pow_vec(vector);
   test_powf_vec(vector);
+  test_scalbn(vector);
+  test_scalbnf(vector);
   test_sin(vector);
   test_sinf(vector);
   test_sinh(vector);

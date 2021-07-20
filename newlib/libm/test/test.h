@@ -481,6 +481,12 @@ void
 test_powf_vec(int vector);
 
 void
+test_scalbn(int vector);
+
+void
+test_scalbnf(int vector);
+
+void
 test_sin(int vector);
 
 void
