@@ -23,6 +23,12 @@
 #define OVERFLOW_INT 30000
 #endif
 
+#ifdef _IEEE_LIBM
+#define erange(_ret) return (_ret)
+#else
+#define erange(_ret) do { errno = ERANGE; return (_ret); } while(0)
+#endif
+
 #ifdef __STDC__
 static const float
 #else
@@ -49,21 +55,21 @@ tiny   = 1.0e-30;
 	if (FLT_UWORD_IS_ZERO(hx))
 	    return x;
         if (!FLT_UWORD_IS_FINITE(hx))
-	    return x+x;		/* NaN or Inf */
+	    return x;		/* NaN or Inf */
         if (FLT_UWORD_IS_SUBNORMAL(hx)) {
 	    x *= two25;
 	    GET_FLOAT_WORD(ix,x);
 	    k = ((ix&0x7f800000)>>23) - 25; 
-            if (n< -50000) return tiny*x; 	/*underflow*/
+            if (n< -50000) erange(tiny*x); 	/*underflow*/
         }
         if (n > OVERFLOW_INT) 	/* in case integer overflow in n+k */
-            return huge*copysignf(huge,x);	/*overflow*/
+            erange(huge*copysignf(huge,x));	/*overflow*/
         k = k+n; 
-        if (k > FLT_LARGEST_EXP) return huge*copysignf(huge,x); /* overflow  */
+        if (k > FLT_LARGEST_EXP) erange(huge*copysignf(huge,x)); /* overflow  */
         if (k > 0) 				/* normal result */
 	    {SET_FLOAT_WORD(x,(ix&0x807fffff)|(k<<23)); return x;}
         if (k < FLT_SMALLEST_EXP)
-	    return tiny*copysignf(tiny,x);	/*underflow*/
+	    erange(tiny*copysignf(tiny,x));	/*underflow*/
         k += 25;				/* subnormal result */
 	SET_FLOAT_WORD(x,(ix&0x807fffff)|(k<<23));
         return x*twom25;

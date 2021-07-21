@@ -65,6 +65,12 @@ SEEALSO
 
 #ifndef _DOUBLE_IS_32BITS
 
+#ifdef _IEEE_LIBM
+#define erange(_ret) return (_ret)
+#else
+#define erange(_ret) do { errno = ERANGE; return (_ret); } while(0)
+#endif
+
 #ifdef __STDC__
 static const double
 #else
@@ -90,17 +96,17 @@ tiny   = 1.0e-300;
 	    x *= two54; 
 	    GET_HIGH_WORD(hx,x);
 	    k = ((hx&0x7ff00000)>>20) - 54; 
-            if (n< -50000) return tiny*x; 	/*underflow*/
+            if (n< -50000) erange(tiny*x); 	/*underflow*/
 	    }
-        if (k==0x7ff) return x+x;		/* NaN or Inf */
+        if (k==0x7ff) return x;		        /* NaN or Inf */
         if (n > 50000) 	/* in case integer overflow in n+k */
-            return huge*copysign(huge,x);	/*overflow*/
+            erange(huge*copysign(huge,x));	/*overflow*/
         k = k+n; 
-        if (k >  0x7fe) return huge*copysign(huge,x); /* overflow  */
+        if (k >  0x7fe) erange(huge*copysign(huge,x)); /* overflow  */
         if (k > 0) 				/* normal result */
 	    {SET_HIGH_WORD(x,(hx&0x800fffff)|(k<<20)); return x;}
         if (k <= -54)
-	    return tiny*copysign(tiny,x); 	/*underflow*/
+	    erange(tiny*copysign(tiny,x)); 	/*underflow*/
         k += 54;				/* subnormal result */
 	SET_HIGH_WORD(x,(hx&0x800fffff)|(k<<20));
         return x*twom54;
