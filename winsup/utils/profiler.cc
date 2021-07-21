@@ -312,10 +312,11 @@ dump_profile_data (child *c)
       if (s->name)
         {
           WCHAR *name = 1 + wcsrchr (s->name, L'\\');
-          sprintf (filename, "%s.%u.%ls", prefix, c->pid, name);
+          sprintf (filename, "%s.%lu.%ls", prefix, (unsigned long) c->pid,
+					   name);
         }
       else
-        sprintf (filename, "%s.%u", prefix, c->pid);
+        sprintf (filename, "%s.%lu", prefix, (unsigned long) c->pid);
 
       fd = open (filename, O_CREAT | O_TRUNC | O_WRONLY | O_BINARY);
       if (fd < 0)
@@ -804,9 +805,10 @@ cygwin_pid (DWORD winpid)
   cygpid = (DWORD) cygwin_internal (CW_WINPID_TO_CYGWIN_PID, winpid);
 
   if (cygpid >= max_cygpid)
-    snprintf (buf, sizeof buf, "%u", winpid);
+    snprintf (buf, sizeof buf, "%lu", (unsigned long) winpid);
   else
-    snprintf (buf, sizeof buf, "%u (pid: %u)", winpid, cygpid);
+    snprintf (buf, sizeof buf, "%lu (pid: %lu)", (unsigned long) winpid,
+						 (unsigned long) cygpid);
   return buf;
 }
 
