@@ -806,9 +806,18 @@ line separates the ACLs for each file.
     </refnamediv>
 
     <refsynopsisdiv>
-    <screen>
-gmondump [OPTION]... FILENAME...
-    </screen>
+      <cmdsynopsis>
+	<command>gmondump</command>
+	<arg>-v</arg>
+	<arg rep="repeat">FILENAME</arg>
+      </cmdsynopsis>
+      <cmdsynopsis>
+	<command>gmondump</command>
+	<group choice="plain">
+	  <arg choice="plain">-h</arg>
+	  <arg choice="plain">-V</arg>
+	</group>
+      </cmdsynopsis>
     </refsynopsisdiv>
 
     <refsect1 id="gmondump-options">
@@ -2190,10 +2199,26 @@ specifying an empty password.
     </refnamediv>
 
     <refsynopsisdiv>
-    <screen>
-profiler [OPTION]... PROGRAM [ARG]...
-profiler [OPTION]... -p PID
-    </screen>
+      <cmdsynopsis>
+	<command>profiler</command>
+	<arg>-defw</arg>
+	<arg>-o <replaceable>FILENAME</replaceable></arg>
+	<arg>-s <replaceable>N</replaceable></arg>
+	<group choice="plain">
+	  <arg choice="plain">
+	    <arg choice="plain"><replaceable>PROGRAM</replaceable></arg>
+	    <arg rep="repeat" choice="plain"><replaceable>ARG</replaceable></arg>
+	  </arg>
+	  <arg choice="plain">-p <replaceable>PID</replaceable></arg>
+	</group>
+      </cmdsynopsis>
+      <cmdsynopsis>
+	<command>profiler</command>
+	<group choice="plain">
+	  <arg choice="plain">-h</arg>
+	  <arg choice="plain">-V</arg>
+	</group>
+      </cmdsynopsis>
     </refsynopsisdiv>
 
     <refsect1 id="profiler-options">
