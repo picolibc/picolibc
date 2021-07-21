@@ -127,7 +127,7 @@
 #endif
 
 /* Configure small REENT structure for Xilinx MicroBlaze platforms */
-#if defined (__MICROBLAZE__)
+#if defined (__MICROBLAZE__) && !defined(__rtems__)
 #ifndef _REENT_SMALL
 #define _REENT_SMALL
 #endif
