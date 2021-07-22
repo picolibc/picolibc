@@ -1,7 +1,5 @@
 ## Process this file with automake to generate Makefile.in
 
-AUTOMAKE_OPTIONS = cygnus
-
 INCLUDES = -I$(srcdir)/../../../include -I$(srcdir)/../.. -I$(srcdir)/../generic -I$(srcdir)/../../.. $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 AM_CCASFLAGS = -I. -I$(srcdir) $(INCLUDES)

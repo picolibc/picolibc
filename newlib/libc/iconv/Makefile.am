@@ -1,6 +1,4 @@
 ## Process this file with automake to generate Makefile.in
-AUTOMAKE_OPTIONS = cygnus
-
 SUBDIRS = ces ccs lib .
 
 cctdir=$(datadir)/iconv_data

@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 
-AUTOMAKE_OPTIONS = cygnus dejagnu subdir-objects
+AUTOMAKE_OPTIONS = dejagnu subdir-objects
 ACLOCAL_AMFLAGS = -I . -I ..
 
 # Variables that will accumulate in subdirs.

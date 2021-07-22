@@ -1,7 +1,5 @@
 ## Process this file with automake to generate Makefile.in
 
-AUTOMAKE_OPTIONS = cygnus
-
 cctdir=$(datadir)/iconv_data
 
 cct_DATA= \

@@ -1,7 +1,5 @@
 ## Process this file with automake to generate Makefile.in
 
-AUTOMAKE_OPTIONS = cygnus
-
 if NEWLIB_HW_FP
 MATHDIR = mathfp
 else

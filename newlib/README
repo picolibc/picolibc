@@ -576,9 +576,10 @@ from the newlib/libc/machine/arm directory.
 
 If you have regenerated a configure file or if you have modified a Makefile.am
 file, you will need to regenerate the appropriate Makefile.in file(s).
-For newlib, automake is a bit trickier.  First of all, all Makefile.in
-files in newlib (and libgloss) are generated using the --cygnus option
-of automake.  
+For newlib, automake is a bit trickier.
+
+First of all, note that all the Makefile.in files in libgloss must be
+generated using the --cygnus option of automake.
 
 Makefile.in files are generated from the nearest directory up the chain
 which contains a configure.ac file.  In most cases, this is the same
@@ -590,21 +591,21 @@ which is the nearest parent directory that contains a configure.ac.
 When you issue the automake command, you specify the subdirectory for
 the Makefile.in you are regenerating.  For example:
 
-   automake --cygnus stdio/Makefile stdlib/Makefile
+   automake stdio/Makefile stdlib/Makefile
 
 Note how multiple Makefile.in files can be created in the same step.  You
 would not specify machine/Makefile or sys/Makefile in the previous example
 because both of these subdirectories contain their own configure.ac files.
 One would change to each of these subdirectories and in turn issue:
 
-   automake --cygnus Makefile
+   automake Makefile
 
 Let's say you create a new machine directory XXXX off of newlib/libc/machine.
 After creating a new configure.ac and Makefile.am file, you would issue:
 
    aclocal -I ../../..
    autoconf
-   automake --cygnus Makefile
+   automake Makefile
 
 from newlib/libc/machine/XXXX
 
