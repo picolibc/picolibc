@@ -127,6 +127,9 @@ directories, you can run `make' on them in parallel (for example, if
 they are NFS-mounted on each of the hosts); they will not interfere
 with each other.
 
+   By default, the execution of build rules in `make' is less verbose.
+To disable, run `make V=1'; or use the `--disable-silent-rules’ option
+of `./configure'.
 
 Specifying names for hosts and targets
 ======================================

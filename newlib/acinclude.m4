@@ -121,6 +121,7 @@ AC_SUBST(newlib_basedir)
 AC_CANONICAL_HOST
 
 AM_INIT_AUTOMAKE([cygnus no-define 1.9.5])
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES(yes)])
 
 # FIXME: We temporarily define our own version of AC_PROG_CC.  This is
 # copied from autoconf 2.12, but does not call AC_PROG_CC_WORKS.  We
