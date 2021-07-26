@@ -1869,6 +1869,7 @@ get_ifs (ULONG family)
 		    if (prefix < 32)
 		      if_sin6->sin6_addr.s6_addr32[cnt] <<= 32 - prefix;
 		  }
+		if_sin6->sin6_family = AF_INET6;
 		break;
 	      }
 	    ifp->ifa_ifa.ifa_netmask = (struct sockaddr *) &ifp->ifa_netmask;
