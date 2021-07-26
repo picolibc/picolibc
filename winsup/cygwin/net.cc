@@ -1595,6 +1595,7 @@ static void
 get_ipv4fromreg (struct ifall *ifp, const char *name, DWORD idx)
 {
   WCHAR regkey[256], *c;
+  bool got_addr = false, got_mask = false;
 
   c = wcpcpy (regkey, L"Tcpip\\Parameters\\Interfaces\\");
   sys_mbstowcs (c, 220, name);
@@ -1637,9 +1638,15 @@ get_ipv4fromreg (struct ifall *ifp, const char *name, DWORD idx)
       if (dhcp)
 	{
 	  if (udipa.Buffer)
-	    inet_uton (udipa.Buffer, &addr->sin_addr);
+	    {
+	      inet_uton (udipa.Buffer, &addr->sin_addr);
+	      got_addr = true;
+	    }
 	  if (udsub.Buffer)
-	    inet_uton (udsub.Buffer, &mask->sin_addr);
+	    {
+	      inet_uton (udsub.Buffer, &mask->sin_addr);
+	      got_mask = true;
+	    }
 	}
       else
 	{
@@ -1649,7 +1656,10 @@ get_ipv4fromreg (struct ifall *ifp, const char *name, DWORD idx)
 		   c += wcslen (c) + 1)
 		ifs++;
 	      if (*c)
-		inet_uton (c, &addr->sin_addr);
+		{
+		  inet_uton (c, &addr->sin_addr);
+		  got_addr = true;
+		}
 	    }
 	  if (usub.Buffer)
 	    {
@@ -1657,9 +1667,16 @@ get_ipv4fromreg (struct ifall *ifp, const char *name, DWORD idx)
 		   c += wcslen (c) + 1)
 		ifs++;
 	      if (*c)
-		inet_uton (c, &mask->sin_addr);
+		{
+		  inet_uton (c, &mask->sin_addr);
+		  got_mask = true;
+		}
 	    }
 	}
+      if (got_addr)
+	ifp->ifa_ifa.ifa_addr = (struct sockaddr *) addr;
+      if (got_mask)
+	ifp->ifa_ifa.ifa_netmask = (struct sockaddr *) mask;
       if (ifp->ifa_ifa.ifa_flags & IFF_BROADCAST)
 	brdc->sin_addr.s_addr = (addr->sin_addr.s_addr
 				 & mask->sin_addr.s_addr)
@@ -1800,13 +1817,13 @@ get_ifs (ULONG family)
 	      ifp->ifa_ifa.ifa_flags |= IFF_BROADCAST;
 	    /* Address */
 	    ifp->ifa_addr.ss_family = AF_INET;
-	    ifp->ifa_ifa.ifa_addr = (struct sockaddr *) &ifp->ifa_addr;
+	    ifp->ifa_ifa.ifa_addr = NULL;
 	    /* Broadcast/Destination address */
 	    ifp->ifa_brddstaddr.ss_family = AF_INET;
 	    ifp->ifa_ifa.ifa_dstaddr = NULL;
 	    /* Netmask */
 	    ifp->ifa_netmask.ss_family = AF_INET;
-	    ifp->ifa_ifa.ifa_netmask = (struct sockaddr *) &ifp->ifa_netmask;
+	    ifp->ifa_ifa.ifa_netmask = NULL;
 	    /* Try to fetch real IPv4 address information from registry. */
 	    get_ipv4fromreg (ifp, pap->AdapterName, idx);
 	    /* Hardware address */
