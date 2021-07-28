@@ -48,3 +48,6 @@ Bug Fixes
 - Fix nanosleep(2) returning negative rem. NtQueryTimer appears to be able to
   return a negative remaining time (less than the timer resolution) for
   unsignalled timers.
+
+- Fix getifaddrs(3) returning address family 0 or IPv4 address 0.
+  Addresses: https://cygwin.com/pipermail/cygwin/2021-July/248970.html
