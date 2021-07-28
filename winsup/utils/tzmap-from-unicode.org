@@ -71,5 +71,5 @@ wget -O - "${ZONES_FILE}" | \
   echo '  { L"Mid-Atlantic Standard Time", L"", L"Atlantic/South_Georgia" },'
   echo '  { L"SA Pacific Standard Time", L"HT", L"America/Port-au-Prince" },'
   echo '  { L"South Africa Standard Time", L"LY", L"Africa/Tripoli" },'
-} | sort -d
+} | LC_ALL=C sort -d
 echo "};"
