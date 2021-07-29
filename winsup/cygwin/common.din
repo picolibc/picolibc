@@ -1141,6 +1141,8 @@ pthread_mutexattr_setprotocol SIGFE
 pthread_mutexattr_setpshared SIGFE
 pthread_mutexattr_settype SIGFE
 pthread_once SIGFE
+pthread_rwlock_clockrdlock SIGFE
+pthread_rwlock_clockwrlock SIGFE
 pthread_rwlock_destroy SIGFE
 pthread_rwlock_init SIGFE
 pthread_rwlock_rdlock SIGFE

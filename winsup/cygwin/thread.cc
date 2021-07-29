@@ -3174,7 +3174,7 @@ pthread_rwlock_rdlock (pthread_rwlock_t *rwlock)
 }
 
 extern "C" int
-pthread_rwlock_timedrdlock (pthread_rwlock_t *rwlock,
+pthread_rwlock_clockrdlock (pthread_rwlock_t *rwlock, clockid_t clock_id,
 			    const struct timespec *abstime)
 {
   LARGE_INTEGER timeout;
@@ -3193,7 +3193,7 @@ pthread_rwlock_timedrdlock (pthread_rwlock_t *rwlock,
 
   __try
     {
-      int err = pthread_convert_abstime (CLOCK_REALTIME, abstime, &timeout);
+      int err = pthread_convert_abstime (clock_id, abstime, &timeout);
       if (err)
 	return err;
 
@@ -3202,6 +3202,13 @@ pthread_rwlock_timedrdlock (pthread_rwlock_t *rwlock,
   __except (NO_ERROR) {}
   __endtry
   return EINVAL;
+}
+
+extern "C" int
+pthread_rwlock_timedrdlock (pthread_rwlock_t *rwlock,
+			    const struct timespec *abstime)
+{
+  return pthread_rwlock_clockrdlock (rwlock, CLOCK_REALTIME, abstime);
 }
 
 extern "C" int
@@ -3229,7 +3236,7 @@ pthread_rwlock_wrlock (pthread_rwlock_t *rwlock)
 }
 
 extern "C" int
-pthread_rwlock_timedwrlock (pthread_rwlock_t *rwlock,
+pthread_rwlock_clockwrlock (pthread_rwlock_t *rwlock, clockid_t clock_id,
 			    const struct timespec *abstime)
 {
   LARGE_INTEGER timeout;
@@ -3248,7 +3255,7 @@ pthread_rwlock_timedwrlock (pthread_rwlock_t *rwlock,
 
   __try
     {
-      int err = pthread_convert_abstime (CLOCK_REALTIME, abstime, &timeout);
+      int err = pthread_convert_abstime (clock_id, abstime, &timeout);
       if (err)
 	return err;
 
@@ -3257,6 +3264,13 @@ pthread_rwlock_timedwrlock (pthread_rwlock_t *rwlock,
   __except (NO_ERROR) {}
   __endtry
   return EINVAL;
+}
+
+extern "C" int
+pthread_rwlock_timedwrlock (pthread_rwlock_t *rwlock,
+			    const struct timespec *abstime)
+{
+  return pthread_rwlock_clockwrlock (rwlock, CLOCK_REALTIME, abstime);
 }
 
 extern "C" int

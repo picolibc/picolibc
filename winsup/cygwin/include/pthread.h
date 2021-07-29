@@ -199,9 +199,17 @@ int pthread_spin_unlock (pthread_spinlock_t *);
 int pthread_rwlock_destroy (pthread_rwlock_t *);
 int pthread_rwlock_init (pthread_rwlock_t *, const pthread_rwlockattr_t *);
 int pthread_rwlock_rdlock (pthread_rwlock_t *);
+#if __GNU_VISIBLE
+int pthread_rwlock_clockrdlock (pthread_rwlock_t *, clockid_t,
+				const struct timespec *);
+#endif
 int pthread_rwlock_timedrdlock (pthread_rwlock_t *, const struct timespec *);
 int pthread_rwlock_tryrdlock (pthread_rwlock_t *);
 int pthread_rwlock_wrlock (pthread_rwlock_t *);
+#if __GNU_VISIBLE
+int pthread_rwlock_clockwrlock (pthread_rwlock_t *, clockid_t,
+				const struct timespec *);
+#endif
 int pthread_rwlock_timedwrlock (pthread_rwlock_t *, const struct timespec *);
 int pthread_rwlock_trywrlock (pthread_rwlock_t *);
 int pthread_rwlock_unlock (pthread_rwlock_t *);
