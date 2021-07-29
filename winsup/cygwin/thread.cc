@@ -2965,12 +2965,30 @@ __pthread_cond_wait_init (pthread_cond_t *cond, pthread_mutex_t *mutex)
   return 0;
 }
 
-extern "C" int
-pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
-			const struct timespec *abstime)
+static int
+__pthread_cond_clockwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
+			  clockid_t clock_id, const struct timespec *abstime)
 {
   int err = 0;
   LARGE_INTEGER timeout;
+
+  do
+    {
+      err = pthread_convert_abstime (clock_id, abstime, &timeout);
+      if (err)
+	break;
+
+      err = (*cond)->wait (*mutex, &timeout);
+    }
+  while (err == ETIMEDOUT);
+  return err;
+}
+
+extern "C" int
+pthread_cond_clockwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
+			clockid_t clock_id, const struct timespec *abstime)
+{
+  int err = 0;
 
   pthread_testcancel ();
 
@@ -2979,16 +2997,30 @@ pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
       err = __pthread_cond_wait_init (cond, mutex);
       if (err)
 	__leave;
+      err = __pthread_cond_clockwait (cond, mutex, clock_id, abstime);
+    }
+  __except (NO_ERROR)
+    {
+      return EINVAL;
+    }
+  __endtry
+  return err;
+}
 
-      do
-	{
-	  err = pthread_convert_abstime ((*cond)->clock_id, abstime, &timeout);
-	  if (err)
-	    __leave;
+extern "C" int
+pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
+			const struct timespec *abstime)
+{
+  int err = 0;
 
-	  err = (*cond)->wait (*mutex, &timeout);
-	}
-      while (err == ETIMEDOUT);
+  pthread_testcancel ();
+
+  __try
+    {
+      err = __pthread_cond_wait_init (cond, mutex);
+      if (err)
+	__leave;
+      err = __pthread_cond_clockwait (cond, mutex, (*cond)->clock_id, abstime);
     }
   __except (NO_ERROR)
     {

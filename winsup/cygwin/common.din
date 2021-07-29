@@ -1092,6 +1092,7 @@ pthread_barrierattr_init SIGFE
 pthread_barrierattr_setpshared SIGFE
 pthread_cancel SIGFE
 pthread_cond_broadcast SIGFE
+pthread_cond_clockwait SIGFE
 pthread_cond_destroy SIGFE
 pthread_cond_init SIGFE
 pthread_cond_signal SIGFE
