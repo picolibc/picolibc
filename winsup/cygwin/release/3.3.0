@@ -8,6 +8,9 @@ What's new:
   of any "gmon.out" file created by profiler, ssp, or use of the gcc/g++
   option '-pg'.  (Continue using gprof to get symbolic profile displays.)
 
+- New GNU-specific APIs: pthread_cond_clockwait, pthread_mutex_clocklock,
+  pthread_rwlock_clockrdlock, pthread_rwlock_clockwrlock, sem_clockwait.
+
 
 What changed:
 -------------

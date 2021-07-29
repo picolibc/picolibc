@@ -5,10 +5,10 @@
 <chapter id="compatibility" xmlns:xi="http://www.w3.org/2001/XInclude">
 <title>Compatibility</title>
 
-<sect1 id="std-susv4"><title>System interfaces compatible with the Single Unix Specification, Version 4:</title>
+<sect1 id="std-susv4"><title>System interfaces compatible with the Single Unix Specification, Version 7:</title>
 
-<para>Note that the core of the Single Unix Specification, Version 4 is
-also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
+<para>Note that the core of the Single Unix Specification, Version 7 is
+also IEEE Std 1003.1-2017 (POSIX.1-2017).</para>
 
 <screen>
     FD_CLR
@@ -1359,9 +1359,13 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pow10f
     pow10l
     ppoll
+    pthread_cond_clockwait
     pthread_getaffinity_np
     pthread_getattr_np
     pthread_getname_np
+    pthread_mutex_clocklock
+    pthread_rwlock_clockrdlock
+    pthread_rwlock_clockwrlock
     pthread_setaffinity_np
     pthread_setname_np
     pthread_sigqueue
@@ -1380,6 +1384,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     sched_getcpu
     sched_setaffinity
     secure_getenv
+    sem_clockwait
     setxattr
     signalfd
     sincos
@@ -1597,7 +1602,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
 
 </sect1>
 
-<sect1 id="std-notimpl"><title>NOT implemented system interfaces from the Single Unix Specification, Volume 4:</title>
+<sect1 id="std-notimpl"><title>NOT implemented system interfaces from the Single Unix Specification, Volume 7:</title>
 
 <screen>
     endnetent

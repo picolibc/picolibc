@@ -4,6 +4,35 @@
 
 <sect1 id="ov-new"><title>What's new and what changed in Cygwin</title>
 
+<sect2 id="ov-new3.3"><title>What's new and what changed in 3.3</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+An IP-sampling profiler named 'profiler' has been added.  It can be used
+to profile any Cygwin program along with any DLLs loaded.
+</para></listitem>
+
+<listitem><para>
+A new tool 'gmondump' has been added.  It can dump the raw information
+of any "gmon.out" file created by profiler, ssp, or use of the gcc/g++
+option '-pg'.  (Continue using gprof to get symbolic profile displays.)
+</para></listitem>
+
+<listitem><para>
+New GNU-specific APIs: pthread_cond_clockwait, pthread_mutex_clocklock,
+pthread_rwlock_clockrdlock, pthread_rwlock_clockwrlock, sem_clockwait.
+</para></listitem>
+
+<listitem><para>
+The speed argument to cfsetspeed(3) can now be a numerical baud rate
+rather than a Bnnn constant, as on Linux.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new3.2"><title>What's new and what changed in 3.2</title>
 
 <itemizedlist mark="bullet">
