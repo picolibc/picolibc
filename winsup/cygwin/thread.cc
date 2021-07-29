@@ -4002,7 +4002,8 @@ semaphore::trywait (sem_t *sem)
 }
 
 int
-semaphore::timedwait (sem_t *sem, const struct timespec *abstime)
+semaphore::clockwait (sem_t *sem, clockid_t clock_id,
+		      const struct timespec *abstime)
 {
   LARGE_INTEGER timeout;
 
@@ -4019,7 +4020,7 @@ semaphore::timedwait (sem_t *sem, const struct timespec *abstime)
 
   __try
     {
-      int err = pthread_convert_abstime (CLOCK_REALTIME, abstime, &timeout);
+      int err = pthread_convert_abstime (clock_id, abstime, &timeout);
       if (err)
 	return err;
 

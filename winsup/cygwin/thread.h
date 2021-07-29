@@ -679,7 +679,8 @@ public:
   static int post (sem_t *sem);
   static int getvalue (sem_t *sem, int *sval);
   static int trywait (sem_t *sem);
-  static int timedwait (sem_t *sem, const struct timespec *abstime);
+  static int clockwait (sem_t *sem, clockid_t clock_id,
+			const struct timespec *abstime);
 
   static int getinternal (sem_t *sem, int *sfd, unsigned long long *shash,
 			  LUID *sluid, unsigned int *sval);

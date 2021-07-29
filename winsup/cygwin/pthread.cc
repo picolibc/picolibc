@@ -170,9 +170,15 @@ sem_trywait (sem_t * sem)
 }
 
 int
+sem_clockwait (sem_t * sem, clockid_t clock_id, const struct timespec *abstime)
+{
+  return semaphore::clockwait (sem, clock_id, abstime);
+}
+
+int
 sem_timedwait (sem_t * sem, const struct timespec *abstime)
 {
-  return semaphore::timedwait (sem, abstime);
+  return semaphore::clockwait (sem, CLOCK_REALTIME, abstime);
 }
 
 int

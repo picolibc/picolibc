@@ -1287,6 +1287,7 @@ secure_getenv NOSIGFE
 seed48 NOSIGFE
 seekdir SIGFE
 select = cygwin_select SIGFE
+sem_clockwait SIGFE
 sem_close SIGFE
 sem_destroy SIGFE
 sem_getvalue SIGFE
