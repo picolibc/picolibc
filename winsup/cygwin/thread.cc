@@ -3475,7 +3475,8 @@ pthread_mutex_lock (pthread_mutex_t *mutex)
 }
 
 extern "C" int
-pthread_mutex_timedlock (pthread_mutex_t *mutex, const struct timespec *abstime)
+pthread_mutex_clocklock (pthread_mutex_t *mutex, clockid_t clock_id,
+			 const struct timespec *abstime)
 {
   LARGE_INTEGER timeout;
 
@@ -3491,7 +3492,7 @@ pthread_mutex_timedlock (pthread_mutex_t *mutex, const struct timespec *abstime)
 
   __try
     {
-      int err = pthread_convert_abstime (CLOCK_REALTIME, abstime, &timeout);
+      int err = pthread_convert_abstime (clock_id, abstime, &timeout);
       if (err)
 	return err;
 
@@ -3500,6 +3501,12 @@ pthread_mutex_timedlock (pthread_mutex_t *mutex, const struct timespec *abstime)
   __except (NO_ERROR) {}
   __endtry
   return EINVAL;
+}
+
+extern "C" int
+pthread_mutex_timedlock (pthread_mutex_t *mutex, const struct timespec *abstime)
+{
+  return pthread_mutex_clocklock (mutex, CLOCK_REALTIME, abstime);
 }
 
 extern "C" int

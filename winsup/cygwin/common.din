@@ -1121,6 +1121,7 @@ pthread_join SIGFE
 pthread_key_create SIGFE
 pthread_key_delete SIGFE
 pthread_kill SIGFE
+pthread_mutex_clocklock SIGFE
 pthread_mutex_destroy SIGFE
 pthread_mutex_getprioceiling SIGFE
 pthread_mutex_init SIGFE

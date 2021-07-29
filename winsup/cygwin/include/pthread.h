@@ -167,6 +167,10 @@ int pthread_mutex_getprioceiling (const pthread_mutex_t *, int *);
 int pthread_mutex_init (pthread_mutex_t *, const pthread_mutexattr_t *);
 int pthread_mutex_lock (pthread_mutex_t *);
 int pthread_mutex_setprioceiling (pthread_mutex_t *, int, int *);
+#if __GNU_VISIBLE
+int pthread_mutex_clocklock (pthread_mutex_t *, clockid_t,
+			     const struct timespec *);
+#endif
 int pthread_mutex_timedlock (pthread_mutex_t *, const struct timespec *);
 int pthread_mutex_trylock (pthread_mutex_t *);
 int pthread_mutex_unlock (pthread_mutex_t *);
