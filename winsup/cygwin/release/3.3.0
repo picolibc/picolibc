@@ -54,3 +54,7 @@ Bug Fixes
 
 - Fix getifaddrs(3) returning address family 0 or IPv4 address 0.
   Addresses: https://cygwin.com/pipermail/cygwin/2021-July/248970.html
+
+- Fix getaddrinfo(3) to return valid ai_socktype and ai_protocol values
+  if the underlying GetAddrInfoW screwes up.
+  Addresses: https://cygwin.com/pipermail/cygwin/2021-July/248985.html
