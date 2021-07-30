@@ -2910,14 +2910,62 @@ ga_duplist (struct addrinfoW *ai, bool v4mapped, int idn_flags, int &err)
 {
   struct addrinfo *tmp, *nai = NULL, *nai0 = NULL;
 
-  for (; ai; ai = ai->ai_next, nai = tmp)
+  for (; ai; ai = ai->ai_next)
     {
+      /* Workaround for a Windows weirdness.  If a service is supported as
+	 TCP and UDP service, GetAddrInfo does not return two entries, one
+	 for TCP, one for UDP, as on Linux.  Rather, it just returns a single
+	 entry with ai_socktype and ai_protocol set to 0, kind of like a
+	 placeholder.  If the service only exists as TCP or UDP service, then
+	 ai->ai_socktype is set, but ai_protocol isn't.  Fix up the fields,
+	 and in case ai_socktype and ai_protocol are 0 duplicate the entry
+	 with valid values for ai_socktype and ai_protocol. */
+      switch (ai->ai_socktype)
+	{
+	case SOCK_STREAM:
+	  if (ai->ai_protocol == 0)
+	    ai->ai_protocol = IPPROTO_TCP;
+	  break;
+	case SOCK_DGRAM:
+	  if (ai->ai_protocol == 0)
+	    ai->ai_protocol = IPPROTO_UDP;
+	  break;
+	case 0:
+	  switch (ai->ai_protocol)
+	    {
+	    case IPPROTO_TCP:
+	      ai->ai_socktype = SOCK_STREAM;
+	      break;
+	    case IPPROTO_UDP:
+	      ai->ai_socktype = SOCK_DGRAM;
+	      break;
+	    case 0:
+	      ai->ai_socktype = SOCK_STREAM;
+	      ai->ai_protocol = IPPROTO_TCP;
+	      if (!(tmp = ga_dup (ai, v4mapped, idn_flags, err)))
+		goto bad;
+	      if (!nai0)
+		nai0 = tmp;
+	      if (nai)
+		nai->ai_next = tmp;
+	      nai = tmp;
+	      ai->ai_socktype = SOCK_DGRAM;
+	      ai->ai_protocol = IPPROTO_UDP;
+	      break;
+	    default:
+	      break;
+	    }
+	  break;
+	default:
+	  break;
+	}
       if (!(tmp = ga_dup (ai, v4mapped, idn_flags, err)))
 	goto bad;
       if (!nai0)
 	nai0 = tmp;
       if (nai)
 	nai->ai_next = tmp;
+      nai = tmp;
     }
   return nai0;
 
