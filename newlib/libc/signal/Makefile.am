@@ -4,7 +4,7 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = psignal.c raise.c signal.c
+LIB_SOURCES = psignal.c raise.c signal.c sig2str.c
 
 libsignal_la_LDFLAGS = -Xcompiler -nostdlib
 
@@ -21,6 +21,6 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
-CHEWOUT_FILES = psignal.def raise.def signal.def
+CHEWOUT_FILES = psignal.def raise.def signal.def sig2str.def
 
 CHAPTERS = signal.tex

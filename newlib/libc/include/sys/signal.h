@@ -12,6 +12,7 @@ extern "C" {
 #include <sys/types.h>
 #include <sys/_sigset.h>
 #include <sys/_timespec.h>
+#include <stdint.h>
 
 #if !defined(_SIGSET_T_DECLARED)
 #define	_SIGSET_T_DECLARED
@@ -237,6 +238,22 @@ int sigtimedwait (const sigset_t *, siginfo_t *, const struct timespec *);
 int sigqueue (pid_t, int, const union sigval);
 
 #endif /* __POSIX_VISIBLE >= 199309 */
+
+/* Using __MISC_VISIBLE until POSIX Issue 8 is officially released */
+#if __MISC_VISIBLE
+
+/* POSIX Issue 8 adds sig2str() and str2sig() */
+
+#if __STDINT_EXP(INT_MAX) > 0x7fff
+#define SIG2STR_MAX (sizeof("RTMAX+") + sizeof("4294967295") - 1)
+#else
+#define SIG2STR_MAX (sizeof("RTMAX+") + sizeof("65535") - 1)
+#endif
+
+int sig2str(int, char *);
+int str2sig(const char *__restrict, int *__restrict);
+
+#endif /* __MISC_VISIBLE */
 
 #if defined(___AM29K__)
 /* These all need to be defined for ANSI C, but I don't think they are
