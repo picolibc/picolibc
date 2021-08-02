@@ -2240,9 +2240,10 @@ specifying an empty password.
 
     <refsect1 id="profiler-desc">
       <title>Description</title>
-    <para>The <command>profiler</command> utility executes a given program, and
-      optionally the children of that program, collecting the location of the
-      CPU instruction pointer (IP) many times per second. This gives a profile
+    <para>The <command>profiler</command> utility executes a given program and
+      any children of that program, collecting the location of the CPU
+      instruction pointer (IP) many times per second. (It is optional to
+      collect this info from child processes.) This info gives a profile
       of the program's execution, showing where the most time is being spent.
       This profiling technique is called "IP sampling".</para>
 

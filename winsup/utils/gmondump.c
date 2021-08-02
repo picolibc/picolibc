@@ -46,6 +46,14 @@ OPTIONS are:\n\
   exit (where == stderr ? 1 : 0 );
 }
 
+void __attribute__ ((__noreturn__))
+usage1 (FILE *where)
+{
+  fprintf (where, "Usage: %s [OPTIONS] FILENAME...\n", pgm);
+
+  exit (where == stderr ? 1 : 0 );
+}
+
 void
 note (const char *fmt, ...)
 {
@@ -247,6 +255,10 @@ main(int argc, char **argv)
       default:
         ;
       }
+
+  if (optind >= argc)
+    /* Print one-line help and exit. */
+    usage1 (ofile);
 
   for (int i = optind; i < argc; i++)
     gmondump1 (argv[i]);
