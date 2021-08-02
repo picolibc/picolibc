@@ -194,6 +194,7 @@ sig2str(int signum, char *str)
 {
   const sig_name_and_num *sptr;
 
+#if defined (SIGRTMIN) && defined (SIGRTMAX)
   /* If signum falls in lower half of the real time signals range, define
    * the saved str value as "RTMIN+n" according to the Issue 8 standard */
   if ((SIGRTMIN + 1) <= signum &&
@@ -209,6 +210,7 @@ sig2str(int signum, char *str)
     sprintf(str, "RTMAX-%d", (SIGRTMAX - signum));
     return 0;
   }
+#endif
 
   /* Otherwise, search for signal matching signum in sig_array. If found,
    * save its string value in str. */
@@ -231,6 +233,7 @@ str2sig(const char *restrict str, int *restrict pnum)
   const sig_name_and_num *sptr;
   unsigned long is_valid_decimal;
 
+#if defined (SIGRTMIN) && defined (SIGRTMAX)
   /* i686 Cygwin only supports one RT signal. For this case, skip checks
    * for "RTMIN+n" and "RTMAX-m". */
   if (SIGRTMIN != SIGRTMAX) {
@@ -269,6 +272,7 @@ str2sig(const char *restrict str, int *restrict pnum)
       return -1;
     }
   }
+#endif
 
   /*If str is a valid signal name, save its corresponding number in pnum. */
   for (sptr = sig_array; sptr < &sig_array[NUM_OF_SIGS]; sptr++) {
@@ -289,9 +293,10 @@ str2sig(const char *restrict str, int *restrict pnum)
   /* If str is a representation of a decimal value, save its integer value
    * in pnum. */
   if (1 <= is_valid_decimal &&
-      is_valid_decimal <= SIGRTMAX) {
+      is_valid_decimal <= (NSIG - 1)) {
     *pnum = is_valid_decimal;
     return 0;
   }
+
   return -1;
 }
