@@ -20,8 +20,9 @@ option '-pg'.  (Continue using gprof to get symbolic profile displays.)
 </para></listitem>
 
 <listitem><para>
-New GNU-specific APIs: pthread_cond_clockwait, pthread_mutex_clocklock,
-pthread_rwlock_clockrdlock, pthread_rwlock_clockwrlock, sem_clockwait.
+New GNU-specific APIs, slated to become part of the next POSIX standard:
+pthread_cond_clockwait, pthread_mutex_clocklock, pthread_rwlock_clockrdlock,
+pthread_rwlock_clockwrlock, sem_clockwait.
 </para></listitem>
 
 <listitem><para>
