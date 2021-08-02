@@ -12,6 +12,9 @@ What's new:
   pthread_cond_clockwait, pthread_mutex_clocklock, pthread_rwlock_clockrdlock,
   pthread_rwlock_clockwrlock, sem_clockwait.
 
+- New Solaris-specific APIs, slated to become part of the next POSIX standard:
+  sig2str, str2sig.
+
 
 What changed:
 -------------

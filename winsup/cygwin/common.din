@@ -1354,6 +1354,7 @@ shmctl SIGFE
 shmdt SIGFE
 shmget SIGFE
 shutdown = cygwin_shutdown SIGFE
+sig2str SIGFE
 sigaction SIGFE
 sigaddset SIGFE
 sigaltstack SIGFE
@@ -1417,6 +1418,7 @@ statvfs SIGFE
 stime SIGFE
 stpcpy NOSIGFE
 stpncpy NOSIGFE
+str2sig SIGFE
 strcasecmp NOSIGFE
 strcasecmp_l NOSIGFE
 strcasestr NOSIGFE

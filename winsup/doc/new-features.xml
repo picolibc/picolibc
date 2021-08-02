@@ -26,6 +26,11 @@ pthread_rwlock_clockwrlock, sem_clockwait.
 </para></listitem>
 
 <listitem><para>
+New Solaris-specific APIs, slated to become part of the next POSIX standard:
+sig2str, str2sig.
+</para></listitem>
+
+<listitem><para>
 The speed argument to cfsetspeed(3) can now be a numerical baud rate
 rather than a Bnnn constant, as on Linux.
 </para></listitem>
