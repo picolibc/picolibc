@@ -153,9 +153,11 @@
 	((off_t)(db) << DEV_BSHIFT)
 #endif
 
-#define	PRIMASK	0x0ff
-#define	PCATCH	0x100		/* OR'd with pri for tsleep to check signals */
-#define	PDROP	0x200	/* OR'd with pri to stop re-entry of interlock mutex */
+#define	PRIMASK		0x0ff
+#define	PCATCH		0x100	/* OR'd with pri for tsleep to check signals */
+#define	PDROP		0x200	/* OR'd with pri to stop re-entry of interlock mutex */
+#define	PNOLOCK		0x400	/* OR'd with pri to allow sleeping w/o a lock */
+#define	PRILASTFLAG	0x400	/* Last flag defined above */
 
 #define	NZERO	0		/* default "nice" */
 
