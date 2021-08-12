@@ -406,7 +406,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
                         _dtoa.digits[d] = dig;
                     }
                 }
-                if (fval)
+                if ((fi<<1) != 0)
                     exp -= EXP_BIAS;
                 else
                     exp = 0;
