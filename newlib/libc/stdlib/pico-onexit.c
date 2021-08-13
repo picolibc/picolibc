@@ -77,9 +77,9 @@ __call_exitprocs(int code, void *param)
 {
 	for (;;) {
 		int	                i;
-                union on_exit_func      func;
+                union on_exit_func      func = {};
                 int                     kind = PICO_ONEXIT_EMPTY;
-		void	                *arg;
+		void	                *arg = 0;
 
 		__LIBC_LOCK();
 		for (i = ATEXIT_MAX - 1; i >= 0; i--) {
