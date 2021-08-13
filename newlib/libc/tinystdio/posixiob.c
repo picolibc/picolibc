@@ -58,8 +58,18 @@ static struct __file_posix __stdout = {
 	.write_buf = write_buf
 };
 
-FILE *const __posix_iob[3] = { &__stdin.cfile.file, &__stdout.cfile.file, &__stdout.cfile.file };
-__weak_reference(__posix_iob,__iob);
+FILE *const __posix_stdin = &__stdin.cfile.file;
+FILE *const __posix_stdout = &__stdout.cfile.file;
+
+#ifdef __strong_reference
+__strong_reference(__posix_stdout, __posix_stderr);
+#else
+FILE *const __posix_stderr = &__stdout.cfile.file;
+#endif
+
+__weak_reference(__posix_stdin,stdin);
+__weak_reference(__posix_stdout,stdout);
+__weak_reference(__posix_stderr,stderr);
 
 /*
  * Add a destructor function to get stdout flushed on

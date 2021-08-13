@@ -114,12 +114,12 @@
     conversion should be performed, but instead any string that aims
     to issue a CR-LF sequence must use <tt>"\r\n"</tt> explicitly.
 
-    stdin, stdout and stderr are macros which refer to an undefined
-    array of FILE pointers, __iob. If you want to use this, your
-    application must define this array and initialize it. It is
-    declared 'const' so that you can place it in ROM if you don't need
-    to modify it after startup. FILEs cannot be placed in ROM as they
-    have values which are modified during runtime.
+    stdin, stdout and stderr are undefined global FILE pointers. If
+    you want to use this, your application must define these variables
+    and initialize them. They are declared 'const' so that you can place
+    them in ROM if you don't need to modify it after startup. FILEs
+    cannot be placed in ROM as they have values which are modified
+    during runtime.
 
     \anchor stdio_without_malloc
     <h3>Running stdio without malloc()</h3>
@@ -283,22 +283,29 @@ typedef __FILE FILE;
 #endif
 
 /**
+   This symbol is defined when stdin/stdout/stderr are global
+   variables. When undefined, the old __iob array is used which
+   contains the pointers instead
+*/
+#define PICOLIBC_STDIO_GLOBALS
+
+/**
    Stream that will be used as an input stream by the simplified
    functions that don't take a \c stream argument.
 */
-#define stdin (__iob[0])
+extern FILE *const stdin;
 
 /**
    Stream that will be used as an output stream by the simplified
    functions that don't take a \c stream argument.
 */
-#define stdout (__iob[1])
+extern FILE *const stdout;
 
 /**
    Stream destined for error output.  Unless specifically assigned,
    identical to \c stdout.
 */
-#define stderr (__iob[2])
+extern FILE *const stderr;
 
 /**
    \c EOF declares the value that is returned by various standard IO
@@ -387,8 +394,6 @@ extern "C" {
 /*
  * Doxygen documentation can be found in fdevopen.c.
  */
-
-extern struct __file *const __iob[];
 
 extern FILE *fdevopen(int (*__put)(char, FILE*), int (*__get)(FILE*), int(*__flush)(FILE *));
 

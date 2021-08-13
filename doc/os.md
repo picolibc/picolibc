@@ -16,11 +16,12 @@ complex file operations so that a minimal system can easily support
 the former with only a few functions.
 
 To get stdin/stdout/stderr working, the application needs to define
-the '__iob' array, which contains pointers to FILE objects for each of
-stdin/stdout/stderr. The __iob array may reside in read-only memory,
-but the FILE objects may not. A single FILE object may be used for all
-three pointers. The FILE object contains function pointers for putc,
-getc, which might be defined as follows:
+the `stdin`, `stdout` and `stderr` globals, which contain pointers to
+FILE objects. The pointers may reside in read-only memory, but the
+FILE objects may not. A single FILE object may be used for all three
+pointers, and linker aliases may be used to make all three pointers be
+stored in the same location. The FILE object contains function
+pointers for putc, getc, which might be defined as follows:
 
 	static int
 	sample_putc(char c, FILE *file)
@@ -69,9 +70,12 @@ supported, can be one of the following:
 | _FDEV_SETUP_WRITE | Write      | putc               |
 | _FDEV_SETUP_RW    | Read/Write | putc, getc         |
 
-Finally, the FILE is used to initialize the __iob array:
+Finally, the FILE is used to initialize the `stdin`, `stdout` and
+`stderr` values, the latter two of which are simply aliases to `stdin`:
 
-	FILE *const __iob[3] = { &__stdio, &__stdio, &__stdio };
+   FILE *const stdin = &__stdio;
+   __strong_reference(stdin, stdout);
+   __strong_reference(stdin, stderr);
 
 ### fopen, fdopen
 

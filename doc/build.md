@@ -64,13 +64,14 @@ types and formats.
 
 These options apply when tinystdio is enabled, which is the
 default. For stdin/stdout/stderr, the application will need to provide
-`__iob`, which is an array of three pointers to FILE structures (which
-can be a single shared FILE structure).
+`stdin`, `stdout` and `stderr`, which are three pointers to FILE
+structures (which can all reference a single shared FILE structure,
+and which can be aliases to the same underlying global pointer).
 
 Note that while posix-io support is enabled by default, using it will
 require that the underlying system offer the required functions. POSIX
-console support offers a built-in `__iob` definition which uses the
-same POSIX I/O functions.
+console support offers built-in `stdin`, `stdout` and `stderr`
+definitions which use the same POSIX I/O functions.
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
