@@ -578,6 +578,7 @@ conf_data = configuration_data()
 # can be compiled + linked.
 # The name should match the builtin, but technically it's not necessary
 builtins = [
+  ['builtin_alloca', '__builtin_alloca(1);'],
   ['builtin_ffs', '__builtin_ffs(42);'],
   ['builtin_ffsl', '__builtin_ffsl((long)42);'],
   ['builtin_ffsll', '__builtin_ffsll((long long)42);'],

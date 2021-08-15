@@ -80,6 +80,7 @@ Supporting OS subroutines required:
 #include <wctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <alloca.h>
 #include <stdint.h>
 #include <limits.h>
 #include <wchar.h>
