@@ -82,7 +82,7 @@ main(int argc, char **argv)
 
     i1 = finite (d1);
     i1 = finitef (f1);
-#ifdef HAVE_BUILTIN_FINITEL
+#if defined(HAVE_BUILTIN_FINITEL) || defined(HAVE_BUILTIN_ISFINITE)
     i1 = finitel (l1);
 #endif
     i1 = isinff (f1);
