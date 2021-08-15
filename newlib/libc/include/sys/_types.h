@@ -81,7 +81,7 @@ typedef int __pid_t;
 #endif
 
 #ifndef __machine_dev_t_defined
-#ifdef linux
+#ifdef __linux
 typedef __uint64_t __dev_t;
 #else
 typedef short __dev_t;
@@ -89,14 +89,14 @@ typedef short __dev_t;
 #endif
 
 #ifndef __machine_uid_t_defined
-#ifdef linux
+#ifdef __linux
 typedef __uint32_t __uid_t;
 #else
 typedef unsigned short __uid_t;
 #endif
 #endif
 #ifndef __machine_gid_t_defined
-#ifdef linux
+#ifdef __linux
 typedef __uint32_t __gid_t;
 #else
 typedef unsigned short __gid_t;
@@ -109,7 +109,7 @@ typedef __uint32_t __id_t;
 
 #ifndef __machine_ino_t_defined
 #if (defined(__i386__) && (defined(GO32) || defined(__MSDOS__))) || \
-	defined(__sparc__) || defined(__SPU__) || defined(linux)
+	defined(__sparc__) || defined(__SPU__) || defined(__linux)
 typedef unsigned long __ino_t;
 #else
 typedef unsigned short __ino_t;
