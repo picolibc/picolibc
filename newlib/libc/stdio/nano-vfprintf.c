@@ -152,6 +152,7 @@ static char *rcsid = "$Id$";
 # define _VFPRINTF_R _vfprintf_r
 #endif
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -60,6 +60,7 @@ conforming C implementations may return a different result from
 No supporting OS subroutines are required.
 */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
 

@@ -84,6 +84,7 @@ PORTABILITY
 <<getwchar_unlocked>> is a GNU extension.
 */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
 #include <wchar.h>

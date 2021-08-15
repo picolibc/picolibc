@@ -6,6 +6,7 @@
 
 /* finitel(x) returns 1 is x is finite, else 0; */
 
+#define _DEFAULT_SOURCE
 #include <math.h>
 
 #if defined(_LDBL_EQ_DBL) || defined(HAVE_BUILTIN_FINITEL) || defined(HAVE_BUILTIN_ISFINITE)

@@ -40,6 +40,7 @@ QUICKREF
 	strcoll_l ansi pure
 */
 
+#define _DEFAULT_SOURCE
 #include <string.h>
 
 int

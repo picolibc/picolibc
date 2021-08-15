@@ -18,6 +18,7 @@
 
 #ifndef _REENT_ONLY
 
+#define _DEFAULT_SOURCE
 #include <stdlib.h>
 #include <string.h>
 

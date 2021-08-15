@@ -92,6 +92,7 @@ SEEALSO
  *
  * This code is large and complicated...
  */
+#define _DEFAULT_SOURCE
 #include <newlib.h>
 
 #ifdef INTEGER_ONLY
@@ -118,6 +119,7 @@ SEEALSO
 # undef _NO_POS_ARGS
 #endif
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
 #include <stdlib.h>

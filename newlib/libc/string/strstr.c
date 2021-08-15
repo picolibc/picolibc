@@ -72,6 +72,7 @@ QUICKREF
 	strstr ansi pure
 */
 
+#define _DEFAULT_SOURCE
 #include <string.h>
 #include <limits.h>
 

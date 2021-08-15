@@ -32,6 +32,7 @@
  * SUCH DAMAGE.
  */
 
+#define _DEFAULT_SOURCE
 #include <sys/cdefs.h>
 #if 0
 #if defined(LIBC_SCCS) && !defined(lint)

@@ -42,6 +42,7 @@ This set of functions is an integer-only extension, and is not portable.
 Supporting OS subroutines required: <<sbrk>>, <<write>>.
 */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
 #include <unistd.h>

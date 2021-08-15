@@ -36,6 +36,7 @@ PORTABILITY
 <<wcscoll_l>> is POSIX-1.2008.
 */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <wchar.h>
 

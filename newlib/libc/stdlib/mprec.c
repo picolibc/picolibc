@@ -80,6 +80,7 @@
  *	down depends on the machine and the number being converted.
  */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdlib.h>
 #include <string.h>

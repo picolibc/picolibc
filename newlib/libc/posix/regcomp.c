@@ -38,6 +38,7 @@
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)regcomp.c	8.5 (Berkeley) 3/20/94";
 #endif /* LIBC_SCCS and not lint */
+#define _DEFAULT_SOURCE
 #include <sys/cdefs.h>
 
 #include <sys/types.h>

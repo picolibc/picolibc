@@ -33,9 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
-#define _XOPEN_SOURCE
-#define _XOPEN_SOURCE_EXTENDED
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <errno.h>
 #include <stdlib.h>

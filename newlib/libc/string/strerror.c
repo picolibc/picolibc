@@ -397,6 +397,7 @@ QUICKREF
 	strerror ansi pure
 */
 
+#define _DEFAULT_SOURCE
 #include <errno.h>
 #include <string.h>
 

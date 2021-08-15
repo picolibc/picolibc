@@ -26,8 +26,8 @@
 
 /* Documented in malloc.c.  */
 
+#define _DEFAULT_SOURCE
 #include <sys/cdefs.h>
-
 #include <stdlib.h>
 
 #ifndef _REENT_ONLY

@@ -59,6 +59,7 @@ on two different systems.
 
 #ifndef _REENT_ONLY
 
+#define _DEFAULT_SOURCE
 #include <stdlib.h>
 
 void

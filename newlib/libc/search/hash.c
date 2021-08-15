@@ -30,6 +30,7 @@
  * SUCH DAMAGE.
  */
 
+#define _DEFAULT_SOURCE
 #include <sys/param.h>
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)hash.c	8.9 (Berkeley) 6/16/94";

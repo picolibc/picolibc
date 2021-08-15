@@ -32,6 +32,7 @@
  * Interface documentation refer to malloc.c.
  */
 
+#define _DEFAULT_SOURCE
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>

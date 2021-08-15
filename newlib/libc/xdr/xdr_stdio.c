@@ -36,6 +36,7 @@
  * from the stream.
  */
 
+#define _DEFAULT_SOURCE
 #include <stdio.h>
 
 #include <rpc/types.h>

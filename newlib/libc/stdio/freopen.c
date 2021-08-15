@@ -59,6 +59,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<open>>, <<read>>, <<sbrk>>, <<write>>.
 */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <time.h>
 #include <stdio.h>

@@ -60,7 +60,7 @@ threads could be affected by the temporary change to TZ.
 
 <<timegm>> is the inverse of <<gmtime>>.
 
-<<timegm>> is available if _BSD_SOURCE || _SVID_SOURCE || _GNU_SOURCE.
+<<timegm>> is available if _BSD_SOURCE || _SVID_SOURCE || _DEFAULT_SOURCE.
 
 RETURNS
 If the contents of the structure at <[timp]> do not form a valid
@@ -75,6 +75,7 @@ ANSI C requires <<mktime>>.
 <<mktime>> and <<timegm>> require no supporting OS subroutines.
 */
 
+#define _DEFAULT_SOURCE
 #include <stdlib.h>
 #include <time.h>
 #include "local.h"

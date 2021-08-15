@@ -26,6 +26,7 @@
 	dmg@research.att.com or research!dmg
  */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdlib.h>
 #include <string.h>

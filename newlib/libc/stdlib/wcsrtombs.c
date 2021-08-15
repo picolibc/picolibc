@@ -3,6 +3,7 @@ Copyright (c) 2002 Thomas Fitzsimmons <fitzsim@redhat.com>
  */
 /* Doc in wcsnrtombs.c */
 
+#define _DEFAULT_SOURCE
 #include <newlib.h>
 #include <wchar.h>
 

@@ -102,6 +102,7 @@ PORTABILITY
 <<newlocale>> is POSIX-1.2008.
 */
 
+#define _DEFAULT_SOURCE
 #include <newlib.h>
 #include <errno.h>
 #include <stdlib.h>

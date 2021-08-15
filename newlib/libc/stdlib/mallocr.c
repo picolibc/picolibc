@@ -245,6 +245,7 @@ int _dummy_mallocr = 1;
 
 /* Preliminaries */
 
+#define _DEFAULT_SOURCE
 #ifndef __STD_C
 #ifdef __STDC__
 #define __STD_C     1

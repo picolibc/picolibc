@@ -12,6 +12,9 @@
  */
 
 /* REDHAT LOCAL: Include files.  */
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
 #include <math.h>
 #include <sys/types.h>
 #include <machine/ieeefp.h>

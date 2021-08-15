@@ -61,6 +61,7 @@ POSIX.1-2008
 Supporting OS subroutines required: <<sbrk>>.
 */
 
+#define _DEFAULT_SOURCE
 #include <stdio.h>
 #include <wchar.h>
 #include <errno.h>

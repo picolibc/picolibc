@@ -37,6 +37,7 @@
  *
  */
 
+#define _DEFAULT_SOURCE
 #include <sys/types.h>
 #include <string.h>
 #include <limits.h>

@@ -57,6 +57,7 @@ PORTABILITY
 Supporting OS subroutine required: None
 */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
 #include <time.h>

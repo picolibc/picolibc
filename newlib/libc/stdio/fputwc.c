@@ -118,6 +118,7 @@ PORTABILITY
 <<fputwc_unlocked>> and <<putwc_unlocked>> are GNU extensions.
 */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <errno.h>
 #include <limits.h>

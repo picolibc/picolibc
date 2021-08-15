@@ -34,6 +34,7 @@
  * when serialized using XDR.
  */
 
+#define _DEFAULT_SOURCE
 #include <rpc/types.h>
 #include <rpc/xdr.h>
 #include <sys/types.h>

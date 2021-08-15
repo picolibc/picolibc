@@ -24,6 +24,7 @@
  * SUCH DAMAGE.
  */
 
+#define _DEFAULT_SOURCE
 #include <stdio.h>
 #include "local.h"
 

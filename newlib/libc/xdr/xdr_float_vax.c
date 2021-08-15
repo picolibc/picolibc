@@ -36,6 +36,7 @@
  * most common data items.  See xdr.h for more info on the interface to
  * xdr.
  */
+#define _DEFAULT_SOURCE
 #ifndef XDR_FLOAT_C
 #error "Must be included from xdr_float.c"
 #endif

@@ -29,6 +29,7 @@ THIS SOFTWARE.
 /* Please send bug reports to David M. Gay (dmg at acm dot org,
  * with " at " changed at "@" and " dot " changed to ".").	*/
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <errno.h>
 #include <stdlib.h>

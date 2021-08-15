@@ -17,6 +17,7 @@
 
 /* Split from vfscanf.c  */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <newlib.h>
 #include <stdio.h>

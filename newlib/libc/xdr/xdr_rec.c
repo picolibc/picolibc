@@ -44,6 +44,7 @@
  * The other 31 bits encode the byte length of the fragment.
  */
 
+#define _DEFAULT_SOURCE
 #include <stddef.h>
 #include <sys/types.h>
 #include <stdlib.h>

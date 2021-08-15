@@ -2,6 +2,7 @@
   * This program has been placed in the public domain.
   */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <string.h>
 #include <stdlib.h>
