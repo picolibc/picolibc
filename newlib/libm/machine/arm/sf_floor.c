@@ -31,7 +31,7 @@ float
 floorf (float x)
 {
   float result;
-  asm volatile ( "vrintm.f32\t%0, %1" : "=t" (result) : "t" (x) );
+  __asm__ volatile ( "vrintm.f32\t%0, %1" : "=t" (result) : "t" (x) );
   return result;
 }
 

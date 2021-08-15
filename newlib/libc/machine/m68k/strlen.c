@@ -38,7 +38,7 @@ strlen (const char *str)
 	unsigned int n = ~0;
 	const char *cp = str;
 
-	asm volatile ("1:\n"
+	__asm__ volatile ("1:\n"
 	     "\ttst.b (%0)+\n"
 #if defined(__mcpu32__)
 	     "\tdbeq %1,1b\n"

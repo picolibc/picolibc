@@ -56,7 +56,7 @@ int fetestexcept(int excepts)
   /* Read the current flags */
 
   fexcept_t flags;
-  asm volatile("frflags %0" : "=r"(flags));
+  __asm__ volatile("frflags %0" : "=r"(flags));
 
   /* "The fetestexcept() function shall return the value of the
    * bitwise-inclusive OR of the floating-point exception macros

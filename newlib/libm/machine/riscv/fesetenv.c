@@ -59,7 +59,7 @@ int fesetenv(const fenv_t *envp)
   /* Set environment (FCSR) */
 
   fenv_t fcsr = *envp;
-  asm volatile("fscsr %0" : : "r"(fcsr));
+  __asm__ volatile("fscsr %0" : : "r"(fcsr));
 
   /* Per 'fegetenv.html:
    *

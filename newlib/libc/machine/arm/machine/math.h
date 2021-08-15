@@ -72,7 +72,7 @@ __declare_arm_macro(double)
 ceil (double x)
 {
   double result;
-  asm volatile ( "vrintp.f64\t%P0, %P1" : "=w" (result) : "w" (x) );
+  __asm__ volatile ( "vrintp.f64\t%P0, %P1" : "=w" (result) : "w" (x) );
   return result;
 }
 
@@ -80,7 +80,7 @@ __declare_arm_macro(double)
 floor (double x)
 {
   double result;
-  asm volatile ("vrintm.f64\t%P0, %P1" : "=w" (result) : "w" (x));
+  __asm__ volatile ("vrintm.f64\t%P0, %P1" : "=w" (result) : "w" (x));
   return result;
 }
 
@@ -88,7 +88,7 @@ __declare_arm_macro(double)
 nearbyint (double x)
 {
   double result;
-  asm volatile ("vrintr.f64\t%P0, %P1" : "=w" (result) : "w" (x));
+  __asm__ volatile ("vrintr.f64\t%P0, %P1" : "=w" (result) : "w" (x));
   return result;
 }
 
@@ -96,7 +96,7 @@ __declare_arm_macro(double)
 rint (double x)
 {
   double result;
-  asm volatile ("vrintx.f64\t%P0, %P1" : "=w" (result) : "w" (x));
+  __asm__ volatile ("vrintx.f64\t%P0, %P1" : "=w" (result) : "w" (x));
   return result;
 }
 
@@ -104,7 +104,7 @@ __declare_arm_macro(double)
 round (double x)
 {
   double result;
-  asm volatile ("vrinta.f64\t%P0, %P1" : "=w" (result) : "w" (x));
+  __asm__ volatile ("vrinta.f64\t%P0, %P1" : "=w" (result) : "w" (x));
   return result;
 }
 
@@ -112,7 +112,7 @@ __declare_arm_macro(double)
 trunc (double x)
 {
   double result;
-  asm volatile ("vrintz.f64\t%P0, %P1" : "=w" (result) : "w" (x));
+  __asm__ volatile ("vrintz.f64\t%P0, %P1" : "=w" (result) : "w" (x));
   return result;
 }
 #endif /* __ARM_ARCH >= 8 */
@@ -160,7 +160,7 @@ __declare_arm_macro(float)
 ceilf (float x)
 {
   float result;
-  asm volatile ( "vrintp.f32\t%0, %1" : "=t" (result) : "t" (x) );
+  __asm__ volatile ( "vrintp.f32\t%0, %1" : "=t" (result) : "t" (x) );
   return result;
 }
 
@@ -168,7 +168,7 @@ __declare_arm_macro(float)
 floorf (float x)
 {
   float result;
-  asm volatile ( "vrintm.f32\t%0, %1" : "=t" (result) : "t" (x) );
+  __asm__ volatile ( "vrintm.f32\t%0, %1" : "=t" (result) : "t" (x) );
   return result;
 }
 
@@ -176,7 +176,7 @@ __declare_arm_macro(float)
 nearbyintf (float x)
 {
   float result;
-  asm volatile ("vrintr.f32\t%0, %1" : "=t" (result) : "t" (x));
+  __asm__ volatile ("vrintr.f32\t%0, %1" : "=t" (result) : "t" (x));
   return result;
 }
 
@@ -184,7 +184,7 @@ __declare_arm_macro(float)
 rintf (float x)
 {
   float result;
-  asm volatile ("vrintx.f32\t%0, %1" : "=t" (result) : "t" (x));
+  __asm__ volatile ("vrintx.f32\t%0, %1" : "=t" (result) : "t" (x));
   return result;
 }
 
@@ -192,7 +192,7 @@ __declare_arm_macro(float)
 roundf (float x)
 {
   float result;
-  asm volatile ("vrinta.f32\t%0, %1" : "=t" (result) : "t" (x));
+  __asm__ volatile ("vrinta.f32\t%0, %1" : "=t" (result) : "t" (x));
   return result;
 }
 
@@ -200,7 +200,7 @@ __declare_arm_macro(float)
 truncf (float x)
 {
   float result;
-  asm volatile ("vrintz.f32\t%0, %1" : "=t" (result) : "t" (x));
+  __asm__ volatile ("vrintz.f32\t%0, %1" : "=t" (result) : "t" (x));
   return result;
 }
 #endif /* __ARM_ARCH >= 8 */

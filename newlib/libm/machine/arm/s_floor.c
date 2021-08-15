@@ -31,7 +31,7 @@ double
 floor (double x)
 {
   double result;
-  asm volatile ("vrintm.f64\t%P0, %P1" : "=w" (result) : "w" (x));
+  __asm__ volatile ("vrintm.f64\t%P0, %P1" : "=w" (result) : "w" (x));
   return result;
 }
 

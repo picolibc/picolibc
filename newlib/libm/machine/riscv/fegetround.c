@@ -50,7 +50,7 @@ int fegetround()
   /* Get current rounding mode */
 
   fenv_t frm;
-  asm volatile("frrm %0" : "=r"(frm));
+  __asm__ volatile("frrm %0" : "=r"(frm));
 
   /* Per 'fegetround.html:
    *

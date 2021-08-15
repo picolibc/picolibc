@@ -31,7 +31,7 @@ float
 rintf (float x)
 {
   float result;
-  asm volatile ("vrintx.f32\t%0, %1" : "=t" (result) : "t" (x));
+  __asm__ volatile ("vrintx.f32\t%0, %1" : "=t" (result) : "t" (x));
   return result;
 }
 

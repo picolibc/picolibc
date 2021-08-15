@@ -14,7 +14,7 @@ static inline void *
 do_memcpy (void *dst0, const void *src0, size_t len)
 {
   int dummy;
-  asm volatile (
+  __asm__ volatile (
 #ifndef __OPTIMIZE_SIZE__
        "cmp	%2, #0x3\n\
 	bls	3f\n\

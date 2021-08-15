@@ -65,7 +65,7 @@ int fesetexceptflag(const fexcept_t *flagp, int excepts)
 
   /* Set new the flags */
 
-  asm volatile("csrs fflags, %0" : : "r"(fflags));
+  __asm__ volatile("csrs fflags, %0" : : "r"(fflags));
 
   /* Per 'fesetexceptflag.html:
    *

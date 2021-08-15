@@ -16,7 +16,7 @@ __inhibit_loop_to_libcall
 memcpy (void *__restrict dst0, const void *__restrict src0, size_t len)
 {
   int dummy;
-  asm volatile (
+  __asm__ volatile (
 #ifndef __OPTIMIZE_SIZE__
        "cmp	%2, #0x3\n\
 	bls	3f\n\

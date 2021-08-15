@@ -57,7 +57,7 @@ int fegetexceptflag(fexcept_t *flagp, int excepts)
   /* Get current exception flags */
 
   fexcept_t flags;
-  asm volatile("frflags %0" : "=r"(flags));
+  __asm__ volatile("frflags %0" : "=r"(flags));
 
   /* Return the requested flags in flagp */
 

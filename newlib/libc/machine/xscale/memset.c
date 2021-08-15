@@ -17,7 +17,7 @@ memset (void *dst, int c, size_t len)
 {
   int dummy;
 
-  asm volatile ("tst	%0, #0x3"
+  __asm__ volatile ("tst	%0, #0x3"
 #ifndef __OPTIMIZE_SIZE__
 "\n\
 	beq	1f\n\

@@ -55,16 +55,16 @@ int feupdateenv(const fenv_t *envp)
   /* Get current exception flags */
 
   fexcept_t flags;
-  asm volatile("frflags %0" : "=r"(flags));
+  __asm__ volatile("frflags %0" : "=r"(flags));
 
   /* Set the environment as requested */
 
   fenv_t fcsr = *envp; /* Environment to install */
-  asm volatile("fscsr %0" : : "r"(fcsr)); /* Install environment */
+  __asm__ volatile("fscsr %0" : : "r"(fcsr)); /* Install environment */
 
   /* OR in the saved exception flags */
 
-  asm volatile("csrs fflags, %0" : : "r"(flags));
+  __asm__ volatile("csrs fflags, %0" : : "r"(flags));
 
   /* "The feupdateenv() function shall return a zero value if and only
    * if all the required actions were successfully carried out."

@@ -31,7 +31,7 @@ float
 ceilf (float x)
 {
   float result;
-  asm volatile ( "vrintp.f32\t%0, %1" : "=t" (result) : "t" (x) );
+  __asm__ volatile ( "vrintp.f32\t%0, %1" : "=t" (result) : "t" (x) );
   return result;
 }
 

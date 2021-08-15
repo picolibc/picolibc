@@ -133,7 +133,7 @@ strcmp (const char *s1,
 
 #include "mb_endian.h"
 
-    asm volatile ("                                          \n\
+    __asm__ volatile ("                                          \n\
         or      r9, r0, r0               /* Index register */\n\
 check_alignment:                                             \n\
         andi    r3, r5, 3                                    \n\

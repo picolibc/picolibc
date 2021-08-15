@@ -62,7 +62,7 @@ int feraiseexcept(int excepts)
 
   /* Set the requested exception flags */
 
-  asm volatile("csrs fflags, %0" : : "r"(excepts));
+  __asm__ volatile("csrs fflags, %0" : : "r"(excepts));
 
   /* Per 'feraiseexcept.html:
    * "If the argument is zero or if all the specified exceptions were
