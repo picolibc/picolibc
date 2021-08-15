@@ -276,7 +276,7 @@ if enable_native_tests
   if native_lib_m.found()
     test('math_errhandling_native',
 	 executable('math_errhandling_native', 'math_errhandling.c',
-		    c_args: ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE', '-DNO_NEWLIB'],
+		    c_args: ['-DNO_NEWLIB'],
 		    dependencies: native_lib_m))
   endif
 endif
