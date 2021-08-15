@@ -8,7 +8,7 @@ INDEX
 
 SYNOPSIS
 	#include <wchar.h>
-	int wcwidth(const wint_t <[wc]>);
+	int wcwidth(const wchar_t <[wc]>);
 
 DESCRIPTION
 	The <<wcwidth>> function shall determine the number of column
@@ -231,7 +231,7 @@ __wcwidth (const wint_t ucs)
 }
 
 int
-wcwidth (const wint_t wc)
+wcwidth (const wchar_t wc)
 {
   wint_t wi = wc;
 
