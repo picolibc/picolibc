@@ -39,7 +39,7 @@
 #undef offsetoff
 #define _O(TYPE, MEMBER)  __builtin_offsetof (TYPE, MEMBER)
 
-#define _NLITEM(cat,memb) { { cat:__get_##cat##_locale }, \
+#define _NLITEM(cat,memb) { { .cat = __get_##cat##_locale }, \
 			      _O (struct lc_##cat##_T, memb) }
 
 #ifdef __HAVE_LOCALE_INFO_EXTENDED__

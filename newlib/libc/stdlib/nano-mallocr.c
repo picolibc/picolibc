@@ -144,8 +144,8 @@ bool __malloc_grow_chunk(chunk_t *c, size_t new_size);
  * call to free.
  */
 #ifdef HAVE_ALIAS_ATTRIBUTE
-extern typeof(free) __malloc_free;
-extern typeof(malloc) __malloc_malloc;
+extern __typeof(free) __malloc_free;
+extern __typeof(malloc) __malloc_malloc;
 #else
 #define __malloc_free(x) free(x)
 #define __malloc_malloc(x) malloc(x)
