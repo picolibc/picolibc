@@ -77,7 +77,7 @@ __call_exitprocs(int code, void *param)
 {
 	for (;;) {
 		int	                i;
-                union on_exit_func      func = {};
+                union on_exit_func      func = {0};
                 int                     kind = PICO_ONEXIT_EMPTY;
 		void	                *arg = 0;
 
