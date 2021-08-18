@@ -135,6 +135,8 @@ option('newlib-unbuf-stream-opt', type: 'boolean', value: false,
        description: 'enable unbuffered stream optimization in streamio')
 option('newlib-wide-orient', type: 'boolean', value: false,
        description: 'Turn off wide orientation in streamio')
+option('newlib-have-fcntl', type: 'boolean', value: false,
+       description: 'System has fcntl function')
 
 #
 # Internationalization options

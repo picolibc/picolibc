@@ -96,6 +96,7 @@ configuration
 | newlib-fseek-optimization   | false   | Enable fseek optimization                                                            |
 | newlib-fvwrite-in-streamio  | false   | Enable iov in streamio                                                               |
 | newlib-global-stdio-streams | false   | Enable global stdio streams                                                          |
+| newlib-have-fcntl           | false   | System has fcntl function available                                                  |
 | newlib-io-float             | false   | Enable printf/scanf family float support                                             |
 | newlib-io-pos-args          | false   | Enable printf-family positional arg support                                          |
 | newlib-io-long-double       | false   | Enable long double type support in IO functions printf/scanf                         |
