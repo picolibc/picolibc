@@ -53,7 +53,7 @@ foreach target : targets
     _libs_minimal = _libs_base
   endif
 
-  _c_args = value[1] + test_c_args + test_c_warnings
+  _c_args = value[1] + test_c_args
   _link_args = value[1] + test_link_args
 
   t1 = 'printf_scanf'
@@ -276,7 +276,7 @@ if enable_native_tests
   if native_lib_m.found()
     test('math_errhandling_native',
 	 executable('math_errhandling_native', 'math_errhandling.c',
-		    c_args: test_c_warnings + ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE', '-DNO_NEWLIB'],
+		    c_args: ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE', '-DNO_NEWLIB'],
 		    dependencies: native_lib_m))
   endif
 endif

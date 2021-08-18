@@ -60,7 +60,7 @@ foreach target : targets
 
     test(test + target,
 	 executable(test_name, src,
-		    c_args: test_c_warnings + ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE'] + _c_args,
+		    c_args: ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE'] + _c_args,
 		    link_args: _link_args,
 		    link_with: _libs,
 		    include_directories: test_inc),

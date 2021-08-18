@@ -424,13 +424,15 @@ picolibcpp_ld = configure_file(input: 'picolibc.ld.in',
 			     configuration: picolibcpp_ld_data,
 			     install_dir: lib_dir)
 
-# Not all compilers necessarily support all warnings used by the tests; only use these which are:
-test_c_warnings = []
-foreach arg : ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-Wimplicit-function-declaration', '-Werror=vla']
+# Not all compilers necessarily support all warnings; only use these which are:
+c_warnings = []
+foreach arg : ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-Werror=implicit-function-declaration', '-Werror=vla']
   if meson.get_compiler('c').has_argument(arg)
-    test_c_warnings += [arg]
+    c_warnings += [arg]
   endif
 endforeach
+
+c_args += c_warnings
 
 long_double_code = '''
 #include <float.h>
