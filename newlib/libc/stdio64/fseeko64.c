@@ -186,6 +186,7 @@ _fseeko64_r (struct _reent *ptr,
       return (EOF);
     }
 
+  (void) havepos;
   /*
    * Can only optimise if:
    *	reading (and not reading-and-writing);
