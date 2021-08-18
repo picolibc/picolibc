@@ -118,7 +118,7 @@ memwriter (struct _reent *ptr,
       size_t newsize = c->max * 3 / 2;
       if (newsize < c->pos + n + 1)
 	newsize = c->pos + n + 1;
-      cbuf = _realloc_r (ptr, cbuf, newsize);
+      cbuf = realloc (cbuf, newsize);
       if (! cbuf)
 	return EOF; /* errno already set to ENOMEM */
       *c->pbuf = cbuf;
@@ -279,7 +279,7 @@ memcloser (struct _reent *ptr,
   char *buf;
 
   /* Be nice and try to reduce any unused memory.  */
-  buf = _realloc_r (ptr, *c->pbuf,
+  buf = realloc (*c->pbuf,
 		    c->wide > 0 ? (*c->psize + 1) * sizeof (wchar_t)
 				: *c->psize + 1);
   if (buf)

@@ -125,7 +125,7 @@ _fgetws_r (struct _reent *ptr,
     {
       src = (char *) fp->_p;
       nl = memchr (fp->_p, '\n', fp->_r);
-      nconv = _mbsnrtowcs_r (ptr, wsp, &src,
+      nconv = mbsnrtowcs (wsp, &src,
 			     /* Read all bytes up to the next NL, or up to the
 				end of the buffer if there is no NL. */
 			     nl != NULL ? (nl - fp->_p + 1) : fp->_r,

@@ -146,7 +146,7 @@ __fputwc (struct _reent *ptr,
     }
   else
     {
-      if ((len = _wcrtomb_r (ptr, buf, wc, &fp->_mbstate)) == (size_t) -1)
+      if ((len = wcrtomb (buf, wc, &fp->_mbstate)) == (size_t) -1)
 	{
 	  fp->_flags |= __SERR;
 	  return WEOF;

@@ -60,6 +60,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<getpid>>,
 #include <reent.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include <sys/stat.h>
 
 #ifndef O_BINARY
@@ -81,7 +82,7 @@ _tmpfile64_r (struct _reent *ptr)
   {
      if ((f = _tmpnam_r (ptr, buf)) == NULL)
 	return NULL;
-      fd = _open64_r (ptr, f, O_RDWR | O_CREAT | O_EXCL | O_BINARY,
+      fd = open64 (f, O_RDWR | O_CREAT | O_EXCL | O_BINARY,
 		      S_IRUSR | S_IWUSR);
   }
   while (fd < 0 && __errno_r(ptr) == EEXIST);
@@ -90,7 +91,7 @@ _tmpfile64_r (struct _reent *ptr)
   fp = _fdopen64_r (ptr, fd, "wb+");
   e = __errno_r(ptr);
   if (!fp)
-    _close_r (ptr, fd);
+    close (fd);
   (void) _remove_r (ptr, f);
   __errno_r(ptr) = e;
   return fp;

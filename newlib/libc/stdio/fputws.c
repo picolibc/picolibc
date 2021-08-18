@@ -135,7 +135,7 @@ error:
   do
     {
       size_t i = 0;
-      nbytes = _wcsrtombs_r (ptr, buf, &ws, sizeof (buf), &fp->_mbstate);
+      nbytes = wcsrtombs (buf, &ws, sizeof (buf), &fp->_mbstate);
       if (nbytes == (size_t) -1)
 	goto error;
       while (i < nbytes)

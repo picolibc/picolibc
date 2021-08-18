@@ -84,7 +84,7 @@ _ungetwc_r (struct _reent *ptr,
   ORIENT (fp, 1);
   if (wc == WEOF)
     wc = WEOF;
-  else if ((len = _wcrtomb_r(ptr, buf, wc, &fp->_mbstate)) == (size_t)-1)
+  else if ((len = wcrtomb(buf, wc, &fp->_mbstate)) == (size_t)-1)
     {
       fp->_flags |= __SERR;
       wc = WEOF;

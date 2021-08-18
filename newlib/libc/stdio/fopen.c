@@ -110,9 +110,6 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#ifdef __CYGWIN__
-#include <fcntl.h>
-#endif
 #include "local.h"
 
 FILE *
