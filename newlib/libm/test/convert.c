@@ -50,9 +50,15 @@ test_strtod (void)
   errno = 0;
   v = strtod(pd->string, &tail);
   if (tail - pd->string) {
-    if (fabs(v) < DBL_MIN && !(pd->endscan & ENDSCAN_IS_ZERO))
-      test_eok(errno, ERANGE);
-    else if (v == (double) INFINITY && !(pd->endscan & ENDSCAN_IS_INF))
+    if (fabs(v) < DBL_MIN && !(pd->endscan & ENDSCAN_IS_ZERO)) {
+#ifdef NO_NEWLIB
+      /* Glibc has bugs in strtod with hex format float */
+      if (strncasecmp(pd->string, "0x", 2) == 0)
+        ;
+      else
+#endif
+        test_eok(errno, ERANGE);
+    } else if (v == (double) INFINITY && !(pd->endscan & ENDSCAN_IS_INF))
       test_eok(errno, ERANGE);
     else
       test_eok(errno, 0);
