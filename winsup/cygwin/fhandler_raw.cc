@@ -45,6 +45,8 @@ fhandler_dev_raw::fstat (struct stat *buf)
       else
 	buf->st_mode = S_IFBLK | STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
 
+      if (get_major () == DEV_SD_HIGHPART_END && get_minor () == 9999)
+	buf->st_ino = get_ino ();
       buf->st_uid = geteuid32 ();
       buf->st_gid = getegid32 ();
       buf->st_nlink = 1;
