@@ -1690,15 +1690,6 @@ format_proc_partitions (void *, char *&destbuf)
   IO_STATUS_BLOCK io;
   NTSTATUS status;
   HANDLE dirhdl;
-  tmp_pathbuf tp;
-
-  char *buf = tp.c_get ();
-  char *bufptr = buf;
-  char *ioctl_buf = tp.c_get ();
-  PWCHAR mp_buf = tp.w_get ();
-  WCHAR fpath[MAX_PATH];
-  WCHAR gpath[MAX_PATH];
-  DWORD len;
 
   /* Open \Device object directory. */
   wchar_t wpath[MAX_PATH] = L"\\Device";
@@ -1712,141 +1703,169 @@ format_proc_partitions (void *, char *&destbuf)
       return 0;
     }
 
+  tmp_pathbuf tp;
+  char *buf = tp.c_get ();
+  char *bufptr = buf;
+  char *ioctl_buf = tp.c_get ();
+  PWCHAR mp_buf = tp.w_get ();
+  PDIRECTORY_BASIC_INFORMATION dbi_buf = (PDIRECTORY_BASIC_INFORMATION)
+					 tp.w_get ();
+  WCHAR fpath[MAX_PATH];
+  WCHAR gpath[MAX_PATH];
+  DWORD len;
+
   /* Traverse \Device directory ... */
-  PDIRECTORY_BASIC_INFORMATION dbi = (PDIRECTORY_BASIC_INFORMATION)
-				     alloca (640);
   BOOLEAN restart = TRUE;
   bool got_one = false;
+  bool last_run = false;
   ULONG context = 0;
-  while (NT_SUCCESS (NtQueryDirectoryObject (dirhdl, dbi, 640, TRUE, restart,
-					     &context, NULL)))
+  while (!last_run)
     {
-      HANDLE devhdl;
-      PARTITION_INFORMATION_EX *pix = NULL;
-      PARTITION_INFORMATION *pi = NULL;
-      DWORD bytes_read;
-      DWORD part_cnt = 0;
-      unsigned long long size;
-
-      restart = FALSE;
-      /* ... and check for a "Harddisk[0-9]*" entry. */
-      if (dbi->ObjectName.Length < 9 * sizeof (WCHAR)
-	  || wcsncasecmp (dbi->ObjectName.Buffer, L"Harddisk", 8) != 0
-	  || !iswdigit (dbi->ObjectName.Buffer[8]))
-	continue;
-      /* Got it.  Now construct the path to the entire disk, which is
-	 "\\Device\\HarddiskX\\Partition0", and open the disk with
-	 minimum permissions. */
-      unsigned long drive_num = wcstoul (dbi->ObjectName.Buffer + 8, NULL, 10);
-      wcscpy (wpath, dbi->ObjectName.Buffer);
-      PWCHAR wpart = wpath + dbi->ObjectName.Length / sizeof (WCHAR);
-      wcpcpy (wpart, L"\\Partition0");
-      upath.Length = dbi->ObjectName.Length + 22;
-      upath.MaximumLength = upath.Length + sizeof (WCHAR);
-      InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
-				  dirhdl, NULL);
-      status = NtOpenFile (&devhdl, READ_CONTROL, &attr, &io,
-			   FILE_SHARE_VALID_FLAGS, 0);
+      status = NtQueryDirectoryObject (dirhdl, dbi_buf, 65536, FALSE, restart,
+				       &context, NULL);
       if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("NtOpenFile(%S), status %y", &upath, status);
+	  debug_printf ("NtQueryDirectoryObject, status %y", status);
 	  __seterrno_from_nt_status (status);
-	  continue;
+	  break;
 	}
-      if (!got_one)
+      if (status != STATUS_MORE_ENTRIES)
+	last_run = true;
+      restart = FALSE;
+      for (PDIRECTORY_BASIC_INFORMATION dbi = dbi_buf;
+	   dbi->ObjectName.Length > 0;
+	   dbi++)
 	{
-	  print ("major minor  #blocks  name   win-mounts\n\n");
-	  got_one = true;
-	}
-      /* Fetch partition info for the entire disk to get its size. */
-      if (DeviceIoControl (devhdl, IOCTL_DISK_GET_PARTITION_INFO_EX, NULL, 0,
-			   ioctl_buf, NT_MAX_PATH, &bytes_read, NULL))
-	{
-	  pix = (PARTITION_INFORMATION_EX *) ioctl_buf;
-	  size = pix->PartitionLength.QuadPart;
-	}
-      else if (DeviceIoControl (devhdl, IOCTL_DISK_GET_PARTITION_INFO, NULL, 0,
-				ioctl_buf, NT_MAX_PATH, &bytes_read, NULL))
-	{
-	  pi = (PARTITION_INFORMATION *) ioctl_buf;
-	  size = pi->PartitionLength.QuadPart;
-	}
-      else
-	{
-	  debug_printf ("DeviceIoControl (%S, "
-			 "IOCTL_DISK_GET_PARTITION_INFO{_EX}) %E", &upath);
-	  size = 0;
-	}
-      device dev (drive_num, 0);
-      bufptr += __small_sprintf (bufptr, "%5d %5d %9U %s\n",
-				 dev.get_major (), dev.get_minor (),
-				 size >> 10, dev.name () + 5);
-      /* Fetch drive layout info to get size of all partitions on the disk. */
-      if (DeviceIoControl (devhdl, IOCTL_DISK_GET_DRIVE_LAYOUT_EX,
-			   NULL, 0, ioctl_buf, NT_MAX_PATH, &bytes_read, NULL))
-	{
-	  PDRIVE_LAYOUT_INFORMATION_EX pdlix = (PDRIVE_LAYOUT_INFORMATION_EX)
-					       ioctl_buf;
-	  part_cnt = pdlix->PartitionCount;
-	  pix = pdlix->PartitionEntry;
-	}
-      else if (DeviceIoControl (devhdl, IOCTL_DISK_GET_DRIVE_LAYOUT,
-				NULL, 0, ioctl_buf, NT_MAX_PATH, &bytes_read, NULL))
-	{
-	  PDRIVE_LAYOUT_INFORMATION pdli = (PDRIVE_LAYOUT_INFORMATION) ioctl_buf;
-	  part_cnt = pdli->PartitionCount;
-	  pi = pdli->PartitionEntry;
-	}
-      else
-	debug_printf ("DeviceIoControl(%S, "
-		      "IOCTL_DISK_GET_DRIVE_LAYOUT{_EX}): %E", &upath);
-      /* Loop over partitions. */
-      if (pix || pi)
-	for (DWORD i = 0; i < part_cnt && i < 64; ++i)
-	  {
-	    DWORD part_num;
+	  HANDLE devhdl;
+	  PARTITION_INFORMATION_EX *pix = NULL;
+	  PARTITION_INFORMATION *pi = NULL;
+	  DWORD bytes_read;
+	  DWORD part_cnt = 0;
+	  unsigned long drive_num;
+	  unsigned long long size;
 
-	    if (pix)
-	      {
-		size = pix->PartitionLength.QuadPart;
-		part_num = pix->PartitionNumber;
-		++pix;
-	      }
-	    else
-	      {
-		size = pi->PartitionLength.QuadPart;
-		part_num = pi->PartitionNumber;
-		++pi;
-	      }
-	    /* A partition number of 0 denotes an extended partition or a
-	       filler entry as described in fhandler_dev_floppy::lock_partition.
-	       Just skip. */
-	    if (part_num == 0)
+	  /* ... and check for a "Harddisk[0-9]*" entry. */
+	  if (dbi->ObjectName.Length < 9 * sizeof (WCHAR)
+	      || wcsncasecmp (dbi->ObjectName.Buffer, L"Harddisk", 8) != 0
+	      || !iswdigit (dbi->ObjectName.Buffer[8]))
+	    continue;
+	  /* Got it.  Now construct the path to the entire disk, which is
+	     "\\Device\\HarddiskX\\Partition0", and open the disk with
+	     minimum permissions. */
+	  drive_num = wcstoul (dbi->ObjectName.Buffer + 8, NULL, 10);
+	  wcscpy (wpath, dbi->ObjectName.Buffer);
+	  PWCHAR wpart = wpath + dbi->ObjectName.Length / sizeof (WCHAR);
+	  wcpcpy (wpart, L"\\Partition0");
+	  upath.Length = dbi->ObjectName.Length + 22;
+	  upath.MaximumLength = upath.Length + sizeof (WCHAR);
+	  InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
+				      dirhdl, NULL);
+	  status = NtOpenFile (&devhdl, READ_CONTROL, &attr, &io,
+			       FILE_SHARE_VALID_FLAGS, 0);
+	  if (!NT_SUCCESS (status))
+	    {
+	      debug_printf ("NtOpenFile(%S), status %y", &upath, status);
+	      __seterrno_from_nt_status (status);
 	      continue;
-	    device dev (drive_num, part_num);
-
-	    bufptr += __small_sprintf (bufptr, "%5d %5d %9U %s",
-				       dev.get_major (), dev.get_minor (),
-				       size >> 10, dev.name () + 5);
-	    /* Check if the partition is mounted in Windows and, if so,
-	       print the mount point list. */
-	    __small_swprintf (fpath,
-			      L"\\\\?\\GLOBALROOT\\Device\\%S\\Partition%u\\",
-			      &dbi->ObjectName, part_num);
-	    if (GetVolumeNameForVolumeMountPointW (fpath, gpath, MAX_PATH)
-		&& GetVolumePathNamesForVolumeNameW (gpath, mp_buf,
-						     NT_MAX_PATH, &len))
+	    }
+	  if (!got_one)
+	    {
+	      print ("major minor  #blocks  name   win-mounts\n\n");
+	      got_one = true;
+	    }
+	  /* Fetch partition info for the entire disk to get its size. */
+	  if (DeviceIoControl (devhdl, IOCTL_DISK_GET_PARTITION_INFO_EX, NULL,
+			       0, ioctl_buf, NT_MAX_PATH, &bytes_read, NULL))
+	    {
+	      pix = (PARTITION_INFORMATION_EX *) ioctl_buf;
+	      size = pix->PartitionLength.QuadPart;
+	    }
+	  else if (DeviceIoControl (devhdl, IOCTL_DISK_GET_PARTITION_INFO, NULL,
+				    0, ioctl_buf, NT_MAX_PATH, &bytes_read,
+				    NULL))
+	    {
+	      pi = (PARTITION_INFORMATION *) ioctl_buf;
+	      size = pi->PartitionLength.QuadPart;
+	    }
+	  else
+	    {
+	      debug_printf ("DeviceIoControl (%S, "
+			     "IOCTL_DISK_GET_PARTITION_INFO{_EX}) %E", &upath);
+	      size = 0;
+	    }
+	  device dev (drive_num, 0);
+	  bufptr += __small_sprintf (bufptr, "%5d %5d %9U %s\n",
+				     dev.get_major (), dev.get_minor (),
+				     size >> 10, dev.name () + 5);
+	  /* Fetch drive layout info to get size of all partitions on disk. */
+	  if (DeviceIoControl (devhdl, IOCTL_DISK_GET_DRIVE_LAYOUT_EX, NULL, 0,
+			       ioctl_buf, NT_MAX_PATH, &bytes_read, NULL))
+	    {
+	      PDRIVE_LAYOUT_INFORMATION_EX pdlix =
+		  (PDRIVE_LAYOUT_INFORMATION_EX) ioctl_buf;
+	      part_cnt = pdlix->PartitionCount;
+	      pix = pdlix->PartitionEntry;
+	    }
+	  else if (DeviceIoControl (devhdl, IOCTL_DISK_GET_DRIVE_LAYOUT, NULL,
+				    0, ioctl_buf, NT_MAX_PATH, &bytes_read,
+				    NULL))
+	    {
+	      PDRIVE_LAYOUT_INFORMATION pdli =
+		  (PDRIVE_LAYOUT_INFORMATION) ioctl_buf;
+	      part_cnt = pdli->PartitionCount;
+	      pi = pdli->PartitionEntry;
+	    }
+	  else
+	    debug_printf ("DeviceIoControl(%S, "
+			  "IOCTL_DISK_GET_DRIVE_LAYOUT{_EX}): %E", &upath);
+	  /* Loop over partitions. */
+	  if (pix || pi)
+	    for (DWORD i = 0; i < part_cnt && i < 64; ++i)
 	      {
-		len = strlen (dev.name () + 5);
-		while (len++ < 6)
-		  *bufptr++ = ' ';
-		for (PWCHAR p = mp_buf; *p; p = wcschr (p, L'\0') + 1)
-		  bufptr += __small_sprintf (bufptr, " %W", p);
-	      }
+		DWORD part_num;
 
-	    *bufptr++ = '\n';
-	  }
-      NtClose (devhdl);
+		if (pix)
+		  {
+		    size = pix->PartitionLength.QuadPart;
+		    part_num = pix->PartitionNumber;
+		    ++pix;
+		  }
+		else
+		  {
+		    size = pi->PartitionLength.QuadPart;
+		    part_num = pi->PartitionNumber;
+		    ++pi;
+		  }
+		/* A partition number of 0 denotes an extended partition or a
+		   filler entry as described in
+		   fhandler_dev_floppy::lock_partition.  Just skip. */
+		if (part_num == 0)
+		  continue;
+		device dev (drive_num, part_num);
+
+		bufptr += __small_sprintf (bufptr, "%5d %5d %9U %s",
+					   dev.get_major (), dev.get_minor (),
+					   size >> 10, dev.name () + 5);
+		/* Check if the partition is mounted in Windows and, if so,
+		   print the mount point list. */
+		__small_swprintf (fpath,
+				L"\\\\?\\GLOBALROOT\\Device\\%S\\Partition%u\\",
+				&dbi->ObjectName, part_num);
+		if (GetVolumeNameForVolumeMountPointW (fpath, gpath, MAX_PATH)
+		    && GetVolumePathNamesForVolumeNameW (gpath, mp_buf,
+							 NT_MAX_PATH, &len))
+		  {
+		    len = strlen (dev.name () + 5);
+		    while (len++ < 6)
+		      *bufptr++ = ' ';
+		    for (PWCHAR p = mp_buf; *p; p = wcschr (p, L'\0') + 1)
+		      bufptr += __small_sprintf (bufptr, " %W", p);
+		  }
+
+		*bufptr++ = '\n';
+	      }
+	  NtClose (devhdl);
+	}
     }
   NtClose (dirhdl);
 

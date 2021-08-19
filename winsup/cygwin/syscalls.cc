@@ -2050,19 +2050,35 @@ sync ()
       return;
     }
   /* Traverse \Device directory ... */
-  PDIRECTORY_BASIC_INFORMATION dbi = (PDIRECTORY_BASIC_INFORMATION)
-				     alloca (640);
+  tmp_pathbuf tp;
+  PDIRECTORY_BASIC_INFORMATION dbi_buf = (PDIRECTORY_BASIC_INFORMATION)
+					 tp.w_get ();
   BOOLEAN restart = TRUE;
+  bool last_run = false;
   ULONG context = 0;
-  while (NT_SUCCESS (NtQueryDirectoryObject (devhdl, dbi, 640, TRUE, restart,
-					     &context, NULL)))
+  while (!last_run)
     {
+      status = NtQueryDirectoryObject (devhdl, dbi_buf, 65536, FALSE, restart,
+				       &context, NULL);
+      if (!NT_SUCCESS (status))
+	{
+	  debug_printf ("NtQueryDirectoryObject, status %y", status);
+	  break;
+	}
+      if (status != STATUS_MORE_ENTRIES)
+	last_run = true;
       restart = FALSE;
-      /* ... and call sync_worker for each HarddiskVolumeX entry. */
-      if (dbi->ObjectName.Length >= 15 * sizeof (WCHAR)
-	  && !wcsncasecmp (dbi->ObjectName.Buffer, L"HarddiskVolume", 14)
-	  && iswdigit (dbi->ObjectName.Buffer[14]))
-	sync_worker (devhdl, dbi->ObjectName.Length, dbi->ObjectName.Buffer);
+      for (PDIRECTORY_BASIC_INFORMATION dbi = dbi_buf;
+	   dbi->ObjectName.Length > 0;
+	   dbi++)
+	{
+	  /* ... and call sync_worker for each HarddiskVolumeX entry. */
+	  if (dbi->ObjectName.Length >= 15 * sizeof (WCHAR)
+	      && !wcsncasecmp (dbi->ObjectName.Buffer, L"HarddiskVolume", 14)
+	      && iswdigit (dbi->ObjectName.Buffer[14]))
+	    sync_worker (devhdl, dbi->ObjectName.Length,
+			 dbi->ObjectName.Buffer);
+	}
     }
   NtClose (devhdl);
 }

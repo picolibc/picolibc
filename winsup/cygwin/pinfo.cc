@@ -1526,23 +1526,35 @@ winpids::enum_processes (bool winpid)
 
   if (!winpid)
     {
+      tmp_pathbuf tp;
+      NTSTATUS status;
       HANDLE dir = get_shared_parent_dir ();
       BOOLEAN restart = TRUE;
-      ULONG context;
-      struct fdbi
+      bool last_run = false;
+      ULONG context = 0;
+      PDIRECTORY_BASIC_INFORMATION dbi_buf = (PDIRECTORY_BASIC_INFORMATION)
+					     tp.w_get ();
+      while (!last_run)
 	{
-	  DIRECTORY_BASIC_INFORMATION dbi;
-	  WCHAR buf[2][NAME_MAX + 1];
-	} f;
-      while (NT_SUCCESS (NtQueryDirectoryObject (dir, &f, sizeof f, TRUE,
-						 restart, &context, NULL)))
-	{
-	  restart = FALSE;
-	  f.dbi.ObjectName.Buffer[f.dbi.ObjectName.Length / sizeof (WCHAR)] = L'\0';
-	  if (wcsncmp (f.dbi.ObjectName.Buffer, L"winpid.", 7) == 0)
+	  status = NtQueryDirectoryObject (dir, dbi_buf, 65536, FALSE, restart,
+					   &context, NULL);
+	  if (!NT_SUCCESS (status))
 	    {
-	      DWORD pid = wcstoul (f.dbi.ObjectName.Buffer + 7, NULL, 10);
-	      add (nelem, false, pid);
+	      debug_printf ("NtQueryDirectoryObject, status %y", status);
+	      break;
+	    }
+	  if (status != STATUS_MORE_ENTRIES)
+	    last_run = true;
+	  restart = FALSE;
+	  for (PDIRECTORY_BASIC_INFORMATION dbi = dbi_buf;
+	       dbi->ObjectName.Length > 0;
+	       dbi++)
+	    {
+	      if (wcsncmp (dbi->ObjectName.Buffer, L"winpid.", 7) == 0)
+		{
+		  DWORD pid = wcstoul (dbi->ObjectName.Buffer + 7, NULL, 10);
+		  add (nelem, false, pid);
+		}
 	    }
 	}
     }

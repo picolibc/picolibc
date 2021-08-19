@@ -596,34 +596,46 @@ lockf_t::from_obj_name (inode_t *node, lockf_t **head, const wchar_t *name)
 lockf_t *
 inode_t::get_all_locks_list ()
 {
-  struct fdbi
-  {
-    DIRECTORY_BASIC_INFORMATION dbi;
-    WCHAR buf[2][NAME_MAX + 1];
-  } f;
+  tmp_pathbuf tp;
   ULONG context;
   NTSTATUS status;
+  BOOLEAN restart = TRUE;
+  bool last_run = false;
   lockf_t newlock, *lock = i_all_lf;
 
-  for (BOOLEAN restart = TRUE;
-       NT_SUCCESS (status = NtQueryDirectoryObject (i_dir, &f, sizeof f, TRUE,
-						    restart, &context, NULL));
-       restart = FALSE)
+  PDIRECTORY_BASIC_INFORMATION dbi_buf = (PDIRECTORY_BASIC_INFORMATION)
+					 tp.w_get ();
+  while (!last_run)
     {
-      if (f.dbi.ObjectName.Length != LOCK_OBJ_NAME_LEN * sizeof (WCHAR))
-	continue;
-      f.dbi.ObjectName.Buffer[LOCK_OBJ_NAME_LEN] = L'\0';
-      if (!newlock.from_obj_name (this, &i_all_lf, f.dbi.ObjectName.Buffer))
-	continue;
-      if (lock - i_all_lf >= MAX_LOCKF_CNT)
+      status = NtQueryDirectoryObject (i_dir, dbi_buf, 65536, FALSE, restart,
+				       &context, NULL);
+      if (!NT_SUCCESS (status))
 	{
-	  system_printf ("Warning, can't handle more than %d locks per file.",
-			 MAX_LOCKF_CNT);
+	  debug_printf ("NtQueryDirectoryObject, status %y", status);
 	  break;
 	}
-      if (lock > i_all_lf)
-	lock[-1].lf_next = lock;
-      new (lock++) lockf_t (newlock);
+      if (status != STATUS_MORE_ENTRIES)
+	last_run = true;
+      restart = FALSE;
+      for (PDIRECTORY_BASIC_INFORMATION dbi = dbi_buf;
+	   dbi->ObjectName.Length > 0;
+	   dbi++)
+	{
+	  if (dbi->ObjectName.Length != LOCK_OBJ_NAME_LEN * sizeof (WCHAR))
+	    continue;
+	  dbi->ObjectName.Buffer[LOCK_OBJ_NAME_LEN] = L'\0';
+	  if (!newlock.from_obj_name (this, &i_all_lf, dbi->ObjectName.Buffer))
+	    continue;
+	  if (lock - i_all_lf >= MAX_LOCKF_CNT)
+	    {
+	      system_printf ("Warning, can't handle more than %d locks per file.",
+			     MAX_LOCKF_CNT);
+	      break;
+	    }
+	  if (lock > i_all_lf)
+	    lock[-1].lf_next = lock;
+	  new (lock++) lockf_t (newlock);
+	}
     }
   /* If no lock has been found, return NULL. */
   if (lock == i_all_lf)
