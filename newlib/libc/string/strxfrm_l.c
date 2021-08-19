@@ -57,6 +57,7 @@ strxfrm_l (char *__restrict s1, const char *__restrict s2, size_t n,
 	   locale_t locale)
 {
   size_t res;
+  (void) locale;
   res = 0;
   while (n-- > 0)
     {

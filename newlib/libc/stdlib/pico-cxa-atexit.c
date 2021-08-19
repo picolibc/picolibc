@@ -41,5 +41,6 @@ int
 __cxa_atexit (void (*func) (void *), void *arg, void *d)
 {
         union on_exit_func func_u = { .cxa_atexit = func };
+        (void) d;
         return _on_exit(PICO_ONEXIT_CXA_ATEXIT, func_u, arg);
 }

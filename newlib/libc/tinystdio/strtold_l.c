@@ -44,5 +44,6 @@ strtold_l (const char *__restrict s00,
 	  char **__restrict se,
 	  locale_t loc)
 {
+        (void) loc;
 	return strtold (s00, se);
 }

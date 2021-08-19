@@ -129,6 +129,7 @@ ucs_2_convert_to_ucs (void *data,
 static int
 ucs_2_get_mb_cur_max (void *data)
 {
+  (void) data;
   return 2;
 }
 

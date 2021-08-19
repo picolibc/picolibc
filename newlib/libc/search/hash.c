@@ -109,6 +109,7 @@ __hash_open (const char *file,
 {
 	HTAB *hashp;
 
+        (void) dflags;
 #ifdef __USE_INTERNAL_STAT64
         struct stat64 statbuf;
 #else

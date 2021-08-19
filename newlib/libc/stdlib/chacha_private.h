@@ -73,6 +73,7 @@ chacha_keysetup(chacha_ctx *x,const u8 *k,u32 kbits,u32 ivbits)
 {
   const char *constants;
 
+  (void) ivbits;
   x->input[4] = U8TO32_LITTLE(k + 0);
   x->input[5] = U8TO32_LITTLE(k + 4);
   x->input[6] = U8TO32_LITTLE(k + 8);

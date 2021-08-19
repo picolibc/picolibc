@@ -63,6 +63,7 @@ int
 _remove_r (struct _reent *ptr,
        const char *filename)
 {
+  (void) ptr;
   if (unlink (filename) == -1)
     return -1;
 

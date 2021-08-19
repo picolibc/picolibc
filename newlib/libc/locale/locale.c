@@ -284,6 +284,7 @@ setlocale (
        int category,
        const char *locale)
 {
+  (void) category;
 #ifndef _MB_CAPABLE
   if (locale)
     { 

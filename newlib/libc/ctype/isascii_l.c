@@ -11,5 +11,6 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 int
 isascii_l (int c, struct __locale_t *locale)
 {
+  (void) locale;
   return c >= 0 && c < 128;
 }

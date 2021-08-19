@@ -50,6 +50,7 @@ convert_from_ucs (void *data,
   register unsigned char *cp;
   register size_t bytes;
 
+  (void) data;
   if ((in  >= 0x0000D800 && in <= 0x0000DFFF)
       || in > 0x7FFFFFFF || in == 0x0000FFFF || in == 0x0000FFFE)
     return (size_t)ICONV_CES_INVALID_CHARACTER;
@@ -131,6 +132,7 @@ convert_to_ucs (void *data,
   register size_t bytes;
   ucs4_t res;
 
+  (void) data;
   if (in[0] >= 0xC0)
     {
       if (in[0] < 0xE0)
@@ -258,6 +260,7 @@ convert_to_ucs (void *data,
 static int
 get_mb_cur_max (void *data)
 {
+  (void) data;
   return UTF8_MB_CUR_MAX;
 }
 

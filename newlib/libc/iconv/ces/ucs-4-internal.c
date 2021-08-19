@@ -48,6 +48,7 @@ ucs_4_internal_convert_from_ucs (void *data,
                                         unsigned char **outbuf,
                                         size_t *outbytesleft)
 {
+  (void) data;
   if (in > 0x7FFFFFFF)
     return (size_t)ICONV_CES_INVALID_CHARACTER;
     
@@ -68,6 +69,7 @@ ucs_4_internal_convert_to_ucs (void *data,
                                       const unsigned char **inbuf,
                                       size_t *inbytesleft)
 {
+  (void) data;
   register ucs4_t res;
 
   if (*inbytesleft < sizeof (ucs4_t))
@@ -88,6 +90,7 @@ ucs_4_internal_convert_to_ucs (void *data,
 static int
 ucs_4_internal_get_mb_cur_max (void *data)
 {
+  (void) data;
   return 2;
 }
 

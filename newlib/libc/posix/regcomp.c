@@ -1440,6 +1440,8 @@ mcinvert(p, cs)
 struct parse *p;
 cset *cs;
 {
+        (void) p;
+        (void) cs;
 	assert(cs->multis == NULL);	/* xxx */
 }
 
@@ -1455,6 +1457,8 @@ mccase(p, cs)
 struct parse *p;
 cset *cs;
 {
+        (void) p;
+        (void) cs;
 	assert(cs->multis == NULL);	/* xxx */
 }
 

@@ -47,6 +47,7 @@ static bool_t
 x_putlong (XDR * xdrs,
 	const long *longp)
 {
+  (void) longp;
   xdrs->x_handy += BYTES_PER_XDR_UNIT;
   return TRUE;
 }
@@ -57,6 +58,7 @@ x_putbytes (XDR * xdrs,
 	const char *bp,
 	u_int len)
 {
+  (void) bp;
   xdrs->x_handy += len;
   return TRUE;
 }
@@ -72,6 +74,8 @@ static bool_t
 x_setpostn (XDR * xdrs,
 	u_int pos)
 {
+  (void) xdrs;
+  (void) pos;
   /* This is not allowed */
   return FALSE;
 }
@@ -130,6 +134,7 @@ static bool_t
 x_putint32 (XDR *xdrs,
 	const int32_t *int32p)
 {
+  (void) int32p;
   xdrs->x_handy += BYTES_PER_XDR_UNIT;
   return TRUE;
 }

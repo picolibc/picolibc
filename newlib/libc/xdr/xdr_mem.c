@@ -118,6 +118,7 @@ xdrmem_create (XDR * xdrs,
 static void
 xdrmem_destroy (XDR * xdrs)
 {
+  (void) xdrs;
 }
 
 static bool_t
@@ -245,6 +246,8 @@ static int32_t *
 xdrmem_inline_unaligned (XDR * xdrs,
 	u_int len)
 {
+  (void) xdrs;
+  (void) len;
   return (0);
 }
 

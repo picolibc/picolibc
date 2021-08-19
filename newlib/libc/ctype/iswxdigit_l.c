@@ -9,6 +9,7 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 int
 iswxdigit_l (wint_t c, struct __locale_t *locale)
 {
+  (void) locale;
   return ((c >= (wint_t)'0' && c <= (wint_t)'9') ||
 	  (c >= (wint_t)'a' && c <= (wint_t)'f') ||
 	  (c >= (wint_t)'A' && c <= (wint_t)'F'));

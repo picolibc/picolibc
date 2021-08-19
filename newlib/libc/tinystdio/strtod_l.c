@@ -44,6 +44,7 @@ strtod_l (const char *__restrict s00,
 	  char **__restrict se,
 	  locale_t loc)
 {
+        (void) loc;
 	return strtod (s00, se);
 }
 
@@ -55,6 +56,7 @@ extern long double strtold_l(const char *, char **, locale_t loc) __attribute__ 
 long double
 strtold_l (const char * nptr, char ** endptr, locale_t loc)
 {
+        (void) loc;
 	return (long double) strtod_l(nptr, endptr, loc);
 }
 #endif

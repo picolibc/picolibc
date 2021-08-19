@@ -87,6 +87,7 @@ __swhatbuf_r (struct _reent *ptr,
   const int snpt = 0;
 #endif
 
+  (void) ptr;
 #ifdef __USE_INTERNAL_STAT64
   struct stat64 st;
 

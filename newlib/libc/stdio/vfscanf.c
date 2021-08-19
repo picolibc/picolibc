@@ -326,6 +326,7 @@ __ssrefill_r (struct _reent * ptr,
    * Our only hope of further input is the ungetc buffer.
    * If there is anything in that buffer to read, return.
    */
+  (void) ptr;
   if (HASUB (fp))
     {
       FREEUB (ptr, fp);
@@ -391,6 +392,7 @@ __wctob (struct _reent *rptr, wint_t wc)
   mbstate_t mbs;
   unsigned char pmb[MB_LEN_MAX];
 
+  (void) rptr;
   if (wc == WEOF)
     return EOF;
   memset (&mbs, '\0', sizeof (mbs));

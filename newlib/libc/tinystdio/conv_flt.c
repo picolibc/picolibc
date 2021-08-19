@@ -72,6 +72,8 @@ static inline int scanf_getc(const char *s, int *lenp)
 
 static inline void scanf_ungetc(int c, const char *s, int *lenp)
 {
+    (void) c;
+    (void) s;
     *lenp = *lenp - 1;
 }
 

@@ -75,6 +75,7 @@ on_exit (void (*func)(int, void *),void *arg)
 void
 __call_exitprocs(int code, void *param)
 {
+        (void) param;
 	for (;;) {
 		int	                i;
                 union on_exit_func      func = {0};

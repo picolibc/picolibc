@@ -203,6 +203,7 @@ __ssputs_r (struct _reent *ptr,
 {
 	register int w;
 
+        (void) ptr;
 	w = fp->_w;
 	if (len >= w && fp->_flags & (__SMBF | __SOPT)) {
 		/* must be asprintf family */
@@ -273,6 +274,7 @@ __ssprint_r (struct _reent *ptr,
 	register struct __siov *iov;
 	register const char *p = NULL;
 
+        (void) ptr;
 	iov = uio->uio_iov;
 	len = 0;
 
@@ -1822,6 +1824,7 @@ cvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 		*sign = '\000';
 # endif /* !_NO_LONGDBL */
 
+        (void) data;
 # ifdef _WANT_IO_C99_FORMATS
 	if (ch == 'a' || ch == 'A') {
 		/* This code assumes FLT_RADIX is a power of 2.  The initial

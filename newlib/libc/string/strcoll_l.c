@@ -46,5 +46,6 @@ QUICKREF
 int
 strcoll_l (const char *a, const char *b, struct __locale_t *locale)
 {
+  (void) locale;
   return strcmp (a, b);
 }

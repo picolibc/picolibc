@@ -128,6 +128,7 @@ __sfmoreglue (struct _reent *d,
 {
   struct glue_with_file *g;
 
+  (void) d;
   g = (struct glue_with_file *)
     malloc (sizeof (*g) + (n - 1) * sizeof (FILE));
   if (g == NULL)

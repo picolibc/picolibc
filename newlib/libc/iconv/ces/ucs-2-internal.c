@@ -48,6 +48,7 @@ ucs_2_internal_convert_from_ucs (void *data,
                                         unsigned char **outbuf,
                                         size_t *outbytesleft)
 {
+  (void) data;
   if (in > 0x0000FFFF)
     return (size_t)ICONV_CES_INVALID_CHARACTER;
   
@@ -70,6 +71,7 @@ ucs_2_internal_convert_to_ucs (void *data,
 {
   register ucs4_t res;
   
+  (void) data;
   if (*inbytesleft < sizeof (ucs2_t))
     return (ucs4_t)ICONV_CES_BAD_SEQUENCE;
 
@@ -88,6 +90,7 @@ ucs_2_internal_convert_to_ucs (void *data,
 static int
 ucs_2_internal_get_mb_cur_max (void *data)
 {
+  (void) data;
   return 2;
 }
 

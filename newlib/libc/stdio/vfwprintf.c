@@ -1576,6 +1576,7 @@ wcvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 		*sign = L'\0';
 # endif /* !_NO_LONGDBL */
 
+        (void) data;
 # ifdef _WANT_IO_C99_FORMATS
 	if (ch == L'a' || ch == L'A') {
 		wchar_t *digits, *bp, *rve;

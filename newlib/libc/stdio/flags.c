@@ -37,6 +37,7 @@ __sflags (struct _reent *ptr,
 {
   register int ret, m, o;
 
+  (void) ptr;
   switch (mode[0])
     {
     case 'r':			/* open for reading */

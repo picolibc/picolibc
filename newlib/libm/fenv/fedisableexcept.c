@@ -63,5 +63,6 @@ the file <<sys/fenv.h>> to see the status for your target.
  */
 int fedisableexcept(int excepts)
 {
+  (void) excepts;
   return 0;
 }

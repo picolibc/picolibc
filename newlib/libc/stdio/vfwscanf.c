@@ -267,6 +267,7 @@ _sungetwc_r (struct _reent *data,
 	wint_t wc,
 	register FILE *fp)
 {
+  (void) data;
   if (wc == WEOF)
     return (WEOF);
 

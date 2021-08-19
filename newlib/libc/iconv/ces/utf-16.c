@@ -196,6 +196,7 @@ utf_16_convert_to_ucs (void *data,
   ucs4_t res;
   int bytes = sizeof (ucs2_t);
 
+  (void) data;
   if (*inbytesleft < bytes)
     return (ucs4_t)ICONV_CES_BAD_SEQUENCE;
   
@@ -264,6 +265,7 @@ utf_16_convert_to_ucs (void *data,
 static int
 utf_16_get_mb_cur_max (void *data)
 {
+  (void) data;
   return 6;
 }
 

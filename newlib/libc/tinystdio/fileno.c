@@ -38,5 +38,6 @@
 int
 fileno(FILE *file)
 {
+        (void) file;
 	return -1;
 }

@@ -21,6 +21,7 @@ __ascii_wctomb (
      is 4, as is the case on cygwin.  */
   wint_t wchar = _wchar;
 
+  (void) state;
   if (s == NULL)
     return 0;
  
@@ -146,6 +147,7 @@ __sjis_wctomb (
   unsigned char char2 = (unsigned char)wchar;
   unsigned char char1 = (unsigned char)(wchar >> 8);
 
+  (void) state;
   if (s == NULL)
     return 0;  /* not state-dependent */
 
@@ -178,6 +180,7 @@ __eucjp_wctomb (
   unsigned char char2 = (unsigned char)wchar;
   unsigned char char1 = (unsigned char)(wchar >> 8);
 
+  (void) state;
   if (s == NULL)
     return 0;  /* not state-dependent */
 

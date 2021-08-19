@@ -17,6 +17,7 @@ is preserved.
 {
 	float x;
 
+        (void) unused;
 #if __GNUC_PREREQ (3, 3)
 	x = __builtin_nanf("");
 #else

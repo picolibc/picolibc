@@ -155,6 +155,7 @@ _gettemp (struct _reent *ptr,
 #endif
   unsigned int pid;
 
+  (void) ptr;
   pid = getpid ();
   for (trv = path; *trv; ++trv)		/* extra X's get set to 0's */
     continue;

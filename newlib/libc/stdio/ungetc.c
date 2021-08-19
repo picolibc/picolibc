@@ -83,6 +83,7 @@ __submore (struct _reent *rptr,
   register int i;
   register unsigned char *p;
 
+  (void) rptr;
   if (fp->_ub._base == fp->_ubuf)
     {
       /*

@@ -44,6 +44,7 @@ us_ascii_convert_from_ucs (void *data,
                                   unsigned char **outbuf,
                                   size_t *outbytesleft)
 {
+  (void) data;
   if (in  > 0x7F)
     return (size_t)ICONV_CES_INVALID_CHARACTER;
 
@@ -62,6 +63,7 @@ us_ascii_convert_to_ucs (void *data,
                                 const unsigned char **inbuf,
                                 size_t *inbytesleft)
 {
+  (void) data;
   ucs4_t res;
 
   if (*inbytesleft < 1)
@@ -82,6 +84,7 @@ us_ascii_convert_to_ucs (void *data,
 static int
 us_ascii_get_mb_cur_max (void *data)
 {
+  (void) data;
   return 2;
 }
 

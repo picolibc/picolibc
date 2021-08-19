@@ -50,6 +50,7 @@ __sprintf_chk(char * __restrict buf, int flags, size_t slen,
 	va_list ap;
 	int rv;
 
+        (void) flags;
 	va_start(ap, fmt);
 	if (slen > (size_t)INT_MAX)
 		rv = vsprintf(buf, fmt, ap);

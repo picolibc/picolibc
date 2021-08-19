@@ -9,5 +9,6 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 wctype_t
 wctype_l (const char *c, struct __locale_t *locale)
 {
+  (void) locale;
   return wctype (c);
 }

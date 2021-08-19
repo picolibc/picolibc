@@ -762,6 +762,8 @@ __strong_reference(memalign, aligned_alloc);
 #ifdef DEFINE_MALLOPT
 int mallopt(int parameter_number, int parameter_value)
 {
+    (void) parameter_number;
+    (void) parameter_value;
     return 0;
 }
 #endif /* DEFINE_MALLOPT */

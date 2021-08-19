@@ -149,6 +149,7 @@ touupper (wint_t c)
 wint_t
 towctrans_l (wint_t c, wctrans_t w, struct __locale_t *locale)
 {
+  (void) locale;
 #ifdef _MB_CAPABLE
   wint_t u = _jp2uc_l (c, locale);
 #else

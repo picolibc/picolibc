@@ -44,6 +44,7 @@ QUICKREF
 {
 	double x;
 
+        (void) unused;
 #if __GNUC_PREREQ (3, 3)
 	x = __builtin_nan("");
 #else
