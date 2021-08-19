@@ -545,6 +545,12 @@ void __attribute__((destructor(101))) dtor (void) {}
 '''
 have_attr_ctor_dtor = meson.get_compiler('c').compiles(attr_ctor_dtor_code, name : 'attributes constructor/destructor', args : (meson.get_compiler('c').has_argument('-Werror') ? '-Werror' : ''))
 
+# Add c_args from the cross file. This
+# means that the command line values get
+# added to the cross file values instead of
+# replacing them.
+c_args += meson.get_cross_property('c_args', [])
+
 if enable_multilib
   used_libs = []
 
@@ -581,14 +587,7 @@ if enable_multilib
       endif
 
       # Add any extra flags for this target from the cross file
-      target_extra = meson.get_cross_property('c_args_' + name, [])
-      if target_extra != []
-	flags += target_extra
-      endif
-      c_args_extra = meson.get_cross_property('c_args', [])
-      if c_args_extra != []
-	flags += c_args_extra
-      endif
+      flags += meson.get_cross_property('c_args_' + name, [])
 
       value = [tmp[0], flags]
       set_variable('target_' + name, value)
@@ -606,7 +605,7 @@ if enable_multilib
   endif
 else
   targets = ['']
-  target_ = ['.', c_args + meson.get_cross_property('c_args', [])]
+  target_ = ['.', c_args]
 endif
 
 conf_data = configuration_data()
@@ -859,7 +858,7 @@ conf_data.set('HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs support
 # By default, tests don't require any special arguments
 
 # disable compiler built-ins so we reach the library equivalents
-test_c_args = c_args + arg_fnobuiltin
+test_c_args = arg_fnobuiltin
 if tests_enable_stack_protector
   if meson.get_compiler('c').has_argument('-fstack-protector-all') and meson.get_compiler('c').has_argument('-fstack-protector-strong')
     test_c_args += ['-fstack-protector-all', '-fstack-protector-strong', '-DTESTS_ENABLE_STACK_PROTECTOR']
@@ -867,7 +866,7 @@ if tests_enable_stack_protector
     tests_enable_stack_protector = false
   endif
 endif
-test_link_args = test_c_args
+test_link_args = []
 test_link_depends = []
 
 # CompCert needs the '-WUl,' prefix to correctly pass the --spec parameters to the linker
@@ -895,7 +894,7 @@ if has_semihost
     test_c_args += [specs_prefix + '--specs', specs_prefix + '@0@/@1@'.format(meson.current_build_dir(), picolibc_specs)]
   endif
 
-  test_link_args += test_c_args + ['-nostartfiles', '-nostdlib', '-T', test_link_path, '-T', 'picolibc.ld', '-lgcc']
+  test_link_args += ['-nostartfiles', '-nostdlib', '-T', test_link_path, '-T', 'picolibc.ld', '-lgcc']
 
   # Make sure all of the tests get re-linked if the linker scripts change
 
@@ -905,8 +904,9 @@ elif meson.get_compiler('c').get_id() == 'clang'
 else
   test_link_depends += test_specs
   test_c_args += [specs_prefix + '--specs', specs_prefix + '@0@/@1@'.format(meson.current_build_dir(), test_specs)]
-  test_link_args += test_c_args
 endif
+
+test_link_args = test_c_args + test_link_args
 
 has_picolibc_tls_api = false
 
