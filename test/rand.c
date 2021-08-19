@@ -49,7 +49,7 @@ near(double got, double target, double close)
 }
 
 int
-main(int argc, char **argv)
+main(void)
 {
 	int i;
 	int ret = 0;

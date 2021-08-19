@@ -101,6 +101,8 @@ ffcheck_id(double is,
   int mag;
   isbits.value = is;
 
+  (void) serrno;
+  (void) merror;
   correct.parts.msw = p->qs[id].msw;
   correct.parts.lsw = p->qs[id].lsw;
 
@@ -178,6 +180,10 @@ fffcheck_id (float is,
   __ieee_double_shape_type correct_double;
   __ieee_double_shape_type is_double;
   int mag;
+
+  (void) serrno;
+  (void) merror;
+
   isbits.value = is;
   to_double(is_double.value, is);
 
@@ -273,6 +279,7 @@ frontline (FILE *f,
        char *args,
        char *name)
 {
+  (void) name;
   /* float returns can never have more than 32 bits of accuracy */
   if (*args == 'f' && mag > 32)
     mag = 32;

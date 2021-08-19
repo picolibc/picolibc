@@ -300,5 +300,6 @@
 {64, 0,123,__LINE__, 0x403a1999, 0xa0000000, 0x403a1999, 0x99999996, 0x403e1999, 0x99999996},	/* 26.1=f(26.1, 30.1)*/
 {64, 0,123,__LINE__, 0x403bcccc, 0xc0000000, 0x403bcccc, 0xccccccc9, 0x403fcccc, 0xccccccc9},	/* 27.8=f(27.8, 31.8)*/
 {64, 0,123,__LINE__, 0x403d8000, 0x00000000, 0x403d7fff, 0xfffffffc, 0x4040bfff, 0xfffffffe},	/* 29.5=f(29.5, 33.5)*/
-0,};
+{0}
+};
 void test_fmodf(m)   {run_vector_1(m,fmodf_vec,(char *)(fmodf),"fmodf","fff");   }	

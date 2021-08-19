@@ -41,7 +41,9 @@
 #include <malloc.h>
 #include <stdlib.h>
 
+#ifndef __clang__
 #pragma GCC diagnostic ignored "-Walloc-size-larger-than="
+#endif
 
 int
 main(void)

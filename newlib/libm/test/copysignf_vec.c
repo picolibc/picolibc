@@ -93,5 +93,6 @@
 {64, 0,123,__LINE__, 0xbff00000, 0x00000000, 0xbff00000, 0x00000000, 0xc0100000, 0x00000000 },   /* 1=f(1, -4) */
 {64, 0,123,__LINE__, 0xbff00000, 0x00000000, 0xbff00000, 0x00000000, 0xbfe00000, 0x00000000 },   /* 1=f(1, -0.5) */
 
-0,};
+{0}
+};
 void test_copysignf(int m)   {run_vector_1(m,copysignf_vec,(char *)(copysignf),"copysignf","fff");   }

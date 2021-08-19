@@ -59,7 +59,7 @@ testfail(const char *file, unsigned long line, const char *expression)
 }
 
 int
-main(int argc, char *argv[])
+main(void)
 {
 	ENTRY e, *ep, *ep2;
 	int created_ok;

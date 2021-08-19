@@ -53,7 +53,7 @@ long double l1, l2, l3;
  */
 
 int
-main(int argc, char **argv)
+main(void)
 {
     printf("sizeof float %ld double %ld long double %ld\n",
 	   (long) sizeof(float), (long) sizeof(double), (long) sizeof(long double));

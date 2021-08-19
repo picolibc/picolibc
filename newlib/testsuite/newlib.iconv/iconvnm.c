@@ -53,9 +53,9 @@ char *bad_names[] =
 #define TEST_NLSPATH "./"
 #endif
 
-int main(int argc, char **argv)
+int main(void)
 {
-    int i, failed = 0;
+    unsigned i, failed = 0;
     iconv_t cd;
 
     puts("iconv names test");

@@ -40,8 +40,8 @@
 
 #define DATA_VAL	0x600df00d
 
-volatile NEWLIB_THREAD_LOCAL int data_var = DATA_VAL;
-volatile NEWLIB_THREAD_LOCAL int bss_var;
+NEWLIB_THREAD_LOCAL volatile int data_var = DATA_VAL;
+NEWLIB_THREAD_LOCAL volatile int bss_var;
 
 volatile int *volatile data_addr;
 volatile int *volatile bss_addr;

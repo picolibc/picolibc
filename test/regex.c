@@ -71,9 +71,9 @@ struct test tests[] = {
 #define NTEST (sizeof(tests)/sizeof(tests[0]))
 
 int
-main(int argc, char **argv)
+main(void)
 {
-	int	t;
+	unsigned	t;
 	int	m;
 	int	errors = 0;
 	regmatch_t matches[MAX_MATCH];

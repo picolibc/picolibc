@@ -40,6 +40,6 @@ one_line_type issignaling_vec[] = {
 	{64, 0, 123, __LINE__, 0x00000000, 0x00000000, 0x7ff00000, 0x00000000}, /* 0 = f(+inf) */
 	{64, 0, 123, __LINE__, 0x00000000, 0x00000000, 0xfff00000, 0x00000000}, /* 0 = f(-inf) */
 	{64, 0, 123, __LINE__, 0x00000000, 0x00000000, 0x00000000, 0x00000000}, /* 0 = f(0) */
-	0,
+	{0},
 };
 void test_issignaling(m) {run_vector_1(m,issignaling_vec,(char*)(__issignaling),"issignaling","id"); }

@@ -165,7 +165,7 @@ main(void)
 
 	for (loops = 0; loops < 10; loops++)
 	{
-		int i;
+		long i;
 		size_t in_use;
 
 		reset_blocks();
@@ -193,9 +193,11 @@ main(void)
 		reset_blocks();
 
 #pragma GCC diagnostic push
+#ifndef __clang__
 #pragma GCC diagnostic ignored "-Walloc-size-larger-than=PTRDIFF_MAX"
+#endif
 		/* Test huge malloc sizes */
-		for (i = sizeof(size_t) * 8 - 2; i < sizeof(size_t) * 8; i++) {
+		for (i = sizeof(size_t) * 8 - 2; i < (long) (sizeof(size_t) * 8); i++) {
 			blocks[0] = malloc((size_t) 1 << i);
 			if (blocks[0])
 				free(blocks[0]);
@@ -213,7 +215,7 @@ main(void)
 			blocks[0] = malloc((size_t) i);
 #pragma GCC diagnostic pop
 			if (blocks[0]) {
-				printf("malloc size %d succeeded\n", i);
+				printf("malloc size %ld succeeded\n", i);
 				result++;
 				free(blocks[0]);
 			}

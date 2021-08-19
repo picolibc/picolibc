@@ -41,6 +41,8 @@
 void
 fail(int code, void *param)
 {
+        (void) code;
+        (void) param;
 	printf("on_exit failure\n");
 	_exit(2);
 }
@@ -48,6 +50,8 @@ fail(int code, void *param)
 void
 success(int code, void *param)
 {
+        (void) code;
+        (void) param;
 	_exit(0);
 }
 

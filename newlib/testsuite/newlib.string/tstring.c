@@ -19,7 +19,9 @@
 
 /* Ignore warnings about odd (but intended) use of functions */
 #pragma GCC diagnostic ignored "-Wmemset-transposed-args"
+#ifndef __clang__
 #pragma GCC diagnostic ignored "-Wstringop-truncation"
+#endif
 #pragma GCC diagnostic ignored "-Wunused-value"
 
 #define MAX_2 (2 * MAX_1 + MAX_1 / 10)
@@ -70,7 +72,7 @@ int main()
   char array[] = "abcdefghijklmnopqrstuvwxz";
   char array2[] = "0123456789!@#$%^&*(";
   char *tmp1, *tmp2, *tmp3, *tmp4, *tmp5, *tmp6, *tmp7;
-  int i, j, k, x, z = 0, align_test_iterations;
+  unsigned i, j, k, x, z = 0, align_test_iterations;
 
   int test_failed = 0;
 

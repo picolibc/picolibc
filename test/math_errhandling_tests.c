@@ -178,7 +178,7 @@ struct {
 	TEST(yn_neg, (FLOAT_T)NAN, FE_INVALID, EDOM),
         TEST(scalbn_big, (FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
         TEST(scalbn_tiny, (FLOAT_T)0.0, FE_UNDERFLOW, ERANGE),
-	{ NULL, NULL },
+	{ 0 },
 };
 
 int

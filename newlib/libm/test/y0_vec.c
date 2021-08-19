@@ -300,5 +300,5 @@
 {62, 0,123,__LINE__, 0x3f9c2b29, 0x4eeab909, 0x403a1999, 0x99999996},	/* 0.0275084=f(26.1)*/
 {64, 0,123,__LINE__, 0x3fc2771c, 0x9fef6e9f, 0x403bcccc, 0xccccccc9},	/* 0.14426=f(27.8)*/
 {61, 0,123,__LINE__, 0xbfafc3a0, 0x56b6c329, 0x403d7fff, 0xfffffffc},	/* -0.0620394=f(29.5)*/
-0,};
+{0},};
 void test_y0(m)   {run_vector_1(m,y0_vec,(char *)(y0),"y0","dd");   }	

@@ -300,5 +300,6 @@
 {64, 0,123,__LINE__, 0x404d29f1, 0x436831ba, 0x403a1999, 0x99999996},	/* 58.3277=f(26.1)*/
 {64, 0,123,__LINE__, 0x404ff29d, 0x1a191b4b, 0x403bcccc, 0xccccccc9},	/* 63.8954=f(27.8)*/
 {64, 0,123,__LINE__, 0x4051646b, 0xd261edc0, 0x403d7fff, 0xfffffffc},	/* 69.5691=f(29.5)*/
-0,};
+{0}
+};
 void test_gamma(m)   {run_vector_1(m,gamma_vec,(char *)(lgamma),"lgamma","dd");   }	

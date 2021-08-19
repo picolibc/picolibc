@@ -301,5 +301,6 @@
 {32, 0, 33,__LINE__, 0x7ff80000, 0x00000000, 0x403a1999, 0x99999996},	/* nan=f(26.1)*/
 {32, 0, 33,__LINE__, 0x7ff80000, 0x00000000, 0x403bcccc, 0xccccccc9},	/* nan=f(27.8)*/
 {32, 0, 33,__LINE__, 0x7ff80000, 0x00000000, 0x403d7fff, 0xfffffffc},	/* nan=f(29.5)*/
-0,};
+{0}
+};
 void test_asinf(m)   {run_vector_1(m,asinf_vec,(char *)(asinf),"asinf","ff");   }	

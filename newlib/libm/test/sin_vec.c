@@ -300,5 +300,5 @@
 {61, 0,123,__LINE__, 0x3fea58be, 0x72fc66f8, 0x403a1999, 0x99999996},	/* 0.823333=f(26.1)*/
 {59, 0,123,__LINE__, 0x3fdd3b53, 0x753c1a0b, 0x403bcccc, 0xccccccc9},	/* 0.456746=f(27.8)*/
 {61, 0,123,__LINE__, 0xbfee1ced, 0xe66aefea, 0x403d7fff, 0xfffffffc},	/* -0.941031=f(29.5)*/
-0,};
+{0},};
 void test_sin(m)   {run_vector_1(m,sin_vec,(char *)(sin),"sin","dd");   }	

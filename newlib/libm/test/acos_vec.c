@@ -300,5 +300,6 @@
 {64, 0, 33,__LINE__, 0x7ff80000, 0x00000000, 0x403a1999, 0x99999996},	/* nan=f(26.1)*/
 {64, 0, 33,__LINE__, 0x7ff80000, 0x00000000, 0x403bcccc, 0xccccccc9},	/* nan=f(27.8)*/
 {64, 0, 33,__LINE__, 0x7ff80000, 0x00000000, 0x403d7fff, 0xfffffffc},	/* nan=f(29.5)*/
-0,};
+{0}
+};
 void test_acos(m)   {run_vector_1(m,acos_vec,(char *)(acos),"acos","dd");   }	

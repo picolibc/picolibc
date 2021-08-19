@@ -103,7 +103,7 @@ static int test(int serial, char *expect, char *fmt, ...) {
 	free(abuf);
         return 1;
     }
-    if (n != strlen(expect)) {
+    if (n != (int) strlen(expect)) {
         failmsg(serial, "expected \"%s\" (%d), got \"%s\" (%d)",
 		expect, strlen(expect), buf, n);
 	free(abuf);
