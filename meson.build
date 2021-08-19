@@ -36,7 +36,7 @@ project('picolibc', 'c',
 	default_options: [
 	  'buildtype=minsize',
 	  'debug=true',
-	  'c_std=gnu99',
+	  'c_std=c18',
 	  'b_staticpic=false',
 	],
 	license : 'BSD',
