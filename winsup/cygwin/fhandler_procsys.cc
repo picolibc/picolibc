@@ -309,59 +309,88 @@ fhandler_procsys::opendir (int fd)
   UNICODE_STRING path;
   OBJECT_ATTRIBUTES attr;
   NTSTATUS status;
-  HANDLE h;
+  HANDLE dir_hdl;
   DIR *dir;
 
   mk_unicode_path (&path);
   InitializeObjectAttributes (&attr, &path, OBJ_CASE_INSENSITIVE, NULL, NULL);
-  status = NtOpenDirectoryObject (&h, DIRECTORY_QUERY, &attr);
+  status = NtOpenDirectoryObject (&dir_hdl, DIRECTORY_QUERY, &attr);
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_nt_status (status);
       return NULL;
     }
+
+  void *dbi_buf = NULL;
+  ULONG size = 65536;
+  ULONG context = 0;
+  int iter;
+  for (iter = 0; iter <= 3; ++iter)	/* Allows for a 512K buffer */
+    {
+      void *new_buf = realloc (dbi_buf, size);
+      if (!new_buf)
+	goto err;
+      dbi_buf = new_buf;
+      status = NtQueryDirectoryObject (dir_hdl, dbi_buf, size, FALSE, TRUE,
+				       &context, NULL);
+      if (!NT_SUCCESS (status))
+	{
+	  __seterrno_from_nt_status (status);
+	  goto err;
+	}
+      if (status != STATUS_MORE_ENTRIES)
+	break;
+      size <<= 1;
+    }
+  if (iter > 3)
+    {
+      __seterrno_from_nt_status (STATUS_INSUFFICIENT_RESOURCES);
+      goto err;
+    }
   if (!(dir = fhandler_virtual::opendir (fd)))
-    NtClose (h);
-  else
-    dir->__handle = h;
+    goto err;
+  /* Note that dir->__handle points to the buffer, it does NOT contain an
+     actual handle! */
+  dir->__handle = dbi_buf;
+  /* dir->__d_internal contains the number of objects returned in the buffer. */
+  dir->__d_internal = context;
   return dir;
+
+err:
+  NtClose (dir_hdl);
+  free (dbi_buf);
+  return NULL;
 }
 
 int
 fhandler_procsys::readdir (DIR *dir, dirent *de)
 {
-  NTSTATUS status;
-  struct fdbi
-  {
-    DIRECTORY_BASIC_INFORMATION dbi;
-    WCHAR buf[2][NAME_MAX + 1];
-  } f;
+  PDIRECTORY_BASIC_INFORMATION dbi;
   int res = EBADF;
 
   if (dir->__handle != INVALID_HANDLE_VALUE)
     {
-      BOOLEAN restart = dir->__d_position ? FALSE : TRUE;
-      status = NtQueryDirectoryObject (dir->__handle, &f, sizeof f, TRUE,
-				       restart, (PULONG) &dir->__d_position,
-				       NULL);
-      if (!NT_SUCCESS (status))
+      dbi = ((PDIRECTORY_BASIC_INFORMATION) dir->__handle);
+      dbi += dir->__d_position;
+      if (dir->__d_position >= (__int32_t) dir->__d_internal
+	  || dbi->ObjectName.Length == 0)
 	res = ENMFILE;
       else
 	{
-	  sys_wcstombs (de->d_name, NAME_MAX + 1, f.dbi.ObjectName.Buffer,
-			f.dbi.ObjectName.Length / sizeof (WCHAR));
+	  sys_wcstombs (de->d_name, NAME_MAX + 1, dbi->ObjectName.Buffer,
+			dbi->ObjectName.Length / sizeof (WCHAR));
 	  de->d_ino = hash_path_name (get_ino (), de->d_name);
-	  if (RtlEqualUnicodeString (&f.dbi.ObjectTypeName, &ro_u_natdir,
-				     FALSE))
+	  if (RtlEqualUnicodeString (&dbi->ObjectTypeName, &ro_u_natdir, FALSE))
 	    de->d_type = DT_DIR;
-	  else if (RtlEqualUnicodeString (&f.dbi.ObjectTypeName, &ro_u_natsyml,
+	  else if (RtlEqualUnicodeString (&dbi->ObjectTypeName, &ro_u_natsyml,
 					  FALSE))
 	    de->d_type = DT_LNK;
-	  else if (!RtlEqualUnicodeString (&f.dbi.ObjectTypeName, &ro_u_natdev,
+	  else if (!RtlEqualUnicodeString (&dbi->ObjectTypeName, &ro_u_natdev,
 					   FALSE))
 	    de->d_type = DT_CHR;
 	  else /* Can't nail down "Device" objects without further testing. */
 	    de->d_type = DT_UNKNOWN;
+	  ++dir->__d_position;
 	  res = 0;
 	}
     }
@@ -378,7 +407,12 @@ fhandler_procsys::telldir (DIR *dir)
 void
 fhandler_procsys::seekdir (DIR *dir, long pos)
 {
-  dir->__d_position = pos;
+  if (pos < 0)
+    dir->__d_position = 0;
+  else if (pos > (__int32_t) dir->__d_internal)
+    dir->__d_position = (__int32_t) dir->__d_internal;
+  else
+    dir->__d_position = pos;
 }
 
 int
@@ -386,7 +420,7 @@ fhandler_procsys::closedir (DIR *dir)
 {
   if (dir->__handle != INVALID_HANDLE_VALUE)
     {
-      NtClose (dir->__handle);
+      free (dir->__handle);
       dir->__handle = INVALID_HANDLE_VALUE;
     }
   return fhandler_virtual::closedir (dir);
