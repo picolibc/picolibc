@@ -267,7 +267,7 @@ loop:	swap_cnt = 0;
 	pn = (char *) a + n * es;
 	r = min(pa - (char *)a, pb - pa);
 	vecswap(a, pb - r, r);
-	r = min(pd - pc, pn - pd - es);
+	r = min((size_t) (pd - pc), (size_t) (pn - pd) - es);
 	vecswap(pb, pn - r, r);
 	d = pb - pa; /* d = Size of left part. */
 	r = pd - pc; /* r = Size of right part. */
