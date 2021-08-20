@@ -468,7 +468,7 @@ picolibcpp_ld = configure_file(input: 'picolibc.ld.in',
 
 # Not all compilers necessarily support all warnings; only use these which are:
 c_warnings = []
-foreach arg : ['-Wall', '-Wextra', '-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-Werror=implicit-function-declaration', '-Werror=vla']
+foreach arg : ['-Wall', '-Wextra', '-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-Werror=implicit-function-declaration', '-Werror=vla', '-Wno-unused-command-line-argument']
   if meson.get_compiler('c').has_argument(arg)
     c_warnings += [arg]
   endif
