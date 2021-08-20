@@ -1253,7 +1253,7 @@ freeset(p, cs)
 struct parse *p;
 cset *cs;
 {
-	int i;
+	size_t i;
 	cset *top = &p->g->sets[p->g->ncsets];
 	size_t css = (size_t)p->g->csetsize;
 
@@ -1279,7 +1279,7 @@ struct parse *p;
 cset *cs;
 {
 	short h = cs->hash;
-	int i;
+	size_t i;
 	cset *top = &p->g->sets[p->g->ncsets];
 	cset *cs2;
 	size_t css = (size_t)p->g->csetsize;
@@ -1312,7 +1312,7 @@ firstch(p, cs)
 struct parse *p;
 cset *cs;
 {
-	int i;
+	size_t i;
 	size_t css = (size_t)p->g->csetsize;
 
 	for (i = 0; i < css; i++)
@@ -1331,7 +1331,7 @@ nch(p, cs)
 struct parse *p;
 cset *cs;
 {
-	int i;
+	size_t i;
 	size_t css = (size_t)p->g->csetsize;
 	int n = 0;
 
