@@ -195,7 +195,7 @@ iconv (iconv_t cd,
           /* Get initial shift state sequence and it's length */
           ic->handlers->get_state (ic->data, &state_null, 1);
           
-          if (*outbytesleft >= state_null.__count)
+          if (*outbytesleft >= (size_t) state_null.__count)
             {
               memcpy ((void *)(*outbuf), (void *)&state_null, state_null.__count);
               
