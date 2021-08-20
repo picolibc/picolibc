@@ -691,7 +691,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 
             str_lpad:
                 if (!(flags & FL_LPAD)) {
-                    while (width > size) {
+                    while ((size_t) width > size) {
                         my_putc (' ', stream);
                         width--;
                     }
