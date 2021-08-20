@@ -51,8 +51,8 @@ __attribute__((packed))
 caseconv_table [] = {
 #include "caseconv.t"
 };
-#define first(ce)	ce.first
-#define last(ce)	(ce.first + ce.diff)
+#define first(ce)	((wint_t) ce.first)
+#define last(ce)	((wint_t) (ce.first + ce.diff))
 
 /* auxiliary function for binary search in interval properties table */
 static const struct caseconv_entry *
