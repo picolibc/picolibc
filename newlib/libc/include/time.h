@@ -51,11 +51,23 @@ SUCH DAMAGE.
 #include <machine/time.h>
 
 #ifndef _CLOCKS_PER_SEC_
+#ifdef CLK_TCK
+#define _CLOCKS_PER_SEC_ CLK_TCK
+#else
+#ifdef CLOCKS_PER_SEC
+#define _CLOCKS_PER_SEC_ CLOCKS_PER_SEC
+#else
 #define _CLOCKS_PER_SEC_ 1000
 #endif
+#endif
+#endif
 
+#ifndef CLOCKS_PER_SEC
 #define CLOCKS_PER_SEC _CLOCKS_PER_SEC_
+#endif
+#ifndef CLK_TCK
 #define CLK_TCK CLOCKS_PER_SEC
+#endif
 
 #include <sys/types.h>
 #include <sys/timespec.h>

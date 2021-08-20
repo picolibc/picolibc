@@ -231,7 +231,7 @@ void* __malloc_sbrk_aligned(size_t s)
      * parameter is int, not intptr_t or ptrdiff_t,
      */
     int d = (int) s;
-    if (d != s || d < 0)
+    if (d < 0 || (size_t) d != s)
 	return (void *)-1;
 #else
     ptrdiff_t d = (ptrdiff_t)s;
