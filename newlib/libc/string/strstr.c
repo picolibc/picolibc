@@ -162,7 +162,7 @@ strstr (const char *haystack, const char *needle)
 {
   const unsigned char *hs = (const unsigned char *) haystack;
   const unsigned char *ne = (const unsigned char *) needle;
-  int i;
+  size_t i;
 
   /* Handle short needle special cases first.  */
   if (ne[0] == '\0')
