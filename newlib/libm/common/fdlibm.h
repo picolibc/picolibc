@@ -372,10 +372,10 @@ do {								\
    of a shift is exactly equal to the size of the shifted operand.  */
 
 #define SAFE_LEFT_SHIFT(op,amt)					\
-  (((amt) < 8 * sizeof(op)) ? ((op) << (amt)) : 0)
+  (((amt) < (int) (8 * sizeof(op))) ? ((op) << (amt)) : 0)
 
 #define SAFE_RIGHT_SHIFT(op,amt)				\
-  (((amt) < 8 * sizeof(op)) ? ((op) >> (amt)) : 0)
+  (((amt) < (int) (8 * sizeof(op))) ? ((op) >> (amt)) : 0)
 
 #ifdef  _COMPLEX_H
 
