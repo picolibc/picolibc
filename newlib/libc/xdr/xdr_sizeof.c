@@ -161,9 +161,9 @@ xdr_sizeof (xdrproc_t func,
   ops.x_putint32 = x_putint32;
 
   /* the other harmless ones */
-  ops.x_getlong = (dummyfunc1) harmless;
-  ops.x_getbytes = (dummyfunc2) harmless;
-  ops.x_getint32 = (dummyfunc3) harmless;
+  ops.x_getlong = (dummyfunc1) (void *) harmless;
+  ops.x_getbytes = (dummyfunc2) (void *) harmless;
+  ops.x_getint32 = (dummyfunc3) (void *) harmless;
 
   x.x_op = XDR_ENCODE;
   x.x_ops = &ops;
