@@ -44,7 +44,8 @@ setenv (const char *name,
 {
   static int alloced;		/* if allocated space before */
   register char *C;
-  int l_value, offset;
+  size_t l_value;
+  int offset;
 
   if (strchr(name, '='))
     {
