@@ -61,7 +61,7 @@ get_features(void)
 		return;
 
 	int len = sys_semihost_flen(fd);
-	if (len < sizeof(fb_magic))
+	if (len < (int) sizeof(fb_magic))
 		goto do_close;
 
 	uint8_t magic[sizeof (fb_magic)];
@@ -71,7 +71,7 @@ get_features(void)
 		goto do_close;
 
 	int to_read = len - sizeof(fb_magic);
-	if (to_read > sizeof(feature_bytes))
+	if (to_read > (int) sizeof(feature_bytes))
 		to_read = sizeof(feature_bytes);
 
 	(void) sys_semihost_read(fd, feature_bytes, to_read);
