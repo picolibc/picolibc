@@ -51,7 +51,7 @@ llround(double x)
           result = msw >> (20 - exponent_less_1023);
         }
     }
-  else if (exponent_less_1023 < (8 * sizeof (long long int)) - 1)
+  else if (exponent_less_1023 < (__int32_t) ((8 * sizeof (long long int)) - 1))
     {
       /* 64bit longlong: exponent_less_1023 in [20,62] */
       if (exponent_less_1023 >= 52)
