@@ -72,7 +72,7 @@ static euc_cs_desc_t euc_jp_cs_desc[] =
   {ICONV_CCS_JIS_X0208_1990, "",     2, 0, 1},
   {ICONV_CCS_JIS_X0201_1976, "\x8e", 1, 1, 0},
   {ICONV_CCS_JIS_X0212_1990, "\x8f", 2, 1, 1},
-  {NULL, NULL, 0, 0}
+  {0}
 };
 #endif
 
@@ -84,7 +84,7 @@ static euc_cs_desc_t euc_tw_cs_desc [] =
   {ICONV_CCS_CNS11643_PLANE1,  "",         2, 0, 1},
   {ICONV_CCS_CNS11643_PLANE2,  "\x8e\xa2", 2, 2, 1},
   {ICONV_CCS_CNS11643_PLANE14, "\x8e\xae", 2, 2, 1},
-  {NULL, NULL, 0, 0}
+  {0}
 };
 #endif
 
@@ -94,7 +94,7 @@ static euc_cs_desc_t euc_tw_cs_desc [] =
 static euc_cs_desc_t euc_kr_cs_desc [] =
 {
   {ICONV_CCS_KSX1001,  "", 2, 0, 1},
-  {NULL, NULL, 0, 0}
+  {0}
 };
 #endif
 
