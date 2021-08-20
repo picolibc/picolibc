@@ -134,7 +134,7 @@ wcstoll_l (const wchar_t *nptr, wchar_t **endptr,
 {
 	register const wchar_t *s = nptr;
 	register unsigned long long acc;
-	register int c;
+	register wchar_t c;
 	register unsigned long long cutoff;
 	register int neg = 0, any, cutlim;
 
@@ -189,14 +189,14 @@ wcstoll_l (const wchar_t *nptr, wchar_t **endptr,
 			c -= L'a' - 10;
 		else
 			break;
-		if (c >= base)
+		if ((int) c >= base)
 			break;
-               if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
+                if (any < 0 || acc > cutoff || (acc == cutoff && (int) c > cutlim))
 			any = -1;
 		else {
 			any = 1;
 			acc *= base;
-			acc += c;
+			acc += (int) c;
 		}
 	}
 	if (any < 0) {
