@@ -34,7 +34,10 @@
 #define _SCANF_PRIVATE_H_
 
 #if	!defined (SCANF_LEVEL)
-#define SCANF_LEVEL SCANF_FLT
+# define SCANF_LEVEL SCANF_FLT
+# ifndef FORMAT_DEFAULT_DOUBLE
+#  define vfscanf __d_vfscanf
+# endif
 #endif
 
 #if	SCANF_LEVEL == SCANF_STD

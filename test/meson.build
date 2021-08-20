@@ -65,8 +65,8 @@ foreach target : targets
 
   test(t1 + target,
        executable(t1_name, 'printf_scanf.c',
-		  c_args: _c_args,
-		  link_args: _link_args,
+		  c_args: double_printf_compile_args + _c_args,
+		  link_args: double_printf_link_args + _link_args,
 		  link_with: _libs,
 		  link_depends:  test_link_depends,
 		  include_directories: inc),
@@ -97,8 +97,8 @@ foreach target : targets
 
   test(t1 + target,
        executable(t1_name, ['printf-tests.c'],
-		  c_args: _c_args,
-		  link_args: _link_args,
+		  c_args: double_printf_compile_args + _c_args,
+		  link_args: double_printf_link_args + _link_args,
 		  link_with: _libs,
 		  include_directories: inc),
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
@@ -259,8 +259,8 @@ foreach target : targets
 
     test(t1 + target,
 	 executable(t1_name, [t1_src],
-		    c_args: _c_args,
-		    link_args: _link_args,
+		    c_args: double_printf_compile_args + _c_args,
+		    link_args: double_printf_link_args + _link_args,
 		    link_with: _libs,
 		    link_depends:  test_link_depends,
 		    include_directories: inc),

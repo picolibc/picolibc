@@ -149,9 +149,9 @@ foreach target : targets
 
   test('math' + target,
        executable(test_name, math_test_src,
-		  c_args: value[1] + test_c_args,
+		  c_args: value[1] + double_printf_compile_args + test_c_args,
 		  link_with: libs,
-		  link_args: value[1] + test_link_args,
+		  link_args: value[1] + double_printf_link_args + test_link_args,
 		  include_directories: inc),
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 endforeach

@@ -31,6 +31,17 @@
 */
 
 #define PICOLIBC_FLOAT_PRINTF_SCANF
+#define SCANF_LEVEL SCANF_FLT
+#ifndef FORMAT_DEFAULT_FLOAT
 #define vfscanf __f_vfscanf
+#endif
 
 #include "vfscanf.c"
+
+#ifdef FORMAT_DEFAULT_FLOAT
+#ifdef HAVE_ALIAS_ATTRIBUTE
+__strong_reference(vfscanf, __f_vfscanf);
+#else
+int __f_vfscanf (FILE * stream, const char *fmt, va_list ap) { return vfscanf(stream, fmt, ap); }
+#endif
+#endif

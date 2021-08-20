@@ -83,14 +83,13 @@ typedef int64_t printf_float_int_t;
  */
 
 #ifndef PRINTF_LEVEL
-# define PRINTF_LEVEL PRINTF_FLT
+#  define PRINTF_LEVEL PRINTF_FLT
+#  ifndef FORMAT_DEFAULT_DOUBLE
+#    define vfprintf __d_vfprintf
+#  endif
 #endif
 
 #if PRINTF_LEVEL == PRINTF_STD || PRINTF_LEVEL == PRINTF_FLT
-/* OK */
-#else
-# error "Not a known printf level."
-#endif
 
 #if ((PRINTF_LEVEL >= PRINTF_FLT) || defined(_WANT_IO_LONG_LONG))
 #define PRINTF_LONGLONG
@@ -845,10 +844,11 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 #undef my_putc
 }
 
-#ifndef vfprintf
+#if defined(FORMAT_DEFAULT_DOUBLE) && !defined(vfprintf)
 #ifdef HAVE_ALIAS_ATTRIBUTE
 __strong_reference(vfprintf, __d_vfprintf);
 #else
 int __d_vfprintf (FILE * stream, const char *fmt, va_list ap) { return vfprintf(stream, fmt, ap); }
+#endif
 #endif
 #endif

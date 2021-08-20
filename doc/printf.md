@@ -36,17 +36,36 @@ picolibc.specs includes the --gc-sections linker flag. This causes
 those functions to be discarded if they aren't used in the
 application.
 
+However, the defsym approach does not work with link-time
+optimization. In that case, applications can only use the default
+function. For that case, the library needs to allow a different
+default version to be selected while compiling the library.
+
 ## Printf and Scanf levels in Picolibc
 
 There are three levels of printf support provided by Picolibc that can
-be selected when building applications:
+be selected when building applications. One of these is the default
+used when no symbol definitions are applied; that is selected using
+the picolibc built-time option, `-Dformat-default`, which defaults to
+`double`, selecting PICOLIBC_DOUBLE_PRINTF_SCANF.
 
- * Default level. This offers full printf functionality, including
-   both float and double conversions. This is what you get with no
-   pre-processor definition.
+ * PICOLIBC_DOUBLE_PRINTF_SCANF (default when
+   `-Dformat-default=double`). This offers full printf functionality,
+   including both float and double conversions. The picolibc.specs
+   stanza that matches this option maps __d_vfprintf to vfprintf and
+   __d_vfscanf to vfscanf. This is equivalent to adding this when
+   linking your application:
 
- * PICOLIBC_INTEGER_PRINTF_SCANF. This removes support for all float
-   and double conversions. The picolibc.specs stanza that matches this
+	cc -Wl,--defsym=vfprintf=__d_vfprintf -Wl,--defsym=vfscanf=__d_vfscanf
+
+   If you're using a linker that supports -alias instead of --defsym,
+   you  would use:
+
+	cc -Wl,-alias,___d_vfprintf,_vfprintf -Wl,-alias,___d_vfscanf,_vfscanf
+
+ * PICOLIBC_INTEGER_PRINTF_SCANF (default when
+   `-Dformat-default=integer`). This removes support for all float and
+   double conversions. The picolibc.specs stanza that matches this
    option maps __i_vfprintf to vfprintf and __i_vfscanf to
    vfscanf. This is equivalent to adding this when linking your
    application:
@@ -58,8 +77,9 @@ be selected when building applications:
 
 	cc -Wl,-alias,___i_vfprintf,_vfprintf -Wl,-alias,___i_vfscanf,_vfscanf
 
- * PICOLIBC_FLOAT_PRINTF_SCANF. This provides support for float, but
-   not double conversions. When picolibc.specs finds
+ * PICOLIBC_FLOAT_PRINTF_SCANF (default when
+   `-Dformat-default=float`). This provides support for float, but not
+   double conversions. When picolibc.specs finds
    -DPICOLIBC_FLOAT_PRINTF_SCANF on the command line during linking,
    it maps __f_vfprintf to vfprintf and __f_vfscanf to vfscanf. This
    is equivalent to adding this when linking your application:
@@ -83,9 +103,9 @@ Here's an example program to experiment with these options:
 		printf(" 2⁶¹ = %lld π ≃ %.17g\n", 1ll << 61, printf_float(3.141592653589793));
 	}
 
-Now we can build and run it with the default options:
+Now we can build and run it with the double options:
 
-	$ arm-none-eabi-gcc -Os -march=armv7-m --specs=picolibc.specs --oslib=semihost --crt0=hosted -Wl,--defsym=__flash=0 -Wl,--defsym=__flash_size=0x00200000 -Wl,--defsym=__ram=0x20000000 -Wl,--defsym=__ram_size=0x200000 -o printf.elf printf.c
+	$ arm-none-eabi-gcc -DPICOLIBC_DOUBLE_PRINTF_SCANF -Os -march=armv7-m --specs=picolibc.specs --oslib=semihost --crt0=hosted -Wl,--defsym=__flash=0 -Wl,--defsym=__flash_size=0x00200000 -Wl,--defsym=__ram=0x20000000 -Wl,--defsym=__ram_size=0x200000 -o printf.elf printf.c
 	$ arm-none-eabi-size printf.elf
 	   text	   data	    bss	    dec	    hex	filename
            7760	     80	   2056	   9896	   26a8	printf.elf
