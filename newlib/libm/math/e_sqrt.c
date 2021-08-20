@@ -103,7 +103,7 @@ __strong_reference(__ieee754_sqrt, sqrt);
 #endif
 {
 	double z;
-	__int32_t sign = 0x80000000; 
+	__uint32_t sign = 0x80000000; 
 	__uint32_t r,t1,s1,ix1,q1;
 	__int32_t ix0,s0,q,m,t,i;
 
