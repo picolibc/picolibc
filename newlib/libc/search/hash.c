@@ -766,7 +766,7 @@ hash_seq(dbp, key, data, flag)
 	DBT *key, *data;
 	u_int flag;
 {
-	__uint32_t bucket;
+	int32_t bucket;
 	BUFHEAD *bufp;
 	HTAB *hashp;
 	__uint16_t *bp, ndx;
@@ -854,7 +854,7 @@ extern int
 __expand_table(hashp)
 	HTAB *hashp;
 {
-	__uint32_t old_bucket, new_bucket;
+	int32_t old_bucket, new_bucket;
 	int dirsize, new_segnum, spare_ndx;
 
 #ifdef HASH_STATISTICS
@@ -927,7 +927,7 @@ __call_hash(hashp, k, len)
 	char *k;
 	int len;
 {
-	int n, bucket;
+	int32_t n, bucket;
 
 	n = hashp->hash(k, len);
 	bucket = n & hashp->HIGH_MASK;

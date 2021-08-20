@@ -97,7 +97,7 @@ typedef struct hashhdr {		/* Disk resident portion */
 	int32_t		ffactor;	/* Fill factor */
 	int32_t		nkeys;		/* Number of keys in hash table */
 	int32_t		hdrpages;	/* Size of table header */
-	int32_t		h_charkey;	/* value of hash(CHARKEY) */
+	uint32_t	h_charkey;	/* value of hash(CHARKEY) */
 #define NCACHED	32			/* number of bit maps and spare 
 					 * points */
 	int32_t		spares[NCACHED];/* spare pages for overflow */
