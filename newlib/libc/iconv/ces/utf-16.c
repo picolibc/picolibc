@@ -194,7 +194,7 @@ utf_16_convert_to_ucs (void *data,
   register ucs2_t *cp;
   int *state;
   ucs4_t res;
-  int bytes = sizeof (ucs2_t);
+  size_t bytes = sizeof (ucs2_t);
 
   (void) data;
   if (*inbytesleft < bytes)
