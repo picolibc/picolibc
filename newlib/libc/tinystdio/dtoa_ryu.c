@@ -41,8 +41,8 @@
 #define DOUBLE_EXPONENT_BITS 11
 #define DOUBLE_BIAS 1023
 
-static uint32_t decimalLength17(const uint64_t v) {
-	uint32_t len = 1;
+static int decimalLength17(const uint64_t v) {
+	int len = 1;
 	uint64_t c = 10;
 	while (c <= v) {
 		len++;
