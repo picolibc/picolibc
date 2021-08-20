@@ -16,8 +16,8 @@
 int
 _buf_findstr(const char *str, char **buf, size_t *buf_len)
 {
-  int i = 0;
-  int j = 0;
+  size_t i = 0;
+  size_t j = 0;
 
   for (i = 0; i < *buf_len; i++)
     {
