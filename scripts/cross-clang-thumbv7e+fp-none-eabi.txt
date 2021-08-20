@@ -30,6 +30,6 @@ c_link_args = [
 	'-mcpu=cortex-m7',
 	'-mfloat-abi=hard',
 	'-nostdlib',
-	'-L/usr/lib/gcc/arm-none-eabi/8.3.1/thumb/v7e-m+dp/hard/'
+	'-L/usr/lib/gcc/arm-none-eabi/10.2.1/thumb/v7e-m+dp/hard/'
 	]
 needs_exe_wrapper = true
