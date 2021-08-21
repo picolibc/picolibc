@@ -90,7 +90,7 @@ c_args += '-U_FORTIFY_SOURCE'
 if meson.get_compiler('c').has_argument('-fno-common')
   c_args += '-fno-common'
 endif
-if meson.get_compiler('c').has_argument('-frounding-math')
+if meson.get_compiler('c').has_argument('-frounding-math') and meson.get_compiler('c').get_id() != 'clang'
   c_args += '-frounding-math'
 endif
 if meson.get_compiler('c').symbols_have_underscore_prefix()
