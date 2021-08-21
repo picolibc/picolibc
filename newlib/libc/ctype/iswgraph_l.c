@@ -16,7 +16,7 @@ iswgraph_l (wint_t c, struct __locale_t *locale)
   //return iswprint (c, locale) && !iswspace (c, locale);
   c = _jp2uc_l (c, locale);
   enum category cat = category (c);
-  return cat != -1
+  return cat != CAT_error
       && cat != CAT_Cc && cat != CAT_Cf
       && cat != CAT_Cs // Surrogate
       && cat != CAT_Zs
