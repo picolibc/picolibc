@@ -1012,7 +1012,7 @@ reswitch:	switch (ch) {
 			if (width >= 0)
 				goto rflag;
 			width = -width;
-			/* FALLTHROUGH */
+			FALLTHROUGH;
 		case '-':
 			flags |= LADJUST;
 			goto rflag;
@@ -1183,7 +1183,7 @@ reswitch:	switch (ch) {
 			break;
 		case 'D':  /* extension */
 			flags |= LONGINT;
-			/*FALLTHROUGH*/
+			FALLTHROUGH;
 		case 'd':
 		case 'i':
 			_uquad = SARG ();
@@ -1404,7 +1404,7 @@ reswitch:	switch (ch) {
 			continue;	/* no output */
 		case 'O': /* extension */
 			flags |= LONGINT;
-			/*FALLTHROUGH*/
+			FALLTHROUGH;
 		case 'o':
 			_uquad = UARG ();
 			base = OCT;
@@ -1526,7 +1526,7 @@ string:
 			break;
 		case 'U': /* extension */
 			flags |= LONGINT;
-			/*FALLTHROUGH*/
+			FALLTHROUGH;
 		case 'u':
 			_uquad = UARG ();
 			base = DEC;
@@ -2283,7 +2283,7 @@ get_arg (struct _reent *data,
 	      break;
 	    case GETPWB: /* we require format pushback */
 	      --fmt;
-	      /* fallthrough */
+	      FALLTHROUGH;
 	    case GETPW:  /* we have a variable precision or width to acquire */
 	      args[numargs++].val_int = va_arg (*ap, int);
 	      break;

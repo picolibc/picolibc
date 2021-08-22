@@ -791,7 +791,7 @@ __SVFSCANF_R (struct _reent *rptr,
 
 	case 'D':		/* compat */
 	  flags |= LONG;
-	  /* FALLTHROUGH */
+	  FALLTHROUGH;
 	case 'd':
 	  c = CT_INT;
 	  ccfn = (u_long (*)CCFN_PARAMS)strtol;
@@ -806,7 +806,7 @@ __SVFSCANF_R (struct _reent *rptr,
 
 	case 'O':		/* compat */
 	  flags |= LONG;
-	  /* FALLTHROUGH */
+	  FALLTHROUGH;
 	case 'o':
 	  c = CT_INT;
 	  ccfn = strtoul;
@@ -845,7 +845,7 @@ __SVFSCANF_R (struct _reent *rptr,
 #ifdef _WANT_IO_C99_FORMATS
 	case 'S':
 	  flags |= LONG;
-	  /* FALLTHROUGH */
+          FALLTHROUGH;
 #endif
 
 	case 's':
@@ -861,7 +861,7 @@ __SVFSCANF_R (struct _reent *rptr,
 #ifdef _WANT_IO_C99_FORMATS
 	case 'C':
 	  flags |= LONG;
-	  /* FALLTHROUGH */
+          FALLTHROUGH;
 #endif
 
 	case 'c':

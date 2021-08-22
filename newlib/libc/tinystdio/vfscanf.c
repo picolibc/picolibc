@@ -121,7 +121,7 @@ conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
     switch ((unsigned char)i) {
       case '-':
         flags |= FL_MINUS;
-	/* FALLTHROUGH */
+	FALLTHROUGH;
       case '+':
 	if (!--width || (i = scanf_getc(stream, lenp)) < 0)
 	    goto err;
@@ -590,7 +590,7 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 
 	          case 'o':
 		    flags |= FL_OCT;
-		    /* FALLTHROUGH */
+		    FALLTHROUGH;
 		  case 'i':
 		  conv_int:
 		    c = conv_int (stream, lenp, width, addr, flags);
@@ -606,7 +606,7 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 
 	          case 'o':
 		    flags |= FL_OCT;
-		    /* FALLTHROUGH */
+		    FALLTHROUGH;
 		  case 'i':
 		    goto conv_int;
 

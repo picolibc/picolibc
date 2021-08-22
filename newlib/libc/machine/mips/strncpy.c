@@ -165,7 +165,7 @@ strncpy (char *dst0, const char *src0, size_t count)
  found_null0:
   count++;			/* add 1 to cover remaining byte */
   dst -= 1;			/* adjust dst += 4 gets correct ptr */
-  /* fall through */
+  FALLTHROUGH;
 
   /* Found null byte in second byte, count has been decremented by 4, null has
      been stored in dst[1].  */
@@ -173,14 +173,14 @@ strncpy (char *dst0, const char *src0, size_t count)
 #if UNROLL_FACTOR > 2
   count++;			/* add 1 to cover remaining byte */
   dst -= 1;			/* adjust dst += 4 gets correct ptr */
-  /* fall through */
+  FALLTHROUGH;
 
   /* Found null byte in third byte, count has been decremented by 4, null has
      been stored in dst[2].  */
  found_null2:
   count++;			/* add 1 to cover remaining byte */
   dst -= 1;			/* adjust dst += 4 gets correct ptr */
-  /* fall through */
+  FALLTHROUGH;
 
   /* Found null byte in fourth byte, count is accurate, dst has not been
      updated yet.  */

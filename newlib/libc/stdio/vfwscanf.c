@@ -737,7 +737,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 #ifdef _WANT_IO_C99_FORMATS
 	case L'S':
 	  flags |= LONG;
-	  /* FALLTHROUGH */
+          FALLTHROUGH;
 #endif
 
 	case L's':
@@ -766,7 +766,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 #ifdef _WANT_IO_C99_FORMATS
 	case 'C':
 	  flags |= LONG;
-	  /* FALLTHROUGH */
+          FALLTHROUGH;
 #endif
 
 	case 'c':

@@ -220,7 +220,7 @@ __sfvwrite_r (struct _reent *ptr,
 	  if (!nlknown)
 	    {
 	      nl = memchr ((void *) p, '\n', len);
-	      nldist = nl ? nl + 1 - p : len + 1;
+	      nldist = nl ? nl + 1 - p : (int) (len + 1);
 	      nlknown = 1;
 	    }
 	  s = MIN (len, nldist);

@@ -431,7 +431,7 @@ struct parse *p;
 		break;
 	case '{':		/* okay as ordinary except if digit follows */
 		(void)REQUIRE(!MORE() || !isdigit((uch)PEEK()), REG_BADRPT);
-		/* FALLTHROUGH */
+		FALLTHROUGH;
 	default:
 		ordinary(p, c);
 		break;
@@ -634,7 +634,7 @@ int starordinary;		/* is a leading * an ordinary character? */
 		break;
 	case '*':
 		(void)REQUIRE(starordinary, REG_BADRPT);
-		/* FALLTHROUGH */
+		FALLTHROUGH;
 	default:
 		ordinary(p, (char)c);
 		break;
@@ -1750,7 +1750,7 @@ struct re_guts *g;
 					return;
 				}
 			} while (OP(s) != O_QUEST && OP(s) != O_CH);
-			/* fallthrough */
+			FALLTHROUGH;
 		case OBOW:		/* things that break a sequence */
 		case OEOW:
 		case OBOL:
@@ -1908,6 +1908,7 @@ int mccs;
 		case OANYOF:
 			if (mccs)
 				return -1;
+                        FALLTHROUGH;
 		case OCHAR:
 		case OANY:
 			try++;

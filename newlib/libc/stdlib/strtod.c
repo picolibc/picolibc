@@ -272,11 +272,11 @@ strtod_l (const char *__restrict s00, char **__restrict se,
 	for(s = s00;;s++) switch(*s) {
 		case '-':
 			sign = 1;
-			/* no break */
+                        FALLTHROUGH;
 		case '+':
 			if (*++s)
 				goto break2;
-			/* no break */
+                        FALLTHROUGH;
 		case 0:
 			goto ret0;
 		case '\t':
@@ -317,7 +317,7 @@ strtod_l (const char *__restrict s00, char **__restrict se,
 			  case STRTOG_NoNumber:
 				s = s00;
 				sign = 0;
-				/* FALLTHROUGH */
+				FALLTHROUGH;
 			  case STRTOG_Zero:
 				break;
 			  default:
@@ -393,6 +393,7 @@ strtod_l (const char *__restrict s00, char **__restrict se,
 		switch(c = *++s) {
 			case '-':
 				esign = 1;
+                                FALLTHROUGH;
 			case '+':
 				c = *++s;
 			}

@@ -748,7 +748,7 @@ reswitch:	switch (ch) {
 			if (width >= 0)
 				goto rflag;
 			width = -width;
-			/* FALLTHROUGH */
+			FALLTHROUGH;
 		case L'-':
 			flags |= LADJUST;
 			goto rflag;
@@ -1949,7 +1949,7 @@ get_arg (struct _reent *data,
 	      break;
 	    case GETPWB: /* we require format pushback */
 	      --fmt;
-	      /* fallthrough */
+	      FALLTHROUGH;
 	    case GETPW:  /* we have a variable precision or width to acquire */
 	      args[numargs++].val_int = va_arg (*ap, int);
 	      break;

@@ -138,25 +138,25 @@ hash3(keyarg, len)
 		case 0:
 			do {
 				HASHC;
-				/* FALLTHROUGH */
+				FALLTHROUGH;
 		case 7:
 				HASHC;
-				/* FALLTHROUGH */
+				FALLTHROUGH;
 		case 6:
 				HASHC;
-				/* FALLTHROUGH */
+				FALLTHROUGH;
 		case 5:
 				HASHC;
-				/* FALLTHROUGH */
+				FALLTHROUGH;
 		case 4:
 				HASHC;
-				/* FALLTHROUGH */
+				FALLTHROUGH;
 		case 3:
 				HASHC;
-				/* FALLTHROUGH */
+				FALLTHROUGH;
 		case 2:
 				HASHC;
-				/* FALLTHROUGH */
+				FALLTHROUGH;
 		case 1:
 				HASHC;
 			} while (--loop);

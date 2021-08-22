@@ -769,6 +769,19 @@
 #define __nosanitizethread
 #endif
 
+/*
+ * fall-through case statement annotations
+ */
+#if __cplusplus >= 201703L || __STDC_VERSION__ > 201710L
+/* Standard C++17/C23 attribute */
+#define FALLTHROUGH [[fallthrough]]
+#elif __has_attribute(fallthrough)
+/* Non-standard but supported by at least gcc and clang */
+#define FALLTHROUGH __attribute__((fallthrough))
+#else
+#define FALLTHROUGH do { } while(0)
+#endif
+
 /* Guard variables and structure members by lock. */
 #define	__guarded_by(x)		__lock_annotate(guarded_by(x))
 #define	__pt_guarded_by(x)	__lock_annotate(pt_guarded_by(x))

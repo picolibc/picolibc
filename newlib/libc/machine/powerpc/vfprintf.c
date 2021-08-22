@@ -538,7 +538,7 @@ reswitch:	switch (ch) {
 			if ((width = va_arg(ap, int)) >= 0)
 				goto rflag;
 			width = -width;
-			/* FALLTHROUGH */
+			FALLTHROUGH;
 		case '-':
 			flags |= LADJUST;
 			goto rflag;
@@ -686,7 +686,7 @@ reswitch:	switch (ch) {
 			break;
 		case 'D':
 			flags |= LONGINT;
-			/*FALLTHROUGH*/
+			FALLTHROUGH;
 		case 'd':
 		case 'i':
 #ifdef __ALTIVEC__
@@ -906,7 +906,7 @@ fixed_nosign:
 			continue;	/* no output */
 		case 'O':
 			flags |= LONGINT;
-			/*FALLTHROUGH*/
+			FALLTHROUGH;
 		case 'o':
 #ifdef __ALTIVEC__
 		        if (!(flags & VECTOR) && vec_sep != ' ') 
@@ -973,7 +973,7 @@ fixed_nosign:
 			break;
 		case 'U':
 			flags |= LONGINT;
-			/*FALLTHROUGH*/
+			FALLTHROUGH;
 		case 'u':
 #ifdef __ALTIVEC__
 		        if (!(flags & VECTOR) && vec_sep != ' ') 

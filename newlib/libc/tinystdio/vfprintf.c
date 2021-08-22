@@ -220,7 +220,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		    continue;
 		  case '+':
 		    flags |= FL_PLUS;
-		    /* FALLTHROUGH */
+		    FALLTHROUGH;
 		  case ' ':
 		    flags |= FL_SPACE;
 		    continue;
