@@ -162,8 +162,8 @@ _fgets_r (struct _reent * ptr,
        * newline, and stop.  Otherwise, copy entire chunk
        * and loop.
        */
-      if (len > n)
-	len = n;
+      if (len > (size_t) n)     /* n is always non-negative here */
+        len = (size_t) n;
       t = (unsigned char *) memchr ((void *) p, '\n', len);
       if (t != 0)
 	{

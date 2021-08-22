@@ -205,7 +205,7 @@ __ssputs_r (struct _reent *ptr,
 
         (void) ptr;
 	w = fp->_w;
-	if (len >= w && fp->_flags & (__SMBF | __SOPT)) {
+	if (len >= (size_t) w && fp->_flags & (__SMBF | __SOPT)) {
 		/* must be asprintf family */
 		unsigned char *str;
 		int curpos = (fp->_p - fp->_bf._base);
@@ -217,7 +217,7 @@ __ssputs_r (struct _reent *ptr,
 	 	 * reallocating.  The new allocation should thus be
 	 	 * max(prev_size*1.5, curpos+len+1). */
 		int newsize = fp->_bf._size * 3 / 2;
-		if (newsize < curpos + len + 1)
+		if ((size_t) newsize < curpos + len + 1)
 			newsize = curpos + len + 1;
 		if (fp->_flags & __SOPT)
 		{
@@ -250,7 +250,7 @@ __ssputs_r (struct _reent *ptr,
 		w = len;
 		fp->_w = newsize - curpos;
 	}
-	if (len < w)
+	if (len < (size_t) w)
 		w = len;
 	(void)memmove ((void *) fp->_p, (void *) buf, (size_t) (w));
 	fp->_w -= w;
@@ -290,7 +290,7 @@ __ssprint_r (struct _reent *ptr,
 			iov++;
 		}
 		w = fp->_w;
-		if (len >= w && fp->_flags & (__SMBF | __SOPT)) {
+		if (len >= (size_t) w && fp->_flags & (__SMBF | __SOPT)) {
 			/* must be asprintf family */
 			unsigned char *str;
 			int curpos = (fp->_p - fp->_bf._base);
@@ -302,7 +302,7 @@ __ssprint_r (struct _reent *ptr,
 		 	 * reallocating.  The new allocation should thus be
 		 	 * max(prev_size*1.5, curpos+len+1). */
 			int newsize = fp->_bf._size * 3 / 2;
-			if (newsize < curpos + len + 1)
+			if ((size_t) newsize < curpos + len + 1)
 				newsize = curpos + len + 1;
 			if (fp->_flags & __SOPT)
 			{
@@ -335,7 +335,7 @@ __ssprint_r (struct _reent *ptr,
 			w = len;
 			fp->_w = newsize - curpos;
 		}
-		if (len < w)
+		if (len < (size_t) w)
 			w = len;
 		(void)memmove ((void *) fp->_p, (void *) p, (size_t) (w));
 		fp->_w -= w;
@@ -387,7 +387,7 @@ __sfputs_r (struct _reent *ptr,
 #else
 	{
 #endif
-		for (i = 0; i < len; i++) {
+                for (i = 0; (size_t) i < len; i++) {
 			if (_fputc_r (ptr, buf[i], fp) == EOF)
 				return -1;
 		}

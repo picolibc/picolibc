@@ -1254,7 +1254,7 @@ string:
 					cp = malloc_buf;
 				} else
 					cp = buf;
-				for (size = 0; size < insize; ++size)
+				for (size = 0; (size_t) size < insize; ++size)
 					cp[size] = arg[size];
 				cp[size] = L'\0';
 			}
@@ -1669,7 +1669,7 @@ wexponent(wchar_t *p0, int exp, int fmtch)
 # endif
 
 	p = p0;
-	*p++ = isa ? L'p' - L'a' + fmtch : fmtch;
+	*p++ = isa ? (int) (L'p' - L'a') + fmtch : fmtch;
 	if (exp < 0) {
 		exp = -exp;
 		*p++ = L'-';

@@ -159,7 +159,7 @@ _gettemp (struct _reent *ptr,
   pid = getpid ();
   for (trv = path; *trv; ++trv)		/* extra X's get set to 0's */
     continue;
-  if (trv - path < suffixlen)
+  if (trv - path < (ptrdiff_t) suffixlen)
     {
       __errno_r(ptr) = EINVAL;
       return 0;

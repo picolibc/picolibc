@@ -427,8 +427,8 @@ __SVFWSCANF_R (struct _reent *rptr,
       size_t _nw = (_w);						\
       ptrdiff_t _dif = _p - _p0;					\
       if (_p_p &&							\
-	  ((sizeof (_type) == 1 && _dif >= _nw - MB_CUR_MAX)		\
-	   || _dif >= _nw))						\
+	  ((sizeof (_type) == 1 && (size_t) _dif >= _nw - MB_CUR_MAX)   \
+	   || (size_t) _dif >= _nw))                                    \
 	{								\
 	  _p0 = (_type *) realloc (_p0, (_nw << 1) * sizeof (_type));	\
 	  if (!_p0)							\

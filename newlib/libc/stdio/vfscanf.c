@@ -362,7 +362,7 @@ _sfread_r (struct _reent * ptr,
   total = resid;
   p = buf;
 
-  while (resid > (r = fp->_r))
+  while (resid > (size_t) (r = fp->_r))
     {
       (void) memcpy ((void *) p, (void *) fp->_p, (size_t) r);
       fp->_p += r;
@@ -504,8 +504,8 @@ __SVFSCANF_R (struct _reent *rptr,
       size_t _nw = (_w);						\
       ptrdiff_t _dif = _p - _p0;					\
       if (_p_p &&							\
-	  ((sizeof (_type) == 2 && _dif >= _nw - 1)			\
-	   || _dif >= _nw))						\
+	  ((sizeof (_type) == 2 && (size_t) _dif >= _nw - 1)             \
+	   || (size_t) _dif >= _nw))                                    \
 	{								\
 	  _p0 = (_type *) realloc (_p0, (_nw << 1) * sizeof (_type));			\
 	  if (!_p0)							\
