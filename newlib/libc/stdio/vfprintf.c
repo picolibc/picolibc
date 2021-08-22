@@ -711,7 +711,7 @@ _VFPRINTF_R (struct _reent *data,
 	register struct __siov *iovp;/* for PRINT macro */
 #endif
 	char buf[BUF];		/* space for %c, %S, %[diouxX], %[aA] */
-	char ox[2];		/* space for 0x hex-prefix */
+	char ox[2] = {0};	/* space for 0x hex-prefix */
 #ifdef _MB_CAPABLE
 	wchar_t wc;
 	mbstate_t state;        /* mbtowc calls from library must not change state */
