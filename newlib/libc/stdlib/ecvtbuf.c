@@ -75,6 +75,7 @@ print_f (
   int sign;
   char *p, *start, *end;
 
+  (void) type; /* XXX should be used */
   start = p = __dtoa (invalue, mode, ndigit, &decpt, &sign, &end);
   if (!p) {
     buf[0] = '\0';
@@ -459,6 +460,7 @@ _dcvt (
 	char type,
 	int dot)
 {
+  (void) width; /* XXX should be used */
   switch (type)
     {
     case 'f':
