@@ -1007,8 +1007,8 @@ strtod_l (const char *__restrict s00, char **__restrict se,
 #ifdef Avoid_Underflow
 				if (scale) {
 					L = dword0(rv) & Exp_mask;
-					if (L <= (2*P+1)*Exp_msk1) {
-						if (L > (P+2)*Exp_msk1)
+					if (L <= (Long) ((2*P+1)*Exp_msk1)) {
+                                                if (L > (Long)((P+2)*Exp_msk1))
 							/* round even ==> */
 							/* accept rv */
 							break;
