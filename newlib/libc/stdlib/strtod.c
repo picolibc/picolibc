@@ -263,8 +263,13 @@ _strtod_l (struct _reent *ptr, const char *__restrict s00, char **__restrict se,
 #ifdef Honor_FLT_ROUNDS
 	int rounding;
 #endif
+#ifdef __HAVE_LOCALE_INFO__
 	const char *decimal_point = __get_numeric_locale(loc)->decimal_point;
-	int dec_len = strlen (decimal_point);
+	const int dec_len = strlen (decimal_point);
+#else
+	const char *decimal_point = ".";
+	const int dec_len = 1;
+#endif
 
 	delta = bs = bd = NULL;
 	sign = nz0 = nz = decpt = 0;
