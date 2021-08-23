@@ -377,7 +377,7 @@ _VFWPRINTF_R (struct _reent *data,
        va_list ap)
 {
 	register wchar_t *fmt;	/* format string */
-	register wint_t ch;	/* character from fmt */
+	register wchar_t ch;	/* character from fmt */
 	register int n, m;	/* handy integers (short term usage) */
 	register wchar_t *cp;	/* handy char pointer (short term usage) */
 	register int flags;	/* flags as above */
