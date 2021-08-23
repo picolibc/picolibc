@@ -1595,7 +1595,7 @@ pthread_rwlock::add_reader ()
 {
   RWLOCK_READER *rd = new RWLOCK_READER;
   if (rd)
-    List_insert (readers, rd);
+    List_insert_nolock (readers, rd);
   return rd;
 }
 
@@ -2165,7 +2165,7 @@ pthread::atfork (void (*prepare)(void), void (*parent)(void), void (*child)(void
   if (prepcb)
   {
     prepcb->cb = prepare;
-    List_insert (MT_INTERFACE->pthread_prepare, prepcb);
+    List_insert_nolock (MT_INTERFACE->pthread_prepare, prepcb);
   }
   if (parentcb)
   {
@@ -2174,7 +2174,7 @@ pthread::atfork (void (*prepare)(void), void (*parent)(void), void (*child)(void
     while (*t)
       t = &(*t)->next;
     /* t = pointer to last next in the list */
-    List_insert (*t, parentcb);
+    List_insert_nolock (*t, parentcb);
   }
   if (childcb)
   {
@@ -2183,7 +2183,7 @@ pthread::atfork (void (*prepare)(void), void (*parent)(void), void (*child)(void
     while (*t)
       t = &(*t)->next;
     /* t = pointer to last next in the list */
-    List_insert (*t, childcb);
+    List_insert_nolock (*t, childcb);
   }
   return 0;
 }

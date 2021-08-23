@@ -111,7 +111,20 @@ typedef enum
 } verifyable_object_state;
 
 template <class list_node> inline void
-List_insert (list_node *&head, list_node *node)
+List_insert (fast_mutex &mx, list_node *&head, list_node *node)
+{
+  if (!node)
+    return;
+  mx.lock ();
+  do
+    node->next = head;
+  while (InterlockedCompareExchangePointer ((PVOID volatile *) &head,
+					    node, node->next) != node->next);
+  mx.unlock ();
+}
+
+template <class list_node> inline void
+List_insert_nolock (list_node *&head, list_node *node)
 {
   if (!node)
     return;
@@ -163,7 +176,7 @@ template <class list_node> class List
 
   void insert (list_node *node)
   {
-    List_insert (head, node);
+    List_insert (mx, head, node);
   }
 
   void remove (list_node *node)
