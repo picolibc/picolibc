@@ -565,6 +565,7 @@ ac_unique_file="Makefile.am"
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 sys_dir
+shared_machine_dir
 machine_dir
 libm_machine_dir
 lpfx
@@ -3417,6 +3418,7 @@ fi
 # Hard-code OBJEXT.  Normally it is set by AC_OBJEXT, but we
 # use oext, which is set in configure.host based on the target platform.
 OBJEXT=${oext}
+
 
 
 

@@ -76,7 +76,7 @@ am_lib_a_OBJECTS = lib_a-calloc.$(OBJEXT) lib_a-callocr.$(OBJEXT) \
 	lib_a-assert.$(OBJEXT) lib_a-puts.$(OBJEXT) \
 	lib_a-putchar.$(OBJEXT) lib_a-printf.$(OBJEXT) \
 	lib_a-abort.$(OBJEXT) lib_a-exit.$(OBJEXT) \
-	lib_a-misc.$(OBJEXT)
+	lib_a-misc.$(OBJEXT) lib_a-clock.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
@@ -188,6 +188,7 @@ prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
 sbindir = @sbindir@
+shared_machine_dir = @shared_machine_dir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
 sys_dir = @sys_dir@
@@ -202,7 +203,7 @@ AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = calloc.c callocr.c malloc.c mallocr.c realloc.c reallocr.c \
 		free.c write.c assert.c puts.c putchar.c printf.c abort.c \
-		exit.c misc.c
+		exit.c misc.c clock.c
 
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
@@ -354,6 +355,12 @@ lib_a-misc.o: misc.c
 
 lib_a-misc.obj: misc.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-misc.obj `if test -f 'misc.c'; then $(CYGPATH_W) 'misc.c'; else $(CYGPATH_W) '$(srcdir)/misc.c'; fi`
+
+lib_a-clock.o: clock.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clock.o `test -f 'clock.c' || echo '$(srcdir)/'`clock.c
+
+lib_a-clock.obj: clock.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clock.obj `if test -f 'clock.c'; then $(CYGPATH_W) 'clock.c'; else $(CYGPATH_W) '$(srcdir)/clock.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
