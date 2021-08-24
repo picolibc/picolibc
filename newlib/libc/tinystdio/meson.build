@@ -75,6 +75,7 @@ srcs_tinystdio = [
     'printf.c',
     'putchar.c',
     'puts.c',
+    'rewind.c',
     'scanf.c',
     'setbuf.c',
     'setvbuf.c',
