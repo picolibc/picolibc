@@ -30,15 +30,9 @@ details. */
 #include <asm/socket.h>
 #include "cygwait.h"
 
-#define MAX_OVERLAPPED_WRITE_LEN (64 * 1024 * 1024)
-#define MIN_OVERLAPPED_WRITE_LEN (1 * 1024 * 1024)
-
 static const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
 
 struct __cygwin_perfile *perfile_table;
-
-HANDLE NO_COPY fhandler_base_overlapped::asio_done;
-LONG NO_COPY fhandler_base_overlapped::asio_close_counter;
 
 int
 fhandler_base::puts_readahead (const char *s, size_t len)
@@ -184,8 +178,6 @@ fhandler_base::set_flags (int flags, int supplied_bin)
     bin = wbinary () || rbinary () ? O_BINARY : O_TEXT;
 
   openflags = flags | bin;
-  if (openflags & O_NONBLOCK)
-    was_nonblocking (true);
 
   bin &= O_BINARY;
   rbinary (bin ? true : false);
@@ -1222,88 +1214,6 @@ fhandler_base::close ()
   return res;
 }
 
-DWORD WINAPI
-flush_async_io (void *arg)
-{
-  fhandler_base_overlapped *fh = (fhandler_base_overlapped *) arg;
-  debug_only_printf ("waiting for write I/O for %s", fh->get_name ());
-  DWORD nbytes;
-  bool res = GetOverlappedResult (fh->get_output_handle (),
-				  fh->get_overlapped (), &nbytes, true);
-  debug_printf ("finished waiting for I/O from %s, res %d", fh->get_name (),
-		res);
-  fh->close ();
-  delete fh;
-
-  InterlockedDecrement (&fhandler_base_overlapped::asio_close_counter);
-  SetEvent (fhandler_base_overlapped::asio_done);
-
-  _my_tls._ctinfo->auto_release ();
-  return 0;
-}
-
-void
-fhandler_base_overlapped::flush_all_async_io ()
-{
-  while (asio_close_counter > 0)
-    if (WaitForSingleObject (asio_done, INFINITE) != WAIT_OBJECT_0)
-      {
-	system_printf ("WaitForSingleObject failed, possible data loss in pipe, %E");
-	break;
-      }
-  asio_close_counter = 0;
-  if (asio_done)
-    CloseHandle (asio_done);
-}
-
-/* Start a thread to handle closing of overlapped asynchronous I/O since
-   Windows amazingly does not seem to always flush I/O on close.  */
-void
-fhandler_base_overlapped::check_later ()
-{
-  set_close_on_exec (true);
-  char buf[MAX_PATH];
-  if (!asio_done
-      && !(asio_done = CreateEvent (&sec_none_nih, false, false,
-				    shared_name (buf, "asio",
-						 GetCurrentProcessId ()))))
-    api_fatal ("CreateEvent failed, %E");
-
-  InterlockedIncrement (&asio_close_counter);
-  if (!new cygthread(flush_async_io, this, "flasio"))
-    api_fatal ("couldn't create a thread to track async I/O, %E");
-  debug_printf ("started thread to handle asynchronous closing for %s", get_name ());
-}
-
-int
-fhandler_base_overlapped::close ()
-{
-  int res;
-  int writer = (get_access () & GENERIC_WRITE);
-  /* Need to treat non-blocking I/O specially because Windows appears to
-     be brain-dead.  We're checking here if the descriptor was ever set
-     to nonblocking, rather than checking if it's nonblocking at close time.
-     The reason is that applications may switch back to blocking (for the
-     sake of some other application accessing this descriptor) without
-     performaing any further I/O.  These applications would suffer data
-     loss, which this workaround is trying to fix. */
-  if (writer && was_nonblocking () && has_ongoing_io ())
-    {
-      clone (HEAP_3_FHANDLER)->check_later ();
-      res = 0;
-    }
-  else
-    {
-     /* Cancelling seems to be necessary for cases where a reader is
-	 still executing when a signal handler performs a close.  */
-      if (!writer)
-	CancelIo (get_handle ());
-      destroy_overlapped ();
-      res = fhandler_base::close ();
-    }
-  return res;
-}
-
 int
 fhandler_base::ioctl (unsigned int cmd, void *buf)
 {
@@ -1419,14 +1329,6 @@ fhandler_base::dup (fhandler_base *child, int)
       child->set_handle (nh);
     }
   return 0;
-}
-
-int
-fhandler_base_overlapped::dup (fhandler_base *child, int flags)
-{
-  int res = fhandler_base::dup (child, flags) ||
-	    ((fhandler_base_overlapped *) child)->setup_overlapped ();
-  return res;
 }
 
 int fhandler_base::fcntl (int cmd, intptr_t arg)
@@ -1649,25 +1551,12 @@ fhandler_base::fixup_after_fork (HANDLE parent)
 }
 
 void
-fhandler_base_overlapped::fixup_after_fork (HANDLE parent)
-{
-  setup_overlapped ();
-  fhandler_base::fixup_after_fork (parent);
-}
-
-void
 fhandler_base::fixup_after_exec ()
 {
   debug_printf ("here for '%s'", get_name ());
   if (unique_id && close_on_exec ())
     del_my_locks (after_exec);
   mandatory_locking (false);
-}
-void
-fhandler_base_overlapped::fixup_after_exec ()
-{
-  setup_overlapped ();
-  fhandler_base::fixup_after_exec ();
 }
 
 bool
@@ -1682,8 +1571,6 @@ fhandler_base::set_nonblocking (int yes)
   int current = openflags & O_NONBLOCK_MASK;
   int new_flags = yes ? (!current ? O_NONBLOCK : current) : 0;
   openflags = (openflags & ~O_NONBLOCK_MASK) | new_flags;
-  if (new_flags)
-    was_nonblocking (true);
 }
 
 int
@@ -1945,274 +1832,4 @@ fhandler_base::fpathconf (int v)
       break;
     }
   return -1;
-}
-
-/* Overlapped I/O */
-
-int __reg1
-fhandler_base_overlapped::setup_overlapped ()
-{
-  OVERLAPPED *ov = get_overlapped_buffer ();
-  memset (ov, 0, sizeof (*ov));
-  set_overlapped (ov);
-  ov->hEvent = CreateEvent (&sec_none_nih, true, true, NULL);
-  io_pending = false;
-  return ov->hEvent ? 0 : -1;
-}
-
-void __reg1
-fhandler_base_overlapped::destroy_overlapped ()
-{
-  OVERLAPPED *ov = get_overlapped ();
-  if (ov && ov->hEvent)
-    {
-      SetEvent (ov->hEvent);
-      CloseHandle (ov->hEvent);
-      ov->hEvent = NULL;
-    }
-  io_pending = false;
-  get_overlapped () = NULL;
-}
-
-bool __reg1
-fhandler_base_overlapped::has_ongoing_io ()
-{
-  if (!io_pending)
-    return false;
-
-  if (!IsEventSignalled (get_overlapped ()->hEvent))
-    return true;
-  io_pending = false;
-  DWORD nbytes;
-  GetOverlappedResult (get_output_handle (), get_overlapped (), &nbytes, false);
-  return false;
-}
-
-fhandler_base_overlapped::wait_return __reg3
-fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *bytes, bool nonblocking, DWORD len)
-{
-  if (!get_overlapped ())
-    return inres ? overlapped_success : overlapped_error;
-
-  wait_return res = overlapped_unknown;
-  DWORD err;
-  if (inres)
-    /* handle below */;
-  else if ((err = GetLastError ()) != ERROR_IO_PENDING)
-    res = overlapped_error;
-  else if (!nonblocking)
-    /* handle below */;
-  else if (!writing)
-    SetEvent (get_overlapped ()->hEvent);	/* Force immediate WFMO return */
-  else
-    {
-      *bytes = len;				/* Assume that this worked */
-      io_pending = true;			/*  but don't allow subsequent */
-      res = overlapped_success;			/*  writes until completed */
-    }
-  if (res == overlapped_unknown)
-    {
-      DWORD wfres = cygwait (get_overlapped ()->hEvent);
-      HANDLE h = writing ? get_output_handle () : get_handle ();
-      BOOL wores;
-      if (isclosed ())
-	{
-	  switch (wfres)
-	    {
-	    case WAIT_OBJECT_0:
-	      err = ERROR_INVALID_HANDLE;
-	      break;
-	    case WAIT_SIGNALED:
-	      err = ERROR_INVALID_AT_INTERRUPT_TIME;
-	      break;
-	    default:
-	      err = GetLastError ();
-	      break;
-	    }
-	  res = overlapped_error;
-	}
-      else
-	{
-	  /* Cancelling here to prevent races.  It's possible that the I/O has
-	     completed already, in which case this is a no-op.  Otherwise,
-	     WFMO returned because 1) This is a non-blocking call, 2) a signal
-	     arrived, or 3) the operation was cancelled.  These cases may be
-	     overridden by the return of GetOverlappedResult which could detect
-	     that I/O completion occurred.  */
-	  CancelIo (h);
-	  wores = GetOverlappedResult (h, get_overlapped (), bytes, false);
-	  err = GetLastError ();
-	  ResetEvent (get_overlapped ()->hEvent);	/* Probably not needed but CYA */
-	  debug_printf ("wfres %u, wores %d, bytes %u", wfres, wores, *bytes);
-	  if (wores)
-	    res = overlapped_success;	/* operation succeeded */
-	  else if (wfres == WAIT_OBJECT_0 + 1)
-	    {
-	      err = ERROR_INVALID_AT_INTERRUPT_TIME; /* forces an EINTR below */
-	      debug_printf ("signal");
-	      res = overlapped_error;
-	    }
-	  else if (wfres == WAIT_OBJECT_0 + 2)
-	    pthread::static_cancel_self ();		/* never returns */
-	  else if (nonblocking)
-	    res = overlapped_nonblocking_no_data;	/* more handling below */
-	  else
-	    {
-	      debug_printf ("GetOverlappedResult failed, h %p, bytes %u, %E", h, *bytes);
-	      res = overlapped_error;
-	    }
-	}
-    }
-
-  if (res == overlapped_success)
-    {
-      debug_printf ("normal %s, %u bytes ispipe() %d", writing ? "write" : "read", *bytes, ispipe ());
-      if (*bytes == 0 && !writing && ispipe ())
-	res = overlapped_nullread;
-    }
-  else if (res == overlapped_nonblocking_no_data)
-    {
-      *bytes = (DWORD) -1;
-      set_errno (EAGAIN);
-      debug_printf ("no data to read for nonblocking I/O");
-    }
-  else if (err == ERROR_HANDLE_EOF || err == ERROR_BROKEN_PIPE)
-    {
-      debug_printf ("EOF, %E");
-      *bytes = 0;
-      res = overlapped_success;
-      if (writing && err == ERROR_BROKEN_PIPE)
-	raise (SIGPIPE);
-    }
-  else
-    {
-      debug_printf ("res %u, Win32 Error %u", (unsigned) res, err);
-      *bytes = (DWORD) -1;
-      __seterrno_from_win_error (err);
-      if (writing && err == ERROR_NO_DATA)
-	raise (SIGPIPE);
-    }
-
-  return res;
-}
-
-void __reg3
-fhandler_base_overlapped::raw_read (void *ptr, size_t& len)
-{
-  DWORD nbytes;
-  bool keep_looping;
-  do
-    {
-      bool res = ReadFile (get_handle (), ptr, len, &nbytes,
-			   get_overlapped ());
-      switch (wait_overlapped (res, false, &nbytes, is_nonblocking ()))
-	{
-	case overlapped_nullread:
-	  keep_looping = true;
-	  break;
-	default:	/* Added to quiet gcc */
-	case overlapped_success:
-	case overlapped_error:
-	  keep_looping = false;
-	  break;
-	}
-    }
-  while (keep_looping);
-  len = (nbytes == (DWORD) -1) ? (size_t) -1 : (size_t) nbytes;
-}
-
-ssize_t __reg3
-fhandler_base_overlapped::raw_write (const void *ptr, size_t len)
-{
-  size_t nbytes;
-  if (has_ongoing_io ())
-    {
-      set_errno (EAGAIN);
-      nbytes = (size_t) -1;
-    }
-  else
-    {
-      size_t chunk;
-      if (!max_atomic_write || len < max_atomic_write)
-	chunk = MIN (len, INT_MAX);
-      else if (is_nonblocking ())
-	chunk = len = max_atomic_write;
-      else
-	chunk = max_atomic_write;
-
-      /* MSDN "WriteFile" contains the following note: "Accessing the output
-         buffer while a write operation is using the buffer may lead to
-	 corruption of the data written from that buffer.  [...]  This can
-	 be particularly problematic when using an asynchronous file handle.
-	 (https://msdn.microsoft.com/en-us/library/windows/desktop/aa365747)
-
-	 MSDN "Synchronous and Asynchronous I/O" contains the following note:
-	 "Do not deallocate or modify [...] the data buffer until all
-	 asynchronous I/O operations to the file object have been completed."
-	 (https://msdn.microsoft.com/en-us/library/windows/desktop/aa365683)
-
-	 This problem is a non-issue for blocking I/O, but it can lead to
-	 problems when using nonblocking I/O.  Consider:
-	 - The application uses a static buffer in repeated calls to
-	   non-blocking write.
-	 - The previous write returned with success, but the overlapped I/O
-	   operation is ongoing.
-	 - The application copies the next set of data to the static buffer,
-	   thus overwriting data still accessed by the previous write call.
-	 --> potential data corruption.
-
-	 What we do here is to allocate a per-fhandler buffer big enough
-	 to perform the maximum atomic operation from, copy the user space
-	 data over to this buffer and then call NtWriteFile on this buffer.
-	 This decouples the write operation from the user buffer and the
-	 user buffer can be reused without data corruption issues.
-
-	 Since no further write can occur while we're still having ongoing
-	 I/O, this should be reasanably safe.
-
-	 Note: We only have proof that this problem actually occurs on Wine
-	 yet.  However, the MSDN language indicates that this may be a real
-	 problem on real Windows as well. */
-      if (is_nonblocking ())
-	{
-	  if (!atomic_write_buf)
-	    atomic_write_buf = cmalloc_abort (HEAP_BUF, max_atomic_write);
-	  ptr = memcpy (atomic_write_buf, ptr, chunk);
-	}
-
-      nbytes = 0;
-      DWORD nbytes_now = 0;
-      /* Write to fd in smaller chunks, accumulating a total.
-	 If there's an error, just return the accumulated total
-	 unless the first write fails, in which case return value
-	 from wait_overlapped(). */
-      while (nbytes < len)
-	{
-	  size_t left = len - nbytes;
-	  size_t len1;
-	  if (left > chunk)
-	    len1 = chunk;
-	  else
-	    len1 = left;
-	  bool res = WriteFile (get_output_handle (), ptr, len1, &nbytes_now,
-				get_overlapped ());
-	  switch (wait_overlapped (res, true, &nbytes_now,
-				   is_nonblocking (), len1))
-	    {
-	    case overlapped_success:
-	      ptr = ((char *) ptr) + chunk;
-	      nbytes += nbytes_now;
-	      break;
-	    case overlapped_error:
-	      len = 0;		/* terminate loop */
-	    case overlapped_unknown:
-	    case overlapped_nullread:
-	    case overlapped_nonblocking_no_data:
-	      break;
-	    }
-	}
-      if (!nbytes)
-	nbytes = (nbytes_now == (DWORD) -1) ? (size_t) -1 : nbytes_now;
-    }
-  return nbytes;
 }

@@ -178,16 +178,12 @@ class fhandler_base
     unsigned need_fork_fixup    : 1; /* Set if need to fixup after fork. */
     unsigned isclosed		: 1; /* Set when fhandler is closed. */
     unsigned mandatory_locking	: 1; /* Windows mandatory locking */
-    unsigned was_nonblocking	: 1; /* Set when setting O_NONBLOCK.  Never
-					reset.  This is for the sake of
-					fhandler_base_overlapped::close. */
 
    public:
     status_flags () :
       rbinary (0), rbinset (0), wbinary (0), wbinset (0), nohandle (0),
       did_lseek (0), query_open (no_query), close_on_exec (0),
-      need_fork_fixup (0), isclosed (0), mandatory_locking (0),
-      was_nonblocking (0)
+      need_fork_fixup (0), isclosed (0), mandatory_locking (0)
       {}
   } status, open_status;
 
@@ -289,7 +285,6 @@ class fhandler_base
   IMPLEMENT_STATUS_FLAG (bool, need_fork_fixup)
   IMPLEMENT_STATUS_FLAG (bool, isclosed)
   IMPLEMENT_STATUS_FLAG (bool, mandatory_locking)
-  IMPLEMENT_STATUS_FLAG (bool, was_nonblocking)
 
   int get_default_fmode (int flags);
 
@@ -1169,74 +1164,6 @@ class fhandler_socket_unix : public fhandler_socket
 };
 
 #endif /* __WITH_AF_UNIX */
-
-class fhandler_base_overlapped: public fhandler_base
-{
-  static HANDLE asio_done;
-  static LONG asio_close_counter;
-protected:
-  enum wait_return
-  {
-    overlapped_unknown = 0,
-    overlapped_success,
-    overlapped_nonblocking_no_data,
-    overlapped_nullread,
-    overlapped_error
-  };
-  bool io_pending;
-  OVERLAPPED io_status;
-  OVERLAPPED *overlapped;
-  size_t max_atomic_write;
-  void *atomic_write_buf;
-public:
-  wait_return __reg3 wait_overlapped (bool, bool, DWORD *, bool, DWORD = 0);
-  int __reg1 setup_overlapped ();
-  void __reg1 destroy_overlapped ();
-  virtual void __reg3 raw_read (void *ptr, size_t& len);
-  virtual ssize_t __reg3 raw_write (const void *ptr, size_t len);
-  OVERLAPPED *&get_overlapped () {return overlapped;}
-  OVERLAPPED *get_overlapped_buffer () {return &io_status;}
-  void set_overlapped (OVERLAPPED *ov) {overlapped = ov;}
-  fhandler_base_overlapped (): io_pending (false), overlapped (NULL), max_atomic_write (0), atomic_write_buf (NULL)
-  {
-    memset (&io_status, 0, sizeof io_status);
-  }
-  bool __reg1 has_ongoing_io ();
-
-  void fixup_after_fork (HANDLE);
-  void fixup_after_exec ();
-
-  int close ();
-  int dup (fhandler_base *child, int);
-
-  void check_later ();
-  static void __reg1 flush_all_async_io ();;
-
-  fhandler_base_overlapped (void *) {}
-  ~fhandler_base_overlapped ()
-  {
-    if (atomic_write_buf)
-      cfree (atomic_write_buf);
-  }
-
-  virtual void copy_from (fhandler_base *x)
-  {
-    pc.free_strings ();
-    *this = *reinterpret_cast<fhandler_base_overlapped *> (x);
-    atomic_write_buf = NULL;
-    _copy_from_reset_helper ();
-  }
-
-  virtual fhandler_base_overlapped *clone (cygheap_types malloc_type = HEAP_FHANDLER)
-  {
-    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_base_overlapped));
-    fhandler_base_overlapped *fh = new (ptr) fhandler_base_overlapped (ptr);
-    fh->copy_from (this);
-    return fh;
-  }
-
-  friend DWORD WINAPI flush_async_io (void *);
-};
 
 class fhandler_pipe: public fhandler_base
 {
