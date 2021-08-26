@@ -531,6 +531,7 @@ endif
 
 override CFLAGS += $($(*F)_CFLAGS)
 override CXXFLAGS += $($(*F)_CFLAGS)
+AM_CXXFLAGS += $(CFLAGS)
 
 localtime_wrapper_CFLAGS=-I$(srcdir)/tzcode -fwrapv
 

@@ -9,6 +9,7 @@
 include $(top_srcdir)/Makefile.am.common
 
 cygserver_flags=$(cxxflags_common) -Wimplicit-fallthrough=5 -Werror -DSYSCONFDIR="\"$(sysconfdir)\""
+AM_CXXFLAGS = $(CFLAGS)
 
 noinst_LIBRARIES = libcygserver.a
 sbin_PROGRAMS = cygserver
