@@ -201,15 +201,15 @@ MapView (HANDLE h, void *addr, size_t len, DWORD openflags,
      a function under loader lock (STATUS_DLL_INIT_FAILED). */
   if (!from_fixup_after_fork && wincap.has_extended_mem_api ())
     {
-      MEM_ADDRESS_REQUIREMENTS mmap_req = {
+      static const MEM_ADDRESS_REQUIREMENTS mmap_req = {
 	(PVOID) MMAP_STORAGE_LOW,
 	(PVOID) (MMAP_STORAGE_HIGH - 1),
 	0
       };
-      MEM_EXTENDED_PARAMETER mmap_ext = {
-	.Type = MemExtendedParameterAddressRequirements,
-	.Pointer = (PVOID) &mmap_req
-      };
+      /* g++ 11.2 workaround: don't use initializer */
+      MEM_EXTENDED_PARAMETER mmap_ext;
+      mmap_ext.Type = MemExtendedParameterAddressRequirements;
+      mmap_ext.Pointer = (PVOID) &mmap_req;
 
       alloc_type |= attached (prot) ? MEM_RESERVE : 0;
       status = NtMapViewOfSectionEx (h, NtCurrentProcess (), &base, &offset,
@@ -1621,15 +1621,15 @@ fhandler_dev_zero::mmap (caddr_t *addr, size_t len, int prot,
 #ifdef __x86_64__
       if (wincap.has_extended_mem_api ())
 	{
-	  MEM_ADDRESS_REQUIREMENTS mmap_req = {
+	  static const MEM_ADDRESS_REQUIREMENTS mmap_req = {
 	    (PVOID) MMAP_STORAGE_LOW,
 	    (PVOID) (MMAP_STORAGE_HIGH - 1),
 	    0
 	  };
-	  MEM_EXTENDED_PARAMETER mmap_ext = {
-	    .Type = MemExtendedParameterAddressRequirements,
-	    .Pointer = (PVOID) &mmap_req
-	  };
+	  /* g++ 11.2 workaround: don't use initializer */
+	  MEM_EXTENDED_PARAMETER mmap_ext;
+	  mmap_ext.Type = MemExtendedParameterAddressRequirements;
+	  mmap_ext.Pointer = (PVOID) &mmap_req;
 
 	  base = VirtualAlloc2 (GetCurrentProcess(), *addr, len, alloc_type,
 				protect, *addr ? NULL : &mmap_ext,
