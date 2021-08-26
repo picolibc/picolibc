@@ -1238,13 +1238,13 @@ public:
   friend DWORD WINAPI flush_async_io (void *);
 };
 
-class fhandler_pipe: public fhandler_base_overlapped
+class fhandler_pipe: public fhandler_base
 {
 private:
   pid_t popen_pid;
+  size_t max_atomic_write;
 public:
   fhandler_pipe ();
-
 
   bool ispipe() const { return true; }
 
@@ -1272,7 +1272,6 @@ public:
   {
     pc.free_strings ();
     *this = *reinterpret_cast<fhandler_pipe *> (x);
-    atomic_write_buf = NULL;
     _copy_from_reset_helper ();
   }
 

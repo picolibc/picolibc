@@ -21,7 +21,7 @@ details. */
 #include "shared_info.h"
 
 fhandler_pipe::fhandler_pipe ()
-  : fhandler_base_overlapped (), popen_pid (0)
+  : fhandler_base (), popen_pid (0)
 {
   max_atomic_write = DEFAULT_PIPEBUFSIZE;
   need_fork_fixup (true);
@@ -54,9 +54,8 @@ fhandler_pipe::init (HANDLE f, DWORD a, mode_t mode, int64_t uniq_id)
   set_ino (uniq_id);
   set_unique_id (uniq_id | !!(mode & GENERIC_WRITE));
   if (opened_properly)
-    setup_overlapped ();
-  else
-    destroy_overlapped ();
+    /* ... */
+    ;
   return 1;
 }
 
@@ -192,7 +191,7 @@ fhandler_pipe::dup (fhandler_base *child, int flags)
   ftp->set_popen_pid (0);
 
   int res;
-  if (get_handle () && fhandler_base_overlapped::dup (child, flags))
+  if (get_handle () && fhandler_base::dup (child, flags))
     res = -1;
   else
     res = 0;
@@ -359,7 +358,7 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
   int res = -1;
   int64_t unique_id;
 
-  int ret = create (sa, &r, &w, psize, NULL, FILE_FLAG_OVERLAPPED, &unique_id);
+  int ret = create (sa, &r, &w, psize, NULL, 0, &unique_id);
   if (ret)
     __seterrno_from_win_error (ret);
   else if ((fhs[0] = (fhandler_pipe *) build_fh_dev (*piper_dev)) == NULL)
