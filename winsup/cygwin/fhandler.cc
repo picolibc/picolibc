@@ -1833,3 +1833,33 @@ fhandler_base::fpathconf (int v)
     }
   return -1;
 }
+
+NTSTATUS
+fhandler_base::npfs_handle (HANDLE &nph)
+{
+  static NO_COPY SRWLOCK npfs_lock;
+  static NO_COPY HANDLE npfs_dirh;
+
+  NTSTATUS status = STATUS_SUCCESS;
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+
+  /* Lockless after first call. */
+  if (npfs_dirh)
+    {
+      nph = npfs_dirh;
+      return STATUS_SUCCESS;
+    }
+  AcquireSRWLockExclusive (&npfs_lock);
+  if (!npfs_dirh)
+    {
+      InitializeObjectAttributes (&attr, &ro_u_npfs, 0, NULL, NULL);
+      status = NtOpenFile (&npfs_dirh, FILE_READ_ATTRIBUTES | SYNCHRONIZE,
+			   &attr, &io, FILE_SHARE_READ | FILE_SHARE_WRITE,
+			   0);
+    }
+  ReleaseSRWLockExclusive (&npfs_lock);
+  if (NT_SUCCESS (status))
+    nph = npfs_dirh;
+  return status;
+}

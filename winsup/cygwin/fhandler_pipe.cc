@@ -624,36 +624,6 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
   return res;
 }
 
-NTSTATUS
-fhandler_pipe::npfs_handle (HANDLE &nph)
-{
-  static NO_COPY SRWLOCK npfs_lock;
-  static NO_COPY HANDLE npfs_dirh;
-
-  NTSTATUS status = STATUS_SUCCESS;
-  OBJECT_ATTRIBUTES attr;
-  IO_STATUS_BLOCK io;
-
-  /* Lockless after first call. */
-  if (npfs_dirh)
-    {
-      nph = npfs_dirh;
-      return STATUS_SUCCESS;
-    }
-  AcquireSRWLockExclusive (&npfs_lock);
-  if (!npfs_dirh)
-    {
-      InitializeObjectAttributes (&attr, &ro_u_npfs, 0, NULL, NULL);
-      status = NtOpenFile (&npfs_dirh, FILE_READ_ATTRIBUTES | SYNCHRONIZE,
-			   &attr, &io, FILE_SHARE_READ | FILE_SHARE_WRITE,
-			   0);
-    }
-  ReleaseSRWLockExclusive (&npfs_lock);
-  if (NT_SUCCESS (status))
-    nph = npfs_dirh;
-  return status;
-}
-
 static int
 nt_create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
 		DWORD psize, int64_t *unique_id)
@@ -671,7 +641,7 @@ nt_create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
   if (w)
     *w = NULL;
 
-  status = fhandler_pipe::npfs_handle (npfsh);
+  status = fhandler_base::npfs_handle (npfsh);
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_nt_status (status);
