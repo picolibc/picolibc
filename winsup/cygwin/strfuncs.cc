@@ -890,7 +890,7 @@ RtlInt64ToHexUnicodeString (ULONGLONG value, PUNICODE_STRING dest,
   if (dest->MaximumLength - len < 16 * (int) sizeof (WCHAR))
     return STATUS_BUFFER_OVERFLOW;
   wchar_t *end = (PWCHAR) ((PBYTE) dest->Buffer + len);
-  register PWCHAR p = end + 16;
+  PWCHAR p = end + 16;
   while (p-- > end)
     {
       *p = hex_wchars[value & 0xf];

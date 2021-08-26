@@ -997,7 +997,7 @@ find_ws (char *in)
 inline char *
 conv_fstab_spaces (char *field)
 {
-  register char *sp = field;
+  char *sp = field;
   while ((sp = strstr (sp, "\\040")) != NULL)
     {
       *sp++ = ' ';

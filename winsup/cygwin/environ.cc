@@ -482,8 +482,8 @@ posify_maybe (char **here, const char *value, char *outenv)
 static char *
 my_findenv (const char *name, int *offset)
 {
-  register int len;
-  register char **p;
+  int len;
+  char **p;
   const char *c;
 
   if (cur_environ () == NULL)
@@ -706,7 +706,7 @@ setenv (const char *name, const char *value, int overwrite)
 extern "C" int
 unsetenv (const char *name)
 {
-  register char **e;
+  char **e;
   int offset;
 
   __try

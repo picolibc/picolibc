@@ -32,7 +32,7 @@ extern const char isalpha_array[];
 static inline int
 ascii_strcasematch (const char *cs, const char *ct)
 {
-  register const unsigned char *us, *ut;
+  const unsigned char *us, *ut;
 
   us = (const unsigned char *) cs;
   ut = (const unsigned char *) ct;
@@ -49,7 +49,7 @@ ascii_strcasematch (const char *cs, const char *ct)
 static inline int
 ascii_strncasematch (const char *cs, const char *ct, size_t n)
 {
-  register const unsigned char *us, *ut;
+  const unsigned char *us, *ut;
 
   if (!n)
    return 1;

@@ -20,9 +20,9 @@ cpuid (uint32_t *a, uint32_t *b, uint32_t *c, uint32_t *d, uint32_t ain,
 
 #ifdef __x86_64__
 static inline bool __attribute ((always_inline))
-can_set_flag (register uint32_t long flag)
+can_set_flag (uint32_t long flag)
 {
-  register uint32_t long r1, r2;
+  uint32_t long r1, r2;
 
   asm volatile ("pushfq\n"
 		"popq %0\n"
@@ -41,9 +41,9 @@ can_set_flag (register uint32_t long flag)
 }
 #else
 static inline bool __attribute ((always_inline))
-can_set_flag (register uint32_t flag)
+can_set_flag (uint32_t flag)
 {
-  register uint32_t r1, r2;
+  uint32_t r1, r2;
 
   asm volatile ("pushfl\n"
 		"popl %0\n"

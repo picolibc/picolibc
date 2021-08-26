@@ -359,7 +359,7 @@ msgctl(struct thread *td, struct msgctl_args *uap)
 	struct msqid_ds *user_msqptr = uap->buf;
 	int rval, error;
 	struct msqid_ds msqbuf;
-	register struct msqid_ds *msqptr;
+	struct msqid_ds *msqptr;
 
 	DPRINTF(("call to msgctl(%d, %d, 0x%x)\n", msqid, cmd, user_msqptr));
 
@@ -516,7 +516,7 @@ msgget(struct thread *td, struct msgget_args *uap)
 	int msqid, error = 0;
 	key_t key = uap->key;
 	unsigned msgflg = uap->msgflg;
-	register struct msqid_ds *msqptr = NULL;
+	struct msqid_ds *msqptr = NULL;
 
 	DPRINTF(("msgget(0x%x, 0%o)\n", key, msgflg));
 
@@ -629,8 +629,8 @@ msgsnd(struct thread *td, struct msgsnd_args *uap)
 	size_t msgsz = uap->msgsz;
 	int msgflg = uap->msgflg;
 	int segs_needed, error = 0;
-	register struct msqid_ds *msqptr;
-	register struct msg *msghdr;
+	struct msqid_ds *msqptr;
+	struct msg *msghdr;
 	short next;
 
 	DPRINTF(("call to msgsnd(%d, 0x%x, %d, %d)\n", msqid, user_msgp, msgsz,
@@ -943,8 +943,8 @@ msgrcv(struct thread *td, struct msgrcv_args *uap)
 	long msgtyp = uap->msgtyp;
 	int msgflg = uap->msgflg;
 	size_t len;
-	register struct msqid_ds *msqptr;
-	register struct msg *msghdr;
+	struct msqid_ds *msqptr;
+	struct msg *msghdr;
 	int error = 0;
 	short next;
 
