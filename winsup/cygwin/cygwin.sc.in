@@ -178,8 +178,13 @@ SECTIONS
   .debug_typenames ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_typenames) }
   .debug_varnames  ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_varnames) }
   .debug_macro    ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_macro) }
-  /* DWARF 3. */
+  /* DWARF 3 */
   .debug_ranges   ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_ranges) }
-  /* DWARF 4. */
+  /* DWARF 4, merged back into .debug_info with DWARF 5 */
   .debug_types	  ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_types .gnu.linkonce.wt.*) }
+  /* DWARF 5 */
+  .debug_loclists ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_loclists) }
+  .debug_rnglists ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_rnglists) }
+  .debug_line_str ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_line_str) }
+
 }
