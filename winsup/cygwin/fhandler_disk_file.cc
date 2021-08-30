@@ -1444,7 +1444,7 @@ fhandler_disk_file::dup (fhandler_base *child, int flags)
   if (!ret && prw_handle
       && !DuplicateHandle (GetCurrentProcess (), prw_handle,
 			   GetCurrentProcess (), &fhc->prw_handle,
-			   0, TRUE, DUPLICATE_SAME_ACCESS))
+			   0, FALSE, DUPLICATE_SAME_ACCESS))
     fhc->prw_handle = NULL;
   return ret;
 }
