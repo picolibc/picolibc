@@ -463,13 +463,13 @@ fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
   if (name)
     len += __small_sprintf (pipename + len, "%s", name);
 
-  open_mode |= PIPE_ACCESS_OUTBOUND | FILE_FLAG_FIRST_PIPE_INSTANCE;
+  open_mode |= PIPE_ACCESS_INBOUND | FILE_FLAG_FIRST_PIPE_INSTANCE;
 
   /* Retry CreateNamedPipe as long as the pipe name is in use.
      Retrying will probably never be necessary, but we want
      to be as robust as possible.  */
   DWORD err = 0;
-  while (w && !*w)
+  while (r && !*r)
     {
       static volatile ULONG pipe_unique_id;
       if (!name)
@@ -498,12 +498,12 @@ fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
 	 definitely required for pty handling since fhandler_pty_master
 	 writes to the pipe in chunks, terminated by newline when CANON mode
 	 is specified.  */
-      *w = CreateNamedPipe (pipename, open_mode, pipe_mode, 1, psize,
+      *r = CreateNamedPipe (pipename, open_mode, pipe_mode, 1, psize,
 			   psize, NMPWAIT_USE_DEFAULT_WAIT, sa_ptr);
 
-      if (*w != INVALID_HANDLE_VALUE)
+      if (*r != INVALID_HANDLE_VALUE)
 	{
-	  debug_printf ("pipe write handle %p", *w);
+	  debug_printf ("pipe read handle %p", *r);
 	  err = 0;
 	  break;
 	}
@@ -516,14 +516,14 @@ fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
 	     Pick a new name and retry.  */
 	  debug_printf ("pipe busy", !name ? ", retrying" : "");
 	  if (!name)
-	    *w = NULL;
+	    *r = NULL;
 	  break;
 	case ERROR_ACCESS_DENIED:
 	  /* The pipe is already open with incompatible parameters.
 	     Pick a new name and retry.  */
 	  debug_printf ("pipe access denied%s", !name ? ", retrying" : "");
 	  if (!name)
-	    *w = NULL;
+	    *r = NULL;
 	  break;
 	default:
 	  {
@@ -535,41 +535,59 @@ fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
 
   if (err)
     {
-      *w = NULL;
+      *r = NULL;
       return err;
     }
 
-  if (!r)
-    debug_printf ("pipe read handle NULL");
+  if (!w)
+    debug_printf ("pipe write handle NULL");
   else
     {
       debug_printf ("CreateFile: name %s", pipename);
 
-      /* Open the named pipe for reading.
-	 Be sure to permit FILE_WRITE_ATTRIBUTES access.  */
-      DWORD access = GENERIC_READ | FILE_WRITE_ATTRIBUTES;
+      /* Open the named pipe for writing.
+	 Be sure to permit FILE_READ_ATTRIBUTES access.  */
+      DWORD access = GENERIC_WRITE | FILE_READ_ATTRIBUTES;
       if ((open_mode & PIPE_ACCESS_DUPLEX) == PIPE_ACCESS_DUPLEX)
-	access |= GENERIC_WRITE | FILE_READ_ATTRIBUTES;
-      *r = CreateFile (pipename, access, 0, sa_ptr, OPEN_EXISTING,
+	access |= GENERIC_READ | FILE_WRITE_ATTRIBUTES;
+      *w = CreateFile (pipename, access, 0, sa_ptr, OPEN_EXISTING,
 		      open_mode & FILE_FLAG_OVERLAPPED, 0);
 
-      if (!*r || *r == INVALID_HANDLE_VALUE)
+      if (!*w || *w == INVALID_HANDLE_VALUE)
 	{
 	  /* Failure. */
 	  DWORD err = GetLastError ();
 	  debug_printf ("CreateFile failed, r %p, %E", r);
-	  if (w)
-	    CloseHandle (*w);
-	  *r = NULL;
+	  if (r)
+	    CloseHandle (*r);
+	  *w = NULL;
 	  return err;
 	}
 
-      debug_printf ("pipe read handle %p", *r);
+      debug_printf ("pipe write handle %p", *w);
     }
 
   /* Success. */
   return 0;
 }
+
+/* The next version of fhandler_pipe::create used to call the previous
+   version.  But the read handle created by the latter doesn't have
+   FILE_WRITE_ATTRIBUTES access unless the pipe is created with
+   PIPE_ACCESS_DUPLEX, and it doesn't seem possible to add that access
+   right.  This causes set_pipe_non_blocking to fail.
+
+   To fix this we will define a helper function 'nt_create' that is
+   similar to the above fhandler_pipe::create but uses
+   NtCreateNamedPipeFile instead of CreateNamedPipe; this gives more
+   flexibility in setting the access rights.  We will use this helper
+   function in the version of fhandler_pipe::create below, which
+   suffices for all of our uses of set_pipe_non_blocking.  For
+   simplicity, nt_create will omit the 'open_mode' and 'name'
+   parameters, which aren't needed for our purposes.  */
+
+static int nt_create (LPSECURITY_ATTRIBUTES, PHANDLE, PHANDLE, DWORD,
+		      int64_t *);
 
 int
 fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
@@ -579,7 +597,7 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
   int res = -1;
   int64_t unique_id;
 
-  int ret = create (sa, &r, &w, psize, NULL, 0, &unique_id);
+  int ret = nt_create (sa, &r, &w, psize, &unique_id);
   if (ret)
     __seterrno_from_win_error (ret);
   else if ((fhs[0] = (fhandler_pipe *) build_fh_dev (*piper_dev)) == NULL)
@@ -604,6 +622,138 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
 
   debug_printf ("%R = pipe([%p, %p], %d, %y)", res, fhs[0], fhs[1], psize, mode);
   return res;
+}
+
+static int
+nt_create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
+		DWORD psize, int64_t *unique_id)
+{
+  NTSTATUS status;
+  HANDLE npfsh;
+  ACCESS_MASK access;
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+  LARGE_INTEGER timeout;
+
+  /* Default to error. */
+  if (r)
+    *r = NULL;
+  if (w)
+    *w = NULL;
+
+  status = fhandler_base::npfs_handle (npfsh);
+  if (!NT_SUCCESS (status))
+    {
+      __seterrno_from_nt_status (status);
+      return GetLastError ();
+    }
+
+  /* Ensure that there is enough pipe buffer space for atomic writes.  */
+  if (!psize)
+    psize = DEFAULT_PIPEBUFSIZE;
+
+  UNICODE_STRING pipename;
+  WCHAR pipename_buf[MAX_PATH];
+  size_t len = __small_swprintf (pipename_buf, L"%S-%u-",
+				 &cygheap->installation_key,
+				 GetCurrentProcessId ());
+
+  access = GENERIC_READ | FILE_WRITE_ATTRIBUTES;
+
+  ULONG pipe_type = pipe_byte ? FILE_PIPE_BYTE_STREAM_TYPE
+    : FILE_PIPE_MESSAGE_TYPE;
+
+  /* Retry NtCreateNamedPipeFile as long as the pipe name is in use.
+     Retrying will probably never be necessary, but we want
+     to be as robust as possible.  */
+  DWORD err = 0;
+  while (r && !*r)
+    {
+      static volatile ULONG pipe_unique_id;
+      LONG id = InterlockedIncrement ((LONG *) &pipe_unique_id);
+      __small_swprintf (pipename_buf + len, L"pipe-nt-%p", id);
+      if (unique_id)
+	*unique_id = ((int64_t) id << 32 | GetCurrentProcessId ());
+
+      debug_printf ("name %W, size %u, mode %s", pipename_buf, psize,
+		    (pipe_type & FILE_PIPE_MESSAGE_TYPE)
+		    ? "PIPE_TYPE_MESSAGE" : "PIPE_TYPE_BYTE");
+
+      RtlInitUnicodeString (&pipename, pipename_buf);
+
+      InitializeObjectAttributes (&attr, &pipename,
+				  sa_ptr->bInheritHandle ? OBJ_INHERIT : 0,
+				  npfsh, sa_ptr->lpSecurityDescriptor);
+
+      timeout.QuadPart = -500000;
+      status = NtCreateNamedPipeFile (r, access, &attr, &io,
+				      FILE_SHARE_READ | FILE_SHARE_WRITE,
+				      FILE_CREATE, 0, pipe_type,
+				      FILE_PIPE_BYTE_STREAM_MODE,
+				      0, 1, psize, psize, &timeout);
+
+      if (NT_SUCCESS (status))
+	{
+	  debug_printf ("pipe read handle %p", *r);
+	  err = 0;
+	  break;
+	}
+
+      switch (status)
+	{
+	case STATUS_PIPE_BUSY:
+	case STATUS_INSTANCE_NOT_AVAILABLE:
+	case STATUS_PIPE_NOT_AVAILABLE:
+	  /* The pipe is already open with compatible parameters.
+	     Pick a new name and retry.  */
+	  debug_printf ("pipe busy, retrying");
+	  *r = NULL;
+	  break;
+	case STATUS_ACCESS_DENIED:
+	  /* The pipe is already open with incompatible parameters.
+	     Pick a new name and retry.  */
+	  debug_printf ("pipe access denied, retrying");
+	  *r = NULL;
+	  break;
+	default:
+	  {
+	    __seterrno_from_nt_status (status);
+	    err = GetLastError ();
+	    debug_printf ("failed, %E");
+	    *r = INVALID_HANDLE_VALUE;
+	  }
+	}
+    }
+
+  if (err)
+    {
+      *r = NULL;
+      return err;
+    }
+
+  if (!w)
+    debug_printf ("pipe write handle NULL");
+  else
+    {
+      debug_printf ("NtOpenFile: name %S", &pipename);
+
+      access = GENERIC_WRITE | FILE_READ_ATTRIBUTES;
+      status = NtOpenFile (w, access, &attr, &io, 0, 0);
+      if (!NT_SUCCESS (status))
+	{
+	  DWORD err = GetLastError ();
+	  debug_printf ("NtOpenFile failed, r %p, %E", r);
+	  if (r)
+	    CloseHandle (*r);
+	  *w = NULL;
+	  return err;
+	}
+
+      debug_printf ("pipe write handle %p", *w);
+    }
+
+  /* Success. */
+  return 0;
 }
 
 int
