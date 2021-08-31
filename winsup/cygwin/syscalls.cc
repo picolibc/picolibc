@@ -5217,6 +5217,7 @@ pipe_worker (int filedes[2], unsigned int psize, int mode)
   return res;
 }
 
+/* MS compatible version of pipe.  Hopefully nobody is using it... */
 extern "C" int
 _pipe (int filedes[2], unsigned int psize, int mode)
 {
