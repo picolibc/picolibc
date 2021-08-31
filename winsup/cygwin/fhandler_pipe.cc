@@ -686,8 +686,10 @@ nt_create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
 				  npfsh, sa_ptr->lpSecurityDescriptor);
 
       timeout.QuadPart = -500000;
-      status = NtCreateNamedPipeFile (r, access, &attr, &io, 0, FILE_CREATE,
-				      0, pipe_type, FILE_PIPE_BYTE_STREAM_MODE,
+      status = NtCreateNamedPipeFile (r, access, &attr, &io,
+				      FILE_SHARE_READ | FILE_SHARE_WRITE,
+				      FILE_CREATE, FILE_SYNCHRONOUS_IO_NONALERT,
+				      pipe_type, FILE_PIPE_BYTE_STREAM_MODE,
 				      0, 1, psize, psize, &timeout);
 
       if (NT_SUCCESS (status))
@@ -736,7 +738,8 @@ nt_create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
       debug_printf ("NtOpenFile: name %S", &pipename);
 
       access = GENERIC_WRITE | FILE_READ_ATTRIBUTES | SYNCHRONIZE;
-      status = NtOpenFile (w, access, &attr, &io, 0, 0);
+      status = NtOpenFile (w, access, &attr, &io, 0,
+			   FILE_SYNCHRONOUS_IO_NONALERT);
       if (!NT_SUCCESS (status))
 	{
 	  DWORD err = GetLastError ();
