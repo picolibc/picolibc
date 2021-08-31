@@ -658,7 +658,7 @@ nt_create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
 				 &cygheap->installation_key,
 				 GetCurrentProcessId ());
 
-  access = GENERIC_READ | FILE_WRITE_ATTRIBUTES | SYNCHRONIZE;
+  access = GENERIC_READ | FILE_WRITE_ATTRIBUTES;
 
   ULONG pipe_type = pipe_byte ? FILE_PIPE_BYTE_STREAM_TYPE
     : FILE_PIPE_MESSAGE_TYPE;
@@ -688,8 +688,8 @@ nt_create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
       timeout.QuadPart = -500000;
       status = NtCreateNamedPipeFile (r, access, &attr, &io,
 				      FILE_SHARE_READ | FILE_SHARE_WRITE,
-				      FILE_CREATE, FILE_SYNCHRONOUS_IO_NONALERT,
-				      pipe_type, FILE_PIPE_BYTE_STREAM_MODE,
+				      FILE_CREATE, 0, pipe_type,
+				      FILE_PIPE_BYTE_STREAM_MODE,
 				      0, 1, psize, psize, &timeout);
 
       if (NT_SUCCESS (status))
@@ -737,9 +737,8 @@ nt_create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
     {
       debug_printf ("NtOpenFile: name %S", &pipename);
 
-      access = GENERIC_WRITE | FILE_READ_ATTRIBUTES | SYNCHRONIZE;
-      status = NtOpenFile (w, access, &attr, &io, 0,
-			   FILE_SYNCHRONOUS_IO_NONALERT);
+      access = GENERIC_WRITE | FILE_READ_ATTRIBUTES;
+      status = NtOpenFile (w, access, &attr, &io, 0, 0);
       if (!NT_SUCCESS (status))
 	{
 	  DWORD err = GetLastError ();
