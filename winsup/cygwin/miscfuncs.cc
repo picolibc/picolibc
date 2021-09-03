@@ -18,6 +18,22 @@ details. */
 #include "tls_pbuf.h"
 #include "mmap_alloc.h"
 
+/* Get handle count of an object. */
+ULONG
+get_obj_handle_count (HANDLE h)
+{
+  OBJECT_BASIC_INFORMATION obi;
+  NTSTATUS status;
+  ULONG hdl_cnt = 0;
+
+  status = NtQueryObject (h, ObjectBasicInformation, &obi, sizeof obi, NULL);
+  if (!NT_SUCCESS (status))
+    debug_printf ("NtQueryObject: %y", status);
+  else
+    hdl_cnt = obi.HandleCount;
+  return hdl_cnt;
+}
+
 int __reg2
 check_invalid_virtual_addr (const void *s, unsigned sz)
 {

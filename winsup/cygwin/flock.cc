@@ -216,22 +216,6 @@ allow_others_to_sync ()
   done = true;
 }
 
-/* Get the handle count of an object. */
-static ULONG
-get_obj_handle_count (HANDLE h)
-{
-  OBJECT_BASIC_INFORMATION obi;
-  NTSTATUS status;
-  ULONG hdl_cnt = 0;
-
-  status = NtQueryObject (h, ObjectBasicInformation, &obi, sizeof obi, NULL);
-  if (!NT_SUCCESS (status))
-    debug_printf ("NtQueryObject: %y", status);
-  else
-    hdl_cnt = obi.HandleCount;
-  return hdl_cnt;
-}
-
 /* Helper struct to construct a local OBJECT_ATTRIBUTES on the stack. */
 struct lockfattr_t
 {

@@ -98,6 +98,9 @@ transform_chars (PUNICODE_STRING upath, USHORT start_idx)
 
 PWCHAR transform_chars_af_unix (PWCHAR, const char *, __socklen_t);
 
+/* Get handle count of an object. */
+ULONG get_obj_handle_count (HANDLE h);
+
 /* Memory checking */
 int __reg2 check_invalid_virtual_addr (const void *s, unsigned sz);
 
