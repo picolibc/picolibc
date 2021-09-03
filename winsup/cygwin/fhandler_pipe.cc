@@ -380,7 +380,7 @@ fhandler_pipe::raw_write (const void *ptr, size_t len)
 	     buffer doesn't have sufficient space. */
 	  if (nbytes_now == 0)
 	    set_errno (EAGAIN);
-	  ptr = ((char *) ptr) + chunk;
+	  ptr = ((char *) ptr) + nbytes_now;
 	  nbytes += nbytes_now;
 	}
       else if (STATUS_PIPE_IS_CLOSED (status))
