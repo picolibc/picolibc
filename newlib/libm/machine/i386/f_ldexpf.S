@@ -27,7 +27,7 @@ There is no error checking or setting of errno.
 SYM (_f_ldexpf):
 	pushl ebp
 	movl esp,ebp
-	fild 12(ebp)
+	fildl 12(ebp)
 	flds 8(ebp)
 	fscale
 	fstp st1
