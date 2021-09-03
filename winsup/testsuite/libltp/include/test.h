@@ -47,9 +47,9 @@
 #undef execv
 #undef execve
 
-int execve(const char *, const char * const [], char * const *);
-int execv(const char *, const char * const []);
-int execvp(const char *, const char * const []);
+int execve(const char *, char * const [], char * const *);
+int execv(const char *, char * const []);
+int execvp(const char *, char * const []);
 
 /* CGF: Avoid compilation warnings for undefined functions */
 extern int setregid (gid_t, gid_t);
