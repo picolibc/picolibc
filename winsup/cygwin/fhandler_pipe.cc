@@ -602,14 +602,14 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
     __seterrno_from_win_error (ret);
   else if ((fhs[0] = (fhandler_pipe *) build_fh_dev (*piper_dev)) == NULL)
     {
-      CloseHandle (r);
-      CloseHandle (w);
+      NtClose (r);
+      NtClose (w);
     }
   else if ((fhs[1] = (fhandler_pipe *) build_fh_dev (*pipew_dev)) == NULL)
     {
       delete fhs[0];
-      CloseHandle (r);
-      CloseHandle (w);
+      NtClose (r);
+      NtClose (w);
     }
   else
     {
@@ -745,7 +745,7 @@ nt_create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
 	  DWORD err = GetLastError ();
 	  debug_printf ("NtOpenFile failed, r %p, %E", r);
 	  if (r)
-	    CloseHandle (*r);
+	    NtClose (*r);
 	  *w = NULL;
 	  return err;
 	}
