@@ -608,6 +608,7 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
   else if ((fhs[1] = (fhandler_pipe *) build_fh_dev (*pipew_dev)) == NULL)
     {
       delete fhs[0];
+      CloseHandle (r);
       CloseHandle (w);
     }
   else
