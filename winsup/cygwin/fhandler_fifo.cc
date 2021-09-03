@@ -254,7 +254,7 @@ fhandler_fifo::open_pipe (HANDLE& ph)
   status = npfs_handle (npfsh);
   if (!NT_SUCCESS (status))
     return status;
-  access = GENERIC_WRITE | SYNCHRONIZE;
+  access = GENERIC_WRITE | FILE_READ_ATTRIBUTES | SYNCHRONIZE;
   InitializeObjectAttributes (&attr, get_pipe_name (),
 			      openflags & O_CLOEXEC ? 0 : OBJ_INHERIT,
 			      npfsh, NULL);
