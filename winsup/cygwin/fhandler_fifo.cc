@@ -128,13 +128,12 @@ STATUS_PIPE_EMPTY simply means there's no data to be read. */
 static NO_COPY fifo_reader_id_t null_fr_id = { .winpid = 0, .fh = NULL };
 
 fhandler_fifo::fhandler_fifo ():
-  fhandler_base (),
+  fhandler_pipe_fifo (),
   read_ready (NULL), write_ready (NULL), writer_opening (NULL),
   owner_needed_evt (NULL), owner_found_evt (NULL), update_needed_evt (NULL),
   cancel_evt (NULL), thr_sync_evt (NULL), pipe_name_buf (NULL),
   fc_handler (NULL), shandlers (0), nhandlers (0),
   reader (false), writer (false), duplexer (false),
-  max_atomic_write (DEFAULT_PIPEBUFSIZE),
   me (null_fr_id), shmem_handle (NULL), shmem (NULL),
   shared_fc_hdl (NULL), shared_fc_handler (NULL)
 {
@@ -1136,99 +1135,6 @@ fhandler_fifo::wait (HANDLE h)
       __seterrno ();
       return false;
    }
-}
-
-ssize_t __reg3
-fhandler_fifo::raw_write (const void *ptr, size_t len)
-{
-  ssize_t ret = -1;
-  size_t nbytes = 0;
-  ULONG chunk;
-  NTSTATUS status = STATUS_SUCCESS;
-  IO_STATUS_BLOCK io;
-  HANDLE evt = NULL;
-
-  if (!len)
-    return 0;
-
-  if (len <= max_atomic_write)
-    chunk = len;
-  else if (is_nonblocking ())
-    chunk = len = max_atomic_write;
-  else
-    chunk = max_atomic_write;
-
-  /* Create a wait event if the FIFO is in blocking mode. */
-  if (!is_nonblocking () && !(evt = CreateEvent (NULL, false, false, NULL)))
-    {
-      __seterrno ();
-      return -1;
-    }
-
-  /* Write in chunks, accumulating a total.  If there's an error, just
-     return the accumulated total unless the first write fails, in
-     which case return -1. */
-  while (nbytes < len)
-    {
-      ULONG_PTR nbytes_now = 0;
-      size_t left = len - nbytes;
-      ULONG len1;
-      DWORD waitret = WAIT_OBJECT_0;
-
-      if (left > chunk)
-	len1 = chunk;
-      else
-	len1 = (ULONG) left;
-      nbytes_now = 0;
-      status = NtWriteFile (get_handle (), evt, NULL, NULL, &io,
-			    (PVOID) ptr, len1, NULL, NULL);
-      if (evt && status == STATUS_PENDING)
-	{
-	  waitret = cygwait (evt);
-	  if (waitret == WAIT_OBJECT_0)
-	    status = io.Status;
-	}
-      if (waitret == WAIT_CANCELED)
-	status = STATUS_THREAD_CANCELED;
-      else if (waitret == WAIT_SIGNALED)
-	status = STATUS_THREAD_SIGNALED;
-      else if (isclosed ())  /* A signal handler might have closed the fd. */
-	{
-	  if (waitret == WAIT_OBJECT_0)
-	    set_errno (EBADF);
-	  else
-	    __seterrno ();
-	}
-      else if (NT_SUCCESS (status))
-	{
-	  nbytes_now = io.Information;
-	  /* NtWriteFile returns success with # of bytes written == 0
-	     if writing on a non-blocking pipe fails because the pipe
-	     buffer doesn't have sufficient space. */
-	  if (nbytes_now == 0)
-	    set_errno (EAGAIN);
-	  ptr = ((char *) ptr) + chunk;
-	  nbytes += nbytes_now;
-	}
-      else if (STATUS_PIPE_IS_CLOSED (status))
-	{
-	  set_errno (EPIPE);
-	  raise (SIGPIPE);
-	}
-      else
-	__seterrno_from_nt_status (status);
-      if (nbytes_now == 0)
-	len = 0;		/* Terminate loop. */
-      if (nbytes > 0)
-	ret = nbytes;
-    }
-  if (evt)
-    NtClose (evt);
-  if (status == STATUS_THREAD_SIGNALED && ret < 0)
-    set_errno (EINTR);
-  else if (status == STATUS_THREAD_CANCELED)
-    pthread::static_cancel_self ();
-  return ret;
 }
 
 /* Called from raw_read and select.cc:peek_fifo. */

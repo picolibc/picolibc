@@ -1168,12 +1168,24 @@ class fhandler_socket_unix : public fhandler_socket
 
 #endif /* __WITH_AF_UNIX */
 
-class fhandler_pipe: public fhandler_base
+/* A parent of fhandler_pipe and fhandler_fifo. */
+class fhandler_pipe_fifo: public fhandler_base
+{
+ protected:
+  size_t max_atomic_write;
+
+ public:
+  fhandler_pipe_fifo ();
+
+  ssize_t __reg3 raw_write (const void *ptr, size_t len);
+
+};
+
+class fhandler_pipe: public fhandler_pipe_fifo
 {
 private:
   HANDLE read_mtx;
   pid_t popen_pid;
-  size_t max_atomic_write;
   void set_pipe_non_blocking (bool nonblocking);
 public:
   fhandler_pipe ();
@@ -1193,7 +1205,6 @@ public:
   int dup (fhandler_base *child, int);
   int close ();
   void __reg3 raw_read (void *ptr, size_t& len);
-  ssize_t __reg3 raw_write (const void *ptr, size_t len);
   int ioctl (unsigned int cmd, void *);
   int fcntl (int cmd, intptr_t);
   int __reg2 fstat (struct stat *buf);
@@ -1319,7 +1330,7 @@ public:
   { InterlockedExchange (&_sh_fc_handler_updated, val); }
 };
 
-class fhandler_fifo: public fhandler_base
+class fhandler_fifo: public fhandler_pipe_fifo
 {
   /* Handles to named events shared by all fhandlers for a given FIFO. */
   HANDLE read_ready;            /* A reader is open; OK for a writer to open. */
@@ -1342,7 +1353,6 @@ class fhandler_fifo: public fhandler_base
   int nhandlers;                       /* Number of elements in the array. */
   af_unix_spinlock_t _fifo_client_lock;
   bool reader, writer, duplexer;
-  size_t max_atomic_write;
   fifo_reader_id_t me;
 
   HANDLE shmem_handle;
@@ -1447,7 +1457,6 @@ public:
   bool isfifo () const { return true; }
   void set_close_on_exec (bool val);
   void __reg3 raw_read (void *ptr, size_t& ulen);
-  ssize_t __reg3 raw_write (const void *ptr, size_t ulen);
   void fixup_after_fork (HANDLE);
   void fixup_after_exec ();
   int __reg2 fstat (struct stat *buf);

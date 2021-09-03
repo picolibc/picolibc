@@ -28,10 +28,15 @@ STATUS_PIPE_EMPTY simply means there's no data to be read. */
 		   || _s == STATUS_PIPE_BROKEN \
 		   || _s == STATUS_PIPE_EMPTY; })
 
-fhandler_pipe::fhandler_pipe ()
-  : fhandler_base (), popen_pid (0)
+fhandler_pipe_fifo::fhandler_pipe_fifo ()
+  : fhandler_base (), max_atomic_write (DEFAULT_PIPEBUFSIZE)
 {
-  max_atomic_write = DEFAULT_PIPEBUFSIZE;
+}
+
+
+fhandler_pipe::fhandler_pipe ()
+  : fhandler_pipe_fifo (), popen_pid (0)
+{
   need_fork_fixup (true);
 }
 
@@ -340,7 +345,7 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
 }
 
 ssize_t __reg3
-fhandler_pipe::raw_write (const void *ptr, size_t len)
+fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 {
   size_t nbytes = 0;
   ULONG chunk;
@@ -358,7 +363,7 @@ fhandler_pipe::raw_write (const void *ptr, size_t len)
   else
     chunk = max_atomic_write;
 
-  /* Create a wait event if the pipe is in blocking mode. */
+  /* Create a wait event if the pipe or fifo is in blocking mode. */
   if (!is_nonblocking () && !(evt = CreateEvent (NULL, false, false, NULL)))
     {
       __seterrno ();
