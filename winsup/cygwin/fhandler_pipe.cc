@@ -248,8 +248,8 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
 
 	  WaitForSingleObject (read_mtx, INFINITE);
 
-	  /* Make sure never to request more bytes than half the pipe
-	     buffer size.  Every pending read lowers WriteQuotaAvailable
+	  /* If the pipe is empty, don't request more bytes than half the
+	     pipe buffer size.  Every pending read lowers WriteQuotaAvailable
 	     on the write side and thus affects select's ability to return
 	     more or less reliable info whether a write succeeds or not.
 
@@ -425,7 +425,6 @@ fhandler_pipe::raw_write (const void *ptr, size_t len)
 	    set_errno (EBADF);
 	  else
 	    __seterrno ();
-	  len = (size_t) -1;
 	}
       else if (NT_SUCCESS (status))
 	{
