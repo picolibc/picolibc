@@ -811,7 +811,7 @@ nt_create (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE &r, HANDLE &w,
 	    __seterrno_from_nt_status (status);
 	    err = GetLastError ();
 	    debug_printf ("failed, %E");
-	    r = INVALID_HANDLE_VALUE;
+	    r = NULL;
 	  }
 	}
     }
