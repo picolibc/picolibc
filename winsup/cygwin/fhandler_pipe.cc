@@ -313,7 +313,6 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
 ssize_t __reg3
 fhandler_pipe::raw_write (const void *ptr, size_t len)
 {
-  ssize_t ret = -1;
   size_t nbytes = 0;
   ULONG chunk;
   NTSTATUS status = STATUS_SUCCESS;
@@ -351,9 +350,36 @@ fhandler_pipe::raw_write (const void *ptr, size_t len)
 	len1 = chunk;
       else
 	len1 = (ULONG) left;
-      nbytes_now = 0;
-      status = NtWriteFile (get_handle (), evt, NULL, NULL, &io,
-			    (PVOID) ptr, len1, NULL, NULL);
+      /* NtWriteFile returns success with # of bytes written == 0 if writing
+         on a non-blocking pipe fails because the pipe buffer doesn't have
+	 sufficient space.
+
+	 POSIX requires
+	 - A write request for {PIPE_BUF} or fewer bytes shall have the
+	   following effect: if there is sufficient space available in the
+	   pipe, write() shall transfer all the data and return the number
+	   of bytes requested. Otherwise, write() shall transfer no data and
+	   return -1 with errno set to [EAGAIN].
+
+	 - A write request for more than {PIPE_BUF} bytes shall cause one
+	   of the following:
+
+	  - When at least one byte can be written, transfer what it can and
+	    return the number of bytes written. When all data previously
+	    written to the pipe is read, it shall transfer at least {PIPE_BUF}
+	    bytes.
+
+	  - When no data can be written, transfer no data, and return -1 with
+	    errno set to [EAGAIN]. */
+      while (len1 > 0)
+	{
+	  status = NtWriteFile (get_handle (), evt, NULL, NULL, &io,
+				(PVOID) ptr, len1, NULL, NULL);
+	  if (evt || !NT_SUCCESS (status) || io.Information > 0
+	      || len <= PIPE_BUF)
+	    break;
+	  len1 >>= 1;
+	}
       if (evt && status == STATUS_PENDING)
 	{
 	  waitret = cygwait (evt);
@@ -375,13 +401,11 @@ fhandler_pipe::raw_write (const void *ptr, size_t len)
       else if (NT_SUCCESS (status))
 	{
 	  nbytes_now = io.Information;
-	  /* NtWriteFile returns success with # of bytes written == 0
-	     if writing on a non-blocking pipe fails because the pipe
-	     buffer doesn't have sufficient space. */
-	  if (nbytes_now == 0)
-	    set_errno (EAGAIN);
 	  ptr = ((char *) ptr) + nbytes_now;
 	  nbytes += nbytes_now;
+	  /* 0 bytes returned?  EAGAIN.  See above. */
+	  if (nbytes == 0)
+	    set_errno (EAGAIN);
 	}
       else if (STATUS_PIPE_IS_CLOSED (status))
 	{
@@ -392,17 +416,16 @@ fhandler_pipe::raw_write (const void *ptr, size_t len)
 	__seterrno_from_nt_status (status);
 
       if (nbytes_now == 0)
-	len = 0;		/* Terminate loop. */
-      if (nbytes > 0)
-	ret = nbytes;
+	break;
     }
   if (evt)
     CloseHandle (evt);
-  if (status == STATUS_THREAD_SIGNALED && ret < 0)
+  if (status == STATUS_THREAD_SIGNALED && nbytes == 0)
     set_errno (EINTR);
   else if (status == STATUS_THREAD_CANCELED)
     pthread::static_cancel_self ();
-  return ret;
+  return nbytes ?: -1;
+}
 }
 
 int
