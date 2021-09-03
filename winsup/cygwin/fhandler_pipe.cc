@@ -240,8 +240,37 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
       keep_looping = false;
       if (evt)
 	ResetEvent (evt);
+      if (!is_nonblocking ())
+	{
+	  FILE_PIPE_LOCAL_INFORMATION fpli;
+	  ULONG reader_count;
+	  ULONG max_len = 64;
+
+	  WaitForSingleObject (read_mtx, INFINITE);
+
+	  /* Make sure never to request more bytes than half the pipe
+	     buffer size.  Every pending read lowers WriteQuotaAvailable
+	     on the write side and thus affects select's ability to return
+	     more or less reliable info whether a write succeeds or not.
+
+	     Let the size of the request depend on the number of readers
+	     at the time. */
+	  status = NtQueryInformationFile (get_handle (), &io,
+					   &fpli, sizeof (fpli),
+					   FilePipeLocalInformation);
+	  if (NT_SUCCESS (status) && fpli.ReadDataAvailable == 0)
+	    {
+	      reader_count = get_obj_handle_count (get_handle ());
+	      if (reader_count < 10)
+		max_len = fpli.InboundQuota / (2 * reader_count);
+	      if (len > max_len)
+		len = max_len;
+	    }
+	}
       status = NtReadFile (get_handle (), evt, NULL, NULL, &io, ptr,
 			   len, NULL, NULL);
+      if (!is_nonblocking ())
+	ReleaseMutex (read_mtx);
       if (evt && status == STATUS_PENDING)
 	{
 	  waitret = cygwait (evt);
@@ -426,6 +455,13 @@ fhandler_pipe::raw_write (const void *ptr, size_t len)
     pthread::static_cancel_self ();
   return nbytes ?: -1;
 }
+
+void
+fhandler_pipe::fixup_after_fork (HANDLE parent)
+{
+  if (read_mtx)
+    fork_fixup (parent, read_mtx, "read_mtx");
+  fhandler_base::fixup_after_fork (parent);
 }
 
 int
@@ -434,14 +470,29 @@ fhandler_pipe::dup (fhandler_base *child, int flags)
   fhandler_pipe *ftp = (fhandler_pipe *) child;
   ftp->set_popen_pid (0);
 
-  int res;
-  if (get_handle () && fhandler_base::dup (child, flags))
+  int res = 0;
+  if (fhandler_base::dup (child, flags))
     res = -1;
-  else
-    res = 0;
+  else if (read_mtx &&
+	   !DuplicateHandle (GetCurrentProcess (), read_mtx,
+			     GetCurrentProcess (), &ftp->read_mtx,
+			     0, !(flags & O_CLOEXEC), DUPLICATE_SAME_ACCESS))
+    {
+      __seterrno ();
+      ftp->close ();
+      res = -1;
+    }
 
   debug_printf ("res %d", res);
   return res;
+}
+
+int
+fhandler_pipe::close ()
+{
+  if (read_mtx)
+    CloseHandle (read_mtx);
+  return fhandler_base::close ();
 }
 
 #define PIPE_INTRO "\\\\.\\pipe\\cygwin-"
@@ -641,7 +692,25 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
 		    unique_id);
       fhs[1]->init (w, FILE_CREATE_PIPE_INSTANCE | GENERIC_WRITE, mode,
 		    unique_id);
-      res = 0;
+      /* For the read side of the pipe, add a mutex.  See raw_read for the
+	 usage. */
+      SECURITY_ATTRIBUTES sa = { .nLength = sizeof (SECURITY_ATTRIBUTES),
+				 .lpSecurityDescriptor = NULL,
+				 .bInheritHandle = !(mode & O_CLOEXEC)
+			       };
+      HANDLE mtx = CreateMutexW (&sa, FALSE, NULL);
+      if (!mtx)
+	{
+	  delete fhs[0];
+	  NtClose (r);
+	  delete fhs[1];
+	  NtClose (w);
+	}
+      else
+	{
+	  fhs[0]->set_read_mutex (mtx);
+	  res = 0;
+	}
     }
 
   debug_printf ("%R = pipe([%p, %p], %d, %y)", res, fhs[0], fhs[1], psize, mode);

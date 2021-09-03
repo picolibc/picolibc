@@ -1171,6 +1171,7 @@ class fhandler_socket_unix : public fhandler_socket
 class fhandler_pipe: public fhandler_base
 {
 private:
+  HANDLE read_mtx;
   pid_t popen_pid;
   size_t max_atomic_write;
   void set_pipe_non_blocking (bool nonblocking);
@@ -1178,6 +1179,7 @@ public:
   fhandler_pipe ();
 
   bool ispipe() const { return true; }
+  void set_read_mutex (HANDLE mtx) { read_mtx = mtx; }
 
   void set_popen_pid (pid_t pid) {popen_pid = pid;}
   pid_t get_popen_pid () const {return popen_pid;}
@@ -1187,7 +1189,9 @@ public:
   select_record *select_except (select_stuff *);
   char *get_proc_fd_name (char *buf);
   int open (int flags, mode_t mode = 0);
+  void fixup_after_fork (HANDLE);
   int dup (fhandler_base *child, int);
+  int close ();
   void __reg3 raw_read (void *ptr, size_t& len);
   ssize_t __reg3 raw_write (const void *ptr, size_t len);
   int ioctl (unsigned int cmd, void *);

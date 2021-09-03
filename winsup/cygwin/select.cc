@@ -612,7 +612,6 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
 	   that.  This means that a pipe could still block since you could
 	   be trying to write more to the pipe than is available in the
 	   buffer but that is the hazard of select().  */
-      fpli.WriteQuotaAvailable = fpli.OutboundQuota - fpli.ReadDataAvailable;
       if (fpli.WriteQuotaAvailable > 0)
 	{
 	  paranoid_printf ("fd %d, %s, write: size %u, avail %u", fd,
