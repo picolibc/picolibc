@@ -659,7 +659,7 @@ nt_create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
 				 &cygheap->installation_key,
 				 GetCurrentProcessId ());
 
-  access = GENERIC_READ | FILE_WRITE_ATTRIBUTES;
+  access = GENERIC_READ | FILE_WRITE_ATTRIBUTES | SYNCHRONIZE;
 
   ULONG pipe_type = pipe_byte ? FILE_PIPE_BYTE_STREAM_TYPE
     : FILE_PIPE_MESSAGE_TYPE;
@@ -738,7 +738,7 @@ nt_create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
     {
       debug_printf ("NtOpenFile: name %S", &pipename);
 
-      access = GENERIC_WRITE | FILE_READ_ATTRIBUTES;
+      access = GENERIC_WRITE | FILE_READ_ATTRIBUTES | SYNCHRONIZE;
       status = NtOpenFile (w, access, &attr, &io, 0, 0);
       if (!NT_SUCCESS (status))
 	{
