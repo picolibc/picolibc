@@ -660,7 +660,7 @@ fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
    simplicity, nt_create will omit the 'open_mode' and 'name'
    parameters, which aren't needed for our purposes.  */
 
-static int nt_create (LPSECURITY_ATTRIBUTES, PHANDLE, PHANDLE, DWORD,
+static int nt_create (LPSECURITY_ATTRIBUTES, HANDLE &, HANDLE &, DWORD,
 		      int64_t *);
 
 int
@@ -671,7 +671,7 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
   int res = -1;
   int64_t unique_id;
 
-  int ret = nt_create (sa, &r, &w, psize, &unique_id);
+  int ret = nt_create (sa, r, w, psize, &unique_id);
   if (ret)
     __seterrno_from_win_error (ret);
   else if ((fhs[0] = (fhandler_pipe *) build_fh_dev (*piper_dev)) == NULL)
@@ -718,7 +718,7 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
 }
 
 static int
-nt_create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
+nt_create (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE &r, HANDLE &w,
 		DWORD psize, int64_t *unique_id)
 {
   NTSTATUS status;
@@ -729,10 +729,8 @@ nt_create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
   LARGE_INTEGER timeout;
 
   /* Default to error. */
-  if (r)
-    *r = NULL;
-  if (w)
-    *w = NULL;
+  r = NULL;
+  w = NULL;
 
   status = fhandler_base::npfs_handle (npfsh);
   if (!NT_SUCCESS (status))
@@ -760,7 +758,7 @@ nt_create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
      Retrying will probably never be necessary, but we want
      to be as robust as possible.  */
   DWORD err = 0;
-  while (r && !*r)
+  while (!r)
     {
       static volatile ULONG pipe_unique_id;
       LONG id = InterlockedIncrement ((LONG *) &pipe_unique_id);
@@ -779,7 +777,7 @@ nt_create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
 				  npfsh, sa_ptr->lpSecurityDescriptor);
 
       timeout.QuadPart = -500000;
-      status = NtCreateNamedPipeFile (r, access, &attr, &io,
+      status = NtCreateNamedPipeFile (&r, access, &attr, &io,
 				      FILE_SHARE_READ | FILE_SHARE_WRITE,
 				      FILE_CREATE, 0, pipe_type,
 				      FILE_PIPE_BYTE_STREAM_MODE,
@@ -787,7 +785,7 @@ nt_create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
 
       if (NT_SUCCESS (status))
 	{
-	  debug_printf ("pipe read handle %p", *r);
+	  debug_printf ("pipe read handle %p", r);
 	  err = 0;
 	  break;
 	}
@@ -800,49 +798,42 @@ nt_create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
 	  /* The pipe is already open with compatible parameters.
 	     Pick a new name and retry.  */
 	  debug_printf ("pipe busy, retrying");
-	  *r = NULL;
+	  r = NULL;
 	  break;
 	case STATUS_ACCESS_DENIED:
 	  /* The pipe is already open with incompatible parameters.
 	     Pick a new name and retry.  */
 	  debug_printf ("pipe access denied, retrying");
-	  *r = NULL;
+	  r = NULL;
 	  break;
 	default:
 	  {
 	    __seterrno_from_nt_status (status);
 	    err = GetLastError ();
 	    debug_printf ("failed, %E");
-	    *r = INVALID_HANDLE_VALUE;
+	    r = INVALID_HANDLE_VALUE;
 	  }
 	}
     }
 
   if (err)
     {
-      *r = NULL;
+      r = NULL;
       return err;
     }
 
-  if (!w)
-    debug_printf ("pipe write handle NULL");
-  else
+  debug_printf ("NtOpenFile: name %S", &pipename);
+
+  access = GENERIC_WRITE | FILE_READ_ATTRIBUTES | SYNCHRONIZE;
+  status = NtOpenFile (&w, access, &attr, &io, 0, 0);
+  if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtOpenFile: name %S", &pipename);
-
-      access = GENERIC_WRITE | FILE_READ_ATTRIBUTES | SYNCHRONIZE;
-      status = NtOpenFile (w, access, &attr, &io, 0, 0);
-      if (!NT_SUCCESS (status))
-	{
-	  DWORD err = GetLastError ();
-	  debug_printf ("NtOpenFile failed, r %p, %E", r);
-	  if (r)
-	    NtClose (*r);
-	  *w = NULL;
-	  return err;
-	}
-
-      debug_printf ("pipe write handle %p", *w);
+      DWORD err = GetLastError ();
+      debug_printf ("NtOpenFile failed, r %p, %E", r);
+      if (r)
+	NtClose (r);
+      w = NULL;
+      return err;
     }
 
   /* Success. */
