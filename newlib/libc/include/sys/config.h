@@ -194,8 +194,6 @@
 #endif
 
 #ifdef __XTENSA__
-#include <xtensa/config/core-isa.h>
-#define MALLOC_ALIGNMENT ((XCHAL_DATA_WIDTH) < 16 ? 16 : (XCHAL_DATA_WIDTH))
 /* Espressif-specific: shrink the default fd buffer size */
 #define __BUFSIZ__ 128
 #ifndef __DYNAMIC_REENT__
