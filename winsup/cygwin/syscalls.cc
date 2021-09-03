@@ -561,7 +561,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
     {
       /* In the remote case we need the full path, but recycler is only
 	 a relative path.  Convert to absolute path. */
-      RtlInitEmptyUnicodeString (&fname, (PCWSTR) tp.w_get (),
+      RtlInitEmptyUnicodeString (&fname, tp.w_get (),
 				 (NT_MAX_PATH - 1) * sizeof (WCHAR));
       RtlCopyUnicodeString (&fname, pc.get_nt_native_path ());
       RtlSplitUnicodePath (&fname, &fname, NULL);

@@ -1638,13 +1638,14 @@ extern "C"
 
   /* RtlInitEmptyUnicodeString is defined as a macro in wdm.h, but that file
      is missing entirely in w32api. */
+
   inline
-  VOID NTAPI RtlInitEmptyUnicodeString(PUNICODE_STRING dest, PCWSTR buf,
+  VOID NTAPI RtlInitEmptyUnicodeString(PUNICODE_STRING dest, PWSTR buf,
 				       USHORT len)
   {
     dest->Length = 0;
     dest->MaximumLength = len;
-    dest->Buffer = (PWSTR) buf;
+    dest->Buffer = buf;
   }
   /* Like RtlInitEmptyUnicodeString, but initialize Length to len, too.
      This is for instance useful when creating a UNICODE_STRING from an
