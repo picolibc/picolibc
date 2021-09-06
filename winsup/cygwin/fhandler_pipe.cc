@@ -221,12 +221,10 @@ fhandler_pipe::get_proc_fd_name (char *buf)
 void __reg3
 fhandler_pipe::raw_read (void *ptr, size_t& len)
 {
-  NTSTATUS status;
+  size_t nbytes = 0;
+  NTSTATUS status = STATUS_SUCCESS;
   IO_STATUS_BLOCK io;
   HANDLE evt = NULL;
-  DWORD waitret = WAIT_OBJECT_0;
-  bool keep_looping = false;
-  size_t orig_len = len;
 
   if (!len)
     return;
@@ -239,43 +237,59 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
       return;
     }
 
-  do
+  DWORD timeout = is_nonblocking () ? 0 : INFINITE;
+  DWORD waitret = cygwait (read_mtx, timeout);
+  switch (waitret)
     {
-      len = orig_len;
-      keep_looping = false;
+    case WAIT_OBJECT_0:
+      break;
+    case WAIT_TIMEOUT:
+      set_errno (EAGAIN);
+      len = (size_t) -1;
+      return;
+    default:
+      set_errno (EINTR);
+      len = (size_t) -1;
+      return;
+    }
+  while (nbytes < len)
+    {
+      ULONG_PTR nbytes_now = 0;
+      size_t left = len - nbytes;
+      ULONG len1 = (ULONG) left;
+      waitret = WAIT_OBJECT_0;
+
       if (evt)
 	ResetEvent (evt);
       if (!is_nonblocking ())
 	{
 	  FILE_PIPE_LOCAL_INFORMATION fpli;
-	  ULONG reader_count;
-	  ULONG max_len = 64;
 
-	  WaitForSingleObject (read_mtx, INFINITE);
-
-	  /* If the pipe is empty, don't request more bytes than half the
-	     pipe buffer size.  Every pending read lowers WriteQuotaAvailable
-	     on the write side and thus affects select's ability to return
-	     more or less reliable info whether a write succeeds or not.
-
-	     Let the size of the request depend on the number of readers
-	     at the time. */
+	  /* If the pipe is empty, don't request more bytes than pipe
+	     buffer size - 1. Pending read lowers WriteQuotaAvailable on
+	     the write side and thus affects select's ability to return
+	     more or less reliable info whether a write succeeds or not. */
+	  ULONG chunk = max_atomic_write - 1;
 	  status = NtQueryInformationFile (get_handle (), &io,
 					   &fpli, sizeof (fpli),
 					   FilePipeLocalInformation);
-	  if (NT_SUCCESS (status) && fpli.ReadDataAvailable == 0)
+	  if (NT_SUCCESS (status))
 	    {
-	      reader_count = get_obj_handle_count (get_handle ());
-	      if (reader_count < 10)
-		max_len = fpli.InboundQuota / (2 * reader_count);
-	      if (len > max_len)
-		len = max_len;
+	      if (fpli.ReadDataAvailable > 0)
+		chunk = left;
+	      else if (nbytes != 0)
+		break;
+	      else
+		chunk = fpli.InboundQuota - 1;
 	    }
+	  else if (nbytes != 0)
+	    break;
+
+	  if (len1 > chunk)
+	    len1 = chunk;
 	}
       status = NtReadFile (get_handle (), evt, NULL, NULL, &io, ptr,
-			   len, NULL, NULL);
-      if (!is_nonblocking ())
-	ReleaseMutex (read_mtx);
+			   len1, NULL, NULL);
       if (evt && status == STATUS_PENDING)
 	{
 	  waitret = cygwait (evt);
@@ -292,13 +306,13 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
 	    set_errno (EBADF);
 	  else
 	    __seterrno ();
-	  len = (size_t) -1;
+	  nbytes = (size_t) -1;
 	}
       else if (NT_SUCCESS (status))
 	{
-	  len = io.Information;
-	  if (len == 0)
-	    keep_looping = true;
+	  nbytes_now = io.Information;
+	  ptr = ((char *) ptr) + nbytes_now;
+	  nbytes += nbytes_now;
 	}
       else
 	{
@@ -308,40 +322,46 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
 	    case STATUS_END_OF_FILE:
 	    case STATUS_PIPE_BROKEN:
 	      /* This is really EOF.  */
-	      len = 0;
 	      break;
 	    case STATUS_MORE_ENTRIES:
 	    case STATUS_BUFFER_OVERFLOW:
 	      /* `io.Information' is supposedly valid.  */
-	      len = io.Information;
-	      if (len == 0)
-		keep_looping = true;
+	      nbytes_now = io.Information;
+	      ptr = ((char *) ptr) + nbytes_now;
+	      nbytes += nbytes_now;
 	      break;
 	    case STATUS_PIPE_LISTENING:
 	    case STATUS_PIPE_EMPTY:
+	      if (nbytes != 0)
+		break;
 	      if (is_nonblocking ())
 		{
 		  set_errno (EAGAIN);
-		  len = (size_t) -1;
+		  nbytes = (size_t) -1;
 		  break;
 		}
 	      fallthrough;
 	    default:
 	      __seterrno_from_nt_status (status);
-	      len = (size_t) -1;
+	      nbytes = (size_t) -1;
 	      break;
 	    }
 	}
-    } while (keep_looping);
+
+      if (nbytes_now == 0)
+	break;
+    }
+  ReleaseMutex (read_mtx);
   if (evt)
     CloseHandle (evt);
-  if (status == STATUS_THREAD_SIGNALED)
+  if (status == STATUS_THREAD_SIGNALED && nbytes == 0)
     {
       set_errno (EINTR);
-      len = (size_t) -1;
+      nbytes = (size_t) -1;
     }
   else if (status == STATUS_THREAD_CANCELED)
     pthread::static_cancel_self ();
+  len = nbytes;
 }
 
 ssize_t __reg3
