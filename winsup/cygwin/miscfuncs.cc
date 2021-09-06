@@ -519,6 +519,7 @@ class thread_allocator
     /* g++ 11.2 workaround: don't use initializer */
     MEM_EXTENDED_PARAMETER thread_ext;
     thread_ext.Type = MemExtendedParameterAddressRequirements;
+    thread_ext.Reserved = 0;
     thread_ext.Pointer = (PVOID) &thread_req;
 
     SIZE_T real_size = roundup2 (size, THREAD_STACK_SLOT);
@@ -540,6 +541,7 @@ class thread_allocator
 	/* g++ 11.2 workaround: don't use initializer */
 	MEM_EXTENDED_PARAMETER mmap_ext;
 	mmap_ext.Type = MemExtendedParameterAddressRequirements;
+	mmap_ext.Reserved = 0;
 	mmap_ext.Pointer = (PVOID) &mmap_req;
 
 	real_stackaddr = VirtualAlloc2 (GetCurrentProcess(), NULL, real_size,

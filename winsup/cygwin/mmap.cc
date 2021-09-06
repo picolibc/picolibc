@@ -209,6 +209,7 @@ MapView (HANDLE h, void *addr, size_t len, DWORD openflags,
       /* g++ 11.2 workaround: don't use initializer */
       MEM_EXTENDED_PARAMETER mmap_ext;
       mmap_ext.Type = MemExtendedParameterAddressRequirements;
+      mmap_ext.Reserved = 0;
       mmap_ext.Pointer = (PVOID) &mmap_req;
 
       alloc_type |= attached (prot) ? MEM_RESERVE : 0;
@@ -1629,6 +1630,7 @@ fhandler_dev_zero::mmap (caddr_t *addr, size_t len, int prot,
 	  /* g++ 11.2 workaround: don't use initializer */
 	  MEM_EXTENDED_PARAMETER mmap_ext;
 	  mmap_ext.Type = MemExtendedParameterAddressRequirements;
+	  mmap_ext.Reserved = 0;
 	  mmap_ext.Pointer = (PVOID) &mmap_req;
 
 	  base = VirtualAlloc2 (GetCurrentProcess(), *addr, len, alloc_type,
