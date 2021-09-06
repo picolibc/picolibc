@@ -292,12 +292,15 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
 			   len1, NULL, NULL);
       if (evt && status == STATUS_PENDING)
 	{
-	  waitret = cygwait (evt);
+	  waitret = cygwait (evt, INFINITE, cw_cancel | cw_sig);
 	  if (waitret == WAIT_OBJECT_0)
 	    status = io.Status;
 	}
       if (waitret == WAIT_CANCELED)
-	status = STATUS_THREAD_CANCELED;
+	{
+	  status = STATUS_THREAD_CANCELED;
+	  break;
+	}
       else if (waitret == WAIT_SIGNALED)
 	status = STATUS_THREAD_SIGNALED;
       else if (isclosed ())  /* A signal handler might have closed the fd. */
@@ -360,7 +363,10 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
       nbytes = (size_t) -1;
     }
   else if (status == STATUS_THREAD_CANCELED)
-    pthread::static_cancel_self ();
+    {
+      CancelIo (get_handle ());
+      pthread::static_cancel_self ();
+    }
   len = nbytes;
 }
 
@@ -436,12 +442,15 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 	}
       if (evt && status == STATUS_PENDING)
 	{
-	  waitret = cygwait (evt);
+	  waitret = cygwait (evt, INFINITE, cw_cancel | cw_sig);
 	  if (waitret == WAIT_OBJECT_0)
 	    status = io.Status;
 	}
       if (waitret == WAIT_CANCELED)
-	status = STATUS_THREAD_CANCELED;
+	{
+	  status = STATUS_THREAD_CANCELED;
+	  break;
+	}
       else if (waitret == WAIT_SIGNALED)
 	status = STATUS_THREAD_SIGNALED;
       else if (isclosed ())  /* A signal handler might have closed the fd. */
@@ -476,7 +485,10 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
   if (status == STATUS_THREAD_SIGNALED && nbytes == 0)
     set_errno (EINTR);
   else if (status == STATUS_THREAD_CANCELED)
-    pthread::static_cancel_self ();
+    {
+      CancelIo (get_handle ());
+      pthread::static_cancel_self ();
+    }
   return nbytes ?: -1;
 }
 
