@@ -301,21 +301,21 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
 	  CancelIo (get_handle ());
 	  if (waitret == WAIT_SIGNALED && io.Status != STATUS_CANCELLED)
 	    waitret = WAIT_OBJECT_0;
-	  if (waitret == WAIT_OBJECT_0)
-	    status = io.Status;
+
+	  if (waitret == WAIT_CANCELED)
+	    {
+	      status = STATUS_THREAD_CANCELED;
+	      break;
+	    }
+	  else if (waitret == WAIT_SIGNALED)
+	    {
+	      status = STATUS_THREAD_SIGNALED;
+	      nbytes += io.Information;
+	      break;
+	    }
+	  status = io.Status;
 	}
-      if (waitret == WAIT_CANCELED)
-	{
-	  status = STATUS_THREAD_CANCELED;
-	  break;
-	}
-      else if (waitret == WAIT_SIGNALED)
-	{
-	  status = STATUS_THREAD_SIGNALED;
-	  nbytes += io.Information;
-	  break;
-	}
-      else if (isclosed ())  /* A signal handler might have closed the fd. */
+      if (isclosed ())  /* A signal handler might have closed the fd. */
 	{
 	  if (waitret == WAIT_OBJECT_0)
 	    set_errno (EBADF);
@@ -460,21 +460,21 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 	  CancelIo (get_handle ());
 	  if (waitret == WAIT_SIGNALED && io.Status != STATUS_CANCELLED)
 	    waitret = WAIT_OBJECT_0;
-	  if (waitret == WAIT_OBJECT_0)
-	    status = io.Status;
+
+	  if (waitret == WAIT_CANCELED)
+	    {
+	      status = STATUS_THREAD_CANCELED;
+	      break;
+	    }
+	  else if (waitret == WAIT_SIGNALED)
+	    {
+	      status = STATUS_THREAD_SIGNALED;
+	      nbytes += io.Information;
+	      break;
+	    }
+	  status = io.Status;
 	}
-      if (waitret == WAIT_CANCELED)
-	{
-	  status = STATUS_THREAD_CANCELED;
-	  break;
-	}
-      else if (waitret == WAIT_SIGNALED)
-	{
-	  status = STATUS_THREAD_SIGNALED;
-	  nbytes += io.Information;
-	  break;
-	}
-      else if (isclosed ())  /* A signal handler might have closed the fd. */
+      if (isclosed ())  /* A signal handler might have closed the fd. */
 	{
 	  if (waitret == WAIT_OBJECT_0)
 	    set_errno (EBADF);
