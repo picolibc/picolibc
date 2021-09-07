@@ -608,10 +608,12 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
     }
   if (writing)
     {
-	/* If there is anything available in the pipe buffer then signal
-	   that.  This means that a pipe could still block since you could
-	   be trying to write more to the pipe than is available in the
-	   buffer but that is the hazard of select().  */
+      /* WriteQuotaAvailable is decremented by the number of bytes requested
+	 by a blocking reader on the other side of the pipe.  Cygwin readers
+	 are serialized and never request a number of bytes equivalent to the
+	 full buffer size.  So WriteQuotaAvailable is 0 only if either the
+	 read buffer on the other side is really full, or if we have non-Cygwin
+	 readers. */
       if (fpli.WriteQuotaAvailable > 0)
 	{
 	  paranoid_printf ("fd %d, %s, write: size %u, avail %u", fd,
@@ -619,17 +621,7 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
 			   fpli.WriteQuotaAvailable);
 	  return 1;
 	}
-      /* If we somehow inherit a tiny pipe (size < PIPE_BUF), then consider
-	 the pipe writable only if it is completely empty, to minimize the
-	 probability that a subsequent write will block.  */
-      if (fpli.OutboundQuota < PIPE_BUF
-	  && fpli.WriteQuotaAvailable == fpli.OutboundQuota)
-	{
-	  select_printf ("fd, %s, write tiny pipe: size %u, avail %u",
-			 fd, fh->get_name (), fpli.OutboundQuota,
-			 fpli.WriteQuotaAvailable);
-	  return 1;
-	}
+      /* TODO: Buffer really full or non-Cygwin reader? */
     }
   else if (fpli.ReadDataAvailable)
     {
