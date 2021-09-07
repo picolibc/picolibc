@@ -68,6 +68,7 @@ case "${target}" in
   mn10?00-*-*)
 	;;
   riscv*-*-*)
+	AC_DEFINE(REENTRANT_SYSCALLS_STUBS)
 	;;
   powerpcle-*-pe)
 	;;
@@ -86,8 +87,8 @@ case "${target}" in
   z8k-*-*)
 	;;
   xtensa-*-*)
-  AC_DEFINE(REENTRANT_SYSCALLS_STUBS)
-  ;;
+	AC_DEFINE(REENTRANT_SYSCALLS_STUBS)
+	;;
   *)
 	AC_DEFINE(MISSING_SYSCALL_NAMES)
 	;;
