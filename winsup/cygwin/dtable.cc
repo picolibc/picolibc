@@ -406,6 +406,11 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	}
       if (!fh->init (handle, access, bin))
 	api_fatal ("couldn't initialize fd %d for %s", fd, fh->get_name ());
+      if (fh->ispipe ())
+	{
+	  fhandler_pipe *fhp = (fhandler_pipe *) fh;
+	  fhp->set_pipe_buf_size ();
+	}
 
       fh->open_setup (openflags);
       fh->usecount = 0;

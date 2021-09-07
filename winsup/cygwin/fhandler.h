@@ -1172,7 +1172,7 @@ class fhandler_socket_unix : public fhandler_socket
 class fhandler_pipe_fifo: public fhandler_base
 {
  protected:
-  size_t max_atomic_write;
+  size_t pipe_buf_size;
 
  public:
   fhandler_pipe_fifo ();
@@ -1192,6 +1192,7 @@ public:
 
   bool ispipe() const { return true; }
   void set_read_mutex (HANDLE mtx) { read_mtx = mtx; }
+  void set_pipe_buf_size ();
 
   void set_popen_pid (pid_t pid) {popen_pid = pid;}
   pid_t get_popen_pid () const {return popen_pid;}

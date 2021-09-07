@@ -29,7 +29,7 @@ STATUS_PIPE_EMPTY simply means there's no data to be read. */
 		   || _s == STATUS_PIPE_EMPTY; })
 
 fhandler_pipe_fifo::fhandler_pipe_fifo ()
-  : fhandler_base (), max_atomic_write (DEFAULT_PIPEBUFSIZE)
+  : fhandler_base (), pipe_buf_size (DEFAULT_PIPEBUFSIZE)
 {
 }
 
@@ -269,7 +269,7 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
 	     buffer size - 1. Pending read lowers WriteQuotaAvailable on
 	     the write side and thus affects select's ability to return
 	     more or less reliable info whether a write succeeds or not. */
-	  ULONG chunk = max_atomic_write - 1;
+	  ULONG chunk = pipe_buf_size - 1;
 	  status = NtQueryInformationFile (get_handle (), &io,
 					   &fpli, sizeof (fpli),
 					   FilePipeLocalInformation);
@@ -391,12 +391,12 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
   if (!len)
     return 0;
 
-  if (len <= max_atomic_write)
+  if (len <= pipe_buf_size)
     chunk = len;
   else if (is_nonblocking ())
-    chunk = len = max_atomic_write;
+    chunk = len = pipe_buf_size;
   else
-    chunk = max_atomic_write;
+    chunk = pipe_buf_size;
 
   /* Create a wait event if the pipe or fifo is in blocking mode. */
   if (!is_nonblocking () && !(evt = CreateEvent (NULL, false, false, NULL)))
@@ -892,6 +892,21 @@ nt_create (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE &r, HANDLE &w,
 
   /* Success. */
   return 0;
+}
+
+/* Called by dtable::init_std_file_from_handle for stdio handles
+   inherited from non-Cygwin processes. */
+void
+fhandler_pipe::set_pipe_buf_size ()
+{
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+  FILE_PIPE_LOCAL_INFORMATION fpli;
+
+  status = NtQueryInformationFile (get_handle (), &io, &fpli, sizeof fpli,
+				   FilePipeLocalInformation);
+  if (NT_SUCCESS (status))
+    pipe_buf_size = fpli.InboundQuota;
 }
 
 int
