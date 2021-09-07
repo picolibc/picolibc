@@ -2034,6 +2034,8 @@ case "${target}" in
   mn10?00-*-*)
 	;;
   riscv*-*-*)
+	$as_echo "#define REENTRANT_SYSCALLS_STUBS 1" >>confdefs.h
+
 	;;
   powerpcle-*-pe)
 	;;
@@ -2052,9 +2054,9 @@ case "${target}" in
   z8k-*-*)
 	;;
   xtensa-*-*)
-  $as_echo "#define REENTRANT_SYSCALLS_STUBS 1" >>confdefs.h
+	$as_echo "#define REENTRANT_SYSCALLS_STUBS 1" >>confdefs.h
 
-  ;;
+	;;
   *)
 	$as_echo "#define MISSING_SYSCALL_NAMES 1" >>confdefs.h
 
