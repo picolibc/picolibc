@@ -308,12 +308,12 @@ fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
   int input_done = 0;
   bool sawsig = false;
   int iscanon = ti.c_lflag & ICANON;
+  size_t read_cnt = 0;
 
-  if (bytes_read)
-    *bytes_read = nread;
-  while (nread-- > 0)
+  while (read_cnt < nread)
     {
       c = *rptr++;
+      read_cnt++;
 
       paranoid_printf ("char %0o", c);
 
@@ -453,7 +453,6 @@ fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
 	  if (status != 1)
 	    {
 	      ret = status ? line_edit_error : line_edit_pipe_full;
-	      nread += ralen ();
 	      break;
 	    }
 	  ret = line_edit_input_done;
@@ -462,22 +461,21 @@ fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
     }
 
   /* If we didn't write all bytes in non-canonical mode, write them now. */
-  if (!iscanon && ralen () > 0
-      && (ret == line_edit_ok || ret == line_edit_input_done))
+  if ((input_done || !iscanon) && ralen () > 0 && ret != line_edit_error)
     {
-      int status = accept_input ();
+      int status;
+      int retry_count = 3;
+      while ((status = accept_input ()) != 1 &&
+	     ralen () > 0 && --retry_count > 0)
+	cygwait ((DWORD) 10);
       if (status != 1)
-	{
-	  ret = status ? line_edit_error : line_edit_pipe_full;
-	  nread += ralen ();
-	}
+	ret = status ? line_edit_error : line_edit_pipe_full;
       else
 	ret = line_edit_input_done;
     }
 
-  /* Adding one compensates for the postdecrement in the above loop. */
   if (bytes_read)
-    *bytes_read -= (nread + 1);
+    *bytes_read = read_cnt;
 
   if (sawsig)
     ret = line_edit_signalled;

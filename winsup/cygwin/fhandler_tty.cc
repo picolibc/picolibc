@@ -561,18 +561,21 @@ fhandler_pty_master::accept_input ()
 	{
 	  n = p1 - p0 + 1;
 	  rc = WriteFile (write_to, p0, n, &n, NULL);
-	  written += n;
+	  if (rc)
+	    written += n;
 	  p0 = p1 + 1;
 	}
-      if ((n = bytes_left - (p0 - p)))
+      if (rc && (n = bytes_left - (p0 - p)))
 	{
 	  rc = WriteFile (write_to, p0, n, &n, NULL);
-	  written += n;
+	  if (rc)
+	    written += n;
 	}
-      if (!rc)
+      if (!rc && written == 0)
 	{
 	  debug_printf ("error writing to pipe %p %E", write_to);
 	  get_ttyp ()->read_retval = -1;
+	  puts_readahead (p, bytes_left);
 	  ret = -1;
 	}
       else
