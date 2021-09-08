@@ -41,7 +41,9 @@ gloss_srcs = \
 	sys_write.c 
 
 gloss_specs = \
-	nano.specs sim.specs
+	default.specs \
+	nano.specs \
+	sim.specs
 
 # Extra files
 
