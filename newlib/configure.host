@@ -595,6 +595,10 @@ case "${host}" in
   powerpcle-*-pe)
 	posix_dir=posix
 	;;
+  riscv*-*-*)
+	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME -D_NO_GLOB -D_NO_EXECVE -D_NO_GETLOGIN -D_NO_GETPWENT -D_NO_GETUT -D_NO_GETPASS -D_NO_SIGSET -D_NO_WORDEXP -D_NO_POPEN -D_NO_POSIX_SPAWN"
+	posix_dir=posix
+	;;
   sh*-*)
 	sys_dir=sh
 	;;
