@@ -726,7 +726,6 @@ thread_pipe (void *arg)
   select_pipe_info *pi = (select_pipe_info *) arg;
   DWORD sleep_time = 0;
   bool looping = true;
-  DWORD t0 = GetTickCount ();
 
   while (looping)
     {
@@ -746,12 +745,7 @@ thread_pipe (void *arg)
 	break;
       cygwait (pi->bye, sleep_time >> 3);
       if (sleep_time < 80)
-	{
-	  DWORD t1 = GetTickCount ();
-	  if (t0 != t1)
-	    ++sleep_time;
-	  t0 = t1;
-	}
+	++sleep_time;
       if (pi->stop_thread)
 	break;
     }
@@ -927,7 +921,6 @@ thread_fifo (void *arg)
   select_fifo_info *pi = (select_fifo_info *) arg;
   DWORD sleep_time = 0;
   bool looping = true;
-  DWORD t0 = GetTickCount ();
 
   while (looping)
     {
@@ -947,12 +940,7 @@ thread_fifo (void *arg)
 	break;
       cygwait (pi->bye, sleep_time >> 3);
       if (sleep_time < 80)
-	{
-	  DWORD t1 = GetTickCount ();
-	  if (t0 != t1)
-	    ++sleep_time;
-	  t0 = t1;
-	}
+	++sleep_time;
       if (pi->stop_thread)
 	break;
     }
@@ -1128,7 +1116,6 @@ thread_console (void *arg)
   select_console_info *ci = (select_console_info *) arg;
   DWORD sleep_time = 0;
   bool looping = true;
-  DWORD t0 = GetTickCount ();
 
   while (looping)
     {
@@ -1148,12 +1135,7 @@ thread_console (void *arg)
 	break;
       cygwait (ci->bye, sleep_time >> 3);
       if (sleep_time < 80)
-	{
-	  DWORD t1 = GetTickCount ();
-	  if (t0 != t1)
-	    ++sleep_time;
-	  t0 = t1;
-	}
+	++sleep_time;
       if (ci->stop_thread)
 	break;
     }
@@ -1373,7 +1355,6 @@ thread_pty_slave (void *arg)
   select_pipe_info *pi = (select_pipe_info *) arg;
   DWORD sleep_time = 0;
   bool looping = true;
-  DWORD t0 = GetTickCount ();
 
   while (looping)
     {
@@ -1393,12 +1374,7 @@ thread_pty_slave (void *arg)
 	break;
       cygwait (pi->bye, sleep_time >> 3);
       if (sleep_time < 80)
-	{
-	  DWORD t1 = GetTickCount ();
-	  if (t0 != t1)
-	    ++sleep_time;
-	  t0 = t1;
-	}
+	++sleep_time;
       if (pi->stop_thread)
 	break;
     }
