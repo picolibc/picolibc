@@ -1,0 +1,4 @@
+# Normally, this spec file is not used explicitly. Just it goes from GCC's LIB_SPEC
+
+*lib:
+-lc -lnosys -lc

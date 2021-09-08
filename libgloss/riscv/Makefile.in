@@ -71,7 +71,7 @@ semihost_srcs = \
 	semihost-sys_write.c
 
 gloss_specs = \
-	nano.specs sim.specs semihost.specs
+	default.specs nano.specs sim.specs semihost.specs
 
 # Extra files
 
