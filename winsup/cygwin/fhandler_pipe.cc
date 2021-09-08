@@ -376,6 +376,8 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
     }
   else if (status == STATUS_THREAD_CANCELED)
     pthread::static_cancel_self ();
+  if (select_sem && nbytes)
+    ReleaseSemaphore (select_sem, get_obj_handle_count (select_sem), NULL);
   len = nbytes;
 }
 
@@ -507,6 +509,8 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
     set_errno (EINTR);
   else if (status == STATUS_THREAD_CANCELED)
     pthread::static_cancel_self ();
+  if (select_sem && nbytes)
+    ReleaseSemaphore (select_sem, get_obj_handle_count (select_sem), NULL);
   return nbytes ?: -1;
 }
 
@@ -515,6 +519,8 @@ fhandler_pipe::fixup_after_fork (HANDLE parent)
 {
   if (read_mtx)
     fork_fixup (parent, read_mtx, "read_mtx");
+  if (select_sem)
+    fork_fixup (parent, select_sem, "select_sem");
   fhandler_base::fixup_after_fork (parent);
 }
 
@@ -536,6 +542,15 @@ fhandler_pipe::dup (fhandler_base *child, int flags)
       ftp->close ();
       res = -1;
     }
+  else if (select_sem &&
+	   !DuplicateHandle (GetCurrentProcess (), select_sem,
+			    GetCurrentProcess (), &ftp->select_sem,
+			    0, !(flags & O_CLOEXEC), DUPLICATE_SAME_ACCESS))
+    {
+      __seterrno ();
+      ftp->close ();
+      res = -1;
+    }
 
   debug_printf ("res %d", res);
   return res;
@@ -546,6 +561,11 @@ fhandler_pipe::close ()
 {
   if (read_mtx)
     CloseHandle (read_mtx);
+  if (select_sem)
+    {
+      ReleaseSemaphore (select_sem, get_obj_handle_count (select_sem), NULL);
+      CloseHandle (select_sem);
+    }
   return fhandler_base::close ();
 }
 
@@ -765,6 +785,11 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
 	  fhs[0]->set_read_mutex (mtx);
 	  res = 0;
 	}
+      fhs[0]->select_sem = CreateSemaphore (&sa, 0, INT32_MAX, NULL);
+      if (fhs[0]->select_sem)
+	DuplicateHandle (GetCurrentProcess (), fhs[0]->select_sem,
+			 GetCurrentProcess (), &fhs[1]->select_sem,
+			 0, 1, DUPLICATE_SAME_ACCESS);
     }
 
   debug_printf ("%R = pipe([%p, %p], %d, %y)", res, fhs[0], fhs[1], psize, mode);

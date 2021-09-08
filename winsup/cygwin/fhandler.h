@@ -217,6 +217,7 @@ class fhandler_base
   void set_ino (ino_t i) { ino = i; }
 
   HANDLE read_state;
+  HANDLE select_sem;
 
  public:
   LONG inc_refcnt () {return InterlockedIncrement (&_refcnt);}
@@ -520,6 +521,8 @@ public:
     fh->copy_from (this);
     return fh;
   }
+
+  HANDLE get_select_sem () { return select_sem; }
 };
 
 struct wsa_event

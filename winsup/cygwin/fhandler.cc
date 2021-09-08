@@ -1464,6 +1464,7 @@ fhandler_base::fhandler_base () :
   _refcnt (0),
   openflags (0),
   unique_id (0),
+  select_sem (NULL),
   archetype (NULL),
   usecount (0)
 {
