@@ -5,14 +5,22 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 GENERAL_SOURCES = \
-	collate.c collcmp.c \
-	regcomp.c regerror.c regexec.c regfree.c
+	closedir.c collate.c collcmp.c creat.c dirfd.c \
+	fnmatch.c glob.c _isatty.c isatty.c \
+	opendir.c readdir.c readdir_r.c \
+	regcomp.c regerror.c regexec.c regfree.c \
+	rewinddir.c sleep.c usleep.c \
+	telldir.c
 
-ELIX_2_SOURCES =
+ELIX_2_SOURCES = \
+        scandir.c seekdir.c
 
-ELIX_3_SOURCES =
+ELIX_3_SOURCES = \
+	execl.c execle.c execlp.c execv.c \
+	execve.c execvp.c wordexp.c wordfree.c
 
-ELIX_4_SOURCES =
+ELIX_4_SOURCES = \
+	popen.c posix_spawn.c
 
 if ELIX_LEVEL_1
 ELIX_SOURCES =
