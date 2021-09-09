@@ -303,20 +303,11 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
 	    waitret = WAIT_OBJECT_0;
 
 	  if (waitret == WAIT_CANCELED)
-	    {
-	      status = STATUS_THREAD_CANCELED;
-	      break;
-	    }
+	    status = STATUS_THREAD_CANCELED;
 	  else if (waitret == WAIT_SIGNALED)
-	    {
-	      status = STATUS_THREAD_SIGNALED;
-	      nbytes += io.Information;
-	      if (select_sem && io.Information > 0)
-		ReleaseSemaphore (select_sem,
-				  get_obj_handle_count (select_sem), NULL);
-	      break;
-	    }
-	  status = io.Status;
+	    status = STATUS_THREAD_SIGNALED;
+	  else
+	    status = io.Status;
 	}
       if (isclosed ())  /* A signal handler might have closed the fd. */
 	{
@@ -326,11 +317,17 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
 	    __seterrno ();
 	  nbytes = (size_t) -1;
 	}
-      else if (NT_SUCCESS (status))
+      else if (NT_SUCCESS (status)
+	       || status == STATUS_BUFFER_OVERFLOW
+	       || status == STATUS_THREAD_CANCELED
+	       || status == STATUS_THREAD_SIGNALED)
 	{
 	  nbytes_now = io.Information;
 	  ptr = ((char *) ptr) + nbytes_now;
 	  nbytes += nbytes_now;
+	  if (select_sem && nbytes_now > 0)
+	    ReleaseSemaphore (select_sem,
+			      get_obj_handle_count (select_sem), NULL);
 	}
       else
 	{
@@ -340,13 +337,6 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
 	    case STATUS_END_OF_FILE:
 	    case STATUS_PIPE_BROKEN:
 	      /* This is really EOF.  */
-	      break;
-	    case STATUS_MORE_ENTRIES:
-	    case STATUS_BUFFER_OVERFLOW:
-	      /* `io.Information' is supposedly valid.  */
-	      nbytes_now = io.Information;
-	      ptr = ((char *) ptr) + nbytes_now;
-	      nbytes += nbytes_now;
 	      break;
 	    case STATUS_PIPE_LISTENING:
 	    case STATUS_PIPE_EMPTY:
@@ -366,10 +356,8 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
 	    }
 	}
 
-      if (nbytes_now == 0)
+      if (nbytes_now == 0 || status == STATUS_BUFFER_OVERFLOW)
 	break;
-      else if (select_sem)
-	ReleaseSemaphore (select_sem, get_obj_handle_count (select_sem), NULL);
     }
   ReleaseMutex (read_mtx);
   if (evt)
@@ -467,20 +455,11 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 	    waitret = WAIT_OBJECT_0;
 
 	  if (waitret == WAIT_CANCELED)
-	    {
-	      status = STATUS_THREAD_CANCELED;
-	      break;
-	    }
+	    status = STATUS_THREAD_CANCELED;
 	  else if (waitret == WAIT_SIGNALED)
-	    {
-	      status = STATUS_THREAD_SIGNALED;
-	      nbytes += io.Information;
-	      if (select_sem && io.Information > 0)
-		ReleaseSemaphore (select_sem,
-				  get_obj_handle_count (select_sem), NULL);
-	      break;
-	    }
-	  status = io.Status;
+	    status = STATUS_THREAD_SIGNALED;
+	  else
+	    status = io.Status;
 	}
       if (isclosed ())  /* A signal handler might have closed the fd. */
 	{
@@ -489,13 +468,18 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 	  else
 	    __seterrno ();
 	}
-      else if (NT_SUCCESS (status))
+      else if (NT_SUCCESS (status)
+	       || status == STATUS_THREAD_CANCELED
+	       || status == STATUS_THREAD_SIGNALED)
 	{
 	  nbytes_now = io.Information;
 	  ptr = ((char *) ptr) + nbytes_now;
 	  nbytes += nbytes_now;
+	  if (select_sem && nbytes_now > 0)
+	    ReleaseSemaphore (select_sem,
+			      get_obj_handle_count (select_sem), NULL);
 	  /* 0 bytes returned?  EAGAIN.  See above. */
-	  if (nbytes == 0)
+	  if (NT_SUCCESS (status) && nbytes == 0)
 	    set_errno (EAGAIN);
 	}
       else if (STATUS_PIPE_IS_CLOSED (status))
@@ -508,8 +492,6 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 
       if (nbytes_now == 0)
 	break;
-      else if (select_sem)
-	ReleaseSemaphore (select_sem, get_obj_handle_count (select_sem), NULL);
     }
   if (evt)
     CloseHandle (evt);
