@@ -963,7 +963,13 @@ start_thread_fifo (select_record *me, select_stuff *stuff)
     {
       pi->start = &stuff->start;
       pi->stop_thread = false;
-      pi->bye = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
+      pi->bye = me->fh->get_select_sem ();
+      if (pi->bye)
+	DuplicateHandle (GetCurrentProcess (), pi->bye,
+			 GetCurrentProcess (), &pi->bye,
+			 0, 0, DUPLICATE_SAME_ACCESS);
+      else
+	pi->bye = CreateSemaphore (&sec_none_nih, 0, INT32_MAX, NULL);
       pi->thread = new cygthread (thread_fifo, pi, "fifosel");
       me->h = *pi->thread;
       if (!me->h)
@@ -981,7 +987,7 @@ fifo_cleanup (select_record *, select_stuff *stuff)
   if (pi->thread)
     {
       pi->stop_thread = true;
-      SetEvent (pi->bye);
+      ReleaseSemaphore (pi->bye, get_obj_handle_count (pi->bye), NULL);
       pi->thread->detach ();
       CloseHandle (pi->bye);
     }

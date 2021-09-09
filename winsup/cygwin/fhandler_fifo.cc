@@ -1047,6 +1047,11 @@ writer_shmem:
   ResetEvent (writer_opening);
   nwriters_unlock ();
 success:
+  if (!select_sem)
+    {
+      __small_sprintf (npbuf, "semaphore.%08x.%016X", get_dev (), get_ino ());
+      select_sem = CreateSemaphore (sa_buf, 0, INT32_MAX, npbuf);
+    }
   return 1;
 err_close_reader:
   saved_errno = get_errno ();
@@ -1233,9 +1238,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 	      if (io.Information > 0)
 		{
 		  len = io.Information;
-		  fifo_client_unlock ();
-		  reading_unlock ();
-		  return;
+		  goto out;
 		}
 	      break;
 	    case STATUS_PIPE_EMPTY:
@@ -1271,9 +1274,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 		    if (j < nhandlers)
 		      fc_handler[j].last_read = false;
 		    fc_handler[i].last_read = true;
-		    fifo_client_unlock ();
-		    reading_unlock ();
-		    return;
+		    goto out;
 		  }
 		break;
 	      case STATUS_PIPE_EMPTY:
@@ -1310,9 +1311,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 		    if (j < nhandlers)
 		      fc_handler[j].last_read = false;
 		    fc_handler[i].last_read = true;
-		    fifo_client_unlock ();
-		    reading_unlock ();
-		    return;
+		    goto out;
 		  }
 		break;
 	      case STATUS_PIPE_EMPTY:
@@ -1345,7 +1344,7 @@ maybe_retry:
       else
 	{
 	  /* Allow interruption and don't hog the CPU. */
-	  DWORD waitret = cygwait (NULL, 1, cw_cancel | cw_sig_eintr);
+	  DWORD waitret = cygwait (select_sem, 1, cw_cancel | cw_sig_eintr);
 	  if (waitret == WAIT_CANCELED)
 	    pthread::static_cancel_self ();
 	  else if (waitret == WAIT_SIGNALED)
@@ -1368,6 +1367,12 @@ maybe_retry:
     }
 errout:
   len = (size_t) -1;
+  return;
+out:
+  fifo_client_unlock ();
+  reading_unlock ();
+  if (select_sem)
+    ReleaseSemaphore (select_sem, get_obj_handle_count (select_sem), NULL);
 }
 
 int __reg2
@@ -1569,6 +1574,11 @@ fhandler_fifo::close ()
     NtClose (write_ready);
   if (writer_opening)
     NtClose (writer_opening);
+  if (select_sem)
+    {
+      ReleaseSemaphore (select_sem, get_obj_handle_count (select_sem), NULL);
+      NtClose (select_sem);
+    }
   if (nohandle ())
     return 0;
   else
@@ -1634,6 +1644,14 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
     }
   if (fhf->reopen_shmem () < 0)
     goto err_close_shmem_handle;
+  if (select_sem &&
+      !DuplicateHandle (GetCurrentProcess (), select_sem,
+			GetCurrentProcess (), &fhf->select_sem,
+			0, !(flags & O_CLOEXEC), DUPLICATE_SAME_ACCESS))
+    {
+      __seterrno ();
+      goto err_close_shmem;
+    }
   if (reader)
     {
       /* Make sure the child starts unlocked. */
@@ -1648,7 +1666,7 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
 			    0, !(flags & O_CLOEXEC), DUPLICATE_SAME_ACCESS))
 	{
 	  __seterrno ();
-	  goto err_close_shmem;
+	  goto err_close_select_sem;
 	}
       if (fhf->reopen_shared_fc_handler () < 0)
 	goto err_close_shared_fc_hdl;
@@ -1696,6 +1714,8 @@ err_close_shared_fc_handler:
   NtUnmapViewOfSection (GetCurrentProcess (), fhf->shared_fc_handler);
 err_close_shared_fc_hdl:
   NtClose (fhf->shared_fc_hdl);
+err_close_select_sem:
+  NtClose (fhf->select_sem);
 err_close_shmem:
   NtUnmapViewOfSection (GetCurrentProcess (), fhf->shmem);
 err_close_shmem_handle:
@@ -1720,6 +1740,8 @@ fhandler_fifo::fixup_after_fork (HANDLE parent)
   fork_fixup (parent, shmem_handle, "shmem_handle");
   if (reopen_shmem () < 0)
     api_fatal ("Can't reopen shared memory during fork, %E");
+  if (select_sem)
+    fork_fixup (parent, select_sem, "select_sem");
   if (reader)
     {
       /* Make sure the child starts unlocked. */
