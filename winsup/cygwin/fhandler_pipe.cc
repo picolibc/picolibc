@@ -311,6 +311,9 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
 	    {
 	      status = STATUS_THREAD_SIGNALED;
 	      nbytes += io.Information;
+	      if (select_sem && io.Information > 0)
+		ReleaseSemaphore (select_sem,
+				  get_obj_handle_count (select_sem), NULL);
 	      break;
 	    }
 	  status = io.Status;
@@ -365,6 +368,8 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
 
       if (nbytes_now == 0)
 	break;
+      else if (select_sem)
+	ReleaseSemaphore (select_sem, get_obj_handle_count (select_sem), NULL);
     }
   ReleaseMutex (read_mtx);
   if (evt)
@@ -376,8 +381,6 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
     }
   else if (status == STATUS_THREAD_CANCELED)
     pthread::static_cancel_self ();
-  if (select_sem && nbytes)
-    ReleaseSemaphore (select_sem, get_obj_handle_count (select_sem), NULL);
   len = nbytes;
 }
 
@@ -472,6 +475,9 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 	    {
 	      status = STATUS_THREAD_SIGNALED;
 	      nbytes += io.Information;
+	      if (select_sem && io.Information > 0)
+		ReleaseSemaphore (select_sem,
+				  get_obj_handle_count (select_sem), NULL);
 	      break;
 	    }
 	  status = io.Status;
@@ -502,6 +508,8 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 
       if (nbytes_now == 0)
 	break;
+      else if (select_sem)
+	ReleaseSemaphore (select_sem, get_obj_handle_count (select_sem), NULL);
     }
   if (evt)
     CloseHandle (evt);
@@ -509,8 +517,6 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
     set_errno (EINTR);
   else if (status == STATUS_THREAD_CANCELED)
     pthread::static_cancel_self ();
-  if (select_sem && nbytes)
-    ReleaseSemaphore (select_sem, get_obj_handle_count (select_sem), NULL);
   return nbytes ?: -1;
 }
 
