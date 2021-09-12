@@ -191,6 +191,19 @@ out:
   return 0;
 }
 
+void
+fhandler_pipe::open_setup (int flags)
+{
+  fhandler_base::open_setup (flags);
+  if (get_dev () == FH_PIPER && !read_mtx)
+    {
+      SECURITY_ATTRIBUTES *sa = sec_none_cloexec (flags);
+      read_mtx = CreateMutex (sa, FALSE, NULL);
+      if (!read_mtx)
+	debug_printf ("CreateMutex failed: %E");
+    }
+}
+
 off_t
 fhandler_pipe::lseek (off_t offset, int whence)
 {

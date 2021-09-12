@@ -1205,6 +1205,7 @@ public:
   select_record *select_except (select_stuff *);
   char *get_proc_fd_name (char *buf);
   int open (int flags, mode_t mode = 0);
+  void open_setup (int flags);
   void fixup_after_fork (HANDLE);
   int dup (fhandler_base *child, int);
   int close ();
