@@ -769,11 +769,7 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
 		    unique_id);
       /* For the read side of the pipe, add a mutex.  See raw_read for the
 	 usage. */
-      SECURITY_ATTRIBUTES sa = { .nLength = sizeof (SECURITY_ATTRIBUTES),
-				 .lpSecurityDescriptor = NULL,
-				 .bInheritHandle = !(mode & O_CLOEXEC)
-			       };
-      HANDLE mtx = CreateMutexW (&sa, FALSE, NULL);
+      HANDLE mtx = CreateMutexW (sa, FALSE, NULL);
       if (!mtx)
 	{
 	  delete fhs[0];
@@ -786,11 +782,11 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
 	  fhs[0]->set_read_mutex (mtx);
 	  res = 0;
 	}
-      fhs[0]->select_sem = CreateSemaphore (&sa, 0, INT32_MAX, NULL);
+      fhs[0]->select_sem = CreateSemaphore (sa, 0, INT32_MAX, NULL);
       if (fhs[0]->select_sem)
 	DuplicateHandle (GetCurrentProcess (), fhs[0]->select_sem,
 			 GetCurrentProcess (), &fhs[1]->select_sem,
-			 0, !(mode & O_CLOEXEC), DUPLICATE_SAME_ACCESS);
+			 0, sa->bInheritHandle, DUPLICATE_SAME_ACCESS);
     }
 
   debug_printf ("%R = pipe([%p, %p], %d, %y)", res, fhs[0], fhs[1], psize, mode);
