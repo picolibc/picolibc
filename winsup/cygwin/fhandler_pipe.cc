@@ -790,7 +790,7 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
       if (fhs[0]->select_sem)
 	DuplicateHandle (GetCurrentProcess (), fhs[0]->select_sem,
 			 GetCurrentProcess (), &fhs[1]->select_sem,
-			 0, 1, DUPLICATE_SAME_ACCESS);
+			 0, !(mode & O_CLOEXEC), DUPLICATE_SAME_ACCESS);
     }
 
   debug_printf ("%R = pipe([%p, %p], %d, %y)", res, fhs[0], fhs[1], psize, mode);
