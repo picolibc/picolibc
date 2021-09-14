@@ -1308,7 +1308,7 @@ fhandler_base::init (HANDLE f, DWORD a, mode_t bin)
 }
 
 int
-fhandler_base::dup (fhandler_base *child, int)
+fhandler_base::dup (fhandler_base *child, int flags)
 {
   debug_printf ("in fhandler_base dup");
 
@@ -1317,7 +1317,7 @@ fhandler_base::dup (fhandler_base *child, int)
     {
       if (!DuplicateHandle (GetCurrentProcess (), get_handle (),
 			    GetCurrentProcess (), &nh,
-			    0, TRUE, DUPLICATE_SAME_ACCESS))
+			    0, !(flags & O_CLOEXEC), DUPLICATE_SAME_ACCESS))
 	{
 	  debug_printf ("dup(%s) failed, handle %p, %E",
 			get_name (), get_handle ());
