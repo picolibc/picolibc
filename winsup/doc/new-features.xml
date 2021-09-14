@@ -35,6 +35,11 @@ The speed argument to cfsetspeed(3) can now be a numerical baud rate
 rather than a Bnnn constant, as on Linux.
 </para></listitem>
 
+<listitem><para>
+The internal implementation of pipes has been overhauled; this should
+result in improved performance.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
