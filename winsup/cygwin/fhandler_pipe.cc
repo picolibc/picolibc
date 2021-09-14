@@ -407,6 +407,13 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
   if (!len)
     return 0;
 
+  if (reader_closed ())
+    {
+      set_errno (EPIPE);
+      raise (SIGPIPE);
+      return -1;
+    }
+
   if (len <= pipe_buf_size)
     chunk = len;
   else if (is_nonblocking ())
@@ -475,7 +482,7 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 		  CancelIo (get_handle ());
 		  set_errno (EPIPE);
 		  raise (SIGPIPE);
-		  break;
+		  goto out;
 		}
 	      else
 		cygwait (select_sem, 10);
@@ -527,6 +534,7 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
       if (nbytes_now == 0)
 	break;
     }
+out:
   if (evt)
     CloseHandle (evt);
   if (status == STATUS_THREAD_SIGNALED && nbytes == 0)
