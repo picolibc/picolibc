@@ -1185,6 +1185,22 @@ fhandler_fifo::take_ownership (DWORD timeout)
   return ret;
 }
 
+void
+fhandler_fifo::release_select_sem (const char *from)
+{
+  LONG n_release;
+  if (reader) /* Number of select() call. */
+    n_release = get_obj_handle_count (select_sem)
+      - get_obj_handle_count (read_ready);
+  else /* Number of select() and reader */
+    n_release = get_obj_handle_count (select_sem)
+      - get_obj_handle_count (get_handle ());
+  debug_printf("%s(%s) release %d", from,
+	       reader ? "reader" : "writer", n_release);
+  if (n_release)
+    ReleaseSemaphore (select_sem, n_release, NULL);
+}
+
 void __reg3
 fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 {
@@ -1372,7 +1388,7 @@ out:
   fifo_client_unlock ();
   reading_unlock ();
   if (select_sem)
-    ReleaseSemaphore (select_sem, get_obj_handle_count (select_sem), NULL);
+    release_select_sem ("raw_read");
 }
 
 int __reg2
@@ -1483,6 +1499,11 @@ fhandler_fifo::cancel_reader_thread ()
 int
 fhandler_fifo::close ()
 {
+  if (select_sem)
+    {
+      release_select_sem ("close");
+      NtClose (select_sem);
+    }
   if (writer)
     {
       nwriters_lock ();
@@ -1574,11 +1595,6 @@ fhandler_fifo::close ()
     NtClose (write_ready);
   if (writer_opening)
     NtClose (writer_opening);
-  if (select_sem)
-    {
-      ReleaseSemaphore (select_sem, get_obj_handle_count (select_sem), NULL);
-      NtClose (select_sem);
-    }
   if (nohandle ())
     return 0;
   else

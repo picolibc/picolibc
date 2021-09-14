@@ -1177,6 +1177,7 @@ class fhandler_pipe_fifo: public fhandler_base
  protected:
   size_t pipe_buf_size;
   HANDLE query_hdl;
+  virtual void release_select_sem (const char *) {};
 
  public:
   fhandler_pipe_fifo ();
@@ -1201,6 +1202,7 @@ class fhandler_pipe: public fhandler_pipe_fifo
 private:
   HANDLE read_mtx;
   pid_t popen_pid;
+  void release_select_sem (const char *);
 public:
   fhandler_pipe ();
 
@@ -1443,6 +1445,8 @@ class fhandler_fifo: public fhandler_pipe_fifo
   { return shmem->shared_fc_handler_updated (); }
   void shared_fc_handler_updated (bool val)
   { shmem->shared_fc_handler_updated (val); }
+
+  void release_select_sem (const char *);
 
 public:
   fhandler_fifo ();

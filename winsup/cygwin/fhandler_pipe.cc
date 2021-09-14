@@ -233,6 +233,22 @@ fhandler_pipe::get_proc_fd_name (char *buf)
   return buf;
 }
 
+void
+fhandler_pipe::release_select_sem (const char *from)
+{
+  LONG n_release;
+  if (get_dev () == FH_PIPER) /* Number of select() and writer */
+    n_release = get_obj_handle_count (select_sem)
+      - get_obj_handle_count (read_mtx);
+  else /* Number of select() call */
+    n_release = get_obj_handle_count (select_sem)
+      - get_obj_handle_count (query_hdl);
+  debug_printf("%s(%s) release %d", from,
+	       get_dev () == FH_PIPER ? "PIPER" : "PIPEW", n_release);
+  if (n_release)
+    ReleaseSemaphore (select_sem, n_release, NULL);
+}
+
 void __reg3
 fhandler_pipe::raw_read (void *ptr, size_t& len)
 {
@@ -324,8 +340,7 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
 	  ptr = ((char *) ptr) + nbytes_now;
 	  nbytes += nbytes_now;
 	  if (select_sem && nbytes_now > 0)
-	    ReleaseSemaphore (select_sem,
-			      get_obj_handle_count (select_sem), NULL);
+	    release_select_sem ("raw_read");
 	}
       else
 	{
@@ -496,8 +511,7 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 	  ptr = ((char *) ptr) + nbytes_now;
 	  nbytes += nbytes_now;
 	  if (select_sem && nbytes_now > 0)
-	    ReleaseSemaphore (select_sem,
-			      get_obj_handle_count (select_sem), NULL);
+	    release_select_sem ("raw_write");
 	  /* 0 bytes returned?  EAGAIN.  See above. */
 	  if (NT_SUCCESS (status) && nbytes == 0)
 	    set_errno (EAGAIN);
@@ -591,13 +605,13 @@ fhandler_pipe::dup (fhandler_base *child, int flags)
 int
 fhandler_pipe::close ()
 {
-  if (read_mtx)
-    CloseHandle (read_mtx);
   if (select_sem)
     {
-      ReleaseSemaphore (select_sem, get_obj_handle_count (select_sem), NULL);
+      release_select_sem ("close");
       CloseHandle (select_sem);
     }
+  if (read_mtx)
+    CloseHandle (read_mtx);
   if (query_hdl)
     CloseHandle (query_hdl);
   return fhandler_base::close ();
