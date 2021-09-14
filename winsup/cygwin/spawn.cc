@@ -657,6 +657,17 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 		ptys->create_invisible_console ();
 		ptys->setup_locale ();
 	      }
+	    else if (cfd->get_dev () == FH_PIPEW)
+	      {
+		fhandler_pipe *pipe = (fhandler_pipe *)(fhandler_base *) cfd;
+		pipe->close_query_handle ();
+		pipe->set_pipe_non_blocking (false);
+	      }
+	    else if (cfd->get_dev () == FH_PIPER)
+	      {
+		fhandler_pipe *pipe = (fhandler_pipe *)(fhandler_base *) cfd;
+		pipe->set_pipe_non_blocking (false);
+	      }
 	}
 
       bool enable_pcon = false;

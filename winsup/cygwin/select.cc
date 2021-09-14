@@ -608,16 +608,47 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
     }
   if (writing)
     {
-      /* WriteQuotaAvailable is decremented by the number of bytes requested
-	 by a blocking reader on the other side of the pipe.  Cygwin readers
-	 are serialized and never request a number of bytes equivalent to the
-	 full buffer size.  So WriteQuotaAvailable is 0 only if either the
-	 read buffer on the other side is really full, or if we have non-Cygwin
-	 readers. */
+      /* If there is anything available in the pipe buffer then signal
+        that.  This means that a pipe could still block since you could
+        be trying to write more to the pipe than is available in the
+        buffer but that is the hazard of select().
+
+        Note that WriteQuotaAvailable is unreliable.
+
+        Usually WriteQuotaAvailable on the write side reflects the space
+        available in the inbound buffer on the read side.  However, if a
+        pipe read is currently pending, WriteQuotaAvailable on the write side
+        is decremented by the number of bytes the read side is requesting.
+        So it's possible (even likely) that WriteQuotaAvailable is 0, even
+        if the inbound buffer on the read side is not full.  This can lead to
+        a deadlock situation: The reader is waiting for data, but select
+        on the writer side assumes that no space is available in the read
+        side inbound buffer.
+
+        Consequentially, the only reliable information is available on the
+        read side, so fetch info from the read side via the pipe-specific
+        query handle.  Use fpli.WriteQuotaAvailable as storage for the actual
+        interesting value, which is the InboundQuote on the write side,
+        decremented by the number of bytes of data in that buffer. */
+      /* Note: Do not use NtQueryInformationFile() for query_hdl because
+	 NtQueryInformationFile() seems to interfere with reading pipes
+	 in non-cygwin apps. Instead, use PeekNamedPipe() here. */
+      if (fh->get_device () == FH_PIPEW)
+	{
+	  HANDLE query_hdl = ((fhandler_pipe *) fh)->get_query_handle ();
+	  if (query_hdl)
+	    {
+	      DWORD nbytes_in_pipe;
+	      PeekNamedPipe (query_hdl, NULL, 0, NULL, &nbytes_in_pipe, NULL);
+	      fpli.WriteQuotaAvailable = fpli.InboundQuota - nbytes_in_pipe;
+	    }
+	  else
+	    return 1;
+	}
       if (fpli.WriteQuotaAvailable > 0)
 	{
 	  paranoid_printf ("fd %d, %s, write: size %u, avail %u", fd,
-			   fh->get_name (), fpli.OutboundQuota,
+			   fh->get_name (), fpli.InboundQuota,
 			   fpli.WriteQuotaAvailable);
 	  return 1;
 	}
@@ -712,6 +743,13 @@ out:
   h = fh->get_output_handle ();
   if (s->write_selected && dev != FH_PIPER)
     {
+      if (dev == FH_PIPEW && ((fhandler_pipe *) fh)->reader_closed ())
+	{
+	  gotone += s->write_ready = true;
+	  if (s->except_selected)
+	    gotone += s->except_ready = true;
+	  return gotone;
+	}
       gotone += s->write_ready =  pipe_data_available (s->fd, fh, h, true);
       select_printf ("write: %s, gotone %d", fh->get_name (), gotone);
     }

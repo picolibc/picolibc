@@ -202,6 +202,8 @@ fhandler_pipe::open_setup (int flags)
       if (!read_mtx)
 	debug_printf ("CreateMutex failed: %E");
     }
+  if (get_dev () == FH_PIPEW && !query_hdl)
+    set_pipe_non_blocking (is_nonblocking ());
 }
 
 off_t
@@ -268,39 +270,22 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
   while (nbytes < len)
     {
       ULONG_PTR nbytes_now = 0;
-      size_t left = len - nbytes;
-      ULONG len1 = (ULONG) left;
+      ULONG len1 = (ULONG) (len - nbytes);
       waitret = WAIT_OBJECT_0;
 
       if (evt)
 	ResetEvent (evt);
-      if (!is_nonblocking ())
+      FILE_PIPE_LOCAL_INFORMATION fpli;
+      status = NtQueryInformationFile (get_handle (), &io,
+				       &fpli, sizeof (fpli),
+				       FilePipeLocalInformation);
+      if (NT_SUCCESS (status))
 	{
-	  FILE_PIPE_LOCAL_INFORMATION fpli;
-
-	  /* If the pipe is empty, don't request more bytes than pipe
-	     buffer size - 1. Pending read lowers WriteQuotaAvailable on
-	     the write side and thus affects select's ability to return
-	     more or less reliable info whether a write succeeds or not. */
-	  ULONG chunk = pipe_buf_size - 1;
-	  status = NtQueryInformationFile (get_handle (), &io,
-					   &fpli, sizeof (fpli),
-					   FilePipeLocalInformation);
-	  if (NT_SUCCESS (status))
-	    {
-	      if (fpli.ReadDataAvailable > 0)
-		chunk = left;
-	      else if (nbytes != 0)
-		break;
-	      else
-		chunk = fpli.InboundQuota - 1;
-	    }
-	  else if (nbytes != 0)
-	    break;
-
-	  if (len1 > chunk)
-	    len1 = chunk;
+	if (fpli.ReadDataAvailable == 0 && nbytes != 0)
+	  break;
 	}
+      else if (nbytes != 0)
+	break;
       status = NtReadFile (get_handle (), evt, NULL, NULL, &io, ptr,
 			   len1, NULL, NULL);
       if (evt && status == STATUS_PENDING)
@@ -385,6 +370,16 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
   len = nbytes;
 }
 
+bool
+fhandler_pipe_fifo::reader_closed ()
+{
+  if (!query_hdl)
+    return false;
+  int n_reader = get_obj_handle_count (query_hdl);
+  int n_writer = get_obj_handle_count (get_handle ());
+  return n_reader == n_writer;
+}
+
 ssize_t __reg3
 fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 {
@@ -457,7 +452,19 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 	}
       if (evt && status == STATUS_PENDING)
 	{
-	  waitret = cygwait (evt, INFINITE, cw_cancel | cw_sig);
+	  while (WAIT_TIMEOUT ==
+		 (waitret = cygwait (evt, (DWORD) 0, cw_cancel | cw_sig)))
+	    {
+	      if (reader_closed ())
+		{
+		  CancelIo (get_handle ());
+		  set_errno (EPIPE);
+		  raise (SIGPIPE);
+		  break;
+		}
+	      else
+		cygwait (select_sem, 10);
+	    }
 	  /* If io.Status is STATUS_CANCELLED after CancelIo, IO has actually
 	     been cancelled and io.Information contains the number of bytes
 	     processed so far.
@@ -523,6 +530,8 @@ fhandler_pipe::set_close_on_exec (bool val)
     set_no_inheritance (read_mtx, val);
   if (select_sem)
     set_no_inheritance (select_sem, val);
+  if (query_hdl)
+    set_no_inheritance (query_hdl, val);
 }
 
 void
@@ -532,6 +541,9 @@ fhandler_pipe::fixup_after_fork (HANDLE parent)
     fork_fixup (parent, read_mtx, "read_mtx");
   if (select_sem)
     fork_fixup (parent, select_sem, "select_sem");
+  if (query_hdl)
+    fork_fixup (parent, query_hdl, "query_hdl");
+
   fhandler_base::fixup_after_fork (parent);
 }
 
@@ -562,6 +574,15 @@ fhandler_pipe::dup (fhandler_base *child, int flags)
       ftp->close ();
       res = -1;
     }
+  else if (query_hdl &&
+	   !DuplicateHandle (GetCurrentProcess (), query_hdl,
+			    GetCurrentProcess (), &ftp->query_hdl,
+			    0, !(flags & O_CLOEXEC), DUPLICATE_SAME_ACCESS))
+    {
+      __seterrno ();
+      ftp->close ();
+      res = -1;
+    }
 
   debug_printf ("res %d", res);
   return res;
@@ -577,6 +598,8 @@ fhandler_pipe::close ()
       ReleaseSemaphore (select_sem, get_obj_handle_count (select_sem), NULL);
       CloseHandle (select_sem);
     }
+  if (query_hdl)
+    CloseHandle (query_hdl);
   return fhandler_base::close ();
 }
 
@@ -797,6 +820,19 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
 	DuplicateHandle (GetCurrentProcess (), fhs[0]->select_sem,
 			 GetCurrentProcess (), &fhs[1]->select_sem,
 			 0, sa->bInheritHandle, DUPLICATE_SAME_ACCESS);
+      if (!DuplicateHandle (GetCurrentProcess (), r,
+			    GetCurrentProcess (), &fhs[1]->query_hdl,
+			    FILE_READ_DATA, sa->bInheritHandle, 0))
+	{
+	  CloseHandle (fhs[0]->select_sem);
+	  delete fhs[0];
+	  CloseHandle (r);
+	  CloseHandle (fhs[1]->select_sem);
+	  delete fhs[1];
+	  CloseHandle (w);
+	}
+      else
+	res = 0;
     }
 
   debug_printf ("%R = pipe([%p, %p], %d, %y)", res, fhs[0], fhs[1], psize, mode);
