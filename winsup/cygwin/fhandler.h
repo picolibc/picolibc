@@ -1208,6 +1208,7 @@ public:
   void open_setup (int flags);
   void fixup_after_fork (HANDLE);
   int dup (fhandler_base *child, int);
+  void set_close_on_exec (bool val);
   int close ();
   void __reg3 raw_read (void *ptr, size_t& len);
   int ioctl (unsigned int cmd, void *);

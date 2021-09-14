@@ -1817,4 +1817,6 @@ fhandler_fifo::set_close_on_exec (bool val)
 	set_no_inheritance (fc_handler[i].h, val);
       fifo_client_unlock ();
     }
+  if (select_sem)
+    set_no_inheritance (select_sem, val);
 }

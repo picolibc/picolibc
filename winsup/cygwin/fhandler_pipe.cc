@@ -516,6 +516,16 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 }
 
 void
+fhandler_pipe::set_close_on_exec (bool val)
+{
+  fhandler_base::set_close_on_exec (val);
+  if (read_mtx)
+    set_no_inheritance (read_mtx, val);
+  if (select_sem)
+    set_no_inheritance (select_sem, val);
+}
+
+void
 fhandler_pipe::fixup_after_fork (HANDLE parent)
 {
   if (read_mtx)
