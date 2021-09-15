@@ -491,7 +491,6 @@ public:
   bool issymlink () {return pc.issymlink ();}
   bool __reg2 device_access_denied (int);
   int __reg3 fhaccess (int flags, bool);
-  virtual bool __reg1 has_ongoing_io ()  {return false;}
 
   fhandler_base (void *) {}
 

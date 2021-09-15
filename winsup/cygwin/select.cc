@@ -591,9 +591,6 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
   FILE_PIPE_LOCAL_INFORMATION fpli = {0};
   NTSTATUS status;
 
-  if (fh->has_ongoing_io ())
-    return 0;
-
   status = NtQueryInformationFile (h, &iosb, &fpli, sizeof (fpli),
 				   FilePipeLocalInformation);
   if (!NT_SUCCESS (status))
