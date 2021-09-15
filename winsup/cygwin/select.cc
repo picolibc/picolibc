@@ -753,8 +753,11 @@ out:
 	    gotone += s->except_ready = true;
 	  return gotone;
 	}
-      gotone += s->write_ready =  pipe_data_available (s->fd, fh, h, true);
-      select_printf ("write: %s, gotone %d", fh->get_name (), gotone);
+      int n = pipe_data_available (s->fd, fh, h, true);
+      select_printf ("write: %s, n %d", fh->get_name (), n);
+      gotone += s->write_ready = n;
+      if (n < 0 && s->except_selected)
+	gotone += s->except_ready = true;
     }
   return gotone;
 }
@@ -953,9 +956,11 @@ peek_fifo (select_record *s, bool from_select)
 out:
   if (s->write_selected)
     {
-      gotone += s->write_ready
-	= pipe_data_available (s->fd, fh, fh->get_handle (), true);
-      select_printf ("write: %s, gotone %d", fh->get_name (), gotone);
+      int n = pipe_data_available (s->fd, fh, fh->get_handle (), true);
+      select_printf ("write: %s, n %d", fh->get_name (), n);
+      gotone += s->write_ready = n;
+      if (n < 0 && s->except_selected)
+	gotone += s->except_ready = true;
     }
   return gotone;
 }
@@ -1394,8 +1399,11 @@ out:
   HANDLE h = ptys->get_output_handle ();
   if (s->write_selected)
     {
-      gotone += s->write_ready =  pipe_data_available (s->fd, fh, h, true);
-      select_printf ("write: %s, gotone %d", fh->get_name (), gotone);
+      int n = pipe_data_available (s->fd, fh, h, true);
+      select_printf ("write: %s, n %d", fh->get_name (), n);
+      gotone += s->write_ready = n;
+      if (n < 0 && s->except_selected)
+	gotone += s->except_ready = true;
     }
   return gotone;
 }
