@@ -54,13 +54,13 @@ dnl an executable or not.
 dnl
 saved_LDFLAGS="$LDFLAGS"
 LDFLAGS="-nostdlib -e main"
-AC_PREPROC_IFELSE([#ifndef __mcoldfire__
+AC_PREPROC_IFELSE([AC_LANG_PROGRAM([#ifndef __mcoldfire__
 		#error we are not coldfire
-		#endif],
+		#endif])],
 	       DO="cf",)
-AC_PREPROC_IFELSE([#ifndef __mfido__
+AC_PREPROC_IFELSE([AC_LANG_PROGRAM([#ifndef __mfido__
 		#error we are not fido
-		#endif],
+		#endif])],
 	       DO="fido",)
 LDFLAGS=$saved_LDFLAGS
 AC_MSG_RESULT($DO)
