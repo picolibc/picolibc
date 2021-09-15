@@ -226,7 +226,7 @@ sig2str(int signum, char *str)
 }
 
 int
-str2sig(const char *restrict str, int *restrict pnum)
+str2sig(const char *__restrict str, int *__restrict pnum)
 {
   unsigned long j = 0;
   char *endp;
