@@ -587,6 +587,14 @@ no_verify (select_record *, fd_set *, fd_set *, fd_set *)
 static int
 pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
 {
+  if (fh->get_device () == FH_PIPER)
+    {
+      DWORD nbytes_in_pipe;
+      if (!writing && PeekNamedPipe (h, NULL, 0, NULL, &nbytes_in_pipe, NULL))
+	return nbytes_in_pipe > 0;
+      return -1;
+    }
+
   IO_STATUS_BLOCK iosb = {{0}, 0};
   FILE_PIPE_LOCAL_INFORMATION fpli = {0};
   NTSTATUS status;
