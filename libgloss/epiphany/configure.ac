@@ -30,7 +30,7 @@
 
 # Process this file with autoconf to produce a configure script
 
-AC_PREREQ(2.59)
+AC_PREREQ(2.69)dnl
 AC_INIT(libepiphany,0.0.1)
 AC_CONFIG_HEADER(config.h)
 

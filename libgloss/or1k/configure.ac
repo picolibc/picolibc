@@ -14,7 +14,7 @@
 
 # Process this file with autoconf to produce a configure script
 
-AC_PREREQ(2.59)
+AC_PREREQ(2.69)dnl
 AC_INIT(libor1k,0.0.1)
 
 # No shared libraries allowed

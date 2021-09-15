@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_PREREQ(2.59)
+AC_PREREQ(2.69)dnl
 AC_INIT(crt0.S)
 
 AC_CANONICAL_SYSTEM

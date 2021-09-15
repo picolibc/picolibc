@@ -15,7 +15,7 @@
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 dnl Process this file with autoconf to produce a configure script.
-AC_PREREQ(2.59)
+AC_PREREQ(2.69)dnl
 AC_INIT(libsys-crt0.S)
 
 if test "$srcdir" = "." ; then

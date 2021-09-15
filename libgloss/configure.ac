@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_PREREQ(2.59)
+AC_PREREQ(2.69)dnl
 AC_INIT([libgloss],[LIBGLOSS_VERSION])
 AC_CONFIG_SRCDIR([libnosys])
 
@@ -21,7 +21,7 @@ AC_CONFIG_AUX_DIR($libgloss_topdir)
 AC_PROG_INSTALL
 
 AC_CANONICAL_SYSTEM
-AM_INIT_AUTOMAKE([cygnus no-define 1.9.5])
+AM_INIT_AUTOMAKE([foreign no-define 1.15])
 
 if test -z "${with_multisubdir}" ; then
   AC_CONFIG_SUBDIRS([doc])

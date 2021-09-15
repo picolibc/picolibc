@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_PREREQ(2.59)
+AC_PREREQ(2.69)dnl
 AC_INIT(redboot-crt0.S)
 
 dnl Support --disable-newlib-supplied-syscalls
