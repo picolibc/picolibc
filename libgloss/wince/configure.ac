@@ -2,10 +2,10 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.69)dnl
 
-AC_INIT(Makefile.in)
+AC_INIT(wince-stub, 1.0)
 AC_CANONICAL_SYSTEM
 AC_ARG_PROGRAM
-AM_INIT_AUTOMAKE(wince-stub, 1.0)
+AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 
 cross_compiling=yes
