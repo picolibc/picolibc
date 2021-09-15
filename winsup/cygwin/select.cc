@@ -633,17 +633,15 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
       /* Note: Do not use NtQueryInformationFile() for query_hdl because
 	 NtQueryInformationFile() seems to interfere with reading pipes
 	 in non-cygwin apps. Instead, use PeekNamedPipe() here. */
-      if (fh->get_device () == FH_PIPEW)
+      if (fh->get_device () == FH_PIPEW && fpli.WriteQuotaAvailable == 0)
 	{
 	  HANDLE query_hdl = ((fhandler_pipe *) fh)->get_query_handle ();
-	  if (query_hdl)
-	    {
-	      DWORD nbytes_in_pipe;
-	      PeekNamedPipe (query_hdl, NULL, 0, NULL, &nbytes_in_pipe, NULL);
-	      fpli.WriteQuotaAvailable = fpli.InboundQuota - nbytes_in_pipe;
-	    }
-	  else
+	  if (!query_hdl)
+	    return 1; /* We cannot know actual write pipe space. */
+	  DWORD nbytes_in_pipe;
+	  if (!PeekNamedPipe (query_hdl, NULL, 0, NULL, &nbytes_in_pipe, NULL))
 	    return 1;
+	  fpli.WriteQuotaAvailable = fpli.InboundQuota - nbytes_in_pipe;
 	}
       if (fpli.WriteQuotaAvailable > 0)
 	{
