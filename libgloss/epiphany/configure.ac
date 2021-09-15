@@ -72,24 +72,24 @@ AC_DEFINE(HAVE_ASM_POPSECTION_DIRECTIVE, 1,
 
 # Sort out what the symbol prefix is (we could just fix it as '_', but let the
 # script work it out.
-AC_CACHE_CHECK([for symbol prefix], libc_symbol_prefix, [dnl
+AC_CACHE_CHECK([for symbol prefix], libc_cv_symbol_prefix, [dnl
 cat > conftest.c <<\EOF
 foo () { }
 EOF
 dnl
-libc_symbol_prefix=none
+libc_cv_symbol_prefix=none
 if AC_TRY_COMMAND([${CC-cc} -S conftest.c -o - | fgrep "\$foo" > /dev/null]);
 then
-  libc_symbol_prefix='$'
+  libc_cv_symbol_prefix='$'
 else
   if AC_TRY_COMMAND([${CC-cc} -S conftest.c -o - | fgrep "_foo" > /dev/null]);
   then
-    libc_symbol_prefix=_
+    libc_cv_symbol_prefix=_
   fi
 fi
 rm -f conftest* ])
-if test $libc_symbol_prefix != none; then
-  AC_DEFINE_UNQUOTED(__SYMBOL_PREFIX, "$libc_symbol_prefix", [symbol prefix])
+if test $libc_cv_symbol_prefix != none; then
+  AC_DEFINE_UNQUOTED(__SYMBOL_PREFIX, "$libc_cv_symbol_prefix", [symbol prefix])
 else
   AC_DEFINE(__SYMBOL_PREFIX, "", [symbol prefix])
 fi
