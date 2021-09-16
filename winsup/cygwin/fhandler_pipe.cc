@@ -200,7 +200,14 @@ fhandler_pipe::open_setup (int flags)
       SECURITY_ATTRIBUTES *sa = sec_none_cloexec (flags);
       read_mtx = CreateMutex (sa, FALSE, NULL);
       if (!read_mtx)
-	debug_printf ("CreateMutex failed: %E");
+	debug_printf ("CreateMutex read_mtx failed: %E");
+    }
+  if (!hdl_cnt_mtx)
+    {
+      SECURITY_ATTRIBUTES *sa = sec_none_cloexec (flags);
+      hdl_cnt_mtx = CreateMutex (sa, FALSE, NULL);
+      if (!hdl_cnt_mtx)
+	debug_printf ("CreateMutex hdl_cnt_mtx failed: %E");
     }
   if (get_dev () == FH_PIPEW && !query_hdl)
     set_pipe_non_blocking (is_nonblocking ());
@@ -390,8 +397,12 @@ fhandler_pipe_fifo::reader_closed ()
 {
   if (!query_hdl)
     return false;
+  if (hdl_cnt_mtx)
+    WaitForSingleObject (hdl_cnt_mtx, INFINITE);
   int n_reader = get_obj_handle_count (query_hdl);
   int n_writer = get_obj_handle_count (get_handle ());
+  if (hdl_cnt_mtx)
+    ReleaseMutex (hdl_cnt_mtx);
   return n_reader == n_writer;
 }
 
@@ -554,11 +565,18 @@ fhandler_pipe::set_close_on_exec (bool val)
     set_no_inheritance (select_sem, val);
   if (query_hdl)
     set_no_inheritance (query_hdl, val);
+  if (hdl_cnt_mtx)
+    set_no_inheritance (hdl_cnt_mtx, val);
 }
 
 void
 fhandler_pipe::fixup_after_fork (HANDLE parent)
 {
+  if (hdl_cnt_mtx)
+    {
+      fork_fixup (parent, hdl_cnt_mtx, "hdl_cnt_mtx");
+      WaitForSingleObject (hdl_cnt_mtx, INFINITE);
+    }
   if (read_mtx)
     fork_fixup (parent, read_mtx, "read_mtx");
   if (select_sem)
@@ -567,6 +585,8 @@ fhandler_pipe::fixup_after_fork (HANDLE parent)
     fork_fixup (parent, query_hdl, "query_hdl");
 
   fhandler_base::fixup_after_fork (parent);
+  if (hdl_cnt_mtx)
+    ReleaseMutex (hdl_cnt_mtx);
 }
 
 int
@@ -576,6 +596,8 @@ fhandler_pipe::dup (fhandler_base *child, int flags)
   ftp->set_popen_pid (0);
 
   int res = 0;
+  if (hdl_cnt_mtx)
+    WaitForSingleObject (hdl_cnt_mtx, INFINITE);
   if (fhandler_base::dup (child, flags))
     res = -1;
   else if (read_mtx &&
@@ -589,8 +611,8 @@ fhandler_pipe::dup (fhandler_base *child, int flags)
     }
   else if (select_sem &&
 	   !DuplicateHandle (GetCurrentProcess (), select_sem,
-			    GetCurrentProcess (), &ftp->select_sem,
-			    0, !(flags & O_CLOEXEC), DUPLICATE_SAME_ACCESS))
+			     GetCurrentProcess (), &ftp->select_sem,
+			     0, !(flags & O_CLOEXEC), DUPLICATE_SAME_ACCESS))
     {
       __seterrno ();
       ftp->close ();
@@ -598,13 +620,24 @@ fhandler_pipe::dup (fhandler_base *child, int flags)
     }
   else if (query_hdl &&
 	   !DuplicateHandle (GetCurrentProcess (), query_hdl,
-			    GetCurrentProcess (), &ftp->query_hdl,
-			    0, !(flags & O_CLOEXEC), DUPLICATE_SAME_ACCESS))
+			     GetCurrentProcess (), &ftp->query_hdl,
+			     0, !(flags & O_CLOEXEC), DUPLICATE_SAME_ACCESS))
     {
       __seterrno ();
       ftp->close ();
       res = -1;
     }
+  else if (hdl_cnt_mtx &&
+	   !DuplicateHandle (GetCurrentProcess (), hdl_cnt_mtx,
+			     GetCurrentProcess (), &ftp->hdl_cnt_mtx,
+			     0, !(flags & O_CLOEXEC), DUPLICATE_SAME_ACCESS))
+    {
+      __seterrno ();
+      ftp->close ();
+      res = -1;
+    }
+  if (hdl_cnt_mtx)
+    ReleaseMutex (hdl_cnt_mtx);
 
   debug_printf ("res %d", res);
   return res;
@@ -620,9 +653,17 @@ fhandler_pipe::close ()
     }
   if (read_mtx)
     CloseHandle (read_mtx);
+  if (hdl_cnt_mtx)
+    WaitForSingleObject (hdl_cnt_mtx, INFINITE);
   if (query_hdl)
     CloseHandle (query_hdl);
-  return fhandler_base::close ();
+  int ret = fhandler_base::close ();
+  if (hdl_cnt_mtx)
+    {
+      ReleaseMutex (hdl_cnt_mtx);
+      CloseHandle (hdl_cnt_mtx);
+    }
+  return ret;
 }
 
 #define PIPE_INTRO "\\\\.\\pipe\\cygwin-"
@@ -834,9 +875,21 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
 			FILE_READ_DATA, sa->bInheritHandle, 0))
     goto err_close_select_sem1;
 
+  fhs[0]->hdl_cnt_mtx = CreateMutexW (sa, FALSE, NULL);
+  if (!fhs[0]->hdl_cnt_mtx)
+    goto err_close_query_hdl;
+  if (!DuplicateHandle (GetCurrentProcess (), fhs[0]->hdl_cnt_mtx,
+			GetCurrentProcess (), &fhs[1]->hdl_cnt_mtx,
+			0, sa->bInheritHandle, DUPLICATE_SAME_ACCESS))
+    goto err_close_hdl_cnt_mtx0;
+
   res = 0;
   goto out;
 
+err_close_hdl_cnt_mtx0:
+  CloseHandle (fhs[0]->hdl_cnt_mtx);
+err_close_query_hdl:
+  CloseHandle (fhs[1]->query_hdl);
 err_close_select_sem1:
   CloseHandle (fhs[1]->select_sem);
 err_close_select_sem0:

@@ -1176,6 +1176,7 @@ class fhandler_pipe_fifo: public fhandler_base
  protected:
   size_t pipe_buf_size;
   HANDLE query_hdl;
+  HANDLE hdl_cnt_mtx;
   virtual void release_select_sem (const char *) {};
 
  public:
