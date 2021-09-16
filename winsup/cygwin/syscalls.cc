@@ -95,7 +95,7 @@ close_all_files (bool norelease)
       if (cfd >= 0)
 	{
 	  debug_only_printf ("closing fd %d", i);
-	  if (i == 2)
+	  if (i == 2 && cfd->get_dev () != FH_PIPEW)
 	    DuplicateHandle (GetCurrentProcess (), cfd->get_output_handle (),
 			     GetCurrentProcess (), &h,
 			     0, false, DUPLICATE_SAME_ACCESS);
