@@ -803,61 +803,56 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
 
   int ret = nt_create (sa, r, w, psize, &unique_id);
   if (ret)
-    __seterrno_from_win_error (ret);
-  else if ((fhs[0] = (fhandler_pipe *) build_fh_dev (*piper_dev)) == NULL)
     {
-      NtClose (r);
-      NtClose (w);
+      __seterrno_from_win_error (ret);
+      goto out;
     }
-  else if ((fhs[1] = (fhandler_pipe *) build_fh_dev (*pipew_dev)) == NULL)
-    {
-      delete fhs[0];
-      NtClose (r);
-      NtClose (w);
-    }
-  else
-    {
-      mode |= mode & O_TEXT ?: O_BINARY;
-      fhs[0]->init (r, FILE_CREATE_PIPE_INSTANCE | GENERIC_READ, mode,
-		    unique_id);
-      fhs[1]->init (w, FILE_CREATE_PIPE_INSTANCE | GENERIC_WRITE, mode,
-		    unique_id);
-      /* For the read side of the pipe, add a mutex.  See raw_read for the
-	 usage. */
-      HANDLE mtx = CreateMutexW (sa, FALSE, NULL);
-      if (!mtx)
-	{
-	  delete fhs[0];
-	  NtClose (r);
-	  delete fhs[1];
-	  NtClose (w);
-	}
-      else
-	{
-	  fhs[0]->set_read_mutex (mtx);
-	  res = 0;
-	}
-      fhs[0]->select_sem = CreateSemaphore (sa, 0, INT32_MAX, NULL);
-      if (fhs[0]->select_sem)
-	DuplicateHandle (GetCurrentProcess (), fhs[0]->select_sem,
-			 GetCurrentProcess (), &fhs[1]->select_sem,
-			 0, sa->bInheritHandle, DUPLICATE_SAME_ACCESS);
-      if (!DuplicateHandle (GetCurrentProcess (), r,
-			    GetCurrentProcess (), &fhs[1]->query_hdl,
-			    FILE_READ_DATA, sa->bInheritHandle, 0))
-	{
-	  CloseHandle (fhs[0]->select_sem);
-	  delete fhs[0];
-	  CloseHandle (r);
-	  CloseHandle (fhs[1]->select_sem);
-	  delete fhs[1];
-	  CloseHandle (w);
-	}
-      else
-	res = 0;
-    }
+  if ((fhs[0] = (fhandler_pipe *) build_fh_dev (*piper_dev)) == NULL)
+    goto err_close_rw_handle;
+  if ((fhs[1] = (fhandler_pipe *) build_fh_dev (*pipew_dev)) == NULL)
+    goto err_delete_fhs0;
+  mode |= mode & O_TEXT ?: O_BINARY;
+  fhs[0]->init (r, FILE_CREATE_PIPE_INSTANCE | GENERIC_READ, mode, unique_id);
+  fhs[1]->init (w, FILE_CREATE_PIPE_INSTANCE | GENERIC_WRITE, mode, unique_id);
 
-  debug_printf ("%R = pipe([%p, %p], %d, %y)", res, fhs[0], fhs[1], psize, mode);
+  /* For the read side of the pipe, add a mutex.  See raw_read for the
+     usage. */
+  fhs[0]->read_mtx = CreateMutexW (sa, FALSE, NULL);
+  if (!fhs[0]->read_mtx)
+    goto err_delete_fhs1;
+
+  fhs[0]->select_sem = CreateSemaphore (sa, 0, INT32_MAX, NULL);
+  if (!fhs[0]->select_sem)
+    goto err_close_read_mtx;
+  if (!DuplicateHandle (GetCurrentProcess (), fhs[0]->select_sem,
+			GetCurrentProcess (), &fhs[1]->select_sem,
+			0, sa->bInheritHandle, DUPLICATE_SAME_ACCESS))
+    goto err_close_select_sem0;
+
+  if (!DuplicateHandle (GetCurrentProcess (), r,
+			GetCurrentProcess (), &fhs[1]->query_hdl,
+			FILE_READ_DATA, sa->bInheritHandle, 0))
+    goto err_close_select_sem1;
+
+  res = 0;
+  goto out;
+
+err_close_select_sem1:
+  CloseHandle (fhs[1]->select_sem);
+err_close_select_sem0:
+  CloseHandle (fhs[0]->select_sem);
+err_close_read_mtx:
+  CloseHandle (fhs[0]->read_mtx);
+err_delete_fhs1:
+  delete fhs[1];
+err_delete_fhs0:
+  delete fhs[0];
+err_close_rw_handle:
+  NtClose (r);
+  NtClose (w);
+out:
+  debug_printf ("%R = pipe([%p, %p], %d, %y)",
+		res, fhs[0], fhs[1], psize, mode);
   return res;
 }
 

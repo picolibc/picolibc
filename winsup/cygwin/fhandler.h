@@ -1206,7 +1206,6 @@ public:
   fhandler_pipe ();
 
   bool ispipe() const { return true; }
-  void set_read_mutex (HANDLE mtx) { read_mtx = mtx; }
   void set_pipe_buf_size ();
 
   void set_popen_pid (pid_t pid) {popen_pid = pid;}
