@@ -1175,26 +1175,13 @@ class fhandler_pipe_fifo: public fhandler_base
 {
  protected:
   size_t pipe_buf_size;
-  HANDLE query_hdl;
-  HANDLE hdl_cnt_mtx;
   virtual void release_select_sem (const char *) {};
 
  public:
   fhandler_pipe_fifo ();
 
-  HANDLE get_query_handle () const { return query_hdl; }
-  void close_query_handle ()
-  {
-    if (query_hdl)
-      {
-	CloseHandle (query_hdl);
-	query_hdl = NULL;
-      }
-  }
-  bool reader_closed ();
-
+  virtual bool reader_closed () { return false; };
   ssize_t __reg3 raw_write (const void *ptr, size_t len);
-
 };
 
 class fhandler_pipe: public fhandler_pipe_fifo
@@ -1202,6 +1189,8 @@ class fhandler_pipe: public fhandler_pipe_fifo
 private:
   HANDLE read_mtx;
   pid_t popen_pid;
+  HANDLE query_hdl;
+  HANDLE hdl_cnt_mtx;
   void release_select_sem (const char *);
 public:
   fhandler_pipe ();
@@ -1250,6 +1239,16 @@ public:
     return fh;
   }
   void set_pipe_non_blocking (bool nonblocking);
+  HANDLE get_query_handle () const { return query_hdl; }
+  void close_query_handle ()
+  {
+    if (query_hdl)
+      {
+	CloseHandle (query_hdl);
+	query_hdl = NULL;
+      }
+  }
+  bool reader_closed ();
 };
 
 #define CYGWIN_FIFO_PIPE_NAME_LEN     47

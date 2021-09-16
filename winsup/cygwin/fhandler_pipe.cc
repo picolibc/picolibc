@@ -393,7 +393,7 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
 }
 
 bool
-fhandler_pipe_fifo::reader_closed ()
+fhandler_pipe::reader_closed ()
 {
   if (!query_hdl)
     return false;
