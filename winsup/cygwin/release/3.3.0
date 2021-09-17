@@ -25,7 +25,7 @@ What changed:
 
 - The internal implementation of pipes has been overhauled; this
   should result in improved performance.
-  Adresses: https://cygwin.com/pipermail/cygwin/2021-August/249238.html
+  Addresses: https://cygwin.com/pipermail/cygwin/2021-August/249238.html
 
 
 Bug Fixes
@@ -64,7 +64,7 @@ Bug Fixes
   Addresses: https://cygwin.com/pipermail/cygwin/2021-July/248970.html
 
 - Fix getaddrinfo(3) to return valid ai_socktype and ai_protocol values
-  if the underlying GetAddrInfoW screwes up.
+  if the underlying GetAddrInfoW screws up.
   Addresses: https://cygwin.com/pipermail/cygwin/2021-July/248985.html
 
 - Fix duplicate /proc/partitions entries and (presumably) duplicate PIDs
