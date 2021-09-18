@@ -194,26 +194,39 @@ out:
 bool
 fhandler_pipe::open_setup (int flags)
 {
+  bool read_mtx_created = false;
+
   if (!fhandler_base::open_setup (flags))
     goto err;
   if (get_dev () == FH_PIPER && !read_mtx)
     {
       SECURITY_ATTRIBUTES *sa = sec_none_cloexec (flags);
       read_mtx = CreateMutex (sa, FALSE, NULL);
-      if (!read_mtx)
-	debug_printf ("CreateMutex read_mtx failed: %E");
+      if (read_mtx)
+	read_mtx_created = true;
+      else
+	{
+	  debug_printf ("CreateMutex read_mtx failed: %E");
+	  goto err;
+	}
     }
   if (!hdl_cnt_mtx)
     {
       SECURITY_ATTRIBUTES *sa = sec_none_cloexec (flags);
       hdl_cnt_mtx = CreateMutex (sa, FALSE, NULL);
       if (!hdl_cnt_mtx)
-	debug_printf ("CreateMutex hdl_cnt_mtx failed: %E");
+	{
+	  debug_printf ("CreateMutex hdl_cnt_mtx failed: %E");
+	  goto err_close_read_mtx;
+	}
     }
   if (get_dev () == FH_PIPEW && !query_hdl)
     set_pipe_non_blocking (is_nonblocking ());
   return true;
 
+err_close_read_mtx:
+  if (read_mtx_created)
+    CloseHandle (read_mtx);
 err:
   return false;
 }
