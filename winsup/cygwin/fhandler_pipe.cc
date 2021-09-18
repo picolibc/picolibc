@@ -415,12 +415,10 @@ fhandler_pipe::reader_closed ()
 {
   if (!query_hdl)
     return false;
-  if (hdl_cnt_mtx)
-    WaitForSingleObject (hdl_cnt_mtx, INFINITE);
+  WaitForSingleObject (hdl_cnt_mtx, INFINITE);
   int n_reader = get_obj_handle_count (query_hdl);
   int n_writer = get_obj_handle_count (get_handle ());
-  if (hdl_cnt_mtx)
-    ReleaseMutex (hdl_cnt_mtx);
+  ReleaseMutex (hdl_cnt_mtx);
   return n_reader == n_writer;
 }
 
@@ -583,18 +581,14 @@ fhandler_pipe::set_close_on_exec (bool val)
     set_no_inheritance (select_sem, val);
   if (query_hdl)
     set_no_inheritance (query_hdl, val);
-  if (hdl_cnt_mtx)
-    set_no_inheritance (hdl_cnt_mtx, val);
+  set_no_inheritance (hdl_cnt_mtx, val);
 }
 
 void
 fhandler_pipe::fixup_after_fork (HANDLE parent)
 {
-  if (hdl_cnt_mtx)
-    {
-      fork_fixup (parent, hdl_cnt_mtx, "hdl_cnt_mtx");
-      WaitForSingleObject (hdl_cnt_mtx, INFINITE);
-    }
+  fork_fixup (parent, hdl_cnt_mtx, "hdl_cnt_mtx");
+  WaitForSingleObject (hdl_cnt_mtx, INFINITE);
   if (read_mtx)
     fork_fixup (parent, read_mtx, "read_mtx");
   if (select_sem)
@@ -603,8 +597,7 @@ fhandler_pipe::fixup_after_fork (HANDLE parent)
     fork_fixup (parent, query_hdl, "query_hdl");
 
   fhandler_base::fixup_after_fork (parent);
-  if (hdl_cnt_mtx)
-    ReleaseMutex (hdl_cnt_mtx);
+  ReleaseMutex (hdl_cnt_mtx);
 }
 
 int
@@ -614,8 +607,7 @@ fhandler_pipe::dup (fhandler_base *child, int flags)
   ftp->set_popen_pid (0);
 
   int res = 0;
-  if (hdl_cnt_mtx)
-    WaitForSingleObject (hdl_cnt_mtx, INFINITE);
+  WaitForSingleObject (hdl_cnt_mtx, INFINITE);
   if (fhandler_base::dup (child, flags))
     res = -1;
   else if (read_mtx &&
@@ -645,8 +637,7 @@ fhandler_pipe::dup (fhandler_base *child, int flags)
       ftp->close ();
       res = -1;
     }
-  else if (hdl_cnt_mtx &&
-	   !DuplicateHandle (GetCurrentProcess (), hdl_cnt_mtx,
+  else if (!DuplicateHandle (GetCurrentProcess (), hdl_cnt_mtx,
 			     GetCurrentProcess (), &ftp->hdl_cnt_mtx,
 			     0, !(flags & O_CLOEXEC), DUPLICATE_SAME_ACCESS))
     {
@@ -654,8 +645,7 @@ fhandler_pipe::dup (fhandler_base *child, int flags)
       ftp->close ();
       res = -1;
     }
-  if (hdl_cnt_mtx)
-    ReleaseMutex (hdl_cnt_mtx);
+  ReleaseMutex (hdl_cnt_mtx);
 
   debug_printf ("res %d", res);
   return res;
@@ -671,16 +661,12 @@ fhandler_pipe::close ()
     }
   if (read_mtx)
     CloseHandle (read_mtx);
-  if (hdl_cnt_mtx)
-    WaitForSingleObject (hdl_cnt_mtx, INFINITE);
+  WaitForSingleObject (hdl_cnt_mtx, INFINITE);
   if (query_hdl)
     CloseHandle (query_hdl);
   int ret = fhandler_base::close ();
-  if (hdl_cnt_mtx)
-    {
-      ReleaseMutex (hdl_cnt_mtx);
-      CloseHandle (hdl_cnt_mtx);
-    }
+  ReleaseMutex (hdl_cnt_mtx);
+  CloseHandle (hdl_cnt_mtx);
   return ret;
 }
 
