@@ -789,9 +789,10 @@ fhandler_base::fd_reopen (int, mode_t)
   return NULL;
 }
 
-void
+bool
 fhandler_base::open_setup (int)
 {
+  return true;
 }
 
 /* states:

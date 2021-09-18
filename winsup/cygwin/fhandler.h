@@ -355,7 +355,7 @@ class fhandler_base
   int open_null (int flags);
   virtual int open (int, mode_t);
   virtual fhandler_base *fd_reopen (int, mode_t);
-  virtual void open_setup (int flags);
+  virtual bool open_setup (int flags);
   void set_unique_id (int64_t u) { unique_id = u; }
   void set_unique_id () { NtAllocateLocallyUniqueId ((PLUID) &unique_id); }
 
@@ -1206,7 +1206,7 @@ public:
   select_record *select_except (select_stuff *);
   char *get_proc_fd_name (char *buf);
   int open (int flags, mode_t mode = 0);
-  void open_setup (int flags);
+  bool open_setup (int flags);
   void fixup_after_fork (HANDLE);
   int dup (fhandler_base *child, int);
   void set_close_on_exec (bool val);
@@ -2132,7 +2132,7 @@ private:
   bool use_archetype () const {return true;}
 
   int open (int flags, mode_t mode);
-  void open_setup (int flags);
+  bool open_setup (int flags);
   int dup (fhandler_base *, int);
 
   void __reg3 read (void *ptr, size_t& len);
@@ -2300,7 +2300,7 @@ class fhandler_pty_slave: public fhandler_pty_common
   HANDLE& get_handle_nat () { return io_handle_nat; }
 
   int open (int flags, mode_t mode = 0);
-  void open_setup (int flags);
+  bool open_setup (int flags);
   ssize_t __stdcall write (const void *ptr, size_t len);
   void __reg3 read (void *ptr, size_t& len);
   int init (HANDLE, DWORD, mode_t);
@@ -2399,7 +2399,7 @@ public:
   void doecho (const void *str, DWORD len);
   int accept_input ();
   int open (int flags, mode_t mode = 0);
-  void open_setup (int flags);
+  bool open_setup (int flags);
   ssize_t __stdcall write (const void *ptr, size_t len);
   void __reg3 read (void *ptr, size_t& len);
   int close ();

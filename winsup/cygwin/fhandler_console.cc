@@ -1366,13 +1366,13 @@ fhandler_console::open (int flags, mode_t)
   return 1;
 }
 
-void
+bool
 fhandler_console::open_setup (int flags)
 {
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   if (myself->set_ctty (this, flags) && !myself->cygstarted)
     init_console_handler (true);
-  fhandler_base::open_setup (flags);
+  return fhandler_base::open_setup (flags);
 }
 
 int

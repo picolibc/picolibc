@@ -964,13 +964,13 @@ err_no_msg:
   return 0;
 }
 
-void
+bool
 fhandler_pty_slave::open_setup (int flags)
 {
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   myself->set_ctty (this, flags);
   report_tty_counts (this, "opened", "");
-  fhandler_base::open_setup (flags);
+  return fhandler_base::open_setup (flags);
 }
 
 void
@@ -1947,14 +1947,14 @@ fhandler_pty_master::open (int flags, mode_t)
   return 1;
 }
 
-void
+bool
 fhandler_pty_master::open_setup (int flags)
 {
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   char buf[sizeof ("opened pty master for ptyNNNNNNNNNNN")];
   __small_sprintf (buf, "opened pty master for pty%d", get_minor ());
   report_tty_counts (this, buf, "");
-  fhandler_base::open_setup (flags);
+  return fhandler_base::open_setup (flags);
 }
 
 off_t

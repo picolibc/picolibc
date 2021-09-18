@@ -191,10 +191,11 @@ out:
   return 0;
 }
 
-void
+bool
 fhandler_pipe::open_setup (int flags)
 {
-  fhandler_base::open_setup (flags);
+  if (!fhandler_base::open_setup (flags))
+    goto err;
   if (get_dev () == FH_PIPER && !read_mtx)
     {
       SECURITY_ATTRIBUTES *sa = sec_none_cloexec (flags);
@@ -211,6 +212,10 @@ fhandler_pipe::open_setup (int flags)
     }
   if (get_dev () == FH_PIPEW && !query_hdl)
     set_pipe_non_blocking (is_nonblocking ());
+  return true;
+
+err:
+  return false;
 }
 
 off_t
