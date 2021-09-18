@@ -412,7 +412,8 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	  fhp->set_pipe_buf_size ();
 	}
 
-      fh->open_setup (openflags);
+      if (!fh->open_setup (openflags))
+	api_fatal ("open_setup failed, %E");
       fh->usecount = 0;
       cygheap->fdtab[fd] = fh;
       cygheap->fdtab[fd]->inc_refcnt ();

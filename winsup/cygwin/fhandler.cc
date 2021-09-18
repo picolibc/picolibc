@@ -471,7 +471,8 @@ fhandler_base::open_with_arch (int flags, mode_t mode)
 	  archetype_usecount (1);
 	  usecount = 0;
 	}
-      open_setup (flags);
+      if (!open_setup (flags))
+	api_fatal ("open_setup failed, %E");
     }
 
   close_on_exec (flags & O_CLOEXEC);
