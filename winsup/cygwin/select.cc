@@ -642,9 +642,15 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
 	{
 	  HANDLE query_hdl = ((fhandler_pipe *) fh)->get_query_handle ();
 	  if (!query_hdl)
+	    query_hdl = ((fhandler_pipe *) fh)->temporary_query_hdl ();
+	  if (!query_hdl)
 	    return 1; /* We cannot know actual write pipe space. */
 	  DWORD nbytes_in_pipe;
-	  if (!PeekNamedPipe (query_hdl, NULL, 0, NULL, &nbytes_in_pipe, NULL))
+	  BOOL res =
+	    PeekNamedPipe (query_hdl, NULL, 0, NULL, &nbytes_in_pipe, NULL);
+	  if (!((fhandler_pipe *) fh)->get_query_handle ())
+	    CloseHandle (query_hdl); /* Close temporary query_hdl */
+	  if (!res)
 	    return 1;
 	  fpli.WriteQuotaAvailable = fpli.InboundQuota - nbytes_in_pipe;
 	}

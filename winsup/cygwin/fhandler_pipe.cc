@@ -19,6 +19,7 @@ details. */
 #include "cygheap.h"
 #include "pinfo.h"
 #include "shared_info.h"
+#include "tls_pbuf.h"
 
 /* This is only to be used for writing.  When reading,
 STATUS_PIPE_EMPTY simply means there's no data to be read. */
@@ -220,8 +221,6 @@ fhandler_pipe::open_setup (int flags)
 	  goto err_close_read_mtx;
 	}
     }
-  if (get_dev () == FH_PIPEW && !query_hdl)
-    set_pipe_non_blocking (is_nonblocking ());
   return true;
 
 err_close_read_mtx:
@@ -267,7 +266,7 @@ fhandler_pipe::release_select_sem (const char *from)
       - get_obj_handle_count (read_mtx);
   else /* Number of select() call */
     n_release = get_obj_handle_count (select_sem)
-      - get_obj_handle_count (query_hdl);
+      - get_obj_handle_count (hdl_cnt_mtx);
   debug_printf("%s(%s) release %d", from,
 	       get_dev () == FH_PIPER ? "PIPER" : "PIPEW", n_release);
   if (n_release)
@@ -667,6 +666,8 @@ fhandler_pipe::close ()
   int ret = fhandler_base::close ();
   ReleaseMutex (hdl_cnt_mtx);
   CloseHandle (hdl_cnt_mtx);
+  if (query_hdl_proc)
+    CloseHandle (query_hdl_proc);
   return ret;
 }
 
@@ -820,6 +821,13 @@ fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
   return 0;
 }
 
+inline static bool
+is_running_as_service (void)
+{
+  return check_token_membership (well_known_service_sid)
+    || cygheap->user.saved_sid () == well_known_system_sid;
+}
+
 /* The next version of fhandler_pipe::create used to call the previous
    version.  But the read handle created by the latter doesn't have
    FILE_WRITE_ATTRIBUTES access unless the pipe is created with
@@ -874,7 +882,8 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
 			0, sa->bInheritHandle, DUPLICATE_SAME_ACCESS))
     goto err_close_select_sem0;
 
-  if (!DuplicateHandle (GetCurrentProcess (), r,
+  if (is_running_as_service () &&
+      !DuplicateHandle (GetCurrentProcess (), r,
 			GetCurrentProcess (), &fhs[1]->query_hdl,
 			FILE_READ_DATA, sa->bInheritHandle, 0))
     goto err_close_select_sem1;
@@ -893,7 +902,8 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
 err_close_hdl_cnt_mtx0:
   CloseHandle (fhs[0]->hdl_cnt_mtx);
 err_close_query_hdl:
-  CloseHandle (fhs[1]->query_hdl);
+  if (fhs[1]->query_hdl)
+    CloseHandle (fhs[1]->query_hdl);
 err_close_select_sem1:
   CloseHandle (fhs[1]->select_sem);
 err_close_select_sem0:
@@ -946,6 +956,7 @@ nt_create (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE &r, HANDLE &w,
 				 GetCurrentProcessId ());
 
   access = GENERIC_READ | FILE_WRITE_ATTRIBUTES | SYNCHRONIZE;
+  access |= FILE_WRITE_EA; /* Add this right as a marker of cygwin read pipe */
 
   ULONG pipe_type = pipe_byte ? FILE_PIPE_BYTE_STREAM_TYPE
     : FILE_PIPE_MESSAGE_TYPE;
@@ -1111,4 +1122,119 @@ fhandler_pipe::fstatvfs (struct statvfs *sfs)
 {
   set_errno (EBADF);
   return -1;
+}
+
+HANDLE
+fhandler_pipe::temporary_query_hdl ()
+{
+  if (get_dev () != FH_PIPEW)
+    return NULL;
+
+  ULONG len;
+  NTSTATUS status;
+  tmp_pathbuf tp;
+  OBJECT_NAME_INFORMATION *ntfn = (OBJECT_NAME_INFORMATION *) tp.w_get ();
+
+  /* Try process handle opened and pipe handle value cached first
+     in order to reduce overhead. */
+  if (query_hdl_proc && query_hdl_value)
+    {
+      HANDLE h;
+      if (!DuplicateHandle (query_hdl_proc, query_hdl_value,
+			   GetCurrentProcess (), &h, FILE_READ_DATA, 0, 0))
+	goto cache_err;
+      /* Check name */
+      status = NtQueryObject (h, ObjectNameInformation, ntfn, 65536, &len);
+      if (!NT_SUCCESS (status) || !ntfn->Name.Buffer)
+	goto hdl_err;
+      ntfn->Name.Buffer[ntfn->Name.Length / sizeof (WCHAR)] = L'\0';
+      uint64_t key;
+      DWORD pid;
+      LONG id;
+      if (swscanf (ntfn->Name.Buffer,
+		   L"\\Device\\NamedPipe\\%llx-%u-pipe-nt-0x%x",
+		   &key, &pid, &id) == 3 &&
+	  key == pipename_key && pid == pipename_pid && id == pipename_id)
+	return h;
+hdl_err:
+      CloseHandle (h);
+cache_err:
+      CloseHandle (query_hdl_proc);
+      query_hdl_proc = NULL;
+      query_hdl_value = NULL;
+    }
+
+  status = NtQueryObject (get_handle (), ObjectNameInformation, ntfn,
+			  65536, &len);
+  if (!NT_SUCCESS (status) || !ntfn->Name.Buffer)
+    return NULL; /* Non cygwin pipe? */
+  WCHAR name[MAX_PATH];
+  int namelen = min (ntfn->Name.Length / sizeof (WCHAR), MAX_PATH-1);
+  memcpy (name, ntfn->Name.Buffer, namelen * sizeof (WCHAR));
+  name[namelen] = L'\0';
+  if (swscanf (name, L"\\Device\\NamedPipe\\%llx-%u-pipe-nt-0x%x",
+	       &pipename_key, &pipename_pid, &pipename_id) != 3)
+    return NULL; /* Non cygwin pipe? */
+
+  SIZE_T n_handle = 65536;
+  PSYSTEM_HANDLE_INFORMATION shi;
+  do
+    {
+      SIZE_T nbytes =
+	sizeof (ULONG) + n_handle * sizeof (SYSTEM_HANDLE_TABLE_ENTRY_INFO);
+      shi = (PSYSTEM_HANDLE_INFORMATION) HeapAlloc (GetProcessHeap (),
+						     0, nbytes);
+      if (!shi)
+	return NULL;
+      status = NtQuerySystemInformation (SystemHandleInformation,
+					 shi, nbytes, NULL);
+      if (NT_SUCCESS (status))
+	break;
+      HeapFree (GetProcessHeap (), 0, shi);
+      n_handle *= 2;
+    }
+  while (n_handle < (1L<<20));
+  if (!NT_SUCCESS (status))
+    return NULL;
+
+  HANDLE qh = NULL;
+  for (LONG i = (LONG) shi->NumberOfHandles - 1; i >= 0; i--)
+    {
+      /* Check for the peculiarity of cygwin read pipe */
+      DWORD access = FILE_READ_DATA | FILE_READ_EA | FILE_WRITE_EA /* marker */
+	| FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES
+	| READ_CONTROL | SYNCHRONIZE;
+      if (shi->Handles[i].GrantedAccess != access)
+	continue;
+
+      /* Retrieve handle */
+      HANDLE proc = OpenProcess (PROCESS_DUP_HANDLE, 0,
+				 shi->Handles[i].UniqueProcessId);
+      if (!proc)
+	continue;
+      HANDLE h = (HANDLE)(intptr_t) shi->Handles[i].HandleValue;
+      BOOL res  = DuplicateHandle (proc, h, GetCurrentProcess (), &h,
+				   FILE_READ_DATA, 0, 0);
+      if (!res)
+	goto close_proc;
+
+      /* Check object name */
+      status = NtQueryObject (h, ObjectNameInformation, ntfn, 65536, &len);
+      if (!NT_SUCCESS (status) || !ntfn->Name.Buffer)
+	goto close_handle;
+      ntfn->Name.Buffer[ntfn->Name.Length / sizeof (WCHAR)] = L'\0';
+      if (wcscmp (name, ntfn->Name.Buffer) == 0)
+	{
+	  query_hdl_proc = proc;
+	  query_hdl_value = (HANDLE)(intptr_t) shi->Handles[i].HandleValue;
+	  qh = h;
+	  break;
+	}
+close_handle:
+      CloseHandle (h);
+close_proc:
+      CloseHandle (proc);
+    }
+  HeapFree (GetProcessHeap (), 0, shi);
+  return qh;
 }

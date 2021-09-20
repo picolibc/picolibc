@@ -1191,6 +1191,11 @@ private:
   pid_t popen_pid;
   HANDLE query_hdl;
   HANDLE hdl_cnt_mtx;
+  HANDLE query_hdl_proc;
+  HANDLE query_hdl_value;
+  uint64_t pipename_key;
+  DWORD pipename_pid;
+  LONG pipename_id;
   void release_select_sem (const char *);
 public:
   fhandler_pipe ();
@@ -1249,6 +1254,7 @@ public:
       }
   }
   bool reader_closed ();
+  HANDLE temporary_query_hdl ();
 };
 
 #define CYGWIN_FIFO_PIPE_NAME_LEN     47
