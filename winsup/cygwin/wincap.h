@@ -44,6 +44,7 @@ struct wincaps
     unsigned has_tcp_fastopen					: 1;
     unsigned has_linux_tcp_keepalive_sockopts			: 1;
     unsigned has_tcp_maxrtms					: 1;
+    unsigned has_query_process_handle_info			: 1;
   };
 };
 
@@ -111,6 +112,7 @@ public:
   bool	IMPLEMENT (has_tcp_fastopen)
   bool	IMPLEMENT (has_linux_tcp_keepalive_sockopts)
   bool	IMPLEMENT (has_tcp_maxrtms)
+  bool	IMPLEMENT (has_query_process_handle_info)
 
   void disable_case_sensitive_dirs ()
   {
