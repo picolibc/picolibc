@@ -2904,7 +2904,7 @@ stripspaces:
   else				/* account for sign + max precision digs + E + exp sign + exponent */
     i = orig_ndigits + MAX_EXP_DIGITS + 4;
 
-  outstr = _alloc_dtoa_result(i);
+  outstr = __alloc_dtoa_result(i);
   if (!outstr)
     return NULL;
 
