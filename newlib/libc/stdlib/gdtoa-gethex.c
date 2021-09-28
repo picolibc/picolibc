@@ -165,6 +165,7 @@ gethex (const char **sp, const FPI *fpi,
 	const unsigned char *decimalpoint = (const unsigned char *) ".";
 	const size_t decp_len = 1;
 	const unsigned char decp_end = (unsigned char) '.';
+        (void) loc;
 #endif
 
 	havedig = 0;

@@ -228,7 +228,6 @@ sig2str(int signum, char *str)
 int
 str2sig(const char *__restrict str, int *__restrict pnum)
 {
-  unsigned long j = 0;
   char *endp;
   const sig_name_and_num *sptr;
   unsigned long is_valid_decimal;
@@ -241,7 +240,7 @@ str2sig(const char *__restrict str, int *__restrict pnum)
     /* If str is in RT signal range, get number of of RT signal, save it as an
     * integer. */
     if (strncmp(str, "RTMIN+", SPACES_TO_N) == 0) {
-      j = strtoul(&str[SPACES_TO_N], &endp, 10);
+      unsigned long j = strtoul(&str[SPACES_TO_N], &endp, 10);
 
       /* If number is valid, save it in pnum. */
       if (*endp == '\0') {
@@ -258,7 +257,7 @@ str2sig(const char *__restrict str, int *__restrict pnum)
     /* If str is in RT signal range, get number of of RT signal, save it as an
     * integer. */
     if (strncmp(str, "RTMAX-", SPACES_TO_N) == 0) {
-      j = strtoul(&str[SPACES_TO_N], &endp, 10); // and endptr null check
+      unsigned long j = strtoul(&str[SPACES_TO_N], &endp, 10); // and endptr null check
 
       /* If number is valid, save it in pnum. */
       if (*endp == '\0') {
