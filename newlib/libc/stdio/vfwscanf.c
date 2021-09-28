@@ -282,6 +282,7 @@ _sungetwc_r (struct _reent *data,
       fp->_p -= sizeof (wchar_t);
       fp->_r += sizeof (wchar_t);
     }
+
   return wc;
 }
 

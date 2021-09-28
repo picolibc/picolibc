@@ -51,6 +51,7 @@ well as OS-specific portions of the build system, without approval.
 
 RTEMS			Joel Sherrill		joel.sherrill@oarcorp.com
 			Sebastian Huber		sebastian.huber@embedded-brains.de
+simulator		Mike Frysinger		vapier@gentoo.org
 
 			Write After Approval
 
@@ -64,3 +65,4 @@ Eric Blake			eblake@redhat.com
 Will Newton			will.newton@linaro.org
 Sebastian Huber			sebastian.huber@embedded-brains.de
 Joel Sherrill			joel.sherrill@oarcorp.com
+Mike Frysinger			vapier@gentoo.org

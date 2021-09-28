@@ -98,7 +98,7 @@ tiny   = 1.0e-300;
 	    k = ((hx&0x7ff00000)>>20) - 54; 
             if (n< -50000) erange(tiny*x); 	/*underflow*/
 	    }
-        if (k==0x7ff) return x;		        /* NaN or Inf */
+        if (k==0x7ff) return x+x;		/* NaN or Inf */
         if (n > 50000) 	/* in case integer overflow in n+k */
             erange(huge*copysign(huge,x));	/*overflow*/
         k = k+n; 

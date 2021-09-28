@@ -15,6 +15,7 @@
 
 #include <errno.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #undef errno
 extern int errno;
 
@@ -23,12 +24,36 @@ close(int fd) {
   return -1;
 }
 
+int
+fstat (int fd, struct stat *buf) {
+  return -1;
+}
+
+int
+isatty (int fd) {
+  return fd == 1;
+}
+
 off_t
 lseek(int fd, off_t offset, int whence) {
   return 0;
 }
 
 int
+open (const char *pathname, int flags, ...) {
+  return -1;
+}
+
+int
 read(int fd, void *buf, size_t count) {
   return 0;
+}
+
+void
+sync (void) {
+}
+
+int
+unlink (const char *pathname) {
+  return -1;
 }

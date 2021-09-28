@@ -49,6 +49,7 @@
 #else
 #define MALLOC_LOCK __LIBC_LOCK()
 #define MALLOC_UNLOCK __LIBC_UNLOCK()
+#undef assert
 #define assert(x) ((void)0)
 #endif
 
