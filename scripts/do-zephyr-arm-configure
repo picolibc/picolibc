@@ -35,4 +35,4 @@
 #
 PREFIX=$HOME/zephyr-sdk
 ARCH=arm-zephyr-eabi
-exec `dirname $0`/do-configure "$ARCH" -Dprefix="$PREFIX" -Dtests=true "$@"
+exec "$(dirname "$0")"/do-configure "$ARCH" -Dprefix="$PREFIX" -Dtests=true "$@"

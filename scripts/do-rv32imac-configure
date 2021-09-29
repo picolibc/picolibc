@@ -34,7 +34,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 ARCH=riscv64-unknown-elf
-DIR=`dirname $0`
+DIR="$(dirname "$0")"
 meson "$DIR"/.. \
 	-Dtests=true \
 	-Dmultilib=false \

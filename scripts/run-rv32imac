@@ -36,7 +36,7 @@
 
 # Run qemu for rv32imac processor
 
-qemu=qemu-system-riscv32
+qemu="qemu-system-riscv32"
 options="i m a c"
 cpu=rv32
 
@@ -47,18 +47,18 @@ shift
 cpu="$cpu,mmu=false,pmp=false"
 
 if [ -z "$options" ]; then
-    options=`echo $elf | sed 's/.*rv[36][24]\([a-z]*\)_.*$/\1/' | sed 's/\(.\)/\1 /g'`
+    options="$(echo "$elf" | sed 's/.*rv[36][24]\([a-z]*\)_.*$/\1/' | sed 's/\(.\)/\1 /g')"
 fi
 
 all_options="i e g m a f d c s u"
 
 for o in $all_options; do
-    if `echo $options | grep -q $o`; then
+    if echo "$options" | grep -q "$o"; then
 	value=true
     else
 	value=false
     fi
-    cpu=$cpu",$o=$value"
+    cpu="$cpu,$o=$value"
 done
 
 # Set the target machine
@@ -93,4 +93,4 @@ mon=none
 
 serial=none
 
-echo "$input" | $qemu -chardev $chardev -semihosting-config $semi -monitor $mon -serial $serial -machine $machine -cpu $cpu -kernel $elf -nographic "$@" -bios none
+echo "$input" | "$qemu" -chardev "$chardev" -semihosting-config "$semi" -monitor "$mon" -serial "$serial" -machine "$machine" -cpu "$cpu" -kernel "$elf" -nographic "$@" -bios none
