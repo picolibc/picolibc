@@ -53,7 +53,7 @@ foreach target : targets
     _libs_minimal = _libs_base
   endif
 
-  _c_args = value[1] + test_c_args + test_c_warnings
+  _c_args = value[1] + test_c_args
   _link_args = value[1] + test_link_args
 
   t1 = 'printf_scanf'
@@ -65,8 +65,8 @@ foreach target : targets
 
   test(t1 + target,
        executable(t1_name, 'printf_scanf.c',
-		  c_args: _c_args,
-		  link_args: _link_args,
+		  c_args: double_printf_compile_args + _c_args,
+		  link_args: double_printf_link_args + _link_args,
 		  link_with: _libs,
 		  link_depends:  test_link_depends,
 		  include_directories: inc),
@@ -97,8 +97,8 @@ foreach target : targets
 
   test(t1 + target,
        executable(t1_name, ['printf-tests.c'],
-		  c_args: _c_args,
-		  link_args: _link_args,
+		  c_args: double_printf_compile_args + _c_args,
+		  link_args: double_printf_link_args + _link_args,
 		  link_with: _libs,
 		  include_directories: inc),
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
@@ -259,8 +259,8 @@ foreach target : targets
 
     test(t1 + target,
 	 executable(t1_name, [t1_src],
-		    c_args: _c_args,
-		    link_args: _link_args,
+		    c_args: double_printf_compile_args + _c_args,
+		    link_args: double_printf_link_args + _link_args,
 		    link_with: _libs,
 		    link_depends:  test_link_depends,
 		    include_directories: inc),
@@ -276,7 +276,7 @@ if enable_native_tests
   if native_lib_m.found()
     test('math_errhandling_native',
 	 executable('math_errhandling_native', 'math_errhandling.c',
-		    c_args: test_c_warnings + ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE', '-DNO_NEWLIB'],
+		    c_args: ['-DNO_NEWLIB'],
 		    dependencies: native_lib_m))
   endif
 endif

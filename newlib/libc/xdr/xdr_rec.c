@@ -44,6 +44,7 @@
  * The other 31 bits encode the byte length of the fragment.
  */
 
+#define _DEFAULT_SOURCE
 #include <stddef.h>
 #include <sys/types.h>
 #include <stdlib.h>
@@ -268,8 +269,8 @@ xdrrec_getlong (XDR * xdrs,
   int32_t mylong;
 
   /* first try the inline, fast case */
-  if ((rstrm->fbtbc >= sizeof (int32_t)) &&
-      (((long) rstrm->in_boundry - (long) buflp) >= sizeof (int32_t)))
+  if ((rstrm->fbtbc >= (long) sizeof (int32_t)) &&
+      (((long) rstrm->in_boundry - (long) buflp) >= (long) sizeof (int32_t)))
     {
       *lp = (long) ntohl ((u_int32_t) (*buflp));
       rstrm->fbtbc -= sizeof (int32_t);
@@ -492,8 +493,8 @@ xdrrec_getint32 (XDR *xdrs,
   int32_t mylong;
 
   /* first try the inline, fast case */
-  if ((rstrm->fbtbc >= sizeof (int32_t)) &&
-      (( rstrm->in_boundry - (char *) bufip) >= sizeof (int32_t)))
+  if ((rstrm->fbtbc >= (long) sizeof (int32_t)) &&
+      (( rstrm->in_boundry - (char *) bufip) >= (ssize_t) sizeof (int32_t)))
     {
       *ip = (int32_t) ntohl (*bufip);
       rstrm->fbtbc -= sizeof (int32_t);
@@ -654,7 +655,7 @@ __xdrrec_getrec (XDR * xdrs,
         }
       rstrm->in_hdrp += n;
       rstrm->in_hdrlen += n;
-      if (rstrm->in_hdrlen < sizeof (rstrm->in_header))
+      if (rstrm->in_hdrlen < (int) sizeof (rstrm->in_header))
         {
           *statp = XPRT_MOREREQS;
           return FALSE;

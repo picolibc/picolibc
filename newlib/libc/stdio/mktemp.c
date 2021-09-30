@@ -127,6 +127,7 @@ are not standardized.
 Supporting OS subroutines required: <<getpid>>, <<mkdir>>, <<open>>, <<stat>>.
 */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -154,10 +155,11 @@ _gettemp (struct _reent *ptr,
 #endif
   unsigned int pid;
 
+  (void) ptr;
   pid = getpid ();
   for (trv = path; *trv; ++trv)		/* extra X's get set to 0's */
     continue;
-  if (trv - path < suffixlen)
+  if (trv - path < (ptrdiff_t) suffixlen)
     {
       __errno_r(ptr) = EINVAL;
       return 0;

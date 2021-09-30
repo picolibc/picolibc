@@ -55,5 +55,5 @@ static struct cclass {
 	{"space",       CSPACE},
 	{"upper",       CUPPER},
 	{"xdigit",      CXDIGIT},
-	{NULL,          }
+	{0}
 };

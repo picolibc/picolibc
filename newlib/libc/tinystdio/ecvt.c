@@ -33,6 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _GNU_SOURCE
 #include "dtoa_engine.h"
 #include <_ansi.h>
 #include <stdlib.h>

@@ -26,6 +26,8 @@ jobs:
           # Tinystdio configurations
           "-Dio-float-exact=false",
           "-Dio-long-long=true",
+	  "-Dformat-default=integer",
+	  "-Dformat-default=float",
 
           # Malloc configurations
           "-Dnewlib-nano-malloc=false",

@@ -31,8 +31,6 @@
 #ifndef	_FTOA_ENGINE_H
 #define	_FTOA_ENGINE_H
 
-#define _XOPEN_SOURCE
-#define _XOPEN_SOURCE_EXTENDED
 #include <stdlib.h>
 #include <stdint.h>
 #include <float.h>

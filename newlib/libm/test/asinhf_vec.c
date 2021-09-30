@@ -300,5 +300,6 @@
 {37, 0,123,__LINE__, 0x400fa4c2, 0x9a7ccf12, 0x403a1999, 0x99999996},	/* 3.95545=f(26.1)*/
 {39, 0,123,__LINE__, 0x401012f3, 0x5e235e71, 0x403bcccc, 0xccccccc9},	/* 4.01851=f(27.8)*/
 {43, 0,123,__LINE__, 0x40104fb1, 0x4017a7cb, 0x403d7fff, 0xfffffffc},	/* 4.07782=f(29.5)*/
-0,};
+{0}
+};
 void test_asinhf(m)   {run_vector_1(m,asinhf_vec,(char *)(asinhf),"asinhf","ff");   }	

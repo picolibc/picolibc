@@ -53,12 +53,11 @@ Supporting OS subroutines required: <<close>>, <<fstat64>>, <<isatty>>,
 static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
+#define _DEFAULT_SOURCE
 #include <stdio.h>
 #include <errno.h>
 #include "local.h"
-#ifdef __CYGWIN__
 #include <fcntl.h>
-#endif
 #include <sys/lock.h>
 
 #ifdef __LARGE64_FILES
@@ -77,7 +76,7 @@ _fopen64_r (struct _reent *ptr,
   if ((fp = __sfp (ptr)) == NULL)
     return NULL;
 
-  if ((f = _open64_r (ptr, file, oflags, 0666)) < 0)
+  if ((f = open64 (file, oflags, 0666)) < 0)
     {
       _newlib_sfp_lock_start ();
       fp->_flags = 0;		/* release */

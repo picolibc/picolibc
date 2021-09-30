@@ -54,6 +54,7 @@ open file may vary among implementations.
 Supporting OS subroutine required: <<unlink>>.
 */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -62,6 +63,7 @@ int
 _remove_r (struct _reent *ptr,
        const char *filename)
 {
+  (void) ptr;
   if (unlink (filename) == -1)
     return -1;
 

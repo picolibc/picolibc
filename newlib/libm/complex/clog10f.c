@@ -1,4 +1,5 @@
 /* Copyright (c) 2016 Yaakov Selkowitz <yselkowi@redhat.com> */
+#define _DEFAULT_SOURCE
 #include <complex.h>
 #include <math.h>
 

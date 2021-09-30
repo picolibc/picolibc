@@ -66,5 +66,6 @@ the file <<sys/fenv.h>> to see the status for your target.
  */
 int feholdexcept(fenv_t *envp)
 {
+  (void) envp;
   return -ENOTSUP;
 }

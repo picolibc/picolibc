@@ -56,7 +56,7 @@ int fesetround(int round)
 
   /* Set the rounding mode */
 
-  asm volatile("fsrm %0" : : "r"(round));
+  __asm__ volatile("fsrm %0" : : "r"(round));
 
   /* Per 'fesetround.html:
    *

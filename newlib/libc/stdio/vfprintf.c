@@ -118,6 +118,7 @@ static char *rcsid = "$Id$";
  *
  * This code is large and complicated...
  */
+#define _DEFAULT_SOURCE
 #include <newlib.h>
 
 #ifdef INTEGER_ONLY
@@ -144,9 +145,11 @@ static char *rcsid = "$Id$";
 # undef _NO_POS_ARGS
 #endif
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <alloca.h>
 #include <string.h>
 #include <limits.h>
 #include <stdint.h>
@@ -200,8 +203,9 @@ __ssputs_r (struct _reent *ptr,
 {
 	register int w;
 
+        (void) ptr;
 	w = fp->_w;
-	if (len >= w && fp->_flags & (__SMBF | __SOPT)) {
+	if (len >= (size_t) w && fp->_flags & (__SMBF | __SOPT)) {
 		/* must be asprintf family */
 		unsigned char *str;
 		int curpos = (fp->_p - fp->_bf._base);
@@ -213,7 +217,7 @@ __ssputs_r (struct _reent *ptr,
 	 	 * reallocating.  The new allocation should thus be
 	 	 * max(prev_size*1.5, curpos+len+1). */
 		int newsize = fp->_bf._size * 3 / 2;
-		if (newsize < curpos + len + 1)
+		if ((size_t) newsize < curpos + len + 1)
 			newsize = curpos + len + 1;
 		if (fp->_flags & __SOPT)
 		{
@@ -246,7 +250,7 @@ __ssputs_r (struct _reent *ptr,
 		w = len;
 		fp->_w = newsize - curpos;
 	}
-	if (len < w)
+	if (len < (size_t) w)
 		w = len;
 	(void)memmove ((void *) fp->_p, (void *) buf, (size_t) (w));
 	fp->_w -= w;
@@ -270,6 +274,7 @@ __ssprint_r (struct _reent *ptr,
 	register struct __siov *iov;
 	register const char *p = NULL;
 
+        (void) ptr;
 	iov = uio->uio_iov;
 	len = 0;
 
@@ -285,7 +290,7 @@ __ssprint_r (struct _reent *ptr,
 			iov++;
 		}
 		w = fp->_w;
-		if (len >= w && fp->_flags & (__SMBF | __SOPT)) {
+		if (len >= (size_t) w && fp->_flags & (__SMBF | __SOPT)) {
 			/* must be asprintf family */
 			unsigned char *str;
 			int curpos = (fp->_p - fp->_bf._base);
@@ -297,7 +302,7 @@ __ssprint_r (struct _reent *ptr,
 		 	 * reallocating.  The new allocation should thus be
 		 	 * max(prev_size*1.5, curpos+len+1). */
 			int newsize = fp->_bf._size * 3 / 2;
-			if (newsize < curpos + len + 1)
+			if ((size_t) newsize < curpos + len + 1)
 				newsize = curpos + len + 1;
 			if (fp->_flags & __SOPT)
 			{
@@ -330,7 +335,7 @@ __ssprint_r (struct _reent *ptr,
 			w = len;
 			fp->_w = newsize - curpos;
 		}
-		if (len < w)
+		if (len < (size_t) w)
 			w = len;
 		(void)memmove ((void *) fp->_p, (void *) p, (size_t) (w));
 		fp->_w -= w;
@@ -382,7 +387,7 @@ __sfputs_r (struct _reent *ptr,
 #else
 	{
 #endif
-		for (i = 0; i < len; i++) {
+                for (i = 0; (size_t) i < len; i++) {
 			if (_fputc_r (ptr, buf[i], fp) == EOF)
 				return -1;
 		}
@@ -706,7 +711,7 @@ _VFPRINTF_R (struct _reent *data,
 	register struct __siov *iovp;/* for PRINT macro */
 #endif
 	char buf[BUF];		/* space for %c, %S, %[diouxX], %[aA] */
-	char ox[2];		/* space for 0x hex-prefix */
+	char ox[2] = {0};	/* space for 0x hex-prefix */
 #ifdef _MB_CAPABLE
 	wchar_t wc;
 	mbstate_t state;        /* mbtowc calls from library must not change state */
@@ -1007,7 +1012,7 @@ reswitch:	switch (ch) {
 			if (width >= 0)
 				goto rflag;
 			width = -width;
-			/* FALLTHROUGH */
+			FALLTHROUGH;
 		case '-':
 			flags |= LADJUST;
 			goto rflag;
@@ -1178,7 +1183,7 @@ reswitch:	switch (ch) {
 			break;
 		case 'D':  /* extension */
 			flags |= LONGINT;
-			/*FALLTHROUGH*/
+			FALLTHROUGH;
 		case 'd':
 		case 'i':
 			_uquad = SARG ();
@@ -1399,7 +1404,7 @@ reswitch:	switch (ch) {
 			continue;	/* no output */
 		case 'O': /* extension */
 			flags |= LONGINT;
-			/*FALLTHROUGH*/
+			FALLTHROUGH;
 		case 'o':
 			_uquad = UARG ();
 			base = OCT;
@@ -1521,7 +1526,7 @@ string:
 			break;
 		case 'U': /* extension */
 			flags |= LONGINT;
-			/*FALLTHROUGH*/
+			FALLTHROUGH;
 		case 'u':
 			_uquad = UARG ();
 			base = DEC;
@@ -1819,6 +1824,7 @@ cvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 		*sign = '\000';
 # endif /* !_NO_LONGDBL */
 
+        (void) data;
 # ifdef _WANT_IO_C99_FORMATS
 	if (ch == 'a' || ch == 'A') {
 		/* This code assumes FLT_RADIX is a power of 2.  The initial
@@ -2277,7 +2283,7 @@ get_arg (struct _reent *data,
 	      break;
 	    case GETPWB: /* we require format pushback */
 	      --fmt;
-	      /* fallthrough */
+	      FALLTHROUGH;
 	    case GETPW:  /* we have a variable precision or width to acquire */
 	      args[numargs++].val_int = va_arg (*ap, int);
 	      break;

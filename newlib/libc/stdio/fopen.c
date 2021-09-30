@@ -102,6 +102,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
 #include <errno.h>
@@ -110,9 +111,6 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#ifdef __CYGWIN__
-#include <fcntl.h>
-#endif
 #include "local.h"
 
 FILE *

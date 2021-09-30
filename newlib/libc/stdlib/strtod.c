@@ -263,8 +263,13 @@ strtod_l (const char *__restrict s00, char **__restrict se,
 #ifdef Honor_FLT_ROUNDS
 	int rounding;
 #endif
+#ifdef __HAVE_LOCALE_INFO__
 	const char *decimal_point = __get_numeric_locale(loc)->decimal_point;
-	int dec_len = strlen (decimal_point);
+	const int dec_len = strlen (decimal_point);
+#else
+	const char *decimal_point = ".";
+	const int dec_len = 1;
+#endif
 
 	delta = bs = bd = NULL;
 	sign = nz0 = nz = decpt = 0;
@@ -272,11 +277,11 @@ strtod_l (const char *__restrict s00, char **__restrict se,
 	for(s = s00;;s++) switch(*s) {
 		case '-':
 			sign = 1;
-			/* no break */
+                        FALLTHROUGH;
 		case '+':
 			if (*++s)
 				goto break2;
-			/* no break */
+                        FALLTHROUGH;
 		case 0:
 			goto ret0;
 		case '\t':
@@ -317,7 +322,7 @@ strtod_l (const char *__restrict s00, char **__restrict se,
 			  case STRTOG_NoNumber:
 				s = s00;
 				sign = 0;
-				/* FALLTHROUGH */
+				FALLTHROUGH;
 			  case STRTOG_Zero:
 				break;
 			  default:
@@ -393,6 +398,7 @@ strtod_l (const char *__restrict s00, char **__restrict se,
 		switch(c = *++s) {
 			case '-':
 				esign = 1;
+                                FALLTHROUGH;
 			case '+':
 				c = *++s;
 			}
@@ -1006,8 +1012,8 @@ strtod_l (const char *__restrict s00, char **__restrict se,
 #ifdef Avoid_Underflow
 				if (scale) {
 					L = dword0(rv) & Exp_mask;
-					if (L <= (2*P+1)*Exp_msk1) {
-						if (L > (P+2)*Exp_msk1)
+					if (L <= (Long) ((2*P+1)*Exp_msk1)) {
+                                                if (L > (Long)((P+2)*Exp_msk1))
 							/* round even ==> */
 							/* accept rv */
 							break;

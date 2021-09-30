@@ -75,11 +75,12 @@ on_exit (void (*func)(int, void *),void *arg)
 void
 __call_exitprocs(int code, void *param)
 {
+        (void) param;
 	for (;;) {
 		int	                i;
-                union on_exit_func      func;
+                union on_exit_func      func = {0};
                 int                     kind = PICO_ONEXIT_EMPTY;
-		void	                *arg;
+		void	                *arg = 0;
 
 		__LIBC_LOCK();
 		for (i = ATEXIT_MAX - 1; i >= 0; i--) {

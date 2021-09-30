@@ -33,6 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _DEFAULT_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -40,7 +41,9 @@
 #include <malloc.h>
 #include <stdlib.h>
 
+#ifndef __clang__
 #pragma GCC diagnostic ignored "-Walloc-size-larger-than="
+#endif
 
 int
 main(void)

@@ -80,6 +80,7 @@ It is not portable.  See also the <<fopencookie>> interface from Linux.
 Supporting OS subroutines required: <<sbrk>>.
 */
 
+#define _DEFAULT_SOURCE
 #include <stdio.h>
 #include <errno.h>
 #include <sys/lock.h>

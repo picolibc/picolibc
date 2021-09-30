@@ -39,8 +39,8 @@
 #define FLOAT_BIAS 127
 
 // Returns the number of decimal digits in v, which must not contain more than 9 digits.
-static uint32_t decimalLength9(const uint32_t v) {
-	uint32_t len = 1;
+static int decimalLength9(const uint32_t v) {
+	int len = 1;
 	uint32_t c = 10;
 	while (c <= v) {
 		len++;

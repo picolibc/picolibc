@@ -80,7 +80,7 @@ __malloc_lock (struct _reent *reent)
   while (__sync_lock_test_and_set (&__heap_lock, 1))
     /* A sleep seems like it should allow the wavefront to yeild (maybe?)
        Use the shortest possible sleep time of 1*64 cycles.  */
-    asm volatile ("s_sleep\t1" ::: "memory");
+    __asm__ volatile ("s_sleep\t1" ::: "memory");
 
   if (__heap_lock_id != NULL)
     abort ();

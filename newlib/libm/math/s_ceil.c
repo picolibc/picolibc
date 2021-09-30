@@ -37,8 +37,8 @@ static double huge = 1.0e300;
 	double x;
 #endif
 {
-	__int32_t i0,i1,j0;
-	__uint32_t i,j;
+        __int32_t i0,i1,j0,j;
+	__uint32_t i;
 	EXTRACT_WORDS(i0,i1,x);
 	j0 = ((i0>>20)&0x7ff)-0x3ff;
 	if(j0<20) {

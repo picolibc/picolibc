@@ -13,6 +13,7 @@
  * ====================================================
  */
 
+#define _DEFAULT_SOURCE
 #include "math.h"
 #include "fdlibm.h"
 

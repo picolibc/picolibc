@@ -47,7 +47,7 @@ static void test_cleanup(void)
 }
 
 int
-main(int argc, char **argv)
+main(void)
 {
 	FILE		*f;
 	const char	*t;
@@ -60,7 +60,7 @@ main(int argc, char **argv)
 		return 1;
 	}
 
-	if (fprintf(f, "%s", test_string) != strlen(test_string)) {
+	if ((size_t) fprintf(f, "%s", test_string) != strlen(test_string)) {
 		printf("failed to fprintf test string %s\n", test_string);
 		return 1;
 	}

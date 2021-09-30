@@ -300,5 +300,6 @@
 {37, 0,123,__LINE__, 0x404d29f1, 0x39876d1b, 0x403a1999, 0x99999996},	/* 58.3277=f(26.1)*/
 {36, 0,123,__LINE__, 0x404ff29d, 0x11cb635a, 0x403bcccc, 0xccccccc9},	/* 63.8954=f(27.8)*/
 {38, 0,123,__LINE__, 0x4051646b, 0xdd7cf160, 0x403d7fff, 0xfffffffc},	/* 69.5691=f(29.5)*/
-0,};
+{0}
+};
 void test_gammaf(m)   {run_vector_1(m,gammaf_vec,(char *)(lgammaf),"lgammaf","ff");   }	

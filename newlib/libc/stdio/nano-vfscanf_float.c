@@ -15,6 +15,7 @@
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <newlib.h>
 #include <ctype.h>

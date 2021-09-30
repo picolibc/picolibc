@@ -134,7 +134,7 @@ wcstoll_l (const wchar_t *nptr, wchar_t **endptr,
 {
 	register const wchar_t *s = nptr;
 	register unsigned long long acc;
-	register int c;
+	register wchar_t c;
 	register unsigned long long cutoff;
 	register int neg = 0, any, cutlim;
 
@@ -177,7 +177,7 @@ wcstoll_l (const wchar_t *nptr, wchar_t **endptr,
 	 * Set any if any `digits' consumed; make it negative to indicate
 	 * overflow.
 	 */
-	cutoff = neg ? -(unsigned long long)LONG_LONG_MIN : LONG_LONG_MAX;
+	cutoff = neg ? -(unsigned long long)LLONG_MIN : LLONG_MAX;
 	cutlim = cutoff % (unsigned long long)base;
 	cutoff /= (unsigned long long)base;
 	for (acc = 0, any = 0;; c = *s++) {
@@ -189,18 +189,18 @@ wcstoll_l (const wchar_t *nptr, wchar_t **endptr,
 			c -= L'a' - 10;
 		else
 			break;
-		if (c >= base)
+		if ((int) c >= base)
 			break;
-               if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
+                if (any < 0 || acc > cutoff || (acc == cutoff && (int) c > cutlim))
 			any = -1;
 		else {
 			any = 1;
 			acc *= base;
-			acc += c;
+			acc += (int) c;
 		}
 	}
 	if (any < 0) {
-		acc = neg ? LONG_LONG_MIN : LONG_LONG_MAX;
+		acc = neg ? LLONG_MIN : LLONG_MAX;
 		__errno_r(rptr) = ERANGE;
 	} else if (neg)
 		acc = -acc;

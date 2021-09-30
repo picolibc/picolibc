@@ -59,6 +59,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<open>>, <<read>>, <<sbrk>>, <<write>>.
 */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <time.h>
 #include <stdio.h>
@@ -148,10 +149,10 @@ _freopen_r (struct _reent *ptr,
        * ignores creation flags.
        */
       f = fp->_file;
-      if ((oldflags = _fcntl_r (ptr, f, F_GETFL, 0)) == -1
+      if ((oldflags = fcntl (f, F_GETFL, 0)) == -1
 	  || ! ((oldflags & O_ACCMODE) == O_RDWR
 		|| ((oldflags ^ oflags) & O_ACCMODE) == 0)
-	  || _fcntl_r (ptr, f, F_SETFL, oflags) == -1)
+	  || fcntl (f, F_SETFL, oflags) == -1)
 	f = -1;
 #else
       /* We cannot modify without fcntl support.  */

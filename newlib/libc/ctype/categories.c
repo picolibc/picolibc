@@ -27,19 +27,19 @@ bisearch_cat(wint_t ucs, const struct _category *table, int max)
   int min = 0;
   int mid;
 
-  if (ucs < table[0].first || ucs > table[max].first + table[max].delta)
-    return -1;
+  if (ucs < table[0].first || ucs > (wint_t) (table[max].first + table[max].delta))
+    return CAT_error;
   while (max >= min)
     {
       mid = (min + max) / 2;
-      if (ucs > table[mid].first + table[mid].delta)
+      if (ucs > (wint_t) (table[mid].first + table[mid].delta))
 	min = mid + 1;
       else if (ucs < table[mid].first)
 	max = mid - 1;
       else
 	return table[mid].cat;
     }
-  return -1;
+  return CAT_error;
 }
 
 enum category category(wint_t ucs)

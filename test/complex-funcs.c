@@ -15,7 +15,7 @@ long double complex l1, l2;
  */
 
 int
-main(int argc, char **argv)
+main(void)
 {
     /* 7.3.5 Trigonometric functions */
     /* 7.3.5.1 The cacos functions */

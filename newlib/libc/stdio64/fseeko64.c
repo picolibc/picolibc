@@ -66,6 +66,7 @@ Supporting OS subroutines required: <<close>>, <<fstat64>>, <<isatty>>,
 <<lseek64>>, <<read>>, <<sbrk>>, <<write>>.
 */
 
+#define _DEFAULT_SOURCE
 #include <stdio.h>
 #include <time.h>
 #include <fcntl.h>
@@ -186,6 +187,7 @@ _fseeko64_r (struct _reent *ptr,
       return (EOF);
     }
 
+  (void) havepos;
   /*
    * Can only optimise if:
    *	reading (and not reading-and-writing);

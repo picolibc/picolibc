@@ -22,6 +22,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <newlib.h>
 #include <sys/types.h>

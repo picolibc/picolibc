@@ -49,6 +49,7 @@ __vsprintf_chk(char * __restrict buf, int flags, size_t slen,
 {
 	int rv;
 
+        (void) flags;
 	if (slen > (size_t)INT_MAX)
 		rv = vsprintf(buf, fmt, ap);
 	else {

@@ -143,6 +143,7 @@ No supporting OS subroutines are required.
  * SUCH DAMAGE.
  */
 
+#define _DEFAULT_SOURCE
 #include <newlib.h>
 #include <errno.h>
 #include <string.h>
@@ -283,6 +284,7 @@ setlocale (
        int category,
        const char *locale)
 {
+  (void) category;
 #ifndef _MB_CAPABLE
   if (locale)
     { 

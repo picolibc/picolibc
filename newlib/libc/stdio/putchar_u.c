@@ -54,6 +54,8 @@ static char sccsid[] = "%W% (Berkeley) %G%";
  * A subroutine version of the macro putchar_unlocked.
  */
 
+#define _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
 

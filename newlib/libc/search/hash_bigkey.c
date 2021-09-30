@@ -30,6 +30,7 @@
  * SUCH DAMAGE.
  */
 
+#define _DEFAULT_SOURCE
 #include <sys/param.h>
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)hash_bigkey.c	8.3 (Berkeley) 5/31/94";
@@ -70,8 +71,8 @@ static char sccsid[] = "@(#)hash_bigkey.c	8.3 (Berkeley) 5/31/94";
 #include "page.h"
 #include "extern.h"
 
-static int collect_key(HTAB *, BUFHEAD *, int, DBT *, int);
-static int collect_data(HTAB *, BUFHEAD *, int, int);
+static size_t collect_key(HTAB *, BUFHEAD *, size_t, DBT *, int);
+static size_t collect_data(HTAB *, BUFHEAD *, size_t, int);
 
 /*
  * Big_insert
@@ -89,7 +90,8 @@ __big_insert(hashp, bufp, key, val)
 	const DBT *key, *val;
 {
 	__uint16_t *p;
-	int key_size, n, val_size;
+	size_t key_size, n;
+        size_t val_size;
 	__uint16_t space, move_bytes, off;
 	char *cp, *key_data, *val_data;
 
@@ -429,8 +431,8 @@ __big_return(hashp, bufp, ndx, val, set_current)
 			return (0);
 		}
 
-	val->size = collect_data(hashp, bufp, (int)len, set_current);
-	if (val->size == -1)
+	val->size = collect_data(hashp, bufp, len, set_current);
+	if (val->size == (size_t) -1)
 		return (-1);
 	if (save_p->addr != save_addr) {
 		/* We are pretty short on buffers. */
@@ -445,17 +447,18 @@ __big_return(hashp, bufp, ndx, val, set_current)
  * Count how big the total datasize is by recursing through the pages.  Then
  * allocate a buffer and copy the data as you recurse up.
  */
-static int
+static size_t
 collect_data(hashp, bufp, len, set)
 	HTAB *hashp;
 	BUFHEAD *bufp;
-	int len, set;
+	size_t len;
+        int set;
 {
 	__uint16_t *bp;
 	char *p;
 	BUFHEAD *xbp;
 	__uint16_t save_addr;
-	int mylen, totlen;
+	size_t mylen, totlen;
 
 	p = bufp->page;
 	bp = (__uint16_t *)p;
@@ -509,7 +512,7 @@ __big_keydata(hashp, bufp, key, val, set)
 	int set;
 {
 	key->size = collect_key(hashp, bufp, 0, val, set);
-	if (key->size == -1)
+	if (key->size == (size_t) -1)
 		return (-1);
 	key->data = (u_char *)hashp->tmp_key;
 	return (0);
@@ -519,17 +522,17 @@ __big_keydata(hashp, bufp, key, val, set)
  * Count how big the total key size is by recursing through the pages.  Then
  * collect the data, allocate a buffer and copy the key as you recurse up.
  */
-static int
+static size_t
 collect_key(hashp, bufp, len, val, set)
 	HTAB *hashp;
 	BUFHEAD *bufp;
-	int len;
+	size_t len;
 	DBT *val;
 	int set;
 {
 	BUFHEAD *xbp;
 	char *p;
-	int mylen, totlen;
+	size_t mylen, totlen;
 	__uint16_t *bp, save_addr;
 
 	p = bufp->page;

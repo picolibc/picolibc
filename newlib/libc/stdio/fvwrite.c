@@ -16,6 +16,7 @@
  */
 /* No user fns here.  Pesch 15apr92. */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
 #include <string.h>
@@ -125,7 +126,7 @@ __sfvwrite_r (struct _reent *ptr,
 	  w = fp->_w;
 	  if (fp->_flags & __SSTR)
 	    {
-	      if (len >= w && fp->_flags & (__SMBF | __SOPT))
+              if (len >= (size_t) w && fp->_flags & (__SMBF | __SOPT))
 		{ /* must be asprintf family */
 		  unsigned char *str;
 		  int curpos = (fp->_p - fp->_bf._base);
@@ -137,7 +138,7 @@ __sfvwrite_r (struct _reent *ptr,
 		     reallocating.  The new allocation should thus be
 		     max(prev_size*1.5, curpos+len+1). */
 		  int newsize = fp->_bf._size * 3 / 2;
-		  if (newsize < curpos + len + 1)
+		  if ((size_t) newsize < curpos + len + 1)
 		    newsize = curpos + len + 1;
 		  if (fp->_flags & __SOPT)
 		    {
@@ -172,17 +173,17 @@ __sfvwrite_r (struct _reent *ptr,
 		  w = len;
 		  fp->_w = newsize - curpos;
 		}
-	      if (len < w)
+	      if (len < (size_t) w)
 		w = len;
 	      COPY (w);		/* copy MIN(fp->_w,len), */
 	      fp->_w -= w;
 	      fp->_p += w;
 	      w = len;		/* but pretend copied all */
 	    }
-	  else if (fp->_p > fp->_bf._base || len < fp->_bf._size)
+	  else if (fp->_p > fp->_bf._base || len < (size_t) fp->_bf._size)
 	    {
 	      /* pass through the buffer */
-	      w = MIN (len, w);
+	      w = MIN (len, (size_t) w);
 	      COPY (w);
 	      fp->_w -= w;
 	      fp->_p += w;
@@ -219,10 +220,10 @@ __sfvwrite_r (struct _reent *ptr,
 	  if (!nlknown)
 	    {
 	      nl = memchr ((void *) p, '\n', len);
-	      nldist = nl ? nl + 1 - p : len + 1;
+	      nldist = nl ? nl + 1 - p : (int) (len + 1);
 	      nlknown = 1;
 	    }
-	  s = MIN (len, nldist);
+	  s = MIN (len, (size_t) nldist);
 	  w = fp->_w + fp->_bf._size;
 	  if (fp->_p > fp->_bf._base && s > w)
 	    {

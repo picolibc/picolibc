@@ -143,7 +143,7 @@ regmatch_t pmatch[];
 int eflags;
 {
 	char *endp;
-	int i;
+	size_t i;
 	struct match mv;
 	struct match *m = &mv;
 	char *dp = NULL;
@@ -657,7 +657,7 @@ sopno lev;			/* PLUS nesting level */
 		ssp = m->offp + m->pmatch[i].rm_so;
 		if (memcmp(sp, ssp, len) != 0)
 			return(NULL);
-		while (m->g->strip[ss] != SOP(O_BACK, i))
+		while (m->g->strip[ss] != (sop) SOP(O_BACK, i))
 			ss++;
 		return(backref(m, sp+len, stop, ss+1, stopst, lev));
 		break;

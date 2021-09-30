@@ -23,6 +23,7 @@
  * ChaCha based random number generator for OpenBSD.
  */
 
+#define _DEFAULT_SOURCE
 #include <fcntl.h>
 #include <limits.h>
 #include <signal.h>
@@ -57,17 +58,17 @@ static struct _rs {
 /* Maybe be preserved in fork children, if _rs_allocate() decides. */
 static struct _rsx {
 	chacha_ctx	rs_chacha;	/* chacha context for random keystream */
-	u_char		rs_buf[RSBUFSZ];	/* keystream blocks */
+	unsigned char	rs_buf[RSBUFSZ];	/* keystream blocks */
 } *rsx;
 
 static inline int _rs_allocate(struct _rs **, struct _rsx **);
 static inline void _rs_forkdetect(void);
 #include "arc4random.h"
 
-static inline void _rs_rekey(u_char *dat, size_t datlen);
+static inline void _rs_rekey(unsigned char *dat, size_t datlen);
 
 static inline void
-_rs_init(u_char *buf, size_t n)
+_rs_init(unsigned char *buf, size_t n)
 {
 	if (n < KEYSZ + IVSZ)
 		return;
@@ -84,7 +85,7 @@ _rs_init(u_char *buf, size_t n)
 static void
 _rs_stir(void)
 {
-	u_char rnd[KEYSZ + IVSZ];
+	unsigned char rnd[KEYSZ + IVSZ];
 
 	if (getentropy(rnd, sizeof rnd) == -1)
 		_getentropy_fail();
@@ -116,7 +117,7 @@ _rs_stir_if_needed(size_t len)
 }
 
 static inline void
-_rs_rekey(u_char *dat, size_t datlen)
+_rs_rekey(unsigned char *dat, size_t datlen)
 {
 #ifndef KEYSTREAM_ONLY
 	memset(rsx->rs_buf, 0, sizeof(rsx->rs_buf));
@@ -141,8 +142,8 @@ _rs_rekey(u_char *dat, size_t datlen)
 static inline void
 _rs_random_buf(void *_buf, size_t n)
 {
-	u_char *buf = (u_char *)_buf;
-	u_char *keystream;
+	unsigned char *buf = (unsigned char *)_buf;
+	unsigned char *keystream;
 	size_t m;
 
 	_rs_stir_if_needed(n);
@@ -165,7 +166,7 @@ _rs_random_buf(void *_buf, size_t n)
 static inline void
 _rs_random_u32(uint32_t *val)
 {
-	u_char *keystream;
+	unsigned char *keystream;
 
 	_rs_stir_if_needed(sizeof(*val));
 	if (rs->rs_have < sizeof(*val))

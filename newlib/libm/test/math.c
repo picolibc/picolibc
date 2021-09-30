@@ -101,6 +101,8 @@ ffcheck_id(double is,
   int mag;
   isbits.value = is;
 
+  (void) serrno;
+  (void) merror;
   correct.parts.msw = p->qs[id].msw;
   correct.parts.lsw = p->qs[id].lsw;
 
@@ -178,6 +180,10 @@ fffcheck_id (float is,
   __ieee_double_shape_type correct_double;
   __ieee_double_shape_type is_double;
   int mag;
+
+  (void) serrno;
+  (void) merror;
+
   isbits.value = is;
   to_double(is_double.value, is);
 
@@ -273,6 +279,7 @@ frontline (FILE *f,
        char *args,
        char *name)
 {
+  (void) name;
   /* float returns can never have more than 32 bits of accuracy */
   if (*args == 'f' && mag > 32)
     mag = 32;
@@ -588,6 +595,20 @@ run_vector_1 (int vector,
        fresult = (float) ((pdblfunc)(func))(arg1, &result2);
        ffinish2(f, vector, fresult, result2, p, args, name);
      }
+     else if (strcmp(args,"ddi") == 0)
+     {
+       typedef double (*pdblfunc)(double, int);
+
+       result = ((pdblfunc)func) (arg1, (int) arg2);
+       finish(f, vector, result, p, args, name);
+     }
+     else if (strcmp(args,"ffi") == 0)
+     {
+       typedef float (*pdblfunc)(float, int);
+
+       fresult = ((pdblfunc)func) (arg1, (int) arg2);
+       ffinish(f, vector, fresult, p, args, name);
+     }
     p++;
   }
   if (vector)
@@ -656,6 +677,8 @@ test_math (int vector)
   test_modff(vector);
   test_pow_vec(vector);
   test_powf_vec(vector);
+  test_scalbn(vector);
+  test_scalbnf(vector);
   test_sin(vector);
   test_sinf(vector);
   test_sinh(vector);

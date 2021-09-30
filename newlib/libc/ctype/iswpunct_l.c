@@ -12,6 +12,7 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 int
 iswpunct_l (wint_t c, struct __locale_t *locale)
 {
+  (void) locale;
 #ifdef _MB_CAPABLE
   //return !iswalnum (c) && iswgraph (c);
   c = _jp2uc_l (c, locale);

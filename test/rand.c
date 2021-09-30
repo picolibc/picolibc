@@ -32,6 +32,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#define _DEFAULT_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -48,7 +49,7 @@ near(double got, double target, double close)
 }
 
 int
-main(int argc, char **argv)
+main(void)
 {
 	int i;
 	int ret = 0;

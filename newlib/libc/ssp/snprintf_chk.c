@@ -48,6 +48,7 @@ __snprintf_chk(char * __restrict buf, size_t len, int flags, size_t slen,
 	va_list ap;
 	int rv;
 
+        (void) flags;
 	if (len > slen)
 		__chk_fail();
 

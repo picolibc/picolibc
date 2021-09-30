@@ -54,12 +54,12 @@ int feholdexcept(fenv_t *envp)
   /* Store the current FP environment in envp*/
 
   fenv_t fcsr;
-  asm volatile("frcsr %0" : "=r"(fcsr));
+  __asm__ volatile("frcsr %0" : "=r"(fcsr));
   *envp = fcsr;
 
   /* Clear all flags */
 
-  asm volatile("csrrc zero, fflags, %0" : : "r"(FE_ALL_EXCEPT));
+  __asm__ volatile("csrrc zero, fflags, %0" : : "r"(FE_ALL_EXCEPT));
 
   /* RISC-V does not raise FP traps so it is always in a "non-stop" mode */
 

@@ -300,5 +300,5 @@
 {35, 0,123,__LINE__, 0x3fc3ad27, 0xaec15e2f, 0x403a1999, 0x99999996},	/* 0.153722=f(26.1)*/
 {31, 0,123,__LINE__, 0xbfa76177, 0xa9edecfb, 0x403bcccc, 0xccccccc9},	/* -0.0456655=f(27.8)*/
 {34, 0,123,__LINE__, 0xbfc10afd, 0x42788fc9, 0x403d7fff, 0xfffffffc},	/* -0.133148=f(29.5)*/
-0,};
+{0},};
 void test_j0f(m)   {run_vector_1(m,j0f_vec,(char *)(j0f),"j0f","ff");   }	

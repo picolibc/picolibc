@@ -161,7 +161,7 @@ report(char *expr, test_t v, int e, int exception, int oexception)
 #endif
 
 #define TEST_CASE(expr, exception) do {					\
-		if ((exception & (my_overflow|my_underflow)) && my_inexact) \
+		if ((exception & (my_overflow|my_underflow)) && my_inexact != 0) \
 			TEST_CASE2(expr, exception, exception | my_inexact); \
 		else							\
 			TEST_CASE2(expr, exception, 0);			\

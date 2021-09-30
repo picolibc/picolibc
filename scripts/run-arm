@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -34,7 +34,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-qemu=qemu-system-arm
+qemu="qemu-system-arm"
 
 # select the program
 elf="$1"
@@ -211,14 +211,15 @@ mon=none
 
 serial=none
 
-echo "$input" | $qemu $memory \
-      -chardev $chardev \
-      -semihosting-config $semi \
-      -monitor $mon \
-      -serial $serial \
-      -machine $machine,accel=tcg \
-      -cpu $cpu \
-      -device loader,file=$elf,cpu-num=0 \
+# shellcheck disable=SC2086
+echo "$input" | "$qemu" $memory \
+      -chardev "$chardev" \
+      -semihosting-config "$semi" \
+      -monitor "$mon" \
+      -serial "$serial" \
+      -machine "$machine",accel=tcg \
+      -cpu "$cpu" \
+      -device loader,file="$elf",cpu-num=0 \
       -nographic \
       "$@"
 
@@ -229,10 +230,10 @@ if [ $result != 0 ]; then
 	# Cortex-a8 qemu has minor floating point errors
 	# when run on i686 processors
 	cortex-a8)
-	    test=`uname -m`"-$elf"
+	    test="$(uname -m)-$elf"
 	    case "$test" in
 		i?86-*math_test)
-		    echo "fp imprecise for $cpu on" `uname -m`
+		    echo "fp imprecise for $cpu on" "$(uname -m)"
 		    result=77
 		    ;;
 	    esac

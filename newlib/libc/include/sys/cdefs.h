@@ -554,7 +554,7 @@
 #endif
 
 #if defined(__GNUC__) || defined(__INTEL_COMPILER)
-#ifndef __INTEL_COMPILER
+#if !defined(__INTEL_COMPILER) && defined(HAVE_ALIAS_ATTRIBUTE)
 #define	__strong_reference(sym,aliassym)	\
 	extern __typeof (sym) aliassym __attribute__ ((__alias__ (#sym)))
 #endif
@@ -767,6 +767,19 @@
 #else
 #define __nosanitizeaddress
 #define __nosanitizethread
+#endif
+
+/*
+ * fall-through case statement annotations
+ */
+#if __cplusplus >= 201703L || __STDC_VERSION__ > 201710L
+/* Standard C++17/C23 attribute */
+#define FALLTHROUGH [[fallthrough]]
+#elif __has_attribute(fallthrough)
+/* Non-standard but supported by at least gcc and clang */
+#define FALLTHROUGH __attribute__((fallthrough))
+#else
+#define FALLTHROUGH do { } while(0)
 #endif
 
 /* Guard variables and structure members by lock. */

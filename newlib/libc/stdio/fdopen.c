@@ -43,6 +43,7 @@ PORTABILITY
 <<fdopen>> is ANSI.
 */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <sys/types.h>
 #include <sys/fcntl.h>
@@ -67,7 +68,7 @@ _fdopen_r (struct _reent *ptr,
 
   /* make sure the mode the user wants is a subset of the actual mode */
 #ifdef HAVE_FCNTL
-  if ((fdflags = _fcntl_r (ptr, fd, F_GETFL, 0)) < 0)
+  if ((fdflags = fcntl (fd, F_GETFL, 0)) < 0)
     return 0;
   fdmode = fdflags & O_ACCMODE;
   if (fdmode != O_RDWR && (fdmode != (oflags & O_ACCMODE)))
@@ -89,7 +90,7 @@ _fdopen_r (struct _reent *ptr,
      setting __SAPP properly.  */
 #ifdef HAVE_FCNTL
   if ((oflags & O_APPEND) && !(fdflags & O_APPEND))
-    _fcntl_r (ptr, fd, F_SETFL, fdflags | O_APPEND);
+    fcntl (fd, F_SETFL, fdflags | O_APPEND);
 #endif
   fp->_file = fd;
   fp->_cookie = (void *) fp;

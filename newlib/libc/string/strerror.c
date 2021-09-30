@@ -397,6 +397,7 @@ QUICKREF
 	strerror ansi pure
 */
 
+#define _DEFAULT_SOURCE
 #include <errno.h>
 #include <string.h>
 
@@ -916,6 +917,7 @@ strerror (int errnum)
 char *
 strerror_l (int errnum, locale_t locale)
 {
+  (void) locale;
   /* We don't support per-locale error messages. */
   return _strerror_r (errnum, 0, NULL);
 }

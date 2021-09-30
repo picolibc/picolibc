@@ -91,7 +91,7 @@ ANSI C, POSIX
           result = msw >> (20 - exponent_less_1023);
         }
     }
-  else if (exponent_less_1023 < (8 * sizeof (long int)) - 1)
+  else if (exponent_less_1023 < (__int32_t) ((8 * sizeof (long int)) - 1))
     {
       /* 32bit long: exponent_less_1023 in [20,30] */
       /* 64bit long: exponent_less_1023 in [20,62] */

@@ -9,7 +9,7 @@ INDEX
         clog10f
 
 SYNOPSIS
-       #define _GNU_SOURCE
+       #define _DEFAULT_SOURCE
        #include <complex.h>
        double complex clog10(double complex <[z]>);
        float complex clog10f(float complex <[z]>);
@@ -30,6 +30,7 @@ PORTABILITY
 
 */
 
+#define _DEFAULT_SOURCE
 #include <complex.h>
 #include <math.h>
 

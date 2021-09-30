@@ -39,6 +39,8 @@ null_conversion_open (
                              const char *to,
                              const char *from)
 {
+  (void) to;
+  (void) from;
   return (void *)&null_conversion_dummy_data;
 }
 
@@ -47,6 +49,7 @@ static size_t
 null_conversion_close (
                               void *data)
 {
+  (void) data;
   return 0;
 }
 
@@ -63,6 +66,7 @@ null_conversion_convert (
   size_t result;
   size_t len;
   
+  (void) data;
   if (*inbytesleft < *outbytesleft)
     {
       result = 0;
@@ -91,6 +95,8 @@ static int
 null_conversion_get_mb_cur_max (void *data,
                                        int direction)
 {
+  (void) data;
+  (void) direction;
   return ICONV_MB_LEN_MAX;
 }
 
@@ -100,6 +106,9 @@ null_conversion_get_state (void *data,
                                   mbstate_t *state,
                                   int direction)
 {
+  (void) data;
+  (void) state;
+  (void) direction;
   return;
 }
 
@@ -109,6 +118,9 @@ null_conversion_set_state (void *data,
                                   mbstate_t *state,
                                   int direction)
 {
+  (void) data;
+  (void) state;
+  (void) direction;
   return 0;
 }
 
@@ -116,6 +128,8 @@ static int
 null_conversion_is_stateful (void *data,
                                     int direction)
 {
+  (void) data;
+  (void) direction;
   return 0;
 }
 

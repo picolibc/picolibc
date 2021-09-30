@@ -46,7 +46,7 @@ void func(jmp_buf env, int param)
 static volatile int been_here;
 
 int
-main(int argc, char **argv)
+main(void)
 {
 	int ret;
 	jmp_buf env;

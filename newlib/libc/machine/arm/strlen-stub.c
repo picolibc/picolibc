@@ -51,6 +51,7 @@
   /* Implemented in strlen.S.  */
 
 #else
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 size_t __attribute__((naked))
 strlen (const char* str)
 {

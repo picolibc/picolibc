@@ -16,6 +16,7 @@
  */
 /* No user fns here.  Pesch 15apr92. */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -86,6 +87,7 @@ __swhatbuf_r (struct _reent *ptr,
   const int snpt = 0;
 #endif
 
+  (void) ptr;
 #ifdef __USE_INTERNAL_STAT64
   struct stat64 st;
 

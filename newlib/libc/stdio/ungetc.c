@@ -61,6 +61,7 @@ Supporting OS subroutines required: <<sbrk>>.
 static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -82,6 +83,7 @@ __submore (struct _reent *rptr,
   register int i;
   register unsigned char *p;
 
+  (void) rptr;
   if (fp->_ub._base == fp->_ubuf)
     {
       /*

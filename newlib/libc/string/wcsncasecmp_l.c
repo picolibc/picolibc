@@ -40,6 +40,7 @@ QUICKREF
 	wcsncasecmp_l
 */
 
+#define _DEFAULT_SOURCE
 #include <wchar.h>
 #include <wctype.h>
 

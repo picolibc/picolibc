@@ -42,6 +42,7 @@ nanl (const char *tagp)
 long double
 nanl (const char *tagp)
 {
+  (void) tagp;
   return __builtin_nanl("");
 }
 #endif

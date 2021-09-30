@@ -300,5 +300,5 @@
 {31, 0,123,__LINE__, 0x3ff00000, 0x00000000, 0x403a1999, 0x99999996},	/* 1=f(26.1)*/
 {31, 0,123,__LINE__, 0x3ff00000, 0x00000000, 0x403bcccc, 0xccccccc9},	/* 1=f(27.8)*/
 {31, 0,123,__LINE__, 0x3ff00000, 0x00000000, 0x403d7fff, 0xfffffffc},	/* 1=f(29.5)*/
-0,};
+{0},};
 void test_tanhf(m)   {run_vector_1(m,tanhf_vec,(char *)(tanhf),"tanhf","ff");   }

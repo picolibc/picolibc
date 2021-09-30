@@ -158,6 +158,8 @@ __jp2uc (wint_t c, int type)
 static wint_t
 __uc2jp (wint_t c, int type)
 {
+  (void) c;
+  (void) type;
 //#warning back-conversion Unicode to Japanese not implemented; needed for towupper/towlower
   return c;
 }
@@ -179,6 +181,7 @@ _jp2uc_l (wint_t c, struct __locale_t * l)
 wint_t
 _jp2uc (wint_t c)
 {
+  (void) c;
   return _jp2uc_l (c, 0);
 }
 

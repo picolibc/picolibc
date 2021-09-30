@@ -20,6 +20,7 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
+#define _DEFAULT_SOURCE
 #include <stdarg.h>
 #include "xdr_private.h"
 

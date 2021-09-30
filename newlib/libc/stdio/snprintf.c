@@ -17,6 +17,7 @@
 /* doc in sprintf.c */
 /* This code created by modifying sprintf.c so copyright inherited. */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
 #include <stdarg.h>

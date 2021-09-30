@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -34,24 +34,24 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-qemu=qemu-system-arm
+qemu="qemu-system-arm"
 
 # select the program
 elf="$1"
 shift
 
-cpu=cortex-m7
+cpu="cortex-m7"
 machine=unknown
 memory=
 
 #
 # Select a QEMU machine based on the CPU
 #
-case $cpu in
+case "$cpu" in
 
     # mps2-an385 offers a cortex-m3 processor
     cortex-m3)
-	machine=mps2-an385
+	machine="mps2-an385"
 	;;
 
     # Maybe qemu upstream will take this machine
@@ -72,7 +72,7 @@ esac
 #
 # Make sure the target machine is supported by qemu
 # 
-if $qemu -machine help | grep -q "^$machine "; then
+if "$qemu" -machine help | grep -q "^$machine "; then
     :
 else
     echo "Skipping $elf" unsupported machine
@@ -108,13 +108,14 @@ mon=none
 
 serial=none
 
-echo "$input" | $qemu $memory \
-      -chardev $chardev \
-      -semihosting-config $semi \
-      -monitor $mon \
-      -serial $serial \
-      -machine $machine,accel=tcg \
-      -cpu $cpu \
+# shellcheck disable=SC2086
+echo "$input" | "$qemu" $memory \
+      -chardev "$chardev" \
+      -semihosting-config "$semi" \
+      -monitor "$mon" \
+      -serial "$serial" \
+      -machine "$machine",accel=tcg \
+      -cpu "$cpu" \
       -device loader,file=$elf,cpu-num=0 \
       -nographic \
       "$@"

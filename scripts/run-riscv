@@ -34,7 +34,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-qemu=qemu-system-riscv32
+qemu="qemu-system-riscv32"
 
 # select the program
 elf="$1"
@@ -42,15 +42,15 @@ shift
 
 case "$elf" in
     */rv32*_ilp32*/*)
-	qemu=qemu-system-riscv32
+	qemu="qemu-system-riscv32"
 	cpu=rv32
 	;;
     */rv64*_lp64*/*)
-	qemu=qemu-system-riscv64
+	qemu="qemu-system-riscv64"
 	cpu=rv64
 	;;
     *)
-	qemu=qemu-system-riscv64
+	qemu="qemu-system-riscv64"
 	options="i m a f d c"
 	cpu=rv64
 	;;
@@ -59,18 +59,18 @@ esac
 cpu="$cpu,mmu=false,pmp=false"
 
 if [ -z "$options" ]; then
-    options=`echo $elf | sed 's/.*rv[36][24]\([a-z]*\)_.*$/\1/' | sed 's/\(.\)/\1 /g'`
+    options="$(echo "$elf" | sed 's/.*rv[36][24]\([a-z]*\)_.*$/\1/' | sed 's/\(.\)/\1 /g')"
 fi
 
 all_options="i e g m a f d c s u"
 
 for o in $all_options; do
-    if `echo $options | grep -q $o`; then
+    if echo "$options" | grep -q "$o"; then
 	value=true
     else
 	value=false
     fi
-    cpu=$cpu",$o=$value"
+    cpu="$cpu,$o=$value"
 done
 
 # Set the target machine
@@ -105,4 +105,4 @@ mon=none
 
 serial=none
 
-echo "$input" | $qemu -chardev $chardev -semihosting-config $semi -monitor $mon -serial $serial -machine $machine -cpu $cpu -kernel $elf -nographic "$@" -bios none
+echo "$input" | $qemu -chardev $chardev -semihosting-config "$semi" -monitor "$mon" -serial "$serial" -machine "$machine" -cpu "$cpu" -kernel "$elf" -nographic "$@" -bios none

@@ -31,14 +31,6 @@
 __strong_reference(__ieee754_sqrt, sqrt);
 #endif
 
-#ifndef _IEEE_LIBM
-#warning not IEEE_LIBM
-#endif
-#ifndef HAVE_ALIAS_ATTRIBUTE
-#warning not have aliase
-#endif
-
-
 double
 __ieee754_sqrt(double x)
 {

@@ -840,7 +840,7 @@ short ucs2[] =
 
 struct iconv_data
 {
-    int len;
+    size_t len;
     char *name;
     char *data;
 };
@@ -875,9 +875,10 @@ iconv_t descs[CONVERSIONS*CONVERSIONS];
 #define TEST_NLSPATH "./"
 #endif
 
-int main(int argc, char **argv)
+int main(void)
 {
-    int i, j, k, d = 0;
+    int i, j, d = 0;
+    unsigned k;
     size_t n;
     char *outbuf, *inbuf;
     int conversions = sizeof(data)/sizeof(struct iconv_data) - 1;
@@ -930,8 +931,8 @@ int main(int argc, char **argv)
 	    {
                 printf("Conversion from %s to %s FAILED",
                        data[i].name, data[j].name);
-	        printf(" - bad output buffer length (%ld instead of %d)\n",
-		       OUTBUF_LEN - (long) outbytes, data[j].len);
+	        printf(" - bad output buffer length (%ld instead of %lu)\n",
+		       OUTBUF_LEN - (long) outbytes, (unsigned long) data[j].len);
                 CHECK(ERROR);
 	    }
 

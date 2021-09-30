@@ -36,12 +36,12 @@ project('picolibc', 'c',
 	default_options: [
 	  'buildtype=minsize',
 	  'debug=true',
-	  'c_std=gnu99',
+	  'c_std=c18',
 	  'b_staticpic=false',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.50',
-	version: '1.7.2'
+	version: '1.7.3'
        )
 
 targets = []
@@ -90,7 +90,7 @@ c_args += '-U_FORTIFY_SOURCE'
 if meson.get_compiler('c').has_argument('-fno-common')
   c_args += '-fno-common'
 endif
-if meson.get_compiler('c').has_argument('-frounding-math')
+if meson.get_compiler('c').has_argument('-frounding-math') and meson.get_compiler('c').get_id() != 'clang'
   c_args += '-frounding-math'
 endif
 if meson.get_compiler('c').symbols_have_underscore_prefix()
@@ -140,30 +140,6 @@ endif
 has_link_defsym=meson.get_compiler('c').has_link_argument('-Wl,--defsym=' + global_prefix + '_start=0')
 has_link_alias=meson.get_compiler('c').has_link_argument('-Wl,-alias,' + global_prefix + 'main,testalias')
 
-float_printf_compile_args=['-DPICOLIBC_FLOAT_PRINTF_SCANF']
-float_printf_link_args=float_printf_compile_args
-int_printf_compile_args=['-DPICOLIBC_INTEGER_PRINTF_SCANF']
-int_printf_link_args=int_printf_compile_args
-if tinystdio
-  vfprintf_symbol = global_prefix + 'vfprintf'
-  __f_vfprintf_symbol = global_prefix + '__f_vfprintf'
-  __i_vfprintf_symbol = global_prefix + '__i_vfprintf'
-  vfscanf_symbol = global_prefix + 'vfscanf'
-  __f_vfscanf_symbol = global_prefix + '__f_vfscanf'
-  __i_vfscanf_symbol = global_prefix + '__i_vfscanf'
-  if has_link_defsym
-    float_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __f_vfprintf_symbol
-    float_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __f_vfscanf_symbol
-    int_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __i_vfprintf_symbol
-    int_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __i_vfscanf_symbol
-  elif has_link_alias
-    float_printf_link_args += '-Wl,-alias,' + __f_vfprintf_symbol +  ',' + vfprintf_symbol
-    float_printf_link_args += '-Wl,-alias,' + __f_vfscanf_symbol + ',' + vfscanf_symbol
-    int_printf_link_args += '-Wl,-alias,' + __i_vfprintf_symbol +  ',' + vfprintf_symbol
-    int_printf_link_args += '-Wl,-alias,' + __i_vfscanf_symbol + ',' + vfscanf_symbol
-  endif
-endif
-
 # Shared stdio options
 io_long_long = get_option('io-long-long')
 newlib_io_long_long = get_option('newlib-io-long-long')
@@ -182,6 +158,69 @@ posix_io = tinystdio and get_option('posix-io')
 posix_console = posix_io and get_option('posix-console')
 io_float_exact = not tinystdio or get_option('io-float-exact')
 atomic_ungetc = tinystdio and get_option('atomic-ungetc')
+format_default = get_option('format-default')
+
+double_printf_compile_args=['-DPICOLIBC_DOUBLE_PRINTF_SCANF']
+double_printf_link_args=double_printf_compile_args
+float_printf_compile_args=['-DPICOLIBC_FLOAT_PRINTF_SCANF']
+float_printf_link_args=float_printf_compile_args
+int_printf_compile_args=['-DPICOLIBC_INTEGER_PRINTF_SCANF']
+int_printf_link_args=int_printf_compile_args
+if tinystdio
+  vfprintf_symbol = global_prefix + 'vfprintf'
+  __d_vfprintf_symbol = global_prefix + '__d_vfprintf'
+  __f_vfprintf_symbol = global_prefix + '__f_vfprintf'
+  __i_vfprintf_symbol = global_prefix + '__i_vfprintf'
+  vfscanf_symbol = global_prefix + 'vfscanf'
+  __d_vfscanf_symbol = global_prefix + '__d_vfscanf'
+  __f_vfscanf_symbol = global_prefix + '__f_vfscanf'
+  __i_vfscanf_symbol = global_prefix + '__i_vfscanf'
+  if has_link_defsym
+    if format_default != 'double'	
+      double_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __d_vfprintf_symbol
+      double_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __d_vfscanf_symbol
+    endif
+    if format_default != 'float'
+      float_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __f_vfprintf_symbol
+      float_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __f_vfscanf_symbol
+    endif
+    if format_default != 'integer'
+      int_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __i_vfprintf_symbol
+      int_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __i_vfscanf_symbol
+    endif
+  elif has_link_alias
+    if format_default == 'double'
+      float_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __d_vfprintf_symbol
+      float_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __d_vfscanf_symbol
+      int_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __d_vfprintf_symbol
+      int_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __d_vfscanf_symbol
+    endif
+    if format_default == 'float'
+      double_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __f_vfprintf_symbol
+      double_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __f_vfscanf_symbol
+      int_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __f_vfprintf_symbol
+      int_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __f_vfscanf_symbol
+    endif
+    if format_default == 'int'
+      double_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __i_vfprintf_symbol
+      double_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __i_vfscanf_symbol
+      float_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __i_vfprintf_symbol
+      float_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __i_vfscanf_symbol
+    endif
+    if format_default != 'double'
+      double_printf_link_args += '-Wl,-alias,' + __d_vfprintf_symbol +  ',' + vfprintf_symbol
+      double_printf_link_args += '-Wl,-alias,' + __d_vfscanf_symbol + ',' + vfscanf_symbol
+    endif
+    if format_default != 'float'
+      float_printf_link_args += '-Wl,-alias,' + __f_vfprintf_symbol +  ',' + vfprintf_symbol
+      float_printf_link_args += '-Wl,-alias,' + __f_vfscanf_symbol + ',' + vfscanf_symbol
+    endif
+    if format_default != 'integer'
+      int_printf_link_args += '-Wl,-alias,' + __i_vfprintf_symbol +  ',' + vfprintf_symbol
+      int_printf_link_args += '-Wl,-alias,' + __i_vfscanf_symbol + ',' + vfscanf_symbol
+    endif
+  endif
+endif
 
 # A bunch of newlib-stdio only options
 newlib_io_pos_args = get_option('newlib-io-pos-args')
@@ -193,6 +232,7 @@ newlib_nano_formatted_io = get_option('newlib-nano-formatted-io')
 newlib_io_float = get_option('newlib-io-float')
 newlib_stdio64 = get_option('newlib-stdio64')
 newlib_wide_orient = get_option('newlib-wide-orient')
+newlib_have_fcntl = get_option('newlib-have-fcntl')
 
 # options which no longer have any effect
 newlib_reentrant_syscalls_provided = get_option('newlib-reentrant-syscalls-provided')
@@ -358,6 +398,8 @@ specs_data.set(
 if tinystdio
   specs_printf=('%{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfprintf=__f_vfprintf}' +
 		' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfscanf=__f_vfscanf}' +
+		' %{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfprintf=__d_vfprintf}' +
+		' %{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfscanf=__d_vfscanf}' +
 		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfprintf=__i_vfprintf}' +
 		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfscanf=__i_vfscanf}')
 else
@@ -424,13 +466,15 @@ picolibcpp_ld = configure_file(input: 'picolibc.ld.in',
 			     configuration: picolibcpp_ld_data,
 			     install_dir: lib_dir)
 
-# Not all compilers necessarily support all warnings used by the tests; only use these which are:
-test_c_warnings = []
-foreach arg : ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-Wimplicit-function-declaration', '-Werror=vla']
+# Not all compilers necessarily support all warnings; only use these which are:
+c_warnings = []
+foreach arg : ['-Wall', '-Wextra', '-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-Werror=implicit-function-declaration', '-Werror=vla', '-Wno-unused-command-line-argument']
   if meson.get_compiler('c').has_argument(arg)
-    test_c_warnings += [arg]
+    c_warnings += [arg]
   endif
 endforeach
+
+c_args += c_warnings
 
 long_double_code = '''
 #include <float.h>
@@ -501,6 +545,12 @@ void __attribute__((destructor(101))) dtor (void) {}
 '''
 have_attr_ctor_dtor = meson.get_compiler('c').compiles(attr_ctor_dtor_code, name : 'attributes constructor/destructor', args : (meson.get_compiler('c').has_argument('-Werror') ? '-Werror' : ''))
 
+# Add c_args from the cross file. This
+# means that the command line values get
+# added to the cross file values instead of
+# replacing them.
+c_args += meson.get_cross_property('c_args', [])
+
 if enable_multilib
   used_libs = []
 
@@ -537,14 +587,7 @@ if enable_multilib
       endif
 
       # Add any extra flags for this target from the cross file
-      target_extra = meson.get_cross_property('c_args_' + name, [])
-      if target_extra != []
-	flags += target_extra
-      endif
-      c_args_extra = meson.get_cross_property('c_args', [])
-      if c_args_extra != []
-	flags += c_args_extra
-      endif
+      flags += meson.get_cross_property('c_args_' + name, [])
 
       value = [tmp[0], flags]
       set_variable('target_' + name, value)
@@ -562,7 +605,7 @@ if enable_multilib
   endif
 else
   targets = ['']
-  target_ = ['.', c_args + meson.get_cross_property('c_args', [])]
+  target_ = ['.', c_args]
 endif
 
 conf_data = configuration_data()
@@ -575,6 +618,7 @@ conf_data = configuration_data()
 # can be compiled + linked.
 # The name should match the builtin, but technically it's not necessary
 builtins = [
+  ['builtin_alloca', '__builtin_alloca(1);'],
   ['builtin_ffs', '__builtin_ffs(42);'],
   ['builtin_ffsl', '__builtin_ffsl((long)42);'],
   ['builtin_ffsll', '__builtin_ffsll((long long)42);'],
@@ -582,9 +626,13 @@ builtins = [
   ['builtin_ctzl', '__builtin_ctzl((unsigned long)42);'],
   ['builtin_ctzll', '__builtin_ctzll((unsigned long long)42);'],
   ['builtin_copysignl', '__builtin_copysignl((long double)42);'],
+  ['builtin_copysign', '__builtin_copysign((long double)42);'],
   ['builtin_isinfl', '__builtin_isinfl((long double)42);'],
+  ['builtin_isinf', '__builtin_isinf((long double)42);'],
   ['builtin_isnanl', '__builtin_isnanl((long double)42);'],
+  ['builtin_isnan', '__builtin_isnan((long double)42);'],
   ['builtin_finitel', '__builtin_finitel((long double)42);'],
+  ['builtin_isfinite', '__builtin_isfinite((long double)42);'],
 ]
 foreach builtin : builtins
   have_current_builtin = meson.get_compiler('c').links('int main(void) { ' + builtin[1] + ' return 0; }', name : 'test for __' + builtin[0])
@@ -632,6 +680,7 @@ conf_data.set('_REENT_GLOBAL_ATEXIT', newlib_global_atexit)
 conf_data.set('_FVWRITE_IN_STREAMIO', newlib_fvwrite_in_streamio)
 conf_data.set('_FSEEK_OPTIMIZATION', newlib_fseek_optimization)
 conf_data.set('_WIDE_ORIENT', newlib_wide_orient)
+conf_data.set('HAVE_FCNTL', newlib_have_fcntl)
 conf_data.set('_NANO_MALLOC', newlib_nano_malloc)
 conf_data.set('_UNBUF_STREAM_OPT', newlib_unbuf_stream_opt)
 conf_data.set('_LITE_EXIT', lite_exit)
@@ -809,7 +858,7 @@ conf_data.set('HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs support
 # By default, tests don't require any special arguments
 
 # disable compiler built-ins so we reach the library equivalents
-test_c_args = c_args + arg_fnobuiltin
+test_c_args = arg_fnobuiltin
 if tests_enable_stack_protector
   if meson.get_compiler('c').has_argument('-fstack-protector-all') and meson.get_compiler('c').has_argument('-fstack-protector-strong')
     test_c_args += ['-fstack-protector-all', '-fstack-protector-strong', '-DTESTS_ENABLE_STACK_PROTECTOR']
@@ -817,7 +866,7 @@ if tests_enable_stack_protector
     tests_enable_stack_protector = false
   endif
 endif
-test_link_args = test_c_args
+test_link_args = []
 test_link_depends = []
 
 # CompCert needs the '-WUl,' prefix to correctly pass the --spec parameters to the linker
@@ -845,7 +894,7 @@ if has_semihost
     test_c_args += [specs_prefix + '--specs', specs_prefix + '@0@/@1@'.format(meson.current_build_dir(), picolibc_specs)]
   endif
 
-  test_link_args += test_c_args + ['-nostartfiles', '-nostdlib', '-T', test_link_path, '-T', 'picolibc.ld', '-lgcc']
+  test_link_args += ['-nostartfiles', '-nostdlib', '-T', test_link_path, '-T', 'picolibc.ld', '-lgcc']
 
   # Make sure all of the tests get re-linked if the linker scripts change
 
@@ -855,8 +904,9 @@ elif meson.get_compiler('c').get_id() == 'clang'
 else
   test_link_depends += test_specs
   test_c_args += [specs_prefix + '--specs', specs_prefix + '@0@/@1@'.format(meson.current_build_dir(), test_specs)]
-  test_link_args += test_c_args
 endif
+
+test_link_args = test_c_args + test_link_args
 
 has_picolibc_tls_api = false
 

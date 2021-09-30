@@ -300,5 +300,5 @@
 {36, 0,123,__LINE__, 0x40146f6d, 0x72988610, 0x403a1999, 0x99999996},	/* 5.10882=f(26.1)*/
 {36, 0,123,__LINE__, 0x4015171c, 0xb5cfe9d8, 0x403bcccc, 0xccccccc9},	/* 5.27257=f(27.8)*/
 {38, 0,123,__LINE__, 0x4015b9be, 0x5d52a9da, 0x403d7fff, 0xfffffffc},	/* 5.43139=f(29.5)*/
-0,};
+{0},};
 void test_sqrtf(m)   {run_vector_1(m,sqrtf_vec,(char *)(sqrtf),"sqrtf","ff");   }	

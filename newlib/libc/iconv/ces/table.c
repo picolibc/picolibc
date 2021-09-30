@@ -455,17 +455,16 @@ load_file (
 {
   FILE *file;
   char *buf;
-  int tbllen, hdrlen;
+  size_t tbllen;
+  size_t hdrlen;
   off_t off;
   off_t cur = 0;
   const char *fname;
   iconv_ccs_desc_t *ccsp = NULL;
-  int nmlen = strlen(name);
+  size_t nmlen = strlen(name);
   /* Since CCS table name length can vary - it is aligned (by adding extra
    * bytes to it's end) to 4-byte boundary. */
   int alignment = nmlen & 3 ? 4 - (nmlen & 3) : 0;
-  
-  nmlen = strlen(name);
   
   hdrlen = nmlen + EXTTABLE_HEADER_LEN + alignment;
 

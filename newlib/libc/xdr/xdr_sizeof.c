@@ -34,6 +34,7 @@
  * when serialized using XDR.
  */
 
+#define _DEFAULT_SOURCE
 #include <rpc/types.h>
 #include <rpc/xdr.h>
 #include <sys/types.h>
@@ -46,6 +47,7 @@ static bool_t
 x_putlong (XDR * xdrs,
 	const long *longp)
 {
+  (void) longp;
   xdrs->x_handy += BYTES_PER_XDR_UNIT;
   return TRUE;
 }
@@ -56,6 +58,7 @@ x_putbytes (XDR * xdrs,
 	const char *bp,
 	u_int len)
 {
+  (void) bp;
   xdrs->x_handy += len;
   return TRUE;
 }
@@ -71,6 +74,8 @@ static bool_t
 x_setpostn (XDR * xdrs,
 	u_int pos)
 {
+  (void) xdrs;
+  (void) pos;
   /* This is not allowed */
   return FALSE;
 }
@@ -129,6 +134,7 @@ static bool_t
 x_putint32 (XDR *xdrs,
 	const int32_t *int32p)
 {
+  (void) int32p;
   xdrs->x_handy += BYTES_PER_XDR_UNIT;
   return TRUE;
 }
@@ -155,9 +161,9 @@ xdr_sizeof (xdrproc_t func,
   ops.x_putint32 = x_putint32;
 
   /* the other harmless ones */
-  ops.x_getlong = (dummyfunc1) harmless;
-  ops.x_getbytes = (dummyfunc2) harmless;
-  ops.x_getint32 = (dummyfunc3) harmless;
+  ops.x_getlong = (dummyfunc1) (void *) harmless;
+  ops.x_getbytes = (dummyfunc2) (void *) harmless;
+  ops.x_getint32 = (dummyfunc3) (void *) harmless;
 
   x.x_op = XDR_ENCODE;
   x.x_ops = &ops;

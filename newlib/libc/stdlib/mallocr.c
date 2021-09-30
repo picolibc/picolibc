@@ -245,6 +245,7 @@ int _dummy_mallocr = 1;
 
 /* Preliminaries */
 
+#define _DEFAULT_SOURCE
 #ifndef __STD_C
 #ifdef __STDC__
 #define __STD_C     1
@@ -1035,7 +1036,7 @@ struct mallinfo mALLINFo();
  * call to free.
  */
 #ifdef HAVE_ALIAS_ATTRIBUTE
-extern typeof(free) __malloc_free;
+extern __typeof(free) __malloc_free;
 #else
 #define __malloc_free(x) fREe(x)
 #endif

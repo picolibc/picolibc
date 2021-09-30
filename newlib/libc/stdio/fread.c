@@ -80,6 +80,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
 */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
 #include <string.h>
@@ -170,7 +171,7 @@ _fread_r (struct _reent * ptr,
   if (fp->_flags & __SNBF)
     {
       /* First copy any available characters from ungetc buffer.  */
-      int copy_size = resid > fp->_r ? fp->_r : resid;
+      int copy_size = resid > (size_t) fp->_r ? fp->_r : (int) resid;
       (void) memcpy ((void *) p, (void *) fp->_p, (size_t) copy_size);
       fp->_p += copy_size;
       fp->_r -= copy_size;
@@ -218,7 +219,7 @@ _fread_r (struct _reent * ptr,
   else
 #endif /* !PREFER_SIZE_OVER_SPEED && !__OPTIMIZE_SIZE__ */
     {
-      while (resid > (r = fp->_r))
+        while (resid > (size_t) (r = fp->_r))
 	{
 	  (void) memcpy ((void *) p, (void *) fp->_p, (size_t) r);
 	  fp->_p += r;

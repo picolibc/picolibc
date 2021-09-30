@@ -74,12 +74,14 @@ These are GNU extensions.
 Supporting OS subroutines required:
 */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <newlib.h>
 #include <ctype.h>
 #include <wctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <alloca.h>
 #include <stdint.h>
 #include <limits.h>
 #include <wchar.h>
@@ -324,6 +326,7 @@ __ssrefill_r (struct _reent * ptr,
    * Our only hope of further input is the ungetc buffer.
    * If there is anything in that buffer to read, return.
    */
+  (void) ptr;
   if (HASUB (fp))
     {
       FREEUB (ptr, fp);
@@ -359,7 +362,7 @@ _sfread_r (struct _reent * ptr,
   total = resid;
   p = buf;
 
-  while (resid > (r = fp->_r))
+  while (resid > (size_t) (r = fp->_r))
     {
       (void) memcpy ((void *) p, (void *) fp->_p, (size_t) r);
       fp->_p += r;
@@ -389,6 +392,7 @@ __wctob (struct _reent *rptr, wint_t wc)
   mbstate_t mbs;
   unsigned char pmb[MB_LEN_MAX];
 
+  (void) rptr;
   if (wc == WEOF)
     return EOF;
   memset (&mbs, '\0', sizeof (mbs));
@@ -500,8 +504,8 @@ __SVFSCANF_R (struct _reent *rptr,
       size_t _nw = (_w);						\
       ptrdiff_t _dif = _p - _p0;					\
       if (_p_p &&							\
-	  ((sizeof (_type) == 2 && _dif >= _nw - 1)			\
-	   || _dif >= _nw))						\
+	  ((sizeof (_type) == 2 && (size_t) _dif >= _nw - 1)             \
+	   || (size_t) _dif >= _nw))                                    \
 	{								\
 	  _p0 = (_type *) realloc (_p0, (_nw << 1) * sizeof (_type));			\
 	  if (!_p0)							\
@@ -787,7 +791,7 @@ __SVFSCANF_R (struct _reent *rptr,
 
 	case 'D':		/* compat */
 	  flags |= LONG;
-	  /* FALLTHROUGH */
+	  FALLTHROUGH;
 	case 'd':
 	  c = CT_INT;
 	  ccfn = (u_long (*)CCFN_PARAMS)strtol;
@@ -802,7 +806,7 @@ __SVFSCANF_R (struct _reent *rptr,
 
 	case 'O':		/* compat */
 	  flags |= LONG;
-	  /* FALLTHROUGH */
+	  FALLTHROUGH;
 	case 'o':
 	  c = CT_INT;
 	  ccfn = strtoul;
@@ -841,7 +845,7 @@ __SVFSCANF_R (struct _reent *rptr,
 #ifdef _WANT_IO_C99_FORMATS
 	case 'S':
 	  flags |= LONG;
-	  /* FALLTHROUGH */
+          FALLTHROUGH;
 #endif
 
 	case 's':
@@ -857,7 +861,7 @@ __SVFSCANF_R (struct _reent *rptr,
 #ifdef _WANT_IO_C99_FORMATS
 	case 'C':
 	  flags |= LONG;
-	  /* FALLTHROUGH */
+          FALLTHROUGH;
 #endif
 
 	case 'c':

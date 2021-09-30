@@ -67,7 +67,7 @@ int feclearexcept(int excepts)
 
   /* Clear the requested flags */
 
-  asm volatile("csrrc zero, fflags, %0" : : "r"(excepts));
+  __asm__ volatile("csrrc zero, fflags, %0" : : "r"(excepts));
 
   /* Per 'feclearexcept.html
    * "If the argument is zero or if all the specified exceptions were

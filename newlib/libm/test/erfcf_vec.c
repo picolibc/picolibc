@@ -298,5 +298,6 @@
 {64, 0, 34,__LINE__, 0x00000000, 0x00000000, 0x403a1999, 0x99999996},	/* 0=f(26.1)*/
 {64, 0, 34,__LINE__, 0x00000000, 0x00000000, 0x403bcccc, 0xccccccc9},	/* 0=f(27.8)*/
 {31, 0, 34,__LINE__, 0x3379b604, 0xad690000, 0x403d7fff, 0xfffffffc},	/* 1e-60=f(29.5)*/
-0,};
+{0}
+};
 void test_erfcf(m)   {run_vector_1(m,erfcf_vec,(char *)(erfcf),"erfcf","ff");   }	

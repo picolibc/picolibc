@@ -98,6 +98,8 @@ FLOAT_T makemathname(test_y1_0)(void) { return makemathname(y1)(makemathname(zer
 FLOAT_T makemathname(test_y1_neg)(void) { return makemathname(y1)(-makemathname(one)); }
 FLOAT_T makemathname(test_yn_0)(void) { return makemathname(yn)(2, makemathname(zero)); }
 FLOAT_T makemathname(test_yn_neg)(void) { return makemathname(yn)(2, -makemathname(one)); }
+FLOAT_T makemathname(test_scalbn_big)(void) { return makemathname(scalbn)(makemathname(one), 0x7fffffff); }
+FLOAT_T makemathname(test_scalbn_tiny)(void) { return makemathname(scalbn)(makemathname(one), -0x7fffffff); }
 
 #ifndef FE_DIVBYZERO
 #define FE_DIVBYZERO 0
@@ -174,7 +176,9 @@ struct {
 	TEST(y1_neg, (FLOAT_T)NAN, FE_INVALID, EDOM),
 	TEST(yn_0, -(FLOAT_T)INFINITY, FE_DIVBYZERO, ERANGE),
 	TEST(yn_neg, (FLOAT_T)NAN, FE_INVALID, EDOM),
-	{ NULL, NULL },
+        TEST(scalbn_big, (FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
+        TEST(scalbn_tiny, (FLOAT_T)0.0, FE_UNDERFLOW, ERANGE),
+	{ 0 },
 };
 
 int
@@ -198,19 +202,20 @@ makemathname(run_tests)(void) {
 		       makemathname(tests)[t].name, err, strerror(err), except);
 #endif
 		if ((isinf(v) && isinf(makemathname(tests)[t].value) && ((v > 0) != (makemathname(tests)[t].value > 0))) ||
-		    (v != makemathname(tests)[t].value && isnanf(v) != isnanf(makemathname(tests)[t].value)))
+		    (v != makemathname(tests)[t].value && (!isnanf(v) || !isnanf(makemathname(tests)[t].value))))
 		{
 			printf("\tbad value got %g expect %g\n", (double) v, (double) makemathname(tests)[t].value);
 			++result;
 		}
 		if (math_errhandling & EXCEPTION_TEST) {
 			if ((except & makemathname(tests)[t].except) != makemathname(tests)[t].except) {
-				printf("\texceptions supported but %s returns 0x%x\n", makemathname(tests)[t].name, except);
+				printf("\texceptions supported. %s returns 0x%x instead of 0x%x\n",
+                                       makemathname(tests)[t].name, except, makemathname(tests)[t].except);
 				++result;
 			}
 		} else {
 			if (except) {
-				printf("\texceptions not supported but %s returns 0x%x\n", makemathname(tests)[t].name, except);
+				printf("\texceptions not supported. %s returns 0x%x\n", makemathname(tests)[t].name, except);
 				++result;
 			}
 		}

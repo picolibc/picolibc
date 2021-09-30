@@ -57,6 +57,7 @@ No supporting OS subroutines are required.
 
 #ifndef __rtems__
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
 

@@ -32,7 +32,7 @@ size_t strlen(const char *str)
   unsigned long *ls = (unsigned long *)str;
   while (!__libc_detect_null (*ls++))
     ;
-  asm volatile ("" : "+r"(ls)); /* prevent "optimization" */
+  __asm__ volatile ("" : "+r"(ls)); /* prevent "optimization" */
 
   str = (const char *)ls;
   size_t ret = str - start, sl = sizeof (long);

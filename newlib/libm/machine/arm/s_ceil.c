@@ -31,7 +31,7 @@ double
 ceil (double x)
 {
   double result;
-  asm volatile ( "vrintp.f64\t%P0, %P1" : "=w" (result) : "w" (x) );
+  __asm__ volatile ( "vrintp.f64\t%P0, %P1" : "=w" (result) : "w" (x) );
   return result;
 }
 

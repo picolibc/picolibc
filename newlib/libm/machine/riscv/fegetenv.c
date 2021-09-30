@@ -52,7 +52,7 @@ int fegetenv(fenv_t *envp)
   /* Get the current environment (FCSR) */
 
   fenv_t fcsr;
-  asm volatile("frcsr %0" : "=r"(fcsr));
+  __asm__ volatile("frcsr %0" : "=r"(fcsr));
 
   /* Store FCSR in envp */
 

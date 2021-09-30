@@ -17,6 +17,7 @@
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#define _DEFAULT_SOURCE
 #include <stdio.h>
 #include <sys/types.h>
 #include <fcntl.h>
@@ -37,6 +38,7 @@ __sseek64 (struct _reent *ptr,
   register FILE *fp = (FILE *) cookie;
   register _off64_t ret;
 
+  (void) ptr;
   ret = lseek64 (fp->_file, (_off64_t) offset, whence);
   if (ret == (_fpos64_t)-1L)
     fp->_flags &= ~__SOFF;
@@ -60,6 +62,7 @@ __swrite64 (struct _reent *ptr,
   int oldmode=0;
 #endif
 
+  (void) ptr;
   if (fp->_flags & __SAPP)
     (void) lseek64 (fp->_file, (_off64_t)0, SEEK_END);
   fp->_flags &= ~__SOFF;	/* in case O_APPEND mode is set */

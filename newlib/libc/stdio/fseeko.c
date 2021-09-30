@@ -74,6 +74,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
 */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
 #include <string.h>
@@ -183,6 +184,8 @@ _fseeko_r (struct _reent *ptr,
       _newlib_flockfile_exit (fp);
       return (EOF);
     }
+
+  (void) havepos;
 
   /*
    * Can only optimise if:

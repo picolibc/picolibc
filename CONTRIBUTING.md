@@ -5,7 +5,7 @@ documentation, issue reports, or just kind words.
 
 ## Getting Current Source Code
 
-Snek sources are maintained in git and hosted in two places.
+Picolibc sources are maintained in git and hosted in two places.
 
  1. [keithp.com](https://keithp.com/cgit/picolibc.git/). This is the
     'canonical' source location.
@@ -90,7 +90,7 @@ to abide by the [Picolibc Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Code of Conduct
 
-Snek uses the [Contributor Covenant](https://www.contributor-covenant.org/),
+Picolibc uses the [Contributor Covenant](https://www.contributor-covenant.org/),
 which you'll find in the source tree as [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
-Please help make Snek a kind and welcoming environment by following
+Please help make picolibc a kind and welcoming environment by following
 those rules.

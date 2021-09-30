@@ -31,7 +31,7 @@ float
 nearbyintf (float x)
 {
   float result;
-  asm volatile ("vrintr.f32\t%0, %1" : "=t" (result) : "t" (x));
+  __asm__ volatile ("vrintr.f32\t%0, %1" : "=t" (result) : "t" (x));
   return result;
 }
 

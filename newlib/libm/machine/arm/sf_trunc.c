@@ -31,7 +31,7 @@ float
 truncf (float x)
 {
   float result;
-  asm volatile ("vrintz.f32\t%0, %1" : "=t" (result) : "t" (x));
+  __asm__ volatile ("vrintz.f32\t%0, %1" : "=t" (result) : "t" (x));
   return result;
 }
 

@@ -36,6 +36,7 @@
  * arrays.  See xdr.h for more info on the interface to xdr.
  */
 
+#define _DEFAULT_SOURCE
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>

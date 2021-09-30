@@ -92,6 +92,7 @@ SEEALSO
  *
  * This code is large and complicated...
  */
+#define _DEFAULT_SOURCE
 #include <newlib.h>
 
 #ifdef INTEGER_ONLY
@@ -118,6 +119,7 @@ SEEALSO
 # undef _NO_POS_ARGS
 #endif
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -375,7 +377,7 @@ _VFWPRINTF_R (struct _reent *data,
        va_list ap)
 {
 	register wchar_t *fmt;	/* format string */
-	register wint_t ch;	/* character from fmt */
+	register wchar_t ch;	/* character from fmt */
 	register int n, m;	/* handy integers (short term usage) */
 	register wchar_t *cp;	/* handy char pointer (short term usage) */
 	register int flags;	/* flags as above */
@@ -746,7 +748,7 @@ reswitch:	switch (ch) {
 			if (width >= 0)
 				goto rflag;
 			width = -width;
-			/* FALLTHROUGH */
+			FALLTHROUGH;
 		case L'-':
 			flags |= LADJUST;
 			goto rflag;
@@ -1252,7 +1254,7 @@ string:
 					cp = malloc_buf;
 				} else
 					cp = buf;
-				for (size = 0; size < insize; ++size)
+				for (size = 0; (size_t) size < insize; ++size)
 					cp[size] = arg[size];
 				cp[size] = L'\0';
 			}
@@ -1574,6 +1576,7 @@ wcvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 		*sign = L'\0';
 # endif /* !_NO_LONGDBL */
 
+        (void) data;
 # ifdef _WANT_IO_C99_FORMATS
 	if (ch == L'a' || ch == L'A') {
 		wchar_t *digits, *bp, *rve;
@@ -1666,7 +1669,7 @@ wexponent(wchar_t *p0, int exp, int fmtch)
 # endif
 
 	p = p0;
-	*p++ = isa ? L'p' - L'a' + fmtch : fmtch;
+	*p++ = isa ? (int) (L'p' - L'a') + fmtch : fmtch;
 	if (exp < 0) {
 		exp = -exp;
 		*p++ = L'-';
@@ -1946,7 +1949,7 @@ get_arg (struct _reent *data,
 	      break;
 	    case GETPWB: /* we require format pushback */
 	      --fmt;
-	      /* fallthrough */
+	      FALLTHROUGH;
 	    case GETPW:  /* we have a variable precision or width to acquire */
 	      args[numargs++].val_int = va_arg (*ap, int);
 	      break;

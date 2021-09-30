@@ -75,6 +75,7 @@ srcs_tinystdio = [
     'printf.c',
     'putchar.c',
     'puts.c',
+    'rewind.c',
     'scanf.c',
     'setbuf.c',
     'setvbuf.c',
@@ -180,6 +181,14 @@ install_headers(
   'stdio.h'
 )
 
+if format_default == 'double'
+  c_args_format = '-DFORMAT_DEFAULT_DOUBLE'
+elif format_default == 'float'
+  c_args_format = '-DFORMAT_DEFAULT_FLOAT'
+elif format_default == 'integer'
+  c_args_format = '-DFORMAT_DEFAULT_INTEGER'
+endif
+
 srcs_tinystdio_use = []
 foreach file : srcs_tinystdio
   s_file = file.split('.')[0] + '.S'
@@ -199,5 +208,5 @@ foreach target : targets
 				    srcs_tinystdio_use,
 				    pic: false,
 				    include_directories: inc,
-				    c_args: value[1]))
+				    c_args: value[1] + [c_args_format]))
 endforeach

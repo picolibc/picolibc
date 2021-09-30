@@ -33,9 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
-#define _XOPEN_SOURCE
-#define _XOPEN_SOURCE_EXTENDED
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -46,6 +44,7 @@ strtod_l (const char *__restrict s00,
 	  char **__restrict se,
 	  locale_t loc)
 {
+        (void) loc;
 	return strtod (s00, se);
 }
 
@@ -57,6 +56,7 @@ extern long double strtold_l(const char *, char **, locale_t loc) __attribute__ 
 long double
 strtold_l (const char * nptr, char ** endptr, locale_t loc)
 {
+        (void) loc;
 	return (long double) strtod_l(nptr, endptr, loc);
 }
 #endif

@@ -33,7 +33,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-DIR=`dirname $0`
+DIR="$(dirname "$0")"
 
 # First argument must be target architecture
 
@@ -62,7 +62,7 @@ fi
 
 case "$ARCH" in
     clang-*)
-	ARCH=`echo $ARCH | sed 's/clang-//'`
+	ARCH=$(echo "$ARCH" | sed 's/clang-//')
 	;;
 esac
 
@@ -75,8 +75,8 @@ case "$*" in
 		:
 		;;
 	    *)
-		SYSROOT_ORIG=`${ARCH}-gcc -print-sysroot`
-		SYSROOT=`readlink -f "$SYSROOT_ORIG"`
+		SYSROOT_ORIG="$("${ARCH}-gcc" -print-sysroot)"
+		SYSROOT="$(readlink -f "$SYSROOT_ORIG")"
 		PREFIX="-Dprefix=$SYSROOT"
 		;;
 	esac
@@ -88,15 +88,15 @@ esac
 case "$PREFIX" in
     "")
 	meson "$DIR"/.. \
-	      -Dincludedir=picolibc/$ARCH/include \
-	      -Dlibdir=picolibc/$ARCH/lib \
+	      -Dincludedir=picolibc/"$ARCH"/include \
+	      -Dlibdir=picolibc/"$ARCH"/lib \
 	      --cross-file "$CROSS" \
 	      "$@"
 	;;
     *)
 	meson "$DIR"/.. \
-	      -Dincludedir=picolibc/$ARCH/include \
-	      -Dlibdir=picolibc/$ARCH/lib \
+	      -Dincludedir=picolibc/"$ARCH"/include \
+	      -Dlibdir=picolibc/"$ARCH"/lib \
 	      --cross-file "$CROSS" \
 	      "$PREFIX" "$@"
 	;;

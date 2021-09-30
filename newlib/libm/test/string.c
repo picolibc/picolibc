@@ -24,8 +24,10 @@
  */
 
 #pragma GCC diagnostic ignored "-Wmemset-transposed-args"
+#ifndef __clang__
 #pragma GCC diagnostic ignored "-Wstringop-overflow="
 #pragma GCC diagnostic ignored "-Wstringop-truncation"
+#endif
 #pragma GCC diagnostic ignored "-Warray-bounds"
 
 
@@ -552,7 +554,7 @@ void test_string()
   equal(one+4, "ef");
 
   (void) strcpy(one, "abcdef");
-  bzero(one+2, 0);
+  bzero(one+2, (0));
   equal(one, "abcdef");	/* Zero-length copy. */
 
   /* bcmp - somewhat like memcmp.  */

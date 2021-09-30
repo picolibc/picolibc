@@ -32,6 +32,7 @@
  * SUCH DAMAGE.
  */
 
+#define _DEFAULT_SOURCE
 #include <sys/cdefs.h>
 #if 0
 #if defined(LIBC_SCCS) && !defined(lint)
@@ -108,9 +109,9 @@ wcstoimax_l(const wchar_t * __restrict nptr,
 			c -= L'a' - 10;
 		else
 			break;
-		if (c >= base)
+		if ((int) c >= base)
 			break;
-		if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
+		if (any < 0 || acc > cutoff || (acc == cutoff && (int) c > cutlim))
 			any = -1;
 		else {
 			any = 1;

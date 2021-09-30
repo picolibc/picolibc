@@ -32,6 +32,7 @@
  * Interface documentation refer to malloc.c.
  */
 
+#define _DEFAULT_SOURCE
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
@@ -48,6 +49,7 @@
 #else
 #define MALLOC_LOCK __LIBC_LOCK()
 #define MALLOC_UNLOCK __LIBC_UNLOCK()
+#undef assert
 #define assert(x) ((void)0)
 #endif
 
@@ -144,8 +146,8 @@ bool __malloc_grow_chunk(chunk_t *c, size_t new_size);
  * call to free.
  */
 #ifdef HAVE_ALIAS_ATTRIBUTE
-extern typeof(free) __malloc_free;
-extern typeof(malloc) __malloc_malloc;
+extern __typeof(free) __malloc_free;
+extern __typeof(malloc) __malloc_malloc;
 #else
 #define __malloc_free(x) free(x)
 #define __malloc_malloc(x) malloc(x)
@@ -230,7 +232,7 @@ void* __malloc_sbrk_aligned(size_t s)
      * parameter is int, not intptr_t or ptrdiff_t,
      */
     int d = (int) s;
-    if (d != s || d < 0)
+    if (d < 0 || (size_t) d != s)
 	return (void *)-1;
 #else
     ptrdiff_t d = (ptrdiff_t)s;
@@ -761,6 +763,8 @@ __strong_reference(memalign, aligned_alloc);
 #ifdef DEFINE_MALLOPT
 int mallopt(int parameter_number, int parameter_value)
 {
+    (void) parameter_number;
+    (void) parameter_value;
     return 0;
 }
 #endif /* DEFINE_MALLOPT */

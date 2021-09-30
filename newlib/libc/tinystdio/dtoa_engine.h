@@ -29,8 +29,6 @@
 #ifndef	_DTOA_ENGINE_H_
 #define	_DTOA_ENGINE_H_
 
-#define _XOPEN_SOURCE
-#define _XOPEN_SOURCE_EXTENDED
 #include <stdlib.h>
 #include <stdint.h>
 #include <float.h>

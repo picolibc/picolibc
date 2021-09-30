@@ -12,6 +12,7 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 int
 iswprint_l (wint_t c, struct __locale_t *locale)
 {
+  (void) locale;
 #ifdef _MB_CAPABLE
   c = _jp2uc_l (c, locale);
   enum category cat = category (c);

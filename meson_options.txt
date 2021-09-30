@@ -107,6 +107,8 @@ option('posix-io', type: 'boolean', value: true,
        description: 'Provide fopen/fdopen using POSIX I/O (open, close, read, write, lseek)')
 option('posix-console', type: 'boolean', value: false,
        description: 'Use POSIX I/O for stdin/stdout/stderr')
+option('format-default', type: 'combo', choices: ['double', 'float', 'integer'], value: 'double',
+       description: 'which printf/scanf versions should be the default')
 
 #
 # Options applying to only legacy stdio
@@ -135,6 +137,8 @@ option('newlib-unbuf-stream-opt', type: 'boolean', value: false,
        description: 'enable unbuffered stream optimization in streamio')
 option('newlib-wide-orient', type: 'boolean', value: false,
        description: 'Turn off wide orientation in streamio')
+option('newlib-have-fcntl', type: 'boolean', value: false,
+       description: 'System has fcntl function')
 
 #
 # Internationalization options

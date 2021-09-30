@@ -31,7 +31,7 @@ double
 rint (double x)
 {
   double result;
-  asm volatile ("vrintx.f64\t%P0, %P1" : "=w" (result) : "w" (x));
+  __asm__ volatile ("vrintx.f64\t%P0, %P1" : "=w" (result) : "w" (x));
   return result;
 }
 

@@ -19,7 +19,9 @@ c_args = [
 	'-target', 'riscv32-unknown-elf',
 	'-march=rv32imafdc',
 	'-Wdouble-promotion',
-	'-Werror=double-promotion'
+	'-Werror=double-promotion',
+        '-Wno-unsupported-floating-point-opt',
+        '-std=c17',
 	]
 c_link_args = [
 	'-m32',

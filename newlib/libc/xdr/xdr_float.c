@@ -37,6 +37,7 @@
  * xdr.
  */
 
+#define _DEFAULT_SOURCE
 #include <sys/types.h>
 #include <rpc/types.h>
 #include <rpc/xdr.h>

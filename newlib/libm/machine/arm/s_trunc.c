@@ -31,7 +31,7 @@ double
 trunc (double x)
 {
   double result;
-  asm volatile ("vrintz.f64\t%P0, %P1" : "=w" (result) : "w" (x));
+  __asm__ volatile ("vrintz.f64\t%P0, %P1" : "=w" (result) : "w" (x));
   return result;
 }
 

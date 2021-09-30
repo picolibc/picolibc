@@ -21,6 +21,7 @@ __ascii_mbtowc (
   wchar_t dummy;
   unsigned char *t = (unsigned char *)s;
 
+  (void) state;
   if (pwc == NULL)
     pwc = &dummy;
 
@@ -817,7 +818,7 @@ __eucjp_mbtowc (
 	    {
 	      state->__value.__wchb[1] = ch;
 	      state->__count = 2;
-	      if (n <= i)
+	      if (n <= (size_t) i)
 		return -2;
 	      ch = t[i++];
 	    }

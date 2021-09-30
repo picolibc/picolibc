@@ -116,7 +116,7 @@ extern char _etext;
 
 /* EAR entry for the starting address of SPE executable image.  */
 extern const unsigned long long _EAR_;
-asm (".section .toe,\"a\",@nobits\n\r"
+__asm__ (".section .toe,\"a\",@nobits\n\r"
      ".align 4\n\r"
      ".type _EAR_, @object\n\r"
      ".size _EAR_, 16\n" "_EAR_: .space 16\n" ".previous");

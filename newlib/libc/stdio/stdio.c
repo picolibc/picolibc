@@ -16,6 +16,7 @@
  */
 /* No user fns here.  Pesch 15apr92. */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -37,6 +38,7 @@ __sread (struct _reent *ptr,
   register FILE *fp = (FILE *) cookie;
   register ssize_t ret;
 
+  (void) ptr;
 #ifdef __SCLE
   int oldmode = 0;
   if (fp->_flags & __SCLE)
@@ -66,6 +68,10 @@ __seofread (struct _reent *_ptr,
        char *buf,
        _READ_WRITE_BUFSIZE_TYPE len)
 {
+  (void) _ptr;
+  (void) cookie;
+  (void) buf;
+  (void) len;
   return 0;
 }
 
@@ -81,6 +87,7 @@ __swrite (struct _reent *ptr,
   int oldmode=0;
 #endif
 
+  (void) ptr;
   if (fp->_flags & __SAPP)
     lseek (fp->_file, (_off_t) 0, SEEK_END);
   fp->_flags &= ~__SOFF;	/* in case O_APPEND mode is set */
@@ -109,6 +116,7 @@ __sseek (struct _reent *ptr,
   register FILE *fp = (FILE *) cookie;
   register _off_t ret;
 
+  (void) ptr;
   ret = lseek (fp->_file, (_off_t) offset, whence);
   if (ret == -1L)
     fp->_flags &= ~__SOFF;
@@ -126,6 +134,7 @@ __sclose (struct _reent *ptr,
 {
   FILE *fp = (FILE *) cookie;
 
+  (void) ptr;
   return close (fp->_file);
 }
 

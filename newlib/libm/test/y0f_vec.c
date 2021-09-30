@@ -300,5 +300,5 @@
 {28, 0,123,__LINE__, 0x3f9c2b2d, 0x21cd4b2e, 0x403a1999, 0x99999996},	/* 0.0275085=f(26.1)*/
 {30, 0,123,__LINE__, 0x3fc2771d, 0x062782c2, 0x403bcccc, 0xccccccc9},	/* 0.14426=f(27.8)*/
 {30, 0,123,__LINE__, 0xbfafc3a0, 0x7f18ce55, 0x403d7fff, 0xfffffffc},	/* -0.0620394=f(29.5)*/
-0,};
+{0},};
 void test_y0f(m)   {run_vector_1(m,y0f_vec,(char *)(y0f),"y0f","ff");   }	

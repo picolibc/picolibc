@@ -143,7 +143,7 @@ memmem (const void *haystack, size_t hs_len, const void *needle, size_t ne_len)
   size_t tmp, shift1;
   size_t m1 = ne_len - 1;
   size_t offset = 0;
-  int i;
+  size_t i;
 
   /* Initialize bad character shift hash table.  */
   memset (shift, 0, sizeof (shift));

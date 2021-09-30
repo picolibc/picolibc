@@ -118,6 +118,7 @@ PORTABILITY
 <<fputwc_unlocked>> and <<putwc_unlocked>> are GNU extensions.
 */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <errno.h>
 #include <limits.h>
@@ -146,7 +147,7 @@ __fputwc (struct _reent *ptr,
     }
   else
     {
-      if ((len = _wcrtomb_r (ptr, buf, wc, &fp->_mbstate)) == (size_t) -1)
+      if ((len = wcrtomb (buf, wc, &fp->_mbstate)) == (size_t) -1)
 	{
 	  fp->_flags |= __SERR;
 	  return WEOF;

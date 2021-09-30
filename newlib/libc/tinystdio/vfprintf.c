@@ -33,6 +33,7 @@
 /* From: Id: printf_p_new.c,v 1.1.1.9 2002/10/15 20:10:28 joerg_wunsch Exp */
 /* $Id: vfprintf.c 2191 2010-11-05 13:45:57Z arcanum $ */
 
+#define _DEFAULT_SOURCE
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -82,14 +83,13 @@ typedef int64_t printf_float_int_t;
  */
 
 #ifndef PRINTF_LEVEL
-# define PRINTF_LEVEL PRINTF_FLT
+#  define PRINTF_LEVEL PRINTF_FLT
+#  ifndef FORMAT_DEFAULT_DOUBLE
+#    define vfprintf __d_vfprintf
+#  endif
 #endif
 
 #if PRINTF_LEVEL == PRINTF_STD || PRINTF_LEVEL == PRINTF_FLT
-/* OK */
-#else
-# error "Not a known printf level."
-#endif
 
 #if ((PRINTF_LEVEL >= PRINTF_FLT) || defined(_WANT_IO_LONG_LONG))
 #define PRINTF_LONGLONG
@@ -220,7 +220,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		    continue;
 		  case '+':
 		    flags |= FL_PLUS;
-		    /* FALLTHROUGH */
+		    FALLTHROUGH;
 		  case ' ':
 		    flags |= FL_SPACE;
 		    continue;
@@ -406,7 +406,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
                         _dtoa.digits[d] = dig;
                     }
                 }
-                if (fval)
+                if ((fi<<1) != 0)
                     exp -= EXP_BIAS;
                 else
                     exp = 0;
@@ -691,7 +691,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 
             str_lpad:
                 if (!(flags & FL_LPAD)) {
-                    while (width > size) {
+                    while ((size_t) width > size) {
                         my_putc (' ', stream);
                         width--;
                     }
@@ -844,10 +844,11 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 #undef my_putc
 }
 
-#ifndef vfprintf
+#if defined(FORMAT_DEFAULT_DOUBLE) && !defined(vfprintf)
 #ifdef HAVE_ALIAS_ATTRIBUTE
 __strong_reference(vfprintf, __d_vfprintf);
 #else
 int __d_vfprintf (FILE * stream, const char *fmt, va_list ap) { return vfprintf(stream, fmt, ap); }
+#endif
 #endif
 #endif

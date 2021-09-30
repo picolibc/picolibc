@@ -54,7 +54,7 @@ vsnprintf(char *s, size_t n, const char *fmt, va_list ap)
 	i = vfprintf(&f.file, fmt, ap);
 
 	if ((int) n >= 0 && i >= 0)
-		s[i < n ? i : n] = 0;
+                s[i < (int) n ? i : (int) n] = 0;
 
 	return i;
 }

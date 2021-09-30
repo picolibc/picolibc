@@ -34,6 +34,7 @@
 #
 srcs_signal = [
     'psignal.c',
+    'sig2str.c',
     'signal.c',
 ]
 

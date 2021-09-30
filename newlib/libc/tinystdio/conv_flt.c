@@ -72,6 +72,8 @@ static inline int scanf_getc(const char *s, int *lenp)
 
 static inline void scanf_ungetc(int c, const char *s, int *lenp)
 {
+    (void) c;
+    (void) s;
     *lenp = *lenp - 1;
 }
 
@@ -130,7 +132,7 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
     switch ((unsigned char)i) {
     case '-':
         flags |= FL_MINUS;
-	/* FALLTHROUGH */
+	FALLTHROUGH;
     case '+':
 	if (!CHECK_WIDTH() || (i = scanf_getc (stream, lenp)) < 0)
 	    return 0;
@@ -243,7 +245,7 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 	    switch ((unsigned char)esign) {
             case '-':
 		flags |= FL_MEXP;
-		/* FALLTHROUGH */
+		FALLTHROUGH;
             case '+':
                 if (!CHECK_WIDTH()) {
                     scanf_ungetc(esign, stream, lenp);

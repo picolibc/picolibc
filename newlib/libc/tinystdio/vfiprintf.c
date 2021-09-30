@@ -31,6 +31,16 @@
 */
 
 #define PRINTF_LEVEL PRINTF_STD
+#ifndef FORMAT_DEFAULT_INTEGER
 #define vfprintf __i_vfprintf
+#endif
 
 #include <vfprintf.c>
+
+#ifdef FORMAT_DEFAULT_INTEGER
+#ifdef HAVE_ALIAS_ATTRIBUTE
+__strong_reference(vfprintf, __i_vfprintf);
+#else
+int __i_vfprintf (FILE * stream, const char *fmt, va_list ap) { return vfprintf(stream, fmt, ap); }
+#endif
+#endif

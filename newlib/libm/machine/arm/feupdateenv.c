@@ -43,6 +43,8 @@ int feupdateenv(const fenv_t *envp)
 #if defined(FE_NOMASK_ENV) && FE_ALL_EXCEPT != 0
 	if (envp == FE_NOMASK_ENV)
 		return (1);
+#else
+        (void) envp;
 #endif
 #endif
 	return (0);

@@ -38,6 +38,7 @@
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)regcomp.c	8.5 (Berkeley) 3/20/94";
 #endif /* LIBC_SCCS and not lint */
+#define _DEFAULT_SOURCE
 #include <sys/cdefs.h>
 
 #include <sys/types.h>
@@ -430,7 +431,7 @@ struct parse *p;
 		break;
 	case '{':		/* okay as ordinary except if digit follows */
 		(void)REQUIRE(!MORE() || !isdigit((uch)PEEK()), REG_BADRPT);
-		/* FALLTHROUGH */
+		FALLTHROUGH;
 	default:
 		ordinary(p, c);
 		break;
@@ -633,7 +634,7 @@ int starordinary;		/* is a leading * an ordinary character? */
 		break;
 	case '*':
 		(void)REQUIRE(starordinary, REG_BADRPT);
-		/* FALLTHROUGH */
+		FALLTHROUGH;
 	default:
 		ordinary(p, (char)c);
 		break;
@@ -1252,7 +1253,7 @@ freeset(p, cs)
 struct parse *p;
 cset *cs;
 {
-	int i;
+	size_t i;
 	cset *top = &p->g->sets[p->g->ncsets];
 	size_t css = (size_t)p->g->csetsize;
 
@@ -1278,7 +1279,7 @@ struct parse *p;
 cset *cs;
 {
 	short h = cs->hash;
-	int i;
+	size_t i;
 	cset *top = &p->g->sets[p->g->ncsets];
 	cset *cs2;
 	size_t css = (size_t)p->g->csetsize;
@@ -1311,7 +1312,7 @@ firstch(p, cs)
 struct parse *p;
 cset *cs;
 {
-	int i;
+	size_t i;
 	size_t css = (size_t)p->g->csetsize;
 
 	for (i = 0; i < css; i++)
@@ -1330,7 +1331,7 @@ nch(p, cs)
 struct parse *p;
 cset *cs;
 {
-	int i;
+	size_t i;
 	size_t css = (size_t)p->g->csetsize;
 	int n = 0;
 
@@ -1439,6 +1440,8 @@ mcinvert(p, cs)
 struct parse *p;
 cset *cs;
 {
+        (void) p;
+        (void) cs;
 	assert(cs->multis == NULL);	/* xxx */
 }
 
@@ -1454,6 +1457,8 @@ mccase(p, cs)
 struct parse *p;
 cset *cs;
 {
+        (void) p;
+        (void) cs;
 	assert(cs->multis == NULL);	/* xxx */
 }
 
@@ -1745,7 +1750,7 @@ struct re_guts *g;
 					return;
 				}
 			} while (OP(s) != O_QUEST && OP(s) != O_CH);
-			/* fallthrough */
+			FALLTHROUGH;
 		case OBOW:		/* things that break a sequence */
 		case OEOW:
 		case OBOL:
@@ -1903,6 +1908,7 @@ int mccs;
 		case OANYOF:
 			if (mccs)
 				return -1;
+                        FALLTHROUGH;
 		case OCHAR:
 		case OANY:
 			try++;

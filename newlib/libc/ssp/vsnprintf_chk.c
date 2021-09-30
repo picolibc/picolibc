@@ -47,5 +47,6 @@ __vsnprintf_chk(char * __restrict buf, size_t len, int flags, size_t slen,
 	if (len > slen)
 		__chk_fail();
 
+        (void) flags;
 	return vsnprintf(buf, len, fmt, ap);
 }

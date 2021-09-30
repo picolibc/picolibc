@@ -16,6 +16,7 @@
  */
 /* No user fns here.  Pesch 15apr92. */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -127,6 +128,7 @@ __sfmoreglue (struct _reent *d,
 {
   struct glue_with_file *g;
 
+  (void) d;
   g = (struct glue_with_file *)
     malloc (sizeof (*g) + (n - 1) * sizeof (FILE));
   if (g == NULL)

@@ -32,6 +32,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+#define _DEFAULT_SOURCE
 #include <stdio.h>
 #include <math.h>
 #include <unistd.h>
@@ -72,7 +74,7 @@ check_vsnprintf(char *str, size_t size, const char *format, ...)
 }
 
 int
-main(int argc, char **argv)
+main(void)
 {
 	int x = -35;
 	int y;
@@ -158,7 +160,7 @@ main(int argc, char **argv)
 } while(0)
 
 #define CHECK_RT(type, prefix) do {                                     \
-        for (x = 0; x < sizeof(type) * 8; x++) {                        \
+        for (x = 0; x < (int) (sizeof(type) * 8); x++) {            \
                 type v = (type) (0x123456789abcdef0LL >> (64 - sizeof(type) * 8)) >> x; \
                 type r;                                                 \
                 VERIFY(prefix, "d");                                    \
@@ -207,7 +209,7 @@ main(int argc, char **argv)
 	for (x = -37; x <= 37; x++)
 	{
                 float_type r;
-		int t;
+		unsigned t;
 		for (t = 0; t < sizeof(test_vals)/sizeof(test_vals[0]); t++) {
 
 			float_type v = (float_type) test_vals[t] * pow(10.0, (float_type) x);

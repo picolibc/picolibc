@@ -18,6 +18,7 @@
 /* This code created by modifying snprintf.c so copyright inherited. */
 /* doc in siprintf.c */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
 #include <stdarg.h>

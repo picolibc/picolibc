@@ -12,6 +12,9 @@
  */
 
 /* REDHAT LOCAL: Include files.  */
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
 #include <math.h>
 #include <sys/types.h>
 #include <machine/ieeefp.h>
@@ -369,10 +372,10 @@ do {								\
    of a shift is exactly equal to the size of the shifted operand.  */
 
 #define SAFE_LEFT_SHIFT(op,amt)					\
-  (((amt) < 8 * sizeof(op)) ? ((op) << (amt)) : 0)
+  (((amt) < (int) (8 * sizeof(op))) ? ((op) << (amt)) : 0)
 
 #define SAFE_RIGHT_SHIFT(op,amt)				\
-  (((amt) < 8 * sizeof(op)) ? ((op) >> (amt)) : 0)
+  (((amt) < (int) (8 * sizeof(op))) ? ((op) >> (amt)) : 0)
 
 #ifdef  _COMPLEX_H
 

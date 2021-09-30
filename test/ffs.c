@@ -33,6 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _DEFAULT_SOURCE
 #include <strings.h>
 #include <string.h>
 #include <stdlib.h>
@@ -42,7 +43,7 @@ long long int
 rand_long_long(void)
 {
 	unsigned long long int r = 0;
-	int x;
+	size_t x;
 
 	for (x = 0; x < sizeof(r) / 4; x++)
 		r = (r << 32) | (lrand48() & 0xffffffffL);
@@ -97,7 +98,7 @@ check(long long int x, int got, int expect, char *which)
 int
 main(void)
 {
-	int i;
+	size_t i;
 	int ret = 0;
 
 	/* Test zero */

@@ -300,5 +300,6 @@
 {63, 0,123,__LINE__, 0x400fa341, 0xc64646d8, 0x403a1999, 0x99999996},	/* 3.95472=f(26.1)*/
 {64, 0,123,__LINE__, 0x40101249, 0xc6ea2cbb, 0x403bcccc, 0xccccccc9},	/* 4.01786=f(27.8)*/
 {64, 0,123,__LINE__, 0x40104f1a, 0xa2d94c29, 0x403d7fff, 0xfffffffc},	/* 4.07725=f(29.5)*/
-0,};
+{0}
+};
 void test_acosh(m)   {run_vector_1(m,acosh_vec,(char *)(acosh),"acosh","dd");   }	

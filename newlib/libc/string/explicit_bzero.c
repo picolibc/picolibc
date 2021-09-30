@@ -4,6 +4,7 @@
  * Public domain.
  */
 
+#define _DEFAULT_SOURCE
 #include <string.h>
 
 /*

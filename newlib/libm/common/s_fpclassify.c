@@ -13,18 +13,15 @@ __fpclassifyd (double x)
 
   EXTRACT_WORDS(msw,lsw,x);
 
-  if ((msw == 0x00000000 && lsw == 0x00000000) ||
-      (msw == 0x80000000 && lsw == 0x00000000))
+  msw &= 0x7fffffff;
+  if (msw == 0x00000000 && lsw == 0x00000000)
     return FP_ZERO;
-  else if ((msw >= 0x00100000 && msw <= 0x7fefffff) ||
-           (msw >= 0x80100000 && msw <= 0xffefffff))
-    return FP_NORMAL;
-  else if ((msw >= 0x00000000 && msw <= 0x000fffff) ||
-           (msw >= 0x80000000 && msw <= 0x800fffff))
+  else if (msw <= 0x000fffff)
     /* zero is already handled above */
     return FP_SUBNORMAL;
-  else if ((msw == 0x7ff00000 && lsw == 0x00000000) ||
-           (msw == 0xfff00000 && lsw == 0x00000000))
+  else if (msw <= 0x7fefffff)
+    return FP_NORMAL;
+  else if (msw == 0x7ff00000 && lsw == 0x00000000)
     return FP_INFINITE;
   else
     return FP_NAN;

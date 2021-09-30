@@ -83,7 +83,8 @@ main (void)
 
   /* Fill the source buffer with non-null values, reproducable random data.  */
   srand (1539);
-  int i, j;
+  int i;
+  unsigned j;
   unsigned sa;
   unsigned da;
   unsigned n;

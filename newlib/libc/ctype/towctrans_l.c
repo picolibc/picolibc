@@ -51,8 +51,8 @@ __attribute__((packed))
 caseconv_table [] = {
 #include "caseconv.t"
 };
-#define first(ce)	ce.first
-#define last(ce)	(ce.first + ce.diff)
+#define first(ce)	((wint_t) ce.first)
+#define last(ce)	((wint_t) (ce.first + ce.diff))
 
 /* auxiliary function for binary search in interval properties table */
 static const struct caseconv_entry *
@@ -149,6 +149,7 @@ touupper (wint_t c)
 wint_t
 towctrans_l (wint_t c, wctrans_t w, struct __locale_t *locale)
 {
+  (void) locale;
 #ifdef _MB_CAPABLE
   wint_t u = _jp2uc_l (c, locale);
 #else

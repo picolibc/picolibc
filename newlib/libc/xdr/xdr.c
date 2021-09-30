@@ -36,6 +36,7 @@
  * xdr.
  */
 
+#define _DEFAULT_SOURCE
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
@@ -669,7 +670,7 @@ xdr_bytes (XDR * xdrs,
           errno = ENOMEM;
           return FALSE;
         }
-      /* FALLTHROUGH */
+      FALLTHROUGH;
 
     case XDR_ENCODE:
       return xdr_opaque (xdrs, sp, nodesize);
@@ -776,7 +777,7 @@ xdr_string (XDR * xdrs,
       if (sp == NULL)
         return TRUE;        /* already free */
 
-      /* FALLTHROUGH */
+      FALLTHROUGH;
     case XDR_ENCODE:
       if (sp == NULL)
         return FALSE;
@@ -818,7 +819,7 @@ xdr_string (XDR * xdrs,
           return FALSE;
         }
       sp[size] = 0;
-      /* FALLTHROUGH */
+      FALLTHROUGH;
 
     case XDR_ENCODE:
       return xdr_opaque (xdrs, sp, size);

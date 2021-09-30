@@ -40,6 +40,7 @@ QUICKREF
 	strncasecmp_l
 */
 
+#define _DEFAULT_SOURCE
 #include <strings.h>
 #include <ctype.h>
 

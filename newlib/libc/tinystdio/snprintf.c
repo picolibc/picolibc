@@ -57,7 +57,7 @@ snprintf(char *s, size_t n, const char *fmt, ...)
 	va_end(ap);
 
 	if ((int) n >= 0 && i >= 0)
-		s[i < n ? i : n] = 0;
+                s[i < (int) n ? i : (int) n] = 0;
 
 	return i;
 }

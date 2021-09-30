@@ -31,7 +31,7 @@ float
 roundf (float x)
 {
   float result;
-  asm volatile ("vrinta.f32\t%0, %1" : "=t" (result) : "t" (x));
+  __asm__ volatile ("vrinta.f32\t%0, %1" : "=t" (result) : "t" (x));
   return result;
 }
 

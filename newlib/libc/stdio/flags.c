@@ -16,6 +16,7 @@
  */
 /* No user fns here. Pesch 15apr92 */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
 #include <time.h>
@@ -36,6 +37,7 @@ __sflags (struct _reent *ptr,
 {
   register int ret, m, o;
 
+  (void) ptr;
   switch (mode[0])
     {
     case 'r':			/* open for reading */

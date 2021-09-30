@@ -6,6 +6,6 @@ shift
 
 mkdir $DIR
 cd $DIR
-../scripts/$CONFIGURE "$@"
+../scripts/$CONFIGURE -Dwerror=true "$@"
 cat meson-logs/*
 ninja && meson test -v

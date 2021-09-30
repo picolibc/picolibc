@@ -196,7 +196,7 @@ static double my_values[] = {
 
 int main(void)
 {
-	int i;
+	unsigned i;
 	int ret = 0;
 
 	for (i = 0; i < NUM_VALUE; i++) {

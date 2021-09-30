@@ -116,6 +116,7 @@ PORTABILITY
 <<fgetwc_unlocked>> and <<getwc_unlocked>> are GNU extensions.
 */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <errno.h>
 #include <stdio.h>

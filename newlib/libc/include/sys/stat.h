@@ -60,15 +60,15 @@ struct	stat
   nlink_t	st_nlink;
   uid_t		st_uid;
   gid_t		st_gid;
-#if defined(linux) && defined(__x86_64__)
+#if defined(__linux) && defined(__x86_64__)
     int __pad0;
 #endif
   dev_t		st_rdev;
-#if defined(linux) && !defined(__x86_64__)
+#if defined(__linux) && !defined(__x86_64__)
     unsigned short int __pad2;
 #endif
   off_t		st_size;
-#if defined(linux)
+#if defined(__linux)
   blksize_t	st_blksize;
   blkcnt_t	st_blocks;
   struct timespec st_atim;
@@ -77,7 +77,7 @@ struct	stat
 #define st_atime st_atim.tv_sec      /* Backward compatibility */
 #define st_mtime st_mtim.tv_sec
 #define st_ctime st_ctim.tv_sec
-#if defined(linux) && defined(__x86_64__)
+#if defined(__linux) && defined(__x86_64__)
     __uint64_t __glibc_reserved[3];
 #endif
 #else
@@ -185,7 +185,7 @@ struct	stat
 #define	S_ISLNK(m)	(((m)&_IFMT) == _IFLNK)
 #define	S_ISSOCK(m)	(((m)&_IFMT) == _IFSOCK)
 
-#if defined(__CYGWIN__)
+#if defined(__CYGWIN__) || defined(__rtems__)
 /* Special tv_nsec values for futimens(2) and utimensat(2). */
 #define UTIME_NOW	-2L
 #define UTIME_OMIT	-1L

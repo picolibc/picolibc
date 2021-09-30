@@ -35,7 +35,7 @@ extern int _malloc_test_fail;
 
 int
 main (int ac,
-      char **av, char **en)
+      char **av)
 {
 #ifdef MALLOC_DEBUG
   environ = en;

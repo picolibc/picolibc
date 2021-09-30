@@ -15,14 +15,14 @@
 static void
 fssr(unsigned value)
 {
-  asm volatile ("fscsr %0" :: "r"(value));
+  __asm__ volatile ("fscsr %0" :: "r"(value));
 }
 
 static unsigned
 frsr()
 {
   unsigned value;
-  asm volatile ("frcsr %0" : "=r" (value));
+  __asm__ volatile ("frcsr %0" : "=r" (value));
   return value;
 }
 
@@ -106,6 +106,7 @@ fpgetsticky(void)
 fp_except
 fpsetmask(fp_except mask)
 {
+  (void) mask;
   return -1;
 }
 
@@ -127,6 +128,7 @@ fpsetround(fp_rnd rnd_dir)
   fssr (new_rm << 5 | (fsr & 0x1f));
   return frm_fp_rnd (rm);
 #else
+  (void) rnd_dir;
   return -1;
 #endif /* __riscv_flen */
 }
@@ -139,6 +141,7 @@ fpsetsticky(fp_except sticky)
   fssr (frm_except(sticky) | (fsr & ~0x1f));
   return frm_fp_except(fsr);
 #else
+  (void) sticky;
   return -1;
 #endif /* __riscv_flen */
 }
@@ -150,5 +153,6 @@ fp_rdi fpgetroundtoi (void)
 
 fp_rdi fpsetroundtoi (fp_rdi rdi)
 {
+  (void) rdi;
   return -1;
 }

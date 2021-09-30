@@ -34,7 +34,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-qemu=qemu-system-arm
+qemu="qemu-system-arm"
 
 # select the program
 elf=hello-world-arm.elf

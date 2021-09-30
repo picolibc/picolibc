@@ -86,9 +86,9 @@
 #ifndef _DOUBLE_IS_32BITS
 
 #ifdef __STDC__
-static	const double	one	= 1.0, tiny=1.0e-300;
+static	const volatile double	one	= 1.0, tiny=1.0e-300;
 #else
-static	double	one	= 1.0, tiny=1.0e-300;
+static	double	volatile one	= 1.0, tiny=1.0e-300;
 #endif
 
 #if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
@@ -103,7 +103,7 @@ __strong_reference(__ieee754_sqrt, sqrt);
 #endif
 {
 	double z;
-	__int32_t sign = 0x80000000; 
+	__uint32_t sign = 0x80000000; 
 	__uint32_t r,t1,s1,ix1,q1;
 	__int32_t ix0,s0,q,m,t,i;
 

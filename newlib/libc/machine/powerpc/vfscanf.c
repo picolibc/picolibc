@@ -383,7 +383,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 
 	case 'D':		/* compat */
 	  flags |= LONG;
-	  /* FALLTHROUGH */
+	  FALLTHROUGH;
 	case 'd':
 	  type = CT_INT;
 	  ccfn = (u_long (*)())_strtol_r;
@@ -398,7 +398,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 
 	case 'O':		/* compat */
 	  flags |= LONG;
-	  /* FALLTHROUGH */
+	  FALLTHROUGH;
 	case 'o':
 	  type = CT_INT;
 	  ccfn = _strtoul_r;
@@ -423,7 +423,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	case 'E':		/* compat   XXX */
 	case 'G':		/* compat   XXX */
 /* ANSI says that E,G and X behave the same way as e,g,x */
-	  /* FALLTHROUGH */
+	  FALLTHROUGH;
 	case 'e':
 	case 'f':
 	case 'g':
@@ -436,7 +436,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	  /* treat fixed-point like %f floating point */
         case 'r':
 	  flags |= SIGNED;
-	  /* fallthrough */
+	  FALLTHROUGH;
         case 'R':
           flags |= FIXEDPOINT;
 	  type = CT_FLOAT;
