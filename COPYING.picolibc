@@ -430,9 +430,13 @@ Files: newlib/libc/machine/xtensa/sys/fenv.h
 Copyright: 2011 Tensilica Inc.
 License: BSD2-9
 
+Files: newlib/libc/signal/sig2str.c
+Copyright: 2021 Matthew Joyce
+License: BSD2-10
+
 Files: newlib/libm/machine/sparc/fenv.c
 Copyright: 2004-2005 David Schultz <das@FreeBSD.ORG>
-License: BSD2-10
+License: BSD2-11
 
 Files: dummyhost/iob.c
  dummyhost/meson.build
@@ -453,6 +457,7 @@ Files: dummyhost/iob.c
  newlib/libc/iconv/ces/meson.build
  newlib/libc/iconv/lib/meson.build
  newlib/libc/iconv/meson.build
+ newlib/libc/include/endian.h
  newlib/libc/include/machine/meson.build
  newlib/libc/include/meson.build
  newlib/libc/include/newlib.h
@@ -588,7 +593,6 @@ Files: dummyhost/iob.c
  scripts/do-zephyr-riscv-configure
  scripts/run-arm
  scripts/run-riscv
- scripts/run-riscv-gdb
  scripts/run-thumbv7e
  scripts/run-thumbv7m
  semihost/close.c
@@ -773,12 +777,14 @@ Files: newlib/empty.c
  newlib/libc/stdlib/pico-onexit.h
  newlib/libc/tinystdio/atold_engine.c
  newlib/libc/tinystdio/matchcaseprefix.c
+ newlib/libc/tinystdio/rewind.c
  newlib/libc/tinystdio/strfromd.c
  newlib/libc/tinystdio/strfromf.c
  newlib/libm/common/dreml.c
  newlib/libm/common/exp10l.c
  newlib/libm/common/pow10l.c
  newlib/libm/common/sincosl.c
+ newlib/libm/test/scalbn_vec.c
  semihost/machine/i386/bios.S
  semihost/machine/i386/e9_exit.c
  semihost/machine/i386/e9_io.c
@@ -2245,7 +2251,6 @@ Files: .gitattributes
  doc/tls.md
  doc/using.md
  hello-world/README.md
- make-target
  newlib/HOWTO
  newlib/README
  newlib/doc/doc.str
@@ -2253,6 +2258,7 @@ Files: .gitattributes
  newlib/libc/include/sys/_tz_structs.h
  newlib/libc/libc.in.xml
  newlib/libc/machine/necv70/necv70.tex
+ newlib/libc/machine/nvptx/clock.c
  newlib/libc/ssp/ssp.tex
  newlib/libc/stdlib/mul_overflow.h
  newlib/libc/string/wcstrings.tex
@@ -2262,8 +2268,6 @@ Files: .gitattributes
  newlib/libm/complex/complex.tex
  newlib/libm/fenv/fenv.tex
  newlib/libm/libm.in.xml
- newlib/make-library
- newlib/make-target
  newlib/newlib.hin
  picolibc.ld.in
  picolibc.specs.in
@@ -2462,10 +2466,6 @@ Files: newlib/libc/include/ssp/stdlib.h
 Copyright: 2017 Yaakov Selkowitz <yselkowi@redhat.com>
 License: Default-1
 
-Files: newlib/libc/include/stdio_ext.h
-Copyright: 2011 Yaakov Selkowitz <yselkowi@redhat.com>
-License: Default-1
-
 Files: newlib/libc/include/sys/_default_fcntl.h
  newlib/libc/include/sys/custom_file.h
  newlib/libc/machine/i386/machine/fastmath.h
@@ -2609,6 +2609,10 @@ License: Default-1
 Files: newlib/libc/stdio/getdelim.c
  newlib/libc/stdio/getline.c
 Copyright: 2002, Red Hat Inc. -
+License: Default-1
+
+Files: newlib/libc/stdio/stdio_ext.h
+Copyright: 2011 Yaakov Selkowitz <yselkowi@redhat.com>
 License: Default-1
 
 Files: newlib/libc/stdio64/fdopen64.c
@@ -4092,6 +4096,28 @@ License: BSD2-9
  OF THE POSSIBILITY OF SUCH DAMAGE.
 
 License: BSD2-10
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 1. Redistributions of source code must retain the above copyright
+ notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+ notice, this list of conditions and the following disclaimer in the
+ documentation and/or other materials provided with the distribution.
+ .
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+
+License: BSD2-11
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
