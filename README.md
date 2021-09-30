@@ -97,6 +97,17 @@ sync has not been difficult so far.
 
 ## Releases
 
+### Picolibc version 1.7.3
+
+ 1. Add -Wall -Wextra to default builds. Fixed warnings this raised.
+
+ 2. Add htonl and friends (based on __htonl). Thanks to Johan de
+    Claville Christiansen
+
+ 3. Set errno in scalbn and scalbnf (patch forwarded to newlib).
+
+ 4. Merge newlib recent changes which includes a couple of libm fixes.
+
 ### Picolibc version 1.7.2
 
  1. Fix picolibc.ld to split C++ exceptions back apart (thanks to
