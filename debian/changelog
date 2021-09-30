@@ -1,3 +1,18 @@
+picolibc (1.7.3-1) unstable; urgency=medium
+
+  * New upstream release
+
+  * Add -Wall -Wextra to default builds. Fixed warnings this raised.
+
+  * Add htonl and friends (based on __htonl). Thanks to Johan de
+    Claville Christiansen
+
+  * Set errno in scalbn and scalbnf (patch forwarded to newlib).
+
+  * Merge newlib recent changes which includes a couple of libm fixes.
+
+ -- Keith Packard <keithp@keithp.com>  Thu, 30 Sep 2021 13:21:44 -0700
+
 picolibc (1.7.2-2) unstable; urgency=medium
 
   * Build with updated gcc version
