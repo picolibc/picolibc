@@ -34,7 +34,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-qemu=qemu-system-aarch64
+qemu="qemu-system-aarch64"
 
 # select the program
 elf=hello-world++-aarch64.elf
