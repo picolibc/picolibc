@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 ARCH=$1
 GCC="$ARCH"-gcc

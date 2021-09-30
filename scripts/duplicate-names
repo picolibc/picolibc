@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 NM="$1"
 FILE="$2"
 OUTPUT="$3"
