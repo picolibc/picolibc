@@ -2786,7 +2786,7 @@ __ldtoa (long double d, int mode, int ndigits,
 {
   unsigned short e[NI];
   char *s, *p;
-  int i, j, k;
+  int i, k;
   int orig_ndigits;
   LDPARMS rnd;
   LDPARMS *ldp = &rnd;
