@@ -37,6 +37,7 @@ jobs:
           "-Dtinystdio=false -Dnewlib-io-float=false -Dio-long-long=true",
           "-Dtinystdio=false -Dnewlib-io-float=true",
           "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
 
           # Locale configurations
           "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true",
