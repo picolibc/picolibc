@@ -66,6 +66,17 @@ case "$ARCH" in
 	;;
 esac
 
+case "$ARCH" in
+    *rv[36][24]*|*riscv*|*aarch64*)
+	case "$*" in
+	    *-Dnewlib-io-long-double=true*)
+		echo "newlib-io-long-double not supported on riscv or aarch64"
+		exit 77
+		;;
+	esac
+	;;
+esac
+
 # Check for sysroot-install and automatically set prefix if needed
 
 case "$*" in
