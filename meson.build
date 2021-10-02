@@ -46,6 +46,45 @@ project('picolibc', 'c',
 
 targets = []
 
+# Find out about long double type
+
+long_double_code = '''
+#include <float.h>
+#ifndef __LDBL_MANT_DIG__
+#error No long double support in float.h
+#endif
+long double test()
+{
+	long double ld = 0.0L;
+	 return ld;
+}
+'''
+have_long_double = meson.get_compiler('c').compiles(long_double_code, name : 'long double check')
+
+long_double_size_code = '''
+#include <float.h>
+char size_test[sizeof(double) == sizeof(long double) ? 1 : -1];
+'''
+
+long_double_mant_64_code = '''
+#include <float.h>
+char size_test[__LDBL_MANT_DIG__ == 64 ? 1 : -1];
+'''
+
+long_double_mant_113_code = '''
+#include <float.h>
+char size_test[__LDBL_MANT_DIG__ == 113 ? 1 : -1];
+'''
+
+if have_long_double
+  long_double_equals_double = meson.get_compiler('c').compiles(long_double_size_code, name : 'long double same as double')
+  if not long_double_equals_double
+    long_double_mant_is_64 = meson.get_compiler('c').compiles(long_double_mant_64_code, name : 'long double mantissa is 64 bits')
+    long_double_mant_is_113 = meson.get_compiler('c').compiles(long_double_mant_113_code, name : 'long double mantissa is 113 bits')
+    message('long double mant is 64 bits:', long_double_mant_is_64, 'is 113 bits:', long_double_mant_is_113)
+  endif
+endif
+
 enable_multilib = get_option('multilib')
 multilib_list = get_option('multilib-list')
 enable_picolib = get_option('picolib')
@@ -270,6 +309,9 @@ else
   if posix_console
     error('newlib stdio does not support the posix-console option (posix-console)')
   endif
+  if newlib_io_long_double and not long_double_equals_double and not long_double_mant_is_64
+    error('newlib-io-long-double not supported on target')
+  endif
 endif
 
 host_cpu_family=host_machine.cpu_family()
@@ -475,28 +517,6 @@ foreach arg : ['-Wall', '-Wextra', '-Wno-missing-braces', '-Wno-implicit-int', '
 endforeach
 
 c_args += c_warnings
-
-long_double_code = '''
-#include <float.h>
-#ifndef LDBL_MANT_DIG
-#error No long double support in float.h
-#endif
-long double test()
-{
-	long double ld = 0.0L;
-	 return ld;
-}
-'''
-have_long_double = meson.get_compiler('c').compiles(long_double_code, name : 'long double check')
-
-long_double_size_code = '''
-#include <float.h>
-char size_test[sizeof(double) == sizeof(long double) ? 1 : -1];
-'''
-
-if have_long_double
-  long_double_equals_double = meson.get_compiler('c').compiles(long_double_size_code, name : 'long double same as double')
-endif
 
 # CompCert does not support bitfields in packed structs, so avoid using this optimization
 bitfields_in_packed_structs_code = '''
