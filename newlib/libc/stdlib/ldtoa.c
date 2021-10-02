@@ -577,7 +577,7 @@ einfin (register short unsigned int *x, register LDPARMS * ldp)
   for (i = 0; i < NE - 1; i++)
     *x++ = 0;
   *x |= 32767;
-  ldp = ldp;
+  (void) ldp;
 #else
   for (i = 0; i < NE - 1; i++)
     *x++ = 0xffff;
