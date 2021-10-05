@@ -528,7 +528,7 @@ name##_RB_REMOVE_COLOR(struct name *head, struct type *parent)		\
 				RB_ROTATE_LEFT(head, tmp, oright, field); \
 				RB_COLOR(oright, field) = RB_BLACK;	\
 				tmp = oright;				\
-			} else if (!RB_ISRED(RB_LEFT(tmp, field), field)) { \
+			} else {					\
 				RB_COLOR(tmp, field) = RB_RED;		\
 				elm = parent;				\
 				parent = RB_PARENT(elm, field);		\
