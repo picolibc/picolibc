@@ -540,7 +540,7 @@ name##_RB_REMOVE_COLOR(struct name *head, struct type *parent)		\
 			elm = RB_ROOT(head);				\
 			break;						\
 		}							\
-	} while (!RB_ISRED(elm, field) && parent != NULL);		\
+	} while (RB_COLOR(elm, field) == RB_BLACK && parent != NULL);	\
 	RB_COLOR(elm, field) = RB_BLACK;				\
 }
 
