@@ -1,3 +1,11 @@
+picolibc (1.7.3-2) unstable; urgency=medium
+
+  * Add -fno-stack-protector to touch test build. Closes: #995473.
+
+  * Update standards to 4.6.0.1
+
+ -- Keith Packard <keithp@keithp.com>  Mon, 04 Oct 2021 22:02:31 -0700
+
 picolibc (1.7.3-1) unstable; urgency=medium
 
   * New upstream release
