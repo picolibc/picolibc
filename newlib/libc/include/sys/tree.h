@@ -412,6 +412,45 @@ struct {								\
 	RB_AUGMENT(right);						\
 } while (/*CONSTCOND*/ 0)
 
+/*
+ * The RB_RED_ROTATE_LEFT() and RB_RED_ROTATE_RIGHT() rotations are specialized
+ * versions of RB_ROTATE_LEFT() and RB_ROTATE_RIGHT() which may be used if we
+ * rotate an element with a red child which has a black sibling.  Such a red
+ * node must have at least two child nodes so that the following red-black tree
+ * invariant is fulfilled:
+ *
+ *  Every path from a given node to any of its descendant NULL nodes goes
+ *  through the same number of black nodes.
+ *
+ *  elm (could be the root)
+ *    /      \
+ * BLACK   RED (left or right child)
+ *          /   \
+ *       BLACK  BLACK
+ */
+
+#define RB_RED_ROTATE_LEFT(head, elm, tmp, field) do {			\
+	(tmp) = RB_RIGHT(elm, field);					\
+	RB_RIGHT(elm, field) = RB_LEFT(tmp, field);			\
+	RB_SET_PARENT(RB_RIGHT(elm, field), elm, field);		\
+	RB_SET_PARENT(tmp, RB_PARENT(elm, field), field);		\
+	RB_SWAP_CHILD(head, elm, tmp, field);				\
+	RB_LEFT(tmp, field) = (elm);					\
+	RB_SET_PARENT(elm, tmp, field);					\
+	RB_AUGMENT(elm);						\
+} while (/*CONSTCOND*/ 0)
+
+#define RB_RED_ROTATE_RIGHT(head, elm, tmp, field) do {			\
+	(tmp) = RB_LEFT(elm, field);					\
+	RB_LEFT(elm, field) = RB_RIGHT(tmp, field);			\
+	RB_SET_PARENT(RB_LEFT(elm, field), elm, field);			\
+	RB_SET_PARENT(tmp, RB_PARENT(elm, field), field);		\
+	RB_SWAP_CHILD(head, elm, tmp, field);				\
+	RB_RIGHT(tmp, field) = (elm);					\
+	RB_SET_PARENT(elm, tmp, field);					\
+	RB_AUGMENT(elm);						\
+} while (/*CONSTCOND*/ 0)
+
 /* Generates prototypes and inline functions */
 #define	RB_PROTOTYPE(name, type, field, cmp)				\
 	RB_PROTOTYPE_INTERNAL(name, type, field, cmp,)
@@ -526,7 +565,7 @@ name##_RB_REMOVE_COLOR(struct name *head, struct type *parent)		\
 			tmp = RB_RIGHT(parent, field);			\
 			if (RB_COLOR(tmp, field) == RB_RED) {		\
 				RB_SET_BLACKRED(tmp, parent, field);	\
-				RB_ROTATE_LEFT(head, parent, tmp, field);\
+				RB_RED_ROTATE_LEFT(head, parent, tmp, field); \
 				tmp = RB_RIGHT(parent, field);		\
 			}						\
 			if (RB_ISRED(RB_RIGHT(tmp, field), field))	\
@@ -552,7 +591,7 @@ name##_RB_REMOVE_COLOR(struct name *head, struct type *parent)		\
 			tmp = RB_LEFT(parent, field);			\
 			if (RB_COLOR(tmp, field) == RB_RED) {		\
 				RB_SET_BLACKRED(tmp, parent, field);	\
-				RB_ROTATE_RIGHT(head, parent, tmp, field);\
+				RB_RED_ROTATE_RIGHT(head, parent, tmp, field); \
 				tmp = RB_LEFT(parent, field);		\
 			}						\
 			if (RB_ISRED(RB_LEFT(tmp, field), field))	\
