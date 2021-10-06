@@ -84,8 +84,8 @@ definitions which use the same POSIX I/O functions.
 ### Options when using legacy stdio bits
 
 Normally, Picolibc is built with the small stdio library adapted from
-avrlibc (newlib-tinystdio=true). It still has the original newlib
-stdio bits and those still work (newlib-tinystdio=false), but depend
+avrlibc (tinystdio=true). It still has the original newlib
+stdio bits and those still work (tinystdio=false), but depend
 on POSIX I/O functions from the underlying system, and perform many
 malloc calls at runtime. These options are relevant only in that
 configuration
@@ -367,4 +367,3 @@ Once configured, you can compile the libraries with
     $ ninja install
     ...
     $
-

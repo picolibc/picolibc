@@ -14,7 +14,6 @@ The do-native-configure script has an example:
     DIR=`dirname $0`
     meson $DIR \
 	    -Dmultilib=false \
-	    -Dnewlib-tinystdio=true \
 	    -Dnewlib-supplied-syscalls=false \
 	    -Dnewlib-wide-orient=false\
 	    -Dnewlib-nano-malloc=true\
