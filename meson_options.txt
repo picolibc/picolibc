@@ -79,8 +79,6 @@ option('tests-enable-full-malloc-stress', type: 'boolean', value: false,
 option('tests-enable-posix-io', type: 'boolean', value: true,
        description: 'tests enable posix-io when available')
 
-option('newlib-tinystdio', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
-       description: 'Use tiny stdio from avr libc')
 option('tinystdio', type: 'boolean', value: true,
        description: 'Use tiny stdio from avr libc')
 

@@ -169,16 +169,6 @@ endif
 # Select exit code
 picoexit = get_option('picoexit')
 
-# Select stdio implementation
-tinystdio = get_option('tinystdio')
-newlib_tinystdio = get_option('newlib-tinystdio')
-if newlib_tinystdio != 'auto'
-  tinystdio = newlib_tinystdio == 'true'
-endif
-
-has_link_defsym=meson.get_compiler('c').has_link_argument('-Wl,--defsym=' + global_prefix + '_start=0')
-has_link_alias=meson.get_compiler('c').has_link_argument('-Wl,-alias,' + global_prefix + 'main,testalias')
-
 # Shared stdio options
 io_long_long = get_option('io-long-long')
 newlib_io_long_long = get_option('newlib-io-long-long')
@@ -191,6 +181,12 @@ newlib_io_c99_formats = get_option('newlib-io-c99-formats')
 if newlib_io_c99_formats != 'auto'
   io_c99_formats = newlib_io_c99_formats == 'true'
 endif
+
+# Select stdio implementation
+tinystdio = get_option('tinystdio')
+
+has_link_defsym=meson.get_compiler('c').has_link_argument('-Wl,--defsym=' + global_prefix + '_start=0')
+has_link_alias=meson.get_compiler('c').has_link_argument('-Wl,-alias,' + global_prefix + 'main,testalias')
 
 # tinystdio options
 posix_io = tinystdio and get_option('posix-io')
