@@ -721,7 +721,6 @@ conf_data.set('HAVE_INIT_FINI', newlib_initfini, description: 'Support _init() a
 conf_data.set('NEWLIB_TLS', thread_local_storage, description: 'use thread local storage')
 conf_data.set('PICOLIBC_TLS', thread_local_storage, description: 'use thread local storage')
 conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in tinystdio')
-conf_data.set('POSIX_CONSOLE', posix_console, description: 'Use POSIX I/O for stdin, stdout and stderr')
 conf_data.set('ATOMIC_UNGETC', atomic_ungetc, description: 'Use atomics for fgetc/ungetc for re-entrancy')
 conf_data.set('HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
 conf_data.set('HAVE_BUILTIN_MUL', have_builtin_mul_overflow, description: 'Compiler has __builtin_mul_overflow')
