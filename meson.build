@@ -380,19 +380,18 @@ else
 endif
 
 # When passing the specs file to CompCert, the libcompcert needs to be included there as well
+additional_libs = ''
 if meson.get_compiler('c').get_id() == 'ccomp'
   additional_libs = '-lcompcert'
-else
-  additional_libs = ''
 endif
 
+specs_extra = ''
 specs_extra_list = meson.get_cross_property('specs_extra', [])
 if specs_extra_list != []
   specs_extra = '\n' + '\n'.join(specs_extra_list)
-else
-  specs_extra = ''
 endif
 
+specs_printf = ''
 if tinystdio
   specs_printf=('%{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfprintf=__f_vfprintf}' +
 		' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfscanf=__f_vfscanf}' +
@@ -400,8 +399,6 @@ if tinystdio
 		' %{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfscanf=__d_vfscanf}' +
 		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfprintf=__i_vfprintf}' +
 		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfscanf=__i_vfscanf}')
-else
-  specs_printf=''
 endif
 
 specs_data = configuration_data()
