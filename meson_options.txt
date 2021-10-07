@@ -197,12 +197,12 @@ option('newlib-retargetable-locking', type: 'boolean', value: true,
 #
 option('thread-local-storage', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
        description: 'use thread local storage for static data (default: automatically detect support)')
-option('tls-model', type: 'string', value: 'local-exec',
+option('tls-model', type: 'combo', choices: ['global-dynamic', 'local-dynamic', 'initial-exec', 'local-exec'], value: 'local-exec',
        description: 'tls model (global-dynamic, local-dynamic, initial-exec or local-exec)')
 option('newlib-global-errno', type: 'boolean', value: false,
        description: 'use global errno variable')
 
-# 
+#
 # Math options
 #
 # Use "obsolete" math code, which use 'float' for 'float' functions

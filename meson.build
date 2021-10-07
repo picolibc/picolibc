@@ -152,7 +152,6 @@ newlib_obsolete_math_double = get_option('newlib-obsolete-math-double')
 want_math_errno = get_option('want-math-errno')
 
 thread_local_storage_option = get_option('thread-local-storage')
-tls_model = get_option('tls-model')
 
 sysroot_install = get_option('sysroot-install')
 prefix = get_option('prefix')
@@ -335,6 +334,12 @@ else
   thread_local_storage = thread_local_storage_option == 'true'
 endif
 
+if get_option('tls-model') != ''
+  tls_model_spec = '%{!ftls-model:-ftls-model=' + get_option('tls-model') + '}'
+else
+  tls_model_spec = ''
+endif
+
 if sysroot_install
   sysroot = run_command(meson.get_compiler('c').cmd_array() + ['-print-sysroot']).stdout().split('\n')[0]
   if sysroot == ''
@@ -378,18 +383,7 @@ specs_data = configuration_data()
 specs_data.set('PREFIX', sysroot_install? '%R' : prefix)
 specs_data.set('INCLUDEDIR', get_option('includedir'))
 specs_data.set('LIBDIR', get_option('libdir'))
-
-if tls_model != ''
-  specs_data.set(
-    'TLSMODEL',
-    '%{!ftls-model:-ftls-model=' + tls_model + '}'
-  )
-else
-  specs_data.set(
-    'TLSMODEL',
-    ''
-  )
-endif
+specs_data.set('TLSMODEL', tls_model_spec)
 
 
 specs_data.set(
@@ -840,8 +834,8 @@ if meson.get_compiler('c').has_argument('-ffunction-sections')
   arguments += ['-ffunction-sections']
 endif
 
-if tls_model != ''
-  tls_arg = '-ftls-model=' + tls_model
+if get_option('tls-model') != ''
+  tls_arg = '-ftls-model=' + get_option('tls-model')
   assert(meson.get_compiler('c').has_argument(tls_arg), 'Compiler does not support \'-ftls-model\'!')
   arguments += [tls_arg]
 endif
