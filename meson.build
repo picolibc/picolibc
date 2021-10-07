@@ -386,27 +386,12 @@ else
   additional_libs = ''
 endif
 
-specs_data = configuration_data()
-specs_data.set('PREFIX', sysroot_install? '%R' : prefix)
-specs_data.set('INCLUDEDIR', get_option('includedir'))
-specs_data.set('LIBDIR', get_option('libdir'))
-specs_data.set('TLSMODEL', tls_model_spec)
-specs_data.set('LINK_SPEC', meson.get_cross_property('link_spec', ''))
-specs_data.set('CC1_SPEC', meson.get_cross_property('cc1_spec', ''))
-specs_data.set('CC1PLUS_SPEC', meson.get_cross_property('cc1plus_spec', ''))
-specs_data.set('ADDITIONAL_LIBS', additional_libs)
-
 specs_extra_list = meson.get_cross_property('specs_extra', [])
 if specs_extra_list != []
   specs_extra = '\n' + '\n'.join(specs_extra_list)
 else
   specs_extra = ''
 endif
-
-specs_data.set(
-  'SPECS_EXTRA',
-  specs_extra
-)
 
 if tinystdio
   specs_printf=('%{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfprintf=__f_vfprintf}' +
@@ -419,10 +404,17 @@ else
   specs_printf=''
 endif
 
-specs_data.set(
-  'SPECS_PRINTF',
-  specs_printf
-)
+specs_data = configuration_data()
+specs_data.set('PREFIX', sysroot_install? '%R' : prefix)
+specs_data.set('INCLUDEDIR', get_option('includedir'))
+specs_data.set('LIBDIR', get_option('libdir'))
+specs_data.set('TLSMODEL', tls_model_spec)
+specs_data.set('LINK_SPEC', meson.get_cross_property('link_spec', ''))
+specs_data.set('CC1_SPEC', meson.get_cross_property('cc1_spec', ''))
+specs_data.set('CC1PLUS_SPEC', meson.get_cross_property('cc1plus_spec', ''))
+specs_data.set('ADDITIONAL_LIBS', additional_libs)
+specs_data.set('SPECS_EXTRA', specs_extra)
+specs_data.set('SPECS_PRINTF', specs_printf)
 
 # Create C and C++ specific specs data,
 # that includes setting the correct linker script
