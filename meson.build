@@ -379,6 +379,13 @@ else
   specs_install = true
 endif
 
+# When passing the specs file to CompCert, the libcompcert needs to be included there as well
+if meson.get_compiler('c').get_id() == 'ccomp'
+  additional_libs = '-lcompcert'
+else
+  additional_libs = ''
+endif
+
 specs_data = configuration_data()
 specs_data.set('PREFIX', sysroot_install? '%R' : prefix)
 specs_data.set('INCLUDEDIR', get_option('includedir'))
@@ -387,19 +394,7 @@ specs_data.set('TLSMODEL', tls_model_spec)
 specs_data.set('LINK_SPEC', meson.get_cross_property('link_spec', ''))
 specs_data.set('CC1_SPEC', meson.get_cross_property('cc1_spec', ''))
 specs_data.set('CC1PLUS_SPEC', meson.get_cross_property('cc1plus_spec', ''))
-
-# When passing the specs file to CompCert, the libcompcert needs to be included there as well
-if meson.get_compiler('c').get_id() == 'ccomp'
-  specs_data.set(
-    'ADDITIONAL_LIBS',
-    '-lcompcert'
-  )
-else
-  specs_data.set(
-    'ADDITIONAL_LIBS',
-    ''
-  )
-endif
+specs_data.set('ADDITIONAL_LIBS', additional_libs)
 
 specs_extra_list = meson.get_cross_property('specs_extra', [])
 if specs_extra_list != []
