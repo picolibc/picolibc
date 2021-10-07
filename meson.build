@@ -81,7 +81,6 @@ if have_long_double
   if not long_double_equals_double
     long_double_mant_is_64 = meson.get_compiler('c').compiles(long_double_mant_64_code, name : 'long double mantissa is 64 bits')
     long_double_mant_is_113 = meson.get_compiler('c').compiles(long_double_mant_113_code, name : 'long double mantissa is 113 bits')
-    message('long double mant is 64 bits:', long_double_mant_is_64, 'is 113 bits:', long_double_mant_is_113)
   endif
 endif
 
