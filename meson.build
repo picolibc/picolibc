@@ -878,8 +878,6 @@ if has_semihost
 
   test_link_path = '@0@/@1@'.format(meson.current_source_dir(), test_link_name)
 
-  picolibc_link_path = 'picolibc.ld'
-
   if meson.get_compiler('c').get_id() != 'clang'
     test_c_args += [specs_prefix + '--specs', specs_prefix + '@0@/@1@'.format(meson.current_build_dir(), picolibc_specs)]
   endif
