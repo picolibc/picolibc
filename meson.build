@@ -856,8 +856,6 @@ if tests_enable_stack_protector
     tests_enable_stack_protector = false
   endif
 endif
-test_link_args = []
-test_link_depends = []
 
 # CompCert needs the '-WUl,' prefix to correctly pass the --spec parameters to the linker
 specs_prefix = ''
@@ -866,35 +864,34 @@ if meson.get_compiler('c').get_id() == 'ccomp'
 endif
 
 if has_semihost
-
-  # If we're using semihosting, we assume that there's a
-  # custom linker script that includes picolibc.specs
-
-  test_link_name = 'scripts/test-' + host_cpu_family + '.ld'
-  test_link_dep = files(test_link_name)
-
-  # Linker args must be strings (seems like a bug), so compute the
-  # full path by hand
-
-  test_link_path = '@0@/@1@'.format(meson.current_source_dir(), test_link_name)
-
-  if meson.get_compiler('c').get_id() != 'clang'
-    test_c_args += [specs_prefix + '--specs', specs_prefix + '@0@/@1@'.format(meson.current_build_dir(), picolibc_specs)]
-  endif
-
-  test_link_args += ['-nostartfiles', '-nostdlib', '-T', test_link_path, '-T', 'picolibc.ld', '-lgcc']
-
-  # Make sure all of the tests get re-linked if the linker scripts change
-
-  test_link_depends += test_link_dep + [picolibc_ld] + [picolibc_specs]
-elif meson.get_compiler('c').get_id() == 'clang'
-  # Clang does not support spec files
+  # If we're using semihosting, we assume that there's a custom linker
+  # script that includes picolibc.specs.  Linker args must be strings
+  # (seems like a bug), so compute the path by hand.  Because at the
+  # linker's runtime, its working directory is the build dir, linker
+  # scripts under scripts/ can't be found. We use the absolute path
+  # for our convinience.
+  custom_script = 'scripts/test-' + host_cpu_family + '.ld'
+  test_link_args = ['-nostartfiles', '-nostdlib',
+                    '-T', meson.current_source_dir() / custom_script,
+                    '-T', '@0@'.format(picolibc_ld), '-lgcc']
+  test_linker_files = files(custom_script) + [picolibc_ld]
+  specs = picolibc_specs
 else
-  test_link_depends += test_specs
-  test_c_args += [specs_prefix + '--specs', specs_prefix + '@0@/@1@'.format(meson.current_build_dir(), test_specs)]
+  test_link_args = []
+  test_linker_files = []
+  specs = test_specs
 endif
 
-test_link_args = test_c_args + test_link_args
+# Clang does not support spec files
+specs_line = []
+if meson.get_compiler('c').get_id() != 'clang'
+  specs_line += [specs_prefix + '--specs', specs_prefix + meson.current_build_dir() / '@0@'.format(specs)]
+endif
+
+test_c_args += specs_line
+test_link_args += specs_line
+# Make sure all of the tests get re-linked if the linker scripts change.
+test_link_depends = test_linker_files + [specs]
 
 has_picolibc_tls_api = false
 
