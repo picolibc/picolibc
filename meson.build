@@ -384,22 +384,9 @@ specs_data.set('PREFIX', sysroot_install? '%R' : prefix)
 specs_data.set('INCLUDEDIR', get_option('includedir'))
 specs_data.set('LIBDIR', get_option('libdir'))
 specs_data.set('TLSMODEL', tls_model_spec)
-
-
-specs_data.set(
-  'LINK_SPEC',
-  meson.get_cross_property('link_spec', '')
-)
-
-specs_data.set(
-  'CC1_SPEC',
-  meson.get_cross_property('cc1_spec', '')
-)
-
-specs_data.set(
-  'CC1PLUS_SPEC',
-  meson.get_cross_property('cc1plus_spec', '')
-)
+specs_data.set('LINK_SPEC', meson.get_cross_property('link_spec', ''))
+specs_data.set('CC1_SPEC', meson.get_cross_property('cc1_spec', ''))
+specs_data.set('CC1PLUS_SPEC', meson.get_cross_property('cc1plus_spec', ''))
 
 # When passing the specs file to CompCert, the libcompcert needs to be included there as well
 if meson.get_compiler('c').get_id() == 'ccomp'
