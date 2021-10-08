@@ -57,6 +57,7 @@ struct pipe_reply {
 };
 
 extern HANDLE attach_mutex; /* Defined in fhandler_console.cc */
+static LONG NO_COPY master_cnt = 0;
 
 inline static bool pcon_pid_alive (DWORD pid);
 
@@ -2041,7 +2042,8 @@ fhandler_pty_master::close ()
 	    }
 	  release_output_mutex ();
 	  master_fwd_thread->terminate_thread ();
-	  CloseHandle (attach_mutex);
+	  if (InterlockedDecrement (&master_cnt) == 0)
+	    CloseHandle (attach_mutex);
 	}
     }
 
@@ -2876,7 +2878,8 @@ fhandler_pty_master::setup ()
   if (!(pcon_mutex = CreateMutex (&sa, FALSE, buf)))
     goto err;
 
-  attach_mutex = CreateMutex (&sa, FALSE, NULL);
+  if (InterlockedIncrement (&master_cnt) == 1)
+    attach_mutex = CreateMutex (&sa, FALSE, NULL);
 
   /* Create master control pipe which allows the master to duplicate
      the pty pipe handles to processes which deserve it. */

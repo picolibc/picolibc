@@ -71,3 +71,6 @@ Bug Fixes
   in ps(1) output.
   Addresses: https://cygwin.com/pipermail/cygwin/2021-July/248998.html
              https://cygwin.com/pipermail/cygwin/2021-August/249124.html
+
+- Fix pty master closing error regarding attach_mutex.
+  Addresses: https://cygwin.com/pipermail/cygwin-developers/2021-October/012418.html
