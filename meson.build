@@ -632,7 +632,7 @@ if have_long_double
 		description: 'long double is the same as double')
 endif
 conf_data.set('HAVE_ALIAS_ATTRIBUTE', have_alias_attribute)
-conf_data.set('HAVE_FORMAT_ATTRIBUTE', have_alias_attribute)
+conf_data.set('HAVE_FORMAT_ATTRIBUTE', have_format_attribute)
 conf_data.set('_WANT_REGISTER_FINI', newlib_register_fini)
 conf_data.set('_WANT_IO_LONG_LONG', io_long_long)
 conf_data.set('_WANT_IO_C99_FORMATS', io_c99_formats)
