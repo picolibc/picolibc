@@ -158,7 +158,7 @@ endforeach
 
 if enable_native_tests
 
-  native_lib_m = meson.get_compiler('c').find_library('m', required: false)
+  native_lib_m = cc.find_library('m', required: false)
 
   if native_lib_m.found()
     test('math-native',

@@ -175,7 +175,7 @@ if have_long_double
 endif
 
 c_args_exp2 = []
-if meson.get_compiler('c').has_argument('-fno-builtin-exp2')
+if cc.has_argument('-fno-builtin-exp2')
   c_args_exp2 += ['-fno-builtin-exp2', '-fno-builtin-exp2f']
   message('Set c_args_exp2')
 endif

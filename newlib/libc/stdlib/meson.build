@@ -195,11 +195,11 @@ endif
 # Work around compiler optimizing calls involving malloc/free
 
 c_args_malloc = []
-if meson.get_compiler('c').has_argument('-fno-builtin-malloc')
+if cc.has_argument('-fno-builtin-malloc')
   c_args_malloc += ['-fno-builtin-malloc']
 endif
 
-if meson.get_compiler('c').has_argument('-fno-builtin-free')
+if cc.has_argument('-fno-builtin-free')
   c_args_malloc += ['-fno-builtin-free']
 endif
 
@@ -262,7 +262,7 @@ foreach target : targets
 				    include_directories: inc,
 				    c_args: value[1] + ['-DINTERNAL_NEWLIB'] + c_args_malloc))
 	lib_stdlib_malloc_objs = get_variable('lib_stdlib_malloc' + target).extract_all_objects(recursive:true)
-	
+
 	set_variable('lib_stdlib' + target,
 		     static_library('stdlib' + target,
 				    srcs_stdlib_use,
