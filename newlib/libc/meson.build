@@ -135,12 +135,14 @@ inc_sys_headers_machine = []
 inc_machine_headers_machine = []
 srcs_machine = []
 
+fs = import('fs')
+
 if machine_dirs.has_key(host_cpu_family)
 
   if shared_dirs.has_key(machine_dirs[host_cpu_family])
     shared_dir = join_paths('machine', shared_dirs[machine_dirs[host_cpu_family]])
     shared_inc_dir = join_paths(shared_dir, 'include')
-    if run_command('ls', shared_inc_dir).returncode() == 0
+    if fs.is_dir(shared_inc_dir)
       inc = [include_directories(shared_inc_dir), inc]
     endif
 
@@ -152,7 +154,7 @@ if machine_dirs.has_key(host_cpu_family)
   machine_dir = join_paths('machine', machine_dirs[host_cpu_family])
   machine_inc_dir = join_paths(machine_dir, 'include')
 
-  if run_command('ls', machine_inc_dir).returncode() == 0
+  if fs.is_dir(machine_inc_dir)
     inc = [include_directories(machine_inc_dir), inc]
   endif
 
@@ -191,4 +193,3 @@ foreach target : targets
 
   set_variable('lib_cpart' + target, local_lib_cpart_target)
 endforeach
-
