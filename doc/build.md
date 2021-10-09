@@ -144,8 +144,10 @@ at startup and shutdown times.
 
 By default, Picolibc can uses native TLS support as provided by the
 compiler, this allows re-entrancy into the library if the run-time
-environment supports that. As a separate option, you can make `errno`
-not use TLS if necessary.
+environment supports that. A TLS model is specified only when TLS is
+enabled. The default TLS model is local-exec.
+
+As a separate option, you can make `errno` not use TLS if necessary.
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |

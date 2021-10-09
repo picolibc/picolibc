@@ -153,8 +153,6 @@ newlib_obsolete_math_float = get_option('newlib-obsolete-math-float')
 newlib_obsolete_math_double = get_option('newlib-obsolete-math-double')
 want_math_errno = get_option('want-math-errno')
 
-thread_local_storage_option = get_option('thread-local-storage')
-
 sysroot_install = get_option('sysroot-install')
 prefix = get_option('prefix')
 
@@ -330,16 +328,14 @@ else
   have_format_attribute = have_format_attribute_option == 'true'
 endif
 
-if thread_local_storage_option == 'auto'
+tls_model_spec = ''
+if get_option('thread-local-storage') == 'auto'
   thread_local_storage = not cc.has_function('__emutls_get_address', args: ['-nostdlib', '-lgcc'])
 else
-  thread_local_storage = thread_local_storage_option == 'true'
+  thread_local_storage = get_option('thread-local-storage') == 'true'
 endif
-
-if get_option('tls-model') != ''
+if thread_local_storage
   tls_model_spec = '%{!ftls-model:-ftls-model=' + get_option('tls-model') + '}'
-else
-  tls_model_spec = ''
 endif
 
 if sysroot_install
@@ -807,7 +803,7 @@ if cc.has_argument('-ffunction-sections')
   arguments += ['-ffunction-sections']
 endif
 
-if get_option('tls-model') != ''
+if thread_local_storage
   tls_arg = '-ftls-model=' + get_option('tls-model')
   assert(cc.has_argument(tls_arg), 'Compiler does not support \'-ftls-model\'!')
   arguments += [tls_arg]
