@@ -138,8 +138,6 @@ inc_sys_headers_machine = []
 inc_machine_headers_machine = []
 srcs_machine = []
 
-fs = import('fs')
-
 if machine_dirs.has_key(host_cpu_family)
 
   if shared_dirs.has_key(machine_dirs[host_cpu_family])

@@ -47,6 +47,12 @@ project('picolibc', 'c',
 targets = []
 
 cc = meson.get_compiler('c')
+fs = import('fs')
+host_cpu_family = host_machine.cpu_family()
+if host_cpu_family == 'riscv32' or host_cpu_family == 'riscv64'
+  # https://github.com/picolibc/picolibc/issues/187
+  host_cpu_family = 'riscv'
+endif
 
 # Find out about long double type
 
@@ -308,7 +314,6 @@ else
   endif
 endif
 
-host_cpu_family=host_machine.cpu_family()
 if host_cpu_family == ''
   host_cmds = cc.cmd_array() + ['-dumpmachine']
   host_cc_machine=run_command(host_cmds).stdout().strip().split('-')
@@ -329,8 +334,12 @@ else
 endif
 
 tls_model_spec = ''
+thread_local_storage = false
 if get_option('thread-local-storage') == 'auto'
-  thread_local_storage = not cc.has_function('__emutls_get_address', args: ['-nostdlib', '-lgcc'])
+  # We assume that _set_tls() is defined in the arch specific tls.c
+  if fs.is_file('newlib/libc/picolib/machine' / host_cpu_family / 'tls.c')
+    thread_local_storage = not cc.has_function('__emutls_get_address', args: ['-nostdlib', '-lgcc'])
+  endif
 else
   thread_local_storage = get_option('thread-local-storage') == 'true'
 endif
@@ -678,6 +687,7 @@ conf_data.set('HAVE_INITFINI_ARRAY', newlib_initfini_array, description: 'compil
 conf_data.set('HAVE_INIT_FINI', newlib_initfini, description: 'Support _init() and _fini() functions')
 conf_data.set('NEWLIB_TLS', thread_local_storage, description: 'use thread local storage')
 conf_data.set('PICOLIBC_TLS', thread_local_storage, description: 'use thread local storage')
+conf_data.set('HAVE_PICOLIBC_TLS_API', thread_local_storage, description: '_set_tls and _init_tls functions available')
 conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in tinystdio')
 conf_data.set('ATOMIC_UNGETC', atomic_ungetc, description: 'Use atomics for fgetc/ungetc for re-entrancy')
 conf_data.set('HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
@@ -880,8 +890,6 @@ test_link_args += specs_line
 # Make sure all of the tests get re-linked if the linker scripts change.
 test_link_depends = test_linker_files + [specs]
 
-has_picolibc_tls_api = false
-
 # make sure to include semihost BEFORE picocrt!
 if enable_picocrt
   subdir('picocrt')
@@ -891,8 +899,6 @@ subdir('newlib')
 if enable_tests
   subdir('test')
 endif
-
-conf_data.set('HAVE_PICOLIBC_TLS_API', has_picolibc_tls_api, description: '_set_tls and _init_tls functions available')
 
 conf_data.set('HAVE_IEEEFP_FUNCS', has_ieeefp_funcs, description: 'IEEE fp funcs available')
 
