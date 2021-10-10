@@ -57,7 +57,7 @@ struct pipe_reply {
 };
 
 extern HANDLE attach_mutex; /* Defined in fhandler_console.cc */
-static LONG NO_COPY master_cnt = 0;
+static LONG master_cnt = 0;
 
 inline static bool pcon_pid_alive (DWORD pid);
 
@@ -2042,10 +2042,10 @@ fhandler_pty_master::close ()
 	    }
 	  release_output_mutex ();
 	  master_fwd_thread->terminate_thread ();
-	  if (InterlockedDecrement (&master_cnt) == 0)
-	    CloseHandle (attach_mutex);
 	}
     }
+  if (InterlockedDecrement (&master_cnt) == 0)
+    CloseHandle (attach_mutex);
 
   /* Check if the last master handle has been closed.  If so, set
      input_available_event to wake up potentially waiting slaves. */

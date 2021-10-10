@@ -57,7 +57,7 @@ fhandler_console::console_state NO_COPY *fhandler_console::shared_console_info;
 bool NO_COPY fhandler_console::invisible_console;
 
 /* Mutex for AttachConsole()/FreeConsole() in fhandler_tty.cc */
-HANDLE NO_COPY attach_mutex;
+HANDLE attach_mutex;
 
 static inline void
 acquire_attach_mutex (DWORD t)
