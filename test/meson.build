@@ -226,7 +226,7 @@ foreach target : targets
 		 'math_errhandling', 'malloc', 'tls',
 		 'ffs', 'setjmp', 'atexit', 'on_exit',
 		 'math-funcs', 'timegm', 'time-tests',
-                 'test-strtod',
+                 'test-strtod', 'test-strchr',
 		]
 
   if have_attr_ctor_dtor
