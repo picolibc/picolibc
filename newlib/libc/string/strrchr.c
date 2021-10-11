@@ -34,10 +34,11 @@ strrchr (const char *s,
 	int i)
 {
   const char *last = NULL;
+  char c = i;
 
-  if (i)
+  if (c)
     {
-      while ((s=strchr(s, i)))
+      while ((s=strchr(s, c)))
 	{
 	  last = s;
 	  s++;
@@ -45,8 +46,8 @@ strrchr (const char *s,
     }
   else
     {
-      last = strchr(s, i);
+      last = strchr(s, c);
     }
-		  
+
   return (char *) last;
 }
