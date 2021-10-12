@@ -228,6 +228,20 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #endif
 #endif
 
+#ifdef __powerpc__
+
+#ifdef __LITTLE_ENDIAN__
+#define __IEEE_LITTLE_ENDIAN
+#else
+#define __IEEE_BIG_ENDIAN
+#endif
+
+#ifndef _SOFT_FLOAT
+# define _SUPPORTS_ERREXCEPT
+#endif
+
+#endif
+
 #ifdef __i960__
 #define __IEEE_LITTLE_ENDIAN
 #endif
