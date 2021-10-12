@@ -34,15 +34,52 @@
  */
 
 #include "stdio_private.h"
+#include <float.h>
 
+#if __LDBL_MAX_10_EXP__ >= 4096
 #define NPOW_10	13
+#elif __LDBL_MAX_10_EXP__ >= 2048
+#define NPOW_10	12
+#elif __LDBL_MAX_10_EXP__ >= 1024
+#define NPOW_10 11
+#elif __LDBL_MAX_10_EXP__ >= 512
+#define NPOW_10 10
+#elif __LDBL_MAX_10_EXP__ >= 256
+#define NPOW_10 9
+#else
+#error __LDBL_MAX_10_EXP__ too small
+#endif
 
 static const long double pwr_p10 [NPOW_10] = {
-    1e+1L, 1e+2L, 1e+4L, 1e+8L, 1e+16L, 1e+32L, 1e+64L, 1e+128L, 1e+256L, 1e+512L, 1e+1024L, 1e+2048L, 1e+4096L
+    1e+1L, 1e+2L, 1e+4L, 1e+8L, 1e+16L, 1e+32L, 1e+64L, 1e+128L, 1e+256L,
+#if NPOW_10 >= 10
+    1e+512L,
+#endif
+#if NPOW_10 >= 11
+    1e+1024L,
+#endif
+#if NPOW_10 >= 12
+    1e+2048L,
+#endif
+#if NPOW_10 >= 13
+    1e+4096L
+#endif
 };
 
 static const long double pwr_m10 [NPOW_10] = {
-    1e-1L, 1e-2L, 1e-4L, 1e-8L, 1e-16L, 1e-32L, 1e-64L, 1e-128L, 1e-256L, 1e-512L, 1e-1024L, 1e-2048L, 1e-4096L
+    1e-1L, 1e-2L, 1e-4L, 1e-8L, 1e-16L, 1e-32L, 1e-64L, 1e-128L, 1e-256L,
+#if NPOW_10 >= 10
+    1e-512L,
+#endif
+#if NPOW_10 >= 11
+    1e-1024L,
+#endif
+#if NPOW_10 >= 12
+    1e-2048L,
+#endif
+#if NPOW_10 >= 13
+    1e-4096L
+#endif
 };
 
 long double

@@ -57,28 +57,26 @@ _BEGIN_STD_C
 #define	EXT_FRACLBITS	32
 #define __ieee_ext_field_type unsigned long
 
-#elif LDBL_MANT_DIG == 64
+#elif (LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 65) && LDBL_MAX_EXP == 16384
+/* 80-bit floats, as on x86 */
 #define	EXT_EXPBITS	15
 #define EXT_FRACHBITS	32
 #define	EXT_FRACLBITS	32
 #define __ieee_ext_field_type unsigned int
 
-#elif LDBL_MANT_DIG == 65
-#define	EXT_EXPBITS	15
-#define EXT_FRACHBITS	32
-#define	EXT_FRACLBITS	32
-#define __ieee_ext_field_type unsigned int
-
-#elif LDBL_MANT_DIG == 112
+#elif (LDBL_MANT_DIG == 113 || LDBL_MANT_DIG == 112) && LDBL_MAX_EXP == 16384
+/* 128-bit IEEE floats, as on risc-v */
 #define	EXT_EXPBITS	15
 #define EXT_FRACHBITS	48
 #define	EXT_FRACLBITS	64
 #define __ieee_ext_field_type unsigned long long
 
-#elif LDBL_MANT_DIG == 113
-#define	EXT_EXPBITS	15
-#define EXT_FRACHBITS	48
-#define	EXT_FRACLBITS	64
+#elif LDBL_MANT_DIG == 106 && DBL_MANT_DIG == 53 && LDBL_MAX_EXP == 1024
+/* 128-bit double-double, as on powerpc */
+#define EXT_EXPBITS     11
+#define EXT_FRACHBITS   DBL_MANT_DIG
+#define EXT_FRACLBITS   DBL_MANT_DIG
+#define EXT_FRACGAP     EXT_EXPBITS
 #define __ieee_ext_field_type unsigned long long
 
 #else
@@ -92,6 +90,9 @@ _BEGIN_STD_C
 typedef struct ieee_ext
 {
   __ieee_ext_field_type	 ext_fracl : EXT_FRACLBITS;
+#ifdef EXT_FRACGAP
+  __ieee_ext_field_type  ext_gap   : EXT_FRACGAP;
+#endif
   __ieee_ext_field_type	 ext_frach : EXT_FRACHBITS;
   __ieee_ext_field_type	 ext_exp   : EXT_EXPBITS;
   __ieee_ext_field_type	 ext_sign  : 1;
