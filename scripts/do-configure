@@ -98,17 +98,19 @@ esac
 
 case "$PREFIX" in
     "")
-	meson "$DIR"/.. \
+	meson setup \
 	      -Dincludedir=picolibc/"$ARCH"/include \
 	      -Dlibdir=picolibc/"$ARCH"/lib \
 	      --cross-file "$CROSS" \
-	      "$@"
+	      "$@" \
+	      "$DIR"/..
 	;;
     *)
-	meson "$DIR"/.. \
+	meson setup \
 	      -Dincludedir=picolibc/"$ARCH"/include \
 	      -Dlibdir=picolibc/"$ARCH"/lib \
 	      --cross-file "$CROSS" \
-	      "$PREFIX" "$@"
+	      "$PREFIX" "$@" \
+	      "$DIR"/..
 	;;
 esac
