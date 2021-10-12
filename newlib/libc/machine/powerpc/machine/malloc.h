@@ -29,7 +29,7 @@ SUCH DAMAGE.
 #ifndef	_MACHMALLOC_H_
 #define	_MACHMALLOC_H_
 
-# if defined(__ALTIVEC__)
+# if defined(__ALTIVEC__) && 0
 
 void *vec_calloc (size_t __nmemb, size_t __size);
 void *_vec_calloc_r (struct _reent *, size_t __nmemb, size_t __size);
