@@ -59,13 +59,4 @@ foreach file : srcs_xdr
   endif
 endforeach
 
-
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_xdr' + target,
-		static_library('xdr' + target,
-			srcs_xdr_use,
-			pic: false,
-			include_directories: inc,
-			c_args: value[1]))
-endforeach
+src_xdr = files(srcs_xdr_use)

@@ -57,13 +57,5 @@ foreach file : srcs_stdio64
   endif
 endforeach
 
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_stdio64' + target,
-		static_library('stdio64' + target,
-			srcs_stdio64_use,
-			pic: false,
-			include_directories: inc,
-			c_args: value[1] + ['-D_COMPILING_NEWLIB']))
-endforeach
+src_stdio64 = files(srcs_stdio64_use)
 

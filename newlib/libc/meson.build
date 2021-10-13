@@ -170,27 +170,39 @@ foreach libdir : libdirs
   subdir(libdir)
 endforeach
 
+src_cpart = []
+
+foreach libname : libnames
+  src_cpart += get_variable('src_' + libname, [])
+endforeach
+
 subdir('include')
 
 foreach target : targets
   value = get_variable('target_' + target)
   libobjs = []
+  libsrcs_target = []
 
   foreach libname : libnames
-    libobjs += get_variable('lib_' + libname + target).extract_all_objects(recursive:true)
+    if is_variable('lib_' + libname + target)
+      libobjs += get_variable('lib_' + libname + target).extract_all_objects(recursive:true)
+    endif
+    libsrcs_target += get_variable('src_' + libname + target, [])
   endforeach
 
-  instdir = join_paths(get_option('libdir'), value[0])
+  set_variable('src_cpart_' + target, libsrcs_target)
 
   if target == ''
     libcpart_name = 'cpart'
   else
-    libcpart_name = join_paths(target, 'libcpart')
+    libcpart_name = 'cpart' + '_' + target
   endif
 
   local_lib_cpart_target = static_library(libcpart_name,
 				          pic: false,
-				          objects : libobjs)
+				          objects : libobjs,
+					  include_directories: inc,
+					  c_args: value[1] + ['-D_COMPILING_NEWLIB'])
 
   set_variable('lib_cpart' + target, local_lib_cpart_target)
 endforeach

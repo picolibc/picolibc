@@ -37,12 +37,22 @@ subdir('libm')
 
 libnames = ['cpart', 'mpart']
 
+libsrcs = []
+
+foreach libname : libnames
+  libsrcs += get_variable('src_' + libname, [])
+endforeach
+
 foreach target : targets
   value = get_variable('target_' + target)
   libobjs = []
+  libsrcs_target = libsrcs
 
   foreach libname : libnames
-    libobjs += get_variable('lib_' + libname + target).extract_all_objects(recursive:true)
+    if is_variable('lib_' + libname + target)
+      libobjs += get_variable('lib_' + libname + target).extract_all_objects(recursive:true)
+    endif
+    libsrcs_target += get_variable('src_' + libname + target, [])
   endforeach
 
   instdir = join_paths(get_option('libdir'), value[0])
@@ -56,10 +66,13 @@ foreach target : targets
   endif
 
   local_lib_c_target = static_library(libc_name,
+				      libsrcs_target,
 				      install : true,
 				      install_dir : instdir,
 				      pic: false,
-				      objects : libobjs)
+				      objects : libobjs,
+				      include_directories: inc,
+				      c_args: value[1] + ['-D_COMPILING_NEWLIB'])
 
   set_variable('lib_c' + target, local_lib_c_target)
 
@@ -84,4 +97,5 @@ endforeach
 
 if enable_tests
   subdir('testsuite')
+  subdir('libm/test')
 endif

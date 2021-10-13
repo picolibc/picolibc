@@ -64,12 +64,4 @@ foreach file : srcs_ssp
   endif
 endforeach
 
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_ssp' + target,
-		static_library('ssp' + target,
-			srcs_ssp_use,
-			pic: false,
-			include_directories: inc,
-			c_args: value[1]))
-endforeach
+src_ssp = files(srcs_ssp_use)

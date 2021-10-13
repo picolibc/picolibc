@@ -68,35 +68,43 @@ else
   srcs_libm_machine = []
 endif
 
-math_inc = [include_directories('common'), inc]
+inc = [include_directories('common'), inc]
 
 foreach libdir : libdirs
   subdir(libdir)
 endforeach
 
+src_mpart = []
+
+foreach libname : libnames
+  src_mpart += get_variable('src_libm_' + libname, [])
+endforeach
+
 foreach target : targets
   value = get_variable('target_' + target)
   libobjs = []
+  libsrcs_target = []
 
   foreach libname : libnames
-    libobjs += get_variable('lib_' + libname + target).extract_all_objects(recursive:true)
+    if is_variable('lib_' + libname + target)
+      libobjs += get_variable('lib_' + libname + target).extract_all_objects(recursive:true)
+    endif
+    libsrcs_target += get_variable('src_libm_' + libname + target, [])
   endforeach
 
-  instdir = join_paths(get_option('libdir'), value[0])
+  set_variable('src_mpart_' + target, libsrcs_target)
 
   if target == ''
     libmpart_name = 'mpart'
   else
-    libmpart_name = join_paths(target, 'libmpart')
+    libmpart_name = 'mpart' + '_' + target
   endif
 
   local_lib_mpart_target = static_library(libmpart_name,
-				      pic: false,
-				      objects : libobjs)
+					  pic: false,
+					  objects : libobjs,
+					  include_directories: inc,
+					  c_args: value[1] + ['-D_COMPILING_NEWLIB'])
   set_variable('lib_mpart' + target, local_lib_mpart_target)
 endforeach
-
-if enable_tests
-  subdir('test')
-endif
 

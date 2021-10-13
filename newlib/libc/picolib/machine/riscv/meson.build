@@ -34,5 +34,5 @@
 #
 
 if thread_local_storage
-  srcs_picolib += files('tls.c')
+  src_picolib += files('tls.c')
 endif

@@ -214,6 +214,15 @@ if tinystdio
   __d_vfscanf_symbol = global_prefix + '__d_vfscanf'
   __f_vfscanf_symbol = global_prefix + '__f_vfscanf'
   __i_vfscanf_symbol = global_prefix + '__i_vfscanf'
+
+  if format_default == 'double'
+    c_args += '-DFORMAT_DEFAULT_DOUBLE'
+  elif format_default == 'float'
+    c_args += '-DFORMAT_DEFAULT_FLOAT'
+  elif format_default == 'integer'
+    c_args += '-DFORMAT_DEFAULT_INTEGER'
+  endif
+
   if has_link_defsym
     if format_default != 'double'
       double_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __d_vfprintf_symbol

@@ -194,21 +194,15 @@ endforeach
 
 math_inc = [ inc, include_directories('../common') ]
 
+src_libm_math = files(srcs_math_use)
+
 foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_math_exp2' + target,
-		     static_library('math_exp2' + target,
-				    ['w_exp2.c', 'wf_exp2.c'],
-				    pic: false,
-				    include_directories: math_inc,
-				    c_args: value[1] + c_args_exp2)
-		    )
-	lib_math_exp2_objs = get_variable('lib_math_exp2' + target).extract_all_objects(recursive:true)
-	set_variable('lib_math' + target,
-		static_library('math' + target,
-			       srcs_math_use,
-			       objects: lib_math_exp2_objs,
-			       pic: false,
-			       include_directories: math_inc,
-			       c_args: value[1]))
+  value = get_variable('target_' + target)
+  set_variable('lib_math' + target,
+	       static_library('math_exp2' + target,
+			      ['w_exp2.c', 'wf_exp2.c'],
+			      pic: false,
+			      include_directories: math_inc,
+			      c_args: value[1] + c_args_exp2)
+	      )
 endforeach

@@ -290,12 +290,4 @@ foreach file : srcs_stdio
   endif
 endforeach
 
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_stdio' + target,
-		static_library('stdio' + target,
-			srcs_stdio_use,
-			pic: false,
-			include_directories: inc,
-			c_args: value[1] + ['-D_COMPILING_NEWLIB']))
-endforeach
+src_stdio = files(srcs_stdio_use)

@@ -43,16 +43,9 @@ if thread_local_storage
   srcs_picolib += 'inittls.c'
 endif
 
+src_picolib = files(srcs_picolib)
+
 if fs.is_dir('machine' / host_cpu_family)
   subdir('machine' / host_cpu_family)
 endif
 
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_picolib' + target,
-		     static_library('picolib' + target,
-				    srcs_picolib,
-				    pic: false,
-				    include_directories: inc,
-				    c_args: value[1]))
-endforeach

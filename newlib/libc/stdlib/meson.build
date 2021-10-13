@@ -253,21 +253,17 @@ foreach file : srcs_stdlib_malloc
   endif
 endforeach
 
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_stdlib_malloc' + target,
-		     static_library('stdlib_malloc' + target,
-				    srcs_stdlib_malloc_use,
-				    pic: false,
-				    include_directories: inc,
-				    c_args: value[1] + ['-DINTERNAL_NEWLIB'] + c_args_malloc))
-	lib_stdlib_malloc_objs = get_variable('lib_stdlib_malloc' + target).extract_all_objects(recursive:true)
+src_stdlib = files(srcs_stdlib_use)
 
-	set_variable('lib_stdlib' + target,
-		     static_library('stdlib' + target,
-				    srcs_stdlib_use,
-				    objects: lib_stdlib_malloc_objs,
-				    pic: false,
-				    include_directories: inc,
-				    c_args: value[1] + ['-DINTERNAL_NEWLIB']))
+foreach target : targets
+  value = get_variable('target_' + target)
+
+  # Have to build a sub-library to get custom c_args for malloc
+  set_variable('lib_stdlib' + target,
+	       static_library('stdlib_malloc' + target,
+			      srcs_stdlib_malloc_use,
+			      pic: false,
+			      include_directories: inc,
+			      c_args: value[1] + ['-DINTERNAL_NEWLIB'] + c_args_malloc))
+
 endforeach

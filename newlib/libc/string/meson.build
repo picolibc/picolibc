@@ -176,20 +176,19 @@ else
   cargs_strcmp = []
 endif
 
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_strcmp' + target,
-		     static_library('strcmp' + target,
-				    srcs_strcmp_use,
-				    pic: false,
-				    c_args: value[1] + cargs_strcmp,
-				    include_directories: inc))
-	strcmp_objs = get_variable('lib_strcmp' + target).extract_all_objects(recursive:true)
-	set_variable('lib_string' + target,
-		static_library('string' + target,
-			       srcs_string_use,
-			       objects: strcmp_objs,
-			       pic: false,
-			       include_directories: inc,
-			       c_args: value[1]))
-endforeach
+src_string = files(srcs_string_use)
+
+# Need a sub-library to pass custom cflags to strcmp
+
+if srcs_strcmp_use != []
+  foreach target : targets
+    value = get_variable('target_' + target)
+
+    set_variable('lib_string' + target,
+		 static_library('strcmp' + target,
+				srcs_strcmp_use,
+				pic: false,
+				c_args: value[1] + cargs_strcmp,
+				include_directories: inc))
+  endforeach
+endif

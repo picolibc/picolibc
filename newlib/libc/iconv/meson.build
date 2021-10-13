@@ -34,20 +34,12 @@
 #
 libdirs = ['ces', 'ccs', 'lib']
 
+libsrcs = []
+
 foreach libdir : libdirs
   subdir(libdir)
+  libsrcs += get_variable('src_iconv_' + libdir, [])
 endforeach
 
-foreach target : targets
-  value = get_variable('target_' + target)
-  libobjs = []
-  foreach libname : libdirs
-    libobjs += get_variable('lib_iconv_' + libname + target).extract_all_objects(recursive:true)
-  endforeach
-  
-	set_variable('lib_iconv' + target,
-		static_library('iconv' + target,
-			       objects : libobjs,
-			       pic: false))
-endforeach
+src_iconv = libsrcs
 

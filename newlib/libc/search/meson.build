@@ -57,12 +57,5 @@ hdrs_search = [
     'hash.h',
     'page.h',
 ]
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_search' + target,
-		static_library('search' + target,
-			srcs_search,
-			pic: false,
-			include_directories: inc,
-			c_args: value[1]))
-endforeach
+
+src_search = files(srcs_search)

@@ -63,12 +63,4 @@ foreach file : srcs_fenv
   endif
 endforeach
 
-foreach target : targets
-  value = get_variable('target_' + target)
-  set_variable('lib_fenv' + target,
-	       static_library('fenv' + target,
-			      srcs_fenv_use,
-			      pic: false,
-			      include_directories: inc,
-			      c_args: value[1]))
-endforeach
+src_libm_fenv = files(srcs_fenv_use)

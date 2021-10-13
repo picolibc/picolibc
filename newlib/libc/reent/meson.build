@@ -50,12 +50,4 @@ foreach file : srcs_reent
   endif
 endforeach
 
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_reent' + target,
-		static_library('reent' + target,
-			srcs_reent_use,
-			pic: false,
-			include_directories: inc,
-			c_args: value[1]))
-endforeach
+src_reent = files(srcs_reent_use)

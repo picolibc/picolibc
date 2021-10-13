@@ -32,11 +32,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-src_common = [
+srcs_common = [
     'signgam.c'
 ]  
 
-dsrc_common = [
+dsrcs_common = [
   's_finite.c',
   's_copysign.c',
   's_modf.c',
@@ -93,7 +93,7 @@ dsrc_common = [
   'pow_log_data.c',
 ]
 
-fsrc_common = [
+fsrcs_common = [
   'sf_finite.c',
   'sf_copysign.c',
   'sf_modf.c',
@@ -225,7 +225,7 @@ lsrc_wrap = [
   'sincosl.c',
 ]
 
-srcs_common = src_common + dsrc_common + fsrc_common
+srcs_common += dsrcs_common + fsrcs_common
 
 if have_long_double
   srcs_common += lsrc_full
@@ -253,12 +253,4 @@ hdrs_common = [
     'sincosf.h',
 ]
 
-foreach target : targets
-  value = get_variable('target_' + target)
-  set_variable('lib_common' + target,
-	       static_library('common' + target,
-			      srcs_common_use,
-			      pic: false,
-			      include_directories: inc,
-			      c_args: value[1]))
-endforeach
+src_libm_common = files(srcs_common_use)

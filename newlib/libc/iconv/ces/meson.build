@@ -62,12 +62,4 @@ foreach file : srcs_iconv_ces
   endif
 endforeach
 
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_iconv_ces' + target,
-		static_library('iconv_ces' + target,
-			       srcs_iconv_ces_use,
-			       pic: false,
-			       include_directories: inc,
-			       c_args: value[1]))
-endforeach
+src_iconv_ces = files(srcs_iconv_ces_use)
