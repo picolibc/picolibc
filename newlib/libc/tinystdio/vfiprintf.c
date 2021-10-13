@@ -35,7 +35,7 @@
 #define vfprintf __i_vfprintf
 #endif
 
-#include <vfprintf.c>
+#include "vfprintf.c"
 
 #ifdef FORMAT_DEFAULT_INTEGER
 #ifdef HAVE_ALIAS_ATTRIBUTE

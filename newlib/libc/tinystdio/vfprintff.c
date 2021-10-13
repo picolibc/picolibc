@@ -36,7 +36,7 @@
 #define vfprintf __f_vfprintf
 #endif
 
-#include <vfprintf.c>
+#include "vfprintf.c"
 
 #ifdef FORMAT_DEFAULT_FLOAT
 #ifdef HAVE_ALIAS_ATTRIBUTE
