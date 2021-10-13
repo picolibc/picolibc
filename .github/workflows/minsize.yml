@@ -64,6 +64,9 @@ jobs:
           "./.github/do-test do-clang-rv32imafdc-configure build-clang-rv32imafdc",
         ]
 
+    env:
+      IMAGE: picolibc
+
     steps:
       - name: 'Clone picolibc'
         uses: actions/checkout@v2
@@ -72,10 +75,10 @@ jobs:
 
       - name: 'Build picolibc container'
         run: |
-          docker build -t picolibc \
+          docker build -t $IMAGE \
             -f picolibc/.github/Dockerfile \
             picolibc
 
       - name: 'Minsize test'
         run: |
-          docker run picolibc ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
+          docker run $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
