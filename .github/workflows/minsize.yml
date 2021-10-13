@@ -82,3 +82,9 @@ jobs:
       - name: 'Minsize test'
         run: |
           docker run -v $(readlink -f picolibc):/picolibc  -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
+
+      - name: Check Disk Space
+        if: always()
+        run: |
+          df -h
+          docker buildx du --verbose
