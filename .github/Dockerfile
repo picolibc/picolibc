@@ -63,5 +63,3 @@ RUN apt-get update && \
 # Copy picolibc into container
 RUN mkdir picolibc
 COPY ./ picolibc/
-
-WORKDIR ./picolibc
