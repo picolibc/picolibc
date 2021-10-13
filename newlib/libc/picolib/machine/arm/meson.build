@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2021 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,26 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-srcs_picolib = [
-  'picosbrk.c',
-  'dso_handle.c',
-  'getauxval.c'
-]
-
+srcs_picolib += files('interrupt.c')
 if thread_local_storage
-  srcs_picolib += 'inittls.c'
+  srcs_picolib += files('tls.c', 'read_tp.S')
 endif
-
-if fs.is_dir('machine' / host_cpu_family)
-  subdir('machine' / host_cpu_family)
-endif
-
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_picolib' + target,
-		     static_library('picolib' + target,
-				    srcs_picolib,
-				    pic: false,
-				    include_directories: inc,
-				    c_args: value[1]))
-endforeach
