@@ -87,10 +87,10 @@ foreach target : targets
     if target == ''
       semihost_test_name = semihost_test
     else
-      semihost_test_name = join_paths(target, semihost_test)
+      semihost_test_name = semihost_test + '_' + target
     endif
 
-    test(semihost_test + target,
+    test(semihost_test_name,
 	 executable(semihost_test_name, [semihost_test_src],
 		    c_args: _c_args,
 		    link_args: _link_args,
@@ -106,10 +106,10 @@ foreach target : targets
     if target == ''
       semihost_fail_test_name = semihost_fail_test
     else
-      semihost_fail_test_name = join_paths(target, semihost_fail_test)
+      semihost_fail_test_name = semihost_fail_test + '_' + target
     endif
 
-    test(semihost_fail_test + target,
+    test(semihost_fail_test_name,
 	 executable(semihost_fail_test_name, [semihost_fail_test_src],
 		    c_args: _c_args,
 		    link_args: _link_args,

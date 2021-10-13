@@ -144,10 +144,10 @@ foreach target : targets
   if target == ''
     test_name = 'math_test'
   else
-    test_name = join_paths(target, 'math_test')
+    test_name = 'math_test_' + target
   endif
 
-  test('math' + target,
+  test(test_name,
        executable(test_name, math_test_src,
 		  c_args: value[1] + double_printf_compile_args + test_c_args,
 		  link_with: libs,

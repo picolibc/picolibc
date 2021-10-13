@@ -60,10 +60,10 @@ foreach target : targets
   if target == ''
     t1_name = t1
   else
-    t1_name = join_paths(target, t1)
+    t1_name = t1 + '_' + target
   endif
 
-  test(t1 + target,
+  test(t1_name,
        executable(t1_name, 'printf_scanf.c',
 		  c_args: double_printf_compile_args + _c_args,
 		  link_args: double_printf_link_args + _link_args,
@@ -76,10 +76,10 @@ foreach target : targets
   if target == ''
     t1_name = t1
   else
-    t1_name = join_paths(target, t1)
+    t1_name = t1 + '_' + target
   endif
 
-  test(t1 + target,
+  test(t1_name,
        executable(t1_name, 'printf_scanf.c',
 		  c_args: float_printf_compile_args + _c_args,
 		  link_args: float_printf_link_args + _link_args,
@@ -92,10 +92,10 @@ foreach target : targets
   if target == ''
     t1_name = t1
   else
-    t1_name = join_paths(target, t1)
+    t1_name = t1 + '_' + target
   endif
 
-  test(t1 + target,
+  test(t1_name,
        executable(t1_name, ['printf-tests.c'],
 		  c_args: double_printf_compile_args + _c_args,
 		  link_args: double_printf_link_args + _link_args,
@@ -107,10 +107,10 @@ foreach target : targets
   if target == ''
     t1_name = t1
   else
-    t1_name = join_paths(target, t1)
+    t1_name = t1 + '_' + target
   endif
 
-  test(t1 + target,
+  test(t1_name,
        executable(t1_name, ['printf-tests.c'],
 		  c_args: float_printf_compile_args + _c_args,
 		  link_args: float_printf_link_args + _link_args,
@@ -122,10 +122,10 @@ foreach target : targets
   if target == ''
     t1_name = t1
   else
-    t1_name = join_paths(target, t1)
+    t1_name = t1 + '_' + target
   endif
 
-  test(t1 + target,
+  test(t1_name,
        executable(t1_name, ['printf-tests.c'],
 		  c_args: int_printf_compile_args + _c_args,
 		  link_args: int_printf_link_args + _link_args,
@@ -137,10 +137,10 @@ foreach target : targets
   if target == ''
     t1_name = t1
   else
-    t1_name = join_paths(target, t1)
+    t1_name = t1 + '_' + target
   endif
 
-  test(t1 + target,
+  test(t1_name,
        executable(t1_name, ['try-ilp32.c', 'try-ilp32-sub.c'],
 		  c_args: _c_args,
 		  link_args: _link_args,
@@ -152,10 +152,10 @@ foreach target : targets
   if target == ''
     t1_name = t1
   else
-    t1_name = join_paths(target, t1)
+    t1_name = t1 + '_' + target
   endif
 
-  test(t1 + target,
+  test(t1_name,
        executable(t1_name, 'hosted-exit.c',
 		  c_args: _c_args,
 		  link_args:  _link_args,
@@ -177,10 +177,10 @@ foreach target : targets
   if target == ''
     t1_name = t1
   else
-    t1_name = join_paths(target, t1)
+    t1_name = t1 + '_' + target
   endif
 
-  test(t1 + target,
+  test(t1_name,
        executable(t1_name, 'abort.c',
 		  c_args: _c_args,
 		  link_args:  _link_args,
@@ -195,10 +195,10 @@ foreach target : targets
     if target == ''
       t1_name = t1
     else
-      t1_name = join_paths(target, t1)
+      t1_name = t1 + '_' + target
     endif
 
-    test(t1 + target,
+    test(t1_name,
 	 executable(t1_name, 'constructor-skip.c',
 		    c_args: _c_args,
 		    link_args:  _link_args,
@@ -211,10 +211,10 @@ foreach target : targets
   if target == ''
     t1_name = t1
   else
-    t1_name = join_paths(target, t1)
+    t1_name = t1 + '_' + target
   endif
 
-  test(t1 + target,
+  test(t1_name,
        executable(t1_name, ['rounding-mode.c', 'rounding-mode-sub.c'],
 		  c_args: _c_args,
 		  link_args: _link_args,
@@ -254,10 +254,10 @@ foreach target : targets
     if target == ''
       t1_name = t1
     else
-      t1_name = join_paths(target, t1)
+      t1_name = t1 + '_' + target
     endif
 
-    test(t1 + target,
+    test(t1_name,
 	 executable(t1_name, [t1_src],
 		    c_args: double_printf_compile_args + _c_args,
 		    link_args: double_printf_link_args + _link_args,
