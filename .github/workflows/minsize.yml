@@ -8,8 +8,39 @@ on:
     branches:
       - main
 
+env:
+  IMAGE_FILE: dockerimg.tar
+  IMAGE: picolibc
+
 jobs:
+  cache-maker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: 'Build picolibc container'
+        uses: docker/build-push-action@v2
+        with:
+          platforms: linux/amd64
+          file: .github/Dockerfile
+          tags: ${{ env.IMAGE }}:latest
+          cache-from: type=gha
+          cache-to: type=gha
+          outputs: type=docker,dest=${{ env.IMAGE_FILE }}
+
+      - name: Check size
+        run: |
+          ls -al
+
+      - name: Cache the Docker Image
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.IMAGE_FILE }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles(format('{0}', env.IMAGE_FILE)) }}
+
   test:
+    needs: cache-maker
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -64,20 +95,26 @@ jobs:
           "./.github/do-test do-clang-rv32imafdc-configure build-clang-rv32imafdc",
         ]
 
-    env:
-      IMAGE: picolibc
-
     steps:
       - name: 'Clone picolibc'
         uses: actions/checkout@v2
         with:
           path: picolibc
 
-      - name: 'Build picolibc container'
+      - name: Restore the Docker Image
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.IMAGE_FILE }}
+          key: ${{ env.IMAGE_FILE }}-
+
+      - name: Check
         run: |
-          docker build -t $IMAGE \
-            -f picolibc/.github/Dockerfile \
-            picolibc
+          ls -al
+
+      - name: Load and Check the Docker Image
+        run: |
+          docker load -i $IMAGE_FILE
+          docker images -a $IMAGE
 
       - name: 'Minsize test'
         run: |
