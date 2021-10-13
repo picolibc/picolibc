@@ -59,7 +59,3 @@ RUN apt-get update && \
     qemu-system-arm=1:5.0-5.5 \
     qemu-system-misc=1:5.0-5.5 \
     clang lld)
-
-# Copy picolibc into container
-RUN mkdir picolibc
-COPY ./ picolibc/
