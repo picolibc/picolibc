@@ -81,4 +81,4 @@ jobs:
 
       - name: 'Release test'
         run: |
-          docker run $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
+          docker run -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
