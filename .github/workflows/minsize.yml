@@ -81,4 +81,4 @@ jobs:
 
       - name: 'Minsize test'
         run: |
-          docker run $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
+          docker run -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
