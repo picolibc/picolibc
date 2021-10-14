@@ -581,7 +581,7 @@ Files: dummyhost/iob.c
  scripts/do-configure
  scripts/do-esp32-configure
  scripts/do-freedom-tools-configure
- scripts/do-i686-configure
+ scripts/do-i386-configure
  scripts/do-lx106-configure
  scripts/do-native-configure
  scripts/do-riscv-configure
@@ -701,7 +701,7 @@ Files: hello-world/hello-world++.c++
  newlib/libm/math/e_lgamma.c
  newlib/libm/math/ef_lgamma.c
  scripts/run-aarch64
- scripts/run-i686
+ scripts/run-i386
  scripts/run-rv32imac
  scripts/run-rv32imafdc
  scripts/run-x86_64

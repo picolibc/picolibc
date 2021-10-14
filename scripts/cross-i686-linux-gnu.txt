@@ -5,12 +5,12 @@ as = 'i686-linux-gnu-as'
 ld = ['i686-linux-gnu-gcc', '-march=core2', '-mfpmath=sse', '-msse2', '-nostdlib', '-fno-pic', '-fno-PIE', '-static']
 nm = 'i686-linux-gnu-nm'
 strip = 'i686-linux-gnu-strip'
-exe_wrapper = ['sh', '-c', 'test -z "$MESON_SOURCE_ROOT" || "$MESON_SOURCE_ROOT"/scripts/run-i686 "$@"', 'run-i686']
+exe_wrapper = ['sh', '-c', 'test -z "$MESON_SOURCE_ROOT" || "$MESON_SOURCE_ROOT"/scripts/run-i386 "$@"', 'run-i386']
 
 [host_machine]
 system='linux'
-cpu_family='x86'
-cpu='i686'
+cpu_family='i386'
+cpu='i386'
 endian='little'
 
 [properties]
