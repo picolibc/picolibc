@@ -32,26 +32,6 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-libm_machine_dirs = {
-		      'aarch64' : 'aarch64',
-		      'arm' : 'arm',
-		      'i386' : 'i386',
-		      'i486' : 'i386',
-		      'i586' : 'i386',
-		      'i686' : 'i386',
-		      'nds32' : 'nds32',
-		      'powerpc': 'powerpc',
-		      'powerpc64': 'powerpc',
-		      'ppc64': 'powerpc',
-		      'ppc64le': 'powerpc',
-		      'riscv' : 'riscv',
-		      'riscv32' : 'riscv',
-		      'riscv64' : 'riscv',
-		      'spu' : 'spu',
-		      'x86' : 'i386',
-		      'x86_64' : 'x86_64',
-		      'xtensa': 'xtensa',
-		    }
 
 libdirs = ['math', 'common', 'fenv']
 if have_complex
@@ -60,8 +40,8 @@ endif
 
 libnames = libdirs
 
-if libm_machine_dirs.has_key(host_cpu_family)
-  libm_machine_dir = join_paths('machine', libm_machine_dirs[host_cpu_family])
+libm_machine_dir = 'machine' / host_cpu_family
+if fs.is_dir(libm_machine_dir)
   libdirs = [libm_machine_dir] + libdirs
   libnames = ['machine'] + libnames
 else

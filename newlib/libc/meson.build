@@ -32,83 +32,6 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-machine_dirs = {
-		 'a29k': 'a29k',
-		 'aarch64': 'aarch64',
-		 'arc': 'arc',
-		 'arm': 'arm',
-		 'bfin': 'bfin',
-		 'cr16': 'cr16',
-		 'cris': 'cris',
-		 'crisv32': 'cris',
-		 'crx': 'crx',
-		 'csky': 'csky',
-		 'd10v': 'd10v',
-		 'd30v': 'd30v',
-		 'epiphany': 'epiphany',
-		 'fido': 'm68k',
-		 'fr30': 'fr30',
-		 'frv': 'frv',
-		 'ft32': 'ft32',
-		 'h8300': 'h8300',
-		 'h8500': 'h8500',
-		 'hppa': 'hppa',
-		 'i960': 'i960',
-		 'i386': 'i386',
-		 'i486': 'i386',
-		 'i586': 'i386',
-		 'i686': 'i386',
-		 'x86' : 'i386',
-		 'iq2000': 'iq2000',
-		 'lm32': 'lm32',
-		 'm32c': 'm32c',
-		 'm32r': 'm32r',
-		 'm6811': 'm68hc11',
-		 'm6812': 'm68hc11',
-		 'm68hc11': 'm68hc11',
-		 'm68hc12': 'm68hc11',
-		 'm68k': 'm68k',
-		 'm88k': 'm88k',
-		 'm88110': 'm88k',
-		 'microblaze': 'microblaze',
-		 'mep': 'mep',
-		 'mips': 'mips',
-		 'mn10200': 'mn10200',
-		 'mn10300': 'mn10300',
-		 'moxie': 'moxie',
-		 'msp430': 'msp430',
-		 'mt': 'mt',
-		 'nds32': 'nds32',
-		 'nios2': 'nios2',
-		 'nvptx': 'nvptx',
-		 'or1k': 'or1k',
-		 'or1knd': 'or1k',
-		 'powerpc': 'powerpc',
-		 'powerpc64': 'powerpc',
-		 'ppc64': 'powerpc',
-		 'ppc64le': 'powerpc',
-		 'riscv': 'riscv',
-		 'riscv32': 'riscv',
-		 'riscv64': 'riscv',
-		 'rl78': 'rl78',
-		 'rx': 'rx',
-		 'sh': 'sh',
-		 'sh64': 'sh',
-		 'sparc': 'sparc',
-		 'c4x': 'tic4x',
-		 'tic4x': 'tic4x',
-		 'tic6x': 'tic6x',
-		 'tic80': 'tic80',
-		 'v850': 'v850',
-		 'visium': 'visium',
-		 'w65': 'w65',
-		 'x86_64': 'x86_64',
-		 'xc16x': 'xc16x',
-		 'xstormy16': 'xstormy16',
-		 'xtensa': 'xtensa',
-		 'z8k': 'z8k',
-		 'spu': 'spu',
-	       }
 
 shared_dirs = {
 		'i386': 'shared_x86',
@@ -138,11 +61,12 @@ inc_sys_headers_machine = []
 inc_machine_headers_machine = []
 srcs_machine = []
 
-if machine_dirs.has_key(host_cpu_family)
+machine_dir = 'machine' / host_cpu_family
+if fs.is_dir(machine_dir)
 
-  if shared_dirs.has_key(machine_dirs[host_cpu_family])
-    shared_dir = join_paths('machine', shared_dirs[machine_dirs[host_cpu_family]])
-    shared_inc_dir = join_paths(shared_dir, 'include')
+  if shared_dirs.has_key(host_cpu_family)
+    shared_dir = 'machine' / shared_dirs[host_cpu_family]
+    shared_inc_dir = shared_dir / 'include'
     if fs.is_dir(shared_inc_dir)
       inc = [include_directories(shared_inc_dir), inc]
     endif
@@ -152,9 +76,7 @@ if machine_dirs.has_key(host_cpu_family)
     libdirs = [shared_dir] + libdirs
   endif
 
-  machine_dir = join_paths('machine', machine_dirs[host_cpu_family])
-  machine_inc_dir = join_paths(machine_dir, 'include')
-
+  machine_inc_dir = machine_dir / 'include'
   if fs.is_dir(machine_inc_dir)
     inc = [include_directories(machine_inc_dir), inc]
   endif
