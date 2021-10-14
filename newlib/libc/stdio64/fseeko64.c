@@ -74,7 +74,7 @@ Supporting OS subroutines required: <<close>>, <<fstat64>>, <<isatty>>,
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "local.h"
+#include "../stdio/local.h"
 
 #define	POS_ERR	(-(_fpos64_t)1)
 

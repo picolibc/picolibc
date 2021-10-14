@@ -67,7 +67,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <fcntl.h>
 #include <stdlib.h>
 #include <sys/lock.h>
-#include "local.h"
+#include "../stdio/local.h"
 
 /*
  * Re-direct an existing, open (probably) file to some other file.
