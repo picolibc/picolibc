@@ -48,11 +48,43 @@ targets = []
 
 cc = meson.get_compiler('c')
 fs = import('fs')
-host_cpu_family = host_machine.cpu_family()
-if host_cpu_family == 'riscv32' or host_cpu_family == 'riscv64'
-  # https://github.com/picolibc/picolibc/issues/187
-  host_cpu_family = 'riscv'
-endif
+
+# Find the picolibc name for the host cpu. Provide
+# for some common aliases
+
+cpu_family_aliases = {
+		       # aarch64
+		       'arm64' : 'aarch64',
+		       # cris
+		       'crisv32' : 'cris',
+		       # i386
+		       'i486' : 'i386',
+		       'i586' : 'i386',
+		       'i686' : 'i386',
+		       'x86' : 'i386',
+		       # m68hc11
+		       'm6811' : 'm68hc11',
+		       'm6812' : 'm68hc11',
+		       'm68hc12' : 'm68hc11',
+		       # m68k
+		       'fido' : 'm68k',
+		       # m88k
+		       'm88110' : 'm88k',
+		       # or1k
+		       'or1knd': 'or1k',
+		       # powerpc
+		       'powerpc64' : 'powerpc',
+		       'ppc64' : 'powerpc',
+		       'ppc64le' : 'powerpc',
+		       # riscv
+		       'riscv32' : 'riscv',
+		       'riscv64' : 'riscv',
+		       # x86_64
+		       'amd64' : 'x86_64',
+		     }
+
+# Check for an alias, default to provided name
+host_cpu_family = cpu_family_aliases.get(host_machine.cpu_family(), host_machine.cpu_family())
 
 # Find out about long double type
 
