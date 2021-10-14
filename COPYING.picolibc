@@ -572,7 +572,6 @@ Files: dummyhost/iob.c
  picocrt/shared/crt0.c
  scripts/do-aarch64-configure
  scripts/do-aarch64-zephyr-elf-configure
- scripts/do-amd64-configure
  scripts/do-arm-configure
  scripts/do-clang-arm-configure
  scripts/do-clang-riscv-configure
@@ -588,6 +587,7 @@ Files: dummyhost/iob.c
  scripts/do-riscv-configure
  scripts/do-rv32imac-configure
  scripts/do-x86-configure
+ scripts/do-x86_64-configure
  scripts/do-zephyr-aarch64-configure
  scripts/do-zephyr-arm-configure
  scripts/do-zephyr-riscv-configure
@@ -852,7 +852,7 @@ Files: newlib/libm/machine/riscv/s_copysign.c
 Copyright: 2020 Kito Cheng
 License: BSD3-1
 
-Files: picocrt/machine/amd64/crt0.S
+Files: picocrt/machine/x86_64/crt0.S
  picocrt/machine/i386/crt0.S
 Copyright: 2021 Mike Haertel and Keith Packard
 License: BSD3-1
