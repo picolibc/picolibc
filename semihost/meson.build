@@ -32,16 +32,28 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-src_semihost_machine = {
-			'riscv' : 'riscv/semihost-riscv.s',
-			'riscv32' : 'riscv/semihost-riscv.s',
-			'riscv64' : 'riscv/semihost-riscv.s',
-			'arm' : 'arm/semihost-arm.S',
-			'aarch64' : 'aarch64/semihost-aarch64.S'
-		      }
 
-if src_semihost_machine.has_key(host_cpu_family)
-  srcs_semihost = [
+has_arm_semihost = false
+
+src_semihost = []
+
+# i386 holds code for both i386 and x86_64
+semihost_family = host_cpu_family
+if semihost_family == 'x86_64'
+  semihost_family = 'i386'
+endif
+
+machine_dir = 'machine' / semihost_family
+if fs.is_dir(machine_dir)
+  subdir(machine_dir)
+endif
+
+# If host_cpu_family supports ARM-style semihosting, the meson.build
+# will add the support files to src_semihost.  Check to see if that
+# happened and add the rest of the needed files
+
+if src_semihost != []
+  src_semihost += files([
     'close.c',
     'exit.c',
     'fstat.c',
@@ -78,13 +90,12 @@ if src_semihost_machine.has_key(host_cpu_family)
     'sys_tmpnam.c',
     'sys_write.c',
     'sys_write0.c',
-    join_paths('machine', src_semihost_machine[host_cpu_family])
-  ]
+  ])
 
   if tinystdio
-    srcs_semihost += 'iob.c'
+    src_semihost += 'iob.c'
   else
-    srcs_semihost += 'mapstdio.c'
+    src_semihost += 'mapstdio.c'
   endif
 
   install_headers(
@@ -110,25 +121,11 @@ if src_semihost_machine.has_key(host_cpu_family)
 
     set_variable('lib_semihost' + target,
 		 static_library(libsemihost_name,
-				srcs_semihost,
+				src_semihost,
 				install : true,
 				install_dir : instdir,
 				include_directories : inc,
 				c_args : value[1]))
     
   endforeach
-endif
-
-#
-# Systems with non-arm semihosting support
-#
-semihost_custom = {
-		    'x86' : 'i386',
-		    'x86_64' : 'i386',
-		  }
-
-message('host_cpu_family ' + host_cpu_family)
-
-if semihost_custom.has_key(host_cpu_family)
-  subdir(join_paths('machine', semihost_custom[host_cpu_family]))
 endif
