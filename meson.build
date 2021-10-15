@@ -685,7 +685,6 @@ conf_data.set('__HAVE_LOCALE_INFO_EXTENDED__', newlib_locale_info_extended, desc
 conf_data.set('NEWLIB_GLOBAL_ERRNO', newlib_global_errno, description: 'use global errno variable')
 conf_data.set('HAVE_INITFINI_ARRAY', newlib_initfini_array, description: 'compiler supports INIT_ARRAY sections')
 conf_data.set('HAVE_INIT_FINI', newlib_initfini, description: 'Support _init() and _fini() functions')
-conf_data.set('NEWLIB_TLS', thread_local_storage, description: 'use thread local storage')
 conf_data.set('PICOLIBC_TLS', thread_local_storage, description: 'use thread local storage')
 conf_data.set('HAVE_PICOLIBC_TLS_API', thread_local_storage, description: '_set_tls and _init_tls functions available')
 conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in tinystdio')
