@@ -1,4 +1,4 @@
-FROM debian:testing AS download-tarballs
+FROM debian:testing
 
 RUN apt-get update && \
     apt-get install -y wget gnupg && \
