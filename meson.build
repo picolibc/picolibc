@@ -86,6 +86,25 @@ cpu_family_aliases = {
 # Check for an alias, default to provided name
 host_cpu_family = cpu_family_aliases.get(host_machine.cpu_family(), host_machine.cpu_family())
 
+# Make sure we have meson build support for the machine-specific files
+if not fs.is_file('newlib/libc/machine' / host_cpu_family / 'meson.build')
+  families=''
+  foreach f : supported_families
+    families += '        @0@\n'.format(f)
+  endforeach
+  message = '''
+
+Unsupported architecture: "@0@"
+
+    Picolibc has support for the following architectures:
+@1@
+
+    Read the Supported Architectures section in README.md
+    to learn how to add a new architecture.
+'''
+  error(message.format(host_cpu_family, families))
+endif
+
 # Find out about long double type
 
 long_double_code = '''
