@@ -47,7 +47,9 @@ at this point only has code to build for the following targets:
 Supporting architectures that already have Newlib code requires:
 
  1. newlib/libc/machine/_architecture_/meson.build to build any
-    architecture-specific libc bits
+    architecture-specific libc bits. You should at least consider
+    adding setjmp/longjmp support as these cannot be performed in
+    architecture independent code.
 
  2. newlib/libm/machine/_architecture_/meson.build to build any
     architecture-specific libm bits
