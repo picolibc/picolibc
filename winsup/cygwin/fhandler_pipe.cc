@@ -20,7 +20,6 @@ details. */
 #include "pinfo.h"
 #include "shared_info.h"
 #include "tls_pbuf.h"
-#include <psapi.h>
 
 /* This is only to be used for writing.  When reading,
 STATUS_PIPE_EMPTY simply means there's no data to be read. */
@@ -1190,27 +1189,47 @@ HANDLE
 fhandler_pipe::get_query_hdl_per_process (WCHAR *name,
 					  OBJECT_NAME_INFORMATION *ntfn)
 {
+  NTSTATUS status;
   ULONG len;
-  BOOL res;
   DWORD n_process = 256;
-  DWORD *proc_pids;
+  PSYSTEM_PROCESS_INFORMATION spi;
   do
     { /* Enumerate processes */
-      DWORD nbytes = n_process * sizeof (DWORD);
-      proc_pids = (DWORD *) HeapAlloc (GetProcessHeap (), 0, nbytes);
-      if (!proc_pids)
+      DWORD nbytes = n_process * sizeof (SYSTEM_PROCESS_INFORMATION);
+      spi = (PSYSTEM_PROCESS_INFORMATION) HeapAlloc (GetProcessHeap (),
+						     0, nbytes);
+      if (!spi)
 	return NULL;
-      res = EnumProcesses (proc_pids, nbytes, &len);
-      if (res && len < nbytes)
+      status = NtQuerySystemInformation (SystemProcessInformation,
+					 spi, nbytes, &len);
+      if (NT_SUCCESS (status))
 	break;
-      res = FALSE;
-      HeapFree (GetProcessHeap (), 0, proc_pids);
+      HeapFree (GetProcessHeap (), 0, spi);
       n_process *= 2;
     }
-  while (n_process < (1L<<20));
-  if (!res)
+  while (n_process < (1L<<20) && status == STATUS_INFO_LENGTH_MISMATCH);
+  if (!NT_SUCCESS (status))
     return NULL;
-  n_process = len / sizeof (DWORD);
+
+  /* In most cases, it is faster to check the processes in reverse order.
+     To do this, store PIDs into an array. */
+  DWORD *proc_pids = (DWORD *) HeapAlloc (GetProcessHeap (), 0,
+					  n_process * sizeof (DWORD));
+  if (!proc_pids)
+    {
+      HeapFree (GetProcessHeap (), 0, spi);
+      return NULL;
+    }
+  PSYSTEM_PROCESS_INFORMATION p = spi;
+  n_process = 0;
+  while (true)
+    {
+      proc_pids[n_process++] = (DWORD)(intptr_t) p->UniqueProcessId;
+      if (!p->NextEntryOffset)
+	break;
+      p = (PSYSTEM_PROCESS_INFORMATION) ((char *) p + p->NextEntryOffset);
+    }
+  HeapFree (GetProcessHeap (), 0, spi);
 
   for (LONG i = (LONG) n_process - 1; i >= 0; i--)
     {
@@ -1221,7 +1240,6 @@ fhandler_pipe::get_query_hdl_per_process (WCHAR *name,
 	continue;
 
       /* Retrieve process handles */
-      NTSTATUS status;
       DWORD n_handle = 256;
       PPROCESS_HANDLE_SNAPSHOT_INFORMATION phi;
       do
@@ -1255,8 +1273,8 @@ fhandler_pipe::get_query_hdl_per_process (WCHAR *name,
 
 	  /* Retrieve handle */
 	  HANDLE h = (HANDLE)(intptr_t) phi->Handles[j].HandleValue;
-	  res = DuplicateHandle (proc, h, GetCurrentProcess (), &h,
-				 FILE_READ_DATA, 0, 0);
+	  BOOL res = DuplicateHandle (proc, h, GetCurrentProcess (), &h,
+				      FILE_READ_DATA, 0, 0);
 	  if (!res)
 	    continue;
 
