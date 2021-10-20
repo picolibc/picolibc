@@ -71,7 +71,7 @@ foreach target : targets
 		    link_args: _link_args,
 		    link_with: _libs,
 		    include_directories: test_inc),
-	 depends: iconv_data_link,
+	 depends: [iconv_data_link, bios_bin],
 	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
   endforeach
 endforeach

@@ -892,6 +892,9 @@ has_semihost = false
 # arm compatible semihosting, enough to run arm semihost tests
 has_arm_semihost = false
 
+# some semihost needs bios to run the tests with qemu
+bios_bin = []
+
 # make sure to include semihost BEFORE picocrt!
 if enable_semihost
   subdir('semihost')

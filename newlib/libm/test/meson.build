@@ -153,6 +153,7 @@ foreach target : targets
 		  link_with: libs,
 		  link_args: value[1] + double_printf_link_args + test_link_args,
 		  include_directories: inc),
+       depends: bios_bin,
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 endforeach
 

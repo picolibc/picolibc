@@ -70,6 +70,7 @@ foreach target : targets
 		  link_with: _libs,
 		  link_depends:  test_link_depends,
 		  include_directories: inc),
+       depends: bios_bin,
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
   t1 = 'printff_scanff'
@@ -86,6 +87,7 @@ foreach target : targets
 		  link_with: _libs,
 		  link_depends:  test_link_depends,
 		  include_directories: inc),
+       depends: bios_bin,
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
   t1 = 'printf-tests'
@@ -101,6 +103,7 @@ foreach target : targets
 		  link_args: double_printf_link_args + _link_args,
 		  link_with: _libs,
 		  include_directories: inc),
+       depends: bios_bin,
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
   t1 = 'printff-tests'
@@ -116,6 +119,7 @@ foreach target : targets
 		  link_args: float_printf_link_args + _link_args,
 		  link_with: _libs,
 		  include_directories: inc),
+       depends: bios_bin,
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
   t1 = 'printfi-tests'
@@ -131,6 +135,7 @@ foreach target : targets
 		  link_args: int_printf_link_args + _link_args,
 		  link_with: _libs,
 		  include_directories: inc),
+       depends: bios_bin,
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
   t1 = 'try-ilp32'
@@ -146,6 +151,7 @@ foreach target : targets
 		  link_args: _link_args,
 		  link_with: _libs,
 		  include_directories: inc),
+       depends: bios_bin,
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
   t1 = 'hosted-exit'
@@ -161,6 +167,7 @@ foreach target : targets
 		  link_args:  _link_args,
 		  link_with: _libs,
 		  include_directories: inc),
+       depends: bios_bin,
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
   test(t1 + '-fail' + target,
@@ -169,6 +176,7 @@ foreach target : targets
 		  link_args:  _link_args,
 		  link_with: _libs,
 		  include_directories: inc),
+       depends: bios_bin,
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()],
        should_fail: true
       )
@@ -186,6 +194,7 @@ foreach target : targets
 		  link_args:  _link_args,
 		  link_with: _libs,
 		  include_directories: inc),
+       depends: bios_bin,
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()],
        should_fail: true
       )
@@ -204,6 +213,7 @@ foreach target : targets
 		    link_args:  _link_args,
 		    link_with: _libs_minimal,
 		    include_directories: inc),
+         depends: bios_bin,
 	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
   endif
 
@@ -220,6 +230,7 @@ foreach target : targets
 		  link_args: _link_args,
 		  link_with: _libs,
 		  include_directories: inc),
+       depends: bios_bin,
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
   plain_tests = ['rand', 'regex', 'ungetc', 'fenv',
@@ -264,6 +275,7 @@ foreach target : targets
 		    link_with: _libs,
 		    link_depends:  test_link_depends,
 		    include_directories: inc),
+         depends: bios_bin,
 	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
   endforeach
 

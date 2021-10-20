@@ -98,6 +98,7 @@ foreach target : targets
 		    link_depends:  test_link_depends,
 		    include_directories: inc),
 	 args: [command_line],
+         depends: bios_bin,
 	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
   endforeach
 
