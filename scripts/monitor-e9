@@ -8,6 +8,9 @@ status = 1
 
 with subprocess.Popen(sys.argv[1:], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL) as proc:
     while True:
+        status = proc.poll()
+        if status:
+            break;
         c = proc.stdout.read(1)
         if c == b'\xe9':
             c = proc.stdout.readline().decode('utf-8')
