@@ -1418,8 +1418,19 @@ dump_sysinfo ()
 	      }
 	  else if (osversion.dwMajorVersion == 10)
 	    {
-	      strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
-			      ? "10" : "2016");
+	      if (osversion.wProductType == VER_NT_WORKSTATION)
+		strcpy (osname, osversion.dwBuildNumber >= 22000 ? "11" : "10");
+	      else
+		{
+		  if (osversion.dwBuildNumber <= 14393)
+		    strcpy (osname, "2016");
+		  else if (osversion.dwBuildNumber <= 17763)
+		    strcpy (osname, "2019");
+		  else if (osversion.dwBuildNumber <= 20348)
+		    strcpy (osname, "2022");
+		  else
+		    strcpy (osname, "20??");
+		}
 	    }
 	  DWORD prod;
 	  if (GetProductInfo (osversion.dwMajorVersion,
