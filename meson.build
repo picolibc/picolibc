@@ -169,10 +169,8 @@ newlib_nano_malloc = get_option('newlib-nano-malloc')
 newlib_unbuf_stream_opt = get_option('newlib-unbuf-stream-opt')
 lite_exit = get_option('lite-exit')
 newlib_retargetable_locking = get_option('newlib-retargetable-locking')
-newlib_long_time_t = get_option('newlib-long-time_t')
 newlib_multithread = get_option('newlib-multithread')
 
-newlib_supplied_syscalls = get_option('newlib-supplied-syscalls')
 newlib_elix_level = get_option('newlib-elix-level')
 target_optspace = get_option('optimization') == 's'
 c_args = ['-include', '@0@/@1@'.format(meson.current_build_dir(), 'picolibc.h')]
@@ -332,10 +330,6 @@ newlib_io_float = get_option('newlib-io-float')
 newlib_stdio64 = get_option('newlib-stdio64')
 newlib_wide_orient = get_option('newlib-wide-orient')
 newlib_have_fcntl = get_option('newlib-have-fcntl')
-
-# options which no longer have any effect
-newlib_reentrant_syscalls_provided = get_option('newlib-reentrant-syscalls-provided')
-newlib_missing_syscall_names = get_option('newlib-missing-syscall-names')
 
 # Check for a bunch of newlib-stdio only options and complain
 # if they are selected while using tinystdio
@@ -733,13 +727,10 @@ conf_data.set('_UNBUF_STREAM_OPT', newlib_unbuf_stream_opt)
 conf_data.set('_LITE_EXIT', lite_exit)
 conf_data.set('_NANO_FORMATTED_IO', newlib_nano_formatted_io)
 conf_data.set('_RETARGETABLE_LOCKING', newlib_retargetable_locking)
-conf_data.set('_WANT_USE_LONG_TIME_T', newlib_long_time_t)
 conf_data.set('TINY_STDIO', tinystdio, description: 'Use tiny stdio from gcc avr')
 conf_data.set('_IEEE_LIBM', not want_math_errno, description: 'math library does not set errno (offering only ieee semantics)')
 conf_data.set('PREFER_SIZE_OVER_SPEED', target_optspace, description: 'Optimize for space over speed')
 conf_data.set('FAST_STRCMP', fast_strcmp, description: 'Always optimize strcmp for performance')
-conf_data.set('REENTRANT_SYSCALLS_PROVIDED', newlib_reentrant_syscalls_provided, description: 'Reentrant syscalls provided for us')
-conf_data.set('MISSING_SYSCALL_NAMES', newlib_missing_syscall_names, description: 'use regular syscalls')
 conf_data.set('__HAVE_LOCALE_INFO__', newlib_locale_info, description: 'locale support')
 conf_data.set('__HAVE_LOCALE_INFO_EXTENDED__', newlib_locale_info_extended, description: 'extended locale support')
 conf_data.set('NEWLIB_GLOBAL_ERRNO', newlib_global_errno, description: 'use global errno variable')
@@ -755,6 +746,11 @@ conf_data.set('HAVE_BUILTIN_MUL', have_builtin_mul_overflow, description: 'Compi
 conf_data.set('HAVE_COMPLEX', have_complex, description: 'Compiler supports _Complex')
 conf_data.set('HAVE_BUILTIN_EXPECT', have_builtin_expect, description: 'Compiler has __builtin_expect')
 conf_data.set('HAVE_ALLOC_SIZE', have_alloc_size, description: 'The compiler REALLY has the attribute __alloc_size__')
+
+# Obsolete newlib options
+conf_data.set('_WANT_USE_LONG_TIME_T', get_option('newlib-long-time_t'), description: 'Obsoleted. Define time_t to long instead of using a 64-bit type')
+conf_data.set('REENTRANT_SYSCALLS_PROVIDED', get_option('newlib-reentrant-syscalls-provided'), description: 'Obsoleted. Reentrant syscalls provided for us')
+conf_data.set('MISSING_SYSCALL_NAMES', get_option('newlib-missing-syscall-names'), description: 'Obsoleted. Use regular syscalls')
 
 if newlib_obsolete_math == 'auto'
   obsolete_math_value = false
