@@ -9,7 +9,7 @@ exe_wrapper = ['sh', '-c', 'test -z "$MESON_SOURCE_ROOT" || "$MESON_SOURCE_ROOT"
 
 [host_machine]
 system='linux'
-cpu_family='i386'
+cpu_family='x86'
 cpu='i386'
 endian='little'
 
