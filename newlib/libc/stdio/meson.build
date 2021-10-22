@@ -280,7 +280,7 @@ hdrs_stdio = [
 
 srcs_stdio_use = []
 foreach file : srcs_stdio
-  s_file = file.split('.')[0] + '.S'
+  s_file = fs.replace_suffix(file, '.S')
   if file in srcs_machine
     message('libc/stdio/' + file + ': machine overrides generic')
   elif s_file in srcs_machine

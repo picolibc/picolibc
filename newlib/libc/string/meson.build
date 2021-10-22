@@ -148,7 +148,7 @@ srcs_strcmp = [
 
 srcs_string_use = []
 foreach file : srcs_string
-  s_file = file.split('.')[0] + '.S'
+  s_file = fs.replace_suffix(file, '.S')
   if file in srcs_machine
     message('libc/string/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
@@ -160,7 +160,7 @@ endforeach
 
 srcs_strcmp_use = []
 foreach file : srcs_strcmp
-  s_file = file.split('.')[0] + '.S'
+  s_file = fs.replace_suffix(file, '.S')
   if file in srcs_machine
     message('libc/string/' + file + ': machine overrides generic')
   elif s_file in srcs_machine

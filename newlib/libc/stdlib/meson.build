@@ -231,7 +231,7 @@ hdrs_stdlib = [
 
 srcs_stdlib_use = []
 foreach file : srcs_stdlib
-  s_file = file.split('.')[0] + '.S'
+  s_file = fs.replace_suffix(file, '.S')
   if file in srcs_machine
     message('libc/stdlib/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
@@ -243,7 +243,7 @@ endforeach
 
 srcs_stdlib_malloc_use = []
 foreach file : srcs_stdlib_malloc
-  s_file = file.split('.')[0] + '.S'
+  s_file = fs.replace_suffix(file, '.S')
   if file in srcs_machine
     message('libc/stdlib/' + file + ': machine overrides generic')
   elif s_file in srcs_machine

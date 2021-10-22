@@ -40,7 +40,7 @@ srcs_signal = [
 
 srcs_signal_use = []
 foreach file : srcs_signal
-  s_file = file.split('.')[0] + '.S'
+  s_file = fs.replace_suffix(file, '.S')
   if file in srcs_machine
     message('libc/signal/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
