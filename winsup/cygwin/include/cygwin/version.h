@@ -514,7 +514,8 @@ details. */
   340: Export dbm_clearerr, dbm_close, dbm_delete, dbm_dirfno, dbm_error,
        dbm_fetch, dbm_firstkey, dbm_nextkey, dbm_open, dbm_store.
   341: Export pthread_cond_clockwait, pthread_mutex_clocklock,
-       pthread_rwlock_clockrdlock, pthread_rwlock_clockwrlock, sem_clockwait.
+       pthread_rwlock_clockrdlock, pthread_rwlock_clockwrlock,
+       sem_clockwait, sig2str, str2sig.
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */
