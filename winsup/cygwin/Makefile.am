@@ -548,16 +548,6 @@ endif
 
 dtable_CFLAGS=-fcheck-new
 
-# If an optimization level is explicitly set in CXXFLAGS, set -O3 for these files
-# XXX: this seems to assume it's not -O0?
-#
-# (the indentation here prevents automake trying to process this as an automake
-# conditional)
- ifneq "${filter -O%,$(CXXFLAGS)}" ""
-  malloc_CFLAGS=-O3
-  sync_CFLAGS=-O3
- endif
-
 #
 # libraries and installed objects
 #
