@@ -55,10 +55,12 @@ types and formats.
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
 | io-c99-formats              | true    | Enable C99 support in IO functions like printf/scanf                                 |
-| io-long-long                | false   | Enable long long type support in IO functions like printf/scanf.
-					  These are always enabled for the tinystdio full printf/scanf modes,
-					  this option adds them to the limited (float and integer) versions, as well
-					  as to the original newlib stdio bits                                                 |
+| io-long-long                | false   | Enable long long type support in IO functions like printf/scanf.		       |
+
+`long long` support is always enabled for the tinystdio full
+printf/scanf modes, the `io-long-long` option adds them to the limited
+(float and integer) versions, as well as to the original newlib stdio
+bits.
 
 ### Options when using tinystdio bits
 
