@@ -86,7 +86,7 @@ hdrs_iconv_ccs = [
 
 srcs_iconv_ccs_use = []
 foreach file : srcs_iconv_ccs
-  s_file = file.split('.')[0] + '.S'
+  s_file = fs.replace_suffix(file, '.S')
   if file in srcs_machine
     message('libc/iconv/ccs/' + file + ': machine overrides generic')
   elif s_file in srcs_machine

@@ -236,7 +236,7 @@ endif
 
 srcs_common_use = []
 foreach file : srcs_common
-  s_file = file.split('.')[0] + '.S'
+  s_file = fs.replace_suffix(file, '.S')
   if file in srcs_libm_machine
     message('libm/common/' + file + ': machine overrides generic')
   elif s_file in srcs_libm_machine

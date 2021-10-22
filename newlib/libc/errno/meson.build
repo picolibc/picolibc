@@ -38,7 +38,7 @@ srcs_errno = [
 
 srcs_errno_use = []
 foreach file : srcs_errno
-  s_file = file.split('.')[0] + '.S'
+  s_file = fs.replace_suffix(file, '.S')
   if file in srcs_machine
     message('libc/errno/' + file + ': machine overrides generic')
   elif s_file in srcs_machine

@@ -183,7 +183,7 @@ install_headers(
 
 srcs_tinystdio_use = []
 foreach file : srcs_tinystdio
-  s_file = file.split('.')[0] + '.S'
+  s_file = fs.replace_suffix(file, '.S')
   if file in srcs_machine
     message('libc/tinystdio/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
