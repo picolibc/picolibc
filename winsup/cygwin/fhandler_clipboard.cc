@@ -17,21 +17,13 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "child_info.h"
+#include <sys/clipboard.h>
 
 /*
  * Robert Collins:
  * FIXME: should we use GetClipboardSequenceNumber to tell if the clipboard has
  * changed? How does /dev/clipboard operate under (say) linux?
  */
-
-static const WCHAR *CYGWIN_NATIVE = L"CYGWIN_NATIVE_CLIPBOARD";
-
-typedef struct
-{
-  timestruc_t	timestamp;
-  size_t	len;
-  char		data[1];
-} cygcb_t;
 
 fhandler_dev_clipboard::fhandler_dev_clipboard ()
   : fhandler_base (), pos (0), membuffer (NULL), msize (0)
@@ -74,9 +66,17 @@ fhandler_dev_clipboard::set_clipboard (const void *buf, size_t len)
 	}
       clipbuf = (cygcb_t *) GlobalLock (hmem);
 
-      clock_gettime (CLOCK_REALTIME, &clipbuf->timestamp);
-      clipbuf->len = len;
-      memcpy (clipbuf->data, buf, len);
+      clock_gettime (CLOCK_REALTIME, &clipbuf->ts);
+#ifdef __x86_64__
+      /* ts overlays cb_sec and cb_nsec such that no conversion is needed */
+#elif __i386__
+      /* Expand 32-bit timespec layout to 64-bit layout.
+         NOTE: Steps must be done in this order to avoid data loss. */
+      clipbuf->cb_nsec = clipbuf->ts.tv_nsec;
+      clipbuf->cb_sec  = clipbuf->ts.tv_sec;
+#endif
+      clipbuf->cb_size = len;
+      memcpy (&clipbuf[1], buf, len); // append user-supplied data
 
       GlobalUnlock (hmem);
       EmptyClipboard ();
@@ -179,8 +179,16 @@ fhandler_dev_clipboard::fstat (struct stat *buf)
 	  && (hglb = GetClipboardData (format))
 	  && (clipbuf = (cygcb_t *) GlobalLock (hglb)))
 	{
-	  buf->st_atim = buf->st_mtim = clipbuf->timestamp;
-	  buf->st_size = clipbuf->len;
+#ifdef __x86_64__
+	  /* ts overlays cb_sec and cb_nsec such that no conversion is needed */
+#elif __i386__
+	  /* Compress 64-bit timespec layout to 32-bit layout.
+	     NOTE: Steps must be done in this order to avoid data loss. */
+	  clipbuf->ts.tv_sec  = clipbuf->cb_sec;
+	  clipbuf->ts.tv_nsec = clipbuf->cb_nsec;
+#endif
+	  buf->st_atim = buf->st_mtim = clipbuf->ts;
+	  buf->st_size = clipbuf->cb_size;
 	  GlobalUnlock (hglb);
 	}
       CloseClipboard ();
@@ -218,10 +226,10 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
     {
       cygcb_t *clipbuf = (cygcb_t *) cb_data;
 
-      if (pos < (off_t) clipbuf->len)
+      if (pos < (off_t) clipbuf->cb_size)
 	{
-	  ret = ((len > (clipbuf->len - pos)) ? (clipbuf->len - pos) : len);
-	  memcpy (ptr, clipbuf->data + pos , ret);
+	  ret = (len > (clipbuf->cb_size - pos)) ? clipbuf->cb_size - pos : len;
+	  memcpy (ptr, &clipbuf[1] + pos , ret);
 	  pos += ret;
 	}
     }

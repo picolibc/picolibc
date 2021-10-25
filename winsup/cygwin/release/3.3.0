@@ -74,3 +74,7 @@ Bug Fixes
 
 - Fix pty master closing error regarding attach_mutex.
   Addresses: https://cygwin.com/pipermail/cygwin-developers/2021-October/012418.html
+
+- Fix access violation that can sometimes occur when copy/pasting between
+  32-bit and 64-bit Cygwin environments.  Align clipboard descriptor layouts.
+  Addresses: https://cygwin.com/pipermail/cygwin-patches/2021q4/011517.html
