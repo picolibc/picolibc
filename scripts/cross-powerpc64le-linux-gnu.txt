@@ -9,8 +9,8 @@ exe_wrapper = ['sh', '-c', 'test -z "$MESON_SOURCE_ROOT" || "$MESON_SOURCE_ROOT"
 
 [host_machine]
 system = 'linux'
-cpu_family = 'powerpc64le'
-cpu = 'powerpc64le'
+cpu_family = 'ppc64'
+cpu = 'ppc64'
 endian = 'little'
 
 [properties]
