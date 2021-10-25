@@ -173,7 +173,14 @@ c_args = ['-include', '@0@/@1@'.format(meson.current_build_dir(), 'picolibc.h')]
 if cc.has_argument('-fno-stack-protector')
   c_args += '-fno-stack-protector'
 endif
-c_args += '-U_FORTIFY_SOURCE'
+
+# Select a fortify source option
+fortify_source = get_option('fortify-source')
+if fortify_source == 'none'
+  c_args += '-U_FORTIFY_SOURCE'
+else
+  c_args += '-D_FORTIFY_SOURCE=' + fortify_source
+endif
 
 if cc.has_argument('-fno-common')
   c_args += '-fno-common'

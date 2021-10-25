@@ -65,6 +65,9 @@ option('sysroot-install', type: 'boolean', value: false,
 option('picoexit', type: 'boolean', value: true,
        description: 'Smaller exit/atexit/onexit code')
 
+option('fortify-source', type: 'combo', choices: ['none', '1', '2'], value: 'none',
+       description: 'Set _FORTIFY_SOURCE=<value>')
+
 #
 # Testing options
 #
