@@ -73,7 +73,7 @@ funcqual (char *a,
 
 
 
-static char one[50];
+static char one[100];
 static char two[50];
 
 
