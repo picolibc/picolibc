@@ -94,7 +94,7 @@ typedef int (*__compar_fn_t) (const void *, const void *);
 
 #define RAND_MAX __RAND_MAX
 
-int	__locale_mb_cur_max (void);
+size_t	__locale_mb_cur_max (void);
 
 #define MB_CUR_MAX __locale_mb_cur_max()
 
