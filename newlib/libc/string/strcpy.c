@@ -67,6 +67,10 @@ QUICKREF
 #error long int is not a 32bit or 64bit byte
 #endif
 
+#ifdef strcpy
+#undef strcpy
+#endif
+
 char*
 strcpy (char *dst0,
 	const char *src0)

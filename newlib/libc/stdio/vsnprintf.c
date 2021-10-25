@@ -31,6 +31,10 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 #ifndef _REENT_ONLY
 
+#ifdef vsnprintf
+#undef vsnprintf
+#endif
+
 int
 vsnprintf (char *__restrict str,
        size_t size,

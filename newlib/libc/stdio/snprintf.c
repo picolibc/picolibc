@@ -62,6 +62,10 @@ _sniprintf_r (struct _reent *, char *, size_t, const char *, ...)
 
 #ifndef _REENT_ONLY
 
+#ifdef snprintf
+#undef snprintf
+#endif
+
 int
 snprintf (char *__restrict str,
        size_t size,
