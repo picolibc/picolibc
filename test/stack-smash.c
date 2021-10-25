@@ -44,13 +44,22 @@
 #ifdef TESTS_ENABLE_STACK_PROTECTOR
 static volatile bool expect_smash;
 
+void __attribute__((noinline))
+#ifdef _HAVE_CC_INHIBIT_LOOP_TO_LIBCALL
+__attribute((__optimize__("-fno-tree-loop-distribute-patterns")))
+#endif
+    my_strcpy(char *d, char *s)
+{
+    while ((*d++ = *s++));
+}
+
 void __attribute__((noinline)) smash_array(char *source, char *dest)
 {
 	char	local[16];
 
-	strcpy(local, source);
+	my_strcpy(local, source);
 	local[0]++;
-	strcpy(dest, local);
+	my_strcpy(dest, local);
 }
 
 void
