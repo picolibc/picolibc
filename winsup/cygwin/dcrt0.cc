@@ -29,6 +29,7 @@ details. */
 #include "shared_info.h"
 #include "cygwin_version.h"
 #include "dll_init.h"
+#include "cygmalloc.h"
 #include "heap.h"
 #include "tls_pbuf.h"
 #include "exception.h"
@@ -769,6 +770,8 @@ dll_crt0_0 ()
   NtOpenProcessToken (NtCurrentProcess (), MAXIMUM_ALLOWED, &hProcToken);
   set_cygwin_privileges (hProcToken);
 
+  malloc_init_0 ();
+
   device::init ();
   do_global_ctors (&__CTOR_LIST__, 1);
   cygthread::init ();
@@ -857,7 +860,7 @@ dll_crt0_1 (void *)
      on a functioning malloc and it's possible that the user's program may
      have overridden malloc.  We only know about that at this stage,
      unfortunately. */
-  malloc_init ();
+  malloc_init_1 ();
   user_shared->initialize ();
 
 #ifdef CYGHEAP_DEBUG

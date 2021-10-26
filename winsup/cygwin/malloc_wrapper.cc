@@ -272,10 +272,8 @@ strdup (const char *s)
 muto NO_COPY mallock;
 
 void
-malloc_init ()
+malloc_init_1 ()
 {
-  mallock.init ("mallock");
-
   /* Check if malloc is provided by application. If so, redirect all
      calls to malloc/free/realloc to application provided. This may
      happen if some other dll calls cygwin's malloc, but main code provides

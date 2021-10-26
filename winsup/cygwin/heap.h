@@ -10,7 +10,6 @@ details. */
 
 /* Heap management. */
 void heap_init ();
-void malloc_init ();
 
 #define inheap(s) \
   (cygheap->user_heap.ptr && s \

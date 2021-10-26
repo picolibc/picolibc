@@ -39,6 +39,8 @@ void *mmap64 (void *, size_t, int, int, int, off_t);
 # define __malloc_lock() mallock.acquire ()
 # define __malloc_unlock() mallock.release ()
 extern muto mallock;
+inline void malloc_init_0 () { mallock.init ("mallock"); }
+extern void malloc_init_1 ();
 
 #endif
 
