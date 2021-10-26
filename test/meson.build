@@ -238,6 +238,7 @@ foreach target : targets
 		 'ffs', 'setjmp', 'atexit', 'on_exit',
 		 'math-funcs', 'timegm', 'time-tests',
                  'test-strtod', 'test-strchr',
+		 'test-memset',
 		]
 
   if have_attr_ctor_dtor
