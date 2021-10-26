@@ -26,24 +26,80 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stddef.h>
-#include <_ansi.h>
-
-/* Support the alias for the __aeabi_memclr which may
-   assume memory alignment.  */
-void __aeabi_memclr4 (void *dest, size_t n)
-	_ATTRIBUTE ((alias ("__aeabi_memclr")));
-
-void __aeabi_memclr8 (void *dest, size_t n)
-	_ATTRIBUTE ((alias ("__aeabi_memclr")));
-
-/* Support the routine __aeabi_memclr.  */
-/*
- *__attribute__((used)) added so that building with clang -flto
- * doesn't discard this function
- */
-void __attribute__((used)) __aeabi_memclr (void *dest, size_t n)
-{
-  extern void __aeabi_memset (void *dest, size_t n, int c);
-  __aeabi_memset (dest, n, 0);
-}
+	.arm
+	.syntax unified
+	.global memset
+	.type	memset, %function
+memset:
+	tst	r0, #3
+	stmfd	sp!, {r4, lr}
+	beq	10f
+	cmp	r2, #0
+	sub	r2, r2, #1
+	beq	9f
+	and	ip, r1, #255
+	mov	r3, r0
+	b	2f
+1:
+	cmp	r2, #0
+	sub	r2, r2, #1
+	beq	9f
+2:
+	strb	ip, [r3], #1
+	tst	r3, #3
+	bne	1b
+3:
+	cmp	r2, #3
+	bls	7f
+	and	lr, r1, #255
+	orr	lr, lr, lr, asl #8
+	cmp	r2, #15
+	orr	lr, lr, lr, asl #16
+	bls	5f
+	mov	r4, r2
+	add	ip, r3, #16
+4:
+	sub	r4, r4, #16
+	cmp	r4, #15
+	str	lr, [ip, #-16]
+	str	lr, [ip, #-12]
+	str	lr, [ip, #-8]
+	str	lr, [ip, #-4]
+	add	ip, ip, #16
+	bhi	4b
+	sub	ip, r2, #16
+	bic	ip, ip, #15
+	and	r2, r2, #15
+	add	ip, ip, #16
+	cmp	r2, #3
+	add	r3, r3, ip
+	bls	7f
+5:
+	mov	r4, r3
+	mov	ip, r2
+6:
+	sub	ip, ip, #4
+	cmp	ip, #3
+	str	lr, [r4], #4
+	bhi	6b
+	sub	ip, r2, #4
+	bic	ip, ip, #3
+	add	ip, ip, #4
+	add	r3, r3, ip
+	and	r2, r2, #3
+7:
+	cmp	r2, #0
+	andne	r1, r1, #255
+	addne	r2, r3, r2
+	beq	9f
+8:
+	strb	r1, [r3], #1
+	cmp	r3, r2
+	bne	8b
+9:
+	ldmfd	sp!, {r4, lr}
+	bx	lr
+10:
+	mov	r3, r0
+	b	3b
+	.size memset, . - memset

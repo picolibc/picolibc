@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 ARM Ltd
+ * Copyright (c) 2015 ARM Ltd
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,41 +26,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stddef.h>
-#include <string.h>
-#include <_ansi.h>
+/* NOTE: This ifdef MUST match the one in memset.c.  */
+#if !defined (__SOFTFP__) && !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
 
-/* According to the Run-time ABI for the ARM Architecture.  This
-   function is allowed to corrupt only the integer core register
-   permitted to be corrupted by the [AAPCS] (r0-r3, ip, lr, and
-   CPSR).
+# if defined (__thumb2__)
+#  include "memset-thumb2.S"
+# elif defined (__thumb__)
+#  include "memset-thumb.S"
+# else
+#  include "memset-arm.S"
+# endif
 
-   The FP registers are used in memcpy for target __ARM_ARCH_7A.
-   Therefore, we can't just simply use alias to support the function
-   aeabi_memcpy for target __ARM_ARCH_7A.  Instead, we choose the
-   previous versions of memcpy to suppport it as an alternative.  */
-
-/* NOTE: This ifdef MUST match the one in aeabi_memcpy-armv7a.S.  */
-#if defined (__ARM_ARCH_7A__) && defined (__ARM_FEATURE_UNALIGNED) && \
-	(defined (__ARM_NEON__) || !defined (__SOFTFP__))
-
-/* Defined in aeabi_memcpy-armv7a.S.  */
-
-#else
-/* Support the alias for the __aeabi_memcpy which may
-   assume memory alignment.  */
-void __aeabi_memcpy4 (void *dest, const void *source, size_t n)
-	_ATTRIBUTE ((alias ("__aeabi_memcpy")));
-
-void __aeabi_memcpy8 (void *dest, const void *source, size_t n)
-	_ATTRIBUTE ((alias ("__aeabi_memcpy")));
-
-/* Support the routine __aeabi_memcpy.  Can't alias to memcpy
-   because it's not defined in the same translation unit.  */
-#undef memcpy
-
-void __aeabi_memcpy (void *dest, const void *source, size_t n)
-{
-  memcpy (dest, source, n);
-}
 #endif

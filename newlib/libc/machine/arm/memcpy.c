@@ -30,12 +30,29 @@
 #include "acle-compat.h"
 
 #if (defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED))
-# include "../../string/memcpy.c"
+#define MEMCPY_FALLBACK
 #elif (__ARM_ARCH >= 7 && __ARM_ARCH_PROFILE == 'A' \
        && defined (__ARM_FEATURE_UNALIGNED))
 /* Defined in memcpy.S.  */
 #elif __ARM_ARCH_ISA_THUMB == 2 && !__ARM_ARCH_ISA_ARM
 /* Defined in memcpy.S.  */
+#elif defined (__ARM_ARCH_7A__) && defined (__ARM_FEATURE_UNALIGNED) && \
+	(defined (__ARM_NEON__) || !defined (__SOFTFP__))
+/* Defined in aeabi_memcpy-armv7a.S */
 #else
+#define MEMCPY_FALLBACK
+#endif
+
+#ifdef MEMCPY_FALLBACK
 # include "../../string/memcpy.c"
+
+void *__aeabi_memcpy4 (void *__restrict dest, const void * __restrict source, size_t n)
+	_ATTRIBUTE ((alias ("memcpy")));
+
+void *__aeabi_memcpy8 (void * __restrict dest, const void * __restrict source, size_t n)
+	_ATTRIBUTE ((alias ("memcpy")));
+
+void *__aeabi_memcpy (void * __restrict dest, const void * __restrict source, size_t n)
+	_ATTRIBUTE ((alias ("memcpy")));
+
 #endif
