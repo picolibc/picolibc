@@ -36,9 +36,11 @@ void *mmap64 (void *, size_t, int, int, int, off_t);
 
 #elif defined (__INSIDE_CYGWIN__)
 
-# define __malloc_lock() mallock.acquire ()
-# define __malloc_unlock() mallock.release ()
-extern muto mallock;
+# define __malloc_lock() AcquireSRWLockExclusive (&mallock)
+# define __malloc_trylock() TryAcquireSRWLockExclusive (&mallock)
+# define __malloc_unlock() ReleaseSRWLockExclusive (&mallock)
+extern SRWLOCK NO_COPY mallock;
+void malloc_init ();
 
 #endif
 

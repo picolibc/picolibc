@@ -296,7 +296,7 @@ frok::parent (volatile char * volatile stack_here)
   si.lpReserved2 = (LPBYTE) &ch;
   si.cbReserved2 = sizeof (ch);
 
-  bool locked = __malloc_lock ();
+  bool locked = __malloc_trylock ();
 
   /* Remove impersonation */
   cygheap->user.deimpersonate ();

@@ -230,7 +230,6 @@ user_heap_info::init ()
   debug_printf ("heap base %p, heap top %p, heap size %ly (%lu)",
 		base, top, chunk, chunk);
   page_const--;
-  // malloc_init ();
 }
 
 #define pround(n) (((size_t)(n) + page_const) & ~page_const)
