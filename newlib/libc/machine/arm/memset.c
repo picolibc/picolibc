@@ -26,25 +26,25 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-.macro	ASM_ALIAS new old
-	.global	\new
-	.type	\new, %function
-#if defined (__thumb__)
-	.thumb_set	\new, \old
+#include <stddef.h>
+#include <string.h>
+#include <_ansi.h>
+
+/* According to the run-time ABI for the ARM Architecture, this
+   function is allowed to corrupt only the integer core register
+   permitted to be corrupted by the [AAPCS] (r0-r3, ip, lr, and
+   CPSR).
+
+   Therefore, we can't just simply use alias to support the function
+   aeabi_memset for the targets with FP register.  Instead, versions
+   for these specific targets are written in assembler (in
+   aeabi_memset-soft.S).  */
+
+/* NOTE: This ifdef MUST match the one in memset-soft.S.  */
+#if !defined (__SOFTFP__) && !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
+
+/* Defined in memset-soft.S.  */
+
 #else
-	.set	\new, \old
-#endif
-.endm
-
-/* NOTE: This ifdef MUST match the one in aeabi_memset.c.  */
-#if !defined (__SOFTFP__)
-
-# if defined (__thumb2__)
-#  include "aeabi_memset-thumb2.S"
-# elif defined (__thumb__)
-#  include "aeabi_memset-thumb.S"
-# else
-#  include "aeabi_memset-arm.S"
-# endif
-
+#include "../../string/memset.c"
 #endif

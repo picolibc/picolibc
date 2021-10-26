@@ -26,82 +26,99 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-	.arm
+#include "acle-compat.h"
+
+	.thumb
 	.syntax unified
-	.global __aeabi_memset
-	.type	__aeabi_memset, %function
-	ASM_ALIAS __aeabi_memset4 __aeabi_memset
-	ASM_ALIAS __aeabi_memset8 __aeabi_memset
-__aeabi_memset:
-	tst	r0, #3
-	stmfd	sp!, {r4, lr}
+	.global memset
+	.type	memset, %function
+memset:
+	push	{r4, r5, r6, lr}
+	lsls	r3, r0, #30
 	beq	10f
-	cmp	r1, #0
-	sub	r1, r1, #1
+	subs	r4, r2, #1
+	cmp	r2, #0
 	beq	9f
-	and	ip, r2, #255
-	mov	r3, r0
+	lsls	r5, r1, #24
+	lsrs	r5, r5, #24
+	movs	r3, r0
+	movs	r6, #3
 	b	2f
 1:
-	cmp	r1, #0
-	sub	r1, r1, #1
+	subs	r2, r4, #1
+	cmp	r4, #0
 	beq	9f
+	movs	r4, r2
 2:
-	strb	ip, [r3], #1
-	tst	r3, #3
+	adds	r3, r3, #1
+	subs	r2, r3, #1
+	strb	r5, [r2]
+	tst	r3, r6
 	bne	1b
 3:
-	cmp	r1, #3
+	cmp	r4, #3
 	bls	7f
-	and	lr, r2, #255
-	orr	lr, lr, lr, asl #8
-	cmp	r1, #15
-	orr	lr, lr, lr, asl #16
-	bls	5f
-	mov	r4, r1
-	add	ip, r3, #16
-4:
-	sub	r4, r4, #16
+	movs	r5, #255
+	ands	r5, r1
+	lsls	r2, r5, #8
+	orrs	r5, r2
+	lsls	r2, r5, #16
+	orrs	r5, r2
 	cmp	r4, #15
-	str	lr, [ip, #-16]
-	str	lr, [ip, #-12]
-	str	lr, [ip, #-8]
-	str	lr, [ip, #-4]
-	add	ip, ip, #16
-	bhi	4b
-	sub	ip, r1, #16
-	bic	ip, ip, #15
-	and	r1, r1, #15
-	add	ip, ip, #16
-	cmp	r1, #3
-	add	r3, r3, ip
+	bls	5f
+	movs	r6, r4
+	subs	r6, r6, #16
+	lsrs	r6, r6, #4
+	adds	r6, r6, #1
+	lsls	r6, r6, #4
+	movs	r2, r3
+	adds	r3, r3, r6
+4:
+	str	r5, [r2]
+	str	r5, [r2, #4]
+	str	r5, [r2, #8]
+	str	r5, [r2, #12]
+	adds	r2, r2, #16
+	cmp	r3, r2
+	bne	4b
+	movs	r2, #15
+	ands	r4, r2
+	cmp	r4, #3
 	bls	7f
 5:
-	mov	r4, r3
-	mov	ip, r1
+	subs	r6, r4, #4
+	lsrs	r6, r6, #2
+	adds	r6, r6, #1
+	lsls	r6, r6, #2
+	movs	r2, r3
+	adds	r3, r3, r6
 6:
-	sub	ip, ip, #4
-	cmp	ip, #3
-	str	lr, [r4], #4
-	bhi	6b
-	sub	ip, r1, #4
-	bic	ip, ip, #3
-	add	ip, ip, #4
-	add	r3, r3, ip
-	and	r1, r1, #3
+	stmia	r2!, {r5}
+	cmp	r3, r2
+	bne	6b
+	movs	r2, #3
+	ands	r4, r2
 7:
-	cmp	r1, #0
-	andne	r2, r2, #255
-	addne	r1, r3, r1
+	cmp	r4, #0
 	beq	9f
+	lsls	r1, r1, #24
+	lsrs	r1, r1, #24
+	adds	r4, r3, r4
 8:
-	strb	r2, [r3], #1
-	cmp	r3, r1
+	strb	r1, [r3]
+	adds	r3, r3, #1
+	cmp	r4, r3
 	bne	8b
 9:
-	ldmfd	sp!, {r4, lr}
-	bx	lr
+#if __ARM_ARCH >= 5
+	pop	{r4, r5, r6, pc}
+#else
+	pop	{r4, r5, r6}
+	pop	{r2}
+	bx	r2
+#endif
 10:
-	mov	r3, r0
+	movs	r3, r0
+	movs	r4, r2
 	b	3b
-	.size __aeabi_memset, . - __aeabi_memset
+	.size memset, . - memset

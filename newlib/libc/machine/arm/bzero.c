@@ -26,39 +26,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-	.arm
-	.syntax unified
-	.global __aeabi_memmove
-	.type	__aeabi_memmove, %function
-	ASM_ALIAS __aeabi_memmove4 __aeabi_memmove
-	ASM_ALIAS __aeabi_memmove8 __aeabi_memmove
-__aeabi_memmove:
-	cmp	r0, r1
-	bls	2f
-	add	r3, r1, r2
-	cmp	r0, r3
-	bcs	2f
-	cmp	r2, #0
-	add	r1, r0, r2
-	bxeq	lr
-	rsb	r2, r2, r3
-1:
-	ldrb	ip, [r3, #-1]!
-	cmp	r2, r3
-	strb	ip, [r1, #-1]!
-	bne	1b
-	bx	lr
-2:
-	cmp	r2, #0
-	addne	r2, r1, r2
-	subne	r3, r0, #1
-	beq	4f
-3:
-	ldrb	ip, [r1], #1
-	cmp	r2, r1
-	strb	ip, [r3, #1]!
-	bne	3b
-	bx	lr
-4:
-	bx	lr
-	.size __aeabi_memmove, . - __aeabi_memmove
+#include "../../string/bzero.c"
+
+/* Support the alias for the __aeabi_memclr which may
+   assume memory alignment.  */
+
+void __aeabi_memclr4 (void *dest, size_t n)
+	_ATTRIBUTE ((alias ("bzero")));
+
+void __aeabi_memclr8 (void *dest, size_t n)
+	_ATTRIBUTE ((alias ("bzero")));
+
+void __aeabi_memclr (void *dest, size_t n)
+	_ATTRIBUTE ((alias ("bzero")));

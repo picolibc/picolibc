@@ -26,25 +26,80 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-.macro	ASM_ALIAS new old
-	.global	\new
-	.type	\new, %function
-#if defined (__thumb__)
-	.thumb_set	\new, \old
-#else
-	.set	\new, \old
-#endif
-.endm
-
-/* NOTE: This ifdef MUST match the one in aeabi_memmove.c.  */
-#if !defined (__SOFTFP__)
-
-# if defined (__thumb2__)
-#  include "aeabi_memmove-thumb2.S"
-# elif defined (__thumb__)
-#  include "aeabi_memmove-thumb.S"
-# else
-#  include "aeabi_memmove-arm.S"
-# endif
-
-#endif
+	.thumb
+	.syntax unified
+	.global memset
+	.type	memset, %function
+memset:	
+	push	{r4, r5, r6}
+	lsls	r4, r0, #30
+	beq	10f
+	subs	r4, r2, #1
+	cmp	r2, #0
+	beq	9f
+	uxtb	r5, r1
+	mov	r3, r0
+	b	2f
+1:
+	subs	r2, r4, #1
+	cbz	r4, 9f
+	mov	r4, r2
+2:
+	strb	r5, [r3], #1
+	lsls	r2, r3, #30
+	bne	1b
+3:
+	cmp	r4, #3
+	bls	7f
+	uxtb	r5, r1
+	orr	r5, r5, r5, lsl #8
+	cmp	r4, #15
+	orr	r5, r5, r5, lsl #16
+	bls	5f
+	mov	r6, r4
+	add	r2, r3, #16
+4:
+	subs	r6, r6, #16
+	cmp	r6, #15
+	str	r5, [r2, #-16]
+	str	r5, [r2, #-12]
+	str	r5, [r2, #-8]
+	str	r5, [r2, #-4]
+	add	r2, r2, #16
+	bhi	4b
+	sub	r2, r4, #16
+	bic	r2, r2, #15
+	and	r4, r4, #15
+	adds	r2, r2, #16
+	cmp	r4, #3
+	add	r3, r3, r2
+	bls	7f
+5:
+	mov	r6, r3
+	mov	r2, r4
+6:
+	subs	r2, r2, #4
+	cmp	r2, #3
+	str	r5, [r6], #4
+	bhi	6b
+	subs	r2, r4, #4
+	bic	r2, r2, #3
+	adds	r2, r2, #4
+	add	r3, r3, r2
+	and	r4, r4, #3
+7:
+	cbz	r4, 9f
+	uxtb	r1, r1
+	add	r4, r4, r3
+8:
+	strb	r1, [r3], #1
+	cmp	r3, r4
+	bne	8b
+9:
+	pop	{r4, r5, r6}
+	bx	lr
+10:
+	mov	r4, r2
+	mov	r3, r0
+	b	3b
+	.size memset, . - memset
