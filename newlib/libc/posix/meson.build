@@ -33,6 +33,9 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 srcs_posix = [
+  'basename.c',
+  'dirname.c',
+  'fnmatch.c',
   'regcomp.c',
   'regerror.c',
   'regexec.c',
