@@ -414,7 +414,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
             } else
 #endif /* _WANT_IO_C99_FORMATS */
             {
-                uint8_t ndecimal;	        /* digits after decimal (for 'f' format), 0 if no limit */
+                int ndecimal;	        /* digits after decimal (for 'f' format), 0 if no limit */
 
                 if (!(flags & FL_PREC))
                     prec = 6;
