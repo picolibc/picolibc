@@ -39,6 +39,13 @@ srcs_posix = [
   'regfree.c',
 ]
 
+if newlib_locale_info
+  srcs_posix += [
+    'collate.c',
+    'collcmp.c',
+  ]
+endif
+
 srcs_posix_use = []
 foreach file : srcs_posix
   s_file = fs.replace_suffix(file, '.S')

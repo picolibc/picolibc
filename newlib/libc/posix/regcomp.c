@@ -33,15 +33,7 @@
  *	@(#)regcomp.c	8.5 (Berkeley) 3/20/94
  */
 
-#ifndef _NO_REGEX
-
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)regcomp.c	8.5 (Berkeley) 3/20/94";
-#endif /* LIBC_SCCS and not lint */
-#define _DEFAULT_SOURCE
-#include <sys/cdefs.h>
-
-#include <sys/types.h>
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -49,8 +41,7 @@ static char sccsid[] = "@(#)regcomp.c	8.5 (Berkeley) 3/20/94";
 #include <stdlib.h>
 #include <regex.h>
 
-#undef HAS_COLLATE
-#ifdef HAS_COLLATE
+#ifdef __HAVE_LOCALE_INFO__
 #include "collate.h"
 #endif
 
@@ -827,13 +818,13 @@ cset *cs;
 		if (start == finish)
 			CHadd(cs, start);
 		else {
-#ifdef HAS_COLLATE
+#ifdef __HAVE_LOCALE_INFO__
 			if (__collate_load_error) {
 #endif
 				(void)REQUIRE((uch)start <= (uch)finish, REG_ERANGE);
 				for (i = (uch)start; i <= (uch)finish; i++)
 					CHadd(cs, i);
-#ifdef HAS_COLLATE 
+#ifdef __HAVE_LOCALE_INFO__
 			} else {
 				(void)REQUIRE(__collate_range_cmp(start, finish) <= 0, REG_ERANGE);
 				for (i = CHAR_MIN; i <= CHAR_MAX; i++) {
@@ -2097,5 +2088,3 @@ struct re_guts *g;
 		g->iflags |= BAD;
 	return(maxnest);
 }
-
-#endif /* !_NO_REGEX  */
