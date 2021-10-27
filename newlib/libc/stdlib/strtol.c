@@ -131,6 +131,8 @@ _strtol_l (const char *__restrict nptr,
 
 	if (base < 0 || base == 1 || base > 36) {
 		errno = EINVAL;
+                if (endptr != 0)
+                        *endptr = (char *) nptr;
 		return 0;
 	}
 
