@@ -73,9 +73,7 @@ QUICKREF
 #error long int is not a 32bit or 64bit byte
 #endif
 
-#ifdef strncat
 #undef strncat
-#endif
 
 char *
 strncat (char *__restrict s1,
@@ -121,7 +119,7 @@ strncat (char *__restrict s1,
       if (n == 0)
 	*s1 = '\0';
     }
-	
+
   return s;
 #endif /* not PREFER_SIZE_OVER_SPEED */
 }

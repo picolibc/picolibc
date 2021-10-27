@@ -38,9 +38,7 @@ __RCSID("$NetBSD: memmove_chk.c,v 1.5 2014/09/17 00:39:28 joerg Exp $");
 
 #undef memmove
 
-#ifdef __memmove_chk
 #undef __memmove_chk
-#endif
 
 void *__memmove_chk(void *, const void *src, size_t, size_t);
 

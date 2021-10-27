@@ -19,9 +19,7 @@
 
 #define unlikely(X) __builtin_expect (!!(X), 0)
 
-#ifdef memcpy
 #undef memcpy
-#endif
 
 void *
 __inhibit_loop_to_libcall

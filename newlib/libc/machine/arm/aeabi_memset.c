@@ -60,9 +60,7 @@ void __aeabi_memset8 (void *dest, size_t n, int c)
  *__attribute__((used)) added so that building with clang -flto
  * doesn't discard this function
  */
-#ifdef memset
 #undef memset
-#endif
 
 void __attribute__((used)) __aeabi_memset (void *dest, size_t n, int c)
 {

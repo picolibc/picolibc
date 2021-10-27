@@ -63,9 +63,7 @@ QUICKREF
 /* Threshhold for punting to the byte copier.  */
 #define TOO_SMALL(LEN)  ((LEN) < BIGBLOCKSIZE)
 
-#ifdef memmove
 #undef memmove
-#endif
 
 /*SUPPRESS 20*/
 void *
@@ -115,7 +113,7 @@ memmove (void *dst_void,
     }
   else
     {
-      /* Use optimizing algorithm for a non-destructive copy to closely 
+      /* Use optimizing algorithm for a non-destructive copy to closely
          match memcpy. If the size is small or either SRC or DST is unaligned,
          then punt into the byte copy loop.  This should be rare.  */
       if (!TOO_SMALL(length) && !UNALIGNED (src, dst))

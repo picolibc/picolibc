@@ -39,9 +39,7 @@ QUICKREF
 #include <string.h>
 #include <strings.h>
 
-#ifdef bcopy
 #undef bcopy
-#endif
 
 void
 bcopy (const void *b1,

@@ -38,9 +38,7 @@
 #define magic2(REG) #REG ", lsl #7"
 #endif
 
-#ifdef strcpy
 #undef strcpy
-#endif
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 char* __attribute__((naked))

@@ -60,9 +60,7 @@ void __aeabi_memmove8 (void *dest, const void *source, size_t n)
  *__attribute__((used)) added so that building with clang -flto
  * doesn't discard this function
  */
-#ifdef memmove
 #undef memmove
-#endif
 
 void __attribute__((used)) __aeabi_memmove (void *dest, const void *source, size_t n)
 {
