@@ -294,6 +294,8 @@ if enable_native_tests
   endif
 endif
 
+subdir('libc-testsuite')
+
 if has_arm_semihost
   subdir('semihost')
 endif
