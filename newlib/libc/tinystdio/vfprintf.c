@@ -747,8 +747,10 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 
                     flags &= ~(FL_PLUS | FL_SPACE);
 
-                    if ((flags & FL_PREC) && prec == 0 && x == 0)
+                    if ((flags & FL_PREC) && prec == 0 && x == 0) {
                         buf_len = 0;
+                        flags &= ~FL_ALT;
+                    }
                     else
                         buf_len = __ultoa_invert (x, buf, base) - buf;
                 }
