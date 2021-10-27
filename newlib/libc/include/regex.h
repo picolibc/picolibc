@@ -40,7 +40,7 @@
 #include <sys/cdefs.h>
 
 /* types */
-typedef off_t regoff_t;
+typedef ptrdiff_t regoff_t;
 
 typedef struct {
 	int re_magic;

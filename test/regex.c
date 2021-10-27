@@ -101,7 +101,7 @@ main(void)
 				if (m < tests[t].nmatch) {
 					if (matches[m].rm_so != tests[t].matches[m].rm_so ||
 					    matches[m].rm_eo != tests[t].matches[m].rm_eo) {
-						printf("match %d wrong range got (%ld,%ld) expect (%ld,%ld)\n",
+						printf("match %d wrong range got (%td,%td) expect (%td,%td)\n",
 						       m,
 						       matches[m].rm_so,
 						       matches[m].rm_eo,
