@@ -306,7 +306,7 @@ install : install-hdrs install-libs install-specs
 #-------------------------------------------------------------------------
 
 configure_prereq = \
-  $(src_dir)/configure.in \
+  $(src_dir)/configure.ac \
 
 $(src_dir)/configure : $(configure_prereq)
 	cd $(src_dir) && autoconf
