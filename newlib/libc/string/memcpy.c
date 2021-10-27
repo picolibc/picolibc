@@ -60,9 +60,7 @@ QUICKREF
 /* Threshhold for punting to the byte copier.  */
 #define TOO_SMALL(LEN)  ((LEN) < BIGBLOCKSIZE)
 
-#ifdef memcpy
 #undef memcpy
-#endif
 
 void *
 __inhibit_loop_to_libcall

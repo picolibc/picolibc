@@ -92,9 +92,7 @@ _gets_r (struct _reent *ptr,
 
 #ifndef _REENT_ONLY
 
-#ifdef gets
 #undef gets
-#endif
 
 char *
 gets (char *buf)

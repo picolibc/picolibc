@@ -57,9 +57,7 @@ void __aeabi_memcpy8 (void *dest, const void *source, size_t n)
 
 /* Support the routine __aeabi_memcpy.  Can't alias to memcpy
    because it's not defined in the same translation unit.  */
-#ifdef memcpy
 #undef memcpy
-#endif
 
 void __aeabi_memcpy (void *dest, const void *source, size_t n)
 {

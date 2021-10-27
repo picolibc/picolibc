@@ -602,9 +602,7 @@ _siprintf_r (struct _reent *, char *, const char *, ...)
 
 #ifndef _REENT_ONLY
 
-#ifdef sprintf
 #undef sprintf
-#endif
 
 int
 sprintf (char *__restrict str,
