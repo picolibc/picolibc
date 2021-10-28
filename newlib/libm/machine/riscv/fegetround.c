@@ -44,7 +44,7 @@
 
 #if __riscv_flen
 
-int fegetround()
+int fegetround(void)
 {
 
   /* Get current rounding mode */
