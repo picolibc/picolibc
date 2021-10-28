@@ -67,7 +67,7 @@ foreach target : targets
     'strtol',
   ]
 
-  if tinystdio or newlib_io_float
+  if (tinystdio and io_float_exact) or newlib_io_float
     libc_tests += ['strtod']
   endif
 

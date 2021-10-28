@@ -103,7 +103,7 @@ int test_sscanf(void)
 
         (void) d;
         (void) t;
-#ifndef NO_FLOATING_POINT
+#if !defined(NO_FLOATING_POINT) && defined(_IO_FLOAT_EXACT)
 	TEST_F(123);
 	TEST_F(123.0);
 	TEST_F(123.0e+0);
