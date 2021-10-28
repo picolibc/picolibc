@@ -78,7 +78,7 @@ int     dup3 (int __fildes, int __fildes2, int flags);
 int	eaccess (const char *__path, int __mode);
 #endif
 #if __XSI_VISIBLE
-void	encrypt (char *__block, int __edflag);
+void	encrypt (char *, int);
 #endif
 #if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
 void	endusershell (void);
