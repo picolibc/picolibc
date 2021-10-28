@@ -269,11 +269,13 @@ strdup (const char *s)
    newlib will call __malloc_lock and __malloc_unlock at appropriate
    times.  */
 
-SRWLOCK NO_COPY mallock = SRWLOCK_INIT;
+muto NO_COPY mallock;
 
 void
 malloc_init ()
 {
+  mallock.init ("mallock");
+
   /* Check if malloc is provided by application. If so, redirect all
      calls to malloc/free/realloc to application provided. This may
      happen if some other dll calls cygwin's malloc, but main code provides

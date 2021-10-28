@@ -29,7 +29,6 @@ details. */
 #include "shared_info.h"
 #include "cygwin_version.h"
 #include "dll_init.h"
-#include "cygmalloc.h"
 #include "heap.h"
 #include "tls_pbuf.h"
 #include "exception.h"
