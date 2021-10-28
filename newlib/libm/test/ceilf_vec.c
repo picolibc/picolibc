@@ -308,4 +308,4 @@
 {64, 0,123,__LINE__, 0x80000000, 0x00000000, 0x80000000, 0x00000000},   /* -0=f(-0)*/
 {0}
 };
-void test_ceilf(m)   {run_vector_1(m,ceilf_vec,(char *)(ceilf),"ceilf","ff");   }	
+void test_ceilf(int m)   {run_vector_1(m,ceilf_vec,(char *)(ceilf),"ceilf","ff");   }	

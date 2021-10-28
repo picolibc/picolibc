@@ -308,4 +308,4 @@
 {64, 0,123,__LINE__, 0x80000000, 0x00000000, 0x80000000, 0x00000000},   /* -0=f(-0)*/
 {0}
 };
-void test_floorf(m)   {run_vector_1(m,floorf_vec,(char *)(floorf),"floorf","ff");   }	
+void test_floorf(int m)   {run_vector_1(m,floorf_vec,(char *)(floorf),"floorf","ff");   }	

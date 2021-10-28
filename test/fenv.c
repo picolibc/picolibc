@@ -181,7 +181,7 @@ report(char *expr, test_t v, int e, int exception, int oexception)
 			TEST_CASE2(expr, exception, 0);			\
 	} while(0)
 
-int main()
+int main(void)
 {
 	int result = 0;
 

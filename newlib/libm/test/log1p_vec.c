@@ -301,4 +301,4 @@
 {64, 0,123,__LINE__, 0x400ae20c, 0x7db0765f, 0x403bcccc, 0xccccccc9},	/* 3.36038=f(27.8)*/
 {64, 0,123,__LINE__, 0x400b5781, 0x1666499d, 0x403d7fff, 0xfffffffc},	/* 3.41773=f(29.5)*/
 {0},};
-void test_log1p(m)   {run_vector_1(m,log1p_vec,(char *)(log1p),"log1p","dd");   }	
+void test_log1p(int m)   {run_vector_1(m,log1p_vec,(char *)(log1p),"log1p","dd");   }	

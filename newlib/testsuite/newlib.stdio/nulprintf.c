@@ -11,7 +11,7 @@
 
 const char m[8] = {'M','M','M','M','M','M','M','M'};
 
-int main()
+int main(void)
 {
   char buf[20];
   sprintf (buf, "%.*s\n", 8, m);

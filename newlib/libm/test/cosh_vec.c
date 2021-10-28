@@ -302,4 +302,4 @@
 {60, 0,123,__LINE__, 0x42879487, 0x9e85b8ea, 0x403d7fff, 0xfffffffc},	/* 3.24084e+12=f(29.5)*/
 {0},
 };
-void test_cosh(m)   {run_vector_1(m,cosh_vec,(char *)(cosh),"cosh","dd");   }	
+void test_cosh(int m)   {run_vector_1(m,cosh_vec,(char *)(cosh),"cosh","dd");   }	

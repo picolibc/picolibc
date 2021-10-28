@@ -307,4 +307,4 @@
 {64, 0,123,__LINE__, 0x00000000, 0x00000000, 0x00000000, 0x00000000},   /* +0=f(+0)*/
 {64, 0,123,__LINE__, 0x80000000, 0x00000000, 0x80000000, 0x00000000},   /* -0=f(-0)*/
 {0},};
-void test_trunc(m)   {run_vector_1(m,trunc_vec,(char *)(trunc),"trunc","dd");   }	
+void test_trunc(int m)   {run_vector_1(m,trunc_vec,(char *)(trunc),"trunc","dd");   }	

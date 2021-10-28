@@ -308,4 +308,4 @@
 {64, 0,123,__LINE__, 0x00000000, 0x00000000, 0x80000000, 0x00000000},   /* +0=f(-0)*/
 {0}
 };
-void test_fabsf(m)   {run_vector_1(m,fabsf_vec,(char *)(fabsf),"fabsf","ff");   }	
+void test_fabsf(int m)   {run_vector_1(m,fabsf_vec,(char *)(fabsf),"fabsf","ff");   }	

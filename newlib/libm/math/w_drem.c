@@ -16,8 +16,7 @@ is preserved.
 #include "fdlibm.h"
 
 double
-drem(x, y)
-	double x, y;
+drem(double x, double y)
 {
 	return remainder(x, y);
 }

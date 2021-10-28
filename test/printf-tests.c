@@ -130,7 +130,7 @@ static int test(int serial, char *expect, char *fmt, ...) {
     return 0;
 }
 
-int main() {
+int main(void) {
     int result = 0;
 #include "testcases.c"
     return result;

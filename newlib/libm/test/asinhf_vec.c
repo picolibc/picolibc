@@ -302,4 +302,4 @@
 {43, 0,123,__LINE__, 0x40104fb1, 0x4017a7cb, 0x403d7fff, 0xfffffffc},	/* 4.07782=f(29.5)*/
 {0}
 };
-void test_asinhf(m)   {run_vector_1(m,asinhf_vec,(char *)(asinhf),"asinhf","ff");   }	
+void test_asinhf(int m)   {run_vector_1(m,asinhf_vec,(char *)(asinhf),"asinhf","ff");   }	

@@ -430,7 +430,7 @@ setlocale (
 
 #ifdef _MB_CAPABLE
 static char *
-currentlocale ()
+currentlocale (void)
 {
   int i;
 

@@ -8,10 +8,7 @@
  * This is only implemented for size_t, so in case mallocr.c's INTERNAL_SIZE_T
  *  is non default, mallocr.c throws an #error.
  */
-static int mul_overflow_size_t(a, b, res)
-    size_t a;
-    size_t b;
-    size_t *res;
+static int mul_overflow_size_t(size_t a, size_t b, size_t *res)
 {
     // always fill the result (gcc doesn't define what happens here)
     if (res)

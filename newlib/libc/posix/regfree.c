@@ -54,8 +54,7 @@ static char sccsid[] = "@(#)regfree.c	8.3 (Berkeley) 3/20/94";
  = extern void regfree(regex_t *);
  */
 void
-regfree(preg)
-regex_t *preg;
+regfree(regex_t *preg)
 {
 	struct re_guts *g;
 

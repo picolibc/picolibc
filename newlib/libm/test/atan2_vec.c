@@ -1618,4 +1618,4 @@
 {64, 0,123,__LINE__, 0x3fe921fb, 0x54442d18, 0x3fee6666, 0x6666666d, 0x3fee6666, 0x6666666d},	/* 0.785398=f(0.95, 0.95)*/
 {0}
 };
-void test_atan2(m)   {run_vector_1(m,atan2_vec,(char *)(atan2),"atan2","ddd");   }	
+void test_atan2(int m)   {run_vector_1(m,atan2_vec,(char *)(atan2),"atan2","ddd");   }	

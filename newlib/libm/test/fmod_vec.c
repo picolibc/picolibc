@@ -302,4 +302,4 @@
 {64, 0,123,__LINE__, 0x403d7fff, 0xfffffffc, 0x403d7fff, 0xfffffffc, 0x4040bfff, 0xfffffffe},	/* 29.5=f(29.5, 33.5)*/
 {0}
 };
-void test_fmod(m)   {run_vector_1(m,fmod_vec,(char *)(fmod),"fmod","ddd");   }	
+void test_fmod(int m)   {run_vector_1(m,fmod_vec,(char *)(fmod),"fmod","ddd");   }	

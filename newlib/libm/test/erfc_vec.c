@@ -300,4 +300,4 @@
 {64, 0, 34,__LINE__, 0x00000000, 0x00000000, 0x403d7fff, 0xfffffffc},	/* 0=f(29.5)*/
 {0}
 };
-void test_erfc(m)   {run_vector_1(m,erfc_vec,(char *)(erfc),"erfc","dd");   }	
+void test_erfc(int m)   {run_vector_1(m,erfc_vec,(char *)(erfc),"erfc","dd");   }	

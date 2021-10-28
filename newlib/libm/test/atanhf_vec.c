@@ -302,4 +302,4 @@
 { 0, 0, 33,__LINE__, 0xfff80000, 0x00000000, 0x403d7fff, 0xfffffffc},	/* -nan=f(29.5)*/
 {0},
 };
-void test_atanhf(m)   {run_vector_1(m,atanhf_vec,(char *)(atanhf),"atanhf","ff");   }	
+void test_atanhf(int m)   {run_vector_1(m,atanhf_vec,(char *)(atanhf),"atanhf","ff");   }	

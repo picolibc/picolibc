@@ -77,7 +77,7 @@ static char one[100];
 static char two[50];
 
 
-void test_string()
+void test_string(void)
 {
   /* Test strcmp first because we use it to test other things.  */
   it = "strcmp";

@@ -108,11 +108,10 @@ static BUFHEAD *newbuf(HTAB *, __uint32_t, BUFHEAD *);
  * address you are seeking.
  */
 extern BUFHEAD *
-__get_buf(hashp, addr, prev_bp, newpage)
-	HTAB *hashp;
-	__uint32_t addr;
-	BUFHEAD *prev_bp;
-	int newpage;	/* If prev_bp set, indicates a new overflow page. */
+__get_buf(HTAB *hashp,
+          __uint32_t addr,
+          BUFHEAD *prev_bp,
+          int newpage)	/* If prev_bp set, indicates a new overflow page. */
 {
 	BUFHEAD *bp;
 	__uint32_t is_disk_mask;
@@ -163,10 +162,9 @@ __get_buf(hashp, addr, prev_bp, newpage)
  * If newbuf finds an error (returning NULL), it also sets errno.
  */
 static BUFHEAD *
-newbuf(hashp, addr, prev_bp)
-	HTAB *hashp;
-	__uint32_t addr;
-	BUFHEAD *prev_bp;
+newbuf(HTAB *hashp,
+       __uint32_t addr,
+       BUFHEAD *prev_bp)
 {
 	BUFHEAD *bp;		/* The buffer we're going to use */
 	BUFHEAD *xbp;		/* Temp pointer */
@@ -293,9 +291,7 @@ newbuf(hashp, addr, prev_bp)
 }
 
 extern void
-__buf_init(hashp, nbytes)
-	HTAB *hashp;
-	int nbytes;
+__buf_init(HTAB *hashp,	int nbytes)
 {
 	BUFHEAD *bfp;
 	int npages;
@@ -318,9 +314,7 @@ __buf_init(hashp, nbytes)
 }
 
 extern int
-__buf_free(hashp, do_free, to_disk)
-	HTAB *hashp;
-	int do_free, to_disk;
+__buf_free(HTAB *hashp,	int do_free, int to_disk)
 {
 	BUFHEAD *bp;
 
@@ -349,9 +343,7 @@ __buf_free(hashp, do_free, to_disk)
 }
 
 extern void
-__reclaim_buf(hashp, bp)
-	HTAB *hashp;
-	BUFHEAD *bp;
+__reclaim_buf(HTAB *hashp, BUFHEAD *bp)
 {
 	bp->ovfl = 0;
 	bp->addr = 0;

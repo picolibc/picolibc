@@ -301,4 +301,4 @@
 {41, 0,123,__LINE__, 0x400ae20c, 0x7a223d7c, 0x403bcccc, 0xccccccc9},	/* 3.36038=f(27.8)*/
 {42, 0,123,__LINE__, 0x400b5781, 0x1666499e, 0x403d7fff, 0xfffffffc},	/* 3.41773=f(29.5)*/
 {0},};
-void test_log1pf(m)   {run_vector_1(m,log1pf_vec,(char *)(log1pf),"log1pf","ff");   }	
+void test_log1pf(int m)   {run_vector_1(m,log1pf_vec,(char *)(log1pf),"log1pf","ff");   }	

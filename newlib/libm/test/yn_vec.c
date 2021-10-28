@@ -217,4 +217,4 @@
 {64,0,123,__LINE__, 0x3fbefed6, 0x4831e4df, 0x40080000, 0x00000000, 0x3fff3333, 0x33333338},
 {64,0,123,__LINE__, 0x3f9fc826, 0xafa66438, 0x40100000, 0x00000000, 0x3fff3333, 0x33333338},
 {0},};
-void test_yn(m)   {run_vector_1(m,yn_vec,(char *)(yn),"yn","did");   }	
+void test_yn(int m)   {run_vector_1(m,yn_vec,(char *)(yn),"yn","did");   }	

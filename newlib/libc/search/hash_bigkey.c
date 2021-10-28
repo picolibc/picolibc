@@ -84,10 +84,10 @@ static size_t collect_data(HTAB *, BUFHEAD *, size_t, int);
  *-1 ==> ERROR
  */
 extern int
-__big_insert(hashp, bufp, key, val)
-	HTAB *hashp;
-	BUFHEAD *bufp;
-	const DBT *key, *val;
+__big_insert(HTAB *hashp,
+             BUFHEAD *bufp,
+             const DBT *key,
+             const DBT *val)
 {
 	__uint16_t *p;
 	size_t key_size, n;
@@ -185,9 +185,8 @@ __big_insert(hashp, bufp, key, val)
  *-1 => ERROR
  */
 extern int
-__big_delete(hashp, bufp)
-	HTAB *hashp;
-	BUFHEAD *bufp;
+__big_delete(HTAB *hashp,
+             BUFHEAD *bufp)
 {
 	BUFHEAD *last_bfp, *rbufp;
 	__uint16_t *bp, pageno;
@@ -264,12 +263,11 @@ __big_delete(hashp, bufp)
  * -3 error
  */
 extern int
-__find_bigpair(hashp, bufp, ndx, key, size)
-	HTAB *hashp;
-	BUFHEAD *bufp;
-	int ndx;
-	char *key;
-	int size;
+__find_bigpair(HTAB *hashp,
+               BUFHEAD *bufp,
+               int ndx,
+               char *key,
+               int size)
 {
 	__uint16_t *bp;
 	char *p;
@@ -316,9 +314,8 @@ __find_bigpair(hashp, bufp, ndx, key, size)
  * bucket)
  */
 extern __uint16_t
-__find_last_page(hashp, bpp)
-	HTAB *hashp;
-	BUFHEAD **bpp;
+__find_last_page(HTAB *hashp,
+                 BUFHEAD **bpp)
 {
 	BUFHEAD *bufp;
 	__uint16_t *bp, pageno;
@@ -357,12 +354,11 @@ __find_last_page(hashp, bpp)
  * index (index should always be 1).
  */
 extern int
-__big_return(hashp, bufp, ndx, val, set_current)
-	HTAB *hashp;
-	BUFHEAD *bufp;
-	int ndx;
-	DBT *val;
-	int set_current;
+__big_return(HTAB *hashp,
+             BUFHEAD *bufp,
+             int ndx,
+             DBT *val,
+             int set_current)
 {
 	BUFHEAD *save_p;
 	__uint16_t *bp, len, off, save_addr;
@@ -448,11 +444,10 @@ __big_return(hashp, bufp, ndx, val, set_current)
  * allocate a buffer and copy the data as you recurse up.
  */
 static size_t
-collect_data(hashp, bufp, len, set)
-	HTAB *hashp;
-	BUFHEAD *bufp;
-	size_t len;
-        int set;
+collect_data(HTAB *hashp,
+             BUFHEAD *bufp,
+             size_t len,
+             int set)
 {
 	__uint16_t *bp;
 	char *p;
@@ -505,11 +500,11 @@ collect_data(hashp, bufp, len, set)
  * Fill in the key and data for this big pair.
  */
 extern int
-__big_keydata(hashp, bufp, key, val, set)
-	HTAB *hashp;
-	BUFHEAD *bufp;
-	DBT *key, *val;
-	int set;
+__big_keydata(HTAB *hashp,
+              BUFHEAD *bufp,
+              DBT *key,
+              DBT *val,
+              int set)
 {
 	key->size = collect_key(hashp, bufp, 0, val, set);
 	if (key->size == (size_t) -1)
@@ -523,12 +518,11 @@ __big_keydata(hashp, bufp, key, val, set)
  * collect the data, allocate a buffer and copy the key as you recurse up.
  */
 static size_t
-collect_key(hashp, bufp, len, val, set)
-	HTAB *hashp;
-	BUFHEAD *bufp;
-	size_t len;
-	DBT *val;
-	int set;
+collect_key(HTAB *hashp,
+            BUFHEAD *bufp,
+            size_t len,
+            DBT *val,
+            int set)
 {
 	BUFHEAD *xbp;
 	char *p;
@@ -568,15 +562,14 @@ collect_key(hashp, bufp, len, val, set)
  * -1 => error
  */
 extern int
-__big_split(hashp, op, np, big_keyp, addr, obucket, ret)
-	HTAB *hashp;
-	BUFHEAD *op;	/* Pointer to where to put keys that go in old bucket */
-	BUFHEAD *np;	/* Pointer to new bucket page */
-			/* Pointer to first page containing the big key/data */
-	BUFHEAD *big_keyp;
-	int addr;	/* Address of big_keyp */
-	__uint32_t   obucket;/* Old Bucket */
-	SPLIT_RETURN *ret;
+__big_split(
+    HTAB *hashp,
+    BUFHEAD *op,	/* Pointer to where to put keys that go in old bucket */
+    BUFHEAD *np,	/* Pointer to new bucket page */
+    BUFHEAD *big_keyp,  /* Pointer to first page containing the big key/data */
+    int addr,	        /* Address of big_keyp */
+    __uint32_t obucket, /* Old Bucket */
+    SPLIT_RETURN *ret)
 {
 	BUFHEAD *tmpp;
 	__uint16_t *tp;

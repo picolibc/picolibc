@@ -302,4 +302,4 @@
 {32, 0, 33,__LINE__, 0x7ff80000, 0x00000000, 0x403d7fff, 0xfffffffc},	/* nan=f(29.5)*/
 {0}
 };
-void test_acosf(m)   {run_vector_1(m,acosf_vec,(char *)(acosf),"acosf","ff");   }	
+void test_acosf(int m)   {run_vector_1(m,acosf_vec,(char *)(acosf),"acosf","ff");   }	

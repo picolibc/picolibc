@@ -80,7 +80,7 @@
 
 #include "math_errhandling_tests.c"
 
-int main()
+int main(void)
 {
 	int result = 0;
 

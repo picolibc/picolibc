@@ -302,4 +302,4 @@
 {64, 0,123,__LINE__, 0x3ff00000, 0x00000000, 0x403d7fff, 0xfffffffc},	/* 1=f(29.5)*/
 {0}
 };
-void test_erf(m)   {run_vector_1(m,erf_vec,(char *)(erf),"erf","dd");   }	
+void test_erf(int m)   {run_vector_1(m,erf_vec,(char *)(erf),"erf","dd");   }	
