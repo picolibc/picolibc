@@ -37,8 +37,11 @@
 TEST(i, sscanf(# x, "%lf", &d), 1, "got %d fields, expected %d"), \
 TEST(t, d, (double)x, "%g != %g") )
 
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wunused-value"
 #pragma GCC diagnostic ignored "-Woverflow"
+#pragma GCC diagnostic ignored "-Wliteral-range"
 #pragma GCC diagnostic ignored "-Wformat-extra-args"
 
 int test_sscanf(void)

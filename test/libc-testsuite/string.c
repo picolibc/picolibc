@@ -30,7 +30,11 @@
  * m = message to print on failure (with formats for r & x)
 **/
 
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wformat-extra-args"
+#pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
 
 #define TEST(r, f, x, m) do {                                           \
         (r) = (f);                                                      \

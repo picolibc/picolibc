@@ -28,8 +28,11 @@
 #include <limits.h>
 #include <math.h>
 
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wformat-extra-args"
 #pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic ignored "-Wformat-truncation"
 
 #define DISABLE_SLOW_TESTS
 
