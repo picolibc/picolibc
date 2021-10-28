@@ -31,6 +31,8 @@
 #pragma GCC diagnostic ignored "-Wformat-extra-args"
 #pragma GCC diagnostic ignored "-Wformat"
 
+#define DISABLE_SLOW_TESTS
+
 #define TEST(r, f, x, m) ( \
 ((r) = (f)) == (x) || \
 (printf(__FILE__ ":%d: %s failed (" m ")\n", __LINE__, #f, r, x), err++, 0) )
