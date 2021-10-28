@@ -78,6 +78,10 @@ duplocale (struct __locale_t *locobj)
   struct __locale_t tmp_locale, *new_locale;
   int i;
 
+  (void) locobj;
+  (void) i;
+  (void) new_locale;
+  (void) tmp_locale;
 #ifndef _MB_CAPABLE
   return __get_C_locale ();
 #else /* _MB_CAPABLE */
