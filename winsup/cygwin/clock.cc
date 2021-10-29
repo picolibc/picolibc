@@ -190,26 +190,13 @@ clk_monotonic_t::now (clockid_t clockid, struct timespec *ts)
 int
 clk_monotonic_coarse_t::now (clockid_t clockid, struct timespec *ts)
 {
-  if (wincap.has_unbiased_interrupt_time ())
-    {
-      /* Suspend time not taken into account, as on Linux */
-      ULONGLONG now;
+  /* Suspend time not taken into account, as on Linux */
+  ULONGLONG now;
 
-      QueryUnbiasedInterruptTime (&now);
-      ts->tv_sec = now / NS100PERSEC;
-      now %= NS100PERSEC;
-      ts->tv_nsec = now * (NSPERSEC/NS100PERSEC);
-    }
-  else
-    {
-      /* Vista-only: GetTickCount64 is biased but it's coarse and monotonic. */
-      ULONGLONG now;
-
-      now = GetTickCount64 ();	/* Returns ms since boot */
-      ts->tv_sec = now / MSPERSEC;
-      now %= MSPERSEC;
-      ts->tv_nsec = now * (NSPERSEC/MSPERSEC);
-    }
+  QueryUnbiasedInterruptTime (&now);
+  ts->tv_sec = now / NS100PERSEC;
+  now %= NS100PERSEC;
+  ts->tv_nsec = now * (NSPERSEC/NS100PERSEC);
   return 0;
 }
 
