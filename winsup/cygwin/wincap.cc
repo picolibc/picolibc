@@ -23,7 +23,6 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   mmap_storage_high:0x070000000000LL,
   {
     is_server:false,
-    needs_count_in_si_lpres2:true,
     needs_query_information:true,
     has_gaa_largeaddress_bug:true,
     has_broken_alloc_console:false,
@@ -59,7 +58,6 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   mmap_storage_high:0x070000000000LL,
   {
     is_server:false,
-    needs_count_in_si_lpres2:false,
     needs_query_information:true,
     has_gaa_largeaddress_bug:true,
     has_broken_alloc_console:true,
@@ -95,7 +93,6 @@ wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
   mmap_storage_high:0x070000000000LL,
   {
     is_server:false,
-    needs_count_in_si_lpres2:false,
     needs_query_information:true,
     has_gaa_largeaddress_bug:false,
     has_broken_alloc_console:true,
@@ -131,7 +128,6 @@ wincaps wincap_8_1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
-    needs_count_in_si_lpres2:false,
     needs_query_information:false,
     has_gaa_largeaddress_bug:false,
     has_broken_alloc_console:true,
@@ -167,7 +163,6 @@ wincaps  wincap_10_1507 __attribute__((section (".cygwin_dll_common"), shared)) 
   mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
-    needs_count_in_si_lpres2:false,
     needs_query_information:false,
     has_gaa_largeaddress_bug:false,
     has_broken_alloc_console:true,
@@ -203,7 +198,6 @@ wincaps  wincap_10_1607 __attribute__((section (".cygwin_dll_common"), shared)) 
   mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
-    needs_count_in_si_lpres2:false,
     needs_query_information:false,
     has_gaa_largeaddress_bug:false,
     has_broken_alloc_console:true,
@@ -239,7 +233,6 @@ wincaps wincap_10_1703 __attribute__((section (".cygwin_dll_common"), shared)) =
   mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
-    needs_count_in_si_lpres2:false,
     needs_query_information:false,
     has_gaa_largeaddress_bug:false,
     has_broken_alloc_console:true,
@@ -275,7 +268,6 @@ wincaps wincap_10_1709 __attribute__((section (".cygwin_dll_common"), shared)) =
   mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
-    needs_count_in_si_lpres2:false,
     needs_query_information:false,
     has_gaa_largeaddress_bug:false,
     has_broken_alloc_console:true,
@@ -311,7 +303,6 @@ wincaps wincap_10_1803 __attribute__((section (".cygwin_dll_common"), shared)) =
   mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
-    needs_count_in_si_lpres2:false,
     needs_query_information:false,
     has_gaa_largeaddress_bug:false,
     has_broken_alloc_console:true,
@@ -347,7 +338,6 @@ wincaps wincap_10_1809 __attribute__((section (".cygwin_dll_common"), shared)) =
   mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
-    needs_count_in_si_lpres2:false,
     needs_query_information:false,
     has_gaa_largeaddress_bug:false,
     has_broken_alloc_console:true,
@@ -383,7 +373,6 @@ wincaps wincap_10_1903 __attribute__((section (".cygwin_dll_common"), shared)) =
   mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
-    needs_count_in_si_lpres2:false,
     needs_query_information:false,
     has_gaa_largeaddress_bug:false,
     has_broken_alloc_console:true,
@@ -482,7 +471,6 @@ wincapc::init ()
       && !wow64)
 #endif
     {
-      ((wincaps *)caps)->needs_count_in_si_lpres2 = false;
       ((wincaps *)caps)->has_gaa_largeaddress_bug = false;
       ((wincaps *)caps)->has_broken_prefetchvm = false;
       ((wincaps *)caps)->no_msv1_0_s4u_logon_in_wow64 = false;

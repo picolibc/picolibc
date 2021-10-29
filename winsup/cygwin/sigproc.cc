@@ -809,31 +809,11 @@ int child_info::retry_count = 0;
    by fork/spawn/exec. */
 child_info::child_info (unsigned in_cb, child_info_types chtype,
 			bool need_subproc_ready):
-  cb (in_cb), intro (PROC_MAGIC_GENERIC), magic (CHILD_INFO_MAGIC),
-  type (chtype), cygheap (::cygheap), cygheap_max (::cygheap_max),
-  flag (0), retry (child_info::retry_count), rd_proc_pipe (NULL),
-  wr_proc_pipe (NULL)
+  msv_count (0), cb (in_cb), intro (PROC_MAGIC_GENERIC),
+  magic (CHILD_INFO_MAGIC), type (chtype), cygheap (::cygheap),
+  cygheap_max (::cygheap_max), flag (0), retry (child_info::retry_count),
+  rd_proc_pipe (NULL), wr_proc_pipe (NULL)
 {
-  /* It appears that when running under WOW64 on Vista 64, the first DWORD
-     value in the datastructure lpReserved2 is pointing to (msv_count in
-     Cygwin), has to reflect the size of that datastructure as used in the
-     Microsoft C runtime (a count value, counting the number of elements in
-     two subsequent arrays, BYTE[count and HANDLE[count]), even though the C
-     runtime isn't used.  Otherwise, if msv_count is 0 or too small, the
-     datastructure gets overwritten.
-
-     This seems to be a bug in Vista's WOW64, which apparently copies the
-     lpReserved2 datastructure not using the cbReserved2 size information,
-     but using the information given in the first DWORD within lpReserved2
-     instead.  However, it's not clear if a non-0 count doesn't result in
-     trying to evaluate the content, so we do this really only for Vista 64.
-
-     The value is sizeof (child_info_*) / 5 which results in a count which
-     covers the full datastructure, plus not more than 4 extra bytes.  This
-     is ok as long as the child_info structure is cosily stored within a bigger
-     datastructure. */
-  msv_count = wincap.needs_count_in_si_lpres2 () ? in_cb / 5 : 0;
-
   fhandler_union_cb = sizeof (fhandler_union);
   user_h = cygwin_user_h;
   if (strace.active ())
