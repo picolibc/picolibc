@@ -300,15 +300,6 @@ public:
   void count (int ncnt)
     { cnt = ncnt; }
   int count () const { return cnt; }
-  int non_well_known_count () const
-    {
-      int wcnt = 0;
-      for (int i = 0; i < cnt; ++i)
-	if (!sids[i].is_well_known_sid ())
-	  ++wcnt;
-      return wcnt;
-    }
-
   int position (const PSID sid) const
     {
       for (int i = 0; i < cnt; ++i)
@@ -317,13 +308,6 @@ public:
       return -1;
     }
 
-  int next_non_well_known_sid (int idx)
-    {
-      while (++idx < cnt)
-	if (!sids[idx].is_well_known_sid ())
-	  return idx;
-      return -1;
-    }
   BOOL contains (const PSID sid) const { return position (sid) >= 0; }
   cygsid *alloc_sids (int n);
   void free_sids ();
@@ -475,8 +459,6 @@ int setacl (HANDLE, path_conv &, int, struct acl *, bool &);
 void set_imp_token (HANDLE token, int type);
 /* Function creating a token by calling NtCreateToken. */
 HANDLE create_token (cygsid &usersid, user_groups &groups);
-/* LSA authentication function. */
-HANDLE lsaauth (cygsid &, user_groups &);
 /* LSA private key storage authentication, same as when using service logons. */
 HANDLE lsaprivkeyauth (struct passwd *pw);
 /* Kerberos or MsV1 S4U logon. */
