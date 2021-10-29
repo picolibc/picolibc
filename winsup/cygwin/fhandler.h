@@ -2118,7 +2118,6 @@ private:
 /* Input calls */
   int igncr_enabled ();
   void set_cursor_maybe ();
-  static bool create_invisible_console (HWINSTA);
   static bool create_invisible_console_workaround (bool force);
   static console_state *open_shared_console (HWND, HANDLE&, bool&);
   void fix_tab_position (void);

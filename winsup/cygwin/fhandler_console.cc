@@ -3530,34 +3530,7 @@ fhandler_console::fixup_after_fork_exec (bool execing)
   setup_io_mutex ();
 }
 
-// #define WINSTA_ACCESS (WINSTA_READATTRIBUTES | STANDARD_RIGHTS_READ | STANDARD_RIGHTS_WRITE | WINSTA_CREATEDESKTOP | WINSTA_EXITWINDOWS)
-#define WINSTA_ACCESS WINSTA_ALL_ACCESS
-
-/* Create a console in an invisible window station.  This should work
-   in all versions of Windows NT except Windows 7 (so far). */
-bool
-fhandler_console::create_invisible_console (HWINSTA horig)
-{
-  HWINSTA h = CreateWindowStationW (NULL, 0, WINSTA_ACCESS, NULL);
-  termios_printf ("%p = CreateWindowStation(NULL), %E", h);
-  BOOL b;
-  if (h)
-    {
-      b = SetProcessWindowStation (h);
-      termios_printf ("SetProcessWindowStation %d, %E", b);
-    }
-  b = AllocConsole ();	/* will cause flashing if CreateWindowStation
-			   failed */
-  if (!h)
-    SetParent (GetConsoleWindow (), HWND_MESSAGE);
-  if (horig && h && h != horig && SetProcessWindowStation (horig))
-    CloseWindowStation (h);
-  termios_printf ("%d = AllocConsole (), %E", b);
-  invisible_console = true;
-  return b;
-}
-
-/* Ugly workaround for Windows 7 and later.
+/* Ugly workaround to create invisible console required since Windows 7.
 
    First try to just attach to any console which may have started this
    app.  If that works use this as our "invisible console".
@@ -3707,10 +3680,7 @@ fhandler_console::need_invisible (bool force)
 	  AllocConsole ();
 	  invisible_console = true;
 	}
-      else if (wincap.has_broken_alloc_console ())
-	b = create_invisible_console_workaround (force);
-      else
-	b = create_invisible_console (h);
+      b = create_invisible_console_workaround (force);
     }
 
   debug_printf ("invisible_console %d", invisible_console);
