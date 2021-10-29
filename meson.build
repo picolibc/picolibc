@@ -646,24 +646,29 @@ conf_data = configuration_data()
 # can be compiled + linked.
 # The name should match the builtin, but technically it's not necessary
 builtins = [
-  ['builtin_alloca', '__builtin_alloca(1);'],
-  ['builtin_ffs', '__builtin_ffs(42);'],
-  ['builtin_ffsl', '__builtin_ffsl((long)42);'],
-  ['builtin_ffsll', '__builtin_ffsll((long long)42);'],
-  ['builtin_ctz', '__builtin_ctz((unsigned int)42);'],
-  ['builtin_ctzl', '__builtin_ctzl((unsigned long)42);'],
-  ['builtin_ctzll', '__builtin_ctzll((unsigned long long)42);'],
-  ['builtin_copysignl', '__builtin_copysignl((long double)42);'],
-  ['builtin_copysign', '__builtin_copysign((long double)42);'],
-  ['builtin_isinfl', '__builtin_isinfl((long double)42);'],
-  ['builtin_isinf', '__builtin_isinf((long double)42);'],
-  ['builtin_isnanl', '__builtin_isnanl((long double)42);'],
-  ['builtin_isnan', '__builtin_isnan((long double)42);'],
-  ['builtin_finitel', '__builtin_finitel((long double)42);'],
-  ['builtin_isfinite', '__builtin_isfinite((long double)42);'],
+  ['builtin_alloca', '__builtin_alloca(1)', 'void *'],
+  ['builtin_ffs', '__builtin_ffs(42)', 'int'],
+  ['builtin_ffsl', '__builtin_ffsl((long)42)', 'long'],
+  ['builtin_ffsll', '__builtin_ffsll((long long)42)', 'long long'],
+  ['builtin_ctz', '__builtin_ctz((unsigned int)42)', 'int'],
+  ['builtin_ctzl', '__builtin_ctzl((unsigned long)42)', 'int'],
+  ['builtin_ctzll', '__builtin_ctzll((unsigned long long)42)', 'int'],
+  ['builtin_copysignl', '__builtin_copysignl((long double)42, (long double) 42)', 'long double'],
+  ['builtin_copysign', '__builtin_copysign(42, 42)', 'double'],
+  ['builtin_isinfl', '__builtin_isinfl((long double)42)', 'int'],
+  ['builtin_isinf', '__builtin_isinf((long double)42)', 'int'],
+  ['builtin_isnanl', '__builtin_isnanl((long double)42)', 'int'],
+  ['builtin_isnan', '__builtin_isnan((long double)42)', 'int'],
+  ['builtin_finitel', '__builtin_finitel((long double)42)', 'int'],
+  ['builtin_isfinite', '__builtin_isfinite((long double)42)', 'int'],
 ]
 foreach builtin : builtins
-  have_current_builtin = cc.links('int main(void) { ' + builtin[1] + ' return 0; }', name : 'test for __' + builtin[0])
+  builtin_template='''
+static int foo(@1@ i __attribute__((unused))) { return 0; }
+int main(void) { return foo(@0@); }
+'''
+  builtin_code = builtin_template.format(builtin[1], builtin[2])
+  have_current_builtin = cc.links(builtin_code, name : 'test for __' + builtin[0])
   conf_data.set('HAVE_' + builtin[0].to_upper(), have_current_builtin, description: 'The compiler supports __' + builtin[0])
 endforeach
 
