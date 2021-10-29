@@ -86,7 +86,6 @@ C99, POSIX-1.2008
 #include <wchar.h>
 #include <string.h>
 #include <stdarg.h>
-#include <alloca.h>
 #include <errno.h>
 #include "local.h"
 
@@ -370,13 +369,13 @@ __SVFWSCANF_R (struct _reent *rptr,
     void ***m_arr;		/* Array of pointer args to 'm' conversion */
     uint16_t m_siz;		/* Number of slots in m_arr */
     uint16_t m_cnt;		/* Number of valid entries in m_arr */
-  } *m_ptr = NULL;
+  } *m_ptr = NULL, m_store;
   #define init_m_ptr()							\
     do									\
       {									\
 	if (!m_ptr)							\
 	  {								\
-	    m_ptr = (struct m_ptrs *) alloca (sizeof *m_ptr);		\
+	    m_ptr = &m_store;		                                \
 	    m_ptr->m_arr = NULL;					\
 	    m_ptr->m_siz = 0;						\
 	    m_ptr->m_cnt = 0;						\
