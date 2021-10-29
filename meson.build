@@ -517,14 +517,9 @@ picolibcpp_ld = configure_file(input: 'picolibc.ld.in',
 			     install_dir: lib_dir)
 
 # Not all compilers necessarily support all warnings; only use these which are:
-c_warnings = []
-foreach arg : ['-Wall', '-Wextra', '-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-Werror=implicit-function-declaration', '-Werror=vla', '-Wno-unused-command-line-argument', '-Warray-bounds', '-Wold-style-definition']
-  if cc.has_argument(arg)
-    c_warnings += [arg]
-  endif
-endforeach
-
-c_args += c_warnings
+c_warnings = ['-Wall', '-Wextra', '-Werror=implicit-function-declaration', '-Werror=vla', '-Warray-bounds', '-Wold-style-definition']
+disabled_warnings = ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-Wno-unused-command-line-argument']
+c_args += cc.get_supported_arguments(c_warnings, disabled_warnings)
 
 # CompCert does not support bitfields in packed structs, so avoid using this optimization
 bitfields_in_packed_structs_code = '''
