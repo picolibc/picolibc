@@ -528,8 +528,7 @@ get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps)
   if (my_grps)
     {
       grp_list += well_known_local_sid;
-      if (wincap.has_console_logon_sid ())
-	grp_list += well_known_console_logon_sid;
+      grp_list += well_known_console_logon_sid;
       if (sid_in_token_groups (my_grps, well_known_dialup_sid))
 	grp_list *= well_known_dialup_sid;
       if (sid_in_token_groups (my_grps, well_known_network_sid))

@@ -19,7 +19,6 @@ struct wincaps
     unsigned is_server						: 1;
     unsigned needs_query_information				: 1;
     unsigned has_gaa_largeaddress_bug				: 1;
-    unsigned has_console_logon_sid				: 1;
     unsigned has_precise_system_time				: 1;
     unsigned has_microsoft_accounts				: 1;
     unsigned has_broken_prefetchvm				: 1;
@@ -83,7 +82,6 @@ public:
   bool  IMPLEMENT (is_server)
   bool	IMPLEMENT (needs_query_information)
   bool	IMPLEMENT (has_gaa_largeaddress_bug)
-  bool	IMPLEMENT (has_console_logon_sid)
   bool	IMPLEMENT (has_precise_system_time)
   bool	IMPLEMENT (has_microsoft_accounts)
   bool	IMPLEMENT (has_broken_prefetchvm)
