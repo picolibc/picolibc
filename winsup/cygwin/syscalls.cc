@@ -3627,8 +3627,8 @@ seteuid32 (uid_t uid)
 		}
 	      /* If s4uauth fails with status code STATUS_INVALID_PARAMETER,
 		 we're running on a system not implementing MsV1_0S4ULogon
-		 (Windows 7 WOW64, Vista?).  Fall back to create_token in
-		 this single case only. */
+		 (Windows 7 WOW64).  Fall back to create_token in this single
+		 case only. */
 	      debug_printf ("s4uauth failed, try create_token.");
 	      if (!(new_token = create_token (usersid, groups)))
 		{

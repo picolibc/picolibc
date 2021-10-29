@@ -2180,7 +2180,7 @@ fhandler_socket_inet::getsockopt (int level, int optname, const void *optval,
 
   if (onebyte)
     {
-      /* Regression in Vista and later: instead of a 4 byte BOOL value, a
+      /* Regression in 6.0 kernel and later: instead of a 4 byte BOOL value, a
 	 1 byte BOOLEAN value is returned, in contrast to older systems and
 	 the documentation.  Since an int type is expected by the calling
 	 application, we convert the result here. */

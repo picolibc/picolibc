@@ -1617,8 +1617,6 @@ s4uauth (bool logon, PCWSTR domain, PCWSTR user, NTSTATUS &ret_status)
     }
   else
     {
-      /* Per MSDN MsV1_0S4ULogon is not implemented on Vista, but surprisingly
-	 it works. */
       MSV1_0_S4U_LOGON *s4u_logon;
       USHORT user_len, domain_len;
 
@@ -1671,9 +1669,9 @@ out:
 
   if (token && logon)
     {
-      /* Convert to primary token.  Strictly speaking this is only
-	 required on Vista/2008.  CreateProcessAsUser also takes
-	 impersonation tokens since Windows 7. */
+      /* Convert to primary token.  CreateProcessAsUser takes impersonation
+	 tokens since Windows 7 but MSDN still claims a primary token is
+	 required.  Better safe than sorry. */
       HANDLE tmp_token;
 
       if (DuplicateTokenEx (token, MAXIMUM_ALLOWED, &sec_none,

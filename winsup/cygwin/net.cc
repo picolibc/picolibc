@@ -1488,12 +1488,12 @@ get_adapters_addresses (PIP_ADAPTER_ADDRESSES *pa_ret, ULONG family)
   if (wincap.has_gaa_largeaddress_bug ()
       && (uintptr_t) &param >= (uintptr_t) 0x80000000L)
     {
-      /* In Windows Vista and Windows 7 under WOW64, GetAdaptersAddresses fails
-	 if it's running in a thread with a stack located in the large address
-	 area.  So, if we're running in a pthread with such a stack, we call
-	 GetAdaptersAddresses in a child thread with an OS-allocated stack.
-	 The OS allocates stacks bottom up, so chances are good that the new
-	 stack will be located in the lower address area. */
+      /* In Windows 7 under WOW64, GetAdaptersAddresses fails if it's running
+	 in a thread with a stack located in the large address area.  If we're
+	 running in a pthread with such a stack, we call GetAdaptersAddresses
+	 in a child thread with an OS-allocated stack.  The OS allocates stacks
+	 bottom up, so chances are good that the new stack will be located in
+	 the lower address area. */
       HANDLE thr = CreateThread (NULL, 0, call_gaa, &param, 0, NULL);
       SetThreadName (GetThreadId (thr), "__call_gaa");
       if (!thr)

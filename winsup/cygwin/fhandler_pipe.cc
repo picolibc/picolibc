@@ -1179,7 +1179,7 @@ cache_err:
   if (wincap.has_query_process_handle_info ())
     return get_query_hdl_per_process (name, ntfn); /* Since Win8 */
   else
-    return get_query_hdl_per_system (name, ntfn); /* Vista or Win7 */
+    return get_query_hdl_per_system (name, ntfn); /* Win7 */
 }
 
 /* This function is faster than get_query_hdl_per_system(), however,

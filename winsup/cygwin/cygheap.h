@@ -222,7 +222,7 @@ class fcwd_access_t {
     LONG           FSCharacteristics;	/* Taken from FileFsDeviceInformation */
     WCHAR          Buffer[MAX_PATH] __attribute ((aligned (8)));
   };
-  /* This is the layout used in Windows 7 and Vista. */
+  /* This is the layout used in Windows 7. */
   struct FAST_CWD_7 {
     UNICODE_STRING Path;		/* Path's Buffer member always refers
 					   to the following Buffer array. */
