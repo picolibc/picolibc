@@ -75,8 +75,7 @@ __get_lcid_from_locale (const char *name)
 
   wchar_t wlocale[ENCODING_LEN + 1];
 
-  /* Convert to RFC 4646 syntax which is the standard for the locale names
-     replacing LCIDs starting with Vista. */
+  /* Convert to RFC 4646 syntax. */
   *c = '-';
   mbstowcs (wlocale, locale, ENCODING_LEN + 1);
   lcid = LocaleNameToLCID (wlocale, 0);
@@ -107,7 +106,6 @@ __get_lcid_from_locale (const char *name)
 	{ "sd-PK" , L"sd-Arab-PK"  },
 	{ "sd-IN" , L"sd-Deva-IN"  },
 	{ "sr-BA" , L"sr-Cyrl-BA"  },
-	{ "sr-CS" , L"sr-Cyrl-CS"  },
 	{ "sr-ME" , L"sr-Cyrl-ME"  },
 	{ "sr-RS" , L"sr-Cyrl-RS"  },
 	{ "tg-TJ" , L"tg-Cyrl-TJ"  },
@@ -123,10 +121,6 @@ __get_lcid_from_locale (const char *name)
 	    lcid = LocaleNameToLCID (sc_only_locale[i].wloc, 0);
 	    if (!strncmp (locale, "sr-", 3))
 	      {
-		/* Vista/2K8 is missing sr-ME and sr-RS.  It has only the
-		   deprecated sr-CS.  So we map ME and RS to CS here. */
-		if (lcid == 0 || lcid == LOCALE_CUSTOM_UNSPECIFIED)
-		  lcid = LocaleNameToLCID (L"sr-Cyrl-CS", 0);
 		/* "@latin" modifier for the sr_XY locales changes
 		    collation behaviour so lcid should accommodate that
 		    by being set to the Latin sublang. */
@@ -1323,9 +1317,7 @@ __set_charset_from_locale (const char *locale, char *charset)
       cs = "BIG5";
       break;
     case 1250:
-      if (lcid == 0x081a		/* sr_CS (Serbian Language/Former
-						  Serbia and Montenegro) */
-	  || lcid == 0x181a		/* sr_BA (Serbian Language/Bosnia
+      if (lcid == 0x181a		/* sr_BA (Serbian Language/Bosnia
 						  and Herzegovina) */
 	  || lcid == 0x241a		/* sr_RS (Serbian Language/Serbia) */
 	  || lcid == 0x2c1a		/* sr_ME (Serbian Language/Montenegro)*/
@@ -1337,9 +1329,7 @@ __set_charset_from_locale (const char *locale, char *charset)
 	cs = "ISO-8859-2";
       break;
     case 1251:
-      if (lcid == 0x0c1a		/* sr_CS (Serbian Language/Former
-						  Serbia and Montenegro) */
-	  || lcid == 0x1c1a		/* sr_BA (Serbian Language/Bosnia
+      if (lcid == 0x1c1a		/* sr_BA (Serbian Language/Bosnia
 						  and Herzegovina) */
 	  || lcid == 0x281a		/* sr_RS (Serbian Language/Serbia) */
 	  || lcid == 0x301a		/* sr_ME (Serbian Language/Montenegro)*/

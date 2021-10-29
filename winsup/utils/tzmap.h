@@ -28,11 +28,6 @@
     SA Pacific Standard Time/HT 
     South Africa Standard Time/LY
 
-  It also doesn't contain deprecated country codes used in older
-  OSes, namely:
-
-    CS (Serbian and Montenegro, dissolved, now RS and ME) used in Vista
- 
   While these are apparently old, they are required here to get a complete
   mapping on all supported OSes. */
 struct
@@ -119,7 +114,6 @@ struct
   { L"Central Brazilian Standard Time", L"BR", L"America/Cuiaba America/Campo_Grande" },
   { L"Central Europe Standard Time", L"", L"Europe/Budapest" },
   { L"Central Europe Standard Time", L"AL", L"Europe/Tirane" },
-  { L"Central Europe Standard Time", L"CS", L"Europe/Belgrade" },
   { L"Central Europe Standard Time", L"CZ", L"Europe/Prague" },
   { L"Central Europe Standard Time", L"HU", L"Europe/Budapest" },
   { L"Central Europe Standard Time", L"ME", L"Europe/Podgorica" },

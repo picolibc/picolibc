@@ -369,29 +369,6 @@ print_all_locales (int verbose)
 	      add_locale (loc, language, country);
 	    }
 	}
-      /* Check Serbian language for the available territories.  Vista only
-	 had sr_CS.  Only starting with W7 we have the actual sr_RS and sr_ME.
-	 However, they are supported on Vista as well in Cygwin.  So we fake
-	 them here, if they are missing. */
-      if (lang == LANG_SERBIAN)
-	{
-	  int sr_CS_idx = -1;
-	  int sr_RS_idx = -1;
-	  int i;
-
-	  for (i = 0; i < lcnt; ++ i)
-	    if (!strcmp (loc_list[i].loc, "sr_CS"))
-	      sr_CS_idx = i;
-	    else if (!strcmp (loc_list[i].loc, "sr_RS"))
-	      sr_RS_idx = i;
-	  if (sr_CS_idx > 0 && sr_RS_idx == -1)
-	    {
-	      add_locale ("sr_RS@latin", L"Serbian (Latin)", L"Serbia");
-	      add_locale ("sr_RS", L"Serbian (Cyrillic)", L"Serbia");
-	      add_locale ("sr_ME@latin", L"Serbian (Latin)", L"Montenegro");
-	      add_locale ("sr_ME", L"Serbian (Cyrillic)", L"Montenegro");
-	    }
-	}
     }
   /* First sort allows add_locale_alias_locales to bsearch in locales. */
   qsort (locale, loc_num, sizeof (loc_t), compare_locales);
