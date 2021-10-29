@@ -42,28 +42,6 @@ __nt_query_system (PSYSTEM_BASIC_INFORMATION psbi)
 static long
 get_nproc_values (int in)
 {
-  if (!wincap.has_processor_groups ())	/* Pre Windows 7 */
-    {
-      SYSTEM_BASIC_INFORMATION sbi;
-
-      if (!__nt_query_system (&sbi))
-	return -1;
-      switch (in)
-	{
-	case _SC_NPROCESSORS_CONF:
-	  return sbi.NumberProcessors;
-	case _SC_NPROCESSORS_ONLN:
-	  {
-	    int i = 0;
-	    do
-	     if (sbi.ActiveProcessors & 1)
-	       i++;
-	    while (sbi.ActiveProcessors >>= 1);
-	    return i;
-	  }
-	}
-    }
-
   tmp_pathbuf tp;
   PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX lpi, plpi;
   DWORD lpi_size = NT_MAX_PATH;

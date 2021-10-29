@@ -1047,11 +1047,9 @@ __get_cpus_per_group (void)
             (PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX) tp.c_get ();
   DWORD lpi_size = NT_MAX_PATH;
 
-  /* Fake a SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX group info block on Vista
-     systems.  This may be over the top but if the below code just using
-     ActiveProcessorCount turns out to be insufficient, we can build on that. */
-  if (!wincap.has_processor_groups ()
-      || !GetLogicalProcessorInformationEx (RelationGroup, lpi, &lpi_size))
+  /* Fake a SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX group info block if
+     GetLogicalProcessorInformationEx fails for some reason. */
+  if (!GetLogicalProcessorInformationEx (RelationGroup, lpi, &lpi_size))
     {
       lpi_size = sizeof *lpi;
       lpi->Relationship = RelationGroup;

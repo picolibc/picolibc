@@ -416,9 +416,6 @@ EXPORT_ALIAS (sched_yield, pthread_yield)
 int
 sched_getcpu ()
 {
-  if (!wincap.has_processor_groups ())
-    return (int) GetCurrentProcessorNumber ();
-
   PROCESSOR_NUMBER pnum;
 
   GetCurrentProcessorNumberEx (&pnum);
@@ -520,33 +517,18 @@ whichgroup (size_t sizeof_set, const cpu_set_t *set)
 int
 sched_get_thread_affinity (HANDLE thread, size_t sizeof_set, cpu_set_t *set)
 {
+  GROUP_AFFINITY ga;
   int status = 0;
 
   if (thread)
     {
       memset (set, 0, sizeof_set);
-      if (wincap.has_processor_groups () && __get_group_count () > 1)
+      if (!GetThreadGroupAffinity (thread, &ga))
 	{
-	  GROUP_AFFINITY ga;
-
-	  if (!GetThreadGroupAffinity (thread, &ga))
-	    {
-	      status = geterrno_from_win_error (GetLastError (), EPERM);
-	      goto done;
-	    }
-	  setgroup (sizeof_set, set, ga.Group, ga.Mask);
+	  status = geterrno_from_win_error (GetLastError (), EPERM);
+	  goto done;
 	}
-      else
-	{
-	  THREAD_BASIC_INFORMATION tbi;
-
-	  status = NtQueryInformationThread (thread, ThreadBasicInformation,
-					     &tbi, sizeof (tbi), NULL);
-	  if (NT_SUCCESS (status))
-	    setgroup (sizeof_set, set, 0, tbi.AffinityMask);
-	  else
-	    status = geterrno_from_nt_status (status);
-	}
+      setgroup (sizeof_set, set, ga.Group, ga.Mask);
     }
   else
     status = ESRCH;
@@ -570,6 +552,8 @@ __sched_getaffinity_sys (pid_t pid, size_t sizeof_set, cpu_set_t *set)
                              p->dwProcessId) : GetCurrentProcess ();
       KAFFINITY procmask;
       KAFFINITY sysmask;
+      USHORT groupcount = __CPU_GROUPMAX;
+      USHORT grouparray[__CPU_GROUPMAX];
 
       if (!GetProcessAffinityMask (process, &procmask, &sysmask))
         {
@@ -577,23 +561,15 @@ __sched_getaffinity_sys (pid_t pid, size_t sizeof_set, cpu_set_t *set)
           goto done;
         }
       memset (set, 0, sizeof_set);
-      if (wincap.has_processor_groups () && __get_group_count () > 1)
-        {
-          USHORT groupcount = __CPU_GROUPMAX;
-          USHORT grouparray[__CPU_GROUPMAX];
+      if (!GetProcessGroupAffinity (process, &groupcount, grouparray))
+	{
+	  status = geterrno_from_win_error (GetLastError (), EPERM);
+	  goto done;
+	}
 
-          if (!GetProcessGroupAffinity (process, &groupcount, grouparray))
-            {
-	      status = geterrno_from_win_error (GetLastError (), EPERM);
-	      goto done;
-	    }
-
-	  KAFFINITY miscmask = groupmask (__get_cpus_per_group ());
-	  for (int i = 0; i < groupcount; i++)
-	    setgroup (sizeof_set, set, grouparray[i], miscmask);
-        }
-      else
-        setgroup (sizeof_set, set, 0, procmask);
+      KAFFINITY miscmask = groupmask (__get_cpus_per_group ());
+      for (int i = 0; i < groupcount; i++)
+	setgroup (sizeof_set, set, grouparray[i], miscmask);
     }
   else
     status = ESRCH;
@@ -625,41 +601,24 @@ sched_getaffinity (pid_t pid, size_t sizeof_set, cpu_set_t *set)
 int
 sched_set_thread_affinity (HANDLE thread, size_t sizeof_set, const cpu_set_t *set)
 {
+  GROUP_AFFINITY ga;
   int group = whichgroup (sizeof_set, set);
   int status = 0;
 
   if (thread)
     {
-      if (wincap.has_processor_groups () && __get_group_count () > 1)
+      if (group < 0)
 	{
-	  GROUP_AFFINITY ga;
-
-	  if (group < 0)
-	    {
-	      status = EINVAL;
-	      goto done;
-	    }
-	  memset (&ga, 0, sizeof (ga));
-	  ga.Mask = getgroup (sizeof_set, set, group);
-	  ga.Group = group;
-	  if (!SetThreadGroupAffinity (thread, &ga, NULL))
-	    {
-	      status = geterrno_from_win_error (GetLastError (), EPERM);
-	      goto done;
-	    }
+	  status = EINVAL;
+	  goto done;
 	}
-      else
+      memset (&ga, 0, sizeof (ga));
+      ga.Mask = getgroup (sizeof_set, set, group);
+      ga.Group = group;
+      if (!SetThreadGroupAffinity (thread, &ga, NULL))
 	{
-	  if (group != 0)
-	    {
-	      status = EINVAL;
-	      goto done;
-	    }
-	  if (!SetThreadAffinityMask (thread, getgroup (sizeof_set, set, 0)))
-	    {
-	      status = geterrno_from_win_error (GetLastError (), EPERM);
-	      goto done;
-	    }
+	  status = geterrno_from_win_error (GetLastError (), EPERM);
+	  goto done;
 	}
     }
   else
@@ -672,6 +631,8 @@ done:
 int
 sched_setaffinity (pid_t pid, size_t sizeof_set, const cpu_set_t *set)
 {
+  USHORT groupcount = __CPU_GROUPMAX;
+  USHORT grouparray[__CPU_GROUPMAX];
   int group = whichgroup (sizeof_set, set);
   HANDLE process = 0;
   int status = 0;
@@ -682,49 +643,30 @@ sched_setaffinity (pid_t pid, size_t sizeof_set, const cpu_set_t *set)
       process = pid && pid != myself->pid ?
 		OpenProcess (PROCESS_SET_INFORMATION, FALSE,
 			     p->dwProcessId) : GetCurrentProcess ();
-      if (wincap.has_processor_groups () && __get_group_count () > 1)
+      if (!GetProcessGroupAffinity (process, &groupcount, grouparray))
 	{
-	  USHORT groupcount = __CPU_GROUPMAX;
-	  USHORT grouparray[__CPU_GROUPMAX];
-
-	  if (!GetProcessGroupAffinity (process, &groupcount, grouparray))
-	    {
-	      status = geterrno_from_win_error (GetLastError (), EPERM);
-	      goto done;
-	    }
-	  if (group < 0)
-	    {
-	      status = EINVAL;
-	      goto done;
-	    }
-	  if (groupcount == 1 && grouparray[0] == group)
-	    {
-	      if (!SetProcessAffinityMask (process, getgroup (sizeof_set, set, group)))
-		status = geterrno_from_win_error (GetLastError (), EPERM);
-	      goto done;
-	    }
-
-	  /* If we get here, the user is trying to add the process to another
-             group or move it from current group to another group.  These ops
-             are not allowed by Windows.  One has to move one or more of the
-             process' threads to the new group(s) one by one.  Here, we bail.
-          */
+	  status = geterrno_from_win_error (GetLastError (), EPERM);
+	  goto done;
+	}
+      if (group < 0)
+	{
 	  status = EINVAL;
 	  goto done;
 	}
-      else
+      if (groupcount == 1 && grouparray[0] == group)
 	{
-	  if (group != 0)
-	    {
-	      status = EINVAL;
-	      goto done;
-	    }
-	  if (!SetProcessAffinityMask (process, getgroup (sizeof_set, set, 0)))
-	    {
-	      status = geterrno_from_win_error (GetLastError (), EPERM);
-	      goto done;
-	    }
+	  if (!SetProcessAffinityMask (process, getgroup (sizeof_set, set, group)))
+	    status = geterrno_from_win_error (GetLastError (), EPERM);
+	  goto done;
 	}
+
+      /* If we get here, the user is trying to add the process to another
+	 group or move it from current group to another group.  These ops
+	 are not allowed by Windows.  One has to move one or more of the
+	 process' threads to the new group(s) one by one.  Here, we bail.
+      */
+      status = EINVAL;
+      goto done;
     }
   else
     status = ESRCH;

@@ -665,26 +665,15 @@ format_proc_cpuinfo (void *, char *&destbuf)
 
       WORD cpu_group = cpu_number / num_cpu_per_group;
       KAFFINITY cpu_mask = 1L << (cpu_number % num_cpu_per_group);
+      GROUP_AFFINITY affinity = {
+	.Mask	= cpu_mask,
+	.Group	= cpu_group,
+      };
 
-      if (wincap.has_processor_groups ())
-	{
-	  GROUP_AFFINITY affinity = {
-	    .Mask	= cpu_mask,
-	    .Group	= cpu_group,
-	  };
-
-	  if (!SetThreadGroupAffinity (GetCurrentThread (), &affinity,
-				       &orig_group_affinity))
-	    system_printf ("SetThreadGroupAffinity(%x,%d (%x/%d)) failed %E", cpu_mask, cpu_group, cpu_number, cpu_number);
-	  orig_affinity_mask = 1; /* Just mark success. */
-	}
-      else
-	{
-	  orig_affinity_mask = SetThreadAffinityMask (GetCurrentThread (),
-						      1 << cpu_number);
-	  if (orig_affinity_mask == 0)
-	    debug_printf ("SetThreadAffinityMask failed %E");
-	}
+      if (!SetThreadGroupAffinity (GetCurrentThread (), &affinity,
+				   &orig_group_affinity))
+	system_printf ("SetThreadGroupAffinity(%x,%d (%x/%d)) failed %E", cpu_mask, cpu_group, cpu_number, cpu_number);
+      orig_affinity_mask = 1; /* Just mark success. */
       /* I'm not sure whether the thread changes processor immediately
 	 and I'm not sure whether this function will cause the thread
 	 to be rescheduled */
@@ -1668,13 +1657,8 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	}
 
       if (orig_affinity_mask != 0)
-	{
-	  if (wincap.has_processor_groups ())
-	    SetThreadGroupAffinity (GetCurrentThread (), &orig_group_affinity,
-				    NULL);
-	  else
-	    SetThreadAffinityMask (GetCurrentThread (), orig_affinity_mask);
-	}
+	SetThreadGroupAffinity (GetCurrentThread (), &orig_group_affinity,
+				NULL);
       print ("\n");
     }
 
