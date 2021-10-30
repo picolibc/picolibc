@@ -1,4 +1,4 @@
-/* wf_sqrt.c -- float version of w_sqrt.c.
+/* wf_exp2.c -- float version of w_exp2.c.
  * Conversion to float by Ian Lance Taylor, Cygnus Support, ian@cygnus.com.
  */
 
@@ -8,46 +8,41 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
 
-/* 
- * wrapper sqrtf(x)
+/*
+ * wrapper exp2f(x)
  */
 
 #include "fdlibm.h"
+#if __OBSOLETE_MATH_FLOAT
 #include <errno.h>
+#include <math.h>
 
-#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
-	float sqrtf(float x)		/* wrapper sqrtf */
+	float exp2f(float x)		/* wrapper exp2f */
 #else
-	float sqrtf(x)			/* wrapper sqrtf */
+	float exp2f(x)			/* wrapper exp2f */
 	float x;
 #endif
 {
-	float z;
-	z = __ieee754_sqrtf(x);
-	if(_LIB_VERSION == _IEEE_ || isnan(x)) return z;
-	if(x<0.0f)
-	    /* sqrtf(negative) */
-	    errno = EDOM;
-	return z;
+  return powf(2.0, x);
 }
-#endif
 
 #ifdef _DOUBLE_IS_32BITS
 
 #ifdef __STDC__
-	double sqrt(double x)
+	double exp2(double x)
 #else
-	double sqrt(x)
+	double exp2(x)
 	double x;
 #endif
 {
-	return (double) sqrtf((float) x);
+	return (double) exp2f((float) x);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
+#endif /* __OBSOLETE_MATH_FLOAT */

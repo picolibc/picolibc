@@ -154,7 +154,6 @@ fsrcs_common = [
 # These have full implementations
 lsrc_full = [
   'copysignl.c',
-  'hypotl.c',
   'isinfl.c',
   'isnanl.c',
   'nanl.c',
