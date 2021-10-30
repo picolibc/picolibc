@@ -16,12 +16,7 @@
 #include "fdlibm.h"
 #if __OBSOLETE_MATH_FLOAT
 
-#ifdef __STDC__
 	float cosf(float x)
-#else
-	float cosf(x)
-	float x;
-#endif
 {
 	float y[2],z=0.0;
 	__int32_t n,ix;
@@ -57,12 +52,7 @@ __strong_reference(cosf, _cosf);
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double cos(double x)
-#else
-	double cos(x)
-	double x;
-#endif
 {
 	return (double) cosf((float) x);
 }

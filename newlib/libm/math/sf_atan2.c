@@ -16,11 +16,7 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 static const float 
-#else
-static float 
-#endif
 tiny  = 1.0e-30,
 zero  = 0.0,
 pi_o_4  = 7.8539818525e-01, /* 0x3f490fdb */
@@ -28,16 +24,8 @@ pi_o_2  = 1.5707963705e+00, /* 0x3fc90fdb */
 pi      = 3.1415927410e+00,  /* 0x40490fdb */
 pi_lo   = -8.7422776573e-08; /* 0xb3bbbd2e */
 
-#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
-__strong_reference(__ieee754_atan2f, atan2f);
-#endif
 
-#ifdef __STDC__
 	float __ieee754_atan2f(float y, float x)
-#else
-	float __ieee754_atan2f(y,x)
-	float  y,x;
-#endif
 {  
 	float z;
 	__int32_t k,m,hx,hy,ix,iy;

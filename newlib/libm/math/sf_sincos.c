@@ -14,14 +14,7 @@ extern float _cosf(float);
 #define _cosf cosf
 #endif
 
-#ifdef __STDC__
 	void sincosf(float x, float *sinx, float *cosx)
-#else
-	void sincosf(x, sinx, cosx)
-	float x;
-        float *sinx;
-        float *cosx;
-#endif
 {
   *sinx = _sinf (x);
   *cosx = _cosf (x);
@@ -29,14 +22,7 @@ extern float _cosf(float);
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	void sincos(double x, double *sinx, double *cosx)
-#else
-	void sincos(x, sinx, cosx)
-	double x;
-        double sinx;
-        double cosx;
-#endif
 {
   *sinx = _sinf((float) x);
   *cosx = _cosf((float) x);

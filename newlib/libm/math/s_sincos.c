@@ -16,14 +16,7 @@ extern double _cos(double);
 #define _cos cos
 #endif
 
-#ifdef __STDC__
 	void sincos(double x, double *sinx, double *cosx)
-#else
-	void sincos(x, sinx, cosx)
-	double x;
-        double *sinx;
-        double *cosx;
-#endif
 {
   *sinx = _sin (x);
   *cosx = _cos (x);

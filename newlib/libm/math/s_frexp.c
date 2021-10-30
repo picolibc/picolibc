@@ -69,19 +69,10 @@ PORTABILITY
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 static const double
-#else
-static double
-#endif
 two54 =  1.80143985094819840000e+16; /* 0x43500000, 0x00000000 */
 
-#ifdef __STDC__
 	double frexp(double x, int *eptr)
-#else
-	double frexp(x, eptr)
-	double x; int *eptr;
-#endif
 {
 	__int32_t hx, ix, lx;
 	EXTRACT_WORDS(hx,lx,x);

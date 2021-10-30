@@ -21,22 +21,10 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 static const float one = 1.0, Zero[] = {0.0, -0.0,};
-#else
-static float one = 1.0, Zero[] = {0.0, -0.0,};
-#endif
 
-#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
-__strong_reference(__ieee754_fmodf, fmodf);
-#endif
 
-#ifdef __STDC__
 	float __ieee754_fmodf(float x, float y)
-#else
-	float __ieee754_fmodf(x,y)
-	float x,y ;
-#endif
 {
 	__int32_t n,hx,hy,hz,ix,iy,sx,i;
 

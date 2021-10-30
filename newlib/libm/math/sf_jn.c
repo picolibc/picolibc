@@ -15,30 +15,14 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 static const float
-#else
-static float
-#endif
 two   =  2.0000000000e+00, /* 0x40000000 */
 one   =  1.0000000000e+00; /* 0x3F800000 */
 
-#ifdef __STDC__
 static const float zero  =  0.0000000000e+00;
-#else
-static float zero  =  0.0000000000e+00;
-#endif
 
-#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
-__strong_reference(__ieee754_jnf, jnf);
-#endif
 
-#ifdef __STDC__
 	float __ieee754_jnf(int n, float x)
-#else
-	float __ieee754_jnf(n,x)
-	int n; float x;
-#endif
 {
 	__int32_t i,hx,ix, sgn;
 	float a, b, temp, di;
@@ -170,16 +154,8 @@ __strong_reference(__ieee754_jnf, jnf);
 	if(sgn==1) return -b; else return b;
 }
 
-#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
-__strong_reference(__ieee754_ynf, ynf);
-#endif
 
-#ifdef __STDC__
 	float __ieee754_ynf(int n, float x) 
-#else
-	float __ieee754_ynf(n,x) 
-	int n; float x;
-#endif
 {
 	__int32_t i,hx,ix,ib;
 	__int32_t sign;

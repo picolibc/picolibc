@@ -16,12 +16,7 @@
 #include "fdlibm.h"
 #if __OBSOLETE_MATH_FLOAT
 
-#ifdef __STDC__
 	float sinf(float x)
-#else
-	float sinf(x)
-	float x;
-#endif
 {
 	float y[2],z=0.0;
 	__int32_t n,ix;
@@ -57,12 +52,7 @@ __strong_reference(sinf, _sinf);
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double sin(double x)
-#else
-	double sin(x)
-	double x;
-#endif
 {
 	return (double) sinf((float) x);
 }

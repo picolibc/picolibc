@@ -35,10 +35,6 @@
 
 #include "fdlibm.h"
 
-#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
-__strong_reference(__ieee754_lgamma, lgamma);
-__strong_reference(__ieee754_lgamma, gamma);
-#endif
 
 double __ieee754_lgamma(double x)
 {

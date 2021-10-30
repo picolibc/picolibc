@@ -24,23 +24,11 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 static const double zero = 0.0;
-#else
-static double zero = 0.0;
-#endif
 
 
-#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
-__strong_reference(__ieee754_remainder, remainder);
-#endif
 
-#ifdef __STDC__
 	double __ieee754_remainder(double x, double p)
-#else
-	double __ieee754_remainder(x,p)
-	double x,p;
-#endif
 {
 	__int32_t hx,hp;
 	__uint32_t sx,lx,lp;

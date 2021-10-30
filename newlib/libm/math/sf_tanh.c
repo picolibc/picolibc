@@ -15,18 +15,9 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 static const volatile float one=1.0, two=2.0, tiny = 1.0e-30;
-#else
-static volatile float one=1.0, two=2.0, tiny = 1.0e-30;
-#endif
 
-#ifdef __STDC__
 	float tanhf(float x)
-#else
-	float tanhf(x)
-	float x;
-#endif
 {
 	float t,z;
 	__int32_t jx,ix;
@@ -60,12 +51,7 @@ static volatile float one=1.0, two=2.0, tiny = 1.0e-30;
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double tanh(double x)
-#else
-	double tanh(x)
-	double x;
-#endif
 {
 	return (double) tanhf((float) x);
 }

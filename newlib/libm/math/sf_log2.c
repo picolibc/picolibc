@@ -24,24 +24,14 @@
 #undef log2
 #undef log2f
 
-#ifdef __STDC__
 	float log2f(float x)		/* wrapper log2f */
-#else
-	float log2f(x)			/* wrapper log2f */
-	float x;
-#endif
 {
   return (logf(x) / (float_t) M_LN2);
 }
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double log2(double x)
-#else
-	double log2(x)
-	double x;
-#endif
 {
 	return (double) log2f((float) x);
 }

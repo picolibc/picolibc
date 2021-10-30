@@ -48,32 +48,16 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 static const double
-#else
-static double
-#endif
 two54      =  1.80143985094819840000e+16, /* 0x43500000, 0x00000000 */
 ivln10     =  4.34294481903251816668e-01, /* 0x3FDBCB7B, 0x1526E50E */
 log10_2hi  =  3.01029995663611771306e-01, /* 0x3FD34413, 0x509F6000 */
 log10_2lo  =  3.69423907715893078616e-13; /* 0x3D59FEF3, 0x11F12B36 */
 
-#ifdef __STDC__
 static const double zero   =  0.0;
-#else
-static double zero   =  0.0;
-#endif
 
-#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
-__strong_reference(__ieee754_log10, log10);
-#endif
 
-#ifdef __STDC__
 	double __ieee754_log10(double x)
-#else
-	double __ieee754_log10(x)
-	double x;
-#endif
 {
 	double y,z;
 	__int32_t i,k,hx;

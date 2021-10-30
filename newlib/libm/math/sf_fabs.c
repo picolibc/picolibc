@@ -19,12 +19,7 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 	float fabsf(float x)
-#else
-	float fabsf(x)
-	float x;
-#endif
 {
 	__uint32_t ix;
 	GET_FLOAT_WORD(ix,x);
@@ -34,12 +29,7 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double fabs(double x)
-#else
-	double fabs(x)
-	double x;
-#endif
 {
 	return (double) fabsf((float) x);
 }

@@ -41,31 +41,15 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 static const double
-#else
-static double
-#endif
 invsqrtpi=  5.64189583547756279280e-01, /* 0x3FE20DD7, 0x50429B6D */
 two   =  2.00000000000000000000e+00, /* 0x40000000, 0x00000000 */
 one   =  1.00000000000000000000e+00; /* 0x3FF00000, 0x00000000 */
 
-#ifdef __STDC__
 static const double zero  =  0.00000000000000000000e+00;
-#else
-static double zero  =  0.00000000000000000000e+00;
-#endif
 
-#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
-__strong_reference(__ieee754_jn, jn);
-#endif
 
-#ifdef __STDC__
 	double __ieee754_jn(int n, double x)
-#else
-	double __ieee754_jn(n,x)
-	int n; double x;
-#endif
 {
 	__int32_t i,hx,ix,lx, sgn;
 	double a, b, temp, di;
@@ -220,16 +204,8 @@ __strong_reference(__ieee754_jn, jn);
 	if(sgn==1) return -b; else return b;
 }
 
-#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
-__strong_reference(__ieee754_yn, yn);
-#endif
 
-#ifdef __STDC__
 	double __ieee754_yn(int n, double x) 
-#else
-	double __ieee754_yn(n,x) 
-	int n; double x;
-#endif
 {
 	__int32_t i,hx,ix,lx;
 	__int32_t sign;

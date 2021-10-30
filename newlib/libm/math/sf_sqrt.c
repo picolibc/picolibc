@@ -15,22 +15,10 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 static	const volatile float	one	= 1.0, tiny=1.0e-30;
-#else
-static	float	volatile one	= 1.0, tiny=1.0e-30;
-#endif
 
-#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
-__strong_reference(__ieee754_sqrtf, sqrtf);
-#endif
 
-#ifdef __STDC__
 	float __ieee754_sqrtf(float x)
-#else
-	float __ieee754_sqrtf(x)
-	float x;
-#endif
 {
 	float z;
 	__uint32_t r,hx;

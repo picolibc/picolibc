@@ -17,26 +17,14 @@
 #include "fdlibm.h"
 #include <errno.h>
 
-#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
-#ifdef __STDC__
 	float gammaf(float x)
-#else
-	float gammaf(x)
-	float x;
-#endif
 {
 	return lgammaf(x);
 }
-#endif
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double gamma(double x)
-#else
-	double gamma(x)
-	double x;
-#endif
 {
 	return (double) lgammaf((float) x);
 }

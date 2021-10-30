@@ -15,12 +15,7 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 	float tanf(float x)
-#else
-	float tanf(x)
-	float x;
-#endif
 {
 	float y[2],z=0.0;
 	__int32_t n,ix;
@@ -44,12 +39,7 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double tan(double x)
-#else
-	double tan(x)
-	double x;
-#endif
 {
 	return (double) tanf((float) x);
 }

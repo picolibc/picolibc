@@ -20,16 +20,8 @@
 
 #include "fdlibm.h"
 
-#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
-__strong_reference(__ieee754_tgamma, tgamma);
-#endif
 
-#ifdef __STDC__
 	double __ieee754_tgamma(double x)
-#else
-	double __ieee754_tgamma(x)
-	double x;
-#endif
 {
 	int signgam_local = 1;
 	double y = __ieee754_exp(___ieee754_lgamma_r(x, &signgam_local));
