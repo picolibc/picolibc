@@ -38,6 +38,10 @@
 
 #ifdef __riscv_flen
 
+#ifdef _WANT_MATH_ERRNO
+#include <errno.h>
+#endif
+
 #define FCLASS_NEG_INF       (1 << 0)
 #define FCLASS_NEG_NORMAL    (1 << 1)
 #define FCLASS_NEG_SUBNORMAL (1 << 2)
@@ -156,20 +160,16 @@ isnan (double x)
 #endif
 
 __declare_riscv_macro(double)
-__ieee754_sqrt (double x)
+sqrt (double x)
 {
 	double result;
+#ifdef _WANT_MATH_ERRNO
+        if (x < 0)
+            errno = EDOM;
+#endif
 	__asm__("fsqrt.d %0, %1" : "=f" (result) : "f" (x));
 	return result;
 }
-
-#ifdef _IEEE_LIBM
-__declare_riscv_macro(double)
-sqrt (double x)
-{
-	return __ieee754_sqrt(x);
-}
-#endif
 
 #if HAVE_FAST_FMA
 __declare_riscv_macro(double)
@@ -267,20 +267,16 @@ isnanf (float x)
 }
 
 __declare_riscv_macro(float)
-__ieee754_sqrtf (float x)
+sqrtf (float x)
 {
 	float result;
+#ifdef _WANT_MATH_ERRNO
+        if (x < 0)
+            errno = EDOM;
+#endif
 	__asm__("fsqrt.s %0, %1" : "=f" (result) : "f" (x));
 	return result;
 }
-
-#ifdef _IEEE_LIBM
-__declare_riscv_macro(float)
-sqrtf (float x)
-{
-	return __ieee754_sqrtf(x);
-}
-#endif
 
 #endif /* defined(__riscv_flen) && __riscv_flen >= 32 && defined(__GNUC_GNU_INLINE__) */
 
