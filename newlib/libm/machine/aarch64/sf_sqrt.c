@@ -1,4 +1,4 @@
-/* e_sqrt.c -- define __ieee754_sqrt
+/* ef_sqrt.c -- define __ieee754_sqrtf
    Copyright (c) 2015 ARM Ltd.  All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -26,14 +26,15 @@
 
 #include "fdlibm.h"
 
-#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
-__strong_reference(__ieee754_sqrt, sqrt);
-#endif
-
-double
-__ieee754_sqrt (double x)
+float
+sqrtf (float x)
 {
-  double result;
-  __asm__("fsqrt\t%d0, %d1" : "=w" (result) : "w" (x));
+  float result;
+#ifdef _WANT_MATH_ERRNO
+  if (x < 0)
+      return __math_invalidf(x);
+#endif
+  __asm__("fsqrt\t%s0, %s1" : "=w" (result) : "w" (x));
   return result;
 }
+
