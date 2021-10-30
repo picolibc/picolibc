@@ -6,15 +6,15 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  *
  */
 
 /* __rem_pio2(x,y)
- * 
- * return the remainder of x rem pi/2 in y[0]+y[1] 
+ *
+ * return the remainder of x rem pi/2 in y[0]+y[1]
  * use __kernel_rem_pio2()
  */
 
@@ -23,7 +23,7 @@
 #ifndef _DOUBLE_IS_32BITS
 
 /*
- * Table of constants for 2/pi, 396 Hex digits (476 decimal) of 2/pi 
+ * Table of constants for 2/pi, 396 Hex digits (476 decimal) of 2/pi
  */
 static const __int32_t two_over_pi[] = {
     0xA2F983, 0x6E4E44, 0x1529FC, 0x2757D1, 0xF534DD, 0xC0DB62, 0x95993C,
@@ -150,7 +150,7 @@ __rem_pio2(double x, double *y)
         } else
             return n;
     }
-    /* 
+    /*
      * all other (large) arguments
      */
     if (ix >= 0x7ff00000) { /* x is inf or NaN */

@@ -8,22 +8,22 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  *
  */
 
 /* __rem_pio2f(x,y)
- * 
- * return the remainder of x rem pi/2 in y[0]+y[1] 
+ *
+ * return the remainder of x rem pi/2 in y[0]+y[1]
  * use __kernel_rem_pio2f()
  */
 
 #include "fdlibm.h"
 
 /*
- * Table of constants for 2/pi, 396 Hex digits (476 decimal) of 2/pi 
+ * Table of constants for 2/pi, 396 Hex digits (476 decimal) of 2/pi
  */
 static const __int32_t two_over_pi[] = {
     0xA2, 0xF9, 0x83, 0x6E, 0x4E, 0x44, 0x15, 0x29, 0xFC, 0x27, 0x57, 0xD1,
@@ -157,7 +157,7 @@ __rem_pio2f(float x, float *y)
         } else
             return n;
     }
-    /* 
+    /*
      * all other (large) arguments
      */
     if (!FLT_UWORD_IS_FINITE(ix)) {

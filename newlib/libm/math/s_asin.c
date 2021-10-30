@@ -6,18 +6,18 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
 
 /* asin(x)
- * Method :                  
+ * Method :
  *	Since  asin(x) = x + x^3/6 + x^5*3/40 + x^7*15/336 + ...
  *	we approximate asin(x) on [0,0.5] by
  *		asin(x) = x + x*x^2*R(x^2)
  *	where
- *		R(x^2) is a rational approximation of (asin(x)-x)/x^3 
+ *		R(x^2) is a rational approximation of (asin(x)-x)/x^3
  *	and its remez error is bounded by
  *		|(asin(x)-x)/x^3 - R(x^2)| < 2^(-58.75)
  *

@@ -6,7 +6,7 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
@@ -27,13 +27,13 @@ SYNOPSIS
         float tanf(float <[x]>);
 
 DESCRIPTION
-<<tan>> computes the tangent of the argument <[x]>.  
-Angles are specified in radians.  
+<<tan>> computes the tangent of the argument <[x]>.
+Angles are specified in radians.
 
 <<tanf>> is identical, save that it takes and returns <<float>> values.
 
 RETURNS
-The tangent of <[x]> is returned. 
+The tangent of <[x]> is returned.
 
 PORTABILITY
 <<tan>> is ANSI. <<tanf>> is an extension.
@@ -47,8 +47,8 @@ PORTABILITY
  *	__rem_pio2	... argument reduction routine
  *
  * Method.
- *      Let S,C and T denote the sin, cos and tan respectively on 
- *	[-PI/4, +PI/4]. Reduce the argument x to y1+y2 = x-k*pi/2 
+ *      Let S,C and T denote the sin, cos and tan respectively on
+ *	[-PI/4, +PI/4]. Reduce the argument x to y1+y2 = x-k*pi/2
  *	in [-pi/4 , +pi/4], and let n = k mod 4.
  *	We have
  *
@@ -66,7 +66,7 @@ PORTABILITY
  *      trig(NaN)    is that NaN;
  *
  * Accuracy:
- *	TRIG(x) returns trig(x) nearly rounded 
+ *	TRIG(x) returns trig(x) nearly rounded
  */
 
 #include "fdlibm.h"

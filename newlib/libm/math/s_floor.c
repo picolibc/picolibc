@@ -6,7 +6,7 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
@@ -31,12 +31,12 @@ SYNOPSIS
         float ceilf(float <[x]>);
 
 DESCRIPTION
-<<floor>> and <<floorf>> find 
+<<floor>> and <<floorf>> find
 @tex
-$\lfloor x \rfloor$, 
+$\lfloor x \rfloor$,
 @end tex
 the nearest integer less than or equal to <[x]>.
-<<ceil>> and <<ceilf>> find 
+<<ceil>> and <<ceilf>> find
 @tex
 $\lceil x\rceil$,
 @end tex

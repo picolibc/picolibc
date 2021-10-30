@@ -8,7 +8,7 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
@@ -41,7 +41,7 @@ static const float tiny = 1e-30, half = 5.0000000000e-01, /* 0x3F000000 */
     qq4 = 1.3249473704e-04, /* 0x390aee49 */
     qq5 = -3.9602282413e-06, /* 0xb684e21a */
     /*
- * Coefficients for approximation to  erf  in [0.84375,1.25] 
+ * Coefficients for approximation to  erf  in [0.84375,1.25]
  */
     pa0 = -2.3621185683e-03, /* 0xbb1acdc6 */
     pa1 = 4.1485610604e-01, /* 0x3ed46805 */

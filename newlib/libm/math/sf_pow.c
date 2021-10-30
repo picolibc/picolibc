@@ -8,7 +8,7 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
@@ -147,7 +147,7 @@ powf(float x, float y)
             return (hy < 0) ? __math_oflowf(0) : __math_uflowf(0);
         if (ix > 0x3f800007)
             return (hy > 0) ? __math_oflowf(0) : __math_uflowf(0);
-        /* now |1-x| is tiny <= 2**-20, suffice to compute 
+        /* now |1-x| is tiny <= 2**-20, suffice to compute
 	   log(x) by x-x^2/2+x^3/3-x^4/4 */
         t = ax - 1; /* t has 20 trailing zeros */
         w = (t * t) *

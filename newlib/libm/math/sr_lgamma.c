@@ -6,19 +6,19 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  *
  */
 
 /* lgamma_r(x)
- * Reentrant version of the logarithm of the Gamma function 
- * with signgam for the sign of Gamma(x). 
+ * Reentrant version of the logarithm of the Gamma function
+ * with signgam for the sign of Gamma(x).
  *
  * Method:
  *   1. Argument Reduction for 0 < x <= 8
- * 	Since gamma(1+s)=s*gamma(s), for x in [0,8], we may 
+ * 	Since gamma(1+s)=s*gamma(s), for x in [0,8], we may
  * 	reduce x to a number in [1.5,2.5] by
  * 		lgamma(1+s) = log(s) + lgamma(s)
  *	for example,
@@ -56,27 +56,27 @@
  *	by
  *	  			    3       5             11
  *		w = w0 + w1*z + w2*z  + w3*z  + ... + w6*z
- *	where 
+ *	where
  *		|w - f(z)| < 2**-58.74
- *		
+ *
  *   4. For negative x, since (G is gamma function)
  *		-x*G(-x)*G(x) = pi/sin(pi*x),
  * 	we have
  * 		G(x) = pi/(sin(pi*x)*(-x)*G(-x))
  *	since G(-x) is positive, sign(G(x)) = sign(sin(pi*x)) for x<0
- *	Hence, for x<0, signgam = sign(sin(pi*x)) and 
+ *	Hence, for x<0, signgam = sign(sin(pi*x)) and
  *		lgamma(x) = log(|Gamma(x)|)
  *			  = log(pi/(|x*sin(pi*x)|)) - lgamma(-x);
- *	Note: one should avoid compute pi*(-x) directly in the 
+ *	Note: one should avoid compute pi*(-x) directly in the
  *	      computation of sin(pi*(-x)).
- *		
+ *
  *   5. Special Cases
  *		lgamma(2+s) ~ s*(1-Euler) for tiny s
  *		lgamma(1)=lgamma(2)=0
  *		lgamma(x) ~ -log(x) for tiny x
  *		lgamma(0) = lgamma(inf) = inf
  *	 	lgamma(-integer) = +-inf
- *	
+ *
  */
 
 #include "fdlibm.h"

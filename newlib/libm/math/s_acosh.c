@@ -6,7 +6,7 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  *
@@ -14,7 +14,7 @@
 
 /* acosh(x)
  * Method :
- *	Based on 
+ *	Based on
  *		acosh(x) = log [ x + sqrt(x*x-1) ]
  *	we have
  *		acosh(x) := log(x)+ln2,	if x is large; else

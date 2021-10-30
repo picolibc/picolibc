@@ -6,14 +6,14 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
 
 /*
 FUNCTION
-	<<asinh>>, <<asinhf>>---inverse hyperbolic sine 
+	<<asinh>>, <<asinhf>>---inverse hyperbolic sine
 
 INDEX
 	asinh
@@ -27,7 +27,7 @@ SYNOPSIS
 
 DESCRIPTION
 <<asinh>> calculates the inverse hyperbolic sine of <[x]>.
-<<asinh>> is defined as 
+<<asinh>> is defined as
 @ifnottex
 . sgn(<[x]>) * log(abs(<[x]>) + sqrt(1+<[x]>*<[x]>))
 @end ifnottex
@@ -47,13 +47,13 @@ Neither <<asinh>> nor <<asinhf>> are ANSI C.
 
 /* asinh(x)
  * Method :
- *	Based on 
+ *	Based on
  *		asinh(x) = sign(x) * log [ |x| + sqrt(x*x+1) ]
  *	we have
  *	asinh(x) := x  if  1+x*x=1,
  *		 := sign(x)*(log(x)+ln2)) for large |x|, else
  *		 := sign(x)*log(2|x|+1/(|x|+sqrt(x*x+1))) if|x|>2, else
- *		 := sign(x)*log1p(|x| + x^2/(1 + sqrt(1+x^2)))  
+ *		 := sign(x)*log1p(|x| + x^2/(1 + sqrt(1+x^2)))
  */
 
 #include "fdlibm.h"

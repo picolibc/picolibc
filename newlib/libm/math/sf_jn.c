@@ -8,7 +8,7 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
@@ -59,7 +59,7 @@ jnf(int n, float x)
         }
     } else {
         if (ix < 0x30800000) { /* x < 2**-29 */
-            /* x is tiny, return the first Taylor expansion of J(n,x) 
+            /* x is tiny, return the first Taylor expansion of J(n,x)
      * J(n,x) = 1/n!*(x/2)^n  - ...
      */
             if (n > 33) /* underflow */
@@ -75,14 +75,14 @@ jnf(int n, float x)
             }
         } else {
             /* use backward recurrence */
-            /* 			x      x^2      x^2       
+            /* 			x      x^2      x^2
 		 *  J(n,x)/J(n-1,x) =  ----   ------   ------   .....
 		 *			2n  - 2(n+1) - 2(n+2)
 		 *
-		 * 			1      1        1       
+		 * 			1      1        1
 		 *  (for large x)   =  ----  ------   ------   .....
 		 *			2n   2(n+1)   2(n+2)
-		 *			-- - ------ - ------ - 
+		 *			-- - ------ - ------ -
 		 *			 x     x         x
 		 *
 		 * Let w = 2n/x and h=2/x, then the above quotient
@@ -98,9 +98,9 @@ jnf(int n, float x)
 		 * To determine how many terms needed, let
 		 * Q(0) = w, Q(1) = w(w+h) - 1,
 		 * Q(k) = (w+k*h)*Q(k-1) - Q(k-2),
-		 * When Q(k) > 1e4	good for single 
-		 * When Q(k) > 1e9	good for double 
-		 * When Q(k) > 1e17	good for quadruple 
+		 * When Q(k) > 1e4	good for single
+		 * When Q(k) > 1e9	good for double
+		 * When Q(k) > 1e17	good for quadruple
 		 */
             /* determine k */
             float t, v;
@@ -129,7 +129,7 @@ jnf(int n, float x)
 		 *  single 8.8722839355e+01
 		 *  double 7.09782712893383973096e+02
 		 *  long double 1.1356523406294143949491931077970765006170e+04
-		 *  then recurrent value may overflow and the result is 
+		 *  then recurrent value may overflow and the result is
 		 *  likely underflow to zero
 		 */
             tmp = n;

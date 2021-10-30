@@ -6,7 +6,7 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
@@ -14,12 +14,12 @@
 /*
  * __kernel_rem_pio2(x,y,e0,nx,prec,ipio2)
  * double x[],y[]; int e0,nx,prec; int ipio2[];
- * 
- * __kernel_rem_pio2 return the last three digits of N with 
+ *
+ * __kernel_rem_pio2 return the last three digits of N with
  *		y = x - N*pi/2
  * so that |y| < pi/2.
  *
- * The method is to compute the integer (mod 8) and fraction parts of 
+ * The method is to compute the integer (mod 8) and fraction parts of
  * (2/pi)*x without doing the full multiplication. In general we
  * skip the part of the product that are known to be a huge integer (
  * more accurately, = 0 mod 8 ). Thus the number of operations are
@@ -28,10 +28,10 @@
  * (2/pi) is represented by an array of 24-bit integers in ipio2[].
  *
  * Input parameters:
- * 	x[]	The input value (must be positive) is broken into nx 
+ * 	x[]	The input value (must be positive) is broken into nx
  *		pieces of 24-bit integers in double precision format.
- *		x[i] will be the i-th 24 bit of x. The scaled exponent 
- *		of x[0] is given in input parameter e0 (i.e., x[0]*2^e0 
+ *		x[i] will be the i-th 24 bit of x. The scaled exponent
+ *		of x[0] is given in input parameter e0 (i.e., x[0]*2^e0
  *		match x's up to 24 bits.
  *
  *		Example of breaking a double positive z into x[0]+x[1]+x[2]:
@@ -68,8 +68,8 @@
  *			3	113 bits (quad)
  *
  *	ipio2[]
- *		integer array, contains the (24*i)-th to (24*i+23)-th 
- *		bit of 2/pi after binary point. The corresponding 
+ *		integer array, contains the (24*i)-th to (24*i+23)-th
+ *		bit of 2/pi after binary point. The corresponding
  *		floating value is
  *
  *			ipio2[i] * 2^(-24(i+1)).
@@ -84,8 +84,8 @@
  *		in the computation. The recommended value is 2,3,4,
  *		6 for single, double, extended,and quad.
  *
- * 	jz	local integer variable indicating the number of 
- *		terms of ipio2[] used. 
+ * 	jz	local integer variable indicating the number of
+ *		terms of ipio2[] used.
  *
  *	jx	nx - 1
  *
@@ -105,9 +105,9 @@
  *		exponent for q[i] would be q0-24*i.
  *
  *	PIo2[]	double precision array, obtained by cutting pi/2
- *		into 24 bits chunks. 
+ *		into 24 bits chunks.
  *
- *	f[]	ipio2[] in floating point 
+ *	f[]	ipio2[] in floating point
  *
  *	iq[]	integer array by breaking up q[] in 24-bits chunk.
  *
@@ -120,9 +120,9 @@
 
 /*
  * Constants:
- * The hexadecimal values are the intended ones for the following 
- * constants. The decimal values may be used, provided that the 
- * compiler will convert from decimal to binary accurately enough 
+ * The hexadecimal values are the intended ones for the following
+ * constants. The decimal values may be used, provided that the
+ * compiler will convert from decimal to binary accurately enough
  * to produce the hexadecimal values shown.
  */
 

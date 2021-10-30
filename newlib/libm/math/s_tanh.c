@@ -6,7 +6,7 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
@@ -29,11 +29,11 @@ SYNOPSIS
 DESCRIPTION
 
 <<tanh>> computes the hyperbolic tangent of
-the argument <[x]>.  Angles are specified in radians.  
+the argument <[x]>.  Angles are specified in radians.
 
-<<tanh(<[x]>)>> is defined as 
+<<tanh(<[x]>)>> is defined as
 . sinh(<[x]>)/cosh(<[x]>)
-	
+
 <<tanhf>> is identical, save that it takes and returns <<float>> values.
 
 RETURNS

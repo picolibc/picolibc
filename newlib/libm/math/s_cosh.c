@@ -6,24 +6,24 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
 
 /* cosh(x)
- * Method : 
+ * Method :
  * mathematically cosh(x) if defined to be (exp(x)+exp(-x))/2
- *	1. Replace x by |x| (cosh(x) = cosh(-x)). 
- *	2. 
- *		                                        [ exp(x) - 1 ]^2 
+ *	1. Replace x by |x| (cosh(x) = cosh(-x)).
+ *	2.
+ *		                                        [ exp(x) - 1 ]^2
  *	    0        <= x <= ln2/2  :  cosh(x) := 1 + -------------------
  *			       			           2*exp(x)
  *
  *		                                  exp(x) +  1/exp(x)
  *	    ln2/2    <= x <= 22     :  cosh(x) := -------------------
  *			       			          2
- *	    22       <= x <= lnovft :  cosh(x) := exp(x)/2 
+ *	    22       <= x <= lnovft :  cosh(x) := exp(x)/2
  *	    lnovft   <= x <= ln2ovft:  cosh(x) := exp(x/2)/2 * exp(x/2)
  *	    ln2ovft  <  x	    :  cosh(x) := overflow
  *

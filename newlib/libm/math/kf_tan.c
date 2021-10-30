@@ -8,7 +8,7 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
@@ -79,7 +79,7 @@ __kernel_tanf(float x, float y, int iy)
     }
     if (iy == 1)
         return w;
-    else { /* if allow error up to 2 ulp, 
+    else { /* if allow error up to 2 ulp,
 			   simply return -1.0/(x+r) here */
         /*  compute -1.0/(x+r) accurately */
         float a, t;

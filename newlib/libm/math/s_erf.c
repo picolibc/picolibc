@@ -6,14 +6,14 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
 
 /*
 FUNCTION
-        <<erf>>, <<erff>>, <<erfc>>, <<erfcf>>---error function 
+        <<erf>>, <<erff>>, <<erfc>>, <<erfcf>>---error function
 INDEX
 	erf
 INDEX
@@ -61,11 +61,11 @@ PORTABILITY
  *			     x
  *		      2      |\
  *     erf(x)  =  ---------  | exp(-t*t)dt
- *	 	   sqrt(pi) \| 
+ *	 	   sqrt(pi) \|
  *			     0
  *
  *     erfc(x) =  1-erf(x)
- *  Note that 
+ *  Note that
  *		erf(-x) = -erf(x)
  *		erfc(-x) = 2 - erfc(x)
  *
@@ -78,7 +78,7 @@ PORTABILITY
  *	   Q is an odd poly of degree 10.
  *						 -57.90
  *			| R - (erf(x)-x)/x | <= 2
- *	
+ *
  *
  *	   Remark. The formula is derived by noting
  *          erf(x) = (2/sqrt(pi))*(x - x^3/3 + x^5/10 - x^7/42 + ....)
@@ -101,14 +101,14 @@ PORTABILITY
  *	   That is, we use rational approximation to approximate
  *			erf(1+s) - (c = (single)0.84506291151)
  *	   Note that |P1/Q1|< 0.078 for x in [0.84375,1.25]
- *	   where 
+ *	   where
  *		P1(s) = degree 6 poly in s
  *		Q1(s) = degree 6 poly in s
  *
- *      3. For x in [1.25,1/0.35(~2.857143)], 
+ *      3. For x in [1.25,1/0.35(~2.857143)],
  *         	erfc(x) = (1/x)*exp(-x*x-0.5625+R1/S1)
  *         	erf(x)  = 1 - erfc(x)
- *	   where 
+ *	   where
  *		R1(z) = degree 7 poly in z, (z=1/x^2)
  *		S1(z) = degree 8 poly in z
  *
@@ -126,7 +126,7 @@ PORTABILITY
  *	   To compute exp(-x*x-0.5625+R/S), let s be a single
  *	   precision number and s := x; then
  *		-x*x = -s*s + (s-x)*(s+x)
- *	        exp(-x*x-0.5626+R/S) = 
+ *	        exp(-x*x-0.5626+R/S) =
  *			exp(-s*s-0.5625)*exp((s-x)*(s+x)+R/S);
  *      Note2:
  *	   Here 4 and 5 make use of the asymptotic series
@@ -146,7 +146,7 @@ PORTABILITY
  *
  *      7. Special case:
  *         	erf(0)  = 0, erf(inf)  = 1, erf(-inf) = -1,
- *         	erfc(0) = 1, erfc(inf) = 0, erfc(-inf) = 2, 
+ *         	erfc(0) = 1, erfc(inf) = 0, erfc(-inf) = 2,
  *	   	erfc/erf(NaN) is NaN
  */
 
@@ -178,7 +178,7 @@ static const double tiny = 1e-300,
     qq4 = 1.32494738004321644526e-04, /* 0x3F215DC9, 0x221C1A10 */
     qq5 = -3.96022827877536812320e-06, /* 0xBED09C43, 0x42A26120 */
     /*
- * Coefficients for approximation to  erf  in [0.84375,1.25] 
+ * Coefficients for approximation to  erf  in [0.84375,1.25]
  */
     pa0 = -2.36211856075265944077e-03, /* 0xBF6359B8, 0xBEF77538 */
     pa1 = 4.14856118683748331666e-01, /* 0x3FDA8D00, 0xAD92B34D */
