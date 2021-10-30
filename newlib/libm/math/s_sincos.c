@@ -16,10 +16,11 @@ extern double _cos(double);
 #define _cos cos
 #endif
 
-	void sincos(double x, double *sinx, double *cosx)
+void
+sincos(double x, double *sinx, double *cosx)
 {
-  *sinx = _sin (x);
-  *cosx = _cos (x);
+    *sinx = _sin(x);
+    *cosx = _cos(x);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

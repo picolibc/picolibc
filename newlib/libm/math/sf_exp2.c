@@ -22,16 +22,18 @@
 #include <errno.h>
 #include <math.h>
 
-	float exp2f(float x)		/* wrapper exp2f */
+float
+exp2f(float x) /* wrapper exp2f */
 {
-  return powf(2.0, x);
+    return powf(2.0, x);
 }
 
 #ifdef _DOUBLE_IS_32BITS
 
-	double exp2(double x)
+double
+exp2(double x)
 {
-	return (double) exp2f((float) x);
+    return (double)exp2f((float)x);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

@@ -14,18 +14,20 @@ extern float _cosf(float);
 #define _cosf cosf
 #endif
 
-	void sincosf(float x, float *sinx, float *cosx)
+void
+sincosf(float x, float *sinx, float *cosx)
 {
-  *sinx = _sinf (x);
-  *cosx = _cosf (x);
+    *sinx = _sinf(x);
+    *cosx = _cosf(x);
 }
 
 #ifdef _DOUBLE_IS_32BITS
 
-	void sincos(double x, double *sinx, double *cosx)
+void
+sincos(double x, double *sinx, double *cosx)
 {
-  *sinx = _sinf((float) x);
-  *cosx = _cosf((float) x);
+    *sinx = _sinf((float)x);
+    *cosx = _cosf((float)x);
 }
 #endif /* defined(_DOUBLE_IS_32BITS) */
 #endif /* __OBSOLETE_MATH_FLOAT */

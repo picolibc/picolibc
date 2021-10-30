@@ -20,45 +20,47 @@
 #define const
 #endif
 
-static const float one = 1.0, half=0.5;
+static const float one = 1.0, half = 0.5;
 
+float
+__ieee754_coshf(float x)
+{
+    float t, w;
+    __int32_t ix;
 
-	float __ieee754_coshf(float x)
-{	
-	float t,w;
-	__int32_t ix;
-
-	GET_FLOAT_WORD(ix,x);
-	ix &= 0x7fffffff;
+    GET_FLOAT_WORD(ix, x);
+    ix &= 0x7fffffff;
 
     /* x is INF or NaN */
-	if(!FLT_UWORD_IS_FINITE(ix)) return x*x;	
+    if (!FLT_UWORD_IS_FINITE(ix))
+        return x * x;
 
     /* |x| in [0,0.5*ln2], return 1+expm1(|x|)^2/(2*exp(|x|)) */
-	if(ix<0x3eb17218) {
-	    t = expm1f(fabsf(x));
-	    w = one+t;
-	    if (ix<0x24000000) return w;	/* cosh(tiny) = 1 */
-	    return one+(t*t)/(w+w);
-	}
+    if (ix < 0x3eb17218) {
+        t = expm1f(fabsf(x));
+        w = one + t;
+        if (ix < 0x24000000)
+            return w; /* cosh(tiny) = 1 */
+        return one + (t * t) / (w + w);
+    }
 
     /* |x| in [0.5*ln2,22], return (exp(|x|)+1/exp(|x|)/2; */
-	if (ix < 0x41b00000) {
-		t = __ieee754_expf(fabsf(x));
-		return half*t+half/t;
-	}
+    if (ix < 0x41b00000) {
+        t = __ieee754_expf(fabsf(x));
+        return half * t + half / t;
+    }
 
     /* |x| in [22, log(maxdouble)] return half*exp(|x|) */
-	if (ix <= FLT_UWORD_LOG_MAX)
-	  return half*__ieee754_expf(fabsf(x));
+    if (ix <= FLT_UWORD_LOG_MAX)
+        return half * __ieee754_expf(fabsf(x));
 
     /* |x| in [log(maxdouble), overflowthresold] */
-	if (ix <= FLT_UWORD_LOG_2MAX) {
-	    w = __ieee754_expf(half*fabsf(x));
-	    t = half*w;
-	    return t*w;
-	}
+    if (ix <= FLT_UWORD_LOG_2MAX) {
+        w = __ieee754_expf(half * fabsf(x));
+        t = half * w;
+        return t * w;
+    }
 
     /* |x| > overflowthresold, cosh(x) overflow */
-	return __math_oflowf(0);
+    return __math_oflowf(0);
 }

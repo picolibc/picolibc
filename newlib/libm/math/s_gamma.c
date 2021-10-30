@@ -140,9 +140,10 @@ in terms of the base return values, although the <[signgam]> global for
 
 #ifndef _DOUBLE_IS_32BITS
 
-	double gamma(double x)
+double
+gamma(double x)
 {
-	return lgamma(x);
+    return lgamma(x);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

@@ -17,16 +17,18 @@
 #include "fdlibm.h"
 #include <errno.h>
 
-	float gammaf(float x)
+float
+gammaf(float x)
 {
-	return lgammaf(x);
+    return lgammaf(x);
 }
 
 #ifdef _DOUBLE_IS_32BITS
 
-	double gamma(double x)
+double
+gamma(double x)
 {
-	return (double) lgammaf((float) x);
+    return (double)lgammaf((float)x);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

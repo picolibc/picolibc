@@ -20,12 +20,12 @@
 
 #include "fdlibm.h"
 
-
-	double __ieee754_tgamma(double x)
+double
+__ieee754_tgamma(double x)
 {
-	int signgam_local = 1;
-	double y = __ieee754_exp(___ieee754_lgamma_r(x, &signgam_local));
-	if (signgam_local < 0)
-		y = -y;
-	return y;
+    int signgam_local = 1;
+    double y = __ieee754_exp(___ieee754_lgamma_r(x, &signgam_local));
+    if (signgam_local < 0)
+        y = -y;
+    return y;
 }

@@ -21,9 +21,10 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
-	double significand(double x)
+double
+significand(double x)
 {
-	return __ieee754_scalb(x,(double) -ilogb(x));
+    return __ieee754_scalb(x, (double)-ilogb(x));
 }
 
 #endif /* _DOUBLE_IS_32BITS */

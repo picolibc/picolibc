@@ -22,12 +22,12 @@
 
 #include "fdlibm.h"
 
-
-	float __ieee754_tgammaf(float x)
+float
+__ieee754_tgammaf(float x)
 {
-	int signgam_local = 1;
-	float y = __ieee754_expf(___ieee754_lgammaf_r(x, &signgam_local));
-	if (signgam_local < 0)
-		y = -y;
-	return y;
+    int signgam_local = 1;
+    float y = __ieee754_expf(___ieee754_lgammaf_r(x, &signgam_local));
+    if (signgam_local < 0)
+        y = -y;
+    return y;
 }

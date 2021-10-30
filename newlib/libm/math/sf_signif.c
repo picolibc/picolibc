@@ -15,16 +15,18 @@
 
 #include "fdlibm.h"
 
-	float significandf(float x)
+float
+significandf(float x)
 {
-	return __ieee754_scalbf(x,(float) -ilogbf(x));
+    return __ieee754_scalbf(x, (float)-ilogbf(x));
 }
 
 #ifdef _DOUBLE_IS_32BITS
 
-	double significand(double x)
+double
+significand(double x)
 {
-	return (double) significandf((float) x);
+    return (double)significandf((float)x);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

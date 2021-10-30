@@ -55,9 +55,10 @@ PORTABILITY
 
 #ifndef _DOUBLE_IS_32BITS
 
-	double exp2(double x)		/* wrapper exp2 */
+double
+exp2(double x) /* wrapper exp2 */
 {
-  return pow(2.0, x);
+    return pow(2.0, x);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

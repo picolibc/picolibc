@@ -15,36 +15,38 @@
 
 #include "fdlibm.h"
 
-static const float
-two25      =  3.3554432000e+07, /* 0x4c000000 */
-ivln10     =  4.3429449201e-01, /* 0x3ede5bd9 */
-log10_2hi  =  3.0102920532e-01, /* 0x3e9a2080 */
-log10_2lo  =  7.9034151668e-07; /* 0x355427db */
+static const float two25 = 3.3554432000e+07, /* 0x4c000000 */
+    ivln10 = 4.3429449201e-01, /* 0x3ede5bd9 */
+    log10_2hi = 3.0102920532e-01, /* 0x3e9a2080 */
+    log10_2lo = 7.9034151668e-07; /* 0x355427db */
 
-static const float zero   =  0.0;
+static const float zero = 0.0;
 
-
-	float __ieee754_log10f(float x)
+float
+__ieee754_log10f(float x)
 {
-	float y,z;
-	__int32_t i,k,hx;
+    float y, z;
+    __int32_t i, k, hx;
 
-	GET_FLOAT_WORD(hx,x);
+    GET_FLOAT_WORD(hx, x);
 
-        k=0;
-        if (FLT_UWORD_IS_ZERO(hx&0x7fffffff))
-	    return -two25/(x-x);             /* log(+-0)=-inf */
-        if (hx<0) return (x-x)/zero;        /* log(-#) = NaN */
-	if (!FLT_UWORD_IS_FINITE(hx)) return x+x;
-        if (FLT_UWORD_IS_SUBNORMAL(hx)) {
-            k -= 25; x *= two25; /* subnormal number, scale up x */
-	    GET_FLOAT_WORD(hx,x);
-        }
-	k += (hx>>23)-127;
-	i  = ((__uint32_t)k&0x80000000)>>31;
-        hx = (hx&0x007fffff)|((0x7f-i)<<23);
-        y  = (float)(k+i);
-	SET_FLOAT_WORD(x,hx);
-	z  = y*log10_2lo + ivln10*__ieee754_logf(x);
-	return  z+y*log10_2hi;
+    k = 0;
+    if (FLT_UWORD_IS_ZERO(hx & 0x7fffffff))
+        return -two25 / (x - x); /* log(+-0)=-inf */
+    if (hx < 0)
+        return (x - x) / zero; /* log(-#) = NaN */
+    if (!FLT_UWORD_IS_FINITE(hx))
+        return x + x;
+    if (FLT_UWORD_IS_SUBNORMAL(hx)) {
+        k -= 25;
+        x *= two25; /* subnormal number, scale up x */
+        GET_FLOAT_WORD(hx, x);
+    }
+    k += (hx >> 23) - 127;
+    i = ((__uint32_t)k & 0x80000000) >> 31;
+    hx = (hx & 0x007fffff) | ((0x7f - i) << 23);
+    y = (float)(k + i);
+    SET_FLOAT_WORD(x, hx);
+    z = y * log10_2lo + ivln10 * __ieee754_logf(x);
+    return z + y * log10_2hi;
 }
