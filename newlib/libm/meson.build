@@ -80,11 +80,13 @@ foreach target : targets
     libmpart_name = 'mpart' + '_' + target
   endif
 
-  local_lib_mpart_target = static_library(libmpart_name,
-					  pic: false,
-					  objects : libobjs,
-					  include_directories: inc,
-					  c_args: value[1] + ['-D_COMPILING_NEWLIB'])
-  set_variable('lib_mpart' + target, local_lib_mpart_target)
+  if libobjs != []
+    local_lib_mpart_target = static_library(libmpart_name,
+					    pic: false,
+					    objects : libobjs,
+					    include_directories: inc,
+					    c_args: value[1] + ['-D_COMPILING_NEWLIB'])
+    set_variable('lib_mpart' + target, local_lib_mpart_target)
+  endif
 endforeach
 
