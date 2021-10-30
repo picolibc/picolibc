@@ -24,26 +24,27 @@
  * SUCH DAMAGE.
  */
 
-#if (__ARM_FP & 0x8) && !defined(__SOFTFP__)
+#if (__ARM_FP & 0x4) && !defined(__SOFTFP__)
 #include "fdlibm.h"
+#include <stdio.h>
 
-#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
-__strong_reference(__ieee754_sqrt, sqrt);
-#endif
-
-double
-__ieee754_sqrt(double x)
+float
+sqrtf(float x)
 {
-	double result;
+	float result;
+#ifdef _WANT_MATH_ERRNO
+        if (x < 0)
+            errno = EDOM;
+#endif
 #if __ARM_ARCH >= 6
-	__asm__("vsqrt.f64 %P0, %P1" : "=w" (result) : "w" (x));
+	__asm__("vsqrt.f32 %0, %1" : "=w" (result) : "w" (x));
 #else
 	/* VFP9 Erratum 760019, see GCC sources "gcc/config/arm/vfp.md" */
-	__asm__("vsqrt.f64 %P0, %P1" : "=&w" (result) : "w" (x));
+	__asm__("vsqrt.f32 %0, %1" : "=&w" (result) : "w" (x));
 #endif
 	return result;
 }
 
 #else
-#include "../../math/e_sqrt.c"
+#include "../../math/sf_sqrt.c"
 #endif
