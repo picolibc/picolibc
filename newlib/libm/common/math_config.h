@@ -384,6 +384,8 @@ HIDDEN double __math_invalid (double);
 /* Error handling using output checking, only for errno setting.  */
 
 /* Check if the result overflowed to infinity.  */
+HIDDEN float __math_check_oflowf (float);
+/* Check if the result overflowed to infinity.  */
 HIDDEN double __math_check_oflow (double);
 /* Check if the result underflowed to 0.  */
 HIDDEN double __math_check_uflow (double);
