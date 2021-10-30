@@ -38,7 +38,7 @@ P4   = -1.6533901999e-06, /* 0xb5ddea0e */
 P5   =  4.1381369442e-08; /* 0x3331bb4c */
 
 float
-__ieee754_expf(float x) /* default IEEE double exp */
+expf(float x) /* default IEEE double exp */
 {
     float y, hi, lo, c, t;
     __int32_t k = 0, xsb, sx;

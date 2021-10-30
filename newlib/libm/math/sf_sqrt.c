@@ -18,7 +18,7 @@
 static const volatile float one = 1.0, tiny = 1.0e-30;
 
 float
-__ieee754_sqrtf(float x)
+sqrtf(float x)
 {
     float z;
     __uint32_t r, hx;

@@ -11,7 +11,7 @@
  * ====================================================
  */
 
-/* __ieee754_log(x)
+/* log(x)
  * Return the logrithm of x
  *
  * Method :                  
@@ -81,7 +81,7 @@ static const double ln2_hi = 6.93147180369123816490e-01, /* 3fe62e42 fee00000 */
 static const double zero = 0.0;
 
 double
-__ieee754_log(double x)
+log(double x)
 {
     double hfsq, f, s, z, R, w, t1, t2, dk;
     __int32_t k, hx, i, j;

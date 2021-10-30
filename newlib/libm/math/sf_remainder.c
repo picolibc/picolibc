@@ -18,7 +18,7 @@
 static const float zero = 0.0;
 
 float
-__ieee754_remainderf(float x, float p)
+remainderf(float x, float p)
 {
     __int32_t hx, hp;
     __uint32_t sx;
@@ -36,7 +36,7 @@ __ieee754_remainderf(float x, float p)
         return (x * p) / (x * p);
 
     if (hp <= FLT_UWORD_HALF_MAX)
-        x = __ieee754_fmodf(x, p + p); /* now x < 2p */
+        x = fmodf(x, p + p); /* now x < 2p */
     if ((hx - hp) == 0)
         return zero * x;
     x = fabsf(x);

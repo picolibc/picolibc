@@ -34,7 +34,7 @@ static const float huge = 1e30, one = 1.0,
 static const float zero = 0.0;
 
 float
-__ieee754_j1f(float x)
+j1f(float x)
 {
     float z, s, c, ss, cc, r, u, v, y;
     __int32_t hx, ix;
@@ -61,11 +61,11 @@ __ieee754_j1f(float x)
 	 * y1(x) = 1/sqrt(pi) * (P(1,x)*ss + Q(1,x)*cc) / sqrt(x)
 	 */
         if (ix > 0x5c000000)
-            z = (invsqrtpi * cc) / __ieee754_sqrtf(y);
+            z = (invsqrtpi * cc) / sqrtf(y);
         else {
             u = ponef(y);
             v = qonef(y);
-            z = invsqrtpi * (u * cc - v * ss) / __ieee754_sqrtf(y);
+            z = invsqrtpi * (u * cc - v * ss) / sqrtf(y);
         }
         if (hx < 0)
             return -z;
@@ -99,7 +99,7 @@ static const float V0[5] = {
 };
 
 float
-__ieee754_y1f(float x)
+y1f(float x)
 {
     float z, s, c, ss, cc, u, v;
     __int32_t hx, ix;
@@ -137,11 +137,11 @@ __ieee754_y1f(float x)
          * to compute the worse one.
          */
         if (ix > 0x5c000000)
-            z = (invsqrtpi * ss) / __ieee754_sqrtf(x);
+            z = (invsqrtpi * ss) / sqrtf(x);
         else {
             u = ponef(x);
             v = qonef(x);
-            z = invsqrtpi * (u * ss + v * cc) / __ieee754_sqrtf(x);
+            z = invsqrtpi * (u * ss + v * cc) / sqrtf(x);
         }
         return z;
     }
@@ -151,8 +151,7 @@ __ieee754_y1f(float x)
     z = x * x;
     u = U0[0] + z * (U0[1] + z * (U0[2] + z * (U0[3] + z * U0[4])));
     v = one + z * (V0[0] + z * (V0[1] + z * (V0[2] + z * (V0[3] + z * V0[4]))));
-    return (x * (u / v) +
-            tpi * (__ieee754_j1f(x) * __ieee754_logf(x) - one / x));
+    return (x * (u / v) + tpi * (j1f(x) * logf(x) - one / x));
 }
 
 /* For x >= 8, the asymptotic expansions of pone is

@@ -11,7 +11,7 @@
  * ====================================================
  */
 
-/* __ieee754_acos(x)
+/* acos(x)
  * Method :                  
  *	acos(x)  = pi/2 - asin(x)
  *	acos(-x) = pi/2 + asin(x)
@@ -56,7 +56,7 @@ static const double one =
     qS4 = 7.70381505559019352791e-02; /* 0x3FB3B8C5, 0xB12E9282 */
 
 double
-__ieee754_acos(double x)
+acos(double x)
 {
     double z, p, q, r, w, s, c, df;
     __int32_t hx, ix;
@@ -85,13 +85,13 @@ __ieee754_acos(double x)
         z = (one + x) * 0.5;
         p = z * (pS0 + z * (pS1 + z * (pS2 + z * (pS3 + z * (pS4 + z * pS5)))));
         q = one + z * (qS1 + z * (qS2 + z * (qS3 + z * qS4)));
-        s = __ieee754_sqrt(z);
+        s = sqrt(z);
         r = p / q;
         w = r * s - pio2_lo;
         return pi - 2.0 * (s + w);
     } else { /* x > 0.5 */
         z = (one - x) * 0.5;
-        s = __ieee754_sqrt(z);
+        s = sqrt(z);
         df = s;
         SET_LOW_WORD(df, 0);
         c = (z - df * df) / (s + df);

@@ -12,7 +12,7 @@
  *
  */
 
-/* __ieee754_lgamma_r(x)
+/* lgamma_r(x)
  * Reentrant version of the logarithm of the Gamma function 
  * with signgam for the sign of Gamma(x). 
  *
@@ -210,7 +210,7 @@ sin_pi(double x)
 }
 
 double
-___ieee754_lgamma_r(double x, int *signgamp)
+_lgamma_r(double x, int *signgamp)
 {
     double t, y, z, nadj = 0.0, p, p1, p2, p3, q, r, w;
     __int32_t i, hx, lx, ix;
@@ -234,9 +234,9 @@ ___ieee754_lgamma_r(double x, int *signgamp)
     if (ix < 0x3b900000) { /* |x|<2**-70, return -log(|x|) */
         if (hx < 0) {
             *signgamp = -1;
-            return -__ieee754_log(-x);
+            return -log(-x);
         } else
-            return -__ieee754_log(x);
+            return -log(x);
     }
     if (hx < 0) {
         if (ix >= 0x43300000) { /* |x|>=2**52, must be -integer */
@@ -252,7 +252,7 @@ ___ieee754_lgamma_r(double x, int *signgamp)
             else
                 return one / (x - x); /* -integer */
         }
-        nadj = __ieee754_log(pi / fabs(t * x));
+        nadj = log(pi / fabs(t * x));
         if (t < zero)
             *signgamp = -1;
         x = -x;
@@ -264,7 +264,7 @@ ___ieee754_lgamma_r(double x, int *signgamp)
     /* for x < 2.0 */
     else if (ix < 0x40000000) {
         if (ix <= 0x3feccccc) { /* lgamma(x) = lgamma(x+1)-log(x) */
-            r = -__ieee754_log(x);
+            r = -log(x);
             if (ix >= 0x3FE76944) {
                 y = one - x;
                 i = 0;
@@ -333,27 +333,27 @@ ___ieee754_lgamma_r(double x, int *signgamp)
             z *= (y + 3.0); /* FALLTHRU */
         case 3:
             z *= (y + 2.0); /* FALLTHRU */
-            r += __ieee754_log(z);
+            r += log(z);
             break;
         }
         /* 8.0 <= x < 2**58 */
     } else if (ix < 0x43900000) {
-        t = __ieee754_log(x);
+        t = log(x);
         z = one / x;
         y = z * z;
         w = w0 + z * (w1 + y * (w2 + y * (w3 + y * (w4 + y * (w5 + y * w6)))));
         r = (x - half) * (t - one) + w;
     } else
         /* 2**58 <= x <= inf */
-        r = x * (__ieee754_log(x) - one);
+        r = x * (log(x) - one);
     if (hx < 0)
         r = nadj - r;
     return r;
 }
 
 double
-__ieee754_lgamma_r(double x, int *signgamp)
+lgamma_r(double x, int *signgamp)
 {
     *signgamp = 0;
-    return ___ieee754_lgamma_r(x, signgamp);
+    return _lgamma_r(x, signgamp);
 }

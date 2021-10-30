@@ -23,7 +23,7 @@
 static const float one = 1.0, half = 0.5;
 
 float
-__ieee754_coshf(float x)
+coshf(float x)
 {
     float t, w;
     __int32_t ix;
@@ -46,17 +46,17 @@ __ieee754_coshf(float x)
 
     /* |x| in [0.5*ln2,22], return (exp(|x|)+1/exp(|x|)/2; */
     if (ix < 0x41b00000) {
-        t = __ieee754_expf(fabsf(x));
+        t = expf(fabsf(x));
         return half * t + half / t;
     }
 
     /* |x| in [22, log(maxdouble)] return half*exp(|x|) */
     if (ix <= FLT_UWORD_LOG_MAX)
-        return half * __ieee754_expf(fabsf(x));
+        return half * expf(fabsf(x));
 
     /* |x| in [log(maxdouble), overflowthresold] */
     if (ix <= FLT_UWORD_LOG_2MAX) {
-        w = __ieee754_expf(half * fabsf(x));
+        w = expf(half * fabsf(x));
         t = half * w;
         return t * w;
     }

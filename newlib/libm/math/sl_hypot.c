@@ -9,10 +9,10 @@
 #if !defined(_LDBL_EQ_DBL) || !defined(HAVE_ALIAS_ATTRIBUTE)
 
 long double
-__ieee754_hypotl(long double x, long double y)
+hypotl(long double x, long double y)
 {
 #ifdef _LDBL_EQ_DBL
-    return __ieee754_hypot(x, y);
+    return hypot(x, y);
 #else
     /* Keep it simple for now...  */
     return sqrtl((x * x) + (y * y));

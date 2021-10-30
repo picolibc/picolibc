@@ -12,19 +12,19 @@
  *
  */
 
-/* __ieee754_tgamma(x)
+/* tgamma(x)
  * Gamma function. Returns gamma(x)
  *
- * Method: See __ieee754_lgamma_r
+ * Method: See lgamma_r
  */
 
 #include "fdlibm.h"
 
 double
-__ieee754_tgamma(double x)
+tgamma(double x)
 {
     int signgam_local = 1;
-    double y = __ieee754_exp(___ieee754_lgamma_r(x, &signgam_local));
+    double y = exp(lgamma_r(x, &signgam_local));
     if (signgam_local < 0)
         y = -y;
     return y;

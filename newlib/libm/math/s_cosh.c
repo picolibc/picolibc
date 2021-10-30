@@ -11,7 +11,7 @@
  * ====================================================
  */
 
-/* __ieee754_cosh(x)
+/* cosh(x)
  * Method : 
  * mathematically cosh(x) if defined to be (exp(x)+exp(-x))/2
  *	1. Replace x by |x| (cosh(x) = cosh(-x)). 
@@ -40,7 +40,7 @@
 static const double one = 1.0, half = 0.5;
 
 double
-__ieee754_cosh(double x)
+cosh(double x)
 {
     double t, w;
     __int32_t ix;
@@ -65,18 +65,18 @@ __ieee754_cosh(double x)
 
     /* |x| in [0.5*ln2,22], return (exp(|x|)+1/exp(|x|)/2; */
     if (ix < 0x40360000) {
-        t = __ieee754_exp(fabs(x));
+        t = exp(fabs(x));
         return half * t + half / t;
     }
 
     /* |x| in [22, log(maxdouble)] return half*exp(|x|) */
     if (ix < 0x40862E42)
-        return half * __ieee754_exp(fabs(x));
+        return half * exp(fabs(x));
 
     /* |x| in [log(maxdouble), overflowthresold] */
     GET_LOW_WORD(lx, x);
     if (ix < 0x408633CE || (ix == 0x408633ce && lx <= (__uint32_t)0x8fb9f87d)) {
-        w = __ieee754_exp(half * fabs(x));
+        w = exp(half * fabs(x));
         t = half * w;
         return t * w;
     }

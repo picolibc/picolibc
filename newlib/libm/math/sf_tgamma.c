@@ -14,19 +14,19 @@
  *
  */
 
-/* __ieee754_tgammaf(x)
+/* tgammaf(x)
  * Float version the Gamma function. Returns gamma(x)
  *
- * Method: See __ieee754_lgammaf
+ * Method: See lgammaf
  */
 
 #include "fdlibm.h"
 
 float
-__ieee754_tgammaf(float x)
+tgammaf(float x)
 {
     int signgam_local = 1;
-    float y = __ieee754_expf(___ieee754_lgammaf_r(x, &signgam_local));
+    float y = expf(lgammaf_r(x, &signgam_local));
     if (signgam_local < 0)
         y = -y;
     return y;

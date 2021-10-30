@@ -18,7 +18,7 @@
 static const float one = 1.0, shuge = 1.0e37;
 
 float
-__ieee754_sinhf(float x)
+sinhf(float x)
 {
     float t, w, h;
     __int32_t ix, jx;
@@ -46,11 +46,11 @@ __ieee754_sinhf(float x)
 
     /* |x| in [22, log(maxdouble)] return 0.5*exp(|x|) */
     if (ix <= FLT_UWORD_LOG_MAX)
-        return h * __ieee754_expf(fabsf(x));
+        return h * expf(fabsf(x));
 
     /* |x| in [log(maxdouble), overflowthresold] */
     if (ix <= FLT_UWORD_LOG_2MAX) {
-        w = __ieee754_expf((float)0.5 * fabsf(x));
+        w = expf((float)0.5 * fabsf(x));
         t = h * w;
         return t * w;
     }

@@ -158,8 +158,8 @@ erff(float x)
     }
     GET_FLOAT_WORD(ix, x);
     SET_FLOAT_WORD(z, ix & 0xfffff000);
-    r = __ieee754_expf(-z * z - (float)0.5625) *
-        __ieee754_expf((z - x) * (z + x) + R / S);
+    r = expf(-z * z - (float)0.5625) *
+        expf((z - x) * (z + x) + R / S);
     if (hx >= 0)
         return one - r / x;
     else
@@ -237,8 +237,8 @@ erfcf(float x)
         }
         GET_FLOAT_WORD(ix, x);
         SET_FLOAT_WORD(z, ix & 0xfffff000);
-        r = __ieee754_expf(-z * z - (float)0.5625) *
-            __ieee754_expf((z - x) * (z + x) + R / S);
+        r = expf(-z * z - (float)0.5625) *
+            expf((z - x) * (z + x) + R / S);
         if (hx > 0)
             return r / x;
         else

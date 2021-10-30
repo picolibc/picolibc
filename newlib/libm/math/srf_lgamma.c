@@ -144,7 +144,7 @@ sin_pif(float x)
 }
 
 float
-___ieee754_lgammaf_r(float x, int *signgamp)
+_lgammaf_r(float x, int *signgamp)
 {
     float t, y, z, nadj = 0.0, p, p1, p2, p3, q, r, w;
     __int32_t i, hx, ix;
@@ -168,9 +168,9 @@ ___ieee754_lgammaf_r(float x, int *signgamp)
     if (ix < 0x1c800000) { /* |x|<2**-70, return -log(|x|) */
         if (hx < 0) {
             *signgamp = -1;
-            return -__ieee754_logf(-x);
+            return -logf(-x);
         } else
-            return -__ieee754_logf(x);
+            return -logf(x);
     }
     if (hx < 0) {
         if (ix >= 0x4b000000) { /* |x|>=2**23, must be -integer */
@@ -185,7 +185,7 @@ ___ieee754_lgammaf_r(float x, int *signgamp)
                 return zero / (x - x);
             return one / (x - x); /* -integer */
         }
-        nadj = __ieee754_logf(pi / fabsf(t * x));
+        nadj = logf(pi / fabsf(t * x));
         if (t < zero)
             *signgamp = -1;
         x = -x;
@@ -197,7 +197,7 @@ ___ieee754_lgammaf_r(float x, int *signgamp)
     /* for x < 2.0 */
     else if (ix < 0x40000000) {
         if (ix <= 0x3f666666) { /* lgamma(x) = lgamma(x+1)-log(x) */
-            r = -__ieee754_logf(x);
+            r = -logf(x);
             if (ix >= 0x3f3b4a20) {
                 y = one - x;
                 i = 0;
@@ -266,27 +266,27 @@ ___ieee754_lgammaf_r(float x, int *signgamp)
             z *= (y + (float)3.0); /* FALLTHRU */
         case 3:
             z *= (y + (float)2.0); /* FALLTHRU */
-            r += __ieee754_logf(z);
+            r += logf(z);
             break;
         }
         /* 8.0 <= x < 2**58 */
     } else if (ix < 0x5c800000) {
-        t = __ieee754_logf(x);
+        t = logf(x);
         z = one / x;
         y = z * z;
         w = w0 + z * (w1 + y * (w2 + y * (w3 + y * (w4 + y * (w5 + y * w6)))));
         r = (x - half) * (t - one) + w;
     } else
         /* 2**58 <= x <= inf */
-        r = x * (__ieee754_logf(x) - one);
+        r = x * (logf(x) - one);
     if (hx < 0)
         r = nadj - r;
     return r;
 }
 
 float
-__ieee754_lgammaf_r(float x, int *signgamp)
+lgammaf_r(float x, int *signgamp)
 {
     *signgamp = 0;
-    return ___ieee754_lgammaf_r(x, signgamp);
+    return _lgammaf_r(x, signgamp);
 }

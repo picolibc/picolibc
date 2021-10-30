@@ -32,7 +32,7 @@ static const float one = 1.0000000000e+00, /* 0x3F800000 */
     qS4 = 7.7038154006e-02; /* 0x3d9dc62e */
 
 float
-__ieee754_asinf(float x)
+asinf(float x)
 {
     float t, w, p, q, c, r, s;
     __int32_t hx, ix;
@@ -61,7 +61,7 @@ __ieee754_asinf(float x)
     t = w * (float)0.5;
     p = t * (pS0 + t * (pS1 + t * (pS2 + t * (pS3 + t * (pS4 + t * pS5)))));
     q = one + t * (qS1 + t * (qS2 + t * (qS3 + t * qS4)));
-    s = __ieee754_sqrtf(t);
+    s = sqrtf(t);
     if (ix >= 0x3F79999A) { /* if |x| > 0.975 */
         w = p / q;
         t = pio2_hi - ((float)2.0 * (s + s * w) - pio2_lo);

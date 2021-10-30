@@ -11,7 +11,7 @@
  * ====================================================
  */
 
-/* __ieee754_sinh(x)
+/* sinh(x)
  * Method : 
  * mathematically sinh(x) if defined to be (exp(x)-exp(-x))/2
  *	1. Replace x by |x| (sinh(-x) = -sinh(x)). 
@@ -36,7 +36,7 @@
 static const double one = 1.0, shuge = 1.0e307;
 
 double
-__ieee754_sinh(double x)
+sinh(double x)
 {
     double t, w, h;
     __int32_t ix, jx;
@@ -66,12 +66,12 @@ __ieee754_sinh(double x)
 
     /* |x| in [22, log(maxdouble)] return 0.5*exp(|x|) */
     if (ix < 0x40862E42)
-        return h * __ieee754_exp(fabs(x));
+        return h * exp(fabs(x));
 
     /* |x| in [log(maxdouble), overflowthresold] */
     GET_LOW_WORD(lx, x);
     if (ix < 0x408633CE || (ix == 0x408633ce && lx <= (__uint32_t)0x8fb9f87d)) {
-        w = __ieee754_exp(0.5 * fabs(x));
+        w = exp(0.5 * fabs(x));
         t = h * w;
         return t * w;
     }

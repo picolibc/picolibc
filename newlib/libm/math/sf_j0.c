@@ -33,7 +33,7 @@ static const float huge = 1e30, one = 1.0,
 static const float zero = 0.0;
 
 float
-__ieee754_j0f(float x)
+j0f(float x)
 {
     float z, s, c, ss, cc, r, u, v;
     __int32_t hx, ix;
@@ -60,11 +60,11 @@ __ieee754_j0f(float x)
 	 * y0(x) = 1/sqrt(pi) * (P(0,x)*ss + Q(0,x)*cc) / sqrt(x)
 	 */
         if (ix > 0x5c000000)
-            z = (invsqrtpi * cc) / __ieee754_sqrtf(x);
+            z = (invsqrtpi * cc) / sqrtf(x);
         else {
             u = pzerof(x);
             v = qzerof(x);
-            z = invsqrtpi * (u * cc - v * ss) / __ieee754_sqrtf(x);
+            z = invsqrtpi * (u * cc - v * ss) / sqrtf(x);
         }
         return z;
     }
@@ -100,7 +100,7 @@ static const float u00 = -7.3804296553e-02, /* 0xbd9726b5 */
     v04 = 4.4111031494e-10; /* 0x2ff280c2 */
 
 float
-__ieee754_y0f(float x)
+y0f(float x)
 {
     float z, s, c, ss, cc, u, v;
     __int32_t hx, ix;
@@ -142,22 +142,22 @@ __ieee754_y0f(float x)
                 ss = z / cc;
         }
         if (ix > 0x5c000000)
-            z = (invsqrtpi * ss) / __ieee754_sqrtf(x);
+            z = (invsqrtpi * ss) / sqrtf(x);
         else {
             u = pzerof(x);
             v = qzerof(x);
-            z = invsqrtpi * (u * ss + v * cc) / __ieee754_sqrtf(x);
+            z = invsqrtpi * (u * ss + v * cc) / sqrtf(x);
         }
         return z;
     }
     if (ix <= 0x39800000) { /* x < 2**-27 */
-        return (u00 + tpi * __ieee754_logf(x));
+        return (u00 + tpi * logf(x));
     }
     z = x * x;
     u = u00 +
         z * (u01 + z * (u02 + z * (u03 + z * (u04 + z * (u05 + z * u06)))));
     v = one + z * (v01 + z * (v02 + z * (v03 + z * v04)));
-    return (u / v + tpi * (__ieee754_j0f(x) * __ieee754_logf(x)));
+    return (u / v + tpi * (j0f(x) * logf(x)));
 }
 
 /* The asymptotic expansions of pzero is

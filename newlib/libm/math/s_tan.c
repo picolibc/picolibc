@@ -44,7 +44,7 @@ PORTABILITY
  *
  * kernel function:
  *	__kernel_tan		... tangent function on [-pi/4,pi/4]
- *	__ieee754_rem_pio2	... argument reduction routine
+ *	__rem_pio2	... argument reduction routine
  *
  * Method.
  *      Let S,C and T denote the sin, cos and tan respectively on 
@@ -93,7 +93,7 @@ tan(double x)
 
     /* argument reduction needed */
     else {
-        n = __ieee754_rem_pio2(x, y);
+        n = __rem_pio2(x, y);
         return __kernel_tan(y[0], y[1], 1 - ((n & 1) << 1)); /*   1 -- n even
 							-1 -- n odd */
     }

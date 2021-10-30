@@ -36,7 +36,7 @@
 #include "fdlibm.h"
 
 double
-__ieee754_lgamma(double x)
+lgamma(double x)
 {
-    return __ieee754_lgamma_r(x, &signgam);
+    return lgamma_r(x, &signgam);
 }

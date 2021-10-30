@@ -11,7 +11,7 @@
  * ====================================================
  */
 
-/* __ieee754_j1(x), __ieee754_y1(x)
+/* j1(x), y1(x)
  * Bessel function of the first and second kinds of order zero.
  * Method -- j1(x):
  *	1. For tiny x, we use j1(x) = x/2 - x^3/16 + x^5/384 - ...
@@ -80,7 +80,7 @@ static const double huge = 1e300, one = 1.0,
 static const double zero = 0.0;
 
 double
-__ieee754_j1(double x)
+j1(double x)
 {
     double z, s, c, ss, cc, r, u, v, y;
     __int32_t hx, ix;
@@ -103,15 +103,15 @@ __ieee754_j1(double x)
                 ss = z / cc;
         }
         /*
-	 * j1(x) = 1/__ieee754_sqrt(pi) * (P(1,x)*cc - Q(1,x)*ss) / __ieee754_sqrt(x)
-	 * y1(x) = 1/__ieee754_sqrt(pi) * (P(1,x)*ss + Q(1,x)*cc) / __ieee754_sqrt(x)
+	 * j1(x) = 1/sqrt(pi) * (P(1,x)*cc - Q(1,x)*ss) / sqrt(x)
+	 * y1(x) = 1/sqrt(pi) * (P(1,x)*ss + Q(1,x)*cc) / sqrt(x)
 	 */
         if (ix > 0x48000000)
-            z = (invsqrtpi * cc) / __ieee754_sqrt(y);
+            z = (invsqrtpi * cc) / sqrt(y);
         else {
             u = pone(y);
             v = qone(y);
-            z = invsqrtpi * (u * cc - v * ss) / __ieee754_sqrt(y);
+            z = invsqrtpi * (u * cc - v * ss) / sqrt(y);
         }
         if (hx < 0)
             return -z;
@@ -145,7 +145,7 @@ static const double V0[5] = {
 };
 
 double
-__ieee754_y1(double x)
+y1(double x)
 {
     double z, s, c, ss, cc, u, v;
     __int32_t hx, ix, lx;
@@ -183,11 +183,11 @@ __ieee754_y1(double x)
          * to compute the worse one.
          */
         if (ix > 0x48000000)
-            z = (invsqrtpi * ss) / __ieee754_sqrt(x);
+            z = (invsqrtpi * ss) / sqrt(x);
         else {
             u = pone(x);
             v = qone(x);
-            z = invsqrtpi * (u * ss + v * cc) / __ieee754_sqrt(x);
+            z = invsqrtpi * (u * ss + v * cc) / sqrt(x);
         }
         return z;
     }
@@ -197,7 +197,7 @@ __ieee754_y1(double x)
     z = x * x;
     u = U0[0] + z * (U0[1] + z * (U0[2] + z * (U0[3] + z * U0[4])));
     v = one + z * (V0[0] + z * (V0[1] + z * (V0[2] + z * (V0[3] + z * V0[4]))));
-    return (x * (u / v) + tpi * (__ieee754_j1(x) * __ieee754_log(x) - one / x));
+    return (x * (u / v) + tpi * (j1(x) * log(x) - one / x));
 }
 
 /* For x >= 8, the asymptotic expansions of pone is

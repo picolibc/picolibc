@@ -30,7 +30,7 @@ static const float ln2_hi = 6.9313812256e-01, /* 0x3f317180 */
 static const float zero = 0.0;
 
 float
-__ieee754_logf(float x)
+logf(float x)
 {
     float hfsq, f, s, z, R, w, t1, t2, dk;
     __int32_t k, ix, i, j;

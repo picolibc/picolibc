@@ -11,7 +11,7 @@
  * ====================================================
  */
 
-/* __ieee754_hypot(x,y)
+/* hypot(x,y)
  *
  * Method :                  
  *	If (assume round-to-nearest) z=x*x+y*y 
@@ -49,13 +49,13 @@
 
 #if defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef _LDBL_EQ_DBL
-extern long double __ieee754_hypotl(long double x, long double y)
-    __attribute__((__alias__("__ieee754_hypot")));
+extern long double hypotl(long double x, long double y)
+    __attribute__((__alias__("hypot")));
 #endif
 #endif
 
 double
-__ieee754_hypot(double x, double y)
+hypot(double x, double y)
 {
     double a = x, b = y, t1, t2, y1, y2, w;
     __int32_t j, k, ha, hb;
@@ -124,7 +124,7 @@ __ieee754_hypot(double x, double y)
         t1 = 0;
         SET_HIGH_WORD(t1, ha);
         t2 = a - t1;
-        w = __ieee754_sqrt(t1 * t1 - (b * (-b) - t2 * (a + t1)));
+        w = sqrt(t1 * t1 - (b * (-b) - t2 * (a + t1)));
     } else {
         a = a + a;
         y1 = 0;
@@ -133,7 +133,7 @@ __ieee754_hypot(double x, double y)
         t1 = 0;
         SET_HIGH_WORD(t1, ha + 0x00100000);
         t2 = a - t1;
-        w = __ieee754_sqrt(t1 * y1 - (w * (-w) - (t1 * y2 + t2 * b)));
+        w = sqrt(t1 * y1 - (w * (-w) - (t1 * y2 + t2 * b)));
     }
     if (k != 0) {
         __uint32_t high;

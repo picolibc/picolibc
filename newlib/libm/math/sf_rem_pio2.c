@@ -14,7 +14,7 @@
  *
  */
 
-/* __ieee754_rem_pio2f(x,y)
+/* __rem_pio2f(x,y)
  * 
  * return the remainder of x rem pi/2 in y[0]+y[1] 
  * use __kernel_rem_pio2f()
@@ -78,7 +78,7 @@ static const float zero = 0.0000000000e+00, /* 0x00000000 */
     pio2_3t = 6.1232342629e-17; /* 0x248d3132 */
 
 __int32_t
-__ieee754_rem_pio2f(float x, float *y)
+__rem_pio2f(float x, float *y)
 {
     float z, w, t, r, fn;
     float tx[3];

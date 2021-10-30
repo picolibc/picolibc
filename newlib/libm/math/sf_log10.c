@@ -23,7 +23,7 @@ static const float two25 = 3.3554432000e+07, /* 0x4c000000 */
 static const float zero = 0.0;
 
 float
-__ieee754_log10f(float x)
+log10f(float x)
 {
     float y, z;
     __int32_t i, k, hx;
@@ -47,6 +47,6 @@ __ieee754_log10f(float x)
     hx = (hx & 0x007fffff) | ((0x7f - i) << 23);
     y = (float)(k + i);
     SET_FLOAT_WORD(x, hx);
-    z = y * log10_2lo + ivln10 * __ieee754_logf(x);
+    z = y * log10_2lo + ivln10 * logf(x);
     return z + y * log10_2hi;
 }

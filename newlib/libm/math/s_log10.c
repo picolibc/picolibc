@@ -11,7 +11,7 @@
  * ====================================================
  */
 
-/* __ieee754_log10(x)
+/* log10(x)
  * Return the base 10 logarithm of x
  * 
  * Method :
@@ -57,7 +57,7 @@ static const double two54 =
 static const double zero = 0.0;
 
 double
-__ieee754_log10(double x)
+log10(double x)
 {
     double y, z;
     __int32_t i, k, hx;
@@ -82,7 +82,7 @@ __ieee754_log10(double x)
     hx = (hx & 0x000fffff) | ((0x3ff - i) << 20);
     y = (double)(k + i);
     SET_HIGH_WORD(x, hx);
-    z = y * log10_2lo + ivln10 * __ieee754_log(x);
+    z = y * log10_2lo + ivln10 * log(x);
     return z + y * log10_2hi;
 }
 

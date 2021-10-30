@@ -17,7 +17,7 @@
  * kernel function:
  *	__kernel_sin		... sine function on [-pi/4,pi/4]
  *	__kernel_cos		... cosine function on [-pi/4,pi/4]
- *	__ieee754_rem_pio2	... argument reduction routine
+ *	__rem_pio2	... argument reduction routine
  *
  * Method.
  *      Let S,C and T denote the sin, cos and tan respectively on 
@@ -66,7 +66,7 @@ cos(double x)
 
     /* argument reduction needed */
     else {
-        n = __ieee754_rem_pio2(x, y);
+        n = __rem_pio2(x, y);
         switch (n & 3) {
         case 0:
             return __kernel_cos(y[0], y[1]);
