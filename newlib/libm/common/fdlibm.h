@@ -124,13 +124,6 @@
 #define FLT_SMALLEST_EXP -22
 #endif
 
-#ifdef __STDC__
-#undef __P
-#define	__P(p)	p
-#else
-#define	__P(p)	()
-#endif
-
 /* 
  * set X_TLOSS = pi*2**52, which is possibly defined in <values.h>
  * (one may replace the following line by "#include <values.h>")
@@ -141,35 +134,35 @@
 /* Functions that are not documented, and are not in <math.h>.  */
 
 #ifdef _SCALB_INT
-extern double scalb __P((double, int));
+extern double scalb (double, int);
 #else
-extern double scalb __P((double, double));
+extern double scalb (double, double);
 #endif
-extern double significand __P((double));
+extern double significand (double);
 
-extern __int32_t __rem_pio2 __P((double,double*));
+extern __int32_t __rem_pio2 (double,double*);
 
 /* fdlibm kernel function */
-extern double __kernel_sin __P((double,double,int));
-extern double __kernel_cos __P((double,double));
-extern double __kernel_tan __P((double,double,int));
-extern int    __kernel_rem_pio2 __P((double*,double*,int,int,int,const __int32_t*));
+extern double __kernel_sin (double,double,int);
+extern double __kernel_cos (double,double);
+extern double __kernel_tan (double,double,int);
+extern int    __kernel_rem_pio2 (double*,double*,int,int,int,const __int32_t*);
 
 /* Undocumented float functions.  */
 #ifdef _SCALB_INT
-extern float scalbf __P((float, int));
+extern float scalbf (float, int);
 #else
-extern float scalbf __P((float, float));
+extern float scalbf (float, float);
 #endif
-extern float significandf __P((float));
+extern float significandf (float);
 
-extern __int32_t __rem_pio2f __P((float,float*));
+extern __int32_t __rem_pio2f (float,float*);
 
 /* float versions of fdlibm kernel functions */
-extern float __kernel_sinf __P((float,float,int));
-extern float __kernel_cosf __P((float,float));
-extern float __kernel_tanf __P((float,float,int));
-extern int   __kernel_rem_pio2f __P((float*,float*,int,int,int,const __int32_t*));
+extern float __kernel_sinf (float,float,int);
+extern float __kernel_cosf (float,float);
+extern float __kernel_tanf (float,float,int);
+extern int   __kernel_rem_pio2f (float*,float*,int,int,int,const __int32_t*);
 
 /* The original code used statements like
 	n0 = ((*(int*)&one)>>29)^1;		* index of high word *
