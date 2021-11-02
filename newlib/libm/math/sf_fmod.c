@@ -38,9 +38,15 @@ fmodf(float x, float y)
     hy &= 0x7fffffff; /* |y| */
 
     /* purge off exception values */
-    if (FLT_UWORD_IS_ZERO(hy) || !FLT_UWORD_IS_FINITE(hx) ||
-        FLT_UWORD_IS_NAN(hy))
-        return (x * y) / (x * y);
+    if (isnan(x) || isnan(y)) /* x or y nan, return nan */
+        return (float)NAN;
+
+    if (isinf(x)) /* x == inf, domain error */
+        return __math_invalidf(x);
+
+    if (hy == 0) /* y=0, domain error */
+        return __math_invalidf(y);
+
     if (hx < hy)
         return x; /* |x|<|y| return x */
     if (hx == hy)

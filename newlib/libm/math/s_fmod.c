@@ -39,9 +39,15 @@ fmod(double x, double y)
     hy &= 0x7fffffff; /* |y| */
 
     /* purge off exception values */
-    if ((hy | ly) == 0 || (hx >= 0x7ff00000) || /* y=0,or x not finite */
-        ((hy | ((ly | -ly) >> 31)) > 0x7ff00000)) /* or y is NaN */
-        return (x * y) / (x * y);
+    if (isnan(x) || isnan(y)) /* x or y nan, return nan */
+        return (double)NAN;
+
+    if (isinf(x)) /* x == inf, domain error */
+        return __math_invalid(x);
+
+    if ((hy | ly) == 0) /* y=0, domain error */
+        return __math_invalid(y);
+
     if (hx <= hy) {
         if ((hx < hy) || (lx < ly))
             return x; /* |x|<|y| return x */
