@@ -33,7 +33,7 @@ coshf(float x)
 
     /* x is INF or NaN */
     if (!FLT_UWORD_IS_FINITE(ix))
-        return x * x;
+        return x;
 
     /* |x| in [0,0.5*ln2], return 1+expm1(|x|)^2/(2*exp(|x|)) */
     if (ix < 0x3eb17218) {
