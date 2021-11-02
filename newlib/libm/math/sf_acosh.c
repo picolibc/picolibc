@@ -25,10 +25,10 @@ acoshf(float x)
     __int32_t hx;
     GET_FLOAT_WORD(hx, x);
     if (hx < 0x3f800000) { /* x < 1 */
-        return (x - x) / (x - x);
+        return __math_invalidf(x);
     } else if (hx >= 0x4d800000) { /* x > 2**28 */
         if (!FLT_UWORD_IS_FINITE(hx)) { /* x is inf of NaN */
-            return x + x;
+            return x;
         } else
             return logf(x) + ln2; /* acosh(huge)=log(2x) */
     } else if (hx == 0x3f800000) {

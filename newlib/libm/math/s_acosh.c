@@ -42,7 +42,7 @@ acosh(double x)
     __uint32_t lx;
     EXTRACT_WORDS(hx, lx, x);
     if (hx < 0x3ff00000) { /* x < 1 */
-        return (x - x) / (x - x);
+        return __math_invalid(x);
     } else if (hx >= 0x41b00000) { /* x > 2**28 */
         if (hx >= 0x7ff00000) { /* x is inf of NaN */
             return x + x;
