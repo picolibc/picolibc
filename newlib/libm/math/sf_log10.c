@@ -20,8 +20,6 @@ static const float two25 = 3.3554432000e+07, /* 0x4c000000 */
     log10_2hi = 3.0102920532e-01, /* 0x3e9a2080 */
     log10_2lo = 7.9034151668e-07; /* 0x355427db */
 
-static const float zero = 0.0;
-
 float
 log10f(float x)
 {
@@ -32,11 +30,11 @@ log10f(float x)
 
     k = 0;
     if (FLT_UWORD_IS_ZERO(hx & 0x7fffffff))
-        return -two25 / (x - x); /* log(+-0)=-inf */
+        return __math_divzerof(1); /* log(+-0)=-inf */
     if (hx < 0)
-        return (x - x) / zero; /* log(-#) = NaN */
+        return __math_invalidf(x); /* log(-#) = NaN */
     if (!FLT_UWORD_IS_FINITE(hx))
-        return x + x;
+        return x;
     if (FLT_UWORD_IS_SUBNORMAL(hx)) {
         k -= 25;
         x *= two25; /* subnormal number, scale up x */

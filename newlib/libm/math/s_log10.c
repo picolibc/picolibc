@@ -54,8 +54,6 @@ static const double two54 =
     log10_2hi = 3.01029995663611771306e-01, /* 0x3FD34413, 0x509F6000 */
     log10_2lo = 3.69423907715893078616e-13; /* 0x3D59FEF3, 0x11F12B36 */
 
-static const double zero = 0.0;
-
 double
 log10(double x)
 {
@@ -68,15 +66,15 @@ log10(double x)
     k = 0;
     if (hx < 0x00100000) { /* x < 2**-1022  */
         if (((hx & 0x7fffffff) | lx) == 0)
-            return -two54 / (x - x); /* log(+-0)=-inf */
+            return __math_divzero(1); /* log(+-0)=-inf */
         if (hx < 0)
-            return (x - x) / zero; /* log(-#) = NaN */
+            return __math_invalid(x); /* log(-#) = NaN */
         k -= 54;
         x *= two54; /* subnormal number, scale up x */
         GET_HIGH_WORD(hx, x);
     }
     if (hx >= 0x7ff00000)
-        return x + x;
+        return x;
     k += (hx >> 20) - 1023;
     i = ((__uint32_t)k & 0x80000000) >> 31;
     hx = (hx & 0x000fffff) | ((0x3ff - i) << 20);

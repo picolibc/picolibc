@@ -92,15 +92,15 @@ log(double x)
     k = 0;
     if (hx < 0x00100000) { /* x < 2**-1022  */
         if (((hx & 0x7fffffff) | lx) == 0)
-            return -two54 / (x - x); /* log(+-0)=-inf */
+            return __math_divzero(1); /* log(+-0)=-inf */
         if (hx < 0)
-            return (x - x) / zero; /* log(-#) = NaN */
+            return __math_invalid(x); /* log(-#) = NaN */
         k -= 54;
         x *= two54; /* subnormal number, scale up x */
         GET_HIGH_WORD(hx, x);
     }
     if (hx >= 0x7ff00000)
-        return x + x;
+        return x;
     k += (hx >> 20) - 1023;
     hx &= 0x000fffff;
     i = (hx + 0x95f64) & 0x100000;

@@ -39,11 +39,11 @@ logf(float x)
 
     k = 0;
     if (FLT_UWORD_IS_ZERO(ix & 0x7fffffff))
-        return -two25 / (x - x); /* log(+-0)=-inf */
+        return __math_divzerof(1); /* log(+-0)=-inf */
     if (ix < 0)
-        return (x - x) / zero; /* log(-#) = NaN */
+        return __math_invalidf(x); /* log(-#) = NaN */
     if (!FLT_UWORD_IS_FINITE(ix))
-        return x + x;
+        return x;
     if (FLT_UWORD_IS_SUBNORMAL(ix)) {
         k -= 25;
         x *= two25; /* subnormal number, scale up x */
