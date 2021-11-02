@@ -28,14 +28,17 @@ sqrtf(float x)
     hx = ix & 0x7fffffff;
 
     /* take care of Inf and NaN */
-    if (!FLT_UWORD_IS_FINITE(hx))
-        return x * x + x; /* sqrt(NaN)=NaN, sqrt(+inf)=+inf
-					   sqrt(-inf)=sNaN */
+    if (!FLT_UWORD_IS_FINITE(hx)) {
+        if (ix < 0)
+            return __math_invalidf(x); /* sqrt(-inf)=sNaN */
+        return x; /* sqrt(NaN)=NaN, sqrt(+inf)=+inf */
+    }
+
     /* take care of zero and -ves */
     if (FLT_UWORD_IS_ZERO(hx))
         return x; /* sqrt(+-0) = +-0 */
     if (ix < 0)
-        return (x - x) / (x - x); /* sqrt(-ve) = sNaN */
+        return __math_invalidf(x); /* sqrt(-ve) = sNaN */
 
     /* normalize x */
     m = (ix >> 23);

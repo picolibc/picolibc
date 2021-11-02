@@ -99,15 +99,16 @@ sqrt(double x)
 
     /* take care of Inf and NaN */
     if ((ix0 & 0x7ff00000) == 0x7ff00000) {
-        return x * x + x; /* sqrt(NaN)=NaN, sqrt(+inf)=+inf
-					   sqrt(-inf)=sNaN */
+        if (ix0 < 0)
+            return __math_invalid(x); /* sqrt(-inf)=sNaN */
+        return x; /* sqrt(NaN)=NaN, sqrt(+inf)=+inf */
     }
     /* take care of zero */
     if (ix0 <= 0) {
         if (((ix0 & (~sign)) | ix1) == 0)
             return x; /* sqrt(+-0) = +-0 */
         else if (ix0 < 0)
-            return (x - x) / (x - x); /* sqrt(-ve) = sNaN */
+            return __math_invalid(x); /* sqrt(-ve) = sNaN */
     }
     /* normalize x */
     m = (ix0 >> 20);
