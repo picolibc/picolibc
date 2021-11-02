@@ -40,15 +40,20 @@ remainder(double x, double p)
     hx &= 0x7fffffff;
 
     /* purge off exception values */
+    if (isnan(x))
+        return x;
+    if (isnan(p))
+        return p;
+
+    if (isinf(x) || (hp | lp) == 0)
+        return __math_invalid(x);
+
     if ((hp | lp) == 0)
         return (x * p) / (x * p); /* p = 0 */
-    if ((hx >= 0x7ff00000) || /* x not finite */
-        ((hp >= 0x7ff00000) && /* p is NaN */
-         (((hp - 0x7ff00000) | lp) != 0)))
-        return (x * p) / (x * p);
 
     if (hp <= 0x7fdfffff)
         x = fmod(x, p + p); /* now x < 2p */
+
     if (((hx - hp) | (lx - lp)) == 0)
         return zero * x;
     x = fabs(x);

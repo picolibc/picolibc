@@ -31,9 +31,13 @@ remainderf(float x, float p)
     hx &= 0x7fffffff;
 
     /* purge off exception values */
-    if (FLT_UWORD_IS_ZERO(hp) || !FLT_UWORD_IS_FINITE(hx) ||
-        FLT_UWORD_IS_NAN(hp))
-        return (x * p) / (x * p);
+    if (FLT_UWORD_IS_NAN(hx))
+        return x;
+    if (FLT_UWORD_IS_NAN(hp))
+        return p;
+
+    if (isinf(x) || hp == 0)
+        return __math_invalidf(x);
 
     if (hp <= FLT_UWORD_HALF_MAX)
         x = fmodf(x, p + p); /* now x < 2p */
