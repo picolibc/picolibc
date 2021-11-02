@@ -6,7 +6,7 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  *
@@ -47,9 +47,9 @@ atanh(double x)
     EXTRACT_WORDS(hx, lx, x);
     ix = hx & 0x7fffffff;
     if ((ix | ((lx | (-lx)) >> 31)) > 0x3ff00000) /* |x|>1 */
-        return (x - x) / (x - x);
+        return __math_invalid(x);
     if (ix == 0x3ff00000)
-        return x / zero;
+        return __math_divzero(x < 0);
     if (ix < 0x3e300000 && (huge + x) > zero)
         return x; /* x<2**-28 */
     SET_HIGH_WORD(x, ix);
