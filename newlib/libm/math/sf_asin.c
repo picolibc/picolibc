@@ -42,7 +42,7 @@ asinf(float x)
         /* asin(1)=+-pi/2 with inexact */
         return x * pio2_hi + x * pio2_lo;
     } else if (ix > 0x3f800000) { /* |x|>= 1 */
-        return (x - x) / (x - x); /* asin(|x|>1) is NaN */
+        return __math_invalidf(x); /* asin(|x|>1) is NaN */
     } else if (ix < 0x3f000000) { /* |x|<0.5 */
         if (ix < 0x32000000) { /* if |x| < 2**-27 */
             if (huge + x > one)
