@@ -140,9 +140,9 @@ hypot(double x, double y)
         t1 = 1.0;
         GET_HIGH_WORD(high, t1);
         SET_HIGH_WORD(t1, high + (k << 20));
-        return t1 * w;
-    } else
-        return w;
+        w *= t1;
+    }
+    return __math_check_oflow(w);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

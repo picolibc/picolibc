@@ -15,7 +15,12 @@ hypotl(long double x, long double y)
     return hypot(x, y);
 #else
     /* Keep it simple for now...  */
-    return sqrtl((x * x) + (y * y));
+    long double z = sqrtl((x * x) + (y * y));
+#ifdef _WANT_MATH_ERRNO
+    if (!finite(z) && finite(x) && finite(y))
+        errno = ERANGE;
+#endif
+    return z;
 #endif
 }
 #endif
