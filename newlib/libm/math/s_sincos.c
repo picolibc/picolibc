@@ -16,7 +16,7 @@ extern double _cos(double);
 #define _cos cos
 #endif
 
-void
+void __inhibit_new_builtin_calls
 sincos(double x, double *sinx, double *cosx)
 {
     *sinx = _sin(x);

@@ -14,7 +14,7 @@ extern float _cosf(float);
 #define _cosf cosf
 #endif
 
-void
+void __inhibit_new_builtin_calls
 sincosf(float x, float *sinx, float *cosx)
 {
     *sinx = _sinf(x);
@@ -23,7 +23,7 @@ sincosf(float x, float *sinx, float *cosx)
 
 #ifdef _DOUBLE_IS_32BITS
 
-void
+void __inhibit_new_builtin_calls
 sincos(double x, double *sinx, double *cosx)
 {
     *sinx = _sinf((float)x);

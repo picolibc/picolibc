@@ -55,7 +55,7 @@ PORTABILITY
 
 #ifndef _DOUBLE_IS_32BITS
 
-double
+double __inhibit_new_builtin_calls
 exp2(double x) /* wrapper exp2 */
 {
     return pow(2.0, x);

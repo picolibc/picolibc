@@ -22,7 +22,7 @@
 #include <errno.h>
 #include <math.h>
 
-float
+float __inhibit_new_builtin_calls
 exp2f(float x) /* wrapper exp2f */
 {
     return powf(2.0, x);
@@ -30,7 +30,7 @@ exp2f(float x) /* wrapper exp2f */
 
 #ifdef _DOUBLE_IS_32BITS
 
-double
+double __inhibit_new_builtin_calls
 exp2(double x)
 {
     return (double)exp2f((float)x);
