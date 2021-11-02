@@ -55,14 +55,18 @@ jn(int n, double x)
     double a, b, temp, di;
     double z, w;
 
+    if (isnan(x))
+        return x;
+
+    if (isinf(x))
+        return 0.0;
+
     /* J(-n,x) = (-1)^n * J(n, x), J(n, -x) = (-1)^n * J(n, x)
      * Thus, J(-n,x) = J(n,-x)
      */
     EXTRACT_WORDS(hx, lx, x);
     ix = 0x7fffffff & hx;
-    /* if J(n,NaN) is NaN */
-    if ((ix | ((__uint32_t)(lx | -lx)) >> 31) > 0x7ff00000)
-        return x + x;
+
     if (n < 0) {
         n = -n;
         x = -x;
@@ -236,12 +240,19 @@ yn(int n, double x)
     EXTRACT_WORDS(hx, lx, x);
     ix = 0x7fffffff & hx;
     /* if Y(n,NaN) is NaN */
-    if ((ix | ((__uint32_t)(lx | -lx)) >> 31) > 0x7ff00000)
-        return x + x;
+
     if ((ix | lx) == 0)
-        return -one / (x - x);
+        return __math_divzero(1);
+
+    if (isnan(x))
+        return x;
+
     if (hx < 0)
-        return zero / (x - x);
+        return __math_invalid(x);
+
+    if (ix == 0x7ff00000)
+        return 0.0;
+
     sign = 1;
     if (n < 0) {
         n = -n;
@@ -251,8 +262,7 @@ yn(int n, double x)
         return (y0(x));
     if (n == 1)
         return (sign * y1(x));
-    if (ix == 0x7ff00000)
-        return zero;
+
     if (ix >= 0x52D00000) { /* x > 2**302 */
         /* (x >> n**2)
      *	    Jn(x) = cos(x-(2n+1)*pi/4)*sqrt(2/x*pi)

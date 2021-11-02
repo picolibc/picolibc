@@ -39,10 +39,15 @@ j1f(float x)
     float z, s, c, ss, cc, r, u, v, y;
     __int32_t hx, ix;
 
+    if (isnan(x))
+        return x;
+
+    if (isinf(x))
+        return zero;
+
     GET_FLOAT_WORD(hx, x);
     ix = hx & 0x7fffffff;
-    if (!FLT_UWORD_IS_FINITE(ix))
-        return one / x;
+
     y = fabsf(x);
     if (ix >= 0x40000000) { /* |x| >= 2.0 */
         s = sinf(y);
@@ -106,13 +111,19 @@ y1f(float x)
 
     GET_FLOAT_WORD(hx, x);
     ix = 0x7fffffff & hx;
-    /* if Y1(NaN) is NaN, Y1(-inf) is NaN, Y1(inf) is 0 */
-    if (!FLT_UWORD_IS_FINITE(ix))
-        return one / (x + x * x);
-    if (FLT_UWORD_IS_ZERO(ix))
-        return -one / (x - x);
+
+    if (ix == 0)
+        return __math_divzerof(1);
+
+    if (ix > 0x7f800000)
+        return x;
+
     if (hx < 0)
-        return zero / (x - x);
+        return __math_invalidf(x);
+
+    if (ix == 0x7f800000)
+        return zero;
+
     if (ix >= 0x40000000) { /* |x| >= 2.0 */
         s = sinf(x);
         c = cosf(x);

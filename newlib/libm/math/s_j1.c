@@ -85,10 +85,14 @@ j1(double x)
     double z, s, c, ss, cc, r, u, v, y;
     __int32_t hx, ix;
 
+    if (isnan(x))
+        return x;
+
+    if (isinf(x))
+        return 0.0;
+
     GET_HIGH_WORD(hx, x);
     ix = hx & 0x7fffffff;
-    if (ix >= 0x7ff00000)
-        return one / x;
     y = fabs(x);
     if (ix >= 0x40000000) { /* |x| >= 2.0 */
         s = sin(y);
@@ -153,12 +157,18 @@ y1(double x)
     EXTRACT_WORDS(hx, lx, x);
     ix = 0x7fffffff & hx;
     /* if Y1(NaN) is NaN, Y1(-inf) is NaN, Y1(inf) is 0 */
-    if (ix >= 0x7ff00000)
-        return one / (x + x * x);
     if ((ix | lx) == 0)
-        return -one / (x - x);
+        return __math_divzero(1);
+
+    if (isnan(x))
+        return x;
+
     if (hx < 0)
-        return zero / (x - x);
+        return __math_invalid(x);
+
+    if (ix >= 0x7ff00000)
+        return 0.0;
+
     if (ix >= 0x40000000) { /* |x| >= 2.0 */
         s = sin(x);
         c = cos(x);
