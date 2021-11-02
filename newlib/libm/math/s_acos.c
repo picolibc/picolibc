@@ -71,7 +71,7 @@ acos(double x)
             else
                 return pi + 2.0 * pio2_lo; /* acos(-1)= pi */
         }
-        return (x - x) / (x - x); /* acos(|x|>1) is NaN */
+        return __math_invalid(x); /* acos(|x|>1) is NaN */
     }
     if (ix < 0x3fe00000) { /* |x| < 0.5 */
         if (ix <= 0x3c600000)
