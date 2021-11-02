@@ -24,27 +24,23 @@
 double
 scalb(double x, double fn)
 {
-    if (isnan(x) || isnan(fn))
-        return x * fn;
-    if (!finite(fn)) {
-        if (fn > 0.0)
-            return x * fn;
-        else
-            return x / (-fn);
+    if (isnan(fn))
+        return fn;
+
+    if (isinf(fn)) {
+        if ((x == 0.0 && fn > 0.0) || (isinf(x) && fn < 0.0))
+            return __math_invalid(fn);
     }
+
     if (rint(fn) != fn)
-        return (fn - fn) / (fn - fn);
-#if INT_MAX == 32767
-    if (fn > 65000.0)
-        return scalbln(x, 65000);
-    if (-fn > 65000.0)
-        return scalbln(x, -65000);
-#else
-    if (fn > 65000.0)
-        return scalbn(x, 65000);
-    if (-fn > 65000.0)
-        return scalbn(x, -65000);
-#endif
+        return __math_invalid(fn);
+
+    if (fn > 4 * __DBL_MAX_EXP__)
+        fn = 4 * __DBL_MAX_EXP__;
+
+    if (fn < -4 * __DBL_MAX_EXP__)
+        fn = -4 * __DBL_MAX_EXP__;
+
     return scalbn(x, (int)fn);
 }
 

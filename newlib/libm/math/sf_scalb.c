@@ -19,26 +19,22 @@
 float
 scalbf(float x, float fn)
 {
-    if (isnan(x) || isnan(fn))
-        return x * fn;
-    if (!finitef(fn)) {
-        if (fn > (float)0.0)
-            return x * fn;
-        else
-            return x / (-fn);
+    if (isnan(fn))
+        return fn;
+
+    if (isinf(fn)) {
+        if ((x == 0.0f && fn > 0.0f) || (isinf(x) && fn < 0.0f))
+            return __math_invalidf(fn);
     }
+
     if (rintf(fn) != fn)
-        return (fn - fn) / (fn - fn);
-#if INT_MAX > 65000
-    if (fn > (float)65000.0)
-        return scalbnf(x, 65000);
-    if (-fn > (float)65000.0)
-        return scalbnf(x, -65000);
-#else
-    if (fn > (float)32000.0)
-        return scalbnf(x, 32000);
-    if (-fn > (float)32000.0)
-        return scalbnf(x, -32000);
-#endif
+        return __math_invalidf(fn);
+
+    if (fn > 4 * __FLT_MAX_EXP__)
+        fn = 4 * __FLT_MAX_EXP__;
+
+    if (fn < -4 * __FLT_MAX_EXP__)
+        fn = -4 * __FLT_MAX_EXP__;
+
     return scalbnf(x, (int)fn);
 }
