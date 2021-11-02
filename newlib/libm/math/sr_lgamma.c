@@ -214,22 +214,18 @@ _lgamma_r(double x, int *signgamp)
 {
     double t, y, z, nadj = 0.0, p, p1, p2, p3, q, r, w;
     __int32_t i, hx, lx, ix;
-    int mode = *signgamp;
 
     EXTRACT_WORDS(hx, lx, x);
 
     /* purge off +-inf, NaN, +-0, and negative arguments */
     *signgamp = 1;
     ix = hx & 0x7fffffff;
-    if (ix >= 0x7ff00000) {
-        if (hx < 0 && mode)
-            return zero / (x - x);
-        return x * x;
-    }
+    if (ix >= 0x7ff00000)
+        return fabs(x);
     if ((ix | lx) == 0) {
         if (hx < 0)
             *signgamp = -1;
-        return one / (x - x);
+        return __math_divzero(0);
     }
     if (ix < 0x3b900000) { /* |x|<2**-70, return -log(|x|) */
         if (hx < 0) {
@@ -239,19 +235,11 @@ _lgamma_r(double x, int *signgamp)
             return -log(x);
     }
     if (hx < 0) {
-        if (ix >= 0x43300000) { /* |x|>=2**52, must be -integer */
-            if (mode)
-                return zero / (x - x);
-            else
-                return one / (x - x); /* -integer */
-        }
+        if (ix >= 0x43300000) /* |x|>=2**52, must be -integer */
+            return __math_divzero(0);
         t = sin_pi(x);
-        if (t == zero) {
-            if (mode)
-                return zero / (x - x);
-            else
-                return one / (x - x); /* -integer */
-        }
+        if (t == zero)
+            return __math_divzero(0);
         nadj = log(pi / fabs(t * x));
         if (t < zero)
             *signgamp = -1;
@@ -348,7 +336,7 @@ _lgamma_r(double x, int *signgamp)
         r = x * (log(x) - one);
     if (hx < 0)
         r = nadj - r;
-    return r;
+    return __math_check_oflow(r);
 }
 
 double

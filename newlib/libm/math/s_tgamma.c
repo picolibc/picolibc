@@ -23,9 +23,15 @@
 double
 tgamma(double x)
 {
-    int signgam_local = 1;
+    int signgam_local;
+
+    if (x < 0.0 && floor(x) == x)
+        return __math_invalid(x);
+
     double y = exp(lgamma_r(x, &signgam_local));
     if (signgam_local < 0)
         y = -y;
+    if (!finite(y) && finite(x))
+        return __math_oflow(signgam_local < 0);
     return y;
 }

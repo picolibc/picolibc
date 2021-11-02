@@ -148,22 +148,18 @@ _lgammaf_r(float x, int *signgamp)
 {
     float t, y, z, nadj = 0.0, p, p1, p2, p3, q, r, w;
     __int32_t i, hx, ix;
-    int mode = *signgamp;
 
     GET_FLOAT_WORD(hx, x);
 
     /* purge off +-inf, NaN, +-0, and negative arguments */
     *signgamp = 1;
     ix = hx & 0x7fffffff;
-    if (ix >= 0x7f800000) {
-        if (hx < 0 && mode)
-            return zero / (x - x);
-        return x * x;
-    }
+    if (ix >= 0x7f800000)
+        return fabsf(x);
     if (ix == 0) {
         if (hx < 0)
             *signgamp = -1;
-        return one / (x - x);
+        return __math_divzerof(0);
     }
     if (ix < 0x1c800000) { /* |x|<2**-70, return -log(|x|) */
         if (hx < 0) {
@@ -173,18 +169,11 @@ _lgammaf_r(float x, int *signgamp)
             return -logf(x);
     }
     if (hx < 0) {
-        if (ix >= 0x4b000000) { /* |x|>=2**23, must be -integer */
-            if (mode)
-                return zero / (x - x);
-            return one / (x - x);
-        }
+        if (ix >= 0x4b000000) /* |x|>=2**23, must be -integer */
+            return __math_divzerof(0);
         t = sin_pif(x);
-        if (t == zero) {
-            /* tgamma wants NaN instead of INFINITY */
-            if (mode)
-                return zero / (x - x);
-            return one / (x - x); /* -integer */
-        }
+        if (t == zero)
+            return __math_divzerof(0);
         nadj = logf(pi / fabsf(t * x));
         if (t < zero)
             *signgamp = -1;
@@ -281,7 +270,7 @@ _lgammaf_r(float x, int *signgamp)
         r = x * (logf(x) - one);
     if (hx < 0)
         r = nadj - r;
-    return r;
+    return __math_check_oflowf(r);
 }
 
 float

@@ -25,9 +25,15 @@
 float
 tgammaf(float x)
 {
-    int signgam_local = 1;
+    int signgam_local;
+
+    if (x < 0.0f && floorf(x) == x)
+        return __math_invalidf(x);
+
     float y = expf(lgammaf_r(x, &signgam_local));
     if (signgam_local < 0)
         y = -y;
+    if (!finitef(y) && finitef(x))
+        return __math_oflowf(signgam_local < 0);
     return y;
 }
