@@ -16,17 +16,9 @@
 #include "fdlibm.h"
 #include <limits.h>
 
-#ifdef _SCALB_INT
-float
-scalbf(float x, int fn)
-#else
 float
 scalbf(float x, float fn)
-#endif
 {
-#ifdef _SCALB_INT
-    return scalbnf(x, fn);
-#else
     if (isnan(x) || isnan(fn))
         return x * fn;
     if (!finitef(fn)) {
@@ -49,5 +41,4 @@ scalbf(float x, float fn)
         return scalbnf(x, -32000);
 #endif
     return scalbnf(x, (int)fn);
-#endif
 }

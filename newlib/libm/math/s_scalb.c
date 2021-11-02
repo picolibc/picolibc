@@ -21,17 +21,9 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef _SCALB_INT
-double
-scalb(double x, int fn)
-#else
 double
 scalb(double x, double fn)
-#endif
 {
-#ifdef _SCALB_INT
-    return scalbn(x, fn);
-#else
     if (isnan(x) || isnan(fn))
         return x * fn;
     if (!finite(fn)) {
@@ -54,7 +46,6 @@ scalb(double x, double fn)
         return scalbn(x, -65000);
 #endif
     return scalbn(x, (int)fn);
-#endif
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

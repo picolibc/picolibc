@@ -133,11 +133,7 @@
 
 /* Functions that are not documented, and are not in <math.h>.  */
 
-#ifdef _SCALB_INT
-extern double scalb (double, int);
-#else
 extern double scalb (double, double);
-#endif
 extern double significand (double);
 
 extern __int32_t __rem_pio2 (double,double*);
@@ -149,11 +145,7 @@ extern double __kernel_tan (double,double,int);
 extern int    __kernel_rem_pio2 (double*,double*,int,int,int,const __int32_t*);
 
 /* Undocumented float functions.  */
-#ifdef _SCALB_INT
-extern float scalbf (float, int);
-#else
 extern float scalbf (float, float);
-#endif
 extern float significandf (float);
 
 extern __int32_t __rem_pio2f (float,float*);
