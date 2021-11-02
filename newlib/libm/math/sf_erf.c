@@ -245,7 +245,7 @@ erfcf(float x)
             return two - r / x;
     } else {
         if (hx > 0)
-            return __math_uflow(0);
+            return __math_uflowf(0);
         else
             return two - tiny;
     }
