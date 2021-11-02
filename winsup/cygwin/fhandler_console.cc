@@ -1178,6 +1178,10 @@ out:
   /* Discard processed recored. */
   DWORD dummy;
   DWORD discard_len = min (total_read, i + 1);
+  /* If input is signalled, do not discard input here because
+     tcflush() is already called from line_edit(). */
+  if (stat == input_signalled && !(ti->c_lflag & NOFLSH))
+    discard_len = 0;
   if (discard_len)
     ReadConsoleInputW (get_handle (), input_rec, discard_len, &dummy);
   return stat;
