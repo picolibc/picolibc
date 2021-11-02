@@ -48,15 +48,15 @@ jobs:
           # Math configurations
           "-Dnewlib-obsolete-math=false",
           "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
-          "-Dnewlib-obsolete-math-float=true -Dnewlib-obsolete-math-double=false",
+          "-Dnewlib-obsolete-math-float=true -Dnewlib-obsolete-math-double=true",
           "-Dnewlib-obsolete-math=true",
           "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
 
           # Tinystdio configurations
           "-Dio-float-exact=false",
           "-Dio-long-long=true",
-	  "-Dformat-default=integer",
-	  "-Dformat-default=float",
+          "-Dformat-default=integer",
+          "-Dformat-default=float",
 
           # Malloc configurations
           "-Dnewlib-nano-malloc=false",
@@ -76,7 +76,7 @@ jobs:
 
           # Multithread disabled
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dnewlib-tinystdio=false"
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
         ]
         test: [
           "./.github/do-test do-native-configure build-native",
