@@ -673,11 +673,16 @@ NEWLIB_MAJOR_VERSION=4
 NEWLIB_MINOR_VERSION=1
 NEWLIB_PATCHLEVEL_VERSION=0
 
-have_cc_inhibit_loop_to_libcall = cc.has_argument('-fno-tree-loop-distribute-patterns')
-conf_data.set('_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL', have_cc_inhibit_loop_to_libcall,
-	      description: 'GCC flag to prevent detecting memcpy/memset patterns')
-have_no_builtin_attribute = cc.compiles('int __attribute__((no_builtin)) foo(x) { return x + 1; }')
-conf_data.set('_HAVE_NO_BUILTIN_ATTRIBUTE', have_no_builtin_attribute)
+conf_data.set('_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL',
+	      cc.has_argument('-fno-tree-loop-distribute-patterns'),
+	      description: 'Compiler flag to prevent detecting memcpy/memset patterns')
+
+conf_data.set('_HAVE_NO_BUILTIN_ATTRIBUTE',
+	      cc.compiles('int __attribute__((no_builtin)) foo(x) { return x + 1; }',
+			  name : 'no_builtin attribute',
+			  args : (cc.has_argument('-Werrror=attributes') ? '-Werror=attributes' : '')),
+	      description: 'Compiler attribute to prevent the optimizer from adding new builtin calls')
+
 conf_data.set('_HAVE_LONG_DOUBLE', have_long_double,
 	      description: 'Compiler has long double type')
 if have_long_double
