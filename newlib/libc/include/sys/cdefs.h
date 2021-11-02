@@ -575,6 +575,17 @@
 # define __inhibit_loop_to_libcall
 #endif
 
+/*
+ * Tell optimizer to not add new builtin calls when optimizing a
+ * function body.
+ */
+#if defined(_HAVE_NO_BUILTIN_ATTRIBUTE)
+# define __inhibit_new_builtin_calls \
+    __attribute__((no_builtin))
+#else
+#define __inhibit_new_builtin_calls
+#endif
+
 #ifdef __ELF__
 #ifdef __STDC__
 #define	__weak_reference(sym,alias)	\
