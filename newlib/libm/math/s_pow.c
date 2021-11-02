@@ -175,8 +175,8 @@ pow(double x, double y)
     ax = fabs(x);
     /* special value of x */
     if (lx == 0) {
-        if (ix == 0x7ff00000 || ix == 0 || ix == 0x3ff00000) {
-            z = ax; /*x is +-0,+-inf,+-1*/
+        if (ix == 0x7ff00000 || ix == 0x3ff00000) {
+            z = ax; /*x is +-inf,+-1*/
             if (hy < 0)
                 z = one / z; /* z = (1/|x|) */
             if (hx < 0) {
@@ -187,15 +187,23 @@ pow(double x, double y)
             }
             return z;
         }
+
+        if (ix == 0) {
+            if (hy < 0)
+                return __math_divzero(hx < 0 && yisint == 1);
+            if (yisint != 1)
+                x = ax;
+            return x;
+        }
     }
 
     /* (x<0)**(non-int) is NaN */
     /* REDHAT LOCAL: This used to be
-	if((((hx>>31)+1)|yisint)==0) return (x-x)/(x-x);
+	if((((hx>>31)+1)|yisint)==0) return __math_invalid(x);
        but ANSI C says a right shift of a signed negative quantity is
        implementation defined.  */
     if (((((__uint32_t)hx >> 31) - 1) | yisint) == 0)
-        return (x - x) / (x - x);
+        return __math_invalid(x);
 
     /* |y| is huge */
     if (iy > 0x41e00000) { /* if |y| > 2**31 */
@@ -339,6 +347,13 @@ pow(double x, double y)
         SET_HIGH_WORD(z, j);
     return s * z;
 }
+
+#if defined(HAVE_ALIAS_ATTRIBUTE)
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(pow, _pow);
+#endif
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
 #endif /* __OBSOLETE_MATH_DOUBLE */

@@ -122,23 +122,30 @@ powf(float x, float y)
 
     ax = fabsf(x);
     /* special value of x */
-    if (FLT_UWORD_IS_INFINITE(ix) || FLT_UWORD_IS_ZERO(ix) ||
-        ix == 0x3f800000) {
-        z = ax; /*x is +-0,+-inf,+-1*/
+    if (FLT_UWORD_IS_INFINITE(ix) || ix == 0x3f800000) {
+        z = ax; /*x is +-inf,+-1*/
         if (hy < 0)
             z = one / z; /* z = (1/|x|) */
         if (hx < 0) {
             if (((ix - 0x3f800000) | yisint) == 0) {
-                z = (z - z) / (z - z); /* (-1)**non-int is NaN */
+                return __math_invalidf(x); /* (-1)**non-int is NaN */
             } else if (yisint == 1)
                 z = -z; /* (x<0)**odd = -(|x|**odd) */
         }
         return z;
     }
 
+    if (FLT_UWORD_IS_ZERO(ix)) {
+        if (hy < 0)
+            return __math_divzerof(hx < 0 && yisint == 1);
+        if (yisint != 1)
+            x = ax;
+        return x;
+    }
+
     /* (x<0)**(non-int) is NaN */
     if (((((__uint32_t)hx >> 31) - 1) | yisint) == 0)
-        return (x - x) / (x - x);
+        return __math_invalidf(x);
 
     /* |y| is huge */
     if (iy > 0x4d000000) { /* if |y| > 2**27 */
@@ -279,4 +286,12 @@ powf(float x, float y)
         SET_FLOAT_WORD(z, j);
     return s * z;
 }
+
+#if defined(HAVE_ALIAS_ATTRIBUTE)
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(powf, _powf);
+#endif
+
 #endif /* __OBSOLETE_MATH_FLOAT */
