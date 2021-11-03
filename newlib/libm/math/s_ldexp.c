@@ -59,8 +59,10 @@ ldexp(double value, int exp)
     if (!finite(value) || value == 0.0)
         return value;
     value = scalbn(value, exp);
+#ifdef _WANT_MATH_ERRNO
     if (!finite(value) || value == 0.0)
         errno = ERANGE;
+#endif
     return value;
 }
 

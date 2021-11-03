@@ -22,8 +22,10 @@ ldexpf(float value, int exp)
     if (!finitef(value) || value == (float)0.0)
         return value;
     value = scalbnf(value, exp);
+#ifdef _WANT_MATH_ERRNO
     if (!finitef(value) || value == (float)0.0)
         errno = ERANGE;
+#endif
     return value;
 }
 
