@@ -18,7 +18,7 @@
 float
 significandf(float x)
 {
-    return scalbf(x, (float)-ilogbf(x));
+    return scalbnf(x, -ilogbf(x));
 }
 
 #ifdef _DOUBLE_IS_32BITS

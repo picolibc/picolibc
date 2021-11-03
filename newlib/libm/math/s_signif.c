@@ -24,7 +24,7 @@
 double
 significand(double x)
 {
-    return scalb(x, (double)-ilogb(x));
+    return scalbn(x, -ilogb(x));
 }
 
 #endif /* _DOUBLE_IS_32BITS */
