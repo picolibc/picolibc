@@ -27,16 +27,24 @@
 
 	GET_FLOAT_WORD(hx,x);
 	hx &= 0x7fffffff;
-	if(FLT_UWORD_IS_ZERO(hx))
+	if(FLT_UWORD_IS_ZERO(hx)) {
+            (void) __math_invalidf(0.0);
 	    return FP_ILOGB0;	/* ilogb(0) = special case error */
+        }
 	if(FLT_UWORD_IS_SUBNORMAL(hx)) {
 	    for (ix = -126,hx<<=8; hx>0; hx<<=1) ix -=1;
 	    return ix;
 	}
-	#if FP_ILOGBNAN != INT_MAX
-	else if (FLT_UWORD_IS_NAN(hx)) return FP_ILOGBNAN;	/* NAN */
-	#endif
-	else if (!FLT_UWORD_IS_FINITE(hx)) return INT_MAX;
+#if FP_ILOGBNAN != INT_MAX
+	else if (FLT_UWORD_IS_NAN(hx)) {
+            (void) __math_invalidf(0.0);
+            return FP_ILOGBNAN;	/* NAN */
+        }
+#endif
+	else if (!FLT_UWORD_IS_FINITE(hx)) {
+            (void) __math_invalidf(0.0);
+            return INT_MAX;
+        }
 	else return (hx>>23)-127;
 }
 
