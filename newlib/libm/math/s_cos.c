@@ -62,7 +62,7 @@ cos(double x)
 
     /* cos(Inf or NaN) is NaN */
     else if (ix >= 0x7ff00000)
-        return x - x;
+        return __math_invalid(x);
 
     /* argument reduction needed */
     else {

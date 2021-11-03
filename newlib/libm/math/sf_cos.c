@@ -31,7 +31,7 @@ cosf(float x)
 
     /* cos(Inf or NaN) is NaN */
     else if (!FLT_UWORD_IS_FINITE(ix))
-        return x - x;
+        return __math_invalidf(x);
 
     /* argument reduction needed */
     else {
