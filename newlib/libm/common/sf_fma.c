@@ -17,14 +17,11 @@
         float z;
 #endif
 {
-  /* NOTE:  The floating-point exception behavior of this is not as
-   * required.  But since the basic function is not really done properly,
-   * it is not worth bothering to get the exceptions right, either.  */
-  /* Let the implementation handle this. */ /* <= NONSENSE! */
-  /* In floating-point implementations in which double is larger than float,
-   * computing as double should provide the desired function.  Otherwise,
-   * the behavior will not be as specified in the standards.  */
-  return (float) (((double) x * (double) y) + (double) z);
+  /*
+   * Better to just get a double-rounded answer than invoke double
+   * precision operations and get exceptions messed up
+   */
+  return x * y + z;
 }
 
 #endif
