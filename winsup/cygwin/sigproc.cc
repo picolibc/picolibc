@@ -594,6 +594,14 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
       p = myself;
     }
 
+  /* If myself is the stub process, send signal to the child process
+     rather than myself. The fact that myself->dwProcessId is not equal
+     to the current process id indicates myself is the stub process. */
+  if (its_me && myself->dwProcessId != GetCurrentProcessId ())
+    {
+      wait_for_completion = false;
+      its_me = false;
+    }
 
   if (its_me)
     sendsig = my_sendsig;
