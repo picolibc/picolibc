@@ -40,6 +40,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <limits.h>
 
 #ifdef __STDC_IEC_559__
 #define HAVE_HW_DOUBLE
