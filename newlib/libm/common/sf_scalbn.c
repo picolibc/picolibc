@@ -23,21 +23,13 @@
 #define OVERFLOW_INT 30000
 #endif
 
-#ifdef _IEEE_LIBM
-#define erange(_ret) return (_ret)
-#else
-#define erange(_ret) do { errno = ERANGE; return (_ret); } while(0)
-#endif
-
 #ifdef __STDC__
 static const float
 #else
 static float
 #endif
 two25   =  3.355443200e+07,	/* 0x4c000000 */
-twom25  =  2.9802322388e-08,	/* 0x33000000 */
-huge   = 1.0e+30,
-tiny   = 1.0e-30;
+twom25  =  2.9802322388e-08;	/* 0x33000000 */
 
 #ifdef __STDC__
 	float scalbnf (float x, int n)
@@ -60,16 +52,18 @@ tiny   = 1.0e-30;
 	    x *= two25;
 	    GET_FLOAT_WORD(ix,x);
 	    k = ((ix&0x7f800000)>>23) - 25; 
-            if (n< -50000) erange(tiny*x); 	/*underflow*/
+            if (n< -50000)
+                return __math_uflowf(ix<0); 	/*underflow*/
         }
         if (n > OVERFLOW_INT) 	/* in case integer overflow in n+k */
-            erange(huge*copysignf(huge,x));	/*overflow*/
+            return __math_oflowf(ix<0);	        /*overflow*/
         k = k+n; 
-        if (k > FLT_LARGEST_EXP) erange(huge*copysignf(huge,x)); /* overflow  */
+        if (k > FLT_LARGEST_EXP)
+            return __math_oflowf(ix<0);          /* overflow  */
         if (k > 0) 				/* normal result */
 	    {SET_FLOAT_WORD(x,(ix&0x807fffff)|(k<<23)); return x;}
         if (k < FLT_SMALLEST_EXP)
-	    erange(tiny*copysignf(tiny,x));	/*underflow*/
+	    return __math_uflowf(ix<0);	        /*underflow*/
         k += 25;				/* subnormal result */
 	SET_FLOAT_WORD(x,(ix&0x807fffff)|(k<<23));
         return x*twom25;
