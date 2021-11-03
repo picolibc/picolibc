@@ -30,7 +30,7 @@ tanf(float x)
 
     /* tan(Inf or NaN) is NaN */
     else if (!FLT_UWORD_IS_FINITE(ix))
-        return x - x; /* NaN */
+        return __math_invalidf(x); /* NaN */
 
     /* argument reduction needed */
     else {

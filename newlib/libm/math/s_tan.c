@@ -89,7 +89,7 @@ tan(double x)
 
     /* tan(Inf or NaN) is NaN */
     else if (ix >= 0x7ff00000)
-        return x - x; /* NaN */
+        return __math_invalid(x); /* NaN */
 
     /* argument reduction needed */
     else {
