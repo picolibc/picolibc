@@ -69,6 +69,21 @@ twom25  =  2.9802322388e-08;	/* 0x33000000 */
         return x*twom25;
 }
 
+#if defined(HAVE_ALIAS_ATTRIBUTE)
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(scalbnf, ldexpf);
+#else
+
+float
+ldexpf(float value, int exp)
+{
+    return scalbnf(value, exp);
+}
+
+#endif
+
 #ifdef _DOUBLE_IS_32BITS
 
 #ifdef __STDC__
@@ -81,5 +96,20 @@ twom25  =  2.9802322388e-08;	/* 0x33000000 */
 {
 	return (double) scalbnf((float) x, n);
 }
+
+#if defined(HAVE_ALIAS_ATTRIBUTE)
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(scalbn, ldexp);
+#else
+
+double
+ldexp(double value, int exp)
+{
+    return scalbn(value, exp);
+}
+
+#endif
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

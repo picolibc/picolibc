@@ -104,4 +104,19 @@ twom54  =  5.55111512312578270212e-17; /* 0x3C900000, 0x00000000 */
         return x*twom54;
 }
 
+#if defined(HAVE_ALIAS_ATTRIBUTE)
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(scalbn, ldexp);
+#else
+
+double
+ldexp(double value, int exp)
+{
+    return scalbn(value, exp);
+}
+
+#endif
+
 #endif /* _DOUBLE_IS_32BITS */
