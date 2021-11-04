@@ -34,9 +34,9 @@ void _IO_ldtostr (long double *, char *, int, int, char);
 #define NBITS ((NI-4)*16)
 
  /* Maximum number of decimal digits in ASCII conversion
-  * = NBITS*log10(2)
+  * Take full possible size of output into account
   */
-#define NDEC (NBITS*8/27)
+#define NDEC 1023
 
  /* The exponent of 1.0 */
 #define EXONE (0x3fff)
@@ -2794,7 +2794,6 @@ _ldtoa_r (struct _reent *ptr, long double d, int mode, int ndigits,
   LDPARMS rnd;
   LDPARMS *ldp = &rnd;
   char *outstr;
-  char outbuf[NDEC + MAX_EXP_DIGITS + 10];
   union uconv du;
   du.d = d;
 
@@ -2840,6 +2839,8 @@ _ldtoa_r (struct _reent *ptr, long double d, int mode, int ndigits,
    keep straight the returned value of outexpon.  */
   if (ndigits > NDEC)
     ndigits = NDEC;
+
+  char outbuf[ndigits + MAX_EXP_DIGITS + 10];
 
   etoasc (e, outbuf, ndigits, mode, ldp);
   s = outbuf;
@@ -3111,6 +3112,8 @@ tnzro:
       else
 	{
 	  emovi (y, w);
+	  /* Note that this loop does not access the incoming string array,
+	   * which may be shorter than NDEC + 1 bytes! */
 	  for (i = 0; i < NDEC + 1; i++)
 	    {
 	      if ((w[NI - 1] & 0x7) != 0)
