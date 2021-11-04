@@ -561,10 +561,12 @@ fhandler_base::open (int flags, mode_t mode)
       access = READ_CONTROL | FILE_READ_ATTRIBUTES;
       break;
     case query_write_control:
-      access = READ_CONTROL | WRITE_OWNER | WRITE_DAC | FILE_WRITE_ATTRIBUTES;
+      access = READ_CONTROL | WRITE_OWNER | WRITE_DAC
+	       | (pc.fs_is_samba () ? 0 : FILE_WRITE_ATTRIBUTES);
       break;
     case query_write_dac:
-      access = READ_CONTROL | WRITE_DAC | FILE_WRITE_ATTRIBUTES;
+      access = READ_CONTROL | WRITE_DAC
+	       | (pc.fs_is_samba () ? 0 : FILE_WRITE_ATTRIBUTES);
       break;
     case query_write_attributes:
       access = READ_CONTROL | FILE_WRITE_ATTRIBUTES;
