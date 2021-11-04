@@ -33,10 +33,8 @@ float x;
 	GET_FLOAT_WORD(hx,x);
 	hx &= 0x7fffffff;
 	if(FLT_UWORD_IS_ZERO(hx))  {
-		float  xx;
 		/* arg==0:  return -inf and raise divide-by-zero exception */
-		SET_FLOAT_WORD(xx,hx);	/* +0.0 */
-		return -1.f/xx;	/* logbf(0) = -inf */
+		return -1.f/fabsf(x);	/* logbf(0) = -inf */
 		}
 	if(FLT_UWORD_IS_SUBNORMAL(hx)) {
 	    for (ix = -126,hx<<=8; hx>0; hx<<=1) ix -=1;
