@@ -393,7 +393,8 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
 	    }
 	}
 
-      if (nbytes_now == 0 || status == STATUS_BUFFER_OVERFLOW)
+      if ((nbytes_now == 0 && !NT_SUCCESS (status))
+	  || status == STATUS_BUFFER_OVERFLOW)
 	break;
     }
   ReleaseMutex (read_mtx);
