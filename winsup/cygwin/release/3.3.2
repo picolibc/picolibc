@@ -8,3 +8,7 @@ Bug Fixes
   Addresses: https://sourceware.org/pipermail/newlib/2021/018626.html
 
 - Fix a permission problem when writing ACLs on Samba.
+
+- Fix the issue that pipe reader falsely detects EOF if the output of
+  the C# program is redirected to the pipe.
+  Addresses: https://cygwin.com/pipermail/cygwin/2021-November/249777.html
