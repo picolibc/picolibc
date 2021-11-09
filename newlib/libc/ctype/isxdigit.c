@@ -46,5 +46,5 @@ No supporting OS subroutines are required.
 int
 isxdigit (int c)
 {
-	return(__CTYPE_PTR[c+1] & ((_X)|(_N)));
+	return(__CTYPE_PTR[c+1] & ((_ISxdigit)|(_ISdigit)));
 }

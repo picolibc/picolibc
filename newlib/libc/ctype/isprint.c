@@ -59,7 +59,7 @@ No supporting OS subroutines are required.
 int
 isgraph (int c)
 {
-	return(__CTYPE_PTR[c+1] & (_P|_U|_L|_N));
+	return(__CTYPE_PTR[c+1] & (_ISpunct|_ISupper|_ISlower|_ISdigit));
 }
 
 
@@ -67,5 +67,5 @@ isgraph (int c)
 int
 isprint (int c)
 {
-	return(__CTYPE_PTR[c+1] & (_P|_U|_L|_N|_B));
+	return(__CTYPE_PTR[c+1] & (_ISpunct|_ISupper|_ISlower|_ISdigit|_ISblank));
 }
