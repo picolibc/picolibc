@@ -31,7 +31,7 @@
 # include "machine/asm.h"
 # include "machine/regdef.h"
 # define PREFETCH_STORE_HINT PREFETCH_HINT_PREPAREFORSTORE
-#elif _COMPILING_NEWLIB
+#elif _LIBC
 # include "machine/asm.h"
 # include "machine/regdef.h"
 # define PREFETCH_STORE_HINT PREFETCH_HINT_PREPAREFORSTORE

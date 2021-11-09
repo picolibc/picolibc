@@ -15,7 +15,7 @@ details. */
 #include "cygheap.h"
 #include "devices.h"
 
-#define _COMPILING_NEWLIB
+#define _LIBC
 #include <dirent.h>
 
 #define dev_prefix_len (sizeof ("/dev"))

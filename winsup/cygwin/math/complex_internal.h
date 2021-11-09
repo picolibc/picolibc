@@ -44,7 +44,7 @@
 
 #ifdef __CYGWIN__
 /* Disable __IMPORT when defining __fdlib_version. */
-#define _COMPILING_NEWLIB
+#define _LIBC
 #define _GNU_SOURCE
 #endif
 #include <math.h>

@@ -18,7 +18,7 @@ details. */
 #include "cygheap.h"
 #include "child_info.h"
 
-#define _COMPILING_NEWLIB
+#define _LIBC
 #include <dirent.h>
 
 /* If this bit is set in __d_position then we are enumerating values,

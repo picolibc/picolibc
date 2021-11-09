@@ -32,7 +32,7 @@ details. */
 #include "mount.h"
 #include <math.h>
 
-#define _COMPILING_NEWLIB
+#define _LIBC
 #include <dirent.h>
 
 static off_t format_proc_loadavg (void *, char *&);

@@ -27,7 +27,7 @@ details. */
 #include <aio.h>
 #include <cygwin/fs.h>
 
-#define _COMPILING_NEWLIB
+#define _LIBC
 #include <dirent.h>
 
 enum __DIR_mount_type {

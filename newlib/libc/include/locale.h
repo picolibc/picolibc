@@ -21,7 +21,7 @@
 #define LC_TIME     5
 #define LC_MESSAGES 6
 
-#if __POSIX_VISIBLE >= 200809 || defined (_COMPILING_NEWLIB)
+#if __POSIX_VISIBLE >= 200809 || defined (_LIBC)
 
 #include <sys/_locale.h>
 

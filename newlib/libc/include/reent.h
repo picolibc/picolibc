@@ -174,7 +174,7 @@ extern int _open64_r (struct _reent *, const char *, int, int);
 extern int _stat64_r (struct _reent *, const char *, struct stat64 *);
 
 /* Don't pollute namespace if not building newlib. */
-#if defined (__CYGWIN__) && !defined (_COMPILING_NEWLIB)
+#if defined (__CYGWIN__) && !defined (_LIBC)
 #undef stat64
 #endif
 

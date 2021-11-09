@@ -32,7 +32,7 @@ struct stat
   timestruc_t   st_birthtim;
 };
 
-#if defined (__INSIDE_CYGWIN__) || defined (_COMPILING_NEWLIB)
+#if defined (__INSIDE_CYGWIN__) || defined (_LIBC)
 #ifdef __i386__
 struct __stat32
 {

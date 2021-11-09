@@ -26,7 +26,7 @@ details. */
 #include <sys/param.h>
 #include <ctype.h>
 
-#define _COMPILING_NEWLIB
+#define _LIBC
 #include <dirent.h>
 
 #define _KERNEL

@@ -27,7 +27,7 @@ details. */
 #include <sys/param.h>
 #include <ctype.h>
 
-#define _COMPILING_NEWLIB
+#define _LIBC
 #include <dirent.h>
 
 static off_t format_process_maps (void *, char *&);

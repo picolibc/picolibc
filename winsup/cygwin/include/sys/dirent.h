@@ -45,7 +45,7 @@ struct dirent
 #endif
 typedef struct __DIR
 {
-  /* This is first to set alignment in non _COMPILING_NEWLIB case.  */
+  /* This is first to set alignment in non _LIBC case.  */
   unsigned long __d_cookie;
   struct dirent *__d_dirent;
   char *__d_dirname;			/* directory name with trailing '*' */

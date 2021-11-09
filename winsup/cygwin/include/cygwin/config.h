@@ -35,7 +35,7 @@ extern "C" {
    compute these offsets already exists for the sake of gendef so
    we might as well just use it here.  */
 
-#if defined (_COMPILING_NEWLIB) || defined (__INSIDE_CYGWIN__)
+#if defined (_LIBC) || defined (__INSIDE_CYGWIN__)
 #ifdef __x86_64__
 #include "../tlsoffsets64.h"
 #else
@@ -52,7 +52,7 @@ extern inline struct _reent *__getreent (void)
 #endif
   return (struct _reent *) (ret + tls_local_clib);
 }
-#endif /* _COMPILING_NEWLIB || __INSIDE_CYGWIN__ */
+#endif /* _LIBC || __INSIDE_CYGWIN__ */
 
 #ifdef __x86_64__
 # define __SYMBOL_PREFIX
@@ -81,7 +81,7 @@ extern inline struct _reent *__getreent (void)
 #define __TM_ZONE   tm_zone
 #define _USE_LONG_TIME_T 1
 
-#if defined(__INSIDE_CYGWIN__) || defined(_COMPILING_NEWLIB)
+#if defined(__INSIDE_CYGWIN__) || defined(_LIBC)
 #define __EXPORT __declspec(dllexport)
 #define __IMPORT
 #else

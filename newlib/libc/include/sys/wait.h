@@ -29,7 +29,7 @@ extern "C" {
 pid_t wait (int *);
 pid_t waitpid (pid_t, int *, int);
 
-#ifdef _COMPILING_NEWLIB
+#ifdef _LIBC
 pid_t _wait (int *);
 #endif
 

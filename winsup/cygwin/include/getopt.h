@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-#ifdef _COMPILING_NEWLIB
+#ifdef _LIBC
 #include_next "getopt.h"
 #else
 #ifndef __GETOPT_H__

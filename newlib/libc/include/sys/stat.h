@@ -20,7 +20,7 @@ extern "C" {
 
 #ifdef __CYGWIN__
 #include <cygwin/stat.h>
-#ifdef _COMPILING_NEWLIB
+#ifdef _LIBC
 #define stat64 stat
 #endif
 #else
@@ -161,7 +161,7 @@ int	futimens (int, const struct timespec [2]);
 
 /* Provide prototypes for most of the _<systemcall> names that are
    provided in newlib for some compilers.  */
-#ifdef _COMPILING_NEWLIB
+#ifdef _LIBC
 int	_fstat (int __fd, struct stat *__sbuf );
 int	_stat (const char *__restrict __path, struct stat *__restrict __sbuf );
 int	_mkdir (const char *_path, mode_t __mode );

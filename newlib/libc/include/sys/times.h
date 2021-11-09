@@ -22,7 +22,7 @@ struct tms {
 };
 
 clock_t times (struct tms *);
-#ifdef _COMPILING_NEWLIB
+#ifdef _LIBC
 clock_t _times (struct tms *);
 #endif
 

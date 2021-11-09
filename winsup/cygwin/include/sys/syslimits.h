@@ -9,7 +9,7 @@ details. */
 #ifndef _SYS_SYSLIMITS_H
 #define _SYS_SYSLIMITS_H
 
-#ifdef _COMPILING_NEWLIB
+#ifdef _LIBC
 # include <limits.h>
 #else
 # error "Do not include sys/syslimits.h from applications directly."

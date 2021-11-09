@@ -54,7 +54,7 @@
 #   have_init_fini	have init/fini ("yes" or "no", set to "yes" by default)
 #   noinclude		list of include files to not install
 
-newlib_cflags="-D_COMPILING_NEWLIB"
+newlib_cflags="-D_LIBC"
 libm_machine_dir=
 machine_dir=
 shared_machine_dir=

@@ -10,7 +10,7 @@ details. */
 #include <stdlib.h>
 #include <unistd.h>
 
-#define _COMPILING_NEWLIB
+#define _LIBC
 #include <dirent.h>
 
 #include "cygerrno.h"

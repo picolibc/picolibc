@@ -43,7 +43,7 @@ int getpt (void);
 int posix_openpt (int);
 #endif
 
-#ifdef _COMPILING_NEWLIB
+#ifdef _LIBC
 #define unsetenv UNUSED_unsetenv
 #define _unsetenv_r UNUSED__unsetenv_r
 #endif

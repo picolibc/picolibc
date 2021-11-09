@@ -30,7 +30,7 @@
 #ifdef ANDROID_CHANGES
 # include "machine/asm.h"
 # include "machine/regdef.h"
-#elif _COMPILING_NEWLIB
+#elif _LIBC
 # include "machine/asm.h"
 # include "machine/regdef.h"
 #else

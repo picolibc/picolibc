@@ -17,7 +17,7 @@ details. */
 #include "cygheap.h"
 #include "shared_info.h"
 
-#define _COMPILING_NEWLIB
+#define _LIBC
 #include <dirent.h>
 
 fhandler_cygdrive::fhandler_cygdrive () :

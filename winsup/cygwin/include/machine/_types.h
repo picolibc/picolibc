@@ -5,7 +5,7 @@
 
 #include <machine/_default_types.h>
 
-#if defined (__INSIDE_CYGWIN__) || defined (_COMPILING_NEWLIB)
+#if defined (__INSIDE_CYGWIN__) || defined (_LIBC)
 typedef __int32_t __blkcnt32_t;
 typedef __int16_t  __dev16_t;
 typedef __uint16_t __uid16_t;

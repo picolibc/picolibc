@@ -169,9 +169,9 @@ int sigprocmask (int, const sigset_t *, sigset_t *);
 int pthread_sigmask (int, const sigset_t *, sigset_t *);
 #endif
 
-#ifdef _COMPILING_NEWLIB
+#ifdef _LIBC
 int _kill (pid_t, int);
-#endif /* _COMPILING_NEWLIB */
+#endif /* _LIBC */
 
 #if __POSIX_VISIBLE
 int kill (pid_t, int);
