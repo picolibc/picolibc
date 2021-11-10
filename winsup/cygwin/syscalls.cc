@@ -4714,7 +4714,7 @@ gen_full_path_at (char *path_ret, int dirfd, const char *pathname,
 	  return -1;
 	}
     }
-  if (pathname && isabspath (pathname))
+  if (pathname && isabspath_strict (pathname))
     stpcpy (path_ret, pathname);
   else
     {

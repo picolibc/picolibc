@@ -139,8 +139,16 @@ extern int cygserver_running;
 #undef issep
 #define issep(ch) (strchr (" \t\n\r", (ch)) != NULL)
 
+/* Treats "X:" as absolute path.
+   FIXME: We should drop the notion that "X:" is a valid absolute path.
+   Only "X:/" and "X:\\" should be (see isabspath_strict below).  The
+   problem is to find out if we have code depending on this behaviour. */
 #define isabspath(p) \
   (isdirsep (*(p)) || (isalpha (*(p)) && (p)[1] == ':' && (!(p)[2] || isdirsep ((p)[2]))))
+
+/* Treats "X:/" and "X:\\" as absolute paths, but not "X:" */
+#define isabspath_strict(p) \
+  (isdirsep (*(p)) || (isalpha (*(p)) && (p)[1] == ':' && isdirsep ((p)[2])))
 
 /******************** Initialization/Termination **********************/
 
