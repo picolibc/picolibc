@@ -69,7 +69,7 @@ int NO_COPY dynamically_loaded;
 /* Some CYGWIN environment variable variables. */
 bool allow_glob = true;
 bool ignore_case_with_glob;
-bool pipe_byte;
+bool pipe_byte = true; /* Default to byte mode so that C# programs work. */
 bool reset_com;
 bool wincmdln;
 winsym_t allow_winsymlinks = WSYM_default;

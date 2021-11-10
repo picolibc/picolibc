@@ -90,7 +90,10 @@ fhandler_pipe::init (HANDLE f, DWORD a, mode_t mode, int64_t uniq_id)
   set_ino (uniq_id);
   set_unique_id (uniq_id | !!(mode & GENERIC_WRITE));
   if (opened_properly)
-    set_pipe_non_blocking (is_nonblocking ());
+    /* Set read pipe always nonblocking to allow signal handling
+       even with FILE_SYNCHRONOUS_IO_NONALERT. */
+    set_pipe_non_blocking (get_device () == FH_PIPER ?
+			   true : is_nonblocking ());
   return 1;
 }
 
@@ -264,9 +267,9 @@ fhandler_pipe::release_select_sem (const char *from)
   if (get_dev () == FH_PIPER) /* Number of select() and writer */
     n_release = get_obj_handle_count (select_sem)
       - get_obj_handle_count (read_mtx);
-  else /* Number of select() call */
+  else /* Number of select() call and reader */
     n_release = get_obj_handle_count (select_sem)
-      - get_obj_handle_count (hdl_cnt_mtx);
+      - get_obj_handle_count (get_handle ());
   debug_printf("%s(%s) release %d", from,
 	       get_dev () == FH_PIPER ? "PIPER" : "PIPEW", n_release);
   if (n_release)
@@ -279,7 +282,6 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
   size_t nbytes = 0;
   NTSTATUS status = STATUS_SUCCESS;
   IO_STATUS_BLOCK io;
-  HANDLE evt;
 
   if (!len)
     return;
@@ -307,60 +309,27 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
       len = (size_t) -1;
       return;
     }
-
-  if (!(evt = CreateEvent (NULL, false, false, NULL)))
-    {
-      __seterrno ();
-      len = (size_t) -1;
-      ReleaseMutex (read_mtx);
-      return;
-    }
-
   while (nbytes < len)
     {
       ULONG_PTR nbytes_now = 0;
       ULONG len1 = (ULONG) (len - nbytes);
-      waitret = WAIT_OBJECT_0;
 
-      ResetEvent (evt);
       FILE_PIPE_LOCAL_INFORMATION fpli;
       status = NtQueryInformationFile (get_handle (), &io,
 				       &fpli, sizeof (fpli),
 				       FilePipeLocalInformation);
       if (NT_SUCCESS (status))
 	{
-	if (fpli.ReadDataAvailable == 0 && nbytes != 0)
-	  break;
+	  if (fpli.ReadDataAvailable == 0 && nbytes != 0)
+	    break;
 	}
       else if (nbytes != 0)
 	break;
-      status = NtReadFile (get_handle (), evt, NULL, NULL, &io, ptr,
+      status = NtReadFile (get_handle (), NULL, NULL, NULL, &io, ptr,
 			   len1, NULL, NULL);
-      if (status == STATUS_PENDING)
-	{
-	  waitret = cygwait (evt, INFINITE, cw_cancel | cw_sig);
-	  /* If io.Status is STATUS_CANCELLED after CancelIo, IO has actually
-	     been cancelled and io.Information contains the number of bytes
-	     processed so far.
-	     Otherwise IO has been finished regulary and io.Status contains
-	     valid success or error information. */
-	  CancelIo (get_handle ());
-	  if (waitret == WAIT_SIGNALED && io.Status != STATUS_CANCELLED)
-	    waitret = WAIT_OBJECT_0;
-
-	  if (waitret == WAIT_CANCELED)
-	    status = STATUS_THREAD_CANCELED;
-	  else if (waitret == WAIT_SIGNALED)
-	    status = STATUS_THREAD_SIGNALED;
-	  else
-	    status = io.Status;
-	}
       if (isclosed ())  /* A signal handler might have closed the fd. */
 	{
-	  if (waitret == WAIT_OBJECT_0)
-	    set_errno (EBADF);
-	  else
-	    __seterrno ();
+	  set_errno (EBADF);
 	  nbytes = (size_t) -1;
 	}
       else if (NT_SUCCESS (status)
@@ -393,7 +362,16 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
 		  nbytes = (size_t) -1;
 		  break;
 		}
-	      fallthrough;
+	      waitret = cygwait (select_sem, 1);
+	      if (waitret == WAIT_CANCELED)
+		pthread::static_cancel_self ();
+	      else if (waitret == WAIT_SIGNALED)
+		{
+		  set_errno (EINTR);
+		  nbytes = (size_t) -1;
+		  break;
+		}
+	      continue;
 	    default:
 	      __seterrno_from_nt_status (status);
 	      nbytes = (size_t) -1;
@@ -406,7 +384,6 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
 	break;
     }
   ReleaseMutex (read_mtx);
-  CloseHandle (evt);
   if (status == STATUS_THREAD_SIGNALED && nbytes == 0)
     {
       set_errno (EINTR);
@@ -990,9 +967,12 @@ nt_create (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE &r, HANDLE &w,
 				  npfsh, sa_ptr->lpSecurityDescriptor);
 
       timeout.QuadPart = -500000;
+      /* Set FILE_SYNCHRONOUS_IO_NONALERT flag so that native
+	 C# programs work with cygwin pipe. */
       status = NtCreateNamedPipeFile (&r, access, &attr, &io,
 				      FILE_SHARE_READ | FILE_SHARE_WRITE,
-				      FILE_CREATE, 0, pipe_type,
+				      FILE_CREATE,
+				      FILE_SYNCHRONOUS_IO_NONALERT, pipe_type,
 				      FILE_PIPE_BYTE_STREAM_MODE,
 				      0, 1, psize, psize, &timeout);
 
@@ -1104,7 +1084,9 @@ fhandler_pipe::fcntl (int cmd, intptr_t arg)
   const bool was_nonblocking = is_nonblocking ();
   int res = fhandler_base::fcntl (cmd, arg);
   const bool now_nonblocking = is_nonblocking ();
-  if (now_nonblocking != was_nonblocking)
+  /* Do not set blocking mode for read pipe to allow signal handling
+     even with FILE_SYNCHRONOUS_IO_NONALERT. */
+  if (now_nonblocking != was_nonblocking && get_device () != FH_PIPER)
     set_pipe_non_blocking (now_nonblocking);
   return res;
 }
