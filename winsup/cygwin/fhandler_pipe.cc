@@ -302,8 +302,16 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
       set_errno (EAGAIN);
       len = (size_t) -1;
       return;
-    default:
+    case WAIT_SIGNALED:
       set_errno (EINTR);
+      len = (size_t) -1;
+      return;
+    case WAIT_CANCELED:
+      pthread::static_cancel_self ();
+      /* NOTREACHED */
+    default:
+      /* Should not reach here. */
+      __seterrno ();
       len = (size_t) -1;
       return;
     }
