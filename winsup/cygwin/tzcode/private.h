@@ -777,19 +777,4 @@ char *ctime_r(time_t const *, char *);
   ((int_fast64_t) YEARSPERREPEAT * (int_fast64_t) AVGSECSPERYEAR)
 #define SECSPERREPEAT_BITS	34	/* ceil(log2(SECSPERREPEAT)) */
 
-#ifdef _LIBC
-#include "reentrant.h"
-extern struct __state *__lclptr;
-#if defined(__LIBC12_SOURCE__)
-#define tzset_unlocked __tzset_unlocked
-#else
-#define tzset_unlocked __tzset_unlocked50
-#endif
-
-void tzset_unlocked(void);
-#ifdef _REENTRANT
-extern rwlock_t __lcl_lock;
-#endif
-#endif
-
 #endif /* !defined PRIVATE_H */
