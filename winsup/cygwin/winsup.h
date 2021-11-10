@@ -139,18 +139,6 @@ extern int cygserver_running;
 #undef issep
 #define issep(ch) (strchr (" \t\n\r", (ch)) != NULL)
 
-/* Every path beginning with / or \, as well as every path being X:
-   or starting with X:/ or X:\ */
-#define isabspath_u(p) \
-  ((p)->Length && \
-   (iswdirsep ((p)->Buffer[0]) || \
-    ((p)->Length > sizeof (WCHAR) && iswalpha ((p)->Buffer[0]) \
-    && (p)->Buffer[1] == L':' && \
-    ((p)->Length == 2 * sizeof (WCHAR) || iswdirsep ((p)->Buffer[2])))))
-
-#define iswabspath(p) \
-  (iswdirsep (*(p)) || (iswalpha (*(p)) && (p)[1] == L':' && (!(p)[2] || iswdirsep ((p)[2]))))
-
 #define isabspath(p) \
   (isdirsep (*(p)) || (isalpha (*(p)) && (p)[1] == ':' && (!(p)[2] || isdirsep ((p)[2]))))
 
