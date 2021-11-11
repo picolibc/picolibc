@@ -51,8 +51,9 @@ If supplied, wildcard matching is case insensitive.  The default is <literal>noi
 </listitem>
 
 <listitem>
-<para><envar>(no)pipe_byte</envar> - causes Cygwin to open pipes in byte mode rather than
-message mode.</para>
+<para><envar>(no)pipe_byte</envar> - if set, Cygwin opens pipes in byte mode rather than
+message mode.  This is the default starting with Cygwin 3.4.0.
+</para>
 </listitem>
 
 <listitem>
