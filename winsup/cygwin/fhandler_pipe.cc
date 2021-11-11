@@ -449,7 +449,7 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
       return -1;
     }
 
-  if (len <= pipe_buf_size)
+  if (len <= pipe_buf_size || pipe_buf_size == 0)
     chunk = len;
   else if (is_nonblocking ())
     chunk = len = pipe_buf_size;
