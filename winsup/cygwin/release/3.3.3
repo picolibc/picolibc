@@ -1,0 +1,11 @@
+Bug Fixes
+---------
+
+- Fix issue that new pipe code doesn't handle reading zero byte reads
+  emitted by some non-Cygwin apps.
+  Addresses: https://cygwin.com/pipermail/cygwin/2021-November/249844.html
+
+- Make sure that "X:" paths are not handled as absolute DOS paths in
+  fstatat and other ...at calls.  "X:/" still is handled as absolute
+  path.
+  Addresses: https://cygwin.com/pipermail/cygwin/2021-November/249837.html
