@@ -332,10 +332,7 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
 	  set_errno (EBADF);
 	  nbytes = (size_t) -1;
 	}
-      else if (NT_SUCCESS (status)
-	       || status == STATUS_BUFFER_OVERFLOW
-	       || status == STATUS_THREAD_CANCELED
-	       || status == STATUS_THREAD_SIGNALED)
+      else if (NT_SUCCESS (status) || status == STATUS_BUFFER_OVERFLOW)
 	{
 	  nbytes_now = io.Information;
 	  ptr = ((char *) ptr) + nbytes_now;
@@ -384,13 +381,6 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
 	break;
     }
   ReleaseMutex (read_mtx);
-  if (status == STATUS_THREAD_SIGNALED && nbytes == 0)
-    {
-      set_errno (EINTR);
-      nbytes = (size_t) -1;
-    }
-  else if (status == STATUS_THREAD_CANCELED)
-    pthread::static_cancel_self ();
   len = nbytes;
 }
 
