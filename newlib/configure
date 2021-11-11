@@ -618,6 +618,7 @@ HAVE_LONG_DOUBLE_FALSE
 HAVE_LONG_DOUBLE_TRUE
 libc_cv_cc_loop_to_function
 libc_cv_initfinit_array
+EXEEXT_FOR_BUILD
 CC_FOR_BUILD
 STDIO64_OBJECTLIST
 UNIX_OBJECTLIST
@@ -838,7 +839,6 @@ CPPFLAGS
 CPP'
 ac_subdirs_all='libc
 libm
-doc
 iconvdata'
 
 # Initialize some variables set by options.
@@ -12237,8 +12237,6 @@ subdirs="$subdirs libm"
 
 if test -z "${with_multisubdir}"; then
   have_multisubdir=no
-  subdirs="$subdirs doc"
-
 else
   have_multisubdir=yes
 fi
@@ -12355,7 +12353,37 @@ fi
 
 # Put a plausible default for CC_FOR_BUILD in Makefile.
 if test -z "$CC_FOR_BUILD"; then
-  CC_FOR_BUILD=gcc
+  if test "x$cross_compiling" = "xno"; then
+    CC_FOR_BUILD='$(CC)'
+  else
+    CC_FOR_BUILD=gcc
+  fi
+fi
+
+
+# Also set EXEEXT_FOR_BUILD.
+if test "x$cross_compiling" = "xno"; then
+  EXEEXT_FOR_BUILD='$(EXEEXT)'
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for build system executable suffix" >&5
+$as_echo_n "checking for build system executable suffix... " >&6; }
+if ${newlib_cv_build_exeext+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat > ac_c_test.c << 'EOF'
+int main() {
+/* Nothing needed here */
+}
+EOF
+    ${CC_FOR_BUILD} -o ac_c_test am_c_test.c 1>&5 2>&5
+    newlib_cv_build_exeext=`echo ac_c_test.* | grep -v ac_c_test.c | sed -e s/ac_c_test//`
+    rm -f ac_c_test*
+    test x"${newlib_cv_build_exeext}" = x && newlib_cv_build_exeext=no
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $newlib_cv_build_exeext" >&5
+$as_echo "$newlib_cv_build_exeext" >&6; }
+  EXEEXT_FOR_BUILD=""
+  test x"${newlib_cv_build_exeext}" != xno && EXEEXT_FOR_BUILD=${newlib_cv_build_exeext}
 fi
 
 

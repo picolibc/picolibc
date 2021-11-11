@@ -303,7 +303,6 @@ AC_CONFIG_SUBDIRS(libm)
 
 if test -z "${with_multisubdir}"; then
   have_multisubdir=no
-  AC_CONFIG_SUBDIRS(doc)
 else
   have_multisubdir=yes
 fi
@@ -398,9 +397,32 @@ AC_SUBST(STDIO64_OBJECTLIST)
 
 # Put a plausible default for CC_FOR_BUILD in Makefile.
 if test -z "$CC_FOR_BUILD"; then
-  CC_FOR_BUILD=gcc
+  if test "x$cross_compiling" = "xno"; then
+    CC_FOR_BUILD='$(CC)'
+  else
+    CC_FOR_BUILD=gcc
+  fi
 fi
 AC_SUBST(CC_FOR_BUILD)
+
+# Also set EXEEXT_FOR_BUILD.
+if test "x$cross_compiling" = "xno"; then
+  EXEEXT_FOR_BUILD='$(EXEEXT)'
+else
+  AC_CACHE_CHECK([for build system executable suffix], newlib_cv_build_exeext,
+    [cat > ac_c_test.c << 'EOF'
+int main() {
+/* Nothing needed here */
+}
+EOF
+    ${CC_FOR_BUILD} -o ac_c_test am_c_test.c 1>&5 2>&5
+    newlib_cv_build_exeext=`echo ac_c_test.* | grep -v ac_c_test.c | sed -e s/ac_c_test//`
+    rm -f ac_c_test*
+    test x"${newlib_cv_build_exeext}" = x && newlib_cv_build_exeext=no])
+  EXEEXT_FOR_BUILD=""
+  test x"${newlib_cv_build_exeext}" != xno && EXEEXT_FOR_BUILD=${newlib_cv_build_exeext}
+fi
+AC_SUBST(EXEEXT_FOR_BUILD)
 
 if test "${newlib_elix_level}" -gt "0"; then
 AC_DEFINE_UNQUOTED(_ELIX_LEVEL,${newlib_elix_level})

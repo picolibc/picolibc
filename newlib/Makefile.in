@@ -55,11 +55,16 @@ build_triplet = @build@
 host_triplet = @host@
 @HAVE_CRT0_TRUE@@HAVE_MULTISUBDIR_TRUE@@USE_LIBTOOL_FALSE@am__append_1 = $(BUILD_MULTISUBDIR)/$(CRT0)
 @HAVE_MULTISUBDIR_TRUE@@USE_LIBTOOL_FALSE@am__append_2 = $(BUILD_MULTISUBDIR)/libc.a $(BUILD_MULTISUBDIR)/libm.a
+DIST_COMMON = $(srcdir)/doc/local.mk NEWS README ChangeLog \
+	$(srcdir)/Makefile.in $(srcdir)/Makefile.am \
+	$(top_srcdir)/configure $(am__configure_deps) acconfig.h \
+	$(srcdir)/_newlib_version.hin $(srcdir)/newlib.hin \
+	$(srcdir)/../mkinstalldirs
+
+# We can't use noinst_PROGRAMS, because automake will add $(EXEEXT).
+@HAVE_DOC_TRUE@am__append_3 = doc/makedoc
+@HAVE_DOC_TRUE@am__append_4 = man-cache
 subdir = .
-DIST_COMMON = NEWS README ChangeLog $(srcdir)/Makefile.in \
-	$(srcdir)/Makefile.am $(top_srcdir)/configure \
-	$(am__configure_deps) acconfig.h $(srcdir)/_newlib_version.hin \
-	$(srcdir)/newlib.hin $(srcdir)/../mkinstalldirs
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../libtool.m4 \
 	$(top_srcdir)/../ltoptions.m4 $(top_srcdir)/../ltsugar.m4 \
@@ -171,7 +176,7 @@ RUNTEST = `if test -f $(top_srcdir)/../dejagnu/runtest; then \
 	   else \
 	     echo runtest; \
 	   fi`
-DIST_SUBDIRS = libc libm doc . @EXTRA_DIRS@
+DIST_SUBDIRS = $(SUBDIRS)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AR = @AR@
@@ -204,6 +209,7 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+EXEEXT_FOR_BUILD = @EXEEXT_FOR_BUILD@
 EXTRA_DIRS = @EXTRA_DIRS@
 FGREP = @FGREP@
 GREP = @GREP@
@@ -317,8 +323,16 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AUTOMAKE_OPTIONS = cygnus dejagnu
+AUTOMAKE_OPTIONS = cygnus dejagnu subdir-objects
 ACLOCAL_AMFLAGS = -I . -I ..
+
+# Variables that will accumulate in subdirs.
+
+# Multilib support.
+PHONY = all-multi check-multi mostlyclean-multi clean-multi \
+	distclean-multi maintainer-clean-multi $(am__append_4)
+noinst_DATA = stmp-targ-include $(am__append_1) $(am__append_2) \
+	$(am__append_3)
 
 # Multilib support variables.
 MULTISRCTOP = 
@@ -375,15 +389,12 @@ AM_MAKEFLAGS = \
 	"DESTDIR=$(DESTDIR)"
 
 FLAGS_TO_PASS = $(AM_MAKEFLAGS)
-@HAVE_DOC_FALSE@DOCDIR = 
-@HAVE_DOC_TRUE@DOCDIR = doc
 SUBDIRS = libc libm \
-	$(DOCDIR) . $(EXTRA_DIRS)
+	. $(EXTRA_DIRS)
 
 tooldir = $(exec_prefix)/$(host_alias)
 toollibdir = $(tooldir)/lib$(MULTISUBDIR)
 AR_FLAGS = rc
-noinst_DATA = stmp-targ-include $(am__append_1) $(am__append_2)
 @USE_LIBTOOL_TRUE@toollib_LTLIBRARIES = libm.la \
 @USE_LIBTOOL_TRUE@	libc.la
 
@@ -449,6 +460,7 @@ MAKEOVERRIDES =
 
 # dejagnu support
 RUNTESTFLAGS = 
+@HAVE_DOC_TRUE@MKDOC = doc/makedoc$(EXEEXT_FOR_BUILD)
 all: _newlib_version.h newlib.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -456,7 +468,7 @@ all: _newlib_version.h newlib.h
 .SUFFIXES: .c .lo .o .obj
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/doc/local.mk $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -479,6 +491,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe);; \
 	esac;
+$(srcdir)/doc/local.mk:
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
@@ -594,10 +607,10 @@ distclean-compile:
 	-rm -f *.tab.c
 
 .c.o:
-	$(COMPILE) -c $<
+	$(COMPILE) -c -o $@ $<
 
 .c.obj:
-	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+	$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .c.lo:
 	$(LTCOMPILE) -c -o $@ $<
@@ -1172,10 +1185,7 @@ unidata:
 	cd $(srcdir)/libc/ctype; ./mkunidata -u
 
 # Force makedoc to be built before building info files.
-info-recursive: doc/makedoc
-dvi-recursive: doc/makedoc
-doc/makedoc:
-	cd doc && $(MAKE) all
+info-recursive dvi-recursive: doc/makedoc$(EXEEXT_FOR_BUILD)
 
 # Recursive targets for man and install-man
 man:
@@ -1192,10 +1202,6 @@ install-man:
 	    (cd $$d && $(MAKE) install-man) || exit 1; \
 	  fi; \
 	done
-
-# Multilib support.
-.PHONY: all-multi check-multi mostlyclean-multi clean-multi distclean-multi \
-	maintainer-clean-multi
 
 all-recursive: all-multi
 check-recursive: check-multi
@@ -1280,6 +1286,22 @@ check-DEJAGNU: site.exp
 
 clean-local:
 	-rm -rf targ-include newlib.h _newlib_version.h stamp-*
+
+# We don't use CFLAGS with CC_FOR_BUILD because here CFLAGS will
+# actually be CFLAGS_FOR_TARGET, and in some cases that will include
+# -Os, which CC_FOR_BUILD may not recognize.
+
+@HAVE_DOC_TRUE@$(MKDOC): doc/makedoc.o
+@HAVE_DOC_TRUE@	$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) $(LDFLAGS_FOR_BUILD) -o $@ $<
+
+@HAVE_DOC_TRUE@doc/makedoc.o: doc/makedoc.c
+@HAVE_DOC_TRUE@	$(MKDIR_P) doc
+@HAVE_DOC_TRUE@	$(CC_FOR_BUILD) -g $(CFLAGS_FOR_BUILD) -o $@ -c $<
+
+@HAVE_DOC_TRUE@man-cache:
+@HAVE_DOC_TRUE@	${srcdir}/doc/makedocbook.py --cache
+
+.PHONY: $(PHONY)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

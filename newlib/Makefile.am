@@ -1,7 +1,11 @@
 ## Process this file with automake to generate Makefile.in
 
-AUTOMAKE_OPTIONS = cygnus dejagnu
+AUTOMAKE_OPTIONS = cygnus dejagnu subdir-objects
 ACLOCAL_AMFLAGS = -I . -I ..
+
+# Variables that will accumulate in subdirs.
+PHONY =
+noinst_DATA =
 
 # Multilib support variables.
 MULTISRCTOP =
@@ -63,21 +67,15 @@ AM_MAKEFLAGS = \
 
 FLAGS_TO_PASS=$(AM_MAKEFLAGS)
 
-if HAVE_DOC
-DOCDIR = doc
-else
-DOCDIR =
-endif
-
 SUBDIRS = libc libm \
-	$(DOCDIR) . $(EXTRA_DIRS)
+	. $(EXTRA_DIRS)
 
 tooldir = $(exec_prefix)/$(host_alias)
 toollibdir = $(tooldir)/lib$(MULTISUBDIR)
 
 AR_FLAGS = rc
 
-noinst_DATA = stmp-targ-include
+noinst_DATA += stmp-targ-include
 
 if USE_LIBTOOL
 toollib_LTLIBRARIES = libm.la \
@@ -424,10 +422,7 @@ unidata:
 	cd $(srcdir)/libc/ctype; ./mkunidata -u
 
 # Force makedoc to be built before building info files.
-info-recursive: doc/makedoc
-dvi-recursive: doc/makedoc
-doc/makedoc:
-	cd doc && $(MAKE) all
+info-recursive dvi-recursive: doc/makedoc$(EXEEXT_FOR_BUILD)
 
 # Recursive targets for man and install-man
 man:
@@ -448,7 +443,7 @@ install-man:
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 
 # Multilib support.
-.PHONY: all-multi check-multi mostlyclean-multi clean-multi distclean-multi \
+PHONY += all-multi check-multi mostlyclean-multi clean-multi distclean-multi \
 	maintainer-clean-multi
 
 all-recursive: all-multi
@@ -540,3 +535,9 @@ check-DEJAGNU: site.exp
 
 clean-local:
 	-rm -rf targ-include newlib.h _newlib_version.h stamp-*
+
+if HAVE_DOC
+include doc/local.mk
+endif
+
+.PHONY: $(PHONY)
