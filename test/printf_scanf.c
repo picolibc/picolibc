@@ -265,7 +265,7 @@ main(void)
 			e = fabs(v-r) / v;
 			if (e > (float_type) ERROR_MAX)
 			{
-				printf("\tg %3d: wanted %.7e got %.7e (error %.7e, buf %s)\n", x,
+				printf("\ta %3d: wanted %.7e got %.7e (error %.7e, buf %s)\n", x,
 				       printf_float(v), printf_float(r), printf_float(e), buf);
 				errors++;
 				fflush(stdout);
