@@ -92,6 +92,7 @@ FLOAT_T makemathname(test_cbrt_nan)(void) { return makemathname(cbrt)(makemathna
 
 FLOAT_T makemathname(test_cos_inf)(void) { return makemathname(cos)(makemathname(infval)); }
 FLOAT_T makemathname(test_cos_nan)(void) { return makemathname(cos)(makemathname(nanval)); }
+FLOAT_T makemathname(test_cos_0)(void) { return makemathname(cos)(makemathname(zero)); }
 
 FLOAT_T makemathname(test_cosh_big)(void) { return makemathname(cosh)(makemathname(big)); }
 FLOAT_T makemathname(test_cosh_negbig)(void) { return makemathname(cosh)(makemathname(big)); }
@@ -238,6 +239,9 @@ long makemathname(test_lround_negbig)(void) { makemathname(lround)(-makemathname
 
 FLOAT_T makemathname(test_sin_inf)(void) { return makemathname(sin)(makemathname(infval)); }
 FLOAT_T makemathname(test_sin_nan)(void) { return makemathname(sin)(makemathname(nanval)); }
+FLOAT_T makemathname(test_sin_pio2)(void) { return makemathname(sin)(makemathname(pio2)); }
+FLOAT_T makemathname(test_sin_small)(void) { return makemathname(sin)(makemathname(small)); }
+FLOAT_T makemathname(test_sin_0)(void) { return makemathname(sin)(makemathname(zero)); }
 
 /* This is mostly here to make sure sincos doesn't infinite loop due to compiler optimization */
 FLOAT_T makemathname(test_sincos)(void) {
@@ -405,6 +409,7 @@ FLOAT_T makemathname(test_sqrt_neg0)(void) { return makemathname(sqrt)(-makemath
 FLOAT_T makemathname(test_sqrt_inf)(void) { return makemathname(sqrt)(makemathname(infval)); }
 FLOAT_T makemathname(test_sqrt_neginf)(void) { return makemathname(sqrt)(-makemathname(infval)); }
 FLOAT_T makemathname(test_sqrt_neg)(void) { return makemathname(sqrt)(-makemathname(two)); }
+FLOAT_T makemathname(test_sqrt_2)(void) { return makemathname(sqrt)(makemathname(two)); }
 
 FLOAT_T makemathname(test_tan_nan)(void) { return makemathname(tan)(makemathname(nanval)); }
 FLOAT_T makemathname(test_tan_inf)(void) { return makemathname(tan)(makemathname(infval)); }
@@ -509,6 +514,7 @@ struct {
 
         TEST(cos_inf, (FLOAT_T)NAN, FE_INVALID, EDOM),
         TEST(cos_nan, (FLOAT_T)NAN, 0, 0),
+        TEST(cos_0, (FLOAT_T)1.0, 0, 0),
 
         TEST(cosh_big, (FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
         TEST(cosh_negbig, (FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
@@ -786,6 +792,9 @@ struct {
 
         TEST(sin_inf, (FLOAT_T)NAN, FE_INVALID, EDOM),
         TEST(sin_nan, (FLOAT_T)NAN, 0, 0),
+        TEST(sin_pio2, (FLOAT_T)1.0, FE_INEXACT, 0),
+        TEST(sin_small, (FLOAT_T)SMALL, FE_INEXACT, 0),
+        TEST(sin_0, (FLOAT_T)0.0, 0, 0),
 
         TEST(sincos, (FLOAT_T)1.0, 0, 0),
         TEST(sincos_inf, (FLOAT_T)NAN, FE_INVALID, EDOM),
@@ -803,6 +812,11 @@ struct {
         TEST(sqrt_inf, (FLOAT_T)INFINITY, 0, 0),
         TEST(sqrt_neginf, (FLOAT_T)NAN, FE_INVALID, EDOM),
 	TEST(sqrt_neg, (FLOAT_T)NAN, FE_INVALID, EDOM),
+        /*
+         * Picolibc doesn't ever set inexact for sqrt as that's
+         * an expensive operation
+         */
+//	TEST(sqrt_2, (FLOAT_T)1.4142135623730951, FE_INEXACT, 0),
 
         TEST(tan_nan, (FLOAT_T)NAN, 0, 0),
         TEST(tan_inf, (FLOAT_T)NAN, FE_INVALID, EDOM),
