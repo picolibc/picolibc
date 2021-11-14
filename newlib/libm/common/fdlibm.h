@@ -18,6 +18,7 @@
 #include <math.h>
 #include <sys/types.h>
 #include <machine/ieeefp.h>
+#include <fenv.h>
 #include "math_config.h"
 
 /* Most routines need to check whether a float is finite, infinite, or not a
@@ -80,6 +81,39 @@
 #endif
 #define FLT_UWORD_HALF_MAX (FLT_UWORD_MAX-(1L<<23))
 #define FLT_LARGEST_EXP (FLT_UWORD_MAX>>23)
+
+/* rounding mode tests; nearest if not set. Assumes hardware
+ * without rounding mode support uses nearest
+ */
+
+/* If there are rounding modes other than FE_TONEAREST defined, then
+ * add code to check which is active
+ */
+#if (defined(FE_UPWARD) + defined(FE_DOWNWARD) + defined(FE_TOWARDZERO)) >= 1
+#define FE_DECL_ROUND(v)        int v = fegetround()
+#define __is_nearest(r)         ((r) == FE_TONEAREST)
+#else
+#define FE_DECL_ROUND(v)
+#define __is_nearest(r)         1
+#endif
+
+#ifdef FE_UPWARD
+#define __is_upward(r)          ((r) == FE_UPWARD)
+#else
+#define __is_upward(r)          0
+#endif
+
+#ifdef FE_DOWNWARD
+#define __is_downward(r)        ((r) == FE_DOWNWARD)
+#else
+#define __is_downward(r)        0
+#endif
+
+#ifdef FE_TOWARDZERO
+#define __is_towardzero(r)      ((r) == FE_TOWARDZERO)
+#else
+#define __is_towardzero(r)      0
+#endif
 
 /* Many routines check for zero and subnormal numbers.  Such things depend
    on whether the target supports denormals or not:
