@@ -125,14 +125,26 @@ div_f_mul_sub(float a, float b, float c, float d)
 
 #define do_fancyf(sign) div_f_mul_sub(sign 1.0f, 3.0f, 3.0f, sign 1.0f)
 
+#define n4      nextafter(4.0, 5.0)
+#define nn4     nextafter(nextafter(4.0, 5.0), 5.0)
+#define n2      nextafter(2.0, 3.0)
+#define nn2     nextafter(nextafter(2.0, 3.0), 3.0)
+
+#define n4f     nextafterf(4.0f, 5.0f)
+#define nn4f    nextafterf(nextafterf(4.0f, 5.0f), 5.0f)
+#define n2f     nextafterf(2.0f, 3.0f)
+
 static int
 check(int mode, char *name, double value)
 {
 	int ret = 0;
 
-	printf("test %s for value %g\n", name, value);
+        (void) mode;
+        (void) name;
+        (void) value;
 #ifndef PICOLIBC_DOUBLE_NOROUND
 	double want, got;
+	printf("test double %s for value %g \n", name, value);
 	want = do_round_int(value, mode);
 	if (fesetround(mode) != 0) {
 		printf("ERROR fesetround %s failed\n", name);
@@ -158,6 +170,7 @@ check(int mode, char *name, double value)
 #ifndef PICOLIBC_FLOAT_NOROUND
 	float valuef = value, wantf, gotf;
 
+	printf("test float %s for value %g \n", name, value);
 	wantf = do_roundf_int(valuef, mode);
 	if (fesetround(mode) != 0) {
 		printf("ERROR fesetround %s failed\n", name);
@@ -251,6 +264,30 @@ int main(void)
 	check_func(up_plus, toward_plus, "up/toward");
 	check_func(up_minus, down_minus, "-up/-down");
 	check_func(toward_minus, down_minus, "-toward/-down");
+
+#define check_sqrt(mode, param, expect) do {                            \
+                fesetround(mode);                                       \
+                double __p = (param);                                   \
+                double __e = (expect);                                  \
+                printf("testing sqrt %s for value %a\n", #mode, __p);   \
+                double __r = sqrt(__p);                                 \
+                if (__r != __e) {                                       \
+                        printf("ERROR %s: sqrt(%a) got %a expect %a\n", #mode, __p, __r, __e); \
+                        ret++;                                          \
+                }                                                       \
+        } while(0)
+
+        check_sqrt(FE_TONEAREST, n4, 2.0);
+        check_sqrt(FE_TONEAREST, nn4, n2);
+
+        check_sqrt(FE_UPWARD, n4, n2);
+        check_sqrt(FE_UPWARD, nn4, n2);
+
+        check_sqrt(FE_DOWNWARD, n4, 2.0);
+        check_sqrt(FE_DOWNWARD, nn4, 2.0);
+
+        check_sqrt(FE_TOWARDZERO, n4, 2.0);
+        check_sqrt(FE_TOWARDZERO, nn4, 2.0);
 #endif
 #ifndef PICOLIBC_FLOAT_NOROUND
 	float fup_plus, ftoward_plus, fdown_plus, fup_minus, ftoward_minus, fdown_minus;
@@ -271,6 +308,31 @@ int main(void)
 	check_func(fup_plus, ftoward_plus, "fup/ftoward");
 	check_func(fup_minus, fdown_minus, "-fup/-fdown");
 	check_func(ftoward_minus, fdown_minus, "-ftoward/-fdown");
+
+#define check_sqrtf(mode, param, expect) do {                           \
+                fesetround(mode);                                       \
+                float __p = (param);                                    \
+                float __e = (expect);                                   \
+                printf("testing sqrtf %s for value %a\n", #mode, (double) __p); \
+                float __r = sqrtf(__p);                                 \
+                if (__r != __e) {                                       \
+                    printf("ERROR %s: sqrtf(%a) got %a expect %a\n", #mode, (double) __p, (double) __r, (double) __e); \
+                        ret++;                                          \
+                }                                                       \
+        } while(0)
+
+        check_sqrtf(FE_TONEAREST, n4f, 2.0f);
+        check_sqrtf(FE_TONEAREST, nn4f, n2f);
+
+        check_sqrtf(FE_UPWARD, n4f, n2f);
+        check_sqrtf(FE_UPWARD, nn4f, n2f);
+
+        check_sqrtf(FE_DOWNWARD, n4f, 2.0f);
+        check_sqrtf(FE_DOWNWARD, nn4f, 2.0f);
+
+        check_sqrtf(FE_TOWARDZERO, n4f, 2.0f);
+        check_sqrtf(FE_TOWARDZERO, nn4f, 2.0f);
+
 #endif
 #endif
 
