@@ -47,8 +47,8 @@ typedef int fexcept_t;
 #endif
 
 #if defined(__SOFTFP__) || (__ARM_FP & 0x4) == 0
-#define PICOLIBC_DOUBLE_NOROUND
-#define PICOLIBC_DOUBLE_NOEXCEPT
+#define PICOLIBC_FLOAT_NOROUND
+#define PICOLIBC_FLOAT_NOEXCEPT
 #endif
 
 #ifndef __SOFTFP__
