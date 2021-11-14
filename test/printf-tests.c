@@ -8,6 +8,8 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <math.h>
 
 #ifndef TINY_STDIO
 #define printf_float(x) x
@@ -98,6 +100,7 @@ static int test(int serial, char *expect, char *fmt, ...) {
 #ifdef TEST_ASPRINTF
     va_end(aap);
 #endif
+//    printf("serial %d expect \"%s\" got \"%s\"\n", serial, expect, buf);
     if (n >= 1024) {
         failmsg(serial, "buffer overflow");
 	free(abuf);
