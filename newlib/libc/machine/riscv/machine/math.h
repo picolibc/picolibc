@@ -72,7 +72,9 @@
 # define __declare_riscv_macro_fclass(type) static __inline type
 #endif
 
-#if defined (__riscv_flen) && __riscv_flen >= 64
+/* We always need the fclass functions */
+
+#if __riscv_flen >= 64
 __declare_riscv_macro_fclass(long)
 _fclass_d(double x)
 {
@@ -82,7 +84,21 @@ _fclass_d(double x)
 }
 #endif
 
-#if defined(__riscv_flen) && __riscv_flen >= 64 && defined(__GNUC_GNU_INLINE__)
+#if __riscv_flen >= 32
+__declare_riscv_macro_fclass(long)
+_fclass_f(float x)
+{
+	long fclass;
+	__asm __volatile ("fclass.s\t%0, %1" : "=r" (fclass) : "f" (x));
+	return fclass;
+}
+#endif
+
+#undef declare_riscv_macro_fclass
+
+#ifdef __declare_riscv_macro
+
+#if __riscv_flen >= 64
 
 /* Double-precision functions */
 __declare_riscv_macro(double)
@@ -181,19 +197,9 @@ fma (double x, double y, double z)
 }
 #endif
 
-#endif /* defined(__riscv_flen) && __riscv_flen >= 64 && defined(__GNUC_GNU_INLINE__) */
+#endif /* __riscv_flen >= 64 */
 
-#if defined(__riscv_flen) && __riscv_flen >= 32
-__declare_riscv_macro_fclass(long)
-_fclass_f(float x)
-{
-	long fclass;
-	__asm __volatile ("fclass.s\t%0, %1" : "=r" (fclass) : "f" (x));
-	return fclass;
-}
-#endif
-
-#if defined(__riscv_flen) && __riscv_flen >= 32 && defined(__GNUC_GNU_INLINE__)
+#if __riscv_flen >= 32
 
 /* Single-precision functions */
 __declare_riscv_macro(float)
@@ -278,9 +284,8 @@ sqrtf (float x)
 	return result;
 }
 
-#endif /* defined(__riscv_flen) && __riscv_flen >= 32 && defined(__GNUC_GNU_INLINE__) */
 
-#if defined(HAVE_FAST_FMAF) && defined(__GNUC_GNU_INLINE__)
+#if defined(HAVE_FAST_FMAF)
 __declare_riscv_macro(float)
 fmaf (float x, float y, float z)
 {
@@ -289,5 +294,11 @@ fmaf (float x, float y, float z)
 	return result;
 }
 #endif
+
+#endif /* __riscv_flen >= 32 */
+
+#undef declare_riscv_macro
+
+#endif /* defined(declare_riscv_macro) */
 
 #endif /* _MACHINE_MATH_H_ */
