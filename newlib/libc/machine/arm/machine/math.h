@@ -38,6 +38,7 @@
 #ifndef _MACHINE_MATH_H_
 #define _MACHINE_MATH_H_
 
+#if defined(_HAVE_ATTRIBUTE_ALWAYS_INLINE) && defined(_HAVE_ATTRIBUTE_GNU_INLINE)
 #define __declare_arm_macro(type) extern __inline type __attribute((gnu_inline, always_inline))
 
 #ifdef _WANT_MATH_ERRNO
@@ -214,5 +215,7 @@ fmaf (float x, float y, float z)
 #endif /* (__ARM_FP & 0x4) && !defined(__SOFTFP__) */
 
 #undef __declare_arm_macro
+
+#endif /* have attributes */
 
 #endif /* _MACHINE_MATH_H_ */
