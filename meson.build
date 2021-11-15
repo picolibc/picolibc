@@ -734,6 +734,12 @@ conf_data.set('HAVE_BUILTIN_MUL', have_builtin_mul_overflow, description: 'Compi
 conf_data.set('HAVE_COMPLEX', have_complex, description: 'Compiler supports _Complex')
 conf_data.set('HAVE_BUILTIN_EXPECT', have_builtin_expect, description: 'Compiler has __builtin_expect')
 conf_data.set('HAVE_ALLOC_SIZE', have_alloc_size, description: 'The compiler REALLY has the attribute __alloc_size__')
+conf_data.set('_HAVE_ATTRIBUTE_ALWAYS_INLINE',
+	      cc.has_function_attribute('always_inline'),
+	      descrption: 'The compiler supports the always_inline function attribute')
+conf_data.set('_HAVE_ATTRIBUTE_GNU_INLINE',
+	      cc.has_function_attribute('gnu_inline'),
+	      descrption: 'The compiler supports the gnu_inline function attribute')
 
 # Obsolete newlib options
 conf_data.set('_WANT_USE_LONG_TIME_T', get_option('newlib-long-time_t'), description: 'Obsoleted. Define time_t to long instead of using a 64-bit type')
@@ -892,7 +898,7 @@ conf_data.set('HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs support
 # By default, tests don't require any special arguments
 
 # disable compiler built-ins so we reach the library equivalents
-test_c_args = arg_fnobuiltin
+test_c_args = c_args + arg_fnobuiltin
 if tests_enable_stack_protector
   if cc.has_argument('-fstack-protector-all') and cc.has_argument('-fstack-protector-strong')
     test_c_args += ['-fstack-protector-all', '-fstack-protector-strong', '-DTESTS_ENABLE_STACK_PROTECTOR']
