@@ -32,6 +32,7 @@
 #include <math.h>
 #include <stdint.h>
 #include <errno.h>
+#include <fenv.h>
 
 #ifndef WANT_ROUNDING
 /* Correct special case results in non-nearest rounding modes.  */
@@ -386,6 +387,23 @@ check_uflow (double x)
 {
   return WANT_ERRNO ? __math_check_uflow (x) : x;
 }
+
+/* Set inexact exception */
+#if defined(FE_INEXACT) && !defined(PICOLIBC_DOUBLE_NOEXECPT)
+double __math_inexact(double);
+void __math_set_inexact(void);
+#else
+#define __math_inexact(val) (val)
+#define __math_set_inexact()
+#endif
+
+#if defined(FE_INEXACT) && !defined(PICOLIBC_FLOAT_NOEXECPT)
+float __math_inexactf(float val);
+void __math_set_inexactf(void);
+#else
+#define __math_inexactf(val) (val)
+#define __math_set_inexactf()
+#endif
 
 /* Shared between expf, exp2f and powf.  */
 #define EXP2F_TABLE_BITS 5

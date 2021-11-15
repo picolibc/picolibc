@@ -85,6 +85,8 @@ dsrcs_common = [
   'math_err_may_uflow.c',
   'math_err_check_uflow.c',
   'math_err_check_oflow.c',
+  'math_inexact.c',
+  'math_inexactf.c',
   'log.c',
   'log_data.c',
   'log2.c',
