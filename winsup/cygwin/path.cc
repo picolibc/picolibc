@@ -1945,7 +1945,7 @@ symlink_wsl (const char *oldpath, path_conv &win32_newpath)
   status = NtCreateFile (&fh, DELETE | FILE_GENERIC_WRITE
 			     | READ_CONTROL | WRITE_DAC,
 			 win32_newpath.get_object_attr (attr, sec_none_nih),
-			 &io, NULL, FILE_ATTRIBUTE_NORMAL,
+			 &io, NULL, FILE_ATTRIBUTE_ARCHIVE,
 			 FILE_SHARE_VALID_FLAGS, FILE_CREATE,
 			 FILE_SYNCHRONOUS_IO_NONALERT
 			 | FILE_NON_DIRECTORY_FILE
@@ -2264,7 +2264,7 @@ symlink_worker (const char *oldpath, path_conv &win32_newpath, bool isdevice)
 
       status = NtCreateFile (&fh, access,
 			     win32_newpath.get_object_attr (attr, sec_none_nih),
-			     &io, NULL, FILE_ATTRIBUTE_NORMAL,
+			     &io, NULL, FILE_ATTRIBUTE_ARCHIVE,
 			     FILE_SHARE_VALID_FLAGS,
 			     isdevice ? FILE_OVERWRITE_IF : FILE_CREATE,
 			     FILE_SYNCHRONOUS_IO_NONALERT

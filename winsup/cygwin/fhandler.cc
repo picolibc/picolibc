@@ -649,7 +649,8 @@ fhandler_base::open (int flags, mode_t mode)
 
       if (flags & (O_CREAT | O_TMPFILE))
 	{
-	  file_attributes |= FILE_ATTRIBUTE_NORMAL;
+	  file_attributes |= (flags & O_TMPFILE)
+			     ? FILE_ATTRIBUTE_NORMAL : FILE_ATTRIBUTE_ARCHIVE;
 
 	  if (pc.fs_is_nfs ())
 	    {
