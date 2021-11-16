@@ -66,8 +66,7 @@ build_script: >-
     make &&
     make install &&
     (cd */newlib; make info man) &&
-    (cd */newlib; make install-info install-man) &&
-    (cd */winsup; test "${BUILD}" != 'x86_64-pc-cygwin' || make check || true)"
+    (cd */newlib; make install-info install-man)"
 
 test: off
 deploy: off
