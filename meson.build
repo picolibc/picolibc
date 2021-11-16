@@ -164,9 +164,7 @@ c_args = ['-include', '@0@/@1@'.format(meson.current_build_dir(), 'picolibc.h')]
 
 # Disable ssp and fortify source while building picolibc (it's enabled
 # by default by the ubuntu native compiler)
-if cc.has_argument('-fno-stack-protector')
-  c_args += '-fno-stack-protector'
-endif
+c_args += cc.get_supported_arguments(['-fno-common', '-frounding-math', '-Wno-unsupported-floating-point-opt', '-fno-stack-protector'])
 
 # Select a fortify source option
 fortify_source = get_option('fortify-source')
@@ -176,12 +174,6 @@ else
   c_args += '-D_FORTIFY_SOURCE=' + fortify_source
 endif
 
-if cc.has_argument('-fno-common')
-  c_args += '-fno-common'
-endif
-if cc.has_argument('-frounding-math') and cc.get_id() != 'clang'
-  c_args += '-frounding-math'
-endif
 if cc.symbols_have_underscore_prefix()
   global_prefix = '_'
 else
