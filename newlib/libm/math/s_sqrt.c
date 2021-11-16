@@ -85,8 +85,6 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
-static const volatile double one = 1.0, tiny = 1.0e-300;
-
 double
 sqrt(double x)
 {
@@ -169,15 +167,13 @@ sqrt(double x)
         r >>= 1;
     }
 
-    /* use floating add to find out rounding direction */
     if ((ix0 | ix1) != 0) {
-        z = one - tiny; /* trigger inexact flag */
-        if (z >= one) {
-            z = one + tiny;
+        FE_DECL_ROUND(rnd);
+        if (__is_nearest(rnd) || __is_upward(rnd)) {
             if (q1 == (__uint32_t)0xffffffff) {
                 q1 = 0;
                 q += 1;
-            } else if (z > one) {
+            } else if (__is_upward(rnd)) {
                 if (q1 == (__uint32_t)0xfffffffe)
                     q += 1;
                 q1 += 2;

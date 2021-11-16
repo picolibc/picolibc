@@ -15,8 +15,6 @@
 
 #include "fdlibm.h"
 
-static const volatile float one = 1.0, tiny = 1.0e-30;
-
 float
 sqrtf(float x)
 {
@@ -69,16 +67,12 @@ sqrtf(float x)
         r >>= 1;
     }
 
-    /* use floating add to find out rounding direction */
     if (ix != 0) {
-        z = one - tiny; /* trigger inexact flag */
-        if (z >= one) {
-            z = one + tiny;
-            if (z > one)
-                q += 2;
-            else
-                q += (q & 1);
-        }
+        FE_DECL_ROUND(rnd);
+        if (__is_nearest(rnd))
+            q += (q & 1);
+        else if (__is_upward(rnd))
+            q += 2;
     }
     ix = (q >> 1) + 0x3f000000L;
     ix += (m << 23);
