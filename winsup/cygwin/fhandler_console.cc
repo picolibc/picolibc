@@ -919,7 +919,22 @@ fhandler_console::process_input_message (void)
 	    }
 	  else
 	    {
-	      nread = con.con_to_str (tmp + 1, 59, unicode_char);
+	      WCHAR second = unicode_char >= 0xd800 && unicode_char <= 0xdbff
+		  && i + 1 < total_read ?
+		  input_rec[i + 1].Event.KeyEvent.uChar.UnicodeChar : 0;
+
+	      if (second < 0xdc00 || second > 0xdfff)
+		{
+		  nread = con.con_to_str (tmp + 1, 59, unicode_char);
+		}
+	      else
+		{
+		  /* handle surrogate pairs */
+		  WCHAR pair[2] = { unicode_char, second };
+		  nread = sys_wcstombs (tmp + 1, 59, pair, 2);
+		  i++;
+		}
+
 	      /* Determine if the keystroke is modified by META.  The tricky
 		 part is to distinguish whether the right Alt key should be
 		 recognized as Alt, or as AltGr. */
