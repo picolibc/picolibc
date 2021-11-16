@@ -270,7 +270,7 @@ _lgammaf_r(float x, int *signgamp)
         r = x * (logf(x) - one);
     if (hx < 0)
         r = nadj - r;
-    return __math_check_oflowf(r);
+    return check_oflowf(r);
 }
 
 float

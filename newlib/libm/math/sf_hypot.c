@@ -86,5 +86,5 @@ hypotf(float x, float y)
         SET_FLOAT_WORD(t1, 0x3f800000L + (k << 23));
         w *= t1;
     }
-    return __math_check_oflowf(w);
+    return check_oflowf(w);
 }

@@ -381,6 +381,13 @@ check_oflow (double x)
   return WANT_ERRNO ? __math_check_oflow (x) : x;
 }
 
+/* Check if the result overflowed to infinity.  */
+static inline float
+check_oflowf (float x)
+{
+  return WANT_ERRNO ? __math_check_oflowf (x) : x;
+}
+
 /* Check if the result underflowed to 0.  */
 static inline double
 check_uflow (double x)

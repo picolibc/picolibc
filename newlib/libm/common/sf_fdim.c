@@ -19,7 +19,7 @@
 
   float z = x > y ? x - y : 0.0;
   if (!isinf(x) && !isinf(y))
-    z = __math_check_oflowf(z);
+    z = check_oflowf(z);
   return z;
 }
 
