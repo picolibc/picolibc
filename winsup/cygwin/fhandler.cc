@@ -676,8 +676,6 @@ fhandler_base::open (int flags, mode_t mode)
 	    /* If mode has no write bits set, and ACLs are not used, we set
 	       the DOS R/O attribute. */
 	    file_attributes |= FILE_ATTRIBUTE_READONLY;
-	  /* The file attributes are needed for later use in, e.g. fchmod. */
-	  pc.file_attributes (file_attributes);
 	  /* Never set the WRITE_DAC flag here.  Calls to fstat may return
 	     wrong st_ctime information after calls to fchmod, fchown, etc
 	     because Windows only guarantees the update of metadata when
@@ -720,28 +718,38 @@ fhandler_base::open (int flags, mode_t mode)
 	goto done;
    }
 
-  /* Always create files using a NULL SD.  Create correct permission bits
-     afterwards, maintaining the owner and group information just like chmod.
+  if (io.Information == FILE_CREATED)
+    {
+      /* Correct file attributes are needed for later use in, e.g. fchmod. */
+      FILE_BASIC_INFORMATION fbi;
 
-     This is done for two reasons.
+      if (!NT_SUCCESS (NtQueryInformationFile (fh, &io, &fbi, sizeof fbi,
+					       FileBasicInformation)))
+	fbi.FileAttributes = file_attributes | FILE_ATTRIBUTE_ARCHIVE;
+      pc.file_attributes (fbi.FileAttributes);
 
-     On Windows filesystems we need to create the file with default
-     permissions to allow inheriting ACEs.  When providing an explicit DACL
-     in calls to [Nt]CreateFile, the created file will not inherit default
-     permissions from the parent object.  This breaks not only Windows
-     inheritance, but also POSIX ACL inheritance.
+      /* Always create files using a NULL SD.  Create correct permission bits
+	 afterwards, maintaining the owner and group information just like
+	 chmod.  This is done for two reasons.
 
-     Another reason to do this are remote shares.  Files on a remote share
-     are created as the user used for authentication.  In a domain that's
-     usually the user you're logged in as.  Outside of a domain you're
-     authenticating using a local user account on the sharing machine.
-     If the SIDs of the client machine are used, that's entirely
-     unexpected behaviour.  Doing it like we do here creates the expected SD
-     in a domain as well as on standalone servers.
-     This is the result of a discussion on the samba-technical list, starting at
-     http://lists.samba.org/archive/samba-technical/2008-July/060247.html */
-  if (io.Information == FILE_CREATED && has_acls ())
-    set_created_file_access (fh, pc, mode);
+	 On Windows filesystems we need to create the file with default
+	 permissions to allow inheriting ACEs.  When providing an explicit DACL
+	 in calls to [Nt]CreateFile, the created file will not inherit default
+	 permissions from the parent object.  This breaks not only Windows
+	 inheritance, but also POSIX ACL inheritance.
+
+	 Another reason to do this are remote shares.  Files on a remote share
+	 are created as the user used for authentication.  In a domain that's
+	 usually the user you're logged in as.  Outside of a domain you're
+	 authenticating using a local user account on the sharing machine.
+	 If the SIDs of the client machine are used, that's entirely unexpected
+	 behaviour.  Doing it like we do here creates the expected SD in a
+	 domain as well as on standalone servers.  This is the result of a
+	 discussion on the samba-technical list, starting at
+	 http://lists.samba.org/archive/samba-technical/2008-July/060247.html */
+      if (has_acls ())
+	set_created_file_access (fh, pc, mode);
+    }
 
   /* If you O_TRUNC a file on Linux, the data is truncated, but the EAs are
      preserved.  If you open a file on Windows with FILE_OVERWRITE{_IF} or
