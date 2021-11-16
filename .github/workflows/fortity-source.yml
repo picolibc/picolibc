@@ -76,7 +76,7 @@ jobs:
 
           # Multithread disabled
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dnewlib-tinystdio=false"
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false"
         ]
         test: [
           "./.github/do-test do-native-configure build-native",
