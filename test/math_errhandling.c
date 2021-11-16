@@ -42,10 +42,6 @@
 #include <errno.h>
 #include <limits.h>
 
-#ifdef __STDC_IEC_559__
-#define HAVE_HW_DOUBLE
-#endif
-
 static const char *
 e_to_str(int e)
 {
@@ -133,11 +129,12 @@ e_to_str(int e)
 #define scat(a,b) a ## b
 
 /* Tests with doubles */
-#ifdef HAVE_HW_DOUBLE
-#define EXCEPTION_TEST	MATH_ERREXCEPT
+#ifdef PICOLIBC_DOUBLE_NOEXCEPT
+#define EXCEPTION_TEST 0
 #else
-#define EXCEPTION_TEST	0
+#define EXCEPTION_TEST	MATH_ERREXCEPT
 #endif
+#define DOUBLE_EXCEPTION_TEST EXCEPTION_TEST
 
 #define BIG 1.7e308
 #define SMALL 5e-324
@@ -173,7 +170,7 @@ int main(void)
 {
 	int result = 0;
 
-#ifdef HAVE_HW_DOUBLE
+#if DOUBLE_EXCEPTION_TEST
 	printf("Double tests:\n");
 	result += run_tests();
 #endif
