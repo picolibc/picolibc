@@ -142,7 +142,7 @@ hypot(double x, double y)
         SET_HIGH_WORD(t1, high + (k << 20));
         w *= t1;
     }
-    return __math_check_oflow(w);
+    return check_oflow(w);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

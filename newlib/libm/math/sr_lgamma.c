@@ -336,7 +336,7 @@ _lgamma_r(double x, int *signgamp)
         r = x * (log(x) - one);
     if (hx < 0)
         r = nadj - r;
-    return __math_check_oflow(r);
+    return check_oflow(r);
 }
 
 double

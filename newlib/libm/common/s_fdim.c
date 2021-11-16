@@ -54,7 +54,7 @@ ANSI C, POSIX.
 
   double z = x > y ? x - y : 0.0;
   if (!isinf(x) && !isinf(y))
-    z = __math_check_oflow(z);
+    z = check_oflow(z);
   return z;
 }
 
