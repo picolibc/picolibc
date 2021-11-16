@@ -678,9 +678,9 @@ conf_data.set('_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL',
 	      description: 'Compiler flag to prevent detecting memcpy/memset patterns')
 
 conf_data.set('_HAVE_NO_BUILTIN_ATTRIBUTE',
-	      cc.compiles('int __attribute__((no_builtin)) foo(x) { return x + 1; }',
+	      cc.compiles('int __attribute__((no_builtin)) foo(int x) { return x + 1; }',
 			  name : 'no_builtin attribute',
-			  args : (cc.has_argument('-Werrror=attributes') ? '-Werror=attributes' : '')),
+			  args : (cc.has_argument('-Werror=attributes') ? '-Werror=attributes' : '')),
 	      description: 'Compiler attribute to prevent the optimizer from adding new builtin calls')
 
 conf_data.set('_HAVE_LONG_DOUBLE', have_long_double,
