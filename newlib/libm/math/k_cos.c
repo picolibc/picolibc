@@ -66,10 +66,8 @@ __kernel_cos(double x, double y)
     __int32_t ix;
     GET_HIGH_WORD(ix, x);
     ix &= 0x7fffffff; /* ix = |x|'s high word*/
-    if (ix < 0x3e400000) { /* if x < 2**27 */
-        if (((int)x) == 0)
-            return one; /* generate inexact */
-    }
+    if (ix < 0x3e400000) /* if x < 2**27 */
+        return one;
     z = x * x;
     r = z * (C1 + z * (C2 + z * (C3 + z * (C4 + z * (C5 + z * C6)))));
     if (ix < 0x3FD33333) /* if |x| < 0.3 */

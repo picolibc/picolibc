@@ -31,10 +31,7 @@ __kernel_sinf(float x, float y, int iy)
     GET_FLOAT_WORD(ix, x);
     ix &= 0x7fffffff; /* high word of x */
     if (ix < 0x32000000) /* |x| < 2**-27 */
-    {
-        if ((int)x == 0)
-            return x;
-    } /* generate inexact */
+        return __math_inexactf(x); /* generate inexact */
     z = x * x;
     v = z * x;
     r = S2 + z * (S3 + z * (S4 + z * (S5 + z * S6)));
