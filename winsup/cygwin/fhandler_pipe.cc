@@ -279,13 +279,12 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
   size_t nbytes = 0;
   NTSTATUS status = STATUS_SUCCESS;
   IO_STATUS_BLOCK io;
-  HANDLE evt = NULL;
+  HANDLE evt;
 
   if (!len)
     return;
 
-  /* Create a wait event if we're in blocking mode. */
-  if (!is_nonblocking () && !(evt = CreateEvent (NULL, false, false, NULL)))
+  if (!(evt = CreateEvent (NULL, false, false, NULL)))
     {
       __seterrno ();
       len = (size_t) -1;
@@ -321,8 +320,7 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
       ULONG len1 = (ULONG) (len - nbytes);
       waitret = WAIT_OBJECT_0;
 
-      if (evt)
-	ResetEvent (evt);
+      ResetEvent (evt);
       FILE_PIPE_LOCAL_INFORMATION fpli;
       status = NtQueryInformationFile (get_handle (), &io,
 				       &fpli, sizeof (fpli),
@@ -336,7 +334,7 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
 	break;
       status = NtReadFile (get_handle (), evt, NULL, NULL, &io, ptr,
 			   len1, NULL, NULL);
-      if (evt && status == STATUS_PENDING)
+      if (status == STATUS_PENDING)
 	{
 	  waitret = cygwait (evt, INFINITE, cw_cancel | cw_sig);
 	  /* If io.Status is STATUS_CANCELLED after CancelIo, IO has actually
@@ -406,8 +404,7 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
 	break;
     }
   ReleaseMutex (read_mtx);
-  if (evt)
-    CloseHandle (evt);
+  CloseHandle (evt);
   if (status == STATUS_THREAD_SIGNALED && nbytes == 0)
     {
       set_errno (EINTR);
@@ -437,7 +434,7 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
   ULONG chunk;
   NTSTATUS status = STATUS_SUCCESS;
   IO_STATUS_BLOCK io;
-  HANDLE evt = NULL;
+  HANDLE evt;
 
   if (!len)
     return 0;
@@ -456,8 +453,7 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
   else
     chunk = pipe_buf_size;
 
-  /* Create a wait event if the pipe or fifo is in blocking mode. */
-  if (!is_nonblocking () && !(evt = CreateEvent (NULL, false, false, NULL)))
+  if (!(evt = CreateEvent (NULL, false, false, NULL)))
     {
       __seterrno ();
       return -1;
@@ -502,41 +498,41 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 	{
 	  status = NtWriteFile (get_handle (), evt, NULL, NULL, &io,
 				(PVOID) ptr, len1, NULL, NULL);
-	  if (evt || !NT_SUCCESS (status) || io.Information > 0
+	  if (status == STATUS_PENDING)
+	    {
+	      while (WAIT_TIMEOUT ==
+		     (waitret = cygwait (evt, (DWORD) 0, cw_cancel | cw_sig)))
+		{
+		  if (reader_closed ())
+		    {
+		      CancelIo (get_handle ());
+		      set_errno (EPIPE);
+		      raise (SIGPIPE);
+		      goto out;
+		    }
+		  else
+		    cygwait (select_sem, 10);
+		}
+	      /* If io.Status is STATUS_CANCELLED after CancelIo, IO has
+		 actually been cancelled and io.Information contains the
+		 number of bytes processed so far.
+		 Otherwise IO has been finished regulary and io.Status
+		 contains valid success or error information. */
+	      CancelIo (get_handle ());
+	      if (waitret == WAIT_SIGNALED && io.Status != STATUS_CANCELLED)
+		waitret = WAIT_OBJECT_0;
+
+	      if (waitret == WAIT_CANCELED)
+		status = STATUS_THREAD_CANCELED;
+	      else if (waitret == WAIT_SIGNALED)
+		status = STATUS_THREAD_SIGNALED;
+	      else
+		status = io.Status;
+	    }
+	  if (!is_nonblocking () || !NT_SUCCESS (status) || io.Information > 0
 	      || len <= PIPE_BUF)
 	    break;
 	  len1 >>= 1;
-	}
-      if (evt && status == STATUS_PENDING)
-	{
-	  while (WAIT_TIMEOUT ==
-		 (waitret = cygwait (evt, (DWORD) 0, cw_cancel | cw_sig)))
-	    {
-	      if (reader_closed ())
-		{
-		  CancelIo (get_handle ());
-		  set_errno (EPIPE);
-		  raise (SIGPIPE);
-		  goto out;
-		}
-	      else
-		cygwait (select_sem, 10);
-	    }
-	  /* If io.Status is STATUS_CANCELLED after CancelIo, IO has actually
-	     been cancelled and io.Information contains the number of bytes
-	     processed so far.
-	     Otherwise IO has been finished regulary and io.Status contains
-	     valid success or error information. */
-	  CancelIo (get_handle ());
-	  if (waitret == WAIT_SIGNALED && io.Status != STATUS_CANCELLED)
-	    waitret = WAIT_OBJECT_0;
-
-	  if (waitret == WAIT_CANCELED)
-	    status = STATUS_THREAD_CANCELED;
-	  else if (waitret == WAIT_SIGNALED)
-	    status = STATUS_THREAD_SIGNALED;
-	  else
-	    status = io.Status;
 	}
       if (isclosed ())  /* A signal handler might have closed the fd. */
 	{
@@ -570,8 +566,7 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 	break;
     }
 out:
-  if (evt)
-    CloseHandle (evt);
+  CloseHandle (evt);
   if (status == STATUS_THREAD_SIGNALED && nbytes == 0)
     set_errno (EINTR);
   else if (status == STATUS_THREAD_CANCELED)
