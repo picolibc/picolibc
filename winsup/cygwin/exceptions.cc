@@ -157,7 +157,7 @@ cygwin_exception::open_stackdumpfile ()
       NTSTATUS status;
       /* Try to open it to dump the stack in it. */
       status = NtCreateFile (&h, GENERIC_WRITE | SYNCHRONIZE, &attr, &io,
-			     NULL, FILE_ATTRIBUTE_ARCHIVE, 0, FILE_OVERWRITE_IF,
+			     NULL, FILE_ATTRIBUTE_NORMAL, 0, FILE_OVERWRITE_IF,
 			     FILE_SYNCHRONOUS_IO_NONALERT
 			     | FILE_OPEN_FOR_BACKUP_INTENT, NULL, 0);
       if (NT_SUCCESS (status))
