@@ -28,9 +28,13 @@
 
 #include "math_config.h"
 
+static const FORCE_DOUBLE VAL = pick_double_except(0.0, (double) INFINITY);
+
 HIDDEN double
 __math_divzero (uint32_t sign)
 {
-  double y = opt_barrier_double (sign ? -1.0 : 1.0) / 0.0;
-  return __math_with_errno (y, ERANGE);
+    double y = pick_double_except(1.0 / VAL, VAL);
+    if (sign)
+        y = -y;
+    return __math_with_errno (y, ERANGE);
 }

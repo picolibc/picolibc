@@ -29,9 +29,13 @@
 #include "fdlibm.h"
 #include "math_config.h"
 
+static const FORCE_FLOAT VAL = pick_float_except(0.0f, (float) NAN);
+
 HIDDEN float
 __math_invalidf (float x)
 {
-  float y = (x - x) / (x - x);
-  return isnan (x) ? y : __math_with_errnof (y, EDOM);
+    if (isnan(x))
+        return pick_float_except(x, (float) NAN);
+    x = pick_float_except(VAL / VAL, VAL);
+    return __math_with_errnof (x, EDOM);
 }

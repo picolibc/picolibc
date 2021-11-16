@@ -29,9 +29,13 @@
 #include "fdlibm.h"
 #include "math_config.h"
 
+static const FORCE_FLOAT VAL = pick_float_except(0.0f, (float) INFINITY);
+
 HIDDEN float
 __math_divzerof (uint32_t sign)
 {
-  float y = 0;
-  return __math_with_errnof ((sign ? -1 : 1) / y, ERANGE);
+    float y = pick_float_except(1.0f / VAL, VAL);
+    if (sign)
+        y = -y;
+    return __math_with_errnof (y, ERANGE);
 }

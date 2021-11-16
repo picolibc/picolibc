@@ -290,29 +290,47 @@ issignaling_inline (double x)
   return 2 * (ix ^ 0x0008000000000000) > 2 * 0x7ff8000000000000ULL;
 }
 
+#ifdef PICOLIBC_FLOAT_NOEXCEPT
+#define FORCE_FLOAT     float
+#define pick_float_except(expr,val)    (val)
+#else
+#define FORCE_FLOAT     volatile float
+#define pick_float_except(expr,val)    (expr)
+#endif
+
+#ifdef PICOLIBC_DOUBLE_NOEXCEPT
+#define FORCE_DOUBLE    double
+#define pick_double_except(expr,val)    (val)
+#else
+#define FORCE_DOUBLE    volatile double
+#define pick_double_except(expr,val)    (expr)
+#endif
+
 static ALWAYS_INLINE float
 opt_barrier_float (float x)
 {
-  volatile float y = x;
+  FORCE_FLOAT y = x;
   return y;
 }
+
 static ALWAYS_INLINE double
 opt_barrier_double (double x)
 {
-  volatile double y = x;
+  FORCE_DOUBLE y = x;
   return y;
 }
 
 static ALWAYS_INLINE void
 force_eval_float (float x)
 {
-  volatile float y = x;
+  FORCE_FLOAT y = x;
   (void) y;
 }
+
 static ALWAYS_INLINE void
 force_eval_double (double x)
 {
-  volatile double y = x;
+  FORCE_DOUBLE y = x;
   (void) y;
 }
 

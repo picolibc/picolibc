@@ -29,11 +29,17 @@
 #include "math_config.h"
 
 #if WANT_ERRNO_UFLOW
+
+static const FORCE_DOUBLE VAL = pick_double_except(0x1.8p-538, 0.0);
+
 /* Underflows to zero in some non-nearest rounding mode, setting errno
    is valid even if the result is non-zero, but in the subnormal range.  */
 HIDDEN double
 __math_may_uflow (uint32_t sign)
 {
-  return __math_xflow (sign, 0x1.8p-538);
+    double y = pick_float_except(VAL * VAL, VAL);
+    if (sign)
+        y = -y;
+    return __math_with_errno (y, ERANGE);
 }
 #endif

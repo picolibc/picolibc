@@ -37,16 +37,18 @@
 
 #if FE_INEXACT && !defined(PICOLIBC_FLOAT_NOEXECPT)
 
+static const FORCE_FLOAT VAL = pick_float_except(FLT_MIN, 0.0f);
+
 HIDDEN void
 __math_set_inexactf(void)
 {
-    force_eval_float(1.0f + FLT_MIN);
+    force_eval_float(1.0f + VAL);
 }
 
 HIDDEN float
 __math_inexactf(float val)
 {
-    force_eval_float(1.0f + FLT_MIN);
+    force_eval_float(1.0f + VAL);
     return val;
 }
 

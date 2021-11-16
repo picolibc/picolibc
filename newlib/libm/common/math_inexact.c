@@ -37,16 +37,18 @@
 
 #if FE_INEXACT && !defined(PICOLIBC_DOUBLE_NOEXECPT)
 
+static const FORCE_DOUBLE VAL = pick_double_except(DBL_MIN, 0.0);
+
 HIDDEN void
 __math_set_inexact(void)
 {
-    force_eval_double(1.0 + DBL_MIN);
+    force_eval_double(1.0 + VAL);
 }
 
 HIDDEN double
 __math_inexact(double val)
 {
-    force_eval_double(1.0 + DBL_MIN);
+    force_eval_double(1.0 + VAL);
     return val;
 }
 

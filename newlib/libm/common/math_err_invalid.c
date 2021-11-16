@@ -28,9 +28,13 @@
 
 #include "math_config.h"
 
+static const FORCE_DOUBLE VAL = pick_double_except(0.0, (double) NAN);
+
 HIDDEN double
 __math_invalid (double x)
 {
-  double y = (x - x) / (x - x);
-  return isnan (x) ? y : __math_with_errno (y, EDOM);
+    if (isnan(x))
+        return pick_double_except(x, VAL);
+    x = pick_double_except(VAL / VAL, VAL);
+    return __math_with_errno (x, EDOM);
 }

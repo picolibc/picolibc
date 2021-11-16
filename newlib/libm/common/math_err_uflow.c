@@ -28,8 +28,13 @@
 
 #include "math_config.h"
 
+static const FORCE_DOUBLE VAL = pick_double_except(DBL_MIN, 0.0);
+
 HIDDEN double
 __math_uflow (uint32_t sign)
 {
-  return __math_xflow (sign, 0x1p-767);
+    double y = pick_double_except(VAL * VAL, VAL);
+    if (sign)
+        y = -y;
+    return __math_with_errno (y, ERANGE);
 }
