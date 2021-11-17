@@ -648,8 +648,9 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 
       if (!iscygwin ())
 	{
+	  int fd;
 	  cfd.rewind ();
-	  while (cfd.next () >= 0)
+	  while ((fd = cfd.next ()) >= 0)
 	    if (cfd->get_major () == DEV_PTYS_MAJOR)
 	      {
 		fhandler_pty_slave *ptys =
@@ -657,13 +658,15 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 		ptys->create_invisible_console ();
 		ptys->setup_locale ();
 	      }
-	    else if (cfd->get_dev () == FH_PIPEW)
+	    else if (cfd->get_dev () == FH_PIPEW
+		     && (fd == (in__stdout < 0 ? 1 : in__stdout) || fd == 2))
 	      {
 		fhandler_pipe *pipe = (fhandler_pipe *)(fhandler_base *) cfd;
 		pipe->close_query_handle ();
 		pipe->set_pipe_non_blocking (false);
 	      }
-	    else if (cfd->get_dev () == FH_PIPER)
+	    else if (cfd->get_dev () == FH_PIPER
+		     && fd == (in__stdin < 0 ? 0 : in__stdin))
 	      {
 		fhandler_pipe *pipe = (fhandler_pipe *)(fhandler_base *) cfd;
 		pipe->set_pipe_non_blocking (false);
