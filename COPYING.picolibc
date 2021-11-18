@@ -188,8 +188,8 @@ Files: newlib/libc/string/ffsl.c
  newlib/libc/string/fls.c
  newlib/libc/string/flsl.c
  newlib/libc/string/flsll.c
- newlib/libm/machine/arm/e_sqrt.c
- newlib/libm/machine/arm/ef_sqrt.c
+ newlib/libm/machine/arm/s_sqrt.c
+ newlib/libm/machine/arm/sf_sqrt.c
 Copyright: 2017 embedded brains GmbH
 License: BSD2-1
 
@@ -704,15 +704,14 @@ Files: hello-world/hello-world++.c++
  newlib/libc/tinystdio/vasprintf.c
  newlib/libm/machine/arm/s_fma_arm.c
  newlib/libm/machine/arm/sf_fma_arm.c
- newlib/libm/machine/riscv/e_sqrt.c
- newlib/libm/machine/riscv/ef_sqrt.c
  newlib/libm/machine/riscv/s_fma.c
  newlib/libm/machine/riscv/s_fma_riscv.c
+ newlib/libm/machine/riscv/s_sqrt.c
  newlib/libm/machine/riscv/sf_fma.c
  newlib/libm/machine/riscv/sf_fma_riscv.c
+ newlib/libm/machine/riscv/sf_sqrt.c
  newlib/libm/machine/x86_64/meson.build
- newlib/libm/math/e_lgamma.c
- newlib/libm/math/ef_lgamma.c
+ newlib/libm/math/s_lgamma.c
  scripts/run-aarch64
  scripts/run-i386
  scripts/run-rv32imac
@@ -799,6 +798,8 @@ Files: newlib/empty.c
  newlib/libc/tinystdio/strfromf.c
  newlib/libm/common/dreml.c
  newlib/libm/common/exp10l.c
+ newlib/libm/common/math_inexact.c
+ newlib/libm/common/math_inexactf.c
  newlib/libm/common/pow10l.c
  newlib/libm/common/sincosl.c
  newlib/libm/machine/powerpc/meson.build
@@ -1256,10 +1257,10 @@ Files: newlib/libc/machine/arm/aeabi_memset.c
  newlib/libc/machine/arm/memset-thumb2.S
  newlib/libc/machine/arm/memset.S
  newlib/libc/machine/arm/memset.c
- newlib/libm/machine/aarch64/e_sqrt.c
- newlib/libm/machine/aarch64/ef_sqrt.c
  newlib/libm/machine/aarch64/s_fabs.c
+ newlib/libm/machine/aarch64/s_sqrt.c
  newlib/libm/machine/aarch64/sf_fabs.c
+ newlib/libm/machine/aarch64/sf_sqrt.c
 Copyright: 2015 ARM Ltd
 License: BSD3-8
 
@@ -1583,7 +1584,6 @@ Files: newlib/libc/machine/spu/fdopen.c
  newlib/libm/common/fminl.c
  newlib/libm/common/fmodl.c
  newlib/libm/common/frexpl.c
- newlib/libm/common/hypotl.c
  newlib/libm/common/ilogbl.c
  newlib/libm/common/isinfl.c
  newlib/libm/common/isnanl.c
@@ -1897,7 +1897,7 @@ Files: newlib/libc/string/memmem.c
  newlib/libm/common/math_err_oflow.c
  newlib/libm/common/math_err_uflow.c
  newlib/libm/common/math_err_with_errno.c
- newlib/libm/common/math_err_xflow.c
+ newlib/libm/common/math_errf_check_oflowf.c
  newlib/libm/common/pow.c
  newlib/libm/common/pow_log_data.c
  newlib/libm/common/sincosf.c
@@ -1914,7 +1914,6 @@ Files: newlib/libm/common/math_config.h
  newlib/libm/common/math_errf_oflowf.c
  newlib/libm/common/math_errf_uflowf.c
  newlib/libm/common/math_errf_with_errnof.c
- newlib/libm/common/math_errf_xflowf.c
  newlib/libm/common/sf_pow.c
 Copyright: 2017-2018 Arm Ltd.
 License: BSD3-28
@@ -2269,7 +2268,8 @@ Files: newlib/libm/machine/spu/headers/nearbyintf4.h
 Copyright: 2006,2008, International Business Machines Corporation, Sony Computer Entertainment, Incorporated, Toshiba Corporation, 
 License: BSD3-36
 
-Files: .gitattributes
+Files: .clang-format
+ .gitattributes
  .github/Dockerfile
  .github/do-build
  .github/do-test
@@ -2411,8 +2411,8 @@ Files: newlib/libc/ctype/isblank.c
  newlib/libc/stdlib/wcrtomb.c
  newlib/libc/stdlib/wcsrtombs.c
  newlib/libc/stdlib/wctob.c
- newlib/libm/math/w_sincos.c
- newlib/libm/math/wf_sincos.c
+ newlib/libm/math/s_sincos.c
+ newlib/libm/math/sf_sincos.c
 Copyright: 2002 Thomas Fitzsimmons <fitzsim@redhat.com>
 License: Default-1
 
@@ -2991,7 +2991,7 @@ Files: newlib/libm/common/sl_finite.c
  newlib/libm/complex/cabsl.c
  newlib/libm/complex/cimagl.c
  newlib/libm/complex/creall.c
- newlib/libm/math/el_hypot.c
+ newlib/libm/math/sl_hypot.c
 Copyright: 2015 Red Hat, Incorporated.
 License: Other-1
 
@@ -3606,50 +3606,6 @@ Files: newlib/libm/common/fdlibm.h
  newlib/libm/common/sf_scalbln.c
  newlib/libm/common/sf_scalbn.c
  newlib/libm/common/sf_trunc.c
- newlib/libm/math/e_acos.c
- newlib/libm/math/e_acosh.c
- newlib/libm/math/e_asin.c
- newlib/libm/math/e_atan2.c
- newlib/libm/math/e_atanh.c
- newlib/libm/math/e_cosh.c
- newlib/libm/math/e_exp.c
- newlib/libm/math/e_fmod.c
- newlib/libm/math/e_hypot.c
- newlib/libm/math/e_j0.c
- newlib/libm/math/e_j1.c
- newlib/libm/math/e_jn.c
- newlib/libm/math/e_log.c
- newlib/libm/math/e_log10.c
- newlib/libm/math/e_pow.c
- newlib/libm/math/e_rem_pio2.c
- newlib/libm/math/e_remainder.c
- newlib/libm/math/e_scalb.c
- newlib/libm/math/e_sinh.c
- newlib/libm/math/e_sqrt.c
- newlib/libm/math/e_tgamma.c
- newlib/libm/math/ef_acos.c
- newlib/libm/math/ef_acosh.c
- newlib/libm/math/ef_asin.c
- newlib/libm/math/ef_atan2.c
- newlib/libm/math/ef_atanh.c
- newlib/libm/math/ef_cosh.c
- newlib/libm/math/ef_exp.c
- newlib/libm/math/ef_fmod.c
- newlib/libm/math/ef_hypot.c
- newlib/libm/math/ef_j0.c
- newlib/libm/math/ef_j1.c
- newlib/libm/math/ef_jn.c
- newlib/libm/math/ef_log.c
- newlib/libm/math/ef_log10.c
- newlib/libm/math/ef_pow.c
- newlib/libm/math/ef_rem_pio2.c
- newlib/libm/math/ef_remainder.c
- newlib/libm/math/ef_scalb.c
- newlib/libm/math/ef_sinh.c
- newlib/libm/math/ef_sqrt.c
- newlib/libm/math/ef_tgamma.c
- newlib/libm/math/er_lgamma.c
- newlib/libm/math/erf_lgamma.c
  newlib/libm/math/k_cos.c
  newlib/libm/math/k_rem_pio2.c
  newlib/libm/math/k_sin.c
@@ -3659,83 +3615,82 @@ Files: newlib/libm/common/fdlibm.h
  newlib/libm/math/kf_sin.c
  newlib/libm/math/kf_tan.c
  newlib/libm/math/math.tex
+ newlib/libm/math/s_acos.c
+ newlib/libm/math/s_acosh.c
+ newlib/libm/math/s_asin.c
  newlib/libm/math/s_asinh.c
  newlib/libm/math/s_atan.c
+ newlib/libm/math/s_atan2.c
+ newlib/libm/math/s_atanh.c
  newlib/libm/math/s_ceil.c
  newlib/libm/math/s_cos.c
+ newlib/libm/math/s_cosh.c
+ newlib/libm/math/s_drem.c
  newlib/libm/math/s_erf.c
+ newlib/libm/math/s_exp.c
+ newlib/libm/math/s_exp2.c
  newlib/libm/math/s_fabs.c
  newlib/libm/math/s_floor.c
+ newlib/libm/math/s_fmod.c
  newlib/libm/math/s_frexp.c
- newlib/libm/math/s_ldexp.c
+ newlib/libm/math/s_gamma.c
+ newlib/libm/math/s_hypot.c
+ newlib/libm/math/s_j0.c
+ newlib/libm/math/s_j1.c
+ newlib/libm/math/s_jn.c
+ newlib/libm/math/s_log.c
+ newlib/libm/math/s_log10.c
+ newlib/libm/math/s_pow.c
+ newlib/libm/math/s_rem_pio2.c
+ newlib/libm/math/s_remainder.c
+ newlib/libm/math/s_scalb.c
  newlib/libm/math/s_signif.c
  newlib/libm/math/s_sin.c
+ newlib/libm/math/s_sinh.c
+ newlib/libm/math/s_sqrt.c
  newlib/libm/math/s_tan.c
  newlib/libm/math/s_tanh.c
+ newlib/libm/math/s_tgamma.c
+ newlib/libm/math/sf_acos.c
+ newlib/libm/math/sf_acosh.c
+ newlib/libm/math/sf_asin.c
  newlib/libm/math/sf_asinh.c
  newlib/libm/math/sf_atan.c
+ newlib/libm/math/sf_atan2.c
+ newlib/libm/math/sf_atanh.c
  newlib/libm/math/sf_ceil.c
  newlib/libm/math/sf_cos.c
+ newlib/libm/math/sf_cosh.c
+ newlib/libm/math/sf_drem.c
  newlib/libm/math/sf_erf.c
+ newlib/libm/math/sf_exp.c
+ newlib/libm/math/sf_exp2.c
  newlib/libm/math/sf_fabs.c
  newlib/libm/math/sf_floor.c
+ newlib/libm/math/sf_fmod.c
  newlib/libm/math/sf_frexp.c
- newlib/libm/math/sf_ldexp.c
+ newlib/libm/math/sf_gamma.c
+ newlib/libm/math/sf_hypot.c
+ newlib/libm/math/sf_j0.c
+ newlib/libm/math/sf_j1.c
+ newlib/libm/math/sf_jn.c
+ newlib/libm/math/sf_lgamma.c
+ newlib/libm/math/sf_log.c
+ newlib/libm/math/sf_log10.c
+ newlib/libm/math/sf_log2.c
+ newlib/libm/math/sf_pow.c
+ newlib/libm/math/sf_rem_pio2.c
+ newlib/libm/math/sf_remainder.c
+ newlib/libm/math/sf_scalb.c
  newlib/libm/math/sf_signif.c
  newlib/libm/math/sf_sin.c
+ newlib/libm/math/sf_sinh.c
+ newlib/libm/math/sf_sqrt.c
  newlib/libm/math/sf_tan.c
  newlib/libm/math/sf_tanh.c
- newlib/libm/math/w_acos.c
- newlib/libm/math/w_acosh.c
- newlib/libm/math/w_asin.c
- newlib/libm/math/w_atan2.c
- newlib/libm/math/w_atanh.c
- newlib/libm/math/w_cosh.c
- newlib/libm/math/w_drem.c
- newlib/libm/math/w_exp.c
- newlib/libm/math/w_exp2.c
- newlib/libm/math/w_fmod.c
- newlib/libm/math/w_gamma.c
- newlib/libm/math/w_hypot.c
- newlib/libm/math/w_j0.c
- newlib/libm/math/w_j1.c
- newlib/libm/math/w_jn.c
- newlib/libm/math/w_lgamma.c
- newlib/libm/math/w_log.c
- newlib/libm/math/w_log10.c
- newlib/libm/math/w_pow.c
- newlib/libm/math/w_remainder.c
- newlib/libm/math/w_scalb.c
- newlib/libm/math/w_sinh.c
- newlib/libm/math/w_sqrt.c
- newlib/libm/math/w_tgamma.c
- newlib/libm/math/wf_acos.c
- newlib/libm/math/wf_acosh.c
- newlib/libm/math/wf_asin.c
- newlib/libm/math/wf_atan2.c
- newlib/libm/math/wf_atanh.c
- newlib/libm/math/wf_cosh.c
- newlib/libm/math/wf_drem.c
- newlib/libm/math/wf_exp.c
- newlib/libm/math/wf_exp2.c
- newlib/libm/math/wf_fmod.c
- newlib/libm/math/wf_gamma.c
- newlib/libm/math/wf_hypot.c
- newlib/libm/math/wf_j0.c
- newlib/libm/math/wf_j1.c
- newlib/libm/math/wf_jn.c
- newlib/libm/math/wf_lgamma.c
- newlib/libm/math/wf_log.c
- newlib/libm/math/wf_log10.c
- newlib/libm/math/wf_log2.c
- newlib/libm/math/wf_pow.c
- newlib/libm/math/wf_remainder.c
- newlib/libm/math/wf_scalb.c
- newlib/libm/math/wf_sinh.c
- newlib/libm/math/wf_sqrt.c
- newlib/libm/math/wf_tgamma.c
- newlib/libm/math/wr_lgamma.c
- newlib/libm/math/wrf_lgamma.c
+ newlib/libm/math/sf_tgamma.c
+ newlib/libm/math/sr_lgamma.c
+ newlib/libm/math/srf_lgamma.c
 Copyright: 1993 Sun Microsystems, Inc.
 License: Other-25
 
