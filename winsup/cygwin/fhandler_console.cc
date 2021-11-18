@@ -208,6 +208,12 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
       DWORD total_read, n, i;
       INPUT_RECORD input_rec[INREC_SIZE];
 
+      if (con.disable_master_thread)
+	{
+	  cygwait (40);
+	  continue;
+	}
+
       WaitForSingleObject (p->input_mutex, INFINITE);
       total_read = 0;
       switch (cygwait (p->input_handle, (DWORD) 0))
@@ -427,6 +433,7 @@ fhandler_console::setup ()
       con.cons_rapoi = NULL;
       shared_console_info->tty_min_state.is_console = true;
       con.cursor_key_app_mode = false;
+      con.disable_master_thread = false;
     }
 }
 
@@ -480,6 +487,8 @@ fhandler_console::set_input_mode (tty::cons_mode m, const termios *t,
 	flags |= ENABLE_VIRTUAL_TERMINAL_INPUT;
       else
 	flags |= ENABLE_MOUSE_INPUT;
+      if (shared_console_info)
+	con.disable_master_thread = false;
       break;
     case tty::native:
       if (t->c_lflag & ECHO)
@@ -492,6 +501,8 @@ fhandler_console::set_input_mode (tty::cons_mode m, const termios *t,
 	flags &= ~ENABLE_ECHO_INPUT;
       if (t->c_lflag & ISIG)
 	flags |= ENABLE_PROCESSED_INPUT;
+      if (shared_console_info)
+	con.disable_master_thread = true;
       break;
     }
   SetConsoleMode (p->input_handle, flags);
