@@ -16,13 +16,21 @@ then you need to define the addresses used in that code, and set up
 the data as required. Checkout the [Initializers in Picolibc](init.md) document
 for details on what names to declare.
 
+To use a custom linker script when linking with gcc using
+`-specs=picolibc.specs`, you'll need to use the gcc `-T` option
+instead of using the `-Wl,-T` linker pass through option. This causes
+`picolibc.specs` to not add the picolibc linker script along with your
+custom one:
+
+	gcc -specs=picolibc.specs -Tcustom.ld
+
 ## Using picolibc.ld
 
 Picolibc provides a default linker script which can often be used to
 link applications, providing that your linking requirements are fairly
 straightforward. To use picolibc.ld, you'll create a custom linker
 script that sets up some variables and then INCLUDE's
-picolibc.ld. Here's a sample custom linker script:
+picolibc.ld. Here's a sample custom linker script `sample.ld`:
 
 	__flash = 0x08000000;
 	__flash_size = 128K;
@@ -33,7 +41,10 @@ picolibc.ld. Here's a sample custom linker script:
 	INCLUDE picolibc.ld
 
 This is for an STM32L151 SoC with 128kB of flash and 16kB of RAM. We
-want to make sure there's space for at least 512 bytes of stack.
+want to make sure there's space for at least 512 bytes of stack. To use
+this with gcc, the command line would look like this:
+
+	gcc -specs=picolibc.specs -Tsample.ld
 
 ### Defining Memory Regions
 
