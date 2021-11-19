@@ -35,7 +35,7 @@
 #define vfscanf __i_vfscanf
 #endif
 
-#include <vfscanf.c>
+#include "vfscanf.c"
 
 #ifdef FORMAT_DEFAULT_INTEGER
 #ifdef HAVE_ALIAS_ATTRIBUTE

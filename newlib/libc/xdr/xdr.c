@@ -40,6 +40,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <limits.h>
 
 #include <rpc/types.h>
 #include <rpc/xdr.h>
@@ -568,6 +569,7 @@ xdr_enum (XDR * xdrs,
           if (!XDR_GETLONG (xdrs, &l))
             return FALSE;
           *ep = l;
+          FALLTHROUGH;
         case XDR_FREE:
           return TRUE;
         }
@@ -765,7 +767,7 @@ xdr_string (XDR * xdrs,
         u_int maxsize)
 {
   char *sp = *cpp;              /* sp is the actual string pointer */
-  u_int size;
+  u_int size = 0;
   u_int nodesize;
 
   /*

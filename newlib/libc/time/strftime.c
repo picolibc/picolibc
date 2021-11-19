@@ -294,6 +294,8 @@ locale, hard-coding the "C" locale settings.
 #if !defined(MAKE_WCSFTIME)
 #  define CHAR		char		/* string type basis */
 #  define CQ(a)		a		/* character constant qualifier */
+#  define t_snprintf	snprintf	/* char equivalent function name */
+#  define t_strncmp	strncmp		/* char equivalent function name */
 #  define SFLG				/* %s flag (null for normal char) */
 #  define _ctloc(x)     (ctloclen = strlen (ctloc = _CurrentTimeLocale->x))
 #  define TOLOWER(c)	tolower((int)(unsigned char)(c))
@@ -306,8 +308,8 @@ locale, hard-coding the "C" locale settings.
 #  define strftime_l	wcsftime_l	/* Alternate function name */
 #  define CHAR		wchar_t		/* string type basis */
 #  define CQ(a)		L##a		/* character constant qualifier */
-#  define snprintf	swprintf	/* wide-char equivalent function name */
-#  define strncmp	wcsncmp		/* wide-char equivalent function name */
+#  define t_snprintf	swprintf	/* wide-char equivalent function name */
+#  define t_strncmp	wcsncmp		/* wide-char equivalent function name */
 #  define TOLOWER(c)	towlower((wint_t)(c))
 #  define STRTOUL(c,p,b) wcstoul((c),(p),(b))
 #  define STRCPY(a,b)	wcscpy((a),(b))
@@ -849,7 +851,7 @@ recurse:
 	    */
 #ifdef _WANT_C99_TIME_FORMATS
 	    if (alt == 'E' && *era_info)
-	      len = snprintf (&s[count], maxsize - count, CQ("%" SFLG "s"),
+	      len = t_snprintf (&s[count], maxsize - count, CQ("%" SFLG "s"),
 			      (*era_info)->era_C);
 	    else
 #endif /* _WANT_C99_TIME_FORMATS */
@@ -868,7 +870,7 @@ recurse:
 		  }
 		if (width < 2)
 		  width = 2;
-		len = snprintf (&s[count], maxsize - count, fmt,
+		len = t_snprintf (&s[count], maxsize - count, fmt,
 				neg ? "-" : pos, width - neg, century);
 	      }
             CHECK_LENGTH ();
@@ -898,14 +900,14 @@ recurse:
 		break;
 	    }
 #endif /* _WANT_C99_TIME_FORMATS */
-	  len = snprintf (&s[count], maxsize - count,
+	  len = t_snprintf (&s[count], maxsize - count,
 			  *format == CQ('d') ? CQ("%.2d") : CQ("%2d"),
 			  tim_p->tm_mday);
 	  CHECK_LENGTH ();
 	  break;
 	case CQ('D'):
 	  /* %m/%d/%y */
-	  len = snprintf (&s[count], maxsize - count,
+	  len = t_snprintf (&s[count], maxsize - count,
 			  CQ("%.2d/%.2d/%.2d"),
 			  tim_p->tm_mon + 1, tim_p->tm_mday,
 			  tim_p->tm_year >= 0 ? tim_p->tm_year % 100
@@ -929,7 +931,7 @@ recurse:
 	    width -= 6;
 	    if (width)
 	      {
-		len = snprintf (fmt, fmtbuf + 32 - fmt, CQ("%lu"), width);
+		len = t_snprintf (fmt, fmtbuf + 32 - fmt, CQ("%lu"), width);
 		if (len > 0)
 		  fmt += len;
 	      }
@@ -953,7 +955,7 @@ recurse:
 		adjust = 1;
 	    else if (adjust > 0 && tim_p->tm_year < -YEAR_BASE)
 		adjust = -1;
-	    len = snprintf (&s[count], maxsize - count, CQ("%.2d"),
+	    len = t_snprintf (&s[count], maxsize - count, CQ("%.2d"),
 			    ((year + adjust) % 100 + 100) % 100);
             CHECK_LENGTH ();
 	  }
@@ -1001,7 +1003,7 @@ recurse:
 	    if (pad)
 	      *fmt++ = CQ('0');
 	    STRCPY (fmt, CQ(".*u"));
-	    len = snprintf (&s[count], maxsize - count, fmtbuf, width, p_year);
+	    len = t_snprintf (&s[count], maxsize - count, fmtbuf, width, p_year);
             if (len < 0  ||  (count+=len) >= maxsize)
               return 0;
 	  }
@@ -1019,7 +1021,7 @@ recurse:
 #endif /* _WANT_C99_TIME_FORMATS */
 	  /*FALLTHRU*/
 	case CQ('k'):	/* newlib extension */
-	  len = snprintf (&s[count], maxsize - count,
+	  len = t_snprintf (&s[count], maxsize - count,
 			  *format == CQ('k') ? CQ("%2d") : CQ("%.2d"),
 			  tim_p->tm_hour);
           CHECK_LENGTH ();
@@ -1038,13 +1040,13 @@ recurse:
 		|| !(len = conv_to_alt_digits (&s[count], maxsize - count,
 					       h12, *alt_digits)))
 #endif /* _WANT_C99_TIME_FORMATS */
-	      len = snprintf (&s[count], maxsize - count,
+	      len = t_snprintf (&s[count], maxsize - count,
 			      *format == CQ('I') ? CQ("%.2d") : CQ("%2d"), h12);
 	    CHECK_LENGTH ();
 	  }
 	  break;
 	case CQ('j'):
-	  len = snprintf (&s[count], maxsize - count, CQ("%.3d"),
+	  len = t_snprintf (&s[count], maxsize - count, CQ("%.3d"),
 			  tim_p->tm_yday + 1);
           CHECK_LENGTH ();
 	  break;
@@ -1054,7 +1056,7 @@ recurse:
 	      || !(len = conv_to_alt_digits (&s[count], maxsize - count,
 					     tim_p->tm_mon + 1, *alt_digits)))
 #endif /* _WANT_C99_TIME_FORMATS */
-	    len = snprintf (&s[count], maxsize - count, CQ("%.2d"),
+	    len = t_snprintf (&s[count], maxsize - count, CQ("%.2d"),
 			    tim_p->tm_mon + 1);
           CHECK_LENGTH ();
 	  break;
@@ -1064,7 +1066,7 @@ recurse:
 	      || !(len = conv_to_alt_digits (&s[count], maxsize - count,
 					     tim_p->tm_min, *alt_digits)))
 #endif /* _WANT_C99_TIME_FORMATS */
-	    len = snprintf (&s[count], maxsize - count, CQ("%.2d"),
+	    len = t_snprintf (&s[count], maxsize - count, CQ("%.2d"),
 			    tim_p->tm_min);
           CHECK_LENGTH ();
 	  break;
@@ -1087,7 +1089,7 @@ recurse:
 	    }
 	  break;
 	case CQ('R'):
-          len = snprintf (&s[count], maxsize - count, CQ("%.2d:%.2d"),
+          len = t_snprintf (&s[count], maxsize - count, CQ("%.2d:%.2d"),
 			  tim_p->tm_hour, tim_p->tm_min);
           CHECK_LENGTH ();
           break;
@@ -1149,7 +1151,7 @@ recurse:
 #endif
 		TZ_UNLOCK;
 	      }
-	    len = snprintf (&s[count], maxsize - count, CQ("%lld"),
+	    len = t_snprintf (&s[count], maxsize - count, CQ("%lld"),
 			    (((((long long)tim_p->tm_year - 69)/4
 				- (tim_p->tm_year - 1)/100
 				+ (tim_p->tm_year + 299)/400
@@ -1165,7 +1167,7 @@ recurse:
 	      || !(len = conv_to_alt_digits (&s[count], maxsize - count,
 					     tim_p->tm_sec, *alt_digits)))
 #endif /* _WANT_C99_TIME_FORMATS */
-	    len = snprintf (&s[count], maxsize - count, CQ("%.2d"),
+	    len = t_snprintf (&s[count], maxsize - count, CQ("%.2d"),
 			    tim_p->tm_sec);
           CHECK_LENGTH ();
 	  break;
@@ -1176,7 +1178,7 @@ recurse:
 	    return 0;
 	  break;
 	case CQ('T'):
-          len = snprintf (&s[count], maxsize - count, CQ("%.2d:%.2d:%.2d"),
+          len = t_snprintf (&s[count], maxsize - count, CQ("%.2d:%.2d:%.2d"),
 			  tim_p->tm_hour, tim_p->tm_min, tim_p->tm_sec);
           CHECK_LENGTH ();
           break;
@@ -1211,7 +1213,7 @@ recurse:
 					      tim_p->tm_wday) / 7,
 					     *alt_digits)))
 #endif /* _WANT_C99_TIME_FORMATS */
-	    len = snprintf (&s[count], maxsize - count, CQ("%.2d"),
+	    len = t_snprintf (&s[count], maxsize - count, CQ("%.2d"),
 			 (tim_p->tm_yday + 7 -
 			  tim_p->tm_wday) / 7);
           CHECK_LENGTH ();
@@ -1237,7 +1239,7 @@ recurse:
 		|| !(len = conv_to_alt_digits (&s[count], maxsize - count,
 					       week, *alt_digits)))
 #endif /* _WANT_C99_TIME_FORMATS */
-	      len = snprintf (&s[count], maxsize - count, CQ("%.2d"), week);
+	      len = t_snprintf (&s[count], maxsize - count, CQ("%.2d"), week);
             CHECK_LENGTH ();
 	  }
           break;
@@ -1266,7 +1268,7 @@ recurse:
 		|| !(len = conv_to_alt_digits (&s[count], maxsize - count,
 					       wday, *alt_digits)))
 #endif /* _WANT_C99_TIME_FORMATS */
-	      len = snprintf (&s[count], maxsize - count, CQ("%.2d"), wday);
+	      len = t_snprintf (&s[count], maxsize - count, CQ("%.2d"), wday);
             CHECK_LENGTH ();
 	  }
 	  break;
@@ -1274,7 +1276,7 @@ recurse:
 	    {
 #ifdef _WANT_C99_TIME_FORMATS
 	      if (alt == 'E' && *era_info)
-		len = snprintf (&s[count], maxsize - count, CQ("%d"),
+		len = t_snprintf (&s[count], maxsize - count, CQ("%d"),
 				(*era_info)->year);
 	      else
 #endif /* _WANT_C99_TIME_FORMATS */
@@ -1288,7 +1290,7 @@ recurse:
 		      || !(len = conv_to_alt_digits (&s[count], maxsize - count,
 						     year, *alt_digits)))
 #endif /* _WANT_C99_TIME_FORMATS */
-		    len = snprintf (&s[count], maxsize - count, CQ("%.2d"),
+		    len = t_snprintf (&s[count], maxsize - count, CQ("%.2d"),
 				    year);
 		}
               CHECK_LENGTH ();
@@ -1325,7 +1327,7 @@ recurse:
 	      if (pad)
 		*fmt++ = CQ('0');
 	      STRCPY (fmt, CQ(".*u"));
-	      len = snprintf (&s[count], maxsize - count, fmtbuf, width,
+	      len = t_snprintf (&s[count], maxsize - count, fmtbuf, width,
 			      year);
 	      CHECK_LENGTH ();
 	    }
@@ -1360,7 +1362,7 @@ recurse:
 	      offset = -tz->__tzrule[tim_p->tm_isdst > 0].offset;
 #endif
 	      TZ_UNLOCK;
-	      len = snprintf (&s[count], maxsize - count, CQ("%+03ld%.2ld"),
+	      len = t_snprintf (&s[count], maxsize - count, CQ("%+03ld%.2ld"),
 			      offset / SECSPERHOUR,
 			      labs (offset / SECSPERMIN) % 60L);
               CHECK_LENGTH ();
@@ -1849,7 +1851,7 @@ for(l=0; l<sizeof(List)/sizeof(List[0]); l++)  {
 		"ERROR:  return %d != %d expected for List[%d].vec[%d]\n",
 						ret, test->vec[i].ret, l, i);
 	    }
-	if(strncmp(out, test->vec[i].out, test->vec[i].max-1))  {
+	if(t_strncmp(out, test->vec[i].out, test->vec[i].max-1))  {
 	    erro++;
 	    fprintf(stderr,
 		"ERROR:  \"%"SFLG"s\" != \"%"SFLG"s\" expected for List[%d].vec[%d]\n",
@@ -1875,7 +1877,7 @@ for(l=0; l<sizeof(List)/sizeof(List[0]); l++)  {
 	 * go ahead and test the output even though have failed.  (The test
 	 * times chosen happen to not hit any of the cases that fail this, so it
 	 * works.)  */
-	if(strncmp(out, test->vec[i].out, test->vec[i].max-1-1))  {
+	if(t_strncmp(out, test->vec[i].out, test->vec[i].max-1-1))  {
 	    erro++;
 	    fprintf(stderr,
 		"ERROR:  \"%"SFLG"s\" != \"%"SFLG"s\" expected for List[%d].vec[%d]\n",
@@ -1896,7 +1898,7 @@ for(l=0; l<sizeof(ListYr)/sizeof(ListYr[0]); l++)  {
 		"ERROR:  return %d != %d expected for ListYr[%d].vec[%d]\n",
 						ret, test->vec[i].ret, l, i);
 	    }
-	if(strncmp(out, test->vec[i].out, test->vec[i].max-1))  {
+	if(t_strncmp(out, test->vec[i].out, test->vec[i].max-1))  {
 	    erro++;
 	    fprintf(stderr,
 		"ERROR:  \"%"SFLG"s\" != \"%"SFLG"s\" expected for ListYr[%d].vec[%d]\n",

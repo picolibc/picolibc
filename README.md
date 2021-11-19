@@ -46,8 +46,10 @@ at this point only has code to build for the following targets:
 
 Supporting architectures that already have Newlib code requires:
 
- 1. newlib/libc/machine/_architecture_/meson.build to build any
-    architecture-specific libc bits
+ 1. newlib/libc/machine/_architecture_/meson.build to build the
+    architecture-specific libc bits. This should at least include
+    setjmp/longjmp support as these cannot be performed in
+    architecture independent code.
 
  2. newlib/libm/machine/_architecture_/meson.build to build any
     architecture-specific libm bits
@@ -95,7 +97,75 @@ The bulk of newlib changes over the last several years have been in
 areas unrelated to the code used by picolibc, so keeping things in
 sync has not been difficult so far.
 
+## Documentation
+
+Introductory documentation. Read these first:
+
+ * [Building Picolibc](doc/build.md). Explains how to compile picolibc yourself.
+ * [Using Picolibc](doc/using.md). Shows how to compile and link
+   applications once you have picolibc built and installed.
+ * [Linking with Picolibc.ld](doc/linking.md). Provides more details
+   about the linking process.
+ * [Hello World](hello-world/README.md). Build and run a stand-alone C
+   application by following step-by-step instructions
+
+Detailed documentation. Use these to learn more details about how to
+use Picolibc:
+
+ * [Picolibc initialization](doc/init.md)
+ * [Operating System Support](doc/os.md).
+ * [Printf and Scanf in Picolibc](doc/printf.md)
+ * [Thread Local Storage](doc/tls.md)
+ * [Picolibc as embedded source](doc/embedsource.md)
+ * [Releasing Picolibc](doc/releasing.md)
+ * [Copyright and license information](COPYING.picolibc)
+
 ## Releases
+
+### Picolibc version 1.7.4
+
+ 1. Clean up meson build bits, including use of 'fs module (thanks to
+    Yasushi Shoji).
+
+ 2. Speed up github actions by sharing Debian docker image (thanks to
+    Yasushi Shoji).
+
+ 3. Reduce use of intermediate static libraries during build
+
+ 4. Use standard Meson architecture names everywhere (thanks to
+    Yasushi Shoji).
+
+ 5. Support building with -D_FORTIFY_SOURCE enabled.
+
+ 6. Clean up 32-bit arm assembly code, eliminating __aeabi wrappers
+    where possible.
+
+ 7. Add basename, dirname and fnmatch back.
+
+ 8. Fix all old-style (K&R) function definitions.
+
+ 9. Enable lots more compiler warning flags.
+
+ 10. Remove last uses of alloca in legacy stdio code.
+
+ 11. Add tests from musl libc-testsuite. There aren't many tests, but
+     these identified a few bugs.
+
+ 12. Add lots more exception and errno tests for the math functions.
+
+ 13. Restructure math library to always use the __math_err functions
+     to raise exceptions and set errno. This removes the w_*.c wrapper
+     functions and eliminates the __ieee names. This centralizes
+     compiler work-arounds to ensure run-time evaluation of
+     expressions intended to raise exceptions. In the process, all of
+     the libm/math files were reformatted with clang-format.
+
+ 14. Make tinystdio '%a' compatible with glibc, including supporting
+     rounding and trimming trailing zeros when possible.
+
+ 15. Remove floating point exception generation code on targets
+     without floating point exception support. This reduces code size
+     on soft float machines without affecting results.
 
 ### Picolibc version 1.7.3
 
@@ -514,16 +584,3 @@ include:
     don't have complicated requirements, allowing small applications
     to avoid needing to figure this out.
 
-## Documentation
-
- * [Building Picolibc](doc/build.md)
- * [Operating System Support](doc/os.md)
- * [Printf and Scanf in Picolibc](doc/printf.md)
- * [Using Picolibc](doc/using.md)
- * [Picolibc initialization](doc/init.md)
- * [Thread Local Storage](doc/tls.md)
- * [Linking with Picolibc.ld](doc/linking.md)
- * [Hello World](hello-world/README.md)
- * [Picolibc as embedded source](doc/embedsource.md)
- * [Releasing Picolibc](doc/releasing.md)
- * [Copyright and license information](COPYING.picolibc)

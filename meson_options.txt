@@ -65,6 +65,9 @@ option('sysroot-install', type: 'boolean', value: false,
 option('picoexit', type: 'boolean', value: true,
        description: 'Smaller exit/atexit/onexit code')
 
+option('fortify-source', type: 'combo', choices: ['none', '1', '2'], value: 'none',
+       description: 'Set _FORTIFY_SOURCE=<value>')
+
 #
 # Testing options
 #
@@ -79,8 +82,6 @@ option('tests-enable-full-malloc-stress', type: 'boolean', value: false,
 option('tests-enable-posix-io', type: 'boolean', value: true,
        description: 'tests enable posix-io when available')
 
-option('newlib-tinystdio', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
-       description: 'Use tiny stdio from avr libc')
 option('tinystdio', type: 'boolean', value: true,
        description: 'Use tiny stdio from avr libc')
 
@@ -199,12 +200,12 @@ option('newlib-retargetable-locking', type: 'boolean', value: true,
 #
 option('thread-local-storage', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
        description: 'use thread local storage for static data (default: automatically detect support)')
-option('tls-model', type: 'string', value: 'local-exec',
-       description: 'tls model (global-dynamic, local-dynamic, initial-exec or local-exec)')
+option('tls-model', type: 'combo', choices: ['global-dynamic', 'local-dynamic', 'initial-exec', 'local-exec'], value: 'local-exec',
+       description: 'Set TLS model. No-op when thread-local-storage is false')
 option('newlib-global-errno', type: 'boolean', value: false,
        description: 'use global errno variable')
 
-# 
+#
 # Math options
 #
 # Use "obsolete" math code, which use 'float' for 'float' functions

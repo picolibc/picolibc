@@ -59,7 +59,7 @@ hdrs_argz = [
 
 srcs_argz_use = []
 foreach file : srcs_argz
-  s_file = file.split('.')[0] + '.S'
+  s_file = fs.replace_suffix(file, '.S')
   if file in srcs_machine
     message('libc/argz/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
@@ -69,12 +69,4 @@ foreach file : srcs_argz
   endif
 endforeach
 
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_argz' + target,
-		static_library('argz' + target,
-			srcs_argz_use,
-			pic: false,
-			include_directories: inc,
-			c_args: value[1]))
-endforeach
+src_argz = files(srcs_argz_use)

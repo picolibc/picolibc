@@ -1,67 +1,16 @@
-FROM debian:testing AS download-tarballs
+FROM debian:testing
+
+COPY .github/packages.txt /
 
 RUN apt-get update && \
     apt-get install -y wget gnupg && \
-    wget -O - https://maps.altusmetrum.org/archive/archive-key | apt-key add - && \
+    wget -O /etc/apt/trusted.gpg.d/altusmetrum.gpg https://maps.altusmetrum.org/archive/archive-key.gpg && \
     echo "deb http://maps.altusmetrum.org/archive unstable/" > /etc/apt/sources.list.d/keithp.list && \
     (apt-get update || apt-get update || apt-get update) && \
     (apt-get upgrade -y || apt-get upgrade -y || apt-get upgrade -y) && \
-    (apt-get install -y \
-    build-essential \
-    meson \
-    ninja-build \
-    gcc \
-    gcc-i686-linux-gnu \
-    gcc-arm-none-eabi \
-    gcc-riscv64-unknown-elf \
-    gcc-aarch64-linux-gnu \
-    gcc-xtensa-lx106 \
-    qemu-system-x86 \
-    qemu-system-arm=1:5.0-5.5 \
-    qemu-system-misc=1:5.0-5.5 \
-    clang lld || apt-get install -y \
-    build-essential \
-    meson \
-    ninja-build \
-    gcc \
-    gcc-i686-linux-gnu \
-    gcc-arm-none-eabi \
-    gcc-riscv64-unknown-elf \
-    gcc-aarch64-linux-gnu \
-    gcc-xtensa-lx106 \
-    qemu-system-x86 \
-    qemu-system-arm=1:5.0-5.5 \
-    qemu-system-misc=1:5.0-5.5 \
-    clang lld || apt-get install -y \
-    build-essential \
-    meson \
-    ninja-build \
-    gcc \
-    gcc-i686-linux-gnu \
-    gcc-arm-none-eabi \
-    gcc-riscv64-unknown-elf \
-    gcc-aarch64-linux-gnu \
-    gcc-xtensa-lx106 \
-    qemu-system-x86 \
-    qemu-system-arm=1:5.0-5.5 \
-    qemu-system-misc=1:5.0-5.5 \
-    clang lld || apt-get install -y \
-    build-essential \
-    meson \
-    ninja-build \
-    gcc \
-    gcc-i686-linux-gnu \
-    gcc-arm-none-eabi \
-    gcc-riscv64-unknown-elf \
-    gcc-aarch64-linux-gnu \
-    gcc-xtensa-lx106 \
-    qemu-system-x86 \
-    qemu-system-arm=1:5.0-5.5 \
-    qemu-system-misc=1:5.0-5.5 \
-    clang lld)
+    (xargs -a packages.txt apt-get install -y || \
+     xargs -a packages.txt apt-get install -y || \
+     xargs -a packages.txt apt-get install -y || \
+     xargs -a packages.txt apt-get install -y)
 
-# Copy picolibc into container
-RUN mkdir picolibc
-COPY ./ picolibc/
-
-WORKDIR ./picolibc
+RUN apt-get clean

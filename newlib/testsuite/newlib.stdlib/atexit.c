@@ -33,7 +33,7 @@ static void newline (void)
   printf("\n");
 }
 
-int main()
+int main(void)
 {
   if (atexit(newline) != 0)
     abort();

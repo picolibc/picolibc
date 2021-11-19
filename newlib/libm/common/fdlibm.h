@@ -18,6 +18,7 @@
 #include <math.h>
 #include <sys/types.h>
 #include <machine/ieeefp.h>
+#include <fenv.h>
 #include "math_config.h"
 
 /* Most routines need to check whether a float is finite, infinite, or not a
@@ -81,6 +82,39 @@
 #define FLT_UWORD_HALF_MAX (FLT_UWORD_MAX-(1L<<23))
 #define FLT_LARGEST_EXP (FLT_UWORD_MAX>>23)
 
+/* rounding mode tests; nearest if not set. Assumes hardware
+ * without rounding mode support uses nearest
+ */
+
+/* If there are rounding modes other than FE_TONEAREST defined, then
+ * add code to check which is active
+ */
+#if (defined(FE_UPWARD) + defined(FE_DOWNWARD) + defined(FE_TOWARDZERO)) >= 1
+#define FE_DECL_ROUND(v)        int v = fegetround()
+#define __is_nearest(r)         ((r) == FE_TONEAREST)
+#else
+#define FE_DECL_ROUND(v)
+#define __is_nearest(r)         1
+#endif
+
+#ifdef FE_UPWARD
+#define __is_upward(r)          ((r) == FE_UPWARD)
+#else
+#define __is_upward(r)          0
+#endif
+
+#ifdef FE_DOWNWARD
+#define __is_downward(r)        ((r) == FE_DOWNWARD)
+#else
+#define __is_downward(r)        0
+#endif
+
+#ifdef FE_TOWARDZERO
+#define __is_towardzero(r)      ((r) == FE_TOWARDZERO)
+#else
+#define __is_towardzero(r)      0
+#endif
+
 /* Many routines check for zero and subnormal numbers.  Such things depend
    on whether the target supports denormals or not:
 
@@ -124,13 +158,6 @@
 #define FLT_SMALLEST_EXP -22
 #endif
 
-#ifdef __STDC__
-#undef __P
-#define	__P(p)	p
-#else
-#define	__P(p)	()
-#endif
-
 /* 
  * set X_TLOSS = pi*2**52, which is possibly defined in <values.h>
  * (one may replace the following line by "#include <values.h>")
@@ -140,116 +167,28 @@
 
 /* Functions that are not documented, and are not in <math.h>.  */
 
-#ifdef _SCALB_INT
-extern double scalb __P((double, int));
-#else
-extern double scalb __P((double, double));
-#endif
-extern double significand __P((double));
+extern double scalb (double, double);
+extern double significand (double);
 
-extern long double __ieee754_hypotl __P((long double, long double));
-
-/* ieee style elementary functions */
-extern double __ieee754_sqrt __P((double));			
-extern double __ieee754_acos __P((double));			
-extern double __ieee754_acosh __P((double));			
-extern double __ieee754_log __P((double));			
-extern double __ieee754_atanh __P((double));			
-extern double __ieee754_asin __P((double));			
-extern double __ieee754_atan2 __P((double,double));			
-extern double __ieee754_exp __P((double));
-extern double __ieee754_cosh __P((double));
-extern double __ieee754_fmod __P((double,double));
-extern double __ieee754_pow __P((double,double));
-extern double __ieee754_lgamma __P((double));
-extern double ___ieee754_lgamma_r __P((double, int *));
-extern double __ieee754_lgamma_r __P((double, int *));
-extern double __ieee754_tgamma __P((double));
-extern double __ieee754_log10 __P((double));
-extern double __ieee754_sinh __P((double));
-extern double __ieee754_hypot __P((double,double));
-extern double __ieee754_j0 __P((double));
-extern double __ieee754_j1 __P((double));
-extern double __ieee754_y0 __P((double));
-extern double __ieee754_y1 __P((double));
-extern double __ieee754_jn __P((int,double));
-extern double __ieee754_yn __P((int,double));
-extern double __ieee754_remainder __P((double,double));
-extern __int32_t __ieee754_rem_pio2 __P((double,double*));
-#ifdef _SCALB_INT
-extern double __ieee754_scalb __P((double,int));
-#else
-extern double __ieee754_scalb __P((double,double));
-#endif
+extern __int32_t __rem_pio2 (double,double*);
 
 /* fdlibm kernel function */
-extern double __kernel_sin __P((double,double,int));
-extern double __kernel_cos __P((double,double));
-extern double __kernel_tan __P((double,double,int));
-extern int    __kernel_rem_pio2 __P((double*,double*,int,int,int,const __int32_t*));
+extern double __kernel_sin (double,double,int);
+extern double __kernel_cos (double,double);
+extern double __kernel_tan (double,double,int);
+extern int    __kernel_rem_pio2 (double*,double*,int,int,int,const __int32_t*);
 
 /* Undocumented float functions.  */
-#ifdef _SCALB_INT
-extern float scalbf __P((float, int));
-#else
-extern float scalbf __P((float, float));
-#endif
-extern float significandf __P((float));
+extern float scalbf (float, float);
+extern float significandf (float);
 
-/* ieee style elementary float functions */
-extern float __ieee754_sqrtf __P((float));			
-extern float __ieee754_acosf __P((float));			
-extern float __ieee754_acoshf __P((float));			
-extern float __ieee754_logf __P((float));			
-extern float __ieee754_atanhf __P((float));			
-extern float __ieee754_asinf __P((float));			
-extern float __ieee754_atan2f __P((float,float));			
-extern float __ieee754_expf __P((float));
-extern float __ieee754_coshf __P((float));
-extern float __ieee754_fmodf __P((float,float));
-extern float __ieee754_powf __P((float,float));
-extern float __ieee754_lgammaf __P((float));
-extern float ___ieee754_lgammaf_r __P((float, int *));
-extern float __ieee754_lgammaf_r __P((float, int *));
-extern float __ieee754_tgammaf __P((float));
-extern float __ieee754_log10f __P((float));
-extern float __ieee754_sinhf __P((float));
-extern float __ieee754_hypotf __P((float,float));
-extern float __ieee754_j0f __P((float));
-extern float __ieee754_j1f __P((float));
-extern float __ieee754_y0f __P((float));
-extern float __ieee754_y1f __P((float));
-extern float __ieee754_jnf __P((int,float));
-extern float __ieee754_ynf __P((int,float));
-extern float __ieee754_remainderf __P((float,float));
-extern __int32_t __ieee754_rem_pio2f __P((float,float*));
-#ifdef _SCALB_INT
-extern float __ieee754_scalbf __P((float,int));
-#else
-extern float __ieee754_scalbf __P((float,float));
-#endif
-
-#if !__OBSOLETE_MATH_DOUBLE
-/* The new math code does not provide separate wrapper function
-   for error handling, so the extern symbol is called directly.
-   This is valid as long as there are no namespace issues (the
-   extern symbol is reserved whenever the caller is reserved)
-   and there are no observable error handling side effects.  */
-# define __ieee754_exp(x) exp(x)
-# define __ieee754_log(x) log(x)
-# define __ieee754_pow(x,y) pow(x,y)
-#endif
-#if !__OBSOLETE_MATH_FLOAT
-# define __ieee754_expf(x) expf(x)
-# define __ieee754_logf(x) logf(x)
-# define __ieee754_powf(x,y) powf(x,y)
-#endif
+extern __int32_t __rem_pio2f (float,float*);
 
 /* float versions of fdlibm kernel functions */
-extern float __kernel_sinf __P((float,float,int));
-extern float __kernel_cosf __P((float,float));
-extern float __kernel_tanf __P((float,float,int));
-extern int   __kernel_rem_pio2f __P((float*,float*,int,int,int,const __int32_t*));
+extern float __kernel_sinf (float,float,int);
+extern float __kernel_cosf (float,float);
+extern float __kernel_tanf (float,float,int);
+extern int   __kernel_rem_pio2f (float*,float*,int,int,int,const __int32_t*);
 
 /* The original code used statements like
 	n0 = ((*(int*)&one)>>29)^1;		* index of high word *

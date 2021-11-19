@@ -32,21 +32,6 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-srcs_machine_tls = {
-			'riscv' : ['machine/riscv/tls.c'],
-			'riscv32' : ['machine/riscv/tls.c'],
-			'riscv64' : ['machine/riscv/tls.c'],
-			'arm' : ['machine/arm/tls.c', 'machine/arm/read_tp.S'],
-			'aarch64' : [ 'machine/aarch64/tls.c' ]
-		      }
-
-srcs_machine = {
-			'arm' : ['machine/arm/interrupt.c']
-		      }
-
-srcs_tls = [
-  'inittls.c'
-]
 
 srcs_picolib = [
   'picosbrk.c',
@@ -54,24 +39,13 @@ srcs_picolib = [
   'getauxval.c'
 ]
 
-if srcs_machine.has_key(host_cpu_family)
-  srcs_picolib += srcs_machine[host_cpu_family]
-endif
-
 if thread_local_storage
-  srcs_picolib += srcs_tls
-  if srcs_machine_tls.has_key(host_cpu_family)
-    has_picolibc_tls_api = true
-    srcs_picolib += srcs_machine_tls[host_cpu_family]
-  endif
+  srcs_picolib += 'inittls.c'
 endif
 
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_picolib' + target,
-		     static_library('picolib' + target,
-				    srcs_picolib,
-				    pic: false,
-				    include_directories: inc,
-				    c_args: value[1]))
-endforeach
+src_picolib = files(srcs_picolib)
+
+if fs.is_dir('machine' / host_cpu_family)
+  subdir('machine' / host_cpu_family)
+endif
+

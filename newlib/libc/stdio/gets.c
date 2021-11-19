@@ -92,6 +92,8 @@ _gets_r (struct _reent *ptr,
 
 #ifndef _REENT_ONLY
 
+#undef gets
+
 char *
 gets (char *buf)
 {

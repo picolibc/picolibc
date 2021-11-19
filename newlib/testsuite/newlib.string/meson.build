@@ -53,17 +53,18 @@ foreach target : targets
     if target == ''
       test_name = test
     else
-      test_name = join_paths(target, test)
+      test_name = test + '_' + target
     endif
 
     src = test + '.c'
 
-    test(test + target,
+    test(test_name,
 	 executable(test_name, [src],
 		    c_args: ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE'] + _c_args,
 		    link_args: _link_args,
 		    link_with: _libs,
 		    include_directories: test_inc),
+         depends: bios_bin,
 	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
   endforeach
 endforeach

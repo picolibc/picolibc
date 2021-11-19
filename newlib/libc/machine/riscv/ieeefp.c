@@ -19,7 +19,7 @@ fssr(unsigned value)
 }
 
 static unsigned
-frsr()
+frsr(void)
 {
   unsigned value;
   __asm__ volatile ("frcsr %0" : "=r" (value));

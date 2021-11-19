@@ -33,15 +33,25 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 srcs_posix = [
+  'basename.c',
+  'dirname.c',
+  'fnmatch.c',
   'regcomp.c',
   'regerror.c',
   'regexec.c',
   'regfree.c',
 ]
 
+if newlib_locale_info
+  srcs_posix += [
+    'collate.c',
+    'collcmp.c',
+  ]
+endif
+
 srcs_posix_use = []
 foreach file : srcs_posix
-  s_file = file.split('.')[0] + '.S'
+  s_file = fs.replace_suffix(file, '.S')
   if file in srcs_machine
     message('libc/posix/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
@@ -51,13 +61,5 @@ foreach file : srcs_posix
   endif
 endforeach
 
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_posix' + target,
-		static_library('posix' + target,
-			srcs_posix_use,
-			pic: false,
-			include_directories: inc,
-			c_args: value[1]))
-endforeach
+src_posix = files(srcs_posix_use)
   

@@ -41,11 +41,11 @@ elf="$1"
 shift
 
 case "$elf" in
-    */rv32*_ilp32*/*)
+    *rv32*_ilp32*)
 	qemu="qemu-system-riscv32"
 	cpu=rv32
 	;;
-    */rv64*_lp64*/*)
+    *rv64*_lp64*)
 	qemu="qemu-system-riscv64"
 	cpu=rv64
 	;;

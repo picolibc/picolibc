@@ -300,4 +300,4 @@
 {64, 0,123,__LINE__, 0x3ff00000, 0x00000000, 0x403d7fff, 0xfffffffc},	/* 1=f(29.5)*/
 {0}
 };
-void test_erff(m)   {run_vector_1(m,erff_vec,(char *)(erff),"erff","ff");   }	
+void test_erff(int m)   {run_vector_1(m,erff_vec,(char *)(erff),"erff","ff");   }	

@@ -38,7 +38,12 @@
 #ifndef _MACHINE_MATH_H_
 #define _MACHINE_MATH_H_
 
+#if defined(_HAVE_ATTRIBUTE_ALWAYS_INLINE) && defined(_HAVE_ATTRIBUTE_GNU_INLINE)
 #define __declare_arm_macro(type) extern __inline type __attribute((gnu_inline, always_inline))
+
+#ifdef _WANT_MATH_ERRNO
+#include <errno.h>
+#endif
 
 #if (__ARM_FP & 0x8) && !defined(__SOFTFP__)
 
@@ -47,9 +52,13 @@
  */
 
 __declare_arm_macro(double)
-__ieee754_sqrt(double x)
+sqrt(double x)
 {
 	double result;
+#ifdef _WANT_MATH_ERRNO
+        if (x < 0)
+            errno = EDOM;
+#endif
 #if __ARM_ARCH >= 6
 	__asm__("vsqrt.f64 %P0, %P1" : "=w" (result) : "w" (x));
 #else
@@ -58,14 +67,6 @@ __ieee754_sqrt(double x)
 #endif
 	return result;
 }
-
-#ifdef _IEEE_LIBM
-__declare_arm_macro(double)
-sqrt(double x)
-{
-	return __ieee754_sqrt(x);
-}
-#endif
 
 #if __ARM_ARCH >= 8
 __declare_arm_macro(double)
@@ -135,9 +136,13 @@ fma (double x, double y, double z)
  */
 
 __declare_arm_macro(float)
-__ieee754_sqrtf(float x)
+sqrtf(float x)
 {
 	float result;
+#ifdef _WANT_MATH_ERRNO
+        if (x < 0)
+            errno = EDOM;
+#endif
 #if __ARM_ARCH >= 6
 	__asm__("vsqrt.f32 %0, %1" : "=w" (result) : "w" (x));
 #else
@@ -146,14 +151,6 @@ __ieee754_sqrtf(float x)
 #endif
 	return result;
 }
-
-#ifdef _IEEE_LIBM
-__declare_arm_macro(float)
-sqrtf(float x)
-{
-	return __ieee754_sqrtf(x);
-}
-#endif
 
 #if __ARM_ARCH >= 8
 __declare_arm_macro(float)
@@ -218,5 +215,7 @@ fmaf (float x, float y, float z)
 #endif /* (__ARM_FP & 0x4) && !defined(__SOFTFP__) */
 
 #undef __declare_arm_macro
+
+#endif /* have attributes */
 
 #endif /* _MACHINE_MATH_H_ */

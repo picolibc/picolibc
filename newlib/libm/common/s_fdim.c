@@ -49,10 +49,13 @@ ANSI C, POSIX.
 	double y;
 #endif
 {
-  if (__fpclassifyd(x) == FP_NAN)  return(x);
-  if (__fpclassifyd(y) == FP_NAN)  return(y);
+  if (isnan(x)) return(x);
+  if (isnan(y)) return(y);
 
-  return x > y ? x - y : 0.0;
+  double z = x > y ? x - y : 0.0;
+  if (!isinf(x) && !isinf(y))
+    z = check_oflow(z);
+  return z;
 }
 
 #endif /* _DOUBLE_IS_32BITS */

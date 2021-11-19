@@ -78,13 +78,13 @@ foreach target : targets
 		      c_args: value[1],
 		      link_args: ['-nostartfiles', '-nostdlib', '-Wl,--build-id=none', '-T', bios_ld])
 
-    custom_target('bios' + target + '.bin',
-		  build_by_default: true,
-		  input: bios,
-		  install: true,
-		  install_dir: instdir,
-		  output: 'bios' + target + '.bin',
-		  command: [objcopy, '-O', 'binary', '@INPUT@', '@OUTPUT@'])
+    bios_bin = custom_target('bios' + target + '.bin',
+		             build_by_default: true,
+		             input: bios,
+		             install: true,
+		             install_dir: instdir,
+		             output: 'bios' + target + '.bin',
+		             command: [objcopy, '-O', 'binary', '@INPUT@', '@OUTPUT@'])
   endif
 
 endforeach

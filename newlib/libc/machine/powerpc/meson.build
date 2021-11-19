@@ -33,20 +33,20 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 srcs_machine = [
-  'atosfix16.c',
-  'atosfix32.c',
-  'atosfix64.c',
-  'atoufix16.c',
-  'atoufix32.c',
-  'atoufix64.c',
+#  'atosfix16.c',
+#  'atosfix32.c',
+#  'atosfix64.c',
+#  'atoufix16.c',
+#  'atoufix32.c',
+#  'atoufix64.c',
   'setjmp.S',
-  'strtosfix16.c',
-  'strtosfix32.c',
-  'strtosfix64.c',
-  'strtoufix16.c',
-  'strtoufix32.c',
-  'strtoufix64.c',
-  'ufix64toa.c',
+#  'strtosfix16.c',
+#  'strtosfix32.c',
+#  'strtosfix64.c',
+#  'strtoufix16.c',
+#  'strtoufix32.c',
+#  'strtoufix64.c',
+#  'ufix64toa.c',
 #  These don't work with picolibc's stdio/malloc/locking
 #  'vec_calloc.c',
 #  'vec_free.c',
@@ -57,12 +57,4 @@ srcs_machine = [
 #  'vfscanf.c',
 ]
 
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_machine' + target,
-		static_library('machine' + target,
-			srcs_machine,
-			pic: false,
-			include_directories: inc,
-			c_args: value[1] + arg_fnobuiltin))
-endforeach
+src_machine = files(srcs_machine)

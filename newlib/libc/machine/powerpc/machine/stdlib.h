@@ -31,7 +31,7 @@ SUCH DAMAGE.
 
 #ifndef __STRICT_ANSI__
 
-# if defined(__ALTIVEC__)
+# if defined(__ALTIVEC__) && 0
 
 void *vec_calloc (size_t __nmemb, size_t __size);
 void *_vec_calloc_r (struct _reent *, size_t __nmemb, size_t __size);
@@ -44,7 +44,7 @@ void *_vec_realloc_r (struct _reent *, void *__r, size_t __size);
 
 # endif /* __ALTIVEC__ */
 
-# if defined(__SPE__)
+# if defined(__SPE__) && 0
 
 #define __need_inttypes
 #include <sys/types.h>

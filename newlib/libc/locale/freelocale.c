@@ -69,6 +69,7 @@ PORTABILITY
 void
 freelocale (struct __locale_t *locobj)
 {
+  (void) locobj;
   /* Nothing to do on !_MB_CAPABLE targets. */
 #ifdef _MB_CAPABLE
   /* Sanity check.  The "C" locale is static, don't try to free it. */

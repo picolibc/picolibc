@@ -301,4 +301,4 @@
 {37, 0,123,__LINE__, 0xbfe06e07, 0x00000000, 0x403bcccc, 0xccccccc9},	/* -0.513431=f(27.8)*/
 {37, 0,123,__LINE__, 0x4006407d, 0xa0000000, 0x403d7fff, 0xfffffffc},	/* 2.78149=f(29.5)*/
 {0},};
-void test_tanf(m)   {run_vector_1(m,tanf_vec,(char *)(tanf),"tanf","ff");   }	
+void test_tanf(int m)   {run_vector_1(m,tanf_vec,(char *)(tanf),"tanf","ff");   }	

@@ -118,8 +118,7 @@ void newfunc (const char *string)
 
 static int theline;
 
-void line(li)
-int li;
+void line(int li)
 {
   if (verbose)  
   {
@@ -419,7 +418,7 @@ kill() {}
 getpid() {}
 #endif
 
-void bt(){
+void bt(void){
 
   double f1,f2;
   f1 = 0.0;

@@ -33,30 +33,114 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _DEFAULT_SOURCE
+#define _GNU_SOURCE
 #include <fenv.h>
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <limits.h>
 
-#ifdef __STDC_IEC_559__
-#define HAVE_HW_DOUBLE
+static const char *
+e_to_str(int e)
+{
+	if (e == 0)
+		return "NONE";
+
+#ifdef FE_DIVBYZERO
+	if (e == FE_DIVBYZERO)
+		return "FE_DIVBYZERO";
 #endif
+#ifdef FE_OVERFLOW
+	if (e == FE_OVERFLOW)
+		return "FE_OVERFLOW";
+#endif
+#ifdef FE_UNDERFLOW
+	if (e == FE_UNDERFLOW)
+		return "FE_UNDERFLOW";
+#endif
+#ifdef FE_INEXACT
+	if (e == FE_INEXACT)
+		return "FE_INEXACT";
+#endif
+#ifdef FE_INVALID
+	if (e == FE_INVALID)
+		return "FE_INVALID";
+#endif
+#if defined(FE_OVERFLOW) && defined(FE_INEXACT)
+	if (e == (FE_OVERFLOW|FE_INEXACT))
+		return "FE_OVERFLOW|FE_INEXACT";
+#endif
+#if defined(FE_UNDERFLOW) && defined(FE_INEXACT)
+	if (e == (FE_UNDERFLOW|FE_INEXACT))
+		return "FE_UNDERFLOW|FE_INEXACT";
+#endif
+	static char buf[3][50];
+        static int i = 0;
+        buf[i][0] = '\0';
+        while (e) {
+            char *v = NULL;
+            char tmp[24];
+#ifdef FE_DIVBYZERO
+            if (e & FE_DIVBYZERO) {
+		v = "FE_DIVBYZERO";
+                e &= ~FE_DIVBYZERO;
+            } else
+#endif
+#ifdef FE_OVERFLOW
+            if (e & FE_OVERFLOW) {
+		v = "FE_OVERFLOW";
+                e &= ~FE_OVERFLOW;
+            } else
+#endif
+#ifdef FE_UNDERFLOW
+            if (e & FE_UNDERFLOW) {
+		v = "FE_UNDERFLOW";
+                e &= ~FE_UNDERFLOW;
+            } else
+#endif
+#ifdef FE_INEXACT
+            if (e & FE_INEXACT) {
+		v = "FE_INEXACT";
+                e &= ~FE_INEXACT;
+            } else
+#endif
+#ifdef FE_INVALID
+            if (e & FE_INVALID) {
+		v = "FE_INVALID";
+                e &= ~FE_INVALID;
+            } else
+#endif
+            {
+                snprintf(tmp, sizeof(tmp), "?? 0x%x", e);
+                v = tmp;
+                e = 0;
+            }
+            if (buf[i][0])
+                strcat(buf[i], " | ");
+            strcat(buf[i], v);
+        }
+        char *ret = buf[i];
+        i = (i + 1) % 3;
+        return ret;
+}
 
 #define scat(a,b) a ## b
 
 /* Tests with doubles */
-#ifdef HAVE_HW_DOUBLE
-#define EXCEPTION_TEST	MATH_ERREXCEPT
+#ifdef PICOLIBC_DOUBLE_NOEXCEPT
+#define EXCEPTION_TEST 0
 #else
-#define EXCEPTION_TEST	0
+#define EXCEPTION_TEST	MATH_ERREXCEPT
 #endif
+#define DOUBLE_EXCEPTION_TEST EXCEPTION_TEST
 
 #define BIG 1.7e308
 #define SMALL 5e-324
 #define FLOAT_T double
+
+#define TEST_DOUBLE
 
 #define makemathname(s) s
 #define makemathname_r(s) scat(s,_r)
@@ -69,22 +153,24 @@
 #undef makemathname_r
 #undef FLOAT_T
 #undef EXCEPTION_TEST
+#undef TEST_DOUBLE
 
 /* Tests with floats */
 #define EXCEPTION_TEST	MATH_ERREXCEPT
 #define BIG 3e38
 #define SMALL 1e-45
 #define FLOAT_T float
+#define TEST_FLOAT
 #define makemathname(s) scat(s,f)
 #define makemathname_r(s) scat(s,f_r)
 
 #include "math_errhandling_tests.c"
 
-int main()
+int main(void)
 {
 	int result = 0;
 
-#ifdef HAVE_HW_DOUBLE
+#if DOUBLE_EXCEPTION_TEST
 	printf("Double tests:\n");
 	result += run_tests();
 #endif

@@ -39,6 +39,8 @@ QUICKREF
 #include <string.h>
 #include <strings.h>
 
+#undef bcopy
+
 void
 bcopy (const void *b1,
 	void *b2,

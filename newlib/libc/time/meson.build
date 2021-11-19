@@ -64,7 +64,7 @@ hdrs_time = [
 
 srcs_time_use = []
 foreach file : srcs_time
-  s_file = file.split('.')[0] + '.S'
+  s_file = fs.replace_suffix(file, '.S')
   if file in srcs_machine
     message('libc/time/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
@@ -74,12 +74,4 @@ foreach file : srcs_time
   endif
 endforeach
 
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_time' + target,
-		static_library('time' + target,
-			srcs_time_use,
-			pic: false,
-			include_directories: inc,
-			c_args: value[1]))
-endforeach
+src_time = files(srcs_time_use)

@@ -5,7 +5,7 @@ Copyright (c) 2002 Jeff Johnston <jjohnstn@redhat.com>
 #include <newlib.h>
 #include "check.h"
 
-int main()
+int main(void)
 {
   wctrans_t x;
 

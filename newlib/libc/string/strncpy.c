@@ -74,6 +74,8 @@ QUICKREF
 
 #define TOO_SMALL(LEN) ((LEN) < sizeof (long))
 
+#undef strncpy
+
 char *
 strncpy (char *__restrict dst0,
 	const char *__restrict src0,

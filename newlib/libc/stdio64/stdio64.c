@@ -23,7 +23,7 @@
 #include <fcntl.h>
 #include <sys/unistd.h>
 #include <errno.h>
-#include "local.h"
+#include "../stdio/local.h"
 
 #ifdef __LARGE64_FILES
 

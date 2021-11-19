@@ -90,6 +90,16 @@ you can plug your own code into:
     * The hosted crt0 variant calls `exit`, passing it the value
       returned from main.
 
+## Linking
+
+Picolibc provides two sample linker scripts: `picolibc.ld` for C
+applications and `picolibcpp.ld` for C++ applications. These are
+designed to be useful for fairly simple applications running on
+embedded hardware which need read-only code and data stored in flash
+and read-write data allocated in RAM and initialized by picolibc at
+boot time. You can read more about this on the [linking](linking.md)
+page.
+
 ## Semihosting
 
 “Semihosting” is a mechanism used when the application is run under a

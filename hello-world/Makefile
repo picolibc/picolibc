@@ -33,53 +33,65 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-CFLAGS=--oslib=semihost --crt0=hosted -Os -g
+CFLAGS=--oslib=semihost -Os
 
-CPP_RISCV=riscv64-unknown-elf-g++ -specs=picolibcpp.specs 
-CC_RISCV=riscv64-unknown-elf-gcc -specs=picolibc.specs 
-CFLAGS_RISCV=$(CFLAGS) -march=rv32imac -mabi=ilp32 -Wl,-Thello-world-riscv.ld
+CFLAGS_RISCV=$(CFLAGS) -march=rv32imac -mabi=ilp32 -Triscv.ld
+CC_RISCV=riscv64-unknown-elf-gcc -specs=picolibc.specs $(CFLAGS_RISCV)
+CPPFLAGS_RISCV=$(CFLAGS) -march=rv32imac -mabi=ilp32 -Triscv-cpp.ld
+CPP_RISCV=riscv64-unknown-elf-g++ -specs=picolibcpp.specs $(CPPFLAGS_RISCV)
 
-CPP_ARM=arm-none-eabi-c++ -specs=picolibcpp.specs 
-CC_ARM=arm-none-eabi-gcc -specs=picolibc.specs 
-CFLAGS_ARM=$(CFLAGS) -mcpu=cortex-m3 -Wl,-Thello-world-arm.ld
+CFLAGS_ARM=$(CFLAGS) -mcpu=cortex-m3 -Tarm.ld
+CC_ARM=arm-none-eabi-gcc -specs=picolibc.specs $(CFLAGS_ARM)
+CPPFLAGS_ARM=$(CFLAGS) -mcpu=cortex-m3 -Tarm-cpp.ld
+CPP_ARM=arm-none-eabi-c++ -specs=picolibcpp.specs $(CPPFLAGS_ARM)
 
-CPP_AARCH64=aarch64-linux-gnu-g++ -specs=picolibcpp.specs 
-CC_AARCH64=aarch64-linux-gnu-gcc -specs=picolibc.specs 
-CFLAGS_AARCH64=$(CFLAGS) -Wl,-Thello-world-aarch64.ld
+CFLAGS_AARCH64=$(CFLAGS) -Taarch64.ld
+CC_AARCH64=aarch64-linux-gnu-gcc -specs=picolibc.specs $(CFLAGS_AARCH64)
+CPPFLAGS_AARCH64=$(CFLAGS) -Taarch64-cpp.ld
+CPP_AARCH64=aarch64-linux-gnu-g++ -specs=picolibcpp.specs $(CPPFLAGS_AARCH64)
 
-all: hello-world-riscv.elf hello-world-arm.elf hello-world-aarch64.elf printf.elf printf-int.elf printf-float.elf \
-	hello-world++-riscv.elf hello-world++-arm.elf hello-world++-aarch64.elf
+all: \
+	hello-world-arm.elf hello-world-aarch64.elf \
+	hello-world-riscv.elf hello-world-native.elf \
+	printf.elf printf-int.elf printf-float.elf
 
-
-hello-world-riscv.elf: hello-world.c
-	$(CC_RISCV) $(CFLAGS_RISCV) -o $@ $^ -Wl,-Map=hello-world-riscv.map
+all-cpp: \
+	hello-worldpp-arm.elf hello-worldpp-aarch64.elf \
+	hello-worldpp-riscv.elf hello-worldpp-native.elf
 
 hello-world-arm.elf: hello-world.c
-	$(CC_ARM) $(CFLAGS_ARM) -o $@ $^ -Wl,-Map=hello-world-arm.map
+	$(CC_ARM) -o $@ $^ -Wl,-Map=hello-world-arm.map
 
 hello-world-aarch64.elf: hello-world.c
-	$(CC_AARCH64) $(CFLAGS_AARCH64) -o $@ $^ -Wl,-Map=hello-world-aarch64.map
+	$(CC_AARCH64) -o $@ $^ -Wl,-Map=hello-world-aarch64.map
+
+hello-world-riscv.elf: hello-world.c
+	$(CC_RISCV) -o $@ $^ -Wl,-Map=hello-world-riscv.map
+
+hello-world-native.elf: hello-world.c
+	cc -o $@ $^
+
+printf.elf: printf.c
+	$(CC_ARM) -o $@ $^ -Wl,-Map=printf.map
+
+printf-int.elf: printf.c
+	$(CC_ARM) -DPICOLIBC_INTEGER_PRINTF_SCANF -o $@ $^ -Wl,-Map=printf-int.map
+
+printf-float.elf: printf.c
+	$(CC_ARM) -DPICOLIBC_FLOAT_PRINTF_SCANF -o $@ $^ -Wl,-Map=printf-float.map
+
+hello-worldpp-native.elf: hello-worldpp.cpp
+	c++ -o $@ $^
+
+hello-worldpp-arm.elf:  hello-worldpp.cpp
+	$(CPP_ARM) -Wl,-Map=hello-worldpp-arm.map -o $@ $^
+
+hello-worldpp-aarch64.elf:  hello-worldpp.cpp
+	$(CPP_AARCH64) -Wl,-Map=hello-worldpp-aarch64.map -o $@ $^
+
+hello-worldpp-riscv.elf:  hello-worldpp.cpp
+	$(CPP_RISCV) -Wl,-Map=hello-worldpp-riscv.map -o $@ $^
 
 clean:
 	rm -f *.elf *.map
 
-hello-world++-native.elf: hello-world++.c++
-	c++ -o $@ $^
-
-hello-world++-arm.elf:  hello-world++.c++
-	$(CPP_ARM) $(CFLAGS_ARM) -Wl,-Map=hello-world++-arm.map -o $@ $^
-
-hello-world++-riscv.elf:  hello-world++.c++
-	$(CPP_RISCV) $(CFLAGS_RISCV) -Wl,-Map=hello-world++-riscv.map -o $@ $^
-
-hello-world++-aarch64.elf:  hello-world++.c++
-	$(CPP_AARCH64) $(CFLAGS_AARCH64) -Wl,-Map=hello-world++-aarch64.map -o $@ $^
-
-printf.elf: printf.c
-	$(CC_ARM) $(CFLAGS_ARM) -o $@ $^ -Wl,-Map=printf.map
-
-printf-int.elf: printf.c
-	$(CC_ARM) $(CFLAGS_ARM) -DPICOLIBC_INTEGER_PRINTF_SCANF -o $@ $^ -Wl,-Map=printf-int.map
-
-printf-float.elf: printf.c
-	$(CC_ARM) $(CFLAGS_ARM) -DPICOLIBC_FLOAT_PRINTF_SCANF -o $@ $^ -Wl,-Map=printf-float.map

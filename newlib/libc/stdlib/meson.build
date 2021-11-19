@@ -195,11 +195,11 @@ endif
 # Work around compiler optimizing calls involving malloc/free
 
 c_args_malloc = []
-if meson.get_compiler('c').has_argument('-fno-builtin-malloc')
+if cc.has_argument('-fno-builtin-malloc')
   c_args_malloc += ['-fno-builtin-malloc']
 endif
 
-if meson.get_compiler('c').has_argument('-fno-builtin-free')
+if cc.has_argument('-fno-builtin-free')
   c_args_malloc += ['-fno-builtin-free']
 endif
 
@@ -231,7 +231,7 @@ hdrs_stdlib = [
 
 srcs_stdlib_use = []
 foreach file : srcs_stdlib
-  s_file = file.split('.')[0] + '.S'
+  s_file = fs.replace_suffix(file, '.S')
   if file in srcs_machine
     message('libc/stdlib/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
@@ -243,7 +243,7 @@ endforeach
 
 srcs_stdlib_malloc_use = []
 foreach file : srcs_stdlib_malloc
-  s_file = file.split('.')[0] + '.S'
+  s_file = fs.replace_suffix(file, '.S')
   if file in srcs_machine
     message('libc/stdlib/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
@@ -253,21 +253,17 @@ foreach file : srcs_stdlib_malloc
   endif
 endforeach
 
+src_stdlib = files(srcs_stdlib_use)
+
 foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_stdlib_malloc' + target,
-		     static_library('stdlib_malloc' + target,
-				    srcs_stdlib_malloc_use,
-				    pic: false,
-				    include_directories: inc,
-				    c_args: value[1] + ['-DINTERNAL_NEWLIB'] + c_args_malloc))
-	lib_stdlib_malloc_objs = get_variable('lib_stdlib_malloc' + target).extract_all_objects(recursive:true)
-	
-	set_variable('lib_stdlib' + target,
-		     static_library('stdlib' + target,
-				    srcs_stdlib_use,
-				    objects: lib_stdlib_malloc_objs,
-				    pic: false,
-				    include_directories: inc,
-				    c_args: value[1] + ['-DINTERNAL_NEWLIB']))
+  value = get_variable('target_' + target)
+
+  # Have to build a sub-library to get custom c_args for malloc
+  set_variable('lib_stdlib' + target,
+	       static_library('stdlib_malloc' + target,
+			      srcs_stdlib_malloc_use,
+			      pic: false,
+			      include_directories: inc,
+			      c_args: value[1] + ['-DINTERNAL_NEWLIB'] + c_args_malloc))
+
 endforeach

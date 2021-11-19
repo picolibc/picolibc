@@ -302,4 +302,4 @@
 {38, 0,123,__LINE__, 0x4051646b, 0xdd7cf160, 0x403d7fff, 0xfffffffc},	/* 69.5691=f(29.5)*/
 {0}
 };
-void test_gammaf(m)   {run_vector_1(m,gammaf_vec,(char *)(lgammaf),"lgammaf","ff");   }	
+void test_gammaf(int m)   {run_vector_1(m,gammaf_vec,(char *)(lgammaf),"lgammaf","ff");   }	

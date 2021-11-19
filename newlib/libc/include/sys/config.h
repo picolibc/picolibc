@@ -305,7 +305,7 @@ SUCH DAMAGE.
 #endif
 #endif
 
-#ifdef NEWLIB_TLS
+#ifdef PICOLIBC_TLS
 #define NEWLIB_THREAD_LOCAL __thread
 #else
 #define NEWLIB_THREAD_LOCAL

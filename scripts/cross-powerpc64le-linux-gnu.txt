@@ -1,0 +1,22 @@
+[binaries]
+c = 'powerpc64le-linux-gnu-gcc'
+ar = 'powerpc64le-linux-gnu-ar'
+as = 'powerpc64le-linux-gnu-as'
+ld = 'powerpc64le-linux-gnu-ld'
+nm = 'powerpc64le-linux-gnu-nm'
+strip = 'powerpc64le-linux-gnu-strip'
+exe_wrapper = ['sh', '-c', 'test -z "$MESON_SOURCE_ROOT" || "$MESON_SOURCE_ROOT"/scripts/run-powerpc64le "$@"', 'run-powerpc64le']
+
+[host_machine]
+system = 'linux'
+cpu_family = 'ppc64'
+cpu = 'ppc64'
+endian = 'little'
+
+[properties]
+c_args = ['-nostdlib', '-fno-pic', '-static']
+needs_exe_wrapper = true
+skip_sanity_check = true
+link_spec = '--build-id=none'
+cc1_spec = '-fno-pic'
+specs_extra = ['*libgcc:', '-lgcc']

@@ -45,5 +45,6 @@ foreach test : tests
 		  link_args: test_link_args,
 		  link_with: [lib_c, lib_semihost, lib_crt],
 		  include_directories: inc),
+       depends: bios_bin,
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 endforeach

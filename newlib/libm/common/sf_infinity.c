@@ -13,7 +13,7 @@ is preserved.
 
 #include "fdlibm.h"
 
-	float infinityf()
+float infinityf(void)
 {
 	float x;
 
@@ -23,7 +23,7 @@ is preserved.
 
 #ifdef _DOUBLE_IS_32BITS
 
-	double infinity()
+double infinity(void)
 {
 	return (double) infinityf();
 }

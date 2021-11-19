@@ -65,21 +65,13 @@ SEEALSO
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef _IEEE_LIBM
-#define erange(_ret) return (_ret)
-#else
-#define erange(_ret) do { errno = ERANGE; return (_ret); } while(0)
-#endif
-
 #ifdef __STDC__
 static const double
 #else
 static double
 #endif
 two54   =  1.80143985094819840000e+16, /* 0x43500000, 0x00000000 */
-twom54  =  5.55111512312578270212e-17, /* 0x3C900000, 0x00000000 */
-huge   = 1.0e+300,
-tiny   = 1.0e-300;
+twom54  =  5.55111512312578270212e-17; /* 0x3C900000, 0x00000000 */
 
 #ifdef __STDC__
 	double scalbn (double x, int n)
@@ -96,20 +88,35 @@ tiny   = 1.0e-300;
 	    x *= two54; 
 	    GET_HIGH_WORD(hx,x);
 	    k = ((hx&0x7ff00000)>>20) - 54; 
-            if (n< -50000) erange(tiny*x); 	/*underflow*/
+            if (n< -50000) return __math_uflow(hx<0); 	/*underflow*/
 	    }
         if (k==0x7ff) return x+x;		/* NaN or Inf */
         if (n > 50000) 	/* in case integer overflow in n+k */
-            erange(huge*copysign(huge,x));	/*overflow*/
+            return __math_oflow(hx<0);	        /*overflow*/
         k = k+n; 
-        if (k >  0x7fe) erange(huge*copysign(huge,x)); /* overflow  */
+        if (k >  0x7fe) return __math_oflow(hx<0); /* overflow  */
         if (k > 0) 				/* normal result */
 	    {SET_HIGH_WORD(x,(hx&0x800fffff)|(k<<20)); return x;}
         if (k <= -54)
-	    erange(tiny*copysign(tiny,x)); 	/*underflow*/
+	    return __math_uflow(hx<0); 	        /*underflow*/
         k += 54;				/* subnormal result */
 	SET_HIGH_WORD(x,(hx&0x800fffff)|(k<<20));
         return x*twom54;
 }
+
+#if defined(HAVE_ALIAS_ATTRIBUTE)
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(scalbn, ldexp);
+#else
+
+double
+ldexp(double value, int exp)
+{
+    return scalbn(value, exp);
+}
+
+#endif
 
 #endif /* _DOUBLE_IS_32BITS */

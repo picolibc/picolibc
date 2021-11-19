@@ -12,6 +12,8 @@
 #include <string.h>
 #include <stdint.h>
 
+#undef strcpy
+
 char *strcpy(char *dst, const char *src)
 {
   char *dst0 = dst;

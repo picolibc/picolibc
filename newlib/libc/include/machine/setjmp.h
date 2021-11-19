@@ -185,9 +185,17 @@ _BEGIN_STD_C
 
 #ifdef __PPC__
 #ifdef __ALTIVEC__
+#ifdef _LP64
+#define _JBLEN 96
+#else
+#define _JBLEN 64
+#endif
+#else
+#ifdef _LP64
 #define _JBLEN 64
 #else
 #define _JBLEN 32
+#endif
 #endif
 #define _JBTYPE double
 #endif

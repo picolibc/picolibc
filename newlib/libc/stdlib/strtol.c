@@ -131,6 +131,8 @@ _strtol_l (const char *__restrict nptr,
 
 	if (base < 0 || base == 1 || base > 36) {
 		errno = EINVAL;
+                if (endptr != 0)
+                        *endptr = (char *) nptr;
 		return 0;
 	}
 
@@ -148,7 +150,9 @@ _strtol_l (const char *__restrict nptr,
 	} else if (c == '+')
 		c = *s++;
 	if ((base == 0 || base == 16) &&
-	    c == '0' && (*s == 'x' || *s == 'X')) {
+	    c == '0' && (*s == 'x' || *s == 'X') && (('0' <= s[1] && s[1] <= '9') ||
+                                                     ('a' <= s[1] && s[1] <= 'f') ||
+                                                     ('A' <= s[1] && s[1] <= 'F'))) {
 		c = s[1];
 		s += 2;
 		base = 16;

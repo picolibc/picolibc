@@ -382,5 +382,5 @@ memchr:
 	subs	r0,r0,#1
 	bx	lr
 #else
-  /* Defined in memchr-stub.c.  */
+  /* Defined in memchr.c.  */
 #endif

@@ -430,7 +430,7 @@ setlocale (
 
 #ifdef _MB_CAPABLE
 static char *
-currentlocale ()
+currentlocale (void)
 {
   int i;
 
@@ -970,7 +970,7 @@ __get_locale_env (int category)
 }
 #endif /* _MB_CAPABLE */
 
-int
+size_t
 __locale_mb_cur_max (void)
 {
 #ifdef __HAVE_LOCALE_INFO__

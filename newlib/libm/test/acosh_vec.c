@@ -302,4 +302,4 @@
 {64, 0,123,__LINE__, 0x40104f1a, 0xa2d94c29, 0x403d7fff, 0xfffffffc},	/* 4.07725=f(29.5)*/
 {0}
 };
-void test_acosh(m)   {run_vector_1(m,acosh_vec,(char *)(acosh),"acosh","dd");   }	
+void test_acosh(int m)   {run_vector_1(m,acosh_vec,(char *)(acosh),"acosh","dd");   }	

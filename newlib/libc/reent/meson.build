@@ -40,7 +40,7 @@ srcs_reent = [
 
 srcs_reent_use = []
 foreach file : srcs_reent
-  s_file = file.split('.')[0] + '.S'
+  s_file = fs.replace_suffix(file, '.S')
   if file in srcs_machine
     message('libc/reent/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
@@ -50,12 +50,4 @@ foreach file : srcs_reent
   endif
 endforeach
 
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_reent' + target,
-		static_library('reent' + target,
-			srcs_reent_use,
-			pic: false,
-			include_directories: inc,
-			c_args: value[1]))
-endforeach
+src_reent = files(srcs_reent_use)

@@ -301,4 +301,4 @@
 {61, 0,123,__LINE__, 0x42613b19, 0x1e69fb1e, 0x403bcccc, 0xccccccc9},	/* 5.92048e+11=f(27.8)*/
 {60, 0,123,__LINE__, 0x42879487, 0x9e85b8ea, 0x403d7fff, 0xfffffffc},	/* 3.24084e+12=f(29.5)*/
 {0},};
-void test_sinh(m)   {run_vector_1(m,sinh_vec,(char *)(sinh),"sinh","dd");   }	
+void test_sinh(int m)   {run_vector_1(m,sinh_vec,(char *)(sinh),"sinh","dd");   }	

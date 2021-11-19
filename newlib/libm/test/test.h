@@ -211,7 +211,7 @@ int fmag_of_error (float, float);
 #define VECCLOSE(f,name,args)\
 {\
   fprintf(f,"0,};\n");      \
-   fprintf(f,"test_%s(m)   {run_vector_1(m,%s_vec,(char *)(%s),\"%s\",\"%s\");   }	\n",\
+   fprintf(f,"test_%s(int m)   {run_vector_1(m,%s_vec,(char *)(%s),\"%s\",\"%s\");   }	\n",\
 	   name,\
 	   name,name,name,args);\
 	    fclose(f);\

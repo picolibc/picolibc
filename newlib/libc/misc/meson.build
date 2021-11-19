@@ -43,7 +43,7 @@ srcs_misc = [
 
 srcs_misc_use = []
 foreach file : srcs_misc
-  s_file = file.split('.')[0] + '.S'
+  s_file = fs.replace_suffix(file, '.S')
   if file in srcs_machine
     message('libc/misc/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
@@ -53,12 +53,4 @@ foreach file : srcs_misc
   endif
 endforeach
 
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_misc' + target,
-		static_library('misc' + target,
-			srcs_misc_use,
-			pic: false,
-			include_directories: inc,
-			c_args: value[1]))
-endforeach
+src_misc = files(srcs_misc_use)

@@ -115,6 +115,9 @@ struct __locale_t *
 newlocale (int category_mask, const char *locale,
 	      struct __locale_t *base)
 {
+  (void) category_mask;
+  (void) locale;
+  (void) base;
 #ifndef _MB_CAPABLE
   return __get_C_locale ();
 #else /* _MB_CAPABLE */

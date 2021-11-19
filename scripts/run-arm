@@ -49,91 +49,91 @@ memory=
 #
 
 case "$elf" in
-    */arm_v5te_hard/*|*/arm_v5te_softfp/*)
+    *arm_v5te_hard*|*arm_v5te_softfp*)
 	# The only v5 supported by qemu is the arm946,
 	# which doesn't have an FPU, and all of the GCC
 	#cpu=arm946
 	;;
 
     # v6-m - Cortex-M0
-    */thumb_v6_m_nofp/*)
+    *thumb_v6_m_nofp*)
 	cpu=cortex-m0
 	;;
 
     # v7-a/v7ve - Cortex-A7
-    */thumb_v7_a*|*/thumb_v7ve_*)
+    *thumb_v7_a*|*thumb_v7ve_*)
 	cpu=cortex-a7
 	;;
 
     # v7-m - Cortex-M3
-    */thumb_v7_m_nofp/*)
+    *thumb_v7_m_nofp*)
 	cpu=cortex-m3
 	;;
 
     # v7-r - Cortex-R5
-    */thumb_v7_r*)
+    *thumb_v7_r*)
 	cpu=cortex-r5f
 	;;
 
     # v7e-m - Cortex-M4
-    */thumb_v7e_m_nofp/*)
+    *thumb_v7e_m_nofp*)
 	cpu=cortex-m4
 	;;
-    */thumb_v7e_m_fp_hard/*)
+    *thumb_v7e_m_fp_hard*)
 	cpu=cortex-m4
 	;;
-    */thumb_v7e_m_fp_softfp/*)
+    *thumb_v7e_m_fp_softfp*)
 	cpu=cortex-m4
 	;;
 
     # v7e-m dp - Cortex-M7
-    */thumb_v7e_m_dp_hard/*)
+    *thumb_v7e_m_dp_hard*)
 	cpu=cortex-m7
 	;;
-    */thumb_v7e_m_dp_softfp/*)
+    *thumb_v7e_m_dp_softfp*)
 	cpu=cortex-m7
 	;;
 
     # v8-a - unknown
-    */thumb_v8_a*)
+    *thumb_v8_a*)
 	cpu=unknown
 	;;
 
     # v8.1 - unknown
-    */thumb_v8_1*)
+    *thumb_v8_1*)
 	cpu=unknown
 	;;
 
     # v8-m with single-precision FPU - Cortex-M33
-    */thumb_v8_m_base_nofp/*)
+    *thumb_v8_m_base_nofp*)
 	cpu=cortex-m33
 	;;
-    */thumb_v8_m_main_fp_softfp/*)
+    *thumb_v8_m_main_fp_softfp*)
 	cpu=cortex-m33
 	;;
-    */thumb_v8_m_main_dp_softfp/*)
+    *thumb_v8_m_main_dp_softfp*)
 	;;
-    */thumb_v8_m_main_fp_hard/*)
+    *thumb_v8_m_main_fp_hard*)
 	cpu=cortex-m33
 	;;
-    */thumb_v8_m_main_nofp/*)
+    *thumb_v8_m_main_nofp*)
 	cpu=cortex-m33
 	;;
 
     # v8-m with double-preicision FPU - none
-    */thumb_v8_m_main_dp_hard/*)
+    *thumb_v8_m_main_dp_hard*)
 	;;
 
     # v7 - Cortex-A7
-    */thumb_v7_nofp/*)
+    *thumb_v7_nofp*)
 	cpu=cortex-a7
 	;;
 
     # v7 with FPU - Cortex-A9
-    */thumb_v7_fp_hard/*)
+    *thumb_v7_fp_hard*)
 	cpu=cortex-a8
 	;;
-    */thumb_v7_fp_softfp/*)
+    *thumb_v7_fp_softfp*)
 	cpu=cortex-a8
 	;;
 

@@ -32,6 +32,7 @@
 #include <math.h>
 #include <stdint.h>
 #include <errno.h>
+#include <fenv.h>
 
 #ifndef WANT_ROUNDING
 /* Correct special case results in non-nearest rounding modes.  */
@@ -52,6 +53,26 @@
 
 #define _IEEE_  -1
 #define _POSIX_ 0
+
+#ifdef _HAVE_ATTRIBUTE_ALWAYS_INLINE
+#define ALWAYS_INLINE __inline__ __attribute__((__always_inline__))
+#else
+#define ALWAYS_INLINE __inline__
+#endif
+
+#ifdef _HAVE_ATTRIBUTE_NOINLINE
+# define NOINLINE __attribute__ ((__noinline__))
+#else
+# define NOINLINE
+#endif
+
+#ifdef HAVE_BUILTIN_EXPECT
+# define likely(x) __builtin_expect (!!(x), 1)
+# define unlikely(x) __builtin_expect (x, 0)
+#else
+# define likely(x) (x)
+# define unlikely(x) (x)
+#endif
 
 /* Compiler can inline round as a single instruction.  */
 #ifndef HAVE_FAST_ROUND
@@ -96,7 +117,7 @@
 /* Round x to nearest int in all rounding modes, ties have to be rounded
    consistently with converttoint so the results match.  If the result
    would be outside of [-2^31, 2^31-1] then the semantics is unspecified.  */
-static inline double_t
+static ALWAYS_INLINE double_t
 roundtoint (double_t x)
 {
   return round (x);
@@ -105,7 +126,7 @@ roundtoint (double_t x)
 /* Convert x to nearest int in all rounding modes, ties have to be rounded
    consistently with roundtoint.  If the result is not representible in an
    int32_t then the semantics is unspecified.  */
-static inline int32_t
+static ALWAYS_INLINE int32_t
 converttoint (double_t x)
 {
 # if HAVE_FAST_LROUND
@@ -120,7 +141,7 @@ converttoint (double_t x)
 # define TOINT_INTRINSICS 0
 #endif
 
-static inline uint32_t
+static ALWAYS_INLINE uint32_t
 asuint (float f)
 {
 #if defined(__riscv_flen) && __riscv_flen >= 32
@@ -137,7 +158,7 @@ asuint (float f)
 #endif
 }
 
-static inline float
+static ALWAYS_INLINE float
 asfloat (uint32_t i)
 {
 #if defined(__riscv_flen) && __riscv_flen >= 32
@@ -154,37 +175,37 @@ asfloat (uint32_t i)
 #endif
 }
 
-static inline int32_t
+static ALWAYS_INLINE int32_t
 _asint32 (float f)
 {
     return (int32_t) asuint(f);
 }
 
-static inline int
+static ALWAYS_INLINE int
 _sign32(int32_t ix)
 {
     return ((uint32_t) ix) >> 31;
 }
 
-static inline int
+static ALWAYS_INLINE int
 _exponent32(int32_t ix)
 {
     return (ix >> 23) & 0xff;
 }
 
-static inline int32_t
+static ALWAYS_INLINE int32_t
 _significand32(int32_t ix)
 {
     return ix & 0x7fffff;
 }
 
-static inline float
+static ALWAYS_INLINE float
 _asfloat(int32_t i)
 {
     return asfloat((uint32_t) i);
 }
 
-static inline uint64_t
+static ALWAYS_INLINE uint64_t
 asuint64 (double f)
 {
 #if defined(__riscv_flen) && __riscv_flen >= 64 && __riscv_xlen >= 64
@@ -201,7 +222,7 @@ asuint64 (double f)
 #endif
 }
 
-static inline double
+static ALWAYS_INLINE double
 asdouble (uint64_t i)
 {
 #if defined(__riscv_flen) && __riscv_flen >= 64 && __riscv_xlen >= 64
@@ -218,31 +239,31 @@ asdouble (uint64_t i)
 #endif
 }
 
-static inline int64_t
+static ALWAYS_INLINE int64_t
 _asint64(double f)
 {
     return (int64_t) asuint64(f);
 }
 
-static inline int
+static ALWAYS_INLINE int
 _sign64(int64_t ix)
 {
     return ((uint64_t) ix) >> 63;
 }
 
-static inline int
+static ALWAYS_INLINE int
 _exponent64(int64_t ix)
 {
     return (ix >> 52) & 0x7ff;
 }
 
-static inline int64_t
+static ALWAYS_INLINE int64_t
 _significand64(int64_t ix)
 {
     return ix & 0xfffffffffffffLL;
 }
 
-static inline double
+static ALWAYS_INLINE double
 _asdouble(int64_t i)
 {
     return asdouble((uint64_t) i);
@@ -251,7 +272,7 @@ _asdouble(int64_t i)
 #ifndef IEEE_754_2008_SNAN
 # define IEEE_754_2008_SNAN 1
 #endif
-static inline int
+static ALWAYS_INLINE int
 issignalingf_inline (float x)
 {
   uint32_t ix = asuint (x);
@@ -260,7 +281,7 @@ issignalingf_inline (float x)
   return 2 * (ix ^ 0x00400000) > 0xFF800000u;
 }
 
-static inline int
+static ALWAYS_INLINE int
 issignaling_inline (double x)
 {
   uint64_t ix = asuint64 (x);
@@ -269,83 +290,64 @@ issignaling_inline (double x)
   return 2 * (ix ^ 0x0008000000000000) > 2 * 0x7ff8000000000000ULL;
 }
 
-#if __aarch64__ && __GNUC__
-/* Prevent the optimization of a floating-point expression.  */
-static inline float
-opt_barrier_float (float x)
-{
-  __asm__ __volatile__ ("" : "+w" (x));
-  return x;
-}
-static inline double
-opt_barrier_double (double x)
-{
-  __asm__ __volatile__ ("" : "+w" (x));
-  return x;
-}
-/* Force the evaluation of a floating-point expression for its side-effect.  */
-static inline void
-force_eval_float (float x)
-{
-  __asm__ __volatile__ ("" : "+w" (x));
-}
-static inline void
-force_eval_double (double x)
-{
-  __asm__ __volatile__ ("" : "+w" (x));
-}
+#ifdef PICOLIBC_FLOAT_NOEXCEPT
+#define FORCE_FLOAT     float
+#define pick_float_except(expr,val)    (val)
 #else
-static inline float
+#define FORCE_FLOAT     volatile float
+#define pick_float_except(expr,val)    (expr)
+#endif
+
+#ifdef PICOLIBC_DOUBLE_NOEXCEPT
+#define FORCE_DOUBLE    double
+#define pick_double_except(expr,val)    (val)
+#else
+#define FORCE_DOUBLE    volatile double
+#define pick_double_except(expr,val)    (expr)
+#endif
+
+static ALWAYS_INLINE float
 opt_barrier_float (float x)
 {
-  volatile float y = x;
+  FORCE_FLOAT y = x;
   return y;
 }
-static inline double
+
+static ALWAYS_INLINE double
 opt_barrier_double (double x)
 {
-  volatile double y = x;
+  FORCE_DOUBLE y = x;
   return y;
 }
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-variable"
-static inline void
+
+static ALWAYS_INLINE void
 force_eval_float (float x)
 {
-  volatile float y = x;
+  FORCE_FLOAT y = x;
+  (void) y;
 }
-static inline void
+
+static ALWAYS_INLINE void
 force_eval_double (double x)
 {
-  volatile double y = x;
+  FORCE_DOUBLE y = x;
+  (void) y;
 }
-#pragma GCC diagnostic pop
-#endif
 
 /* Evaluate an expression as the specified type, normally a type
    cast should be enough, but compilers implement non-standard
    excess-precision handling, so when FLT_EVAL_METHOD != 0 then
    these functions may need to be customized.  */
-static inline float
+static ALWAYS_INLINE float
 eval_as_float (float x)
 {
   return x;
 }
-static inline double
+static ALWAYS_INLINE double
 eval_as_double (double x)
 {
   return x;
 }
-
-#ifdef __GNUC__
-# define NOINLINE __attribute__ ((noinline))
-# define likely(x) __builtin_expect (!!(x), 1)
-# define unlikely(x) __builtin_expect (x, 0)
-#else
-# define NOINLINE
-# define likely(x) (x)
-# define unlikely(x) (x)
-#endif
 
 /* gcc emitting PE/COFF doesn't support visibility */
 #if defined (__GNUC__) && !defined (__CYGWIN__)
@@ -384,6 +386,8 @@ HIDDEN double __math_invalid (double);
 /* Error handling using output checking, only for errno setting.  */
 
 /* Check if the result overflowed to infinity.  */
+HIDDEN float __math_check_oflowf (float);
+/* Check if the result overflowed to infinity.  */
 HIDDEN double __math_check_oflow (double);
 /* Check if the result underflowed to 0.  */
 HIDDEN double __math_check_uflow (double);
@@ -395,12 +399,36 @@ check_oflow (double x)
   return WANT_ERRNO ? __math_check_oflow (x) : x;
 }
 
+/* Check if the result overflowed to infinity.  */
+static inline float
+check_oflowf (float x)
+{
+  return WANT_ERRNO ? __math_check_oflowf (x) : x;
+}
+
 /* Check if the result underflowed to 0.  */
 static inline double
 check_uflow (double x)
 {
   return WANT_ERRNO ? __math_check_uflow (x) : x;
 }
+
+/* Set inexact exception */
+#if defined(FE_INEXACT) && !defined(PICOLIBC_DOUBLE_NOEXECPT)
+double __math_inexact(double);
+void __math_set_inexact(void);
+#else
+#define __math_inexact(val) (val)
+#define __math_set_inexact()
+#endif
+
+#if defined(FE_INEXACT) && !defined(PICOLIBC_FLOAT_NOEXECPT)
+float __math_inexactf(float val);
+void __math_set_inexactf(void);
+#else
+#define __math_inexactf(val) (val)
+#define __math_set_inexactf()
+#endif
 
 /* Shared between expf, exp2f and powf.  */
 #define EXP2F_TABLE_BITS 5

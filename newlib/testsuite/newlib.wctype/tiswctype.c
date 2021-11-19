@@ -3,7 +3,7 @@
 #include <newlib.h>
 #include "check.h"
 
-int main()
+int main(void)
 {
   wctype_t x;
 

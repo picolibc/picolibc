@@ -60,7 +60,7 @@ hdrs_locale = [
 
 srcs_locale_use = []
 foreach file : srcs_locale
-  s_file = file.split('.')[0] + '.S'
+  s_file = fs.replace_suffix(file, '.S')
   if file in srcs_machine
     message('libc/locale/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
@@ -70,12 +70,4 @@ foreach file : srcs_locale
   endif
 endforeach
 
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_locale' + target,
-		static_library('locale' + target,
-			srcs_locale_use,
-			pic: false,
-			include_directories: inc,
-			c_args: value[1]))
-endforeach
+src_locale = files(srcs_locale_use)

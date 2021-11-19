@@ -32,11 +32,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-src_common = [
+srcs_common = [
     'signgam.c'
 ]  
 
-dsrc_common = [
+dsrcs_common = [
   's_finite.c',
   's_copysign.c',
   's_modf.c',
@@ -77,7 +77,6 @@ dsrc_common = [
   'exp2.c',
   'exp_data.c',
   'math_err_with_errno.c',
-  'math_err_xflow.c',
   'math_err_uflow.c',
   'math_err_oflow.c',
   'math_err_divzero.c',
@@ -85,6 +84,8 @@ dsrc_common = [
   'math_err_may_uflow.c',
   'math_err_check_uflow.c',
   'math_err_check_oflow.c',
+  'math_inexact.c',
+  'math_inexactf.c',
   'log.c',
   'log_data.c',
   'log2.c',
@@ -93,7 +94,7 @@ dsrc_common = [
   'pow_log_data.c',
 ]
 
-fsrc_common = [
+fsrcs_common = [
   'sf_finite.c',
   'sf_copysign.c',
   'sf_modf.c',
@@ -142,18 +143,17 @@ fsrc_common = [
   'sincosf.c',
   'sincosf_data.c',
   'math_errf_with_errnof.c',
-  'math_errf_xflowf.c',
   'math_errf_uflowf.c',
   'math_errf_may_uflowf.c',
   'math_errf_oflowf.c',
   'math_errf_divzerof.c',
-  'math_errf_invalidf.c'
+  'math_errf_invalidf.c',
+  'math_errf_check_oflowf.c',
 ]
 
 # These have full implementations
 lsrc_full = [
   'copysignl.c',
-  'hypotl.c',
   'isinfl.c',
   'isnanl.c',
   'nanl.c',
@@ -225,7 +225,7 @@ lsrc_wrap = [
   'sincosl.c',
 ]
 
-srcs_common = src_common + dsrc_common + fsrc_common
+srcs_common += dsrcs_common + fsrcs_common
 
 if have_long_double
   srcs_common += lsrc_full
@@ -236,7 +236,7 @@ endif
 
 srcs_common_use = []
 foreach file : srcs_common
-  s_file = file.split('.')[0] + '.S'
+  s_file = fs.replace_suffix(file, '.S')
   if file in srcs_libm_machine
     message('libm/common/' + file + ': machine overrides generic')
   elif s_file in srcs_libm_machine
@@ -253,12 +253,4 @@ hdrs_common = [
     'sincosf.h',
 ]
 
-foreach target : targets
-  value = get_variable('target_' + target)
-  set_variable('lib_common' + target,
-	       static_library('common' + target,
-			      srcs_common_use,
-			      pic: false,
-			      include_directories: inc,
-			      c_args: value[1]))
-endforeach
+src_libm_common = files(srcs_common_use)

@@ -39,4 +39,4 @@
 {64, 0,123,__LINE__, 0x00000000, 0x00000000, 0x7ff00000, 0x00000000, 0x7ff00000, 0x00000000 },   /* +0=f(+inf, &+inf) */
 {64, 0,123,__LINE__, 0x80000000, 0x00000000, 0xfff00000, 0x00000000, 0xfff00000, 0x00000000 },   /* -0=f(-inf, &-inf) */
 {0},};
-void test_modf(m)   {run_vector_1(m,modf_vec,(char *)(modf),"modf","ddp");   }
+void test_modf(int m)   {run_vector_1(m,modf_vec,(char *)(modf),"modf","ddp");   }

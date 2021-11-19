@@ -149,7 +149,6 @@ static char *rcsid = "$Id$";
 #include <_ansi.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <alloca.h>
 #include <string.h>
 #include <limits.h>
 #include <stdint.h>
@@ -1842,7 +1841,7 @@ cvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 			value -= mode;
 			*bp++ = digits[mode];
 		} while (ndigits-- && value);
-		if (value > 0.5 || (value == 0.5 && mode & 1)) {
+		if (value > (_PRINTF_FLOAT_TYPE) 0.5 || (value == (_PRINTF_FLOAT_TYPE) 0.5 && mode & 1)) {
 			/* round to even */
 			rve = bp;
 			while (*--rve == digits[0xf]) {

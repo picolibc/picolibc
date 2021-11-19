@@ -114,7 +114,7 @@ hdrs_ctype = [
 
 srcs_ctype_use = []
 foreach file : srcs_ctype
-  s_file = file.split('.')[0] + '.S'
+  s_file = fs.replace_suffix(file, '.S')
   if file in srcs_machine
     message('libc/ctype/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
@@ -124,12 +124,4 @@ foreach file : srcs_ctype
   endif
 endforeach
 
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_ctype' + target,
-		static_library('ctype' + target,
-			srcs_ctype_use,
-			pic: false,
-			include_directories: inc,
-			c_args: value[1]))
-endforeach
+src_ctype = files(srcs_ctype_use)

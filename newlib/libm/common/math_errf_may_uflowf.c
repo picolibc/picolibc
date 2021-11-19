@@ -29,14 +29,18 @@
 #include "fdlibm.h"
 #include "math_config.h"
 
-#if !__OBSOLETE_MATH_FLOAT
 #if WANT_ERRNO_UFLOW
+
+static const FORCE_FLOAT VAL = pick_float_except(0x1.4p-75f, 0.0f);
+
 /* Underflows to zero in some non-nearest rounding mode, setting errno
    is valid even if the result is non-zero, but in the subnormal range.  */
 HIDDEN float
 __math_may_uflowf (uint32_t sign)
 {
-  return __math_xflowf (sign, 0x1.4p-75f);
+    float y = pick_float_except(VAL * VAL, VAL);
+    if (sign)
+        y = -y;
+    return __math_with_errnof (y, ERANGE);
 }
 #endif
-#endif /* !__OBSOLETE_MATH_FLOAT */

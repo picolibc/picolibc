@@ -38,6 +38,10 @@
 
 #ifdef __riscv_flen
 
+#ifdef _WANT_MATH_ERRNO
+#include <errno.h>
+#endif
+
 #define FCLASS_NEG_INF       (1 << 0)
 #define FCLASS_NEG_NORMAL    (1 << 1)
 #define FCLASS_NEG_SUBNORMAL (1 << 2)
@@ -68,7 +72,9 @@
 # define __declare_riscv_macro_fclass(type) static __inline type
 #endif
 
-#if defined (__riscv_flen) && __riscv_flen >= 64
+/* We always need the fclass functions */
+
+#if __riscv_flen >= 64
 __declare_riscv_macro_fclass(long)
 _fclass_d(double x)
 {
@@ -78,7 +84,21 @@ _fclass_d(double x)
 }
 #endif
 
-#if defined(__riscv_flen) && __riscv_flen >= 64 && defined(__GNUC_GNU_INLINE__)
+#if __riscv_flen >= 32
+__declare_riscv_macro_fclass(long)
+_fclass_f(float x)
+{
+	long fclass;
+	__asm __volatile ("fclass.s\t%0, %1" : "=r" (fclass) : "f" (x));
+	return fclass;
+}
+#endif
+
+#undef declare_riscv_macro_fclass
+
+#ifdef __declare_riscv_macro
+
+#if __riscv_flen >= 64
 
 /* Double-precision functions */
 __declare_riscv_macro(double)
@@ -156,20 +176,16 @@ isnan (double x)
 #endif
 
 __declare_riscv_macro(double)
-__ieee754_sqrt (double x)
+sqrt (double x)
 {
 	double result;
+#ifdef _WANT_MATH_ERRNO
+        if (x < 0)
+            errno = EDOM;
+#endif
 	__asm__("fsqrt.d %0, %1" : "=f" (result) : "f" (x));
 	return result;
 }
-
-#ifdef _IEEE_LIBM
-__declare_riscv_macro(double)
-sqrt (double x)
-{
-	return __ieee754_sqrt(x);
-}
-#endif
 
 #if HAVE_FAST_FMA
 __declare_riscv_macro(double)
@@ -181,19 +197,9 @@ fma (double x, double y, double z)
 }
 #endif
 
-#endif /* defined(__riscv_flen) && __riscv_flen >= 64 && defined(__GNUC_GNU_INLINE__) */
+#endif /* __riscv_flen >= 64 */
 
-#if defined(__riscv_flen) && __riscv_flen >= 32
-__declare_riscv_macro_fclass(long)
-_fclass_f(float x)
-{
-	long fclass;
-	__asm __volatile ("fclass.s\t%0, %1" : "=r" (fclass) : "f" (x));
-	return fclass;
-}
-#endif
-
-#if defined(__riscv_flen) && __riscv_flen >= 32 && defined(__GNUC_GNU_INLINE__)
+#if __riscv_flen >= 32
 
 /* Single-precision functions */
 __declare_riscv_macro(float)
@@ -267,24 +273,19 @@ isnanf (float x)
 }
 
 __declare_riscv_macro(float)
-__ieee754_sqrtf (float x)
+sqrtf (float x)
 {
 	float result;
+#ifdef _WANT_MATH_ERRNO
+        if (x < 0)
+            errno = EDOM;
+#endif
 	__asm__("fsqrt.s %0, %1" : "=f" (result) : "f" (x));
 	return result;
 }
 
-#ifdef _IEEE_LIBM
-__declare_riscv_macro(float)
-sqrtf (float x)
-{
-	return __ieee754_sqrtf(x);
-}
-#endif
 
-#endif /* defined(__riscv_flen) && __riscv_flen >= 32 && defined(__GNUC_GNU_INLINE__) */
-
-#if defined(HAVE_FAST_FMAF) && defined(__GNUC_GNU_INLINE__)
+#if defined(HAVE_FAST_FMAF)
 __declare_riscv_macro(float)
 fmaf (float x, float y, float z)
 {
@@ -293,5 +294,11 @@ fmaf (float x, float y, float z)
 	return result;
 }
 #endif
+
+#endif /* __riscv_flen >= 32 */
+
+#undef declare_riscv_macro
+
+#endif /* defined(declare_riscv_macro) */
 
 #endif /* _MACHINE_MATH_H_ */

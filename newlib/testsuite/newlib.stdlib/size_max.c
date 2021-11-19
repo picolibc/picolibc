@@ -8,7 +8,7 @@ is freely granted, provided that this notice is preserved.
 #include <stdint.h>
 #include <stdlib.h>
 
-int main () {
+int main (void) {
   size_t s;
 
   s = SIZE_MAX;

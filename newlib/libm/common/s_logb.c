@@ -89,10 +89,8 @@ double x;
 	hx &= 0x7fffffff;		/* high |x| */
 	if(hx<0x00100000) {		/* 0 or subnormal */
 	    if((hx|lx)==0)  {
-		double  xx;
 		/* arg==0:  return -inf and raise divide-by-zero exception */
-		INSERT_WORDS(xx,hx,lx);	/* +0.0 */
-		return -1./xx;	/* logb(0) = -inf */
+		return -1./fabs(x);	/* logb(0) = -inf */
 		}
 	    else			/* subnormal x */
 		if(hx==0) {

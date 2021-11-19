@@ -577,7 +577,7 @@ einfin (register short unsigned int *x, register LDPARMS * ldp)
   for (i = 0; i < NE - 1; i++)
     *x++ = 0;
   *x |= 32767;
-  ldp = ldp;
+  (void) ldp;
 #else
   for (i = 0; i < NE - 1; i++)
     *x++ = 0xffff;
@@ -2786,7 +2786,7 @@ __ldtoa (long double d, int mode, int ndigits,
 {
   unsigned short e[NI];
   char *s, *p;
-  int i, j, k;
+  int i, k;
   int orig_ndigits;
   LDPARMS rnd;
   LDPARMS *ldp = &rnd;
@@ -2904,7 +2904,7 @@ stripspaces:
   else				/* account for sign + max precision digs + E + exp sign + exponent */
     i = orig_ndigits + MAX_EXP_DIGITS + 4;
 
-  outstr = _alloc_dtoa_result(i);
+  outstr = __alloc_dtoa_result(i);
   if (!outstr)
     return NULL;
 

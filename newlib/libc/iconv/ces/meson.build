@@ -52,7 +52,7 @@ hdrs_iconv_ces = [
 
 srcs_iconv_ces_use = []
 foreach file : srcs_iconv_ces
-  s_file = file.split('.')[0] + '.S'
+  s_file = fs.replace_suffix(file, '.S')
   if file in srcs_machine
     message('libc/iconv/ces/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
@@ -62,12 +62,4 @@ foreach file : srcs_iconv_ces
   endif
 endforeach
 
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_iconv_ces' + target,
-		static_library('iconv_ces' + target,
-			       srcs_iconv_ces_use,
-			       pic: false,
-			       include_directories: inc,
-			       c_args: value[1]))
-endforeach
+src_iconv_ces = files(srcs_iconv_ces_use)

@@ -71,6 +71,36 @@ volatile test_t inf = INFINITY;
 #define lowbit(x) 	((x) & -(x))
 #define ispoweroftwo(x)	(((x) & ((x) - 1)) == 0)
 
+#ifdef FE_DIVBYZERO
+#define my_divbyzero FE_DIVBYZERO
+#else
+#define my_divbyzero 0
+#endif
+
+#ifdef FE_OVERFLOW
+#define my_overflow FE_OVERFLOW
+#else
+#define my_overflow 0
+#endif
+
+#ifdef FE_UNDERFLOW
+#define my_underflow FE_UNDERFLOW
+#else
+#define my_underflow 0
+#endif
+
+#ifdef FE_INEXACT
+#define my_inexact FE_INEXACT
+#else
+#define my_inexact 0
+#endif
+
+#ifdef FE_INVALID
+#define my_invalid FE_INVALID
+#else
+#define my_invalid 0
+#endif
+
 static const char *
 e_to_str(int e)
 {
@@ -115,6 +145,8 @@ e_to_str(int e)
 static int
 report(char *expr, test_t v, int e, int exception, int oexception)
 {
+        /* powerpc has additional details in the exception flags */
+        e &= (my_inexact | my_divbyzero | my_underflow | my_overflow | my_invalid);
 	printf("%-20.20s: ", expr);
 	printf("%8g ", (double) v);
 	printf("(e expect %s", e_to_str(exception));
@@ -142,24 +174,6 @@ report(char *expr, test_t v, int e, int exception, int oexception)
 		result += report(s(expr), v, e, exception, oexception); \
 	} while(0)
 
-#ifdef FE_OVERFLOW
-#define my_overflow FE_OVERFLOW
-#else
-#define my_overflow 0
-#endif
-
-#ifdef FE_UNDERFLOW
-#define my_underflow FE_UNDERFLOW
-#else
-#define my_underflow 0
-#endif
-
-#ifdef FE_INEXACT
-#define my_inexact FE_INEXACT
-#else
-#define my_inexact 0
-#endif
-
 #define TEST_CASE(expr, exception) do {					\
 		if ((exception & (my_overflow|my_underflow)) && my_inexact != 0) \
 			TEST_CASE2(expr, exception, exception | my_inexact); \
@@ -167,7 +181,7 @@ report(char *expr, test_t v, int e, int exception, int oexception)
 			TEST_CASE2(expr, exception, 0);			\
 	} while(0)
 
-int main()
+int main(void)
 {
 	int result = 0;
 

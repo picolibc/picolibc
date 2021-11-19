@@ -38,7 +38,7 @@ srcs_errno = [
 
 srcs_errno_use = []
 foreach file : srcs_errno
-  s_file = file.split('.')[0] + '.S'
+  s_file = fs.replace_suffix(file, '.S')
   if file in srcs_machine
     message('libc/errno/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
@@ -48,12 +48,4 @@ foreach file : srcs_errno
   endif
 endforeach
 
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_errno' + target,
-		static_library('errno' + target,
-			srcs_errno_use,
-			pic: false,
-			include_directories: inc,
-			c_args: value[1]))
-endforeach
+src_errno = files(srcs_errno_use)

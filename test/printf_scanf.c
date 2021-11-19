@@ -192,10 +192,15 @@ main(void)
 #define pow(a,b) powf((float) a, (float) b)
 #define fabs(a) fabsf(a)
 #define scanf_format "%f"
-#if defined(TINY_STDIO) && !defined(_IO_FLOAT_EXACT)
+#if (defined(TINY_STDIO) && !defined(_IO_FLOAT_EXACT))
 #define ERROR_MAX 1e-6
 #else
+#if (!defined(TINY_STDIO) && defined(_WANT_IO_LONG_DOUBLE))
+/* __ldtoa is really broken */
+#define ERROR_MAX 1e-5
+#else
 #define ERROR_MAX 0
+#endif
 #endif
 #else
 #define float_type double
@@ -203,7 +208,12 @@ main(void)
 #if defined(TINY_STDIO) && !defined(_IO_FLOAT_EXACT)
 #define ERROR_MAX 1e-15
 #else
+#if (!defined(TINY_STDIO) && defined(_WANT_IO_LONG_DOUBLE))
+/* __ldtoa is really broken */
+#define ERROR_MAX 1e-5
+#else
 #define ERROR_MAX 0
+#endif
 #endif
 #endif
 	for (x = -37; x <= 37; x++)
@@ -255,7 +265,7 @@ main(void)
 			e = fabs(v-r) / v;
 			if (e > (float_type) ERROR_MAX)
 			{
-				printf("\tg %3d: wanted %.7e got %.7e (error %.7e, buf %s)\n", x,
+				printf("\ta %3d: wanted %.7e got %.7e (error %.7e, buf %s)\n", x,
 				       printf_float(v), printf_float(r), printf_float(e), buf);
 				errors++;
 				fflush(stdout);

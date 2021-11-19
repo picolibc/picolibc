@@ -36,7 +36,7 @@
 
 __BEGIN_DECLS
 void *__memcpy_chk(void *, const void *, size_t, size_t);
-void *__memmove_chk(void *, void *, size_t, size_t);
+void *__memmove_chk(void *, const void *, size_t, size_t);
 void *__mempcpy_chk(void *, const void *, size_t, size_t);
 void *__memset_chk(void *, int, size_t, size_t);
 char *__stpcpy_chk(char *, const char *, size_t);

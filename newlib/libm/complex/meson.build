@@ -130,12 +130,5 @@ hdrs_complex = [
     'cephes_subr.h',
     'cephes_subrl.h',
 ]
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_complex' + target,
-		static_library('complex' + target,
-			srcs_complex,
-			pic: false,
-			include_directories: inc,
-			c_args: value[1]))
-endforeach
+
+src_libm_complex = files(srcs_complex)

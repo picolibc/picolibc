@@ -302,4 +302,4 @@
 {64, 0, 33,__LINE__, 0x7ff80000, 0x00000000, 0x403d7fff, 0xfffffffc},	/* nan=f(29.5)*/
 {0}
 };
-void test_asin(m)   {run_vector_1(m,asin_vec,(char *)(asin),"asin","dd");   }	
+void test_asin(int m)   {run_vector_1(m,asin_vec,(char *)(asin),"asin","dd");   }	

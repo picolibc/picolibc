@@ -19,6 +19,8 @@
 
 #define unlikely(X) __builtin_expect (!!(X), 0)
 
+#undef memcpy
+
 void *
 __inhibit_loop_to_libcall
 memcpy(void *__restrict aa, const void *__restrict bb, size_t n)

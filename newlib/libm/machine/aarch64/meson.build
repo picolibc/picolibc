@@ -35,8 +35,6 @@
 #
 
 srcs_libm_machine_real = [
-  'e_sqrt.c',
-  'ef_sqrt.c',
   'fenv.c',
   's_ceil.c',
   's_fabs.c',
@@ -48,6 +46,7 @@ srcs_libm_machine_real = [
   's_llround.c',
   's_lrint.c',
   's_lround.c',
+  's_sqrt.c',
   's_trunc.c',
   'sf_ceil.c',
   'sf_fabs.c',
@@ -62,6 +61,7 @@ srcs_libm_machine_real = [
   'sf_nearbyint.c',
   'sf_rint.c',
   'sf_round.c',
+  'sf_sqrt.c',
   'sf_trunc.c'
 ]
 
@@ -82,12 +82,4 @@ srcs_libm_machine = srcs_libm_machine_real + [
   'feupdateenv.c',
 ]
 
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_machine' + target,
-		static_library('machine' + target,
-			srcs_libm_machine_real,
-			pic: false,
-			include_directories: math_inc,
-			c_args: value[1] + arg_fnobuiltin))
-endforeach
+src_libm_machine = files(srcs_libm_machine_real)

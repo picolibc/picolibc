@@ -302,4 +302,4 @@
 {64, 0,123,__LINE__, 0x4051646b, 0xd261edc0, 0x403d7fff, 0xfffffffc},	/* 69.5691=f(29.5)*/
 {0}
 };
-void test_gamma(m)   {run_vector_1(m,gamma_vec,(char *)(lgamma),"lgamma","dd");   }	
+void test_gamma(int m)   {run_vector_1(m,gamma_vec,(char *)(lgamma),"lgamma","dd");   }	

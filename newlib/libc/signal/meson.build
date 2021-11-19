@@ -40,7 +40,7 @@ srcs_signal = [
 
 srcs_signal_use = []
 foreach file : srcs_signal
-  s_file = file.split('.')[0] + '.S'
+  s_file = fs.replace_suffix(file, '.S')
   if file in srcs_machine
     message('libc/signal/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
@@ -50,12 +50,4 @@ foreach file : srcs_signal
   endif
 endforeach
 
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_signal' + target,
-		static_library('signal' + target,
-			srcs_signal_use,
-			pic: false,
-			include_directories: inc,
-			c_args: value[1]))
-endforeach
+src_signal = files(srcs_signal_use)

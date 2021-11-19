@@ -65,7 +65,7 @@ static char buffer6[MAX_2];
 static char buffer7[MAX_2];
 static char expected[MAX_1];
 
-int main()
+int main(void)
 {
   char first_char;
   char second_char;

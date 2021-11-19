@@ -16,13 +16,21 @@ then you need to define the addresses used in that code, and set up
 the data as required. Checkout the [Initializers in Picolibc](init.md) document
 for details on what names to declare.
 
+To use a custom linker script when linking with gcc using
+`-specs=picolibc.specs`, you'll need to use the gcc `-T` option
+instead of using the `-Wl,-T` linker pass through option. This causes
+`picolibc.specs` to not add the picolibc linker script along with your
+custom one:
+
+	gcc -specs=picolibc.specs -Tcustom.ld
+
 ## Using picolibc.ld
 
 Picolibc provides a default linker script which can often be used to
 link applications, providing that your linking requirements are fairly
 straightforward. To use picolibc.ld, you'll create a custom linker
 script that sets up some variables and then INCLUDE's
-picolibc.ld. Here's a sample custom linker script:
+picolibc.ld. Here's a sample custom linker script `sample.ld`:
 
 	__flash = 0x08000000;
 	__flash_size = 128K;
@@ -33,7 +41,10 @@ picolibc.ld. Here's a sample custom linker script:
 	INCLUDE picolibc.ld
 
 This is for an STM32L151 SoC with 128kB of flash and 16kB of RAM. We
-want to make sure there's space for at least 512 bytes of stack.
+want to make sure there's space for at least 512 bytes of stack. To use
+this with gcc, the command line would look like this:
+
+	gcc -specs=picolibc.specs -Tsample.ld
 
 ### Defining Memory Regions
 
@@ -78,41 +89,66 @@ picolibc.ld:
 
 These are stored in flash and used directly from flash.
 
- 1) `.text.init.enter`
- 2) `.data.init.enter`
- 3) `.init`, `.init.*`. Contents located
-   first in flash. These can be used for interrupt vectors or startup
-   code.
+ 1. Contents located first in flash. These can be used for interrupt
+    vectors or startup code.
 
- 4) `.text.unlikely`, `.text.unlikely.*`
- 5) `.text.startup`, `.text.startup.*`
- 6) `.text`, `.text.*`
- 7) `.gnu.linkonce.t.*`. Usually the bulk of the
-    application code
+    * `.text.init.enter`
+    * `.data.init.enter`
+    * `.init`, `.init.*`
 
- 8) `.fini`, `.fini.*`. Usually cleanup routines.
+ 2. The bulk of the application code
 
- 9) `.rdata`
- 10) `.rodata`, `.rodata.*`
- 11) `.gnu.linkonce.r.*`
- 12) `.srodata.cst16`
- 13) `.srodata.cst8`
- 14) `.srodata.cst4`
- 15) `.srodata.cst2`
- 16) `.srodata .srodata.*`. These are generally used for read-only
-     data
+    * `.text.unlikely`, `.text.unlikely.*`
+    * `.text.startup`, `.text.startup.*`
+    * `.text`, `.text.*`
+    * `.gnu.linkonce.t.*`
 
- 17) `.preinit_array`. This secton contain addresses of
-     pre-initialization functions. Each of the addresses in the list
-     is called during program initialization, before `_init()`.
+ 3. Cleanup routines
 
- 18) `.init_array`, `.ctors`. These segments contain addresses of
-     initializer/constructor functions. Each of the addresses in the
-     list is called during program initialization, before `main()`.
+    * `.fini`, `.fini.*`
 
- 19) `.fini_array`, `.dtors`. These segments contain addresses of
-     de-iniitializer/destructor functions. Each of the addresses in
-     the list is called after the program finishes, after `main()`.
+ 4. Read-only data
+
+    * `.rdata`
+    * `.rodata`, `.rodata.*`
+    * `.gnu.linkonce.r.*`
+    * `.srodata.cst16`
+    * `.srodata.cst8`
+    * `.srodata.cst4`
+    * `.srodata.cst2`
+    * `.srodata`,  `.srodata.*`
+    * `.data.rel.ro`, `.data.rel.ro.*`
+    * `.got`, `.got.*`
+
+ 5. Addresses of pre-initialization functions. Each of the addresses
+    in the list is called during program initialization, before
+    `_init()`.
+
+    * `.preinit_array`
+
+ 6. Addresses of initializer/constructor functions. Each of the
+    addresses in the list is called during program initialization,
+    before `main()`.
+
+    * `.init_array`, `.ctors`
+
+ 7. Addresses of de-initializer/destructor functions. Each of the
+    addresses in the list is called after the program finishes, after
+    `main()`.
+
+    * `.fini_array`, `.dtors`
+
+#### Uninitialized ram contents
+
+You can place items in RAM that is *not* initialized by
+picolibc. These can be handy if you need values in memory to survive
+reset, perhaps as a way to communicate from the application to a boot
+loader or similar. These are placed first in RAM and are sorted by
+name so that the order is consistent across linking operations:
+
+ 1. `.preserve.*`
+
+ 2. `.preserve`
 
 #### Initialized ram contents
 
@@ -130,10 +166,6 @@ stored in ram. Making values read-only where possible saves the RAM.
  3) `.sdata`, `.sdata.*`, `.sdata2.*`
 
  4) `.gnu.linkonce.s.*`
- 5) `.srodata.cst16`
- 6) `.srodata.cst8`
- 7) `.srodata.cst4`
- 8) `.srodata.cst2`
  
 Picolibc uses native toolchain TLS support for values which should be
 per-thread. This means that variables like `errno` will be referenced
@@ -162,7 +194,7 @@ at startup time. The first chunk of these is part of the TLS block:
 After the TLS bss section comes the regular BSS variables:
 
  1) `.sbss*`
- 2) `.gnu.linkonce.sb.*
+ 2) `.gnu.linkonce.sb.*`
  3) `.bss`, `.bss.*`
  4) `.gnu.linkonce.b.*`
  5) `COMMON`

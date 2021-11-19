@@ -14,10 +14,13 @@
 	float y;
 #endif
 {
-  if (__fpclassifyf(x) == FP_NAN)  return(x);
-  if (__fpclassifyf(y) == FP_NAN)  return(y);
+  if (isnan(x)) return(x);
+  if (isnan(y)) return(y);
 
-  return x > y ? x - y : 0.0;
+  float z = x > y ? x - y : 0.0;
+  if (!isinf(x) && !isinf(y))
+    z = check_oflowf(z);
+  return z;
 }
 
 #ifdef _DOUBLE_IS_32BITS

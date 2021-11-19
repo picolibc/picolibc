@@ -133,7 +133,7 @@ endif
 foreach target : targets
   value = get_variable('target_' + target)
 
-  libs = [get_variable('lib_mpart' + target), get_variable('lib_cpart' + target)]
+  libs = [get_variable('lib_c' + target)]
   if is_variable('lib_semihost' + target)
     libs += [get_variable('lib_semihost' + target)]
   endif
@@ -144,21 +144,22 @@ foreach target : targets
   if target == ''
     test_name = 'math_test'
   else
-    test_name = join_paths(target, 'math_test')
+    test_name = 'math_test_' + target
   endif
 
-  test('math' + target,
+  test(test_name,
        executable(test_name, math_test_src,
 		  c_args: value[1] + double_printf_compile_args + test_c_args,
 		  link_with: libs,
 		  link_args: value[1] + double_printf_link_args + test_link_args,
 		  include_directories: inc),
+       depends: bios_bin,
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 endforeach
 
 if enable_native_tests
 
-  native_lib_m = meson.get_compiler('c').find_library('m', required: false)
+  native_lib_m = cc.find_library('m', required: false)
 
   if native_lib_m.found()
     test('math-native',

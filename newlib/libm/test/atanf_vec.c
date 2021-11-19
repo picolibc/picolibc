@@ -302,4 +302,4 @@
 {41, 0,123,__LINE__, 0x3ff8972f, 0xfc482372, 0x403d7fff, 0xfffffffc},	/* 1.53691=f(29.5)*/
 {0},
 };
-void test_atanf(m)   {run_vector_1(m,atanf_vec,(char *)(atanf),"atanf","ff");   }	
+void test_atanf(int m)   {run_vector_1(m,atanf_vec,(char *)(atanf),"atanf","ff");   }	

@@ -55,10 +55,12 @@ types and formats.
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
 | io-c99-formats              | true    | Enable C99 support in IO functions like printf/scanf                                 |
-| io-long-long                | false   | Enable long long type support in IO functions like printf/scanf.
-					  These are always enabled for the tinystdio full printf/scanf modes,
-					  this option adds them to the limited (float and integer) versions, as well
-					  as to the original newlib stdio bits                                                 |
+| io-long-long                | false   | Enable long long type support in IO functions like printf/scanf.		       |
+
+`long long` support is always enabled for the tinystdio full
+printf/scanf modes, the `io-long-long` option adds them to the limited
+(float and integer) versions, as well as to the original newlib stdio
+bits.
 
 ### Options when using tinystdio bits
 
@@ -84,8 +86,8 @@ definitions which use the same POSIX I/O functions.
 ### Options when using legacy stdio bits
 
 Normally, Picolibc is built with the small stdio library adapted from
-avrlibc (newlib-tinystdio=true). It still has the original newlib
-stdio bits and those still work (newlib-tinystdio=false), but depend
+avrlibc (tinystdio=true). It still has the original newlib
+stdio bits and those still work (tinystdio=false), but depend
 on POSIX I/O functions from the underlying system, and perform many
 malloc calls at runtime. These options are relevant only in that
 configuration
@@ -144,8 +146,10 @@ at startup and shutdown times.
 
 By default, Picolibc can uses native TLS support as provided by the
 compiler, this allows re-entrancy into the library if the run-time
-environment supports that. As a separate option, you can make `errno`
-not use TLS if necessary.
+environment supports that. A TLS model is specified only when TLS is
+enabled. The default TLS model is local-exec.
+
+As a separate option, you can make `errno` not use TLS if necessary.
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
@@ -367,4 +371,3 @@ Once configured, you can compile the libraries with
     $ ninja install
     ...
     $
-

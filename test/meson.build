@@ -60,107 +60,114 @@ foreach target : targets
   if target == ''
     t1_name = t1
   else
-    t1_name = join_paths(target, t1)
+    t1_name = t1 + '_' + target
   endif
 
-  test(t1 + target,
+  test(t1_name,
        executable(t1_name, 'printf_scanf.c',
 		  c_args: double_printf_compile_args + _c_args,
 		  link_args: double_printf_link_args + _link_args,
 		  link_with: _libs,
 		  link_depends:  test_link_depends,
 		  include_directories: inc),
+       depends: bios_bin,
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
   t1 = 'printff_scanff'
   if target == ''
     t1_name = t1
   else
-    t1_name = join_paths(target, t1)
+    t1_name = t1 + '_' + target
   endif
 
-  test(t1 + target,
+  test(t1_name,
        executable(t1_name, 'printf_scanf.c',
 		  c_args: float_printf_compile_args + _c_args,
 		  link_args: float_printf_link_args + _link_args,
 		  link_with: _libs,
 		  link_depends:  test_link_depends,
 		  include_directories: inc),
+       depends: bios_bin,
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
   t1 = 'printf-tests'
   if target == ''
     t1_name = t1
   else
-    t1_name = join_paths(target, t1)
+    t1_name = t1 + '_' + target
   endif
 
-  test(t1 + target,
+  test(t1_name,
        executable(t1_name, ['printf-tests.c'],
 		  c_args: double_printf_compile_args + _c_args,
 		  link_args: double_printf_link_args + _link_args,
 		  link_with: _libs,
 		  include_directories: inc),
+       depends: bios_bin,
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
   t1 = 'printff-tests'
   if target == ''
     t1_name = t1
   else
-    t1_name = join_paths(target, t1)
+    t1_name = t1 + '_' + target
   endif
 
-  test(t1 + target,
+  test(t1_name,
        executable(t1_name, ['printf-tests.c'],
 		  c_args: float_printf_compile_args + _c_args,
 		  link_args: float_printf_link_args + _link_args,
 		  link_with: _libs,
 		  include_directories: inc),
+       depends: bios_bin,
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
   t1 = 'printfi-tests'
   if target == ''
     t1_name = t1
   else
-    t1_name = join_paths(target, t1)
+    t1_name = t1 + '_' + target
   endif
 
-  test(t1 + target,
+  test(t1_name,
        executable(t1_name, ['printf-tests.c'],
 		  c_args: int_printf_compile_args + _c_args,
 		  link_args: int_printf_link_args + _link_args,
 		  link_with: _libs,
 		  include_directories: inc),
+       depends: bios_bin,
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
   t1 = 'try-ilp32'
   if target == ''
     t1_name = t1
   else
-    t1_name = join_paths(target, t1)
+    t1_name = t1 + '_' + target
   endif
 
-  test(t1 + target,
+  test(t1_name,
        executable(t1_name, ['try-ilp32.c', 'try-ilp32-sub.c'],
 		  c_args: _c_args,
 		  link_args: _link_args,
 		  link_with: _libs,
 		  include_directories: inc),
+       depends: bios_bin,
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
   t1 = 'hosted-exit'
   if target == ''
     t1_name = t1
   else
-    t1_name = join_paths(target, t1)
+    t1_name = t1 + '_' + target
   endif
 
-  test(t1 + target,
+  test(t1_name,
        executable(t1_name, 'hosted-exit.c',
 		  c_args: _c_args,
 		  link_args:  _link_args,
 		  link_with: _libs,
 		  include_directories: inc),
+       depends: bios_bin,
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
   test(t1 + '-fail' + target,
@@ -169,6 +176,7 @@ foreach target : targets
 		  link_args:  _link_args,
 		  link_with: _libs,
 		  include_directories: inc),
+       depends: bios_bin,
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()],
        should_fail: true
       )
@@ -177,15 +185,16 @@ foreach target : targets
   if target == ''
     t1_name = t1
   else
-    t1_name = join_paths(target, t1)
+    t1_name = t1 + '_' + target
   endif
 
-  test(t1 + target,
+  test(t1_name,
        executable(t1_name, 'abort.c',
 		  c_args: _c_args,
 		  link_args:  _link_args,
 		  link_with: _libs,
 		  include_directories: inc),
+       depends: bios_bin,
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()],
        should_fail: true
       )
@@ -195,15 +204,16 @@ foreach target : targets
     if target == ''
       t1_name = t1
     else
-      t1_name = join_paths(target, t1)
+      t1_name = t1 + '_' + target
     endif
 
-    test(t1 + target,
+    test(t1_name,
 	 executable(t1_name, 'constructor-skip.c',
 		    c_args: _c_args,
 		    link_args:  _link_args,
 		    link_with: _libs_minimal,
 		    include_directories: inc),
+         depends: bios_bin,
 	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
   endif
 
@@ -211,22 +221,24 @@ foreach target : targets
   if target == ''
     t1_name = t1
   else
-    t1_name = join_paths(target, t1)
+    t1_name = t1 + '_' + target
   endif
 
-  test(t1 + target,
+  test(t1_name,
        executable(t1_name, ['rounding-mode.c', 'rounding-mode-sub.c'],
 		  c_args: _c_args,
 		  link_args: _link_args,
 		  link_with: _libs,
 		  include_directories: inc),
+       depends: bios_bin,
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
   plain_tests = ['rand', 'regex', 'ungetc', 'fenv',
 		 'math_errhandling', 'malloc', 'tls',
 		 'ffs', 'setjmp', 'atexit', 'on_exit',
 		 'math-funcs', 'timegm', 'time-tests',
-                 'test-strtod',
+                 'test-strtod', 'test-strchr',
+		 'test-memset',
 		]
 
   if have_attr_ctor_dtor
@@ -254,16 +266,17 @@ foreach target : targets
     if target == ''
       t1_name = t1
     else
-      t1_name = join_paths(target, t1)
+      t1_name = t1 + '_' + target
     endif
 
-    test(t1 + target,
+    test(t1_name,
 	 executable(t1_name, [t1_src],
 		    c_args: double_printf_compile_args + _c_args,
 		    link_args: double_printf_link_args + _link_args,
 		    link_with: _libs,
 		    link_depends:  test_link_depends,
 		    include_directories: inc),
+         depends: bios_bin,
 	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
   endforeach
 
@@ -271,15 +284,27 @@ endforeach
 
 if enable_native_tests
 
-  native_lib_m = meson.get_compiler('c').find_library('m', required: false)
+  native_lib_m = cc.find_library('m', required: false)
 
   if native_lib_m.found()
     test('math_errhandling_native',
 	 executable('math_errhandling_native', 'math_errhandling.c',
 		    c_args: ['-DNO_NEWLIB'],
 		    dependencies: native_lib_m))
+    test('rounding-mode_native',
+	 executable('rounding-mode_native',
+		    ['rounding-mode.c', 'rounding-mode-sub.c'],
+		    c_args: test_c_args + ['-DNO_NEWLIB'],
+		    dependencies: native_lib_m))
+    test('printf-tests_native',
+	 executable('printf-tests_native',
+		    'printf-tests.c',
+		    c_args: ['-DNO_NEWLIB'],
+		    dependencies: native_lib_m))
   endif
 endif
+
+subdir('libc-testsuite')
 
 if has_arm_semihost
   subdir('semihost')

@@ -1093,7 +1093,7 @@ GmListElement* makeGmListElement (void* bas)
 	return this;
 }
 
-void gcleanup ()
+void gcleanup (void)
 {
 	BOOL rval;
 	ASSERT ( (head == NULL) || (head->base == (void*)gAddressBase));
@@ -3403,7 +3403,7 @@ size_t malloc_usable_size(mem) RDECL Void_t* mem;
 
 /* Utility to update current_mallinfo for malloc_stats and mallinfo() */
 
-STATIC void malloc_update_mallinfo() 
+STATIC void malloc_update_mallinfo(void) 
 {
   int i;
   mbinptr b;

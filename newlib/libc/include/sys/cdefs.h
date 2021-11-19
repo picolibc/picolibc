@@ -559,6 +559,33 @@
 	extern __typeof (sym) aliassym __attribute__ ((__alias__ (#sym)))
 #endif
 
+/*
+   Taken from glibc:
+   Add the compiler optimization to inhibit loop transformation to library
+   calls.  This is used to avoid recursive calls in memset and memmove
+   default implementations.
+*/
+#if defined(_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL)
+# define __inhibit_loop_to_libcall \
+  __attribute__ ((__optimize__ ("-fno-tree-loop-distribute-patterns")))
+#elif defined(_HAVE_NO_BUILTIN_ATTRIBUTE)
+# define __inhibit_loop_to_libcall \
+    __attribute__((no_builtin))
+#else
+# define __inhibit_loop_to_libcall
+#endif
+
+/*
+ * Tell optimizer to not add new builtin calls when optimizing a
+ * function body.
+ */
+#if defined(_HAVE_NO_BUILTIN_ATTRIBUTE)
+# define __inhibit_new_builtin_calls \
+    __attribute__((no_builtin))
+#else
+#define __inhibit_new_builtin_calls
+#endif
+
 #ifdef __ELF__
 #ifdef __STDC__
 #define	__weak_reference(sym,alias)	\

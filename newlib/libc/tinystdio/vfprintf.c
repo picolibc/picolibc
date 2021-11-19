@@ -365,56 +365,74 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 #else
                 ndigs = 14;
 #endif
-                if (!(flags & FL_PREC))
-                    prec = ndigs - 1;
-                else if (prec > ndigs)
-                    prec = ndigs - 1;
                 fi = ASUINT(fval);
 
+                _dtoa.digits[0] = '0';
 #ifdef PICOLIBC_FLOAT_PRINTF_SCANF
-                exp = ((fi >> 23) & 0xff);
-                s = (fi & 0x7fffff) << 1;
+#define EXP_SHIFT       23
+#define EXP_MASK        0xff
+#define SIG_SHIFT       1
+#define SIG_MASK        0x7fffff
 #else
-                exp = ((fi >> 52) & 0x7ff);
-                s = fi & 0xfffffffffffffLL;
+#define EXP_SHIFT       52
+#define EXP_MASK        0x7ff
+#define SIG_SHIFT       0
+#define SIG_MASK        0xfffffffffffffLL
 #endif
+                exp = ((fi >> EXP_SHIFT) & EXP_MASK);
+                s = (fi & SIG_MASK) << SIG_SHIFT;
+                if (s | exp) {
+                    if (!exp)
+                        exp = 1;
+                    else
+                        _dtoa.digits[0] = '1';
+                    exp -= EXP_BIAS;
+                }
                 _dtoa.flags = 0;
                 if (fi < 0)
                     _dtoa.flags = DTOA_MINUS;
 
-                if (exp == 2 * EXP_BIAS + 1) {
+                if (!(flags & FL_PREC))
+                    prec = 0;
+                else if (prec >= (ndigs - 1))
+                    prec = ndigs - 1;
+                else {
+                    int                 bits = ((ndigs - 1) - prec) << 2;
+                    ultoa_signed_t      half = ((ultoa_signed_t) 1) << (bits - 1);
+                    ultoa_signed_t      mask = ~((half << 1) - 1);
+
+                    s += half;
+                    if (s > (SIG_MASK << SIG_SHIFT))
+                        _dtoa.digits[0]++;
+                    s &= mask;
+                }
+
+                if (exp == EXP_BIAS + 1) {
                     if (s)
                         _dtoa.flags |= DTOA_NAN;
                     else
                         _dtoa.flags |= DTOA_INF;
                 } else {
-                    if (exp) {
-                        _dtoa.digits[0] = '1';
-                    } else {
-                        _dtoa.digits[0] = '0';
-                        exp++;
-                    }
-
                     uint8_t d;
                     for (d = ndigs - 1; d; d--) {
                         char dig = s & 0xf;
                         s >>= 4;
+                        if (dig == 0 && d > prec)
+                            continue;
                         if (dig <= 9)
                             dig += '0';
                         else
                             dig += TOCASE('a' - 10);
                         _dtoa.digits[d] = dig;
+                        if (prec < d)
+                            prec = d;
                     }
                 }
-                if ((fi<<1) != 0)
-                    exp -= EXP_BIAS;
-                else
-                    exp = 0;
                 ndigs_exp = 1;
             } else
 #endif /* _WANT_IO_C99_FORMATS */
             {
-                uint8_t ndecimal;	        /* digits after decimal (for 'f' format), 0 if no limit */
+                int ndecimal;	        /* digits after decimal (for 'f' format), 0 if no limit */
 
                 if (!(flags & FL_PREC))
                     prec = 6;
@@ -747,8 +765,10 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 
                     flags &= ~(FL_PLUS | FL_SPACE);
 
-                    if ((flags & FL_PREC) && prec == 0 && x == 0)
+                    if ((flags & FL_PREC) && prec == 0 && x == 0) {
                         buf_len = 0;
+                        flags &= ~FL_ALT;
+                    }
                     else
                         buf_len = __ultoa_invert (x, buf, base) - buf;
                 }

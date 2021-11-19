@@ -81,7 +81,6 @@ Supporting OS subroutines required:
 #include <wctype.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <alloca.h>
 #include <stdint.h>
 #include <limits.h>
 #include <wchar.h>
@@ -446,13 +445,13 @@ __SVFSCANF_R (struct _reent *rptr,
     void ***m_arr;		/* Array of pointer args to 'm' conversion */
     uint16_t m_siz;		/* Number of slots in m_arr */
     uint16_t m_cnt;		/* Number of valid entries in m_arr */
-  } *m_ptr = NULL;
+  } *m_ptr = NULL, m_store;
   #define init_m_ptr()							\
     do									\
       {									\
 	if (!m_ptr)							\
 	  {								\
-	    m_ptr = (struct m_ptrs *) alloca (sizeof *m_ptr);		\
+	    m_ptr = &m_store;		                                \
 	    m_ptr->m_arr = NULL;					\
 	    m_ptr->m_siz = 0;						\
 	    m_ptr->m_cnt = 0;						\
@@ -970,26 +969,26 @@ __SVFSCANF_R (struct _reent *rptr,
 #endif
               else
                 wcp = GET_ARG (N, ap, wchar_t *);
-              n = 0;
+              size_t s = 0;
               while (width != 0)
                 {
-                  if (n == MB_CUR_MAX)
+                  if (s == MB_CUR_MAX)
                     goto input_failure;
-                  buf[n++] = *fp->_p;
+                  buf[s++] = *fp->_p;
                   fp->_r -= 1;
                   fp->_p += 1;
 		  /* Got a high surrogate, allow low surrogate to slip
 		     through */
 		  if (mbslen != 3 || state.__count != 4)
 		    memset (&state, 0, sizeof (mbstate_t));
-                  if ((mbslen = mbrtowc (wcp, buf, n, &state))
+                  if ((mbslen = mbrtowc (wcp, buf, s, &state))
                                                          == (size_t)-1)
                     goto input_failure; /* Invalid sequence */
                   if (mbslen == 0 && !(flags & SUPPRESS))
                     *wcp = L'\0';
                   if (mbslen != (size_t)-2) /* Incomplete sequence */
                     {
-                      nread += n;
+                      nread += s;
 		      /* Handle high surrogate */
 		      if (mbslen != 3 || state.__count != 4)
 			width -= 1;
@@ -1001,11 +1000,11 @@ __SVFSCANF_R (struct _reent *rptr,
 #endif
 			  wcp++;
 			}
-                      n = 0;
+                      s = 0;
                     }
                   if (BufferEmpty)
 	            {
-                      if (n != 0)
+                      if (s != 0)
                         goto input_failure;
                       break;
                     }
@@ -1088,18 +1087,18 @@ __SVFSCANF_R (struct _reent *rptr,
 #endif
               else
 		wcp = GET_ARG (N, ap, wchar_t *);
-              n = 0;
+              size_t s = 0;
               while (width != 0) {
-                  if (n == MB_CUR_MAX)
+                  if (s == MB_CUR_MAX)
                     goto input_failure;
-                  buf[n++] = *fp->_p;
+                  buf[s++] = *fp->_p;
                   fp->_r -= 1;
                   fp->_p += 1;
 		  /* Got a high surrogate, allow low surrogate to slip
 		     through */
 		  if (mbslen != 3 || state.__count != 4)
 		    memset (&state, 0, sizeof (mbstate_t));
-                  if ((mbslen = mbrtowc (wcp, buf, n, &state))
+                  if ((mbslen = mbrtowc (wcp, buf, s, &state))
                                                         == (size_t)-1)
                     goto input_failure;
                   if (mbslen == 0)
@@ -1108,11 +1107,11 @@ __SVFSCANF_R (struct _reent *rptr,
                     {
                       if (!ccltab[__wctob (rptr, *wcp)])
                         {
-                          while (n != 0)
-                            _ungetc_r (rptr, (unsigned char) buf[--n], fp);
+                          while (s != 0)
+                            _ungetc_r (rptr, (unsigned char) buf[--s], fp);
                           break;
                         }
-                      nread += n;
+                      nread += s;
 		      /* Handle high surrogate */
 		      if (mbslen != 3 || state.__count != 4)
 			width -= 1;
@@ -1124,11 +1123,11 @@ __SVFSCANF_R (struct _reent *rptr,
 						   wcp_siz);
 #endif
 			}
-                      n = 0;
+                      s = 0;
                     }
                   if (BufferEmpty)
                     {
-                      if (n != 0)
+                      if (s != 0)
                         goto input_failure;
                       break;
                     }
@@ -1224,19 +1223,19 @@ __SVFSCANF_R (struct _reent *rptr,
 #endif
               else
 		wcp = GET_ARG (N, ap, wchar_t *);
-              n = 0;
+              size_t s = 0;
               while (!isspace (*fp->_p) && width != 0)
                 {
-                  if (n == MB_CUR_MAX)
+                  if (s == MB_CUR_MAX)
                     goto input_failure;
-                  buf[n++] = *fp->_p;
+                  buf[s++] = *fp->_p;
                   fp->_r -= 1;
                   fp->_p += 1;
 		  /* Got a high surrogate, allow low surrogate to slip
 		     through */
 		  if (mbslen != 3 || state.__count != 4)
 		    memset (&state, 0, sizeof (mbstate_t));
-                  if ((mbslen = mbrtowc (wcp, buf, n, &state))
+                  if ((mbslen = mbrtowc (wcp, buf, s, &state))
                                                         == (size_t)-1)
                     goto input_failure;
                   if (mbslen == 0)
@@ -1245,11 +1244,11 @@ __SVFSCANF_R (struct _reent *rptr,
                     {
                       if (iswspace(*wcp))
                         {
-                          while (n != 0)
-                            _ungetc_r (rptr, (unsigned char) buf[--n], fp);
+                          while (s != 0)
+                            _ungetc_r (rptr, (unsigned char) buf[--s], fp);
                           break;
                         }
-                      nread += n;
+                      nread += s;
 		      /* Handle high surrogate */
 		      if (mbslen != 3 || state.__count != 4)
 			width -= 1;
@@ -1261,11 +1260,11 @@ __SVFSCANF_R (struct _reent *rptr,
 						   wcp_siz);
 #endif
 			}
-                      n = 0;
+                      s = 0;
                     }
                   if (BufferEmpty)
                     {
-                      if (n != 0)
+                      if (s != 0)
                         goto input_failure;
                       break;
                     }

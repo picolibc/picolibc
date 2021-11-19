@@ -308,4 +308,4 @@
 {64, 0,123,__LINE__, 0x80000000, 0x00000000, 0x80000000, 0x00000000},   /* -0=f(-0)*/
 {0}
 };
-void test_ceil(m)   {run_vector_1(m,ceil_vec,(char *)(ceil),"ceil","dd");   }	
+void test_ceil(int m)   {run_vector_1(m,ceil_vec,(char *)(ceil),"ceil","dd");   }	

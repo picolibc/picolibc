@@ -297,4 +297,4 @@
 {64, 0,123,__LINE__, 0x3fc25cf8, 0x6ae10498, 0x403bcccc, 0xccccccc9},	/* 0.143462=f(27.8)*/
 {58, 0,123,__LINE__, 0xbfb07640, 0x70ecf6df, 0x403d7fff, 0xfffffffc},	/* -0.0643044=f(29.5)*/
 {0},};
-void test_j1(m)   {run_vector_1(m,j1_vec,(char *)(j1),"j1","dd");   }	
+void test_j1(int m)   {run_vector_1(m,j1_vec,(char *)(j1),"j1","dd");   }	
