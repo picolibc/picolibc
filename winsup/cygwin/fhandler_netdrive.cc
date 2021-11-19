@@ -42,6 +42,27 @@ struct net_hdls
     HANDLE dom;
   };
 
+static void
+wnet_dbg_out (const char *func, DWORD ndi_ret)
+{
+  DWORD gle_ret;
+  DWORD error;
+  WCHAR errorbuf[MAX_PATH];
+  WCHAR namebuf[MAX_PATH];
+
+  if (ndi_ret != ERROR_EXTENDED_ERROR)
+    {
+      debug_printf ("%s failed: %u", func, ndi_ret);
+      return;
+    }
+  gle_ret = WNetGetLastErrorW (&error, errorbuf, MAX_PATH, namebuf, MAX_PATH);
+  if (gle_ret == NO_ERROR)
+    debug_printf ("%s failed: %u --> %u from '%W': '%W'",
+		  func, ndi_ret, error, namebuf, errorbuf);
+  else
+    debug_printf ("WNetGetLastError failed: %u", gle_ret);
+}
+
 static DWORD WINAPI
 thread_netdrive (void *arg)
 {
@@ -61,7 +82,10 @@ thread_netdrive (void *arg)
       ndi->ret = WNetGetProviderNameW (WNNC_NET_LANMAN, provider,
 				       (size = 256, &size));
       if (ndi->ret != NO_ERROR)
-	break;
+	{
+	  wnet_dbg_out ("WNetGetProviderNameW", ndi->ret);
+	  break;
+	}
       memset (nro, 0, sizeof *nro);
       nro->dwScope = RESOURCE_GLOBALNET;
       nro->dwType = RESOURCETYPE_ANY;
@@ -72,7 +96,10 @@ thread_netdrive (void *arg)
       ndi->ret = WNetOpenEnumW (RESOURCE_GLOBALNET, RESOURCETYPE_DISK,
 				RESOURCEUSAGE_ALL, nro, &nh->net);
       if (ndi->ret != NO_ERROR)
-	break;
+	{
+	  wnet_dbg_out ("WNetOpenEnumW", ndi->ret);
+	  break;
+	}
       while ((ndi->ret = WNetEnumResourceW (nh->net, (cnt = 1, &cnt), nro,
 					    (size = NT_MAX_PATH, &size)))
 	     == NO_ERROR)
@@ -89,13 +116,19 @@ thread_netdrive (void *arg)
       ndi->ret = WNetGetProviderNameW (WNNC_NET_LANMAN, provider,
 				      (size = 256, &size));
       if (ndi->ret != NO_ERROR)
-	break;
+	{
+	  wnet_dbg_out ("WNetGetProviderNameW", ndi->ret);
+	  break;
+	}
       ((LPNETRESOURCEW) ndi->in)->lpProvider = provider;
       ndi->ret = WNetGetResourceInformationW ((LPNETRESOURCEW) ndi->in, nro,
 					      (size = NT_MAX_PATH, &size),
 					      &dummy);
       if (ndi->ret != NO_ERROR)
-	break;
+	{
+	  wnet_dbg_out ("WNetGetResourceInformationW", ndi->ret);
+	  break;
+	}
       ndi->ret = WNetOpenEnumW (RESOURCE_GLOBALNET, RESOURCETYPE_DISK,
 				RESOURCEUSAGE_ALL, nro, &nh->dom);
       break;

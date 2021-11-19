@@ -630,6 +630,7 @@ LoadDLLfunc (LdapMapErrorToWin32, 0, wldap32)
 
 LoadDLLfunc (WNetCloseEnum, 4, mpr)
 LoadDLLfunc (WNetEnumResourceW, 16, mpr)
+LoadDLLfunc (WNetGetLastErrorW, 20, mpr)
 LoadDLLfunc (WNetGetProviderNameW, 12, mpr)
 LoadDLLfunc (WNetGetResourceInformationW, 16, mpr)
 LoadDLLfunc (WNetOpenEnumW, 20, mpr)
