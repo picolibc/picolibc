@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright © 2020 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,12 +33,14 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <iostream>
 
-int
-main(void)
-{
-	printf("hello, world\n");
+int main() {
+	std::cout << "Hello, world!\n";
+	try {
+		throw 20;
+	}
+	catch (int param) { std::cout << "int exception " << param << '\n'; }
+	std::cout << "Goodbye, world!\n";
 	exit(0);
 }

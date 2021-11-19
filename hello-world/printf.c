@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2020 Keith Packard
+ * Copyright © 2019 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,14 +33,16 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
 
-int main() {
-	std::cout << "Hello, world!\n";
-	try {
-		throw 20;
-	}
-	catch (int param) { std::cout << "int exception " << param << '\n'; }
-	std::cout << "Goodbye, world!\n";
-	return 0;
+#ifndef printf_float
+#define printf_float(x) (x)
+#endif
+
+void
+main(void)
+{
+	printf(" 2⁶¹ = %lld π ≃ %.17g\n", 1ll << 61, printf_float(3.141592653589793));
+        _Exit(0);
 }

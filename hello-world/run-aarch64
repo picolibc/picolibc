@@ -39,25 +39,15 @@ qemu="qemu-system-aarch64"
 # select the program
 elf=hello-world-aarch64.elf
 
+case $1 in
+    *.elf)
+	elf="$1"
+	shift;
+	;;
+esac
+
 # Set the target machine
 machine=virt
 cpu=cortex-a57
 
-# Map stdio to a multiplexed character device so we can use it
-# for the monitor and semihosting output
-
-chardev=stdio,mux=on,id=stdio0
-
-# Point the semihosting driver at our new chardev
-
-semi=enable=on,chardev=stdio0,arg="test-file"
-
-# Disable monitor
-
-mon=none
-
-# Disable the serial port
-
-serial=none
-
-$qemu -chardev $chardev -semihosting-config $semi -monitor $mon -serial $serial -machine $machine -cpu $cpu -kernel $elf -nographic "$@"
+$qemu -semihosting-config enable=on -monitor none -serial none -nographic -machine $machine -cpu $cpu -kernel $elf "$@"

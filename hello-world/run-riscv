@@ -39,25 +39,15 @@ qemu="qemu-system-riscv32"
 # select the program
 elf=hello-world-riscv.elf
 
+case $1 in
+    *.elf)
+	elf="$1"
+	shift;
+	;;
+esac
+
 # Set the target machine
 machine=virt,accel=tcg
 cpu=rv32
 
-# Map stdio to a multiplexed character device so we can use it
-# for the monitor and semihosting output
-
-chardev=stdio,mux=on,id=stdio0
-
-# Point the semihosting driver at our new chardev
-
-semi=enable=on,chardev=stdio0,arg="test-file"
-
-# Point the monitor at the new chardev too
-
-mon=chardev=stdio0,mode=readline
-
-# Disable the serial port
-
-serial=chardev:stdio0
-
-$qemu -chardev $chardev -semihosting-config $semi -mon $mon -serial $serial -machine $machine -cpu $cpu -kernel $elf -bios none -nographic "$@"
+$qemu -semihosting-config enable=on -monitor none -serial none -nographic -machine $machine -cpu $cpu -bios none -kernel $elf "$@"
