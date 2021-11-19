@@ -603,6 +603,11 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
       its_me = false;
     }
 
+  /* Do not send signal to myself if exiting, which will be
+     ignored in wait_sig thread. */
+  if (its_me && exit_state > ES_EXIT_STARTING && si.si_signo > 0)
+    goto out;
+
   if (its_me)
     sendsig = my_sendsig;
   else
