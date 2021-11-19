@@ -10,7 +10,7 @@ Copyright: 2020 The Newlib Project
 License: Default-1
 
 Files: debian/*
-Copyright: 2019 Keith Packard
+Copyright: 2019-2021 Keith Packard
 License: BSD3-1
 
 Files: *.md
@@ -188,8 +188,8 @@ Files: newlib/libc/string/ffsl.c
  newlib/libc/string/fls.c
  newlib/libc/string/flsl.c
  newlib/libc/string/flsll.c
- newlib/libm/machine/arm/e_sqrt.c
- newlib/libm/machine/arm/ef_sqrt.c
+ newlib/libm/machine/arm/s_sqrt.c
+ newlib/libm/machine/arm/sf_sqrt.c
 Copyright: 2017 embedded brains GmbH
 License: BSD2-1
 
@@ -404,8 +404,17 @@ Files: newlib/libc/locale/nl_langinfo.3
 Copyright: 2001 Alexey Zelkin <phantom@FreeBSD.org>
 License: BSD2-6
 
+Files: newlib/libc/posix/namespace.h
+ newlib/libc/posix/un-namespace.h
+Copyright: 2001 Daniel Eischen <deischen@FreeBSD.org>.
+License: BSD2-6
+
 Files: newlib/libc/locale/setlocale.h
 Copyright: 1997 Andrey A. Chernov, Moscow, Russia.
+License: BSD2-7
+
+Files: newlib/libc/posix/collcmp.c
+Copyright: 1996 Andrey A. Chernov, Moscow, Russia.
 License: BSD2-7
 
 Files: newlib/libc/machine/or1k/setjmp.S
@@ -430,22 +439,27 @@ Files: newlib/libc/machine/xtensa/sys/fenv.h
 Copyright: 2011 Tensilica Inc.
 License: BSD2-9
 
+Files: newlib/libc/posix/collate.c
+ newlib/libc/posix/collate.h
+Copyright: 1995 Alex Tatmanjants <alex@elvisti.kiev.ua> at Electronni Visti IA, Kiev, Ukraine.
+License: BSD2-10
+
 Files: newlib/libc/signal/sig2str.c
 Copyright: 2021 Matthew Joyce
-License: BSD2-10
+License: BSD2-11
 
 Files: newlib/libm/machine/sparc/fenv.c
 Copyright: 2004-2005 David Schultz <das@FreeBSD.ORG>
-License: BSD2-11
+License: BSD2-12
 
 Files: dummyhost/iob.c
  dummyhost/meson.build
  hello-world/Makefile
  hello-world/hello-world.c
+ hello-world/printf.c
  hello-world/run-aarch64
  hello-world/run-aarch64++
  hello-world/run-arm
- hello-world/run-arm++
  hello-world/run-riscv
  hello-world/run-riscv++
  hello-world/*.ld
@@ -466,7 +480,6 @@ Files: dummyhost/iob.c
  newlib/libc/locale/meson.build
  newlib/libc/machine/arm/meson.build
  newlib/libc/machine/i386/meson.build
- newlib/libc/machine/meson.build
  newlib/libc/machine/riscv/meson.build
  newlib/libc/machine/riscv/sys/meson.build
  newlib/libc/machine/x86_64/meson.build
@@ -572,7 +585,6 @@ Files: dummyhost/iob.c
  picocrt/shared/crt0.c
  scripts/do-aarch64-configure
  scripts/do-aarch64-zephyr-elf-configure
- scripts/do-amd64-configure
  scripts/do-arm-configure
  scripts/do-clang-arm-configure
  scripts/do-clang-riscv-configure
@@ -582,12 +594,12 @@ Files: dummyhost/iob.c
  scripts/do-configure
  scripts/do-esp32-configure
  scripts/do-freedom-tools-configure
- scripts/do-i686-configure
+ scripts/do-i386-configure
  scripts/do-lx106-configure
  scripts/do-native-configure
  scripts/do-riscv-configure
  scripts/do-rv32imac-configure
- scripts/do-x86-configure
+ scripts/do-x86_64-configure
  scripts/do-zephyr-aarch64-configure
  scripts/do-zephyr-arm-configure
  scripts/do-zephyr-riscv-configure
@@ -633,6 +645,7 @@ Files: dummyhost/iob.c
  semihost/sys_write0.c
  semihost/unlink.c
  semihost/write.c
+ test/libc-testsuite/meson.build
  test/meson.build
  test/posix-io.c
  test/printf_scanf.c
@@ -641,7 +654,7 @@ Files: dummyhost/iob.c
 Copyright: 2019 Keith Packard
 License: BSD3-1
 
-Files: hello-world/hello-world++.c++
+Files: hello-world/hello-worldpp.cpp
  newlib/libc/errno/errno.c
  newlib/libc/iconv/ccs/binary/meson.build
  newlib/libc/include/machine/math.h
@@ -691,25 +704,24 @@ Files: hello-world/hello-world++.c++
  newlib/libc/tinystdio/vasprintf.c
  newlib/libm/machine/arm/s_fma_arm.c
  newlib/libm/machine/arm/sf_fma_arm.c
- newlib/libm/machine/riscv/e_sqrt.c
- newlib/libm/machine/riscv/ef_sqrt.c
  newlib/libm/machine/riscv/s_fma.c
  newlib/libm/machine/riscv/s_fma_riscv.c
+ newlib/libm/machine/riscv/s_sqrt.c
  newlib/libm/machine/riscv/sf_fma.c
  newlib/libm/machine/riscv/sf_fma_riscv.c
+ newlib/libm/machine/riscv/sf_sqrt.c
  newlib/libm/machine/x86_64/meson.build
- newlib/libm/math/e_lgamma.c
- newlib/libm/math/ef_lgamma.c
+ newlib/libm/math/s_lgamma.c
  scripts/run-aarch64
- scripts/run-i686
+ scripts/run-i386
  scripts/run-rv32imac
  scripts/run-rv32imafdc
  scripts/run-x86_64
  scripts/test-arm.ld
+ scripts/test-i386.ld
  scripts/test-riscv.ld
  scripts/test-riscv32.ld
  scripts/test-riscv64.ld
- scripts/test-x86.ld
  scripts/test-x86_64.ld
  semihost/fstat.c
  semihost/isatty.c
@@ -767,9 +779,13 @@ Copyright: 2019-2021 Keith Packard
 License: BSD3-1
 
 Files: newlib/empty.c
+ newlib/libc/machine/arm/memmove.c
  newlib/libc/machine/shared_x86/meson.build
  newlib/libc/machine/shared_x86/sys/meson.build
  newlib/libc/machine/xtensa/machine/meson.build
+ newlib/libc/picolib/machine/aarch64/meson.build
+ newlib/libc/picolib/machine/arm/meson.build
+ newlib/libc/picolib/machine/riscv/meson.build
  newlib/libc/stdlib/pico-atexit.c
  newlib/libc/stdlib/pico-cxa-atexit.c
  newlib/libc/stdlib/pico-exit.c
@@ -782,23 +798,38 @@ Files: newlib/empty.c
  newlib/libc/tinystdio/strfromf.c
  newlib/libm/common/dreml.c
  newlib/libm/common/exp10l.c
+ newlib/libm/common/math_inexact.c
+ newlib/libm/common/math_inexactf.c
  newlib/libm/common/pow10l.c
  newlib/libm/common/sincosl.c
+ newlib/libm/machine/powerpc/meson.build
  newlib/libm/test/scalbn_vec.c
+ picocrt/machine/aarch64/meson.build
+ picocrt/machine/arm/meson.build
+ picocrt/machine/i386/meson.build
+ picocrt/machine/riscv/meson.build
+ picocrt/machine/x86_64/meson.build
+ scripts/do-powerpc64le-configure
+ semihost/machine/aarch64/meson.build
+ semihost/machine/arm/meson.build
  semihost/machine/i386/bios.S
  semihost/machine/i386/e9_exit.c
  semihost/machine/i386/e9_io.c
  semihost/machine/i386/e9_kill.c
  semihost/machine/i386/e9_stub.c
  semihost/machine/i386/meson.build
+ semihost/machine/riscv/meson.build
  test/atexit.c
  test/constructor-skip.c
  test/constructor.c
  test/hosted-exit.c
+ test/libc-testsuite/testcase.h
  test/math-funcs.c
  test/on_exit.c
  test/rounding-mode-sub.c
  test/rounding-mode.c
+ test/test-memset.c
+ test/test-strchr.c
  test/timegm.c
  test/timegm.h
 Copyright: 2021 Keith Packard
@@ -852,8 +883,8 @@ Files: newlib/libm/machine/riscv/s_copysign.c
 Copyright: 2020 Kito Cheng
 License: BSD3-1
 
-Files: picocrt/machine/amd64/crt0.S
- picocrt/machine/i386/crt0.S
+Files: picocrt/machine/i386/crt0.S
+ picocrt/machine/x86_64/crt0.S
 Copyright: 2021 Mike Haertel and Keith Packard
 License: BSD3-1
 
@@ -1130,6 +1161,19 @@ Copyright: 1992, 1993, 1994 Henry Spencer.
  1992, 1993, 1994 The Regents of the University of California.
 License: BSD3-5
 
+Files: newlib/libc/posix/fnmatch.c
+Copyright: 1989, 1993, 1994 The Regents of the University of California.
+License: BSD3-5
+
+Files: newlib/libc/posix/rune.h
+ newlib/libc/posix/runetype.h
+Copyright: 1993 The Regents of the University of California.
+License: BSD3-5
+
+Files: newlib/libc/posix/sysexits.h
+Copyright: 1987, 1993 The Regents of the University of California.
+License: BSD3-5
+
 Files: newlib/libc/string/strcasestr.c
 Copyright: 1990, 1993 The Regents of the University of California.
 License: BSD3-5
@@ -1200,28 +1244,23 @@ License: BSD3-8
 
 Files: newlib/libc/machine/arm/acle-compat.h
  newlib/libc/machine/arm/aeabi_memcpy-armv7a.S
- newlib/libc/machine/arm/aeabi_memcpy.c
  newlib/libc/machine/arm/machine/acle-compat.h
  newlib/libc/machine/arm/strcmp-armv6m.S
 Copyright: 2014 ARM Ltd
 License: BSD3-8
 
-Files: newlib/libc/machine/arm/aeabi_memclr.c
- newlib/libc/machine/arm/aeabi_memmove-arm.S
- newlib/libc/machine/arm/aeabi_memmove-soft.S
- newlib/libc/machine/arm/aeabi_memmove-thumb.S
- newlib/libc/machine/arm/aeabi_memmove-thumb2.S
- newlib/libc/machine/arm/aeabi_memmove.c
- newlib/libc/machine/arm/aeabi_memset-arm.S
- newlib/libc/machine/arm/aeabi_memset-soft.S
- newlib/libc/machine/arm/aeabi_memset-thumb.S
- newlib/libc/machine/arm/aeabi_memset-thumb2.S
- newlib/libc/machine/arm/aeabi_memset.c
+Files: newlib/libc/machine/arm/aeabi_memset.c
+ newlib/libc/machine/arm/bzero.c
  newlib/libc/machine/arm/machine/_endian.h
- newlib/libm/machine/aarch64/e_sqrt.c
- newlib/libm/machine/aarch64/ef_sqrt.c
+ newlib/libc/machine/arm/memset-arm.S
+ newlib/libc/machine/arm/memset-thumb.S
+ newlib/libc/machine/arm/memset-thumb2.S
+ newlib/libc/machine/arm/memset.S
+ newlib/libc/machine/arm/memset.c
  newlib/libm/machine/aarch64/s_fabs.c
+ newlib/libm/machine/aarch64/s_sqrt.c
  newlib/libm/machine/aarch64/sf_fabs.c
+ newlib/libm/machine/aarch64/sf_sqrt.c
 Copyright: 2015 ARM Ltd
 License: BSD3-8
 
@@ -1249,11 +1288,11 @@ Files: newlib/libc/machine/arm/strcmp-arm-tiny.S
 Copyright: 2012-2014 ARM Ltd
 License: BSD3-8
 
-Files: newlib/libc/machine/arm/strcpy.c
+Files: newlib/libc/machine/arm/strcpy.S
 Copyright: 2008 ARM Ltd
 License: BSD3-8
 
-Files: newlib/libc/machine/arm/strlen-stub.c
+Files: newlib/libc/machine/arm/strlen.c
 Copyright: 2008-2015 ARM Ltd
 License: BSD3-8
 
@@ -1301,8 +1340,8 @@ Files: newlib/libc/machine/aarch64/strncmp.S
 Copyright: 2013, 2018, Linaro Limited
 License: BSD3-9
 
-Files: newlib/libc/machine/arm/memchr-stub.c
- newlib/libc/machine/arm/memcpy-stub.c
+Files: newlib/libc/machine/arm/memchr.c
+ newlib/libc/machine/arm/memcpy.c
  newlib/libc/machine/arm/strlen-thumb1-Os.S
  newlib/libc/machine/arm/strlen-thumb2-Os.S
  newlib/libc/machine/arm/strlen.S
@@ -1545,7 +1584,6 @@ Files: newlib/libc/machine/spu/fdopen.c
  newlib/libm/common/fminl.c
  newlib/libm/common/fmodl.c
  newlib/libm/common/frexpl.c
- newlib/libm/common/hypotl.c
  newlib/libm/common/ilogbl.c
  newlib/libm/common/isinfl.c
  newlib/libm/common/isnanl.c
@@ -1859,7 +1897,7 @@ Files: newlib/libc/string/memmem.c
  newlib/libm/common/math_err_oflow.c
  newlib/libm/common/math_err_uflow.c
  newlib/libm/common/math_err_with_errno.c
- newlib/libm/common/math_err_xflow.c
+ newlib/libm/common/math_errf_check_oflowf.c
  newlib/libm/common/pow.c
  newlib/libm/common/pow_log_data.c
  newlib/libm/common/sincosf.c
@@ -1876,7 +1914,6 @@ Files: newlib/libm/common/math_config.h
  newlib/libm/common/math_errf_oflowf.c
  newlib/libm/common/math_errf_uflowf.c
  newlib/libm/common/math_errf_with_errnof.c
- newlib/libm/common/math_errf_xflowf.c
  newlib/libm/common/sf_pow.c
 Copyright: 2017-2018 Arm Ltd.
 License: BSD3-28
@@ -2231,8 +2268,12 @@ Files: newlib/libm/machine/spu/headers/nearbyintf4.h
 Copyright: 2006,2008, International Business Machines Corporation, Sony Computer Entertainment, Incorporated, Toshiba Corporation, 
 License: BSD3-36
 
-Files: .gitattributes
+Files: .clang-format
+ .gitattributes
  .github/Dockerfile
+ .github/do-build
+ .github/do-test
+ .github/workflows/fortity-source.yml
  .github/workflows/macos.yml
  .github/workflows/minsize.yml
  .github/workflows/release.yml
@@ -2280,6 +2321,7 @@ Files: .gitattributes
  scripts/cross-clang-thumbv7e+fp-none-eabi.txt
  scripts/cross-clang-thumbv7m-none-eabi.txt
  scripts/cross-i686-linux-gnu.txt
+ scripts/cross-powerpc64le-linux-gnu.txt
  scripts/cross-riscv64-unknown-elf.txt
  scripts/cross-riscv64-zephyr-elf.txt
  scripts/cross-rv32imac.txt
@@ -2369,8 +2411,8 @@ Files: newlib/libc/ctype/isblank.c
  newlib/libc/stdlib/wcrtomb.c
  newlib/libc/stdlib/wcsrtombs.c
  newlib/libc/stdlib/wctob.c
- newlib/libm/math/w_sincos.c
- newlib/libm/math/wf_sincos.c
+ newlib/libm/math/s_sincos.c
+ newlib/libm/math/sf_sincos.c
 Copyright: 2002 Thomas Fitzsimmons <fitzsim@redhat.com>
 License: Default-1
 
@@ -2899,6 +2941,11 @@ Files: newlib/libc/machine/xstormy16/setjmp.S
 Copyright: 2001 Red Hat, Incorporated.
 License: Other-1
 
+Files: newlib/libc/posix/basename.c
+ newlib/libc/posix/dirname.c
+Copyright: 2005 Shaun Jackman
+License: Other-1
+
 Files: newlib/libc/stdio/asniprintf.c
  newlib/libc/stdio/asnprintf.c
  newlib/libc/stdio/vasniprintf.c
@@ -2944,7 +2991,7 @@ Files: newlib/libm/common/sl_finite.c
  newlib/libm/complex/cabsl.c
  newlib/libm/complex/cimagl.c
  newlib/libm/complex/creall.c
- newlib/libm/math/el_hypot.c
+ newlib/libm/math/sl_hypot.c
 Copyright: 2015 Red Hat, Incorporated.
 License: Other-1
 
@@ -3011,6 +3058,18 @@ License: Other-3
 
 Files: newlib/libc/machine/xtensa/xtensa-asm.h
 Copyright: 2006 Tensilica Inc.
+License: Other-3
+
+Files: test/libc-testsuite/basename.c
+ test/libc-testsuite/dirname.c
+ test/libc-testsuite/fnmatch.c
+ test/libc-testsuite/qsort.c
+ test/libc-testsuite/snprintf.c
+ test/libc-testsuite/sscanf.c
+ test/libc-testsuite/string.c
+ test/libc-testsuite/strtod.c
+ test/libc-testsuite/strtol.c
+Copyright: 2005-2020 Rich Felker
 License: Other-3
 
 Files: newlib/libc/include/getopt.h
@@ -3547,50 +3606,6 @@ Files: newlib/libm/common/fdlibm.h
  newlib/libm/common/sf_scalbln.c
  newlib/libm/common/sf_scalbn.c
  newlib/libm/common/sf_trunc.c
- newlib/libm/math/e_acos.c
- newlib/libm/math/e_acosh.c
- newlib/libm/math/e_asin.c
- newlib/libm/math/e_atan2.c
- newlib/libm/math/e_atanh.c
- newlib/libm/math/e_cosh.c
- newlib/libm/math/e_exp.c
- newlib/libm/math/e_fmod.c
- newlib/libm/math/e_hypot.c
- newlib/libm/math/e_j0.c
- newlib/libm/math/e_j1.c
- newlib/libm/math/e_jn.c
- newlib/libm/math/e_log.c
- newlib/libm/math/e_log10.c
- newlib/libm/math/e_pow.c
- newlib/libm/math/e_rem_pio2.c
- newlib/libm/math/e_remainder.c
- newlib/libm/math/e_scalb.c
- newlib/libm/math/e_sinh.c
- newlib/libm/math/e_sqrt.c
- newlib/libm/math/e_tgamma.c
- newlib/libm/math/ef_acos.c
- newlib/libm/math/ef_acosh.c
- newlib/libm/math/ef_asin.c
- newlib/libm/math/ef_atan2.c
- newlib/libm/math/ef_atanh.c
- newlib/libm/math/ef_cosh.c
- newlib/libm/math/ef_exp.c
- newlib/libm/math/ef_fmod.c
- newlib/libm/math/ef_hypot.c
- newlib/libm/math/ef_j0.c
- newlib/libm/math/ef_j1.c
- newlib/libm/math/ef_jn.c
- newlib/libm/math/ef_log.c
- newlib/libm/math/ef_log10.c
- newlib/libm/math/ef_pow.c
- newlib/libm/math/ef_rem_pio2.c
- newlib/libm/math/ef_remainder.c
- newlib/libm/math/ef_scalb.c
- newlib/libm/math/ef_sinh.c
- newlib/libm/math/ef_sqrt.c
- newlib/libm/math/ef_tgamma.c
- newlib/libm/math/er_lgamma.c
- newlib/libm/math/erf_lgamma.c
  newlib/libm/math/k_cos.c
  newlib/libm/math/k_rem_pio2.c
  newlib/libm/math/k_sin.c
@@ -3600,83 +3615,82 @@ Files: newlib/libm/common/fdlibm.h
  newlib/libm/math/kf_sin.c
  newlib/libm/math/kf_tan.c
  newlib/libm/math/math.tex
+ newlib/libm/math/s_acos.c
+ newlib/libm/math/s_acosh.c
+ newlib/libm/math/s_asin.c
  newlib/libm/math/s_asinh.c
  newlib/libm/math/s_atan.c
+ newlib/libm/math/s_atan2.c
+ newlib/libm/math/s_atanh.c
  newlib/libm/math/s_ceil.c
  newlib/libm/math/s_cos.c
+ newlib/libm/math/s_cosh.c
+ newlib/libm/math/s_drem.c
  newlib/libm/math/s_erf.c
+ newlib/libm/math/s_exp.c
+ newlib/libm/math/s_exp2.c
  newlib/libm/math/s_fabs.c
  newlib/libm/math/s_floor.c
+ newlib/libm/math/s_fmod.c
  newlib/libm/math/s_frexp.c
- newlib/libm/math/s_ldexp.c
+ newlib/libm/math/s_gamma.c
+ newlib/libm/math/s_hypot.c
+ newlib/libm/math/s_j0.c
+ newlib/libm/math/s_j1.c
+ newlib/libm/math/s_jn.c
+ newlib/libm/math/s_log.c
+ newlib/libm/math/s_log10.c
+ newlib/libm/math/s_pow.c
+ newlib/libm/math/s_rem_pio2.c
+ newlib/libm/math/s_remainder.c
+ newlib/libm/math/s_scalb.c
  newlib/libm/math/s_signif.c
  newlib/libm/math/s_sin.c
+ newlib/libm/math/s_sinh.c
+ newlib/libm/math/s_sqrt.c
  newlib/libm/math/s_tan.c
  newlib/libm/math/s_tanh.c
+ newlib/libm/math/s_tgamma.c
+ newlib/libm/math/sf_acos.c
+ newlib/libm/math/sf_acosh.c
+ newlib/libm/math/sf_asin.c
  newlib/libm/math/sf_asinh.c
  newlib/libm/math/sf_atan.c
+ newlib/libm/math/sf_atan2.c
+ newlib/libm/math/sf_atanh.c
  newlib/libm/math/sf_ceil.c
  newlib/libm/math/sf_cos.c
+ newlib/libm/math/sf_cosh.c
+ newlib/libm/math/sf_drem.c
  newlib/libm/math/sf_erf.c
+ newlib/libm/math/sf_exp.c
+ newlib/libm/math/sf_exp2.c
  newlib/libm/math/sf_fabs.c
  newlib/libm/math/sf_floor.c
+ newlib/libm/math/sf_fmod.c
  newlib/libm/math/sf_frexp.c
- newlib/libm/math/sf_ldexp.c
+ newlib/libm/math/sf_gamma.c
+ newlib/libm/math/sf_hypot.c
+ newlib/libm/math/sf_j0.c
+ newlib/libm/math/sf_j1.c
+ newlib/libm/math/sf_jn.c
+ newlib/libm/math/sf_lgamma.c
+ newlib/libm/math/sf_log.c
+ newlib/libm/math/sf_log10.c
+ newlib/libm/math/sf_log2.c
+ newlib/libm/math/sf_pow.c
+ newlib/libm/math/sf_rem_pio2.c
+ newlib/libm/math/sf_remainder.c
+ newlib/libm/math/sf_scalb.c
  newlib/libm/math/sf_signif.c
  newlib/libm/math/sf_sin.c
+ newlib/libm/math/sf_sinh.c
+ newlib/libm/math/sf_sqrt.c
  newlib/libm/math/sf_tan.c
  newlib/libm/math/sf_tanh.c
- newlib/libm/math/w_acos.c
- newlib/libm/math/w_acosh.c
- newlib/libm/math/w_asin.c
- newlib/libm/math/w_atan2.c
- newlib/libm/math/w_atanh.c
- newlib/libm/math/w_cosh.c
- newlib/libm/math/w_drem.c
- newlib/libm/math/w_exp.c
- newlib/libm/math/w_exp2.c
- newlib/libm/math/w_fmod.c
- newlib/libm/math/w_gamma.c
- newlib/libm/math/w_hypot.c
- newlib/libm/math/w_j0.c
- newlib/libm/math/w_j1.c
- newlib/libm/math/w_jn.c
- newlib/libm/math/w_lgamma.c
- newlib/libm/math/w_log.c
- newlib/libm/math/w_log10.c
- newlib/libm/math/w_pow.c
- newlib/libm/math/w_remainder.c
- newlib/libm/math/w_scalb.c
- newlib/libm/math/w_sinh.c
- newlib/libm/math/w_sqrt.c
- newlib/libm/math/w_tgamma.c
- newlib/libm/math/wf_acos.c
- newlib/libm/math/wf_acosh.c
- newlib/libm/math/wf_asin.c
- newlib/libm/math/wf_atan2.c
- newlib/libm/math/wf_atanh.c
- newlib/libm/math/wf_cosh.c
- newlib/libm/math/wf_drem.c
- newlib/libm/math/wf_exp.c
- newlib/libm/math/wf_exp2.c
- newlib/libm/math/wf_fmod.c
- newlib/libm/math/wf_gamma.c
- newlib/libm/math/wf_hypot.c
- newlib/libm/math/wf_j0.c
- newlib/libm/math/wf_j1.c
- newlib/libm/math/wf_jn.c
- newlib/libm/math/wf_lgamma.c
- newlib/libm/math/wf_log.c
- newlib/libm/math/wf_log10.c
- newlib/libm/math/wf_log2.c
- newlib/libm/math/wf_pow.c
- newlib/libm/math/wf_remainder.c
- newlib/libm/math/wf_scalb.c
- newlib/libm/math/wf_sinh.c
- newlib/libm/math/wf_sqrt.c
- newlib/libm/math/wf_tgamma.c
- newlib/libm/math/wr_lgamma.c
- newlib/libm/math/wrf_lgamma.c
+ newlib/libm/math/sf_tgamma.c
+ newlib/libm/math/sr_lgamma.c
+ newlib/libm/math/srf_lgamma.c
 Copyright: 1993 Sun Microsystems, Inc.
 License: Other-25
 
@@ -4105,6 +4119,28 @@ License: BSD2-10
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
  .
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND
+ ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE
+ FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ SUCH DAMAGE.
+
+License: BSD2-11
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 1. Redistributions of source code must retain the above copyright
+ notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+ notice, this list of conditions and the following disclaimer in the
+ documentation and/or other materials provided with the distribution.
+ .
  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -4117,7 +4153,7 @@ License: BSD2-10
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD2-11
+License: BSD2-12
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
