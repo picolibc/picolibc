@@ -71,7 +71,7 @@ SECTIONS
 		*(.text.startup .text.startup.*)
 		*(.text .text.*)
 		*(.gnu.linkonce.t.*)
-		KEEP (*(.fini))
+		KEEP (*(.fini .fini.*))
 		__text_end = .;
 
 	        PROVIDE (__etext = __text_end);
