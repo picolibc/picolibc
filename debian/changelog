@@ -1,3 +1,11 @@
+picolibc (1.7.4-1) unstable; urgency=medium
+
+  * New upstream
+
+  * Improvements to math library
+
+ -- Keith Packard <keithp@keithp.com>  Fri, 19 Nov 2021 09:33:14 -0800
+
 picolibc (1.7.3-2) unstable; urgency=medium
 
   * Add -fno-stack-protector to touch test build. Closes: #995473.
