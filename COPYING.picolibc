@@ -456,10 +456,10 @@ Files: dummyhost/iob.c
  dummyhost/meson.build
  hello-world/Makefile
  hello-world/hello-world.c
+ hello-world/printf.c
  hello-world/run-aarch64
  hello-world/run-aarch64++
  hello-world/run-arm
- hello-world/run-arm++
  hello-world/run-riscv
  hello-world/run-riscv++
  hello-world/*.ld
@@ -654,7 +654,7 @@ Files: dummyhost/iob.c
 Copyright: 2019 Keith Packard
 License: BSD3-1
 
-Files: hello-world/hello-world++.c++
+Files: hello-world/hello-worldpp.cpp
  newlib/libc/errno/errno.c
  newlib/libc/iconv/ccs/binary/meson.build
  newlib/libc/include/machine/math.h
