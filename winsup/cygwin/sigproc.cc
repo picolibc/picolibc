@@ -603,11 +603,6 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
       its_me = false;
     }
 
-  /* Do not send signal to myself if exiting, which will be
-     ignored in wait_sig thread. */
-  if (its_me && exit_state > ES_EXIT_STARTING && si.si_signo > 0)
-    goto out;
-
   if (its_me)
     sendsig = my_sendsig;
   else
@@ -1352,7 +1347,7 @@ wait_sig (VOID *)
       sigq.retry = false;
       /* Don't process signals when we start exiting */
       if (exit_state > ES_EXIT_STARTING && pack.si.si_signo > 0)
-	continue;
+	goto skip_process_signal;
 
       sigset_t dummy_mask;
       threadlist_t *tl_entry;
@@ -1364,8 +1359,10 @@ wait_sig (VOID *)
 	  pack.mask = &dummy_mask;
 	}
 
-      sigpacket *q = &sigq.start;
-      bool clearwait = false;
+      sigpacket *q;
+      q = &sigq.start;
+      bool clearwait;
+      clearwait = false;
       switch (pack.si.si_signo)
 	{
 	case __SIGCOMMUNE:
@@ -1462,6 +1459,7 @@ wait_sig (VOID *)
 	}
       if (clearwait && !have_execed)
 	proc_subproc (PROC_CLEARWAIT, 0);
+skip_process_signal:
       if (pack.wakeup)
 	{
 	  sigproc_printf ("signalling pack.wakeup %p", pack.wakeup);
