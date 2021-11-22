@@ -301,7 +301,7 @@ extern "C" int
 raise (int sig)
 {
   pthread *thread = _my_tls.tid;
-  if (!thread)
+  if (!thread || !__isthreaded)
     return kill (myself->pid, sig);
   return pthread_kill (thread, sig);
 }
