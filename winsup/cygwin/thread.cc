@@ -3351,6 +3351,10 @@ pthread_kill (pthread_t thread, int sig)
   if (!pthread::is_good_object (&thread))
     return EINVAL;
 
+  /* check that sig is in right range */
+  if (sig < 0 || sig >= _NSIG)
+      return EINVAL;
+
   siginfo_t si = {0};
   si.si_signo = sig;
   si.si_code = SI_USER;
