@@ -303,7 +303,12 @@ raise (int sig)
   pthread *thread = _my_tls.tid;
   if (!thread || !__isthreaded)
     return kill (myself->pid, sig);
-  return pthread_kill (thread, sig);
+
+  /* Make sure to return -1 and set errno, as on Linux. */
+  int err = pthread_kill (thread, sig);
+  if (err)
+    set_errno (err);
+  return err ? -1 : 0;
 }
 
 static int
