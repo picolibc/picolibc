@@ -33,10 +33,10 @@ void _IO_ldtostr (long double *, char *, int, int, char);
  /* Number of bits of precision */
 #define NBITS ((NI-4)*16)
 
- /* Maximum number of decimal digits in ASCII conversion
-  * Take full possible size of output into account
-  */
+ /* Maximum number of decimal digits in ASCII conversion */
 #define NDEC 1023
+ /* Use static stack buffer for up to 44 digits */
+#define NDEC_SML 44
 
  /* The exponent of 1.0 */
 #define EXONE (0x3fff)
@@ -2794,6 +2794,8 @@ _ldtoa_r (struct _reent *ptr, long double d, int mode, int ndigits,
   LDPARMS rnd;
   LDPARMS *ldp = &rnd;
   char *outstr;
+  char outbuf_sml[NDEC_SML + MAX_EXP_DIGITS + 10];
+  char *outbuf = outbuf_sml;
   union uconv du;
   du.d = d;
 
@@ -2836,11 +2838,22 @@ _ldtoa_r (struct _reent *ptr, long double d, int mode, int ndigits,
     ndigits = 20;
 
 /* This sanity limit must agree with the corresponding one in etoasc, to
-   keep straight the returned value of outexpon.  */
+   keep straight the returned value of outexpon.  Note that we use a dynamic
+   limit now, either NDEC or NDEC_SML, depending on ndigits.  See the usage
+   of "my_NDEC" in etoasc. */
   if (ndigits > NDEC)
     ndigits = NDEC;
 
-  char outbuf[ndigits + MAX_EXP_DIGITS + 10];
+  /* Allocate buffer if more than NDEC_SML digits are requested. */
+  if (ndigits > NDEC_SML)
+    {
+      outbuf = (char *) _malloc_r (ptr, NDEC + MAX_EXP_DIGITS + 10);
+      if (!outbuf)
+	{
+	  ndigits = NDEC_SML;
+	  outbuf = outbuf_sml;
+	}
+    }
 
   etoasc (e, outbuf, ndigits, mode, ldp);
   s = outbuf;
@@ -2933,6 +2946,9 @@ stripspaces:
   if (rve)
     *rve = outstr + (s - outbuf);
 
+  if (outbuf != outbuf_sml)
+    _free_r (ptr, outbuf);
+
   return outstr;
 }
 
@@ -2987,6 +3003,7 @@ etoasc (short unsigned int *x, char *string, int ndigits, int outformat,
   char *s, *ss;
   unsigned short m;
   unsigned short *equot = ldp->equot;
+  int my_NDEC = (ndigits > NDEC_SML) ? NDEC : NDEC_SML;
 
   ndigs = ndigits;
   rndsav = ldp->rndprc;
@@ -3112,9 +3129,7 @@ tnzro:
       else
 	{
 	  emovi (y, w);
-	  /* Note that this loop does not access the incoming string array,
-	   * which may be shorter than NDEC + 1 bytes! */
-	  for (i = 0; i < NDEC + 1; i++)
+	  for (i = 0; i < my_NDEC + 1; i++)
 	    {
 	      if ((w[NI - 1] & 0x7) != 0)
 		break;
@@ -3190,8 +3205,8 @@ isone:
 else if( ndigs < 0 )
         ndigs = 0;
 */
-  if (ndigs > NDEC)
-    ndigs = NDEC;
+  if (ndigs > my_NDEC)
+    ndigs = my_NDEC;
   if (digit == 10)
     {
       *s++ = '1';
