@@ -284,13 +284,6 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
   if (!len)
     return;
 
-  if (!(evt = CreateEvent (NULL, false, false, NULL)))
-    {
-      __seterrno ();
-      len = (size_t) -1;
-      return;
-    }
-
   DWORD timeout = is_nonblocking () ? 0 : INFINITE;
   DWORD waitret = cygwait (read_mtx, timeout);
   switch (waitret)
@@ -314,6 +307,15 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
       len = (size_t) -1;
       return;
     }
+
+  if (!(evt = CreateEvent (NULL, false, false, NULL)))
+    {
+      __seterrno ();
+      len = (size_t) -1;
+      ReleaseMutex (read_mtx);
+      return;
+    }
+
   while (nbytes < len)
     {
       ULONG_PTR nbytes_now = 0;
