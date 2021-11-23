@@ -1201,11 +1201,38 @@ fhandler_fifo::release_select_sem (const char *from)
     ReleaseSemaphore (select_sem, n_release, NULL);
 }
 
+/* Read from a non-blocking pipe and wait for completion. */
+static NTSTATUS
+nt_read (HANDLE h, HANDLE evt, PIO_STATUS_BLOCK pio, void *in_ptr, size_t& len)
+{
+  NTSTATUS status;
+
+  ResetEvent (evt);
+  status = NtReadFile (h, evt, NULL, NULL, pio, in_ptr, len, NULL, NULL);
+  if (status == STATUS_PENDING)
+    {
+      /* Very short-lived */
+      status = NtWaitForSingleObject (evt, FALSE, NULL);
+      if (NT_SUCCESS (status))
+	status = pio->Status;
+    }
+  return status;
+}
+
 void __reg3
 fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 {
+  HANDLE evt;
+
   if (!len)
     return;
+
+  if (!(evt = CreateEvent (NULL, false, false, NULL)))
+    {
+      __seterrno ();
+      len = (size_t) -1;
+      return;
+    }
 
   while (1)
     {
@@ -1244,17 +1271,15 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 	  NTSTATUS status;
 	  IO_STATUS_BLOCK io;
 
-	  status = NtReadFile (fc_handler[j].h, NULL, NULL, NULL,
-			       &io, in_ptr, len, NULL, NULL);
+	  status = nt_read (fc_handler[j].h, evt, &io, in_ptr, len);
 	  switch (status)
 	    {
 	    case STATUS_SUCCESS:
 	    case STATUS_BUFFER_OVERFLOW:
-	      /* io.Information is supposedly valid in latter case. */
 	      if (io.Information > 0)
 		{
 		  len = io.Information;
-		  goto out;
+		  goto unlock_out;
 		}
 	      break;
 	    case STATUS_PIPE_EMPTY:
@@ -1265,7 +1290,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 	      fc_handler[j].set_state (fc_disconnected);
 	      break;
 	    default:
-	      debug_printf ("NtReadFile status %y", status);
+	      debug_printf ("nt_read status %y", status);
 	      fc_handler[j].set_state (fc_error);
 	      break;
 	    }
@@ -1278,8 +1303,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 	    NTSTATUS status;
 	    IO_STATUS_BLOCK io;
 
-	    status = NtReadFile (fc_handler[i].h, NULL, NULL, NULL,
-				 &io, in_ptr, len, NULL, NULL);
+	    status = nt_read (fc_handler[i].h, evt, &io, in_ptr, len);
 	    switch (status)
 	      {
 	      case STATUS_SUCCESS:
@@ -1290,7 +1314,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 		    if (j < nhandlers)
 		      fc_handler[j].last_read = false;
 		    fc_handler[i].last_read = true;
-		    goto out;
+		    goto unlock_out;
 		  }
 		break;
 	      case STATUS_PIPE_EMPTY:
@@ -1301,7 +1325,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 		fc_handler[i].set_state (fc_disconnected);
 		break;
 	      default:
-		debug_printf ("NtReadFile status %y", status);
+		debug_printf ("nt_read status %y", status);
 		fc_handler[i].set_state (fc_error);
 		break;
 	      }
@@ -1315,8 +1339,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 	    IO_STATUS_BLOCK io;
 
 	    nconnected++;
-	    status = NtReadFile (fc_handler[i].h, NULL, NULL, NULL,
-				 &io, in_ptr, len, NULL, NULL);
+	    status = nt_read (fc_handler[i].h, evt, &io, in_ptr, len);
 	    switch (status)
 	      {
 	      case STATUS_SUCCESS:
@@ -1327,7 +1350,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 		    if (j < nhandlers)
 		      fc_handler[j].last_read = false;
 		    fc_handler[i].last_read = true;
-		    goto out;
+		    goto unlock_out;
 		  }
 		break;
 	      case STATUS_PIPE_EMPTY:
@@ -1337,25 +1360,25 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 		nconnected--;
 		break;
 	      default:
-		debug_printf ("NtReadFile status %y", status);
+		debug_printf ("nt_read status %y", status);
 		fc_handler[i].set_state (fc_error);
 		nconnected--;
 		break;
 	      }
 	  }
-      fifo_client_unlock ();
       if (!nconnected && hit_eof ())
 	{
-	  reading_unlock ();
 	  len = 0;
-	  return;
+	  goto unlock_out;
 	}
+      fifo_client_unlock ();
 maybe_retry:
       reading_unlock ();
       if (is_nonblocking ())
 	{
 	  set_errno (EAGAIN);
-	  goto errout;
+	  len = (size_t) -1;
+	  goto out;
 	}
       else
 	{
@@ -1370,7 +1393,8 @@ maybe_retry:
 	      else
 		{
 		  set_errno (EINTR);
-		  goto errout;
+		  len = (size_t) -1;
+		  goto out;
 		}
 	    }
 	}
@@ -1378,17 +1402,17 @@ maybe_retry:
       if (isclosed ())
 	{
 	  set_errno (EBADF);
-	  goto errout;
+	  len = (size_t) -1;
+	  goto out;
 	}
     }
-errout:
-  len = (size_t) -1;
-  return;
-out:
+unlock_out:
   fifo_client_unlock ();
   reading_unlock ();
+out:
   if (select_sem)
     release_select_sem ("raw_read");
+  CloseHandle (evt);
 }
 
 int __reg2
