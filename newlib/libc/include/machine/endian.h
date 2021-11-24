@@ -69,10 +69,10 @@ __bswap64(__uint64_t _x)
 #define	__htons(_x)	((__uint16_t)(_x))
 #define	__ntohl(_x)	((__uint32_t)(_x))
 #define	__ntohs(_x)	((__uint16_t)(_x))
-#define	htonl(_x)	__htonl(_x))
-#define	htons(_x)	__htons(_x))
-#define	ntohl(_x)	__ntohl(_x))
-#define	ntohs(_x)	__ntohs(_x))
+#define	htonl(_x)	__htonl(_x)
+#define	htons(_x)	__htons(_x)
+#define	ntohl(_x)	__ntohl(_x)
+#define	ntohs(_x)	__ntohs(_x)
 #endif
 #endif /* __machine_host_to_from_network_defined */
 
