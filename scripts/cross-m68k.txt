@@ -1,0 +1,18 @@
+[binaries]
+c = 'm68k-linux-gnu-gcc'
+ar = 'm68k-linux-gnu-ar'
+as = 'm68k-linux-gnu-as'
+ld = 'm68k-linux-gnu-ld'
+nm = 'm68k-linux-gnu-nm'
+strip = 'm68k-linux-gnu-strip'
+
+[host_machine]
+system = 'unknown'
+cpu_family = 'm68k'
+cpu = '68000'
+endian = 'big'
+
+[properties]
+c_args = [ '-nostdlib', '-march=68000']
+c_link_args = [ '-nostdlib', '-march=68000', '-lgcc' ]
+skip_sanity_check = true
