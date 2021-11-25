@@ -83,7 +83,7 @@ static void eclear (register short unsigned int *x);
 static void einfin (register short unsigned int *x, register LDPARMS * ldp);
 static void efloor (short unsigned int *x, short unsigned int *y,
 		    LDPARMS * ldp);
-static void etoasc (short unsigned int *x, char *string, int ndigs,
+static void etoasc (short unsigned int *x, char *string, int ndec, int ndigs,
 		    int outformat, LDPARMS * ldp);
 
 union uconv
@@ -217,7 +217,7 @@ static const char *const ermsg[7] = {
  *	e24toasc( &f, str, n )	single to ASCII string, n digits after decimal
  *	e53toasc( &d, str, n )	double to ASCII string, n digits after decimal
  *	e64toasc( &d, str, n )	long double to ASCII string
- *	etoasc(e,str,n,fmt,ldp)e to ASCII string, n digits after decimal
+ *	etoasc(e,str,ndec,n,fmt,ldp)e to ASCII string, n digits after decimal
  *	etoe24( e, &f )		convert e type to IEEE single precision
  *	etoe53( e, &d )		convert e type to IEEE double precision
  *	etoe64( e, &d )		convert e type to IEEE long double precision
@@ -2839,23 +2839,33 @@ _ldtoa_r (struct _reent *ptr, long double d, int mode, int ndigits,
 
 /* This sanity limit must agree with the corresponding one in etoasc, to
    keep straight the returned value of outexpon.  Note that we use a dynamic
-   limit now, either NDEC or NDEC_SML, depending on ndigits.  See the usage
-   of "my_NDEC" in etoasc. */
-  if (ndigits > NDEC)
-    ndigits = NDEC;
+   limit now, either ndec (<= NDEC) or NDEC_SML, depending on ndigits. */
+  __int32_t ndec;
+  if (mode == 3) /* %f */
+    {
+      __int32_t expon = (e[NE - 1] & 0x7fff) - (EXONE - 1); /* exponent part */
+      /* log2(10) approximately 485/146 */
+      ndec = expon * 146 / 485 + ndigits;
+    }
+  else /* %g/%e */
+    ndec = ndigits;
+  if (ndec < 0)
+    ndec = 0;
+  if (ndec > NDEC)
+    ndec = NDEC;
 
   /* Allocate buffer if more than NDEC_SML digits are requested. */
-  if (ndigits > NDEC_SML)
+  if (ndec > NDEC_SML)
     {
-      outbuf = (char *) _malloc_r (ptr, NDEC + MAX_EXP_DIGITS + 10);
+      outbuf = (char *) _malloc_r (ptr, ndec + MAX_EXP_DIGITS + 10);
       if (!outbuf)
 	{
-	  ndigits = NDEC_SML;
+	  ndec = NDEC_SML;
 	  outbuf = outbuf_sml;
 	}
     }
 
-  etoasc (e, outbuf, ndigits, mode, ldp);
+  etoasc (e, outbuf, (int) ndec, ndigits, mode, ldp);
   s = outbuf;
   if (eisinf (e) || eisnan (e))
     {
@@ -2992,8 +3002,8 @@ _ldcheck (long double *d)
 }				/* _ldcheck */
 
 static void
-etoasc (short unsigned int *x, char *string, int ndigits, int outformat,
-	LDPARMS * ldp)
+etoasc (short unsigned int *x, char *string, int ndec, int ndigits,
+	int outformat, LDPARMS * ldp)
 {
   long digit;
   unsigned short y[NI], t[NI], u[NI], w[NI];
@@ -3003,7 +3013,6 @@ etoasc (short unsigned int *x, char *string, int ndigits, int outformat,
   char *s, *ss;
   unsigned short m;
   unsigned short *equot = ldp->equot;
-  int my_NDEC = (ndigits > NDEC_SML) ? NDEC : NDEC_SML;
 
   ndigs = ndigits;
   rndsav = ldp->rndprc;
@@ -3129,7 +3138,7 @@ tnzro:
       else
 	{
 	  emovi (y, w);
-	  for (i = 0; i < my_NDEC + 1; i++)
+	  for (i = 0; i < ndec + 1; i++)
 	    {
 	      if ((w[NI - 1] & 0x7) != 0)
 		break;
@@ -3205,8 +3214,8 @@ isone:
 else if( ndigs < 0 )
         ndigs = 0;
 */
-  if (ndigs > my_NDEC)
-    ndigs = my_NDEC;
+  if (ndigs > ndec)
+    ndigs = ndec;
   if (digit == 10)
     {
       *s++ = '1';
