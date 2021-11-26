@@ -20,6 +20,7 @@ details. */
 #include "pinfo.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "shared_info.h"
 #include "ntdll.h"
 
 /* add timeval values */
@@ -162,6 +163,15 @@ get_rlimit_stack (void)
   return (size_t) rl.rlim_cur;
 }
 
+static LONG job_serial_number __attribute__((section (".cygwin_dll_common"), shared));
+
+static PWCHAR
+job_shared_name (PWCHAR buf, LONG num)
+{
+  __small_swprintf (buf, L"rlimit.%d", num);
+  return buf;
+}
+
 extern "C" int
 getrlimit (int resource, struct rlimit *rlp)
 {
@@ -175,7 +185,36 @@ getrlimit (int resource, struct rlimit *rlp)
 	case RLIMIT_CPU:
 	case RLIMIT_FSIZE:
 	case RLIMIT_DATA:
+	  break;
 	case RLIMIT_AS:
+	  {
+	    UNICODE_STRING uname;
+	    WCHAR jobname[32];
+	    OBJECT_ATTRIBUTES attr;
+	    HANDLE job = NULL;
+	    NTSTATUS status;
+	    JOBOBJECT_EXTENDED_LIMIT_INFORMATION jobinfo;
+
+	    if (cygheap->rlim_as_id)
+	      {
+		RtlInitUnicodeString (&uname,
+				      job_shared_name (jobname,
+						       cygheap->rlim_as_id));
+		InitializeObjectAttributes (&attr, &uname, 0,
+					    get_session_parent_dir (), NULL);
+		/* May fail, just check NULL job in that case. */
+		NtOpenJobObject (&job, JOB_OBJECT_QUERY, &attr);
+	      }
+	    status = NtQueryInformationJobObject (job,
+					JobObjectExtendedLimitInformation,
+					&jobinfo, sizeof jobinfo, NULL);
+	    if (!NT_SUCCESS (status))
+	      break;
+	    if (jobinfo.BasicLimitInformation.LimitFlags & JOB_OBJECT_LIMIT_PROCESS_MEMORY)
+	      rlp->rlim_cur = rlp->rlim_max = jobinfo.ProcessMemoryLimit;
+	    if (job)
+	      NtClose (job);
+	  }
 	  break;
 	case RLIMIT_STACK:
 	  __get_rlimit_stack (rlp);
@@ -222,6 +261,53 @@ setrlimit (int resource, const struct rlimit *rlp)
 
       switch (resource)
 	{
+	case RLIMIT_AS:
+	  {
+	    LONG new_as_id = 0;
+	    UNICODE_STRING uname;
+	    WCHAR jobname[32];
+	    OBJECT_ATTRIBUTES attr;
+	    NTSTATUS status = STATUS_SUCCESS;
+	    HANDLE job = NULL;
+	    JOBOBJECT_EXTENDED_LIMIT_INFORMATION jobinfo = { 0 };
+
+	    /* If we already have a limit, we must not change it because that
+	       would potentially influence already running child processes.
+	       Just try to create another, nested job.  On systems prior to
+	       Windows 8 / Server 2012 this will fail, but that's ok. */
+	    while (new_as_id == 0)
+	      new_as_id = InterlockedIncrement (&job_serial_number);
+	    RtlInitUnicodeString (&uname,
+				  job_shared_name (jobname, new_as_id));
+	    InitializeObjectAttributes (&attr, &uname, 0,
+					get_session_parent_dir (), NULL);
+	    status = NtCreateJobObject (&job, JOB_OBJECT_ALL_ACCESS, &attr);
+	    if (!NT_SUCCESS (status))
+	      {
+		__seterrno_from_nt_status (status);
+		__leave;
+	      }
+	    status = NtAssignProcessToJobObject (job, NtCurrentProcess ());
+	    if (NT_SUCCESS (status))
+	      {
+		jobinfo.BasicLimitInformation.LimitFlags
+		  = JOB_OBJECT_LIMIT_PROCESS_MEMORY;
+		/* Per Linux man page, round down to system pagesize. */
+		jobinfo.ProcessMemoryLimit
+		  = rounddown (rlp->rlim_cur, wincap.allocation_granularity ());
+		status = NtSetInformationJobObject (job,
+					      JobObjectExtendedLimitInformation,
+					      &jobinfo, sizeof jobinfo);
+	      }
+	    NtClose (job);
+	    if (!NT_SUCCESS (status))
+	      {
+		__seterrno_from_nt_status (status);
+		__leave;
+	      }
+	    cygheap->rlim_as_id = new_as_id;
+	  }
+	  break;
 	case RLIMIT_CORE:
 	  cygheap->rlim_core = rlp->rlim_cur;
 	  break;

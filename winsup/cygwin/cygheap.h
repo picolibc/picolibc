@@ -565,6 +565,7 @@ struct init_cygheap: public mini_cygheap
   cygheap_user user;
   user_heap_info user_heap;
   mode_t umask;
+  LONG rlim_as_id;
   unsigned long rlim_core;
   HANDLE console_h;
   cwdstuff cwd;
