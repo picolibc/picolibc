@@ -3,6 +3,8 @@ What's new:
 
 - Drop support for Vista and Server 2008.
 
+- Add code to handle setrlimit(RLIMIT_AS).
+
 
 What changed:
 -------------
