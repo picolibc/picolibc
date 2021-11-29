@@ -75,7 +75,7 @@ am__objects_1 = lib_a-feclearexcept.$(OBJEXT) lib_a-fegetenv.$(OBJEXT) \
 	lib_a-feholdexcept.$(OBJEXT) lib_a-feraiseexcept.$(OBJEXT) \
 	lib_a-fesetenv.$(OBJEXT) lib_a-fesetexceptflag.$(OBJEXT) \
 	lib_a-fesetround.$(OBJEXT) lib_a-fetestexcept.$(OBJEXT) \
-	lib_a-feupdateenv.$(OBJEXT) lib_a-fenv.$(OBJEXT)
+	lib_a-feupdateenv.$(OBJEXT)
 am_lib_a_OBJECTS = $(am__objects_1)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -189,6 +189,7 @@ prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
 sbindir = @sbindir@
+shared_machine_dir = @shared_machine_dir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
 sys_dir = @sys_dir@
@@ -203,8 +204,7 @@ INCLUDES = -I $(newlib_basedir)/../newlib/libm/common $(NEWLIB_CFLAGS) \
 LIB_SOURCES = \
 	feclearexcept.c fegetenv.c fegetexceptflag.c \
 	fegetround.c feholdexcept.c feraiseexcept.c fesetenv.c \
-	fesetexceptflag.c fesetround.c fetestexcept.c feupdateenv.c \
-	fenv.c
+	fesetexceptflag.c fesetround.c fetestexcept.c feupdateenv.c
 
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)
@@ -221,6 +221,9 @@ DOCBOOK_CHEW = ${top_srcdir}/../doc/makedocbook.py
 DOCBOOK_OUT_FILES = $(CHEWOUT_FILES:.def=.xml)
 DOCBOOK_CHAPTERS = $(CHAPTERS:.tex=.xml)
 CLEANFILES = $(CHEWOUT_FILES) $(DOCBOOK_OUT_FILES)
+LIBADD_OBJS = \
+	lib_a-fenv.$(OBJEXT)
+
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
@@ -347,12 +350,6 @@ lib_a-feupdateenv.o: feupdateenv.c
 
 lib_a-feupdateenv.obj: feupdateenv.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-feupdateenv.obj `if test -f 'feupdateenv.c'; then $(CYGPATH_W) 'feupdateenv.c'; else $(CYGPATH_W) '$(srcdir)/feupdateenv.c'; fi`
-
-lib_a-fenv.o: fenv.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fenv.o `test -f 'fenv.c' || echo '$(srcdir)/'`fenv.c
-
-lib_a-fenv.obj: fenv.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fenv.obj `if test -f 'fenv.c'; then $(CYGPATH_W) 'fenv.c'; else $(CYGPATH_W) '$(srcdir)/fenv.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -553,6 +550,13 @@ docbook: $(DOCBOOK_OUT_FILES)
 	do \
 	  ${top_srcdir}/../doc/chapter-texi2docbook.py <$(srcdir)/$${chapter%.xml}.tex >../$$chapter ; \
 	done
+
+# fenv.c cannot be compiled as mips16 since it uses the cfc1 instruction
+lib_a-fenv.o: fenv.c
+	$(COMPILE) -mno-mips16 -c -o $@ `test -f 'fenv.c' || echo '$(srcdir)/'`fenv.c
+
+lib_a-fenv.obj: fenv.c
+	$(COMPILE) -mno-mips16 -c -o $@ `if test -f 'fenv.c'; then $(CYGPATH_W) 'fenv.c'; else $(CYGPATH_W) '$(srcdir)/fenv.c'; fi`
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
