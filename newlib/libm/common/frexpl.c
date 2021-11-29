@@ -29,10 +29,11 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <math.h>
+#include <float.h>
 #include "local.h"
 
 /* On platforms where long double is as wide as double.  */
-#ifdef _LDBL_EQ_DBL
+#if defined(_LDBL_EQ_DBL) || (LDBL_MANT_DIG == 53 && LDBL_MAX_EXP == 1024)
 long double
 frexpl (long double x, int *eptr)
 {
@@ -40,3 +41,82 @@ frexpl (long double x, int *eptr)
 }
 #endif
 
+#if (LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113) && LDBL_MAX_EXP == 16384
+# if (LDBL_MANT_DIG == 64) /* 80-bit long double */
+union ldbl {
+  long double x;
+  struct {
+#  ifdef __IEEE_LITTLE_ENDIAN /* for Intel CPU */
+    __uint32_t fracl;
+    __uint32_t frach;
+    __uint32_t exp:15;
+    __uint32_t sign:1;
+    __uint32_t pad:16;
+#  endif
+#  ifdef __IEEE_BIG_ENDIAN
+#   ifndef ___IEEE_BYTES_LITTLE_ENDIAN /* for m86k */
+    __uint32_t sign:1;
+    __uint32_t exp:15;
+    __uint32_t pad:16;
+#   else /* ARM FPA10 math copprocessor */
+    __uint32_t exp:15;
+    __uint32_t pad:16;
+    __uint32_t sign:1;
+#   endif
+    __uint32_t frach;
+    __uint32_t fracl;
+#  endif
+  } u32;
+};
+# else /* LDBL_MANT_DIG == 113, 128-bit long double */
+union ldbl {
+  long double x;
+  struct {
+#  ifdef __IEEE_LITTLE_ENDIAN
+    __uint32_t fracl;
+    __uint32_t fraclm;
+    __uint32_t frachm;
+    __uint32_t frach:16;
+    __uint32_t exp:15;
+    __uint32_t sign:1;
+#  endif
+#  ifdef __IEEE_BIG_ENDIAN
+#   ifndef ___IEEE_BYTES_LITTLE_ENDIAN
+    __uint32_t sign:1;
+    __uint32_t exp:15;
+    __uint32_t frach:16;
+#   else /* ARMEL without __VFP_FP__ */
+    __uint32_t frach:16;
+    __uint32_t exp:15;
+    __uint32_t sign:1;
+#   endif
+    __uint32_t frachm;
+    __uint32_t fraclm;
+    __uint32_t fracl;
+#  endif
+  } u32;
+};
+# endif
+
+static const double two114 = 0x1p114;
+
+long double
+frexpl (long double x, int *eptr)
+{
+  union ldbl u;
+  u.x = x;
+  int e = u.u32.exp;
+  *eptr = 0;
+  if (e == 0x7fff || x == 0)
+    return x; /* inf,nan,0 */
+  if (e == 0) /* subnormal */
+    {
+      u.x *= two114;
+      e = u.u32.exp;
+      *eptr -= 114;
+    }
+  *eptr += e - 16382;
+  u.u32.exp = 0x3ffe; /* 0 */
+  return u.x;
+}
+#endif /* End of 80-bit or 128-bit long double */

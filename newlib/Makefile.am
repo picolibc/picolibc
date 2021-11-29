@@ -105,7 +105,7 @@ MATHOBJS_IN_LIBC = \
 	$(lpfx)s_isnand.$(oext) $(lpfx)sf_isnanf.$(oext) \
 	$(lpfx)s_nan.$(oext) $(lpfx)sf_nan.$(oext) \
 	$(lpfx)s_ldexp.$(oext) $(lpfx)sf_ldexp.$(oext) \
-	$(lpfx)s_frexp.$(oext) $(lpfx)sf_frexp.$(oext) \
+	$(lpfx)s_frexp.$(oext) $(lpfx)sf_frexp.$(oext) $(lpfx)frexpl.$(oext) \
 	$(lpfx)s_modf.$(oext) \
 	$(lpfx)sf_modf.$(oext) $(lpfx)s_scalbn.$(oext) \
 	$(lpfx)sf_scalbn.$(oext) \
