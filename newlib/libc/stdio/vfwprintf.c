@@ -243,10 +243,7 @@ extern int _ldcheck (_LONG_DOUBLE *);
 
 #  define _PRINTF_FLOAT_TYPE _LONG_DOUBLE
 #  define _DTOA_R _ldtoa_r
-/* FIXME - frexpl is not yet supported; and cvt infloops if (double)f
-   converts a finite value into infinity.  */
-/* #  define FREXP frexpl */
-#  define FREXP(f,e) ((_LONG_DOUBLE) frexp ((double)f, e))
+#  define FREXP frexpl
 # endif /* !_NO_LONGDBL */
 
 static wchar_t *wcvt(struct _reent *, _PRINTF_FLOAT_TYPE, int, int, wchar_t *,

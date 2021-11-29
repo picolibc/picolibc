@@ -509,6 +509,7 @@ extern long double erfcl (long double);
 #else /* !_LDBL_EQ_DBL && !__CYGWIN__ */
 extern long double hypotl (long double, long double);
 extern long double sqrtl (long double);
+extern long double frexpl (long double, int *);
 #ifdef __i386__
 /* Other long double precision functions.  */
 extern _LONG_DOUBLE rintl (_LONG_DOUBLE);
