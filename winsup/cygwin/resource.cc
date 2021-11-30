@@ -147,6 +147,8 @@ __get_rlimit_stack (struct rlimit *rlp)
   rlimit_stack_guard.release ();
 }
 
+/* Interface to stack limit called from pthread_create and
+   pthread_attr_getstacksize. */
 size_t
 get_rlimit_stack (void)
 {
