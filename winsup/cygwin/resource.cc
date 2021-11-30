@@ -261,6 +261,12 @@ setrlimit (int resource, const struct rlimit *rlp)
 	  __leave;
 	}
 
+      if (rlp->rlim_cur > oldlimits.rlim_max)
+	{
+	  set_errno (EPERM);
+	  __leave;
+	}
+
       switch (resource)
 	{
 	case RLIMIT_AS:
