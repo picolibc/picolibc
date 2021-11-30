@@ -38,6 +38,10 @@ GENERAL_SOURCES = \
 	labs.c 		\
 	ldiv.c  	\
 	ldtoa.c		\
+	gdtoa-ldtoa.c	\
+	gdtoa-gdtoa.c	\
+	gdtoa-dmisc.c	\
+	gdtoa-gmisc.c	\
 	malloc.c  	\
 	mblen.c		\
 	mblen_r.c	\
@@ -311,7 +315,11 @@ CHEWOUT_FILES= \
 CHAPTERS = stdlib.tex
 
 $(lpfx)dtoa.$(oext): dtoa.c mprec.h
-$(lpfx)ldtoa.$(oext): ldtoa.c mprec.h
+$(lpfx)ldtoa.$(oext): ldtoa.c mprec.h gdtoa.h
+$(lpfx)gdtoa-ldtoa.$(oext): gdtoa-ldtoa.c mprec.h gdtoaimp.h gdtoa.h
+$(lpfx)gdtoa-gdtoa.$(oext): gdtoa-gdtoa.c mprec.h gdtoaimp.h gdtoa.h
+$(lpfx)gdtoa-dmisc.$(oext): gdtoa-dmisc.c mprec.h gdtoaimp.h gdtoa.h
+$(lpfx)gdtoa-gmisc.$(oext): gdtoa-gmisc.c mprec.h gdtoaimp.h gdtoa.h
 $(lpfx)ecvtbuf.$(oext): ecvtbuf.c mprec.h
 $(lpfx)mbtowc_r.$(oext): mbtowc_r.c mbctype.h
 $(lpfx)mprec.$(oext): mprec.c mprec.h

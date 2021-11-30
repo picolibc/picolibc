@@ -352,6 +352,16 @@ One feature can be enabled by specifying `--enable-FEATURE=yes' or
      64-bit integer on most systems.
      Disabled by default.
 
+`--enable-newlib-use-gdtoa'
+     Use gdtoa rather than legacy ldtoa.  gdtoa privides more accurate
+     output and faster conversion than legacy ldtoa, while it requires
+     more heap memory.  gdtoa sometimes requires 16KB heap memory, so
+     if the platform does not have enough heap memory, consider disabling
+     this option. Legacy ldtoa also use heap, however, only 1KB memory
+     is malloc'ed.  In addition, if malloc fails, it still works, with
+     less conversion accuracy.
+     Enabled by default.
+
 `--enable-multilib'
      Build many library versions.
      Enabled by default.

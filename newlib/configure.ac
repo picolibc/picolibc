@@ -259,6 +259,17 @@ AC_ARG_ENABLE(newlib-long-time_t,
   esac
  fi], [newlib_long_time_t=no])dnl
 
+dnl Support --enable-newlib-use-gdtoa
+AC_ARG_ENABLE(newlib-use-gdtoa,
+[  --enable-newlib-use-gdtoa   Use gdtoa rather than legacy ldtoa],
+[if test "${newlib_use_gdtoa+set}" != set; then
+  case "${enableval}" in
+    yes) newlib_use_gdtoa=yes ;;
+    no)  newlib_use_gdtoa=no  ;;
+    *)   AC_MSG_ERROR(bad value ${enableval} for newlib-use-gdtoa option) ;;
+  esac
+ fi], [newlib_use_gdtoa=yes])dnl
+
 NEWLIB_CONFIGURE(.)
 
 dnl We have to enable libtool after NEWLIB_CONFIGURE because if we try and
@@ -535,6 +546,10 @@ fi
 
 if test "${newlib_long_time_t}" = "yes"; then
 AC_DEFINE_UNQUOTED(_WANT_USE_LONG_TIME_T)
+fi
+
+if test "${newlib_use_gdtoa}" = "yes"; then
+AC_DEFINE_UNQUOTED(_WANT_USE_GDTOA)
 fi
 
 dnl

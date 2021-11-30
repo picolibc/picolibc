@@ -2,6 +2,10 @@
   * This program has been placed in the public domain.
   */
 
+#include <newlib.h>
+#include <sys/config.h>
+
+#ifndef _USE_GDTOA
 #include <_ansi.h>
 #include <reent.h>
 #include <string.h>
@@ -3900,3 +3904,5 @@ enan (short unsigned int *nan, int size)
   for (i = 0; i < n; i++)
     *nan++ = *p++;
 }
+
+#endif /* !_USE_GDTOA */
