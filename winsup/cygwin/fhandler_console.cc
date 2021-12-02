@@ -3308,13 +3308,30 @@ fhandler_console::write (const void *vsrc, size_t len)
 	case gotrsquare:
 	  if (isdigit (*src))
 	    con.rarg = con.rarg * 10 + (*src - '0');
-	  else if (*src == ';' && (con.rarg == 2 || con.rarg == 0))
-	    con.state = gettitle;
-	  else if (*src == ';' && (con.rarg == 4 || con.rarg == 104
-				   || (con.rarg >= 10 && con.rarg <= 19)))
-	    con.state = eatpalette;
-	  else
-	    con.state = eattitle;
+	  else if (*src == ';')
+	    {
+	      if (con.rarg == 0 || con.rarg == 2)
+		con.state = gettitle;
+	      else if ((con.rarg >= 4 && con.rarg <= 6)
+		       || (con.rarg >=10 && con.rarg <= 19)
+		       || (con.rarg >=104 && con.rarg <= 106)
+		       || (con.rarg >=110 && con.rarg <= 119))
+		con.state = eatpalette;
+	      else
+		con.state = eattitle;
+	    }
+	  else if (*src == '\033')
+	    con.state = endpalette;
+	  else if (*src == '\007')
+	    {
+	      wpbuf.put (*src);
+	      if (wincap.has_con_24bit_colors () && !con_is_legacy)
+		wpbuf.send (get_output_handle ());
+	      wpbuf.empty ();
+	      con.state = normal;
+	      src++;
+	      break;
+	    }
 	  wpbuf.put (*src);
 	  src++;
 	  break;
