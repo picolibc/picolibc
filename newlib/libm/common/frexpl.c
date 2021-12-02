@@ -33,16 +33,42 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "local.h"
 
 /* On platforms where long double is as wide as double.  */
-#if defined(_LDBL_EQ_DBL) || (LDBL_MANT_DIG == 53 && LDBL_MAX_EXP == 1024)
+#if defined(_LDBL_EQ_DBL)
 long double
 frexpl (long double x, int *eptr)
 {
   return frexp(x, eptr);
 }
-#endif
+#else  /* !_DBL_EQ_DBL */
+# if (LDBL_MANT_DIG == 53) /* 64-bit long double */
+static const double scale = 0x1p54;
 
-#if (LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113) && LDBL_MAX_EXP == 16384
-# if (LDBL_MANT_DIG == 64) /* 80-bit long double */
+union ldbl {
+  long double x;
+  struct {
+#  ifdef __IEEE_LITTLE_ENDIAN /* for Intel CPU */
+    __uint32_t fracl;
+    __uint32_t frach:20;
+    __uint32_t exp:11;
+    __uint32_t sign:1;
+#  endif
+#  ifdef __IEEE_BIG_ENDIAN
+    __uint32_t sign:1;
+    __uint32_t exp:11;
+    __uint32_t frach:20;
+#   ifndef ___IEEE_BYTES_LITTLE_ENDIAN
+#   else /* ARMEL without __VFP_FP__ */
+    __uint32_t frach:20;
+    __uint32_t exp:11;
+    __uint32_t sign:1;
+#   endif
+    __uint32_t fracl;
+#  endif
+  } u32;
+};
+# elif (LDBL_MANT_DIG == 64) /* 80-bit long double */
+static const double scale = 0x1p65;
+
 union ldbl {
   long double x;
   struct {
@@ -68,7 +94,9 @@ union ldbl {
 #  endif
   } u32;
 };
-# else /* LDBL_MANT_DIG == 113, 128-bit long double */
+# elif (LDBL_MANT_DIG == 113) /* 128-bit long double */
+static const double scale = 0x1p114;
+
 union ldbl {
   long double x;
   struct {
@@ -96,9 +124,11 @@ union ldbl {
 #  endif
   } u32;
 };
+# else
+#  error Unsupported long double format.
 # endif
 
-static const double two114 = 0x1p114;
+static const int scale_exp = LDBL_MANT_DIG + 1;
 
 long double
 frexpl (long double x, int *eptr)
@@ -107,16 +137,16 @@ frexpl (long double x, int *eptr)
   u.x = x;
   int e = u.u32.exp;
   *eptr = 0;
-  if (e == 0x7fff || x == 0)
+  if (e == (LDBL_MAX_EXP*2 - 1) || x == 0)
     return x; /* inf,nan,0 */
   if (e == 0) /* subnormal */
     {
-      u.x *= two114;
+      u.x *= scale;
       e = u.u32.exp;
-      *eptr -= 114;
+      *eptr -= scale_exp;
     }
-  *eptr += e - 16382;
-  u.u32.exp = 0x3ffe; /* 0 */
+  *eptr += e - (LDBL_MAX_EXP - 2);
+  u.u32.exp = LDBL_MAX_EXP - 2; /* -1 */
   return u.x;
 }
-#endif /* End of 80-bit or 128-bit long double */
+#endif /* !_LDBL_EQ_DBL */
