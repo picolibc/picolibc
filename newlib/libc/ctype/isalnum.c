@@ -46,5 +46,5 @@ No OS subroutines are required.
 int
 isalnum (int c)
 {
-	return(__CTYPE_PTR[c+1] & (_ISupper|_ISlower|_ISdigit));
+	return(__CTYPE_PTR[c+1] & (_U|_L|_N));
 }

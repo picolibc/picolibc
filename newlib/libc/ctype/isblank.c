@@ -44,5 +44,5 @@ No supporting OS subroutines are required.
 int
 isblank (int c)
 {
-	return ((__CTYPE_PTR[c+1] & _ISblank) || (c == '\t'));
+	return ((__CTYPE_PTR[c+1] & _B) || (c == '\t'));
 }

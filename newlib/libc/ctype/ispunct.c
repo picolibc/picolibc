@@ -47,5 +47,5 @@ No supporting OS subroutines are required.
 int
 ispunct (int c)
 {
-	return(__CTYPE_PTR[c+1] & _ISpunct);
+	return(__CTYPE_PTR[c+1] & _P);
 }

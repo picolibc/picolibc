@@ -47,5 +47,5 @@ No supporting OS subroutines are required.
 int
 isdigit (int c)
 {
-	return(__CTYPE_PTR[c+1] & _ISdigit);
+	return(__CTYPE_PTR[c+1] & _N);
 }

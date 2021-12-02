@@ -46,5 +46,5 @@ No supporting OS subroutines are required.
 int
 isspace (int c)
 {
-	return(__CTYPE_PTR[c+1] & _ISspace);
+	return(__CTYPE_PTR[c+1] & _S);
 }

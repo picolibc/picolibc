@@ -45,5 +45,5 @@ No supporting OS subroutines are required.
 int
 islower (int c)
 {
-	return ((__CTYPE_PTR[c+1] & (_ISupper|_ISlower)) == _ISlower);
+	return ((__CTYPE_PTR[c+1] & (_U|_L)) == _L);
 }
