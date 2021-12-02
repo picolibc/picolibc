@@ -15,6 +15,11 @@
 extern GUID __cygwin_socket_guid;
 #define CYGWIN_SOCKET_GUID (&__cygwin_socket_guid)
 
+/* Status codes not known to Mingw-w64 yet.  The error code needs to
+   be maintained here as well as long as Mingw-w64 didn't follow up. */
+#define STATUS_CASE_DIFFERING_NAMES_IN_DIR	((NTSTATUS)0xC00004B3)
+#define ERROR_CASE_DIFFERING_NAMES_IN_DIR	__MSABI_LONG(424)
+
 /* Custom Cygwin-only status codes. */
 #define STATUS_THREAD_SIGNALED	((NTSTATUS)0xe0000001)
 #define STATUS_THREAD_CANCELED	((NTSTATUS)0xe0000002)

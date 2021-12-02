@@ -2547,15 +2547,7 @@ fhandler_disk_file::fs_ioc_setflags (uint64_t flags)
 					 FileCaseSensitiveInformation);
 	  if (!NT_SUCCESS (status))
 	    {
-	      /* Special case: The directory contains files which only
-		 differ in case.  NtSetInformationFile refuses to change
-		 back to case insensitivity and returns status 0xc00004b3.
-		 There's no STATUS_xyz macro assigned to that value yet,
-		 nor does it map to a useful Win32 error value. */
-	      if (status == (NTSTATUS) 0xc00004b3)
-		set_errno (EINVAL);	/* Does that make sense? */
-	      else
-		__seterrno_from_nt_status (status);
+	      __seterrno_from_nt_status (status);
 	      goto out;
 	    }
 	}
