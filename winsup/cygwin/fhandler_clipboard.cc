@@ -229,7 +229,7 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
       if (pos < (off_t) clipbuf->cb_size)
 	{
 	  ret = (len > (clipbuf->cb_size - pos)) ? clipbuf->cb_size - pos : len;
-	  memcpy (ptr, &clipbuf[1] + pos , ret);
+	  memcpy (ptr, (char *) (clipbuf + 1) + pos, ret);
 	  pos += ret;
 	}
     }
