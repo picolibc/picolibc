@@ -44,7 +44,7 @@ AC_ARG_WITH([cross-bootstrap],[AS_HELP_STRING([--with-cross-bootstrap],[do not b
 
 AC_CYGWIN_INCLUDES
 
-AC_CONFIG_HEADER(cygwin/config.h)
+AC_CONFIG_HEADERS([cygwin/config.h])
 
 AC_CHECK_TOOL(AR, ar, ar)
 AC_CHECK_TOOL(AS, as, as)
