@@ -58,7 +58,7 @@ AC_CHECK_TOOL(STRIP, strip, strip)
 AC_CHECK_TOOL(WINDRES, windres, windres)
 
 AC_ARG_ENABLE(debugging,
-[ --enable-debugging		Build a cygwin DLL which has more consistency checking for debugging],
+[AS_HELP_STRING([--enable-debugging],[Build a cygwin DLL which has more consistency checking for debugging])],
 [case "${enableval}" in
 yes)	 AC_DEFINE([DEBUGGING],[1],[Define if DEBUGGING support is requested.]) ;;
 no)	 ;;
