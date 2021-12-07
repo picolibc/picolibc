@@ -689,12 +689,16 @@ Building for 32-bit Cygwin also requires
 Building for 64-bit Cygwin also requires
 <literal>mingw64-x86_64-gcc-g++</literal> and
 <literal>mingw64-x86_64-zlib</literal>.
+</para>
+
 <!-- If you want to run the tests, <literal>dejagnu</literal> is also required. -->
-Normally, building ignores any errors in building the documentation,
-which requires the <literal>dblatex</literal>, <literal>docbook2X</literal>,
-<literal>docbook-xml45</literal>, <literal>docbook-xsl</literal>, and
-<literal>xmlto</literal> packages.  For more information on building the
-documentation, see the README included in the <literal>cygwin-doc</literal> package.
+
+<para>
+Building the documentation also requires the <literal>dblatex</literal>,
+<literal>docbook2X</literal>, <literal>docbook-xml45</literal>,
+<literal>docbook-xsl</literal>, and <literal>xmlto</literal> packages.  Building
+the documentation can be disabled with the <literal>--disable-doc</literal>
+option to <literal>configure</literal>.
 </para>
 
 <para>Next, check out the Cygwin sources from the

@@ -88,7 +88,30 @@ AC_SUBST(TLSOFFSETS_H)
 
 AM_CONDITIONAL(TARGET_X86_64, [test $target_cpu = "x86_64"])
 
-AC_CHECK_PROGS([DOCBOOK2XTEXI], [docbook2x-texi db2x_docbook2texi], [true])
+AC_ARG_ENABLE(doc,
+	      [AS_HELP_STRING([--enable-doc], [Build documentation])],,
+	      enable_doc=yes)
+AM_CONDITIONAL(BUILD_DOC, [test $enable_doc != "no"])
+
+AC_CHECK_PROGS([DOCBOOK2XTEXI], [docbook2x-texi db2x_docbook2texi])
+if test -z "$DOCBOOK2XTEXI" ; then
+    if test "x$enable_doc" != "xno"; then
+        AC_MSG_ERROR([docbook2texi is required to build documentation])
+    else
+        unset DOCBOOK2XTEXI
+        AM_MISSING_PROG([DOCBOOK2XTEXI], [docbook2texi])
+    fi
+fi
+
+AC_CHECK_PROGS([XMLTO], [xmlto])
+if test -z "$XMLTO"; then
+    if test "x$enable_doc" != "xno"; then
+        AC_MSG_ERROR([xmlto is required to build documentation])
+    else
+        unset XMLTO
+        AM_MISSING_PROG([XMLTO], [xmlto])
+    fi
+fi
 
 if test "x$with_cross_bootstrap" != "xyes"; then
     AC_CHECK_PROGS(MINGW_CXX, ${target_cpu}-w64-mingw32-g++)

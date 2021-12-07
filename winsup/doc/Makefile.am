@@ -16,7 +16,7 @@ doc_DATA = \
 
 htmldir = $(datarootdir)/doc
 
-XMLTO=xmlto --skip-validation --with-dblatex
+XMLTO=@XMLTO@ --skip-validation --with-dblatex
 DOCBOOK2XTEXI=@DOCBOOK2XTEXI@ --xinclude --info --utf8trans-map=charmap
 
 -include Makefile.dep
