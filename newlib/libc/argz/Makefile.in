@@ -70,6 +70,12 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
+AM_V_AR = $(am__v_AR_@AM_V@)
+am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
+am__v_AR_0 = @echo "  AR    " $@;
+AM_V_at = $(am__v_at_@AM_V@)
+am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
+am__v_at_0 = @
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 @ELIX_LEVEL_1_FALSE@am__objects_1 = lib_a-argz_add.$(OBJEXT) \
@@ -107,7 +113,10 @@ libargz_la_LIBADD =
 @ELIX_LEVEL_1_FALSE@	envz_strip.lo
 @USE_LIBTOOL_TRUE@am_libargz_la_OBJECTS = dummy.lo $(am__objects_2)
 libargz_la_OBJECTS = $(am_libargz_la_OBJECTS)
-libargz_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+libargz_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libargz_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_LIBTOOL_TRUE@am_libargz_la_rpath =
@@ -116,13 +125,23 @@ depcomp =
 am__depfiles_maybe =
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC    " $@;
 CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD  " $@;
+AM_V_GEN = $(am__v_GEN_@AM_V@)
+am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
+am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(lib_a_SOURCES) $(libargz_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
@@ -134,6 +153,7 @@ ETAGS = etags
 CTAGS = ctags
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
+AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
@@ -360,9 +380,9 @@ $(am__aclocal_m4_deps):
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
 lib.a: $(lib_a_OBJECTS) $(lib_a_DEPENDENCIES) $(EXTRA_lib_a_DEPENDENCIES) 
-	-rm -f lib.a
-	$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
-	$(RANLIB) lib.a
+	$(AM_V_at)-rm -f lib.a
+	$(AM_V_AR)$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
+	$(AM_V_at)$(RANLIB) lib.a
 
 clean-noinstLTLIBRARIES:
 	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
@@ -373,7 +393,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libargz.la: $(libargz_la_OBJECTS) $(libargz_la_DEPENDENCIES) $(EXTRA_libargz_la_DEPENDENCIES) 
-	$(libargz_la_LINK) $(am_libargz_la_rpath) $(libargz_la_OBJECTS) $(libargz_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(libargz_la_LINK) $(am_libargz_la_rpath) $(libargz_la_OBJECTS) $(libargz_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -382,133 +402,133 @@ distclean-compile:
 	-rm -f *.tab.c
 
 .c.o:
-	$(COMPILE) -c $<
+	$(AM_V_CC)$(COMPILE) -c $<
 
 .c.obj:
-	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+	$(AM_V_CC)$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
 .c.lo:
-	$(LTCOMPILE) -c -o $@ $<
+	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
 
 lib_a-dummy.o: dummy.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dummy.o `test -f 'dummy.c' || echo '$(srcdir)/'`dummy.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dummy.o `test -f 'dummy.c' || echo '$(srcdir)/'`dummy.c
 
 lib_a-dummy.obj: dummy.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dummy.obj `if test -f 'dummy.c'; then $(CYGPATH_W) 'dummy.c'; else $(CYGPATH_W) '$(srcdir)/dummy.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dummy.obj `if test -f 'dummy.c'; then $(CYGPATH_W) 'dummy.c'; else $(CYGPATH_W) '$(srcdir)/dummy.c'; fi`
 
 lib_a-argz_add.o: argz_add.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_add.o `test -f 'argz_add.c' || echo '$(srcdir)/'`argz_add.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_add.o `test -f 'argz_add.c' || echo '$(srcdir)/'`argz_add.c
 
 lib_a-argz_add.obj: argz_add.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_add.obj `if test -f 'argz_add.c'; then $(CYGPATH_W) 'argz_add.c'; else $(CYGPATH_W) '$(srcdir)/argz_add.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_add.obj `if test -f 'argz_add.c'; then $(CYGPATH_W) 'argz_add.c'; else $(CYGPATH_W) '$(srcdir)/argz_add.c'; fi`
 
 lib_a-argz_add_sep.o: argz_add_sep.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_add_sep.o `test -f 'argz_add_sep.c' || echo '$(srcdir)/'`argz_add_sep.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_add_sep.o `test -f 'argz_add_sep.c' || echo '$(srcdir)/'`argz_add_sep.c
 
 lib_a-argz_add_sep.obj: argz_add_sep.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_add_sep.obj `if test -f 'argz_add_sep.c'; then $(CYGPATH_W) 'argz_add_sep.c'; else $(CYGPATH_W) '$(srcdir)/argz_add_sep.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_add_sep.obj `if test -f 'argz_add_sep.c'; then $(CYGPATH_W) 'argz_add_sep.c'; else $(CYGPATH_W) '$(srcdir)/argz_add_sep.c'; fi`
 
 lib_a-argz_append.o: argz_append.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_append.o `test -f 'argz_append.c' || echo '$(srcdir)/'`argz_append.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_append.o `test -f 'argz_append.c' || echo '$(srcdir)/'`argz_append.c
 
 lib_a-argz_append.obj: argz_append.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_append.obj `if test -f 'argz_append.c'; then $(CYGPATH_W) 'argz_append.c'; else $(CYGPATH_W) '$(srcdir)/argz_append.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_append.obj `if test -f 'argz_append.c'; then $(CYGPATH_W) 'argz_append.c'; else $(CYGPATH_W) '$(srcdir)/argz_append.c'; fi`
 
 lib_a-argz_count.o: argz_count.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_count.o `test -f 'argz_count.c' || echo '$(srcdir)/'`argz_count.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_count.o `test -f 'argz_count.c' || echo '$(srcdir)/'`argz_count.c
 
 lib_a-argz_count.obj: argz_count.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_count.obj `if test -f 'argz_count.c'; then $(CYGPATH_W) 'argz_count.c'; else $(CYGPATH_W) '$(srcdir)/argz_count.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_count.obj `if test -f 'argz_count.c'; then $(CYGPATH_W) 'argz_count.c'; else $(CYGPATH_W) '$(srcdir)/argz_count.c'; fi`
 
 lib_a-argz_create.o: argz_create.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_create.o `test -f 'argz_create.c' || echo '$(srcdir)/'`argz_create.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_create.o `test -f 'argz_create.c' || echo '$(srcdir)/'`argz_create.c
 
 lib_a-argz_create.obj: argz_create.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_create.obj `if test -f 'argz_create.c'; then $(CYGPATH_W) 'argz_create.c'; else $(CYGPATH_W) '$(srcdir)/argz_create.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_create.obj `if test -f 'argz_create.c'; then $(CYGPATH_W) 'argz_create.c'; else $(CYGPATH_W) '$(srcdir)/argz_create.c'; fi`
 
 lib_a-argz_create_sep.o: argz_create_sep.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_create_sep.o `test -f 'argz_create_sep.c' || echo '$(srcdir)/'`argz_create_sep.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_create_sep.o `test -f 'argz_create_sep.c' || echo '$(srcdir)/'`argz_create_sep.c
 
 lib_a-argz_create_sep.obj: argz_create_sep.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_create_sep.obj `if test -f 'argz_create_sep.c'; then $(CYGPATH_W) 'argz_create_sep.c'; else $(CYGPATH_W) '$(srcdir)/argz_create_sep.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_create_sep.obj `if test -f 'argz_create_sep.c'; then $(CYGPATH_W) 'argz_create_sep.c'; else $(CYGPATH_W) '$(srcdir)/argz_create_sep.c'; fi`
 
 lib_a-argz_delete.o: argz_delete.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_delete.o `test -f 'argz_delete.c' || echo '$(srcdir)/'`argz_delete.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_delete.o `test -f 'argz_delete.c' || echo '$(srcdir)/'`argz_delete.c
 
 lib_a-argz_delete.obj: argz_delete.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_delete.obj `if test -f 'argz_delete.c'; then $(CYGPATH_W) 'argz_delete.c'; else $(CYGPATH_W) '$(srcdir)/argz_delete.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_delete.obj `if test -f 'argz_delete.c'; then $(CYGPATH_W) 'argz_delete.c'; else $(CYGPATH_W) '$(srcdir)/argz_delete.c'; fi`
 
 lib_a-argz_extract.o: argz_extract.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_extract.o `test -f 'argz_extract.c' || echo '$(srcdir)/'`argz_extract.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_extract.o `test -f 'argz_extract.c' || echo '$(srcdir)/'`argz_extract.c
 
 lib_a-argz_extract.obj: argz_extract.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_extract.obj `if test -f 'argz_extract.c'; then $(CYGPATH_W) 'argz_extract.c'; else $(CYGPATH_W) '$(srcdir)/argz_extract.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_extract.obj `if test -f 'argz_extract.c'; then $(CYGPATH_W) 'argz_extract.c'; else $(CYGPATH_W) '$(srcdir)/argz_extract.c'; fi`
 
 lib_a-argz_insert.o: argz_insert.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_insert.o `test -f 'argz_insert.c' || echo '$(srcdir)/'`argz_insert.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_insert.o `test -f 'argz_insert.c' || echo '$(srcdir)/'`argz_insert.c
 
 lib_a-argz_insert.obj: argz_insert.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_insert.obj `if test -f 'argz_insert.c'; then $(CYGPATH_W) 'argz_insert.c'; else $(CYGPATH_W) '$(srcdir)/argz_insert.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_insert.obj `if test -f 'argz_insert.c'; then $(CYGPATH_W) 'argz_insert.c'; else $(CYGPATH_W) '$(srcdir)/argz_insert.c'; fi`
 
 lib_a-argz_next.o: argz_next.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_next.o `test -f 'argz_next.c' || echo '$(srcdir)/'`argz_next.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_next.o `test -f 'argz_next.c' || echo '$(srcdir)/'`argz_next.c
 
 lib_a-argz_next.obj: argz_next.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_next.obj `if test -f 'argz_next.c'; then $(CYGPATH_W) 'argz_next.c'; else $(CYGPATH_W) '$(srcdir)/argz_next.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_next.obj `if test -f 'argz_next.c'; then $(CYGPATH_W) 'argz_next.c'; else $(CYGPATH_W) '$(srcdir)/argz_next.c'; fi`
 
 lib_a-argz_replace.o: argz_replace.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_replace.o `test -f 'argz_replace.c' || echo '$(srcdir)/'`argz_replace.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_replace.o `test -f 'argz_replace.c' || echo '$(srcdir)/'`argz_replace.c
 
 lib_a-argz_replace.obj: argz_replace.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_replace.obj `if test -f 'argz_replace.c'; then $(CYGPATH_W) 'argz_replace.c'; else $(CYGPATH_W) '$(srcdir)/argz_replace.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_replace.obj `if test -f 'argz_replace.c'; then $(CYGPATH_W) 'argz_replace.c'; else $(CYGPATH_W) '$(srcdir)/argz_replace.c'; fi`
 
 lib_a-argz_stringify.o: argz_stringify.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_stringify.o `test -f 'argz_stringify.c' || echo '$(srcdir)/'`argz_stringify.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_stringify.o `test -f 'argz_stringify.c' || echo '$(srcdir)/'`argz_stringify.c
 
 lib_a-argz_stringify.obj: argz_stringify.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_stringify.obj `if test -f 'argz_stringify.c'; then $(CYGPATH_W) 'argz_stringify.c'; else $(CYGPATH_W) '$(srcdir)/argz_stringify.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argz_stringify.obj `if test -f 'argz_stringify.c'; then $(CYGPATH_W) 'argz_stringify.c'; else $(CYGPATH_W) '$(srcdir)/argz_stringify.c'; fi`
 
 lib_a-buf_findstr.o: buf_findstr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-buf_findstr.o `test -f 'buf_findstr.c' || echo '$(srcdir)/'`buf_findstr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-buf_findstr.o `test -f 'buf_findstr.c' || echo '$(srcdir)/'`buf_findstr.c
 
 lib_a-buf_findstr.obj: buf_findstr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-buf_findstr.obj `if test -f 'buf_findstr.c'; then $(CYGPATH_W) 'buf_findstr.c'; else $(CYGPATH_W) '$(srcdir)/buf_findstr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-buf_findstr.obj `if test -f 'buf_findstr.c'; then $(CYGPATH_W) 'buf_findstr.c'; else $(CYGPATH_W) '$(srcdir)/buf_findstr.c'; fi`
 
 lib_a-envz_entry.o: envz_entry.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-envz_entry.o `test -f 'envz_entry.c' || echo '$(srcdir)/'`envz_entry.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-envz_entry.o `test -f 'envz_entry.c' || echo '$(srcdir)/'`envz_entry.c
 
 lib_a-envz_entry.obj: envz_entry.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-envz_entry.obj `if test -f 'envz_entry.c'; then $(CYGPATH_W) 'envz_entry.c'; else $(CYGPATH_W) '$(srcdir)/envz_entry.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-envz_entry.obj `if test -f 'envz_entry.c'; then $(CYGPATH_W) 'envz_entry.c'; else $(CYGPATH_W) '$(srcdir)/envz_entry.c'; fi`
 
 lib_a-envz_get.o: envz_get.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-envz_get.o `test -f 'envz_get.c' || echo '$(srcdir)/'`envz_get.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-envz_get.o `test -f 'envz_get.c' || echo '$(srcdir)/'`envz_get.c
 
 lib_a-envz_get.obj: envz_get.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-envz_get.obj `if test -f 'envz_get.c'; then $(CYGPATH_W) 'envz_get.c'; else $(CYGPATH_W) '$(srcdir)/envz_get.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-envz_get.obj `if test -f 'envz_get.c'; then $(CYGPATH_W) 'envz_get.c'; else $(CYGPATH_W) '$(srcdir)/envz_get.c'; fi`
 
 lib_a-envz_add.o: envz_add.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-envz_add.o `test -f 'envz_add.c' || echo '$(srcdir)/'`envz_add.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-envz_add.o `test -f 'envz_add.c' || echo '$(srcdir)/'`envz_add.c
 
 lib_a-envz_add.obj: envz_add.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-envz_add.obj `if test -f 'envz_add.c'; then $(CYGPATH_W) 'envz_add.c'; else $(CYGPATH_W) '$(srcdir)/envz_add.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-envz_add.obj `if test -f 'envz_add.c'; then $(CYGPATH_W) 'envz_add.c'; else $(CYGPATH_W) '$(srcdir)/envz_add.c'; fi`
 
 lib_a-envz_remove.o: envz_remove.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-envz_remove.o `test -f 'envz_remove.c' || echo '$(srcdir)/'`envz_remove.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-envz_remove.o `test -f 'envz_remove.c' || echo '$(srcdir)/'`envz_remove.c
 
 lib_a-envz_remove.obj: envz_remove.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-envz_remove.obj `if test -f 'envz_remove.c'; then $(CYGPATH_W) 'envz_remove.c'; else $(CYGPATH_W) '$(srcdir)/envz_remove.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-envz_remove.obj `if test -f 'envz_remove.c'; then $(CYGPATH_W) 'envz_remove.c'; else $(CYGPATH_W) '$(srcdir)/envz_remove.c'; fi`
 
 lib_a-envz_merge.o: envz_merge.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-envz_merge.o `test -f 'envz_merge.c' || echo '$(srcdir)/'`envz_merge.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-envz_merge.o `test -f 'envz_merge.c' || echo '$(srcdir)/'`envz_merge.c
 
 lib_a-envz_merge.obj: envz_merge.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-envz_merge.obj `if test -f 'envz_merge.c'; then $(CYGPATH_W) 'envz_merge.c'; else $(CYGPATH_W) '$(srcdir)/envz_merge.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-envz_merge.obj `if test -f 'envz_merge.c'; then $(CYGPATH_W) 'envz_merge.c'; else $(CYGPATH_W) '$(srcdir)/envz_merge.c'; fi`
 
 lib_a-envz_strip.o: envz_strip.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-envz_strip.o `test -f 'envz_strip.c' || echo '$(srcdir)/'`envz_strip.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-envz_strip.o `test -f 'envz_strip.c' || echo '$(srcdir)/'`envz_strip.c
 
 lib_a-envz_strip.obj: envz_strip.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-envz_strip.obj `if test -f 'envz_strip.c'; then $(CYGPATH_W) 'envz_strip.c'; else $(CYGPATH_W) '$(srcdir)/envz_strip.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-envz_strip.obj `if test -f 'envz_strip.c'; then $(CYGPATH_W) 'envz_strip.c'; else $(CYGPATH_W) '$(srcdir)/envz_strip.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

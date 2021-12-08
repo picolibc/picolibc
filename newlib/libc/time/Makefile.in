@@ -70,6 +70,12 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
+AM_V_AR = $(am__v_AR_@AM_V@)
+am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
+am__v_AR_0 = @echo "  AR    " $@;
+AM_V_at = $(am__v_at_@AM_V@)
+am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
+am__v_at_0 = @
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 am__objects_1 = lib_a-asctime.$(OBJEXT) lib_a-asctime_r.$(OBJEXT) \
@@ -94,7 +100,10 @@ am__objects_2 = asctime.lo asctime_r.lo clock.lo ctime.lo ctime_r.lo \
 	tzset_r.lo tzvars.lo wcsftime.lo
 @USE_LIBTOOL_TRUE@am_libtime_la_OBJECTS = $(am__objects_2)
 libtime_la_OBJECTS = $(am_libtime_la_OBJECTS)
-libtime_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+libtime_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libtime_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_LIBTOOL_TRUE@am_libtime_la_rpath =
@@ -103,13 +112,23 @@ depcomp =
 am__depfiles_maybe =
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC    " $@;
 CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD  " $@;
+AM_V_GEN = $(am__v_GEN_@AM_V@)
+am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
+am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(lib_a_SOURCES) $(libtime_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
@@ -121,6 +140,7 @@ ETAGS = etags
 CTAGS = ctags
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
+AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
@@ -362,9 +382,9 @@ $(am__aclocal_m4_deps):
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
 lib.a: $(lib_a_OBJECTS) $(lib_a_DEPENDENCIES) $(EXTRA_lib_a_DEPENDENCIES) 
-	-rm -f lib.a
-	$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
-	$(RANLIB) lib.a
+	$(AM_V_at)-rm -f lib.a
+	$(AM_V_AR)$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
+	$(AM_V_at)$(RANLIB) lib.a
 
 clean-noinstLTLIBRARIES:
 	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
@@ -375,7 +395,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libtime.la: $(libtime_la_OBJECTS) $(libtime_la_DEPENDENCIES) $(EXTRA_libtime_la_DEPENDENCIES) 
-	$(libtime_la_LINK) $(am_libtime_la_rpath) $(libtime_la_OBJECTS) $(libtime_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(libtime_la_LINK) $(am_libtime_la_rpath) $(libtime_la_OBJECTS) $(libtime_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -384,145 +404,145 @@ distclean-compile:
 	-rm -f *.tab.c
 
 .c.o:
-	$(COMPILE) -c $<
+	$(AM_V_CC)$(COMPILE) -c $<
 
 .c.obj:
-	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+	$(AM_V_CC)$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
 .c.lo:
-	$(LTCOMPILE) -c -o $@ $<
+	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
 
 lib_a-asctime.o: asctime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asctime.o `test -f 'asctime.c' || echo '$(srcdir)/'`asctime.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asctime.o `test -f 'asctime.c' || echo '$(srcdir)/'`asctime.c
 
 lib_a-asctime.obj: asctime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asctime.obj `if test -f 'asctime.c'; then $(CYGPATH_W) 'asctime.c'; else $(CYGPATH_W) '$(srcdir)/asctime.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asctime.obj `if test -f 'asctime.c'; then $(CYGPATH_W) 'asctime.c'; else $(CYGPATH_W) '$(srcdir)/asctime.c'; fi`
 
 lib_a-asctime_r.o: asctime_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asctime_r.o `test -f 'asctime_r.c' || echo '$(srcdir)/'`asctime_r.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asctime_r.o `test -f 'asctime_r.c' || echo '$(srcdir)/'`asctime_r.c
 
 lib_a-asctime_r.obj: asctime_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asctime_r.obj `if test -f 'asctime_r.c'; then $(CYGPATH_W) 'asctime_r.c'; else $(CYGPATH_W) '$(srcdir)/asctime_r.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asctime_r.obj `if test -f 'asctime_r.c'; then $(CYGPATH_W) 'asctime_r.c'; else $(CYGPATH_W) '$(srcdir)/asctime_r.c'; fi`
 
 lib_a-clock.o: clock.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clock.o `test -f 'clock.c' || echo '$(srcdir)/'`clock.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clock.o `test -f 'clock.c' || echo '$(srcdir)/'`clock.c
 
 lib_a-clock.obj: clock.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clock.obj `if test -f 'clock.c'; then $(CYGPATH_W) 'clock.c'; else $(CYGPATH_W) '$(srcdir)/clock.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clock.obj `if test -f 'clock.c'; then $(CYGPATH_W) 'clock.c'; else $(CYGPATH_W) '$(srcdir)/clock.c'; fi`
 
 lib_a-ctime.o: ctime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctime.o `test -f 'ctime.c' || echo '$(srcdir)/'`ctime.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctime.o `test -f 'ctime.c' || echo '$(srcdir)/'`ctime.c
 
 lib_a-ctime.obj: ctime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctime.obj `if test -f 'ctime.c'; then $(CYGPATH_W) 'ctime.c'; else $(CYGPATH_W) '$(srcdir)/ctime.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctime.obj `if test -f 'ctime.c'; then $(CYGPATH_W) 'ctime.c'; else $(CYGPATH_W) '$(srcdir)/ctime.c'; fi`
 
 lib_a-ctime_r.o: ctime_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctime_r.o `test -f 'ctime_r.c' || echo '$(srcdir)/'`ctime_r.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctime_r.o `test -f 'ctime_r.c' || echo '$(srcdir)/'`ctime_r.c
 
 lib_a-ctime_r.obj: ctime_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctime_r.obj `if test -f 'ctime_r.c'; then $(CYGPATH_W) 'ctime_r.c'; else $(CYGPATH_W) '$(srcdir)/ctime_r.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctime_r.obj `if test -f 'ctime_r.c'; then $(CYGPATH_W) 'ctime_r.c'; else $(CYGPATH_W) '$(srcdir)/ctime_r.c'; fi`
 
 lib_a-difftime.o: difftime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-difftime.o `test -f 'difftime.c' || echo '$(srcdir)/'`difftime.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-difftime.o `test -f 'difftime.c' || echo '$(srcdir)/'`difftime.c
 
 lib_a-difftime.obj: difftime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-difftime.obj `if test -f 'difftime.c'; then $(CYGPATH_W) 'difftime.c'; else $(CYGPATH_W) '$(srcdir)/difftime.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-difftime.obj `if test -f 'difftime.c'; then $(CYGPATH_W) 'difftime.c'; else $(CYGPATH_W) '$(srcdir)/difftime.c'; fi`
 
 lib_a-gettzinfo.o: gettzinfo.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gettzinfo.o `test -f 'gettzinfo.c' || echo '$(srcdir)/'`gettzinfo.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gettzinfo.o `test -f 'gettzinfo.c' || echo '$(srcdir)/'`gettzinfo.c
 
 lib_a-gettzinfo.obj: gettzinfo.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gettzinfo.obj `if test -f 'gettzinfo.c'; then $(CYGPATH_W) 'gettzinfo.c'; else $(CYGPATH_W) '$(srcdir)/gettzinfo.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gettzinfo.obj `if test -f 'gettzinfo.c'; then $(CYGPATH_W) 'gettzinfo.c'; else $(CYGPATH_W) '$(srcdir)/gettzinfo.c'; fi`
 
 lib_a-gmtime.o: gmtime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gmtime.o `test -f 'gmtime.c' || echo '$(srcdir)/'`gmtime.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gmtime.o `test -f 'gmtime.c' || echo '$(srcdir)/'`gmtime.c
 
 lib_a-gmtime.obj: gmtime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gmtime.obj `if test -f 'gmtime.c'; then $(CYGPATH_W) 'gmtime.c'; else $(CYGPATH_W) '$(srcdir)/gmtime.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gmtime.obj `if test -f 'gmtime.c'; then $(CYGPATH_W) 'gmtime.c'; else $(CYGPATH_W) '$(srcdir)/gmtime.c'; fi`
 
 lib_a-gmtime_r.o: gmtime_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gmtime_r.o `test -f 'gmtime_r.c' || echo '$(srcdir)/'`gmtime_r.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gmtime_r.o `test -f 'gmtime_r.c' || echo '$(srcdir)/'`gmtime_r.c
 
 lib_a-gmtime_r.obj: gmtime_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gmtime_r.obj `if test -f 'gmtime_r.c'; then $(CYGPATH_W) 'gmtime_r.c'; else $(CYGPATH_W) '$(srcdir)/gmtime_r.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gmtime_r.obj `if test -f 'gmtime_r.c'; then $(CYGPATH_W) 'gmtime_r.c'; else $(CYGPATH_W) '$(srcdir)/gmtime_r.c'; fi`
 
 lib_a-lcltime.o: lcltime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lcltime.o `test -f 'lcltime.c' || echo '$(srcdir)/'`lcltime.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lcltime.o `test -f 'lcltime.c' || echo '$(srcdir)/'`lcltime.c
 
 lib_a-lcltime.obj: lcltime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lcltime.obj `if test -f 'lcltime.c'; then $(CYGPATH_W) 'lcltime.c'; else $(CYGPATH_W) '$(srcdir)/lcltime.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lcltime.obj `if test -f 'lcltime.c'; then $(CYGPATH_W) 'lcltime.c'; else $(CYGPATH_W) '$(srcdir)/lcltime.c'; fi`
 
 lib_a-lcltime_r.o: lcltime_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lcltime_r.o `test -f 'lcltime_r.c' || echo '$(srcdir)/'`lcltime_r.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lcltime_r.o `test -f 'lcltime_r.c' || echo '$(srcdir)/'`lcltime_r.c
 
 lib_a-lcltime_r.obj: lcltime_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lcltime_r.obj `if test -f 'lcltime_r.c'; then $(CYGPATH_W) 'lcltime_r.c'; else $(CYGPATH_W) '$(srcdir)/lcltime_r.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lcltime_r.obj `if test -f 'lcltime_r.c'; then $(CYGPATH_W) 'lcltime_r.c'; else $(CYGPATH_W) '$(srcdir)/lcltime_r.c'; fi`
 
 lib_a-mktime.o: mktime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mktime.o `test -f 'mktime.c' || echo '$(srcdir)/'`mktime.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mktime.o `test -f 'mktime.c' || echo '$(srcdir)/'`mktime.c
 
 lib_a-mktime.obj: mktime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mktime.obj `if test -f 'mktime.c'; then $(CYGPATH_W) 'mktime.c'; else $(CYGPATH_W) '$(srcdir)/mktime.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mktime.obj `if test -f 'mktime.c'; then $(CYGPATH_W) 'mktime.c'; else $(CYGPATH_W) '$(srcdir)/mktime.c'; fi`
 
 lib_a-month_lengths.o: month_lengths.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-month_lengths.o `test -f 'month_lengths.c' || echo '$(srcdir)/'`month_lengths.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-month_lengths.o `test -f 'month_lengths.c' || echo '$(srcdir)/'`month_lengths.c
 
 lib_a-month_lengths.obj: month_lengths.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-month_lengths.obj `if test -f 'month_lengths.c'; then $(CYGPATH_W) 'month_lengths.c'; else $(CYGPATH_W) '$(srcdir)/month_lengths.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-month_lengths.obj `if test -f 'month_lengths.c'; then $(CYGPATH_W) 'month_lengths.c'; else $(CYGPATH_W) '$(srcdir)/month_lengths.c'; fi`
 
 lib_a-strftime.o: strftime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strftime.o `test -f 'strftime.c' || echo '$(srcdir)/'`strftime.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strftime.o `test -f 'strftime.c' || echo '$(srcdir)/'`strftime.c
 
 lib_a-strftime.obj: strftime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strftime.obj `if test -f 'strftime.c'; then $(CYGPATH_W) 'strftime.c'; else $(CYGPATH_W) '$(srcdir)/strftime.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strftime.obj `if test -f 'strftime.c'; then $(CYGPATH_W) 'strftime.c'; else $(CYGPATH_W) '$(srcdir)/strftime.c'; fi`
 
 lib_a-strptime.o: strptime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strptime.o `test -f 'strptime.c' || echo '$(srcdir)/'`strptime.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strptime.o `test -f 'strptime.c' || echo '$(srcdir)/'`strptime.c
 
 lib_a-strptime.obj: strptime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strptime.obj `if test -f 'strptime.c'; then $(CYGPATH_W) 'strptime.c'; else $(CYGPATH_W) '$(srcdir)/strptime.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strptime.obj `if test -f 'strptime.c'; then $(CYGPATH_W) 'strptime.c'; else $(CYGPATH_W) '$(srcdir)/strptime.c'; fi`
 
 lib_a-time.o: time.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-time.o `test -f 'time.c' || echo '$(srcdir)/'`time.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-time.o `test -f 'time.c' || echo '$(srcdir)/'`time.c
 
 lib_a-time.obj: time.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-time.obj `if test -f 'time.c'; then $(CYGPATH_W) 'time.c'; else $(CYGPATH_W) '$(srcdir)/time.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-time.obj `if test -f 'time.c'; then $(CYGPATH_W) 'time.c'; else $(CYGPATH_W) '$(srcdir)/time.c'; fi`
 
 lib_a-tzcalc_limits.o: tzcalc_limits.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzcalc_limits.o `test -f 'tzcalc_limits.c' || echo '$(srcdir)/'`tzcalc_limits.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzcalc_limits.o `test -f 'tzcalc_limits.c' || echo '$(srcdir)/'`tzcalc_limits.c
 
 lib_a-tzcalc_limits.obj: tzcalc_limits.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzcalc_limits.obj `if test -f 'tzcalc_limits.c'; then $(CYGPATH_W) 'tzcalc_limits.c'; else $(CYGPATH_W) '$(srcdir)/tzcalc_limits.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzcalc_limits.obj `if test -f 'tzcalc_limits.c'; then $(CYGPATH_W) 'tzcalc_limits.c'; else $(CYGPATH_W) '$(srcdir)/tzcalc_limits.c'; fi`
 
 lib_a-tzlock.o: tzlock.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzlock.o `test -f 'tzlock.c' || echo '$(srcdir)/'`tzlock.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzlock.o `test -f 'tzlock.c' || echo '$(srcdir)/'`tzlock.c
 
 lib_a-tzlock.obj: tzlock.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzlock.obj `if test -f 'tzlock.c'; then $(CYGPATH_W) 'tzlock.c'; else $(CYGPATH_W) '$(srcdir)/tzlock.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzlock.obj `if test -f 'tzlock.c'; then $(CYGPATH_W) 'tzlock.c'; else $(CYGPATH_W) '$(srcdir)/tzlock.c'; fi`
 
 lib_a-tzset.o: tzset.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzset.o `test -f 'tzset.c' || echo '$(srcdir)/'`tzset.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzset.o `test -f 'tzset.c' || echo '$(srcdir)/'`tzset.c
 
 lib_a-tzset.obj: tzset.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzset.obj `if test -f 'tzset.c'; then $(CYGPATH_W) 'tzset.c'; else $(CYGPATH_W) '$(srcdir)/tzset.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzset.obj `if test -f 'tzset.c'; then $(CYGPATH_W) 'tzset.c'; else $(CYGPATH_W) '$(srcdir)/tzset.c'; fi`
 
 lib_a-tzset_r.o: tzset_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzset_r.o `test -f 'tzset_r.c' || echo '$(srcdir)/'`tzset_r.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzset_r.o `test -f 'tzset_r.c' || echo '$(srcdir)/'`tzset_r.c
 
 lib_a-tzset_r.obj: tzset_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzset_r.obj `if test -f 'tzset_r.c'; then $(CYGPATH_W) 'tzset_r.c'; else $(CYGPATH_W) '$(srcdir)/tzset_r.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzset_r.obj `if test -f 'tzset_r.c'; then $(CYGPATH_W) 'tzset_r.c'; else $(CYGPATH_W) '$(srcdir)/tzset_r.c'; fi`
 
 lib_a-tzvars.o: tzvars.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzvars.o `test -f 'tzvars.c' || echo '$(srcdir)/'`tzvars.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzvars.o `test -f 'tzvars.c' || echo '$(srcdir)/'`tzvars.c
 
 lib_a-tzvars.obj: tzvars.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzvars.obj `if test -f 'tzvars.c'; then $(CYGPATH_W) 'tzvars.c'; else $(CYGPATH_W) '$(srcdir)/tzvars.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzvars.obj `if test -f 'tzvars.c'; then $(CYGPATH_W) 'tzvars.c'; else $(CYGPATH_W) '$(srcdir)/tzvars.c'; fi`
 
 lib_a-wcsftime.o: wcsftime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcsftime.o `test -f 'wcsftime.c' || echo '$(srcdir)/'`wcsftime.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcsftime.o `test -f 'wcsftime.c' || echo '$(srcdir)/'`wcsftime.c
 
 lib_a-wcsftime.obj: wcsftime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcsftime.obj `if test -f 'wcsftime.c'; then $(CYGPATH_W) 'wcsftime.c'; else $(CYGPATH_W) '$(srcdir)/wcsftime.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcsftime.obj `if test -f 'wcsftime.c'; then $(CYGPATH_W) 'wcsftime.c'; else $(CYGPATH_W) '$(srcdir)/wcsftime.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

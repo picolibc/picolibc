@@ -70,6 +70,12 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
+AM_V_AR = $(am__v_AR_@AM_V@)
+am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
+am__v_AR_0 = @echo "  AR    " $@;
+AM_V_at = $(am__v_at_@AM_V@)
+am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
+am__v_at_0 = @
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 am__objects_1 = lib_a-bsearch.$(OBJEXT) lib_a-ndbm.$(OBJEXT) \
@@ -104,7 +110,10 @@ am__objects_4 = bsearch.lo ndbm.lo qsort.lo
 @USE_LIBTOOL_TRUE@am_libsearch_la_OBJECTS = $(am__objects_4) \
 @USE_LIBTOOL_TRUE@	$(am__objects_5) $(am__objects_6)
 libsearch_la_OBJECTS = $(am_libsearch_la_OBJECTS)
-libsearch_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+libsearch_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libsearch_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_LIBTOOL_TRUE@am_libsearch_la_rpath =
@@ -113,13 +122,23 @@ depcomp =
 am__depfiles_maybe =
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC    " $@;
 CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD  " $@;
+AM_V_GEN = $(am__v_GEN_@AM_V@)
+am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
+am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(lib_a_SOURCES) $(libsearch_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
@@ -131,6 +150,7 @@ ETAGS = etags
 CTAGS = ctags
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
+AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
@@ -371,9 +391,9 @@ $(am__aclocal_m4_deps):
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
 lib.a: $(lib_a_OBJECTS) $(lib_a_DEPENDENCIES) $(EXTRA_lib_a_DEPENDENCIES) 
-	-rm -f lib.a
-	$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
-	$(RANLIB) lib.a
+	$(AM_V_at)-rm -f lib.a
+	$(AM_V_AR)$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
+	$(AM_V_at)$(RANLIB) lib.a
 
 clean-noinstLTLIBRARIES:
 	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
@@ -384,7 +404,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libsearch.la: $(libsearch_la_OBJECTS) $(libsearch_la_DEPENDENCIES) $(EXTRA_libsearch_la_DEPENDENCIES) 
-	$(libsearch_la_LINK) $(am_libsearch_la_rpath) $(libsearch_la_OBJECTS) $(libsearch_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(libsearch_la_LINK) $(am_libsearch_la_rpath) $(libsearch_la_OBJECTS) $(libsearch_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -393,121 +413,121 @@ distclean-compile:
 	-rm -f *.tab.c
 
 .c.o:
-	$(COMPILE) -c $<
+	$(AM_V_CC)$(COMPILE) -c $<
 
 .c.obj:
-	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+	$(AM_V_CC)$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
 .c.lo:
-	$(LTCOMPILE) -c -o $@ $<
+	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
 
 lib_a-bsearch.o: bsearch.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-bsearch.o `test -f 'bsearch.c' || echo '$(srcdir)/'`bsearch.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-bsearch.o `test -f 'bsearch.c' || echo '$(srcdir)/'`bsearch.c
 
 lib_a-bsearch.obj: bsearch.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-bsearch.obj `if test -f 'bsearch.c'; then $(CYGPATH_W) 'bsearch.c'; else $(CYGPATH_W) '$(srcdir)/bsearch.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-bsearch.obj `if test -f 'bsearch.c'; then $(CYGPATH_W) 'bsearch.c'; else $(CYGPATH_W) '$(srcdir)/bsearch.c'; fi`
 
 lib_a-ndbm.o: ndbm.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ndbm.o `test -f 'ndbm.c' || echo '$(srcdir)/'`ndbm.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ndbm.o `test -f 'ndbm.c' || echo '$(srcdir)/'`ndbm.c
 
 lib_a-ndbm.obj: ndbm.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ndbm.obj `if test -f 'ndbm.c'; then $(CYGPATH_W) 'ndbm.c'; else $(CYGPATH_W) '$(srcdir)/ndbm.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ndbm.obj `if test -f 'ndbm.c'; then $(CYGPATH_W) 'ndbm.c'; else $(CYGPATH_W) '$(srcdir)/ndbm.c'; fi`
 
 lib_a-qsort.o: qsort.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-qsort.o `test -f 'qsort.c' || echo '$(srcdir)/'`qsort.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-qsort.o `test -f 'qsort.c' || echo '$(srcdir)/'`qsort.c
 
 lib_a-qsort.obj: qsort.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-qsort.obj `if test -f 'qsort.c'; then $(CYGPATH_W) 'qsort.c'; else $(CYGPATH_W) '$(srcdir)/qsort.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-qsort.obj `if test -f 'qsort.c'; then $(CYGPATH_W) 'qsort.c'; else $(CYGPATH_W) '$(srcdir)/qsort.c'; fi`
 
 lib_a-hash.o: hash.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash.o `test -f 'hash.c' || echo '$(srcdir)/'`hash.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash.o `test -f 'hash.c' || echo '$(srcdir)/'`hash.c
 
 lib_a-hash.obj: hash.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash.obj `if test -f 'hash.c'; then $(CYGPATH_W) 'hash.c'; else $(CYGPATH_W) '$(srcdir)/hash.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash.obj `if test -f 'hash.c'; then $(CYGPATH_W) 'hash.c'; else $(CYGPATH_W) '$(srcdir)/hash.c'; fi`
 
 lib_a-hash_bigkey.o: hash_bigkey.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_bigkey.o `test -f 'hash_bigkey.c' || echo '$(srcdir)/'`hash_bigkey.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_bigkey.o `test -f 'hash_bigkey.c' || echo '$(srcdir)/'`hash_bigkey.c
 
 lib_a-hash_bigkey.obj: hash_bigkey.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_bigkey.obj `if test -f 'hash_bigkey.c'; then $(CYGPATH_W) 'hash_bigkey.c'; else $(CYGPATH_W) '$(srcdir)/hash_bigkey.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_bigkey.obj `if test -f 'hash_bigkey.c'; then $(CYGPATH_W) 'hash_bigkey.c'; else $(CYGPATH_W) '$(srcdir)/hash_bigkey.c'; fi`
 
 lib_a-hash_buf.o: hash_buf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_buf.o `test -f 'hash_buf.c' || echo '$(srcdir)/'`hash_buf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_buf.o `test -f 'hash_buf.c' || echo '$(srcdir)/'`hash_buf.c
 
 lib_a-hash_buf.obj: hash_buf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_buf.obj `if test -f 'hash_buf.c'; then $(CYGPATH_W) 'hash_buf.c'; else $(CYGPATH_W) '$(srcdir)/hash_buf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_buf.obj `if test -f 'hash_buf.c'; then $(CYGPATH_W) 'hash_buf.c'; else $(CYGPATH_W) '$(srcdir)/hash_buf.c'; fi`
 
 lib_a-hash_func.o: hash_func.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_func.o `test -f 'hash_func.c' || echo '$(srcdir)/'`hash_func.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_func.o `test -f 'hash_func.c' || echo '$(srcdir)/'`hash_func.c
 
 lib_a-hash_func.obj: hash_func.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_func.obj `if test -f 'hash_func.c'; then $(CYGPATH_W) 'hash_func.c'; else $(CYGPATH_W) '$(srcdir)/hash_func.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_func.obj `if test -f 'hash_func.c'; then $(CYGPATH_W) 'hash_func.c'; else $(CYGPATH_W) '$(srcdir)/hash_func.c'; fi`
 
 lib_a-hash_log2.o: hash_log2.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_log2.o `test -f 'hash_log2.c' || echo '$(srcdir)/'`hash_log2.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_log2.o `test -f 'hash_log2.c' || echo '$(srcdir)/'`hash_log2.c
 
 lib_a-hash_log2.obj: hash_log2.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_log2.obj `if test -f 'hash_log2.c'; then $(CYGPATH_W) 'hash_log2.c'; else $(CYGPATH_W) '$(srcdir)/hash_log2.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_log2.obj `if test -f 'hash_log2.c'; then $(CYGPATH_W) 'hash_log2.c'; else $(CYGPATH_W) '$(srcdir)/hash_log2.c'; fi`
 
 lib_a-hash_page.o: hash_page.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_page.o `test -f 'hash_page.c' || echo '$(srcdir)/'`hash_page.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_page.o `test -f 'hash_page.c' || echo '$(srcdir)/'`hash_page.c
 
 lib_a-hash_page.obj: hash_page.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_page.obj `if test -f 'hash_page.c'; then $(CYGPATH_W) 'hash_page.c'; else $(CYGPATH_W) '$(srcdir)/hash_page.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hash_page.obj `if test -f 'hash_page.c'; then $(CYGPATH_W) 'hash_page.c'; else $(CYGPATH_W) '$(srcdir)/hash_page.c'; fi`
 
 lib_a-hcreate.o: hcreate.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hcreate.o `test -f 'hcreate.c' || echo '$(srcdir)/'`hcreate.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hcreate.o `test -f 'hcreate.c' || echo '$(srcdir)/'`hcreate.c
 
 lib_a-hcreate.obj: hcreate.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hcreate.obj `if test -f 'hcreate.c'; then $(CYGPATH_W) 'hcreate.c'; else $(CYGPATH_W) '$(srcdir)/hcreate.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hcreate.obj `if test -f 'hcreate.c'; then $(CYGPATH_W) 'hcreate.c'; else $(CYGPATH_W) '$(srcdir)/hcreate.c'; fi`
 
 lib_a-hcreate_r.o: hcreate_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hcreate_r.o `test -f 'hcreate_r.c' || echo '$(srcdir)/'`hcreate_r.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hcreate_r.o `test -f 'hcreate_r.c' || echo '$(srcdir)/'`hcreate_r.c
 
 lib_a-hcreate_r.obj: hcreate_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hcreate_r.obj `if test -f 'hcreate_r.c'; then $(CYGPATH_W) 'hcreate_r.c'; else $(CYGPATH_W) '$(srcdir)/hcreate_r.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hcreate_r.obj `if test -f 'hcreate_r.c'; then $(CYGPATH_W) 'hcreate_r.c'; else $(CYGPATH_W) '$(srcdir)/hcreate_r.c'; fi`
 
 lib_a-tdelete.o: tdelete.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tdelete.o `test -f 'tdelete.c' || echo '$(srcdir)/'`tdelete.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tdelete.o `test -f 'tdelete.c' || echo '$(srcdir)/'`tdelete.c
 
 lib_a-tdelete.obj: tdelete.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tdelete.obj `if test -f 'tdelete.c'; then $(CYGPATH_W) 'tdelete.c'; else $(CYGPATH_W) '$(srcdir)/tdelete.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tdelete.obj `if test -f 'tdelete.c'; then $(CYGPATH_W) 'tdelete.c'; else $(CYGPATH_W) '$(srcdir)/tdelete.c'; fi`
 
 lib_a-tdestroy.o: tdestroy.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tdestroy.o `test -f 'tdestroy.c' || echo '$(srcdir)/'`tdestroy.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tdestroy.o `test -f 'tdestroy.c' || echo '$(srcdir)/'`tdestroy.c
 
 lib_a-tdestroy.obj: tdestroy.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tdestroy.obj `if test -f 'tdestroy.c'; then $(CYGPATH_W) 'tdestroy.c'; else $(CYGPATH_W) '$(srcdir)/tdestroy.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tdestroy.obj `if test -f 'tdestroy.c'; then $(CYGPATH_W) 'tdestroy.c'; else $(CYGPATH_W) '$(srcdir)/tdestroy.c'; fi`
 
 lib_a-tfind.o: tfind.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tfind.o `test -f 'tfind.c' || echo '$(srcdir)/'`tfind.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tfind.o `test -f 'tfind.c' || echo '$(srcdir)/'`tfind.c
 
 lib_a-tfind.obj: tfind.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tfind.obj `if test -f 'tfind.c'; then $(CYGPATH_W) 'tfind.c'; else $(CYGPATH_W) '$(srcdir)/tfind.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tfind.obj `if test -f 'tfind.c'; then $(CYGPATH_W) 'tfind.c'; else $(CYGPATH_W) '$(srcdir)/tfind.c'; fi`
 
 lib_a-tsearch.o: tsearch.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tsearch.o `test -f 'tsearch.c' || echo '$(srcdir)/'`tsearch.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tsearch.o `test -f 'tsearch.c' || echo '$(srcdir)/'`tsearch.c
 
 lib_a-tsearch.obj: tsearch.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tsearch.obj `if test -f 'tsearch.c'; then $(CYGPATH_W) 'tsearch.c'; else $(CYGPATH_W) '$(srcdir)/tsearch.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tsearch.obj `if test -f 'tsearch.c'; then $(CYGPATH_W) 'tsearch.c'; else $(CYGPATH_W) '$(srcdir)/tsearch.c'; fi`
 
 lib_a-twalk.o: twalk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-twalk.o `test -f 'twalk.c' || echo '$(srcdir)/'`twalk.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-twalk.o `test -f 'twalk.c' || echo '$(srcdir)/'`twalk.c
 
 lib_a-twalk.obj: twalk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-twalk.obj `if test -f 'twalk.c'; then $(CYGPATH_W) 'twalk.c'; else $(CYGPATH_W) '$(srcdir)/twalk.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-twalk.obj `if test -f 'twalk.c'; then $(CYGPATH_W) 'twalk.c'; else $(CYGPATH_W) '$(srcdir)/twalk.c'; fi`
 
 lib_a-bsd_qsort_r.o: bsd_qsort_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-bsd_qsort_r.o `test -f 'bsd_qsort_r.c' || echo '$(srcdir)/'`bsd_qsort_r.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-bsd_qsort_r.o `test -f 'bsd_qsort_r.c' || echo '$(srcdir)/'`bsd_qsort_r.c
 
 lib_a-bsd_qsort_r.obj: bsd_qsort_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-bsd_qsort_r.obj `if test -f 'bsd_qsort_r.c'; then $(CYGPATH_W) 'bsd_qsort_r.c'; else $(CYGPATH_W) '$(srcdir)/bsd_qsort_r.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-bsd_qsort_r.obj `if test -f 'bsd_qsort_r.c'; then $(CYGPATH_W) 'bsd_qsort_r.c'; else $(CYGPATH_W) '$(srcdir)/bsd_qsort_r.c'; fi`
 
 lib_a-qsort_r.o: qsort_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-qsort_r.o `test -f 'qsort_r.c' || echo '$(srcdir)/'`qsort_r.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-qsort_r.o `test -f 'qsort_r.c' || echo '$(srcdir)/'`qsort_r.c
 
 lib_a-qsort_r.obj: qsort_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-qsort_r.obj `if test -f 'qsort_r.c'; then $(CYGPATH_W) 'qsort_r.c'; else $(CYGPATH_W) '$(srcdir)/qsort_r.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-qsort_r.obj `if test -f 'qsort_r.c'; then $(CYGPATH_W) 'qsort_r.c'; else $(CYGPATH_W) '$(srcdir)/qsort_r.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

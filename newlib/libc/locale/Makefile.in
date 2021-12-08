@@ -70,6 +70,12 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
+AM_V_AR = $(am__v_AR_@AM_V@)
+am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
+am__v_AR_0 = @echo "  AR    " $@;
+AM_V_at = $(am__v_at_@AM_V@)
+am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
+am__v_at_0 = @
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 am__objects_1 = lib_a-locale.$(OBJEXT) lib_a-localeconv.$(OBJEXT)
@@ -96,7 +102,10 @@ am__objects_3 = locale.lo localeconv.lo
 @USE_LIBTOOL_TRUE@am_liblocale_la_OBJECTS = $(am__objects_3) \
 @USE_LIBTOOL_TRUE@	$(am__objects_4)
 liblocale_la_OBJECTS = $(am_liblocale_la_OBJECTS)
-liblocale_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+liblocale_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(liblocale_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_LIBTOOL_TRUE@am_liblocale_la_rpath =
@@ -105,13 +114,23 @@ depcomp =
 am__depfiles_maybe =
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC    " $@;
 CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD  " $@;
+AM_V_GEN = $(am__v_GEN_@AM_V@)
+am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
+am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(lib_a_SOURCES) $(liblocale_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
@@ -123,6 +142,7 @@ ETAGS = etags
 CTAGS = ctags
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
+AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
@@ -347,9 +367,9 @@ $(am__aclocal_m4_deps):
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
 lib.a: $(lib_a_OBJECTS) $(lib_a_DEPENDENCIES) $(EXTRA_lib_a_DEPENDENCIES) 
-	-rm -f lib.a
-	$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
-	$(RANLIB) lib.a
+	$(AM_V_at)-rm -f lib.a
+	$(AM_V_AR)$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
+	$(AM_V_at)$(RANLIB) lib.a
 
 clean-noinstLTLIBRARIES:
 	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
@@ -360,7 +380,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 liblocale.la: $(liblocale_la_OBJECTS) $(liblocale_la_DEPENDENCIES) $(EXTRA_liblocale_la_DEPENDENCIES) 
-	$(liblocale_la_LINK) $(am_liblocale_la_rpath) $(liblocale_la_OBJECTS) $(liblocale_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(liblocale_la_LINK) $(am_liblocale_la_rpath) $(liblocale_la_OBJECTS) $(liblocale_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -369,85 +389,85 @@ distclean-compile:
 	-rm -f *.tab.c
 
 .c.o:
-	$(COMPILE) -c $<
+	$(AM_V_CC)$(COMPILE) -c $<
 
 .c.obj:
-	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+	$(AM_V_CC)$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
 .c.lo:
-	$(LTCOMPILE) -c -o $@ $<
+	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
 
 lib_a-locale.o: locale.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-locale.o `test -f 'locale.c' || echo '$(srcdir)/'`locale.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-locale.o `test -f 'locale.c' || echo '$(srcdir)/'`locale.c
 
 lib_a-locale.obj: locale.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-locale.obj `if test -f 'locale.c'; then $(CYGPATH_W) 'locale.c'; else $(CYGPATH_W) '$(srcdir)/locale.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-locale.obj `if test -f 'locale.c'; then $(CYGPATH_W) 'locale.c'; else $(CYGPATH_W) '$(srcdir)/locale.c'; fi`
 
 lib_a-localeconv.o: localeconv.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-localeconv.o `test -f 'localeconv.c' || echo '$(srcdir)/'`localeconv.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-localeconv.o `test -f 'localeconv.c' || echo '$(srcdir)/'`localeconv.c
 
 lib_a-localeconv.obj: localeconv.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-localeconv.obj `if test -f 'localeconv.c'; then $(CYGPATH_W) 'localeconv.c'; else $(CYGPATH_W) '$(srcdir)/localeconv.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-localeconv.obj `if test -f 'localeconv.c'; then $(CYGPATH_W) 'localeconv.c'; else $(CYGPATH_W) '$(srcdir)/localeconv.c'; fi`
 
 lib_a-duplocale.o: duplocale.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-duplocale.o `test -f 'duplocale.c' || echo '$(srcdir)/'`duplocale.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-duplocale.o `test -f 'duplocale.c' || echo '$(srcdir)/'`duplocale.c
 
 lib_a-duplocale.obj: duplocale.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-duplocale.obj `if test -f 'duplocale.c'; then $(CYGPATH_W) 'duplocale.c'; else $(CYGPATH_W) '$(srcdir)/duplocale.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-duplocale.obj `if test -f 'duplocale.c'; then $(CYGPATH_W) 'duplocale.c'; else $(CYGPATH_W) '$(srcdir)/duplocale.c'; fi`
 
 lib_a-freelocale.o: freelocale.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-freelocale.o `test -f 'freelocale.c' || echo '$(srcdir)/'`freelocale.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-freelocale.o `test -f 'freelocale.c' || echo '$(srcdir)/'`freelocale.c
 
 lib_a-freelocale.obj: freelocale.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-freelocale.obj `if test -f 'freelocale.c'; then $(CYGPATH_W) 'freelocale.c'; else $(CYGPATH_W) '$(srcdir)/freelocale.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-freelocale.obj `if test -f 'freelocale.c'; then $(CYGPATH_W) 'freelocale.c'; else $(CYGPATH_W) '$(srcdir)/freelocale.c'; fi`
 
 lib_a-lctype.o: lctype.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lctype.o `test -f 'lctype.c' || echo '$(srcdir)/'`lctype.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lctype.o `test -f 'lctype.c' || echo '$(srcdir)/'`lctype.c
 
 lib_a-lctype.obj: lctype.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lctype.obj `if test -f 'lctype.c'; then $(CYGPATH_W) 'lctype.c'; else $(CYGPATH_W) '$(srcdir)/lctype.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lctype.obj `if test -f 'lctype.c'; then $(CYGPATH_W) 'lctype.c'; else $(CYGPATH_W) '$(srcdir)/lctype.c'; fi`
 
 lib_a-lmessages.o: lmessages.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lmessages.o `test -f 'lmessages.c' || echo '$(srcdir)/'`lmessages.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lmessages.o `test -f 'lmessages.c' || echo '$(srcdir)/'`lmessages.c
 
 lib_a-lmessages.obj: lmessages.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lmessages.obj `if test -f 'lmessages.c'; then $(CYGPATH_W) 'lmessages.c'; else $(CYGPATH_W) '$(srcdir)/lmessages.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lmessages.obj `if test -f 'lmessages.c'; then $(CYGPATH_W) 'lmessages.c'; else $(CYGPATH_W) '$(srcdir)/lmessages.c'; fi`
 
 lib_a-lnumeric.o: lnumeric.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lnumeric.o `test -f 'lnumeric.c' || echo '$(srcdir)/'`lnumeric.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lnumeric.o `test -f 'lnumeric.c' || echo '$(srcdir)/'`lnumeric.c
 
 lib_a-lnumeric.obj: lnumeric.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lnumeric.obj `if test -f 'lnumeric.c'; then $(CYGPATH_W) 'lnumeric.c'; else $(CYGPATH_W) '$(srcdir)/lnumeric.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lnumeric.obj `if test -f 'lnumeric.c'; then $(CYGPATH_W) 'lnumeric.c'; else $(CYGPATH_W) '$(srcdir)/lnumeric.c'; fi`
 
 lib_a-lmonetary.o: lmonetary.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lmonetary.o `test -f 'lmonetary.c' || echo '$(srcdir)/'`lmonetary.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lmonetary.o `test -f 'lmonetary.c' || echo '$(srcdir)/'`lmonetary.c
 
 lib_a-lmonetary.obj: lmonetary.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lmonetary.obj `if test -f 'lmonetary.c'; then $(CYGPATH_W) 'lmonetary.c'; else $(CYGPATH_W) '$(srcdir)/lmonetary.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lmonetary.obj `if test -f 'lmonetary.c'; then $(CYGPATH_W) 'lmonetary.c'; else $(CYGPATH_W) '$(srcdir)/lmonetary.c'; fi`
 
 lib_a-newlocale.o: newlocale.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-newlocale.o `test -f 'newlocale.c' || echo '$(srcdir)/'`newlocale.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-newlocale.o `test -f 'newlocale.c' || echo '$(srcdir)/'`newlocale.c
 
 lib_a-newlocale.obj: newlocale.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-newlocale.obj `if test -f 'newlocale.c'; then $(CYGPATH_W) 'newlocale.c'; else $(CYGPATH_W) '$(srcdir)/newlocale.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-newlocale.obj `if test -f 'newlocale.c'; then $(CYGPATH_W) 'newlocale.c'; else $(CYGPATH_W) '$(srcdir)/newlocale.c'; fi`
 
 lib_a-nl_langinfo.o: nl_langinfo.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-nl_langinfo.o `test -f 'nl_langinfo.c' || echo '$(srcdir)/'`nl_langinfo.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-nl_langinfo.o `test -f 'nl_langinfo.c' || echo '$(srcdir)/'`nl_langinfo.c
 
 lib_a-nl_langinfo.obj: nl_langinfo.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-nl_langinfo.obj `if test -f 'nl_langinfo.c'; then $(CYGPATH_W) 'nl_langinfo.c'; else $(CYGPATH_W) '$(srcdir)/nl_langinfo.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-nl_langinfo.obj `if test -f 'nl_langinfo.c'; then $(CYGPATH_W) 'nl_langinfo.c'; else $(CYGPATH_W) '$(srcdir)/nl_langinfo.c'; fi`
 
 lib_a-timelocal.o: timelocal.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-timelocal.o `test -f 'timelocal.c' || echo '$(srcdir)/'`timelocal.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-timelocal.o `test -f 'timelocal.c' || echo '$(srcdir)/'`timelocal.c
 
 lib_a-timelocal.obj: timelocal.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-timelocal.obj `if test -f 'timelocal.c'; then $(CYGPATH_W) 'timelocal.c'; else $(CYGPATH_W) '$(srcdir)/timelocal.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-timelocal.obj `if test -f 'timelocal.c'; then $(CYGPATH_W) 'timelocal.c'; else $(CYGPATH_W) '$(srcdir)/timelocal.c'; fi`
 
 lib_a-uselocale.o: uselocale.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-uselocale.o `test -f 'uselocale.c' || echo '$(srcdir)/'`uselocale.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-uselocale.o `test -f 'uselocale.c' || echo '$(srcdir)/'`uselocale.c
 
 lib_a-uselocale.obj: uselocale.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-uselocale.obj `if test -f 'uselocale.c'; then $(CYGPATH_W) 'uselocale.c'; else $(CYGPATH_W) '$(srcdir)/uselocale.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-uselocale.obj `if test -f 'uselocale.c'; then $(CYGPATH_W) 'uselocale.c'; else $(CYGPATH_W) '$(srcdir)/uselocale.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

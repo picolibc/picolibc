@@ -70,6 +70,12 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
+AM_V_AR = $(am__v_AR_@AM_V@)
+am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
+am__v_AR_0 = @echo "  AR    " $@;
+AM_V_at = $(am__v_at_@AM_V@)
+am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
+am__v_at_0 = @
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 am__objects_1 = lib_a-cabs.$(OBJEXT) lib_a-cacos.$(OBJEXT) \
@@ -129,7 +135,10 @@ am__objects_6 = cabsl.lo creall.lo cimagl.lo ccoshl.lo cacoshl.lo \
 @USE_LIBTOOL_TRUE@am_libcomplex_la_OBJECTS = $(am__objects_4) \
 @USE_LIBTOOL_TRUE@	$(am__objects_5) $(am__objects_6)
 libcomplex_la_OBJECTS = $(am_libcomplex_la_OBJECTS)
-libcomplex_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+libcomplex_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libcomplex_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_LIBTOOL_TRUE@am_libcomplex_la_rpath =
@@ -138,13 +147,23 @@ depcomp =
 am__depfiles_maybe =
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC    " $@;
 CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD  " $@;
+AM_V_GEN = $(am__v_GEN_@AM_V@)
+am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
+am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(lib_a_SOURCES) $(libcomplex_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
@@ -156,6 +175,7 @@ ETAGS = etags
 CTAGS = ctags
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
+AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
@@ -366,9 +386,9 @@ $(am__aclocal_m4_deps):
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
 lib.a: $(lib_a_OBJECTS) $(lib_a_DEPENDENCIES) $(EXTRA_lib_a_DEPENDENCIES) 
-	-rm -f lib.a
-	$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
-	$(RANLIB) lib.a
+	$(AM_V_at)-rm -f lib.a
+	$(AM_V_AR)$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
+	$(AM_V_at)$(RANLIB) lib.a
 
 clean-noinstLTLIBRARIES:
 	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
@@ -379,7 +399,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libcomplex.la: $(libcomplex_la_OBJECTS) $(libcomplex_la_DEPENDENCIES) $(EXTRA_libcomplex_la_DEPENDENCIES) 
-	$(libcomplex_la_LINK) $(am_libcomplex_la_rpath) $(libcomplex_la_OBJECTS) $(libcomplex_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(libcomplex_la_LINK) $(am_libcomplex_la_rpath) $(libcomplex_la_OBJECTS) $(libcomplex_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -388,439 +408,439 @@ distclean-compile:
 	-rm -f *.tab.c
 
 .c.o:
-	$(COMPILE) -c $<
+	$(AM_V_CC)$(COMPILE) -c $<
 
 .c.obj:
-	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+	$(AM_V_CC)$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
 .c.lo:
-	$(LTCOMPILE) -c -o $@ $<
+	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
 
 lib_a-cabs.o: cabs.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cabs.o `test -f 'cabs.c' || echo '$(srcdir)/'`cabs.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cabs.o `test -f 'cabs.c' || echo '$(srcdir)/'`cabs.c
 
 lib_a-cabs.obj: cabs.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cabs.obj `if test -f 'cabs.c'; then $(CYGPATH_W) 'cabs.c'; else $(CYGPATH_W) '$(srcdir)/cabs.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cabs.obj `if test -f 'cabs.c'; then $(CYGPATH_W) 'cabs.c'; else $(CYGPATH_W) '$(srcdir)/cabs.c'; fi`
 
 lib_a-cacos.o: cacos.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cacos.o `test -f 'cacos.c' || echo '$(srcdir)/'`cacos.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cacos.o `test -f 'cacos.c' || echo '$(srcdir)/'`cacos.c
 
 lib_a-cacos.obj: cacos.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cacos.obj `if test -f 'cacos.c'; then $(CYGPATH_W) 'cacos.c'; else $(CYGPATH_W) '$(srcdir)/cacos.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cacos.obj `if test -f 'cacos.c'; then $(CYGPATH_W) 'cacos.c'; else $(CYGPATH_W) '$(srcdir)/cacos.c'; fi`
 
 lib_a-cacosh.o: cacosh.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cacosh.o `test -f 'cacosh.c' || echo '$(srcdir)/'`cacosh.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cacosh.o `test -f 'cacosh.c' || echo '$(srcdir)/'`cacosh.c
 
 lib_a-cacosh.obj: cacosh.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cacosh.obj `if test -f 'cacosh.c'; then $(CYGPATH_W) 'cacosh.c'; else $(CYGPATH_W) '$(srcdir)/cacosh.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cacosh.obj `if test -f 'cacosh.c'; then $(CYGPATH_W) 'cacosh.c'; else $(CYGPATH_W) '$(srcdir)/cacosh.c'; fi`
 
 lib_a-carg.o: carg.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-carg.o `test -f 'carg.c' || echo '$(srcdir)/'`carg.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-carg.o `test -f 'carg.c' || echo '$(srcdir)/'`carg.c
 
 lib_a-carg.obj: carg.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-carg.obj `if test -f 'carg.c'; then $(CYGPATH_W) 'carg.c'; else $(CYGPATH_W) '$(srcdir)/carg.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-carg.obj `if test -f 'carg.c'; then $(CYGPATH_W) 'carg.c'; else $(CYGPATH_W) '$(srcdir)/carg.c'; fi`
 
 lib_a-casin.o: casin.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-casin.o `test -f 'casin.c' || echo '$(srcdir)/'`casin.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-casin.o `test -f 'casin.c' || echo '$(srcdir)/'`casin.c
 
 lib_a-casin.obj: casin.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-casin.obj `if test -f 'casin.c'; then $(CYGPATH_W) 'casin.c'; else $(CYGPATH_W) '$(srcdir)/casin.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-casin.obj `if test -f 'casin.c'; then $(CYGPATH_W) 'casin.c'; else $(CYGPATH_W) '$(srcdir)/casin.c'; fi`
 
 lib_a-casinh.o: casinh.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-casinh.o `test -f 'casinh.c' || echo '$(srcdir)/'`casinh.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-casinh.o `test -f 'casinh.c' || echo '$(srcdir)/'`casinh.c
 
 lib_a-casinh.obj: casinh.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-casinh.obj `if test -f 'casinh.c'; then $(CYGPATH_W) 'casinh.c'; else $(CYGPATH_W) '$(srcdir)/casinh.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-casinh.obj `if test -f 'casinh.c'; then $(CYGPATH_W) 'casinh.c'; else $(CYGPATH_W) '$(srcdir)/casinh.c'; fi`
 
 lib_a-catan.o: catan.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catan.o `test -f 'catan.c' || echo '$(srcdir)/'`catan.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catan.o `test -f 'catan.c' || echo '$(srcdir)/'`catan.c
 
 lib_a-catan.obj: catan.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catan.obj `if test -f 'catan.c'; then $(CYGPATH_W) 'catan.c'; else $(CYGPATH_W) '$(srcdir)/catan.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catan.obj `if test -f 'catan.c'; then $(CYGPATH_W) 'catan.c'; else $(CYGPATH_W) '$(srcdir)/catan.c'; fi`
 
 lib_a-catanh.o: catanh.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catanh.o `test -f 'catanh.c' || echo '$(srcdir)/'`catanh.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catanh.o `test -f 'catanh.c' || echo '$(srcdir)/'`catanh.c
 
 lib_a-catanh.obj: catanh.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catanh.obj `if test -f 'catanh.c'; then $(CYGPATH_W) 'catanh.c'; else $(CYGPATH_W) '$(srcdir)/catanh.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catanh.obj `if test -f 'catanh.c'; then $(CYGPATH_W) 'catanh.c'; else $(CYGPATH_W) '$(srcdir)/catanh.c'; fi`
 
 lib_a-ccos.o: ccos.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ccos.o `test -f 'ccos.c' || echo '$(srcdir)/'`ccos.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ccos.o `test -f 'ccos.c' || echo '$(srcdir)/'`ccos.c
 
 lib_a-ccos.obj: ccos.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ccos.obj `if test -f 'ccos.c'; then $(CYGPATH_W) 'ccos.c'; else $(CYGPATH_W) '$(srcdir)/ccos.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ccos.obj `if test -f 'ccos.c'; then $(CYGPATH_W) 'ccos.c'; else $(CYGPATH_W) '$(srcdir)/ccos.c'; fi`
 
 lib_a-ccosh.o: ccosh.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ccosh.o `test -f 'ccosh.c' || echo '$(srcdir)/'`ccosh.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ccosh.o `test -f 'ccosh.c' || echo '$(srcdir)/'`ccosh.c
 
 lib_a-ccosh.obj: ccosh.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ccosh.obj `if test -f 'ccosh.c'; then $(CYGPATH_W) 'ccosh.c'; else $(CYGPATH_W) '$(srcdir)/ccosh.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ccosh.obj `if test -f 'ccosh.c'; then $(CYGPATH_W) 'ccosh.c'; else $(CYGPATH_W) '$(srcdir)/ccosh.c'; fi`
 
 lib_a-cephes_subr.o: cephes_subr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cephes_subr.o `test -f 'cephes_subr.c' || echo '$(srcdir)/'`cephes_subr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cephes_subr.o `test -f 'cephes_subr.c' || echo '$(srcdir)/'`cephes_subr.c
 
 lib_a-cephes_subr.obj: cephes_subr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cephes_subr.obj `if test -f 'cephes_subr.c'; then $(CYGPATH_W) 'cephes_subr.c'; else $(CYGPATH_W) '$(srcdir)/cephes_subr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cephes_subr.obj `if test -f 'cephes_subr.c'; then $(CYGPATH_W) 'cephes_subr.c'; else $(CYGPATH_W) '$(srcdir)/cephes_subr.c'; fi`
 
 lib_a-cexp.o: cexp.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cexp.o `test -f 'cexp.c' || echo '$(srcdir)/'`cexp.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cexp.o `test -f 'cexp.c' || echo '$(srcdir)/'`cexp.c
 
 lib_a-cexp.obj: cexp.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cexp.obj `if test -f 'cexp.c'; then $(CYGPATH_W) 'cexp.c'; else $(CYGPATH_W) '$(srcdir)/cexp.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cexp.obj `if test -f 'cexp.c'; then $(CYGPATH_W) 'cexp.c'; else $(CYGPATH_W) '$(srcdir)/cexp.c'; fi`
 
 lib_a-cimag.o: cimag.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cimag.o `test -f 'cimag.c' || echo '$(srcdir)/'`cimag.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cimag.o `test -f 'cimag.c' || echo '$(srcdir)/'`cimag.c
 
 lib_a-cimag.obj: cimag.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cimag.obj `if test -f 'cimag.c'; then $(CYGPATH_W) 'cimag.c'; else $(CYGPATH_W) '$(srcdir)/cimag.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cimag.obj `if test -f 'cimag.c'; then $(CYGPATH_W) 'cimag.c'; else $(CYGPATH_W) '$(srcdir)/cimag.c'; fi`
 
 lib_a-clog.o: clog.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clog.o `test -f 'clog.c' || echo '$(srcdir)/'`clog.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clog.o `test -f 'clog.c' || echo '$(srcdir)/'`clog.c
 
 lib_a-clog.obj: clog.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clog.obj `if test -f 'clog.c'; then $(CYGPATH_W) 'clog.c'; else $(CYGPATH_W) '$(srcdir)/clog.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clog.obj `if test -f 'clog.c'; then $(CYGPATH_W) 'clog.c'; else $(CYGPATH_W) '$(srcdir)/clog.c'; fi`
 
 lib_a-clog10.o: clog10.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clog10.o `test -f 'clog10.c' || echo '$(srcdir)/'`clog10.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clog10.o `test -f 'clog10.c' || echo '$(srcdir)/'`clog10.c
 
 lib_a-clog10.obj: clog10.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clog10.obj `if test -f 'clog10.c'; then $(CYGPATH_W) 'clog10.c'; else $(CYGPATH_W) '$(srcdir)/clog10.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clog10.obj `if test -f 'clog10.c'; then $(CYGPATH_W) 'clog10.c'; else $(CYGPATH_W) '$(srcdir)/clog10.c'; fi`
 
 lib_a-conj.o: conj.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-conj.o `test -f 'conj.c' || echo '$(srcdir)/'`conj.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-conj.o `test -f 'conj.c' || echo '$(srcdir)/'`conj.c
 
 lib_a-conj.obj: conj.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-conj.obj `if test -f 'conj.c'; then $(CYGPATH_W) 'conj.c'; else $(CYGPATH_W) '$(srcdir)/conj.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-conj.obj `if test -f 'conj.c'; then $(CYGPATH_W) 'conj.c'; else $(CYGPATH_W) '$(srcdir)/conj.c'; fi`
 
 lib_a-cpow.o: cpow.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cpow.o `test -f 'cpow.c' || echo '$(srcdir)/'`cpow.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cpow.o `test -f 'cpow.c' || echo '$(srcdir)/'`cpow.c
 
 lib_a-cpow.obj: cpow.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cpow.obj `if test -f 'cpow.c'; then $(CYGPATH_W) 'cpow.c'; else $(CYGPATH_W) '$(srcdir)/cpow.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cpow.obj `if test -f 'cpow.c'; then $(CYGPATH_W) 'cpow.c'; else $(CYGPATH_W) '$(srcdir)/cpow.c'; fi`
 
 lib_a-cproj.o: cproj.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cproj.o `test -f 'cproj.c' || echo '$(srcdir)/'`cproj.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cproj.o `test -f 'cproj.c' || echo '$(srcdir)/'`cproj.c
 
 lib_a-cproj.obj: cproj.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cproj.obj `if test -f 'cproj.c'; then $(CYGPATH_W) 'cproj.c'; else $(CYGPATH_W) '$(srcdir)/cproj.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cproj.obj `if test -f 'cproj.c'; then $(CYGPATH_W) 'cproj.c'; else $(CYGPATH_W) '$(srcdir)/cproj.c'; fi`
 
 lib_a-creal.o: creal.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-creal.o `test -f 'creal.c' || echo '$(srcdir)/'`creal.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-creal.o `test -f 'creal.c' || echo '$(srcdir)/'`creal.c
 
 lib_a-creal.obj: creal.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-creal.obj `if test -f 'creal.c'; then $(CYGPATH_W) 'creal.c'; else $(CYGPATH_W) '$(srcdir)/creal.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-creal.obj `if test -f 'creal.c'; then $(CYGPATH_W) 'creal.c'; else $(CYGPATH_W) '$(srcdir)/creal.c'; fi`
 
 lib_a-csin.o: csin.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csin.o `test -f 'csin.c' || echo '$(srcdir)/'`csin.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csin.o `test -f 'csin.c' || echo '$(srcdir)/'`csin.c
 
 lib_a-csin.obj: csin.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csin.obj `if test -f 'csin.c'; then $(CYGPATH_W) 'csin.c'; else $(CYGPATH_W) '$(srcdir)/csin.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csin.obj `if test -f 'csin.c'; then $(CYGPATH_W) 'csin.c'; else $(CYGPATH_W) '$(srcdir)/csin.c'; fi`
 
 lib_a-csinh.o: csinh.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csinh.o `test -f 'csinh.c' || echo '$(srcdir)/'`csinh.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csinh.o `test -f 'csinh.c' || echo '$(srcdir)/'`csinh.c
 
 lib_a-csinh.obj: csinh.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csinh.obj `if test -f 'csinh.c'; then $(CYGPATH_W) 'csinh.c'; else $(CYGPATH_W) '$(srcdir)/csinh.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csinh.obj `if test -f 'csinh.c'; then $(CYGPATH_W) 'csinh.c'; else $(CYGPATH_W) '$(srcdir)/csinh.c'; fi`
 
 lib_a-csqrt.o: csqrt.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csqrt.o `test -f 'csqrt.c' || echo '$(srcdir)/'`csqrt.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csqrt.o `test -f 'csqrt.c' || echo '$(srcdir)/'`csqrt.c
 
 lib_a-csqrt.obj: csqrt.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csqrt.obj `if test -f 'csqrt.c'; then $(CYGPATH_W) 'csqrt.c'; else $(CYGPATH_W) '$(srcdir)/csqrt.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csqrt.obj `if test -f 'csqrt.c'; then $(CYGPATH_W) 'csqrt.c'; else $(CYGPATH_W) '$(srcdir)/csqrt.c'; fi`
 
 lib_a-ctan.o: ctan.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctan.o `test -f 'ctan.c' || echo '$(srcdir)/'`ctan.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctan.o `test -f 'ctan.c' || echo '$(srcdir)/'`ctan.c
 
 lib_a-ctan.obj: ctan.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctan.obj `if test -f 'ctan.c'; then $(CYGPATH_W) 'ctan.c'; else $(CYGPATH_W) '$(srcdir)/ctan.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctan.obj `if test -f 'ctan.c'; then $(CYGPATH_W) 'ctan.c'; else $(CYGPATH_W) '$(srcdir)/ctan.c'; fi`
 
 lib_a-ctanh.o: ctanh.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctanh.o `test -f 'ctanh.c' || echo '$(srcdir)/'`ctanh.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctanh.o `test -f 'ctanh.c' || echo '$(srcdir)/'`ctanh.c
 
 lib_a-ctanh.obj: ctanh.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctanh.obj `if test -f 'ctanh.c'; then $(CYGPATH_W) 'ctanh.c'; else $(CYGPATH_W) '$(srcdir)/ctanh.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctanh.obj `if test -f 'ctanh.c'; then $(CYGPATH_W) 'ctanh.c'; else $(CYGPATH_W) '$(srcdir)/ctanh.c'; fi`
 
 lib_a-cabsf.o: cabsf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cabsf.o `test -f 'cabsf.c' || echo '$(srcdir)/'`cabsf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cabsf.o `test -f 'cabsf.c' || echo '$(srcdir)/'`cabsf.c
 
 lib_a-cabsf.obj: cabsf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cabsf.obj `if test -f 'cabsf.c'; then $(CYGPATH_W) 'cabsf.c'; else $(CYGPATH_W) '$(srcdir)/cabsf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cabsf.obj `if test -f 'cabsf.c'; then $(CYGPATH_W) 'cabsf.c'; else $(CYGPATH_W) '$(srcdir)/cabsf.c'; fi`
 
 lib_a-casinf.o: casinf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-casinf.o `test -f 'casinf.c' || echo '$(srcdir)/'`casinf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-casinf.o `test -f 'casinf.c' || echo '$(srcdir)/'`casinf.c
 
 lib_a-casinf.obj: casinf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-casinf.obj `if test -f 'casinf.c'; then $(CYGPATH_W) 'casinf.c'; else $(CYGPATH_W) '$(srcdir)/casinf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-casinf.obj `if test -f 'casinf.c'; then $(CYGPATH_W) 'casinf.c'; else $(CYGPATH_W) '$(srcdir)/casinf.c'; fi`
 
 lib_a-ccosf.o: ccosf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ccosf.o `test -f 'ccosf.c' || echo '$(srcdir)/'`ccosf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ccosf.o `test -f 'ccosf.c' || echo '$(srcdir)/'`ccosf.c
 
 lib_a-ccosf.obj: ccosf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ccosf.obj `if test -f 'ccosf.c'; then $(CYGPATH_W) 'ccosf.c'; else $(CYGPATH_W) '$(srcdir)/ccosf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ccosf.obj `if test -f 'ccosf.c'; then $(CYGPATH_W) 'ccosf.c'; else $(CYGPATH_W) '$(srcdir)/ccosf.c'; fi`
 
 lib_a-cimagf.o: cimagf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cimagf.o `test -f 'cimagf.c' || echo '$(srcdir)/'`cimagf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cimagf.o `test -f 'cimagf.c' || echo '$(srcdir)/'`cimagf.c
 
 lib_a-cimagf.obj: cimagf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cimagf.obj `if test -f 'cimagf.c'; then $(CYGPATH_W) 'cimagf.c'; else $(CYGPATH_W) '$(srcdir)/cimagf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cimagf.obj `if test -f 'cimagf.c'; then $(CYGPATH_W) 'cimagf.c'; else $(CYGPATH_W) '$(srcdir)/cimagf.c'; fi`
 
 lib_a-cprojf.o: cprojf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cprojf.o `test -f 'cprojf.c' || echo '$(srcdir)/'`cprojf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cprojf.o `test -f 'cprojf.c' || echo '$(srcdir)/'`cprojf.c
 
 lib_a-cprojf.obj: cprojf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cprojf.obj `if test -f 'cprojf.c'; then $(CYGPATH_W) 'cprojf.c'; else $(CYGPATH_W) '$(srcdir)/cprojf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cprojf.obj `if test -f 'cprojf.c'; then $(CYGPATH_W) 'cprojf.c'; else $(CYGPATH_W) '$(srcdir)/cprojf.c'; fi`
 
 lib_a-csqrtf.o: csqrtf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csqrtf.o `test -f 'csqrtf.c' || echo '$(srcdir)/'`csqrtf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csqrtf.o `test -f 'csqrtf.c' || echo '$(srcdir)/'`csqrtf.c
 
 lib_a-csqrtf.obj: csqrtf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csqrtf.obj `if test -f 'csqrtf.c'; then $(CYGPATH_W) 'csqrtf.c'; else $(CYGPATH_W) '$(srcdir)/csqrtf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csqrtf.obj `if test -f 'csqrtf.c'; then $(CYGPATH_W) 'csqrtf.c'; else $(CYGPATH_W) '$(srcdir)/csqrtf.c'; fi`
 
 lib_a-cacosf.o: cacosf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cacosf.o `test -f 'cacosf.c' || echo '$(srcdir)/'`cacosf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cacosf.o `test -f 'cacosf.c' || echo '$(srcdir)/'`cacosf.c
 
 lib_a-cacosf.obj: cacosf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cacosf.obj `if test -f 'cacosf.c'; then $(CYGPATH_W) 'cacosf.c'; else $(CYGPATH_W) '$(srcdir)/cacosf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cacosf.obj `if test -f 'cacosf.c'; then $(CYGPATH_W) 'cacosf.c'; else $(CYGPATH_W) '$(srcdir)/cacosf.c'; fi`
 
 lib_a-casinhf.o: casinhf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-casinhf.o `test -f 'casinhf.c' || echo '$(srcdir)/'`casinhf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-casinhf.o `test -f 'casinhf.c' || echo '$(srcdir)/'`casinhf.c
 
 lib_a-casinhf.obj: casinhf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-casinhf.obj `if test -f 'casinhf.c'; then $(CYGPATH_W) 'casinhf.c'; else $(CYGPATH_W) '$(srcdir)/casinhf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-casinhf.obj `if test -f 'casinhf.c'; then $(CYGPATH_W) 'casinhf.c'; else $(CYGPATH_W) '$(srcdir)/casinhf.c'; fi`
 
 lib_a-ccoshf.o: ccoshf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ccoshf.o `test -f 'ccoshf.c' || echo '$(srcdir)/'`ccoshf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ccoshf.o `test -f 'ccoshf.c' || echo '$(srcdir)/'`ccoshf.c
 
 lib_a-ccoshf.obj: ccoshf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ccoshf.obj `if test -f 'ccoshf.c'; then $(CYGPATH_W) 'ccoshf.c'; else $(CYGPATH_W) '$(srcdir)/ccoshf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ccoshf.obj `if test -f 'ccoshf.c'; then $(CYGPATH_W) 'ccoshf.c'; else $(CYGPATH_W) '$(srcdir)/ccoshf.c'; fi`
 
 lib_a-clogf.o: clogf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clogf.o `test -f 'clogf.c' || echo '$(srcdir)/'`clogf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clogf.o `test -f 'clogf.c' || echo '$(srcdir)/'`clogf.c
 
 lib_a-clogf.obj: clogf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clogf.obj `if test -f 'clogf.c'; then $(CYGPATH_W) 'clogf.c'; else $(CYGPATH_W) '$(srcdir)/clogf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clogf.obj `if test -f 'clogf.c'; then $(CYGPATH_W) 'clogf.c'; else $(CYGPATH_W) '$(srcdir)/clogf.c'; fi`
 
 lib_a-clog10f.o: clog10f.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clog10f.o `test -f 'clog10f.c' || echo '$(srcdir)/'`clog10f.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clog10f.o `test -f 'clog10f.c' || echo '$(srcdir)/'`clog10f.c
 
 lib_a-clog10f.obj: clog10f.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clog10f.obj `if test -f 'clog10f.c'; then $(CYGPATH_W) 'clog10f.c'; else $(CYGPATH_W) '$(srcdir)/clog10f.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clog10f.obj `if test -f 'clog10f.c'; then $(CYGPATH_W) 'clog10f.c'; else $(CYGPATH_W) '$(srcdir)/clog10f.c'; fi`
 
 lib_a-crealf.o: crealf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-crealf.o `test -f 'crealf.c' || echo '$(srcdir)/'`crealf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-crealf.o `test -f 'crealf.c' || echo '$(srcdir)/'`crealf.c
 
 lib_a-crealf.obj: crealf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-crealf.obj `if test -f 'crealf.c'; then $(CYGPATH_W) 'crealf.c'; else $(CYGPATH_W) '$(srcdir)/crealf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-crealf.obj `if test -f 'crealf.c'; then $(CYGPATH_W) 'crealf.c'; else $(CYGPATH_W) '$(srcdir)/crealf.c'; fi`
 
 lib_a-ctanf.o: ctanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctanf.o `test -f 'ctanf.c' || echo '$(srcdir)/'`ctanf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctanf.o `test -f 'ctanf.c' || echo '$(srcdir)/'`ctanf.c
 
 lib_a-ctanf.obj: ctanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctanf.obj `if test -f 'ctanf.c'; then $(CYGPATH_W) 'ctanf.c'; else $(CYGPATH_W) '$(srcdir)/ctanf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctanf.obj `if test -f 'ctanf.c'; then $(CYGPATH_W) 'ctanf.c'; else $(CYGPATH_W) '$(srcdir)/ctanf.c'; fi`
 
 lib_a-cacoshf.o: cacoshf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cacoshf.o `test -f 'cacoshf.c' || echo '$(srcdir)/'`cacoshf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cacoshf.o `test -f 'cacoshf.c' || echo '$(srcdir)/'`cacoshf.c
 
 lib_a-cacoshf.obj: cacoshf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cacoshf.obj `if test -f 'cacoshf.c'; then $(CYGPATH_W) 'cacoshf.c'; else $(CYGPATH_W) '$(srcdir)/cacoshf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cacoshf.obj `if test -f 'cacoshf.c'; then $(CYGPATH_W) 'cacoshf.c'; else $(CYGPATH_W) '$(srcdir)/cacoshf.c'; fi`
 
 lib_a-catanf.o: catanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catanf.o `test -f 'catanf.c' || echo '$(srcdir)/'`catanf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catanf.o `test -f 'catanf.c' || echo '$(srcdir)/'`catanf.c
 
 lib_a-catanf.obj: catanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catanf.obj `if test -f 'catanf.c'; then $(CYGPATH_W) 'catanf.c'; else $(CYGPATH_W) '$(srcdir)/catanf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catanf.obj `if test -f 'catanf.c'; then $(CYGPATH_W) 'catanf.c'; else $(CYGPATH_W) '$(srcdir)/catanf.c'; fi`
 
 lib_a-cephes_subrf.o: cephes_subrf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cephes_subrf.o `test -f 'cephes_subrf.c' || echo '$(srcdir)/'`cephes_subrf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cephes_subrf.o `test -f 'cephes_subrf.c' || echo '$(srcdir)/'`cephes_subrf.c
 
 lib_a-cephes_subrf.obj: cephes_subrf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cephes_subrf.obj `if test -f 'cephes_subrf.c'; then $(CYGPATH_W) 'cephes_subrf.c'; else $(CYGPATH_W) '$(srcdir)/cephes_subrf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cephes_subrf.obj `if test -f 'cephes_subrf.c'; then $(CYGPATH_W) 'cephes_subrf.c'; else $(CYGPATH_W) '$(srcdir)/cephes_subrf.c'; fi`
 
 lib_a-conjf.o: conjf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-conjf.o `test -f 'conjf.c' || echo '$(srcdir)/'`conjf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-conjf.o `test -f 'conjf.c' || echo '$(srcdir)/'`conjf.c
 
 lib_a-conjf.obj: conjf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-conjf.obj `if test -f 'conjf.c'; then $(CYGPATH_W) 'conjf.c'; else $(CYGPATH_W) '$(srcdir)/conjf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-conjf.obj `if test -f 'conjf.c'; then $(CYGPATH_W) 'conjf.c'; else $(CYGPATH_W) '$(srcdir)/conjf.c'; fi`
 
 lib_a-csinf.o: csinf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csinf.o `test -f 'csinf.c' || echo '$(srcdir)/'`csinf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csinf.o `test -f 'csinf.c' || echo '$(srcdir)/'`csinf.c
 
 lib_a-csinf.obj: csinf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csinf.obj `if test -f 'csinf.c'; then $(CYGPATH_W) 'csinf.c'; else $(CYGPATH_W) '$(srcdir)/csinf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csinf.obj `if test -f 'csinf.c'; then $(CYGPATH_W) 'csinf.c'; else $(CYGPATH_W) '$(srcdir)/csinf.c'; fi`
 
 lib_a-ctanhf.o: ctanhf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctanhf.o `test -f 'ctanhf.c' || echo '$(srcdir)/'`ctanhf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctanhf.o `test -f 'ctanhf.c' || echo '$(srcdir)/'`ctanhf.c
 
 lib_a-ctanhf.obj: ctanhf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctanhf.obj `if test -f 'ctanhf.c'; then $(CYGPATH_W) 'ctanhf.c'; else $(CYGPATH_W) '$(srcdir)/ctanhf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctanhf.obj `if test -f 'ctanhf.c'; then $(CYGPATH_W) 'ctanhf.c'; else $(CYGPATH_W) '$(srcdir)/ctanhf.c'; fi`
 
 lib_a-cargf.o: cargf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cargf.o `test -f 'cargf.c' || echo '$(srcdir)/'`cargf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cargf.o `test -f 'cargf.c' || echo '$(srcdir)/'`cargf.c
 
 lib_a-cargf.obj: cargf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cargf.obj `if test -f 'cargf.c'; then $(CYGPATH_W) 'cargf.c'; else $(CYGPATH_W) '$(srcdir)/cargf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cargf.obj `if test -f 'cargf.c'; then $(CYGPATH_W) 'cargf.c'; else $(CYGPATH_W) '$(srcdir)/cargf.c'; fi`
 
 lib_a-catanhf.o: catanhf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catanhf.o `test -f 'catanhf.c' || echo '$(srcdir)/'`catanhf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catanhf.o `test -f 'catanhf.c' || echo '$(srcdir)/'`catanhf.c
 
 lib_a-catanhf.obj: catanhf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catanhf.obj `if test -f 'catanhf.c'; then $(CYGPATH_W) 'catanhf.c'; else $(CYGPATH_W) '$(srcdir)/catanhf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catanhf.obj `if test -f 'catanhf.c'; then $(CYGPATH_W) 'catanhf.c'; else $(CYGPATH_W) '$(srcdir)/catanhf.c'; fi`
 
 lib_a-cexpf.o: cexpf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cexpf.o `test -f 'cexpf.c' || echo '$(srcdir)/'`cexpf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cexpf.o `test -f 'cexpf.c' || echo '$(srcdir)/'`cexpf.c
 
 lib_a-cexpf.obj: cexpf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cexpf.obj `if test -f 'cexpf.c'; then $(CYGPATH_W) 'cexpf.c'; else $(CYGPATH_W) '$(srcdir)/cexpf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cexpf.obj `if test -f 'cexpf.c'; then $(CYGPATH_W) 'cexpf.c'; else $(CYGPATH_W) '$(srcdir)/cexpf.c'; fi`
 
 lib_a-cpowf.o: cpowf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cpowf.o `test -f 'cpowf.c' || echo '$(srcdir)/'`cpowf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cpowf.o `test -f 'cpowf.c' || echo '$(srcdir)/'`cpowf.c
 
 lib_a-cpowf.obj: cpowf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cpowf.obj `if test -f 'cpowf.c'; then $(CYGPATH_W) 'cpowf.c'; else $(CYGPATH_W) '$(srcdir)/cpowf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cpowf.obj `if test -f 'cpowf.c'; then $(CYGPATH_W) 'cpowf.c'; else $(CYGPATH_W) '$(srcdir)/cpowf.c'; fi`
 
 lib_a-csinhf.o: csinhf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csinhf.o `test -f 'csinhf.c' || echo '$(srcdir)/'`csinhf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csinhf.o `test -f 'csinhf.c' || echo '$(srcdir)/'`csinhf.c
 
 lib_a-csinhf.obj: csinhf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csinhf.obj `if test -f 'csinhf.c'; then $(CYGPATH_W) 'csinhf.c'; else $(CYGPATH_W) '$(srcdir)/csinhf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csinhf.obj `if test -f 'csinhf.c'; then $(CYGPATH_W) 'csinhf.c'; else $(CYGPATH_W) '$(srcdir)/csinhf.c'; fi`
 
 lib_a-cabsl.o: cabsl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cabsl.o `test -f 'cabsl.c' || echo '$(srcdir)/'`cabsl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cabsl.o `test -f 'cabsl.c' || echo '$(srcdir)/'`cabsl.c
 
 lib_a-cabsl.obj: cabsl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cabsl.obj `if test -f 'cabsl.c'; then $(CYGPATH_W) 'cabsl.c'; else $(CYGPATH_W) '$(srcdir)/cabsl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cabsl.obj `if test -f 'cabsl.c'; then $(CYGPATH_W) 'cabsl.c'; else $(CYGPATH_W) '$(srcdir)/cabsl.c'; fi`
 
 lib_a-creall.o: creall.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-creall.o `test -f 'creall.c' || echo '$(srcdir)/'`creall.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-creall.o `test -f 'creall.c' || echo '$(srcdir)/'`creall.c
 
 lib_a-creall.obj: creall.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-creall.obj `if test -f 'creall.c'; then $(CYGPATH_W) 'creall.c'; else $(CYGPATH_W) '$(srcdir)/creall.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-creall.obj `if test -f 'creall.c'; then $(CYGPATH_W) 'creall.c'; else $(CYGPATH_W) '$(srcdir)/creall.c'; fi`
 
 lib_a-cimagl.o: cimagl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cimagl.o `test -f 'cimagl.c' || echo '$(srcdir)/'`cimagl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cimagl.o `test -f 'cimagl.c' || echo '$(srcdir)/'`cimagl.c
 
 lib_a-cimagl.obj: cimagl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cimagl.obj `if test -f 'cimagl.c'; then $(CYGPATH_W) 'cimagl.c'; else $(CYGPATH_W) '$(srcdir)/cimagl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cimagl.obj `if test -f 'cimagl.c'; then $(CYGPATH_W) 'cimagl.c'; else $(CYGPATH_W) '$(srcdir)/cimagl.c'; fi`
 
 lib_a-ccoshl.o: ccoshl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ccoshl.o `test -f 'ccoshl.c' || echo '$(srcdir)/'`ccoshl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ccoshl.o `test -f 'ccoshl.c' || echo '$(srcdir)/'`ccoshl.c
 
 lib_a-ccoshl.obj: ccoshl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ccoshl.obj `if test -f 'ccoshl.c'; then $(CYGPATH_W) 'ccoshl.c'; else $(CYGPATH_W) '$(srcdir)/ccoshl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ccoshl.obj `if test -f 'ccoshl.c'; then $(CYGPATH_W) 'ccoshl.c'; else $(CYGPATH_W) '$(srcdir)/ccoshl.c'; fi`
 
 lib_a-cacoshl.o: cacoshl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cacoshl.o `test -f 'cacoshl.c' || echo '$(srcdir)/'`cacoshl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cacoshl.o `test -f 'cacoshl.c' || echo '$(srcdir)/'`cacoshl.c
 
 lib_a-cacoshl.obj: cacoshl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cacoshl.obj `if test -f 'cacoshl.c'; then $(CYGPATH_W) 'cacoshl.c'; else $(CYGPATH_W) '$(srcdir)/cacoshl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cacoshl.obj `if test -f 'cacoshl.c'; then $(CYGPATH_W) 'cacoshl.c'; else $(CYGPATH_W) '$(srcdir)/cacoshl.c'; fi`
 
 lib_a-clogl.o: clogl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clogl.o `test -f 'clogl.c' || echo '$(srcdir)/'`clogl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clogl.o `test -f 'clogl.c' || echo '$(srcdir)/'`clogl.c
 
 lib_a-clogl.obj: clogl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clogl.obj `if test -f 'clogl.c'; then $(CYGPATH_W) 'clogl.c'; else $(CYGPATH_W) '$(srcdir)/clogl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clogl.obj `if test -f 'clogl.c'; then $(CYGPATH_W) 'clogl.c'; else $(CYGPATH_W) '$(srcdir)/clogl.c'; fi`
 
 lib_a-csqrtl.o: csqrtl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csqrtl.o `test -f 'csqrtl.c' || echo '$(srcdir)/'`csqrtl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csqrtl.o `test -f 'csqrtl.c' || echo '$(srcdir)/'`csqrtl.c
 
 lib_a-csqrtl.obj: csqrtl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csqrtl.obj `if test -f 'csqrtl.c'; then $(CYGPATH_W) 'csqrtl.c'; else $(CYGPATH_W) '$(srcdir)/csqrtl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csqrtl.obj `if test -f 'csqrtl.c'; then $(CYGPATH_W) 'csqrtl.c'; else $(CYGPATH_W) '$(srcdir)/csqrtl.c'; fi`
 
 lib_a-cargl.o: cargl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cargl.o `test -f 'cargl.c' || echo '$(srcdir)/'`cargl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cargl.o `test -f 'cargl.c' || echo '$(srcdir)/'`cargl.c
 
 lib_a-cargl.obj: cargl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cargl.obj `if test -f 'cargl.c'; then $(CYGPATH_W) 'cargl.c'; else $(CYGPATH_W) '$(srcdir)/cargl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cargl.obj `if test -f 'cargl.c'; then $(CYGPATH_W) 'cargl.c'; else $(CYGPATH_W) '$(srcdir)/cargl.c'; fi`
 
 lib_a-cprojl.o: cprojl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cprojl.o `test -f 'cprojl.c' || echo '$(srcdir)/'`cprojl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cprojl.o `test -f 'cprojl.c' || echo '$(srcdir)/'`cprojl.c
 
 lib_a-cprojl.obj: cprojl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cprojl.obj `if test -f 'cprojl.c'; then $(CYGPATH_W) 'cprojl.c'; else $(CYGPATH_W) '$(srcdir)/cprojl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cprojl.obj `if test -f 'cprojl.c'; then $(CYGPATH_W) 'cprojl.c'; else $(CYGPATH_W) '$(srcdir)/cprojl.c'; fi`
 
 lib_a-cexpl.o: cexpl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cexpl.o `test -f 'cexpl.c' || echo '$(srcdir)/'`cexpl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cexpl.o `test -f 'cexpl.c' || echo '$(srcdir)/'`cexpl.c
 
 lib_a-cexpl.obj: cexpl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cexpl.obj `if test -f 'cexpl.c'; then $(CYGPATH_W) 'cexpl.c'; else $(CYGPATH_W) '$(srcdir)/cexpl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cexpl.obj `if test -f 'cexpl.c'; then $(CYGPATH_W) 'cexpl.c'; else $(CYGPATH_W) '$(srcdir)/cexpl.c'; fi`
 
 lib_a-cephes_subrl.o: cephes_subrl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cephes_subrl.o `test -f 'cephes_subrl.c' || echo '$(srcdir)/'`cephes_subrl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cephes_subrl.o `test -f 'cephes_subrl.c' || echo '$(srcdir)/'`cephes_subrl.c
 
 lib_a-cephes_subrl.obj: cephes_subrl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cephes_subrl.obj `if test -f 'cephes_subrl.c'; then $(CYGPATH_W) 'cephes_subrl.c'; else $(CYGPATH_W) '$(srcdir)/cephes_subrl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cephes_subrl.obj `if test -f 'cephes_subrl.c'; then $(CYGPATH_W) 'cephes_subrl.c'; else $(CYGPATH_W) '$(srcdir)/cephes_subrl.c'; fi`
 
 lib_a-cacosl.o: cacosl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cacosl.o `test -f 'cacosl.c' || echo '$(srcdir)/'`cacosl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cacosl.o `test -f 'cacosl.c' || echo '$(srcdir)/'`cacosl.c
 
 lib_a-cacosl.obj: cacosl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cacosl.obj `if test -f 'cacosl.c'; then $(CYGPATH_W) 'cacosl.c'; else $(CYGPATH_W) '$(srcdir)/cacosl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cacosl.obj `if test -f 'cacosl.c'; then $(CYGPATH_W) 'cacosl.c'; else $(CYGPATH_W) '$(srcdir)/cacosl.c'; fi`
 
 lib_a-ccosl.o: ccosl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ccosl.o `test -f 'ccosl.c' || echo '$(srcdir)/'`ccosl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ccosl.o `test -f 'ccosl.c' || echo '$(srcdir)/'`ccosl.c
 
 lib_a-ccosl.obj: ccosl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ccosl.obj `if test -f 'ccosl.c'; then $(CYGPATH_W) 'ccosl.c'; else $(CYGPATH_W) '$(srcdir)/ccosl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ccosl.obj `if test -f 'ccosl.c'; then $(CYGPATH_W) 'ccosl.c'; else $(CYGPATH_W) '$(srcdir)/ccosl.c'; fi`
 
 lib_a-casinl.o: casinl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-casinl.o `test -f 'casinl.c' || echo '$(srcdir)/'`casinl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-casinl.o `test -f 'casinl.c' || echo '$(srcdir)/'`casinl.c
 
 lib_a-casinl.obj: casinl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-casinl.obj `if test -f 'casinl.c'; then $(CYGPATH_W) 'casinl.c'; else $(CYGPATH_W) '$(srcdir)/casinl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-casinl.obj `if test -f 'casinl.c'; then $(CYGPATH_W) 'casinl.c'; else $(CYGPATH_W) '$(srcdir)/casinl.c'; fi`
 
 lib_a-catanhl.o: catanhl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catanhl.o `test -f 'catanhl.c' || echo '$(srcdir)/'`catanhl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catanhl.o `test -f 'catanhl.c' || echo '$(srcdir)/'`catanhl.c
 
 lib_a-catanhl.obj: catanhl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catanhl.obj `if test -f 'catanhl.c'; then $(CYGPATH_W) 'catanhl.c'; else $(CYGPATH_W) '$(srcdir)/catanhl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catanhl.obj `if test -f 'catanhl.c'; then $(CYGPATH_W) 'catanhl.c'; else $(CYGPATH_W) '$(srcdir)/catanhl.c'; fi`
 
 lib_a-conjl.o: conjl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-conjl.o `test -f 'conjl.c' || echo '$(srcdir)/'`conjl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-conjl.o `test -f 'conjl.c' || echo '$(srcdir)/'`conjl.c
 
 lib_a-conjl.obj: conjl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-conjl.obj `if test -f 'conjl.c'; then $(CYGPATH_W) 'conjl.c'; else $(CYGPATH_W) '$(srcdir)/conjl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-conjl.obj `if test -f 'conjl.c'; then $(CYGPATH_W) 'conjl.c'; else $(CYGPATH_W) '$(srcdir)/conjl.c'; fi`
 
 lib_a-cpowl.o: cpowl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cpowl.o `test -f 'cpowl.c' || echo '$(srcdir)/'`cpowl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cpowl.o `test -f 'cpowl.c' || echo '$(srcdir)/'`cpowl.c
 
 lib_a-cpowl.obj: cpowl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cpowl.obj `if test -f 'cpowl.c'; then $(CYGPATH_W) 'cpowl.c'; else $(CYGPATH_W) '$(srcdir)/cpowl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cpowl.obj `if test -f 'cpowl.c'; then $(CYGPATH_W) 'cpowl.c'; else $(CYGPATH_W) '$(srcdir)/cpowl.c'; fi`
 
 lib_a-ctanhl.o: ctanhl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctanhl.o `test -f 'ctanhl.c' || echo '$(srcdir)/'`ctanhl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctanhl.o `test -f 'ctanhl.c' || echo '$(srcdir)/'`ctanhl.c
 
 lib_a-ctanhl.obj: ctanhl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctanhl.obj `if test -f 'ctanhl.c'; then $(CYGPATH_W) 'ctanhl.c'; else $(CYGPATH_W) '$(srcdir)/ctanhl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctanhl.obj `if test -f 'ctanhl.c'; then $(CYGPATH_W) 'ctanhl.c'; else $(CYGPATH_W) '$(srcdir)/ctanhl.c'; fi`
 
 lib_a-ctanl.o: ctanl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctanl.o `test -f 'ctanl.c' || echo '$(srcdir)/'`ctanl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctanl.o `test -f 'ctanl.c' || echo '$(srcdir)/'`ctanl.c
 
 lib_a-ctanl.obj: ctanl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctanl.obj `if test -f 'ctanl.c'; then $(CYGPATH_W) 'ctanl.c'; else $(CYGPATH_W) '$(srcdir)/ctanl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctanl.obj `if test -f 'ctanl.c'; then $(CYGPATH_W) 'ctanl.c'; else $(CYGPATH_W) '$(srcdir)/ctanl.c'; fi`
 
 lib_a-casinhl.o: casinhl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-casinhl.o `test -f 'casinhl.c' || echo '$(srcdir)/'`casinhl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-casinhl.o `test -f 'casinhl.c' || echo '$(srcdir)/'`casinhl.c
 
 lib_a-casinhl.obj: casinhl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-casinhl.obj `if test -f 'casinhl.c'; then $(CYGPATH_W) 'casinhl.c'; else $(CYGPATH_W) '$(srcdir)/casinhl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-casinhl.obj `if test -f 'casinhl.c'; then $(CYGPATH_W) 'casinhl.c'; else $(CYGPATH_W) '$(srcdir)/casinhl.c'; fi`
 
 lib_a-csinhl.o: csinhl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csinhl.o `test -f 'csinhl.c' || echo '$(srcdir)/'`csinhl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csinhl.o `test -f 'csinhl.c' || echo '$(srcdir)/'`csinhl.c
 
 lib_a-csinhl.obj: csinhl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csinhl.obj `if test -f 'csinhl.c'; then $(CYGPATH_W) 'csinhl.c'; else $(CYGPATH_W) '$(srcdir)/csinhl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csinhl.obj `if test -f 'csinhl.c'; then $(CYGPATH_W) 'csinhl.c'; else $(CYGPATH_W) '$(srcdir)/csinhl.c'; fi`
 
 lib_a-csinl.o: csinl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csinl.o `test -f 'csinl.c' || echo '$(srcdir)/'`csinl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csinl.o `test -f 'csinl.c' || echo '$(srcdir)/'`csinl.c
 
 lib_a-csinl.obj: csinl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csinl.obj `if test -f 'csinl.c'; then $(CYGPATH_W) 'csinl.c'; else $(CYGPATH_W) '$(srcdir)/csinl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csinl.obj `if test -f 'csinl.c'; then $(CYGPATH_W) 'csinl.c'; else $(CYGPATH_W) '$(srcdir)/csinl.c'; fi`
 
 lib_a-catanl.o: catanl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catanl.o `test -f 'catanl.c' || echo '$(srcdir)/'`catanl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catanl.o `test -f 'catanl.c' || echo '$(srcdir)/'`catanl.c
 
 lib_a-catanl.obj: catanl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catanl.obj `if test -f 'catanl.c'; then $(CYGPATH_W) 'catanl.c'; else $(CYGPATH_W) '$(srcdir)/catanl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catanl.obj `if test -f 'catanl.c'; then $(CYGPATH_W) 'catanl.c'; else $(CYGPATH_W) '$(srcdir)/catanl.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

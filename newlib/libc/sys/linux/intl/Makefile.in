@@ -70,6 +70,12 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
+AM_V_AR = $(am__v_AR_@AM_V@)
+am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
+am__v_AR_0 = @echo "  AR    " $@;
+AM_V_at = $(am__v_at_@AM_V@)
+am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
+am__v_at_0 = @
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 am__objects_1 = lib_a-bindtextdom.$(OBJEXT) lib_a-catgets.$(OBJEXT) \
@@ -92,7 +98,10 @@ am__objects_2 = bindtextdom.lo catgets.lo dcgettext.lo dgettext.lo \
 	explodename.lo plural.lo
 @USE_LIBTOOL_TRUE@am_libintl_la_OBJECTS = $(am__objects_2)
 libintl_la_OBJECTS = $(am_libintl_la_OBJECTS)
-libintl_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+libintl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libintl_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_LIBTOOL_TRUE@am_libintl_la_rpath =
@@ -101,13 +110,23 @@ depcomp =
 am__depfiles_maybe =
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC    " $@;
 CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD  " $@;
+AM_V_GEN = $(am__v_GEN_@AM_V@)
+am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
+am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(lib_a_SOURCES) $(libintl_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
@@ -119,6 +138,7 @@ ETAGS = etags
 CTAGS = ctags
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
+AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
@@ -237,6 +257,7 @@ prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
 sbindir = @sbindir@
+shared_machine_dir = @shared_machine_dir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
 subdirs = @subdirs@
@@ -316,9 +337,9 @@ $(am__aclocal_m4_deps):
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
 lib.a: $(lib_a_OBJECTS) $(lib_a_DEPENDENCIES) $(EXTRA_lib_a_DEPENDENCIES) 
-	-rm -f lib.a
-	$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
-	$(RANLIB) lib.a
+	$(AM_V_at)-rm -f lib.a
+	$(AM_V_AR)$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
+	$(AM_V_at)$(RANLIB) lib.a
 
 clean-noinstLTLIBRARIES:
 	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
@@ -329,7 +350,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libintl.la: $(libintl_la_OBJECTS) $(libintl_la_DEPENDENCIES) $(EXTRA_libintl_la_DEPENDENCIES) 
-	$(libintl_la_LINK) $(am_libintl_la_rpath) $(libintl_la_OBJECTS) $(libintl_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(libintl_la_LINK) $(am_libintl_la_rpath) $(libintl_la_OBJECTS) $(libintl_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -338,121 +359,121 @@ distclean-compile:
 	-rm -f *.tab.c
 
 .c.o:
-	$(COMPILE) -c $<
+	$(AM_V_CC)$(COMPILE) -c $<
 
 .c.obj:
-	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+	$(AM_V_CC)$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
 .c.lo:
-	$(LTCOMPILE) -c -o $@ $<
+	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
 
 lib_a-bindtextdom.o: bindtextdom.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-bindtextdom.o `test -f 'bindtextdom.c' || echo '$(srcdir)/'`bindtextdom.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-bindtextdom.o `test -f 'bindtextdom.c' || echo '$(srcdir)/'`bindtextdom.c
 
 lib_a-bindtextdom.obj: bindtextdom.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-bindtextdom.obj `if test -f 'bindtextdom.c'; then $(CYGPATH_W) 'bindtextdom.c'; else $(CYGPATH_W) '$(srcdir)/bindtextdom.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-bindtextdom.obj `if test -f 'bindtextdom.c'; then $(CYGPATH_W) 'bindtextdom.c'; else $(CYGPATH_W) '$(srcdir)/bindtextdom.c'; fi`
 
 lib_a-catgets.o: catgets.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catgets.o `test -f 'catgets.c' || echo '$(srcdir)/'`catgets.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catgets.o `test -f 'catgets.c' || echo '$(srcdir)/'`catgets.c
 
 lib_a-catgets.obj: catgets.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catgets.obj `if test -f 'catgets.c'; then $(CYGPATH_W) 'catgets.c'; else $(CYGPATH_W) '$(srcdir)/catgets.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catgets.obj `if test -f 'catgets.c'; then $(CYGPATH_W) 'catgets.c'; else $(CYGPATH_W) '$(srcdir)/catgets.c'; fi`
 
 lib_a-dcgettext.o: dcgettext.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dcgettext.o `test -f 'dcgettext.c' || echo '$(srcdir)/'`dcgettext.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dcgettext.o `test -f 'dcgettext.c' || echo '$(srcdir)/'`dcgettext.c
 
 lib_a-dcgettext.obj: dcgettext.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dcgettext.obj `if test -f 'dcgettext.c'; then $(CYGPATH_W) 'dcgettext.c'; else $(CYGPATH_W) '$(srcdir)/dcgettext.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dcgettext.obj `if test -f 'dcgettext.c'; then $(CYGPATH_W) 'dcgettext.c'; else $(CYGPATH_W) '$(srcdir)/dcgettext.c'; fi`
 
 lib_a-dgettext.o: dgettext.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dgettext.o `test -f 'dgettext.c' || echo '$(srcdir)/'`dgettext.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dgettext.o `test -f 'dgettext.c' || echo '$(srcdir)/'`dgettext.c
 
 lib_a-dgettext.obj: dgettext.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dgettext.obj `if test -f 'dgettext.c'; then $(CYGPATH_W) 'dgettext.c'; else $(CYGPATH_W) '$(srcdir)/dgettext.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dgettext.obj `if test -f 'dgettext.c'; then $(CYGPATH_W) 'dgettext.c'; else $(CYGPATH_W) '$(srcdir)/dgettext.c'; fi`
 
 lib_a-gettext.o: gettext.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gettext.o `test -f 'gettext.c' || echo '$(srcdir)/'`gettext.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gettext.o `test -f 'gettext.c' || echo '$(srcdir)/'`gettext.c
 
 lib_a-gettext.obj: gettext.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gettext.obj `if test -f 'gettext.c'; then $(CYGPATH_W) 'gettext.c'; else $(CYGPATH_W) '$(srcdir)/gettext.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gettext.obj `if test -f 'gettext.c'; then $(CYGPATH_W) 'gettext.c'; else $(CYGPATH_W) '$(srcdir)/gettext.c'; fi`
 
 lib_a-dcigettext.o: dcigettext.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dcigettext.o `test -f 'dcigettext.c' || echo '$(srcdir)/'`dcigettext.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dcigettext.o `test -f 'dcigettext.c' || echo '$(srcdir)/'`dcigettext.c
 
 lib_a-dcigettext.obj: dcigettext.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dcigettext.obj `if test -f 'dcigettext.c'; then $(CYGPATH_W) 'dcigettext.c'; else $(CYGPATH_W) '$(srcdir)/dcigettext.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dcigettext.obj `if test -f 'dcigettext.c'; then $(CYGPATH_W) 'dcigettext.c'; else $(CYGPATH_W) '$(srcdir)/dcigettext.c'; fi`
 
 lib_a-dcngettext.o: dcngettext.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dcngettext.o `test -f 'dcngettext.c' || echo '$(srcdir)/'`dcngettext.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dcngettext.o `test -f 'dcngettext.c' || echo '$(srcdir)/'`dcngettext.c
 
 lib_a-dcngettext.obj: dcngettext.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dcngettext.obj `if test -f 'dcngettext.c'; then $(CYGPATH_W) 'dcngettext.c'; else $(CYGPATH_W) '$(srcdir)/dcngettext.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dcngettext.obj `if test -f 'dcngettext.c'; then $(CYGPATH_W) 'dcngettext.c'; else $(CYGPATH_W) '$(srcdir)/dcngettext.c'; fi`
 
 lib_a-dngettext.o: dngettext.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dngettext.o `test -f 'dngettext.c' || echo '$(srcdir)/'`dngettext.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dngettext.o `test -f 'dngettext.c' || echo '$(srcdir)/'`dngettext.c
 
 lib_a-dngettext.obj: dngettext.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dngettext.obj `if test -f 'dngettext.c'; then $(CYGPATH_W) 'dngettext.c'; else $(CYGPATH_W) '$(srcdir)/dngettext.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dngettext.obj `if test -f 'dngettext.c'; then $(CYGPATH_W) 'dngettext.c'; else $(CYGPATH_W) '$(srcdir)/dngettext.c'; fi`
 
 lib_a-ngettext.o: ngettext.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ngettext.o `test -f 'ngettext.c' || echo '$(srcdir)/'`ngettext.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ngettext.o `test -f 'ngettext.c' || echo '$(srcdir)/'`ngettext.c
 
 lib_a-ngettext.obj: ngettext.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ngettext.obj `if test -f 'ngettext.c'; then $(CYGPATH_W) 'ngettext.c'; else $(CYGPATH_W) '$(srcdir)/ngettext.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ngettext.obj `if test -f 'ngettext.c'; then $(CYGPATH_W) 'ngettext.c'; else $(CYGPATH_W) '$(srcdir)/ngettext.c'; fi`
 
 lib_a-open_catalog.o: open_catalog.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-open_catalog.o `test -f 'open_catalog.c' || echo '$(srcdir)/'`open_catalog.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-open_catalog.o `test -f 'open_catalog.c' || echo '$(srcdir)/'`open_catalog.c
 
 lib_a-open_catalog.obj: open_catalog.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-open_catalog.obj `if test -f 'open_catalog.c'; then $(CYGPATH_W) 'open_catalog.c'; else $(CYGPATH_W) '$(srcdir)/open_catalog.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-open_catalog.obj `if test -f 'open_catalog.c'; then $(CYGPATH_W) 'open_catalog.c'; else $(CYGPATH_W) '$(srcdir)/open_catalog.c'; fi`
 
 lib_a-finddomain.o: finddomain.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-finddomain.o `test -f 'finddomain.c' || echo '$(srcdir)/'`finddomain.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-finddomain.o `test -f 'finddomain.c' || echo '$(srcdir)/'`finddomain.c
 
 lib_a-finddomain.obj: finddomain.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-finddomain.obj `if test -f 'finddomain.c'; then $(CYGPATH_W) 'finddomain.c'; else $(CYGPATH_W) '$(srcdir)/finddomain.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-finddomain.obj `if test -f 'finddomain.c'; then $(CYGPATH_W) 'finddomain.c'; else $(CYGPATH_W) '$(srcdir)/finddomain.c'; fi`
 
 lib_a-lcl_stpcpy.o: lcl_stpcpy.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lcl_stpcpy.o `test -f 'lcl_stpcpy.c' || echo '$(srcdir)/'`lcl_stpcpy.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lcl_stpcpy.o `test -f 'lcl_stpcpy.c' || echo '$(srcdir)/'`lcl_stpcpy.c
 
 lib_a-lcl_stpcpy.obj: lcl_stpcpy.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lcl_stpcpy.obj `if test -f 'lcl_stpcpy.c'; then $(CYGPATH_W) 'lcl_stpcpy.c'; else $(CYGPATH_W) '$(srcdir)/lcl_stpcpy.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lcl_stpcpy.obj `if test -f 'lcl_stpcpy.c'; then $(CYGPATH_W) 'lcl_stpcpy.c'; else $(CYGPATH_W) '$(srcdir)/lcl_stpcpy.c'; fi`
 
 lib_a-loadmsgcat.o: loadmsgcat.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-loadmsgcat.o `test -f 'loadmsgcat.c' || echo '$(srcdir)/'`loadmsgcat.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-loadmsgcat.o `test -f 'loadmsgcat.c' || echo '$(srcdir)/'`loadmsgcat.c
 
 lib_a-loadmsgcat.obj: loadmsgcat.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-loadmsgcat.obj `if test -f 'loadmsgcat.c'; then $(CYGPATH_W) 'loadmsgcat.c'; else $(CYGPATH_W) '$(srcdir)/loadmsgcat.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-loadmsgcat.obj `if test -f 'loadmsgcat.c'; then $(CYGPATH_W) 'loadmsgcat.c'; else $(CYGPATH_W) '$(srcdir)/loadmsgcat.c'; fi`
 
 lib_a-localealias.o: localealias.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-localealias.o `test -f 'localealias.c' || echo '$(srcdir)/'`localealias.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-localealias.o `test -f 'localealias.c' || echo '$(srcdir)/'`localealias.c
 
 lib_a-localealias.obj: localealias.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-localealias.obj `if test -f 'localealias.c'; then $(CYGPATH_W) 'localealias.c'; else $(CYGPATH_W) '$(srcdir)/localealias.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-localealias.obj `if test -f 'localealias.c'; then $(CYGPATH_W) 'localealias.c'; else $(CYGPATH_W) '$(srcdir)/localealias.c'; fi`
 
 lib_a-textdomain.o: textdomain.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-textdomain.o `test -f 'textdomain.c' || echo '$(srcdir)/'`textdomain.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-textdomain.o `test -f 'textdomain.c' || echo '$(srcdir)/'`textdomain.c
 
 lib_a-textdomain.obj: textdomain.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-textdomain.obj `if test -f 'textdomain.c'; then $(CYGPATH_W) 'textdomain.c'; else $(CYGPATH_W) '$(srcdir)/textdomain.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-textdomain.obj `if test -f 'textdomain.c'; then $(CYGPATH_W) 'textdomain.c'; else $(CYGPATH_W) '$(srcdir)/textdomain.c'; fi`
 
 lib_a-l10nflist.o: l10nflist.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-l10nflist.o `test -f 'l10nflist.c' || echo '$(srcdir)/'`l10nflist.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-l10nflist.o `test -f 'l10nflist.c' || echo '$(srcdir)/'`l10nflist.c
 
 lib_a-l10nflist.obj: l10nflist.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-l10nflist.obj `if test -f 'l10nflist.c'; then $(CYGPATH_W) 'l10nflist.c'; else $(CYGPATH_W) '$(srcdir)/l10nflist.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-l10nflist.obj `if test -f 'l10nflist.c'; then $(CYGPATH_W) 'l10nflist.c'; else $(CYGPATH_W) '$(srcdir)/l10nflist.c'; fi`
 
 lib_a-explodename.o: explodename.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-explodename.o `test -f 'explodename.c' || echo '$(srcdir)/'`explodename.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-explodename.o `test -f 'explodename.c' || echo '$(srcdir)/'`explodename.c
 
 lib_a-explodename.obj: explodename.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-explodename.obj `if test -f 'explodename.c'; then $(CYGPATH_W) 'explodename.c'; else $(CYGPATH_W) '$(srcdir)/explodename.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-explodename.obj `if test -f 'explodename.c'; then $(CYGPATH_W) 'explodename.c'; else $(CYGPATH_W) '$(srcdir)/explodename.c'; fi`
 
 lib_a-plural.o: plural.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-plural.o `test -f 'plural.c' || echo '$(srcdir)/'`plural.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-plural.o `test -f 'plural.c' || echo '$(srcdir)/'`plural.c
 
 lib_a-plural.obj: plural.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-plural.obj `if test -f 'plural.c'; then $(CYGPATH_W) 'plural.c'; else $(CYGPATH_W) '$(srcdir)/plural.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-plural.obj `if test -f 'plural.c'; then $(CYGPATH_W) 'plural.c'; else $(CYGPATH_W) '$(srcdir)/plural.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

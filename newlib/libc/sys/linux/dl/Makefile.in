@@ -70,6 +70,12 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
+AM_V_AR = $(am__v_AR_@AM_V@)
+am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
+am__v_AR_0 = @echo "  AR    " $@;
+AM_V_at = $(am__v_at_@AM_V@)
+am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
+am__v_at_0 = @
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 am__objects_1 = lib_a-dl-addr.$(OBJEXT) lib_a-dl-deps.$(OBJEXT) \
@@ -94,22 +100,35 @@ am__objects_2 = dl-addr.lo dl-deps.lo dl-init.lo dl-load.lo dl-misc.lo \
 	dl-open.lo dl-reloc.lo dl-sym.lo dl-cache.lo
 @USE_LIBTOOL_TRUE@am_libdl_la_OBJECTS = $(am__objects_2)
 libdl_la_OBJECTS = $(am_libdl_la_OBJECTS)
-libdl_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(libdl_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+libdl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(libdl_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_LIBTOOL_TRUE@am_libdl_la_rpath =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
 am__depfiles_maybe =
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC    " $@;
 CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD  " $@;
+AM_V_GEN = $(am__v_GEN_@AM_V@)
+am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
+am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(lib_a_SOURCES) $(libdl_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
@@ -121,6 +140,7 @@ ETAGS = etags
 CTAGS = ctags
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
+AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
@@ -239,6 +259,7 @@ prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
 sbindir = @sbindir@
+shared_machine_dir = @shared_machine_dir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
 subdirs = @subdirs@
@@ -313,9 +334,9 @@ $(am__aclocal_m4_deps):
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
 lib.a: $(lib_a_OBJECTS) $(lib_a_DEPENDENCIES) $(EXTRA_lib_a_DEPENDENCIES) 
-	-rm -f lib.a
-	$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
-	$(RANLIB) lib.a
+	$(AM_V_at)-rm -f lib.a
+	$(AM_V_AR)$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
+	$(AM_V_at)$(RANLIB) lib.a
 
 clean-noinstLTLIBRARIES:
 	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
@@ -326,7 +347,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libdl.la: $(libdl_la_OBJECTS) $(libdl_la_DEPENDENCIES) $(EXTRA_libdl_la_DEPENDENCIES) 
-	$(libdl_la_LINK) $(am_libdl_la_rpath) $(libdl_la_OBJECTS) $(libdl_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(libdl_la_LINK) $(am_libdl_la_rpath) $(libdl_la_OBJECTS) $(libdl_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -335,145 +356,145 @@ distclean-compile:
 	-rm -f *.tab.c
 
 .c.o:
-	$(COMPILE) -c $<
+	$(AM_V_CC)$(COMPILE) -c $<
 
 .c.obj:
-	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+	$(AM_V_CC)$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
 .c.lo:
-	$(LTCOMPILE) -c -o $@ $<
+	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
 
 lib_a-dl-addr.o: dl-addr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-addr.o `test -f 'dl-addr.c' || echo '$(srcdir)/'`dl-addr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-addr.o `test -f 'dl-addr.c' || echo '$(srcdir)/'`dl-addr.c
 
 lib_a-dl-addr.obj: dl-addr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-addr.obj `if test -f 'dl-addr.c'; then $(CYGPATH_W) 'dl-addr.c'; else $(CYGPATH_W) '$(srcdir)/dl-addr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-addr.obj `if test -f 'dl-addr.c'; then $(CYGPATH_W) 'dl-addr.c'; else $(CYGPATH_W) '$(srcdir)/dl-addr.c'; fi`
 
 lib_a-dl-deps.o: dl-deps.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-deps.o `test -f 'dl-deps.c' || echo '$(srcdir)/'`dl-deps.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-deps.o `test -f 'dl-deps.c' || echo '$(srcdir)/'`dl-deps.c
 
 lib_a-dl-deps.obj: dl-deps.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-deps.obj `if test -f 'dl-deps.c'; then $(CYGPATH_W) 'dl-deps.c'; else $(CYGPATH_W) '$(srcdir)/dl-deps.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-deps.obj `if test -f 'dl-deps.c'; then $(CYGPATH_W) 'dl-deps.c'; else $(CYGPATH_W) '$(srcdir)/dl-deps.c'; fi`
 
 lib_a-dl-init.o: dl-init.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-init.o `test -f 'dl-init.c' || echo '$(srcdir)/'`dl-init.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-init.o `test -f 'dl-init.c' || echo '$(srcdir)/'`dl-init.c
 
 lib_a-dl-init.obj: dl-init.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-init.obj `if test -f 'dl-init.c'; then $(CYGPATH_W) 'dl-init.c'; else $(CYGPATH_W) '$(srcdir)/dl-init.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-init.obj `if test -f 'dl-init.c'; then $(CYGPATH_W) 'dl-init.c'; else $(CYGPATH_W) '$(srcdir)/dl-init.c'; fi`
 
 lib_a-dl-load.o: dl-load.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-load.o `test -f 'dl-load.c' || echo '$(srcdir)/'`dl-load.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-load.o `test -f 'dl-load.c' || echo '$(srcdir)/'`dl-load.c
 
 lib_a-dl-load.obj: dl-load.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-load.obj `if test -f 'dl-load.c'; then $(CYGPATH_W) 'dl-load.c'; else $(CYGPATH_W) '$(srcdir)/dl-load.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-load.obj `if test -f 'dl-load.c'; then $(CYGPATH_W) 'dl-load.c'; else $(CYGPATH_W) '$(srcdir)/dl-load.c'; fi`
 
 lib_a-dl-misc.o: dl-misc.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-misc.o `test -f 'dl-misc.c' || echo '$(srcdir)/'`dl-misc.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-misc.o `test -f 'dl-misc.c' || echo '$(srcdir)/'`dl-misc.c
 
 lib_a-dl-misc.obj: dl-misc.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-misc.obj `if test -f 'dl-misc.c'; then $(CYGPATH_W) 'dl-misc.c'; else $(CYGPATH_W) '$(srcdir)/dl-misc.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-misc.obj `if test -f 'dl-misc.c'; then $(CYGPATH_W) 'dl-misc.c'; else $(CYGPATH_W) '$(srcdir)/dl-misc.c'; fi`
 
 lib_a-dl-profile.o: dl-profile.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-profile.o `test -f 'dl-profile.c' || echo '$(srcdir)/'`dl-profile.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-profile.o `test -f 'dl-profile.c' || echo '$(srcdir)/'`dl-profile.c
 
 lib_a-dl-profile.obj: dl-profile.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-profile.obj `if test -f 'dl-profile.c'; then $(CYGPATH_W) 'dl-profile.c'; else $(CYGPATH_W) '$(srcdir)/dl-profile.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-profile.obj `if test -f 'dl-profile.c'; then $(CYGPATH_W) 'dl-profile.c'; else $(CYGPATH_W) '$(srcdir)/dl-profile.c'; fi`
 
 lib_a-dl-runtime.o: dl-runtime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-runtime.o `test -f 'dl-runtime.c' || echo '$(srcdir)/'`dl-runtime.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-runtime.o `test -f 'dl-runtime.c' || echo '$(srcdir)/'`dl-runtime.c
 
 lib_a-dl-runtime.obj: dl-runtime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-runtime.obj `if test -f 'dl-runtime.c'; then $(CYGPATH_W) 'dl-runtime.c'; else $(CYGPATH_W) '$(srcdir)/dl-runtime.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-runtime.obj `if test -f 'dl-runtime.c'; then $(CYGPATH_W) 'dl-runtime.c'; else $(CYGPATH_W) '$(srcdir)/dl-runtime.c'; fi`
 
 lib_a-dl-version.o: dl-version.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-version.o `test -f 'dl-version.c' || echo '$(srcdir)/'`dl-version.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-version.o `test -f 'dl-version.c' || echo '$(srcdir)/'`dl-version.c
 
 lib_a-dl-version.obj: dl-version.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-version.obj `if test -f 'dl-version.c'; then $(CYGPATH_W) 'dl-version.c'; else $(CYGPATH_W) '$(srcdir)/dl-version.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-version.obj `if test -f 'dl-version.c'; then $(CYGPATH_W) 'dl-version.c'; else $(CYGPATH_W) '$(srcdir)/dl-version.c'; fi`
 
 lib_a-dl-close.o: dl-close.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-close.o `test -f 'dl-close.c' || echo '$(srcdir)/'`dl-close.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-close.o `test -f 'dl-close.c' || echo '$(srcdir)/'`dl-close.c
 
 lib_a-dl-close.obj: dl-close.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-close.obj `if test -f 'dl-close.c'; then $(CYGPATH_W) 'dl-close.c'; else $(CYGPATH_W) '$(srcdir)/dl-close.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-close.obj `if test -f 'dl-close.c'; then $(CYGPATH_W) 'dl-close.c'; else $(CYGPATH_W) '$(srcdir)/dl-close.c'; fi`
 
 lib_a-dl-error.o: dl-error.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-error.o `test -f 'dl-error.c' || echo '$(srcdir)/'`dl-error.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-error.o `test -f 'dl-error.c' || echo '$(srcdir)/'`dl-error.c
 
 lib_a-dl-error.obj: dl-error.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-error.obj `if test -f 'dl-error.c'; then $(CYGPATH_W) 'dl-error.c'; else $(CYGPATH_W) '$(srcdir)/dl-error.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-error.obj `if test -f 'dl-error.c'; then $(CYGPATH_W) 'dl-error.c'; else $(CYGPATH_W) '$(srcdir)/dl-error.c'; fi`
 
 lib_a-dl-iteratephdr.o: dl-iteratephdr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-iteratephdr.o `test -f 'dl-iteratephdr.c' || echo '$(srcdir)/'`dl-iteratephdr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-iteratephdr.o `test -f 'dl-iteratephdr.c' || echo '$(srcdir)/'`dl-iteratephdr.c
 
 lib_a-dl-iteratephdr.obj: dl-iteratephdr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-iteratephdr.obj `if test -f 'dl-iteratephdr.c'; then $(CYGPATH_W) 'dl-iteratephdr.c'; else $(CYGPATH_W) '$(srcdir)/dl-iteratephdr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-iteratephdr.obj `if test -f 'dl-iteratephdr.c'; then $(CYGPATH_W) 'dl-iteratephdr.c'; else $(CYGPATH_W) '$(srcdir)/dl-iteratephdr.c'; fi`
 
 lib_a-dl-lookup.o: dl-lookup.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-lookup.o `test -f 'dl-lookup.c' || echo '$(srcdir)/'`dl-lookup.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-lookup.o `test -f 'dl-lookup.c' || echo '$(srcdir)/'`dl-lookup.c
 
 lib_a-dl-lookup.obj: dl-lookup.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-lookup.obj `if test -f 'dl-lookup.c'; then $(CYGPATH_W) 'dl-lookup.c'; else $(CYGPATH_W) '$(srcdir)/dl-lookup.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-lookup.obj `if test -f 'dl-lookup.c'; then $(CYGPATH_W) 'dl-lookup.c'; else $(CYGPATH_W) '$(srcdir)/dl-lookup.c'; fi`
 
 lib_a-dl-object.o: dl-object.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-object.o `test -f 'dl-object.c' || echo '$(srcdir)/'`dl-object.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-object.o `test -f 'dl-object.c' || echo '$(srcdir)/'`dl-object.c
 
 lib_a-dl-object.obj: dl-object.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-object.obj `if test -f 'dl-object.c'; then $(CYGPATH_W) 'dl-object.c'; else $(CYGPATH_W) '$(srcdir)/dl-object.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-object.obj `if test -f 'dl-object.c'; then $(CYGPATH_W) 'dl-object.c'; else $(CYGPATH_W) '$(srcdir)/dl-object.c'; fi`
 
 lib_a-dl-profstub.o: dl-profstub.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-profstub.o `test -f 'dl-profstub.c' || echo '$(srcdir)/'`dl-profstub.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-profstub.o `test -f 'dl-profstub.c' || echo '$(srcdir)/'`dl-profstub.c
 
 lib_a-dl-profstub.obj: dl-profstub.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-profstub.obj `if test -f 'dl-profstub.c'; then $(CYGPATH_W) 'dl-profstub.c'; else $(CYGPATH_W) '$(srcdir)/dl-profstub.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-profstub.obj `if test -f 'dl-profstub.c'; then $(CYGPATH_W) 'dl-profstub.c'; else $(CYGPATH_W) '$(srcdir)/dl-profstub.c'; fi`
 
 lib_a-dl-support.o: dl-support.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-support.o `test -f 'dl-support.c' || echo '$(srcdir)/'`dl-support.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-support.o `test -f 'dl-support.c' || echo '$(srcdir)/'`dl-support.c
 
 lib_a-dl-support.obj: dl-support.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-support.obj `if test -f 'dl-support.c'; then $(CYGPATH_W) 'dl-support.c'; else $(CYGPATH_W) '$(srcdir)/dl-support.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-support.obj `if test -f 'dl-support.c'; then $(CYGPATH_W) 'dl-support.c'; else $(CYGPATH_W) '$(srcdir)/dl-support.c'; fi`
 
 lib_a-dl-debug.o: dl-debug.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-debug.o `test -f 'dl-debug.c' || echo '$(srcdir)/'`dl-debug.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-debug.o `test -f 'dl-debug.c' || echo '$(srcdir)/'`dl-debug.c
 
 lib_a-dl-debug.obj: dl-debug.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-debug.obj `if test -f 'dl-debug.c'; then $(CYGPATH_W) 'dl-debug.c'; else $(CYGPATH_W) '$(srcdir)/dl-debug.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-debug.obj `if test -f 'dl-debug.c'; then $(CYGPATH_W) 'dl-debug.c'; else $(CYGPATH_W) '$(srcdir)/dl-debug.c'; fi`
 
 lib_a-dl-fini.o: dl-fini.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-fini.o `test -f 'dl-fini.c' || echo '$(srcdir)/'`dl-fini.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-fini.o `test -f 'dl-fini.c' || echo '$(srcdir)/'`dl-fini.c
 
 lib_a-dl-fini.obj: dl-fini.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-fini.obj `if test -f 'dl-fini.c'; then $(CYGPATH_W) 'dl-fini.c'; else $(CYGPATH_W) '$(srcdir)/dl-fini.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-fini.obj `if test -f 'dl-fini.c'; then $(CYGPATH_W) 'dl-fini.c'; else $(CYGPATH_W) '$(srcdir)/dl-fini.c'; fi`
 
 lib_a-dl-libc.o: dl-libc.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-libc.o `test -f 'dl-libc.c' || echo '$(srcdir)/'`dl-libc.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-libc.o `test -f 'dl-libc.c' || echo '$(srcdir)/'`dl-libc.c
 
 lib_a-dl-libc.obj: dl-libc.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-libc.obj `if test -f 'dl-libc.c'; then $(CYGPATH_W) 'dl-libc.c'; else $(CYGPATH_W) '$(srcdir)/dl-libc.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-libc.obj `if test -f 'dl-libc.c'; then $(CYGPATH_W) 'dl-libc.c'; else $(CYGPATH_W) '$(srcdir)/dl-libc.c'; fi`
 
 lib_a-dl-open.o: dl-open.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-open.o `test -f 'dl-open.c' || echo '$(srcdir)/'`dl-open.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-open.o `test -f 'dl-open.c' || echo '$(srcdir)/'`dl-open.c
 
 lib_a-dl-open.obj: dl-open.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-open.obj `if test -f 'dl-open.c'; then $(CYGPATH_W) 'dl-open.c'; else $(CYGPATH_W) '$(srcdir)/dl-open.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-open.obj `if test -f 'dl-open.c'; then $(CYGPATH_W) 'dl-open.c'; else $(CYGPATH_W) '$(srcdir)/dl-open.c'; fi`
 
 lib_a-dl-reloc.o: dl-reloc.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-reloc.o `test -f 'dl-reloc.c' || echo '$(srcdir)/'`dl-reloc.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-reloc.o `test -f 'dl-reloc.c' || echo '$(srcdir)/'`dl-reloc.c
 
 lib_a-dl-reloc.obj: dl-reloc.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-reloc.obj `if test -f 'dl-reloc.c'; then $(CYGPATH_W) 'dl-reloc.c'; else $(CYGPATH_W) '$(srcdir)/dl-reloc.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-reloc.obj `if test -f 'dl-reloc.c'; then $(CYGPATH_W) 'dl-reloc.c'; else $(CYGPATH_W) '$(srcdir)/dl-reloc.c'; fi`
 
 lib_a-dl-sym.o: dl-sym.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-sym.o `test -f 'dl-sym.c' || echo '$(srcdir)/'`dl-sym.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-sym.o `test -f 'dl-sym.c' || echo '$(srcdir)/'`dl-sym.c
 
 lib_a-dl-sym.obj: dl-sym.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-sym.obj `if test -f 'dl-sym.c'; then $(CYGPATH_W) 'dl-sym.c'; else $(CYGPATH_W) '$(srcdir)/dl-sym.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-sym.obj `if test -f 'dl-sym.c'; then $(CYGPATH_W) 'dl-sym.c'; else $(CYGPATH_W) '$(srcdir)/dl-sym.c'; fi`
 
 lib_a-dl-cache.o: dl-cache.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-cache.o `test -f 'dl-cache.c' || echo '$(srcdir)/'`dl-cache.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-cache.o `test -f 'dl-cache.c' || echo '$(srcdir)/'`dl-cache.c
 
 lib_a-dl-cache.obj: dl-cache.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-cache.obj `if test -f 'dl-cache.c'; then $(CYGPATH_W) 'dl-cache.c'; else $(CYGPATH_W) '$(srcdir)/dl-cache.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dl-cache.obj `if test -f 'dl-cache.c'; then $(CYGPATH_W) 'dl-cache.c'; else $(CYGPATH_W) '$(srcdir)/dl-cache.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

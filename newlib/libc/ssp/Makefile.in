@@ -70,6 +70,12 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
+AM_V_AR = $(am__v_AR_@AM_V@)
+am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
+am__v_AR_0 = @echo "  AR    " $@;
+AM_V_at = $(am__v_at_@AM_V@)
+am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
+am__v_at_0 = @
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 am__objects_1 = lib_a-chk_fail.$(OBJEXT) \
@@ -104,7 +110,10 @@ am__objects_7 = gets_chk.lo snprintf_chk.lo sprintf_chk.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@ELIX_LEVEL_4_FALSE@@HAVE_STDIO_DIR_TRUE@	$(am__objects_7)
 @USE_LIBTOOL_TRUE@am_libssp_la_OBJECTS = $(am__objects_8)
 libssp_la_OBJECTS = $(am_libssp_la_OBJECTS)
-libssp_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+libssp_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libssp_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_LIBTOOL_TRUE@am_libssp_la_rpath =
@@ -113,13 +122,23 @@ depcomp =
 am__depfiles_maybe =
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC    " $@;
 CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD  " $@;
+AM_V_GEN = $(am__v_GEN_@AM_V@)
+am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
+am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(lib_a_SOURCES) $(libssp_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
@@ -131,6 +150,7 @@ ETAGS = etags
 CTAGS = ctags
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
+AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
@@ -364,9 +384,9 @@ $(am__aclocal_m4_deps):
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
 lib.a: $(lib_a_OBJECTS) $(lib_a_DEPENDENCIES) $(EXTRA_lib_a_DEPENDENCIES) 
-	-rm -f lib.a
-	$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
-	$(RANLIB) lib.a
+	$(AM_V_at)-rm -f lib.a
+	$(AM_V_AR)$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
+	$(AM_V_at)$(RANLIB) lib.a
 
 clean-noinstLTLIBRARIES:
 	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
@@ -377,7 +397,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libssp.la: $(libssp_la_OBJECTS) $(libssp_la_DEPENDENCIES) $(EXTRA_libssp_la_DEPENDENCIES) 
-	$(libssp_la_LINK) $(am_libssp_la_rpath) $(libssp_la_OBJECTS) $(libssp_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(libssp_la_LINK) $(am_libssp_la_rpath) $(libssp_la_OBJECTS) $(libssp_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -386,115 +406,115 @@ distclean-compile:
 	-rm -f *.tab.c
 
 .c.o:
-	$(COMPILE) -c $<
+	$(AM_V_CC)$(COMPILE) -c $<
 
 .c.obj:
-	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+	$(AM_V_CC)$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
 .c.lo:
-	$(LTCOMPILE) -c -o $@ $<
+	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
 
 lib_a-chk_fail.o: chk_fail.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-chk_fail.o `test -f 'chk_fail.c' || echo '$(srcdir)/'`chk_fail.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-chk_fail.o `test -f 'chk_fail.c' || echo '$(srcdir)/'`chk_fail.c
 
 lib_a-chk_fail.obj: chk_fail.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-chk_fail.obj `if test -f 'chk_fail.c'; then $(CYGPATH_W) 'chk_fail.c'; else $(CYGPATH_W) '$(srcdir)/chk_fail.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-chk_fail.obj `if test -f 'chk_fail.c'; then $(CYGPATH_W) 'chk_fail.c'; else $(CYGPATH_W) '$(srcdir)/chk_fail.c'; fi`
 
 lib_a-stack_protector.o: stack_protector.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stack_protector.o `test -f 'stack_protector.c' || echo '$(srcdir)/'`stack_protector.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stack_protector.o `test -f 'stack_protector.c' || echo '$(srcdir)/'`stack_protector.c
 
 lib_a-stack_protector.obj: stack_protector.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stack_protector.obj `if test -f 'stack_protector.c'; then $(CYGPATH_W) 'stack_protector.c'; else $(CYGPATH_W) '$(srcdir)/stack_protector.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stack_protector.obj `if test -f 'stack_protector.c'; then $(CYGPATH_W) 'stack_protector.c'; else $(CYGPATH_W) '$(srcdir)/stack_protector.c'; fi`
 
 lib_a-memcpy_chk.o: memcpy_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcpy_chk.o `test -f 'memcpy_chk.c' || echo '$(srcdir)/'`memcpy_chk.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcpy_chk.o `test -f 'memcpy_chk.c' || echo '$(srcdir)/'`memcpy_chk.c
 
 lib_a-memcpy_chk.obj: memcpy_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcpy_chk.obj `if test -f 'memcpy_chk.c'; then $(CYGPATH_W) 'memcpy_chk.c'; else $(CYGPATH_W) '$(srcdir)/memcpy_chk.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcpy_chk.obj `if test -f 'memcpy_chk.c'; then $(CYGPATH_W) 'memcpy_chk.c'; else $(CYGPATH_W) '$(srcdir)/memcpy_chk.c'; fi`
 
 lib_a-memmove_chk.o: memmove_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memmove_chk.o `test -f 'memmove_chk.c' || echo '$(srcdir)/'`memmove_chk.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memmove_chk.o `test -f 'memmove_chk.c' || echo '$(srcdir)/'`memmove_chk.c
 
 lib_a-memmove_chk.obj: memmove_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memmove_chk.obj `if test -f 'memmove_chk.c'; then $(CYGPATH_W) 'memmove_chk.c'; else $(CYGPATH_W) '$(srcdir)/memmove_chk.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memmove_chk.obj `if test -f 'memmove_chk.c'; then $(CYGPATH_W) 'memmove_chk.c'; else $(CYGPATH_W) '$(srcdir)/memmove_chk.c'; fi`
 
 lib_a-mempcpy_chk.o: mempcpy_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mempcpy_chk.o `test -f 'mempcpy_chk.c' || echo '$(srcdir)/'`mempcpy_chk.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mempcpy_chk.o `test -f 'mempcpy_chk.c' || echo '$(srcdir)/'`mempcpy_chk.c
 
 lib_a-mempcpy_chk.obj: mempcpy_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mempcpy_chk.obj `if test -f 'mempcpy_chk.c'; then $(CYGPATH_W) 'mempcpy_chk.c'; else $(CYGPATH_W) '$(srcdir)/mempcpy_chk.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mempcpy_chk.obj `if test -f 'mempcpy_chk.c'; then $(CYGPATH_W) 'mempcpy_chk.c'; else $(CYGPATH_W) '$(srcdir)/mempcpy_chk.c'; fi`
 
 lib_a-memset_chk.o: memset_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memset_chk.o `test -f 'memset_chk.c' || echo '$(srcdir)/'`memset_chk.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memset_chk.o `test -f 'memset_chk.c' || echo '$(srcdir)/'`memset_chk.c
 
 lib_a-memset_chk.obj: memset_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memset_chk.obj `if test -f 'memset_chk.c'; then $(CYGPATH_W) 'memset_chk.c'; else $(CYGPATH_W) '$(srcdir)/memset_chk.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memset_chk.obj `if test -f 'memset_chk.c'; then $(CYGPATH_W) 'memset_chk.c'; else $(CYGPATH_W) '$(srcdir)/memset_chk.c'; fi`
 
 lib_a-stpcpy_chk.o: stpcpy_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stpcpy_chk.o `test -f 'stpcpy_chk.c' || echo '$(srcdir)/'`stpcpy_chk.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stpcpy_chk.o `test -f 'stpcpy_chk.c' || echo '$(srcdir)/'`stpcpy_chk.c
 
 lib_a-stpcpy_chk.obj: stpcpy_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stpcpy_chk.obj `if test -f 'stpcpy_chk.c'; then $(CYGPATH_W) 'stpcpy_chk.c'; else $(CYGPATH_W) '$(srcdir)/stpcpy_chk.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stpcpy_chk.obj `if test -f 'stpcpy_chk.c'; then $(CYGPATH_W) 'stpcpy_chk.c'; else $(CYGPATH_W) '$(srcdir)/stpcpy_chk.c'; fi`
 
 lib_a-stpncpy_chk.o: stpncpy_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stpncpy_chk.o `test -f 'stpncpy_chk.c' || echo '$(srcdir)/'`stpncpy_chk.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stpncpy_chk.o `test -f 'stpncpy_chk.c' || echo '$(srcdir)/'`stpncpy_chk.c
 
 lib_a-stpncpy_chk.obj: stpncpy_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stpncpy_chk.obj `if test -f 'stpncpy_chk.c'; then $(CYGPATH_W) 'stpncpy_chk.c'; else $(CYGPATH_W) '$(srcdir)/stpncpy_chk.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stpncpy_chk.obj `if test -f 'stpncpy_chk.c'; then $(CYGPATH_W) 'stpncpy_chk.c'; else $(CYGPATH_W) '$(srcdir)/stpncpy_chk.c'; fi`
 
 lib_a-strcat_chk.o: strcat_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strcat_chk.o `test -f 'strcat_chk.c' || echo '$(srcdir)/'`strcat_chk.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strcat_chk.o `test -f 'strcat_chk.c' || echo '$(srcdir)/'`strcat_chk.c
 
 lib_a-strcat_chk.obj: strcat_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strcat_chk.obj `if test -f 'strcat_chk.c'; then $(CYGPATH_W) 'strcat_chk.c'; else $(CYGPATH_W) '$(srcdir)/strcat_chk.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strcat_chk.obj `if test -f 'strcat_chk.c'; then $(CYGPATH_W) 'strcat_chk.c'; else $(CYGPATH_W) '$(srcdir)/strcat_chk.c'; fi`
 
 lib_a-strcpy_chk.o: strcpy_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strcpy_chk.o `test -f 'strcpy_chk.c' || echo '$(srcdir)/'`strcpy_chk.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strcpy_chk.o `test -f 'strcpy_chk.c' || echo '$(srcdir)/'`strcpy_chk.c
 
 lib_a-strcpy_chk.obj: strcpy_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strcpy_chk.obj `if test -f 'strcpy_chk.c'; then $(CYGPATH_W) 'strcpy_chk.c'; else $(CYGPATH_W) '$(srcdir)/strcpy_chk.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strcpy_chk.obj `if test -f 'strcpy_chk.c'; then $(CYGPATH_W) 'strcpy_chk.c'; else $(CYGPATH_W) '$(srcdir)/strcpy_chk.c'; fi`
 
 lib_a-strncat_chk.o: strncat_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strncat_chk.o `test -f 'strncat_chk.c' || echo '$(srcdir)/'`strncat_chk.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strncat_chk.o `test -f 'strncat_chk.c' || echo '$(srcdir)/'`strncat_chk.c
 
 lib_a-strncat_chk.obj: strncat_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strncat_chk.obj `if test -f 'strncat_chk.c'; then $(CYGPATH_W) 'strncat_chk.c'; else $(CYGPATH_W) '$(srcdir)/strncat_chk.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strncat_chk.obj `if test -f 'strncat_chk.c'; then $(CYGPATH_W) 'strncat_chk.c'; else $(CYGPATH_W) '$(srcdir)/strncat_chk.c'; fi`
 
 lib_a-strncpy_chk.o: strncpy_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strncpy_chk.o `test -f 'strncpy_chk.c' || echo '$(srcdir)/'`strncpy_chk.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strncpy_chk.o `test -f 'strncpy_chk.c' || echo '$(srcdir)/'`strncpy_chk.c
 
 lib_a-strncpy_chk.obj: strncpy_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strncpy_chk.obj `if test -f 'strncpy_chk.c'; then $(CYGPATH_W) 'strncpy_chk.c'; else $(CYGPATH_W) '$(srcdir)/strncpy_chk.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strncpy_chk.obj `if test -f 'strncpy_chk.c'; then $(CYGPATH_W) 'strncpy_chk.c'; else $(CYGPATH_W) '$(srcdir)/strncpy_chk.c'; fi`
 
 lib_a-gets_chk.o: gets_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gets_chk.o `test -f 'gets_chk.c' || echo '$(srcdir)/'`gets_chk.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gets_chk.o `test -f 'gets_chk.c' || echo '$(srcdir)/'`gets_chk.c
 
 lib_a-gets_chk.obj: gets_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gets_chk.obj `if test -f 'gets_chk.c'; then $(CYGPATH_W) 'gets_chk.c'; else $(CYGPATH_W) '$(srcdir)/gets_chk.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gets_chk.obj `if test -f 'gets_chk.c'; then $(CYGPATH_W) 'gets_chk.c'; else $(CYGPATH_W) '$(srcdir)/gets_chk.c'; fi`
 
 lib_a-snprintf_chk.o: snprintf_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-snprintf_chk.o `test -f 'snprintf_chk.c' || echo '$(srcdir)/'`snprintf_chk.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-snprintf_chk.o `test -f 'snprintf_chk.c' || echo '$(srcdir)/'`snprintf_chk.c
 
 lib_a-snprintf_chk.obj: snprintf_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-snprintf_chk.obj `if test -f 'snprintf_chk.c'; then $(CYGPATH_W) 'snprintf_chk.c'; else $(CYGPATH_W) '$(srcdir)/snprintf_chk.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-snprintf_chk.obj `if test -f 'snprintf_chk.c'; then $(CYGPATH_W) 'snprintf_chk.c'; else $(CYGPATH_W) '$(srcdir)/snprintf_chk.c'; fi`
 
 lib_a-sprintf_chk.o: sprintf_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sprintf_chk.o `test -f 'sprintf_chk.c' || echo '$(srcdir)/'`sprintf_chk.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sprintf_chk.o `test -f 'sprintf_chk.c' || echo '$(srcdir)/'`sprintf_chk.c
 
 lib_a-sprintf_chk.obj: sprintf_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sprintf_chk.obj `if test -f 'sprintf_chk.c'; then $(CYGPATH_W) 'sprintf_chk.c'; else $(CYGPATH_W) '$(srcdir)/sprintf_chk.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sprintf_chk.obj `if test -f 'sprintf_chk.c'; then $(CYGPATH_W) 'sprintf_chk.c'; else $(CYGPATH_W) '$(srcdir)/sprintf_chk.c'; fi`
 
 lib_a-vsnprintf_chk.o: vsnprintf_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsnprintf_chk.o `test -f 'vsnprintf_chk.c' || echo '$(srcdir)/'`vsnprintf_chk.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsnprintf_chk.o `test -f 'vsnprintf_chk.c' || echo '$(srcdir)/'`vsnprintf_chk.c
 
 lib_a-vsnprintf_chk.obj: vsnprintf_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsnprintf_chk.obj `if test -f 'vsnprintf_chk.c'; then $(CYGPATH_W) 'vsnprintf_chk.c'; else $(CYGPATH_W) '$(srcdir)/vsnprintf_chk.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsnprintf_chk.obj `if test -f 'vsnprintf_chk.c'; then $(CYGPATH_W) 'vsnprintf_chk.c'; else $(CYGPATH_W) '$(srcdir)/vsnprintf_chk.c'; fi`
 
 lib_a-vsprintf_chk.o: vsprintf_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsprintf_chk.o `test -f 'vsprintf_chk.c' || echo '$(srcdir)/'`vsprintf_chk.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsprintf_chk.o `test -f 'vsprintf_chk.c' || echo '$(srcdir)/'`vsprintf_chk.c
 
 lib_a-vsprintf_chk.obj: vsprintf_chk.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsprintf_chk.obj `if test -f 'vsprintf_chk.c'; then $(CYGPATH_W) 'vsprintf_chk.c'; else $(CYGPATH_W) '$(srcdir)/vsprintf_chk.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsprintf_chk.obj `if test -f 'vsprintf_chk.c'; then $(CYGPATH_W) 'vsprintf_chk.c'; else $(CYGPATH_W) '$(srcdir)/vsprintf_chk.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

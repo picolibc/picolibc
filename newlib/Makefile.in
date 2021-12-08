@@ -109,6 +109,12 @@ am__installdirs = "$(DESTDIR)$(toollibdir)" "$(DESTDIR)$(toollibdir)" \
 	"$(DESTDIR)$(toollibdir)"
 LIBRARIES = $(toollib_LIBRARIES)
 ARFLAGS = cru
+AM_V_AR = $(am__v_AR_@AM_V@)
+am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
+am__v_AR_0 = @echo "  AR    " $@;
+AM_V_at = $(am__v_at_@AM_V@)
+am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
+am__v_at_0 = @
 libc_a_AR = $(AR) $(ARFLAGS)
 libc_a_LIBADD =
 libc_a_SOURCES = libc.c
@@ -121,29 +127,42 @@ LTLIBRARIES = $(toollib_LTLIBRARIES)
 libc_la_LIBADD =
 am_libc_la_OBJECTS =
 libc_la_OBJECTS = $(am_libc_la_OBJECTS)
-libc_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(libc_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+libc_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(libc_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_LIBTOOL_TRUE@am_libc_la_rpath = -rpath $(toollibdir)
 libm_la_LIBADD =
 am_libm_la_OBJECTS =
 libm_la_OBJECTS = $(am_libm_la_OBJECTS)
-libm_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(libm_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
+libm_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(libm_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_LIBTOOL_TRUE@am_libm_la_rpath = -rpath $(toollibdir)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
 am__depfiles_maybe =
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC    " $@;
 CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD  " $@;
+AM_V_GEN = $(am__v_GEN_@AM_V@)
+am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
+am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = libc.c libm.c $(libc_la_SOURCES) $(libm_la_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
@@ -179,6 +198,7 @@ RUNTEST = `if test -f $(top_srcdir)/../dejagnu/runtest; then \
 DIST_SUBDIRS = $(SUBDIRS)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
+AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
@@ -312,7 +332,6 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
-runstatedir = @runstatedir@
 sbindir = @sbindir@
 shared_machine_dir = @shared_machine_dir@
 sharedstatedir = @sharedstatedir@
@@ -557,13 +576,13 @@ uninstall-toollibLIBRARIES:
 clean-toollibLIBRARIES:
 	-test -z "$(toollib_LIBRARIES)" || rm -f $(toollib_LIBRARIES)
 @USE_LIBTOOL_TRUE@libc.a: $(libc_a_OBJECTS) $(libc_a_DEPENDENCIES) $(EXTRA_libc_a_DEPENDENCIES) 
-@USE_LIBTOOL_TRUE@	-rm -f libc.a
-@USE_LIBTOOL_TRUE@	$(libc_a_AR) libc.a $(libc_a_OBJECTS) $(libc_a_LIBADD)
-@USE_LIBTOOL_TRUE@	$(RANLIB) libc.a
+@USE_LIBTOOL_TRUE@	$(AM_V_at)-rm -f libc.a
+@USE_LIBTOOL_TRUE@	$(AM_V_AR)$(libc_a_AR) libc.a $(libc_a_OBJECTS) $(libc_a_LIBADD)
+@USE_LIBTOOL_TRUE@	$(AM_V_at)$(RANLIB) libc.a
 @USE_LIBTOOL_TRUE@libm.a: $(libm_a_OBJECTS) $(libm_a_DEPENDENCIES) $(EXTRA_libm_a_DEPENDENCIES) 
-@USE_LIBTOOL_TRUE@	-rm -f libm.a
-@USE_LIBTOOL_TRUE@	$(libm_a_AR) libm.a $(libm_a_OBJECTS) $(libm_a_LIBADD)
-@USE_LIBTOOL_TRUE@	$(RANLIB) libm.a
+@USE_LIBTOOL_TRUE@	$(AM_V_at)-rm -f libm.a
+@USE_LIBTOOL_TRUE@	$(AM_V_AR)$(libm_a_AR) libm.a $(libm_a_OBJECTS) $(libm_a_LIBADD)
+@USE_LIBTOOL_TRUE@	$(AM_V_at)$(RANLIB) libm.a
 install-toollibLTLIBRARIES: $(toollib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
 	@list='$(toollib_LTLIBRARIES)'; test -n "$(toollibdir)" || list=; \
@@ -597,9 +616,9 @@ clean-toollibLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libc.la: $(libc_la_OBJECTS) $(libc_la_DEPENDENCIES) $(EXTRA_libc_la_DEPENDENCIES) 
-	$(libc_la_LINK) $(am_libc_la_rpath) $(libc_la_OBJECTS) $(libc_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(libc_la_LINK) $(am_libc_la_rpath) $(libc_la_OBJECTS) $(libc_la_LIBADD) $(LIBS)
 libm.la: $(libm_la_OBJECTS) $(libm_la_DEPENDENCIES) $(EXTRA_libm_la_DEPENDENCIES) 
-	$(libm_la_LINK) $(am_libm_la_rpath) $(libm_la_OBJECTS) $(libm_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(libm_la_LINK) $(am_libm_la_rpath) $(libm_la_OBJECTS) $(libm_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -608,13 +627,13 @@ distclean-compile:
 	-rm -f *.tab.c
 
 .c.o:
-	$(COMPILE) -c -o $@ $<
+	$(AM_V_CC)$(COMPILE) -c -o $@ $<
 
 .c.obj:
-	$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+	$(AM_V_CC)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .c.lo:
-	$(LTCOMPILE) -c -o $@ $<
+	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
 
 mostlyclean-libtool:
 	-rm -f *.lo

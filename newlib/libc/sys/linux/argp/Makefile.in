@@ -70,6 +70,12 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
+AM_V_AR = $(am__v_AR_@AM_V@)
+am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
+am__v_AR_0 = @echo "  AR    " $@;
+AM_V_at = $(am__v_at_@AM_V@)
+am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
+am__v_at_0 = @
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 am__objects_1 = lib_a-argp-ba.$(OBJEXT) lib_a-argp-eexst.$(OBJEXT) \
@@ -86,7 +92,10 @@ am__objects_2 = argp-ba.lo argp-eexst.lo argp-fmtstream.lo \
 	argp-pvh.lo argp-xinl.lo
 @USE_LIBTOOL_TRUE@am_libargp_la_OBJECTS = $(am__objects_2)
 libargp_la_OBJECTS = $(am_libargp_la_OBJECTS)
-libargp_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+libargp_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libargp_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_LIBTOOL_TRUE@am_libargp_la_rpath =
@@ -95,13 +104,23 @@ depcomp =
 am__depfiles_maybe =
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC    " $@;
 CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD  " $@;
+AM_V_GEN = $(am__v_GEN_@AM_V@)
+am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
+am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(lib_a_SOURCES) $(libargp_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
@@ -113,6 +132,7 @@ ETAGS = etags
 CTAGS = ctags
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
+AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
@@ -231,6 +251,7 @@ prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
 sbindir = @sbindir@
+shared_machine_dir = @shared_machine_dir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
 subdirs = @subdirs@
@@ -303,9 +324,9 @@ $(am__aclocal_m4_deps):
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
 lib.a: $(lib_a_OBJECTS) $(lib_a_DEPENDENCIES) $(EXTRA_lib_a_DEPENDENCIES) 
-	-rm -f lib.a
-	$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
-	$(RANLIB) lib.a
+	$(AM_V_at)-rm -f lib.a
+	$(AM_V_AR)$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
+	$(AM_V_at)$(RANLIB) lib.a
 
 clean-noinstLTLIBRARIES:
 	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
@@ -316,7 +337,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libargp.la: $(libargp_la_OBJECTS) $(libargp_la_DEPENDENCIES) $(EXTRA_libargp_la_DEPENDENCIES) 
-	$(libargp_la_LINK) $(am_libargp_la_rpath) $(libargp_la_OBJECTS) $(libargp_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(libargp_la_LINK) $(am_libargp_la_rpath) $(libargp_la_OBJECTS) $(libargp_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -325,67 +346,67 @@ distclean-compile:
 	-rm -f *.tab.c
 
 .c.o:
-	$(COMPILE) -c $<
+	$(AM_V_CC)$(COMPILE) -c $<
 
 .c.obj:
-	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+	$(AM_V_CC)$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
 .c.lo:
-	$(LTCOMPILE) -c -o $@ $<
+	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
 
 lib_a-argp-ba.o: argp-ba.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-ba.o `test -f 'argp-ba.c' || echo '$(srcdir)/'`argp-ba.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-ba.o `test -f 'argp-ba.c' || echo '$(srcdir)/'`argp-ba.c
 
 lib_a-argp-ba.obj: argp-ba.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-ba.obj `if test -f 'argp-ba.c'; then $(CYGPATH_W) 'argp-ba.c'; else $(CYGPATH_W) '$(srcdir)/argp-ba.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-ba.obj `if test -f 'argp-ba.c'; then $(CYGPATH_W) 'argp-ba.c'; else $(CYGPATH_W) '$(srcdir)/argp-ba.c'; fi`
 
 lib_a-argp-eexst.o: argp-eexst.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-eexst.o `test -f 'argp-eexst.c' || echo '$(srcdir)/'`argp-eexst.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-eexst.o `test -f 'argp-eexst.c' || echo '$(srcdir)/'`argp-eexst.c
 
 lib_a-argp-eexst.obj: argp-eexst.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-eexst.obj `if test -f 'argp-eexst.c'; then $(CYGPATH_W) 'argp-eexst.c'; else $(CYGPATH_W) '$(srcdir)/argp-eexst.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-eexst.obj `if test -f 'argp-eexst.c'; then $(CYGPATH_W) 'argp-eexst.c'; else $(CYGPATH_W) '$(srcdir)/argp-eexst.c'; fi`
 
 lib_a-argp-fmtstream.o: argp-fmtstream.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-fmtstream.o `test -f 'argp-fmtstream.c' || echo '$(srcdir)/'`argp-fmtstream.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-fmtstream.o `test -f 'argp-fmtstream.c' || echo '$(srcdir)/'`argp-fmtstream.c
 
 lib_a-argp-fmtstream.obj: argp-fmtstream.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-fmtstream.obj `if test -f 'argp-fmtstream.c'; then $(CYGPATH_W) 'argp-fmtstream.c'; else $(CYGPATH_W) '$(srcdir)/argp-fmtstream.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-fmtstream.obj `if test -f 'argp-fmtstream.c'; then $(CYGPATH_W) 'argp-fmtstream.c'; else $(CYGPATH_W) '$(srcdir)/argp-fmtstream.c'; fi`
 
 lib_a-argp-fs-xinl.o: argp-fs-xinl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-fs-xinl.o `test -f 'argp-fs-xinl.c' || echo '$(srcdir)/'`argp-fs-xinl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-fs-xinl.o `test -f 'argp-fs-xinl.c' || echo '$(srcdir)/'`argp-fs-xinl.c
 
 lib_a-argp-fs-xinl.obj: argp-fs-xinl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-fs-xinl.obj `if test -f 'argp-fs-xinl.c'; then $(CYGPATH_W) 'argp-fs-xinl.c'; else $(CYGPATH_W) '$(srcdir)/argp-fs-xinl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-fs-xinl.obj `if test -f 'argp-fs-xinl.c'; then $(CYGPATH_W) 'argp-fs-xinl.c'; else $(CYGPATH_W) '$(srcdir)/argp-fs-xinl.c'; fi`
 
 lib_a-argp-help.o: argp-help.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-help.o `test -f 'argp-help.c' || echo '$(srcdir)/'`argp-help.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-help.o `test -f 'argp-help.c' || echo '$(srcdir)/'`argp-help.c
 
 lib_a-argp-help.obj: argp-help.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-help.obj `if test -f 'argp-help.c'; then $(CYGPATH_W) 'argp-help.c'; else $(CYGPATH_W) '$(srcdir)/argp-help.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-help.obj `if test -f 'argp-help.c'; then $(CYGPATH_W) 'argp-help.c'; else $(CYGPATH_W) '$(srcdir)/argp-help.c'; fi`
 
 lib_a-argp-parse.o: argp-parse.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-parse.o `test -f 'argp-parse.c' || echo '$(srcdir)/'`argp-parse.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-parse.o `test -f 'argp-parse.c' || echo '$(srcdir)/'`argp-parse.c
 
 lib_a-argp-parse.obj: argp-parse.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-parse.obj `if test -f 'argp-parse.c'; then $(CYGPATH_W) 'argp-parse.c'; else $(CYGPATH_W) '$(srcdir)/argp-parse.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-parse.obj `if test -f 'argp-parse.c'; then $(CYGPATH_W) 'argp-parse.c'; else $(CYGPATH_W) '$(srcdir)/argp-parse.c'; fi`
 
 lib_a-argp-pv.o: argp-pv.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-pv.o `test -f 'argp-pv.c' || echo '$(srcdir)/'`argp-pv.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-pv.o `test -f 'argp-pv.c' || echo '$(srcdir)/'`argp-pv.c
 
 lib_a-argp-pv.obj: argp-pv.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-pv.obj `if test -f 'argp-pv.c'; then $(CYGPATH_W) 'argp-pv.c'; else $(CYGPATH_W) '$(srcdir)/argp-pv.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-pv.obj `if test -f 'argp-pv.c'; then $(CYGPATH_W) 'argp-pv.c'; else $(CYGPATH_W) '$(srcdir)/argp-pv.c'; fi`
 
 lib_a-argp-pvh.o: argp-pvh.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-pvh.o `test -f 'argp-pvh.c' || echo '$(srcdir)/'`argp-pvh.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-pvh.o `test -f 'argp-pvh.c' || echo '$(srcdir)/'`argp-pvh.c
 
 lib_a-argp-pvh.obj: argp-pvh.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-pvh.obj `if test -f 'argp-pvh.c'; then $(CYGPATH_W) 'argp-pvh.c'; else $(CYGPATH_W) '$(srcdir)/argp-pvh.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-pvh.obj `if test -f 'argp-pvh.c'; then $(CYGPATH_W) 'argp-pvh.c'; else $(CYGPATH_W) '$(srcdir)/argp-pvh.c'; fi`
 
 lib_a-argp-xinl.o: argp-xinl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-xinl.o `test -f 'argp-xinl.c' || echo '$(srcdir)/'`argp-xinl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-xinl.o `test -f 'argp-xinl.c' || echo '$(srcdir)/'`argp-xinl.c
 
 lib_a-argp-xinl.obj: argp-xinl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-xinl.obj `if test -f 'argp-xinl.c'; then $(CYGPATH_W) 'argp-xinl.c'; else $(CYGPATH_W) '$(srcdir)/argp-xinl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-argp-xinl.obj `if test -f 'argp-xinl.c'; then $(CYGPATH_W) 'argp-xinl.c'; else $(CYGPATH_W) '$(srcdir)/argp-xinl.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

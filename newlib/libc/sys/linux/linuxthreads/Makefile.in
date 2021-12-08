@@ -103,6 +103,12 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(toollibdir)" "$(DESTDIR)$(toollibdir)"
 LIBRARIES = $(toollib_LIBRARIES)
 ARFLAGS = cru
+AM_V_AR = $(am__v_AR_@AM_V@)
+am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
+am__v_AR_0 = @echo "  AR    " $@;
+AM_V_at = $(am__v_at_@AM_V@)
+am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
+am__v_at_0 = @
 libpthread_a_AR = $(AR) $(ARFLAGS)
 am__DEPENDENCIES_1 =
 am__objects_1 = libpthread_a-attr.$(OBJEXT) \
@@ -195,7 +201,10 @@ am__objects_6 = ptfork.lo
 @USE_LIBTOOL_TRUE@am_libpthread_la_OBJECTS = $(am__objects_5) \
 @USE_LIBTOOL_TRUE@	$(am__objects_7)
 libpthread_la_OBJECTS = $(am_libpthread_la_OBJECTS)
-libpthread_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+libpthread_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libpthread_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_LIBTOOL_TRUE@am_libpthread_la_rpath = -rpath $(toollibdir)
@@ -216,22 +225,33 @@ am__objects_8 = td_init.lo td_log.lo td_ta_delete.lo \
 	td_symbol_list.lo
 @USE_LIBTOOL_TRUE@am_libthread_db_la_OBJECTS = $(am__objects_8)
 libthread_db_la_OBJECTS = $(am_libthread_db_la_OBJECTS)
-libthread_db_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(libthread_db_la_LDFLAGS) $(LDFLAGS) -o $@
+libthread_db_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(AM_CFLAGS) $(CFLAGS) $(libthread_db_la_LDFLAGS) $(LDFLAGS) \
+	-o $@
 @USE_LIBTOOL_TRUE@am_libthread_db_la_rpath = -rpath $(toollibdir)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
 am__depfiles_maybe =
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC    " $@;
 CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD  " $@;
+AM_V_GEN = $(am__v_GEN_@AM_V@)
+am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
+am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(libpthread_a_SOURCES) $(libthread_db_a_SOURCES) \
 	$(libpthread_la_SOURCES) $(libthread_db_la_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -256,6 +276,7 @@ CTAGS = ctags
 DIST_SUBDIRS = $(SUBDIRS)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
+AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
@@ -373,6 +394,7 @@ prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
 sbindir = @sbindir@
+shared_machine_dir = @shared_machine_dir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
 subdirs = @subdirs@
@@ -530,13 +552,13 @@ uninstall-toollibLIBRARIES:
 clean-toollibLIBRARIES:
 	-test -z "$(toollib_LIBRARIES)" || rm -f $(toollib_LIBRARIES)
 libpthread.a: $(libpthread_a_OBJECTS) $(libpthread_a_DEPENDENCIES) $(EXTRA_libpthread_a_DEPENDENCIES) 
-	-rm -f libpthread.a
-	$(libpthread_a_AR) libpthread.a $(libpthread_a_OBJECTS) $(libpthread_a_LIBADD)
-	$(RANLIB) libpthread.a
+	$(AM_V_at)-rm -f libpthread.a
+	$(AM_V_AR)$(libpthread_a_AR) libpthread.a $(libpthread_a_OBJECTS) $(libpthread_a_LIBADD)
+	$(AM_V_at)$(RANLIB) libpthread.a
 libthread_db.a: $(libthread_db_a_OBJECTS) $(libthread_db_a_DEPENDENCIES) $(EXTRA_libthread_db_a_DEPENDENCIES) 
-	-rm -f libthread_db.a
-	$(libthread_db_a_AR) libthread_db.a $(libthread_db_a_OBJECTS) $(libthread_db_a_LIBADD)
-	$(RANLIB) libthread_db.a
+	$(AM_V_at)-rm -f libthread_db.a
+	$(AM_V_AR)$(libthread_db_a_AR) libthread_db.a $(libthread_db_a_OBJECTS) $(libthread_db_a_LIBADD)
+	$(AM_V_at)$(RANLIB) libthread_db.a
 install-toollibLTLIBRARIES: $(toollib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
 	@list='$(toollib_LTLIBRARIES)'; test -n "$(toollibdir)" || list=; \
@@ -570,9 +592,9 @@ clean-toollibLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libpthread.la: $(libpthread_la_OBJECTS) $(libpthread_la_DEPENDENCIES) $(EXTRA_libpthread_la_DEPENDENCIES) 
-	$(libpthread_la_LINK) $(am_libpthread_la_rpath) $(libpthread_la_OBJECTS) $(libpthread_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(libpthread_la_LINK) $(am_libpthread_la_rpath) $(libpthread_la_OBJECTS) $(libpthread_la_LIBADD) $(LIBS)
 libthread_db.la: $(libthread_db_la_OBJECTS) $(libthread_db_la_DEPENDENCIES) $(EXTRA_libthread_db_la_DEPENDENCIES) 
-	$(libthread_db_la_LINK) $(am_libthread_db_la_rpath) $(libthread_db_la_OBJECTS) $(libthread_db_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(libthread_db_la_LINK) $(am_libthread_db_la_rpath) $(libthread_db_la_OBJECTS) $(libthread_db_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -581,427 +603,427 @@ distclean-compile:
 	-rm -f *.tab.c
 
 .c.o:
-	$(COMPILE) -c $<
+	$(AM_V_CC)$(COMPILE) -c $<
 
 .c.obj:
-	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+	$(AM_V_CC)$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
 .c.lo:
-	$(LTCOMPILE) -c -o $@ $<
+	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
 
 libpthread_a-attr.o: attr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-attr.o `test -f 'attr.c' || echo '$(srcdir)/'`attr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-attr.o `test -f 'attr.c' || echo '$(srcdir)/'`attr.c
 
 libpthread_a-attr.obj: attr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-attr.obj `if test -f 'attr.c'; then $(CYGPATH_W) 'attr.c'; else $(CYGPATH_W) '$(srcdir)/attr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-attr.obj `if test -f 'attr.c'; then $(CYGPATH_W) 'attr.c'; else $(CYGPATH_W) '$(srcdir)/attr.c'; fi`
 
 libpthread_a-barrier.o: barrier.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-barrier.o `test -f 'barrier.c' || echo '$(srcdir)/'`barrier.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-barrier.o `test -f 'barrier.c' || echo '$(srcdir)/'`barrier.c
 
 libpthread_a-barrier.obj: barrier.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-barrier.obj `if test -f 'barrier.c'; then $(CYGPATH_W) 'barrier.c'; else $(CYGPATH_W) '$(srcdir)/barrier.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-barrier.obj `if test -f 'barrier.c'; then $(CYGPATH_W) 'barrier.c'; else $(CYGPATH_W) '$(srcdir)/barrier.c'; fi`
 
 libpthread_a-condvar.o: condvar.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-condvar.o `test -f 'condvar.c' || echo '$(srcdir)/'`condvar.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-condvar.o `test -f 'condvar.c' || echo '$(srcdir)/'`condvar.c
 
 libpthread_a-condvar.obj: condvar.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-condvar.obj `if test -f 'condvar.c'; then $(CYGPATH_W) 'condvar.c'; else $(CYGPATH_W) '$(srcdir)/condvar.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-condvar.obj `if test -f 'condvar.c'; then $(CYGPATH_W) 'condvar.c'; else $(CYGPATH_W) '$(srcdir)/condvar.c'; fi`
 
 libpthread_a-events.o: events.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-events.o `test -f 'events.c' || echo '$(srcdir)/'`events.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-events.o `test -f 'events.c' || echo '$(srcdir)/'`events.c
 
 libpthread_a-events.obj: events.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-events.obj `if test -f 'events.c'; then $(CYGPATH_W) 'events.c'; else $(CYGPATH_W) '$(srcdir)/events.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-events.obj `if test -f 'events.c'; then $(CYGPATH_W) 'events.c'; else $(CYGPATH_W) '$(srcdir)/events.c'; fi`
 
 libpthread_a-getcpuclockid.o: getcpuclockid.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-getcpuclockid.o `test -f 'getcpuclockid.c' || echo '$(srcdir)/'`getcpuclockid.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-getcpuclockid.o `test -f 'getcpuclockid.c' || echo '$(srcdir)/'`getcpuclockid.c
 
 libpthread_a-getcpuclockid.obj: getcpuclockid.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-getcpuclockid.obj `if test -f 'getcpuclockid.c'; then $(CYGPATH_W) 'getcpuclockid.c'; else $(CYGPATH_W) '$(srcdir)/getcpuclockid.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-getcpuclockid.obj `if test -f 'getcpuclockid.c'; then $(CYGPATH_W) 'getcpuclockid.c'; else $(CYGPATH_W) '$(srcdir)/getcpuclockid.c'; fi`
 
 libpthread_a-getreent.o: getreent.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-getreent.o `test -f 'getreent.c' || echo '$(srcdir)/'`getreent.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-getreent.o `test -f 'getreent.c' || echo '$(srcdir)/'`getreent.c
 
 libpthread_a-getreent.obj: getreent.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-getreent.obj `if test -f 'getreent.c'; then $(CYGPATH_W) 'getreent.c'; else $(CYGPATH_W) '$(srcdir)/getreent.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-getreent.obj `if test -f 'getreent.c'; then $(CYGPATH_W) 'getreent.c'; else $(CYGPATH_W) '$(srcdir)/getreent.c'; fi`
 
 libpthread_a-join.o: join.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-join.o `test -f 'join.c' || echo '$(srcdir)/'`join.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-join.o `test -f 'join.c' || echo '$(srcdir)/'`join.c
 
 libpthread_a-join.obj: join.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-join.obj `if test -f 'join.c'; then $(CYGPATH_W) 'join.c'; else $(CYGPATH_W) '$(srcdir)/join.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-join.obj `if test -f 'join.c'; then $(CYGPATH_W) 'join.c'; else $(CYGPATH_W) '$(srcdir)/join.c'; fi`
 
 libpthread_a-lockfile.o: lockfile.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-lockfile.o `test -f 'lockfile.c' || echo '$(srcdir)/'`lockfile.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-lockfile.o `test -f 'lockfile.c' || echo '$(srcdir)/'`lockfile.c
 
 libpthread_a-lockfile.obj: lockfile.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-lockfile.obj `if test -f 'lockfile.c'; then $(CYGPATH_W) 'lockfile.c'; else $(CYGPATH_W) '$(srcdir)/lockfile.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-lockfile.obj `if test -f 'lockfile.c'; then $(CYGPATH_W) 'lockfile.c'; else $(CYGPATH_W) '$(srcdir)/lockfile.c'; fi`
 
 libpthread_a-manager.o: manager.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-manager.o `test -f 'manager.c' || echo '$(srcdir)/'`manager.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-manager.o `test -f 'manager.c' || echo '$(srcdir)/'`manager.c
 
 libpthread_a-manager.obj: manager.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-manager.obj `if test -f 'manager.c'; then $(CYGPATH_W) 'manager.c'; else $(CYGPATH_W) '$(srcdir)/manager.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-manager.obj `if test -f 'manager.c'; then $(CYGPATH_W) 'manager.c'; else $(CYGPATH_W) '$(srcdir)/manager.c'; fi`
 
 libpthread_a-mq_notify.o: mq_notify.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-mq_notify.o `test -f 'mq_notify.c' || echo '$(srcdir)/'`mq_notify.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-mq_notify.o `test -f 'mq_notify.c' || echo '$(srcdir)/'`mq_notify.c
 
 libpthread_a-mq_notify.obj: mq_notify.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-mq_notify.obj `if test -f 'mq_notify.c'; then $(CYGPATH_W) 'mq_notify.c'; else $(CYGPATH_W) '$(srcdir)/mq_notify.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-mq_notify.obj `if test -f 'mq_notify.c'; then $(CYGPATH_W) 'mq_notify.c'; else $(CYGPATH_W) '$(srcdir)/mq_notify.c'; fi`
 
 libpthread_a-oldsemaphore.o: oldsemaphore.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-oldsemaphore.o `test -f 'oldsemaphore.c' || echo '$(srcdir)/'`oldsemaphore.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-oldsemaphore.o `test -f 'oldsemaphore.c' || echo '$(srcdir)/'`oldsemaphore.c
 
 libpthread_a-oldsemaphore.obj: oldsemaphore.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-oldsemaphore.obj `if test -f 'oldsemaphore.c'; then $(CYGPATH_W) 'oldsemaphore.c'; else $(CYGPATH_W) '$(srcdir)/oldsemaphore.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-oldsemaphore.obj `if test -f 'oldsemaphore.c'; then $(CYGPATH_W) 'oldsemaphore.c'; else $(CYGPATH_W) '$(srcdir)/oldsemaphore.c'; fi`
 
 libpthread_a-prio.o: prio.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-prio.o `test -f 'prio.c' || echo '$(srcdir)/'`prio.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-prio.o `test -f 'prio.c' || echo '$(srcdir)/'`prio.c
 
 libpthread_a-prio.obj: prio.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-prio.obj `if test -f 'prio.c'; then $(CYGPATH_W) 'prio.c'; else $(CYGPATH_W) '$(srcdir)/prio.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-prio.obj `if test -f 'prio.c'; then $(CYGPATH_W) 'prio.c'; else $(CYGPATH_W) '$(srcdir)/prio.c'; fi`
 
 libpthread_a-ptclock_gettime.o: ptclock_gettime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-ptclock_gettime.o `test -f 'ptclock_gettime.c' || echo '$(srcdir)/'`ptclock_gettime.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-ptclock_gettime.o `test -f 'ptclock_gettime.c' || echo '$(srcdir)/'`ptclock_gettime.c
 
 libpthread_a-ptclock_gettime.obj: ptclock_gettime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-ptclock_gettime.obj `if test -f 'ptclock_gettime.c'; then $(CYGPATH_W) 'ptclock_gettime.c'; else $(CYGPATH_W) '$(srcdir)/ptclock_gettime.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-ptclock_gettime.obj `if test -f 'ptclock_gettime.c'; then $(CYGPATH_W) 'ptclock_gettime.c'; else $(CYGPATH_W) '$(srcdir)/ptclock_gettime.c'; fi`
 
 libpthread_a-ptclock_settime.o: ptclock_settime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-ptclock_settime.o `test -f 'ptclock_settime.c' || echo '$(srcdir)/'`ptclock_settime.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-ptclock_settime.o `test -f 'ptclock_settime.c' || echo '$(srcdir)/'`ptclock_settime.c
 
 libpthread_a-ptclock_settime.obj: ptclock_settime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-ptclock_settime.obj `if test -f 'ptclock_settime.c'; then $(CYGPATH_W) 'ptclock_settime.c'; else $(CYGPATH_W) '$(srcdir)/ptclock_settime.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-ptclock_settime.obj `if test -f 'ptclock_settime.c'; then $(CYGPATH_W) 'ptclock_settime.c'; else $(CYGPATH_W) '$(srcdir)/ptclock_settime.c'; fi`
 
 libpthread_a-ptlongjmp.o: ptlongjmp.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-ptlongjmp.o `test -f 'ptlongjmp.c' || echo '$(srcdir)/'`ptlongjmp.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-ptlongjmp.o `test -f 'ptlongjmp.c' || echo '$(srcdir)/'`ptlongjmp.c
 
 libpthread_a-ptlongjmp.obj: ptlongjmp.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-ptlongjmp.obj `if test -f 'ptlongjmp.c'; then $(CYGPATH_W) 'ptlongjmp.c'; else $(CYGPATH_W) '$(srcdir)/ptlongjmp.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-ptlongjmp.obj `if test -f 'ptlongjmp.c'; then $(CYGPATH_W) 'ptlongjmp.c'; else $(CYGPATH_W) '$(srcdir)/ptlongjmp.c'; fi`
 
 libpthread_a-pt-machine.o: pt-machine.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-pt-machine.o `test -f 'pt-machine.c' || echo '$(srcdir)/'`pt-machine.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-pt-machine.o `test -f 'pt-machine.c' || echo '$(srcdir)/'`pt-machine.c
 
 libpthread_a-pt-machine.obj: pt-machine.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-pt-machine.obj `if test -f 'pt-machine.c'; then $(CYGPATH_W) 'pt-machine.c'; else $(CYGPATH_W) '$(srcdir)/pt-machine.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-pt-machine.obj `if test -f 'pt-machine.c'; then $(CYGPATH_W) 'pt-machine.c'; else $(CYGPATH_W) '$(srcdir)/pt-machine.c'; fi`
 
 libpthread_a-reent.o: reent.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-reent.o `test -f 'reent.c' || echo '$(srcdir)/'`reent.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-reent.o `test -f 'reent.c' || echo '$(srcdir)/'`reent.c
 
 libpthread_a-reent.obj: reent.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-reent.obj `if test -f 'reent.c'; then $(CYGPATH_W) 'reent.c'; else $(CYGPATH_W) '$(srcdir)/reent.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-reent.obj `if test -f 'reent.c'; then $(CYGPATH_W) 'reent.c'; else $(CYGPATH_W) '$(srcdir)/reent.c'; fi`
 
 libpthread_a-rwlock.o: rwlock.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-rwlock.o `test -f 'rwlock.c' || echo '$(srcdir)/'`rwlock.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-rwlock.o `test -f 'rwlock.c' || echo '$(srcdir)/'`rwlock.c
 
 libpthread_a-rwlock.obj: rwlock.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-rwlock.obj `if test -f 'rwlock.c'; then $(CYGPATH_W) 'rwlock.c'; else $(CYGPATH_W) '$(srcdir)/rwlock.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-rwlock.obj `if test -f 'rwlock.c'; then $(CYGPATH_W) 'rwlock.c'; else $(CYGPATH_W) '$(srcdir)/rwlock.c'; fi`
 
 libpthread_a-semaphore.o: semaphore.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-semaphore.o `test -f 'semaphore.c' || echo '$(srcdir)/'`semaphore.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-semaphore.o `test -f 'semaphore.c' || echo '$(srcdir)/'`semaphore.c
 
 libpthread_a-semaphore.obj: semaphore.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-semaphore.obj `if test -f 'semaphore.c'; then $(CYGPATH_W) 'semaphore.c'; else $(CYGPATH_W) '$(srcdir)/semaphore.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-semaphore.obj `if test -f 'semaphore.c'; then $(CYGPATH_W) 'semaphore.c'; else $(CYGPATH_W) '$(srcdir)/semaphore.c'; fi`
 
 libpthread_a-signals.o: signals.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-signals.o `test -f 'signals.c' || echo '$(srcdir)/'`signals.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-signals.o `test -f 'signals.c' || echo '$(srcdir)/'`signals.c
 
 libpthread_a-signals.obj: signals.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-signals.obj `if test -f 'signals.c'; then $(CYGPATH_W) 'signals.c'; else $(CYGPATH_W) '$(srcdir)/signals.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-signals.obj `if test -f 'signals.c'; then $(CYGPATH_W) 'signals.c'; else $(CYGPATH_W) '$(srcdir)/signals.c'; fi`
 
 libpthread_a-spinlock.o: spinlock.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-spinlock.o `test -f 'spinlock.c' || echo '$(srcdir)/'`spinlock.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-spinlock.o `test -f 'spinlock.c' || echo '$(srcdir)/'`spinlock.c
 
 libpthread_a-spinlock.obj: spinlock.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-spinlock.obj `if test -f 'spinlock.c'; then $(CYGPATH_W) 'spinlock.c'; else $(CYGPATH_W) '$(srcdir)/spinlock.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-spinlock.obj `if test -f 'spinlock.c'; then $(CYGPATH_W) 'spinlock.c'; else $(CYGPATH_W) '$(srcdir)/spinlock.c'; fi`
 
 libpthread_a-sysctl.o: sysctl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-sysctl.o `test -f 'sysctl.c' || echo '$(srcdir)/'`sysctl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-sysctl.o `test -f 'sysctl.c' || echo '$(srcdir)/'`sysctl.c
 
 libpthread_a-sysctl.obj: sysctl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-sysctl.obj `if test -f 'sysctl.c'; then $(CYGPATH_W) 'sysctl.c'; else $(CYGPATH_W) '$(srcdir)/sysctl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-sysctl.obj `if test -f 'sysctl.c'; then $(CYGPATH_W) 'sysctl.c'; else $(CYGPATH_W) '$(srcdir)/sysctl.c'; fi`
 
 libpthread_a-timer_create.o: timer_create.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-timer_create.o `test -f 'timer_create.c' || echo '$(srcdir)/'`timer_create.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-timer_create.o `test -f 'timer_create.c' || echo '$(srcdir)/'`timer_create.c
 
 libpthread_a-timer_create.obj: timer_create.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-timer_create.obj `if test -f 'timer_create.c'; then $(CYGPATH_W) 'timer_create.c'; else $(CYGPATH_W) '$(srcdir)/timer_create.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-timer_create.obj `if test -f 'timer_create.c'; then $(CYGPATH_W) 'timer_create.c'; else $(CYGPATH_W) '$(srcdir)/timer_create.c'; fi`
 
 libpthread_a-timer_getoverr.o: timer_getoverr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-timer_getoverr.o `test -f 'timer_getoverr.c' || echo '$(srcdir)/'`timer_getoverr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-timer_getoverr.o `test -f 'timer_getoverr.c' || echo '$(srcdir)/'`timer_getoverr.c
 
 libpthread_a-timer_getoverr.obj: timer_getoverr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-timer_getoverr.obj `if test -f 'timer_getoverr.c'; then $(CYGPATH_W) 'timer_getoverr.c'; else $(CYGPATH_W) '$(srcdir)/timer_getoverr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-timer_getoverr.obj `if test -f 'timer_getoverr.c'; then $(CYGPATH_W) 'timer_getoverr.c'; else $(CYGPATH_W) '$(srcdir)/timer_getoverr.c'; fi`
 
 libpthread_a-timer_routines.o: timer_routines.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-timer_routines.o `test -f 'timer_routines.c' || echo '$(srcdir)/'`timer_routines.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-timer_routines.o `test -f 'timer_routines.c' || echo '$(srcdir)/'`timer_routines.c
 
 libpthread_a-timer_routines.obj: timer_routines.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-timer_routines.obj `if test -f 'timer_routines.c'; then $(CYGPATH_W) 'timer_routines.c'; else $(CYGPATH_W) '$(srcdir)/timer_routines.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-timer_routines.obj `if test -f 'timer_routines.c'; then $(CYGPATH_W) 'timer_routines.c'; else $(CYGPATH_W) '$(srcdir)/timer_routines.c'; fi`
 
 libpthread_a-timer_delete.o: timer_delete.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-timer_delete.o `test -f 'timer_delete.c' || echo '$(srcdir)/'`timer_delete.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-timer_delete.o `test -f 'timer_delete.c' || echo '$(srcdir)/'`timer_delete.c
 
 libpthread_a-timer_delete.obj: timer_delete.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-timer_delete.obj `if test -f 'timer_delete.c'; then $(CYGPATH_W) 'timer_delete.c'; else $(CYGPATH_W) '$(srcdir)/timer_delete.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-timer_delete.obj `if test -f 'timer_delete.c'; then $(CYGPATH_W) 'timer_delete.c'; else $(CYGPATH_W) '$(srcdir)/timer_delete.c'; fi`
 
 libpthread_a-timer_gettime.o: timer_gettime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-timer_gettime.o `test -f 'timer_gettime.c' || echo '$(srcdir)/'`timer_gettime.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-timer_gettime.o `test -f 'timer_gettime.c' || echo '$(srcdir)/'`timer_gettime.c
 
 libpthread_a-timer_gettime.obj: timer_gettime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-timer_gettime.obj `if test -f 'timer_gettime.c'; then $(CYGPATH_W) 'timer_gettime.c'; else $(CYGPATH_W) '$(srcdir)/timer_gettime.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-timer_gettime.obj `if test -f 'timer_gettime.c'; then $(CYGPATH_W) 'timer_gettime.c'; else $(CYGPATH_W) '$(srcdir)/timer_gettime.c'; fi`
 
 libpthread_a-timer_settime.o: timer_settime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-timer_settime.o `test -f 'timer_settime.c' || echo '$(srcdir)/'`timer_settime.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-timer_settime.o `test -f 'timer_settime.c' || echo '$(srcdir)/'`timer_settime.c
 
 libpthread_a-timer_settime.obj: timer_settime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-timer_settime.obj `if test -f 'timer_settime.c'; then $(CYGPATH_W) 'timer_settime.c'; else $(CYGPATH_W) '$(srcdir)/timer_settime.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-timer_settime.obj `if test -f 'timer_settime.c'; then $(CYGPATH_W) 'timer_settime.c'; else $(CYGPATH_W) '$(srcdir)/timer_settime.c'; fi`
 
 libpthread_a-wrapsyscall.o: wrapsyscall.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-wrapsyscall.o `test -f 'wrapsyscall.c' || echo '$(srcdir)/'`wrapsyscall.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-wrapsyscall.o `test -f 'wrapsyscall.c' || echo '$(srcdir)/'`wrapsyscall.c
 
 libpthread_a-wrapsyscall.obj: wrapsyscall.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-wrapsyscall.obj `if test -f 'wrapsyscall.c'; then $(CYGPATH_W) 'wrapsyscall.c'; else $(CYGPATH_W) '$(srcdir)/wrapsyscall.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-wrapsyscall.obj `if test -f 'wrapsyscall.c'; then $(CYGPATH_W) 'wrapsyscall.c'; else $(CYGPATH_W) '$(srcdir)/wrapsyscall.c'; fi`
 
 libpthread_a-ptfork.o: ptfork.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-ptfork.o `test -f 'ptfork.c' || echo '$(srcdir)/'`ptfork.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-ptfork.o `test -f 'ptfork.c' || echo '$(srcdir)/'`ptfork.c
 
 libpthread_a-ptfork.obj: ptfork.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-ptfork.obj `if test -f 'ptfork.c'; then $(CYGPATH_W) 'ptfork.c'; else $(CYGPATH_W) '$(srcdir)/ptfork.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-ptfork.obj `if test -f 'ptfork.c'; then $(CYGPATH_W) 'ptfork.c'; else $(CYGPATH_W) '$(srcdir)/ptfork.c'; fi`
 
 libpthread_a-reqsyscalls.o: reqsyscalls.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-reqsyscalls.o `test -f 'reqsyscalls.c' || echo '$(srcdir)/'`reqsyscalls.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-reqsyscalls.o `test -f 'reqsyscalls.c' || echo '$(srcdir)/'`reqsyscalls.c
 
 libpthread_a-reqsyscalls.obj: reqsyscalls.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-reqsyscalls.obj `if test -f 'reqsyscalls.c'; then $(CYGPATH_W) 'reqsyscalls.c'; else $(CYGPATH_W) '$(srcdir)/reqsyscalls.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpthread_a_CFLAGS) $(CFLAGS) -c -o libpthread_a-reqsyscalls.obj `if test -f 'reqsyscalls.c'; then $(CYGPATH_W) 'reqsyscalls.c'; else $(CYGPATH_W) '$(srcdir)/reqsyscalls.c'; fi`
 
 libthread_db_a-td_init.o: td_init.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_init.o `test -f 'td_init.c' || echo '$(srcdir)/'`td_init.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_init.o `test -f 'td_init.c' || echo '$(srcdir)/'`td_init.c
 
 libthread_db_a-td_init.obj: td_init.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_init.obj `if test -f 'td_init.c'; then $(CYGPATH_W) 'td_init.c'; else $(CYGPATH_W) '$(srcdir)/td_init.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_init.obj `if test -f 'td_init.c'; then $(CYGPATH_W) 'td_init.c'; else $(CYGPATH_W) '$(srcdir)/td_init.c'; fi`
 
 libthread_db_a-td_log.o: td_log.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_log.o `test -f 'td_log.c' || echo '$(srcdir)/'`td_log.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_log.o `test -f 'td_log.c' || echo '$(srcdir)/'`td_log.c
 
 libthread_db_a-td_log.obj: td_log.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_log.obj `if test -f 'td_log.c'; then $(CYGPATH_W) 'td_log.c'; else $(CYGPATH_W) '$(srcdir)/td_log.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_log.obj `if test -f 'td_log.c'; then $(CYGPATH_W) 'td_log.c'; else $(CYGPATH_W) '$(srcdir)/td_log.c'; fi`
 
 libthread_db_a-td_ta_delete.o: td_ta_delete.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_delete.o `test -f 'td_ta_delete.c' || echo '$(srcdir)/'`td_ta_delete.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_delete.o `test -f 'td_ta_delete.c' || echo '$(srcdir)/'`td_ta_delete.c
 
 libthread_db_a-td_ta_delete.obj: td_ta_delete.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_delete.obj `if test -f 'td_ta_delete.c'; then $(CYGPATH_W) 'td_ta_delete.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_delete.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_delete.obj `if test -f 'td_ta_delete.c'; then $(CYGPATH_W) 'td_ta_delete.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_delete.c'; fi`
 
 libthread_db_a-td_ta_get_nthreads.o: td_ta_get_nthreads.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_get_nthreads.o `test -f 'td_ta_get_nthreads.c' || echo '$(srcdir)/'`td_ta_get_nthreads.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_get_nthreads.o `test -f 'td_ta_get_nthreads.c' || echo '$(srcdir)/'`td_ta_get_nthreads.c
 
 libthread_db_a-td_ta_get_nthreads.obj: td_ta_get_nthreads.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_get_nthreads.obj `if test -f 'td_ta_get_nthreads.c'; then $(CYGPATH_W) 'td_ta_get_nthreads.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_get_nthreads.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_get_nthreads.obj `if test -f 'td_ta_get_nthreads.c'; then $(CYGPATH_W) 'td_ta_get_nthreads.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_get_nthreads.c'; fi`
 
 libthread_db_a-td_ta_get_ph.o: td_ta_get_ph.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_get_ph.o `test -f 'td_ta_get_ph.c' || echo '$(srcdir)/'`td_ta_get_ph.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_get_ph.o `test -f 'td_ta_get_ph.c' || echo '$(srcdir)/'`td_ta_get_ph.c
 
 libthread_db_a-td_ta_get_ph.obj: td_ta_get_ph.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_get_ph.obj `if test -f 'td_ta_get_ph.c'; then $(CYGPATH_W) 'td_ta_get_ph.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_get_ph.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_get_ph.obj `if test -f 'td_ta_get_ph.c'; then $(CYGPATH_W) 'td_ta_get_ph.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_get_ph.c'; fi`
 
 libthread_db_a-td_ta_map_id2thr.o: td_ta_map_id2thr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_map_id2thr.o `test -f 'td_ta_map_id2thr.c' || echo '$(srcdir)/'`td_ta_map_id2thr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_map_id2thr.o `test -f 'td_ta_map_id2thr.c' || echo '$(srcdir)/'`td_ta_map_id2thr.c
 
 libthread_db_a-td_ta_map_id2thr.obj: td_ta_map_id2thr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_map_id2thr.obj `if test -f 'td_ta_map_id2thr.c'; then $(CYGPATH_W) 'td_ta_map_id2thr.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_map_id2thr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_map_id2thr.obj `if test -f 'td_ta_map_id2thr.c'; then $(CYGPATH_W) 'td_ta_map_id2thr.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_map_id2thr.c'; fi`
 
 libthread_db_a-td_ta_map_lwp2thr.o: td_ta_map_lwp2thr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_map_lwp2thr.o `test -f 'td_ta_map_lwp2thr.c' || echo '$(srcdir)/'`td_ta_map_lwp2thr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_map_lwp2thr.o `test -f 'td_ta_map_lwp2thr.c' || echo '$(srcdir)/'`td_ta_map_lwp2thr.c
 
 libthread_db_a-td_ta_map_lwp2thr.obj: td_ta_map_lwp2thr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_map_lwp2thr.obj `if test -f 'td_ta_map_lwp2thr.c'; then $(CYGPATH_W) 'td_ta_map_lwp2thr.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_map_lwp2thr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_map_lwp2thr.obj `if test -f 'td_ta_map_lwp2thr.c'; then $(CYGPATH_W) 'td_ta_map_lwp2thr.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_map_lwp2thr.c'; fi`
 
 libthread_db_a-td_ta_new.o: td_ta_new.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_new.o `test -f 'td_ta_new.c' || echo '$(srcdir)/'`td_ta_new.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_new.o `test -f 'td_ta_new.c' || echo '$(srcdir)/'`td_ta_new.c
 
 libthread_db_a-td_ta_new.obj: td_ta_new.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_new.obj `if test -f 'td_ta_new.c'; then $(CYGPATH_W) 'td_ta_new.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_new.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_new.obj `if test -f 'td_ta_new.c'; then $(CYGPATH_W) 'td_ta_new.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_new.c'; fi`
 
 libthread_db_a-td_ta_thr_iter.o: td_ta_thr_iter.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_thr_iter.o `test -f 'td_ta_thr_iter.c' || echo '$(srcdir)/'`td_ta_thr_iter.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_thr_iter.o `test -f 'td_ta_thr_iter.c' || echo '$(srcdir)/'`td_ta_thr_iter.c
 
 libthread_db_a-td_ta_thr_iter.obj: td_ta_thr_iter.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_thr_iter.obj `if test -f 'td_ta_thr_iter.c'; then $(CYGPATH_W) 'td_ta_thr_iter.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_thr_iter.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_thr_iter.obj `if test -f 'td_ta_thr_iter.c'; then $(CYGPATH_W) 'td_ta_thr_iter.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_thr_iter.c'; fi`
 
 libthread_db_a-td_ta_tsd_iter.o: td_ta_tsd_iter.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_tsd_iter.o `test -f 'td_ta_tsd_iter.c' || echo '$(srcdir)/'`td_ta_tsd_iter.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_tsd_iter.o `test -f 'td_ta_tsd_iter.c' || echo '$(srcdir)/'`td_ta_tsd_iter.c
 
 libthread_db_a-td_ta_tsd_iter.obj: td_ta_tsd_iter.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_tsd_iter.obj `if test -f 'td_ta_tsd_iter.c'; then $(CYGPATH_W) 'td_ta_tsd_iter.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_tsd_iter.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_tsd_iter.obj `if test -f 'td_ta_tsd_iter.c'; then $(CYGPATH_W) 'td_ta_tsd_iter.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_tsd_iter.c'; fi`
 
 libthread_db_a-td_thr_get_info.o: td_thr_get_info.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_get_info.o `test -f 'td_thr_get_info.c' || echo '$(srcdir)/'`td_thr_get_info.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_get_info.o `test -f 'td_thr_get_info.c' || echo '$(srcdir)/'`td_thr_get_info.c
 
 libthread_db_a-td_thr_get_info.obj: td_thr_get_info.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_get_info.obj `if test -f 'td_thr_get_info.c'; then $(CYGPATH_W) 'td_thr_get_info.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_get_info.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_get_info.obj `if test -f 'td_thr_get_info.c'; then $(CYGPATH_W) 'td_thr_get_info.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_get_info.c'; fi`
 
 libthread_db_a-td_thr_getfpregs.o: td_thr_getfpregs.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_getfpregs.o `test -f 'td_thr_getfpregs.c' || echo '$(srcdir)/'`td_thr_getfpregs.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_getfpregs.o `test -f 'td_thr_getfpregs.c' || echo '$(srcdir)/'`td_thr_getfpregs.c
 
 libthread_db_a-td_thr_getfpregs.obj: td_thr_getfpregs.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_getfpregs.obj `if test -f 'td_thr_getfpregs.c'; then $(CYGPATH_W) 'td_thr_getfpregs.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_getfpregs.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_getfpregs.obj `if test -f 'td_thr_getfpregs.c'; then $(CYGPATH_W) 'td_thr_getfpregs.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_getfpregs.c'; fi`
 
 libthread_db_a-td_thr_getgregs.o: td_thr_getgregs.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_getgregs.o `test -f 'td_thr_getgregs.c' || echo '$(srcdir)/'`td_thr_getgregs.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_getgregs.o `test -f 'td_thr_getgregs.c' || echo '$(srcdir)/'`td_thr_getgregs.c
 
 libthread_db_a-td_thr_getgregs.obj: td_thr_getgregs.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_getgregs.obj `if test -f 'td_thr_getgregs.c'; then $(CYGPATH_W) 'td_thr_getgregs.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_getgregs.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_getgregs.obj `if test -f 'td_thr_getgregs.c'; then $(CYGPATH_W) 'td_thr_getgregs.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_getgregs.c'; fi`
 
 libthread_db_a-td_thr_getxregs.o: td_thr_getxregs.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_getxregs.o `test -f 'td_thr_getxregs.c' || echo '$(srcdir)/'`td_thr_getxregs.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_getxregs.o `test -f 'td_thr_getxregs.c' || echo '$(srcdir)/'`td_thr_getxregs.c
 
 libthread_db_a-td_thr_getxregs.obj: td_thr_getxregs.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_getxregs.obj `if test -f 'td_thr_getxregs.c'; then $(CYGPATH_W) 'td_thr_getxregs.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_getxregs.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_getxregs.obj `if test -f 'td_thr_getxregs.c'; then $(CYGPATH_W) 'td_thr_getxregs.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_getxregs.c'; fi`
 
 libthread_db_a-td_thr_getxregsize.o: td_thr_getxregsize.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_getxregsize.o `test -f 'td_thr_getxregsize.c' || echo '$(srcdir)/'`td_thr_getxregsize.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_getxregsize.o `test -f 'td_thr_getxregsize.c' || echo '$(srcdir)/'`td_thr_getxregsize.c
 
 libthread_db_a-td_thr_getxregsize.obj: td_thr_getxregsize.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_getxregsize.obj `if test -f 'td_thr_getxregsize.c'; then $(CYGPATH_W) 'td_thr_getxregsize.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_getxregsize.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_getxregsize.obj `if test -f 'td_thr_getxregsize.c'; then $(CYGPATH_W) 'td_thr_getxregsize.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_getxregsize.c'; fi`
 
 libthread_db_a-td_thr_setfpregs.o: td_thr_setfpregs.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_setfpregs.o `test -f 'td_thr_setfpregs.c' || echo '$(srcdir)/'`td_thr_setfpregs.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_setfpregs.o `test -f 'td_thr_setfpregs.c' || echo '$(srcdir)/'`td_thr_setfpregs.c
 
 libthread_db_a-td_thr_setfpregs.obj: td_thr_setfpregs.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_setfpregs.obj `if test -f 'td_thr_setfpregs.c'; then $(CYGPATH_W) 'td_thr_setfpregs.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_setfpregs.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_setfpregs.obj `if test -f 'td_thr_setfpregs.c'; then $(CYGPATH_W) 'td_thr_setfpregs.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_setfpregs.c'; fi`
 
 libthread_db_a-td_thr_setgregs.o: td_thr_setgregs.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_setgregs.o `test -f 'td_thr_setgregs.c' || echo '$(srcdir)/'`td_thr_setgregs.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_setgregs.o `test -f 'td_thr_setgregs.c' || echo '$(srcdir)/'`td_thr_setgregs.c
 
 libthread_db_a-td_thr_setgregs.obj: td_thr_setgregs.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_setgregs.obj `if test -f 'td_thr_setgregs.c'; then $(CYGPATH_W) 'td_thr_setgregs.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_setgregs.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_setgregs.obj `if test -f 'td_thr_setgregs.c'; then $(CYGPATH_W) 'td_thr_setgregs.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_setgregs.c'; fi`
 
 libthread_db_a-td_thr_setprio.o: td_thr_setprio.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_setprio.o `test -f 'td_thr_setprio.c' || echo '$(srcdir)/'`td_thr_setprio.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_setprio.o `test -f 'td_thr_setprio.c' || echo '$(srcdir)/'`td_thr_setprio.c
 
 libthread_db_a-td_thr_setprio.obj: td_thr_setprio.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_setprio.obj `if test -f 'td_thr_setprio.c'; then $(CYGPATH_W) 'td_thr_setprio.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_setprio.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_setprio.obj `if test -f 'td_thr_setprio.c'; then $(CYGPATH_W) 'td_thr_setprio.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_setprio.c'; fi`
 
 libthread_db_a-td_thr_setsigpending.o: td_thr_setsigpending.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_setsigpending.o `test -f 'td_thr_setsigpending.c' || echo '$(srcdir)/'`td_thr_setsigpending.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_setsigpending.o `test -f 'td_thr_setsigpending.c' || echo '$(srcdir)/'`td_thr_setsigpending.c
 
 libthread_db_a-td_thr_setsigpending.obj: td_thr_setsigpending.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_setsigpending.obj `if test -f 'td_thr_setsigpending.c'; then $(CYGPATH_W) 'td_thr_setsigpending.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_setsigpending.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_setsigpending.obj `if test -f 'td_thr_setsigpending.c'; then $(CYGPATH_W) 'td_thr_setsigpending.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_setsigpending.c'; fi`
 
 libthread_db_a-td_thr_setxregs.o: td_thr_setxregs.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_setxregs.o `test -f 'td_thr_setxregs.c' || echo '$(srcdir)/'`td_thr_setxregs.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_setxregs.o `test -f 'td_thr_setxregs.c' || echo '$(srcdir)/'`td_thr_setxregs.c
 
 libthread_db_a-td_thr_setxregs.obj: td_thr_setxregs.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_setxregs.obj `if test -f 'td_thr_setxregs.c'; then $(CYGPATH_W) 'td_thr_setxregs.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_setxregs.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_setxregs.obj `if test -f 'td_thr_setxregs.c'; then $(CYGPATH_W) 'td_thr_setxregs.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_setxregs.c'; fi`
 
 libthread_db_a-td_thr_sigsetmask.o: td_thr_sigsetmask.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_sigsetmask.o `test -f 'td_thr_sigsetmask.c' || echo '$(srcdir)/'`td_thr_sigsetmask.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_sigsetmask.o `test -f 'td_thr_sigsetmask.c' || echo '$(srcdir)/'`td_thr_sigsetmask.c
 
 libthread_db_a-td_thr_sigsetmask.obj: td_thr_sigsetmask.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_sigsetmask.obj `if test -f 'td_thr_sigsetmask.c'; then $(CYGPATH_W) 'td_thr_sigsetmask.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_sigsetmask.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_sigsetmask.obj `if test -f 'td_thr_sigsetmask.c'; then $(CYGPATH_W) 'td_thr_sigsetmask.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_sigsetmask.c'; fi`
 
 libthread_db_a-td_thr_tsd.o: td_thr_tsd.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_tsd.o `test -f 'td_thr_tsd.c' || echo '$(srcdir)/'`td_thr_tsd.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_tsd.o `test -f 'td_thr_tsd.c' || echo '$(srcdir)/'`td_thr_tsd.c
 
 libthread_db_a-td_thr_tsd.obj: td_thr_tsd.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_tsd.obj `if test -f 'td_thr_tsd.c'; then $(CYGPATH_W) 'td_thr_tsd.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_tsd.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_tsd.obj `if test -f 'td_thr_tsd.c'; then $(CYGPATH_W) 'td_thr_tsd.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_tsd.c'; fi`
 
 libthread_db_a-td_thr_validate.o: td_thr_validate.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_validate.o `test -f 'td_thr_validate.c' || echo '$(srcdir)/'`td_thr_validate.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_validate.o `test -f 'td_thr_validate.c' || echo '$(srcdir)/'`td_thr_validate.c
 
 libthread_db_a-td_thr_validate.obj: td_thr_validate.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_validate.obj `if test -f 'td_thr_validate.c'; then $(CYGPATH_W) 'td_thr_validate.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_validate.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_validate.obj `if test -f 'td_thr_validate.c'; then $(CYGPATH_W) 'td_thr_validate.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_validate.c'; fi`
 
 libthread_db_a-td_thr_dbsuspend.o: td_thr_dbsuspend.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_dbsuspend.o `test -f 'td_thr_dbsuspend.c' || echo '$(srcdir)/'`td_thr_dbsuspend.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_dbsuspend.o `test -f 'td_thr_dbsuspend.c' || echo '$(srcdir)/'`td_thr_dbsuspend.c
 
 libthread_db_a-td_thr_dbsuspend.obj: td_thr_dbsuspend.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_dbsuspend.obj `if test -f 'td_thr_dbsuspend.c'; then $(CYGPATH_W) 'td_thr_dbsuspend.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_dbsuspend.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_dbsuspend.obj `if test -f 'td_thr_dbsuspend.c'; then $(CYGPATH_W) 'td_thr_dbsuspend.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_dbsuspend.c'; fi`
 
 libthread_db_a-td_thr_dbresume.o: td_thr_dbresume.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_dbresume.o `test -f 'td_thr_dbresume.c' || echo '$(srcdir)/'`td_thr_dbresume.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_dbresume.o `test -f 'td_thr_dbresume.c' || echo '$(srcdir)/'`td_thr_dbresume.c
 
 libthread_db_a-td_thr_dbresume.obj: td_thr_dbresume.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_dbresume.obj `if test -f 'td_thr_dbresume.c'; then $(CYGPATH_W) 'td_thr_dbresume.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_dbresume.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_dbresume.obj `if test -f 'td_thr_dbresume.c'; then $(CYGPATH_W) 'td_thr_dbresume.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_dbresume.c'; fi`
 
 libthread_db_a-td_ta_setconcurrency.o: td_ta_setconcurrency.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_setconcurrency.o `test -f 'td_ta_setconcurrency.c' || echo '$(srcdir)/'`td_ta_setconcurrency.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_setconcurrency.o `test -f 'td_ta_setconcurrency.c' || echo '$(srcdir)/'`td_ta_setconcurrency.c
 
 libthread_db_a-td_ta_setconcurrency.obj: td_ta_setconcurrency.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_setconcurrency.obj `if test -f 'td_ta_setconcurrency.c'; then $(CYGPATH_W) 'td_ta_setconcurrency.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_setconcurrency.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_setconcurrency.obj `if test -f 'td_ta_setconcurrency.c'; then $(CYGPATH_W) 'td_ta_setconcurrency.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_setconcurrency.c'; fi`
 
 libthread_db_a-td_ta_enable_stats.o: td_ta_enable_stats.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_enable_stats.o `test -f 'td_ta_enable_stats.c' || echo '$(srcdir)/'`td_ta_enable_stats.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_enable_stats.o `test -f 'td_ta_enable_stats.c' || echo '$(srcdir)/'`td_ta_enable_stats.c
 
 libthread_db_a-td_ta_enable_stats.obj: td_ta_enable_stats.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_enable_stats.obj `if test -f 'td_ta_enable_stats.c'; then $(CYGPATH_W) 'td_ta_enable_stats.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_enable_stats.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_enable_stats.obj `if test -f 'td_ta_enable_stats.c'; then $(CYGPATH_W) 'td_ta_enable_stats.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_enable_stats.c'; fi`
 
 libthread_db_a-td_ta_reset_stats.o: td_ta_reset_stats.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_reset_stats.o `test -f 'td_ta_reset_stats.c' || echo '$(srcdir)/'`td_ta_reset_stats.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_reset_stats.o `test -f 'td_ta_reset_stats.c' || echo '$(srcdir)/'`td_ta_reset_stats.c
 
 libthread_db_a-td_ta_reset_stats.obj: td_ta_reset_stats.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_reset_stats.obj `if test -f 'td_ta_reset_stats.c'; then $(CYGPATH_W) 'td_ta_reset_stats.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_reset_stats.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_reset_stats.obj `if test -f 'td_ta_reset_stats.c'; then $(CYGPATH_W) 'td_ta_reset_stats.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_reset_stats.c'; fi`
 
 libthread_db_a-td_ta_get_stats.o: td_ta_get_stats.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_get_stats.o `test -f 'td_ta_get_stats.c' || echo '$(srcdir)/'`td_ta_get_stats.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_get_stats.o `test -f 'td_ta_get_stats.c' || echo '$(srcdir)/'`td_ta_get_stats.c
 
 libthread_db_a-td_ta_get_stats.obj: td_ta_get_stats.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_get_stats.obj `if test -f 'td_ta_get_stats.c'; then $(CYGPATH_W) 'td_ta_get_stats.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_get_stats.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_get_stats.obj `if test -f 'td_ta_get_stats.c'; then $(CYGPATH_W) 'td_ta_get_stats.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_get_stats.c'; fi`
 
 libthread_db_a-td_ta_event_addr.o: td_ta_event_addr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_event_addr.o `test -f 'td_ta_event_addr.c' || echo '$(srcdir)/'`td_ta_event_addr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_event_addr.o `test -f 'td_ta_event_addr.c' || echo '$(srcdir)/'`td_ta_event_addr.c
 
 libthread_db_a-td_ta_event_addr.obj: td_ta_event_addr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_event_addr.obj `if test -f 'td_ta_event_addr.c'; then $(CYGPATH_W) 'td_ta_event_addr.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_event_addr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_event_addr.obj `if test -f 'td_ta_event_addr.c'; then $(CYGPATH_W) 'td_ta_event_addr.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_event_addr.c'; fi`
 
 libthread_db_a-td_thr_event_enable.o: td_thr_event_enable.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_event_enable.o `test -f 'td_thr_event_enable.c' || echo '$(srcdir)/'`td_thr_event_enable.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_event_enable.o `test -f 'td_thr_event_enable.c' || echo '$(srcdir)/'`td_thr_event_enable.c
 
 libthread_db_a-td_thr_event_enable.obj: td_thr_event_enable.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_event_enable.obj `if test -f 'td_thr_event_enable.c'; then $(CYGPATH_W) 'td_thr_event_enable.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_event_enable.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_event_enable.obj `if test -f 'td_thr_event_enable.c'; then $(CYGPATH_W) 'td_thr_event_enable.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_event_enable.c'; fi`
 
 libthread_db_a-td_thr_set_event.o: td_thr_set_event.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_set_event.o `test -f 'td_thr_set_event.c' || echo '$(srcdir)/'`td_thr_set_event.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_set_event.o `test -f 'td_thr_set_event.c' || echo '$(srcdir)/'`td_thr_set_event.c
 
 libthread_db_a-td_thr_set_event.obj: td_thr_set_event.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_set_event.obj `if test -f 'td_thr_set_event.c'; then $(CYGPATH_W) 'td_thr_set_event.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_set_event.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_set_event.obj `if test -f 'td_thr_set_event.c'; then $(CYGPATH_W) 'td_thr_set_event.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_set_event.c'; fi`
 
 libthread_db_a-td_thr_clear_event.o: td_thr_clear_event.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_clear_event.o `test -f 'td_thr_clear_event.c' || echo '$(srcdir)/'`td_thr_clear_event.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_clear_event.o `test -f 'td_thr_clear_event.c' || echo '$(srcdir)/'`td_thr_clear_event.c
 
 libthread_db_a-td_thr_clear_event.obj: td_thr_clear_event.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_clear_event.obj `if test -f 'td_thr_clear_event.c'; then $(CYGPATH_W) 'td_thr_clear_event.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_clear_event.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_clear_event.obj `if test -f 'td_thr_clear_event.c'; then $(CYGPATH_W) 'td_thr_clear_event.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_clear_event.c'; fi`
 
 libthread_db_a-td_thr_event_getmsg.o: td_thr_event_getmsg.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_event_getmsg.o `test -f 'td_thr_event_getmsg.c' || echo '$(srcdir)/'`td_thr_event_getmsg.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_event_getmsg.o `test -f 'td_thr_event_getmsg.c' || echo '$(srcdir)/'`td_thr_event_getmsg.c
 
 libthread_db_a-td_thr_event_getmsg.obj: td_thr_event_getmsg.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_event_getmsg.obj `if test -f 'td_thr_event_getmsg.c'; then $(CYGPATH_W) 'td_thr_event_getmsg.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_event_getmsg.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_thr_event_getmsg.obj `if test -f 'td_thr_event_getmsg.c'; then $(CYGPATH_W) 'td_thr_event_getmsg.c'; else $(CYGPATH_W) '$(srcdir)/td_thr_event_getmsg.c'; fi`
 
 libthread_db_a-td_ta_set_event.o: td_ta_set_event.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_set_event.o `test -f 'td_ta_set_event.c' || echo '$(srcdir)/'`td_ta_set_event.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_set_event.o `test -f 'td_ta_set_event.c' || echo '$(srcdir)/'`td_ta_set_event.c
 
 libthread_db_a-td_ta_set_event.obj: td_ta_set_event.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_set_event.obj `if test -f 'td_ta_set_event.c'; then $(CYGPATH_W) 'td_ta_set_event.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_set_event.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_set_event.obj `if test -f 'td_ta_set_event.c'; then $(CYGPATH_W) 'td_ta_set_event.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_set_event.c'; fi`
 
 libthread_db_a-td_ta_event_getmsg.o: td_ta_event_getmsg.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_event_getmsg.o `test -f 'td_ta_event_getmsg.c' || echo '$(srcdir)/'`td_ta_event_getmsg.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_event_getmsg.o `test -f 'td_ta_event_getmsg.c' || echo '$(srcdir)/'`td_ta_event_getmsg.c
 
 libthread_db_a-td_ta_event_getmsg.obj: td_ta_event_getmsg.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_event_getmsg.obj `if test -f 'td_ta_event_getmsg.c'; then $(CYGPATH_W) 'td_ta_event_getmsg.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_event_getmsg.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_event_getmsg.obj `if test -f 'td_ta_event_getmsg.c'; then $(CYGPATH_W) 'td_ta_event_getmsg.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_event_getmsg.c'; fi`
 
 libthread_db_a-td_ta_clear_event.o: td_ta_clear_event.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_clear_event.o `test -f 'td_ta_clear_event.c' || echo '$(srcdir)/'`td_ta_clear_event.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_clear_event.o `test -f 'td_ta_clear_event.c' || echo '$(srcdir)/'`td_ta_clear_event.c
 
 libthread_db_a-td_ta_clear_event.obj: td_ta_clear_event.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_clear_event.obj `if test -f 'td_ta_clear_event.c'; then $(CYGPATH_W) 'td_ta_clear_event.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_clear_event.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_ta_clear_event.obj `if test -f 'td_ta_clear_event.c'; then $(CYGPATH_W) 'td_ta_clear_event.c'; else $(CYGPATH_W) '$(srcdir)/td_ta_clear_event.c'; fi`
 
 libthread_db_a-td_symbol_list.o: td_symbol_list.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_symbol_list.o `test -f 'td_symbol_list.c' || echo '$(srcdir)/'`td_symbol_list.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_symbol_list.o `test -f 'td_symbol_list.c' || echo '$(srcdir)/'`td_symbol_list.c
 
 libthread_db_a-td_symbol_list.obj: td_symbol_list.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_symbol_list.obj `if test -f 'td_symbol_list.c'; then $(CYGPATH_W) 'td_symbol_list.c'; else $(CYGPATH_W) '$(srcdir)/td_symbol_list.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libthread_db_a_CFLAGS) $(CFLAGS) -c -o libthread_db_a-td_symbol_list.obj `if test -f 'td_symbol_list.c'; then $(CYGPATH_W) 'td_symbol_list.c'; else $(CYGPATH_W) '$(srcdir)/td_symbol_list.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

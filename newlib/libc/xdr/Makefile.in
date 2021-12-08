@@ -70,6 +70,12 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
+AM_V_AR = $(am__v_AR_@AM_V@)
+am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
+am__v_AR_0 = @echo "  AR    " $@;
+AM_V_at = $(am__v_at_@AM_V@)
+am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
+am__v_at_0 = @
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 am__objects_1 = lib_a-xdr_private.$(OBJEXT) lib_a-xdr.$(OBJEXT) \
@@ -93,7 +99,10 @@ am__objects_5 = xdr_stdio.lo
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@ELIX_LEVEL_4_FALSE@@HAVE_STDIO_DIR_TRUE@	$(am__objects_5)
 @USE_LIBTOOL_TRUE@am_libxdr_la_OBJECTS = dummy.lo $(am__objects_6)
 libxdr_la_OBJECTS = $(am_libxdr_la_OBJECTS)
-libxdr_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+libxdr_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libxdr_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_LIBTOOL_TRUE@am_libxdr_la_rpath =
@@ -102,13 +111,23 @@ depcomp =
 am__depfiles_maybe =
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC    " $@;
 CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD  " $@;
+AM_V_GEN = $(am__v_GEN_@AM_V@)
+am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
+am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(lib_a_SOURCES) $(libxdr_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
@@ -120,6 +139,7 @@ ETAGS = etags
 CTAGS = ctags
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
+AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
@@ -347,9 +367,9 @@ $(am__aclocal_m4_deps):
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
 lib.a: $(lib_a_OBJECTS) $(lib_a_DEPENDENCIES) $(EXTRA_lib_a_DEPENDENCIES) 
-	-rm -f lib.a
-	$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
-	$(RANLIB) lib.a
+	$(AM_V_at)-rm -f lib.a
+	$(AM_V_AR)$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
+	$(AM_V_at)$(RANLIB) lib.a
 
 clean-noinstLTLIBRARIES:
 	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
@@ -360,7 +380,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libxdr.la: $(libxdr_la_OBJECTS) $(libxdr_la_DEPENDENCIES) $(EXTRA_libxdr_la_DEPENDENCIES) 
-	$(libxdr_la_LINK) $(am_libxdr_la_rpath) $(libxdr_la_OBJECTS) $(libxdr_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(libxdr_la_LINK) $(am_libxdr_la_rpath) $(libxdr_la_OBJECTS) $(libxdr_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -369,73 +389,73 @@ distclean-compile:
 	-rm -f *.tab.c
 
 .c.o:
-	$(COMPILE) -c $<
+	$(AM_V_CC)$(COMPILE) -c $<
 
 .c.obj:
-	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+	$(AM_V_CC)$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
 .c.lo:
-	$(LTCOMPILE) -c -o $@ $<
+	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
 
 lib_a-dummy.o: dummy.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dummy.o `test -f 'dummy.c' || echo '$(srcdir)/'`dummy.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dummy.o `test -f 'dummy.c' || echo '$(srcdir)/'`dummy.c
 
 lib_a-dummy.obj: dummy.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dummy.obj `if test -f 'dummy.c'; then $(CYGPATH_W) 'dummy.c'; else $(CYGPATH_W) '$(srcdir)/dummy.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dummy.obj `if test -f 'dummy.c'; then $(CYGPATH_W) 'dummy.c'; else $(CYGPATH_W) '$(srcdir)/dummy.c'; fi`
 
 lib_a-xdr_private.o: xdr_private.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_private.o `test -f 'xdr_private.c' || echo '$(srcdir)/'`xdr_private.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_private.o `test -f 'xdr_private.c' || echo '$(srcdir)/'`xdr_private.c
 
 lib_a-xdr_private.obj: xdr_private.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_private.obj `if test -f 'xdr_private.c'; then $(CYGPATH_W) 'xdr_private.c'; else $(CYGPATH_W) '$(srcdir)/xdr_private.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_private.obj `if test -f 'xdr_private.c'; then $(CYGPATH_W) 'xdr_private.c'; else $(CYGPATH_W) '$(srcdir)/xdr_private.c'; fi`
 
 lib_a-xdr.o: xdr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr.o `test -f 'xdr.c' || echo '$(srcdir)/'`xdr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr.o `test -f 'xdr.c' || echo '$(srcdir)/'`xdr.c
 
 lib_a-xdr.obj: xdr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr.obj `if test -f 'xdr.c'; then $(CYGPATH_W) 'xdr.c'; else $(CYGPATH_W) '$(srcdir)/xdr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr.obj `if test -f 'xdr.c'; then $(CYGPATH_W) 'xdr.c'; else $(CYGPATH_W) '$(srcdir)/xdr.c'; fi`
 
 lib_a-xdr_float.o: xdr_float.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_float.o `test -f 'xdr_float.c' || echo '$(srcdir)/'`xdr_float.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_float.o `test -f 'xdr_float.c' || echo '$(srcdir)/'`xdr_float.c
 
 lib_a-xdr_float.obj: xdr_float.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_float.obj `if test -f 'xdr_float.c'; then $(CYGPATH_W) 'xdr_float.c'; else $(CYGPATH_W) '$(srcdir)/xdr_float.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_float.obj `if test -f 'xdr_float.c'; then $(CYGPATH_W) 'xdr_float.c'; else $(CYGPATH_W) '$(srcdir)/xdr_float.c'; fi`
 
 lib_a-xdr_array.o: xdr_array.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_array.o `test -f 'xdr_array.c' || echo '$(srcdir)/'`xdr_array.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_array.o `test -f 'xdr_array.c' || echo '$(srcdir)/'`xdr_array.c
 
 lib_a-xdr_array.obj: xdr_array.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_array.obj `if test -f 'xdr_array.c'; then $(CYGPATH_W) 'xdr_array.c'; else $(CYGPATH_W) '$(srcdir)/xdr_array.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_array.obj `if test -f 'xdr_array.c'; then $(CYGPATH_W) 'xdr_array.c'; else $(CYGPATH_W) '$(srcdir)/xdr_array.c'; fi`
 
 lib_a-xdr_mem.o: xdr_mem.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_mem.o `test -f 'xdr_mem.c' || echo '$(srcdir)/'`xdr_mem.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_mem.o `test -f 'xdr_mem.c' || echo '$(srcdir)/'`xdr_mem.c
 
 lib_a-xdr_mem.obj: xdr_mem.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_mem.obj `if test -f 'xdr_mem.c'; then $(CYGPATH_W) 'xdr_mem.c'; else $(CYGPATH_W) '$(srcdir)/xdr_mem.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_mem.obj `if test -f 'xdr_mem.c'; then $(CYGPATH_W) 'xdr_mem.c'; else $(CYGPATH_W) '$(srcdir)/xdr_mem.c'; fi`
 
 lib_a-xdr_rec.o: xdr_rec.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_rec.o `test -f 'xdr_rec.c' || echo '$(srcdir)/'`xdr_rec.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_rec.o `test -f 'xdr_rec.c' || echo '$(srcdir)/'`xdr_rec.c
 
 lib_a-xdr_rec.obj: xdr_rec.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_rec.obj `if test -f 'xdr_rec.c'; then $(CYGPATH_W) 'xdr_rec.c'; else $(CYGPATH_W) '$(srcdir)/xdr_rec.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_rec.obj `if test -f 'xdr_rec.c'; then $(CYGPATH_W) 'xdr_rec.c'; else $(CYGPATH_W) '$(srcdir)/xdr_rec.c'; fi`
 
 lib_a-xdr_reference.o: xdr_reference.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_reference.o `test -f 'xdr_reference.c' || echo '$(srcdir)/'`xdr_reference.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_reference.o `test -f 'xdr_reference.c' || echo '$(srcdir)/'`xdr_reference.c
 
 lib_a-xdr_reference.obj: xdr_reference.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_reference.obj `if test -f 'xdr_reference.c'; then $(CYGPATH_W) 'xdr_reference.c'; else $(CYGPATH_W) '$(srcdir)/xdr_reference.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_reference.obj `if test -f 'xdr_reference.c'; then $(CYGPATH_W) 'xdr_reference.c'; else $(CYGPATH_W) '$(srcdir)/xdr_reference.c'; fi`
 
 lib_a-xdr_sizeof.o: xdr_sizeof.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_sizeof.o `test -f 'xdr_sizeof.c' || echo '$(srcdir)/'`xdr_sizeof.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_sizeof.o `test -f 'xdr_sizeof.c' || echo '$(srcdir)/'`xdr_sizeof.c
 
 lib_a-xdr_sizeof.obj: xdr_sizeof.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_sizeof.obj `if test -f 'xdr_sizeof.c'; then $(CYGPATH_W) 'xdr_sizeof.c'; else $(CYGPATH_W) '$(srcdir)/xdr_sizeof.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_sizeof.obj `if test -f 'xdr_sizeof.c'; then $(CYGPATH_W) 'xdr_sizeof.c'; else $(CYGPATH_W) '$(srcdir)/xdr_sizeof.c'; fi`
 
 lib_a-xdr_stdio.o: xdr_stdio.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_stdio.o `test -f 'xdr_stdio.c' || echo '$(srcdir)/'`xdr_stdio.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_stdio.o `test -f 'xdr_stdio.c' || echo '$(srcdir)/'`xdr_stdio.c
 
 lib_a-xdr_stdio.obj: xdr_stdio.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_stdio.obj `if test -f 'xdr_stdio.c'; then $(CYGPATH_W) 'xdr_stdio.c'; else $(CYGPATH_W) '$(srcdir)/xdr_stdio.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_stdio.obj `if test -f 'xdr_stdio.c'; then $(CYGPATH_W) 'xdr_stdio.c'; else $(CYGPATH_W) '$(srcdir)/xdr_stdio.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

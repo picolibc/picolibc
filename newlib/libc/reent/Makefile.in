@@ -70,6 +70,12 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
+AM_V_AR = $(am__v_AR_@AM_V@)
+am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
+am__v_AR_0 = @echo "  AR    " $@;
+AM_V_at = $(am__v_at_@AM_V@)
+am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
+am__v_at_0 = @
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 am__objects_1 = lib_a-closer.$(OBJEXT) lib_a-reent.$(OBJEXT) \
@@ -115,7 +121,10 @@ am__objects_9 = execr.lo
 @USE_LIBTOOL_TRUE@am_libreent_la_OBJECTS = $(am__objects_6) \
 @USE_LIBTOOL_TRUE@	$(am__objects_10)
 libreent_la_OBJECTS = $(am_libreent_la_OBJECTS)
-libreent_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+libreent_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libreent_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_LIBTOOL_TRUE@am_libreent_la_rpath =
@@ -124,13 +133,23 @@ depcomp =
 am__depfiles_maybe =
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC    " $@;
 CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD  " $@;
+AM_V_GEN = $(am__v_GEN_@AM_V@)
+am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
+am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(lib_a_SOURCES) $(libreent_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
@@ -142,6 +161,7 @@ ETAGS = etags
 CTAGS = ctags
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
+AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
@@ -406,9 +426,9 @@ $(am__aclocal_m4_deps):
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
 lib.a: $(lib_a_OBJECTS) $(lib_a_DEPENDENCIES) $(EXTRA_lib_a_DEPENDENCIES) 
-	-rm -f lib.a
-	$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
-	$(RANLIB) lib.a
+	$(AM_V_at)-rm -f lib.a
+	$(AM_V_AR)$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
+	$(AM_V_at)$(RANLIB) lib.a
 
 clean-noinstLTLIBRARIES:
 	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
@@ -419,7 +439,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libreent.la: $(libreent_la_OBJECTS) $(libreent_la_DEPENDENCIES) $(EXTRA_libreent_la_DEPENDENCIES) 
-	$(libreent_la_LINK) $(am_libreent_la_rpath) $(libreent_la_OBJECTS) $(libreent_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(libreent_la_LINK) $(am_libreent_la_rpath) $(libreent_la_OBJECTS) $(libreent_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -428,169 +448,169 @@ distclean-compile:
 	-rm -f *.tab.c
 
 .c.o:
-	$(COMPILE) -c $<
+	$(AM_V_CC)$(COMPILE) -c $<
 
 .c.obj:
-	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+	$(AM_V_CC)$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
 .c.lo:
-	$(LTCOMPILE) -c -o $@ $<
+	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
 
 lib_a-closer.o: closer.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-closer.o `test -f 'closer.c' || echo '$(srcdir)/'`closer.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-closer.o `test -f 'closer.c' || echo '$(srcdir)/'`closer.c
 
 lib_a-closer.obj: closer.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-closer.obj `if test -f 'closer.c'; then $(CYGPATH_W) 'closer.c'; else $(CYGPATH_W) '$(srcdir)/closer.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-closer.obj `if test -f 'closer.c'; then $(CYGPATH_W) 'closer.c'; else $(CYGPATH_W) '$(srcdir)/closer.c'; fi`
 
 lib_a-reent.o: reent.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-reent.o `test -f 'reent.c' || echo '$(srcdir)/'`reent.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-reent.o `test -f 'reent.c' || echo '$(srcdir)/'`reent.c
 
 lib_a-reent.obj: reent.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-reent.obj `if test -f 'reent.c'; then $(CYGPATH_W) 'reent.c'; else $(CYGPATH_W) '$(srcdir)/reent.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-reent.obj `if test -f 'reent.c'; then $(CYGPATH_W) 'reent.c'; else $(CYGPATH_W) '$(srcdir)/reent.c'; fi`
 
 lib_a-impure.o: impure.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-impure.o `test -f 'impure.c' || echo '$(srcdir)/'`impure.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-impure.o `test -f 'impure.c' || echo '$(srcdir)/'`impure.c
 
 lib_a-impure.obj: impure.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-impure.obj `if test -f 'impure.c'; then $(CYGPATH_W) 'impure.c'; else $(CYGPATH_W) '$(srcdir)/impure.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-impure.obj `if test -f 'impure.c'; then $(CYGPATH_W) 'impure.c'; else $(CYGPATH_W) '$(srcdir)/impure.c'; fi`
 
 lib_a-fcntlr.o: fcntlr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fcntlr.o `test -f 'fcntlr.c' || echo '$(srcdir)/'`fcntlr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fcntlr.o `test -f 'fcntlr.c' || echo '$(srcdir)/'`fcntlr.c
 
 lib_a-fcntlr.obj: fcntlr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fcntlr.obj `if test -f 'fcntlr.c'; then $(CYGPATH_W) 'fcntlr.c'; else $(CYGPATH_W) '$(srcdir)/fcntlr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fcntlr.obj `if test -f 'fcntlr.c'; then $(CYGPATH_W) 'fcntlr.c'; else $(CYGPATH_W) '$(srcdir)/fcntlr.c'; fi`
 
 lib_a-fstatr.o: fstatr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fstatr.o `test -f 'fstatr.c' || echo '$(srcdir)/'`fstatr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fstatr.o `test -f 'fstatr.c' || echo '$(srcdir)/'`fstatr.c
 
 lib_a-fstatr.obj: fstatr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fstatr.obj `if test -f 'fstatr.c'; then $(CYGPATH_W) 'fstatr.c'; else $(CYGPATH_W) '$(srcdir)/fstatr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fstatr.obj `if test -f 'fstatr.c'; then $(CYGPATH_W) 'fstatr.c'; else $(CYGPATH_W) '$(srcdir)/fstatr.c'; fi`
 
 lib_a-getreent.o: getreent.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getreent.o `test -f 'getreent.c' || echo '$(srcdir)/'`getreent.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getreent.o `test -f 'getreent.c' || echo '$(srcdir)/'`getreent.c
 
 lib_a-getreent.obj: getreent.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getreent.obj `if test -f 'getreent.c'; then $(CYGPATH_W) 'getreent.c'; else $(CYGPATH_W) '$(srcdir)/getreent.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getreent.obj `if test -f 'getreent.c'; then $(CYGPATH_W) 'getreent.c'; else $(CYGPATH_W) '$(srcdir)/getreent.c'; fi`
 
 lib_a-gettimeofdayr.o: gettimeofdayr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gettimeofdayr.o `test -f 'gettimeofdayr.c' || echo '$(srcdir)/'`gettimeofdayr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gettimeofdayr.o `test -f 'gettimeofdayr.c' || echo '$(srcdir)/'`gettimeofdayr.c
 
 lib_a-gettimeofdayr.obj: gettimeofdayr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gettimeofdayr.obj `if test -f 'gettimeofdayr.c'; then $(CYGPATH_W) 'gettimeofdayr.c'; else $(CYGPATH_W) '$(srcdir)/gettimeofdayr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gettimeofdayr.obj `if test -f 'gettimeofdayr.c'; then $(CYGPATH_W) 'gettimeofdayr.c'; else $(CYGPATH_W) '$(srcdir)/gettimeofdayr.c'; fi`
 
 lib_a-isattyr.o: isattyr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-isattyr.o `test -f 'isattyr.c' || echo '$(srcdir)/'`isattyr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-isattyr.o `test -f 'isattyr.c' || echo '$(srcdir)/'`isattyr.c
 
 lib_a-isattyr.obj: isattyr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-isattyr.obj `if test -f 'isattyr.c'; then $(CYGPATH_W) 'isattyr.c'; else $(CYGPATH_W) '$(srcdir)/isattyr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-isattyr.obj `if test -f 'isattyr.c'; then $(CYGPATH_W) 'isattyr.c'; else $(CYGPATH_W) '$(srcdir)/isattyr.c'; fi`
 
 lib_a-linkr.o: linkr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-linkr.o `test -f 'linkr.c' || echo '$(srcdir)/'`linkr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-linkr.o `test -f 'linkr.c' || echo '$(srcdir)/'`linkr.c
 
 lib_a-linkr.obj: linkr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-linkr.obj `if test -f 'linkr.c'; then $(CYGPATH_W) 'linkr.c'; else $(CYGPATH_W) '$(srcdir)/linkr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-linkr.obj `if test -f 'linkr.c'; then $(CYGPATH_W) 'linkr.c'; else $(CYGPATH_W) '$(srcdir)/linkr.c'; fi`
 
 lib_a-lseekr.o: lseekr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lseekr.o `test -f 'lseekr.c' || echo '$(srcdir)/'`lseekr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lseekr.o `test -f 'lseekr.c' || echo '$(srcdir)/'`lseekr.c
 
 lib_a-lseekr.obj: lseekr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lseekr.obj `if test -f 'lseekr.c'; then $(CYGPATH_W) 'lseekr.c'; else $(CYGPATH_W) '$(srcdir)/lseekr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lseekr.obj `if test -f 'lseekr.c'; then $(CYGPATH_W) 'lseekr.c'; else $(CYGPATH_W) '$(srcdir)/lseekr.c'; fi`
 
 lib_a-mkdirr.o: mkdirr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mkdirr.o `test -f 'mkdirr.c' || echo '$(srcdir)/'`mkdirr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mkdirr.o `test -f 'mkdirr.c' || echo '$(srcdir)/'`mkdirr.c
 
 lib_a-mkdirr.obj: mkdirr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mkdirr.obj `if test -f 'mkdirr.c'; then $(CYGPATH_W) 'mkdirr.c'; else $(CYGPATH_W) '$(srcdir)/mkdirr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mkdirr.obj `if test -f 'mkdirr.c'; then $(CYGPATH_W) 'mkdirr.c'; else $(CYGPATH_W) '$(srcdir)/mkdirr.c'; fi`
 
 lib_a-openr.o: openr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-openr.o `test -f 'openr.c' || echo '$(srcdir)/'`openr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-openr.o `test -f 'openr.c' || echo '$(srcdir)/'`openr.c
 
 lib_a-openr.obj: openr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-openr.obj `if test -f 'openr.c'; then $(CYGPATH_W) 'openr.c'; else $(CYGPATH_W) '$(srcdir)/openr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-openr.obj `if test -f 'openr.c'; then $(CYGPATH_W) 'openr.c'; else $(CYGPATH_W) '$(srcdir)/openr.c'; fi`
 
 lib_a-readr.o: readr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-readr.o `test -f 'readr.c' || echo '$(srcdir)/'`readr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-readr.o `test -f 'readr.c' || echo '$(srcdir)/'`readr.c
 
 lib_a-readr.obj: readr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-readr.obj `if test -f 'readr.c'; then $(CYGPATH_W) 'readr.c'; else $(CYGPATH_W) '$(srcdir)/readr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-readr.obj `if test -f 'readr.c'; then $(CYGPATH_W) 'readr.c'; else $(CYGPATH_W) '$(srcdir)/readr.c'; fi`
 
 lib_a-renamer.o: renamer.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-renamer.o `test -f 'renamer.c' || echo '$(srcdir)/'`renamer.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-renamer.o `test -f 'renamer.c' || echo '$(srcdir)/'`renamer.c
 
 lib_a-renamer.obj: renamer.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-renamer.obj `if test -f 'renamer.c'; then $(CYGPATH_W) 'renamer.c'; else $(CYGPATH_W) '$(srcdir)/renamer.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-renamer.obj `if test -f 'renamer.c'; then $(CYGPATH_W) 'renamer.c'; else $(CYGPATH_W) '$(srcdir)/renamer.c'; fi`
 
 lib_a-signalr.o: signalr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-signalr.o `test -f 'signalr.c' || echo '$(srcdir)/'`signalr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-signalr.o `test -f 'signalr.c' || echo '$(srcdir)/'`signalr.c
 
 lib_a-signalr.obj: signalr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-signalr.obj `if test -f 'signalr.c'; then $(CYGPATH_W) 'signalr.c'; else $(CYGPATH_W) '$(srcdir)/signalr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-signalr.obj `if test -f 'signalr.c'; then $(CYGPATH_W) 'signalr.c'; else $(CYGPATH_W) '$(srcdir)/signalr.c'; fi`
 
 lib_a-signgam.o: signgam.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-signgam.o `test -f 'signgam.c' || echo '$(srcdir)/'`signgam.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-signgam.o `test -f 'signgam.c' || echo '$(srcdir)/'`signgam.c
 
 lib_a-signgam.obj: signgam.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-signgam.obj `if test -f 'signgam.c'; then $(CYGPATH_W) 'signgam.c'; else $(CYGPATH_W) '$(srcdir)/signgam.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-signgam.obj `if test -f 'signgam.c'; then $(CYGPATH_W) 'signgam.c'; else $(CYGPATH_W) '$(srcdir)/signgam.c'; fi`
 
 lib_a-sbrkr.o: sbrkr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sbrkr.o `test -f 'sbrkr.c' || echo '$(srcdir)/'`sbrkr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sbrkr.o `test -f 'sbrkr.c' || echo '$(srcdir)/'`sbrkr.c
 
 lib_a-sbrkr.obj: sbrkr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sbrkr.obj `if test -f 'sbrkr.c'; then $(CYGPATH_W) 'sbrkr.c'; else $(CYGPATH_W) '$(srcdir)/sbrkr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sbrkr.obj `if test -f 'sbrkr.c'; then $(CYGPATH_W) 'sbrkr.c'; else $(CYGPATH_W) '$(srcdir)/sbrkr.c'; fi`
 
 lib_a-statr.o: statr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-statr.o `test -f 'statr.c' || echo '$(srcdir)/'`statr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-statr.o `test -f 'statr.c' || echo '$(srcdir)/'`statr.c
 
 lib_a-statr.obj: statr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-statr.obj `if test -f 'statr.c'; then $(CYGPATH_W) 'statr.c'; else $(CYGPATH_W) '$(srcdir)/statr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-statr.obj `if test -f 'statr.c'; then $(CYGPATH_W) 'statr.c'; else $(CYGPATH_W) '$(srcdir)/statr.c'; fi`
 
 lib_a-timesr.o: timesr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-timesr.o `test -f 'timesr.c' || echo '$(srcdir)/'`timesr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-timesr.o `test -f 'timesr.c' || echo '$(srcdir)/'`timesr.c
 
 lib_a-timesr.obj: timesr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-timesr.obj `if test -f 'timesr.c'; then $(CYGPATH_W) 'timesr.c'; else $(CYGPATH_W) '$(srcdir)/timesr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-timesr.obj `if test -f 'timesr.c'; then $(CYGPATH_W) 'timesr.c'; else $(CYGPATH_W) '$(srcdir)/timesr.c'; fi`
 
 lib_a-unlinkr.o: unlinkr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-unlinkr.o `test -f 'unlinkr.c' || echo '$(srcdir)/'`unlinkr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-unlinkr.o `test -f 'unlinkr.c' || echo '$(srcdir)/'`unlinkr.c
 
 lib_a-unlinkr.obj: unlinkr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-unlinkr.obj `if test -f 'unlinkr.c'; then $(CYGPATH_W) 'unlinkr.c'; else $(CYGPATH_W) '$(srcdir)/unlinkr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-unlinkr.obj `if test -f 'unlinkr.c'; then $(CYGPATH_W) 'unlinkr.c'; else $(CYGPATH_W) '$(srcdir)/unlinkr.c'; fi`
 
 lib_a-writer.o: writer.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-writer.o `test -f 'writer.c' || echo '$(srcdir)/'`writer.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-writer.o `test -f 'writer.c' || echo '$(srcdir)/'`writer.c
 
 lib_a-writer.obj: writer.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-writer.obj `if test -f 'writer.c'; then $(CYGPATH_W) 'writer.c'; else $(CYGPATH_W) '$(srcdir)/writer.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-writer.obj `if test -f 'writer.c'; then $(CYGPATH_W) 'writer.c'; else $(CYGPATH_W) '$(srcdir)/writer.c'; fi`
 
 lib_a-fstat64r.o: fstat64r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fstat64r.o `test -f 'fstat64r.c' || echo '$(srcdir)/'`fstat64r.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fstat64r.o `test -f 'fstat64r.c' || echo '$(srcdir)/'`fstat64r.c
 
 lib_a-fstat64r.obj: fstat64r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fstat64r.obj `if test -f 'fstat64r.c'; then $(CYGPATH_W) 'fstat64r.c'; else $(CYGPATH_W) '$(srcdir)/fstat64r.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fstat64r.obj `if test -f 'fstat64r.c'; then $(CYGPATH_W) 'fstat64r.c'; else $(CYGPATH_W) '$(srcdir)/fstat64r.c'; fi`
 
 lib_a-lseek64r.o: lseek64r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lseek64r.o `test -f 'lseek64r.c' || echo '$(srcdir)/'`lseek64r.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lseek64r.o `test -f 'lseek64r.c' || echo '$(srcdir)/'`lseek64r.c
 
 lib_a-lseek64r.obj: lseek64r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lseek64r.obj `if test -f 'lseek64r.c'; then $(CYGPATH_W) 'lseek64r.c'; else $(CYGPATH_W) '$(srcdir)/lseek64r.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lseek64r.obj `if test -f 'lseek64r.c'; then $(CYGPATH_W) 'lseek64r.c'; else $(CYGPATH_W) '$(srcdir)/lseek64r.c'; fi`
 
 lib_a-stat64r.o: stat64r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stat64r.o `test -f 'stat64r.c' || echo '$(srcdir)/'`stat64r.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stat64r.o `test -f 'stat64r.c' || echo '$(srcdir)/'`stat64r.c
 
 lib_a-stat64r.obj: stat64r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stat64r.obj `if test -f 'stat64r.c'; then $(CYGPATH_W) 'stat64r.c'; else $(CYGPATH_W) '$(srcdir)/stat64r.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stat64r.obj `if test -f 'stat64r.c'; then $(CYGPATH_W) 'stat64r.c'; else $(CYGPATH_W) '$(srcdir)/stat64r.c'; fi`
 
 lib_a-open64r.o: open64r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-open64r.o `test -f 'open64r.c' || echo '$(srcdir)/'`open64r.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-open64r.o `test -f 'open64r.c' || echo '$(srcdir)/'`open64r.c
 
 lib_a-open64r.obj: open64r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-open64r.obj `if test -f 'open64r.c'; then $(CYGPATH_W) 'open64r.c'; else $(CYGPATH_W) '$(srcdir)/open64r.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-open64r.obj `if test -f 'open64r.c'; then $(CYGPATH_W) 'open64r.c'; else $(CYGPATH_W) '$(srcdir)/open64r.c'; fi`
 
 lib_a-execr.o: execr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execr.o `test -f 'execr.c' || echo '$(srcdir)/'`execr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execr.o `test -f 'execr.c' || echo '$(srcdir)/'`execr.c
 
 lib_a-execr.obj: execr.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execr.obj `if test -f 'execr.c'; then $(CYGPATH_W) 'execr.c'; else $(CYGPATH_W) '$(srcdir)/execr.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execr.obj `if test -f 'execr.c'; then $(CYGPATH_W) 'execr.c'; else $(CYGPATH_W) '$(srcdir)/execr.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

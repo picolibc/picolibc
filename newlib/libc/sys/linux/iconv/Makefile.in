@@ -70,6 +70,12 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
+AM_V_AR = $(am__v_AR_@AM_V@)
+am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
+am__v_AR_0 = @echo "  AR    " $@;
+AM_V_at = $(am__v_at_@AM_V@)
+am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
+am__v_at_0 = @
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 am__objects_1 = lib_a-iconv_open.$(OBJEXT) lib_a-iconv.$(OBJEXT) \
@@ -92,7 +98,10 @@ am__objects_2 = libiconv_la-iconv_open.lo libiconv_la-iconv.lo \
 	libiconv_la-gconv_cache.lo
 @USE_LIBTOOL_TRUE@am_libiconv_la_OBJECTS = $(am__objects_2)
 libiconv_la_OBJECTS = $(am_libiconv_la_OBJECTS)
-libiconv_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+libiconv_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libiconv_la_CFLAGS) \
 	$(CFLAGS) $(libiconv_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_LIBTOOL_TRUE@am_libiconv_la_rpath =
@@ -101,13 +110,23 @@ depcomp =
 am__depfiles_maybe =
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC    " $@;
 CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD  " $@;
+AM_V_GEN = $(am__v_GEN_@AM_V@)
+am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
+am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(lib_a_SOURCES) $(libiconv_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
@@ -119,6 +138,7 @@ ETAGS = etags
 CTAGS = ctags
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
+AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
@@ -237,6 +257,7 @@ prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
 sbindir = @sbindir@
+shared_machine_dir = @shared_machine_dir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
 subdirs = @subdirs@
@@ -313,9 +334,9 @@ $(am__aclocal_m4_deps):
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
 lib.a: $(lib_a_OBJECTS) $(lib_a_DEPENDENCIES) $(EXTRA_lib_a_DEPENDENCIES) 
-	-rm -f lib.a
-	$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
-	$(RANLIB) lib.a
+	$(AM_V_at)-rm -f lib.a
+	$(AM_V_AR)$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
+	$(AM_V_at)$(RANLIB) lib.a
 
 clean-noinstLTLIBRARIES:
 	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
@@ -326,7 +347,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libiconv.la: $(libiconv_la_OBJECTS) $(libiconv_la_DEPENDENCIES) $(EXTRA_libiconv_la_DEPENDENCIES) 
-	$(libiconv_la_LINK) $(am_libiconv_la_rpath) $(libiconv_la_OBJECTS) $(libiconv_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(libiconv_la_LINK) $(am_libiconv_la_rpath) $(libiconv_la_OBJECTS) $(libiconv_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -335,130 +356,130 @@ distclean-compile:
 	-rm -f *.tab.c
 
 .c.o:
-	$(COMPILE) -c $<
+	$(AM_V_CC)$(COMPILE) -c $<
 
 .c.obj:
-	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+	$(AM_V_CC)$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
 .c.lo:
-	$(LTCOMPILE) -c -o $@ $<
+	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
 
 lib_a-iconv_open.o: iconv_open.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iconv_open.o `test -f 'iconv_open.c' || echo '$(srcdir)/'`iconv_open.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iconv_open.o `test -f 'iconv_open.c' || echo '$(srcdir)/'`iconv_open.c
 
 lib_a-iconv_open.obj: iconv_open.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iconv_open.obj `if test -f 'iconv_open.c'; then $(CYGPATH_W) 'iconv_open.c'; else $(CYGPATH_W) '$(srcdir)/iconv_open.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iconv_open.obj `if test -f 'iconv_open.c'; then $(CYGPATH_W) 'iconv_open.c'; else $(CYGPATH_W) '$(srcdir)/iconv_open.c'; fi`
 
 lib_a-iconv.o: iconv.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iconv.o `test -f 'iconv.c' || echo '$(srcdir)/'`iconv.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iconv.o `test -f 'iconv.c' || echo '$(srcdir)/'`iconv.c
 
 lib_a-iconv.obj: iconv.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iconv.obj `if test -f 'iconv.c'; then $(CYGPATH_W) 'iconv.c'; else $(CYGPATH_W) '$(srcdir)/iconv.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iconv.obj `if test -f 'iconv.c'; then $(CYGPATH_W) 'iconv.c'; else $(CYGPATH_W) '$(srcdir)/iconv.c'; fi`
 
 lib_a-iconv_close.o: iconv_close.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iconv_close.o `test -f 'iconv_close.c' || echo '$(srcdir)/'`iconv_close.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iconv_close.o `test -f 'iconv_close.c' || echo '$(srcdir)/'`iconv_close.c
 
 lib_a-iconv_close.obj: iconv_close.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iconv_close.obj `if test -f 'iconv_close.c'; then $(CYGPATH_W) 'iconv_close.c'; else $(CYGPATH_W) '$(srcdir)/iconv_close.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iconv_close.obj `if test -f 'iconv_close.c'; then $(CYGPATH_W) 'iconv_close.c'; else $(CYGPATH_W) '$(srcdir)/iconv_close.c'; fi`
 
 lib_a-gconv_open.o: gconv_open.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_open.o `test -f 'gconv_open.c' || echo '$(srcdir)/'`gconv_open.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_open.o `test -f 'gconv_open.c' || echo '$(srcdir)/'`gconv_open.c
 
 lib_a-gconv_open.obj: gconv_open.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_open.obj `if test -f 'gconv_open.c'; then $(CYGPATH_W) 'gconv_open.c'; else $(CYGPATH_W) '$(srcdir)/gconv_open.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_open.obj `if test -f 'gconv_open.c'; then $(CYGPATH_W) 'gconv_open.c'; else $(CYGPATH_W) '$(srcdir)/gconv_open.c'; fi`
 
 lib_a-gconv.o: gconv.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv.o `test -f 'gconv.c' || echo '$(srcdir)/'`gconv.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv.o `test -f 'gconv.c' || echo '$(srcdir)/'`gconv.c
 
 lib_a-gconv.obj: gconv.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv.obj `if test -f 'gconv.c'; then $(CYGPATH_W) 'gconv.c'; else $(CYGPATH_W) '$(srcdir)/gconv.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv.obj `if test -f 'gconv.c'; then $(CYGPATH_W) 'gconv.c'; else $(CYGPATH_W) '$(srcdir)/gconv.c'; fi`
 
 lib_a-gconv_close.o: gconv_close.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_close.o `test -f 'gconv_close.c' || echo '$(srcdir)/'`gconv_close.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_close.o `test -f 'gconv_close.c' || echo '$(srcdir)/'`gconv_close.c
 
 lib_a-gconv_close.obj: gconv_close.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_close.obj `if test -f 'gconv_close.c'; then $(CYGPATH_W) 'gconv_close.c'; else $(CYGPATH_W) '$(srcdir)/gconv_close.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_close.obj `if test -f 'gconv_close.c'; then $(CYGPATH_W) 'gconv_close.c'; else $(CYGPATH_W) '$(srcdir)/gconv_close.c'; fi`
 
 lib_a-gconv_db.o: gconv_db.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_db.o `test -f 'gconv_db.c' || echo '$(srcdir)/'`gconv_db.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_db.o `test -f 'gconv_db.c' || echo '$(srcdir)/'`gconv_db.c
 
 lib_a-gconv_db.obj: gconv_db.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_db.obj `if test -f 'gconv_db.c'; then $(CYGPATH_W) 'gconv_db.c'; else $(CYGPATH_W) '$(srcdir)/gconv_db.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_db.obj `if test -f 'gconv_db.c'; then $(CYGPATH_W) 'gconv_db.c'; else $(CYGPATH_W) '$(srcdir)/gconv_db.c'; fi`
 
 lib_a-gconv_dl.o: gconv_dl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_dl.o `test -f 'gconv_dl.c' || echo '$(srcdir)/'`gconv_dl.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_dl.o `test -f 'gconv_dl.c' || echo '$(srcdir)/'`gconv_dl.c
 
 lib_a-gconv_dl.obj: gconv_dl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_dl.obj `if test -f 'gconv_dl.c'; then $(CYGPATH_W) 'gconv_dl.c'; else $(CYGPATH_W) '$(srcdir)/gconv_dl.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_dl.obj `if test -f 'gconv_dl.c'; then $(CYGPATH_W) 'gconv_dl.c'; else $(CYGPATH_W) '$(srcdir)/gconv_dl.c'; fi`
 
 lib_a-gconv_conf.o: gconv_conf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_conf.o `test -f 'gconv_conf.c' || echo '$(srcdir)/'`gconv_conf.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_conf.o `test -f 'gconv_conf.c' || echo '$(srcdir)/'`gconv_conf.c
 
 lib_a-gconv_conf.obj: gconv_conf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_conf.obj `if test -f 'gconv_conf.c'; then $(CYGPATH_W) 'gconv_conf.c'; else $(CYGPATH_W) '$(srcdir)/gconv_conf.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_conf.obj `if test -f 'gconv_conf.c'; then $(CYGPATH_W) 'gconv_conf.c'; else $(CYGPATH_W) '$(srcdir)/gconv_conf.c'; fi`
 
 lib_a-gconv_builtin.o: gconv_builtin.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_builtin.o `test -f 'gconv_builtin.c' || echo '$(srcdir)/'`gconv_builtin.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_builtin.o `test -f 'gconv_builtin.c' || echo '$(srcdir)/'`gconv_builtin.c
 
 lib_a-gconv_builtin.obj: gconv_builtin.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_builtin.obj `if test -f 'gconv_builtin.c'; then $(CYGPATH_W) 'gconv_builtin.c'; else $(CYGPATH_W) '$(srcdir)/gconv_builtin.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_builtin.obj `if test -f 'gconv_builtin.c'; then $(CYGPATH_W) 'gconv_builtin.c'; else $(CYGPATH_W) '$(srcdir)/gconv_builtin.c'; fi`
 
 lib_a-gconv_simple.o: gconv_simple.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_simple.o `test -f 'gconv_simple.c' || echo '$(srcdir)/'`gconv_simple.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_simple.o `test -f 'gconv_simple.c' || echo '$(srcdir)/'`gconv_simple.c
 
 lib_a-gconv_simple.obj: gconv_simple.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_simple.obj `if test -f 'gconv_simple.c'; then $(CYGPATH_W) 'gconv_simple.c'; else $(CYGPATH_W) '$(srcdir)/gconv_simple.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_simple.obj `if test -f 'gconv_simple.c'; then $(CYGPATH_W) 'gconv_simple.c'; else $(CYGPATH_W) '$(srcdir)/gconv_simple.c'; fi`
 
 lib_a-gconv_trans.o: gconv_trans.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_trans.o `test -f 'gconv_trans.c' || echo '$(srcdir)/'`gconv_trans.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_trans.o `test -f 'gconv_trans.c' || echo '$(srcdir)/'`gconv_trans.c
 
 lib_a-gconv_trans.obj: gconv_trans.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_trans.obj `if test -f 'gconv_trans.c'; then $(CYGPATH_W) 'gconv_trans.c'; else $(CYGPATH_W) '$(srcdir)/gconv_trans.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_trans.obj `if test -f 'gconv_trans.c'; then $(CYGPATH_W) 'gconv_trans.c'; else $(CYGPATH_W) '$(srcdir)/gconv_trans.c'; fi`
 
 lib_a-gconv_cache.o: gconv_cache.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_cache.o `test -f 'gconv_cache.c' || echo '$(srcdir)/'`gconv_cache.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_cache.o `test -f 'gconv_cache.c' || echo '$(srcdir)/'`gconv_cache.c
 
 lib_a-gconv_cache.obj: gconv_cache.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_cache.obj `if test -f 'gconv_cache.c'; then $(CYGPATH_W) 'gconv_cache.c'; else $(CYGPATH_W) '$(srcdir)/gconv_cache.c'; fi`
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gconv_cache.obj `if test -f 'gconv_cache.c'; then $(CYGPATH_W) 'gconv_cache.c'; else $(CYGPATH_W) '$(srcdir)/gconv_cache.c'; fi`
 
 libiconv_la-iconv_open.lo: iconv_open.c
-	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-iconv_open.lo `test -f 'iconv_open.c' || echo '$(srcdir)/'`iconv_open.c
+	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-iconv_open.lo `test -f 'iconv_open.c' || echo '$(srcdir)/'`iconv_open.c
 
 libiconv_la-iconv.lo: iconv.c
-	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-iconv.lo `test -f 'iconv.c' || echo '$(srcdir)/'`iconv.c
+	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-iconv.lo `test -f 'iconv.c' || echo '$(srcdir)/'`iconv.c
 
 libiconv_la-iconv_close.lo: iconv_close.c
-	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-iconv_close.lo `test -f 'iconv_close.c' || echo '$(srcdir)/'`iconv_close.c
+	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-iconv_close.lo `test -f 'iconv_close.c' || echo '$(srcdir)/'`iconv_close.c
 
 libiconv_la-gconv_open.lo: gconv_open.c
-	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-gconv_open.lo `test -f 'gconv_open.c' || echo '$(srcdir)/'`gconv_open.c
+	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-gconv_open.lo `test -f 'gconv_open.c' || echo '$(srcdir)/'`gconv_open.c
 
 libiconv_la-gconv.lo: gconv.c
-	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-gconv.lo `test -f 'gconv.c' || echo '$(srcdir)/'`gconv.c
+	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-gconv.lo `test -f 'gconv.c' || echo '$(srcdir)/'`gconv.c
 
 libiconv_la-gconv_close.lo: gconv_close.c
-	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-gconv_close.lo `test -f 'gconv_close.c' || echo '$(srcdir)/'`gconv_close.c
+	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-gconv_close.lo `test -f 'gconv_close.c' || echo '$(srcdir)/'`gconv_close.c
 
 libiconv_la-gconv_db.lo: gconv_db.c
-	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-gconv_db.lo `test -f 'gconv_db.c' || echo '$(srcdir)/'`gconv_db.c
+	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-gconv_db.lo `test -f 'gconv_db.c' || echo '$(srcdir)/'`gconv_db.c
 
 libiconv_la-gconv_dl.lo: gconv_dl.c
-	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-gconv_dl.lo `test -f 'gconv_dl.c' || echo '$(srcdir)/'`gconv_dl.c
+	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-gconv_dl.lo `test -f 'gconv_dl.c' || echo '$(srcdir)/'`gconv_dl.c
 
 libiconv_la-gconv_conf.lo: gconv_conf.c
-	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-gconv_conf.lo `test -f 'gconv_conf.c' || echo '$(srcdir)/'`gconv_conf.c
+	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-gconv_conf.lo `test -f 'gconv_conf.c' || echo '$(srcdir)/'`gconv_conf.c
 
 libiconv_la-gconv_builtin.lo: gconv_builtin.c
-	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-gconv_builtin.lo `test -f 'gconv_builtin.c' || echo '$(srcdir)/'`gconv_builtin.c
+	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-gconv_builtin.lo `test -f 'gconv_builtin.c' || echo '$(srcdir)/'`gconv_builtin.c
 
 libiconv_la-gconv_simple.lo: gconv_simple.c
-	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-gconv_simple.lo `test -f 'gconv_simple.c' || echo '$(srcdir)/'`gconv_simple.c
+	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-gconv_simple.lo `test -f 'gconv_simple.c' || echo '$(srcdir)/'`gconv_simple.c
 
 libiconv_la-gconv_trans.lo: gconv_trans.c
-	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-gconv_trans.lo `test -f 'gconv_trans.c' || echo '$(srcdir)/'`gconv_trans.c
+	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-gconv_trans.lo `test -f 'gconv_trans.c' || echo '$(srcdir)/'`gconv_trans.c
 
 libiconv_la-gconv_cache.lo: gconv_cache.c
-	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-gconv_cache.lo `test -f 'gconv_cache.c' || echo '$(srcdir)/'`gconv_cache.c
+	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libiconv_la_CFLAGS) $(CFLAGS) -c -o libiconv_la-gconv_cache.lo `test -f 'gconv_cache.c' || echo '$(srcdir)/'`gconv_cache.c
 
 mostlyclean-libtool:
 	-rm -f *.lo
