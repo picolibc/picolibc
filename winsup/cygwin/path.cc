@@ -3492,10 +3492,45 @@ restart:
 	    {
 	      UNICODE_STRING fpath;
 
-	      RtlInitCountedUnicodeString (&fpath, fpbuf, ret * sizeof (WCHAR));
+	      /* If incoming path has no trailing backslash, but final path
+		 has one, drop trailing backslash from final path so the
+		 below string comparison has a chance to succeed. */
+	      if (upath.Buffer[(upath.Length - 1) / sizeof (WCHAR)] != L'\\'
+                  && fpbuf[ret - 1] == L'\\')
+                fpbuf[--ret] = L'\0';
 	      fpbuf[1] = L'?';	/* \\?\ --> \??\ */
+	      RtlInitCountedUnicodeString (&fpath, fpbuf, ret * sizeof (WCHAR));
 	      if (!RtlEqualUnicodeString (&upath, &fpath, !!ci_flag))
 	        {
+		  /* Check if the final path is an UNC path and the incoming
+		     path isn't.  If so... */
+		  if (RtlEqualUnicodePathPrefix (&fpath, &ro_u_uncp, TRUE)
+		      && !RtlEqualUnicodePathPrefix (&upath, &ro_u_uncp, TRUE))
+		    {
+		      /* ...get the remote path from the volume path name,
+			 replace remote path with drive letter, check again. */
+		      WCHAR remote[MAX_PATH];
+
+		      fpbuf[1] = L'\\';
+		      BOOL r = GetVolumePathNameW (fpbuf, remote, MAX_PATH);
+		      fpbuf[1] = L'?';
+		      if (r)
+			{
+			  int remlen = wcslen (remote);
+			  if (remote[remlen - 1] == L'\\')
+			    remlen--;
+			  /* Hackfest */
+			  fpath.Buffer[4] = upath.Buffer[4]; /* Drive letter */
+			  fpath.Buffer[5] = L':';
+			  WCHAR *to = fpath.Buffer + 6;
+			  WCHAR *from = to + remlen - 6;
+			  memmove (to, from,
+				   (wcslen (from) + 1) * sizeof (WCHAR));
+			  fpath.Length -= (from - to) * sizeof (WCHAR);
+			  if (RtlEqualUnicodeString (&upath, &fpath, !!ci_flag))
+			    goto file_not_symlink;
+			}
+		    }
 		  issymlink = true;
 		  /* upath.Buffer is big enough and unused from this point on.
 		     Reuse it here, avoiding yet another buffer allocation. */
