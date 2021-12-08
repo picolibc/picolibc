@@ -76,7 +76,7 @@ fhandler_dev_clipboard::set_clipboard (const void *buf, size_t len)
       clipbuf->cb_sec  = clipbuf->ts.tv_sec;
 #endif
       clipbuf->cb_size = len;
-      memcpy (&clipbuf[1], buf, len); // append user-supplied data
+      memcpy (clipbuf->cb_data, buf, len); // append user-supplied data
 
       GlobalUnlock (hmem);
       EmptyClipboard ();
@@ -229,7 +229,7 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
       if (pos < (off_t) clipbuf->cb_size)
 	{
 	  ret = (len > (clipbuf->cb_size - pos)) ? clipbuf->cb_size - pos : len;
-	  memcpy (ptr, (char *) (clipbuf + 1) + pos, ret);
+	  memcpy (ptr, clipbuf->cb_data + pos, ret);
 	  pos += ret;
 	}
     }

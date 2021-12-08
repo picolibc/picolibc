@@ -44,6 +44,7 @@ typedef struct
     };
   };
   uint64_t      cb_size; // 8 bytes everywhere
+  char          cb_data[];
 } cygcb_t;
 
 #endif
