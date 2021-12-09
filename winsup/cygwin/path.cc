@@ -3507,29 +3507,43 @@ restart:
 		  if (RtlEqualUnicodePathPrefix (&fpath, &ro_u_uncp, TRUE)
 		      && !RtlEqualUnicodePathPrefix (&upath, &ro_u_uncp, TRUE))
 		    {
-		      /* ...get the remote path from the volume path name,
-			 replace remote path with drive letter, check again. */
+		      /* ...get the remote path, replace remote path
+			 with drive letter, check again. */
+		      WCHAR drive[3] =
+			{(WCHAR) towupper (upath.Buffer[4]), L':', L'\0'};
 		      WCHAR remote[MAX_PATH];
 
-		      fpbuf[1] = L'\\';
-		      BOOL r = GetVolumePathNameW (fpbuf, remote, MAX_PATH);
-		      fpbuf[1] = L'?';
-		      if (r)
-			{
-			  int remlen = wcslen (remote);
-			  if (remote[remlen - 1] == L'\\')
-			    remlen--;
-			  /* Hackfest */
-			  fpath.Buffer[4] = upath.Buffer[4]; /* Drive letter */
-			  fpath.Buffer[5] = L':';
-			  WCHAR *to = fpath.Buffer + 6;
-			  WCHAR *from = to + remlen - 6;
-			  memmove (to, from,
-				   (wcslen (from) + 1) * sizeof (WCHAR));
-			  fpath.Length -= (from - to) * sizeof (WCHAR);
-			  if (RtlEqualUnicodeString (&upath, &fpath, !!ci_flag))
-			    goto file_not_symlink;
-			}
+
+		      int remlen = QueryDosDeviceW (drive, remote, MAX_PATH);
+		      if (remlen < 3)
+			goto file_not_symlink; /* fallback */
+		      remlen -= 2;
+
+		      if (remote[remlen - 1] == L'\\')
+			remlen--;
+		      WCHAR *p;
+		      UNICODE_STRING rpath;
+		      RtlInitCountedUnicodeString (&rpath, remote,
+						   remlen * sizeof (WCHAR));
+		      if (RtlEqualUnicodePathPrefix (&rpath, &ro_u_uncp, TRUE))
+			remlen -= 6;
+		      else if ((p = wcschr (remote, L';'))
+			       && p + 3 < remote + remlen
+			       && wcsncmp (p + 1, drive, 2) == 0
+			       && (p = wcschr (p + 3, L'\\')))
+			remlen -= p - remote - 1;
+		      else
+			goto file_not_symlink; /* fallback */
+		      /* Hackfest */
+		      fpath.Buffer[4] = drive[0]; /* Drive letter */
+		      fpath.Buffer[5] = L':';
+		      WCHAR *to = fpath.Buffer + 6;
+		      WCHAR *from = to + remlen;
+		      memmove (to, from,
+			       (wcslen (from) + 1) * sizeof (WCHAR));
+		      fpath.Length -= (from - to) * sizeof (WCHAR);
+		      if (RtlEqualUnicodeString (&upath, &fpath, !!ci_flag))
+			goto file_not_symlink;
 		    }
 		  issymlink = true;
 		  /* upath.Buffer is big enough and unused from this point on.
