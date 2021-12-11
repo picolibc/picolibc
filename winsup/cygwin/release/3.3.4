@@ -9,3 +9,8 @@ Bug Fixes
   This solves the following issues:
   Addresses: https://cygwin.com/pipermail/cygwin/2021-November/250087.html
              https://cygwin.com/pipermail/cygwin/2021-December/250103.html
+
+- Fix a bug in pty code that input is wrongly sent to io_handle_nat
+  rather than io_handle while neither read() nor select() is called
+  after the cygwin app is started from non-cygwin app.
+  Addresses: https://cygwin.com/pipermail/cygwin-patches/2021q4/011587.html
