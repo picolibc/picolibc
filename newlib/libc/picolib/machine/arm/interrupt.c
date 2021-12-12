@@ -135,6 +135,7 @@ __weak_vector_table(void)
 #if __ARM_ARCH_ISA_THUMB == 2
 	/* Thumb 2 processors start in thumb mode */
 	__asm__(".thumb");
+	__asm__(".syntax unified");
 	__asm__("b.w _start");
 	__asm__("b.w arm_undef_vector");
 	__asm__("b.w arm_svc_vector");
