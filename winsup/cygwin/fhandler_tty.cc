@@ -3384,7 +3384,7 @@ skip_create:
   if (get_ttyp ()->previous_output_code_page)
     SetConsoleOutputCP (get_ttyp ()->previous_output_code_page);
 
-  do
+  if (get_ttyp ()->getpgid () == myself->pgid)
     {
       termios &t = get_ttyp ()->ti;
       DWORD mode;
@@ -3409,7 +3409,6 @@ skip_create:
 	mode |= DISABLE_NEWLINE_AUTO_RETURN;
       SetConsoleMode (hpConOut, mode);
     }
-  while (false);
 
   return true;
 
