@@ -631,11 +631,14 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 		      cons_ti = &((tty *)cons->tc ())->ti;
 		      cons_owner = cons->get_owner ();
 		    }
+		  tty::cons_mode conmode =
+		    (ctty_pgid && ctty_pgid == myself->pgid) ?
+		    tty::native : tty::restore;
 		  if (fd == 0)
-		    fhandler_console::set_input_mode (tty::native,
+		    fhandler_console::set_input_mode (conmode,
 					   cons_ti, cons->get_handle_set ());
 		  else if (fd == 1 || fd == 2)
-		    fhandler_console::set_output_mode (tty::native,
+		    fhandler_console::set_output_mode (conmode,
 					   cons_ti, cons->get_handle_set ());
 		}
 	    }
