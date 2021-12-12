@@ -2249,9 +2249,12 @@ fhandler_pty_master::write (const void *ptr, size_t len)
 			  &mbp);
 	}
 
-      if ((ti.c_lflag & ISIG) && !(ti.c_lflag & NOFLSH)
-	  && memchr (buf, '\003', nlen))
-	get_ttyp ()->discard_input = true;
+      if ((ti.c_lflag & ISIG) && memchr (buf, '\003', nlen))
+	{
+	  get_ttyp ()->kill_pgrp (SIGINT);
+	  if (!(ti.c_lflag & NOFLSH))
+	    get_ttyp ()->discard_input = true;
+	}
       DWORD n;
       WriteFile (to_slave_nat, buf, nlen, &n, NULL);
       ReleaseMutex (input_mutex);
