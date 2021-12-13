@@ -274,6 +274,8 @@ enum
   PID_NEW	       = 0x01000, /* Available. */
   PID_ALLPIDS	       = 0x02000, /* used by pinfo scanner */
   PID_PROCINFO	       = 0x08000, /* caller just asks for process info */
+  PID_NEW_PG	       = 0x10000, /* Process created with
+				     CREATE_NEW_PROCESS_GROUOP flag */
   PID_EXITED	       = 0x40000000, /* Free entry. */
   PID_REAPED	       = 0x80000000  /* Reaped */
 };
