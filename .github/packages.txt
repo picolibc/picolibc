@@ -8,7 +8,7 @@ gcc-riscv64-unknown-elf
 gcc-aarch64-linux-gnu
 gcc-xtensa-lx106
 qemu-system-x86
-qemu-system-arm
+qemu-system-arm=1:6.1+dfsg-8.1
 qemu-system-misc
 clang
 lld
