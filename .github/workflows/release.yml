@@ -66,6 +66,7 @@ jobs:
           "./.github/do-test do-clang-thumbv7e+fp-configure build-clang-thumbv7e+fp",
           "./.github/do-test do-clang-thumbv7m-configure build-clang-thumbv7m",
           "./.github/do-test do-clang-rv32imafdc-configure build-clang-rv32imafdc",
+          "./.github/do-build do-m68k-configure build-m68k",
         ]
 
     steps:
