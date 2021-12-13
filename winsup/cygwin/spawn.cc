@@ -575,6 +575,9 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	c_flags |= CREATE_NEW_PROCESS_GROUP;
       refresh_cygheap ();
 
+      if (c_flags & CREATE_NEW_PROCESS_GROUP)
+	myself->process_state |= PID_NEW_PG;
+
       if (mode == _P_DETACH)
 	/* all set */;
       else if (mode != _P_OVERLAY || !my_wr_proc_pipe)

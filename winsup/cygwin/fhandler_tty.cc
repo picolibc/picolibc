@@ -2251,7 +2251,41 @@ fhandler_pty_master::write (const void *ptr, size_t len)
 
       if ((ti.c_lflag & ISIG) && memchr (buf, '\003', nlen))
 	{
-	  get_ttyp ()->kill_pgrp (SIGINT);
+	  /* If the process is started with CREATE_NEW_PROCESS_GROUP
+	     flag, Ctrl-C will not be sent to that process. Therefore,
+	     send Ctrl-break event to that process here. */
+	  DWORD wpid = 0;
+	  winpids pids ((DWORD) 0);
+	  for (unsigned i = 0; i < pids.npids; i++)
+	    {
+	      _pinfo *p = pids[i];
+	      if (p->ctty == get_ttyp ()->ntty
+		  && p->pgid == get_ttyp ()->getpgid ()
+		  && (p->process_state & PID_NEW_PG))
+		{
+		  wpid = p->dwProcessId;
+		  break;
+		}
+	    }
+	  pinfo pinfo_resume = pinfo (myself->ppid);
+	  DWORD resume_pid;
+	  if (pinfo_resume)
+	    resume_pid = pinfo_resume->dwProcessId;
+	  else
+	    resume_pid = get_console_process_id (myself->dwProcessId, false);
+	  if (wpid && resume_pid)
+	    {
+	      WaitForSingleObject (pcon_mutex, INFINITE);
+	      FreeConsole ();
+	      AttachConsole (wpid);
+	      /* CTRL_C_EVENT does not work for the process started with
+		 CREATE_NEW_PROCESS_GROUP flag, so send CTRL_BREAK_EVENT
+		 instead. */
+	      GenerateConsoleCtrlEvent (CTRL_BREAK_EVENT, wpid);
+	      FreeConsole ();
+	      AttachConsole (resume_pid);
+	      ReleaseMutex (pcon_mutex);
+	    }
 	  if (!(ti.c_lflag & NOFLSH))
 	    get_ttyp ()->discard_input = true;
 	}
