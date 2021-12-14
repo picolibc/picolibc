@@ -1181,37 +1181,48 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
       && pcon_pid_alive (get_ttyp ()->pcon_pid))
     {
       /* There is a process which is grabbing pseudo console. */
-      if (!to_be_read_from_pcon () && get_ttyp ()->pcon_activated
+      if (!to_be_read_from_pcon ()
 	  && get_ttyp ()->pcon_input_state_eq (tty::to_nat))
 	{
-	  HANDLE pcon_owner =
-	    OpenProcess (PROCESS_DUP_HANDLE, FALSE, get_ttyp ()->pcon_pid);
-	  if (pcon_owner)
+	  if (get_ttyp ()->pcon_activated)
 	    {
-	      pinfo pinfo_resume = pinfo (myself->ppid);
-	      DWORD resume_pid;
-	      if (pinfo_resume)
-		resume_pid = pinfo_resume->dwProcessId;
-	      else
-		resume_pid =
-		  get_console_process_id (myself->dwProcessId, false);
-	      if (resume_pid)
+	      HANDLE pcon_owner =
+		OpenProcess (PROCESS_DUP_HANDLE, FALSE, get_ttyp ()->pcon_pid);
+	      if (pcon_owner)
 		{
-		  HANDLE h_pcon_in;
-		  DuplicateHandle (pcon_owner, get_ttyp ()->h_pcon_in,
-				   GetCurrentProcess (), &h_pcon_in,
-				   0, TRUE, DUPLICATE_SAME_ACCESS);
-		  FreeConsole ();
-		  AttachConsole (get_ttyp ()->pcon_pid);
-		  WaitForSingleObject (input_mutex, INFINITE);
-		  transfer_input (tty::to_cyg, h_pcon_in, get_ttyp (),
-				  input_available_event);
-		  ReleaseMutex (input_mutex);
-		  FreeConsole ();
-		  AttachConsole (resume_pid);
-		  CloseHandle (h_pcon_in);
+		  pinfo pinfo_resume = pinfo (myself->ppid);
+		  DWORD resume_pid;
+		  if (pinfo_resume)
+		    resume_pid = pinfo_resume->dwProcessId;
+		  else
+		    resume_pid =
+		      get_console_process_id (myself->dwProcessId, false);
+		  if (resume_pid)
+		    {
+		      HANDLE h_pcon_in;
+		      DuplicateHandle (pcon_owner, get_ttyp ()->h_pcon_in,
+				       GetCurrentProcess (), &h_pcon_in,
+				       0, TRUE, DUPLICATE_SAME_ACCESS);
+		      FreeConsole ();
+		      AttachConsole (get_ttyp ()->pcon_pid);
+		      WaitForSingleObject (input_mutex, INFINITE);
+		      transfer_input (tty::to_cyg, h_pcon_in, get_ttyp (),
+				      input_available_event);
+		      ReleaseMutex (input_mutex);
+		      FreeConsole ();
+		      AttachConsole (resume_pid);
+		      CloseHandle (h_pcon_in);
+		    }
+		  CloseHandle (pcon_owner);
 		}
-	      CloseHandle (pcon_owner);
+	    }
+	  else if (!get_ttyp ()->pcon_fg (get_ttyp ()->getpgid ())
+		   && get_ttyp ()->switch_to_pcon_in)
+	    {
+	      WaitForSingleObject (input_mutex, INFINITE);
+	      transfer_input (tty::to_cyg, get_handle_nat (), get_ttyp (),
+			      input_available_event);
+	      ReleaseMutex (input_mutex);
 	    }
 	}
       ReleaseMutex (pcon_mutex);
@@ -1287,8 +1298,8 @@ fhandler_pty_slave::mask_switch_to_pcon_in (bool mask, bool xfer)
 
   /* This is needed when cygwin-app is started from non-cygwin app if
      pseudo console is disabled. */
-  bool need_xfer =
-    get_ttyp ()->switch_to_pcon_in && !get_ttyp ()->pcon_activated;
+  bool need_xfer = get_ttyp ()->pcon_fg (get_ttyp ()->getpgid ())
+    && get_ttyp ()->switch_to_pcon_in && !get_ttyp ()->pcon_activated;
 
   /* In GDB, transfer input based on setpgid() does not work because
      GDB may not set terminal process group properly. Therefore,
