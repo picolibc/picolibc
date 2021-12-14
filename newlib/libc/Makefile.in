@@ -153,11 +153,7 @@ PDFS = libc.pdf
 PSS = libc.ps
 HTMLS = libc.html
 TEXINFOS = libc.texinfo
-TEXI2DVI = `if test -f $(top_srcdir)/../texinfo/util/texi2dvi; then \
-             echo $(top_srcdir)/../texinfo/util/texi2dvi; \
-           else \
-             echo texi2dvi; \
-           fi`
+TEXI2DVI = texi2dvi
 TEXI2PDF = $(TEXI2DVI) --pdf --batch
 MAKEINFOHTML = $(MAKEINFO) --html
 AM_MAKEINFOHTMLFLAGS = $(AM_MAKEINFOFLAGS)
@@ -357,7 +353,6 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AUTOMAKE_OPTIONS = cygnus
 @HAVE_POSIX_DIR_TRUE@POSIX_SUBDIR = posix
 @HAVE_SIGNAL_DIR_TRUE@SIGNAL_SUBDIR = signal
 @HAVE_SYSCALL_DIR_TRUE@SYSCALLS_SUBDIR = syscalls
@@ -477,15 +472,15 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
-	      echo ' cd $(srcdir) && $(AUTOMAKE) --cygnus --ignore-deps'; \
-	      $(am__cd) $(srcdir) && $(AUTOMAKE) --cygnus --ignore-deps \
+	      echo ' cd $(srcdir) && $(AUTOMAKE) --foreign --ignore-deps'; \
+	      $(am__cd) $(srcdir) && $(AUTOMAKE) --foreign --ignore-deps \
 		&& exit 0; \
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --cygnus --ignore-deps Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign --ignore-deps Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --cygnus --ignore-deps Makefile
+	  $(AUTOMAKE) --foreign --ignore-deps Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -692,8 +687,6 @@ maintainer-clean-aminfo:
 	  rm -f $$i $$i-[0-9] $$i-[0-9][0-9] $$i_i[0-9] $$i_i[0-9][0-9]; \
 	done
 
-clean-info: mostlyclean-aminfo clean-aminfo
-
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run `make' without going through this Makefile.
 # To change the values of `make' variables: instead of editing Makefiles,
@@ -828,7 +821,7 @@ GTAGS:
 
 distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
-check-am:
+check-am: all-am
 check: check-recursive
 all-am: Makefile $(LIBRARIES) $(LTLIBRARIES) $(DATA)
 installdirs: installdirs-recursive
@@ -1032,7 +1025,7 @@ uninstall-am: uninstall-dvi-am uninstall-html-am uninstall-info-am \
 
 .PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
 	all all-am am--refresh check check-am clean clean-aminfo \
-	clean-generic clean-info clean-libtool clean-noinstLIBRARIES \
+	clean-generic clean-libtool clean-noinstLIBRARIES \
 	clean-noinstLTLIBRARIES ctags ctags-recursive dist-info \
 	distclean distclean-compile distclean-generic \
 	distclean-libtool distclean-tags dvi dvi-am html html-am info \

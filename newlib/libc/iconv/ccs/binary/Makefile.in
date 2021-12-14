@@ -255,7 +255,6 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AUTOMAKE_OPTIONS = cygnus
 cctdir = $(datadir)/iconv_data
 cct_DATA = \
 iso_8859_10.cct iso_8859_13.cct iso_8859_14.cct iso_8859_15.cct \
@@ -295,9 +294,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/..
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --cygnus --ignore-deps iconv/ccs/binary/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign --ignore-deps iconv/ccs/binary/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --cygnus --ignore-deps iconv/ccs/binary/Makefile
+	  $(AUTOMAKE) --foreign --ignore-deps iconv/ccs/binary/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -350,7 +349,7 @@ TAGS:
 ctags: CTAGS
 CTAGS:
 
-check-am:
+check-am: all-am
 check: check-am
 all-am: Makefile $(DATA)
 installdirs:

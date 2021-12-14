@@ -185,16 +185,8 @@ ETAGS = etags
 CTAGS = ctags
 DEJATOOL = $(PACKAGE)
 RUNTESTDEFAULTFLAGS = --tool $$tool --srcdir $$srcdir
-EXPECT = `if test -f $(top_builddir)/../expect/expect; then \
-	    echo $(top_builddir)/../expect/expect; \
-	  else \
-	    echo expect; \
-	  fi`
-RUNTEST = `if test -f $(top_srcdir)/../dejagnu/runtest; then \
-	     echo $(top_srcdir)/../dejagnu/runtest; \
-	   else \
-	     echo runtest; \
-	   fi`
+EXPECT = expect
+RUNTEST = runtest
 DIST_SUBDIRS = $(SUBDIRS)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
@@ -343,7 +335,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AUTOMAKE_OPTIONS = cygnus dejagnu subdir-objects
+AUTOMAKE_OPTIONS = dejagnu subdir-objects
 ACLOCAL_AMFLAGS = -I . -I ..
 
 # Variables that will accumulate in subdirs.
@@ -492,15 +484,15 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/do
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
-	      echo ' cd $(srcdir) && $(AUTOMAKE) --cygnus --ignore-deps'; \
-	      $(am__cd) $(srcdir) && $(AUTOMAKE) --cygnus --ignore-deps \
+	      echo ' cd $(srcdir) && $(AUTOMAKE) --foreign --ignore-deps'; \
+	      $(am__cd) $(srcdir) && $(AUTOMAKE) --foreign --ignore-deps \
 		&& exit 0; \
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --cygnus --ignore-deps Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign --ignore-deps Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --cygnus --ignore-deps Makefile
+	  $(AUTOMAKE) --foreign --ignore-deps Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -805,7 +797,7 @@ distclean-DEJAGNU:
 	-l='$(DEJATOOL)'; for tool in $$l; do \
 	  rm -f $$tool.sum $$tool.log; \
 	done
-check-am:
+check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) check-DEJAGNU
 check: check-recursive
 all-am: Makefile $(LIBRARIES) $(LTLIBRARIES) $(DATA) _newlib_version.h \
