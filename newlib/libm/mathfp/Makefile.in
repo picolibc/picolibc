@@ -422,9 +422,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/..
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --cygnus mathfp/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --cygnus --ignore-deps mathfp/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --cygnus mathfp/Makefile
+	  $(AUTOMAKE) --cygnus --ignore-deps mathfp/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

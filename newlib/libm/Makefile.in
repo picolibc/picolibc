@@ -126,8 +126,7 @@ am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
 am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = libm.c $(libm_la_SOURCES)
 INFO_DEPS = $(srcdir)/libm.info
-TEXINFO_TEX = $(top_srcdir)/../texinfo/texinfo.tex
-am__TEXINFO_TEX_DIR = $(top_srcdir)/../texinfo
+am__TEXINFO_TEX_DIR = $(srcdir)/../../texinfo
 DVIS = libm.dvi
 PDFS = libm.pdf
 PSS = libm.ps
@@ -328,6 +327,7 @@ libm_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@libm_la_SOURCES = 
 @USE_LIBTOOL_TRUE@libm_la_LIBADD = $(SUBLIBS)
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = libm.a
+TEXINFO_TEX = ../../texinfo/texinfo.tex
 info_TEXINFOS = libm.texinfo
 libm_TEXINFOS = targetdep.tex
 CLEANFILES = tmp.texi targetdep.tex stmp-targetdep *.xml *.3
@@ -343,15 +343,15 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
-	      echo ' cd $(srcdir) && $(AUTOMAKE) --cygnus'; \
-	      $(am__cd) $(srcdir) && $(AUTOMAKE) --cygnus \
+	      echo ' cd $(srcdir) && $(AUTOMAKE) --cygnus --ignore-deps'; \
+	      $(am__cd) $(srcdir) && $(AUTOMAKE) --cygnus --ignore-deps \
 		&& exit 0; \
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --cygnus Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --cygnus --ignore-deps Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --cygnus Makefile
+	  $(AUTOMAKE) --cygnus --ignore-deps Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

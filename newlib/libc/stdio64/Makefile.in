@@ -347,9 +347,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/..
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --cygnus stdio64/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --cygnus --ignore-deps stdio64/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --cygnus stdio64/Makefile
+	  $(AUTOMAKE) --cygnus --ignore-deps stdio64/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
