@@ -224,6 +224,7 @@ targetdep.tex: stmp-targetdep ; @true
 
 $(SUBDEFS): stmp-targetdep ; @true
 
+TEXINFO_TEX = ../../texinfo/texinfo.tex
 info_TEXINFOS = libc.texinfo
 libc_TEXINFOS = sigset.texi extra.texi posix.texi stdio64.texi iconvset.texi \
 	targetdep.tex $(SUBDEFS)

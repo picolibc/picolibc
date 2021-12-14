@@ -35,8 +35,8 @@ endif
 
 $(SUBLIBS):
 
+TEXINFO_TEX = ../../texinfo/texinfo.tex
 info_TEXINFOS = libm.texinfo
-
 libm_TEXINFOS = targetdep.tex
 
 libm.dvi: targetdep.tex math/stmp-def complex/stmp-def fenv/stmp-def
