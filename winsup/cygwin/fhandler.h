@@ -2280,6 +2280,7 @@ class fhandler_pty_common: public fhandler_termios
   static DWORD get_console_process_id (DWORD pid, bool match,
 				       bool cygwin = false,
 				       bool stub_only = false);
+  bool to_be_read_from_pcon (void);
 
  protected:
   static BOOL process_opost_output (HANDLE h, const void *ptr, ssize_t& len,
@@ -2446,7 +2447,6 @@ public:
     fh->copy_from (this);
     return fh;
   }
-  bool to_be_read_from_pcon (void);
   void get_master_thread_param (master_thread_param_t *p);
   void get_master_fwd_thread_param (master_fwd_thread_param_t *p);
   void set_mask_flusho (bool m) { get_ttyp ()->mask_flusho = m; }
