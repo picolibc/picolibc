@@ -1176,21 +1176,12 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
     return;
   if (get_ttyp ()->pcon_start)
     return;
-  /* This input transfer is needed if non-cygwin app is terminated
-     by Ctrl-C or killed. */
-  WaitForSingleObject (input_mutex, INFINITE);
-  if (!get_ttyp ()->pcon_fg (get_ttyp ()->getpgid ())
-      && get_ttyp ()->switch_to_pcon_in && !get_ttyp ()->pcon_activated
-      && get_ttyp ()->pcon_input_state_eq (tty::to_nat))
-    transfer_input (tty::to_cyg, get_handle_nat (), get_ttyp (),
-		    input_available_event);
-  ReleaseMutex (input_mutex);
   WaitForSingleObject (pcon_mutex, INFINITE);
   if (!pcon_pid_self (get_ttyp ()->pcon_pid)
       && pcon_pid_alive (get_ttyp ()->pcon_pid))
     {
       /* There is a process which is grabbing pseudo console. */
-      if (get_ttyp ()->pcon_activated
+      if (!to_be_read_from_pcon () && get_ttyp ()->pcon_activated
 	  && get_ttyp ()->pcon_input_state_eq (tty::to_nat))
 	{
 	  HANDLE pcon_owner =
@@ -1226,6 +1217,14 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
       ReleaseMutex (pcon_mutex);
       return;
     }
+  /* This input transfer is needed if non-cygwin app is terminated
+     by Ctrl-C or killed. */
+  WaitForSingleObject (input_mutex, INFINITE);
+  if (get_ttyp ()->switch_to_pcon_in && !get_ttyp ()->pcon_activated
+      && get_ttyp ()->pcon_input_state_eq (tty::to_nat))
+    transfer_input (tty::to_cyg, get_handle_nat (), get_ttyp (),
+		    input_available_event);
+  ReleaseMutex (input_mutex);
   get_ttyp ()->pcon_input_state = tty::to_cyg;
   get_ttyp ()->pcon_pid = 0;
   get_ttyp ()->switch_to_pcon_in = false;
@@ -1288,14 +1287,15 @@ fhandler_pty_slave::mask_switch_to_pcon_in (bool mask, bool xfer)
 
   /* This is needed when cygwin-app is started from non-cygwin app if
      pseudo console is disabled. */
-  bool need_xfer = get_ttyp ()->pcon_fg (get_ttyp ()->getpgid ()) && mask
-    && get_ttyp ()->switch_to_pcon_in && !get_ttyp ()->pcon_activated;
+  bool need_xfer =
+    get_ttyp ()->switch_to_pcon_in && !get_ttyp ()->pcon_activated;
 
   /* In GDB, transfer input based on setpgid() does not work because
      GDB may not set terminal process group properly. Therefore,
      transfer input here if isHybrid is set. */
-  if ((isHybrid || need_xfer) && !!masked != mask && xfer
-      && GetStdHandle (STD_INPUT_HANDLE) == get_handle ())
+  bool need_gdb_xfer =
+    isHybrid && GetStdHandle (STD_INPUT_HANDLE) == get_handle ();
+  if (!!masked != mask && xfer && (need_gdb_xfer || need_xfer))
     {
       if (mask && get_ttyp ()->pcon_input_state_eq (tty::to_nat))
 	transfer_input (tty::to_cyg, get_handle_nat (), get_ttyp (),
@@ -1308,7 +1308,7 @@ fhandler_pty_slave::mask_switch_to_pcon_in (bool mask, bool xfer)
 }
 
 bool
-fhandler_pty_master::to_be_read_from_pcon (void)
+fhandler_pty_common::to_be_read_from_pcon (void)
 {
   if (!get_ttyp ()->switch_to_pcon_in)
     return false;
