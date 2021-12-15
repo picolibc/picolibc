@@ -1056,6 +1056,7 @@ fhandler_pty_slave::set_switch_to_pcon (void)
       isHybrid = true;
       setup_locale ();
       myself->exec_dwProcessId = myself->dwProcessId;
+      myself->process_state |= PID_NEW_PG; /* Marker for pcon_fg */
       bool nopcon = (disable_pcon || !term_has_pcon_cap (NULL));
       WaitForSingleObject (pcon_mutex, INFINITE);
       bool pcon_enabled = setup_pseudoconsole (nopcon);
@@ -1168,6 +1169,7 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
 		    }
 		}
 	      myself->exec_dwProcessId = 0;
+	      myself->process_state &= ~PID_NEW_PG;
 	      isHybrid = false;
 	    }
 	}
@@ -2272,6 +2274,7 @@ fhandler_pty_master::write (const void *ptr, size_t len)
 	      _pinfo *p = pids[i];
 	      if (p->ctty == get_ttyp ()->ntty
 		  && p->pgid == get_ttyp ()->getpgid ()
+		  && (p->process_state & PID_NOTCYGWIN)
 		  && (p->process_state & PID_NEW_PG))
 		{
 		  wpid = p->dwProcessId;

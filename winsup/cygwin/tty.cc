@@ -392,7 +392,8 @@ tty::pcon_fg (pid_t pgid)
   for (unsigned i = 0; i < pids.npids; i++)
     {
       _pinfo *p = pids[i];
-      if (p->ctty == ntty && p->pgid == pgid && p->exec_dwProcessId)
+      if (p->ctty == ntty && p->pgid == pgid
+	  && (p->process_state & (PID_NOTCYGWIN | PID_NEW_PG)))
 	return true;
     }
   if (pgid > MAX_PID)
