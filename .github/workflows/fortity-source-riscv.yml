@@ -1,4 +1,4 @@
-name: Minsize
+name: Fortify-source RISC-V
 
 on:
   push:
@@ -23,15 +23,15 @@ jobs:
           # Math configurations
           "-Dnewlib-obsolete-math=false",
           "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
-          "-Dnewlib-obsolete-math-float=true -Dnewlib-obsolete-math-double=true",
+          "-Dnewlib-obsolete-math-float=true -Dnewlib-obsolete-math-double=false",
           "-Dnewlib-obsolete-math=true",
           "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
 
           # Tinystdio configurations
           "-Dio-float-exact=false",
           "-Dio-long-long=true",
-          "-Dformat-default=integer",
-          "-Dformat-default=float",
+	  "-Dformat-default=integer",
+	  "-Dformat-default=float",
 
           # Malloc configurations
           "-Dnewlib-nano-malloc=false",
@@ -51,14 +51,13 @@ jobs:
 
           # Multithread disabled
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false"
         ]
         test: [
-          "./.github/do-test do-native-configure build-native",
-          "./.github/do-test do-aarch64-configure build-aarch64",
-          "./.github/do-build do-lx106-configure build-lx106",
-          "./.github/do-test do-i386-configure build-i386",
-          "./.github/do-test do-x86_64-configure build-x86_64",
+          "./.github/do-test do-riscv-configure build-riscv",
+          "./.github/do-test do-rv32imac-configure build-rv32imac",
+          "./.github/do-build do-clang-riscv-configure build-riscv-clang",
+          "./.github/do-test do-clang-rv32imafdc-configure build-clang-rv32imafdc",
         ]
 
     steps:
@@ -82,9 +81,9 @@ jobs:
           docker load -i $IMAGE_FILE
           docker images -a $IMAGE
 
-      - name: Minsize test
+      - name: Fortity source test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc  -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
+          docker run -v $(readlink -f picolibc):/picolibc  -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} -Dfortify-source=2
 
       - name: Check Disk Space
         if: always()

@@ -1,4 +1,4 @@
-name: Minsize
+name: Release ARM
 
 on:
   push:
@@ -49,16 +49,14 @@ jobs:
           # Iconv configurations
           "-Dnewlib-iconv-external-ccs=true",
 
-          # Multithread disabled
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
+          # Multithread
+          "-Dnewlib-multithread=true -Dnewlib-retargetable-locking=true",
+          "-Dnewlib-multithread=true -Dnewlib-retargetable-locking=true -Dtinystdio=false",
         ]
         test: [
-          "./.github/do-test do-native-configure build-native",
-          "./.github/do-test do-aarch64-configure build-aarch64",
-          "./.github/do-build do-lx106-configure build-lx106",
-          "./.github/do-test do-i386-configure build-i386",
-          "./.github/do-test do-x86_64-configure build-x86_64",
+          "./.github/do-test do-arm-configure build-arm",
+          "./.github/do-test do-clang-thumbv7e+fp-configure build-clang-thumbv7e+fp",
+          "./.github/do-test do-clang-thumbv7m-configure build-clang-thumbv7m",
         ]
 
     steps:
@@ -82,9 +80,9 @@ jobs:
           docker load -i $IMAGE_FILE
           docker images -a $IMAGE
 
-      - name: Minsize test
+      - name: Release test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc  -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
+          docker run  -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
 
       - name: Check Disk Space
         if: always()
