@@ -920,7 +920,13 @@ if has_semihost
   # linker's runtime, its working directory is the build dir, linker
   # scripts under scripts/ can't be found. We use the absolute path
   # for our convinience.
-  custom_script = 'scripts/test-' + host_cpu_family + '.ld'
+  cpu_script = 'scripts' / 'test-' + host_machine.cpu() + '.ld'
+  cpu_family_script = 'scripts' / 'test-' + host_cpu_family + '.ld'
+  if fs.is_file(cpu_script)
+    custom_script = cpu_script
+  else
+    custom_script = cpu_family_script
+  endif
   test_link_args = ['-nostartfiles', '-nostdlib',
                     '-T', meson.current_source_dir() / custom_script,
                     '-T', '@0@'.format(picolibc_ld), '-lgcc']
