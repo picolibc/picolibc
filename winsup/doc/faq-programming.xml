@@ -679,11 +679,11 @@ rewriting the runtime library in question from specs...
 installed; you at least need <literal>gcc-g++</literal>,
 <literal>make</literal>, <literal>automake</literal>,
 <literal>autoconf</literal>, <literal>git</literal>, <literal>perl</literal>,
-<literal>gettext-devel</literal>, <literal>libiconv-devel</literal> and
-<literal>zlib-devel</literal>.  Fetch the sources from the
-<ulink url="https://cygwin.com/git/newlib-cygwin.git">Cygwin GIT source repository</ulink>.
-If you change a certain core part of Cygwin, namely the layout
-of the Cygwin TLS area, you also have to install <literal>cocom</literal>.
+<literal>gettext-devel</literal>, <literal>libiconv-devel</literal>
+<literal>zlib-devel</literal>, <literal>cocom</literal> and <literal>patch</literal>.
+</para>
+
+<para>
 Building for 32-bit Cygwin also requires
 <literal>mingw64-i686-gcc-g++</literal> and <literal>mingw64-i686-zlib</literal>.
 Building for 64-bit Cygwin also requires
