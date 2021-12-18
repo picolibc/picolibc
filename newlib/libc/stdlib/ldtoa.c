@@ -754,6 +754,9 @@ eiisnan (short unsigned int *x)
 
 #if LDBL_MANT_DIG == 64
 
+#ifdef USE_INFINITY
+#ifdef IBMPC
+
 /* Return nonzero if internal format number is infinite. */
 static int
 eiisinf (unsigned short x[])
@@ -767,6 +770,9 @@ eiisinf (unsigned short x[])
     return (1);
   return (0);
 }
+#endif
+#endif
+
 #endif /* LDBL_MANT_DIG == 64 */
 
 /*
