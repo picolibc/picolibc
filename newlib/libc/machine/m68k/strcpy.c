@@ -33,6 +33,8 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  * Copy bytes using CPU32+ loop mode if possible
  */
 
+#undef strcpy
+
 char *
 strcpy (char *to, const char *from)
 {
