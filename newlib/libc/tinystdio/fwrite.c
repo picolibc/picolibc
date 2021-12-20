@@ -38,7 +38,7 @@ fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
 	size_t i, j;
 	const uint8_t *cp;
 
-	if ((stream->flags & __SWR) == 0)
+	if ((stream->flags & __SWR) == 0 || size == 0)
 		return 0;
 
 	for (i = 0, cp = (const uint8_t *)ptr; i < nmemb; i++)
