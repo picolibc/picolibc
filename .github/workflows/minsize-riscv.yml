@@ -11,6 +11,7 @@ on:
 env:
   IMAGE_FILE: dockerimg.tar
   IMAGE: picolibc
+  HASHED_FILE: .github/packages.txt
 
 jobs:
   test:
@@ -66,11 +67,22 @@ jobs:
         with:
           path: picolibc
 
+      - name: Get current date
+        id: date
+        run: |
+          echo "::set-output name=today::$(date -u +'%Y%m%d')"
+          echo "::set-output name=yesterday::$(date -u -d '-1 day' +'%Y%m%d')"
+
       - name: Restore the Docker Image
         uses: actions/cache@v2
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-
+          key: no-exact-key-is-used
+          restore-keys: |
+            ${{ env.IMAGE_FILE }}-${{ hashFiles(format('picolibc/{0}', env.HASHED_FILE)) }}-${{ steps.date.outputs.today }}
+            ${{ env.IMAGE_FILE }}-${{ hashFiles(format('picolibc/{0}', env.HASHED_FILE)) }}-${{ steps.date.outputs.yesterday }}
+            ${{ env.IMAGE_FILE }}-${{ hashFiles(format('picolibc/{0}', env.HASHED_FILE)) }}-
+            ${{ env.IMAGE_FILE }}-
 
       - name: Check
         run: |
