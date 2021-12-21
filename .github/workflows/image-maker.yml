@@ -4,9 +4,18 @@ on:
   push:
     branches:
       - main
+    paths:
+      - .github/packages.txt
+      - .github/workflows/image-maker.yml
   pull_request:
     branches:
       - main
+    paths:
+      - .github/packages.txt
+      - .github/workflows/image-maker.yml
+  schedule:
+    # We build at 5:00 UTC every 6 days
+      - cron: '0 5 */6 * *'
 
 env:
   IMAGE_FILE: dockerimg.tar
@@ -19,10 +28,18 @@ jobs:
     steps:
       - name: Clone picolibc
         uses: actions/checkout@v2
+        with:
+         path: picolibc
 
       - name: Get current date
         id: date
-        run: echo "::set-output name=datetime::$(date -u +'%Y%m%d-%R')"
+        run: echo "::set-output name=today::$(date -u +'%Y%m%d')"
+
+      - name: Cache the Docker Image
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.IMAGE_FILE }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles(format('picolibc/{0}', env.HASHED_FILE)) }}-${{ steps.date.outputs.today }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -40,8 +57,3 @@ jobs:
         run: |
           ls -al
 
-      - name: Cache the Docker Image
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles(format('{0}', env.HASHED_FILE)) }}-${{ steps.date.outputs.datetime }}
