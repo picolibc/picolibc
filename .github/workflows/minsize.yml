@@ -68,13 +68,18 @@ jobs:
         with:
           path: picolibc
 
+      - name: Get current date
+        run: |
+          echo "today=$(date -u +'%Y%m%d')" >> $GITHUB_ENV
+          echo "yesterday=$(date -u -d '-1 day' +'%Y%m%d')" >> $GITHUB_ENV
+
       - name: Restore the Docker Image
         uses: actions/cache@v2
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles(format('picolibc/{0}', env.HASHED_FILE)) }}-${{ steps.date.outputs.today }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles(format('picolibc/{0}', env.HASHED_FILE)) }}-${{ env.today }}
           restore-keys: |
-            ${{ env.IMAGE_FILE }}-${{ hashFiles(format('picolibc/{0}', env.HASHED_FILE)) }}-${{ steps.date.outputs.yesterday }}
+            ${{ env.IMAGE_FILE }}-${{ hashFiles(format('picolibc/{0}', env.HASHED_FILE)) }}-${{ env.yesterday }}
             ${{ env.IMAGE_FILE }}-${{ hashFiles(format('picolibc/{0}', env.HASHED_FILE)) }}-
             ${{ env.IMAGE_FILE }}-
 

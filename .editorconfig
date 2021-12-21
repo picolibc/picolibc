@@ -6,3 +6,6 @@ insert_final_newline = true
 [*.{c,h}]
 indent_size = 4
 indent_style = space
+
+[*.yml]
+indent_style = space
