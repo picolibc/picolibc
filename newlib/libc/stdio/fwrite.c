@@ -121,7 +121,8 @@ _fwrite_r (struct _reent * ptr,
   struct __siov iov;
 
   iov.iov_base = buf;
-  uio.uio_resid = iov.iov_len = n = count * size;
+  if (!(uio.uio_resid = iov.iov_len = n = count * size))
+      return 0;
   uio.uio_iov = &iov;
   uio.uio_iovcnt = 1;
 
@@ -145,7 +146,8 @@ _fwrite_r (struct _reent * ptr,
 #else
   size_t i = 0;
   const char *p = buf;
-  n = count * size;
+  if (!(n = count * size))
+      return 0;
   CHECK_INIT (ptr, fp);
 
   _newlib_flockfile_start (fp);
