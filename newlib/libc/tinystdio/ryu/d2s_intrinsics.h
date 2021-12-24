@@ -49,6 +49,8 @@ static inline uint64_t shiftright128(const uint64_t lo, const uint64_t hi, const
   // of Ryu, the shift value is always < 64. (In the case
   // RYU_OPTIMIZE_SIZE == 0, the shift value is in the range [49, 58].
   // Otherwise in the range [2, 59].)
+  // However, this function is now also called by s2d, which requires supporting
+  // the larger shift range (TODO: what is the actual range?).
   // Check this here in case a future change requires larger shift
   // values. In this case this function needs to be adjusted.
   assert(dist < 64);

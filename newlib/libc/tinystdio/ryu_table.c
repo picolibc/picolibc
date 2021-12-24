@@ -20,7 +20,7 @@
 #include "ryu/common.h"
 #include "ryu/d2s_intrinsics.h"
 
-static const uint64_t DOUBLE_POW5_INV_SPLIT2[14][2] = {
+static const uint64_t DOUBLE_POW5_INV_SPLIT2[15][2] = {
   {                    1u, 2305843009213693952u },
   {  5955668970331000884u, 1784059615882449851u },
   {  8982663654677661702u, 1380349269358112757u },
@@ -35,6 +35,7 @@ static const uint64_t DOUBLE_POW5_INV_SPLIT2[14][2] = {
   {  5577825024675947042u, 2194449627517475473u },
   { 11006974540203867551u, 1697873161311732311u },
   { 10313493231639821582u, 1313665730009899186u },
+  { 12701016819766672773u, 2032799256770390445u }
 };
 static const uint32_t POW5_INV_OFFSETS[21] = {
   0x54544554, 0x04055545, 0x10041000, 0x00400414, 0x40010000, 0x41155555,
@@ -76,15 +77,14 @@ static const uint64_t DOUBLE_POW5_TABLE[POW5_TABLE_SIZE] = {
 };
 
 uint32_t __pow5Factor(uint64_t value) {
+  const uint64_t m_inv_5 = 14757395258967641293u; // 5 * m_inv_5 = 1 (mod 2^64)
+  const uint64_t n_div_5 = 3689348814741910323u;  // #{ n | n = 0 (mod 2^64) } = 2^64 / 5
   uint32_t count = 0;
   for (;;) {
     assert(value != 0);
-    const uint64_t q = div5(value);
-    const uint32_t r = ((uint32_t) value) - 5 * ((uint32_t) q);
-    if (r != 0) {
+    value *= m_inv_5;
+    if (value > n_div_5)
       break;
-    }
-    value = q;
     ++count;
   }
   return count;

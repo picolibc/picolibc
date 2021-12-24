@@ -51,21 +51,12 @@ uint64_t __umul128(const uint64_t a, const uint64_t b, uint64_t* const productHi
   return pLo;
 }
 
+// Returns the lower 64 bits of (hi*2^64 + lo) >> dist, with 0 < dist < 64.
 uint64_t __shiftright128(const uint64_t lo, const uint64_t hi, const uint32_t dist) {
   // We don't need to handle the case dist >= 64 here (see above).
   assert(dist < 64);
-  /*
-   * This function *does* get called with shift < 32 when converting
-   * strings to floats, so disable this optimization
-   */
-#if defined(RYU_OPTIMIZE_SIZE) || !defined(NOT_DEFINED_RYU_32_BIT_PLATFORM)
   assert(dist > 0);
   return (hi << (64 - dist)) | (lo >> dist);
-#else
-  // Avoid a 64-bit shift by taking advantage of the range of shift values.
-  assert(dist >= 32);
-  return (hi << (64 - dist)) | ((uint32_t)(lo >> 32) >> (dist - 32));
-#endif
 }
 
 #endif
