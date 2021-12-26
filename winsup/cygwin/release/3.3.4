@@ -14,3 +14,6 @@ Bug Fixes
   rather than io_handle while neither read() nor select() is called
   after the cygwin app is started from non-cygwin app.
   Addresses: https://cygwin.com/pipermail/cygwin-patches/2021q4/011587.html
+
+- Avoid a crash when NtQueryInformationProcess returns invalid handle data.
+  Addresses: https://cygwin.com/pipermail/cygwin-patches/2021q4/011611.html
