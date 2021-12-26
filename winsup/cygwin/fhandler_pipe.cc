@@ -6,8 +6,6 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-/* FIXME: Should this really be fhandler_pipe.cc? */
-
 #include "winsup.h"
 #include <stdlib.h>
 #include <sys/socket.h>
@@ -20,6 +18,7 @@ details. */
 #include "pinfo.h"
 #include "shared_info.h"
 #include "tls_pbuf.h"
+#include <assert.h>
 
 /* This is only to be used for writing.  When reading,
 STATUS_PIPE_EMPTY simply means there's no data to be read. */
@@ -1228,6 +1227,12 @@ fhandler_pipe::get_query_hdl_per_process (WCHAR *name,
 	    HeapAlloc (GetProcessHeap (), 0, nbytes);
 	  if (!phi)
 	    goto close_proc;
+	  /* NtQueryInformationProcess can return STATUS_SUCCESS with
+	     invalid handle data for certain processes.  See
+	     https://github.com/processhacker/processhacker/blob/05f5e9fa477dcaa1709d9518170d18e1b3b8330d/phlib/native.c#L5754.
+	     We need to ensure that NumberOfHandles is zero in this
+	     case to avoid a crash in the for loop below. */
+	  phi->NumberOfHandles = 0;
 	  status = NtQueryInformationProcess (proc, ProcessHandleInformation,
 					      phi, nbytes, &len);
 	  if (NT_SUCCESS (status))
@@ -1239,6 +1244,10 @@ fhandler_pipe::get_query_hdl_per_process (WCHAR *name,
       if (!NT_SUCCESS (status))
 	goto close_proc;
 
+      /* Sanity check in case Microsoft changes
+	 NtQueryInformationProcess and the initialization of
+	 NumberOfHandles above is no longer sufficient. */
+      assert (phi->NumberOfHandles <= n_handle);
       for (ULONG j = 0; j < phi->NumberOfHandles; j++)
 	{
 	  /* Check for the peculiarity of cygwin read pipe */
