@@ -36,7 +36,6 @@ lib_a_SOURCES =			\
 	strncpy-stub.c		\
 	strncpy-bs.S
 
-lib_a_CCASFLAGS=$(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config

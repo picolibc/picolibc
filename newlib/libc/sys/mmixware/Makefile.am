@@ -11,7 +11,6 @@ lib_a_SOURCES = _exit.c access.c chmod.c chown.c close.c creat.c \
 	kill.c link.c lseek.c open.c pipe.c read.c \
 	sbrk.c stat.c time.c unlink.c utime.c wait.c write.c \
 	times.c gettime.c setjmp.S
-lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 
 all-local: crt0.o

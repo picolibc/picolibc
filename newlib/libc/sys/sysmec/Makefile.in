@@ -120,7 +120,7 @@ am_lib_a_OBJECTS = lib_a-_exit.$(OBJEXT) lib_a-access.$(OBJEXT) \
 	lib_a-isatty.$(OBJEXT) lib_a-kill.$(OBJEXT) \
 	lib_a-lseek.$(OBJEXT) lib_a-open.$(OBJEXT) \
 	lib_a-pipe.$(OBJEXT) lib_a-read.$(OBJEXT) lib_a-sbrk.$(OBJEXT) \
-	lib_a-stat.$(OBJEXT) lib_a-time.$(OBJEXT) lib_a-trap.$(OBJEXT) \
+	lib_a-stat.$(OBJEXT) lib_a-time.$(OBJEXT) trap.$(OBJEXT) \
 	lib_a-unlink.$(OBJEXT) lib_a-utime.$(OBJEXT) \
 	lib_a-wait.$(OBJEXT) lib_a-write.$(OBJEXT) \
 	lib_a-times.$(OBJEXT) lib_a-gettime.$(OBJEXT)
@@ -140,16 +140,16 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
 am__depfiles_maybe =
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
 CPPASCOMPILE = $(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS)
 AM_V_CPPAS = $(am__v_CPPAS_@AM_V@)
 am__v_CPPAS_ = $(am__v_CPPAS_@AM_DEFAULT_V@)
 am__v_CPPAS_0 = @echo "  CPPAS   " $@;
 am__v_CPPAS_1 = 
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 AM_V_CC = $(am__v_CC_@AM_V@)
@@ -303,7 +303,6 @@ lib_a_SOURCES = _exit.c access.c chmod.c chown.c close.c creat.c crt1.c \
 	sbrk.c stat.c time.c trap.S unlink.c utime.c wait.c write.c \
 	times.c gettime.c
 
-lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
@@ -364,12 +363,6 @@ distclean-compile:
 
 .S.obj:
 	$(AM_V_CPPAS)$(CPPASCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-lib_a-trap.o: trap.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-trap.o `test -f 'trap.S' || echo '$(srcdir)/'`trap.S
-
-lib_a-trap.obj: trap.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-trap.obj `if test -f 'trap.S'; then $(CYGPATH_W) 'trap.S'; else $(CYGPATH_W) '$(srcdir)/trap.S'; fi`
 
 .c.o:
 	$(AM_V_CC)$(COMPILE) -c -o $@ $<

@@ -347,7 +347,6 @@ COPYRENAMEOFILES = divS.o
 COPYOMFILES = ieee_flags.o
 lib_a_SOURCES = _main.c ieee.c
 lib_a_LIBADD = $(COPYOFILES) $(COPYOMFILES) $(COPYRENAMEOFILES)
-lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

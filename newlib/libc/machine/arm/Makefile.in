@@ -111,16 +111,14 @@ am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-strcmp.$(OBJEXT) \
+am_lib_a_OBJECTS = setjmp.$(OBJEXT) strcmp.$(OBJEXT) \
 	lib_a-strcpy.$(OBJEXT) lib_a-aeabi_memcpy.$(OBJEXT) \
-	lib_a-aeabi_memcpy-armv7a.$(OBJEXT) \
-	lib_a-aeabi_memmove.$(OBJEXT) \
-	lib_a-aeabi_memmove-soft.$(OBJEXT) \
-	lib_a-aeabi_memset.$(OBJEXT) lib_a-aeabi_memset-soft.$(OBJEXT) \
-	lib_a-aeabi_memclr.$(OBJEXT) lib_a-memchr-stub.$(OBJEXT) \
-	lib_a-memchr.$(OBJEXT) lib_a-memcpy-stub.$(OBJEXT) \
-	lib_a-memcpy.$(OBJEXT) lib_a-strlen-stub.$(OBJEXT) \
-	lib_a-strlen.$(OBJEXT)
+	aeabi_memcpy-armv7a.$(OBJEXT) lib_a-aeabi_memmove.$(OBJEXT) \
+	aeabi_memmove-soft.$(OBJEXT) lib_a-aeabi_memset.$(OBJEXT) \
+	aeabi_memset-soft.$(OBJEXT) lib_a-aeabi_memclr.$(OBJEXT) \
+	lib_a-memchr-stub.$(OBJEXT) memchr.$(OBJEXT) \
+	lib_a-memcpy-stub.$(OBJEXT) memcpy.$(OBJEXT) \
+	lib_a-strlen-stub.$(OBJEXT) strlen.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -137,16 +135,16 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
 am__depfiles_maybe =
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
 CPPASCOMPILE = $(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS)
 AM_V_CPPAS = $(am__v_CPPAS_@AM_V@)
 am__v_CPPAS_ = $(am__v_CPPAS_@AM_DEFAULT_V@)
 am__v_CPPAS_0 = @echo "  CPPAS   " $@;
 am__v_CPPAS_1 = 
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 AM_V_CC = $(am__v_CC_@AM_V@)
@@ -300,7 +298,6 @@ lib_a_SOURCES = setjmp.S strcmp.S strcpy.c aeabi_memcpy.c \
 	aeabi_memset.c aeabi_memset-soft.S aeabi_memclr.c \
 	memchr-stub.c memchr.S memcpy-stub.c memcpy.S strlen-stub.c \
 	strlen.S
-lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
@@ -372,54 +369,6 @@ distclean-compile:
 
 .S.obj:
 	$(AM_V_CPPAS)$(CPPASCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-lib_a-setjmp.o: setjmp.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.o `test -f 'setjmp.S' || echo '$(srcdir)/'`setjmp.S
-
-lib_a-setjmp.obj: setjmp.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.obj `if test -f 'setjmp.S'; then $(CYGPATH_W) 'setjmp.S'; else $(CYGPATH_W) '$(srcdir)/setjmp.S'; fi`
-
-lib_a-strcmp.o: strcmp.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strcmp.o `test -f 'strcmp.S' || echo '$(srcdir)/'`strcmp.S
-
-lib_a-strcmp.obj: strcmp.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strcmp.obj `if test -f 'strcmp.S'; then $(CYGPATH_W) 'strcmp.S'; else $(CYGPATH_W) '$(srcdir)/strcmp.S'; fi`
-
-lib_a-aeabi_memcpy-armv7a.o: aeabi_memcpy-armv7a.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-aeabi_memcpy-armv7a.o `test -f 'aeabi_memcpy-armv7a.S' || echo '$(srcdir)/'`aeabi_memcpy-armv7a.S
-
-lib_a-aeabi_memcpy-armv7a.obj: aeabi_memcpy-armv7a.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-aeabi_memcpy-armv7a.obj `if test -f 'aeabi_memcpy-armv7a.S'; then $(CYGPATH_W) 'aeabi_memcpy-armv7a.S'; else $(CYGPATH_W) '$(srcdir)/aeabi_memcpy-armv7a.S'; fi`
-
-lib_a-aeabi_memmove-soft.o: aeabi_memmove-soft.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-aeabi_memmove-soft.o `test -f 'aeabi_memmove-soft.S' || echo '$(srcdir)/'`aeabi_memmove-soft.S
-
-lib_a-aeabi_memmove-soft.obj: aeabi_memmove-soft.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-aeabi_memmove-soft.obj `if test -f 'aeabi_memmove-soft.S'; then $(CYGPATH_W) 'aeabi_memmove-soft.S'; else $(CYGPATH_W) '$(srcdir)/aeabi_memmove-soft.S'; fi`
-
-lib_a-aeabi_memset-soft.o: aeabi_memset-soft.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-aeabi_memset-soft.o `test -f 'aeabi_memset-soft.S' || echo '$(srcdir)/'`aeabi_memset-soft.S
-
-lib_a-aeabi_memset-soft.obj: aeabi_memset-soft.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-aeabi_memset-soft.obj `if test -f 'aeabi_memset-soft.S'; then $(CYGPATH_W) 'aeabi_memset-soft.S'; else $(CYGPATH_W) '$(srcdir)/aeabi_memset-soft.S'; fi`
-
-lib_a-memchr.o: memchr.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memchr.o `test -f 'memchr.S' || echo '$(srcdir)/'`memchr.S
-
-lib_a-memchr.obj: memchr.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memchr.obj `if test -f 'memchr.S'; then $(CYGPATH_W) 'memchr.S'; else $(CYGPATH_W) '$(srcdir)/memchr.S'; fi`
-
-lib_a-memcpy.o: memcpy.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcpy.o `test -f 'memcpy.S' || echo '$(srcdir)/'`memcpy.S
-
-lib_a-memcpy.obj: memcpy.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcpy.obj `if test -f 'memcpy.S'; then $(CYGPATH_W) 'memcpy.S'; else $(CYGPATH_W) '$(srcdir)/memcpy.S'; fi`
-
-lib_a-strlen.o: strlen.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strlen.o `test -f 'strlen.S' || echo '$(srcdir)/'`strlen.S
-
-lib_a-strlen.obj: strlen.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strlen.obj `if test -f 'strlen.S'; then $(CYGPATH_W) 'strlen.S'; else $(CYGPATH_W) '$(srcdir)/strlen.S'; fi`
 
 .c.o:
 	$(AM_V_CC)$(COMPILE) -c -o $@ $<

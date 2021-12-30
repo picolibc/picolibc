@@ -8,7 +8,6 @@ noinst_LIBRARIES = lib.a
 
 lib_a_SOURCES = memcpy.c memset.c memmove.c setjmp.S
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

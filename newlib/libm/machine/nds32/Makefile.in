@@ -113,8 +113,8 @@ am__v_AR_1 =
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 am__objects_1 =
-@HAS_NDS32_FPU_SP_TRUE@am__objects_2 = lib_a-wf_sqrt.$(OBJEXT)
-@HAS_NDS32_FPU_DP_TRUE@am__objects_3 = lib_a-w_sqrt.$(OBJEXT)
+@HAS_NDS32_FPU_SP_TRUE@am__objects_2 = wf_sqrt.$(OBJEXT)
+@HAS_NDS32_FPU_DP_TRUE@am__objects_3 = w_sqrt.$(OBJEXT)
 am__objects_4 = $(am__objects_1) $(am__objects_2) $(am__objects_3)
 am_lib_a_OBJECTS = $(am__objects_4)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
@@ -133,10 +133,6 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
 am__depfiles_maybe =
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
 CPPASCOMPILE = $(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS)
 AM_V_CPPAS = $(am__v_CPPAS_@AM_V@)
@@ -302,7 +298,6 @@ LIB_SOURCES = $(GPR_SOURCES) $(FPU_SP_SOURCES) $(FPU_DP_SOURCES)
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 noinst_DATA = 
 
 #
@@ -374,18 +369,6 @@ distclean-compile:
 
 .S.obj:
 	$(AM_V_CPPAS)$(CPPASCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-lib_a-wf_sqrt.o: wf_sqrt.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-wf_sqrt.o `test -f 'wf_sqrt.S' || echo '$(srcdir)/'`wf_sqrt.S
-
-lib_a-wf_sqrt.obj: wf_sqrt.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-wf_sqrt.obj `if test -f 'wf_sqrt.S'; then $(CYGPATH_W) 'wf_sqrt.S'; else $(CYGPATH_W) '$(srcdir)/wf_sqrt.S'; fi`
-
-lib_a-w_sqrt.o: w_sqrt.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-w_sqrt.o `test -f 'w_sqrt.S' || echo '$(srcdir)/'`w_sqrt.S
-
-lib_a-w_sqrt.obj: w_sqrt.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-w_sqrt.obj `if test -f 'w_sqrt.S'; then $(CYGPATH_W) 'w_sqrt.S'; else $(CYGPATH_W) '$(srcdir)/w_sqrt.S'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique

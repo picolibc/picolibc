@@ -111,12 +111,10 @@ am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am_lib_a_OBJECTS = lib_a-memmove.$(OBJEXT) \
-	lib_a-memmove-stub.$(OBJEXT) lib_a-memset.$(OBJEXT) \
-	lib_a-memcpy-asm.$(OBJEXT) lib_a-memcpy.$(OBJEXT) \
-	lib_a-strlen.$(OBJEXT) lib_a-strcpy.$(OBJEXT) \
-	lib_a-strcmp.$(OBJEXT) lib_a-setjmp.$(OBJEXT) \
-	lib_a-ieeefp.$(OBJEXT) lib_a-ffs.$(OBJEXT)
+am_lib_a_OBJECTS = memmove.$(OBJEXT) lib_a-memmove-stub.$(OBJEXT) \
+	memset.$(OBJEXT) memcpy-asm.$(OBJEXT) lib_a-memcpy.$(OBJEXT) \
+	lib_a-strlen.$(OBJEXT) lib_a-strcpy.$(OBJEXT) strcmp.$(OBJEXT) \
+	setjmp.$(OBJEXT) lib_a-ieeefp.$(OBJEXT) lib_a-ffs.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -133,16 +131,16 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
 am__depfiles_maybe =
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
 CPPASCOMPILE = $(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS)
 AM_V_CPPAS = $(am__v_CPPAS_@AM_V@)
 am__v_CPPAS_ = $(am__v_CPPAS_@AM_DEFAULT_V@)
 am__v_CPPAS_0 = @echo "  CPPAS   " $@;
 am__v_CPPAS_1 = 
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 AM_V_CC = $(am__v_CC_@AM_V@)
@@ -293,7 +291,6 @@ noinst_LIBRARIES = lib.a
 lib_a_SOURCES = memmove.S memmove-stub.c memset.S memcpy-asm.S memcpy.c strlen.c \
 	strcpy.c strcmp.S setjmp.S ieeefp.c ffs.c
 
-lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
@@ -354,36 +351,6 @@ distclean-compile:
 
 .S.obj:
 	$(AM_V_CPPAS)$(CPPASCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-lib_a-memmove.o: memmove.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memmove.o `test -f 'memmove.S' || echo '$(srcdir)/'`memmove.S
-
-lib_a-memmove.obj: memmove.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memmove.obj `if test -f 'memmove.S'; then $(CYGPATH_W) 'memmove.S'; else $(CYGPATH_W) '$(srcdir)/memmove.S'; fi`
-
-lib_a-memset.o: memset.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memset.o `test -f 'memset.S' || echo '$(srcdir)/'`memset.S
-
-lib_a-memset.obj: memset.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memset.obj `if test -f 'memset.S'; then $(CYGPATH_W) 'memset.S'; else $(CYGPATH_W) '$(srcdir)/memset.S'; fi`
-
-lib_a-memcpy-asm.o: memcpy-asm.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcpy-asm.o `test -f 'memcpy-asm.S' || echo '$(srcdir)/'`memcpy-asm.S
-
-lib_a-memcpy-asm.obj: memcpy-asm.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcpy-asm.obj `if test -f 'memcpy-asm.S'; then $(CYGPATH_W) 'memcpy-asm.S'; else $(CYGPATH_W) '$(srcdir)/memcpy-asm.S'; fi`
-
-lib_a-strcmp.o: strcmp.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strcmp.o `test -f 'strcmp.S' || echo '$(srcdir)/'`strcmp.S
-
-lib_a-strcmp.obj: strcmp.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strcmp.obj `if test -f 'strcmp.S'; then $(CYGPATH_W) 'strcmp.S'; else $(CYGPATH_W) '$(srcdir)/strcmp.S'; fi`
-
-lib_a-setjmp.o: setjmp.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.o `test -f 'setjmp.S' || echo '$(srcdir)/'`setjmp.S
-
-lib_a-setjmp.obj: setjmp.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.obj `if test -f 'setjmp.S'; then $(CYGPATH_W) 'setjmp.S'; else $(CYGPATH_W) '$(srcdir)/setjmp.S'; fi`
 
 .c.o:
 	$(AM_V_CC)$(COMPILE) -c -o $@ $<

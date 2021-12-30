@@ -9,7 +9,6 @@ noinst_LIBRARIES = lib.a
 AM_CFLAGS = -I $(srcdir)/../../stdio -I $(srcdir)/../../stdlib
 
 lib_a_SOURCES = setjmp.S
-lib_a_CCASFLAGS=$(AM_CCASFLAGS)
 lib_a_CFLAGS=$(AM_CFLAGS)
 lib_a_LIBADD = @extra_objs@
 lib_a_DEPENDENCIES = @extra_objs@

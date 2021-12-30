@@ -75,7 +75,6 @@ COPYOMFILES = ieee_flags.o
 
 lib_a_SOURCES = _main.c ieee.c
 lib_a_LIBADD = $(COPYOFILES) $(COPYOMFILES) $(COPYRENAMEOFILES)
-lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 
 $(COPYOFILES):

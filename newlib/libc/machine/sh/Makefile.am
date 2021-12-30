@@ -12,7 +12,6 @@ else
 lib_a_SOURCES = memcpy.S memset.S setjmp.S strcpy.S strlen.S strcmp.S
 endif
 
-lib_a_CCASFLAGS=$(AM_CCASFLAGS)
 lib_a_CFLAGS=$(AM_CFLAGS)
 
 $(lpfx)memcpy.o: asm.h

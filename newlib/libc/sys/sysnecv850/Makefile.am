@@ -28,7 +28,6 @@ EXTRA_lib_a_SOURCES = \
 	times.c gettime.c rename.c
 lib_a_SOURCES =
 lib_a_DEPENDENCIES = $(extra_objs)
-lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 
 if MAY_SUPPLY_SYSCALLS

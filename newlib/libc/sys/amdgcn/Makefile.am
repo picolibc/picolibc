@@ -8,7 +8,6 @@ noinst_LIBRARIES = lib.a
 
 lib_a_SOURCES = close.c fstat.c isatty.c lseek.c read.c write.c \
                 fcntl.c getpid.c kill.c open.c raise.c stat.c unlink.c
-lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config

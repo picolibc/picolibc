@@ -39,7 +39,6 @@ lib_a_SOURCES += strnlen.S
 lib_a_SOURCES += strrchr-stub.c
 lib_a_SOURCES += strrchr.S
 
-lib_a_CCASFLAGS=$(AM_CCASFLAGS)
 lib_a_CFLAGS=$(AM_CFLAGS)
 
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config

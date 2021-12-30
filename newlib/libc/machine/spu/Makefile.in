@@ -152,35 +152,30 @@ lib_a_LIBADD =
 @HAVE_SPU_EA_TRUE@	lib_a-write_ea.$(OBJEXT) \
 @HAVE_SPU_EA_TRUE@	lib_a-pwrite_ea.$(OBJEXT) \
 @HAVE_SPU_EA_TRUE@	lib_a-writev_ea.$(OBJEXT) \
-@HAVE_SPU_EA_TRUE@	lib_a-spu-mcount.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	spu-mcount.$(OBJEXT) \
 @HAVE_SPU_EA_TRUE@	lib_a-spu-gmon.$(OBJEXT)
-am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-assert.$(OBJEXT) \
+am_lib_a_OBJECTS = setjmp.$(OBJEXT) lib_a-assert.$(OBJEXT) \
 	lib_a-clearerr.$(OBJEXT) lib_a-creat.$(OBJEXT) \
 	lib_a-fclose.$(OBJEXT) lib_a-feof.$(OBJEXT) \
 	lib_a-ferror.$(OBJEXT) lib_a-fflush.$(OBJEXT) \
 	lib_a-fgetc.$(OBJEXT) lib_a-fgetpos.$(OBJEXT) \
 	lib_a-fgets.$(OBJEXT) lib_a-fileno.$(OBJEXT) \
-	lib_a-fiprintf.$(OBJEXT) lib_a-fiscanf.$(OBJEXT) \
-	lib_a-fopen.$(OBJEXT) lib_a-fprintf.$(OBJEXT) \
-	lib_a-fputc.$(OBJEXT) lib_a-fputs.$(OBJEXT) \
-	lib_a-fread.$(OBJEXT) lib_a-freopen.$(OBJEXT) \
-	lib_a-fscanf.$(OBJEXT) lib_a-fseek.$(OBJEXT) \
-	lib_a-fsetpos.$(OBJEXT) lib_a-ftell.$(OBJEXT) \
-	lib_a-fwrite.$(OBJEXT) lib_a-getc.$(OBJEXT) \
-	lib_a-getchar.$(OBJEXT) lib_a-gets.$(OBJEXT) \
-	lib_a-impure.$(OBJEXT) lib_a-iprintf.$(OBJEXT) \
-	lib_a-iscanf.$(OBJEXT) lib_a-memcmp.$(OBJEXT) \
-	lib_a-memcpy.$(OBJEXT) lib_a-memmove.$(OBJEXT) \
-	lib_a-memset.$(OBJEXT) lib_a-perror.$(OBJEXT) \
-	lib_a-printf.$(OBJEXT) lib_a-putc.$(OBJEXT) \
+	fiprintf.$(OBJEXT) fiscanf.$(OBJEXT) lib_a-fopen.$(OBJEXT) \
+	fprintf.$(OBJEXT) lib_a-fputc.$(OBJEXT) lib_a-fputs.$(OBJEXT) \
+	lib_a-fread.$(OBJEXT) lib_a-freopen.$(OBJEXT) fscanf.$(OBJEXT) \
+	lib_a-fseek.$(OBJEXT) lib_a-fsetpos.$(OBJEXT) \
+	lib_a-ftell.$(OBJEXT) lib_a-fwrite.$(OBJEXT) \
+	lib_a-getc.$(OBJEXT) lib_a-getchar.$(OBJEXT) \
+	lib_a-gets.$(OBJEXT) lib_a-impure.$(OBJEXT) iprintf.$(OBJEXT) \
+	iscanf.$(OBJEXT) lib_a-memcmp.$(OBJEXT) lib_a-memcpy.$(OBJEXT) \
+	lib_a-memmove.$(OBJEXT) lib_a-memset.$(OBJEXT) \
+	lib_a-perror.$(OBJEXT) printf.$(OBJEXT) lib_a-putc.$(OBJEXT) \
 	lib_a-putchar.$(OBJEXT) lib_a-puts.$(OBJEXT) \
 	lib_a-remove.$(OBJEXT) lib_a-rename.$(OBJEXT) \
-	lib_a-rewind.$(OBJEXT) lib_a-scanf.$(OBJEXT) \
-	lib_a-setbuf.$(OBJEXT) lib_a-setvbuf.$(OBJEXT) \
-	lib_a-siprintf.$(OBJEXT) lib_a-siscanf.$(OBJEXT) \
-	lib_a-sleep.$(OBJEXT) lib_a-sniprintf.$(OBJEXT) \
-	lib_a-snprintf.$(OBJEXT) lib_a-sprintf.$(OBJEXT) \
-	lib_a-sscanf.$(OBJEXT) lib_a-stdio.$(OBJEXT) \
+	lib_a-rewind.$(OBJEXT) scanf.$(OBJEXT) lib_a-setbuf.$(OBJEXT) \
+	lib_a-setvbuf.$(OBJEXT) siprintf.$(OBJEXT) siscanf.$(OBJEXT) \
+	lib_a-sleep.$(OBJEXT) sniprintf.$(OBJEXT) snprintf.$(OBJEXT) \
+	sprintf.$(OBJEXT) sscanf.$(OBJEXT) lib_a-stdio.$(OBJEXT) \
 	lib_a-strcat.$(OBJEXT) lib_a-strchr.$(OBJEXT) \
 	lib_a-strcmp.$(OBJEXT) lib_a-strcpy.$(OBJEXT) \
 	lib_a-strcspn.$(OBJEXT) lib_a-strlen.$(OBJEXT) \
@@ -196,9 +191,9 @@ am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-assert.$(OBJEXT) \
 	lib_a-vscanf.$(OBJEXT) lib_a-vsiprintf.$(OBJEXT) \
 	lib_a-vsiscanf.$(OBJEXT) lib_a-vsniprintf.$(OBJEXT) \
 	lib_a-vsnprintf.$(OBJEXT) lib_a-vsprintf.$(OBJEXT) \
-	lib_a-vsscanf.$(OBJEXT) lib_a-stack_reg_va.$(OBJEXT) \
+	lib_a-vsscanf.$(OBJEXT) stack_reg_va.$(OBJEXT) \
 	lib_a-spu_clock_svcs.$(OBJEXT) lib_a-spu_clock_stop.$(OBJEXT) \
-	lib_a-spu_timer_flih.$(OBJEXT) lib_a-spu_timer_slih.$(OBJEXT) \
+	spu_timer_flih.$(OBJEXT) lib_a-spu_timer_slih.$(OBJEXT) \
 	lib_a-spu_timer_slih_reg.$(OBJEXT) \
 	lib_a-spu_timer_svcs.$(OBJEXT) lib_a-spu_timer_stop.$(OBJEXT) \
 	lib_a-spu_timer_free.$(OBJEXT) lib_a-spu_timebase.$(OBJEXT) \
@@ -219,16 +214,16 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
 am__depfiles_maybe =
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
 CPPASCOMPILE = $(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS)
 AM_V_CPPAS = $(am__v_CPPAS_@AM_V@)
 am__v_CPPAS_ = $(am__v_CPPAS_@AM_DEFAULT_V@)
 am__v_CPPAS_0 = @echo "  CPPAS   " $@;
 am__v_CPPAS_1 = 
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 AM_V_CC = $(am__v_CC_@AM_V@)
@@ -394,7 +389,6 @@ lib_a_SOURCES = setjmp.S assert.c clearerr.c creat.c fclose.c feof.c \
 	spu_timer_slih.c spu_timer_slih_reg.c spu_timer_svcs.c \
 	spu_timer_stop.c spu_timer_free.c spu_timebase.c fdopen.c \
 	$(am__append_1)
-lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
@@ -455,114 +449,6 @@ distclean-compile:
 
 .S.obj:
 	$(AM_V_CPPAS)$(CPPASCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-lib_a-setjmp.o: setjmp.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.o `test -f 'setjmp.S' || echo '$(srcdir)/'`setjmp.S
-
-lib_a-setjmp.obj: setjmp.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.obj `if test -f 'setjmp.S'; then $(CYGPATH_W) 'setjmp.S'; else $(CYGPATH_W) '$(srcdir)/setjmp.S'; fi`
-
-lib_a-fiprintf.o: fiprintf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fiprintf.o `test -f 'fiprintf.S' || echo '$(srcdir)/'`fiprintf.S
-
-lib_a-fiprintf.obj: fiprintf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fiprintf.obj `if test -f 'fiprintf.S'; then $(CYGPATH_W) 'fiprintf.S'; else $(CYGPATH_W) '$(srcdir)/fiprintf.S'; fi`
-
-lib_a-fiscanf.o: fiscanf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fiscanf.o `test -f 'fiscanf.S' || echo '$(srcdir)/'`fiscanf.S
-
-lib_a-fiscanf.obj: fiscanf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fiscanf.obj `if test -f 'fiscanf.S'; then $(CYGPATH_W) 'fiscanf.S'; else $(CYGPATH_W) '$(srcdir)/fiscanf.S'; fi`
-
-lib_a-fprintf.o: fprintf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fprintf.o `test -f 'fprintf.S' || echo '$(srcdir)/'`fprintf.S
-
-lib_a-fprintf.obj: fprintf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fprintf.obj `if test -f 'fprintf.S'; then $(CYGPATH_W) 'fprintf.S'; else $(CYGPATH_W) '$(srcdir)/fprintf.S'; fi`
-
-lib_a-fscanf.o: fscanf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fscanf.o `test -f 'fscanf.S' || echo '$(srcdir)/'`fscanf.S
-
-lib_a-fscanf.obj: fscanf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fscanf.obj `if test -f 'fscanf.S'; then $(CYGPATH_W) 'fscanf.S'; else $(CYGPATH_W) '$(srcdir)/fscanf.S'; fi`
-
-lib_a-iprintf.o: iprintf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-iprintf.o `test -f 'iprintf.S' || echo '$(srcdir)/'`iprintf.S
-
-lib_a-iprintf.obj: iprintf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-iprintf.obj `if test -f 'iprintf.S'; then $(CYGPATH_W) 'iprintf.S'; else $(CYGPATH_W) '$(srcdir)/iprintf.S'; fi`
-
-lib_a-iscanf.o: iscanf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-iscanf.o `test -f 'iscanf.S' || echo '$(srcdir)/'`iscanf.S
-
-lib_a-iscanf.obj: iscanf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-iscanf.obj `if test -f 'iscanf.S'; then $(CYGPATH_W) 'iscanf.S'; else $(CYGPATH_W) '$(srcdir)/iscanf.S'; fi`
-
-lib_a-printf.o: printf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-printf.o `test -f 'printf.S' || echo '$(srcdir)/'`printf.S
-
-lib_a-printf.obj: printf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-printf.obj `if test -f 'printf.S'; then $(CYGPATH_W) 'printf.S'; else $(CYGPATH_W) '$(srcdir)/printf.S'; fi`
-
-lib_a-scanf.o: scanf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-scanf.o `test -f 'scanf.S' || echo '$(srcdir)/'`scanf.S
-
-lib_a-scanf.obj: scanf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-scanf.obj `if test -f 'scanf.S'; then $(CYGPATH_W) 'scanf.S'; else $(CYGPATH_W) '$(srcdir)/scanf.S'; fi`
-
-lib_a-siprintf.o: siprintf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-siprintf.o `test -f 'siprintf.S' || echo '$(srcdir)/'`siprintf.S
-
-lib_a-siprintf.obj: siprintf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-siprintf.obj `if test -f 'siprintf.S'; then $(CYGPATH_W) 'siprintf.S'; else $(CYGPATH_W) '$(srcdir)/siprintf.S'; fi`
-
-lib_a-siscanf.o: siscanf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-siscanf.o `test -f 'siscanf.S' || echo '$(srcdir)/'`siscanf.S
-
-lib_a-siscanf.obj: siscanf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-siscanf.obj `if test -f 'siscanf.S'; then $(CYGPATH_W) 'siscanf.S'; else $(CYGPATH_W) '$(srcdir)/siscanf.S'; fi`
-
-lib_a-sniprintf.o: sniprintf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-sniprintf.o `test -f 'sniprintf.S' || echo '$(srcdir)/'`sniprintf.S
-
-lib_a-sniprintf.obj: sniprintf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-sniprintf.obj `if test -f 'sniprintf.S'; then $(CYGPATH_W) 'sniprintf.S'; else $(CYGPATH_W) '$(srcdir)/sniprintf.S'; fi`
-
-lib_a-snprintf.o: snprintf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-snprintf.o `test -f 'snprintf.S' || echo '$(srcdir)/'`snprintf.S
-
-lib_a-snprintf.obj: snprintf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-snprintf.obj `if test -f 'snprintf.S'; then $(CYGPATH_W) 'snprintf.S'; else $(CYGPATH_W) '$(srcdir)/snprintf.S'; fi`
-
-lib_a-sprintf.o: sprintf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-sprintf.o `test -f 'sprintf.S' || echo '$(srcdir)/'`sprintf.S
-
-lib_a-sprintf.obj: sprintf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-sprintf.obj `if test -f 'sprintf.S'; then $(CYGPATH_W) 'sprintf.S'; else $(CYGPATH_W) '$(srcdir)/sprintf.S'; fi`
-
-lib_a-sscanf.o: sscanf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-sscanf.o `test -f 'sscanf.S' || echo '$(srcdir)/'`sscanf.S
-
-lib_a-sscanf.obj: sscanf.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-sscanf.obj `if test -f 'sscanf.S'; then $(CYGPATH_W) 'sscanf.S'; else $(CYGPATH_W) '$(srcdir)/sscanf.S'; fi`
-
-lib_a-stack_reg_va.o: stack_reg_va.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-stack_reg_va.o `test -f 'stack_reg_va.S' || echo '$(srcdir)/'`stack_reg_va.S
-
-lib_a-stack_reg_va.obj: stack_reg_va.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-stack_reg_va.obj `if test -f 'stack_reg_va.S'; then $(CYGPATH_W) 'stack_reg_va.S'; else $(CYGPATH_W) '$(srcdir)/stack_reg_va.S'; fi`
-
-lib_a-spu_timer_flih.o: spu_timer_flih.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-spu_timer_flih.o `test -f 'spu_timer_flih.S' || echo '$(srcdir)/'`spu_timer_flih.S
-
-lib_a-spu_timer_flih.obj: spu_timer_flih.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-spu_timer_flih.obj `if test -f 'spu_timer_flih.S'; then $(CYGPATH_W) 'spu_timer_flih.S'; else $(CYGPATH_W) '$(srcdir)/spu_timer_flih.S'; fi`
-
-lib_a-spu-mcount.o: spu-mcount.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-spu-mcount.o `test -f 'spu-mcount.S' || echo '$(srcdir)/'`spu-mcount.S
-
-lib_a-spu-mcount.obj: spu-mcount.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-spu-mcount.obj `if test -f 'spu-mcount.S'; then $(CYGPATH_W) 'spu-mcount.S'; else $(CYGPATH_W) '$(srcdir)/spu-mcount.S'; fi`
 
 .c.o:
 	$(AM_V_CC)$(COMPILE) -c -o $@ $<

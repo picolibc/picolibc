@@ -10,7 +10,6 @@ lib_a_SOURCES = chown.c close.c execve.c fork.c fstat.c getenv.c \
 	getpid.c gettod.c isatty.c kill.c link.c lseek.c open.c rdoshelp.c \
 	rdos.S read.c readlink.c sbrk.c stat.c symlink.c times.c unlink.c \
 	wait.c write.c
-lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 
 all-local: crt0.o

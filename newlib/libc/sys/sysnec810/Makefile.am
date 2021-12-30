@@ -7,7 +7,6 @@ AM_CCASFLAGS = $(AM_CPPFLAGS)
 noinst_LIBRARIES = lib.a
 
 lib_a_SOURCES = io.S write.c sbrk.c misc.c
-lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 
 all-local: crt0.o

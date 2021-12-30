@@ -20,7 +20,6 @@ AM_CCASFLAGS = $(AM_CPPFLAGS)
 noinst_LIBRARIES = lib.a
 
 lib_a_SOURCES = setjmp.S $(TINY_SOURCES)
-lib_a_CCASFLAGS=$(AM_CCASFLAGS)
 lib_a_CFLAGS=$(AM_CFLAGS)
 
 # tiny-printf.c and tiny-puts.c are derived from the nano printf/puts

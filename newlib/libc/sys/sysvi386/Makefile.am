@@ -16,7 +16,6 @@ lib_a_SOURCES = \
 	getgroups.S setuid.S getuid.S setgid.S geteuid.S getegid.S \
 	chdir.S dup2.c dup.c tcgetattr.c tcsetattr.c speed.c tcline.c \
 	times.S pause.S sleep.c alarm.S access.S _longjmp.S _setjmp.S
-lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 
 all-local: crt0.o

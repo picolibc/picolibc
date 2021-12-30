@@ -111,10 +111,10 @@ am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am_lib_a_OBJECTS = lib_a-udivhi3.$(OBJEXT) lib_a-umodhi3.$(OBJEXT) \
-	lib_a-smulhi3.$(OBJEXT) lib_a-lshrhi.$(OBJEXT) \
-	lib_a-sdivhi3.$(OBJEXT) lib_a-mulsi3.$(OBJEXT) \
-	lib_a-divsi3.$(OBJEXT) lib_a-cmpsi.$(OBJEXT)
+am_lib_a_OBJECTS = udivhi3.$(OBJEXT) umodhi3.$(OBJEXT) \
+	smulhi3.$(OBJEXT) lshrhi.$(OBJEXT) sdivhi3.$(OBJEXT) \
+	lib_a-mulsi3.$(OBJEXT) lib_a-divsi3.$(OBJEXT) \
+	lib_a-cmpsi.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -131,16 +131,16 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
 am__depfiles_maybe =
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
 CPPASCOMPILE = $(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS)
 AM_V_CPPAS = $(am__v_CPPAS_@AM_V@)
 am__v_CPPAS_ = $(am__v_CPPAS_@AM_DEFAULT_V@)
 am__v_CPPAS_0 = @echo "  CPPAS   " $@;
 am__v_CPPAS_1 = 
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 AM_V_CC = $(am__v_CC_@AM_V@)
@@ -291,7 +291,6 @@ noinst_LIBRARIES = lib.a
 lib_a_SOURCES = udivhi3.S umodhi3.S smulhi3.S lshrhi.S sdivhi3.S mulsi3.c \
 	divsi3.c cmpsi.c
 
-lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
@@ -352,36 +351,6 @@ distclean-compile:
 
 .S.obj:
 	$(AM_V_CPPAS)$(CPPASCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-lib_a-udivhi3.o: udivhi3.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-udivhi3.o `test -f 'udivhi3.S' || echo '$(srcdir)/'`udivhi3.S
-
-lib_a-udivhi3.obj: udivhi3.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-udivhi3.obj `if test -f 'udivhi3.S'; then $(CYGPATH_W) 'udivhi3.S'; else $(CYGPATH_W) '$(srcdir)/udivhi3.S'; fi`
-
-lib_a-umodhi3.o: umodhi3.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-umodhi3.o `test -f 'umodhi3.S' || echo '$(srcdir)/'`umodhi3.S
-
-lib_a-umodhi3.obj: umodhi3.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-umodhi3.obj `if test -f 'umodhi3.S'; then $(CYGPATH_W) 'umodhi3.S'; else $(CYGPATH_W) '$(srcdir)/umodhi3.S'; fi`
-
-lib_a-smulhi3.o: smulhi3.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-smulhi3.o `test -f 'smulhi3.S' || echo '$(srcdir)/'`smulhi3.S
-
-lib_a-smulhi3.obj: smulhi3.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-smulhi3.obj `if test -f 'smulhi3.S'; then $(CYGPATH_W) 'smulhi3.S'; else $(CYGPATH_W) '$(srcdir)/smulhi3.S'; fi`
-
-lib_a-lshrhi.o: lshrhi.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-lshrhi.o `test -f 'lshrhi.S' || echo '$(srcdir)/'`lshrhi.S
-
-lib_a-lshrhi.obj: lshrhi.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-lshrhi.obj `if test -f 'lshrhi.S'; then $(CYGPATH_W) 'lshrhi.S'; else $(CYGPATH_W) '$(srcdir)/lshrhi.S'; fi`
-
-lib_a-sdivhi3.o: sdivhi3.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-sdivhi3.o `test -f 'sdivhi3.S' || echo '$(srcdir)/'`sdivhi3.S
-
-lib_a-sdivhi3.obj: sdivhi3.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-sdivhi3.obj `if test -f 'sdivhi3.S'; then $(CYGPATH_W) 'sdivhi3.S'; else $(CYGPATH_W) '$(srcdir)/sdivhi3.S'; fi`
 
 .c.o:
 	$(AM_V_CC)$(COMPILE) -c -o $@ $<

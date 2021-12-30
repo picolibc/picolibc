@@ -42,7 +42,6 @@ lib_a_SOURCES = \
 	getpid.c	\
 	stubs.S
 
-lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 
 all-local: crt0.o

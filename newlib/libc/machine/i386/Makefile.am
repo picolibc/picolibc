@@ -23,8 +23,10 @@ noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES) $(ADDED_SOURCES)
+## These flag settings are basically redundant, but necessary to workaround the
+## automake limitation "Objects 'created with both libtool and without'".
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
-lib_a_CFLAGS=$(AM_CFLAGS)
+lib_a_CFLAGS = $(AM_CFLAGS)
 noinst_DATA =
 endif # USE_LIBTOOL
 

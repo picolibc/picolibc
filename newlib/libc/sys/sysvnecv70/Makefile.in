@@ -111,13 +111,11 @@ am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am_lib_a_OBJECTS = lib_a-ioctl.$(OBJEXT) lib_a-isatty.$(OBJEXT) \
-	lib_a-read.$(OBJEXT) lib_a-lseek.$(OBJEXT) \
-	lib_a-close.$(OBJEXT) lib_a-sbrk.$(OBJEXT) \
-	lib_a-fstat.$(OBJEXT) lib_a-cerror.$(OBJEXT) \
-	lib_a-exit.$(OBJEXT) lib_a-write.$(OBJEXT) \
-	lib_a-sysv60.$(OBJEXT) lib_a-fpx.$(OBJEXT) lib_a-fps.$(OBJEXT) \
-	lib_a-open.$(OBJEXT)
+am_lib_a_OBJECTS = ioctl.$(OBJEXT) isatty.$(OBJEXT) read.$(OBJEXT) \
+	lseek.$(OBJEXT) close.$(OBJEXT) sbrk.$(OBJEXT) fstat.$(OBJEXT) \
+	cerror.$(OBJEXT) exit.$(OBJEXT) write.$(OBJEXT) \
+	sysv60.$(OBJEXT) lib_a-fpx.$(OBJEXT) fps.$(OBJEXT) \
+	open.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -134,16 +132,16 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
 am__depfiles_maybe =
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
 CPPASCOMPILE = $(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS)
 AM_V_CPPAS = $(am__v_CPPAS_@AM_V@)
 am__v_CPPAS_ = $(am__v_CPPAS_@AM_DEFAULT_V@)
 am__v_CPPAS_0 = @echo "  CPPAS   " $@;
 am__v_CPPAS_1 = 
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 AM_V_CC = $(am__v_CC_@AM_V@)
@@ -294,7 +292,6 @@ noinst_LIBRARIES = lib.a
 lib_a_SOURCES = ioctl.S isatty.S read.S lseek.S close.S sbrk.S fstat.S \
 	cerror.S exit.S write.S sysv60.S fpx.c fps.S open.S
 
-lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
@@ -355,84 +352,6 @@ distclean-compile:
 
 .S.obj:
 	$(AM_V_CPPAS)$(CPPASCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-lib_a-ioctl.o: ioctl.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-ioctl.o `test -f 'ioctl.S' || echo '$(srcdir)/'`ioctl.S
-
-lib_a-ioctl.obj: ioctl.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-ioctl.obj `if test -f 'ioctl.S'; then $(CYGPATH_W) 'ioctl.S'; else $(CYGPATH_W) '$(srcdir)/ioctl.S'; fi`
-
-lib_a-isatty.o: isatty.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-isatty.o `test -f 'isatty.S' || echo '$(srcdir)/'`isatty.S
-
-lib_a-isatty.obj: isatty.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-isatty.obj `if test -f 'isatty.S'; then $(CYGPATH_W) 'isatty.S'; else $(CYGPATH_W) '$(srcdir)/isatty.S'; fi`
-
-lib_a-read.o: read.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-read.o `test -f 'read.S' || echo '$(srcdir)/'`read.S
-
-lib_a-read.obj: read.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-read.obj `if test -f 'read.S'; then $(CYGPATH_W) 'read.S'; else $(CYGPATH_W) '$(srcdir)/read.S'; fi`
-
-lib_a-lseek.o: lseek.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-lseek.o `test -f 'lseek.S' || echo '$(srcdir)/'`lseek.S
-
-lib_a-lseek.obj: lseek.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-lseek.obj `if test -f 'lseek.S'; then $(CYGPATH_W) 'lseek.S'; else $(CYGPATH_W) '$(srcdir)/lseek.S'; fi`
-
-lib_a-close.o: close.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-close.o `test -f 'close.S' || echo '$(srcdir)/'`close.S
-
-lib_a-close.obj: close.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-close.obj `if test -f 'close.S'; then $(CYGPATH_W) 'close.S'; else $(CYGPATH_W) '$(srcdir)/close.S'; fi`
-
-lib_a-sbrk.o: sbrk.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-sbrk.o `test -f 'sbrk.S' || echo '$(srcdir)/'`sbrk.S
-
-lib_a-sbrk.obj: sbrk.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-sbrk.obj `if test -f 'sbrk.S'; then $(CYGPATH_W) 'sbrk.S'; else $(CYGPATH_W) '$(srcdir)/sbrk.S'; fi`
-
-lib_a-fstat.o: fstat.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fstat.o `test -f 'fstat.S' || echo '$(srcdir)/'`fstat.S
-
-lib_a-fstat.obj: fstat.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fstat.obj `if test -f 'fstat.S'; then $(CYGPATH_W) 'fstat.S'; else $(CYGPATH_W) '$(srcdir)/fstat.S'; fi`
-
-lib_a-cerror.o: cerror.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-cerror.o `test -f 'cerror.S' || echo '$(srcdir)/'`cerror.S
-
-lib_a-cerror.obj: cerror.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-cerror.obj `if test -f 'cerror.S'; then $(CYGPATH_W) 'cerror.S'; else $(CYGPATH_W) '$(srcdir)/cerror.S'; fi`
-
-lib_a-exit.o: exit.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-exit.o `test -f 'exit.S' || echo '$(srcdir)/'`exit.S
-
-lib_a-exit.obj: exit.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-exit.obj `if test -f 'exit.S'; then $(CYGPATH_W) 'exit.S'; else $(CYGPATH_W) '$(srcdir)/exit.S'; fi`
-
-lib_a-write.o: write.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-write.o `test -f 'write.S' || echo '$(srcdir)/'`write.S
-
-lib_a-write.obj: write.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-write.obj `if test -f 'write.S'; then $(CYGPATH_W) 'write.S'; else $(CYGPATH_W) '$(srcdir)/write.S'; fi`
-
-lib_a-sysv60.o: sysv60.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-sysv60.o `test -f 'sysv60.S' || echo '$(srcdir)/'`sysv60.S
-
-lib_a-sysv60.obj: sysv60.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-sysv60.obj `if test -f 'sysv60.S'; then $(CYGPATH_W) 'sysv60.S'; else $(CYGPATH_W) '$(srcdir)/sysv60.S'; fi`
-
-lib_a-fps.o: fps.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fps.o `test -f 'fps.S' || echo '$(srcdir)/'`fps.S
-
-lib_a-fps.obj: fps.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fps.obj `if test -f 'fps.S'; then $(CYGPATH_W) 'fps.S'; else $(CYGPATH_W) '$(srcdir)/fps.S'; fi`
-
-lib_a-open.o: open.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-open.o `test -f 'open.S' || echo '$(srcdir)/'`open.S
-
-lib_a-open.obj: open.S
-	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-open.obj `if test -f 'open.S'; then $(CYGPATH_W) 'open.S'; else $(CYGPATH_W) '$(srcdir)/open.S'; fi`
 
 .c.o:
 	$(AM_V_CC)$(COMPILE) -c -o $@ $<
