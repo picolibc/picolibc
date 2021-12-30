@@ -120,9 +120,9 @@ AC_SUBST(newlib_basedir)
 
 AC_CANONICAL_HOST
 
-AM_INIT_AUTOMAKE([foreign no-installinfo no-dependencies no-dist no-define 1.9.5])
+AM_INIT_AUTOMAKE([foreign no-installinfo no-dependencies no-dist no-define 1.11.6])
 AM_MAINTAINER_MODE()
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES(yes)])
+AM_SILENT_RULES(yes)
 
 # FIXME: We temporarily define our own version of AC_PROG_CC.  This is
 # copied from autoconf 2.12, but does not call AC_PROG_CC_WORKS.  We
