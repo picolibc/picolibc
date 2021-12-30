@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 
-INCLUDES = -I$(srcdir)/../include -I$(srcdir)/machine/$(machine_dir) -I$(srcdir)/machine/generic  $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS) -I$(srcdir)/..
+AM_CPPFLAGS = -I$(srcdir)/../include -I$(srcdir)/machine/$(machine_dir) -I$(srcdir)/machine/generic  $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS) -I$(srcdir)/..
 
 LIBTOOL_VERSION_INFO = 0:0:0
 

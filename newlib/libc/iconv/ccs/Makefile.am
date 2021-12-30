@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 
-INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+AM_CPPFLAGS = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 GENERAL_SOURCES = ccsbi.c \
 iso_8859_10.c iso_8859_13.c iso_8859_14.c iso_8859_15.c \

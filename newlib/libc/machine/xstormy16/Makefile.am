@@ -1,10 +1,10 @@
 ## Process this file with automake to generate Makefile.in
 
-# hack: putting $(newlib_basedir)/libm/common into INCLUDES forces automake
+# hack: putting $(newlib_basedir)/libm/common into AM_CPPFLAGS forces automake
 # to output a definition for newlib_basedir.
-INCLUDES = -I $(newlib_basedir)/libm/common $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+AM_CPPFLAGS = -I $(newlib_basedir)/libm/common $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-AM_CCASFLAGS = $(INCLUDES)
+AM_CCASFLAGS = $(AM_CPPFLAGS)
 
 noinst_LIBRARIES = lib.a
 

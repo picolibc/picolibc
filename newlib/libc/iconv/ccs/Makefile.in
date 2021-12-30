@@ -332,7 +332,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+AM_CPPFLAGS = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 GENERAL_SOURCES = ccsbi.c \
 iso_8859_10.c iso_8859_13.c iso_8859_14.c iso_8859_15.c \
 iso_8859_1.c iso_8859_2.c iso_8859_3.c iso_8859_4.c \

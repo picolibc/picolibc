@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 
-INCLUDES = -I$(srcdir)/../include $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+AM_CPPFLAGS = -I$(srcdir)/../include $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 LIB_SOURCES = \
 	argp-ba.c  argp-eexst.c  argp-fmtstream.c  argp-fs-xinl.c \

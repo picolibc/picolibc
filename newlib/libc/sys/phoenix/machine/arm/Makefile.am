@@ -1,11 +1,11 @@
 ## Process this file with automake to generate Makefile.in
 
-INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+AM_CPPFLAGS = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 LIB_SOURCES = syscall.S
 
 AM_CFLAGS = -I$(srcdir)/../..
-AM_CCASFLAGS = -I$(srcdir)/../.. $(INCLUDES)
+AM_CCASFLAGS = -I$(srcdir)/../.. $(AM_CPPFLAGS)
 
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)

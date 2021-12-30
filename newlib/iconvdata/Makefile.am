@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 
-INCLUDES = -I$(srcdir) -I$(srcdir)/../libc/sys/linux $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+AM_CPPFLAGS = -I$(srcdir) -I$(srcdir)/../libc/sys/linux $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 if ELIX_LEVEL_1
 LIB_OBJS = 

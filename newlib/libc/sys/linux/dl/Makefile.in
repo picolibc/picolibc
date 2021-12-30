@@ -269,7 +269,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-INCLUDES = -DSHARED -D_GNU_SOURCE $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS) -I$(srcdir)/..
+AM_CPPFLAGS = -DSHARED -D_GNU_SOURCE $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS) -I$(srcdir)/..
 LIB_SOURCES = \
 	dl-addr.c   dl-deps.c   dl-init.c         dl-load.c     dl-misc.c    dl-profile.c   dl-runtime.c  dl-version.c \
 	dl-close.c  dl-error.c  dl-iteratephdr.c  dl-lookup.c   dl-object.c  dl-profstub.c  dl-support.c \

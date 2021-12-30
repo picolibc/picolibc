@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 
-INCLUDES = -DSHARED -D_GNU_SOURCE $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS) -I$(srcdir)/..
+AM_CPPFLAGS = -DSHARED -D_GNU_SOURCE $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS) -I$(srcdir)/..
 
 LIB_SOURCES = \
 	dl-addr.c   dl-deps.c   dl-init.c         dl-load.c     dl-misc.c    dl-profile.c   dl-runtime.c  dl-version.c \

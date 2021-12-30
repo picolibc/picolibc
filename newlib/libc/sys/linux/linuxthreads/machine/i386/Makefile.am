@@ -1,8 +1,8 @@
 ## Process this file with automake to generate Makefile.in
 
-INCLUDES = -I$(srcdir)/../../../include -I$(srcdir)/../.. -I$(srcdir)/../generic -I$(srcdir)/../../.. $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+AM_CPPFLAGS = -I$(srcdir)/../../../include -I$(srcdir)/../.. -I$(srcdir)/../generic -I$(srcdir)/../../.. $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-AM_CCASFLAGS = -I. -I$(srcdir) $(INCLUDES)
+AM_CCASFLAGS = -I. -I$(srcdir) $(AM_CPPFLAGS)
 
 LIB_SOURCES = clone.S i386-sysdep.S pspinlock.c sysdep.S
 

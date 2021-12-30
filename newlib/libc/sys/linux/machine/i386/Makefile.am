@@ -1,13 +1,13 @@
 ## Process this file with automake to generate Makefile.in
 
-INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+AM_CPPFLAGS = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 LIB_SOURCES = get_clockfreq.c getpagesize.c hp-timing.c setjmp.S sigaction.c dl-procinfo.c
 
 liblinuxi386_la_LDFLAGS = -Xcompiler -nostdlib
 
 AM_CFLAGS = -I$(srcdir)/../..
-AM_CCASFLAGS = -I$(srcdir)/../.. $(INCLUDES)
+AM_CCASFLAGS = -I$(srcdir)/../.. $(AM_CPPFLAGS)
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = liblinuxi386.la

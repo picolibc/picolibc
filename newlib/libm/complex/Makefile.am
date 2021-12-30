@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 
-INCLUDES = -I$(srcdir)/../common -I$(srcdir)/ $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+AM_CPPFLAGS = -I$(srcdir)/../common -I$(srcdir)/ $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 src = cabs.c cacos.c cacosh.c carg.c casin.c casinh.c \
       catan.c catanh.c ccos.c ccosh.c cephes_subr.c \

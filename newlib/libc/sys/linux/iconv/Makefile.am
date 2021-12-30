@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 
-INCLUDES = -DGCONV_DIR='"$(pkglibdir)"' -DGCONV_PATH='"$(pkglibdir)"' -I$(srcdir) -I$(srcdir)/.. $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+AM_CPPFLAGS = -DGCONV_DIR='"$(pkglibdir)"' -DGCONV_PATH='"$(pkglibdir)"' -I$(srcdir) -I$(srcdir)/.. $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 LIB_SOURCES = \
 	iconv.h gconv.h \

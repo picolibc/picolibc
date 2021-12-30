@@ -297,7 +297,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+AM_CPPFLAGS = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 @ELIX_LEVEL_1_FALSE@ELIX_SOURCES = \
 @ELIX_LEVEL_1_FALSE@	argz_add.c 	\
 @ELIX_LEVEL_1_FALSE@	argz_add_sep.c 	\
