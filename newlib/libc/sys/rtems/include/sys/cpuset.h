@@ -71,13 +71,9 @@ typedef cpuset_t cpu_set_t;
 
 #define	_cpu_set_bits(_setsize) (8 * (_setsize))
 
-#define	CPU_ALLOC_SIZE(_num_cpus) (sizeof(long) * __bitset_words(_num_cpus))
+#define CPU_ALLOC_SIZE(_s)		__BITSET_SIZE(_s)
 
 __BEGIN_DECLS
-
-cpu_set_t *__cpuset_alloc(int num_cpus);
-
-void __cpuset_free(cpu_set_t *set);
 
 static __inline cpu_set_t *CPU_ALLOC(int num_cpus)
 {

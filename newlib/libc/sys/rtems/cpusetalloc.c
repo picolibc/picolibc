@@ -32,7 +32,7 @@
 #include <sys/cpuset.h>
 #include <stdlib.h>
 
-cpu_set_t *__cpuset_alloc(int num_cpus)
+cpu_set_t *__cpuset_alloc(size_t num_cpus)
 {
   return (cpu_set_t *)malloc(CPU_ALLOC_SIZE(num_cpus));
 }
