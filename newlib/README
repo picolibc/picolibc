@@ -578,9 +578,6 @@ If you have regenerated a configure file or if you have modified a Makefile.am
 file, you will need to regenerate the appropriate Makefile.in file(s).
 For newlib, automake is a bit trickier.
 
-First of all, note that all the Makefile.in files in libgloss must be
-generated using the --cygnus option of automake.
-
 Makefile.in files are generated from the nearest directory up the chain
 which contains a configure.ac file.  In most cases, this is the same
 directory containing configure.ac, but there are exceptions.
