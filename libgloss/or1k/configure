@@ -1765,6 +1765,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+
+
+
 # No shared libraries allowed
 if test "${enable_shared}" = "yes" ; then
     echo "Shared libraries not supported for cross compiling, ignored"

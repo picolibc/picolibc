@@ -1,7 +1,6 @@
 dnl This is the newlib/libc/machine/i960 configure.in file.
 dnl Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.59)
 AC_INIT([newlib],[NEWLIB_VERSION])
 AC_CONFIG_SRCDIR([memccpy_ca.S])
 

@@ -59,7 +59,10 @@ DIST_COMMON = $(srcdir)/../../../../Makefile.shared \
 	$(srcdir)/../../../../../mkinstalldirs
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/../../../../../libtool.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/../../../../../config/depstand.m4 \
+	$(top_srcdir)/../../../../../config/lead-dot.m4 \
+	$(top_srcdir)/../../../../../config/override.m4 \
+	$(top_srcdir)/../../../../../libtool.m4 \
 	$(top_srcdir)/../../../../../ltoptions.m4 \
 	$(top_srcdir)/../../../../../ltsugar.m4 \
 	$(top_srcdir)/../../../../../ltversion.m4 \
@@ -474,7 +477,7 @@ DOCBOOK_OUT_FILES = $(CHEWOUT_FILES:.def=.xml)
 DOCBOOK_CHAPTERS = $(CHAPTERS:.tex=.xml)
 CLEANFILES = $(CHEWOUT_FILES) $(DOCBOOK_OUT_FILES)
 AM_CFLAGS = -D_XOPEN_SOURCE=600 -D_GNU_SOURCE=1
-ACLOCAL_AMFLAGS = -I ../../../.. -I ../../../../..
+ACLOCAL_AMFLAGS = -I ../../../.. -I ../../../../.. -I ../../../../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 CFLAGS_pt_initfini = -g0 -fPIC -fno-inline-functions
 CFLAGS_noweak = -D__NO_WEAK_PTHREAD_ALIASES

@@ -1,6 +1,5 @@
 dnl This file is based on ../mcore/configure.in
 dnl Process this file with autoconf to produce a configure script.
-AC_PREREQ(2.69)dnl
 AC_INIT(Makefile.in)
 
 if test "${enable_shared}" = "yes" ; then

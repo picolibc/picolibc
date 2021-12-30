@@ -10,7 +10,6 @@
 # the new terms are clearly indicated on the first page of each file where
 # they apply.
 dnl Process this file with autoconf to produce a configure script.
-AC_PREREQ(2.69)dnl
 AC_INIT(sparc-stub.c)
 
 if test "${enable_shared}" = "yes" ; then

@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in.
 
 AUTOMAKE_OPTIONS = foreign
-ACLOCAL_AMFLAGS = -I . -I ..
+ACLOCAL_AMFLAGS = -I . -I .. -I ../.. -I ../../config
 
 gdbdir = ${dir ${patsubst %/,%,${dir @srcdir@}}}gdb
 VPATH = $(gdbdir)

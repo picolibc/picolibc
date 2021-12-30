@@ -80,5 +80,5 @@ force:
 
 CLEANFILES = tmp.texi targetdep.tex stmp-targetdep *.xml *.3
 
-ACLOCAL_AMFLAGS = -I .. -I ../..
+ACLOCAL_AMFLAGS = -I .. -I ../.. -I ../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

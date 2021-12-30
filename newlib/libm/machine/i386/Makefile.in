@@ -58,7 +58,10 @@ DIST_COMMON = $(srcdir)/../../../Makefile.shared $(srcdir)/Makefile.in \
 	$(am__configure_deps) $(srcdir)/../../../../mkinstalldirs
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/../../../../libtool.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/../../../../config/depstand.m4 \
+	$(top_srcdir)/../../../../config/lead-dot.m4 \
+	$(top_srcdir)/../../../../config/override.m4 \
+	$(top_srcdir)/../../../../libtool.m4 \
 	$(top_srcdir)/../../../../ltoptions.m4 \
 	$(top_srcdir)/../../../../ltsugar.m4 \
 	$(top_srcdir)/../../../../ltversion.m4 \
@@ -321,7 +324,7 @@ DOCBOOK_CHEW = ${top_srcdir}/../doc/makedocbook.py
 DOCBOOK_OUT_FILES = $(CHEWOUT_FILES:.def=.xml)
 DOCBOOK_CHAPTERS = $(CHAPTERS:.tex=.xml)
 CLEANFILES = $(CHEWOUT_FILES) $(DOCBOOK_OUT_FILES)
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
+ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
 

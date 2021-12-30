@@ -1,7 +1,6 @@
 dnl This is the newlib configure.in file.
 dnl Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.59)
 AC_INIT([newlib],[NEWLIB_VERSION])
 AC_CONFIG_SRCDIR([libc])
 AC_CONFIG_HEADERS([_newlib_version.h:_newlib_version.hin newlib.h:newlib.hin])

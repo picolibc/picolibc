@@ -1,7 +1,7 @@
 ## Process this file with automake to generate Makefile.in
 
 AUTOMAKE_OPTIONS = dejagnu subdir-objects
-ACLOCAL_AMFLAGS = -I . -I ..
+ACLOCAL_AMFLAGS = -I . -I .. -I ../config
 
 # Variables that will accumulate in subdirs.
 PHONY =

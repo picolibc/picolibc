@@ -14,7 +14,6 @@
 dnl This is the newlib/libc/machine/msp430 configure.in file.
 dnl Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.59)
 AC_INIT([newlib],[NEWLIB_VERSION])
 AC_CONFIG_SRCDIR([setjmp.S])
 

@@ -35,5 +35,5 @@ if MAY_SUPPLY_SYSCALLS
 all-local: crt0.o
 endif
 
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
+ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

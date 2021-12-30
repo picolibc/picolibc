@@ -115,5 +115,5 @@ wait_r.o: wait.S
 wait4_r.o: wait4.S
 write_r.o: write.S
 
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
+ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

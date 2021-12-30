@@ -237,5 +237,5 @@ siglist.inc:
 		    { rm -f siglist.inc; exit 1; }
 
 AM_CFLAGS = -I $(srcdir)/../../stdio
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
+ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

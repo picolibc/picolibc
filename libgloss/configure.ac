@@ -1,5 +1,4 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_PREREQ(2.69)dnl
 AC_INIT([libgloss],[LIBGLOSS_VERSION])
 AC_CONFIG_SRCDIR([libnosys])
 

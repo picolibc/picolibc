@@ -1,5 +1,4 @@
 
-AC_PREREQ(2.59)
 AC_INIT([newlib],[NEWLIB_VERSION])
 AC_CONFIG_SRCDIR([Makefile.am])
 

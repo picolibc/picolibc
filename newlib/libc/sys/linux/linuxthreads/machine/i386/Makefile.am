@@ -24,5 +24,5 @@ include $(srcdir)/../../../../../../Makefile.shared
 
 AM_CFLAGS = -D_XOPEN_SOURCE=600 -D_GNU_SOURCE=1
 
-ACLOCAL_AMFLAGS = -I ../../../../../.. -I ../../../../../../..
+ACLOCAL_AMFLAGS = -I ../../../../../.. -I ../../../../../../.. -I ../../../../../../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

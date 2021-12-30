@@ -111,7 +111,7 @@ crt0.o: machine/crt0.o
 machine/crt0.o: ; @true
 
 AM_CFLAGS = -I $(srcdir)/../../stdio
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
+ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 
 install-data-local:

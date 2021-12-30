@@ -1,7 +1,6 @@
 dnl This is the newlib/libc/sys/mmixware configure.in file.
 dnl Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.59)
 AC_INIT([newlib],[NEWLIB_VERSION])
 AC_CONFIG_SRCDIR([crt0.c])
 

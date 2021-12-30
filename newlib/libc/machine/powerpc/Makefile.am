@@ -20,7 +20,7 @@ EXTRA_lib_a_SOURCES = \
   simdldtoa.c strtosfix16.c strtosfix32.c strtosfix64.c strtoufix16.c \
   strtoufix32.c strtoufix64.c ufix64toa.c
 
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. 
+ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 
 lib_a-vec_reallocr.o: vec_mallocr.c

@@ -254,5 +254,5 @@ CLEANFILES = $(CRT0) \
 	tmp-stdio64.texi tmp-posix.texi tmp-targetdep.texi \
 	*.xml *.3
 
-ACLOCAL_AMFLAGS = -I .. -I ../..
+ACLOCAL_AMFLAGS = -I .. -I ../.. -I ../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

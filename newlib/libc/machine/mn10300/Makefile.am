@@ -11,5 +11,5 @@ lib_a_SOURCES = setjmp.S memchr.S memcmp.S memcpy.S memset.S strchr.S \
 lib_a_CFLAGS=$(AM_CFLAGS)
 lib_a_CCASFLAGS=$(AM_CCASFLAGS) -Wa,--gdwarf-2
 
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
+ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

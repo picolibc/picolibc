@@ -12,7 +12,6 @@
 #
 # Process this file with autoconf to produce a configure script.
 #
-AC_PREREQ(2.69)dnl
 AC_INIT(crt0.S)
 
 if test "${enable_shared}" = "yes" ; then

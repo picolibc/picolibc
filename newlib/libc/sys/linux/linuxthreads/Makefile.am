@@ -98,7 +98,7 @@ install-data-local: install-toollibLIBRARIES
 	  $(DESTDIR)$(toollibdir)/libthread_db.so.1 
 
 AM_CFLAGS = -D_XOPEN_SOURCE=600 -D_GNU_SOURCE=1
-ACLOCAL_AMFLAGS = -I ../../../.. -I ../../../../..
+ACLOCAL_AMFLAGS = -I ../../../.. -I ../../../../.. -I ../../../../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 
 ## PTHREAD_HEADERS=pthread.h semaphore.h

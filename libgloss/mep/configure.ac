@@ -12,7 +12,6 @@ dnl BSD License and may only be used or replicated with the express permission
 dnl of Red Hat, Inc.
 
 dnl Process this file with autoconf to produce a configure script.
-AC_PREREQ(2.69)dnl
 AC_INIT(crt0.S)
 
 if test "${enable_shared}" = "yes" ; then

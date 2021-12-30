@@ -91,8 +91,10 @@ target_triplet = @target@
 bin_PROGRAMS = stub.exe$(EXEEXT)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/../acinclude.m4 \
-	$(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/../../config/depstand.m4 \
+	$(top_srcdir)/../../config/lead-dot.m4 \
+	$(top_srcdir)/../../config/override.m4 \
+	$(top_srcdir)/../acinclude.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(top_srcdir)/configure \
@@ -283,7 +285,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
-ACLOCAL_AMFLAGS = -I . -I ..
+ACLOCAL_AMFLAGS = -I . -I .. -I ../.. -I ../../config
 gdbdir = ${dir ${patsubst %/,%,${dir @srcdir@}}}gdb
 stub_exe_SOURCES = wince-stub.c
 tooldir = $(exec_prefix)/$(host_alias)
