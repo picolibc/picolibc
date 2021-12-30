@@ -52,8 +52,8 @@ texlive-collection-latexrecommended,\
 texlive-collection-fontsrecommended,\
 texlive-collection-pictures,\
 xmlto,\
-python38-lxml,\
-python38-ply"
+python39-lxml,\
+python39-ply"
 
 build_script: >-
     %CYGWIN_ROOT%/bin/bash -lc "
