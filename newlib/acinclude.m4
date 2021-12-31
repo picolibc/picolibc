@@ -120,7 +120,7 @@ AC_SUBST(newlib_basedir)
 
 AC_CANONICAL_HOST
 
-AM_INIT_AUTOMAKE([foreign no-installinfo no-dependencies no-dist no-define 1.11.6])
+AM_INIT_AUTOMAKE([foreign no-installinfo no-dependencies no-dist no-define 1.15.1])
 AM_MAINTAINER_MODE()
 AM_SILENT_RULES(yes)
 

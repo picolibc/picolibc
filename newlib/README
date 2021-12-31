@@ -607,8 +607,8 @@ After creating a new configure.ac and Makefile.am file, you would issue:
 from newlib/libc/machine/XXXX
 
 It is strongly advised that you use an adequate version of autotools.
-For this latest release, the following were used: autoconf 2.69, aclocal 1.13.4, and 
-automake 1.13.4.
+For this latest release, the following were used: autoconf 2.69, aclocal 1.15.1,
+and automake 1.15.1.
 
 Reporting Bugs
 ==============
