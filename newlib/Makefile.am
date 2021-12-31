@@ -6,6 +6,7 @@ ACLOCAL_AMFLAGS = -I . -I .. -I ../config
 # Variables that will accumulate in subdirs.
 PHONY =
 noinst_DATA =
+pkglib_LTLIBRARIES =
 
 LIBTOOL_VERSION_INFO = 0:0:0
 
@@ -59,8 +60,7 @@ AM_MAKEFLAGS = \
 
 FLAGS_TO_PASS=$(AM_MAKEFLAGS)
 
-SUBDIRS = libc libm \
-	. $(EXTRA_DIRS)
+SUBDIRS = libc libm .
 
 tooldir = $(exec_prefix)/$(host_alias)
 toollibdir = $(tooldir)/lib$(MULTISUBDIR)
@@ -512,6 +512,9 @@ clean-local:
 
 if HAVE_DOC
 include doc/local.mk
+endif
+if HAVE_ICONVDATA
+include iconvdata/Makefile.inc
 endif
 
 .PHONY: $(PHONY)

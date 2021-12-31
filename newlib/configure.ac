@@ -348,14 +348,14 @@ AM_CONDITIONAL(HAVE_DOC, test x$have_multisubdir = xno)
 # subdirectory withing the build directory.
 AM_CONDITIONAL(HAVE_MULTISUBDIR, test x$have_multisubdir = xyes)
 
-EXTRA_DIRS=
+HAVE_ICONVDATA=false
 case $host in
   i[[34567]]86-pc-linux-*)
   	AC_CONFIG_SUBDIRS(iconvdata)
-	EXTRA_DIRS=iconvdata
+	HAVE_ICONVDATA=true
 	;;
 esac
-AC_SUBST(EXTRA_DIRS)
+AM_CONDITIONAL([HAVE_ICONVDATA], $HAVE_ICONVDATA)
 
 CRT0=
 CRT0_DIR=
