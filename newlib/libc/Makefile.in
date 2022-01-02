@@ -152,7 +152,7 @@ DVIS = libc.dvi
 PDFS = libc.pdf
 PSS = libc.ps
 HTMLS = libc.html
-TEXINFOS = libc.texinfo
+TEXINFOS = libc.texi
 TEXI2DVI = texi2dvi
 TEXI2PDF = $(TEXI2DVI) --pdf --batch
 MAKEINFOHTML = $(MAKEINFO) --html
@@ -449,7 +449,7 @@ SUBDEFS = \
 # ditto for stmp-xml files in each subdirectory which builds .xml files
 SUBXMLS = $(SUBDEFS:stmp-def=stmp-xml)
 TEXINFO_TEX = ../../texinfo/texinfo.tex
-info_TEXINFOS = libc.texinfo
+info_TEXINFOS = libc.texi
 libc_TEXINFOS = sigset.texi extra.texi posix.texi stdio64.texi iconvset.texi \
 	targetdep.tex $(SUBDEFS)
 
@@ -465,7 +465,7 @@ CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .c .dvi .html .info .lo .o .obj .pdf .ps .texinfo
+.SUFFIXES: .c .dvi .html .info .lo .o .obj .pdf .ps .texi
 am--refresh: Makefile
 	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -543,7 +543,7 @@ clean-libtool:
 distclean-libtool:
 	-rm -f libtool config.lt
 
-.texinfo.info:
+.texi.info:
 	restore=: && backupdir="$(am__leading_dot)am$$$$" && \
 	am__cwd=`pwd` && $(am__cd) $(srcdir) && \
 	rm -rf $$backupdir && mkdir $$backupdir && \
@@ -565,17 +565,17 @@ distclean-libtool:
 	fi; \
 	rm -rf $$backupdir; exit $$rc
 
-.texinfo.dvi:
+.texi.dvi:
 	TEXINPUTS="$(am__TEXINFO_TEX_DIR)$(PATH_SEPARATOR)$$TEXINPUTS" \
 	MAKEINFO='$(MAKEINFO) $(AM_MAKEINFOFLAGS) $(MAKEINFOFLAGS) -I $(srcdir)' \
 	$(TEXI2DVI) $<
 
-.texinfo.pdf:
+.texi.pdf:
 	TEXINPUTS="$(am__TEXINFO_TEX_DIR)$(PATH_SEPARATOR)$$TEXINPUTS" \
 	MAKEINFO='$(MAKEINFO) $(AM_MAKEINFOFLAGS) $(MAKEINFOFLAGS) -I $(srcdir)' \
 	$(TEXI2PDF) $<
 
-.texinfo.html:
+.texi.html:
 	rm -rf $(@:.html=.htp)
 	if $(MAKEINFOHTML) $(AM_MAKEINFOHTMLFLAGS) $(MAKEINFOFLAGS) -I $(srcdir) \
 	 -o $(@:.html=.htp) $<; \
@@ -588,9 +588,9 @@ distclean-libtool:
 	    rm -rf $(@:.html=); else rm -Rf $(@:.html=.htp) $@; fi; \
 	  exit 1; \
 	fi
-$(srcdir)/libc.info: libc.texinfo $(libc_TEXINFOS)
-libc.pdf: libc.texinfo $(libc_TEXINFOS)
-libc.html: libc.texinfo $(libc_TEXINFOS)
+$(srcdir)/libc.info: libc.texi $(libc_TEXINFOS)
+libc.pdf: libc.texi $(libc_TEXINFOS)
+libc.html: libc.texi $(libc_TEXINFOS)
 .dvi.ps:
 	TEXINPUTS="$(am__TEXINFO_TEX_DIR)$(PATH_SEPARATOR)$$TEXINPUTS" \
 	$(DVIPS) -o $@ $<

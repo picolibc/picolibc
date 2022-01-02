@@ -592,7 +592,7 @@ PACKAGE_STRING='newlib 4.2.0'
 PACKAGE_BUGREPORT=''
 PACKAGE_URL=''
 
-ac_unique_file="libm.texinfo"
+ac_unique_file="libm.texi"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>

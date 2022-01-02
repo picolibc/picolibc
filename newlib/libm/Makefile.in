@@ -131,7 +131,7 @@ DVIS = libm.dvi
 PDFS = libm.pdf
 PSS = libm.ps
 HTMLS = libm.html
-TEXINFOS = libm.texinfo
+TEXINFOS = libm.texi
 TEXI2DVI = texi2dvi
 TEXI2PDF = $(TEXI2DVI) --pdf --batch
 MAKEINFOHTML = $(MAKEINFO) --html
@@ -323,7 +323,7 @@ libm_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@libm_la_LIBADD = $(SUBLIBS)
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = libm.a
 TEXINFO_TEX = ../../texinfo/texinfo.tex
-info_TEXINFOS = libm.texinfo
+info_TEXINFOS = libm.texi
 libm_TEXINFOS = targetdep.tex
 CLEANFILES = tmp.texi targetdep.tex stmp-targetdep *.xml *.3
 ACLOCAL_AMFLAGS = -I .. -I ../..
@@ -331,7 +331,7 @@ CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .c .dvi .html .info .lo .o .obj .pdf .ps .texinfo
+.SUFFIXES: .c .dvi .html .info .lo .o .obj .pdf .ps .texi
 am--refresh: Makefile
 	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -409,7 +409,7 @@ clean-libtool:
 distclean-libtool:
 	-rm -f libtool config.lt
 
-.texinfo.info:
+.texi.info:
 	restore=: && backupdir="$(am__leading_dot)am$$$$" && \
 	am__cwd=`pwd` && $(am__cd) $(srcdir) && \
 	rm -rf $$backupdir && mkdir $$backupdir && \
@@ -431,17 +431,17 @@ distclean-libtool:
 	fi; \
 	rm -rf $$backupdir; exit $$rc
 
-.texinfo.dvi:
+.texi.dvi:
 	TEXINPUTS="$(am__TEXINFO_TEX_DIR)$(PATH_SEPARATOR)$$TEXINPUTS" \
 	MAKEINFO='$(MAKEINFO) $(AM_MAKEINFOFLAGS) $(MAKEINFOFLAGS) -I $(srcdir)' \
 	$(TEXI2DVI) $<
 
-.texinfo.pdf:
+.texi.pdf:
 	TEXINPUTS="$(am__TEXINFO_TEX_DIR)$(PATH_SEPARATOR)$$TEXINPUTS" \
 	MAKEINFO='$(MAKEINFO) $(AM_MAKEINFOFLAGS) $(MAKEINFOFLAGS) -I $(srcdir)' \
 	$(TEXI2PDF) $<
 
-.texinfo.html:
+.texi.html:
 	rm -rf $(@:.html=.htp)
 	if $(MAKEINFOHTML) $(AM_MAKEINFOHTMLFLAGS) $(MAKEINFOFLAGS) -I $(srcdir) \
 	 -o $(@:.html=.htp) $<; \
@@ -454,9 +454,9 @@ distclean-libtool:
 	    rm -rf $(@:.html=); else rm -Rf $(@:.html=.htp) $@; fi; \
 	  exit 1; \
 	fi
-$(srcdir)/libm.info: libm.texinfo $(libm_TEXINFOS)
-libm.pdf: libm.texinfo $(libm_TEXINFOS)
-libm.html: libm.texinfo $(libm_TEXINFOS)
+$(srcdir)/libm.info: libm.texi $(libm_TEXINFOS)
+libm.pdf: libm.texi $(libm_TEXINFOS)
+libm.html: libm.texi $(libm_TEXINFOS)
 .dvi.ps:
 	TEXINPUTS="$(am__TEXINFO_TEX_DIR)$(PATH_SEPARATOR)$$TEXINPUTS" \
 	$(DVIPS) -o $@ $<
