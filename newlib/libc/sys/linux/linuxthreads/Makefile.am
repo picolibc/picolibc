@@ -67,7 +67,7 @@ libpthread_la_LIBADD = $(LIBADD_OBJS)
 ## libpthread_la_DEPENDENCIES = defs.h crti.S
 libpthread_la_DEPENDENCIES = $(LIBADD_OBJS) extra-libtool-objlist
 noinst_DATA=objectlist.awk.in
-LIB_COMPILE = $(LTCOMPILE)
+LIB_COMPILE = $(AM_V_CC)$(LTCOMPILE)
 
 libthread_db_la_SOURCES = $(LIB_DB_SOURCES)
 
@@ -79,7 +79,7 @@ libpthread_a_LIBADD = $(LIBADD_OBJS) $(MACHINE_LIB)
 libpthread_a_CFLAGS = $(AM_CFLAGS)
 ## libpthread_a_DEPENDENCIES = defs.h crti.S
 libpthread_a_DEPENDENCIES = $(LIBADD_OBJS) $(MACHINE_LIB)
-LIB_COMPILE = $(COMPILE)
+LIB_COMPILE = $(AM_V_CC)$(COMPILE)
 
 libthread_db_a_SOURCES = $(LIB_DB_SOURCES)
 libthread_db_a_CFLAGS = $(AM_CFLAGS)
