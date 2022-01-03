@@ -218,8 +218,8 @@ endif
 # Select stdio implementation
 tinystdio = get_option('tinystdio')
 
-has_link_defsym = cc.has_link_argument('-Wl,--defsym=' + global_prefix + '_start=0')
-has_link_alias = cc.has_link_argument('-Wl,-alias,' + global_prefix + 'main,testalias')
+has_link_defsym = meson.get_cross_property('has_link_defsym', cc.has_link_argument('-Wl,--defsym=' + global_prefix + '_start=0'))
+has_link_alias = meson.get_cross_property('has_link_alias', cc.has_link_argument('-Wl,-alias,' + global_prefix + 'main,testalias'))
 
 # tinystdio options
 posix_io = tinystdio and get_option('posix-io')
