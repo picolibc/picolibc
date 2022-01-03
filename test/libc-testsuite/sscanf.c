@@ -118,7 +118,7 @@ int test_sscanf(void)
 	TEST_F(0.1e-10);
 	TEST_F(0x1234p56);
 
-#ifndef _PICOLIBC__
+#ifndef __PICOLIBC__
         /* both tinystdio and legacy stdio fail this test */
 	TEST(i, sscanf("10e", "%lf", &d), 0, "got %d fields, expected no match (%d)");
 #endif

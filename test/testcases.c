@@ -17,7 +17,7 @@
 
 */
 
-#ifndef _PICOLIBC__
+#ifndef __PICOLIBC__
 # define _WANT_IO_C99_FORMATS
 # define _WANT_IO_LONG_LONG
 #elif defined(TINY_STDIO)

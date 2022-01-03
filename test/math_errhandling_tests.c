@@ -383,7 +383,7 @@ FLOAT_T makemathname(test_pow_neg0_neghalf)(void) { return makemathname(pow)(-ma
 FLOAT_T makemathname(test_pow_0_neg3)(void) { return makemathname(pow)(makemathname(zero), -makemathname(three)); }
 FLOAT_T makemathname(test_pow_neg0_neg3)(void) { return makemathname(pow)(-makemathname(zero), -makemathname(three)); }
 
-#ifndef _PICOLIBC__
+#ifndef __PICOLIBC__
 #define pow10(x) exp10(x)
 #define pow10f(x) exp10f(x)
 #endif
@@ -595,7 +595,7 @@ struct {
         TEST(fma_1_neginf_inf, (FLOAT_T)NAN, FE_INVALID, 0),
         TEST(fma_inf_0_1, (FLOAT_T)NAN, FE_INVALID, 0),
         TEST(fma_0_inf_1, (FLOAT_T)NAN, FE_INVALID, 0),
-#ifdef _PICOLIBC__
+#ifdef __PICOLIBC__
         /* Linux says these will set FE_INVALID, POSIX says optional, glibc does not set exception */
         TEST(fma_inf_0_nan, (FLOAT_T)NAN, FE_INVALID, 0),
         TEST(fma_0_inf_nan, (FLOAT_T)NAN, FE_INVALID, 0),
@@ -839,7 +839,7 @@ struct {
 	TEST(tgamma_negbig, (FLOAT_T)NAN, FE_INVALID, EDOM),
 	TEST(tgamma_inf, (FLOAT_T)INFINITY, 0, 0),
 	TEST(tgamma_neginf, (FLOAT_T)NAN, FE_INVALID, EDOM),
-#if !defined(TEST_FLOAT) || defined(_PICOLIBC__)
+#if !defined(TEST_FLOAT) || defined(__PICOLIBC__)
 	/* glibc has a bug with this test using float */
 	TEST(tgamma_small, (FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
 	TEST(tgamma_negsmall, -(FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),

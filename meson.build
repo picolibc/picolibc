@@ -831,10 +831,17 @@ else
   picolibc_patch_level = 0
 endif
 
+conf_data.set('__PICOLIBC_VERSION__', '"@0@"'.format(meson.project_version()), description: 'The Picolibc version in string format.')
+conf_data.set('__PICOLIBC__', version_array[0], description: 'The Picolibc major version number.')
+conf_data.set('__PICOLIBC_MINOR__', version_array[1], description: 'The Picolibc minor version number.')
+conf_data.set('__PICOLIBC_PATCHLEVEL__', picolibc_patch_level, description: 'The Picolibc patch level.')
+
+# Old version macros. These have just a single leading underscore,
+# which isn't consistent with the newlib macros; they were created
+# by mistake.
 conf_data.set('_PICOLIBC_VERSION', '"@0@"'.format(meson.project_version()), description: 'The Picolibc version in string format.')
 conf_data.set('_PICOLIBC__', version_array[0], description: 'The Picolibc major version number.')
 conf_data.set('_PICOLIBC_MINOR__', version_array[1], description: 'The Picolibc minor version number.')
-conf_data.set('__PICOLIBC_PATCHLEVEL__', picolibc_patch_level, description: 'The Picolibc patch level.')
 
 conf_data.set('_NEWLIB_VERSION', '"@0@"'.format(NEWLIB_VERSION), description: 'The newlib version in string format.')
 conf_data.set('__NEWLIB__', NEWLIB_MAJOR_VERSION, description: 'The newlib major version number.')
