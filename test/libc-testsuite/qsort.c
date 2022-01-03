@@ -35,6 +35,28 @@ static int icmp(const void *a, const void *b)
 	return *(int*)a - *(int*)b;
 }
 
+struct three {
+    unsigned char b[3];
+};
+
+#define i3(x)                                                    \
+        { (unsigned char) ((x) >> 16), (unsigned char) ((x) >> 8),      \
+                        (unsigned char) ((x) >> 0) }
+
+static int tcmp(const void *av, const void *bv)
+{
+    const struct three *a = av, *b = bv;
+    int c;
+    int i;
+
+    for (i = 0; i < 3; i++) {
+        c = (int) a->b[i] - (int) b->b[i];
+        if (c)
+            return c;
+    }
+    return 0;
+}
+
 #define FAIL(m) do {                                            \
         printf(__FILE__ ":%d: %s failed\n", __LINE__, m);       \
         err++;                                                  \
@@ -61,6 +83,12 @@ int test_qsort(void)
 		848405, 3434, 3434344, 3535, 93994, 2230404, 4334
 	};
 
+        struct three t[] = {
+                i3(879045), i3(394), i3(99405644), i3(33434), i3(232323), i3(4334), i3(5454),
+                i3(343), i3(45545), i3(454), i3(324), i3(22), i3(34344), i3(233), i3(45345), i3(343),
+                i3(848405), i3(3434), i3(3434344), i3(3535), i3(93994), i3(2230404), i3(4334)
+        };
+
 	qsort(s, sizeof(s)/sizeof(char *), sizeof(char *), scmp);
 	for (i=0; i<(int) (sizeof(s)/sizeof(char *)-1); i++) {
 		if (strcmp(s[i], s[i+1]) > 0) {
@@ -80,6 +108,17 @@ int test_qsort(void)
 			break;
 		}
 	}
+
+        qsort(t, sizeof(t)/sizeof(t[0]), sizeof(t[0]), tcmp);
+	for (i=0; i<(int)(sizeof(t)/sizeof(t[0])-1); i++) {
+                if (tcmp(&t[i], &t[i+1]) > 0) {
+			FAIL("three byte sort");
+			for (i=0; i<(int)(sizeof(t)/sizeof(t[0])); i++)
+                                printf("\t0x%02x%02x%02x\n", t[i].b[0], t[i].b[1], t[i].b[2]);
+			break;
+		}
+	}
+
 
 	return err;
 }
