@@ -837,8 +837,8 @@ conf_data.set('_PICOLIBC_MINOR__', version_array[1], description: 'The Picolibc 
 conf_data.set('__PICOLIBC_PATCHLEVEL__', picolibc_patch_level, description: 'The Picolibc patch level.')
 
 conf_data.set('_NEWLIB_VERSION', '"@0@"'.format(NEWLIB_VERSION), description: 'The newlib version in string format.')
-conf_data.set('_NEWLIB__', NEWLIB_MAJOR_VERSION, description: 'The newlib major version number.')
-conf_data.set('_NEWLIB_MINOR__', NEWLIB_MINOR_VERSION, description: 'The newlib minor version number.')
+conf_data.set('__NEWLIB__', NEWLIB_MAJOR_VERSION, description: 'The newlib major version number.')
+conf_data.set('__NEWLIB_MINOR__', NEWLIB_MINOR_VERSION, description: 'The newlib minor version number.')
 conf_data.set('__NEWLIB_PATCHLEVEL__', NEWLIB_PATCHLEVEL_VERSION, description: 'The newlib patch level.')
 
 if tinystdio
