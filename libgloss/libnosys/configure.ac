@@ -36,7 +36,7 @@ AC_ARG_PROGRAM
 
 AC_PROG_INSTALL
 
-AC_DEFINE(HAVE_GNU_LD)
+AC_DEFINE(HAVE_GNU_LD, 1, [Using GNU LD])
 dnl Make sure syscall names match those being used by newlib
 case "${target}" in
   *-*-cygwin*)
@@ -86,14 +86,14 @@ case "${target}" in
   z8k-*-*)
 	;;
   *)
-	AC_DEFINE(MISSING_SYSCALL_NAMES)
+	AC_DEFINE(MISSING_SYSCALL_NAMES, 1, [Missing syscall names])
 	;;
 esac
 
 dnl Make sure we know if elf format used
 case "${target}" in
   *-*-elf)
-        AC_DEFINE(HAVE_ELF)
+        AC_DEFINE(HAVE_ELF, 1, [Using ELF format])
 
         AC_CACHE_CHECK([for .previous assembler directive],
                          libc_cv_asm_previous_directive, [dnl
@@ -108,7 +108,7 @@ EOF
         rm -f conftest*])
 
 	if test "x${libc_cv_asm_previous_directive}" = "xyes"; then
-          AC_DEFINE(HAVE_ASM_PREVIOUS_DIRECTIVE)
+          AC_DEFINE(HAVE_ASM_PREVIOUS_DIRECTIVE, 1, [.previous directive allowed])
 	fi
 
         AC_CACHE_CHECK([for .popsection assembler directive],
@@ -124,7 +124,7 @@ EOF
         rm -f conftest*])
 
 	if test "x${libc_cv_asm_popsection_directive}" = "xyes"; then
-          AC_DEFINE(HAVE_ASM_POPSECTION_DIRECTIVE)
+          AC_DEFINE(HAVE_ASM_POPSECTION_DIRECTIVE, 1, [.pushsection/.popsection directives allowed])
 	fi
 
         AC_CACHE_CHECK([for section attributes],
@@ -139,7 +139,7 @@ EOF
         fi
         rm -f conftest*])
 	if test "x${libc_cv_section_attributes}" = "xyes"; then
-          AC_DEFINE(HAVE_SECTION_ATTRIBUTES)
+          AC_DEFINE(HAVE_SECTION_ATTRIBUTES, 1, [support for section attributes])
 	fi
         ;;
 esac
@@ -149,7 +149,7 @@ cat > conftest.c <<\EOF
 foo () { }
 EOF
 dnl
-libc_cv_symbol_prefix=none
+libc_cv_symbol_prefix=''
 if AC_TRY_COMMAND([${CC-cc} -S conftest.c -o - | fgrep "\$foo" > /dev/null]);
 then
   libc_cv_symbol_prefix='$'
@@ -160,11 +160,7 @@ else
   fi
 fi
 rm -f conftest* ])
-if test $libc_cv_symbol_prefix != none; then
-  AC_DEFINE_UNQUOTED(__SYMBOL_PREFIX, "$libc_cv_symbol_prefix")
-else
-  AC_DEFINE(__SYMBOL_PREFIX, "")
-fi
+AC_DEFINE_UNQUOTED(__SYMBOL_PREFIX, "$libc_cv_symbol_prefix", [symbol prefix])
 
 LIB_AC_PROG_CC
 AS=${AS-as}
