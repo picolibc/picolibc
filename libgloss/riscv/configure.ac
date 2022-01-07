@@ -8,7 +8,7 @@
 
 AC_INIT([crt0.S])
 AC_CONFIG_SRCDIR([crt0.S])
-AC_CONFIG_AUX_DIR([${srcdir}/../..])
+AC_CONFIG_AUX_DIR(../..)
 
 #-------------------------------------------------------------------------
 # Checks for programs
@@ -23,23 +23,12 @@ AC_PROG_INSTALL
 # Output
 #-------------------------------------------------------------------------
 
-if test "$srcdir" = "." ; then
-  if test "${with_target_subdir}" != "." ; then
-    libgloss_topdir="${srcdir}/${with_multisrctop}../../.."
-  else
-    libgloss_topdir="${srcdir}/${with_multisrctop}../.."
-  fi
-else
-  libgloss_topdir="${srcdir}/../.."
-fi
-AC_CONFIG_AUX_DIR($libgloss_topdir)
 AC_CONFIG_FILES(Makefile,
-. ${libgloss_topdir}/config-ml.in,
+. ${srcdir}/../../config-ml.in,
 srcdir=${srcdir}
 target=${target}
 with_multisubdir=${with_multisubdir}
 ac_configure_args="${ac_configure_args} --enable-multilib"
 CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
-libgloss_topdir=${libgloss_topdir}
 )
 AC_OUTPUT

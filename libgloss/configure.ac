@@ -7,16 +7,7 @@ if test "${enable_shared}" = "yes" ; then
     echo "Shared libraries not supported for cross compiling, ignored"
 fi
 
-if test "${srcdir}" = "." ; then
-  if test "${with_target_subdir}" != "." ; then
-    libgloss_topdir="${srcdir}/${with_multisrctop}../.."
-  else
-    libgloss_topdir="${srcdir}/${with_multisrctop}.."
-  fi
-else
-  libgloss_topdir="${srcdir}/.."
-fi
-AC_CONFIG_AUX_DIR($libgloss_topdir)
+AC_CONFIG_AUX_DIR(..)
 
 AC_PROG_INSTALL
 
@@ -228,7 +219,7 @@ fi
 AC_CONFIG_FILES([Makefile],
 [if test -n "$CONFIG_FILES"; then
   unset ac_file
-  . ${libgloss_topdir}/config-ml.in
+  . ${srcdir}/../config-ml.in
 fi],
 srcdir=${srcdir}
 target=${target}
@@ -236,7 +227,6 @@ host=${host}
 with_multisubdir=${with_multisubdir}
 ac_configure_args="--enable-multilib ${ac_configure_args}"
 CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
-libgloss_topdir=${libgloss_topdir}
 CC="${CC}"
 LDFLAGS=${LDFLAGS}
 )

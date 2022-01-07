@@ -5,13 +5,7 @@ AC_INIT(crt0.S)
 AC_CANONICAL_SYSTEM
 AC_ARG_PROGRAM
 
-if test "$srcdir" = "." ; then
-  mdir=`echo "${with_multisubdir}/" \
-    | sed -e 's,\([[^/]][[^/]]*\),..,g' -e 's,^/$,,'`
-  AC_CONFIG_AUX_DIR(${mdir}../../..)
-else
-  AC_CONFIG_AUX_DIR(${srcdir}/../..)
-fi
+AC_CONFIG_AUX_DIR(../..)
 
 AC_PROG_INSTALL
 
@@ -42,6 +36,5 @@ target=${target}
 with_multisubdir=${with_multisubdir}
 ac_configure_args="${ac_configure_args} --enable-multilib"
 CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
-libgloss_topdir=${srcdir}/../..
 )
 AC_OUTPUT

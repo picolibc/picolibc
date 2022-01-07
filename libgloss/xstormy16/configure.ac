@@ -5,13 +5,7 @@ AC_INIT(crt0.s)
 AC_CANONICAL_SYSTEM
 AC_ARG_PROGRAM
 
-if test "$srcdir" = "." ; then
-  mdir=`echo "${with_multisubdir}/" \
-    | sed -e 's,\([[^/]][[^/]]*\),..,g' -e 's,^/$,,'`
-  AC_CONFIG_AUX_DIR(${mdir}../../..)
-else
-  AC_CONFIG_AUX_DIR(${srcdir}/../..)
-fi
+AC_CONFIG_AUX_DIR(../..)
 
 AC_PROG_INSTALL
 

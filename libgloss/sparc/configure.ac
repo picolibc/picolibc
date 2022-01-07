@@ -17,17 +17,7 @@ if test "${enable_shared}" = "yes" ; then
     echo "Shared libraries not supported for cross compiling, ignored"
 fi
 
-if test "$srcdir" = "." ; then
-  if test "${with_target_subdir}" != "." ; then
-    libgloss_topdir="${with_multisrctop}../../.."
-  else
-    libgloss_topdir="${with_multisrctop}../.."
-  fi
-else
-  libgloss_topdir="${srcdir}/../.."
-fi
-
-AC_CONFIG_AUX_DIR($libgloss_topdir)
+AC_CONFIG_AUX_DIR(../..)
 
 AC_PROG_INSTALL
 
@@ -74,12 +64,11 @@ AC_SUBST_FILE(target_makefile_frag)
 AC_SUBST(CYGMONLDSCRIPTTEMPL)
 
 AC_OUTPUT(Makefile,
-. ${libgloss_topdir}/config-ml.in,
+. ${srcdir}/../../config-ml.in,
 srcdir=${srcdir}
 target=${target}
 with_multisubdir=${with_multisubdir}
 ac_configure_args="${ac_configure_args} --enable-multilib"
 CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
-libgloss_topdir=${libgloss_topdir}
 )
 

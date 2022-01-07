@@ -1827,18 +1827,8 @@ if test "${enable_shared}" = "yes" ; then
     echo "Shared libraries not supported for cross compiling, ignored"
 fi
 
-if test "$srcdir" = "." ; then
-  if test "${with_target_subdir}" != "." ; then
-    libgloss_topdir="${with_multisrctop}../../.."
-  else
-    libgloss_topdir="${with_multisrctop}../.."
-  fi
-else
-  libgloss_topdir="${srcdir}/../.."
-fi
-
 ac_aux_dir=
-for ac_dir in $libgloss_topdir "$srcdir"/$libgloss_topdir; do
+for ac_dir in ../.. "$srcdir"/../..; do
   if test -f "$ac_dir/install-sh"; then
     ac_aux_dir=$ac_dir
     ac_install_sh="$ac_aux_dir/install-sh -c"
@@ -1854,7 +1844,7 @@ for ac_dir in $libgloss_topdir "$srcdir"/$libgloss_topdir; do
   fi
 done
 if test -z "$ac_aux_dir"; then
-  as_fn_error $? "cannot find install-sh, install.sh, or shtool in $libgloss_topdir \"$srcdir\"/$libgloss_topdir" "$LINENO" 5
+  as_fn_error $? "cannot find install-sh, install.sh, or shtool in ../.. \"$srcdir\"/../.." "$LINENO" 5
 fi
 
 # These three variables are undocumented and unsupported,
@@ -4309,7 +4299,6 @@ target=${target}
 with_multisubdir=${with_multisubdir}
 ac_configure_args="${ac_configure_args} --enable-multilib"
 CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
-libgloss_topdir=${libgloss_topdir}
 
 
 _ACEOF
@@ -4877,7 +4866,7 @@ $as_echo X"$file" |
   done
 }
  ;;
-    "Makefile":F) . ${libgloss_topdir}/config-ml.in ;;
+    "Makefile":F) . ${srcdir}/../../config-ml.in ;;
 
   esac
 done # for ac_tag
