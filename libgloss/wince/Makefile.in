@@ -283,6 +283,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
+ACLOCAL_AMFLAGS = -I . -I ..
 gdbdir = ${dir ${patsubst %/,%,${dir @srcdir@}}}gdb
 stub_exe_SOURCES = wince-stub.c
 tooldir = $(exec_prefix)/$(host_alias)
