@@ -78,6 +78,14 @@ FUNC_START(setjmp)
 	   on its own would be enough for GCC 4.1 and above, but older
 	   compilers only define _SOFT_FLOAT, so check both.  */
 #if !defined (__NO_FPRS__) && !defined (_SOFT_FLOAT)
+#if defined (__rtems__) && !defined (__PPC_CPU_E6500__)
+	/* For some RTEMS multilibs, the FPU and Altivec units are disabled
+	   during interrupt handling.  Do not save and restore the
+	   corresponding registers in this case.  */
+	mfmsr	5
+	andi.	5,5,0x2000
+	beq	1f
+#endif
 	stfdu	14,8(3)		# offset 96
 	stfdu	15,8(3)		# offset 104
 	stfdu	16,8(3)		# offset 112
@@ -96,12 +104,18 @@ FUNC_START(setjmp)
 	stfdu	29,8(3)		# offset 216
 	stfdu	30,8(3)		# offset 224
 	stfdu	31,8(3)		# offset 232
+1:
 #endif
 
 	/* This requires a total of 21 * 4 + 18 * 8 + 4 + 4 + 4
 	   bytes == 60 * 4 bytes == 240 bytes.  */
 
 #ifdef __ALTIVEC__
+#if defined (__rtems__) && !defined (__PPC_CPU_E6500__)
+	mfmsr	5
+	andis.	5,5,0x200
+	beq	1f
+#endif
 	/* save Altivec vrsave and vr20-vr31 registers */
 	mfspr	4,256		# vrsave register
 	stwu	4,16(3)		# offset 248
@@ -129,6 +143,7 @@ FUNC_START(setjmp)
 	stvx	30,0,3		# offset 416
 	addi	3,3,16
 	stvx	31,0,3		# offset 432
+1:
 
 	/* This requires a total of 240 + 8 + 8 + 12 * 16 == 448 bytes. */
 #endif
@@ -211,6 +226,11 @@ FUNC_START(longjmp)
 	   above, but older compilers only define _SOFT_FLOAT, so
 	   check both.  */
 #if !defined (__NO_FPRS__) && !defined (_SOFT_FLOAT)
+#if defined (__rtems__) && !defined (__PPC_CPU_E6500__)
+	mfmsr	5
+	andi.	5,5,0x2000
+	beq	1f
+#endif
 	lfdu	14,8(3)         # offset 96 
 	lfdu	15,8(3)         # offset 104
 	lfdu	16,8(3)         # offset 112
@@ -229,9 +249,15 @@ FUNC_START(longjmp)
 	lfdu	29,8(3)         # offset 216
 	lfdu	30,8(3)         # offset 224
 	lfdu	31,8(3)         # offset 232
+1:
 #endif
 
 #ifdef __ALTIVEC__
+#if defined (__rtems__) && !defined (__PPC_CPU_E6500__)
+	mfmsr	5
+	andis.	5,5,0x200
+	beq	1f
+#endif
 	/* restore Altivec vrsave and v20-v31 registers */
 	lwzu	5,16(3)		# offset 248
 	mtspr	256,5		# vrsave
@@ -259,6 +285,7 @@ FUNC_START(longjmp)
 	lvx	30,0,3		# offset 416
 	addi	3,3,16
 	lvx	31,0,3		# offset 432
+1:
 #endif
 
 	mr.	3,4
