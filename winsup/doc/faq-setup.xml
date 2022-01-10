@@ -12,9 +12,8 @@
 
 <para>
 There is only one recommended way to install Cygwin, which is to use the
-Cygwin Setup program, a GUI installer named
-<command>setup-x86_64.exe</command> for 64 bit Windows, or
-<command>setup-x86.exe</command> for 32 bit Windows. It is flexible and easy to use.
+Cygwin Setup program, a GUI installer.
+It is flexible and easy to use.
 You can pick and choose the packages you wish to install, and update
 them individually.  Full source code is available for all packages and
 tools.
@@ -191,7 +190,6 @@ Here is how Cygwin secures the installation and update process to counter
 
 <orderedlist>
 <listitem><para>The Cygwin website provides the Cygwin Setup program
-(<literal>setup-x86.exe</literal> or <literal>setup-x86_64.exe</literal>)
 using HTTPS (SSL/TLS).
 This authenticates that the Cygwin Setup program
 came from the Cygwin website
@@ -261,8 +259,7 @@ widely-used SHA-2 suite of cryptographic hashes).
 
 <para>
 To best secure your installation and update process, download
-the Cygwin Setup program <filename>setup-x86_64.exe</filename> (64-bit) or
-<filename>setup-x86.exe</filename> (32-bit), and then
+the Cygwin Setup program, and then
 check its signature (using a signature-checking tool you trust)
 using the Cygwin public key
 (<ulink url="https://cygwin.com/key/pubring.asc"/>).
@@ -318,8 +315,7 @@ archives.  If this happens to you, consider disabling your anti-virus
 software when running the Cygwin Setup program.  The following procedure should be
 a fairly safe way to do that:
 </para>
-<orderedlist><listitem><para>Download <filename>setup-x86_64.exe</filename> or
-<filename>setup-x86.exe</filename> and scan it explicitly.
+<orderedlist><listitem><para>Download the Cygwin Setup program and scan it explicitly.
 </para>
 </listitem>
 <listitem><para>Turn off the anti-virus software.
