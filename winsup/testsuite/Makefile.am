@@ -61,4 +61,6 @@ EXTRA_DEJAGNU_SITE_CONFIG = site-extra.exp
 clean-local:
 	rm -f *.log *.exe *.exp *.bak *.stackdump winsup.sum
 
+if CROSS_BOOTSTRAP
 SUBDIRS = cygrun
+endif
