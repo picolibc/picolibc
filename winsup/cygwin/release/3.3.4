@@ -17,3 +17,6 @@ Bug Fixes
 
 - Avoid a crash when NtQueryInformationProcess returns invalid handle data.
   Addresses: https://cygwin.com/pipermail/cygwin-patches/2021q4/011611.html
+
+- Ignore INHERIT ACEs when reading the DACL of non-directory files.
+  Addresses: https://cygwin.com/pipermail/cygwin/2022-January/250363.html
