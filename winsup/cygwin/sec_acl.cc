@@ -811,7 +811,8 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 			  class_perm = lacl[pos].a_perm;
 			}
 		    }
-		  if (ace->Header.AceFlags & SUB_CONTAINERS_AND_OBJECTS_INHERIT)
+		  if (S_ISDIR (attr)
+		      && (ace->Header.AceFlags & SUB_CONTAINERS_AND_OBJECTS_INHERIT) != 0)
 		    {
 		      if ((pos = searchace (lacl, MAX_ACL_ENTRIES,
 					    DEF_CLASS_OBJ)) >= 0)
@@ -952,7 +953,8 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 		standard_ACEs_only = false;
 	    }
 	}
-      if ((ace->Header.AceFlags & SUB_CONTAINERS_AND_OBJECTS_INHERIT))
+      if (S_ISDIR (attr)
+	  && (ace->Header.AceFlags & SUB_CONTAINERS_AND_OBJECTS_INHERIT) != 0)
 	{
 	  if (type == USER_OBJ)
 	    {
@@ -1197,10 +1199,11 @@ int
 getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
 {
   security_descriptor sd;
+  mode_t attr = pc.isdir () ? S_IFDIR : 0;
 
   if (get_file_sd (handle, pc, sd, false))
     return -1;
-  int pos = get_posix_access (sd, NULL, NULL, NULL, aclbufp, nentries);
+  int pos = get_posix_access (sd, &attr, NULL, NULL, aclbufp, nentries);
   syscall_printf ("%R = getacl(%S)", pos, pc.get_nt_native_path ());
   return pos;
 }
