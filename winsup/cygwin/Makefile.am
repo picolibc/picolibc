@@ -623,7 +623,8 @@ $(LDSCRIPT): $(LDSCRIPT).in
 	$(CC) -E - -P < $^ -o $@
 
 # cygwin dll
-$(TEST_DLL_NAME): $(LDSCRIPT) dllfixdbg libdll.a $(VERSION_OFILES) $(LIBSERVER)
+$(TEST_DLL_NAME): $(LDSCRIPT) dllfixdbg libdll.a $(VERSION_OFILES) $(LIBSERVER)\
+		  $(newlib_build)/libm/libm.a $(newlib_build)/libc/libc.a
 	$(CXX) $(CXXFLAGS) \
 	-mno-use-libstdc-wrappers \
 	-Wl,--gc-sections -nostdlib -Wl,-T$(LDSCRIPT) -static \
