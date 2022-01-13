@@ -272,6 +272,8 @@ child_info_spawn NO_COPY ch_spawn;
 
 extern "C" void __posix_spawn_sem_release (void *sem, int error);
 
+extern DWORD mutex_timeout; /* defined in fhandler_termios.cc */
+
 int
 child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 			  const char *const envp[], int mode,
@@ -718,7 +720,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	      && stdin_is_ptys
 	      && ptys_ttyp->pcon_input_state_eq (tty::to_cyg))
 	    {
-	      WaitForSingleObject (ptys_input_mutex, INFINITE);
+	      WaitForSingleObject (ptys_input_mutex, mutex_timeout);
 	      fhandler_pty_slave::transfer_input (tty::to_nat,
 				    ptys_primary->get_handle (),
 				    ptys_ttyp, ptys_input_available_event);
@@ -1011,7 +1013,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	      if (ptys_ttyp->getpgid () == myself->pgid && stdin_is_ptys
 		  && ptys_ttyp->pcon_input_state_eq (tty::to_nat))
 		{
-		  WaitForSingleObject (ptys_input_mutex, INFINITE);
+		  WaitForSingleObject (ptys_input_mutex, mutex_timeout);
 		  fhandler_pty_slave::transfer_input (tty::to_cyg,
 					    ptys_from_master_nat, ptys_ttyp,
 					    ptys_input_available_event);
@@ -1048,7 +1050,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	      if (ptys_ttyp->getpgid () == myself->pgid && stdin_is_ptys
 		  && ptys_ttyp->pcon_input_state_eq (tty::to_nat))
 		{
-		  WaitForSingleObject (ptys_input_mutex, INFINITE);
+		  WaitForSingleObject (ptys_input_mutex, mutex_timeout);
 		  fhandler_pty_slave::transfer_input (tty::to_cyg,
 					    ptys_from_master_nat, ptys_ttyp,
 					    ptys_input_available_event);

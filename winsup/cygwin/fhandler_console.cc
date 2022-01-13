@@ -59,6 +59,8 @@ bool NO_COPY fhandler_console::invisible_console;
 /* Mutex for AttachConsole()/FreeConsole() in fhandler_tty.cc */
 HANDLE attach_mutex;
 
+extern DWORD mutex_timeout; /* defined in fhandler_termios.cc */
+
 static inline void
 acquire_attach_mutex (DWORD t)
 {
@@ -214,7 +216,7 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 	  continue;
 	}
 
-      WaitForSingleObject (p->input_mutex, INFINITE);
+      WaitForSingleObject (p->input_mutex, mutex_timeout);
       total_read = 0;
       switch (cygwait (p->input_handle, (DWORD) 0))
 	{
@@ -474,7 +476,7 @@ fhandler_console::set_input_mode (tty::cons_mode m, const termios *t,
 				  const handle_set_t *p)
 {
   DWORD flags = 0, oflags;
-  WaitForSingleObject (p->input_mutex, INFINITE);
+  WaitForSingleObject (p->input_mutex, mutex_timeout);
   GetConsoleMode (p->input_handle, &oflags);
   switch (m)
     {
@@ -521,7 +523,7 @@ fhandler_console::set_output_mode (tty::cons_mode m, const termios *t,
 				   const handle_set_t *p)
 {
   DWORD flags = ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
-  WaitForSingleObject (p->output_mutex, INFINITE);
+  WaitForSingleObject (p->output_mutex, mutex_timeout);
   switch (m)
     {
     case tty::restore:
@@ -626,7 +628,7 @@ fhandler_console::set_raw_win32_keyboard_mode (bool new_mode)
 void
 fhandler_console::set_cursor_maybe ()
 {
-  acquire_attach_mutex (INFINITE);
+  acquire_attach_mutex (mutex_timeout);
   con.fillin (get_output_handle ());
   release_attach_mutex ();
   /* Nothing to do for xterm compatible mode. */
@@ -635,7 +637,7 @@ fhandler_console::set_cursor_maybe ()
   if (con.dwLastCursorPosition.X != con.b.dwCursorPosition.X ||
       con.dwLastCursorPosition.Y != con.b.dwCursorPosition.Y)
     {
-      acquire_attach_mutex (INFINITE);
+      acquire_attach_mutex (mutex_timeout);
       SetConsoleCursorPosition (get_output_handle (), con.b.dwCursorPosition);
       release_attach_mutex ();
       con.dwLastCursorPosition = con.b.dwCursorPosition;
@@ -742,7 +744,7 @@ wait_retry:
 	  if (GetLastError () == ERROR_INVALID_HANDLE)
 	    { /* Confirm the handle is still valid */
 	      DWORD mode;
-	      acquire_attach_mutex (INFINITE);
+	      acquire_attach_mutex (mutex_timeout);
 	      BOOL res = GetConsoleMode (get_handle (), &mode);
 	      release_attach_mutex ();
 	      if (res)
@@ -754,8 +756,8 @@ wait_retry:
 #define buf ((char *) pv)
 
       int ret;
-      acquire_input_mutex (INFINITE);
-      acquire_attach_mutex (INFINITE);
+      acquire_input_mutex (mutex_timeout);
+      acquire_attach_mutex (mutex_timeout);
       ret = process_input_message ();
       release_attach_mutex ();
       switch (ret)
@@ -1410,7 +1412,7 @@ fhandler_console::close ()
 {
   debug_printf ("closing: %p, %p", get_handle (), get_output_handle ());
 
-  acquire_output_mutex (INFINITE);
+  acquire_output_mutex (mutex_timeout);
 
   if (shared_console_info)
     {
@@ -1463,13 +1465,13 @@ fhandler_console::ioctl (unsigned int cmd, void *arg)
   int res = fhandler_termios::ioctl (cmd, arg);
   if (res <= 0)
     return res;
-  acquire_output_mutex (INFINITE);
+  acquire_output_mutex (mutex_timeout);
   switch (cmd)
     {
       case TIOCGWINSZ:
 	int st;
 
-	acquire_attach_mutex (INFINITE);
+	acquire_attach_mutex (mutex_timeout);
 	st = con.fillin (get_output_handle ());
 	release_attach_mutex ();
 	if (st)
@@ -1529,7 +1531,7 @@ fhandler_console::ioctl (unsigned int cmd, void *arg)
 	  DWORD n;
 	  int ret = 0;
 	  INPUT_RECORD inp[INREC_SIZE];
-	  acquire_attach_mutex (INFINITE);
+	  acquire_attach_mutex (mutex_timeout);
 	  if (!PeekConsoleInputW (get_handle (), inp, INREC_SIZE, &n))
 	    {
 	      set_errno (EINVAL);
@@ -1588,7 +1590,7 @@ fhandler_console::tcflush (int queue)
   if (queue == TCIFLUSH
       || queue == TCIOFLUSH)
     {
-      acquire_attach_mutex (INFINITE);
+      acquire_attach_mutex (mutex_timeout);
       if (!FlushConsoleInputBuffer (get_handle ()))
 	{
 	  __seterrno ();
@@ -2734,7 +2736,7 @@ fhandler_console::char_command (char c)
 	 fhandler_console object associated with standard input.
 	 So puts_readahead does not work.
 	 Use a common console read-ahead buffer instead. */
-      acquire_input_mutex (INFINITE);
+      acquire_input_mutex (mutex_timeout);
       con.cons_rapoi = NULL;
       strcpy (con.cons_rabuf, buf);
       con.cons_rapoi = con.cons_rabuf;
@@ -2751,7 +2753,7 @@ fhandler_console::char_command (char c)
 	  y -= con.b.srWindow.Top;
 	  /* x -= con.b.srWindow.Left;		// not available yet */
 	  __small_sprintf (buf, "\033[%d;%dR", y + 1, x + 1);
-	  acquire_input_mutex (INFINITE);
+	  acquire_input_mutex (mutex_timeout);
 	  con.cons_rapoi = NULL;
 	  strcpy (con.cons_rabuf, buf);
 	  con.cons_rapoi = con.cons_rabuf;
@@ -3109,12 +3111,12 @@ fhandler_console::write (const void *vsrc, size_t len)
   while (get_ttyp ()->output_stopped)
     cygwait (10);
 
-  acquire_attach_mutex (INFINITE);
+  acquire_attach_mutex (mutex_timeout);
   push_process_state process_state (PID_TTYOU);
 
   set_output_mode (tty::cygwin, &get_ttyp ()->ti, &handle_set);
 
-  acquire_output_mutex (INFINITE);
+  acquire_output_mutex (mutex_timeout);
 
   /* Run and check for ansi sequences */
   unsigned const char *src = (unsigned char *) vsrc;
@@ -3570,11 +3572,52 @@ set_console_title (char *title)
   debug_printf ("title '%W'", buf);
 }
 
+#define DEF_HOOK(name) static __typeof__ (name) *name##_Orig
+/* CreateProcess() is hooked for GDB etc. */
+DEF_HOOK (CreateProcessA);
+DEF_HOOK (CreateProcessW);
+
+static BOOL WINAPI
+CreateProcessA_Hooked
+     (LPCSTR n, LPSTR c, LPSECURITY_ATTRIBUTES pa, LPSECURITY_ATTRIBUTES ta,
+      BOOL inh, DWORD f, LPVOID e, LPCSTR d,
+      LPSTARTUPINFOA si, LPPROCESS_INFORMATION pi)
+{
+  if (f & (DEBUG_PROCESS | DEBUG_ONLY_THIS_PROCESS))
+    mutex_timeout = 0; /* to avoid deadlock in GDB */
+  return CreateProcessA_Orig (n, c, pa, ta, inh, f, e, d, si, pi);
+}
+
+static BOOL WINAPI
+CreateProcessW_Hooked
+     (LPCWSTR n, LPWSTR c, LPSECURITY_ATTRIBUTES pa, LPSECURITY_ATTRIBUTES ta,
+      BOOL inh, DWORD f, LPVOID e, LPCWSTR d,
+      LPSTARTUPINFOW si, LPPROCESS_INFORMATION pi)
+{
+  if (f & (DEBUG_PROCESS | DEBUG_ONLY_THIS_PROCESS))
+    mutex_timeout = 0; /* to avoid deadlock in GDB */
+  return CreateProcessW_Orig (n, c, pa, ta, inh, f, e, d, si, pi);
+}
+
 void
 fhandler_console::fixup_after_fork_exec (bool execing)
 {
   set_unit ();
   setup_io_mutex ();
+
+  if (!execing)
+    return;
+
+#define DO_HOOK(module, name) \
+  if (!name##_Orig) \
+    { \
+      void *api = hook_api (module, #name, (void *) name##_Hooked); \
+      name##_Orig = (__typeof__ (name) *) api; \
+      /*if (api) system_printf (#name " hooked.");*/ \
+    }
+  /* CreateProcess() is hooked for GDB etc. */
+  DO_HOOK (NULL, CreateProcessA);
+  DO_HOOK (NULL, CreateProcessW);
 }
 
 // #define WINSTA_ACCESS (WINSTA_READATTRIBUTES | STANDARD_RIGHTS_READ | STANDARD_RIGHTS_WRITE | WINSTA_CREATEDESKTOP | WINSTA_EXITWINDOWS)
