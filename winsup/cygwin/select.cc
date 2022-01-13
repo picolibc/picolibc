@@ -1095,22 +1095,6 @@ fhandler_fifo::select_except (select_stuff *ss)
   return s;
 }
 
-extern HANDLE attach_mutex; /* Defined in fhandler_console.cc */
-
-static inline void
-acquire_attach_mutex (DWORD t)
-{
-  if (attach_mutex)
-    WaitForSingleObject (attach_mutex, t);
-}
-
-static inline void
-release_attach_mutex ()
-{
-  if (attach_mutex)
-    ReleaseMutex (attach_mutex);
-}
-
 extern DWORD mutex_timeout; /* defined in fhandler_termios.cc */
 
 static int
