@@ -56,24 +56,7 @@ fhandler_console::console_state NO_COPY *fhandler_console::shared_console_info;
 
 bool NO_COPY fhandler_console::invisible_console;
 
-/* Mutex for AttachConsole()/FreeConsole() in fhandler_tty.cc */
-HANDLE attach_mutex;
-
 extern DWORD mutex_timeout; /* defined in fhandler_termios.cc */
-
-static inline void
-acquire_attach_mutex (DWORD t)
-{
-  if (attach_mutex)
-    WaitForSingleObject (attach_mutex, t);
-}
-
-static inline void
-release_attach_mutex ()
-{
-  if (attach_mutex)
-    ReleaseMutex (attach_mutex);
-}
 
 /* con_ra is shared in the same process.
    Only one console can exist in a process, therefore, static is suitable. */

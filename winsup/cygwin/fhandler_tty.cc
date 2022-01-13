@@ -58,8 +58,21 @@ struct pipe_reply {
   DWORD error;
 };
 
-extern HANDLE attach_mutex; /* Defined in fhandler_console.cc */
-static LONG master_cnt = 0;
+HANDLE attach_mutex;
+
+DWORD acquire_attach_mutex (DWORD t)
+{
+  if (!attach_mutex)
+    return WAIT_OBJECT_0;
+  return WaitForSingleObject (attach_mutex, t);
+}
+
+void release_attach_mutex (void)
+{
+  if (!attach_mutex)
+    return;
+  ReleaseMutex (attach_mutex);
+}
 
 inline static bool pcon_pid_alive (DWORD pid);
 
@@ -523,13 +536,13 @@ fhandler_pty_master::accept_input ()
 	{
 	  /* Slave attaches to a different console than master.
 	     Therefore reattach here. */
-	  WaitForSingleObject (attach_mutex, mutex_timeout);
+	  acquire_attach_mutex (mutex_timeout);
 	  FreeConsole ();
 	  AttachConsole (target_pid);
 	  cp_to = GetConsoleCP ();
 	  FreeConsole ();
 	  AttachConsole (resume_pid);
-	  ReleaseMutex (attach_mutex);
+	  release_attach_mutex ();
 	}
       else
 	cp_to = GetConsoleCP ();
@@ -2111,8 +2124,6 @@ fhandler_pty_master::close ()
 	  master_fwd_thread->detach ();
 	}
     }
-  if (InterlockedDecrement (&master_cnt) == 0)
-    CloseHandle (attach_mutex);
 
   /* Check if the last master handle has been closed.  If so, set
      input_available_event to wake up potentially waiting slaves. */
@@ -2838,13 +2849,13 @@ fhandler_pty_master::pty_master_fwd_thread (const master_fwd_thread_param_t *p)
 	{
 	  /* Slave attaches to a different console than master.
 	     Therefore reattach here. */
-	  WaitForSingleObject (attach_mutex, mutex_timeout);
+	  acquire_attach_mutex (mutex_timeout);
 	  FreeConsole ();
 	  AttachConsole (target_pid);
 	  cp_from = GetConsoleOutputCP ();
 	  FreeConsole ();
 	  AttachConsole (resume_pid);
-	  ReleaseMutex (attach_mutex);
+	  release_attach_mutex ();
 	}
       else
 	cp_from = GetConsoleOutputCP ();
@@ -2993,7 +3004,7 @@ fhandler_pty_master::setup ()
   if (!(pcon_mutex = CreateMutex (&sa, FALSE, buf)))
     goto err;
 
-  if (InterlockedIncrement (&master_cnt) == 1)
+  if (!attach_mutex)
     attach_mutex = CreateMutex (&sa, FALSE, NULL);
 
   /* Create master control pipe which allows the master to duplicate
@@ -3057,7 +3068,6 @@ err:
   close_maybe (input_available_event);
   close_maybe (output_mutex);
   close_maybe (input_mutex);
-  close_maybe (attach_mutex);
   close_maybe (from_master_nat);
   close_maybe (from_master);
   close_maybe (to_master_nat);

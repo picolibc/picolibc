@@ -1881,6 +1881,9 @@ class fhandler_serial: public fhandler_base
 #define release_output_mutex() \
   __release_output_mutex (__PRETTY_FUNCTION__, __LINE__)
 
+DWORD acquire_attach_mutex (DWORD t);
+void release_attach_mutex (void);
+
 class tty;
 class tty_min;
 class fhandler_termios: public fhandler_base
