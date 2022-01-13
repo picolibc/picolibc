@@ -433,56 +433,54 @@ fi
 AC_SUBST(EXEEXT_FOR_BUILD)
 
 if test "${newlib_elix_level}" -gt "0"; then
-AC_DEFINE_UNQUOTED(_ELIX_LEVEL,${newlib_elix_level})
+  AC_DEFINE_UNQUOTED(_ELIX_LEVEL, ${newlib_elix_level}, [EL/IX level])
 fi
 
 if test "${newlib_reent_check_verify}" = "yes"; then
-AC_DEFINE_UNQUOTED(_REENT_CHECK_VERIFY)
+  AC_DEFINE(_REENT_CHECK_VERIFY, 1, [Verify _REENT_CHECK macros allocate memory successfully.])
 fi
 
 if test "${newlib_io_c99_formats}" = "yes"; then
-AC_DEFINE_UNQUOTED(_WANT_IO_C99_FORMATS)
+  AC_DEFINE(_WANT_IO_C99_FORMATS, 1, [Enable C99 formats support (e.g. %a, %zu, ...) in IO functions like printf/scanf.])
 fi
 
 if test "${newlib_register_fini}" = "yes"; then
-AC_DEFINE_UNQUOTED(_WANT_REGISTER_FINI)
+  AC_DEFINE(_WANT_REGISTER_FINI, 1, [Register application finalization function using atexit.])
 fi
 
 if test "${newlib_io_long_long}" = "yes"; then
-AC_DEFINE_UNQUOTED(_WANT_IO_LONG_LONG)
+  AC_DEFINE(_WANT_IO_LONG_LONG, 1, [Define to enable long long type support in IO functions like printf/scanf.])
 fi
 
 if test "${newlib_io_long_double}" = "yes"; then
-AC_DEFINE_UNQUOTED(_WANT_IO_LONG_DOUBLE)
+  AC_DEFINE(_WANT_IO_LONG_DOUBLE, 1, [Define to enable long double type support in IO functions like printf/scanf.])
 fi
 
 if test "${newlib_io_pos_args}" = "yes"; then
-AC_DEFINE_UNQUOTED(_WANT_IO_POS_ARGS)
+  AC_DEFINE(_WANT_IO_POS_ARGS, 1, [Positional argument support in printf functions enabled.])
 fi
 
 if test "${newlib_reent_small}" = "yes"; then
-AC_DEFINE_UNQUOTED(_WANT_REENT_SMALL)
+  AC_DEFINE(_WANT_REENT_SMALL, 1, [Optional reentrant struct support.  Used mostly on platforms with very restricted storage.])
 fi
 
 if test "${newlib_global_stdio_streams}" = "yes"; then
-AC_DEFINE_UNQUOTED(_WANT_REENT_GLOBAL_STDIO_STREAMS)
+  AC_DEFINE(_WANT_REENT_GLOBAL_STDIO_STREAMS, 1,
+	    [Define to move the stdio stream FILE objects out of struct _reent and make them global.
+	     The stdio stream pointers of struct _reent are initialized to point to the global stdio FILE stream objects.])
 fi
 
+_mb_len_max=1
 if test "${newlib_mb}" = "yes"; then
-AC_DEFINE_UNQUOTED(_MB_CAPABLE)
-AC_DEFINE_UNQUOTED(_MB_LEN_MAX,8)
-else
-AC_DEFINE_UNQUOTED(_MB_LEN_MAX,1)
+  AC_DEFINE(_MB_CAPABLE, 1, [Multibyte supported.])
+  _mb_len_max=8
 fi
+AC_DEFINE_UNQUOTED(_MB_LEN_MAX, $_mb_len_max, [Multibyte max length.])
 
-if test "${newlib_iconv_external_ccs}" = "yes"; then
-AC_DEFINE_UNQUOTED(_ICONV_ENABLE_EXTERNAL_CCS)
-fi
-
-AC_DEFINE(_NEWLIB_VERSION,"NEWLIB_VERSION","The newlib version in string format.")
-AC_DEFINE(__NEWLIB__,NEWLIB_MAJOR_VERSION,"The newlib major version number.")
-AC_DEFINE(__NEWLIB_MINOR__,NEWLIB_MINOR_VERSION,"The newlib minor version number.")
-AC_DEFINE(__NEWLIB_PATCHLEVEL__,NEWLIB_PATCHLEVEL_VERSION,"The newlib patch level.")
+AC_DEFINE(_NEWLIB_VERSION, "NEWLIB_VERSION", [The newlib version in string format.])
+AC_DEFINE(__NEWLIB__, NEWLIB_MAJOR_VERSION, [The newlib major version number.])
+AC_DEFINE(__NEWLIB_MINOR__, NEWLIB_MINOR_VERSION, [The newlib minor version number.])
+AC_DEFINE(__NEWLIB_PATCHLEVEL__, NEWLIB_PATCHLEVEL_VERSION, [The newlib patch level.])
 
 if test "${multilib}" = "yes"; then
   multilib_arg="--enable-multilib"
@@ -491,62 +489,62 @@ else
 fi
 
 if test "${newlib_iconv}" = "yes"; then
-AC_DEFINE_UNQUOTED(_ICONV_ENABLED,1)
+  AC_DEFINE(_ICONV_ENABLED, 1, [ICONV enabled.])
 fi
 
 if test "x${newlib_iconv_external_ccs}" = "xyes"; then
   if test "x${newlib_iconv}" = "x"; then
       AC_MSG_ERROR(--enable-newlib-iconv-external-ccs option can't be used if iconv library is disabled, use --enable-newlib-iconv to enable it.)
   fi
-  AC_DEFINE_UNQUOTED(_ICONV_ENABLE_EXTERNAL_CCS,1)
+  AC_DEFINE(_ICONV_ENABLE_EXTERNAL_CCS, 1, [Enable ICONV external CCS files loading capabilities.])
 fi
 
 if test "${newlib_atexit_dynamic_alloc}" = "yes"; then
-AC_DEFINE_UNQUOTED(_ATEXIT_DYNAMIC_ALLOC)
+  AC_DEFINE(_ATEXIT_DYNAMIC_ALLOC, 1, [If atexit() may dynamically allocate space for cleanup functions.])
 fi
 
 if test "${newlib_global_atexit}" = "yes"; then
-AC_DEFINE_UNQUOTED(_REENT_GLOBAL_ATEXIT)
+  AC_DEFINE(_REENT_GLOBAL_ATEXIT, 1, [Define if declare atexit data as global.])
 fi
 
 if test "${newlib_fvwrite_in_streamio}" = "yes"; then
-AC_DEFINE_UNQUOTED(_FVWRITE_IN_STREAMIO)
+  AC_DEFINE(_FVWRITE_IN_STREAMIO, 1, [Define if ivo supported in streamio.])
 fi
 
 if test "${newlib_fseek_optimization}" = "yes"; then
-AC_DEFINE_UNQUOTED(_FSEEK_OPTIMIZATION)
+  AC_DEFINE(_FSEEK_OPTIMIZATION, 1, [Define if fseek functions support seek optimization.])
 fi
 
 if test "${newlib_wide_orient}" = "yes"; then
-AC_DEFINE_UNQUOTED(_WIDE_ORIENT)
+  AC_DEFINE(_WIDE_ORIENT, 1, [Define if wide char orientation is supported.])
 fi
 
 if test "${newlib_nano_malloc}" = "yes"; then
-AC_DEFINE_UNQUOTED(_NANO_MALLOC)
+  AC_DEFINE(_NANO_MALLOC, 1, [nano version of malloc is used.])
 fi
 
 if test "${newlib_unbuf_stream_opt}" = "yes"; then
-AC_DEFINE_UNQUOTED(_UNBUF_STREAM_OPT)
+  AC_DEFINE(_UNBUF_STREAM_OPT, 1, [Define if unbuffered stream file optimization is supported.])
 fi
 
 if test "${lite_exit}" = "yes"; then
-AC_DEFINE_UNQUOTED(_LITE_EXIT)
+  AC_DEFINE(_LITE_EXIT, 1, [Define if lite version of exit supported.])
 fi
 
 if test "${newlib_nano_formatted_io}" = "yes"; then
-AC_DEFINE_UNQUOTED(_NANO_FORMATTED_IO)
+  AC_DEFINE(_NANO_FORMATTED_IO, 1, [Define if small footprint nano-formatted-IO implementation used.])
 fi
 
 if test "${newlib_retargetable_locking}" = "yes"; then
-AC_DEFINE_UNQUOTED(_RETARGETABLE_LOCKING)
+  AC_DEFINE(_RETARGETABLE_LOCKING, 1, [Define if using retargetable functions for default lock routines.])
 fi
 
 if test "${newlib_long_time_t}" = "yes"; then
-AC_DEFINE_UNQUOTED(_WANT_USE_LONG_TIME_T)
+  AC_DEFINE(_WANT_USE_LONG_TIME_T, 1, [Define to use type long for time_t.])
 fi
 
 if test "${newlib_use_gdtoa}" = "yes"; then
-AC_DEFINE_UNQUOTED(_WANT_USE_GDTOA)
+  AC_DEFINE(_WANT_USE_GDTOA, 1, [Define if using gdtoa rather than legacy ldtoa.])
 fi
 
 dnl
@@ -648,7 +646,7 @@ fi
 rm -f conftest*])
 AC_SUBST(libc_cv_initfinit_array)
 if test $libc_cv_initfinit_array = yes; then
-  AC_DEFINE_UNQUOTED(_HAVE_INITFINI_ARRAY)
+  AC_DEFINE(_HAVE_INITFINI_ARRAY, 1, [Define if the linker supports .preinit_array/.init_array/.fini_array sections.])
 fi
 
 AC_CACHE_CHECK(if $CC accepts -fno-tree-loop-distribute-patterns with \
@@ -666,7 +664,7 @@ then
 fi
 rm -f conftest*])
 if test $libc_cv_cc_loop_to_function = yes; then
-  AC_DEFINE(_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL)
+  AC_DEFINE(_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL, 1, [Define if compiler supports -fno-tree-loop-distribute-patterns.])
 fi
 AC_SUBST(libc_cv_cc_loop_to_function)
 
@@ -700,7 +698,7 @@ else
 fi
 rm -f conftest*])
 if test $acnewlib_cv_type_long_double = yes; then
-  AC_DEFINE_UNQUOTED(_HAVE_LONG_DOUBLE)
+  AC_DEFINE(_HAVE_LONG_DOUBLE, 1, [Define if the platform supports long double type.])
 fi
 AM_CONDITIONAL(HAVE_LONG_DOUBLE, test x"$acnewlib_cv_type_long_double" = x"yes")
 
@@ -724,7 +722,7 @@ else
 fi
 rm -f conftest*])
 if test $newlib_cv_ldbl_eq_dbl = yes; then
-  AC_DEFINE_UNQUOTED(_LDBL_EQ_DBL)
+  AC_DEFINE(_LDBL_EQ_DBL, 1, [Define if the platform long double type is equal to double.])
 fi
 
 AC_SUBST(CFLAGS)

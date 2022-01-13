@@ -12503,6 +12503,7 @@ fi
 
 
 if test "${newlib_elix_level}" -gt "0"; then
+
 cat >>confdefs.h <<_ACEOF
 #define _ELIX_LEVEL ${newlib_elix_level}
 _ACEOF
@@ -12510,83 +12511,65 @@ _ACEOF
 fi
 
 if test "${newlib_reent_check_verify}" = "yes"; then
-cat >>confdefs.h <<_ACEOF
-#define _REENT_CHECK_VERIFY 1
-_ACEOF
+
+$as_echo "#define _REENT_CHECK_VERIFY 1" >>confdefs.h
 
 fi
 
 if test "${newlib_io_c99_formats}" = "yes"; then
-cat >>confdefs.h <<_ACEOF
-#define _WANT_IO_C99_FORMATS 1
-_ACEOF
+
+$as_echo "#define _WANT_IO_C99_FORMATS 1" >>confdefs.h
 
 fi
 
 if test "${newlib_register_fini}" = "yes"; then
-cat >>confdefs.h <<_ACEOF
-#define _WANT_REGISTER_FINI 1
-_ACEOF
+
+$as_echo "#define _WANT_REGISTER_FINI 1" >>confdefs.h
 
 fi
 
 if test "${newlib_io_long_long}" = "yes"; then
-cat >>confdefs.h <<_ACEOF
-#define _WANT_IO_LONG_LONG 1
-_ACEOF
+
+$as_echo "#define _WANT_IO_LONG_LONG 1" >>confdefs.h
 
 fi
 
 if test "${newlib_io_long_double}" = "yes"; then
-cat >>confdefs.h <<_ACEOF
-#define _WANT_IO_LONG_DOUBLE 1
-_ACEOF
+
+$as_echo "#define _WANT_IO_LONG_DOUBLE 1" >>confdefs.h
 
 fi
 
 if test "${newlib_io_pos_args}" = "yes"; then
-cat >>confdefs.h <<_ACEOF
-#define _WANT_IO_POS_ARGS 1
-_ACEOF
+
+$as_echo "#define _WANT_IO_POS_ARGS 1" >>confdefs.h
 
 fi
 
 if test "${newlib_reent_small}" = "yes"; then
-cat >>confdefs.h <<_ACEOF
-#define _WANT_REENT_SMALL 1
-_ACEOF
+
+$as_echo "#define _WANT_REENT_SMALL 1" >>confdefs.h
 
 fi
 
 if test "${newlib_global_stdio_streams}" = "yes"; then
-cat >>confdefs.h <<_ACEOF
-#define _WANT_REENT_GLOBAL_STDIO_STREAMS 1
-_ACEOF
+
+$as_echo "#define _WANT_REENT_GLOBAL_STDIO_STREAMS 1" >>confdefs.h
 
 fi
 
+_mb_len_max=1
 if test "${newlib_mb}" = "yes"; then
-cat >>confdefs.h <<_ACEOF
-#define _MB_CAPABLE 1
-_ACEOF
 
-cat >>confdefs.h <<_ACEOF
-#define _MB_LEN_MAX 8
-_ACEOF
+$as_echo "#define _MB_CAPABLE 1" >>confdefs.h
 
-else
-cat >>confdefs.h <<_ACEOF
-#define _MB_LEN_MAX 1
-_ACEOF
-
+  _mb_len_max=8
 fi
 
-if test "${newlib_iconv_external_ccs}" = "yes"; then
 cat >>confdefs.h <<_ACEOF
-#define _ICONV_ENABLE_EXTERNAL_CCS 1
+#define _MB_LEN_MAX $_mb_len_max
 _ACEOF
 
-fi
 
 
 $as_echo "#define _NEWLIB_VERSION \"4.2.0\"" >>confdefs.h
@@ -12608,9 +12591,8 @@ else
 fi
 
 if test "${newlib_iconv}" = "yes"; then
-cat >>confdefs.h <<_ACEOF
-#define _ICONV_ENABLED 1
-_ACEOF
+
+$as_echo "#define _ICONV_ENABLED 1" >>confdefs.h
 
 fi
 
@@ -12618,93 +12600,80 @@ if test "x${newlib_iconv_external_ccs}" = "xyes"; then
   if test "x${newlib_iconv}" = "x"; then
       as_fn_error use --enable-newlib-iconv to enable it. "--enable-newlib-iconv-external-ccs option can't be used if iconv library is disabled" "$LINENO" 5
   fi
-  cat >>confdefs.h <<_ACEOF
-#define _ICONV_ENABLE_EXTERNAL_CCS 1
-_ACEOF
+
+$as_echo "#define _ICONV_ENABLE_EXTERNAL_CCS 1" >>confdefs.h
 
 fi
 
 if test "${newlib_atexit_dynamic_alloc}" = "yes"; then
-cat >>confdefs.h <<_ACEOF
-#define _ATEXIT_DYNAMIC_ALLOC 1
-_ACEOF
+
+$as_echo "#define _ATEXIT_DYNAMIC_ALLOC 1" >>confdefs.h
 
 fi
 
 if test "${newlib_global_atexit}" = "yes"; then
-cat >>confdefs.h <<_ACEOF
-#define _REENT_GLOBAL_ATEXIT 1
-_ACEOF
+
+$as_echo "#define _REENT_GLOBAL_ATEXIT 1" >>confdefs.h
 
 fi
 
 if test "${newlib_fvwrite_in_streamio}" = "yes"; then
-cat >>confdefs.h <<_ACEOF
-#define _FVWRITE_IN_STREAMIO 1
-_ACEOF
+
+$as_echo "#define _FVWRITE_IN_STREAMIO 1" >>confdefs.h
 
 fi
 
 if test "${newlib_fseek_optimization}" = "yes"; then
-cat >>confdefs.h <<_ACEOF
-#define _FSEEK_OPTIMIZATION 1
-_ACEOF
+
+$as_echo "#define _FSEEK_OPTIMIZATION 1" >>confdefs.h
 
 fi
 
 if test "${newlib_wide_orient}" = "yes"; then
-cat >>confdefs.h <<_ACEOF
-#define _WIDE_ORIENT 1
-_ACEOF
+
+$as_echo "#define _WIDE_ORIENT 1" >>confdefs.h
 
 fi
 
 if test "${newlib_nano_malloc}" = "yes"; then
-cat >>confdefs.h <<_ACEOF
-#define _NANO_MALLOC 1
-_ACEOF
+
+$as_echo "#define _NANO_MALLOC 1" >>confdefs.h
 
 fi
 
 if test "${newlib_unbuf_stream_opt}" = "yes"; then
-cat >>confdefs.h <<_ACEOF
-#define _UNBUF_STREAM_OPT 1
-_ACEOF
+
+$as_echo "#define _UNBUF_STREAM_OPT 1" >>confdefs.h
 
 fi
 
 if test "${lite_exit}" = "yes"; then
-cat >>confdefs.h <<_ACEOF
-#define _LITE_EXIT 1
-_ACEOF
+
+$as_echo "#define _LITE_EXIT 1" >>confdefs.h
 
 fi
 
 if test "${newlib_nano_formatted_io}" = "yes"; then
-cat >>confdefs.h <<_ACEOF
-#define _NANO_FORMATTED_IO 1
-_ACEOF
+
+$as_echo "#define _NANO_FORMATTED_IO 1" >>confdefs.h
 
 fi
 
 if test "${newlib_retargetable_locking}" = "yes"; then
-cat >>confdefs.h <<_ACEOF
-#define _RETARGETABLE_LOCKING 1
-_ACEOF
+
+$as_echo "#define _RETARGETABLE_LOCKING 1" >>confdefs.h
 
 fi
 
 if test "${newlib_long_time_t}" = "yes"; then
-cat >>confdefs.h <<_ACEOF
-#define _WANT_USE_LONG_TIME_T 1
-_ACEOF
+
+$as_echo "#define _WANT_USE_LONG_TIME_T 1" >>confdefs.h
 
 fi
 
 if test "${newlib_use_gdtoa}" = "yes"; then
-cat >>confdefs.h <<_ACEOF
-#define _WANT_USE_GDTOA 1
-_ACEOF
+
+$as_echo "#define _WANT_USE_GDTOA 1" >>confdefs.h
 
 fi
 
@@ -12816,9 +12785,8 @@ fi
 $as_echo "$libc_cv_initfinit_array" >&6; }
 
 if test $libc_cv_initfinit_array = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define _HAVE_INITFINI_ARRAY 1
-_ACEOF
+
+$as_echo "#define _HAVE_INITFINI_ARRAY 1" >>confdefs.h
 
 fi
 
@@ -12850,7 +12818,8 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $libc_cv_cc_loop_to_function" >&5
 $as_echo "$libc_cv_cc_loop_to_function" >&6; }
 if test $libc_cv_cc_loop_to_function = yes; then
-  $as_echo "#define _HAVE_CC_INHIBIT_LOOP_TO_LIBCALL 1" >>confdefs.h
+
+$as_echo "#define _HAVE_CC_INHIBIT_LOOP_TO_LIBCALL 1" >>confdefs.h
 
 fi
 
@@ -12890,9 +12859,8 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $acnewlib_cv_type_long_double" >&5
 $as_echo "$acnewlib_cv_type_long_double" >&6; }
 if test $acnewlib_cv_type_long_double = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define _HAVE_LONG_DOUBLE 1
-_ACEOF
+
+$as_echo "#define _HAVE_LONG_DOUBLE 1" >>confdefs.h
 
 fi
  if test x"$acnewlib_cv_type_long_double" = x"yes"; then
@@ -12935,9 +12903,8 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $newlib_cv_ldbl_eq_dbl" >&5
 $as_echo "$newlib_cv_ldbl_eq_dbl" >&6; }
 if test $newlib_cv_ldbl_eq_dbl = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define _LDBL_EQ_DBL 1
-_ACEOF
+
+$as_echo "#define _LDBL_EQ_DBL 1" >>confdefs.h
 
 fi
 
