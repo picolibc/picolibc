@@ -21,6 +21,12 @@ details. */
 #include "child_info.h"
 #include "ntdll.h"
 
+/* Wait time for some treminal mutexes. This is set to 0 when the
+   process calls CreateProcess() with DEBUG_PROCESS flag, because
+   the debuggie may be suspended while it grabs the mutex. Without
+   this, GDB may cause deadlock in console or pty I/O. */
+DWORD NO_COPY mutex_timeout = INFINITE;
+
 /* Common functions shared by tty/console */
 
 void
@@ -340,7 +346,7 @@ fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
 	    }
 	  release_input_mutex_if_necessary ();
 	  tc ()->kill_pgrp (sig);
-	  acquire_input_mutex_if_necessary (INFINITE);
+	  acquire_input_mutex_if_necessary (mutex_timeout);
 	  ti.c_lflag &= ~FLUSHO;
 	  sawsig = true;
 	  goto restart_output;

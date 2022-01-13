@@ -299,6 +299,8 @@ tty_min::ttyname ()
   return d.name ();
 }
 
+extern DWORD mutex_timeout; /* defined in fhandler_termios.cc */
+
 void
 tty_min::setpgid (int pid)
 {
@@ -317,7 +319,7 @@ tty_min::setpgid (int pid)
       if (!was_pcon_fg && pcon_fg && ttyp->switch_to_pcon_in
 	  && ttyp->pcon_input_state_eq (tty::to_cyg))
 	{
-	WaitForSingleObject (ptys->input_mutex, INFINITE);
+	WaitForSingleObject (ptys->input_mutex, mutex_timeout);
 	fhandler_pty_slave::transfer_input (tty::to_nat,
 					    ptys->get_handle (), ttyp,
 					    ptys->get_input_available_event ());
@@ -341,7 +343,7 @@ tty_min::setpgid (int pid)
 	      AttachConsole (ttyp->pcon_pid);
 	      attach_restore = true;
 	    }
-	  WaitForSingleObject (ptys->input_mutex, INFINITE);
+	  WaitForSingleObject (ptys->input_mutex, mutex_timeout);
 	  fhandler_pty_slave::transfer_input (tty::to_cyg, from, ttyp,
 				  ptys->get_input_available_event ());
 	  ReleaseMutex (ptys->input_mutex);
