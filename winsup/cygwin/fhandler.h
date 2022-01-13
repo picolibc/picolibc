@@ -2209,9 +2209,11 @@ private:
   void acquire_input_mutex_if_necessary (DWORD ms)
   {
     acquire_input_mutex (ms);
+    acquire_attach_mutex (ms);
   }
   void release_input_mutex_if_necessary (void)
   {
+    release_attach_mutex ();
     release_input_mutex ();
   }
 
