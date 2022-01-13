@@ -2106,7 +2106,9 @@ fhandler_pty_master::close ()
 	      master_ctl = NULL;
 	    }
 	  release_output_mutex ();
-	  master_fwd_thread->terminate_thread ();
+	  get_ttyp ()->stop_fwd_thread = true;
+	  WriteFile (to_master_nat, "", 0, NULL, NULL);
+	  master_fwd_thread->detach ();
 	}
     }
   if (InterlockedDecrement (&master_cnt) == 0)
@@ -2695,6 +2697,8 @@ fhandler_pty_master::pty_master_fwd_thread (const master_fwd_thread_param_t *p)
 	  termios_printf ("ReadFile for forwarding failed, %E");
 	  break;
 	}
+      if (p->ttyp->stop_fwd_thread)
+	break;
       ssize_t wlen = rlen;
       char *ptr = outbuf;
       if (p->ttyp->pcon_activated)
