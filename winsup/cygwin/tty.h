@@ -132,6 +132,7 @@ private:
   xfer_dir pcon_input_state;
   bool mask_flusho;
   bool discard_input;
+  bool stop_fwd_thread;
 
 public:
   HANDLE from_master_nat () const { return _from_master_nat; }

@@ -254,6 +254,7 @@ tty::init ()
   last_sig = 0;
   mask_flusho = false;
   discard_input = false;
+  stop_fwd_thread = false;
 }
 
 HANDLE
