@@ -2146,8 +2146,6 @@ fhandler_pty_master::close ()
 
   if (!ForceCloseHandle (from_master_nat))
     termios_printf ("error closing from_master_nat %p, %E", from_master_nat);
-  if (!ForceCloseHandle (from_master))
-    termios_printf ("error closing from_master %p, %E", from_master);
   if (!ForceCloseHandle (to_master_nat))
     termios_printf ("error closing to_master_nat %p, %E", to_master_nat);
   from_master_nat = to_master_nat = NULL;
@@ -2156,7 +2154,7 @@ fhandler_pty_master::close ()
   from_slave_nat = NULL;
   if (!ForceCloseHandle (to_master))
     termios_printf ("error closing to_master %p, %E", to_master);
-  to_master = from_master = NULL;
+  to_master = NULL;
   ForceCloseHandle (echo_r);
   ForceCloseHandle (echo_w);
   echo_r = echo_w = NULL;
@@ -2170,6 +2168,12 @@ fhandler_pty_master::close ()
   if (!ForceCloseHandle (input_available_event))
     termios_printf ("CloseHandle (input_available_event<%p>), %E",
 		    input_available_event);
+
+  /* The from_master must be closed last so that the same pty is not
+     allocated before cleaning up the other corresponding instances. */
+  if (!ForceCloseHandle (from_master))
+    termios_printf ("error closing from_master %p, %E", from_master);
+  from_master = NULL;
 
   return 0;
 }
@@ -3069,12 +3073,14 @@ err:
   close_maybe (output_mutex);
   close_maybe (input_mutex);
   close_maybe (from_master_nat);
-  close_maybe (from_master);
   close_maybe (to_master_nat);
   close_maybe (to_master);
   close_maybe (echo_r);
   close_maybe (echo_w);
   close_maybe (master_ctl);
+  /* The from_master must be closed last so that the same pty is not
+     allocated before cleaning up the other corresponding instances. */
+  close_maybe (from_master);
   termios_printf ("pty%d open failed - failed to create %s", unit, errstr);
   return false;
 }
