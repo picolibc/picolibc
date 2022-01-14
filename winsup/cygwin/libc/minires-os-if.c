@@ -359,7 +359,7 @@ static void get_registry_dns(res_state statp)
   status = RtlCheckRegistryKey (RTL_REGISTRY_SERVICES, keyName);
   if (!NT_SUCCESS (status))
     {
-      DPRINTF (statp->options & RES_DEBUG, "RtlCheckRegistryKey: status %p\n",
+      DPRINTF (statp->options & RES_DEBUG, "RtlCheckRegistryKey: status 0x%08X\n",
 	       status);
       return;
     }
@@ -381,7 +381,7 @@ static void get_registry_dns(res_state statp)
   if (!NT_SUCCESS (status))
     {
       DPRINTF (statp->options & RES_DEBUG,
-	       "RtlQueryRegistryValues: status %p\n", status);
+	       "RtlQueryRegistryValues: status 0x%08X\n", status);
       return;
     }
 
