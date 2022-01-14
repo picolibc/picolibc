@@ -355,7 +355,7 @@ static void get_registry_dns(res_state statp)
   NTSTATUS status;
   const PCWSTR keyName = L"Tcpip\\Parameters";
 
-  DPRINTF(statp->options & RES_DEBUG, "key %s\n", keyName);
+  DPRINTF(statp->options & RES_DEBUG, "key %ls\n", keyName);
   status = RtlCheckRegistryKey (RTL_REGISTRY_SERVICES, keyName);
   if (!NT_SUCCESS (status))
     {
