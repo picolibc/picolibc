@@ -15,8 +15,7 @@ dnl line of the macro which fail because appropriate LDFLAGS are not set.
 _LT_DECL_SED
 _LT_PROG_ECHO_BACKSLASH
 if test "${use_libtool}" = "yes"; then
-AC_LIBTOOL_WIN32_DLL
-LT_INIT
+LT_INIT([win32-dll])
 fi
 
 if test -n "${sys_dir}"; then

@@ -16,8 +16,7 @@ dnl NEWLIB_CONFIGURE.
 _LT_DECL_SED
 _LT_PROG_ECHO_BACKSLASH
 if test "${use_libtool}" = "yes"; then
-AC_LIBTOOL_WIN32_DLL
-LT_INIT
+LT_INIT([win32-dll])
 fi
 
 AM_CONDITIONAL(MACH_ADD_SETJMP, test "x$mach_add_setjmp" = 'xtrue')
