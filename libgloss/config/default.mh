@@ -29,3 +29,6 @@ AR_FLAGS = rc
 #
 .c.s:
 	$(CC) $(CFLAGS_FOR_TARGET) -S $(INCLUDES) $(CFLAGS) $<
+
+# We don't build docs in subdirs, so stub out the rules.
+.PHONY: doc docs dvi html install-html info install-info clean-info pdf install-pdf

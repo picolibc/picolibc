@@ -11,7 +11,8 @@ AC_CONFIG_AUX_DIR(..)
 AC_PROG_INSTALL
 
 AC_CANONICAL_SYSTEM
-AM_INIT_AUTOMAKE([foreign no-define 1.15])
+AM_INIT_AUTOMAKE([foreign no-dist no-define subdir-objects 1.15.1])
+AM_SILENT_RULES(yes)
 
 if test -z "${with_multisubdir}" ; then
   AC_CONFIG_FILES([doc/Makefile])
