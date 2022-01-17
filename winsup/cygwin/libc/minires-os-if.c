@@ -69,15 +69,14 @@ static unsigned char * write_record(unsigned char * ptr, PDNS_RECORD rr,
 
   switch(rr->wType) {
   case DNS_TYPE_A:
+  case DNS_TYPE_AAAA:
   {
-    u_int8_t * aptr = (u_int8_t *) & rr->Data.A.IpAddress;
-    if (ptr + 4 <= EndPtr) {
-      ptr[0] = aptr[0];
-      ptr[1] = aptr[1];
-      ptr[2] = aptr[2];
-      ptr[3] = aptr[3];
-    }
-    ptr += 4;
+    u_int8_t * aptr = rr->wType == DNS_TYPE_A
+      ? (u_int8_t *) & rr->Data.A.IpAddress : (u_int8_t *) & rr->Data.AAAA.Ip6Address;
+    int sz = rr->wType == DNS_TYPE_A ? NS_INADDRSZ/*4*/ : NS_IN6ADDRSZ/*16*/;
+    if (ptr + sz <= EndPtr)
+      memcpy(ptr, aptr, sz);
+    ptr += sz;
     break;
   }
   case DNS_TYPE_NS:
