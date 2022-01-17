@@ -112,18 +112,24 @@ am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 lib_a_AR = $(AR) $(ARFLAGS)
 am__DEPENDENCIES_1 =
-am__objects_1 = lib_a-domainname.$(OBJEXT) \
-	lib_a-freeaddrinfo.$(OBJEXT) lib_a-getaddrinfo.$(OBJEXT) \
-	lib_a-gethostbyaddr.$(OBJEXT) lib_a-gethostbyname.$(OBJEXT) \
-	lib_a-getnameinfo.$(OBJEXT) lib_a-getservbyname.$(OBJEXT) \
-	lib_a-getservbyport.$(OBJEXT) lib_a-herror.$(OBJEXT) \
-	lib_a-hostname.$(OBJEXT) lib_a-inet_addr.$(OBJEXT) \
-	lib_a-inet_aton.$(OBJEXT) lib_a-inet_lnaof.$(OBJEXT) \
-	lib_a-inet_makeaddr.$(OBJEXT) lib_a-inet_net_ntop.$(OBJEXT) \
-	lib_a-inet_net_pton.$(OBJEXT) lib_a-inet_netof.$(OBJEXT) \
-	lib_a-inet_network.$(OBJEXT) lib_a-inet_ntoa.$(OBJEXT) \
-	lib_a-inet_ntop.$(OBJEXT) lib_a-inet_pton.$(OBJEXT) \
-	lib_a-nametoindex.$(OBJEXT) lib_a-network.$(OBJEXT) \
+am__dirstamp = $(am__leading_dot)dirstamp
+am__objects_1 = net/lib_a-domainname.$(OBJEXT) \
+	net/lib_a-freeaddrinfo.$(OBJEXT) \
+	net/lib_a-getaddrinfo.$(OBJEXT) \
+	net/lib_a-gethostbyaddr.$(OBJEXT) \
+	net/lib_a-gethostbyname.$(OBJEXT) \
+	net/lib_a-getnameinfo.$(OBJEXT) \
+	net/lib_a-getservbyname.$(OBJEXT) \
+	net/lib_a-getservbyport.$(OBJEXT) net/lib_a-herror.$(OBJEXT) \
+	net/lib_a-hostname.$(OBJEXT) net/lib_a-inet_addr.$(OBJEXT) \
+	net/lib_a-inet_aton.$(OBJEXT) net/lib_a-inet_lnaof.$(OBJEXT) \
+	net/lib_a-inet_makeaddr.$(OBJEXT) \
+	net/lib_a-inet_net_ntop.$(OBJEXT) \
+	net/lib_a-inet_net_pton.$(OBJEXT) \
+	net/lib_a-inet_netof.$(OBJEXT) \
+	net/lib_a-inet_network.$(OBJEXT) net/lib_a-inet_ntoa.$(OBJEXT) \
+	net/lib_a-inet_ntop.$(OBJEXT) net/lib_a-inet_pton.$(OBJEXT) \
+	net/lib_a-nametoindex.$(OBJEXT) net/lib_a-network.$(OBJEXT) \
 	lib_a-alarm.$(OBJEXT) lib_a-chmod.$(OBJEXT) \
 	lib_a-chown.$(OBJEXT) lib_a-clocks.$(OBJEXT) \
 	lib_a-dup.$(OBJEXT) lib_a-endmntent.$(OBJEXT) \
@@ -459,9 +465,36 @@ $(am__aclocal_m4_deps):
 
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
+net/$(am__dirstamp):
+	@$(MKDIR_P) net
+	@: > net/$(am__dirstamp)
+net/lib_a-domainname.$(OBJEXT): net/$(am__dirstamp)
+net/lib_a-freeaddrinfo.$(OBJEXT): net/$(am__dirstamp)
+net/lib_a-getaddrinfo.$(OBJEXT): net/$(am__dirstamp)
+net/lib_a-gethostbyaddr.$(OBJEXT): net/$(am__dirstamp)
+net/lib_a-gethostbyname.$(OBJEXT): net/$(am__dirstamp)
+net/lib_a-getnameinfo.$(OBJEXT): net/$(am__dirstamp)
+net/lib_a-getservbyname.$(OBJEXT): net/$(am__dirstamp)
+net/lib_a-getservbyport.$(OBJEXT): net/$(am__dirstamp)
+net/lib_a-herror.$(OBJEXT): net/$(am__dirstamp)
+net/lib_a-hostname.$(OBJEXT): net/$(am__dirstamp)
+net/lib_a-inet_addr.$(OBJEXT): net/$(am__dirstamp)
+net/lib_a-inet_aton.$(OBJEXT): net/$(am__dirstamp)
+net/lib_a-inet_lnaof.$(OBJEXT): net/$(am__dirstamp)
+net/lib_a-inet_makeaddr.$(OBJEXT): net/$(am__dirstamp)
+net/lib_a-inet_net_ntop.$(OBJEXT): net/$(am__dirstamp)
+net/lib_a-inet_net_pton.$(OBJEXT): net/$(am__dirstamp)
+net/lib_a-inet_netof.$(OBJEXT): net/$(am__dirstamp)
+net/lib_a-inet_network.$(OBJEXT): net/$(am__dirstamp)
+net/lib_a-inet_ntoa.$(OBJEXT): net/$(am__dirstamp)
+net/lib_a-inet_ntop.$(OBJEXT): net/$(am__dirstamp)
+net/lib_a-inet_pton.$(OBJEXT): net/$(am__dirstamp)
+net/lib_a-nametoindex.$(OBJEXT): net/$(am__dirstamp)
+net/lib_a-network.$(OBJEXT): net/$(am__dirstamp)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f net/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -472,143 +505,143 @@ distclean-compile:
 .c.obj:
 	$(AM_V_CC)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
-lib_a-domainname.o: net/domainname.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-domainname.o `test -f 'net/domainname.c' || echo '$(srcdir)/'`net/domainname.c
+net/lib_a-domainname.o: net/domainname.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-domainname.o `test -f 'net/domainname.c' || echo '$(srcdir)/'`net/domainname.c
 
-lib_a-domainname.obj: net/domainname.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-domainname.obj `if test -f 'net/domainname.c'; then $(CYGPATH_W) 'net/domainname.c'; else $(CYGPATH_W) '$(srcdir)/net/domainname.c'; fi`
+net/lib_a-domainname.obj: net/domainname.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-domainname.obj `if test -f 'net/domainname.c'; then $(CYGPATH_W) 'net/domainname.c'; else $(CYGPATH_W) '$(srcdir)/net/domainname.c'; fi`
 
-lib_a-freeaddrinfo.o: net/freeaddrinfo.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-freeaddrinfo.o `test -f 'net/freeaddrinfo.c' || echo '$(srcdir)/'`net/freeaddrinfo.c
+net/lib_a-freeaddrinfo.o: net/freeaddrinfo.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-freeaddrinfo.o `test -f 'net/freeaddrinfo.c' || echo '$(srcdir)/'`net/freeaddrinfo.c
 
-lib_a-freeaddrinfo.obj: net/freeaddrinfo.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-freeaddrinfo.obj `if test -f 'net/freeaddrinfo.c'; then $(CYGPATH_W) 'net/freeaddrinfo.c'; else $(CYGPATH_W) '$(srcdir)/net/freeaddrinfo.c'; fi`
+net/lib_a-freeaddrinfo.obj: net/freeaddrinfo.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-freeaddrinfo.obj `if test -f 'net/freeaddrinfo.c'; then $(CYGPATH_W) 'net/freeaddrinfo.c'; else $(CYGPATH_W) '$(srcdir)/net/freeaddrinfo.c'; fi`
 
-lib_a-getaddrinfo.o: net/getaddrinfo.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getaddrinfo.o `test -f 'net/getaddrinfo.c' || echo '$(srcdir)/'`net/getaddrinfo.c
+net/lib_a-getaddrinfo.o: net/getaddrinfo.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-getaddrinfo.o `test -f 'net/getaddrinfo.c' || echo '$(srcdir)/'`net/getaddrinfo.c
 
-lib_a-getaddrinfo.obj: net/getaddrinfo.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getaddrinfo.obj `if test -f 'net/getaddrinfo.c'; then $(CYGPATH_W) 'net/getaddrinfo.c'; else $(CYGPATH_W) '$(srcdir)/net/getaddrinfo.c'; fi`
+net/lib_a-getaddrinfo.obj: net/getaddrinfo.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-getaddrinfo.obj `if test -f 'net/getaddrinfo.c'; then $(CYGPATH_W) 'net/getaddrinfo.c'; else $(CYGPATH_W) '$(srcdir)/net/getaddrinfo.c'; fi`
 
-lib_a-gethostbyaddr.o: net/gethostbyaddr.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gethostbyaddr.o `test -f 'net/gethostbyaddr.c' || echo '$(srcdir)/'`net/gethostbyaddr.c
+net/lib_a-gethostbyaddr.o: net/gethostbyaddr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-gethostbyaddr.o `test -f 'net/gethostbyaddr.c' || echo '$(srcdir)/'`net/gethostbyaddr.c
 
-lib_a-gethostbyaddr.obj: net/gethostbyaddr.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gethostbyaddr.obj `if test -f 'net/gethostbyaddr.c'; then $(CYGPATH_W) 'net/gethostbyaddr.c'; else $(CYGPATH_W) '$(srcdir)/net/gethostbyaddr.c'; fi`
+net/lib_a-gethostbyaddr.obj: net/gethostbyaddr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-gethostbyaddr.obj `if test -f 'net/gethostbyaddr.c'; then $(CYGPATH_W) 'net/gethostbyaddr.c'; else $(CYGPATH_W) '$(srcdir)/net/gethostbyaddr.c'; fi`
 
-lib_a-gethostbyname.o: net/gethostbyname.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gethostbyname.o `test -f 'net/gethostbyname.c' || echo '$(srcdir)/'`net/gethostbyname.c
+net/lib_a-gethostbyname.o: net/gethostbyname.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-gethostbyname.o `test -f 'net/gethostbyname.c' || echo '$(srcdir)/'`net/gethostbyname.c
 
-lib_a-gethostbyname.obj: net/gethostbyname.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gethostbyname.obj `if test -f 'net/gethostbyname.c'; then $(CYGPATH_W) 'net/gethostbyname.c'; else $(CYGPATH_W) '$(srcdir)/net/gethostbyname.c'; fi`
+net/lib_a-gethostbyname.obj: net/gethostbyname.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-gethostbyname.obj `if test -f 'net/gethostbyname.c'; then $(CYGPATH_W) 'net/gethostbyname.c'; else $(CYGPATH_W) '$(srcdir)/net/gethostbyname.c'; fi`
 
-lib_a-getnameinfo.o: net/getnameinfo.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getnameinfo.o `test -f 'net/getnameinfo.c' || echo '$(srcdir)/'`net/getnameinfo.c
+net/lib_a-getnameinfo.o: net/getnameinfo.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-getnameinfo.o `test -f 'net/getnameinfo.c' || echo '$(srcdir)/'`net/getnameinfo.c
 
-lib_a-getnameinfo.obj: net/getnameinfo.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getnameinfo.obj `if test -f 'net/getnameinfo.c'; then $(CYGPATH_W) 'net/getnameinfo.c'; else $(CYGPATH_W) '$(srcdir)/net/getnameinfo.c'; fi`
+net/lib_a-getnameinfo.obj: net/getnameinfo.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-getnameinfo.obj `if test -f 'net/getnameinfo.c'; then $(CYGPATH_W) 'net/getnameinfo.c'; else $(CYGPATH_W) '$(srcdir)/net/getnameinfo.c'; fi`
 
-lib_a-getservbyname.o: net/getservbyname.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getservbyname.o `test -f 'net/getservbyname.c' || echo '$(srcdir)/'`net/getservbyname.c
+net/lib_a-getservbyname.o: net/getservbyname.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-getservbyname.o `test -f 'net/getservbyname.c' || echo '$(srcdir)/'`net/getservbyname.c
 
-lib_a-getservbyname.obj: net/getservbyname.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getservbyname.obj `if test -f 'net/getservbyname.c'; then $(CYGPATH_W) 'net/getservbyname.c'; else $(CYGPATH_W) '$(srcdir)/net/getservbyname.c'; fi`
+net/lib_a-getservbyname.obj: net/getservbyname.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-getservbyname.obj `if test -f 'net/getservbyname.c'; then $(CYGPATH_W) 'net/getservbyname.c'; else $(CYGPATH_W) '$(srcdir)/net/getservbyname.c'; fi`
 
-lib_a-getservbyport.o: net/getservbyport.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getservbyport.o `test -f 'net/getservbyport.c' || echo '$(srcdir)/'`net/getservbyport.c
+net/lib_a-getservbyport.o: net/getservbyport.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-getservbyport.o `test -f 'net/getservbyport.c' || echo '$(srcdir)/'`net/getservbyport.c
 
-lib_a-getservbyport.obj: net/getservbyport.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getservbyport.obj `if test -f 'net/getservbyport.c'; then $(CYGPATH_W) 'net/getservbyport.c'; else $(CYGPATH_W) '$(srcdir)/net/getservbyport.c'; fi`
+net/lib_a-getservbyport.obj: net/getservbyport.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-getservbyport.obj `if test -f 'net/getservbyport.c'; then $(CYGPATH_W) 'net/getservbyport.c'; else $(CYGPATH_W) '$(srcdir)/net/getservbyport.c'; fi`
 
-lib_a-herror.o: net/herror.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-herror.o `test -f 'net/herror.c' || echo '$(srcdir)/'`net/herror.c
+net/lib_a-herror.o: net/herror.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-herror.o `test -f 'net/herror.c' || echo '$(srcdir)/'`net/herror.c
 
-lib_a-herror.obj: net/herror.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-herror.obj `if test -f 'net/herror.c'; then $(CYGPATH_W) 'net/herror.c'; else $(CYGPATH_W) '$(srcdir)/net/herror.c'; fi`
+net/lib_a-herror.obj: net/herror.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-herror.obj `if test -f 'net/herror.c'; then $(CYGPATH_W) 'net/herror.c'; else $(CYGPATH_W) '$(srcdir)/net/herror.c'; fi`
 
-lib_a-hostname.o: net/hostname.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hostname.o `test -f 'net/hostname.c' || echo '$(srcdir)/'`net/hostname.c
+net/lib_a-hostname.o: net/hostname.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-hostname.o `test -f 'net/hostname.c' || echo '$(srcdir)/'`net/hostname.c
 
-lib_a-hostname.obj: net/hostname.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-hostname.obj `if test -f 'net/hostname.c'; then $(CYGPATH_W) 'net/hostname.c'; else $(CYGPATH_W) '$(srcdir)/net/hostname.c'; fi`
+net/lib_a-hostname.obj: net/hostname.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-hostname.obj `if test -f 'net/hostname.c'; then $(CYGPATH_W) 'net/hostname.c'; else $(CYGPATH_W) '$(srcdir)/net/hostname.c'; fi`
 
-lib_a-inet_addr.o: net/inet_addr.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-inet_addr.o `test -f 'net/inet_addr.c' || echo '$(srcdir)/'`net/inet_addr.c
+net/lib_a-inet_addr.o: net/inet_addr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-inet_addr.o `test -f 'net/inet_addr.c' || echo '$(srcdir)/'`net/inet_addr.c
 
-lib_a-inet_addr.obj: net/inet_addr.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-inet_addr.obj `if test -f 'net/inet_addr.c'; then $(CYGPATH_W) 'net/inet_addr.c'; else $(CYGPATH_W) '$(srcdir)/net/inet_addr.c'; fi`
+net/lib_a-inet_addr.obj: net/inet_addr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-inet_addr.obj `if test -f 'net/inet_addr.c'; then $(CYGPATH_W) 'net/inet_addr.c'; else $(CYGPATH_W) '$(srcdir)/net/inet_addr.c'; fi`
 
-lib_a-inet_aton.o: net/inet_aton.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-inet_aton.o `test -f 'net/inet_aton.c' || echo '$(srcdir)/'`net/inet_aton.c
+net/lib_a-inet_aton.o: net/inet_aton.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-inet_aton.o `test -f 'net/inet_aton.c' || echo '$(srcdir)/'`net/inet_aton.c
 
-lib_a-inet_aton.obj: net/inet_aton.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-inet_aton.obj `if test -f 'net/inet_aton.c'; then $(CYGPATH_W) 'net/inet_aton.c'; else $(CYGPATH_W) '$(srcdir)/net/inet_aton.c'; fi`
+net/lib_a-inet_aton.obj: net/inet_aton.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-inet_aton.obj `if test -f 'net/inet_aton.c'; then $(CYGPATH_W) 'net/inet_aton.c'; else $(CYGPATH_W) '$(srcdir)/net/inet_aton.c'; fi`
 
-lib_a-inet_lnaof.o: net/inet_lnaof.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-inet_lnaof.o `test -f 'net/inet_lnaof.c' || echo '$(srcdir)/'`net/inet_lnaof.c
+net/lib_a-inet_lnaof.o: net/inet_lnaof.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-inet_lnaof.o `test -f 'net/inet_lnaof.c' || echo '$(srcdir)/'`net/inet_lnaof.c
 
-lib_a-inet_lnaof.obj: net/inet_lnaof.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-inet_lnaof.obj `if test -f 'net/inet_lnaof.c'; then $(CYGPATH_W) 'net/inet_lnaof.c'; else $(CYGPATH_W) '$(srcdir)/net/inet_lnaof.c'; fi`
+net/lib_a-inet_lnaof.obj: net/inet_lnaof.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-inet_lnaof.obj `if test -f 'net/inet_lnaof.c'; then $(CYGPATH_W) 'net/inet_lnaof.c'; else $(CYGPATH_W) '$(srcdir)/net/inet_lnaof.c'; fi`
 
-lib_a-inet_makeaddr.o: net/inet_makeaddr.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-inet_makeaddr.o `test -f 'net/inet_makeaddr.c' || echo '$(srcdir)/'`net/inet_makeaddr.c
+net/lib_a-inet_makeaddr.o: net/inet_makeaddr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-inet_makeaddr.o `test -f 'net/inet_makeaddr.c' || echo '$(srcdir)/'`net/inet_makeaddr.c
 
-lib_a-inet_makeaddr.obj: net/inet_makeaddr.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-inet_makeaddr.obj `if test -f 'net/inet_makeaddr.c'; then $(CYGPATH_W) 'net/inet_makeaddr.c'; else $(CYGPATH_W) '$(srcdir)/net/inet_makeaddr.c'; fi`
+net/lib_a-inet_makeaddr.obj: net/inet_makeaddr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-inet_makeaddr.obj `if test -f 'net/inet_makeaddr.c'; then $(CYGPATH_W) 'net/inet_makeaddr.c'; else $(CYGPATH_W) '$(srcdir)/net/inet_makeaddr.c'; fi`
 
-lib_a-inet_net_ntop.o: net/inet_net_ntop.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-inet_net_ntop.o `test -f 'net/inet_net_ntop.c' || echo '$(srcdir)/'`net/inet_net_ntop.c
+net/lib_a-inet_net_ntop.o: net/inet_net_ntop.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-inet_net_ntop.o `test -f 'net/inet_net_ntop.c' || echo '$(srcdir)/'`net/inet_net_ntop.c
 
-lib_a-inet_net_ntop.obj: net/inet_net_ntop.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-inet_net_ntop.obj `if test -f 'net/inet_net_ntop.c'; then $(CYGPATH_W) 'net/inet_net_ntop.c'; else $(CYGPATH_W) '$(srcdir)/net/inet_net_ntop.c'; fi`
+net/lib_a-inet_net_ntop.obj: net/inet_net_ntop.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-inet_net_ntop.obj `if test -f 'net/inet_net_ntop.c'; then $(CYGPATH_W) 'net/inet_net_ntop.c'; else $(CYGPATH_W) '$(srcdir)/net/inet_net_ntop.c'; fi`
 
-lib_a-inet_net_pton.o: net/inet_net_pton.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-inet_net_pton.o `test -f 'net/inet_net_pton.c' || echo '$(srcdir)/'`net/inet_net_pton.c
+net/lib_a-inet_net_pton.o: net/inet_net_pton.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-inet_net_pton.o `test -f 'net/inet_net_pton.c' || echo '$(srcdir)/'`net/inet_net_pton.c
 
-lib_a-inet_net_pton.obj: net/inet_net_pton.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-inet_net_pton.obj `if test -f 'net/inet_net_pton.c'; then $(CYGPATH_W) 'net/inet_net_pton.c'; else $(CYGPATH_W) '$(srcdir)/net/inet_net_pton.c'; fi`
+net/lib_a-inet_net_pton.obj: net/inet_net_pton.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-inet_net_pton.obj `if test -f 'net/inet_net_pton.c'; then $(CYGPATH_W) 'net/inet_net_pton.c'; else $(CYGPATH_W) '$(srcdir)/net/inet_net_pton.c'; fi`
 
-lib_a-inet_netof.o: net/inet_netof.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-inet_netof.o `test -f 'net/inet_netof.c' || echo '$(srcdir)/'`net/inet_netof.c
+net/lib_a-inet_netof.o: net/inet_netof.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-inet_netof.o `test -f 'net/inet_netof.c' || echo '$(srcdir)/'`net/inet_netof.c
 
-lib_a-inet_netof.obj: net/inet_netof.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-inet_netof.obj `if test -f 'net/inet_netof.c'; then $(CYGPATH_W) 'net/inet_netof.c'; else $(CYGPATH_W) '$(srcdir)/net/inet_netof.c'; fi`
+net/lib_a-inet_netof.obj: net/inet_netof.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-inet_netof.obj `if test -f 'net/inet_netof.c'; then $(CYGPATH_W) 'net/inet_netof.c'; else $(CYGPATH_W) '$(srcdir)/net/inet_netof.c'; fi`
 
-lib_a-inet_network.o: net/inet_network.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-inet_network.o `test -f 'net/inet_network.c' || echo '$(srcdir)/'`net/inet_network.c
+net/lib_a-inet_network.o: net/inet_network.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-inet_network.o `test -f 'net/inet_network.c' || echo '$(srcdir)/'`net/inet_network.c
 
-lib_a-inet_network.obj: net/inet_network.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-inet_network.obj `if test -f 'net/inet_network.c'; then $(CYGPATH_W) 'net/inet_network.c'; else $(CYGPATH_W) '$(srcdir)/net/inet_network.c'; fi`
+net/lib_a-inet_network.obj: net/inet_network.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-inet_network.obj `if test -f 'net/inet_network.c'; then $(CYGPATH_W) 'net/inet_network.c'; else $(CYGPATH_W) '$(srcdir)/net/inet_network.c'; fi`
 
-lib_a-inet_ntoa.o: net/inet_ntoa.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-inet_ntoa.o `test -f 'net/inet_ntoa.c' || echo '$(srcdir)/'`net/inet_ntoa.c
+net/lib_a-inet_ntoa.o: net/inet_ntoa.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-inet_ntoa.o `test -f 'net/inet_ntoa.c' || echo '$(srcdir)/'`net/inet_ntoa.c
 
-lib_a-inet_ntoa.obj: net/inet_ntoa.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-inet_ntoa.obj `if test -f 'net/inet_ntoa.c'; then $(CYGPATH_W) 'net/inet_ntoa.c'; else $(CYGPATH_W) '$(srcdir)/net/inet_ntoa.c'; fi`
+net/lib_a-inet_ntoa.obj: net/inet_ntoa.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-inet_ntoa.obj `if test -f 'net/inet_ntoa.c'; then $(CYGPATH_W) 'net/inet_ntoa.c'; else $(CYGPATH_W) '$(srcdir)/net/inet_ntoa.c'; fi`
 
-lib_a-inet_ntop.o: net/inet_ntop.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-inet_ntop.o `test -f 'net/inet_ntop.c' || echo '$(srcdir)/'`net/inet_ntop.c
+net/lib_a-inet_ntop.o: net/inet_ntop.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-inet_ntop.o `test -f 'net/inet_ntop.c' || echo '$(srcdir)/'`net/inet_ntop.c
 
-lib_a-inet_ntop.obj: net/inet_ntop.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-inet_ntop.obj `if test -f 'net/inet_ntop.c'; then $(CYGPATH_W) 'net/inet_ntop.c'; else $(CYGPATH_W) '$(srcdir)/net/inet_ntop.c'; fi`
+net/lib_a-inet_ntop.obj: net/inet_ntop.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-inet_ntop.obj `if test -f 'net/inet_ntop.c'; then $(CYGPATH_W) 'net/inet_ntop.c'; else $(CYGPATH_W) '$(srcdir)/net/inet_ntop.c'; fi`
 
-lib_a-inet_pton.o: net/inet_pton.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-inet_pton.o `test -f 'net/inet_pton.c' || echo '$(srcdir)/'`net/inet_pton.c
+net/lib_a-inet_pton.o: net/inet_pton.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-inet_pton.o `test -f 'net/inet_pton.c' || echo '$(srcdir)/'`net/inet_pton.c
 
-lib_a-inet_pton.obj: net/inet_pton.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-inet_pton.obj `if test -f 'net/inet_pton.c'; then $(CYGPATH_W) 'net/inet_pton.c'; else $(CYGPATH_W) '$(srcdir)/net/inet_pton.c'; fi`
+net/lib_a-inet_pton.obj: net/inet_pton.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-inet_pton.obj `if test -f 'net/inet_pton.c'; then $(CYGPATH_W) 'net/inet_pton.c'; else $(CYGPATH_W) '$(srcdir)/net/inet_pton.c'; fi`
 
-lib_a-nametoindex.o: net/nametoindex.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-nametoindex.o `test -f 'net/nametoindex.c' || echo '$(srcdir)/'`net/nametoindex.c
+net/lib_a-nametoindex.o: net/nametoindex.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-nametoindex.o `test -f 'net/nametoindex.c' || echo '$(srcdir)/'`net/nametoindex.c
 
-lib_a-nametoindex.obj: net/nametoindex.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-nametoindex.obj `if test -f 'net/nametoindex.c'; then $(CYGPATH_W) 'net/nametoindex.c'; else $(CYGPATH_W) '$(srcdir)/net/nametoindex.c'; fi`
+net/lib_a-nametoindex.obj: net/nametoindex.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-nametoindex.obj `if test -f 'net/nametoindex.c'; then $(CYGPATH_W) 'net/nametoindex.c'; else $(CYGPATH_W) '$(srcdir)/net/nametoindex.c'; fi`
 
-lib_a-network.o: net/network.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-network.o `test -f 'net/network.c' || echo '$(srcdir)/'`net/network.c
+net/lib_a-network.o: net/network.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-network.o `test -f 'net/network.c' || echo '$(srcdir)/'`net/network.c
 
-lib_a-network.obj: net/network.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-network.obj `if test -f 'net/network.c'; then $(CYGPATH_W) 'net/network.c'; else $(CYGPATH_W) '$(srcdir)/net/network.c'; fi`
+net/lib_a-network.obj: net/network.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o net/lib_a-network.obj `if test -f 'net/network.c'; then $(CYGPATH_W) 'net/network.c'; else $(CYGPATH_W) '$(srcdir)/net/network.c'; fi`
 
 lib_a-alarm.o: alarm.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-alarm.o `test -f 'alarm.c' || echo '$(srcdir)/'`alarm.c
@@ -1034,6 +1067,7 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f net/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
