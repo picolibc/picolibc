@@ -192,7 +192,10 @@ AC_CHECK_TOOL(AR, ar)
 AC_CHECK_TOOL(RANLIB, ranlib, :)
 AC_CHECK_TOOL(READELF, readelf, :)
 
-AC_PROG_INSTALL
+dnl We need these programs, but so does Automake.  Require the macros to avoid
+dnl expanding them multiple times.
+AC_REQUIRE([AC_PROG_INSTALL])dnl
+AC_REQUIRE([AC_PROG_AWK])dnl
 
 # Hack to ensure that INSTALL won't be set to "../" with autoconf 2.13.  */
 ac_given_INSTALL=$INSTALL

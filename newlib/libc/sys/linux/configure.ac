@@ -14,7 +14,6 @@ dnl add it into NEWLIB_CONFIGURE, executable tests are made before the first
 dnl line of the macro which fail because appropriate LDFLAGS are not set.
 _LT_DECL_SED
 _LT_PROG_ECHO_BACKSLASH
-AC_PROG_AWK
 if test "${use_libtool}" = "yes"; then
 LT_INIT([win32-dll])
 fi

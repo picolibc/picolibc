@@ -3825,7 +3825,6 @@ fi
 
 
 
-
 # Hack to ensure that INSTALL won't be set to "../" with autoconf 2.13.  */
 ac_given_INSTALL=$INSTALL
 
@@ -11592,7 +11591,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11595 "configure"
+#line 11594 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11698,7 +11697,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11701 "configure"
+#line 11700 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
