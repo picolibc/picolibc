@@ -3336,6 +3336,7 @@ restart:
 	 hasn't been found. */
       if (ext_tacked_on && !had_ext && (fileattr & FILE_ATTRIBUTE_DIRECTORY))
 	{
+	  fileattr = INVALID_FILE_ATTRIBUTES;
 	  set_error (ENOENT);
 	  continue;
 	}
