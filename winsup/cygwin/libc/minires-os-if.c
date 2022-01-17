@@ -210,7 +210,7 @@ static int cygwin_query(res_state statp, const char * DomName, int Class, int Ty
 #define NO_DATA		4 /* Valid name, no data record of requested type */
 #endif
 
-  DPRINTF(debug, "DnsQuery: %lu (Windows)\n", res);
+  DPRINTF(debug, "DnsQuery: %u (Windows)\n", res);
   if (res) {
     switch (res) {
     case ERROR_INVALID_NAME:
@@ -236,7 +236,7 @@ static int cygwin_query(res_state statp, const char * DomName, int Class, int Ty
       statp->res_h_errno = NO_DATA;
       break;
     default:
-      DPRINTF(debug, "Unknown code %lu for %s %d\n", res, DomName, Type);
+      DPRINTF(debug, "Unknown code %u for %s %d\n", res, DomName, Type);
       statp->res_h_errno = NO_RECOVERY;
       break;
     }
@@ -442,7 +442,7 @@ void get_dns_info(res_state statp)
   /* First call to get the buffer length we need */
   dwRetVal = GetNetworkParams((FIXED_INFO *) 0, &ulOutBufLen);
   if (dwRetVal != ERROR_BUFFER_OVERFLOW) {
-    DPRINTF(debug, "GetNetworkParams: error %lu (Windows)\n", dwRetVal);
+    DPRINTF(debug, "GetNetworkParams: error %u (Windows)\n", dwRetVal);
     goto use_registry;
   }
   if ((pFixedInfo = (FIXED_INFO *) alloca(ulOutBufLen)) == 0) {
@@ -450,7 +450,7 @@ void get_dns_info(res_state statp)
     goto use_registry;
   }
   if ((dwRetVal = GetNetworkParams(pFixedInfo, & ulOutBufLen))) {
-    DPRINTF(debug, "GetNetworkParams: error %lu (Windows)\n", dwRetVal);
+    DPRINTF(debug, "GetNetworkParams: error %u (Windows)\n", dwRetVal);
     goto use_registry;
   }
 
