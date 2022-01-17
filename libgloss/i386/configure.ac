@@ -14,10 +14,6 @@
 #
 AC_INIT(cygmon-salib.c)
 
-if test "${enable_shared}" = "yes" ; then
-    echo "Shared libraries not supported for cross compiling, ignored"
-fi
-
 AC_CONFIG_AUX_DIR(../..)
 
 AC_CANONICAL_SYSTEM

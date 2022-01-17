@@ -1826,10 +1826,6 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-if test "${enable_shared}" = "yes" ; then
-    echo "Shared libraries not supported for cross compiling, ignored"
-fi
-
 ac_aux_dir=
 for ac_dir in ../.. "$srcdir"/../..; do
   if test -f "$ac_dir/install-sh"; then

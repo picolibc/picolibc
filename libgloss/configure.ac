@@ -3,7 +3,7 @@ AC_INIT([libgloss],[LIBGLOSS_VERSION])
 AC_CONFIG_SRCDIR([libnosys])
 
 if test "${enable_shared}" = "yes" ; then
-    echo "Shared libraries not supported for cross compiling, ignored"
+  AC_MSG_WARN([Shared libraries not supported for cross compiling, ignored])
 fi
 
 AC_CONFIG_AUX_DIR(..)

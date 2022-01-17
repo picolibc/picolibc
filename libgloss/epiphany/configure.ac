@@ -33,11 +33,6 @@
 AC_INIT(libepiphany,0.0.1)
 AC_CONFIG_HEADER(config.h)
 
-# No shared libraries allowed
-if test "${enable_shared}" = "yes" ; then
-    echo "Shared libraries not supported for cross compiling, ignored"
-fi
-
 AC_CONFIG_AUX_DIR(../..)
 
 AC_CANONICAL_SYSTEM

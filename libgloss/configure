@@ -1846,7 +1846,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 if test "${enable_shared}" = "yes" ; then
-    echo "Shared libraries not supported for cross compiling, ignored"
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Shared libraries not supported for cross compiling, ignored" >&5
+$as_echo "$as_me: WARNING: Shared libraries not supported for cross compiling, ignored" >&2;}
 fi
 
 ac_aux_dir=

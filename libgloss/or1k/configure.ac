@@ -16,11 +16,6 @@
 
 AC_INIT(libor1k,0.0.1)
 
-# No shared libraries allowed
-if test "${enable_shared}" = "yes" ; then
-    echo "Shared libraries not supported for cross compiling, ignored"
-fi
-
 # Where are the auxillary tools (confg.sub etc)?
 AC_CONFIG_AUX_DIR(../..)
 

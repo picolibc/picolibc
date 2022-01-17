@@ -12,10 +12,6 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(sparc-stub.c)
 
-if test "${enable_shared}" = "yes" ; then
-    echo "Shared libraries not supported for cross compiling, ignored"
-fi
-
 AC_CONFIG_AUX_DIR(../..)
 
 AC_PROG_INSTALL

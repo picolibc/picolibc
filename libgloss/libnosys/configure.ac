@@ -15,10 +15,6 @@
 AC_INIT(close.c)
 AC_CONFIG_HEADER(config.h)
 
-if test "${enable_shared}" = "yes" ; then
-    echo "Shared libraries not supported for cross compiling, ignored"
-fi
-
 AC_CONFIG_AUX_DIR(../..)
 
 AC_CANONICAL_SYSTEM
