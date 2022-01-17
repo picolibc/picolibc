@@ -45,7 +45,7 @@ _LT_DECL_SED
 _LT_PROG_ECHO_BACKSLASH
 if test "${use_libtool}" = "yes"; then
 AC_LIBTOOL_WIN32_DLL
-AM_PROG_LIBTOOL
+LT_INIT
 fi
 
 AC_CONFIG_SUBDIRS(machine)

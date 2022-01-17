@@ -279,7 +279,7 @@ _LT_PROG_ECHO_BACKSLASH
 AC_PROG_AWK
 if test "${use_libtool}" = "yes"; then
 AC_LIBTOOL_WIN32_DLL
-AM_PROG_LIBTOOL
+LT_INIT
 fi
 
 dnl The following is being disabled because the mathfp library is

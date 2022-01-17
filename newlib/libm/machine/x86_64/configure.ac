@@ -11,13 +11,13 @@ NEWLIB_CONFIGURE(../../..)
 
 dnl We have to add the following lines because automake detects the
 dnl references to libtool libraries from aclocal and tries to verify that
-dnl AM_PROG_LIBTOOL is being used.  This code must occur after
-dnl NEWLIB_CONFIGURE. 
+dnl LT_INIT is being used.  This must be added after dnl the call to
+dnl NEWLIB_CONFIGURE.
 _LT_DECL_SED
 _LT_PROG_ECHO_BACKSLASH
 if test "${use_libtool}" = "yes"; then
 AC_LIBTOOL_WIN32_DLL
-AM_PROG_LIBTOOL
+LT_INIT
 fi
 
 AC_CONFIG_FILES([Makefile])
