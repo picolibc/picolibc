@@ -584,8 +584,8 @@ sub generate_aliasesbi_c($)
   print ALIASESBI_C "$comment_automatic\n\n";
   print ALIASESBI_C "#include <_ansi.h>\n";
   print ALIASESBI_C "#include \"encnames.h\"\n\n";
-  print ALIASESBI_C "const char *\n";
-  print ALIASESBI_C "$var_aliases =\n";
+  print ALIASESBI_C "const char\n";
+  print ALIASESBI_C "$var_aliases\[\] =\n";
   print ALIASESBI_C "{\n";
 
   foreach my $enc (sort keys %{$_[0]})
@@ -598,7 +598,7 @@ sub generate_aliasesbi_c($)
     print ALIASESBI_C "#endif\n";
   }
   print ALIASESBI_C "  \"\"\n";
-  print ALIASESBI_C "};\n\n";
+  print ALIASESBI_C "};\n";
   
   close ALIASESBI_C or err "Error while closing ../lib/aliasesbi.c file.";
 }
