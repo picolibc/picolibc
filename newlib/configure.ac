@@ -477,10 +477,12 @@ if test "${newlib_mb}" = "yes"; then
 fi
 AC_DEFINE_UNQUOTED(_MB_LEN_MAX, $_mb_len_max, [Multibyte max length.])
 
-AC_DEFINE(_NEWLIB_VERSION, "NEWLIB_VERSION", [The newlib version in string format.])
-AC_DEFINE(__NEWLIB__, NEWLIB_MAJOR_VERSION, [The newlib major version number.])
-AC_DEFINE(__NEWLIB_MINOR__, NEWLIB_MINOR_VERSION, [The newlib minor version number.])
-AC_DEFINE(__NEWLIB_PATCHLEVEL__, NEWLIB_PATCHLEVEL_VERSION, [The newlib patch level.])
+dnl These are AC_SUBST instead of AC_DEFINE as they're hand maintained in a
+dnl dedicated _newlib_version.h, and we don't want them in newlib.h.
+AC_SUBST([NEWLIB_VERSION])
+AC_SUBST([NEWLIB_MAJOR_VERSION])
+AC_SUBST([NEWLIB_MINOR_VERSION])
+AC_SUBST([NEWLIB_PATCHLEVEL_VERSION])
 
 if test "${multilib}" = "yes"; then
   multilib_arg="--enable-multilib"
