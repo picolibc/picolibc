@@ -49,7 +49,7 @@ _sbrk_r (struct _reent *ptr,
 
   errno = 0;
   if ((ret = (char *)(_sbrk (incr))) == (void *) -1 && errno != 0)
-    ptr->_errno = errno;
+    _REENT_ERRNO(ptr) = errno;
   return ret;
 }
 

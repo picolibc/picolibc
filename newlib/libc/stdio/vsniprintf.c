@@ -54,7 +54,7 @@ _vsniprintf_r (struct _reent *ptr,
 
   if (size > INT_MAX)
     {
-      ptr->_errno = EOVERFLOW;
+      _REENT_ERRNO(ptr) = EOVERFLOW;
       return EOF;
     }
   f._flags = __SWR | __SSTR;
@@ -63,7 +63,7 @@ _vsniprintf_r (struct _reent *ptr,
   f._file = -1;  /* No file. */
   ret = _svfiprintf_r (ptr, &f, fmt, ap);
   if (ret < EOF)
-    ptr->_errno = EOVERFLOW;
+    _REENT_ERRNO(ptr) = EOVERFLOW;
   if (size > 0)
     *f._p = 0;
   return ret;

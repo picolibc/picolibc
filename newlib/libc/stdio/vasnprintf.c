@@ -42,7 +42,7 @@ _vasnprintf_r (struct _reent *ptr,
      for _size.  */
   if (len > INT_MAX)
     {
-      ptr->_errno = EOVERFLOW;
+      _REENT_ERRNO(ptr) = EOVERFLOW;
       return NULL;
     }
   f._bf._size = f._w = len;

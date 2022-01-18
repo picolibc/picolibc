@@ -53,7 +53,7 @@ _fstat_r (ptr, fd, pstat)
 
   errno = 0;
   if ((ret = _fstat (fd, pstat)) == -1 && errno != 0)
-    ptr->_errno = errno;
+    _REENT_ERRNO(ptr) = errno;
   return ret;
 }
 

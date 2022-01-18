@@ -115,10 +115,10 @@ _strtoumax_l(struct _reent *rptr, const char * __restrict nptr,
 	}
 	if (any < 0) {
 		acc = UINTMAX_MAX;
-		rptr->_errno = ERANGE;
+		_REENT_ERRNO(rptr) = ERANGE;
 	} else if (!any) {
 noconv:
-		rptr->_errno = EINVAL;
+		_REENT_ERRNO(rptr) = EINVAL;
 	} else if (neg)
 		acc = -acc;
 	if (endptr != NULL)

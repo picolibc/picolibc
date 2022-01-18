@@ -211,7 +211,7 @@ _iconv_r (struct _reent *rptr,
        || (ic->handlers != &_iconv_null_conversion_handlers
            && ic->handlers != &_iconv_ucs_conversion_handlers))
     {
-      __errno_r (rptr) = EBADF;
+      _REENT_ERRNO (rptr) = EBADF;
       return (size_t)-1;
     }
 
@@ -257,19 +257,19 @@ _iconv_r (struct _reent *rptr,
            ic->handlers->set_state (ic->data, &state_save, 1);
         }
        
-      __errno_r (rptr) = E2BIG;
+      _REENT_ERRNO (rptr) = E2BIG;
       return (size_t)-1;
     }
   
   if (*inbytesleft == 0)
     {
-      __errno_r (rptr) = EINVAL;
+      _REENT_ERRNO (rptr) = EINVAL;
       return (size_t)-1;
     }
    
   if (*outbytesleft == 0 || *outbuf == NULL)
     {
-      __errno_r (rptr) = E2BIG;
+      _REENT_ERRNO (rptr) = E2BIG;
       return (size_t)-1;
     }
 
@@ -294,7 +294,7 @@ _iconv_close_r (struct _reent *rptr,
        || (ic->handlers != &_iconv_null_conversion_handlers
            && ic->handlers != &_iconv_ucs_conversion_handlers))
     {
-      __errno_r (rptr) = EBADF;
+      _REENT_ERRNO (rptr) = EBADF;
       return -1;
     }
 

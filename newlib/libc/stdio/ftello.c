@@ -96,7 +96,7 @@ _ftello_r (struct _reent * ptr,
 
   if (fp->_seek == NULL)
     {
-      ptr->_errno = ESPIPE;
+      _REENT_ERRNO(ptr) = ESPIPE;
       _newlib_flockfile_exit (fp);
       return (_off_t) -1;
     }

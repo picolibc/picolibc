@@ -177,7 +177,7 @@ _iconv_nls_conv (struct _reent *rptr,
        || (ic->handlers != &_iconv_null_conversion_handlers
            && ic->handlers != &_iconv_ucs_conversion_handlers))
     {
-      __errno_r (rptr) = EBADF;
+      _REENT_ERRNO (rptr) = EBADF;
       return (size_t)-1;
     }
   
@@ -189,7 +189,7 @@ _iconv_nls_conv (struct _reent *rptr,
   
   if (outbytesleft == NULL || *outbytesleft == 0)
     {
-      __errno_r (rptr) = E2BIG;
+      _REENT_ERRNO (rptr) = E2BIG;
       return (size_t)-1;
     }
 

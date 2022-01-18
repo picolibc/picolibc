@@ -24,7 +24,7 @@ extern int *__errno (void);
 extern const char * const _sys_errlist[];
 extern int _sys_nerr;
 
-#define __errno_r(ptr) ((ptr)->_errno)
+#define __errno_r(ptr) _REENT_ERRNO(ptr)
 
 /* Adjusted to the linux asm/errno.h */
 #define	EPERM		 1	/* Operation not permitted */

@@ -26,7 +26,7 @@ extern __IMPORT char *program_invocation_name;
 extern __IMPORT char *program_invocation_short_name;
 #endif
 
-#define __errno_r(ptr) ((ptr)->_errno)
+#define __errno_r(ptr) _REENT_ERRNO(ptr)
 
 #define	EPERM 1		/* Not owner */
 #define	ENOENT 2	/* No such file or directory */

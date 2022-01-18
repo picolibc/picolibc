@@ -49,7 +49,7 @@ _rename_r (struct _reent *ptr,
 #ifdef HAVE_RENAME
   errno = 0;
   if ((ret = _rename (old, new)) == -1 && errno != 0)
-    ptr->_errno = errno;
+    _REENT_ERRNO(ptr) = errno;
 #else
   if (_link_r (ptr, old, new) == -1)
     return -1;

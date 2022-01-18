@@ -164,7 +164,7 @@ ucs_based_conversion_convert (struct _reent *rptr,
 
       if (*outbytesleft == 0)
         {
-          __errno_r (rptr) = E2BIG;
+          _REENT_ERRNO (rptr) = E2BIG;
           return (size_t)-1;
         }
 
@@ -173,13 +173,13 @@ ucs_based_conversion_convert (struct _reent *rptr,
 
       if (ch == (ucs4_t)ICONV_CES_BAD_SEQUENCE)
         {
-          __errno_r (rptr) = EINVAL;
+          _REENT_ERRNO (rptr) = EINVAL;
           return (size_t)-1;
         }
 
       if (ch == (ucs4_t)ICONV_CES_INVALID_CHARACTER)
         {
-          __errno_r (rptr) = EILSEQ;
+          _REENT_ERRNO (rptr) = EILSEQ;
           return (size_t)-1;
         }
 
@@ -196,7 +196,7 @@ ucs_based_conversion_convert (struct _reent *rptr,
         {
           *inbuf = inbuf_save;
           *inbytesleft = inbyteslef_save;
-          __errno_r (rptr) = E2BIG;
+          _REENT_ERRNO (rptr) = E2BIG;
           return (size_t)-1;
         }
       else if (bytes == (size_t)ICONV_CES_INVALID_CHARACTER)
@@ -204,7 +204,7 @@ ucs_based_conversion_convert (struct _reent *rptr,
           if (flags & ICONV_FAIL_BIT)
             {
               /* Generate error */
-              __errno_r (rptr) = EILSEQ;
+              _REENT_ERRNO (rptr) = EILSEQ;
               return (size_t)-1;
             }
           /*
@@ -221,7 +221,7 @@ ucs_based_conversion_convert (struct _reent *rptr,
                                          outbytesleft);
           if ((__int32_t)bytes < 0)
             {
-              __errno_r (rptr) = E2BIG;
+              _REENT_ERRNO (rptr) = E2BIG;
               return (size_t)-1;
             }
       

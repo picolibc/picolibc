@@ -84,7 +84,7 @@ _wctrans_r (struct _reent *r,
     return WCT_TOUPPER;
   else
     {
-      r->_errno = EINVAL;
+      _REENT_ERRNO(r) = EINVAL;
       return 0;
     }
 }

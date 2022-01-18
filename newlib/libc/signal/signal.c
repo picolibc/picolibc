@@ -115,7 +115,7 @@ _signal_r (struct _reent *ptr,
 
   if (sig < 0 || sig >= NSIG)
     {
-      ptr->_errno = EINVAL;
+      _REENT_ERRNO(ptr) = EINVAL;
       return SIG_ERR;
     }
 
@@ -136,7 +136,7 @@ _raise_r (struct _reent *ptr,
 
   if (sig < 0 || sig >= NSIG)
     {
-      ptr->_errno = EINVAL;
+      _REENT_ERRNO(ptr) = EINVAL;
       return -1;
     }
 
@@ -151,7 +151,7 @@ _raise_r (struct _reent *ptr,
     return 0;
   else if (func == SIG_ERR)
     {
-      ptr->_errno = EINVAL;
+      _REENT_ERRNO(ptr) = EINVAL;
       return 1;
     }
   else

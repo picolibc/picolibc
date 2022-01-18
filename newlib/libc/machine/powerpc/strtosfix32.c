@@ -29,10 +29,10 @@ _strtosfix32_r (struct _reent *rptr,
     {
       if (isnan (dbl.d))
 	{
-	  rptr->_errno = EDOM;
+	  _REENT_ERRNO(rptr) = EDOM;
 	  return 0;
 	}
-      rptr->_errno = ERANGE;
+      _REENT_ERRNO(rptr) = ERANGE;
       if (word0(dbl) & Sign_bit)
 	return LONG_MIN;
       return LONG_MAX;
@@ -41,12 +41,12 @@ _strtosfix32_r (struct _reent *rptr,
   /* check for normal saturation */
   if (dbl.d >= 1.0)
     {
-      rptr->_errno = ERANGE;
+      _REENT_ERRNO(rptr) = ERANGE;
       return LONG_MAX;
     }
   else if (dbl.d < -1.0)
     {
-      rptr->_errno = ERANGE;
+      _REENT_ERRNO(rptr) = ERANGE;
       return LONG_MIN;
     }
 
@@ -75,7 +75,7 @@ _strtosfix32_r (struct _reent *rptr,
       /* check if positive saturation has occurred because of rounding */
       if (!sign && result < 0)
 	{
-	  rptr->_errno = ERANGE;
+	  _REENT_ERRNO(rptr) = ERANGE;
 	  return LONG_MAX;
 	}
     }

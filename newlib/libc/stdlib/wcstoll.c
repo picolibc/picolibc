@@ -200,7 +200,7 @@ _wcstoll_l (struct _reent *rptr, const wchar_t *nptr, wchar_t **endptr,
 	}
 	if (any < 0) {
 		acc = neg ? LONG_LONG_MIN : LONG_LONG_MAX;
-		rptr->_errno = ERANGE;
+		_REENT_ERRNO(rptr) = ERANGE;
 	} else if (neg)
 		acc = -acc;
 	if (endptr != 0)

@@ -35,7 +35,7 @@ __ascii_wctomb (struct _reent *r,
   if ((size_t)wchar >= 0x100)
 #endif
     {
-      r->_errno = EILSEQ;
+      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
 
@@ -133,7 +133,7 @@ __utf8_wctomb (struct _reent *r,
       return 4;
     }
 
-  r->_errno = EILSEQ;
+  _REENT_ERRNO(r) = EILSEQ;
   return -1;
 }
 
@@ -165,7 +165,7 @@ __sjis_wctomb (struct _reent *r,
 	}
       else
 	{
-	  r->_errno = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
@@ -204,7 +204,7 @@ __eucjp_wctomb (struct _reent *r,
 	}
       else
 	{
-	  r->_errno = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
@@ -244,7 +244,7 @@ __jis_wctomb (struct _reent *r,
 	  *s = (char)char2;
 	  return cnt + 2;
 	}
-      r->_errno = EILSEQ;
+      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
   if (state->__state != 0)
@@ -284,14 +284,14 @@ ___iso_wctomb (struct _reent *r, char *s, wchar_t _wchar, int iso_idx,
 		*s = (char) (mb + 0xa0);
 		return 1;
 	      }
-	  r->_errno = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
  
   if ((size_t)wchar >= 0x100)
     {
-      r->_errno = EILSEQ;
+      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
 
@@ -440,14 +440,14 @@ ___cp_wctomb (struct _reent *r, char *s, wchar_t _wchar, int cp_idx,
 		*s = (char) (mb + 0x80);
 		return 1;
 	      }
-	  r->_errno = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
 
   if ((size_t)wchar >= 0x100)
     {
-      r->_errno = EILSEQ;
+      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
 

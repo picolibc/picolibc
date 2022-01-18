@@ -104,7 +104,7 @@ worker (struct _reent *ptr,
       t = _open_r (ptr, result, O_RDONLY, 0);
       if (t == -1)
 	{
-	  if (ptr->_errno == ENOSYS)
+	  if (_REENT_ERRNO(ptr) == ENOSYS)
 	    {
 	      result[0] = '\0';
 	      return 0;

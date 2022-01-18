@@ -564,7 +564,7 @@ _swprintf_r (struct _reent *ptr,
 
   if (size > INT_MAX / sizeof (wchar_t))
     {
-      ptr->_errno = EOVERFLOW;	/* POSIX extension */
+      _REENT_ERRNO(ptr) = EOVERFLOW;	/* POSIX extension */
       return EOF;
     }
   f._flags = __SWR | __SSTR;
@@ -584,7 +584,7 @@ _swprintf_r (struct _reent *ptr,
     /* _svfwprintf_r() returns how many wide characters it would have printed
      * if there were enough space.  Return an error if too big to fit in str,
      * unlike snprintf, which returns the size needed.  */
-    ptr->_errno = EOVERFLOW;	/* POSIX extension */
+    _REENT_ERRNO(ptr) = EOVERFLOW;	/* POSIX extension */
     ret = -1;
   }
   return (ret);
@@ -604,7 +604,7 @@ swprintf (wchar_t *__restrict str,
 
   if (size > INT_MAX / sizeof (wchar_t))
     {
-      ptr->_errno = EOVERFLOW;	/* POSIX extension */
+      _REENT_ERRNO(ptr) = EOVERFLOW;	/* POSIX extension */
       return EOF;
     }
   f._flags = __SWR | __SSTR;
@@ -624,7 +624,7 @@ swprintf (wchar_t *__restrict str,
     /* _svfwprintf_r() returns how many wide characters it would have printed
      * if there were enough space.  Return an error if too big to fit in str,
      * unlike snprintf, which returns the size needed.  */
-    ptr->_errno = EOVERFLOW;	/* POSIX extension */
+    _REENT_ERRNO(ptr) = EOVERFLOW;	/* POSIX extension */
     ret = -1;
   }
   return (ret);

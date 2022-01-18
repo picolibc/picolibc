@@ -882,7 +882,7 @@ _strerror_r (struct _reent *ptr,
 #endif
     default:
       if (!errptr)
-        errptr = &ptr->_errno;
+        errptr = &_REENT_ERRNO(ptr);
       if ((error = _user_strerror (errnum, internal, errptr)) == 0)
         error = "";
       break;

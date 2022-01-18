@@ -10,7 +10,7 @@
 int *
 __errno ()
 {
-  return &_REENT->_errno;
+  return &_REENT_ERRNO(_REENT);
 }
 
 #endif

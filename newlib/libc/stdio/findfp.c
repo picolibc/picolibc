@@ -179,7 +179,7 @@ __sfp (struct _reent *d)
 	break;
     }
   _newlib_sfp_lock_exit ();
-  d->_errno = ENOMEM;
+  _REENT_ERRNO(d) = ENOMEM;
   return NULL;
 
 found:

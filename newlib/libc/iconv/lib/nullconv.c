@@ -73,7 +73,7 @@ null_conversion_convert (struct _reent *rptr,
     {
       result = (size_t)-1;
       len = *outbytesleft;
-      __errno_r (rptr) = E2BIG;
+      _REENT_ERRNO (rptr) = E2BIG;
     }
   
   if ((flags & 1) == 0)

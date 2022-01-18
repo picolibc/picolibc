@@ -47,7 +47,7 @@ _lseek_r (struct _reent *ptr,
 
   errno = 0;
   if ((ret = _lseek (fd, pos, whence)) == (_off_t) -1 && errno != 0)
-    ptr->_errno = errno;
+    _REENT_ERRNO(ptr) = errno;
   return ret;
 }
 

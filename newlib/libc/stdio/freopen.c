@@ -137,7 +137,7 @@ _freopen_r (struct _reent *ptr,
   if (file != NULL)
     {
       f = _open_r (ptr, (char *) file, oflags, 0666);
-      e = ptr->_errno;
+      e = _REENT_ERRNO(ptr);
     }
   else
     {
@@ -205,7 +205,7 @@ _freopen_r (struct _reent *ptr,
     {				/* did not get it after all */
       __sfp_lock_acquire ();
       fp->_flags = 0;		/* set it free */
-      ptr->_errno = e;		/* restore in case _close clobbered */
+      _REENT_ERRNO(ptr) = e;	/* restore in case _close clobbered */
       if (!(oflags2 & __SNLK))
 	_funlockfile (fp);
 #ifndef __SINGLE_THREAD__

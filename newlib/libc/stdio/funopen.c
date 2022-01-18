@@ -113,7 +113,7 @@ funreader (struct _reent *ptr,
   funcookie *c = (funcookie *) cookie;
   errno = 0;
   if ((result = c->readfn (c->cookie, buf, n)) < 0 && errno)
-    ptr->_errno = errno;
+    _REENT_ERRNO(ptr) = errno;
   return result;
 }
 
@@ -127,7 +127,7 @@ funwriter (struct _reent *ptr,
   funcookie *c = (funcookie *) cookie;
   errno = 0;
   if ((result = c->writefn (c->cookie, buf, n)) < 0 && errno)
-    ptr->_errno = errno;
+    _REENT_ERRNO(ptr) = errno;
   return result;
 }
 
@@ -142,15 +142,15 @@ funseeker (struct _reent *ptr,
   fpos_t result;
   errno = 0;
   if ((result = c->seekfn (c->cookie, (fpos_t) off, whence)) < 0 && errno)
-    ptr->_errno = errno;
+    _REENT_ERRNO(ptr) = errno;
 #else /* __LARGE64_FILES */
   _fpos64_t result;
   errno = 0;
   if ((result = c->seekfn (c->cookie, (_fpos64_t) off, whence)) < 0 && errno)
-    ptr->_errno = errno;
+    _REENT_ERRNO(ptr) = errno;
   else if ((_fpos_t)result != result)
     {
-      ptr->_errno = EOVERFLOW;
+      _REENT_ERRNO(ptr) = EOVERFLOW;
       result = -1;
     }
 #endif /* __LARGE64_FILES */
@@ -168,7 +168,7 @@ funseeker64 (struct _reent *ptr,
   funcookie *c = (funcookie *) cookie;
   errno = 0;
   if ((result = c->seekfn (c->cookie, off, whence)) < 0 && errno)
-    ptr->_errno = errno;
+    _REENT_ERRNO(ptr) = errno;
   return result;
 }
 #endif /* __LARGE64_FILES */
@@ -183,7 +183,7 @@ funcloser (struct _reent *ptr,
     {
       errno = 0;
       if ((result = c->closefn (c->cookie)) < 0 && errno)
-	ptr->_errno = errno;
+	_REENT_ERRNO(ptr) = errno;
     }
   _free_r (ptr, c);
   return result;
@@ -202,7 +202,7 @@ _funopen_r (struct _reent *ptr,
 
   if (!readfn && !writefn)
     {
-      ptr->_errno = EINVAL;
+      _REENT_ERRNO(ptr) = EINVAL;
       return NULL;
     }
   if ((fp = __sfp (ptr)) == NULL)

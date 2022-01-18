@@ -54,7 +54,7 @@ _execve_r (struct _reent *ptr,
 
   errno = 0;
   if ((ret = _execve (name, argv, env)) == -1 && errno != 0)
-    ptr->_errno = errno;
+    _REENT_ERRNO(ptr) = errno;
   return ret;
 }
 
@@ -86,7 +86,7 @@ _fork_r (struct _reent *ptr)
 
   errno = 0;
   if ((ret = _fork ()) == -1 && errno != 0)
-    ptr->_errno = errno;
+    _REENT_ERRNO(ptr) = errno;
   return ret;
 }
 
@@ -118,7 +118,7 @@ _wait_r (struct _reent *ptr,
 
   errno = 0;
   if ((ret = _wait (status)) == -1 && errno != 0)
-    ptr->_errno = errno;
+    _REENT_ERRNO(ptr) = errno;
   return ret;
 }
 

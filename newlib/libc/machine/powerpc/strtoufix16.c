@@ -106,10 +106,10 @@ _strtoufix16_r (struct _reent *rptr,
     {
       if (isnan (dbl.d))
 	{
-	  rptr->_errno = EDOM;
+	  _REENT_ERRNO(rptr) = EDOM;
 	  return 0;
 	}
-      rptr->_errno = ERANGE;
+      _REENT_ERRNO(rptr) = ERANGE;
       if (word0(dbl) & Sign_bit)
 	return 0;
       return USHRT_MAX;
@@ -118,12 +118,12 @@ _strtoufix16_r (struct _reent *rptr,
   /* check for normal saturation */
   if (dbl.d >= 1.0)
     {
-      rptr->_errno = ERANGE;
+      _REENT_ERRNO(rptr) = ERANGE;
       return USHRT_MAX;
     }
   else if (dbl.d < 0)
     {
-      rptr->_errno = ERANGE;
+      _REENT_ERRNO(rptr) = ERANGE;
       return 0;
     }
 
@@ -147,7 +147,7 @@ _strtoufix16_r (struct _reent *rptr,
       if (negexp == 0)
 	{
 	  /* we have overflow which means saturation */
-	  rptr->_errno = ERANGE;
+	  _REENT_ERRNO(rptr) = ERANGE;
 	  return USHRT_MAX;
 	}
       result |= (1 << (16 - negexp));

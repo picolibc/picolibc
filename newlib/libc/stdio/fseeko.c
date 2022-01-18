@@ -128,7 +128,7 @@ _fseeko_r (struct _reent *ptr,
 
   if ((seekfn = fp->_seek) == NULL)
     {
-      ptr->_errno = ESPIPE;	/* ??? */
+      _REENT_ERRNO(ptr) = ESPIPE;	/* ??? */
       _newlib_flockfile_exit (fp);
       return EOF;
     }
@@ -178,7 +178,7 @@ _fseeko_r (struct _reent *ptr,
       break;
 
     default:
-      ptr->_errno = EINVAL;
+      _REENT_ERRNO(ptr) = EINVAL;
       _newlib_flockfile_exit (fp);
       return (EOF);
     }

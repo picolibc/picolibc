@@ -222,7 +222,7 @@ __ssputs_r (struct _reent *ptr,
 			str = (unsigned char *)_malloc_r (ptr, newsize);
 			if (!str)
 			{
-				ptr->_errno = ENOMEM;
+				_REENT_ERRNO(ptr) = ENOMEM;
 				goto err;
 			}
 			memcpy (str, fp->_bf._base, curpos);
@@ -237,7 +237,7 @@ __ssputs_r (struct _reent *ptr,
 				_free_r (ptr, fp->_bf._base);
 				/* Ensure correct errno, even if free
 				 * changed it.  */
-				ptr->_errno = ENOMEM;
+				_REENT_ERRNO(ptr) = ENOMEM;
 				goto err;
 			}
 		}
@@ -306,7 +306,7 @@ __ssprint_r (struct _reent *ptr,
 				str = (unsigned char *)_malloc_r (ptr, newsize);
 				if (!str)
 				{
-					ptr->_errno = ENOMEM;
+					_REENT_ERRNO(ptr) = ENOMEM;
 					goto err;
 				}
 				memcpy (str, fp->_bf._base, curpos);
@@ -321,7 +321,7 @@ __ssprint_r (struct _reent *ptr,
 					_free_r (ptr, fp->_bf._base);
 					/* Ensure correct errno, even if free
 					 * changed it.  */
-					ptr->_errno = ENOMEM;
+					_REENT_ERRNO(ptr) = ENOMEM;
 					goto err;
 				}
 			}
@@ -868,7 +868,7 @@ _VFPRINTF_R (struct _reent *data,
 		fp->_bf._base = fp->_p = _malloc_r (data, 64);
 		if (!fp->_p)
 		{
-			data->_errno = ENOMEM;
+			_REENT_ERRNO(data) = ENOMEM;
 			return EOF;
 		}
 		fp->_bf._size = 64;
@@ -1374,7 +1374,7 @@ reswitch:	switch (ch) {
 		case 'm':  /* extension */
 			{
 				int dummy;
-				cp = _strerror_r (data, data->_errno, 1, &dummy);
+				cp = _strerror_r (data, _REENT_ERRNO(data), 1, &dummy);
 			}
 			flags &= ~LONGINT;
 			goto string;

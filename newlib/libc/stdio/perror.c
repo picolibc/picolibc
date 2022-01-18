@@ -90,7 +90,7 @@ _perror_r (struct _reent *ptr,
       WRITE_STR (": ");
     }
 
-  if ((error = _strerror_r (ptr, ptr->_errno, 1, &dummy)) != NULL)
+  if ((error = _strerror_r (ptr, _REENT_ERRNO(ptr), 1, &dummy)) != NULL)
     WRITE_STR (error);
 
 #ifdef __SCLE

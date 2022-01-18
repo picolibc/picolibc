@@ -56,7 +56,7 @@ __sflags (struct _reent *ptr,
       o = O_CREAT | O_APPEND;
       break;
     default:			/* illegal mode */
-      ptr->_errno = EINVAL;
+      _REENT_ERRNO(ptr) = EINVAL;
       return (0);
     }
   while (*++mode)

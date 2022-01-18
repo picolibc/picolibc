@@ -595,7 +595,7 @@ _strtod_l (struct _reent *ptr, const char *__restrict s00, char **__restrict se,
 			if (e1 > DBL_MAX_10_EXP) {
  ovfl:
 #ifndef NO_ERRNO
-				ptr->_errno = ERANGE;
+				_REENT_ERRNO(ptr) = ERANGE;
 #endif
 				/* Can't trust HUGE_VAL */
 #ifdef IEEE_Arith
@@ -702,7 +702,7 @@ _strtod_l (struct _reent *ptr, const char *__restrict s00, char **__restrict se,
  undfl:
 					dval(rv) = 0.;
 #ifndef NO_ERRNO
-					ptr->_errno = ERANGE;
+					_REENT_ERRNO(ptr) = ERANGE;
 #endif
 					if (bd0)
 						goto retfree;
@@ -1249,7 +1249,7 @@ _strtod_l (struct _reent *ptr, const char *__restrict s00, char **__restrict se,
 #ifndef NO_ERRNO
 		/* try to avoid the bug of testing an 8087 register value */
 		if ((dword0(rv) & Exp_mask) == 0)
-			ptr->_errno = ERANGE;
+			_REENT_ERRNO(ptr) = ERANGE;
 #endif
 		}
 #endif /* Avoid_Underflow */
@@ -1303,7 +1303,7 @@ strtof_l (const char *__restrict s00, char **__restrict se, locale_t loc)
   float retval = (float) val;
 #ifndef NO_ERRNO
   if (isinf (retval) && !isinf (val))
-    _REENT->_errno = ERANGE;
+    _REENT_ERRNO(_REENT) = ERANGE;
 #endif
   return retval;
 }
@@ -1340,7 +1340,7 @@ strtof (const char *__restrict s00,
   float retval = (float) val;
 #ifndef NO_ERRNO
   if ((isinf (retval) && !isinf (val)) || (isdenormf(retval) && !isdenorm(val)))
-    _REENT->_errno = ERANGE;
+    _REENT_ERRNO(_REENT) = ERANGE;
 #endif
   return retval;
 }

@@ -144,7 +144,7 @@ __db_wctomb (struct _reent *r, char *s, wchar_t wchar, UINT cp)
   if (ret > 0 && !def_used)
     return ret;
 
-  r->_errno = EILSEQ;
+  _REENT_ERRNO(r) = EILSEQ;
   return -1;
 }
 
@@ -194,7 +194,7 @@ __eucjp_wctomb (struct _reent *r, char *s, wchar_t wchar, mbstate_t *state)
       return ret;
     }
 
-  r->_errno = EILSEQ;
+  _REENT_ERRNO(r) = EILSEQ;
   return -1;
 }
 
@@ -255,7 +255,7 @@ __db_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n, UINT cp,
 	 here is to check if the first byte returns a valid value... */
       else if (MultiByteToWideChar (cp, MB_ERR_INVALID_CHARS, s, 1, pwc, 1))
 	return 1;
-      r->_errno = EILSEQ;
+      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
   state->__value.__wchb[state->__count] = *s;
@@ -263,7 +263,7 @@ __db_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n, UINT cp,
 			     (const char *) state->__value.__wchb, 2, pwc, 1);
   if (!ret)
     {
-      r->_errno = EILSEQ;
+      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
   state->__count = 0;
@@ -324,7 +324,7 @@ __eucjp_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
 	}
       else if (MultiByteToWideChar (20932, MB_ERR_INVALID_CHARS, s, 1, pwc, 1))
 	return 1;
-      r->_errno = EILSEQ;
+      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
   state->__value.__wchb[state->__count++] = *s;
@@ -347,7 +347,7 @@ jis_x_0212:
   if (!MultiByteToWideChar (20932, MB_ERR_INVALID_CHARS,
 			    (const char *) state->__value.__wchb, 2, pwc, 1))
     {
-      r->_errno = EILSEQ;
+      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
   state->__count = 0;

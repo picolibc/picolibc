@@ -31,7 +31,7 @@ _wcrtomb_r (struct _reent *ptr,
   if (retval == -1)
     {
       ps->__count = 0;
-      ptr->_errno = EILSEQ;
+      _REENT_ERRNO(ptr) = EILSEQ;
       return (size_t)(-1);
     }
   else
@@ -67,7 +67,7 @@ wcrtomb (char *__restrict s,
   if (retval == -1)
     {
       ps->__count = 0;
-      reent->_errno = EILSEQ;
+      _REENT_ERRNO(reent) = EILSEQ;
       return (size_t)(-1);
     }
   else

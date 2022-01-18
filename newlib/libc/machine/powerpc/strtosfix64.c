@@ -32,10 +32,10 @@ _strtosfix64_r (struct _reent *rptr,
     {
       if (ld_type == 1)
 	{
-	  rptr->_errno = EDOM;
+	  _REENT_ERRNO(rptr) = EDOM;
 	  return 0;
 	}
-      rptr->_errno = ERANGE;
+      _REENT_ERRNO(rptr) = ERANGE;
       if (word0(ldbl) & Sign_bit)
 	return LONG_LONG_MIN;
       return LONG_LONG_MAX;
@@ -63,7 +63,7 @@ _strtosfix64_r (struct _reent *rptr,
     {
       if (exp > 0 || (exp == 0 && tmp != 0x8000000000000000LL))
 	{
-	  rptr->_errno = ERANGE;
+	  _REENT_ERRNO(rptr) = ERANGE;
 	  return LONG_LONG_MIN;
 	}
     }
@@ -71,7 +71,7 @@ _strtosfix64_r (struct _reent *rptr,
     {
       if (exp >= 0)
 	{
-	  rptr->_errno = ERANGE;
+	  _REENT_ERRNO(rptr) = ERANGE;
 	  return LONG_LONG_MAX;
 	}
     }
@@ -88,7 +88,7 @@ _strtosfix64_r (struct _reent *rptr,
       /* check if positive saturation has occurred because of rounding */
       if (!sign && result < 0)
 	{
-	  rptr->_errno = ERANGE;
+	  _REENT_ERRNO(rptr) = ERANGE;
 	  return LONG_LONG_MAX;
 	}
     }

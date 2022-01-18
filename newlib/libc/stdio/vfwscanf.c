@@ -682,7 +682,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 	      width = 0;
 	      goto again;
 	    }
-	  rptr->_errno = EINVAL;
+	  _REENT_ERRNO(rptr) = EINVAL;
 	  goto input_failure;
 #endif /* !_NO_POS_ARGS */
 

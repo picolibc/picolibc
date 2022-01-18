@@ -257,7 +257,7 @@ wcstof_l (const wchar_t *__restrict nptr, wchar_t **__restrict endptr,
   float retval = (float) val;
 #ifndef NO_ERRNO
   if (isinf (retval) && !isinf (val))
-    _REENT->_errno = ERANGE;
+    _REENT_ERRNO(_REENT) = ERANGE;
 #endif
   return retval;
 }
@@ -272,7 +272,7 @@ wcstof (const wchar_t *__restrict nptr,
   float retval = (float) val;
 #ifndef NO_ERRNO
   if (isinf (retval) && !isinf (val))
-    _REENT->_errno = ERANGE;
+    _REENT_ERRNO(_REENT) = ERANGE;
 #endif
 
   return retval;
