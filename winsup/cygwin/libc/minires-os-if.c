@@ -189,9 +189,13 @@ static int cygwin_query(res_state statp, const char * DomName, int Class, int Ty
   DWORD section;
   int len, counts[4] = {0, 0, 0, 0}, debug = statp->options & RES_DEBUG;
   unsigned char * dnptrs[256], * ptr;
+  unsigned short Id = 0;
 
   dnptrs[0] = AnsPtr;
   dnptrs[1] = NULL;
+
+  if (AnsLength >= 2)
+    memcpy(&Id, AnsPtr, 2);
 
   memset(AnsPtr, 0, AnsLength);
 
@@ -294,7 +298,7 @@ static int cygwin_query(res_state statp, const char * DomName, int Class, int Ty
 done:
   if (HFIXEDSZ <= AnsLength) {
     ptr = AnsPtr;
-    PUTSHORT(0, ptr); /* Id */
+    PUTSHORT(Id, ptr);
     PUTSHORT((QR << 8) + RA + RD, ptr);
     for (section = 0; section < DIM(counts); section++) {
       PUTSHORT(counts[section], ptr);
