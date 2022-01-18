@@ -12817,7 +12817,7 @@ $as_echo "$libc_cv_initfinit_array" >&6; }
 
 if test $libc_cv_initfinit_array = yes; then
   cat >>confdefs.h <<_ACEOF
-#define HAVE_INITFINI_ARRAY 1
+#define _HAVE_INITFINI_ARRAY 1
 _ACEOF
 
 fi

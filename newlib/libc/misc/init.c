@@ -13,7 +13,7 @@
 /* Handle ELF .{pre_init,init,fini}_array sections.  */
 #include <sys/types.h>
 
-#ifdef HAVE_INITFINI_ARRAY
+#ifdef _HAVE_INITFINI_ARRAY
 
 /* These magic symbols are provided by the linker.  */
 extern void (*__preinit_array_start []) (void) __attribute__((weak));
@@ -21,7 +21,7 @@ extern void (*__preinit_array_end []) (void) __attribute__((weak));
 extern void (*__init_array_start []) (void) __attribute__((weak));
 extern void (*__init_array_end []) (void) __attribute__((weak));
 
-#ifdef HAVE_INIT_FINI
+#ifdef _HAVE_INIT_FINI
 extern void _init (void);
 #endif
 
@@ -36,7 +36,7 @@ __libc_init_array (void)
   for (i = 0; i < count; i++)
     __preinit_array_start[i] ();
 
-#ifdef HAVE_INIT_FINI
+#ifdef _HAVE_INIT_FINI
   _init ();
 #endif
 

@@ -992,7 +992,7 @@ fi
 
 # Have init/finit if not explicitly specified otherwise
 if [ "x${have_init_fini}" != "xno" ]; then
-	newlib_cflags="${newlib_cflags} -DHAVE_INIT_FINI"
+	newlib_cflags="${newlib_cflags} -D_HAVE_INIT_FINI"
 fi
 
 if test -z "${have_crt0}" && test -n "${sys_dir}"; then

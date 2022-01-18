@@ -648,7 +648,7 @@ fi
 rm -f conftest*])
 AC_SUBST(libc_cv_initfinit_array)
 if test $libc_cv_initfinit_array = yes; then
-  AC_DEFINE_UNQUOTED(HAVE_INITFINI_ARRAY)
+  AC_DEFINE_UNQUOTED(_HAVE_INITFINI_ARRAY)
 fi
 
 AC_CACHE_CHECK(if $CC accepts -fno-tree-loop-distribute-patterns with \
