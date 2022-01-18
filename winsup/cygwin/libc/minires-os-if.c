@@ -159,6 +159,7 @@ static unsigned char * write_record(unsigned char * ptr, PDNS_RECORD rr,
       PUTSHORT(rr->Data.SRV.wWeight, ptr);
       PUTSHORT(rr->Data.SRV.wPort, ptr);
     }
+    dnptrs = 0;  /* compression not allowed */
     PUTDOMAIN(rr->Data.SRV.pNameTarget, ptr);
     break;
   default:
