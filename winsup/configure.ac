@@ -89,7 +89,7 @@ AC_SUBST(TLSOFFSETS_H)
 AM_CONDITIONAL(TARGET_X86_64, [test $target_cpu = "x86_64"])
 
 AC_ARG_ENABLE(doc,
-	      [AS_HELP_STRING([--enable-doc], [Build documentation])],,
+	      [AS_HELP_STRING([--disable-doc], [do not build documentation])],,
 	      enable_doc=yes)
 AM_CONDITIONAL(BUILD_DOC, [test $enable_doc != "no"])
 
