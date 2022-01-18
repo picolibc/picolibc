@@ -193,6 +193,8 @@ static int cygwin_query(res_state statp, const char * DomName, int Class, int Ty
   dnptrs[0] = AnsPtr;
   dnptrs[1] = NULL;
 
+  memset(AnsPtr, 0, AnsLength);
+
   if (Class != ns_c_in) {
     errno = ENOSYS;
     statp->res_h_errno = NETDB_INTERNAL;
@@ -214,7 +216,7 @@ static int cygwin_query(res_state statp, const char * DomName, int Class, int Ty
     switch (res) {
     case ERROR_INVALID_NAME:
       errno = EINVAL;
-      statp->res_h_errno = NETDB_INTERNAL;;
+      statp->res_h_errno = NETDB_INTERNAL;
       break;
     case ERROR_TIMEOUT:
       statp->res_h_errno = TRY_AGAIN;
@@ -259,8 +261,9 @@ static int cygwin_query(res_state statp, const char * DomName, int Class, int Ty
       /* No question. Adopt the first name as the name in the question */
       if ((len = dn_comp(rr->pName, ptr, AnsLength - 4,
 			 dnptrs, &dnptrs[DIM(dnptrs) - 1])) < 0) {
-	ptr = NULL;
-	break;
+	statp->res_h_errno = NETDB_INTERNAL;  /* dn_comp sets errno */
+	len = -1;
+	goto done;
       }
       ptr += len;
       PUTSHORT(Type, ptr);
@@ -289,11 +292,13 @@ static int cygwin_query(res_state statp, const char * DomName, int Class, int Ty
 
   len = ptr - AnsPtr;
 done:
-  ptr = AnsPtr;
-  PUTSHORT(0, ptr); /* Id */
-  PUTSHORT((QR << 8) + RA + RD, ptr);
-  for (section = 0; section < DIM(counts); section++) {
-    PUTSHORT(counts[section], ptr);
+  if (HFIXEDSZ <= AnsLength) {
+    ptr = AnsPtr;
+    PUTSHORT(0, ptr); /* Id */
+    PUTSHORT((QR << 8) + RA + RD, ptr);
+    for (section = 0; section < DIM(counts); section++) {
+      PUTSHORT(counts[section], ptr);
+    }
   }
   return len;
 }
