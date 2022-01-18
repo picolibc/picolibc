@@ -159,6 +159,9 @@
 /* Define if small footprint nano-formatted-IO implementation used. */
 #undef _NANO_FORMATTED_IO
 
+/* nano version of malloc is used. */
+#undef _NANO_MALLOC
+
 /* Verify _REENT_CHECK macros allocate memory successfully. */
 #undef _REENT_CHECK_VERIFY
 
