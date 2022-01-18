@@ -586,9 +586,9 @@ if test "x${iconv_encodings}" != "x" \
   dnl Enable appropriate option in newlib.h
   for encoding in ${iconv_encodings}; do
       opt=_ICONV_TO_ENCODING_`echo "${encoding}" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
-      AC_DEFINE_UNQUOTED($opt,1)
+      eval "$opt=1"
       opt=_ICONV_FROM_ENCODING_`echo "${encoding}" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
-      AC_DEFINE_UNQUOTED($opt,1)
+      eval "$opt=1"
   done
 
   dnl iconv_to_encodings
@@ -605,7 +605,7 @@ if test "x${iconv_encodings}" != "x" \
   dnl Enable appropriate option in newlib.h
   for encoding in ${iconv_to_encodings}; do
       opt=_ICONV_TO_ENCODING_`echo "${encoding}" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
-      AC_DEFINE_UNQUOTED($opt,1)
+      eval "$opt=1"
   done
 
   dnl iconv_from_encodings
@@ -622,9 +622,10 @@ if test "x${iconv_encodings}" != "x" \
   dnl Enable appropriate option in newlib.h
   for encoding in ${iconv_from_encodings}; do
       opt=_ICONV_FROM_ENCODING_`echo "${encoding}" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
-      AC_DEFINE_UNQUOTED($opt,1)
+      eval "$opt=1"
   done
 fi;
+NEWLIB_ICONV_DEFINES
 
 AC_CACHE_CHECK(for .preinit_array/.init_array/.fini_array support,
 	       libc_cv_initfinit_array, [dnl
