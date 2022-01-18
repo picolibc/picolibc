@@ -107,56 +107,56 @@ uninstall-hook: uninstall-extra-man uninstall-html uninstall-info uninstall-etc
 
 # nochunks ug html is not installed, but will be deployed to website
 cygwin-ug-net/cygwin-ug-net-nochunks.html.gz: $(cygwin-ug-net_SOURCES) html.xsl
-	$(XMLTO) html-nochunks -m $(srcdir)/html.xsl $<
+	$(AM_V_GEN)$(XMLTO) html-nochunks -m $(srcdir)/html.xsl $<
 	@$(MKDIR_P) cygwin-ug-net
-	cp cygwin-ug-net.html cygwin-ug-net/cygwin-ug-net-nochunks.html
-	rm -f cygwin-ug-net/cygwin-ug-net-nochunks.html.gz
-	gzip cygwin-ug-net/cygwin-ug-net-nochunks.html
+	@cp cygwin-ug-net.html cygwin-ug-net/cygwin-ug-net-nochunks.html
+	@rm -f cygwin-ug-net/cygwin-ug-net-nochunks.html.gz
+	$(AM_V_at)gzip cygwin-ug-net/cygwin-ug-net-nochunks.html
 
 cygwin-ug-net/cygwin-ug-net.html: $(cygwin-ug-net_SOURCES) html.xsl
-	$(XMLTO) html -o cygwin-ug-net/ -m $(srcdir)/html.xsl $<
+	$(AM_V_GEN)$(XMLTO) html -o cygwin-ug-net/ -m $(srcdir)/html.xsl $<
 
 cygwin-ug-net/cygwin-ug-net.pdf: $(cygwin-ug-net_SOURCES) fo.xsl
-	$(XMLTO) pdf -o cygwin-ug-net/ -m $(srcdir)/fo.xsl $<
+	$(AM_V_GEN)$(XMLTO) pdf -o cygwin-ug-net/ -m $(srcdir)/fo.xsl $<
 
 utils2man.stamp: $(cygwin-ug-net_SOURCES) man.xsl
-	$(XMLTO) man -m $(srcdir)/man.xsl $<
+	$(AM_V_GEN)$(XMLTO) man -m $(srcdir)/man.xsl $<
 	@touch $@
 
 cygwin-ug-net.info: $(cygwin-ug-net_SOURCES) charmap
-	$(DOCBOOK2XTEXI) $(srcdir)/cygwin-ug-net.xml --string-param output-file=cygwin-ug-net
+	$(AM_V_GEN)$(DOCBOOK2XTEXI) $(srcdir)/cygwin-ug-net.xml --string-param output-file=cygwin-ug-net
 
 cygwin-api/cygwin-api.html: $(cygwin-api_SOURCES) html.xsl
-	$(XMLTO) html -o cygwin-api/ -m $(srcdir)/html.xsl $<
+	$(AM_V_GEN)$(XMLTO) html -o cygwin-api/ -m $(srcdir)/html.xsl $<
 
 cygwin-api/cygwin-api.pdf: $(cygwin-api_SOURCES) fo.xsl
-	$(XMLTO) pdf -o cygwin-api/ -m $(srcdir)/fo.xsl $<
+	$(AM_V_GEN)$(XMLTO) pdf -o cygwin-api/ -m $(srcdir)/fo.xsl $<
 
 api2man.stamp: $(cygwin-api_SOURCES) man.xsl
-	$(XMLTO) man -m $(srcdir)/man.xsl $<
+	$(AM_V_GEN)$(XMLTO) man -m $(srcdir)/man.xsl $<
 	@touch $@
 
 cygwin-api.info: $(cygwin-api_SOURCES) charmap
-	$(DOCBOOK2XTEXI) $(srcdir)/cygwin-api.xml --string-param output-file=cygwin-api
+	$(AM_V_GEN)$(DOCBOOK2XTEXI) $(srcdir)/cygwin-api.xml --string-param output-file=cygwin-api
 
 # this generates a custom charmap for docbook2x-texi which has a mapping for &reg;
 charmap:
-	cp /usr/share/docbook2X/charmaps/texi.charmap charmap
-	echo "ae (R)" >>charmap
+	$(AM_V_GEN)cp /usr/share/docbook2X/charmaps/texi.charmap charmap
+	$(AM_V_at)echo "ae (R)" >>charmap
 
 intro2man.stamp: intro.xml man.xsl
-	$(XMLTO) man -m $(srcdir)/man.xsl $<
+	$(AM_V_GEN)$(XMLTO) man -m $(srcdir)/man.xsl $<
 	@echo ".so intro.1" >cygwin.1
 	@touch $@
 
 faq/faq.html: $(faq_SOURCES) html.xsl
-	$(XMLTO) html -o faq -m $(srcdir)/html.xsl $(srcdir)/faq.xml
-	sed -i 's;<a name="id[mp][0-9]*"></a>;;g' faq/faq.html
+	$(AM_V_GEN)$(XMLTO) html -o faq -m $(srcdir)/html.xsl $(srcdir)/faq.xml
+	@sed -i 's;<a name="id[mp][0-9]*"></a>;;g' faq/faq.html
 
 # faq body is not installed, but is intended to be deployed to website, where it
 # can be SSI included in a framing page
 faq/faq.body: faq/faq.html
-	$(srcdir)/bodysnatcher.pl $<
+	$(AM_V_GEN)$(srcdir)/bodysnatcher.pl $<
 
 Makefile.dep: cygwin-ug-net.xml cygwin-api.xml faq.xml intro.xml
-	cd $(srcdir) && ./xidepend $^ > "$(CURDIR)/$@"
+	$(AM_V_GEN)cd $(srcdir) && ./xidepend $^ > "$(CURDIR)/$@"

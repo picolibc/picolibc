@@ -367,16 +367,16 @@ libdll_a_SOURCES= \
 #
 
 shared_info_magic.h: cygmagic shared_info.h
-	$(srcdir)/cygmagic $@ "$(CC) $(INCLUDES) $(CPPFLAGS) -E -x c++" $(word 2,$^) SHARED_MAGIC 'class shared_info' USER_MAGIC 'class user_info'
+	$(AM_V_GEN)$(srcdir)/cygmagic $@ "$(CC) $(INCLUDES) $(CPPFLAGS) -E -x c++" $(word 2,$^) SHARED_MAGIC 'class shared_info' USER_MAGIC 'class user_info'
 
 child_info_magic.h: cygmagic child_info.h
-	$(srcdir)/cygmagic $@ "$(CC) $(INCLUDES) $(CPPFLAGS) -E -x c++" $(word 2,$^) CHILD_INFO_MAGIC 'class child_info'
+	$(AM_V_GEN)$(srcdir)/cygmagic $@ "$(CC) $(INCLUDES) $(CPPFLAGS) -E -x c++" $(word 2,$^) CHILD_INFO_MAGIC 'class child_info'
 
 globals.h: mkglobals_h globals.cc
-	$^ > $@
+	$(AM_V_GEN)$^ > $@
 
 localtime.patched.c: tzcode/localtime.c tzcode/localtime.c.patch
-	patch -u -o localtime.patched.c \
+	$(AM_V_GEN)patch -u -o localtime.patched.c \
 		    $(srcdir)/tzcode/localtime.c \
 		    $(srcdir)/tzcode/localtime.c.patch
 
@@ -620,12 +620,12 @@ $(LIBSERVER):
 # linker script
 LDSCRIPT=cygwin.sc
 $(LDSCRIPT): $(LDSCRIPT).in
-	$(CC) -E - -P < $^ -o $@
+	$(AM_V_GEN)$(CC) -E - -P < $^ -o $@
 
 # cygwin dll
 $(TEST_DLL_NAME): $(LDSCRIPT) dllfixdbg libdll.a $(VERSION_OFILES) $(LIBSERVER)\
 		  $(newlib_build)/libm/libm.a $(newlib_build)/libc/libc.a
-	$(CXX) $(CXXFLAGS) \
+	$(AM_V_CXXLD)$(CXX) $(CXXFLAGS) \
 	-mno-use-libstdc-wrappers \
 	-Wl,--gc-sections -nostdlib -Wl,-T$(LDSCRIPT) -static \
 	-Wl,--heap=0 -Wl,--out-implib,cygdll.a -shared -o $@ \
@@ -636,14 +636,14 @@ $(TEST_DLL_NAME): $(LDSCRIPT) dllfixdbg libdll.a $(VERSION_OFILES) $(LIBSERVER)\
 	$(newlib_build)/libm/libm.a \
 	$(newlib_build)/libc/libc.a \
 	-lgcc -lkernel32 -lntdll -Wl,-Map,cygwin.map
-	$(srcdir)/dllfixdbg $(OBJDUMP) $(OBJCOPY) $@ cygwin1.dbg
+	@$(srcdir)/dllfixdbg $(OBJDUMP) $(OBJCOPY) $@ cygwin1.dbg
 	@ln -f $@ new-cygwin1.dll
 
 # cygwin import library
 toolopts=--cpu=@target_cpu@ --ar=@AR@ --as=@AS@ --nm=@NM@ --objcopy=@OBJCOPY@
 
 $(DEF_FILE): gendef $(srcdir)/$(TLSOFFSETS_H) $(DIN_FILE) common.din
-	$(srcdir)/gendef --cpu=@target_cpu@ --output-def=$(DEF_FILE) --tlsoffsets=$(srcdir)/$(TLSOFFSETS_H) $(srcdir)/$(DIN_FILE) $(srcdir)/common.din
+	$(AM_V_GEN)$(srcdir)/gendef --cpu=@target_cpu@ --output-def=$(DEF_FILE) --tlsoffsets=$(srcdir)/$(TLSOFFSETS_H) $(srcdir)/$(DIN_FILE) $(srcdir)/common.din
 
 sigfe.s: $(DEF_FILE)
 	@[ -s $@ ] || \
@@ -652,11 +652,11 @@ sigfe.s: $(DEF_FILE)
 
 LIBCOS=$(addsuffix .o,$(basename $(LIB_FILES)))
 $(LIB_NAME): $(DEF_FILE) $(LIBCOS) | $(TEST_DLL_NAME)
-	$(srcdir)/mkimport $(toolopts) $(NEW_FUNCTIONS) $@ cygdll.a $(wordlist 2,99,$^)
+	$(AM_V_GEN)$(srcdir)/mkimport $(toolopts) $(NEW_FUNCTIONS) $@ cygdll.a $(wordlist 2,99,$^)
 
 # cygwin import library used by testsuite
 $(TEST_LIB_NAME): $(LIB_NAME)
-	perl -p -e 'BEGIN{binmode(STDIN); binmode(STDOUT);}; s/cygwin1/cygwin0/g' < $? > $@
+	$(AM_V_GEN)perl -p -e 'BEGIN{binmode(STDIN); binmode(STDOUT);}; s/cygwin1/cygwin0/g' < $? > $@
 
 # sublibs
 # import libraries for some subset of symbols indicated by given objects
@@ -669,32 +669,32 @@ speclib=\
 	--exclude='^_main$$'
 
 libc.a: $(LIB_NAME) libm.a libpthread.a libutil.a
-	$(speclib) $^ -v $(@F)
+	$(AM_V_GEN)$(speclib) $^ -v $(@F)
 
 libm.a: $(LIB_NAME) $(newlib_build)/libm/libm.a $(addsuffix .o,$(basename $(MATH_FILES)))
-	$(speclib) $^ $(@F)
+	$(AM_V_GEN)$(speclib) $^ $(@F)
 
 libpthread.a: $(LIB_NAME) pthread.o thread.o libc/call_once.o libc/cnd.o \
 	      libc/mtx.o libc/thrd.o libc/tss.o
-	$(speclib) $^ $(@F)
+	$(AM_V_GEN)$(speclib) $^ $(@F)
 
 libutil.a: $(LIB_NAME) libc/bsdlib.o
-	$(speclib) $^ $(@F)
+	$(AM_V_GEN)$(speclib) $^ $(@F)
 
 libdl.a: $(LIB_NAME) dlfcn.o
-	$(speclib) $^ $(@F)
+	$(AM_V_GEN)$(speclib) $^ $(@F)
 
 libresolv.a: $(LIB_NAME) libc/minires.o
-	$(speclib) $^ $(@F)
+	$(AM_V_GEN)$(speclib) $^ $(@F)
 
 librt.a: $(LIB_NAME) posix_ipc.o
-	$(speclib) $^ $(@F)
+	$(AM_V_GEN)$(speclib) $^ $(@F)
 
 libacl.a: $(LIB_NAME) sec_posixacl.o
-	$(speclib) $^ $(@F)
+	$(AM_V_GEN)$(speclib) $^ $(@F)
 
 libssp.a: $(LIB_NAME) $(newlib_build)/libc/ssp/lib.a
-	$(speclib) $^ $(@F)
+	$(AM_V_GEN)$(speclib) $^ $(@F)
 
 #
 # all
