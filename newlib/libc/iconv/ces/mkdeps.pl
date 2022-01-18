@@ -328,7 +328,7 @@ sub process_section_encodings($)
   generate_cesbi_c (\%cesenc);
 
   # Generate ccsbi.c file
-  my @ccs = keys %ccsenc;
+  my @ccs = sort keys %ccsenc;
   generate_ccsbi_c (\@ccs);
   
   # Generate ccsnames.h header file
