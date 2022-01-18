@@ -17,6 +17,9 @@ doc_DATA = \
 htmldir = $(datarootdir)/doc
 
 XMLTO=@XMLTO@ --skip-validation --with-dblatex
+XMLTO_DBLATEX_QUIET_=-p '-q'
+XMLTO_DBLATEX_QUIET=$(XMLTO_DBLATEX_QUIET_$(V))
+
 DOCBOOK2XTEXI=@DOCBOOK2XTEXI@ --xinclude --info --utf8trans-map=charmap
 
 -include Makefile.dep
@@ -117,7 +120,7 @@ cygwin-ug-net/cygwin-ug-net.html: $(cygwin-ug-net_SOURCES) html.xsl
 	$(AM_V_GEN)$(XMLTO) html -o cygwin-ug-net/ -m $(srcdir)/html.xsl $<
 
 cygwin-ug-net/cygwin-ug-net.pdf: $(cygwin-ug-net_SOURCES) fo.xsl
-	$(AM_V_GEN)$(XMLTO) pdf -o cygwin-ug-net/ -m $(srcdir)/fo.xsl $<
+	$(AM_V_GEN)$(XMLTO) pdf -o cygwin-ug-net/ -m $(srcdir)/fo.xsl $(XMLTO_DBLATEX_QUIET) $<
 
 utils2man.stamp: $(cygwin-ug-net_SOURCES) man.xsl
 	$(AM_V_GEN)$(XMLTO) man -m $(srcdir)/man.xsl $<
@@ -130,7 +133,7 @@ cygwin-api/cygwin-api.html: $(cygwin-api_SOURCES) html.xsl
 	$(AM_V_GEN)$(XMLTO) html -o cygwin-api/ -m $(srcdir)/html.xsl $<
 
 cygwin-api/cygwin-api.pdf: $(cygwin-api_SOURCES) fo.xsl
-	$(AM_V_GEN)$(XMLTO) pdf -o cygwin-api/ -m $(srcdir)/fo.xsl $<
+	$(AM_V_GEN)$(XMLTO) pdf -o cygwin-api/ -m $(srcdir)/fo.xsl $(XMLTO_DBLATEX_QUIET) $<
 
 api2man.stamp: $(cygwin-api_SOURCES) man.xsl
 	$(AM_V_GEN)$(XMLTO) man -m $(srcdir)/man.xsl $<
