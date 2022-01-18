@@ -21,6 +21,8 @@ XMLTO_DBLATEX_QUIET_=-p '-q'
 XMLTO_DBLATEX_QUIET=$(XMLTO_DBLATEX_QUIET_$(V))
 XMLTO_HTML_CHUNK_QUIET_=--stringparam chunk.quietly=1
 XMLTO_HTML_CHUNK_QUIET=$(XMLTO_HTML_CHUNK_QUIET_$(V))
+XMLTO_MAN_QUIET_=--stringparam man.output.quietly=1
+XMLTO_MAN_QUIET=$(XMLTO_MAN_QUIET_$(V))
 
 DOCBOOK2XTEXI=@DOCBOOK2XTEXI@ --xinclude --info --utf8trans-map=charmap
 
@@ -125,7 +127,7 @@ cygwin-ug-net/cygwin-ug-net.pdf: $(cygwin-ug-net_SOURCES) fo.xsl
 	$(AM_V_GEN)$(XMLTO) pdf -o cygwin-ug-net/ -m $(srcdir)/fo.xsl $(XMLTO_DBLATEX_QUIET) $<
 
 utils2man.stamp: $(cygwin-ug-net_SOURCES) man.xsl
-	$(AM_V_GEN)$(XMLTO) man -m $(srcdir)/man.xsl $<
+	$(AM_V_GEN)$(XMLTO) man -m $(srcdir)/man.xsl $(XMLTO_MAN_QUIET) $<
 	@touch $@
 
 cygwin-ug-net.info: $(cygwin-ug-net_SOURCES) charmap
@@ -138,7 +140,7 @@ cygwin-api/cygwin-api.pdf: $(cygwin-api_SOURCES) fo.xsl
 	$(AM_V_GEN)$(XMLTO) pdf -o cygwin-api/ -m $(srcdir)/fo.xsl $(XMLTO_DBLATEX_QUIET) $<
 
 api2man.stamp: $(cygwin-api_SOURCES) man.xsl
-	$(AM_V_GEN)$(XMLTO) man -m $(srcdir)/man.xsl $<
+	$(AM_V_GEN)$(XMLTO) man -m $(srcdir)/man.xsl $(XMLTO_MAN_QUIET) $<
 	@touch $@
 
 cygwin-api.info: $(cygwin-api_SOURCES) charmap
@@ -150,7 +152,7 @@ charmap:
 	$(AM_V_at)echo "ae (R)" >>charmap
 
 intro2man.stamp: intro.xml man.xsl
-	$(AM_V_GEN)$(XMLTO) man -m $(srcdir)/man.xsl $<
+	$(AM_V_GEN)$(XMLTO) man -m $(srcdir)/man.xsl $(XMLTO_MAN_QUIET) $<
 	@echo ".so intro.1" >cygwin.1
 	@touch $@
 
