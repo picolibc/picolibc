@@ -86,12 +86,12 @@ Read options
 
 
 ***********************************************************************/
-static void get_options(res_state statp, int i, char **words)
+static void get_options(res_state statp, int n, char **words)
 {
   char *ptr;
-  int value;
+  int i, value;
 
-  while (i-- > 0) {
+  for (i = 0;  i < n;  ++i) {
     if (!strcasecmp("debug", words[i])) {
       statp->options |= RES_DEBUG;
       DPRINTF(statp->options & RES_DEBUG, "%s: 1\n", words[i]);
@@ -208,8 +208,10 @@ static void get_resolv(res_state statp)
 	}
       }
       /* Options line */
-      else if (!strncasecmp("options", words[0], sizes[0]))
+      else if (!strncasecmp("options", words[0], sizes[0])) {
 	get_options(statp, i - 1, &words[1]);
+	debug = statp->options & RES_DEBUG;
+      }
     }
   }
   fclose(fd);
