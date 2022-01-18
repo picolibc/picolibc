@@ -440,8 +440,8 @@ fhandler_base::open_with_arch (int flags, mode_t mode)
   if (!(res = (archetype && archetype->io_handle)
 	|| open (flags, mode & 07777)))
     {
-      if (archetype)
-	delete archetype;
+      if (archetype && archetype->usecount == 0)
+	cygheap->fdtab.delete_archetype (archetype);
     }
   else if (archetype)
     {
