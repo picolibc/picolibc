@@ -23,3 +23,10 @@ Bug Fixes
 
 - Fix an "Invalid argument" problem in posix_spawn on i686.
   Addresses: https://cygwin.com/pipermail/cygwin/2022-January/250453.html
+
+- Fix handling of AAAA records in Cygwin resolver code using native
+  windows calls.
+
+- Fix a problem creating a dir "foo", if a file (but not a Cygwin symlink)
+  "foo.lnk" already exists.
+  Addresses: https://github.com/msys2/msys2-runtime/issues/81
