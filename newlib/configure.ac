@@ -3,7 +3,23 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT([newlib],[NEWLIB_VERSION])
 AC_CONFIG_SRCDIR([libc])
-AC_CONFIG_HEADERS([_newlib_version.h:_newlib_version.hin newlib.h:newlib.hin])
+
+dnl Since we can't control what defines autoheader picks up (various autoconf
+dnl macros will add their own), filter out all the ones w/out a _ prefix.  All
+dnl the ones we want to export use a _ prefix, and all the rest we don't want
+dnl to export as it'll pollute the namespace of newlib users.
+dnl NB: newlib.h must be the first AC_CONFIG_HEADERS call for autoheader.
+AC_CONFIG_HEADERS([newlib.h:newlib.hin], [sed -i.tmp -e '/^#define [^_]/d' -e '/^\/\* #undef [^_]/d' newlib.h && rm -f newlib.h.tmp])
+AH_TOP([/* NB: The contents are filtered before being installed. */
+
+#ifndef __NEWLIB_H__
+#define __NEWLIB_H__ 1
+
+/* Newlib version */
+#include <_newlib_version.h>])
+AH_BOTTOM([#endif /* !__NEWLIB_H__ */])
+
+AC_CONFIG_HEADERS([_newlib_version.h:_newlib_version.hin])
 
 dnl Can't be done in NEWLIB_CONFIGURE because that confuses automake. 
 AC_CONFIG_AUX_DIR(..)

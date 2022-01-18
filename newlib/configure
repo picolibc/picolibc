@@ -2251,7 +2251,13 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-ac_config_headers="$ac_config_headers _newlib_version.h:_newlib_version.hin newlib.h:newlib.hin"
+
+ac_config_headers="$ac_config_headers newlib.h:newlib.hin"
+
+
+
+
+ac_config_headers="$ac_config_headers _newlib_version.h:_newlib_version.hin"
 
 
 ac_aux_dir=
@@ -11974,7 +11980,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11977 "configure"
+#line 11983 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12080,7 +12086,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12083 "configure"
+#line 12089 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -14451,8 +14457,8 @@ cat >>$CONFIG_STATUS <<\_ACEOF || ac_write_fail=1
 for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
-    "_newlib_version.h") CONFIG_HEADERS="$CONFIG_HEADERS _newlib_version.h:_newlib_version.hin" ;;
     "newlib.h") CONFIG_HEADERS="$CONFIG_HEADERS newlib.h:newlib.hin" ;;
+    "_newlib_version.h") CONFIG_HEADERS="$CONFIG_HEADERS _newlib_version.h:_newlib_version.hin" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
@@ -15051,6 +15057,7 @@ $as_echo "$as_me: executing $ac_file commands" >&6;}
 
 
   case $ac_file$ac_mode in
+    "newlib.h":H) sed -i.tmp -e '/^#define [^_]/d' -e '/^\/\* #undef [^_]/d' newlib.h && rm -f newlib.h.tmp ;;
     "depfiles":C) test x"$AMDEP_TRUE" != x"" || {
   # Older Autoconf quotes --file arguments for eval, but not when files
   # are listed without --file.  Let's play safe and only enable the eval

@@ -112,7 +112,7 @@ DIST_COMMON = $(srcdir)/Makefile.am $(top_srcdir)/configure \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(SHELL) $(top_srcdir)/../mkinstalldirs
-CONFIG_HEADER = _newlib_version.h newlib.h
+CONFIG_HEADER = newlib.h _newlib_version.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
@@ -234,7 +234,7 @@ am__recursive_targets = \
 AM_RECURSIVE_TARGETS = $(am__recursive_targets:-recursive=) TAGS CTAGS \
 	cscope
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) \
-	$(LISP)_newlib_version.hin newlib.hin
+	$(LISP)newlib.hin _newlib_version.hin
 # Read a list of newline-separated strings from the standard input,
 # and print each of them once, without duplicates.  Input order is
 # *not* preserved.
@@ -548,7 +548,7 @@ MAKEOVERRIDES =
 # dejagnu support
 RUNTESTFLAGS = 
 @HAVE_DOC_TRUE@MKDOC = doc/makedoc$(EXEEXT_FOR_BUILD)
-all: _newlib_version.h newlib.h
+all: newlib.h _newlib_version.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
 .SUFFIXES:
@@ -588,28 +588,28 @@ $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	$(am__cd) $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 $(am__aclocal_m4_deps):
 
-_newlib_version.h: stamp-h1
+newlib.h: stamp-h1
 	@test -f $@ || rm -f stamp-h1
 	@test -f $@ || $(MAKE) $(AM_MAKEFLAGS) stamp-h1
 
-stamp-h1: $(srcdir)/_newlib_version.hin $(top_builddir)/config.status
+stamp-h1: $(srcdir)/newlib.hin $(top_builddir)/config.status
 	@rm -f stamp-h1
-	cd $(top_builddir) && $(SHELL) ./config.status _newlib_version.h
-$(srcdir)/_newlib_version.hin: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
+	cd $(top_builddir) && $(SHELL) ./config.status newlib.h
+$(srcdir)/newlib.hin: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
 	($(am__cd) $(top_srcdir) && $(AUTOHEADER))
 	rm -f stamp-h1
 	touch $@
 
-newlib.h: stamp-h2
+_newlib_version.h: stamp-h2
 	@test -f $@ || rm -f stamp-h2
 	@test -f $@ || $(MAKE) $(AM_MAKEFLAGS) stamp-h2
 
-stamp-h2: $(srcdir)/newlib.hin $(top_builddir)/config.status
+stamp-h2: $(srcdir)/_newlib_version.hin $(top_builddir)/config.status
 	@rm -f stamp-h2
-	cd $(top_builddir) && $(SHELL) ./config.status newlib.h
+	cd $(top_builddir) && $(SHELL) ./config.status _newlib_version.h
 
 distclean-hdr:
-	-rm -f _newlib_version.h stamp-h1 newlib.h stamp-h2
+	-rm -f newlib.h stamp-h1 _newlib_version.h stamp-h2
 install-toollibLIBRARIES: $(toollib_LIBRARIES)
 	@$(NORMAL_INSTALL)
 	@list='$(toollib_LIBRARIES)'; test -n "$(toollibdir)" || list=; \
@@ -852,8 +852,8 @@ distclean-DEJAGNU:
 check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) check-DEJAGNU
 check: check-recursive
-all-am: Makefile $(LIBRARIES) $(LTLIBRARIES) $(DATA) _newlib_version.h \
-		newlib.h
+all-am: Makefile $(LIBRARIES) $(LTLIBRARIES) $(DATA) newlib.h \
+		_newlib_version.h
 installdirs: installdirs-recursive
 installdirs-am:
 	for dir in "$(DESTDIR)$(toollibdir)" "$(DESTDIR)$(toollibdir)" "$(DESTDIR)$(toollibdir)"; do \
