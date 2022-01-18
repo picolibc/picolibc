@@ -19,6 +19,8 @@ htmldir = $(datarootdir)/doc
 XMLTO=@XMLTO@ --skip-validation --with-dblatex
 XMLTO_DBLATEX_QUIET_=-p '-q'
 XMLTO_DBLATEX_QUIET=$(XMLTO_DBLATEX_QUIET_$(V))
+XMLTO_HTML_CHUNK_QUIET_=--stringparam chunk.quietly=1
+XMLTO_HTML_CHUNK_QUIET=$(XMLTO_HTML_CHUNK_QUIET_$(V))
 
 DOCBOOK2XTEXI=@DOCBOOK2XTEXI@ --xinclude --info --utf8trans-map=charmap
 
@@ -117,7 +119,7 @@ cygwin-ug-net/cygwin-ug-net-nochunks.html.gz: $(cygwin-ug-net_SOURCES) html.xsl
 	$(AM_V_at)gzip cygwin-ug-net/cygwin-ug-net-nochunks.html
 
 cygwin-ug-net/cygwin-ug-net.html: $(cygwin-ug-net_SOURCES) html.xsl
-	$(AM_V_GEN)$(XMLTO) html -o cygwin-ug-net/ -m $(srcdir)/html.xsl $<
+	$(AM_V_GEN)$(XMLTO) html -o cygwin-ug-net/ -m $(srcdir)/html.xsl $(XMLTO_HTML_CHUNK_QUIET) $<
 
 cygwin-ug-net/cygwin-ug-net.pdf: $(cygwin-ug-net_SOURCES) fo.xsl
 	$(AM_V_GEN)$(XMLTO) pdf -o cygwin-ug-net/ -m $(srcdir)/fo.xsl $(XMLTO_DBLATEX_QUIET) $<
@@ -130,7 +132,7 @@ cygwin-ug-net.info: $(cygwin-ug-net_SOURCES) charmap
 	$(AM_V_GEN)$(DOCBOOK2XTEXI) $(srcdir)/cygwin-ug-net.xml --string-param output-file=cygwin-ug-net
 
 cygwin-api/cygwin-api.html: $(cygwin-api_SOURCES) html.xsl
-	$(AM_V_GEN)$(XMLTO) html -o cygwin-api/ -m $(srcdir)/html.xsl $<
+	$(AM_V_GEN)$(XMLTO) html -o cygwin-api/ -m $(srcdir)/html.xsl $(XMLTO_HTML_CHUNK_QUIET) $<
 
 cygwin-api/cygwin-api.pdf: $(cygwin-api_SOURCES) fo.xsl
 	$(AM_V_GEN)$(XMLTO) pdf -o cygwin-api/ -m $(srcdir)/fo.xsl $(XMLTO_DBLATEX_QUIET) $<
@@ -153,7 +155,7 @@ intro2man.stamp: intro.xml man.xsl
 	@touch $@
 
 faq/faq.html: $(faq_SOURCES) html.xsl
-	$(AM_V_GEN)$(XMLTO) html -o faq -m $(srcdir)/html.xsl $(srcdir)/faq.xml
+	$(AM_V_GEN)$(XMLTO) html -o faq -m $(srcdir)/html.xsl $(XMLTO_HTML_CHUNK_QUIET) $(srcdir)/faq.xml
 	@sed -i 's;<a name="id[mp][0-9]*"></a>;;g' faq/faq.html
 
 # faq body is not installed, but is intended to be deployed to website, where it
