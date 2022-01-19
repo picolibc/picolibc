@@ -266,6 +266,7 @@ static int cygwin_query(res_state statp, const char * DomName, int Class, int Ty
       if ((len = dn_comp(rr->pName, ptr, AnsLength - 4,
 			 dnptrs, &dnptrs[DIM(dnptrs) - 1])) < 0) {
 	statp->res_h_errno = NETDB_INTERNAL;  /* dn_comp sets errno */
+	AnsLength = 0;
 	len = -1;
 	goto done;
       }
@@ -283,7 +284,7 @@ static int cygwin_query(res_state statp, const char * DomName, int Class, int Ty
       DPRINTF(debug, "Unexpected section order %s %d\n", DomName, Type);
       continue;
     }
-    section =  rr->Flags.DW & 0x3;
+    section = rr->Flags.DW & 0x3;
 
     ptr = write_record(ptr, rr, AnsPtr + AnsLength, dnptrs,
 		       &dnptrs[DIM(dnptrs) - 1], debug);
