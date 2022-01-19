@@ -246,8 +246,7 @@ static int cygwin_query(res_state statp, const char * DomName, int Class, int Ty
       statp->res_h_errno = NO_RECOVERY;
       break;
     }
-    len = -1;
-    goto done;
+    return -1;
   }
 
   ptr = AnsPtr + HFIXEDSZ; /* Skip header */
@@ -293,10 +292,12 @@ static int cygwin_query(res_state statp, const char * DomName, int Class, int Ty
     rr = rr->pNext;
   }
 
+  len = ptr - AnsPtr;
+
+done:
+
   DnsFree(pQueryResultsSet, DnsFreeRecordList);
 
-  len = ptr - AnsPtr;
-done:
   if (HFIXEDSZ <= AnsLength) {
     ptr = AnsPtr;
     PUTSHORT(Id, ptr);
