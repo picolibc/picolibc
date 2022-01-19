@@ -85,7 +85,7 @@ foreach target : targets
 					    pic: false,
 					    objects : libobjs,
 					    include_directories: inc,
-					    c_args: value[1] + ['-D_COMPILING_NEWLIB'])
+					    c_args: value[1] + ['-D_LIBC'])
     set_variable('lib_mpart' + target, local_lib_mpart_target)
   endif
 endforeach
