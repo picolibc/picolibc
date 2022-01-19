@@ -34,12 +34,6 @@
 # define PREFETCH_LOAD_HINT PREFETCH_HINT_LOAD_STREAMED
 # define PREFETCH_STORE_HINT PREFETCH_HINT_PREPAREFORSTORE
 #elif _LIBC
-# include <sysdep.h>
-# include <regdef.h>
-# include <sys/asm.h>
-# define PREFETCH_LOAD_HINT PREFETCH_HINT_LOAD_STREAMED
-# define PREFETCH_STORE_HINT PREFETCH_HINT_PREPAREFORSTORE
-#elif _COMPILING_NEWLIB
 # include "machine/asm.h"
 # include "machine/regdef.h"
 # define PREFETCH_LOAD_HINT PREFETCH_HINT_LOAD_STREAMED
@@ -877,8 +871,3 @@ L(r6_unaligned7):
 	.set	at
 	.set	reorder
 END(MEMCPY_NAME)
-#ifndef ANDROID_CHANGES
-# ifdef _LIBC
-libc_hidden_builtin_def (MEMCPY_NAME)
-# endif
-#endif

@@ -227,7 +227,7 @@ extern int futimesat (int, const char *, const struct timeval [2]);
 
 /* Provide _<systemcall> prototypes for functions provided by some versions
    of newlib.  */
-#ifdef _COMPILING_NEWLIB
+#ifdef _LIBC
 extern int open (const char *, int, ...);
 extern int fcntl (int, int, ...);
 #ifdef __LARGE64_FILES

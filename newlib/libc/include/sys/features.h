@@ -319,7 +319,8 @@ extern "C" {
 #endif
 
 #if _FORTIFY_SOURCE > 0 && !defined(__cplusplus) && !defined(__lint__) && \
-   (__OPTIMIZE__ > 0 || defined(__clang__)) && __GNUC_PREREQ__(4, 1)
+   (__OPTIMIZE__ > 0 || defined(__clang__)) && __GNUC_PREREQ__(4, 1) && \
+   !defined(_LIBC)
 #  if _FORTIFY_SOURCE > 1
 #    define __SSP_FORTIFY_LEVEL 2
 #  else
