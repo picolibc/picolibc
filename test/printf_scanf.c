@@ -195,12 +195,7 @@ main(void)
 #if (defined(TINY_STDIO) && !defined(_IO_FLOAT_EXACT))
 #define ERROR_MAX 1e-6
 #else
-#if (!defined(TINY_STDIO) && defined(_WANT_IO_LONG_DOUBLE))
-/* __ldtoa is really broken */
-#define ERROR_MAX 1e-5
-#else
 #define ERROR_MAX 0
-#endif
 #endif
 #else
 #define float_type double
