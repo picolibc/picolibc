@@ -141,7 +141,7 @@ frexpl (long double x, int *eptr)
     return x; /* inf,nan,0 */
   if (e == 0) /* subnormal */
     {
-      u.x *= scale;
+      u.x *= (long double) scale;
       e = u.u32.exp;
       *eptr -= scale_exp;
     }
