@@ -285,6 +285,7 @@ AC_ARG_ENABLE(newlib-use-gdtoa,
   esac
  fi], [newlib_use_gdtoa=yes])dnl
 
+AM_ENABLE_MULTILIB(, ..)
 NEWLIB_CONFIGURE(.)
 
 dnl We have to enable libtool after NEWLIB_CONFIGURE because if we try and

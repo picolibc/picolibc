@@ -13,17 +13,6 @@ dnl newlib directory.
 
 AC_DEFUN([NEWLIB_CONFIGURE],
 [AC_REQUIRE([DEF_NEWLIB_VERSION])
-m4_if($1, [.], [AM_ENABLE_MULTILIB(, ..)], [dnl
-dnl Default to --enable-multilib
-AC_ARG_ENABLE(multilib,
-[  --enable-multilib         build many library versions (default)],
-[case "${enableval}" in
-  yes) multilib=yes ;;
-  no)  multilib=no ;;
-  *)   AC_MSG_ERROR(bad value ${enableval} for multilib option) ;;
- esac], [multilib=yes])dnl
-])dnl
-
 dnl Support --enable-target-optspace
 AC_ARG_ENABLE(target-optspace,
 [  --enable-target-optspace  optimize for space],
