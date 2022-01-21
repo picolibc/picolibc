@@ -39,7 +39,7 @@ endif
 # The order of SUBDIRS is important for the integrated documentation.
 # Do not change the order without considering the doc impact.
 SUBDIRS = argz stdlib ctype search $(STDIO_SUBDIR) $(STDIO64_SUBDIR) string $(SIGNAL_SUBDIR) time locale sys reent \
-	$(extra_dir) errno misc machine $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) $(NEWLIB_ICONV_DIRS) \
+	errno misc machine $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) $(NEWLIB_ICONV_DIRS) \
 	$(XDR_SUBDIR) ssp .
 
 noinst_DATA = $(CRT0)
@@ -59,7 +59,6 @@ SUBLIBS = \
 	time/libtime.$(aext) \
 	locale/liblocale.$(aext) \
 	reent/libreent.$(aext) \
-	$(LIBC_EXTRA_LIB) \
 	errno/liberrno.$(aext) \
 	misc/libmisc.$(aext) \
 	ssp/libssp.$(aext) \
@@ -83,7 +82,6 @@ SUBLIBS = \
 	time/lib.$(aext) \
 	locale/lib.$(aext) \
 	reent/lib.$(aext) \
-	$(LIBC_EXTRA_LIB) \
 	errno/lib.$(aext) \
 	misc/lib.$(aext) \
 	ssp/lib.$(aext) \
@@ -139,16 +137,15 @@ SUBDEFS = \
 	time/stmp-def \
 	locale/stmp-def \
 	reent/stmp-def \
-	$(LIBC_EXTRA_DEF) \
 	misc/stmp-def
 
 # ditto for stmp-xml files in each subdirectory which builds .xml files
 SUBXMLS = $(SUBDEFS:stmp-def=stmp-xml)
 
-libc.info: sigset.texi extra.texi stdio64.texi posix.texi iconvset.texi \
+libc.info: sigset.texi stdio64.texi posix.texi iconvset.texi \
 	targetdep.tex $(SUBDEFS)
 
-libc.dvi: sigset.texi extra.texi stdio64.texi posix.texi iconvset.texi \
+libc.dvi: sigset.texi stdio64.texi posix.texi iconvset.texi \
 	targetdep.tex $(SUBDEFS)
 
 stmp-sigset: config.status
@@ -172,17 +169,6 @@ stmp-iconvset: config.status
 	touch $@
 
 iconvset.texi: stmp-iconvset ; @true
-
-stmp-extra: config.status
-	if test -n "$(LIBC_EXTRA_LIB)"; then \
-	  echo "@set EXTRA" >tmp-extra.texi; \
-	else \
-	  echo "@clear EXTRA" >tmp-extra.texi; \
-	fi
-	$(SHELL) $(newlib_basedir)/../move-if-change tmp-extra.texi extra.texi
-	touch $@
-
-extra.texi: stmp-extra ; @true
 
 stmp-stdio64: config.status
 	if test -n "$(LIBC_STDIO64_LIB)"; then \
@@ -224,7 +210,7 @@ $(SUBDEFS): stmp-targetdep ; @true
 
 TEXINFO_TEX = ../../texinfo/texinfo.tex
 info_TEXINFOS = libc.texi
-libc_TEXINFOS = sigset.texi extra.texi posix.texi stdio64.texi iconvset.texi \
+libc_TEXINFOS = sigset.texi posix.texi stdio64.texi iconvset.texi \
 	targetdep.tex $(SUBDEFS)
 
 docbook-recursive: force
@@ -248,9 +234,9 @@ install-man: man
 force:
 
 CLEANFILES = $(CRT0) \
-	sigset.texi stmp-sigset extra.texi stmp-extra \
+	sigset.texi stmp-sigset \
 	stdio64.texi stmp-stdio64 targetdep.tex stmp-targetdep \
-	tmp-sigset.texi tmp-iconvset.texi tmp-extra.texi \
+	tmp-sigset.texi tmp-iconvset.texi \
 	tmp-stdio64.texi tmp-posix.texi tmp-targetdep.texi \
 	*.xml *.3
 

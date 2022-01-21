@@ -138,7 +138,6 @@ into another language, under the above conditions for modified versions.
 @c switch to set SIGNALS on or off, according to whether config picks up
 @c signal subdirectory:
 @include sigset.texi
-@include extra.texi
 @include posix.texi
 @include stdio64.texi
 @include iconvset.texi
