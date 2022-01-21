@@ -13315,46 +13315,54 @@ $as_echo "#define _HAVE_CC_INHIBIT_LOOP_TO_LIBCALL 1" >>confdefs.h
 fi
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether long double type exists" >&5
-$as_echo_n "checking whether long double type exists... " >&6; }
-if ${acnewlib_cv_type_long_double+:} false; then :
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for long double" >&5
+$as_echo_n "checking for long double... " >&6; }
+if ${ac_cv_type_long_double+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  cat > conftest.c <<EOF
-/* Check two ways:  float.h defines and direct type declaration.  */
-#include <float.h>
-#if defined(LDBL_MANT_DIG)
-  #define _HAVE_LONG_DOUBLE
- #else
-  #error "LDBL != DBL"
-#endif
-long double test() {
-long double ld = 0.0L;
-return ld;
+  if test "$GCC" = yes; then
+       ac_cv_type_long_double=yes
+     else
+       cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+/* The Stardent Vistra knows sizeof (long double), but does
+		 not support it.  */
+	      long double foo = 0.0L;
+int
+main ()
+{
+static int test_array [1 - 2 * !(/* On Ultrix 4.3 cc, long double is 4 and double is 8.  */
+	      sizeof (double) <= sizeof (long double))];
+test_array [0] = 0;
+return test_array [0];
+
+  ;
+  return 0;
 }
-EOF
-if { ac_try='${CC} $CFLAGS $CPPFLAGS -c -o conftest.o conftest.c
-							1>&5'
-  { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; }
-then
-  acnewlib_cv_type_long_double=yes;
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_cv_type_long_double=yes
 else
-  acnewlib_cv_type_long_double=no;
+  ac_cv_type_long_double=no
 fi
-rm -f conftest*
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+     fi
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $acnewlib_cv_type_long_double" >&5
-$as_echo "$acnewlib_cv_type_long_double" >&6; }
-if test $acnewlib_cv_type_long_double = yes; then
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_type_long_double" >&5
+$as_echo "$ac_cv_type_long_double" >&6; }
+  if test $ac_cv_type_long_double = yes; then
+
+$as_echo "#define HAVE_LONG_DOUBLE 1" >>confdefs.h
+
+  fi
+
+if test $ac_cv_type_long_double = yes; then
 
 $as_echo "#define _HAVE_LONG_DOUBLE 1" >>confdefs.h
 
 fi
- if test x"$acnewlib_cv_type_long_double" = x"yes"; then
+ if test x"$ac_cv_type_long_double" = x"yes"; then
   HAVE_LONG_DOUBLE_TRUE=
   HAVE_LONG_DOUBLE_FALSE='#'
 else

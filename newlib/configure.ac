@@ -687,39 +687,12 @@ if test $libc_cv_cc_loop_to_function = yes; then
 fi
 AC_SUBST(libc_cv_cc_loop_to_function)
 
-dnl Autoconf 2.59 doesn't support the AC_TYPE_LONG_DOUBLE macro. Instead of:
-dnl   AC_TYPE_LONG_DOUBLE
-dnl   AM_CONDITIONAL(HAVE_LONG_DOUBLE, test x"$ac_cv_type_long_double" = x"yes")
-dnl we specify our own long double test.
-dnl Additionally, ac_cv_objext is broken so that AC_COMPILE_IFELSE cannot be
-dnl used, so use AC_TRY_COMMAND instead.
-AC_CACHE_CHECK(whether long double type exists,
-	       acnewlib_cv_type_long_double, [dnl
-cat > conftest.c <<EOF
-/* Check two ways:  float.h defines and direct type declaration.  */
-#include <float.h>
-#if defined(LDBL_MANT_DIG)
-  #define _HAVE_LONG_DOUBLE
- #else
-  #error "LDBL != DBL"
-#endif
-long double test() {
-long double ld = 0.0L;
-return ld;
-}
-EOF
-if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS -c -o conftest.o conftest.c
-							1>&AS_MESSAGE_LOG_FD])
-then
-  acnewlib_cv_type_long_double=yes;
-else
-  acnewlib_cv_type_long_double=no;
-fi
-rm -f conftest*])
-if test $acnewlib_cv_type_long_double = yes; then
+AC_TYPE_LONG_DOUBLE
+dnl Export the setting for our installed headers to check.
+if test $ac_cv_type_long_double = yes; then
   AC_DEFINE(_HAVE_LONG_DOUBLE, 1, [Define if the platform supports long double type.])
 fi
-AM_CONDITIONAL(HAVE_LONG_DOUBLE, test x"$acnewlib_cv_type_long_double" = x"yes")
+AM_CONDITIONAL(HAVE_LONG_DOUBLE, test x"$ac_cv_type_long_double" = x"yes")
 
 AC_CACHE_CHECK(whether long double equals double,
 	       newlib_cv_ldbl_eq_dbl, [dnl
