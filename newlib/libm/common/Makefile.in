@@ -493,20 +493,20 @@ DOCBOOK_CHEW = ${top_srcdir}/../doc/makedocbook.py
 DOCBOOK_OUT_FILES = $(CHEWOUT_FILES:.def=.xml)
 DOCBOOK_CHAPTERS = $(CHAPTERS:.tex=.xml)
 CLEANFILES = $(CHEWOUT_FILES) $(DOCBOOK_OUT_FILES)
-CHEWOUT_FILES = s_cbrt.def s_copysign.def s_exp10.def s_expm1.def s_ilogb.def \
-	s_infinity.def s_isnan.def s_log1p.def s_modf.def \
-	s_nan.def s_nextafter.def s_pow10.def s_scalbn.def \
-	s_fdim.def s_fma.def s_fmax.def s_fmin.def \
-	s_logb.def s_log2.def s_lrint.def s_lround.def s_nearbyint.def \
-	s_remquo.def s_rint.def s_round.def s_signbit.def s_trunc.def \
-	isgreater.def
-
-CHAPTERS = 
+LIBM_CHEWOUT_FILES = s_cbrt.def s_copysign.def s_exp10.def s_expm1.def \
+	s_ilogb.def s_infinity.def s_isnan.def s_log1p.def s_modf.def \
+	s_nan.def s_nextafter.def s_pow10.def s_scalbn.def s_fdim.def \
+	s_fma.def s_fmax.def s_fmin.def s_logb.def s_log2.def \
+	s_lrint.def s_lround.def s_nearbyint.def s_remquo.def \
+	s_rint.def s_round.def s_signbit.def s_trunc.def isgreater.def
+LIBM_CHAPTERS =
+CHEWOUT_FILES = $(LIBM_CHEWOUT_FILES)
+CHAPTERS = $(LIBM_CHAPTERS)
 all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .def .xml .c .lo .o .obj
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../../Makefile.shared $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../../Makefile.shared $(srcdir)/./Makefile.inc $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -526,7 +526,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe);; \
 	esac;
-$(srcdir)/../../Makefile.shared $(am__empty):
+$(srcdir)/../../Makefile.shared $(srcdir)/./Makefile.inc $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh

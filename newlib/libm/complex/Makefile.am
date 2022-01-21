@@ -35,13 +35,11 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
-CHEWOUT_FILES =	cabs.def cacos.def cacosh.def carg.def \
-        casin.def casinh.def catan.def catanh.def \
-        ccos.def ccosh.def cexp.def cimag.def clog.def \
-        clog10.def conj.def cpow.def cproj.def creal.def \
-        csin.def csinh.def csqrt.def ctan.def ctanh.def
-
-CHAPTERS = complex.tex
+LIBM_CHEWOUT_FILES =
+LIBM_CHAPTERS =
+include ./Makefile.inc
+CHEWOUT_FILES = $(LIBM_CHEWOUT_FILES)
+CHAPTERS = $(LIBM_CHAPTERS)
 
 # A partial dependency list.
 

@@ -96,13 +96,60 @@ host_triplet = @host@
 # We can't use noinst_PROGRAMS, because automake will add $(EXEEXT).
 @HAVE_DOC_TRUE@am__append_3 = doc/makedoc
 @HAVE_DOC_TRUE@am__append_4 = man-cache
-@HAVE_ICONVDATA_TRUE@am__append_5 = iconvdata/EUC-JP.la
-@ELIX_LEVEL_1_FALSE@@HAVE_ICONVDATA_TRUE@am__append_6 = \
+
+#
+# Subdir documentation rules.
+#
+@HAVE_DOC_TRUE@am__append_5 = .def
+@HAVE_ICONVDATA_TRUE@am__append_6 = iconvdata/EUC-JP.la
+@ELIX_LEVEL_1_FALSE@@HAVE_ICONVDATA_TRUE@am__append_7 = \
 @ELIX_LEVEL_1_FALSE@@HAVE_ICONVDATA_TRUE@	iconvdata/euc-jp.c \
 @ELIX_LEVEL_1_FALSE@@HAVE_ICONVDATA_TRUE@	iconvdata/jis0201.c \
 @ELIX_LEVEL_1_FALSE@@HAVE_ICONVDATA_TRUE@	iconvdata/jis0208.c \
 @ELIX_LEVEL_1_FALSE@@HAVE_ICONVDATA_TRUE@	iconvdata/jis0212.c
 
+@NEWLIB_HW_FP_TRUE@am__append_8 = \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/e_acosh.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/e_atanh.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/e_hypot.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/e_remainder.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/er_lgamma.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/s_acos.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/s_asine.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/s_asinh.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/s_atan.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/s_atan2.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/s_atangent.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/s_cosh.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/s_erf.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/s_exp.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/s_fabs.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/s_floor.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/s_fmod.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/s_frexp.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/s_ldexp.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/s_log10.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/s_logarithm.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/s_pow.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/s_sine.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/s_sineh.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/s_sqrt.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/s_tan.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/s_tanh.def \
+@NEWLIB_HW_FP_TRUE@	libm/mathfp/w_jn.def
+
+@NEWLIB_HW_FP_TRUE@am__append_9 = libm/mathfp/mathfp.tex
+@NEWLIB_HW_FP_FALSE@am__append_10 = \
+@NEWLIB_HW_FP_FALSE@	libm/math/w_acos.def libm/math/w_acosh.def libm/math/w_asin.def libm/math/s_asinh.def \
+@NEWLIB_HW_FP_FALSE@	libm/math/s_atan.def libm/math/w_atan2.def libm/math/w_atanh.def libm/math/w_j0.def \
+@NEWLIB_HW_FP_FALSE@	libm/math/w_cosh.def libm/math/s_erf.def libm/math/w_exp.def libm/math/w_exp2.def \
+@NEWLIB_HW_FP_FALSE@	libm/math/s_fabs.def libm/math/s_floor.def libm/math/w_fmod.def libm/math/s_frexp.def \
+@NEWLIB_HW_FP_FALSE@	libm/math/w_gamma.def libm/math/w_hypot.def libm/math/s_ldexp.def libm/math/w_log.def \
+@NEWLIB_HW_FP_FALSE@	libm/math/w_log10.def \
+@NEWLIB_HW_FP_FALSE@	libm/math/w_pow.def libm/math/w_remainder.def libm/math/s_sin.def libm/math/w_sinh.def \
+@NEWLIB_HW_FP_FALSE@	libm/math/w_sqrt.def libm/math/s_tan.def libm/math/s_tanh.def
+
+@NEWLIB_HW_FP_FALSE@am__append_11 = libm/math/math.tex
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../config/depstand.m4 \
@@ -237,6 +284,45 @@ am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = libc.c libm.c $(iconvdata_EUC_JP_la_SOURCES) \
 	$(libc_la_SOURCES) $(libm_la_SOURCES)
+AM_V_DVIPS = $(am__v_DVIPS_@AM_V@)
+am__v_DVIPS_ = $(am__v_DVIPS_@AM_DEFAULT_V@)
+am__v_DVIPS_0 = @echo "  DVIPS   " $@;
+am__v_DVIPS_1 = 
+AM_V_MAKEINFO = $(am__v_MAKEINFO_@AM_V@)
+am__v_MAKEINFO_ = $(am__v_MAKEINFO_@AM_DEFAULT_V@)
+am__v_MAKEINFO_0 = @echo "  MAKEINFO" $@;
+am__v_MAKEINFO_1 = 
+AM_V_INFOHTML = $(am__v_INFOHTML_@AM_V@)
+am__v_INFOHTML_ = $(am__v_INFOHTML_@AM_DEFAULT_V@)
+am__v_INFOHTML_0 = @echo "  INFOHTML" $@;
+am__v_INFOHTML_1 = 
+AM_V_TEXI2DVI = $(am__v_TEXI2DVI_@AM_V@)
+am__v_TEXI2DVI_ = $(am__v_TEXI2DVI_@AM_DEFAULT_V@)
+am__v_TEXI2DVI_0 = @echo "  TEXI2DVI" $@;
+am__v_TEXI2DVI_1 = 
+AM_V_TEXI2PDF = $(am__v_TEXI2PDF_@AM_V@)
+am__v_TEXI2PDF_ = $(am__v_TEXI2PDF_@AM_DEFAULT_V@)
+am__v_TEXI2PDF_0 = @echo "  TEXI2PDF" $@;
+am__v_TEXI2PDF_1 = 
+AM_V_texinfo = $(am__v_texinfo_@AM_V@)
+am__v_texinfo_ = $(am__v_texinfo_@AM_DEFAULT_V@)
+am__v_texinfo_0 = -q
+am__v_texinfo_1 = 
+AM_V_texidevnull = $(am__v_texidevnull_@AM_V@)
+am__v_texidevnull_ = $(am__v_texidevnull_@AM_DEFAULT_V@)
+am__v_texidevnull_0 = > /dev/null
+am__v_texidevnull_1 = 
+INFO_DEPS = $(srcdir)/libm/libm.info
+am__TEXINFO_TEX_DIR = $(srcdir)/../texinfo
+DVIS = libm/libm.dvi
+PDFS = libm/libm.pdf
+PSS = libm/libm.ps
+HTMLS = libm/libm.html
+TEXINFOS = libm/libm.texi
+TEXI2PDF = $(TEXI2DVI) --pdf --batch
+MAKEINFOHTML = $(MAKEINFO) --html
+AM_MAKEINFOHTMLFLAGS = $(AM_MAKEINFOFLAGS)
+DVIPS = dvips
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -440,9 +526,11 @@ ACLOCAL_AMFLAGS = -I . -I .. -I ../config
 
 # Variables that will accumulate in subdirs.
 PHONY = $(am__append_4)
+SUFFIXES = $(am__append_5)
+info_TEXINFOS = libm/libm.texi
 noinst_DATA = stmp-targ-include $(am__append_1) $(am__append_2) \
 	$(am__append_3)
-pkglib_LTLIBRARIES = $(am__append_5)
+pkglib_LTLIBRARIES = $(am__append_6)
 LIBTOOL_VERSION_INFO = 0:0:0
 @NEWLIB_HW_FP_FALSE@MATHDIR = math
 
@@ -554,7 +642,8 @@ libc_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-unde
 @USE_LIBTOOL_TRUE@libm_la_DEPENDENCIES = libm-libtool-objectlist
 @USE_LIBTOOL_TRUE@libc_la_SOURCES = 
 @USE_LIBTOOL_TRUE@libc_la_DEPENDENCIES = libc-libtool-objectlist
-CLEANFILES = stmp-targ-include
+CLEANFILES = stmp-targ-include libm/targetdep.tex \
+	libm/targetdep.tex.stamp $(LIBM_CHEWOUT_FILES)
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 MULTISRCTOP = 
 MULTIBUILDTOP = 
@@ -566,9 +655,15 @@ MAKEOVERRIDES =
 
 # dejagnu support
 RUNTESTFLAGS = 
+
+# Workaround bad automake/texinfo interactions.
+# https://bugs.gnu.org/23599
+TEXI2DVI = texi2dvi -E
+TEXINFO_TEX = ../texinfo/texinfo.tex
 @HAVE_DOC_TRUE@MKDOC = doc/makedoc$(EXEEXT_FOR_BUILD)
+@HAVE_DOC_TRUE@CHEW = $(MKDOC) -f $(srcdir)/doc/doc.str
 @HAVE_ICONVDATA_TRUE@iconvdata_EUC_JP_la_SOURCES = iconvdata/dummy.c \
-@HAVE_ICONVDATA_TRUE@	$(am__append_6)
+@HAVE_ICONVDATA_TRUE@	$(am__append_7)
 @HAVE_ICONVDATA_TRUE@iconvdata_EUC_JP_la_DEPENDENCIES = $(iconvdata_EUC_JP_la_LIBADD)
 @HAVE_ICONVDATA_TRUE@iconvdata_EUC_JP_la_CPPFLAGS = \
 @HAVE_ICONVDATA_TRUE@	-DNDEBUG \
@@ -579,14 +674,49 @@ RUNTESTFLAGS =
 @HAVE_ICONVDATA_TRUE@iconvdata_EUC_JP_la_LDFLAGS = -module -no-undefined -Xcompiler -Wl,-rpath-link=. -Xcompiler -nostdlib -L. -lc
 @HAVE_ICONVDATA_TRUE@gconvdir = $(pkglibdir)
 @HAVE_ICONVDATA_TRUE@gconv_DATA = iconvdata/gconv-modules
+libm_libm_TEXINFOS = libm/targetdep.tex $(LIBM_CHEWOUT_FILES)
+LIBM_CHEWOUT_FILES = libm/common/s_cbrt.def libm/common/s_copysign.def \
+	libm/common/s_exp10.def libm/common/s_expm1.def \
+	libm/common/s_ilogb.def libm/common/s_infinity.def \
+	libm/common/s_isnan.def libm/common/s_log1p.def \
+	libm/common/s_modf.def libm/common/s_nan.def \
+	libm/common/s_nextafter.def libm/common/s_pow10.def \
+	libm/common/s_scalbn.def libm/common/s_fdim.def \
+	libm/common/s_fma.def libm/common/s_fmax.def \
+	libm/common/s_fmin.def libm/common/s_logb.def \
+	libm/common/s_log2.def libm/common/s_lrint.def \
+	libm/common/s_lround.def libm/common/s_nearbyint.def \
+	libm/common/s_remquo.def libm/common/s_rint.def \
+	libm/common/s_round.def libm/common/s_signbit.def \
+	libm/common/s_trunc.def libm/common/isgreater.def \
+	libm/complex/cabs.def libm/complex/cacos.def \
+	libm/complex/cacosh.def libm/complex/carg.def \
+	libm/complex/casin.def libm/complex/casinh.def \
+	libm/complex/catan.def libm/complex/catanh.def \
+	libm/complex/ccos.def libm/complex/ccosh.def \
+	libm/complex/cexp.def libm/complex/cimag.def \
+	libm/complex/clog.def libm/complex/clog10.def \
+	libm/complex/conj.def libm/complex/cpow.def \
+	libm/complex/cproj.def libm/complex/creal.def \
+	libm/complex/csin.def libm/complex/csinh.def \
+	libm/complex/csqrt.def libm/complex/ctan.def \
+	libm/complex/ctanh.def libm/fenv/feclearexcept.def \
+	libm/fenv/fegetenv.def libm/fenv/fegetexceptflag.def \
+	libm/fenv/fegetround.def libm/fenv/feholdexcept.def \
+	libm/fenv/feraiseexcept.def libm/fenv/fesetenv.def \
+	libm/fenv/fesetexceptflag.def libm/fenv/fesetround.def \
+	libm/fenv/fetestexcept.def libm/fenv/feupdateenv.def \
+	$(am__append_8) $(am__append_10)
+LIBM_CHAPTERS = libm/complex/complex.tex libm/fenv/fenv.tex \
+	$(am__append_9) $(am__append_11)
 all: newlib.h _newlib_version.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .c .lo .o .obj
+.SUFFIXES: .def .c .dvi .lo .o .obj .ps
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../multilib.am $(srcdir)/doc/local.mk $(srcdir)/iconvdata/Makefile.inc $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../multilib.am $(srcdir)/doc/local.mk $(srcdir)/iconvdata/Makefile.inc $(srcdir)/libm/Makefile.inc $(srcdir)/libm/common/Makefile.inc $(srcdir)/libm/complex/Makefile.inc $(srcdir)/libm/fenv/Makefile.inc $(srcdir)/libm/mathfp/Makefile.inc $(srcdir)/libm/math/Makefile.inc $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -608,7 +738,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe);; \
 	esac;
-$(srcdir)/../multilib.am $(srcdir)/doc/local.mk $(srcdir)/iconvdata/Makefile.inc $(am__empty):
+$(srcdir)/../multilib.am $(srcdir)/doc/local.mk $(srcdir)/iconvdata/Makefile.inc $(srcdir)/libm/Makefile.inc $(srcdir)/libm/common/Makefile.inc $(srcdir)/libm/complex/Makefile.inc $(srcdir)/libm/fenv/Makefile.inc $(srcdir)/libm/mathfp/Makefile.inc $(srcdir)/libm/math/Makefile.inc $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
@@ -811,6 +941,140 @@ clean-libtool:
 
 distclean-libtool:
 	-rm -f libtool config.lt
+libm/$(am__dirstamp):
+	@$(MKDIR_P) libm
+	@: > libm/$(am__dirstamp)
+
+$(srcdir)/libm/libm.info: libm/libm.texi $(libm_libm_TEXINFOS)
+	$(AM_V_MAKEINFO)restore=: && backupdir="$(am__leading_dot)am$$$$" && \
+	am__cwd=`pwd` && $(am__cd) $(srcdir) && \
+	rm -rf $$backupdir && mkdir $$backupdir && \
+	if ($(MAKEINFO) --version) >/dev/null 2>&1; then \
+	  for f in $@ $@-[0-9] $@-[0-9][0-9] $(@:.info=).i[0-9] $(@:.info=).i[0-9][0-9]; do \
+	    if test -f $$f; then mv $$f $$backupdir; restore=mv; else :; fi; \
+	  done; \
+	else :; fi && \
+	cd "$$am__cwd"; \
+	if $(MAKEINFO) $(AM_MAKEINFOFLAGS) $(MAKEINFOFLAGS) -I libm -I $(srcdir)/libm \
+	 -o $@ $(srcdir)/libm/libm.texi; \
+	then \
+	  rc=0; \
+	  $(am__cd) $(srcdir); \
+	else \
+	  rc=$$?; \
+	  $(am__cd) $(srcdir) && \
+	  $$restore $$backupdir/* `echo "./$@" | sed 's|[^/]*$$||'`; \
+	fi; \
+	rm -rf $$backupdir; exit $$rc
+
+libm/libm.pdf: libm/libm.texi $(libm_libm_TEXINFOS) libm/$(am__dirstamp)
+	$(AM_V_TEXI2PDF)TEXINPUTS="$(am__TEXINFO_TEX_DIR)$(PATH_SEPARATOR)$$TEXINPUTS" \
+	MAKEINFO='$(MAKEINFO) $(AM_MAKEINFOFLAGS) $(MAKEINFOFLAGS) -I libm -I $(srcdir)/libm' \
+	$(TEXI2PDF) $(AM_V_texinfo) --build-dir=$(@:.pdf=.t2p) -o $@ $(AM_V_texidevnull) \
+	`test -f 'libm/libm.texi' || echo '$(srcdir)/'`libm/libm.texi
+
+libm/libm.html: libm/libm.texi $(libm_libm_TEXINFOS) libm/$(am__dirstamp)
+	$(AM_V_MAKEINFO)rm -rf $(@:.html=.htp)
+	$(AM_V_at)if $(MAKEINFOHTML) $(AM_MAKEINFOHTMLFLAGS) $(MAKEINFOFLAGS) -I libm -I $(srcdir)/libm \
+	 -o $(@:.html=.htp) `test -f 'libm/libm.texi' || echo '$(srcdir)/'`libm/libm.texi; \
+	then \
+	  rm -rf $@ && mv $(@:.html=.htp) $@; \
+	else \
+	  rm -rf $(@:.html=.htp); exit 1; \
+	fi
+.dvi.ps:
+	$(AM_V_DVIPS)TEXINPUTS="$(am__TEXINFO_TEX_DIR)$(PATH_SEPARATOR)$$TEXINPUTS" \
+	$(DVIPS) $(AM_V_texinfo) -o $@ $<
+
+uninstall-dvi-am:
+	@$(NORMAL_UNINSTALL)
+	@list='$(DVIS)'; test -n "$(dvidir)" || list=; \
+	for p in $$list; do \
+	  $(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(dvidir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(dvidir)/$$f"; \
+	done
+
+uninstall-html-am:
+	@$(NORMAL_UNINSTALL)
+	@list='$(HTMLS)'; test -n "$(htmldir)" || list=; \
+	for p in $$list; do \
+	  $(am__strip_dir) \
+	  echo " rm -rf '$(DESTDIR)$(htmldir)/$$f'"; \
+	  rm -rf "$(DESTDIR)$(htmldir)/$$f"; \
+	done
+
+uninstall-info-am:
+	@$(PRE_UNINSTALL)
+	@if test -d '$(DESTDIR)$(infodir)' && $(am__can_run_installinfo); then \
+	  list='$(INFO_DEPS)'; \
+	  for file in $$list; do \
+	    relfile=`echo "$$file" | sed 's|^.*/||'`; \
+	    echo " install-info --info-dir='$(DESTDIR)$(infodir)' --remove '$(DESTDIR)$(infodir)/$$relfile'"; \
+	    if install-info --info-dir="$(DESTDIR)$(infodir)" --remove "$(DESTDIR)$(infodir)/$$relfile"; \
+	    then :; else test ! -f "$(DESTDIR)$(infodir)/$$relfile" || exit 1; fi; \
+	  done; \
+	else :; fi
+	@$(NORMAL_UNINSTALL)
+	@list='$(INFO_DEPS)'; \
+	for file in $$list; do \
+	  relfile=`echo "$$file" | sed 's|^.*/||'`; \
+	  relfile_i=`echo "$$relfile" | sed 's|\.info$$||;s|$$|.i|'`; \
+	  (if test -d "$(DESTDIR)$(infodir)" && cd "$(DESTDIR)$(infodir)"; then \
+	     echo " cd '$(DESTDIR)$(infodir)' && rm -f $$relfile $$relfile-[0-9] $$relfile-[0-9][0-9] $$relfile_i[0-9] $$relfile_i[0-9][0-9]"; \
+	     rm -f $$relfile $$relfile-[0-9] $$relfile-[0-9][0-9] $$relfile_i[0-9] $$relfile_i[0-9][0-9]; \
+	   else :; fi); \
+	done
+
+uninstall-pdf-am:
+	@$(NORMAL_UNINSTALL)
+	@list='$(PDFS)'; test -n "$(pdfdir)" || list=; \
+	for p in $$list; do \
+	  $(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(pdfdir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(pdfdir)/$$f"; \
+	done
+
+uninstall-ps-am:
+	@$(NORMAL_UNINSTALL)
+	@list='$(PSS)'; test -n "$(psdir)" || list=; \
+	for p in $$list; do \
+	  $(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(psdir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(psdir)/$$f"; \
+	done
+
+dist-info: $(INFO_DEPS)
+	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
+	list='$(INFO_DEPS)'; \
+	for base in $$list; do \
+	  case $$base in \
+	    $(srcdir)/*) base=`echo "$$base" | sed "s|^$$srcdirstrip/||"`;; \
+	  esac; \
+	  if test -f $$base; then d=.; else d=$(srcdir); fi; \
+	  base_i=`echo "$$base" | sed 's|\.info$$||;s|$$|.i|'`; \
+	  for file in $$d/$$base $$d/$$base-[0-9] $$d/$$base-[0-9][0-9] $$d/$$base_i[0-9] $$d/$$base_i[0-9][0-9]; do \
+	    if test -f $$file; then \
+	      relfile=`expr "$$file" : "$$d/\(.*\)"`; \
+	      test -f "$(distdir)/$$relfile" || \
+		cp -p $$file "$(distdir)/$$relfile"; \
+	    else :; fi; \
+	  done; \
+	done
+
+mostlyclean-aminfo:
+	-rm -rf libm/libm.t2d libm/libm.t2p
+
+clean-aminfo:
+	-test -z "libm/libm.dvi libm/libm.pdf libm/libm.ps libm/libm.html" \
+	|| rm -rf libm/libm.dvi libm/libm.pdf libm/libm.ps libm/libm.html
+
+maintainer-clean-aminfo:
+	@list='$(INFO_DEPS)'; for i in $$list; do \
+	  i_i=`echo "$$i" | sed 's|\.info$$||;s|$$|.i|'`; \
+	  echo " rm -f $$i $$i-[0-9] $$i-[0-9][0-9] $$i_i[0-9] $$i_i[0-9][0-9]"; \
+	  rm -f $$i $$i-[0-9] $$i-[0-9][0-9] $$i_i[0-9] $$i_i[0-9][0-9]; \
+	done
 install-gconvDATA: $(gconv_DATA)
 	@$(NORMAL_INSTALL)
 	@list='$(gconv_DATA)'; test -n "$(gconvdir)" || list=; \
@@ -1003,13 +1267,14 @@ distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
 	-rm -f iconvdata/$(am__dirstamp)
+	-rm -f libm/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-generic clean-libtool clean-local \
+clean-am: clean-aminfo clean-generic clean-libtool clean-local \
 	clean-pkglibLTLIBRARIES clean-toollibLIBRARIES \
 	clean-toollibLTLIBRARIES mostlyclean-am
 
@@ -1022,15 +1287,15 @@ distclean-am: clean-am distclean-DEJAGNU distclean-compile \
 
 dvi: dvi-recursive
 
-dvi-am:
+dvi-am: $(DVIS)
 
 html: html-recursive
 
-html-am:
+html-am: $(HTMLS)
 
 info: info-recursive
 
-info-am:
+info-am: $(INFO_DEPS)
 
 install-data-am: install-data-local install-gconvDATA \
 	install-toollibDATA install-toollibLIBRARIES \
@@ -1038,60 +1303,152 @@ install-data-am: install-data-local install-gconvDATA \
 
 install-dvi: install-dvi-recursive
 
-install-dvi-am:
-
+install-dvi-am: $(DVIS)
+	@$(NORMAL_INSTALL)
+	@list='$(DVIS)'; test -n "$(dvidir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(dvidir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(dvidir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(dvidir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(dvidir)" || exit $$?; \
+	done
 install-exec-am: install-exec-local install-pkglibLTLIBRARIES
 
 install-html: install-html-recursive
 
-install-html-am:
-
+install-html-am: $(HTMLS)
+	@$(NORMAL_INSTALL)
+	@list='$(HTMLS)'; list2=; test -n "$(htmldir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(htmldir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(htmldir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p" || test -d "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  $(am__strip_dir) \
+	  d2=$$d$$p; \
+	  if test -d "$$d2"; then \
+	    echo " $(MKDIR_P) '$(DESTDIR)$(htmldir)/$$f'"; \
+	    $(MKDIR_P) "$(DESTDIR)$(htmldir)/$$f" || exit 1; \
+	    echo " $(INSTALL_DATA) '$$d2'/* '$(DESTDIR)$(htmldir)/$$f'"; \
+	    $(INSTALL_DATA) "$$d2"/* "$(DESTDIR)$(htmldir)/$$f" || exit $$?; \
+	  else \
+	    list2="$$list2 $$d2"; \
+	  fi; \
+	done; \
+	test -z "$$list2" || { echo "$$list2" | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(htmldir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(htmldir)" || exit $$?; \
+	done; }
 install-info: install-info-recursive
 
-install-info-am:
-
+install-info-am: $(INFO_DEPS)
+	@$(NORMAL_INSTALL)
+	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
+	list='$(INFO_DEPS)'; test -n "$(infodir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(infodir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(infodir)" || exit 1; \
+	fi; \
+	for file in $$list; do \
+	  case $$file in \
+	    $(srcdir)/*) file=`echo "$$file" | sed "s|^$$srcdirstrip/||"`;; \
+	  esac; \
+	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
+	  file_i=`echo "$$file" | sed 's|\.info$$||;s|$$|.i|'`; \
+	  for ifile in $$d/$$file $$d/$$file-[0-9] $$d/$$file-[0-9][0-9] \
+	               $$d/$$file_i[0-9] $$d/$$file_i[0-9][0-9] ; do \
+	    if test -f $$ifile; then \
+	      echo "$$ifile"; \
+	    else : ; fi; \
+	  done; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(infodir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(infodir)" || exit $$?; done
+	@$(POST_INSTALL)
+	@if $(am__can_run_installinfo); then \
+	  list='$(INFO_DEPS)'; test -n "$(infodir)" || list=; \
+	  for file in $$list; do \
+	    relfile=`echo "$$file" | sed 's|^.*/||'`; \
+	    echo " install-info --info-dir='$(DESTDIR)$(infodir)' '$(DESTDIR)$(infodir)/$$relfile'";\
+	    install-info --info-dir="$(DESTDIR)$(infodir)" "$(DESTDIR)$(infodir)/$$relfile" || :;\
+	  done; \
+	else : ; fi
 install-pdf: install-pdf-recursive
 
-install-pdf-am:
-
+install-pdf-am: $(PDFS)
+	@$(NORMAL_INSTALL)
+	@list='$(PDFS)'; test -n "$(pdfdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(pdfdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(pdfdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(pdfdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(pdfdir)" || exit $$?; done
 install-ps: install-ps-recursive
 
-install-ps-am:
-
+install-ps-am: $(PSS)
+	@$(NORMAL_INSTALL)
+	@list='$(PSS)'; test -n "$(psdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(psdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(psdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(psdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(psdir)" || exit $$?; done
 installcheck-am:
 
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
 	-rm -f Makefile
-maintainer-clean-am: distclean-am maintainer-clean-generic \
-	maintainer-clean-local
+maintainer-clean-am: distclean-am maintainer-clean-aminfo \
+	maintainer-clean-generic maintainer-clean-local
 
 mostlyclean: mostlyclean-recursive
 
-mostlyclean-am: mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool mostlyclean-local
+mostlyclean-am: mostlyclean-aminfo mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool mostlyclean-local
 
 pdf: pdf-recursive
 
-pdf-am:
+pdf-am: $(PDFS)
 
 ps: ps-recursive
 
-ps-am:
+ps-am: $(PSS)
 
-uninstall-am: uninstall-gconvDATA uninstall-pkglibLTLIBRARIES \
-	uninstall-toollibDATA uninstall-toollibLIBRARIES \
-	uninstall-toollibLTLIBRARIES
+uninstall-am: uninstall-dvi-am uninstall-gconvDATA uninstall-html-am \
+	uninstall-info-am uninstall-pdf-am uninstall-pkglibLTLIBRARIES \
+	uninstall-ps-am uninstall-toollibDATA \
+	uninstall-toollibLIBRARIES uninstall-toollibLTLIBRARIES
 
 .MAKE: $(am__recursive_targets) all check-am install-am install-strip
 
 .PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am all-local \
-	am--refresh check check-DEJAGNU check-am clean clean-cscope \
-	clean-generic clean-libtool clean-local \
+	am--refresh check check-DEJAGNU check-am clean clean-aminfo \
+	clean-cscope clean-generic clean-libtool clean-local \
 	clean-pkglibLTLIBRARIES clean-toollibLIBRARIES \
 	clean-toollibLTLIBRARIES cscope cscopelist-am ctags ctags-am \
-	distclean distclean-DEJAGNU distclean-compile \
+	dist-info distclean distclean-DEJAGNU distclean-compile \
 	distclean-generic distclean-hdr distclean-libtool \
 	distclean-local distclean-tags dvi dvi-am html html-am info \
 	info-am install install-am install-data install-data-am \
@@ -1103,10 +1460,13 @@ uninstall-am: uninstall-gconvDATA uninstall-pkglibLTLIBRARIES \
 	install-strip install-toollibDATA install-toollibLIBRARIES \
 	install-toollibLTLIBRARIES installcheck installcheck-am \
 	installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic maintainer-clean-local mostlyclean \
+	maintainer-clean-aminfo maintainer-clean-generic \
+	maintainer-clean-local mostlyclean mostlyclean-aminfo \
 	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
 	mostlyclean-local pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am uninstall-gconvDATA uninstall-pkglibLTLIBRARIES \
+	uninstall-am uninstall-dvi-am uninstall-gconvDATA \
+	uninstall-html-am uninstall-info-am uninstall-pdf-am \
+	uninstall-pkglibLTLIBRARIES uninstall-ps-am \
 	uninstall-toollibDATA uninstall-toollibLIBRARIES \
 	uninstall-toollibLTLIBRARIES
 
@@ -1498,6 +1858,17 @@ clean-local:
 
 @HAVE_DOC_TRUE@man-cache:
 @HAVE_DOC_TRUE@	${srcdir}/doc/makedocbook.py --cache
+
+@HAVE_DOC_TRUE@.c.def:
+@HAVE_DOC_TRUE@	$(AM_V_GEN)$(CHEW) < $< > $*.def || ( rm $*.def && false )
+
+libm/libm.dvi: libm/targetdep.tex $(LIBM_CHEWOUT_FILES)
+
+libm/targetdep.tex.stamp: $(LIBM_CHAPTERS)
+	$(AM_V_GEN)cat $^ > $@.tmp
+	$(AM_V_at)$(SHELL) $(newlib_basedir)/../move-if-change $@.tmp $(@:.stamp=)
+	$(AM_V_at)touch $@
+libm/targetdep.tex: libm/targetdep.tex.stamp; @true
 
 .PHONY: $(PHONY)
 

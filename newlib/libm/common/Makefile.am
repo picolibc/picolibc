@@ -59,15 +59,11 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
-CHEWOUT_FILES =	s_cbrt.def s_copysign.def s_exp10.def s_expm1.def s_ilogb.def \
-	s_infinity.def s_isnan.def s_log1p.def s_modf.def \
-	s_nan.def s_nextafter.def s_pow10.def s_scalbn.def \
-	s_fdim.def s_fma.def s_fmax.def s_fmin.def \
-	s_logb.def s_log2.def s_lrint.def s_lround.def s_nearbyint.def \
-	s_remquo.def s_rint.def s_round.def s_signbit.def s_trunc.def \
-	isgreater.def
-
-CHAPTERS =
+LIBM_CHEWOUT_FILES =
+LIBM_CHAPTERS =
+include ./Makefile.inc
+CHEWOUT_FILES = $(LIBM_CHEWOUT_FILES)
+CHAPTERS = $(LIBM_CHAPTERS)
 
 # A partial dependency list.
 

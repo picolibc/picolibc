@@ -5,6 +5,8 @@ ACLOCAL_AMFLAGS = -I . -I .. -I ../config
 
 # Variables that will accumulate in subdirs.
 PHONY =
+SUFFIXES =
+info_TEXINFOS =
 noinst_DATA =
 pkglib_LTLIBRARIES =
 
@@ -510,11 +512,18 @@ check-DEJAGNU: site.exp
 clean-local:
 	-rm -rf targ-include newlib.h _newlib_version.h stamp-*
 
+# Workaround bad automake/texinfo interactions.
+# https://bugs.gnu.org/23599
+TEXI2DVI = texi2dvi -E
+
+TEXINFO_TEX = ../texinfo/texinfo.tex
+
 if HAVE_DOC
 include doc/local.mk
 endif
 if HAVE_ICONVDATA
 include iconvdata/Makefile.inc
 endif
+include libm/Makefile.inc
 
 .PHONY: $(PHONY)

@@ -56,36 +56,11 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
-CHEWOUT_FILES = e_acosh.def \
-	e_atanh.def \
-	e_hypot.def \
-	e_remainder.def \
-	er_lgamma.def \
-	s_acos.def \
-	s_asine.def \
-	s_asinh.def \
-	s_atan.def \
-	s_atan2.def \
-	s_atangent.def \
-	s_cosh.def \
-	s_erf.def \
-	s_exp.def \
-	s_fabs.def \
-	s_floor.def \
-	s_fmod.def \
-	s_frexp.def \
-	s_ldexp.def \
-	s_log10.def \
-	s_logarithm.def \
-	s_pow.def \
-	s_sine.def \
-	s_sineh.def \
-	s_sqrt.def \
-	s_tan.def \
-	s_tanh.def \
-	w_jn.def
-
-CHAPTERS = mathfp.tex
+LIBM_CHEWOUT_FILES =
+LIBM_CHAPTERS =
+include ./Makefile.inc
+CHEWOUT_FILES = $(LIBM_CHEWOUT_FILES)
+CHAPTERS = $(LIBM_CHAPTERS)
 
 # A partial dependency list.
 

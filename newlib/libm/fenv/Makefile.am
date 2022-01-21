@@ -22,12 +22,11 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
-CHEWOUT_FILES =	feclearexcept.def fegetenv.def \
-	fegetexceptflag.def fegetround.def feholdexcept.def \
-	feraiseexcept.def fesetenv.def fesetexceptflag.def fesetround.def \
-	fetestexcept.def feupdateenv.def
-
-CHAPTERS = fenv.tex
+LIBM_CHEWOUT_FILES =
+LIBM_CHAPTERS =
+include ./Makefile.inc
+CHEWOUT_FILES = $(LIBM_CHEWOUT_FILES)
+CHAPTERS = $(LIBM_CHAPTERS)
 
 # A partial dependency list.
 

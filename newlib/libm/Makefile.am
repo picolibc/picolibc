@@ -36,31 +36,6 @@ endif
 
 $(SUBLIBS):
 
-TEXINFO_TEX = ../../texinfo/texinfo.tex
-info_TEXINFOS = libm.texi
-libm_TEXINFOS = targetdep.tex
-
-libm.dvi: targetdep.tex math/stmp-def complex/stmp-def fenv/stmp-def
-
-stmp-targetdep: force
-	rm -f tmp.texi
-	targetdoc=`pwd`/tmp.texi; \
-	for d in $(SUBDIRS); do \
-	  if test "$$d" != "."; then \
-	    (cd $$d && $(MAKE) doc) || exit 1; \
-	  fi; \
-	done
-	$(SHELL) $(newlib_basedir)/../move-if-change tmp.texi targetdep.tex
-	touch $@
-
-targetdep.tex: stmp-targetdep ; @true
-
-math/stmp-def: stmp-targetdep ; @true
-
-complex/stmp-def: stmp-targetdep ; @true
-
-fenv/stmp-def: stmp-targetdep ; @true
-
 docbook-recursive: force
 	for d in $(SUBDIRS); do \
 	  if test "$$d" != "."; then \
@@ -81,7 +56,7 @@ install-man: man
 .PHONY: force
 force:
 
-CLEANFILES = tmp.texi targetdep.tex stmp-targetdep *.xml *.3
+CLEANFILES = *.xml *.3
 
 ACLOCAL_AMFLAGS = -I .. -I ../.. -I ../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

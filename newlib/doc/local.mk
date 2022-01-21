@@ -18,3 +18,14 @@ man-cache:
 	${srcdir}/doc/makedocbook.py --cache
 
 PHONY += man-cache
+
+#
+# Subdir documentation rules.
+#
+
+SUFFIXES += .def
+
+CHEW = $(MKDOC) -f $(srcdir)/%D%/doc.str
+
+.c.def:
+	$(AM_V_GEN)$(CHEW) < $< > $*.def || ( rm $*.def && false )
