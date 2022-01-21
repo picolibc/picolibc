@@ -744,26 +744,9 @@ DOCBOOK_CHEW = ${top_srcdir}/../doc/makedocbook.py
 DOCBOOK_OUT_FILES = $(CHEWOUT_FILES:.def=.xml)
 DOCBOOK_CHAPTERS = $(CHAPTERS:.tex=.xml)
 CLEANFILES = $(CHEWOUT_FILES) $(DOCBOOK_OUT_FILES)
-@NEWLIB_NANO_FORMATTED_IO_FALSE@CHEWOUT_INT_FORMATTED_IO_FILES = \
-@NEWLIB_NANO_FORMATTED_IO_FALSE@	diprintf.def		\
-@NEWLIB_NANO_FORMATTED_IO_FALSE@	siprintf.def		\
-@NEWLIB_NANO_FORMATTED_IO_FALSE@	siscanf.def		\
-@NEWLIB_NANO_FORMATTED_IO_FALSE@	vfprintf.def		\
-@NEWLIB_NANO_FORMATTED_IO_FALSE@	vfscanf.def		\
-@NEWLIB_NANO_FORMATTED_IO_FALSE@	viprintf.def		\
-@NEWLIB_NANO_FORMATTED_IO_FALSE@	viscanf.def
-
-@NEWLIB_NANO_FORMATTED_IO_TRUE@CHEWOUT_INT_FORMATTED_IO_FILES = \
-@NEWLIB_NANO_FORMATTED_IO_TRUE@	nano-vfprintf.def	\
-@NEWLIB_NANO_FORMATTED_IO_TRUE@	nano-vfprintf_i.def	\
-@NEWLIB_NANO_FORMATTED_IO_TRUE@	nano-vfprintf_float.def	\
-@NEWLIB_NANO_FORMATTED_IO_TRUE@	nano-vfscanf.def	\
-@NEWLIB_NANO_FORMATTED_IO_TRUE@	nano-vfscanf_i.def	\
-@NEWLIB_NANO_FORMATTED_IO_TRUE@	nano-vfscanf_float.def
-
 CHEWOUT_FILES = \
-	$(CHEWOUT_INT_FORMATTED_IO_FILES)	\
 	clearerr.def		\
+	diprintf.def		\
 	dprintf.def		\
 	fclose.def		\
 	fcloseall.def		\
@@ -804,6 +787,8 @@ CHEWOUT_FILES = \
 	getw.def		\
 	getwchar.def		\
 	mktemp.def		\
+	nano-vfprintf.def	\
+	nano-vfscanf.def	\
 	open_memstream.def	\
 	perror.def		\
 	putc.def		\
@@ -820,6 +805,8 @@ CHEWOUT_FILES = \
 	setbuffer.def		\
 	setlinebuf.def		\
 	setvbuf.def		\
+	siprintf.def		\
+	siscanf.def		\
 	sprintf.def		\
 	sscanf.def		\
 	stdio_ext.def		\
@@ -829,8 +816,12 @@ CHEWOUT_FILES = \
 	tmpnam.def		\
 	ungetc.def		\
 	ungetwc.def		\
+	vfprintf.def		\
+	vfscanf.def		\
 	vfwprintf.def		\
-	vfwscanf.def
+	vfwscanf.def		\
+	viprintf.def		\
+	viscanf.def
 
 CHAPTERS = stdio.tex
 all: all-am

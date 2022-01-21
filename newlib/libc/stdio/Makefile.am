@@ -324,27 +324,9 @@ $(lpfx)svfwscanf.$(oext): vfwscanf.c
 $(lpfx)svfiwscanf.$(oext): vfwscanf.c
 	$(LIB_COMPILE) -DINTEGER_ONLY -DSTRING_ONLY -c $(srcdir)/vfwscanf.c -o $@
 
-if NEWLIB_NANO_FORMATTED_IO
-CHEWOUT_INT_FORMATTED_IO_FILES =\
-	nano-vfprintf.def	\
-	nano-vfprintf_i.def	\
-	nano-vfprintf_float.def	\
-	nano-vfscanf.def	\
-	nano-vfscanf_i.def	\
-	nano-vfscanf_float.def
-else
-CHEWOUT_INT_FORMATTED_IO_FILES =\
-	diprintf.def		\
-	siprintf.def		\
-	siscanf.def		\
-	vfprintf.def		\
-	vfscanf.def		\
-	viprintf.def		\
-	viscanf.def
-endif
 CHEWOUT_FILES = \
-	$(CHEWOUT_INT_FORMATTED_IO_FILES)	\
 	clearerr.def		\
+	diprintf.def		\
 	dprintf.def		\
 	fclose.def		\
 	fcloseall.def		\
@@ -385,6 +367,8 @@ CHEWOUT_FILES = \
 	getw.def		\
 	getwchar.def		\
 	mktemp.def		\
+	nano-vfprintf.def	\
+	nano-vfscanf.def	\
 	open_memstream.def	\
 	perror.def		\
 	putc.def		\
@@ -401,6 +385,8 @@ CHEWOUT_FILES = \
 	setbuffer.def		\
 	setlinebuf.def		\
 	setvbuf.def		\
+	siprintf.def		\
+	siscanf.def		\
 	sprintf.def		\
 	sscanf.def		\
 	stdio_ext.def		\
@@ -410,8 +396,12 @@ CHEWOUT_FILES = \
 	tmpnam.def		\
 	ungetc.def		\
 	ungetwc.def		\
+	vfprintf.def		\
+	vfscanf.def		\
 	vfwprintf.def		\
-	vfwscanf.def
+	vfwscanf.def		\
+	viprintf.def		\
+	viscanf.def
 
 CHAPTERS = stdio.tex
 

@@ -8,12 +8,6 @@ STDIO64_SOURCES = \
 	lseek64r.c \
 	stat64r.c \
 	open64r.c
-
-STDIO64_DEFS = \
-	fstat64r.def \
-	lseek64r.def \
-	stat64r.def \
-	open64r.def
 endif
 
 ELIX_2_SOURCES = $(STDIO64_SOURCES)
@@ -72,20 +66,23 @@ CHEWOUT_FILES = \
 	reent.def \
 	execr.def \
 	fcntlr.def \
+	fstat64r.def \
 	fstatr.def \
 	gettimeofdayr.def \
 	linkr.def \
+	lseek64r.def \
 	lseekr.def \
 	mkdirr.def \
+	open64r.def \
 	openr.def \
 	readr.def \
 	renamer.def \
 	signalr.def \
 	sbrkr.def \
+	stat64r.def \
 	statr.def \
 	timesr.def \
 	unlinkr.def \
-	$(STDIO64_DEFS) \
 	writer.def
 
 CHAPTERS = reent.tex
