@@ -214,9 +214,6 @@ AC_SUBST(NEWLIB_CFLAGS)
 NO_INCLUDE_LIST=${noinclude}
 AC_SUBST(NO_INCLUDE_LIST)
 
-LDFLAGS=${ldflags}
-AC_SUBST(LDFLAGS)
-
 AM_CONDITIONAL(ELIX_LEVEL_0, test x[$]{newlib_elix_level} = x0)
 AM_CONDITIONAL(ELIX_LEVEL_1, test x[$]{newlib_elix_level} = x1)
 AM_CONDITIONAL(ELIX_LEVEL_2, test x[$]{newlib_elix_level} = x2)

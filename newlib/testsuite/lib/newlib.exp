@@ -66,13 +66,13 @@ proc newlib_target_compile { source dest type options } {
 	    [target_info needs_status_wrapper] != "0" && \
 	    [info exists gluefile] } {
 	lappend options "libs=$gluefile"
-	lappend options "ldflags=$wrap_flags"
+	lappend options "LDFLAGS=$wrap_flags"
     }
 
     if [string match $host_triplet $target_triplet] then {
 	if [string match "i686-pc-linux-gnu" $host_triplet] then {
 	    lappend options "libs=$objdir/crt0.o -lc -lgcc"
-	    lappend options "ldflags=-nostdlib -L$objdir/.libs [newlib_include_flags]"
+	    lappend options "LDFLAGS=-nostdlib -L$objdir/.libs [newlib_include_flags]"
 	}
     }
 

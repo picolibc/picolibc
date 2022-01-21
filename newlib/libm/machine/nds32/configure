@@ -594,6 +594,7 @@ HAS_NDS32_FPU_SP_TRUE
 EXEEXT
 ac_ct_CC
 CPPFLAGS
+LDFLAGS
 CFLAGS
 sys_dir
 shared_machine_dir
@@ -615,7 +616,6 @@ ELIX_LEVEL_1_FALSE
 ELIX_LEVEL_1_TRUE
 ELIX_LEVEL_0_FALSE
 ELIX_LEVEL_0_TRUE
-LDFLAGS
 NO_INCLUDE_LIST
 NEWLIB_CFLAGS
 CCASFLAGS
@@ -3557,9 +3557,6 @@ NEWLIB_CFLAGS=${newlib_cflags}
 
 
 NO_INCLUDE_LIST=${noinclude}
-
-
-LDFLAGS=${ldflags}
 
 
  if test x${newlib_elix_level} = x0; then
