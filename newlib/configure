@@ -771,6 +771,7 @@ build
 newlib_basedir
 MAY_SUPPLY_SYSCALLS_FALSE
 MAY_SUPPLY_SYSCALLS_TRUE
+multi_basedir
 target_alias
 host_alias
 build_alias
@@ -1512,7 +1513,7 @@ Optional Features:
   --enable-newlib-retargetable-locking    Allow locking routines to be retargeted at link time
   --enable-newlib-long-time_t   define time_t to long
   --enable-newlib-use-gdtoa   Use gdtoa rather than legacy ldtoa
-  --enable-multilib         build many library versions (default)
+  --enable-multilib       build many library versions (default)
   --enable-target-optspace  optimize for space
   --enable-malloc-debugging indicate malloc debugging requested
   --enable-newlib-multithread        enable support for multiple threads
@@ -3188,16 +3189,42 @@ fi
 
 
 
+# Default to --enable-multilib
 # Check whether --enable-multilib was given.
 if test "${enable_multilib+set}" = set; then :
-  enableval=$enable_multilib; case "${enableval}" in
+  enableval=$enable_multilib; case "$enableval" in
   yes) multilib=yes ;;
   no)  multilib=no ;;
-  *)   as_fn_error $? "bad value ${enableval} for multilib option" "$LINENO" 5 ;;
+  *)   as_fn_error $? "bad value $enableval for multilib option" "$LINENO" 5 ;;
  esac
 else
   multilib=yes
 fi
+
+
+# We may get other options which we leave undocumented:
+# --with-target-subdir, --with-multisrctop, --with-multisubdir
+# See config-ml.in if you want the gory details.
+
+if test "$srcdir" = "."; then
+  if test "$with_target_subdir" != "."; then
+    multi_basedir="$srcdir/$with_multisrctop../.."
+  else
+    multi_basedir="$srcdir/$with_multisrctop.."
+  fi
+else
+  multi_basedir="$srcdir/.."
+fi
+
+
+# Even if the default multilib is not a cross compilation,
+# it may be that some of the other multilibs are.
+if test $cross_compiling = no && test $multilib = yes \
+   && test "x${with_multisubdir}" != x ; then
+   cross_compiling=maybe
+fi
+
+ac_config_commands="$ac_config_commands default-1"
 
 # Check whether --enable-target-optspace was given.
 if test "${enable_target_optspace+set}" = set; then :
@@ -11980,7 +12007,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11983 "configure"
+#line 12010 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12086,7 +12113,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12089 "configure"
+#line 12116 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12585,12 +12612,6 @@ _ACEOF
 
 
 
-
-if test "${multilib}" = "yes"; then
-  multilib_arg="--enable-multilib"
-else
-  multilib_arg=
-fi
 
 if test "${newlib_iconv}" = "yes"; then
 
@@ -14182,6 +14203,20 @@ cat >>$CONFIG_STATUS <<_ACEOF || ac_write_fail=1
 #
 # INIT-COMMANDS
 #
+
+srcdir="$srcdir"
+host="$host"
+target="$target"
+with_multisubdir="$with_multisubdir"
+with_multisrctop="$with_multisrctop"
+with_target_subdir="$with_target_subdir"
+ac_configure_args="${multilib_arg} ${ac_configure_args}"
+multi_basedir="$multi_basedir"
+CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
+CC="$CC"
+CXX="$CXX"
+GFORTRAN="$GFORTRAN"
+GCJ="$GCJ"
 AMDEP_TRUE="$AMDEP_TRUE" ac_aux_dir="$ac_aux_dir"
 
 
@@ -14447,15 +14482,6 @@ fi
 
 
 
-srcdir=${srcdir}
-host=${host}
-with_multisubdir=${with_multisubdir}
-ac_configure_args="${multilib_arg} ${ac_configure_args}"
-CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
-newlib_basedir=${newlib_basedir}
-CC="${CC}"
-LDFLAGS="${LDFLAGS}"
-
 
 _ACEOF
 
@@ -14467,6 +14493,7 @@ do
   case $ac_config_target in
     "newlib.h") CONFIG_HEADERS="$CONFIG_HEADERS newlib.h:newlib.hin" ;;
     "_newlib_version.h") CONFIG_HEADERS="$CONFIG_HEADERS _newlib_version.h:_newlib_version.hin" ;;
+    "default-1") CONFIG_COMMANDS="$CONFIG_COMMANDS default-1" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
@@ -15066,6 +15093,14 @@ $as_echo "$as_me: executing $ac_file commands" >&6;}
 
   case $ac_file$ac_mode in
     "newlib.h":H) sed -i.tmp -e '/^#define [^_]/d' -e '/^\/\* #undef [^_]/d' newlib.h && rm -f newlib.h.tmp ;;
+    "default-1":C)
+# Only add multilib support code if we just rebuilt the top-level
+# Makefile.
+case " $CONFIG_FILES " in
+ *" Makefile "*)
+   ac_file=Makefile . ${multi_basedir}/config-ml.in
+   ;;
+esac ;;
     "depfiles":C) test x"$AMDEP_TRUE" != x"" || {
   # Older Autoconf quotes --file arguments for eval, but not when files
   # are listed without --file.  Let's play safe and only enable the eval
@@ -15804,10 +15839,6 @@ _LT_EOF
   chmod +x "$ofile"
 
  ;;
-    "Makefile":F) if test -n "$CONFIG_FILES"; then
-  unset ac_file
-  . ${newlib_basedir}/../config-ml.in
-fi ;;
 
   esac
 done # for ac_tag

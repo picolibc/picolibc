@@ -500,12 +500,6 @@ AC_SUBST([NEWLIB_MAJOR_VERSION])
 AC_SUBST([NEWLIB_MINOR_VERSION])
 AC_SUBST([NEWLIB_PATCHLEVEL_VERSION])
 
-if test "${multilib}" = "yes"; then
-  multilib_arg="--enable-multilib"
-else
-  multilib_arg=
-fi
-
 if test "${newlib_iconv}" = "yes"; then
   AC_DEFINE(_ICONV_ENABLED, 1, [ICONV enabled.])
 fi
@@ -719,18 +713,5 @@ fi
 
 AC_SUBST(CFLAGS)
 
-AC_CONFIG_FILES([Makefile],
-[if test -n "$CONFIG_FILES"; then
-  unset ac_file
-  . ${newlib_basedir}/../config-ml.in
-fi],
-srcdir=${srcdir}
-host=${host}
-with_multisubdir=${with_multisubdir}
-ac_configure_args="${multilib_arg} ${ac_configure_args}"
-CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
-newlib_basedir=${newlib_basedir}
-CC="${CC}"
-LDFLAGS="${LDFLAGS}"
-)
+AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

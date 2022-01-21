@@ -100,6 +100,7 @@ subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../config/depstand.m4 \
 	$(top_srcdir)/../config/lead-dot.m4 \
+	$(top_srcdir)/../config/multi.m4 \
 	$(top_srcdir)/../config/override.m4 \
 	$(top_srcdir)/../libtool.m4 $(top_srcdir)/../ltoptions.m4 \
 	$(top_srcdir)/../ltsugar.m4 $(top_srcdir)/../ltversion.m4 \
@@ -392,6 +393,7 @@ lpfx = @lpfx@
 machine_dir = @machine_dir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
+multi_basedir = @multi_basedir@
 newlib_basedir = @newlib_basedir@
 oext = @oext@
 oldincludedir = @oldincludedir@
