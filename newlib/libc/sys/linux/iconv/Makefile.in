@@ -351,20 +351,10 @@ libiconv_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
 @USE_LIBTOOL_FALSE@lib_a_SOURCES = $(LIB_SOURCES)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
-
-#
-# documentation rules
-#
-SUFFIXES = .def .xml
-CHEW = ${top_builddir}/../doc/makedoc -f $(top_srcdir)/../doc/doc.str
-DOCBOOK_CHEW = ${top_srcdir}/../doc/makedocbook.py
-DOCBOOK_OUT_FILES = $(CHEWOUT_FILES:.def=.xml)
-DOCBOOK_CHAPTERS = $(CHAPTERS:.tex=.xml)
-CLEANFILES = $(CHEWOUT_FILES) $(DOCBOOK_OUT_FILES)
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .def .xml .c .lo .o .obj
+.SUFFIXES: .c .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../../../../Makefile.shared $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -633,7 +623,6 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
-	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -734,28 +723,6 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 	for i in `ls *.lo` ; \
 	do \
 	  echo $$i `pwd`/$$i >> objectlist.awk.in ; \
-	done
-
-.c.def:
-	$(CHEW) < $< > $*.def || ( rm $*.def && false )
-	@touch stmp-def
-
-TARGETDOC ?= ../tmp.texi
-
-doc: $(CHEWOUT_FILES)
-	for chapter in $(CHAPTERS) ; \
-	do \
-	  cat $(srcdir)/$$chapter >> $(TARGETDOC) ; \
-	done
-
-.c.xml:
-	$(DOCBOOK_CHEW) < $< > $*.xml || ( rm $*.xml && false )
-	@touch stmp-xml
-
-docbook: $(DOCBOOK_OUT_FILES)
-	for chapter in $(DOCBOOK_CHAPTERS) ; \
-	do \
-	  ${top_srcdir}/../doc/chapter-texi2docbook.py <$(srcdir)/$${chapter%.xml}.tex >../$$chapter ; \
 	done
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

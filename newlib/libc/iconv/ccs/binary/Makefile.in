@@ -317,20 +317,9 @@ cp775.cct cp850.cct cp852.cct cp855.cct cp866.cct \
 jis_x0212_1990.cct jis_x0201_1976.cct jis_x0208_1990.cct ksx1001.cct \
 cns11643_plane1.cct cns11643_plane2.cct cns11643_plane14.cct
 
-
-#
-# documentation rules
-#
-SUFFIXES = .def .xml
-CHEW = ${top_builddir}/../doc/makedoc -f $(top_srcdir)/../doc/doc.str
-DOCBOOK_CHEW = ${top_srcdir}/../doc/makedocbook.py
-DOCBOOK_OUT_FILES = $(CHEWOUT_FILES:.def=.xml)
-DOCBOOK_CHAPTERS = $(CHAPTERS:.tex=.xml)
-CLEANFILES = $(CHEWOUT_FILES) $(DOCBOOK_OUT_FILES)
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .def .xml .c
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../../../../Makefile.shared $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -423,7 +412,6 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
-	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -517,28 +505,6 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 	for i in `ls *.lo` ; \
 	do \
 	  echo $$i `pwd`/$$i >> objectlist.awk.in ; \
-	done
-
-.c.def:
-	$(CHEW) < $< > $*.def || ( rm $*.def && false )
-	@touch stmp-def
-
-TARGETDOC ?= ../tmp.texi
-
-doc: $(CHEWOUT_FILES)
-	for chapter in $(CHAPTERS) ; \
-	do \
-	  cat $(srcdir)/$$chapter >> $(TARGETDOC) ; \
-	done
-
-.c.xml:
-	$(DOCBOOK_CHEW) < $< > $*.xml || ( rm $*.xml && false )
-	@touch stmp-xml
-
-docbook: $(DOCBOOK_OUT_FILES)
-	for chapter in $(DOCBOOK_CHAPTERS) ; \
-	do \
-	  ${top_srcdir}/../doc/chapter-texi2docbook.py <$(srcdir)/$${chapter%.xml}.tex >../$$chapter ; \
 	done
 
 info:
