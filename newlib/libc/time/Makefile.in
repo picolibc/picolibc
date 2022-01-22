@@ -393,26 +393,19 @@ DOCBOOK_CHEW = ${top_srcdir}/../doc/makedocbook.py
 DOCBOOK_OUT_FILES = $(CHEWOUT_FILES:.def=.xml)
 DOCBOOK_CHAPTERS = $(CHAPTERS:.tex=.xml)
 CLEANFILES = $(CHEWOUT_FILES) $(DOCBOOK_OUT_FILES)
-CHEWOUT_FILES = \
-	asctime.def	\
-	clock.def 	\
-	ctime.def	\
-	difftime.def	\
-	gmtime.def	\
-	lcltime.def	\
-	mktime.def	\
-	strftime.def	\
-	time.def	\
-	tzlock.def	\
-	tzset.def	\
-	wcsftime.def
 
-CHAPTERS = time.tex
+# This rule is needed so that wcsftime.o is rebuilt when strftime.c changes.
+LIBC_CHEWOUT_FILES = asctime.def clock.def ctime.def difftime.def \
+	gmtime.def lcltime.def mktime.def strftime.def time.def \
+	tzlock.def tzset.def wcsftime.def
+LIBC_CHAPTERS = time.tex
+CHEWOUT_FILES = $(LIBC_CHEWOUT_FILES)
+CHAPTERS = $(LIBC_CHAPTERS)
 all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .def .xml .c .lo .o .obj
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../../Makefile.shared $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../../Makefile.shared $(srcdir)/./Makefile.inc $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -432,7 +425,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe);; \
 	esac;
-$(srcdir)/../../Makefile.shared $(am__empty):
+$(srcdir)/../../Makefile.shared $(srcdir)/./Makefile.inc $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
@@ -819,8 +812,6 @@ docbook: $(DOCBOOK_OUT_FILES)
 	do \
 	  ${top_srcdir}/../doc/chapter-texi2docbook.py <$(srcdir)/$${chapter%.xml}.tex >../$$chapter ; \
 	done
-
-# This rule is needed so that wcsftime.o is rebuilt when strftime.c changes.
 
 $(lpfx)wcsftime.$(oext): strftime.c
 

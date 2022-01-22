@@ -61,30 +61,10 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
-CHEWOUT_FILES = \
-	closer.def \
-	reent.def \
-	execr.def \
-	fcntlr.def \
-	fstat64r.def \
-	fstatr.def \
-	gettimeofdayr.def \
-	linkr.def \
-	lseek64r.def \
-	lseekr.def \
-	mkdirr.def \
-	open64r.def \
-	openr.def \
-	readr.def \
-	renamer.def \
-	signalr.def \
-	sbrkr.def \
-	stat64r.def \
-	statr.def \
-	timesr.def \
-	unlinkr.def \
-	writer.def
-
-CHAPTERS = reent.tex
+LIBC_CHEWOUT_FILES =
+LIBC_CHAPTERS =
+include ./Makefile.inc
+CHEWOUT_FILES = $(LIBC_CHEWOUT_FILES)
+CHAPTERS = $(LIBC_CHAPTERS)
 
 $(lpfx)impure.$(oext): $(srcdir)/impure.c $(srcdir)/../include/sys/reent.h

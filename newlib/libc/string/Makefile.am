@@ -144,25 +144,8 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
-CHEWOUT_FILES=\
-bcmp.def	memcpy.def	strcmp.def	strncat.def strstr.def \
-bcopy.def	memmove.def	strcoll.def	strncmp.def strtok.def \
-bzero.def	memset.def	strcpy.def	strncpy.def strxfrm.def \
-index.def	rindex.def	strcspn.def	strpbrk.def swab.def \
-memchr.def	strcat.def	strerror.def	strerror_r.def strrchr.def \
-memcmp.def	strchr.def	strlen.def	strnlen.def strspn.def \
-strcasecmp.def	strncasecmp.def strcasestr.def	strlwr.def  strupr.def \
-memccpy.def 	mempcpy.def	stpcpy.def	stpncpy.def strsignal.def \
-wcscasecmp.def	wcscat.def	wcschr.def	wcscmp.def wcscoll.def \
-wcscpy.def	wcscspn.def	wcpcpy.def	wcpncpy.def wcsdup.def \
-wcslcat.def	wcslcpy.def	wcslen.def	wcsncasecmp.def wcsncat.def \
-wcsncmp.def	wcsncpy.def	wcsnlen.def	wcspbrk.def \
-wcsrchr.def	wcsspn.def	wcsstr.def 	wcstok.def  \
-wcswidth.def	wcsxfrm.def	wcwidth.def	wmemchr.def \
-wmemcmp.def	wmemcpy.def	wmemmove.def	wmemset.def \
-memmem.def	memrchr.def	rawmemchr.def	strchrnul.def \
-strcasecmp_l.def strcoll_l.def	strncasecmp_l.def strxfrm_l.def \
-wcscasecmp_l.def wcscoll_l.def	wcsncasecmp_l.def wcsxfrm_l.def \
-strverscmp.def	strnstr.def	wmempcpy.def
-
-CHAPTERS = strings.tex wcstrings.tex
+LIBC_CHEWOUT_FILES =
+LIBC_CHAPTERS =
+include ./Makefile.inc
+CHEWOUT_FILES = $(LIBC_CHEWOUT_FILES)
+CHAPTERS = $(LIBC_CHAPTERS)

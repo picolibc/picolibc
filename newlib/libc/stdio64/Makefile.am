@@ -38,16 +38,10 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
+LIBC_CHEWOUT_FILES =
+LIBC_CHAPTERS =
+include ./Makefile.inc
+CHEWOUT_FILES = $(LIBC_CHEWOUT_FILES)
+CHAPTERS = $(LIBC_CHAPTERS)
+
 AM_CFLAGS = -I $(srcdir)/../stdio
-
-CHEWOUT_FILES = \
-	fdopen64.def		\
-	fgetpos64.def		\
-	fopen64.def		\
-	freopen64.def		\
-	fseeko64.def		\
-	fsetpos64.def		\
-	ftello64.def		\
-	tmpfile64.def
-
-CHAPTERS = stdio64.tex

@@ -312,13 +312,13 @@ AM_V_texidevnull = $(am__v_texidevnull_@AM_V@)
 am__v_texidevnull_ = $(am__v_texidevnull_@AM_DEFAULT_V@)
 am__v_texidevnull_0 = > /dev/null
 am__v_texidevnull_1 = 
-INFO_DEPS = $(srcdir)/libm/libm.info
+INFO_DEPS = $(srcdir)/libc/libc.info $(srcdir)/libm/libm.info
 am__TEXINFO_TEX_DIR = $(srcdir)/../texinfo
-DVIS = libm/libm.dvi
-PDFS = libm/libm.pdf
-PSS = libm/libm.ps
-HTMLS = libm/libm.html
-TEXINFOS = libm/libm.texi
+DVIS = libc/libc.dvi libm/libm.dvi
+PDFS = libc/libc.pdf libm/libm.pdf
+PSS = libc/libc.ps libm/libm.ps
+HTMLS = libc/libc.html libm/libm.html
+TEXINFOS = libc/libc.texi libm/libm.texi
 TEXI2PDF = $(TEXI2DVI) --pdf --batch
 MAKEINFOHTML = $(MAKEINFO) --html
 AM_MAKEINFOHTMLFLAGS = $(AM_MAKEINFOFLAGS)
@@ -527,7 +527,7 @@ ACLOCAL_AMFLAGS = -I . -I .. -I ../config
 # Variables that will accumulate in subdirs.
 PHONY = $(am__append_4)
 SUFFIXES = $(am__append_5)
-info_TEXINFOS = libm/libm.texi
+info_TEXINFOS = libc/libc.texi libm/libm.texi
 noinst_DATA = stmp-targ-include $(am__append_1) $(am__append_2) \
 	$(am__append_3)
 pkglib_LTLIBRARIES = $(am__append_6)
@@ -642,8 +642,10 @@ libc_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-unde
 @USE_LIBTOOL_TRUE@libm_la_DEPENDENCIES = libm-libtool-objectlist
 @USE_LIBTOOL_TRUE@libc_la_SOURCES = 
 @USE_LIBTOOL_TRUE@libc_la_DEPENDENCIES = libc-libtool-objectlist
-CLEANFILES = stmp-targ-include libm/targetdep.tex \
-	libm/targetdep.tex.stamp $(LIBM_CHEWOUT_FILES)
+CLEANFILES = stmp-targ-include libc/targetdep.tex \
+	libc/targetdep.tex.stamp $(LIBC_CHEWOUT_FILES) \
+	libm/targetdep.tex libm/targetdep.tex.stamp \
+	$(LIBM_CHEWOUT_FILES)
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 MULTISRCTOP = 
 MULTIBUILDTOP = 
@@ -674,6 +676,162 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 @HAVE_ICONVDATA_TRUE@iconvdata_EUC_JP_la_LDFLAGS = -module -no-undefined -Xcompiler -Wl,-rpath-link=. -Xcompiler -nostdlib -L. -lc
 @HAVE_ICONVDATA_TRUE@gconvdir = $(pkglibdir)
 @HAVE_ICONVDATA_TRUE@gconv_DATA = iconvdata/gconv-modules
+libc_libc_TEXINFOS = libc/targetdep.tex $(LIBC_CHEWOUT_FILES)
+LIBC_CHEWOUT_FILES = libc/ctype/isalnum.def libc/ctype/isalpha.def \
+	libc/ctype/isascii.def libc/ctype/isblank.def \
+	libc/ctype/iscntrl.def libc/ctype/isdigit.def \
+	libc/ctype/islower.def libc/ctype/isprint.def \
+	libc/ctype/ispunct.def libc/ctype/isspace.def \
+	libc/ctype/isupper.def libc/ctype/iswalnum.def \
+	libc/ctype/iswalpha.def libc/ctype/iswblank.def \
+	libc/ctype/iswcntrl.def libc/ctype/iswctype.def \
+	libc/ctype/iswdigit.def libc/ctype/iswgraph.def \
+	libc/ctype/iswlower.def libc/ctype/iswprint.def \
+	libc/ctype/iswpunct.def libc/ctype/iswspace.def \
+	libc/ctype/iswupper.def libc/ctype/iswxdigit.def \
+	libc/ctype/isxdigit.def libc/ctype/toascii.def \
+	libc/ctype/tolower.def libc/ctype/toupper.def \
+	libc/ctype/towctrans.def libc/ctype/towlower.def \
+	libc/ctype/towupper.def libc/ctype/wctrans.def \
+	libc/ctype/wctype.def libc/iconv/lib/iconv.def \
+	libc/locale/duplocale.def libc/locale/freelocale.def \
+	libc/locale/locale.def libc/locale/newlocale.def \
+	libc/locale/uselocale.def libc/misc/ffs.def libc/misc/lock.def \
+	libc/misc/unctrl.def libc/posix/popen.def \
+	libc/posix/posix_spawn.def libc/reent/closer.def \
+	libc/reent/reent.def libc/reent/execr.def \
+	libc/reent/fcntlr.def libc/reent/fstatr.def \
+	libc/reent/gettimeofdayr.def libc/reent/linkr.def \
+	libc/reent/lseekr.def libc/reent/mkdirr.def \
+	libc/reent/openr.def libc/reent/readr.def \
+	libc/reent/renamer.def libc/reent/signalr.def \
+	libc/reent/sbrkr.def libc/reent/statr.def \
+	libc/reent/timesr.def libc/reent/unlinkr.def \
+	libc/reent/fstat64r.def libc/reent/lseek64r.def \
+	libc/reent/stat64r.def libc/reent/open64r.def \
+	libc/reent/writer.def libc/search/bsearch.def \
+	libc/search/qsort.def libc/search/qsort_r.def \
+	libc/signal/psignal.def libc/signal/raise.def \
+	libc/signal/signal.def libc/signal/sig2str.def \
+	libc/stdio64/fdopen64.def libc/stdio64/fgetpos64.def \
+	libc/stdio64/fopen64.def libc/stdio64/freopen64.def \
+	libc/stdio64/fseeko64.def libc/stdio64/fsetpos64.def \
+	libc/stdio64/ftello64.def libc/stdio64/tmpfile64.def \
+	libc/stdio/clearerr.def libc/stdio/diprintf.def \
+	libc/stdio/dprintf.def libc/stdio/fcloseall.def \
+	libc/stdio/fclose.def libc/stdio/fdopen.def \
+	libc/stdio/feof.def libc/stdio/ferror.def \
+	libc/stdio/fflush.def libc/stdio/fgetc.def \
+	libc/stdio/fgetpos.def libc/stdio/fgets.def \
+	libc/stdio/fgetwc.def libc/stdio/fgetws.def \
+	libc/stdio/fileno.def libc/stdio/fmemopen.def \
+	libc/stdio/fopen.def libc/stdio/fopencookie.def \
+	libc/stdio/fpurge.def libc/stdio/fputc.def \
+	libc/stdio/fputs.def libc/stdio/fputwc.def \
+	libc/stdio/fputws.def libc/stdio/fread.def \
+	libc/stdio/freopen.def libc/stdio/fseek.def \
+	libc/stdio/fsetlocking.def libc/stdio/fsetpos.def \
+	libc/stdio/ftell.def libc/stdio/funopen.def \
+	libc/stdio/fwide.def libc/stdio/fwrite.def libc/stdio/getc.def \
+	libc/stdio/getc_u.def libc/stdio/getchar.def \
+	libc/stdio/getchar_u.def libc/stdio/getdelim.def \
+	libc/stdio/getline.def libc/stdio/gets.def libc/stdio/getw.def \
+	libc/stdio/getwchar.def libc/stdio/mktemp.def \
+	libc/stdio/nano-vfprintf.def libc/stdio/nano-vfscanf.def \
+	libc/stdio/open_memstream.def libc/stdio/perror.def \
+	libc/stdio/putc.def libc/stdio/putc_u.def \
+	libc/stdio/putchar.def libc/stdio/putchar_u.def \
+	libc/stdio/puts.def libc/stdio/putw.def \
+	libc/stdio/putwchar.def libc/stdio/remove.def \
+	libc/stdio/rename.def libc/stdio/rewind.def \
+	libc/stdio/setbuf.def libc/stdio/setbuffer.def \
+	libc/stdio/setlinebuf.def libc/stdio/setvbuf.def \
+	libc/stdio/siprintf.def libc/stdio/siscanf.def \
+	libc/stdio/sprintf.def libc/stdio/sscanf.def \
+	libc/stdio/stdio_ext.def libc/stdio/swprintf.def \
+	libc/stdio/swscanf.def libc/stdio/tmpfile.def \
+	libc/stdio/tmpnam.def libc/stdio/ungetc.def \
+	libc/stdio/ungetwc.def libc/stdio/vfprintf.def \
+	libc/stdio/vfscanf.def libc/stdio/vfwprintf.def \
+	libc/stdio/vfwscanf.def libc/stdio/viprintf.def \
+	libc/stdio/viscanf.def libc/stdlib/_Exit.def \
+	libc/stdlib/a64l.def libc/stdlib/abort.def libc/stdlib/abs.def \
+	libc/stdlib/assert.def libc/stdlib/atexit.def \
+	libc/stdlib/atof.def libc/stdlib/atoi.def \
+	libc/stdlib/atoll.def libc/stdlib/calloc.def \
+	libc/stdlib/div.def libc/stdlib/ecvtbuf.def \
+	libc/stdlib/efgcvt.def libc/stdlib/envlock.def \
+	libc/stdlib/exit.def libc/stdlib/getenv.def \
+	libc/stdlib/itoa.def libc/stdlib/labs.def libc/stdlib/ldiv.def \
+	libc/stdlib/llabs.def libc/stdlib/lldiv.def \
+	libc/stdlib/malloc.def libc/stdlib/mblen.def \
+	libc/stdlib/mbsnrtowcs.def libc/stdlib/mbstowcs.def \
+	libc/stdlib/mbtowc.def libc/stdlib/mlock.def \
+	libc/stdlib/mstats.def libc/stdlib/on_exit.def \
+	libc/stdlib/rand.def libc/stdlib/rand48.def \
+	libc/stdlib/random.def libc/stdlib/rpmatch.def \
+	libc/stdlib/strtod.def libc/stdlib/strtol.def \
+	libc/stdlib/strtoll.def libc/stdlib/strtoul.def \
+	libc/stdlib/strtoull.def libc/stdlib/utoa.def \
+	libc/stdlib/wcsnrtombs.def libc/stdlib/wcstod.def \
+	libc/stdlib/wcstol.def libc/stdlib/wcstoll.def \
+	libc/stdlib/wcstoul.def libc/stdlib/wcstoull.def \
+	libc/stdlib/system.def libc/stdlib/wcstombs.def \
+	libc/stdlib/wctomb.def libc/string/bcmp.def \
+	libc/string/memcpy.def libc/string/strcmp.def \
+	libc/string/strncat.def libc/string/strstr.def \
+	libc/string/bcopy.def libc/string/memmove.def \
+	libc/string/strcoll.def libc/string/strncmp.def \
+	libc/string/strtok.def libc/string/bzero.def \
+	libc/string/memset.def libc/string/strcpy.def \
+	libc/string/strncpy.def libc/string/strxfrm.def \
+	libc/string/index.def libc/string/rindex.def \
+	libc/string/strcspn.def libc/string/strpbrk.def \
+	libc/string/swab.def libc/string/memchr.def \
+	libc/string/strcat.def libc/string/strerror.def \
+	libc/string/strerror_r.def libc/string/strrchr.def \
+	libc/string/memcmp.def libc/string/strchr.def \
+	libc/string/strlen.def libc/string/strnlen.def \
+	libc/string/strspn.def libc/string/strcasecmp.def \
+	libc/string/strncasecmp.def libc/string/strcasestr.def \
+	libc/string/strlwr.def libc/string/strupr.def \
+	libc/string/memccpy.def libc/string/mempcpy.def \
+	libc/string/stpcpy.def libc/string/stpncpy.def \
+	libc/string/strsignal.def libc/string/wcscasecmp.def \
+	libc/string/wcscat.def libc/string/wcschr.def \
+	libc/string/wcscmp.def libc/string/wcscoll.def \
+	libc/string/wcscpy.def libc/string/wcscspn.def \
+	libc/string/wcpcpy.def libc/string/wcpncpy.def \
+	libc/string/wcsdup.def libc/string/wcslcat.def \
+	libc/string/wcslcpy.def libc/string/wcslen.def \
+	libc/string/wcsncasecmp.def libc/string/wcsncat.def \
+	libc/string/wcsncmp.def libc/string/wcsncpy.def \
+	libc/string/wcsnlen.def libc/string/wcspbrk.def \
+	libc/string/wcsrchr.def libc/string/wcsspn.def \
+	libc/string/wcsstr.def libc/string/wcstok.def \
+	libc/string/wcswidth.def libc/string/wcsxfrm.def \
+	libc/string/wcwidth.def libc/string/wmemchr.def \
+	libc/string/wmemcmp.def libc/string/wmemcpy.def \
+	libc/string/wmemmove.def libc/string/wmemset.def \
+	libc/string/memmem.def libc/string/memrchr.def \
+	libc/string/rawmemchr.def libc/string/strchrnul.def \
+	libc/string/strcasecmp_l.def libc/string/strcoll_l.def \
+	libc/string/strncasecmp_l.def libc/string/strxfrm_l.def \
+	libc/string/wcscasecmp_l.def libc/string/wcscoll_l.def \
+	libc/string/wcsncasecmp_l.def libc/string/wcsxfrm_l.def \
+	libc/string/strverscmp.def libc/string/strnstr.def \
+	libc/string/wmempcpy.def libc/time/asctime.def \
+	libc/time/clock.def libc/time/ctime.def libc/time/difftime.def \
+	libc/time/gmtime.def libc/time/lcltime.def \
+	libc/time/mktime.def libc/time/strftime.def libc/time/time.def \
+	libc/time/tzlock.def libc/time/tzset.def \
+	libc/time/wcsftime.def
+LIBC_CHAPTERS = libc/sys.tex libc/ctype/ctype.tex libc/iconv/iconv.tex \
+	libc/locale/locale.tex libc/misc/misc.tex libc/posix/posix.tex \
+	libc/reent/reent.tex libc/signal/signal.tex libc/ssp/ssp.tex \
+	libc/stdio64/stdio64.tex libc/stdio/stdio.tex \
+	libc/stdlib/stdlib.tex libc/string/strings.tex \
+	libc/string/wcstrings.tex libc/time/time.tex
 libm_libm_TEXINFOS = libm/targetdep.tex $(LIBM_CHEWOUT_FILES)
 LIBM_CHEWOUT_FILES = libm/common/s_cbrt.def libm/common/s_copysign.def \
 	libm/common/s_exp10.def libm/common/s_expm1.def \
@@ -716,7 +874,7 @@ all: newlib.h _newlib_version.h
 .SUFFIXES: .def .c .dvi .lo .o .obj .ps
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../multilib.am $(srcdir)/doc/local.mk $(srcdir)/iconvdata/Makefile.inc $(srcdir)/libm/Makefile.inc $(srcdir)/libm/common/Makefile.inc $(srcdir)/libm/complex/Makefile.inc $(srcdir)/libm/fenv/Makefile.inc $(srcdir)/libm/mathfp/Makefile.inc $(srcdir)/libm/math/Makefile.inc $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../multilib.am $(srcdir)/doc/local.mk $(srcdir)/iconvdata/Makefile.inc $(srcdir)/libc/Makefile.inc $(srcdir)/libc/ctype/Makefile.inc $(srcdir)/libc/iconv/Makefile.inc $(srcdir)/libc/iconv/lib/Makefile.inc $(srcdir)/libc/locale/Makefile.inc $(srcdir)/libc/misc/Makefile.inc $(srcdir)/libc/posix/Makefile.inc $(srcdir)/libc/reent/Makefile.inc $(srcdir)/libc/search/Makefile.inc $(srcdir)/libc/signal/Makefile.inc $(srcdir)/libc/ssp/Makefile.inc $(srcdir)/libc/stdio64/Makefile.inc $(srcdir)/libc/stdio/Makefile.inc $(srcdir)/libc/stdlib/Makefile.inc $(srcdir)/libc/string/Makefile.inc $(srcdir)/libc/time/Makefile.inc $(srcdir)/libm/Makefile.inc $(srcdir)/libm/common/Makefile.inc $(srcdir)/libm/complex/Makefile.inc $(srcdir)/libm/fenv/Makefile.inc $(srcdir)/libm/mathfp/Makefile.inc $(srcdir)/libm/math/Makefile.inc $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -738,7 +896,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe);; \
 	esac;
-$(srcdir)/../multilib.am $(srcdir)/doc/local.mk $(srcdir)/iconvdata/Makefile.inc $(srcdir)/libm/Makefile.inc $(srcdir)/libm/common/Makefile.inc $(srcdir)/libm/complex/Makefile.inc $(srcdir)/libm/fenv/Makefile.inc $(srcdir)/libm/mathfp/Makefile.inc $(srcdir)/libm/math/Makefile.inc $(am__empty):
+$(srcdir)/../multilib.am $(srcdir)/doc/local.mk $(srcdir)/iconvdata/Makefile.inc $(srcdir)/libc/Makefile.inc $(srcdir)/libc/ctype/Makefile.inc $(srcdir)/libc/iconv/Makefile.inc $(srcdir)/libc/iconv/lib/Makefile.inc $(srcdir)/libc/locale/Makefile.inc $(srcdir)/libc/misc/Makefile.inc $(srcdir)/libc/posix/Makefile.inc $(srcdir)/libc/reent/Makefile.inc $(srcdir)/libc/search/Makefile.inc $(srcdir)/libc/signal/Makefile.inc $(srcdir)/libc/ssp/Makefile.inc $(srcdir)/libc/stdio64/Makefile.inc $(srcdir)/libc/stdio/Makefile.inc $(srcdir)/libc/stdlib/Makefile.inc $(srcdir)/libc/string/Makefile.inc $(srcdir)/libc/time/Makefile.inc $(srcdir)/libm/Makefile.inc $(srcdir)/libm/common/Makefile.inc $(srcdir)/libm/complex/Makefile.inc $(srcdir)/libm/fenv/Makefile.inc $(srcdir)/libm/mathfp/Makefile.inc $(srcdir)/libm/math/Makefile.inc $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
@@ -941,6 +1099,47 @@ clean-libtool:
 
 distclean-libtool:
 	-rm -f libtool config.lt
+libc/$(am__dirstamp):
+	@$(MKDIR_P) libc
+	@: > libc/$(am__dirstamp)
+
+$(srcdir)/libc/libc.info: libc/libc.texi $(libc_libc_TEXINFOS)
+	$(AM_V_MAKEINFO)restore=: && backupdir="$(am__leading_dot)am$$$$" && \
+	am__cwd=`pwd` && $(am__cd) $(srcdir) && \
+	rm -rf $$backupdir && mkdir $$backupdir && \
+	if ($(MAKEINFO) --version) >/dev/null 2>&1; then \
+	  for f in $@ $@-[0-9] $@-[0-9][0-9] $(@:.info=).i[0-9] $(@:.info=).i[0-9][0-9]; do \
+	    if test -f $$f; then mv $$f $$backupdir; restore=mv; else :; fi; \
+	  done; \
+	else :; fi && \
+	cd "$$am__cwd"; \
+	if $(MAKEINFO) $(AM_MAKEINFOFLAGS) $(MAKEINFOFLAGS) -I libc -I $(srcdir)/libc \
+	 -o $@ $(srcdir)/libc/libc.texi; \
+	then \
+	  rc=0; \
+	  $(am__cd) $(srcdir); \
+	else \
+	  rc=$$?; \
+	  $(am__cd) $(srcdir) && \
+	  $$restore $$backupdir/* `echo "./$@" | sed 's|[^/]*$$||'`; \
+	fi; \
+	rm -rf $$backupdir; exit $$rc
+
+libc/libc.pdf: libc/libc.texi $(libc_libc_TEXINFOS) libc/$(am__dirstamp)
+	$(AM_V_TEXI2PDF)TEXINPUTS="$(am__TEXINFO_TEX_DIR)$(PATH_SEPARATOR)$$TEXINPUTS" \
+	MAKEINFO='$(MAKEINFO) $(AM_MAKEINFOFLAGS) $(MAKEINFOFLAGS) -I libc -I $(srcdir)/libc' \
+	$(TEXI2PDF) $(AM_V_texinfo) --build-dir=$(@:.pdf=.t2p) -o $@ $(AM_V_texidevnull) \
+	`test -f 'libc/libc.texi' || echo '$(srcdir)/'`libc/libc.texi
+
+libc/libc.html: libc/libc.texi $(libc_libc_TEXINFOS) libc/$(am__dirstamp)
+	$(AM_V_MAKEINFO)rm -rf $(@:.html=.htp)
+	$(AM_V_at)if $(MAKEINFOHTML) $(AM_MAKEINFOHTMLFLAGS) $(MAKEINFOFLAGS) -I libc -I $(srcdir)/libc \
+	 -o $(@:.html=.htp) `test -f 'libc/libc.texi' || echo '$(srcdir)/'`libc/libc.texi; \
+	then \
+	  rm -rf $@ && mv $(@:.html=.htp) $@; \
+	else \
+	  rm -rf $(@:.html=.htp); exit 1; \
+	fi
 libm/$(am__dirstamp):
 	@$(MKDIR_P) libm
 	@: > libm/$(am__dirstamp)
@@ -1063,11 +1262,13 @@ dist-info: $(INFO_DEPS)
 	done
 
 mostlyclean-aminfo:
-	-rm -rf libm/libm.t2d libm/libm.t2p
+	-rm -rf libc/libc.t2d libc/libc.t2p libm/libm.t2d libm/libm.t2p
 
 clean-aminfo:
-	-test -z "libm/libm.dvi libm/libm.pdf libm/libm.ps libm/libm.html" \
-	|| rm -rf libm/libm.dvi libm/libm.pdf libm/libm.ps libm/libm.html
+	-test -z "libc/libc.dvi libc/libc.pdf libc/libc.ps libc/libc.html libm/libm.dvi \
+	  libm/libm.pdf libm/libm.ps libm/libm.html" \
+	|| rm -rf libc/libc.dvi libc/libc.pdf libc/libc.ps libc/libc.html libm/libm.dvi \
+	  libm/libm.pdf libm/libm.ps libm/libm.html
 
 maintainer-clean-aminfo:
 	@list='$(INFO_DEPS)'; for i in $$list; do \
@@ -1267,6 +1468,7 @@ distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
 	-rm -f iconvdata/$(am__dirstamp)
+	-rm -f libc/$(am__dirstamp)
 	-rm -f libm/$(am__dirstamp)
 
 maintainer-clean-generic:
@@ -1861,6 +2063,14 @@ clean-local:
 
 @HAVE_DOC_TRUE@.c.def:
 @HAVE_DOC_TRUE@	$(AM_V_GEN)$(CHEW) < $< > $*.def || ( rm $*.def && false )
+
+libc/libc.dvi: libc/targetdep.tex $(LIBC_CHEWOUT_FILES)
+
+libc/targetdep.tex.stamp: $(LIBC_CHAPTERS)
+	$(AM_V_GEN)cat $^ > $@.tmp
+	$(AM_V_at)$(SHELL) $(newlib_basedir)/../move-if-change $@.tmp $(@:.stamp=)
+	$(AM_V_at)touch $@
+libc/targetdep.tex: libc/targetdep.tex.stamp; @true
 
 libm/libm.dvi: libm/targetdep.tex $(LIBM_CHEWOUT_FILES)
 

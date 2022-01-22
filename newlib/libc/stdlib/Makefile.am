@@ -222,6 +222,12 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
+LIBC_CHEWOUT_FILES =
+LIBC_CHAPTERS =
+include ./Makefile.inc
+CHEWOUT_FILES = $(LIBC_CHEWOUT_FILES)
+CHAPTERS = $(LIBC_CHAPTERS)
+
 MALLOC_COMPILE = $(LIB_COMPILE) -DINTERNAL_NEWLIB
 
 $(lpfx)$(MALLOCR).$(oext): $(MALLOCR).c
@@ -259,58 +265,6 @@ $(lpfx)$(MSIZER).$(oext): $(MALLOCR).c
 
 $(lpfx)$(MALLOPTR).$(oext): $(MALLOCR).c
 	$(MALLOC_COMPILE) -DDEFINE_MALLOPT -c $(srcdir)/$(MALLOCR).c -o $@
-
-CHEWOUT_FILES= \
-	_Exit.def	\
-	a64l.def	\
-	abort.def	\
-	abs.def		\
-	assert.def	\
-	atexit.def	\
-	atof.def 	\
-	atoi.def 	\
-	atoll.def 	\
-	calloc.def	\
-	div.def		\
-	ecvtbuf.def	\
-	efgcvt.def 	\
-	envlock.def	\
-	exit.def	\
-	getenv.def	\
-	itoa.def	\
-	labs.def	\
-	ldiv.def	\
-	llabs.def	\
-	lldiv.def	\
-	malloc.def	\
-	mblen.def	\
-	mbsnrtowcs.def	\
-	mbstowcs.def	\
-	mbtowc.def	\
-	mlock.def	\
-	mstats.def	\
-	on_exit.def	\
-	rand.def	\
-	rand48.def	\
-	random.def	\
-	rpmatch.def	\
-	strtod.def 	\
-	strtol.def 	\
-	strtoll.def 	\
-	strtoul.def 	\
-	strtoull.def 	\
-	utoa.def	\
-	wcsnrtombs.def	\
-	wcstod.def 	\
-	wcstol.def 	\
-	wcstoll.def 	\
-	wcstoul.def 	\
-	wcstoull.def 	\
-	system.def	\
-	wcstombs.def	\
-	wctomb.def	
-
-CHAPTERS = stdlib.tex
 
 $(lpfx)dtoa.$(oext): dtoa.c mprec.h
 $(lpfx)ldtoa.$(oext): ldtoa.c mprec.h gdtoa.h

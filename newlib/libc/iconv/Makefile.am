@@ -6,28 +6,10 @@ cct_DATA=encoding.aliases
 
 AM_CPPFLAGS = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-SUBDEFS = lib/stmp-def
-
 include $(srcdir)/../../Makefile.shared
 
-CHEWOUT_FILES = iconv.def
-CHAPTERS = iconv.tex
-
-iconv.def: lib/iconv.def
-	cp lib/iconv.def iconv.def
-
-iconv.xml: lib/iconv.xml
-	cp lib/iconv.xml iconv.xml
-
-stmp-def: force
-	(cd lib && $(MAKE) doc)
-	touch $@
-
-.PHONY: force
-force:
-
-$(SUBDEFS): stmp-def
-
-lib/iconv.def: $(SUBDEFS); @true
-
-lib/stmp-def: ; @true
+LIBC_CHEWOUT_FILES =
+LIBC_CHAPTERS =
+include ./Makefile.inc
+CHEWOUT_FILES = $(LIBC_CHEWOUT_FILES)
+CHAPTERS = $(LIBC_CHAPTERS)

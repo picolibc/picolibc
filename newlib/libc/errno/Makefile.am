@@ -18,7 +18,3 @@ noinst_DATA =
 endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
-
-CHEWOUT_FILES =
-CHAPTERS =
-# No doc for errno.

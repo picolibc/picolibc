@@ -439,8 +439,6 @@ lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
 noinst_DATA = 
 SUBDIRS = binary
-CHEWOUT_FILES = 
-CHAPTERS = 
 
 #
 # documentation rules

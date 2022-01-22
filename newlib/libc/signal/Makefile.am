@@ -19,6 +19,8 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
-CHEWOUT_FILES = psignal.def raise.def signal.def sig2str.def
-
-CHAPTERS = signal.tex
+LIBC_CHEWOUT_FILES =
+LIBC_CHAPTERS =
+include ./Makefile.inc
+CHEWOUT_FILES = $(LIBC_CHEWOUT_FILES)
+CHAPTERS = $(LIBC_CHAPTERS)

@@ -41,8 +41,4 @@ lib_a_CFLAGS = $(AM_CFLAGS)
 noinst_DATA =
 endif # USE_LIBTOOL
 
-CHEWOUT_FILES =
-CHAPTERS =
-# No doc for argz.
-
 include $(srcdir)/../../Makefile.shared

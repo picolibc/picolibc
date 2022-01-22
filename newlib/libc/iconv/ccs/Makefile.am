@@ -45,7 +45,4 @@ noinst_DATA =
 
 SUBDIRS=binary
 
-CHEWOUT_FILES =
-CHAPTERS =
-
 include $(srcdir)/../../../Makefile.shared

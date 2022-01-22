@@ -24,5 +24,8 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
-CHEWOUT_FILES = unctrl.def lock.def ffs.def
-CHAPTERS = misc.tex
+LIBC_CHEWOUT_FILES =
+LIBC_CHAPTERS =
+include ./Makefile.inc
+CHEWOUT_FILES = $(LIBC_CHEWOUT_FILES)
+CHAPTERS = $(LIBC_CHAPTERS)

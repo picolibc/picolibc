@@ -61,7 +61,10 @@ lib_a_CFLAGS = $(AM_CFLAGS)
 noinst_DATA =
 endif # USE_LIBTOOL
 
-CHEWOUT_FILES =
-CHAPTERS = ssp.tex
-
 include $(srcdir)/../../Makefile.shared
+
+LIBC_CHEWOUT_FILES =
+LIBC_CHAPTERS =
+include ./Makefile.inc
+CHEWOUT_FILES = $(LIBC_CHEWOUT_FILES)
+CHAPTERS = $(LIBC_CHAPTERS)

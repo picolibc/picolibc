@@ -49,7 +49,3 @@ noinst_DATA =
 endif
 
 include $(srcdir)/../../Makefile.shared
-
-CHEWOUT_FILES =
-CHAPTERS =
-# No doc for syscalls.

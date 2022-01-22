@@ -42,20 +42,10 @@ endif # USE_LIBTOOL
 # This rule is needed so that wcsftime.o is rebuilt when strftime.c changes.
 include $(srcdir)/../../Makefile.shared
 
+LIBC_CHEWOUT_FILES =
+LIBC_CHAPTERS =
+include ./Makefile.inc
+CHEWOUT_FILES = $(LIBC_CHEWOUT_FILES)
+CHAPTERS = $(LIBC_CHAPTERS)
+
 $(lpfx)wcsftime.$(oext): strftime.c
-
-CHEWOUT_FILES = \
-	asctime.def	\
-	clock.def 	\
-	ctime.def	\
-	difftime.def	\
-	gmtime.def	\
-	lcltime.def	\
-	mktime.def	\
-	strftime.def	\
-	time.def	\
-	tzlock.def	\
-	tzset.def	\
-	wcsftime.def
-
-CHAPTERS = time.tex

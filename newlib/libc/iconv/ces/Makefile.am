@@ -39,6 +39,3 @@ lib_a_CFLAGS = $(AM_CFLAGS)
 noinst_DATA =
 
 include $(srcdir)/../../../Makefile.shared
-
-CHEWOUT_FILES =
-CHAPTERS =

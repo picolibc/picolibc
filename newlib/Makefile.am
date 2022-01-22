@@ -524,6 +524,7 @@ endif
 if HAVE_ICONVDATA
 include iconvdata/Makefile.inc
 endif
+include libc/Makefile.inc
 include libm/Makefile.inc
 
 .PHONY: $(PHONY)

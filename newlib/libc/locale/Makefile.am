@@ -36,11 +36,8 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
-CHEWOUT_FILES = \
-	duplocale.def \
-	freelocale.def \
-	locale.def \
-	newlocale.def \
-	uselocale.def
-
-CHAPTERS = locale.tex
+LIBC_CHEWOUT_FILES =
+LIBC_CHAPTERS =
+include ./Makefile.inc
+CHEWOUT_FILES = $(LIBC_CHEWOUT_FILES)
+CHAPTERS = $(LIBC_CHAPTERS)

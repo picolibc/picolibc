@@ -381,8 +381,6 @@ libxdr_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
 @USE_LIBTOOL_FALSE@lib_a_SOURCES = dummy.c $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
-CHEWOUT_FILES = 
-CHAPTERS = 
 
 #
 # documentation rules
@@ -732,7 +730,6 @@ docbook: $(DOCBOOK_OUT_FILES)
 	do \
 	  ${top_srcdir}/../doc/chapter-texi2docbook.py <$(srcdir)/$${chapter%.xml}.tex >../$$chapter ; \
 	done
-# No doc for xdr.
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

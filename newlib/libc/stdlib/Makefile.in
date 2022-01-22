@@ -597,63 +597,25 @@ DOCBOOK_CHEW = ${top_srcdir}/../doc/makedocbook.py
 DOCBOOK_OUT_FILES = $(CHEWOUT_FILES:.def=.xml)
 DOCBOOK_CHAPTERS = $(CHAPTERS:.tex=.xml)
 CLEANFILES = $(CHEWOUT_FILES) $(DOCBOOK_OUT_FILES)
+LIBC_CHEWOUT_FILES = _Exit.def a64l.def abort.def abs.def assert.def \
+	atexit.def atof.def atoi.def atoll.def calloc.def div.def \
+	ecvtbuf.def efgcvt.def envlock.def exit.def getenv.def \
+	itoa.def labs.def ldiv.def llabs.def lldiv.def malloc.def \
+	mblen.def mbsnrtowcs.def mbstowcs.def mbtowc.def mlock.def \
+	mstats.def on_exit.def rand.def rand48.def random.def \
+	rpmatch.def strtod.def strtol.def strtoll.def strtoul.def \
+	strtoull.def utoa.def wcsnrtombs.def wcstod.def wcstol.def \
+	wcstoll.def wcstoul.def wcstoull.def system.def wcstombs.def \
+	wctomb.def
+LIBC_CHAPTERS = stdlib.tex
+CHEWOUT_FILES = $(LIBC_CHEWOUT_FILES)
+CHAPTERS = $(LIBC_CHAPTERS)
 MALLOC_COMPILE = $(LIB_COMPILE) -DINTERNAL_NEWLIB
-CHEWOUT_FILES = \
-	_Exit.def	\
-	a64l.def	\
-	abort.def	\
-	abs.def		\
-	assert.def	\
-	atexit.def	\
-	atof.def 	\
-	atoi.def 	\
-	atoll.def 	\
-	calloc.def	\
-	div.def		\
-	ecvtbuf.def	\
-	efgcvt.def 	\
-	envlock.def	\
-	exit.def	\
-	getenv.def	\
-	itoa.def	\
-	labs.def	\
-	ldiv.def	\
-	llabs.def	\
-	lldiv.def	\
-	malloc.def	\
-	mblen.def	\
-	mbsnrtowcs.def	\
-	mbstowcs.def	\
-	mbtowc.def	\
-	mlock.def	\
-	mstats.def	\
-	on_exit.def	\
-	rand.def	\
-	rand48.def	\
-	random.def	\
-	rpmatch.def	\
-	strtod.def 	\
-	strtol.def 	\
-	strtoll.def 	\
-	strtoul.def 	\
-	strtoull.def 	\
-	utoa.def	\
-	wcsnrtombs.def	\
-	wcstod.def 	\
-	wcstol.def 	\
-	wcstoll.def 	\
-	wcstoul.def 	\
-	wcstoull.def 	\
-	system.def	\
-	wcstombs.def	\
-	wctomb.def	
-
-CHAPTERS = stdlib.tex
 all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .def .xml .c .lo .o .obj
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../../Makefile.shared $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../../Makefile.shared $(srcdir)/./Makefile.inc $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -673,7 +635,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe);; \
 	esac;
-$(srcdir)/../../Makefile.shared $(am__empty):
+$(srcdir)/../../Makefile.shared $(srcdir)/./Makefile.inc $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh

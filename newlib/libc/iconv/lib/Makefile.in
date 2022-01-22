@@ -366,8 +366,6 @@ DOCBOOK_CHEW = ${top_srcdir}/../doc/makedocbook.py
 DOCBOOK_OUT_FILES = $(CHEWOUT_FILES:.def=.xml)
 DOCBOOK_CHAPTERS = $(CHAPTERS:.tex=.xml)
 CLEANFILES = $(CHEWOUT_FILES) $(DOCBOOK_OUT_FILES)
-CHEWOUT_FILES = iconv.def
-CHAPTER = 
 all: all-am
 
 .SUFFIXES:

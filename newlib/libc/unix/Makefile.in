@@ -397,8 +397,6 @@ DOCBOOK_CHEW = ${top_srcdir}/../doc/makedocbook.py
 DOCBOOK_OUT_FILES = $(CHEWOUT_FILES:.def=.xml)
 DOCBOOK_CHAPTERS = $(CHAPTERS:.tex=.xml)
 CLEANFILES = $(CHEWOUT_FILES) $(DOCBOOK_OUT_FILES)
-CHEWOUT_FILES = 
-CHAPTERS = 
 all: all-am
 
 .SUFFIXES:
@@ -750,7 +748,6 @@ docbook: $(DOCBOOK_OUT_FILES)
 	do \
 	  ${top_srcdir}/../doc/chapter-texi2docbook.py <$(srcdir)/$${chapter%.xml}.tex >../$$chapter ; \
 	done
-# No doc for unix.
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

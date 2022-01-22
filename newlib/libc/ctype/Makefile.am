@@ -95,41 +95,10 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
-CHEWOUT_FILES= \
-	isalnum.def	\
-	isalpha.def	\
-	isascii.def	\
-	isblank.def	\
-	iscntrl.def	\
-	isdigit.def	\
-	islower.def	\
-	isprint.def	\
-	ispunct.def	\
-	isspace.def	\
-	isupper.def	\
-	iswalnum.def	\
-	iswalpha.def	\
-	iswblank.def 	\
-	iswcntrl.def 	\
-	iswctype.def 	\
-	iswdigit.def 	\
-	iswgraph.def 	\
-	iswlower.def 	\
-	iswprint.def 	\
-	iswpunct.def 	\
-	iswspace.def 	\
-	iswupper.def 	\
-	iswxdigit.def 	\
-	isxdigit.def	\
-	toascii.def	\
-	tolower.def	\
-	toupper.def	\
-	towctrans.def	\
-	towlower.def	\
-	towupper.def	\
-	wctrans.def	\
-	wctype.def
-
-CHAPTERS = ctype.tex
+LIBC_CHEWOUT_FILES =
+LIBC_CHAPTERS =
+include ./Makefile.inc
+CHEWOUT_FILES = $(LIBC_CHEWOUT_FILES)
+CHAPTERS = $(LIBC_CHAPTERS)
 
 $(lpfx)ctype_.$(oext): ctype_.c ctype_iso.h ctype_cp.h
