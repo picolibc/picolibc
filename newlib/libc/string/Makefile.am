@@ -143,9 +143,3 @@ noinst_DATA =
 endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
-
-LIBC_CHEWOUT_FILES =
-LIBC_CHAPTERS =
-include ./Makefile.inc
-CHEWOUT_FILES = $(LIBC_CHEWOUT_FILES)
-CHAPTERS = $(LIBC_CHAPTERS)

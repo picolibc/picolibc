@@ -4,6 +4,7 @@ info_TEXINFOS += %D%/libm.texi
 LIBM_CHEWOUT_FILES =
 
 LIBM_CHAPTERS =
+LIBM_DOCBOOK_OUT_FILES = $(LIBM_CHEWOUT_FILES:.def=.xml)
 
 %D%/libm.dvi: %D%/targetdep.tex $(LIBM_CHEWOUT_FILES)
 
@@ -12,6 +13,25 @@ LIBM_CHAPTERS =
 	$(AM_V_at)$(SHELL) $(newlib_basedir)/../move-if-change $@.tmp $(@:.stamp=)
 	$(AM_V_at)touch $@
 %D%/targetdep.tex: %D%/targetdep.tex.stamp; @true
+
+%D%/libm.xml.stamp: %D%/libm.in.xml $(LIBM_CHAPTERS) $(LIBM_DOCBOOK_OUT_FILES)
+	$(AM_V_at)\
+	for chapter in $(LIBM_CHAPTERS); do \
+	  $(TEXI2DOCBOOK) < $(srcdir)/$$chapter > %D%/`basename $${chapter%.tex}`.xml || exit 1; \
+	done
+	$(AM_V_GEN)xsltproc --xinclude --path $(builddir)/%D% --nonet $(srcdir)/refcontainers.xslt $< > $@.tmp
+	$(AM_V_at)$(SHELL) $(newlib_basedir)/../move-if-change $@.tmp $(@:.stamp=)
+	$(AM_V_at)touch $@
+%D%/libm.xml: %D%/libm.xml.stamp; @true
+
+%C%_man: %D%/libm.xml
+	$(AM_V_GEN)xmlto --skip-validation -o %D% --searchpath $(builddir)/%D% man -m $(srcdir)/man.xsl %D%/libm.xml
+man: %C%_man
+
+%C%_install-man: %C%_man
+	$(MKDIR_P) $(DESTDIR)$(mandir)/man3
+	$(INSTALL_DATA) %D%/*.3 $(DESTDIR)$(mandir)/man3/
+install-man: %C%_install-man
 
 include %D%/common/Makefile.inc
 include %D%/complex/Makefile.inc
@@ -25,4 +45,6 @@ endif
 CLEANFILES += \
 	%D%/targetdep.tex \
 	%D%/targetdep.tex.stamp \
-	$(LIBM_CHEWOUT_FILES)
+	$(LIBM_CHEWOUT_FILES) \
+	$(LIBM_DOCBOOK_OUT_FILES) \
+	%D%/*.xml %D%/*.xml.stamp %D%/*.3

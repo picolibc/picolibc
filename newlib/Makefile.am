@@ -420,22 +420,6 @@ unidata:
 # Force makedoc to be built before building info files.
 info-recursive dvi-recursive: doc/makedoc$(EXEEXT_FOR_BUILD)
 
-# Recursive targets for man and install-man
-man:
-	$(MAKE) man-cache || exit 1; \
-	for d in $(SUBDIRS); do \
-	  if test "$$d" != "."; then \
-	    (cd $$d && $(MAKE) man) || exit 1; \
-	  fi; \
-	done
-
-install-man:
-	for d in $(SUBDIRS); do \
-	  if test "$$d" != "."; then \
-	    (cd $$d && $(MAKE) install-man) || exit 1; \
-	  fi; \
-	done
-
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 
 include ../multilib.am

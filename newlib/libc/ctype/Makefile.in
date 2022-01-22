@@ -514,22 +514,11 @@ DOCBOOK_CHEW = ${top_srcdir}/../doc/makedocbook.py
 DOCBOOK_OUT_FILES = $(CHEWOUT_FILES:.def=.xml)
 DOCBOOK_CHAPTERS = $(CHAPTERS:.tex=.xml)
 CLEANFILES = $(CHEWOUT_FILES) $(DOCBOOK_OUT_FILES)
-LIBC_CHEWOUT_FILES = isalnum.def isalpha.def isascii.def isblank.def \
-	iscntrl.def isdigit.def islower.def isprint.def ispunct.def \
-	isspace.def isupper.def iswalnum.def iswalpha.def iswblank.def \
-	iswcntrl.def iswctype.def iswdigit.def iswgraph.def \
-	iswlower.def iswprint.def iswpunct.def iswspace.def \
-	iswupper.def iswxdigit.def isxdigit.def toascii.def \
-	tolower.def toupper.def towctrans.def towlower.def \
-	towupper.def wctrans.def wctype.def
-LIBC_CHAPTERS = ctype.tex
-CHEWOUT_FILES = $(LIBC_CHEWOUT_FILES)
-CHAPTERS = $(LIBC_CHAPTERS)
 all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .def .xml .c .lo .o .obj
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../../Makefile.shared $(srcdir)/./Makefile.inc $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../../Makefile.shared $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -549,7 +538,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe);; \
 	esac;
-$(srcdir)/../../Makefile.shared $(srcdir)/./Makefile.inc $(am__empty):
+$(srcdir)/../../Makefile.shared $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh

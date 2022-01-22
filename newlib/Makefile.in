@@ -100,7 +100,7 @@ host_triplet = @host@
 #
 # Subdir documentation rules.
 #
-@HAVE_DOC_TRUE@am__append_5 = .def
+@HAVE_DOC_TRUE@am__append_5 = .def .xml
 @HAVE_ICONVDATA_TRUE@am__append_6 = iconvdata/EUC-JP.la
 @ELIX_LEVEL_1_FALSE@@HAVE_ICONVDATA_TRUE@am__append_7 = \
 @ELIX_LEVEL_1_FALSE@@HAVE_ICONVDATA_TRUE@	iconvdata/euc-jp.c \
@@ -644,8 +644,10 @@ libc_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-unde
 @USE_LIBTOOL_TRUE@libc_la_DEPENDENCIES = libc-libtool-objectlist
 CLEANFILES = stmp-targ-include libc/targetdep.tex \
 	libc/targetdep.tex.stamp $(LIBC_CHEWOUT_FILES) \
+	$(LIBC_DOCBOOK_OUT_FILES) libc/*.xml libc/*.xml.stamp libc/*.3 \
 	libm/targetdep.tex libm/targetdep.tex.stamp \
-	$(LIBM_CHEWOUT_FILES)
+	$(LIBM_CHEWOUT_FILES) $(LIBM_DOCBOOK_OUT_FILES) libm/*.xml \
+	libm/*.xml.stamp libm/*.3
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 MULTISRCTOP = 
 MULTIBUILDTOP = 
@@ -664,6 +666,12 @@ TEXI2DVI = texi2dvi -E
 TEXINFO_TEX = ../texinfo/texinfo.tex
 @HAVE_DOC_TRUE@MKDOC = doc/makedoc$(EXEEXT_FOR_BUILD)
 @HAVE_DOC_TRUE@CHEW = $(MKDOC) -f $(srcdir)/doc/doc.str
+@HAVE_DOC_TRUE@DOCBOOK_CHEW = ${top_srcdir}/doc/makedocbook.py
+
+# We can't use .tex.xml rule here as it'll conflict with .c.xml when the chapter
+# name (e.g. "stdio.xml") matches a source file name (e.g. "stdio.c").  We've
+# been flattening chapters into the main library dir (e.g. libc/) to avoid that.
+@HAVE_DOC_TRUE@TEXI2DOCBOOK = $(top_srcdir)/doc/chapter-texi2docbook.py
 @HAVE_ICONVDATA_TRUE@iconvdata_EUC_JP_la_SOURCES = iconvdata/dummy.c \
 @HAVE_ICONVDATA_TRUE@	$(am__append_7)
 @HAVE_ICONVDATA_TRUE@iconvdata_EUC_JP_la_DEPENDENCIES = $(iconvdata_EUC_JP_la_LIBADD)
@@ -832,6 +840,7 @@ LIBC_CHAPTERS = libc/sys.tex libc/ctype/ctype.tex libc/iconv/iconv.tex \
 	libc/stdio64/stdio64.tex libc/stdio/stdio.tex \
 	libc/stdlib/stdlib.tex libc/string/strings.tex \
 	libc/string/wcstrings.tex libc/time/time.tex
+LIBC_DOCBOOK_OUT_FILES = $(LIBC_CHEWOUT_FILES:.def=.xml)
 libm_libm_TEXINFOS = libm/targetdep.tex $(LIBM_CHEWOUT_FILES)
 LIBM_CHEWOUT_FILES = libm/common/s_cbrt.def libm/common/s_copysign.def \
 	libm/common/s_exp10.def libm/common/s_expm1.def \
@@ -867,11 +876,12 @@ LIBM_CHEWOUT_FILES = libm/common/s_cbrt.def libm/common/s_copysign.def \
 	$(am__append_8) $(am__append_10)
 LIBM_CHAPTERS = libm/complex/complex.tex libm/fenv/fenv.tex \
 	$(am__append_9) $(am__append_11)
+LIBM_DOCBOOK_OUT_FILES = $(LIBM_CHEWOUT_FILES:.def=.xml)
 all: newlib.h _newlib_version.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .def .c .dvi .lo .o .obj .ps
+.SUFFIXES: .def .xml .c .dvi .lo .o .obj .ps
 am--refresh: Makefile
 	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../multilib.am $(srcdir)/doc/local.mk $(srcdir)/iconvdata/Makefile.inc $(srcdir)/libc/Makefile.inc $(srcdir)/libc/ctype/Makefile.inc $(srcdir)/libc/iconv/Makefile.inc $(srcdir)/libc/iconv/lib/Makefile.inc $(srcdir)/libc/locale/Makefile.inc $(srcdir)/libc/misc/Makefile.inc $(srcdir)/libc/posix/Makefile.inc $(srcdir)/libc/reent/Makefile.inc $(srcdir)/libc/search/Makefile.inc $(srcdir)/libc/signal/Makefile.inc $(srcdir)/libc/ssp/Makefile.inc $(srcdir)/libc/stdio64/Makefile.inc $(srcdir)/libc/stdio/Makefile.inc $(srcdir)/libc/stdlib/Makefile.inc $(srcdir)/libc/string/Makefile.inc $(srcdir)/libc/time/Makefile.inc $(srcdir)/libm/Makefile.inc $(srcdir)/libm/common/Makefile.inc $(srcdir)/libm/complex/Makefile.inc $(srcdir)/libm/fenv/Makefile.inc $(srcdir)/libm/mathfp/Makefile.inc $(srcdir)/libm/math/Makefile.inc $(am__configure_deps)
@@ -1938,22 +1948,6 @@ unidata:
 # Force makedoc to be built before building info files.
 info-recursive dvi-recursive: doc/makedoc$(EXEEXT_FOR_BUILD)
 
-# Recursive targets for man and install-man
-man:
-	$(MAKE) man-cache || exit 1; \
-	for d in $(SUBDIRS); do \
-	  if test "$$d" != "."; then \
-	    (cd $$d && $(MAKE) man) || exit 1; \
-	  fi; \
-	done
-
-install-man:
-	for d in $(SUBDIRS); do \
-	  if test "$$d" != "."; then \
-	    (cd $$d && $(MAKE) install-man) || exit 1; \
-	  fi; \
-	done
-
 # GNU Make needs to see an explicit $(MAKE) variable in the command it
 # runs to enable its job server during parallel builds.  Hence the
 # comments below.
@@ -2064,6 +2058,9 @@ clean-local:
 @HAVE_DOC_TRUE@.c.def:
 @HAVE_DOC_TRUE@	$(AM_V_GEN)$(CHEW) < $< > $*.def || ( rm $*.def && false )
 
+@HAVE_DOC_TRUE@.c.xml:
+@HAVE_DOC_TRUE@	$(AM_V_GEN)$(DOCBOOK_CHEW) < $< > $*.xml || ( rm $*.xml && false )
+
 libc/libc.dvi: libc/targetdep.tex $(LIBC_CHEWOUT_FILES)
 
 libc/targetdep.tex.stamp: $(LIBC_CHAPTERS)
@@ -2072,6 +2069,25 @@ libc/targetdep.tex.stamp: $(LIBC_CHAPTERS)
 	$(AM_V_at)touch $@
 libc/targetdep.tex: libc/targetdep.tex.stamp; @true
 
+libc/libc.xml.stamp: libc/libc.in.xml $(LIBC_CHAPTERS) $(LIBC_DOCBOOK_OUT_FILES)
+	$(AM_V_at)\
+	for chapter in $(LIBC_CHAPTERS); do \
+	  $(TEXI2DOCBOOK) < $(srcdir)/$$chapter > libc/`basename $${chapter%.tex}`.xml || exit 1; \
+	done
+	$(AM_V_GEN)xsltproc --xinclude --path $(builddir)/libc --nonet $(srcdir)/refcontainers.xslt $< > $@.tmp
+	$(AM_V_at)$(SHELL) $(newlib_basedir)/../move-if-change $@.tmp $(@:.stamp=)
+	$(AM_V_at)touch $@
+libc/libc.xml: libc/libc.xml.stamp; @true
+
+libc_man: libc/libc.xml
+	$(AM_V_GEN)xmlto --skip-validation -o libc --searchpath $(builddir)/libc man -m $(srcdir)/man.xsl libc/libc.xml
+man: libc_man
+
+libc_install-man: libc_man
+	$(MKDIR_P) $(DESTDIR)$(mandir)/man3
+	$(INSTALL_DATA) libc/*.3 $(DESTDIR)$(mandir)/man3/
+install-man: libc_install-man
+
 libm/libm.dvi: libm/targetdep.tex $(LIBM_CHEWOUT_FILES)
 
 libm/targetdep.tex.stamp: $(LIBM_CHAPTERS)
@@ -2079,6 +2095,25 @@ libm/targetdep.tex.stamp: $(LIBM_CHAPTERS)
 	$(AM_V_at)$(SHELL) $(newlib_basedir)/../move-if-change $@.tmp $(@:.stamp=)
 	$(AM_V_at)touch $@
 libm/targetdep.tex: libm/targetdep.tex.stamp; @true
+
+libm/libm.xml.stamp: libm/libm.in.xml $(LIBM_CHAPTERS) $(LIBM_DOCBOOK_OUT_FILES)
+	$(AM_V_at)\
+	for chapter in $(LIBM_CHAPTERS); do \
+	  $(TEXI2DOCBOOK) < $(srcdir)/$$chapter > libm/`basename $${chapter%.tex}`.xml || exit 1; \
+	done
+	$(AM_V_GEN)xsltproc --xinclude --path $(builddir)/libm --nonet $(srcdir)/refcontainers.xslt $< > $@.tmp
+	$(AM_V_at)$(SHELL) $(newlib_basedir)/../move-if-change $@.tmp $(@:.stamp=)
+	$(AM_V_at)touch $@
+libm/libm.xml: libm/libm.xml.stamp; @true
+
+libm_man: libm/libm.xml
+	$(AM_V_GEN)xmlto --skip-validation -o libm --searchpath $(builddir)/libm man -m $(srcdir)/man.xsl libm/libm.xml
+man: libm_man
+
+libm_install-man: libm_man
+	$(MKDIR_P) $(DESTDIR)$(mandir)/man3
+	$(INSTALL_DATA) libm/*.3 $(DESTDIR)$(mandir)/man3/
+install-man: libm_install-man
 
 .PHONY: $(PHONY)
 

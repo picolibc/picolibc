@@ -66,12 +66,6 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
-LIBM_CHEWOUT_FILES =
-LIBM_CHAPTERS =
-include ./Makefile.inc
-CHEWOUT_FILES = $(LIBM_CHEWOUT_FILES)
-CHAPTERS = $(LIBM_CHAPTERS)
-
 # A partial dependency list.
 
 $(lib_a_OBJECTS): $(srcdir)/../../libc/include/math.h $(srcdir)/../common/fdlibm.h

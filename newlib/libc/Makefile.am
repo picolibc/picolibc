@@ -124,77 +124,13 @@ endif # USE_LIBTOOL
 
 $(SUBLIBS): ; @true
 
-# This is a list of the stmp-def files in each subdirectory which
-# builds .def files.  We don't list subdirectories which don't build
-# .def files; if the list of subdirectories changes, we must change
-# this as well.
-SUBDEFS = \
-	stdlib/stmp-def \
-	ctype/stmp-def \
-	stdio/stmp-def \
-	stdio64/stmp-def \
-	posix/stmp-def \
-	xdr/stmp-def \
-	string/stmp-def \
-	signal/stmp-def \
-	time/stmp-def \
-	locale/stmp-def \
-	reent/stmp-def \
-	misc/stmp-def
+crt0.o: sys/crt0.o
+	rm -f $@
+	ln sys/crt0.o $@ >/dev/null 2>/dev/null || cp sys/crt0.o $@
 
-# ditto for stmp-xml files in each subdirectory which builds .xml files
-SUBXMLS = $(SUBDEFS:stmp-def=stmp-xml)
+sys/crt0.o: ; @true
 
-libc.info: targetdep.tex $(SUBDEFS)
-
-libc.dvi: targetdep.tex $(SUBDEFS)
-
-stmp-targetdep: force
-	rm -f tmp-targetdep.texi
-	targetdoc=`pwd`/tmp-targetdep.texi; \
-	for d in $(SUBDIRS); do \
-	  if test "$$d" != "." && test "$$d" != "$(LIBC_MACHINE_DIR)"; then \
-	    (cd $$d && $(MAKE) TARGETDOC=$${targetdoc} doc) || exit 1; \
-	  fi; \
-	done
-	cat $(srcdir)/sys.tex >>tmp-targetdep.texi
-	$(SHELL) $(newlib_basedir)/../move-if-change tmp-targetdep.texi targetdep.tex
-	touch $@
-
-targetdep.tex: stmp-targetdep ; @true
-
-$(SUBDEFS): stmp-targetdep ; @true
-
-TEXINFO_TEX = ../../texinfo/texinfo.tex
-info_TEXINFOS = libc.texi
-libc_TEXINFOS = targetdep.tex $(SUBDEFS)
-
-docbook-recursive: force
-	for d in $(SUBDIRS); do \
-	  if test "$$d" != "." && test "$$d" != "$(LIBC_MACHINE_DIR)"; then \
-	    (cd $$d && $(MAKE) docbook) || exit 1; \
-	  fi; \
-	done
-
-$(SUBXMLS): docbook-recursive
-
-man: $(SUBXMLS) libc.in.xml
-	xsltproc --xinclude --path ${builddir} --nonet ${srcdir}/../refcontainers.xslt ${srcdir}/libc.in.xml >libc.xml
-	xmlto --skip-validation man -m ${srcdir}/../man.xsl libc.xml
-
-install-man: man
-	mkdir -p $(DESTDIR)$(mandir)/man3
-	$(INSTALL_DATA) *.3 $(DESTDIR)$(mandir)/man3
-
-.PHONY: force
-force:
-
-CLEANFILES = \
-	sigset.texi stmp-sigset \
-	stdio64.texi stmp-stdio64 targetdep.tex stmp-targetdep \
-	tmp-sigset.texi tmp-iconvset.texi \
-	tmp-stdio64.texi tmp-posix.texi tmp-targetdep.texi \
-	*.xml *.3
+CLEANFILES = $(CRT0)
 
 ACLOCAL_AMFLAGS = -I .. -I ../.. -I ../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

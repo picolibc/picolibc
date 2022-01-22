@@ -408,18 +408,11 @@ DOCBOOK_CHEW = ${top_srcdir}/../doc/makedocbook.py
 DOCBOOK_OUT_FILES = $(CHEWOUT_FILES:.def=.xml)
 DOCBOOK_CHAPTERS = $(CHAPTERS:.tex=.xml)
 CLEANFILES = $(CHEWOUT_FILES) $(DOCBOOK_OUT_FILES)
-LIBM_CHEWOUT_FILES = cabs.def cacos.def cacosh.def carg.def casin.def \
-	casinh.def catan.def catanh.def ccos.def ccosh.def cexp.def \
-	cimag.def clog.def clog10.def conj.def cpow.def cproj.def \
-	creal.def csin.def csinh.def csqrt.def ctan.def ctanh.def
-LIBM_CHAPTERS = complex.tex
-CHEWOUT_FILES = $(LIBM_CHEWOUT_FILES)
-CHAPTERS = $(LIBM_CHAPTERS)
 all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .def .xml .c .lo .o .obj
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../../Makefile.shared $(srcdir)/./Makefile.inc $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../../Makefile.shared $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -439,7 +432,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe);; \
 	esac;
-$(srcdir)/../../Makefile.shared $(srcdir)/./Makefile.inc $(am__empty):
+$(srcdir)/../../Makefile.shared $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh

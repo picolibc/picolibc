@@ -95,10 +95,4 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
-LIBC_CHEWOUT_FILES =
-LIBC_CHAPTERS =
-include ./Makefile.inc
-CHEWOUT_FILES = $(LIBC_CHEWOUT_FILES)
-CHAPTERS = $(LIBC_CHAPTERS)
-
 $(lpfx)ctype_.$(oext): ctype_.c ctype_iso.h ctype_cp.h

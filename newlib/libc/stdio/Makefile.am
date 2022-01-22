@@ -241,12 +241,6 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
-LIBC_CHEWOUT_FILES =
-LIBC_CHAPTERS =
-include ./Makefile.inc
-CHEWOUT_FILES = $(LIBC_CHEWOUT_FILES)
-CHAPTERS = $(LIBC_CHAPTERS)
-
 # Though small footprint nano-formatted-IO implementation is used
 # when NEWLIB_NANO_FORMATTED_IO is enabled, we keep all rules for
 # the other implementation of formatted IO including all i-family

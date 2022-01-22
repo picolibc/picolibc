@@ -744,31 +744,11 @@ DOCBOOK_CHEW = ${top_srcdir}/../doc/makedocbook.py
 DOCBOOK_OUT_FILES = $(CHEWOUT_FILES:.def=.xml)
 DOCBOOK_CHAPTERS = $(CHAPTERS:.tex=.xml)
 CLEANFILES = $(CHEWOUT_FILES) $(DOCBOOK_OUT_FILES)
-LIBC_CHEWOUT_FILES = clearerr.def diprintf.def dprintf.def \
-	fcloseall.def fclose.def fdopen.def feof.def ferror.def \
-	fflush.def fgetc.def fgetpos.def fgets.def fgetwc.def \
-	fgetws.def fileno.def fmemopen.def fopen.def fopencookie.def \
-	fpurge.def fputc.def fputs.def fputwc.def fputws.def fread.def \
-	freopen.def fseek.def fsetlocking.def fsetpos.def ftell.def \
-	funopen.def fwide.def fwrite.def getc.def getc_u.def \
-	getchar.def getchar_u.def getdelim.def getline.def gets.def \
-	getw.def getwchar.def mktemp.def nano-vfprintf.def \
-	nano-vfscanf.def open_memstream.def perror.def putc.def \
-	putc_u.def putchar.def putchar_u.def puts.def putw.def \
-	putwchar.def remove.def rename.def rewind.def setbuf.def \
-	setbuffer.def setlinebuf.def setvbuf.def siprintf.def \
-	siscanf.def sprintf.def sscanf.def stdio_ext.def swprintf.def \
-	swscanf.def tmpfile.def tmpnam.def ungetc.def ungetwc.def \
-	vfprintf.def vfscanf.def vfwprintf.def vfwscanf.def \
-	viprintf.def viscanf.def
-LIBC_CHAPTERS = stdio.tex
-CHEWOUT_FILES = $(LIBC_CHEWOUT_FILES)
-CHAPTERS = $(LIBC_CHAPTERS)
 all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .def .xml .c .lo .o .obj
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../../Makefile.shared $(srcdir)/./Makefile.inc $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../../Makefile.shared $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -788,7 +768,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe);; \
 	esac;
-$(srcdir)/../../Makefile.shared $(srcdir)/./Makefile.inc $(am__empty):
+$(srcdir)/../../Makefile.shared $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh

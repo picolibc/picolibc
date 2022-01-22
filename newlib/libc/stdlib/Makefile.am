@@ -222,12 +222,6 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
-LIBC_CHEWOUT_FILES =
-LIBC_CHAPTERS =
-include ./Makefile.inc
-CHEWOUT_FILES = $(LIBC_CHEWOUT_FILES)
-CHAPTERS = $(LIBC_CHAPTERS)
-
 MALLOC_COMPILE = $(LIB_COMPILE) -DINTERNAL_NEWLIB
 
 $(lpfx)$(MALLOCR).$(oext): $(MALLOCR).c
