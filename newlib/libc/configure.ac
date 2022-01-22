@@ -71,73 +71,58 @@ dnl for the library and an automake conditional for whether we should
 dnl build the library.
 
 LIBC_SIGNAL_LIB=
-LIBC_SIGNAL_DEF=
 if test -n "${signal_dir}"; then
   if test "${use_libtool}" = "yes"; then
     LIBC_SIGNAL_LIB=${signal_dir}/lib${signal_dir}.${aext}
   else
     LIBC_SIGNAL_LIB=${signal_dir}/lib.${aext}
   fi
-  LIBC_SIGNAL_DEF=${signal_dir}/stmp-def
 fi
 AC_SUBST(LIBC_SIGNAL_LIB)
-AC_SUBST(LIBC_SIGNAL_DEF)
 AM_CONDITIONAL(HAVE_SIGNAL_DIR, test x${signal_dir} != x)
 
 LIBC_STDIO_LIB=
-LIBC_STDIO_DEF=
 if test -n "${stdio_dir}"; then
   if test "${use_libtool}" = "yes"; then
     LIBC_STDIO_LIB=${stdio_dir}/lib${stdio_dir}.${aext}
   else
     LIBC_STDIO_LIB=${stdio_dir}/lib.${aext}
   fi
-  LIBC_STDIO_DEF=${stdio_dir}/stmp-def
 fi
 AC_SUBST(LIBC_STDIO_LIB)
-AC_SUBST(LIBC_STDIO_DEF)
 AM_CONDITIONAL(HAVE_STDIO_DIR, test x${stdio_dir} != x)
 
 LIBC_STDIO64_LIB=
-LIBC_STDIO64_DEF=
 if test -n "${stdio64_dir}"; then
   if test "${use_libtool}" = "yes"; then
     LIBC_STDIO64_LIB=${stdio64_dir}/lib${stdio64_dir}.${aext}
   else
     LIBC_STDIO64_LIB=${stdio64_dir}/lib.${aext}
   fi
-  LIBC_STDIO64_DEF=${stdio64_dir}/stmp-def
 fi
 AC_SUBST(LIBC_STDIO64_LIB)
-AC_SUBST(LIBC_STDIO64_DEF)
 AM_CONDITIONAL(HAVE_STDIO64_DIR, test x${stdio64_dir} != x)
 
 LIBC_POSIX_LIB=
-LIBC_POSIX_DEF=
 if test -n "${posix_dir}"; then
   if test "${use_libtool}" = "yes"; then
     LIBC_POSIX_LIB=${posix_dir}/lib${posix_dir}.${aext}
   else
     LIBC_POSIX_LIB=${posix_dir}/lib.${aext}
   fi
-  LIBC_POSIX_DEF=${posix_dir}/stmp-def
 fi
 AC_SUBST(LIBC_POSIX_LIB)
-AC_SUBST(LIBC_POSIX_DEF)
 AM_CONDITIONAL(HAVE_POSIX_DIR, test x${posix_dir} != x)
 
 LIBC_XDR_LIB=
-LIBC_XDR_DEF=
 if test -n "${xdr_dir}"; then
   if test "${use_libtool}" = "yes"; then
     LIBC_XDR_LIB=${xdr_dir}/lib${xdr_dir}.${aext}
   else
     LIBC_XDR_LIB=${xdr_dir}/lib.${aext}
   fi
-  LIBC_XDR_DEF=${xdr_dir}/stmp-def
 fi
 AC_SUBST(LIBC_XDR_LIB)
-AC_SUBST(LIBC_XDR_DEF)
 AM_CONDITIONAL(HAVE_XDR_DIR, test x${xdr_dir} != x)
 
 LIBC_SYSCALL_LIB=

@@ -132,44 +132,26 @@ into another language, under the above conditions for modified versions.
 @node Top
 @top The Red Hat newlib C Library
 
-@c The menu contents depend on the configuration, so we include them
-@c as a separate file
-
-@c switch to set SIGNALS on or off, according to whether config picks up
-@c signal subdirectory:
-@include sigset.texi
-@include posix.texi
-@include stdio64.texi
-@include iconvset.texi
-
 @menu
 * Introduction::
 * Stdlib::
 * Ctype::
 * Stdio::
-@ifset STDIO64
 * Stdio64::
-@end ifset
 
 * Strings::
 * Wchar strings::
-@ifset SIGNALS
 * Signals::
-@end ifset
 
 * Timefns::
 * Locale::
 * Reentrancy::
 
 * Misc::
-@ifset POSIX
 * Posix::
-@end ifset
 * Syscalls::
 * Arglists::
-@ifset ICONV
 * Iconv::
-@end ifset
 * Overflow Protection::
 
 * Document Index::

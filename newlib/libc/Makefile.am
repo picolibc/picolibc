@@ -131,12 +131,12 @@ $(SUBLIBS): ; @true
 SUBDEFS = \
 	stdlib/stmp-def \
 	ctype/stmp-def \
-	$(LIBC_STDIO_DEF) \
-	$(LIBC_STDIO64_DEF) \
-	$(LIBC_POSIX_DEF) \
-	$(LIBC_XDR_DEF) \
+	stdio/stmp-def \
+	stdio64/stmp-def \
+	posix/stmp-def \
+	xdr/stmp-def \
 	string/stmp-def \
-	$(LIBC_SIGNAL_DEF) \
+	signal/stmp-def \
 	time/stmp-def \
 	locale/stmp-def \
 	reent/stmp-def \
@@ -145,55 +145,9 @@ SUBDEFS = \
 # ditto for stmp-xml files in each subdirectory which builds .xml files
 SUBXMLS = $(SUBDEFS:stmp-def=stmp-xml)
 
-libc.info: sigset.texi stdio64.texi posix.texi iconvset.texi \
-	targetdep.tex $(SUBDEFS)
+libc.info: targetdep.tex $(SUBDEFS)
 
-libc.dvi: sigset.texi stdio64.texi posix.texi iconvset.texi \
-	targetdep.tex $(SUBDEFS)
-
-stmp-sigset: config.status
-	if test -n "$(LIBC_SIGNAL_LIB)"; then \
-	  echo "@set SIGNALS" >tmp-sigset.texi; \
-	else \
-	  echo "@clear SIGNALS" >tmp-sigset.texi; \
-	fi
-	$(SHELL) $(newlib_basedir)/../move-if-change tmp-sigset.texi sigset.texi
-	touch $@
-
-sigset.texi: stmp-sigset ; @true
-
-stmp-iconvset: config.status
-	if test -n "$(NEWLIB_ICONV_LIBS)"; then \
-	  echo "@set ICONV" >tmp-iconvset.texi; \
-	else \
-	  echo "@clear ICONV" >tmp-iconvset.texi; \
-	fi
-	$(SHELL) $(newlib_basedir)/../move-if-change tmp-iconvset.texi iconvset.texi
-	touch $@
-
-iconvset.texi: stmp-iconvset ; @true
-
-stmp-stdio64: config.status
-	if test -n "$(LIBC_STDIO64_LIB)"; then \
-	  echo "@set STDIO64" >tmp-stdio64.texi; \
-	else \
-	  echo "@clear STDIO64" >tmp-stdio64.texi; \
-	fi
-	$(SHELL) $(newlib_basedir)/../move-if-change tmp-stdio64.texi stdio64.texi
-	touch $@
-
-stdio64.texi: stmp-stdio64 ; @true
-
-stmp-posix: config.status
-	if test -n "$(LIBC_POSIX_LIB)"; then \
-	  echo "@set POSIX" >tmp-posix.texi; \
-	else \
-	  echo "@clear POSIX" >tmp-posix.texi; \
-	fi
-	$(SHELL) $(newlib_basedir)/../move-if-change tmp-posix.texi posix.texi
-	touch $@
-
-posix.texi: stmp-posix ; @true
+libc.dvi: targetdep.tex $(SUBDEFS)
 
 stmp-targetdep: force
 	rm -f tmp-targetdep.texi
@@ -213,8 +167,7 @@ $(SUBDEFS): stmp-targetdep ; @true
 
 TEXINFO_TEX = ../../texinfo/texinfo.tex
 info_TEXINFOS = libc.texi
-libc_TEXINFOS = sigset.texi posix.texi stdio64.texi iconvset.texi \
-	targetdep.tex $(SUBDEFS)
+libc_TEXINFOS = targetdep.tex $(SUBDEFS)
 
 docbook-recursive: force
 	for d in $(SUBDIRS); do \

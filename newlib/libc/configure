@@ -668,23 +668,18 @@ HAVE_SYSCALL_DIR_TRUE
 LIBC_SYSCALL_LIB
 HAVE_XDR_DIR_FALSE
 HAVE_XDR_DIR_TRUE
-LIBC_XDR_DEF
 LIBC_XDR_LIB
 HAVE_POSIX_DIR_FALSE
 HAVE_POSIX_DIR_TRUE
-LIBC_POSIX_DEF
 LIBC_POSIX_LIB
 HAVE_STDIO64_DIR_FALSE
 HAVE_STDIO64_DIR_TRUE
-LIBC_STDIO64_DEF
 LIBC_STDIO64_LIB
 HAVE_STDIO_DIR_FALSE
 HAVE_STDIO_DIR_TRUE
-LIBC_STDIO_DEF
 LIBC_STDIO_LIB
 HAVE_SIGNAL_DIR_FALSE
 HAVE_SIGNAL_DIR_TRUE
-LIBC_SIGNAL_DEF
 LIBC_SIGNAL_LIB
 CRT0
 OTOOL64
@@ -11829,7 +11824,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11832 "configure"
+#line 11827 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11935,7 +11930,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11938 "configure"
+#line 11933 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12182,16 +12177,13 @@ fi
 
 
 LIBC_SIGNAL_LIB=
-LIBC_SIGNAL_DEF=
 if test -n "${signal_dir}"; then
   if test "${use_libtool}" = "yes"; then
     LIBC_SIGNAL_LIB=${signal_dir}/lib${signal_dir}.${aext}
   else
     LIBC_SIGNAL_LIB=${signal_dir}/lib.${aext}
   fi
-  LIBC_SIGNAL_DEF=${signal_dir}/stmp-def
 fi
-
 
  if test x${signal_dir} != x; then
   HAVE_SIGNAL_DIR_TRUE=
@@ -12203,16 +12195,13 @@ fi
 
 
 LIBC_STDIO_LIB=
-LIBC_STDIO_DEF=
 if test -n "${stdio_dir}"; then
   if test "${use_libtool}" = "yes"; then
     LIBC_STDIO_LIB=${stdio_dir}/lib${stdio_dir}.${aext}
   else
     LIBC_STDIO_LIB=${stdio_dir}/lib.${aext}
   fi
-  LIBC_STDIO_DEF=${stdio_dir}/stmp-def
 fi
-
 
  if test x${stdio_dir} != x; then
   HAVE_STDIO_DIR_TRUE=
@@ -12224,16 +12213,13 @@ fi
 
 
 LIBC_STDIO64_LIB=
-LIBC_STDIO64_DEF=
 if test -n "${stdio64_dir}"; then
   if test "${use_libtool}" = "yes"; then
     LIBC_STDIO64_LIB=${stdio64_dir}/lib${stdio64_dir}.${aext}
   else
     LIBC_STDIO64_LIB=${stdio64_dir}/lib.${aext}
   fi
-  LIBC_STDIO64_DEF=${stdio64_dir}/stmp-def
 fi
-
 
  if test x${stdio64_dir} != x; then
   HAVE_STDIO64_DIR_TRUE=
@@ -12245,16 +12231,13 @@ fi
 
 
 LIBC_POSIX_LIB=
-LIBC_POSIX_DEF=
 if test -n "${posix_dir}"; then
   if test "${use_libtool}" = "yes"; then
     LIBC_POSIX_LIB=${posix_dir}/lib${posix_dir}.${aext}
   else
     LIBC_POSIX_LIB=${posix_dir}/lib.${aext}
   fi
-  LIBC_POSIX_DEF=${posix_dir}/stmp-def
 fi
-
 
  if test x${posix_dir} != x; then
   HAVE_POSIX_DIR_TRUE=
@@ -12266,16 +12249,13 @@ fi
 
 
 LIBC_XDR_LIB=
-LIBC_XDR_DEF=
 if test -n "${xdr_dir}"; then
   if test "${use_libtool}" = "yes"; then
     LIBC_XDR_LIB=${xdr_dir}/lib${xdr_dir}.${aext}
   else
     LIBC_XDR_LIB=${xdr_dir}/lib.${aext}
   fi
-  LIBC_XDR_DEF=${xdr_dir}/stmp-def
 fi
-
 
  if test x${xdr_dir} != x; then
   HAVE_XDR_DIR_TRUE=
