@@ -10,18 +10,11 @@ AC_CONFIG_AUX_DIR(../../../..)
 NEWLIB_CONFIGURE(../../..)
 
 AC_MSG_CHECKING([whether the compiler supports __ea])
-dnl We do not use AC_COMPILE_IFELSE to support building newlib with
-dnl a cross-compiler that is not (yet) able to link executables
-cat > conftest.c <<EOF
-#if defined (__EA32__) || defined (__EA64__)
-  yes;
+AC_PREPROC_IFELSE([AC_LANG_PROGRAM(
+[[#if !defined (__EA32__) && !defined (__EA64__)
+# error "__ea not supported"
 #endif
-EOF
-if AC_TRY_COMMAND(${CC-cc} -E conftest.c) | egrep yes >/dev/null 2>&1; then
-  spu_compiler_has_ea=yes
-else
-  spu_compiler_has_ea=no
-fi
+]])], [spu_compiler_has_ea=yes], [spu_compiler_has_ea=no])
 AM_CONDITIONAL(HAVE_SPU_EA, test x${spu_compiler_has_ea} != xno)
 AC_MSG_RESULT($spu_compiler_has_ea)
 
