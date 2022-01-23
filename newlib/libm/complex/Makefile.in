@@ -100,7 +100,9 @@ am__aclocal_m4_deps = $(top_srcdir)/../../config/depstand.m4 \
 	$(top_srcdir)/../../ltsugar.m4 \
 	$(top_srcdir)/../../ltversion.m4 \
 	$(top_srcdir)/../../lt~obsolete.m4 \
-	$(top_srcdir)/../acinclude.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/../acinclude.m4 \
+	$(top_srcdir)/machine/nds32/acinclude.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am
@@ -362,7 +364,6 @@ sbindir = @sbindir@
 shared_machine_dir = @shared_machine_dir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
-subdirs = @subdirs@
 sys_dir = @sys_dir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@

@@ -30,20 +30,24 @@ fi
 AC_TYPE_LONG_DOUBLE
 AM_CONDITIONAL(HAVE_LONG_DOUBLE, test x"$ac_cv_type_long_double" = x"yes")
 
+dnl We have to include these unconditionally since machines might want to use
+dnl AM_CONDITIONAL in their subdirs.
+m4_include([machine/nds32/acinclude.m4])
+
 LIBM_MACHINE_LIB=
 if test -n "${libm_machine_dir}"; then
   case ${libm_machine_dir} in
-    aarch64) AC_CONFIG_SUBDIRS(machine/aarch64) ;;
-    arm) AC_CONFIG_SUBDIRS(machine/arm) ;;
-    i386) AC_CONFIG_SUBDIRS(machine/i386) ;;
-    nds32) AC_CONFIG_SUBDIRS(machine/nds32) ;;
-    pru) AC_CONFIG_SUBDIRS(machine/pru) ;;
-    spu) AC_CONFIG_SUBDIRS(machine/spu) ;;
-    riscv) AC_CONFIG_SUBDIRS(machine/riscv) ;;
-    x86_64) AC_CONFIG_SUBDIRS(machine/x86_64) ;;
-    powerpc) AC_CONFIG_SUBDIRS(machine/powerpc) ;;
-    sparc) AC_CONFIG_SUBDIRS(machine/sparc) ;;
-    mips) AC_CONFIG_SUBDIRS(machine/mips) ;;
+    aarch64) AC_CONFIG_FILES([machine/aarch64/Makefile]) ;;
+    arm) AC_CONFIG_FILES([machine/arm/Makefile]) ;;
+    i386) AC_CONFIG_FILES([machine/i386/Makefile]) ;;
+    nds32) AC_CONFIG_FILES([machine/nds32/Makefile]) ;;
+    pru) AC_CONFIG_FILES([machine/pru/Makefile]) ;;
+    spu) AC_CONFIG_FILES([machine/spu/Makefile]) ;;
+    riscv) AC_CONFIG_FILES([machine/riscv/Makefile]) ;;
+    x86_64) AC_CONFIG_FILES([machine/x86_64/Makefile]) ;;
+    powerpc) AC_CONFIG_FILES([machine/powerpc/Makefile]) ;;
+    sparc) AC_CONFIG_FILES([machine/sparc/Makefile]) ;;
+    mips) AC_CONFIG_FILES([machine/mips/Makefile]) ;;
     *) AC_MSG_ERROR([unsupported libm_machine_dir "${libm_machine_dir}"]) ;;
   esac
 

@@ -15,6 +15,3 @@ lib_a_CFLAGS = $(AM_CFLAGS)
 noinst_DATA =
 
 include $(srcdir)/../../../Makefile.shared
-
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
-CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

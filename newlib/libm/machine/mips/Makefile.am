@@ -24,6 +24,3 @@ lib_a-fenv.o: fenv.c
 
 lib_a-fenv.obj: fenv.c
 	$(COMPILE) -mno-mips16 -c -o $@ `if test -f 'fenv.c'; then $(CYGPATH_W) 'fenv.c'; else $(CYGPATH_W) '$(srcdir)/fenv.c'; fi`
-
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
-CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
