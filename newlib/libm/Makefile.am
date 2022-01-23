@@ -6,7 +6,10 @@ else
 MATHDIR = math
 endif
 
-SUBDIRS = $(MATHDIR) common complex fenv machine
+SUBDIRS = $(MATHDIR) common complex fenv
+if HAVE_LIBM_MACHINE_DIR
+SUBDIRS += $(LIBM_MACHINE_DIR)
+endif
 
 libm_la_LDFLAGS = -Xcompiler -nostdlib
 
