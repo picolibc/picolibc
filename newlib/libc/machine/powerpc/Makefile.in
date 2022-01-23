@@ -88,6 +88,35 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@HAVE_POWERPC_ALTIVEC_TRUE@am__append_1 = \
+@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vfprintf.o \
+@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vfscanf.o \
+@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vec_malloc.o \
+@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vec_calloc.o \
+@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vec_free.o \
+@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vec_realloc.o \
+@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vec_mallocr.o \
+@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vec_callocr.o \
+@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vec_reallocr.o
+
+@HAVE_POWERPC_SPE_TRUE@am__append_2 = \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-atosfix16.o \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-atosfix32.o \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-atosfix64.o \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-atoufix16.o \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-atoufix32.o \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-atoufix64.o \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-simdldtoa.o \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-strtosfix16.o \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-strtosfix32.o \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-strtosfix64.o \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-strtoufix16.o \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-strtoufix32.o \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-strtoufix64.o \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-ufix64toa.o \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-vfprintf.o \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-vfscanf.o
+
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../../../config/depstand.m4 \
@@ -245,7 +274,6 @@ datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
 exec_prefix = @exec_prefix@
-extra_objs = @extra_objs@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
@@ -287,8 +315,8 @@ noinst_LIBRARIES = lib.a
 AM_CFLAGS = -I $(srcdir)/../../stdio -I $(srcdir)/../../stdlib
 lib_a_SOURCES = setjmp.S
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_LIBADD = @extra_objs@
-lib_a_DEPENDENCIES = @extra_objs@
+lib_a_LIBADD = $(am__append_1) $(am__append_2)
+lib_a_DEPENDENCIES = $(lib_a_LIBADD)
 EXTRA_lib_a_SOURCES = \
   vfprintf.c vfscanf.c \
   vec_malloc.c vec_calloc.c vec_free.c vec_realloc.c vec_mallocr.c \

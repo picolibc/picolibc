@@ -9,16 +9,14 @@ AC_CONFIG_AUX_DIR(../../../..)
 
 NEWLIB_CONFIGURE(../../..)
 
-extra_objs=
+HAVE_POWERPC_ALTIVEC=no
+HAVE_POWERPC_SPE=no
 case $host in
-  powerpc*-*altivec*)
-	extra_objs="lib_a-vfprintf.o lib_a-vfscanf.o lib_a-vec_malloc.o lib_a-vec_calloc.o lib_a-vec_free.o lib_a-vec_realloc.o lib_a-vec_mallocr.o lib_a-vec_callocr.o lib_a-vec_reallocr.o"
-	;;
-  powerpc*-*spe*)
-	extra_objs="lib_a-atosfix16.o lib_a-atosfix32.o lib_a-atosfix64.o lib_a-atoufix16.o lib_a-atoufix32.o lib_a-atoufix64.o lib_a-simdldtoa.o lib_a-strtosfix16.o lib_a-strtosfix32.o lib_a-strtosfix64.o lib_a-strtoufix16.o lib_a-strtoufix32.o lib_a-strtoufix64.o lib_a-ufix64toa.o lib_a-vfprintf.o lib_a-vfscanf.o"
-	;;
+  powerpc*-*altivec*) HAVE_POWERPC_ALTIVEC=yes ;;
+  powerpc*-*spe*) HAVE_POWERPC_SPE=yes ;;
 esac
-AC_SUBST(extra_objs)
+AM_CONDITIONAL(HAVE_POWERPC_ALTIVEC, [test "$HAVE_POWERPC_ALTIVEC" = yes])
+AM_CONDITIONAL(HAVE_POWERPC_SPE, [test "$HAVE_POWERPC_SPE" = yes])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

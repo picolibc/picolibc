@@ -584,7 +584,10 @@ PACKAGE_URL=''
 ac_unique_file="setjmp.S"
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
-extra_objs
+HAVE_POWERPC_SPE_FALSE
+HAVE_POWERPC_SPE_TRUE
+HAVE_POWERPC_ALTIVEC_FALSE
+HAVE_POWERPC_ALTIVEC_TRUE
 sys_dir
 shared_machine_dir
 machine_dir
@@ -3607,15 +3610,27 @@ OBJEXT=${oext}
 
 
 
-extra_objs=
+HAVE_POWERPC_ALTIVEC=no
+HAVE_POWERPC_SPE=no
 case $host in
-  powerpc*-*altivec*)
-	extra_objs="lib_a-vfprintf.o lib_a-vfscanf.o lib_a-vec_malloc.o lib_a-vec_calloc.o lib_a-vec_free.o lib_a-vec_realloc.o lib_a-vec_mallocr.o lib_a-vec_callocr.o lib_a-vec_reallocr.o"
-	;;
-  powerpc*-*spe*)
-	extra_objs="lib_a-atosfix16.o lib_a-atosfix32.o lib_a-atosfix64.o lib_a-atoufix16.o lib_a-atoufix32.o lib_a-atoufix64.o lib_a-simdldtoa.o lib_a-strtosfix16.o lib_a-strtosfix32.o lib_a-strtosfix64.o lib_a-strtoufix16.o lib_a-strtoufix32.o lib_a-strtoufix64.o lib_a-ufix64toa.o lib_a-vfprintf.o lib_a-vfscanf.o"
-	;;
+  powerpc*-*altivec*) HAVE_POWERPC_ALTIVEC=yes ;;
+  powerpc*-*spe*) HAVE_POWERPC_SPE=yes ;;
 esac
+ if test "$HAVE_POWERPC_ALTIVEC" = yes; then
+  HAVE_POWERPC_ALTIVEC_TRUE=
+  HAVE_POWERPC_ALTIVEC_FALSE='#'
+else
+  HAVE_POWERPC_ALTIVEC_TRUE='#'
+  HAVE_POWERPC_ALTIVEC_FALSE=
+fi
+
+ if test "$HAVE_POWERPC_SPE" = yes; then
+  HAVE_POWERPC_SPE_TRUE=
+  HAVE_POWERPC_SPE_FALSE='#'
+else
+  HAVE_POWERPC_SPE_TRUE='#'
+  HAVE_POWERPC_SPE_FALSE=
+fi
 
 
 ac_config_files="$ac_config_files Makefile"
@@ -3816,6 +3831,14 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${USE_LIBTOOL_TRUE}" && test -z "${USE_LIBTOOL_FALSE}"; then
   as_fn_error $? "conditional \"USE_LIBTOOL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_POWERPC_ALTIVEC_TRUE}" && test -z "${HAVE_POWERPC_ALTIVEC_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_POWERPC_ALTIVEC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_POWERPC_SPE_TRUE}" && test -z "${HAVE_POWERPC_SPE_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_POWERPC_SPE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
