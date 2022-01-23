@@ -39,8 +39,14 @@ endif
 # The order of SUBDIRS is important for the integrated documentation.
 # Do not change the order without considering the doc impact.
 SUBDIRS = argz stdlib ctype search $(STDIO_SUBDIR) $(STDIO64_SUBDIR) string $(SIGNAL_SUBDIR) time locale sys reent \
-	errno misc machine $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) $(NEWLIB_ICONV_DIRS) \
-	$(XDR_SUBDIR) ssp .
+	errno misc $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) $(NEWLIB_ICONV_DIRS) \
+	$(XDR_SUBDIR) ssp
+if HAVE_LIBC_MACHINE_DIR
+SUBDIRS += $(LIBC_MACHINE_DIR)
+endif
+# NB: This must come last to avoid parallel build issues with current lib.a
+# accumulation logic.
+SUBDIRS += .
 
 noinst_DATA = $(CRT0)
 

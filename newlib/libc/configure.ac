@@ -58,7 +58,7 @@ if test "${use_libtool}" = "yes"; then
 LT_INIT([win32-dll])
 fi
 
-AC_CONFIG_SUBDIRS(machine sys)
+AC_CONFIG_SUBDIRS(sys)
 
 CRT0=
 if test "x${have_crt0}" = "xyes"; then
@@ -182,13 +182,80 @@ AM_CONDITIONAL(HAVE_LONG_DOUBLE, test x"$ac_cv_type_long_double" = x"yes")
 dnl iconv library will be compiled if --enable-newlib-iconv option is enabled
 AM_CONDITIONAL(ENABLE_NEWLIB_ICONV, test x${newlib_iconv} != x)
 
+LIBC_MACHINE_LIB=
 if test -n "${machine_dir}"; then
+  case ${machine_dir} in
+    a29k) AC_CONFIG_SUBDIRS(machine/a29k) ;;
+    aarch64) AC_CONFIG_SUBDIRS(machine/aarch64) ;;
+    amdgcn) AC_CONFIG_SUBDIRS(machine/amdgcn) ;;
+    arc) AC_CONFIG_SUBDIRS(machine/arc) ;;
+    arm) AC_CONFIG_SUBDIRS(machine/arm) ;;
+    bfin) AC_CONFIG_SUBDIRS(machine/bfin) ;;
+    cr16) AC_CONFIG_SUBDIRS(machine/cr16) ;;
+    cris) AC_CONFIG_SUBDIRS(machine/cris) ;;
+    crx) AC_CONFIG_SUBDIRS(machine/crx) ;;
+    csky) AC_CONFIG_SUBDIRS(machine/csky) ;;
+    d10v) AC_CONFIG_SUBDIRS(machine/d10v) ;;
+    d30v) AC_CONFIG_SUBDIRS(machine/d30v) ;;
+    epiphany) AC_CONFIG_SUBDIRS(machine/epiphany) ;;
+    fr30) AC_CONFIG_SUBDIRS(machine/fr30) ;;
+    frv) AC_CONFIG_SUBDIRS(machine/frv) ;;
+    ft32) AC_CONFIG_SUBDIRS(machine/ft32) ;;
+    h8300) AC_CONFIG_SUBDIRS(machine/h8300) ;;
+    h8500) AC_CONFIG_SUBDIRS(machine/h8500) ;;
+    hppa) AC_CONFIG_SUBDIRS(machine/hppa) ;;
+    i386) AC_CONFIG_SUBDIRS(machine/i386) ;;
+    i960) AC_CONFIG_SUBDIRS(machine/i960) ;;
+    iq2000) AC_CONFIG_SUBDIRS(machine/iq2000) ;;
+    lm32) AC_CONFIG_SUBDIRS(machine/lm32) ;;
+    m32c) AC_CONFIG_SUBDIRS(machine/m32c) ;;
+    m32r) AC_CONFIG_SUBDIRS(machine/m32r) ;;
+    m68hc11) AC_CONFIG_SUBDIRS(machine/m68hc11) ;;
+    m68k) AC_CONFIG_SUBDIRS(machine/m68k) ;;
+    m88k) AC_CONFIG_SUBDIRS(machine/m88k) ;;
+    mep) AC_CONFIG_SUBDIRS(machine/mep) ;;
+    microblaze) AC_CONFIG_SUBDIRS(machine/microblaze) ;;
+    mips) AC_CONFIG_SUBDIRS(machine/mips) ;;
+    riscv) AC_CONFIG_SUBDIRS(machine/riscv) ;;
+    mn10200) AC_CONFIG_SUBDIRS(machine/mn10200) ;;
+    mn10300) AC_CONFIG_SUBDIRS(machine/mn10300) ;;
+    moxie) AC_CONFIG_SUBDIRS(machine/moxie) ;;
+    msp430) AC_CONFIG_SUBDIRS(machine/msp430) ;;
+    mt) AC_CONFIG_SUBDIRS(machine/mt) ;;
+    nds32) AC_CONFIG_SUBDIRS(machine/nds32) ;;
+    necv70) AC_CONFIG_SUBDIRS(machine/necv70) ;;
+    nios2) AC_CONFIG_SUBDIRS(machine/nios2) ;;
+    nvptx) AC_CONFIG_SUBDIRS(machine/nvptx) ;;
+    or1k) AC_CONFIG_SUBDIRS(machine/or1k) ;;
+    powerpc) AC_CONFIG_SUBDIRS(machine/powerpc) ;;
+    pru) AC_CONFIG_SUBDIRS(machine/pru) ;;
+    rl78) AC_CONFIG_SUBDIRS(machine/rl78) ;;
+    rx) AC_CONFIG_SUBDIRS(machine/rx) ;;
+    sh) AC_CONFIG_SUBDIRS(machine/sh) ;;
+    sparc) AC_CONFIG_SUBDIRS(machine/sparc) ;;
+    spu) AC_CONFIG_SUBDIRS(machine/spu) ;;
+    tic4x) AC_CONFIG_SUBDIRS(machine/tic4x) ;;
+    tic6x) AC_CONFIG_SUBDIRS(machine/tic6x) ;;
+    tic80) AC_CONFIG_SUBDIRS(machine/tic80) ;;
+    v850) AC_CONFIG_SUBDIRS(machine/v850) ;;
+    visium) AC_CONFIG_SUBDIRS(machine/visium) ;;
+    w65) AC_CONFIG_SUBDIRS(machine/w65) ;;
+    x86_64) AC_CONFIG_SUBDIRS(machine/x86_64) ;;
+    xc16x) AC_CONFIG_SUBDIRS(machine/xc16x) ;;
+    xstormy16) AC_CONFIG_SUBDIRS(machine/xstormy16) ;;
+    z8k) AC_CONFIG_SUBDIRS(machine/z8k) ;;
+    *) AC_MSG_ERROR([unsupported machine_dir "${machine_dir}"]) ;;
+  esac
+
+  LIBC_MACHINE_DIR=machine/${machine_dir}
   if test "${use_libtool}" = "yes"; then
-    LIBC_MACHINE_LIB=machine/${machine_dir}/lib${machine_dir}.${aext}
+    LIBC_MACHINE_LIB=${LIBC_MACHINE_DIR}/lib${machine_dir}.${aext}
   else
-    LIBC_MACHINE_LIB=machine/lib.${aext}
+    LIBC_MACHINE_LIB=${LIBC_MACHINE_DIR}/lib.${aext}
   fi
 fi
+AM_CONDITIONAL(HAVE_LIBC_MACHINE_DIR, test "x${LIBC_MACHINE_DIR}" != x)
+AC_SUBST(LIBC_MACHINE_DIR)
 AC_SUBST(LIBC_MACHINE_LIB)
 AC_SUBST(machine_dir)
 AC_SUBST(shared_machine_dir)
