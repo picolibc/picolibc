@@ -169,10 +169,7 @@ clean-info:
 	-rm -rf *.info*
 
 distclean:      clean
-	-rm -f Makefile config.cache config.log config.status 
+	-rm -f Makefile
 
-Makefile: Makefile.in config.status 
-	$(SHELL) config.status
-
-config.status: configure
-	$(SHELL) config.status --recheck
+Makefile: Makefile.in ../config.status 
+	cd .. && $(SHELL) config.status

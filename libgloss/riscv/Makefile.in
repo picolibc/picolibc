@@ -305,19 +305,10 @@ install : install-hdrs install-libs install-specs
 # Regenerate configure information
 #-------------------------------------------------------------------------
 
-configure_prereq = \
-  $(src_dir)/configure.ac \
+Makefile : $(src_dir)/Makefile.in ../config.status
+	cd .. && $(SHELL) config.status
 
-$(src_dir)/configure : $(configure_prereq)
-	cd $(src_dir) && autoconf
-
-config.status : $(src_dir)/configure
-	./config.status --recheck
-
-Makefile : $(src_dir)/Makefile.in config.status
-	./config.status
-
-dist_junk += config.status Makefile config.log
+dist_junk += Makefile
 
 #-------------------------------------------------------------------------
 # Default

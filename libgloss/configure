@@ -694,55 +694,24 @@ host_alias
 target_alias
 CCAS
 CCASFLAGS'
-ac_subdirs_all='doc
-aarch64
-arc
+ac_subdirs_all='aarch64
 csky
 epiphany
 i386
-m32r
-m68hc11
-nds32
 m68k
-pa
-i960
-sparc_leon
 sparc
 wince
 mips
-riscv
 rs6000
 mn10200
 mn10300
-bfin
-cr16
-cris
-crx
-d30v
-fr30
-frv
-ft32
-lm32
 mcore
-mep
 moxie
-microblaze
-mt
-v850
-visium
 xc16x
-xstormy16
-m32c
-msp430
-rl78
-rx
 arm
 spu
-tic6x
 iq2000
 or1k
-pru
-nios2
 libnosys'
 
 # Initialize some variables set by options.
@@ -2566,9 +2535,7 @@ fi
 
 
 if test -z "${with_multisubdir}" ; then
-
-
-subdirs="$subdirs doc"
+  ac_config_files="$ac_config_files doc/Makefile"
 
 fi
 
@@ -2578,13 +2545,16 @@ config_libnosys=true
 
 case "${target}" in
   aarch64*-*-*)
-	subdirs="$subdirs aarch64"
+
+
+subdirs="$subdirs aarch64"
 
 	config_testsuite=true
 	;;
   arc*-*-*)
-	subdirs="$subdirs arc"
+	ac_config_files="$ac_config_files arc/Makefile"
 
+	subdirs="$subdirs arc"
 	;;
   csky*-*-*)
 	subdirs="$subdirs csky"
@@ -2600,32 +2570,38 @@ case "${target}" in
 
 	;;
   m32r-*-*)
-	subdirs="$subdirs m32r"
+	ac_config_files="$ac_config_files m32r/Makefile"
 
+	subdirs="$subdirs m32r"
 	;;
   m68hc11-*-* | m6811-*-* | m68hc12-*-* | m6812-*-*)
-	subdirs="$subdirs m68hc11"
+	ac_config_files="$ac_config_files m68hc11/Makefile"
 
+	subdirs="$subdirs m68hc11"
 	;;
   nds32*-*-*)
-	subdirs="$subdirs nds32"
+	ac_config_files="$ac_config_files nds32/Makefile"
 
+	subdirs="$subdirs nds32"
 	;;
   fido-*-* | m68*-*-*)
 	subdirs="$subdirs m68k"
 
 	;;
   hppa*-*-pro*)
-	subdirs="$subdirs pa"
+	ac_config_files="$ac_config_files pa/Makefile"
 
+	subdirs="$subdirs pa"
 	;;
   i960-*-coff)
-	subdirs="$subdirs i960"
+	ac_config_files="$ac_config_files i960/Makefile"
 
+	subdirs="$subdirs i960"
 	;;
   sparc-*leon*-elf* | sparc-*leon*-none*)
-	subdirs="$subdirs sparc_leon"
+	ac_config_files="$ac_config_files sparc_leon/Makefile"
 
+	subdirs="$subdirs sparc_leon"
 	;;
   sparclet-*-aout* | sparc-*-elf* | sparc64-*-elf* | sparc86x-*-* | sparclite-*-*)
 	subdirs="$subdirs sparc"
@@ -2640,8 +2616,9 @@ case "${target}" in
 
 	;;
   riscv*-*-*)
-	subdirs="$subdirs riscv"
+	ac_config_files="$ac_config_files riscv/Makefile"
 
+	subdirs="$subdirs riscv"
 	;;
   powerpc-*-*|powerpcle-*-*)
 	subdirs="$subdirs rs6000"
@@ -2656,68 +2633,82 @@ case "${target}" in
 
 	;;
   bfin-*-*)
-	subdirs="$subdirs bfin"
+	ac_config_files="$ac_config_files bfin/Makefile"
 
+	subdirs="$subdirs bfin"
 	;;
   cr16-*-*)
-        subdirs="$subdirs cr16"
+	ac_config_files="$ac_config_files cr16/Makefile"
 
-        ;;
+	subdirs="$subdirs cr16"
+	;;
   cris-*-* | crisv32-*-*)
-	subdirs="$subdirs cris"
+	ac_config_files="$ac_config_files cris/Makefile"
 
+	subdirs="$subdirs cris"
 	;;
   crx-*-*)
-	subdirs="$subdirs crx"
+	ac_config_files="$ac_config_files crx/Makefile"
 
+	subdirs="$subdirs crx"
 	;;
   d30v-*-*)
-	subdirs="$subdirs d30v"
+	ac_config_files="$ac_config_files d30v/Makefile"
 
+	subdirs="$subdirs d30v"
 	;;
   fr30-*-*)
-	subdirs="$subdirs fr30"
+	ac_config_files="$ac_config_files fr30/Makefile"
 
+	subdirs="$subdirs fr30"
 	;;
   frv*-*-*)
-	subdirs="$subdirs frv"
+	ac_config_files="$ac_config_files frv/Makefile"
 
+	subdirs="$subdirs frv"
 	;;
   ft32*-*-*)
-	subdirs="$subdirs ft32"
+	ac_config_files="$ac_config_files ft32/Makefile"
 
+	subdirs="$subdirs ft32"
 	;;
   lm32*-*-*)
-	subdirs="$subdirs lm32"
+	ac_config_files="$ac_config_files lm32/Makefile"
 
+	subdirs="$subdirs lm32"
 	;;
   mcore-*-*)
 	subdirs="$subdirs mcore"
 
 	;;
   mep-*-*)
-	subdirs="$subdirs mep"
+	ac_config_files="$ac_config_files mep/Makefile"
 
+	subdirs="$subdirs mep"
 	;;
   moxie-*-*)
 	subdirs="$subdirs moxie"
 
 	;;
   microblaze*-*-*)
-	subdirs="$subdirs microblaze"
+	ac_config_files="$ac_config_files microblaze/Makefile"
 
+	subdirs="$subdirs microblaze"
 	;;
   mt-*-*)
-        subdirs="$subdirs mt"
+	ac_config_files="$ac_config_files mt/Makefile"
 
+	subdirs="$subdirs mt"
 	;;
   v850*-*-*)
-        subdirs="$subdirs v850"
+	ac_config_files="$ac_config_files v850/Makefile"
 
-        ;;
+	subdirs="$subdirs v850"
+	;;
   visium-*-*)
-	subdirs="$subdirs visium"
+	ac_config_files="$ac_config_files visium/Makefile"
 
+	subdirs="$subdirs visium"
 	config_testsuite=false
 	;;
   xc16x-*-*)
@@ -2725,25 +2716,30 @@ case "${target}" in
 
 	;;
   xstormy16-*-*)
-	subdirs="$subdirs xstormy16"
+	ac_config_files="$ac_config_files xstormy16/Makefile"
 
+	subdirs="$subdirs xstormy16"
 	;;
   m32c-*-*)
-	subdirs="$subdirs m32c"
+	ac_config_files="$ac_config_files m32c/Makefile"
 
+	subdirs="$subdirs m32c"
 	;;
   msp430-*-elf*)
-	subdirs="$subdirs msp430"
+	ac_config_files="$ac_config_files msp430/Makefile"
 
+	subdirs="$subdirs msp430"
 	config_libnosys=false
 	;;
   rl78*-*-elf)
-	subdirs="$subdirs rl78"
+	ac_config_files="$ac_config_files rl78/Makefile"
 
+	subdirs="$subdirs rl78"
 	;;
   rx*-*-elf)
-	subdirs="$subdirs rx"
+	ac_config_files="$ac_config_files rx/Makefile"
 
+	subdirs="$subdirs rx"
 	;;
   arm*-*-elf | arm*-*-coff | arm*-*-*)
 	subdirs="$subdirs arm"
@@ -2756,8 +2752,9 @@ case "${target}" in
 	config_libnosys=false
 	;;
   tic6x-*-*)
-	subdirs="$subdirs tic6x"
+	ac_config_files="$ac_config_files tic6x/Makefile"
 
+	subdirs="$subdirs tic6x"
 	config_testsuite=false
 	;;
   iq2000-*-*)
@@ -2769,12 +2766,14 @@ case "${target}" in
 
 	;;
   pru-*-*)
-	subdirs="$subdirs pru"
+	ac_config_files="$ac_config_files pru/Makefile"
 
+	subdirs="$subdirs pru"
 	;;
   nios2-*-*)
-	subdirs="$subdirs nios2"
+	ac_config_files="$ac_config_files nios2/Makefile"
 
+	subdirs="$subdirs nios2"
 	;;
 esac
 
@@ -4098,6 +4097,37 @@ cat >>$CONFIG_STATUS <<\_ACEOF || ac_write_fail=1
 for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
+    "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
+    "arc/Makefile") CONFIG_FILES="$CONFIG_FILES arc/Makefile" ;;
+    "m32r/Makefile") CONFIG_FILES="$CONFIG_FILES m32r/Makefile" ;;
+    "m68hc11/Makefile") CONFIG_FILES="$CONFIG_FILES m68hc11/Makefile" ;;
+    "nds32/Makefile") CONFIG_FILES="$CONFIG_FILES nds32/Makefile" ;;
+    "pa/Makefile") CONFIG_FILES="$CONFIG_FILES pa/Makefile" ;;
+    "i960/Makefile") CONFIG_FILES="$CONFIG_FILES i960/Makefile" ;;
+    "sparc_leon/Makefile") CONFIG_FILES="$CONFIG_FILES sparc_leon/Makefile" ;;
+    "riscv/Makefile") CONFIG_FILES="$CONFIG_FILES riscv/Makefile" ;;
+    "bfin/Makefile") CONFIG_FILES="$CONFIG_FILES bfin/Makefile" ;;
+    "cr16/Makefile") CONFIG_FILES="$CONFIG_FILES cr16/Makefile" ;;
+    "cris/Makefile") CONFIG_FILES="$CONFIG_FILES cris/Makefile" ;;
+    "crx/Makefile") CONFIG_FILES="$CONFIG_FILES crx/Makefile" ;;
+    "d30v/Makefile") CONFIG_FILES="$CONFIG_FILES d30v/Makefile" ;;
+    "fr30/Makefile") CONFIG_FILES="$CONFIG_FILES fr30/Makefile" ;;
+    "frv/Makefile") CONFIG_FILES="$CONFIG_FILES frv/Makefile" ;;
+    "ft32/Makefile") CONFIG_FILES="$CONFIG_FILES ft32/Makefile" ;;
+    "lm32/Makefile") CONFIG_FILES="$CONFIG_FILES lm32/Makefile" ;;
+    "mep/Makefile") CONFIG_FILES="$CONFIG_FILES mep/Makefile" ;;
+    "microblaze/Makefile") CONFIG_FILES="$CONFIG_FILES microblaze/Makefile" ;;
+    "mt/Makefile") CONFIG_FILES="$CONFIG_FILES mt/Makefile" ;;
+    "v850/Makefile") CONFIG_FILES="$CONFIG_FILES v850/Makefile" ;;
+    "visium/Makefile") CONFIG_FILES="$CONFIG_FILES visium/Makefile" ;;
+    "xstormy16/Makefile") CONFIG_FILES="$CONFIG_FILES xstormy16/Makefile" ;;
+    "m32c/Makefile") CONFIG_FILES="$CONFIG_FILES m32c/Makefile" ;;
+    "msp430/Makefile") CONFIG_FILES="$CONFIG_FILES msp430/Makefile" ;;
+    "rl78/Makefile") CONFIG_FILES="$CONFIG_FILES rl78/Makefile" ;;
+    "rx/Makefile") CONFIG_FILES="$CONFIG_FILES rx/Makefile" ;;
+    "tic6x/Makefile") CONFIG_FILES="$CONFIG_FILES tic6x/Makefile" ;;
+    "pru/Makefile") CONFIG_FILES="$CONFIG_FILES pru/Makefile" ;;
+    "nios2/Makefile") CONFIG_FILES="$CONFIG_FILES nios2/Makefile" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
 
