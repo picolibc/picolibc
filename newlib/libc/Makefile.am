@@ -38,7 +38,7 @@ endif
 
 # The order of SUBDIRS is important for the integrated documentation.
 # Do not change the order without considering the doc impact.
-SUBDIRS = argz stdlib ctype search $(STDIO_SUBDIR) $(STDIO64_SUBDIR) string $(SIGNAL_SUBDIR) sys time locale reent \
+SUBDIRS = argz stdlib ctype search $(STDIO_SUBDIR) $(STDIO64_SUBDIR) string $(SIGNAL_SUBDIR) time locale reent \
 	errno misc $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) $(NEWLIB_ICONV_DIRS) \
 	$(XDR_SUBDIR) ssp
 if HAVE_SYS_DIR
@@ -123,12 +123,6 @@ libc.a: $(SUBLIBS)
 endif # USE_LIBTOOL
 
 $(SUBLIBS): ; @true
-
-crt0.o: sys/crt0.o
-	rm -f $@
-	ln sys/crt0.o $@ >/dev/null 2>/dev/null || cp sys/crt0.o $@
-
-sys/crt0.o: ; @true
 
 # This is a list of the stmp-def files in each subdirectory which
 # builds .def files.  We don't list subdirectories which don't build
@@ -242,7 +236,7 @@ install-man: man
 .PHONY: force
 force:
 
-CLEANFILES = $(CRT0) \
+CLEANFILES = \
 	sigset.texi stmp-sigset \
 	stdio64.texi stmp-stdio64 targetdep.tex stmp-targetdep \
 	tmp-sigset.texi tmp-iconvset.texi \

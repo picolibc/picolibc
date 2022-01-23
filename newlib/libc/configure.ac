@@ -60,7 +60,7 @@ fi
 
 CRT0=
 if test "x${have_crt0}" = "xyes"; then
-  CRT0=crt0.o
+  CRT0=sys/${sys_dir}/crt0.o
 fi
 AC_SUBST(CRT0)
 
@@ -293,5 +293,5 @@ AC_SUBST(LIBC_MACHINE_LIB)
 AC_SUBST(machine_dir)
 AC_SUBST(shared_machine_dir)
 
-AC_CONFIG_FILES([Makefile argz/Makefile ctype/Makefile errno/Makefile locale/Makefile misc/Makefile reent/Makefile search/Makefile stdio/Makefile stdio64/Makefile stdlib/Makefile string/Makefile time/Makefile posix/Makefile signal/Makefile syscalls/Makefile unix/Makefile iconv/Makefile iconv/ces/Makefile iconv/ccs/Makefile iconv/ccs/binary/Makefile iconv/lib/Makefile ssp/Makefile sys/Makefile xdr/Makefile])
+AC_CONFIG_FILES([Makefile argz/Makefile ctype/Makefile errno/Makefile locale/Makefile misc/Makefile reent/Makefile search/Makefile stdio/Makefile stdio64/Makefile stdlib/Makefile string/Makefile time/Makefile posix/Makefile signal/Makefile syscalls/Makefile unix/Makefile iconv/Makefile iconv/ces/Makefile iconv/ccs/Makefile iconv/ccs/binary/Makefile iconv/lib/Makefile ssp/Makefile xdr/Makefile])
 AC_OUTPUT

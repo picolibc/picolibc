@@ -306,8 +306,8 @@ ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
 DIST_SUBDIRS = argz stdlib ctype search stdio stdio64 string signal \
-	sys time locale reent errno misc unix posix syscalls iconv xdr \
-	ssp @SYS_DIR@ @LIBC_MACHINE_DIR@ .
+	time locale reent errno misc unix posix syscalls iconv xdr ssp \
+	@SYS_DIR@ @LIBC_MACHINE_DIR@ .
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
@@ -470,7 +470,7 @@ top_srcdir = @top_srcdir@
 # NB: This must come last to avoid parallel build issues with current lib.a
 # accumulation logic.
 SUBDIRS = argz stdlib ctype search $(STDIO_SUBDIR) $(STDIO64_SUBDIR) \
-	string $(SIGNAL_SUBDIR) sys time locale reent errno misc \
+	string $(SIGNAL_SUBDIR) time locale reent errno misc \
 	$(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) \
 	$(NEWLIB_ICONV_DIRS) $(XDR_SUBDIR) ssp $(am__append_1) \
 	$(am__append_2) .
@@ -553,7 +553,7 @@ info_TEXINFOS = libc.texi
 libc_TEXINFOS = sigset.texi posix.texi stdio64.texi iconvset.texi \
 	targetdep.tex $(SUBDEFS)
 
-CLEANFILES = $(CRT0) \
+CLEANFILES = \
 	sigset.texi stmp-sigset \
 	stdio64.texi stmp-stdio64 targetdep.tex stmp-targetdep \
 	tmp-sigset.texi tmp-iconvset.texi \
@@ -1125,12 +1125,6 @@ uninstall-am: uninstall-dvi-am uninstall-html-am uninstall-info-am \
 @USE_LIBTOOL_FALSE@	rm -rf tmp
 
 $(SUBLIBS): ; @true
-
-crt0.o: sys/crt0.o
-	rm -f $@
-	ln sys/crt0.o $@ >/dev/null 2>/dev/null || cp sys/crt0.o $@
-
-sys/crt0.o: ; @true
 
 libc.info: sigset.texi stdio64.texi posix.texi iconvset.texi \
 	targetdep.tex $(SUBDEFS)
