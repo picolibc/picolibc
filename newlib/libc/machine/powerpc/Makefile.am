@@ -50,12 +50,8 @@ EXTRA_lib_a_SOURCES = \
   simdldtoa.c strtosfix16.c strtosfix32.c strtosfix64.c strtoufix16.c \
   strtoufix32.c strtoufix64.c ufix64toa.c
 
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
-CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
-
 lib_a-vec_reallocr.o: vec_mallocr.c
 	$(CC) $(DEFS) -DINTERNAL_NEWLIB -DDEFINE_VECREALLOC $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vec_reallocr.o `test -f 'vec_mallocr.c' || echo '$(srcdir)/'`vec_mallocr.c
 
 lib_a-vec_callocr.o: vec_mallocr.c
 	$(CC) $(DEFS) -DINTERNAL_NEWLIB -DDEFINE_VECCALLOC $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vec_callocr.o `test -f 'vec_mallocr.c' || echo '$(srcdir)/'`vec_mallocr.c
-

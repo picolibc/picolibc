@@ -11,6 +11,3 @@ lib_a_SOURCES = reg_memcpy.S reg_memset.S strcmp.S memcpy.S memset.S \
 lib_a_LIBADD = 
 lib_a_DEPENDENCIES = 
 lib_a_CFLAGS=$(AM_CFLAGS)
-
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
-CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

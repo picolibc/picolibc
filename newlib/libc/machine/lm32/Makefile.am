@@ -8,7 +8,3 @@ AM_CCASFLAGS = $(AM_CPPFLAGS)
 
 lib_a_SOURCES = setjmp.S
 lib_a_CFLAGS=$(AM_CFLAGS)
-
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
-CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
-

@@ -28,6 +28,3 @@ lib_a_CFLAGS=$(AM_CFLAGS)
 if NEWLIB_NANO_FORMATTED_IO
 TINY_SOURCES = tiny-puts.c tiny-printf.c
 endif
-
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
-CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

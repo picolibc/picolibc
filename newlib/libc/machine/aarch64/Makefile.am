@@ -40,6 +40,3 @@ lib_a_SOURCES += strrchr-stub.c
 lib_a_SOURCES += strrchr.S
 
 lib_a_CFLAGS=$(AM_CFLAGS)
-
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
-CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

@@ -34,7 +34,3 @@ lib_a_SOURCES += calloc_ea.c free_ea.c malloc_ea.c memchr_ea.c memcmp_ea.c \
 endif
 
 lib_a_CFLAGS = $(AM_CFLAGS)
-
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
-CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
-

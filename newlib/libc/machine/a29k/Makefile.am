@@ -7,6 +7,3 @@ AM_CCASFLAGS = $(AM_CPPFLAGS)
 noinst_LIBRARIES = lib.a
 
 lib_a_SOURCES =
-
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
-CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

@@ -634,10 +634,22 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
+MACH_ADD_SETJMP_FALSE
+MACH_ADD_SETJMP_TRUE
 LIBC_MACHINE_LIB
 LIBC_MACHINE_DIR
 HAVE_LIBC_MACHINE_DIR_FALSE
 HAVE_LIBC_MACHINE_DIR_TRUE
+HAVE_SPU_EA_FALSE
+HAVE_SPU_EA_TRUE
+SH64_FALSE
+SH64_TRUE
+HAVE_POWERPC_SPE_FALSE
+HAVE_POWERPC_SPE_TRUE
+HAVE_POWERPC_ALTIVEC_FALSE
+HAVE_POWERPC_ALTIVEC_TRUE
+IS_NDS32_ISA_V3M_FALSE
+IS_NDS32_ISA_V3M_TRUE
 ENABLE_NEWLIB_ICONV_FALSE
 ENABLE_NEWLIB_ICONV_TRUE
 HAVE_LONG_DOUBLE_FALSE
@@ -858,66 +870,7 @@ LIBS
 CPPFLAGS
 CPP'
 ac_subdirs_all='sys/linux
-sys/phoenix
-machine/a29k
-machine/aarch64
-machine/amdgcn
-machine/arc
-machine/arm
-machine/bfin
-machine/cr16
-machine/cris
-machine/crx
-machine/csky
-machine/d10v
-machine/d30v
-machine/epiphany
-machine/fr30
-machine/frv
-machine/ft32
-machine/h8300
-machine/h8500
-machine/hppa
-machine/i386
-machine/i960
-machine/iq2000
-machine/lm32
-machine/m32c
-machine/m32r
-machine/m68hc11
-machine/m68k
-machine/m88k
-machine/mep
-machine/microblaze
-machine/mips
-machine/riscv
-machine/mn10200
-machine/mn10300
-machine/moxie
-machine/msp430
-machine/mt
-machine/nds32
-machine/necv70
-machine/nios2
-machine/nvptx
-machine/or1k
-machine/powerpc
-machine/pru
-machine/rl78
-machine/rx
-machine/sh
-machine/sparc
-machine/spu
-machine/tic4x
-machine/tic6x
-machine/tic80
-machine/v850
-machine/visium
-machine/w65
-machine/x86_64
-machine/xc16x
-machine/xstormy16
-machine/z8k'
+sys/phoenix'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -11758,7 +11711,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11761 "configure"
+#line 11714 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11864,7 +11817,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11867 "configure"
+#line 11820 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12395,126 +12348,251 @@ else
 fi
 
 
+if test "${machine_dir}" = "nds32"; then
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#ifdef __NDS32_ISA_V3M__
+# error "This is nds32_isa_v3m."
+#endif
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_cpp "$LINENO"; then :
+  is_nds32_isa_v3m="no"
+else
+  is_nds32_isa_v3m="yes"
+fi
+rm -f conftest.err conftest.i conftest.$ac_ext
+fi
+
+ if test "$is_nds32_isa_v3m" = "yes"; then
+  IS_NDS32_ISA_V3M_TRUE=
+  IS_NDS32_ISA_V3M_FALSE='#'
+else
+  IS_NDS32_ISA_V3M_TRUE='#'
+  IS_NDS32_ISA_V3M_FALSE=
+fi
+
+
+HAVE_POWERPC_ALTIVEC=no
+HAVE_POWERPC_SPE=no
+if test "${machine_dir}" = "powerpc"; then
+  case $host in
+    powerpc*-*altivec*) HAVE_POWERPC_ALTIVEC=yes ;;
+    powerpc*-*spe*) HAVE_POWERPC_SPE=yes ;;
+  esac
+fi
+ if test "$HAVE_POWERPC_ALTIVEC" = yes; then
+  HAVE_POWERPC_ALTIVEC_TRUE=
+  HAVE_POWERPC_ALTIVEC_FALSE='#'
+else
+  HAVE_POWERPC_ALTIVEC_TRUE='#'
+  HAVE_POWERPC_ALTIVEC_FALSE=
+fi
+
+ if test "$HAVE_POWERPC_SPE" = yes; then
+  HAVE_POWERPC_SPE_TRUE=
+  HAVE_POWERPC_SPE_FALSE='#'
+else
+  HAVE_POWERPC_SPE_TRUE='#'
+  HAVE_POWERPC_SPE_FALSE=
+fi
+
+
+if test "${machine_dir}" = "sh"; then
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#if !defined(__SH5__)
+# error "not SH5"
+#endif
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_cpp "$LINENO"; then :
+  have_sh64=yes
+else
+  have_sh64=no
+fi
+rm -f conftest.err conftest.i conftest.$ac_ext
+fi
+
+ if test "$have_sh64" = yes; then
+  SH64_TRUE=
+  SH64_FALSE='#'
+else
+  SH64_TRUE='#'
+  SH64_FALSE=
+fi
+
+
+if test "${machine_dir}" = "spu"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports __ea" >&5
+$as_echo_n "checking whether the compiler supports __ea... " >&6; }
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#if !defined (__EA32__) && !defined (__EA64__)
+# error "__ea not supported"
+#endif
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_cpp "$LINENO"; then :
+  spu_compiler_has_ea=yes
+else
+  spu_compiler_has_ea=no
+fi
+rm -f conftest.err conftest.i conftest.$ac_ext
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $spu_compiler_has_ea" >&5
+$as_echo "$spu_compiler_has_ea" >&6; }
+fi
+ if test x${spu_compiler_has_ea} != xno; then
+  HAVE_SPU_EA_TRUE=
+  HAVE_SPU_EA_FALSE='#'
+else
+  HAVE_SPU_EA_TRUE='#'
+  HAVE_SPU_EA_FALSE=
+fi
+
+
+
 LIBC_MACHINE_LIB=
 if test -n "${machine_dir}"; then
   case ${machine_dir} in
-    a29k) subdirs="$subdirs machine/a29k"
+    a29k) ac_config_files="$ac_config_files machine/a29k/Makefile"
  ;;
-    aarch64) subdirs="$subdirs machine/aarch64"
+    aarch64) ac_config_files="$ac_config_files machine/aarch64/Makefile"
  ;;
-    amdgcn) subdirs="$subdirs machine/amdgcn"
+    amdgcn) ac_config_files="$ac_config_files machine/amdgcn/Makefile"
  ;;
-    arc) subdirs="$subdirs machine/arc"
+    arc) ac_config_files="$ac_config_files machine/arc/Makefile"
  ;;
-    arm) subdirs="$subdirs machine/arm"
+    arm) ac_config_files="$ac_config_files machine/arm/Makefile"
  ;;
-    bfin) subdirs="$subdirs machine/bfin"
+    bfin) ac_config_files="$ac_config_files machine/bfin/Makefile"
  ;;
-    cr16) subdirs="$subdirs machine/cr16"
+    cr16) ac_config_files="$ac_config_files machine/cr16/Makefile"
  ;;
-    cris) subdirs="$subdirs machine/cris"
+    cris) ac_config_files="$ac_config_files machine/cris/Makefile"
  ;;
-    crx) subdirs="$subdirs machine/crx"
+    crx) ac_config_files="$ac_config_files machine/crx/Makefile"
  ;;
-    csky) subdirs="$subdirs machine/csky"
+    csky) ac_config_files="$ac_config_files machine/csky/Makefile"
  ;;
-    d10v) subdirs="$subdirs machine/d10v"
+    d10v) ac_config_files="$ac_config_files machine/d10v/Makefile"
  ;;
-    d30v) subdirs="$subdirs machine/d30v"
+    d30v) ac_config_files="$ac_config_files machine/d30v/Makefile"
  ;;
-    epiphany) subdirs="$subdirs machine/epiphany"
+    epiphany) ac_config_files="$ac_config_files machine/epiphany/Makefile"
  ;;
-    fr30) subdirs="$subdirs machine/fr30"
+    fr30) ac_config_files="$ac_config_files machine/fr30/Makefile"
  ;;
-    frv) subdirs="$subdirs machine/frv"
+    frv) ac_config_files="$ac_config_files machine/frv/Makefile"
  ;;
-    ft32) subdirs="$subdirs machine/ft32"
+    ft32) ac_config_files="$ac_config_files machine/ft32/Makefile"
  ;;
-    h8300) subdirs="$subdirs machine/h8300"
+    h8300) ac_config_files="$ac_config_files machine/h8300/Makefile"
  ;;
-    h8500) subdirs="$subdirs machine/h8500"
+    h8500) ac_config_files="$ac_config_files machine/h8500/Makefile"
  ;;
-    hppa) subdirs="$subdirs machine/hppa"
+    hppa) ac_config_files="$ac_config_files machine/hppa/Makefile"
  ;;
-    i386) subdirs="$subdirs machine/i386"
+    i386) ac_config_files="$ac_config_files machine/i386/Makefile"
  ;;
-    i960) subdirs="$subdirs machine/i960"
+    i960) ac_config_files="$ac_config_files machine/i960/Makefile"
  ;;
-    iq2000) subdirs="$subdirs machine/iq2000"
+    iq2000) ac_config_files="$ac_config_files machine/iq2000/Makefile"
  ;;
-    lm32) subdirs="$subdirs machine/lm32"
+    lm32) ac_config_files="$ac_config_files machine/lm32/Makefile"
  ;;
-    m32c) subdirs="$subdirs machine/m32c"
+    m32c) ac_config_files="$ac_config_files machine/m32c/Makefile"
  ;;
-    m32r) subdirs="$subdirs machine/m32r"
+    m32r) ac_config_files="$ac_config_files machine/m32r/Makefile"
  ;;
-    m68hc11) subdirs="$subdirs machine/m68hc11"
+    m68hc11) ac_config_files="$ac_config_files machine/m68hc11/Makefile"
  ;;
-    m68k) subdirs="$subdirs machine/m68k"
+    m68k) ac_config_files="$ac_config_files machine/m68k/Makefile"
  ;;
-    m88k) subdirs="$subdirs machine/m88k"
+    m88k) ac_config_files="$ac_config_files machine/m88k/Makefile"
  ;;
-    mep) subdirs="$subdirs machine/mep"
+    mep) ac_config_files="$ac_config_files machine/mep/Makefile"
  ;;
-    microblaze) subdirs="$subdirs machine/microblaze"
+    microblaze) ac_config_files="$ac_config_files machine/microblaze/Makefile"
  ;;
-    mips) subdirs="$subdirs machine/mips"
+    mips) ac_config_files="$ac_config_files machine/mips/Makefile"
  ;;
-    riscv) subdirs="$subdirs machine/riscv"
+    riscv) ac_config_files="$ac_config_files machine/riscv/Makefile"
  ;;
-    mn10200) subdirs="$subdirs machine/mn10200"
+    mn10200) ac_config_files="$ac_config_files machine/mn10200/Makefile"
  ;;
-    mn10300) subdirs="$subdirs machine/mn10300"
+    mn10300) ac_config_files="$ac_config_files machine/mn10300/Makefile"
  ;;
-    moxie) subdirs="$subdirs machine/moxie"
+    moxie) ac_config_files="$ac_config_files machine/moxie/Makefile"
  ;;
-    msp430) subdirs="$subdirs machine/msp430"
+    msp430) ac_config_files="$ac_config_files machine/msp430/Makefile"
  ;;
-    mt) subdirs="$subdirs machine/mt"
+    mt) ac_config_files="$ac_config_files machine/mt/Makefile"
  ;;
-    nds32) subdirs="$subdirs machine/nds32"
+    nds32) ac_config_files="$ac_config_files machine/nds32/Makefile"
  ;;
-    necv70) subdirs="$subdirs machine/necv70"
+    necv70) ac_config_files="$ac_config_files machine/necv70/Makefile"
  ;;
-    nios2) subdirs="$subdirs machine/nios2"
+    nios2) ac_config_files="$ac_config_files machine/nios2/Makefile"
  ;;
-    nvptx) subdirs="$subdirs machine/nvptx"
+    nvptx) ac_config_files="$ac_config_files machine/nvptx/Makefile"
  ;;
-    or1k) subdirs="$subdirs machine/or1k"
+    or1k) ac_config_files="$ac_config_files machine/or1k/Makefile"
  ;;
-    powerpc) subdirs="$subdirs machine/powerpc"
+    powerpc) ac_config_files="$ac_config_files machine/powerpc/Makefile"
  ;;
-    pru) subdirs="$subdirs machine/pru"
+    pru) ac_config_files="$ac_config_files machine/pru/Makefile"
  ;;
-    rl78) subdirs="$subdirs machine/rl78"
+    rl78) ac_config_files="$ac_config_files machine/rl78/Makefile"
  ;;
-    rx) subdirs="$subdirs machine/rx"
+    rx) ac_config_files="$ac_config_files machine/rx/Makefile"
  ;;
-    sh) subdirs="$subdirs machine/sh"
+    sh) ac_config_files="$ac_config_files machine/sh/Makefile"
  ;;
-    sparc) subdirs="$subdirs machine/sparc"
+    sparc) ac_config_files="$ac_config_files machine/sparc/Makefile"
  ;;
-    spu) subdirs="$subdirs machine/spu"
+    spu) ac_config_files="$ac_config_files machine/spu/Makefile"
  ;;
-    tic4x) subdirs="$subdirs machine/tic4x"
+    tic4x) ac_config_files="$ac_config_files machine/tic4x/Makefile"
  ;;
-    tic6x) subdirs="$subdirs machine/tic6x"
+    tic6x) ac_config_files="$ac_config_files machine/tic6x/Makefile"
  ;;
-    tic80) subdirs="$subdirs machine/tic80"
+    tic80) ac_config_files="$ac_config_files machine/tic80/Makefile"
  ;;
-    v850) subdirs="$subdirs machine/v850"
+    v850) ac_config_files="$ac_config_files machine/v850/Makefile"
  ;;
-    visium) subdirs="$subdirs machine/visium"
+    visium) ac_config_files="$ac_config_files machine/visium/Makefile"
  ;;
-    w65) subdirs="$subdirs machine/w65"
+    w65) ac_config_files="$ac_config_files machine/w65/Makefile"
  ;;
-    x86_64) subdirs="$subdirs machine/x86_64"
+    x86_64) ac_config_files="$ac_config_files machine/x86_64/Makefile"
  ;;
-    xc16x) subdirs="$subdirs machine/xc16x"
+    xc16x) ac_config_files="$ac_config_files machine/xc16x/Makefile"
  ;;
-    xstormy16) subdirs="$subdirs machine/xstormy16"
+    xstormy16) ac_config_files="$ac_config_files machine/xstormy16/Makefile"
  ;;
-    z8k) subdirs="$subdirs machine/z8k"
+    z8k) ac_config_files="$ac_config_files machine/z8k/Makefile"
  ;;
     *) as_fn_error $? "unsupported machine_dir \"${machine_dir}\"" "$LINENO" 5 ;;
   esac
@@ -12537,6 +12615,15 @@ fi
 
 
 
+
+
+ if test "x$mach_add_setjmp" = "xtrue"; then
+  MACH_ADD_SETJMP_TRUE=
+  MACH_ADD_SETJMP_FALSE='#'
+else
+  MACH_ADD_SETJMP_TRUE='#'
+  MACH_ADD_SETJMP_FALSE=
+fi
 
 
 ac_config_files="$ac_config_files Makefile argz/Makefile ctype/Makefile errno/Makefile locale/Makefile misc/Makefile reent/Makefile search/Makefile stdio/Makefile stdio64/Makefile stdlib/Makefile string/Makefile time/Makefile posix/Makefile signal/Makefile syscalls/Makefile unix/Makefile iconv/Makefile iconv/ces/Makefile iconv/ccs/Makefile iconv/ccs/binary/Makefile iconv/lib/Makefile ssp/Makefile xdr/Makefile"
@@ -12798,8 +12885,32 @@ if test -z "${ENABLE_NEWLIB_ICONV_TRUE}" && test -z "${ENABLE_NEWLIB_ICONV_FALSE
   as_fn_error $? "conditional \"ENABLE_NEWLIB_ICONV\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${IS_NDS32_ISA_V3M_TRUE}" && test -z "${IS_NDS32_ISA_V3M_FALSE}"; then
+  as_fn_error $? "conditional \"IS_NDS32_ISA_V3M\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_POWERPC_ALTIVEC_TRUE}" && test -z "${HAVE_POWERPC_ALTIVEC_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_POWERPC_ALTIVEC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_POWERPC_SPE_TRUE}" && test -z "${HAVE_POWERPC_SPE_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_POWERPC_SPE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${SH64_TRUE}" && test -z "${SH64_FALSE}"; then
+  as_fn_error $? "conditional \"SH64\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_SPU_EA_TRUE}" && test -z "${HAVE_SPU_EA_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_SPU_EA\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${HAVE_LIBC_MACHINE_DIR_TRUE}" && test -z "${HAVE_LIBC_MACHINE_DIR_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${MACH_ADD_SETJMP_TRUE}" && test -z "${MACH_ADD_SETJMP_FALSE}"; then
+  as_fn_error $? "conditional \"MACH_ADD_SETJMP\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
@@ -13666,6 +13777,65 @@ do
     "sys/tirtos/Makefile") CONFIG_FILES="$CONFIG_FILES sys/tirtos/Makefile" ;;
     "sys/w65/Makefile") CONFIG_FILES="$CONFIG_FILES sys/w65/Makefile" ;;
     "sys/z8ksim/Makefile") CONFIG_FILES="$CONFIG_FILES sys/z8ksim/Makefile" ;;
+    "machine/a29k/Makefile") CONFIG_FILES="$CONFIG_FILES machine/a29k/Makefile" ;;
+    "machine/aarch64/Makefile") CONFIG_FILES="$CONFIG_FILES machine/aarch64/Makefile" ;;
+    "machine/amdgcn/Makefile") CONFIG_FILES="$CONFIG_FILES machine/amdgcn/Makefile" ;;
+    "machine/arc/Makefile") CONFIG_FILES="$CONFIG_FILES machine/arc/Makefile" ;;
+    "machine/arm/Makefile") CONFIG_FILES="$CONFIG_FILES machine/arm/Makefile" ;;
+    "machine/bfin/Makefile") CONFIG_FILES="$CONFIG_FILES machine/bfin/Makefile" ;;
+    "machine/cr16/Makefile") CONFIG_FILES="$CONFIG_FILES machine/cr16/Makefile" ;;
+    "machine/cris/Makefile") CONFIG_FILES="$CONFIG_FILES machine/cris/Makefile" ;;
+    "machine/crx/Makefile") CONFIG_FILES="$CONFIG_FILES machine/crx/Makefile" ;;
+    "machine/csky/Makefile") CONFIG_FILES="$CONFIG_FILES machine/csky/Makefile" ;;
+    "machine/d10v/Makefile") CONFIG_FILES="$CONFIG_FILES machine/d10v/Makefile" ;;
+    "machine/d30v/Makefile") CONFIG_FILES="$CONFIG_FILES machine/d30v/Makefile" ;;
+    "machine/epiphany/Makefile") CONFIG_FILES="$CONFIG_FILES machine/epiphany/Makefile" ;;
+    "machine/fr30/Makefile") CONFIG_FILES="$CONFIG_FILES machine/fr30/Makefile" ;;
+    "machine/frv/Makefile") CONFIG_FILES="$CONFIG_FILES machine/frv/Makefile" ;;
+    "machine/ft32/Makefile") CONFIG_FILES="$CONFIG_FILES machine/ft32/Makefile" ;;
+    "machine/h8300/Makefile") CONFIG_FILES="$CONFIG_FILES machine/h8300/Makefile" ;;
+    "machine/h8500/Makefile") CONFIG_FILES="$CONFIG_FILES machine/h8500/Makefile" ;;
+    "machine/hppa/Makefile") CONFIG_FILES="$CONFIG_FILES machine/hppa/Makefile" ;;
+    "machine/i386/Makefile") CONFIG_FILES="$CONFIG_FILES machine/i386/Makefile" ;;
+    "machine/i960/Makefile") CONFIG_FILES="$CONFIG_FILES machine/i960/Makefile" ;;
+    "machine/iq2000/Makefile") CONFIG_FILES="$CONFIG_FILES machine/iq2000/Makefile" ;;
+    "machine/lm32/Makefile") CONFIG_FILES="$CONFIG_FILES machine/lm32/Makefile" ;;
+    "machine/m32c/Makefile") CONFIG_FILES="$CONFIG_FILES machine/m32c/Makefile" ;;
+    "machine/m32r/Makefile") CONFIG_FILES="$CONFIG_FILES machine/m32r/Makefile" ;;
+    "machine/m68hc11/Makefile") CONFIG_FILES="$CONFIG_FILES machine/m68hc11/Makefile" ;;
+    "machine/m68k/Makefile") CONFIG_FILES="$CONFIG_FILES machine/m68k/Makefile" ;;
+    "machine/m88k/Makefile") CONFIG_FILES="$CONFIG_FILES machine/m88k/Makefile" ;;
+    "machine/mep/Makefile") CONFIG_FILES="$CONFIG_FILES machine/mep/Makefile" ;;
+    "machine/microblaze/Makefile") CONFIG_FILES="$CONFIG_FILES machine/microblaze/Makefile" ;;
+    "machine/mips/Makefile") CONFIG_FILES="$CONFIG_FILES machine/mips/Makefile" ;;
+    "machine/riscv/Makefile") CONFIG_FILES="$CONFIG_FILES machine/riscv/Makefile" ;;
+    "machine/mn10200/Makefile") CONFIG_FILES="$CONFIG_FILES machine/mn10200/Makefile" ;;
+    "machine/mn10300/Makefile") CONFIG_FILES="$CONFIG_FILES machine/mn10300/Makefile" ;;
+    "machine/moxie/Makefile") CONFIG_FILES="$CONFIG_FILES machine/moxie/Makefile" ;;
+    "machine/msp430/Makefile") CONFIG_FILES="$CONFIG_FILES machine/msp430/Makefile" ;;
+    "machine/mt/Makefile") CONFIG_FILES="$CONFIG_FILES machine/mt/Makefile" ;;
+    "machine/nds32/Makefile") CONFIG_FILES="$CONFIG_FILES machine/nds32/Makefile" ;;
+    "machine/necv70/Makefile") CONFIG_FILES="$CONFIG_FILES machine/necv70/Makefile" ;;
+    "machine/nios2/Makefile") CONFIG_FILES="$CONFIG_FILES machine/nios2/Makefile" ;;
+    "machine/nvptx/Makefile") CONFIG_FILES="$CONFIG_FILES machine/nvptx/Makefile" ;;
+    "machine/or1k/Makefile") CONFIG_FILES="$CONFIG_FILES machine/or1k/Makefile" ;;
+    "machine/powerpc/Makefile") CONFIG_FILES="$CONFIG_FILES machine/powerpc/Makefile" ;;
+    "machine/pru/Makefile") CONFIG_FILES="$CONFIG_FILES machine/pru/Makefile" ;;
+    "machine/rl78/Makefile") CONFIG_FILES="$CONFIG_FILES machine/rl78/Makefile" ;;
+    "machine/rx/Makefile") CONFIG_FILES="$CONFIG_FILES machine/rx/Makefile" ;;
+    "machine/sh/Makefile") CONFIG_FILES="$CONFIG_FILES machine/sh/Makefile" ;;
+    "machine/sparc/Makefile") CONFIG_FILES="$CONFIG_FILES machine/sparc/Makefile" ;;
+    "machine/spu/Makefile") CONFIG_FILES="$CONFIG_FILES machine/spu/Makefile" ;;
+    "machine/tic4x/Makefile") CONFIG_FILES="$CONFIG_FILES machine/tic4x/Makefile" ;;
+    "machine/tic6x/Makefile") CONFIG_FILES="$CONFIG_FILES machine/tic6x/Makefile" ;;
+    "machine/tic80/Makefile") CONFIG_FILES="$CONFIG_FILES machine/tic80/Makefile" ;;
+    "machine/v850/Makefile") CONFIG_FILES="$CONFIG_FILES machine/v850/Makefile" ;;
+    "machine/visium/Makefile") CONFIG_FILES="$CONFIG_FILES machine/visium/Makefile" ;;
+    "machine/w65/Makefile") CONFIG_FILES="$CONFIG_FILES machine/w65/Makefile" ;;
+    "machine/x86_64/Makefile") CONFIG_FILES="$CONFIG_FILES machine/x86_64/Makefile" ;;
+    "machine/xc16x/Makefile") CONFIG_FILES="$CONFIG_FILES machine/xc16x/Makefile" ;;
+    "machine/xstormy16/Makefile") CONFIG_FILES="$CONFIG_FILES machine/xstormy16/Makefile" ;;
+    "machine/z8k/Makefile") CONFIG_FILES="$CONFIG_FILES machine/z8k/Makefile" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "argz/Makefile") CONFIG_FILES="$CONFIG_FILES argz/Makefile" ;;
     "ctype/Makefile") CONFIG_FILES="$CONFIG_FILES ctype/Makefile" ;;

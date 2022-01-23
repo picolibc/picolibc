@@ -12,6 +12,3 @@ else
 lib_a_SOURCES = abort.c memcpy.S memset.S setjmp.S strcmp.S strcpy.S
 endif
 lib_a_CFLAGS = $(AM_CFLAGS)
-
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
-CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

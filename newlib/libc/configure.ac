@@ -215,68 +215,75 @@ AM_CONDITIONAL(HAVE_LONG_DOUBLE, test x"$ac_cv_type_long_double" = x"yes")
 dnl iconv library will be compiled if --enable-newlib-iconv option is enabled
 AM_CONDITIONAL(ENABLE_NEWLIB_ICONV, test x${newlib_iconv} != x)
 
+dnl We have to include these unconditionally since machines might want to use
+dnl AM_CONDITIONAL in their subdirs.
+m4_include([machine/nds32/acinclude.m4])
+m4_include([machine/powerpc/acinclude.m4])
+m4_include([machine/sh/acinclude.m4])
+m4_include([machine/spu/acinclude.m4])
+
 LIBC_MACHINE_LIB=
 if test -n "${machine_dir}"; then
   case ${machine_dir} in
-    a29k) AC_CONFIG_SUBDIRS(machine/a29k) ;;
-    aarch64) AC_CONFIG_SUBDIRS(machine/aarch64) ;;
-    amdgcn) AC_CONFIG_SUBDIRS(machine/amdgcn) ;;
-    arc) AC_CONFIG_SUBDIRS(machine/arc) ;;
-    arm) AC_CONFIG_SUBDIRS(machine/arm) ;;
-    bfin) AC_CONFIG_SUBDIRS(machine/bfin) ;;
-    cr16) AC_CONFIG_SUBDIRS(machine/cr16) ;;
-    cris) AC_CONFIG_SUBDIRS(machine/cris) ;;
-    crx) AC_CONFIG_SUBDIRS(machine/crx) ;;
-    csky) AC_CONFIG_SUBDIRS(machine/csky) ;;
-    d10v) AC_CONFIG_SUBDIRS(machine/d10v) ;;
-    d30v) AC_CONFIG_SUBDIRS(machine/d30v) ;;
-    epiphany) AC_CONFIG_SUBDIRS(machine/epiphany) ;;
-    fr30) AC_CONFIG_SUBDIRS(machine/fr30) ;;
-    frv) AC_CONFIG_SUBDIRS(machine/frv) ;;
-    ft32) AC_CONFIG_SUBDIRS(machine/ft32) ;;
-    h8300) AC_CONFIG_SUBDIRS(machine/h8300) ;;
-    h8500) AC_CONFIG_SUBDIRS(machine/h8500) ;;
-    hppa) AC_CONFIG_SUBDIRS(machine/hppa) ;;
-    i386) AC_CONFIG_SUBDIRS(machine/i386) ;;
-    i960) AC_CONFIG_SUBDIRS(machine/i960) ;;
-    iq2000) AC_CONFIG_SUBDIRS(machine/iq2000) ;;
-    lm32) AC_CONFIG_SUBDIRS(machine/lm32) ;;
-    m32c) AC_CONFIG_SUBDIRS(machine/m32c) ;;
-    m32r) AC_CONFIG_SUBDIRS(machine/m32r) ;;
-    m68hc11) AC_CONFIG_SUBDIRS(machine/m68hc11) ;;
-    m68k) AC_CONFIG_SUBDIRS(machine/m68k) ;;
-    m88k) AC_CONFIG_SUBDIRS(machine/m88k) ;;
-    mep) AC_CONFIG_SUBDIRS(machine/mep) ;;
-    microblaze) AC_CONFIG_SUBDIRS(machine/microblaze) ;;
-    mips) AC_CONFIG_SUBDIRS(machine/mips) ;;
-    riscv) AC_CONFIG_SUBDIRS(machine/riscv) ;;
-    mn10200) AC_CONFIG_SUBDIRS(machine/mn10200) ;;
-    mn10300) AC_CONFIG_SUBDIRS(machine/mn10300) ;;
-    moxie) AC_CONFIG_SUBDIRS(machine/moxie) ;;
-    msp430) AC_CONFIG_SUBDIRS(machine/msp430) ;;
-    mt) AC_CONFIG_SUBDIRS(machine/mt) ;;
-    nds32) AC_CONFIG_SUBDIRS(machine/nds32) ;;
-    necv70) AC_CONFIG_SUBDIRS(machine/necv70) ;;
-    nios2) AC_CONFIG_SUBDIRS(machine/nios2) ;;
-    nvptx) AC_CONFIG_SUBDIRS(machine/nvptx) ;;
-    or1k) AC_CONFIG_SUBDIRS(machine/or1k) ;;
-    powerpc) AC_CONFIG_SUBDIRS(machine/powerpc) ;;
-    pru) AC_CONFIG_SUBDIRS(machine/pru) ;;
-    rl78) AC_CONFIG_SUBDIRS(machine/rl78) ;;
-    rx) AC_CONFIG_SUBDIRS(machine/rx) ;;
-    sh) AC_CONFIG_SUBDIRS(machine/sh) ;;
-    sparc) AC_CONFIG_SUBDIRS(machine/sparc) ;;
-    spu) AC_CONFIG_SUBDIRS(machine/spu) ;;
-    tic4x) AC_CONFIG_SUBDIRS(machine/tic4x) ;;
-    tic6x) AC_CONFIG_SUBDIRS(machine/tic6x) ;;
-    tic80) AC_CONFIG_SUBDIRS(machine/tic80) ;;
-    v850) AC_CONFIG_SUBDIRS(machine/v850) ;;
-    visium) AC_CONFIG_SUBDIRS(machine/visium) ;;
-    w65) AC_CONFIG_SUBDIRS(machine/w65) ;;
-    x86_64) AC_CONFIG_SUBDIRS(machine/x86_64) ;;
-    xc16x) AC_CONFIG_SUBDIRS(machine/xc16x) ;;
-    xstormy16) AC_CONFIG_SUBDIRS(machine/xstormy16) ;;
-    z8k) AC_CONFIG_SUBDIRS(machine/z8k) ;;
+    a29k) AC_CONFIG_FILES([machine/a29k/Makefile]) ;;
+    aarch64) AC_CONFIG_FILES([machine/aarch64/Makefile]) ;;
+    amdgcn) AC_CONFIG_FILES([machine/amdgcn/Makefile]) ;;
+    arc) AC_CONFIG_FILES([machine/arc/Makefile]) ;;
+    arm) AC_CONFIG_FILES([machine/arm/Makefile]) ;;
+    bfin) AC_CONFIG_FILES([machine/bfin/Makefile]) ;;
+    cr16) AC_CONFIG_FILES([machine/cr16/Makefile]) ;;
+    cris) AC_CONFIG_FILES([machine/cris/Makefile]) ;;
+    crx) AC_CONFIG_FILES([machine/crx/Makefile]) ;;
+    csky) AC_CONFIG_FILES([machine/csky/Makefile]) ;;
+    d10v) AC_CONFIG_FILES([machine/d10v/Makefile]) ;;
+    d30v) AC_CONFIG_FILES([machine/d30v/Makefile]) ;;
+    epiphany) AC_CONFIG_FILES([machine/epiphany/Makefile]) ;;
+    fr30) AC_CONFIG_FILES([machine/fr30/Makefile]) ;;
+    frv) AC_CONFIG_FILES([machine/frv/Makefile]) ;;
+    ft32) AC_CONFIG_FILES([machine/ft32/Makefile]) ;;
+    h8300) AC_CONFIG_FILES([machine/h8300/Makefile]) ;;
+    h8500) AC_CONFIG_FILES([machine/h8500/Makefile]) ;;
+    hppa) AC_CONFIG_FILES([machine/hppa/Makefile]) ;;
+    i386) AC_CONFIG_FILES([machine/i386/Makefile]) ;;
+    i960) AC_CONFIG_FILES([machine/i960/Makefile]) ;;
+    iq2000) AC_CONFIG_FILES([machine/iq2000/Makefile]) ;;
+    lm32) AC_CONFIG_FILES([machine/lm32/Makefile]) ;;
+    m32c) AC_CONFIG_FILES([machine/m32c/Makefile]) ;;
+    m32r) AC_CONFIG_FILES([machine/m32r/Makefile]) ;;
+    m68hc11) AC_CONFIG_FILES([machine/m68hc11/Makefile]) ;;
+    m68k) AC_CONFIG_FILES([machine/m68k/Makefile]) ;;
+    m88k) AC_CONFIG_FILES([machine/m88k/Makefile]) ;;
+    mep) AC_CONFIG_FILES([machine/mep/Makefile]) ;;
+    microblaze) AC_CONFIG_FILES([machine/microblaze/Makefile]) ;;
+    mips) AC_CONFIG_FILES([machine/mips/Makefile]) ;;
+    riscv) AC_CONFIG_FILES([machine/riscv/Makefile]) ;;
+    mn10200) AC_CONFIG_FILES([machine/mn10200/Makefile]) ;;
+    mn10300) AC_CONFIG_FILES([machine/mn10300/Makefile]) ;;
+    moxie) AC_CONFIG_FILES([machine/moxie/Makefile]) ;;
+    msp430) AC_CONFIG_FILES([machine/msp430/Makefile]) ;;
+    mt) AC_CONFIG_FILES([machine/mt/Makefile]) ;;
+    nds32) AC_CONFIG_FILES([machine/nds32/Makefile]) ;;
+    necv70) AC_CONFIG_FILES([machine/necv70/Makefile]) ;;
+    nios2) AC_CONFIG_FILES([machine/nios2/Makefile]) ;;
+    nvptx) AC_CONFIG_FILES([machine/nvptx/Makefile]) ;;
+    or1k) AC_CONFIG_FILES([machine/or1k/Makefile]) ;;
+    powerpc) AC_CONFIG_FILES([machine/powerpc/Makefile]) ;;
+    pru) AC_CONFIG_FILES([machine/pru/Makefile]) ;;
+    rl78) AC_CONFIG_FILES([machine/rl78/Makefile]) ;;
+    rx) AC_CONFIG_FILES([machine/rx/Makefile]) ;;
+    sh) AC_CONFIG_FILES([machine/sh/Makefile]) ;;
+    sparc) AC_CONFIG_FILES([machine/sparc/Makefile]) ;;
+    spu) AC_CONFIG_FILES([machine/spu/Makefile]) ;;
+    tic4x) AC_CONFIG_FILES([machine/tic4x/Makefile]) ;;
+    tic6x) AC_CONFIG_FILES([machine/tic6x/Makefile]) ;;
+    tic80) AC_CONFIG_FILES([machine/tic80/Makefile]) ;;
+    v850) AC_CONFIG_FILES([machine/v850/Makefile]) ;;
+    visium) AC_CONFIG_FILES([machine/visium/Makefile]) ;;
+    w65) AC_CONFIG_FILES([machine/w65/Makefile]) ;;
+    x86_64) AC_CONFIG_FILES([machine/x86_64/Makefile]) ;;
+    xc16x) AC_CONFIG_FILES([machine/xc16x/Makefile]) ;;
+    xstormy16) AC_CONFIG_FILES([machine/xstormy16/Makefile]) ;;
+    z8k) AC_CONFIG_FILES([machine/z8k/Makefile]) ;;
     *) AC_MSG_ERROR([unsupported machine_dir "${machine_dir}"]) ;;
   esac
 
@@ -292,6 +299,8 @@ AC_SUBST(LIBC_MACHINE_DIR)
 AC_SUBST(LIBC_MACHINE_LIB)
 AC_SUBST(machine_dir)
 AC_SUBST(shared_machine_dir)
+
+AM_CONDITIONAL(MACH_ADD_SETJMP, test "x$mach_add_setjmp" = "xtrue")
 
 AC_CONFIG_FILES([Makefile argz/Makefile ctype/Makefile errno/Makefile locale/Makefile misc/Makefile reent/Makefile search/Makefile stdio/Makefile stdio64/Makefile stdlib/Makefile string/Makefile time/Makefile posix/Makefile signal/Makefile syscalls/Makefile unix/Makefile iconv/Makefile iconv/ces/Makefile iconv/ccs/Makefile iconv/ccs/binary/Makefile iconv/lib/Makefile ssp/Makefile xdr/Makefile])
 AC_OUTPUT

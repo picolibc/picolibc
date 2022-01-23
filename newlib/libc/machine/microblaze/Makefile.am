@@ -8,6 +8,3 @@ noinst_LIBRARIES = lib.a
 
 lib_a_SOURCES = strlen.c strcmp.c strcpy.c setjmp.S longjmp.S
 lib_a_CFLAGS=$(AM_CFLAGS)
-
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
-CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

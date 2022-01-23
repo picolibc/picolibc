@@ -11,9 +11,6 @@ noinst_LIBRARIES = lib.a
 lib_a_SOURCES = setjmp.S
 lib_a_CFLAGS = $(AM_CFLAGS)
 
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
-CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
-
 lib_a_LIBADD = $(lpfx)malloc.o \
 	$(lpfx)free.o \
 	$(lpfx)realloc.o \
@@ -82,4 +79,3 @@ $(lpfx)reallocr.o: mallocr.c
 
 $(lpfx)callocr.o: mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_CALLOC -c $(srcdir)/mallocr.c -o $@
-

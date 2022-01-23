@@ -19,9 +19,6 @@ lib_a_SOURCES += strlen.S
 
 lib_a_CFLAGS = $(AM_CFLAGS)
 
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
-CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
-
 MEMCHR_DEP=acle-compat.h
 MEMCPY_DEP=memcpy-armv7a.S memcpy-armv7m.S
 STRCMP_DEP=strcmp-arm-tiny.S strcmp-armv4.S strcmp-armv4t.S strcmp-armv6.S \
