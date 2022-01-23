@@ -166,34 +166,34 @@ dnl do.  However, we do need to know whether they will produce a library.
 LIBC_SYS_LIB=
 if test -n "${sys_dir}"; then
   case ${sys_dir} in
-    a29khif) AC_CONFIG_SUBDIRS(sys/a29khif) ;;
-    amdgcn) AC_CONFIG_SUBDIRS(sys/amdgcn) ;;
-    arm) AC_CONFIG_SUBDIRS(sys/arm) ;;
-    d10v) AC_CONFIG_SUBDIRS(sys/d10v) ;;
-    decstation) AC_CONFIG_SUBDIRS(sys/decstation) ;;
-    epiphany) AC_CONFIG_SUBDIRS(sys/epiphany) ;;
-    h8300hms) AC_CONFIG_SUBDIRS(sys/h8300hms) ;;
-    h8500hms) AC_CONFIG_SUBDIRS(sys/h8500hms) ;;
+    a29khif) AC_CONFIG_FILES([sys/a29khif/Makefile]) ;;
+    amdgcn) AC_CONFIG_FILES([sys/amdgcn/Makefile]) ;;
+    arm) AC_CONFIG_FILES([sys/arm/Makefile]) ;;
+    d10v) AC_CONFIG_FILES([sys/d10v/Makefile]) ;;
+    decstation) AC_CONFIG_FILES([sys/decstation/Makefile]) ;;
+    epiphany) AC_CONFIG_FILES([sys/epiphany/Makefile]) ;;
+    h8300hms) AC_CONFIG_FILES([sys/h8300hms/Makefile]) ;;
+    h8500hms) AC_CONFIG_FILES([sys/h8500hms/Makefile]) ;;
     linux) AC_CONFIG_SUBDIRS(sys/linux) ;;
-    m88kbug) AC_CONFIG_SUBDIRS(sys/m88kbug) ;;
-    mmixware) AC_CONFIG_SUBDIRS(sys/mmixware) ;;
-    netware) AC_CONFIG_SUBDIRS(sys/netware) ;;
-    or1k) AC_CONFIG_SUBDIRS(sys/or1k) ;;
+    m88kbug) AC_CONFIG_FILES([sys/m88kbug/Makefile]) ;;
+    mmixware) AC_CONFIG_FILES([sys/mmixware/Makefile]) ;;
+    netware) AC_CONFIG_FILES([sys/netware/Makefile]) ;;
+    or1k) AC_CONFIG_FILES([sys/or1k/Makefile]) ;;
     phoenix) AC_CONFIG_SUBDIRS(sys/phoenix) ;;
-    rdos) AC_CONFIG_SUBDIRS(sys/rdos) ;;
-    rtems) AC_CONFIG_SUBDIRS(sys/rtems) ;;
-    sh) AC_CONFIG_SUBDIRS(sys/sh) ;;
-    sparc64) AC_CONFIG_SUBDIRS(sys/sparc64) ;;
-    sun4) AC_CONFIG_SUBDIRS(sys/sun4) ;;
-    sysmec) AC_CONFIG_SUBDIRS(sys/sysmec) ;;
-    sysnec810) AC_CONFIG_SUBDIRS(sys/sysnec810) ;;
-    sysnecv850) AC_CONFIG_SUBDIRS(sys/sysnecv850) ;;
-    sysvi386) AC_CONFIG_SUBDIRS(sys/sysvi386) ;;
-    sysvnecv70) AC_CONFIG_SUBDIRS(sys/sysvnecv70) ;;
-    tic80) AC_CONFIG_SUBDIRS(sys/tic80) ;;
-    tirtos) AC_CONFIG_SUBDIRS(sys/tirtos) ;;
-    w65) AC_CONFIG_SUBDIRS(sys/w65) ;;
-    z8ksim) AC_CONFIG_SUBDIRS(sys/z8ksim) ;;
+    rdos) AC_CONFIG_FILES([sys/rdos/Makefile]) ;;
+    rtems) AC_CONFIG_FILES([sys/rtems/Makefile]) ;;
+    sh) AC_CONFIG_FILES([sys/sh/Makefile]) ;;
+    sparc64) AC_CONFIG_FILES([sys/sparc64/Makefile]) ;;
+    sun4) AC_CONFIG_FILES([sys/sun4/Makefile]) ;;
+    sysmec) AC_CONFIG_FILES([sys/sysmec/Makefile]) ;;
+    sysnec810) AC_CONFIG_FILES([sys/sysnec810/Makefile]) ;;
+    sysnecv850) AC_CONFIG_FILES([sys/sysnecv850/Makefile]) ;;
+    sysvi386) AC_CONFIG_FILES([sys/sysvi386/Makefile]) ;;
+    sysvnecv70) AC_CONFIG_FILES([sys/sysvnecv70/Makefile]) ;;
+    tic80) AC_CONFIG_FILES([sys/tic80/Makefile]) ;;
+    tirtos) AC_CONFIG_FILES([sys/tirtos/Makefile]) ;;
+    w65) AC_CONFIG_FILES([sys/w65/Makefile]) ;;
+    z8ksim) AC_CONFIG_FILES([sys/z8ksim/Makefile]) ;;
     *) AC_MSG_ERROR([unsupported sys_dir "${sys_dir}"]) ;;
   esac
 

@@ -11,6 +11,3 @@ lib_a_SOURCES = syscalls.c _exit.S sbrk.c misc.c crt1.c \
 lib_a_CFLAGS = $(AM_CFLAGS)
 
 all-local: crt0.o
-
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
-CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

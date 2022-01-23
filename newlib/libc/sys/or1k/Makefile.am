@@ -8,6 +8,3 @@ noinst_LIBRARIES = lib.a
 
 lib_a_SOURCES = getreent.S mlock.c
 lib_a_CFLAGS=$(AM_CFLAGS)
-
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
-CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

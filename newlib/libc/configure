@@ -857,34 +857,8 @@ LDFLAGS
 LIBS
 CPPFLAGS
 CPP'
-ac_subdirs_all='sys/a29khif
-sys/amdgcn
-sys/arm
-sys/d10v
-sys/decstation
-sys/epiphany
-sys/h8300hms
-sys/h8500hms
-sys/linux
-sys/m88kbug
-sys/mmixware
-sys/netware
-sys/or1k
+ac_subdirs_all='sys/linux
 sys/phoenix
-sys/rdos
-sys/rtems
-sys/sh
-sys/sparc64
-sys/sun4
-sys/sysmec
-sys/sysnec810
-sys/sysnecv850
-sys/sysvi386
-sys/sysvnecv70
-sys/tic80
-sys/tirtos
-sys/w65
-sys/z8ksim
 machine/a29k
 machine/aarch64
 machine/amdgcn
@@ -11784,7 +11758,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11787 "configure"
+#line 11761 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11890,7 +11864,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11893 "configure"
+#line 11867 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12281,63 +12255,63 @@ fi
 LIBC_SYS_LIB=
 if test -n "${sys_dir}"; then
   case ${sys_dir} in
-    a29khif)
+    a29khif) ac_config_files="$ac_config_files sys/a29khif/Makefile"
+ ;;
+    amdgcn) ac_config_files="$ac_config_files sys/amdgcn/Makefile"
+ ;;
+    arm) ac_config_files="$ac_config_files sys/arm/Makefile"
+ ;;
+    d10v) ac_config_files="$ac_config_files sys/d10v/Makefile"
+ ;;
+    decstation) ac_config_files="$ac_config_files sys/decstation/Makefile"
+ ;;
+    epiphany) ac_config_files="$ac_config_files sys/epiphany/Makefile"
+ ;;
+    h8300hms) ac_config_files="$ac_config_files sys/h8300hms/Makefile"
+ ;;
+    h8500hms) ac_config_files="$ac_config_files sys/h8500hms/Makefile"
+ ;;
+    linux)
 
-subdirs="$subdirs sys/a29khif"
+subdirs="$subdirs sys/linux"
  ;;
-    amdgcn) subdirs="$subdirs sys/amdgcn"
+    m88kbug) ac_config_files="$ac_config_files sys/m88kbug/Makefile"
  ;;
-    arm) subdirs="$subdirs sys/arm"
+    mmixware) ac_config_files="$ac_config_files sys/mmixware/Makefile"
  ;;
-    d10v) subdirs="$subdirs sys/d10v"
+    netware) ac_config_files="$ac_config_files sys/netware/Makefile"
  ;;
-    decstation) subdirs="$subdirs sys/decstation"
- ;;
-    epiphany) subdirs="$subdirs sys/epiphany"
- ;;
-    h8300hms) subdirs="$subdirs sys/h8300hms"
- ;;
-    h8500hms) subdirs="$subdirs sys/h8500hms"
- ;;
-    linux) subdirs="$subdirs sys/linux"
- ;;
-    m88kbug) subdirs="$subdirs sys/m88kbug"
- ;;
-    mmixware) subdirs="$subdirs sys/mmixware"
- ;;
-    netware) subdirs="$subdirs sys/netware"
- ;;
-    or1k) subdirs="$subdirs sys/or1k"
+    or1k) ac_config_files="$ac_config_files sys/or1k/Makefile"
  ;;
     phoenix) subdirs="$subdirs sys/phoenix"
  ;;
-    rdos) subdirs="$subdirs sys/rdos"
+    rdos) ac_config_files="$ac_config_files sys/rdos/Makefile"
  ;;
-    rtems) subdirs="$subdirs sys/rtems"
+    rtems) ac_config_files="$ac_config_files sys/rtems/Makefile"
  ;;
-    sh) subdirs="$subdirs sys/sh"
+    sh) ac_config_files="$ac_config_files sys/sh/Makefile"
  ;;
-    sparc64) subdirs="$subdirs sys/sparc64"
+    sparc64) ac_config_files="$ac_config_files sys/sparc64/Makefile"
  ;;
-    sun4) subdirs="$subdirs sys/sun4"
+    sun4) ac_config_files="$ac_config_files sys/sun4/Makefile"
  ;;
-    sysmec) subdirs="$subdirs sys/sysmec"
+    sysmec) ac_config_files="$ac_config_files sys/sysmec/Makefile"
  ;;
-    sysnec810) subdirs="$subdirs sys/sysnec810"
+    sysnec810) ac_config_files="$ac_config_files sys/sysnec810/Makefile"
  ;;
-    sysnecv850) subdirs="$subdirs sys/sysnecv850"
+    sysnecv850) ac_config_files="$ac_config_files sys/sysnecv850/Makefile"
  ;;
-    sysvi386) subdirs="$subdirs sys/sysvi386"
+    sysvi386) ac_config_files="$ac_config_files sys/sysvi386/Makefile"
  ;;
-    sysvnecv70) subdirs="$subdirs sys/sysvnecv70"
+    sysvnecv70) ac_config_files="$ac_config_files sys/sysvnecv70/Makefile"
  ;;
-    tic80) subdirs="$subdirs sys/tic80"
+    tic80) ac_config_files="$ac_config_files sys/tic80/Makefile"
  ;;
-    tirtos) subdirs="$subdirs sys/tirtos"
+    tirtos) ac_config_files="$ac_config_files sys/tirtos/Makefile"
  ;;
-    w65) subdirs="$subdirs sys/w65"
+    w65) ac_config_files="$ac_config_files sys/w65/Makefile"
  ;;
-    z8ksim) subdirs="$subdirs sys/z8ksim"
+    z8ksim) ac_config_files="$ac_config_files sys/z8ksim/Makefile"
  ;;
     *) as_fn_error $? "unsupported sys_dir \"${sys_dir}\"" "$LINENO" 5 ;;
   esac
@@ -13666,6 +13640,32 @@ do
   case $ac_config_target in
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
+    "sys/a29khif/Makefile") CONFIG_FILES="$CONFIG_FILES sys/a29khif/Makefile" ;;
+    "sys/amdgcn/Makefile") CONFIG_FILES="$CONFIG_FILES sys/amdgcn/Makefile" ;;
+    "sys/arm/Makefile") CONFIG_FILES="$CONFIG_FILES sys/arm/Makefile" ;;
+    "sys/d10v/Makefile") CONFIG_FILES="$CONFIG_FILES sys/d10v/Makefile" ;;
+    "sys/decstation/Makefile") CONFIG_FILES="$CONFIG_FILES sys/decstation/Makefile" ;;
+    "sys/epiphany/Makefile") CONFIG_FILES="$CONFIG_FILES sys/epiphany/Makefile" ;;
+    "sys/h8300hms/Makefile") CONFIG_FILES="$CONFIG_FILES sys/h8300hms/Makefile" ;;
+    "sys/h8500hms/Makefile") CONFIG_FILES="$CONFIG_FILES sys/h8500hms/Makefile" ;;
+    "sys/m88kbug/Makefile") CONFIG_FILES="$CONFIG_FILES sys/m88kbug/Makefile" ;;
+    "sys/mmixware/Makefile") CONFIG_FILES="$CONFIG_FILES sys/mmixware/Makefile" ;;
+    "sys/netware/Makefile") CONFIG_FILES="$CONFIG_FILES sys/netware/Makefile" ;;
+    "sys/or1k/Makefile") CONFIG_FILES="$CONFIG_FILES sys/or1k/Makefile" ;;
+    "sys/rdos/Makefile") CONFIG_FILES="$CONFIG_FILES sys/rdos/Makefile" ;;
+    "sys/rtems/Makefile") CONFIG_FILES="$CONFIG_FILES sys/rtems/Makefile" ;;
+    "sys/sh/Makefile") CONFIG_FILES="$CONFIG_FILES sys/sh/Makefile" ;;
+    "sys/sparc64/Makefile") CONFIG_FILES="$CONFIG_FILES sys/sparc64/Makefile" ;;
+    "sys/sun4/Makefile") CONFIG_FILES="$CONFIG_FILES sys/sun4/Makefile" ;;
+    "sys/sysmec/Makefile") CONFIG_FILES="$CONFIG_FILES sys/sysmec/Makefile" ;;
+    "sys/sysnec810/Makefile") CONFIG_FILES="$CONFIG_FILES sys/sysnec810/Makefile" ;;
+    "sys/sysnecv850/Makefile") CONFIG_FILES="$CONFIG_FILES sys/sysnecv850/Makefile" ;;
+    "sys/sysvi386/Makefile") CONFIG_FILES="$CONFIG_FILES sys/sysvi386/Makefile" ;;
+    "sys/sysvnecv70/Makefile") CONFIG_FILES="$CONFIG_FILES sys/sysvnecv70/Makefile" ;;
+    "sys/tic80/Makefile") CONFIG_FILES="$CONFIG_FILES sys/tic80/Makefile" ;;
+    "sys/tirtos/Makefile") CONFIG_FILES="$CONFIG_FILES sys/tirtos/Makefile" ;;
+    "sys/w65/Makefile") CONFIG_FILES="$CONFIG_FILES sys/w65/Makefile" ;;
+    "sys/z8ksim/Makefile") CONFIG_FILES="$CONFIG_FILES sys/z8ksim/Makefile" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "argz/Makefile") CONFIG_FILES="$CONFIG_FILES argz/Makefile" ;;
     "ctype/Makefile") CONFIG_FILES="$CONFIG_FILES ctype/Makefile" ;;

@@ -35,6 +35,3 @@ noinst_LIBRARIES = lib.a
 # crt0.o comes from libgloss
 lib_a_SOURCES = e_printf.c
 lib_a_CFLAGS = $(AM_CFLAGS)
-
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
-CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
