@@ -90,7 +90,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@HAVE_LIBC_MACHINE_DIR_TRUE@am__append_1 = $(LIBC_MACHINE_DIR)
+@HAVE_SYS_DIR_TRUE@am__append_1 = $(SYS_DIR)
+@HAVE_LIBC_MACHINE_DIR_TRUE@am__append_2 = $(LIBC_MACHINE_DIR)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../config/depstand.m4 \
@@ -305,8 +306,8 @@ ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
 DIST_SUBDIRS = argz stdlib ctype search stdio stdio64 string signal \
-	time locale sys reent errno misc unix posix syscalls iconv xdr \
-	ssp @LIBC_MACHINE_DIR@ .
+	sys time locale reent errno misc unix posix syscalls iconv xdr \
+	ssp @SYS_DIR@ @LIBC_MACHINE_DIR@ .
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
@@ -390,6 +391,7 @@ SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+SYS_DIR = @SYS_DIR@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
@@ -468,9 +470,10 @@ top_srcdir = @top_srcdir@
 # NB: This must come last to avoid parallel build issues with current lib.a
 # accumulation logic.
 SUBDIRS = argz stdlib ctype search $(STDIO_SUBDIR) $(STDIO64_SUBDIR) \
-	string $(SIGNAL_SUBDIR) time locale sys reent errno misc \
+	string $(SIGNAL_SUBDIR) sys time locale reent errno misc \
 	$(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) \
-	$(NEWLIB_ICONV_DIRS) $(XDR_SUBDIR) ssp $(am__append_1) .
+	$(NEWLIB_ICONV_DIRS) $(XDR_SUBDIR) ssp $(am__append_1) \
+	$(am__append_2) .
 noinst_DATA = $(CRT0)
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libc.la
 @USE_LIBTOOL_FALSE@SUBLIBS = \

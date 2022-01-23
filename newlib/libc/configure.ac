@@ -58,8 +58,6 @@ if test "${use_libtool}" = "yes"; then
 LT_INIT([win32-dll])
 fi
 
-AC_CONFIG_SUBDIRS(sys)
-
 CRT0=
 if test "x${have_crt0}" = "xyes"; then
   CRT0=crt0.o
@@ -167,12 +165,47 @@ dnl do.  However, we do need to know whether they will produce a library.
 
 LIBC_SYS_LIB=
 if test -n "${sys_dir}"; then
+  case ${sys_dir} in
+    a29khif) AC_CONFIG_SUBDIRS(sys/a29khif) ;;
+    amdgcn) AC_CONFIG_SUBDIRS(sys/amdgcn) ;;
+    arm) AC_CONFIG_SUBDIRS(sys/arm) ;;
+    d10v) AC_CONFIG_SUBDIRS(sys/d10v) ;;
+    decstation) AC_CONFIG_SUBDIRS(sys/decstation) ;;
+    epiphany) AC_CONFIG_SUBDIRS(sys/epiphany) ;;
+    h8300hms) AC_CONFIG_SUBDIRS(sys/h8300hms) ;;
+    h8500hms) AC_CONFIG_SUBDIRS(sys/h8500hms) ;;
+    linux) AC_CONFIG_SUBDIRS(sys/linux) ;;
+    m88kbug) AC_CONFIG_SUBDIRS(sys/m88kbug) ;;
+    mmixware) AC_CONFIG_SUBDIRS(sys/mmixware) ;;
+    netware) AC_CONFIG_SUBDIRS(sys/netware) ;;
+    or1k) AC_CONFIG_SUBDIRS(sys/or1k) ;;
+    phoenix) AC_CONFIG_SUBDIRS(sys/phoenix) ;;
+    rdos) AC_CONFIG_SUBDIRS(sys/rdos) ;;
+    rtems) AC_CONFIG_SUBDIRS(sys/rtems) ;;
+    sh) AC_CONFIG_SUBDIRS(sys/sh) ;;
+    sparc64) AC_CONFIG_SUBDIRS(sys/sparc64) ;;
+    sun4) AC_CONFIG_SUBDIRS(sys/sun4) ;;
+    sysmec) AC_CONFIG_SUBDIRS(sys/sysmec) ;;
+    sysnec810) AC_CONFIG_SUBDIRS(sys/sysnec810) ;;
+    sysnecv850) AC_CONFIG_SUBDIRS(sys/sysnecv850) ;;
+    sysvi386) AC_CONFIG_SUBDIRS(sys/sysvi386) ;;
+    sysvnecv70) AC_CONFIG_SUBDIRS(sys/sysvnecv70) ;;
+    tic80) AC_CONFIG_SUBDIRS(sys/tic80) ;;
+    tirtos) AC_CONFIG_SUBDIRS(sys/tirtos) ;;
+    w65) AC_CONFIG_SUBDIRS(sys/w65) ;;
+    z8ksim) AC_CONFIG_SUBDIRS(sys/z8ksim) ;;
+    *) AC_MSG_ERROR([unsupported sys_dir "${sys_dir}"]) ;;
+  esac
+
+  SYS_DIR=sys/${sys_dir}
   if test "${use_libtool}" = "yes"; then
-    LIBC_SYS_LIB=sys/${sys_dir}/lib${sys_dir}.${aext}
+    LIBC_SYS_LIB=${SYS_DIR}/lib${sys_dir}.${aext}
   else
-    LIBC_SYS_LIB=sys/lib.${aext}
+    LIBC_SYS_LIB=${SYS_DIR}/lib.${aext}
   fi
 fi
+AC_SUBST(SYS_DIR)
+AM_CONDITIONAL(HAVE_SYS_DIR, test x${sys_dir} != x)
 AC_SUBST(LIBC_SYS_LIB)
 AC_SUBST(sys_dir)
 
@@ -260,5 +293,5 @@ AC_SUBST(LIBC_MACHINE_LIB)
 AC_SUBST(machine_dir)
 AC_SUBST(shared_machine_dir)
 
-AC_CONFIG_FILES([Makefile argz/Makefile ctype/Makefile errno/Makefile locale/Makefile misc/Makefile reent/Makefile search/Makefile stdio/Makefile stdio64/Makefile stdlib/Makefile string/Makefile time/Makefile posix/Makefile signal/Makefile syscalls/Makefile unix/Makefile iconv/Makefile iconv/ces/Makefile iconv/ccs/Makefile iconv/ccs/binary/Makefile iconv/lib/Makefile ssp/Makefile xdr/Makefile])
+AC_CONFIG_FILES([Makefile argz/Makefile ctype/Makefile errno/Makefile locale/Makefile misc/Makefile reent/Makefile search/Makefile stdio/Makefile stdio64/Makefile stdlib/Makefile string/Makefile time/Makefile posix/Makefile signal/Makefile syscalls/Makefile unix/Makefile iconv/Makefile iconv/ces/Makefile iconv/ccs/Makefile iconv/ccs/binary/Makefile iconv/lib/Makefile ssp/Makefile sys/Makefile xdr/Makefile])
 AC_OUTPUT

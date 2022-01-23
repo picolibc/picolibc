@@ -643,6 +643,10 @@ ENABLE_NEWLIB_ICONV_TRUE
 HAVE_LONG_DOUBLE_FALSE
 HAVE_LONG_DOUBLE_TRUE
 LIBC_SYS_LIB
+HAVE_SYS_DIR_FALSE
+HAVE_SYS_DIR_TRUE
+SYS_DIR
+subdirs
 HAVE_UNIX_DIR_FALSE
 HAVE_UNIX_DIR_TRUE
 LIBC_UNIX_LIB
@@ -670,7 +674,6 @@ HAVE_SIGNAL_DIR_TRUE
 LIBC_SIGNAL_DEF
 LIBC_SIGNAL_LIB
 CRT0
-subdirs
 CPP
 OTOOL64
 OTOOL
@@ -854,7 +857,34 @@ LDFLAGS
 LIBS
 CPPFLAGS
 CPP'
-ac_subdirs_all='sys
+ac_subdirs_all='sys/a29khif
+sys/amdgcn
+sys/arm
+sys/d10v
+sys/decstation
+sys/epiphany
+sys/h8300hms
+sys/h8500hms
+sys/linux
+sys/m88kbug
+sys/mmixware
+sys/netware
+sys/or1k
+sys/phoenix
+sys/rdos
+sys/rtems
+sys/sh
+sys/sparc64
+sys/sun4
+sys/sysmec
+sys/sysnec810
+sys/sysnecv850
+sys/sysvi386
+sys/sysvnecv70
+sys/tic80
+sys/tirtos
+sys/w65
+sys/z8ksim
 machine/a29k
 machine/aarch64
 machine/amdgcn
@@ -11754,7 +11784,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11757 "configure"
+#line 11787 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11860,7 +11890,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11863 "configure"
+#line 11893 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12099,11 +12129,6 @@ CC="$lt_save_CC"
 
 fi
 
-
-
-subdirs="$subdirs sys"
-
-
 CRT0=
 if test "x${have_crt0}" = "xyes"; then
   CRT0=crt0.o
@@ -12255,12 +12280,84 @@ fi
 
 LIBC_SYS_LIB=
 if test -n "${sys_dir}"; then
+  case ${sys_dir} in
+    a29khif)
+
+subdirs="$subdirs sys/a29khif"
+ ;;
+    amdgcn) subdirs="$subdirs sys/amdgcn"
+ ;;
+    arm) subdirs="$subdirs sys/arm"
+ ;;
+    d10v) subdirs="$subdirs sys/d10v"
+ ;;
+    decstation) subdirs="$subdirs sys/decstation"
+ ;;
+    epiphany) subdirs="$subdirs sys/epiphany"
+ ;;
+    h8300hms) subdirs="$subdirs sys/h8300hms"
+ ;;
+    h8500hms) subdirs="$subdirs sys/h8500hms"
+ ;;
+    linux) subdirs="$subdirs sys/linux"
+ ;;
+    m88kbug) subdirs="$subdirs sys/m88kbug"
+ ;;
+    mmixware) subdirs="$subdirs sys/mmixware"
+ ;;
+    netware) subdirs="$subdirs sys/netware"
+ ;;
+    or1k) subdirs="$subdirs sys/or1k"
+ ;;
+    phoenix) subdirs="$subdirs sys/phoenix"
+ ;;
+    rdos) subdirs="$subdirs sys/rdos"
+ ;;
+    rtems) subdirs="$subdirs sys/rtems"
+ ;;
+    sh) subdirs="$subdirs sys/sh"
+ ;;
+    sparc64) subdirs="$subdirs sys/sparc64"
+ ;;
+    sun4) subdirs="$subdirs sys/sun4"
+ ;;
+    sysmec) subdirs="$subdirs sys/sysmec"
+ ;;
+    sysnec810) subdirs="$subdirs sys/sysnec810"
+ ;;
+    sysnecv850) subdirs="$subdirs sys/sysnecv850"
+ ;;
+    sysvi386) subdirs="$subdirs sys/sysvi386"
+ ;;
+    sysvnecv70) subdirs="$subdirs sys/sysvnecv70"
+ ;;
+    tic80) subdirs="$subdirs sys/tic80"
+ ;;
+    tirtos) subdirs="$subdirs sys/tirtos"
+ ;;
+    w65) subdirs="$subdirs sys/w65"
+ ;;
+    z8ksim) subdirs="$subdirs sys/z8ksim"
+ ;;
+    *) as_fn_error $? "unsupported sys_dir \"${sys_dir}\"" "$LINENO" 5 ;;
+  esac
+
+  SYS_DIR=sys/${sys_dir}
   if test "${use_libtool}" = "yes"; then
-    LIBC_SYS_LIB=sys/${sys_dir}/lib${sys_dir}.${aext}
+    LIBC_SYS_LIB=${SYS_DIR}/lib${sys_dir}.${aext}
   else
-    LIBC_SYS_LIB=sys/lib.${aext}
+    LIBC_SYS_LIB=${SYS_DIR}/lib.${aext}
   fi
 fi
+
+ if test x${sys_dir} != x; then
+  HAVE_SYS_DIR_TRUE=
+  HAVE_SYS_DIR_FALSE='#'
+else
+  HAVE_SYS_DIR_TRUE='#'
+  HAVE_SYS_DIR_FALSE=
+fi
+
 
 
 
@@ -12468,7 +12565,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile argz/Makefile ctype/Makefile errno/Makefile locale/Makefile misc/Makefile reent/Makefile search/Makefile stdio/Makefile stdio64/Makefile stdlib/Makefile string/Makefile time/Makefile posix/Makefile signal/Makefile syscalls/Makefile unix/Makefile iconv/Makefile iconv/ces/Makefile iconv/ccs/Makefile iconv/ccs/binary/Makefile iconv/lib/Makefile ssp/Makefile xdr/Makefile"
+ac_config_files="$ac_config_files Makefile argz/Makefile ctype/Makefile errno/Makefile locale/Makefile misc/Makefile reent/Makefile search/Makefile stdio/Makefile stdio64/Makefile stdlib/Makefile string/Makefile time/Makefile posix/Makefile signal/Makefile syscalls/Makefile unix/Makefile iconv/Makefile iconv/ces/Makefile iconv/ccs/Makefile iconv/ccs/binary/Makefile iconv/lib/Makefile ssp/Makefile sys/Makefile xdr/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -12713,6 +12810,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_UNIX_DIR_TRUE}" && test -z "${HAVE_UNIX_DIR_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_UNIX_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_SYS_DIR_TRUE}" && test -z "${HAVE_SYS_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_SYS_DIR\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_LONG_DOUBLE_TRUE}" && test -z "${HAVE_LONG_DOUBLE_FALSE}"; then
@@ -13588,6 +13689,7 @@ do
     "iconv/ccs/binary/Makefile") CONFIG_FILES="$CONFIG_FILES iconv/ccs/binary/Makefile" ;;
     "iconv/lib/Makefile") CONFIG_FILES="$CONFIG_FILES iconv/lib/Makefile" ;;
     "ssp/Makefile") CONFIG_FILES="$CONFIG_FILES ssp/Makefile" ;;
+    "sys/Makefile") CONFIG_FILES="$CONFIG_FILES sys/Makefile" ;;
     "xdr/Makefile") CONFIG_FILES="$CONFIG_FILES xdr/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

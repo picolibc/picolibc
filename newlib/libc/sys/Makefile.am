@@ -1,24 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 
-SUBDIRS = $(sys_dir) .
-
-if HAVE_SYS_DIR
-SYSLIB = lib.a
-endif
-
 noinst_DATA = $(CRT0)
-
-if USE_LIBTOOL
-else
-noinst_LIBRARIES = $(SYSLIB)
-
-lib.a: $(sys_dir)/lib.a
-	rm -f $@
-	ln $(sys_dir)/lib.a $@ >/dev/null 2>/dev/null \
-	 || cp $(sys_dir)/lib.a $@
-endif # USE_LIBTOOL
-
-$(sys_dir)/libsys.$(aext): ; @true
 
 $(CRT0): $(sys_dir)/$(CRT0)
 	rm -f $@
@@ -32,6 +14,3 @@ CLEANFILES = $(CRT0)
 doc:
 
 docbook:
-
-ACLOCAL_AMFLAGS = -I ../.. -I ../../.. -I ../../../config
-CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
