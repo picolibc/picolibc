@@ -584,6 +584,7 @@ PACKAGE_URL=
 ac_unique_file="cygmon-salib.c"
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+multi_basedir
 host_makefile_frag_path
 CCASFLAGS
 CCAS
@@ -663,6 +664,7 @@ ac_subst_files='host_makefile_frag'
 ac_user_opts='
 enable_option_checking
 enable_dependency_tracking
+enable_multilib
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1290,6 +1292,7 @@ Optional Features:
                           do not reject slow dependency extractors
   --disable-dependency-tracking
                           speeds up one-time build
+  --enable-multilib       build many library versions (default)
 
 Some influential environment variables:
   CCAS        assembler compiler command (defaults to CC)
@@ -2555,6 +2558,44 @@ host_makefile_frag_path=$host_makefile_frag
 
 
 
+# Default to --enable-multilib
+# Check whether --enable-multilib was given.
+if test "${enable_multilib+set}" = set; then :
+  enableval=$enable_multilib; case "$enableval" in
+  yes) multilib=yes ;;
+  no)  multilib=no ;;
+  *)   as_fn_error $? "bad value $enableval for multilib option" "$LINENO" 5 ;;
+ esac
+else
+  multilib=yes
+fi
+
+
+# We may get other options which we leave undocumented:
+# --with-target-subdir, --with-multisrctop, --with-multisubdir
+# See config-ml.in if you want the gory details.
+
+if test "$srcdir" = "."; then
+  if test "$with_target_subdir" != "."; then
+    multi_basedir="$srcdir/$with_multisrctop../../.."
+  else
+    multi_basedir="$srcdir/$with_multisrctop../.."
+  fi
+else
+  multi_basedir="$srcdir/../.."
+fi
+
+
+# Even if the default multilib is not a cross compilation,
+# it may be that some of the other multilibs are.
+if test $cross_compiling = no && test $multilib = yes \
+   && test "x${with_multisubdir}" != x ; then
+   cross_compiling=maybe
+fi
+
+ac_config_commands="$ac_config_commands default-1"
+
+
 ac_config_files="$ac_config_files Makefile"
 
 cat >confcache <<\_ACEOF
@@ -3271,12 +3312,20 @@ cat >>$CONFIG_STATUS <<_ACEOF || ac_write_fail=1
 # INIT-COMMANDS
 #
 AMDEP_TRUE="$AMDEP_TRUE" ac_aux_dir="$ac_aux_dir"
-srcdir=${srcdir}
-target=${target}
-with_multisubdir=${with_multisubdir}
-ac_configure_args="${ac_configure_args} --enable-multilib"
-CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
 
+srcdir="$srcdir"
+host="$host"
+target="$target"
+with_multisubdir="$with_multisubdir"
+with_multisrctop="$with_multisrctop"
+with_target_subdir="$with_target_subdir"
+ac_configure_args="${multilib_arg} ${ac_configure_args}"
+multi_basedir="$multi_basedir"
+CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
+CC="$CC"
+CXX="$CXX"
+GFORTRAN="$GFORTRAN"
+GCJ="$GCJ"
 
 _ACEOF
 
@@ -3287,6 +3336,7 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
+    "default-1") CONFIG_COMMANDS="$CONFIG_COMMANDS default-1" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
@@ -3843,7 +3893,14 @@ $as_echo X"$file" |
   done
 }
  ;;
-    "Makefile":F) . ${srcdir}/../../config-ml.in ;;
+    "default-1":C)
+# Only add multilib support code if we just rebuilt the top-level
+# Makefile.
+case " $CONFIG_FILES " in
+ *" Makefile "*)
+   ac_file=Makefile . ${multi_basedir}/config-ml.in
+   ;;
+esac ;;
 
   esac
 done # for ac_tag

@@ -97,12 +97,7 @@ AC_SUBST(bsp_list)
 AC_SUBST(crt0)
 AC_SUBST(pcrt0)
 
-AC_CONFIG_FILES(Makefile,
-. ${srcdir}/../../config-ml.in,
-srcdir=${srcdir}
-target=${target}
-with_multisubdir=${with_multisubdir}
-ac_configure_args="${ac_configure_args} --enable-multilib"
-CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
-)
+AM_ENABLE_MULTILIB(, ../..)
+
+AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

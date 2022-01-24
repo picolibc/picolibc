@@ -62,24 +62,11 @@ AC_SUBST_FILE(host_makefile_frag)
 # Configure cpu init plug-ins
 if test -d "${srcdir}/cpu-init"; then
   subdirs="${subdirs} cpu-init"
-  AC_CONFIG_FILES(cpu-init/Makefile,
-  . ${srcdir}/../../config-ml.in,
-  srcdir=${srcdir}
-  target=${target}
-  with_multisubdir=${with_multisubdir}
-  ac_configure_args="${ac_configure_args} --enable-multilib"
-  CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
-  )
+  AC_CONFIG_FILES([cpu-init/Makefile])
   AC_SUBST(subdirs)
 fi
 
-AC_CONFIG_FILES(Makefile,
-. ${srcdir}/../../config-ml.in,
-srcdir=${srcdir}
-target=${target}
-with_multisubdir=${with_multisubdir}
-ac_configure_args="${ac_configure_args} --enable-multilib"
-CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
-)
-AC_OUTPUT
+AM_ENABLE_MULTILIB(, ../..)
 
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT

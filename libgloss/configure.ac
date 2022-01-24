@@ -330,27 +330,7 @@ target_makefile_frag_path=$target_makefile_frag
 AC_SUBST(target_makefile_frag_path)
 AC_SUBST_FILE(target_makefile_frag)
 
-if test "${multilib}" = "yes"; then
-  multilib_arg="--enable-multilib"
-else
-  multilib_arg=
-fi
+AM_ENABLE_MULTILIB(, ..)
 
-# for now, only add multilibs for specific targets
-AC_CONFIG_FILES([Makefile],
-[if test -n "$CONFIG_FILES"; then
-  unset ac_file
-  . ${srcdir}/../config-ml.in
-fi],
-srcdir=${srcdir}
-target=${target}
-host=${host}
-with_multisubdir=${with_multisubdir}
-ac_configure_args="--enable-multilib ${ac_configure_args}"
-CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
-CC="${CC}"
-LDFLAGS=${LDFLAGS}
-)
+AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
-
-

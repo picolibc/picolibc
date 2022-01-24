@@ -52,14 +52,7 @@ AC_SUBST(target_makefile_frag_path)
 AC_SUBST_FILE(target_makefile_frag)
 AC_SUBST(part_specific_obj)
 
-AC_CONFIG_FILES(Makefile,
-. ${srcdir}/../../config-ml.in,
-srcdir=${srcdir}
-target=${target}
-with_multisubdir=${with_multisubdir}
-ac_configure_args="${ac_configure_args} --enable-multilib"
-CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
-)
+AM_ENABLE_MULTILIB(, ../..)
+
+AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
-
-

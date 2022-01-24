@@ -379,5 +379,6 @@ AC_DEFUN([AM_SUBST_NOTMAKE], [_AM_SUBST_NOTMAKE($@)])
 
 m4_include([../../config/depstand.m4])
 m4_include([../../config/lead-dot.m4])
+m4_include([../../config/multi.m4])
 m4_include([../../config/override.m4])
 m4_include([../acinclude.m4])
