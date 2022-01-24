@@ -585,6 +585,7 @@ ac_unique_file="libnosys"
 enable_option_checking=no
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+target_makefile_frag_path
 host_makefile_frag_path
 CCASFLAGS
 CCAS
@@ -681,7 +682,8 @@ PACKAGE_TARNAME
 PACKAGE_NAME
 PATH_SEPARATOR
 SHELL'
-ac_subst_files='host_makefile_frag'
+ac_subst_files='host_makefile_frag
+target_makefile_frag'
 ac_user_opts='
 enable_option_checking
 enable_silent_rules
@@ -3335,8 +3337,12 @@ test "${CCASFLAGS+set}" = set || CCASFLAGS=$CFLAGS
 
 
 host_makefile_frag=${srcdir}/config/default.mh
+target_makefile_frag=${srcdir}/config/default.mt
 
 host_makefile_frag_path=$host_makefile_frag
+
+
+target_makefile_frag_path=$target_makefile_frag
 
 
 

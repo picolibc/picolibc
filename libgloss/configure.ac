@@ -199,6 +199,7 @@ AC_PROG_RANLIB
 LIB_AM_PROG_AS
 
 host_makefile_frag=${srcdir}/config/default.mh
+target_makefile_frag=${srcdir}/config/default.mt
 
 dnl We have to assign the same value to other variables because autoconf
 dnl doesn't provide a mechanism to substitute a replacement keyword with
@@ -207,6 +208,9 @@ dnl
 host_makefile_frag_path=$host_makefile_frag
 AC_SUBST(host_makefile_frag_path)
 AC_SUBST_FILE(host_makefile_frag)
+target_makefile_frag_path=$target_makefile_frag
+AC_SUBST(target_makefile_frag_path)
+AC_SUBST_FILE(target_makefile_frag)
 
 if test "${multilib}" = "yes"; then
   multilib_arg="--enable-multilib"
