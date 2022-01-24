@@ -175,6 +175,7 @@ distclean maintainer-clean realclean: clean
 install: ${SIM_INSTALL} ${BOARD_INSTALL}
 
 install-sim:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	for x in ${SIM_CRT0} ${SIM_BSP} ${SIM_SCRIPTS}; do \
 	 ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x || exit $$?; \
 	done
