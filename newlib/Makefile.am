@@ -7,14 +7,6 @@ ACLOCAL_AMFLAGS = -I . -I .. -I ../config
 PHONY =
 noinst_DATA =
 
-# Multilib support variables.
-MULTISRCTOP =
-MULTIBUILDTOP =
-MULTIDIRS =
-MULTISUBDIR =
-MULTIDO = true
-MULTICLEAN = true
-
 LIBTOOL_VERSION_INFO = 0:0:0
 
 # The newlib hardware floating-point routines have been disabled due to
@@ -312,13 +304,15 @@ stmp-targ-include: config.status
 
 CLEANFILES = stmp-targ-include
 
-install-data-local:	install-toollibLIBRARIES
+## We hook install-multi because this Makefile doesn't have any exec targets,
+## only data targets.  If that ever changes, this should be removed and the
+## install-exec-local in ../multilib.am will kick in.
+install-data-local: install-toollibLIBRARIES install-multi
 if USE_LIBTOOL
 else
 	rm -f $(DESTDIR)$(toollibdir)/libg.a
 	ln $(DESTDIR)$(toollibdir)/libc.a $(DESTDIR)$(toollibdir)/libg.a >/dev/null 2>/dev/null || cp $(DESTDIR)$(toollibdir)/libc.a $(DESTDIR)$(toollibdir)/libg.a
 endif
-	$(MULTIDO) $(AM_MAKEFLAGS) DO=install multi-do # $(MAKE)
 	-if [ -z "$(MULTISUBDIR)" ]; then \
 	  $(mkinstalldirs) $(DESTDIR)$(tooldir)/include; \
 	  for i in $(srcdir)/libc/include/*.h; do \
@@ -442,30 +436,10 @@ install-man:
 
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 
-# Multilib support.
-PHONY += all-multi check-multi mostlyclean-multi clean-multi distclean-multi \
-	maintainer-clean-multi
+include ../multilib.am
 
-all-recursive: all-multi
-check-recursive: check-multi
-mostlyclean-recursive: mostlyclean-multi
-clean-recursive: clean-multi
-distclean-recursive: distclean-multi
-maintainer-clean-recursive: maintainer-clean-multi
-
-# The $(MAKE) comments below are to enable parallel building.
-all-multi:
-	$(MULTIDO) $(AM_MAKEFLAGS) DO=all multi-do # $(MAKE)
 check-multi:
 	$(MULTIDO) $(AM_MAKEFLAGS) DO=check multi-do # $(MAKE)
-mostlyclean-multi:
-	$(MULTICLEAN) $(AM_MAKEFLAGS) DO=mostlyclean multi-clean # $(MAKE)
-clean-multi:
-	$(MULTICLEAN) $(AM_MAKEFLAGS) DO=clean multi-clean # $(MAKE)
-distclean-multi:
-	$(MULTICLEAN) $(AM_MAKEFLAGS) DO=distclean multi-clean # $(MAKE)
-maintainer-clean-multi:
-	$(MULTICLEAN) $(AM_MAKEFLAGS) DO=maintainer-clean multi-clean # $(MAKE)
 
 MAKEOVERRIDES=
 
