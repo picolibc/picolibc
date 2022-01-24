@@ -584,10 +584,8 @@ PACKAGE_URL=
 ac_unique_file="crt0.S"
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
-part_specific_obj
 target_makefile_frag_path
 host_makefile_frag_path
-LD_TYPE
 CCASFLAGS
 CCAS
 RANLIB
@@ -2541,18 +2539,10 @@ test "${CCASFLAGS+set}" = set || CCASFLAGS=$CFLAGS
 host_makefile_frag=${srcdir}/../config/default.mh
 target_makefile_frag=${srcdir}/../config/default.mt
 
-if test "${with_multisubdir}" = "m32"; then
-  LD_TYPE="m32"
-else
-  LD_TYPE="m16"
-fi
-
-
 host_makefile_frag_path=$host_makefile_frag
 
 
 target_makefile_frag_path=$target_makefile_frag
-
 
 
 

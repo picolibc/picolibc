@@ -34,13 +34,6 @@ LIB_AM_PROG_AS
 host_makefile_frag=${srcdir}/../config/default.mh
 target_makefile_frag=${srcdir}/../config/default.mt
 
-if test "${with_multisubdir}" = "m32"; then
-  LD_TYPE="m32"
-else
-  LD_TYPE="m16"
-fi
-AC_SUBST(LD_TYPE)
- 
 dnl We have to assign the same value to other variables because autoconf
 dnl doesn't provide a mechanism to substitute a replacement keyword with
 dnl arbitrary data or pathnames.
@@ -51,7 +44,6 @@ AC_SUBST_FILE(host_makefile_frag)
 target_makefile_frag_path=$target_makefile_frag
 AC_SUBST(target_makefile_frag_path)
 AC_SUBST_FILE(target_makefile_frag)
-AC_SUBST(part_specific_obj)
 
 AC_CONFIG_FILES(Makefile,
 . ${srcdir}/../../config-ml.in,
