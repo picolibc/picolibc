@@ -5,7 +5,7 @@ NEWLIB_LDFLAGS = `if [ -d ${objroot}/newlib ]; then echo -B${objroot}/newlib/ -L
 # multilibs, but are ignored when building the toplevel directory.
 CFLAGS_MRELOCATABLE = -mrelocatable-lib -mno-eabi
 
-INCLUDES = -I. -I$(srcdir)/..
+INCLUDES = -I. -I$(srcdir)/.. -I$(objdir)/..
 # Note that when building the library, ${MULTILIB} is not the way multilib
 # options are passed; they're passed in $(CFLAGS).
 CFLAGS_FOR_TARGET = -O2 -g ${MULTILIB} ${INCLUDES} ${NEWLIB_CFLAGS}

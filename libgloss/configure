@@ -716,14 +716,11 @@ m68k
 sparc
 wince
 mips
-rs6000
 mn10200
 mn10300
 mcore
 moxie
-xc16x
-arm
-spu'
+arm'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -2602,6 +2599,9 @@ config_testsuite=true
 
 config_libnosys=true
 
+host_makefile_frag=${srcdir}/config/default.mh
+target_makefile_frag=${srcdir}/config/default.mt
+
 case "${target}" in
   aarch64*-*-*)
 
@@ -2681,8 +2681,10 @@ subdirs="$subdirs aarch64"
 	subdirs="$subdirs riscv"
 	;;
   powerpc-*-*|powerpcle-*-*)
-	subdirs="$subdirs rs6000"
+	ac_config_files="$ac_config_files rs6000/Makefile"
 
+	subdirs="$subdirs rs6000"
+	host_makefile_frag=${srcdir}/config/ppc.mh
 	;;
   mn10200-*-*)
 	subdirs="$subdirs mn10200"
@@ -2772,8 +2774,10 @@ subdirs="$subdirs aarch64"
 	config_testsuite=false
 	;;
   xc16x-*-*)
-	subdirs="$subdirs xc16x"
+	ac_config_files="$ac_config_files xc16x/Makefile"
 
+	subdirs="$subdirs xc16x"
+	target_makefile_frag=${srcdir}/config/xc16x.mt
 	;;
   xstormy16-*-*)
 	ac_config_files="$ac_config_files xstormy16/Makefile"
@@ -2806,8 +2810,10 @@ subdirs="$subdirs aarch64"
 
 	;;
   spu-*-elf)
-	subdirs="$subdirs spu"
+	ac_config_files="$ac_config_files spu/Makefile"
 
+	subdirs="$subdirs spu"
+	host_makefile_frag=${srcdir}/config/ppc.mh
 	config_testsuite=false
 	config_libnosys=false
 	;;
@@ -4778,9 +4784,6 @@ $as_echo "#define MISSING_SYSCALL_NAMES 1" >>confdefs.h
 esac
 
 
-host_makefile_frag=${srcdir}/config/default.mh
-target_makefile_frag=${srcdir}/config/default.mt
-
 host_makefile_frag_path=$host_makefile_frag
 
 
@@ -5546,6 +5549,7 @@ do
     "i960/Makefile") CONFIG_FILES="$CONFIG_FILES i960/Makefile" ;;
     "sparc_leon/Makefile") CONFIG_FILES="$CONFIG_FILES sparc_leon/Makefile" ;;
     "riscv/Makefile") CONFIG_FILES="$CONFIG_FILES riscv/Makefile" ;;
+    "rs6000/Makefile") CONFIG_FILES="$CONFIG_FILES rs6000/Makefile" ;;
     "bfin/Makefile") CONFIG_FILES="$CONFIG_FILES bfin/Makefile" ;;
     "cr16/Makefile") CONFIG_FILES="$CONFIG_FILES cr16/Makefile" ;;
     "cris/Makefile") CONFIG_FILES="$CONFIG_FILES cris/Makefile" ;;
@@ -5560,11 +5564,13 @@ do
     "mt/Makefile") CONFIG_FILES="$CONFIG_FILES mt/Makefile" ;;
     "v850/Makefile") CONFIG_FILES="$CONFIG_FILES v850/Makefile" ;;
     "visium/Makefile") CONFIG_FILES="$CONFIG_FILES visium/Makefile" ;;
+    "xc16x/Makefile") CONFIG_FILES="$CONFIG_FILES xc16x/Makefile" ;;
     "xstormy16/Makefile") CONFIG_FILES="$CONFIG_FILES xstormy16/Makefile" ;;
     "m32c/Makefile") CONFIG_FILES="$CONFIG_FILES m32c/Makefile" ;;
     "msp430/Makefile") CONFIG_FILES="$CONFIG_FILES msp430/Makefile" ;;
     "rl78/Makefile") CONFIG_FILES="$CONFIG_FILES rl78/Makefile" ;;
     "rx/Makefile") CONFIG_FILES="$CONFIG_FILES rx/Makefile" ;;
+    "spu/Makefile") CONFIG_FILES="$CONFIG_FILES spu/Makefile" ;;
     "tic6x/Makefile") CONFIG_FILES="$CONFIG_FILES tic6x/Makefile" ;;
     "iq2000/Makefile") CONFIG_FILES="$CONFIG_FILES iq2000/Makefile" ;;
     "or1k/Makefile") CONFIG_FILES="$CONFIG_FILES or1k/Makefile" ;;

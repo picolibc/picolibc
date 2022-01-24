@@ -25,6 +25,9 @@ config_testsuite=true
 dnl indicates whether to run configure within the libnosys subdirectory
 config_libnosys=true
 
+host_makefile_frag=${srcdir}/config/default.mh
+target_makefile_frag=${srcdir}/config/default.mt
+
 case "${target}" in
   aarch64*-*-*)
 	AC_CONFIG_SUBDIRS(aarch64)
@@ -86,7 +89,9 @@ case "${target}" in
 	subdirs="$subdirs riscv"
 	;;
   powerpc-*-*|powerpcle-*-*)
-	AC_CONFIG_SUBDIRS([rs6000])
+	AC_CONFIG_FILES([rs6000/Makefile])
+	subdirs="$subdirs rs6000"
+	host_makefile_frag=${srcdir}/config/ppc.mh
 	;;
   mn10200-*-*)
 	AC_CONFIG_SUBDIRS([mn10200])
@@ -158,7 +163,9 @@ case "${target}" in
 	config_testsuite=false
 	;;
   xc16x-*-*)
-	AC_CONFIG_SUBDIRS([xc16x])
+	AC_CONFIG_FILES([xc16x/Makefile])
+	subdirs="$subdirs xc16x"
+	target_makefile_frag=${srcdir}/config/xc16x.mt
 	;;
   xstormy16-*-*)
 	AC_CONFIG_FILES([xstormy16/Makefile])
@@ -185,7 +192,9 @@ case "${target}" in
 	AC_CONFIG_SUBDIRS([arm])
 	;;
   spu-*-elf)
-	AC_CONFIG_SUBDIRS([spu])
+	AC_CONFIG_FILES([spu/Makefile])
+	subdirs="$subdirs spu"
+	host_makefile_frag=${srcdir}/config/ppc.mh
 	config_testsuite=false
 	config_libnosys=false
 	;;
@@ -309,9 +318,6 @@ dnl
 AC_DEFINE_UNQUOTED(__SYMBOL_PREFIX, "$libc_cv_symbol_prefix", [symbol prefix])
 
 m4_include([libnosys/acinclude.m4])
-
-host_makefile_frag=${srcdir}/config/default.mh
-target_makefile_frag=${srcdir}/config/default.mt
 
 dnl We have to assign the same value to other variables because autoconf
 dnl doesn't provide a mechanism to substitute a replacement keyword with
