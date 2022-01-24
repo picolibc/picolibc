@@ -252,28 +252,28 @@ syscalls.stamp: gensyscalls
 	touch $@
 
 # Dependencies that could and should be auto-generated.
-close.o: close.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/warning.h
-execve.o: execve.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/warning.h
-exit.o: exit.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/warning.h
-fork.o: fork.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/warning.h
-fstat.o: fstat.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/warning.h
-fcntl.o: fcntl.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/warning.h
-getpid.o: getpid.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/warning.h
-gettod.o: gettod.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/warning.h
-isatty.o: isatty.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/warning.h
-kill.o: kill.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/warning.h
-link.o: link.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/warning.h
-lseek.o: lseek.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/warning.h
-open.o: open.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/warning.h
-read.o: read.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/warning.h
-rename.o: rename.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/warning.h
-sbrk.o: sbrk.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/warning.h
-stat.o: stat.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/warning.h
-times.o: times.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/warning.h
-unlink.o: unlink.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/warning.h
-wait.o: wait.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/warning.h
-write.o: write.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/warning.h
-lcrt0.o: lcrt0.c linunistd.h $(objdir)/../libnosys/config.h $(srcdir)/../libnosys/warning.h
+close.o: close.c linunistd.h $(objdir)/../config.h $(srcdir)/../libnosys/warning.h
+execve.o: execve.c linunistd.h $(objdir)/../config.h $(srcdir)/../libnosys/warning.h
+exit.o: exit.c linunistd.h $(objdir)/../config.h $(srcdir)/../libnosys/warning.h
+fork.o: fork.c linunistd.h $(objdir)/../config.h $(srcdir)/../libnosys/warning.h
+fstat.o: fstat.c linunistd.h $(objdir)/../config.h $(srcdir)/../libnosys/warning.h
+fcntl.o: fcntl.c linunistd.h $(objdir)/../config.h $(srcdir)/../libnosys/warning.h
+getpid.o: getpid.c linunistd.h $(objdir)/../config.h $(srcdir)/../libnosys/warning.h
+gettod.o: gettod.c linunistd.h $(objdir)/../config.h $(srcdir)/../libnosys/warning.h
+isatty.o: isatty.c linunistd.h $(objdir)/../config.h $(srcdir)/../libnosys/warning.h
+kill.o: kill.c linunistd.h $(objdir)/../config.h $(srcdir)/../libnosys/warning.h
+link.o: link.c linunistd.h $(objdir)/../config.h $(srcdir)/../libnosys/warning.h
+lseek.o: lseek.c linunistd.h $(objdir)/../config.h $(srcdir)/../libnosys/warning.h
+open.o: open.c linunistd.h $(objdir)/../config.h $(srcdir)/../libnosys/warning.h
+read.o: read.c linunistd.h $(objdir)/../config.h $(srcdir)/../libnosys/warning.h
+rename.o: rename.c linunistd.h $(objdir)/../config.h $(srcdir)/../libnosys/warning.h
+sbrk.o: sbrk.c linunistd.h $(objdir)/../config.h $(srcdir)/../libnosys/warning.h
+stat.o: stat.c linunistd.h $(objdir)/../config.h $(srcdir)/../libnosys/warning.h
+times.o: times.c linunistd.h $(objdir)/../config.h $(srcdir)/../libnosys/warning.h
+unlink.o: unlink.c linunistd.h $(objdir)/../config.h $(srcdir)/../libnosys/warning.h
+wait.o: wait.c linunistd.h $(objdir)/../config.h $(srcdir)/../libnosys/warning.h
+write.o: write.c linunistd.h $(objdir)/../config.h $(srcdir)/../libnosys/warning.h
+lcrt0.o: lcrt0.c linunistd.h $(objdir)/../config.h $(srcdir)/../libnosys/warning.h
 setup.o: setup.S
 irqtable.o: irqtable.S
 crti.o: crti.c

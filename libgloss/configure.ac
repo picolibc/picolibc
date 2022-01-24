@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT([libgloss],[LIBGLOSS_VERSION])
-AC_CONFIG_SRCDIR([libnosys])
+AC_CONFIG_HEADER(config.h)
 
 if test "${enable_shared}" = "yes" ; then
   AC_MSG_WARN([Shared libraries not supported for cross compiling, ignored])
@@ -16,6 +16,8 @@ AM_INIT_AUTOMAKE([foreign no-define 1.15])
 if test -z "${with_multisubdir}" ; then
   AC_CONFIG_FILES([doc/Makefile])
 fi
+
+AC_NO_EXECUTABLES
 
 dnl indicates whether to run configure within the testsuite subdirectory
 config_testsuite=true
@@ -36,7 +38,8 @@ case "${target}" in
 	AC_CONFIG_SUBDIRS(csky)
 	;;
   epiphany-*-*)
-	AC_CONFIG_SUBDIRS(epiphany)
+	AC_CONFIG_FILES([epiphany/Makefile])
+	subdirs="$subdirs epiphany"
 	config_testsuite=true
 	;;
   i[[3456]]86-*-elf* | i[[3456]]86-*-coff*)
@@ -196,7 +199,8 @@ case "${target}" in
 	subdirs="$subdirs iq2000"
 	;;
   or1k-*-* | or1knd-*-* )
-	AC_CONFIG_SUBDIRS([or1k])
+	AC_CONFIG_FILES([or1k/Makefile])
+	subdirs="$subdirs or1k"
 	;;
   pru-*-*)
 	AC_CONFIG_FILES([pru/Makefile])
@@ -215,7 +219,8 @@ dnl   then AC_CONFIG_SUBDIRS([testsuite])
 dnl fi
 
 if test "${config_libnosys}" = "true"; then
-  AC_CONFIG_SUBDIRS([libnosys])
+  AC_CONFIG_FILES([libnosys/Makefile])
+  subdirs="$subdirs libnosys"
 fi
 
 LIB_AC_PROG_CC
@@ -228,6 +233,82 @@ LD=${LD-ld}
 AC_SUBST(LD)
 AC_PROG_RANLIB
 LIB_AM_PROG_AS
+
+AC_DEFINE(HAVE_GNU_LD, 1, [Using GNU LD])
+
+AC_CACHE_CHECK([if target is ELF], libc_cv_is_elf, [dnl
+  AC_PREPROC_IFELSE([AC_LANG_PROGRAM(
+[[#ifndef __ELF__
+# error "not ELF"
+#endif
+]])], [libc_cv_is_elf=yes], [libc_cv_is_elf=no])
+])
+if test "x${libc_cv_is_elf}" = "xyes"; then
+  AC_DEFINE(HAVE_ELF, 1, [Using ELF format])
+fi
+
+AC_CACHE_CHECK([for .previous assembler directive],
+	       libc_cv_asm_previous_directive, [dnl
+  libc_cv_asm_previous_directive=no
+  cat > conftest.s <<EOF
+.section foo_section
+.previous
+EOF
+  if AC_TRY_COMMAND(${CC-cc} -c $CFLAGS conftest.s 1>&AC_FD_CC); then
+    libc_cv_asm_previous_directive=yes
+  fi
+  rm -f conftest*])
+if test "x${libc_cv_asm_previous_directive}" = "xyes"; then
+  AC_DEFINE(HAVE_ASM_PREVIOUS_DIRECTIVE, 1, [.previous directive allowed])
+fi
+
+AC_CACHE_CHECK([for .popsection assembler directive],
+	       libc_cv_asm_popsection_directive, [dnl
+  libc_cv_asm_popsection_directive=no
+  cat > conftest.s <<EOF
+.pushsection foo_section
+.popsection
+EOF
+  if AC_TRY_COMMAND(${CC-cc} -c $CFLAGS conftest.s 1>&AC_FD_CC); then
+    libc_cv_asm_popsection_directive=yes
+  fi
+  rm -f conftest*])
+if test "x${libc_cv_asm_popsection_directive}" = "xyes"; then
+  AC_DEFINE(HAVE_ASM_POPSECTION_DIRECTIVE, 1, [.pushsection/.popsection directives allowed])
+fi
+
+AC_CACHE_CHECK([for section attributes],
+	       libc_cv_section_attributes, [dnl
+  libc_cv_section_attributes=no
+  cat > conftest.c <<EOF
+int secttest __attribute__ ((section (".gnu.warning.secttest"))) = 10;
+int main() {}
+EOF
+  if AC_TRY_COMMAND(${CC-cc} -c $CFLAGS conftest.c 1>&AC_FD_CC); then
+    libc_cv_section_attributes=yes
+  fi
+  rm -f conftest*])
+if test "x${libc_cv_section_attributes}" = "xyes"; then
+  AC_DEFINE(HAVE_SECTION_ATTRIBUTES, 1, [support for section attributes])
+fi
+
+AC_CACHE_CHECK([for symbol prefix], libc_cv_symbol_prefix, [dnl
+  cat > conftest.c <<\EOF
+foo () { }
+EOF
+dnl
+  libc_cv_symbol_prefix=''
+  if AC_TRY_COMMAND([${CC-cc} -S conftest.c -o - | fgrep "\$foo" > /dev/null]); then
+    libc_cv_symbol_prefix='$'
+  else
+    if AC_TRY_COMMAND([${CC-cc} -S conftest.c -o - | fgrep "_foo" > /dev/null]); then
+      libc_cv_symbol_prefix=_
+    fi
+  fi
+  rm -f conftest* ])
+AC_DEFINE_UNQUOTED(__SYMBOL_PREFIX, "$libc_cv_symbol_prefix", [symbol prefix])
+
+m4_include([libnosys/acinclude.m4])
 
 host_makefile_frag=${srcdir}/config/default.mh
 target_makefile_frag=${srcdir}/config/default.mt

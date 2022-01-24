@@ -33,7 +33,7 @@
 #define _ASM_ELINUX_UNISTD_H_
 
 /* Our callers might want to use link_warning, so provide it from here.  */
-#include "../libnosys/config.h"
+#include "../config.h"
 #include "libnosys/warning.h"
 
 #include <errno.h>
