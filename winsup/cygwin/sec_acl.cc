@@ -850,14 +850,12 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
       else if (ace_sid == well_known_creator_owner_sid)
 	{
 	  type = DEF_USER_OBJ;
-	  types_def |= type;
 	  id = ACL_UNDEFINED_ID;
 	  saw_def_user_obj = true;
 	}
       else if (ace_sid == well_known_creator_group_sid)
 	{
 	  type = DEF_GROUP_OBJ;
-	  types_def |= type;
 	  id = ACL_UNDEFINED_ID;
 	  saw_def_group_obj = true;
 	}
