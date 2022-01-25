@@ -322,7 +322,7 @@ void * nano_malloc(RARG malloc_size_t s)
                 r=r->next;
             }
 
-            if ((char *)p + p->size == (char *)_SBRK_R(RCALL 0))
+            if (p != NULL && (char *)p + p->size == (char *)_SBRK_R(RCALL 0))
             {
                /* The last free item has the heap end as neighbour.
                 * Let's ask for a smaller amount and merge */
