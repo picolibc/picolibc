@@ -471,60 +471,6 @@ NEW_FUNCTIONS=$(addprefix --replace=,\
 	xdrstdio_create= \
 )
 
-if !TARGET_X86_64
-NEW_FUNCTIONS+=$(addprefix --replace=,\
-	acl=_acl32 \
-	aclcheck=_aclcheck32 \
-	aclfrommode=_aclfrommode32 \
-	aclfrompbits=_aclfrompbits32 \
-	aclfromtext=_aclfromtext32 \
-	aclsort=_aclsort32 \
-	acltomode=_acltomode32 \
-	acltopbits=_acltopbits32 \
-	acltotext=_acltotext32 \
-	chown=_chown32 \
-	facl=_facl32 \
-	fchown=_fchown32 \
-	fcntl=_fcntl64 \
-	fdopen=_fdopen64 \
-	fgetpos=_fgetpos64 \
-	fopen=_fopen64 \
-	freopen=_freopen64 \
-	fseeko=_fseeko64 \
-	fsetpos=_fsetpos64 \
-	fstat=_fstat64 \
-	ftello=_ftello64 \
-	ftruncate=_ftruncate64 \
-	getegid=_getegid32 \
-	geteuid=_geteuid32 \
-	getgid=_getgid32 \
-	getgrent=_getgrent32 \
-	getgrgid=_getgrgid32 \
-	getgrnam=_getgrnam32 \
-	getgroups=_getgroups32 \
-	getpwuid=_getpwuid32 \
-	getpwuid_r=_getpwuid_r32 \
-	getuid=_getuid32 \
-	initgroups=_initgroups32 \
-	lchown=_lchown32 \
-	lseek=_lseek64 \
-	lstat=_lstat64 \
-	mknod=_mknod32 \
-	mmap=_mmap64 \
-	open=_open64 \
-	setegid=_setegid32 \
-	seteuid=_seteuid32 \
-	setgid=_setgid32 \
-	setgroups=_setgroups32 \
-	setregid=_setregid32 \
-	setreuid=_setreuid32 \
-	setuid=_setuid32 \
-	stat=_stat64 \
-	tmpfile=_tmpfile64 \
-	truncate=_truncate64 \
-)
-endif
-
 #
 # per-file compilation flags
 #
@@ -543,11 +489,6 @@ exec_CFLAGS=-fno-builtin-execve
 
 fhandler_proc_CFLAGS=-DUSERNAME="\"$(USER)\"" -DHOSTNAME="\"$(HOSTNAME)\"" \
 		     -DGCC_VERSION="\"`$(CC) -v 2>&1 | tail -n 1`\""
-
-if !TARGET_X86_64
-# on x86, exceptions.cc must be compiled with a frame-pointer as it uses RtlCaptureContext()
-exceptions_CFLAGS=-fno-omit-frame-pointer
-endif
 
 dtable_CFLAGS=-fcheck-new
 

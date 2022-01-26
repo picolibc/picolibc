@@ -66,12 +66,6 @@ esac
 ])
 
 case "$target_cpu" in
-   i?86)
-		DLL_ENTRY="_dll_entry@12"
-		DEF_DLL_ENTRY="dll_entry@12"
-		DIN_FILE="i686.din"
-		TLSOFFSETS_H="tlsoffsets.h"
-		;;
    x86_64)
 		DLL_ENTRY="dll_entry"
 		DEF_DLL_ENTRY="dll_entry"
