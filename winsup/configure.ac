@@ -68,7 +68,6 @@ esac
 case "$target_cpu" in
    x86_64)
 		DLL_ENTRY="dll_entry"
-		DEF_DLL_ENTRY="dll_entry"
 		DIN_FILE="x86_64.din"
 		TLSOFFSETS_H="tlsoffsets64.h"
 		;;
@@ -76,7 +75,6 @@ case "$target_cpu" in
 esac
 
 AC_SUBST(DLL_ENTRY)
-AC_SUBST(DEF_DLL_ENTRY)
 AC_SUBST(DIN_FILE)
 AC_SUBST(TLSOFFSETS_H)
 
