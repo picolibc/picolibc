@@ -736,10 +736,10 @@ conf_data.set('HAVE_BUILTIN_EXPECT', have_builtin_expect, description: 'Compiler
 conf_data.set('HAVE_ALLOC_SIZE', have_alloc_size, description: 'The compiler REALLY has the attribute __alloc_size__')
 conf_data.set('_HAVE_ATTRIBUTE_ALWAYS_INLINE',
 	      cc.has_function_attribute('always_inline'),
-	      descrption: 'The compiler supports the always_inline function attribute')
+	      description: 'The compiler supports the always_inline function attribute')
 conf_data.set('_HAVE_ATTRIBUTE_GNU_INLINE',
 	      cc.has_function_attribute('gnu_inline'),
-	      descrption: 'The compiler supports the gnu_inline function attribute')
+	      description: 'The compiler supports the gnu_inline function attribute')
 
 # Obsolete newlib options
 conf_data.set('_WANT_USE_LONG_TIME_T', get_option('newlib-long-time_t'), description: 'Obsoleted. Define time_t to long instead of using a 64-bit type')
