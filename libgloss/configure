@@ -710,7 +710,6 @@ moxie
 xc16x
 arm
 spu
-iq2000
 or1k
 libnosys'
 
@@ -2758,8 +2757,9 @@ subdirs="$subdirs aarch64"
 	config_testsuite=false
 	;;
   iq2000-*-*)
-	subdirs="$subdirs iq2000"
+	ac_config_files="$ac_config_files iq2000/Makefile"
 
+	subdirs="$subdirs iq2000"
 	;;
   or1k-*-* | or1knd-*-* )
 	subdirs="$subdirs or1k"
@@ -4126,6 +4126,7 @@ do
     "rl78/Makefile") CONFIG_FILES="$CONFIG_FILES rl78/Makefile" ;;
     "rx/Makefile") CONFIG_FILES="$CONFIG_FILES rx/Makefile" ;;
     "tic6x/Makefile") CONFIG_FILES="$CONFIG_FILES tic6x/Makefile" ;;
+    "iq2000/Makefile") CONFIG_FILES="$CONFIG_FILES iq2000/Makefile" ;;
     "pru/Makefile") CONFIG_FILES="$CONFIG_FILES pru/Makefile" ;;
     "nios2/Makefile") CONFIG_FILES="$CONFIG_FILES nios2/Makefile" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;

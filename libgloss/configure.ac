@@ -192,7 +192,8 @@ case "${target}" in
 	config_testsuite=false
 	;;
   iq2000-*-*)
-	AC_CONFIG_SUBDIRS([iq2000])
+	AC_CONFIG_FILES([iq2000/Makefile])
+	subdirs="$subdirs iq2000"
 	;;
   or1k-*-* | or1knd-*-* )
 	AC_CONFIG_SUBDIRS([or1k])
