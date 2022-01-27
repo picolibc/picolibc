@@ -65,12 +65,12 @@ no)	 ;;
 esac
 ])
 
+DLL_ENTRY="dll_entry"
+DIN_FILE="${target_cpu}.din"
+TLSOFFSETS_H="tlsoffsets-${target_cpu}.h"
+
 case "$target_cpu" in
-   x86_64)
-		DLL_ENTRY="dll_entry"
-		DIN_FILE="x86_64.din"
-		TLSOFFSETS_H="tlsoffsets64.h"
-		;;
+   x86_64)	;;
    *)		AC_MSG_ERROR([Invalid target processor "$target_cpu"]) ;;
 esac
 
