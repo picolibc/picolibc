@@ -199,7 +199,7 @@ stmp-targetdep: force
 	rm -f tmp-targetdep.texi
 	targetdoc=`pwd`/tmp-targetdep.texi; \
 	for d in $(SUBDIRS); do \
-	  if test "$$d" != "."; then \
+	  if test "$$d" != "." && test "$$d" != "$(LIBC_MACHINE_DIR)"; then \
 	    (cd $$d && $(MAKE) TARGETDOC=$${targetdoc} doc) || exit 1; \
 	  fi; \
 	done
@@ -218,7 +218,7 @@ libc_TEXINFOS = sigset.texi posix.texi stdio64.texi iconvset.texi \
 
 docbook-recursive: force
 	for d in $(SUBDIRS); do \
-	  if test "$$d" != "."; then \
+	  if test "$$d" != "." && test "$$d" != "$(LIBC_MACHINE_DIR)"; then \
 	    (cd $$d && $(MAKE) docbook) || exit 1; \
 	  fi; \
 	done
