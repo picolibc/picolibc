@@ -24,7 +24,7 @@ details. */
 #include "sys/strace.h"
 #include "sys/cygwin.h"
 #include "cygwin/version.h"
-#include "cygtls_padsize.h"
+#include "cygwin/config.h"
 #include "gcc_seh.h"
 #include "path.h"
 #undef cygwin_internal
@@ -1218,7 +1218,7 @@ main (int argc, char **argv)
      This is required to make sure cygwin_internal calls into Cygwin work
      reliably.  This problem has been noticed under AllocationPreference
      registry setting to 0x100000 (TOP_DOWN). */
-  char buf[CYGTLS_PADSIZE];
+  char buf[__CYGTLS_PADSIZE__];
 
   RtlSecureZeroMemory (buf, sizeof (buf));
   exit (main2 (argc, argv));

@@ -20,7 +20,7 @@ details. */
 void
 _cygtls::call (DWORD (*func) (void *, void *), void *arg)
 {
-  char buf[CYGTLS_PADSIZE];
+  char buf[__CYGTLS_PADSIZE__];
   /* Initialize this thread's ability to respond to things like
      SIGSEGV or SIGFPE. */
   exception protect;

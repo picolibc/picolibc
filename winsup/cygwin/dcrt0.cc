@@ -1103,7 +1103,7 @@ dll_crt0 (per_process *uptr)
 }
 
 /* This must be called by anyone who uses LoadLibrary to load cygwin1.dll.
-   You must have CYGTLS_PADSIZE bytes reserved at the bottom of the stack
+   You must have __CYGTLS_PADSIZE__ bytes reserved at the bottom of the stack
    calling this function, and that storage must not be overwritten until you
    unload cygwin1.dll, as it is used for _my_tls.  It is best to load
    cygwin1.dll before spawning any additional threads in your process.

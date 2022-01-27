@@ -1,7 +1,7 @@
 Contributed by Max Kaehn
 
 All cygwin threads have separate context in an object of class _cygtls.  The
-storage for this object is kept on the stack in the bottom CYGTLS_PADSIZE
+storage for this object is kept on the stack in the bottom __CYGTLS_PADSIZE__
 bytes.  Each thread references the storage via the Thread Environment Block
 (aka Thread Information Block), which Windows maintains for each user thread
 in the system, with the address in the FS segment register.  The memory
@@ -34,13 +34,13 @@ And accesses cygtls like this:
 Initialization always goes through _cygtls::init_thread().  It works
 in the following ways:
 
-* In the main thread, _dll_crt0() provides CYGTLS_PADSIZE bytes on the stack
+* In the main thread, _dll_crt0() provides __CYGTLS_PADSIZE__ bytes on the stack
   and passes them to initialize_main_tls(), which calls _cygtls::init_thread().
   It then calls dll_crt0_1(), which terminates with cygwin_exit() rather than
   by returning, so the storage never goes out of scope.
 
   If you load cygwin1.dll dynamically from a non-cygwin application, it is
-  vital that the bottom CYGTLS_PADSIZE bytes of the stack are not in use
+  vital that the bottom __CYGTLS_PADSIZE__ bytes of the stack are not in use
   before you call cygwin_dll_init().  See winsup/testsuite/cygload for
   more information.
 
@@ -49,7 +49,7 @@ in the following ways:
   - dll_entry() calls munge_threadfunc(), which grabs the function pointer
     for the thread from the stack frame and substitutes threadfunc_fe(),
   - which then passes the original function pointer to _cygtls::call(),
-  - which then allocates CYGTLS_PADSIZE bytes on the stack and hands them
+  - which then allocates __CYGTLS_PADSIZE__ bytes on the stack and hands them
     to call2(),
   - which allocates an exception_list object on the stack and hands it to
     init_exceptions() (in exceptions.cc), which attaches it to the end of
@@ -60,7 +60,7 @@ in the following ways:
 
 Note that the padding isn't necessarily going to be just where the _cygtls
 structure lives; it just makes sure there's enough room on the stack when the
-CYGTLS_PADSIZE bytes down from there are overwritten.
+__CYGTLS_PADSIZE__ bytes down from there are overwritten.
 
 
 Debugging

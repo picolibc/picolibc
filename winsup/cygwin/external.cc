@@ -449,7 +449,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	res = 0;
 	break;
       case CW_CYGTLS_PADSIZE:
-	res = CYGTLS_PADSIZE;
+	res = __CYGTLS_PADSIZE__;
 	break;
       case CW_SET_DOS_FILE_WARNING:
 	res = 0;

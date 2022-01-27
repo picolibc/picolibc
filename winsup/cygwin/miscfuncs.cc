@@ -415,7 +415,7 @@ pthread_wrapper (PVOID arg)
       SetThreadStackGuarantee (&wrapper_arg.guardsize);
     }
   /* Initialize new _cygtls. */
-  _my_tls.init_thread (wrapper_arg.stackbase - CYGTLS_PADSIZE,
+  _my_tls.init_thread (wrapper_arg.stackbase - __CYGTLS_PADSIZE__,
 		       (DWORD (*)(void*, void*)) wrapper_arg.func);
 #ifdef __i386__
   /* Copy exception list over to new stack.  I'm not quite sure how the
@@ -458,7 +458,7 @@ pthread_wrapper (PVOID arg)
 	   movq  8(%%rbx), %%r13	# Load thread arg into r13	\n\
 	   movq  16(%%rbx), %%rcx	# Load stackaddr into rcx	\n\
 	   movq  24(%%rbx), %%rsp	# Load stackbase into rsp	\n\
-	   subq  %[CYGTLS], %%rsp	# Subtract CYGTLS_PADSIZE	\n\
+	   subq  %[CYGTLS], %%rsp	# Subtract __CYGTLS_PADSIZE__	\n\
 					# (here we are 16 bytes aligned)\n\
 	   subq  $32, %%rsp		# Subtract another 32 bytes	\n\
 					# (shadow space for arg regs)	\n\
@@ -474,7 +474,7 @@ pthread_wrapper (PVOID arg)
 	   movq  %%r13, %%rcx		# Move thread arg to 1st arg reg\n\
 	   call  *%%r12			# Call thread func		\n"
 	   : : [WRAPPER_ARG] "o" (wrapper_arg),
-	       [CYGTLS] "i" (CYGTLS_PADSIZE));
+	       [CYGTLS] "i" (__CYGTLS_PADSIZE__));
 #else
   __asm__ ("\n\
 	   leal  %[WRAPPER_ARG], %%ebx	# Load &wrapper_arg into ebx	\n\
@@ -482,7 +482,7 @@ pthread_wrapper (PVOID arg)
 	   movl  4(%%ebx), %%ecx	# Load thread arg into ecx	\n\
 	   movl  8(%%ebx), %%edx	# Load stackaddr into edx	\n\
 	   movl  12(%%ebx), %%ebx	# Load stackbase into ebx	\n\
-	   subl  %[CYGTLS], %%ebx	# Subtract CYGTLS_PADSIZE	\n\
+	   subl  %[CYGTLS], %%ebx	# Subtract __CYGTLS_PADSIZE__	\n\
 	   subl  $4, %%ebx		# Subtract another 4 bytes	\n\
 	   movl  %%ebx, %%esp		# Set esp			\n\
 	   xorl  %%ebp, %%ebp		# Set ebp to 0			\n\
@@ -505,7 +505,7 @@ pthread_wrapper (PVOID arg)
 	   popl  %%eax			# Pop thread_func address	\n\
 	   call  *%%eax			# Call thread func		\n"
 	   : : [WRAPPER_ARG] "o" (wrapper_arg),
-	       [CYGTLS] "i" (CYGTLS_PADSIZE));
+	       [CYGTLS] "i" (__CYGTLS_PADSIZE__));
 #endif
   /* pthread::thread_init_wrapper calls pthread::exit, which
      in turn calls ExitThread, so we should never arrive here. */

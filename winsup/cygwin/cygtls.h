@@ -170,13 +170,13 @@ typedef uintptr_t __tlsstack_t;
 class _cygtls
 {
 public:
-  /* Please keep these two declarations first */
-  struct _local_storage locals;
+  /* Keep these two declarations first, keep local_clib first. */
   union
   {
     struct _reent local_clib;
     char __dontuse[8 * ((sizeof(struct _reent) + 4) / 8)];
   };
+  struct _local_storage locals;
   /**/
   void (*func) /*gentls_offsets*/(int, siginfo_t *, void *)/*gentls_offsets*/;
   int saved_errno;
@@ -280,14 +280,13 @@ private:
 };
 #pragma pack(pop)
 
-#include "cygtls_padsize.h"
-
 /*gentls_offsets*/
 
 #include "cygerrno.h"
 #include "ntdll.h"
 
-#define _my_tls (*((_cygtls *) ((PBYTE) NtCurrentTeb()->Tib.StackBase - CYGTLS_PADSIZE)))
+#define _my_tls (*((_cygtls *) ((PBYTE) NtCurrentTeb()->Tib.StackBase \
+		                - __CYGTLS_PADSIZE__)))
 extern _cygtls *_main_tls;
 extern _cygtls *_sig_tls;
 

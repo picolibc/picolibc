@@ -24,23 +24,14 @@ extern "C" {
    version of a function that takes _REENT.  This saves the overhead
    of a function call for what amounts to a simple computation.
 
-   The definition below is essentially equivalent to the one in cygtls.h
-   (&_my_tls.local_clib) however it uses a fixed precomputed
-   offset rather than dereferencing a field of a structure.
-
-   Including tlsoffets.h here in order to get this constant offset
-   tls_local_clib is a bit of a hack, but the alternative would require
-   dragging the entire definition of struct _cygtls (a large and complex
-   Cygwin internal data structure) into newlib.  The machinery to
-   compute these offsets already exists for the sake of gendef so
-   we might as well just use it here.  */
+   This is the allocation size of the TLS area on the stack.  Parts of
+   the stack are in use by the OS, so we need to go a bit higher than
+   what's actually required by the cygtls struct.  The _reent struct is
+   right at the beginning of struct cygtls and always has to be. */
+#define __CYGTLS_PADSIZE__ 12800	/* Must be 16-byte aligned */
 
 #if defined (_LIBC) || defined (__INSIDE_CYGWIN__)
-#ifdef __x86_64__
-#include "../tlsoffsets64.h"
-#else
-#include "../tlsoffsets.h"
-#endif
+
 __attribute__((__gnu_inline__))
 extern inline struct _reent *__getreent (void)
 {
@@ -50,7 +41,7 @@ extern inline struct _reent *__getreent (void)
 #else
   __asm __volatile__ ("movl %%fs:4,%0" : "=r" (ret));
 #endif
-  return (struct _reent *) (ret + tls_local_clib);
+  return (struct _reent *) (ret - __CYGTLS_PADSIZE__);
 }
 #endif /* _LIBC || __INSIDE_CYGWIN__ */
 
