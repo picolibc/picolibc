@@ -7,7 +7,6 @@ srcdir = @srcdir@
 objdir = .
 srcroot = $(srcdir)/../..
 objroot = $(objdir)/../..
-top_srcdir = @top_srcdir@
 
 prefix = @prefix@
 exec_prefix = @exec_prefix@
@@ -30,7 +29,7 @@ MULTISUBDIR =
 
 SHELL =	/bin/sh
 
-mkinstalldirs = $(SHELL) $(top_srcdir)/../../mkinstalldirs
+mkinstalldirs = $(SHELL) $(srcroot)/mkinstalldirs
 
 CC = @CC@
 
