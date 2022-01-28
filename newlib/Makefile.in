@@ -374,6 +374,7 @@ SYS_OBJECTLIST = @SYS_OBJECTLIST@
 UNIX_OBJECTLIST = @UNIX_OBJECTLIST@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
+abs_newlib_basedir = @abs_newlib_basedir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@

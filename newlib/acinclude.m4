@@ -109,6 +109,9 @@ else
 fi
 AC_SUBST(newlib_basedir)
 
+abs_newlib_basedir=`cd "${newlib_basedir}" && pwd`
+AC_SUBST(abs_newlib_basedir)
+
 AC_CANONICAL_HOST
 
 AM_INIT_AUTOMAKE([foreign no-installinfo no-dependencies no-dist no-define subdir-objects 1.15.1])

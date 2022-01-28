@@ -289,6 +289,7 @@ STRIP = @STRIP@
 SYS_DIR = @SYS_DIR@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
+abs_newlib_basedir = @abs_newlib_basedir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@

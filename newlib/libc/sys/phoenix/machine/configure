@@ -666,6 +666,7 @@ build_os
 build_vendor
 build_cpu
 build
+abs_newlib_basedir
 newlib_basedir
 MAY_SUPPLY_SYSCALLS_FALSE
 MAY_SUPPLY_SYSCALLS_TRUE
@@ -2589,6 +2590,9 @@ if test "${srcdir}" = "."; then
 else
   newlib_basedir="${srcdir}/../../../.."
 fi
+
+
+abs_newlib_basedir=`cd "${newlib_basedir}" && pwd`
 
 
 

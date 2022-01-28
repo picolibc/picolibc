@@ -738,6 +738,7 @@ build_os
 build_vendor
 build_cpu
 build
+abs_newlib_basedir
 newlib_basedir
 MAY_SUPPLY_SYSCALLS_FALSE
 MAY_SUPPLY_SYSCALLS_TRUE
@@ -2914,6 +2915,9 @@ if test "${srcdir}" = "."; then
 else
   newlib_basedir="${srcdir}/../../.."
 fi
+
+
+abs_newlib_basedir=`cd "${newlib_basedir}" && pwd`
 
 
 
@@ -11577,7 +11581,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11580 "configure"
+#line 11584 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11683,7 +11687,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11686 "configure"
+#line 11690 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H

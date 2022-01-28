@@ -315,7 +315,6 @@ AM_CONDITIONAL(NEWLIB_HW_FP, test x$newlib_hw_fp = xtrue)
 # These get added in the top-level configure.in, except in the case where
 # newlib is being built natively.
 LIBC_INCLUDE_GREP=`echo ${CC} | grep \/libc\/include`
-abs_newlib_basedir=`cd ${newlib_basedir} && pwd`
 if test -z "${LIBC_INCLUDE_GREP}"; then
   CC_FOR_NEWLIB="${CC} -I$PWD/targ-include -I${abs_newlib_basedir}/libc/include"
 else
