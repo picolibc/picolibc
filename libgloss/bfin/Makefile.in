@@ -180,6 +180,7 @@ install-sim:
 	done
 
 install-board:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	for x in ${BOARD_CRT0S} ${BOARD_BSP}; do \
 	 ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x || exit $$?; \
 	done
