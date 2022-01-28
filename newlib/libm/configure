@@ -12120,7 +12120,12 @@ fi
 
 
 if test "${libm_machine_dir}" = "nds32"; then
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for nds32 FPU SP extension" >&5
+$as_echo_n "checking for nds32 FPU SP extension... " >&6; }
+if ${newlib_cv_nds32_fpu_sp+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #if (__NDS32_EXT_FPU_SP__)
 # error "Has nds32 FPU SP extension support"
@@ -12135,13 +12140,21 @@ main ()
 }
 _ACEOF
 if ac_fn_c_try_cpp "$LINENO"; then :
-  has_nds32_fpu_sp="no"
+  newlib_cv_nds32_fpu_sp="no"
 else
-  has_nds32_fpu_sp="yes"
+  newlib_cv_nds32_fpu_sp="yes"
 fi
 rm -f conftest.err conftest.i conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $newlib_cv_nds32_fpu_sp" >&5
+$as_echo "$newlib_cv_nds32_fpu_sp" >&6; }
 
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for nds32 FPU DP extension" >&5
+$as_echo_n "checking for nds32 FPU DP extension... " >&6; }
+if ${newlib_cv_nds32_fpu_dp+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #if (__NDS32_EXT_FPU_DP__)
 # error "Has nds32 FPU DP extension support"
@@ -12156,14 +12169,17 @@ main ()
 }
 _ACEOF
 if ac_fn_c_try_cpp "$LINENO"; then :
-  has_nds32_fpu_dp="no"
+  newlib_cv_nds32_fpu_dp="no"
 else
-  has_nds32_fpu_dp="yes"
+  newlib_cv_nds32_fpu_dp="yes"
 fi
 rm -f conftest.err conftest.i conftest.$ac_ext
 fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $newlib_cv_nds32_fpu_dp" >&5
+$as_echo "$newlib_cv_nds32_fpu_dp" >&6; }
+fi
 
- if test "$has_nds32_fpu_sp" = "yes"; then
+ if test "$newlib_cv_nds32_fpu_sp" = "yes"; then
   HAS_NDS32_FPU_SP_TRUE=
   HAS_NDS32_FPU_SP_FALSE='#'
 else
@@ -12171,7 +12187,7 @@ else
   HAS_NDS32_FPU_SP_FALSE=
 fi
 
- if test "$has_nds32_fpu_dp" = "yes"; then
+ if test "$newlib_cv_nds32_fpu_dp" = "yes"; then
   HAS_NDS32_FPU_DP_TRUE=
   HAS_NDS32_FPU_DP_FALSE='#'
 else

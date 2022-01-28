@@ -12467,7 +12467,12 @@ fi
 
 
 if test "${machine_dir}" = "nds32"; then
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for nds32 V3M ISA" >&5
+$as_echo_n "checking for nds32 V3M ISA... " >&6; }
+if ${newlib_cv_nds32_isa_v3m+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #ifdef __NDS32_ISA_V3M__
 # error "This is nds32_isa_v3m."
@@ -12482,14 +12487,17 @@ main ()
 }
 _ACEOF
 if ac_fn_c_try_cpp "$LINENO"; then :
-  is_nds32_isa_v3m="no"
+  newlib_cv_nds32_isa_v3m="no"
 else
-  is_nds32_isa_v3m="yes"
+  newlib_cv_nds32_isa_v3m="yes"
 fi
 rm -f conftest.err conftest.i conftest.$ac_ext
 fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $newlib_cv_nds32_isa_v3m" >&5
+$as_echo "$newlib_cv_nds32_isa_v3m" >&6; }
+fi
 
- if test "$is_nds32_isa_v3m" = "yes"; then
+ if test "$newlib_cv_nds32_isa_v3m" = "yes"; then
   IS_NDS32_ISA_V3M_TRUE=
   IS_NDS32_ISA_V3M_FALSE='#'
 else
@@ -12524,7 +12532,12 @@ fi
 
 
 if test "${machine_dir}" = "sh"; then
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for SH5 (64-bit)" >&5
+$as_echo_n "checking for SH5 (64-bit)... " >&6; }
+if ${newlib_cv_sh64+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #if !defined(__SH5__)
 # error "not SH5"
@@ -12539,14 +12552,17 @@ main ()
 }
 _ACEOF
 if ac_fn_c_try_cpp "$LINENO"; then :
-  have_sh64=yes
+  newlib_cv_sh64=yes
 else
-  have_sh64=no
+  newlib_cv_sh64=no
 fi
 rm -f conftest.err conftest.i conftest.$ac_ext
 fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $newlib_cv_sh64" >&5
+$as_echo "$newlib_cv_sh64" >&6; }
+fi
 
- if test "$have_sh64" = yes; then
+ if test "$newlib_cv_sh64" = yes; then
   SH64_TRUE=
   SH64_FALSE='#'
 else
@@ -12558,7 +12574,10 @@ fi
 if test "${machine_dir}" = "spu"; then
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports __ea" >&5
 $as_echo_n "checking whether the compiler supports __ea... " >&6; }
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+if ${newlib_cv_spu_compiler_has_ea+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #if !defined (__EA32__) && !defined (__EA64__)
 # error "__ea not supported"
@@ -12573,15 +12592,16 @@ main ()
 }
 _ACEOF
 if ac_fn_c_try_cpp "$LINENO"; then :
-  spu_compiler_has_ea=yes
+  newlib_cv_spu_compiler_has_ea=yes
 else
-  spu_compiler_has_ea=no
+  newlib_cv_spu_compiler_has_ea=no
 fi
 rm -f conftest.err conftest.i conftest.$ac_ext
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $spu_compiler_has_ea" >&5
-$as_echo "$spu_compiler_has_ea" >&6; }
 fi
- if test x${spu_compiler_has_ea} != xno; then
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $newlib_cv_spu_compiler_has_ea" >&5
+$as_echo "$newlib_cv_spu_compiler_has_ea" >&6; }
+fi
+ if test "$newlib_cv_spu_compiler_has_ea" = yes; then
   HAVE_SPU_EA_TRUE=
   HAVE_SPU_EA_FALSE='#'
 else
