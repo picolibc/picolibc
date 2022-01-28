@@ -320,13 +320,13 @@ int	_wscanf_r (struct _reent *, const wchar_t *, ...);
 
 #define getwc(fp)	fgetwc(fp)
 #define putwc(wc,fp)	fputwc((wc), (fp))
-#define getwchar()	fgetwc(_REENT->_stdin)
+#define getwchar()	fgetwc(_REENT_STDIN(_REENT))
 #define putwchar(wc)	fputwc((wc), _REENT->_stdout)
 
 #if __GNU_VISIBLE
 #define getwc_unlocked(fp)	fgetwc_unlocked(fp)
 #define putwc_unlocked(wc,fp)	fputwc_unlocked((wc), (fp))
-#define getwchar_unlocked()	fgetwc_unlocked(_REENT->_stdin)
+#define getwchar_unlocked()	fgetwc_unlocked(_REENT_STDIN(_REENT))
 #define putwchar_unlocked(wc)	fputwc_unlocked((wc), _REENT->_stdout)
 #endif
 

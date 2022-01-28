@@ -218,8 +218,8 @@ found:
 static void
 cleanup_stdio (struct _reent *ptr)
 {
-  if (ptr->_stdin != &__sf[0])
-    CLEANUP_FILE (ptr, ptr->_stdin);
+  if (_REENT_STDIN(ptr) != &__sf[0])
+    CLEANUP_FILE (ptr, _REENT_STDIN(ptr));
   if (ptr->_stdout != &__sf[1])
     CLEANUP_FILE (ptr, ptr->_stdout);
   if (ptr->_stderr != &__sf[2])

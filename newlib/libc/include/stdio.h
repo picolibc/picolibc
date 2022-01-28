@@ -167,11 +167,11 @@ typedef _ssize_t ssize_t;
 
 #define	TMP_MAX		26
 
-#define	stdin	(_REENT->_stdin)
+#define	stdin	_REENT_STDIN(_REENT)
 #define	stdout	(_REENT->_stdout)
 #define	stderr	(_REENT->_stderr)
 
-#define _stdin_r(x)	((x)->_stdin)
+#define _stdin_r(x)	_REENT_STDIN(x)
 #define _stdout_r(x)	((x)->_stdout)
 #define _stderr_r(x)	((x)->_stderr)
 

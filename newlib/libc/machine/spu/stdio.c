@@ -67,8 +67,8 @@ __sinit (struct _reent *s)
 {
   s->__cleanup = __cleanup;
 
-  s->_stdin = &s->__sf[0];
-  s->_stdin->_fp = SPE_STDIN;
+  _REENT_STDIN(s) = &s->__sf[0];
+  _REENT_STDIN(s)->_fp = SPE_STDIN;
 
   s->_stdout = &s->__sf[1];
   s->_stdout->_fp = SPE_STDOUT;
