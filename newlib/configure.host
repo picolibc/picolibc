@@ -641,7 +641,7 @@ esac
 
 case "${host}" in
   *-*-cygwin*)
-	test -z "$cygwin_srcdir" && cygwin_srcdir=`cd ${srcdir}/../winsup/cygwin; pwd`
+	test -z "$cygwin_srcdir" && cygwin_srcdir="${abs_newlib_basedir}/../winsup/cygwin"
 	export cygwin_srcdir
 	default_newlib_io_c99_formats="yes"
 	default_newlib_io_long_long="yes"
