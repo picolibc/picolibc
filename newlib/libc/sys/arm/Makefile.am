@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 
-AM_CPPFLAGS = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS) -I$(newlib_basedir)/libc/machine/arm
+AM_CPPFLAGS = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS) -I$(abs_newlib_basedir)/libc/machine/arm
 
 AM_CCASFLAGS = $(AM_CPPFLAGS)
 

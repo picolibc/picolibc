@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 
-AM_CPPFLAGS = -I $(newlib_basedir)/../newlib/libm/common $(NEWLIB_CFLAGS) \
+AM_CPPFLAGS = -I $(abs_newlib_basedir)/libm/common $(NEWLIB_CFLAGS) \
 	$(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 if HAS_NDS32_FPU_SP_FALSE
