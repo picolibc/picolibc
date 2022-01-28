@@ -361,7 +361,7 @@ CRT0=
 CRT0_DIR=
 if test "x${have_crt0}" = "xyes"; then
   CRT0=crt0.o
-  CRT0_DIR=libc/
+  CRT0_DIR=libc/sys/${sys_dir}/
 fi
 AM_CONDITIONAL(HAVE_CRT0, test x$have_crt0 = xyes)
 AC_SUBST(CRT0)

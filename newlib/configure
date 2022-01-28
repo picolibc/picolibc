@@ -12442,7 +12442,7 @@ CRT0=
 CRT0_DIR=
 if test "x${have_crt0}" = "xyes"; then
   CRT0=crt0.o
-  CRT0_DIR=libc/
+  CRT0_DIR=libc/sys/${sys_dir}/
 fi
  if test x$have_crt0 = xyes; then
   HAVE_CRT0_TRUE=
