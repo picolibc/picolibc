@@ -60,6 +60,8 @@ MULTI_DEFAULT_FLAGS = -DSEMIHOST_V2
 
 SHELL =	/bin/sh
 
+mkinstalldirs = $(SHELL) $(srcroot)/mkinstalldirs
+
 CC = @CC@
 
 AS = @AS@
@@ -196,9 +198,11 @@ install: ${CRT0_INSTALL} ${RDIMON_INSTALL}
 	$(MAKE) $(AM_MAKEFLAGS) install-recursive
 
 install-crt0:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	${INSTALL_DATA} ${CRT0} $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x
 
 install-rdimon:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	set -e; for x in ${RDIMON_CRT0} ${RDIMON_BSP}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 	set -e; for x in ${RDIMON_SCRIPTS}; do ${INSTALL_DATA} ${srcdir}/${objtype}$$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 

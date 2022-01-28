@@ -43,6 +43,8 @@ INSTALL_DATA = @INSTALL_DATA@
 
 SHELL = /bin/sh
 
+mkinstalldirs = $(SHELL) $(srcroot)/mkinstalldirs
+
 CC = @CC@
 
 AS = @AS@
@@ -172,15 +174,18 @@ $(objdir)/cygmon.ld: @CYGMONLDSCRIPTTEMPL@
 	sed 's/TARGET_OBJ_FORMAT/$($(CPU)_OBJ_FORMAT)/g;s/TARGET_RAM_START/$($(CPU)_RAM_START)/g;' < $(<) > $(objdir)/cygmon.ld
 
 install: $($(CPU)_INSTALL)
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	$(INSTALL_DATA) $(CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(CRT0)
 
 sparc-install:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	$(INSTALL_DATA) $(CYGMON_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
 	$(INSTALL_DATA) $(CYGMON_OBJS) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
 	$(INSTALL_DATA) $(objdir)/cygmon.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
 	$(INSTALL_DATA) $(CYGMON_CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
 
 slite-install:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	$(INSTALL_DATA) $(930_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(930_BSP)
 	$(INSTALL_DATA) $(931_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(931_BSP)
 	$(INSTALL_DATA) $(934_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(934_BSP)
@@ -199,6 +204,7 @@ slite-install:
 	$(INSTALL_DATA) $(CYGMON_CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
 
 splet-install:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	$(INSTALL_DATA) $(701_CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(701_CRT0)
 	$(INSTALL_DATA) $(701_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(701_BSP)
 	$(INSTALL_DATA) $(srcdir)/tsc701.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
