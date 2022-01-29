@@ -157,8 +157,5 @@ clean-info:
 # target specific makefile fragment comes in here.
 @target_makefile_frag@
 
-Makefile: Makefile.in config.status @host_makefile_frag_path@ @target_makefile_frag_path@
-	$(SHELL) config.status
-
-config.status: configure
-	$(SHELL) config.status --recheck
+Makefile: Makefile.in ../config.status
+	cd .. && $(SHELL) config.status
