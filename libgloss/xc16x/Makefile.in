@@ -42,6 +42,8 @@ INSTALL_DATA = @INSTALL_DATA@
 
 SHELL =	/bin/sh
 
+mkinstalldirs = $(SHELL) $(srcroot)/mkinstalldirs
+
 CC = @CC@
 
 #AS = @AS@
@@ -118,6 +120,7 @@ distclean maintainer-clean realclean: clean
 
 .PHONY: install info install-info clean-info
 install:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	@for crt in ${CRT0}; do \
 	$(INSTALL_PROGRAM) $${crt} $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$${crt}; \
 	done

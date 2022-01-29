@@ -29,6 +29,8 @@ MULTISUBDIR =
 
 SHELL =	/bin/sh
 
+mkinstalldirs = $(SHELL) $(srcroot)/mkinstalldirs
+
 CC = @CC@
 
 AS = @AS@
@@ -126,10 +128,12 @@ distclean maintainer-clean realclean: clean
 install: ${SIM_INSTALL}
 
 install-mon:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	set -e; for x in ${MON_CRT0} ${MON_BSP}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 	set -e; for x in ${MON_SCRIPTS}; do ${INSTALL_DATA} ${srcdir}/$$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 install-sim:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib
 	set -e; for x in ${SIM_CRT0} ${SIM_BSP} ${SIM_SCRIPTS}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib/$$x; done
 
 doc:

@@ -41,6 +41,8 @@ INSTALL_DATA = @INSTALL_DATA@
 
 SHELL = /bin/sh
 
+mkinstalldirs = $(SHELL) $(srcroot)/mkinstalldirs
+
 CC = @CC@
 
 AS = @AS@
@@ -135,6 +137,7 @@ utime.o : $(SDEPS)
 write.o : $(SDEPS)
 
 install: $(CRT) $(SIM_BSP) $(SCRIPTS)
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	for c in $(CRT) $(SIM_BSP); do \
 	  $(INSTALL_DATA) $$c $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$c ;\
 	done

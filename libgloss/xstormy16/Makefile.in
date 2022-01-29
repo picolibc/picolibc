@@ -29,6 +29,8 @@ MULTISUBDIR =
 
 SHELL =	/bin/sh
 
+mkinstalldirs = $(SHELL) $(srcroot)/mkinstalldirs
+
 CC = @CC@
 
 AS = @AS@
@@ -111,6 +113,7 @@ distclean maintainer-clean realclean: clean
 
 .PHONY: install info install-info clean-info
 install: 
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	set -e; for x in ${SIM_BSP} ${CRT} ${EVA_APP_BSP} ${EVA_STUB_HEX} ${EVA_STUB} ; do\
 	  ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; \
 	done

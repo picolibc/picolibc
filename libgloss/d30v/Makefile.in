@@ -45,6 +45,8 @@ INSTALL_DATA = @INSTALL_DATA@
 
 SHELL =	/bin/sh
 
+mkinstalldirs = $(SHELL) $(srcroot)/mkinstalldirs
+
 CC = @CC@
 
 AS = @AS@
@@ -115,6 +117,7 @@ distclean maintainer-clean realclean: clean
 install: ${SIM_INSTALL}
 
 install-sim:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	set -e; for x in ${SIM_CRT0} ${SIM_BSP} ${SIM_SCRIPTS}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 doc:

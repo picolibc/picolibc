@@ -42,6 +42,8 @@ INSTALL_DATA = @INSTALL_DATA@
 
 SHELL = /bin/sh
 
+mkinstalldirs = $(SHELL) $(srcroot)/mkinstalldirs
+
 CC = @CC@
 
 AS = @AS@
@@ -98,6 +100,7 @@ simnovec-crt0.o: $(srcdir)/simnovec-crt0.S $(srcdir)/sim-crt0.S
 crtn.o: $(srcdir)/crtn.S $(srcdir)/sim-crtn.S
 
 install: $(CRT) $(SIM_BSP)
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	for c in $(CRT) $(SIM_BSP); do \
 	  $(INSTALL_DATA) $$c $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$c ;\
 	done

@@ -60,6 +60,8 @@ INSTALL_DATA = @INSTALL_DATA@
 
 SHELL = /bin/sh
 
+mkinstalldirs = $(SHELL) $(srcroot)/mkinstalldirs
+
 CC = @CC@
 
 AS = @AS@
@@ -99,6 +101,7 @@ CPU = @CPU@
 all: ${CRT} ${LIB} ${LINUX_BSP}
 
 install: ${CRT} ${LIB} install-linux
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	@for crt in ${CRT}; do \
 	$(INSTALL_PROGRAM) $${crt} $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$${crt}; \
 	done
@@ -106,6 +109,7 @@ install: ${CRT} ${LIB} install-linux
 	$(INSTALL_PROGRAM) $(srcdir)/${SCRIPTS} $(DESTDIR)$(tooldir)/lib/
 
 install-linux: ${LINUX_BSP}
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	$(INSTALL_PROGRAM) ${LINUX_BSP} $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
 	set -e; for x in ${LINUX_SCRIPTS}; do ${INSTALL_DATA} ${srcdir}/${objtype}$$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 

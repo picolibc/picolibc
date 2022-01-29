@@ -46,6 +46,8 @@ INSTALL_DATA = @INSTALL_DATA@
 
 SHELL =	/bin/sh
 
+mkinstalldirs = $(SHELL) $(srcroot)/mkinstalldirs
+
 CC = @CC@
 
 AS = @AS@
@@ -141,6 +143,7 @@ distclean maintainer-clean realclean: clean
 
 .PHONY: install info install-info clean-info
 install:	install-scripts
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	$(INSTALL_PROGRAM) $(CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(CRT0)
 	@for bsp in ${BSP}; do\
 	 $(INSTALL_PROGRAM) $${bsp} $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}; \
@@ -148,6 +151,7 @@ install:	install-scripts
 
 # Install the linker script in the correct place.
 install-scripts:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	if [ -f ${objroot}/../binutils/objdump ] ; then \
 	   objdump="${objroot}/../binutils/objdump"; \
 	else \

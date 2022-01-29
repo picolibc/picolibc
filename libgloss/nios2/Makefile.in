@@ -43,6 +43,8 @@ INSTALL_DATA = @INSTALL_DATA@
 
 SHELL =	/bin/sh
 
+mkinstalldirs = $(SHELL) $(srcroot)/mkinstalldirs
+
 CC = @CC@
 
 AS = @AS@
@@ -92,6 +94,7 @@ $(HOSTED_BSP): crt0.o io-nios2.o $(HOSTED_OBJS) $(OTHER_OBJS)
 
 .PHONY: install info dvi doc install-info clean-info
 install:: 
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	$(INSTALL_DATA) $(HOSTED_BSP) \
 		$(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
 	for x in ${BSP_SCRIPTS}; do\

@@ -45,6 +45,8 @@ INSTALL_DATA = @INSTALL_DATA@
 
 SHELL =	/bin/sh
 
+mkinstalldirs = $(SHELL) $(srcroot)/mkinstalldirs
+
 CC = @CC@
 
 AS = @AS@
@@ -409,6 +411,7 @@ install:: $(DO:%=install_%)
 
 .PHONY:install_m68k
 install_m68k::
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	# install SIM stuff
 	$(INSTALL_PROGRAM) $(SIM_CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(SIM_CRT0)
 	$(INSTALL_PROGRAM) $(SIM_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(SIM_BSP)
@@ -435,6 +438,7 @@ install_m68k::
 
 .PHONY: install_cf
 install_cf:: install_io
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	# install CF stuff
 	$(INSTALL_DATA) $(CF_CRT0S) $(CF_BSP) \
 		$(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
@@ -447,6 +451,7 @@ endif
 
 .PHONY: install_fido
 install_fido:: install_io
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	$(INSTALL_DATA) $(FIDO_CRT0S) $(FIDO_BSP) \
 		$(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)
 	$(INSTALL_DATA) $(FIDO_SCRIPTS) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
@@ -459,6 +464,7 @@ endif
 
 .PHONY: install_io
 install_io::
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	# install IO stuff
 	$(INSTALL_DATA) $(HOSTED_BSP) $(UNHOSTED_BSP) \
 		$(DESTDIR)$(tooldir)/lib${MULTISUBDIR}

@@ -30,6 +30,8 @@ MULTISUBDIR =
 
 SHELL =	/bin/sh
 
+mkinstalldirs = $(SHELL) $(srcroot)/mkinstalldirs
+
 CC = @CC@
 
 AS = @AS@
@@ -203,6 +205,7 @@ install: ${SIM_INSTALL} ${BSP_INSTALL} ${LIN_INSTALL}
 # Note that bsp and elinux objects are exclusive: do not overlap
 # installed files.
 install-bsp:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	case "${MULTISUBDIR}" in \
           */elinux) ;; \
 	  *) set -e; \
@@ -212,12 +215,14 @@ install-bsp:
 	esac
 
 install-sim:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	set -e; \
 	for x in ${SIM_CRT0} ${SIM_BSP} ${SIM_SCRIPTS}; do \
 	  ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; \
 	done
 
 install-lin:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	case "${MULTISUBDIR}" in \
           */elinux) \
 	    ${INSTALL_DATA} ${LIN_CRT0} $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/crt0.o; \

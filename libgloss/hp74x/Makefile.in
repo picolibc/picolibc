@@ -42,6 +42,8 @@ INSTALL_DATA = @INSTALL_DATA@
 
 SHELL = /bin/sh
 
+mkinstalldirs = $(SHELL) $(srcroot)/mkinstalldirs
+
 CC = @CC@
 
 AS = @AS@
@@ -101,6 +103,7 @@ hpstub: $(OBJS)
 	$(OBJS) -lc -m >stub.map
 
 install:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib/${MULTISUBDIR}
 	$(INSTALL_PROGRAM) $(STUBLIB) $(DESTDIR)$(tooldir)/lib/$(MULTISUBDIR)$(STUBLIB)
 	$(INSTALL_PROGRAM) $(SHARED_DIR)/$(STUBCRT0) $(DESTDIR)$(tooldir)/lib/$(MULTISUBDIR)$(STUBCRT0)
 	$(INSTALL_PROGRAM) $(srcdir)/$(LDSCRIPT) $(DESTDIR)$(tooldir)/lib/$(LDSCRIPT)

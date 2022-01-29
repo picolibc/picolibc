@@ -43,6 +43,8 @@ INSTALL_DATA = @INSTALL_DATA@
 
 SHELL = /bin/sh
 
+mkinstalldirs = $(SHELL) $(srcroot)/mkinstalldirs
+
 CC = @CC@
 
 AS = @AS@
@@ -130,6 +132,7 @@ wait.o: $(srcdir)/wait.c
 write.o: $(srcdir)/write.c
 
 install: $($(CPU)_INSTALL)
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	$(INSTALL_DATA) $(CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(CRT0)
 	$(INSTALL_DATA) $(SIM_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(SIM_BSP)
 

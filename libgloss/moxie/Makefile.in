@@ -43,6 +43,8 @@ INSTALL_DATA = @INSTALL_DATA@
 
 SHELL = /bin/sh
 
+mkinstalldirs = $(SHELL) $(srcroot)/mkinstalldirs
+
 CC = @CC@
 
 AS = @AS@
@@ -129,6 +131,7 @@ stat.o: $(srcdir)/stat.c
 qemu-write.o: $(srcdir)/qemu-write.c
 
 install: ${CRT0_INSTALL} $($(CPU)_INSTALL)
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	$(INSTALL_DATA) $(SIM_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(SIM_BSP)
 	$(INSTALL_DATA) $(QEMU_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(QEMU_BSP)
 	for x in ${LD_SCRIPTS}; do \
@@ -136,6 +139,7 @@ install: ${CRT0_INSTALL} $($(CPU)_INSTALL)
 	done;
 
 install-crt0:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	${INSTALL_DATA} ${CRT0} $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x
 
 clean mostlyclean:

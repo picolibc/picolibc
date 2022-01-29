@@ -45,6 +45,8 @@ INSTALL_DATA = @INSTALL_DATA@
 
 SHELL =	/bin/sh
 
+mkinstalldirs = $(SHELL) $(srcroot)/mkinstalldirs
+
 CC = @CC@
 
 AS = @AS@
@@ -355,30 +357,38 @@ distclean maintainer-clean realclean: clean
 install: ${SIM_INSTALL} ${MVME_INSTALL} ${SOLARIS_INSTALL} ${LINUX_INSTALL} ${YELLOWKNIFE_INSTALL} ${ADS_INSTALL} ${MBX_INSTALL} ${XIL_INSTALL}
 
 install-sim:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	set -e; for x in ${SIM_CRT0} ${SIM_BSP} ${SIM_SCRIPTS}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 install-mvme:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	set -e; for x in ${MVME_CRT0} ${MVME_BSP} ${MVME_SCRIPTS}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 install-solaris:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	set -e; for x in ${SOLARIS_CRT0} ${SOLARIS_BSP} ${SOLARIS_SCRIPTS}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 install-linux:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	set -e; for x in ${LINUX_CRT0} ${LINUX_BSP} ${LINUX_SCRIPTS}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 install-yellowknife:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	set -e; for x in ${YELLOWKNIFE_CRT0} ${YELLOWKNIFE_BSP}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 	set -e; for x in ${YELLOWKNIFE_SCRIPTS}; do ${INSTALL_DATA} $(srcdir)/$$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 install-ads:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	set -e; for x in ${ADS_CRT0} ${ADS_BSP}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 	set -e; for x in ${ADS_SCRIPTS}; do ${INSTALL_DATA} $(srcdir)/$$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 install-mbx:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	set -e; for x in ${MBX_CRT0} ${MBX_BSP}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 	set -e; for x in ${MBX_SCRIPTS} ${MBX_SPECS}; do ${INSTALL_DATA} $(srcdir)/$$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 install-xil:
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	set -e; for x in ${XIL_CRT0} ${XIL_BSP}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib/$$x; done
 	set -e; for x in ${XIL_SCRIPTS} ${XIL_SPECS}; do ${INSTALL_DATA} $(srcdir)/$$x $(DESTDIR)${tooldir}/lib/$$x; done
 

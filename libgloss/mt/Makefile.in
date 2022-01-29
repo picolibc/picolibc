@@ -41,6 +41,8 @@ INSTALL_DATA = @INSTALL_DATA@
 
 SHELL = /bin/sh
 
+mkinstalldirs = $(SHELL) $(srcroot)/mkinstalldirs
+
 CC = @CC@
 
 AS = @AS@
@@ -102,6 +104,7 @@ crt0-ms2.o: $(srcdir)/crt0-ms2.S
 trap.o:	$(srcdir)/trap.S
 
 install: $($(CPU)_INSTALL)
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	for c in $(CRT0); do \
 	  $(INSTALL_DATA) $$c $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$c ; \
 	done; 
