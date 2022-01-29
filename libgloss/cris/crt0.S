@@ -36,7 +36,7 @@
 #define L(x) _ ## x
 #endif
 
-#ifdef HAVE_INITFINI_ARRAY
+#ifdef _HAVE_INITFINI_ARRAY
 #define _init __libc_init_array
 #define _fini __libc_fini_array
 #endif
