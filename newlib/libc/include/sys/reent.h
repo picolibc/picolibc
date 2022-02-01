@@ -721,6 +721,7 @@ struct _reent
 #define _REENT_EMERGENCY(_ptr)	((_ptr)->_emergency)
 #define _REENT_ERRNO(_ptr)	((_ptr)->_errno)
 #define _REENT_STDIN(_ptr)	((_ptr)->_stdin)
+#define _REENT_STDOUT(_ptr)	((_ptr)->_stdout)
 
 #define _REENT_INIT_PTR(var) \
   { memset((var), 0, sizeof(*(var))); \
