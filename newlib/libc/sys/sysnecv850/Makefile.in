@@ -88,6 +88,13 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@MAY_SUPPLY_SYSCALLS_TRUE@am__append_1 = \
+@MAY_SUPPLY_SYSCALLS_TRUE@	_exit.c access.c chmod.c chown.c close.c creat.c crt1.c \
+@MAY_SUPPLY_SYSCALLS_TRUE@	execv.c execve.c fork.c fstat.c getpid.c isatty.c \
+@MAY_SUPPLY_SYSCALLS_TRUE@	kill.c lseek.c open.c pipe.c read.c link.c \
+@MAY_SUPPLY_SYSCALLS_TRUE@	sbrk.c stat.c time.c trap.S unlink.c utime.c wait.c write.c \
+@MAY_SUPPLY_SYSCALLS_TRUE@	times.c gettime.c rename.c
+
 subdir = sys/sysnecv850
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../config/depstand.m4 \
@@ -117,23 +124,37 @@ am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
 am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 lib_a_AR = $(AR) $(ARFLAGS)
-@MAY_SUPPLY_SYSCALLS_TRUE@am__DEPENDENCIES_1 = $(lpfx)_exit.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)access.o $(lpfx)chmod.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)chown.o $(lpfx)close.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)creat.o $(lpfx)crt1.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)execv.o $(lpfx)execve.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)fork.o $(lpfx)fstat.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)getpid.o $(lpfx)isatty.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)kill.o $(lpfx)lseek.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)open.o $(lpfx)pipe.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)read.o $(lpfx)link.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)sbrk.o $(lpfx)stat.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)time.o $(lpfx)trap.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)unlink.o $(lpfx)utime.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)wait.o $(lpfx)write.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)times.o $(lpfx)gettime.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)rename.o
-am_lib_a_OBJECTS =
+lib_a_LIBADD =
+@MAY_SUPPLY_SYSCALLS_TRUE@am__objects_1 = lib_a-_exit.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-access.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-chmod.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-chown.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-close.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-creat.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-crt1.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-execv.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-execve.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-fork.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-fstat.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-getpid.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-isatty.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-kill.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-lseek.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-open.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-pipe.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-read.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-link.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-sbrk.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-stat.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-time.$(OBJEXT) trap.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-unlink.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-utime.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-wait.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-write.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-times.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-gettime.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-rename.$(OBJEXT)
+am_lib_a_OBJECTS = $(am__objects_1)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -182,7 +203,7 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(lib_a_SOURCES) $(EXTRA_lib_a_SOURCES)
+SOURCES = $(lib_a_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -356,26 +377,7 @@ top_srcdir = @top_srcdir@
 AM_CPPFLAGS = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(AM_CPPFLAGS)
 noinst_LIBRARIES = lib.a
-@MAY_SUPPLY_SYSCALLS_FALSE@extra_objs = 
-@MAY_SUPPLY_SYSCALLS_TRUE@extra_objs = $(lpfx)_exit.o $(lpfx)access.o $(lpfx)chmod.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)chown.o $(lpfx)close.o $(lpfx)creat.o $(lpfx)crt1.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)execv.o $(lpfx)execve.o $(lpfx)fork.o $(lpfx)fstat.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)getpid.o $(lpfx)isatty.o $(lpfx)kill.o $(lpfx)lseek.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)open.o $(lpfx)pipe.o $(lpfx)read.o $(lpfx)link.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)sbrk.o $(lpfx)stat.o $(lpfx)time.o $(lpfx)trap.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)unlink.o $(lpfx)utime.o $(lpfx)wait.o $(lpfx)write.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)times.o $(lpfx)gettime.o $(lpfx)rename.o
-
-lib_a_LIBADD = $(extra_objs)
-EXTRA_lib_a_SOURCES = \
-	_exit.c access.c chmod.c chown.c close.c creat.c crt1.c \
-	execv.c execve.c fork.c fstat.c getpid.c isatty.c \
-	kill.c lseek.c open.c pipe.c read.c link.c \
-	sbrk.c stat.c time.c trap.S unlink.c utime.c wait.c write.c \
-	times.c gettime.c rename.c
-
-lib_a_SOURCES = 
-lib_a_DEPENDENCIES = $(extra_objs)
+lib_a_SOURCES = $(am__append_1)
 lib_a_CFLAGS = $(AM_CFLAGS)
 all: all-am
 

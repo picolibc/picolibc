@@ -88,6 +88,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@MAY_SUPPLY_SYSCALLS_TRUE@am__append_1 = libcfunc.c trap.S syscalls.c
 subdir = sys/arm
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../config/depstand.m4 \
@@ -117,9 +118,12 @@ am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
 am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 lib_a_AR = $(AR) $(ARFLAGS)
-@MAY_SUPPLY_SYSCALLS_TRUE@am__DEPENDENCIES_1 = $(lpfx)libcfunc.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)trap.o $(lpfx)syscalls.o
-am_lib_a_OBJECTS = lib_a-access.$(OBJEXT) lib_a-aeabi_atexit.$(OBJEXT)
+lib_a_LIBADD =
+@MAY_SUPPLY_SYSCALLS_TRUE@am__objects_1 = lib_a-libcfunc.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	trap.$(OBJEXT) \
+@MAY_SUPPLY_SYSCALLS_TRUE@	lib_a-syscalls.$(OBJEXT)
+am_lib_a_OBJECTS = lib_a-access.$(OBJEXT) lib_a-aeabi_atexit.$(OBJEXT) \
+	$(am__objects_1)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -168,7 +172,7 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(lib_a_SOURCES) $(EXTRA_lib_a_SOURCES)
+SOURCES = $(lib_a_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -342,12 +346,7 @@ top_srcdir = @top_srcdir@
 AM_CPPFLAGS = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS) -I$(abs_newlib_basedir)/libc/machine/arm
 AM_CCASFLAGS = $(AM_CPPFLAGS)
 noinst_LIBRARIES = lib.a
-@MAY_SUPPLY_SYSCALLS_FALSE@extra_objs = 
-@MAY_SUPPLY_SYSCALLS_TRUE@extra_objs = $(lpfx)libcfunc.o $(lpfx)trap.o $(lpfx)syscalls.o
-lib_a_SOURCES = access.c aeabi_atexit.c
-lib_a_LIBADD = $(extra_objs)
-EXTRA_lib_a_SOURCES = trap.S syscalls.c libcfunc.c
-lib_a_DEPENDENCIES = $(extra_objs)
+lib_a_SOURCES = access.c aeabi_atexit.c $(am__append_1)
 lib_a_CFLAGS = $(AM_CFLAGS)
 all: all-am
 
@@ -427,17 +426,17 @@ lib_a-aeabi_atexit.o: aeabi_atexit.c
 lib_a-aeabi_atexit.obj: aeabi_atexit.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-aeabi_atexit.obj `if test -f 'aeabi_atexit.c'; then $(CYGPATH_W) 'aeabi_atexit.c'; else $(CYGPATH_W) '$(srcdir)/aeabi_atexit.c'; fi`
 
-lib_a-syscalls.o: syscalls.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-syscalls.o `test -f 'syscalls.c' || echo '$(srcdir)/'`syscalls.c
-
-lib_a-syscalls.obj: syscalls.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-syscalls.obj `if test -f 'syscalls.c'; then $(CYGPATH_W) 'syscalls.c'; else $(CYGPATH_W) '$(srcdir)/syscalls.c'; fi`
-
 lib_a-libcfunc.o: libcfunc.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-libcfunc.o `test -f 'libcfunc.c' || echo '$(srcdir)/'`libcfunc.c
 
 lib_a-libcfunc.obj: libcfunc.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-libcfunc.obj `if test -f 'libcfunc.c'; then $(CYGPATH_W) 'libcfunc.c'; else $(CYGPATH_W) '$(srcdir)/libcfunc.c'; fi`
+
+lib_a-syscalls.o: syscalls.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-syscalls.o `test -f 'syscalls.c' || echo '$(srcdir)/'`syscalls.c
+
+lib_a-syscalls.obj: syscalls.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-syscalls.obj `if test -f 'syscalls.c'; then $(CYGPATH_W) 'syscalls.c'; else $(CYGPATH_W) '$(srcdir)/syscalls.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
