@@ -73,8 +73,8 @@ __sinit (struct _reent *s)
   _REENT_STDOUT(s) = &s->__sf[1];
   _REENT_STDOUT(s)->_fp = SPE_STDOUT;
 
-  s->_stderr = &s->__sf[2];
-  s->_stderr->_fp = SPE_STDERR;
+  _REENT_STDERR(s) = &s->__sf[2];
+  _REENT_STDERR(s)->_fp = SPE_STDERR;
 }
 
 void

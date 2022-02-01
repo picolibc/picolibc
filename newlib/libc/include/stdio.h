@@ -169,11 +169,11 @@ typedef _ssize_t ssize_t;
 
 #define	stdin	_REENT_STDIN(_REENT)
 #define	stdout	_REENT_STDOUT(_REENT)
-#define	stderr	(_REENT->_stderr)
+#define	stderr	_REENT_STDERR(_REENT)
 
 #define _stdin_r(x)	_REENT_STDIN(x)
 #define _stdout_r(x)	_REENT_STDOUT(x)
-#define _stderr_r(x)	((x)->_stderr)
+#define _stderr_r(x)	_REENT_STDERR(x)
 
 /*
  * Functions defined in ANSI C standard.

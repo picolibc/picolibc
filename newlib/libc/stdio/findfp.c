@@ -222,8 +222,8 @@ cleanup_stdio (struct _reent *ptr)
     CLEANUP_FILE (ptr, _REENT_STDIN(ptr));
   if (_REENT_STDOUT(ptr) != &__sf[1])
     CLEANUP_FILE (ptr, _REENT_STDOUT(ptr));
-  if (ptr->_stderr != &__sf[2])
-    CLEANUP_FILE (ptr, ptr->_stderr);
+  if (_REENT_STDERR(ptr) != &__sf[2])
+    CLEANUP_FILE (ptr, _REENT_STDERR(ptr));
 }
 
 /*
