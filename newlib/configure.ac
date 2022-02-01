@@ -350,7 +350,6 @@ AM_CONDITIONAL(HAVE_MULTISUBDIR, test x$have_multisubdir = xyes)
 HAVE_ICONVDATA=false
 case $host in
   i[[34567]]86-pc-linux-*)
-  	AC_CONFIG_SUBDIRS(iconvdata)
 	HAVE_ICONVDATA=true
 	;;
 esac

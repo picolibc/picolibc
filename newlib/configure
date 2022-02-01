@@ -871,8 +871,7 @@ LIBS
 CPPFLAGS
 CPP'
 ac_subdirs_all='libc
-libm
-iconvdata'
+libm'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -12009,7 +12008,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12012 "configure"
+#line 12011 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12115,7 +12114,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12118 "configure"
+#line 12117 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12427,8 +12426,6 @@ fi
 HAVE_ICONVDATA=false
 case $host in
   i[34567]86-pc-linux-*)
-  	subdirs="$subdirs iconvdata"
-
 	HAVE_ICONVDATA=true
 	;;
 esac
