@@ -314,7 +314,7 @@ fi
 AC_SUBST(CC_FOR_NEWLIB)
 
 AC_CONFIG_SUBDIRS(libc)
-AC_CONFIG_SUBDIRS(libm)
+m4_include([libm/acinclude.m4])
 
 if test -z "${with_multisubdir}"; then
   have_multisubdir=no

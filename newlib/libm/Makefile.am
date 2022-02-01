@@ -26,6 +26,3 @@ libm.a: $(SUBLIBS)
 	rm -rf tmp
 
 $(SUBLIBS):
-
-ACLOCAL_AMFLAGS = -I .. -I ../.. -I ../../config
-CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

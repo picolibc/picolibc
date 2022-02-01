@@ -606,6 +606,14 @@ HAVE_MULTISUBDIR_FALSE
 HAVE_MULTISUBDIR_TRUE
 HAVE_DOC_FALSE
 HAVE_DOC_TRUE
+LIBM_MACHINE_LIB
+LIBM_MACHINE_DIR
+HAVE_LIBM_MACHINE_DIR_FALSE
+HAVE_LIBM_MACHINE_DIR_TRUE
+HAS_NDS32_FPU_DP_FALSE
+HAS_NDS32_FPU_DP_TRUE
+HAS_NDS32_FPU_SP_FALSE
+HAS_NDS32_FPU_SP_TRUE
 subdirs
 CC_FOR_NEWLIB
 NEWLIB_HW_FP_FALSE
@@ -773,8 +781,7 @@ CPPFLAGS
 CPP
 CCAS
 CCASFLAGS'
-ac_subdirs_all='libc
-libm'
+ac_subdirs_all='libc'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -4708,7 +4715,133 @@ fi
 
 subdirs="$subdirs libc"
 
-subdirs="$subdirs libm"
+if test "${libm_machine_dir}" = "nds32"; then
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for nds32 FPU SP extension" >&5
+$as_echo_n "checking for nds32 FPU SP extension... " >&6; }
+if ${newlib_cv_nds32_fpu_sp+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#if (__NDS32_EXT_FPU_SP__)
+# error "Has nds32 FPU SP extension support"
+#endif
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_cpp "$LINENO"; then :
+  newlib_cv_nds32_fpu_sp="no"
+else
+  newlib_cv_nds32_fpu_sp="yes"
+fi
+rm -f conftest.err conftest.i conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $newlib_cv_nds32_fpu_sp" >&5
+$as_echo "$newlib_cv_nds32_fpu_sp" >&6; }
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for nds32 FPU DP extension" >&5
+$as_echo_n "checking for nds32 FPU DP extension... " >&6; }
+if ${newlib_cv_nds32_fpu_dp+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#if (__NDS32_EXT_FPU_DP__)
+# error "Has nds32 FPU DP extension support"
+#endif
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_cpp "$LINENO"; then :
+  newlib_cv_nds32_fpu_dp="no"
+else
+  newlib_cv_nds32_fpu_dp="yes"
+fi
+rm -f conftest.err conftest.i conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $newlib_cv_nds32_fpu_dp" >&5
+$as_echo "$newlib_cv_nds32_fpu_dp" >&6; }
+fi
+
+ if test "$newlib_cv_nds32_fpu_sp" = "yes"; then
+  HAS_NDS32_FPU_SP_TRUE=
+  HAS_NDS32_FPU_SP_FALSE='#'
+else
+  HAS_NDS32_FPU_SP_TRUE='#'
+  HAS_NDS32_FPU_SP_FALSE=
+fi
+
+ if test "$newlib_cv_nds32_fpu_dp" = "yes"; then
+  HAS_NDS32_FPU_DP_TRUE=
+  HAS_NDS32_FPU_DP_FALSE='#'
+else
+  HAS_NDS32_FPU_DP_TRUE='#'
+  HAS_NDS32_FPU_DP_FALSE=
+fi
+
+
+
+LIBM_MACHINE_LIB=
+if test -n "${libm_machine_dir}"; then
+  case ${libm_machine_dir} in
+    aarch64) ac_config_files="$ac_config_files libm/machine/aarch64/Makefile"
+ ;;
+    arm) ac_config_files="$ac_config_files libm/machine/arm/Makefile"
+ ;;
+    i386) ac_config_files="$ac_config_files libm/machine/i386/Makefile"
+ ;;
+    nds32) ac_config_files="$ac_config_files libm/machine/nds32/Makefile"
+ ;;
+    pru) ac_config_files="$ac_config_files libm/machine/pru/Makefile"
+ ;;
+    spu) ac_config_files="$ac_config_files libm/machine/spu/Makefile"
+ ;;
+    riscv) ac_config_files="$ac_config_files libm/machine/riscv/Makefile"
+ ;;
+    x86_64) ac_config_files="$ac_config_files libm/machine/x86_64/Makefile"
+ ;;
+    powerpc) ac_config_files="$ac_config_files libm/machine/powerpc/Makefile"
+ ;;
+    sparc) ac_config_files="$ac_config_files libm/machine/sparc/Makefile"
+ ;;
+    mips) ac_config_files="$ac_config_files libm/machine/mips/Makefile"
+ ;;
+    *) as_fn_error $? "unsupported libm_machine_dir \"${libm_machine_dir}\"" "$LINENO" 5 ;;
+  esac
+
+  LIBM_MACHINE_DIR=machine/${libm_machine_dir}
+  if test "${use_libtool}" = "yes"; then
+    LIBM_MACHINE_LIB=${LIBM_MACHINE_DIR}/lib${libm_machine_dir}.${aext}
+  else
+    LIBM_MACHINE_LIB=${LIBM_MACHINE_DIR}/lib.${aext}
+  fi
+fi
+ if test "x${LIBM_MACHINE_DIR}" != x; then
+  HAVE_LIBM_MACHINE_DIR_TRUE=
+  HAVE_LIBM_MACHINE_DIR_FALSE='#'
+else
+  HAVE_LIBM_MACHINE_DIR_TRUE='#'
+  HAVE_LIBM_MACHINE_DIR_FALSE=
+fi
+
+
+
+
+ac_config_files="$ac_config_files libm/Makefile libm/math/Makefile libm/mathfp/Makefile libm/common/Makefile libm/complex/Makefile libm/fenv/Makefile"
+
 
 
 if test -z "${with_multisubdir}"; then
@@ -5858,6 +5991,18 @@ if test -z "${NEWLIB_HW_FP_TRUE}" && test -z "${NEWLIB_HW_FP_FALSE}"; then
   as_fn_error $? "conditional \"NEWLIB_HW_FP\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${HAS_NDS32_FPU_SP_TRUE}" && test -z "${HAS_NDS32_FPU_SP_FALSE}"; then
+  as_fn_error $? "conditional \"HAS_NDS32_FPU_SP\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAS_NDS32_FPU_DP_TRUE}" && test -z "${HAS_NDS32_FPU_DP_FALSE}"; then
+  as_fn_error $? "conditional \"HAS_NDS32_FPU_DP\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBM_MACHINE_DIR_TRUE}" && test -z "${HAVE_LIBM_MACHINE_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBM_MACHINE_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${HAVE_DOC_TRUE}" && test -z "${HAVE_DOC_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_DOC\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -6482,6 +6627,23 @@ do
     "newlib.h") CONFIG_HEADERS="$CONFIG_HEADERS newlib.h:newlib.hin" ;;
     "_newlib_version.h") CONFIG_HEADERS="$CONFIG_HEADERS _newlib_version.h:_newlib_version.hin" ;;
     "default-1") CONFIG_COMMANDS="$CONFIG_COMMANDS default-1" ;;
+    "libm/machine/aarch64/Makefile") CONFIG_FILES="$CONFIG_FILES libm/machine/aarch64/Makefile" ;;
+    "libm/machine/arm/Makefile") CONFIG_FILES="$CONFIG_FILES libm/machine/arm/Makefile" ;;
+    "libm/machine/i386/Makefile") CONFIG_FILES="$CONFIG_FILES libm/machine/i386/Makefile" ;;
+    "libm/machine/nds32/Makefile") CONFIG_FILES="$CONFIG_FILES libm/machine/nds32/Makefile" ;;
+    "libm/machine/pru/Makefile") CONFIG_FILES="$CONFIG_FILES libm/machine/pru/Makefile" ;;
+    "libm/machine/spu/Makefile") CONFIG_FILES="$CONFIG_FILES libm/machine/spu/Makefile" ;;
+    "libm/machine/riscv/Makefile") CONFIG_FILES="$CONFIG_FILES libm/machine/riscv/Makefile" ;;
+    "libm/machine/x86_64/Makefile") CONFIG_FILES="$CONFIG_FILES libm/machine/x86_64/Makefile" ;;
+    "libm/machine/powerpc/Makefile") CONFIG_FILES="$CONFIG_FILES libm/machine/powerpc/Makefile" ;;
+    "libm/machine/sparc/Makefile") CONFIG_FILES="$CONFIG_FILES libm/machine/sparc/Makefile" ;;
+    "libm/machine/mips/Makefile") CONFIG_FILES="$CONFIG_FILES libm/machine/mips/Makefile" ;;
+    "libm/Makefile") CONFIG_FILES="$CONFIG_FILES libm/Makefile" ;;
+    "libm/math/Makefile") CONFIG_FILES="$CONFIG_FILES libm/math/Makefile" ;;
+    "libm/mathfp/Makefile") CONFIG_FILES="$CONFIG_FILES libm/mathfp/Makefile" ;;
+    "libm/common/Makefile") CONFIG_FILES="$CONFIG_FILES libm/common/Makefile" ;;
+    "libm/complex/Makefile") CONFIG_FILES="$CONFIG_FILES libm/complex/Makefile" ;;
+    "libm/fenv/Makefile") CONFIG_FILES="$CONFIG_FILES libm/fenv/Makefile" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
