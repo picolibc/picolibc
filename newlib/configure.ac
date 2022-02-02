@@ -656,7 +656,6 @@ else
   libc_cv_initfinit_array=no
 fi
 rm -f conftest*])
-AC_SUBST(libc_cv_initfinit_array)
 if test $libc_cv_initfinit_array = yes; then
   AC_DEFINE(_HAVE_INITFINI_ARRAY, 1, [Define if the linker supports .preinit_array/.init_array/.fini_array sections.])
 fi
@@ -678,7 +677,6 @@ rm -f conftest*])
 if test $libc_cv_cc_loop_to_function = yes; then
   AC_DEFINE(_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL, 1, [Define if compiler supports -fno-tree-loop-distribute-patterns.])
 fi
-AC_SUBST(libc_cv_cc_loop_to_function)
 
 AC_TYPE_LONG_DOUBLE
 dnl Export the setting for our installed headers to check.
