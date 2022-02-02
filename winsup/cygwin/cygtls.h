@@ -152,33 +152,22 @@ typedef struct struct_waitq
   HANDLE thread_ev;
 } waitq;
 
-/* Changes to the below structure may require acompanying changes to the very
-   simple parser in the perl script 'gentls_offsets' (<<-- start parsing here).
-   The union in this structure is used to force alignment between the version
-   of the compiler used to generate tlsoffsets.h and the cygwin cross compiler.
-*/
-
-/*gentls_offsets*/
+/* Changes to the below structure may require acompanying changes to the
+   gawk parser in the shell script 'gentls_offsets' */
 
 extern "C" int __sjfault (jmp_buf);
 extern "C" int __ljfault (jmp_buf, int);
-
-/*gentls_offsets*/
 
 typedef uintptr_t __tlsstack_t;
 
 class _cygtls
 {
-public:
-  /* Keep these two declarations first, keep local_clib first. */
-  union
-  {
-    struct _reent local_clib;
-    char __dontuse[8 * ((sizeof(struct _reent) + 4) / 8)];
-  };
+public: /* Do NOT remove this public: line, it's a marker for gentls_offsets. */
+  /* offsetoff (class _cygtls, local_clib) *must* be 0. */
+  struct _reent local_clib;
   struct _local_storage locals;
   /**/
-  void (*func) /*gentls_offsets*/(int, siginfo_t *, void *)/*gentls_offsets*/;
+  void (*func) (int, siginfo_t *, void *);
   int saved_errno;
   int sa_flags;
   sigset_t oldmask;
@@ -209,7 +198,7 @@ public:
   __tlsstack_t stack[TLS_STACK_SIZE];
   unsigned initialized;
 
-  /*gentls_offsets*/
+public: /* Do NOT remove this public: line, it's a marker for gentls_offsets. */
   void init_thread (void *, DWORD (*) (void *, void *));
   static void call (DWORD (*) (void *, void *), void *);
   void remove (DWORD);
@@ -276,11 +265,8 @@ public:
 private:
   void __reg3 call2 (DWORD (*) (void *, void *), void *, void *);
   void remove_pending_sigs ();
-  /*gentls_offsets*/
 };
 #pragma pack(pop)
-
-/*gentls_offsets*/
 
 #include "cygerrno.h"
 #include "ntdll.h"

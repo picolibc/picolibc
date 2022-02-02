@@ -14,15 +14,12 @@ sub cleanup(@);
 
 my $cpu;
 my $output_def;
-my $tls_offsets;
-GetOptions('cpu=s'=>\$cpu, 'output-def=s'=>\$output_def, 'tlsoffsets=s'=>\$tls_offsets);
+GetOptions('cpu=s'=>\$cpu, 'output-def=s'=>\$output_def);
 
 $main::first = 0;
-if (!defined($cpu) || !defined($output_def) || !defined($tls_offsets)) {
+if (!defined($cpu) || !defined($output_def)) {
     die "$0: missing required option\n";
 }
-
-require $tls_offsets;
 
 my $is64bit = $cpu eq 'x86_64';
 my $sym_prefix = $is64bit ? '' : '_';
@@ -125,16 +122,17 @@ EOF
     if (!$main::first++) {
 	if ($is64bit) {
 	  $res = <<EOF . longjmp () . $res;
+	.include "tlsoffsets"
 	.text
 
 	.seh_proc _sigfe_maybe
 _sigfe_maybe:					# stack is aligned on entry!
 	.seh_endprologue
 	movq	%gs:8,%r10			# location of bottom of stack
-	leaq	$tls::initialized(%r10),%r11	# where we will be looking
+	leaq	_cygtls.initialized(%r10),%r11	# where we will be looking
 	cmpq	%r11,%rsp			# stack loc > than tls
 	jge	0f				# yep.  we don't have a tls.
-	movl	$tls::initialized(%r10),%r11d
+	movl	_cygtls.initialized(%r10),%r11d
 	cmpl	\$0xc763173f,%r11d		# initialized?
 	je	1f
 0:	ret
@@ -145,19 +143,19 @@ _sigfe:						# stack is aligned on entry!
 	.seh_endprologue
 	movq	%gs:8,%r10			# location of bottom of stack
 1:	movl	\$1,%r11d			# potential lock value
-	xchgl	%r11d,$tls::stacklock(%r10)	# see if we can grab it
-	movl	%r11d,$tls::spinning(%r10)	# flag if we are waiting for lock
+	xchgl	%r11d,_cygtls.stacklock(%r10)	# see if we can grab it
+	movl	%r11d,_cygtls.spinning(%r10)	# flag if we are waiting for lock
 	testl	%r11d,%r11d			# it will be zero
 	jz	2f				#  if so
 	pause
 	jmp	1b				# loop
 2:	movq	\$8,%rax			# have the lock, now increment the
-	xaddq	%rax,$tls::stackptr(%r10)	#  stack pointer and get pointer
+	xaddq	%rax,_cygtls.stackptr(%r10)	#  stack pointer and get pointer
 	leaq	_sigbe(%rip),%r11		# new place to return to
 	xchgq	%r11,8(%rsp)			# exchange with real return value
 	movq	%r11,(%rax)			# store real return value on alt stack
-	incl	$tls::incyg(%r10)
-	decl	$tls::stacklock(%r10)		# remove lock
+	incl	_cygtls.incyg(%r10)
+	decl	_cygtls.stacklock(%r10)		# remove lock
 	popq	%rax				# pop real function address from stack
 	jmp	*%rax				# and jmp to it
 	.seh_endproc
@@ -169,17 +167,17 @@ _sigbe:						# return here after cygwin syscall
 	.seh_endprologue
 	movq	%gs:8,%r10			# address of bottom of tls
 1:	movl	\$1,%r11d			# potential lock value
-	xchgl	%r11d,$tls::stacklock(%r10)	# see if we can grab it
-	movl	%r11d,$tls::spinning(%r10)	# flag if we are waiting for lock
+	xchgl	%r11d,_cygtls.stacklock(%r10)	# see if we can grab it
+	movl	%r11d,_cygtls.spinning(%r10)	# flag if we are waiting for lock
 	testl	%r11d,%r11d			# it will be zero
 	jz	2f				#  if so
 	pause
 	jmp	1b				#  and loop
 2:	movq	\$-8,%r11			# now decrement aux stack
-	xaddq	%r11,$tls::stackptr(%r10)	#  and get pointer
+	xaddq	%r11,_cygtls.stackptr(%r10)	#  and get pointer
 	movq	-8(%r11),%r11			# get return address from signal stack
-	decl	$tls::incyg(%r10)
-	decl	$tls::stacklock(%r10)		# release lock
+	decl	_cygtls.incyg(%r10)
+	decl	_cygtls.stacklock(%r10)		# release lock
 	jmp	*%r11				# "return" to caller
 	.seh_endproc
 
@@ -248,29 +246,29 @@ sigdelayed:
 	.seh_endprologue
 
 	movq	%gs:8,%r12			# get tls
-	movl	$tls::saved_errno(%r12),%r15d	# temporarily save saved_errno
-	movq	\$$tls::start_offset,%rcx	# point to beginning of tls block
+	movl	_cygtls.saved_errno(%r12),%r15d	# temporarily save saved_errno
+	movq	\$_cygtls.start_offset,%rcx	# point to beginning of tls block
 	addq	%r12,%rcx			#  and store as first arg to method
 	call	_ZN7_cygtls19call_signal_handlerEv	# call handler
 
 1:	movl	\$1,%r11d			# potential lock value
-	xchgl	%r11d,$tls::stacklock(%r12)	# see if we can grab it
-	movl	%r11d,$tls::spinning(%r12)	# flag if we are waiting for lock
+	xchgl	%r11d,_cygtls.stacklock(%r12)	# see if we can grab it
+	movl	%r11d,_cygtls.spinning(%r12)	# flag if we are waiting for lock
 	testl	%r11d,%r11d			# it will be zero
 	jz	2f				#  if so
 	pause
 	jmp	1b				#  and loop
 2:	testl	%r15d,%r15d			# was saved_errno < 0
 	jl	3f				# yup.  ignore it
-	movq	$tls::errno_addr(%r12),%r11
+	movq	_cygtls.errno_addr(%r12),%r11
 	movl	%r15d,(%r11)
 3:	movq	\$-8,%r11			# now decrement aux stack
-	xaddq	%r11,$tls::stackptr(%r12)	#  and get pointer
+	xaddq	%r11,_cygtls.stackptr(%r12)	#  and get pointer
 	xorq	%r10,%r10
 	xchgq	%r10,-8(%r11)			# get return address from signal stack
 	xorl	%r11d,%r11d
-	movl	%r11d,$tls::incyg(%r12)
-	movl	%r11d,$tls::stacklock(%r12)	# unlock
+	movl	%r11d,_cygtls.incyg(%r12)
+	movl	%r11d,_cygtls.stacklock(%r12)	# unlock
 	movdqa	0x20(%rsp),%xmm0
 	movdqa	0x30(%rsp),%xmm1
 	movdqa	0x40(%rsp),%xmm2
@@ -320,7 +318,7 @@ _sigdelayed_end:
 _ZN7_cygtls3popEv:
 	.seh_endprologue
 	movq	\$-8,%r11
-	xaddq	%r11,$tls::pstackptr(%rcx)
+	xaddq	%r11,_cygtls.pstackptr(%rcx)
 	movq	-8(%r11),%rax
 	ret
 	.seh_endproc
@@ -334,7 +332,7 @@ _ZN7_cygtls4lockEv:
 	.seh_endprologue
 	movq	%rcx,%r12
 1:	movl	\$1,%r11d
-	xchgl	%r11d,$tls::pstacklock(%r12)
+	xchgl	%r11d,_cygtls.pstacklock(%r12)
 	testl   %r11d,%r11d
 	jz	2f
 	pause
@@ -348,7 +346,7 @@ _ZN7_cygtls4lockEv:
 	.seh_proc _ZN7_cygtls6unlockEv
 _ZN7_cygtls6unlockEv:
 	.seh_endprologue
-	decl	$tls::pstacklock(%rcx)
+	decl	_cygtls.pstacklock(%rcx)
 	ret
 	.seh_endproc
 
@@ -357,7 +355,7 @@ _ZN7_cygtls6unlockEv:
 	.seh_proc _ZN7_cygtls6lockedEv
 _ZN7_cygtls6lockedEv:
 	.seh_endprologue
-	movl	$tls::pstacklock(%rcx),%eax
+	movl	_cygtls.pstacklock(%rcx),%eax
 	ret
 	.seh_endproc
 
@@ -370,21 +368,21 @@ stabilize_sig_stack:
 	.seh_endprologue
 	movq	%gs:8,%r12
 1:	movl	\$1,%r10d
-	xchgl	%r10d,$tls::stacklock(%r12)
-	movl	%r10d,$tls::spinning(%r12)	# flag if we are waiting for lock
+	xchgl	%r10d,_cygtls.stacklock(%r12)
+	movl	%r10d,_cygtls.spinning(%r12)	# flag if we are waiting for lock
 	testl	%r10d,%r10d
 	jz	2f
 	pause
 	jmp	1b
-2:	incl	$tls::incyg(%r12)
-	cmpl	\$0,$tls::sig(%r12)
+2:	incl	_cygtls.incyg(%r12)
+	cmpl	\$0,_cygtls.sig(%r12)
 	jz	3f
-	decl	$tls::stacklock(%r12)		# unlock
-	movq	\$$tls::start_offset,%rcx	# point to beginning
+	decl	_cygtls.stacklock(%r12)		# unlock
+	movq	\$_cygtls.start_offset,%rcx	# point to beginning
 	addq	%r12,%rcx			#  of tls block
 	call	_ZN7_cygtls19call_signal_handlerEv
 	jmp	1b
-3:	decl	$tls::incyg(%r12)
+3:	decl	_cygtls.incyg(%r12)
 	addq	\$0x20,%rsp
 	movq	%r12,%r11			# return tls addr in r11
 	popq	%r12
@@ -399,11 +397,11 @@ __sigfe_maybe:
 	pushl	%ebx
 	pushl	%edx
 	movl	%fs:4,%ebx			# location of bottom of stack
-	addl	\$$tls::initialized,%ebx	# where we will be looking
+	addl	\$_cygtls.initialized,%ebx	# where we will be looking
 	cmpl	%ebx,%esp			# stack loc > than tls
 	jge	0f				# yep.  we don't have a tls.
-	subl	\$$tls::initialized,%ebx	# where we will be looking
-	movl	$tls::initialized(%ebx),%eax
+	subl	\$_cygtls.initialized,%ebx	# where we will be looking
+	movl	_cygtls.initialized(%ebx),%eax
 	cmpl	\$0xc763173f,%eax		# initialized?
 	je	1f
 0:	popl	%edx
@@ -415,19 +413,19 @@ __sigfe:
 	pushl	%edx
 	movl	%fs:4,%ebx			# location of bottom of stack
 1:	movl	\$1,%eax			# potential lock value
-	xchgl	%eax,$tls::stacklock(%ebx)	# see if we can grab it
-	movl	%eax,$tls::spinning(%ebx)	# flag if we are waiting for lock
+	xchgl	%eax,_cygtls.stacklock(%ebx)	# see if we can grab it
+	movl	%eax,_cygtls.spinning(%ebx)	# flag if we are waiting for lock
 	testl	%eax,%eax			# it will be zero
 	jz	2f				#  if so
 	call	_yield				# should be a short-time thing, so
 	jmp	1b				# sleep and loop
 2:	movl	\$4,%eax			# have the lock, now increment the
-	xadd	%eax,$tls::stackptr(%ebx)	#  stack pointer and get pointer
+	xadd	%eax,_cygtls.stackptr(%ebx)	#  stack pointer and get pointer
 	leal	__sigbe,%edx			# new place to return to
 	xchgl	%edx,12(%esp)			# exchange with real return value
 	movl	%edx,(%eax)			# store real return value on alt stack
-	incl	$tls::incyg(%ebx)
-	decl	$tls::stacklock(%ebx)		# remove lock
+	incl	_cygtls.incyg(%ebx)
+	decl	_cygtls.stacklock(%ebx)		# remove lock
 	popl	%edx				# restore saved value
 	popl	%ebx
 	ret
@@ -438,18 +436,18 @@ __sigbe:					# return here after cygwin syscall
 	pushl	%ebx				# tls pointer
 1:	movl	%fs:4,%ebx			# address of bottom of tls
 	movl	\$1,%eax			# potential lock value
-	xchgl	%eax,$tls::stacklock(%ebx)	# see if we can grab it
-	movl	%eax,$tls::spinning(%ebx)	# flag if we are waiting for lock
+	xchgl	%eax,_cygtls.stacklock(%ebx)	# see if we can grab it
+	movl	%eax,_cygtls.spinning(%ebx)	# flag if we are waiting for lock
 	testl	%eax,%eax			# it will be zero
 	jz	2f				#  if so
 	call	_yield				# sleep
 	jmp	1b				#  and loop
 2:	movl	\$-4,%eax			# now decrement aux stack
-	xadd	%eax,$tls::stackptr(%ebx)	#  and get pointer
+	xadd	%eax,_cygtls.stackptr(%ebx)	#  and get pointer
 	movl	-4(%eax),%eax			# get return address from signal stack
 	xchgl	%eax,4(%esp)			# swap return address with saved eax
-	decl	$tls::incyg(%ebx)
-	decl	$tls::stacklock(%ebx)		# release lock
+	decl	_cygtls.incyg(%ebx)
+	decl	_cygtls.stacklock(%ebx)		# release lock
 	popl	%ebx
 	ret
 
@@ -477,16 +475,16 @@ _sigdelayed:
 	movdqu	%xmm1,0x10(%esp)
 	movdqu	%xmm0,(%esp)
 	movl	%fs:4,%ebx				# get tls
-	pushl   $tls::saved_errno(%ebx) # saved errno
+	pushl   _cygtls.saved_errno(%ebx) # saved errno
 
-	movl	\$$tls::start_offset,%eax		# point to beginning
+	movl	\$_cygtls.start_offset,%eax		# point to beginning
 	addl	%ebx,%eax				#  of tls block
 	call	__ZN7_cygtls19call_signal_handlerEv\@4	# call handler
 
 	movl	%fs:4,%ebx				# reget tls
 1:	movl	\$1,%eax				# potential lock value
-	xchgl	%eax,$tls::stacklock(%ebx)		# see if we can grab it
-	movl	%eax,$tls::spinning(%ebx)		# flag if we are waiting for lock
+	xchgl	%eax,_cygtls.stacklock(%ebx)		# see if we can grab it
+	movl	%eax,_cygtls.spinning(%ebx)		# flag if we are waiting for lock
 	testl	%eax,%eax				# it will be zero
 	jz	2f					#  if so
 	call	_yield					# sleep
@@ -494,16 +492,16 @@ _sigdelayed:
 2:	popl	%edx					# saved errno
 	testl	%edx,%edx				# Is it < 0
 	jl	3f					# yup.  ignore it
-	movl	$tls::errno_addr(%ebx),%eax
+	movl	_cygtls.errno_addr(%ebx),%eax
 	movl	%edx,(%eax)
 3:	movl	\$-4,%eax				# now decrement aux stack
-	xadd	%eax,$tls::stackptr(%ebx)		#  and get pointer
+	xadd	%eax,_cygtls.stackptr(%ebx)		#  and get pointer
 	xorl	%ebp,%ebp
 	xchgl	%ebp,-4(%eax)				# get return address from signal stack
 	xchgl	%ebp,0xa0(%esp)				# store real return address
 leave:	xorl	%eax,%eax
-	movl	%eax,$tls::incyg(%ebx)
-	movl	%eax,$tls::stacklock(%ebx)		# unlock
+	movl	%eax,_cygtls.incyg(%ebx)
+	movl	%eax,_cygtls.stacklock(%ebx)		# unlock
 
 	movdqu	(%esp),%xmm0
 	movdqu	0x10(%esp),%xmm1
@@ -530,7 +528,7 @@ __ZN7_cygtls3popEv\@4:
 1:	pushl	%ebx
 	movl	%eax,%ebx			# this
 	movl	\$-4,%eax
-	xadd	%eax,$tls::pstackptr(%ebx)
+	xadd	%eax,_cygtls.pstackptr(%ebx)
 	movl	-4(%eax),%eax
 	popl	%ebx
 	ret
@@ -541,7 +539,7 @@ __ZN7_cygtls4lockEv\@4:
 	pushl	%ebx
 	movl	%eax,%ebx
 1:	movl	\$1,%eax
-	xchgl	%eax,$tls::pstacklock(%ebx)
+	xchgl	%eax,_cygtls.pstacklock(%ebx)
 	testl	%eax,%eax
 	jz	2f
 	call	_yield
@@ -552,33 +550,33 @@ __ZN7_cygtls4lockEv\@4:
 # _cygtls::unlock
 	.global	__ZN7_cygtls6unlockEv\@4
 __ZN7_cygtls6unlockEv\@4:
-	decl	$tls::pstacklock(%eax)
+	decl	_cygtls.pstacklock(%eax)
 	ret
 
 	.global	__ZN7_cygtls6lockedEv
 __ZN7_cygtls6lockedEv:
-	movl	$tls::pstacklock(%eax),%eax
+	movl	_cygtls.pstacklock(%eax),%eax
 	ret
 
 	.extern	__ZN7_cygtls19call_signal_handlerEv\@4
 stabilize_sig_stack:
 	movl	%fs:4,%ebx
 1:	movl	\$1,%eax
-	xchgl	%eax,$tls::stacklock(%ebx)
-	movl	%eax,$tls::spinning(%ebx)		# flag if we are waiting for lock
+	xchgl	%eax,_cygtls.stacklock(%ebx)
+	movl	%eax,_cygtls.spinning(%ebx)		# flag if we are waiting for lock
 	testl	%eax,%eax
 	jz	2f
 	call	_yield
 	jmp	1b
-2:	incl	$tls::incyg(%ebx)
-	cmpl	\$0,$tls::sig(%ebx)
+2:	incl	_cygtls.incyg(%ebx)
+	cmpl	\$0,_cygtls.sig(%ebx)
 	jz	3f
-	decl	$tls::stacklock(%ebx)			# unlock
-	movl	\$$tls::start_offset,%eax		# point to beginning
+	decl	_cygtls.stacklock(%ebx)			# unlock
+	movl	\$_cygtls.start_offset,%eax		# point to beginning
 	addl	%ebx,%eax				#  of tls block
 	call	__ZN7_cygtls19call_signal_handlerEv\@4
 	jmp	1b
-3:	decl	$tls::incyg(%ebx)
+3:	decl	_cygtls.incyg(%ebx)
 	ret
 EOF
 	}
@@ -644,9 +642,9 @@ setjmp:
 	.seh_pushreg %rcx
 	call	stabilize_sig_stack		# returns tls in r11
 	popq	%rcx
-	movq	$tls::stackptr(%r11),%r10
+	movq	_cygtls.stackptr(%r11),%r10
 	movq	%r10,(%rcx)
-	decl	$tls::stacklock(%r11)
+	decl	_cygtls.stacklock(%r11)
 	xorl	%eax,%eax
 	ret
 	.seh_endproc
@@ -682,10 +680,10 @@ longjmp:
 	popq	%rcx
 	movl	%r12d,%eax			# restore return value
 	movq	(%rcx),%r10			# get old signal stack
-	movq	%r10,$tls::stackptr(%r11)	# restore
-	decl	$tls::stacklock(%r11)		# relinquish lock
+	movq	%r10,_cygtls.stackptr(%r11)	# restore
+	decl	_cygtls.stacklock(%r11)		# relinquish lock
 	xorl	%r10d,%r10d
-	movl	%r10d,$tls::incyg(%r11)		# we're not in cygwin anymore
+	movl	%r10d,_cygtls.incyg(%r11)		# we're not in cygwin anymore
 	movq	0x8(%rcx),%rbx
 	movq	0x10(%rcx),%rsp
 	movq	0x18(%rcx),%rbp
@@ -774,8 +772,8 @@ _setjmp:
 	fnstcw  48(%edi)
 	pushl	%ebx
 	call	stabilize_sig_stack
-	movl	$tls::stackptr(%ebx),%eax	# save stack pointer contents
-	decl	$tls::stacklock(%ebx)
+	movl	_cygtls.stackptr(%ebx),%eax	# save stack pointer contents
+	decl	_cygtls.stacklock(%ebx)
 	popl	%ebx
 	movl	%eax,52(%edi)
 	popl	%edi
@@ -879,10 +877,10 @@ _longjmp:
 1:
 	call	stabilize_sig_stack
 	movl	52(%edi),%eax			# get old signal stack
-	movl	%eax,$tls::stackptr(%ebx)	# restore
-	decl	$tls::stacklock(%ebx)		# relinquish lock
+	movl	%eax,_cygtls.stackptr(%ebx)	# restore
+	decl	_cygtls.stacklock(%ebx)		# relinquish lock
 	xorl	%eax,%eax
-	movl	%eax,$tls::incyg(%ebx)		# we're not in cygwin anymore
+	movl	%eax,_cygtls.incyg(%ebx)		# we're not in cygwin anymore
 
 	movl	12(%ebp),%eax
 	testl	%eax,%eax

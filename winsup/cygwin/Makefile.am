@@ -45,7 +45,6 @@ DBG_DLL_NAME=cygwin1.dbg
 NEW_DLL_NAME=new-cygwin1.dll
 DIN_FILE=@DIN_FILE@
 DEF_FILE=cygwin.def
-TLSOFFSETS_H=@TLSOFFSETS_H@
 LIB_NAME=libcygwin.a
 TEST_LIB_NAME=libcygwin0.a
 
@@ -386,8 +385,8 @@ localtime.patched.c: tzcode/localtime.c tzcode/localtime.c.patch
 $(srcdir)/devices.cc: gendevices devices.in devices.h
 	$(wordlist 1,2,$^) $@
 
-$(srcdir)/$(TLSOFFSETS_H): gentls_offsets cygtls.h
-	$^ $@ $(target_cpu) $(CC) $(AM_CFLAGS) -c || rm $@
+tlsoffsets: gentls_offsets cygtls.h
+	$(AM_V_GEN)CXXCOMPILE="$(CXXCOMPILE)" $^ $@
 
 BUILT_SOURCES = \
 	child_info_magic.h \
@@ -609,10 +608,10 @@ $(NEW_DLL_NAME): $(PRE_DLL_NAME) $(DBG_DLL_NAME)
 # cygwin import library
 toolopts=--cpu=@target_cpu@ --ar=@AR@ --as=@AS@ --nm=@NM@ --objcopy=@OBJCOPY@
 
-$(DEF_FILE): gendef $(srcdir)/$(TLSOFFSETS_H) $(DIN_FILE) common.din
-	$(AM_V_GEN)$(srcdir)/gendef --cpu=@target_cpu@ --output-def=$(DEF_FILE) --tlsoffsets=$(srcdir)/$(TLSOFFSETS_H) $(srcdir)/$(DIN_FILE) $(srcdir)/common.din
+$(DEF_FILE): gendef $(DIN_FILE) common.din
+	$(AM_V_GEN)$(srcdir)/gendef --cpu=@target_cpu@ --output-def=$(DEF_FILE) $(srcdir)/$(DIN_FILE) $(srcdir)/common.din
 
-sigfe.s: $(DEF_FILE)
+sigfe.s: $(DEF_FILE) tlsoffsets
 	@[ -s $@ ] || \
 	{ rm -f $(DEF_FILE); $(MAKE) -s -j1 $(DEF_FILE); }; \
 	[ -s $@ ] && touch $@
@@ -680,9 +679,10 @@ clean-local:
 	-rm -f $(PRE_DLL_NAME) $(DBG_DLL_NAME) $(NEW_DLL_NAME)
 	-rm -f $(LIB_NAME) $(TEST_LIB_NAME) $(SUBLIBS)
 	-rm -f version.cc
+	-rm -f tlsoffsets
 
 maintainer-clean-local:
-	-rm -f $(srcdir)/$(TLSOFFSETS_H) $(srcdir)/devices.cc
+	-rm -f $(srcdir)/devices.cc
 
 #
 # install
