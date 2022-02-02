@@ -65,7 +65,7 @@ sub align {
 
 sub xit($@) {
     my $execit = shift;
-    print "+ @_\n";
+    #print "+ @_\n";
     if ($execit) {
 	exec @_ or die "$0: couldn't exec $_[0] - $!\n";
     } else {
