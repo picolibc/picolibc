@@ -231,10 +231,7 @@ dnl if test "${config_testsuite}" = "true";
 dnl   then AC_CONFIG_SUBDIRS([testsuite])
 dnl fi
 
-if test "${config_libnosys}" = "true"; then
-  AC_CONFIG_FILES([libnosys/Makefile])
-  subdirs="$subdirs libnosys"
-fi
+AM_CONDITIONAL(CONFIG_LIBNOSYS, test x$config_libnosys = xtrue)
 
 LIB_AC_PROG_CC
 AS=${AS-as}

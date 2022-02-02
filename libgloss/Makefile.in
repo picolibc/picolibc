@@ -13,6 +13,8 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
+
+
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -88,7 +90,10 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
+check_PROGRAMS =
 @HAVE_DOC_TRUE@am__append_1 = doc/porting.texi
+@CONFIG_LIBNOSYS_TRUE@am__append_2 = libnosys/nosys.specs
+@CONFIG_LIBNOSYS_TRUE@am__append_3 = libnosys/libnosys.a
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../config/depstand.m4 \
@@ -113,8 +118,76 @@ CONFIG_CLEAN_FILES = arc/Makefile epiphany/Makefile m32r/Makefile \
 	v850/Makefile visium/Makefile xc16x/Makefile \
 	xstormy16/Makefile m32c/Makefile msp430/Makefile rl78/Makefile \
 	rx/Makefile spu/Makefile tic6x/Makefile iq2000/Makefile \
-	or1k/Makefile pru/Makefile nios2/Makefile libnosys/Makefile
+	or1k/Makefile pru/Makefile nios2/Makefile
 CONFIG_CLEAN_VPATH_FILES =
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = f=`echo $$p | sed -e 's|^.*/||'`;
+am__install_max = 40
+am__nobase_strip_setup = \
+  srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*|]/\\\\&/g'`
+am__nobase_strip = \
+  for p in $$list; do echo "$$p"; done | sed -e "s|$$srcdirstrip/||"
+am__nobase_list = $(am__nobase_strip_setup); \
+  for p in $$list; do echo "$$p $$p"; done | \
+  sed "s| $$srcdirstrip/| |;"' / .*\//!s/ .*/ ./; s,\( .*\)/[^/]*$$,\1,' | \
+  $(AWK) 'BEGIN { files["."] = "" } { files[$$2] = files[$$2] " " $$1; \
+    if (++n[$$2] == $(am__install_max)) \
+      { print $$2, files[$$2]; n[$$2] = 0; files[$$2] = "" } } \
+    END { for (dir in files) print dir, files[dir] }'
+am__base_list = \
+  sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+  sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+am__uninstall_files_from_dir = { \
+  test -z "$$files" \
+    || { test ! -d "$$dir" && test ! -f "$$dir" && test ! -r "$$dir"; } \
+    || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
+         $(am__cd) "$$dir" && rm -f $$files; }; \
+  }
+am__installdirs = "$(DESTDIR)$(multilibtooldir)" \
+	"$(DESTDIR)$(infodir)" "$(DESTDIR)$(multilibtooldir)"
+LIBRARIES = $(multilibtool_LIBRARIES) $(noinst_LIBRARIES)
+ARFLAGS = cru
+AM_V_AR = $(am__v_AR_@AM_V@)
+am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
+am__v_AR_0 = @echo "  AR      " $@;
+am__v_AR_1 = 
+libnosys_libnosys_a_AR = $(AR) $(ARFLAGS)
+libnosys_libnosys_a_LIBADD =
+am__dirstamp = $(am__leading_dot)dirstamp
+@CONFIG_LIBNOSYS_TRUE@am_libnosys_libnosys_a_OBJECTS =  \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/chown.$(OBJEXT) \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/close.$(OBJEXT) \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/environ.$(OBJEXT) \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/errno.$(OBJEXT) \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/execve.$(OBJEXT) \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/fork.$(OBJEXT) \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/fstat.$(OBJEXT) \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/getpid.$(OBJEXT) \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/gettod.$(OBJEXT) \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/isatty.$(OBJEXT) \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/kill.$(OBJEXT) \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/link.$(OBJEXT) \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/lseek.$(OBJEXT) \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/open.$(OBJEXT) \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/read.$(OBJEXT) \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/readlink.$(OBJEXT) \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/sbrk.$(OBJEXT) \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/stat.$(OBJEXT) \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/symlink.$(OBJEXT) \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/times.$(OBJEXT) \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/unlink.$(OBJEXT) \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/wait.$(OBJEXT) \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/write.$(OBJEXT) \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/_exit.$(OBJEXT)
+libnosys_libnosys_a_OBJECTS = $(am_libnosys_libnosys_a_OBJECTS)
+libobjs_a_AR = $(AR) $(ARFLAGS)
+libobjs_a_LIBADD =
+am_libobjs_a_OBJECTS =
+libobjs_a_OBJECTS = $(am_libobjs_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -127,7 +200,23 @@ AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
 am__v_at_1 = 
-SOURCES =
+DEFAULT_INCLUDES = -I.@am__isrc@
+depcomp = $(SHELL) $(top_srcdir)/../depcomp
+am__depfiles_maybe = depfiles
+am__mv = mv -f
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC      " $@;
+am__v_CC_1 = 
+CCLD = $(CC)
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD    " $@;
+am__v_CCLD_1 = 
+SOURCES = $(libnosys_libnosys_a_SOURCES) $(libobjs_a_SOURCES)
 AM_V_DVIPS = $(am__v_DVIPS_@AM_V@)
 am__v_DVIPS_ = $(am__v_DVIPS_@AM_DEFAULT_V@)
 am__v_DVIPS_0 = @echo "  DVIPS   " $@;
@@ -156,7 +245,6 @@ AM_V_texidevnull = $(am__v_texidevnull_@AM_V@)
 am__v_texidevnull_ = $(am__v_texidevnull_@AM_DEFAULT_V@)
 am__v_texidevnull_0 = > /dev/null
 am__v_texidevnull_1 = 
-am__dirstamp = $(am__leading_dot)dirstamp
 INFO_DEPS = $(srcdir)/doc/porting.info
 am__TEXINFO_TEX_DIR = $(srcdir)/../texinfo
 DVIS = doc/porting.dvi
@@ -182,34 +270,7 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-am__installdirs = "$(DESTDIR)$(infodir)"
-am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
-am__vpath_adj = case $$p in \
-    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-    *) f=$$p;; \
-  esac;
-am__strip_dir = f=`echo $$p | sed -e 's|^.*/||'`;
-am__install_max = 40
-am__nobase_strip_setup = \
-  srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*|]/\\\\&/g'`
-am__nobase_strip = \
-  for p in $$list; do echo "$$p"; done | sed -e "s|$$srcdirstrip/||"
-am__nobase_list = $(am__nobase_strip_setup); \
-  for p in $$list; do echo "$$p $$p"; done | \
-  sed "s| $$srcdirstrip/| |;"' / .*\//!s/ .*/ ./; s,\( .*\)/[^/]*$$,\1,' | \
-  $(AWK) 'BEGIN { files["."] = "" } { files[$$2] = files[$$2] " " $$1; \
-    if (++n[$$2] == $(am__install_max)) \
-      { print $$2, files[$$2]; n[$$2] = 0; files[$$2] = "" } } \
-    END { for (dir in files) print dir, files[dir] }'
-am__base_list = \
-  sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
-  sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
-am__uninstall_files_from_dir = { \
-  test -z "$$files" \
-    || { test ! -d "$$dir" && test ! -f "$$dir" && test ! -r "$$dir"; } \
-    || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
-         $(am__cd) "$$dir" && rm -f $$files; }; \
-  }
+DATA = $(multilibtool_DATA)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 am__recursive_targets = \
@@ -348,12 +409,18 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I . -I .. -I ../config
-
-# Variables that will accumulate in subdirs.
 info_TEXINFOS = $(am__append_1)
 PHONY = 
 SUBDIRS = @subdirs@ .
 tooldir = $(exec_prefix)/$(target_alias)
+multilibtooldir = $(tooldir)/lib$(MULTISUBDIR)
+multilibtool_DATA = $(am__append_2)
+multilibtool_LIBRARIES = $(am__append_3)
+
+# A fake library so automake will generate rules for plain objects that we want
+# to install (e.g. our crt0.o objects).
+noinst_LIBRARIES = libobjs.a
+libobjs_a_SOURCES = 
 FLAGS_TO_PASS = \
 	"CC=$(CC)" \
 	"CFLAGS=$(CFLAGS)" \
@@ -385,14 +452,40 @@ MULTISUBDIR =
 MULTIDO = true
 MULTICLEAN = true
 TEXINFO_TEX = ../texinfo/texinfo.tex
+@CONFIG_LIBNOSYS_TRUE@libnosys_libnosys_a_SOURCES = \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/chown.c \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/close.c \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/environ.c \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/errno.c \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/execve.c \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/fork.c \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/fstat.c \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/getpid.c \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/gettod.c \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/isatty.c \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/kill.c \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/link.c \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/lseek.c \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/open.c \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/read.c \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/readlink.c \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/sbrk.c \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/stat.c \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/symlink.c \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/times.c \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/unlink.c \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/wait.c \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/write.c \
+@CONFIG_LIBNOSYS_TRUE@	libnosys/_exit.c
+
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .dvi .ps
+.SUFFIXES: .c .dvi .o .obj .ps
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am $(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(am__configure_deps)
+$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am $(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -414,7 +507,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe);; \
 	esac;
-$(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(am__empty):
+$(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
@@ -511,8 +604,155 @@ pru/Makefile: $(top_builddir)/config.status $(top_srcdir)/pru/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 nios2/Makefile: $(top_builddir)/config.status $(top_srcdir)/nios2/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
-libnosys/Makefile: $(top_builddir)/config.status $(top_srcdir)/libnosys/Makefile.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
+install-multilibtoolLIBRARIES: $(multilibtool_LIBRARIES)
+	@$(NORMAL_INSTALL)
+	@list='$(multilibtool_LIBRARIES)'; test -n "$(multilibtooldir)" || list=; \
+	list2=; for p in $$list; do \
+	  if test -f $$p; then \
+	    list2="$$list2 $$p"; \
+	  else :; fi; \
+	done; \
+	test -z "$$list2" || { \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(multilibtooldir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(multilibtooldir)" || exit 1; \
+	  echo " $(INSTALL_DATA) $$list2 '$(DESTDIR)$(multilibtooldir)'"; \
+	  $(INSTALL_DATA) $$list2 "$(DESTDIR)$(multilibtooldir)" || exit $$?; }
+	@$(POST_INSTALL)
+	@list='$(multilibtool_LIBRARIES)'; test -n "$(multilibtooldir)" || list=; \
+	for p in $$list; do \
+	  if test -f $$p; then \
+	    $(am__strip_dir) \
+	    echo " ( cd '$(DESTDIR)$(multilibtooldir)' && $(RANLIB) $$f )"; \
+	    ( cd "$(DESTDIR)$(multilibtooldir)" && $(RANLIB) $$f ) || exit $$?; \
+	  else :; fi; \
+	done
+
+uninstall-multilibtoolLIBRARIES:
+	@$(NORMAL_UNINSTALL)
+	@list='$(multilibtool_LIBRARIES)'; test -n "$(multilibtooldir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(multilibtooldir)'; $(am__uninstall_files_from_dir)
+
+clean-multilibtoolLIBRARIES:
+	-test -z "$(multilibtool_LIBRARIES)" || rm -f $(multilibtool_LIBRARIES)
+
+clean-noinstLIBRARIES:
+	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
+libnosys/$(am__dirstamp):
+	@$(MKDIR_P) libnosys
+	@: > libnosys/$(am__dirstamp)
+libnosys/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) libnosys/$(DEPDIR)
+	@: > libnosys/$(DEPDIR)/$(am__dirstamp)
+libnosys/chown.$(OBJEXT): libnosys/$(am__dirstamp) \
+	libnosys/$(DEPDIR)/$(am__dirstamp)
+libnosys/close.$(OBJEXT): libnosys/$(am__dirstamp) \
+	libnosys/$(DEPDIR)/$(am__dirstamp)
+libnosys/environ.$(OBJEXT): libnosys/$(am__dirstamp) \
+	libnosys/$(DEPDIR)/$(am__dirstamp)
+libnosys/errno.$(OBJEXT): libnosys/$(am__dirstamp) \
+	libnosys/$(DEPDIR)/$(am__dirstamp)
+libnosys/execve.$(OBJEXT): libnosys/$(am__dirstamp) \
+	libnosys/$(DEPDIR)/$(am__dirstamp)
+libnosys/fork.$(OBJEXT): libnosys/$(am__dirstamp) \
+	libnosys/$(DEPDIR)/$(am__dirstamp)
+libnosys/fstat.$(OBJEXT): libnosys/$(am__dirstamp) \
+	libnosys/$(DEPDIR)/$(am__dirstamp)
+libnosys/getpid.$(OBJEXT): libnosys/$(am__dirstamp) \
+	libnosys/$(DEPDIR)/$(am__dirstamp)
+libnosys/gettod.$(OBJEXT): libnosys/$(am__dirstamp) \
+	libnosys/$(DEPDIR)/$(am__dirstamp)
+libnosys/isatty.$(OBJEXT): libnosys/$(am__dirstamp) \
+	libnosys/$(DEPDIR)/$(am__dirstamp)
+libnosys/kill.$(OBJEXT): libnosys/$(am__dirstamp) \
+	libnosys/$(DEPDIR)/$(am__dirstamp)
+libnosys/link.$(OBJEXT): libnosys/$(am__dirstamp) \
+	libnosys/$(DEPDIR)/$(am__dirstamp)
+libnosys/lseek.$(OBJEXT): libnosys/$(am__dirstamp) \
+	libnosys/$(DEPDIR)/$(am__dirstamp)
+libnosys/open.$(OBJEXT): libnosys/$(am__dirstamp) \
+	libnosys/$(DEPDIR)/$(am__dirstamp)
+libnosys/read.$(OBJEXT): libnosys/$(am__dirstamp) \
+	libnosys/$(DEPDIR)/$(am__dirstamp)
+libnosys/readlink.$(OBJEXT): libnosys/$(am__dirstamp) \
+	libnosys/$(DEPDIR)/$(am__dirstamp)
+libnosys/sbrk.$(OBJEXT): libnosys/$(am__dirstamp) \
+	libnosys/$(DEPDIR)/$(am__dirstamp)
+libnosys/stat.$(OBJEXT): libnosys/$(am__dirstamp) \
+	libnosys/$(DEPDIR)/$(am__dirstamp)
+libnosys/symlink.$(OBJEXT): libnosys/$(am__dirstamp) \
+	libnosys/$(DEPDIR)/$(am__dirstamp)
+libnosys/times.$(OBJEXT): libnosys/$(am__dirstamp) \
+	libnosys/$(DEPDIR)/$(am__dirstamp)
+libnosys/unlink.$(OBJEXT): libnosys/$(am__dirstamp) \
+	libnosys/$(DEPDIR)/$(am__dirstamp)
+libnosys/wait.$(OBJEXT): libnosys/$(am__dirstamp) \
+	libnosys/$(DEPDIR)/$(am__dirstamp)
+libnosys/write.$(OBJEXT): libnosys/$(am__dirstamp) \
+	libnosys/$(DEPDIR)/$(am__dirstamp)
+libnosys/_exit.$(OBJEXT): libnosys/$(am__dirstamp) \
+	libnosys/$(DEPDIR)/$(am__dirstamp)
+
+libnosys/libnosys.a: $(libnosys_libnosys_a_OBJECTS) $(libnosys_libnosys_a_DEPENDENCIES) $(EXTRA_libnosys_libnosys_a_DEPENDENCIES) libnosys/$(am__dirstamp)
+	$(AM_V_at)-rm -f libnosys/libnosys.a
+	$(AM_V_AR)$(libnosys_libnosys_a_AR) libnosys/libnosys.a $(libnosys_libnosys_a_OBJECTS) $(libnosys_libnosys_a_LIBADD)
+	$(AM_V_at)$(RANLIB) libnosys/libnosys.a
+
+libobjs.a: $(libobjs_a_OBJECTS) $(libobjs_a_DEPENDENCIES) $(EXTRA_libobjs_a_DEPENDENCIES) 
+	$(AM_V_at)-rm -f libobjs.a
+	$(AM_V_AR)$(libobjs_a_AR) libobjs.a $(libobjs_a_OBJECTS) $(libobjs_a_LIBADD)
+	$(AM_V_at)$(RANLIB) libobjs.a
+
+clean-checkPROGRAMS:
+	-test -z "$(check_PROGRAMS)" || rm -f $(check_PROGRAMS)
+
+mostlyclean-compile:
+	-rm -f *.$(OBJEXT)
+	-rm -f libnosys/*.$(OBJEXT)
+
+distclean-compile:
+	-rm -f *.tab.c
+
+@AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/_exit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/chown.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/close.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/environ.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/errno.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/execve.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/fork.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/fstat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/getpid.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/gettod.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/isatty.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/kill.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/link.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/lseek.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/open.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/read.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/readlink.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/sbrk.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/stat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/symlink.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/times.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/unlink.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/wait.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/write.Po@am__quote@
+
+.c.o:
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ $<
+
+.c.obj:
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 doc/$(am__dirstamp):
 	@$(MKDIR_P) doc
 	@: > doc/$(am__dirstamp)
@@ -653,6 +893,27 @@ maintainer-clean-aminfo:
 	  echo " rm -f $$i $$i-[0-9] $$i-[0-9][0-9] $$i_i[0-9] $$i_i[0-9][0-9]"; \
 	  rm -f $$i $$i-[0-9] $$i-[0-9][0-9] $$i_i[0-9] $$i_i[0-9][0-9]; \
 	done
+install-multilibtoolDATA: $(multilibtool_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(multilibtool_DATA)'; test -n "$(multilibtooldir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(multilibtooldir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(multilibtooldir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(multilibtooldir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(multilibtooldir)" || exit $$?; \
+	done
+
+uninstall-multilibtoolDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(multilibtool_DATA)'; test -n "$(multilibtooldir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(multilibtooldir)'; $(am__uninstall_files_from_dir)
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run 'make' without going through this Makefile.
@@ -760,11 +1021,12 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 	-rm -f cscope.out cscope.in.out cscope.po.out cscope.files
 check-am: all-am
+	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
 check: check-recursive
-all-am: Makefile $(INFO_DEPS) config.h all-local
+all-am: Makefile $(INFO_DEPS) $(LIBRARIES) $(DATA) config.h all-local
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(infodir)"; do \
+	for dir in "$(DESTDIR)$(multilibtooldir)" "$(DESTDIR)$(infodir)" "$(DESTDIR)$(multilibtooldir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -794,19 +1056,24 @@ distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
 	-rm -f doc/$(am__dirstamp)
+	-rm -f libnosys/$(DEPDIR)/$(am__dirstamp)
+	-rm -f libnosys/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-aminfo clean-generic clean-local mostlyclean-am
+clean-am: clean-aminfo clean-checkPROGRAMS clean-generic clean-local \
+	clean-multilibtoolLIBRARIES clean-noinstLIBRARIES \
+	mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
+	-rm -rf libnosys/$(DEPDIR)
 	-rm -f Makefile
-distclean-am: clean-am distclean-generic distclean-hdr distclean-local \
-	distclean-tags
+distclean-am: clean-am distclean-compile distclean-generic \
+	distclean-hdr distclean-local distclean-tags
 
 dvi: dvi-recursive
 
@@ -820,7 +1087,8 @@ info: info-recursive
 
 info-am: $(INFO_DEPS)
 
-install-data-am: install-info-am
+install-data-am: install-info-am install-multilibtoolDATA \
+	install-multilibtoolLIBRARIES
 
 install-dvi: install-dvi-recursive
 
@@ -942,14 +1210,15 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
+	-rm -rf libnosys/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-aminfo \
 	maintainer-clean-generic maintainer-clean-local
 
 mostlyclean: mostlyclean-recursive
 
-mostlyclean-am: mostlyclean-aminfo mostlyclean-generic \
-	mostlyclean-local
+mostlyclean-am: mostlyclean-aminfo mostlyclean-compile \
+	mostlyclean-generic mostlyclean-local
 
 pdf: pdf-recursive
 
@@ -960,27 +1229,32 @@ ps: ps-recursive
 ps-am: $(PSS)
 
 uninstall-am: uninstall-dvi-am uninstall-html-am uninstall-info-am \
+	uninstall-multilibtoolDATA uninstall-multilibtoolLIBRARIES \
 	uninstall-pdf-am uninstall-ps-am
 
-.MAKE: $(am__recursive_targets) all install-am install-strip
+.MAKE: $(am__recursive_targets) all check-am install-am install-strip
 
 .PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am all-local \
-	am--refresh check check-am clean clean-aminfo clean-cscope \
-	clean-generic clean-local cscope cscopelist-am ctags ctags-am \
-	dist-info distclean distclean-generic distclean-hdr \
+	am--refresh check check-am clean clean-aminfo \
+	clean-checkPROGRAMS clean-cscope clean-generic clean-local \
+	clean-multilibtoolLIBRARIES clean-noinstLIBRARIES cscope \
+	cscopelist-am ctags ctags-am dist-info distclean \
+	distclean-compile distclean-generic distclean-hdr \
 	distclean-local distclean-tags dvi dvi-am html html-am info \
 	info-am install install-am install-data install-data-am \
 	install-dvi install-dvi-am install-exec install-exec-am \
 	install-exec-local install-html install-html-am install-info \
-	install-info-am install-man install-pdf install-pdf-am \
+	install-info-am install-man install-multilibtoolDATA \
+	install-multilibtoolLIBRARIES install-pdf install-pdf-am \
 	install-ps install-ps-am install-strip installcheck \
 	installcheck-am installdirs installdirs-am maintainer-clean \
 	maintainer-clean-aminfo maintainer-clean-generic \
 	maintainer-clean-local mostlyclean mostlyclean-aminfo \
-	mostlyclean-generic mostlyclean-local pdf pdf-am ps ps-am tags \
-	tags-am uninstall uninstall-am uninstall-dvi-am \
-	uninstall-html-am uninstall-info-am uninstall-pdf-am \
-	uninstall-ps-am
+	mostlyclean-compile mostlyclean-generic mostlyclean-local pdf \
+	pdf-am ps ps-am tags tags-am uninstall uninstall-am \
+	uninstall-dvi-am uninstall-html-am uninstall-info-am \
+	uninstall-multilibtoolDATA uninstall-multilibtoolLIBRARIES \
+	uninstall-pdf-am uninstall-ps-am
 
 .PRECIOUS: Makefile
 

@@ -3,12 +3,22 @@
 ACLOCAL_AMFLAGS = -I . -I .. -I ../config
 
 # Variables that will accumulate in subdirs.
+check_PROGRAMS =
 info_TEXINFOS =
 PHONY =
 
 SUBDIRS = @subdirs@ .
 
 tooldir = $(exec_prefix)/$(target_alias)
+
+multilibtooldir = $(tooldir)/lib$(MULTISUBDIR)
+multilibtool_DATA =
+multilibtool_LIBRARIES =
+
+# A fake library so automake will generate rules for plain objects that we want
+# to install (e.g. our crt0.o objects).
+noinst_LIBRARIES = libobjs.a
+libobjs_a_SOURCES =
 
 ## These are roughly topologically sorted in order to make porting more
 ## streamlined.
@@ -42,4 +52,7 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 
 if HAVE_DOC
 include doc/Makefile.inc
+endif
+if CONFIG_LIBNOSYS
+include libnosys/Makefile.inc
 endif

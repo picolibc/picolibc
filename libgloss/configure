@@ -614,6 +614,8 @@ am__quote
 am__include
 DEPDIR
 CC
+CONFIG_LIBNOSYS_FALSE
+CONFIG_LIBNOSYS_TRUE
 subdirs
 HAVE_DOC_FALSE
 HAVE_DOC_TRUE
@@ -2899,11 +2901,14 @@ subdirs="$subdirs aarch64"
 esac
 
 
-if test "${config_libnosys}" = "true"; then
-  ac_config_files="$ac_config_files libnosys/Makefile"
-
-  subdirs="$subdirs libnosys"
+ if test x$config_libnosys = xtrue; then
+  CONFIG_LIBNOSYS_TRUE=
+  CONFIG_LIBNOSYS_FALSE='#'
+else
+  CONFIG_LIBNOSYS_TRUE='#'
+  CONFIG_LIBNOSYS_FALSE=
 fi
+
 
 DEPDIR="${am__leading_dot}deps"
 
@@ -5016,6 +5021,10 @@ if test -z "${HAVE_DOC_TRUE}" && test -z "${HAVE_DOC_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_DOC\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${CONFIG_LIBNOSYS_TRUE}" && test -z "${CONFIG_LIBNOSYS_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_LIBNOSYS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${AMDEP_TRUE}" && test -z "${AMDEP_FALSE}"; then
   as_fn_error $? "conditional \"AMDEP\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -5672,7 +5681,6 @@ do
     "or1k/Makefile") CONFIG_FILES="$CONFIG_FILES or1k/Makefile" ;;
     "pru/Makefile") CONFIG_FILES="$CONFIG_FILES pru/Makefile" ;;
     "nios2/Makefile") CONFIG_FILES="$CONFIG_FILES nios2/Makefile" ;;
-    "libnosys/Makefile") CONFIG_FILES="$CONFIG_FILES libnosys/Makefile" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "default-1") CONFIG_COMMANDS="$CONFIG_COMMANDS default-1" ;;
     "default-2") CONFIG_COMMANDS="$CONFIG_COMMANDS default-2" ;;
