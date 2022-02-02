@@ -208,8 +208,7 @@ case "${target}" in
 	config_testsuite=false
 	;;
   iq2000-*-*)
-	AC_CONFIG_FILES([iq2000/Makefile])
-	subdirs="$subdirs iq2000"
+	config_iq2000=true
 	;;
   or1k-*-* | or1knd-*-* )
 	AC_CONFIG_FILES([or1k/Makefile])
@@ -224,6 +223,8 @@ case "${target}" in
 	subdirs="$subdirs nios2"
 	;;
 esac
+
+AM_CONDITIONAL(CONFIG_IQ2000, test x$config_iq2000 = xtrue)
 
 dnl For now, don't bother configuring testsuite
 dnl
@@ -242,7 +243,7 @@ AC_SUBST(AR)
 LD=${LD-ld}
 AC_SUBST(LD)
 AC_PROG_RANLIB
-LIB_AM_PROG_AS
+AM_PROG_AS
 
 AC_DEFINE(HAVE_GNU_LD, 1, [Using GNU LD])
 

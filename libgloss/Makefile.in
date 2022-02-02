@@ -90,10 +90,14 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-check_PROGRAMS =
+check_PROGRAMS = $(am__EXEEXT_1)
 @HAVE_DOC_TRUE@am__append_1 = doc/porting.texi
-@CONFIG_LIBNOSYS_TRUE@am__append_2 = libnosys/nosys.specs
-@CONFIG_LIBNOSYS_TRUE@am__append_3 = libnosys/libnosys.a
+@CONFIG_IQ2000_TRUE@am__append_2 = iq2000/crt0.o iq2000/sim.ld
+@CONFIG_IQ2000_TRUE@am__append_3 = iq2000/libeval.a
+@CONFIG_IQ2000_TRUE@am__append_4 = iq2000/crt0.S iq2000/test.o
+@CONFIG_IQ2000_TRUE@am__append_5 = iq2000/test
+@CONFIG_LIBNOSYS_TRUE@am__append_6 = libnosys/nosys.specs
+@CONFIG_LIBNOSYS_TRUE@am__append_7 = libnosys/libnosys.a
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../config/depstand.m4 \
@@ -117,8 +121,8 @@ CONFIG_CLEAN_FILES = arc/Makefile epiphany/Makefile m32r/Makefile \
 	lm32/Makefile mep/Makefile microblaze/Makefile mt/Makefile \
 	v850/Makefile visium/Makefile xc16x/Makefile \
 	xstormy16/Makefile m32c/Makefile msp430/Makefile rl78/Makefile \
-	rx/Makefile spu/Makefile tic6x/Makefile iq2000/Makefile \
-	or1k/Makefile pru/Makefile nios2/Makefile
+	rx/Makefile spu/Makefile tic6x/Makefile or1k/Makefile \
+	pru/Makefile nios2/Makefile
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -155,9 +159,33 @@ AM_V_AR = $(am__v_AR_@AM_V@)
 am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
 am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
+iq2000_libeval_a_AR = $(AR) $(ARFLAGS)
+iq2000_libeval_a_LIBADD =
+am__dirstamp = $(am__leading_dot)dirstamp
+@CONFIG_IQ2000_TRUE@am_iq2000_libeval_a_OBJECTS =  \
+@CONFIG_IQ2000_TRUE@	iq2000/_exit.$(OBJEXT) \
+@CONFIG_IQ2000_TRUE@	iq2000/access.$(OBJEXT) \
+@CONFIG_IQ2000_TRUE@	iq2000/chmod.$(OBJEXT) \
+@CONFIG_IQ2000_TRUE@	iq2000/close.$(OBJEXT) \
+@CONFIG_IQ2000_TRUE@	iq2000/crt1.$(OBJEXT) \
+@CONFIG_IQ2000_TRUE@	iq2000/fstat.$(OBJEXT) \
+@CONFIG_IQ2000_TRUE@	iq2000/getpid.$(OBJEXT) \
+@CONFIG_IQ2000_TRUE@	iq2000/gettime.$(OBJEXT) \
+@CONFIG_IQ2000_TRUE@	iq2000/isatty.$(OBJEXT) \
+@CONFIG_IQ2000_TRUE@	iq2000/kill.$(OBJEXT) \
+@CONFIG_IQ2000_TRUE@	iq2000/lseek.$(OBJEXT) \
+@CONFIG_IQ2000_TRUE@	iq2000/open.$(OBJEXT) \
+@CONFIG_IQ2000_TRUE@	iq2000/read.$(OBJEXT) \
+@CONFIG_IQ2000_TRUE@	iq2000/sbrk.$(OBJEXT) \
+@CONFIG_IQ2000_TRUE@	iq2000/stat.$(OBJEXT) \
+@CONFIG_IQ2000_TRUE@	iq2000/time.$(OBJEXT) \
+@CONFIG_IQ2000_TRUE@	iq2000/trap.$(OBJEXT) \
+@CONFIG_IQ2000_TRUE@	iq2000/unlink.$(OBJEXT) \
+@CONFIG_IQ2000_TRUE@	iq2000/utime.$(OBJEXT) \
+@CONFIG_IQ2000_TRUE@	iq2000/write.$(OBJEXT)
+iq2000_libeval_a_OBJECTS = $(am_iq2000_libeval_a_OBJECTS)
 libnosys_libnosys_a_AR = $(AR) $(ARFLAGS)
 libnosys_libnosys_a_LIBADD =
-am__dirstamp = $(am__leading_dot)dirstamp
 @CONFIG_LIBNOSYS_TRUE@am_libnosys_libnosys_a_OBJECTS =  \
 @CONFIG_LIBNOSYS_TRUE@	libnosys/chown.$(OBJEXT) \
 @CONFIG_LIBNOSYS_TRUE@	libnosys/close.$(OBJEXT) \
@@ -186,8 +214,13 @@ am__dirstamp = $(am__leading_dot)dirstamp
 libnosys_libnosys_a_OBJECTS = $(am_libnosys_libnosys_a_OBJECTS)
 libobjs_a_AR = $(AR) $(ARFLAGS)
 libobjs_a_LIBADD =
-am_libobjs_a_OBJECTS =
+@CONFIG_IQ2000_TRUE@am__objects_1 = iq2000/crt0.$(OBJEXT)
+am_libobjs_a_OBJECTS = $(am__objects_1)
 libobjs_a_OBJECTS = $(am_libobjs_a_OBJECTS)
+@CONFIG_IQ2000_TRUE@am__EXEEXT_1 = iq2000/test$(EXEEXT)
+iq2000_test_SOURCES = iq2000/test.c
+iq2000_test_OBJECTS = iq2000/test.$(OBJEXT)
+iq2000_test_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -204,6 +237,12 @@ DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
+CPPASCOMPILE = $(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS)
+AM_V_CPPAS = $(am__v_CPPAS_@AM_V@)
+am__v_CPPAS_ = $(am__v_CPPAS_@AM_DEFAULT_V@)
+am__v_CPPAS_0 = @echo "  CPPAS   " $@;
+am__v_CPPAS_1 = 
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 AM_V_CC = $(am__v_CC_@AM_V@)
@@ -216,7 +255,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libnosys_libnosys_a_SOURCES) $(libobjs_a_SOURCES)
+SOURCES = $(iq2000_libeval_a_SOURCES) $(libnosys_libnosys_a_SOURCES) \
+	$(libobjs_a_SOURCES) iq2000/test.c
 AM_V_DVIPS = $(am__v_DVIPS_@AM_V@)
 am__v_DVIPS_ = $(am__v_DVIPS_@AM_DEFAULT_V@)
 am__v_DVIPS_0 = @echo "  DVIPS   " $@;
@@ -312,6 +352,7 @@ AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 CC = @CC@
 CCAS = @CCAS@
+CCASDEPMODE = @CCASDEPMODE@
 CCASFLAGS = @CCASFLAGS@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -414,13 +455,13 @@ PHONY =
 SUBDIRS = @subdirs@ .
 tooldir = $(exec_prefix)/$(target_alias)
 multilibtooldir = $(tooldir)/lib$(MULTISUBDIR)
-multilibtool_DATA = $(am__append_2)
-multilibtool_LIBRARIES = $(am__append_3)
+multilibtool_DATA = $(am__append_2) $(am__append_6)
+multilibtool_LIBRARIES = $(am__append_3) $(am__append_7)
 
 # A fake library so automake will generate rules for plain objects that we want
 # to install (e.g. our crt0.o objects).
 noinst_LIBRARIES = libobjs.a
-libobjs_a_SOURCES = 
+libobjs_a_SOURCES = $(am__append_4)
 FLAGS_TO_PASS = \
 	"CC=$(CC)" \
 	"CFLAGS=$(CFLAGS)" \
@@ -452,6 +493,12 @@ MULTISUBDIR =
 MULTIDO = true
 MULTICLEAN = true
 TEXINFO_TEX = ../texinfo/texinfo.tex
+@CONFIG_IQ2000_TRUE@iq2000_libeval_a_SOURCES = \
+@CONFIG_IQ2000_TRUE@	iq2000/_exit.c iq2000/access.c iq2000/chmod.c iq2000/close.c iq2000/crt1.c \
+@CONFIG_IQ2000_TRUE@	iq2000/fstat.c iq2000/getpid.c iq2000/gettime.c iq2000/isatty.c \
+@CONFIG_IQ2000_TRUE@	iq2000/kill.c iq2000/lseek.c iq2000/open.c iq2000/read.c \
+@CONFIG_IQ2000_TRUE@	iq2000/sbrk.c iq2000/stat.c iq2000/time.c iq2000/trap.c iq2000/unlink.c iq2000/utime.c iq2000/write.c
+
 @CONFIG_LIBNOSYS_TRUE@libnosys_libnosys_a_SOURCES = \
 @CONFIG_LIBNOSYS_TRUE@	libnosys/chown.c \
 @CONFIG_LIBNOSYS_TRUE@	libnosys/close.c \
@@ -482,10 +529,10 @@ all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .c .dvi .o .obj .ps
+.SUFFIXES: .S .c .dvi .o .obj .ps
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am $(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(am__configure_deps)
+$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am $(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -507,7 +554,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe);; \
 	esac;
-$(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(am__empty):
+$(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
@@ -596,8 +643,6 @@ spu/Makefile: $(top_builddir)/config.status $(top_srcdir)/spu/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 tic6x/Makefile: $(top_builddir)/config.status $(top_srcdir)/tic6x/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
-iq2000/Makefile: $(top_builddir)/config.status $(top_srcdir)/iq2000/Makefile.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
 or1k/Makefile: $(top_builddir)/config.status $(top_srcdir)/or1k/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 pru/Makefile: $(top_builddir)/config.status $(top_srcdir)/pru/Makefile.in
@@ -638,6 +683,57 @@ clean-multilibtoolLIBRARIES:
 
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
+iq2000/$(am__dirstamp):
+	@$(MKDIR_P) iq2000
+	@: > iq2000/$(am__dirstamp)
+iq2000/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) iq2000/$(DEPDIR)
+	@: > iq2000/$(DEPDIR)/$(am__dirstamp)
+iq2000/_exit.$(OBJEXT): iq2000/$(am__dirstamp) \
+	iq2000/$(DEPDIR)/$(am__dirstamp)
+iq2000/access.$(OBJEXT): iq2000/$(am__dirstamp) \
+	iq2000/$(DEPDIR)/$(am__dirstamp)
+iq2000/chmod.$(OBJEXT): iq2000/$(am__dirstamp) \
+	iq2000/$(DEPDIR)/$(am__dirstamp)
+iq2000/close.$(OBJEXT): iq2000/$(am__dirstamp) \
+	iq2000/$(DEPDIR)/$(am__dirstamp)
+iq2000/crt1.$(OBJEXT): iq2000/$(am__dirstamp) \
+	iq2000/$(DEPDIR)/$(am__dirstamp)
+iq2000/fstat.$(OBJEXT): iq2000/$(am__dirstamp) \
+	iq2000/$(DEPDIR)/$(am__dirstamp)
+iq2000/getpid.$(OBJEXT): iq2000/$(am__dirstamp) \
+	iq2000/$(DEPDIR)/$(am__dirstamp)
+iq2000/gettime.$(OBJEXT): iq2000/$(am__dirstamp) \
+	iq2000/$(DEPDIR)/$(am__dirstamp)
+iq2000/isatty.$(OBJEXT): iq2000/$(am__dirstamp) \
+	iq2000/$(DEPDIR)/$(am__dirstamp)
+iq2000/kill.$(OBJEXT): iq2000/$(am__dirstamp) \
+	iq2000/$(DEPDIR)/$(am__dirstamp)
+iq2000/lseek.$(OBJEXT): iq2000/$(am__dirstamp) \
+	iq2000/$(DEPDIR)/$(am__dirstamp)
+iq2000/open.$(OBJEXT): iq2000/$(am__dirstamp) \
+	iq2000/$(DEPDIR)/$(am__dirstamp)
+iq2000/read.$(OBJEXT): iq2000/$(am__dirstamp) \
+	iq2000/$(DEPDIR)/$(am__dirstamp)
+iq2000/sbrk.$(OBJEXT): iq2000/$(am__dirstamp) \
+	iq2000/$(DEPDIR)/$(am__dirstamp)
+iq2000/stat.$(OBJEXT): iq2000/$(am__dirstamp) \
+	iq2000/$(DEPDIR)/$(am__dirstamp)
+iq2000/time.$(OBJEXT): iq2000/$(am__dirstamp) \
+	iq2000/$(DEPDIR)/$(am__dirstamp)
+iq2000/trap.$(OBJEXT): iq2000/$(am__dirstamp) \
+	iq2000/$(DEPDIR)/$(am__dirstamp)
+iq2000/unlink.$(OBJEXT): iq2000/$(am__dirstamp) \
+	iq2000/$(DEPDIR)/$(am__dirstamp)
+iq2000/utime.$(OBJEXT): iq2000/$(am__dirstamp) \
+	iq2000/$(DEPDIR)/$(am__dirstamp)
+iq2000/write.$(OBJEXT): iq2000/$(am__dirstamp) \
+	iq2000/$(DEPDIR)/$(am__dirstamp)
+
+iq2000/libeval.a: $(iq2000_libeval_a_OBJECTS) $(iq2000_libeval_a_DEPENDENCIES) $(EXTRA_iq2000_libeval_a_DEPENDENCIES) iq2000/$(am__dirstamp)
+	$(AM_V_at)-rm -f iq2000/libeval.a
+	$(AM_V_AR)$(iq2000_libeval_a_AR) iq2000/libeval.a $(iq2000_libeval_a_OBJECTS) $(iq2000_libeval_a_LIBADD)
+	$(AM_V_at)$(RANLIB) iq2000/libeval.a
 libnosys/$(am__dirstamp):
 	@$(MKDIR_P) libnosys
 	@: > libnosys/$(am__dirstamp)
@@ -697,6 +793,8 @@ libnosys/libnosys.a: $(libnosys_libnosys_a_OBJECTS) $(libnosys_libnosys_a_DEPEND
 	$(AM_V_at)-rm -f libnosys/libnosys.a
 	$(AM_V_AR)$(libnosys_libnosys_a_AR) libnosys/libnosys.a $(libnosys_libnosys_a_OBJECTS) $(libnosys_libnosys_a_LIBADD)
 	$(AM_V_at)$(RANLIB) libnosys/libnosys.a
+iq2000/crt0.$(OBJEXT): iq2000/$(am__dirstamp) \
+	iq2000/$(DEPDIR)/$(am__dirstamp)
 
 libobjs.a: $(libobjs_a_OBJECTS) $(libobjs_a_DEPENDENCIES) $(EXTRA_libobjs_a_DEPENDENCIES) 
 	$(AM_V_at)-rm -f libobjs.a
@@ -705,14 +803,43 @@ libobjs.a: $(libobjs_a_OBJECTS) $(libobjs_a_DEPENDENCIES) $(EXTRA_libobjs_a_DEPE
 
 clean-checkPROGRAMS:
 	-test -z "$(check_PROGRAMS)" || rm -f $(check_PROGRAMS)
+iq2000/test.$(OBJEXT): iq2000/$(am__dirstamp) \
+	iq2000/$(DEPDIR)/$(am__dirstamp)
+
+iq2000/test$(EXEEXT): $(iq2000_test_OBJECTS) $(iq2000_test_DEPENDENCIES) $(EXTRA_iq2000_test_DEPENDENCIES) iq2000/$(am__dirstamp)
+	@rm -f iq2000/test$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(iq2000_test_OBJECTS) $(iq2000_test_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f iq2000/*.$(OBJEXT)
 	-rm -f libnosys/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/_exit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/access.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/chmod.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/close.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/crt0.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/crt1.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/fstat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/getpid.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/gettime.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/isatty.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/kill.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/lseek.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/open.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/read.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/sbrk.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/stat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/time.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/trap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/unlink.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/utime.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/write.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/_exit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/chown.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/close.Po@am__quote@
@@ -737,6 +864,22 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/unlink.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/wait.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/write.Po@am__quote@
+
+.S.o:
+@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCCAS_TRUE@	$(CPPASCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCCAS_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CPPASCOMPILE) -c -o $@ $<
+
+.S.obj:
+@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCCAS_TRUE@	$(CPPASCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+@am__fastdepCCAS_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CPPASCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -1056,6 +1199,8 @@ distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
 	-rm -f doc/$(am__dirstamp)
+	-rm -f iq2000/$(DEPDIR)/$(am__dirstamp)
+	-rm -f iq2000/$(am__dirstamp)
 	-rm -f libnosys/$(DEPDIR)/$(am__dirstamp)
 	-rm -f libnosys/$(am__dirstamp)
 
@@ -1070,7 +1215,7 @@ clean-am: clean-aminfo clean-checkPROGRAMS clean-generic clean-local \
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf libnosys/$(DEPDIR)
+	-rm -rf iq2000/$(DEPDIR) libnosys/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-local distclean-tags
@@ -1210,7 +1355,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf libnosys/$(DEPDIR)
+	-rm -rf iq2000/$(DEPDIR) libnosys/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-aminfo \
 	maintainer-clean-generic maintainer-clean-local

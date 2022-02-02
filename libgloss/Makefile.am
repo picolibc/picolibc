@@ -53,6 +53,9 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 if HAVE_DOC
 include doc/Makefile.inc
 endif
+if CONFIG_IQ2000
+include iq2000/Makefile.inc
+endif
 if CONFIG_LIBNOSYS
 include libnosys/Makefile.inc
 endif
