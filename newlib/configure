@@ -13269,7 +13269,7 @@ $as_echo "#define _ICONV_FROM_ENCODING_WIN_1258 1" >>confdefs.h
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for .preinit_array/.init_array/.fini_array support" >&5
 $as_echo_n "checking for .preinit_array/.init_array/.fini_array support... " >&6; }
-if ${libc_cv_initfinit_array+:} false; then :
+if ${newlib_cv_initfinit_array+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   cat > conftest.c <<EOF
@@ -13287,18 +13287,18 @@ if { ac_try='${CC} $CFLAGS $CPPFLAGS -c -o conftest conftest.c
   test $ac_status = 0; }; }
 then
   if ${READELF} -S conftest | grep -e INIT_ARRAY > /dev/null; then
-    libc_cv_initfinit_array=yes
+    newlib_cv_initfinit_array=yes
   else
-    libc_cv_initfinit_array=no
+    newlib_cv_initfinit_array=no
   fi
 else
-  libc_cv_initfinit_array=no
+  newlib_cv_initfinit_array=no
 fi
 rm -f conftest*
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $libc_cv_initfinit_array" >&5
-$as_echo "$libc_cv_initfinit_array" >&6; }
-if test $libc_cv_initfinit_array = yes; then
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $newlib_cv_initfinit_array" >&5
+$as_echo "$newlib_cv_initfinit_array" >&6; }
+if test $newlib_cv_initfinit_array = yes; then
 
 $as_echo "#define _HAVE_INITFINI_ARRAY 1" >>confdefs.h
 
@@ -13308,7 +13308,7 @@ fi
 __attribute__ ((__optimize__))" >&5
 $as_echo_n "checking if $CC accepts -fno-tree-loop-distribute-patterns with \
 __attribute__ ((__optimize__))... " >&6; }
-if ${libc_cv_cc_loop_to_function+:} false; then :
+if ${newlib_cv_cc_loop_to_function+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   cat > conftest.c <<EOF
@@ -13316,7 +13316,7 @@ void
 __attribute__ ((__optimize__ ("-fno-tree-loop-distribute-patterns")))
 foo (void) {}
 EOF
-libc_cv_cc_loop_to_function=no
+newlib_cv_cc_loop_to_function=no
 if { ac_try='${CC-cc} $CFLAGS $CPPFLAGS -c
 			    -fno-tree-loop-distribute-patterns conftest.c'
   { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
@@ -13325,13 +13325,13 @@ if { ac_try='${CC-cc} $CFLAGS $CPPFLAGS -c
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; }
 then
-  libc_cv_cc_loop_to_function=yes
+  newlib_cv_cc_loop_to_function=yes
 fi
 rm -f conftest*
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $libc_cv_cc_loop_to_function" >&5
-$as_echo "$libc_cv_cc_loop_to_function" >&6; }
-if test $libc_cv_cc_loop_to_function = yes; then
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $newlib_cv_cc_loop_to_function" >&5
+$as_echo "$newlib_cv_cc_loop_to_function" >&6; }
+if test $newlib_cv_cc_loop_to_function = yes; then
 
 $as_echo "#define _HAVE_CC_INHIBIT_LOOP_TO_LIBCALL 1" >>confdefs.h
 

@@ -637,7 +637,7 @@ fi;
 NEWLIB_ICONV_DEFINES
 
 AC_CACHE_CHECK(for .preinit_array/.init_array/.fini_array support,
-	       libc_cv_initfinit_array, [dnl
+	       newlib_cv_initfinit_array, [dnl
 cat > conftest.c <<EOF
 int _start (void) { return 0; }
 int __start (void) { return 0; }
@@ -648,33 +648,33 @@ if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS -c -o conftest conftest.c
 							1>&AS_MESSAGE_LOG_FD])
 then
   if ${READELF} -S conftest | grep -e INIT_ARRAY > /dev/null; then
-    libc_cv_initfinit_array=yes
+    newlib_cv_initfinit_array=yes
   else
-    libc_cv_initfinit_array=no
+    newlib_cv_initfinit_array=no
   fi
 else
-  libc_cv_initfinit_array=no
+  newlib_cv_initfinit_array=no
 fi
 rm -f conftest*])
-if test $libc_cv_initfinit_array = yes; then
+if test $newlib_cv_initfinit_array = yes; then
   AC_DEFINE(_HAVE_INITFINI_ARRAY, 1, [Define if the linker supports .preinit_array/.init_array/.fini_array sections.])
 fi
 
 AC_CACHE_CHECK(if $CC accepts -fno-tree-loop-distribute-patterns with \
-__attribute__ ((__optimize__)), libc_cv_cc_loop_to_function, [dnl
+__attribute__ ((__optimize__)), newlib_cv_cc_loop_to_function, [dnl
 cat > conftest.c <<EOF
 void
 __attribute__ ((__optimize__ ("-fno-tree-loop-distribute-patterns")))
 foo (void) {}
 EOF
-libc_cv_cc_loop_to_function=no
+newlib_cv_cc_loop_to_function=no
 if AC_TRY_COMMAND([${CC-cc} $CFLAGS $CPPFLAGS -c
 			    -fno-tree-loop-distribute-patterns conftest.c])
 then
-  libc_cv_cc_loop_to_function=yes
+  newlib_cv_cc_loop_to_function=yes
 fi
 rm -f conftest*])
-if test $libc_cv_cc_loop_to_function = yes; then
+if test $newlib_cv_cc_loop_to_function = yes; then
   AC_DEFINE(_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL, 1, [Define if compiler supports -fno-tree-loop-distribute-patterns.])
 fi
 
