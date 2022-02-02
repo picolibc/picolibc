@@ -720,6 +720,7 @@ struct _reent
 
 #define _REENT_EMERGENCY(_ptr)	((_ptr)->_emergency)
 #define _REENT_ERRNO(_ptr)	((_ptr)->_errno)
+#define _REENT_INC(_ptr)	((_ptr)->_inc)
 #define _REENT_STDIN(_ptr)	((_ptr)->_stdin)
 #define _REENT_STDOUT(_ptr)	((_ptr)->_stdout)
 #define _REENT_STDERR(_ptr)	((_ptr)->_stderr)
