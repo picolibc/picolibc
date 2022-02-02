@@ -90,14 +90,53 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-check_PROGRAMS = $(am__EXEEXT_1)
+check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2)
 @HAVE_DOC_TRUE@am__append_1 = doc/porting.texi
-@CONFIG_IQ2000_TRUE@am__append_2 = iq2000/crt0.o iq2000/sim.ld
-@CONFIG_IQ2000_TRUE@am__append_3 = iq2000/libeval.a
-@CONFIG_IQ2000_TRUE@am__append_4 = iq2000/crt0.S iq2000/test.o
-@CONFIG_IQ2000_TRUE@am__append_5 = iq2000/test
-@CONFIG_LIBNOSYS_TRUE@am__append_6 = libnosys/nosys.specs
-@CONFIG_LIBNOSYS_TRUE@am__append_7 = libnosys/libnosys.a
+
+# Here is all of the simulator stuff.
+@CONFIG_BFIN_TRUE@am__append_2 = bfin/libsim.a bfin/libbfinbsp.a
+@CONFIG_BFIN_TRUE@am__append_3 = bfin/sim-test
+
+# Here is all of the development board stuff.
+@CONFIG_BFIN_TRUE@am__append_4 = \
+@CONFIG_BFIN_TRUE@	bfin/crt0.o \
+@CONFIG_BFIN_TRUE@	bfin/basiccrt.o \
+@CONFIG_BFIN_TRUE@	bfin/basiccrts.o \
+@CONFIG_BFIN_TRUE@	bfin/basiccrt561.o \
+@CONFIG_BFIN_TRUE@	bfin/basiccrt561s.o \
+@CONFIG_BFIN_TRUE@	bfin/basiccrt561b.o
+
+# 	bfin/basiccrt60x.o \
+#	bfin/basiccrt60xs.o \
+#	bfin/basiccrt60xc1.o
+@CONFIG_BFIN_TRUE@am__append_5 = \
+@CONFIG_BFIN_TRUE@	bfin/crt0.S \
+@CONFIG_BFIN_TRUE@	bfin/basiccrt.S
+
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_6 = \
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bfin-common-sc.ld bfin/bfin-common-mc.ld bfin/bfin-common-mc0.ld \
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf504.ld bfin/bf506.ld \
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf512.ld bfin/bf514.ld bfin/bf516.ld bfin/bf518.ld \
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf522.ld bfin/bf523.ld bfin/bf524.ld bfin/bf525.ld bfin/bf526.ld bfin/bf527.ld \
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf531.ld bfin/bf532.ld bfin/bf533.ld \
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf534.ld bfin/bf536.ld bfin/bf537.ld \
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf538.ld bfin/bf539.ld \
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf542.ld bfin/bf544.ld bfin/bf547.ld bfin/bf548.ld bfin/bf549.ld \
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf561.ld bfin/bf561a.ld bfin/bf561b.ld bfin/bf561m.ld \
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf606.ld bfin/bf606c0.ld bfin/bf606c1.ld bfin/bf606m.ld \
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf607.ld bfin/bf607c0.ld bfin/bf607c1.ld bfin/bf607m.ld \
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf608.ld bfin/bf608c0.ld bfin/bf608c1.ld bfin/bf608m.ld \
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf609.ld bfin/bf609c0.ld bfin/bf609c1.ld bfin/bf609m.ld \
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf592.ld
+
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_7 = $(wildcard $(srcdir)/bfin/include/*.h)
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_8 = $(wildcard $(srcdir)/bfin/include/sys/*.h)
+@CONFIG_IQ2000_TRUE@am__append_9 = iq2000/crt0.o iq2000/sim.ld
+@CONFIG_IQ2000_TRUE@am__append_10 = iq2000/libeval.a
+@CONFIG_IQ2000_TRUE@am__append_11 = iq2000/crt0.S iq2000/test.o
+@CONFIG_IQ2000_TRUE@am__append_12 = iq2000/test
+@CONFIG_LIBNOSYS_TRUE@am__append_13 = libnosys/nosys.specs
+@CONFIG_LIBNOSYS_TRUE@am__append_14 = libnosys/libnosys.a
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../config/depstand.m4 \
@@ -116,13 +155,13 @@ CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES = arc/Makefile epiphany/Makefile m32r/Makefile \
 	m68hc11/Makefile nds32/Makefile pa/Makefile i960/Makefile \
 	sparc_leon/Makefile riscv/Makefile rs6000/Makefile \
-	bfin/Makefile cr16/Makefile cris/Makefile crx/Makefile \
-	d30v/Makefile fr30/Makefile frv/Makefile ft32/Makefile \
-	lm32/Makefile mep/Makefile microblaze/Makefile mt/Makefile \
-	v850/Makefile visium/Makefile xc16x/Makefile \
-	xstormy16/Makefile m32c/Makefile msp430/Makefile rl78/Makefile \
-	rx/Makefile spu/Makefile tic6x/Makefile or1k/Makefile \
-	pru/Makefile nios2/Makefile
+	cr16/Makefile cris/Makefile crx/Makefile d30v/Makefile \
+	fr30/Makefile frv/Makefile ft32/Makefile lm32/Makefile \
+	mep/Makefile microblaze/Makefile mt/Makefile v850/Makefile \
+	visium/Makefile xc16x/Makefile xstormy16/Makefile \
+	m32c/Makefile msp430/Makefile rl78/Makefile rx/Makefile \
+	spu/Makefile tic6x/Makefile or1k/Makefile pru/Makefile \
+	nios2/Makefile
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -152,16 +191,27 @@ am__uninstall_files_from_dir = { \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
 am__installdirs = "$(DESTDIR)$(multilibtooldir)" \
-	"$(DESTDIR)$(infodir)" "$(DESTDIR)$(multilibtooldir)"
+	"$(DESTDIR)$(infodir)" "$(DESTDIR)$(includesystooldir)" \
+	"$(DESTDIR)$(includetooldir)" "$(DESTDIR)$(multilibtooldir)"
 LIBRARIES = $(multilibtool_LIBRARIES) $(noinst_LIBRARIES)
 ARFLAGS = cru
 AM_V_AR = $(am__v_AR_@AM_V@)
 am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
 am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
+bfin_libbfinbsp_a_AR = $(AR) $(ARFLAGS)
+bfin_libbfinbsp_a_LIBADD =
+am__dirstamp = $(am__leading_dot)dirstamp
+@CONFIG_BFIN_TRUE@am_bfin_libbfinbsp_a_OBJECTS = bfin/bfin_libbfinbsp_a-clear_cache_range.$(OBJEXT) \
+@CONFIG_BFIN_TRUE@	bfin/bfin_libbfinbsp_a-_exit.$(OBJEXT)
+bfin_libbfinbsp_a_OBJECTS = $(am_bfin_libbfinbsp_a_OBJECTS)
+bfin_libsim_a_AR = $(AR) $(ARFLAGS)
+bfin_libsim_a_LIBADD =
+@CONFIG_BFIN_TRUE@am_bfin_libsim_a_OBJECTS = bfin/bfin_libsim_a-clear_cache_range.$(OBJEXT) \
+@CONFIG_BFIN_TRUE@	bfin/bfin_libsim_a-syscalls.$(OBJEXT)
+bfin_libsim_a_OBJECTS = $(am_bfin_libsim_a_OBJECTS)
 iq2000_libeval_a_AR = $(AR) $(ARFLAGS)
 iq2000_libeval_a_LIBADD =
-am__dirstamp = $(am__leading_dot)dirstamp
 @CONFIG_IQ2000_TRUE@am_iq2000_libeval_a_OBJECTS =  \
 @CONFIG_IQ2000_TRUE@	iq2000/_exit.$(OBJEXT) \
 @CONFIG_IQ2000_TRUE@	iq2000/access.$(OBJEXT) \
@@ -214,10 +264,16 @@ libnosys_libnosys_a_LIBADD =
 libnosys_libnosys_a_OBJECTS = $(am_libnosys_libnosys_a_OBJECTS)
 libobjs_a_AR = $(AR) $(ARFLAGS)
 libobjs_a_LIBADD =
-@CONFIG_IQ2000_TRUE@am__objects_1 = iq2000/crt0.$(OBJEXT)
-am_libobjs_a_OBJECTS = $(am__objects_1)
+@CONFIG_BFIN_TRUE@am__objects_1 = bfin/crt0.$(OBJEXT) \
+@CONFIG_BFIN_TRUE@	bfin/basiccrt.$(OBJEXT)
+@CONFIG_IQ2000_TRUE@am__objects_2 = iq2000/crt0.$(OBJEXT)
+am_libobjs_a_OBJECTS = $(am__objects_1) $(am__objects_2)
 libobjs_a_OBJECTS = $(am_libobjs_a_OBJECTS)
-@CONFIG_IQ2000_TRUE@am__EXEEXT_1 = iq2000/test$(EXEEXT)
+@CONFIG_BFIN_TRUE@am__EXEEXT_1 = bfin/sim-test$(EXEEXT)
+@CONFIG_IQ2000_TRUE@am__EXEEXT_2 = iq2000/test$(EXEEXT)
+bfin_sim_test_SOURCES = bfin/sim-test.c
+bfin_sim_test_OBJECTS = bfin/sim-test.$(OBJEXT)
+bfin_sim_test_LDADD = $(LDADD)
 iq2000_test_SOURCES = iq2000/test.c
 iq2000_test_OBJECTS = iq2000/test.$(OBJEXT)
 iq2000_test_LDADD = $(LDADD)
@@ -243,6 +299,10 @@ AM_V_CPPAS = $(am__v_CPPAS_@AM_V@)
 am__v_CPPAS_ = $(am__v_CPPAS_@AM_DEFAULT_V@)
 am__v_CPPAS_0 = @echo "  CPPAS   " $@;
 am__v_CPPAS_1 = 
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 AM_V_CC = $(am__v_CC_@AM_V@)
@@ -255,8 +315,9 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(iq2000_libeval_a_SOURCES) $(libnosys_libnosys_a_SOURCES) \
-	$(libobjs_a_SOURCES) iq2000/test.c
+SOURCES = $(bfin_libbfinbsp_a_SOURCES) $(bfin_libsim_a_SOURCES) \
+	$(iq2000_libeval_a_SOURCES) $(libnosys_libnosys_a_SOURCES) \
+	$(libobjs_a_SOURCES) bfin/sim-test.c iq2000/test.c
 AM_V_DVIPS = $(am__v_DVIPS_@AM_V@)
 am__v_DVIPS_ = $(am__v_DVIPS_@AM_DEFAULT_V@)
 am__v_DVIPS_0 = @echo "  DVIPS   " $@;
@@ -310,7 +371,7 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-DATA = $(multilibtool_DATA)
+DATA = $(includesystool_DATA) $(includetool_DATA) $(multilibtool_DATA)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 am__recursive_targets = \
@@ -455,13 +516,19 @@ PHONY =
 SUBDIRS = @subdirs@ .
 tooldir = $(exec_prefix)/$(target_alias)
 multilibtooldir = $(tooldir)/lib$(MULTISUBDIR)
-multilibtool_DATA = $(am__append_2) $(am__append_6)
-multilibtool_LIBRARIES = $(am__append_3) $(am__append_7)
+multilibtool_DATA = $(am__append_4) $(am__append_6) $(am__append_9) \
+	$(am__append_13)
+multilibtool_LIBRARIES = $(am__append_2) $(am__append_10) \
+	$(am__append_14)
+includetooldir = $(tooldir)/include
+includetool_DATA = $(am__append_7)
+includesystooldir = $(tooldir)/include/sys
+includesystool_DATA = $(am__append_8)
 
 # A fake library so automake will generate rules for plain objects that we want
 # to install (e.g. our crt0.o objects).
 noinst_LIBRARIES = libobjs.a
-libobjs_a_SOURCES = $(am__append_4)
+libobjs_a_SOURCES = $(am__append_5) $(am__append_11)
 FLAGS_TO_PASS = \
 	"CC=$(CC)" \
 	"CFLAGS=$(CFLAGS)" \
@@ -493,6 +560,22 @@ MULTISUBDIR =
 MULTIDO = true
 MULTICLEAN = true
 TEXINFO_TEX = ../texinfo/texinfo.tex
+@CONFIG_BFIN_TRUE@bfin_libsim_a_SOURCES = \
+@CONFIG_BFIN_TRUE@	bfin/clear_cache_range.c \
+@CONFIG_BFIN_TRUE@	bfin/syscalls.c
+
+@CONFIG_BFIN_TRUE@bfin_libsim_a_CPPFLAGS = \
+@CONFIG_BFIN_TRUE@	$(AM_CPPFLAGS) \
+@CONFIG_BFIN_TRUE@	-I$(srcdir)/%D/include
+
+@CONFIG_BFIN_TRUE@bfin_libbfinbsp_a_SOURCES = \
+@CONFIG_BFIN_TRUE@	bfin/clear_cache_range.c \
+@CONFIG_BFIN_TRUE@	bfin/_exit.c
+
+@CONFIG_BFIN_TRUE@bfin_libbfinbsp_a_CPPFLAGS = \
+@CONFIG_BFIN_TRUE@	$(AM_CPPFLAGS) \
+@CONFIG_BFIN_TRUE@	-I$(srcdir)/%D/include
+
 @CONFIG_IQ2000_TRUE@iq2000_libeval_a_SOURCES = \
 @CONFIG_IQ2000_TRUE@	iq2000/_exit.c iq2000/access.c iq2000/chmod.c iq2000/close.c iq2000/crt1.c \
 @CONFIG_IQ2000_TRUE@	iq2000/fstat.c iq2000/getpid.c iq2000/gettime.c iq2000/isatty.c \
@@ -532,7 +615,7 @@ all: config.h
 .SUFFIXES: .S .c .dvi .o .obj .ps
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am $(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(am__configure_deps)
+$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am $(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -554,7 +637,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe);; \
 	esac;
-$(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(am__empty):
+$(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
@@ -598,8 +681,6 @@ sparc_leon/Makefile: $(top_builddir)/config.status $(top_srcdir)/sparc_leon/Make
 riscv/Makefile: $(top_builddir)/config.status $(top_srcdir)/riscv/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 rs6000/Makefile: $(top_builddir)/config.status $(top_srcdir)/rs6000/Makefile.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-bfin/Makefile: $(top_builddir)/config.status $(top_srcdir)/bfin/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 cr16/Makefile: $(top_builddir)/config.status $(top_srcdir)/cr16/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
@@ -683,6 +764,30 @@ clean-multilibtoolLIBRARIES:
 
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
+bfin/$(am__dirstamp):
+	@$(MKDIR_P) bfin
+	@: > bfin/$(am__dirstamp)
+bfin/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) bfin/$(DEPDIR)
+	@: > bfin/$(DEPDIR)/$(am__dirstamp)
+bfin/bfin_libbfinbsp_a-clear_cache_range.$(OBJEXT):  \
+	bfin/$(am__dirstamp) bfin/$(DEPDIR)/$(am__dirstamp)
+bfin/bfin_libbfinbsp_a-_exit.$(OBJEXT): bfin/$(am__dirstamp) \
+	bfin/$(DEPDIR)/$(am__dirstamp)
+
+bfin/libbfinbsp.a: $(bfin_libbfinbsp_a_OBJECTS) $(bfin_libbfinbsp_a_DEPENDENCIES) $(EXTRA_bfin_libbfinbsp_a_DEPENDENCIES) bfin/$(am__dirstamp)
+	$(AM_V_at)-rm -f bfin/libbfinbsp.a
+	$(AM_V_AR)$(bfin_libbfinbsp_a_AR) bfin/libbfinbsp.a $(bfin_libbfinbsp_a_OBJECTS) $(bfin_libbfinbsp_a_LIBADD)
+	$(AM_V_at)$(RANLIB) bfin/libbfinbsp.a
+bfin/bfin_libsim_a-clear_cache_range.$(OBJEXT): bfin/$(am__dirstamp) \
+	bfin/$(DEPDIR)/$(am__dirstamp)
+bfin/bfin_libsim_a-syscalls.$(OBJEXT): bfin/$(am__dirstamp) \
+	bfin/$(DEPDIR)/$(am__dirstamp)
+
+bfin/libsim.a: $(bfin_libsim_a_OBJECTS) $(bfin_libsim_a_DEPENDENCIES) $(EXTRA_bfin_libsim_a_DEPENDENCIES) bfin/$(am__dirstamp)
+	$(AM_V_at)-rm -f bfin/libsim.a
+	$(AM_V_AR)$(bfin_libsim_a_AR) bfin/libsim.a $(bfin_libsim_a_OBJECTS) $(bfin_libsim_a_LIBADD)
+	$(AM_V_at)$(RANLIB) bfin/libsim.a
 iq2000/$(am__dirstamp):
 	@$(MKDIR_P) iq2000
 	@: > iq2000/$(am__dirstamp)
@@ -793,6 +898,10 @@ libnosys/libnosys.a: $(libnosys_libnosys_a_OBJECTS) $(libnosys_libnosys_a_DEPEND
 	$(AM_V_at)-rm -f libnosys/libnosys.a
 	$(AM_V_AR)$(libnosys_libnosys_a_AR) libnosys/libnosys.a $(libnosys_libnosys_a_OBJECTS) $(libnosys_libnosys_a_LIBADD)
 	$(AM_V_at)$(RANLIB) libnosys/libnosys.a
+bfin/crt0.$(OBJEXT): bfin/$(am__dirstamp) \
+	bfin/$(DEPDIR)/$(am__dirstamp)
+bfin/basiccrt.$(OBJEXT): bfin/$(am__dirstamp) \
+	bfin/$(DEPDIR)/$(am__dirstamp)
 iq2000/crt0.$(OBJEXT): iq2000/$(am__dirstamp) \
 	iq2000/$(DEPDIR)/$(am__dirstamp)
 
@@ -803,6 +912,12 @@ libobjs.a: $(libobjs_a_OBJECTS) $(libobjs_a_DEPENDENCIES) $(EXTRA_libobjs_a_DEPE
 
 clean-checkPROGRAMS:
 	-test -z "$(check_PROGRAMS)" || rm -f $(check_PROGRAMS)
+bfin/sim-test.$(OBJEXT): bfin/$(am__dirstamp) \
+	bfin/$(DEPDIR)/$(am__dirstamp)
+
+bfin/sim-test$(EXEEXT): $(bfin_sim_test_OBJECTS) $(bfin_sim_test_DEPENDENCIES) $(EXTRA_bfin_sim_test_DEPENDENCIES) bfin/$(am__dirstamp)
+	@rm -f bfin/sim-test$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(bfin_sim_test_OBJECTS) $(bfin_sim_test_LDADD) $(LIBS)
 iq2000/test.$(OBJEXT): iq2000/$(am__dirstamp) \
 	iq2000/$(DEPDIR)/$(am__dirstamp)
 
@@ -812,12 +927,20 @@ iq2000/test$(EXEEXT): $(iq2000_test_OBJECTS) $(iq2000_test_DEPENDENCIES) $(EXTRA
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f bfin/*.$(OBJEXT)
 	-rm -f iq2000/*.$(OBJEXT)
 	-rm -f libnosys/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@bfin/$(DEPDIR)/basiccrt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@bfin/$(DEPDIR)/bfin_libbfinbsp_a-_exit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@bfin/$(DEPDIR)/bfin_libbfinbsp_a-clear_cache_range.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@bfin/$(DEPDIR)/bfin_libsim_a-clear_cache_range.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@bfin/$(DEPDIR)/bfin_libsim_a-syscalls.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@bfin/$(DEPDIR)/crt0.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@bfin/$(DEPDIR)/sim-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/_exit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/access.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@iq2000/$(DEPDIR)/chmod.Po@am__quote@
@@ -896,6 +1019,62 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+bfin/bfin_libbfinbsp_a-clear_cache_range.o: bfin/clear_cache_range.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bfin_libbfinbsp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bfin/bfin_libbfinbsp_a-clear_cache_range.o -MD -MP -MF bfin/$(DEPDIR)/bfin_libbfinbsp_a-clear_cache_range.Tpo -c -o bfin/bfin_libbfinbsp_a-clear_cache_range.o `test -f 'bfin/clear_cache_range.c' || echo '$(srcdir)/'`bfin/clear_cache_range.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) bfin/$(DEPDIR)/bfin_libbfinbsp_a-clear_cache_range.Tpo bfin/$(DEPDIR)/bfin_libbfinbsp_a-clear_cache_range.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='bfin/clear_cache_range.c' object='bfin/bfin_libbfinbsp_a-clear_cache_range.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bfin_libbfinbsp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bfin/bfin_libbfinbsp_a-clear_cache_range.o `test -f 'bfin/clear_cache_range.c' || echo '$(srcdir)/'`bfin/clear_cache_range.c
+
+bfin/bfin_libbfinbsp_a-clear_cache_range.obj: bfin/clear_cache_range.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bfin_libbfinbsp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bfin/bfin_libbfinbsp_a-clear_cache_range.obj -MD -MP -MF bfin/$(DEPDIR)/bfin_libbfinbsp_a-clear_cache_range.Tpo -c -o bfin/bfin_libbfinbsp_a-clear_cache_range.obj `if test -f 'bfin/clear_cache_range.c'; then $(CYGPATH_W) 'bfin/clear_cache_range.c'; else $(CYGPATH_W) '$(srcdir)/bfin/clear_cache_range.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) bfin/$(DEPDIR)/bfin_libbfinbsp_a-clear_cache_range.Tpo bfin/$(DEPDIR)/bfin_libbfinbsp_a-clear_cache_range.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='bfin/clear_cache_range.c' object='bfin/bfin_libbfinbsp_a-clear_cache_range.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bfin_libbfinbsp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bfin/bfin_libbfinbsp_a-clear_cache_range.obj `if test -f 'bfin/clear_cache_range.c'; then $(CYGPATH_W) 'bfin/clear_cache_range.c'; else $(CYGPATH_W) '$(srcdir)/bfin/clear_cache_range.c'; fi`
+
+bfin/bfin_libbfinbsp_a-_exit.o: bfin/_exit.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bfin_libbfinbsp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bfin/bfin_libbfinbsp_a-_exit.o -MD -MP -MF bfin/$(DEPDIR)/bfin_libbfinbsp_a-_exit.Tpo -c -o bfin/bfin_libbfinbsp_a-_exit.o `test -f 'bfin/_exit.c' || echo '$(srcdir)/'`bfin/_exit.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) bfin/$(DEPDIR)/bfin_libbfinbsp_a-_exit.Tpo bfin/$(DEPDIR)/bfin_libbfinbsp_a-_exit.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='bfin/_exit.c' object='bfin/bfin_libbfinbsp_a-_exit.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bfin_libbfinbsp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bfin/bfin_libbfinbsp_a-_exit.o `test -f 'bfin/_exit.c' || echo '$(srcdir)/'`bfin/_exit.c
+
+bfin/bfin_libbfinbsp_a-_exit.obj: bfin/_exit.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bfin_libbfinbsp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bfin/bfin_libbfinbsp_a-_exit.obj -MD -MP -MF bfin/$(DEPDIR)/bfin_libbfinbsp_a-_exit.Tpo -c -o bfin/bfin_libbfinbsp_a-_exit.obj `if test -f 'bfin/_exit.c'; then $(CYGPATH_W) 'bfin/_exit.c'; else $(CYGPATH_W) '$(srcdir)/bfin/_exit.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) bfin/$(DEPDIR)/bfin_libbfinbsp_a-_exit.Tpo bfin/$(DEPDIR)/bfin_libbfinbsp_a-_exit.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='bfin/_exit.c' object='bfin/bfin_libbfinbsp_a-_exit.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bfin_libbfinbsp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bfin/bfin_libbfinbsp_a-_exit.obj `if test -f 'bfin/_exit.c'; then $(CYGPATH_W) 'bfin/_exit.c'; else $(CYGPATH_W) '$(srcdir)/bfin/_exit.c'; fi`
+
+bfin/bfin_libsim_a-clear_cache_range.o: bfin/clear_cache_range.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bfin_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bfin/bfin_libsim_a-clear_cache_range.o -MD -MP -MF bfin/$(DEPDIR)/bfin_libsim_a-clear_cache_range.Tpo -c -o bfin/bfin_libsim_a-clear_cache_range.o `test -f 'bfin/clear_cache_range.c' || echo '$(srcdir)/'`bfin/clear_cache_range.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) bfin/$(DEPDIR)/bfin_libsim_a-clear_cache_range.Tpo bfin/$(DEPDIR)/bfin_libsim_a-clear_cache_range.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='bfin/clear_cache_range.c' object='bfin/bfin_libsim_a-clear_cache_range.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bfin_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bfin/bfin_libsim_a-clear_cache_range.o `test -f 'bfin/clear_cache_range.c' || echo '$(srcdir)/'`bfin/clear_cache_range.c
+
+bfin/bfin_libsim_a-clear_cache_range.obj: bfin/clear_cache_range.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bfin_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bfin/bfin_libsim_a-clear_cache_range.obj -MD -MP -MF bfin/$(DEPDIR)/bfin_libsim_a-clear_cache_range.Tpo -c -o bfin/bfin_libsim_a-clear_cache_range.obj `if test -f 'bfin/clear_cache_range.c'; then $(CYGPATH_W) 'bfin/clear_cache_range.c'; else $(CYGPATH_W) '$(srcdir)/bfin/clear_cache_range.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) bfin/$(DEPDIR)/bfin_libsim_a-clear_cache_range.Tpo bfin/$(DEPDIR)/bfin_libsim_a-clear_cache_range.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='bfin/clear_cache_range.c' object='bfin/bfin_libsim_a-clear_cache_range.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bfin_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bfin/bfin_libsim_a-clear_cache_range.obj `if test -f 'bfin/clear_cache_range.c'; then $(CYGPATH_W) 'bfin/clear_cache_range.c'; else $(CYGPATH_W) '$(srcdir)/bfin/clear_cache_range.c'; fi`
+
+bfin/bfin_libsim_a-syscalls.o: bfin/syscalls.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bfin_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bfin/bfin_libsim_a-syscalls.o -MD -MP -MF bfin/$(DEPDIR)/bfin_libsim_a-syscalls.Tpo -c -o bfin/bfin_libsim_a-syscalls.o `test -f 'bfin/syscalls.c' || echo '$(srcdir)/'`bfin/syscalls.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) bfin/$(DEPDIR)/bfin_libsim_a-syscalls.Tpo bfin/$(DEPDIR)/bfin_libsim_a-syscalls.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='bfin/syscalls.c' object='bfin/bfin_libsim_a-syscalls.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bfin_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bfin/bfin_libsim_a-syscalls.o `test -f 'bfin/syscalls.c' || echo '$(srcdir)/'`bfin/syscalls.c
+
+bfin/bfin_libsim_a-syscalls.obj: bfin/syscalls.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bfin_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bfin/bfin_libsim_a-syscalls.obj -MD -MP -MF bfin/$(DEPDIR)/bfin_libsim_a-syscalls.Tpo -c -o bfin/bfin_libsim_a-syscalls.obj `if test -f 'bfin/syscalls.c'; then $(CYGPATH_W) 'bfin/syscalls.c'; else $(CYGPATH_W) '$(srcdir)/bfin/syscalls.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) bfin/$(DEPDIR)/bfin_libsim_a-syscalls.Tpo bfin/$(DEPDIR)/bfin_libsim_a-syscalls.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='bfin/syscalls.c' object='bfin/bfin_libsim_a-syscalls.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bfin_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bfin/bfin_libsim_a-syscalls.obj `if test -f 'bfin/syscalls.c'; then $(CYGPATH_W) 'bfin/syscalls.c'; else $(CYGPATH_W) '$(srcdir)/bfin/syscalls.c'; fi`
 doc/$(am__dirstamp):
 	@$(MKDIR_P) doc
 	@: > doc/$(am__dirstamp)
@@ -1036,6 +1215,48 @@ maintainer-clean-aminfo:
 	  echo " rm -f $$i $$i-[0-9] $$i-[0-9][0-9] $$i_i[0-9] $$i_i[0-9][0-9]"; \
 	  rm -f $$i $$i-[0-9] $$i-[0-9][0-9] $$i_i[0-9] $$i_i[0-9][0-9]; \
 	done
+install-includesystoolDATA: $(includesystool_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(includesystool_DATA)'; test -n "$(includesystooldir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(includesystooldir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(includesystooldir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(includesystooldir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(includesystooldir)" || exit $$?; \
+	done
+
+uninstall-includesystoolDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(includesystool_DATA)'; test -n "$(includesystooldir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(includesystooldir)'; $(am__uninstall_files_from_dir)
+install-includetoolDATA: $(includetool_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(includetool_DATA)'; test -n "$(includetooldir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(includetooldir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(includetooldir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(includetooldir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(includetooldir)" || exit $$?; \
+	done
+
+uninstall-includetoolDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(includetool_DATA)'; test -n "$(includetooldir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(includetooldir)'; $(am__uninstall_files_from_dir)
 install-multilibtoolDATA: $(multilibtool_DATA)
 	@$(NORMAL_INSTALL)
 	@list='$(multilibtool_DATA)'; test -n "$(multilibtooldir)" || list=; \
@@ -1169,7 +1390,7 @@ check: check-recursive
 all-am: Makefile $(INFO_DEPS) $(LIBRARIES) $(DATA) config.h all-local
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(multilibtooldir)" "$(DESTDIR)$(infodir)" "$(DESTDIR)$(multilibtooldir)"; do \
+	for dir in "$(DESTDIR)$(multilibtooldir)" "$(DESTDIR)$(infodir)" "$(DESTDIR)$(includesystooldir)" "$(DESTDIR)$(includetooldir)" "$(DESTDIR)$(multilibtooldir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -1198,6 +1419,8 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f bfin/$(DEPDIR)/$(am__dirstamp)
+	-rm -f bfin/$(am__dirstamp)
 	-rm -f doc/$(am__dirstamp)
 	-rm -f iq2000/$(DEPDIR)/$(am__dirstamp)
 	-rm -f iq2000/$(am__dirstamp)
@@ -1215,7 +1438,7 @@ clean-am: clean-aminfo clean-checkPROGRAMS clean-generic clean-local \
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf iq2000/$(DEPDIR) libnosys/$(DEPDIR)
+	-rm -rf bfin/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-local distclean-tags
@@ -1232,7 +1455,8 @@ info: info-recursive
 
 info-am: $(INFO_DEPS)
 
-install-data-am: install-info-am install-multilibtoolDATA \
+install-data-am: install-includesystoolDATA install-includetoolDATA \
+	install-info-am install-multilibtoolDATA \
 	install-multilibtoolLIBRARIES
 
 install-dvi: install-dvi-recursive
@@ -1355,7 +1579,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf iq2000/$(DEPDIR) libnosys/$(DEPDIR)
+	-rm -rf bfin/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-aminfo \
 	maintainer-clean-generic maintainer-clean-local
@@ -1373,9 +1597,11 @@ ps: ps-recursive
 
 ps-am: $(PSS)
 
-uninstall-am: uninstall-dvi-am uninstall-html-am uninstall-info-am \
-	uninstall-multilibtoolDATA uninstall-multilibtoolLIBRARIES \
-	uninstall-pdf-am uninstall-ps-am
+uninstall-am: uninstall-dvi-am uninstall-html-am \
+	uninstall-includesystoolDATA uninstall-includetoolDATA \
+	uninstall-info-am uninstall-multilibtoolDATA \
+	uninstall-multilibtoolLIBRARIES uninstall-pdf-am \
+	uninstall-ps-am
 
 .MAKE: $(am__recursive_targets) all check-am install-am install-strip
 
@@ -1388,18 +1614,21 @@ uninstall-am: uninstall-dvi-am uninstall-html-am uninstall-info-am \
 	distclean-local distclean-tags dvi dvi-am html html-am info \
 	info-am install install-am install-data install-data-am \
 	install-dvi install-dvi-am install-exec install-exec-am \
-	install-exec-local install-html install-html-am install-info \
-	install-info-am install-man install-multilibtoolDATA \
-	install-multilibtoolLIBRARIES install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs installdirs-am maintainer-clean \
-	maintainer-clean-aminfo maintainer-clean-generic \
-	maintainer-clean-local mostlyclean mostlyclean-aminfo \
-	mostlyclean-compile mostlyclean-generic mostlyclean-local pdf \
-	pdf-am ps ps-am tags tags-am uninstall uninstall-am \
-	uninstall-dvi-am uninstall-html-am uninstall-info-am \
-	uninstall-multilibtoolDATA uninstall-multilibtoolLIBRARIES \
-	uninstall-pdf-am uninstall-ps-am
+	install-exec-local install-html install-html-am \
+	install-includesystoolDATA install-includetoolDATA \
+	install-info install-info-am install-man \
+	install-multilibtoolDATA install-multilibtoolLIBRARIES \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-aminfo \
+	maintainer-clean-generic maintainer-clean-local mostlyclean \
+	mostlyclean-aminfo mostlyclean-compile mostlyclean-generic \
+	mostlyclean-local pdf pdf-am ps ps-am tags tags-am uninstall \
+	uninstall-am uninstall-dvi-am uninstall-html-am \
+	uninstall-includesystoolDATA uninstall-includetoolDATA \
+	uninstall-info-am uninstall-multilibtoolDATA \
+	uninstall-multilibtoolLIBRARIES uninstall-pdf-am \
+	uninstall-ps-am
 
 .PRECIOUS: Makefile
 
@@ -1430,6 +1659,23 @@ mostlyclean-local: mostlyclean-multi
 clean-local: clean-multi
 distclean-local: distclean-multi
 maintainer-clean-local: maintainer-clean-multi
+
+@CONFIG_BFIN_TRUE@bfin/basiccrt.$(OBJEXT): bfin/basiccrt.S
+@CONFIG_BFIN_TRUE@	$(AM_V_CC)$(COMPILE) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),,-mcpu=bf532-any)
+@CONFIG_BFIN_TRUE@bfin/basiccrts.$(OBJEXT): bfin/basiccrt.S
+@CONFIG_BFIN_TRUE@	$(AM_V_CC)$(COMPILE) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),,-mcpu=bf532-any) -D__BFIN_SDRAM
+@CONFIG_BFIN_TRUE@bfin/basiccrt561.$(OBJEXT): bfin/basiccrt.S
+@CONFIG_BFIN_TRUE@	$(AM_V_CC)$(COMPILE) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf561-any,-mcpu=bf561-none)
+@CONFIG_BFIN_TRUE@bfin/basiccrt561s.$(OBJEXT): bfin/basiccrt.S
+@CONFIG_BFIN_TRUE@	$(AM_V_CC)$(COMPILE) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf561-any,-mcpu=bf561-none) -D__BFIN_SDRAM
+@CONFIG_BFIN_TRUE@bfin/basiccrt561b.$(OBJEXT): bfin/basiccrt.S
+@CONFIG_BFIN_TRUE@	$(AM_V_CC)$(COMPILE) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf561-any,-mcpu=bf561-none) -D__ADSPBF561_COREB__
+@CONFIG_BFIN_TRUE@bfin/basiccrt60x.$(OBJEXT): bfin/basiccrt.S
+@CONFIG_BFIN_TRUE@	$(AM_V_CC)$(COMPILE) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf608-any,-mcpu=bf608-none)
+@CONFIG_BFIN_TRUE@bfin/basiccrt60xs.$(OBJEXT): bfin/basiccrt.S
+@CONFIG_BFIN_TRUE@	$(AM_V_CC)$(COMPILE) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf608-any,-mcpu=bf608-none) -D__BFIN_SDRAM
+@CONFIG_BFIN_TRUE@bfin/basiccrt60xc1.$(OBJEXT): bfin/basiccrt.S
+@CONFIG_BFIN_TRUE@	$(AM_V_CC)$(COMPILE) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf608-any,-mcpu=bf608-none) -D__ADSPBF60x_CORE1__
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

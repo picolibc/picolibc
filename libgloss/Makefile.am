@@ -15,6 +15,12 @@ multilibtooldir = $(tooldir)/lib$(MULTISUBDIR)
 multilibtool_DATA =
 multilibtool_LIBRARIES =
 
+includetooldir = $(tooldir)/include
+includetool_DATA =
+
+includesystooldir = $(tooldir)/include/sys
+includesystool_DATA =
+
 # A fake library so automake will generate rules for plain objects that we want
 # to install (e.g. our crt0.o objects).
 noinst_LIBRARIES = libobjs.a
@@ -52,6 +58,9 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 
 if HAVE_DOC
 include doc/Makefile.inc
+endif
+if CONFIG_BFIN
+include bfin/Makefile.inc
 endif
 if CONFIG_IQ2000
 include iq2000/Makefile.inc

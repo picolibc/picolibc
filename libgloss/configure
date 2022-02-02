@@ -621,7 +621,11 @@ CONFIG_LIBNOSYS_FALSE
 CONFIG_LIBNOSYS_TRUE
 CONFIG_IQ2000_FALSE
 CONFIG_IQ2000_TRUE
+CONFIG_BFIN_FALSE
+CONFIG_BFIN_TRUE
 subdirs
+HAVE_MULTISUBDIR_FALSE
+HAVE_MULTISUBDIR_TRUE
 HAVE_DOC_FALSE
 HAVE_DOC_TRUE
 AM_BACKSLASH
@@ -2652,6 +2656,14 @@ else
   HAVE_DOC_FALSE=
 fi
 
+ if test x$have_multisubdir = xyes; then
+  HAVE_MULTISUBDIR_TRUE=
+  HAVE_MULTISUBDIR_FALSE='#'
+else
+  HAVE_MULTISUBDIR_TRUE='#'
+  HAVE_MULTISUBDIR_FALSE=
+fi
+
 
 
 
@@ -2755,9 +2767,7 @@ subdirs="$subdirs aarch64"
 
 	;;
   bfin-*-*)
-	ac_config_files="$ac_config_files bfin/Makefile"
-
-	subdirs="$subdirs bfin"
+	config_bfin=true
 	;;
   cr16-*-*)
 	ac_config_files="$ac_config_files cr16/Makefile"
@@ -2902,6 +2912,14 @@ subdirs="$subdirs aarch64"
 	subdirs="$subdirs nios2"
 	;;
 esac
+
+ if test x$config_bfin = xtrue; then
+  CONFIG_BFIN_TRUE=
+  CONFIG_BFIN_FALSE='#'
+else
+  CONFIG_BFIN_TRUE='#'
+  CONFIG_BFIN_FALSE=
+fi
 
  if test x$config_iq2000 = xtrue; then
   CONFIG_IQ2000_TRUE=
@@ -5159,6 +5177,14 @@ if test -z "${HAVE_DOC_TRUE}" && test -z "${HAVE_DOC_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_DOC\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${HAVE_MULTISUBDIR_TRUE}" && test -z "${HAVE_MULTISUBDIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_MULTISUBDIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${CONFIG_BFIN_TRUE}" && test -z "${CONFIG_BFIN_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_BFIN\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${CONFIG_IQ2000_TRUE}" && test -z "${CONFIG_IQ2000_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_IQ2000\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -5801,7 +5827,6 @@ do
     "sparc_leon/Makefile") CONFIG_FILES="$CONFIG_FILES sparc_leon/Makefile" ;;
     "riscv/Makefile") CONFIG_FILES="$CONFIG_FILES riscv/Makefile" ;;
     "rs6000/Makefile") CONFIG_FILES="$CONFIG_FILES rs6000/Makefile" ;;
-    "bfin/Makefile") CONFIG_FILES="$CONFIG_FILES bfin/Makefile" ;;
     "cr16/Makefile") CONFIG_FILES="$CONFIG_FILES cr16/Makefile" ;;
     "cris/Makefile") CONFIG_FILES="$CONFIG_FILES cris/Makefile" ;;
     "crx/Makefile") CONFIG_FILES="$CONFIG_FILES crx/Makefile" ;;

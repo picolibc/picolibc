@@ -20,6 +20,7 @@ else
   have_multisubdir=yes
 fi
 AM_CONDITIONAL(HAVE_DOC, test x$have_multisubdir = xno)
+AM_CONDITIONAL(HAVE_MULTISUBDIR, test x$have_multisubdir = xyes)
 
 AC_NO_EXECUTABLES
 
@@ -104,8 +105,7 @@ case "${target}" in
 	AC_CONFIG_SUBDIRS([mn10300])
 	;;
   bfin-*-*)
-	AC_CONFIG_FILES([bfin/Makefile])
-	subdirs="$subdirs bfin"
+	config_bfin=true
 	;;
   cr16-*-*)
 	AC_CONFIG_FILES([cr16/Makefile])
@@ -224,6 +224,7 @@ case "${target}" in
 	;;
 esac
 
+AM_CONDITIONAL(CONFIG_BFIN, test x$config_bfin = xtrue)
 AM_CONDITIONAL(CONFIG_IQ2000, test x$config_iq2000 = xtrue)
 
 dnl For now, don't bother configuring testsuite
