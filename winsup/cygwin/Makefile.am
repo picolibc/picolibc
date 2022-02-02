@@ -40,7 +40,9 @@ toolincludedir=$(tooldir)/include
 # Parameters used in building the cygwin.dll.
 
 DLL_NAME=cygwin1.dll
-TEST_DLL_NAME=cygwin0.dll
+PRE_DLL_NAME=cygwin0.dll
+DBG_DLL_NAME=cygwin1.dbg
+NEW_DLL_NAME=new-cygwin1.dll
 DIN_FILE=@DIN_FILE@
 DEF_FILE=cygwin.def
 TLSOFFSETS_H=@TLSOFFSETS_H@
@@ -623,7 +625,7 @@ $(LDSCRIPT): $(LDSCRIPT).in
 	$(AM_V_GEN)$(CC) -E - -P < $^ -o $@
 
 # cygwin dll
-$(TEST_DLL_NAME): $(LDSCRIPT) dllfixdbg libdll.a $(VERSION_OFILES) $(LIBSERVER)\
+$(PRE_DLL_NAME): $(LDSCRIPT) dllfixdbg libdll.a $(VERSION_OFILES) $(LIBSERVER)\
 		  $(newlib_build)/libm/libm.a $(newlib_build)/libc/libc.a
 	$(AM_V_CXXLD)$(CXX) $(CXXFLAGS) \
 	-mno-use-libstdc-wrappers \
@@ -636,8 +638,12 @@ $(TEST_DLL_NAME): $(LDSCRIPT) dllfixdbg libdll.a $(VERSION_OFILES) $(LIBSERVER)\
 	$(newlib_build)/libm/libm.a \
 	$(newlib_build)/libc/libc.a \
 	-lgcc -lkernel32 -lntdll -Wl,-Map,cygwin.map
-	@$(srcdir)/dllfixdbg $(OBJDUMP) $(OBJCOPY) $@ cygwin1.dbg
-	@ln -f $@ new-cygwin1.dll
+
+$(DBG_DLL_NAME): $(PRE_DLL_NAME)
+	$(AM_V_GEN)$(srcdir)/dllfixdbg $(OBJDUMP) $(OBJCOPY) $(PRE_DLL_NAME) $(DBG_DLL_NAME)
+
+$(NEW_DLL_NAME): $(PRE_DLL_NAME) $(DBG_DLL_NAME)
+	$(AM_V_GEN)ln -f $(PRE_DLL_NAME) $@
 
 # cygwin import library
 toolopts=--cpu=@target_cpu@ --ar=@AR@ --as=@AS@ --nm=@NM@ --objcopy=@OBJCOPY@
@@ -651,7 +657,7 @@ sigfe.s: $(DEF_FILE)
 	[ -s $@ ] && touch $@
 
 LIBCOS=$(addsuffix .o,$(basename $(LIB_FILES)))
-$(LIB_NAME): $(DEF_FILE) $(LIBCOS) | $(TEST_DLL_NAME)
+$(LIB_NAME): $(DEF_FILE) $(LIBCOS) | $(NEW_DLL_NAME)
 	$(AM_V_GEN)$(srcdir)/mkimport $(toolopts) $(NEW_FUNCTIONS) $@ cygdll.a $(wordlist 2,99,$^)
 
 # cygwin import library used by testsuite
@@ -709,7 +715,8 @@ all-local: $(LIB_NAME) $(TEST_LIB_NAME) $(SUBLIBS)
 clean-local:
 	-rm -f $(BUILT_SOURCES)
 	-rm -f $(DEF_FILE) sigfe.s
-	-rm -f cygwin.sc cygdll.a cygwin.map $(TEST_DLL_NAME) cygwin1.dbg new-cygwin1.dll
+	-rm -f cygwin.sc cygdll.a cygwin.map
+	-rm -f $(PRE_DLL_NAME) $(DBG_DLL_NAME) $(NEW_DLL_NAME)
 	-rm -f $(LIB_NAME) $(TEST_LIB_NAME) $(SUBLIBS)
 	-rm -f version.cc
 
@@ -727,7 +734,7 @@ install-data-local: install-headers install-ldif
 
 install-libs:
 	@$(MKDIR_P) $(DESTDIR)$(bindir)
-	$(INSTALL_PROGRAM) $(TEST_DLL_NAME) $(DESTDIR)$(bindir)/$(DLL_NAME)
+	$(INSTALL_PROGRAM) $(NEW_DLL_NAME) $(DESTDIR)$(bindir)/$(DLL_NAME)
 	@$(MKDIR_P) $(DESTDIR)$(toollibdir)
 	(cd $(DESTDIR)$(toollibdir) && ln -sf $(LIB_NAME) libg.a)
 
