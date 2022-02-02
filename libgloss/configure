@@ -615,6 +615,8 @@ am__include
 DEPDIR
 CC
 subdirs
+HAVE_DOC_FALSE
+HAVE_DOC_TRUE
 AM_BACKSLASH
 AM_DEFAULT_VERBOSITY
 AM_DEFAULT_V
@@ -2630,10 +2632,19 @@ fi
 AM_BACKSLASH='\'
 
 
-if test -z "${with_multisubdir}" ; then
-  ac_config_files="$ac_config_files doc/Makefile"
-
+if test -z "${with_multisubdir}"; then
+  have_multisubdir=no
+else
+  have_multisubdir=yes
 fi
+ if test x$have_multisubdir = xno; then
+  HAVE_DOC_TRUE=
+  HAVE_DOC_FALSE='#'
+else
+  HAVE_DOC_TRUE='#'
+  HAVE_DOC_FALSE=
+fi
+
 
 
 
@@ -5001,6 +5012,10 @@ else
   am__EXEEXT_FALSE=
 fi
 
+if test -z "${HAVE_DOC_TRUE}" && test -z "${HAVE_DOC_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_DOC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${AMDEP_TRUE}" && test -z "${AMDEP_FALSE}"; then
   as_fn_error $? "conditional \"AMDEP\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -5621,7 +5636,6 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
-    "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "arc/Makefile") CONFIG_FILES="$CONFIG_FILES arc/Makefile" ;;
     "epiphany/Makefile") CONFIG_FILES="$CONFIG_FILES epiphany/Makefile" ;;
     "m32r/Makefile") CONFIG_FILES="$CONFIG_FILES m32r/Makefile" ;;

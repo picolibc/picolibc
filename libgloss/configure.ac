@@ -14,9 +14,12 @@ AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE([foreign no-dist no-define subdir-objects 1.15.1])
 AM_SILENT_RULES(yes)
 
-if test -z "${with_multisubdir}" ; then
-  AC_CONFIG_FILES([doc/Makefile])
+if test -z "${with_multisubdir}"; then
+  have_multisubdir=no
+else
+  have_multisubdir=yes
 fi
+AM_CONDITIONAL(HAVE_DOC, test x$have_multisubdir = xno)
 
 AC_NO_EXECUTABLES
 

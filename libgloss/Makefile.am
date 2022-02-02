@@ -3,6 +3,7 @@
 ACLOCAL_AMFLAGS = -I . -I .. -I ../config
 
 # Variables that will accumulate in subdirs.
+info_TEXINFOS =
 PHONY =
 
 SUBDIRS = @subdirs@ .
@@ -36,3 +37,9 @@ FLAGS_TO_PASS = \
 	"DESTDIR=$(DESTDIR)"
 
 include $(top_srcdir)/../multilib.am
+
+TEXINFO_TEX = ../texinfo/texinfo.tex
+
+if HAVE_DOC
+include doc/Makefile.inc
+endif
