@@ -2174,6 +2174,12 @@ fhandler_console::char_command (char c)
 	      cursor_get (&x, &y);
 	      if (y < srTop || y > srBottom)
 		break;
+	      if (y == con.b.srWindow.Bottom)
+		{
+		  WriteConsoleW (get_output_handle (), L"\033[2K", 4, 0, 0);
+		  wpbuf.empty ();
+		  break;
+		}
 	      if (y == con.b.srWindow.Top
 		  && srBottom == con.b.srWindow.Bottom)
 		{
@@ -2213,6 +2219,12 @@ fhandler_console::char_command (char c)
 	      cursor_get (&x, &y);
 	      if (y < srTop || y > srBottom)
 		break;
+	      if (y == con.b.srWindow.Bottom)
+		{
+		  WriteConsoleW (get_output_handle (), L"\033[2K", 4, 0, 0);
+		  wpbuf.empty ();
+		  break;
+		}
 	      __small_swprintf (bufw, L"\033[%d;%dr",
 				y + 1 - con.b.srWindow.Top,
 				srBottom + 1 - con.b.srWindow.Top);
