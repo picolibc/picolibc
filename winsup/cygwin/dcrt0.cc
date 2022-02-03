@@ -800,7 +800,7 @@ main_thread_sinit ()
      read or written in the first stdio function call in the main thread.
 
      To fix this issue we set __cleanup to _cygtls::cleanup_early here. */
-  _REENT->__cleanup = _cygtls::cleanup_early;
+  _REENT_CLEANUP(_REENT) = _cygtls::cleanup_early;
 }
 
 /* Take over from libc's crt0.o and start the application. Note the

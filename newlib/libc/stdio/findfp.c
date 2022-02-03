@@ -235,14 +235,14 @@ __sinit (struct _reent *s)
 {
   __sfp_lock_acquire ();
 
-  if (s->__cleanup)
+  if (_REENT_CLEANUP(s))
     {
       __sfp_lock_release ();
       return;
     }
 
   /* make sure we clean up on exit */
-  s->__cleanup = cleanup_stdio;	/* conservative */
+  _REENT_CLEANUP(s) = cleanup_stdio;	/* conservative */
 
   global_stdio_init ();
   __sfp_lock_release ();

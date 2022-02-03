@@ -55,7 +55,7 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
       _REENT_INIT_PTR (&local_clib);
       stackptr = stack;
       altstack.ss_flags = SS_DISABLE;
-      if (_GLOBAL_REENT->__cleanup)
+      if (_REENT_CLEANUP(_GLOBAL_REENT))
 	local_clib.__cleanup = _cygtls::cleanup_early;
     }
 

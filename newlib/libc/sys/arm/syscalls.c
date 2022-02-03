@@ -60,7 +60,7 @@ extern void   __sinit (struct _reent *);
 #define CHECK_INIT(ptr) \
   do						\
     {						\
-      if ((ptr) && !(ptr)->__cleanup)		\
+      if ((ptr) && !_REENT_CLEANUP(ptr))	\
 	__sinit (ptr);				\
     }						\
   while (0)

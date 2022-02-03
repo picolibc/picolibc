@@ -197,7 +197,7 @@ extern _READ_WRITE_RETURN_TYPE __swrite64 (struct _reent *, void *,
   do								\
     {								\
       struct _reent *_check_init_ptr = (ptr);			\
-      if ((_check_init_ptr) && !(_check_init_ptr)->__cleanup)	\
+      if ((_check_init_ptr) && !_REENT_CLEANUP(_check_init_ptr))\
 	__sinit (_check_init_ptr);				\
     }								\
   while (0)

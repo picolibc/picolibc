@@ -65,7 +65,7 @@ __cleanup (struct _reent *s)
 void
 __sinit (struct _reent *s)
 {
-  s->__cleanup = __cleanup;
+  _REENT_CLEANUP(s) = __cleanup;
 
   _REENT_STDIN(s) = &s->__sf[0];
   _REENT_STDIN(s)->_fp = SPE_STDIN;
