@@ -78,8 +78,8 @@ _reclaim_reent (struct _reent *ptr)
 	_free_r (ptr, ptr->_misc);
 #endif
 
-      if (ptr->_cvtbuf)
-	_free_r (ptr, ptr->_cvtbuf);
+      if (_REENT_CVTBUF(ptr))
+	_free_r (ptr, _REENT_CVTBUF(ptr));
     /* We should free _sig_func to avoid a memory leak, but how to
 	   do it safely considering that a signal may be delivered immediately
 	   after the free?

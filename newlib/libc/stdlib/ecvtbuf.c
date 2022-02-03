@@ -232,14 +232,14 @@ fcvtbuf (double invalue,
     {
       if (_REENT_CVTLEN(reent) <= ndigit + 35)
 	{
-	  if ((fcvt_buf = (char *) _realloc_r (reent, reent->_cvtbuf,
+	  if ((fcvt_buf = (char *) _realloc_r (reent, _REENT_CVTBUF(reent),
 					       ndigit + 36)) == NULL)
 	    return NULL;
 	  _REENT_CVTLEN(reent) = ndigit + 36;
-	  reent->_cvtbuf = fcvt_buf;
+	  _REENT_CVTBUF(reent) = fcvt_buf;
 	}
 
-      fcvt_buf = reent->_cvtbuf ;
+      fcvt_buf = _REENT_CVTBUF(reent) ;
     }
 
   save = fcvt_buf;
@@ -281,14 +281,14 @@ ecvtbuf (double invalue,
     {
       if (_REENT_CVTLEN(reent) <= ndigit)
 	{
-	  if ((fcvt_buf = (char *) _realloc_r (reent, reent->_cvtbuf,
+	  if ((fcvt_buf = (char *) _realloc_r (reent, _REENT_CVTBUF(reent),
 					       ndigit + 1)) == NULL)
 	    return NULL;
 	  _REENT_CVTLEN(reent) = ndigit + 1;
-	  reent->_cvtbuf = fcvt_buf;
+	  _REENT_CVTBUF(reent) = fcvt_buf;
 	}
 
-      fcvt_buf = reent->_cvtbuf ;
+      fcvt_buf = _REENT_CVTBUF(reent) ;
     }
 
   save = fcvt_buf;

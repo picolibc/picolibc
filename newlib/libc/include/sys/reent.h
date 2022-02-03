@@ -719,6 +719,7 @@ struct _reent
 #endif /* !_REENT_SMALL */
 
 #define _REENT_CLEANUP(_ptr)	((_ptr)->__cleanup)
+#define _REENT_CVTBUF(_ptr)	((_ptr)->_cvtbuf)
 #define _REENT_CVTLEN(_ptr)	((_ptr)->_cvtlen)
 #define _REENT_EMERGENCY(_ptr)	((_ptr)->_emergency)
 #define _REENT_ERRNO(_ptr)	((_ptr)->_errno)
