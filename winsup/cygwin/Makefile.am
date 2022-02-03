@@ -639,11 +639,8 @@ $(PRE_DLL_NAME): $(LDSCRIPT) dllfixdbg libdll.a $(VERSION_OFILES) $(LIBSERVER)\
 	$(newlib_build)/libc/libc.a \
 	-lgcc -lkernel32 -lntdll -Wl,-Map,cygwin.map
 
-$(DBG_DLL_NAME): $(PRE_DLL_NAME)
-	$(AM_V_GEN)$(srcdir)/dllfixdbg $(OBJDUMP) $(OBJCOPY) $(PRE_DLL_NAME) $(DBG_DLL_NAME)
-
-$(NEW_DLL_NAME): $(PRE_DLL_NAME) $(DBG_DLL_NAME)
-	$(AM_V_GEN)ln -f $(PRE_DLL_NAME) $@
+$(DBG_DLL_NAME) $(NEW_DLL_NAME): $(PRE_DLL_NAME)
+	$(AM_V_GEN)$(srcdir)/dllfixdbg $(OBJDUMP) $(OBJCOPY) $(PRE_DLL_NAME) $(DBG_DLL_NAME) $(NEW_DLL_NAME)
 
 # cygwin import library
 toolopts=--cpu=@target_cpu@ --ar=@AR@ --as=@AS@ --nm=@NM@ --objcopy=@OBJCOPY@
