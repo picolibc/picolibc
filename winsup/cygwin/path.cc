@@ -3495,10 +3495,19 @@ restart:
 
 	      /* If incoming path has no trailing backslash, but final path
 		 has one, drop trailing backslash from final path so the
-		 below string comparison has a chance to succeed. */
+		 below string comparison has a chance to succeed.
+		 On the contrary, if incoming path has trailing backslash,
+		 but final path does not have one, add trailing backslash
+		 to the final path. */
 	      if (upath.Buffer[(upath.Length - 1) / sizeof (WCHAR)] != L'\\'
-                  && fpbuf[ret - 1] == L'\\')
+		  && fpbuf[ret - 1] == L'\\')
                 fpbuf[--ret] = L'\0';
+	      if (upath.Buffer[(upath.Length - 1) / sizeof (WCHAR)] == L'\\'
+		  && fpbuf[ret - 1] != L'\\' && ret < NT_MAX_PATH - 1)
+		{
+		  fpbuf[ret++] = L'\\';
+		  fpbuf[ret] = L'\0';
+		}
 	      fpbuf[1] = L'?';	/* \\?\ --> \??\ */
 	      RtlInitCountedUnicodeString (&fpath, fpbuf, ret * sizeof (WCHAR));
 	      if (!RtlEqualUnicodeString (&upath, &fpath, !!ci_flag))
