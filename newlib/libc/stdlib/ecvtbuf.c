@@ -230,12 +230,12 @@ fcvtbuf (double invalue,
 
   if (fcvt_buf == NULL)
     {
-      if (reent->_cvtlen <= ndigit + 35)
+      if (_REENT_CVTLEN(reent) <= ndigit + 35)
 	{
 	  if ((fcvt_buf = (char *) _realloc_r (reent, reent->_cvtbuf,
 					       ndigit + 36)) == NULL)
 	    return NULL;
-	  reent->_cvtlen = ndigit + 36;
+	  _REENT_CVTLEN(reent) = ndigit + 36;
 	  reent->_cvtbuf = fcvt_buf;
 	}
 
@@ -279,12 +279,12 @@ ecvtbuf (double invalue,
 
   if (fcvt_buf == NULL)
     {
-      if (reent->_cvtlen <= ndigit)
+      if (_REENT_CVTLEN(reent) <= ndigit)
 	{
 	  if ((fcvt_buf = (char *) _realloc_r (reent, reent->_cvtbuf,
 					       ndigit + 1)) == NULL)
 	    return NULL;
-	  reent->_cvtlen = ndigit + 1;
+	  _REENT_CVTLEN(reent) = ndigit + 1;
 	  reent->_cvtbuf = fcvt_buf;
 	}
 
