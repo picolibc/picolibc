@@ -93,14 +93,14 @@ _init_signal_r (struct _reent *ptr)
 {
   int i;
 
-  if (ptr->_sig_func == NULL)
+  if (_REENT_SIG_FUNC(ptr) == NULL)
     {
-      ptr->_sig_func = (_sig_func_ptr *)_malloc_r (ptr, sizeof (_sig_func_ptr) * NSIG);
-      if (ptr->_sig_func == NULL)
+      _REENT_SIG_FUNC(ptr) = (_sig_func_ptr *)_malloc_r (ptr, sizeof (_sig_func_ptr) * NSIG);
+      if (_REENT_SIG_FUNC(ptr) == NULL)
 	return -1;
 
       for (i = 0; i < NSIG; i++)
-	ptr->_sig_func[i] = SIG_DFL;
+	_REENT_SIG_FUNC(ptr)[i] = SIG_DFL;
     }
 
   return 0;
@@ -119,11 +119,11 @@ _signal_r (struct _reent *ptr,
       return SIG_ERR;
     }
 
-  if (ptr->_sig_func == NULL && _init_signal_r (ptr) != 0)
+  if (_REENT_SIG_FUNC(ptr) == NULL && _init_signal_r (ptr) != 0)
     return SIG_ERR;
   
-  old_func = ptr->_sig_func[sig];
-  ptr->_sig_func[sig] = func;
+  old_func = _REENT_SIG_FUNC(ptr)[sig];
+  _REENT_SIG_FUNC(ptr)[sig] = func;
 
   return old_func;
 }
@@ -140,10 +140,10 @@ _raise_r (struct _reent *ptr,
       return -1;
     }
 
-  if (ptr->_sig_func == NULL)
+  if (_REENT_SIG_FUNC(ptr) == NULL)
     func = SIG_DFL;
   else
-    func = ptr->_sig_func[sig];
+    func = _REENT_SIG_FUNC(ptr)[sig];
 
   if (func == SIG_DFL)
     return _kill_r (ptr, _getpid_r (ptr), sig);
@@ -156,7 +156,7 @@ _raise_r (struct _reent *ptr,
     }
   else
     {
-      ptr->_sig_func[sig] = SIG_DFL;
+      _REENT_SIG_FUNC(ptr)[sig] = SIG_DFL;
       func (sig);
       return 0;
     }
@@ -173,10 +173,10 @@ __sigtramp_r (struct _reent *ptr,
       return -1;
     }
 
-  if (ptr->_sig_func == NULL && _init_signal_r (ptr) != 0)
+  if (_REENT_SIG_FUNC(ptr) == NULL && _init_signal_r (ptr) != 0)
     return -1;
 
-  func = ptr->_sig_func[sig];
+  func = _REENT_SIG_FUNC(ptr)[sig];
   if (func == SIG_DFL)
     return 1;
   else if (func == SIG_ERR)
@@ -185,7 +185,7 @@ __sigtramp_r (struct _reent *ptr,
     return 3;
   else
     {
-      ptr->_sig_func[sig] = SIG_DFL;
+      _REENT_SIG_FUNC(ptr)[sig] = SIG_DFL;
       func (sig);
       return 0;
     }

@@ -83,8 +83,8 @@ _reclaim_reent (struct _reent *ptr)
     /* We should free _sig_func to avoid a memory leak, but how to
 	   do it safely considering that a signal may be delivered immediately
 	   after the free?
-	  if (ptr->_sig_func)
-	_free_r (ptr, ptr->_sig_func);*/
+	  if (_REENT_SIG_FUNC(ptr))
+	_free_r (ptr, _REENT_SIG_FUNC(ptr));*/
 
       if (_REENT_CLEANUP(ptr))
 	{
