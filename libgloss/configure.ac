@@ -330,6 +330,19 @@ target_makefile_frag_path=$target_makefile_frag
 AC_SUBST(target_makefile_frag_path)
 AC_SUBST_FILE(target_makefile_frag)
 
+dnl AM_ENABLE_MULTILIB only processes the top-level Makefile, but we want the
+dnl multilib settings to propagate to all sub-Makefiles that we recurse into
+dnl too.  This can go away if we ever get rid of sub-Makefiles and only use
+dnl Automake + makefile include fragments.
+AC_OUTPUT_COMMANDS([
+for subdir in $subdirs; do
+  case " $CONFIG_FILES " in
+   *" $subdir/Makefile "*)
+     ac_file=$subdir/Makefile . ${multi_basedir}/config-ml.in
+     ;;
+  esac
+done], [subdirs="$subdirs"])
+
 AM_ENABLE_MULTILIB(, ..)
 
 AC_CONFIG_FILES([Makefile])

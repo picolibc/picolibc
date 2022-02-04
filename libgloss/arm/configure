@@ -3926,6 +3926,8 @@ $as_echo X"$file" |
   done
 }
  ;;
+    "cpu-init/Makefile":F)     ac_file=cpu-init/Makefile . ${srcdir}/../../config-ml.in
+   ;;
     "default-1":C)
 # Only add multilib support code if we just rebuilt the top-level
 # Makefile.

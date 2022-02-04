@@ -62,7 +62,9 @@ AC_SUBST_FILE(host_makefile_frag)
 # Configure cpu init plug-ins
 if test -d "${srcdir}/cpu-init"; then
   subdirs="${subdirs} cpu-init"
-  AC_CONFIG_FILES([cpu-init/Makefile])
+  AC_CONFIG_FILES([cpu-init/Makefile], [dnl
+    ac_file=cpu-init/Makefile . ${srcdir}/../../config-ml.in
+  ])
   AC_SUBST(subdirs)
 fi
 
