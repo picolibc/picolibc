@@ -625,7 +625,7 @@ $(LDSCRIPT): $(LDSCRIPT).in
 	$(AM_V_GEN)$(CC) -E - -P < $^ -o $@
 
 # cygwin dll
-$(PRE_DLL_NAME): $(LDSCRIPT) dllfixdbg libdll.a $(VERSION_OFILES) $(LIBSERVER)\
+$(PRE_DLL_NAME): $(LDSCRIPT) libdll.a $(VERSION_OFILES) $(LIBSERVER)\
 		  $(newlib_build)/libm/libm.a $(newlib_build)/libc/libc.a
 	$(AM_V_CXXLD)$(CXX) $(CXXFLAGS) \
 	-mno-use-libstdc-wrappers \
@@ -639,7 +639,7 @@ $(PRE_DLL_NAME): $(LDSCRIPT) dllfixdbg libdll.a $(VERSION_OFILES) $(LIBSERVER)\
 	$(newlib_build)/libc/libc.a \
 	-lgcc -lkernel32 -lntdll -Wl,-Map,cygwin.map
 
-$(DBG_DLL_NAME) $(NEW_DLL_NAME): $(PRE_DLL_NAME)
+$(DBG_DLL_NAME) $(NEW_DLL_NAME): dllfixdbg $(PRE_DLL_NAME)
 	$(AM_V_GEN)$(srcdir)/dllfixdbg $(OBJDUMP) $(OBJCOPY) $(PRE_DLL_NAME) $(DBG_DLL_NAME) $(NEW_DLL_NAME) $(V)
 
 # cygwin import library
