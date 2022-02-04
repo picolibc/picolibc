@@ -8,69 +8,73 @@
 #
 use integer;
 use strict;
-sub xit($@);
-my $strip = $ARGV[0] eq '-s';
-shift if $strip;
-my $objdump = shift;
-my @objcopy = ((shift));
-my $pre_dll = shift;
-my $dbg_dll = shift;
-my $new_dll = shift;
-my $verbose = shift;
-xit 0, @objcopy, '-R', '.gnu_debuglink_overlay', '--add-gnu-debuglink=/dev/null', '--only-keep-debug', $pre_dll, $dbg_dll;
-xit 0, @objcopy, '-g', '--keep-section=.gnu_debuglink_overlay', '--add-gnu-debuglink=' . $dbg_dll, $pre_dll, $new_dll;
-open(OBJDUMP, '-|', "$objdump --headers $new_dll");
-my %section;
-while (<OBJDUMP>) {
-    my ($idx, $name, $size, $vma, $lma, $fileoff, $algn) = /^\s*(\d+)\s+(\.\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s*$/;
-    if ($name eq '.gnu_debuglink') {
-	push(@objcopy, '--set-section-flag', '.gnu_debuglink=contents,readonly,debug,noload');
-	$idx = $section{'.gnu_debuglink'}{-idx} if defined($section{'.gnu_debuglink'}{-idx});
-    } elsif ($name eq '.gnu_debuglink_overlay') {
-	push (@objcopy, '-R', '.gnu_debuglink_overlay');
-	$section{'.gnu_debuglink'}{-idx} = $idx;
-	next;
+
+sub xit {
+    my ( $execit, $cmdline, $verbose ) = @_;
+    print "+ ", join (' ', @$cmdline), "\n" if ($verbose);
+    if ($execit) {
+	exec @{$cmdline} or die "$0: couldn't exec @{$cmdline}[0] - $!\n";
+    } else {
+	system @{$cmdline} and die "$0: couldn't exec @{$cmdline}[0] - $!\n";
     }
-    defined($idx) and
-      $section{$name} = {-idx=>int($idx), -size=>hex($size), -vma=>hex($vma), -lma=>hex($lma), -fileoff=>hex($fileoff),
-	  -algn=>0x00001000};
+}
+
+my $objdump = shift;	# path to objdump
+my $objcopy = shift;	# path to objcopy
+my $pre_dll = shift;	# name of input DLL, usually cygwin0.dll
+my $dbg_dll = shift;	# name of debug section file, usually cygwin1.dbg
+my $new_dll = shift;	# name of stripped DLL, usually new-cygwin1.dll
+my $verbose = shift;	# verbose flag, taken from Makefile's $(V)
+
+# Create cygwin1.dbg file
+my @create_dbgfile = ( $objcopy,
+		       '-R',
+		       '.gnu_debuglink_overlay',
+		       '--add-gnu-debuglink=/dev/null',
+		       '--only-keep-debug',
+		       $pre_dll,
+		       $dbg_dll );
+&xit (0, \@create_dbgfile, $verbose);
+# Create stripped new-cygwin1.dll
+# The .gnu_debuglink section gets appended
+my @create_stripped_dll = ( $objcopy,
+			    '-g',
+			    '--keep-section=.gnu_debuglink_overlay',
+			    '--add-gnu-debuglink=' . $dbg_dll,
+			    $pre_dll,
+			    $new_dll );
+&xit (0, \@create_stripped_dll, $verbose);
+# Fixup .gnu_debuglink section
+my @fixup_debuglink = ( $objcopy );
+open (OBJDUMP, '-|', "$objdump --headers $new_dll");
+my $overlay_vma;
+while (<OBJDUMP>) {
+    # Fetch line and split
+    my ($idx, $name, $size, $vma, $lma, $fileoff, $algn)
+      = /^\s*(\d+)\s+(\.\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s*$/;
+    # skip section flag lines
+    next if !defined ($idx);
+    # If we see a .gnu_debuglink_overlay section, use its section vma
+    # as vma of the .gnu_debuglink section.
+    if ($name eq '.gnu_debuglink_overlay') {
+	$overlay_vma = $vma;
+	# remove .gnu_debuglink_overlay section
+	push (@fixup_debuglink,
+	      '-R',
+	      '.gnu_debuglink_overlay');
+	# move .gnu_debuglink to .gnu_debuglink_overlay section slot
+	push (@fixup_debuglink,
+	      '--change-section-address',
+	      '.gnu_debuglink=0x' . $overlay_vma);
+	# fix up section flags
+	push (@fixup_debuglink,
+	      '--set-section-flag',
+	      '.gnu_debuglink=contents,readonly,debug,noload');
+    }
 }
 close OBJDUMP;
-my $vma;
-for my $k (sort {$section{$a}{-idx} <=> $section{$b}{-idx}} keys %section) {
-    if ($strip && $k =~ /\.(?:stab|debug)/o) {
-	push(@objcopy, '-R', $k);
-	next;
-    }
-    if (!defined($vma)) {
-	$vma = $section{$k}{-vma};
-    }
-    if ($vma != $section{$k}{-vma}) {
-	my $newvma = align($vma, $section{$k}{-algn});
-	if ($newvma != $vma) {
-	    printf STDERR "$0: ERROR $k VMA 0x%08x != 0x%08x\n", $vma, $newvma;
-	    exit 1;
-	}
-	push(@objcopy, '--change-section-address', sprintf "$k=0x%08x", $vma);
-    }
-    $vma = align($vma + $section{$k}{-size}, $section{$k}{-algn});
-}
+# If we didn't find a .gnu_debuglink_overlay section, bail out
+defined ($overlay_vma) or die "$0: no .gnu_debuglink_overlay section!\n";
 
-warn "$0: ERROR final VMA (" . sprintf("0x%08x", $vma) . ") not on 64K boundary\n" if $vma != align($vma, 64 * 1024);
-push(@objcopy, $new_dll, @ARGV);
-xit 1, @objcopy;
-sub align {
-    my $n = $_[0];
-    my $align = $_[1] - 1;
-    return ($n + $align) & ~$align;
-}
-
-sub xit($@) {
-    my $execit = shift;
-    print "+ @_\n" if ($verbose);
-    if ($execit) {
-	exec @_ or die "$0: couldn't exec $_[0] - $!\n";
-    } else {
-	system @_ and die "$0: couldn't exec $_[0] - $!\n";
-    }
-}
+push (@fixup_debuglink, $new_dll);
+&xit (1, \@fixup_debuglink, $verbose);
