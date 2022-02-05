@@ -118,6 +118,8 @@ AM_INIT_AUTOMAKE([foreign no-installinfo no-dependencies no-dist no-define subdi
 AM_MAINTAINER_MODE()
 AM_SILENT_RULES(yes)
 
+AC_NO_EXECUTABLES
+
 # FIXME: We temporarily define our own version of AC_PROG_CC.  This is
 # copied from autoconf 2.12, but does not call AC_PROG_CC_WORKS.  We
 # are probably using a cross compiler, which will not be able to fully
@@ -180,6 +182,7 @@ fi
 ])
 
 LIB_AC_PROG_CC
+AC_REQUIRE([AC_PROG_CPP])dnl
 
 AC_CHECK_TOOL(AS, as)
 AC_CHECK_TOOL(AR, ar)

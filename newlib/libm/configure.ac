@@ -16,9 +16,7 @@ AM_CONDITIONAL(NEWLIB_HW_FP, test x$newlib_hw_fp = xtrue)
 dnl Can't be done in NEWLIB_CONFIGURE because that confuses automake. 
 AC_CONFIG_AUX_DIR(../..)
 
-AC_NO_EXECUTABLES
 NEWLIB_CONFIGURE(..)
-AC_PROG_CPP
 
 dnl We have to enable libtool after NEWLIB_CONFIGURE because if we try and
 dnl add it into NEWLIB_CONFIGURE, executable tests are made before the first

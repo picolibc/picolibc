@@ -45,9 +45,7 @@ AC_ARG_ENABLE(newlib-retargetable-locking,
  esac],[newlib_retargetable_locking=no])
 AM_CONDITIONAL(NEWLIB_RETARGETABLE_LOCKING, test x$newlib_retargetable_locking = xyes)
 
-AC_NO_EXECUTABLES
 NEWLIB_CONFIGURE(..)
-AC_PROG_CPP
 
 AM_CONDITIONAL(NEWLIB_NANO_MALLOC, test x$newlib_nano_malloc = xyes)
 
