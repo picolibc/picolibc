@@ -4177,9 +4177,6 @@ fi
 
 
 
-# Hack to ensure that INSTALL won't be set to "../" with autoconf 2.13.  */
-ac_given_INSTALL=$INSTALL
-
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable maintainer-specific portions of Makefiles" >&5
 $as_echo_n "checking whether to enable maintainer-specific portions of Makefiles... " >&6; }

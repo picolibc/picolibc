@@ -4567,9 +4567,6 @@ fi
 
 
 
-# Hack to ensure that INSTALL won't be set to "../" with autoconf 2.13.  */
-ac_given_INSTALL=$INSTALL
-
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable maintainer-specific portions of Makefiles" >&5
 $as_echo_n "checking whether to enable maintainer-specific portions of Makefiles... " >&6; }
@@ -11367,7 +11364,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11370 "configure"
+#line 11367 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11473,7 +11470,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11476 "configure"
+#line 11473 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H

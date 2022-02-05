@@ -132,9 +132,6 @@ dnl expanding them multiple times.
 AC_REQUIRE([AC_PROG_INSTALL])dnl
 AC_REQUIRE([AC_PROG_AWK])dnl
 
-# Hack to ensure that INSTALL won't be set to "../" with autoconf 2.13.  */
-ac_given_INSTALL=$INSTALL
-
 AM_MAINTAINER_MODE
 
 . [$]{newlib_basedir}/configure.host
