@@ -2177,7 +2177,6 @@ fhandler_console::char_command (char c)
 	      if (y == con.b.srWindow.Bottom)
 		{
 		  WriteConsoleW (get_output_handle (), L"\033[2K", 4, 0, 0);
-		  wpbuf.empty ();
 		  break;
 		}
 	      if (y == con.b.srWindow.Top
@@ -2222,7 +2221,6 @@ fhandler_console::char_command (char c)
 	      if (y == con.b.srWindow.Bottom)
 		{
 		  WriteConsoleW (get_output_handle (), L"\033[2K", 4, 0, 0);
-		  wpbuf.empty ();
 		  break;
 		}
 	      __small_swprintf (bufw, L"\033[%d;%dr",
