@@ -124,7 +124,7 @@ AC_REQUIRE([AC_PROG_CC])dnl
 AC_REQUIRE([AC_PROG_CPP])dnl
 AC_REQUIRE([AM_PROG_AS])dnl
 AC_REQUIRE([AM_PROG_AR])dnl
-AC_CHECK_TOOL(RANLIB, ranlib, :)
+AC_PROG_RANLIB
 AC_CHECK_TOOL(READELF, readelf, :)
 
 dnl We need these programs, but so does Automake.  Require the macros to avoid
