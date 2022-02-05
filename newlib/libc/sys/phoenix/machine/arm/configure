@@ -608,12 +608,11 @@ ELIX_LEVEL_0_FALSE
 ELIX_LEVEL_0_TRUE
 NO_INCLUDE_LIST
 NEWLIB_CFLAGS
-CCASFLAGS
-CCAS
 READELF
 RANLIB
 AR
-AS
+CCASFLAGS
+CCAS
 CPP
 OBJEXT
 EXEEXT
@@ -3510,6 +3509,13 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
+# By default we simply use the C compiler to build assembly code.
+
+test "${CCAS+set}" = set || CCAS=$CC
+test "${CCASFLAGS+set}" = set || CCASFLAGS=$CFLAGS
+
+
+
 
 # Check whether --enable-target-optspace was given.
 if test "${enable_target_optspace+set}" = set; then :
@@ -3803,101 +3809,6 @@ AM_BACKSLASH='\'
 
 
 
-
-
-
-
-if test -n "$ac_tool_prefix"; then
-  # Extract the first word of "${ac_tool_prefix}as", so it can be a program name with args.
-set dummy ${ac_tool_prefix}as; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_AS+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$AS"; then
-  ac_cv_prog_AS="$AS" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_AS="${ac_tool_prefix}as"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-fi
-fi
-AS=$ac_cv_prog_AS
-if test -n "$AS"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $AS" >&5
-$as_echo "$AS" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-fi
-if test -z "$ac_cv_prog_AS"; then
-  ac_ct_AS=$AS
-  # Extract the first word of "as", so it can be a program name with args.
-set dummy as; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_ac_ct_AS+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$ac_ct_AS"; then
-  ac_cv_prog_ac_ct_AS="$ac_ct_AS" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_ac_ct_AS="as"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-fi
-fi
-ac_ct_AS=$ac_cv_prog_ac_ct_AS
-if test -n "$ac_ct_AS"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_ct_AS" >&5
-$as_echo "$ac_ct_AS" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-  if test "x$ac_ct_AS" = x; then
-    AS=""
-  else
-    case $cross_compiling:$ac_tool_warned in
-yes:)
-{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
-$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
-ac_tool_warned=yes ;;
-esac
-    AS=$ac_ct_AS
-  fi
-else
-  AS="$ac_cv_prog_AS"
-fi
 
 if test -n "$ac_tool_prefix"; then
   # Extract the first word of "${ac_tool_prefix}ar", so it can be a program name with args.
@@ -4201,12 +4112,6 @@ else
 fi
 
   MAINT=$MAINTAINER_MODE_TRUE
-
-
-# By default we simply use the C compiler to build assembly code.
-test "${CCAS+set}" = set || CCAS=$CC
-test "${CCASFLAGS+set}" = set || CCASFLAGS=$CFLAGS
-
 
 
 

@@ -120,18 +120,9 @@ AM_SILENT_RULES(yes)
 
 AC_NO_EXECUTABLES
 
-AC_DEFUN([LIB_AM_PROG_AS],
-[# By default we simply use the C compiler to build assembly code.
-test "${CCAS+set}" = set || CCAS=$CC
-test "${CCASFLAGS+set}" = set || CCASFLAGS=$CFLAGS
-AC_ARG_VAR([CCAS],      [assembler compiler command (defaults to CC)])
-AC_ARG_VAR([CCASFLAGS], [assembler compiler flags (defaults to CFLAGS)])
-])
-
 AC_REQUIRE([AC_PROG_CC])dnl
 AC_REQUIRE([AC_PROG_CPP])dnl
-
-AC_CHECK_TOOL(AS, as)
+AC_REQUIRE([AM_PROG_AS])dnl
 AC_CHECK_TOOL(AR, ar)
 AC_CHECK_TOOL(RANLIB, ranlib, :)
 AC_CHECK_TOOL(READELF, readelf, :)
@@ -145,7 +136,6 @@ AC_REQUIRE([AC_PROG_AWK])dnl
 ac_given_INSTALL=$INSTALL
 
 AM_MAINTAINER_MODE
-LIB_AM_PROG_AS
 
 # We need AC_EXEEXT to keep automake happy in cygnus mode.  However,
 # at least currently, we never actually build a program, so we never
