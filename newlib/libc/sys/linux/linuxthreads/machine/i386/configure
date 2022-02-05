@@ -4468,18 +4468,6 @@ fi
 
 
 
-# We need AC_EXEEXT to keep automake happy in cygnus mode.  However,
-# at least currently, we never actually build a program, so we never
-# need to use $(EXEEXT).  Moreover, the test for EXEEXT normally
-# fails, because we are probably configuring with a cross compiler
-# which can't create executables.  So we include AC_EXEEXT to keep
-# automake happy, but we don't execute it, since we don't care about
-# the result.
-if false; then
-
-  dummy_var=1
-fi
-
 . ${newlib_basedir}/configure.host
 
 NEWLIB_CFLAGS=${newlib_cflags}
@@ -11244,7 +11232,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11247 "configure"
+#line 11235 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11350,7 +11338,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11353 "configure"
+#line 11341 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H

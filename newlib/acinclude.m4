@@ -137,18 +137,6 @@ ac_given_INSTALL=$INSTALL
 
 AM_MAINTAINER_MODE
 
-# We need AC_EXEEXT to keep automake happy in cygnus mode.  However,
-# at least currently, we never actually build a program, so we never
-# need to use $(EXEEXT).  Moreover, the test for EXEEXT normally
-# fails, because we are probably configuring with a cross compiler
-# which can't create executables.  So we include AC_EXEEXT to keep
-# automake happy, but we don't execute it, since we don't care about
-# the result.
-if false; then
-  AC_EXEEXT
-  dummy_var=1
-fi
-
 . [$]{newlib_basedir}/configure.host
 
 NEWLIB_CFLAGS=${newlib_cflags}
