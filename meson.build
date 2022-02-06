@@ -350,7 +350,7 @@ endif
 
 if host_cpu_family == ''
   host_cmds = cc.cmd_array() + ['-dumpmachine']
-  host_cc_machine=run_command(host_cmds).stdout().strip().split('-')
+  host_cc_machine=run_command(host_cmds, check : false).stdout().strip().split('-')
   host_cpu_family=host_cc_machine[0]
   message('Computed host_cpu_family as ' + host_cpu_family)
 endif
@@ -382,12 +382,12 @@ if thread_local_storage
 endif
 
 if sysroot_install
-  sysroot = run_command(cc.cmd_array() + ['-print-sysroot']).stdout().split('\n')[0]
+  sysroot = run_command(cc.cmd_array() + ['-print-sysroot'], check : false).stdout().split('\n')[0]
   if sysroot == ''
     error('sysroot install requested, but compiler has no sysroot')
   endif
-  sysroot = run_command('realpath', sysroot).stdout().split('\n')[0]
-  prefix_path = run_command('realpath', prefix).stdout().split('\n')[0]
+  sysroot = run_command('realpath', sysroot, check : false).stdout().split('\n')[0]
+  prefix_path = run_command('realpath', prefix, check : false).stdout().split('\n')[0]
   if sysroot != prefix_path
     error('sysroot install requires --prefix=' + sysroot)
   endif
@@ -408,9 +408,9 @@ endif
 specs_dir_option = get_option('specsdir')
 if specs_dir_option == ''
   search_cmds = cc.cmd_array() + ['-print-search-dirs']
-  install_dir=run_command(search_cmds).stdout().split('\n')[0]
+  install_dir=run_command(search_cmds, check : false).stdout().split('\n')[0]
   # Meson 0.56 adds a 'substring' method which can be used here
-  specs_dir=run_command(['expr', install_dir, ':', 'install: *\(.*\)']).stdout().split('\n')[0]
+  specs_dir=run_command(['expr', install_dir, ':', 'install: *\(.*\)'], check : false).stdout().split('\n')[0]
   specs_install = specs_dir != ''
 elif specs_dir_option == 'none'
   specs_install = false
@@ -572,7 +572,7 @@ if enable_multilib
 
   # Ask the compiler for the set of available multilib configurations,
   # set up the build system to compile for all desired ones
-  foreach target : run_command(cc, '--print-multi-lib').stdout().strip().split('\n')
+  foreach target : run_command(cc, '--print-multi-lib', check : false).stdout().strip().split('\n')
     tmp = target.split(';')
     flags = c_args
 
@@ -786,7 +786,7 @@ endif
 # Dig out the list of available encodings from the encoding.aliases file. Only
 # accept the first entry from each line
 
-available_encodings = run_command(['sed', '-e', '/^#/d', '-e', '/^$/d', '-e', 's/ .*$//', files('newlib/libc/iconv/encoding.aliases')[0]]).stdout().split('\n')
+available_encodings = run_command(['sed', '-e', '/^#/d', '-e', '/^$/d', '-e', 's/ .*$//', files('newlib/libc/iconv/encoding.aliases')[0]], check : false).stdout().split('\n')
 
 # Include all available encodings if none were specified on the command line
 
