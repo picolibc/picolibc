@@ -9,7 +9,7 @@ on:
       - main
 
 env:
-  IMAGE_FILE: dockerimg.tar
+  IMAGE_FILE: img-fortify-source-arm.tar
   IMAGE: picolibc
   HASH_FILE: picolibc/.github/packages.txt
 
