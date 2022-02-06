@@ -1,0 +1,8 @@
+build-essential
+meson
+ninja-build
+gcc
+gcc-arm-none-eabi
+qemu-system-arm
+clang
+lld

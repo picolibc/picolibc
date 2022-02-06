@@ -3,8 +3,6 @@ meson
 ninja-build
 gcc
 gcc-i686-linux-gnu
-gcc-arm-none-eabi
-gcc-riscv64-unknown-elf
 gcc-aarch64-linux-gnu
 gcc-xtensa-lx106
 gcc-m68k-linux-gnu

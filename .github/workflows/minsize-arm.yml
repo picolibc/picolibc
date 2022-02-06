@@ -9,9 +9,9 @@ on:
       - main
 
 env:
-  IMAGE_FILE: img-minsize-arm.tar
+  IMAGE_FILE: docker-minsize-arm.tar
   IMAGE: picolibc
-  HASH_FILE: picolibc/.github/packages.txt
+  HASH_FILE: picolibc/.github/packages-arm.txt
 
 jobs:
   cache-maker:
@@ -38,7 +38,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           platforms: linux/amd64
-          file: .github/Dockerfile
+          file: .github/Dockerfile-arm
           tags: ${{ env.IMAGE }}:latest
           outputs: type=docker,dest=${{ env.IMAGE_FILE }}
 
