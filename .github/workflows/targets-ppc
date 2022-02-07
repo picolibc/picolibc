@@ -1,0 +1,5 @@
+        test: [
+          "./.github/do-build do-powerpc64-configure build-powerpc64",
+          "./.github/do-build do-powerpc64le-configure build-powerpc64le",
+        ]
+
