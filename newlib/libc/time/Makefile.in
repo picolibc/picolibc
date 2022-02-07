@@ -283,7 +283,6 @@ machine_dir = @machine_dir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 newlib_basedir = @newlib_basedir@
-oext = @oext@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
 prefix = @prefix@
@@ -684,7 +683,7 @@ uninstall-am:
 .PRECIOUS: Makefile
 
 
-$(lpfx)wcsftime.$(oext): strftime.c
+$(lpfx)wcsftime.o: strftime.c
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

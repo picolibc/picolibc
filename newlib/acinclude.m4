@@ -155,10 +155,9 @@ fi
 
 # Hard-code OBJEXT.  Normally it is set by AC_OBJEXT, but we
 # use oext, which is set in configure.host based on the target platform.
-OBJEXT=${oext}
+OBJEXT=o
 
 AC_SUBST(OBJEXT)
-AC_SUBST(oext)
 AC_SUBST(lpfx)
 
 AC_SUBST(libm_machine_dir)

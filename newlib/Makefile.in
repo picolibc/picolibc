@@ -418,7 +418,6 @@ mandir = @mandir@
 mkdir_p = @mkdir_p@
 multi_basedir = @multi_basedir@
 newlib_basedir = @newlib_basedir@
-oext = @oext@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
 prefix = @prefix@
@@ -505,19 +504,19 @@ toollib_DATA = $(CRT0) $(CRT1)
 # both libc.a and libm.a.  We build them in libm.a and copy them over,
 # along with some required supporting routines.
 MATHOBJS_IN_LIBC = \
-	$(lpfx)s_fpclassify.$(oext) $(lpfx)sf_fpclassify.$(oext) \
-	$(lpfx)s_isinf.$(oext) $(lpfx)sf_isinf.$(oext) \
-	$(lpfx)s_isnan.$(oext) $(lpfx)sf_isnan.$(oext) \
-	$(lpfx)s_isinfd.$(oext) $(lpfx)sf_isinff.$(oext) \
-	$(lpfx)s_isnand.$(oext) $(lpfx)sf_isnanf.$(oext) \
-	$(lpfx)s_nan.$(oext) $(lpfx)sf_nan.$(oext) \
-	$(lpfx)s_ldexp.$(oext) $(lpfx)sf_ldexp.$(oext) \
-	$(lpfx)s_frexp.$(oext) $(lpfx)sf_frexp.$(oext) $(lpfx)frexpl.$(oext) \
-	$(lpfx)s_modf.$(oext) \
-	$(lpfx)sf_modf.$(oext) $(lpfx)s_scalbn.$(oext) \
-	$(lpfx)sf_scalbn.$(oext) \
-	$(lpfx)s_finite.$(oext) $(lpfx)sf_finite.$(oext) \
-	$(lpfx)s_copysign.$(oext) $(lpfx)sf_copysign.$(oext)
+	$(lpfx)s_fpclassify.o $(lpfx)sf_fpclassify.o \
+	$(lpfx)s_isinf.o $(lpfx)sf_isinf.o \
+	$(lpfx)s_isnan.o $(lpfx)sf_isnan.o \
+	$(lpfx)s_isinfd.o $(lpfx)sf_isinff.o \
+	$(lpfx)s_isnand.o $(lpfx)sf_isnanf.o \
+	$(lpfx)s_nan.o $(lpfx)sf_nan.o \
+	$(lpfx)s_ldexp.o $(lpfx)sf_ldexp.o \
+	$(lpfx)s_frexp.o $(lpfx)sf_frexp.o $(lpfx)frexpl.o \
+	$(lpfx)s_modf.o \
+	$(lpfx)sf_modf.o $(lpfx)s_scalbn.o \
+	$(lpfx)sf_scalbn.o \
+	$(lpfx)s_finite.o $(lpfx)sf_finite.o \
+	$(lpfx)s_copysign.o $(lpfx)sf_copysign.o
 
 CLEANFILES = stmp-targ-include libc/targetdep.tex \
 	libc/targetdep.tex.stamp $(LIBC_CHEWOUT_FILES) \

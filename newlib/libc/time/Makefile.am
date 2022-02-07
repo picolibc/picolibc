@@ -30,4 +30,4 @@ noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
 
-$(lpfx)wcsftime.$(oext): strftime.c
+$(lpfx)wcsftime.o: strftime.c

@@ -355,7 +355,6 @@ machine_dir = @machine_dir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 newlib_basedir = @newlib_basedir@
-oext = @oext@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
 prefix = @prefix@
@@ -461,10 +460,10 @@ ELIX_2_SOURCES = \
 	wctob.c
 
 ELIX_2_OBJS = \
-	$(lpfx)$(MALIGNR).$(oext)	\
-	$(lpfx)$(MALLOPTR).$(oext) \
-	$(lpfx)$(PVALLOCR).$(oext)	\
-	$(lpfx)$(VALLOCR).$(oext)
+	$(lpfx)$(MALIGNR).o	\
+	$(lpfx)$(MALLOPTR).o \
+	$(lpfx)$(PVALLOCR).o	\
+	$(lpfx)$(VALLOCR).o
 
 ELIX_3_SOURCES = \
 	putenv.c	\
@@ -486,10 +485,10 @@ ELIX_4_SOURCES = \
 @ELIX_LEVEL_1_TRUE@ELIX_OBJS = 
 
 # Because of how libtool moves objects around, mallocr must be built last.
-LIBADD_OBJS = $(lpfx)$(FREER).$(oext) $(lpfx)$(REALLOCR).$(oext) \
-	$(lpfx)$(CALLOCR).$(oext) $(lpfx)$(CFREER).$(oext) \
-	$(lpfx)$(MALLINFOR).$(oext) $(lpfx)$(MALLSTATSR).$(oext) \
-	$(lpfx)$(MSIZER).$(oext) $(lpfx)$(MALLOCR).$(oext)
+LIBADD_OBJS = $(lpfx)$(FREER).o $(lpfx)$(REALLOCR).o \
+	$(lpfx)$(CALLOCR).o $(lpfx)$(CFREER).o \
+	$(lpfx)$(MALLINFOR).o $(lpfx)$(MALLSTATSR).o \
+	$(lpfx)$(MSIZER).o $(lpfx)$(MALLOCR).o
 
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(GENERAL_SOURCES) $(EXTENDED_SOURCES) $(ELIX_SOURCES)
@@ -1484,65 +1483,65 @@ uninstall-am:
 .PRECIOUS: Makefile
 
 
-$(lpfx)$(MALLOCR).$(oext): $(MALLOCR).c
+$(lpfx)$(MALLOCR).o: $(MALLOCR).c
 	$(MALLOC_COMPILE) -DDEFINE_MALLOC -c $(srcdir)/$(MALLOCR).c -o $@
 
-$(lpfx)$(FREER).$(oext): $(MALLOCR).c
+$(lpfx)$(FREER).o: $(MALLOCR).c
 	$(MALLOC_COMPILE) -DDEFINE_FREE -c $(srcdir)/$(MALLOCR).c -o $@
 
-$(lpfx)$(REALLOCR).$(oext): $(MALLOCR).c
+$(lpfx)$(REALLOCR).o: $(MALLOCR).c
 	$(MALLOC_COMPILE) -DDEFINE_REALLOC -c $(srcdir)/$(MALLOCR).c -o $@
 
-$(lpfx)$(CALLOCR).$(oext): $(MALLOCR).c
+$(lpfx)$(CALLOCR).o: $(MALLOCR).c
 	$(MALLOC_COMPILE) -DDEFINE_CALLOC -c $(srcdir)/$(MALLOCR).c -o $@
 
-$(lpfx)$(CFREER).$(oext): $(MALLOCR).c
+$(lpfx)$(CFREER).o: $(MALLOCR).c
 	$(MALLOC_COMPILE) -DDEFINE_CFREE -c $(srcdir)/$(MALLOCR).c -o $@
 
-$(lpfx)$(MALIGNR).$(oext): $(MALLOCR).c
+$(lpfx)$(MALIGNR).o: $(MALLOCR).c
 	$(MALLOC_COMPILE) -DDEFINE_MEMALIGN -c $(srcdir)/$(MALLOCR).c -o $@
 
-$(lpfx)$(VALLOCR).$(oext): $(MALLOCR).c
+$(lpfx)$(VALLOCR).o: $(MALLOCR).c
 	$(MALLOC_COMPILE) -DDEFINE_VALLOC -c $(srcdir)/$(MALLOCR).c -o $@
 
-$(lpfx)$(PVALLOCR).$(oext): $(MALLOCR).c
+$(lpfx)$(PVALLOCR).o: $(MALLOCR).c
 	$(MALLOC_COMPILE) -DDEFINE_PVALLOC -c $(srcdir)/$(MALLOCR).c -o $@
 
-$(lpfx)$(MALLINFOR).$(oext): $(MALLOCR).c
+$(lpfx)$(MALLINFOR).o: $(MALLOCR).c
 	$(MALLOC_COMPILE) -DDEFINE_MALLINFO -c $(srcdir)/$(MALLOCR).c -o $@
 
-$(lpfx)$(MALLSTATSR).$(oext): $(MALLOCR).c
+$(lpfx)$(MALLSTATSR).o: $(MALLOCR).c
 	$(MALLOC_COMPILE) -DDEFINE_MALLOC_STATS -c $(srcdir)/$(MALLOCR).c -o $@
 
-$(lpfx)$(MSIZER).$(oext): $(MALLOCR).c
+$(lpfx)$(MSIZER).o: $(MALLOCR).c
 	$(MALLOC_COMPILE) -DDEFINE_MALLOC_USABLE_SIZE -c $(srcdir)/$(MALLOCR).c -o $@
 
-$(lpfx)$(MALLOPTR).$(oext): $(MALLOCR).c
+$(lpfx)$(MALLOPTR).o: $(MALLOCR).c
 	$(MALLOC_COMPILE) -DDEFINE_MALLOPT -c $(srcdir)/$(MALLOCR).c -o $@
 
-$(lpfx)dtoa.$(oext): dtoa.c mprec.h
-$(lpfx)ldtoa.$(oext): ldtoa.c mprec.h gdtoa.h
-$(lpfx)gdtoa-ldtoa.$(oext): gdtoa-ldtoa.c mprec.h gdtoaimp.h gdtoa.h
-$(lpfx)gdtoa-gdtoa.$(oext): gdtoa-gdtoa.c mprec.h gdtoaimp.h gdtoa.h
-$(lpfx)gdtoa-dmisc.$(oext): gdtoa-dmisc.c mprec.h gdtoaimp.h gdtoa.h
-$(lpfx)gdtoa-gmisc.$(oext): gdtoa-gmisc.c mprec.h gdtoaimp.h gdtoa.h
-$(lpfx)ecvtbuf.$(oext): ecvtbuf.c mprec.h
-$(lpfx)mbtowc_r.$(oext): mbtowc_r.c mbctype.h
-$(lpfx)mprec.$(oext): mprec.c mprec.h
-$(lpfx)strtod.$(oext): strtod.c mprec.h
-$(lpfx)gdtoa-gethex.$(oext): gdtoa-gethex.c mprec.h
-$(lpfx)gdtoa-hexnan.$(oext): gdtoa-hexnan.c mprec.h
-$(lpfx)wctomb_r.$(oext): wctomb_r.c mbctype.h
-$(lpfx)drand48.$(oext): drand48.c rand48.h
-$(lpfx)erand48.$(oext): erand48.c rand48.h
-$(lpfx)jrand48.$(oext): jrand48.c rand48.h
-$(lpfx)lcong48.$(oext): lcong48.c rand48.h
-$(lpfx)lrand48.$(oext): lrand48.c rand48.h
-$(lpfx)mrand48.$(oext): mrand48.c rand48.h
-$(lpfx)nrand48.$(oext): nrand48.c rand48.h
-$(lpfx)rand48.$(oext): rand48.c rand48.h
-$(lpfx)seed48.$(oext): seed48.c rand48.h
-$(lpfx)srand48.$(oext): srand48.c rand48.h
+$(lpfx)dtoa.o: dtoa.c mprec.h
+$(lpfx)ldtoa.o: ldtoa.c mprec.h gdtoa.h
+$(lpfx)gdtoa-ldtoa.o: gdtoa-ldtoa.c mprec.h gdtoaimp.h gdtoa.h
+$(lpfx)gdtoa-gdtoa.o: gdtoa-gdtoa.c mprec.h gdtoaimp.h gdtoa.h
+$(lpfx)gdtoa-dmisc.o: gdtoa-dmisc.c mprec.h gdtoaimp.h gdtoa.h
+$(lpfx)gdtoa-gmisc.o: gdtoa-gmisc.c mprec.h gdtoaimp.h gdtoa.h
+$(lpfx)ecvtbuf.o: ecvtbuf.c mprec.h
+$(lpfx)mbtowc_r.o: mbtowc_r.c mbctype.h
+$(lpfx)mprec.o: mprec.c mprec.h
+$(lpfx)strtod.o: strtod.c mprec.h
+$(lpfx)gdtoa-gethex.o: gdtoa-gethex.c mprec.h
+$(lpfx)gdtoa-hexnan.o: gdtoa-hexnan.c mprec.h
+$(lpfx)wctomb_r.o: wctomb_r.c mbctype.h
+$(lpfx)drand48.o: drand48.c rand48.h
+$(lpfx)erand48.o: erand48.c rand48.h
+$(lpfx)jrand48.o: jrand48.c rand48.h
+$(lpfx)lcong48.o: lcong48.c rand48.h
+$(lpfx)lrand48.o: lrand48.c rand48.h
+$(lpfx)mrand48.o: mrand48.c rand48.h
+$(lpfx)nrand48.o: nrand48.c rand48.h
+$(lpfx)rand48.o: rand48.c rand48.h
+$(lpfx)seed48.o: seed48.c rand48.h
+$(lpfx)srand48.o: srand48.c rand48.h
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

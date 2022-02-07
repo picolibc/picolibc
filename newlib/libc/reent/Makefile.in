@@ -294,7 +294,6 @@ machine_dir = @machine_dir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 newlib_basedir = @newlib_basedir@
-oext = @oext@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
 prefix = @prefix@
@@ -729,7 +728,7 @@ uninstall-am:
 .PRECIOUS: Makefile
 
 
-$(lpfx)impure.$(oext): $(srcdir)/impure.c $(srcdir)/../include/sys/reent.h
+$(lpfx)impure.o: $(srcdir)/impure.c $(srcdir)/../include/sys/reent.h
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

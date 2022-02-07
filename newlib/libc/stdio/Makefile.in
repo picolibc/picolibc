@@ -385,7 +385,6 @@ machine_dir = @machine_dir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 newlib_basedir = @newlib_basedir@
-oext = @oext@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
 prefix = @prefix@
@@ -569,31 +568,31 @@ GENERAL_SOURCES = \
 
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@NEWLIB_NANO_FORMATTED_IO_TRUE@ELIX_4_INT_FORMATTED_IO_SOURCES = 
 @NEWLIB_NANO_FORMATTED_IO_FALSE@LIBADD_OBJS = \
-@NEWLIB_NANO_FORMATTED_IO_FALSE@	$(lpfx)svfiprintf.$(oext) $(lpfx)svfprintf.$(oext) \
-@NEWLIB_NANO_FORMATTED_IO_FALSE@	$(lpfx)svfiscanf.$(oext) $(lpfx)svfscanf.$(oext) \
-@NEWLIB_NANO_FORMATTED_IO_FALSE@	$(lpfx)vfiprintf.$(oext) \
-@NEWLIB_NANO_FORMATTED_IO_FALSE@	$(lpfx)vfscanf.$(oext) $(lpfx)vfiscanf.$(oext) \
-@NEWLIB_NANO_FORMATTED_IO_FALSE@	$(lpfx)svfiwprintf.$(oext) $(lpfx)svfwprintf.$(oext) \
-@NEWLIB_NANO_FORMATTED_IO_FALSE@	$(lpfx)vfiwprintf.$(oext) \
-@NEWLIB_NANO_FORMATTED_IO_FALSE@	$(lpfx)svfiwscanf.$(oext) $(lpfx)svfwscanf.$(oext) \
-@NEWLIB_NANO_FORMATTED_IO_FALSE@	$(lpfx)vfiwscanf.$(oext) $(lpfx)vfwscanf.$(oext)
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	$(lpfx)svfiprintf.o $(lpfx)svfprintf.o \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	$(lpfx)svfiscanf.o $(lpfx)svfscanf.o \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	$(lpfx)vfiprintf.o \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	$(lpfx)vfscanf.o $(lpfx)vfiscanf.o \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	$(lpfx)svfiwprintf.o $(lpfx)svfwprintf.o \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	$(lpfx)vfiwprintf.o \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	$(lpfx)svfiwscanf.o $(lpfx)svfwscanf.o \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	$(lpfx)vfiwscanf.o $(lpfx)vfwscanf.o
 
 @NEWLIB_NANO_FORMATTED_IO_TRUE@LIBADD_OBJS = \
-@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)nano-vfprintf_float.$(oext)	\
-@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)nano-svfprintf.$(oext)		\
-@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)nano-svfscanf.$(oext)		\
-@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)nano-vfprintf.$(oext)		\
-@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)nano-vfprintf_i.$(oext)		\
-@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)nano-vfscanf.$(oext)		\
-@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)nano-vfscanf_i.$(oext)		\
-@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)nano-vfscanf_float.$(oext)	\
-@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)svfiwprintf.$(oext)		\
-@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)svfwprintf.$(oext)		\
-@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)vfiwprintf.$(oext)		\
-@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)svfiwscanf.$(oext)		\
-@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)svfwscanf.$(oext)		\
-@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)vfiwscanf.$(oext)		\
-@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)vfwscanf.$(oext)
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)nano-vfprintf_float.o	\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)nano-svfprintf.o		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)nano-svfscanf.o		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)nano-vfprintf.o		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)nano-vfprintf_i.o		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)nano-vfscanf.o		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)nano-vfscanf_i.o		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)nano-vfscanf_float.o	\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)svfiwprintf.o		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)svfwprintf.o		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)vfiwprintf.o		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)svfiwscanf.o		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)svfwscanf.o		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)vfiwscanf.o		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)vfwscanf.o
 
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_2_SOURCES) $(ELIX_4_SOURCES)
@@ -1691,180 +1690,180 @@ uninstall-am:
 # library, because they are not depended on by final makefile target.
 
 # Rules compiling small-footprint nano-formatted-io implementation.
-@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfprintf.$(oext): nano-vfprintf.c
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfprintf.o: nano-vfprintf.c
 @NEWLIB_NANO_FORMATTED_IO_TRUE@	$(LIB_COMPILE) -c $(srcdir)/nano-vfprintf.c -o $@
 
-@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfprintf_i.$(oext): nano-vfprintf_i.c
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfprintf_i.o: nano-vfprintf_i.c
 @NEWLIB_NANO_FORMATTED_IO_TRUE@	$(LIB_COMPILE) -c $(srcdir)/nano-vfprintf_i.c -o $@
 
-@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfprintf_float.$(oext): nano-vfprintf_float.c
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfprintf_float.o: nano-vfprintf_float.c
 @NEWLIB_NANO_FORMATTED_IO_TRUE@	$(LIB_COMPILE) -c $(srcdir)/nano-vfprintf_float.c -o $@
 
-@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-svfprintf.$(oext): nano-vfprintf.c
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-svfprintf.o: nano-vfprintf.c
 @NEWLIB_NANO_FORMATTED_IO_TRUE@	$(LIB_COMPILE) -DSTRING_ONLY -c $(srcdir)/nano-vfprintf.c -o $@
 
 # This rule is needed so that libtool compiles vfiprintf before vfprintf.
 # Otherwise libtool moves vfprintf.o and subsequently can't find it.
 
-$(lpfx)vfiprintf.$(oext): vfprintf.c
+$(lpfx)vfiprintf.o: vfprintf.c
 	$(LIB_COMPILE) -DINTEGER_ONLY -c $(srcdir)/vfprintf.c -o $@
 
-$(lpfx)svfprintf.$(oext): vfprintf.c
+$(lpfx)svfprintf.o: vfprintf.c
 	$(LIB_COMPILE) -DSTRING_ONLY -c $(srcdir)/vfprintf.c -o $@
 
-$(lpfx)svfiprintf.$(oext): vfprintf.c
+$(lpfx)svfiprintf.o: vfprintf.c
 	$(LIB_COMPILE) -DINTEGER_ONLY -DSTRING_ONLY -c $(srcdir)/vfprintf.c -o $@
 
-$(lpfx)vfiwprintf.$(oext): vfwprintf.c
+$(lpfx)vfiwprintf.o: vfwprintf.c
 	$(LIB_COMPILE) -DINTEGER_ONLY -c $(srcdir)/vfwprintf.c -o $@
 
-$(lpfx)svfwprintf.$(oext): vfwprintf.c
+$(lpfx)svfwprintf.o: vfwprintf.c
 	$(LIB_COMPILE) -DSTRING_ONLY -c $(srcdir)/vfwprintf.c -o $@
 
-$(lpfx)svfiwprintf.$(oext): vfwprintf.c
+$(lpfx)svfiwprintf.o: vfwprintf.c
 	$(LIB_COMPILE) -DINTEGER_ONLY -DSTRING_ONLY -c $(srcdir)/vfwprintf.c -o $@
 
 # Rules compiling small-footprint nano-formatted-io implementation.
-@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfscanf.$(oext): nano-vfscanf.c
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfscanf.o: nano-vfscanf.c
 @NEWLIB_NANO_FORMATTED_IO_TRUE@	$(LIB_COMPILE) -c $(srcdir)/nano-vfscanf.c -o $@
 
-@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfscanf_i.$(oext): nano-vfscanf_i.c
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfscanf_i.o: nano-vfscanf_i.c
 @NEWLIB_NANO_FORMATTED_IO_TRUE@	$(LIB_COMPILE) -c $(srcdir)/nano-vfscanf_i.c -o $@
 
-@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfscanf_float.$(oext): nano-vfscanf_float.c
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfscanf_float.o: nano-vfscanf_float.c
 @NEWLIB_NANO_FORMATTED_IO_TRUE@	$(LIB_COMPILE) -c $(srcdir)/nano-vfscanf_float.c -o $@
 
-@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-svfscanf.$(oext): nano-vfscanf.c
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-svfscanf.o: nano-vfscanf.c
 @NEWLIB_NANO_FORMATTED_IO_TRUE@	$(LIB_COMPILE) -DSTRING_ONLY -c $(srcdir)/nano-vfscanf.c -o $@
 
-$(lpfx)vfscanf.$(oext): vfscanf.c
+$(lpfx)vfscanf.o: vfscanf.c
 	$(LIB_COMPILE) -c $(srcdir)/vfscanf.c -o $@
 
-$(lpfx)vfiscanf.$(oext): vfscanf.c
+$(lpfx)vfiscanf.o: vfscanf.c
 	$(LIB_COMPILE) -DINTEGER_ONLY -c $(srcdir)/vfscanf.c -o $@
 
-$(lpfx)svfscanf.$(oext): vfscanf.c
+$(lpfx)svfscanf.o: vfscanf.c
 	$(LIB_COMPILE) -DSTRING_ONLY -c $(srcdir)/vfscanf.c -o $@
 
-$(lpfx)svfiscanf.$(oext): vfscanf.c
+$(lpfx)svfiscanf.o: vfscanf.c
 	$(LIB_COMPILE) -DINTEGER_ONLY -DSTRING_ONLY -c $(srcdir)/vfscanf.c -o $@
 
-$(lpfx)vfwscanf.$(oext): vfwscanf.c
+$(lpfx)vfwscanf.o: vfwscanf.c
 	$(LIB_COMPILE) -c $(srcdir)/vfwscanf.c -o $@
 
-$(lpfx)vfiwscanf.$(oext): vfwscanf.c
+$(lpfx)vfiwscanf.o: vfwscanf.c
 	$(LIB_COMPILE) -DINTEGER_ONLY -c $(srcdir)/vfwscanf.c -o $@
 
-$(lpfx)svfwscanf.$(oext): vfwscanf.c
+$(lpfx)svfwscanf.o: vfwscanf.c
 	$(LIB_COMPILE) -DSTRING_ONLY -c $(srcdir)/vfwscanf.c -o $@
 
-$(lpfx)svfiwscanf.$(oext): vfwscanf.c
+$(lpfx)svfiwscanf.o: vfwscanf.c
 	$(LIB_COMPILE) -DINTEGER_ONLY -DSTRING_ONLY -c $(srcdir)/vfwscanf.c -o $@
 
-$(lpfx)clearerr.$(oext): local.h
-$(lpfx)clearerr_u.$(oext): local.h
-$(lpfx)fclose.$(oext): local.h
-$(lpfx)fdopen.$(oext): local.h
-$(lpfx)feof.$(oext): local.h
-$(lpfx)feof_u.$(oext): local.h
-$(lpfx)ferror.$(oext): local.h
-$(lpfx)ferror_u.$(oext): local.h
-$(lpfx)fflush.$(oext): local.h
-$(lpfx)fflush_u.$(oext): fflush.c
-$(lpfx)fgetc.$(oext): local.h
-$(lpfx)fgetc_u.$(oext): local.h
-$(lpfx)fgets.$(oext): local.h
-$(lpfx)fgets_u.$(oext): fgets.c
-$(lpfx)fgetwc.$(oext): local.h
-$(lpfx)fgetwc_u.$(oext): local.h
-$(lpfx)fgetws.$(oext): local.h
-$(lpfx)fgetws_u.$(oext): fgetws.c
-$(lpfx)fileno.$(oext): local.h
-$(lpfx)fileno_u.$(oext): local.h
-$(lpfx)findfp.$(oext): local.h
-$(lpfx)fmemopen.$(oext): local.h
-$(lpfx)fopen.$(oext): local.h
-$(lpfx)fopencookie.$(oext): local.h
-$(lpfx)fpurge.$(oext): local.h
-$(lpfx)fputc.$(oext): local.h
-$(lpfx)fputc_u.$(oext): local.h
-$(lpfx)fputs.$(oext): fvwrite.h
-$(lpfx)fputs_u.$(oext): fputs.c
-$(lpfx)fputwc.$(oext): local.h
-$(lpfx)fputwc_u.$(oext): local.h
-$(lpfx)fputws.$(oext): local.h fvwrite.h
-$(lpfx)fputws_u.$(oext): fputws.c
-$(lpfx)fread.$(oext): local.h
-$(lpfx)fread_u.$(oext): fread.c
-$(lpfx)freopen.$(oext): local.h
-$(lpfx)fseek.$(oext): local.h
-$(lpfx)fsetlocking.$(oext): local.h
-$(lpfx)ftell.$(oext): local.h
-$(lpfx)funopen.$(oext): local.h
-$(lpfx)fvwrite.$(oext): local.h fvwrite.h
-$(lpfx)fwalk.$(oext): local.h
-$(lpfx)fwide.$(oext): local.h
-$(lpfx)fwprintf.$(oext): local.h
-$(lpfx)fwrite.$(oext): local.h fvwrite.h
-$(lpfx)fwrite_u.$(oext): fwrite.c
-$(lpfx)fwscanf.$(oext): local.h
-$(lpfx)getwc.$(oext): local.h
-$(lpfx)getwc_u.$(oext): local.h
-$(lpfx)getwchar.$(oext): local.h
-$(lpfx)getwchar_u.$(oext): local.h
-$(lpfx)iscanf.$(oext): local.h
-$(lpfx)makebuf.$(oext): local.h
-$(lpfx)open_memstream.$(oext): local.h
-$(lpfx)puts.$(oext): fvwrite.h
-$(lpfx)putwc.$(oext): local.h
-$(lpfx)putwc_u.$(oext): local.h
-$(lpfx)putwchar.$(oext): local.h
-$(lpfx)putwchar_u.$(oext): local.h
-$(lpfx)refill.$(oext): local.h
-$(lpfx)scanf.$(oext): local.h
-$(lpfx)setbuf.$(oext): local.h
-$(lpfx)setvbuf.$(oext): local.h
-$(lpfx)siprintf.$(oext): local.h
-$(lpfx)siscanf.$(oext): local.h
-$(lpfx)sniprintf.$(oext): local.h
-$(lpfx)sprintf.$(oext): local.h
-$(lpfx)sscanf.$(oext): local.h
-$(lpfx)stdio.$(oext): local.h
-@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-svfprintf.$(oext): local.h nano-vfprintf_local.h
-@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-svfscanf.$(oext): local.h nano-vfscanf_local.h
-$(lpfx)svfiprintf.$(oext): local.h
-$(lpfx)svfiscanf.$(oext): local.h floatio.h
-$(lpfx)svfprintf.$(oext): local.h
-$(lpfx)svfscanf.$(oext): local.h floatio.h
-$(lpfx)swprintf.$(oext): local.h
-$(lpfx)swscanf.$(oext): local.h
-$(lpfx)ungetc.$(oext): local.h
-$(lpfx)ungetwc.$(oext): local.h
-@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfprintf.$(oext): local.h nano-vfprintf_local.h
-@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfprintf_i.$(oext): local.h nano-vfprintf_local.h
-@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfprintf_float.$(oext): local.h floatio.h nano-vfprintf_local.h
-@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfscanf.$(oext): local.h nano-vfscanf_local.h
-@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfscanf_i.$(oext): local.h nano-vfscanf_local.h
-@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfscanf_float.$(oext): local.h floatio.h nano-vfscanf_local.h
-$(lpfx)vfiprintf.$(oext): local.h
-$(lpfx)vfiscanf.$(oext): local.h floatio.h
-$(lpfx)vfprintf.$(oext): local.h
-$(lpfx)vfscanf.$(oext): local.h floatio.h
-$(lpfx)vfwprintf.$(oext): local.h
-$(lpfx)vfwscanf.$(oext): local.h
-$(lpfx)viscanf.$(oext): local.h
-$(lpfx)vscanf.$(oext): local.h
-$(lpfx)vsiscanf.$(oext): local.h
-$(lpfx)vsniprintf.$(oext): local.h
-$(lpfx)vsscanf.$(oext): local.h
-$(lpfx)vswprintf.$(oext): local.h
-$(lpfx)vswscanf.$(oext): local.h
-$(lpfx)vwprintf.$(oext): local.h
-$(lpfx)vwscanf.$(oext): local.h
-$(lpfx)wbuf.$(oext): local.h fvwrite.h
-$(lpfx)wprintf.$(oext): local.h
-$(lpfx)wscanf.$(oext): local.h
-$(lpfx)wsetup.$(oext): local.h
+$(lpfx)clearerr.o: local.h
+$(lpfx)clearerr_u.o: local.h
+$(lpfx)fclose.o: local.h
+$(lpfx)fdopen.o: local.h
+$(lpfx)feof.o: local.h
+$(lpfx)feof_u.o: local.h
+$(lpfx)ferror.o: local.h
+$(lpfx)ferror_u.o: local.h
+$(lpfx)fflush.o: local.h
+$(lpfx)fflush_u.o: fflush.c
+$(lpfx)fgetc.o: local.h
+$(lpfx)fgetc_u.o: local.h
+$(lpfx)fgets.o: local.h
+$(lpfx)fgets_u.o: fgets.c
+$(lpfx)fgetwc.o: local.h
+$(lpfx)fgetwc_u.o: local.h
+$(lpfx)fgetws.o: local.h
+$(lpfx)fgetws_u.o: fgetws.c
+$(lpfx)fileno.o: local.h
+$(lpfx)fileno_u.o: local.h
+$(lpfx)findfp.o: local.h
+$(lpfx)fmemopen.o: local.h
+$(lpfx)fopen.o: local.h
+$(lpfx)fopencookie.o: local.h
+$(lpfx)fpurge.o: local.h
+$(lpfx)fputc.o: local.h
+$(lpfx)fputc_u.o: local.h
+$(lpfx)fputs.o: fvwrite.h
+$(lpfx)fputs_u.o: fputs.c
+$(lpfx)fputwc.o: local.h
+$(lpfx)fputwc_u.o: local.h
+$(lpfx)fputws.o: local.h fvwrite.h
+$(lpfx)fputws_u.o: fputws.c
+$(lpfx)fread.o: local.h
+$(lpfx)fread_u.o: fread.c
+$(lpfx)freopen.o: local.h
+$(lpfx)fseek.o: local.h
+$(lpfx)fsetlocking.o: local.h
+$(lpfx)ftell.o: local.h
+$(lpfx)funopen.o: local.h
+$(lpfx)fvwrite.o: local.h fvwrite.h
+$(lpfx)fwalk.o: local.h
+$(lpfx)fwide.o: local.h
+$(lpfx)fwprintf.o: local.h
+$(lpfx)fwrite.o: local.h fvwrite.h
+$(lpfx)fwrite_u.o: fwrite.c
+$(lpfx)fwscanf.o: local.h
+$(lpfx)getwc.o: local.h
+$(lpfx)getwc_u.o: local.h
+$(lpfx)getwchar.o: local.h
+$(lpfx)getwchar_u.o: local.h
+$(lpfx)iscanf.o: local.h
+$(lpfx)makebuf.o: local.h
+$(lpfx)open_memstream.o: local.h
+$(lpfx)puts.o: fvwrite.h
+$(lpfx)putwc.o: local.h
+$(lpfx)putwc_u.o: local.h
+$(lpfx)putwchar.o: local.h
+$(lpfx)putwchar_u.o: local.h
+$(lpfx)refill.o: local.h
+$(lpfx)scanf.o: local.h
+$(lpfx)setbuf.o: local.h
+$(lpfx)setvbuf.o: local.h
+$(lpfx)siprintf.o: local.h
+$(lpfx)siscanf.o: local.h
+$(lpfx)sniprintf.o: local.h
+$(lpfx)sprintf.o: local.h
+$(lpfx)sscanf.o: local.h
+$(lpfx)stdio.o: local.h
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-svfprintf.o: local.h nano-vfprintf_local.h
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-svfscanf.o: local.h nano-vfscanf_local.h
+$(lpfx)svfiprintf.o: local.h
+$(lpfx)svfiscanf.o: local.h floatio.h
+$(lpfx)svfprintf.o: local.h
+$(lpfx)svfscanf.o: local.h floatio.h
+$(lpfx)swprintf.o: local.h
+$(lpfx)swscanf.o: local.h
+$(lpfx)ungetc.o: local.h
+$(lpfx)ungetwc.o: local.h
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfprintf.o: local.h nano-vfprintf_local.h
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfprintf_i.o: local.h nano-vfprintf_local.h
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfprintf_float.o: local.h floatio.h nano-vfprintf_local.h
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfscanf.o: local.h nano-vfscanf_local.h
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfscanf_i.o: local.h nano-vfscanf_local.h
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfscanf_float.o: local.h floatio.h nano-vfscanf_local.h
+$(lpfx)vfiprintf.o: local.h
+$(lpfx)vfiscanf.o: local.h floatio.h
+$(lpfx)vfprintf.o: local.h
+$(lpfx)vfscanf.o: local.h floatio.h
+$(lpfx)vfwprintf.o: local.h
+$(lpfx)vfwscanf.o: local.h
+$(lpfx)viscanf.o: local.h
+$(lpfx)vscanf.o: local.h
+$(lpfx)vsiscanf.o: local.h
+$(lpfx)vsniprintf.o: local.h
+$(lpfx)vsscanf.o: local.h
+$(lpfx)vswprintf.o: local.h
+$(lpfx)vswscanf.o: local.h
+$(lpfx)vwprintf.o: local.h
+$(lpfx)vwscanf.o: local.h
+$(lpfx)wbuf.o: local.h fvwrite.h
+$(lpfx)wprintf.o: local.h
+$(lpfx)wscanf.o: local.h
+$(lpfx)wsetup.o: local.h
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

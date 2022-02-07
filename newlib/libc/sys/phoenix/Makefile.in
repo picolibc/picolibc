@@ -319,7 +319,6 @@ machine_dir = @machine_dir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 newlib_basedir = @newlib_basedir@
-oext = @oext@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
 prefix = @prefix@

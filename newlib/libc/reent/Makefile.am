@@ -50,4 +50,4 @@ noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
 
-$(lpfx)impure.$(oext): $(srcdir)/impure.c $(srcdir)/../include/sys/reent.h
+$(lpfx)impure.o: $(srcdir)/impure.c $(srcdir)/../include/sys/reent.h

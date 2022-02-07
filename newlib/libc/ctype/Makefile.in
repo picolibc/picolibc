@@ -335,7 +335,6 @@ machine_dir = @machine_dir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 newlib_basedir = @newlib_basedir@
-oext = @oext@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
 prefix = @prefix@
@@ -1068,7 +1067,7 @@ uninstall-am:
 .PRECIOUS: Makefile
 
 
-$(lpfx)ctype_.$(oext): ctype_.c ctype_iso.h ctype_cp.h
+$(lpfx)ctype_.o: ctype_.c ctype_iso.h ctype_cp.h
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

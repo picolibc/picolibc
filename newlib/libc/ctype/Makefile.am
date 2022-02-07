@@ -84,4 +84,4 @@ noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
 
-$(lpfx)ctype_.$(oext): ctype_.c ctype_iso.h ctype_cp.h
+$(lpfx)ctype_.o: ctype_.c ctype_iso.h ctype_cp.h
