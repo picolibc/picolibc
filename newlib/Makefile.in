@@ -101,14 +101,7 @@ host_triplet = @host@
 # Subdir documentation rules.
 #
 @HAVE_DOC_TRUE@am__append_5 = .def .xml
-@HAVE_ICONVDATA_TRUE@am__append_6 = iconvdata/EUC-JP.la
-@ELIX_LEVEL_1_FALSE@@HAVE_ICONVDATA_TRUE@am__append_7 = \
-@ELIX_LEVEL_1_FALSE@@HAVE_ICONVDATA_TRUE@	iconvdata/euc-jp.c \
-@ELIX_LEVEL_1_FALSE@@HAVE_ICONVDATA_TRUE@	iconvdata/jis0201.c \
-@ELIX_LEVEL_1_FALSE@@HAVE_ICONVDATA_TRUE@	iconvdata/jis0208.c \
-@ELIX_LEVEL_1_FALSE@@HAVE_ICONVDATA_TRUE@	iconvdata/jis0212.c
-
-@NEWLIB_HW_FP_TRUE@am__append_8 = \
+@NEWLIB_HW_FP_TRUE@am__append_6 = \
 @NEWLIB_HW_FP_TRUE@	libm/mathfp/e_acosh.def \
 @NEWLIB_HW_FP_TRUE@	libm/mathfp/e_atanh.def \
 @NEWLIB_HW_FP_TRUE@	libm/mathfp/e_hypot.def \
@@ -138,8 +131,8 @@ host_triplet = @host@
 @NEWLIB_HW_FP_TRUE@	libm/mathfp/s_tanh.def \
 @NEWLIB_HW_FP_TRUE@	libm/mathfp/w_jn.def
 
-@NEWLIB_HW_FP_TRUE@am__append_9 = libm/mathfp/mathfp.tex
-@NEWLIB_HW_FP_FALSE@am__append_10 = \
+@NEWLIB_HW_FP_TRUE@am__append_7 = libm/mathfp/mathfp.tex
+@NEWLIB_HW_FP_FALSE@am__append_8 = \
 @NEWLIB_HW_FP_FALSE@	libm/math/w_acos.def libm/math/w_acosh.def libm/math/w_asin.def libm/math/s_asinh.def \
 @NEWLIB_HW_FP_FALSE@	libm/math/s_atan.def libm/math/w_atan2.def libm/math/w_atanh.def libm/math/w_j0.def \
 @NEWLIB_HW_FP_FALSE@	libm/math/w_cosh.def libm/math/s_erf.def libm/math/w_exp.def libm/math/w_exp2.def \
@@ -149,7 +142,7 @@ host_triplet = @host@
 @NEWLIB_HW_FP_FALSE@	libm/math/w_pow.def libm/math/w_remainder.def libm/math/s_sin.def libm/math/w_sinh.def \
 @NEWLIB_HW_FP_FALSE@	libm/math/w_sqrt.def libm/math/s_tan.def libm/math/s_tanh.def
 
-@NEWLIB_HW_FP_FALSE@am__append_11 = libm/math/math.tex
+@NEWLIB_HW_FP_FALSE@am__append_9 = libm/math/math.tex
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../config/lead-dot.m4 \
@@ -197,8 +190,7 @@ am__uninstall_files_from_dir = { \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
 am__installdirs = "$(DESTDIR)$(toollibdir)" "$(DESTDIR)$(pkglibdir)" \
-	"$(DESTDIR)$(toollibdir)" "$(DESTDIR)$(gconvdir)" \
-	"$(DESTDIR)$(toollibdir)"
+	"$(DESTDIR)$(toollibdir)" "$(DESTDIR)$(toollibdir)"
 LIBRARIES = $(toollib_LIBRARIES)
 ARFLAGS = cru
 AM_V_AR = $(am__v_AR_@AM_V@)
@@ -214,29 +206,13 @@ libm_a_LIBADD =
 libm_a_SOURCES = libm.c
 libm_a_OBJECTS = libm.$(OBJEXT)
 LTLIBRARIES = $(pkglib_LTLIBRARIES) $(toollib_LTLIBRARIES)
-iconvdata_EUC_JP_la_LIBADD =
-am__dirstamp = $(am__leading_dot)dirstamp
-@ELIX_LEVEL_1_FALSE@@HAVE_ICONVDATA_TRUE@am__objects_1 = iconvdata/iconvdata_EUC_JP_la-euc-jp.lo \
-@ELIX_LEVEL_1_FALSE@@HAVE_ICONVDATA_TRUE@	iconvdata/iconvdata_EUC_JP_la-jis0201.lo \
-@ELIX_LEVEL_1_FALSE@@HAVE_ICONVDATA_TRUE@	iconvdata/iconvdata_EUC_JP_la-jis0208.lo \
-@ELIX_LEVEL_1_FALSE@@HAVE_ICONVDATA_TRUE@	iconvdata/iconvdata_EUC_JP_la-jis0212.lo
-@HAVE_ICONVDATA_TRUE@am_iconvdata_EUC_JP_la_OBJECTS =  \
-@HAVE_ICONVDATA_TRUE@	iconvdata/iconvdata_EUC_JP_la-dummy.lo \
-@HAVE_ICONVDATA_TRUE@	$(am__objects_1)
-iconvdata_EUC_JP_la_OBJECTS = $(am_iconvdata_EUC_JP_la_OBJECTS)
+libc_la_LIBADD =
+am_libc_la_OBJECTS =
+libc_la_OBJECTS = $(am_libc_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-iconvdata_EUC_JP_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(iconvdata_EUC_JP_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
-@HAVE_ICONVDATA_TRUE@am_iconvdata_EUC_JP_la_rpath = -rpath \
-@HAVE_ICONVDATA_TRUE@	$(pkglibdir)
-libc_la_LIBADD =
-am_libc_la_OBJECTS =
-libc_la_OBJECTS = $(am_libc_la_OBJECTS)
 libc_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libc_la_LDFLAGS) $(LDFLAGS) -o $@
@@ -281,8 +257,7 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = libc.c libm.c $(iconvdata_EUC_JP_la_SOURCES) \
-	$(libc_la_SOURCES) $(libm_la_SOURCES)
+SOURCES = libc.c libm.c $(libc_la_SOURCES) $(libm_la_SOURCES)
 AM_V_DVIPS = $(am__v_DVIPS_@AM_V@)
 am__v_DVIPS_ = $(am__v_DVIPS_@AM_DEFAULT_V@)
 am__v_DVIPS_0 = @echo "  DVIPS   " $@;
@@ -311,6 +286,7 @@ AM_V_texidevnull = $(am__v_texidevnull_@AM_V@)
 am__v_texidevnull_ = $(am__v_texidevnull_@AM_DEFAULT_V@)
 am__v_texidevnull_0 = > /dev/null
 am__v_texidevnull_1 = 
+am__dirstamp = $(am__leading_dot)dirstamp
 INFO_DEPS = $(srcdir)/libc/libc.info $(srcdir)/libm/libm.info
 am__TEXINFO_TEX_DIR = $(srcdir)/../texinfo
 DVIS = libc/libc.dvi libm/libm.dvi
@@ -335,7 +311,7 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-DATA = $(gconv_DATA) $(noinst_DATA) $(toollib_DATA)
+DATA = $(noinst_DATA) $(toollib_DATA)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 am__recursive_targets = \
@@ -526,7 +502,7 @@ SUFFIXES = $(am__append_5)
 info_TEXINFOS = libc/libc.texi libm/libm.texi
 noinst_DATA = stmp-targ-include $(am__append_1) $(am__append_2) \
 	$(am__append_3)
-pkglib_LTLIBRARIES = $(am__append_6)
+pkglib_LTLIBRARIES = 
 LIBTOOL_VERSION_INFO = 0:0:0
 @NEWLIB_HW_FP_FALSE@MATHDIR = math
 
@@ -668,18 +644,6 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 # name (e.g. "stdio.xml") matches a source file name (e.g. "stdio.c").  We've
 # been flattening chapters into the main library dir (e.g. libc/) to avoid that.
 @HAVE_DOC_TRUE@TEXI2DOCBOOK = $(top_srcdir)/doc/chapter-texi2docbook.py
-@HAVE_ICONVDATA_TRUE@iconvdata_EUC_JP_la_SOURCES = iconvdata/dummy.c \
-@HAVE_ICONVDATA_TRUE@	$(am__append_7)
-@HAVE_ICONVDATA_TRUE@iconvdata_EUC_JP_la_DEPENDENCIES = $(iconvdata_EUC_JP_la_LIBADD)
-@HAVE_ICONVDATA_TRUE@iconvdata_EUC_JP_la_CPPFLAGS = \
-@HAVE_ICONVDATA_TRUE@	-DNDEBUG \
-@HAVE_ICONVDATA_TRUE@	-I$(srcdir)/iconvdata \
-@HAVE_ICONVDATA_TRUE@	-I$(srcdir)/libc/sys/linux \
-@HAVE_ICONVDATA_TRUE@	$(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
-
-@HAVE_ICONVDATA_TRUE@iconvdata_EUC_JP_la_LDFLAGS = -module -no-undefined -Xcompiler -Wl,-rpath-link=. -Xcompiler -nostdlib -L. -lc
-@HAVE_ICONVDATA_TRUE@gconvdir = $(pkglibdir)
-@HAVE_ICONVDATA_TRUE@gconv_DATA = iconvdata/gconv-modules
 libc_libc_TEXINFOS = libc/targetdep.tex $(LIBC_CHEWOUT_FILES)
 LIBC_CHEWOUT_FILES = libc/ctype/isalnum.def libc/ctype/isalpha.def \
 	libc/ctype/isascii.def libc/ctype/isblank.def \
@@ -869,9 +833,9 @@ LIBM_CHEWOUT_FILES = libm/common/s_cbrt.def libm/common/s_copysign.def \
 	libm/fenv/feraiseexcept.def libm/fenv/fesetenv.def \
 	libm/fenv/fesetexceptflag.def libm/fenv/fesetround.def \
 	libm/fenv/fetestexcept.def libm/fenv/feupdateenv.def \
-	$(am__append_8) $(am__append_10)
+	$(am__append_6) $(am__append_8)
 LIBM_CHAPTERS = libm/complex/complex.tex libm/fenv/fenv.tex \
-	$(am__append_9) $(am__append_11)
+	$(am__append_7) $(am__append_9)
 LIBM_DOCBOOK_OUT_FILES = $(LIBM_CHEWOUT_FILES:.def=.xml)
 all: newlib.h _newlib_version.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
@@ -880,7 +844,7 @@ all: newlib.h _newlib_version.h
 .SUFFIXES: .def .xml .c .dvi .lo .o .obj .ps
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../multilib.am $(srcdir)/doc/local.mk $(srcdir)/iconvdata/Makefile.inc $(srcdir)/libc/Makefile.inc $(srcdir)/libc/ctype/Makefile.inc $(srcdir)/libc/iconv/Makefile.inc $(srcdir)/libc/iconv/lib/Makefile.inc $(srcdir)/libc/locale/Makefile.inc $(srcdir)/libc/misc/Makefile.inc $(srcdir)/libc/posix/Makefile.inc $(srcdir)/libc/reent/Makefile.inc $(srcdir)/libc/search/Makefile.inc $(srcdir)/libc/signal/Makefile.inc $(srcdir)/libc/ssp/Makefile.inc $(srcdir)/libc/stdio64/Makefile.inc $(srcdir)/libc/stdio/Makefile.inc $(srcdir)/libc/stdlib/Makefile.inc $(srcdir)/libc/string/Makefile.inc $(srcdir)/libc/time/Makefile.inc $(srcdir)/libm/Makefile.inc $(srcdir)/libm/common/Makefile.inc $(srcdir)/libm/complex/Makefile.inc $(srcdir)/libm/fenv/Makefile.inc $(srcdir)/libm/mathfp/Makefile.inc $(srcdir)/libm/math/Makefile.inc $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../multilib.am $(srcdir)/doc/local.mk $(srcdir)/libc/Makefile.inc $(srcdir)/libc/ctype/Makefile.inc $(srcdir)/libc/iconv/Makefile.inc $(srcdir)/libc/iconv/lib/Makefile.inc $(srcdir)/libc/locale/Makefile.inc $(srcdir)/libc/misc/Makefile.inc $(srcdir)/libc/posix/Makefile.inc $(srcdir)/libc/reent/Makefile.inc $(srcdir)/libc/search/Makefile.inc $(srcdir)/libc/signal/Makefile.inc $(srcdir)/libc/ssp/Makefile.inc $(srcdir)/libc/stdio64/Makefile.inc $(srcdir)/libc/stdio/Makefile.inc $(srcdir)/libc/stdlib/Makefile.inc $(srcdir)/libc/string/Makefile.inc $(srcdir)/libc/time/Makefile.inc $(srcdir)/libm/Makefile.inc $(srcdir)/libm/common/Makefile.inc $(srcdir)/libm/complex/Makefile.inc $(srcdir)/libm/fenv/Makefile.inc $(srcdir)/libm/mathfp/Makefile.inc $(srcdir)/libm/math/Makefile.inc $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -902,7 +866,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe);; \
 	esac;
-$(srcdir)/../multilib.am $(srcdir)/doc/local.mk $(srcdir)/iconvdata/Makefile.inc $(srcdir)/libc/Makefile.inc $(srcdir)/libc/ctype/Makefile.inc $(srcdir)/libc/iconv/Makefile.inc $(srcdir)/libc/iconv/lib/Makefile.inc $(srcdir)/libc/locale/Makefile.inc $(srcdir)/libc/misc/Makefile.inc $(srcdir)/libc/posix/Makefile.inc $(srcdir)/libc/reent/Makefile.inc $(srcdir)/libc/search/Makefile.inc $(srcdir)/libc/signal/Makefile.inc $(srcdir)/libc/ssp/Makefile.inc $(srcdir)/libc/stdio64/Makefile.inc $(srcdir)/libc/stdio/Makefile.inc $(srcdir)/libc/stdlib/Makefile.inc $(srcdir)/libc/string/Makefile.inc $(srcdir)/libc/time/Makefile.inc $(srcdir)/libm/Makefile.inc $(srcdir)/libm/common/Makefile.inc $(srcdir)/libm/complex/Makefile.inc $(srcdir)/libm/fenv/Makefile.inc $(srcdir)/libm/mathfp/Makefile.inc $(srcdir)/libm/math/Makefile.inc $(am__empty):
+$(srcdir)/../multilib.am $(srcdir)/doc/local.mk $(srcdir)/libc/Makefile.inc $(srcdir)/libc/ctype/Makefile.inc $(srcdir)/libc/iconv/Makefile.inc $(srcdir)/libc/iconv/lib/Makefile.inc $(srcdir)/libc/locale/Makefile.inc $(srcdir)/libc/misc/Makefile.inc $(srcdir)/libc/posix/Makefile.inc $(srcdir)/libc/reent/Makefile.inc $(srcdir)/libc/search/Makefile.inc $(srcdir)/libc/signal/Makefile.inc $(srcdir)/libc/ssp/Makefile.inc $(srcdir)/libc/stdio64/Makefile.inc $(srcdir)/libc/stdio/Makefile.inc $(srcdir)/libc/stdlib/Makefile.inc $(srcdir)/libc/string/Makefile.inc $(srcdir)/libc/time/Makefile.inc $(srcdir)/libm/Makefile.inc $(srcdir)/libm/common/Makefile.inc $(srcdir)/libm/complex/Makefile.inc $(srcdir)/libm/fenv/Makefile.inc $(srcdir)/libm/mathfp/Makefile.inc $(srcdir)/libm/math/Makefile.inc $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
@@ -1046,17 +1010,6 @@ clean-toollibLTLIBRARIES:
 	  echo rm -f $${locs}; \
 	  rm -f $${locs}; \
 	}
-iconvdata/$(am__dirstamp):
-	@$(MKDIR_P) iconvdata
-	@: > iconvdata/$(am__dirstamp)
-iconvdata/iconvdata_EUC_JP_la-dummy.lo: iconvdata/$(am__dirstamp)
-iconvdata/iconvdata_EUC_JP_la-euc-jp.lo: iconvdata/$(am__dirstamp)
-iconvdata/iconvdata_EUC_JP_la-jis0201.lo: iconvdata/$(am__dirstamp)
-iconvdata/iconvdata_EUC_JP_la-jis0208.lo: iconvdata/$(am__dirstamp)
-iconvdata/iconvdata_EUC_JP_la-jis0212.lo: iconvdata/$(am__dirstamp)
-
-iconvdata/EUC-JP.la: $(iconvdata_EUC_JP_la_OBJECTS) $(iconvdata_EUC_JP_la_DEPENDENCIES) $(EXTRA_iconvdata_EUC_JP_la_DEPENDENCIES) iconvdata/$(am__dirstamp)
-	$(AM_V_CCLD)$(iconvdata_EUC_JP_la_LINK) $(am_iconvdata_EUC_JP_la_rpath) $(iconvdata_EUC_JP_la_OBJECTS) $(iconvdata_EUC_JP_la_LIBADD) $(LIBS)
 
 libc.la: $(libc_la_OBJECTS) $(libc_la_DEPENDENCIES) $(EXTRA_libc_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(libc_la_LINK) $(am_libc_la_rpath) $(libc_la_OBJECTS) $(libc_la_LIBADD) $(LIBS)
@@ -1066,8 +1019,6 @@ libm.la: $(libm_la_OBJECTS) $(libm_la_DEPENDENCIES) $(EXTRA_libm_la_DEPENDENCIES
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
-	-rm -f iconvdata/*.$(OBJEXT)
-	-rm -f iconvdata/*.lo
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -1081,27 +1032,11 @@ distclean-compile:
 .c.lo:
 	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
 
-iconvdata/iconvdata_EUC_JP_la-dummy.lo: iconvdata/dummy.c
-	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iconvdata_EUC_JP_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iconvdata/iconvdata_EUC_JP_la-dummy.lo `test -f 'iconvdata/dummy.c' || echo '$(srcdir)/'`iconvdata/dummy.c
-
-iconvdata/iconvdata_EUC_JP_la-euc-jp.lo: iconvdata/euc-jp.c
-	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iconvdata_EUC_JP_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iconvdata/iconvdata_EUC_JP_la-euc-jp.lo `test -f 'iconvdata/euc-jp.c' || echo '$(srcdir)/'`iconvdata/euc-jp.c
-
-iconvdata/iconvdata_EUC_JP_la-jis0201.lo: iconvdata/jis0201.c
-	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iconvdata_EUC_JP_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iconvdata/iconvdata_EUC_JP_la-jis0201.lo `test -f 'iconvdata/jis0201.c' || echo '$(srcdir)/'`iconvdata/jis0201.c
-
-iconvdata/iconvdata_EUC_JP_la-jis0208.lo: iconvdata/jis0208.c
-	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iconvdata_EUC_JP_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iconvdata/iconvdata_EUC_JP_la-jis0208.lo `test -f 'iconvdata/jis0208.c' || echo '$(srcdir)/'`iconvdata/jis0208.c
-
-iconvdata/iconvdata_EUC_JP_la-jis0212.lo: iconvdata/jis0212.c
-	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iconvdata_EUC_JP_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iconvdata/iconvdata_EUC_JP_la-jis0212.lo `test -f 'iconvdata/jis0212.c' || echo '$(srcdir)/'`iconvdata/jis0212.c
-
 mostlyclean-libtool:
 	-rm -f *.lo
 
 clean-libtool:
 	-rm -rf .libs _libs
-	-rm -rf iconvdata/.libs iconvdata/_libs
 
 distclean-libtool:
 	-rm -f libtool config.lt
@@ -1282,27 +1217,6 @@ maintainer-clean-aminfo:
 	  echo " rm -f $$i $$i-[0-9] $$i-[0-9][0-9] $$i_i[0-9] $$i_i[0-9][0-9]"; \
 	  rm -f $$i $$i-[0-9] $$i-[0-9][0-9] $$i_i[0-9] $$i_i[0-9][0-9]; \
 	done
-install-gconvDATA: $(gconv_DATA)
-	@$(NORMAL_INSTALL)
-	@list='$(gconv_DATA)'; test -n "$(gconvdir)" || list=; \
-	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(gconvdir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(gconvdir)" || exit 1; \
-	fi; \
-	for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  echo "$$d$$p"; \
-	done | $(am__base_list) | \
-	while read files; do \
-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(gconvdir)'"; \
-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(gconvdir)" || exit $$?; \
-	done
-
-uninstall-gconvDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(gconv_DATA)'; test -n "$(gconvdir)" || list=; \
-	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
-	dir='$(DESTDIR)$(gconvdir)'; $(am__uninstall_files_from_dir)
 install-toollibDATA: $(toollib_DATA)
 	@$(NORMAL_INSTALL)
 	@list='$(toollib_DATA)'; test -n "$(toollibdir)" || list=; \
@@ -1443,7 +1357,7 @@ all-am: Makefile $(LIBRARIES) $(LTLIBRARIES) $(DATA) newlib.h \
 		_newlib_version.h all-local
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(toollibdir)" "$(DESTDIR)$(pkglibdir)" "$(DESTDIR)$(toollibdir)" "$(DESTDIR)$(gconvdir)" "$(DESTDIR)$(toollibdir)"; do \
+	for dir in "$(DESTDIR)$(toollibdir)" "$(DESTDIR)$(pkglibdir)" "$(DESTDIR)$(toollibdir)" "$(DESTDIR)$(toollibdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -1473,7 +1387,6 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
-	-rm -f iconvdata/$(am__dirstamp)
 	-rm -f libc/$(am__dirstamp)
 	-rm -f libm/$(am__dirstamp)
 
@@ -1505,9 +1418,8 @@ info: info-recursive
 
 info-am: $(INFO_DEPS)
 
-install-data-am: install-data-local install-gconvDATA \
-	install-toollibDATA install-toollibLIBRARIES \
-	install-toollibLTLIBRARIES
+install-data-am: install-data-local install-toollibDATA \
+	install-toollibLIBRARIES install-toollibLTLIBRARIES
 
 install-dvi: install-dvi-recursive
 
@@ -1644,10 +1556,10 @@ ps: ps-recursive
 
 ps-am: $(PSS)
 
-uninstall-am: uninstall-dvi-am uninstall-gconvDATA uninstall-html-am \
-	uninstall-info-am uninstall-pdf-am uninstall-pkglibLTLIBRARIES \
-	uninstall-ps-am uninstall-toollibDATA \
-	uninstall-toollibLIBRARIES uninstall-toollibLTLIBRARIES
+uninstall-am: uninstall-dvi-am uninstall-html-am uninstall-info-am \
+	uninstall-pdf-am uninstall-pkglibLTLIBRARIES uninstall-ps-am \
+	uninstall-toollibDATA uninstall-toollibLIBRARIES \
+	uninstall-toollibLTLIBRARIES
 
 .MAKE: $(am__recursive_targets) all check-am install-am install-strip
 
@@ -1661,18 +1573,17 @@ uninstall-am: uninstall-dvi-am uninstall-gconvDATA uninstall-html-am \
 	distclean-local distclean-tags dvi dvi-am html html-am info \
 	info-am install install-am install-data install-data-am \
 	install-data-local install-dvi install-dvi-am install-exec \
-	install-exec-am install-exec-local install-gconvDATA \
-	install-html install-html-am install-info install-info-am \
-	install-man install-pdf install-pdf-am \
-	install-pkglibLTLIBRARIES install-ps install-ps-am \
-	install-strip install-toollibDATA install-toollibLIBRARIES \
-	install-toollibLTLIBRARIES installcheck installcheck-am \
-	installdirs installdirs-am maintainer-clean \
-	maintainer-clean-aminfo maintainer-clean-generic \
-	maintainer-clean-local mostlyclean mostlyclean-aminfo \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	mostlyclean-local pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am uninstall-dvi-am uninstall-gconvDATA \
+	install-exec-am install-exec-local install-html \
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-pkglibLTLIBRARIES \
+	install-ps install-ps-am install-strip install-toollibDATA \
+	install-toollibLIBRARIES install-toollibLTLIBRARIES \
+	installcheck installcheck-am installdirs installdirs-am \
+	maintainer-clean maintainer-clean-aminfo \
+	maintainer-clean-generic maintainer-clean-local mostlyclean \
+	mostlyclean-aminfo mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool mostlyclean-local pdf pdf-am ps ps-am tags \
+	tags-am uninstall uninstall-am uninstall-dvi-am \
 	uninstall-html-am uninstall-info-am uninstall-pdf-am \
 	uninstall-pkglibLTLIBRARIES uninstall-ps-am \
 	uninstall-toollibDATA uninstall-toollibLIBRARIES \

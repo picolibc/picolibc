@@ -505,9 +505,6 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 if HAVE_DOC
 include doc/local.mk
 endif
-if HAVE_ICONVDATA
-include iconvdata/Makefile.inc
-endif
 include libc/Makefile.inc
 include libm/Makefile.inc
 

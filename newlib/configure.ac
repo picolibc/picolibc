@@ -347,9 +347,6 @@ AM_CONDITIONAL(HAVE_DOC, test x$have_multisubdir = xno)
 # subdirectory withing the build directory.
 AM_CONDITIONAL(HAVE_MULTISUBDIR, test x$have_multisubdir = xyes)
 
-HAVE_ICONVDATA=false
-AM_CONDITIONAL([HAVE_ICONVDATA], $HAVE_ICONVDATA)
-
 CRT0=
 CRT0_DIR=
 if test "x${have_crt0}" = "xyes"; then
