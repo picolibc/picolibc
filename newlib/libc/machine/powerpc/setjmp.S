@@ -27,7 +27,6 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #define LWZU	ldu
 #define OFFSET	8
 #else
-#error 32-bit
 #define STW	stw
 #define STWU	stwu
 #define LWZ	lwz
