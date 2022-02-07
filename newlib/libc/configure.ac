@@ -159,7 +159,6 @@ if test -n "${sys_dir}"; then
     epiphany) AC_CONFIG_FILES([sys/epiphany/Makefile]) ;;
     h8300hms) AC_CONFIG_FILES([sys/h8300hms/Makefile]) ;;
     h8500hms) AC_CONFIG_FILES([sys/h8500hms/Makefile]) ;;
-    linux) AC_CONFIG_SUBDIRS(sys/linux) ;;
     m88kbug) AC_CONFIG_FILES([sys/m88kbug/Makefile]) ;;
     mmixware) AC_CONFIG_FILES([sys/mmixware/Makefile]) ;;
     netware) AC_CONFIG_FILES([sys/netware/Makefile]) ;;
