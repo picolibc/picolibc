@@ -406,7 +406,7 @@ fi
 
 if [ "x${newlib_mb}" = "x" ]; then
 	case "${host}" in
-  	  i[34567]86-pc-linux-*|*-*-cygwin*)
+	  *-*-cygwin*)
 		newlib_mb=yes
 	  	;;
 	esac
@@ -417,21 +417,6 @@ fi
 if [ "${newlib_io_float}" = "no" ] ; then
 	newlib_cflags="${newlib_cflags} -DNO_FLOATING_POINT"
 fi
-
-# Verify if shared newlib support is allowed and set appropriate variables
-# We don't want to use libtool for platforms that we are not going to
-# support shared libraries.  This is because it adds executable tests which
-# we don't want for most embedded platforms.
-case "${host}" in
-  i[34567]86-pc-linux-*)
-    use_libtool=yes
-    have_sys_mach_dir=yes
-    stdio64_dir=stdio64
-    oext=lo
-    lpfx=
-    aext=la ;;
-  *) ;; #shared library not supported for ${host}
-esac
 
 # Get the source directories to use for the host.  unix_dir is set
 # to unix to get some standard Unix routines.  posix_dir is set to get some
@@ -529,29 +514,6 @@ case "${host}" in
   i[34567]86-*-sco*)
 	sys_dir=sysvi386
 	unix_dir=unix
-	;;
-  i[34567]86-pc-linux-*)
-	sys_dir=linux
-	unix_dir=unix
-	posix_dir=posix
-	crt1=crt1.o
-	crt1_dir=libc/sys/${sys_dir}	
-	gcc_dir=`gcc -print-search-dirs | awk '/^install:/{print $2}'`
-	default_newlib_io_c99_formats="yes"
-	default_newlib_io_long_double="yes"
-	default_newlib_io_long_long="yes"
-	default_newlib_io_pos_args="yes"
-	#newlib_cflags="${newlib_cflags} -Werror" # DEBUGGING ONLY;BREAKS BUILD
-	newlib_cflags="${newlib_cflags} -Wall"
-	newlib_cflags="${newlib_cflags} -DHAVE_FCNTL"
-	newlib_cflags="${newlib_cflags} -DHAVE_GETOPT"
-	newlib_cflags="${newlib_cflags} -D_NO_POSIX_SPAWN"
-	# --- Required when building a shared library ------------------------
-	newlib_cflags="${newlib_cflags} -fPIC -D_I386MACH_NEED_SOTYPE_FUNCTION"
-	# --- The three lines below are optional ------------------------------
-	##newlib_cflags="${newlib_cflags} -nostdinc"
-	##newlib_cflags="${newlib_cflags} -I`newlib-flags --kernel-dir`/include"
-	##newlib_cflags="${newlib_cflags} -idirafter ${gcc_dir}include"
 	;;
 
   m68hc11-*-*|m6811-*-*|m6812-*-*|m68hc12-*-*)

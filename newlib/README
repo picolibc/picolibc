@@ -508,40 +508,6 @@ need to add the other targets you're testing to the case statement.
 Now type make check-target-newlib in the top-level build directory to
 run the testsuite.
 
-Shared newlib
-=============
-
-newlib uses libtool when it is being compiled natively (with
---target=i[34567]86-pc-linux-gnu) on an i[34567]86-pc-linux-gnu
-host. This allows newlib to be compiled as a shared library.
-
-To configure newlib, do the following from your build directory:
-
-$(source_dir)/src/configure --with-newlib --prefix=$(install_dir)
-
-configure will recognize that host == target ==
-i[34567]86-pc-linux-gnu, so it will tell newlib to compile itself using
-libtool. By default, libtool will build shared and static versions of
-newlib.
-
-To compile a program against shared newlib, do the following (where
-target_install_dir = $(install_dir)/i[34567]86-pc-linux-gnu):
-
-gcc -nostdlib $(target_install_dir)/lib/crt0.o progname.c -I $(target_install_dir)/include -L $(target_install_dir)/lib -lc -lm -lgcc
-
-To run the program, make sure that $(target_install_dir)/lib is listed
-in the LD_LIBRARY_PATH environment variable.
-
-To create a static binary linked against newlib, do the following:
-
-gcc -nostdlib -static $(target_install_dir)/lib/crt0.o progname.c -I $(target_install_dir)/include -L $(target_install_dir)/lib -lc -lm
-
-libtool can be instructed to produce only static libraries. To build
-newlib as a static library only, do the following from your build
-directory:
-
-$(source_dir)/src/configure --with-newlib --prefix=$(install_dir) --disable-shared
-
 Regenerating Configuration Files
 ================================
 

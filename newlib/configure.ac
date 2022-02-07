@@ -348,11 +348,6 @@ AM_CONDITIONAL(HAVE_DOC, test x$have_multisubdir = xno)
 AM_CONDITIONAL(HAVE_MULTISUBDIR, test x$have_multisubdir = xyes)
 
 HAVE_ICONVDATA=false
-case $host in
-  i[[34567]]86-pc-linux-*)
-	HAVE_ICONVDATA=true
-	;;
-esac
 AM_CONDITIONAL([HAVE_ICONVDATA], $HAVE_ICONVDATA)
 
 CRT0=
