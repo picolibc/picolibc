@@ -11,7 +11,7 @@ noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
 
-LIBADD_OBJS = \
+lib_a_LIBADD = \
 	lib_a-fenv.$(OBJEXT)
 
 # fenv.c cannot be compiled as mips16 since it uses the cfc1 instruction

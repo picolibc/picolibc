@@ -111,7 +111,7 @@ am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
 am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 lib_a_AR = $(AR) $(ARFLAGS)
-lib_a_LIBADD =
+lib_a_DEPENDENCIES = lib_a-fenv.$(OBJEXT)
 am__objects_1 = lib_a-feclearexcept.$(OBJEXT) lib_a-fegetenv.$(OBJEXT) \
 	lib_a-fegetexceptflag.$(OBJEXT) lib_a-fegetround.$(OBJEXT) \
 	lib_a-feholdexcept.$(OBJEXT) lib_a-feraiseexcept.$(OBJEXT) \
@@ -305,7 +305,7 @@ LIB_SOURCES = \
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
-LIBADD_OBJS = \
+lib_a_LIBADD = \
 	lib_a-fenv.$(OBJEXT)
 
 all: all-am
