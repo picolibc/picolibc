@@ -94,6 +94,36 @@ union ldbl {
 #  endif
   } u32;
 };
+# elif (LDBL_MANT_DIG == 106) /* 128-bit double double */
+static const double scale = 0x1p107;
+
+#define EXP_EXTRA_BIAS 100
+
+union ldbl {
+  long double x;
+  struct {
+#  ifdef __IEEE_LITTLE_ENDIAN
+    __uint32_t frachm;
+    __uint32_t frach:20;
+    __uint32_t exp:11;
+    __uint32_t sign:1;
+    __uint32_t fracl;
+    __uint32_t fraclm:20;
+    __uint32_t exp_extra:11;
+    __uint32_t sign_extra:1;
+#  endif
+#  ifdef __IEEE_BIG_ENDIAN
+    __uint32_t sign:1;
+    __uint32_t exp:11;
+    __uint32_t frach:20;
+    __uint32_t frachm;
+    __uint32_t sign_extra:1;
+    __uint32_t exp_extra:11;
+    __uint32_t fraclm:20;
+    __uint32_t fracl;
+#  endif
+  } u32;
+};
 # elif (LDBL_MANT_DIG == 113) /* 128-bit long double */
 static const double scale = 0x1p114;
 
@@ -147,6 +177,10 @@ frexpl (long double x, int *eptr)
     }
   *eptr += e - (LDBL_MAX_EXP - 2);
   u.u32.exp = LDBL_MAX_EXP - 2; /* -1 */
+#ifdef EXP_EXTRA_BIAS
+  if (u.u32.exp_extra != 0)
+    u.u32.exp_extra = u.u32.exp - EXP_EXTRA_BIAS;
+#endif
   return u.x;
 }
 #endif /* !_LDBL_EQ_DBL */
