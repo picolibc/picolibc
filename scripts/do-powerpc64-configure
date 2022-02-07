@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2021 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,84 +33,4 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-DIR="$(dirname "$0")"
-
-# First argument must be target architecture
-
-case "$1" in
-    "")
-	echo "Usage: $0 <architecture>" 1>&2
-	exit 1
-	;;
-esac
-
-export ARCH="$1"
-shift
-
-# Find cross compile configuration
-
-CROSS="$DIR"/cross-"$ARCH".txt
-
-if [ -f "$CROSS" ]; then
-    :
-else
-    echo "$0: $ARCH not supported" 1>&2
-    exit 1
-fi
-
-# 'clang-' prefix uses clang instead of gcc
-
-case "$ARCH" in
-    clang-*)
-	ARCH=$(echo "$ARCH" | sed 's/clang-//')
-	;;
-esac
-
-case "$ARCH" in
-    *rv[36][24]*|*riscv*|*aarch64*|*powerpc*)
-	case "$*" in
-	    *-Dnewlib-io-long-double=true*)
-		echo "newlib-io-long-double not supported on riscv or aarch64"
-		exit 77
-		;;
-	esac
-	;;
-esac
-
-# Check for sysroot-install and automatically set prefix if needed
-
-case "$*" in
-    *sysroot-install=true*)
-	case "$*" in
-	    *-Dprefix*)
-		:
-		;;
-	    *)
-		SYSROOT_ORIG="$("${ARCH}-gcc" -print-sysroot)"
-		SYSROOT="$(readlink -f "$SYSROOT_ORIG")"
-		PREFIX="-Dprefix=$SYSROOT"
-		;;
-	esac
-	;;
-esac
-
-# Run meson
-
-case "$PREFIX" in
-    "")
-	meson setup \
-	      -Dincludedir=picolibc/"$ARCH"/include \
-	      -Dlibdir=picolibc/"$ARCH"/lib \
-	      --cross-file "$CROSS" \
-	      "$@" \
-	      "$DIR"/..
-	;;
-    *)
-	meson setup \
-	      -Dincludedir=picolibc/"$ARCH"/include \
-	      -Dlibdir=picolibc/"$ARCH"/lib \
-	      --cross-file "$CROSS" \
-	      "$PREFIX" "$@" \
-	      "$DIR"/..
-	;;
-esac
+exec "$(dirname "$0")"/do-configure powerpc64-linux-gnu -Dtests=false "$@"
