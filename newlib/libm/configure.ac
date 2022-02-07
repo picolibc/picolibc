@@ -43,7 +43,7 @@ if test -n "${libm_machine_dir}"; then
   esac
 
   LIBM_MACHINE_DIR=machine/${libm_machine_dir}
-  LIBM_MACHINE_LIB=${LIBM_MACHINE_DIR}/lib.${aext}
+  LIBM_MACHINE_LIB=${LIBM_MACHINE_DIR}/lib.a
 fi
 AM_CONDITIONAL(HAVE_LIBM_MACHINE_DIR, test "x${LIBM_MACHINE_DIR}" != x)
 AC_SUBST(LIBM_MACHINE_DIR)

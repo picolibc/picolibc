@@ -11,7 +11,7 @@ if HAVE_LIBM_MACHINE_DIR
 SUBDIRS += $(LIBM_MACHINE_DIR)
 endif
 
-SUBLIBS = $(MATHDIR)/lib.$(aext) common/lib.$(aext) complex/lib.$(aext) fenv/lib.$(aext) $(LIBM_MACHINE_LIB)
+SUBLIBS = $(MATHDIR)/lib.a common/lib.a complex/lib.a fenv/lib.a $(LIBM_MACHINE_LIB)
 noinst_LIBRARIES = libm.a
 libm.a: $(SUBLIBS)
 	rm -f $@

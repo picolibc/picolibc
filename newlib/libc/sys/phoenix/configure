@@ -595,7 +595,6 @@ shared_machine_dir
 machine_dir
 libm_machine_dir
 lpfx
-aext
 oext
 ELIX_LEVEL_4_FALSE
 ELIX_LEVEL_4_TRUE
@@ -4265,11 +4264,10 @@ OBJEXT=${oext}
 
 
 
-
 subdirs="$subdirs machine"
 
 
-PHOENIX_MACH_LIB=machine/lib.${aext}
+PHOENIX_MACH_LIB=machine/lib.a
 
 
 ac_config_files="$ac_config_files Makefile"

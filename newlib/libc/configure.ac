@@ -61,49 +61,49 @@ dnl build the library.
 
 LIBC_SIGNAL_LIB=
 if test -n "${signal_dir}"; then
-  LIBC_SIGNAL_LIB=${signal_dir}/lib.${aext}
+  LIBC_SIGNAL_LIB=${signal_dir}/lib.a
 fi
 AC_SUBST(LIBC_SIGNAL_LIB)
 AM_CONDITIONAL(HAVE_SIGNAL_DIR, test x${signal_dir} != x)
 
 LIBC_STDIO_LIB=
 if test -n "${stdio_dir}"; then
-  LIBC_STDIO_LIB=${stdio_dir}/lib.${aext}
+  LIBC_STDIO_LIB=${stdio_dir}/lib.a
 fi
 AC_SUBST(LIBC_STDIO_LIB)
 AM_CONDITIONAL(HAVE_STDIO_DIR, test x${stdio_dir} != x)
 
 LIBC_STDIO64_LIB=
 if test -n "${stdio64_dir}"; then
-  LIBC_STDIO64_LIB=${stdio64_dir}/lib.${aext}
+  LIBC_STDIO64_LIB=${stdio64_dir}/lib.a
 fi
 AC_SUBST(LIBC_STDIO64_LIB)
 AM_CONDITIONAL(HAVE_STDIO64_DIR, test x${stdio64_dir} != x)
 
 LIBC_POSIX_LIB=
 if test -n "${posix_dir}"; then
-  LIBC_POSIX_LIB=${posix_dir}/lib.${aext}
+  LIBC_POSIX_LIB=${posix_dir}/lib.a
 fi
 AC_SUBST(LIBC_POSIX_LIB)
 AM_CONDITIONAL(HAVE_POSIX_DIR, test x${posix_dir} != x)
 
 LIBC_XDR_LIB=
 if test -n "${xdr_dir}"; then
-  LIBC_XDR_LIB=${xdr_dir}/lib.${aext}
+  LIBC_XDR_LIB=${xdr_dir}/lib.a
 fi
 AC_SUBST(LIBC_XDR_LIB)
 AM_CONDITIONAL(HAVE_XDR_DIR, test x${xdr_dir} != x)
 
 LIBC_SYSCALL_LIB=
 if test -n "${syscall_dir}"; then
-  LIBC_SYSCALL_LIB=${syscall_dir}/lib.${aext}
+  LIBC_SYSCALL_LIB=${syscall_dir}/lib.a
 fi
 AC_SUBST(LIBC_SYSCALL_LIB)
 AM_CONDITIONAL(HAVE_SYSCALL_DIR, test x${syscall_dir} != x)
 
 LIBC_UNIX_LIB=
 if test -n "${unix_dir}"; then
-  LIBC_UNIX_LIB=${unix_dir}/lib.${aext}
+  LIBC_UNIX_LIB=${unix_dir}/lib.a
 fi
 AC_SUBST(LIBC_UNIX_LIB)
 AM_CONDITIONAL(HAVE_UNIX_DIR, test x${unix_dir} != x)
@@ -145,7 +145,7 @@ if test -n "${sys_dir}"; then
   esac
 
   SYS_DIR=sys/${sys_dir}
-  LIBC_SYS_LIB=${SYS_DIR}/lib.${aext}
+  LIBC_SYS_LIB=${SYS_DIR}/lib.a
 fi
 AC_SUBST(SYS_DIR)
 AM_CONDITIONAL(HAVE_SYS_DIR, test x${sys_dir} != x)
@@ -231,7 +231,7 @@ if test -n "${machine_dir}"; then
   esac
 
   LIBC_MACHINE_DIR=machine/${machine_dir}
-  LIBC_MACHINE_LIB=${LIBC_MACHINE_DIR}/lib.${aext}
+  LIBC_MACHINE_LIB=${LIBC_MACHINE_DIR}/lib.a
 fi
 AM_CONDITIONAL(HAVE_LIBC_MACHINE_DIR, test "x${LIBC_MACHINE_DIR}" != x)
 AC_SUBST(LIBC_MACHINE_DIR)

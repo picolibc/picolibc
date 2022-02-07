@@ -159,7 +159,6 @@ OBJEXT=${oext}
 
 AC_SUBST(OBJEXT)
 AC_SUBST(oext)
-AC_SUBST(aext)
 AC_SUBST(lpfx)
 
 AC_SUBST(libm_machine_dir)

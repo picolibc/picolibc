@@ -261,7 +261,6 @@ abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
-aext = @aext@
 am__leading_dot = @am__leading_dot@
 am__tar = @am__tar@
 am__untar = @am__untar@
@@ -322,7 +321,7 @@ top_srcdir = @top_srcdir@
 @ENABLE_NEWLIB_ICONV_FALSE@NEWLIB_ICONV_DIRS = 
 @ENABLE_NEWLIB_ICONV_TRUE@NEWLIB_ICONV_DIRS = iconv
 @ENABLE_NEWLIB_ICONV_FALSE@NEWLIB_ICONV_LIBS = 
-@ENABLE_NEWLIB_ICONV_TRUE@NEWLIB_ICONV_LIBS = iconv/ces/lib.$(aext) iconv/ccs/lib.$(aext) iconv/lib/lib.$(aext)
+@ENABLE_NEWLIB_ICONV_TRUE@NEWLIB_ICONV_LIBS = iconv/ces/lib.a iconv/ccs/lib.a iconv/lib/lib.a
 @HAVE_XDR_DIR_TRUE@XDR_SUBDIR = xdr
 
 # The order of SUBDIRS is important for the integrated documentation.
@@ -337,21 +336,21 @@ SUBDIRS = argz stdlib ctype search $(STDIO_SUBDIR) $(STDIO64_SUBDIR) \
 noinst_DATA = $(CRT0)
 noinst_LIBRARIES = libc.a
 SUBLIBS = \
-	argz/lib.$(aext) \
-	stdlib/lib.$(aext) \
-	ctype/lib.$(aext) \
-	search/lib.$(aext) \
+	argz/lib.a \
+	stdlib/lib.a \
+	ctype/lib.a \
+	search/lib.a \
 	$(LIBC_STDIO_LIB) \
 	$(LIBC_STDIO64_LIB) \
 	$(LIBC_XDR_LIB) \
-	string/lib.$(aext) \
+	string/lib.a \
 	$(LIBC_SIGNAL_LIB) \
-	time/lib.$(aext) \
-	locale/lib.$(aext) \
-	reent/lib.$(aext) \
-	errno/lib.$(aext) \
-	misc/lib.$(aext) \
-	ssp/lib.$(aext) \
+	time/lib.a \
+	locale/lib.a \
+	reent/lib.a \
+	errno/lib.a \
+	misc/lib.a \
+	ssp/lib.a \
 	$(LIBC_UNIX_LIB) \
 	$(LIBC_POSIX_LIB) \
 	$(LIBC_SYSCALL_LIB) \

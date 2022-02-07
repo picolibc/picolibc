@@ -26,7 +26,7 @@ endif
 
 if ENABLE_NEWLIB_ICONV
 NEWLIB_ICONV_DIRS = iconv
-NEWLIB_ICONV_LIBS = iconv/ces/lib.$(aext) iconv/ccs/lib.$(aext) iconv/lib/lib.$(aext)
+NEWLIB_ICONV_LIBS = iconv/ces/lib.a iconv/ccs/lib.a iconv/lib/lib.a
 else
 NEWLIB_ICONV_DIRS =
 NEWLIB_ICONV_LIBS =
@@ -55,21 +55,21 @@ noinst_DATA = $(CRT0)
 
 noinst_LIBRARIES = libc.a
 SUBLIBS = \
-	argz/lib.$(aext) \
-	stdlib/lib.$(aext) \
-	ctype/lib.$(aext) \
-	search/lib.$(aext) \
+	argz/lib.a \
+	stdlib/lib.a \
+	ctype/lib.a \
+	search/lib.a \
 	$(LIBC_STDIO_LIB) \
 	$(LIBC_STDIO64_LIB) \
 	$(LIBC_XDR_LIB) \
-	string/lib.$(aext) \
+	string/lib.a \
 	$(LIBC_SIGNAL_LIB) \
-	time/lib.$(aext) \
-	locale/lib.$(aext) \
-	reent/lib.$(aext) \
-	errno/lib.$(aext) \
-	misc/lib.$(aext) \
-	ssp/lib.$(aext) \
+	time/lib.a \
+	locale/lib.a \
+	reent/lib.a \
+	errno/lib.a \
+	misc/lib.a \
+	ssp/lib.a \
 	$(LIBC_UNIX_LIB) \
 	$(LIBC_POSIX_LIB) \
 	$(LIBC_SYSCALL_LIB) \

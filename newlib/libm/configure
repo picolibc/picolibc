@@ -602,7 +602,6 @@ shared_machine_dir
 machine_dir
 libm_machine_dir
 lpfx
-aext
 oext
 ELIX_LEVEL_4_FALSE
 ELIX_LEVEL_4_TRUE
@@ -4295,7 +4294,6 @@ OBJEXT=${oext}
 
 
 
-
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for long double" >&5
 $as_echo_n "checking for long double... " >&6; }
 if ${ac_cv_type_long_double+:} false; then :
@@ -4454,7 +4452,7 @@ if test -n "${libm_machine_dir}"; then
   esac
 
   LIBM_MACHINE_DIR=machine/${libm_machine_dir}
-  LIBM_MACHINE_LIB=${LIBM_MACHINE_DIR}/lib.${aext}
+  LIBM_MACHINE_LIB=${LIBM_MACHINE_DIR}/lib.a
 fi
  if test "x${LIBM_MACHINE_DIR}" != x; then
   HAVE_LIBM_MACHINE_DIR_TRUE=

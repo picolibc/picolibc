@@ -11,7 +11,7 @@ NEWLIB_CONFIGURE(../../..)
 
 AC_CONFIG_SUBDIRS(machine)
 
-PHOENIX_MACH_LIB=machine/lib.${aext}
+PHOENIX_MACH_LIB=machine/lib.a
 AC_SUBST(PHOENIX_MACH_LIB)
 
 AC_CONFIG_FILES([Makefile])
