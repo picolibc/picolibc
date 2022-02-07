@@ -44,5 +44,3 @@ lib_a_CFLAGS = $(AM_CFLAGS)
 noinst_DATA =
 
 SUBDIRS=binary
-
-include $(srcdir)/../../../Makefile.shared

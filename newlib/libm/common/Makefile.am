@@ -37,27 +37,14 @@ lsrc =	atanl.c cosl.c sinl.c tanl.c tanhl.c frexpl.c modfl.c ceill.c fabsl.c \
 	logbl.c nexttowardf.c nexttoward.c nexttowardl.c log2l.c \
 	sl_finite.c
 
-libcommon_la_LDFLAGS = -Xcompiler -nostdlib
 lib_a_CFLAGS = -fbuiltin -fno-math-errno
 
-if USE_LIBTOOL
-noinst_LTLIBRARIES = libcommon.la
-libcommon_la_SOURCES = $(src) $(fsrc)
-if HAVE_LONG_DOUBLE
-libcommon_la_SOURCES += $(lsrc)
-endif # HAVE_LONG_DOUBLE
-noinst_DATA = objectlist.awk.in
-else
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(src) $(fsrc)
 if HAVE_LONG_DOUBLE
 lib_a_SOURCES += $(lsrc)
 endif # HAVE_LONG_DOUBLE
 lib_a_CFLAGS += $(AM_CFLAGS)
-noinst_DATA =
-endif # USE_LIBTOOL
-
-include $(srcdir)/../../Makefile.shared
 
 # A partial dependency list.
 

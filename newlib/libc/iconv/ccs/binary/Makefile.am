@@ -17,6 +17,4 @@ cp775.cct cp850.cct cp852.cct cp855.cct cp866.cct \
 jis_x0212_1990.cct jis_x0201_1976.cct jis_x0208_1990.cct ksx1001.cct \
 cns11643_plane1.cct cns11643_plane2.cct cns11643_plane14.cct
 
-include $(srcdir)/../../../../Makefile.shared
-
 info:

@@ -201,26 +201,12 @@ LIBADD_OBJS = $(lpfx)$(FREER).$(oext) $(lpfx)$(REALLOCR).$(oext) \
 	$(lpfx)$(MALLINFOR).$(oext) $(lpfx)$(MALLSTATSR).$(oext) \
 	$(lpfx)$(MSIZER).$(oext) $(lpfx)$(MALLOCR).$(oext)
 
-libstdlib_la_LDFLAGS = -Xcompiler -nostdlib
-
-if USE_LIBTOOL
-noinst_LTLIBRARIES = libstdlib.la
-libstdlib_la_SOURCES = $(GENERAL_SOURCES) $(EXTENDED_SOURCES) $(ELIX_SOURCES)
-libstdlib_la_LIBADD =  $(LIBADD_OBJS) $(ELIX_OBJS)
-libstdlib_la_DEPENDENCIES = $(LIBADD_OBJS) $(ELIX_OBJS)
-LIB_COMPILE = $(AM_V_CC)$(LTCOMPILE)
-noinst_DATA = objectlist.awk.in
-else
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(GENERAL_SOURCES) $(EXTENDED_SOURCES) $(ELIX_SOURCES)
 lib_a_LIBADD = $(LIBADD_OBJS) $(ELIX_OBJS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 lib_a_DEPENDENCIES = $(LIBADD_OBJS) $(ELIX_OBJS)
 LIB_COMPILE = $(AM_V_CC)$(COMPILE)
-noinst_DATA =
-endif # USE_LIBTOOL
-
-include $(srcdir)/../../Makefile.shared
 
 MALLOC_COMPILE = $(LIB_COMPILE) -DINTERNAL_NEWLIB
 

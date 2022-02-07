@@ -14,7 +14,6 @@
 
 @SET_MAKE@
 
-
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -94,11 +93,6 @@ subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../config/lead-dot.m4 \
 	$(top_srcdir)/../../config/override.m4 \
-	$(top_srcdir)/../../libtool.m4 \
-	$(top_srcdir)/../../ltoptions.m4 \
-	$(top_srcdir)/../../ltsugar.m4 \
-	$(top_srcdir)/../../ltversion.m4 \
-	$(top_srcdir)/../../lt~obsolete.m4 \
 	$(top_srcdir)/../acinclude.m4 \
 	$(top_srcdir)/machine/nds32/acinclude.m4 \
 	$(top_srcdir)/configure.ac
@@ -121,27 +115,6 @@ libm_a_AR = $(AR) $(ARFLAGS)
 libm_a_LIBADD =
 libm_a_SOURCES = libm.c
 libm_a_OBJECTS = libm.$(OBJEXT)
-LTLIBRARIES = $(noinst_LTLIBRARIES)
-am__DEPENDENCIES_1 =
-@USE_LIBTOOL_FALSE@am__DEPENDENCIES_2 = $(MATHDIR)/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	common/lib.$(aext) complex/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	fenv/lib.$(aext) $(am__DEPENDENCIES_1)
-@USE_LIBTOOL_TRUE@am__DEPENDENCIES_2 =  \
-@USE_LIBTOOL_TRUE@	$(MATHDIR)/lib$(MATHDIR).$(aext) \
-@USE_LIBTOOL_TRUE@	common/libcommon.$(aext) \
-@USE_LIBTOOL_TRUE@	complex/libcomplex.$(aext) \
-@USE_LIBTOOL_TRUE@	fenv/libfenv.$(aext) $(am__DEPENDENCIES_1)
-@USE_LIBTOOL_TRUE@libm_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
-am_libm_la_OBJECTS =
-libm_la_OBJECTS = $(am_libm_la_OBJECTS)
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
-libm_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(libm_la_LDFLAGS) $(LDFLAGS) -o $@
-@USE_LIBTOOL_TRUE@am_libm_la_rpath =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -159,23 +132,17 @@ depcomp =
 am__depfiles_maybe =
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
-	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	$(AM_CFLAGS) $(CFLAGS)
 AM_V_CC = $(am__v_CC_@AM_V@)
 am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
 am__v_CC_0 = @echo "  CC      " $@;
 am__v_CC_1 = 
 CCLD = $(CC)
-LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = libm.c $(libm_la_SOURCES)
+SOURCES = libm.c
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -222,7 +189,6 @@ ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
-AS = @AS@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -235,42 +201,27 @@ CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
-DLLTOOL = @DLLTOOL@
-DSYMUTIL = @DSYMUTIL@
-DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
-EGREP = @EGREP@
 EXEEXT = @EXEEXT@
-FGREP = @FGREP@
-GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
-LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBM_MACHINE_DIR = @LIBM_MACHINE_DIR@
 LIBM_MACHINE_LIB = @LIBM_MACHINE_LIB@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
-LIBTOOL = @LIBTOOL@
-LIPO = @LIPO@
-LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
-NM = @NM@
-NMEDIT = @NMEDIT@
 NO_INCLUDE_LIST = @NO_INCLUDE_LIST@
-OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
-OTOOL = @OTOOL@
-OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -281,7 +232,6 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
 READELF = @READELF@
-SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -293,7 +243,6 @@ abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
-ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
 aext = @aext@
 am__leading_dot = @am__leading_dot@
 am__tar = @am__tar@
@@ -348,19 +297,14 @@ top_srcdir = @top_srcdir@
 @NEWLIB_HW_FP_FALSE@MATHDIR = math
 @NEWLIB_HW_FP_TRUE@MATHDIR = mathfp
 SUBDIRS = $(MATHDIR) common complex fenv $(am__append_1)
-libm_la_LDFLAGS = -Xcompiler -nostdlib
-@USE_LIBTOOL_FALSE@SUBLIBS = $(MATHDIR)/lib.$(aext) common/lib.$(aext) complex/lib.$(aext) fenv/lib.$(aext) $(LIBM_MACHINE_LIB)
-@USE_LIBTOOL_TRUE@SUBLIBS = $(MATHDIR)/lib$(MATHDIR).$(aext) common/libcommon.$(aext) complex/libcomplex.$(aext) fenv/libfenv.$(aext) $(LIBM_MACHINE_LIB)
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libm.la
-@USE_LIBTOOL_TRUE@libm_la_SOURCES = 
-@USE_LIBTOOL_TRUE@libm_la_LIBADD = $(SUBLIBS)
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = libm.a
+SUBLIBS = $(MATHDIR)/lib.$(aext) common/lib.$(aext) complex/lib.$(aext) fenv/lib.$(aext) $(LIBM_MACHINE_LIB)
+noinst_LIBRARIES = libm.a
 ACLOCAL_AMFLAGS = -I .. -I ../.. -I ../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .c .lo .o .obj
+.SUFFIXES: .c .o .obj
 am--refresh: Makefile
 	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -398,25 +342,6 @@ $(am__aclocal_m4_deps):
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
 
-@USE_LIBTOOL_TRUE@libm.a: $(libm_a_OBJECTS) $(libm_a_DEPENDENCIES) $(EXTRA_libm_a_DEPENDENCIES) 
-@USE_LIBTOOL_TRUE@	$(AM_V_at)-rm -f libm.a
-@USE_LIBTOOL_TRUE@	$(AM_V_AR)$(libm_a_AR) libm.a $(libm_a_OBJECTS) $(libm_a_LIBADD)
-@USE_LIBTOOL_TRUE@	$(AM_V_at)$(RANLIB) libm.a
-
-clean-noinstLTLIBRARIES:
-	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
-	@list='$(noinst_LTLIBRARIES)'; \
-	locs=`for p in $$list; do echo $$p; done | \
-	      sed 's|^[^/]*$$|.|; s|/[^/]*$$||; s|$$|/so_locations|' | \
-	      sort -u`; \
-	test -z "$$locs" || { \
-	  echo rm -f $${locs}; \
-	  rm -f $${locs}; \
-	}
-
-libm.la: $(libm_la_OBJECTS) $(libm_la_DEPENDENCIES) $(EXTRA_libm_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libm_la_LINK) $(am_libm_la_rpath) $(libm_la_OBJECTS) $(libm_la_LIBADD) $(LIBS)
-
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
@@ -428,18 +353,6 @@ distclean-compile:
 
 .c.obj:
 	$(AM_V_CC)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-.c.lo:
-	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
-
-mostlyclean-libtool:
-	-rm -f *.lo
-
-clean-libtool:
-	-rm -rf .libs _libs
-
-distclean-libtool:
-	-rm -f libtool config.lt
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run 'make' without going through this Makefile.
@@ -548,7 +461,7 @@ distclean-tags:
 	-rm -f cscope.out cscope.in.out cscope.po.out cscope.files
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(LIBRARIES) $(LTLIBRARIES)
+all-am: Makefile $(LIBRARIES)
 installdirs: installdirs-recursive
 installdirs-am:
 install: install-recursive
@@ -583,14 +496,13 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-generic clean-libtool clean-noinstLIBRARIES \
-	clean-noinstLTLIBRARIES mostlyclean-am
+clean-am: clean-generic clean-noinstLIBRARIES mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
-	distclean-libtool distclean-tags
+	distclean-tags
 
 dvi: dvi-recursive
 
@@ -640,8 +552,7 @@ maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-recursive
 
-mostlyclean-am: mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool
+mostlyclean-am: mostlyclean-compile mostlyclean-generic
 
 pdf: pdf-recursive
 
@@ -657,33 +568,31 @@ uninstall-am:
 
 .PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am \
 	am--refresh check check-am clean clean-cscope clean-generic \
-	clean-libtool clean-noinstLIBRARIES clean-noinstLTLIBRARIES \
-	cscope cscopelist-am ctags ctags-am distclean \
-	distclean-compile distclean-generic distclean-libtool \
-	distclean-tags dvi dvi-am html html-am info info-am install \
-	install-am install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am
+	clean-noinstLIBRARIES cscope cscopelist-am ctags ctags-am \
+	distclean distclean-compile distclean-generic distclean-tags \
+	dvi dvi-am html html-am info info-am install install-am \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
+	install-info install-info-am install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs installdirs-am \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic pdf pdf-am ps ps-am \
+	tags tags-am uninstall uninstall-am
 
 .PRECIOUS: Makefile
 
-@USE_LIBTOOL_FALSE@libm.a: $(SUBLIBS)
-@USE_LIBTOOL_FALSE@	rm -f $@
-@USE_LIBTOOL_FALSE@	rm -rf tmp
-@USE_LIBTOOL_FALSE@	mkdir tmp
-@USE_LIBTOOL_FALSE@	cd tmp; \
-@USE_LIBTOOL_FALSE@	  for i in $(SUBLIBS); do \
-@USE_LIBTOOL_FALSE@	    $(AR) x ../$$i; \
-@USE_LIBTOOL_FALSE@	done; \
-@USE_LIBTOOL_FALSE@	$(AR) $(AR_FLAGS) ../$@ *.o
-@USE_LIBTOOL_FALSE@	$(RANLIB) $@
-@USE_LIBTOOL_FALSE@	rm -rf tmp
+libm.a: $(SUBLIBS)
+	rm -f $@
+	rm -rf tmp
+	mkdir tmp
+	cd tmp; \
+	  for i in $(SUBLIBS); do \
+	    $(AR) x ../$$i; \
+	done; \
+	$(AR) $(AR_FLAGS) ../$@ *.o
+	$(RANLIB) $@
+	rm -rf tmp
 
 $(SUBLIBS):
 

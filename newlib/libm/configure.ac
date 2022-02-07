@@ -18,15 +18,6 @@ AC_CONFIG_AUX_DIR(../..)
 
 NEWLIB_CONFIGURE(..)
 
-dnl We have to enable libtool after NEWLIB_CONFIGURE because if we try and
-dnl add it into NEWLIB_CONFIGURE, executable tests are made before the first
-dnl line of the macro which fail because appropriate LDFLAGS are not set.
-_LT_DECL_SED
-_LT_PROG_ECHO_BACKSLASH
-if test "${use_libtool}" = "yes"; then
-LT_INIT([win32-dll])
-fi
-
 AC_TYPE_LONG_DOUBLE
 AM_CONDITIONAL(HAVE_LONG_DOUBLE, test x"$ac_cv_type_long_double" = x"yes")
 
@@ -52,11 +43,7 @@ if test -n "${libm_machine_dir}"; then
   esac
 
   LIBM_MACHINE_DIR=machine/${libm_machine_dir}
-  if test "${use_libtool}" = "yes"; then
-    LIBM_MACHINE_LIB=${LIBM_MACHINE_DIR}/lib${libm_machine_dir}.${aext}
-  else
-    LIBM_MACHINE_LIB=${LIBM_MACHINE_DIR}/lib.${aext}
-  fi
+  LIBM_MACHINE_LIB=${LIBM_MACHINE_DIR}/lib.${aext}
 fi
 AM_CONDITIONAL(HAVE_LIBM_MACHINE_DIR, test "x${LIBM_MACHINE_DIR}" != x)
 AC_SUBST(LIBM_MACHINE_DIR)

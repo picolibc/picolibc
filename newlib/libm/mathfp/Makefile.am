@@ -41,20 +41,9 @@ fsrc =	sf_ceil.c \
 	ef_scalb.c sf_signif.c \
 	sf_exp2.c sf_tgamma.c
 
-libmathfp_la_LDFLAGS = -Xcompiler -nostdlib
-
-if USE_LIBTOOL
-noinst_LTLIBRARIES = libmathfp.la
-libmathfp_la_SOURCES = $(src) $(fsrc)
-noinst_DATA = objectlist.awk.in
-else
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(src) $(fsrc)
 lib_a_CFLAGS = $(AM_CFLAGS)
-noinst_DATA =
-endif # USE_LIBTOOL
-
-include $(srcdir)/../../Makefile.shared
 
 # A partial dependency list.
 

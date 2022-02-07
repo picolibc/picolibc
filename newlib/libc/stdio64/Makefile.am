@@ -21,21 +21,9 @@ ELIX_SOURCES = \
 	tmpfile64.c
 endif
 
-libstdio64_la_LDFLAGS = -Xcompiler -nostdlib
-
-if USE_LIBTOOL
-noinst_LTLIBRARIES = libstdio64.la
-libstdio64_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
-LIB_COMPILE = $(AM_V_CC)$(LTCOMPILE)
-noinst_DATA = objectlist.awk.in
-else
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
 LIB_COMPILE = $(AM_V_CC)$(COMPILE)
-noinst_DATA =
-endif # USE_LIBTOOL
-
-include $(srcdir)/../../Makefile.shared
 
 AM_CFLAGS = -I $(srcdir)/../stdio

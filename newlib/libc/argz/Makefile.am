@@ -28,17 +28,6 @@ ELIX_SOURCES = 		\
 	envz_strip.c
 endif
 
-libargz_la_LDFLAGS = -Xcompiler -nostdlib
-
-if USE_LIBTOOL
-noinst_LTLIBRARIES = libargz.la
-libargz_la_SOURCES = dummy.c $(ELIX_SOURCES)
-noinst_DATA = objectlist.awk.in
-else
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = dummy.c $(ELIX_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
-noinst_DATA =
-endif # USE_LIBTOOL
-
-include $(srcdir)/../../Makefile.shared

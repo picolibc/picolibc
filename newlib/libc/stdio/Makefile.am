@@ -220,26 +220,12 @@ LIBADD_OBJS = \
 	%D%/$(lpfx)vfiwscanf.$(oext) $(lpfx)vfwscanf.$(oext)
 endif
 
-libstdio_la_LDFLAGS = -Xcompiler -nostdlib
-
-if USE_LIBTOOL
-noinst_LTLIBRARIES = libstdio.la
-libstdio_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_2_SOURCES) $(ELIX_4_SOURCES)
-libstdio_la_LIBADD = $(LIBADD_OBJS)
-libstdio_la_DEPENDENCIES = $(LIBADD_OBJS)
-LIB_COMPILE = $(AM_V_CC)$(LTCOMPILE)
-noinst_DATA = objectlist.awk.in
-else
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_2_SOURCES) $(ELIX_4_SOURCES)
 lib_a_LIBADD = $(LIBADD_OBJS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 lib_a_DEPENDENCIES = $(LIBADD_OBJS)
 LIB_COMPILE = $(AM_V_CC)$(COMPILE)
-noinst_DATA =
-endif # USE_LIBTOOL
-
-include $(srcdir)/../../Makefile.shared
 
 # Though small footprint nano-formatted-IO implementation is used
 # when NEWLIB_NANO_FORMATTED_IO is enabled, we keep all rules for

@@ -14,8 +14,6 @@
 
 @SET_MAKE@
 
-
-
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -94,11 +92,6 @@ subdir = locale
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../config/lead-dot.m4 \
 	$(top_srcdir)/../../config/override.m4 \
-	$(top_srcdir)/../../libtool.m4 \
-	$(top_srcdir)/../../ltoptions.m4 \
-	$(top_srcdir)/../../ltsugar.m4 \
-	$(top_srcdir)/../../ltversion.m4 \
-	$(top_srcdir)/../../lt~obsolete.m4 \
 	$(top_srcdir)/../acinclude.m4 \
 	$(top_srcdir)/machine/nds32/acinclude.m4 \
 	$(top_srcdir)/machine/powerpc/acinclude.m4 \
@@ -130,27 +123,8 @@ am__objects_1 = lib_a-locale.$(OBJEXT) lib_a-localeconv.$(OBJEXT)
 @ELIX_LEVEL_1_FALSE@	lib_a-nl_langinfo.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-timelocal.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-uselocale.$(OBJEXT)
-@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
-@USE_LIBTOOL_FALSE@	$(am__objects_2)
+am_lib_a_OBJECTS = $(am__objects_1) $(am__objects_2)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
-LTLIBRARIES = $(noinst_LTLIBRARIES)
-liblocale_la_LIBADD =
-am__objects_3 = locale.lo localeconv.lo
-@ELIX_LEVEL_1_FALSE@am__objects_4 = duplocale.lo freelocale.lo \
-@ELIX_LEVEL_1_FALSE@	lctype.lo lmessages.lo lnumeric.lo \
-@ELIX_LEVEL_1_FALSE@	lmonetary.lo newlocale.lo nl_langinfo.lo \
-@ELIX_LEVEL_1_FALSE@	timelocal.lo uselocale.lo
-@USE_LIBTOOL_TRUE@am_liblocale_la_OBJECTS = $(am__objects_3) \
-@USE_LIBTOOL_TRUE@	$(am__objects_4)
-liblocale_la_OBJECTS = $(am_liblocale_la_OBJECTS)
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
-liblocale_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(liblocale_la_LDFLAGS) $(LDFLAGS) -o $@
-@USE_LIBTOOL_TRUE@am_liblocale_la_rpath =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -166,31 +140,28 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
 am__depfiles_maybe =
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
-	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	$(AM_CFLAGS) $(CFLAGS)
 AM_V_CC = $(am__v_CC_@AM_V@)
 am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
 am__v_CC_0 = @echo "  CC      " $@;
 am__v_CC_1 = 
 CCLD = $(CC)
-LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(lib_a_SOURCES) $(liblocale_la_SOURCES)
+SOURCES = $(lib_a_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-DATA = $(noinst_DATA)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 # Read a list of newline-separated strings from the standard input,
 # and print each of them once, without duplicates.  Input order is
@@ -214,7 +185,6 @@ ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
-AS = @AS@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -228,22 +198,15 @@ CPPFLAGS = @CPPFLAGS@
 CRT0 = @CRT0@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
-DLLTOOL = @DLLTOOL@
-DSYMUTIL = @DSYMUTIL@
-DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
-EGREP = @EGREP@
 EXEEXT = @EXEEXT@
-FGREP = @FGREP@
-GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
-LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBC_MACHINE_DIR = @LIBC_MACHINE_DIR@
 LIBC_MACHINE_LIB = @LIBC_MACHINE_LIB@
@@ -257,21 +220,13 @@ LIBC_UNIX_LIB = @LIBC_UNIX_LIB@
 LIBC_XDR_LIB = @LIBC_XDR_LIB@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
-LIBTOOL = @LIBTOOL@
-LIPO = @LIPO@
-LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
-NM = @NM@
-NMEDIT = @NMEDIT@
 NO_INCLUDE_LIST = @NO_INCLUDE_LIST@
-OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
-OTOOL = @OTOOL@
-OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -282,7 +237,6 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
 READELF = @READELF@
-SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -295,7 +249,6 @@ abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
-ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
 aext = @aext@
 am__leading_dot = @am__leading_dot@
 am__tar = @am__tar@
@@ -363,19 +316,14 @@ GENERAL_SOURCES = setlocale.h locale.c localeconv.c
 @ELIX_LEVEL_1_FALSE@	uselocale.c
 
 @ELIX_LEVEL_1_TRUE@ELIX_SOURCES = 
-liblocale_la_LDFLAGS = -Xcompiler -nostdlib
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = liblocale.la
-@USE_LIBTOOL_TRUE@liblocale_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
-@USE_LIBTOOL_FALSE@noinst_DATA = 
-@USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
+noinst_LIBRARIES = lib.a
+lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
+lib_a_CFLAGS = $(AM_CFLAGS)
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .lo .o .obj
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../../Makefile.shared $(am__configure_deps)
+.SUFFIXES: .c .o .obj
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -395,7 +343,6 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe);; \
 	esac;
-$(srcdir)/../../Makefile.shared $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
@@ -414,20 +361,6 @@ lib.a: $(lib_a_OBJECTS) $(lib_a_DEPENDENCIES) $(EXTRA_lib_a_DEPENDENCIES)
 	$(AM_V_AR)$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
 	$(AM_V_at)$(RANLIB) lib.a
 
-clean-noinstLTLIBRARIES:
-	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
-	@list='$(noinst_LTLIBRARIES)'; \
-	locs=`for p in $$list; do echo $$p; done | \
-	      sed 's|^[^/]*$$|.|; s|/[^/]*$$||; s|$$|/so_locations|' | \
-	      sort -u`; \
-	test -z "$$locs" || { \
-	  echo rm -f $${locs}; \
-	  rm -f $${locs}; \
-	}
-
-liblocale.la: $(liblocale_la_OBJECTS) $(liblocale_la_DEPENDENCIES) $(EXTRA_liblocale_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(liblocale_la_LINK) $(am_liblocale_la_rpath) $(liblocale_la_OBJECTS) $(liblocale_la_LIBADD) $(LIBS)
-
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
@@ -439,9 +372,6 @@ distclean-compile:
 
 .c.obj:
 	$(AM_V_CC)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-.c.lo:
-	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
 
 lib_a-locale.o: locale.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-locale.o `test -f 'locale.c' || echo '$(srcdir)/'`locale.c
@@ -515,12 +445,6 @@ lib_a-uselocale.o: uselocale.c
 lib_a-uselocale.obj: uselocale.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-uselocale.obj `if test -f 'uselocale.c'; then $(CYGPATH_W) 'uselocale.c'; else $(CYGPATH_W) '$(srcdir)/uselocale.c'; fi`
 
-mostlyclean-libtool:
-	-rm -f *.lo
-
-clean-libtool:
-	-rm -rf .libs _libs
-
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
 tags: tags-am
@@ -574,7 +498,7 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 check-am: all-am
 check: check-am
-all-am: Makefile $(LIBRARIES) $(LTLIBRARIES) $(DATA)
+all-am: Makefile $(LIBRARIES)
 installdirs:
 install: install-am
 install-exec: install-exec-am
@@ -608,8 +532,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-libtool clean-noinstLIBRARIES \
-	clean-noinstLTLIBRARIES mostlyclean-am
+clean-am: clean-generic clean-noinstLIBRARIES mostlyclean-am
 
 distclean: distclean-am
 	-rm -f Makefile
@@ -662,8 +585,7 @@ maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-am
 
-mostlyclean-am: mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool
+mostlyclean-am: mostlyclean-compile mostlyclean-generic
 
 pdf: pdf-am
 
@@ -678,9 +600,8 @@ uninstall-am:
 .MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am check check-am clean clean-generic \
-	clean-libtool clean-noinstLIBRARIES clean-noinstLTLIBRARIES \
-	cscopelist-am ctags ctags-am distclean distclean-compile \
-	distclean-generic distclean-libtool distclean-tags dvi dvi-am \
+	clean-noinstLIBRARIES cscopelist-am ctags ctags-am distclean \
+	distclean-compile distclean-generic distclean-tags dvi dvi-am \
 	html html-am info info-am install install-am install-data \
 	install-data-am install-dvi install-dvi-am install-exec \
 	install-exec-am install-html install-html-am install-info \
@@ -688,17 +609,11 @@ uninstall-am:
 	install-ps install-ps-am install-strip installcheck \
 	installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags tags-am uninstall uninstall-am
+	mostlyclean-generic pdf pdf-am ps ps-am tags tags-am uninstall \
+	uninstall-am
 
 .PRECIOUS: Makefile
 
-objectlist.awk.in: $(noinst_LTLIBRARIES)
-	-rm -f objectlist.awk.in
-	for i in `ls *.lo` ; \
-	do \
-	  echo $$i `pwd`/$$i >> objectlist.awk.in ; \
-	done
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

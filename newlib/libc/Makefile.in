@@ -15,7 +15,6 @@
 @SET_MAKE@
 
 
-
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -96,11 +95,6 @@ subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../config/lead-dot.m4 \
 	$(top_srcdir)/../../config/override.m4 \
-	$(top_srcdir)/../../libtool.m4 \
-	$(top_srcdir)/../../ltoptions.m4 \
-	$(top_srcdir)/../../ltsugar.m4 \
-	$(top_srcdir)/../../ltversion.m4 \
-	$(top_srcdir)/../../lt~obsolete.m4 \
 	$(top_srcdir)/../acinclude.m4 \
 	$(top_srcdir)/machine/nds32/acinclude.m4 \
 	$(top_srcdir)/machine/powerpc/acinclude.m4 \
@@ -126,46 +120,6 @@ libc_a_AR = $(AR) $(ARFLAGS)
 libc_a_LIBADD =
 libc_a_SOURCES = libc.c
 libc_a_OBJECTS = libc.$(OBJEXT)
-LTLIBRARIES = $(noinst_LTLIBRARIES)
-am__DEPENDENCIES_1 =
-@ENABLE_NEWLIB_ICONV_TRUE@am__DEPENDENCIES_2 = iconv/ces/lib.$(aext) \
-@ENABLE_NEWLIB_ICONV_TRUE@	iconv/ccs/lib.$(aext) \
-@ENABLE_NEWLIB_ICONV_TRUE@	iconv/lib/lib.$(aext)
-@USE_LIBTOOL_FALSE@am__DEPENDENCIES_3 = argz/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	stdlib/lib.$(aext) ctype/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	search/lib.$(aext) $(am__DEPENDENCIES_1) \
-@USE_LIBTOOL_FALSE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-@USE_LIBTOOL_FALSE@	string/lib.$(aext) $(am__DEPENDENCIES_1) \
-@USE_LIBTOOL_FALSE@	time/lib.$(aext) locale/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	reent/lib.$(aext) errno/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	misc/lib.$(aext) ssp/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-@USE_LIBTOOL_FALSE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
-@USE_LIBTOOL_FALSE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-@USE_LIBTOOL_TRUE@am__DEPENDENCIES_3 = argz/libargz.$(aext) \
-@USE_LIBTOOL_TRUE@	stdlib/libstdlib.$(aext) \
-@USE_LIBTOOL_TRUE@	ctype/libctype.$(aext) \
-@USE_LIBTOOL_TRUE@	search/libsearch.$(aext) \
-@USE_LIBTOOL_TRUE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-@USE_LIBTOOL_TRUE@	$(am__DEPENDENCIES_1) \
-@USE_LIBTOOL_TRUE@	string/libstring.$(aext) \
-@USE_LIBTOOL_TRUE@	$(am__DEPENDENCIES_1) time/libtime.$(aext) \
-@USE_LIBTOOL_TRUE@	locale/liblocale.$(aext) \
-@USE_LIBTOOL_TRUE@	reent/libreent.$(aext) \
-@USE_LIBTOOL_TRUE@	errno/liberrno.$(aext) misc/libmisc.$(aext) \
-@USE_LIBTOOL_TRUE@	ssp/libssp.$(aext) $(am__DEPENDENCIES_1) \
-@USE_LIBTOOL_TRUE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-@USE_LIBTOOL_TRUE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-am_libc_la_OBJECTS =
-libc_la_OBJECTS = $(am_libc_la_OBJECTS)
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
-libc_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(libc_la_LDFLAGS) $(LDFLAGS) -o $@
-@USE_LIBTOOL_TRUE@am_libc_la_rpath =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -183,23 +137,17 @@ depcomp =
 am__depfiles_maybe =
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
-	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	$(AM_CFLAGS) $(CFLAGS)
 AM_V_CC = $(am__v_CC_@AM_V@)
 am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
 am__v_CC_0 = @echo "  CC      " $@;
 am__v_CC_1 = 
 CCLD = $(CC)
-LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = libc.c $(libc_la_SOURCES)
+SOURCES = libc.c
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -249,7 +197,6 @@ ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
-AS = @AS@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -263,22 +210,15 @@ CPPFLAGS = @CPPFLAGS@
 CRT0 = @CRT0@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
-DLLTOOL = @DLLTOOL@
-DSYMUTIL = @DSYMUTIL@
-DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
-EGREP = @EGREP@
 EXEEXT = @EXEEXT@
-FGREP = @FGREP@
-GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
-LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBC_MACHINE_DIR = @LIBC_MACHINE_DIR@
 LIBC_MACHINE_LIB = @LIBC_MACHINE_LIB@
@@ -292,21 +232,13 @@ LIBC_UNIX_LIB = @LIBC_UNIX_LIB@
 LIBC_XDR_LIB = @LIBC_XDR_LIB@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
-LIBTOOL = @LIBTOOL@
-LIPO = @LIPO@
-LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
-NM = @NM@
-NMEDIT = @NMEDIT@
 NO_INCLUDE_LIST = @NO_INCLUDE_LIST@
-OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
-OTOOL = @OTOOL@
-OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -317,7 +249,6 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
 READELF = @READELF@
-SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -330,7 +261,6 @@ abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
-ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
 aext = @aext@
 am__leading_dot = @am__leading_dot@
 am__tar = @am__tar@
@@ -405,64 +335,37 @@ SUBDIRS = argz stdlib ctype search $(STDIO_SUBDIR) $(STDIO64_SUBDIR) \
 	$(NEWLIB_ICONV_DIRS) $(XDR_SUBDIR) ssp $(am__append_1) \
 	$(am__append_2) .
 noinst_DATA = $(CRT0)
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libc.la
-@USE_LIBTOOL_FALSE@SUBLIBS = \
-@USE_LIBTOOL_FALSE@	argz/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	stdlib/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	ctype/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	search/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	$(LIBC_STDIO_LIB) \
-@USE_LIBTOOL_FALSE@	$(LIBC_STDIO64_LIB) \
-@USE_LIBTOOL_FALSE@	$(LIBC_XDR_LIB) \
-@USE_LIBTOOL_FALSE@	string/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	$(LIBC_SIGNAL_LIB) \
-@USE_LIBTOOL_FALSE@	time/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	locale/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	reent/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	errno/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	misc/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	ssp/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	$(LIBC_UNIX_LIB) \
-@USE_LIBTOOL_FALSE@	$(LIBC_POSIX_LIB) \
-@USE_LIBTOOL_FALSE@	$(LIBC_SYSCALL_LIB) \
-@USE_LIBTOOL_FALSE@        $(NEWLIB_ICONV_LIBS) \
-@USE_LIBTOOL_FALSE@	$(LIBC_MACHINE_LIB) \
-@USE_LIBTOOL_FALSE@	$(LIBC_SYS_LIB)
+noinst_LIBRARIES = libc.a
+SUBLIBS = \
+	argz/lib.$(aext) \
+	stdlib/lib.$(aext) \
+	ctype/lib.$(aext) \
+	search/lib.$(aext) \
+	$(LIBC_STDIO_LIB) \
+	$(LIBC_STDIO64_LIB) \
+	$(LIBC_XDR_LIB) \
+	string/lib.$(aext) \
+	$(LIBC_SIGNAL_LIB) \
+	time/lib.$(aext) \
+	locale/lib.$(aext) \
+	reent/lib.$(aext) \
+	errno/lib.$(aext) \
+	misc/lib.$(aext) \
+	ssp/lib.$(aext) \
+	$(LIBC_UNIX_LIB) \
+	$(LIBC_POSIX_LIB) \
+	$(LIBC_SYSCALL_LIB) \
+        $(NEWLIB_ICONV_LIBS) \
+	$(LIBC_MACHINE_LIB) \
+	$(LIBC_SYS_LIB)
 
-@USE_LIBTOOL_TRUE@SUBLIBS = \
-@USE_LIBTOOL_TRUE@	argz/libargz.$(aext) \
-@USE_LIBTOOL_TRUE@	stdlib/libstdlib.$(aext) \
-@USE_LIBTOOL_TRUE@	ctype/libctype.$(aext) \
-@USE_LIBTOOL_TRUE@	search/libsearch.$(aext) \
-@USE_LIBTOOL_TRUE@	$(LIBC_STDIO_LIB) \
-@USE_LIBTOOL_TRUE@	$(LIBC_STDIO64_LIB) \
-@USE_LIBTOOL_TRUE@	$(LIBC_XDR_LIB) \
-@USE_LIBTOOL_TRUE@	string/libstring.$(aext) \
-@USE_LIBTOOL_TRUE@	$(LIBC_SIGNAL_LIB) \
-@USE_LIBTOOL_TRUE@	time/libtime.$(aext) \
-@USE_LIBTOOL_TRUE@	locale/liblocale.$(aext) \
-@USE_LIBTOOL_TRUE@	reent/libreent.$(aext) \
-@USE_LIBTOOL_TRUE@	errno/liberrno.$(aext) \
-@USE_LIBTOOL_TRUE@	misc/libmisc.$(aext) \
-@USE_LIBTOOL_TRUE@	ssp/libssp.$(aext) \
-@USE_LIBTOOL_TRUE@	$(LIBC_UNIX_LIB) \
-@USE_LIBTOOL_TRUE@	$(LIBC_POSIX_LIB) \
-@USE_LIBTOOL_TRUE@	$(LIBC_SYSCALL_LIB) \
-@USE_LIBTOOL_TRUE@	$(LIBC_MACHINE_LIB) \
-@USE_LIBTOOL_TRUE@	$(LIBC_SYS_LIB)
-
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = libc.a
-libc_la_LDFLAGS = -Xcompiler -nostdlib
-@USE_LIBTOOL_TRUE@libc_la_SOURCES = 
-@USE_LIBTOOL_TRUE@libc_la_LIBADD = $(SUBLIBS)
-@USE_LIBTOOL_TRUE@libc_la_DEPENDENCIES = $(SUBLIBS)
 CLEANFILES = $(CRT0)
 ACLOCAL_AMFLAGS = -I .. -I ../.. -I ../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .c .lo .o .obj
+.SUFFIXES: .c .o .obj
 am--refresh: Makefile
 	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -500,25 +403,6 @@ $(am__aclocal_m4_deps):
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
 
-@USE_LIBTOOL_TRUE@libc.a: $(libc_a_OBJECTS) $(libc_a_DEPENDENCIES) $(EXTRA_libc_a_DEPENDENCIES) 
-@USE_LIBTOOL_TRUE@	$(AM_V_at)-rm -f libc.a
-@USE_LIBTOOL_TRUE@	$(AM_V_AR)$(libc_a_AR) libc.a $(libc_a_OBJECTS) $(libc_a_LIBADD)
-@USE_LIBTOOL_TRUE@	$(AM_V_at)$(RANLIB) libc.a
-
-clean-noinstLTLIBRARIES:
-	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
-	@list='$(noinst_LTLIBRARIES)'; \
-	locs=`for p in $$list; do echo $$p; done | \
-	      sed 's|^[^/]*$$|.|; s|/[^/]*$$||; s|$$|/so_locations|' | \
-	      sort -u`; \
-	test -z "$$locs" || { \
-	  echo rm -f $${locs}; \
-	  rm -f $${locs}; \
-	}
-
-libc.la: $(libc_la_OBJECTS) $(libc_la_DEPENDENCIES) $(EXTRA_libc_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libc_la_LINK) $(am_libc_la_rpath) $(libc_la_OBJECTS) $(libc_la_LIBADD) $(LIBS)
-
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
@@ -530,18 +414,6 @@ distclean-compile:
 
 .c.obj:
 	$(AM_V_CC)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-.c.lo:
-	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
-
-mostlyclean-libtool:
-	-rm -f *.lo
-
-clean-libtool:
-	-rm -rf .libs _libs
-
-distclean-libtool:
-	-rm -f libtool config.lt
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run 'make' without going through this Makefile.
@@ -650,7 +522,7 @@ distclean-tags:
 	-rm -f cscope.out cscope.in.out cscope.po.out cscope.files
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(LIBRARIES) $(LTLIBRARIES) $(DATA)
+all-am: Makefile $(LIBRARIES) $(DATA)
 installdirs: installdirs-recursive
 installdirs-am:
 install: install-recursive
@@ -686,14 +558,13 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-generic clean-libtool clean-noinstLIBRARIES \
-	clean-noinstLTLIBRARIES mostlyclean-am
+clean-am: clean-generic clean-noinstLIBRARIES mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
-	distclean-libtool distclean-tags
+	distclean-tags
 
 dvi: dvi-recursive
 
@@ -743,8 +614,7 @@ maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-recursive
 
-mostlyclean-am: mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool
+mostlyclean-am: mostlyclean-compile mostlyclean-generic
 
 pdf: pdf-recursive
 
@@ -760,33 +630,32 @@ uninstall-am:
 
 .PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am \
 	am--refresh check check-am clean clean-cscope clean-generic \
-	clean-libtool clean-noinstLIBRARIES clean-noinstLTLIBRARIES \
-	cscope cscopelist-am ctags ctags-am distclean \
-	distclean-compile distclean-generic distclean-libtool \
-	distclean-tags dvi dvi-am html html-am info info-am install \
-	install-am install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am
+	clean-noinstLIBRARIES cscope cscopelist-am ctags ctags-am \
+	distclean distclean-compile distclean-generic distclean-tags \
+	dvi dvi-am html html-am info info-am install install-am \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
+	install-info install-info-am install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs installdirs-am \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic pdf pdf-am ps ps-am \
+	tags tags-am uninstall uninstall-am
 
 .PRECIOUS: Makefile
 
-@USE_LIBTOOL_FALSE@libc.a: $(SUBLIBS)
-@USE_LIBTOOL_FALSE@	rm -f $@
-@USE_LIBTOOL_FALSE@	rm -rf tmp
-@USE_LIBTOOL_FALSE@	mkdir tmp
-@USE_LIBTOOL_FALSE@	cd tmp; \
-@USE_LIBTOOL_FALSE@	 for i in $(SUBLIBS); do \
-@USE_LIBTOOL_FALSE@	   $(AR) x ../$$i; \
-@USE_LIBTOOL_FALSE@	 done; \
-@USE_LIBTOOL_FALSE@	$(AR) $(AR_FLAGS) ../$@ *.o
-@USE_LIBTOOL_FALSE@	$(RANLIB) $@
-@USE_LIBTOOL_FALSE@	rm -rf tmp
+
+libc.a: $(SUBLIBS)
+	rm -f $@
+	rm -rf tmp
+	mkdir tmp
+	cd tmp; \
+	 for i in $(SUBLIBS); do \
+	   $(AR) x ../$$i; \
+	 done; \
+	$(AR) $(AR_FLAGS) ../$@ *.o
+	$(RANLIB) $@
+	rm -rf tmp
 
 $(SUBLIBS): ; @true
 

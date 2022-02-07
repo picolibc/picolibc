@@ -594,8 +594,6 @@ libm_machine_dir
 lpfx
 aext
 oext
-USE_LIBTOOL_FALSE
-USE_LIBTOOL_TRUE
 ELIX_LEVEL_4_FALSE
 ELIX_LEVEL_4_TRUE
 ELIX_LEVEL_3_FALSE
@@ -4242,15 +4240,6 @@ else
 fi
 
 
- if test x${use_libtool} = xyes; then
-  USE_LIBTOOL_TRUE=
-  USE_LIBTOOL_FALSE='#'
-else
-  USE_LIBTOOL_TRUE='#'
-  USE_LIBTOOL_FALSE=
-fi
-
-
 # Emit any target-specific warnings.
 if test "x${newlib_msg_warn}" != "x"; then
    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: ${newlib_msg_warn}" >&5
@@ -4465,10 +4454,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ELIX_LEVEL_4_TRUE}" && test -z "${ELIX_LEVEL_4_FALSE}"; then
   as_fn_error $? "conditional \"ELIX_LEVEL_4\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${USE_LIBTOOL_TRUE}" && test -z "${USE_LIBTOOL_FALSE}"; then
-  as_fn_error $? "conditional \"USE_LIBTOOL\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

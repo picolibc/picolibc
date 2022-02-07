@@ -8,9 +8,6 @@ PHONY =
 SUFFIXES =
 info_TEXINFOS =
 noinst_DATA =
-pkglib_LTLIBRARIES =
-
-LIBTOOL_VERSION_INFO = 0:0:0
 
 # The newlib hardware floating-point routines have been disabled due to
 # inaccuracy.  If you wish to work on them, you will need to edit the
@@ -71,10 +68,6 @@ AR_FLAGS = rc
 
 noinst_DATA += stmp-targ-include
 
-if USE_LIBTOOL
-toollib_LTLIBRARIES = libm.la \
-	libc.la
-else
 toollib_LIBRARIES = libm.a \
 	libc.a
 if HAVE_MULTISUBDIR
@@ -83,7 +76,6 @@ if HAVE_CRT0
 noinst_DATA += $(BUILD_MULTISUBDIR)/$(CRT0)
 endif
 noinst_DATA += $(BUILD_MULTISUBDIR)/libc.a $(BUILD_MULTISUBDIR)/libm.a
-endif
 endif
 
 toollib_DATA = $(CRT0) $(CRT1)
@@ -106,53 +98,6 @@ MATHOBJS_IN_LIBC = \
 	$(lpfx)s_finite.$(oext) $(lpfx)sf_finite.$(oext) \
 	$(lpfx)s_copysign.$(oext) $(lpfx)sf_copysign.$(oext)
 
-LIBC_OBJECTLISTS = \
-	$(POSIX_OBJECTLIST) \
-	$(SIGNAL_OBJECTLIST) \
-	$(SYSCALL_OBJECTLIST) \
-	$(UNIX_OBJECTLIST) \
-	$(STDIO64_OBJECTLIST) \
-	libc/argz/objectlist.awk.in \
-	libc/stdlib/objectlist.awk.in \
-	libc/time/objectlist.awk.in \
-	libc/ctype/objectlist.awk.in \
-	libc/search/objectlist.awk.in \
-	libc/string/objectlist.awk.in \
-	libc/locale/objectlist.awk.in \
-	libc/misc/objectlist.awk.in \
-	libc/reent/objectlist.awk.in \
-	libc/errno/objectlist.awk.in \
-	libc/stdio/objectlist.awk.in \
-	$(MACHINE_OBJECTLIST) \
-	$(SYS_OBJECTLIST) \
-	$(SYS_MACH_OBJECTLIST)
-
-LIBM_OBJECTLISTS = \
-	libm/$(MATHDIR)/objectlist.awk.in \
-	libm/common/objectlist.awk.in \
-	$(LIBM_MACHINE_OBJECTLIST)
-
-libm_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/libc/sys/linux/shared.ld -lgcc -objectlist libm-libtool-objectlist
-
-libc_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/libc/sys/linux/shared.ld -lgcc -objectlist libc-libtool-objectlist
-
-if USE_LIBTOOL
-libm_la_SOURCES =
-libm_la_DEPENDENCIES = libm-libtool-objectlist
-
-# objects listed later in LIBM_OBJECTLISTS will override those listed earlier
-libm-libtool-objectlist: $(LIBM_OBJECTLISTS)
-	cat $(LIBM_OBJECTLISTS) | $(AWK) '{ libm[$$1] = $$2 }; END { for (x in libm) printf ("%s\n", libm[x]) }' > $@
-
-libc_la_SOURCES =
-libc_la_DEPENDENCIES = libc-libtool-objectlist
-
-# objects listed later in LIBM_OBJECTLISTS and LIBC_OBJECTLISTS will override those listed earlier
-libc-libtool-objectlist: $(LIBM_OBJECTLISTS) $(LIBC_OBJECTLISTS)
-	cat $(LIBM_OBJECTLISTS) $(LIBC_OBJECTLISTS) |  $(AWK) '{ libc[$$1] = $$2 }; END { for (x in libc) printf ("%s\n", libc[x]) }' > $@
-
-else
-
 libc.a: libc/libc.a libm.a
 	rm -rf libc.a libg.a tmp
 	mkdir tmp
@@ -171,8 +116,6 @@ libm.a: libm/libm.a
 	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
 
 libm/libm.a: ; @true
-
-endif # USE_LIBTOOL
 
 if HAVE_MULTISUBDIR
 $(BUILD_MULTISUBDIR):
@@ -310,11 +253,8 @@ CLEANFILES = stmp-targ-include
 ## only data targets.  If that ever changes, this should be removed and the
 ## install-exec-local in ../multilib.am will kick in.
 install-data-local: install-toollibLIBRARIES install-multi
-if USE_LIBTOOL
-else
 	rm -f $(DESTDIR)$(toollibdir)/libg.a
 	ln $(DESTDIR)$(toollibdir)/libc.a $(DESTDIR)$(toollibdir)/libg.a >/dev/null 2>/dev/null || cp $(DESTDIR)$(toollibdir)/libc.a $(DESTDIR)$(toollibdir)/libg.a
-endif
 	-if [ -z "$(MULTISUBDIR)" ]; then \
 	  $(mkinstalldirs) $(DESTDIR)$(tooldir)/include; \
 	  for i in $(srcdir)/libc/include/*.h; do \

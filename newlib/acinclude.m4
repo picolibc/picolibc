@@ -148,8 +148,6 @@ AM_CONDITIONAL(ELIX_LEVEL_2, test x[$]{newlib_elix_level} = x2)
 AM_CONDITIONAL(ELIX_LEVEL_3, test x[$]{newlib_elix_level} = x3)
 AM_CONDITIONAL(ELIX_LEVEL_4, test x[$]{newlib_elix_level} = x4)
 
-AM_CONDITIONAL(USE_LIBTOOL, test x[$]{use_libtool} = xyes)
-
 # Emit any target-specific warnings.
 if test "x${newlib_msg_warn}" != "x"; then
    AC_MSG_WARN([${newlib_msg_warn}])

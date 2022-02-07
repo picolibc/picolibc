@@ -15,18 +15,7 @@ LIB_SOURCES = \
 	fegetround.c feholdexcept.c feraiseexcept.c fesetenv.c \
 	fesetexceptflag.c fesetround.c fetestexcept.c feupdateenv.c
 
-libi386_la_LDFLAGS = -Xcompiler -nostdlib
-
-if USE_LIBTOOL
-noinst_LTLIBRARIES = libi386.la
-libi386_la_SOURCES = $(LIB_SOURCES)
-noinst_DATA = objectlist.awk.in
-else
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
-noinst_DATA = 
-endif # USE_LIBTOOL
-
-include $(srcdir)/../../../Makefile.shared

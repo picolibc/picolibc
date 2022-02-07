@@ -288,15 +288,6 @@ AC_ARG_ENABLE(newlib-use-gdtoa,
 AM_ENABLE_MULTILIB(, ..)
 NEWLIB_CONFIGURE(.)
 
-dnl We have to enable libtool after NEWLIB_CONFIGURE because if we try and
-dnl add it into NEWLIB_CONFIGURE, executable tests are made before the first
-dnl line of the macro which fail because appropriate LDFLAGS are not set.
-_LT_DECL_SED
-_LT_PROG_ECHO_BACKSLASH
-if test "${use_libtool}" = "yes"; then
-LT_INIT([win32-dll])
-fi
-
 dnl The following is being disabled because the mathfp library is
 dnl not up to standard due to inaccuracies caused by some of the
 dnl floating-point algorithms used.  If you wish to work on this,
@@ -364,51 +355,6 @@ if test -n "${crt1_dir}"; then
 fi
 AC_SUBST(CRT1)
 AC_SUBST(CRT1_DIR)
-
-if test -n "${libm_machine_dir}"; then
-  LIBM_MACHINE_OBJECTLIST=libm/machine/${libm_machine_dir}/objectlist.awk.in
-fi
-AC_SUBST(LIBM_MACHINE_OBJECTLIST)
-
-if test -n "${machine_dir}"; then
-  MACHINE_OBJECTLIST=libc/machine/${machine_dir}/objectlist.awk.in
-fi
-AC_SUBST(MACHINE_OBJECTLIST)
-
-if test -n "${sys_dir}"; then
-  SYS_OBJECTLIST=libc/sys/${sys_dir}/objectlist.awk.in
-fi
-AC_SUBST(SYS_OBJECTLIST)
-
-if test "${have_sys_mach_dir}" = "yes"; then
-  SYS_MACH_OBJECTLIST=libc/sys/${sys_dir}/machine/${machine_dir}/objectlist.awk.in
-fi
-AC_SUBST(SYS_MACH_OBJECTLIST)
-
-if test -n "${posix_dir}"; then
-  POSIX_OBJECTLIST=libc/${posix_dir}/objectlist.awk.in
-fi
-AC_SUBST(POSIX_OBJECTLIST)
-
-if test -n "${signal_dir}"; then
-  SIGNAL_OBJECTLIST=libc/${signal_dir}/objectlist.awk.in
-fi
-AC_SUBST(SIGNAL_OBJECTLIST)
-
-if test -n "${syscall_dir}"; then
-  SYSCALL_OBJECTLIST=libc/${syscall_dir}/objectlist.awk.in
-fi
-AC_SUBST(SYSCALL_OBJECTLIST)
-
-if test -n "${unix_dir}"; then
-  UNIX_OBJECTLIST=libc/${unix_dir}/objectlist.awk.in
-fi
-AC_SUBST(UNIX_OBJECTLIST)
-
-if test -n "${stdio64_dir}"; then
-  STDIO64_OBJECTLIST=libc/${stdio64_dir}/objectlist.awk.in
-fi
-AC_SUBST(STDIO64_OBJECTLIST)
 
 # Put a plausible default for CC_FOR_BUILD in Makefile.
 if test -z "$CC_FOR_BUILD"; then

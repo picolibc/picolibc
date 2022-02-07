@@ -16,6 +16,3 @@ endif
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(src)
 lib_a_CFLAGS = $(AM_CFLAGS)
-noinst_DATA =
-
-include $(srcdir)/../../../Makefile.shared

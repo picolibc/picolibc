@@ -43,7 +43,6 @@
 #   stdio64_dir		"stdio64" to build libc/stdio64, "" otherwise
 #   syscall_dir		"syscalls" to build libc/syscalls, "" otherwise
 #   unix_dir		"unix" to build libc/unix, "" otherwise
-#   use_libtool         flag: use libtool to build newlib?
 #   aext                library extension - needed for libtool support
 #   oext                object file extension - needed for libtool support
 #   lpfx		library object prefix - generated when no libtool
@@ -72,8 +71,6 @@ crt1=
 crt1_dir=
 have_crt0=
 have_init_fini=yes
-use_libtool=no
-have_sys_mach_dir=no
 default_newlib_io_c99_formats=no
 default_newlib_io_long_long=no
 default_newlib_io_long_double=no

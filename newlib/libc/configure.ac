@@ -49,15 +49,6 @@ NEWLIB_CONFIGURE(..)
 
 AM_CONDITIONAL(NEWLIB_NANO_MALLOC, test x$newlib_nano_malloc = xyes)
 
-dnl We have to enable libtool after NEWLIB_CONFIGURE because if we try and
-dnl add it into NEWLIB_CONFIGURE, executable tests are made before the first
-dnl line of the macro which fail because appropriate LDFLAGS are not set.
-_LT_DECL_SED
-_LT_PROG_ECHO_BACKSLASH
-if test "${use_libtool}" = "yes"; then
-LT_INIT([win32-dll])
-fi
-
 CRT0=
 if test "x${have_crt0}" = "xyes"; then
   CRT0=sys/${sys_dir}/crt0.o
@@ -70,77 +61,49 @@ dnl build the library.
 
 LIBC_SIGNAL_LIB=
 if test -n "${signal_dir}"; then
-  if test "${use_libtool}" = "yes"; then
-    LIBC_SIGNAL_LIB=${signal_dir}/lib${signal_dir}.${aext}
-  else
-    LIBC_SIGNAL_LIB=${signal_dir}/lib.${aext}
-  fi
+  LIBC_SIGNAL_LIB=${signal_dir}/lib.${aext}
 fi
 AC_SUBST(LIBC_SIGNAL_LIB)
 AM_CONDITIONAL(HAVE_SIGNAL_DIR, test x${signal_dir} != x)
 
 LIBC_STDIO_LIB=
 if test -n "${stdio_dir}"; then
-  if test "${use_libtool}" = "yes"; then
-    LIBC_STDIO_LIB=${stdio_dir}/lib${stdio_dir}.${aext}
-  else
-    LIBC_STDIO_LIB=${stdio_dir}/lib.${aext}
-  fi
+  LIBC_STDIO_LIB=${stdio_dir}/lib.${aext}
 fi
 AC_SUBST(LIBC_STDIO_LIB)
 AM_CONDITIONAL(HAVE_STDIO_DIR, test x${stdio_dir} != x)
 
 LIBC_STDIO64_LIB=
 if test -n "${stdio64_dir}"; then
-  if test "${use_libtool}" = "yes"; then
-    LIBC_STDIO64_LIB=${stdio64_dir}/lib${stdio64_dir}.${aext}
-  else
-    LIBC_STDIO64_LIB=${stdio64_dir}/lib.${aext}
-  fi
+  LIBC_STDIO64_LIB=${stdio64_dir}/lib.${aext}
 fi
 AC_SUBST(LIBC_STDIO64_LIB)
 AM_CONDITIONAL(HAVE_STDIO64_DIR, test x${stdio64_dir} != x)
 
 LIBC_POSIX_LIB=
 if test -n "${posix_dir}"; then
-  if test "${use_libtool}" = "yes"; then
-    LIBC_POSIX_LIB=${posix_dir}/lib${posix_dir}.${aext}
-  else
-    LIBC_POSIX_LIB=${posix_dir}/lib.${aext}
-  fi
+  LIBC_POSIX_LIB=${posix_dir}/lib.${aext}
 fi
 AC_SUBST(LIBC_POSIX_LIB)
 AM_CONDITIONAL(HAVE_POSIX_DIR, test x${posix_dir} != x)
 
 LIBC_XDR_LIB=
 if test -n "${xdr_dir}"; then
-  if test "${use_libtool}" = "yes"; then
-    LIBC_XDR_LIB=${xdr_dir}/lib${xdr_dir}.${aext}
-  else
-    LIBC_XDR_LIB=${xdr_dir}/lib.${aext}
-  fi
+  LIBC_XDR_LIB=${xdr_dir}/lib.${aext}
 fi
 AC_SUBST(LIBC_XDR_LIB)
 AM_CONDITIONAL(HAVE_XDR_DIR, test x${xdr_dir} != x)
 
 LIBC_SYSCALL_LIB=
 if test -n "${syscall_dir}"; then
-  if test "${use_libtool}" = "yes"; then
-    LIBC_SYSCALL_LIB=${syscall_dir}/lib${syscall_dir}.${aext}
-  else
-    LIBC_SYSCALL_LIB=${syscall_dir}/lib.${aext}
-  fi
+  LIBC_SYSCALL_LIB=${syscall_dir}/lib.${aext}
 fi
 AC_SUBST(LIBC_SYSCALL_LIB)
 AM_CONDITIONAL(HAVE_SYSCALL_DIR, test x${syscall_dir} != x)
 
 LIBC_UNIX_LIB=
 if test -n "${unix_dir}"; then
-  if test "${use_libtool}" = "yes"; then
-    LIBC_UNIX_LIB=${unix_dir}/lib${unix_dir}.${aext}
-  else
-    LIBC_UNIX_LIB=${unix_dir}/lib.${aext}
-  fi
+  LIBC_UNIX_LIB=${unix_dir}/lib.${aext}
 fi
 AC_SUBST(LIBC_UNIX_LIB)
 AM_CONDITIONAL(HAVE_UNIX_DIR, test x${unix_dir} != x)
@@ -182,11 +145,7 @@ if test -n "${sys_dir}"; then
   esac
 
   SYS_DIR=sys/${sys_dir}
-  if test "${use_libtool}" = "yes"; then
-    LIBC_SYS_LIB=${SYS_DIR}/lib${sys_dir}.${aext}
-  else
-    LIBC_SYS_LIB=${SYS_DIR}/lib.${aext}
-  fi
+  LIBC_SYS_LIB=${SYS_DIR}/lib.${aext}
 fi
 AC_SUBST(SYS_DIR)
 AM_CONDITIONAL(HAVE_SYS_DIR, test x${sys_dir} != x)
@@ -272,11 +231,7 @@ if test -n "${machine_dir}"; then
   esac
 
   LIBC_MACHINE_DIR=machine/${machine_dir}
-  if test "${use_libtool}" = "yes"; then
-    LIBC_MACHINE_LIB=${LIBC_MACHINE_DIR}/lib${machine_dir}.${aext}
-  else
-    LIBC_MACHINE_LIB=${LIBC_MACHINE_DIR}/lib.${aext}
-  fi
+  LIBC_MACHINE_LIB=${LIBC_MACHINE_DIR}/lib.${aext}
 fi
 AM_CONDITIONAL(HAVE_LIBC_MACHINE_DIR, test "x${LIBC_MACHINE_DIR}" != x)
 AC_SUBST(LIBC_MACHINE_DIR)

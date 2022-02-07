@@ -20,20 +20,9 @@ fsrc =	cabsf.c casinf.c ccosf.c cimagf.c cprojf.c  \
         cephes_subrf.c conjf.c csinf.c ctanhf.c \
         cargf.c catanhf.c cexpf.c cpowf.c csinhf.c
 
-libcomplex_la_LDFLAGS = -Xcompiler -nostdlib
-
-if USE_LIBTOOL
-noinst_LTLIBRARIES = libcomplex.la
-libcomplex_la_SOURCES = $(src) $(fsrc) $(lsrc)
-noinst_DATA = objectlist.awk.in
-else
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(src) $(fsrc) $(lsrc)
 lib_a_CFLAGS = $(AM_CFLAGS)
-noinst_DATA =
-endif # USE_LIBTOOL
-
-include $(srcdir)/../../Makefile.shared
 
 # A partial dependency list.
 

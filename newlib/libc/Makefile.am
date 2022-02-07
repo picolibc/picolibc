@@ -53,30 +53,6 @@ SUBDIRS += .
 
 noinst_DATA = $(CRT0)
 
-if USE_LIBTOOL
-noinst_LTLIBRARIES = libc.la
-SUBLIBS = \
-	argz/libargz.$(aext) \
-	stdlib/libstdlib.$(aext) \
-	ctype/libctype.$(aext) \
-	search/libsearch.$(aext) \
-	$(LIBC_STDIO_LIB) \
-	$(LIBC_STDIO64_LIB) \
-	$(LIBC_XDR_LIB) \
-	string/libstring.$(aext) \
-	$(LIBC_SIGNAL_LIB) \
-	time/libtime.$(aext) \
-	locale/liblocale.$(aext) \
-	reent/libreent.$(aext) \
-	errno/liberrno.$(aext) \
-	misc/libmisc.$(aext) \
-	ssp/libssp.$(aext) \
-	$(LIBC_UNIX_LIB) \
-	$(LIBC_POSIX_LIB) \
-	$(LIBC_SYSCALL_LIB) \
-	$(LIBC_MACHINE_LIB) \
-	$(LIBC_SYS_LIB)
-else
 noinst_LIBRARIES = libc.a
 SUBLIBS = \
 	argz/lib.$(aext) \
@@ -100,15 +76,7 @@ SUBLIBS = \
         $(NEWLIB_ICONV_LIBS) \
 	$(LIBC_MACHINE_LIB) \
 	$(LIBC_SYS_LIB)
-endif
 
-libc_la_LDFLAGS = -Xcompiler -nostdlib
-
-if USE_LIBTOOL
-libc_la_SOURCES =
-libc_la_LIBADD = $(SUBLIBS)
-libc_la_DEPENDENCIES = $(SUBLIBS)
-else
 libc.a: $(SUBLIBS)
 	rm -f $@
 	rm -rf tmp
@@ -120,7 +88,6 @@ libc.a: $(SUBLIBS)
 	$(AR) $(AR_FLAGS) ../$@ *.o
 	$(RANLIB) $@
 	rm -rf tmp
-endif # USE_LIBTOOL
 
 $(SUBLIBS): ; @true
 

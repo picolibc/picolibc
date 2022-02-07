@@ -14,20 +14,9 @@ LIB_SOURCES = \
 	memchr.S memcmp.S memcpy.S memset.S strchr.S \
 	memmove.S strlen.S i386mach.h
 
-libi386_la_LDFLAGS = -Xcompiler -nostdlib
-
-if USE_LIBTOOL
-noinst_LTLIBRARIES = libi386.la
-libi386_la_SOURCES = $(LIB_SOURCES) $(ADDED_SOURCES)
-noinst_DATA = objectlist.awk.in
-else
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES) $(ADDED_SOURCES)
 ## These flag settings are basically redundant, but necessary to workaround the
 ## automake limitation "Objects 'created with both libtool and without'".
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
-noinst_DATA =
-endif # USE_LIBTOOL
-
-include $(srcdir)/../../../Makefile.shared
