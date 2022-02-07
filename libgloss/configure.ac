@@ -237,17 +237,19 @@ case "${target}" in
 	;;
 esac
 
-AM_CONDITIONAL(CONFIG_BFIN, test x$config_bfin = xtrue)
-AM_CONDITIONAL(CONFIG_IQ2000, test x$config_iq2000 = xtrue)
-AM_CONDITIONAL(CONFIG_WINCE, test x$config_wince = xtrue)
+dnl These subdirs have converted to non-recursive make.  Hopefully someday all
+dnl the ports above will too!
+m4_foreach_w([SUBDIR], [
+  bfin iq2000 libnosys wince
+], [dnl
+  AM_CONDITIONAL([CONFIG_]m4_toupper(SUBDIR), [test x$config_]SUBDIR = xtrue)
+])
 
 dnl For now, don't bother configuring testsuite
 dnl
 dnl if test "${config_testsuite}" = "true";
 dnl   then AC_CONFIG_SUBDIRS([testsuite])
 dnl fi
-
-AM_CONDITIONAL(CONFIG_LIBNOSYS, test x$config_libnosys = xtrue)
 
 AC_PROG_CC
 AM_PROG_AS

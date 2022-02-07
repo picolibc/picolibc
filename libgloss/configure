@@ -629,10 +629,10 @@ CPPFLAGS
 LDFLAGS
 CFLAGS
 CC
-CONFIG_LIBNOSYS_FALSE
-CONFIG_LIBNOSYS_TRUE
 CONFIG_WINCE_FALSE
 CONFIG_WINCE_TRUE
+CONFIG_LIBNOSYS_FALSE
+CONFIG_LIBNOSYS_TRUE
 CONFIG_IQ2000_FALSE
 CONFIG_IQ2000_TRUE
 CONFIG_BFIN_FALSE
@@ -2958,7 +2958,7 @@ subdirs="$subdirs aarch64"
 	;;
 esac
 
- if test x$config_bfin = xtrue; then
+   if test x$config_bfin = xtrue; then
   CONFIG_BFIN_TRUE=
   CONFIG_BFIN_FALSE='#'
 else
@@ -2966,7 +2966,7 @@ else
   CONFIG_BFIN_FALSE=
 fi
 
- if test x$config_iq2000 = xtrue; then
+   if test x$config_iq2000 = xtrue; then
   CONFIG_IQ2000_TRUE=
   CONFIG_IQ2000_FALSE='#'
 else
@@ -2974,7 +2974,15 @@ else
   CONFIG_IQ2000_FALSE=
 fi
 
- if test x$config_wince = xtrue; then
+   if test x$config_libnosys = xtrue; then
+  CONFIG_LIBNOSYS_TRUE=
+  CONFIG_LIBNOSYS_FALSE='#'
+else
+  CONFIG_LIBNOSYS_TRUE='#'
+  CONFIG_LIBNOSYS_FALSE=
+fi
+
+   if test x$config_wince = xtrue; then
   CONFIG_WINCE_TRUE=
   CONFIG_WINCE_FALSE='#'
 else
@@ -2983,14 +2991,6 @@ else
 fi
 
 
-
- if test x$config_libnosys = xtrue; then
-  CONFIG_LIBNOSYS_TRUE=
-  CONFIG_LIBNOSYS_FALSE='#'
-else
-  CONFIG_LIBNOSYS_TRUE='#'
-  CONFIG_LIBNOSYS_FALSE=
-fi
 
 
 ac_ext=c
@@ -5195,12 +5195,12 @@ if test -z "${CONFIG_IQ2000_TRUE}" && test -z "${CONFIG_IQ2000_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_IQ2000\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${CONFIG_WINCE_TRUE}" && test -z "${CONFIG_WINCE_FALSE}"; then
-  as_fn_error $? "conditional \"CONFIG_WINCE\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
 if test -z "${CONFIG_LIBNOSYS_TRUE}" && test -z "${CONFIG_LIBNOSYS_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_LIBNOSYS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${CONFIG_WINCE_TRUE}" && test -z "${CONFIG_WINCE_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_WINCE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${AMDEP_TRUE}" && test -z "${AMDEP_FALSE}"; then
