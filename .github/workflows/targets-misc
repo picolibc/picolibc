@@ -1,0 +1,8 @@
+        test: [
+          "./.github/do-test do-native-configure build-native",
+          "./.github/do-test do-aarch64-configure build-aarch64",
+          "./.github/do-build do-lx106-configure build-lx106",
+          "./.github/do-test do-i386-configure build-i386",
+          "./.github/do-test do-x86_64-configure build-x86_64",
+          "./.github/do-build do-m68k-configure build-m68k",
+        ]
