@@ -1,8 +1,0 @@
-build-essential
-meson
-ninja-build
-gcc
-gcc-riscv64-unknown-elf
-qemu-system-misc
-clang
-lld

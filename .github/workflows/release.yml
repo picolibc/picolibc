@@ -9,7 +9,7 @@ on:
       - main
 
 env:
-  IMAGE_FILE: docker-release.tar
+  IMAGE_FILE: img-release.tar
   IMAGE: picolibc
   HASH_FILE: picolibc/.github/packages.txt
 

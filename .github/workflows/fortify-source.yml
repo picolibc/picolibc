@@ -9,7 +9,7 @@ on:
       - main
 
 env:
-  IMAGE_FILE: docker-fortify-source.tar
+  IMAGE_FILE: img-fortify-source.tar
   IMAGE: picolibc
   HASH_FILE: picolibc/.github/packages.txt
 
