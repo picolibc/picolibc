@@ -9,7 +9,7 @@ on:
       - main
 
 env:
-  IMAGE_FILE: img-minsize-riscv.tar
+  IMAGE_FILE: dockerimg.tar
   IMAGE: picolibc
   HASH_FILE: picolibc/.github/packages.txt
 
