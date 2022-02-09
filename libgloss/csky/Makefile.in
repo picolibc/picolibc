@@ -61,8 +61,6 @@ OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
 	then echo ${objroot}/../binutils/objcopy ; \
 	else t='$(program_transform_name)'; echo objcopy | sed -e $$t ; fi`
 
-DO = @DO@
-
 CRT0=crt0.S
 
 #
@@ -101,11 +99,9 @@ crt0.o: $(CRT0)
 	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) -c $< -o $@
 
 .PHONY: install info dvi doc install-info clean-info
-install:: $(DO:%=install_%) crt0.o
+install:: install_hosted crt0.o
 	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	$(INSTALL_PROGRAM) crt0.o $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(crt0.o)
-
-$(DO:%=install_%): install_hosted
 
 .PHONY:install_hosted
 install_hosted::

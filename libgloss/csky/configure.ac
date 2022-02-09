@@ -30,27 +30,6 @@ AC_SUBST(LD)
 AC_PROG_RANLIB
 LIB_AM_PROG_AS
 
-AC_MSG_CHECKING([target cpu family])
-DO=csky
-dnl Temporarily modify LDFLAGS so that link tests will succeed without
-dnl a C library.  Note that we may not have a C librabry yet and that
-dnl autoconf automatically adds script to check whether we can create
-dnl an executable or not.
-dnl
-saved_LDFLAGS="$LDFLAGS"
-LDFLAGS="-nostdlib -e main"
-AC_PREPROC_IFELSE([AC_LANG_PROGRAM([#ifndef __mcoldfire__
-		#error we are not coldfire
-		#endif])],
-	       DO="cf",)
-AC_PREPROC_IFELSE([AC_LANG_PROGRAM([#ifndef __mfido__
-		#error we are not fido
-		#endif])],
-	       DO="fido",)
-LDFLAGS=$saved_LDFLAGS
-AC_MSG_RESULT($DO)
-AC_SUBST(DO)
-     
 host_makefile_frag=${srcdir}/../config/default.mh
 target_makefile_frag=${srcdir}/../config/default.mt
 
