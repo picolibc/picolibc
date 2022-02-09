@@ -725,7 +725,6 @@ CCAS
 CCASFLAGS
 CPP'
 ac_subdirs_all='aarch64
-csky
 i386
 m68k
 sparc
@@ -2688,8 +2687,9 @@ subdirs="$subdirs aarch64"
 	subdirs="$subdirs arc"
 	;;
   csky*-*-*)
-	subdirs="$subdirs csky"
+	ac_config_files="$ac_config_files csky/Makefile"
 
+	subdirs="$subdirs csky"
 	;;
   epiphany-*-*)
 	ac_config_files="$ac_config_files epiphany/Makefile"
@@ -5818,6 +5818,7 @@ do
   case $ac_config_target in
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
     "arc/Makefile") CONFIG_FILES="$CONFIG_FILES arc/Makefile" ;;
+    "csky/Makefile") CONFIG_FILES="$CONFIG_FILES csky/Makefile" ;;
     "epiphany/Makefile") CONFIG_FILES="$CONFIG_FILES epiphany/Makefile" ;;
     "m32r/Makefile") CONFIG_FILES="$CONFIG_FILES m32r/Makefile" ;;
     "m68hc11/Makefile") CONFIG_FILES="$CONFIG_FILES m68hc11/Makefile" ;;

@@ -152,16 +152,16 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(SHELL) $(top_srcdir)/../mkinstalldirs
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES = arc/Makefile epiphany/Makefile m32r/Makefile \
-	m68hc11/Makefile nds32/Makefile pa/Makefile i960/Makefile \
-	sparc_leon/Makefile riscv/Makefile rs6000/Makefile \
-	cr16/Makefile cris/Makefile crx/Makefile d30v/Makefile \
-	fr30/Makefile frv/Makefile ft32/Makefile lm32/Makefile \
-	mep/Makefile microblaze/Makefile mt/Makefile v850/Makefile \
-	visium/Makefile xc16x/Makefile xstormy16/Makefile \
-	m32c/Makefile msp430/Makefile rl78/Makefile rx/Makefile \
-	spu/Makefile tic6x/Makefile or1k/Makefile pru/Makefile \
-	nios2/Makefile
+CONFIG_CLEAN_FILES = arc/Makefile csky/Makefile epiphany/Makefile \
+	m32r/Makefile m68hc11/Makefile nds32/Makefile pa/Makefile \
+	i960/Makefile sparc_leon/Makefile riscv/Makefile \
+	rs6000/Makefile cr16/Makefile cris/Makefile crx/Makefile \
+	d30v/Makefile fr30/Makefile frv/Makefile ft32/Makefile \
+	lm32/Makefile mep/Makefile microblaze/Makefile mt/Makefile \
+	v850/Makefile visium/Makefile xc16x/Makefile \
+	xstormy16/Makefile m32c/Makefile msp430/Makefile rl78/Makefile \
+	rx/Makefile spu/Makefile tic6x/Makefile or1k/Makefile \
+	pru/Makefile nios2/Makefile
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -663,6 +663,8 @@ $(srcdir)/config.h.in:  $(am__configure_deps)
 distclean-hdr:
 	-rm -f config.h stamp-h1
 arc/Makefile: $(top_builddir)/config.status $(top_srcdir)/arc/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+csky/Makefile: $(top_builddir)/config.status $(top_srcdir)/csky/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 epiphany/Makefile: $(top_builddir)/config.status $(top_srcdir)/epiphany/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@

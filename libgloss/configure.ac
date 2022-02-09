@@ -43,7 +43,8 @@ case "${target}" in
 	subdirs="$subdirs arc"
 	;;
   csky*-*-*)
-	AC_CONFIG_SUBDIRS(csky)
+	AC_CONFIG_FILES([csky/Makefile])
+	subdirs="$subdirs csky"
 	;;
   epiphany-*-*)
 	AC_CONFIG_FILES([epiphany/Makefile])
