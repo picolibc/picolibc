@@ -587,7 +587,7 @@ LIBOBJS
 multi_basedir
 target_makefile_frag_path
 host_makefile_frag_path
-DO
+TARGET
 CPP
 OBJEXT
 EXEEXT
@@ -2600,7 +2600,7 @@ test "${CCASFLAGS+set}" = set || CCASFLAGS=$CFLAGS
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking target cpu family" >&5
 $as_echo_n "checking target cpu family... " >&6; }
-DO=m68k
+TARGET=m68k
 saved_LDFLAGS="$LDFLAGS"
 LDFLAGS="-nostdlib -e main"
 ac_ext=c
@@ -3545,7 +3545,7 @@ main ()
 }
 _ACEOF
 if ac_fn_c_try_cpp "$LINENO"; then :
-  DO="cf"
+  TARGET="cf"
 fi
 rm -f conftest.err conftest.i conftest.$ac_ext
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -3562,12 +3562,12 @@ main ()
 }
 _ACEOF
 if ac_fn_c_try_cpp "$LINENO"; then :
-  DO="fido"
+  TARGET="fido"
 fi
 rm -f conftest.err conftest.i conftest.$ac_ext
 LDFLAGS=$saved_LDFLAGS
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $DO" >&5
-$as_echo "$DO" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $TARGET" >&5
+$as_echo "$TARGET" >&6; }
 
 
 host_makefile_frag=${srcdir}/../config/default.mh

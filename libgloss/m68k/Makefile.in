@@ -69,7 +69,7 @@ OBJS =  close.o fstat.o getpid.o isatty.o kill.o \
 	unlink.o write.o
 
 # What targets to build for.  This is a list of {m68k,cf}
-DO = @DO@
+TARGET = @TARGET@
 
 # Here is all of the simulator stuff
 SIM_SCRIPTS	= sim.ld
@@ -200,7 +200,7 @@ HOSTED_OBJS=	hosted-gdb.o hosted-exit.o $(patsubst un%,%,$(UNHOSTED_OBJS))
 # Host specific makefile fragment comes in here.
 @host_makefile_frag@
 
-all :: $(DO:%=all_%)
+all :: $(TARGET:%=all_%)
 
 #
 # here's where we build the board support packages for each target
@@ -406,7 +406,7 @@ dtor.x: dtor.o ${CRT0} ${srcdir}/mvme135.ld Makefile  ${MVME135_BSP}
 unlink.o: $(srcdir)/../unlink.c
 
 .PHONY: install info dvi doc install-info clean-info
-install:: $(DO:%=install_%)
+install:: $(TARGET:%=install_%)
 
 
 .PHONY:install_m68k

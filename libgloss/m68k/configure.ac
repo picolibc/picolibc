@@ -31,7 +31,7 @@ AC_PROG_RANLIB
 LIB_AM_PROG_AS
 
 AC_MSG_CHECKING([target cpu family])
-DO=m68k
+TARGET=m68k
 dnl Temporarily modify LDFLAGS so that link tests will succeed without
 dnl a C library.  Note that we may not have a C librabry yet and that
 dnl autoconf automatically adds script to check whether we can create
@@ -42,14 +42,14 @@ LDFLAGS="-nostdlib -e main"
 AC_PREPROC_IFELSE([AC_LANG_PROGRAM([#ifndef __mcoldfire__
 		#error we are not coldfire
 		#endif])],
-	       DO="cf",)
+	       TARGET="cf",)
 AC_PREPROC_IFELSE([AC_LANG_PROGRAM([#ifndef __mfido__
 		#error we are not fido
 		#endif])],
-	       DO="fido",)
+	       TARGET="fido",)
 LDFLAGS=$saved_LDFLAGS
-AC_MSG_RESULT($DO)
-AC_SUBST(DO)
+AC_MSG_RESULT($TARGET)
+AC_SUBST(TARGET)
      
 host_makefile_frag=${srcdir}/../config/default.mh
 target_makefile_frag=${srcdir}/../config/default.mt
