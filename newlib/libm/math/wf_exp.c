@@ -26,8 +26,8 @@ static const float
 #else
 static float
 #endif
-o_threshold=  8.8721679688e+01,  /* 0x42b17180 */
-u_threshold= -1.0397208405e+02;  /* 0xc2cff1b5 */
+o_threshold=  0x1.62e42ep+06,  /* 0x42b17217 */
+u_threshold= -0x1.9fe36ap+06;  /* 0xc2cff1b5 */
 
 #ifdef __STDC__
 	float expf(float x)		/* wrapper expf */
