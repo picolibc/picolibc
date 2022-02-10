@@ -588,6 +588,9 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
+HAVE_MACHINE_DIR_FALSE
+HAVE_MACHINE_DIR_TRUE
+PHOENIX_MACHINE_DIR
 subdirs
 sys_dir
 shared_machine_dir
@@ -725,7 +728,7 @@ CPPFLAGS
 CPP
 CCAS
 CCASFLAGS'
-ac_subdirs_all='machine'
+ac_subdirs_all='machine/arm'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -4259,9 +4262,24 @@ OBJEXT=o
 
 
 
+if test -n "${machine_dir}"; then
+  case ${machine_dir} in
+	arm)
+
+subdirs="$subdirs machine/arm"
+ ;;
+  esac
+fi
+PHOENIX_MACHINE_DIR=machine/${machine_dir}
 
 
-subdirs="$subdirs machine"
+ if test x${machine_dir} != x; then
+  HAVE_MACHINE_DIR_TRUE=
+  HAVE_MACHINE_DIR_FALSE='#'
+else
+  HAVE_MACHINE_DIR_TRUE='#'
+  HAVE_MACHINE_DIR_FALSE=
+fi
 
 
 ac_config_files="$ac_config_files Makefile"
@@ -4457,6 +4475,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ELIX_LEVEL_4_TRUE}" && test -z "${ELIX_LEVEL_4_FALSE}"; then
   as_fn_error $? "conditional \"ELIX_LEVEL_4\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_MACHINE_DIR_TRUE}" && test -z "${HAVE_MACHINE_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_MACHINE_DIR\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

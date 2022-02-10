@@ -2,9 +2,9 @@
 
 AM_CPPFLAGS = -I$(srcdir)/include $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS) $(INCLTDL)
 
-SUBDIRS = machine
+SUBDIRS = $(PHOENIX_MACHINE_DIR)
 
-PHOENIX_MACH_LIB = machine/lib.a
+PHOENIX_MACH_LIB = $(PHOENIX_MACHINE_DIR)/lib.a
 
 SUBLIBS = \
 	$(PHOENIX_MACH_LIB)
@@ -106,11 +106,11 @@ lib.a:  $(lib_a_OBJECTS)
 
 all-local: crt0.o
 
-crt0.o: machine/crt0.o
+crt0.o: $(PHOENIX_MACHINE_DIR)/crt0.o
 	rm -f $@
-	ln machine/crt0.o $@ >/dev/null 2>/dev/null || cp machine/crt0.o $@
+	ln $(PHOENIX_MACHINE_DIR)/crt0.o $@ >/dev/null 2>/dev/null || cp $(PHOENIX_MACHINE_DIR)/crt0.o $@
 
-machine/crt0.o: ; @true
+$(PHOENIX_MACHINE_DIR)/crt0.o: ; @true
 
 AM_CFLAGS = -I $(srcdir)/../../stdio
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config

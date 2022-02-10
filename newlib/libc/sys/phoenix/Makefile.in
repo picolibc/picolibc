@@ -271,6 +271,7 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PHOENIX_MACHINE_DIR = @PHOENIX_MACHINE_DIR@
 RANLIB = @RANLIB@
 READELF = @READELF@
 SET_MAKE = @SET_MAKE@
@@ -335,8 +336,8 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = -I$(srcdir)/include $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS) $(INCLTDL)
-SUBDIRS = machine
-PHOENIX_MACH_LIB = machine/lib.a
+SUBDIRS = $(PHOENIX_MACHINE_DIR)
+PHOENIX_MACH_LIB = $(PHOENIX_MACHINE_DIR)/lib.a
 SUBLIBS = \
 	$(PHOENIX_MACH_LIB)
 
@@ -1174,11 +1175,11 @@ lib.a:  $(lib_a_OBJECTS)
 
 all-local: crt0.o
 
-crt0.o: machine/crt0.o
+crt0.o: $(PHOENIX_MACHINE_DIR)/crt0.o
 	rm -f $@
-	ln machine/crt0.o $@ >/dev/null 2>/dev/null || cp machine/crt0.o $@
+	ln $(PHOENIX_MACHINE_DIR)/crt0.o $@ >/dev/null 2>/dev/null || cp $(PHOENIX_MACHINE_DIR)/crt0.o $@
 
-machine/crt0.o: ; @true
+$(PHOENIX_MACHINE_DIR)/crt0.o: ; @true
 
 install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(tooldir)/include/arpa; \

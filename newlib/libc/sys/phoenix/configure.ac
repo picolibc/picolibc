@@ -9,7 +9,15 @@ AC_CONFIG_AUX_DIR(../../../..)
 
 NEWLIB_CONFIGURE(../../..)
 
-AC_CONFIG_SUBDIRS(machine)
+if test -n "${machine_dir}"; then
+  case ${machine_dir} in
+	arm) AC_CONFIG_SUBDIRS(machine/arm) ;;
+  esac
+fi
+PHOENIX_MACHINE_DIR=machine/${machine_dir}
+AC_SUBST(PHOENIX_MACHINE_DIR)
+
+AM_CONDITIONAL(HAVE_MACHINE_DIR, test x${machine_dir} != x)
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
