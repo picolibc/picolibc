@@ -11,7 +11,7 @@ NEWLIB_CONFIGURE(../../..)
 
 if test -n "${machine_dir}"; then
   case ${machine_dir} in
-	arm) AC_CONFIG_SUBDIRS(machine/arm) ;;
+	arm) AC_CONFIG_FILES([machine/arm/Makefile]) ;;
   esac
 fi
 PHOENIX_MACHINE_DIR=machine/${machine_dir}

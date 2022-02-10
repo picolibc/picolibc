@@ -328,7 +328,6 @@ sbindir = @sbindir@
 shared_machine_dir = @shared_machine_dir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
-subdirs = @subdirs@
 sys_dir = @sys_dir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
