@@ -93,7 +93,7 @@ host_triplet = @host@
 @HAVE_MULTISUBDIR_TRUE@am__append_2 = $(BUILD_MULTISUBDIR)/libc.a $(BUILD_MULTISUBDIR)/libm.a
 
 # We can't use noinst_PROGRAMS, because automake will add $(EXEEXT).
-@HAVE_DOC_TRUE@am__append_3 = doc/makedoc
+@HAVE_DOC_TRUE@am__append_3 = $(MKDOC)
 @HAVE_DOC_TRUE@am__append_4 = man-cache
 
 #
@@ -1759,6 +1759,7 @@ clean-local:
 
 @HAVE_DOC_TRUE@.c.xml:
 @HAVE_DOC_TRUE@	$(AM_V_GEN)$(DOCBOOK_CHEW) < $< > $*.xml || ( rm $*.xml && false )
+$(LIBC_CHEWOUT_FILES): $(MKDOC)
 
 libc/libc.dvi: libc/targetdep.tex $(LIBC_CHEWOUT_FILES)
 
@@ -1786,6 +1787,7 @@ libc_install-man: libc_man
 	$(MKDIR_P) $(DESTDIR)$(mandir)/man3
 	$(INSTALL_DATA) libc/*.3 $(DESTDIR)$(mandir)/man3/
 install-man: libc_install-man
+$(LIBM_CHEWOUT_FILES): $(MKDOC)
 
 libm/libm.dvi: libm/targetdep.tex $(LIBM_CHEWOUT_FILES)
 

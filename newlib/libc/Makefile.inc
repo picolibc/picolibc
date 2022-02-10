@@ -5,6 +5,7 @@ LIBC_CHEWOUT_FILES =
 
 LIBC_CHAPTERS = %D%/sys.tex
 LIBC_DOCBOOK_OUT_FILES = $(LIBC_CHEWOUT_FILES:.def=.xml)
+$(LIBC_CHEWOUT_FILES): $(MKDOC)
 
 %D%/libc.dvi: %D%/targetdep.tex $(LIBC_CHEWOUT_FILES)
 
