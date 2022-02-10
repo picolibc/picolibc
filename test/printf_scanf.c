@@ -42,11 +42,29 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdarg.h>
+#include <stddef.h>
 
-#ifndef TINY_STDIO
+#ifndef __PICOLIBC__
+# define _WANT_IO_C99_FORMATS
+# define _WANT_IO_LONG_LONG
+# define _WANT_IO_POS_ARGS
+# define printf_float(x) (x)
+#elif defined(TINY_STDIO)
+# ifdef PICOLIBC_INTEGER_PRINTF_SCANF
+#  ifndef _WANT_IO_POS_ARGS
+#   define NO_POS_ARGS
+#  endif
+# endif
+#else
 #define printf_float(x) ((double) (x))
 
+#ifndef _WANT_IO_POS_ARGS
+#define NO_POS_ARGS
+#endif
+
 #ifdef _NANO_FORMATTED_IO
+
 #ifndef NO_FLOATING_POINT
 extern int _printf_float();
 extern int _scanf_float();
@@ -110,6 +128,16 @@ main(void)
 		errors++;
 		fflush(stdout);
 	}
+#endif
+
+#ifndef NO_POS_ARGS
+        x = y = 0;
+        int r = sscanf("3 4", "%2$d %1$d", &x, &y);
+        if (x != 4 || y != 3 || r != 2) {
+            printf("pos: wanted %d %d (ret %d) got %d %d (ret %d)", 4, 3, 2, x, y, r);
+            errors++;
+            fflush(stdout);
+        }
 #endif
 
 	/*
