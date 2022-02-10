@@ -1118,7 +1118,7 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
       if (WaitForSingleObject (h_gdb_process, 0) == WAIT_TIMEOUT)
 	{
 	  if (isHybrid)
-	    get_ttyp ()->wait_pcon_fwd (false);
+	    get_ttyp ()->wait_pcon_fwd ();
 	}
       else
 	{
@@ -2705,6 +2705,9 @@ fhandler_pty_master::pty_master_fwd_thread (const master_fwd_thread_param_t *p)
   for (;;)
     {
       p->ttyp->pcon_last_time = GetTickCount ();
+      DWORD n;
+      p->ttyp->pcon_fwd_not_empty =
+	::bytes_available (n, p->from_slave_nat) && n;
       if (!ReadFile (p->from_slave_nat, outbuf, NT_MAX_PATH, &rlen, NULL))
 	{
 	  termios_printf ("ReadFile for forwarding failed, %E");
