@@ -2,6 +2,8 @@
 
 SUBDIRS = $(machine_dir) .
 
+CRT0 = crt0.o
+
 noinst_DATA = $(CRT0) lib.a
 
 $(CRT0): $(machine_dir)/$(CRT0)

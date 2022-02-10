@@ -18,12 +18,6 @@ if test -n "${machine_dir}"; then
   esac;
 fi
 
-CRT0=
-if test -n "${machine_dir}"; then
-  CRT0=crt0.o
-fi
-AC_SUBST(CRT0)
-
 AM_CONDITIONAL(HAVE_MACHINE_DIR, test x${machine_dir} != x)
 
 AC_CONFIG_FILES([Makefile])

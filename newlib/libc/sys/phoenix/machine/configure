@@ -590,7 +590,6 @@ LTLIBOBJS
 LIBOBJS
 HAVE_MACHINE_DIR_FALSE
 HAVE_MACHINE_DIR_TRUE
-CRT0
 subdirs
 sys_dir
 shared_machine_dir
@@ -4279,12 +4278,6 @@ subdirs="$subdirs arm"
  ;;
   esac;
 fi
-
-CRT0=
-if test -n "${machine_dir}"; then
-  CRT0=crt0.o
-fi
-
 
  if test x${machine_dir} != x; then
   HAVE_MACHINE_DIR_TRUE=

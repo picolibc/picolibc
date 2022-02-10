@@ -4,6 +4,8 @@ AM_CPPFLAGS = -I$(srcdir)/include $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLA
 
 SUBDIRS = machine
 
+PHOENIX_MACH_LIB = machine/lib.a
+
 SUBLIBS = \
 	$(PHOENIX_MACH_LIB)
 
