@@ -113,8 +113,6 @@ crt0.o: $(PHOENIX_MACHINE_DIR)/crt0.o
 $(PHOENIX_MACHINE_DIR)/crt0.o: ; @true
 
 AM_CFLAGS = -I $(srcdir)/../../stdio
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. -I ../../../../config
-CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 
 install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(tooldir)/include/arpa; \

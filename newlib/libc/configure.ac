@@ -126,7 +126,7 @@ if test -n "${sys_dir}"; then
     mmixware) AC_CONFIG_FILES([sys/mmixware/Makefile]) ;;
     netware) AC_CONFIG_FILES([sys/netware/Makefile]) ;;
     or1k) AC_CONFIG_FILES([sys/or1k/Makefile]) ;;
-    phoenix) AC_CONFIG_SUBDIRS(sys/phoenix) ;;
+    phoenix) AC_CONFIG_FILES([sys/phoenix/Makefile]) ;;
     rdos) AC_CONFIG_FILES([sys/rdos/Makefile]) ;;
     rtems) AC_CONFIG_FILES([sys/rtems/Makefile]) ;;
     sh) AC_CONFIG_FILES([sys/sh/Makefile]) ;;
@@ -164,6 +164,7 @@ m4_include([machine/nds32/acinclude.m4])
 m4_include([machine/powerpc/acinclude.m4])
 m4_include([machine/sh/acinclude.m4])
 m4_include([machine/spu/acinclude.m4])
+m4_include([sys/phoenix/acinclude.m4])
 
 LIBC_MACHINE_LIB=
 if test -n "${machine_dir}"; then

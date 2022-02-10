@@ -88,15 +88,21 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-subdir = machine/arm
+subdir = sys/phoenix/machine/arm
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/../../../../config/lead-dot.m4 \
-	$(top_srcdir)/../../../../config/override.m4 \
-	$(top_srcdir)/../../../acinclude.m4 $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/../../config/lead-dot.m4 \
+	$(top_srcdir)/../../config/override.m4 \
+	$(top_srcdir)/../acinclude.m4 \
+	$(top_srcdir)/machine/nds32/acinclude.m4 \
+	$(top_srcdir)/machine/powerpc/acinclude.m4 \
+	$(top_srcdir)/machine/sh/acinclude.m4 \
+	$(top_srcdir)/machine/spu/acinclude.m4 \
+	$(top_srcdir)/sys/phoenix/acinclude.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am
-mkinstalldirs = $(SHELL) $(top_srcdir)/../../../../mkinstalldirs
+mkinstalldirs = $(SHELL) $(top_srcdir)/../../mkinstalldirs
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
@@ -182,6 +188,7 @@ CCASFLAGS = @CCASFLAGS@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
+CRT0 = @CRT0@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 ECHO_C = @ECHO_C@
@@ -194,6 +201,16 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
+LIBC_MACHINE_DIR = @LIBC_MACHINE_DIR@
+LIBC_MACHINE_LIB = @LIBC_MACHINE_LIB@
+LIBC_POSIX_LIB = @LIBC_POSIX_LIB@
+LIBC_SIGNAL_LIB = @LIBC_SIGNAL_LIB@
+LIBC_STDIO64_LIB = @LIBC_STDIO64_LIB@
+LIBC_STDIO_LIB = @LIBC_STDIO_LIB@
+LIBC_SYSCALL_LIB = @LIBC_SYSCALL_LIB@
+LIBC_SYS_LIB = @LIBC_SYS_LIB@
+LIBC_UNIX_LIB = @LIBC_UNIX_LIB@
+LIBC_XDR_LIB = @LIBC_XDR_LIB@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LTLIBOBJS = @LTLIBOBJS@
@@ -217,6 +234,7 @@ READELF = @READELF@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+SYS_DIR = @SYS_DIR@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
 abs_newlib_basedir = @abs_newlib_basedir@
@@ -290,9 +308,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign --ignore-deps machine/arm/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign --ignore-deps sys/phoenix/machine/arm/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign --ignore-deps machine/arm/Makefile
+	  $(AUTOMAKE) --foreign --ignore-deps sys/phoenix/machine/arm/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \

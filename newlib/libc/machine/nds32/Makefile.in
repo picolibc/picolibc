@@ -97,6 +97,7 @@ am__aclocal_m4_deps = $(top_srcdir)/../../config/lead-dot.m4 \
 	$(top_srcdir)/machine/powerpc/acinclude.m4 \
 	$(top_srcdir)/machine/sh/acinclude.m4 \
 	$(top_srcdir)/machine/spu/acinclude.m4 \
+	$(top_srcdir)/sys/phoenix/acinclude.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
@@ -236,6 +237,7 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PHOENIX_MACHINE_DIR = @PHOENIX_MACHINE_DIR@
 RANLIB = @RANLIB@
 READELF = @READELF@
 SET_MAKE = @SET_MAKE@
@@ -293,7 +295,6 @@ sbindir = @sbindir@
 shared_machine_dir = @shared_machine_dir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
-subdirs = @subdirs@
 sys_dir = @sys_dir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
