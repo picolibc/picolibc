@@ -301,6 +301,11 @@ if enable_native_tests
 		    'printf-tests.c',
 		    c_args: ['-DNO_NEWLIB'],
 		    dependencies: native_lib_m))
+    test('printf_scanf_native',
+	 executable('printf_scanf_native',
+		    'printf_scanf.c',
+		    c_args: ['-DNO_NEWLIB'],
+		    dependencies: native_lib_m))
   endif
 endif
 
