@@ -116,6 +116,7 @@ private:
   DWORD pcon_pid;
   UINT term_code_page;
   DWORD pcon_last_time;
+  bool pcon_fwd_not_empty;
   HANDLE h_pcon_write_pipe;
   HANDLE h_pcon_condrv_reference;
   HANDLE h_pcon_conhost_process;
@@ -166,7 +167,7 @@ public:
   void set_master_ctl_closed () {master_pid = -1;}
   static void __stdcall create_master (int);
   static void __stdcall init_session ();
-  void wait_pcon_fwd (bool init = true);
+  void wait_pcon_fwd ();
   bool pcon_input_state_eq (xfer_dir x) { return pcon_input_state == x; }
   bool pcon_fg (pid_t pgid);
   friend class fhandler_pty_common;
