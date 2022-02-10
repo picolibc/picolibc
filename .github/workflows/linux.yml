@@ -85,9 +85,7 @@ jobs:
         ]
         test: [
           "./.github/do-test do-arm-configure build-arm",
-          "./.github/do-test do-clang-thumbv7e+fp-configure build-clang-thumbv7e+fp",
-          "./.github/do-test do-clang-thumbv7m-configure build-clang-thumbv7m",
-          "./.github/do-test do-cortex-a9-configure build-cortex-a9",
+          "./.github/do-many do-test do-clang-thumbv7e+fp-configure build-clang-thumbv7e+fp do-test do-clang-thumbv7m-configure build-clang-thumbv7m do-test do-cortex-a9-configure build-cortex-a9 end",
         ]
     steps:
       - name: Clone picolibc
@@ -152,12 +150,7 @@ jobs:
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
         ]
         test: [
-          "./.github/do-test do-native-configure build-native",
-          "./.github/do-test do-aarch64-configure build-aarch64",
-          "./.github/do-build do-lx106-configure build-lx106",
-          "./.github/do-test do-i386-configure build-i386",
-          "./.github/do-test do-x86_64-configure build-x86_64",
-          "./.github/do-build do-m68k-configure build-m68k",
+          "./.github/do-many do-test do-native-configure build-native do-test do-aarch64-configure build-aarch64 do-build do-lx106-configure build-lx106 do-test do-i386-configure build-i386 do-build do-m68k-configure build-m68k end",
         ]
     steps:
       - name: Clone picolibc
@@ -222,8 +215,7 @@ jobs:
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
         ]
         test: [
-          "./.github/do-build do-powerpc64-configure build-powerpc64",
-          "./.github/do-build do-powerpc64le-configure build-powerpc64le",
+          "./.github/do-many do-build do-powerpc64-configure build-powerpc64 do-build do-powerpc64le-configure build-powerpc64le end",
         ]
 
     steps:
@@ -290,9 +282,7 @@ jobs:
         ]
         test: [
           "./.github/do-test do-riscv-configure build-riscv",
-          "./.github/do-test do-rv32imac-configure build-rv32imac",
-          "./.github/do-build do-clang-riscv-configure build-riscv-clang",
-          "./.github/do-test do-clang-rv32imafdc-configure build-clang-rv32imafdc",
+          "./.github/do-many do-test do-rv32imac-configure build-rv32imac do-build do-clang-riscv-configure build-riscv-clang do-test do-clang-rv32imafdc-configure build-clang-rv32imafdc end",
         ]
     steps:
       - name: Clone picolibc
@@ -358,9 +348,7 @@ jobs:
         ]
         test: [
           "./.github/do-test do-arm-configure build-arm",
-          "./.github/do-test do-clang-thumbv7e+fp-configure build-clang-thumbv7e+fp",
-          "./.github/do-test do-clang-thumbv7m-configure build-clang-thumbv7m",
-          "./.github/do-test do-cortex-a9-configure build-cortex-a9",
+          "./.github/do-many do-test do-clang-thumbv7e+fp-configure build-clang-thumbv7e+fp do-test do-clang-thumbv7m-configure build-clang-thumbv7m do-test do-cortex-a9-configure build-cortex-a9 end",
         ]
     steps:
       - name: Clone picolibc
@@ -425,12 +413,7 @@ jobs:
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
         ]
         test: [
-          "./.github/do-test do-native-configure build-native",
-          "./.github/do-test do-aarch64-configure build-aarch64",
-          "./.github/do-build do-lx106-configure build-lx106",
-          "./.github/do-test do-i386-configure build-i386",
-          "./.github/do-test do-x86_64-configure build-x86_64",
-          "./.github/do-build do-m68k-configure build-m68k",
+          "./.github/do-many do-test do-native-configure build-native do-test do-aarch64-configure build-aarch64 do-build do-lx106-configure build-lx106 do-test do-i386-configure build-i386 do-build do-m68k-configure build-m68k end",
         ]
     steps:
       - name: Clone picolibc
@@ -495,8 +478,7 @@ jobs:
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
         ]
         test: [
-          "./.github/do-build do-powerpc64-configure build-powerpc64",
-          "./.github/do-build do-powerpc64le-configure build-powerpc64le",
+          "./.github/do-many do-build do-powerpc64-configure build-powerpc64 do-build do-powerpc64le-configure build-powerpc64le end",
         ]
 
     steps:
@@ -563,9 +545,7 @@ jobs:
         ]
         test: [
           "./.github/do-test do-riscv-configure build-riscv",
-          "./.github/do-test do-rv32imac-configure build-rv32imac",
-          "./.github/do-build do-clang-riscv-configure build-riscv-clang",
-          "./.github/do-test do-clang-rv32imafdc-configure build-clang-rv32imafdc",
+          "./.github/do-many do-test do-rv32imac-configure build-rv32imac do-build do-clang-riscv-configure build-riscv-clang do-test do-clang-rv32imafdc-configure build-clang-rv32imafdc end",
         ]
     steps:
       - name: Clone picolibc
@@ -631,9 +611,7 @@ jobs:
         ]
         test: [
           "./.github/do-test do-arm-configure build-arm",
-          "./.github/do-test do-clang-thumbv7e+fp-configure build-clang-thumbv7e+fp",
-          "./.github/do-test do-clang-thumbv7m-configure build-clang-thumbv7m",
-          "./.github/do-test do-cortex-a9-configure build-cortex-a9",
+          "./.github/do-many do-test do-clang-thumbv7e+fp-configure build-clang-thumbv7e+fp do-test do-clang-thumbv7m-configure build-clang-thumbv7m do-test do-cortex-a9-configure build-cortex-a9 end",
         ]
     steps:
       - name: Clone picolibc
@@ -698,12 +676,7 @@ jobs:
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
         ]
         test: [
-          "./.github/do-test do-native-configure build-native",
-          "./.github/do-test do-aarch64-configure build-aarch64",
-          "./.github/do-build do-lx106-configure build-lx106",
-          "./.github/do-test do-i386-configure build-i386",
-          "./.github/do-test do-x86_64-configure build-x86_64",
-          "./.github/do-build do-m68k-configure build-m68k",
+          "./.github/do-many do-test do-native-configure build-native do-test do-aarch64-configure build-aarch64 do-build do-lx106-configure build-lx106 do-test do-i386-configure build-i386 do-build do-m68k-configure build-m68k end",
         ]
     steps:
       - name: Clone picolibc
@@ -768,8 +741,7 @@ jobs:
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
         ]
         test: [
-          "./.github/do-build do-powerpc64-configure build-powerpc64",
-          "./.github/do-build do-powerpc64le-configure build-powerpc64le",
+          "./.github/do-many do-build do-powerpc64-configure build-powerpc64 do-build do-powerpc64le-configure build-powerpc64le end",
         ]
 
     steps:
@@ -836,9 +808,7 @@ jobs:
         ]
         test: [
           "./.github/do-test do-riscv-configure build-riscv",
-          "./.github/do-test do-rv32imac-configure build-rv32imac",
-          "./.github/do-build do-clang-riscv-configure build-riscv-clang",
-          "./.github/do-test do-clang-rv32imafdc-configure build-clang-rv32imafdc",
+          "./.github/do-many do-test do-rv32imac-configure build-rv32imac do-build do-clang-riscv-configure build-riscv-clang do-test do-clang-rv32imafdc-configure build-clang-rv32imafdc end",
         ]
     steps:
       - name: Clone picolibc
