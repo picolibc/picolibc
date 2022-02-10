@@ -302,9 +302,9 @@ src = feclearexcept.c fe_dfl_env.c fegetenv.c fegetexceptflag.c \
 	fegetround.c feholdexcept.c feraiseexcept.c fesetenv.c \
 	fesetexceptflag.c fesetround.c fetestexcept.c feupdateenv.c
 
-lib_a_CFLAGS = -fbuiltin -fno-math-errno $(AM_CFLAGS)
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(src)
+lib_a_CFLAGS = $(AM_CFLAGS)
 all: all-am
 
 .SUFFIXES:
