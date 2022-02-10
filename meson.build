@@ -215,6 +215,12 @@ if newlib_io_c99_formats != 'auto'
   io_c99_formats = newlib_io_c99_formats == 'true'
 endif
 
+io_pos_args = get_option('io-pos-args')
+newlib_io_pos_args = get_option('newlib-io-pos-args')
+if newlib_io_pos_args != 'auto'
+  io_pos_args = newlib_io_pos_args == 'true'
+endif
+
 # Select stdio implementation
 tinystdio = get_option('tinystdio')
 
@@ -300,7 +306,6 @@ if tinystdio
 endif
 
 # A bunch of newlib-stdio only options
-newlib_io_pos_args = get_option('newlib-io-pos-args')
 newlib_io_long_double = get_option('newlib-io-long-double')
 newlib_global_stdio_streams = get_option('newlib-global-stdio-streams')
 newlib_fvwrite_in_streamio = get_option('newlib-fvwrite-in-streamio')
@@ -315,9 +320,6 @@ newlib_have_fcntl = get_option('newlib-have-fcntl')
 # if they are selected while using tinystdio
 
 if tinystdio
-  if newlib_io_pos_args
-    error('tinystdio does not support positional arguments (newlib-io-pos-args)')
-  endif
   if newlib_io_long_double
     error('tinystdio does not support long double (newlib-io-long-double)')
   endif
@@ -685,11 +687,11 @@ conf_data.set('HAVE_ALIAS_ATTRIBUTE', have_alias_attribute)
 conf_data.set('HAVE_FORMAT_ATTRIBUTE', have_format_attribute)
 conf_data.set('_WANT_REGISTER_FINI', get_option('newlib-register-fini'))
 conf_data.set('_WANT_IO_LONG_LONG', io_long_long)
+conf_data.set('_WANT_IO_POS_ARGS', io_pos_args)
 conf_data.set('_WANT_IO_C99_FORMATS', io_c99_formats)
 conf_data.set('_IO_FLOAT_EXACT', io_float_exact)
 if not tinystdio
   conf_data.set('_WANT_IO_LONG_DOUBLE', newlib_io_long_double)
-  conf_data.set('_WANT_IO_POS_ARGS', newlib_io_pos_args)
   conf_data.set('NO_FLOATING_POINT', not newlib_io_float)
   conf_data.set('FLOATING_POINT', newlib_io_float)
   conf_data.set('_WANT_REENT_GLOBAL_STDIO_STREAMS', newlib_global_stdio_streams)
