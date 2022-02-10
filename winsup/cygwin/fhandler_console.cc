@@ -238,6 +238,33 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 	  char c = (char) wc;
 	  bool processed = false;
 	  termios &ti = ttyp->ti;
+	  pinfo pi (ttyp->getpgid ());
+	  if (pi && pi->ctty == ttyp->ntty
+	      && (pi->process_state & PID_NOTCYGWIN)
+	      && input_rec[i].EventType == KEY_EVENT && c == '\003')
+	    {
+	      bool not_a_sig = false;
+	      if (!CCEQ (ti.c_cc[VINTR], c)
+		  && !CCEQ (ti.c_cc[VQUIT], c)
+		  && !CCEQ (ti.c_cc[VSUSP], c))
+		not_a_sig = true;
+	      if (input_rec[i].Event.KeyEvent.bKeyDown)
+		{
+		  /* CTRL_C_EVENT does not work for the process started with
+		     CREATE_NEW_PROCESS_GROUP flag, so send CTRL_BREAK_EVENT
+		     instead. */
+		  if (pi->process_state & PID_NEW_PG)
+		    GenerateConsoleCtrlEvent (CTRL_BREAK_EVENT,
+					      pi->dwProcessId);
+		  else
+		    GenerateConsoleCtrlEvent (CTRL_C_EVENT, 0);
+		  if (not_a_sig)
+		    goto skip_writeback;
+		}
+	      processed = true;
+	      if (not_a_sig)
+		goto remove_record;
+	    }
 	  switch (input_rec[i].EventType)
 	    {
 	    case KEY_EVENT:
@@ -310,6 +337,7 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 	      processed = true;
 	      break;
 	    }
+remove_record:
 	  if (processed)
 	    { /* Remove corresponding record. */
 	      memmove (input_rec + i, input_rec + i + 1,
