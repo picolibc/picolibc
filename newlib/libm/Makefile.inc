@@ -34,13 +34,52 @@ man: %C%_man
 	$(INSTALL_DATA) %D%/*.3 $(DESTDIR)$(mandir)/man3/
 install-man: %C%_install-man
 
-include %D%/common/Makefile.inc
-include %D%/complex/Makefile.inc
-include %D%/fenv/Makefile.inc
+## The order of includes is important for two reasons:
+## * The integrated documentation (chapter ordering).
+## * Object overridding -- machine dir must come last.
+## Do not change the order without considering the doc impact.
+
 if NEWLIB_HW_FP
 include %D%/mathfp/Makefile.inc
 else
 include %D%/math/Makefile.inc
+endif
+include %D%/common/Makefile.inc
+include %D%/complex/Makefile.inc
+include %D%/fenv/Makefile.inc
+
+if HAVE_LIBM_MACHINE_AARCH64
+include %D%/machine/aarch64/Makefile.inc
+endif
+if HAVE_LIBM_MACHINE_ARM
+include %D%/machine/arm/Makefile.inc
+endif
+if HAVE_LIBM_MACHINE_I386
+include %D%/machine/i386/Makefile.inc
+endif
+if HAVE_LIBM_MACHINE_MIPS
+include %D%/machine/mips/Makefile.inc
+endif
+if HAVE_LIBM_MACHINE_NDS32
+include %D%/machine/nds32/Makefile.inc
+endif
+if HAVE_LIBM_MACHINE_POWERPC
+include %D%/machine/powerpc/Makefile.inc
+endif
+if HAVE_LIBM_MACHINE_PRU
+include %D%/machine/pru/Makefile.inc
+endif
+if HAVE_LIBM_MACHINE_SPARC
+include %D%/machine/sparc/Makefile.inc
+endif
+if HAVE_LIBM_MACHINE_SPU
+include %D%/machine/spu/Makefile.inc
+endif
+if HAVE_LIBM_MACHINE_RISCV
+include %D%/machine/riscv/Makefile.inc
+endif
+if HAVE_LIBM_MACHINE_X86_64
+include %D%/machine/x86_64/Makefile.inc
 endif
 
 CLEANFILES += \

@@ -60,11 +60,12 @@ AM_MAKEFLAGS = \
 
 FLAGS_TO_PASS=$(AM_MAKEFLAGS)
 
-SUBDIRS = libc libm .
+SUBDIRS = libc .
 
 tooldir = $(exec_prefix)/$(host_alias)
 toollibdir = $(tooldir)/lib$(MULTISUBDIR)
 
+AM_CPPFLAGS = $(NEWLIB_CFLAGS) $(TARGET_CFLAGS)
 AR_FLAGS = rc
 
 noinst_DATA += stmp-targ-include
@@ -88,19 +89,19 @@ CLEANFILES += libg.a
 # both libc.a and libm.a.  We build them in libm.a and copy them over,
 # along with some required supporting routines.
 MATHOBJS_IN_LIBC = \
-	$(lpfx)s_fpclassify.o $(lpfx)sf_fpclassify.o \
-	$(lpfx)s_isinf.o $(lpfx)sf_isinf.o \
-	$(lpfx)s_isnan.o $(lpfx)sf_isnan.o \
-	$(lpfx)s_isinfd.o $(lpfx)sf_isinff.o \
-	$(lpfx)s_isnand.o $(lpfx)sf_isnanf.o \
-	$(lpfx)s_nan.o $(lpfx)sf_nan.o \
-	$(lpfx)s_ldexp.o $(lpfx)sf_ldexp.o \
-	$(lpfx)s_frexp.o $(lpfx)sf_frexp.o $(lpfx)frexpl.o \
-	$(lpfx)s_modf.o \
-	$(lpfx)sf_modf.o $(lpfx)s_scalbn.o \
-	$(lpfx)sf_scalbn.o \
-	$(lpfx)s_finite.o $(lpfx)sf_finite.o \
-	$(lpfx)s_copysign.o $(lpfx)sf_copysign.o
+	libm_a-s_fpclassify.o libm_a-sf_fpclassify.o \
+	libm_a-s_isinf.o libm_a-sf_isinf.o \
+	libm_a-s_isnan.o libm_a-sf_isnan.o \
+	libm_a-s_isinfd.o libm_a-sf_isinff.o \
+	libm_a-s_isnand.o libm_a-sf_isnanf.o \
+	libm_a-s_nan.o libm_a-sf_nan.o \
+	libm_a-s_ldexp.o libm_a-sf_ldexp.o \
+	libm_a-s_frexp.o libm_a-sf_frexp.o libm_a-frexpl.o \
+	libm_a-s_modf.o \
+	libm_a-sf_modf.o libm_a-s_scalbn.o \
+	libm_a-sf_scalbn.o \
+	libm_a-s_finite.o libm_a-sf_finite.o \
+	libm_a-s_copysign.o libm_a-sf_copysign.o
 
 libc.a: libc/libc.a libm.a
 	rm -rf libc.a tmp
@@ -117,11 +118,11 @@ libc/libc.a: ; @true
 libg.a: libc.a
 	$(AM_V_GEN)ln libc.a libg.a >/dev/null 2>/dev/null || cp libc.a libg.a
 
-libm.a: libm/libm.a
-	rm -f $@
-	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
-
-libm/libm.a: ; @true
+libm_a_SOURCES =
+libm_a_CFLAGS = $(AM_CFLAGS) $(libm_a_CFLAGS_$(subst /,_,$(@D))) $(libm_a_CFLAGS_$(subst /,_,$(@D)_$(<F)))
+libm_a_CCASFLAGS = $(AM_CCASFLAGS) $(libm_a_CCASFLAGS_$(subst /,_,$(@D))) $(libm_a_CCASFLAGS_$(subst /,_,$(@D)_$(<F)))
+libm_a_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/libm/common $(libm_a_CPPFLAGS_$(subst /,_,$(@D))) $(libm_a_CPPFLAGS_$(subst /,_,$(@D)_$(<F)))
+$(libm_a_OBJECTS): stmp-targ-include
 
 if HAVE_MULTISUBDIR
 $(BUILD_MULTISUBDIR):
