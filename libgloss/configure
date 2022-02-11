@@ -592,6 +592,7 @@ target_makefile_frag_path
 host_makefile_frag_path
 MOXIE_BUILD_CRT0_FALSE
 MOXIE_BUILD_CRT0_TRUE
+MCORE_BSP_PREFIX
 I386_CPPFLAGS
 CPP
 am__fastdepCCAS_FALSE
@@ -734,7 +735,6 @@ wince
 mips
 mn10200
 mn10300
-mcore
 arm'
 
 # Initialize some variables set by options.
@@ -2812,8 +2812,9 @@ subdirs="$subdirs aarch64"
 	subdirs="$subdirs lm32"
 	;;
   mcore-*-*)
-	subdirs="$subdirs mcore"
+	ac_config_files="$ac_config_files mcore/Makefile"
 
+	subdirs="$subdirs mcore"
 	;;
   mep-*-*)
 	ac_config_files="$ac_config_files mep/Makefile"
@@ -5011,6 +5012,17 @@ $as_echo "#define MISSING_SYSCALL_NAMES 1" >>confdefs.h
  ;;
 esac
 
+MCORE_BSP_PREFIX=
+case "${target}" in
+  mcore-*-elf)
+	MCORE_BSP_PREFIX=elf-
+	;;
+  mcore-*-pe)
+	MCORE_BSP_PREFIX=pe-
+	;;
+esac
+
+
 case "${target}" in
   moxie-*-moxiebox*)
     MOXIE_BUILD_CRT0_TRUE='#'
@@ -5864,6 +5876,7 @@ do
     "frv/Makefile") CONFIG_FILES="$CONFIG_FILES frv/Makefile" ;;
     "ft32/Makefile") CONFIG_FILES="$CONFIG_FILES ft32/Makefile" ;;
     "lm32/Makefile") CONFIG_FILES="$CONFIG_FILES lm32/Makefile" ;;
+    "mcore/Makefile") CONFIG_FILES="$CONFIG_FILES mcore/Makefile" ;;
     "mep/Makefile") CONFIG_FILES="$CONFIG_FILES mep/Makefile" ;;
     "moxie/Makefile") CONFIG_FILES="$CONFIG_FILES moxie/Makefile" ;;
     "microblaze/Makefile") CONFIG_FILES="$CONFIG_FILES microblaze/Makefile" ;;

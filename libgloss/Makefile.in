@@ -145,6 +145,7 @@ am__aclocal_m4_deps = $(top_srcdir)/../config/depstand.m4 \
 	$(top_srcdir)/../config/override.m4 $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/i386/acinclude.m4 \
 	$(top_srcdir)/libnosys/acinclude.m4 \
+	$(top_srcdir)/mcore/acinclude.m4 \
 	$(top_srcdir)/moxie/acinclude.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
@@ -159,11 +160,11 @@ CONFIG_CLEAN_FILES = arc/Makefile csky/Makefile epiphany/Makefile \
 	pa/Makefile i960/Makefile sparc_leon/Makefile riscv/Makefile \
 	rs6000/Makefile cr16/Makefile cris/Makefile crx/Makefile \
 	d30v/Makefile fr30/Makefile frv/Makefile ft32/Makefile \
-	lm32/Makefile mep/Makefile moxie/Makefile microblaze/Makefile \
-	mt/Makefile v850/Makefile visium/Makefile xc16x/Makefile \
-	xstormy16/Makefile m32c/Makefile msp430/Makefile rl78/Makefile \
-	rx/Makefile spu/Makefile tic6x/Makefile or1k/Makefile \
-	pru/Makefile nios2/Makefile
+	lm32/Makefile mcore/Makefile mep/Makefile moxie/Makefile \
+	microblaze/Makefile mt/Makefile v850/Makefile visium/Makefile \
+	xc16x/Makefile xstormy16/Makefile m32c/Makefile \
+	msp430/Makefile rl78/Makefile rx/Makefile spu/Makefile \
+	tic6x/Makefile or1k/Makefile pru/Makefile nios2/Makefile
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -440,6 +441,7 @@ LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
+MCORE_BSP_PREFIX = @MCORE_BSP_PREFIX@
 MKDIR_P = @MKDIR_P@
 MOXIE_BUILD_CRT0_FALSE = @MOXIE_BUILD_CRT0_FALSE@
 MOXIE_BUILD_CRT0_TRUE = @MOXIE_BUILD_CRT0_TRUE@
@@ -706,6 +708,8 @@ frv/Makefile: $(top_builddir)/config.status $(top_srcdir)/frv/Makefile.in
 ft32/Makefile: $(top_builddir)/config.status $(top_srcdir)/ft32/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 lm32/Makefile: $(top_builddir)/config.status $(top_srcdir)/lm32/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+mcore/Makefile: $(top_builddir)/config.status $(top_srcdir)/mcore/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 mep/Makefile: $(top_builddir)/config.status $(top_srcdir)/mep/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@

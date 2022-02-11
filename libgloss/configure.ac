@@ -142,7 +142,8 @@ case "${target}" in
 	subdirs="$subdirs lm32"
 	;;
   mcore-*-*)
-	AC_CONFIG_SUBDIRS([mcore])
+	AC_CONFIG_FILES([mcore/Makefile])
+	subdirs="$subdirs mcore"
 	;;
   mep-*-*)
 	AC_CONFIG_FILES([mep/Makefile])
@@ -325,6 +326,7 @@ AC_DEFINE_UNQUOTED(__SYMBOL_PREFIX, "$libc_cv_symbol_prefix", [symbol prefix])
 
 m4_include([i386/acinclude.m4])
 m4_include([libnosys/acinclude.m4])
+m4_include([mcore/acinclude.m4])
 m4_include([moxie/acinclude.m4])
 
 dnl We have to assign the same value to other variables because autoconf
