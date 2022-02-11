@@ -592,6 +592,8 @@ target_makefile_frag_path
 host_makefile_frag_path
 MOXIE_BUILD_CRT0_FALSE
 MOXIE_BUILD_CRT0_TRUE
+MN10300_BSP_LIST
+MN10300_SCRIPT_LIST
 MCORE_BSP_PREFIX
 M68K_TARGET
 I386_CPPFLAGS
@@ -733,7 +735,6 @@ ac_subdirs_all='aarch64
 sparc
 wince
 mips
-mn10300
 arm'
 
 # Initialize some variables set by options.
@@ -2767,8 +2768,10 @@ subdirs="$subdirs aarch64"
 	target_makefile_frag=${srcdir}/config/mn10200.mt
 	;;
   mn10300-*-*)
-	subdirs="$subdirs mn10300"
+	ac_config_files="$ac_config_files mn10300/Makefile"
 
+	subdirs="$subdirs mn10300"
+	target_makefile_frag=${srcdir}/config/mn10300.mt
 	;;
   bfin-*-*)
 	config_bfin=true
@@ -5072,6 +5075,21 @@ case "${target}" in
 esac
 
 
+MN10300_SCRIPT_LIST=
+MN10300_BSP_LIST=
+case "${target}" in
+  mn10300-*elf)
+    MN10300_SCRIPT_LIST="eval sim asb2303 asb2305"
+    MN10300_BSP_LIST="libeval.a libcygmon.a"
+    ;;
+  *)
+    MN10300_SCRIPT_LIST="eval sim"
+    MN10300_BSP_LIST="libeval.a"
+    ;;
+esac
+
+
+
 case "${target}" in
   moxie-*-moxiebox*)
     MOXIE_BUILD_CRT0_TRUE='#'
@@ -5919,6 +5937,7 @@ do
     "riscv/Makefile") CONFIG_FILES="$CONFIG_FILES riscv/Makefile" ;;
     "rs6000/Makefile") CONFIG_FILES="$CONFIG_FILES rs6000/Makefile" ;;
     "mn10200/Makefile") CONFIG_FILES="$CONFIG_FILES mn10200/Makefile" ;;
+    "mn10300/Makefile") CONFIG_FILES="$CONFIG_FILES mn10300/Makefile" ;;
     "cr16/Makefile") CONFIG_FILES="$CONFIG_FILES cr16/Makefile" ;;
     "cris/Makefile") CONFIG_FILES="$CONFIG_FILES cris/Makefile" ;;
     "crx/Makefile") CONFIG_FILES="$CONFIG_FILES crx/Makefile" ;;

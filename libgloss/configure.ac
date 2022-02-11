@@ -107,7 +107,9 @@ case "${target}" in
 	target_makefile_frag=${srcdir}/config/mn10200.mt
 	;;
   mn10300-*-*)
-	AC_CONFIG_SUBDIRS([mn10300])
+	AC_CONFIG_FILES([mn10300/Makefile])
+	subdirs="$subdirs mn10300"
+	target_makefile_frag=${srcdir}/config/mn10300.mt
 	;;
   bfin-*-*)
 	config_bfin=true
@@ -331,6 +333,7 @@ m4_include([i386/acinclude.m4])
 m4_include([libnosys/acinclude.m4])
 m4_include([m68k/acinclude.m4])
 m4_include([mcore/acinclude.m4])
+m4_include([mn10300/acinclude.m4])
 m4_include([moxie/acinclude.m4])
 
 dnl We have to assign the same value to other variables because autoconf
