@@ -102,7 +102,9 @@ case "${target}" in
 	host_makefile_frag=${srcdir}/config/ppc.mh
 	;;
   mn10200-*-*)
-	AC_CONFIG_SUBDIRS([mn10200])
+	AC_CONFIG_FILES([mn10200/Makefile])
+	subdirs="$subdirs mn10200"
+	target_makefile_frag=${srcdir}/config/mn10200.mt
 	;;
   mn10300-*-*)
 	AC_CONFIG_SUBDIRS([mn10300])

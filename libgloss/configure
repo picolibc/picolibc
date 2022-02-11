@@ -733,7 +733,6 @@ ac_subdirs_all='aarch64
 sparc
 wince
 mips
-mn10200
 mn10300
 arm'
 
@@ -2762,8 +2761,10 @@ subdirs="$subdirs aarch64"
 	host_makefile_frag=${srcdir}/config/ppc.mh
 	;;
   mn10200-*-*)
-	subdirs="$subdirs mn10200"
+	ac_config_files="$ac_config_files mn10200/Makefile"
 
+	subdirs="$subdirs mn10200"
+	target_makefile_frag=${srcdir}/config/mn10200.mt
 	;;
   mn10300-*-*)
 	subdirs="$subdirs mn10300"
@@ -5917,6 +5918,7 @@ do
     "sparc_leon/Makefile") CONFIG_FILES="$CONFIG_FILES sparc_leon/Makefile" ;;
     "riscv/Makefile") CONFIG_FILES="$CONFIG_FILES riscv/Makefile" ;;
     "rs6000/Makefile") CONFIG_FILES="$CONFIG_FILES rs6000/Makefile" ;;
+    "mn10200/Makefile") CONFIG_FILES="$CONFIG_FILES mn10200/Makefile" ;;
     "cr16/Makefile") CONFIG_FILES="$CONFIG_FILES cr16/Makefile" ;;
     "cris/Makefile") CONFIG_FILES="$CONFIG_FILES cris/Makefile" ;;
     "crx/Makefile") CONFIG_FILES="$CONFIG_FILES crx/Makefile" ;;
