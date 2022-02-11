@@ -590,6 +590,7 @@ LIBOBJS
 multi_basedir
 target_makefile_frag_path
 host_makefile_frag_path
+I386_CPPFLAGS
 CPP
 am__fastdepCCAS_FALSE
 am__fastdepCCAS_TRUE
@@ -725,7 +726,6 @@ CCAS
 CCASFLAGS
 CPP'
 ac_subdirs_all='aarch64
-i386
 m68k
 sparc
 wince
@@ -2698,8 +2698,9 @@ subdirs="$subdirs aarch64"
 	config_testsuite=true
 	;;
   i[3456]86-*-elf* | i[3456]86-*-coff*)
-	subdirs="$subdirs i386"
+	ac_config_files="$ac_config_files i386/Makefile"
 
+	subdirs="$subdirs i386"
 	;;
   m32r-*-*)
 	ac_config_files="$ac_config_files m32r/Makefile"
@@ -4968,6 +4969,17 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
+I386_CPPFLAGS=
+case "${target}" in
+  i[3456]86-*-coff)
+    I386_CPPFLAGS="-DCOFF"
+    ;;
+  i[3456]86-*-aout)
+    I386_CPPFLAGS="-DAOUT"
+    ;;
+esac
+
+
 case "${target}" in
   *-*-cygwin*) ;;
   a29k-amd-udi) ;;
@@ -5820,6 +5832,7 @@ do
     "arc/Makefile") CONFIG_FILES="$CONFIG_FILES arc/Makefile" ;;
     "csky/Makefile") CONFIG_FILES="$CONFIG_FILES csky/Makefile" ;;
     "epiphany/Makefile") CONFIG_FILES="$CONFIG_FILES epiphany/Makefile" ;;
+    "i386/Makefile") CONFIG_FILES="$CONFIG_FILES i386/Makefile" ;;
     "m32r/Makefile") CONFIG_FILES="$CONFIG_FILES m32r/Makefile" ;;
     "m68hc11/Makefile") CONFIG_FILES="$CONFIG_FILES m68hc11/Makefile" ;;
     "nds32/Makefile") CONFIG_FILES="$CONFIG_FILES nds32/Makefile" ;;

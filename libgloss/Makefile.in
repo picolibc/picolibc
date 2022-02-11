@@ -143,6 +143,7 @@ am__aclocal_m4_deps = $(top_srcdir)/../config/depstand.m4 \
 	$(top_srcdir)/../config/lead-dot.m4 \
 	$(top_srcdir)/../config/multi.m4 \
 	$(top_srcdir)/../config/override.m4 $(top_srcdir)/acinclude.m4 \
+	$(top_srcdir)/i386/acinclude.m4 \
 	$(top_srcdir)/libnosys/acinclude.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
@@ -153,8 +154,8 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
 mkinstalldirs = $(SHELL) $(top_srcdir)/../mkinstalldirs
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES = arc/Makefile csky/Makefile epiphany/Makefile \
-	m32r/Makefile m68hc11/Makefile nds32/Makefile pa/Makefile \
-	i960/Makefile sparc_leon/Makefile riscv/Makefile \
+	i386/Makefile m32r/Makefile m68hc11/Makefile nds32/Makefile \
+	pa/Makefile i960/Makefile sparc_leon/Makefile riscv/Makefile \
 	rs6000/Makefile cr16/Makefile cris/Makefile crx/Makefile \
 	d30v/Makefile fr30/Makefile frv/Makefile ft32/Makefile \
 	lm32/Makefile mep/Makefile microblaze/Makefile mt/Makefile \
@@ -426,6 +427,7 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EXEEXT = @EXEEXT@
+I386_CPPFLAGS = @I386_CPPFLAGS@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -667,6 +669,8 @@ arc/Makefile: $(top_builddir)/config.status $(top_srcdir)/arc/Makefile.in
 csky/Makefile: $(top_builddir)/config.status $(top_srcdir)/csky/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 epiphany/Makefile: $(top_builddir)/config.status $(top_srcdir)/epiphany/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+i386/Makefile: $(top_builddir)/config.status $(top_srcdir)/i386/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 m32r/Makefile: $(top_builddir)/config.status $(top_srcdir)/m32r/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@

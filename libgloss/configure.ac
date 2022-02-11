@@ -52,7 +52,8 @@ case "${target}" in
 	config_testsuite=true
 	;;
   i[[3456]]86-*-elf* | i[[3456]]86-*-coff*)
-	AC_CONFIG_SUBDIRS([i386])
+	AC_CONFIG_FILES([i386/Makefile])
+	subdirs="$subdirs i386"
 	;;
   m32r-*-*)
 	AC_CONFIG_FILES([m32r/Makefile])
@@ -321,6 +322,7 @@ dnl
   rm -f conftest* ])
 AC_DEFINE_UNQUOTED(__SYMBOL_PREFIX, "$libc_cv_symbol_prefix", [symbol prefix])
 
+m4_include([i386/acinclude.m4])
 m4_include([libnosys/acinclude.m4])
 
 dnl We have to assign the same value to other variables because autoconf

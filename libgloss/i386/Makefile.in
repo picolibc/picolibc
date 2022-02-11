@@ -101,7 +101,7 @@ clean mostlyclean:
 	rm -f a.out core *.i *~ *.o *-test *.srec *.dis *.map *.x
 
 distclean maintainer-clean realclean: clean
-	rm -f Makefile config.status a.out
+	rm -f Makefile a.out
 
 .PHONY: install info install-info clean-info
 install:
@@ -123,8 +123,5 @@ test.o:	${srcdir}/test.c
 # these are for the BSPs
 ${CRT0}: cygmon-crt0.S
 
-Makefile: Makefile.in config.status @host_makefile_frag_path@
-	$(SHELL) config.status
-
-config.status: configure
-	$(SHELL) config.status --recheck
+Makefile: Makefile.in ../config.status
+	cd .. && $(SHELL) config.status
