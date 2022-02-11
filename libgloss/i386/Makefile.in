@@ -90,10 +90,10 @@ libcygmon.a: $(CYGMON_OBJS)
 	${RANLIB} $@
 
 cygmon-salib.o: ${srcdir}/cygmon-salib.c
-	$(CC) -c $(CFLAGS) @NEED_UNDERSCORE@ @IS_COFF@ @IS_AOUT@ $(<) -o $@
+	$(CC) -c $(CFLAGS) $(I386_CPPFLAGS) $(<) -o $@
 
 cygmon-crt0.o: ${srcdir}/cygmon-crt0.S
-	$(CC) -c $(CFLAGS) @NEED_UNDERSCORE@ @IS_COFF@ @IS_AOUT@ $(<) -o $@
+	$(CC) -c $(CFLAGS) $(I386_CPPFLAGS) $(<) -o $@
 
 doc:	
 

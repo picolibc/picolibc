@@ -589,9 +589,6 @@ host_makefile_frag_path
 CCASFLAGS
 CCAS
 RANLIB
-NEED_UNDERSCORE
-IS_AOUT
-IS_COFF
 LD
 AR
 AS
@@ -607,6 +604,7 @@ am__include
 DEPDIR
 am__leading_dot
 CC
+I386_CPPFLAGS
 INSTALL_DATA
 INSTALL_SCRIPT
 INSTALL_PROGRAM
@@ -2017,14 +2015,16 @@ test -z "$INSTALL_SCRIPT" && INSTALL_SCRIPT='${INSTALL}'
 test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
 
 
+I386_CPPFLAGS=
 case "$target" in
     *coff)
-	IS_COFF="-DCOFF"
+	I386_CPPFLAGS="-DCOFF"
 	;;
     *aout)
-	IS_AOUT="-DAOUT"
+	I386_CPPFLAGS="-DAOUT"
 	;;
 esac
+
 
 rm -rf .tst 2>/dev/null
 mkdir .tst 2>/dev/null
@@ -2448,9 +2448,6 @@ AS=${AS-as}
 AR=${AR-ar}
 
 LD=${LD-ld}
-
-
-
 
 if test -n "$ac_tool_prefix"; then
   # Extract the first word of "${ac_tool_prefix}ranlib", so it can be a program name with args.
