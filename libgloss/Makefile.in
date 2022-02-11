@@ -145,6 +145,7 @@ am__aclocal_m4_deps = $(top_srcdir)/../config/depstand.m4 \
 	$(top_srcdir)/../config/override.m4 $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/i386/acinclude.m4 \
 	$(top_srcdir)/libnosys/acinclude.m4 \
+	$(top_srcdir)/m68k/acinclude.m4 \
 	$(top_srcdir)/mcore/acinclude.m4 \
 	$(top_srcdir)/moxie/acinclude.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -157,14 +158,15 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/../mkinstalldirs
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES = arc/Makefile csky/Makefile epiphany/Makefile \
 	i386/Makefile m32r/Makefile m68hc11/Makefile nds32/Makefile \
-	pa/Makefile i960/Makefile sparc_leon/Makefile riscv/Makefile \
-	rs6000/Makefile cr16/Makefile cris/Makefile crx/Makefile \
-	d30v/Makefile fr30/Makefile frv/Makefile ft32/Makefile \
-	lm32/Makefile mcore/Makefile mep/Makefile moxie/Makefile \
-	microblaze/Makefile mt/Makefile v850/Makefile visium/Makefile \
-	xc16x/Makefile xstormy16/Makefile m32c/Makefile \
-	msp430/Makefile rl78/Makefile rx/Makefile spu/Makefile \
-	tic6x/Makefile or1k/Makefile pru/Makefile nios2/Makefile
+	m68k/Makefile pa/Makefile i960/Makefile sparc_leon/Makefile \
+	riscv/Makefile rs6000/Makefile cr16/Makefile cris/Makefile \
+	crx/Makefile d30v/Makefile fr30/Makefile frv/Makefile \
+	ft32/Makefile lm32/Makefile mcore/Makefile mep/Makefile \
+	moxie/Makefile microblaze/Makefile mt/Makefile v850/Makefile \
+	visium/Makefile xc16x/Makefile xstormy16/Makefile \
+	m32c/Makefile msp430/Makefile rl78/Makefile rx/Makefile \
+	spu/Makefile tic6x/Makefile or1k/Makefile pru/Makefile \
+	nios2/Makefile
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -440,6 +442,7 @@ LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LTLIBOBJS = @LTLIBOBJS@
+M68K_TARGET = @M68K_TARGET@
 MAKEINFO = @MAKEINFO@
 MCORE_BSP_PREFIX = @MCORE_BSP_PREFIX@
 MKDIR_P = @MKDIR_P@
@@ -682,6 +685,8 @@ m32r/Makefile: $(top_builddir)/config.status $(top_srcdir)/m32r/Makefile.in
 m68hc11/Makefile: $(top_builddir)/config.status $(top_srcdir)/m68hc11/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 nds32/Makefile: $(top_builddir)/config.status $(top_srcdir)/nds32/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+m68k/Makefile: $(top_builddir)/config.status $(top_srcdir)/m68k/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 pa/Makefile: $(top_builddir)/config.status $(top_srcdir)/pa/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@

@@ -69,7 +69,7 @@ OBJS =  close.o fstat.o getpid.o isatty.o kill.o \
 	unlink.o write.o
 
 # What targets to build for.  This is a list of {m68k,cf}
-TARGET = @TARGET@
+TARGET = @M68K_TARGET@
 
 # Here is all of the simulator stuff
 SIM_SCRIPTS	= sim.ld
@@ -476,14 +476,11 @@ clean mostlyclean:
 	rm -f a.out core *.i *~ *.a *.o *-test *.srec *.dis *.x *.map
 
 distclean maintainer-clean realclean: clean
-	rm -f Makefile config.cache config.log config.status
+	rm -f Makefile
 
 info dvi doc:
 install-info:
 clean-info:
 
-Makefile: Makefile.in config.status @host_makefile_frag_path@ @target_makefile_frag_path@
-	$(SHELL) config.status
-
-config.status: configure
-	$(SHELL) config.status --recheck
+Makefile: Makefile.in ../config.status
+	cd .. && $(SHELL) config.status

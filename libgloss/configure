@@ -593,6 +593,7 @@ host_makefile_frag_path
 MOXIE_BUILD_CRT0_FALSE
 MOXIE_BUILD_CRT0_TRUE
 MCORE_BSP_PREFIX
+M68K_TARGET
 I386_CPPFLAGS
 CPP
 am__fastdepCCAS_FALSE
@@ -729,7 +730,6 @@ CCAS
 CCASFLAGS
 CPP'
 ac_subdirs_all='aarch64
-m68k
 sparc
 wince
 mips
@@ -2719,8 +2719,9 @@ subdirs="$subdirs aarch64"
 	subdirs="$subdirs nds32"
 	;;
   fido-*-* | m68*-*-*)
-	subdirs="$subdirs m68k"
+	ac_config_files="$ac_config_files m68k/Makefile"
 
+	subdirs="$subdirs m68k"
 	;;
   hppa*-*-pro*)
 	ac_config_files="$ac_config_files pa/Makefile"
@@ -5012,6 +5013,53 @@ $as_echo "#define MISSING_SYSCALL_NAMES 1" >>confdefs.h
  ;;
 esac
 
+M68K_TARGET=m68k
+case "${target}" in
+  fido-*-* | m68*-*-*)
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking target cpu family" >&5
+$as_echo_n "checking target cpu family... " >&6; }
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#ifndef __mcoldfire__
+#error we are not coldfire
+#endif
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_cpp "$LINENO"; then :
+  M68K_TARGET="cf"
+fi
+rm -f conftest.err conftest.i conftest.$ac_ext
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#ifndef __mfido__
+#error we are not fido
+#endif
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_cpp "$LINENO"; then :
+  M68K_TARGET="fido"
+fi
+rm -f conftest.err conftest.i conftest.$ac_ext
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $M68K_TARGET" >&5
+$as_echo "$M68K_TARGET" >&6; }
+    ;;
+esac
+
+
 MCORE_BSP_PREFIX=
 case "${target}" in
   mcore-*-elf)
@@ -5863,6 +5911,7 @@ do
     "m32r/Makefile") CONFIG_FILES="$CONFIG_FILES m32r/Makefile" ;;
     "m68hc11/Makefile") CONFIG_FILES="$CONFIG_FILES m68hc11/Makefile" ;;
     "nds32/Makefile") CONFIG_FILES="$CONFIG_FILES nds32/Makefile" ;;
+    "m68k/Makefile") CONFIG_FILES="$CONFIG_FILES m68k/Makefile" ;;
     "pa/Makefile") CONFIG_FILES="$CONFIG_FILES pa/Makefile" ;;
     "i960/Makefile") CONFIG_FILES="$CONFIG_FILES i960/Makefile" ;;
     "sparc_leon/Makefile") CONFIG_FILES="$CONFIG_FILES sparc_leon/Makefile" ;;

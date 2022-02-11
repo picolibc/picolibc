@@ -68,7 +68,8 @@ case "${target}" in
 	subdirs="$subdirs nds32"
 	;;
   fido-*-* | m68*-*-*)
-	AC_CONFIG_SUBDIRS([m68k])
+	AC_CONFIG_FILES([m68k/Makefile])
+	subdirs="$subdirs m68k"
 	;;
   hppa*-*-pro*)
 	AC_CONFIG_FILES([pa/Makefile])
@@ -326,6 +327,7 @@ AC_DEFINE_UNQUOTED(__SYMBOL_PREFIX, "$libc_cv_symbol_prefix", [symbol prefix])
 
 m4_include([i386/acinclude.m4])
 m4_include([libnosys/acinclude.m4])
+m4_include([m68k/acinclude.m4])
 m4_include([mcore/acinclude.m4])
 m4_include([moxie/acinclude.m4])
 
