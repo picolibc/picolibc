@@ -30,15 +30,10 @@ AC_SUBST(LD)
 AC_PROG_RANLIB
 LIB_AM_PROG_AS
 
+AC_NO_EXECUTABLES
+
 AC_MSG_CHECKING([target cpu family])
 TARGET=m68k
-dnl Temporarily modify LDFLAGS so that link tests will succeed without
-dnl a C library.  Note that we may not have a C librabry yet and that
-dnl autoconf automatically adds script to check whether we can create
-dnl an executable or not.
-dnl
-saved_LDFLAGS="$LDFLAGS"
-LDFLAGS="-nostdlib -e main"
 AC_PREPROC_IFELSE([AC_LANG_PROGRAM([#ifndef __mcoldfire__
 		#error we are not coldfire
 		#endif])],
@@ -47,7 +42,6 @@ AC_PREPROC_IFELSE([AC_LANG_PROGRAM([#ifndef __mfido__
 		#error we are not fido
 		#endif])],
 	       TARGET="fido",)
-LDFLAGS=$saved_LDFLAGS
 AC_MSG_RESULT($TARGET)
 AC_SUBST(TARGET)
      
