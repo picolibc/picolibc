@@ -149,7 +149,8 @@ case "${target}" in
 	subdirs="$subdirs mep"
 	;;
   moxie-*-*)
-	AC_CONFIG_SUBDIRS([moxie])
+	AC_CONFIG_FILES([moxie/Makefile])
+	subdirs="$subdirs moxie"
 	;;
   microblaze*-*-*)
 	AC_CONFIG_FILES([microblaze/Makefile])
@@ -324,6 +325,7 @@ AC_DEFINE_UNQUOTED(__SYMBOL_PREFIX, "$libc_cv_symbol_prefix", [symbol prefix])
 
 m4_include([i386/acinclude.m4])
 m4_include([libnosys/acinclude.m4])
+m4_include([moxie/acinclude.m4])
 
 dnl We have to assign the same value to other variables because autoconf
 dnl doesn't provide a mechanism to substitute a replacement keyword with
