@@ -329,6 +329,7 @@ fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
       if (ti.c_iflag & ISTRIP)
 	c &= 0x7f;
       winpids pids ((DWORD) 0);
+      bool need_check_sigs = get_ttyp ()->pcon_input_state_eq (tty::to_cyg);
       if (get_ttyp ()->pcon_input_state_eq (tty::to_nat))
 	{
 	  bool need_discard_input = false;
@@ -349,11 +350,15 @@ fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
 		    GenerateConsoleCtrlEvent (CTRL_C_EVENT, 0);
 		  need_discard_input = true;
 		}
+	      if (p->ctty == get_ttyp ()->ntty
+		  && p->pgid == get_ttyp ()->getpgid () && !p->cygstarted)
+		need_check_sigs = true;
 	    }
-	  if (need_discard_input
-	      && !CCEQ (ti.c_cc[VINTR], c)
+	  if (!CCEQ (ti.c_cc[VINTR], c)
 	      && !CCEQ (ti.c_cc[VQUIT], c)
 	      && !CCEQ (ti.c_cc[VSUSP], c))
+	    need_check_sigs = false;
+	  if (need_discard_input && !need_check_sigs)
 	    {
 	      if (!(ti.c_lflag & NOFLSH))
 		{
@@ -364,7 +369,7 @@ fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
 	      continue;
 	    }
 	}
-      if (ti.c_lflag & ISIG)
+      if ((ti.c_lflag & ISIG) && need_check_sigs)
 	{
 	  int sig;
 	  if (CCEQ (ti.c_cc[VINTR], c))
@@ -469,7 +474,7 @@ fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
 	    }
 	  continue;
 	}
-      else if (CCEQ (ti.c_cc[VEOF], c))
+      else if (CCEQ (ti.c_cc[VEOF], c) && need_check_sigs)
 	{
 	  termios_printf ("EOF");
 	  accept_input ();
