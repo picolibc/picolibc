@@ -309,7 +309,8 @@ tty_min::setpgid (int pid)
   fhandler_pty_slave *ptys = NULL;
   cygheap_fdenum cfd (false);
   while (cfd.next () >= 0 && ptys == NULL)
-    if (cfd->get_device () == getntty ())
+    if (cfd->get_device () == getntty ()
+	&& cfd->get_major () == DEV_PTYS_MAJOR)
       ptys = (fhandler_pty_slave *) (fhandler_base *) cfd;
 
   if (ptys)
