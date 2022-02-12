@@ -438,6 +438,9 @@ fhandler_pty_master::discard_input ()
   while (::bytes_available (bytes_in_pipe, from_master) && bytes_in_pipe)
     ReadFile (from_master, buf, sizeof(buf), &n, NULL);
   ResetEvent (input_available_event);
+  if (!get_ttyp ()->pcon_activated)
+    while (::bytes_available (bytes_in_pipe, from_master_nat) && bytes_in_pipe)
+      ReadFile (from_master_nat, buf, sizeof(buf), &n, NULL);
   get_ttyp ()->discard_input = true;
   ReleaseMutex (input_mutex);
 }
