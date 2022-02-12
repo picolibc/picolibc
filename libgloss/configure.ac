@@ -249,7 +249,7 @@ dnl fi
 
 AM_CONDITIONAL(CONFIG_LIBNOSYS, test x$config_libnosys = xtrue)
 
-LIB_AC_PROG_CC
+AC_PROG_CC
 AS=${AS-as}
 AC_SUBST(AS)
 AC_CHECK_PROG(AR, ar, ar, :)
