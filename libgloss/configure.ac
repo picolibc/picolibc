@@ -90,7 +90,9 @@ case "${target}" in
 	config_wince=true
 	;;
   mips*-*-*)
-	AC_CONFIG_SUBDIRS([mips])
+	AC_CONFIG_FILES([mips/Makefile])
+	subdirs="$subdirs mips"
+	target_makefile_frag=${srcdir}/config/mips.mt
 	;;
   riscv*-*-*)
 	AC_CONFIG_FILES([riscv/Makefile])
@@ -334,6 +336,7 @@ m4_include([i386/acinclude.m4])
 m4_include([libnosys/acinclude.m4])
 m4_include([m68k/acinclude.m4])
 m4_include([mcore/acinclude.m4])
+m4_include([mips/acinclude.m4])
 m4_include([mn10300/acinclude.m4])
 m4_include([moxie/acinclude.m4])
 

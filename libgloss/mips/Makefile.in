@@ -64,31 +64,31 @@ OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
 	then echo ${objroot}/../binutils/objcopy ; \
 	else t='$(program_transform_name)'; echo objcopy | sed -e $$t ; fi`
 
-CRT0 = @crt0@
-PCRT0 = @pcrt0@
+CRT0 = @MIPS_CRT0@
+PCRT0 = pcrt0.o
 GENOBJS = syscalls.o fstat.o getpid.o isatty.o kill.o \
 	lseek.o print.o putnum.o stat.o unlink.o
 GENOBJS2 = open.o close.o read.o write.o
-IDTOBJS = idtmon.o @part_specific_obj@ ${GENOBJS}
-PMONOBJS = pmon.o @part_specific_obj@ ${GENOBJS}
-LSIOBJS = lsipmon.o @part_specific_obj@ ${GENOBJS}
-DVEOBJS = dvemon.o @part_specific_obj@ ${GENOBJS} ${GENOBJS2}
-JMR3904OBJS = jmr3904-io.o @part_specific_obj@ ${GENOBJS} ${GENOBJS2}
-CFEOBJS = cfe.o cfe_api.o cfe_mem.o @part_specific_obj@ ${GENOBJS} ${GENOBJS2}
-CYGMONOBJS = open.o close.o cygmon.o @part_specific_obj@ ${GENOBJS}
+IDTOBJS = idtmon.o @MIPS_PART_SPECIFIC_OBJ@ ${GENOBJS}
+PMONOBJS = pmon.o @MIPS_PART_SPECIFIC_OBJ@ ${GENOBJS}
+LSIOBJS = lsipmon.o @MIPS_PART_SPECIFIC_OBJ@ ${GENOBJS}
+DVEOBJS = dvemon.o @MIPS_PART_SPECIFIC_OBJ@ ${GENOBJS} ${GENOBJS2}
+JMR3904OBJS = jmr3904-io.o @MIPS_PART_SPECIFIC_OBJ@ ${GENOBJS} ${GENOBJS2}
+CFEOBJS = cfe.o cfe_api.o cfe_mem.o @MIPS_PART_SPECIFIC_OBJ@ ${GENOBJS} ${GENOBJS2}
+CYGMONOBJS = open.o close.o cygmon.o @MIPS_PART_SPECIFIC_OBJ@ ${GENOBJS}
 
 # Nullmon cannot support read and write, but the test cases pull them in via libs
-NULLMONOBJS = nullmon.o @part_specific_obj@ ${GENOBJS}
+NULLMONOBJS = nullmon.o @MIPS_PART_SPECIFIC_OBJ@ ${GENOBJS}
 
 CFLAGS = -g 
 
 GCC_LDFLAGS = `if [ -d ${objroot}/../gcc ] ; \
 	then echo -L${objroot}/../gcc ; fi`
 
-SCRIPTS = @script_list@
-BSP = @bsp_list@
+SCRIPTS = @MIPS_SCRIPT_LIST@
+BSP = @MIPS_BSP_LIST@
 
-PART_SPECIFIC_DEFINES = @part_specific_defines@
+PART_SPECIFIC_DEFINES = @MIPS_PART_SPECIFIC_DEFINES@
 
 # Host specific makefile fragment comes in here.
 @host_makefile_frag@
@@ -253,8 +253,5 @@ syscalls.o: ${srcdir}/syscalls.c
 # target specific makefile fragment comes in here.
 @target_makefile_frag@
 
-Makefile: Makefile.in config.status @host_makefile_frag_path@ @target_makefile_frag_path@
-	$(SHELL) config.status
-
-config.status: configure
-	$(SHELL) config.status --recheck
+Makefile: Makefile.in ../config.status
+	cd .. && $(SHELL) config.status
