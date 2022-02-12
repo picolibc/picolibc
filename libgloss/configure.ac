@@ -336,6 +336,17 @@ m4_include([mcore/acinclude.m4])
 m4_include([mn10300/acinclude.m4])
 m4_include([moxie/acinclude.m4])
 
+AC_CACHE_CHECK([for compiler search settings], libc_cv_compiler_isystem, [dnl
+  for subdir in include include-fixed; do
+    AS_IF([dir=`$CC -print-file-name=$subdir`], [dnl
+      AS_IF([test -n "$dir"], [dnl
+        libc_cv_compiler_isystem="$libc_cv_compiler_isystem -isystem $dir"
+      ])
+    ])
+  done
+])
+CC="$CC -nostdinc $libc_cv_compiler_isystem"
+
 dnl We have to assign the same value to other variables because autoconf
 dnl doesn't provide a mechanism to substitute a replacement keyword with
 dnl arbitrary data or pathnames.

@@ -5104,6 +5104,26 @@ esac
 
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for compiler search settings" >&5
+$as_echo_n "checking for compiler search settings... " >&6; }
+if ${libc_cv_compiler_isystem+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+    for subdir in include include-fixed; do
+    if dir=`$CC -print-file-name=$subdir`; then :
+        if test -n "$dir"; then :
+          libc_cv_compiler_isystem="$libc_cv_compiler_isystem -isystem $dir"
+
+fi
+
+fi
+  done
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $libc_cv_compiler_isystem" >&5
+$as_echo "$libc_cv_compiler_isystem" >&6; }
+CC="$CC -nostdinc $libc_cv_compiler_isystem"
+
 host_makefile_frag_path=$host_makefile_frag
 
 
