@@ -251,9 +251,7 @@ AM_CONDITIONAL(CONFIG_LIBNOSYS, test x$config_libnosys = xtrue)
 
 AC_PROG_CC
 AM_PROG_AS
-AC_CHECK_PROG(AR, ar, ar, :)
-AR=${AR-ar}
-AC_SUBST(AR)
+AM_PROG_AR
 LD=${LD-ld}
 AC_SUBST(LD)
 AC_PROG_RANLIB
