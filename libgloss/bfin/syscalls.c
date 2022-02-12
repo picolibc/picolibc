@@ -101,6 +101,7 @@ void
 _exit (int n)
 {
   do_syscall (SYS_exit, &n);
+  __builtin_unreachable ();
 }
 
 int
@@ -153,7 +154,7 @@ _sbrk (int incr)
   return (caddr_t) prev_heap_end;
 }
 
-extern void memset (struct stat *, int, unsigned int);
+extern void *memset (void *, int, unsigned int);
 
 int
 _fstat (int file, struct stat *st)
@@ -190,7 +191,7 @@ _link (const char *existing, const char *new)
 int
 _unlink (const char *path)
 {
-  return do_syscall (SYS_unlink, path);
+  return do_syscall (SYS_unlink, (char *) path);
 }
 
 void
