@@ -1,3 +1,5 @@
+%C%_CPPFLAGS = -I$(srcdir)/%D%/include
+
 # Here is all of the simulator stuff.
 multilibtool_LIBRARIES += %D%/libsim.a
 %C%_libsim_a_SOURCES = \
@@ -5,7 +7,7 @@ multilibtool_LIBRARIES += %D%/libsim.a
 	%D%/syscalls.c
 %C%_libsim_a_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
-	-I$(srcdir)/%D/include
+	$(%C%_CPPFLAGS)
 
 check_PROGRAMS += %D%/sim-test
 
@@ -51,21 +53,21 @@ multilibtool_LIBRARIES += %D%/libbfinbsp.a
 	%D%/_exit.c
 %C%_libbfinbsp_a_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
-	-I$(srcdir)/%D/include
+	$(%C%_CPPFLAGS)
 
 %D%/basiccrt.$(OBJEXT): %D%/basiccrt.S
-	$(AM_V_CC)$(COMPILE) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),,-mcpu=bf532-any)
+	$(AM_V_CC)$(COMPILE) $(%C%_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),,-mcpu=bf532-any)
 %D%/basiccrts.$(OBJEXT): %D%/basiccrt.S
-	$(AM_V_CC)$(COMPILE) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),,-mcpu=bf532-any) -D__BFIN_SDRAM
+	$(AM_V_CC)$(COMPILE) $(%C%_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),,-mcpu=bf532-any) -D__BFIN_SDRAM
 %D%/basiccrt561.$(OBJEXT): %D%/basiccrt.S
-	$(AM_V_CC)$(COMPILE) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf561-any,-mcpu=bf561-none)
+	$(AM_V_CC)$(COMPILE) $(%C%_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf561-any,-mcpu=bf561-none)
 %D%/basiccrt561s.$(OBJEXT): %D%/basiccrt.S
-	$(AM_V_CC)$(COMPILE) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf561-any,-mcpu=bf561-none) -D__BFIN_SDRAM
+	$(AM_V_CC)$(COMPILE) $(%C%_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf561-any,-mcpu=bf561-none) -D__BFIN_SDRAM
 %D%/basiccrt561b.$(OBJEXT): %D%/basiccrt.S
-	$(AM_V_CC)$(COMPILE) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf561-any,-mcpu=bf561-none) -D__ADSPBF561_COREB__
+	$(AM_V_CC)$(COMPILE) $(%C%_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf561-any,-mcpu=bf561-none) -D__ADSPBF561_COREB__
 %D%/basiccrt60x.$(OBJEXT): %D%/basiccrt.S
-	$(AM_V_CC)$(COMPILE) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf608-any,-mcpu=bf608-none)
+	$(AM_V_CC)$(COMPILE) $(%C%_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf608-any,-mcpu=bf608-none)
 %D%/basiccrt60xs.$(OBJEXT): %D%/basiccrt.S
-	$(AM_V_CC)$(COMPILE) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf608-any,-mcpu=bf608-none) -D__BFIN_SDRAM
+	$(AM_V_CC)$(COMPILE) $(%C%_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf608-any,-mcpu=bf608-none) -D__BFIN_SDRAM
 %D%/basiccrt60xc1.$(OBJEXT): %D%/basiccrt.S
-	$(AM_V_CC)$(COMPILE) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf608-any,-mcpu=bf608-none) -D__ADSPBF60x_CORE1__
+	$(AM_V_CC)$(COMPILE) $(%C%_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf608-any,-mcpu=bf608-none) -D__ADSPBF60x_CORE1__
