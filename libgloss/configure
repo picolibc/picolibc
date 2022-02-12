@@ -626,6 +626,8 @@ DEPDIR
 CC
 CONFIG_LIBNOSYS_FALSE
 CONFIG_LIBNOSYS_TRUE
+CONFIG_WINCE_FALSE
+CONFIG_WINCE_TRUE
 CONFIG_IQ2000_FALSE
 CONFIG_IQ2000_TRUE
 CONFIG_BFIN_FALSE
@@ -733,7 +735,6 @@ CCASFLAGS
 CPP'
 ac_subdirs_all='aarch64
 sparc
-wince
 mips
 arm'
 
@@ -2743,8 +2744,7 @@ subdirs="$subdirs aarch64"
 
 	;;
   sh*-*-pe | mips*-*-pe | *arm*-wince-pe)
-	subdirs="$subdirs wince"
-
+	config_wince=true
 	;;
   mips*-*-*)
 	subdirs="$subdirs mips"
@@ -2936,6 +2936,14 @@ fi
 else
   CONFIG_IQ2000_TRUE='#'
   CONFIG_IQ2000_FALSE=
+fi
+
+ if test x$config_wince = xtrue; then
+  CONFIG_WINCE_TRUE=
+  CONFIG_WINCE_FALSE='#'
+else
+  CONFIG_WINCE_TRUE='#'
+  CONFIG_WINCE_FALSE=
 fi
 
 
@@ -5313,6 +5321,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${CONFIG_IQ2000_TRUE}" && test -z "${CONFIG_IQ2000_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_IQ2000\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${CONFIG_WINCE_TRUE}" && test -z "${CONFIG_WINCE_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_WINCE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${CONFIG_LIBNOSYS_TRUE}" && test -z "${CONFIG_LIBNOSYS_FALSE}"; then

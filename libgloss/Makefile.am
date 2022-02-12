@@ -3,6 +3,7 @@
 ACLOCAL_AMFLAGS = -I . -I .. -I ../config
 
 # Variables that will accumulate in subdirs.
+bin_PROGRAMS =
 check_PROGRAMS =
 info_TEXINFOS =
 PHONY =
@@ -66,4 +67,7 @@ include iq2000/Makefile.inc
 endif
 if CONFIG_LIBNOSYS
 include libnosys/Makefile.inc
+endif
+if CONFIG_WINCE
+include wince/Makefile.inc
 endif

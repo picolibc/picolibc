@@ -15,7 +15,7 @@
 @SET_MAKE@
 
 
-VPATH = @srcdir@
+
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
     false; \
@@ -90,7 +90,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2)
+bin_PROGRAMS = $(am__EXEEXT_1)
+check_PROGRAMS = $(am__EXEEXT_2) $(am__EXEEXT_3)
 @HAVE_DOC_TRUE@am__append_1 = doc/porting.texi
 
 # Here is all of the simulator stuff.
@@ -137,6 +138,8 @@ check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2)
 @CONFIG_IQ2000_TRUE@am__append_12 = iq2000/test
 @CONFIG_LIBNOSYS_TRUE@am__append_13 = libnosys/nosys.specs
 @CONFIG_LIBNOSYS_TRUE@am__append_14 = libnosys/libnosys.a
+@CONFIG_WINCE_TRUE@am__append_15 = $(gdbdir)
+@CONFIG_WINCE_TRUE@am__append_16 = wince/stub.exe
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../config/depstand.m4 \
@@ -196,7 +199,7 @@ am__uninstall_files_from_dir = { \
     || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
-am__installdirs = "$(DESTDIR)$(multilibtooldir)" \
+am__installdirs = "$(DESTDIR)$(multilibtooldir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(infodir)" "$(DESTDIR)$(includesystooldir)" \
 	"$(DESTDIR)$(includetooldir)" "$(DESTDIR)$(multilibtooldir)"
 LIBRARIES = $(multilibtool_LIBRARIES) $(noinst_LIBRARIES)
@@ -275,14 +278,20 @@ libobjs_a_LIBADD =
 @CONFIG_IQ2000_TRUE@am__objects_2 = iq2000/crt0.$(OBJEXT)
 am_libobjs_a_OBJECTS = $(am__objects_1) $(am__objects_2)
 libobjs_a_OBJECTS = $(am_libobjs_a_OBJECTS)
-@CONFIG_BFIN_TRUE@am__EXEEXT_1 = bfin/sim-test$(EXEEXT)
-@CONFIG_IQ2000_TRUE@am__EXEEXT_2 = iq2000/test$(EXEEXT)
+@CONFIG_WINCE_TRUE@am__EXEEXT_1 = wince/stub.exe$(EXEEXT)
+@CONFIG_BFIN_TRUE@am__EXEEXT_2 = bfin/sim-test$(EXEEXT)
+@CONFIG_IQ2000_TRUE@am__EXEEXT_3 = iq2000/test$(EXEEXT)
+PROGRAMS = $(bin_PROGRAMS)
 bfin_sim_test_SOURCES = bfin/sim-test.c
 bfin_sim_test_OBJECTS = bfin/sim-test.$(OBJEXT)
 bfin_sim_test_LDADD = $(LDADD)
 iq2000_test_SOURCES = iq2000/test.c
 iq2000_test_OBJECTS = iq2000/test.$(OBJEXT)
 iq2000_test_LDADD = $(LDADD)
+@CONFIG_WINCE_TRUE@am_wince_stub_exe_OBJECTS =  \
+@CONFIG_WINCE_TRUE@	wince_stub_exe-wince-stub.$(OBJEXT)
+wince_stub_exe_OBJECTS = $(am_wince_stub_exe_OBJECTS)
+wince_stub_exe_DEPENDENCIES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -323,7 +332,8 @@ am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(bfin_libbfinbsp_a_SOURCES) $(bfin_libsim_a_SOURCES) \
 	$(iq2000_libeval_a_SOURCES) $(libnosys_libnosys_a_SOURCES) \
-	$(libobjs_a_SOURCES) bfin/sim-test.c iq2000/test.c
+	$(libobjs_a_SOURCES) bfin/sim-test.c iq2000/test.c \
+	$(wince_stub_exe_SOURCES)
 AM_V_DVIPS = $(am__v_DVIPS_@AM_V@)
 am__v_DVIPS_ = $(am__v_DVIPS_@AM_DEFAULT_V@)
 am__v_DVIPS_0 = @echo "  DVIPS   " $@;
@@ -408,6 +418,7 @@ ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
 DIST_SUBDIRS = $(SUBDIRS)
+VPATH = @srcdir@ $(am__append_15)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
@@ -621,6 +632,10 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 @CONFIG_LIBNOSYS_TRUE@	libnosys/write.c \
 @CONFIG_LIBNOSYS_TRUE@	libnosys/_exit.c
 
+@CONFIG_WINCE_TRUE@gdbdir = ${dir ${patsubst %/,%,${dir @srcdir@}}}gdb
+@CONFIG_WINCE_TRUE@wince_stub_exe_SOURCES = wince-stub.c
+@CONFIG_WINCE_TRUE@wince_stub_exe_CPPFLAGS = $(AM_CPPFLAGS) -I$(gdbdir)
+@CONFIG_WINCE_TRUE@wince_stub_exe_LDADD = -lwinsock $(WINCE_STUB_LIBS)
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -628,7 +643,7 @@ all: config.h
 .SUFFIXES: .S .c .dvi .o .obj .ps
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am $(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(am__configure_deps)
+$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am $(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/wince/Makefile.inc $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -650,7 +665,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe);; \
 	esac;
-$(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(am__empty):
+$(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/wince/Makefile.inc $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
@@ -936,6 +951,48 @@ libobjs.a: $(libobjs_a_OBJECTS) $(libobjs_a_DEPENDENCIES) $(EXTRA_libobjs_a_DEPE
 	$(AM_V_at)-rm -f libobjs.a
 	$(AM_V_AR)$(libobjs_a_AR) libobjs.a $(libobjs_a_OBJECTS) $(libobjs_a_LIBADD)
 	$(AM_V_at)$(RANLIB) libobjs.a
+install-binPROGRAMS: $(bin_PROGRAMS)
+	@$(NORMAL_INSTALL)
+	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(bindir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(bindir)" || exit 1; \
+	fi; \
+	for p in $$list; do echo "$$p $$p"; done | \
+	sed 's/$(EXEEXT)$$//' | \
+	while read p p1; do if test -f $$p \
+	  ; then echo "$$p"; echo "$$p"; else :; fi; \
+	done | \
+	sed -e 'p;s,.*/,,;n;h' \
+	    -e 's|.*|.|' \
+	    -e 'p;x;s,.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/' | \
+	sed 'N;N;N;s,\n, ,g' | \
+	$(AWK) 'BEGIN { files["."] = ""; dirs["."] = 1 } \
+	  { d=$$3; if (dirs[d] != 1) { print "d", d; dirs[d] = 1 } \
+	    if ($$2 == $$4) files[d] = files[d] " " $$1; \
+	    else { print "f", $$3 "/" $$4, $$1; } } \
+	  END { for (d in files) print "f", d, files[d] }' | \
+	while read type dir files; do \
+	    if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
+	    test -z "$$files" || { \
+	      echo " $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$files '$(DESTDIR)$(bindir)$$dir'"; \
+	      $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$files "$(DESTDIR)$(bindir)$$dir" || exit $$?; \
+	    } \
+	; done
+
+uninstall-binPROGRAMS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
+	files=`for p in $$list; do echo "$$p"; done | \
+	  sed -e 'h;s,^.*/,,;s/$(EXEEXT)$$//;$(transform)' \
+	      -e 's/$$/$(EXEEXT)/' \
+	`; \
+	test -n "$$list" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(bindir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(bindir)" && rm -f $$files
+
+clean-binPROGRAMS:
+	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
 
 clean-checkPROGRAMS:
 	-test -z "$(check_PROGRAMS)" || rm -f $(check_PROGRAMS)
@@ -951,6 +1008,13 @@ iq2000/test.$(OBJEXT): iq2000/$(am__dirstamp) \
 iq2000/test$(EXEEXT): $(iq2000_test_OBJECTS) $(iq2000_test_DEPENDENCIES) $(EXTRA_iq2000_test_DEPENDENCIES) iq2000/$(am__dirstamp)
 	@rm -f iq2000/test$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(iq2000_test_OBJECTS) $(iq2000_test_LDADD) $(LIBS)
+wince/$(am__dirstamp):
+	@$(MKDIR_P) wince
+	@: > wince/$(am__dirstamp)
+
+wince/stub.exe$(EXEEXT): $(wince_stub_exe_OBJECTS) $(wince_stub_exe_DEPENDENCIES) $(EXTRA_wince_stub_exe_DEPENDENCIES) wince/$(am__dirstamp)
+	@rm -f wince/stub.exe$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(wince_stub_exe_OBJECTS) $(wince_stub_exe_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -961,6 +1025,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wince_stub_exe-wince-stub.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@bfin/$(DEPDIR)/basiccrt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@bfin/$(DEPDIR)/bfin_libbfinbsp_a-_exit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@bfin/$(DEPDIR)/bfin_libbfinbsp_a-clear_cache_range.Po@am__quote@
@@ -1102,6 +1167,20 @@ bfin/bfin_libsim_a-syscalls.obj: bfin/syscalls.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='bfin/syscalls.c' object='bfin/bfin_libsim_a-syscalls.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bfin_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bfin/bfin_libsim_a-syscalls.obj `if test -f 'bfin/syscalls.c'; then $(CYGPATH_W) 'bfin/syscalls.c'; else $(CYGPATH_W) '$(srcdir)/bfin/syscalls.c'; fi`
+
+wince_stub_exe-wince-stub.o: wince-stub.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(wince_stub_exe_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT wince_stub_exe-wince-stub.o -MD -MP -MF $(DEPDIR)/wince_stub_exe-wince-stub.Tpo -c -o wince_stub_exe-wince-stub.o `test -f 'wince-stub.c' || echo '$(srcdir)/'`wince-stub.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wince_stub_exe-wince-stub.Tpo $(DEPDIR)/wince_stub_exe-wince-stub.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='wince-stub.c' object='wince_stub_exe-wince-stub.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(wince_stub_exe_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o wince_stub_exe-wince-stub.o `test -f 'wince-stub.c' || echo '$(srcdir)/'`wince-stub.c
+
+wince_stub_exe-wince-stub.obj: wince-stub.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(wince_stub_exe_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT wince_stub_exe-wince-stub.obj -MD -MP -MF $(DEPDIR)/wince_stub_exe-wince-stub.Tpo -c -o wince_stub_exe-wince-stub.obj `if test -f 'wince-stub.c'; then $(CYGPATH_W) 'wince-stub.c'; else $(CYGPATH_W) '$(srcdir)/wince-stub.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wince_stub_exe-wince-stub.Tpo $(DEPDIR)/wince_stub_exe-wince-stub.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='wince-stub.c' object='wince_stub_exe-wince-stub.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(wince_stub_exe_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o wince_stub_exe-wince-stub.obj `if test -f 'wince-stub.c'; then $(CYGPATH_W) 'wince-stub.c'; else $(CYGPATH_W) '$(srcdir)/wince-stub.c'; fi`
 doc/$(am__dirstamp):
 	@$(MKDIR_P) doc
 	@: > doc/$(am__dirstamp)
@@ -1414,10 +1493,11 @@ distclean-tags:
 check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
 check: check-recursive
-all-am: Makefile $(INFO_DEPS) $(LIBRARIES) $(DATA) config.h all-local
+all-am: Makefile $(INFO_DEPS) $(LIBRARIES) $(PROGRAMS) $(DATA) \
+		config.h all-local
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(multilibtooldir)" "$(DESTDIR)$(infodir)" "$(DESTDIR)$(includesystooldir)" "$(DESTDIR)$(includetooldir)" "$(DESTDIR)$(multilibtooldir)"; do \
+	for dir in "$(DESTDIR)$(multilibtooldir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(infodir)" "$(DESTDIR)$(includesystooldir)" "$(DESTDIR)$(includetooldir)" "$(DESTDIR)$(multilibtooldir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -1453,19 +1533,20 @@ distclean-generic:
 	-rm -f iq2000/$(am__dirstamp)
 	-rm -f libnosys/$(DEPDIR)/$(am__dirstamp)
 	-rm -f libnosys/$(am__dirstamp)
+	-rm -f wince/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-aminfo clean-checkPROGRAMS clean-generic clean-local \
-	clean-multilibtoolLIBRARIES clean-noinstLIBRARIES \
-	mostlyclean-am
+clean-am: clean-aminfo clean-binPROGRAMS clean-checkPROGRAMS \
+	clean-generic clean-local clean-multilibtoolLIBRARIES \
+	clean-noinstLIBRARIES mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf bfin/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) bfin/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-local distclean-tags
@@ -1503,7 +1584,7 @@ install-dvi-am: $(DVIS)
 	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(dvidir)'"; \
 	  $(INSTALL_DATA) $$files "$(DESTDIR)$(dvidir)" || exit $$?; \
 	done
-install-exec-am: install-exec-local
+install-exec-am: install-binPROGRAMS install-exec-local
 
 install-html: install-html-recursive
 
@@ -1606,7 +1687,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf bfin/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) bfin/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-aminfo \
 	maintainer-clean-generic maintainer-clean-local
@@ -1624,7 +1705,7 @@ ps: ps-recursive
 
 ps-am: $(PSS)
 
-uninstall-am: uninstall-dvi-am uninstall-html-am \
+uninstall-am: uninstall-binPROGRAMS uninstall-dvi-am uninstall-html-am \
 	uninstall-includesystoolDATA uninstall-includetoolDATA \
 	uninstall-info-am uninstall-multilibtoolDATA \
 	uninstall-multilibtoolLIBRARIES uninstall-pdf-am \
@@ -1634,24 +1715,25 @@ uninstall-am: uninstall-dvi-am uninstall-html-am \
 
 .PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am all-local \
 	am--refresh check check-am clean clean-aminfo \
-	clean-checkPROGRAMS clean-cscope clean-generic clean-local \
-	clean-multilibtoolLIBRARIES clean-noinstLIBRARIES cscope \
-	cscopelist-am ctags ctags-am dist-info distclean \
-	distclean-compile distclean-generic distclean-hdr \
-	distclean-local distclean-tags dvi dvi-am html html-am info \
-	info-am install install-am install-data install-data-am \
-	install-dvi install-dvi-am install-exec install-exec-am \
-	install-exec-local install-html install-html-am \
-	install-includesystoolDATA install-includetoolDATA \
-	install-info install-info-am install-man \
-	install-multilibtoolDATA install-multilibtoolLIBRARIES \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am maintainer-clean maintainer-clean-aminfo \
-	maintainer-clean-generic maintainer-clean-local mostlyclean \
-	mostlyclean-aminfo mostlyclean-compile mostlyclean-generic \
-	mostlyclean-local pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am uninstall-dvi-am uninstall-html-am \
+	clean-binPROGRAMS clean-checkPROGRAMS clean-cscope \
+	clean-generic clean-local clean-multilibtoolLIBRARIES \
+	clean-noinstLIBRARIES cscope cscopelist-am ctags ctags-am \
+	dist-info distclean distclean-compile distclean-generic \
+	distclean-hdr distclean-local distclean-tags dvi dvi-am html \
+	html-am info info-am install install-am install-binPROGRAMS \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-exec-local install-html \
+	install-html-am install-includesystoolDATA \
+	install-includetoolDATA install-info install-info-am \
+	install-man install-multilibtoolDATA \
+	install-multilibtoolLIBRARIES install-pdf install-pdf-am \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs installdirs-am maintainer-clean \
+	maintainer-clean-aminfo maintainer-clean-generic \
+	maintainer-clean-local mostlyclean mostlyclean-aminfo \
+	mostlyclean-compile mostlyclean-generic mostlyclean-local pdf \
+	pdf-am ps ps-am tags tags-am uninstall uninstall-am \
+	uninstall-binPROGRAMS uninstall-dvi-am uninstall-html-am \
 	uninstall-includesystoolDATA uninstall-includetoolDATA \
 	uninstall-info-am uninstall-multilibtoolDATA \
 	uninstall-multilibtoolLIBRARIES uninstall-pdf-am \

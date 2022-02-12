@@ -87,7 +87,7 @@ case "${target}" in
 	AC_CONFIG_SUBDIRS([sparc])
 	;;
   sh*-*-pe | mips*-*-pe | *arm*-wince-pe)
-	AC_CONFIG_SUBDIRS([wince])
+	config_wince=true
 	;;
   mips*-*-*)
 	AC_CONFIG_SUBDIRS([mips])
@@ -235,6 +235,7 @@ esac
 
 AM_CONDITIONAL(CONFIG_BFIN, test x$config_bfin = xtrue)
 AM_CONDITIONAL(CONFIG_IQ2000, test x$config_iq2000 = xtrue)
+AM_CONDITIONAL(CONFIG_WINCE, test x$config_wince = xtrue)
 
 dnl For now, don't bother configuring testsuite
 dnl
