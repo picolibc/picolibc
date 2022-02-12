@@ -26,7 +26,7 @@ esac
 
 AC_SUBST(objtype)
 
-host_makefile_frag=${srcdir}/../config/default.mh
+host_makefile_frag=`cd $srcdir/../config;pwd`/default.mh
 
 dnl We have to assign the same value to other variables because autoconf
 dnl doesn't provide a mechanism to substitute a replacement keyword with
@@ -39,7 +39,9 @@ AC_SUBST_FILE(host_makefile_frag)
 # Configure cpu init plug-ins
 if test -d "${srcdir}/cpu-init"; then
   subdirs="${subdirs} cpu-init"
-  AC_CONFIG_SUBDIRS(cpu-init)
+  AC_CONFIG_FILES([cpu-init/Makefile], [dnl
+    ac_file=cpu-init/Makefile . ${srcdir}/../../config-ml.in
+  ])
   AC_SUBST(subdirs)
 fi
 
