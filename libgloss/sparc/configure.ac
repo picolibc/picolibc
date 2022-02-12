@@ -39,11 +39,11 @@ AC_SUBST(CPU)
 
 case ${target_cpu} in
 sparc64*) CYGMONLDSCRIPTTEMPL=${srcdir}/cygmon-sparc64-ld.src ;;
-sparclet-*-aout*) CYGMONLDSCRIPTTEMPL-${srcdir}/cygmon.ld.src; AC_CONFIG_SUBDIRS(libsys) ;;
+sparclet-*-aout*) CYGMONLDSCRIPTTEMPL-${srcdir}/cygmon.ld.src; AC_CONFIG_FILES([libsys/Makefile]) ;;
 *) CYGMONLDSCRIPTTEMPL=${srcdir}/cygmon.ld.src
 esac
 
-host_makefile_frag=${srcdir}/../config/default.mh
+host_makefile_frag=`cd $srcdir/../config;pwd`/default.mh
 target_makefile_frag=${srcdir}/../config/default.mt
 
 dnl We have to assign the same value to other variables because autoconf
