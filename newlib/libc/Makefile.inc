@@ -34,20 +34,31 @@ man: %C%_man
 	$(INSTALL_DATA) %D%/*.3 $(DESTDIR)$(mandir)/man3/
 install-man: %C%_install-man
 
-include %D%/ctype/Makefile.inc
-include %D%/iconv/Makefile.inc
-include %D%/locale/Makefile.inc
-include %D%/misc/Makefile.inc
-include %D%/posix/Makefile.inc
-include %D%/reent/Makefile.inc
-include %D%/search/Makefile.inc
-include %D%/signal/Makefile.inc
-include %D%/ssp/Makefile.inc
-include %D%/stdio64/Makefile.inc
-include %D%/stdio/Makefile.inc
+## The order of includes is important for two reasons:
+## * The integrated documentation (chapter ordering).
+## * Object overridding -- machine dir must come last.
+## Do not change the order without considering the doc impact.
+include %D%/argz/Makefile.inc
 include %D%/stdlib/Makefile.inc
+include %D%/ctype/Makefile.inc
+include %D%/search/Makefile.inc
+include %D%/stdio/Makefile.inc
+include %D%/stdio64/Makefile.inc
 include %D%/string/Makefile.inc
+include %D%/signal/Makefile.inc
 include %D%/time/Makefile.inc
+include %D%/locale/Makefile.inc
+include %D%/reent/Makefile.inc
+include %D%/errno/Makefile.inc
+include %D%/misc/Makefile.inc
+include %D%/unix/Makefile.inc
+include %D%/posix/Makefile.inc
+include %D%/syscalls/Makefile.inc
+include %D%/iconv/Makefile.inc
+include %D%/xdr/Makefile.inc
+include %D%/ssp/Makefile.inc
+include %D%/sys/Makefile.inc
+include %D%/machine/Makefile.inc
 
 CLEANFILES += \
 	%D%/targetdep.tex \

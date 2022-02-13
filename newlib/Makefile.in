@@ -553,85 +553,8 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 # been flattening chapters into the main library dir (e.g. libc/) to avoid that.
 @HAVE_DOC_TRUE@TEXI2DOCBOOK = $(top_srcdir)/doc/chapter-texi2docbook.py
 libc_libc_TEXINFOS = libc/targetdep.tex $(LIBC_CHEWOUT_FILES)
-LIBC_CHEWOUT_FILES = libc/ctype/isalnum.def libc/ctype/isalpha.def \
-	libc/ctype/isascii.def libc/ctype/isblank.def \
-	libc/ctype/iscntrl.def libc/ctype/isdigit.def \
-	libc/ctype/islower.def libc/ctype/isprint.def \
-	libc/ctype/ispunct.def libc/ctype/isspace.def \
-	libc/ctype/isupper.def libc/ctype/iswalnum.def \
-	libc/ctype/iswalpha.def libc/ctype/iswblank.def \
-	libc/ctype/iswcntrl.def libc/ctype/iswctype.def \
-	libc/ctype/iswdigit.def libc/ctype/iswgraph.def \
-	libc/ctype/iswlower.def libc/ctype/iswprint.def \
-	libc/ctype/iswpunct.def libc/ctype/iswspace.def \
-	libc/ctype/iswupper.def libc/ctype/iswxdigit.def \
-	libc/ctype/isxdigit.def libc/ctype/toascii.def \
-	libc/ctype/tolower.def libc/ctype/toupper.def \
-	libc/ctype/towctrans.def libc/ctype/towlower.def \
-	libc/ctype/towupper.def libc/ctype/wctrans.def \
-	libc/ctype/wctype.def libc/iconv/lib/iconv.def \
-	libc/locale/duplocale.def libc/locale/freelocale.def \
-	libc/locale/locale.def libc/locale/newlocale.def \
-	libc/locale/uselocale.def libc/misc/ffs.def libc/misc/lock.def \
-	libc/misc/unctrl.def libc/posix/popen.def \
-	libc/posix/posix_spawn.def libc/reent/closer.def \
-	libc/reent/reent.def libc/reent/execr.def \
-	libc/reent/fcntlr.def libc/reent/fstatr.def \
-	libc/reent/gettimeofdayr.def libc/reent/linkr.def \
-	libc/reent/lseekr.def libc/reent/mkdirr.def \
-	libc/reent/openr.def libc/reent/readr.def \
-	libc/reent/renamer.def libc/reent/signalr.def \
-	libc/reent/sbrkr.def libc/reent/statr.def \
-	libc/reent/timesr.def libc/reent/unlinkr.def \
-	libc/reent/fstat64r.def libc/reent/lseek64r.def \
-	libc/reent/stat64r.def libc/reent/open64r.def \
-	libc/reent/writer.def libc/search/bsearch.def \
-	libc/search/qsort.def libc/search/qsort_r.def \
-	libc/signal/psignal.def libc/signal/raise.def \
-	libc/signal/signal.def libc/signal/sig2str.def \
-	libc/stdio64/fdopen64.def libc/stdio64/fgetpos64.def \
-	libc/stdio64/fopen64.def libc/stdio64/freopen64.def \
-	libc/stdio64/fseeko64.def libc/stdio64/fsetpos64.def \
-	libc/stdio64/ftello64.def libc/stdio64/tmpfile64.def \
-	libc/stdio/clearerr.def libc/stdio/diprintf.def \
-	libc/stdio/dprintf.def libc/stdio/fcloseall.def \
-	libc/stdio/fclose.def libc/stdio/fdopen.def \
-	libc/stdio/feof.def libc/stdio/ferror.def \
-	libc/stdio/fflush.def libc/stdio/fgetc.def \
-	libc/stdio/fgetpos.def libc/stdio/fgets.def \
-	libc/stdio/fgetwc.def libc/stdio/fgetws.def \
-	libc/stdio/fileno.def libc/stdio/fmemopen.def \
-	libc/stdio/fopen.def libc/stdio/fopencookie.def \
-	libc/stdio/fpurge.def libc/stdio/fputc.def \
-	libc/stdio/fputs.def libc/stdio/fputwc.def \
-	libc/stdio/fputws.def libc/stdio/fread.def \
-	libc/stdio/freopen.def libc/stdio/fseek.def \
-	libc/stdio/fsetlocking.def libc/stdio/fsetpos.def \
-	libc/stdio/ftell.def libc/stdio/funopen.def \
-	libc/stdio/fwide.def libc/stdio/fwrite.def libc/stdio/getc.def \
-	libc/stdio/getc_u.def libc/stdio/getchar.def \
-	libc/stdio/getchar_u.def libc/stdio/getdelim.def \
-	libc/stdio/getline.def libc/stdio/gets.def libc/stdio/getw.def \
-	libc/stdio/getwchar.def libc/stdio/mktemp.def \
-	libc/stdio/nano-vfprintf.def libc/stdio/nano-vfscanf.def \
-	libc/stdio/open_memstream.def libc/stdio/perror.def \
-	libc/stdio/putc.def libc/stdio/putc_u.def \
-	libc/stdio/putchar.def libc/stdio/putchar_u.def \
-	libc/stdio/puts.def libc/stdio/putw.def \
-	libc/stdio/putwchar.def libc/stdio/remove.def \
-	libc/stdio/rename.def libc/stdio/rewind.def \
-	libc/stdio/setbuf.def libc/stdio/setbuffer.def \
-	libc/stdio/setlinebuf.def libc/stdio/setvbuf.def \
-	libc/stdio/siprintf.def libc/stdio/siscanf.def \
-	libc/stdio/sprintf.def libc/stdio/sscanf.def \
-	libc/stdio/stdio_ext.def libc/stdio/swprintf.def \
-	libc/stdio/swscanf.def libc/stdio/tmpfile.def \
-	libc/stdio/tmpnam.def libc/stdio/ungetc.def \
-	libc/stdio/ungetwc.def libc/stdio/vfprintf.def \
-	libc/stdio/vfscanf.def libc/stdio/vfwprintf.def \
-	libc/stdio/vfwscanf.def libc/stdio/viprintf.def \
-	libc/stdio/viscanf.def libc/stdlib/_Exit.def \
-	libc/stdlib/a64l.def libc/stdlib/abort.def libc/stdlib/abs.def \
+LIBC_CHEWOUT_FILES = libc/stdlib/_Exit.def libc/stdlib/a64l.def \
+	libc/stdlib/abort.def libc/stdlib/abs.def \
 	libc/stdlib/assert.def libc/stdlib/atexit.def \
 	libc/stdlib/atof.def libc/stdlib/atoi.def \
 	libc/stdlib/atoll.def libc/stdlib/calloc.def \
@@ -653,7 +576,67 @@ LIBC_CHEWOUT_FILES = libc/ctype/isalnum.def libc/ctype/isalpha.def \
 	libc/stdlib/wcstol.def libc/stdlib/wcstoll.def \
 	libc/stdlib/wcstoul.def libc/stdlib/wcstoull.def \
 	libc/stdlib/system.def libc/stdlib/wcstombs.def \
-	libc/stdlib/wctomb.def libc/string/bcmp.def \
+	libc/stdlib/wctomb.def libc/ctype/isalnum.def \
+	libc/ctype/isalpha.def libc/ctype/isascii.def \
+	libc/ctype/isblank.def libc/ctype/iscntrl.def \
+	libc/ctype/isdigit.def libc/ctype/islower.def \
+	libc/ctype/isprint.def libc/ctype/ispunct.def \
+	libc/ctype/isspace.def libc/ctype/isupper.def \
+	libc/ctype/iswalnum.def libc/ctype/iswalpha.def \
+	libc/ctype/iswblank.def libc/ctype/iswcntrl.def \
+	libc/ctype/iswctype.def libc/ctype/iswdigit.def \
+	libc/ctype/iswgraph.def libc/ctype/iswlower.def \
+	libc/ctype/iswprint.def libc/ctype/iswpunct.def \
+	libc/ctype/iswspace.def libc/ctype/iswupper.def \
+	libc/ctype/iswxdigit.def libc/ctype/isxdigit.def \
+	libc/ctype/toascii.def libc/ctype/tolower.def \
+	libc/ctype/toupper.def libc/ctype/towctrans.def \
+	libc/ctype/towlower.def libc/ctype/towupper.def \
+	libc/ctype/wctrans.def libc/ctype/wctype.def \
+	libc/search/bsearch.def libc/search/qsort.def \
+	libc/search/qsort_r.def libc/stdio/clearerr.def \
+	libc/stdio/diprintf.def libc/stdio/dprintf.def \
+	libc/stdio/fcloseall.def libc/stdio/fclose.def \
+	libc/stdio/fdopen.def libc/stdio/feof.def \
+	libc/stdio/ferror.def libc/stdio/fflush.def \
+	libc/stdio/fgetc.def libc/stdio/fgetpos.def \
+	libc/stdio/fgets.def libc/stdio/fgetwc.def \
+	libc/stdio/fgetws.def libc/stdio/fileno.def \
+	libc/stdio/fmemopen.def libc/stdio/fopen.def \
+	libc/stdio/fopencookie.def libc/stdio/fpurge.def \
+	libc/stdio/fputc.def libc/stdio/fputs.def \
+	libc/stdio/fputwc.def libc/stdio/fputws.def \
+	libc/stdio/fread.def libc/stdio/freopen.def \
+	libc/stdio/fseek.def libc/stdio/fsetlocking.def \
+	libc/stdio/fsetpos.def libc/stdio/ftell.def \
+	libc/stdio/funopen.def libc/stdio/fwide.def \
+	libc/stdio/fwrite.def libc/stdio/getc.def \
+	libc/stdio/getc_u.def libc/stdio/getchar.def \
+	libc/stdio/getchar_u.def libc/stdio/getdelim.def \
+	libc/stdio/getline.def libc/stdio/gets.def libc/stdio/getw.def \
+	libc/stdio/getwchar.def libc/stdio/mktemp.def \
+	libc/stdio/nano-vfprintf.def libc/stdio/nano-vfscanf.def \
+	libc/stdio/open_memstream.def libc/stdio/perror.def \
+	libc/stdio/putc.def libc/stdio/putc_u.def \
+	libc/stdio/putchar.def libc/stdio/putchar_u.def \
+	libc/stdio/puts.def libc/stdio/putw.def \
+	libc/stdio/putwchar.def libc/stdio/remove.def \
+	libc/stdio/rename.def libc/stdio/rewind.def \
+	libc/stdio/setbuf.def libc/stdio/setbuffer.def \
+	libc/stdio/setlinebuf.def libc/stdio/setvbuf.def \
+	libc/stdio/siprintf.def libc/stdio/siscanf.def \
+	libc/stdio/sprintf.def libc/stdio/sscanf.def \
+	libc/stdio/stdio_ext.def libc/stdio/swprintf.def \
+	libc/stdio/swscanf.def libc/stdio/tmpfile.def \
+	libc/stdio/tmpnam.def libc/stdio/ungetc.def \
+	libc/stdio/ungetwc.def libc/stdio/vfprintf.def \
+	libc/stdio/vfscanf.def libc/stdio/vfwprintf.def \
+	libc/stdio/vfwscanf.def libc/stdio/viprintf.def \
+	libc/stdio/viscanf.def libc/stdio64/fdopen64.def \
+	libc/stdio64/fgetpos64.def libc/stdio64/fopen64.def \
+	libc/stdio64/freopen64.def libc/stdio64/fseeko64.def \
+	libc/stdio64/fsetpos64.def libc/stdio64/ftello64.def \
+	libc/stdio64/tmpfile64.def libc/string/bcmp.def \
 	libc/string/memcpy.def libc/string/strcmp.def \
 	libc/string/strncat.def libc/string/strstr.def \
 	libc/string/bcopy.def libc/string/memmove.def \
@@ -696,18 +679,36 @@ LIBC_CHEWOUT_FILES = libc/ctype/isalnum.def libc/ctype/isalpha.def \
 	libc/string/wcscasecmp_l.def libc/string/wcscoll_l.def \
 	libc/string/wcsncasecmp_l.def libc/string/wcsxfrm_l.def \
 	libc/string/strverscmp.def libc/string/strnstr.def \
-	libc/string/wmempcpy.def libc/time/asctime.def \
+	libc/string/wmempcpy.def libc/signal/psignal.def \
+	libc/signal/raise.def libc/signal/signal.def \
+	libc/signal/sig2str.def libc/time/asctime.def \
 	libc/time/clock.def libc/time/ctime.def libc/time/difftime.def \
 	libc/time/gmtime.def libc/time/lcltime.def \
 	libc/time/mktime.def libc/time/strftime.def libc/time/time.def \
 	libc/time/tzlock.def libc/time/tzset.def \
-	libc/time/wcsftime.def
-LIBC_CHAPTERS = libc/sys.tex libc/ctype/ctype.tex libc/iconv/iconv.tex \
-	libc/locale/locale.tex libc/misc/misc.tex libc/posix/posix.tex \
-	libc/reent/reent.tex libc/signal/signal.tex libc/ssp/ssp.tex \
-	libc/stdio64/stdio64.tex libc/stdio/stdio.tex \
-	libc/stdlib/stdlib.tex libc/string/strings.tex \
-	libc/string/wcstrings.tex libc/time/time.tex
+	libc/time/wcsftime.def libc/locale/duplocale.def \
+	libc/locale/freelocale.def libc/locale/locale.def \
+	libc/locale/newlocale.def libc/locale/uselocale.def \
+	libc/reent/closer.def libc/reent/reent.def \
+	libc/reent/execr.def libc/reent/fcntlr.def \
+	libc/reent/fstatr.def libc/reent/gettimeofdayr.def \
+	libc/reent/linkr.def libc/reent/lseekr.def \
+	libc/reent/mkdirr.def libc/reent/openr.def \
+	libc/reent/readr.def libc/reent/renamer.def \
+	libc/reent/signalr.def libc/reent/sbrkr.def \
+	libc/reent/statr.def libc/reent/timesr.def \
+	libc/reent/unlinkr.def libc/reent/fstat64r.def \
+	libc/reent/lseek64r.def libc/reent/stat64r.def \
+	libc/reent/open64r.def libc/reent/writer.def libc/misc/ffs.def \
+	libc/misc/lock.def libc/misc/unctrl.def libc/posix/popen.def \
+	libc/posix/posix_spawn.def libc/iconv/lib/iconv.def
+LIBC_CHAPTERS = libc/sys.tex libc/stdlib/stdlib.tex \
+	libc/ctype/ctype.tex libc/stdio/stdio.tex \
+	libc/stdio64/stdio64.tex libc/string/strings.tex \
+	libc/string/wcstrings.tex libc/signal/signal.tex \
+	libc/time/time.tex libc/locale/locale.tex libc/reent/reent.tex \
+	libc/misc/misc.tex libc/posix/posix.tex libc/iconv/iconv.tex \
+	libc/ssp/ssp.tex
 LIBC_DOCBOOK_OUT_FILES = $(LIBC_CHEWOUT_FILES:.def=.xml)
 libm_libm_TEXINFOS = libm/targetdep.tex $(LIBM_CHEWOUT_FILES)
 LIBM_CHEWOUT_FILES = libm/common/s_cbrt.def libm/common/s_copysign.def \
@@ -752,7 +753,7 @@ all: newlib.h _newlib_version.h
 .SUFFIXES: .def .xml .c .dvi .o .obj .ps
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/libc/Makefile.inc $(srcdir)/libc/ctype/Makefile.inc $(srcdir)/libc/iconv/Makefile.inc $(srcdir)/libc/iconv/lib/Makefile.inc $(srcdir)/libc/locale/Makefile.inc $(srcdir)/libc/misc/Makefile.inc $(srcdir)/libc/posix/Makefile.inc $(srcdir)/libc/reent/Makefile.inc $(srcdir)/libc/search/Makefile.inc $(srcdir)/libc/signal/Makefile.inc $(srcdir)/libc/ssp/Makefile.inc $(srcdir)/libc/stdio64/Makefile.inc $(srcdir)/libc/stdio/Makefile.inc $(srcdir)/libc/stdlib/Makefile.inc $(srcdir)/libc/string/Makefile.inc $(srcdir)/libc/time/Makefile.inc $(srcdir)/libm/Makefile.inc $(srcdir)/libm/common/Makefile.inc $(srcdir)/libm/complex/Makefile.inc $(srcdir)/libm/fenv/Makefile.inc $(srcdir)/libm/mathfp/Makefile.inc $(srcdir)/libm/math/Makefile.inc $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/libc/Makefile.inc $(srcdir)/libc/argz/Makefile.inc $(srcdir)/libc/stdlib/Makefile.inc $(srcdir)/libc/ctype/Makefile.inc $(srcdir)/libc/search/Makefile.inc $(srcdir)/libc/stdio/Makefile.inc $(srcdir)/libc/stdio64/Makefile.inc $(srcdir)/libc/string/Makefile.inc $(srcdir)/libc/signal/Makefile.inc $(srcdir)/libc/time/Makefile.inc $(srcdir)/libc/locale/Makefile.inc $(srcdir)/libc/reent/Makefile.inc $(srcdir)/libc/errno/Makefile.inc $(srcdir)/libc/misc/Makefile.inc $(srcdir)/libc/unix/Makefile.inc $(srcdir)/libc/posix/Makefile.inc $(srcdir)/libc/syscalls/Makefile.inc $(srcdir)/libc/iconv/Makefile.inc $(srcdir)/libc/iconv/lib/Makefile.inc $(srcdir)/libc/xdr/Makefile.inc $(srcdir)/libc/ssp/Makefile.inc $(srcdir)/libc/sys/Makefile.inc $(srcdir)/libc/machine/Makefile.inc $(srcdir)/libm/Makefile.inc $(srcdir)/libm/common/Makefile.inc $(srcdir)/libm/complex/Makefile.inc $(srcdir)/libm/fenv/Makefile.inc $(srcdir)/libm/mathfp/Makefile.inc $(srcdir)/libm/math/Makefile.inc $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -774,7 +775,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe);; \
 	esac;
-$(srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/libc/Makefile.inc $(srcdir)/libc/ctype/Makefile.inc $(srcdir)/libc/iconv/Makefile.inc $(srcdir)/libc/iconv/lib/Makefile.inc $(srcdir)/libc/locale/Makefile.inc $(srcdir)/libc/misc/Makefile.inc $(srcdir)/libc/posix/Makefile.inc $(srcdir)/libc/reent/Makefile.inc $(srcdir)/libc/search/Makefile.inc $(srcdir)/libc/signal/Makefile.inc $(srcdir)/libc/ssp/Makefile.inc $(srcdir)/libc/stdio64/Makefile.inc $(srcdir)/libc/stdio/Makefile.inc $(srcdir)/libc/stdlib/Makefile.inc $(srcdir)/libc/string/Makefile.inc $(srcdir)/libc/time/Makefile.inc $(srcdir)/libm/Makefile.inc $(srcdir)/libm/common/Makefile.inc $(srcdir)/libm/complex/Makefile.inc $(srcdir)/libm/fenv/Makefile.inc $(srcdir)/libm/mathfp/Makefile.inc $(srcdir)/libm/math/Makefile.inc $(am__empty):
+$(srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/libc/Makefile.inc $(srcdir)/libc/argz/Makefile.inc $(srcdir)/libc/stdlib/Makefile.inc $(srcdir)/libc/ctype/Makefile.inc $(srcdir)/libc/search/Makefile.inc $(srcdir)/libc/stdio/Makefile.inc $(srcdir)/libc/stdio64/Makefile.inc $(srcdir)/libc/string/Makefile.inc $(srcdir)/libc/signal/Makefile.inc $(srcdir)/libc/time/Makefile.inc $(srcdir)/libc/locale/Makefile.inc $(srcdir)/libc/reent/Makefile.inc $(srcdir)/libc/errno/Makefile.inc $(srcdir)/libc/misc/Makefile.inc $(srcdir)/libc/unix/Makefile.inc $(srcdir)/libc/posix/Makefile.inc $(srcdir)/libc/syscalls/Makefile.inc $(srcdir)/libc/iconv/Makefile.inc $(srcdir)/libc/iconv/lib/Makefile.inc $(srcdir)/libc/xdr/Makefile.inc $(srcdir)/libc/ssp/Makefile.inc $(srcdir)/libc/sys/Makefile.inc $(srcdir)/libc/machine/Makefile.inc $(srcdir)/libm/Makefile.inc $(srcdir)/libm/common/Makefile.inc $(srcdir)/libm/complex/Makefile.inc $(srcdir)/libm/fenv/Makefile.inc $(srcdir)/libm/mathfp/Makefile.inc $(srcdir)/libm/math/Makefile.inc $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck

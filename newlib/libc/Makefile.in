@@ -90,6 +90,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @HAVE_SYS_DIR_TRUE@am__append_1 = $(SYS_DIR)
+# NB: Machine dir must come last so it can override common objects when creating
+# libc.a below.
 @HAVE_LIBC_MACHINE_DIR_TRUE@am__append_2 = $(LIBC_MACHINE_DIR)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -323,9 +325,6 @@ top_srcdir = @top_srcdir@
 @ENABLE_NEWLIB_ICONV_FALSE@NEWLIB_ICONV_LIBS = 
 @ENABLE_NEWLIB_ICONV_TRUE@NEWLIB_ICONV_LIBS = iconv/ces/lib.a iconv/ccs/lib.a iconv/lib/lib.a
 @HAVE_XDR_DIR_TRUE@XDR_SUBDIR = xdr
-
-# The order of SUBDIRS is important for the integrated documentation.
-# Do not change the order without considering the doc impact.
 # NB: This must come last to avoid parallel build issues with current lib.a
 # accumulation logic.
 SUBDIRS = argz stdlib ctype search $(STDIO_SUBDIR) $(STDIO64_SUBDIR) \

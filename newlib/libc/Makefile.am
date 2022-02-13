@@ -36,14 +36,14 @@ if HAVE_XDR_DIR
 XDR_SUBDIR = xdr
 endif
 
-# The order of SUBDIRS is important for the integrated documentation.
-# Do not change the order without considering the doc impact.
 SUBDIRS = argz stdlib ctype search $(STDIO_SUBDIR) $(STDIO64_SUBDIR) string $(SIGNAL_SUBDIR) time locale reent \
 	errno misc $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) $(NEWLIB_ICONV_DIRS) \
 	$(XDR_SUBDIR) ssp
 if HAVE_SYS_DIR
 SUBDIRS += $(SYS_DIR)
 endif
+# NB: Machine dir must come last so it can override common objects when creating
+# libc.a below.
 if HAVE_LIBC_MACHINE_DIR
 SUBDIRS += $(LIBC_MACHINE_DIR)
 endif
