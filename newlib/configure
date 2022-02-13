@@ -583,13 +583,10 @@ PACKAGE_URL=''
 
 ac_unique_file="libc"
 ac_no_link=no
-enable_option_checking=no
 ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
-HAVE_LONG_DOUBLE_FALSE
-HAVE_LONG_DOUBLE_TRUE
 NEWLIB_PATCHLEVEL_VERSION
 NEWLIB_MINOR_VERSION
 NEWLIB_MAJOR_VERSION
@@ -632,7 +629,52 @@ HAS_NDS32_FPU_DP_FALSE
 HAS_NDS32_FPU_DP_TRUE
 HAS_NDS32_FPU_SP_FALSE
 HAS_NDS32_FPU_SP_TRUE
-subdirs
+MACH_ADD_SETJMP_FALSE
+MACH_ADD_SETJMP_TRUE
+LIBC_MACHINE_LIB
+LIBC_MACHINE_DIR
+HAVE_LIBC_MACHINE_DIR_FALSE
+HAVE_LIBC_MACHINE_DIR_TRUE
+PHOENIX_MACHINE_DIR
+HAVE_SPU_EA_FALSE
+HAVE_SPU_EA_TRUE
+SH64_FALSE
+SH64_TRUE
+HAVE_POWERPC_SPE_FALSE
+HAVE_POWERPC_SPE_TRUE
+HAVE_POWERPC_ALTIVEC_FALSE
+HAVE_POWERPC_ALTIVEC_TRUE
+IS_NDS32_ISA_V3M_FALSE
+IS_NDS32_ISA_V3M_TRUE
+ENABLE_NEWLIB_ICONV_FALSE
+ENABLE_NEWLIB_ICONV_TRUE
+HAVE_LONG_DOUBLE_FALSE
+HAVE_LONG_DOUBLE_TRUE
+LIBC_SYS_LIB
+HAVE_SYS_DIR_FALSE
+HAVE_SYS_DIR_TRUE
+SYS_DIR
+HAVE_UNIX_DIR_FALSE
+HAVE_UNIX_DIR_TRUE
+LIBC_UNIX_LIB
+HAVE_SYSCALL_DIR_FALSE
+HAVE_SYSCALL_DIR_TRUE
+LIBC_SYSCALL_LIB
+HAVE_XDR_DIR_FALSE
+HAVE_XDR_DIR_TRUE
+LIBC_XDR_LIB
+HAVE_POSIX_DIR_FALSE
+HAVE_POSIX_DIR_TRUE
+LIBC_POSIX_LIB
+HAVE_STDIO64_DIR_FALSE
+HAVE_STDIO64_DIR_TRUE
+LIBC_STDIO64_LIB
+HAVE_STDIO_DIR_FALSE
+HAVE_STDIO_DIR_TRUE
+LIBC_STDIO_LIB
+HAVE_SIGNAL_DIR_FALSE
+HAVE_SIGNAL_DIR_TRUE
+LIBC_SIGNAL_LIB
 CC_FOR_NEWLIB
 NEWLIB_HW_FP_FALSE
 NEWLIB_HW_FP_TRUE
@@ -710,6 +752,12 @@ newlib_basedir
 MAY_SUPPLY_SYSCALLS_FALSE
 MAY_SUPPLY_SYSCALLS_TRUE
 multi_basedir
+NEWLIB_RETARGETABLE_LOCKING_FALSE
+NEWLIB_RETARGETABLE_LOCKING_TRUE
+NEWLIB_NANO_FORMATTED_IO_FALSE
+NEWLIB_NANO_FORMATTED_IO_TRUE
+NEWLIB_NANO_MALLOC_FALSE
+NEWLIB_NANO_MALLOC_TRUE
 target_alias
 host_alias
 build_alias
@@ -799,7 +847,7 @@ CPPFLAGS
 CPP
 CCAS
 CCASFLAGS'
-ac_subdirs_all='libc'
+
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -1438,7 +1486,7 @@ Optional Features:
   --enable-newlib-nano-malloc    use small-footprint nano-malloc implementation
   --disable-newlib-unbuf-stream-opt    disable unbuffered stream optimization in streamio
   --enable-lite-exit	enable light weight exit
-  --enable-newlib-nano-formatted-io    Use nano version formatted IO
+  --enable-newlib-nano-formatted-io    Use small-footprint nano-formatted-IO implementation
   --enable-newlib-retargetable-locking    Allow locking routines to be retargeted at link time
   --enable-newlib-long-time_t   define time_t to long
   --enable-newlib-use-gdtoa   Use gdtoa rather than legacy ldtoa
@@ -2239,6 +2287,14 @@ if test "${enable_newlib_nano_malloc+set}" = set; then :
 else
   newlib_nano_malloc=
 fi
+ if test x$newlib_nano_malloc = xyes; then
+  NEWLIB_NANO_MALLOC_TRUE=
+  NEWLIB_NANO_MALLOC_FALSE='#'
+else
+  NEWLIB_NANO_MALLOC_TRUE='#'
+  NEWLIB_NANO_MALLOC_FALSE=
+fi
+
 
 # Check whether --enable-newlib-unbuf-stream-opt was given.
 if test "${enable_newlib_unbuf_stream_opt+set}" = set; then :
@@ -2277,6 +2333,14 @@ else
   newlib_nano_formatted_io=no
 fi
 
+ if test x$newlib_nano_formatted_io = xyes; then
+  NEWLIB_NANO_FORMATTED_IO_TRUE=
+  NEWLIB_NANO_FORMATTED_IO_FALSE='#'
+else
+  NEWLIB_NANO_FORMATTED_IO_TRUE='#'
+  NEWLIB_NANO_FORMATTED_IO_FALSE=
+fi
+
 
 # Check whether --enable-newlib-retargetable-locking was given.
 if test "${enable_newlib_retargetable_locking+set}" = set; then :
@@ -2287,6 +2351,14 @@ if test "${enable_newlib_retargetable_locking+set}" = set; then :
  esac
 else
   newlib_retargetable_locking=no
+fi
+
+ if test x$newlib_retargetable_locking = xyes; then
+  NEWLIB_RETARGETABLE_LOCKING_TRUE=
+  NEWLIB_RETARGETABLE_LOCKING_FALSE='#'
+else
+  NEWLIB_RETARGETABLE_LOCKING_TRUE='#'
+  NEWLIB_RETARGETABLE_LOCKING_FALSE=
 fi
 
 
@@ -4730,12 +4802,543 @@ fi
 
 
 
+LIBC_SIGNAL_LIB=
+if test -n "${signal_dir}"; then
+  LIBC_SIGNAL_LIB=${signal_dir}/lib.a
+fi
 
-subdirs="$subdirs libc"
+ if test x${signal_dir} != x; then
+  HAVE_SIGNAL_DIR_TRUE=
+  HAVE_SIGNAL_DIR_FALSE='#'
+else
+  HAVE_SIGNAL_DIR_TRUE='#'
+  HAVE_SIGNAL_DIR_FALSE=
+fi
+
+
+LIBC_STDIO_LIB=
+if test -n "${stdio_dir}"; then
+  LIBC_STDIO_LIB=${stdio_dir}/lib.a
+fi
+
+ if test x${stdio_dir} != x; then
+  HAVE_STDIO_DIR_TRUE=
+  HAVE_STDIO_DIR_FALSE='#'
+else
+  HAVE_STDIO_DIR_TRUE='#'
+  HAVE_STDIO_DIR_FALSE=
+fi
+
+
+LIBC_STDIO64_LIB=
+if test -n "${stdio64_dir}"; then
+  LIBC_STDIO64_LIB=${stdio64_dir}/lib.a
+fi
+
+ if test x${stdio64_dir} != x; then
+  HAVE_STDIO64_DIR_TRUE=
+  HAVE_STDIO64_DIR_FALSE='#'
+else
+  HAVE_STDIO64_DIR_TRUE='#'
+  HAVE_STDIO64_DIR_FALSE=
+fi
+
+
+LIBC_POSIX_LIB=
+if test -n "${posix_dir}"; then
+  LIBC_POSIX_LIB=${posix_dir}/lib.a
+fi
+
+ if test x${posix_dir} != x; then
+  HAVE_POSIX_DIR_TRUE=
+  HAVE_POSIX_DIR_FALSE='#'
+else
+  HAVE_POSIX_DIR_TRUE='#'
+  HAVE_POSIX_DIR_FALSE=
+fi
+
+
+LIBC_XDR_LIB=
+if test -n "${xdr_dir}"; then
+  LIBC_XDR_LIB=${xdr_dir}/lib.a
+fi
+
+ if test x${xdr_dir} != x; then
+  HAVE_XDR_DIR_TRUE=
+  HAVE_XDR_DIR_FALSE='#'
+else
+  HAVE_XDR_DIR_TRUE='#'
+  HAVE_XDR_DIR_FALSE=
+fi
+
+
+LIBC_SYSCALL_LIB=
+if test -n "${syscall_dir}"; then
+  LIBC_SYSCALL_LIB=${syscall_dir}/lib.a
+fi
+
+ if test x${syscall_dir} != x; then
+  HAVE_SYSCALL_DIR_TRUE=
+  HAVE_SYSCALL_DIR_FALSE='#'
+else
+  HAVE_SYSCALL_DIR_TRUE='#'
+  HAVE_SYSCALL_DIR_FALSE=
+fi
+
+
+LIBC_UNIX_LIB=
+if test -n "${unix_dir}"; then
+  LIBC_UNIX_LIB=${unix_dir}/lib.a
+fi
+
+ if test x${unix_dir} != x; then
+  HAVE_UNIX_DIR_TRUE=
+  HAVE_UNIX_DIR_FALSE='#'
+else
+  HAVE_UNIX_DIR_TRUE='#'
+  HAVE_UNIX_DIR_FALSE=
+fi
+
+
+
+LIBC_SYS_LIB=
+if test -n "${sys_dir}"; then
+  case ${sys_dir} in
+    a29khif) ac_config_files="$ac_config_files libc/sys/a29khif/Makefile"
+ ;;
+    amdgcn) ac_config_files="$ac_config_files libc/sys/amdgcn/Makefile"
+ ;;
+    arm) ac_config_files="$ac_config_files libc/sys/arm/Makefile"
+ ;;
+    d10v) ac_config_files="$ac_config_files libc/sys/d10v/Makefile"
+ ;;
+    epiphany) ac_config_files="$ac_config_files libc/sys/epiphany/Makefile"
+ ;;
+    h8300hms) ac_config_files="$ac_config_files libc/sys/h8300hms/Makefile"
+ ;;
+    h8500hms) ac_config_files="$ac_config_files libc/sys/h8500hms/Makefile"
+ ;;
+    m88kbug) ac_config_files="$ac_config_files libc/sys/m88kbug/Makefile"
+ ;;
+    mmixware) ac_config_files="$ac_config_files libc/sys/mmixware/Makefile"
+ ;;
+    netware) ac_config_files="$ac_config_files libc/sys/netware/Makefile"
+ ;;
+    or1k) ac_config_files="$ac_config_files libc/sys/or1k/Makefile"
+ ;;
+    phoenix) ac_config_files="$ac_config_files libc/sys/phoenix/Makefile"
+ ;;
+    rdos) ac_config_files="$ac_config_files libc/sys/rdos/Makefile"
+ ;;
+    rtems) ac_config_files="$ac_config_files libc/sys/rtems/Makefile"
+ ;;
+    sh) ac_config_files="$ac_config_files libc/sys/sh/Makefile"
+ ;;
+    sysmec) ac_config_files="$ac_config_files libc/sys/sysmec/Makefile"
+ ;;
+    sysnec810) ac_config_files="$ac_config_files libc/sys/sysnec810/Makefile"
+ ;;
+    sysnecv850) ac_config_files="$ac_config_files libc/sys/sysnecv850/Makefile"
+ ;;
+    sysvi386) ac_config_files="$ac_config_files libc/sys/sysvi386/Makefile"
+ ;;
+    sysvnecv70) ac_config_files="$ac_config_files libc/sys/sysvnecv70/Makefile"
+ ;;
+    tic80) ac_config_files="$ac_config_files libc/sys/tic80/Makefile"
+ ;;
+    tirtos) ac_config_files="$ac_config_files libc/sys/tirtos/Makefile"
+ ;;
+    w65) ac_config_files="$ac_config_files libc/sys/w65/Makefile"
+ ;;
+    z8ksim) ac_config_files="$ac_config_files libc/sys/z8ksim/Makefile"
+ ;;
+    *) as_fn_error $? "unsupported sys_dir \"${sys_dir}\"" "$LINENO" 5 ;;
+  esac
+
+  SYS_DIR=sys/${sys_dir}
+  LIBC_SYS_LIB=${SYS_DIR}/lib.a
+fi
+
+ if test x${sys_dir} != x; then
+  HAVE_SYS_DIR_TRUE=
+  HAVE_SYS_DIR_FALSE='#'
+else
+  HAVE_SYS_DIR_TRUE='#'
+  HAVE_SYS_DIR_FALSE=
+fi
+
+
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for long double" >&5
+$as_echo_n "checking for long double... " >&6; }
+if ${ac_cv_type_long_double+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test "$GCC" = yes; then
+       ac_cv_type_long_double=yes
+     else
+       cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+/* The Stardent Vistra knows sizeof (long double), but does
+		 not support it.  */
+	      long double foo = 0.0L;
+int
+main ()
+{
+static int test_array [1 - 2 * !(/* On Ultrix 4.3 cc, long double is 4 and double is 8.  */
+	      sizeof (double) <= sizeof (long double))];
+test_array [0] = 0;
+return test_array [0];
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_cv_type_long_double=yes
+else
+  ac_cv_type_long_double=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+     fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_type_long_double" >&5
+$as_echo "$ac_cv_type_long_double" >&6; }
+  if test $ac_cv_type_long_double = yes; then
+
+$as_echo "#define HAVE_LONG_DOUBLE 1" >>confdefs.h
+
+  fi
+
+ if test x"$ac_cv_type_long_double" = x"yes"; then
+  HAVE_LONG_DOUBLE_TRUE=
+  HAVE_LONG_DOUBLE_FALSE='#'
+else
+  HAVE_LONG_DOUBLE_TRUE='#'
+  HAVE_LONG_DOUBLE_FALSE=
+fi
+
+
+ if test x${newlib_iconv} != x; then
+  ENABLE_NEWLIB_ICONV_TRUE=
+  ENABLE_NEWLIB_ICONV_FALSE='#'
+else
+  ENABLE_NEWLIB_ICONV_TRUE='#'
+  ENABLE_NEWLIB_ICONV_FALSE=
+fi
+
+
+if test "${machine_dir}" = "nds32"; then
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for nds32 V3M ISA" >&5
+$as_echo_n "checking for nds32 V3M ISA... " >&6; }
+if ${newlib_cv_nds32_isa_v3m+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#ifdef __NDS32_ISA_V3M__
+# error "This is nds32_isa_v3m."
+#endif
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_cpp "$LINENO"; then :
+  newlib_cv_nds32_isa_v3m="no"
+else
+  newlib_cv_nds32_isa_v3m="yes"
+fi
+rm -f conftest.err conftest.i conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $newlib_cv_nds32_isa_v3m" >&5
+$as_echo "$newlib_cv_nds32_isa_v3m" >&6; }
+fi
+
+ if test "$newlib_cv_nds32_isa_v3m" = "yes"; then
+  IS_NDS32_ISA_V3M_TRUE=
+  IS_NDS32_ISA_V3M_FALSE='#'
+else
+  IS_NDS32_ISA_V3M_TRUE='#'
+  IS_NDS32_ISA_V3M_FALSE=
+fi
+
+
+HAVE_POWERPC_ALTIVEC=no
+HAVE_POWERPC_SPE=no
+if test "${machine_dir}" = "powerpc"; then
+  case $host in
+    powerpc*-*altivec*) HAVE_POWERPC_ALTIVEC=yes ;;
+    powerpc*-*spe*) HAVE_POWERPC_SPE=yes ;;
+  esac
+fi
+ if test "$HAVE_POWERPC_ALTIVEC" = yes; then
+  HAVE_POWERPC_ALTIVEC_TRUE=
+  HAVE_POWERPC_ALTIVEC_FALSE='#'
+else
+  HAVE_POWERPC_ALTIVEC_TRUE='#'
+  HAVE_POWERPC_ALTIVEC_FALSE=
+fi
+
+ if test "$HAVE_POWERPC_SPE" = yes; then
+  HAVE_POWERPC_SPE_TRUE=
+  HAVE_POWERPC_SPE_FALSE='#'
+else
+  HAVE_POWERPC_SPE_TRUE='#'
+  HAVE_POWERPC_SPE_FALSE=
+fi
+
+
+if test "${machine_dir}" = "sh"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for SH5 (64-bit)" >&5
+$as_echo_n "checking for SH5 (64-bit)... " >&6; }
+if ${newlib_cv_sh64+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#if !defined(__SH5__)
+# error "not SH5"
+#endif
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_cpp "$LINENO"; then :
+  newlib_cv_sh64=yes
+else
+  newlib_cv_sh64=no
+fi
+rm -f conftest.err conftest.i conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $newlib_cv_sh64" >&5
+$as_echo "$newlib_cv_sh64" >&6; }
+fi
+
+ if test "$newlib_cv_sh64" = yes; then
+  SH64_TRUE=
+  SH64_FALSE='#'
+else
+  SH64_TRUE='#'
+  SH64_FALSE=
+fi
+
+
+if test "${machine_dir}" = "spu"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports __ea" >&5
+$as_echo_n "checking whether the compiler supports __ea... " >&6; }
+if ${newlib_cv_spu_compiler_has_ea+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#if !defined (__EA32__) && !defined (__EA64__)
+# error "__ea not supported"
+#endif
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_cpp "$LINENO"; then :
+  newlib_cv_spu_compiler_has_ea=yes
+else
+  newlib_cv_spu_compiler_has_ea=no
+fi
+rm -f conftest.err conftest.i conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $newlib_cv_spu_compiler_has_ea" >&5
+$as_echo "$newlib_cv_spu_compiler_has_ea" >&6; }
+fi
+ if test "$newlib_cv_spu_compiler_has_ea" = yes; then
+  HAVE_SPU_EA_TRUE=
+  HAVE_SPU_EA_FALSE='#'
+else
+  HAVE_SPU_EA_TRUE='#'
+  HAVE_SPU_EA_FALSE=
+fi
+
+
+if test "$sys_dir" = "phoenix"; then :
+        if test "${machine_dir}" = arm; then :
+  ac_config_files="$ac_config_files libc/sys/phoenix/machine/arm/Makefile"
+
+fi
+
+
+  PHOENIX_MACHINE_DIR=machine/${machine_dir}
+
+fi
+
+
+
+LIBC_MACHINE_LIB=
+if test -n "${machine_dir}"; then
+  case ${machine_dir} in
+    a29k) ac_config_files="$ac_config_files libc/machine/a29k/Makefile"
+ ;;
+    aarch64) ac_config_files="$ac_config_files libc/machine/aarch64/Makefile"
+ ;;
+    amdgcn) ac_config_files="$ac_config_files libc/machine/amdgcn/Makefile"
+ ;;
+    arc) ac_config_files="$ac_config_files libc/machine/arc/Makefile"
+ ;;
+    arm) ac_config_files="$ac_config_files libc/machine/arm/Makefile"
+ ;;
+    bfin) ac_config_files="$ac_config_files libc/machine/bfin/Makefile"
+ ;;
+    cr16) ac_config_files="$ac_config_files libc/machine/cr16/Makefile"
+ ;;
+    cris) ac_config_files="$ac_config_files libc/machine/cris/Makefile"
+ ;;
+    crx) ac_config_files="$ac_config_files libc/machine/crx/Makefile"
+ ;;
+    csky) ac_config_files="$ac_config_files libc/machine/csky/Makefile"
+ ;;
+    d10v) ac_config_files="$ac_config_files libc/machine/d10v/Makefile"
+ ;;
+    d30v) ac_config_files="$ac_config_files libc/machine/d30v/Makefile"
+ ;;
+    epiphany) ac_config_files="$ac_config_files libc/machine/epiphany/Makefile"
+ ;;
+    fr30) ac_config_files="$ac_config_files libc/machine/fr30/Makefile"
+ ;;
+    frv) ac_config_files="$ac_config_files libc/machine/frv/Makefile"
+ ;;
+    ft32) ac_config_files="$ac_config_files libc/machine/ft32/Makefile"
+ ;;
+    h8300) ac_config_files="$ac_config_files libc/machine/h8300/Makefile"
+ ;;
+    h8500) ac_config_files="$ac_config_files libc/machine/h8500/Makefile"
+ ;;
+    hppa) ac_config_files="$ac_config_files libc/machine/hppa/Makefile"
+ ;;
+    i386) ac_config_files="$ac_config_files libc/machine/i386/Makefile"
+ ;;
+    i960) ac_config_files="$ac_config_files libc/machine/i960/Makefile"
+ ;;
+    iq2000) ac_config_files="$ac_config_files libc/machine/iq2000/Makefile"
+ ;;
+    lm32) ac_config_files="$ac_config_files libc/machine/lm32/Makefile"
+ ;;
+    m32c) ac_config_files="$ac_config_files libc/machine/m32c/Makefile"
+ ;;
+    m32r) ac_config_files="$ac_config_files libc/machine/m32r/Makefile"
+ ;;
+    m68hc11) ac_config_files="$ac_config_files libc/machine/m68hc11/Makefile"
+ ;;
+    m68k) ac_config_files="$ac_config_files libc/machine/m68k/Makefile"
+ ;;
+    m88k) ac_config_files="$ac_config_files libc/machine/m88k/Makefile"
+ ;;
+    mep) ac_config_files="$ac_config_files libc/machine/mep/Makefile"
+ ;;
+    microblaze) ac_config_files="$ac_config_files libc/machine/microblaze/Makefile"
+ ;;
+    mips) ac_config_files="$ac_config_files libc/machine/mips/Makefile"
+ ;;
+    riscv) ac_config_files="$ac_config_files libc/machine/riscv/Makefile"
+ ;;
+    mn10200) ac_config_files="$ac_config_files libc/machine/mn10200/Makefile"
+ ;;
+    mn10300) ac_config_files="$ac_config_files libc/machine/mn10300/Makefile"
+ ;;
+    moxie) ac_config_files="$ac_config_files libc/machine/moxie/Makefile"
+ ;;
+    msp430) ac_config_files="$ac_config_files libc/machine/msp430/Makefile"
+ ;;
+    mt) ac_config_files="$ac_config_files libc/machine/mt/Makefile"
+ ;;
+    nds32) ac_config_files="$ac_config_files libc/machine/nds32/Makefile"
+ ;;
+    necv70) ac_config_files="$ac_config_files libc/machine/necv70/Makefile"
+ ;;
+    nios2) ac_config_files="$ac_config_files libc/machine/nios2/Makefile"
+ ;;
+    nvptx) ac_config_files="$ac_config_files libc/machine/nvptx/Makefile"
+ ;;
+    or1k) ac_config_files="$ac_config_files libc/machine/or1k/Makefile"
+ ;;
+    powerpc) ac_config_files="$ac_config_files libc/machine/powerpc/Makefile"
+ ;;
+    pru) ac_config_files="$ac_config_files libc/machine/pru/Makefile"
+ ;;
+    rl78) ac_config_files="$ac_config_files libc/machine/rl78/Makefile"
+ ;;
+    rx) ac_config_files="$ac_config_files libc/machine/rx/Makefile"
+ ;;
+    sh) ac_config_files="$ac_config_files libc/machine/sh/Makefile"
+ ;;
+    sparc) ac_config_files="$ac_config_files libc/machine/sparc/Makefile"
+ ;;
+    spu) ac_config_files="$ac_config_files libc/machine/spu/Makefile"
+ ;;
+    tic4x) ac_config_files="$ac_config_files libc/machine/tic4x/Makefile"
+ ;;
+    tic6x) ac_config_files="$ac_config_files libc/machine/tic6x/Makefile"
+ ;;
+    tic80) ac_config_files="$ac_config_files libc/machine/tic80/Makefile"
+ ;;
+    v850) ac_config_files="$ac_config_files libc/machine/v850/Makefile"
+ ;;
+    visium) ac_config_files="$ac_config_files libc/machine/visium/Makefile"
+ ;;
+    w65) ac_config_files="$ac_config_files libc/machine/w65/Makefile"
+ ;;
+    x86_64) ac_config_files="$ac_config_files libc/machine/x86_64/Makefile"
+ ;;
+    xc16x) ac_config_files="$ac_config_files libc/machine/xc16x/Makefile"
+ ;;
+    xstormy16) ac_config_files="$ac_config_files libc/machine/xstormy16/Makefile"
+ ;;
+    z8k) ac_config_files="$ac_config_files libc/machine/z8k/Makefile"
+ ;;
+    *) as_fn_error $? "unsupported machine_dir \"${machine_dir}\"" "$LINENO" 5 ;;
+  esac
+
+  LIBC_MACHINE_DIR=machine/${machine_dir}
+  LIBC_MACHINE_LIB=${LIBC_MACHINE_DIR}/lib.a
+fi
+ if test "x${LIBC_MACHINE_DIR}" != x; then
+  HAVE_LIBC_MACHINE_DIR_TRUE=
+  HAVE_LIBC_MACHINE_DIR_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_DIR_TRUE='#'
+  HAVE_LIBC_MACHINE_DIR_FALSE=
+fi
+
+
+
+
+ if test "x$mach_add_setjmp" = "xtrue"; then
+  MACH_ADD_SETJMP_TRUE=
+  MACH_ADD_SETJMP_FALSE='#'
+else
+  MACH_ADD_SETJMP_TRUE='#'
+  MACH_ADD_SETJMP_FALSE=
+fi
+
+
+ac_config_files="$ac_config_files libc/Makefile libc/argz/Makefile libc/ctype/Makefile libc/errno/Makefile libc/locale/Makefile libc/misc/Makefile libc/reent/Makefile libc/search/Makefile libc/stdio/Makefile libc/stdio64/Makefile libc/stdlib/Makefile libc/string/Makefile libc/time/Makefile libc/posix/Makefile libc/signal/Makefile libc/syscalls/Makefile libc/unix/Makefile libc/iconv/Makefile libc/iconv/ces/Makefile libc/iconv/ccs/Makefile libc/iconv/ccs/binary/Makefile libc/iconv/lib/Makefile libc/ssp/Makefile libc/xdr/Makefile"
+
 
 if test "${libm_machine_dir}" = "nds32"; then
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for nds32 FPU SP extension" >&5
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for nds32 FPU SP extension" >&5
 $as_echo_n "checking for nds32 FPU SP extension... " >&6; }
 if ${newlib_cv_nds32_fpu_sp+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -5998,6 +6601,18 @@ LIBOBJS=$ac_libobjs
 LTLIBOBJS=$ac_ltlibobjs
 
 
+if test -z "${NEWLIB_NANO_MALLOC_TRUE}" && test -z "${NEWLIB_NANO_MALLOC_FALSE}"; then
+  as_fn_error $? "conditional \"NEWLIB_NANO_MALLOC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${NEWLIB_NANO_FORMATTED_IO_TRUE}" && test -z "${NEWLIB_NANO_FORMATTED_IO_FALSE}"; then
+  as_fn_error $? "conditional \"NEWLIB_NANO_FORMATTED_IO\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${NEWLIB_RETARGETABLE_LOCKING_TRUE}" && test -z "${NEWLIB_RETARGETABLE_LOCKING_FALSE}"; then
+  as_fn_error $? "conditional \"NEWLIB_RETARGETABLE_LOCKING\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${MAY_SUPPLY_SYSCALLS_TRUE}" && test -z "${MAY_SUPPLY_SYSCALLS_FALSE}"; then
   as_fn_error $? "conditional \"MAY_SUPPLY_SYSCALLS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -6048,6 +6663,74 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${NEWLIB_HW_FP_TRUE}" && test -z "${NEWLIB_HW_FP_FALSE}"; then
   as_fn_error $? "conditional \"NEWLIB_HW_FP\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_SIGNAL_DIR_TRUE}" && test -z "${HAVE_SIGNAL_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_SIGNAL_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_STDIO_DIR_TRUE}" && test -z "${HAVE_STDIO_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_STDIO_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_STDIO64_DIR_TRUE}" && test -z "${HAVE_STDIO64_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_STDIO64_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_POSIX_DIR_TRUE}" && test -z "${HAVE_POSIX_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_POSIX_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_XDR_DIR_TRUE}" && test -z "${HAVE_XDR_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_XDR_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_SYSCALL_DIR_TRUE}" && test -z "${HAVE_SYSCALL_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_SYSCALL_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_UNIX_DIR_TRUE}" && test -z "${HAVE_UNIX_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_UNIX_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_SYS_DIR_TRUE}" && test -z "${HAVE_SYS_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_SYS_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LONG_DOUBLE_TRUE}" && test -z "${HAVE_LONG_DOUBLE_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LONG_DOUBLE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${ENABLE_NEWLIB_ICONV_TRUE}" && test -z "${ENABLE_NEWLIB_ICONV_FALSE}"; then
+  as_fn_error $? "conditional \"ENABLE_NEWLIB_ICONV\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${IS_NDS32_ISA_V3M_TRUE}" && test -z "${IS_NDS32_ISA_V3M_FALSE}"; then
+  as_fn_error $? "conditional \"IS_NDS32_ISA_V3M\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_POWERPC_ALTIVEC_TRUE}" && test -z "${HAVE_POWERPC_ALTIVEC_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_POWERPC_ALTIVEC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_POWERPC_SPE_TRUE}" && test -z "${HAVE_POWERPC_SPE_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_POWERPC_SPE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${SH64_TRUE}" && test -z "${SH64_FALSE}"; then
+  as_fn_error $? "conditional \"SH64\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_SPU_EA_TRUE}" && test -z "${HAVE_SPU_EA_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_SPU_EA\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_DIR_TRUE}" && test -z "${HAVE_LIBC_MACHINE_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${MACH_ADD_SETJMP_TRUE}" && test -z "${MACH_ADD_SETJMP_FALSE}"; then
+  as_fn_error $? "conditional \"MACH_ADD_SETJMP\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAS_NDS32_FPU_SP_TRUE}" && test -z "${HAS_NDS32_FPU_SP_FALSE}"; then
@@ -6726,6 +7409,114 @@ do
     "newlib.h") CONFIG_HEADERS="$CONFIG_HEADERS newlib.h:newlib.hin" ;;
     "_newlib_version.h") CONFIG_HEADERS="$CONFIG_HEADERS _newlib_version.h:_newlib_version.hin" ;;
     "default-1") CONFIG_COMMANDS="$CONFIG_COMMANDS default-1" ;;
+    "libc/sys/a29khif/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/a29khif/Makefile" ;;
+    "libc/sys/amdgcn/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/amdgcn/Makefile" ;;
+    "libc/sys/arm/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/arm/Makefile" ;;
+    "libc/sys/d10v/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/d10v/Makefile" ;;
+    "libc/sys/epiphany/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/epiphany/Makefile" ;;
+    "libc/sys/h8300hms/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/h8300hms/Makefile" ;;
+    "libc/sys/h8500hms/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/h8500hms/Makefile" ;;
+    "libc/sys/m88kbug/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/m88kbug/Makefile" ;;
+    "libc/sys/mmixware/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/mmixware/Makefile" ;;
+    "libc/sys/netware/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/netware/Makefile" ;;
+    "libc/sys/or1k/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/or1k/Makefile" ;;
+    "libc/sys/phoenix/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/phoenix/Makefile" ;;
+    "libc/sys/rdos/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/rdos/Makefile" ;;
+    "libc/sys/rtems/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/rtems/Makefile" ;;
+    "libc/sys/sh/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/sh/Makefile" ;;
+    "libc/sys/sysmec/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/sysmec/Makefile" ;;
+    "libc/sys/sysnec810/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/sysnec810/Makefile" ;;
+    "libc/sys/sysnecv850/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/sysnecv850/Makefile" ;;
+    "libc/sys/sysvi386/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/sysvi386/Makefile" ;;
+    "libc/sys/sysvnecv70/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/sysvnecv70/Makefile" ;;
+    "libc/sys/tic80/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/tic80/Makefile" ;;
+    "libc/sys/tirtos/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/tirtos/Makefile" ;;
+    "libc/sys/w65/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/w65/Makefile" ;;
+    "libc/sys/z8ksim/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/z8ksim/Makefile" ;;
+    "libc/sys/phoenix/machine/arm/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/phoenix/machine/arm/Makefile" ;;
+    "libc/machine/a29k/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/a29k/Makefile" ;;
+    "libc/machine/aarch64/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/aarch64/Makefile" ;;
+    "libc/machine/amdgcn/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/amdgcn/Makefile" ;;
+    "libc/machine/arc/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/arc/Makefile" ;;
+    "libc/machine/arm/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/arm/Makefile" ;;
+    "libc/machine/bfin/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/bfin/Makefile" ;;
+    "libc/machine/cr16/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/cr16/Makefile" ;;
+    "libc/machine/cris/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/cris/Makefile" ;;
+    "libc/machine/crx/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/crx/Makefile" ;;
+    "libc/machine/csky/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/csky/Makefile" ;;
+    "libc/machine/d10v/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/d10v/Makefile" ;;
+    "libc/machine/d30v/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/d30v/Makefile" ;;
+    "libc/machine/epiphany/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/epiphany/Makefile" ;;
+    "libc/machine/fr30/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/fr30/Makefile" ;;
+    "libc/machine/frv/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/frv/Makefile" ;;
+    "libc/machine/ft32/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/ft32/Makefile" ;;
+    "libc/machine/h8300/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/h8300/Makefile" ;;
+    "libc/machine/h8500/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/h8500/Makefile" ;;
+    "libc/machine/hppa/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/hppa/Makefile" ;;
+    "libc/machine/i386/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/i386/Makefile" ;;
+    "libc/machine/i960/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/i960/Makefile" ;;
+    "libc/machine/iq2000/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/iq2000/Makefile" ;;
+    "libc/machine/lm32/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/lm32/Makefile" ;;
+    "libc/machine/m32c/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/m32c/Makefile" ;;
+    "libc/machine/m32r/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/m32r/Makefile" ;;
+    "libc/machine/m68hc11/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/m68hc11/Makefile" ;;
+    "libc/machine/m68k/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/m68k/Makefile" ;;
+    "libc/machine/m88k/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/m88k/Makefile" ;;
+    "libc/machine/mep/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/mep/Makefile" ;;
+    "libc/machine/microblaze/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/microblaze/Makefile" ;;
+    "libc/machine/mips/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/mips/Makefile" ;;
+    "libc/machine/riscv/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/riscv/Makefile" ;;
+    "libc/machine/mn10200/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/mn10200/Makefile" ;;
+    "libc/machine/mn10300/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/mn10300/Makefile" ;;
+    "libc/machine/moxie/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/moxie/Makefile" ;;
+    "libc/machine/msp430/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/msp430/Makefile" ;;
+    "libc/machine/mt/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/mt/Makefile" ;;
+    "libc/machine/nds32/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/nds32/Makefile" ;;
+    "libc/machine/necv70/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/necv70/Makefile" ;;
+    "libc/machine/nios2/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/nios2/Makefile" ;;
+    "libc/machine/nvptx/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/nvptx/Makefile" ;;
+    "libc/machine/or1k/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/or1k/Makefile" ;;
+    "libc/machine/powerpc/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/powerpc/Makefile" ;;
+    "libc/machine/pru/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/pru/Makefile" ;;
+    "libc/machine/rl78/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/rl78/Makefile" ;;
+    "libc/machine/rx/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/rx/Makefile" ;;
+    "libc/machine/sh/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/sh/Makefile" ;;
+    "libc/machine/sparc/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/sparc/Makefile" ;;
+    "libc/machine/spu/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/spu/Makefile" ;;
+    "libc/machine/tic4x/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/tic4x/Makefile" ;;
+    "libc/machine/tic6x/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/tic6x/Makefile" ;;
+    "libc/machine/tic80/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/tic80/Makefile" ;;
+    "libc/machine/v850/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/v850/Makefile" ;;
+    "libc/machine/visium/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/visium/Makefile" ;;
+    "libc/machine/w65/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/w65/Makefile" ;;
+    "libc/machine/x86_64/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/x86_64/Makefile" ;;
+    "libc/machine/xc16x/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/xc16x/Makefile" ;;
+    "libc/machine/xstormy16/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/xstormy16/Makefile" ;;
+    "libc/machine/z8k/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/z8k/Makefile" ;;
+    "libc/Makefile") CONFIG_FILES="$CONFIG_FILES libc/Makefile" ;;
+    "libc/argz/Makefile") CONFIG_FILES="$CONFIG_FILES libc/argz/Makefile" ;;
+    "libc/ctype/Makefile") CONFIG_FILES="$CONFIG_FILES libc/ctype/Makefile" ;;
+    "libc/errno/Makefile") CONFIG_FILES="$CONFIG_FILES libc/errno/Makefile" ;;
+    "libc/locale/Makefile") CONFIG_FILES="$CONFIG_FILES libc/locale/Makefile" ;;
+    "libc/misc/Makefile") CONFIG_FILES="$CONFIG_FILES libc/misc/Makefile" ;;
+    "libc/reent/Makefile") CONFIG_FILES="$CONFIG_FILES libc/reent/Makefile" ;;
+    "libc/search/Makefile") CONFIG_FILES="$CONFIG_FILES libc/search/Makefile" ;;
+    "libc/stdio/Makefile") CONFIG_FILES="$CONFIG_FILES libc/stdio/Makefile" ;;
+    "libc/stdio64/Makefile") CONFIG_FILES="$CONFIG_FILES libc/stdio64/Makefile" ;;
+    "libc/stdlib/Makefile") CONFIG_FILES="$CONFIG_FILES libc/stdlib/Makefile" ;;
+    "libc/string/Makefile") CONFIG_FILES="$CONFIG_FILES libc/string/Makefile" ;;
+    "libc/time/Makefile") CONFIG_FILES="$CONFIG_FILES libc/time/Makefile" ;;
+    "libc/posix/Makefile") CONFIG_FILES="$CONFIG_FILES libc/posix/Makefile" ;;
+    "libc/signal/Makefile") CONFIG_FILES="$CONFIG_FILES libc/signal/Makefile" ;;
+    "libc/syscalls/Makefile") CONFIG_FILES="$CONFIG_FILES libc/syscalls/Makefile" ;;
+    "libc/unix/Makefile") CONFIG_FILES="$CONFIG_FILES libc/unix/Makefile" ;;
+    "libc/iconv/Makefile") CONFIG_FILES="$CONFIG_FILES libc/iconv/Makefile" ;;
+    "libc/iconv/ces/Makefile") CONFIG_FILES="$CONFIG_FILES libc/iconv/ces/Makefile" ;;
+    "libc/iconv/ccs/Makefile") CONFIG_FILES="$CONFIG_FILES libc/iconv/ccs/Makefile" ;;
+    "libc/iconv/ccs/binary/Makefile") CONFIG_FILES="$CONFIG_FILES libc/iconv/ccs/binary/Makefile" ;;
+    "libc/iconv/lib/Makefile") CONFIG_FILES="$CONFIG_FILES libc/iconv/lib/Makefile" ;;
+    "libc/ssp/Makefile") CONFIG_FILES="$CONFIG_FILES libc/ssp/Makefile" ;;
+    "libc/xdr/Makefile") CONFIG_FILES="$CONFIG_FILES libc/xdr/Makefile" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
@@ -7363,151 +8154,6 @@ if test "$no_create" != yes; then
   # Use ||, not &&, to avoid exiting from the if with $? = 1, which
   # would make configure fail if this is the last instruction.
   $ac_cs_success || as_fn_exit 1
-fi
-
-#
-# CONFIG_SUBDIRS section.
-#
-if test "$no_recursion" != yes; then
-
-  # Remove --cache-file, --srcdir, and --disable-option-checking arguments
-  # so they do not pile up.
-  ac_sub_configure_args=
-  ac_prev=
-  eval "set x $ac_configure_args"
-  shift
-  for ac_arg
-  do
-    if test -n "$ac_prev"; then
-      ac_prev=
-      continue
-    fi
-    case $ac_arg in
-    -cache-file | --cache-file | --cache-fil | --cache-fi \
-    | --cache-f | --cache- | --cache | --cach | --cac | --ca | --c)
-      ac_prev=cache_file ;;
-    -cache-file=* | --cache-file=* | --cache-fil=* | --cache-fi=* \
-    | --cache-f=* | --cache-=* | --cache=* | --cach=* | --cac=* | --ca=* \
-    | --c=*)
-      ;;
-    --config-cache | -C)
-      ;;
-    -srcdir | --srcdir | --srcdi | --srcd | --src | --sr)
-      ac_prev=srcdir ;;
-    -srcdir=* | --srcdir=* | --srcdi=* | --srcd=* | --src=* | --sr=*)
-      ;;
-    -prefix | --prefix | --prefi | --pref | --pre | --pr | --p)
-      ac_prev=prefix ;;
-    -prefix=* | --prefix=* | --prefi=* | --pref=* | --pre=* | --pr=* | --p=*)
-      ;;
-    --disable-option-checking)
-      ;;
-    *)
-      case $ac_arg in
-      *\'*) ac_arg=`$as_echo "$ac_arg" | sed "s/'/'\\\\\\\\''/g"` ;;
-      esac
-      as_fn_append ac_sub_configure_args " '$ac_arg'" ;;
-    esac
-  done
-
-  # Always prepend --prefix to ensure using the same prefix
-  # in subdir configurations.
-  ac_arg="--prefix=$prefix"
-  case $ac_arg in
-  *\'*) ac_arg=`$as_echo "$ac_arg" | sed "s/'/'\\\\\\\\''/g"` ;;
-  esac
-  ac_sub_configure_args="'$ac_arg' $ac_sub_configure_args"
-
-  # Pass --silent
-  if test "$silent" = yes; then
-    ac_sub_configure_args="--silent $ac_sub_configure_args"
-  fi
-
-  # Always prepend --disable-option-checking to silence warnings, since
-  # different subdirs can have different --enable and --with options.
-  ac_sub_configure_args="--disable-option-checking $ac_sub_configure_args"
-
-  ac_popdir=`pwd`
-  for ac_dir in : $subdirs; do test "x$ac_dir" = x: && continue
-
-    # Do not complain, so a configure script can configure whichever
-    # parts of a large source tree are present.
-    test -d "$srcdir/$ac_dir" || continue
-
-    ac_msg="=== configuring in $ac_dir (`pwd`/$ac_dir)"
-    $as_echo "$as_me:${as_lineno-$LINENO}: $ac_msg" >&5
-    $as_echo "$ac_msg" >&6
-    as_dir="$ac_dir"; as_fn_mkdir_p
-    ac_builddir=.
-
-case "$ac_dir" in
-.) ac_dir_suffix= ac_top_builddir_sub=. ac_top_build_prefix= ;;
-*)
-  ac_dir_suffix=/`$as_echo "$ac_dir" | sed 's|^\.[\\/]||'`
-  # A ".." for each directory in $ac_dir_suffix.
-  ac_top_builddir_sub=`$as_echo "$ac_dir_suffix" | sed 's|/[^\\/]*|/..|g;s|/||'`
-  case $ac_top_builddir_sub in
-  "") ac_top_builddir_sub=. ac_top_build_prefix= ;;
-  *)  ac_top_build_prefix=$ac_top_builddir_sub/ ;;
-  esac ;;
-esac
-ac_abs_top_builddir=$ac_pwd
-ac_abs_builddir=$ac_pwd$ac_dir_suffix
-# for backward compatibility:
-ac_top_builddir=$ac_top_build_prefix
-
-case $srcdir in
-  .)  # We are building in place.
-    ac_srcdir=.
-    ac_top_srcdir=$ac_top_builddir_sub
-    ac_abs_top_srcdir=$ac_pwd ;;
-  [\\/]* | ?:[\\/]* )  # Absolute name.
-    ac_srcdir=$srcdir$ac_dir_suffix;
-    ac_top_srcdir=$srcdir
-    ac_abs_top_srcdir=$srcdir ;;
-  *) # Relative name.
-    ac_srcdir=$ac_top_build_prefix$srcdir$ac_dir_suffix
-    ac_top_srcdir=$ac_top_build_prefix$srcdir
-    ac_abs_top_srcdir=$ac_pwd/$srcdir ;;
-esac
-ac_abs_srcdir=$ac_abs_top_srcdir$ac_dir_suffix
-
-
-    cd "$ac_dir"
-
-    # Check for guested configure; otherwise get Cygnus style configure.
-    if test -f "$ac_srcdir/configure.gnu"; then
-      ac_sub_configure=$ac_srcdir/configure.gnu
-    elif test -f "$ac_srcdir/configure"; then
-      ac_sub_configure=$ac_srcdir/configure
-    elif test -f "$ac_srcdir/configure.in"; then
-      # This should be Cygnus configure.
-      ac_sub_configure=$ac_aux_dir/configure
-    else
-      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: no configuration information is in $ac_dir" >&5
-$as_echo "$as_me: WARNING: no configuration information is in $ac_dir" >&2;}
-      ac_sub_configure=
-    fi
-
-    # The recursion is here.
-    if test -n "$ac_sub_configure"; then
-      # Make the cache file name correct relative to the subdirectory.
-      case $cache_file in
-      [\\/]* | ?:[\\/]* ) ac_sub_cache_file=$cache_file ;;
-      *) # Relative name.
-	ac_sub_cache_file=$ac_top_build_prefix$cache_file ;;
-      esac
-
-      { $as_echo "$as_me:${as_lineno-$LINENO}: running $SHELL $ac_sub_configure $ac_sub_configure_args --cache-file=$ac_sub_cache_file --srcdir=$ac_srcdir" >&5
-$as_echo "$as_me: running $SHELL $ac_sub_configure $ac_sub_configure_args --cache-file=$ac_sub_cache_file --srcdir=$ac_srcdir" >&6;}
-      # The eval makes quoting arguments work.
-      eval "\$SHELL \"\$ac_sub_configure\" $ac_sub_configure_args \
-	   --cache-file=\"\$ac_sub_cache_file\" --srcdir=\"\$ac_srcdir\"" ||
-	as_fn_error $? "$ac_sub_configure failed for $ac_dir" "$LINENO" 5
-    fi
-
-    cd "$ac_popdir"
-  done
 fi
 if test -n "$ac_unrecognized_opts" && test "$enable_option_checking" != no; then
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: unrecognized options: $ac_unrecognized_opts" >&5

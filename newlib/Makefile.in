@@ -163,7 +163,13 @@ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../config/lead-dot.m4 \
 	$(top_srcdir)/../config/multi.m4 \
 	$(top_srcdir)/../config/override.m4 $(top_srcdir)/iconv.m4 \
-	$(top_srcdir)/acinclude.m4 $(top_srcdir)/libm/acinclude.m4 \
+	$(top_srcdir)/acinclude.m4 $(top_srcdir)/libc/acinclude.m4 \
+	$(top_srcdir)/libc/machine/nds32/acinclude.m4 \
+	$(top_srcdir)/libc/machine/powerpc/acinclude.m4 \
+	$(top_srcdir)/libc/machine/sh/acinclude.m4 \
+	$(top_srcdir)/libc/machine/spu/acinclude.m4 \
+	$(top_srcdir)/libc/sys/phoenix/acinclude.m4 \
+	$(top_srcdir)/libm/acinclude.m4 \
 	$(top_srcdir)/libm/machine/nds32/acinclude.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -1204,6 +1210,16 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
+LIBC_MACHINE_DIR = @LIBC_MACHINE_DIR@
+LIBC_MACHINE_LIB = @LIBC_MACHINE_LIB@
+LIBC_POSIX_LIB = @LIBC_POSIX_LIB@
+LIBC_SIGNAL_LIB = @LIBC_SIGNAL_LIB@
+LIBC_STDIO64_LIB = @LIBC_STDIO64_LIB@
+LIBC_STDIO_LIB = @LIBC_STDIO_LIB@
+LIBC_SYSCALL_LIB = @LIBC_SYSCALL_LIB@
+LIBC_SYS_LIB = @LIBC_SYS_LIB@
+LIBC_UNIX_LIB = @LIBC_UNIX_LIB@
+LIBC_XDR_LIB = @LIBC_XDR_LIB@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LTLIBOBJS = @LTLIBOBJS@
@@ -1225,11 +1241,13 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PHOENIX_MACHINE_DIR = @PHOENIX_MACHINE_DIR@
 RANLIB = @RANLIB@
 READELF = @READELF@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+SYS_DIR = @SYS_DIR@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
 abs_newlib_basedir = @abs_newlib_basedir@
@@ -1282,7 +1300,6 @@ sbindir = @sbindir@
 shared_machine_dir = @shared_machine_dir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
-subdirs = @subdirs@
 sys_dir = @sys_dir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@

@@ -216,6 +216,7 @@ AC_ARG_ENABLE(newlib-nano-malloc,
     *)   AC_MSG_ERROR(bad value ${enableval} for newlib-nano-malloc option) ;;
   esac
  fi], [newlib_nano_malloc=])dnl
+AM_CONDITIONAL(NEWLIB_NANO_MALLOC, test x$newlib_nano_malloc = xyes)
 
 dnl Support --disable-newlib-unbuf-stream-opt
 AC_ARG_ENABLE(newlib-unbuf-stream-opt,
@@ -245,12 +246,13 @@ dnl Support --enable-newlib-nano-formatted-io
 dnl This option is also read in libc/configure.in.  It is repeated
 dnl here so that it shows up in the help text.
 AC_ARG_ENABLE(newlib_nano_formatted_io,
-[  --enable-newlib-nano-formatted-io    Use nano version formatted IO],
+[  --enable-newlib-nano-formatted-io    Use small-footprint nano-formatted-IO implementation],
 [case "${enableval}" in
    yes) newlib_nano_formatted_io=yes ;;
    no)  newlib_nano_formatted_io=no ;;
    *) AC_MSG_ERROR(bad value ${enableval} for newlib-nano-formatted-io) ;;
  esac],[newlib_nano_formatted_io=no])
+AM_CONDITIONAL(NEWLIB_NANO_FORMATTED_IO, test x$newlib_nano_formatted_io = xyes)
 
 dnl Support --enable-retargetable-locking
 dnl This option is also read in libc/configure.in.  It is repeated
@@ -262,6 +264,7 @@ AC_ARG_ENABLE(newlib-retargetable-locking,
    no)  newlib_retargetable_locking=no ;;
    *) AC_MSG_ERROR(bad value ${enableval} for newlib-retargetable-locking) ;;
  esac],[newlib_retargetable_locking=no])
+AM_CONDITIONAL(NEWLIB_RETARGETABLE_LOCKING, test x$newlib_retargetable_locking = xyes)
 
 dnl Support --enable-newlib-long-time_t
 AC_ARG_ENABLE(newlib-long-time_t,
@@ -313,7 +316,7 @@ else
 fi
 AC_SUBST(CC_FOR_NEWLIB)
 
-AC_CONFIG_SUBDIRS(libc)
+m4_include([libc/acinclude.m4])
 m4_include([libm/acinclude.m4])
 
 if test -z "${with_multisubdir}"; then

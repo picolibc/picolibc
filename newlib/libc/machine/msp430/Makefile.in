@@ -101,21 +101,26 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-subdir = machine/msp430
+subdir = libc/machine/msp430
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/../../config/lead-dot.m4 \
-	$(top_srcdir)/../../config/override.m4 \
-	$(top_srcdir)/../acinclude.m4 \
-	$(top_srcdir)/machine/nds32/acinclude.m4 \
-	$(top_srcdir)/machine/powerpc/acinclude.m4 \
-	$(top_srcdir)/machine/sh/acinclude.m4 \
-	$(top_srcdir)/machine/spu/acinclude.m4 \
-	$(top_srcdir)/sys/phoenix/acinclude.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/../config/lead-dot.m4 \
+	$(top_srcdir)/../config/multi.m4 \
+	$(top_srcdir)/../config/override.m4 $(top_srcdir)/iconv.m4 \
+	$(top_srcdir)/acinclude.m4 $(top_srcdir)/libc/acinclude.m4 \
+	$(top_srcdir)/libc/machine/nds32/acinclude.m4 \
+	$(top_srcdir)/libc/machine/powerpc/acinclude.m4 \
+	$(top_srcdir)/libc/machine/sh/acinclude.m4 \
+	$(top_srcdir)/libc/machine/spu/acinclude.m4 \
+	$(top_srcdir)/libc/sys/phoenix/acinclude.m4 \
+	$(top_srcdir)/libm/acinclude.m4 \
+	$(top_srcdir)/libm/machine/nds32/acinclude.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am
-mkinstalldirs = $(SHELL) $(top_srcdir)/../../mkinstalldirs
+mkinstalldirs = $(SHELL) $(top_srcdir)/../mkinstalldirs
+CONFIG_HEADER = $(top_builddir)/newlib.h \
+	$(top_builddir)/_newlib_version.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
@@ -143,7 +148,7 @@ AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
 am__v_at_1 = 
-DEFAULT_INCLUDES = -I.@am__isrc@
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp =
 am__depfiles_maybe =
 CPPASCOMPILE = $(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -204,15 +209,22 @@ AWK = @AWK@
 CC = @CC@
 CCAS = @CCAS@
 CCASFLAGS = @CCASFLAGS@
+CC_FOR_BUILD = @CC_FOR_BUILD@
+CC_FOR_NEWLIB = @CC_FOR_NEWLIB@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
+CRT0 = @CRT0@
+CRT0_DIR = @CRT0_DIR@
+CRT1 = @CRT1@
+CRT1_DIR = @CRT1_DIR@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EXEEXT = @EXEEXT@
+EXEEXT_FOR_BUILD = @EXEEXT_FOR_BUILD@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -236,6 +248,10 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
+NEWLIB_MAJOR_VERSION = @NEWLIB_MAJOR_VERSION@
+NEWLIB_MINOR_VERSION = @NEWLIB_MINOR_VERSION@
+NEWLIB_PATCHLEVEL_VERSION = @NEWLIB_PATCHLEVEL_VERSION@
+NEWLIB_VERSION = @NEWLIB_VERSION@
 NO_INCLUDE_LIST = @NO_INCLUDE_LIST@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
@@ -294,6 +310,7 @@ lpfx = @lpfx@
 machine_dir = @machine_dir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
+multi_basedir = @multi_basedir@
 newlib_basedir = @newlib_basedir@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
@@ -333,9 +350,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign --ignore-deps machine/msp430/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign --ignore-deps libc/machine/msp430/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign --ignore-deps machine/msp430/Makefile
+	  $(AUTOMAKE) --foreign --ignore-deps libc/machine/msp430/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
