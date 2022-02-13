@@ -719,7 +719,7 @@ librt.a: $(LIB_NAME) posix_ipc.o
 libacl.a: $(LIB_NAME) sec_posixacl.o
 	$(AM_V_GEN)$(speclib) $^ $(@F)
 
-libssp.a: $(LIB_NAME) $(newlib_build)/libc/ssp/lib.a
+libssp.a: $(LIB_NAME) $(wildcard $(newlib_build)/libc/ssp/*.o)
 	$(AM_V_GEN)$(speclib) $^ $(@F)
 
 #

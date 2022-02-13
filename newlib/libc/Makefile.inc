@@ -38,6 +38,9 @@ install-man: %C%_install-man
 ## * The integrated documentation (chapter ordering).
 ## * Object overridding -- machine dir must come last.
 ## Do not change the order without considering the doc impact.
+##
+## Also keep in mind that every subdir must always be included here.  Any
+## conditional loigc must live in the respective Makefile.inc files.
 include %D%/argz/Makefile.inc
 include %D%/stdlib/Makefile.inc
 include %D%/ctype/Makefile.inc
@@ -58,6 +61,7 @@ include %D%/iconv/Makefile.inc
 include %D%/xdr/Makefile.inc
 include %D%/ssp/Makefile.inc
 include %D%/sys/Makefile.inc
+## NB: Machine must be last!  See comment block above.
 include %D%/machine/Makefile.inc
 
 CLEANFILES += \

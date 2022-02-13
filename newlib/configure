@@ -631,10 +631,124 @@ HAS_NDS32_FPU_SP_FALSE
 HAS_NDS32_FPU_SP_TRUE
 MACH_ADD_SETJMP_FALSE
 MACH_ADD_SETJMP_TRUE
-LIBC_MACHINE_LIB
-LIBC_MACHINE_DIR
-HAVE_LIBC_MACHINE_DIR_FALSE
-HAVE_LIBC_MACHINE_DIR_TRUE
+HAVE_LIBC_MACHINE_Z8K_FALSE
+HAVE_LIBC_MACHINE_Z8K_TRUE
+HAVE_LIBC_MACHINE_XSTORMY16_FALSE
+HAVE_LIBC_MACHINE_XSTORMY16_TRUE
+HAVE_LIBC_MACHINE_XC16X_FALSE
+HAVE_LIBC_MACHINE_XC16X_TRUE
+HAVE_LIBC_MACHINE_X86_64_FALSE
+HAVE_LIBC_MACHINE_X86_64_TRUE
+HAVE_LIBC_MACHINE_W65_FALSE
+HAVE_LIBC_MACHINE_W65_TRUE
+HAVE_LIBC_MACHINE_VISIUM_FALSE
+HAVE_LIBC_MACHINE_VISIUM_TRUE
+HAVE_LIBC_MACHINE_V850_FALSE
+HAVE_LIBC_MACHINE_V850_TRUE
+HAVE_LIBC_MACHINE_TIC80_FALSE
+HAVE_LIBC_MACHINE_TIC80_TRUE
+HAVE_LIBC_MACHINE_TIC6X_FALSE
+HAVE_LIBC_MACHINE_TIC6X_TRUE
+HAVE_LIBC_MACHINE_TIC4X_FALSE
+HAVE_LIBC_MACHINE_TIC4X_TRUE
+HAVE_LIBC_MACHINE_SPU_FALSE
+HAVE_LIBC_MACHINE_SPU_TRUE
+HAVE_LIBC_MACHINE_SPARC_FALSE
+HAVE_LIBC_MACHINE_SPARC_TRUE
+HAVE_LIBC_MACHINE_SH_FALSE
+HAVE_LIBC_MACHINE_SH_TRUE
+HAVE_LIBC_MACHINE_RX_FALSE
+HAVE_LIBC_MACHINE_RX_TRUE
+HAVE_LIBC_MACHINE_RL78_FALSE
+HAVE_LIBC_MACHINE_RL78_TRUE
+HAVE_LIBC_MACHINE_RISCV_FALSE
+HAVE_LIBC_MACHINE_RISCV_TRUE
+HAVE_LIBC_MACHINE_PRU_FALSE
+HAVE_LIBC_MACHINE_PRU_TRUE
+HAVE_LIBC_MACHINE_POWERPC_FALSE
+HAVE_LIBC_MACHINE_POWERPC_TRUE
+HAVE_LIBC_MACHINE_OR1K_FALSE
+HAVE_LIBC_MACHINE_OR1K_TRUE
+HAVE_LIBC_MACHINE_NVPTX_FALSE
+HAVE_LIBC_MACHINE_NVPTX_TRUE
+HAVE_LIBC_MACHINE_NIOS2_FALSE
+HAVE_LIBC_MACHINE_NIOS2_TRUE
+HAVE_LIBC_MACHINE_NECV70_FALSE
+HAVE_LIBC_MACHINE_NECV70_TRUE
+HAVE_LIBC_MACHINE_NDS32_FALSE
+HAVE_LIBC_MACHINE_NDS32_TRUE
+HAVE_LIBC_MACHINE_MT_FALSE
+HAVE_LIBC_MACHINE_MT_TRUE
+HAVE_LIBC_MACHINE_MSP430_FALSE
+HAVE_LIBC_MACHINE_MSP430_TRUE
+HAVE_LIBC_MACHINE_MOXIE_FALSE
+HAVE_LIBC_MACHINE_MOXIE_TRUE
+HAVE_LIBC_MACHINE_MN10300_FALSE
+HAVE_LIBC_MACHINE_MN10300_TRUE
+HAVE_LIBC_MACHINE_MN10200_FALSE
+HAVE_LIBC_MACHINE_MN10200_TRUE
+HAVE_LIBC_MACHINE_MIPS_FALSE
+HAVE_LIBC_MACHINE_MIPS_TRUE
+HAVE_LIBC_MACHINE_MICROBLAZE_FALSE
+HAVE_LIBC_MACHINE_MICROBLAZE_TRUE
+HAVE_LIBC_MACHINE_MEP_FALSE
+HAVE_LIBC_MACHINE_MEP_TRUE
+HAVE_LIBC_MACHINE_M88K_FALSE
+HAVE_LIBC_MACHINE_M88K_TRUE
+HAVE_LIBC_MACHINE_M68K_FALSE
+HAVE_LIBC_MACHINE_M68K_TRUE
+HAVE_LIBC_MACHINE_M68HC11_FALSE
+HAVE_LIBC_MACHINE_M68HC11_TRUE
+HAVE_LIBC_MACHINE_M32R_FALSE
+HAVE_LIBC_MACHINE_M32R_TRUE
+HAVE_LIBC_MACHINE_M32C_FALSE
+HAVE_LIBC_MACHINE_M32C_TRUE
+HAVE_LIBC_MACHINE_LM32_FALSE
+HAVE_LIBC_MACHINE_LM32_TRUE
+HAVE_LIBC_MACHINE_IQ2000_FALSE
+HAVE_LIBC_MACHINE_IQ2000_TRUE
+HAVE_LIBC_MACHINE_I960_FALSE
+HAVE_LIBC_MACHINE_I960_TRUE
+HAVE_LIBC_MACHINE_I386_FALSE
+HAVE_LIBC_MACHINE_I386_TRUE
+HAVE_LIBC_MACHINE_HPPA_FALSE
+HAVE_LIBC_MACHINE_HPPA_TRUE
+HAVE_LIBC_MACHINE_H8500_FALSE
+HAVE_LIBC_MACHINE_H8500_TRUE
+HAVE_LIBC_MACHINE_H8300_FALSE
+HAVE_LIBC_MACHINE_H8300_TRUE
+HAVE_LIBC_MACHINE_FT32_FALSE
+HAVE_LIBC_MACHINE_FT32_TRUE
+HAVE_LIBC_MACHINE_FRV_FALSE
+HAVE_LIBC_MACHINE_FRV_TRUE
+HAVE_LIBC_MACHINE_FR30_FALSE
+HAVE_LIBC_MACHINE_FR30_TRUE
+HAVE_LIBC_MACHINE_EPIPHANY_FALSE
+HAVE_LIBC_MACHINE_EPIPHANY_TRUE
+HAVE_LIBC_MACHINE_D30V_FALSE
+HAVE_LIBC_MACHINE_D30V_TRUE
+HAVE_LIBC_MACHINE_D10V_FALSE
+HAVE_LIBC_MACHINE_D10V_TRUE
+HAVE_LIBC_MACHINE_CSKY_FALSE
+HAVE_LIBC_MACHINE_CSKY_TRUE
+HAVE_LIBC_MACHINE_CRX_FALSE
+HAVE_LIBC_MACHINE_CRX_TRUE
+HAVE_LIBC_MACHINE_CRIS_FALSE
+HAVE_LIBC_MACHINE_CRIS_TRUE
+HAVE_LIBC_MACHINE_CR16_FALSE
+HAVE_LIBC_MACHINE_CR16_TRUE
+HAVE_LIBC_MACHINE_BFIN_FALSE
+HAVE_LIBC_MACHINE_BFIN_TRUE
+HAVE_LIBC_MACHINE_ARM_FALSE
+HAVE_LIBC_MACHINE_ARM_TRUE
+HAVE_LIBC_MACHINE_ARC_FALSE
+HAVE_LIBC_MACHINE_ARC_TRUE
+HAVE_LIBC_MACHINE_AMDGCN_FALSE
+HAVE_LIBC_MACHINE_AMDGCN_TRUE
+HAVE_LIBC_MACHINE_AARCH64_FALSE
+HAVE_LIBC_MACHINE_AARCH64_TRUE
+HAVE_LIBC_SYS_PHOENIX_ARM_DIR_FALSE
+HAVE_LIBC_SYS_PHOENIX_ARM_DIR_TRUE
 PHOENIX_MACHINE_DIR
 HAVE_SPU_EA_FALSE
 HAVE_SPU_EA_TRUE
@@ -650,31 +764,68 @@ ENABLE_NEWLIB_ICONV_FALSE
 ENABLE_NEWLIB_ICONV_TRUE
 HAVE_LONG_DOUBLE_FALSE
 HAVE_LONG_DOUBLE_TRUE
-LIBC_SYS_LIB
-HAVE_SYS_DIR_FALSE
-HAVE_SYS_DIR_TRUE
-SYS_DIR
+HAVE_LIBC_SYS_Z8KSIM_DIR_FALSE
+HAVE_LIBC_SYS_Z8KSIM_DIR_TRUE
+HAVE_LIBC_SYS_W65_DIR_FALSE
+HAVE_LIBC_SYS_W65_DIR_TRUE
+HAVE_LIBC_SYS_TIRTOS_DIR_FALSE
+HAVE_LIBC_SYS_TIRTOS_DIR_TRUE
+HAVE_LIBC_SYS_TIC80_DIR_FALSE
+HAVE_LIBC_SYS_TIC80_DIR_TRUE
+HAVE_LIBC_SYS_SYSVNECV70_DIR_FALSE
+HAVE_LIBC_SYS_SYSVNECV70_DIR_TRUE
+HAVE_LIBC_SYS_SYSVI386_DIR_FALSE
+HAVE_LIBC_SYS_SYSVI386_DIR_TRUE
+HAVE_LIBC_SYS_SYSNECV850_DIR_FALSE
+HAVE_LIBC_SYS_SYSNECV850_DIR_TRUE
+HAVE_LIBC_SYS_SYSNEC810_DIR_FALSE
+HAVE_LIBC_SYS_SYSNEC810_DIR_TRUE
+HAVE_LIBC_SYS_SYSMEC_DIR_FALSE
+HAVE_LIBC_SYS_SYSMEC_DIR_TRUE
+HAVE_LIBC_SYS_SH_DIR_FALSE
+HAVE_LIBC_SYS_SH_DIR_TRUE
+HAVE_LIBC_SYS_RTEMS_DIR_FALSE
+HAVE_LIBC_SYS_RTEMS_DIR_TRUE
+HAVE_LIBC_SYS_RDOS_DIR_FALSE
+HAVE_LIBC_SYS_RDOS_DIR_TRUE
+HAVE_LIBC_SYS_PHOENIX_DIR_FALSE
+HAVE_LIBC_SYS_PHOENIX_DIR_TRUE
+HAVE_LIBC_SYS_OR1K_DIR_FALSE
+HAVE_LIBC_SYS_OR1K_DIR_TRUE
+HAVE_LIBC_SYS_NETWARE_DIR_FALSE
+HAVE_LIBC_SYS_NETWARE_DIR_TRUE
+HAVE_LIBC_SYS_MMIXWARE_DIR_FALSE
+HAVE_LIBC_SYS_MMIXWARE_DIR_TRUE
+HAVE_LIBC_SYS_M88KBUG_DIR_FALSE
+HAVE_LIBC_SYS_M88KBUG_DIR_TRUE
+HAVE_LIBC_SYS_H8500HMS_DIR_FALSE
+HAVE_LIBC_SYS_H8500HMS_DIR_TRUE
+HAVE_LIBC_SYS_H8300HMS_DIR_FALSE
+HAVE_LIBC_SYS_H8300HMS_DIR_TRUE
+HAVE_LIBC_SYS_EPIPHANY_DIR_FALSE
+HAVE_LIBC_SYS_EPIPHANY_DIR_TRUE
+HAVE_LIBC_SYS_D10V_DIR_FALSE
+HAVE_LIBC_SYS_D10V_DIR_TRUE
+HAVE_LIBC_SYS_ARM_DIR_FALSE
+HAVE_LIBC_SYS_ARM_DIR_TRUE
+HAVE_LIBC_SYS_AMDGCN_DIR_FALSE
+HAVE_LIBC_SYS_AMDGCN_DIR_TRUE
+HAVE_LIBC_SYS_A29KHIF_DIR_FALSE
+HAVE_LIBC_SYS_A29KHIF_DIR_TRUE
 HAVE_UNIX_DIR_FALSE
 HAVE_UNIX_DIR_TRUE
-LIBC_UNIX_LIB
 HAVE_SYSCALL_DIR_FALSE
 HAVE_SYSCALL_DIR_TRUE
-LIBC_SYSCALL_LIB
 HAVE_XDR_DIR_FALSE
 HAVE_XDR_DIR_TRUE
-LIBC_XDR_LIB
 HAVE_POSIX_DIR_FALSE
 HAVE_POSIX_DIR_TRUE
-LIBC_POSIX_LIB
 HAVE_STDIO64_DIR_FALSE
 HAVE_STDIO64_DIR_TRUE
-LIBC_STDIO64_LIB
 HAVE_STDIO_DIR_FALSE
 HAVE_STDIO_DIR_TRUE
-LIBC_STDIO_LIB
 HAVE_SIGNAL_DIR_FALSE
 HAVE_SIGNAL_DIR_TRUE
-LIBC_SIGNAL_LIB
 CC_FOR_NEWLIB
 NEWLIB_HW_FP_FALSE
 NEWLIB_HW_FP_TRUE
@@ -4778,23 +4929,12 @@ fi
 
 
 
-LIBC_SIGNAL_LIB=
-if test -n "${signal_dir}"; then
-  LIBC_SIGNAL_LIB=${signal_dir}/lib.a
-fi
-
  if test x${signal_dir} != x; then
   HAVE_SIGNAL_DIR_TRUE=
   HAVE_SIGNAL_DIR_FALSE='#'
 else
   HAVE_SIGNAL_DIR_TRUE='#'
   HAVE_SIGNAL_DIR_FALSE=
-fi
-
-
-LIBC_STDIO_LIB=
-if test -n "${stdio_dir}"; then
-  LIBC_STDIO_LIB=${stdio_dir}/lib.a
 fi
 
  if test x${stdio_dir} != x; then
@@ -4805,24 +4945,12 @@ else
   HAVE_STDIO_DIR_FALSE=
 fi
 
-
-LIBC_STDIO64_LIB=
-if test -n "${stdio64_dir}"; then
-  LIBC_STDIO64_LIB=${stdio64_dir}/lib.a
-fi
-
  if test x${stdio64_dir} != x; then
   HAVE_STDIO64_DIR_TRUE=
   HAVE_STDIO64_DIR_FALSE='#'
 else
   HAVE_STDIO64_DIR_TRUE='#'
   HAVE_STDIO64_DIR_FALSE=
-fi
-
-
-LIBC_POSIX_LIB=
-if test -n "${posix_dir}"; then
-  LIBC_POSIX_LIB=${posix_dir}/lib.a
 fi
 
  if test x${posix_dir} != x; then
@@ -4833,12 +4961,6 @@ else
   HAVE_POSIX_DIR_FALSE=
 fi
 
-
-LIBC_XDR_LIB=
-if test -n "${xdr_dir}"; then
-  LIBC_XDR_LIB=${xdr_dir}/lib.a
-fi
-
  if test x${xdr_dir} != x; then
   HAVE_XDR_DIR_TRUE=
   HAVE_XDR_DIR_FALSE='#'
@@ -4847,24 +4969,12 @@ else
   HAVE_XDR_DIR_FALSE=
 fi
 
-
-LIBC_SYSCALL_LIB=
-if test -n "${syscall_dir}"; then
-  LIBC_SYSCALL_LIB=${syscall_dir}/lib.a
-fi
-
  if test x${syscall_dir} != x; then
   HAVE_SYSCALL_DIR_TRUE=
   HAVE_SYSCALL_DIR_FALSE='#'
 else
   HAVE_SYSCALL_DIR_TRUE='#'
   HAVE_SYSCALL_DIR_FALSE=
-fi
-
-
-LIBC_UNIX_LIB=
-if test -n "${unix_dir}"; then
-  LIBC_UNIX_LIB=${unix_dir}/lib.a
 fi
 
  if test x${unix_dir} != x; then
@@ -4876,73 +4986,174 @@ else
 fi
 
 
-
-LIBC_SYS_LIB=
-if test -n "${sys_dir}"; then
-  case ${sys_dir} in
-    a29khif) ac_config_files="$ac_config_files libc/sys/a29khif/Makefile"
- ;;
-    amdgcn) ac_config_files="$ac_config_files libc/sys/amdgcn/Makefile"
- ;;
-    arm) ac_config_files="$ac_config_files libc/sys/arm/Makefile"
- ;;
-    d10v) ac_config_files="$ac_config_files libc/sys/d10v/Makefile"
- ;;
-    epiphany) ac_config_files="$ac_config_files libc/sys/epiphany/Makefile"
- ;;
-    h8300hms) ac_config_files="$ac_config_files libc/sys/h8300hms/Makefile"
- ;;
-    h8500hms) ac_config_files="$ac_config_files libc/sys/h8500hms/Makefile"
- ;;
-    m88kbug) ac_config_files="$ac_config_files libc/sys/m88kbug/Makefile"
- ;;
-    mmixware) ac_config_files="$ac_config_files libc/sys/mmixware/Makefile"
- ;;
-    netware) ac_config_files="$ac_config_files libc/sys/netware/Makefile"
- ;;
-    or1k) ac_config_files="$ac_config_files libc/sys/or1k/Makefile"
- ;;
-    phoenix) ac_config_files="$ac_config_files libc/sys/phoenix/Makefile"
- ;;
-    rdos) ac_config_files="$ac_config_files libc/sys/rdos/Makefile"
- ;;
-    rtems) ac_config_files="$ac_config_files libc/sys/rtems/Makefile"
- ;;
-    sh) ac_config_files="$ac_config_files libc/sys/sh/Makefile"
- ;;
-    sysmec) ac_config_files="$ac_config_files libc/sys/sysmec/Makefile"
- ;;
-    sysnec810) ac_config_files="$ac_config_files libc/sys/sysnec810/Makefile"
- ;;
-    sysnecv850) ac_config_files="$ac_config_files libc/sys/sysnecv850/Makefile"
- ;;
-    sysvi386) ac_config_files="$ac_config_files libc/sys/sysvi386/Makefile"
- ;;
-    sysvnecv70) ac_config_files="$ac_config_files libc/sys/sysvnecv70/Makefile"
- ;;
-    tic80) ac_config_files="$ac_config_files libc/sys/tic80/Makefile"
- ;;
-    tirtos) ac_config_files="$ac_config_files libc/sys/tirtos/Makefile"
- ;;
-    w65) ac_config_files="$ac_config_files libc/sys/w65/Makefile"
- ;;
-    z8ksim) ac_config_files="$ac_config_files libc/sys/z8ksim/Makefile"
- ;;
-    *) as_fn_error $? "unsupported sys_dir \"${sys_dir}\"" "$LINENO" 5 ;;
-  esac
-
-  SYS_DIR=sys/${sys_dir}
-  LIBC_SYS_LIB=${SYS_DIR}/lib.a
-fi
-
- if test x${sys_dir} != x; then
-  HAVE_SYS_DIR_TRUE=
-  HAVE_SYS_DIR_FALSE='#'
+ if test "${sys_dir}" = a29khif; then
+  HAVE_LIBC_SYS_A29KHIF_DIR_TRUE=
+  HAVE_LIBC_SYS_A29KHIF_DIR_FALSE='#'
 else
-  HAVE_SYS_DIR_TRUE='#'
-  HAVE_SYS_DIR_FALSE=
+  HAVE_LIBC_SYS_A29KHIF_DIR_TRUE='#'
+  HAVE_LIBC_SYS_A29KHIF_DIR_FALSE=
 fi
-
+ if test "${sys_dir}" = amdgcn; then
+  HAVE_LIBC_SYS_AMDGCN_DIR_TRUE=
+  HAVE_LIBC_SYS_AMDGCN_DIR_FALSE='#'
+else
+  HAVE_LIBC_SYS_AMDGCN_DIR_TRUE='#'
+  HAVE_LIBC_SYS_AMDGCN_DIR_FALSE=
+fi
+ if test "${sys_dir}" = arm; then
+  HAVE_LIBC_SYS_ARM_DIR_TRUE=
+  HAVE_LIBC_SYS_ARM_DIR_FALSE='#'
+else
+  HAVE_LIBC_SYS_ARM_DIR_TRUE='#'
+  HAVE_LIBC_SYS_ARM_DIR_FALSE=
+fi
+ if test "${sys_dir}" = d10v; then
+  HAVE_LIBC_SYS_D10V_DIR_TRUE=
+  HAVE_LIBC_SYS_D10V_DIR_FALSE='#'
+else
+  HAVE_LIBC_SYS_D10V_DIR_TRUE='#'
+  HAVE_LIBC_SYS_D10V_DIR_FALSE=
+fi
+ if test "${sys_dir}" = epiphany; then
+  HAVE_LIBC_SYS_EPIPHANY_DIR_TRUE=
+  HAVE_LIBC_SYS_EPIPHANY_DIR_FALSE='#'
+else
+  HAVE_LIBC_SYS_EPIPHANY_DIR_TRUE='#'
+  HAVE_LIBC_SYS_EPIPHANY_DIR_FALSE=
+fi
+ if test "${sys_dir}" = h8300hms; then
+  HAVE_LIBC_SYS_H8300HMS_DIR_TRUE=
+  HAVE_LIBC_SYS_H8300HMS_DIR_FALSE='#'
+else
+  HAVE_LIBC_SYS_H8300HMS_DIR_TRUE='#'
+  HAVE_LIBC_SYS_H8300HMS_DIR_FALSE=
+fi
+ if test "${sys_dir}" = h8500hms; then
+  HAVE_LIBC_SYS_H8500HMS_DIR_TRUE=
+  HAVE_LIBC_SYS_H8500HMS_DIR_FALSE='#'
+else
+  HAVE_LIBC_SYS_H8500HMS_DIR_TRUE='#'
+  HAVE_LIBC_SYS_H8500HMS_DIR_FALSE=
+fi
+ if test "${sys_dir}" = m88kbug; then
+  HAVE_LIBC_SYS_M88KBUG_DIR_TRUE=
+  HAVE_LIBC_SYS_M88KBUG_DIR_FALSE='#'
+else
+  HAVE_LIBC_SYS_M88KBUG_DIR_TRUE='#'
+  HAVE_LIBC_SYS_M88KBUG_DIR_FALSE=
+fi
+ if test "${sys_dir}" = mmixware; then
+  HAVE_LIBC_SYS_MMIXWARE_DIR_TRUE=
+  HAVE_LIBC_SYS_MMIXWARE_DIR_FALSE='#'
+else
+  HAVE_LIBC_SYS_MMIXWARE_DIR_TRUE='#'
+  HAVE_LIBC_SYS_MMIXWARE_DIR_FALSE=
+fi
+ if test "${sys_dir}" = netware; then
+  HAVE_LIBC_SYS_NETWARE_DIR_TRUE=
+  HAVE_LIBC_SYS_NETWARE_DIR_FALSE='#'
+else
+  HAVE_LIBC_SYS_NETWARE_DIR_TRUE='#'
+  HAVE_LIBC_SYS_NETWARE_DIR_FALSE=
+fi
+ if test "${sys_dir}" = or1k; then
+  HAVE_LIBC_SYS_OR1K_DIR_TRUE=
+  HAVE_LIBC_SYS_OR1K_DIR_FALSE='#'
+else
+  HAVE_LIBC_SYS_OR1K_DIR_TRUE='#'
+  HAVE_LIBC_SYS_OR1K_DIR_FALSE=
+fi
+ if test "${sys_dir}" = phoenix; then
+  HAVE_LIBC_SYS_PHOENIX_DIR_TRUE=
+  HAVE_LIBC_SYS_PHOENIX_DIR_FALSE='#'
+else
+  HAVE_LIBC_SYS_PHOENIX_DIR_TRUE='#'
+  HAVE_LIBC_SYS_PHOENIX_DIR_FALSE=
+fi
+ if test "${sys_dir}" = rdos; then
+  HAVE_LIBC_SYS_RDOS_DIR_TRUE=
+  HAVE_LIBC_SYS_RDOS_DIR_FALSE='#'
+else
+  HAVE_LIBC_SYS_RDOS_DIR_TRUE='#'
+  HAVE_LIBC_SYS_RDOS_DIR_FALSE=
+fi
+ if test "${sys_dir}" = rtems; then
+  HAVE_LIBC_SYS_RTEMS_DIR_TRUE=
+  HAVE_LIBC_SYS_RTEMS_DIR_FALSE='#'
+else
+  HAVE_LIBC_SYS_RTEMS_DIR_TRUE='#'
+  HAVE_LIBC_SYS_RTEMS_DIR_FALSE=
+fi
+ if test "${sys_dir}" = sh; then
+  HAVE_LIBC_SYS_SH_DIR_TRUE=
+  HAVE_LIBC_SYS_SH_DIR_FALSE='#'
+else
+  HAVE_LIBC_SYS_SH_DIR_TRUE='#'
+  HAVE_LIBC_SYS_SH_DIR_FALSE=
+fi
+ if test "${sys_dir}" = sysmec; then
+  HAVE_LIBC_SYS_SYSMEC_DIR_TRUE=
+  HAVE_LIBC_SYS_SYSMEC_DIR_FALSE='#'
+else
+  HAVE_LIBC_SYS_SYSMEC_DIR_TRUE='#'
+  HAVE_LIBC_SYS_SYSMEC_DIR_FALSE=
+fi
+ if test "${sys_dir}" = sysnec810; then
+  HAVE_LIBC_SYS_SYSNEC810_DIR_TRUE=
+  HAVE_LIBC_SYS_SYSNEC810_DIR_FALSE='#'
+else
+  HAVE_LIBC_SYS_SYSNEC810_DIR_TRUE='#'
+  HAVE_LIBC_SYS_SYSNEC810_DIR_FALSE=
+fi
+ if test "${sys_dir}" = sysnecv850; then
+  HAVE_LIBC_SYS_SYSNECV850_DIR_TRUE=
+  HAVE_LIBC_SYS_SYSNECV850_DIR_FALSE='#'
+else
+  HAVE_LIBC_SYS_SYSNECV850_DIR_TRUE='#'
+  HAVE_LIBC_SYS_SYSNECV850_DIR_FALSE=
+fi
+ if test "${sys_dir}" = sysvi386; then
+  HAVE_LIBC_SYS_SYSVI386_DIR_TRUE=
+  HAVE_LIBC_SYS_SYSVI386_DIR_FALSE='#'
+else
+  HAVE_LIBC_SYS_SYSVI386_DIR_TRUE='#'
+  HAVE_LIBC_SYS_SYSVI386_DIR_FALSE=
+fi
+ if test "${sys_dir}" = sysvnecv70; then
+  HAVE_LIBC_SYS_SYSVNECV70_DIR_TRUE=
+  HAVE_LIBC_SYS_SYSVNECV70_DIR_FALSE='#'
+else
+  HAVE_LIBC_SYS_SYSVNECV70_DIR_TRUE='#'
+  HAVE_LIBC_SYS_SYSVNECV70_DIR_FALSE=
+fi
+ if test "${sys_dir}" = tic80; then
+  HAVE_LIBC_SYS_TIC80_DIR_TRUE=
+  HAVE_LIBC_SYS_TIC80_DIR_FALSE='#'
+else
+  HAVE_LIBC_SYS_TIC80_DIR_TRUE='#'
+  HAVE_LIBC_SYS_TIC80_DIR_FALSE=
+fi
+ if test "${sys_dir}" = tirtos; then
+  HAVE_LIBC_SYS_TIRTOS_DIR_TRUE=
+  HAVE_LIBC_SYS_TIRTOS_DIR_FALSE='#'
+else
+  HAVE_LIBC_SYS_TIRTOS_DIR_TRUE='#'
+  HAVE_LIBC_SYS_TIRTOS_DIR_FALSE=
+fi
+ if test "${sys_dir}" = w65; then
+  HAVE_LIBC_SYS_W65_DIR_TRUE=
+  HAVE_LIBC_SYS_W65_DIR_FALSE='#'
+else
+  HAVE_LIBC_SYS_W65_DIR_TRUE='#'
+  HAVE_LIBC_SYS_W65_DIR_FALSE=
+fi
+ if test "${sys_dir}" = z8ksim; then
+  HAVE_LIBC_SYS_Z8KSIM_DIR_TRUE=
+  HAVE_LIBC_SYS_Z8KSIM_DIR_FALSE='#'
+else
+  HAVE_LIBC_SYS_Z8KSIM_DIR_TRUE='#'
+  HAVE_LIBC_SYS_Z8KSIM_DIR_FALSE=
+fi
 
 
 
@@ -5151,154 +5362,427 @@ fi
 
 
 if test "$sys_dir" = "phoenix"; then :
-        if test "${machine_dir}" = arm; then :
-  ac_config_files="$ac_config_files libc/sys/phoenix/machine/arm/Makefile"
+    PHOENIX_MACHINE_DIR=machine/${machine_dir}
 
 fi
 
 
-  PHOENIX_MACHINE_DIR=machine/${machine_dir}
-
-fi
-
-
-
-LIBC_MACHINE_LIB=
-if test -n "${machine_dir}"; then
-  case ${machine_dir} in
-    a29k) ac_config_files="$ac_config_files libc/machine/a29k/Makefile"
- ;;
-    aarch64) ac_config_files="$ac_config_files libc/machine/aarch64/Makefile"
- ;;
-    amdgcn) ac_config_files="$ac_config_files libc/machine/amdgcn/Makefile"
- ;;
-    arc) ac_config_files="$ac_config_files libc/machine/arc/Makefile"
- ;;
-    arm) ac_config_files="$ac_config_files libc/machine/arm/Makefile"
- ;;
-    bfin) ac_config_files="$ac_config_files libc/machine/bfin/Makefile"
- ;;
-    cr16) ac_config_files="$ac_config_files libc/machine/cr16/Makefile"
- ;;
-    cris) ac_config_files="$ac_config_files libc/machine/cris/Makefile"
- ;;
-    crx) ac_config_files="$ac_config_files libc/machine/crx/Makefile"
- ;;
-    csky) ac_config_files="$ac_config_files libc/machine/csky/Makefile"
- ;;
-    d10v) ac_config_files="$ac_config_files libc/machine/d10v/Makefile"
- ;;
-    d30v) ac_config_files="$ac_config_files libc/machine/d30v/Makefile"
- ;;
-    epiphany) ac_config_files="$ac_config_files libc/machine/epiphany/Makefile"
- ;;
-    fr30) ac_config_files="$ac_config_files libc/machine/fr30/Makefile"
- ;;
-    frv) ac_config_files="$ac_config_files libc/machine/frv/Makefile"
- ;;
-    ft32) ac_config_files="$ac_config_files libc/machine/ft32/Makefile"
- ;;
-    h8300) ac_config_files="$ac_config_files libc/machine/h8300/Makefile"
- ;;
-    h8500) ac_config_files="$ac_config_files libc/machine/h8500/Makefile"
- ;;
-    hppa) ac_config_files="$ac_config_files libc/machine/hppa/Makefile"
- ;;
-    i386) ac_config_files="$ac_config_files libc/machine/i386/Makefile"
- ;;
-    i960) ac_config_files="$ac_config_files libc/machine/i960/Makefile"
- ;;
-    iq2000) ac_config_files="$ac_config_files libc/machine/iq2000/Makefile"
- ;;
-    lm32) ac_config_files="$ac_config_files libc/machine/lm32/Makefile"
- ;;
-    m32c) ac_config_files="$ac_config_files libc/machine/m32c/Makefile"
- ;;
-    m32r) ac_config_files="$ac_config_files libc/machine/m32r/Makefile"
- ;;
-    m68hc11) ac_config_files="$ac_config_files libc/machine/m68hc11/Makefile"
- ;;
-    m68k) ac_config_files="$ac_config_files libc/machine/m68k/Makefile"
- ;;
-    m88k) ac_config_files="$ac_config_files libc/machine/m88k/Makefile"
- ;;
-    mep) ac_config_files="$ac_config_files libc/machine/mep/Makefile"
- ;;
-    microblaze) ac_config_files="$ac_config_files libc/machine/microblaze/Makefile"
- ;;
-    mips) ac_config_files="$ac_config_files libc/machine/mips/Makefile"
- ;;
-    riscv) ac_config_files="$ac_config_files libc/machine/riscv/Makefile"
- ;;
-    mn10200) ac_config_files="$ac_config_files libc/machine/mn10200/Makefile"
- ;;
-    mn10300) ac_config_files="$ac_config_files libc/machine/mn10300/Makefile"
- ;;
-    moxie) ac_config_files="$ac_config_files libc/machine/moxie/Makefile"
- ;;
-    msp430) ac_config_files="$ac_config_files libc/machine/msp430/Makefile"
- ;;
-    mt) ac_config_files="$ac_config_files libc/machine/mt/Makefile"
- ;;
-    nds32) ac_config_files="$ac_config_files libc/machine/nds32/Makefile"
- ;;
-    necv70) ac_config_files="$ac_config_files libc/machine/necv70/Makefile"
- ;;
-    nios2) ac_config_files="$ac_config_files libc/machine/nios2/Makefile"
- ;;
-    nvptx) ac_config_files="$ac_config_files libc/machine/nvptx/Makefile"
- ;;
-    or1k) ac_config_files="$ac_config_files libc/machine/or1k/Makefile"
- ;;
-    powerpc) ac_config_files="$ac_config_files libc/machine/powerpc/Makefile"
- ;;
-    pru) ac_config_files="$ac_config_files libc/machine/pru/Makefile"
- ;;
-    rl78) ac_config_files="$ac_config_files libc/machine/rl78/Makefile"
- ;;
-    rx) ac_config_files="$ac_config_files libc/machine/rx/Makefile"
- ;;
-    sh) ac_config_files="$ac_config_files libc/machine/sh/Makefile"
- ;;
-    sparc) ac_config_files="$ac_config_files libc/machine/sparc/Makefile"
- ;;
-    spu) ac_config_files="$ac_config_files libc/machine/spu/Makefile"
- ;;
-    tic4x) ac_config_files="$ac_config_files libc/machine/tic4x/Makefile"
- ;;
-    tic6x) ac_config_files="$ac_config_files libc/machine/tic6x/Makefile"
- ;;
-    tic80) ac_config_files="$ac_config_files libc/machine/tic80/Makefile"
- ;;
-    v850) ac_config_files="$ac_config_files libc/machine/v850/Makefile"
- ;;
-    visium) ac_config_files="$ac_config_files libc/machine/visium/Makefile"
- ;;
-    w65) ac_config_files="$ac_config_files libc/machine/w65/Makefile"
- ;;
-    x86_64) ac_config_files="$ac_config_files libc/machine/x86_64/Makefile"
- ;;
-    xc16x) ac_config_files="$ac_config_files libc/machine/xc16x/Makefile"
- ;;
-    xstormy16) ac_config_files="$ac_config_files libc/machine/xstormy16/Makefile"
- ;;
-    z8k) ac_config_files="$ac_config_files libc/machine/z8k/Makefile"
- ;;
-    *) as_fn_error $? "unsupported machine_dir \"${machine_dir}\"" "$LINENO" 5 ;;
-  esac
-
-  LIBC_MACHINE_DIR=machine/${machine_dir}
-  LIBC_MACHINE_LIB=${LIBC_MACHINE_DIR}/lib.a
-fi
- if test "x${LIBC_MACHINE_DIR}" != x; then
-  HAVE_LIBC_MACHINE_DIR_TRUE=
-  HAVE_LIBC_MACHINE_DIR_FALSE='#'
+ if test "${machine_dir}" = arm; then
+  HAVE_LIBC_SYS_PHOENIX_ARM_DIR_TRUE=
+  HAVE_LIBC_SYS_PHOENIX_ARM_DIR_FALSE='#'
 else
-  HAVE_LIBC_MACHINE_DIR_TRUE='#'
-  HAVE_LIBC_MACHINE_DIR_FALSE=
+  HAVE_LIBC_SYS_PHOENIX_ARM_DIR_TRUE='#'
+  HAVE_LIBC_SYS_PHOENIX_ARM_DIR_FALSE=
 fi
 
 
+
+ if test "${machine_dir}" = aarch64; then
+  HAVE_LIBC_MACHINE_AARCH64_TRUE=
+  HAVE_LIBC_MACHINE_AARCH64_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_AARCH64_TRUE='#'
+  HAVE_LIBC_MACHINE_AARCH64_FALSE=
+fi
+ if test "${machine_dir}" = amdgcn; then
+  HAVE_LIBC_MACHINE_AMDGCN_TRUE=
+  HAVE_LIBC_MACHINE_AMDGCN_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_AMDGCN_TRUE='#'
+  HAVE_LIBC_MACHINE_AMDGCN_FALSE=
+fi
+ if test "${machine_dir}" = arc; then
+  HAVE_LIBC_MACHINE_ARC_TRUE=
+  HAVE_LIBC_MACHINE_ARC_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_ARC_TRUE='#'
+  HAVE_LIBC_MACHINE_ARC_FALSE=
+fi
+ if test "${machine_dir}" = arm; then
+  HAVE_LIBC_MACHINE_ARM_TRUE=
+  HAVE_LIBC_MACHINE_ARM_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_ARM_TRUE='#'
+  HAVE_LIBC_MACHINE_ARM_FALSE=
+fi
+ if test "${machine_dir}" = bfin; then
+  HAVE_LIBC_MACHINE_BFIN_TRUE=
+  HAVE_LIBC_MACHINE_BFIN_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_BFIN_TRUE='#'
+  HAVE_LIBC_MACHINE_BFIN_FALSE=
+fi
+ if test "${machine_dir}" = cr16; then
+  HAVE_LIBC_MACHINE_CR16_TRUE=
+  HAVE_LIBC_MACHINE_CR16_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_CR16_TRUE='#'
+  HAVE_LIBC_MACHINE_CR16_FALSE=
+fi
+ if test "${machine_dir}" = cris; then
+  HAVE_LIBC_MACHINE_CRIS_TRUE=
+  HAVE_LIBC_MACHINE_CRIS_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_CRIS_TRUE='#'
+  HAVE_LIBC_MACHINE_CRIS_FALSE=
+fi
+ if test "${machine_dir}" = crx; then
+  HAVE_LIBC_MACHINE_CRX_TRUE=
+  HAVE_LIBC_MACHINE_CRX_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_CRX_TRUE='#'
+  HAVE_LIBC_MACHINE_CRX_FALSE=
+fi
+ if test "${machine_dir}" = csky; then
+  HAVE_LIBC_MACHINE_CSKY_TRUE=
+  HAVE_LIBC_MACHINE_CSKY_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_CSKY_TRUE='#'
+  HAVE_LIBC_MACHINE_CSKY_FALSE=
+fi
+ if test "${machine_dir}" = d10v; then
+  HAVE_LIBC_MACHINE_D10V_TRUE=
+  HAVE_LIBC_MACHINE_D10V_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_D10V_TRUE='#'
+  HAVE_LIBC_MACHINE_D10V_FALSE=
+fi
+ if test "${machine_dir}" = d30v; then
+  HAVE_LIBC_MACHINE_D30V_TRUE=
+  HAVE_LIBC_MACHINE_D30V_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_D30V_TRUE='#'
+  HAVE_LIBC_MACHINE_D30V_FALSE=
+fi
+ if test "${machine_dir}" = epiphany; then
+  HAVE_LIBC_MACHINE_EPIPHANY_TRUE=
+  HAVE_LIBC_MACHINE_EPIPHANY_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_EPIPHANY_TRUE='#'
+  HAVE_LIBC_MACHINE_EPIPHANY_FALSE=
+fi
+ if test "${machine_dir}" = fr30; then
+  HAVE_LIBC_MACHINE_FR30_TRUE=
+  HAVE_LIBC_MACHINE_FR30_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_FR30_TRUE='#'
+  HAVE_LIBC_MACHINE_FR30_FALSE=
+fi
+ if test "${machine_dir}" = frv; then
+  HAVE_LIBC_MACHINE_FRV_TRUE=
+  HAVE_LIBC_MACHINE_FRV_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_FRV_TRUE='#'
+  HAVE_LIBC_MACHINE_FRV_FALSE=
+fi
+ if test "${machine_dir}" = ft32; then
+  HAVE_LIBC_MACHINE_FT32_TRUE=
+  HAVE_LIBC_MACHINE_FT32_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_FT32_TRUE='#'
+  HAVE_LIBC_MACHINE_FT32_FALSE=
+fi
+ if test "${machine_dir}" = h8300; then
+  HAVE_LIBC_MACHINE_H8300_TRUE=
+  HAVE_LIBC_MACHINE_H8300_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_H8300_TRUE='#'
+  HAVE_LIBC_MACHINE_H8300_FALSE=
+fi
+ if test "${machine_dir}" = h8500; then
+  HAVE_LIBC_MACHINE_H8500_TRUE=
+  HAVE_LIBC_MACHINE_H8500_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_H8500_TRUE='#'
+  HAVE_LIBC_MACHINE_H8500_FALSE=
+fi
+ if test "${machine_dir}" = hppa; then
+  HAVE_LIBC_MACHINE_HPPA_TRUE=
+  HAVE_LIBC_MACHINE_HPPA_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_HPPA_TRUE='#'
+  HAVE_LIBC_MACHINE_HPPA_FALSE=
+fi
+ if test "${machine_dir}" = i386; then
+  HAVE_LIBC_MACHINE_I386_TRUE=
+  HAVE_LIBC_MACHINE_I386_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_I386_TRUE='#'
+  HAVE_LIBC_MACHINE_I386_FALSE=
+fi
+ if test "${machine_dir}" = i960; then
+  HAVE_LIBC_MACHINE_I960_TRUE=
+  HAVE_LIBC_MACHINE_I960_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_I960_TRUE='#'
+  HAVE_LIBC_MACHINE_I960_FALSE=
+fi
+ if test "${machine_dir}" = iq2000; then
+  HAVE_LIBC_MACHINE_IQ2000_TRUE=
+  HAVE_LIBC_MACHINE_IQ2000_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_IQ2000_TRUE='#'
+  HAVE_LIBC_MACHINE_IQ2000_FALSE=
+fi
+ if test "${machine_dir}" = lm32; then
+  HAVE_LIBC_MACHINE_LM32_TRUE=
+  HAVE_LIBC_MACHINE_LM32_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_LM32_TRUE='#'
+  HAVE_LIBC_MACHINE_LM32_FALSE=
+fi
+ if test "${machine_dir}" = m32c; then
+  HAVE_LIBC_MACHINE_M32C_TRUE=
+  HAVE_LIBC_MACHINE_M32C_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_M32C_TRUE='#'
+  HAVE_LIBC_MACHINE_M32C_FALSE=
+fi
+ if test "${machine_dir}" = m32r; then
+  HAVE_LIBC_MACHINE_M32R_TRUE=
+  HAVE_LIBC_MACHINE_M32R_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_M32R_TRUE='#'
+  HAVE_LIBC_MACHINE_M32R_FALSE=
+fi
+ if test "${machine_dir}" = m68hc11; then
+  HAVE_LIBC_MACHINE_M68HC11_TRUE=
+  HAVE_LIBC_MACHINE_M68HC11_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_M68HC11_TRUE='#'
+  HAVE_LIBC_MACHINE_M68HC11_FALSE=
+fi
+ if test "${machine_dir}" = m68k; then
+  HAVE_LIBC_MACHINE_M68K_TRUE=
+  HAVE_LIBC_MACHINE_M68K_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_M68K_TRUE='#'
+  HAVE_LIBC_MACHINE_M68K_FALSE=
+fi
+ if test "${machine_dir}" = m88k; then
+  HAVE_LIBC_MACHINE_M88K_TRUE=
+  HAVE_LIBC_MACHINE_M88K_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_M88K_TRUE='#'
+  HAVE_LIBC_MACHINE_M88K_FALSE=
+fi
+ if test "${machine_dir}" = mep; then
+  HAVE_LIBC_MACHINE_MEP_TRUE=
+  HAVE_LIBC_MACHINE_MEP_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_MEP_TRUE='#'
+  HAVE_LIBC_MACHINE_MEP_FALSE=
+fi
+ if test "${machine_dir}" = microblaze; then
+  HAVE_LIBC_MACHINE_MICROBLAZE_TRUE=
+  HAVE_LIBC_MACHINE_MICROBLAZE_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_MICROBLAZE_TRUE='#'
+  HAVE_LIBC_MACHINE_MICROBLAZE_FALSE=
+fi
+ if test "${machine_dir}" = mips; then
+  HAVE_LIBC_MACHINE_MIPS_TRUE=
+  HAVE_LIBC_MACHINE_MIPS_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_MIPS_TRUE='#'
+  HAVE_LIBC_MACHINE_MIPS_FALSE=
+fi
+ if test "${machine_dir}" = mn10200; then
+  HAVE_LIBC_MACHINE_MN10200_TRUE=
+  HAVE_LIBC_MACHINE_MN10200_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_MN10200_TRUE='#'
+  HAVE_LIBC_MACHINE_MN10200_FALSE=
+fi
+ if test "${machine_dir}" = mn10300; then
+  HAVE_LIBC_MACHINE_MN10300_TRUE=
+  HAVE_LIBC_MACHINE_MN10300_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_MN10300_TRUE='#'
+  HAVE_LIBC_MACHINE_MN10300_FALSE=
+fi
+ if test "${machine_dir}" = moxie; then
+  HAVE_LIBC_MACHINE_MOXIE_TRUE=
+  HAVE_LIBC_MACHINE_MOXIE_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_MOXIE_TRUE='#'
+  HAVE_LIBC_MACHINE_MOXIE_FALSE=
+fi
+ if test "${machine_dir}" = msp430; then
+  HAVE_LIBC_MACHINE_MSP430_TRUE=
+  HAVE_LIBC_MACHINE_MSP430_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_MSP430_TRUE='#'
+  HAVE_LIBC_MACHINE_MSP430_FALSE=
+fi
+ if test "${machine_dir}" = mt; then
+  HAVE_LIBC_MACHINE_MT_TRUE=
+  HAVE_LIBC_MACHINE_MT_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_MT_TRUE='#'
+  HAVE_LIBC_MACHINE_MT_FALSE=
+fi
+ if test "${machine_dir}" = nds32; then
+  HAVE_LIBC_MACHINE_NDS32_TRUE=
+  HAVE_LIBC_MACHINE_NDS32_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_NDS32_TRUE='#'
+  HAVE_LIBC_MACHINE_NDS32_FALSE=
+fi
+ if test "${machine_dir}" = necv70; then
+  HAVE_LIBC_MACHINE_NECV70_TRUE=
+  HAVE_LIBC_MACHINE_NECV70_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_NECV70_TRUE='#'
+  HAVE_LIBC_MACHINE_NECV70_FALSE=
+fi
+ if test "${machine_dir}" = nios2; then
+  HAVE_LIBC_MACHINE_NIOS2_TRUE=
+  HAVE_LIBC_MACHINE_NIOS2_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_NIOS2_TRUE='#'
+  HAVE_LIBC_MACHINE_NIOS2_FALSE=
+fi
+ if test "${machine_dir}" = nvptx; then
+  HAVE_LIBC_MACHINE_NVPTX_TRUE=
+  HAVE_LIBC_MACHINE_NVPTX_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_NVPTX_TRUE='#'
+  HAVE_LIBC_MACHINE_NVPTX_FALSE=
+fi
+ if test "${machine_dir}" = or1k; then
+  HAVE_LIBC_MACHINE_OR1K_TRUE=
+  HAVE_LIBC_MACHINE_OR1K_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_OR1K_TRUE='#'
+  HAVE_LIBC_MACHINE_OR1K_FALSE=
+fi
+ if test "${machine_dir}" = powerpc; then
+  HAVE_LIBC_MACHINE_POWERPC_TRUE=
+  HAVE_LIBC_MACHINE_POWERPC_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_POWERPC_TRUE='#'
+  HAVE_LIBC_MACHINE_POWERPC_FALSE=
+fi
+ if test "${machine_dir}" = pru; then
+  HAVE_LIBC_MACHINE_PRU_TRUE=
+  HAVE_LIBC_MACHINE_PRU_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_PRU_TRUE='#'
+  HAVE_LIBC_MACHINE_PRU_FALSE=
+fi
+ if test "${machine_dir}" = riscv; then
+  HAVE_LIBC_MACHINE_RISCV_TRUE=
+  HAVE_LIBC_MACHINE_RISCV_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_RISCV_TRUE='#'
+  HAVE_LIBC_MACHINE_RISCV_FALSE=
+fi
+ if test "${machine_dir}" = rl78; then
+  HAVE_LIBC_MACHINE_RL78_TRUE=
+  HAVE_LIBC_MACHINE_RL78_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_RL78_TRUE='#'
+  HAVE_LIBC_MACHINE_RL78_FALSE=
+fi
+ if test "${machine_dir}" = rx; then
+  HAVE_LIBC_MACHINE_RX_TRUE=
+  HAVE_LIBC_MACHINE_RX_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_RX_TRUE='#'
+  HAVE_LIBC_MACHINE_RX_FALSE=
+fi
+ if test "${machine_dir}" = sh; then
+  HAVE_LIBC_MACHINE_SH_TRUE=
+  HAVE_LIBC_MACHINE_SH_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_SH_TRUE='#'
+  HAVE_LIBC_MACHINE_SH_FALSE=
+fi
+ if test "${machine_dir}" = sparc; then
+  HAVE_LIBC_MACHINE_SPARC_TRUE=
+  HAVE_LIBC_MACHINE_SPARC_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_SPARC_TRUE='#'
+  HAVE_LIBC_MACHINE_SPARC_FALSE=
+fi
+ if test "${machine_dir}" = spu; then
+  HAVE_LIBC_MACHINE_SPU_TRUE=
+  HAVE_LIBC_MACHINE_SPU_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_SPU_TRUE='#'
+  HAVE_LIBC_MACHINE_SPU_FALSE=
+fi
+ if test "${machine_dir}" = tic4x; then
+  HAVE_LIBC_MACHINE_TIC4X_TRUE=
+  HAVE_LIBC_MACHINE_TIC4X_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_TIC4X_TRUE='#'
+  HAVE_LIBC_MACHINE_TIC4X_FALSE=
+fi
+ if test "${machine_dir}" = tic6x; then
+  HAVE_LIBC_MACHINE_TIC6X_TRUE=
+  HAVE_LIBC_MACHINE_TIC6X_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_TIC6X_TRUE='#'
+  HAVE_LIBC_MACHINE_TIC6X_FALSE=
+fi
+ if test "${machine_dir}" = tic80; then
+  HAVE_LIBC_MACHINE_TIC80_TRUE=
+  HAVE_LIBC_MACHINE_TIC80_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_TIC80_TRUE='#'
+  HAVE_LIBC_MACHINE_TIC80_FALSE=
+fi
+ if test "${machine_dir}" = v850; then
+  HAVE_LIBC_MACHINE_V850_TRUE=
+  HAVE_LIBC_MACHINE_V850_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_V850_TRUE='#'
+  HAVE_LIBC_MACHINE_V850_FALSE=
+fi
+ if test "${machine_dir}" = visium; then
+  HAVE_LIBC_MACHINE_VISIUM_TRUE=
+  HAVE_LIBC_MACHINE_VISIUM_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_VISIUM_TRUE='#'
+  HAVE_LIBC_MACHINE_VISIUM_FALSE=
+fi
+ if test "${machine_dir}" = w65; then
+  HAVE_LIBC_MACHINE_W65_TRUE=
+  HAVE_LIBC_MACHINE_W65_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_W65_TRUE='#'
+  HAVE_LIBC_MACHINE_W65_FALSE=
+fi
+ if test "${machine_dir}" = x86_64; then
+  HAVE_LIBC_MACHINE_X86_64_TRUE=
+  HAVE_LIBC_MACHINE_X86_64_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_X86_64_TRUE='#'
+  HAVE_LIBC_MACHINE_X86_64_FALSE=
+fi
+ if test "${machine_dir}" = xc16x; then
+  HAVE_LIBC_MACHINE_XC16X_TRUE=
+  HAVE_LIBC_MACHINE_XC16X_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_XC16X_TRUE='#'
+  HAVE_LIBC_MACHINE_XC16X_FALSE=
+fi
+ if test "${machine_dir}" = xstormy16; then
+  HAVE_LIBC_MACHINE_XSTORMY16_TRUE=
+  HAVE_LIBC_MACHINE_XSTORMY16_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_XSTORMY16_TRUE='#'
+  HAVE_LIBC_MACHINE_XSTORMY16_FALSE=
+fi
+ if test "${machine_dir}" = z8k; then
+  HAVE_LIBC_MACHINE_Z8K_TRUE=
+  HAVE_LIBC_MACHINE_Z8K_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_Z8K_TRUE='#'
+  HAVE_LIBC_MACHINE_Z8K_FALSE=
+fi
 
 
  if test "x$mach_add_setjmp" = "xtrue"; then
@@ -5308,9 +5792,6 @@ else
   MACH_ADD_SETJMP_TRUE='#'
   MACH_ADD_SETJMP_FALSE=
 fi
-
-
-ac_config_files="$ac_config_files libc/Makefile libc/argz/Makefile libc/ctype/Makefile libc/errno/Makefile libc/locale/Makefile libc/misc/Makefile libc/reent/Makefile libc/search/Makefile libc/stdio/Makefile libc/stdio64/Makefile libc/stdlib/Makefile libc/string/Makefile libc/time/Makefile libc/posix/Makefile libc/signal/Makefile libc/syscalls/Makefile libc/unix/Makefile libc/iconv/Makefile libc/iconv/ces/Makefile libc/iconv/ccs/Makefile libc/iconv/ccs/binary/Makefile libc/iconv/lib/Makefile libc/ssp/Makefile libc/xdr/Makefile"
 
 
 if test "${libm_machine_dir}" = "nds32"; then
@@ -6665,8 +7146,100 @@ if test -z "${HAVE_UNIX_DIR_TRUE}" && test -z "${HAVE_UNIX_DIR_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_UNIX_DIR\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${HAVE_SYS_DIR_TRUE}" && test -z "${HAVE_SYS_DIR_FALSE}"; then
-  as_fn_error $? "conditional \"HAVE_SYS_DIR\" was never defined.
+if test -z "${HAVE_LIBC_SYS_A29KHIF_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_A29KHIF_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_A29KHIF_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_SYS_AMDGCN_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_AMDGCN_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_AMDGCN_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_SYS_ARM_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_ARM_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_ARM_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_SYS_D10V_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_D10V_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_D10V_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_SYS_EPIPHANY_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_EPIPHANY_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_EPIPHANY_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_SYS_H8300HMS_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_H8300HMS_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_H8300HMS_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_SYS_H8500HMS_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_H8500HMS_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_H8500HMS_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_SYS_M88KBUG_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_M88KBUG_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_M88KBUG_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_SYS_MMIXWARE_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_MMIXWARE_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_MMIXWARE_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_SYS_NETWARE_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_NETWARE_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_NETWARE_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_SYS_OR1K_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_OR1K_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_OR1K_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_SYS_PHOENIX_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_PHOENIX_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_PHOENIX_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_SYS_RDOS_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_RDOS_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_RDOS_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_SYS_RTEMS_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_RTEMS_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_RTEMS_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_SYS_SH_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_SH_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_SH_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_SYS_SYSMEC_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_SYSMEC_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_SYSMEC_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_SYS_SYSNEC810_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_SYSNEC810_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_SYSNEC810_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_SYS_SYSNECV850_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_SYSNECV850_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_SYSNECV850_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_SYS_SYSVI386_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_SYSVI386_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_SYSVI386_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_SYS_SYSVNECV70_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_SYSVNECV70_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_SYSVNECV70_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_SYS_TIC80_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_TIC80_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_TIC80_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_SYS_TIRTOS_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_TIRTOS_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_TIRTOS_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_SYS_W65_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_W65_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_W65_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_SYS_Z8KSIM_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_Z8KSIM_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_Z8KSIM_DIR\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_LONG_DOUBLE_TRUE}" && test -z "${HAVE_LONG_DOUBLE_FALSE}"; then
@@ -6697,8 +7270,240 @@ if test -z "${HAVE_SPU_EA_TRUE}" && test -z "${HAVE_SPU_EA_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_SPU_EA\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${HAVE_LIBC_MACHINE_DIR_TRUE}" && test -z "${HAVE_LIBC_MACHINE_DIR_FALSE}"; then
-  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_DIR\" was never defined.
+if test -z "${HAVE_LIBC_SYS_PHOENIX_ARM_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_PHOENIX_ARM_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_PHOENIX_ARM_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_AARCH64_TRUE}" && test -z "${HAVE_LIBC_MACHINE_AARCH64_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_AARCH64\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_AMDGCN_TRUE}" && test -z "${HAVE_LIBC_MACHINE_AMDGCN_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_AMDGCN\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_ARC_TRUE}" && test -z "${HAVE_LIBC_MACHINE_ARC_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_ARC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_ARM_TRUE}" && test -z "${HAVE_LIBC_MACHINE_ARM_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_ARM\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_BFIN_TRUE}" && test -z "${HAVE_LIBC_MACHINE_BFIN_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_BFIN\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_CR16_TRUE}" && test -z "${HAVE_LIBC_MACHINE_CR16_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_CR16\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_CRIS_TRUE}" && test -z "${HAVE_LIBC_MACHINE_CRIS_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_CRIS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_CRX_TRUE}" && test -z "${HAVE_LIBC_MACHINE_CRX_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_CRX\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_CSKY_TRUE}" && test -z "${HAVE_LIBC_MACHINE_CSKY_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_CSKY\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_D10V_TRUE}" && test -z "${HAVE_LIBC_MACHINE_D10V_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_D10V\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_D30V_TRUE}" && test -z "${HAVE_LIBC_MACHINE_D30V_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_D30V\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_EPIPHANY_TRUE}" && test -z "${HAVE_LIBC_MACHINE_EPIPHANY_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_EPIPHANY\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_FR30_TRUE}" && test -z "${HAVE_LIBC_MACHINE_FR30_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_FR30\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_FRV_TRUE}" && test -z "${HAVE_LIBC_MACHINE_FRV_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_FRV\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_FT32_TRUE}" && test -z "${HAVE_LIBC_MACHINE_FT32_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_FT32\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_H8300_TRUE}" && test -z "${HAVE_LIBC_MACHINE_H8300_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_H8300\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_H8500_TRUE}" && test -z "${HAVE_LIBC_MACHINE_H8500_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_H8500\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_HPPA_TRUE}" && test -z "${HAVE_LIBC_MACHINE_HPPA_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_HPPA\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_I386_TRUE}" && test -z "${HAVE_LIBC_MACHINE_I386_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_I386\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_I960_TRUE}" && test -z "${HAVE_LIBC_MACHINE_I960_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_I960\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_IQ2000_TRUE}" && test -z "${HAVE_LIBC_MACHINE_IQ2000_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_IQ2000\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_LM32_TRUE}" && test -z "${HAVE_LIBC_MACHINE_LM32_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_LM32\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_M32C_TRUE}" && test -z "${HAVE_LIBC_MACHINE_M32C_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_M32C\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_M32R_TRUE}" && test -z "${HAVE_LIBC_MACHINE_M32R_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_M32R\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_M68HC11_TRUE}" && test -z "${HAVE_LIBC_MACHINE_M68HC11_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_M68HC11\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_M68K_TRUE}" && test -z "${HAVE_LIBC_MACHINE_M68K_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_M68K\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_M88K_TRUE}" && test -z "${HAVE_LIBC_MACHINE_M88K_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_M88K\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_MEP_TRUE}" && test -z "${HAVE_LIBC_MACHINE_MEP_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_MEP\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_MICROBLAZE_TRUE}" && test -z "${HAVE_LIBC_MACHINE_MICROBLAZE_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_MICROBLAZE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_MIPS_TRUE}" && test -z "${HAVE_LIBC_MACHINE_MIPS_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_MIPS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_MN10200_TRUE}" && test -z "${HAVE_LIBC_MACHINE_MN10200_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_MN10200\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_MN10300_TRUE}" && test -z "${HAVE_LIBC_MACHINE_MN10300_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_MN10300\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_MOXIE_TRUE}" && test -z "${HAVE_LIBC_MACHINE_MOXIE_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_MOXIE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_MSP430_TRUE}" && test -z "${HAVE_LIBC_MACHINE_MSP430_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_MSP430\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_MT_TRUE}" && test -z "${HAVE_LIBC_MACHINE_MT_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_MT\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_NDS32_TRUE}" && test -z "${HAVE_LIBC_MACHINE_NDS32_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_NDS32\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_NECV70_TRUE}" && test -z "${HAVE_LIBC_MACHINE_NECV70_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_NECV70\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_NIOS2_TRUE}" && test -z "${HAVE_LIBC_MACHINE_NIOS2_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_NIOS2\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_NVPTX_TRUE}" && test -z "${HAVE_LIBC_MACHINE_NVPTX_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_NVPTX\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_OR1K_TRUE}" && test -z "${HAVE_LIBC_MACHINE_OR1K_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_OR1K\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_POWERPC_TRUE}" && test -z "${HAVE_LIBC_MACHINE_POWERPC_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_POWERPC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_PRU_TRUE}" && test -z "${HAVE_LIBC_MACHINE_PRU_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_PRU\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_RISCV_TRUE}" && test -z "${HAVE_LIBC_MACHINE_RISCV_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_RISCV\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_RL78_TRUE}" && test -z "${HAVE_LIBC_MACHINE_RL78_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_RL78\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_RX_TRUE}" && test -z "${HAVE_LIBC_MACHINE_RX_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_RX\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_SH_TRUE}" && test -z "${HAVE_LIBC_MACHINE_SH_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_SH\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_SPARC_TRUE}" && test -z "${HAVE_LIBC_MACHINE_SPARC_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_SPARC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_SPU_TRUE}" && test -z "${HAVE_LIBC_MACHINE_SPU_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_SPU\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_TIC4X_TRUE}" && test -z "${HAVE_LIBC_MACHINE_TIC4X_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_TIC4X\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_TIC6X_TRUE}" && test -z "${HAVE_LIBC_MACHINE_TIC6X_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_TIC6X\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_TIC80_TRUE}" && test -z "${HAVE_LIBC_MACHINE_TIC80_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_TIC80\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_V850_TRUE}" && test -z "${HAVE_LIBC_MACHINE_V850_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_V850\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_VISIUM_TRUE}" && test -z "${HAVE_LIBC_MACHINE_VISIUM_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_VISIUM\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_W65_TRUE}" && test -z "${HAVE_LIBC_MACHINE_W65_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_W65\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_X86_64_TRUE}" && test -z "${HAVE_LIBC_MACHINE_X86_64_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_X86_64\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_XC16X_TRUE}" && test -z "${HAVE_LIBC_MACHINE_XC16X_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_XC16X\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_XSTORMY16_TRUE}" && test -z "${HAVE_LIBC_MACHINE_XSTORMY16_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_XSTORMY16\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_Z8K_TRUE}" && test -z "${HAVE_LIBC_MACHINE_Z8K_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_Z8K\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${MACH_ADD_SETJMP_TRUE}" && test -z "${MACH_ADD_SETJMP_FALSE}"; then
@@ -7381,114 +8186,6 @@ do
     "newlib.h") CONFIG_HEADERS="$CONFIG_HEADERS newlib.h:newlib.hin" ;;
     "_newlib_version.h") CONFIG_HEADERS="$CONFIG_HEADERS _newlib_version.h:_newlib_version.hin" ;;
     "default-1") CONFIG_COMMANDS="$CONFIG_COMMANDS default-1" ;;
-    "libc/sys/a29khif/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/a29khif/Makefile" ;;
-    "libc/sys/amdgcn/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/amdgcn/Makefile" ;;
-    "libc/sys/arm/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/arm/Makefile" ;;
-    "libc/sys/d10v/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/d10v/Makefile" ;;
-    "libc/sys/epiphany/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/epiphany/Makefile" ;;
-    "libc/sys/h8300hms/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/h8300hms/Makefile" ;;
-    "libc/sys/h8500hms/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/h8500hms/Makefile" ;;
-    "libc/sys/m88kbug/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/m88kbug/Makefile" ;;
-    "libc/sys/mmixware/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/mmixware/Makefile" ;;
-    "libc/sys/netware/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/netware/Makefile" ;;
-    "libc/sys/or1k/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/or1k/Makefile" ;;
-    "libc/sys/phoenix/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/phoenix/Makefile" ;;
-    "libc/sys/rdos/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/rdos/Makefile" ;;
-    "libc/sys/rtems/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/rtems/Makefile" ;;
-    "libc/sys/sh/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/sh/Makefile" ;;
-    "libc/sys/sysmec/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/sysmec/Makefile" ;;
-    "libc/sys/sysnec810/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/sysnec810/Makefile" ;;
-    "libc/sys/sysnecv850/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/sysnecv850/Makefile" ;;
-    "libc/sys/sysvi386/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/sysvi386/Makefile" ;;
-    "libc/sys/sysvnecv70/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/sysvnecv70/Makefile" ;;
-    "libc/sys/tic80/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/tic80/Makefile" ;;
-    "libc/sys/tirtos/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/tirtos/Makefile" ;;
-    "libc/sys/w65/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/w65/Makefile" ;;
-    "libc/sys/z8ksim/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/z8ksim/Makefile" ;;
-    "libc/sys/phoenix/machine/arm/Makefile") CONFIG_FILES="$CONFIG_FILES libc/sys/phoenix/machine/arm/Makefile" ;;
-    "libc/machine/a29k/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/a29k/Makefile" ;;
-    "libc/machine/aarch64/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/aarch64/Makefile" ;;
-    "libc/machine/amdgcn/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/amdgcn/Makefile" ;;
-    "libc/machine/arc/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/arc/Makefile" ;;
-    "libc/machine/arm/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/arm/Makefile" ;;
-    "libc/machine/bfin/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/bfin/Makefile" ;;
-    "libc/machine/cr16/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/cr16/Makefile" ;;
-    "libc/machine/cris/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/cris/Makefile" ;;
-    "libc/machine/crx/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/crx/Makefile" ;;
-    "libc/machine/csky/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/csky/Makefile" ;;
-    "libc/machine/d10v/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/d10v/Makefile" ;;
-    "libc/machine/d30v/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/d30v/Makefile" ;;
-    "libc/machine/epiphany/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/epiphany/Makefile" ;;
-    "libc/machine/fr30/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/fr30/Makefile" ;;
-    "libc/machine/frv/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/frv/Makefile" ;;
-    "libc/machine/ft32/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/ft32/Makefile" ;;
-    "libc/machine/h8300/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/h8300/Makefile" ;;
-    "libc/machine/h8500/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/h8500/Makefile" ;;
-    "libc/machine/hppa/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/hppa/Makefile" ;;
-    "libc/machine/i386/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/i386/Makefile" ;;
-    "libc/machine/i960/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/i960/Makefile" ;;
-    "libc/machine/iq2000/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/iq2000/Makefile" ;;
-    "libc/machine/lm32/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/lm32/Makefile" ;;
-    "libc/machine/m32c/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/m32c/Makefile" ;;
-    "libc/machine/m32r/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/m32r/Makefile" ;;
-    "libc/machine/m68hc11/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/m68hc11/Makefile" ;;
-    "libc/machine/m68k/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/m68k/Makefile" ;;
-    "libc/machine/m88k/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/m88k/Makefile" ;;
-    "libc/machine/mep/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/mep/Makefile" ;;
-    "libc/machine/microblaze/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/microblaze/Makefile" ;;
-    "libc/machine/mips/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/mips/Makefile" ;;
-    "libc/machine/riscv/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/riscv/Makefile" ;;
-    "libc/machine/mn10200/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/mn10200/Makefile" ;;
-    "libc/machine/mn10300/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/mn10300/Makefile" ;;
-    "libc/machine/moxie/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/moxie/Makefile" ;;
-    "libc/machine/msp430/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/msp430/Makefile" ;;
-    "libc/machine/mt/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/mt/Makefile" ;;
-    "libc/machine/nds32/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/nds32/Makefile" ;;
-    "libc/machine/necv70/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/necv70/Makefile" ;;
-    "libc/machine/nios2/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/nios2/Makefile" ;;
-    "libc/machine/nvptx/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/nvptx/Makefile" ;;
-    "libc/machine/or1k/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/or1k/Makefile" ;;
-    "libc/machine/powerpc/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/powerpc/Makefile" ;;
-    "libc/machine/pru/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/pru/Makefile" ;;
-    "libc/machine/rl78/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/rl78/Makefile" ;;
-    "libc/machine/rx/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/rx/Makefile" ;;
-    "libc/machine/sh/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/sh/Makefile" ;;
-    "libc/machine/sparc/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/sparc/Makefile" ;;
-    "libc/machine/spu/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/spu/Makefile" ;;
-    "libc/machine/tic4x/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/tic4x/Makefile" ;;
-    "libc/machine/tic6x/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/tic6x/Makefile" ;;
-    "libc/machine/tic80/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/tic80/Makefile" ;;
-    "libc/machine/v850/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/v850/Makefile" ;;
-    "libc/machine/visium/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/visium/Makefile" ;;
-    "libc/machine/w65/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/w65/Makefile" ;;
-    "libc/machine/x86_64/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/x86_64/Makefile" ;;
-    "libc/machine/xc16x/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/xc16x/Makefile" ;;
-    "libc/machine/xstormy16/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/xstormy16/Makefile" ;;
-    "libc/machine/z8k/Makefile") CONFIG_FILES="$CONFIG_FILES libc/machine/z8k/Makefile" ;;
-    "libc/Makefile") CONFIG_FILES="$CONFIG_FILES libc/Makefile" ;;
-    "libc/argz/Makefile") CONFIG_FILES="$CONFIG_FILES libc/argz/Makefile" ;;
-    "libc/ctype/Makefile") CONFIG_FILES="$CONFIG_FILES libc/ctype/Makefile" ;;
-    "libc/errno/Makefile") CONFIG_FILES="$CONFIG_FILES libc/errno/Makefile" ;;
-    "libc/locale/Makefile") CONFIG_FILES="$CONFIG_FILES libc/locale/Makefile" ;;
-    "libc/misc/Makefile") CONFIG_FILES="$CONFIG_FILES libc/misc/Makefile" ;;
-    "libc/reent/Makefile") CONFIG_FILES="$CONFIG_FILES libc/reent/Makefile" ;;
-    "libc/search/Makefile") CONFIG_FILES="$CONFIG_FILES libc/search/Makefile" ;;
-    "libc/stdio/Makefile") CONFIG_FILES="$CONFIG_FILES libc/stdio/Makefile" ;;
-    "libc/stdio64/Makefile") CONFIG_FILES="$CONFIG_FILES libc/stdio64/Makefile" ;;
-    "libc/stdlib/Makefile") CONFIG_FILES="$CONFIG_FILES libc/stdlib/Makefile" ;;
-    "libc/string/Makefile") CONFIG_FILES="$CONFIG_FILES libc/string/Makefile" ;;
-    "libc/time/Makefile") CONFIG_FILES="$CONFIG_FILES libc/time/Makefile" ;;
-    "libc/posix/Makefile") CONFIG_FILES="$CONFIG_FILES libc/posix/Makefile" ;;
-    "libc/signal/Makefile") CONFIG_FILES="$CONFIG_FILES libc/signal/Makefile" ;;
-    "libc/syscalls/Makefile") CONFIG_FILES="$CONFIG_FILES libc/syscalls/Makefile" ;;
-    "libc/unix/Makefile") CONFIG_FILES="$CONFIG_FILES libc/unix/Makefile" ;;
-    "libc/iconv/Makefile") CONFIG_FILES="$CONFIG_FILES libc/iconv/Makefile" ;;
-    "libc/iconv/ces/Makefile") CONFIG_FILES="$CONFIG_FILES libc/iconv/ces/Makefile" ;;
-    "libc/iconv/ccs/Makefile") CONFIG_FILES="$CONFIG_FILES libc/iconv/ccs/Makefile" ;;
-    "libc/iconv/ccs/binary/Makefile") CONFIG_FILES="$CONFIG_FILES libc/iconv/ccs/binary/Makefile" ;;
-    "libc/iconv/lib/Makefile") CONFIG_FILES="$CONFIG_FILES libc/iconv/lib/Makefile" ;;
-    "libc/ssp/Makefile") CONFIG_FILES="$CONFIG_FILES libc/ssp/Makefile" ;;
-    "libc/xdr/Makefile") CONFIG_FILES="$CONFIG_FILES libc/xdr/Makefile" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

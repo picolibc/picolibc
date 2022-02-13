@@ -5,10 +5,12 @@ ACLOCAL_AMFLAGS = -I . -I .. -I ../config
 
 # Variables that will accumulate in subdirs.
 CLEANFILES =
+EXTRA_DIST =
 PHONY =
 SUFFIXES =
 info_TEXINFOS =
 noinst_DATA =
+INSTALL_DATA_LOCAL =
 
 # The newlib hardware floating-point routines have been disabled due to
 # inaccuracy.  If you wish to work on them, you will need to edit the
@@ -24,7 +26,6 @@ endif
 # values defined in terms of make variables, as is the case for CC and
 # friends when we are called from the top level Makefile.
 AM_MAKEFLAGS = \
-	"AR_FLAGS=$(AR_FLAGS)" \
 	"CC_FOR_BUILD=$(CC_FOR_BUILD)" \
 	"CFLAGS=$(CFLAGS)" \
 	"CCASFLAGS=$(CCASFLAGS)" \
@@ -60,15 +61,13 @@ AM_MAKEFLAGS = \
 
 FLAGS_TO_PASS=$(AM_MAKEFLAGS)
 
-SUBDIRS = libc .
-
 tooldir = $(exec_prefix)/$(host_alias)
 toollibdir = $(tooldir)/lib$(MULTISUBDIR)
 
-AM_CPPFLAGS = $(NEWLIB_CFLAGS) $(TARGET_CFLAGS)
-AR_FLAGS = rc
-
-noinst_DATA += stmp-targ-include
+# These are useful for standalone object files like crt0.o.
+AM_CFLAGS = $(AM_CFLAGS_$(subst /,_,$(@D))) $(AM_CFLAGS_$(subst /,_,$(@D)_$(<F)))
+AM_CCASFLAGS = $(AM_CCASFLAGS_$(subst /,_,$(@D))) $(AM_CCASFLAGS_$(subst /,_,$(@D)_$(<F)))
+AM_CPPFLAGS = $(NEWLIB_CFLAGS) $(TARGET_CFLAGS) $(AM_CPPFLAGS_$(subst /,_,$(@D))) $(AM_CPPFLAGS_$(subst /,_,$(@D)_$(<F)))
 
 toollib_LIBRARIES = libm.a \
 	libc.a
@@ -122,17 +121,28 @@ MATHOBJS_IN_LIBC = \
 	libm_a-s_finite.o libm_a-sf_finite.o \
 	libm_a-s_copysign.o libm_a-sf_copysign.o
 
-libc.a: libc/libc.a libm.a
-	rm -rf libc.a tmp
-	mkdir tmp
-	cd tmp; \
-	 $(AR) x ../libm.a $(MATHOBJS_IN_LIBC) ; \
-	 $(AR) x ../libc/libc.a ; \
-	 $(AR) $(AR_FLAGS) ../$@ *.o
-	$(RANLIB) libc.a
-	rm -rf tmp
+## Place the libm_a objects in libc/ to keep the top dir tidy.
+stamp-libc-math-objects: libm.a
+	$(AM_V_GEN)cd libc && $(AR) x ../$< $(MATHOBJS_IN_LIBC)
+	$(AM_V_at)touch $@
 
-libc/libc.a: ; @true
+CLEANFILES += $(MATHOBJS_IN_LIBC)
+
+libc_a_SOURCES =
+libc_a_CFLAGS = $(AM_CFLAGS) $(libc_a_CFLAGS_$(subst /,_,$(@D))) $(libc_a_CFLAGS_$(subst /,_,$(@D)_$(<F)))
+libc_a_CCASFLAGS = $(AM_CCASFLAGS) $(libc_a_CCASFLAGS_$(subst /,_,$(@D))) $(libc_a_CCASFLAGS_$(subst /,_,$(@D)_$(<F)))
+libc_a_CPPFLAGS = $(AM_CPPFLAGS) $(libc_a_CPPFLAGS_$(subst /,_,$(@D))) $(libc_a_CPPFLAGS_$(subst /,_,$(@D)_$(<F)))
+libc_a_DEPENDENCIES = stamp-libc-math-objects
+## Best to avoid libc_a_LIBADD entirely to avoid having 2 independent lists
+## with separate overriding behavior (libc_a_OBJECTS is the other).  See the
+## AWK_UNIQUE_OBJS comment aove for more details.
+$(libc_a_OBJECTS) $(libc_a_LIBADD): stmp-targ-include
+
+libc.a: $(libc_a_OBJECTS) $(libc_a_DEPENDENCIES)
+	$(AM_V_at)rm -f $@
+	$(AM_V_AR)objs=`echo $(libc_a_OBJECTS) | $(AWK_UNIQUE_OBJS)` || exit $$?; \
+	  $(AR) $(ARFLAGS) $@ $$objs $(MATHOBJS_IN_LIBC:%=libc/%)
+	$(AM_V_at)$(RANLIB) $@
 
 libg.a: libc.a
 	$(AM_V_GEN)ln libc.a libg.a >/dev/null 2>/dev/null || cp libc.a libg.a
@@ -177,13 +187,13 @@ crt0.o: $(CRT0_DIR)$(CRT0)
 	$(AM_V_at)rm -f $@
 	$(AM_V_GEN)ln $< $@ >/dev/null 2>/dev/null || cp $< $@
 
-$(CRT0_DIR)$(CRT0): ; @true
+$(CRT0_DIR)$(CRT0): stmp-targ-include
 
 crt1.o: $(CRT1_DIR)$(CRT1)
 	$(AM_V_at)rm -f $@
 	$(AM_V_GEN)ln $< $@ >/dev/null 2>/dev/null || cp $< $@
 
-$(CRT1_DIR)$(CRT1): ; @true
+$(CRT1_DIR)$(CRT1): stmp-targ-include
 
 targ-include:
 	$(AM_V_GEN)$(MKDIR_P) $@
@@ -198,8 +208,6 @@ targ-include/newlib.h: newlib.h targ-include
 
 targ-include/_newlib_version.h: _newlib_version.h targ-include
 	$(AM_V_GEN)cp _newlib_version.h $@
-
-all-recursive: stmp-targ-include
 
 # The targ-include directory just holds the includes files for the
 # particular system and machine we have been configured for.  It is
@@ -241,7 +249,7 @@ CLEANFILES += stmp-targ-include
 ## We hook install-multi because this Makefile doesn't have any exec targets,
 ## only data targets.  If that ever changes, this should be removed and the
 ## install-exec-local in ../multilib.am will kick in.
-install-data-local: install-toollibLIBRARIES install-multi
+install-data-local: install-toollibLIBRARIES install-multi $(INSTALL_DATA_LOCAL)
 	rm -f $(DESTDIR)$(toollibdir)/libg.a
 	ln $(DESTDIR)$(toollibdir)/libc.a $(DESTDIR)$(toollibdir)/libg.a >/dev/null 2>/dev/null || cp $(DESTDIR)$(toollibdir)/libc.a $(DESTDIR)$(toollibdir)/libg.a
 	-if [ -z "$(MULTISUBDIR)" ]; then \
