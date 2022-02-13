@@ -4,6 +4,7 @@ AUTOMAKE_OPTIONS = dejagnu
 ACLOCAL_AMFLAGS = -I . -I .. -I ../config
 
 # Variables that will accumulate in subdirs.
+CLEANFILES =
 PHONY =
 SUFFIXES =
 info_TEXINFOS =
@@ -70,6 +71,7 @@ noinst_DATA += stmp-targ-include
 
 toollib_LIBRARIES = libm.a \
 	libc.a
+noinst_DATA += libg.a
 if HAVE_MULTISUBDIR
 BUILD_MULTISUBDIR = $(builddir)$(MULTISUBDIR)
 if HAVE_CRT0
@@ -79,6 +81,8 @@ noinst_DATA += $(BUILD_MULTISUBDIR)/libc.a $(BUILD_MULTISUBDIR)/libm.a
 endif
 
 toollib_DATA = $(CRT0) $(CRT1)
+
+CLEANFILES += libg.a
 
 # The functions ldexp, frexp and modf are traditionally supplied in
 # both libc.a and libm.a.  We build them in libm.a and copy them over,
@@ -99,17 +103,19 @@ MATHOBJS_IN_LIBC = \
 	$(lpfx)s_copysign.o $(lpfx)sf_copysign.o
 
 libc.a: libc/libc.a libm.a
-	rm -rf libc.a libg.a tmp
+	rm -rf libc.a tmp
 	mkdir tmp
 	cd tmp; \
 	 $(AR) x ../libm.a $(MATHOBJS_IN_LIBC) ; \
 	 $(AR) x ../libc/libc.a ; \
 	 $(AR) $(AR_FLAGS) ../$@ *.o
 	$(RANLIB) libc.a
-	ln libc.a libg.a >/dev/null 2>/dev/null || cp libc.a libg.a
 	rm -rf tmp
 
 libc/libc.a: ; @true
+
+libg.a: libc.a
+	$(AM_V_GEN)ln libc.a libg.a >/dev/null 2>/dev/null || cp libc.a libg.a
 
 libm.a: libm/libm.a
 	rm -f $@
@@ -247,7 +253,7 @@ stmp-targ-include: config.status
 	$(MAKE) targ-include/newlib.h
 	touch $@
 
-CLEANFILES = stmp-targ-include
+CLEANFILES += stmp-targ-include
 
 ## We hook install-multi because this Makefile doesn't have any exec targets,
 ## only data targets.  If that ever changes, this should be removed and the

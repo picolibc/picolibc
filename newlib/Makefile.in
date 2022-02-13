@@ -442,10 +442,16 @@ AUTOMAKE_OPTIONS = dejagnu
 ACLOCAL_AMFLAGS = -I . -I .. -I ../config
 
 # Variables that will accumulate in subdirs.
+CLEANFILES = libg.a stmp-targ-include libc/targetdep.tex \
+	libc/targetdep.tex.stamp $(LIBC_CHEWOUT_FILES) \
+	$(LIBC_DOCBOOK_OUT_FILES) libc/*.xml libc/*.xml.stamp libc/*.3 \
+	libm/targetdep.tex libm/targetdep.tex.stamp \
+	$(LIBM_CHEWOUT_FILES) $(LIBM_DOCBOOK_OUT_FILES) libm/*.xml \
+	libm/*.xml.stamp libm/*.3
 PHONY = $(am__append_4)
 SUFFIXES = $(am__append_5)
 info_TEXINFOS = libc/libc.texi libm/libm.texi
-noinst_DATA = stmp-targ-include $(am__append_1) $(am__append_2) \
+noinst_DATA = stmp-targ-include libg.a $(am__append_1) $(am__append_2) \
 	$(am__append_3)
 @NEWLIB_HW_FP_FALSE@MATHDIR = math
 
@@ -522,12 +528,6 @@ MATHOBJS_IN_LIBC = \
 	$(lpfx)s_finite.o $(lpfx)sf_finite.o \
 	$(lpfx)s_copysign.o $(lpfx)sf_copysign.o
 
-CLEANFILES = stmp-targ-include libc/targetdep.tex \
-	libc/targetdep.tex.stamp $(LIBC_CHEWOUT_FILES) \
-	$(LIBC_DOCBOOK_OUT_FILES) libc/*.xml libc/*.xml.stamp libc/*.3 \
-	libm/targetdep.tex libm/targetdep.tex.stamp \
-	$(LIBM_CHEWOUT_FILES) $(LIBM_DOCBOOK_OUT_FILES) libm/*.xml \
-	libm/*.xml.stamp libm/*.3
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 MULTISRCTOP = 
 MULTIBUILDTOP = 
@@ -1396,17 +1396,19 @@ uninstall-am: uninstall-dvi-am uninstall-html-am uninstall-info-am \
 
 
 libc.a: libc/libc.a libm.a
-	rm -rf libc.a libg.a tmp
+	rm -rf libc.a tmp
 	mkdir tmp
 	cd tmp; \
 	 $(AR) x ../libm.a $(MATHOBJS_IN_LIBC) ; \
 	 $(AR) x ../libc/libc.a ; \
 	 $(AR) $(AR_FLAGS) ../$@ *.o
 	$(RANLIB) libc.a
-	ln libc.a libg.a >/dev/null 2>/dev/null || cp libc.a libg.a
 	rm -rf tmp
 
 libc/libc.a: ; @true
+
+libg.a: libc.a
+	$(AM_V_GEN)ln libc.a libg.a >/dev/null 2>/dev/null || cp libc.a libg.a
 
 libm.a: libm/libm.a
 	rm -f $@
