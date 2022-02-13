@@ -28,13 +28,13 @@
 #include <sys/cdefs.h>
 
 #include "namespace.h"
-#include <rune.h>
+#include "rune.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
-#include <sysexits.h>
+#include "sysexits.h"
 #include "un-namespace.h"
 
 #include "collate.h"

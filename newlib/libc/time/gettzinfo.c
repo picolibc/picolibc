@@ -1,5 +1,5 @@
 #include <sys/types.h>
-#include <local.h>
+#include "local.h"
 
 /* Shared timezone information for libc/time functions.  */
 static __tzinfo_type tzinfo = {1, 0,

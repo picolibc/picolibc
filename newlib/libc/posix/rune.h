@@ -36,7 +36,7 @@
 #ifndef	_RUNE_H_
 #define	_RUNE_H_
 
-#include <runetype.h>
+#include "runetype.h"
 #include <stdio.h>
 
 #define	_PATH_LOCALE	"/usr/share/locale"
