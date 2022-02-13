@@ -43,7 +43,7 @@ exit(int code)
 	void __libc_fini_array(void);
 	if (__call_exitprocs)
 		__call_exitprocs (code, NULL);
-#ifdef HAVE_INITFINI_ARRAY
+#ifdef _HAVE_INITFINI_ARRAY
 	__libc_fini_array();
 #endif
 	_exit(code);

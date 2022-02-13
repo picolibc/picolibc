@@ -56,7 +56,7 @@ _start(void);
 int
 main(int, char **);
 
-#ifdef HAVE_INITFINI_ARRAY
+#ifdef _HAVE_INITFINI_ARRAY
 extern void __libc_init_array(void);
 #endif
 
@@ -84,7 +84,7 @@ __start(void)
 #ifdef PICOLIBC_TLS
 	_set_tls(__tls_base);
 #endif
-#if defined(HAVE_INITFINI_ARRAY) && CONSTRUCTORS
+#if defined(_HAVE_INITFINI_ARRAY) && CONSTRUCTORS
 	__libc_init_array();
 #endif
 	int ret = main(0, NULL);
