@@ -49,12 +49,6 @@ NEWLIB_CONFIGURE(..)
 
 AM_CONDITIONAL(NEWLIB_NANO_MALLOC, test x$newlib_nano_malloc = xyes)
 
-CRT0=
-if test "x${have_crt0}" = "xyes"; then
-  CRT0=sys/${sys_dir}/crt0.o
-fi
-AC_SUBST(CRT0)
-
 dnl For each directory which we may or may not want, we define a name
 dnl for the library and an automake conditional for whether we should
 dnl build the library.

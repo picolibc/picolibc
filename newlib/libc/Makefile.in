@@ -14,7 +14,6 @@
 
 @SET_MAKE@
 
-
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -164,7 +163,6 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-DATA = $(noinst_DATA)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 am__recursive_targets = \
@@ -210,7 +208,6 @@ CCASFLAGS = @CCASFLAGS@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
-CRT0 = @CRT0@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 ECHO_C = @ECHO_C@
@@ -332,7 +329,6 @@ SUBDIRS = argz stdlib ctype search $(STDIO_SUBDIR) $(STDIO64_SUBDIR) \
 	$(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) \
 	$(NEWLIB_ICONV_DIRS) $(XDR_SUBDIR) ssp $(am__append_1) \
 	$(am__append_2) .
-noinst_DATA = $(CRT0)
 noinst_LIBRARIES = libc.a
 SUBLIBS = \
 	argz/lib.a \
@@ -357,7 +353,6 @@ SUBLIBS = \
 	$(LIBC_MACHINE_LIB) \
 	$(LIBC_SYS_LIB)
 
-CLEANFILES = $(CRT0)
 ACLOCAL_AMFLAGS = -I .. -I ../.. -I ../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-recursive
@@ -520,7 +515,7 @@ distclean-tags:
 	-rm -f cscope.out cscope.in.out cscope.po.out cscope.files
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(LIBRARIES) $(DATA)
+all-am: Makefile $(LIBRARIES)
 installdirs: installdirs-recursive
 installdirs-am:
 install: install-recursive
@@ -545,7 +540,6 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
-	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -656,12 +650,6 @@ libc.a: $(SUBLIBS)
 	rm -rf tmp
 
 $(SUBLIBS): ; @true
-
-crt0.o: sys/crt0.o
-	rm -f $@
-	ln sys/crt0.o $@ >/dev/null 2>/dev/null || cp sys/crt0.o $@
-
-sys/crt0.o: ; @true
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

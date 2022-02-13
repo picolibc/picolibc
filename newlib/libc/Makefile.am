@@ -51,8 +51,6 @@ endif
 # accumulation logic.
 SUBDIRS += .
 
-noinst_DATA = $(CRT0)
-
 noinst_LIBRARIES = libc.a
 SUBLIBS = \
 	argz/lib.a \
@@ -90,14 +88,6 @@ libc.a: $(SUBLIBS)
 	rm -rf tmp
 
 $(SUBLIBS): ; @true
-
-crt0.o: sys/crt0.o
-	rm -f $@
-	ln sys/crt0.o $@ >/dev/null 2>/dev/null || cp sys/crt0.o $@
-
-sys/crt0.o: ; @true
-
-CLEANFILES = $(CRT0)
 
 ACLOCAL_AMFLAGS = -I .. -I ../.. -I ../../config
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
