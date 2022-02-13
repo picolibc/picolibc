@@ -1,11 +1,5 @@
-bfin	- Analog Devices Blackfin processor.
-sparc	- Fujitsu Sparclite board. Works on the ex930, ex931, ex933
-hp74x	- Hewlett Packard HP742 board. Also some support for the hp743.
-m68hc11 - Motorola 68HC11 or 68HC12 support.
-m68k	- Motorola MVME135 and IDP board. For CPU32 systems.
-mep	- Toshiba Media Processor.
-pa	- WinBond and Oki boards with a PA.
-mips	- R3000 support. Array Tech LSI33k based RAID disk controller.
-lm32    - Lattice Mico32 simulator.
-epiphany - Adapteva Epiphany multicore processor.
-or1k	- OpenRISC 1000 processor.
+Libgloss is a library for all the details that usually get glossed over.
+This library refers to things like startup code, and usually I/O support
+for GCC and the C library.
+
+For more details, see the manual under doc/.

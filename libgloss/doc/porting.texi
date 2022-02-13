@@ -136,16 +136,22 @@ new library is called Libgloss, for Gnu Low-level OS support.
 
 @node Supported targets, Building libgloss, Libgloss, Libgloss
 @section Supported Targets
-Currently libgloss is being used for the following targets:
+Currently libgloss is being used for at least the following targets:
 
 @menu
+* Blackfin::                    Analog Devices, Inc. Blackfin processor.
 * Sparclite::                   Fujitsu's sparclite.
 * CPU32::                       Various m68k based targets.
 * Mips::                        Mips code based targets.
 * PA-RISC::                     Precision Risc Organization..
 @end menu
 
-@node Sparclite, CPU32, , Supported targets
+@node Blackfin
+@subsection Blackfin Targets Supported
+This is for the Analog Devices, Inc. Blackfin family of processors.
+Currently this covers all versions except for the BF535.
+
+@node Sparclite
 @subsection Sparclite Targets Supported
 @c FIXME: put links to the docs in etc/targetdoc
 This is for the Fujitsu Sparclite family of processors. Currently this 
@@ -161,7 +167,7 @@ shell in the ROM. GDB uses the the GDB remote protocol, the relevant
 source files from the gdb sources are remote-sparcl.c. The debug stub is
 part of libgloss and is called sparcl-stub.c.
 
-@node CPU32, Mips, Sparclite, Supported targets
+@node CPU32
 @subsection Motorola CPU32 Targets supported
 This refers to Motorola's m68k based CPU32 processor family. The crt0.S
 startup file should be usable with any target environment, and it's
@@ -184,7 +190,7 @@ target environment in the GDB source tree. The relevant files are
 gdb/monitor.c, monitor.h, and rom58k-rom.c. The usage of these files is
 discussed in the GDB section.
 
-@node Mips, PA-RISC, CPU32, Supported targets
+@node Mips
 @subsection Mips core Targets Supported
 The Crt0 startup file should run on any mips target that doesn't require
 additional hardware initialization. The I/O code so far only supports a
@@ -206,7 +212,7 @@ LSI's @code{pmon} ROM monitor. This uses entry points into the monitor,
 and should easily port to other versions of the pmon monitor. Pmon is
 distributed in source by LSI.
 
-@node PA-RISC, , Mips, Supported targets
+@node PA-RISC
 @subsection PA-RISC Targets Supported
 This supports the various boards manufactured by the HP-PRO consortium.
 This is a group of companies all making variations on the PA-RISC
