@@ -1941,6 +1941,8 @@ class fhandler_termios: public fhandler_base
     fh->copy_from (this);
     return fh;
   }
+  static bool path_iscygexec_a (LPCSTR n, LPSTR c);
+  static bool path_iscygexec_w (LPCWSTR n, LPWSTR c);
 };
 
 enum ansi_intensity
