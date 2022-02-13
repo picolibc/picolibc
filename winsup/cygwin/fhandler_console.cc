@@ -32,6 +32,7 @@ details. */
 #include "sync.h"
 #include "child_info.h"
 #include "cygwait.h"
+#include "winf.h"
 
 /* Don't make this bigger than NT_MAX_PATH as long as the temporary buffer
    is allocated using tmp_pathbuf!!! */
@@ -3595,10 +3596,32 @@ set_console_title (char *title)
   debug_printf ("title '%W'", buf);
 }
 
+static bool NO_COPY gdb_inferior_noncygwin = false;
+static void
+set_console_mode_to_native ()
+{
+  cygheap_fdenum cfd (false);
+  while (cfd.next () >= 0)
+    if (cfd->get_major () == DEV_CONS_MAJOR)
+      {
+	fhandler_console *cons = (fhandler_console *) (fhandler_base *) cfd;
+	if (cons->get_device () == cons->tc ()->getntty ())
+	  {
+	    termios *cons_ti = &((tty *) cons->tc ())->ti;
+	    fhandler_console::set_input_mode (tty::native, cons_ti,
+					      cons->get_handle_set ());
+	    fhandler_console::set_output_mode (tty::native, cons_ti,
+					       cons->get_handle_set ());
+	    break;
+	  }
+      }
+}
+
 #define DEF_HOOK(name) static __typeof__ (name) *name##_Orig
 /* CreateProcess() is hooked for GDB etc. */
 DEF_HOOK (CreateProcessA);
 DEF_HOOK (CreateProcessW);
+DEF_HOOK (ContinueDebugEvent);
 
 static BOOL WINAPI
 CreateProcessA_Hooked
@@ -3608,6 +3631,9 @@ CreateProcessA_Hooked
 {
   if (f & (DEBUG_PROCESS | DEBUG_ONLY_THIS_PROCESS))
     mutex_timeout = 0; /* to avoid deadlock in GDB */
+  gdb_inferior_noncygwin = !fhandler_termios::path_iscygexec_a (n, c);
+  if (gdb_inferior_noncygwin)
+    set_console_mode_to_native ();
   return CreateProcessA_Orig (n, c, pa, ta, inh, f, e, d, si, pi);
 }
 
@@ -3619,7 +3645,19 @@ CreateProcessW_Hooked
 {
   if (f & (DEBUG_PROCESS | DEBUG_ONLY_THIS_PROCESS))
     mutex_timeout = 0; /* to avoid deadlock in GDB */
+  gdb_inferior_noncygwin = !fhandler_termios::path_iscygexec_w (n, c);
+  if (gdb_inferior_noncygwin)
+    set_console_mode_to_native ();
   return CreateProcessW_Orig (n, c, pa, ta, inh, f, e, d, si, pi);
+}
+
+static BOOL WINAPI
+ContinueDebugEvent_Hooked
+     (DWORD p, DWORD t, DWORD s)
+{
+  if (gdb_inferior_noncygwin)
+    set_console_mode_to_native ();
+  return ContinueDebugEvent_Orig (p, t, s);
 }
 
 void
@@ -3641,6 +3679,7 @@ fhandler_console::fixup_after_fork_exec (bool execing)
   /* CreateProcess() is hooked for GDB etc. */
   DO_HOOK (NULL, CreateProcessA);
   DO_HOOK (NULL, CreateProcessW);
+  DO_HOOK (NULL, ContinueDebugEvent);
 }
 
 /* Ugly workaround to create invisible console required since Windows 7.
