@@ -1,8 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 
-# hack: putting $(abs_newlib_basedir)/libm/common into AM_CPPFLAGS forces automake
-# to output a definition for newlib_basedir.
-AM_CPPFLAGS = -I $(abs_newlib_basedir)/libm/common $(NEWLIB_CFLAGS) $(TARGET_CFLAGS)
+AM_CPPFLAGS = $(NEWLIB_CFLAGS) $(TARGET_CFLAGS)
 
 AM_CCASFLAGS = $(AM_CPPFLAGS)
 
