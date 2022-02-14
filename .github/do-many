@@ -18,5 +18,5 @@ while [ $working = t ]; do
     fi
 done
 for i in ${!scripts[@]}; do
-    "$dir"/"${scripts[$i]}" "${configs[$i]}" "${dirs[$i]}" "$@"
+    "$dir"/"${scripts[$i]}" "${configs[$i]}" "${dirs[$i]}" "$@" || exit 1
 done
