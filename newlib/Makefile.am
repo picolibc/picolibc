@@ -443,7 +443,7 @@ TEXI2DVI = texi2dvi -E
 TEXINFO_TEX = ../texinfo/texinfo.tex
 
 if HAVE_DOC
-include doc/local.mk
+include doc/Makefile.inc
 endif
 include libc/Makefile.inc
 include libm/Makefile.inc
