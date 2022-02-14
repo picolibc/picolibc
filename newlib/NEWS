@@ -2,6 +2,7 @@
 
 - remove i?86-pc-linux-gnu support
 - remove decstation & sunos support
+- build system internals heavily rewritten & updated
 
 *** Major changes in newlib version 4.2.0:
 
