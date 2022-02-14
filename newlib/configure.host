@@ -525,9 +525,6 @@ case "${host}" in
   microblaze*-*-*)
 	machine_dir=microblaze
 	;;
-  mips*-dec-*)
-	sys_dir=decstation
-	;;
   mmix-knuth-mmixware)
 	sys_dir=mmixware
 	;;
@@ -547,14 +544,6 @@ case "${host}" in
 	;;
   sh*-*)
 	sys_dir=sh
-	;;
-  sparc-sun-sunos*)
-	sys_dir=sun4
-	unix_dir=unix
-	;;
-  sparc64*)
-	sys_dir=sparc64
-	unix_dir=unix
 	;;
   spu-*-*)
 	default_newlib_io_long_long="yes"

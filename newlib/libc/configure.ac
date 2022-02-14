@@ -118,7 +118,6 @@ if test -n "${sys_dir}"; then
     amdgcn) AC_CONFIG_FILES([sys/amdgcn/Makefile]) ;;
     arm) AC_CONFIG_FILES([sys/arm/Makefile]) ;;
     d10v) AC_CONFIG_FILES([sys/d10v/Makefile]) ;;
-    decstation) AC_CONFIG_FILES([sys/decstation/Makefile]) ;;
     epiphany) AC_CONFIG_FILES([sys/epiphany/Makefile]) ;;
     h8300hms) AC_CONFIG_FILES([sys/h8300hms/Makefile]) ;;
     h8500hms) AC_CONFIG_FILES([sys/h8500hms/Makefile]) ;;
@@ -130,8 +129,6 @@ if test -n "${sys_dir}"; then
     rdos) AC_CONFIG_FILES([sys/rdos/Makefile]) ;;
     rtems) AC_CONFIG_FILES([sys/rtems/Makefile]) ;;
     sh) AC_CONFIG_FILES([sys/sh/Makefile]) ;;
-    sparc64) AC_CONFIG_FILES([sys/sparc64/Makefile]) ;;
-    sun4) AC_CONFIG_FILES([sys/sun4/Makefile]) ;;
     sysmec) AC_CONFIG_FILES([sys/sysmec/Makefile]) ;;
     sysnec810) AC_CONFIG_FILES([sys/sysnec810/Makefile]) ;;
     sysnecv850) AC_CONFIG_FILES([sys/sysnecv850/Makefile]) ;;

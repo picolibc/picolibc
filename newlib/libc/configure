@@ -4507,8 +4507,6 @@ if test -n "${sys_dir}"; then
  ;;
     d10v) ac_config_files="$ac_config_files sys/d10v/Makefile"
  ;;
-    decstation) ac_config_files="$ac_config_files sys/decstation/Makefile"
- ;;
     epiphany) ac_config_files="$ac_config_files sys/epiphany/Makefile"
  ;;
     h8300hms) ac_config_files="$ac_config_files sys/h8300hms/Makefile"
@@ -4530,10 +4528,6 @@ if test -n "${sys_dir}"; then
     rtems) ac_config_files="$ac_config_files sys/rtems/Makefile"
  ;;
     sh) ac_config_files="$ac_config_files sys/sh/Makefile"
- ;;
-    sparc64) ac_config_files="$ac_config_files sys/sparc64/Makefile"
- ;;
-    sun4) ac_config_files="$ac_config_files sys/sun4/Makefile"
  ;;
     sysmec) ac_config_files="$ac_config_files sys/sysmec/Makefile"
  ;;
@@ -5780,7 +5774,6 @@ do
     "sys/amdgcn/Makefile") CONFIG_FILES="$CONFIG_FILES sys/amdgcn/Makefile" ;;
     "sys/arm/Makefile") CONFIG_FILES="$CONFIG_FILES sys/arm/Makefile" ;;
     "sys/d10v/Makefile") CONFIG_FILES="$CONFIG_FILES sys/d10v/Makefile" ;;
-    "sys/decstation/Makefile") CONFIG_FILES="$CONFIG_FILES sys/decstation/Makefile" ;;
     "sys/epiphany/Makefile") CONFIG_FILES="$CONFIG_FILES sys/epiphany/Makefile" ;;
     "sys/h8300hms/Makefile") CONFIG_FILES="$CONFIG_FILES sys/h8300hms/Makefile" ;;
     "sys/h8500hms/Makefile") CONFIG_FILES="$CONFIG_FILES sys/h8500hms/Makefile" ;;
@@ -5792,8 +5785,6 @@ do
     "sys/rdos/Makefile") CONFIG_FILES="$CONFIG_FILES sys/rdos/Makefile" ;;
     "sys/rtems/Makefile") CONFIG_FILES="$CONFIG_FILES sys/rtems/Makefile" ;;
     "sys/sh/Makefile") CONFIG_FILES="$CONFIG_FILES sys/sh/Makefile" ;;
-    "sys/sparc64/Makefile") CONFIG_FILES="$CONFIG_FILES sys/sparc64/Makefile" ;;
-    "sys/sun4/Makefile") CONFIG_FILES="$CONFIG_FILES sys/sun4/Makefile" ;;
     "sys/sysmec/Makefile") CONFIG_FILES="$CONFIG_FILES sys/sysmec/Makefile" ;;
     "sys/sysnec810/Makefile") CONFIG_FILES="$CONFIG_FILES sys/sysnec810/Makefile" ;;
     "sys/sysnecv850/Makefile") CONFIG_FILES="$CONFIG_FILES sys/sysnecv850/Makefile" ;;
