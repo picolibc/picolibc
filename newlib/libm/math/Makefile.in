@@ -358,7 +358,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CPPFLAGS = -I$(srcdir)/../common $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+AM_CPPFLAGS = -I$(srcdir)/../common $(NEWLIB_CFLAGS) $(TARGET_CFLAGS)
 src = k_standard.c k_rem_pio2.c \
 	k_cos.c k_sin.c k_tan.c \
 	e_acos.c e_acosh.c e_asin.c e_atan2.c \

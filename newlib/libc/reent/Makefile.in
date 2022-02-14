@@ -311,7 +311,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CPPFLAGS = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+AM_CPPFLAGS = $(NEWLIB_CFLAGS) $(TARGET_CFLAGS)
 @HAVE_STDIO64_DIR_TRUE@STDIO64_SOURCES = \
 @HAVE_STDIO64_DIR_TRUE@	fstat64r.c \
 @HAVE_STDIO64_DIR_TRUE@	lseek64r.c \

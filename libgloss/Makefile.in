@@ -540,7 +540,6 @@ FLAGS_TO_PASS = \
 	"MAKEINFO=$(MAKEINFO)" \
 	"AS=$(AS)" \
 	"LD=$(LD)" \
-	"CROSS_CFLAGS=$(CROSS_CFLAGS)" \
 	"TARGET_CFLAGS=$(TARGET_CFLAGS)" \
 	"exec_prefix=$(exec_prefix)" \
 	"prefix=$(prefix)" \

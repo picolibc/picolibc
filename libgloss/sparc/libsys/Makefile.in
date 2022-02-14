@@ -50,9 +50,9 @@ RANLIB = @RANLIB@
 .SUFFIXES: .c .S .o _r.o
 
 .S_r.o:
-	$(CC) $(CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS) $(NEWLIB_CFLAGS) -DREENT $(INCLUDES) -c $< -o $@
+	$(CC) $(CFLAGS) $(TARGET_CFLAGS) $(NEWLIB_CFLAGS) -DREENT $(INCLUDES) -c $< -o $@
 .c_r.o:
-	$(CC) $(CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS) $(NEWLIB_CFLAGS) -DREENT $(INCLUDES) -c $< -o $@
+	$(CC) $(CFLAGS) $(TARGET_CFLAGS) $(NEWLIB_CFLAGS) -DREENT $(INCLUDES) -c $< -o $@
 
 # CFILES_R, SFILES_R, and TEMPLATE_SFILES_R define those system calls that are
 # needed by the ANSI C part of newlib when REENTRANT_SYSCALLS_PROVIDED is
@@ -118,13 +118,13 @@ stamp-srcs: Makefile template.S template_r.S
 	for f in $(TEMPLATE_SFILES:_=) ; \
 	do \
 		$(CC) -E -Dfunc=$$f \
-		$(CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS) $(NEWLIB_CFLAGS) $(INCLUDES) \
+		$(CFLAGS) $(TARGET_CFLAGS) $(NEWLIB_CFLAGS) $(INCLUDES) \
 		$(srcdir)/template.S >$$f.S ; \
 	done
 	for f in $(TEMPLATE_SFILES_R:_=) ; \
 	do \
 		$(CC) -E -Dfunc=$$f \
-		$(CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS) $(NEWLIB_CFLAGS) $(INCLUDES) \
+		$(CFLAGS) $(TARGET_CFLAGS) $(NEWLIB_CFLAGS) $(INCLUDES) \
 		$(srcdir)/template_r.S | sed -e 's/^_/#/' >$$f.S ; \
 	done
 	touch stamp-srcs

@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 
-AM_CPPFLAGS = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+AM_CPPFLAGS = $(NEWLIB_CFLAGS) $(TARGET_CFLAGS)
 
 ## All functions in this directory are EL/IX level 2 and above
 if ELIX_LEVEL_1

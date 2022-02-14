@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 
-AM_CPPFLAGS = -I$(srcdir)/../common $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+AM_CPPFLAGS = -I$(srcdir)/../common $(NEWLIB_CFLAGS) $(TARGET_CFLAGS)
 
 src =	s_acos.c s_frexp.c s_mathcnst.c \
 	s_cos.c s_sinh.c \

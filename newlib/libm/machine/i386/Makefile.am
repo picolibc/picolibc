@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 
-AM_CPPFLAGS = -I $(abs_newlib_basedir)/libm/common $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+AM_CPPFLAGS = -I $(abs_newlib_basedir)/libm/common $(NEWLIB_CFLAGS) $(TARGET_CFLAGS)
 
 AM_CCASFLAGS = $(AM_CPPFLAGS)
 
