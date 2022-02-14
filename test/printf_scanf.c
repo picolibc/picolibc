@@ -163,6 +163,9 @@ main(void)
 				errors++;
 			}
 			if (y > 0 && strncmp(tbuf, "123", y - 1) != 0) {
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
 				strncpy(buf, "123", y - 1);
 				buf[y-1] = '\0';
 				printf("%s: returned buffer want %s got %s\n", name, buf, tbuf);
