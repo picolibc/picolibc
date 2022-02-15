@@ -89,33 +89,33 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @HAVE_POWERPC_ALTIVEC_TRUE@am__append_1 = \
-@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vfprintf.o \
-@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vfscanf.o \
-@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vec_malloc.o \
-@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vec_calloc.o \
-@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vec_free.o \
-@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vec_realloc.o \
-@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vec_mallocr.o \
-@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vec_callocr.o \
-@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vec_reallocr.o
+@HAVE_POWERPC_ALTIVEC_TRUE@	vfprintf.c \
+@HAVE_POWERPC_ALTIVEC_TRUE@	vfscanf.c \
+@HAVE_POWERPC_ALTIVEC_TRUE@	vec_malloc.c \
+@HAVE_POWERPC_ALTIVEC_TRUE@	vec_calloc.c \
+@HAVE_POWERPC_ALTIVEC_TRUE@	vec_free.c \
+@HAVE_POWERPC_ALTIVEC_TRUE@	vec_realloc.c \
+@HAVE_POWERPC_ALTIVEC_TRUE@	vec_mallocr.c \
+@HAVE_POWERPC_ALTIVEC_TRUE@	vec_callocr.c \
+@HAVE_POWERPC_ALTIVEC_TRUE@	vec_reallocr.c
 
 @HAVE_POWERPC_SPE_TRUE@am__append_2 = \
-@HAVE_POWERPC_SPE_TRUE@	lib_a-atosfix16.o \
-@HAVE_POWERPC_SPE_TRUE@	lib_a-atosfix32.o \
-@HAVE_POWERPC_SPE_TRUE@	lib_a-atosfix64.o \
-@HAVE_POWERPC_SPE_TRUE@	lib_a-atoufix16.o \
-@HAVE_POWERPC_SPE_TRUE@	lib_a-atoufix32.o \
-@HAVE_POWERPC_SPE_TRUE@	lib_a-atoufix64.o \
-@HAVE_POWERPC_SPE_TRUE@	lib_a-simdldtoa.o \
-@HAVE_POWERPC_SPE_TRUE@	lib_a-strtosfix16.o \
-@HAVE_POWERPC_SPE_TRUE@	lib_a-strtosfix32.o \
-@HAVE_POWERPC_SPE_TRUE@	lib_a-strtosfix64.o \
-@HAVE_POWERPC_SPE_TRUE@	lib_a-strtoufix16.o \
-@HAVE_POWERPC_SPE_TRUE@	lib_a-strtoufix32.o \
-@HAVE_POWERPC_SPE_TRUE@	lib_a-strtoufix64.o \
-@HAVE_POWERPC_SPE_TRUE@	lib_a-ufix64toa.o \
-@HAVE_POWERPC_SPE_TRUE@	lib_a-vfprintf.o \
-@HAVE_POWERPC_SPE_TRUE@	lib_a-vfscanf.o
+@HAVE_POWERPC_SPE_TRUE@	atosfix16.c \
+@HAVE_POWERPC_SPE_TRUE@	atosfix32.c \
+@HAVE_POWERPC_SPE_TRUE@	atosfix64.c \
+@HAVE_POWERPC_SPE_TRUE@	atoufix16.c \
+@HAVE_POWERPC_SPE_TRUE@	atoufix32.c \
+@HAVE_POWERPC_SPE_TRUE@	atoufix64.c \
+@HAVE_POWERPC_SPE_TRUE@	simdldtoa.c \
+@HAVE_POWERPC_SPE_TRUE@	strtosfix16.c \
+@HAVE_POWERPC_SPE_TRUE@	strtosfix32.c \
+@HAVE_POWERPC_SPE_TRUE@	strtosfix64.c \
+@HAVE_POWERPC_SPE_TRUE@	strtoufix16.c \
+@HAVE_POWERPC_SPE_TRUE@	strtoufix32.c \
+@HAVE_POWERPC_SPE_TRUE@	strtoufix64.c \
+@HAVE_POWERPC_SPE_TRUE@	ufix64toa.c \
+@HAVE_POWERPC_SPE_TRUE@	vfprintf.c \
+@HAVE_POWERPC_SPE_TRUE@	vfscanf.c
 
 subdir = machine/powerpc
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -141,7 +141,33 @@ am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
 am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 lib_a_AR = $(AR) $(ARFLAGS)
-am_lib_a_OBJECTS = setjmp.$(OBJEXT)
+lib_a_LIBADD =
+@HAVE_POWERPC_ALTIVEC_TRUE@am__objects_1 = lib_a-vfprintf.$(OBJEXT) \
+@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vfscanf.$(OBJEXT) \
+@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vec_malloc.$(OBJEXT) \
+@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vec_calloc.$(OBJEXT) \
+@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vec_free.$(OBJEXT) \
+@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vec_realloc.$(OBJEXT) \
+@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vec_mallocr.$(OBJEXT) \
+@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vec_callocr.$(OBJEXT) \
+@HAVE_POWERPC_ALTIVEC_TRUE@	lib_a-vec_reallocr.$(OBJEXT)
+@HAVE_POWERPC_SPE_TRUE@am__objects_2 = lib_a-atosfix16.$(OBJEXT) \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-atosfix32.$(OBJEXT) \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-atosfix64.$(OBJEXT) \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-atoufix16.$(OBJEXT) \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-atoufix32.$(OBJEXT) \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-atoufix64.$(OBJEXT) \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-simdldtoa.$(OBJEXT) \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-strtosfix16.$(OBJEXT) \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-strtosfix32.$(OBJEXT) \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-strtosfix64.$(OBJEXT) \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-strtoufix16.$(OBJEXT) \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-strtoufix32.$(OBJEXT) \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-strtoufix64.$(OBJEXT) \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-ufix64toa.$(OBJEXT) \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-vfprintf.$(OBJEXT) \
+@HAVE_POWERPC_SPE_TRUE@	lib_a-vfscanf.$(OBJEXT)
+am_lib_a_OBJECTS = setjmp.$(OBJEXT) $(am__objects_1) $(am__objects_2)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -180,7 +206,7 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(lib_a_SOURCES) $(EXTRA_lib_a_SOURCES)
+SOURCES = $(lib_a_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -327,17 +353,8 @@ AM_CPPFLAGS = $(NEWLIB_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(AM_CPPFLAGS)
 noinst_LIBRARIES = lib.a
 AM_CFLAGS = -I $(srcdir)/../../stdio -I $(srcdir)/../../stdlib
-lib_a_SOURCES = setjmp.S
+lib_a_SOURCES = setjmp.S $(am__append_1) $(am__append_2)
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_LIBADD = $(am__append_1) $(am__append_2)
-lib_a_DEPENDENCIES = $(lib_a_LIBADD)
-EXTRA_lib_a_SOURCES = \
-  vfprintf.c vfscanf.c \
-  vec_malloc.c vec_calloc.c vec_free.c vec_realloc.c vec_mallocr.c vec_callocr.c vec_reallocr.c \
-  atosfix16.c atosfix32.c atosfix64.c atoufix16.c atoufix32.c atoufix64.c \
-  simdldtoa.c strtosfix16.c strtosfix32.c strtosfix64.c strtoufix16.c \
-  strtoufix32.c strtoufix64.c ufix64toa.c
-
 all: all-am
 
 .SUFFIXES:
