@@ -1147,6 +1147,19 @@ ctrl_c_handler (DWORD type)
     return TRUE;
 
   tty_min *t = cygwin_shared->tty.get_cttyp ();
+
+  /* If process group leader is non-cygwin process or not exist,
+     send signal to myself. */
+  pinfo pi (t->getpgid ());
+  if ((!pi || (pi->process_state & PID_NOTCYGWIN))
+      && (!have_execed || have_execed_cygwin)
+      && t->getpgid () == myself->pgid
+      && type == CTRL_C_EVENT)
+    {
+      t->output_stopped = false;
+      sig_send(myself, SIGINT);
+    }
+
   /* Ignore this if we're not the process group leader since it should be
      handled *by* the process group leader. */
   if (t && (!have_execed || have_execed_cygwin)
@@ -1556,6 +1569,8 @@ dosig:
   if (have_execed)
     {
       sigproc_printf ("terminating captive process");
+      if (::cygheap->ctty)
+	::cygheap->ctty->cleanup_before_exit ();
       TerminateProcess (ch_spawn, sigExeced = si.si_signo);
     }
   /* Dispatch to the appropriate function. */

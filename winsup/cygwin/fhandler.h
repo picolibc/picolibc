@@ -356,6 +356,7 @@ class fhandler_base
   virtual int open (int, mode_t);
   virtual fhandler_base *fd_reopen (int, mode_t);
   virtual bool open_setup (int flags);
+  virtual void post_open_setup (int fd) {}
   void set_unique_id (int64_t u) { unique_id = u; }
   void set_unique_id () { NtAllocateLocallyUniqueId ((PLUID) &unique_id); }
 
@@ -1901,6 +1902,13 @@ class fhandler_termios: public fhandler_base
   virtual void release_input_mutex_if_necessary (void) {};
   virtual void discard_input () {};
 
+  enum process_sig_state {
+    signalled,
+    not_signalled,
+    not_signalled_but_done,
+    not_signalled_with_cyg_reader
+  };
+
  public:
   tty_min*& tc () {return _tc;}
   fhandler_termios () :
@@ -1910,6 +1918,9 @@ class fhandler_termios: public fhandler_base
   }
   HANDLE& get_output_handle () { return output_handle; }
   HANDLE& get_output_handle_nat () { return output_handle; }
+  static process_sig_state process_sigs (char c, tty *ttyp,
+					 fhandler_termios *fh);
+  static bool process_stop_start (char c, tty *ttyp, bool on_ixany);
   line_edit_status line_edit (const char *rptr, size_t nread, termios&,
 			      ssize_t *bytes_read = NULL);
   void set_output_handle (HANDLE h) { output_handle = h; }
@@ -1943,6 +1954,8 @@ class fhandler_termios: public fhandler_base
   }
   static bool path_iscygexec_a (LPCSTR n, LPSTR c);
   static bool path_iscygexec_w (LPCWSTR n, LPWSTR c);
+  virtual bool is_pty_master_with_pcon () { return false; }
+  virtual void cleanup_before_exit () {}
 };
 
 enum ansi_intensity
@@ -2047,7 +2060,6 @@ class dev_console
   char cons_rabuf[40];  // cannot get longer than char buf[40] in char_command
   char *cons_rapoi;
   bool cursor_key_app_mode;
-  bool disable_master_thread;
 
   inline UINT get_console_cp ();
   DWORD con_to_str (char *d, int dlen, WCHAR w);
@@ -2147,6 +2159,7 @@ private:
 
   int open (int flags, mode_t mode);
   bool open_setup (int flags);
+  void post_open_setup (int fd);
   int dup (fhandler_base *, int);
 
   void __reg3 read (void *ptr, size_t& len);
@@ -2370,6 +2383,7 @@ class fhandler_pty_slave: public fhandler_pty_common
 			      HANDLE input_available_event);
   HANDLE get_input_available_event (void) { return input_available_event; }
   bool pcon_activated (void) { return get_ttyp ()->pcon_activated; }
+  void cleanup_before_exit ();
 };
 
 #define __ptsname(buf, unit) __small_sprintf ((buf), "/dev/pty%d", (unit))
@@ -2457,6 +2471,7 @@ public:
   void get_master_thread_param (master_thread_param_t *p);
   void get_master_fwd_thread_param (master_fwd_thread_param_t *p);
   void set_mask_flusho (bool m) { get_ttyp ()->mask_flusho = m; }
+  bool is_pty_master_with_pcon () { return get_ttyp ()->pcon_activated; }
 };
 
 class fhandler_dev_null: public fhandler_base

@@ -188,13 +188,28 @@ cons_master_thread (VOID *arg)
 void
 fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 {
+  termios &ti = ttyp->ti;
   DWORD output_stopped_at = 0;
   while (con.owner == myself->pid)
     {
       DWORD total_read, n, i;
       INPUT_RECORD input_rec[INREC_SIZE];
 
-      if (con.disable_master_thread)
+      bool nat_fg = false;
+      bool nat_child_fg = false;
+      winpids pids ((DWORD) 0);
+      for (unsigned i = 0; i < pids.npids; i++)
+	{
+	  _pinfo *pi = pids[i];
+	  if (pi && pi->ctty == ttyp->ntty && pi->pgid == ttyp->getpgid ()
+	      && (pi->process_state & PID_NOTCYGWIN)
+	      && !(pi->process_state & PID_NEW_PG))
+	    nat_fg = true;
+	  if (pi && pi->ctty == ttyp->ntty && pi->pgid == ttyp->getpgid ()
+	      && !(pi->process_state & PID_CYGPARENT))
+	    nat_child_fg = true;
+	}
+      if (nat_fg && !nat_child_fg)
 	{
 	  cygwait (40);
 	  continue;
@@ -233,90 +248,35 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 	}
       for (i = 0; i < total_read; i++)
 	{
-	  const wchar_t wc = input_rec[i].Event.KeyEvent.uChar.UnicodeChar;
-	  if ((wint_t) wc >= 0x80)
-	    continue;
-	  char c = (char) wc;
+	  wchar_t wc;
+	  char c;
+	  bool was_output_stopped;
 	  bool processed = false;
-	  termios &ti = ttyp->ti;
-	  pinfo pi (ttyp->getpgid ());
-	  if (pi && pi->ctty == ttyp->ntty
-	      && (pi->process_state & PID_NOTCYGWIN)
-	      && input_rec[i].EventType == KEY_EVENT && c == '\003')
-	    {
-	      bool not_a_sig = false;
-	      if (!CCEQ (ti.c_cc[VINTR], c)
-		  && !CCEQ (ti.c_cc[VQUIT], c)
-		  && !CCEQ (ti.c_cc[VSUSP], c))
-		not_a_sig = true;
-	      if (input_rec[i].Event.KeyEvent.bKeyDown)
-		{
-		  /* CTRL_C_EVENT does not work for the process started with
-		     CREATE_NEW_PROCESS_GROUP flag, so send CTRL_BREAK_EVENT
-		     instead. */
-		  if (pi->process_state & PID_NEW_PG)
-		    GenerateConsoleCtrlEvent (CTRL_BREAK_EVENT,
-					      pi->dwProcessId);
-		  else
-		    GenerateConsoleCtrlEvent (CTRL_C_EVENT, 0);
-		  if (not_a_sig)
-		    goto skip_writeback;
-		}
-	      processed = true;
-	      if (not_a_sig)
-		goto remove_record;
-	    }
 	  switch (input_rec[i].EventType)
 	    {
 	    case KEY_EVENT:
-	      if (ti.c_lflag & ISIG)
+	      if (!input_rec[i].Event.KeyEvent.bKeyDown)
+		continue;
+	      wc = input_rec[i].Event.KeyEvent.uChar.UnicodeChar;
+	      if (!wc || (wint_t) wc >= 0x80)
+		continue;
+	      c = (char) wc;
+	      switch (process_sigs (c, ttyp, NULL))
 		{
-		  int sig = 0;
-		  if (CCEQ (ti.c_cc[VINTR], c))
-		    sig = SIGINT;
-		  else if (CCEQ (ti.c_cc[VQUIT], c))
-		    sig = SIGQUIT;
-		  else if (CCEQ (ti.c_cc[VSUSP], c))
-		    sig = SIGTSTP;
-		  if (sig && input_rec[i].Event.KeyEvent.bKeyDown)
-		    {
-		      ttyp->kill_pgrp (sig);
-		      ttyp->output_stopped = false;
-		      ti.c_lflag &= ~FLUSHO;
-		      /* Discard type ahead input */
-		      goto skip_writeback;
-		    }
-		}
-	      if (ti.c_iflag & IXON)
-		{
-		  if (CCEQ (ti.c_cc[VSTOP], c))
-		    {
-		      if (!ttyp->output_stopped
-			  && input_rec[i].Event.KeyEvent.bKeyDown)
-			{
-			  ttyp->output_stopped = true;
-			  output_stopped_at = i;
-			}
-		      processed = true;
-		    }
-		  else if (CCEQ (ti.c_cc[VSTART], c))
-		    {
-		restart_output:
-		      if (input_rec[i].Event.KeyEvent.bKeyDown)
-			ttyp->output_stopped = false;
-		      processed = true;
-		    }
-		  else if ((ti.c_iflag & IXANY) && ttyp->output_stopped
-			   && c && i >= output_stopped_at)
-		    goto restart_output;
-		}
-	      if ((ti.c_lflag & ICANON) && (ti.c_lflag & IEXTEN)
-		  && CCEQ (ti.c_cc[VDISCARD], c))
-		{
-		  if (input_rec[i].Event.KeyEvent.bKeyDown)
-		    ti.c_lflag ^= FLUSHO;
+		case signalled:
+		case not_signalled_but_done:
 		  processed = true;
+		  ttyp->output_stopped = false;
+		  if (ti.c_lflag & NOFLSH)
+		    goto remove_record;
+		  goto skip_writeback;
+		default: /* not signalled */
+		  break;
 		}
+	      was_output_stopped = ttyp->output_stopped;
+	      processed = process_stop_start (c, ttyp, i > output_stopped_at);
+	      if (!was_output_stopped && ttyp->output_stopped)
+		output_stopped_at = i;
 	      break;
 	    case WINDOW_BUFFER_SIZE_EVENT:
 	      SHORT y = con.dwWinSize.Y;
@@ -447,7 +407,6 @@ fhandler_console::setup ()
       con.cons_rapoi = NULL;
       shared_console_info->tty_min_state.is_console = true;
       con.cursor_key_app_mode = false;
-      con.disable_master_thread = false;
     }
 }
 
@@ -503,8 +462,6 @@ fhandler_console::set_input_mode (tty::cons_mode m, const termios *t,
 	flags |= ENABLE_VIRTUAL_TERMINAL_INPUT;
       else
 	flags |= ENABLE_MOUSE_INPUT;
-      if (shared_console_info)
-	con.disable_master_thread = false;
       break;
     case tty::native:
       if (t->c_lflag & ECHO)
@@ -517,8 +474,6 @@ fhandler_console::set_input_mode (tty::cons_mode m, const termios *t,
 	flags &= ~ENABLE_ECHO_INPUT;
       if (t->c_lflag & ISIG)
 	flags |= ENABLE_PROCESSED_INPUT;
-      if (shared_console_info)
-	con.disable_master_thread = true;
       break;
     }
   SetConsoleMode (p->input_handle, flags);
@@ -1394,9 +1349,6 @@ fhandler_console::open (int flags, mode_t)
 	setenv ("TERM", "cygwin", 1);
     }
 
-  set_input_mode (tty::cygwin, &get_ttyp ()->ti, &handle_set);
-  set_output_mode (tty::cygwin, &get_ttyp ()->ti, &handle_set);
-
   debug_printf ("opened conin$ %p, conout$ %p", get_handle (),
 		get_output_handle ());
 
@@ -1419,6 +1371,17 @@ fhandler_console::open_setup (int flags)
   if (myself->set_ctty (this, flags) && !myself->cygstarted)
     init_console_handler (true);
   return fhandler_base::open_setup (flags);
+}
+
+void
+fhandler_console::post_open_setup (int fd)
+{
+  if (fd == 0)
+    set_input_mode (tty::cygwin, &get_ttyp ()->ti, &handle_set);
+  else if (fd == 1 || fd == 2)
+    set_output_mode (tty::cygwin, &get_ttyp ()->ti, &handle_set);
+
+  fhandler_base::post_open_setup (fd);
 }
 
 int

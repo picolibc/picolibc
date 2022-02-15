@@ -419,6 +419,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       cygheap->fdtab[fd]->inc_refcnt ();
       set_std_handle (fd);
       paranoid_printf ("fd %d, handle %p", fd, handle);
+      fh->post_open_setup (fd);
     }
 }
 
