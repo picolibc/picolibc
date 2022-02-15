@@ -333,7 +333,7 @@ lib_a_LIBADD = $(am__append_1) $(am__append_2)
 lib_a_DEPENDENCIES = $(lib_a_LIBADD)
 EXTRA_lib_a_SOURCES = \
   vfprintf.c vfscanf.c \
-  vec_malloc.c vec_calloc.c vec_free.c vec_realloc.c vec_mallocr.c \
+  vec_malloc.c vec_calloc.c vec_free.c vec_realloc.c vec_mallocr.c vec_callocr.c vec_reallocr.c \
   atosfix16.c atosfix32.c atosfix64.c atoufix16.c atoufix32.c atoufix64.c \
   simdldtoa.c strtosfix16.c strtosfix32.c strtosfix64.c strtoufix16.c \
   strtoufix32.c strtoufix64.c ufix64toa.c
@@ -439,6 +439,18 @@ lib_a-vec_mallocr.o: vec_mallocr.c
 
 lib_a-vec_mallocr.obj: vec_mallocr.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vec_mallocr.obj `if test -f 'vec_mallocr.c'; then $(CYGPATH_W) 'vec_mallocr.c'; else $(CYGPATH_W) '$(srcdir)/vec_mallocr.c'; fi`
+
+lib_a-vec_callocr.o: vec_callocr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vec_callocr.o `test -f 'vec_callocr.c' || echo '$(srcdir)/'`vec_callocr.c
+
+lib_a-vec_callocr.obj: vec_callocr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vec_callocr.obj `if test -f 'vec_callocr.c'; then $(CYGPATH_W) 'vec_callocr.c'; else $(CYGPATH_W) '$(srcdir)/vec_callocr.c'; fi`
+
+lib_a-vec_reallocr.o: vec_reallocr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vec_reallocr.o `test -f 'vec_reallocr.c' || echo '$(srcdir)/'`vec_reallocr.c
+
+lib_a-vec_reallocr.obj: vec_reallocr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vec_reallocr.obj `if test -f 'vec_reallocr.c'; then $(CYGPATH_W) 'vec_reallocr.c'; else $(CYGPATH_W) '$(srcdir)/vec_reallocr.c'; fi`
 
 lib_a-atosfix16.o: atosfix16.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-atosfix16.o `test -f 'atosfix16.c' || echo '$(srcdir)/'`atosfix16.c
@@ -693,12 +705,6 @@ uninstall-am:
 
 .PRECIOUS: Makefile
 
-
-lib_a-vec_reallocr.o: vec_mallocr.c
-	$(CC) $(DEFS) -DINTERNAL_NEWLIB -DDEFINE_VECREALLOC $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vec_reallocr.o `test -f 'vec_mallocr.c' || echo '$(srcdir)/'`vec_mallocr.c
-
-lib_a-vec_callocr.o: vec_mallocr.c
-	$(CC) $(DEFS) -DINTERNAL_NEWLIB -DDEFINE_VECCALLOC $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vec_callocr.o `test -f 'vec_mallocr.c' || echo '$(srcdir)/'`vec_mallocr.c
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -45,13 +45,7 @@ endif
 lib_a_DEPENDENCIES = $(lib_a_LIBADD)
 EXTRA_lib_a_SOURCES = \
   vfprintf.c vfscanf.c \
-  vec_malloc.c vec_calloc.c vec_free.c vec_realloc.c vec_mallocr.c \
+  vec_malloc.c vec_calloc.c vec_free.c vec_realloc.c vec_mallocr.c vec_callocr.c vec_reallocr.c \
   atosfix16.c atosfix32.c atosfix64.c atoufix16.c atoufix32.c atoufix64.c \
   simdldtoa.c strtosfix16.c strtosfix32.c strtosfix64.c strtoufix16.c \
   strtoufix32.c strtoufix64.c ufix64toa.c
-
-lib_a-vec_reallocr.o: vec_mallocr.c
-	$(CC) $(DEFS) -DINTERNAL_NEWLIB -DDEFINE_VECREALLOC $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vec_reallocr.o `test -f 'vec_mallocr.c' || echo '$(srcdir)/'`vec_mallocr.c
-
-lib_a-vec_callocr.o: vec_mallocr.c
-	$(CC) $(DEFS) -DINTERNAL_NEWLIB -DDEFINE_VECCALLOC $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vec_callocr.o `test -f 'vec_mallocr.c' || echo '$(srcdir)/'`vec_mallocr.c
