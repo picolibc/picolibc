@@ -75,7 +75,7 @@ public:
   void setpgid (int pid);
   int getsid () const {return sid;}
   void setsid (pid_t tsid) {sid = tsid;}
-  void kill_pgrp (int);
+  void kill_pgrp (int, pid_t target_pgid = 0);
   int is_orphaned_process_group (int);
   const __reg1 char *ttyname () __attribute (());
 };

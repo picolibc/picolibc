@@ -130,8 +130,9 @@ is_flush_sig (int sig)
 }
 
 void
-tty_min::kill_pgrp (int sig)
+tty_min::kill_pgrp (int sig, pid_t target_pgid)
 {
+  target_pgid = target_pgid ?: pgid;
   bool killself = false;
   if (is_flush_sig (sig) && cygheap->ctty)
     cygheap->ctty->sigflush ();
@@ -145,7 +146,7 @@ tty_min::kill_pgrp (int sig)
   for (unsigned i = 0; i < pids.npids; i++)
     {
       _pinfo *p = pids[i];
-      if (!p || !p->exists () || p->ctty != ntty || p->pgid != pgid)
+      if (!p || !p->exists () || p->ctty != ntty || p->pgid != target_pgid)
 	continue;
       if (p->process_state & PID_NOTCYGWIN)
 	continue;
@@ -308,6 +309,156 @@ fhandler_termios::echo_erase (int force)
     doecho ("\b \b", 3);
 }
 
+fhandler_termios::process_sig_state
+fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
+{
+  termios &ti = ttyp->ti;
+  pid_t pgid = ttyp->pgid;
+
+  pinfo leader (pgid);
+  bool cyg_leader = leader && !(leader->process_state & PID_NOTCYGWIN);
+  bool ctrl_c_event_sent = false;
+  bool need_discard_input = false;
+  bool pg_with_nat = false;
+  bool need_send_sig = false;
+  bool nat_shell = false;
+  bool cyg_reader = false;
+
+  winpids pids ((DWORD) 0);
+  for (unsigned i = 0; i < pids.npids; i++)
+    {
+      _pinfo *p = pids[i];
+      if (c == '\003' && p && p->ctty == ttyp->ntty && p->pgid == pgid
+	  && ((p->process_state & PID_NOTCYGWIN)
+	      || !(p->process_state & PID_CYGPARENT)))
+	{
+	  pinfo pinfo_resume = pinfo (myself->ppid);
+	  DWORD resume_pid = 0;
+	  if (pinfo_resume)
+	    resume_pid = pinfo_resume->dwProcessId;
+	  else
+	    resume_pid = fhandler_pty_common::get_console_process_id
+	      (myself->dwProcessId, false);
+	  if (resume_pid && fh && !fh->is_console ())
+	    {
+	      FreeConsole ();
+	      AttachConsole (p->dwProcessId);
+	    }
+	  /* CTRL_C_EVENT does not work for the process started with
+	     CREATE_NEW_PROCESS_GROUP flag, so send CTRL_BREAK_EVENT
+	     instead. */
+	  if (p->process_state & PID_NEW_PG)
+	    GenerateConsoleCtrlEvent (CTRL_BREAK_EVENT,
+				      p->dwProcessId);
+	  else if ((!fh || !fh->is_pty_master_with_pcon () || cyg_leader)
+		   && !ctrl_c_event_sent)
+	    {
+	      GenerateConsoleCtrlEvent (CTRL_C_EVENT, 0);
+	      ctrl_c_event_sent = true;
+	    }
+	  if (resume_pid && fh && !fh->is_console ())
+	    {
+	      FreeConsole ();
+	      AttachConsole (resume_pid);
+	    }
+	  need_discard_input = true;
+	}
+      if (p && p->ctty == ttyp->ntty && p->pgid == pgid)
+	{
+	  if (p->process_state & PID_NOTCYGWIN)
+	    pg_with_nat = true;
+	  if (!(p->process_state & PID_NOTCYGWIN))
+	    need_send_sig = true;
+	  if (!p->cygstarted)
+	    nat_shell = true;
+	  if (p->process_state & PID_TTYIN)
+	    cyg_reader = true;
+	}
+    }
+  /* Send SIGQUIT to non-cygwin process. */
+  if ((ti.c_lflag & ISIG) && CCEQ (ti.c_cc[VQUIT], c)
+      && pg_with_nat && need_send_sig && !nat_shell)
+    {
+      for (unsigned i = 0; i < pids.npids; i++)
+	{
+	  _pinfo *p = pids[i];
+	  if (p && p->ctty == ttyp->ntty && p->pgid == pgid
+	      && (p->process_state & PID_NOTCYGWIN))
+	    sig_send (p, SIGQUIT);
+	}
+    }
+  if ((ti.c_lflag & ISIG) && need_send_sig)
+    {
+      int sig;
+      if (CCEQ (ti.c_cc[VINTR], c))
+	sig = SIGINT;
+      else if (CCEQ (ti.c_cc[VQUIT], c))
+	sig = SIGQUIT;
+      else if (pg_with_nat)
+	goto not_a_sig;
+      else if (CCEQ (ti.c_cc[VSUSP], c))
+	sig = SIGTSTP;
+      else
+	goto not_a_sig;
+
+      termios_printf ("got interrupt %d, sending signal %d", c, sig);
+      if (!(ti.c_lflag & NOFLSH) && fh)
+	{
+	  fh->eat_readahead (-1);
+	  fh->discard_input ();
+	}
+      if (fh)
+	fh->release_input_mutex_if_necessary ();
+      ttyp->kill_pgrp (sig, pgid);
+      if (fh)
+	fh->acquire_input_mutex_if_necessary (mutex_timeout);
+      ti.c_lflag &= ~FLUSHO;
+      return signalled;
+    }
+not_a_sig:
+  if (need_discard_input)
+    {
+      if (!(ti.c_lflag & NOFLSH) && fh)
+	{
+	  fh->eat_readahead (-1);
+	  fh->discard_input ();
+	}
+      ti.c_lflag &= ~FLUSHO;
+      return not_signalled_but_done;
+    }
+  bool to_cyg = cyg_reader || !pg_with_nat;
+  return to_cyg ? not_signalled_with_cyg_reader : not_signalled;
+}
+
+bool
+fhandler_termios::process_stop_start (char c, tty *ttyp, bool on_ixany)
+{
+  termios &ti = ttyp->ti;
+  if (ti.c_iflag & IXON)
+    {
+      if (CCEQ (ti.c_cc[VSTOP], c))
+	{
+	  ttyp->output_stopped = true;
+	  return true;
+	}
+      else if (CCEQ (ti.c_cc[VSTART], c))
+	{
+restart_output:
+	  ttyp->output_stopped = false;
+	  return true;
+	}
+      else if ((ti.c_iflag & IXANY) && ttyp->output_stopped && on_ixany)
+	goto restart_output;
+    }
+  if ((ti.c_lflag & ICANON) && (ti.c_lflag & IEXTEN)
+      && CCEQ (ti.c_cc[VDISCARD], c))
+    {
+      ti.c_lflag ^= FLUSHO;
+      return true;
+    }
+  return false;
+}
+
 line_edit_status
 fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
 			     ssize_t *bytes_read)
@@ -328,92 +479,24 @@ fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
 
       if (ti.c_iflag & ISTRIP)
 	c &= 0x7f;
-      winpids pids ((DWORD) 0);
-      bool need_check_sigs = get_ttyp ()->pcon_input_state_eq (tty::to_cyg);
-      if (get_ttyp ()->pcon_input_state_eq (tty::to_nat))
+      bool disable_eof_key = true;
+      switch (process_sigs (c, get_ttyp (), this))
 	{
-	  bool need_discard_input = false;
-	  for (unsigned i = 0; i < pids.npids; i++)
-	    {
-	      _pinfo *p = pids[i];
-	      if (c == '\003' && p && p->ctty == tc ()->ntty
-		  && p->pgid == tc ()->getpgid ()
-		  && (p->process_state & PID_NOTCYGWIN))
-		{
-		  /* CTRL_C_EVENT does not work for the process started with
-		     CREATE_NEW_PROCESS_GROUP flag, so send CTRL_BREAK_EVENT
-		     instead. */
-		  if (p->process_state & PID_NEW_PG)
-		    GenerateConsoleCtrlEvent (CTRL_BREAK_EVENT,
-					      p->dwProcessId);
-		  else
-		    GenerateConsoleCtrlEvent (CTRL_C_EVENT, 0);
-		  need_discard_input = true;
-		}
-	      if (p->ctty == get_ttyp ()->ntty
-		  && p->pgid == get_ttyp ()->getpgid () && !p->cygstarted)
-		need_check_sigs = true;
-	    }
-	  if (!CCEQ (ti.c_cc[VINTR], c)
-	      && !CCEQ (ti.c_cc[VQUIT], c)
-	      && !CCEQ (ti.c_cc[VSUSP], c))
-	    need_check_sigs = false;
-	  if (need_discard_input && !need_check_sigs)
-	    {
-	      if (!(ti.c_lflag & NOFLSH))
-		{
-		  eat_readahead (-1);
-		  discard_input ();
-		}
-	      ti.c_lflag &= ~FLUSHO;
-	      continue;
-	    }
-	}
-      if ((ti.c_lflag & ISIG) && need_check_sigs)
-	{
-	  int sig;
-	  if (CCEQ (ti.c_cc[VINTR], c))
-	    sig = SIGINT;
-	  else if (CCEQ (ti.c_cc[VQUIT], c))
-	    sig = SIGQUIT;
-	  else if (CCEQ (ti.c_cc[VSUSP], c))
-	    sig = SIGTSTP;
-	  else
-	    goto not_a_sig;
-
-	  termios_printf ("got interrupt %d, sending signal %d", c, sig);
-	  if (!(ti.c_lflag & NOFLSH))
-	    {
-	      eat_readahead (-1);
-	      discard_input ();
-	    }
-	  release_input_mutex_if_necessary ();
-	  tc ()->kill_pgrp (sig);
-	  acquire_input_mutex_if_necessary (mutex_timeout);
-	  ti.c_lflag &= ~FLUSHO;
+	case signalled:
 	  sawsig = true;
-	  goto restart_output;
+	  fallthrough;
+	case not_signalled_but_done:
+	  get_ttyp ()->output_stopped = false;
+	  continue;
+	case not_signalled_with_cyg_reader:
+	  disable_eof_key = false;
+	  break;
+	default: /* Not signalled */
+	  break;
 	}
-    not_a_sig:
-      if (ti.c_iflag & IXON)
-	{
-	  if (CCEQ (ti.c_cc[VSTOP], c))
-	    {
-	      if (!tc ()->output_stopped)
-		tc ()->output_stopped = true;
-	      continue;
-	    }
-	  else if (CCEQ (ti.c_cc[VSTART], c))
-	    {
-    restart_output:
-	      tc ()->output_stopped = false;
-	      continue;
-	    }
-	  else if ((ti.c_iflag & IXANY) && tc ()->output_stopped)
-	    goto restart_output;
-	}
+      if (process_stop_start (c, get_ttyp (), true))
+	continue;
       /* Check for special chars */
-
       if (c == '\r')
 	{
 	  if (ti.c_iflag & IGNCR)
@@ -430,12 +513,6 @@ fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
 	    c = '\r';
 	  else
 	    set_input_done (iscanon);
-	}
-
-      if (iscanon && ti.c_lflag & IEXTEN && CCEQ (ti.c_cc[VDISCARD], c))
-	{
-	  ti.c_lflag ^= FLUSHO;
-	  continue;
 	}
 
       if (!iscanon)
@@ -474,7 +551,7 @@ fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
 	    }
 	  continue;
 	}
-      else if (CCEQ (ti.c_cc[VEOF], c) && need_check_sigs)
+      else if (CCEQ (ti.c_cc[VEOF], c) && !disable_eof_key)
 	{
 	  termios_printf ("EOF");
 	  accept_input ();
