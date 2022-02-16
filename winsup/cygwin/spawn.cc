@@ -612,8 +612,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 
       fhandler_pty_slave *ptys_primary = NULL;
       fhandler_console *cons_native = NULL;
-      termios *cons_ti = NULL;
-      pid_t cons_owner = 0;
       for (int i = 0; i < 3; i ++)
 	{
 	  const int chk_order[] = {1, 0, 2};
@@ -629,25 +627,11 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	    {
 	      if (!iscygwin () && cons_native == NULL)
 		{
-		  fhandler_console *cons = (fhandler_console *) fh;
-		  cons_native = cons;
-		  cons_ti = &((tty *)cons->tc ())->ti;
-		  cons_owner = cons->get_owner ();
-		  tty::cons_mode conmode =
-		    (ctty_pgid && ctty_pgid == myself->pgid) ?
-		    tty::native : tty::restore;
-		  fhandler_console::set_input_mode (conmode,
-					   cons_ti, cons->get_handle_set ());
-		  fhandler_console::set_output_mode (conmode,
-					   cons_ti, cons->get_handle_set ());
+		  cons_native = (fhandler_console *) fh;
+		  cons_native->setup_console_for_non_cygwin_app ();
 		}
 	    }
 	}
-      struct fhandler_console::handle_set_t cons_handle_set = { 0, };
-      if (cons_native)
-	/* Console handles will be closed by close_all_files(),
-	   therefore, duplicate them here */
-	cons_native->get_duplicated_handle_set (&cons_handle_set);
 
       if (!iscygwin ())
 	{
@@ -1023,15 +1007,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	      CloseHandle (ptys_pcon_mutex);
 	    }
 	  if (cons_native)
-	    {
-	      tty::cons_mode conmode =
-		cons_owner == myself->pid ? tty::restore : tty::cygwin;
-	      fhandler_console::set_output_mode (conmode, cons_ti,
-						 &cons_handle_set);
-	      fhandler_console::set_input_mode (conmode, cons_ti,
-						&cons_handle_set);
-	      fhandler_console::close_handle_set (&cons_handle_set);
-	    }
+	    cons_native->cleanup_console_for_non_cygwin_app ();
 	  myself.exit (EXITCODE_NOSET);
 	  break;
 	case _P_WAIT:
@@ -1060,15 +1036,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	      CloseHandle (ptys_pcon_mutex);
 	    }
 	  if (cons_native)
-	    {
-	      tty::cons_mode conmode =
-		cons_owner == myself->pid ? tty::restore : tty::cygwin;
-	      fhandler_console::set_output_mode (conmode, cons_ti,
-						 &cons_handle_set);
-	      fhandler_console::set_input_mode (conmode, cons_ti,
-						&cons_handle_set);
-	      fhandler_console::close_handle_set (&cons_handle_set);
-	    }
+	    cons_native->cleanup_console_for_non_cygwin_app ();
 	  break;
 	case _P_DETACH:
 	  res = 0;	/* Lost all memory of this child. */
