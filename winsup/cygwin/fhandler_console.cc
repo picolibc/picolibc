@@ -286,7 +286,8 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 		{
 		  con.scroll_region.Top = 0;
 		  con.scroll_region.Bottom = -1;
-		  if (wincap.has_con_24bit_colors () && !con_is_legacy)
+		  if (wincap.has_con_24bit_colors () && !con_is_legacy
+		      && wincap.has_con_broken_tabs ())
 		    fix_tab_position (p->output_handle);
 		  ttyp->kill_pgrp (SIGWINCH);
 		}
@@ -664,7 +665,8 @@ fhandler_console::send_winch_maybe ()
     {
       con.scroll_region.Top = 0;
       con.scroll_region.Bottom = -1;
-      if (wincap.has_con_24bit_colors () && !con_is_legacy)
+      if (wincap.has_con_24bit_colors () && !con_is_legacy
+	  && wincap.has_con_broken_tabs ())
 	fix_tab_position (get_output_handle ());
       get_ttyp ()->kill_pgrp (SIGWINCH);
       return true;
@@ -2321,7 +2323,7 @@ fhandler_console::char_command (char c)
 		  if (con.args[i] == 1049)
 		    {
 		      con.screen_alternated = (c == 'h');
-		      need_fix_tab_position = true;
+		      need_fix_tab_position = wincap.has_con_broken_tabs ();
 		    }
 		  if (con.args[i] == 1) /* DECCKM */
 		    con.cursor_key_app_mode = (c == 'h');
