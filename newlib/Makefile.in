@@ -1624,6 +1624,7 @@ install-data-local: install-toollibLIBRARIES install-multi
 	  done ; \
 	  for i in $(srcdir)/libc/sys/$(sys_dir)/include/*; do \
 	    if [ -d $$i ]; then \
+	    $(MKDIR_P) $(DESTDIR)$(tooldir)/include/`basename $$i`; \
 		for j in $$i/*.h; do \
 	            $(INSTALL_DATA) $$j $(DESTDIR)$(tooldir)/include/`basename $$i`/`basename $$j`; \
 		done ; \
