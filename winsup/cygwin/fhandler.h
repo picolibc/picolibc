@@ -2138,7 +2138,14 @@ private:
   void set_cursor_maybe ();
   static bool create_invisible_console_workaround (bool force);
   static console_state *open_shared_console (HWND, HANDLE&, bool&);
-  void fix_tab_position (void);
+  static void fix_tab_position (HANDLE h);
+
+/* console mode calls */
+  const handle_set_t *get_handle_set (void) {return &handle_set;}
+  static void set_input_mode (tty::cons_mode m, const termios *t,
+			      const handle_set_t *p);
+  static void set_output_mode (tty::cons_mode m, const termios *t,
+			       const handle_set_t *p);
 
  public:
   static pid_t tc_getpgid ()
@@ -2215,6 +2222,7 @@ private:
     return fh;
   }
   input_states process_input_message ();
+  bg_check_types bg_check (int sig, bool dontsignal = false);
   void setup_io_mutex (void);
   DWORD __acquire_input_mutex (const char *fn, int ln, DWORD ms);
   void __release_input_mutex (const char *fn, int ln);
@@ -2237,17 +2245,14 @@ private:
   size_t &raixput ();
   size_t &rabuflen ();
 
-  const handle_set_t *get_handle_set (void) {return &handle_set;}
   void get_duplicated_handle_set (handle_set_t *p);
   static void close_handle_set (handle_set_t *p);
 
-  static void set_input_mode (tty::cons_mode m, const termios *t,
-			      const handle_set_t *p);
-  static void set_output_mode (tty::cons_mode m, const termios *t,
-			       const handle_set_t *p);
-
   static void cons_master_thread (handle_set_t *p, tty *ttyp);
   pid_t get_owner (void) { return shared_console_info->con.owner; }
+  void setup_console_for_non_cygwin_app ();
+  void cleanup_console_for_non_cygwin_app ();
+  static void set_console_mode_to_native ();
 
   friend tty_min * tty_list::get_cttyp ();
 };

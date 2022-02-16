@@ -287,12 +287,7 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 		  con.scroll_region.Top = 0;
 		  con.scroll_region.Bottom = -1;
 		  if (wincap.has_con_24bit_colors () && !con_is_legacy)
-		    { /* Fix tab position */
-		      /* Re-setting ENABLE_VIRTUAL_TERMINAL_PROCESSING
-			 fixes the tab position. */
-		      set_output_mode (tty::restore, &ti, p);
-		      set_output_mode (tty::cygwin, &ti, p);
-		    }
+		    fix_tab_position (p->output_handle);
 		  ttyp->kill_pgrp (SIGWINCH);
 		}
 	      processed = true;
@@ -511,6 +506,38 @@ fhandler_console::set_output_mode (tty::cons_mode m, const termios *t,
   ReleaseMutex (p->output_mutex);
 }
 
+static fhandler_console::handle_set_t NO_COPY duplicated_handle_set;
+
+void
+fhandler_console::setup_console_for_non_cygwin_app ()
+{
+  /* Setting-up console mode for non-cygwin app. */
+  /* If conmode is set to tty::native for non-cygwin apps
+     in background, tty settings of the shell is reflected
+     to the console mode of the app. So, use tty::restore
+     for background process instead. */
+  tty::cons_mode conmode =
+    (get_ttyp ()->getpgid ()== myself->pgid) ? tty::native : tty::restore;
+  set_input_mode (conmode, &tc ()->ti, get_handle_set ());
+  set_output_mode (conmode, &tc ()->ti, get_handle_set ());
+  /* Console handles will be already closed by close_all_files()
+     when cleaning up, therefore, duplicate them here. */
+  get_duplicated_handle_set (&duplicated_handle_set);
+}
+
+void
+fhandler_console::cleanup_console_for_non_cygwin_app ()
+{
+  /* Cleaning-up console mode for non-cygwin app. */
+  /* conmode can be tty::restore when non-cygwin app is
+     exec'ed from login shell. */
+  tty::cons_mode conmode =
+    (con.owner == myself->pid) ? tty::restore : tty::cygwin;
+  set_output_mode (conmode, &tc ()->ti, &duplicated_handle_set);
+  set_input_mode (conmode, &tc ()->ti, &duplicated_handle_set);
+  close_handle_set (&duplicated_handle_set);
+}
+
 /* Return the tty structure associated with a given tty number.  If the
    tty number is < 0, just return a dummy record. */
 tty_min *
@@ -616,12 +643,14 @@ fhandler_console::set_cursor_maybe ()
 /* Workaround for a bug of windows xterm compatible mode. */
 /* The horizontal tab positions are broken after resize. */
 void
-fhandler_console::fix_tab_position (void)
+fhandler_console::fix_tab_position (HANDLE h)
 {
   /* Re-setting ENABLE_VIRTUAL_TERMINAL_PROCESSING
      fixes the tab position. */
-  set_output_mode (tty::restore, &get_ttyp ()->ti, &handle_set);
-  set_output_mode (tty::cygwin, &get_ttyp ()->ti, &handle_set);
+  DWORD mode;
+  GetConsoleMode (h, &mode);
+  SetConsoleMode (h, mode & ~ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+  SetConsoleMode (h, mode);
 }
 
 bool
@@ -636,7 +665,7 @@ fhandler_console::send_winch_maybe ()
       con.scroll_region.Top = 0;
       con.scroll_region.Bottom = -1;
       if (wincap.has_con_24bit_colors () && !con_is_legacy)
-	fix_tab_position ();
+	fix_tab_position (get_output_handle ());
       get_ttyp ()->kill_pgrp (SIGWINCH);
       return true;
     }
@@ -671,6 +700,21 @@ fhandler_console::mouse_aware (MOUSE_EVENT_RECORD& mouse_event)
 		 || con.use_mouse >= 3));
 }
 
+
+bg_check_types
+fhandler_console::bg_check (int sig, bool dontsignal)
+{
+  /* Setting-up console mode for cygwin app. This is necessary if the
+     cygwin app and other non-cygwin apps are started simultaneously
+     in the same process group. */
+  if (sig == SIGTTIN)
+    set_input_mode (tty::cygwin, &tc ()->ti, get_handle_set ());
+  if (sig == SIGTTOU)
+    set_output_mode (tty::cygwin, &tc ()->ti, get_handle_set ());
+
+  return fhandler_termios::bg_check (sig, dontsignal);
+}
+
 void __reg3
 fhandler_console::read (void *pv, size_t& buflen)
 {
@@ -681,8 +725,6 @@ fhandler_console::read (void *pv, size_t& buflen)
   int copied_chars = 0;
 
   DWORD timeout = is_nonblocking () ? 0 : INFINITE;
-
-  set_input_mode (tty::cygwin, &get_ttyp ()->ti, &handle_set);
 
   while (!input_ready && !get_cons_readahead_valid ())
     {
@@ -1376,6 +1418,7 @@ fhandler_console::open_setup (int flags)
 void
 fhandler_console::post_open_setup (int fd)
 {
+  /* Setting-up console mode for cygwin app started from non-cygwin app. */
   if (fd == 0)
     set_input_mode (tty::cygwin, &get_ttyp ()->ti, &handle_set);
   else if (fd == 1 || fd == 2)
@@ -1401,6 +1444,7 @@ fhandler_console::close ()
       if ((NT_SUCCESS (status) && obi.HandleCount == 1)
 	  || myself->pid == con.owner)
 	{
+	  /* Cleaning-up console mode for cygwin apps. */
 	  set_output_mode (tty::restore, &get_ttyp ()->ti, &handle_set);
 	  set_input_mode (tty::restore, &get_ttyp ()->ti, &handle_set);
 	}
@@ -2284,7 +2328,7 @@ fhandler_console::char_command (char c)
 		}
 	      /* Call fix_tab_position() if screen has been alternated. */
 	      if (need_fix_tab_position)
-		fix_tab_position ();
+		fix_tab_position (get_output_handle ());
 	    }
 	  break;
 	case 'p':
@@ -3101,8 +3145,6 @@ fhandler_console::write (const void *vsrc, size_t len)
   acquire_attach_mutex (mutex_timeout);
   push_process_state process_state (PID_TTYOU);
 
-  set_output_mode (tty::cygwin, &get_ttyp ()->ti, &handle_set);
-
   acquire_output_mutex (mutex_timeout);
 
   /* Run and check for ansi sequences */
@@ -3560,9 +3602,12 @@ set_console_title (char *title)
 }
 
 static bool NO_COPY gdb_inferior_noncygwin = false;
-static void
-set_console_mode_to_native ()
+
+void
+fhandler_console::set_console_mode_to_native ()
 {
+  /* Setting-up console mode for non-cygwin app started by GDB. This is
+     called from hooked CreateProcess() and ContinueDebugEvent(). */
   cygheap_fdenum cfd (false);
   while (cfd.next () >= 0)
     if (cfd->get_major () == DEV_CONS_MAJOR)
@@ -3570,11 +3615,9 @@ set_console_mode_to_native ()
 	fhandler_console *cons = (fhandler_console *) (fhandler_base *) cfd;
 	if (cons->get_device () == cons->tc ()->getntty ())
 	  {
-	    termios *cons_ti = &((tty *) cons->tc ())->ti;
-	    fhandler_console::set_input_mode (tty::native, cons_ti,
-					      cons->get_handle_set ());
-	    fhandler_console::set_output_mode (tty::native, cons_ti,
-					       cons->get_handle_set ());
+	    termios *cons_ti = &cons->tc ()->ti;
+	    set_input_mode (tty::native, cons_ti, cons->get_handle_set ());
+	    set_output_mode (tty::native, cons_ti, cons->get_handle_set ());
 	    break;
 	  }
       }
@@ -3596,7 +3639,7 @@ CreateProcessA_Hooked
     mutex_timeout = 0; /* to avoid deadlock in GDB */
   gdb_inferior_noncygwin = !fhandler_termios::path_iscygexec_a (n, c);
   if (gdb_inferior_noncygwin)
-    set_console_mode_to_native ();
+    fhandler_console::set_console_mode_to_native ();
   return CreateProcessA_Orig (n, c, pa, ta, inh, f, e, d, si, pi);
 }
 
@@ -3610,7 +3653,7 @@ CreateProcessW_Hooked
     mutex_timeout = 0; /* to avoid deadlock in GDB */
   gdb_inferior_noncygwin = !fhandler_termios::path_iscygexec_w (n, c);
   if (gdb_inferior_noncygwin)
-    set_console_mode_to_native ();
+    fhandler_console::set_console_mode_to_native ();
   return CreateProcessW_Orig (n, c, pa, ta, inh, f, e, d, si, pi);
 }
 
@@ -3619,7 +3662,7 @@ ContinueDebugEvent_Hooked
      (DWORD p, DWORD t, DWORD s)
 {
   if (gdb_inferior_noncygwin)
-    set_console_mode_to_native ();
+    fhandler_console::set_console_mode_to_native ();
   return ContinueDebugEvent_Orig (p, t, s);
 }
 

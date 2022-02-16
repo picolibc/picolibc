@@ -1196,10 +1196,6 @@ thread_console (void *arg)
 static int
 console_startup (select_record *me, select_stuff *stuff)
 {
-  fhandler_console *fh = (fhandler_console *) me->fh;
-  fhandler_console::set_input_mode (tty::cygwin, &((tty *)fh->tc ())->ti,
-				    fh->get_handle_set ());
-
   select_console_info *ci = stuff->device_specific_console;
   if (ci->start)
     me->h = *(stuff->device_specific_console)->thread;
