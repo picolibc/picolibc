@@ -38,7 +38,7 @@ and TeX (or `texi2roff') to typeset the printed version.  While Newlib contains
 a copy of the texinfo package (texinfo.tex), the manual for it is not
 included.  The latest one may be found at
 
-http://www.gnu.org/software/texinfo/manual/texinfo/texinfo.html
+https://www.gnu.org/software/texinfo/manual/texinfo/texinfo.html
 
 (which could be for a newer version of texinfo.tex than is included in Newlib).
 
@@ -79,12 +79,12 @@ purpose of Linux-based open standards for embedded development.  In brief,
 the intent is to define multiple levels for API functions that allows the
 user to size the library appropriately for their application--at least in
 terms of the predefined lists.  For full details, refer to the EL/IX home
-page at http://sourceware.org/elix/.  The likely best way to tell how to
+page at https://sourceware.org/elix/.  The likely best way to tell how to
 classify any new functions in terms of needing an ELIX level qualification
 is to ask Jeff Johnston.  To see how it works and try classification on your
 own, refer to the API specification on the web site,
 
-http://sourceware.org/elix/api/current/api.pdf.  
+https://sourceware.org/elix/api/current/api.pdf
 
 (Unfortunately, it is not complete with respect to either the C99 or POSIX 
 standards, so particular C and POSIX functions may or may not be found.)
