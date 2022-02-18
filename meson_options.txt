@@ -213,6 +213,9 @@ option('tls-model', type: 'combo', choices: ['global-dynamic', 'local-dynamic', 
        description: 'Set TLS model. No-op when thread-local-storage is false')
 option('newlib-global-errno', type: 'boolean', value: false,
        description: 'use global errno variable')
+option('errno-function', type: 'string',
+       value: 'false',
+       description: 'Use this function to compute errno address (default false, auto means autodetect)')
 
 #
 # Math options

@@ -752,6 +752,26 @@ conf_data.set('_HAVE_ATTRIBUTE_GNU_INLINE',
 conf_data.set('__PICOLIBC_CRT_RUNTIME_SIZE',
 	      get_option('crt-runtime-size'),
 	      description: 'Compute static memory area sizes at runtime instead of link time')
+errno_function=get_option('errno-function')
+if errno_function == 'auto'
+  errno_function = 'false'
+  # these symbols are from the glibc and os x system C libraries,
+  # it's useful to access them when doing testing
+  foreach e : ['__errno_location', '__error']
+    code = '''extern int @0@();
+int main(void) {
+	return @0@();
+}
+'''.format(e)
+    if cc.links(code, name : 'detect errno function')
+      errno_function = e
+      break
+    endif
+  endforeach
+endif
+if errno_function != 'false'
+  conf_data.set('__PICOLIBC_ERRNO_FUNCTION', errno_function)
+endif
 
 # Obsolete newlib options
 conf_data.set('_WANT_USE_LONG_TIME_T', get_option('newlib-long-time_t'), description: 'Obsoleted. Define time_t to long instead of using a 64-bit type')

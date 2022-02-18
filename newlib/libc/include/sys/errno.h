@@ -55,15 +55,16 @@ extern __IMPORT char *program_invocation_short_name;
 #define NEWLIB_THREAD_LOCAL_ERRNO NEWLIB_THREAD_LOCAL
 #endif
 
+#ifdef __PICOLIBC_ERRNO_FUNCTION
+int *__PICOLIBC_ERRNO_FUNCTION(void);
+#define errno (*__PICOLIBC_ERRNO_FUNCTION())
+#else
 extern NEWLIB_THREAD_LOCAL_ERRNO int errno;
+#define errno		errno
+#endif
 
 #define __errno_r(ptr)	(errno)
 #define __errno() 	(&errno)
-/*
- * This lets applications check for #ifdef errno without requiring
- * that errno be a parameter-less macro
- */
-#define errno()		(errno)
 
 #define	EPERM 1		/* Not owner */
 #define	ENOENT 2	/* No such file or directory */
