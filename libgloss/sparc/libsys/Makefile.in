@@ -108,8 +108,8 @@ clean mostlyclean:
 distclean maintainer-clean realclean: clean
 	rm -f Makefile
 
-Makefile: Makefile.in ../config.status
-	cd .. && $(SHELL) config.status
+Makefile: Makefile.in ../../config.status
+	cd ../.. && $(SHELL) config.status
 
 stamp-srcs: Makefile template.S template_r.S
 	for f in $(TEMPLATE_SFILES:_=) ; \

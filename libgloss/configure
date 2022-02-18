@@ -743,7 +743,6 @@ CCAS
 CCASFLAGS
 CPP'
 ac_subdirs_all='aarch64
-sparc
 arm'
 
 # Initialize some variables set by options.
@@ -2774,8 +2773,9 @@ subdirs="$subdirs aarch64"
 	subdirs="$subdirs sparc_leon"
 	;;
   sparclet-*-aout* | sparc-*-elf* | sparc64-*-elf* | sparc86x-*-* | sparclite-*-*)
-	subdirs="$subdirs sparc"
+	ac_config_files="$ac_config_files sparc/Makefile"
 
+	subdirs="$subdirs sparc"
 	;;
   sh*-*-pe | mips*-*-pe | *arm*-wince-pe)
 	config_wince=true
@@ -6054,6 +6054,7 @@ do
     "pa/Makefile") CONFIG_FILES="$CONFIG_FILES pa/Makefile" ;;
     "i960/Makefile") CONFIG_FILES="$CONFIG_FILES i960/Makefile" ;;
     "sparc_leon/Makefile") CONFIG_FILES="$CONFIG_FILES sparc_leon/Makefile" ;;
+    "sparc/Makefile") CONFIG_FILES="$CONFIG_FILES sparc/Makefile" ;;
     "mips/Makefile") CONFIG_FILES="$CONFIG_FILES mips/Makefile" ;;
     "riscv/Makefile") CONFIG_FILES="$CONFIG_FILES riscv/Makefile" ;;
     "rs6000/Makefile") CONFIG_FILES="$CONFIG_FILES rs6000/Makefile" ;;

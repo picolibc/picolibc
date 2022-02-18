@@ -85,7 +85,8 @@ case "${target}" in
 	subdirs="$subdirs sparc_leon"
 	;;
   sparclet-*-aout* | sparc-*-elf* | sparc64-*-elf* | sparc86x-*-* | sparclite-*-*)
-	AC_CONFIG_SUBDIRS([sparc])
+	AC_CONFIG_FILES([sparc/Makefile])
+	subdirs="$subdirs sparc"
 	;;
   sh*-*-pe | mips*-*-pe | *arm*-wince-pe)
 	config_wince=true
