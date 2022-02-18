@@ -371,6 +371,7 @@ extern double cbrt (double);
 extern double nextafter (double, double);
 extern double rint (double);
 extern double scalbn (double, int);
+extern double getpayload(const double *x);
 
 extern double exp2 (double);
 extern double scalbln (double, long int);
@@ -471,6 +472,7 @@ extern float rintf (float);
 extern float scalbnf (float, int);
 extern float log1pf (float);
 extern float expm1f (float);
+extern float getpayloadf(const float *x);
 
 #ifndef _REENT_ONLY
 extern float acoshf (float);
