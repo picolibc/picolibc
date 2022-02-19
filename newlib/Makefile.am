@@ -211,39 +211,33 @@ stmp-targ-include: config.status
 		targ-include/bits
 	-$(AM_V_at)if [ -n "$(shared_machine_dir)" ]; then \
 	    for i in $(srcdir)/libc/machine/$(shared_machine_dir)/machine/*.h; do \
-		if [ -f $$i ]; then \
-		  cp $$i targ-include/machine/`basename $$i`; \
-		else true; fi ; \
-	      done; \
+		[ -f $$i ] && cp $$i targ-include/machine/; \
+	    done; \
 	    for i in $(srcdir)/libc/machine/$(shared_machine_dir)/sys/*.h; do \
-		if [ -f $$i ]; then \
-		  cp $$i targ-include/sys/`basename $$i`; \
-		else true; fi ; \
-	      done; \
+		[ -f $$i ] && cp $$i targ-include/sys/; \
+	    done; \
 	    for i in $(srcdir)/libc/machine/$(shared_machine_dir)/include/*.h; do \
-		if [ -f $$i ]; then \
-		  cp $$i targ-include/`basename $$i`; \
-		else true; fi ; \
-	      done; \
+		[ -f $$i ] && cp $$i targ-include/; \
+	    done; \
 	  fi
 	-$(AM_V_at)for i in $(srcdir)/libc/machine/$(machine_dir)/machine/*.h; do \
 	    if [ -f $$i ]; then \
-	      cp $$i targ-include/machine/`basename $$i`; \
+	      cp $$i targ-include/machine/; \
 	    else true; fi ; \
 	  done
 	-$(AM_V_at)for i in $(srcdir)/libc/machine/$(machine_dir)/sys/*.h; do \
 	    if [ -f $$i ]; then \
-	      cp $$i targ-include/sys/`basename $$i`; \
+	      cp $$i targ-include/sys/; \
 	    else true; fi ; \
 	  done
 	-$(AM_V_at)for i in $(srcdir)/libc/machine/$(machine_dir)/include/*.h; do \
 	    if [ -f $$i ]; then \
-	      cp $$i targ-include/`basename $$i`; \
+	      cp $$i targ-include/; \
 	    else true; fi ; \
 	  done
 	-$(AM_V_at)for i in $(srcdir)/libc/sys/$(sys_dir)/include/*.h; do \
 	    if [ -f $$i ]; then \
-	      cp $$i targ-include/`basename $$i`; \
+	      cp $$i targ-include/; \
 	    else true; fi ; \
 	  done
 	-$(AM_V_at)for i in $(srcdir)/libc/sys/$(sys_dir)/include/*; do \
@@ -258,27 +252,27 @@ stmp-targ-include: config.status
 	  done
 	-$(AM_V_at)for i in $(srcdir)/libc/sys/$(sys_dir)/sys/*.h; do \
 	    if [ -f $$i ]; then \
-	      cp $$i targ-include/sys/`basename $$i`; \
+	      cp $$i targ-include/sys/; \
 	    else true; fi ; \
 	  done
 	-$(AM_V_at)for i in $(srcdir)/libc/sys/$(sys_dir)/bits/*.h; do \
 	    if [ -f $$i ]; then \
-	      cp $$i targ-include/bits/`basename $$i`; \
+	      cp $$i targ-include/bits/; \
 	    else true; fi ; \
 	  done
 	-$(AM_V_at)for i in $(srcdir)/libc/sys/$(sys_dir)/machine/*.h; do \
 	    if [ -f $$i ]; then \
-	      cp $$i targ-include/machine/`basename $$i`; \
+	      cp $$i targ-include/machine/; \
 	    else true; fi ; \
 	  done
 	-$(AM_V_at)for i in $(srcdir)/libc/sys/$(sys_dir)/machine/$(machine_dir)/*.h; do \
 	    if [ -f $$i ]; then \
-	      cp $$i targ-include/machine/`basename $$i`; \
+	      cp $$i targ-include/machine/; \
 	    else true; fi ; \
 	  done
 	-$(AM_V_at)for i in $(srcdir)/libc/sys/$(sys_dir)/machine/$(machine_dir)/include/*.h; do \
 	    if [ -f $$i ]; then \
-	      cp $$i targ-include/machine/`basename $$i`; \
+	      cp $$i targ-include/machine/; \
 	    else true; fi ; \
 	  done
 	$(AM_V_at)$(MAKE) targ-include/newlib.h
