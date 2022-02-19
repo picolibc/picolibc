@@ -154,50 +154,50 @@ libm.a: $(libm_a_OBJECTS) $(libm_a_DEPENDENCIES)
 
 if HAVE_MULTISUBDIR
 $(BUILD_MULTISUBDIR):
-	$(MKDIR_P) $@
+	$(AM_V_at)$(MKDIR_P) $@
 
 $(BUILD_MULTISUBDIR)/crt0.o: $(CRT0_DIR)$(CRT0) $(BUILD_MULTISUBDIR)
-	rm -f $@
-	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
+	$(AM_V_at)rm -f $@
+	$(AM_V_GEN)ln $< $@ >/dev/null 2>/dev/null || cp $< $@
 
 $(BUILD_MULTISUBDIR)/libc.a: libc.a $(BUILD_MULTISUBDIR)
-	rm -f $@
-	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
+	$(AM_V_at)rm -f $@
+	$(AM_V_GEN)ln $< $@ >/dev/null 2>/dev/null || cp $< $@
 
 $(BUILD_MULTISUBDIR)/libg.a: libg.a ${BUILD_MULTISUBDIR}
-	rm -f $@
-	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
+	$(AM_V_at)rm -f $@
+	$(AM_V_GEN)ln $< $@ >/dev/null 2>/dev/null || cp $< $@
 
 $(BUILD_MULTISUBDIR)/libm.a: libm.a $(BUILD_MULTISUBDIR)
-	rm -f $@
-	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
+	$(AM_V_at)rm -f $@
+	$(AM_V_GEN)ln $< $@ >/dev/null 2>/dev/null || cp $< $@
 endif
 
 crt0.o: $(CRT0_DIR)$(CRT0)
-	rm -f $@
-	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
+	$(AM_V_at)rm -f $@
+	$(AM_V_GEN)ln $< $@ >/dev/null 2>/dev/null || cp $< $@
 
 $(CRT0_DIR)$(CRT0): ; @true
 
 crt1.o: $(CRT1_DIR)$(CRT1)
-	rm -f $@
-	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
+	$(AM_V_at)rm -f $@
+	$(AM_V_GEN)ln $< $@ >/dev/null 2>/dev/null || cp $< $@
 
 $(CRT1_DIR)$(CRT1): ; @true
 
 targ-include:
-	mkdir $@
+	$(AM_V_GEN)$(MKDIR_P) $@
 
 targ-include/newlib.h: targ-include/_newlib_version.h
 
 targ-include/sys targ-include/machine targ-include/bits: targ-include/_newlib_version.h targ-include/newlib.h
-	mkdir $@
+	$(AM_V_GEN)$(MKDIR_P) $@
 
 targ-include/newlib.h: newlib.h targ-include
-	cp newlib.h $@
+	$(AM_V_GEN)cp newlib.h $@
 
 targ-include/_newlib_version.h: _newlib_version.h targ-include
-	cp _newlib_version.h $@
+	$(AM_V_GEN)cp _newlib_version.h $@
 
 all-recursive: stmp-targ-include
 
@@ -205,11 +205,11 @@ all-recursive: stmp-targ-include
 # particular system and machine we have been configured for.  It is
 # used while building.
 stmp-targ-include: config.status
-	-rm -rf targ-include stmp-targ-include
-	$(MAKE) targ-include/sys \
+	$(AM_V_GEN)rm -rf targ-include stmp-targ-include
+	$(AM_V_at)$(MAKE) targ-include/sys \
 		targ-include/machine \
 		targ-include/bits
-	-if [ -n "$(shared_machine_dir)" ]; then \
+	-$(AM_V_at)if [ -n "$(shared_machine_dir)" ]; then \
 	    for i in $(srcdir)/libc/machine/$(shared_machine_dir)/machine/*.h; do \
 		if [ -f $$i ]; then \
 		  cp $$i targ-include/machine/`basename $$i`; \
@@ -226,27 +226,27 @@ stmp-targ-include: config.status
 		else true; fi ; \
 	      done; \
 	  fi
-	-for i in $(srcdir)/libc/machine/$(machine_dir)/machine/*.h; do \
+	-$(AM_V_at)for i in $(srcdir)/libc/machine/$(machine_dir)/machine/*.h; do \
 	    if [ -f $$i ]; then \
 	      cp $$i targ-include/machine/`basename $$i`; \
 	    else true; fi ; \
 	  done
-	-for i in $(srcdir)/libc/machine/$(machine_dir)/sys/*.h; do \
+	-$(AM_V_at)for i in $(srcdir)/libc/machine/$(machine_dir)/sys/*.h; do \
 	    if [ -f $$i ]; then \
 	      cp $$i targ-include/sys/`basename $$i`; \
 	    else true; fi ; \
 	  done
-	-for i in $(srcdir)/libc/machine/$(machine_dir)/include/*.h; do \
+	-$(AM_V_at)for i in $(srcdir)/libc/machine/$(machine_dir)/include/*.h; do \
 	    if [ -f $$i ]; then \
 	      cp $$i targ-include/`basename $$i`; \
 	    else true; fi ; \
 	  done
-	-for i in $(srcdir)/libc/sys/$(sys_dir)/include/*.h; do \
+	-$(AM_V_at)for i in $(srcdir)/libc/sys/$(sys_dir)/include/*.h; do \
 	    if [ -f $$i ]; then \
 	      cp $$i targ-include/`basename $$i`; \
 	    else true; fi ; \
 	  done
-	-for i in $(srcdir)/libc/sys/$(sys_dir)/include/*; do \
+	-$(AM_V_at)for i in $(srcdir)/libc/sys/$(sys_dir)/include/*; do \
 	    if [ -d $$i ]; then \
 		for j in $$i/*.h; do \
 		    if [ ! -d targ-include/`basename $$i` ]; then \
@@ -256,33 +256,33 @@ stmp-targ-include: config.status
 		done \
 	    else true; fi ; \
 	  done
-	-for i in $(srcdir)/libc/sys/$(sys_dir)/sys/*.h; do \
+	-$(AM_V_at)for i in $(srcdir)/libc/sys/$(sys_dir)/sys/*.h; do \
 	    if [ -f $$i ]; then \
 	      cp $$i targ-include/sys/`basename $$i`; \
 	    else true; fi ; \
 	  done
-	-for i in $(srcdir)/libc/sys/$(sys_dir)/bits/*.h; do \
+	-$(AM_V_at)for i in $(srcdir)/libc/sys/$(sys_dir)/bits/*.h; do \
 	    if [ -f $$i ]; then \
 	      cp $$i targ-include/bits/`basename $$i`; \
 	    else true; fi ; \
 	  done
-	-for i in $(srcdir)/libc/sys/$(sys_dir)/machine/*.h; do \
+	-$(AM_V_at)for i in $(srcdir)/libc/sys/$(sys_dir)/machine/*.h; do \
 	    if [ -f $$i ]; then \
 	      cp $$i targ-include/machine/`basename $$i`; \
 	    else true; fi ; \
 	  done
-	-for i in $(srcdir)/libc/sys/$(sys_dir)/machine/$(machine_dir)/*.h; do \
+	-$(AM_V_at)for i in $(srcdir)/libc/sys/$(sys_dir)/machine/$(machine_dir)/*.h; do \
 	    if [ -f $$i ]; then \
 	      cp $$i targ-include/machine/`basename $$i`; \
 	    else true; fi ; \
 	  done
-	-for i in $(srcdir)/libc/sys/$(sys_dir)/machine/$(machine_dir)/include/*.h; do \
+	-$(AM_V_at)for i in $(srcdir)/libc/sys/$(sys_dir)/machine/$(machine_dir)/include/*.h; do \
 	    if [ -f $$i ]; then \
 	      cp $$i targ-include/machine/`basename $$i`; \
 	    else true; fi ; \
 	  done
-	$(MAKE) targ-include/newlib.h
-	touch $@
+	$(AM_V_at)$(MAKE) targ-include/newlib.h
+	$(AM_V_at)touch $@
 
 CLEANFILES += stmp-targ-include
 
