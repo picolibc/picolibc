@@ -254,7 +254,12 @@ foreach target : targets
   endif
 
   if (posix_io or not tinystdio) and tests_enable_posix_io
-    plain_tests += 'posix-io'
+    plain_tests += ['posix-io']
+
+    # legacy stdio doesn't work on semihosting, so just skip it
+    if tinystdio
+      plain_tests += ['test-fopen', 'test-mktemp']
+    endif
   endif
 
   if tests_enable_stack_protector
