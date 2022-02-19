@@ -157,6 +157,7 @@ am__aclocal_m4_deps = $(top_srcdir)/../config/depstand.m4 \
 	$(top_srcdir)/../config/lead-dot.m4 \
 	$(top_srcdir)/../config/multi.m4 \
 	$(top_srcdir)/../config/override.m4 \
+	$(top_srcdir)/aarch64/acinclude.m4 \
 	$(top_srcdir)/i386/acinclude.m4 \
 	$(top_srcdir)/libnosys/acinclude.m4 \
 	$(top_srcdir)/m68k/acinclude.m4 \
@@ -172,10 +173,11 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(SHELL) $(top_srcdir)/../mkinstalldirs
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES = arc/Makefile csky/Makefile epiphany/Makefile \
-	i386/Makefile m32r/Makefile m68hc11/Makefile nds32/Makefile \
-	m68k/Makefile pa/Makefile i960/Makefile sparc_leon/Makefile \
-	sparc/Makefile mips/Makefile rs6000/Makefile mn10200/Makefile \
+CONFIG_CLEAN_FILES = aarch64/Makefile aarch64/cpu-init/Makefile \
+	arc/Makefile csky/Makefile epiphany/Makefile i386/Makefile \
+	m32r/Makefile m68hc11/Makefile nds32/Makefile m68k/Makefile \
+	pa/Makefile i960/Makefile sparc_leon/Makefile sparc/Makefile \
+	mips/Makefile rs6000/Makefile mn10200/Makefile \
 	mn10300/Makefile cr16/Makefile cris/Makefile crx/Makefile \
 	d30v/Makefile fr30/Makefile frv/Makefile ft32/Makefile \
 	mcore/Makefile mep/Makefile moxie/Makefile microblaze/Makefile \
@@ -505,6 +507,7 @@ CTAGS = ctags
 CSCOPE = cscope
 DIST_SUBDIRS = $(SUBDIRS)
 VPATH = @srcdir@ $(am__append_20)
+AARCH64_OBJTYPE = @AARCH64_OBJTYPE@
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
@@ -852,6 +855,10 @@ $(srcdir)/config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
+aarch64/Makefile: $(top_builddir)/config.status $(top_srcdir)/aarch64/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+aarch64/cpu-init/Makefile: $(top_builddir)/config.status $(top_srcdir)/aarch64/cpu-init/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 arc/Makefile: $(top_builddir)/config.status $(top_srcdir)/arc/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 csky/Makefile: $(top_builddir)/config.status $(top_srcdir)/csky/Makefile.in

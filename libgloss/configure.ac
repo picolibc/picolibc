@@ -36,7 +36,8 @@ target_makefile_frag=${srcdir}/config/default.mt
 
 case "${target}" in
   aarch64*-*-*)
-	AC_CONFIG_SUBDIRS(aarch64)
+	AC_CONFIG_FILES([aarch64/Makefile aarch64/cpu-init/Makefile])
+	subdirs="$subdirs aarch64 aarch64/cpu-init"
 	config_testsuite=true
 	;;
   arc*-*-*)
@@ -330,6 +331,7 @@ dnl
   rm -f conftest* ])
 AC_DEFINE_UNQUOTED(__SYMBOL_PREFIX, "$libc_cv_symbol_prefix", [symbol prefix])
 
+m4_include([aarch64/acinclude.m4])
 m4_include([i386/acinclude.m4])
 m4_include([libnosys/acinclude.m4])
 m4_include([m68k/acinclude.m4])

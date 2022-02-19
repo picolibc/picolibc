@@ -26,6 +26,7 @@
 DESTDIR =
 VPATH = @srcdir@ @srcdir@/..
 srcdir = @srcdir@
+abs_srcdir = @abs_srcdir@
 objdir = .
 srcroot = $(srcdir)/../..
 objroot = $(objdir)/../..
@@ -40,7 +41,7 @@ bindir = @bindir@
 libdir = @libdir@
 tooldir = $(exec_prefix)/$(target_alias)
 
-objtype = @objtype@
+objtype = @AARCH64_OBJTYPE@
 
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -65,8 +66,6 @@ AS = @AS@
 AR = @AR@
 LD = @LD@
 RANLIB = @RANLIB@
-
-SUBDIRS = @subdirs@
 
 OBJDUMP = `if [ -f ${objroot}/../binutils/objdump ] ; \
 	then echo ${objroot}/../binutils/objdump ; \
@@ -97,15 +96,6 @@ RDIMON_INSTALL	= install-rdimon
 #
 
 all: ${CRT0} ${RDIMON_CRT0} ${RDIMON_BSP} ${RDIMON_SCRIPTS}
-	@rootpre=`pwd`/; export rootpre; \
-	srcrootpre=`cd $(srcdir); pwd`/; export srcrootpre; \
-	for dir in .. ${SUBDIRS}; do \
-	  if [ x$$dir != x.. ]; then \
-	    if [ -d $$dir ]; then \
-	      (cd $$dir; $(MAKE) $(FLAGS_TO_PASS)); \
-	    else true; fi; \
-	  else true; fi; \
-	done
 
 #
 # here's where we build the test programs for each target
@@ -147,30 +137,12 @@ $(RDIMON_BSP): $(RDIMON_OBJS)
 
 clean mostlyclean:
 	rm -f a.out core *.i *.o *-test *.srec *.dis *.x $(SIM_BSP) ${RDIMON_SCRIPTS}
-	@rootpre=`pwd`/; export rootpre; \
-	srcrootpre=`cd $(srcdir); pwd`/; export srcrootpre; \
-	for dir in .. ${SUBDIRS}; do \
-	  if [ x$$dir != x.. ]; then \
-	    if [ -d $$dir ]; then \
-	      (cd $$dir; $(MAKE) $(FLAGS_TO_PASS) clean); \
-	    else true; fi; \
-	  else true; fi; \
-	done
 
 distclean maintainer-clean realclean: clean
-	rm -f Makefile config.status *~
+	rm -f Makefile *~
 
 .PHONY: install info install-info clean-info
 install: ${CRT0_INSTALL} ${RDIMON_INSTALL}
-	@rootpre=`pwd`/; export rootpre; \
-	srcrootpre=`cd $(srcdir); pwd`/; export srcrootpre; \
-	for dir in .. ${SUBDIRS}; do \
-	  if [ x$$dir != x.. ]; then \
-	    if [ -d $$dir ]; then \
-	      (cd $$dir; $(MAKE) $(FLAGS_TO_PASS) install); \
-	    else true; fi; \
-	  else true; fi; \
-	done
 
 install-crt0:
 	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
@@ -190,8 +162,5 @@ info:
 install-info:
 clean-info:
 
-Makefile: Makefile.in config.status @host_makefile_frag_path@
-	$(SHELL) config.status
-
-config.status: configure
-	$(SHELL) config.status --recheck
+Makefile: Makefile.in ../config.status
+	cd .. && $(SHELL) config.status

@@ -602,6 +602,7 @@ MIPS_PART_SPECIFIC_OBJ
 MCORE_BSP_PREFIX
 M68K_TARGET
 I386_CPPFLAGS
+AARCH64_OBJTYPE
 CPP
 RANLIB
 LD
@@ -747,8 +748,7 @@ CPPFLAGS
 CCAS
 CCASFLAGS
 CPP'
-ac_subdirs_all='aarch64
-arm'
+ac_subdirs_all='arm'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -2726,10 +2726,9 @@ target_makefile_frag=${srcdir}/config/default.mt
 
 case "${target}" in
   aarch64*-*-*)
+	ac_config_files="$ac_config_files aarch64/Makefile aarch64/cpu-init/Makefile"
 
-
-subdirs="$subdirs aarch64"
-
+	subdirs="$subdirs aarch64 aarch64/cpu-init"
 	config_testsuite=true
 	;;
   arc*-*-*)
@@ -2933,7 +2932,9 @@ subdirs="$subdirs aarch64"
 	subdirs="$subdirs rx"
 	;;
   arm*-*-elf | arm*-*-coff | arm*-*-*)
-	subdirs="$subdirs arm"
+
+
+subdirs="$subdirs arm"
 
 	;;
   spu-*-elf)
@@ -4833,6 +4834,14 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
+AARCH64_OBJTYPE=
+case "${target}" in
+  *-*-elf)
+	AARCH64_OBJTYPE=elf-
+	;;
+esac
+
+
 I386_CPPFLAGS=
 case "${target}" in
   i[3456]86-*-coff)
@@ -5859,6 +5868,8 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
+    "aarch64/Makefile") CONFIG_FILES="$CONFIG_FILES aarch64/Makefile" ;;
+    "aarch64/cpu-init/Makefile") CONFIG_FILES="$CONFIG_FILES aarch64/cpu-init/Makefile" ;;
     "arc/Makefile") CONFIG_FILES="$CONFIG_FILES arc/Makefile" ;;
     "csky/Makefile") CONFIG_FILES="$CONFIG_FILES csky/Makefile" ;;
     "epiphany/Makefile") CONFIG_FILES="$CONFIG_FILES epiphany/Makefile" ;;
