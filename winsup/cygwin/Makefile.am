@@ -626,7 +626,7 @@ $(LDSCRIPT): $(LDSCRIPT).in
 
 # cygwin dll
 $(PRE_DLL_NAME): $(LDSCRIPT) libdll.a $(VERSION_OFILES) $(LIBSERVER)\
-		  $(newlib_build)/libm/libm.a $(newlib_build)/libc/libc.a
+		  $(newlib_build)/libm.a $(newlib_build)/libc/libc.a
 	$(AM_V_CXXLD)$(CXX) $(CXXFLAGS) \
 	-mno-use-libstdc-wrappers \
 	-Wl,--gc-sections -nostdlib -Wl,-T$(LDSCRIPT) -static \
@@ -635,7 +635,7 @@ $(PRE_DLL_NAME): $(LDSCRIPT) libdll.a $(VERSION_OFILES) $(LIBSERVER)\
 	-Wl,-whole-archive libdll.a -Wl,-no-whole-archive \
 	$(VERSION_OFILES) \
 	$(LIBSERVER) \
-	$(newlib_build)/libm/libm.a \
+	$(newlib_build)/libm.a \
 	$(newlib_build)/libc/libc.a \
 	-lgcc -lkernel32 -lntdll -Wl,-Map,cygwin.map
 
@@ -696,7 +696,7 @@ speclib=\
 libc.a: $(LIB_NAME) libm.a libpthread.a libutil.a
 	$(AM_V_GEN)$(speclib) $^ -v $(@F)
 
-libm.a: $(LIB_NAME) $(newlib_build)/libm/libm.a $(addsuffix .o,$(basename $(MATH_FILES)))
+libm.a: $(LIB_NAME) $(newlib_build)/libm.a $(addsuffix .o,$(basename $(MATH_FILES)))
 	$(AM_V_GEN)$(speclib) $^ $(@F)
 
 libpthread.a: $(LIB_NAME) pthread.o thread.o libc/call_once.o libc/cnd.o \
