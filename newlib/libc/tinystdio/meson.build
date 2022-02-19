@@ -67,6 +67,7 @@ srcs_tinystdio = [
     'getchar.c',
     'gets.c',
     'matchcaseprefix.c',
+    'mktemp.c',
     'perror.c',
     'printf.c',
     'putchar.c',
