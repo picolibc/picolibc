@@ -1,8 +1,13 @@
+# This is like ../multilib.am and ../config-ml.in and ../config/multi.m4 mashed
+# into one file.  It relies on some custom hardcoded MULTI* variables in the
+# respective Makefile.in instead of dynamic compiler probing that ../multilib.am
+# does.
+
 PWD_COMMAND=$${PWDCMD-pwd}
 
 # FIXME: There should be an @-sign in front of the `if'.
 # Leave out until this is tested a bit more.
-multi-do:
+libgloss-multi-do:
 	if [ -z "$(MULTIDIRS)" ]; then \
 	  true; \
 	else \

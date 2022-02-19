@@ -175,7 +175,7 @@ $(RDIMON_BSP): $(RDIMON_OBJS)
 	${RANLIB} $@
 
 # Multilib support.
-.PHONY:  multi-do all-multi clean-multi install-multi
+.PHONY:  libgloss-multi-do all-multi clean-multi install-multi
 
 all-recursive: all-multi
 clean-recursive: clean-multi
@@ -183,13 +183,13 @@ install-recursive: install-multi
 
 # The $(MAKE) comments below are to enable parallel building.
 all-multi:
-	$(MAKE) $(AM_MAKEFLAGS) DO=all multi-do
+	$(MAKE) $(AM_MAKEFLAGS) DO=all libgloss-multi-do
 
 clean-multi:
-	$(MAKE) $(AM_MAKEFLAGS) DO=clean multi-do
+	$(MAKE) $(AM_MAKEFLAGS) DO=clean libgloss-multi-do
 
 install-multi:
-	$(MAKE) $(AM_MAKEFLAGS) DO=install multi-do
+	$(MAKE) $(AM_MAKEFLAGS) DO=install libgloss-multi-do
 
 clean mostlyclean:
 	rm -f a.out core *.i *.o *-test *.srec *.dis *.x $(SIM_BSP) $(IQ80310_BSP)
