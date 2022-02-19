@@ -204,77 +204,35 @@ all-recursive: stmp-targ-include
 # The targ-include directory just holds the includes files for the
 # particular system and machine we have been configured for.  It is
 # used while building.
+TARG_INCLUDE_CP_DIR = \
+	; srcdir="$(srcdir)/libc/$$s"; dstdir="targ-include/$$d"; \
+	if (cd $$srcdir 2>/dev/null && [ "`echo *.h`" != "*.h" ]); then cp $$srcdir/*.h $$dstdir/; fi
 stmp-targ-include: config.status
 	$(AM_V_GEN)rm -rf targ-include stmp-targ-include
 	$(AM_V_at)$(MAKE) targ-include/sys \
 		targ-include/machine \
 		targ-include/bits
-	-$(AM_V_at)if [ -n "$(shared_machine_dir)" ]; then \
-	    for i in $(srcdir)/libc/machine/$(shared_machine_dir)/machine/*.h; do \
-		[ -f $$i ] && cp $$i targ-include/machine/; \
-	    done; \
-	    for i in $(srcdir)/libc/machine/$(shared_machine_dir)/sys/*.h; do \
-		[ -f $$i ] && cp $$i targ-include/sys/; \
-	    done; \
-	    for i in $(srcdir)/libc/machine/$(shared_machine_dir)/include/*.h; do \
-		[ -f $$i ] && cp $$i targ-include/; \
-	    done; \
+	$(AM_V_at)if [ -n "$(shared_machine_dir)" ]; then \
+	    s=machine/$(shared_machine_dir)/machine d=machine $(TARG_INCLUDE_CP_DIR) || exit $$?; \
+	    s=machine/$(shared_machine_dir)/sys d=sys $(TARG_INCLUDE_CP_DIR) || exit $$?; \
+	    s=machine/$(shared_machine_dir)/include d= $(TARG_INCLUDE_CP_DIR) || exit $$?; \
 	  fi
-	-$(AM_V_at)for i in $(srcdir)/libc/machine/$(machine_dir)/machine/*.h; do \
-	    if [ -f $$i ]; then \
-	      cp $$i targ-include/machine/; \
-	    else true; fi ; \
-	  done
-	-$(AM_V_at)for i in $(srcdir)/libc/machine/$(machine_dir)/sys/*.h; do \
-	    if [ -f $$i ]; then \
-	      cp $$i targ-include/sys/; \
-	    else true; fi ; \
-	  done
-	-$(AM_V_at)for i in $(srcdir)/libc/machine/$(machine_dir)/include/*.h; do \
-	    if [ -f $$i ]; then \
-	      cp $$i targ-include/; \
-	    else true; fi ; \
-	  done
-	-$(AM_V_at)for i in $(srcdir)/libc/sys/$(sys_dir)/include/*.h; do \
-	    if [ -f $$i ]; then \
-	      cp $$i targ-include/; \
-	    else true; fi ; \
-	  done
-	-$(AM_V_at)for i in $(srcdir)/libc/sys/$(sys_dir)/include/*; do \
+	$(AM_V_at)s=machine/$(machine_dir)/machine d=machine $(TARG_INCLUDE_CP_DIR)
+	$(AM_V_at)s=machine/$(machine_dir)/sys d=sys $(TARG_INCLUDE_CP_DIR)
+	$(AM_V_at)s=machine/$(machine_dir)/include d= $(TARG_INCLUDE_CP_DIR)
+	$(AM_V_at)s=sys/$(sys_dir)/include d= $(TARG_INCLUDE_CP_DIR)
+	$(AM_V_at)for i in $(srcdir)/libc/sys/$(sys_dir)/include/*/; do \
 	    if [ -d $$i ]; then \
-		for j in $$i/*.h; do \
-		    if [ ! -d targ-include/`basename $$i` ]; then \
-		    	mkdir targ-include/`basename $$i`; \
-		    fi; \
-	      	    cp $$j targ-include/`basename $$i`/`basename $$j`; \
-		done \
-	    else true; fi ; \
+		d=`basename $$i`; \
+		$(MKDIR_P) targ-include/$$d; \
+		s=sys/${sys_dir}/include/$$d $(TARG_INCLUDE_CP_DIR) || exit $$?; \
+	    fi \
 	  done
-	-$(AM_V_at)for i in $(srcdir)/libc/sys/$(sys_dir)/sys/*.h; do \
-	    if [ -f $$i ]; then \
-	      cp $$i targ-include/sys/; \
-	    else true; fi ; \
-	  done
-	-$(AM_V_at)for i in $(srcdir)/libc/sys/$(sys_dir)/bits/*.h; do \
-	    if [ -f $$i ]; then \
-	      cp $$i targ-include/bits/; \
-	    else true; fi ; \
-	  done
-	-$(AM_V_at)for i in $(srcdir)/libc/sys/$(sys_dir)/machine/*.h; do \
-	    if [ -f $$i ]; then \
-	      cp $$i targ-include/machine/; \
-	    else true; fi ; \
-	  done
-	-$(AM_V_at)for i in $(srcdir)/libc/sys/$(sys_dir)/machine/$(machine_dir)/*.h; do \
-	    if [ -f $$i ]; then \
-	      cp $$i targ-include/machine/; \
-	    else true; fi ; \
-	  done
-	-$(AM_V_at)for i in $(srcdir)/libc/sys/$(sys_dir)/machine/$(machine_dir)/include/*.h; do \
-	    if [ -f $$i ]; then \
-	      cp $$i targ-include/machine/; \
-	    else true; fi ; \
-	  done
+	$(AM_V_at)s=sys/$(sys_dir)/sys d=sys $(TARG_INCLUDE_CP_DIR)
+	$(AM_V_at)s=sys/$(sys_dir)/bits d=bits $(TARG_INCLUDE_CP_DIR)
+	$(AM_V_at)s=sys/$(sys_dir)/machine d=machine $(TARG_INCLUDE_CP_DIR)
+	$(AM_V_at)s=sys/$(sys_dir)/machine/$(machine_dir) d=machine $(TARG_INCLUDE_CP_DIR)
+	$(AM_V_at)s=sys/$(sys_dir)/machine/$(machine_dir)/include d=machine $(TARG_INCLUDE_CP_DIR)
 	$(AM_V_at)$(MAKE) targ-include/newlib.h
 	$(AM_V_at)touch $@
 
