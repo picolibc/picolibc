@@ -8,6 +8,16 @@ fi
 
 AC_CONFIG_AUX_DIR(..)
 
+dnl Support --disable-newlib-supplied-syscalls
+dnl NB: This is kept in sync with the newlib/acinclude.m4 option code.
+AC_ARG_ENABLE(newlib-supplied-syscalls,
+[  --disable-newlib-supplied-syscalls disable newlib from supplying syscalls],
+[case "${enableval}" in
+  yes) newlib_may_supply_syscalls=yes ;;
+  no)  newlib_may_supply_syscalls=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-supplied-syscalls option) ;;
+ esac], [newlib_may_supply_syscalls=yes])dnl
+
 AC_PROG_INSTALL
 
 AC_CANONICAL_SYSTEM
@@ -205,7 +215,8 @@ case "${target}" in
 	subdirs="$subdirs rx"
 	;;
   arm*-*-elf | arm*-*-coff | arm*-*-*)
-	AC_CONFIG_SUBDIRS([arm])
+	AC_CONFIG_FILES([arm/Makefile arm/cpu-init/Makefile])
+	subdirs="$subdirs arm arm/cpu-init"
 	;;
   spu-*-elf)
 	AC_CONFIG_FILES([spu/Makefile])
@@ -235,6 +246,7 @@ case "${target}" in
 	subdirs="$subdirs nios2"
 	;;
 esac
+AC_SUBST(subdirs)
 
 dnl These subdirs have converted to non-recursive make.  Hopefully someday all
 dnl the ports above will too!
@@ -332,6 +344,7 @@ dnl
 AC_DEFINE_UNQUOTED(__SYMBOL_PREFIX, "$libc_cv_symbol_prefix", [symbol prefix])
 
 m4_include([aarch64/acinclude.m4])
+m4_include([arm/acinclude.m4])
 m4_include([i386/acinclude.m4])
 m4_include([libnosys/acinclude.m4])
 m4_include([m68k/acinclude.m4])

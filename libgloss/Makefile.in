@@ -158,7 +158,7 @@ am__aclocal_m4_deps = $(top_srcdir)/../config/depstand.m4 \
 	$(top_srcdir)/../config/multi.m4 \
 	$(top_srcdir)/../config/override.m4 \
 	$(top_srcdir)/aarch64/acinclude.m4 \
-	$(top_srcdir)/i386/acinclude.m4 \
+	$(top_srcdir)/arm/acinclude.m4 $(top_srcdir)/i386/acinclude.m4 \
 	$(top_srcdir)/libnosys/acinclude.m4 \
 	$(top_srcdir)/m68k/acinclude.m4 \
 	$(top_srcdir)/mcore/acinclude.m4 \
@@ -183,8 +183,8 @@ CONFIG_CLEAN_FILES = aarch64/Makefile aarch64/cpu-init/Makefile \
 	mcore/Makefile mep/Makefile moxie/Makefile microblaze/Makefile \
 	mt/Makefile v850/Makefile visium/Makefile xc16x/Makefile \
 	xstormy16/Makefile m32c/Makefile msp430/Makefile rl78/Makefile \
-	rx/Makefile spu/Makefile tic6x/Makefile or1k/Makefile \
-	pru/Makefile nios2/Makefile
+	rx/Makefile arm/Makefile arm/cpu-init/Makefile spu/Makefile \
+	tic6x/Makefile or1k/Makefile pru/Makefile nios2/Makefile
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -512,6 +512,9 @@ ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
+ARM_BUILD_CRT0_FALSE = @ARM_BUILD_CRT0_FALSE@
+ARM_BUILD_CRT0_TRUE = @ARM_BUILD_CRT0_TRUE@
+ARM_OBJTYPE = @ARM_OBJTYPE@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -930,6 +933,10 @@ msp430/Makefile: $(top_builddir)/config.status $(top_srcdir)/msp430/Makefile.in
 rl78/Makefile: $(top_builddir)/config.status $(top_srcdir)/rl78/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 rx/Makefile: $(top_builddir)/config.status $(top_srcdir)/rx/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+arm/Makefile: $(top_builddir)/config.status $(top_srcdir)/arm/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+arm/cpu-init/Makefile: $(top_builddir)/config.status $(top_srcdir)/arm/cpu-init/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 spu/Makefile: $(top_builddir)/config.status $(top_srcdir)/spu/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@

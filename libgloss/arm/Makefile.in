@@ -3,6 +3,7 @@
 DESTDIR =
 VPATH = @srcdir@ @srcdir@/..
 srcdir = @srcdir@
+abs_srcdir = @abs_srcdir@
 objdir = .
 srcroot = $(srcdir)/../..
 objroot = $(objdir)/../..
@@ -17,7 +18,7 @@ bindir = @bindir@
 libdir = @libdir@
 tooldir = $(exec_prefix)/$(target_alias)
 
-objtype = @objtype@
+objtype = @ARM_OBJTYPE@
 
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -43,8 +44,6 @@ AR = @AR@
 LD = @LD@
 RANLIB = @RANLIB@
 
-SUBDIRS = @subdirs@
-
 OBJDUMP = `if [ -f ${objroot}/../binutils/objdump ] ; \
 	then echo ${objroot}/../binutils/objdump ; \
 	else t='$(program_transform_name)'; echo objdump | sed -e $$t ; fi`
@@ -52,10 +51,10 @@ OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
 	then echo ${objroot}/../binutils/objcopy ; \
 	else t='$(program_transform_name)'; echo objcopy | sed -e $$t ; fi`
 
-@BUILD_CRT0_TRUE@CRT0		= crt0.o
-@BUILD_CRT0_TRUE@CRT0_INSTALL	= install-crt0
-@BUILD_CRT0_FALSE@CRT0		=
-@BUILD_CRT0_FALSE@CRT0_INSTALL	=
+@ARM_BUILD_CRT0_TRUE@CRT0		= crt0.o
+@ARM_BUILD_CRT0_TRUE@CRT0_INSTALL	= install-crt0
+@ARM_BUILD_CRT0_FALSE@CRT0		=
+@ARM_BUILD_CRT0_FALSE@CRT0_INSTALL	=
 
 NANO_SCRIPTS=nano.specs
 NANO_INSTALL=install-nano
@@ -105,15 +104,6 @@ INCLUDES += `if [ -d ${objroot}/newlib ]; then echo -I$(srcroot)/newlib/libc/mac
 # it to link is a good test, so we ignore all the errors for now.
 #
 all: ${CRT0} ${LINUX_CRT0} ${LINUX_BSP} ${REDBOOT_CRT0} ${REDBOOT_OBJS} ${RDPMON_CRT0} ${RDPMON_BSP} ${RDIMON_CRT0} ${RDIMON_BSP}
-	@rootpre=`pwd`/; export rootpre; \
-	srcrootpre=`cd $(srcdir); pwd`/; export srcrootpre; \
-	for dir in .. ${SUBDIRS}; do \
-	  if [ x$$dir != x.. ]; then \
-	    if [ -d $$dir ]; then \
-	      (cd $$dir; $(MAKE) $(FLAGS_TO_PASS)); \
-	    else true; fi; \
-	  else true; fi; \
-	done
 
 #
 # here's where we build the test programs for each target
@@ -199,30 +189,12 @@ librdimon-v2m.a: $(RDIMON_SEMIHV2M_OBJS)
 
 clean mostlyclean:
 	rm -f a.out core *.i *.o *-test *.srec *.dis *.x $(SIM_BSP) $(IQ80310_BSP)
-	@rootpre=`pwd`/; export rootpre; \
-	srcrootpre=`cd $(srcdir); pwd`/; export srcrootpre; \
-	for dir in .. ${SUBDIRS}; do \
-	  if [ x$$dir != x.. ]; then \
-	    if [ -d $$dir ]; then \
-	      (cd $$dir; $(MAKE) $(FLAGS_TO_PASS) clean); \
-	    else true; fi; \
-	  else true; fi; \
-	done
 
 distclean maintainer-clean realclean: clean
-	rm -f Makefile config.status *~
+	rm -f Makefile *~
 
 .PHONY: install info install-info clean-info
 install: ${CRT0_INSTALL} ${LINUX_INSTALL} ${REDBOOT_INSTALL} ${RDPMON_INSTALL} ${RDIMON_INSTALL} ${IQ80310_INSTALL}  ${PID_INSTALL} ${NANO_INSTALL}
-	@rootpre=`pwd`/; export rootpre; \
-	srcrootpre=`cd $(srcdir); pwd`/; export srcrootpre; \
-	for dir in .. ${SUBDIRS}; do \
-	  if [ x$$dir != x.. ]; then \
-	    if [ -d $$dir ]; then \
-	      (cd $$dir; $(MAKE) $(FLAGS_TO_PASS) install); \
-	    else true; fi; \
-	  else true; fi; \
-	done
 
 install-nano:
 	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
@@ -267,8 +239,5 @@ info:
 install-info:
 clean-info:
 
-Makefile: Makefile.in config.status @host_makefile_frag_path@
-	$(SHELL) config.status
-
-config.status: configure
-	$(SHELL) config.status --recheck
+Makefile: Makefile.in ../config.status
+	cd .. && $(SHELL) ./config.status
