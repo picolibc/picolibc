@@ -129,3 +129,7 @@ if src_semihost != []
     
   endforeach
 endif
+
+if not has_semihost and get_option('fake-semihost')
+  subdir('fake')
+endif
