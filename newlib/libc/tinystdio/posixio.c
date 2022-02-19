@@ -106,7 +106,7 @@ __posix_getc(FILE *f)
 		if (pf->read_len <= 0) {
 			pf->read_len = 0;
 			__posix_unlock(f);
-			return EOF;
+			return _FDEV_EOF;
 		}
 	}
 
