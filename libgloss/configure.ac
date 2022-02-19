@@ -250,15 +250,13 @@ dnl fi
 AM_CONDITIONAL(CONFIG_LIBNOSYS, test x$config_libnosys = xtrue)
 
 AC_PROG_CC
-AS=${AS-as}
-AC_SUBST(AS)
+AM_PROG_AS
 AC_CHECK_PROG(AR, ar, ar, :)
 AR=${AR-ar}
 AC_SUBST(AR)
 LD=${LD-ld}
 AC_SUBST(LD)
 AC_PROG_RANLIB
-AM_PROG_AS
 
 AC_DEFINE(HAVE_GNU_LD, 1, [Using GNU LD])
 

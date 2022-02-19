@@ -30,14 +30,12 @@ AC_PROG_INSTALL
 
 AC_NO_EXECUTABLES
 AC_PROG_CC
-AS=${AS-as}
-AC_SUBST(AS)
+AM_PROG_AS
 AR=${AR-ar}
 AC_SUBST(AR)
 LD=${LD-ld}
 AC_SUBST(LD)
 AC_PROG_RANLIB
-LIB_AM_PROG_AS
 
 case "${target}" in
   *-*-elf | *-*-eabi* | *-*-tirtos*)
