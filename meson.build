@@ -742,6 +742,9 @@ conf_data.set('_HAVE_ATTRIBUTE_ALWAYS_INLINE',
 conf_data.set('_HAVE_ATTRIBUTE_GNU_INLINE',
 	      cc.has_function_attribute('gnu_inline'),
 	      description: 'The compiler supports the gnu_inline function attribute')
+conf_data.set('__PICOLIBC_CRT_RUNTIME_SIZE',
+	      get_option('crt-runtime-size'),
+	      description: 'Compute static memory area sizes at runtime instead of link time')
 
 # Obsolete newlib options
 conf_data.set('_WANT_USE_LONG_TIME_T', get_option('newlib-long-time_t'), description: 'Obsoleted. Define time_t to long instead of using a 64-bit type')

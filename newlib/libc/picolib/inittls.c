@@ -46,7 +46,16 @@
 
 extern char __tdata_source[];	/* Source of TLS initialization data (in ROM) */
 extern char __tdata_size[];	/* Size of TLS initized data */
+extern char __tbss_start[];     /* Start of static zero-initialized TLS data */
+extern char __tbss_end[];       /* End of static zero-initialized TLS data */
 extern char __tbss_size[];	/* Size of TLS zero-filled data */
+extern char __tdata_start[];    /* Start of static tdata area */
+extern char __tdata_end[];      /* End of static tdata area */
+
+#ifdef __PICOLIBC_CRT_RUNTIME_SIZE
+#define __tdata_size (__tdata_end - __tdata_start)
+#define __tbss_size (__tbss_end - __tbss_start)
+#endif
 
 void
 _init_tls(void *__tls)

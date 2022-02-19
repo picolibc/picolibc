@@ -162,9 +162,12 @@ SECTIONS
 	.tdata : ALIGN_WITH_INPUT {
 		*(.tdata .tdata.* .gnu.linkonce.td.*)
 		PROVIDE(__data_end = .);
+		PROVIDE(__tdata_end = .);
 	} >ram AT>flash :tls :ram_init
 	PROVIDE( __tls_base = ADDR(.tdata));
+	PROVIDE( __tdata_start = ADDR(.tdata));
 	PROVIDE( __tdata_source = LOADADDR(.tdata) );
+	PROVIDE( __tdata_source_end = LOADADDR(.tdata) + SIZEOF(.tdata) );
 	PROVIDE( __tdata_size = SIZEOF(.tdata) );
 
 	PROVIDE( __edata = __data_end );
@@ -176,8 +179,10 @@ SECTIONS
 		*(.tbss .tbss.* .gnu.linkonce.tb.*)
 		*(.tcommon)
 		PROVIDE( __tls_end = . );
+		PROVIDE( __tbss_end = . );
 	} >ram AT>ram :tls :ram
 	PROVIDE( __bss_start = ADDR(.tbss));
+	PROVIDE( __tbss_start = ADDR(.tbss));
 	PROVIDE( __tbss_size = SIZEOF(.tbss) );
 	PROVIDE( __tls_size = __tls_end - __tls_base );
 
@@ -191,7 +196,7 @@ SECTIONS
 	 * so we create a special segment here just to make room
 	 */
 	.tbss_space (NOLOAD) : {
-		. = . + __tbss_size;
+		. = . + SIZEOF(.tbss);
 	} >ram AT>ram :ram
 
 	.bss (NOLOAD) : {

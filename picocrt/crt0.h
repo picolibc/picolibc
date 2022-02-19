@@ -40,10 +40,19 @@
 
 extern char __data_source[];
 extern char __data_start[];
+extern char __data_end[];
 extern char __data_size[];
 extern char __bss_start[];
+extern char __bss_end[];
 extern char __bss_size[];
 extern char __tls_base[];
+extern char __tdata_end[];
+extern char __tls_end[];
+
+#ifdef __PICOLIBC_CRT_RUNTIME_SIZE
+#define __data_size (__data_end - __data_start)
+#define __bss_size (__bss_end - __bss_start)
+#endif
 
 /* These two functions must be defined in the architecture-specific
  * code
