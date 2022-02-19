@@ -165,7 +165,11 @@ specialcase (double_t tmp, uint64_t sbits, uint64_t ki)
   /* Note: sbits is signed scale.  */
   scale = asdouble (sbits);
   y = scale + scale * tmp;
+#if FLT_EVAL_METHOD == 2
+#define fabs(x) fabsl(x)
+#endif
   if (fabs (y) < 1.0)
+#undef fabs
     {
       /* Round y to the right precision before scaling it into the subnormal
 	 range to avoid double rounding that can cause 0.5+E/2 ulp error where
