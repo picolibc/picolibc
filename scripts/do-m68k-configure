@@ -33,14 +33,4 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-ARCH=m68k-linux-gnu
-DIR=`dirname $0`
-meson "$DIR"/.. \
-	-Dtests=false \
-	-Dpicolib=false \
-	-Dposix-io=false \
-	-Dmultilib=false \
-	-Dincludedir=picolibc/$ARCH/include \
-	-Dlibdir=picolibc/$ARCH/lib \
-	--cross-file "$DIR"/cross-m68k.txt \
-	"$@"
+exec "$(dirname "$0")"/do-configure m68k-linux-gnu -Dtests=true -Dfake-semihost=true "$@"

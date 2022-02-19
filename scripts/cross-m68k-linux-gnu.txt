@@ -9,10 +9,11 @@ strip = 'm68k-linux-gnu-strip'
 [host_machine]
 system = 'unknown'
 cpu_family = 'm68k'
-cpu = '68000'
+cpu = '68020'
 endian = 'big'
 
 [properties]
-c_args = [ '-nostdlib', '-march=68000']
-c_link_args = [ '-nostdlib', '-march=68000', '-lgcc' ]
+c_args = [ '-nostdlib', '-march=68020' ]
+c_link_args = [ '-nostdlib', '-march=68020', '-lgcc' ]
+link_spec = '--build-id=none'
 skip_sanity_check = true
