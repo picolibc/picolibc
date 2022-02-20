@@ -135,6 +135,7 @@ int	getsubopt (char **, char * const *, char **);
 long	labs (long);
 ldiv_t	ldiv (long __numer, long __denom);
 void	*malloc(size_t) __malloc_like __result_use_check __alloc_size(1) _NOTHROW;
+void    *valloc (size_t) __malloc_like __result_use_check __alloc_size(1) _NOTHROW;
 int	mblen (const char *, size_t);
 int	mbtowc (wchar_t *__restrict, const char *__restrict, size_t);
 int	wctomb (char *, wchar_t);

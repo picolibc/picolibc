@@ -78,7 +78,6 @@ extern size_t malloc_usable_size (void *);
 /* These aren't too useful on an embedded system, but we define them
    anyhow.  */
 
-extern void *valloc (size_t);
 extern void *pvalloc (size_t);
 extern int malloc_trim (size_t);
 extern void __malloc_lock(void);
