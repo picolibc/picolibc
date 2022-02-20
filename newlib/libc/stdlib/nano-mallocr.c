@@ -808,3 +808,27 @@ void * pvalloc(size_t s)
     return valloc(ALIGN_TO(s, MALLOC_PAGE_ALIGN));
 }
 #endif /* DEFINE_PVALLOC */
+
+#ifdef DEFINE_GETPAGESIZE
+int getpagesize(void)
+{
+    return MALLOC_PAGE_ALIGN;
+}
+#endif /* DEFINE_GETPAGESIZE */
+
+#ifdef DEFINE_POSIX_MEMALIGN
+int posix_memalign(void **memptr, size_t align, size_t size)
+{
+    /* Return EINVAL if align isn't power of 2 or not a multiple of a pointer size */
+    if ((align & (align-1)) != 0 || align % sizeof(void*) != 0 || align == 0)
+        return EINVAL;
+
+    void *mem = memalign(align, size);
+
+    if (!mem)
+        return ENOMEM;
+
+    *memptr = mem;
+    return 0;
+}
+#endif
