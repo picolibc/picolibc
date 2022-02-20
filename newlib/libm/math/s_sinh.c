@@ -77,7 +77,7 @@ sinh(double x)
     }
 
     /* |x| > overflowthresold, sinh(x) overflow */
-    return x * shuge;
+    return __math_oflow(x < 0);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
