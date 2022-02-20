@@ -519,6 +519,12 @@ void * realloc(void * ptr, size_t size)
         return NULL;
     }
 
+    if (size > MALLOC_MAXSIZE)
+    {
+        errno = ENOMEM;
+        return NULL;
+    }
+
     size_t new_size = chunk_size(size);
     chunk_t *p_to_realloc = ptr_to_chunk(ptr);
 
@@ -593,6 +599,9 @@ void * realloc(void * ptr, size_t size)
     /* No short cuts, allocate new memory and copy */
 
     mem = malloc(size);
+    if (!mem)
+        return NULL;
+
     memcpy(mem, ptr, old_size - MALLOC_HEAD);
     free(ptr);
 
@@ -709,10 +718,21 @@ void * memalign(size_t align, size_t s)
     char * allocated, * aligned_p;
 
     /* Return NULL if align isn't power of 2 */
-    if ((align & (align-1)) != 0) return NULL;
+    if ((align & (align-1)) != 0)
+    {
+        errno = EINVAL;
+        return NULL;
+    }
+
+    align = MAX(align, MALLOC_MINSIZE);
+
+    if (s > MALLOC_MAXSIZE - align)
+    {
+        errno = ENOMEM;
+        return NULL;
+    }
 
     s = ALIGN_TO(MAX(s,1), MALLOC_CHUNK_ALIGN);
-    align = MAX(align, MALLOC_MINSIZE);
 
     /* Make sure there's space to align the allocation and split
      * off chunk_t from the front
@@ -779,6 +799,12 @@ void * valloc(size_t s)
 #ifdef DEFINE_PVALLOC
 void * pvalloc(size_t s)
 {
+    if (s > MALLOC_MAXSIZE - MALLOC_PAGE_ALIGN)
+    {
+        errno = ENOMEM;
+        return NULL;
+    }
+
     return valloc(ALIGN_TO(s, MALLOC_PAGE_ALIGN));
 }
 #endif /* DEFINE_PVALLOC */
