@@ -50,7 +50,7 @@ expf(float x) /* default IEEE double exp */
 
     /* filter out non-finite argument */
     if (FLT_UWORD_IS_NAN(hx))
-        return x; /* NaN */
+        return x + x; /* NaN */
     if (FLT_UWORD_IS_INFINITE(hx))
         return (xsb == 0) ? x : 0.0; /* exp(+-inf)={inf,0} */
     if (sx > FLT_UWORD_LOG_MAX)

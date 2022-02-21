@@ -25,7 +25,7 @@ double
 scalb(double x, double fn)
 {
     if (isnan(fn))
-        return fn;
+        return fn + fn;
 
     if (isinf(fn)) {
         if ((x == 0.0 && fn > 0.0) || (isinf(x) && fn < 0.0))

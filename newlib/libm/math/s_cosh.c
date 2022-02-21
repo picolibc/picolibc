@@ -54,7 +54,7 @@ cosh(double x)
 
     /* x is INF or NaN */
     if (ix >= 0x7ff00000)
-        return x + 0.0;
+        return x + x;
 
     /* |x| in [0,0.5*ln2], return 1+expm1(|x|)^2/(2*exp(|x|)) */
     if (ix < 0x3fd62e43) {

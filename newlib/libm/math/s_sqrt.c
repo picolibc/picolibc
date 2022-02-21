@@ -97,9 +97,9 @@ sqrt(double x)
 
     /* take care of Inf and NaN */
     if ((ix0 & 0x7ff00000) == 0x7ff00000) {
-        if (ix0 < 0)
+        if (ix0 < 0 && !isnan(x))
             return __math_invalid(x); /* sqrt(-inf)=sNaN */
-        return x; /* sqrt(NaN)=NaN, sqrt(+inf)=+inf */
+        return x + x; /* sqrt(NaN)=NaN, sqrt(+inf)=+inf */
     }
     /* take care of zero */
     if (ix0 <= 0) {

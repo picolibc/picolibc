@@ -35,7 +35,7 @@ HIDDEN float
 __math_invalidf (float x)
 {
     if (isnan(x))
-        return pick_float_except(x, (float) NAN);
+        return pick_float_except(x + x, (float) NAN);
     x = pick_float_except(VAL / VAL, VAL);
     return __math_with_errnof (x, EDOM);
 }

@@ -85,7 +85,7 @@ j0(double x)
     __int32_t hx, ix;
 
     if (isnan(x))
-        return x;
+        return x + x;
 
     if (isinf(x))
         return 0.0;
@@ -163,7 +163,7 @@ y0(double x)
         return __math_divzero(1);
 
     if (isnan(x))
-        return x;
+        return x + x;
 
     if (hx < 0)
         return __math_invalid(x);

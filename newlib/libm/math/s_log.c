@@ -100,7 +100,7 @@ log(double x)
         GET_HIGH_WORD(hx, x);
     }
     if (hx >= 0x7ff00000)
-        return x;
+        return x + x;
     k += (hx >> 20) - 1023;
     hx &= 0x000fffff;
     i = (hx + 0x95f64) & 0x100000;

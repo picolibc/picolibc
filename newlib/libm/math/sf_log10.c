@@ -34,7 +34,7 @@ log10f(float x)
     if (hx < 0)
         return __math_invalidf(x); /* log(-#) = NaN */
     if (!FLT_UWORD_IS_FINITE(hx))
-        return x;
+        return x + x;
     if (FLT_UWORD_IS_SUBNORMAL(hx)) {
         k -= 25;
         x *= two25; /* subnormal number, scale up x */

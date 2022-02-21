@@ -74,7 +74,7 @@ log10(double x)
         GET_HIGH_WORD(hx, x);
     }
     if (hx >= 0x7ff00000)
-        return x;
+        return x + x;
     k += (hx >> 20) - 1023;
     i = ((__uint32_t)k & 0x80000000) >> 31;
     hx = (hx & 0x000fffff) | ((0x3ff - i) << 20);

@@ -49,8 +49,7 @@ ANSI C, POSIX.
 	double y;
 #endif
 {
-  if (isnan(x)) return(x);
-  if (isnan(y)) return(y);
+  if (isnan(x) || isnan(y)) return(x+y);
 
   double z = x > y ? x - y : 0.0;
   if (!isinf(x) && !isinf(y))

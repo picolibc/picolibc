@@ -28,7 +28,7 @@ acoshf(float x)
         return __math_invalidf(x);
     } else if (hx >= 0x4d800000) { /* x > 2**28 */
         if (!FLT_UWORD_IS_FINITE(hx)) { /* x is inf of NaN */
-            return x + 0.0f;
+            return x + x;
         } else
             return logf(x) + ln2; /* acosh(huge)=log(2x) */
     } else if (hx == 0x3f800000) {

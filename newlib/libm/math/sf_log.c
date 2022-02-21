@@ -43,7 +43,7 @@ logf(float x)
     if (ix < 0)
         return __math_invalidf(x); /* log(-#) = NaN */
     if (!FLT_UWORD_IS_FINITE(ix))
-        return x;
+        return x + x;
     if (FLT_UWORD_IS_SUBNORMAL(ix)) {
         k -= 25;
         x *= two25; /* subnormal number, scale up x */

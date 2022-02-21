@@ -40,7 +40,7 @@ j1f(float x)
     __int32_t hx, ix;
 
     if (isnan(x))
-        return x;
+        return x + x;
 
     if (isinf(x))
         return zero;
@@ -116,7 +116,7 @@ y1f(float x)
         return __math_divzerof(1);
 
     if (ix > 0x7f800000)
-        return x;
+        return x+x;
 
     if (hx < 0)
         return __math_invalidf(x);

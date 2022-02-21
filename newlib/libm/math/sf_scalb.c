@@ -20,7 +20,7 @@ float
 scalbf(float x, float fn)
 {
     if (isnan(fn))
-        return fn;
+        return fn + fn;
 
     if (isinf(fn)) {
         if ((x == 0.0f && fn > 0.0f) || (isinf(x) && fn < 0.0f))
