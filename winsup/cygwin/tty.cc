@@ -315,7 +315,7 @@ tty_min::setpgid (int pid)
 
   if (ptys)
     {
-      tty *ttyp = ptys->get_ttyp ();
+      tty *ttyp = (tty *) ptys->tc ();
       WaitForSingleObject (ptys->pcon_mutex, INFINITE);
       bool was_pcon_fg = ttyp->pcon_fg (pgid);
       bool pcon_fg = ttyp->pcon_fg (pid);

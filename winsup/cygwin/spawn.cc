@@ -281,21 +281,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 {
   bool rc;
   int res = -1;
-  pid_t ctty_pgid = 0;
-
-  /* Search for CTTY and retrieve its PGID */
-  cygheap_fdenum cfd (false);
-  while (cfd.next () >= 0)
-    if (cfd->get_major () == DEV_PTYS_MAJOR ||
-	cfd->get_major () == DEV_CONS_MAJOR)
-      {
-	fhandler_termios *fh = (fhandler_termios *) (fhandler_base *) cfd;
-	if (fh->tc ()->ntty == myself->ctty)
-	  {
-	    ctty_pgid = fh->tc ()->getpgid ();
-	    break;
-	  }
-      }
 
   /* Check if we have been called from exec{lv}p or spawn{lv}p and mask
      mode to keep only the spawn mode. */
@@ -338,6 +323,11 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
   bool null_app_name = false;
   STARTUPINFOW si = {};
   int looped = 0;
+
+  struct fhandler_pty_slave::handle_set_t ptys_handle_set = { 0, };
+  bool ptys_need_cleanup = false;
+  struct fhandler_console::handle_set_t cons_handle_set = { 0, };
+  bool cons_need_cleanup = false;
 
   system_call_handle system_call (mode == _P_SYSTEM);
 
@@ -573,6 +563,8 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	 in a console will break native processes running in the background,
 	 because the Ctrl-C event is sent to all processes in the console, unless
 	 they ignore it explicitely.  CREATE_NEW_PROCESS_GROUP does that for us. */
+      pid_t ctty_pgid =
+	::cygheap->ctty ? ::cygheap->ctty->tc ()->getpgid () : 0;
       if (!iscygwin () && ctty_pgid && ctty_pgid != myself->pgid)
 	c_flags |= CREATE_NEW_PROCESS_GROUP;
       refresh_cygheap ();
@@ -617,26 +609,30 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  const int chk_order[] = {1, 0, 2};
 	  int fd = chk_order[i];
 	  fhandler_base *fh = ::cygheap->fdtab[fd];
-	  if (fh && fh->get_major () == DEV_PTYS_MAJOR)
-	    {
-	      fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
-	      if (ptys_primary == NULL)
-		ptys_primary = ptys;
-	    }
-	  else if (fh && fh->get_major () == DEV_CONS_MAJOR)
-	    {
-	      if (!iscygwin () && cons_native == NULL)
-		{
-		  cons_native = (fhandler_console *) fh;
-		  cons_native->setup_console_for_non_cygwin_app ();
-		}
-	    }
+	  if (fh && fh->get_major () == DEV_PTYS_MAJOR && ptys_primary == NULL)
+	    ptys_primary = (fhandler_pty_slave *) fh;
+	  else if (fh && fh->get_major () == DEV_CONS_MAJOR
+		   && !iscygwin () && cons_native == NULL)
+	    cons_native = (fhandler_console *) fh;
 	}
+
+      if (cons_native)
+	{
+	  cons_native->setup_for_non_cygwin_app ();
+	  /* Console handles will be already closed by close_all_files()
+	     when cleaning up, therefore, duplicate them here. */
+	  cons_native->get_duplicated_handle_set (&cons_handle_set);
+	  cons_need_cleanup = true;
+	}
+
+      int fileno_stdin = in__stdin < 0 ? 0 : in__stdin;
+      int fileno_stdout = in__stdout < 0 ? 1 : in__stdout;
+      int fileno_stderr = 2;
 
       if (!iscygwin ())
 	{
 	  int fd;
-	  cfd.rewind ();
+	  cygheap_fdenum cfd (false);
 	  while ((fd = cfd.next ()) >= 0)
 	    if (cfd->get_major () == DEV_PTYS_MAJOR)
 	      {
@@ -646,72 +642,39 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 		ptys->setup_locale ();
 	      }
 	    else if (cfd->get_dev () == FH_PIPEW
-		     && (fd == (in__stdout < 0 ? 1 : in__stdout) || fd == 2))
+		     && (fd == fileno_stdout || fd == fileno_stderr))
 	      {
 		fhandler_pipe *pipe = (fhandler_pipe *)(fhandler_base *) cfd;
 		pipe->close_query_handle ();
 		pipe->set_pipe_non_blocking (false);
 	      }
-	    else if (cfd->get_dev () == FH_PIPER
-		     && fd == (in__stdin < 0 ? 0 : in__stdin))
+	    else if (cfd->get_dev () == FH_PIPER && fd == fileno_stdin)
 	      {
 		fhandler_pipe *pipe = (fhandler_pipe *)(fhandler_base *) cfd;
 		pipe->set_pipe_non_blocking (false);
 	      }
 	}
 
-      bool enable_pcon = false;
-      HANDLE ptys_from_master_nat = NULL;
-      HANDLE ptys_input_available_event = NULL;
-      HANDLE ptys_pcon_mutex = NULL;
-      HANDLE ptys_input_mutex = NULL;
-      tty *ptys_ttyp = NULL;
       bool stdin_is_ptys = false;
+      tty *ptys_ttyp = NULL;
       if (!iscygwin () && ptys_primary && is_console_app (runpath))
 	{
 	  bool nopcon = mode != _P_OVERLAY && mode != _P_WAIT;
-	  if (disable_pcon || !ptys_primary->term_has_pcon_cap (envblock))
-	    nopcon = true;
-	  ptys_ttyp = ptys_primary->get_ttyp ();
-	  WaitForSingleObject (ptys_primary->pcon_mutex, INFINITE);
-	  if (ptys_primary->setup_pseudoconsole (nopcon))
-	    enable_pcon = true;
-	  ReleaseMutex (ptys_primary->pcon_mutex);
-	  HANDLE h_stdin = handle ((in__stdin < 0 ? 0 : in__stdin), false);
+	  HANDLE h_stdin = handle (fileno_stdin, false);
 	  if (h_stdin == ptys_primary->get_handle_nat ())
 	    stdin_is_ptys = true;
-	  ptys_from_master_nat = ptys_primary->get_handle_nat ();
-	  DuplicateHandle (GetCurrentProcess (), ptys_from_master_nat,
-			   GetCurrentProcess (), &ptys_from_master_nat,
-			   0, 0, DUPLICATE_SAME_ACCESS);
-	  ptys_input_available_event =
-	    ptys_primary->get_input_available_event ();
-	  DuplicateHandle (GetCurrentProcess (), ptys_input_available_event,
-			   GetCurrentProcess (), &ptys_input_available_event,
-			   0, 0, DUPLICATE_SAME_ACCESS);
-	  DuplicateHandle (GetCurrentProcess (), ptys_primary->pcon_mutex,
-			   GetCurrentProcess (), &ptys_pcon_mutex,
-			   0, 0, DUPLICATE_SAME_ACCESS);
-	  DuplicateHandle (GetCurrentProcess (), ptys_primary->input_mutex,
-			   GetCurrentProcess (), &ptys_input_mutex,
-			   0, 0, DUPLICATE_SAME_ACCESS);
-	  if (!enable_pcon && ptys_ttyp->getpgid () == myself->pgid
-	      && stdin_is_ptys
-	      && ptys_ttyp->pcon_input_state_eq (tty::to_cyg))
-	    {
-	      WaitForSingleObject (ptys_input_mutex, mutex_timeout);
-	      fhandler_pty_slave::transfer_input (tty::to_nat,
-				    ptys_primary->get_handle (),
-				    ptys_ttyp, ptys_input_available_event);
-	      ReleaseMutex (ptys_input_mutex);
-	    }
+	  ptys_primary->setup_for_non_cygwin_app (nopcon, envblock,
+						  stdin_is_ptys);
+	  ptys_primary->get_duplicated_handle_set (&ptys_handle_set);
+	  ptys_ttyp = (tty *) ptys_primary->tc ();
+	  ptys_need_cleanup = true;
 	}
 
       /* Set up needed handles for stdio */
       si.dwFlags = STARTF_USESTDHANDLES;
-      si.hStdInput = handle ((in__stdin < 0 ? 0 : in__stdin), false);
-      si.hStdOutput = handle ((in__stdout < 0 ? 1 : in__stdout), true);
-      si.hStdError = handle (2, true);
+      si.hStdInput = handle (fileno_stdin, false);
+      si.hStdOutput = handle (fileno_stdout, true);
+      si.hStdError = handle (fileno_stderr, true);
 
       si.cb = sizeof (si);
 
@@ -868,6 +831,11 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       /* Name the handle similarly to proc_subproc. */
       ProtectHandle1 (pi.hProcess, childhProc);
 
+      /* Do not touch these terminal instances after here.
+	 They may be destroyed by close_all_files(). */
+      ptys_primary = NULL;
+      cons_native = NULL;
+
       if (mode == _P_OVERLAY)
 	{
 	  myself->dwProcessId = pi.dwProcessId;
@@ -984,30 +952,20 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	    }
 	  if (sem)
 	    __posix_spawn_sem_release (sem, 0);
-	  if (enable_pcon || ptys_ttyp || cons_native)
+	  if (ptys_need_cleanup || cons_need_cleanup)
 	    WaitForSingleObject (pi.hProcess, INFINITE);
-	  if (ptys_ttyp)
+	  if (ptys_need_cleanup)
 	    {
-	      ptys_ttyp->wait_pcon_fwd ();
-	      if (ptys_ttyp->getpgid () == myself->pgid && stdin_is_ptys
-		  && ptys_ttyp->pcon_input_state_eq (tty::to_nat))
-		{
-		  WaitForSingleObject (ptys_input_mutex, mutex_timeout);
-		  fhandler_pty_slave::transfer_input (tty::to_cyg,
-					    ptys_from_master_nat, ptys_ttyp,
-					    ptys_input_available_event);
-		  ReleaseMutex (ptys_input_mutex);
-		}
-	      CloseHandle (ptys_from_master_nat);
-	      CloseHandle (ptys_input_mutex);
-	      CloseHandle (ptys_input_available_event);
-	      WaitForSingleObject (ptys_pcon_mutex, INFINITE);
-	      fhandler_pty_slave::close_pseudoconsole (ptys_ttyp);
-	      ReleaseMutex (ptys_pcon_mutex);
-	      CloseHandle (ptys_pcon_mutex);
+	      fhandler_pty_slave::cleanup_for_non_cygwin_app (&ptys_handle_set,
+							      ptys_ttyp,
+							      stdin_is_ptys);
+	      fhandler_pty_slave::close_handle_set (&ptys_handle_set);
 	    }
-	  if (cons_native)
-	    cons_native->cleanup_console_for_non_cygwin_app ();
+	  if (cons_need_cleanup)
+	    {
+	      fhandler_console::cleanup_for_non_cygwin_app (&cons_handle_set);
+	      fhandler_console::close_handle_set (&cons_handle_set);
+	    }
 	  myself.exit (EXITCODE_NOSET);
 	  break;
 	case _P_WAIT:
@@ -1015,28 +973,12 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  system_call.arm ();
 	  if (waitpid (cygpid, &res, 0) != cygpid)
 	    res = -1;
-	  if (ptys_ttyp)
-	    {
-	      ptys_ttyp->wait_pcon_fwd ();
-	      if (ptys_ttyp->getpgid () == myself->pgid && stdin_is_ptys
-		  && ptys_ttyp->pcon_input_state_eq (tty::to_nat))
-		{
-		  WaitForSingleObject (ptys_input_mutex, mutex_timeout);
-		  fhandler_pty_slave::transfer_input (tty::to_cyg,
-					    ptys_from_master_nat, ptys_ttyp,
-					    ptys_input_available_event);
-		  ReleaseMutex (ptys_input_mutex);
-		}
-	      CloseHandle (ptys_from_master_nat);
-	      CloseHandle (ptys_input_mutex);
-	      CloseHandle (ptys_input_available_event);
-	      WaitForSingleObject (ptys_pcon_mutex, INFINITE);
-	      fhandler_pty_slave::close_pseudoconsole (ptys_ttyp);
-	      ReleaseMutex (ptys_pcon_mutex);
-	      CloseHandle (ptys_pcon_mutex);
-	    }
-	  if (cons_native)
-	    cons_native->cleanup_console_for_non_cygwin_app ();
+	  if (ptys_need_cleanup)
+	    fhandler_pty_slave::cleanup_for_non_cygwin_app (&ptys_handle_set,
+							    ptys_ttyp,
+							    stdin_is_ptys);
+	  if (cons_need_cleanup)
+	    fhandler_console::cleanup_for_non_cygwin_app (&cons_handle_set);
 	  break;
 	case _P_DETACH:
 	  res = 0;	/* Lost all memory of this child. */
@@ -1059,6 +1001,10 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       res = -1;
     }
   __endtry
+  if (ptys_need_cleanup)
+    fhandler_pty_slave::close_handle_set (&ptys_handle_set);
+  if (cons_need_cleanup)
+    fhandler_console::close_handle_set (&cons_handle_set);
   this->cleanup ();
   if (envblock)
     free (envblock);
