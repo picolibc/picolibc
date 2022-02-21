@@ -39,9 +39,9 @@ hypotf(float x, float y)
     if (ha > 0x58800000L) { /* a>2**50 */
         if (!FLT_UWORD_IS_FINITE(ha)) { /* Inf or NaN */
             w = a + b; /* for sNaN */
-            if (FLT_UWORD_IS_INFINITE(ha))
+            if (FLT_UWORD_IS_INFINITE(ha) && !issignaling(b))
                 w = a;
-            if (FLT_UWORD_IS_INFINITE(hb))
+            if (FLT_UWORD_IS_INFINITE(hb) && !issignaling(a))
                 w = b;
             return w;
         }
