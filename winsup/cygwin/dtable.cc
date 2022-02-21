@@ -582,6 +582,9 @@ fh_alloc (path_conv& pc)
 	case FH_DEV:
 	  fh = cnew (fhandler_dev);
 	  break;
+	case FH_DEV_FD:
+	  fh = cnew (fhandler_dev_fd);
+	  break;
 	case FH_CYGDRIVE:
 	  fh = cnew (fhandler_cygdrive);
 	  break;

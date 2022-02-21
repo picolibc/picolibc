@@ -232,6 +232,7 @@ DLL_FILES= \
 	fhandler_console.cc \
 	fhandler_cygdrive.cc \
 	fhandler_dev.cc \
+	fhandler_dev_fd.cc \
 	fhandler_disk_file.cc \
 	fhandler_dsp.cc \
 	fhandler_fifo.cc \

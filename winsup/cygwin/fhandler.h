@@ -3027,6 +3027,33 @@ class fhandler_procnet: public fhandler_proc
   }
 };
 
+class fhandler_dev_fd: public fhandler_virtual
+{
+ public:
+  fhandler_dev_fd ();
+  virtual_ftype_t exists();
+
+  int __reg2 fstat (struct stat *buf);
+  bool fill_filebuf ();
+
+  fhandler_dev_fd (void *) {}
+
+  virtual void copy_from (fhandler_base *x)
+  {
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_dev_fd *> (x);
+    _copy_from_reset_helper ();
+  }
+
+  virtual fhandler_dev_fd *clone (cygheap_types malloc_type = HEAP_FHANDLER)
+  {
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_dev_fd));
+    fhandler_dev_fd *fh = new (ptr) fhandler_dev_fd (ptr);
+    fh->copy_from (this);
+    return fh;
+  }
+};
+
 class fhandler_signalfd : public fhandler_base
 {
   sigset_t sigset;
@@ -3226,6 +3253,7 @@ typedef union
   char __dev_raw[sizeof (fhandler_dev_raw)];
   char __dev_tape[sizeof (fhandler_dev_tape)];
   char __dev_zero[sizeof (fhandler_dev_zero)];
+  char __dev_fd[sizeof (fhandler_dev_fd)];
   char __disk_file[sizeof (fhandler_disk_file)];
   char __fifo[sizeof (fhandler_fifo)];
   char __netdrive[sizeof (fhandler_netdrive)];

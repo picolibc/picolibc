@@ -175,6 +175,10 @@ const _device dev_error_storage =
 "/dev/fd%(0-15)d", BRACK(FHDEV(DEV_FLOPPY_MAJOR, {$1})), "\\Device\\Floppy{$1}", exists_ntdev, S_IFBLK
 "/dev/scd%(0-15)d", BRACK(FHDEV(DEV_CDROM_MAJOR, {$1})), "\\Device\\CdRom{$1}", exists_ntdev, S_IFBLK
 "/dev/sr%(0-15)d", BRACK(FHDEV(DEV_CDROM_MAJOR, {$1})), "\\Device\\CdRom{$1}", exists_ntdev, S_IFBLK
+"/dev/fd", BRACK(FH_DEV_FD), "/proc/self/fd", exists, S_IFLNK
+"/dev/stdin", BRACK(FH_DEV_FD), "/proc/self/fd/0", exists, S_IFLNK
+"/dev/stdout", BRACK(FH_DEV_FD), "/proc/self/fd/1", exists, S_IFLNK
+"/dev/stderr", BRACK(FH_DEV_FD), "/proc/self/fd/2", exists, S_IFLNK
 %other	{return	NULL;}
 %%
 #undef BRACK
