@@ -4047,3 +4047,54 @@ fhandler_pty_slave::cleanup_for_non_cygwin_app (handle_set_t *p, tty *ttyp,
   close_pseudoconsole (ttyp);
   ReleaseMutex (p->pcon_mutex);
 }
+
+void
+fhandler_pty_slave::setpgid_aux (pid_t pid)
+{
+  WaitForSingleObject (pcon_mutex, INFINITE);
+  bool was_pcon_fg = get_ttyp ()->pcon_fg (tc ()->pgid);
+  bool pcon_fg = get_ttyp ()->pcon_fg (pid);
+  if (!was_pcon_fg && pcon_fg && get_ttyp ()->switch_to_pcon_in
+      && get_ttyp ()->pcon_input_state_eq (tty::to_cyg))
+    {
+      WaitForSingleObject (input_mutex, mutex_timeout);
+      transfer_input (tty::to_nat, get_handle (), get_ttyp (),
+		      input_available_event);
+      ReleaseMutex (input_mutex);
+    }
+  else if (was_pcon_fg && !pcon_fg && get_ttyp ()->switch_to_pcon_in
+	   && get_ttyp ()->pcon_input_state_eq (tty::to_nat))
+    {
+      bool attach_restore = false;
+      HANDLE from = get_handle_nat ();
+      if (get_ttyp ()->pcon_activated && get_ttyp ()->pcon_pid
+	  && !get_console_process_id (get_ttyp ()->pcon_pid, true))
+	{
+	  HANDLE pcon_owner =
+	    OpenProcess (PROCESS_DUP_HANDLE, FALSE, get_ttyp ()->pcon_pid);
+	  DuplicateHandle (pcon_owner, get_ttyp ()->h_pcon_in,
+			   GetCurrentProcess (), &from,
+			   0, TRUE, DUPLICATE_SAME_ACCESS);
+	  CloseHandle (pcon_owner);
+	  FreeConsole ();
+	  AttachConsole (get_ttyp ()->pcon_pid);
+	  attach_restore = true;
+	}
+      WaitForSingleObject (input_mutex, mutex_timeout);
+      transfer_input (tty::to_cyg, from, get_ttyp (), input_available_event);
+      ReleaseMutex (input_mutex);
+      if (attach_restore)
+	{
+	  FreeConsole ();
+	  pinfo p (myself->ppid);
+	  if (p)
+	    {
+	      if (!AttachConsole (p->dwProcessId))
+		AttachConsole (ATTACH_PARENT_PROCESS);
+	    }
+	  else
+	    AttachConsole (ATTACH_PARENT_PROCESS);
+	}
+    }
+  ReleaseMutex (pcon_mutex);
+}

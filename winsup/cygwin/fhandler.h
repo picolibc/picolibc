@@ -1956,6 +1956,7 @@ class fhandler_termios: public fhandler_base
   static bool path_iscygexec_w (LPCWSTR n, LPWSTR c);
   virtual bool is_pty_master_with_pcon () { return false; }
   virtual void cleanup_before_exit () {}
+  virtual void setpgid_aux (pid_t pid) {}
 };
 
 enum ansi_intensity
@@ -2400,6 +2401,7 @@ class fhandler_pty_slave: public fhandler_pty_common
 				 bool stdin_is_ptys);
   static void cleanup_for_non_cygwin_app (handle_set_t *p, tty *ttyp,
 					  bool stdin_is_ptys);
+  void setpgid_aux (pid_t pid);
 };
 
 #define __ptsname(buf, unit) __small_sprintf ((buf), "/dev/pty%d", (unit))

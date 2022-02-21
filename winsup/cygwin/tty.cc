@@ -306,65 +306,9 @@ extern DWORD mutex_timeout; /* defined in fhandler_termios.cc */
 void
 tty_min::setpgid (int pid)
 {
-  fhandler_pty_slave *ptys = NULL;
-  cygheap_fdenum cfd (false);
-  while (cfd.next () >= 0 && ptys == NULL)
-    if (cfd->get_device () == getntty ()
-	&& cfd->get_major () == DEV_PTYS_MAJOR)
-      ptys = (fhandler_pty_slave *) (fhandler_base *) cfd;
+  if (::cygheap->ctty)
+    ::cygheap->ctty->setpgid_aux (pid);
 
-  if (ptys)
-    {
-      tty *ttyp = (tty *) ptys->tc ();
-      WaitForSingleObject (ptys->pcon_mutex, INFINITE);
-      bool was_pcon_fg = ttyp->pcon_fg (pgid);
-      bool pcon_fg = ttyp->pcon_fg (pid);
-      if (!was_pcon_fg && pcon_fg && ttyp->switch_to_pcon_in
-	  && ttyp->pcon_input_state_eq (tty::to_cyg))
-	{
-	WaitForSingleObject (ptys->input_mutex, mutex_timeout);
-	fhandler_pty_slave::transfer_input (tty::to_nat,
-					    ptys->get_handle (), ttyp,
-					    ptys->get_input_available_event ());
-	ReleaseMutex (ptys->input_mutex);
-	}
-      else if (was_pcon_fg && !pcon_fg && ttyp->switch_to_pcon_in
-	       && ttyp->pcon_input_state_eq (tty::to_nat))
-	{
-	  bool attach_restore = false;
-	  HANDLE from = ptys->get_handle_nat ();
-	  if (ttyp->pcon_activated && ttyp->pcon_pid
-	      && !ptys->get_console_process_id (ttyp->pcon_pid, true))
-	    {
-	      HANDLE pcon_owner =
-		OpenProcess (PROCESS_DUP_HANDLE, FALSE, ttyp->pcon_pid);
-	      DuplicateHandle (pcon_owner, ttyp->h_pcon_in,
-			       GetCurrentProcess (), &from,
-			       0, TRUE, DUPLICATE_SAME_ACCESS);
-	      CloseHandle (pcon_owner);
-	      FreeConsole ();
-	      AttachConsole (ttyp->pcon_pid);
-	      attach_restore = true;
-	    }
-	  WaitForSingleObject (ptys->input_mutex, mutex_timeout);
-	  fhandler_pty_slave::transfer_input (tty::to_cyg, from, ttyp,
-				  ptys->get_input_available_event ());
-	  ReleaseMutex (ptys->input_mutex);
-	  if (attach_restore)
-	    {
-	      FreeConsole ();
-	      pinfo p (myself->ppid);
-	      if (p)
-		{
-		  if (!AttachConsole (p->dwProcessId))
-		    AttachConsole (ATTACH_PARENT_PROCESS);
-		}
-	      else
-		AttachConsole (ATTACH_PARENT_PROCESS);
-	    }
-	}
-      ReleaseMutex (ptys->pcon_mutex);
-    }
   pgid = pid;
 }
 
