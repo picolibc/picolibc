@@ -40,7 +40,9 @@ foreach target : targets
     _libs_base += [get_variable('lib_semihost' + target)]
   endif
 
-  if is_variable('lib_crt_hosted' + target)
+  if is_variable('lib_crt_semihost' + target)
+    _libs = [get_variable('lib_crt_semihost'+ target)] + _libs_base
+  elif is_variable('lib_crt_hosted' + target)
     _libs = [get_variable('lib_crt_hosted'+ target)] + _libs_base
   else
     _libs = _libs_base

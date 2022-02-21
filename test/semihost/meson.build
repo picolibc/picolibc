@@ -67,14 +67,16 @@ semihost_fail_tests = [
   'semihost-system-failure',
 ]
 
-command_line = 'command-line'
+command_line = 'hello world'
 
 foreach target : targets
   value = get_variable('target_' + target)
 
   _libs = [get_variable('lib_c' + target)]
   _libs += [get_variable('lib_semihost' + target)]
-  if is_variable('lib_crt_hosted' + target)
+  if is_variable('lib_crt_semihost' + target)
+    _libs += [get_variable('lib_crt_semihost'+ target)]
+  elif is_variable('lib_crt_hosted' + target)
     _libs += [get_variable('lib_crt_hosted'+ target)]
   endif
   
