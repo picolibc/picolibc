@@ -45,6 +45,8 @@ volatile FLOAT_T makemathname(infval) = (FLOAT_T) INFINITY;
 volatile FLOAT_T makemathname(minfval) = (FLOAT_T) -INFINITY;
 volatile FLOAT_T makemathname(nanval) = (FLOAT_T) NAN;
 volatile FLOAT_T makemathname(pio2) = (FLOAT_T) (M_PI/2.0);
+volatile FLOAT_T makemathname(min_val) = (FLOAT_T) MIN_VAL;
+volatile FLOAT_T makemathname(max_val) = (FLOAT_T) MAX_VAL;
 
 FLOAT_T makemathname(scalb)(FLOAT_T, FLOAT_T);
 
@@ -77,6 +79,8 @@ FLOAT_T makemathname(test_asinh_minf)(void) { return makemathname(asinh)(makemat
 
 FLOAT_T makemathname(test_atan2_nanx)(void) { return makemathname(atan2)(makemathname(one), makemathname(nanval)); }
 FLOAT_T makemathname(test_atan2_nany)(void) { return makemathname(atan2)(makemathname(nanval), makemathname(one)); }
+FLOAT_T makemathname(test_atan2_tiny)(void) { return makemathname(atan2)(makemathname(min_val), makemathname(max_val)); }
+FLOAT_T makemathname(test_atan2_nottiny)(void) { return makemathname(atan2)(makemathname(min_val), (FLOAT_T) -0x8p-20); }
 
 FLOAT_T makemathname(test_atanh_nan)(void) { return makemathname(atanh)(makemathname(nanval)); }
 FLOAT_T makemathname(test_atanh_1)(void) { return makemathname(atanh)(makemathname(one)); }
@@ -499,6 +503,8 @@ struct {
 
         TEST(atan2_nanx, (FLOAT_T)NAN, 0, 0),
         TEST(atan2_nany, (FLOAT_T)NAN, 0, 0),
+        TEST(atan2_tiny, (FLOAT_T)0.0, FE_UNDERFLOW|FE_INEXACT, ERANGE),
+        TEST(atan2_nottiny, (FLOAT_T)M_PI, 0, 0),
 
         TEST(atanh_nan, (FLOAT_T)NAN, 0, 0),
         TEST(atanh_1, (FLOAT_T)INFINITY, FE_DIVBYZERO, ERANGE),
