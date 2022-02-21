@@ -14,7 +14,13 @@ cpu = 'riscv'
 endian = 'little'
 
 [properties]
-c_args = [ '-nostdlib', '-Wdouble-promotion']
+c_args = [ '-nostdlib', '-Wdouble-promotion', '-mcmodel=medany']
+c_link_args = [
+	'-nostdlib',
+	'-mcmodel=medany',
+	'-L/usr/lib/gcc/riscv64-unknown-elf/8.3.0/rv64imac/lp64/'
+	]
+
 needs_exe_wrapper = true
 skip_sanity_check = true
 has_link_defsym = true
