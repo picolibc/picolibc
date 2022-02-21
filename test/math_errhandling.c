@@ -140,7 +140,8 @@ e_to_str(int e)
 #define SMALL 5e-324
 #define FLOAT_T double
 #define MIN_VAL 0x4p-1024;
-#define MAX_VAL 0xf.ffffffffffff8p+1020; 
+#define MAX_VAL 0xf.ffffffffffff8p+1020;
+#define sNAN __builtin_nans("")
 
 #define TEST_DOUBLE
 
@@ -153,6 +154,7 @@ e_to_str(int e)
 #undef SMALL
 #undef MIN_VAL
 #undef MAX_VAL
+#undef sNAN
 #undef makemathname
 #undef makemathname_r
 #undef FLOAT_T
@@ -165,6 +167,7 @@ e_to_str(int e)
 #define SMALL 1e-45
 #define MIN_VAL 0x8p-152;
 #define MAX_VAL 0xf.fffffp+124;
+#define sNAN __builtin_nansf("")
 #define FLOAT_T float
 #define TEST_FLOAT
 #define makemathname(s) scat(s,f)
