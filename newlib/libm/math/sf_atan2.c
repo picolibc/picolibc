@@ -89,9 +89,9 @@ atan2f(float y, float x)
     if (k > 60)
         z = pi_o_2 + (float)0.5 * pi_lo; /* |y/x| >  2**60 */
     else if (hx < 0 && k < -60)
-        z = 0.0; /* |y|/x < -2**60 */
+        z = 0.0f; /* |y|/x < -2**60 */
     else
-        z = atanf(fabsf(y / x)); /* safe to do y/x */
+        z = atanf(check_uflowf(fabsf(y / x))); /* safe to do y/x */
     switch (m) {
     case 0:
         return z; /* atan(+,+) */

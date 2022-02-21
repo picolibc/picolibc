@@ -121,7 +121,7 @@ atan2(double y, double x)
     else if (hx < 0 && k < -60)
         z = 0.0; /* |y|/x < -2**60 */
     else
-        z = atan(fabs(y / x)); /* safe to do y/x */
+        z = atan(check_uflow(fabs(y / x))); /* safe to do y/x */
     switch (m) {
     case 0:
         return z; /* atan(+,+) */
