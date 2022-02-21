@@ -2250,9 +2250,8 @@ private:
   static void close_handle_set (handle_set_t *p);
 
   static void cons_master_thread (handle_set_t *p, tty *ttyp);
-  pid_t get_owner (void) { return shared_console_info->con.owner; }
-  void setup_console_for_non_cygwin_app ();
-  void cleanup_console_for_non_cygwin_app ();
+  void setup_for_non_cygwin_app ();
+  static void cleanup_for_non_cygwin_app (handle_set_t *p);
   static void set_console_mode_to_native ();
 
   friend tty_min * tty_list::get_cttyp ();
@@ -2326,6 +2325,14 @@ class fhandler_pty_slave: public fhandler_pty_common
   void fch_close_handles ();
 
  public:
+  struct handle_set_t
+  {
+    HANDLE from_master_nat;
+    HANDLE input_available_event;
+    HANDLE input_mutex;
+    HANDLE pcon_mutex;
+  };
+
   /* Constructor */
   fhandler_pty_slave (int);
 
@@ -2382,13 +2389,18 @@ class fhandler_pty_slave: public fhandler_pty_common
   void reset_switch_to_pcon (void);
   void mask_switch_to_pcon_in (bool mask, bool xfer);
   void setup_locale (void);
-  tty *get_ttyp () { return (tty *) tc (); } /* Override as public */
   void create_invisible_console (void);
   static void transfer_input (tty::xfer_dir dir, HANDLE from, tty *ttyp,
 			      HANDLE input_available_event);
   HANDLE get_input_available_event (void) { return input_available_event; }
   bool pcon_activated (void) { return get_ttyp ()->pcon_activated; }
   void cleanup_before_exit ();
+  void get_duplicated_handle_set (handle_set_t *p);
+  static void close_handle_set (handle_set_t *p);
+  void setup_for_non_cygwin_app (bool nopcon, PWCHAR envblock,
+				 bool stdin_is_ptys);
+  static void cleanup_for_non_cygwin_app (handle_set_t *p, tty *ttyp,
+					  bool stdin_is_ptys);
 };
 
 #define __ptsname(buf, unit) __small_sprintf ((buf), "/dev/pty%d", (unit))

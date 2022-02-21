@@ -506,10 +506,8 @@ fhandler_console::set_output_mode (tty::cons_mode m, const termios *t,
   ReleaseMutex (p->output_mutex);
 }
 
-static fhandler_console::handle_set_t NO_COPY duplicated_handle_set;
-
 void
-fhandler_console::setup_console_for_non_cygwin_app ()
+fhandler_console::setup_for_non_cygwin_app ()
 {
   /* Setting-up console mode for non-cygwin app. */
   /* If conmode is set to tty::native for non-cygwin apps
@@ -520,22 +518,21 @@ fhandler_console::setup_console_for_non_cygwin_app ()
     (get_ttyp ()->getpgid ()== myself->pgid) ? tty::native : tty::restore;
   set_input_mode (conmode, &tc ()->ti, get_handle_set ());
   set_output_mode (conmode, &tc ()->ti, get_handle_set ());
-  /* Console handles will be already closed by close_all_files()
-     when cleaning up, therefore, duplicate them here. */
-  get_duplicated_handle_set (&duplicated_handle_set);
 }
 
 void
-fhandler_console::cleanup_console_for_non_cygwin_app ()
+fhandler_console::cleanup_for_non_cygwin_app (handle_set_t *p)
 {
+  termios dummy = {0, };
+  termios *ti =
+    shared_console_info ? &(shared_console_info->tty_min_state.ti) : &dummy;
   /* Cleaning-up console mode for non-cygwin app. */
   /* conmode can be tty::restore when non-cygwin app is
      exec'ed from login shell. */
   tty::cons_mode conmode =
     (con.owner == myself->pid) ? tty::restore : tty::cygwin;
-  set_output_mode (conmode, &tc ()->ti, &duplicated_handle_set);
-  set_input_mode (conmode, &tc ()->ti, &duplicated_handle_set);
-  close_handle_set (&duplicated_handle_set);
+  set_output_mode (conmode, ti, p);
+  set_input_mode (conmode, ti, p);
 }
 
 /* Return the tty structure associated with a given tty number.  If the

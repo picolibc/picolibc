@@ -235,7 +235,7 @@ atexit_func (void)
 	      force_switch_to = GetProcessId (h_gdb_process);
 	    fhandler_base *fh = cfd;
 	    fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
-	    tty *ttyp = ptys->get_ttyp ();
+	    tty *ttyp = (tty *) ptys->tc ();
 	    HANDLE from = ptys->get_handle_nat ();
 	    HANDLE input_available_event = ptys->get_input_available_event ();
 	    if (ttyp->getpgid () == myself->pgid
@@ -3978,4 +3978,72 @@ fhandler_pty_slave::cleanup_before_exit ()
 {
   if (myself->process_state & PID_NOTCYGWIN)
     get_ttyp ()->wait_pcon_fwd ();
+}
+
+void
+fhandler_pty_slave::get_duplicated_handle_set (handle_set_t *p)
+{
+  DuplicateHandle (GetCurrentProcess (), get_handle_nat (),
+		   GetCurrentProcess (), &p->from_master_nat,
+		   0, 0, DUPLICATE_SAME_ACCESS);
+  DuplicateHandle (GetCurrentProcess (), input_available_event,
+		   GetCurrentProcess (), &p->input_available_event,
+		   0, 0, DUPLICATE_SAME_ACCESS);
+  DuplicateHandle (GetCurrentProcess (), input_mutex,
+		   GetCurrentProcess (), &p->input_mutex,
+		   0, 0, DUPLICATE_SAME_ACCESS);
+  DuplicateHandle (GetCurrentProcess (), pcon_mutex,
+		   GetCurrentProcess (), &p->pcon_mutex,
+		   0, 0, DUPLICATE_SAME_ACCESS);
+}
+
+void
+fhandler_pty_slave::close_handle_set (handle_set_t *p)
+{
+  CloseHandle (p->from_master_nat);
+  p->from_master_nat = NULL;
+  CloseHandle (p->input_available_event);
+  p->input_available_event = NULL;
+  CloseHandle (p->input_mutex);
+  p->input_mutex = NULL;
+  CloseHandle (p->pcon_mutex);
+  p->pcon_mutex = NULL;
+}
+
+void
+fhandler_pty_slave::setup_for_non_cygwin_app (bool nopcon, PWCHAR envblock,
+					      bool stdin_is_ptys)
+{
+  if (disable_pcon || !term_has_pcon_cap (envblock))
+    nopcon = true;
+  WaitForSingleObject (pcon_mutex, INFINITE);
+  bool enable_pcon = setup_pseudoconsole (nopcon);
+  ReleaseMutex (pcon_mutex);
+  /* For pcon enabled case, transfer_input() is called in master::write() */
+  if (!enable_pcon && get_ttyp ()->getpgid () == myself->pgid
+      && stdin_is_ptys && get_ttyp ()->pcon_input_state_eq (tty::to_cyg))
+    {
+      WaitForSingleObject (input_mutex, mutex_timeout);
+      transfer_input (tty::to_nat, get_handle (), get_ttyp (),
+		      input_available_event);
+      ReleaseMutex (input_mutex);
+    }
+}
+
+void
+fhandler_pty_slave::cleanup_for_non_cygwin_app (handle_set_t *p, tty *ttyp,
+						bool stdin_is_ptys)
+{
+  ttyp->wait_pcon_fwd ();
+  if (ttyp->getpgid () == myself->pgid && stdin_is_ptys
+      && ttyp->pcon_input_state_eq (tty::to_nat))
+    {
+      WaitForSingleObject (p->input_mutex, mutex_timeout);
+      transfer_input (tty::to_cyg, p->from_master_nat, ttyp,
+		      p->input_available_event);
+      ReleaseMutex (p->input_mutex);
+    }
+  WaitForSingleObject (p->pcon_mutex, INFINITE);
+  close_pseudoconsole (ttyp);
+  ReleaseMutex (p->pcon_mutex);
 }
