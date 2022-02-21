@@ -390,6 +390,8 @@ HIDDEN float __math_check_oflowf (float);
 /* Check if the result overflowed to infinity.  */
 HIDDEN double __math_check_oflow (double);
 /* Check if the result underflowed to 0.  */
+HIDDEN float __math_check_uflowf (float);
+/* Check if the result underflowed to 0.  */
 HIDDEN double __math_check_uflow (double);
 
 /* Check if the result overflowed to infinity.  */
@@ -411,6 +413,13 @@ static inline double
 check_uflow (double x)
 {
   return WANT_ERRNO ? __math_check_uflow (x) : x;
+}
+
+/* Check if the result underflowed to 0.  */
+static inline float
+check_uflowf (float x)
+{
+  return WANT_ERRNO ? __math_check_uflowf (x) : x;
 }
 
 /* Set inexact exception */

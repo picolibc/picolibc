@@ -149,6 +149,7 @@ fsrcs_common = [
   'math_errf_divzerof.c',
   'math_errf_invalidf.c',
   'math_errf_check_oflowf.c',
+  'math_errf_check_uflowf.c',
 ]
 
 # These have full implementations
