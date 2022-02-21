@@ -23,20 +23,11 @@
 #define OVERFLOW_INT 30000
 #endif
 
-#ifdef __STDC__
 static const float
-#else
-static float
-#endif
 two25   =  3.355443200e+07,	/* 0x4c000000 */
 twom25  =  2.9802322388e-08;	/* 0x33000000 */
 
-#ifdef __STDC__
-	float scalbnf (float x, int n)
-#else
-	float scalbnf (x,n)
-	float x; int n;
-#endif
+float ldexpf (float x, int n)
 {
 	__int32_t  k,ix;
 	__uint32_t hx;
@@ -69,47 +60,25 @@ twom25  =  2.9802322388e-08;	/* 0x33000000 */
         return x*twom25;
 }
 
-#if defined(HAVE_ALIAS_ATTRIBUTE)
-#ifndef __clang__
-#pragma GCC diagnostic ignored "-Wmissing-attributes"
-#endif
-__strong_reference(scalbnf, ldexpf);
-#else
-
 float
-ldexpf(float value, int exp)
+scalbnf(float value, int exp)
 {
-    return scalbnf(value, exp);
+    if (isnanf(value))
+        return value + value;
+    return ldexpf(value, exp);
 }
-
-#endif
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
-	double scalbn(double x, int n)
-#else
-	double scalbn(x,n)
-	double x;
-	int n;
-#endif
+double scalbn(double x, int n)
 {
 	return (double) scalbnf((float) x, n);
 }
 
-#if defined(HAVE_ALIAS_ATTRIBUTE)
-#ifndef __clang__
-#pragma GCC diagnostic ignored "-Wmissing-attributes"
-#endif
-__strong_reference(scalbn, ldexp);
-#else
-
 double
 ldexp(double value, int exp)
 {
-    return scalbn(value, exp);
+    return (double) ldexpf((float) value, exp);
 }
-
-#endif
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
