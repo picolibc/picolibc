@@ -80,6 +80,9 @@ extern void __libc_init_array(void);
 
 #include <picotls.h>
 #include <stdio.h>
+#ifdef CRT0_SEMIHOST
+#include <semihost.h>
+#endif
 
 #ifndef CONSTRUCTORS
 #define CONSTRUCTORS 1
@@ -96,7 +99,37 @@ __start(void)
 #if defined(_HAVE_INITFINI_ARRAY) && CONSTRUCTORS
 	__libc_init_array();
 #endif
-	int ret = main(0, NULL);
+
+#ifdef CRT0_SEMIHOST
+#define CMDLINE_LEN     1024
+#define ARGV_LEN        64
+        static char cmdline[CMDLINE_LEN];
+        static char *argv[ARGV_LEN];
+        int argc = 0;
+
+        argv[argc++] = "program-name";
+        if (sys_semihost_get_cmdline(cmdline, sizeof(cmdline)) == 0)
+        {
+            char *c = cmdline;
+
+            while (*c && argc < ARGV_LEN - 1) {
+                argv[argc++] = c;
+                while (*c && *c != ' ')
+                    c++;
+                if (!*c)
+                    break;
+                *c = '\0';
+                while (*++c == ' ')
+                    ;
+            }
+        }
+        argv[argc] = NULL;
+#else
+#define argv NULL
+#define argc 0
+#endif
+
+	int ret = main(argc, argv);
 #ifdef CRT0_EXIT
 	exit(ret);
 #else

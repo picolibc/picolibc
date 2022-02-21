@@ -51,16 +51,20 @@ foreach target : targets
     crt_name = 'crt0.o'
     crt_hosted_name = 'crt0-hosted.o'
     crt_minimal_name = 'crt0-minimal.o'
+    crt_semihost_name = 'crt0-semihost.o'
     libcrt_name = 'crt'
     libcrt_hosted_name = 'crt-hosted'
     libcrt_minimal_name = 'crt-minimal'
+    libcrt_semihost_name = 'crt-semihost'
   else
     crt_name = join_paths(target, 'crt0.o')
     crt_hosted_name = join_paths(target, 'crt0-hosted.o')
     crt_minimal_name = join_paths(target, 'crt0-minimal.o')
+    crt_semihost_name = join_paths(target, 'crt0-semihost.o')
     libcrt_name = join_paths(target, 'libcrt')
     libcrt_hosted_name = join_paths(target, 'libcrt-hosted')
     libcrt_minimal_name = join_paths(target, 'libcrt-minimal')
+    libcrt_semihost_name = join_paths(target, 'libcrt-semihost')
   endif
 
   # The normal variant does not call 'exit' after return from main (c lingo: freestanding execution environment)
@@ -113,4 +117,24 @@ foreach target : targets
 			      install : false,
 			      include_directories : inc,
 			      c_args : value[1] + ['-DCONSTRUCTORS=0']))
+
+  if has_arm_semihost
+    # The 'semihost' variant calls sys_semihost_get_cmdline to build argv
+    # and calls exit when main returns
+    executable(crt_semihost_name,
+               src_picocrt,
+               include_directories : inc,
+               install : true,
+               install_dir : instdir,
+               c_args : value[1] + arg_fnobuiltin + ['-ffreestanding', '-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
+               link_args : value[1] + ['-r', '-ffreestanding', '-nostdlib'])
+
+    # Tests link against this because using the .o isn't supported under meson
+    set_variable('lib_crt_semihost' + target,
+		 static_library(libcrt_semihost_name,
+				src_picocrt,
+				install : false,
+				include_directories : inc,
+				c_args : value[1] + ['-DCRT0_EXIT', '-DCRT0_SEMIHOST']))
+  endif
 endforeach
