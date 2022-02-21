@@ -85,6 +85,25 @@ toollib_DATA = $(CRT0) $(CRT1)
 
 CLEANFILES += libg.a
 
+## GNU ar has undocumented behavior when specifying the same name multiple times
+## in a single invocation, so we have to dedupe ourselves.  The algorithm here:
+## - Generates the set of unique objects based on the basename.
+## - Favors objects later in the list (since machine objects come last).
+## - Outputs object list in same order as input for reproducibility.
+## https://sourceware.org/PR28917
+AWK_UNIQUE_OBJS = $(AWK) '{ \
+  for (i = NF; i > 0; --i) { \
+    split($$i, parts, "/"); \
+    name = parts[length(parts)]; \
+    if (!(name in seen)) { \
+      objs[i] = $$i; \
+      seen[name] = 1; \
+    } \
+  } \
+  for (i in objs) \
+    print objs[i]; \
+}'
+
 # The functions ldexp, frexp and modf are traditionally supplied in
 # both libc.a and libm.a.  We build them in libm.a and copy them over,
 # along with some required supporting routines.
@@ -122,7 +141,16 @@ libm_a_SOURCES =
 libm_a_CFLAGS = $(AM_CFLAGS) $(libm_a_CFLAGS_$(subst /,_,$(@D))) $(libm_a_CFLAGS_$(subst /,_,$(@D)_$(<F)))
 libm_a_CCASFLAGS = $(AM_CCASFLAGS) $(libm_a_CCASFLAGS_$(subst /,_,$(@D))) $(libm_a_CCASFLAGS_$(subst /,_,$(@D)_$(<F)))
 libm_a_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/libm/common $(libm_a_CPPFLAGS_$(subst /,_,$(@D))) $(libm_a_CPPFLAGS_$(subst /,_,$(@D)_$(<F)))
+## Best to avoid libm_a_LIBADD entirely to avoid having 2 independent lists
+## with separate overriding behavior (libm_a_OBJECTS is the other).  See the
+## AWK_UNIQUE_OBJS comment aove for more details.
 $(libm_a_OBJECTS): stmp-targ-include
+
+libm.a: $(libm_a_OBJECTS) $(libm_a_DEPENDENCIES)
+	$(AM_V_at)rm -f $@
+	$(AM_V_AR)objs=`echo $(libm_a_OBJECTS) | $(AWK_UNIQUE_OBJS)` || exit $$?; \
+	  $(AR) $(ARFLAGS) $@ $$objs
+	$(AM_V_at)$(RANLIB) $@
 
 if HAVE_MULTISUBDIR
 $(BUILD_MULTISUBDIR):

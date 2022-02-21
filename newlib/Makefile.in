@@ -1361,6 +1361,19 @@ toollib_LIBRARIES = libm.a \
 
 @HAVE_MULTISUBDIR_TRUE@BUILD_MULTISUBDIR = $(builddir)$(MULTISUBDIR)
 toollib_DATA = $(CRT0) $(CRT1)
+AWK_UNIQUE_OBJS = $(AWK) '{ \
+  for (i = NF; i > 0; --i) { \
+    split($$i, parts, "/"); \
+    name = parts[length(parts)]; \
+    if (!(name in seen)) { \
+      objs[i] = $$i; \
+      seen[name] = 1; \
+    } \
+  } \
+  for (i in objs) \
+    print objs[i]; \
+}'
+
 
 # The functions ldexp, frexp and modf are traditionally supplied in
 # both libc.a and libm.a.  We build them in libm.a and copy them over,
@@ -3247,11 +3260,6 @@ libm/machine/x86_64/libm_a-fetestexcept.$(OBJEXT):  \
 	libm/machine/x86_64/$(am__dirstamp)
 libm/machine/x86_64/libm_a-feupdateenv.$(OBJEXT):  \
 	libm/machine/x86_64/$(am__dirstamp)
-
-libm.a: $(libm_a_OBJECTS) $(libm_a_DEPENDENCIES) $(EXTRA_libm_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f libm.a
-	$(AM_V_AR)$(libm_a_AR) libm.a $(libm_a_OBJECTS) $(libm_a_LIBADD)
-	$(AM_V_at)$(RANLIB) libm.a
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -8649,6 +8657,12 @@ libc/libc.a: ; @true
 libg.a: libc.a
 	$(AM_V_GEN)ln libc.a libg.a >/dev/null 2>/dev/null || cp libc.a libg.a
 $(libm_a_OBJECTS): stmp-targ-include
+
+libm.a: $(libm_a_OBJECTS) $(libm_a_DEPENDENCIES)
+	$(AM_V_at)rm -f $@
+	$(AM_V_AR)objs=`echo $(libm_a_OBJECTS) | $(AWK_UNIQUE_OBJS)` || exit $$?; \
+	  $(AR) $(ARFLAGS) $@ $$objs
+	$(AM_V_at)$(RANLIB) $@
 
 @HAVE_MULTISUBDIR_TRUE@$(BUILD_MULTISUBDIR):
 @HAVE_MULTISUBDIR_TRUE@	$(MKDIR_P) $@
