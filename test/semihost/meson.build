@@ -34,6 +34,7 @@
 #
 
 semihost_tests = [
+  'semihost-argv',
   'semihost-exit',
   'semihost-exit-extended',
   'semihost-clock',
@@ -49,7 +50,7 @@ semihost_tests = [
   'semihost-system',
   'semihost-time',
   'semihost-writec',
-  'semihost-write0'
+  'semihost-write0',
 ]
 
 # These tests should pass, but are currently broken under qemu
@@ -99,7 +100,7 @@ foreach target : targets
 		    link_with: _libs,
 		    link_depends:  test_link_depends,
 		    include_directories: inc),
-	 args: [command_line],
+	 args: ['--', command_line],
          depends: bios_bin,
 	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
   endforeach
@@ -119,7 +120,7 @@ foreach target : targets
 		    link_with: _libs,
 		    link_depends:  test_link_depends,
 		    include_directories: inc),
-	 args: [command_line],
+	 args: ['--', command_line],
 	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()],
 	 should_fail: true)
   endforeach
