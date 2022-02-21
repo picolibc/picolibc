@@ -76,6 +76,11 @@ semi=enable=on,chardev=stdio0
 input=""
 
 case "$1" in
+    --)
+	semi="$semi",arg="$2"
+	shift
+	shift
+	;;
     -*|"")
 	;;
     *)
