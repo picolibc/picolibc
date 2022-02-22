@@ -824,15 +824,13 @@ main_thread_sinit ()
      As soon as the main thread calls a stdio function, this would be
      rectified.  But if another thread calls a stdio function on
      stdin/out/err before the main thread does, all the required
-     initialization of stdin/out/err will be done, but _REENT->__sdidinit
-     is *still* 0.  This in turn will result in a call to __sinit in the
+     initialization of stdin/out/err will be done, but _REENT->__cleanup
+     is *still* NULL.  This in turn will result in a call to __sinit in the
      wrong spot.  The input or output buffer will be NULLed and nothing is
      read or written in the first stdio function call in the main thread.
 
-     To fix this issue we have to copy over the relevant part of _GLOBAL_REENT
-     to _REENT here again. */
-  _REENT->__sdidinit = -1;
-  _REENT->__cleanup = _GLOBAL_REENT->__cleanup;
+     To fix this issue we set __cleanup to _cygtls::cleanup_early here. */
+  _REENT->__cleanup = _cygtls::cleanup_early;
 }
 
 /* Take over from libc's crt0.o and start the application. Note the

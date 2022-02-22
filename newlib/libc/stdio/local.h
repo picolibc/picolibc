@@ -202,7 +202,7 @@ extern _READ_WRITE_RETURN_TYPE __swrite64 (struct _reent *, void *,
   do								\
     {								\
       struct _reent *_check_init_ptr = (ptr);			\
-      if ((_check_init_ptr) && !(_check_init_ptr)->__sdidinit)	\
+      if ((_check_init_ptr) && !(_check_init_ptr)->__cleanup)	\
 	__sinit (_check_init_ptr);				\
       if ((fp) == (FILE *)&__sf_fake_stdin)			\
 	(fp) = _stdin_r(_check_init_ptr);			\
@@ -217,7 +217,7 @@ extern _READ_WRITE_RETURN_TYPE __swrite64 (struct _reent *, void *,
   do								\
     {								\
       struct _reent *_check_init_ptr = (ptr);			\
-      if ((_check_init_ptr) && !(_check_init_ptr)->__sdidinit)	\
+      if ((_check_init_ptr) && !(_check_init_ptr)->__cleanup)	\
 	__sinit (_check_init_ptr);				\
     }								\
   while (0)
@@ -227,7 +227,7 @@ extern _READ_WRITE_RETURN_TYPE __swrite64 (struct _reent *, void *,
   do								\
     {								\
       struct _reent *_check_init_ptr = (ptr);			\
-      if ((_check_init_ptr) && !(_check_init_ptr)->__sdidinit)	\
+      if ((_check_init_ptr) && !(_check_init_ptr)->__cleanup)	\
 	__sinit (_check_init_ptr);				\
     }								\
   while (0)

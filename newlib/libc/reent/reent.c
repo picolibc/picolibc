@@ -118,7 +118,7 @@ _reclaim_reent (struct _reent *ptr)
 	  if (ptr->_sig_func)
 	_free_r (ptr, ptr->_sig_func);*/
 
-      if (ptr->__sdidinit)
+      if (ptr->__cleanup)
 	{
 	  /* cleanup won't reclaim memory 'coz usually it's run
 	     before the program exits, and who wants to wait for that? */

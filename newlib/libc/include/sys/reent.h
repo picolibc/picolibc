@@ -175,7 +175,7 @@ extern void   __sinit (struct _reent *);
 # define _REENT_SMALL_CHECK_INIT(ptr)		\
   do						\
     {						\
-      if ((ptr) && !(ptr)->__sdidinit)		\
+      if ((ptr) && !(ptr)->__cleanup)		\
 	__sinit (ptr);				\
     }						\
   while (0)
@@ -389,7 +389,9 @@ struct _reent
 
   char *_emergency;
 
-  int __sdidinit;		/* 1 means stdio has been init'd */
+  /* No longer used, but member retained for binary compatibility.
+     Now, the __cleanup member is used to check initialization. */
+  int _unused_sdidinit;
 
   int _unspecified_locale_info;	/* unused, reserved for locale stuff */
   struct __locale_t *_locale;/* per-thread locale */
@@ -626,7 +628,9 @@ struct _reent
   int _unspecified_locale_info;	/* unused, reserved for locale stuff */
   struct __locale_t *_locale;/* per-thread locale */
 
-  int __sdidinit;		/* 1 means stdio has been init'd */
+  /* No longer used, but member retained for binary compatibility.
+     Now, the __cleanup member is used to check initialization. */
+  int _unused_sdidinit;
 
   void (*__cleanup) (struct _reent *);
 

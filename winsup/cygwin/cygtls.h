@@ -272,6 +272,7 @@ public:
     will_wait_for_signal = false;
   }
   void handle_SIGCONT ();
+  static void cleanup_early(struct _reent *);
 private:
   void __reg3 call2 (DWORD (*) (void *, void *), void *, void *);
   void remove_pending_sigs ();

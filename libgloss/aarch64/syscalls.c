@@ -124,7 +124,7 @@ extern void __sinit (struct _reent *);
 #define CHECK_INIT(ptr) \
   do						\
     {						\
-      if ((ptr) && !(ptr)->__sdidinit)		\
+      if ((ptr) && !(ptr)->__cleanup)		\
 	__sinit (ptr);				\
     }						\
   while (0)

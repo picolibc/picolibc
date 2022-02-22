@@ -564,8 +564,8 @@ pthread::exit (void *value_ptr)
       mutex.unlock ();
     }
 
-  if (_my_tls.local_clib.__sdidinit < 0)
-    _my_tls.local_clib.__sdidinit = 0;
+  if (_my_tls.local_clib.__cleanup == _cygtls::cleanup_early)
+    _my_tls.local_clib.__cleanup = NULL;
   _reclaim_reent (_REENT);
 
   if (InterlockedDecrement (&MT_INTERFACE->threadcount) == 0)

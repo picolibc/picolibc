@@ -152,7 +152,7 @@ __sfp (struct _reent *d)
 
   _newlib_sfp_lock_start ();
 
-  if (!_GLOBAL_REENT->__sdidinit)
+  if (_GLOBAL_REENT->__cleanup == NULL)
     __sinit (_GLOBAL_REENT);
   for (g = &_GLOBAL_REENT->__sglue;; g = g->_next)
     {
@@ -246,7 +246,7 @@ __sinit (struct _reent *s)
 {
   __sinit_lock_acquire ();
 
-  if (s->__sdidinit)
+  if (s->__cleanup)
     {
       __sinit_lock_release ();
       return;
@@ -264,11 +264,6 @@ __sinit (struct _reent *s)
 #else
   s->__sglue._niobs = 0;
   s->__sglue._iobs = NULL;
-  /* Avoid infinite recursion when calling __sfp  for _GLOBAL_REENT.  The
-     problem is that __sfp checks for _GLOBAL_REENT->__sdidinit and calls
-     __sinit if it's 0. */
-  if (s == _GLOBAL_REENT)
-    s->__sdidinit = 1;
 # ifndef _REENT_GLOBAL_STDIO_STREAMS
   s->_stdin = __sfp(s);
   s->_stdout = __sfp(s);
@@ -293,8 +288,6 @@ __sinit (struct _reent *s)
   stdout_init (s->_stdout);
   stderr_init (s->_stderr);
 #endif /* _REENT_GLOBAL_STDIO_STREAMS */
-
-  s->__sdidinit = 1;
 
   __sinit_lock_release ();
 }

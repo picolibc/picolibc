@@ -174,7 +174,7 @@ nbf:
    * We're committed to buffering from here, so make sure we've
    * registered to flush buffers on exit.
    */
-  if (!reent->__sdidinit)
+  if (!reent->__cleanup)
     __sinit(reent);
 
 #ifdef _FSEEK_OPTIMIZATION
