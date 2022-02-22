@@ -683,7 +683,10 @@ struct {
         TEST(floor_0, (FLOAT_T)0.0, 0, 0),
         TEST(floor_neg0, -(FLOAT_T)0.0, 0, 0),
         TEST(floor_qnan, (FLOAT_T)NAN, 0, 0),
+#ifdef __PICOLIBC__
+        /* looks like glibc gets this wrong */
         TEST(floor_snan, (FLOAT_T)NAN, FE_INVALID, 0),
+#endif
         TEST(floor_inf, (FLOAT_T)INFINITY, 0, 0),
         TEST(floor_neginf, -(FLOAT_T)INFINITY, 0, 0),
 
