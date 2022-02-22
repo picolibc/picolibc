@@ -551,6 +551,16 @@ FLOAT_T makemathname(test_scalbn_tiny)(void) { return makemathname(scalbn)(makem
 #define FE_UNDERFLOW 0
 #endif
 
+#ifdef __i386__
+/*
+ * i386 ABI returns floats in the 8087 registers, which convert sNAN
+ * to NAN on load, so you can't ever return a sNAN value successfully.
+ */
+#define sNAN_RET        NAN
+#else
+#define sNAN_RET        sNAN
+#endif
+
 struct {
 	FLOAT_T	(*func)(void);
 	char	*name;
@@ -665,7 +675,7 @@ struct {
 	TEST(expm1_negbig, -(FLOAT_T)1.0, FE_INEXACT, 0),
 
         TEST(fabs_qnan, (FLOAT_T)NAN, 0, 0),
-        TEST(fabs_snan, (FLOAT_T)sNAN, 0, 0),
+        TEST(fabs_snan, (FLOAT_T)sNAN_RET, 0, 0),
         TEST(fabs_0, (FLOAT_T)0.0, 0, 0),
         TEST(fabs_neg0, (FLOAT_T)0.0, 0, 0),
         TEST(fabs_inf, (FLOAT_T)INFINITY, 0, 0),
@@ -767,7 +777,7 @@ struct {
 
         TEST(ldexp_1_0, (FLOAT_T)1.0, 0, 0),
         TEST(ldexp_qnan_0, (FLOAT_T)NAN, 0, 0),
-        TEST(ldexp_snan_0, (FLOAT_T)sNAN, 0, 0),
+        TEST(ldexp_snan_0, (FLOAT_T)sNAN_RET, 0, 0),
         TEST(ldexp_inf_0, (FLOAT_T)INFINITY, 0, 0),
         TEST(ldexp_neginf_0, -(FLOAT_T)INFINITY, 0, 0),
         TEST(ldexp_1_negbig, (FLOAT_T)0.0, FE_UNDERFLOW, ERANGE),
