@@ -626,7 +626,7 @@ $(LDSCRIPT): $(LDSCRIPT).in
 
 # cygwin dll
 $(PRE_DLL_NAME): $(LDSCRIPT) libdll.a $(VERSION_OFILES) $(LIBSERVER)\
-		  $(newlib_build)/libm.a $(newlib_build)/libc/libc.a
+		  $(newlib_build)/libm.a $(newlib_build)/libc.a
 	$(AM_V_CXXLD)$(CXX) $(CXXFLAGS) \
 	-mno-use-libstdc-wrappers \
 	-Wl,--gc-sections -nostdlib -Wl,-T$(LDSCRIPT) -static \
@@ -636,7 +636,7 @@ $(PRE_DLL_NAME): $(LDSCRIPT) libdll.a $(VERSION_OFILES) $(LIBSERVER)\
 	$(VERSION_OFILES) \
 	$(LIBSERVER) \
 	$(newlib_build)/libm.a \
-	$(newlib_build)/libc/libc.a \
+	$(newlib_build)/libc.a \
 	-lgcc -lkernel32 -lntdll -Wl,-Map,cygwin.map
 
 # create cygwin1.dbg file
