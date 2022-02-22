@@ -22,6 +22,8 @@ dirname (char *path)
 	}
 	while( p >= path && *p != '/' )
 		p--;
+	while( p > path && p[-1] == '/' )
+                p--;
 	return
 		p < path ? "." :
 		p == path ? "/" :
