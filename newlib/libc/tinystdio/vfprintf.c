@@ -641,7 +641,10 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
                     ultoa_signed_t      half = ((ultoa_signed_t) 1) << (bits - 1);
                     ultoa_signed_t      mask = ~((half << 1) - 1);
 
-                    s += half;
+                    /* round even */
+                    if ((s & ~mask) > half || ((s >> bits) & 1) != 0)
+                        s += half;
+                    /* special case rounding first digit */
                     if (s > (SIG_MASK << SIG_SHIFT))
                         _dtoa.digits[0]++;
                     s &= mask;
