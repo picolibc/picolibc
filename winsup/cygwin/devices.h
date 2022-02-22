@@ -433,6 +433,7 @@ extern const _device dev_fs_storage;
 #define iscygdrive_dev(devn) (devn == FH_CYGDRIVE)
 
 #define isdev_dev(devn) (devn == FH_DEV)
+#define isdevfd_dev(devn) (devn == FH_DEV_FD)
 
 #define isprocsys_dev(devn) (devn == FH_PROCSYS)
 

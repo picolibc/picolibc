@@ -1123,7 +1123,11 @@ unlink (const char *ourname)
       set_errno (EROFS);
       goto done;
     }
-
+  if (isdevfd_dev (devn) || (win32_name.isdevice () && !win32_name.issocket ()))
+    {
+      set_errno (EPERM);
+      goto done;
+    }
   if (!win32_name.exists ())
     {
       debug_printf ("unlinking a nonexistent file");
