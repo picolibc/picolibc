@@ -159,12 +159,14 @@ pow(double x, double y)
                 return (hy < 0) ? -y : zero;
         }
         if (iy == 0x3ff00000) { /* y is  +-1 */
-            if (hy < 0)
+            if (hy < 0) {
+                if (x == 0)
+                    return __math_divzero(hx < 0);
                 return one / x;
-            else
+            } else
                 return x;
         }
-        if (hy == 0x40000000)
+        if (hy == 0x40000000 && ix < 0x5ff00000 && ix > 0x1e500000)
             return x * x; /* y is  2 */
         if (hy == 0x3fe00000) { /* y is  0.5 */
             if (hx >= 0) /* x >= +0 */
