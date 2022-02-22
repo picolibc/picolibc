@@ -567,6 +567,10 @@
     result |= test(__LINE__, "0x1p+0", "%a", 0x1p+0);
     result |= test(__LINE__, "0x0p+0", "%a", 0.0);
     result |= test(__LINE__, "-0x0p+0", "%a", -0.0);
+    result |= test(__LINE__, "0x1.9p+4", "%.1a", 0x1.89p+4);
+    result |= test(__LINE__, "0x1.8p+4", "%.1a", 0x1.88p+4);
+    result |= test(__LINE__, "0x1.8p+4", "%.1a", 0x1.78p+4);
+    result |= test(__LINE__, "0x1.7p+4", "%.1a", 0x1.77p+4);
     result |= test(__LINE__, "0x1.fffffep+126", "%a", (double) 0x1.fffffep+126f);
     result |= test(__LINE__, "0x1.234564p-126", "%a", (double) 0x1.234564p-126f);
     result |= test(__LINE__, "0x1.234566p-126", "%a", (double) 0x1.234566p-126f);
