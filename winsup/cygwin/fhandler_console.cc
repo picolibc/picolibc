@@ -251,6 +251,7 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 		{
 		case signalled:
 		case not_signalled_but_done:
+		case done_with_debugger:
 		  processed = true;
 		  ttyp->output_stopped = false;
 		  if (ti.c_lflag & NOFLSH)

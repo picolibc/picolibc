@@ -2293,7 +2293,14 @@ fhandler_pty_master::write (const void *ptr, size_t len)
 
       for (size_t i = 0; i < nlen; i++)
 	{
-	  fhandler_termios::process_sigs (buf[i], get_ttyp (), this);
+	  process_sig_state r = process_sigs (buf[i], get_ttyp (), this);
+	  if (r == done_with_debugger)
+	    {
+	      for (size_t j = i; j < nlen - 1; j++)
+		buf[j] = buf[j + 1];
+	      nlen--;
+	      i--;
+	    }
 	  process_stop_start (buf[i], get_ttyp (), true);
 	}
 
