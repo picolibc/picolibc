@@ -315,8 +315,6 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
   termios &ti = ttyp->ti;
   pid_t pgid = ttyp->pgid;
 
-  pinfo leader (pgid);
-  bool cyg_leader = leader && !(leader->process_state & PID_NOTCYGWIN);
   bool ctrl_c_event_sent = false;
   bool need_discard_input = false;
   bool pg_with_nat = false;
@@ -344,24 +342,31 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	      FreeConsole ();
 	      AttachConsole (p->dwProcessId);
 	    }
+	  if (fh && p == myself)
+	    { /* Avoid deadlock in gdb on console. */
+	      fh->tcflush(TCIFLUSH);
+	      fh->release_input_mutex_if_necessary ();
+	    }
 	  /* CTRL_C_EVENT does not work for the process started with
 	     CREATE_NEW_PROCESS_GROUP flag, so send CTRL_BREAK_EVENT
 	     instead. */
 	  if (p->process_state & PID_NEW_PG)
-	    GenerateConsoleCtrlEvent (CTRL_BREAK_EVENT,
-				      p->dwProcessId);
-	  else if ((!fh || !fh->is_pty_master_with_pcon () || cyg_leader)
-		   && !ctrl_c_event_sent)
+	    {
+	      GenerateConsoleCtrlEvent (CTRL_BREAK_EVENT,
+					p->dwProcessId);
+	      need_discard_input = true;
+	    }
+	  else if (!ctrl_c_event_sent)
 	    {
 	      GenerateConsoleCtrlEvent (CTRL_C_EVENT, 0);
 	      ctrl_c_event_sent = true;
+	      need_discard_input = true;
 	    }
 	  if (resume_pid && fh && !fh->is_console ())
 	    {
 	      FreeConsole ();
 	      AttachConsole (resume_pid);
 	    }
-	  need_discard_input = true;
 	}
       if (p && p->ctty == ttyp->ntty && p->pgid == pgid)
 	{
@@ -426,8 +431,8 @@ not_a_sig:
       ti.c_lflag &= ~FLUSHO;
       return not_signalled_but_done;
     }
-  bool to_cyg = cyg_reader || !pg_with_nat;
-  return to_cyg ? not_signalled_with_cyg_reader : not_signalled;
+  bool to_nat = !cyg_reader && pg_with_nat;
+  return to_nat ? not_signalled_with_nat_reader : not_signalled;
 }
 
 bool
@@ -479,7 +484,7 @@ fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
 
       if (ti.c_iflag & ISTRIP)
 	c &= 0x7f;
-      bool disable_eof_key = true;
+      bool disable_eof_key = false;
       switch (process_sigs (c, get_ttyp (), this))
 	{
 	case signalled:
@@ -488,8 +493,8 @@ fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
 	case not_signalled_but_done:
 	  get_ttyp ()->output_stopped = false;
 	  continue;
-	case not_signalled_with_cyg_reader:
-	  disable_eof_key = false;
+	case not_signalled_with_nat_reader:
+	  disable_eof_key = true;
 	  break;
 	default: /* Not signalled */
 	  break;

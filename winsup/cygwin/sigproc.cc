@@ -1392,7 +1392,8 @@ wait_sig (VOID *)
 	  sig_held = true;
 	  break;
 	case __SIGSETPGRP:
-	  init_console_handler (true);
+	  if (::cygheap->ctty)
+	    init_console_handler (::cygheap->ctty->need_console_handler ());
 	  break;
 	case __SIGTHREADEXIT:
 	  {

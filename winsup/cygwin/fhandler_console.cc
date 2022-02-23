@@ -195,21 +195,7 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
       DWORD total_read, n, i;
       INPUT_RECORD input_rec[INREC_SIZE];
 
-      bool nat_fg = false;
-      bool nat_child_fg = false;
-      winpids pids ((DWORD) 0);
-      for (unsigned i = 0; i < pids.npids; i++)
-	{
-	  _pinfo *pi = pids[i];
-	  if (pi && pi->ctty == ttyp->ntty && pi->pgid == ttyp->getpgid ()
-	      && (pi->process_state & PID_NOTCYGWIN)
-	      && !(pi->process_state & PID_NEW_PG))
-	    nat_fg = true;
-	  if (pi && pi->ctty == ttyp->ntty && pi->pgid == ttyp->getpgid ()
-	      && !(pi->process_state & PID_CYGPARENT))
-	    nat_child_fg = true;
-	}
-      if (nat_fg && !nat_child_fg)
+      if (con.disable_master_thread)
 	{
 	  cygwait (40);
 	  continue;
@@ -403,6 +389,7 @@ fhandler_console::setup ()
       con.cons_rapoi = NULL;
       shared_console_info->tty_min_state.is_console = true;
       con.cursor_key_app_mode = false;
+      con.disable_master_thread = true;
     }
 }
 
@@ -519,6 +506,7 @@ fhandler_console::setup_for_non_cygwin_app ()
     (get_ttyp ()->getpgid ()== myself->pgid) ? tty::native : tty::restore;
   set_input_mode (conmode, &tc ()->ti, get_handle_set ());
   set_output_mode (conmode, &tc ()->ti, get_handle_set ());
+  con.disable_master_thread = true;
 }
 
 void
@@ -534,6 +522,7 @@ fhandler_console::cleanup_for_non_cygwin_app (handle_set_t *p)
     (con.owner == myself->pid) ? tty::restore : tty::cygwin;
   set_output_mode (conmode, ti, p);
   set_input_mode (conmode, ti, p);
+  con.disable_master_thread = (con.owner == myself->pid);
 }
 
 /* Return the tty structure associated with a given tty number.  If the
@@ -707,7 +696,14 @@ fhandler_console::bg_check (int sig, bool dontsignal)
      cygwin app and other non-cygwin apps are started simultaneously
      in the same process group. */
   if (sig == SIGTTIN)
-    set_input_mode (tty::cygwin, &tc ()->ti, get_handle_set ());
+    {
+      set_input_mode (tty::cygwin, &tc ()->ti, get_handle_set ());
+      if (con.disable_master_thread)
+	{
+	  con.disable_master_thread = false;
+	  init_console_handler (false);
+	}
+    }
   if (sig == SIGTTOU)
     set_output_mode (tty::cygwin, &tc ()->ti, get_handle_set ());
 
@@ -1409,8 +1405,7 @@ bool
 fhandler_console::open_setup (int flags)
 {
   set_flags ((flags & ~O_TEXT) | O_BINARY);
-  if (myself->set_ctty (this, flags) && !myself->cygstarted)
-    init_console_handler (true);
+  myself->set_ctty (this, flags);
   return fhandler_base::open_setup (flags);
 }
 
@@ -1419,9 +1414,14 @@ fhandler_console::post_open_setup (int fd)
 {
   /* Setting-up console mode for cygwin app started from non-cygwin app. */
   if (fd == 0)
-    set_input_mode (tty::cygwin, &get_ttyp ()->ti, &handle_set);
+    {
+      set_input_mode (tty::cygwin, &get_ttyp ()->ti, &handle_set);
+      con.disable_master_thread = false;
+    }
   else if (fd == 1 || fd == 2)
     set_output_mode (tty::cygwin, &get_ttyp ()->ti, &handle_set);
+
+  init_console_handler (need_console_handler ());
 
   fhandler_base::post_open_setup (fd);
 }
@@ -1446,6 +1446,7 @@ fhandler_console::close ()
 	  /* Cleaning-up console mode for cygwin apps. */
 	  set_output_mode (tty::restore, &get_ttyp ()->ti, &handle_set);
 	  set_input_mode (tty::restore, &get_ttyp ()->ti, &handle_set);
+	  con.disable_master_thread = true;
 	}
     }
 
@@ -3617,6 +3618,7 @@ fhandler_console::set_console_mode_to_native ()
 	    termios *cons_ti = &cons->tc ()->ti;
 	    set_input_mode (tty::native, cons_ti, cons->get_handle_set ());
 	    set_output_mode (tty::native, cons_ti, cons->get_handle_set ());
+	    con.disable_master_thread = true;
 	    break;
 	  }
       }
@@ -3639,6 +3641,7 @@ CreateProcessA_Hooked
   gdb_inferior_noncygwin = !fhandler_termios::path_iscygexec_a (n, c);
   if (gdb_inferior_noncygwin)
     fhandler_console::set_console_mode_to_native ();
+  init_console_handler (false);
   return CreateProcessA_Orig (n, c, pa, ta, inh, f, e, d, si, pi);
 }
 
@@ -3653,6 +3656,7 @@ CreateProcessW_Hooked
   gdb_inferior_noncygwin = !fhandler_termios::path_iscygexec_w (n, c);
   if (gdb_inferior_noncygwin)
     fhandler_console::set_console_mode_to_native ();
+  init_console_handler (false);
   return CreateProcessW_Orig (n, c, pa, ta, inh, f, e, d, si, pi);
 }
 
@@ -3662,6 +3666,7 @@ ContinueDebugEvent_Hooked
 {
   if (gdb_inferior_noncygwin)
     fhandler_console::set_console_mode_to_native ();
+  init_console_handler (false);
   return ContinueDebugEvent_Orig (p, t, s);
 }
 
@@ -3928,4 +3933,10 @@ fhandler_console::close_handle_set (handle_set_t *p)
   p->input_mutex = NULL;
   CloseHandle (p->output_mutex);
   p->output_mutex = NULL;
+}
+
+bool
+fhandler_console::need_console_handler ()
+{
+  return con.disable_master_thread;
 }
