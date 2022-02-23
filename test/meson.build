@@ -241,6 +241,7 @@ foreach target : targets
 		 'math-funcs', 'timegm', 'time-tests',
                  'test-strtod', 'test-strchr',
 		 'test-memset', 'test-put',
+		 'test-efcvt'
 		]
 
   if have_attr_ctor_dtor
@@ -311,6 +312,11 @@ if enable_native_tests
     test('printf_scanf_native',
 	 executable('printf_scanf_native',
 		    'printf_scanf.c',
+		    c_args: ['-DNO_NEWLIB'],
+		    dependencies: native_lib_m))
+    test('test-efcvt_native',
+	 executable('test-efcvt_native',
+		    'test-efcvt.c',
 		    c_args: ['-DNO_NEWLIB'],
 		    dependencies: native_lib_m))
   endif
