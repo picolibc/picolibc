@@ -1906,7 +1906,7 @@ class fhandler_termios: public fhandler_base
     signalled,
     not_signalled,
     not_signalled_but_done,
-    not_signalled_with_cyg_reader
+    not_signalled_with_nat_reader
   };
 
  public:
@@ -1954,8 +1954,8 @@ class fhandler_termios: public fhandler_base
   }
   static bool path_iscygexec_a (LPCSTR n, LPSTR c);
   static bool path_iscygexec_w (LPCWSTR n, LPWSTR c);
-  virtual bool is_pty_master_with_pcon () { return false; }
   virtual void cleanup_before_exit () {}
+  virtual bool need_console_handler () { return false; }
 };
 
 enum ansi_intensity
@@ -2060,6 +2060,7 @@ class dev_console
   char cons_rabuf[40];  // cannot get longer than char buf[40] in char_command
   char *cons_rapoi;
   bool cursor_key_app_mode;
+  bool disable_master_thread;
 
   inline UINT get_console_cp ();
   DWORD con_to_str (char *d, int dlen, WCHAR w);
@@ -2253,6 +2254,7 @@ private:
   void setup_for_non_cygwin_app ();
   static void cleanup_for_non_cygwin_app (handle_set_t *p);
   static void set_console_mode_to_native ();
+  bool need_console_handler ();
 
   friend tty_min * tty_list::get_cttyp ();
 };
@@ -2488,7 +2490,6 @@ public:
   void get_master_thread_param (master_thread_param_t *p);
   void get_master_fwd_thread_param (master_fwd_thread_param_t *p);
   void set_mask_flusho (bool m) { get_ttyp ()->mask_flusho = m; }
-  bool is_pty_master_with_pcon () { return get_ttyp ()->pcon_activated; }
 };
 
 class fhandler_dev_null: public fhandler_base
