@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2020 Keith Packard
+ * Copyright © 2022 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,26 +33,33 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _GNU_SOURCE
 #include "dtoa_engine.h"
 #include <_ansi.h>
 #include <stdlib.h>
 #include <string.h>
 
-char *
-ecvtbuf (double invalue,
-	int ndigit,
-	int *decpt,
-	int *sign,
-	char *ecvt_buf)
+int
+ecvt_r (double invalue,
+        int ndigit,
+        int *decpt,
+        int *sign,
+        char *buf,
+        int len)
 {
-	struct dtoa dtoa;
+    struct dtoa dtoa;
+    int ngot;
 
-	if (ndigit > DTOA_MAX_DIG)
-		ndigit = DTOA_MAX_DIG;
-	ndigit = __dtoa_engine(invalue, &dtoa, ndigit, 0);
-	*sign = dtoa.flags & DTOA_MINUS;
-	*decpt = dtoa.exp + 1;
-	memcpy(ecvt_buf, dtoa.digits, ndigit);
-	ecvt_buf[ndigit] = '\0';
-	return ecvt_buf;
+    if (ndigit > len - 1)
+        return -1;
+    if (ndigit < 0)
+        return -1;
+
+    ngot = __dtoa_engine(invalue, &dtoa, ndigit, 0);
+    *sign = !!(dtoa.flags & DTOA_MINUS);
+    *decpt = dtoa.exp + 1;
+    memset(buf, '0', ndigit);
+    memcpy(buf, dtoa.digits, ngot);
+    buf[ndigit] = '\0';
+    return 0;
 }

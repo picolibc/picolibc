@@ -45,5 +45,7 @@ ecvt (double invalue,
       int *decpt,
       int *sign)
 {
-	return ecvtbuf(invalue, ndigit, decpt, sign, __ecvt_buf);
+    if (ecvt_r(invalue, ndigit, decpt, sign, __ecvt_buf, sizeof(__ecvt_buf)) < 0)
+        return NULL;
+    return __ecvt_buf;
 }

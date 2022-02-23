@@ -33,6 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _GNU_SOURCE
 #include "ftoa_engine.h"
 #include <_ansi.h>
 #include <stdlib.h>
@@ -44,17 +45,7 @@ fcvtf (float invalue,
        int *decpt,
        int *sign)
 {
-	struct ftoa ftoa;
-	int ndigit;
-
-	ndigit = __ftoa_engine(invalue, &ftoa, FTOA_MAX_DIG, ndecimal + 1);
-	*sign = ftoa.flags & FTOA_MINUS;
-	if (ndigit > 0)
-		*decpt = ftoa.exp + 1;
-	else {
-		*decpt = -ndecimal;
-	}
-	memcpy(__ecvtf_buf, ftoa.digits, ndigit);
-	__ecvtf_buf[ndigit] = '\0';
-	return __ecvtf_buf;
+    if (fcvt_r(invalue, ndecimal, decpt, sign, __ecvtf_buf, sizeof(__ecvtf_buf)) < 0)
+        return NULL;
+    return __ecvtf_buf;
 }

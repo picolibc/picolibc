@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2020 Keith Packard
+ * Copyright © 2022 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,29 +33,33 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _GNU_SOURCE
 #include "ftoa_engine.h"
 #include <_ansi.h>
 #include <stdlib.h>
 #include <string.h>
 
-char *
-fcvtfbuf(float invalue,
-	 int ndecimal,
-	 int *decpt,
-	 int *sign,
-	 char *fcvt_buf)
+int
+ecvtf_r (float invalue,
+         int ndigit,
+         int *decpt,
+         int *sign,
+         char *buf,
+         int len)
 {
-	struct ftoa ftoa;
-	int ndigit;
+    struct ftoa ftoa;
+    int ngot;
 
-	ndigit = __ftoa_engine(invalue, &ftoa, FTOA_MAX_DIG, ndecimal + 1);
-	*sign = ftoa.flags & FTOA_MINUS;
-	if (ndigit > 0)
-		*decpt = ftoa.exp + 1;
-	else {
-		*decpt = -ndecimal;
-	}
-	memcpy(fcvt_buf, ftoa.digits, ndigit);
-	fcvt_buf[ndigit] = '\0';
-	return fcvt_buf;
+    if (ndigit > len - 1)
+        return -1;
+    if (ndigit < 0)
+        return -1;
+
+    ngot = __ftoa_engine(invalue, &ftoa, ndigit, 0);
+    *sign = !!(ftoa.flags & FTOA_MINUS);
+    *decpt = ftoa.exp + 1;
+    memset(buf, '0', ndigit);
+    memcpy(buf, ftoa.digits, ngot);
+    buf[ndigit] = '\0';
+    return 0;
 }
