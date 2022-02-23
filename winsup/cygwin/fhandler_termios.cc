@@ -315,12 +315,16 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
   termios &ti = ttyp->ti;
   pid_t pgid = ttyp->pgid;
 
+  pinfo leader (pgid);
+  bool cyg_leader = leader && !(leader->process_state & PID_NOTCYGWIN);
   bool ctrl_c_event_sent = false;
   bool need_discard_input = false;
   bool pg_with_nat = false;
   bool need_send_sig = false;
   bool nat_shell = false;
   bool cyg_reader = false;
+  bool with_debugger = false;
+  bool with_debugger_nat = false;
 
   winpids pids ((DWORD) 0);
   for (unsigned i = 0; i < pids.npids; i++)
@@ -328,6 +332,7 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
       _pinfo *p = pids[i];
       if (c == '\003' && p && p->ctty == ttyp->ntty && p->pgid == pgid
 	  && ((p->process_state & PID_NOTCYGWIN)
+	      || (p->process_state & PID_NEW_PG)
 	      || !(p->process_state & PID_CYGPARENT)))
 	{
 	  pinfo pinfo_resume = pinfo (myself->ppid);
@@ -350,7 +355,8 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	  /* CTRL_C_EVENT does not work for the process started with
 	     CREATE_NEW_PROCESS_GROUP flag, so send CTRL_BREAK_EVENT
 	     instead. */
-	  if (p->process_state & PID_NEW_PG)
+	  if ((p->process_state & PID_NEW_PG)
+	      && (p->process_state & PID_NOTCYGWIN))
 	    {
 	      GenerateConsoleCtrlEvent (CTRL_BREAK_EVENT,
 					p->dwProcessId);
@@ -378,8 +384,28 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	    nat_shell = true;
 	  if (p->process_state & PID_TTYIN)
 	    cyg_reader = true;
+	  if (!p->cygstarted && !(p->process_state & PID_NOTCYGWIN)
+	      && (p != myself || being_debugged ())
+	      && cyg_leader) /* inferior is cygwin app */
+	    with_debugger = true;
+	  if (!(p->process_state & PID_NOTCYGWIN)
+	      && (p->process_state & PID_NEW_PG) /* Check marker */
+	      && p->pid == pgid) /* inferior is non-cygwin app */
+	    with_debugger_nat = true;
 	}
     }
+  if ((with_debugger || with_debugger_nat) && need_discard_input)
+    {
+      if (!(ti.c_lflag & NOFLSH) && fh)
+	{
+	  fh->eat_readahead (-1);
+	  fh->discard_input ();
+	}
+      ti.c_lflag &= ~FLUSHO;
+      return done_with_debugger;
+    }
+  if (with_debugger_nat)
+    return not_signalled;
   /* Send SIGQUIT to non-cygwin process. */
   if ((ti.c_lflag & ISIG) && CCEQ (ti.c_cc[VQUIT], c)
       && pg_with_nat && need_send_sig && !nat_shell)
@@ -491,6 +517,7 @@ fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
 	  sawsig = true;
 	  fallthrough;
 	case not_signalled_but_done:
+	case done_with_debugger:
 	  get_ttyp ()->output_stopped = false;
 	  continue;
 	case not_signalled_with_nat_reader:

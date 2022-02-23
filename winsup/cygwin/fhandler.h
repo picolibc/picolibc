@@ -1906,7 +1906,8 @@ class fhandler_termios: public fhandler_base
     signalled,
     not_signalled,
     not_signalled_but_done,
-    not_signalled_with_nat_reader
+    not_signalled_with_nat_reader,
+    done_with_debugger
   };
 
  public:
