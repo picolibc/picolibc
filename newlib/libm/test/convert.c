@@ -16,6 +16,7 @@
  */
 /* Test conversions */
 
+#define _GNU_SOURCE
 #define IN_CONVERT
 #include "test.h"
 //#include <_ansi.h>
@@ -218,20 +219,36 @@ check_null(char *s) {
   return s;
 }
 
-#ifndef NO_NEWLIB
+#if !defined(TINY_STDIO) && !defined(NO_NEWLIB)
+#define ecvt_r(n, dig, dec, sign, buf, len) (ecvtbuf(n, dig, dec, sign, buf) ? 0 : -1)
+#define fcvt_r(n, dig, dec, sign, buf, len) (fcvtbuf(n, dig, dec, sign, buf) ? 0 : -1)
+#define ecvtf_r(n, dig, dec, sign, buf, len) (ecvtbuf(n, dig, dec, sign, buf) ? 0 : -1)
+#define fcvtf_r(n, dig, dec, sign, buf, len) (fcvtbuf(n, dig, dec, sign, buf) ? 0 : -1)
+#endif
+
 /* test ECVT and friends */
 void
-test_ecvtbuf (void)
+test_ecvt_r (void)
 {
   int a2,a3;
-  char *s;
-  s =  check_null(ecvtbuf(pdd->value, pdd->e1, &a2, &a3, buffer));
+  int r;
 
-  test_sok(s,pdd->estring);
+  r = ecvt_r(pdd->value, pdd->e1, &a2, &a3, buffer, sizeof(buffer));
+  test_iok(0, r);
+
+  test_sok(buffer,pdd->estring);
   test_iok(pdd->e2,a2);
   test_iok(pdd->e3,a3);
-}
+
+#ifndef NO_NEWLIB
+  r = ecvtf_r(pdd->value, pdd->e1, &a2, &a3, buffer, sizeof(buffer));
+  test_iok(0, r);
+
+  test_scok(buffer,pdd->estring, 6);
+  test_iok(pdd->e2,a2);
+  test_iok(pdd->e3,a3);
 #endif
+}
 
 void
 test_ecvt (void)
@@ -253,19 +270,47 @@ test_ecvt (void)
 #endif
 }
 
-#ifndef NO_NEWLIB
 void
-test_fcvtbuf (void)
+test_fcvt_r (void)
 {
   int a2,a3;
-  char *s;
-  s =  check_null(fcvtbuf(pdd->value, pdd->f1, &a2, &a3, buffer));
+  int r;
+  r = fcvt_r(pdd->value, pdd->f1, &a2, &a3, buffer, sizeof(buffer));
 
-  test_scok(s,pdd->fstring,10);
+  test_iok(r, 0);
+  test_scok(buffer,pdd->fstring,10);
   test_iok(pdd->f2,a2);
   test_iok(pdd->f3,a3);
-}
+
+#ifndef NO_NEWLIB
+  double v1;
+  double v2;
+  static char fbuffer[sizeof(buffer)];
+  char *sde, *sfe;
+  /* Test the float version by converting and inspecting the numbers 3
+   after reconverting */
+  r = fcvtf_r(pdd->value, pdd->f1, &a2, &a3, fbuffer, sizeof(fbuffer));
+  test_iok(0, r);
+  errno = 0;
+  v1 = strtod(buffer, &sde);
+  v2 = strtod(fbuffer, &sfe);
+  /* float version may return fewer digits; expand to match */
+  int x = strlen(buffer) - strlen(fbuffer);
+  while (x-- > 0)
+    v2 *= 10;
+  if (strlen(buffer) == 0) {
+    test_iok(0, sde - buffer);
+    v1 = 0.0;
+  }
+  if (strlen(fbuffer) == 0) {
+    test_iok(0, sfe - fbuffer);
+    v2 = 0.0;
+  }
+  test_mok(v1, v2,30);
+  test_iok(pdd->f2,a2);
+  test_iok(pdd->f3,a3);
 #endif
+}
 
 void
 test_gcvt (void)
@@ -518,15 +563,11 @@ test_cvt (void)
 #ifdef GENERATE_VECTORS
   diterate(gen_dvec, "gen");
 #else
-#ifndef NO_NEWLIB
-  diterate(test_fcvtbuf,"fcvtbuf");
-#endif
+  diterate(test_fcvt_r,"fcvt_r");
   diterate(test_fcvt,"fcvt/fcvtf");
 
   diterate(test_gcvt,"gcvt/gcvtf");
-#ifndef NO_NEWLIB
-  diterate(test_ecvtbuf,"ecvtbuf");
-#endif
+  diterate(test_ecvt_r,"ecvt_r");
   diterate(test_ecvt,"ecvt/ecvtf");
 #endif
 
