@@ -156,6 +156,9 @@ pinfo::status_exit (DWORD x)
 	 a lengthy small_printf instead. */
       x = SIGBUS;
       break;
+    case STATUS_CONTROL_C_EXIT:
+      x = SIGINT;
+      break;
     default:
       debug_printf ("*** STATUS_%y\n", x);
       x = 127 << 8;
