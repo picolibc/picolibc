@@ -697,11 +697,7 @@ fhandler_console::bg_check (int sig, bool dontsignal)
   if (sig == SIGTTIN)
     {
       set_input_mode (tty::cygwin, &tc ()->ti, get_handle_set ());
-      if (con.disable_master_thread)
-	{
-	  con.disable_master_thread = false;
-	  init_console_handler (false);
-	}
+      con.disable_master_thread = false;
     }
   if (sig == SIGTTOU)
     set_output_mode (tty::cygwin, &tc ()->ti, get_handle_set ());
@@ -1404,7 +1400,8 @@ bool
 fhandler_console::open_setup (int flags)
 {
   set_flags ((flags & ~O_TEXT) | O_BINARY);
-  myself->set_ctty (this, flags);
+  if (myself->set_ctty (this, flags) && !myself->cygstarted)
+    init_console_handler (true);
   return fhandler_base::open_setup (flags);
 }
 
@@ -1419,8 +1416,6 @@ fhandler_console::post_open_setup (int fd)
     }
   else if (fd == 1 || fd == 2)
     set_output_mode (tty::cygwin, &get_ttyp ()->ti, &handle_set);
-
-  init_console_handler (need_console_handler ());
 
   fhandler_base::post_open_setup (fd);
 }
