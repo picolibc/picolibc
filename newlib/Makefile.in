@@ -8672,10 +8672,12 @@ libm.a: $(libm_a_OBJECTS) $(libm_a_DEPENDENCIES)
 @HAVE_MULTISUBDIR_TRUE@	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
 
 @HAVE_MULTISUBDIR_TRUE@$(BUILD_MULTISUBDIR)/libc.a: libc.a $(BUILD_MULTISUBDIR)
-@HAVE_MULTISUBDIR_TRUE@	rm -f $@ $(BUILD_MULTISUBDIR)/libg.a
+@HAVE_MULTISUBDIR_TRUE@	rm -f $@
 @HAVE_MULTISUBDIR_TRUE@	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
-@HAVE_MULTISUBDIR_TRUE@	ln libg.a $(BUILD_MULTISUBDIR)/libg.a >/dev/null 2>/dev/null || \
-@HAVE_MULTISUBDIR_TRUE@	cp libg.a $(BUILD_MULTISUBDIR)/libg.a
+
+@HAVE_MULTISUBDIR_TRUE@$(BUILD_MULTISUBDIR)/libg.a: libg.a ${BUILD_MULTISUBDIR}
+@HAVE_MULTISUBDIR_TRUE@	rm -f $@
+@HAVE_MULTISUBDIR_TRUE@	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
 
 @HAVE_MULTISUBDIR_TRUE@$(BUILD_MULTISUBDIR)/libm.a: libm.a $(BUILD_MULTISUBDIR)
 @HAVE_MULTISUBDIR_TRUE@	rm -f $@

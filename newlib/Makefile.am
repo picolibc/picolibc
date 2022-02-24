@@ -161,10 +161,12 @@ $(BUILD_MULTISUBDIR)/crt0.o: $(CRT0_DIR)$(CRT0) $(BUILD_MULTISUBDIR)
 	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
 
 $(BUILD_MULTISUBDIR)/libc.a: libc.a $(BUILD_MULTISUBDIR)
-	rm -f $@ $(BUILD_MULTISUBDIR)/libg.a
+	rm -f $@
 	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
-	ln libg.a $(BUILD_MULTISUBDIR)/libg.a >/dev/null 2>/dev/null || \
-	cp libg.a $(BUILD_MULTISUBDIR)/libg.a
+
+$(BUILD_MULTISUBDIR)/libg.a: libg.a ${BUILD_MULTISUBDIR}
+	rm -f $@
+	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
 
 $(BUILD_MULTISUBDIR)/libm.a: libm.a $(BUILD_MULTISUBDIR)
 	rm -f $@
