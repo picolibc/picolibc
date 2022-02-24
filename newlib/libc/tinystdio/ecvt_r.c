@@ -38,6 +38,7 @@
 #include <_ansi.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 int
 ecvt_r (double invalue,
@@ -48,18 +49,32 @@ ecvt_r (double invalue,
         int len)
 {
     struct dtoa dtoa;
+    char *digits = dtoa.digits;
     int ngot;
 
     if (ndigit > len - 1)
         return -1;
     if (ndigit < 0)
-        return -1;
+        ndigit = 0;
 
-    ngot = __dtoa_engine(invalue, &dtoa, ndigit, 0);
-    *sign = !!(dtoa.flags & DTOA_MINUS);
-    *decpt = dtoa.exp + 1;
+    if (!isfinite(invalue)) {
+        *sign = invalue < 0;
+        *decpt = 0;
+        if (isnan(invalue))
+            digits = "nan";
+        else
+            digits = "inf";
+        ngot = 3;
+        if (ndigit < ngot)
+            ngot = ndigit;
+        ndigit = ngot;
+    } else {
+        ngot = __dtoa_engine(invalue, &dtoa, ndigit, false, 0);
+        *sign = !!(dtoa.flags & DTOA_MINUS);
+        *decpt = dtoa.exp + 1;
+    }
     memset(buf, '0', ndigit);
-    memcpy(buf, dtoa.digits, ngot);
+    memcpy(buf, digits, ngot);
     buf[ndigit] = '\0';
     return 0;
 }

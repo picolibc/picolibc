@@ -38,6 +38,7 @@
 #include <_ansi.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 int
 fcvt_r (double invalue,
@@ -50,57 +51,68 @@ fcvt_r (double invalue,
     struct dtoa dtoa;
     int ntrailing;      /* number of zeros to add after the value */
     int ndigit;         /* numer of generated digits */
+    int dtoa_decimal = ndecimal;
+    char *digits = dtoa.digits;
 
-    if (ndecimal < 0)
-        ndecimal = 0;
-
-    /* ndecimal = digits after decimal point desired
-     * ndigit = digits actually generated
-     * dtoa.exp = exponent (position of decimal relative to first digit generated)
-     */
-    ndigit = __dtoa_engine(invalue, &dtoa, DTOA_MAX_DIG, ndecimal + 1);
-    *sign = !!(dtoa.flags & DTOA_MINUS);
-
-    /*
-     * To compute the number of zeros added after the value, there are
-     * three cases:
-     *
-     * 1. all of the generated digits are left of the decimal
-     *    point (dtoa.exp >= ndigit). We need (dtoa.exp - ndigit)
-     *    digits left of the decimal and ndecimal right of the
-     *    decimal: (dtoa.exp - ndigit) + ndecimal
-     *
-     * 2. some of the generated digits are right
-     *    of the decimal point (dtoa.exp < ndigit). We need
-     *    ndecimal digits total, but we have (ndigit - dtoa.exp)
-     *    already, so: ndecimal - (ndigit - dtoa.exp).
-     *
-     * 3. all of the generated digits are right of the decimal point
-     *    We need fewer than ndecimal digits by the magnitude of
-     *    the exponent (which is negative in this case, so:
-     *    ndecimal - (-dtoa.exp - 1) - ndigit
-     *
-     * These all turn out to be the same computation. Kinda cool.
-     */
-    ntrailing = (dtoa.exp + 1 - ndigit) + ndecimal;
-    /*
-     * If this value is negative, then we actually have *no* digits to
-     * generate. In this case, we return the empty string and set the
-     * exponent to the number of digits requested (as they're all
-     * zero)
-     */
-    if (ntrailing < 0) {
+    if (!isfinite(invalue)) {
+        ndigit = 3;
         ntrailing = 0;
-        ndigit = 0;
+        *sign = invalue < 0;
+        *decpt = 0;
+        if (isnan(invalue))
+            digits = "nan";
+        else
+            digits = "inf";
+    } else {
+        /* ndecimal = digits after decimal point desired
+         * ndigit = digits actually generated
+         * dtoa.exp = exponent (position of decimal relative to first digit generated)
+         */
+        if (ndecimal < 0)
+            dtoa_decimal = 0;
+        ndigit = __dtoa_engine(invalue, &dtoa, DTOA_MAX_DIG, true, ndecimal);
+        *sign = !!(dtoa.flags & DTOA_MINUS);
 
         /*
-         * Adjust exponent to reflect the desired output of ndecimal
-         * zeros
+         * To compute the number of zeros added after the value, there are
+         * three cases:
+         *
+         * 1. all of the generated digits are left of the decimal
+         *    point (dtoa.exp >= ndigit). We need (dtoa.exp - ndigit)
+         *    digits left of the decimal and ndecimal right of the
+         *    decimal: (dtoa.exp - ndigit) + ndecimal
+         *
+         * 2. some of the generated digits are right
+         *    of the decimal point (dtoa.exp < ndigit). We need
+         *    ndecimal digits total, but we have (ndigit - dtoa.exp)
+         *    already, so: ndecimal - (ndigit - dtoa.exp).
+         *
+         * 3. all of the generated digits are right of the decimal point
+         *    We need fewer than ndecimal digits by the magnitude of
+         *    the exponent (which is negative in this case, so:
+         *    ndecimal - (-dtoa.exp - 1) - ndigit
+         *
+         * These all turn out to be the same computation. Kinda cool.
          */
-        dtoa.exp = -(ndecimal + 1);
-    }
+        ntrailing = (dtoa.exp + 1 - ndigit) + dtoa_decimal;
+        /*
+         * If this value is negative, then we actually have *no* digits to
+         * generate. In this case, we return the empty string and set the
+         * exponent to the number of digits requested (as they're all
+         * zero)
+         */
+        if (ntrailing < 0) {
+            ntrailing = 0;
+            ndigit = 0;
 
-    *decpt = dtoa.exp + 1;
+            /*
+             * Adjust exponent to reflect the desired output of ndecimal
+             * zeros
+             */
+            dtoa.exp = -(dtoa_decimal + 1);
+        }
+        *decpt = dtoa.exp + 1;
+    }
 
     /* If we can't fit the whole value in the provided space,
      * return an error
@@ -109,7 +121,7 @@ fcvt_r (double invalue,
         return -1;
 
     /* Value */
-    memcpy(buf, dtoa.digits, ndigit);
+    memcpy(buf, digits, ndigit);
     len -= ndigit;
     buf += ndigit;
 

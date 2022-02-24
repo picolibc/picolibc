@@ -61,7 +61,7 @@ typedef struct floating_decimal_64 {
 } floating_decimal_64;
 
 static inline floating_decimal_64
-d2d(const uint64_t ieeeMantissa, const uint32_t ieeeExponent, int max_digits, int max_decimals)
+d2d(const uint64_t ieeeMantissa, const uint32_t ieeeExponent, int max_digits, bool fmode, int max_decimals)
 {
 	int32_t e2;
 	uint64_t m2;
@@ -188,15 +188,16 @@ d2d(const uint64_t ieeeMantissa, const uint32_t ieeeExponent, int max_digits, in
 	 *               there are exp digits to the left of
 	 *               the decimal point
 	 *
-	 * max_decimals:  Only used in 'f' format. Display no more than this
-	 *               many digits (-1) to the right of the decimal point
+	 * max_decimals: Only used in 'f' format. Round to this many
+	 *               digits to the right of the decimal point
+	 *               (left if negative)
 	 *
 	 * max_digits:	 We can't convert more than this number of digits given
 	 *               the limits of the buffer
 	 */
 
 	int save_max_digits = max_digits;
-	if(max_decimals != 0) {
+	if(fmode) {
 		int exp = e10 + decimalLength17(vr) - 1;
 		/*
 		 * This covers two cases:
@@ -215,8 +216,7 @@ d2d(const uint64_t ieeeMantissa, const uint32_t ieeeExponent, int max_digits, in
 		 * A single expression gives the right answer in both
 		 * cases, which is kinda cool
 		 */
-		/* max_decimals comes in biased by 1 to flag the 'f' case */
-		max_digits = min_int(max_digits, max_int(0, max_decimals - 1 + exp + 1));
+		max_digits = min_int(max_digits, max_int(1, max_decimals + exp + 1));
 	}
 
 	for (;;) {
@@ -285,10 +285,10 @@ d2d(const uint64_t ieeeMantissa, const uint32_t ieeeExponent, int max_digits, in
 		if (len > max_digits) {
 
 			/* Recompute max digits in this case */
-			if(max_decimals != 0) {
+                        if(fmode) {
 				int exp = e10 + len - 1;
 				/* max_decimals comes in biased by 1 to flag the 'f' case */
-				max_digits = min_int(save_max_digits, max_int(0, max_decimals - 1 + exp + 1));
+				max_digits = min_int(save_max_digits, max_int(0, max_decimals + exp + 1));
 			}
 
 			if (len > max_digits) {
@@ -350,7 +350,7 @@ static inline bool d2d_small_int(const uint64_t ieeeMantissa, const uint32_t iee
 #include "dtoa_engine.h"
 
 int
-__dtoa_engine(double x, struct dtoa *dtoa, int max_digits, int max_decimals)
+__dtoa_engine(double x, struct dtoa *dtoa, int max_digits, bool fmode, int max_decimals)
 {
 	// Step 1: Decode the floating-point number, and unify normalized and subnormal cases.
 	const uint64_t bits = double_to_bits(x);
@@ -407,7 +407,7 @@ __dtoa_engine(double x, struct dtoa *dtoa, int max_digits, int max_decimals)
 			++v.exponent;
 		}
 	} else {
-		v = d2d(ieeeMantissa, ieeeExponent, max_digits, max_decimals);
+		v = d2d(ieeeMantissa, ieeeExponent, max_digits, fmode, max_decimals);
 	}
 
 	uint64_t mant = v.mantissa;

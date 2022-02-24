@@ -62,7 +62,7 @@ typedef int32_t printf_float_int_t;
 #define DTOA_NAN   FTOA_NAN
 #define DTOA_CARRY FTOA_CARRY
 #define DTOA_MAX_DIG FTOA_MAX_DIG
-#define __dtoa_engine(x,dtoa,dig,dec) __ftoa_engine(x,dtoa,dig,dec)
+#define __dtoa_engine(x,dtoa,dig,f,dec) __ftoa_engine(x,dtoa,dig,f,dec)
 #include "ftoa_engine.h"
 
 #else
@@ -675,29 +675,29 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
             } else
 #endif /* _WANT_IO_C99_FORMATS */
             {
-                int ndecimal;	        /* digits after decimal (for 'f' format), 0 if no limit */
+                int ndecimal = 0;	        /* digits after decimal (for 'f' format) */
+                bool fmode = false;
 
                 if (!(flags & FL_PREC))
                     prec = 6;
                 if (c == 'e') {
                     ndigs = prec + 1;
-                    ndecimal = 0;
                     flags |= FL_FLTEXP;
                 } else if (c == 'f') {
                     ndigs = DTOA_MAX_DIG;
-                    ndecimal = prec + 1;
+                    ndecimal = prec;
                     flags |= FL_FLTFIX;
+                    fmode = true;
                 } else {
                     c += 'e' - 'g';
                     ndigs = prec;
                     if (ndigs < 1) ndigs = 1;
-                    ndecimal = 0;
                 }
 
                 if (ndigs > DTOA_MAX_DIG)
                     ndigs = DTOA_MAX_DIG;
 
-                ndigs = __dtoa_engine (fval, &_dtoa, ndigs, ndecimal);
+                ndigs = __dtoa_engine (fval, &_dtoa, ndigs, fmode, ndecimal);
                 exp = _dtoa.exp;
                 ndigs_exp = 2;
             }

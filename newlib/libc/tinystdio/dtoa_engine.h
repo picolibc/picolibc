@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <float.h>
+#include <stdbool.h>
 
 #ifndef DBL_MAX_10_EXP
 #error DBL_MAX_10_EXP
@@ -83,7 +84,7 @@ struct dtoa {
 };
 
 int
-__dtoa_engine(FLOAT x, struct dtoa *dtoa, int max_digits, int max_decimals);
+__dtoa_engine(FLOAT x, struct dtoa *dtoa, int max_digits, bool fmode, int max_decimals);
 
 extern NEWLIB_THREAD_LOCAL char __ecvt_buf[DTOA_MAX_DIG + 1];
 

@@ -87,7 +87,7 @@ static const uint32_t factorTable[32] = {
 		__typeof(b) _b = b;\
 		_a < _b ? _a : _b; })
 
-int __ftoa_engine(float val, struct ftoa *ftoa, int maxDigits, int maxDecimals) 
+int __ftoa_engine(float val, struct ftoa *ftoa, int maxDigits, bool fmode, int maxDecimals) 
 {
     uint8_t flags = 0;
 
@@ -184,9 +184,9 @@ int __ftoa_engine(float val, struct ftoa *ftoa, int maxDigits, int maxDecimals)
                 hadNonzeroDigit = 1;
 
                 /* If limiting decimals... */
-                if(maxDecimals != 0)
+                if(fmode)
                 {
-		    maxDigits = min(maxDigits, max(0, maxDecimals - 1 + exp10 + 1));
+		    maxDigits = min(maxDigits, max(1, maxDecimals + exp10 + 1));
 		    if (maxDigits == 0)
 			break;
                 }
@@ -241,8 +241,8 @@ int __ftoa_engine(float val, struct ftoa *ftoa, int maxDigits, int maxDecimals)
                  */
 		ftoa->digits[0] = '1';
 		exp10++;
-		if (maxDecimals != 0)
-		    maxDigits = min(saveMaxDigits, max(0, maxDecimals - 1 + exp10 + 1));
+		if (fmode)
+		    maxDigits = min(saveMaxDigits, max(1, maxDecimals + exp10 + 1));
 		flags |= FTOA_CARRY;
 	    }
         }

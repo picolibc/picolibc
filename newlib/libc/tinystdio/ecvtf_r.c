@@ -55,7 +55,7 @@ ecvtf_r (float invalue,
     if (ndigit < 0)
         return -1;
 
-    ngot = __ftoa_engine(invalue, &ftoa, ndigit, 0);
+    ngot = __ftoa_engine(invalue, &ftoa, ndigit, false, 0);
     *sign = !!(ftoa.flags & FTOA_MINUS);
     *decpt = ftoa.exp + 1;
     memset(buf, '0', ndigit);
