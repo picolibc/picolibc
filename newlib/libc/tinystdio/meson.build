@@ -35,10 +35,8 @@
 srcs_tinystdio = [
     'asprintf.c',
     'clearerr.c',
-    'ecvt_data.c',
     'ecvt_r.c',
     'ecvt.c',
-    'ecvtf_data.c',
     'ecvtf_r.c',
     'ecvtf.c',
     'fcvt.c',

@@ -34,10 +34,12 @@
  */
 
 #define _GNU_SOURCE
-#include "ftoa_engine.h"
 #include <_ansi.h>
 #include <stdlib.h>
 #include <string.h>
+#include "ftoa_engine.h"
+
+static NEWLIB_THREAD_LOCAL char ecvtf_buf[FTOA_MAX_DIG + 1];
 
 char *
 ecvtf (float invalue,
@@ -45,7 +47,7 @@ ecvtf (float invalue,
        int *decpt,
        int *sign)
 {
-    if (ecvtf_r(invalue, ndigit, decpt, sign, __ecvtf_buf, sizeof(__ecvtf_buf)) < 0)
+    if (ecvtf_r(invalue, ndigit, decpt, sign, ecvtf_buf, sizeof(ecvtf_buf)) < 0)
         return NULL;
-    return __ecvtf_buf;
+    return ecvtf_buf;
 }

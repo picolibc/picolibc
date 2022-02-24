@@ -86,8 +86,6 @@ struct dtoa {
 int
 __dtoa_engine(FLOAT x, struct dtoa *dtoa, int max_digits, bool fmode, int max_decimals);
 
-extern NEWLIB_THREAD_LOCAL char __ecvt_buf[DTOA_MAX_DIG + 1];
-
 extern const FLOAT __dtoa_scale_up[];
 extern const FLOAT __dtoa_scale_down[];
 extern const FLOAT __dtoa_round[];

@@ -46,8 +46,6 @@ struct ftoa {
 
 int __ftoa_engine (float val, struct ftoa *ftoa, int maxDigits, bool fmode, int maxDecimal);
 
-extern NEWLIB_THREAD_LOCAL char __ecvtf_buf[FTOA_MAX_DIG + 1];
-
 /* '__ftoa_engine' flags return value */
 #define	FTOA_MINUS	1
 #define	FTOA_ZERO	2

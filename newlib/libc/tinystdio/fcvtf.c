@@ -34,10 +34,14 @@
  */
 
 #define _GNU_SOURCE
-#include "ftoa_engine.h"
 #include <_ansi.h>
 #include <stdlib.h>
 #include <string.h>
+#include "ftoa_engine.h"
+
+#define FCVTF_MAXDIG (__FLT_MAX_10_EXP__ + FTOA_MAX_DIG + 1)
+
+static NEWLIB_THREAD_LOCAL char fcvtf_buf[FCVTF_MAXDIG];
 
 char *
 fcvtf (float invalue,
@@ -45,7 +49,7 @@ fcvtf (float invalue,
        int *decpt,
        int *sign)
 {
-    if (fcvt_r(invalue, ndecimal, decpt, sign, __ecvtf_buf, sizeof(__ecvtf_buf)) < 0)
+    if (fcvtf_r(invalue, ndecimal, decpt, sign, fcvtf_buf, sizeof(fcvtf_buf)) < 0)
         return NULL;
-    return __ecvtf_buf;
+    return fcvtf_buf;
 }

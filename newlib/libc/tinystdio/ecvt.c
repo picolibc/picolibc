@@ -34,10 +34,12 @@
  */
 
 #define _GNU_SOURCE
-#include "dtoa_engine.h"
 #include <_ansi.h>
 #include <stdlib.h>
 #include <string.h>
+#include "dtoa_engine.h"
+
+static NEWLIB_THREAD_LOCAL char ecvt_buf[DTOA_MAX_DIG + 1];
 
 char *
 ecvt (double invalue,
@@ -45,7 +47,7 @@ ecvt (double invalue,
       int *decpt,
       int *sign)
 {
-    if (ecvt_r(invalue, ndigit, decpt, sign, __ecvt_buf, sizeof(__ecvt_buf)) < 0)
+    if (ecvt_r(invalue, ndigit, decpt, sign, ecvt_buf, sizeof(ecvt_buf)) < 0)
         return NULL;
-    return __ecvt_buf;
+    return ecvt_buf;
 }
