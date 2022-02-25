@@ -1958,6 +1958,7 @@ class fhandler_termios: public fhandler_base
   virtual void cleanup_before_exit () {}
   virtual void setpgid_aux (pid_t pid) {}
   virtual bool need_console_handler () { return false; }
+  virtual bool need_send_ctrl_c_event () { return true; }
 };
 
 enum ansi_intensity
@@ -2492,6 +2493,7 @@ public:
   void get_master_thread_param (master_thread_param_t *p);
   void get_master_fwd_thread_param (master_fwd_thread_param_t *p);
   void set_mask_flusho (bool m) { get_ttyp ()->mask_flusho = m; }
+  bool need_send_ctrl_c_event ();
 };
 
 class fhandler_dev_null: public fhandler_base
