@@ -208,6 +208,20 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 	case WAIT_OBJECT_0:
 	  ReadConsoleInputW (p->input_handle,
 			     input_rec, INREC_SIZE, &total_read);
+	  if (total_read == INREC_SIZE /* Working space full */
+	      && cygwait (p->input_handle, (DWORD) 0) == WAIT_OBJECT_0)
+	    {
+	      const int incr = 1;
+	      size_t bytes = sizeof (INPUT_RECORD) * (total_read - incr);
+	      /* Discard oldest incr events. */
+	      memmove (input_rec, input_rec + incr, bytes);
+	      total_read -= incr;
+	      processed_up_to =
+		(processed_up_to + 1 >= incr) ? processed_up_to - incr : -1;
+	      ReadConsoleInputW (p->input_handle,
+				 input_rec + total_read, incr, &n);
+	      total_read += n;
+	    }
 	  break;
 	case WAIT_TIMEOUT:
 	  processed_up_to = -1;
@@ -290,8 +304,43 @@ remove_record:
 	}
       processed_up_to = total_read - 1;
       if (total_read)
-	/* Writeback input records other than interrupt. */
-	WriteConsoleInputW (p->input_handle, input_rec, total_read, &n);
+	{
+	  /* Writeback input records other than interrupt. */
+	  WriteConsoleInputW (p->input_handle, input_rec, total_read, &n);
+	  size_t bytes = sizeof (INPUT_RECORD) * total_read;
+	  do
+	    {
+	      const int additional_size = 128; /* Possible max number of
+						  incoming events during
+						  above process. */
+	      const int new_size = INREC_SIZE + additional_size;
+	      INPUT_RECORD tmp[new_size];
+	      /* Check if writeback was successfull. */
+	      PeekConsoleInputW (p->input_handle, tmp, new_size, &n);
+	      if (memcmp (input_rec, tmp, bytes) == 0)
+		break; /* OK */
+	      /* Try to fix */
+	      DWORD incr = n - total_read;
+	      DWORD ofst;
+	      for (ofst = 1; ofst <= incr; ofst++)
+		if (memcmp (input_rec, tmp + ofst, bytes) == 0)
+		  {
+		    ReadConsoleInputW (p->input_handle, tmp, new_size, &n);
+		    DWORD m;
+		    WriteConsoleInputW (p->input_handle, tmp + ofst,
+					total_read, &m);
+		    WriteConsoleInputW (p->input_handle, tmp, ofst, &m);
+		    if ( n > ofst + total_read)
+		      WriteConsoleInputW (p->input_handle,
+					  tmp + ofst + total_read,
+					  n - (ofst + total_read), &m);
+		    break;
+		  }
+	      if (ofst > incr) /* Hard to fix */
+		break; /* Giving up */
+	    }
+	  while (true);
+	}
 skip_writeback:
       ReleaseMutex (p->input_mutex);
       cygwait (40);
