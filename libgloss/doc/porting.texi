@@ -14,6 +14,10 @@
 @global@parindent=0pt
 @end iftex
 
+@set autoconf @ref{Top,,GNU Autoconf,autoconf}
+@set automake @ref{Top,,GNU Automake,automake}
+@set libtool @ref{Top,,GNU Libtool,libtool}
+
 @titlepage
 @title Embed With GNU
 @subtitle Porting The GNU Tools To Embedded Systems
@@ -242,7 +246,7 @@ mostly for Unix based systems.
 @section Configuring and building libgloss.
 
 Libgloss uses an autoconf based script to configure. Autoconf scripts
-are portable shell scripts that are generated from a configure.in file.
+are portable shell scripts that are generated from a configure.ac file.
 Configure input scripts are based themselves on m4. Most configure
 scripts run a series of tests to determine features the various
 supported features of the target. For features that can't be determined
@@ -352,6 +356,50 @@ the dependencies for the @code{all} target and add
 @code{$@{SURF_INSTALL@}} to the dependencies for the @code{install}
 target.  Now, when libgloss is built and installed, support for your
 BSP will be installed as well.
+
+@node Build System Internals
+@section Build System Internals
+
+As noted previously, Libgloss uses GNU Autotools (@value{autoconf} &
+@value{automake}) to build.  @value{libtool} is not used as Libgloss only
+produces objects and static archives, and @value{automake} is capable of
+handling that.
+
+If you're editing any of these files and want to regenerate them, simply run
+@code{autoreconf}.  It will take care of the rest.
+
+Tool versions are strictly controlled.  You must use GNU Autoconf 2.69 and GNU
+Automake 1.15.1 to generate the build files.  If your system does not include
+them, you can manually download and install them into your home directory.
+
+All of the common configure logic lives in @file{configure.ac}.  It checks for
+supported targets and creates the makefiles.  Any architecture that wishes to
+run custom configure tests should store them in @file{acinclude.m4} in their
+respective subdirectory and then use @code{m4_include} in @file{configure.ac}.
+Make sure to avoid running excessive tests for all targets, and avoid using
+generic names that can collide with other architectures -- the build uses a
+flat namespace that is shared among everyone.
+
+Libgloss has partially converted to @value{automake}.  The top-level directory
+uses it with @file{Makefile.am}, as do a few subdirectories with their
+@file{Makefile.inc} fragments.  The other subdirectories still use hand written
+@file{Makefile.in} files.  One day, they should get converted over too.
+Patches welcome!
+
+For directories that have converted to @value{automake}, a non-recursive build
+is used.  That means only a single Makefile is created in the top-level, and no
+Makefiles are created in subdirectories.  Make must be run in the top-level at
+all times.
+
+The @file{config/*.mh} and @file{config/*.mt} files are only used by the non-
+Automake files (i.e., the @file{Makefile.in} files).  They can be ignored for
+any target that has migrated to @value{automake}.
+
+Libgloss automatically builds itself for all multilib configurations that the
+active toolchain supports.  This logic is provided by common code from the
+combined toolchain source tree.  This should @strong{not} be confused with the
+Libgloss-specific @file{multi-build.in} file.  That is used by a few ports to
+further produce multiple targets.
 
 @node GCC, Libraries, Libgloss, Top
 @chapter Porting GCC
