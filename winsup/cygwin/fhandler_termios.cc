@@ -359,16 +359,12 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	     instead. */
 	  if ((p->process_state & PID_NEW_PG)
 	      && (p->process_state & PID_NOTCYGWIN))
-	    {
-	      GenerateConsoleCtrlEvent (CTRL_BREAK_EVENT,
-					p->dwProcessId);
-	      need_discard_input = true;
-	    }
-	  else if (!ctrl_c_event_sent)
+	    GenerateConsoleCtrlEvent (CTRL_BREAK_EVENT, p->dwProcessId);
+	  else if ((!fh || fh->need_send_ctrl_c_event () || cyg_leader)
+			  && !ctrl_c_event_sent)
 	    {
 	      GenerateConsoleCtrlEvent (CTRL_C_EVENT, 0);
 	      ctrl_c_event_sent = true;
-	      need_discard_input = true;
 	    }
 	  if (resume_pid && fh && !fh->is_console ())
 	    {
@@ -377,6 +373,7 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	      if (::cygheap->ctty && ::cygheap->ctty->is_console ())
 		init_console_handler (true);
 	    }
+	  need_discard_input = true;
 	}
       if (p && p->ctty == ttyp->ntty && p->pgid == pgid)
 	{

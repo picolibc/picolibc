@@ -4054,3 +4054,14 @@ fhandler_pty_slave::cleanup_for_non_cygwin_app (handle_set_t *p, tty *ttyp,
   close_pseudoconsole (ttyp);
   ReleaseMutex (p->pcon_mutex);
 }
+
+bool
+fhandler_pty_master::need_send_ctrl_c_event ()
+{
+  /* If pseudo console is activated, sending CTRL_C_EVENT to non-cygwin
+     apps will be done in pseudo console, therefore, sending it in
+     fhandler_pty_master::write() duplicates that event for non-cygwin
+     apps. So return false if pseudo console is activated. */
+  return !(to_be_read_from_pcon () && get_ttyp ()->pcon_activated
+    && get_ttyp ()->pcon_input_state == tty::to_nat);
+}
