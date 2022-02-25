@@ -189,7 +189,7 @@ void
 fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 {
   termios &ti = ttyp->ti;
-  DWORD output_stopped_at = 0;
+  int processed_up_to = -1;
   while (con.owner == myself->pid)
     {
       DWORD total_read, n, i;
@@ -210,6 +210,7 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 			     input_rec, INREC_SIZE, &total_read);
 	  break;
 	case WAIT_TIMEOUT:
+	  processed_up_to = -1;
 	case WAIT_SIGNALED:
 	case WAIT_CANCELED:
 	  break;
@@ -232,11 +233,10 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 	      ttyp->kill_pgrp (SIGWINCH);
 	    }
 	}
-      for (i = 0; i < total_read; i++)
+      for (i = processed_up_to + 1; i < total_read; i++)
 	{
 	  wchar_t wc;
 	  char c;
-	  bool was_output_stopped;
 	  bool processed = false;
 	  switch (input_rec[i].EventType)
 	    {
@@ -256,14 +256,12 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 		  ttyp->output_stopped = false;
 		  if (ti.c_lflag & NOFLSH)
 		    goto remove_record;
+		  processed_up_to = -1;
 		  goto skip_writeback;
 		default: /* not signalled */
 		  break;
 		}
-	      was_output_stopped = ttyp->output_stopped;
-	      processed = process_stop_start (c, ttyp, i > output_stopped_at);
-	      if (!was_output_stopped && ttyp->output_stopped)
-		output_stopped_at = i;
+	      processed = process_stop_start (c, ttyp);
 	      break;
 	    case WINDOW_BUFFER_SIZE_EVENT:
 	      SHORT y = con.dwWinSize.Y;
@@ -283,14 +281,16 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 remove_record:
 	  if (processed)
 	    { /* Remove corresponding record. */
-	      memmove (input_rec + i, input_rec + i + 1,
-		       sizeof (INPUT_RECORD) * (total_read - i - 1));
+	      if (total_read > i + 1)
+		memmove (input_rec + i, input_rec + i + 1,
+			 sizeof (INPUT_RECORD) * (total_read - i - 1));
 	      total_read--;
 	      i--;
 	    }
 	}
+      processed_up_to = total_read - 1;
       if (total_read)
-	/* Write back input records other than interrupt. */
+	/* Writeback input records other than interrupt. */
 	WriteConsoleInputW (p->input_handle, input_rec, total_read, &n);
 skip_writeback:
       ReleaseMutex (p->input_mutex);

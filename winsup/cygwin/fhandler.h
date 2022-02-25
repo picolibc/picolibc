@@ -1921,7 +1921,7 @@ class fhandler_termios: public fhandler_base
   HANDLE& get_output_handle_nat () { return output_handle; }
   static process_sig_state process_sigs (char c, tty *ttyp,
 					 fhandler_termios *fh);
-  static bool process_stop_start (char c, tty *ttyp, bool on_ixany);
+  static bool process_stop_start (char c, tty *ttyp);
   line_edit_status line_edit (const char *rptr, size_t nread, termios&,
 			      ssize_t *bytes_read = NULL);
   void set_output_handle (HANDLE h) { output_handle = h; }

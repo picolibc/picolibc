@@ -344,10 +344,12 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	      (myself->dwProcessId, false);
 	  if (resume_pid && fh && !fh->is_console ())
 	    {
+	      if (::cygheap->ctty && ::cygheap->ctty->is_console ())
+		init_console_handler (false);
 	      FreeConsole ();
 	      AttachConsole (p->dwProcessId);
 	    }
-	  if (fh && p == myself)
+	  if (fh && p == myself && being_debugged ())
 	    { /* Avoid deadlock in gdb on console. */
 	      fh->tcflush(TCIFLUSH);
 	      fh->release_input_mutex_if_necessary ();
@@ -372,6 +374,8 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	    {
 	      FreeConsole ();
 	      AttachConsole (resume_pid);
+	      if (::cygheap->ctty && ::cygheap->ctty->is_console ())
+		init_console_handler (true);
 	    }
 	}
       if (p && p->ctty == ttyp->ntty && p->pgid == pgid)
@@ -447,7 +451,7 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
       return signalled;
     }
 not_a_sig:
-  if (need_discard_input)
+  if ((ti.c_lflag & ISIG) && need_discard_input)
     {
       if (!(ti.c_lflag & NOFLSH) && fh)
 	{
@@ -462,7 +466,7 @@ not_a_sig:
 }
 
 bool
-fhandler_termios::process_stop_start (char c, tty *ttyp, bool on_ixany)
+fhandler_termios::process_stop_start (char c, tty *ttyp)
 {
   termios &ti = ttyp->ti;
   if (ti.c_iflag & IXON)
@@ -478,7 +482,7 @@ restart_output:
 	  ttyp->output_stopped = false;
 	  return true;
 	}
-      else if ((ti.c_iflag & IXANY) && ttyp->output_stopped && on_ixany)
+      else if ((ti.c_iflag & IXANY) && ttyp->output_stopped)
 	goto restart_output;
     }
   if ((ti.c_lflag & ICANON) && (ti.c_lflag & IEXTEN)
@@ -526,7 +530,7 @@ fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
 	default: /* Not signalled */
 	  break;
 	}
-      if (process_stop_start (c, get_ttyp (), true))
+      if (process_stop_start (c, get_ttyp ()))
 	continue;
       /* Check for special chars */
       if (c == '\r')

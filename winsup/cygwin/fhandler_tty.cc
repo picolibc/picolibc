@@ -2301,7 +2301,7 @@ fhandler_pty_master::write (const void *ptr, size_t len)
 	      nlen--;
 	      i--;
 	    }
-	  process_stop_start (buf[i], get_ttyp (), true);
+	  process_stop_start (buf[i], get_ttyp ());
 	}
 
       DWORD n;
