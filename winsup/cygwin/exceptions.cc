@@ -1139,7 +1139,11 @@ ctrl_c_handler (DWORD type)
     }
 
   if (ch_spawn.set_saw_ctrl_c ())
-    return TRUE;
+    {
+      if (myself->process_state & PID_NOTCYGWIN)
+	sigExeced = SIGINT;
+      return TRUE;
+    }
 
   /* We're only the process group leader when we have a valid pinfo structure.
      If we don't have one, then the parent "stub" will handle the signal. */
