@@ -1174,8 +1174,14 @@ ctrl_c_handler (DWORD type)
        (to indicate that we have handled the signal).  At this point, type
        should be a CTRL_C_EVENT or CTRL_BREAK_EVENT. */
     {
+      int sig = SIGINT;
+      /* If intr and quit are both mapped to ^C, send SIGQUIT on ^BREAK */
+      if (type == CTRL_BREAK_EVENT
+	  && t->ti.c_cc[VINTR] == 3 && t->ti.c_cc[VQUIT] == 3)
+	sig = SIGQUIT;
       t->last_ctrl_c = GetTickCount64 ();
-      fhandler_termios::process_sigs ('\003', (tty *) t, ::cygheap->ctty);
+      t->kill_pgrp (sig);
+      t->output_stopped = false;
       t->last_ctrl_c = GetTickCount64 ();
       return TRUE;
     }
