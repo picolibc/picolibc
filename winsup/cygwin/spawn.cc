@@ -953,7 +953,15 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  if (sem)
 	    __posix_spawn_sem_release (sem, 0);
 	  if (ptys_need_cleanup || cons_need_cleanup)
-	    WaitForSingleObject (pi.hProcess, INFINITE);
+	    {
+	      LONG prev_sigExeced = sigExeced;
+	      while (WaitForSingleObject (pi.hProcess, 100) == WAIT_TIMEOUT)
+		/* If child process does not exit in predetermined time
+		   period, the process does not seem to be terminated by
+		   the signal sigExeced. Therefore, clear sigExeced here. */
+		prev_sigExeced =
+		  InterlockedCompareExchange (&sigExeced, 0, prev_sigExeced);
+	    }
 	  if (ptys_need_cleanup)
 	    {
 	      fhandler_pty_slave::cleanup_for_non_cygwin_app (&ptys_handle_set,
@@ -966,6 +974,11 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	      fhandler_console::cleanup_for_non_cygwin_app (&cons_handle_set);
 	      fhandler_console::close_handle_set (&cons_handle_set);
 	    }
+	  /* Make sure that ctrl_c_handler() is not on going. Calling
+	     init_console_handler(false) locks until returning from
+	     ctrl_c_handler(). This insures that setting sigExeced
+	     on Ctrl-C key has been completed. */
+	  init_console_handler (false);
 	  myself.exit (EXITCODE_NOSET);
 	  break;
 	case _P_WAIT:
