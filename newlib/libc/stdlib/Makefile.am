@@ -19,6 +19,8 @@ GENERAL_SOURCES = \
 	atoi.c  	\
 	atol.c		\
 	calloc.c	\
+	callocr.c	\
+	cfreer.c	\
 	div.c  		\
 	dtoa.c 		\
 	dtoastub.c 	\
@@ -26,6 +28,7 @@ GENERAL_SOURCES = \
 	envlock.c	\
 	eprintf.c	\
 	exit.c 		\
+	freer.c		\
 	gdtoa-gethex.c	\
 	gdtoa-hexnan.c	\
 	getenv.c  	\
@@ -40,7 +43,10 @@ GENERAL_SOURCES = \
 	gdtoa-gdtoa.c	\
 	gdtoa-dmisc.c	\
 	gdtoa-gmisc.c	\
+	mallinfor.c	\
 	malloc.c  	\
+	mallocr.c	\
+	mallstatsr.c	\
 	mblen.c		\
 	mblen_r.c	\
 	mbstowcs.c	\
@@ -49,6 +55,7 @@ GENERAL_SOURCES = \
 	mbtowc_r.c	\
 	mlock.c		\
 	mprec.c		\
+	msizer.c	\
 	mstats.c	\
 	on_exit_args.c	\
 	quick_exit.c	\
@@ -58,6 +65,7 @@ GENERAL_SOURCES = \
 	realloc.c	\
 	reallocarray.c	\
 	reallocf.c	\
+	reallocr.c	\
 	sb_charsets.c	\
 	strtod.c	\
 	strtoimax.c	\
@@ -121,23 +129,21 @@ ELIX_2_SOURCES = \
 	getsubopt.c	\
 	l64a.c		\
 	malign.c	\
+	malignr.c	\
+	malloptr.c	\
 	mbrlen.c	\
 	mbrtowc.c	\
 	mbsinit.c	\
 	mbsnrtowcs.c	\
 	mbsrtowcs.c	\
 	on_exit.c	\
+	pvallocr.c	\
 	valloc.c	\
+	vallocr.c	\
 	wcrtomb.c	\
 	wcsnrtombs.c	\
 	wcsrtombs.c	\
 	wctob.c
-
-ELIX_2_OBJS = \
-	$(lpfx)malignr.o	\
-	$(lpfx)malloptr.o \
-	$(lpfx)pvallocr.o	\
-	$(lpfx)vallocr.o
 
 ELIX_3_SOURCES = \
 	putenv.c	\
@@ -151,91 +157,19 @@ ELIX_4_SOURCES = \
 
 if ELIX_LEVEL_1
 ELIX_SOURCES =
-ELIX_OBJS =
 else
 if ELIX_LEVEL_2
 ELIX_SOURCES = $(ELIX_2_SOURCES)
-ELIX_OBJS = $(ELIX_2_OBJS)
 else
 if ELIX_LEVEL_3
 ELIX_SOURCES = $(ELIX_2_SOURCES) $(ELIX_3_SOURCES)
-ELIX_OBJS = $(ELIX_2_OBJS)
 else
 ELIX_SOURCES = $(ELIX_2_SOURCES) $(ELIX_3_SOURCES) $(ELIX_4_SOURCES)
-ELIX_OBJS = $(ELIX_2_OBJS)
 endif
 endif
 endif
-
-# Because of how libtool moves objects around, mallocr must be built last.
-LIBADD_OBJS = $(lpfx)freer.o $(lpfx)reallocr.o \
-	$(lpfx)callocr.o $(lpfx)cfreer.o \
-	$(lpfx)mallinfor.o $(lpfx)mallstatsr.o \
-	$(lpfx)msizer.o $(lpfx)mallocr.o
 
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(GENERAL_SOURCES) $(EXTENDED_SOURCES) $(ELIX_SOURCES)
-lib_a_LIBADD = $(LIBADD_OBJS) $(ELIX_OBJS)
+lib_a_LIBADD =
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_DEPENDENCIES = $(LIBADD_OBJS) $(ELIX_OBJS)
-LIB_COMPILE = $(AM_V_CC)$(COMPILE)
-
-$(lpfx)mallocr.o: _mallocr.c
-	$(LIB_COMPILE) -DDEFINE_MALLOC -c $< -o $@
-
-$(lpfx)freer.o: _mallocr.c
-	$(LIB_COMPILE) -DDEFINE_FREE -c $< -o $@
-
-$(lpfx)reallocr.o: _mallocr.c
-	$(LIB_COMPILE) -DDEFINE_REALLOC -c $< -o $@
-
-$(lpfx)callocr.o: _mallocr.c
-	$(LIB_COMPILE) -DDEFINE_CALLOC -c $< -o $@
-
-$(lpfx)cfreer.o: _mallocr.c
-	$(LIB_COMPILE) -DDEFINE_CFREE -c $< -o $@
-
-$(lpfx)malignr.o: _mallocr.c
-	$(LIB_COMPILE) -DDEFINE_MEMALIGN -c $< -o $@
-
-$(lpfx)vallocr.o: _mallocr.c
-	$(LIB_COMPILE) -DDEFINE_VALLOC -c $< -o $@
-
-$(lpfx)pvallocr.o: _mallocr.c
-	$(LIB_COMPILE) -DDEFINE_PVALLOC -c $< -o $@
-
-$(lpfx)mallinfor.o: _mallocr.c
-	$(LIB_COMPILE) -DDEFINE_MALLINFO -c $< -o $@
-
-$(lpfx)mallstatsr.o: _mallocr.c
-	$(LIB_COMPILE) -DDEFINE_MALLOC_STATS -c $< -o $@
-
-$(lpfx)msizer.o: _mallocr.c
-	$(LIB_COMPILE) -DDEFINE_MALLOC_USABLE_SIZE -c $< -o $@
-
-$(lpfx)malloptr.o: _mallocr.c
-	$(LIB_COMPILE) -DDEFINE_MALLOPT -c $< -o $@
-
-$(lpfx)dtoa.o: dtoa.c mprec.h
-$(lpfx)ldtoa.o: ldtoa.c mprec.h gdtoa.h
-$(lpfx)gdtoa-ldtoa.o: gdtoa-ldtoa.c mprec.h gdtoaimp.h gdtoa.h
-$(lpfx)gdtoa-gdtoa.o: gdtoa-gdtoa.c mprec.h gdtoaimp.h gdtoa.h
-$(lpfx)gdtoa-dmisc.o: gdtoa-dmisc.c mprec.h gdtoaimp.h gdtoa.h
-$(lpfx)gdtoa-gmisc.o: gdtoa-gmisc.c mprec.h gdtoaimp.h gdtoa.h
-$(lpfx)ecvtbuf.o: ecvtbuf.c mprec.h
-$(lpfx)mbtowc_r.o: mbtowc_r.c mbctype.h
-$(lpfx)mprec.o: mprec.c mprec.h
-$(lpfx)strtod.o: strtod.c mprec.h
-$(lpfx)gdtoa-gethex.o: gdtoa-gethex.c mprec.h
-$(lpfx)gdtoa-hexnan.o: gdtoa-hexnan.c mprec.h
-$(lpfx)wctomb_r.o: wctomb_r.c mbctype.h
-$(lpfx)drand48.o: drand48.c rand48.h
-$(lpfx)erand48.o: erand48.c rand48.h
-$(lpfx)jrand48.o: jrand48.c rand48.h
-$(lpfx)lcong48.o: lcong48.c rand48.h
-$(lpfx)lrand48.o: lrand48.c rand48.h
-$(lpfx)mrand48.o: mrand48.c rand48.h
-$(lpfx)nrand48.o: nrand48.c rand48.h
-$(lpfx)rand48.o: rand48.c rand48.h
-$(lpfx)seed48.o: seed48.c rand48.h
-$(lpfx)srand48.o: srand48.c rand48.h

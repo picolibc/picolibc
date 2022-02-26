@@ -123,10 +123,7 @@ am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
 am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 lib_a_AR = $(AR) $(ARFLAGS)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__DEPENDENCIES_1 = $(ELIX_2_OBJS)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@am__DEPENDENCIES_1 = $(ELIX_2_OBJS)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__DEPENDENCIES_1 =  \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@	$(ELIX_2_OBJS)
+lib_a_DEPENDENCIES =
 @HAVE_LONG_DOUBLE_TRUE@am__objects_1 = lib_a-strtodg.$(OBJEXT) \
 @HAVE_LONG_DOUBLE_TRUE@	lib_a-strtold.$(OBJEXT) \
 @HAVE_LONG_DOUBLE_TRUE@	lib_a-strtorx.$(OBJEXT) \
@@ -139,34 +136,38 @@ am__objects_2 = lib_a-__adjust.$(OBJEXT) lib_a-__atexit.$(OBJEXT) \
 	lib_a-atexit.$(OBJEXT) lib_a-atof.$(OBJEXT) \
 	lib_a-atoff.$(OBJEXT) lib_a-atoi.$(OBJEXT) \
 	lib_a-atol.$(OBJEXT) lib_a-calloc.$(OBJEXT) \
+	lib_a-callocr.$(OBJEXT) lib_a-cfreer.$(OBJEXT) \
 	lib_a-div.$(OBJEXT) lib_a-dtoa.$(OBJEXT) \
 	lib_a-dtoastub.$(OBJEXT) lib_a-environ.$(OBJEXT) \
 	lib_a-envlock.$(OBJEXT) lib_a-eprintf.$(OBJEXT) \
-	lib_a-exit.$(OBJEXT) lib_a-gdtoa-gethex.$(OBJEXT) \
-	lib_a-gdtoa-hexnan.$(OBJEXT) lib_a-getenv.$(OBJEXT) \
-	lib_a-getenv_r.$(OBJEXT) lib_a-imaxabs.$(OBJEXT) \
-	lib_a-imaxdiv.$(OBJEXT) lib_a-itoa.$(OBJEXT) \
-	lib_a-labs.$(OBJEXT) lib_a-ldiv.$(OBJEXT) \
+	lib_a-exit.$(OBJEXT) lib_a-freer.$(OBJEXT) \
+	lib_a-gdtoa-gethex.$(OBJEXT) lib_a-gdtoa-hexnan.$(OBJEXT) \
+	lib_a-getenv.$(OBJEXT) lib_a-getenv_r.$(OBJEXT) \
+	lib_a-imaxabs.$(OBJEXT) lib_a-imaxdiv.$(OBJEXT) \
+	lib_a-itoa.$(OBJEXT) lib_a-labs.$(OBJEXT) lib_a-ldiv.$(OBJEXT) \
 	lib_a-ldtoa.$(OBJEXT) lib_a-gdtoa-ldtoa.$(OBJEXT) \
 	lib_a-gdtoa-gdtoa.$(OBJEXT) lib_a-gdtoa-dmisc.$(OBJEXT) \
-	lib_a-gdtoa-gmisc.$(OBJEXT) lib_a-malloc.$(OBJEXT) \
-	lib_a-mblen.$(OBJEXT) lib_a-mblen_r.$(OBJEXT) \
-	lib_a-mbstowcs.$(OBJEXT) lib_a-mbstowcs_r.$(OBJEXT) \
-	lib_a-mbtowc.$(OBJEXT) lib_a-mbtowc_r.$(OBJEXT) \
-	lib_a-mlock.$(OBJEXT) lib_a-mprec.$(OBJEXT) \
+	lib_a-gdtoa-gmisc.$(OBJEXT) lib_a-mallinfor.$(OBJEXT) \
+	lib_a-malloc.$(OBJEXT) lib_a-mallocr.$(OBJEXT) \
+	lib_a-mallstatsr.$(OBJEXT) lib_a-mblen.$(OBJEXT) \
+	lib_a-mblen_r.$(OBJEXT) lib_a-mbstowcs.$(OBJEXT) \
+	lib_a-mbstowcs_r.$(OBJEXT) lib_a-mbtowc.$(OBJEXT) \
+	lib_a-mbtowc_r.$(OBJEXT) lib_a-mlock.$(OBJEXT) \
+	lib_a-mprec.$(OBJEXT) lib_a-msizer.$(OBJEXT) \
 	lib_a-mstats.$(OBJEXT) lib_a-on_exit_args.$(OBJEXT) \
 	lib_a-quick_exit.$(OBJEXT) lib_a-rand.$(OBJEXT) \
 	lib_a-rand_r.$(OBJEXT) lib_a-random.$(OBJEXT) \
 	lib_a-realloc.$(OBJEXT) lib_a-reallocarray.$(OBJEXT) \
-	lib_a-reallocf.$(OBJEXT) lib_a-sb_charsets.$(OBJEXT) \
-	lib_a-strtod.$(OBJEXT) lib_a-strtoimax.$(OBJEXT) \
-	lib_a-strtol.$(OBJEXT) lib_a-strtoul.$(OBJEXT) \
-	lib_a-strtoumax.$(OBJEXT) lib_a-utoa.$(OBJEXT) \
-	lib_a-wcstod.$(OBJEXT) lib_a-wcstoimax.$(OBJEXT) \
-	lib_a-wcstol.$(OBJEXT) lib_a-wcstoul.$(OBJEXT) \
-	lib_a-wcstoumax.$(OBJEXT) lib_a-wcstombs.$(OBJEXT) \
-	lib_a-wcstombs_r.$(OBJEXT) lib_a-wctomb.$(OBJEXT) \
-	lib_a-wctomb_r.$(OBJEXT) $(am__objects_1)
+	lib_a-reallocf.$(OBJEXT) lib_a-reallocr.$(OBJEXT) \
+	lib_a-sb_charsets.$(OBJEXT) lib_a-strtod.$(OBJEXT) \
+	lib_a-strtoimax.$(OBJEXT) lib_a-strtol.$(OBJEXT) \
+	lib_a-strtoul.$(OBJEXT) lib_a-strtoumax.$(OBJEXT) \
+	lib_a-utoa.$(OBJEXT) lib_a-wcstod.$(OBJEXT) \
+	lib_a-wcstoimax.$(OBJEXT) lib_a-wcstol.$(OBJEXT) \
+	lib_a-wcstoul.$(OBJEXT) lib_a-wcstoumax.$(OBJEXT) \
+	lib_a-wcstombs.$(OBJEXT) lib_a-wcstombs_r.$(OBJEXT) \
+	lib_a-wctomb.$(OBJEXT) lib_a-wctomb_r.$(OBJEXT) \
+	$(am__objects_1)
 am__objects_3 = lib_a-arc4random.$(OBJEXT) \
 	lib_a-arc4random_uniform.$(OBJEXT) lib_a-cxa_atexit.$(OBJEXT) \
 	lib_a-cxa_finalize.$(OBJEXT) lib_a-drand48.$(OBJEXT) \
@@ -185,10 +186,12 @@ am__objects_3 = lib_a-arc4random.$(OBJEXT) \
 am__objects_4 = lib_a-a64l.$(OBJEXT) lib_a-btowc.$(OBJEXT) \
 	lib_a-getopt.$(OBJEXT) lib_a-getsubopt.$(OBJEXT) \
 	lib_a-l64a.$(OBJEXT) lib_a-malign.$(OBJEXT) \
+	lib_a-malignr.$(OBJEXT) lib_a-malloptr.$(OBJEXT) \
 	lib_a-mbrlen.$(OBJEXT) lib_a-mbrtowc.$(OBJEXT) \
 	lib_a-mbsinit.$(OBJEXT) lib_a-mbsnrtowcs.$(OBJEXT) \
 	lib_a-mbsrtowcs.$(OBJEXT) lib_a-on_exit.$(OBJEXT) \
-	lib_a-valloc.$(OBJEXT) lib_a-wcrtomb.$(OBJEXT) \
+	lib_a-pvallocr.$(OBJEXT) lib_a-valloc.$(OBJEXT) \
+	lib_a-vallocr.$(OBJEXT) lib_a-wcrtomb.$(OBJEXT) \
 	lib_a-wcsnrtombs.$(OBJEXT) lib_a-wcsrtombs.$(OBJEXT) \
 	lib_a-wctob.$(OBJEXT)
 am__objects_5 = lib_a-putenv.$(OBJEXT) lib_a-putenv_r.$(OBJEXT) \
@@ -391,17 +394,19 @@ top_srcdir = @top_srcdir@
 AM_CPPFLAGS = $(NEWLIB_CFLAGS) $(TARGET_CFLAGS)
 GENERAL_SOURCES = __adjust.c __atexit.c __call_atexit.c __exp10.c \
 	__ten_mu.c _Exit.c abort.c abs.c aligned_alloc.c assert.c \
-	atexit.c atof.c atoff.c atoi.c atol.c calloc.c div.c dtoa.c \
-	dtoastub.c environ.c envlock.c eprintf.c exit.c gdtoa-gethex.c \
-	gdtoa-hexnan.c getenv.c getenv_r.c imaxabs.c imaxdiv.c itoa.c \
-	labs.c ldiv.c ldtoa.c gdtoa-ldtoa.c gdtoa-gdtoa.c \
-	gdtoa-dmisc.c gdtoa-gmisc.c malloc.c mblen.c mblen_r.c \
+	atexit.c atof.c atoff.c atoi.c atol.c calloc.c callocr.c \
+	cfreer.c div.c dtoa.c dtoastub.c environ.c envlock.c eprintf.c \
+	exit.c freer.c gdtoa-gethex.c gdtoa-hexnan.c getenv.c \
+	getenv_r.c imaxabs.c imaxdiv.c itoa.c labs.c ldiv.c ldtoa.c \
+	gdtoa-ldtoa.c gdtoa-gdtoa.c gdtoa-dmisc.c gdtoa-gmisc.c \
+	mallinfor.c malloc.c mallocr.c mallstatsr.c mblen.c mblen_r.c \
 	mbstowcs.c mbstowcs_r.c mbtowc.c mbtowc_r.c mlock.c mprec.c \
-	mstats.c on_exit_args.c quick_exit.c rand.c rand_r.c random.c \
-	realloc.c reallocarray.c reallocf.c sb_charsets.c strtod.c \
-	strtoimax.c strtol.c strtoul.c strtoumax.c utoa.c wcstod.c \
-	wcstoimax.c wcstol.c wcstoul.c wcstoumax.c wcstombs.c \
-	wcstombs_r.c wctomb.c wctomb_r.c $(am__append_1)
+	msizer.c mstats.c on_exit_args.c quick_exit.c rand.c rand_r.c \
+	random.c realloc.c reallocarray.c reallocf.c reallocr.c \
+	sb_charsets.c strtod.c strtoimax.c strtol.c strtoul.c \
+	strtoumax.c utoa.c wcstod.c wcstoimax.c wcstol.c wcstoul.c \
+	wcstoumax.c wcstombs.c wcstombs_r.c wctomb.c wctomb_r.c \
+	$(am__append_1)
 EXTENDED_SOURCES = \
 	arc4random.c	\
 	arc4random_uniform.c \
@@ -440,23 +445,21 @@ ELIX_2_SOURCES = \
 	getsubopt.c	\
 	l64a.c		\
 	malign.c	\
+	malignr.c	\
+	malloptr.c	\
 	mbrlen.c	\
 	mbrtowc.c	\
 	mbsinit.c	\
 	mbsnrtowcs.c	\
 	mbsrtowcs.c	\
 	on_exit.c	\
+	pvallocr.c	\
 	valloc.c	\
+	vallocr.c	\
 	wcrtomb.c	\
 	wcsnrtombs.c	\
 	wcsrtombs.c	\
 	wctob.c
-
-ELIX_2_OBJS = \
-	$(lpfx)malignr.o	\
-	$(lpfx)malloptr.o \
-	$(lpfx)pvallocr.o	\
-	$(lpfx)vallocr.o
 
 ELIX_3_SOURCES = \
 	putenv.c	\
@@ -472,23 +475,10 @@ ELIX_4_SOURCES = \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@ELIX_SOURCES = $(ELIX_2_SOURCES) $(ELIX_3_SOURCES)
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@ELIX_SOURCES = $(ELIX_2_SOURCES)
 @ELIX_LEVEL_1_TRUE@ELIX_SOURCES = 
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@ELIX_OBJS = $(ELIX_2_OBJS)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@ELIX_OBJS = $(ELIX_2_OBJS)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@ELIX_OBJS = $(ELIX_2_OBJS)
-@ELIX_LEVEL_1_TRUE@ELIX_OBJS = 
-
-# Because of how libtool moves objects around, mallocr must be built last.
-LIBADD_OBJS = $(lpfx)freer.o $(lpfx)reallocr.o \
-	$(lpfx)callocr.o $(lpfx)cfreer.o \
-	$(lpfx)mallinfor.o $(lpfx)mallstatsr.o \
-	$(lpfx)msizer.o $(lpfx)mallocr.o
-
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(GENERAL_SOURCES) $(EXTENDED_SOURCES) $(ELIX_SOURCES)
-lib_a_LIBADD = $(LIBADD_OBJS) $(ELIX_OBJS)
+lib_a_LIBADD = 
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_DEPENDENCIES = $(LIBADD_OBJS) $(ELIX_OBJS)
-LIB_COMPILE = $(AM_V_CC)$(COMPILE)
 all: all-am
 
 .SUFFIXES:
@@ -639,6 +629,18 @@ lib_a-calloc.o: calloc.c
 lib_a-calloc.obj: calloc.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-calloc.obj `if test -f 'calloc.c'; then $(CYGPATH_W) 'calloc.c'; else $(CYGPATH_W) '$(srcdir)/calloc.c'; fi`
 
+lib_a-callocr.o: callocr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-callocr.o `test -f 'callocr.c' || echo '$(srcdir)/'`callocr.c
+
+lib_a-callocr.obj: callocr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-callocr.obj `if test -f 'callocr.c'; then $(CYGPATH_W) 'callocr.c'; else $(CYGPATH_W) '$(srcdir)/callocr.c'; fi`
+
+lib_a-cfreer.o: cfreer.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cfreer.o `test -f 'cfreer.c' || echo '$(srcdir)/'`cfreer.c
+
+lib_a-cfreer.obj: cfreer.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cfreer.obj `if test -f 'cfreer.c'; then $(CYGPATH_W) 'cfreer.c'; else $(CYGPATH_W) '$(srcdir)/cfreer.c'; fi`
+
 lib_a-div.o: div.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-div.o `test -f 'div.c' || echo '$(srcdir)/'`div.c
 
@@ -680,6 +682,12 @@ lib_a-exit.o: exit.c
 
 lib_a-exit.obj: exit.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-exit.obj `if test -f 'exit.c'; then $(CYGPATH_W) 'exit.c'; else $(CYGPATH_W) '$(srcdir)/exit.c'; fi`
+
+lib_a-freer.o: freer.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-freer.o `test -f 'freer.c' || echo '$(srcdir)/'`freer.c
+
+lib_a-freer.obj: freer.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-freer.obj `if test -f 'freer.c'; then $(CYGPATH_W) 'freer.c'; else $(CYGPATH_W) '$(srcdir)/freer.c'; fi`
 
 lib_a-gdtoa-gethex.o: gdtoa-gethex.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gdtoa-gethex.o `test -f 'gdtoa-gethex.c' || echo '$(srcdir)/'`gdtoa-gethex.c
@@ -765,11 +773,29 @@ lib_a-gdtoa-gmisc.o: gdtoa-gmisc.c
 lib_a-gdtoa-gmisc.obj: gdtoa-gmisc.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gdtoa-gmisc.obj `if test -f 'gdtoa-gmisc.c'; then $(CYGPATH_W) 'gdtoa-gmisc.c'; else $(CYGPATH_W) '$(srcdir)/gdtoa-gmisc.c'; fi`
 
+lib_a-mallinfor.o: mallinfor.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mallinfor.o `test -f 'mallinfor.c' || echo '$(srcdir)/'`mallinfor.c
+
+lib_a-mallinfor.obj: mallinfor.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mallinfor.obj `if test -f 'mallinfor.c'; then $(CYGPATH_W) 'mallinfor.c'; else $(CYGPATH_W) '$(srcdir)/mallinfor.c'; fi`
+
 lib_a-malloc.o: malloc.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-malloc.o `test -f 'malloc.c' || echo '$(srcdir)/'`malloc.c
 
 lib_a-malloc.obj: malloc.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-malloc.obj `if test -f 'malloc.c'; then $(CYGPATH_W) 'malloc.c'; else $(CYGPATH_W) '$(srcdir)/malloc.c'; fi`
+
+lib_a-mallocr.o: mallocr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mallocr.o `test -f 'mallocr.c' || echo '$(srcdir)/'`mallocr.c
+
+lib_a-mallocr.obj: mallocr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mallocr.obj `if test -f 'mallocr.c'; then $(CYGPATH_W) 'mallocr.c'; else $(CYGPATH_W) '$(srcdir)/mallocr.c'; fi`
+
+lib_a-mallstatsr.o: mallstatsr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mallstatsr.o `test -f 'mallstatsr.c' || echo '$(srcdir)/'`mallstatsr.c
+
+lib_a-mallstatsr.obj: mallstatsr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mallstatsr.obj `if test -f 'mallstatsr.c'; then $(CYGPATH_W) 'mallstatsr.c'; else $(CYGPATH_W) '$(srcdir)/mallstatsr.c'; fi`
 
 lib_a-mblen.o: mblen.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mblen.o `test -f 'mblen.c' || echo '$(srcdir)/'`mblen.c
@@ -818,6 +844,12 @@ lib_a-mprec.o: mprec.c
 
 lib_a-mprec.obj: mprec.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mprec.obj `if test -f 'mprec.c'; then $(CYGPATH_W) 'mprec.c'; else $(CYGPATH_W) '$(srcdir)/mprec.c'; fi`
+
+lib_a-msizer.o: msizer.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-msizer.o `test -f 'msizer.c' || echo '$(srcdir)/'`msizer.c
+
+lib_a-msizer.obj: msizer.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-msizer.obj `if test -f 'msizer.c'; then $(CYGPATH_W) 'msizer.c'; else $(CYGPATH_W) '$(srcdir)/msizer.c'; fi`
 
 lib_a-mstats.o: mstats.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mstats.o `test -f 'mstats.c' || echo '$(srcdir)/'`mstats.c
@@ -872,6 +904,12 @@ lib_a-reallocf.o: reallocf.c
 
 lib_a-reallocf.obj: reallocf.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-reallocf.obj `if test -f 'reallocf.c'; then $(CYGPATH_W) 'reallocf.c'; else $(CYGPATH_W) '$(srcdir)/reallocf.c'; fi`
+
+lib_a-reallocr.o: reallocr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-reallocr.o `test -f 'reallocr.c' || echo '$(srcdir)/'`reallocr.c
+
+lib_a-reallocr.obj: reallocr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-reallocr.obj `if test -f 'reallocr.c'; then $(CYGPATH_W) 'reallocr.c'; else $(CYGPATH_W) '$(srcdir)/reallocr.c'; fi`
 
 lib_a-sb_charsets.o: sb_charsets.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sb_charsets.o `test -f 'sb_charsets.c' || echo '$(srcdir)/'`sb_charsets.c
@@ -1203,6 +1241,18 @@ lib_a-malign.o: malign.c
 lib_a-malign.obj: malign.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-malign.obj `if test -f 'malign.c'; then $(CYGPATH_W) 'malign.c'; else $(CYGPATH_W) '$(srcdir)/malign.c'; fi`
 
+lib_a-malignr.o: malignr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-malignr.o `test -f 'malignr.c' || echo '$(srcdir)/'`malignr.c
+
+lib_a-malignr.obj: malignr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-malignr.obj `if test -f 'malignr.c'; then $(CYGPATH_W) 'malignr.c'; else $(CYGPATH_W) '$(srcdir)/malignr.c'; fi`
+
+lib_a-malloptr.o: malloptr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-malloptr.o `test -f 'malloptr.c' || echo '$(srcdir)/'`malloptr.c
+
+lib_a-malloptr.obj: malloptr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-malloptr.obj `if test -f 'malloptr.c'; then $(CYGPATH_W) 'malloptr.c'; else $(CYGPATH_W) '$(srcdir)/malloptr.c'; fi`
+
 lib_a-mbrlen.o: mbrlen.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mbrlen.o `test -f 'mbrlen.c' || echo '$(srcdir)/'`mbrlen.c
 
@@ -1239,11 +1289,23 @@ lib_a-on_exit.o: on_exit.c
 lib_a-on_exit.obj: on_exit.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-on_exit.obj `if test -f 'on_exit.c'; then $(CYGPATH_W) 'on_exit.c'; else $(CYGPATH_W) '$(srcdir)/on_exit.c'; fi`
 
+lib_a-pvallocr.o: pvallocr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-pvallocr.o `test -f 'pvallocr.c' || echo '$(srcdir)/'`pvallocr.c
+
+lib_a-pvallocr.obj: pvallocr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-pvallocr.obj `if test -f 'pvallocr.c'; then $(CYGPATH_W) 'pvallocr.c'; else $(CYGPATH_W) '$(srcdir)/pvallocr.c'; fi`
+
 lib_a-valloc.o: valloc.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-valloc.o `test -f 'valloc.c' || echo '$(srcdir)/'`valloc.c
 
 lib_a-valloc.obj: valloc.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-valloc.obj `if test -f 'valloc.c'; then $(CYGPATH_W) 'valloc.c'; else $(CYGPATH_W) '$(srcdir)/valloc.c'; fi`
+
+lib_a-vallocr.o: vallocr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vallocr.o `test -f 'vallocr.c' || echo '$(srcdir)/'`vallocr.c
+
+lib_a-vallocr.obj: vallocr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vallocr.obj `if test -f 'vallocr.c'; then $(CYGPATH_W) 'vallocr.c'; else $(CYGPATH_W) '$(srcdir)/vallocr.c'; fi`
 
 lib_a-wcrtomb.o: wcrtomb.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcrtomb.o `test -f 'wcrtomb.c' || echo '$(srcdir)/'`wcrtomb.c
@@ -1474,66 +1536,6 @@ uninstall-am:
 
 .PRECIOUS: Makefile
 
-
-$(lpfx)mallocr.o: _mallocr.c
-	$(LIB_COMPILE) -DDEFINE_MALLOC -c $< -o $@
-
-$(lpfx)freer.o: _mallocr.c
-	$(LIB_COMPILE) -DDEFINE_FREE -c $< -o $@
-
-$(lpfx)reallocr.o: _mallocr.c
-	$(LIB_COMPILE) -DDEFINE_REALLOC -c $< -o $@
-
-$(lpfx)callocr.o: _mallocr.c
-	$(LIB_COMPILE) -DDEFINE_CALLOC -c $< -o $@
-
-$(lpfx)cfreer.o: _mallocr.c
-	$(LIB_COMPILE) -DDEFINE_CFREE -c $< -o $@
-
-$(lpfx)malignr.o: _mallocr.c
-	$(LIB_COMPILE) -DDEFINE_MEMALIGN -c $< -o $@
-
-$(lpfx)vallocr.o: _mallocr.c
-	$(LIB_COMPILE) -DDEFINE_VALLOC -c $< -o $@
-
-$(lpfx)pvallocr.o: _mallocr.c
-	$(LIB_COMPILE) -DDEFINE_PVALLOC -c $< -o $@
-
-$(lpfx)mallinfor.o: _mallocr.c
-	$(LIB_COMPILE) -DDEFINE_MALLINFO -c $< -o $@
-
-$(lpfx)mallstatsr.o: _mallocr.c
-	$(LIB_COMPILE) -DDEFINE_MALLOC_STATS -c $< -o $@
-
-$(lpfx)msizer.o: _mallocr.c
-	$(LIB_COMPILE) -DDEFINE_MALLOC_USABLE_SIZE -c $< -o $@
-
-$(lpfx)malloptr.o: _mallocr.c
-	$(LIB_COMPILE) -DDEFINE_MALLOPT -c $< -o $@
-
-$(lpfx)dtoa.o: dtoa.c mprec.h
-$(lpfx)ldtoa.o: ldtoa.c mprec.h gdtoa.h
-$(lpfx)gdtoa-ldtoa.o: gdtoa-ldtoa.c mprec.h gdtoaimp.h gdtoa.h
-$(lpfx)gdtoa-gdtoa.o: gdtoa-gdtoa.c mprec.h gdtoaimp.h gdtoa.h
-$(lpfx)gdtoa-dmisc.o: gdtoa-dmisc.c mprec.h gdtoaimp.h gdtoa.h
-$(lpfx)gdtoa-gmisc.o: gdtoa-gmisc.c mprec.h gdtoaimp.h gdtoa.h
-$(lpfx)ecvtbuf.o: ecvtbuf.c mprec.h
-$(lpfx)mbtowc_r.o: mbtowc_r.c mbctype.h
-$(lpfx)mprec.o: mprec.c mprec.h
-$(lpfx)strtod.o: strtod.c mprec.h
-$(lpfx)gdtoa-gethex.o: gdtoa-gethex.c mprec.h
-$(lpfx)gdtoa-hexnan.o: gdtoa-hexnan.c mprec.h
-$(lpfx)wctomb_r.o: wctomb_r.c mbctype.h
-$(lpfx)drand48.o: drand48.c rand48.h
-$(lpfx)erand48.o: erand48.c rand48.h
-$(lpfx)jrand48.o: jrand48.c rand48.h
-$(lpfx)lcong48.o: lcong48.c rand48.h
-$(lpfx)lrand48.o: lrand48.c rand48.h
-$(lpfx)mrand48.o: mrand48.c rand48.h
-$(lpfx)nrand48.o: nrand48.c rand48.h
-$(lpfx)rand48.o: rand48.c rand48.h
-$(lpfx)seed48.o: seed48.c rand48.h
-$(lpfx)srand48.o: srand48.c rand48.h
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
