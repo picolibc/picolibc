@@ -1902,12 +1902,15 @@ class fhandler_termios: public fhandler_base
   virtual void release_input_mutex_if_necessary (void) {};
   virtual void discard_input () {};
 
+  /* Result status of processing keys in process_sigs(). */
   enum process_sig_state {
-    signalled,
-    not_signalled,
-    not_signalled_but_done,
-    not_signalled_with_nat_reader,
-    done_with_debugger
+    signalled, /* Signalled normally */
+    not_signalled, /* Not signalled at all */
+    not_signalled_but_done, /* Not signalled, but CTRL_C_EVENT was sent. */
+    not_signalled_with_nat_reader, /* Not signalled, but detected non-cygwin
+				      process may be reading the tty. */
+    done_with_debugger /* The key was processed (CTRL_C_EVENT was sent)
+			  for inferior of GDB. */
   };
 
  public:
