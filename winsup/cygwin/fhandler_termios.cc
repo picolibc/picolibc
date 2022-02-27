@@ -344,10 +344,10 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	      (myself->dwProcessId, false);
 	  if (resume_pid && fh && !fh->is_console ())
 	    {
-	      if (::cygheap->ctty && ::cygheap->ctty->is_console ())
-		init_console_handler (false);
 	      FreeConsole ();
 	      AttachConsole (p->dwProcessId);
+	      if (::cygheap->ctty && ::cygheap->ctty->is_console ())
+		init_console_handler (true);
 	    }
 	  if (fh && p == myself && being_debugged ())
 	    { /* Avoid deadlock in gdb on console. */
