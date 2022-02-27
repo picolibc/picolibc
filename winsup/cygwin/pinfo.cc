@@ -106,6 +106,8 @@ pinfo_init (char **envp, int envc)
 
   myself->process_state |= PID_ACTIVE;
   myself->process_state &= ~(PID_INITIALIZING | PID_EXITED | PID_REAPED);
+  if (being_debugged ())
+    myself->process_state |= PID_DEBUGGED;
   myself.preserve ();
   debug_printf ("pid %d, pgid %d, process_state %y",
 		myself->pid, myself->pgid, myself->process_state);

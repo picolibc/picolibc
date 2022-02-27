@@ -345,7 +345,8 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 		     without pcon enabled. In this case, the inferior is not
 		     cygwin process list. PID_NEW_PG is set as a marker for
 		     GDB with non-cygwin inferior in pty code.
-	 !PID_CYGPARENT: check this for GDB with cygwin inferior. */
+	 !PID_CYGPARENT: check this for GDB with cygwin inferior or
+			 cygwin apps started from non-cygwin shell. */
       if (c == '\003' && p && p->ctty == ttyp->ntty && p->pgid == pgid
 	  && ((p->process_state & PID_NOTCYGWIN)
 	      || (p->process_state & PID_NEW_PG)
@@ -408,13 +409,12 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	  if (p->process_state & PID_TTYIN)
 	    cyg_reader = true; /* Theh process is reading the tty */
 	  if (!p->cygstarted && !(p->process_state & PID_NOTCYGWIN)
-	      && (p != myself || being_debugged ())
-	      && cyg_leader) /* inferior is cygwin app */
-	    with_debugger = true;
+	      && (p->process_state & PID_DEBUGGED))
+	    with_debugger = true; /* inferior is cygwin app */
 	  if (!(p->process_state & PID_NOTCYGWIN)
 	      && (p->process_state & PID_NEW_PG) /* Check marker */
-	      && p->pid == pgid) /* inferior is non-cygwin app */
-	    with_debugger_nat = true;
+	      && p->pid == pgid)
+	    with_debugger_nat = true; /* inferior is non-cygwin app */
 	}
     }
   if ((with_debugger || with_debugger_nat) && need_discard_input)
