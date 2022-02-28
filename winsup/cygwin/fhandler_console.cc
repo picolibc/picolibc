@@ -188,12 +188,23 @@ cons_master_thread (VOID *arg)
 void
 fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 {
+  const int additional_space = 128; /* Possible max number of incoming events
+				       during the process. Additional space
+				       should be left for writeback fix. */
+  const int inrec_size = INREC_SIZE + additional_space;
+  struct
+  {
+    inline static size_t bytes (size_t n)
+      {
+	return sizeof (INPUT_RECORD) * n;
+      }
+  } m;
   termios &ti = ttyp->ti;
   int processed_up_to = -1;
   while (con.owner == myself->pid)
     {
       DWORD total_read, n, i;
-      INPUT_RECORD input_rec[INREC_SIZE];
+      INPUT_RECORD input_rec[inrec_size];
 
       if (con.disable_master_thread)
 	{
@@ -203,6 +214,7 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 
       WaitForSingleObject (p->input_mutex, mutex_timeout);
       total_read = 0;
+      bool nowait = false;
       switch (cygwait (p->input_handle, (DWORD) 0))
 	{
 	case WAIT_OBJECT_0:
@@ -211,16 +223,13 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 	  if (total_read == INREC_SIZE /* Working space full */
 	      && cygwait (p->input_handle, (DWORD) 0) == WAIT_OBJECT_0)
 	    {
-	      const int incr = 1;
-	      size_t bytes = sizeof (INPUT_RECORD) * (total_read - incr);
-	      /* Discard oldest incr events. */
-	      memmove (input_rec, input_rec + incr, bytes);
-	      total_read -= incr;
-	      processed_up_to =
-		(processed_up_to + 1 >= incr) ? processed_up_to - incr : -1;
+	      const int incr = min (processed_up_to + 1, additional_space);
 	      ReadConsoleInputW (p->input_handle,
 				 input_rec + total_read, incr, &n);
-	      total_read += n;
+	      /* Discard oldest n events. */
+	      memmove (input_rec, input_rec + n, m.bytes (total_read));
+	      processed_up_to -= n;
+	      nowait = true;
 	    }
 	  break;
 	case WAIT_TIMEOUT:
@@ -298,7 +307,7 @@ remove_record:
 	    { /* Remove corresponding record. */
 	      if (total_read > i + 1)
 		memmove (input_rec + i, input_rec + i + 1,
-			 sizeof (INPUT_RECORD) * (total_read - i - 1));
+			 m.bytes (total_read - i - 1));
 	      total_read--;
 	      i--;
 	    }
@@ -306,45 +315,45 @@ remove_record:
       processed_up_to = total_read - 1;
       if (total_read)
 	{
-	  /* Writeback input records other than interrupt. */
-	  WriteConsoleInputW (p->input_handle, input_rec, total_read, &n);
-	  size_t bytes = sizeof (INPUT_RECORD) * total_read;
 	  do
 	    {
-	      const int additional_size = 128; /* Possible max number of
-						  incoming events during
-						  above process. */
-	      const int new_size = INREC_SIZE + additional_size;
-	      INPUT_RECORD tmp[new_size];
+	      INPUT_RECORD tmp[inrec_size];
+	      /* Writeback input records other than interrupt. */
+	      WriteConsoleInputW (p->input_handle, input_rec, total_read, &n);
 	      /* Check if writeback was successfull. */
-	      PeekConsoleInputW (p->input_handle, tmp, new_size, &n);
-	      if (memcmp (input_rec, tmp, bytes) == 0)
+	      PeekConsoleInputW (p->input_handle, tmp, inrec_size, &n);
+	      if (n < total_read)
+		break; /* Someone has read input without acquiring
+			  input_mutex. ConEmu cygwin-connector? */
+	      if (memcmp (input_rec, tmp, m.bytes (total_read)) == 0)
 		break; /* OK */
 	      /* Try to fix */
 	      DWORD incr = n - total_read;
 	      DWORD ofst;
 	      for (ofst = 1; ofst <= incr; ofst++)
-		if (memcmp (input_rec, tmp + ofst, bytes) == 0)
+		if (memcmp (input_rec, tmp + ofst, m.bytes (total_read)) == 0)
 		  {
-		    ReadConsoleInputW (p->input_handle, tmp, new_size, &n);
-		    DWORD m;
-		    WriteConsoleInputW (p->input_handle, tmp + ofst,
-					total_read, &m);
-		    WriteConsoleInputW (p->input_handle, tmp, ofst, &m);
-		    if ( n > ofst + total_read)
-		      WriteConsoleInputW (p->input_handle,
-					  tmp + ofst + total_read,
-					  n - (ofst + total_read), &m);
+		    ReadConsoleInputW (p->input_handle, tmp, inrec_size, &n);
+		    memcpy (input_rec, tmp + ofst, m.bytes (total_read));
+		    memcpy (input_rec + total_read, tmp, m.bytes (ofst));
+		    if (n > ofst + total_read)
+		      memcpy (input_rec + total_read + ofst,
+			      tmp + ofst + total_read,
+			      m.bytes (n - (ofst + total_read)));
+		    total_read = n;
 		    break;
 		  }
-	      if (ofst > incr) /* Hard to fix */
-		break; /* Giving up */
+	      if (ofst > incr)
+		break; /* Writeback was not atomic. Or someone has read
+			  input without acquiring input_mutex.
+			  Giving up because hard to fix. */
 	    }
 	  while (true);
 	}
 skip_writeback:
       ReleaseMutex (p->input_mutex);
-      cygwait (40);
+      if (!nowait)
+	cygwait (40);
     }
 }
 
