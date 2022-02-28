@@ -547,6 +547,7 @@ fhandler_pty_master::accept_input ()
 	  cp_to = GetConsoleCP ();
 	  FreeConsole ();
 	  AttachConsole (resume_pid);
+	  init_console_handler (true);
 	  release_attach_mutex ();
 	}
       else
@@ -967,6 +968,12 @@ fhandler_pty_slave::open (int flags, mode_t)
        this behaviour, protection based on attach_mutex does
        not take effect. */
     get_ttyp ()->need_invisible_console = true;
+  else if (_major (myself->ctty) != DEV_CONS_MAJOR
+	   && (!get_ttyp ()->invisible_console_pid
+	       || !pinfo (get_ttyp ()->invisible_console_pid)))
+    /* Create a new invisible console for each pty to isolate
+       CTRL_C_EVENTs between ptys. */
+    get_ttyp ()->need_invisible_console = true;
   else
     fhandler_console::need_invisible ();
 
@@ -1027,6 +1034,7 @@ fhandler_pty_slave::close ()
   fhandler_pty_common::close ();
   if (!ForceCloseHandle (output_mutex))
     termios_printf ("CloseHandle (output_mutex<%p>), %E", output_mutex);
+  get_ttyp ()->invisible_console_pid = 0;
   return 0;
 }
 
@@ -1232,12 +1240,14 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
 				       0, TRUE, DUPLICATE_SAME_ACCESS);
 		      FreeConsole ();
 		      AttachConsole (get_ttyp ()->pcon_pid);
+		      init_console_handler (true);
 		      WaitForSingleObject (input_mutex, mutex_timeout);
 		      transfer_input (tty::to_cyg, h_pcon_in, get_ttyp (),
 				      input_available_event);
 		      ReleaseMutex (input_mutex);
 		      FreeConsole ();
 		      AttachConsole (resume_pid);
+		      init_console_handler (true);
 		      CloseHandle (h_pcon_in);
 		    }
 		  CloseHandle (pcon_owner);
@@ -2839,6 +2849,7 @@ fhandler_pty_master::pty_master_fwd_thread (const master_fwd_thread_param_t *p)
 	  cp_from = GetConsoleOutputCP ();
 	  FreeConsole ();
 	  AttachConsole (resume_pid);
+	  init_console_handler (true);
 	  release_attach_mutex ();
 	}
       else
@@ -3261,6 +3272,7 @@ fhandler_pty_slave::setup_pseudoconsole (bool nopcon)
       CloseHandle (pcon_owner);
       FreeConsole ();
       AttachConsole (get_ttyp ()->pcon_pid);
+      init_console_handler (true);
       goto skip_create;
     }
 
@@ -3384,6 +3396,7 @@ fhandler_pty_slave::setup_pseudoconsole (bool nopcon)
       /* Attach to pseudo console */
       FreeConsole ();
       AttachConsole (pi.dwProcessId);
+      init_console_handler (true);
 
       /* Terminate helper process */
       SetEvent (goodbye);
@@ -3573,6 +3586,7 @@ fhandler_pty_slave::close_pseudoconsole (tty *ttyp, DWORD force_switch_to)
 		}
 	      else
 		AttachConsole (ATTACH_PARENT_PROCESS);
+	      init_console_handler (true);
 	    }
 	  else
 	    { /* Close pseudo console */
@@ -3585,6 +3599,7 @@ fhandler_pty_slave::close_pseudoconsole (tty *ttyp, DWORD force_switch_to)
 		}
 	      else
 		AttachConsole (ATTACH_PARENT_PROCESS);
+	      init_console_handler (true);
 	      /* Reconstruct pseudo console handler container here for close */
 	      HPCON_INTERNAL *hp =
 		(HPCON_INTERNAL *) HeapAlloc (GetProcessHeap (), 0,
@@ -3613,6 +3628,7 @@ fhandler_pty_slave::close_pseudoconsole (tty *ttyp, DWORD force_switch_to)
 	    }
 	  else
 	    AttachConsole (ATTACH_PARENT_PROCESS);
+	  init_console_handler (true);
 	}
     }
   else if (pcon_pid_self (ttyp->pcon_pid))
@@ -3779,6 +3795,7 @@ fhandler_pty_slave::create_invisible_console ()
       /* Detach from console device and create new invisible console. */
       FreeConsole();
       fhandler_console::need_invisible (true);
+      init_console_handler (true);
       get_ttyp ()->need_invisible_console = false;
       get_ttyp ()->invisible_console_pid = myself->pid;
     }

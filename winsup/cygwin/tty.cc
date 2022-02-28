@@ -344,6 +344,7 @@ tty_min::setpgid (int pid)
 	      CloseHandle (pcon_owner);
 	      FreeConsole ();
 	      AttachConsole (ttyp->pcon_pid);
+	      init_console_handler (true);
 	      attach_restore = true;
 	    }
 	  WaitForSingleObject (ptys->input_mutex, mutex_timeout);
@@ -361,6 +362,7 @@ tty_min::setpgid (int pid)
 		}
 	      else
 		AttachConsole (ATTACH_PARENT_PROCESS);
+	      init_console_handler (true);
 	    }
 	}
       ReleaseMutex (ptys->pcon_mutex);
