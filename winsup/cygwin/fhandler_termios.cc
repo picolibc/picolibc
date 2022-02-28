@@ -368,8 +368,7 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	    {
 	      FreeConsole ();
 	      AttachConsole (p->dwProcessId);
-	      if (::cygheap->ctty && ::cygheap->ctty->is_console ())
-		init_console_handler (true);
+	      init_console_handler (true);
 	    }
 	  if (fh && p == myself && being_debugged ())
 	    { /* Avoid deadlock in gdb on console. */
@@ -393,8 +392,7 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	    {
 	      FreeConsole ();
 	      AttachConsole (resume_pid);
-	      if (::cygheap->ctty && ::cygheap->ctty->is_console ())
-		init_console_handler (true);
+	      init_console_handler (true);
 	    }
 	  need_discard_input = true;
 	}
