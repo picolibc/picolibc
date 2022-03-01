@@ -6,7 +6,8 @@ AM_CCASFLAGS = $(AM_CPPFLAGS)
 
 noinst_LIBRARIES = lib.a
 
-lib_a_SOURCES = setjmp.S
+lib_a_SOURCES = setjmp.S \
+	mstats.c
 lib_a_CFLAGS = $(AM_CFLAGS)
 
 lib_a_LIBADD = $(lpfx)malloc.o \
@@ -17,10 +18,7 @@ lib_a_LIBADD = $(lpfx)malloc.o \
 	$(lpfx)malign.o \
 	$(lpfx)valloc.o \
 	$(lpfx)pvalloc.o \
-	$(lpfx)mallinfo.o \
-	$(lpfx)mallstats.o \
 	$(lpfx)msize.o \
-	$(lpfx)mallopt.o \
 	$(lpfx)mallocr.o \
 	$(lpfx)freer.o \
 	$(lpfx)reallocr.o \
@@ -54,17 +52,8 @@ $(lpfx)valloc.o: tiny-malloc.c
 $(lpfx)pvalloc.o: tiny-malloc.c
 	$(MALLOC_COMPILE) -DDEFINE_PVALLOC -c $(srcdir)/tiny-malloc.c -o $@
 
-$(lpfx)mallinfo.o: tiny-malloc.c
-	$(MALLOC_COMPILE) -DDEFINE_MALLINFO -c $(srcdir)/tiny-malloc.c -o $@
-
-$(lpfx)mallstats.o: tiny-malloc.c
-	$(MALLOC_COMPILE) -DDEFINE_MALLOC_STATS -c $(srcdir)/tiny-malloc.c -o $@
-
 $(lpfx)msize.o: tiny-malloc.c
 	$(MALLOC_COMPILE) -DDEFINE_MALLOC_USABLE_SIZE -c $(srcdir)/tiny-malloc.c -o $@
-
-$(lpfx)mallopt.o: mallocr.c
-	$(MALLOC_COMPILE) -DDEFINE_MALLOPT -c $(srcdir)/mallocr.c -o $@
 
 $(lpfx)mallocr.o: mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_MALLOC -c $(srcdir)/mallocr.c -o $@
