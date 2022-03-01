@@ -1199,6 +1199,8 @@ format_process_status (void *data, char *&destbuf)
   int state = 'R';
   const char *state_str = "unknown";
   size_t vmsize = 0, vmrss = 0, vmdata = 0, vmlib = 0, vmtext = 0, vmshare = 0;
+  sigset_t pnd = 0, blk = 0, ign = 0;
+  bool fetch_siginfo = false;
 
   PWCHAR last_slash = wcsrchr (p->progname, L'\\');
   sys_wcstombs (cmd, NAME_MAX + 1, last_slash ? last_slash + 1 : p->progname);
@@ -1221,13 +1223,16 @@ format_process_status (void *data, char *&destbuf)
     {
     case 'O':
       state_str = "running";
+      fetch_siginfo = true;
       break;
     case 'D':
     case 'S':
       state_str = "sleeping";
+      fetch_siginfo = true;
       break;
     case 'R':
       state_str = "runnable";
+      fetch_siginfo = true;
       break;
     case 'Z':
       state_str = "zombie";
@@ -1238,6 +1243,8 @@ format_process_status (void *data, char *&destbuf)
     }
   get_mem_values (p->dwProcessId, vmsize, vmrss, vmtext, vmdata,
 		  vmlib, vmshare);
+  if (fetch_siginfo)
+    p->siginfo (pnd, blk, ign);
   /* The real uid value for *this* process is stored at cygheap->user.real_uid
      but we can't get at the real uid value for any other process, so
      just fake it as p->uid.  Similar for p->gid. */
@@ -1270,7 +1277,7 @@ format_process_status (void *data, char *&destbuf)
 			  vmsize * kb_per_page, 0UL, vmrss * kb_per_page,
 			  vmdata * kb_per_page, 0UL, vmtext * kb_per_page,
 			  vmlib * kb_per_page,
-			  0, 0, _my_tls.sigmask
+			  pnd, blk, ign
 			  );
 }
 

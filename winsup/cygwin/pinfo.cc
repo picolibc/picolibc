@@ -668,6 +668,20 @@ commune_process (void *arg)
 	  sigproc_printf ("WritePipeOverlapped root failed, %E");
 	break;
       }
+    case PICOM_SIGINFO:
+      {
+	sigproc_printf ("processing PICOM_SIGINFO");
+	commune_result cr;
+	sigpending (&cr.pnd);
+	cr.pnd = sig_send (myself, __SIGPENDINGALL, NULL);
+	cr.blk = cygheap->compute_sigblkmask ();
+	for (int sig = 1; sig < NSIG; ++sig)
+	  if (global_sigs[sig].sa_handler == SIG_IGN)
+	    cr.ign |= SIGTOMASK (sig);
+	if (!WritePipeOverlapped (tothem, &cr, sizeof cr, &nr, 1000L))
+	  sigproc_printf ("WritePipeOverlapped siginfo failed, %E");
+	break;
+      }
     case PICOM_FDS:
       {
 	sigproc_printf ("processing PICOM_FDS");
@@ -788,15 +802,12 @@ commune_result
 _pinfo::commune_request (__uint32_t code, ...)
 {
   DWORD nr;
-  commune_result res;
+  commune_result res = { 0 };
   va_list args;
   siginfo_t si = {0};
   HANDLE& hp = si._si_commune._si_process_handle;
   HANDLE& fromthem = si._si_commune._si_read_handle;
   HANDLE request_sync = NULL;
-
-  res.s = NULL;
-  res.n = 0;
 
   if (!pid)
     {
@@ -875,6 +886,14 @@ _pinfo::commune_request (__uint32_t code, ...)
 	      goto err;
 	    }
 	  res.n = p - res.s;
+	}
+      break;
+    case PICOM_SIGINFO:
+      if (!ReadPipeOverlapped (fromthem, &res, sizeof res, &nr, 1000L)
+	  || nr != sizeof res)
+	{
+	  __seterrno ();
+	  goto err;
 	}
       break;
     }
@@ -994,6 +1013,30 @@ _pinfo::root (size_t& n)
       n = strlen (s) + 1;
     }
   return s;
+}
+
+int
+_pinfo::siginfo (sigset_t &pnd, sigset_t &blk, sigset_t &ign)
+{
+  if (!pid)
+    return -1;
+  if (pid != myself->pid && !ISSTATE (this, PID_NOTCYGWIN))
+    {
+      commune_result cr = commune_request (PICOM_SIGINFO);
+      pnd = cr.pnd;
+      blk = cr.blk;
+      ign = cr.ign;
+    }
+  else
+    {
+      pnd = sig_send (myself, __SIGPENDING, NULL);
+      blk = cygheap->compute_sigblkmask ();
+      ign = 0;
+      for (int sig = 1; sig < NSIG; ++sig)
+	if (global_sigs[sig].sa_handler == SIG_IGN)
+	  ign |= SIGTOMASK (sig);
+    }
+  return -1;
 }
 
 static HANDLE

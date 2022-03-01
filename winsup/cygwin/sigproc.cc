@@ -683,7 +683,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
   sigset_t pending;
   if (!its_me)
     pack.mask = NULL;
-  else if (si.si_signo == __SIGPENDING)
+  else if (si.si_signo == __SIGPENDING || si.si_signo == __SIGPENDINGALL)
     pack.mask = &pending;
   else if (si.si_signo == __SIGFLUSH || si.si_signo > 0)
     {
@@ -801,7 +801,7 @@ out:
     }
   if (pack.wakeup)
     ForceCloseHandle (pack.wakeup);
-  if (si.si_signo != __SIGPENDING)
+  if (si.si_signo != __SIGPENDING && si.si_signo != __SIGPENDINGALL)
     /* nothing */;
   else if (!rc)
     rc = pending;

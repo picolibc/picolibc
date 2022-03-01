@@ -11,11 +11,17 @@ details. */
 #include <sys/resource.h>
 #include "thread.h"
 
-struct commune_result
+union commune_result
 {
-  char *s;
-  DWORD n;
-  HANDLE handles[2];
+  struct {
+    char *s;
+    size_t n;
+  };
+  struct {
+    sigset_t pnd;
+    sigset_t blk;
+    sigset_t ign;
+  };
 };
 
 enum picom
@@ -28,7 +34,8 @@ enum picom
   PICOM_FD = 5,
   PICOM_PIPE_FHANDLER = 6,
   PICOM_FILE_PATHCONV = 7,
-  PICOM_ENVIRON = 8
+  PICOM_ENVIRON = 8,
+  PICOM_SIGINFO = 9
 };
 
 #define EXITCODE_SET		0x8000000
@@ -109,6 +116,7 @@ public:
   char *cmdline (size_t &);
   char *environ (size_t &);
   char *win_heap_info (size_t &);
+  int siginfo (sigset_t &, sigset_t &, sigset_t &);
   bool set_ctty (class fhandler_termios *, int);
   bool alert_parent (char);
   int __reg2 kill (siginfo_t&);
