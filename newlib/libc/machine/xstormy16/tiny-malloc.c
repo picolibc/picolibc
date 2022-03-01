@@ -271,6 +271,8 @@ free (void *block_p)
 #endif
 
 #ifdef DEFINE_REALLOC
+#include <string.h>
+
 void *
 realloc (void *block_p, size_t sz)
 {
@@ -310,6 +312,8 @@ realloc (void *block_p, size_t sz)
 #endif
 
 #ifdef DEFINE_CALLOC
+#include <string.h>
+
 void *
 calloc (size_t n, size_t elem_size)
 {
@@ -509,6 +513,7 @@ pvalloc (size_t sz)
 
 #ifdef DEFINE_MALLINFO
 #include "malloc.h"
+#include <string.h>
 
 struct mallinfo 
 mallinfo (void)
