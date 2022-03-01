@@ -2409,6 +2409,8 @@ class fhandler_pty_slave: public fhandler_pty_common
   static void cleanup_for_non_cygwin_app (handle_set_t *p, tty *ttyp,
 					  bool stdin_is_ptys);
   void setpgid_aux (pid_t pid);
+  static void close_pseudoconsole_if_necessary (tty *ttyp,
+						fhandler_termios *fh);
 };
 
 #define __ptsname(buf, unit) __small_sprintf ((buf), "/dev/pty%d", (unit))
