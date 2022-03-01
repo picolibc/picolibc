@@ -737,6 +737,24 @@ init_cygheap::find_tls (int sig, bool& issig_wait)
   return t;
 }
 
+sigset_t
+init_cygheap::compute_sigblkmask ()
+{
+  sigset_t ret_mask = -1;
+
+  tls_sentry here (INFINITE);
+
+  int ix = -1;
+  /* Scan thread list looking for valid signal-receiving threads */
+  while (++ix < (int) nthreads)
+    {
+      /* Only pthreads have tid set to non-0. */
+      if (threadlist[ix].thread->tid && threadlist[ix].thread->initialized)
+	ret_mask &= threadlist[ix].thread->sigmask;
+    }
+  return ret_mask;
+}
+
 /* Called from profil.c to sample all non-main thread PC values for profiling */
 extern "C" void
 cygheap_profthr_all (void (*profthr_byhandle) (HANDLE))

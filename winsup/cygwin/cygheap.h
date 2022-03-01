@@ -590,6 +590,7 @@ struct init_cygheap: public mini_cygheap
   HANDLE __reg3 remove_tls (_cygtls *);
   threadlist_t __reg2 *find_tls (_cygtls *);
   threadlist_t __reg3 *find_tls (int, bool&);
+  sigset_t compute_sigblkmask ();
   void unlock_tls (threadlist_t *t) { if (t) ReleaseMutex (t->mutex); }
 };
 
