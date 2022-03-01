@@ -527,7 +527,7 @@ static struct
   {cons, {c:SEM_VALUE_MAX}},		/*  17, _SC_SEM_VALUE_MAX */
   {cons, {c:SIGQUEUE_MAX}},		/*  18, _SC_SIGQUEUE_MAX */
   {cons, {c:TIMER_MAX}},		/*  19, _SC_TIMER_MAX */
-  {nsup, {c:0}},			/*  20, _SC_TZNAME_MAX */
+  {cons, {c:-1L}},			/*  20, _SC_TZNAME_MAX */
   {cons, {c:_POSIX_ASYNCHRONOUS_IO}},	/*  21, _SC_ASYNCHRONOUS_IO */
   {cons, {c:_POSIX_FSYNC}},		/*  22, _SC_FSYNC */
   {cons, {c:_POSIX_MAPPED_FILES}},	/*  23, _SC_MAPPED_FILES */
