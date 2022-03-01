@@ -117,7 +117,9 @@ am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
 am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 lib_a_AR = $(AR) $(ARFLAGS)
-am_lib_a_OBJECTS = setjmp.$(OBJEXT) lib_a-mstats.$(OBJEXT)
+am_lib_a_OBJECTS = setjmp.$(OBJEXT) lib_a-callocr.$(OBJEXT) \
+	lib_a-freer.$(OBJEXT) lib_a-mallocr.$(OBJEXT) \
+	lib_a-mstats.$(OBJEXT) lib_a-reallocr.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -314,7 +316,11 @@ AM_CPPFLAGS = $(NEWLIB_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(AM_CPPFLAGS)
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = setjmp.S \
-	mstats.c
+	callocr.c \
+	freer.c \
+	mallocr.c \
+	mstats.c \
+	reallocr.c
 
 lib_a_CFLAGS = $(AM_CFLAGS)
 lib_a_LIBADD = $(lpfx)malloc.o \
@@ -325,11 +331,7 @@ lib_a_LIBADD = $(lpfx)malloc.o \
 	$(lpfx)malign.o \
 	$(lpfx)valloc.o \
 	$(lpfx)pvalloc.o \
-	$(lpfx)msize.o \
-	$(lpfx)mallocr.o \
-	$(lpfx)freer.o \
-	$(lpfx)reallocr.o \
-	$(lpfx)callocr.o
+	$(lpfx)msize.o
 
 lib_a_DEPENDENCIES = $(lib_a_LIBADD)
 MALLOC_COMPILE = $(COMPILE)
@@ -393,11 +395,35 @@ distclean-compile:
 .c.obj:
 	$(AM_V_CC)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
+lib_a-callocr.o: callocr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-callocr.o `test -f 'callocr.c' || echo '$(srcdir)/'`callocr.c
+
+lib_a-callocr.obj: callocr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-callocr.obj `if test -f 'callocr.c'; then $(CYGPATH_W) 'callocr.c'; else $(CYGPATH_W) '$(srcdir)/callocr.c'; fi`
+
+lib_a-freer.o: freer.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-freer.o `test -f 'freer.c' || echo '$(srcdir)/'`freer.c
+
+lib_a-freer.obj: freer.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-freer.obj `if test -f 'freer.c'; then $(CYGPATH_W) 'freer.c'; else $(CYGPATH_W) '$(srcdir)/freer.c'; fi`
+
+lib_a-mallocr.o: mallocr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mallocr.o `test -f 'mallocr.c' || echo '$(srcdir)/'`mallocr.c
+
+lib_a-mallocr.obj: mallocr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mallocr.obj `if test -f 'mallocr.c'; then $(CYGPATH_W) 'mallocr.c'; else $(CYGPATH_W) '$(srcdir)/mallocr.c'; fi`
+
 lib_a-mstats.o: mstats.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mstats.o `test -f 'mstats.c' || echo '$(srcdir)/'`mstats.c
 
 lib_a-mstats.obj: mstats.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mstats.obj `if test -f 'mstats.c'; then $(CYGPATH_W) 'mstats.c'; else $(CYGPATH_W) '$(srcdir)/mstats.c'; fi`
+
+lib_a-reallocr.o: reallocr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-reallocr.o `test -f 'reallocr.c' || echo '$(srcdir)/'`reallocr.c
+
+lib_a-reallocr.obj: reallocr.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-reallocr.obj `if test -f 'reallocr.c'; then $(CYGPATH_W) 'reallocr.c'; else $(CYGPATH_W) '$(srcdir)/reallocr.c'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -595,18 +621,6 @@ $(lpfx)pvalloc.o: tiny-malloc.c
 
 $(lpfx)msize.o: tiny-malloc.c
 	$(MALLOC_COMPILE) -DDEFINE_MALLOC_USABLE_SIZE -c $(srcdir)/tiny-malloc.c -o $@
-
-$(lpfx)mallocr.o: mallocr.c
-	$(MALLOC_COMPILE) -DDEFINE_MALLOC -c $(srcdir)/mallocr.c -o $@
-
-$(lpfx)freer.o: mallocr.c
-	$(MALLOC_COMPILE) -DDEFINE_FREE -c $(srcdir)/mallocr.c -o $@
-
-$(lpfx)reallocr.o: mallocr.c
-	$(MALLOC_COMPILE) -DDEFINE_REALLOC -c $(srcdir)/mallocr.c -o $@
-
-$(lpfx)callocr.o: mallocr.c
-	$(MALLOC_COMPILE) -DDEFINE_CALLOC -c $(srcdir)/mallocr.c -o $@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

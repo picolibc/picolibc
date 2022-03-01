@@ -7,7 +7,11 @@ AM_CCASFLAGS = $(AM_CPPFLAGS)
 noinst_LIBRARIES = lib.a
 
 lib_a_SOURCES = setjmp.S \
-	mstats.c
+	callocr.c \
+	freer.c \
+	mallocr.c \
+	mstats.c \
+	reallocr.c
 lib_a_CFLAGS = $(AM_CFLAGS)
 
 lib_a_LIBADD = $(lpfx)malloc.o \
@@ -18,11 +22,7 @@ lib_a_LIBADD = $(lpfx)malloc.o \
 	$(lpfx)malign.o \
 	$(lpfx)valloc.o \
 	$(lpfx)pvalloc.o \
-	$(lpfx)msize.o \
-	$(lpfx)mallocr.o \
-	$(lpfx)freer.o \
-	$(lpfx)reallocr.o \
-	$(lpfx)callocr.o
+	$(lpfx)msize.o
 
 lib_a_DEPENDENCIES = $(lib_a_LIBADD)
 
@@ -54,15 +54,3 @@ $(lpfx)pvalloc.o: tiny-malloc.c
 
 $(lpfx)msize.o: tiny-malloc.c
 	$(MALLOC_COMPILE) -DDEFINE_MALLOC_USABLE_SIZE -c $(srcdir)/tiny-malloc.c -o $@
-
-$(lpfx)mallocr.o: mallocr.c
-	$(MALLOC_COMPILE) -DDEFINE_MALLOC -c $(srcdir)/mallocr.c -o $@
-
-$(lpfx)freer.o: mallocr.c
-	$(MALLOC_COMPILE) -DDEFINE_FREE -c $(srcdir)/mallocr.c -o $@
-
-$(lpfx)reallocr.o: mallocr.c
-	$(MALLOC_COMPILE) -DDEFINE_REALLOC -c $(srcdir)/mallocr.c -o $@
-
-$(lpfx)callocr.o: mallocr.c
-	$(MALLOC_COMPILE) -DDEFINE_CALLOC -c $(srcdir)/mallocr.c -o $@
