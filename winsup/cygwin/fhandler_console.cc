@@ -192,13 +192,13 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 				       during the process. Additional space
 				       should be left for writeback fix. */
   const int inrec_size = INREC_SIZE + additional_space;
-  struct
+  struct m
   {
     inline static size_t bytes (size_t n)
       {
 	return sizeof (INPUT_RECORD) * n;
       }
-  } m;
+  };
   termios &ti = ttyp->ti;
   int processed_up_to = -1;
   while (con.owner == myself->pid)
@@ -227,7 +227,7 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 	      ReadConsoleInputW (p->input_handle,
 				 input_rec + total_read, incr, &n);
 	      /* Discard oldest n events. */
-	      memmove (input_rec, input_rec + n, m.bytes (total_read));
+	      memmove (input_rec, input_rec + n, m::bytes (total_read));
 	      processed_up_to -= n;
 	      nowait = true;
 	    }
@@ -307,7 +307,7 @@ remove_record:
 	    { /* Remove corresponding record. */
 	      if (total_read > i + 1)
 		memmove (input_rec + i, input_rec + i + 1,
-			 m.bytes (total_read - i - 1));
+			 m::bytes (total_read - i - 1));
 	      total_read--;
 	      i--;
 	    }
@@ -325,21 +325,21 @@ remove_record:
 	      if (n < total_read)
 		break; /* Someone has read input without acquiring
 			  input_mutex. ConEmu cygwin-connector? */
-	      if (memcmp (input_rec, tmp, m.bytes (total_read)) == 0)
+	      if (memcmp (input_rec, tmp, m::bytes (total_read)) == 0)
 		break; /* OK */
 	      /* Try to fix */
 	      DWORD incr = n - total_read;
 	      DWORD ofst;
 	      for (ofst = 1; ofst <= incr; ofst++)
-		if (memcmp (input_rec, tmp + ofst, m.bytes (total_read)) == 0)
+		if (memcmp (input_rec, tmp + ofst, m::bytes (total_read)) == 0)
 		  {
 		    ReadConsoleInputW (p->input_handle, tmp, inrec_size, &n);
-		    memcpy (input_rec, tmp + ofst, m.bytes (total_read));
-		    memcpy (input_rec + total_read, tmp, m.bytes (ofst));
+		    memcpy (input_rec, tmp + ofst, m::bytes (total_read));
+		    memcpy (input_rec + total_read, tmp, m::bytes (ofst));
 		    if (n > ofst + total_read)
 		      memcpy (input_rec + total_read + ofst,
 			      tmp + ofst + total_read,
-			      m.bytes (n - (ofst + total_read)));
+			      m::bytes (n - (ofst + total_read)));
 		    total_read = n;
 		    break;
 		  }
