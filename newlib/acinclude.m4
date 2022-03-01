@@ -114,7 +114,7 @@ AC_SUBST(abs_newlib_basedir)
 
 AC_CANONICAL_HOST
 
-AM_INIT_AUTOMAKE([foreign no-installinfo no-dependencies no-dist no-define subdir-objects 1.15.1])
+AM_INIT_AUTOMAKE([foreign no-installinfo no-dist no-define subdir-objects 1.15.1])
 AM_MAINTAINER_MODE
 AM_SILENT_RULES(yes)
 
