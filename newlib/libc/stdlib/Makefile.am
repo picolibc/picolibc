@@ -208,43 +208,41 @@ lib_a_CFLAGS = $(AM_CFLAGS)
 lib_a_DEPENDENCIES = $(LIBADD_OBJS) $(ELIX_OBJS)
 LIB_COMPILE = $(AM_V_CC)$(COMPILE)
 
-MALLOC_COMPILE = $(LIB_COMPILE) -DINTERNAL_NEWLIB
-
 $(lpfx)$(MALLOCR).o: $(MALLOCR).c
-	$(MALLOC_COMPILE) -DDEFINE_MALLOC -c $(srcdir)/$(MALLOCR).c -o $@
+	$(LIB_COMPILE) -DDEFINE_MALLOC -c $(srcdir)/$(MALLOCR).c -o $@
 
 $(lpfx)$(FREER).o: $(MALLOCR).c
-	$(MALLOC_COMPILE) -DDEFINE_FREE -c $(srcdir)/$(MALLOCR).c -o $@
+	$(LIB_COMPILE) -DDEFINE_FREE -c $(srcdir)/$(MALLOCR).c -o $@
 
 $(lpfx)$(REALLOCR).o: $(MALLOCR).c
-	$(MALLOC_COMPILE) -DDEFINE_REALLOC -c $(srcdir)/$(MALLOCR).c -o $@
+	$(LIB_COMPILE) -DDEFINE_REALLOC -c $(srcdir)/$(MALLOCR).c -o $@
 
 $(lpfx)$(CALLOCR).o: $(MALLOCR).c
-	$(MALLOC_COMPILE) -DDEFINE_CALLOC -c $(srcdir)/$(MALLOCR).c -o $@
+	$(LIB_COMPILE) -DDEFINE_CALLOC -c $(srcdir)/$(MALLOCR).c -o $@
 
 $(lpfx)$(CFREER).o: $(MALLOCR).c
-	$(MALLOC_COMPILE) -DDEFINE_CFREE -c $(srcdir)/$(MALLOCR).c -o $@
+	$(LIB_COMPILE) -DDEFINE_CFREE -c $(srcdir)/$(MALLOCR).c -o $@
 
 $(lpfx)$(MALIGNR).o: $(MALLOCR).c
-	$(MALLOC_COMPILE) -DDEFINE_MEMALIGN -c $(srcdir)/$(MALLOCR).c -o $@
+	$(LIB_COMPILE) -DDEFINE_MEMALIGN -c $(srcdir)/$(MALLOCR).c -o $@
 
 $(lpfx)$(VALLOCR).o: $(MALLOCR).c
-	$(MALLOC_COMPILE) -DDEFINE_VALLOC -c $(srcdir)/$(MALLOCR).c -o $@
+	$(LIB_COMPILE) -DDEFINE_VALLOC -c $(srcdir)/$(MALLOCR).c -o $@
 
 $(lpfx)$(PVALLOCR).o: $(MALLOCR).c
-	$(MALLOC_COMPILE) -DDEFINE_PVALLOC -c $(srcdir)/$(MALLOCR).c -o $@
+	$(LIB_COMPILE) -DDEFINE_PVALLOC -c $(srcdir)/$(MALLOCR).c -o $@
 
 $(lpfx)$(MALLINFOR).o: $(MALLOCR).c
-	$(MALLOC_COMPILE) -DDEFINE_MALLINFO -c $(srcdir)/$(MALLOCR).c -o $@
+	$(LIB_COMPILE) -DDEFINE_MALLINFO -c $(srcdir)/$(MALLOCR).c -o $@
 
 $(lpfx)$(MALLSTATSR).o: $(MALLOCR).c
-	$(MALLOC_COMPILE) -DDEFINE_MALLOC_STATS -c $(srcdir)/$(MALLOCR).c -o $@
+	$(LIB_COMPILE) -DDEFINE_MALLOC_STATS -c $(srcdir)/$(MALLOCR).c -o $@
 
 $(lpfx)$(MSIZER).o: $(MALLOCR).c
-	$(MALLOC_COMPILE) -DDEFINE_MALLOC_USABLE_SIZE -c $(srcdir)/$(MALLOCR).c -o $@
+	$(LIB_COMPILE) -DDEFINE_MALLOC_USABLE_SIZE -c $(srcdir)/$(MALLOCR).c -o $@
 
 $(lpfx)$(MALLOPTR).o: $(MALLOCR).c
-	$(MALLOC_COMPILE) -DDEFINE_MALLOPT -c $(srcdir)/$(MALLOCR).c -o $@
+	$(LIB_COMPILE) -DDEFINE_MALLOPT -c $(srcdir)/$(MALLOCR).c -o $@
 
 $(lpfx)dtoa.o: dtoa.c mprec.h
 $(lpfx)ldtoa.o: ldtoa.c mprec.h gdtoa.h

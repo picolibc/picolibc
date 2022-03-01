@@ -50,7 +50,7 @@
 
 #define _SBRK_R(X) _sbrk_r(X)
 
-#ifdef INTERNAL_NEWLIB
+#ifdef _LIBC
 
 #include <sys/config.h>
 #include <reent.h>
@@ -78,7 +78,7 @@
 #define nano_mallinfo		_mallinfo_r
 #define nano_mallopt		_mallopt_r
 
-#else /* ! INTERNAL_NEWLIB */
+#else /* ! _LIBC */
 
 #define RARG
 #define RONEARG
@@ -100,7 +100,7 @@
 #define nano_malloc_stats	malloc_stats
 #define nano_mallinfo		mallinfo
 #define nano_mallopt		mallopt
-#endif /* ! INTERNAL_NEWLIB */
+#endif /* ! _LIBC */
 
 /* Redefine names to avoid conflict with user names */
 #define free_list __malloc_free_list
