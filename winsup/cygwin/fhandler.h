@@ -2389,8 +2389,10 @@ class fhandler_pty_slave: public fhandler_pty_common
     fh->copy_from (this);
     return fh;
   }
-  bool setup_pseudoconsole (bool nopcon);
+  bool setup_pseudoconsole ();
+  static DWORD get_winpid_to_hand_over (tty *ttyp, DWORD force_switch_to);
   static void close_pseudoconsole (tty *ttyp, DWORD force_switch_to = 0);
+  static void hand_over_only (tty *ttyp, DWORD force_switch_to = 0);
   bool term_has_pcon_cap (const WCHAR *env);
   void set_switch_to_pcon (void);
   void reset_switch_to_pcon (void);
@@ -2407,10 +2409,10 @@ class fhandler_pty_slave: public fhandler_pty_common
   void setup_for_non_cygwin_app (bool nopcon, PWCHAR envblock,
 				 bool stdin_is_ptys);
   static void cleanup_for_non_cygwin_app (handle_set_t *p, tty *ttyp,
-					  bool stdin_is_ptys);
+					  bool stdin_is_ptys,
+					  DWORD force_switch_to = 0);
   void setpgid_aux (pid_t pid);
-  static void close_pseudoconsole_if_necessary (tty *ttyp,
-						fhandler_termios *fh);
+  static void release_ownership_of_nat_pipe (tty *ttyp, fhandler_termios *fh);
 };
 
 #define __ptsname(buf, unit) __small_sprintf ((buf), "/dev/pty%d", (unit))

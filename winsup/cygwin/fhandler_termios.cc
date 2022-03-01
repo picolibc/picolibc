@@ -397,7 +397,7 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 		 pseudo console because this process attached to it
 		 before sending CTRL_C_EVENT. In this case, closing
 		 pseudo console is necessary. */
-	      fhandler_pty_slave::close_pseudoconsole_if_necessary (ttyp, fh);
+	      fhandler_pty_slave::release_ownership_of_nat_pipe (ttyp, fh);
 	      FreeConsole ();
 	      if (resume_pid && console_exists)
 		AttachConsole (resume_pid);
