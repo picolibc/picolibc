@@ -180,40 +180,40 @@ lib_a_CFLAGS = $(AM_CFLAGS)
 lib_a_DEPENDENCIES = $(LIBADD_OBJS) $(ELIX_OBJS)
 LIB_COMPILE = $(AM_V_CC)$(COMPILE)
 
-$(lpfx)mallocr.o: mallocr.c
+$(lpfx)mallocr.o: _mallocr.c
 	$(LIB_COMPILE) -DDEFINE_MALLOC -c $< -o $@
 
-$(lpfx)freer.o: mallocr.c
+$(lpfx)freer.o: _mallocr.c
 	$(LIB_COMPILE) -DDEFINE_FREE -c $< -o $@
 
-$(lpfx)reallocr.o: mallocr.c
+$(lpfx)reallocr.o: _mallocr.c
 	$(LIB_COMPILE) -DDEFINE_REALLOC -c $< -o $@
 
-$(lpfx)callocr.o: mallocr.c
+$(lpfx)callocr.o: _mallocr.c
 	$(LIB_COMPILE) -DDEFINE_CALLOC -c $< -o $@
 
-$(lpfx)cfreer.o: mallocr.c
+$(lpfx)cfreer.o: _mallocr.c
 	$(LIB_COMPILE) -DDEFINE_CFREE -c $< -o $@
 
-$(lpfx)malignr.o: mallocr.c
+$(lpfx)malignr.o: _mallocr.c
 	$(LIB_COMPILE) -DDEFINE_MEMALIGN -c $< -o $@
 
-$(lpfx)vallocr.o: mallocr.c
+$(lpfx)vallocr.o: _mallocr.c
 	$(LIB_COMPILE) -DDEFINE_VALLOC -c $< -o $@
 
-$(lpfx)pvallocr.o: mallocr.c
+$(lpfx)pvallocr.o: _mallocr.c
 	$(LIB_COMPILE) -DDEFINE_PVALLOC -c $< -o $@
 
-$(lpfx)mallinfor.o: mallocr.c
+$(lpfx)mallinfor.o: _mallocr.c
 	$(LIB_COMPILE) -DDEFINE_MALLINFO -c $< -o $@
 
-$(lpfx)mallstatsr.o: mallocr.c
+$(lpfx)mallstatsr.o: _mallocr.c
 	$(LIB_COMPILE) -DDEFINE_MALLOC_STATS -c $< -o $@
 
-$(lpfx)msizer.o: mallocr.c
+$(lpfx)msizer.o: _mallocr.c
 	$(LIB_COMPILE) -DDEFINE_MALLOC_USABLE_SIZE -c $< -o $@
 
-$(lpfx)malloptr.o: mallocr.c
+$(lpfx)malloptr.o: _mallocr.c
 	$(LIB_COMPILE) -DDEFINE_MALLOPT -c $< -o $@
 
 $(lpfx)dtoa.o: dtoa.c mprec.h
