@@ -1257,9 +1257,9 @@ format_process_status (void *data, char *&destbuf)
 				   "VmStk:\t%8lu kB\n"
 				   "VmExe:\t%8lu kB\n"
 				   "VmLib:\t%8lu kB\n"
-				   "SigPnd:\t%016x\n"
-				   "SigBlk:\t%016x\n"
-				   "SigIgn:\t%016x\n",
+				   "SigPnd:\t%016lx\n"
+				   "SigBlk:\t%016lx\n"
+				   "SigIgn:\t%016lx\n",
 			  cmd,
 			  state, state_str,
 			  p->pgid,
