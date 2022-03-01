@@ -357,6 +357,7 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	     which the target process is attaching before sending the
 	     CTRL_C_EVENT. After sending the event, reattach to the
 	     console to which the process was previously attached.  */
+	  bool console_exists = fhandler_console::exists ();
 	  pinfo pinfo_resume = pinfo (myself->ppid);
 	  DWORD resume_pid = 0;
 	  if (pinfo_resume)
@@ -364,11 +365,12 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	  else
 	    resume_pid = fhandler_pty_common::get_console_process_id
 	      (myself->dwProcessId, false);
-	  if (resume_pid && fh && !fh->is_console ())
+	  if ((!console_exists || resume_pid) && fh && !fh->is_console ())
 	    {
 	      FreeConsole ();
 	      AttachConsole (p->dwProcessId);
-	      init_console_handler (true);
+	      init_console_handler (::cygheap->ctty
+				    && ::cygheap->ctty->is_console ());
 	    }
 	  if (fh && p == myself && being_debugged ())
 	    { /* Avoid deadlock in gdb on console. */
@@ -388,11 +390,19 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	      GenerateConsoleCtrlEvent (CTRL_C_EVENT, 0);
 	      ctrl_c_event_sent = true;
 	    }
-	  if (resume_pid && fh && !fh->is_console ())
+	  if ((!console_exists || resume_pid) && fh && !fh->is_console ())
 	    {
+	      /* If a process on pseudo console is killed by Ctrl-C,
+		 this process may take over the ownership of the
+		 pseudo console because this process attached to it
+		 before sending CTRL_C_EVENT. In this case, closing
+		 pseudo console is necessary. */
+	      fhandler_pty_slave::close_pseudoconsole_if_necessary (ttyp, fh);
 	      FreeConsole ();
-	      AttachConsole (resume_pid);
-	      init_console_handler (true);
+	      if (resume_pid && console_exists)
+		AttachConsole (resume_pid);
+	      init_console_handler (::cygheap->ctty
+				    && ::cygheap->ctty->is_console ());
 	    }
 	  need_discard_input = true;
 	}

@@ -1157,6 +1157,9 @@ ctrl_c_handler (DWORD type)
 
   tty_min *t = cygwin_shared->tty.get_cttyp ();
 
+  if (!t)
+    return TRUE;
+
   /* If process group leader is non-cygwin process or not exist,
      send signal to myself. */
   pinfo pi (t->getpgid ());

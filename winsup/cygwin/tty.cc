@@ -344,7 +344,7 @@ tty_min::setpgid (int pid)
 	      CloseHandle (pcon_owner);
 	      FreeConsole ();
 	      AttachConsole (ttyp->pcon_pid);
-	      init_console_handler (true);
+	      init_console_handler (false);
 	      attach_restore = true;
 	    }
 	  WaitForSingleObject (ptys->input_mutex, mutex_timeout);
@@ -355,14 +355,9 @@ tty_min::setpgid (int pid)
 	    {
 	      FreeConsole ();
 	      pinfo p (myself->ppid);
-	      if (p)
-		{
-		  if (!AttachConsole (p->dwProcessId))
-		    AttachConsole (ATTACH_PARENT_PROCESS);
-		}
-	      else
+	      if (!p || !AttachConsole (p->dwProcessId))
 		AttachConsole (ATTACH_PARENT_PROCESS);
-	      init_console_handler (true);
+	      init_console_handler (false);
 	    }
 	}
       ReleaseMutex (ptys->pcon_mutex);
