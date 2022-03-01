@@ -83,34 +83,6 @@ GENERAL_SOURCES += \
 	wcstold.c
 endif # HAVE_LONG_DOUBLE
 
-if NEWLIB_NANO_MALLOC
-MALIGNR=nano-malignr
-MALLOPTR=nano-malloptr
-PVALLOCR=nano-pvallocr
-VALLOCR=nano-vallocr
-FREER=nano-freer
-REALLOCR=nano-reallocr
-CALLOCR=nano-callocr
-CFREER=nano-cfreer
-MALLINFOR=nano-mallinfor
-MALLSTATSR=nano-mallstatsr
-MSIZER=nano-msizer
-MALLOCR=nano-mallocr
-else
-MALIGNR=malignr
-MALLOPTR=malloptr
-PVALLOCR=pvallocr
-VALLOCR=vallocr
-FREER=freer
-REALLOCR=reallocr
-CALLOCR=callocr
-CFREER=cfreer
-MALLINFOR=mallinfor
-MALLSTATSR=mallstatsr
-MSIZER=msizer
-MALLOCR=mallocr
-endif
-
 EXTENDED_SOURCES = \
 	arc4random.c	\
 	arc4random_uniform.c \
@@ -162,10 +134,10 @@ ELIX_2_SOURCES = \
 	wctob.c
 
 ELIX_2_OBJS = \
-	$(lpfx)$(MALIGNR).o	\
-	$(lpfx)$(MALLOPTR).o \
-	$(lpfx)$(PVALLOCR).o	\
-	$(lpfx)$(VALLOCR).o
+	$(lpfx)malignr.o	\
+	$(lpfx)malloptr.o \
+	$(lpfx)pvallocr.o	\
+	$(lpfx)vallocr.o
 
 ELIX_3_SOURCES = \
 	putenv.c	\
@@ -196,10 +168,10 @@ endif
 endif
 
 # Because of how libtool moves objects around, mallocr must be built last.
-LIBADD_OBJS = $(lpfx)$(FREER).o $(lpfx)$(REALLOCR).o \
-	$(lpfx)$(CALLOCR).o $(lpfx)$(CFREER).o \
-	$(lpfx)$(MALLINFOR).o $(lpfx)$(MALLSTATSR).o \
-	$(lpfx)$(MSIZER).o $(lpfx)$(MALLOCR).o
+LIBADD_OBJS = $(lpfx)freer.o $(lpfx)reallocr.o \
+	$(lpfx)callocr.o $(lpfx)cfreer.o \
+	$(lpfx)mallinfor.o $(lpfx)mallstatsr.o \
+	$(lpfx)msizer.o $(lpfx)mallocr.o
 
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(GENERAL_SOURCES) $(EXTENDED_SOURCES) $(ELIX_SOURCES)
@@ -208,41 +180,41 @@ lib_a_CFLAGS = $(AM_CFLAGS)
 lib_a_DEPENDENCIES = $(LIBADD_OBJS) $(ELIX_OBJS)
 LIB_COMPILE = $(AM_V_CC)$(COMPILE)
 
-$(lpfx)$(MALLOCR).o: $(MALLOCR).c
-	$(LIB_COMPILE) -DDEFINE_MALLOC -c $(srcdir)/$(MALLOCR).c -o $@
+$(lpfx)mallocr.o: mallocr.c
+	$(LIB_COMPILE) -DDEFINE_MALLOC -c $< -o $@
 
-$(lpfx)$(FREER).o: $(MALLOCR).c
-	$(LIB_COMPILE) -DDEFINE_FREE -c $(srcdir)/$(MALLOCR).c -o $@
+$(lpfx)freer.o: mallocr.c
+	$(LIB_COMPILE) -DDEFINE_FREE -c $< -o $@
 
-$(lpfx)$(REALLOCR).o: $(MALLOCR).c
-	$(LIB_COMPILE) -DDEFINE_REALLOC -c $(srcdir)/$(MALLOCR).c -o $@
+$(lpfx)reallocr.o: mallocr.c
+	$(LIB_COMPILE) -DDEFINE_REALLOC -c $< -o $@
 
-$(lpfx)$(CALLOCR).o: $(MALLOCR).c
-	$(LIB_COMPILE) -DDEFINE_CALLOC -c $(srcdir)/$(MALLOCR).c -o $@
+$(lpfx)callocr.o: mallocr.c
+	$(LIB_COMPILE) -DDEFINE_CALLOC -c $< -o $@
 
-$(lpfx)$(CFREER).o: $(MALLOCR).c
-	$(LIB_COMPILE) -DDEFINE_CFREE -c $(srcdir)/$(MALLOCR).c -o $@
+$(lpfx)cfreer.o: mallocr.c
+	$(LIB_COMPILE) -DDEFINE_CFREE -c $< -o $@
 
-$(lpfx)$(MALIGNR).o: $(MALLOCR).c
-	$(LIB_COMPILE) -DDEFINE_MEMALIGN -c $(srcdir)/$(MALLOCR).c -o $@
+$(lpfx)malignr.o: mallocr.c
+	$(LIB_COMPILE) -DDEFINE_MEMALIGN -c $< -o $@
 
-$(lpfx)$(VALLOCR).o: $(MALLOCR).c
-	$(LIB_COMPILE) -DDEFINE_VALLOC -c $(srcdir)/$(MALLOCR).c -o $@
+$(lpfx)vallocr.o: mallocr.c
+	$(LIB_COMPILE) -DDEFINE_VALLOC -c $< -o $@
 
-$(lpfx)$(PVALLOCR).o: $(MALLOCR).c
-	$(LIB_COMPILE) -DDEFINE_PVALLOC -c $(srcdir)/$(MALLOCR).c -o $@
+$(lpfx)pvallocr.o: mallocr.c
+	$(LIB_COMPILE) -DDEFINE_PVALLOC -c $< -o $@
 
-$(lpfx)$(MALLINFOR).o: $(MALLOCR).c
-	$(LIB_COMPILE) -DDEFINE_MALLINFO -c $(srcdir)/$(MALLOCR).c -o $@
+$(lpfx)mallinfor.o: mallocr.c
+	$(LIB_COMPILE) -DDEFINE_MALLINFO -c $< -o $@
 
-$(lpfx)$(MALLSTATSR).o: $(MALLOCR).c
-	$(LIB_COMPILE) -DDEFINE_MALLOC_STATS -c $(srcdir)/$(MALLOCR).c -o $@
+$(lpfx)mallstatsr.o: mallocr.c
+	$(LIB_COMPILE) -DDEFINE_MALLOC_STATS -c $< -o $@
 
-$(lpfx)$(MSIZER).o: $(MALLOCR).c
-	$(LIB_COMPILE) -DDEFINE_MALLOC_USABLE_SIZE -c $(srcdir)/$(MALLOCR).c -o $@
+$(lpfx)msizer.o: mallocr.c
+	$(LIB_COMPILE) -DDEFINE_MALLOC_USABLE_SIZE -c $< -o $@
 
-$(lpfx)$(MALLOPTR).o: $(MALLOCR).c
-	$(LIB_COMPILE) -DDEFINE_MALLOPT -c $(srcdir)/$(MALLOCR).c -o $@
+$(lpfx)malloptr.o: mallocr.c
+	$(LIB_COMPILE) -DDEFINE_MALLOPT -c $< -o $@
 
 $(lpfx)dtoa.o: dtoa.c mprec.h
 $(lpfx)ldtoa.o: ldtoa.c mprec.h gdtoa.h

@@ -1,5 +1,8 @@
+#include <newlib.h>
 #ifdef MALLOC_PROVIDED
 int _dummy_mallocr = 1;
+#elif defined(_NANO_MALLOC)
+# include "nano-mallocr.c"
 #else
 /* ---------- To make a malloc.h, start cutting here ------------ */
 
