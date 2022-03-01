@@ -631,6 +631,8 @@ CFLAGS
 CC
 CONFIG_WINCE_FALSE
 CONFIG_WINCE_TRUE
+CONFIG_LM32_FALSE
+CONFIG_LM32_TRUE
 CONFIG_LIBNOSYS_FALSE
 CONFIG_LIBNOSYS_TRUE
 CONFIG_IQ2000_FALSE
@@ -2848,9 +2850,7 @@ subdirs="$subdirs aarch64"
 	subdirs="$subdirs ft32"
 	;;
   lm32*-*-*)
-	ac_config_files="$ac_config_files lm32/Makefile"
-
-	subdirs="$subdirs lm32"
+	config_lm32=true
 	;;
   mcore-*-*)
 	ac_config_files="$ac_config_files mcore/Makefile"
@@ -2980,6 +2980,14 @@ fi
 else
   CONFIG_LIBNOSYS_TRUE='#'
   CONFIG_LIBNOSYS_FALSE=
+fi
+
+   if test x$config_lm32 = xtrue; then
+  CONFIG_LM32_TRUE=
+  CONFIG_LM32_FALSE='#'
+else
+  CONFIG_LM32_TRUE='#'
+  CONFIG_LM32_FALSE=
 fi
 
    if test x$config_wince = xtrue; then
@@ -5199,6 +5207,10 @@ if test -z "${CONFIG_LIBNOSYS_TRUE}" && test -z "${CONFIG_LIBNOSYS_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_LIBNOSYS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${CONFIG_LM32_TRUE}" && test -z "${CONFIG_LM32_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_LM32\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${CONFIG_WINCE_TRUE}" && test -z "${CONFIG_WINCE_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_WINCE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -5847,7 +5859,6 @@ do
     "fr30/Makefile") CONFIG_FILES="$CONFIG_FILES fr30/Makefile" ;;
     "frv/Makefile") CONFIG_FILES="$CONFIG_FILES frv/Makefile" ;;
     "ft32/Makefile") CONFIG_FILES="$CONFIG_FILES ft32/Makefile" ;;
-    "lm32/Makefile") CONFIG_FILES="$CONFIG_FILES lm32/Makefile" ;;
     "mcore/Makefile") CONFIG_FILES="$CONFIG_FILES mcore/Makefile" ;;
     "mep/Makefile") CONFIG_FILES="$CONFIG_FILES mep/Makefile" ;;
     "moxie/Makefile") CONFIG_FILES="$CONFIG_FILES moxie/Makefile" ;;

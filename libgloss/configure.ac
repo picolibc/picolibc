@@ -147,8 +147,7 @@ case "${target}" in
 	subdirs="$subdirs ft32"
 	;;
   lm32*-*-*)
-	AC_CONFIG_FILES([lm32/Makefile])
-	subdirs="$subdirs lm32"
+	config_lm32=true
 	;;
   mcore-*-*)
 	AC_CONFIG_FILES([mcore/Makefile])
@@ -240,7 +239,7 @@ esac
 dnl These subdirs have converted to non-recursive make.  Hopefully someday all
 dnl the ports above will too!
 m4_foreach_w([SUBDIR], [
-  bfin iq2000 libnosys wince
+  bfin iq2000 libnosys lm32 wince
 ], [dnl
   AM_CONDITIONAL([CONFIG_]m4_toupper(SUBDIR), [test x$config_]SUBDIR = xtrue)
 ])

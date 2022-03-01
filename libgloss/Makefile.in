@@ -138,8 +138,11 @@ check_PROGRAMS = $(am__EXEEXT_2) $(am__EXEEXT_3)
 @CONFIG_IQ2000_TRUE@am__append_12 = iq2000/test
 @CONFIG_LIBNOSYS_TRUE@am__append_13 = libnosys/nosys.specs
 @CONFIG_LIBNOSYS_TRUE@am__append_14 = libnosys/libnosys.a
-@CONFIG_WINCE_TRUE@am__append_15 = $(gdbdir)
-@CONFIG_WINCE_TRUE@am__append_16 = wince/stub.exe
+@CONFIG_LM32_TRUE@am__append_15 = lm32/crt0.o lm32/sim.ld
+@CONFIG_LM32_TRUE@am__append_16 = lm32/libgloss.a
+@CONFIG_LM32_TRUE@am__append_17 = lm32/crt0.S
+@CONFIG_WINCE_TRUE@am__append_18 = $(gdbdir)
+@CONFIG_WINCE_TRUE@am__append_19 = wince/stub.exe
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../config/depstand.m4 \
@@ -167,12 +170,11 @@ CONFIG_CLEAN_FILES = arc/Makefile csky/Makefile epiphany/Makefile \
 	sparc/Makefile mips/Makefile riscv/Makefile rs6000/Makefile \
 	mn10200/Makefile mn10300/Makefile cr16/Makefile cris/Makefile \
 	crx/Makefile d30v/Makefile fr30/Makefile frv/Makefile \
-	ft32/Makefile lm32/Makefile mcore/Makefile mep/Makefile \
-	moxie/Makefile microblaze/Makefile mt/Makefile v850/Makefile \
-	visium/Makefile xc16x/Makefile xstormy16/Makefile \
-	m32c/Makefile msp430/Makefile rl78/Makefile rx/Makefile \
-	spu/Makefile tic6x/Makefile or1k/Makefile pru/Makefile \
-	nios2/Makefile
+	ft32/Makefile mcore/Makefile mep/Makefile moxie/Makefile \
+	microblaze/Makefile mt/Makefile v850/Makefile visium/Makefile \
+	xc16x/Makefile xstormy16/Makefile m32c/Makefile \
+	msp430/Makefile rl78/Makefile rx/Makefile spu/Makefile \
+	tic6x/Makefile or1k/Makefile pru/Makefile nios2/Makefile
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -278,8 +280,15 @@ libobjs_a_LIBADD =
 @CONFIG_BFIN_TRUE@am__objects_1 = bfin/crt0.$(OBJEXT) \
 @CONFIG_BFIN_TRUE@	bfin/basiccrt.$(OBJEXT)
 @CONFIG_IQ2000_TRUE@am__objects_2 = iq2000/crt0.$(OBJEXT)
-am_libobjs_a_OBJECTS = $(am__objects_1) $(am__objects_2)
+@CONFIG_LM32_TRUE@am__objects_3 = lm32/crt0.$(OBJEXT)
+am_libobjs_a_OBJECTS = $(am__objects_1) $(am__objects_2) \
+	$(am__objects_3)
 libobjs_a_OBJECTS = $(am_libobjs_a_OBJECTS)
+lm32_libgloss_a_AR = $(AR) $(ARFLAGS)
+lm32_libgloss_a_LIBADD =
+@CONFIG_LM32_TRUE@am_lm32_libgloss_a_OBJECTS = lm32/isatty.$(OBJEXT) \
+@CONFIG_LM32_TRUE@	lm32/scall.$(OBJEXT)
+lm32_libgloss_a_OBJECTS = $(am_lm32_libgloss_a_OBJECTS)
 @CONFIG_WINCE_TRUE@am__EXEEXT_1 = wince/stub.exe$(EXEEXT)
 @CONFIG_BFIN_TRUE@am__EXEEXT_2 = bfin/sim-test$(EXEEXT)
 @CONFIG_IQ2000_TRUE@am__EXEEXT_3 = iq2000/test$(EXEEXT)
@@ -334,8 +343,8 @@ am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(bfin_libbfinbsp_a_SOURCES) $(bfin_libsim_a_SOURCES) \
 	$(iq2000_libeval_a_SOURCES) $(libnosys_libnosys_a_SOURCES) \
-	$(libobjs_a_SOURCES) bfin/sim-test.c iq2000/test.c \
-	$(wince_stub_exe_SOURCES)
+	$(libobjs_a_SOURCES) $(lm32_libgloss_a_SOURCES) \
+	bfin/sim-test.c iq2000/test.c $(wince_stub_exe_SOURCES)
 AM_V_DVIPS = $(am__v_DVIPS_@AM_V@)
 am__v_DVIPS_ = $(am__v_DVIPS_@AM_DEFAULT_V@)
 am__v_DVIPS_0 = @echo "  DVIPS   " $@;
@@ -420,7 +429,7 @@ ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
 DIST_SUBDIRS = $(SUBDIRS)
-VPATH = @srcdir@ $(am__append_15)
+VPATH = @srcdir@ $(am__append_18)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
@@ -549,9 +558,9 @@ SUBDIRS = @subdirs@ .
 tooldir = $(exec_prefix)/$(target_alias)
 multilibtooldir = $(tooldir)/lib$(MULTISUBDIR)
 multilibtool_DATA = $(am__append_4) $(am__append_6) $(am__append_9) \
-	$(am__append_13)
+	$(am__append_13) $(am__append_15)
 multilibtool_LIBRARIES = $(am__append_2) $(am__append_10) \
-	$(am__append_14)
+	$(am__append_14) $(am__append_16)
 includetooldir = $(tooldir)/include
 includetool_DATA = $(am__append_7)
 includesystooldir = $(tooldir)/include/sys
@@ -560,7 +569,7 @@ includesystool_DATA = $(am__append_8)
 # A fake library so automake will generate rules for plain objects that we want
 # to install (e.g. our crt0.o objects).
 noinst_LIBRARIES = libobjs.a
-libobjs_a_SOURCES = $(am__append_5) $(am__append_11)
+libobjs_a_SOURCES = $(am__append_5) $(am__append_11) $(am__append_17)
 FLAGS_TO_PASS = \
 	"CC=$(CC)" \
 	"CFLAGS=$(CFLAGS)" \
@@ -640,6 +649,10 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 @CONFIG_LIBNOSYS_TRUE@	libnosys/write.c \
 @CONFIG_LIBNOSYS_TRUE@	libnosys/_exit.c
 
+@CONFIG_LM32_TRUE@lm32_libgloss_a_SOURCES = \
+@CONFIG_LM32_TRUE@	lm32/isatty.c \
+@CONFIG_LM32_TRUE@	lm32/scall.S
+
 @CONFIG_WINCE_TRUE@gdbdir = ${dir ${patsubst %/,%,${dir @srcdir@}}}gdb
 @CONFIG_WINCE_TRUE@wince_stub_exe_SOURCES = wince-stub.c
 @CONFIG_WINCE_TRUE@wince_stub_exe_CPPFLAGS = $(AM_CPPFLAGS) -I$(gdbdir)
@@ -651,7 +664,7 @@ all: config.h
 .SUFFIXES: .S .c .dvi .o .obj .ps
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/wince/Makefile.inc $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/wince/Makefile.inc $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -673,7 +686,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe);; \
 	esac;
-$(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/wince/Makefile.inc $(am__empty):
+$(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/wince/Makefile.inc $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
@@ -745,8 +758,6 @@ fr30/Makefile: $(top_builddir)/config.status $(top_srcdir)/fr30/Makefile.in
 frv/Makefile: $(top_builddir)/config.status $(top_srcdir)/frv/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 ft32/Makefile: $(top_builddir)/config.status $(top_srcdir)/ft32/Makefile.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-lm32/Makefile: $(top_builddir)/config.status $(top_srcdir)/lm32/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 mcore/Makefile: $(top_builddir)/config.status $(top_srcdir)/mcore/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
@@ -958,11 +969,28 @@ bfin/basiccrt.$(OBJEXT): bfin/$(am__dirstamp) \
 	bfin/$(DEPDIR)/$(am__dirstamp)
 iq2000/crt0.$(OBJEXT): iq2000/$(am__dirstamp) \
 	iq2000/$(DEPDIR)/$(am__dirstamp)
+lm32/$(am__dirstamp):
+	@$(MKDIR_P) lm32
+	@: > lm32/$(am__dirstamp)
+lm32/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lm32/$(DEPDIR)
+	@: > lm32/$(DEPDIR)/$(am__dirstamp)
+lm32/crt0.$(OBJEXT): lm32/$(am__dirstamp) \
+	lm32/$(DEPDIR)/$(am__dirstamp)
 
 libobjs.a: $(libobjs_a_OBJECTS) $(libobjs_a_DEPENDENCIES) $(EXTRA_libobjs_a_DEPENDENCIES) 
 	$(AM_V_at)-rm -f libobjs.a
 	$(AM_V_AR)$(libobjs_a_AR) libobjs.a $(libobjs_a_OBJECTS) $(libobjs_a_LIBADD)
 	$(AM_V_at)$(RANLIB) libobjs.a
+lm32/isatty.$(OBJEXT): lm32/$(am__dirstamp) \
+	lm32/$(DEPDIR)/$(am__dirstamp)
+lm32/scall.$(OBJEXT): lm32/$(am__dirstamp) \
+	lm32/$(DEPDIR)/$(am__dirstamp)
+
+lm32/libgloss.a: $(lm32_libgloss_a_OBJECTS) $(lm32_libgloss_a_DEPENDENCIES) $(EXTRA_lm32_libgloss_a_DEPENDENCIES) lm32/$(am__dirstamp)
+	$(AM_V_at)-rm -f lm32/libgloss.a
+	$(AM_V_AR)$(lm32_libgloss_a_AR) lm32/libgloss.a $(lm32_libgloss_a_OBJECTS) $(lm32_libgloss_a_LIBADD)
+	$(AM_V_at)$(RANLIB) lm32/libgloss.a
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
@@ -1033,6 +1061,7 @@ mostlyclean-compile:
 	-rm -f bfin/*.$(OBJEXT)
 	-rm -f iq2000/*.$(OBJEXT)
 	-rm -f libnosys/*.$(OBJEXT)
+	-rm -f lm32/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -1091,6 +1120,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/unlink.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/wait.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libnosys/$(DEPDIR)/write.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lm32/$(DEPDIR)/crt0.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lm32/$(DEPDIR)/isatty.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lm32/$(DEPDIR)/scall.Po@am__quote@
 
 .S.o:
 @am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -1545,6 +1577,8 @@ distclean-generic:
 	-rm -f iq2000/$(am__dirstamp)
 	-rm -f libnosys/$(DEPDIR)/$(am__dirstamp)
 	-rm -f libnosys/$(am__dirstamp)
+	-rm -f lm32/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lm32/$(am__dirstamp)
 	-rm -f wince/$(am__dirstamp)
 
 maintainer-clean-generic:
@@ -1558,7 +1592,7 @@ clean-am: clean-aminfo clean-binPROGRAMS clean-checkPROGRAMS \
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf ./$(DEPDIR) bfin/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) bfin/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-local distclean-tags
@@ -1699,7 +1733,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf ./$(DEPDIR) bfin/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) bfin/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-aminfo \
 	maintainer-clean-generic maintainer-clean-local

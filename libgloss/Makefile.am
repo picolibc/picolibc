@@ -68,6 +68,9 @@ endif
 if CONFIG_LIBNOSYS
 include libnosys/Makefile.inc
 endif
+if CONFIG_LM32
+include lm32/Makefile.inc
+endif
 if CONFIG_WINCE
 include wince/Makefile.inc
 endif
