@@ -205,15 +205,15 @@ sigprocmask (int how, const sigset_t *set, sigset_t *oldset)
 int __reg3
 handle_sigprocmask (int how, const sigset_t *set, sigset_t *oldset, sigset_t& opmask)
 {
-  /* check that how is in right range */
-  if (how != SIG_BLOCK && how != SIG_UNBLOCK && how != SIG_SETMASK)
+  /* check that how is in right range if set is not NULL */
+  if (set && how != SIG_BLOCK && how != SIG_UNBLOCK && how != SIG_SETMASK)
     {
       syscall_printf ("Invalid how value %d", how);
       return EINVAL;
     }
 
   __try
-	{
+    {
       if (oldset)
 	*oldset = opmask;
 
