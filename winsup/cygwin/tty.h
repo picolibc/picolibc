@@ -20,7 +20,7 @@ details. */
 #define INPUT_AVAILABLE_EVENT	"cygtty.input.avail"
 #define OUTPUT_MUTEX		"cygtty.output.mutex"
 #define INPUT_MUTEX		"cygtty.input.mutex"
-#define PCON_MUTEX		"cygtty.pcon.mutex"
+#define PIPE_SW_MUTEX		"cygtty.pipe_sw.mutex"
 #define TTY_SLAVE_ALIVE		"cygtty.slave_alive"
 #define TTY_SLAVE_READING	"cygtty.slave_reading"
 
@@ -80,6 +80,10 @@ public:
   const __reg1 char *ttyname () __attribute (());
 };
 
+
+/* The name *nat* comes from 'native' which means non-cygwin
+   (native windows). They are used for non-cygwin process. */
+
 class fhandler_pty_master;
 
 class tty: public tty_min
@@ -112,11 +116,11 @@ private:
   bool pcon_activated;
   bool pcon_start;
   pid_t pcon_start_pid;
-  bool switch_to_pcon_in;
-  DWORD pcon_pid;
+  bool switch_to_nat_pipe;
+  DWORD nat_pipe_owner_pid;
   UINT term_code_page;
-  DWORD pcon_last_time;
-  bool pcon_fwd_not_empty;
+  DWORD fwd_last_time;
+  bool fwd_not_empty;
   HANDLE h_pcon_write_pipe;
   HANDLE h_pcon_condrv_reference;
   HANDLE h_pcon_conhost_process;
@@ -130,7 +134,7 @@ private:
   UINT previous_output_code_page;
   bool master_is_running_as_service;
   bool req_xfer_input;
-  xfer_dir pcon_input_state;
+  xfer_dir pty_input_state;
   bool mask_flusho;
   bool discard_input;
   bool stop_fwd_thread;
@@ -167,9 +171,9 @@ public:
   void set_master_ctl_closed () {master_pid = -1;}
   static void __stdcall create_master (int);
   static void __stdcall init_session ();
-  void wait_pcon_fwd ();
-  bool pcon_input_state_eq (xfer_dir x) { return pcon_input_state == x; }
-  bool pcon_fg (pid_t pgid);
+  void wait_fwd ();
+  bool pty_input_state_eq (xfer_dir x) { return pty_input_state == x; }
+  bool nat_fg (pid_t pgid);
   friend class fhandler_pty_common;
   friend class fhandler_pty_master;
   friend class fhandler_pty_slave;

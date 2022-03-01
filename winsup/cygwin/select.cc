@@ -1351,7 +1351,7 @@ peek_pty_slave (select_record *s, bool from_select)
   fhandler_base *fh = (fhandler_base *) s->fh;
   fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
 
-  ptys->reset_switch_to_pcon ();
+  ptys->reset_switch_to_nat_pipe ();
 
   if (s->read_selected)
     {
@@ -1437,7 +1437,7 @@ pty_slave_startup (select_record *me, select_stuff *stuff)
   fhandler_base *fh = (fhandler_base *) me->fh;
   fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
   if (me->read_selected)
-    ptys->mask_switch_to_pcon_in (true, true);
+    ptys->mask_switch_to_nat_pipe (true, true);
 
   select_pipe_info *pi = stuff->device_specific_ptys;
   if (pi->start)
@@ -1464,7 +1464,7 @@ pty_slave_cleanup (select_record *me, select_stuff *stuff)
   if (!pi)
     return;
   if (me->read_selected && pi->start)
-    ptys->mask_switch_to_pcon_in (false, false);
+    ptys->mask_switch_to_nat_pipe (false, false);
   if (pi->thread)
     {
       pi->stop_thread = true;

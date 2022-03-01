@@ -2269,13 +2269,13 @@ class fhandler_pty_common: public fhandler_termios
  public:
   fhandler_pty_common ()
     : fhandler_termios (),
-    output_mutex (NULL), input_mutex (NULL), pcon_mutex (NULL),
+    output_mutex (NULL), input_mutex (NULL), pipe_sw_mutex (NULL),
     input_available_event (NULL)
   {
     pc.file_attributes (FILE_ATTRIBUTE_NORMAL);
   }
   static const unsigned pipesize = 128 * 1024;
-  HANDLE output_mutex, input_mutex, pcon_mutex;
+  HANDLE output_mutex, input_mutex, pipe_sw_mutex;
   HANDLE input_available_event;
 
   bool use_archetype () const {return true;}
@@ -2311,7 +2311,7 @@ class fhandler_pty_common: public fhandler_termios
   static DWORD get_console_process_id (DWORD pid, bool match,
 				       bool cygwin = false,
 				       bool stub_only = false);
-  bool to_be_read_from_pcon (void);
+  bool to_be_read_from_nat_pipe (void);
 
  protected:
   static BOOL process_opost_output (HANDLE h, const void *ptr, ssize_t& len,
@@ -2337,7 +2337,7 @@ class fhandler_pty_slave: public fhandler_pty_common
     HANDLE from_master_nat;
     HANDLE input_available_event;
     HANDLE input_mutex;
-    HANDLE pcon_mutex;
+    HANDLE pipe_sw_mutex;
   };
 
   /* Constructor */
@@ -2394,9 +2394,9 @@ class fhandler_pty_slave: public fhandler_pty_common
   static void close_pseudoconsole (tty *ttyp, DWORD force_switch_to = 0);
   static void hand_over_only (tty *ttyp, DWORD force_switch_to = 0);
   bool term_has_pcon_cap (const WCHAR *env);
-  void set_switch_to_pcon (void);
-  void reset_switch_to_pcon (void);
-  void mask_switch_to_pcon_in (bool mask, bool xfer);
+  void set_switch_to_nat_pipe (void);
+  void reset_switch_to_nat_pipe (void);
+  void mask_switch_to_nat_pipe (bool mask, bool xfer);
   void setup_locale (void);
   void create_invisible_console (void);
   static void transfer_input (tty::xfer_dir dir, HANDLE from, tty *ttyp,

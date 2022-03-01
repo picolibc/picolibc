@@ -236,11 +236,11 @@ tty::init ()
   is_console = false;
   column = 0;
   pcon_activated = false;
-  switch_to_pcon_in = false;
-  pcon_pid = 0;
+  switch_to_nat_pipe = false;
+  nat_pipe_owner_pid = 0;
   term_code_page = 0;
-  pcon_last_time = 0;
-  pcon_fwd_not_empty = false;
+  fwd_last_time = 0;
+  fwd_not_empty = false;
   pcon_start = false;
   pcon_start_pid = 0;
   pcon_cap_checked = false;
@@ -251,7 +251,7 @@ tty::init ()
   previous_output_code_page = 0;
   master_is_running_as_service = false;
   req_xfer_input = false;
-  pcon_input_state = to_cyg;
+  pty_input_state = to_cyg;
   last_sig = 0;
   mask_flusho = false;
   discard_input = false;
@@ -313,27 +313,27 @@ tty_min::setpgid (int pid)
 }
 
 void
-tty::wait_pcon_fwd ()
+tty::wait_fwd ()
 {
   /* The forwarding in pseudo console sometimes stops for
      16-32 msec even if it already has data to transfer.
      If the time without transfer exceeds 32 msec, the
-     forwarding is supposed to be finished. pcon_last_time
+     forwarding is supposed to be finished. fwd_last_time
      is reset to GetTickCount() in pty master forwarding
      thread when the last data is transfered. */
-  const int sleep_in_pcon = 16;
-  const int time_to_wait = sleep_in_pcon * 2 + 1/* margine */;
+  const int sleep_in_nat_pipe = 16;
+  const int time_to_wait = sleep_in_nat_pipe * 2 + 1/* margine */;
   int elapsed;
-  while (pcon_fwd_not_empty
-	 || (elapsed = GetTickCount () - pcon_last_time) < time_to_wait)
+  while (fwd_not_empty
+	 || (elapsed = GetTickCount () - fwd_last_time) < time_to_wait)
     {
-      int tw = pcon_fwd_not_empty ? 10 : (time_to_wait - elapsed);
+      int tw = fwd_not_empty ? 10 : (time_to_wait - elapsed);
       cygwait (tw);
     }
 }
 
 bool
-tty::pcon_fg (pid_t pgid)
+tty::nat_fg (pid_t pgid)
 {
   /* Check if the terminal pgid matches with the pgid of the
      non-cygwin process. */
