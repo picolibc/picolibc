@@ -115,7 +115,7 @@ AC_SUBST(abs_newlib_basedir)
 AC_CANONICAL_HOST
 
 AM_INIT_AUTOMAKE([foreign no-installinfo no-dependencies no-dist no-define subdir-objects 1.15.1])
-AM_MAINTAINER_MODE()
+AM_MAINTAINER_MODE
 AM_SILENT_RULES(yes)
 
 AC_NO_EXECUTABLES
@@ -131,8 +131,6 @@ dnl We need these programs, but so does Automake.  Require the macros to avoid
 dnl expanding them multiple times.
 AC_REQUIRE([AC_PROG_INSTALL])dnl
 AC_REQUIRE([AC_PROG_AWK])dnl
-
-AM_MAINTAINER_MODE
 
 . [$]{newlib_basedir}/configure.host
 
