@@ -1371,6 +1371,26 @@ wait_sig (VOID *)
 	case __SIGSTRACE:
 	  strace.activate (false);
 	  break;
+	case __SIGPENDINGALL:
+	  {
+	    unsigned bit;
+	    bool issig_wait;
+
+	    *pack.mask = 0;
+	    while ((q = q->next))
+	      {
+		if (q->sigtls->sigmask & (bit = SIGTOMASK (q->si.si_signo)))
+		  {
+		    tl_entry = cygheap->find_tls (q->si.si_signo, issig_wait);
+		    if (tl_entry)
+		      {
+			*pack.mask |= bit;
+			cygheap->unlock_tls (tl_entry);
+		      }
+		  }
+	      }
+	  }
+	  break;
 	case __SIGPENDING:
 	  {
 	    unsigned bit;
