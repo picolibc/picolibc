@@ -769,7 +769,7 @@ ctags: CTAGS
 tags:  CTAGS
 CTAGS:
 	-cd $(srcdir) && \
-	ctags -R --c++-kinds=+p --fields=+iaS --extra=+q \
+	ctags -R --c++-kinds=+p --fields=+iaS --extras=+q \
 	--regex-C++='/EXPORT_ALIAS *\([a-zA-Z0-9_]*, *([a-zA-Z0-9_]*)\)/\1/' \
 	--regex-C++='/__ASMNAME *\("([a-zA-Z0-9_]+)"\)/\1/' \
 	.
