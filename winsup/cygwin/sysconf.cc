@@ -522,7 +522,7 @@ static struct
   {cons, {c:AIO_LISTIO_MAX}},		/*  34, _SC_AIO_LISTIO_MAX */
   {cons, {c:AIO_MAX}},			/*  35, _SC_AIO_MAX */
   {cons, {c:AIO_PRIO_DELTA_MAX}},	/*  36, _SC_AIO_PRIO_DELTA_MAX */
-  {nsup, {c:0}},			/*  37, _SC_DELAYTIMER_MAX */
+  {cons, {c:DELAYTIMER_MAX}},		/*  37, _SC_DELAYTIMER_MAX */
   {cons, {c:PTHREAD_KEYS_MAX}},		/*  38, _SC_THREAD_KEYS_MAX */
   {cons, {c:PTHREAD_STACK_MIN}},	/*  39, _SC_THREAD_STACK_MIN */
   {cons, {c:-1L}},			/*  40, _SC_THREAD_THREADS_MAX */
