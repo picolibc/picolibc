@@ -1274,7 +1274,7 @@ out:
     {
       DWORD discarded;
       ReadConsoleInputW (get_handle (), input_rec, discard_len, &discarded);
-      con.num_processed = max (con.num_processed - discarded, 0);
+      con.num_processed -= min (con.num_processed, discarded);
     }
   return stat;
 }
