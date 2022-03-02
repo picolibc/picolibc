@@ -481,7 +481,7 @@ printvar (const struct conf_variable *cp, const char *pathname)
 	{
 	  if (a_flag && errno != 0)
 	    return; /* Just skip invalid variables */
-	  print_strvar (cp->name, "undefined");
+	  print_strvar (cp->name, a_flag ? "" : "undefined");
 	}
       else
 	print_longvar (cp->name, val);
@@ -493,7 +493,7 @@ printvar (const struct conf_variable *cp, const char *pathname)
 	{
 	  if (a_flag && errno != 0)
 	    return; /* Just skip invalid variables */
-	  print_strvar (cp->name, "undefined");
+	  print_strvar (cp->name, a_flag ? "" : "undefined");
 	}
       else
 	print_longvar (cp->name, val);
