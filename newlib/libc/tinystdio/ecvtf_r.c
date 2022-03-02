@@ -45,14 +45,15 @@ ecvtf_r (float invalue,
          int *decpt,
          int *sign,
          char *buf,
-         int len)
+         size_t len)
 {
     struct ftoa ftoa;
     int ngot;
 
-    if (ndigit > len - 1)
-        return -1;
     if (ndigit < 0)
+        ndigit = 0;
+
+    if ((size_t) ndigit > len - 1)
         return -1;
 
     ngot = __ftoa_engine(invalue, &ftoa, ndigit, false, 0);

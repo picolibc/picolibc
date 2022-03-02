@@ -46,7 +46,7 @@ fcvt_r (double invalue,
         int *decpt,
         int *sign,
         char *buf,
-        int len)
+        size_t len)
 {
     struct dtoa dtoa;
     int ntrailing;      /* number of zeros to add after the value */
@@ -117,7 +117,7 @@ fcvt_r (double invalue,
     /* If we can't fit the whole value in the provided space,
      * return an error
      */
-    if (ndigit + ntrailing >= len)
+    if ((size_t) (ndigit + ntrailing) >= len)
         return -1;
 
     /* Value */

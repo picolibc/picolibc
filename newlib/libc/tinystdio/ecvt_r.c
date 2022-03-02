@@ -46,16 +46,17 @@ ecvt_r (double invalue,
         int *decpt,
         int *sign,
         char *buf,
-        int len)
+        size_t len)
 {
     struct dtoa dtoa;
     char *digits = dtoa.digits;
     int ngot;
 
-    if (ndigit > len - 1)
-        return -1;
     if (ndigit < 0)
         ndigit = 0;
+
+    if ((size_t) ndigit > len - 1)
+        return -1;
 
     if (!isfinite(invalue)) {
         *sign = invalue < 0;
