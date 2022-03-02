@@ -365,6 +365,7 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	  else
 	    resume_pid = fhandler_pty_common::get_console_process_id
 	      (myself->dwProcessId, false);
+	  acquire_attach_mutex (mutex_timeout);
 	  if ((!console_exists || resume_pid) && fh && !fh->is_console ())
 	    {
 	      FreeConsole ();
@@ -404,6 +405,7 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	      init_console_handler (::cygheap->ctty
 				    && ::cygheap->ctty->is_console ());
 	    }
+	  release_attach_mutex ();
 	  need_discard_input = true;
 	}
       if (p && p->ctty == ttyp->ntty && p->pgid == pgid)

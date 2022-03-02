@@ -1095,8 +1095,6 @@ fhandler_fifo::select_except (select_stuff *ss)
   return s;
 }
 
-extern DWORD mutex_timeout; /* defined in fhandler_termios.cc */
-
 static int
 peek_console (select_record *me, bool)
 {
@@ -1123,7 +1121,6 @@ peek_console (select_record *me, bool)
   set_handle_or_return_if_not_open (h, me);
 
   fh->acquire_input_mutex (mutex_timeout);
-  acquire_attach_mutex (mutex_timeout);
   while (!fh->input_ready && !fh->get_cons_readahead_valid ())
     {
       if (fh->bg_check (SIGTTIN, true) <= bg_eof)
@@ -1132,8 +1129,14 @@ peek_console (select_record *me, bool)
 	  fh->release_input_mutex ();
 	  return me->read_ready = true;
 	}
-      else if (!PeekConsoleInputW (h, &irec, 1, &events_read) || !events_read)
-	break;
+      else
+	{
+	  acquire_attach_mutex (mutex_timeout);
+	  BOOL r = PeekConsoleInputW (h, &irec, 1, &events_read);
+	  release_attach_mutex ();
+	  if (!r || !events_read)
+	    break;
+	}
       if (fhandler_console::input_winch == fh->process_input_message ()
 	  && global_sigs[SIGWINCH].sa_handler != SIG_IGN
 	  && global_sigs[SIGWINCH].sa_handler != SIG_DFL)
@@ -1144,7 +1147,6 @@ peek_console (select_record *me, bool)
 	  return -1;
 	}
     }
-  release_attach_mutex ();
   fh->release_input_mutex ();
   if (fh->input_ready || fh->get_cons_readahead_valid ())
     return me->read_ready = true;

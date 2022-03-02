@@ -1882,6 +1882,7 @@ class fhandler_serial: public fhandler_base
 #define release_output_mutex() \
   __release_output_mutex (__PRETTY_FUNCTION__, __LINE__)
 
+extern DWORD mutex_timeout;
 DWORD acquire_attach_mutex (DWORD t);
 void release_attach_mutex (void);
 
@@ -2181,7 +2182,13 @@ private:
   ssize_t __stdcall write (const void *ptr, size_t len);
   void doecho (const void *str, DWORD len);
   int close ();
-  static bool exists () {return !!GetConsoleCP ();}
+  static bool exists ()
+    {
+      acquire_attach_mutex (mutex_timeout);
+      UINT cp = GetConsoleCP ();
+      release_attach_mutex ();
+      return !!cp;
+    }
 
   int tcflush (int);
   int tcsetattr (int a, const struct termios *t);
