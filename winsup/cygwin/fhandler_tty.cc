@@ -530,26 +530,13 @@ fhandler_pty_master::accept_input ()
       DWORD target_pid = 0;
       if (pinfo_target)
 	target_pid = pinfo_target->dwProcessId;
-      pinfo pinfo_resume = pinfo (myself->ppid);
-      DWORD resume_pid;
-      if (pinfo_resume)
-	resume_pid = pinfo_resume->dwProcessId;
-      else
-	resume_pid = get_console_process_id (myself->dwProcessId, false);
-      bool console_exists = fhandler_console::exists ();
-      if (target_pid && (resume_pid || !console_exists))
+      if (target_pid)
 	{
 	  /* Slave attaches to a different console than master.
 	     Therefore reattach here. */
-	  acquire_attach_mutex (mutex_timeout);
-	  FreeConsole ();
-	  AttachConsole (target_pid);
+	  DWORD resume_pid = attach_console_temporarily (target_pid);
 	  cp_to = GetConsoleCP ();
-	  FreeConsole ();
-	  if (resume_pid && console_exists)
-	    AttachConsole (resume_pid);
-	  init_console_handler (false);
-	  release_attach_mutex ();
+	  resume_from_temporarily_attach (resume_pid);
 	}
       else
 	cp_to = GetConsoleCP ();
@@ -1231,33 +1218,18 @@ fhandler_pty_slave::reset_switch_to_nat_pipe (void)
 					   get_ttyp ()->nat_pipe_owner_pid);
 	      if (pcon_owner)
 		{
-		  pinfo pinfo_resume = pinfo (myself->ppid);
-		  DWORD resume_pid;
-		  if (pinfo_resume)
-		    resume_pid = pinfo_resume->dwProcessId;
-		  else
-		    resume_pid =
-		      get_console_process_id (myself->dwProcessId, false);
-		  if (resume_pid)
-		    {
-		      HANDLE h_pcon_in;
-		      DuplicateHandle (pcon_owner, get_ttyp ()->h_pcon_in,
-				       GetCurrentProcess (), &h_pcon_in,
-				       0, TRUE, DUPLICATE_SAME_ACCESS);
-		      acquire_attach_mutex (mutex_timeout);
-		      FreeConsole ();
-		      AttachConsole (get_ttyp ()->nat_pipe_owner_pid);
-		      init_console_handler (false);
-		      WaitForSingleObject (input_mutex, mutex_timeout);
-		      transfer_input (tty::to_cyg, h_pcon_in, get_ttyp (),
-				      input_available_event);
-		      ReleaseMutex (input_mutex);
-		      FreeConsole ();
-		      AttachConsole (resume_pid);
-		      init_console_handler (false);
-		      release_attach_mutex ();
-		      CloseHandle (h_pcon_in);
-		    }
+		  HANDLE h_pcon_in;
+		  DuplicateHandle (pcon_owner, get_ttyp ()->h_pcon_in,
+				   GetCurrentProcess (), &h_pcon_in,
+				   0, TRUE, DUPLICATE_SAME_ACCESS);
+		  DWORD target_pid = get_ttyp ()->nat_pipe_owner_pid;
+		  DWORD resume_pid = attach_console_temporarily (target_pid);
+		  WaitForSingleObject (input_mutex, mutex_timeout);
+		  transfer_input (tty::to_cyg, h_pcon_in, get_ttyp (),
+				  input_available_event);
+		  ReleaseMutex (input_mutex);
+		  resume_from_temporarily_attach (resume_pid);
+		  CloseHandle (h_pcon_in);
 		  CloseHandle (pcon_owner);
 		}
 	    }
@@ -2853,26 +2825,13 @@ fhandler_pty_master::pty_master_fwd_thread (const master_fwd_thread_param_t *p)
       DWORD target_pid = 0;
       if (pinfo_target)
 	target_pid = pinfo_target->dwProcessId;
-      pinfo pinfo_resume = pinfo (myself->ppid);
-      DWORD resume_pid;
-      if (pinfo_resume)
-	resume_pid = pinfo_resume->dwProcessId;
-      else
-	resume_pid = get_console_process_id (myself->dwProcessId, false);
-      bool console_exists = fhandler_console::exists ();
-      if (target_pid && (resume_pid || !console_exists))
+      if (target_pid)
 	{
 	  /* Slave attaches to a different console than master.
 	     Therefore reattach here. */
-	  acquire_attach_mutex (mutex_timeout);
-	  FreeConsole ();
-	  AttachConsole (target_pid);
+	  DWORD resume_pid = attach_console_temporarily (target_pid);
 	  cp_from = GetConsoleOutputCP ();
-	  FreeConsole ();
-	  if (resume_pid && console_exists)
-	    AttachConsole (resume_pid);
-	  init_console_handler (false);
-	  release_attach_mutex ();
+	  resume_from_temporarily_attach (resume_pid);
 	}
       else
 	cp_from = GetConsoleOutputCP ();
@@ -4130,6 +4089,7 @@ fhandler_pty_slave::setpgid_aux (pid_t pid)
     {
       bool attach_restore = false;
       HANDLE from = get_handle_nat ();
+      DWORD resume_pid = 0;
       if (get_ttyp ()->pcon_activated && get_ttyp ()->nat_pipe_owner_pid
 	  && !get_console_process_id (get_ttyp ()->nat_pipe_owner_pid, true))
 	{
@@ -4139,22 +4099,15 @@ fhandler_pty_slave::setpgid_aux (pid_t pid)
 			   GetCurrentProcess (), &from,
 			   0, TRUE, DUPLICATE_SAME_ACCESS);
 	  CloseHandle (pcon_owner);
-	  FreeConsole ();
-	  AttachConsole (get_ttyp ()->nat_pipe_owner_pid);
-	  init_console_handler (false);
+	  DWORD target_pid = get_ttyp ()->nat_pipe_owner_pid;
+	  resume_pid = attach_console_temporarily (target_pid);
 	  attach_restore = true;
 	}
       WaitForSingleObject (input_mutex, mutex_timeout);
       transfer_input (tty::to_cyg, from, get_ttyp (), input_available_event);
       ReleaseMutex (input_mutex);
       if (attach_restore)
-	{
-	  FreeConsole ();
-	  pinfo p (myself->ppid);
-	  if (!p || !AttachConsole (p->dwProcessId))
-	    AttachConsole (ATTACH_PARENT_PROCESS);
-	  init_console_handler (false);
-	}
+	resume_from_temporarily_attach (resume_pid);
     }
   ReleaseMutex (pipe_sw_mutex);
 }
@@ -4186,4 +4139,41 @@ fhandler_pty_slave::release_ownership_of_nat_pipe (tty *ttyp,
 	hand_over_only (ttyp);
       ReleaseMutex (ptym->pipe_sw_mutex);
     }
+}
+
+DWORD
+fhandler_pty_common::attach_console_temporarily (DWORD target_pid)
+{
+  DWORD resume_pid = 0;
+  pinfo pinfo_resume (myself->ppid);
+  if (pinfo_resume)
+    resume_pid = pinfo_resume->dwProcessId;
+  if (!resume_pid)
+    resume_pid = get_console_process_id (myself->dwProcessId, false);
+  bool console_exists = fhandler_console::exists ();
+  acquire_attach_mutex (mutex_timeout);
+  if (!console_exists || resume_pid)
+    {
+      FreeConsole ();
+      AttachConsole (target_pid);
+      init_console_handler (::cygheap->ctty
+			    && ::cygheap->ctty->is_console ());
+    }
+  return console_exists ? resume_pid : (DWORD) -1;
+}
+
+void
+fhandler_pty_common::resume_from_temporarily_attach (DWORD resume_pid)
+{
+  bool console_exists = (resume_pid != (DWORD) -1);
+  if (!console_exists || resume_pid)
+    {
+      FreeConsole ();
+      if (console_exists)
+	if (!resume_pid || !AttachConsole (resume_pid))
+	  AttachConsole (ATTACH_PARENT_PROCESS);
+      init_console_handler (::cygheap->ctty
+			    && ::cygheap->ctty->is_console ());
+    }
+  release_attach_mutex ();
 }

@@ -2321,6 +2321,8 @@ class fhandler_pty_common: public fhandler_termios
 				       bool cygwin = false,
 				       bool stub_only = false);
   bool to_be_read_from_nat_pipe (void);
+  static DWORD attach_console_temporarily (DWORD target_pid);
+  static void resume_from_temporarily_attach (DWORD resume_pid);
 
  protected:
   static BOOL process_opost_output (HANDLE h, const void *ptr, ssize_t& len,

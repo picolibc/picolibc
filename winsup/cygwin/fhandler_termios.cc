@@ -357,22 +357,10 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	     which the target process is attaching before sending the
 	     CTRL_C_EVENT. After sending the event, reattach to the
 	     console to which the process was previously attached.  */
-	  bool console_exists = fhandler_console::exists ();
-	  pinfo pinfo_resume = pinfo (myself->ppid);
 	  DWORD resume_pid = 0;
-	  if (pinfo_resume)
-	    resume_pid = pinfo_resume->dwProcessId;
-	  else
-	    resume_pid = fhandler_pty_common::get_console_process_id
-	      (myself->dwProcessId, false);
-	  acquire_attach_mutex (mutex_timeout);
-	  if ((!console_exists || resume_pid) && fh && !fh->is_console ())
-	    {
-	      FreeConsole ();
-	      AttachConsole (p->dwProcessId);
-	      init_console_handler (::cygheap->ctty
-				    && ::cygheap->ctty->is_console ());
-	    }
+	  if (fh && !fh->is_console ())
+	    resume_pid =
+	      fhandler_pty_common::attach_console_temporarily (p->dwProcessId);
 	  if (fh && p == myself && being_debugged ())
 	    { /* Avoid deadlock in gdb on console. */
 	      fh->tcflush(TCIFLUSH);
@@ -391,7 +379,7 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	      GenerateConsoleCtrlEvent (CTRL_C_EVENT, 0);
 	      ctrl_c_event_sent = true;
 	    }
-	  if ((!console_exists || resume_pid) && fh && !fh->is_console ())
+	  if (fh && !fh->is_console ())
 	    {
 	      /* If a process on pseudo console is killed by Ctrl-C,
 		 this process may take over the ownership of the
@@ -399,13 +387,8 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 		 before sending CTRL_C_EVENT. In this case, closing
 		 pseudo console is necessary. */
 	      fhandler_pty_slave::release_ownership_of_nat_pipe (ttyp, fh);
-	      FreeConsole ();
-	      if (resume_pid && console_exists)
-		AttachConsole (resume_pid);
-	      init_console_handler (::cygheap->ctty
-				    && ::cygheap->ctty->is_console ());
+	      fhandler_pty_common::resume_from_temporarily_attach (resume_pid);
 	    }
-	  release_attach_mutex ();
 	  need_discard_input = true;
 	}
       if (p && p->ctty == ttyp->ntty && p->pgid == pgid)
