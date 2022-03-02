@@ -64,5 +64,5 @@ endforeach
 
 install_headers(
   inc_machine_headers,
-  subdir:'machine'
+  install_dir: include_dir / 'machine'
 )

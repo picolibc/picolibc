@@ -37,5 +37,4 @@ inc_machine_headers_machine = [
 ]
 
 install_headers(inc_machine_headers_machine,
-		subdir:'machine'
-	       )
+		install_dir: include_dir / 'machine')

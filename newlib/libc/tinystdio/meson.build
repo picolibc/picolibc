@@ -177,9 +177,9 @@ hdrs_tinystdio = [
     'xtoa_fast.h',
 ]
 
-install_headers(
-  'stdio.h'
-)
+install_headers('stdio.h',
+		install_dir: include_dir
+	       )
 
 srcs_tinystdio_use = []
 foreach file : srcs_tinystdio

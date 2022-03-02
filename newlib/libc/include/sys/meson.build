@@ -87,5 +87,4 @@ foreach file : inc_sys_headers_all
 endforeach
 
 install_headers(inc_sys_headers,
-		subdir:'sys'
-	       )
+		install_dir: include_dir / 'sys')

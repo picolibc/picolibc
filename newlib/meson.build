@@ -55,7 +55,7 @@ foreach target : targets
     libsrcs_target += get_variable('src_' + libname + target, [])
   endforeach
 
-  instdir = join_paths(get_option('libdir'), value[0])
+  instdir = join_paths(lib_dir, value[0])
 
   if target == ''
     libc_name = 'c'

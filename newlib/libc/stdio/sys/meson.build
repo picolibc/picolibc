@@ -46,7 +46,5 @@ foreach file : inc_stdio_sys_headers_all
   endif
 endforeach
 
-install_headers(
-  inc_stdio_sys_headers,
-  subdir:'sys'
-)
+install_headers(inc_stdio_sys_headers,
+		install_dir: include_dir / 'sys')

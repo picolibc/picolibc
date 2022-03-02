@@ -40,7 +40,7 @@ srcs_dummyhost = [
 foreach target : targets
   value = get_variable('target_' + target)
 
-  instdir = join_paths(get_option('libdir'), value[0])
+  instdir = join_paths(lib_dir, value[0])
 
   if target == ''
     libdummyhost_name = 'dummyhost'

@@ -395,7 +395,9 @@ if sysroot_install
   endif
 endif
 
-lib_dir = join_paths(prefix, get_option('libdir'))
+lib_dir = prefix / get_option('libdir')
+
+include_dir = prefix / get_option('includedir')
 
 newlib_iconv_dir = get_option('newlib-iconv-dir')
 if newlib_iconv_dir == ''
@@ -863,8 +865,6 @@ inc_dirs = [stdio_inc_dir, '.', 'newlib/libc/include']
 
 inc = include_directories(inc_dirs)
 
-includedir = join_paths(prefix, get_option('includedir'))
-
 # We don't need '-fdata-sections' currently as there aren't any
 # files with data used in separate code paths. This works around
 # versions of gcc for RISC-V which have a bug that mis-names
@@ -975,7 +975,7 @@ conf_data.set('HAVE_IEEEFP_FUNCS', has_ieeefp_funcs, description: 'IEEE fp funcs
 
 configure_file(output : 'picolibc.h',
 	       configuration: conf_data,
-	       install_dir: includedir)
+	       install_dir: include_dir)
 
 # Usage as an embedded subproject:
 # If picolibc is embedded into the source as a subproject,

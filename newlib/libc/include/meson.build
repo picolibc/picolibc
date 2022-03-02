@@ -105,4 +105,5 @@ if not tinystdio
   inc_headers += ['reent.h']
 endif
 
-install_headers(inc_headers)
+install_headers(inc_headers,
+		install_dir: include_dir)
