@@ -395,9 +395,11 @@ if sysroot_install
   endif
 endif
 
-lib_dir = prefix / get_option('libdir')
+build_type_subdir = get_option('build-type-subdir')
 
-include_dir = prefix / get_option('includedir')
+lib_dir = prefix / get_option('libdir') / build_type_subdir
+
+include_dir = prefix / get_option('includedir') / build_type_subdir
 
 newlib_iconv_dir = get_option('newlib-iconv-dir')
 if newlib_iconv_dir == ''
@@ -410,7 +412,10 @@ if newlib_iconv_runtime_dir == ''
 endif
 
 specs_dir_option = get_option('specsdir')
-if specs_dir_option == ''
+if build_type_subdir != ''
+  specs_install = false
+  specs_dir = ''
+elif specs_dir_option == ''
   search_cmds = cc.cmd_array() + ['-print-search-dirs']
   install_dir=run_command(search_cmds, check : true).stdout().split('\n')[0]
   # Meson 0.56 adds a 'substring' method which can be used here
