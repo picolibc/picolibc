@@ -200,7 +200,6 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
       }
   } m;
   termios &ti = ttyp->ti;
-  int processed_up_to = -1;
   while (con.owner == myself->pid)
     {
       DWORD total_read, n, i;
@@ -223,17 +222,17 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 	  if (total_read == INREC_SIZE /* Working space full */
 	      && cygwait (p->input_handle, (DWORD) 0) == WAIT_OBJECT_0)
 	    {
-	      const int incr = min (processed_up_to + 1, additional_space);
+	      const int incr = min (con.num_processed, additional_space);
 	      ReadConsoleInputW (p->input_handle,
 				 input_rec + total_read, incr, &n);
 	      /* Discard oldest n events. */
 	      memmove (input_rec, input_rec + n, m.bytes (total_read));
-	      processed_up_to -= n;
+	      con.num_processed -= n;
 	      nowait = true;
 	    }
 	  break;
 	case WAIT_TIMEOUT:
-	  processed_up_to = -1;
+	  con.num_processed = 0;
 	case WAIT_SIGNALED:
 	case WAIT_CANCELED:
 	  break;
@@ -256,7 +255,7 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 	      ttyp->kill_pgrp (SIGWINCH);
 	    }
 	}
-      for (i = processed_up_to + 1; i < total_read; i++)
+      for (i = con.num_processed; i < total_read; i++)
 	{
 	  wchar_t wc;
 	  char c;
@@ -279,7 +278,7 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 		  ttyp->output_stopped = false;
 		  if (ti.c_lflag & NOFLSH)
 		    goto remove_record;
-		  processed_up_to = -1;
+		  con.num_processed = 0;
 		  goto skip_writeback;
 		default: /* not signalled */
 		  break;
@@ -311,7 +310,7 @@ remove_record:
 	      i--;
 	    }
 	}
-      processed_up_to = total_read - 1;
+      con.num_processed = total_read;
       if (total_read)
 	{
 	  do
@@ -448,6 +447,7 @@ fhandler_console::setup ()
       shared_console_info->tty_min_state.is_console = true;
       con.cursor_key_app_mode = false;
       con.disable_master_thread = true;
+      con.num_processed = 0;
     }
 }
 
@@ -1263,14 +1263,17 @@ fhandler_console::process_input_message (void)
     }
 out:
   /* Discard processed recored. */
-  DWORD dummy;
   DWORD discard_len = min (total_read, i + 1);
   /* If input is signalled, do not discard input here because
      tcflush() is already called from line_edit(). */
   if (stat == input_signalled && !(ti->c_lflag & NOFLSH))
     discard_len = 0;
   if (discard_len)
-    ReadConsoleInputW (get_handle (), input_rec, discard_len, &dummy);
+    {
+      DWORD discarded;
+      ReadConsoleInputW (get_handle (), input_rec, discard_len, &discarded);
+      con.num_processed = max (con.num_processed - discarded, 0);
+    }
   return stat;
 }
 
@@ -1669,6 +1672,7 @@ fhandler_console::tcflush (int queue)
 	  __seterrno ();
 	  res = -1;
 	}
+      con.num_processed = 0;
       release_attach_mutex ();
     }
   return res;
