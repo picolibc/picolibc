@@ -1029,7 +1029,7 @@ _pinfo::siginfo (sigset_t &pnd, sigset_t &blk, sigset_t &ign)
     }
   else
     {
-      pnd = sig_send (myself, __SIGPENDING, NULL);
+      pnd = sig_send (myself, __SIGPENDINGALL, NULL);
       blk = cygheap->compute_sigblkmask ();
       ign = 0;
       for (int sig = 1; sig < NSIG; ++sig)
