@@ -323,9 +323,11 @@ tty_min::setpgid (int pid)
 	  && ttyp->pcon_input_state_eq (tty::to_cyg))
 	{
 	WaitForSingleObject (ptys->input_mutex, mutex_timeout);
+	acquire_attach_mutex (mutex_timeout);
 	fhandler_pty_slave::transfer_input (tty::to_nat,
 					    ptys->get_handle (), ttyp,
 					    ptys->get_input_available_event ());
+	release_attach_mutex ();
 	ReleaseMutex (ptys->input_mutex);
 	}
       else if (was_pcon_fg && !pcon_fg && ttyp->switch_to_pcon_in
@@ -333,6 +335,7 @@ tty_min::setpgid (int pid)
 	{
 	  bool attach_restore = false;
 	  HANDLE from = ptys->get_handle_nat ();
+	  acquire_attach_mutex (mutex_timeout);
 	  if (ttyp->pcon_activated && ttyp->pcon_pid
 	      && !ptys->get_console_process_id (ttyp->pcon_pid, true))
 	    {
@@ -359,6 +362,7 @@ tty_min::setpgid (int pid)
 		AttachConsole (ATTACH_PARENT_PROCESS);
 	      init_console_handler (false);
 	    }
+	  release_attach_mutex ();
 	}
       ReleaseMutex (ptys->pcon_mutex);
     }

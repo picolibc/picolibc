@@ -241,8 +241,10 @@ atexit_func (void)
 		&& ttyp->pcon_input_state_eq (tty::to_nat) && !force_switch_to)
 	      {
 		WaitForSingleObject (ptys->input_mutex, mutex_timeout);
+		acquire_attach_mutex (mutex_timeout);
 		fhandler_pty_slave::transfer_input (tty::to_cyg, from, ttyp,
 						    input_available_event);
+		release_attach_mutex ();
 		ReleaseMutex (ptys->input_mutex);
 	      }
 	    WaitForSingleObject (ptys->pcon_mutex, INFINITE);
@@ -1102,8 +1104,10 @@ fhandler_pty_slave::set_switch_to_pcon (void)
 	  && get_ttyp ()->pcon_input_state_eq (tty::to_cyg))
 	{
 	  WaitForSingleObject (input_mutex, mutex_timeout);
+	  acquire_attach_mutex (mutex_timeout);
 	  transfer_input (tty::to_nat, get_handle (), get_ttyp (),
 			  input_available_event);
+	  release_attach_mutex ();
 	  ReleaseMutex (input_mutex);
 	}
     }
@@ -1153,8 +1157,10 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
 		  && get_ttyp ()->pcon_input_state_eq (tty::to_nat))
 		{
 		  WaitForSingleObject (input_mutex, mutex_timeout);
+		  acquire_attach_mutex (mutex_timeout);
 		  transfer_input (tty::to_cyg, get_handle_nat (), get_ttyp (),
 				  input_available_event);
+		  release_attach_mutex ();
 		  ReleaseMutex (input_mutex);
 		}
 	      if (get_ttyp ()->master_is_running_as_service
@@ -1267,8 +1273,10 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
 		   && get_ttyp ()->switch_to_pcon_in)
 	    {
 	      WaitForSingleObject (input_mutex, mutex_timeout);
+	      acquire_attach_mutex (mutex_timeout);
 	      transfer_input (tty::to_cyg, get_handle_nat (), get_ttyp (),
 			      input_available_event);
+	      release_attach_mutex ();
 	      ReleaseMutex (input_mutex);
 	    }
 	}
@@ -1280,8 +1288,12 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
   WaitForSingleObject (input_mutex, mutex_timeout);
   if (get_ttyp ()->switch_to_pcon_in && !get_ttyp ()->pcon_activated
       && get_ttyp ()->pcon_input_state_eq (tty::to_nat))
-    transfer_input (tty::to_cyg, get_handle_nat (), get_ttyp (),
-		    input_available_event);
+    {
+      acquire_attach_mutex (mutex_timeout);
+      transfer_input (tty::to_cyg, get_handle_nat (), get_ttyp (),
+		      input_available_event);
+      release_attach_mutex ();
+    }
   ReleaseMutex (input_mutex);
   get_ttyp ()->pcon_input_state = tty::to_cyg;
   get_ttyp ()->pcon_pid = 0;
@@ -1356,11 +1368,19 @@ fhandler_pty_slave::mask_switch_to_pcon_in (bool mask, bool xfer)
   if (!!masked != mask && xfer && (need_gdb_xfer || need_xfer))
     {
       if (mask && get_ttyp ()->pcon_input_state_eq (tty::to_nat))
-	transfer_input (tty::to_cyg, get_handle_nat (), get_ttyp (),
-			input_available_event);
+	{
+	  acquire_attach_mutex (mutex_timeout);
+	  transfer_input (tty::to_cyg, get_handle_nat (), get_ttyp (),
+			  input_available_event);
+	  release_attach_mutex ();
+	}
       else if (!mask && get_ttyp ()->pcon_input_state_eq (tty::to_cyg))
-	transfer_input (tty::to_nat, get_handle (), get_ttyp (),
-			input_available_event);
+	{
+	  acquire_attach_mutex (mutex_timeout);
+	  transfer_input (tty::to_nat, get_handle (), get_ttyp (),
+			  input_available_event);
+	  release_attach_mutex ();
+	}
     }
   ReleaseMutex (input_mutex);
 }
@@ -2283,9 +2303,11 @@ fhandler_pty_master::write (const void *ptr, size_t len)
 	      if (get_readahead_valid ())
 		accept_input ();
 	      WaitForSingleObject (input_mutex, mutex_timeout);
+	      acquire_attach_mutex (mutex_timeout);
 	      fhandler_pty_slave::transfer_input (tty::to_nat, from_master,
 						  get_ttyp (),
 						  input_available_event);
+	      release_attach_mutex ();
 	      ReleaseMutex (input_mutex);
 	    }
 	  get_ttyp ()->pcon_start_pid = 0;
@@ -2337,8 +2359,12 @@ fhandler_pty_master::write (const void *ptr, size_t len)
      non-cygwin app is terminated if pseudo console is disabled. */
   if (to_be_read_from_pcon () && !get_ttyp ()->pcon_activated
       && get_ttyp ()->pcon_input_state == tty::to_cyg)
-    fhandler_pty_slave::transfer_input (tty::to_nat, from_master,
-					get_ttyp (), input_available_event);
+    {
+      acquire_attach_mutex (mutex_timeout);
+      fhandler_pty_slave::transfer_input (tty::to_nat, from_master,
+					  get_ttyp (), input_available_event);
+      release_attach_mutex ();
+    }
   ReleaseMutex (input_mutex);
 
   line_edit_status status = line_edit (p, len, ti, &ret);
@@ -4055,8 +4081,10 @@ fhandler_pty_slave::setup_for_non_cygwin_app (bool nopcon, PWCHAR envblock,
       && stdin_is_ptys && get_ttyp ()->pcon_input_state_eq (tty::to_cyg))
     {
       WaitForSingleObject (input_mutex, mutex_timeout);
+      acquire_attach_mutex (mutex_timeout);
       transfer_input (tty::to_nat, get_handle (), get_ttyp (),
 		      input_available_event);
+      release_attach_mutex ();
       ReleaseMutex (input_mutex);
     }
 }
@@ -4070,8 +4098,10 @@ fhandler_pty_slave::cleanup_for_non_cygwin_app (handle_set_t *p, tty *ttyp,
       && ttyp->pcon_input_state_eq (tty::to_nat))
     {
       WaitForSingleObject (p->input_mutex, mutex_timeout);
+      acquire_attach_mutex (mutex_timeout);
       transfer_input (tty::to_cyg, p->from_master_nat, ttyp,
 		      p->input_available_event);
+      release_attach_mutex ();
       ReleaseMutex (p->input_mutex);
     }
   WaitForSingleObject (p->pcon_mutex, INFINITE);
