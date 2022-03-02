@@ -473,7 +473,7 @@ get_cpu_cache (int in)
   return 0;
 }
 
-enum sc_type { nsup, cons, func };
+enum sc_type { cons, func };
 
 static struct
 {
@@ -547,7 +547,7 @@ static struct
   {cons, {c:BC_SCALE_MAX}},		/*  59, _SC_BC_SCALE_MAX */
   {cons, {c:BC_STRING_MAX}},		/*  60, _SC_BC_STRING_MAX */
   {cons, {c:_POSIX_CLOCK_SELECTION}},	/*  61, _SC_CLOCK_SELECTION */
-  {nsup, {c:0}},			/*  62, _SC_COLL_WEIGHTS_MAX */
+  {cons, {c:-1L}},			/*  62, _SC_COLL_WEIGHTS_MAX */
   {cons, {c:_POSIX_CPUTIME}},		/*  63, _SC_CPUTIME */
   {cons, {c:EXPR_NEST_MAX}},		/*  64, _SC_EXPR_NEST_MAX */
   {cons, {c:HOST_NAME_MAX}},		/*  65, _SC_HOST_NAME_MAX */
@@ -563,19 +563,19 @@ static struct
   {cons, {c:_POSIX_SPAWN}},		/*  75, _SC_SPAWN */
   {cons, {c:_POSIX_SPIN_LOCKS}},	/*  76, _SC_SPIN_LOCKS */
   {cons, {c:-1L}},			/*  77, _SC_SPORADIC_SERVER */
-  {nsup, {c:0}},			/*  78, _SC_SS_REPL_MAX */
+  {cons, {c:-1L}},			/*  78, _SC_SS_REPL_MAX */
   {cons, {c:SYMLOOP_MAX}},		/*  79, _SC_SYMLOOP_MAX */
   {cons, {c:_POSIX_THREAD_CPUTIME}},	/*  80, _SC_THREAD_CPUTIME */
   {cons, {c:-1L}},			/*  81, _SC_THREAD_SPORADIC_SERVER */
   {cons, {c:_POSIX_TIMEOUTS}},		/*  82, _SC_TIMEOUTS */
   {cons, {c:-1L}},			/*  83, _SC_TRACE */
   {cons, {c:-1L}},			/*  84, _SC_TRACE_EVENT_FILTER */
-  {nsup, {c:0}},			/*  85, _SC_TRACE_EVENT_NAME_MAX */
+  {cons, {c:-1}},			/*  85, _SC_TRACE_EVENT_NAME_MAX */
   {cons, {c:-1L}},			/*  86, _SC_TRACE_INHERIT */
   {cons, {c:-1L}},			/*  87, _SC_TRACE_LOG */
-  {nsup, {c:0}},			/*  88, _SC_TRACE_NAME_MAX */
-  {nsup, {c:0}},			/*  89, _SC_TRACE_SYS_MAX */
-  {nsup, {c:0}},			/*  90, _SC_TRACE_USER_EVENT_MAX */
+  {cons, {c:-1L}},			/*  88, _SC_TRACE_NAME_MAX */
+  {cons, {c:-1L}},			/*  89, _SC_TRACE_SYS_MAX */
+  {cons, {c:-1L}},			/*  90, _SC_TRACE_USER_EVENT_MAX */
   {cons, {c:-1L}},			/*  91, _SC_TYPED_MEMORY_OBJECTS */
   {cons, {c:_POSIX_V6_ILP32_OFF32}},	/*  92, _SC_V6_ILP32_OFF32 */
   {cons, {c:_POSIX_V6_ILP32_OFFBIG}},	/*  93, _SC_V6_ILP32_OFFBIG */
@@ -640,8 +640,6 @@ sysconf (int in)
     {
       switch (sca[in].type)
 	{
-	case nsup:
-	  break;
 	case cons:
 	  return sca[in].c;
 	case func:
