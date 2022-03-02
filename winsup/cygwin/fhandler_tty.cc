@@ -33,8 +33,6 @@ details. */
 #define PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE 0x00020016
 #endif /* PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE */
 
-extern DWORD mutex_timeout; /* defined in fhandler_termios.cc */
-
 extern "C" int sscanf (const char *, const char *, ...);
 
 #define close_maybe(h) \
@@ -979,7 +977,11 @@ fhandler_pty_slave::open (int flags, mode_t)
        CTRL_C_EVENTs between ptys. */
     get_ttyp ()->need_invisible_console = true;
   else
-    fhandler_console::need_invisible ();
+    {
+      acquire_attach_mutex (mutex_timeout);
+      fhandler_console::need_invisible ();
+      release_attach_mutex ();
+    }
 
   set_open_status ();
   return 1;
@@ -1157,7 +1159,11 @@ fhandler_pty_slave::reset_switch_to_nat_pipe (void)
 	      bool need_restore_handles = get_ttyp ()->pcon_activated;
 	      WaitForSingleObject (pipe_sw_mutex, INFINITE);
 	      if (get_ttyp ()->pcon_activated)
-		close_pseudoconsole (get_ttyp ());
+		{
+		  acquire_attach_mutex (mutex_timeout);
+		  close_pseudoconsole (get_ttyp ());
+		  release_attach_mutex ();
+		}
 	      else
 		hand_over_only (get_ttyp ());
 	      ReleaseMutex (pipe_sw_mutex);
@@ -1238,6 +1244,7 @@ fhandler_pty_slave::reset_switch_to_nat_pipe (void)
 		      DuplicateHandle (pcon_owner, get_ttyp ()->h_pcon_in,
 				       GetCurrentProcess (), &h_pcon_in,
 				       0, TRUE, DUPLICATE_SAME_ACCESS);
+		      acquire_attach_mutex (mutex_timeout);
 		      FreeConsole ();
 		      AttachConsole (get_ttyp ()->nat_pipe_owner_pid);
 		      init_console_handler (false);
@@ -1248,6 +1255,7 @@ fhandler_pty_slave::reset_switch_to_nat_pipe (void)
 		      FreeConsole ();
 		      AttachConsole (resume_pid);
 		      init_console_handler (false);
+		      release_attach_mutex ();
 		      CloseHandle (h_pcon_in);
 		    }
 		  CloseHandle (pcon_owner);
@@ -2096,7 +2104,9 @@ fhandler_pty_common::resize_pseudo_console (struct winsize *ws)
   DuplicateHandle (pcon_owner, get_ttyp ()->h_pcon_write_pipe,
 		   GetCurrentProcess (), &hpcon_local.hWritePipe,
 		   0, TRUE, DUPLICATE_SAME_ACCESS);
+  acquire_attach_mutex (mutex_timeout);
   ResizePseudoConsole ((HPCON) &hpcon_local, size);
+  release_attach_mutex ();
   CloseHandle (pcon_owner);
   CloseHandle (hpcon_local.hWritePipe);
 }
@@ -2473,8 +2483,10 @@ fhandler_pty_slave::setup_locale (void)
   if (!get_ttyp ()->term_code_page)
     {
       get_ttyp ()->term_code_page = __eval_codepage_from_internal_charset ();
+      acquire_attach_mutex (mutex_timeout);
       SetConsoleCP (get_ttyp ()->term_code_page);
       SetConsoleOutputCP (get_ttyp ()->term_code_page);
+      release_attach_mutex ();
     }
 }
 
@@ -3794,9 +3806,11 @@ fhandler_pty_slave::create_invisible_console ()
   if (get_ttyp ()->need_invisible_console)
     {
       /* Detach from console device and create new invisible console. */
+      acquire_attach_mutex (mutex_timeout);
       FreeConsole();
       fhandler_console::need_invisible (true);
       init_console_handler (false);
+      release_attach_mutex ();
       get_ttyp ()->need_invisible_console = false;
       get_ttyp ()->invisible_console_pid = myself->pid;
     }
@@ -4054,7 +4068,11 @@ fhandler_pty_slave::setup_for_non_cygwin_app (bool nopcon, PWCHAR envblock,
     }
   bool pcon_enabled = false;
   if (!nopcon)
-    pcon_enabled = setup_pseudoconsole ();
+    {
+      acquire_attach_mutex (mutex_timeout);
+      pcon_enabled = setup_pseudoconsole ();
+      release_attach_mutex ();
+    }
   ReleaseMutex (pipe_sw_mutex);
   /* For pcon enabled case, transfer_input() is called in master::write() */
   if (!pcon_enabled && get_ttyp ()->getpgid () == myself->pgid
@@ -4083,7 +4101,11 @@ fhandler_pty_slave::cleanup_for_non_cygwin_app (handle_set_t *p, tty *ttyp,
     }
   WaitForSingleObject (p->pipe_sw_mutex, INFINITE);
   if (ttyp->pcon_activated)
-    close_pseudoconsole (ttyp, force_switch_to);
+    {
+      acquire_attach_mutex (mutex_timeout);
+      close_pseudoconsole (ttyp, force_switch_to);
+      release_attach_mutex ();
+    }
   else
     hand_over_only (ttyp, force_switch_to);
   ReleaseMutex (p->pipe_sw_mutex);
@@ -4157,6 +4179,8 @@ fhandler_pty_slave::release_ownership_of_nat_pipe (tty *ttyp,
       fhandler_pty_master *ptym = (fhandler_pty_master *) fh;
       WaitForSingleObject (ptym->pipe_sw_mutex, INFINITE);
       if (ttyp->pcon_activated)
+	/* Do not acquire/release_attach_mutex() here because
+	   it has done in fhandler_termios::process_sigs(). */
 	close_pseudoconsole (ttyp);
       else
 	hand_over_only (ttyp);
