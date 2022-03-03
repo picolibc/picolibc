@@ -121,12 +121,12 @@ static bool isHybrid; /* Set true if the active pipe is set to nat pipe even
 static HANDLE h_gdb_inferior; /* Handle of GDB inferior process. */
 
 static void
-set_switch_to_nat_pipe (HANDLE *in, HANDLE *out, HANDLE *err, bool iscygwin)
+set_switch_to_nat_pipe (HANDLE *in, HANDLE *out, HANDLE *err)
 {
   cygheap_fdenum cfd (false);
   int fd;
   fhandler_base *replace_in = NULL, *replace_out = NULL, *replace_err = NULL;
-  fhandler_pty_slave *ptys_nat = NULL;
+  fhandler_pty_slave *ptys = NULL;
   while ((fd = cfd.next ()) >= 0)
     {
       if (*in == cfd->get_handle () ||
@@ -141,15 +141,14 @@ set_switch_to_nat_pipe (HANDLE *in, HANDLE *out, HANDLE *err, bool iscygwin)
       if (cfd->get_device () == (dev_t) myself->ctty)
 	{
 	  fhandler_base *fh = cfd;
-	  fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
-	  if (*in == ptys->get_handle ()
-	      || *out == ptys->get_output_handle ()
-	      || *err == ptys->get_output_handle ())
-	    ptys_nat = ptys;
+	  if (*in == fh->get_handle ()
+	      || *out == fh->get_output_handle ()
+	      || *err == fh->get_output_handle ())
+	    ptys = (fhandler_pty_slave *) fh;
 	}
     }
-  if (!iscygwin && ptys_nat)
-    ptys_nat->set_switch_to_nat_pipe ();
+  if (ptys)
+    ptys->set_switch_to_nat_pipe ();
   if (replace_in)
     *in = replace_in->get_handle_nat ();
   if (replace_out)
@@ -280,8 +279,9 @@ CreateProcessA_Hooked
       siov->hStdError = GetStdHandle (STD_ERROR_HANDLE);
     }
   bool path_iscygexec = fhandler_termios::path_iscygexec_a (n, c);
-  set_switch_to_nat_pipe (&siov->hStdInput, &siov->hStdOutput,
-			  &siov->hStdError, path_iscygexec);
+  if (!path_iscygexec)
+    set_switch_to_nat_pipe (&siov->hStdInput, &siov->hStdOutput,
+			    &siov->hStdError);
   BOOL ret = CreateProcessA_Orig (n, c, pa, ta, inh, f, e, d, siov, pi);
   h_gdb_inferior = pi->hProcess;
   DuplicateHandle (GetCurrentProcess (), h_gdb_inferior,
@@ -318,8 +318,9 @@ CreateProcessW_Hooked
       siov->hStdError = GetStdHandle (STD_ERROR_HANDLE);
     }
   bool path_iscygexec = fhandler_termios::path_iscygexec_w (n, c);
-  set_switch_to_nat_pipe (&siov->hStdInput, &siov->hStdOutput,
-			  &siov->hStdError, path_iscygexec);
+  if (!path_iscygexec)
+    set_switch_to_nat_pipe (&siov->hStdInput, &siov->hStdOutput,
+			    &siov->hStdError);
   BOOL ret = CreateProcessW_Orig (n, c, pa, ta, inh, f, e, d, siov, pi);
   h_gdb_inferior = pi->hProcess;
   DuplicateHandle (GetCurrentProcess (), h_gdb_inferior,
