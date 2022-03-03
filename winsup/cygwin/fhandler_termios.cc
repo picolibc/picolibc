@@ -341,15 +341,16 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
     {
       _pinfo *p = pids[i];
       /* PID_NOTCYGWIN: check this for non-cygwin process.
-	 PID_NEW_PG: check this ofr GDB with non-cygwin inferior in pty
+	 exec_dwProcessId == dwProcessId:
+		     check this for GDB with non-cygwin inferior in pty
 		     without pcon enabled. In this case, the inferior is not
-		     cygwin process list. PID_NEW_PG is set as a marker for
-		     GDB with non-cygwin inferior in pty code.
+		     cygwin process list. This condition is set true as
+		     a marker for GDB with non-cygwin inferior in pty code.
 	 !PID_CYGPARENT: check this for GDB with cygwin inferior or
 			 cygwin apps started from non-cygwin shell. */
       if (c == '\003' && p && p->ctty == ttyp->ntty && p->pgid == pgid
 	  && ((p->process_state & PID_NOTCYGWIN)
-	      || (p->process_state & PID_NEW_PG)
+	      || (p->exec_dwProcessId == p->dwProcessId)
 	      || !(p->process_state & PID_CYGPARENT)))
 	{
 	  /* Ctrl-C event will be sent only to the processes attaching
@@ -369,8 +370,7 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	  /* CTRL_C_EVENT does not work for the process started with
 	     CREATE_NEW_PROCESS_GROUP flag, so send CTRL_BREAK_EVENT
 	     instead. */
-	  if ((p->process_state & PID_NEW_PG)
-	      && (p->process_state & PID_NOTCYGWIN))
+	  if (p->process_state & PID_NEW_PG)
 	    GenerateConsoleCtrlEvent (CTRL_BREAK_EVENT, p->dwProcessId);
 	  else if ((!fh || fh->need_send_ctrl_c_event () || cyg_leader)
 		   && !ctrl_c_event_sent) /* cyg_leader is needed by GDB
@@ -405,7 +405,7 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	      && (p->process_state & PID_DEBUGGED))
 	    with_debugger = true; /* inferior is cygwin app */
 	  if (!(p->process_state & PID_NOTCYGWIN)
-	      && (p->process_state & PID_NEW_PG) /* Check marker */
+	      && (p->exec_dwProcessId == p->dwProcessId) /* Check marker */
 	      && p->pid == pgid)
 	    with_debugger_nat = true; /* inferior is non-cygwin app */
 	}

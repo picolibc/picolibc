@@ -116,8 +116,9 @@ fhandler_pty_common::get_console_process_id (DWORD pid, bool match,
   return res_pri ?: res;
 }
 
-static bool isHybrid; /* Set true if the active pipe is set to nat pipe even
-			 though the current process is a cygwin process. */
+static bool isHybrid; /* Set true if the active pipe is set to nat pipe
+			 owned by myself even though the current process
+			 is a cygwin process. */
 static HANDLE h_gdb_inferior; /* Handle of GDB inferior process. */
 
 static void
@@ -1079,8 +1080,9 @@ fhandler_pty_slave::set_switch_to_nat_pipe (void)
     {
       isHybrid = true;
       setup_locale ();
-      myself->exec_dwProcessId = myself->dwProcessId;
-      myself->process_state |= PID_NEW_PG; /* Marker for nat_fg */
+      myself->exec_dwProcessId = myself->dwProcessId; /* Set this as a marker
+							 for tty::nat_fg()
+							 and process_sigs() */
       bool stdin_is_ptys = GetStdHandle (STD_INPUT_HANDLE) == get_handle ();
       setup_for_non_cygwin_app (false, NULL, stdin_is_ptys);
     }
@@ -1199,7 +1201,6 @@ fhandler_pty_slave::reset_switch_to_nat_pipe (void)
 		    }
 		}
 	      myself->exec_dwProcessId = 0;
-	      myself->process_state &= ~PID_NEW_PG;
 	      isHybrid = false;
 	    }
 	}
