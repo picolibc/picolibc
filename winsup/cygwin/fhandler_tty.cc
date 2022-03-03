@@ -74,7 +74,7 @@ void release_attach_mutex (void)
   ReleaseMutex (attach_mutex);
 }
 
-inline static bool nat_pipe_owner_alive (DWORD pid);
+inline static bool process_alive (DWORD pid);
 
 DWORD
 fhandler_pty_common::get_console_process_id (DWORD pid, bool match,
@@ -107,7 +107,7 @@ fhandler_pty_common::get_console_process_id (DWORD pid, bool match,
 		res_pri = stub_only ? p->exec_dwProcessId : list[i];
 		break;
 	      }
-	    if (!p && !res && nat_pipe_owner_alive (list[i]) && stub_only)
+	    if (!p && !res && process_alive (list[i]) && stub_only)
 	      res = list[i];
 	    if (!!p && !res && !stub_only)
 	      res = list[i];
@@ -1086,8 +1086,11 @@ fhandler_pty_slave::set_switch_to_nat_pipe (void)
 }
 
 inline static bool
-nat_pipe_owner_alive (DWORD pid)
+process_alive (DWORD pid)
 {
+  /* This function is very similar to _pinfo::alive(), however, this
+     can be used for non-cygwin process which is started from non-cygwin
+     shell. In addition, this checks exit code as well. */
   if (pid == 0)
     return false;
   HANDLE h = OpenProcess (PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
@@ -1208,7 +1211,7 @@ fhandler_pty_slave::reset_switch_to_nat_pipe (void)
   if (wait_ret == WAIT_TIMEOUT)
     return;
   if (!nat_pipe_owner_self (get_ttyp ()->nat_pipe_owner_pid)
-      && nat_pipe_owner_alive (get_ttyp ()->nat_pipe_owner_pid))
+      && process_alive (get_ttyp ()->nat_pipe_owner_pid))
     {
       /* There is a process which owns nat pipe. */
       if (!to_be_read_from_nat_pipe ()
@@ -3421,7 +3424,7 @@ skip_create:
     }
   while (false);
 
-  if (!nat_pipe_owner_alive (get_ttyp ()->nat_pipe_owner_pid))
+  if (!process_alive (get_ttyp ()->nat_pipe_owner_pid))
     get_ttyp ()->nat_pipe_owner_pid = myself->exec_dwProcessId;
 
   if (hpcon && nat_pipe_owner_self (get_ttyp ()->nat_pipe_owner_pid))
@@ -4044,7 +4047,7 @@ fhandler_pty_slave::setup_for_non_cygwin_app (bool nopcon, PWCHAR envblock,
     {
       fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
       ptys->get_ttyp ()->switch_to_nat_pipe = true;
-      if (!nat_pipe_owner_alive (ptys->get_ttyp ()->nat_pipe_owner_pid))
+      if (!process_alive (ptys->get_ttyp ()->nat_pipe_owner_pid))
 	ptys->get_ttyp ()->nat_pipe_owner_pid = myself->exec_dwProcessId;
     }
   bool pcon_enabled = false;
