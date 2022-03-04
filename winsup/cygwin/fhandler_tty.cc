@@ -525,8 +525,11 @@ fhandler_pty_master::accept_input ()
   if (to_be_read_from_nat_pipe ()
       && get_ttyp ()->pty_input_state == tty::to_nat)
     {
-      write_to = to_slave_nat;
+      /* This code is reached if non-cygwin app is foreground and
+	 pseudo console is not enabled. */
+      write_to = to_slave_nat; /* write to nat pipe rather than cyg pipe. */
 
+      /* Charset conversion for non-cygwin apps. */
       UINT cp_to;
       pinfo pinfo_target = pinfo (get_ttyp ()->invisible_console_pid);
       DWORD target_pid = 0;
@@ -607,7 +610,8 @@ fhandler_pty_master::accept_input ()
     }
 
   if (write_to == get_output_handle ())
-    SetEvent (input_available_event);
+    SetEvent (input_available_event); /* Set input_available_event only when
+					 the data is written to cyg pipe. */
   ReleaseMutex (input_mutex);
   return ret;
 }
@@ -1113,7 +1117,7 @@ nat_pipe_owner_self (DWORD pid)
   return (pid == (myself->exec_dwProcessId ?: myself->dwProcessId));
 }
 
-/* This function is called from many pty slave functions. The purpose
+/* This function is called from some pty slave functions. The purpose
    of this function is cleaning up the nat pipe state which is marked
    as active but actually not used anymore. This is needed only when
    non-cygwin process is not terminated cleanly. */
@@ -1207,7 +1211,7 @@ fhandler_pty_slave::reset_switch_to_nat_pipe (void)
     }
   if (isHybrid)
     return;
-  if (get_ttyp ()->pcon_start) /* Pseudo console is initialization on going */
+  if (get_ttyp ()->pcon_start) /* Pseudo console initialization is on going */
     return;
   DWORD wait_ret = WaitForSingleObject (pipe_sw_mutex, mutex_timeout);
   if (wait_ret == WAIT_TIMEOUT)
@@ -2161,7 +2165,7 @@ fhandler_pty_master::write (const void *ptr, size_t len)
   push_process_state process_state (PID_TTYOU);
 
   if (get_ttyp ()->pcon_start)
-    {
+    { /* Reaches here when pseudo console initialization is on going. */
       /* Pseudo condole support uses "CSI6n" to get cursor position.
 	 If the reply for "CSI6n" is divided into multiple writes,
 	 pseudo console sometimes does not recognize it.  Therefore,
@@ -2201,6 +2205,9 @@ fhandler_pty_master::write (const void *ptr, size_t len)
 	}
       if (state == 2)
 	{
+	  /* req_xfer_input is true if "ESC[6n" was sent just for
+	     triggering transfer_input() in master. In this case,
+	     the responce sequence should not be written. */
 	  if (!get_ttyp ()->req_xfer_input)
 	    WriteFile (to_slave_nat, wpbuf, ixput, &n, NULL);
 	  ixput = 0;
@@ -2211,7 +2218,7 @@ fhandler_pty_master::write (const void *ptr, size_t len)
       ReleaseMutex (input_mutex);
 
       if (!get_ttyp ()->pcon_start)
-	{
+	{ /* Pseudo console initialization has been done in above code. */
 	  pinfo pp (get_ttyp ()->pcon_start_pid);
 	  bool pcon_fg = (pp && get_ttyp ()->getpgid () == pp->pgid);
 	  /* GDB may set WINPID rather than cygwin PID to process group
@@ -2243,7 +2250,8 @@ fhandler_pty_master::write (const void *ptr, size_t len)
   WaitForSingleObject (input_mutex, mutex_timeout);
   if (to_be_read_from_nat_pipe () && get_ttyp ()->pcon_activated
       && get_ttyp ()->pty_input_state == tty::to_nat)
-    {
+    { /* Reaches here when non-cygwin app is foreground and pseudo console
+	 is activated. */
       tmp_pathbuf tp;
       char *buf = (char *) ptr;
       size_t nlen = len;
@@ -2276,6 +2284,10 @@ fhandler_pty_master::write (const void *ptr, size_t len)
 
       return len;
     }
+
+  /* The code path reaches here when pseudo console is not activated
+     or cygwin process is foreground even though pseudo console is
+     activated. */
 
   /* This input transfer is needed when cygwin-app which is started from
      non-cygwin app is terminated if pseudo console is disabled. */
@@ -3197,7 +3209,8 @@ fhandler_pty_slave::setup_pseudoconsole ()
 	{ /* Send CSI6n just for requesting transfer input. */
 	  DWORD n;
 	  WaitForSingleObject (input_mutex, mutex_timeout);
-	  get_ttyp ()->req_xfer_input = true;
+	  get_ttyp ()->req_xfer_input = true; /* indicates that this "ESC[6n"
+						 is just for transfer input */
 	  get_ttyp ()->pcon_start = true;
 	  get_ttyp ()->pcon_start_pid = myself->pid;
 	  WriteFile (get_output_handle (), "\033[6n", 4, &n, NULL);
