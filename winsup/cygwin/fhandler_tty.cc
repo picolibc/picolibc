@@ -1216,56 +1216,9 @@ fhandler_pty_slave::reset_switch_to_nat_pipe (void)
       && process_alive (get_ttyp ()->nat_pipe_owner_pid))
     {
       /* There is a process which owns nat pipe. */
-      if (!to_be_read_from_nat_pipe ()
-	  && get_ttyp ()->pty_input_state_eq (tty::to_nat))
-	{
-	  if (get_ttyp ()->pcon_activated)
-	    {
-	      HANDLE pcon_owner = OpenProcess (PROCESS_DUP_HANDLE, FALSE,
-					   get_ttyp ()->nat_pipe_owner_pid);
-	      if (pcon_owner)
-		{
-		  HANDLE h_pcon_in;
-		  DuplicateHandle (pcon_owner, get_ttyp ()->h_pcon_in,
-				   GetCurrentProcess (), &h_pcon_in,
-				   0, TRUE, DUPLICATE_SAME_ACCESS);
-		  DWORD target_pid = get_ttyp ()->nat_pipe_owner_pid;
-		  DWORD resume_pid = attach_console_temporarily (target_pid);
-		  WaitForSingleObject (input_mutex, mutex_timeout);
-		  transfer_input (tty::to_cyg, h_pcon_in, get_ttyp (),
-				  input_available_event);
-		  ReleaseMutex (input_mutex);
-		  resume_from_temporarily_attach (resume_pid);
-		  CloseHandle (h_pcon_in);
-		  CloseHandle (pcon_owner);
-		}
-	    }
-	  else if (!get_ttyp ()->nat_fg (get_ttyp ()->getpgid ())
-		   && get_ttyp ()->switch_to_nat_pipe)
-	    {
-	      WaitForSingleObject (input_mutex, mutex_timeout);
-	      acquire_attach_mutex (mutex_timeout);
-	      transfer_input (tty::to_cyg, get_handle_nat (), get_ttyp (),
-			      input_available_event);
-	      release_attach_mutex ();
-	      ReleaseMutex (input_mutex);
-	    }
-	}
       ReleaseMutex (pipe_sw_mutex);
       return;
     }
-  /* This input transfer is needed if non-cygwin app is terminated
-     by Ctrl-C or killed. */
-  WaitForSingleObject (input_mutex, mutex_timeout);
-  if (get_ttyp ()->switch_to_nat_pipe && !get_ttyp ()->pcon_activated
-      && get_ttyp ()->pty_input_state_eq (tty::to_nat))
-    {
-      acquire_attach_mutex (mutex_timeout);
-      transfer_input (tty::to_cyg, get_handle_nat (), get_ttyp (),
-		      input_available_event);
-      release_attach_mutex ();
-    }
-  ReleaseMutex (input_mutex);
   /* Clean up nat pipe state */
   get_ttyp ()->pty_input_state = tty::to_cyg;
   get_ttyp ()->nat_pipe_owner_pid = 0;
