@@ -76,6 +76,13 @@ void release_attach_mutex (void)
 
 inline static bool process_alive (DWORD pid);
 
+/* This functions looks for a process which attached to the same console
+   with current process and is matched to given conditions:
+     match: If true, return given pid if the process pid attaches to the
+	    same console, otherwise, return 0. If false, return pid except
+	    for given pid.
+     cygwin: return only process's pid which has cygwin pid.
+     stub_only: return only stub process's pid of non-cygwin process. */
 DWORD
 fhandler_pty_common::get_console_process_id (DWORD pid, bool match,
 					     bool cygwin, bool stub_only)
@@ -158,6 +165,7 @@ set_switch_to_nat_pipe (HANDLE *in, HANDLE *out, HANDLE *err)
     *err = replace_err->get_output_handle_nat ();
 }
 
+/* Determine if the given path is cygwin binary. */
 static bool
 path_iscygexec_a_w (LPCSTR na, LPSTR ca, LPCWSTR nw, LPWSTR cw)
 {
@@ -3860,6 +3868,7 @@ fhandler_pty_slave::transfer_input (tty::xfer_dir dir, HANDLE from, tty *ttyp,
 
   if (dir == tty::to_cyg && ttyp->pcon_activated)
     { /* from handle is console handle */
+      /* Reaches here for nat->cyg case with pcon activated. */
       INPUT_RECORD r[INREC_SIZE];
       DWORD n;
       while (PeekConsoleInputA (from, r, INREC_SIZE, &n) && n)
@@ -3931,7 +3940,8 @@ fhandler_pty_slave::transfer_input (tty::xfer_dir dir, HANDLE from, tty *ttyp,
 	}
     }
   else
-    {
+    { /* Reaches here when both cyg->nat and nat->cyg cases with
+	 pcon not activated or cyg->nat case with pcon activated. */
       DWORD bytes_in_pipe;
       while (::bytes_available (bytes_in_pipe, from) && bytes_in_pipe)
 	{
@@ -3964,9 +3974,11 @@ fhandler_pty_slave::transfer_input (tty::xfer_dir dir, HANDLE from, tty *ttyp,
 	}
     }
 
-  if (dir == tty::to_nat)
+  /* Fix input_available_event which indicates availability in cyg pipe. */
+  if (dir == tty::to_nat) /* all data is transfered to nat pipe,
+			     so no data available in cyg pipe. */
     ResetEvent (input_available_event);
-  else if (transfered)
+  else if (transfered) /* There is data transfered to cyg pipe. */
     SetEvent (input_available_event);
   ttyp->pty_input_state = dir;
   ttyp->discard_input = false;
