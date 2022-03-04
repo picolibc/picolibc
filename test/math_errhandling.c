@@ -76,7 +76,7 @@ e_to_str(int e)
 	if (e == (FE_UNDERFLOW|FE_INEXACT))
 		return "FE_UNDERFLOW|FE_INEXACT";
 #endif
-	static char buf[3][50];
+	static char buf[3][128];
         static int i = 0;
         buf[i][0] = '\0';
         while (e) {
@@ -117,9 +117,15 @@ e_to_str(int e)
                 v = tmp;
                 e = 0;
             }
+#define check_add(s) do {                                               \
+                if (strlen(buf[i]) + strlen(s) + 1 > sizeof(buf[i]))    \
+                    printf("exception buf overflow %s + %s\n", buf[i], s); \
+                else                                                    \
+                    strcat(buf[i], s);                                  \
+            } while(0)
             if (buf[i][0])
-                strcat(buf[i], " | ");
-            strcat(buf[i], v);
+                check_add(" | ");
+            check_add(v);
         }
         char *ret = buf[i];
         i = (i + 1) % 3;
