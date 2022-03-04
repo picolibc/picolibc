@@ -3215,7 +3215,8 @@ fhandler_pty_slave::setup_pseudoconsole ()
 	  get_ttyp ()->pcon_start_pid = myself->pid;
 	  WriteFile (get_output_handle (), "\033[6n", 4, &n, NULL);
 	  ReleaseMutex (input_mutex);
-	  while (get_ttyp ()->pcon_start)
+	  while (get_ttyp ()->pcon_start_pid)
+	    /* wait for completion of transfer_input() in master::write(). */
 	    Sleep (1);
 	}
       /* Attach to the pseudo console which already exits. */
