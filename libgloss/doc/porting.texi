@@ -136,6 +136,7 @@ new library is called Libgloss, for Gnu Low-level OS support.
 * Building libgloss::           How to configure and built libgloss
                                 for a target.
 * Board support::               How to add support for a new board.
+* Build System Internals::      How the libgloss build system works.
 @end menu
 
 @node Supported targets, Building libgloss, Libgloss, Libgloss
@@ -311,7 +312,7 @@ used. This is done so libgloss will build automatically with a fresh,
 and uninstalled object tree. It also makes it easier to debug the other
 tools using libgloss's test suites.
 
-@node Board support, , Building libgloss, Libgloss
+@node Board support
 @section Adding Support for a New Board
 
 This section explains how to add support for a new board to libgloss.
