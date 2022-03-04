@@ -321,8 +321,8 @@ FLOAT_T makemathname(test_tgamma_big)(void) { return makemathname(tgamma)(makema
 FLOAT_T makemathname(test_tgamma_negbig)(void) { return makemathname(tgamma)(makemathname(-big)); }
 FLOAT_T makemathname(test_tgamma_inf)(void) { return makemathname(tgamma)(makemathname(infval)); }
 FLOAT_T makemathname(test_tgamma_neginf)(void) { return makemathname(tgamma)(-makemathname(infval)); }
-FLOAT_T makemathname(test_tgamma_small)(void) { return makemathname(tgamma)(small); }
-FLOAT_T makemathname(test_tgamma_negsmall)(void) { return makemathname(tgamma)(-small); }
+FLOAT_T makemathname(test_tgamma_small)(void) { return makemathname(tgamma)(makemathname(small)); }
+FLOAT_T makemathname(test_tgamma_negsmall)(void) { return makemathname(tgamma)(-makemathname(small)); }
 
 FLOAT_T makemathname(test_lgamma_qnan)(void) { return makemathname(lgamma)(makemathname(qnanval)); }
 FLOAT_T makemathname(test_lgamma_snan)(void) { return makemathname(lgamma)(makemathname(snanval)); }
@@ -990,11 +990,8 @@ struct {
 	TEST(tgamma_neginf, (FLOAT_T)NAN, FE_INVALID, EDOM),
 	TEST(tgamma_qnan, (FLOAT_T)NAN, 0, 0),
 	TEST(tgamma_snan, (FLOAT_T)NAN, FE_INVALID, 0),
-#if !defined(TEST_FLOAT) || defined(__PICOLIBC__)
-	/* glibc has a bug with this test using float */
 	TEST(tgamma_small, (FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
 	TEST(tgamma_negsmall, -(FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
-#endif
 
         TEST(y0_inf, (FLOAT_T)0.0, 0, 0),
         TEST(y0_qnan, (FLOAT_T)NAN, 0, 0),
