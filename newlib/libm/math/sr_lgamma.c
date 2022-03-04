@@ -210,7 +210,7 @@ sin_pi(double x)
 }
 
 double
-lgamma_r(double x, int *signgamp)
+__math_lgamma_r(double x, int *signgamp, int *divzero)
 {
     double t, y, z, nadj = 0.0, p, p1, p2, p3, q, r, w;
     __int32_t i, hx, lx, ix;
@@ -225,6 +225,7 @@ lgamma_r(double x, int *signgamp)
     if ((ix | lx) == 0) {
         if (hx < 0)
             *signgamp = -1;
+        *divzero = 1;
         return __math_divzero(0);
     }
     if (ix < 0x3b900000) { /* |x|<2**-70, return -log(|x|) */
@@ -235,11 +236,15 @@ lgamma_r(double x, int *signgamp)
             return -log(x);
     }
     if (hx < 0) {
-        if (ix >= 0x43300000) /* |x|>=2**52, must be -integer */
+        if (ix >= 0x43300000) { /* |x|>=2**52, must be -integer */
+            *divzero = 1;
             return __math_divzero(0);
+        }
         t = sin_pi(x);
-        if (t == zero)
+        if (t == zero) {
+            *divzero = 1;
             return __math_divzero(0);
+        }
         nadj = log(pi / fabs(t * x));
         if (t < zero)
             *signgamp = -1;
@@ -337,4 +342,11 @@ lgamma_r(double x, int *signgamp)
     if (hx < 0)
         r = nadj - r;
     return check_oflow(r);
+}
+
+double
+lgamma_r(double x, int *signgamp)
+{
+    int divzero = 0;
+    return __math_lgamma_r(x, signgamp, &divzero);
 }

@@ -572,4 +572,10 @@ __math_xflow (uint32_t sign, double y);
 HIDDEN float
 __math_xflowf (uint32_t sign, float y);
 
+HIDDEN double
+__math_lgamma_r (double y, int *signgamp, int *divzero);
+
+HIDDEN float
+__math_lgammaf_r (float y, int *signgamp, int *divzero);
+
 #endif

@@ -26,14 +26,15 @@ float
 tgammaf(float x)
 {
     int signgam_local;
+    int divzero = 0;
 
-    if (x < 0.0f && floorf(x) == x)
+    if (isless(x, 0.0f) && rintf(x) == x)
         return __math_invalidf(x);
 
-    float y = expf(lgammaf_r(x, &signgam_local));
+    float y = expf(__math_lgammaf_r(x, &signgam_local, &divzero));
     if (signgam_local < 0)
         y = -y;
-    if (!finitef(y) && finitef(x))
+    if (isinff(y) && finitef(x) && !divzero)
         return __math_oflowf(signgam_local < 0);
     return y;
 }
