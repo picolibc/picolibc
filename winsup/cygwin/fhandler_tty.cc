@@ -3972,9 +3972,11 @@ fhandler_pty_slave::transfer_input (tty::xfer_dir dir, HANDLE from, tty *ttyp,
 	    }
 	  /* Call WriteFile() line by line */
 	  char *p0 = ptr;
-	  char *p1 = ptr;
-	  while ((p1 = (char *) memchr (p0, '\r', len - (p0 - ptr))))
+	  char *p_cr, *p_nl;
+	  while ((p_cr = (char *) memchr (p0, '\r', len - (p0 - ptr)))
+		 || (p_nl = (char *) memchr (p0, '\n', len - (p0 - ptr))))
 	    {
+	      char *p1 = p_cr ? (p_nl ? min (p_cr, p_nl) : p_cr) : p_nl;
 	      *p1 = '\n';
 	      n = p1 - p0 + 1;
 	      if (n && WriteFile (to, p0, n, &n, NULL) && n)
