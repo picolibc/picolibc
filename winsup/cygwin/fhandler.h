@@ -2378,6 +2378,7 @@ class fhandler_pty_slave: public fhandler_pty_common
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);
   select_record *select_except (select_stuff *);
+  bg_check_types bg_check (int sig, bool dontsignal = false);
   virtual char const *ttyname () { return pc.dev.name (); }
   int __reg2 fstat (struct stat *buf);
   int __reg3 facl (int, int, struct acl *);

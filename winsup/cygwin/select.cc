@@ -1353,8 +1353,6 @@ peek_pty_slave (select_record *s, bool from_select)
   fhandler_base *fh = (fhandler_base *) s->fh;
   fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
 
-  ptys->reset_switch_to_nat_pipe ();
-
   if (s->read_selected)
     {
       if (s->read_ready)

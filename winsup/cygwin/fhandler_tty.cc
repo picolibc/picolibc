@@ -1287,8 +1287,6 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
 
   push_process_state process_state (PID_TTYOU);
 
-  reset_switch_to_nat_pipe ();
-
   acquire_output_mutex (mutex_timeout);
   if (!process_opost_output (get_output_handle (), ptr, towrite, false,
 			     get_ttyp (), is_nonblocking ()))
@@ -1409,10 +1407,7 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
   push_process_state process_state (PID_TTYIN);
 
   if (ptr) /* Indicating not tcflush(). */
-    {
-      mask_switch_to_nat_pipe (true, true);
-      reset_switch_to_nat_pipe ();
-    }
+    mask_switch_to_nat_pipe (true, true);
 
   if (is_nonblocking () || !ptr) /* Indicating tcflush(). */
     time_to_wait = 0;
@@ -1669,7 +1664,6 @@ fhandler_pty_master::dup (fhandler_base *child, int)
 int
 fhandler_pty_slave::tcgetattr (struct termios *t)
 {
-  reset_switch_to_nat_pipe ();
   *t = get_ttyp ()->ti;
 
   /* Workaround for rlwrap */
@@ -1690,7 +1684,6 @@ fhandler_pty_slave::tcgetattr (struct termios *t)
 int
 fhandler_pty_slave::tcsetattr (int, const struct termios *t)
 {
-  reset_switch_to_nat_pipe ();
   acquire_output_mutex (mutex_timeout);
   get_ttyp ()->ti = *t;
   release_output_mutex ();
@@ -1703,8 +1696,6 @@ fhandler_pty_slave::tcflush (int queue)
   int ret = 0;
 
   termios_printf ("tcflush(%d) handle %p", queue, get_handle ());
-
-  reset_switch_to_nat_pipe ();
 
   if (queue == TCIFLUSH || queue == TCIOFLUSH)
     {
@@ -1725,7 +1716,6 @@ int
 fhandler_pty_slave::ioctl (unsigned int cmd, void *arg)
 {
   termios_printf ("ioctl (%x)", cmd);
-  reset_switch_to_nat_pipe ();
   int res = fhandler_termios::ioctl (cmd, arg);
   if (res <= 0)
     return res;
@@ -2489,6 +2479,13 @@ fhandler_pty_slave::setup_locale (void)
     }
 }
 
+bg_check_types
+fhandler_pty_slave::bg_check (int sig, bool dontsignal)
+{
+  reset_switch_to_nat_pipe ();
+  return fhandler_termios::bg_check (sig, dontsignal);
+}
+
 void
 fhandler_pty_slave::fixup_after_fork (HANDLE parent)
 {
@@ -2500,7 +2497,6 @@ fhandler_pty_slave::fixup_after_fork (HANDLE parent)
 void
 fhandler_pty_slave::fixup_after_exec ()
 {
-  reset_switch_to_nat_pipe ();
   create_invisible_console ();
 
   if (!close_on_exec ())
@@ -4106,6 +4102,8 @@ fhandler_pty_slave::cleanup_for_non_cygwin_app (handle_set_t *p, tty *ttyp,
 void
 fhandler_pty_slave::setpgid_aux (pid_t pid)
 {
+  reset_switch_to_nat_pipe ();
+
   WaitForSingleObject (pipe_sw_mutex, INFINITE);
   bool was_nat_fg = get_ttyp ()->nat_fg (tc ()->pgid);
   bool nat_fg = get_ttyp ()->nat_fg (pid);
