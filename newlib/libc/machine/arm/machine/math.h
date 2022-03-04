@@ -56,7 +56,7 @@ sqrt(double x)
 {
 	double result;
 #ifdef _WANT_MATH_ERRNO
-        if (x < 0)
+        if (isless(x, 0.0))
             errno = EDOM;
 #endif
 #if __ARM_ARCH >= 6
@@ -140,7 +140,7 @@ sqrtf(float x)
 {
 	float result;
 #ifdef _WANT_MATH_ERRNO
-        if (x < 0)
+        if (isless(x, 0.0f))
             errno = EDOM;
 #endif
 #if __ARM_ARCH >= 6

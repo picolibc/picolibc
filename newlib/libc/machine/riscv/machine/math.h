@@ -180,7 +180,7 @@ sqrt (double x)
 {
 	double result;
 #ifdef _WANT_MATH_ERRNO
-        if (x < 0)
+        if (isless(x, 0.0))
             errno = EDOM;
 #endif
 	__asm__("fsqrt.d %0, %1" : "=f" (result) : "f" (x));
@@ -277,7 +277,7 @@ sqrtf (float x)
 {
 	float result;
 #ifdef _WANT_MATH_ERRNO
-        if (x < 0)
+        if (isless(x, 0.0f))
             errno = EDOM;
 #endif
 	__asm__("fsqrt.s %0, %1" : "=f" (result) : "f" (x));

@@ -31,7 +31,7 @@ sqrt (double x)
 {
   double result;
 #ifdef _WANT_MATH_ERRNO
-  if (x < 0)
+  if (isless(x, 0.0))
       return __math_invalid(x);
 #endif
   __asm__("fsqrt\t%d0, %d1" : "=w" (result) : "w" (x));
