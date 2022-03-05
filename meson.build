@@ -161,10 +161,13 @@ lite_exit = get_option('lite-exit')
 
 newlib_elix_level = get_option('newlib-elix-level')
 c_args = ['-include', '@0@/@1@'.format(meson.current_build_dir(), 'picolibc.h')]
+native_c_args = ['-DNO_NEWLIB']
 
 # Disable ssp and fortify source while building picolibc (it's enabled
 # by default by the ubuntu native compiler)
-c_args += cc.get_supported_arguments(['-fno-common', '-frounding-math', '-Wno-unsupported-floating-point-opt', '-fno-stack-protector'])
+c_flags = cc.get_supported_arguments(['-fno-common', '-frounding-math', '-fsignaling-nans', '-Wno-unsupported-floating-point-opt', '-fno-stack-protector'])
+c_args += c_flags
+native_c_args += c_flags
 
 # Select a fortify source option
 fortify_source = get_option('fortify-source')
@@ -521,7 +524,9 @@ picolibcpp_ld = configure_file(input: 'picolibc.ld.in',
 # Not all compilers necessarily support all warnings; only use these which are:
 c_warnings = ['-Werror=implicit-function-declaration', '-Werror=vla', '-Warray-bounds', '-Wold-style-definition']
 disabled_warnings = ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-Wno-unused-command-line-argument']
-c_args += cc.get_supported_arguments(c_warnings, disabled_warnings)
+c_flags = cc.get_supported_arguments(c_warnings, disabled_warnings)
+c_args += c_flags
+native_c_args += c_flags
 
 # CompCert does not support bitfields in packed structs, so avoid using this optimization
 bitfields_in_packed_structs_code = '''
@@ -936,6 +941,7 @@ conf_data.set('HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs support
 
 # disable compiler built-ins so we reach the library equivalents
 test_c_args = c_args + arg_fnobuiltin
+native_c_args += arg_fnobuiltin
 if tests_enable_stack_protector
   if cc.has_argument('-fstack-protector-all') and cc.has_argument('-fstack-protector-strong')
     test_c_args += ['-fstack-protector-all', '-fstack-protector-strong', '-DTESTS_ENABLE_STACK_PROTECTOR']

@@ -259,7 +259,11 @@ extern int __signbitd (double);
  *       taking double arguments still exist for compatibility purposes
  *       (prototypes for them are earlier in this header).  */
 
-#if __GNUC_PREREQ (4, 4) || defined(__clang__)
+/*
+ * GCC bug 66462 raises INVALID exception when __builtin_fpclassify is
+ * passed snan, so we cannot use it when building with snan support
+ */
+#if (__GNUC_PREREQ (4, 4) || defined(__clang__)) && !defined(__SUPPORT_SNAN__)
   #define fpclassify(__x) (__builtin_fpclassify (FP_NAN, FP_INFINITE, \
 						 FP_NORMAL, FP_SUBNORMAL, \
 						 FP_ZERO, __x))
