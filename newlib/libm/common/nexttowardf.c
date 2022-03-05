@@ -59,18 +59,12 @@ nexttowardf (float x, long double y)
   }
   e = ux & 0x7f800000;
   /* raise overflow if ux.value is infinite and x is finite */
-  if (e == 0x7f800000) {
-    volatile float force_eval;
-    force_eval = x + x;
-    (void) force_eval;
-  }
+  if (e == 0x7f800000)
+    return check_oflowf(opt_barrier_float(x+x));
   /* raise underflow if ux.value is subnormal or zero */
-  if (e == 0) {
-    volatile float force_eval;
-    force_eval = x*x + asfloat(ux)*asfloat(ux);
-    (void) force_eval;
-  }
-  return asfloat(ux);
+  if (e == 0)
+    force_eval_float(x*x + asfloat(ux)*asfloat(ux));
+  return check_uflowf(asfloat(ux));
 }
 
 #endif // _LDBL_EQ_DBL

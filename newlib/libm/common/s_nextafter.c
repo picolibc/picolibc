@@ -52,12 +52,7 @@ PORTABILITY
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
-	double nextafter(double x, double y)
-#else
-	double nextafter(x,y)
-	double x,y;
-#endif
+double nextafter(double x, double y)
 {
 	__int32_t	hx,hy,ix,iy;
 	__uint32_t lx,ly;
@@ -70,11 +65,11 @@ PORTABILITY
 	if(((ix>=0x7ff00000)&&((ix-0x7ff00000)|lx)!=0) ||   /* x is nan */ 
 	   ((iy>=0x7ff00000)&&((iy-0x7ff00000)|ly)!=0))     /* y is nan */ 
 	   return x+y;				
-	if(x==y) return x;		/* x=y, return x */
+	if(x==y) return y;		/* x=y, return y (follow y sign for 0) */
 	if((ix|lx)==0) {			/* x == 0 */
 	    INSERT_WORDS(x,hy&0x80000000,1);	/* return +-minsubnormal */
-	    y = x*x;
-	    if(y==x) return y; else return x;	/* raise underflow flag */
+            force_eval_double(x*x);             /* raise underflow flag */
+            return x;
 	} 
 	if(hx>=0) {				/* x > 0 */
 	    if(hx>hy||((hx==hy)&&(lx>ly))) {	/* x > y, x -= ulp */
@@ -94,16 +89,12 @@ PORTABILITY
 	    }
 	}
 	hy = hx&0x7ff00000;
-	if(hy>=0x7ff00000) return x+x;	/* overflow  */
+	if(hy>=0x7ff00000) return check_oflow(x+x);	/* overflow  */
 	if(hy<0x00100000) {		/* underflow */
-	    y = x*x;
-	    if(y!=x) {		/* raise underflow flag */
-	        INSERT_WORDS(y,hx,lx);
-		return y;
-	    }
+            force_eval_double(x*x);     /* raise underflow flag */
 	}
 	INSERT_WORDS(x,hx,lx);
-	return x;
+	return check_uflow(x);
 }
 
 #endif /* _DOUBLE_IS_32BITS */
