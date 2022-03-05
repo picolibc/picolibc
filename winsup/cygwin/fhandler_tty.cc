@@ -580,20 +580,20 @@ fhandler_pty_master::accept_input ()
       /* Write line by line for transfer input. */
       char *p0 = p;
       char *p_cr = (char *) memchr (p0, '\r', bytes_left - (p0 - p));
-      char *p_nl = (char *) memchr (p0, '\n', bytes_left - (p0 - p));
+      char *p_lf = (char *) memchr (p0, '\n', bytes_left - (p0 - p));
       DWORD n;
-      while (p_cr || p_nl)
+      while (p_cr || p_lf)
 	{
 	  char *p1 =
-	    p_cr ?  (p_nl ? ((p_cr + 1 == p_nl)
-			     ?  p_nl : min(p_cr, p_nl)) : p_cr) : p_nl;
+	    p_cr ?  (p_lf ? ((p_cr + 1 == p_lf)
+			     ?  p_lf : min(p_cr, p_lf)) : p_cr) : p_lf;
 	  n = p1 - p0 + 1;
 	  rc = WriteFile (write_to, p0, n, &n, NULL);
 	  if (rc)
 	    written += n;
 	  p0 = p1 + 1;
 	  p_cr = (char *) memchr (p0, '\r', bytes_left - (p0 - p));
-	  p_nl = (char *) memchr (p0, '\n', bytes_left - (p0 - p));
+	  p_lf = (char *) memchr (p0, '\n', bytes_left - (p0 - p));
 	}
       if (rc && (n = bytes_left - (p0 - p)))
 	{
@@ -3920,19 +3920,19 @@ fhandler_pty_slave::transfer_input (tty::xfer_dir dir, HANDLE from, tty *ttyp,
 	  /* Call WriteFile() line by line */
 	  char *p0 = ptr;
 	  char *p_cr = (char *) memchr (p0, '\r', len - (p0 - ptr));
-	  char *p_nl = (char *) memchr (p0, '\n', len - (p0 - ptr));
-	  while (p_cr || p_nl)
+	  char *p_lf = (char *) memchr (p0, '\n', len - (p0 - ptr));
+	  while (p_cr || p_lf)
 	    {
 	      char *p1 =
-		p_cr ?  (p_nl ? ((p_cr + 1 == p_nl)
-				 ?  p_nl : min(p_cr, p_nl)) : p_cr) : p_nl;
+		p_cr ?  (p_lf ? ((p_cr + 1 == p_lf)
+				 ?  p_lf : min(p_cr, p_lf)) : p_cr) : p_lf;
 	      *p1 = '\n';
 	      n = p1 - p0 + 1;
 	      if (n && WriteFile (to, p0, n, &n, NULL) && n)
 		transfered = true;
 	      p0 = p1 + 1;
 	      p_cr = (char *) memchr (p0, '\r', len - (p0 - ptr));
-	      p_nl = (char *) memchr (p0, '\n', len - (p0 - ptr));
+	      p_lf = (char *) memchr (p0, '\n', len - (p0 - ptr));
 	    }
 	  n = len - (p0 - ptr);
 	  if (n && WriteFile (to, p0, n, &n, NULL) && n)
