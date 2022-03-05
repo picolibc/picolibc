@@ -23,6 +23,14 @@ Bug Fixes
   Addresses:
   https://github.com/GitCredentialManager/git-credential-manager/issues/576
 
+- Fix some problems such as:
+   1) If output of non-cygwin app and input of cygwin app are connected
+      by a pipe, Ctrl-C has to be sent twice to stop apps when the
+      cygwin app does not read stdin at the moment.
+   2) In cmd.exe started from cygwin shell, if output of non-cygwin
+      app and input of cygwin app are connected by a pipe, Ctrl-C
+      can never terminate the apps.
+
 - Fix exit code when non-cygwin app is terminated by Ctrl-C.
 
 - Fix a bug that the order of the console key inputs are occasionally
