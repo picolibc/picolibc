@@ -1,0 +1,30 @@
+Bug Fixes
+---------
+
+- Fix a bug that accessing UNC path mounted to a drive letter using
+  SMB3.11 fails with error "Too many levels of symbolic links.".
+
+- Fix a console bug that escape sequence IL/DL (CSI Ps L, CSI Ps M)
+  does not work correctly at the last line.
+  Addresses: https://cygwin.com/pipermail/cygwin/2022-February/250736.html
+
+- Fix a problem that ENABLE_INSERT_MODE and ENABLE_QUICK_EDIT_MODE
+  flags are cleared if cygwin is started in console.
+
+- Fix an issue that cmd.exe also is terminated along with the cygwin
+  app started from the cmd.exe if the cygwin app is terminated by
+  Ctrl-C.
+
+- Fix deadlock caused when keys are typed in pty while a lot of text
+  output.
+
+- Fix a problem that the console mode for input is not set correctly
+  when non-cygwin app is started with stdin redirected.
+  Addresses:
+  https://github.com/GitCredentialManager/git-credential-manager/issues/576
+
+- Fix exit code when non-cygwin app is terminated by Ctrl-C.
+
+- Fix a bug that the order of the console key inputs are occasionally
+  swapped, especially when CPU load is high.
+  Addresses: https://cygwin.com/pipermail/cygwin/2022-February/250957.html
