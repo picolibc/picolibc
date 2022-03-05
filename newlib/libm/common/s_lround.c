@@ -48,21 +48,17 @@ ANSI C, POSIX
 */
 
 #include "fdlibm.h"
+#include <limits.h>
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
-	long int lround(double x)
-#else
-	long int lround(x)
-	double x;
-#endif
+long int lround(double x)
 {
   __int32_t sign, exponent_less_1023;
   /* Most significant word, least significant word. */
   __uint32_t msw, lsw;
   long int result;
-  
+
   EXTRACT_WORDS(msw, lsw, x);
 
   /* Extract sign. */
@@ -120,8 +116,20 @@ ANSI C, POSIX
         }
     }
   else
+  {
     /* Result is too large to be represented by a long int. */
+    if (sign == 1 ||
+        !((sizeof(long) == 4 && x > LONG_MIN - 0.5) ||
+          (sizeof(long) > 4 && x >= LONG_MIN)))
+    {
+      __math_set_invalid();
+      return sign == 1 ? LONG_MAX : LONG_MIN;
+    }
     return (long int)x;
+  }
+
+  if (sizeof (long) == 4 && sign == 1 && result == LONG_MIN)
+    __math_set_invalid();
 
   return sign * result;
 }
