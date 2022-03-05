@@ -51,14 +51,18 @@ SEEALSO
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
-	double nearbyint(double x)
-#else
-	double nearbyint(x)
-	double x;
-#endif
+double nearbyint(double x)
 {
-  return rint(x);
+    if (isnan(x)) return x + x;
+#if defined(FE_INEXACT) && !defined(PICOLIBC_DOUBLE_NOEXECPT)
+    fenv_t env;
+    fegetenv(&env);
+#endif
+    x = rint(x);
+#if defined(FE_INEXACT) && !defined(PICOLIBC_DOUBLE_NOEXECPT)
+    fesetenv(&env);
+#endif
+    return x;
 }
 
 #endif /* _DOUBLE_IS_32BITS */

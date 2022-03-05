@@ -29,7 +29,14 @@
 float
 nearbyintf (float x)
 {
-  float result;
-  __asm__("frinti\t%s0, %s1" : "=w" (result) : "w" (x));
-  return result;
+    if (isnan(x)) return x + x;
+#if defined(FE_INEXACT)
+    fenv_t env;
+    fegetenv(&env);
+#endif
+    __asm__("frinti\t%s0, %s1" : "=w" (x) : "w" (x));
+#if defined(FE_INEXACT)
+    fesetenv(&env);
+#endif
+    return x;
 }

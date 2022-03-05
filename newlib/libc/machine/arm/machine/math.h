@@ -88,9 +88,16 @@ floor (double x)
 __declare_arm_macro(double)
 nearbyint (double x)
 {
-  double result;
-  __asm__ volatile ("vrintr.f64\t%P0, %P1" : "=w" (result) : "w" (x));
-  return result;
+    if (isnan(x)) return x + x;
+#if defined(FE_INEXACT)
+    fenv_t env;
+    fegetenv(&env);
+#endif
+    __asm__ volatile ("vrintr.f64\t%P0, %P1" : "=w" (x) : "w" (x));
+#if defined(FE_INEXACT)
+    fesetenv(&env);
+#endif
+    return x;
 }
 
 __declare_arm_macro(double)
@@ -172,9 +179,16 @@ floorf (float x)
 __declare_arm_macro(float)
 nearbyintf (float x)
 {
-  float result;
-  __asm__ volatile ("vrintr.f32\t%0, %1" : "=t" (result) : "t" (x));
-  return result;
+    if (isnan(x)) return x + x;
+#if defined(FE_INEXACT)
+    fenv_t env;
+    fegetenv(&env);
+#endif
+    __asm__ volatile ("vrintr.f32\t%0, %1" : "=t" (x) : "t" (x));
+#if defined(FE_INEXACT)
+    fesetenv(&env);
+#endif
+    return x;
 }
 
 __declare_arm_macro(float)

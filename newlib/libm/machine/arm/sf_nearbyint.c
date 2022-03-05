@@ -30,9 +30,16 @@
 float
 nearbyintf (float x)
 {
-  float result;
-  __asm__ volatile ("vrintr.f32\t%0, %1" : "=t" (result) : "t" (x));
-  return result;
+    if (isnan(x)) return x + x;
+#if defined(FE_INEXACT)
+    fenv_t env;
+    fegetenv(&env);
+#endif
+    __asm__ volatile ("vrintr.f32\t%0, %1" : "=t" (x) : "t" (x));
+#if defined(FE_INEXACT)
+    fesetenv(&env);
+#endif
+    return x;
 }
 
 #else
