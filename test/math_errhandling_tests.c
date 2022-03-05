@@ -284,6 +284,24 @@ FLOAT_T makemathname(test_ldexp_neginf_0)(void) { return makemathname(ldexp)(-ma
 FLOAT_T makemathname(test_ldexp_1_negbig)(void) { return makemathname(ldexp)(makemathname(one), -(__DBL_MAX_EXP__ * 100)); }
 FLOAT_T makemathname(test_ldexp_1_big)(void) { return makemathname(ldexp)(makemathname(one),(__DBL_MAX_EXP__ * 100)); }
 
+FLOAT_T makemathname(test_rint_qnan)(void) { return makemathname(rint)(makemathname(qnanval)); }
+FLOAT_T makemathname(test_rint_snan)(void) { return makemathname(rint)(makemathname(snanval)); }
+FLOAT_T makemathname(test_rint_inf)(void) { return makemathname(rint)(makemathname(infval)); }
+FLOAT_T makemathname(test_rint_neginf)(void) { return makemathname(rint)(-makemathname(infval)); }
+FLOAT_T makemathname(test_rint_big)(void) { return makemathname(rint)(makemathname(big)); }
+FLOAT_T makemathname(test_rint_negbig)(void) { return makemathname(rint)(-makemathname(big)); }
+FLOAT_T makemathname(test_rint_half)(void) { return makemathname(rint)(makemathname(half)); }
+FLOAT_T makemathname(test_rint_neghalf)(void) { return makemathname(rint)(makemathname(half)); }
+
+FLOAT_T makemathname(test_nearbyint_qnan)(void) { return makemathname(nearbyint)(makemathname(qnanval)); }
+FLOAT_T makemathname(test_nearbyint_snan)(void) { return makemathname(nearbyint)(makemathname(snanval)); }
+FLOAT_T makemathname(test_nearbyint_inf)(void) { return makemathname(nearbyint)(makemathname(infval)); }
+FLOAT_T makemathname(test_nearbyint_neginf)(void) { return makemathname(nearbyint)(-makemathname(infval)); }
+FLOAT_T makemathname(test_nearbyint_big)(void) { return makemathname(nearbyint)(makemathname(big)); }
+FLOAT_T makemathname(test_nearbyint_negbig)(void) { return makemathname(nearbyint)(-makemathname(big)); }
+FLOAT_T makemathname(test_nearbyint_half)(void) { return makemathname(nearbyint)(makemathname(half)); }
+FLOAT_T makemathname(test_nearbyint_neghalf)(void) { return makemathname(nearbyint)(makemathname(half)); }
+
 long makemathname(test_lrint_qnan)(void) { makemathname(lrint)(makemathname(qnanval)); return 0; }
 long makemathname(test_lrint_snan)(void) { makemathname(lrint)(makemathname(snanval)); return 0; }
 long makemathname(test_lrint_inf)(void) { makemathname(lrint)(makemathname(infval)); return 0; }
@@ -858,6 +876,15 @@ struct {
         TEST(logb_inf, (FLOAT_T)INFINITY, 0, 0),
         TEST(logb_neginf, (FLOAT_T)INFINITY, 0, 0),
 
+        TEST(nearbyint_qnan, (FLOAT_T) NAN, 0, 0),
+        TEST(nearbyint_snan, (FLOAT_T) NAN, FE_INVALID, 0),
+        TEST(nearbyint_inf, (FLOAT_T)INFINITY, 0, 0),
+        TEST(nearbyint_neginf, -(FLOAT_T)INFINITY, 0, 0),
+        TEST(nearbyint_big, BIG, 0, 0),
+        TEST(nearbyint_negbig, -BIG, 0, 0),
+        TEST(nearbyint_half, 0.0, 0, 0),
+        TEST(nearbyint_neghalf, -0.0, 0, 0),
+
 	TEST(pow_neg_half, (FLOAT_T)NAN, FE_INVALID, EDOM),
 	TEST(pow_big, (FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
 	TEST(pow_negbig, (FLOAT_T)-INFINITY, FE_OVERFLOW, ERANGE),
@@ -923,6 +950,15 @@ struct {
         TEST(remainder_2_0, (FLOAT_T)NAN, FE_INVALID, EDOM),
         TEST(remainder_1_2, (FLOAT_T)1.0, 0, 0),
         TEST(remainder_neg1_2, -(FLOAT_T)1.0, 0, 0),
+
+        TEST(rint_qnan, (FLOAT_T) NAN, 0, 0),
+        TEST(rint_snan, (FLOAT_T) NAN, FE_INVALID, 0),
+        TEST(rint_inf, (FLOAT_T)INFINITY, 0, 0),
+        TEST(rint_neginf, -(FLOAT_T)INFINITY, 0, 0),
+        TEST(rint_big, BIG, 0, 0),
+        TEST(rint_negbig, -BIG, 0, 0),
+        TEST(rint_half, 0.0, FE_INEXACT, 0),
+        TEST(rint_neghalf, -0.0, FE_INEXACT, 0),
 
         TEST(scalb_1_1, (FLOAT_T)2.0, 0, 0),
         TEST(scalb_1_half, (FLOAT_T)NAN, FE_INVALID, EDOM),
