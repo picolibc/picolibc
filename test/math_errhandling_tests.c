@@ -1174,7 +1174,16 @@ makemathname(run_tests)(void) {
 			++result;
 		}
 		if (math_errhandling & EXCEPTION_TEST) {
-			if ((except & makemathname(itests)[t].except) != makemathname(itests)[t].except) {
+                        int expect_except = makemathname(itests)[t].except;
+                        int mask = FE_ALL_EXCEPT;
+
+                        /* underflow can be set for inexact operations */
+                        if (expect_except & FE_INEXACT)
+                                mask &= ~FE_UNDERFLOW;
+                        else
+                                mask &= ~FE_INEXACT;
+
+                        if ((except & (expect_except | mask)) != expect_except) {
                                 IPRINT;
 				printf("\texceptions supported. %s returns %s instead of %s\n",
                                        makemathname(itests)[t].name, e_to_str(except), e_to_str(makemathname(itests)[t].except));
