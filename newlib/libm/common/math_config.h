@@ -380,8 +380,20 @@ HIDDEN double __math_divzero (uint32_t);
 
 /* Invalid input unless it is a quiet NaN.  */
 HIDDEN float __math_invalidf (float);
+/* set invalid exception */
+#if defined(FE_INVALID) && !defined(PICOLIBC_FLOAT_NOEXECPT)
+HIDDEN void __math_set_invalidf(void);
+#else
+#define __math_set_invalidf()   ((void) 0)
+#endif
 /* Invalid input unless it is a quiet NaN.  */
 HIDDEN double __math_invalid (double);
+/* set invalid exception */
+#if defined(FE_INVALID) && !defined(PICOLIBC_DOUBLE_NOEXECPT)
+HIDDEN void __math_set_invalid(void);
+#else
+#define __math_set_invalid()    ((void) 0)
+#endif
 
 /* Error handling using output checking, only for errno setting.  */
 
@@ -428,7 +440,7 @@ double __math_inexact(double);
 void __math_set_inexact(void);
 #else
 #define __math_inexact(val) (val)
-#define __math_set_inexact()
+#define __math_set_inexact()    ((void) 0)
 #endif
 
 #if defined(FE_INEXACT) && !defined(PICOLIBC_FLOAT_NOEXECPT)
@@ -436,7 +448,7 @@ float __math_inexactf(float val);
 void __math_set_inexactf(void);
 #else
 #define __math_inexactf(val) (val)
-#define __math_set_inexactf()
+#define __math_set_inexactf()   ((void) 0)
 #endif
 
 /* Shared between expf, exp2f and powf.  */

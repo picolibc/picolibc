@@ -39,3 +39,11 @@ __math_invalidf (float x)
     x = pick_float_except(VAL / VAL, VAL);
     return __math_with_errnof (x, EDOM);
 }
+
+#ifndef __math_set_invalidf
+HIDDEN void
+__math_set_invalidf(void)
+{
+    force_eval_float(pick_float_except(VAL / VAL, VAL));
+}
+#endif
