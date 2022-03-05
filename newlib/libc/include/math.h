@@ -251,6 +251,8 @@ extern int __fpclassifyf (float);
 extern int __fpclassifyd (double);
 extern int __signbitf (float);
 extern int __signbitd (double);
+extern int __finite (double);
+extern int __finitef (float);
 
 /* Note: isinf and isnan were once functions in newlib that took double
  *       arguments.  C99 specifies that these names are reserved for macros
@@ -277,14 +279,13 @@ extern int __signbitd (double);
     #define isnan(__x) (__builtin_isnan (__x))
   #endif
   #define isnormal(__x) (__builtin_isnormal (__x))
+  #define issubnormal(__x) (__builtin_issubnormal (__x))
 #else
   #define fpclassify(__x) \
 	  ((sizeof(__x) == sizeof(float))  ? __fpclassifyf(__x) : \
 	  __fpclassifyd((double) (__x)))
   #ifndef isfinite
-    #define isfinite(__y) \
-	    (__extension__ ({int __cy = fpclassify(__y); \
-			     __cy != FP_INFINITE && __cy != FP_NAN;}))
+    #define isfinite(__x) ((sizeof(__x) == sizeof(float)) ? __finitef(__x) : __finite(__x))
   #endif
   #ifndef isinf
     #define isinf(__x) (fpclassify(__x) == FP_INFINITE)
@@ -293,6 +294,7 @@ extern int __signbitd (double);
     #define isnan(__x) (fpclassify(__x) == FP_NAN)
   #endif
   #define isnormal(__x) (fpclassify(__x) == FP_NORMAL)
+  #define issubnormal(__x) (fpclassify(__x) == FP_SUBNORMAL)
 #endif
 
 #ifndef issignaling

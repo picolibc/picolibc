@@ -20,16 +20,25 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
-	int finite(double x)
-#else
-	int finite(x)
-	double x;
-#endif
+int finite(double x)
 {
 	__int32_t hx;
 	GET_HIGH_WORD(hx,x);
 	return  (int)((__uint32_t)((hx&0x7fffffff)-0x7ff00000)>>31);
 }
+
+#if defined(HAVE_ALIAS_ATTRIBUTE)
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(finite, __finite);
+#else
+
+int __finite(double x)
+{
+    return finite(x);
+}
+
+#endif
 
 #endif /* _DOUBLE_IS_32BITS */

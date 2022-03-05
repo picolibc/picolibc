@@ -42,6 +42,21 @@ int finitef(float x)
 	long fclass = _fclass_f (x);
 	return (fclass & (FCLASS_INF | FCLASS_NAN)) == 0;
 }
+
+#if defined(HAVE_ALIAS_ATTRIBUTE)
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(finitef, __finitef);
+#else
+
+int
+__finitef(float x)
+{
+    return finitef(x);
+}
+#endif
+
 #else
 #include "../../common/sf_finite.c"
 #endif
