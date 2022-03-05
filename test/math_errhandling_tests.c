@@ -253,6 +253,17 @@ long makemathname(test_ilogb_snan)(void) { return makemathname(ilogb)(makemathna
 long makemathname(test_ilogb_inf)(void) { return makemathname(ilogb)(makemathname(infval)); }
 long makemathname(test_ilogb_neginf)(void) { return makemathname(ilogb)(-makemathname(infval)); }
 
+long makemathname(test_fpclassify_snan)(void) { return fpclassify(makemathname(snanval)); }
+long makemathname(test_fpclassify_nan)(void) { return fpclassify(makemathname(qnanval)); }
+long makemathname(test_fpclassify_inf)(void) { return fpclassify(makemathname(infval)); }
+long makemathname(test_fpclassify_neginf)(void) { return fpclassify(-makemathname(infval)); }
+long makemathname(test_fpclassify_zero)(void) { return fpclassify(makemathname(zero)); }
+long makemathname(test_fpclassify_negzero)(void) { return fpclassify(-makemathname(zero)); }
+long makemathname(test_fpclassify_small)(void) { return fpclassify(makemathname(small)); }
+long makemathname(test_fpclassify_negsmall)(void) { return fpclassify(-makemathname(small)); }
+long makemathname(test_fpclassify_two)(void) { return fpclassify(makemathname(two)); }
+long makemathname(test_fpclassify_negtwo)(void) { return fpclassify(-makemathname(two)); }
+
 FLOAT_T makemathname(test_j0_inf)(void) { return makemathname(j0)(makemathname(infval)); }
 FLOAT_T makemathname(test_j0_qnan)(void) { return makemathname(j0)(makemathname(qnanval)); }
 FLOAT_T makemathname(test_j0_snan)(void) { return makemathname(j0)(makemathname(snanval)); }
@@ -1021,6 +1032,17 @@ struct {
 	int	except;
 	int	errno_expect;
 } makemathname(itests)[] = {
+        TEST(fpclassify_snan, FP_NAN, 0, 0),
+        TEST(fpclassify_nan, FP_NAN, 0, 0),
+        TEST(fpclassify_inf, FP_INFINITE, 0, 0),
+        TEST(fpclassify_neginf, FP_INFINITE, 0, 0),
+        TEST(fpclassify_zero, FP_ZERO, 0, 0),
+        TEST(fpclassify_negzero, FP_ZERO, 0, 0),
+        TEST(fpclassify_small, FP_SUBNORMAL, 0, 0),
+        TEST(fpclassify_negsmall, FP_SUBNORMAL, 0, 0),
+        TEST(fpclassify_two, FP_NORMAL, 0, 0),
+        TEST(fpclassify_negtwo, FP_NORMAL, 0, 0),
+
         TEST(ilogb_0, FP_ILOGB0, FE_INVALID, EDOM),
         TEST(ilogb_qnan, FP_ILOGBNAN, FE_INVALID, EDOM),
         TEST(ilogb_inf, INT_MAX, FE_INVALID, EDOM),
