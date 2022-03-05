@@ -788,7 +788,7 @@ struct {
 
         TEST(ldexp_1_0, (FLOAT_T)1.0, 0, 0),
         TEST(ldexp_qnan_0, (FLOAT_T)NAN, 0, 0),
-        TEST(ldexp_snan_0, (FLOAT_T)sNAN_RET, 0, 0),
+        TEST(ldexp_snan_0, (FLOAT_T)NAN, FE_INVALID, 0),
         TEST(ldexp_inf_0, (FLOAT_T)INFINITY, 0, 0),
         TEST(ldexp_neginf_0, -(FLOAT_T)INFINITY, 0, 0),
         TEST(ldexp_1_negbig, (FLOAT_T)0.0, FE_UNDERFLOW, ERANGE),
