@@ -494,6 +494,7 @@ picolibcpp_specs = configure_file(input: 'picolibc.specs.in',
 				  install_dir: specs_dir,
 				  install: specs_install)
 
+
 test_specs = configure_file(input: 'test.specs.in',
 			    output: '@BASENAME@',
 			    configuration: specs_data,
