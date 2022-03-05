@@ -96,6 +96,7 @@ math_test_src = [
   'modff_vec.c',
   'pow_vec.c',
   'powf_vec.c',
+  'scalb_vec.c',
   'scalbn_vec.c',
   'sinf_vec.c',
   'sinhf_vec.c',
