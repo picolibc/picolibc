@@ -297,27 +297,27 @@ if enable_native_tests
   if native_lib_m.found()
     test('math_errhandling_native',
 	 executable('math_errhandling_native', 'math_errhandling.c',
-		    c_args: ['-DNO_NEWLIB'],
+		    c_args: native_c_args,
 		    dependencies: native_lib_m))
     test('rounding-mode_native',
 	 executable('rounding-mode_native',
 		    ['rounding-mode.c', 'rounding-mode-sub.c'],
-		    c_args: test_c_args + ['-DNO_NEWLIB'],
+		    c_args: native_c_args,
 		    dependencies: native_lib_m))
     test('printf-tests_native',
 	 executable('printf-tests_native',
 		    'printf-tests.c',
-		    c_args: ['-DNO_NEWLIB'],
+		    c_args: native_c_args,
 		    dependencies: native_lib_m))
     test('printf_scanf_native',
 	 executable('printf_scanf_native',
 		    'printf_scanf.c',
-		    c_args: ['-DNO_NEWLIB'],
+		    c_args: native_c_args,
 		    dependencies: native_lib_m))
     test('test-efcvt_native',
 	 executable('test-efcvt_native',
 		    'test-efcvt.c',
-		    c_args: ['-DNO_NEWLIB'],
+		    c_args: native_c_args,
 		    dependencies: native_lib_m))
   endif
 endif
