@@ -65,20 +65,11 @@ SEEALSO
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 static const double
-#else
-static double
-#endif
 two54   =  1.80143985094819840000e+16, /* 0x43500000, 0x00000000 */
 twom54  =  5.55111512312578270212e-17; /* 0x3C900000, 0x00000000 */
 
-#ifdef __STDC__
-	double scalbn (double x, int n)
-#else
-	double scalbn (x,n)
-	double x; int n;
-#endif
+double scalbn (double x, int n)
 {
 	__int32_t  k,hx,lx;
 	EXTRACT_WORDS(hx,lx,x);
@@ -101,7 +92,7 @@ twom54  =  5.55111512312578270212e-17; /* 0x3C900000, 0x00000000 */
 	    return __math_uflow(hx<0); 	        /*underflow*/
         k += 54;				/* subnormal result */
 	SET_HIGH_WORD(x,(hx&0x800fffff)|(k<<20));
-        return x*twom54;
+        return check_uflow(x*twom54);
 }
 
 #if defined(HAVE_ALIAS_ATTRIBUTE)
