@@ -116,8 +116,14 @@ TWO52[2]={
 		}
 	    }
 	} else if (j0>51) {
-	    if(j0==0x400) return x+x;	/* inf or NaN */
-	    else return x;		/* x is integral */
+            /*
+             * Use barrier to avoid overflow on clang which would
+             * otherwise always do this add on arm and use a
+             * conditional move instead of a branch for the if
+             */
+            if (j0 == 0x400)
+                return opt_barrier_double(x+x);
+            return x;
 	} else {
 	    i = ((__uint32_t)(0xffffffff))>>(j0-20);
 	    if((i1&i)==0) return x;	/* x is integral */

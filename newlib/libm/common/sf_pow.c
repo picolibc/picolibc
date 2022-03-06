@@ -187,11 +187,13 @@ powf (float x, float y)
 	      x2 = -x2;
 	      sign_bias = 1;
 	    }
+          if (!(iy & 0x80000000))
+              return opt_barrier_float(x2);
 #if WANT_ERRNO
-	  if (2 * ix == 0 && iy & 0x80000000)
-	    return __math_divzerof (sign_bias);
+          if (2 * ix == 0)
+              return __math_divzerof (sign_bias);
 #endif
-	  return iy & 0x80000000 ? 1 / x2 : x2;
+          return 1 / x2;
 	}
       /* x and y are non-zero finite.  */
       if (ix & 0x80000000)
