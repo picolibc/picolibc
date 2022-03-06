@@ -54,7 +54,7 @@ fcvtf_r (float invalue,
     int ftoa_decimal = ndecimal;
     char *digits = ftoa.digits;
 
-    if (!isfinite(invalue)) {
+    if (!__finitef(invalue)) {
         ndigit = 3;
         ntrailing = 0;
         *sign = invalue < 0;
