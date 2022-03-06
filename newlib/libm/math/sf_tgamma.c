@@ -28,7 +28,7 @@ tgammaf(float x)
     int signgam_local;
     int divzero = 0;
 
-    if (isless(x, 0.0f) && rintf(x) == x)
+    if (isless(x, 0.0f) && clang_barrier_float(rintf(x)) == x)
         return __math_invalidf(x);
 
     float y = expf(__math_lgammaf_r(x, &signgam_local, &divzero));

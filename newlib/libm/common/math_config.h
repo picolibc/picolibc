@@ -334,6 +334,22 @@ force_eval_double (double x)
   (void) y;
 }
 
+/* Clang doesn't appear to suppor precise exceptions on
+ * many targets. We introduce barriers for that compiler
+ * to force evaluation order where needed
+ */
+#ifdef __clang__
+#define clang_barrier_double(x) opt_barrier_double(x)
+#define clang_barrier_float(x) opt_barrier_float(x)
+#define clang_force_double(x) force_eval_double(x)
+#define clang_force_float(x) force_eval_float(x)
+#else
+#define clang_barrier_double(x) (x)
+#define clang_barrier_float(x) (x)
+#define clang_force_double(x) (x)
+#define clang_force_float(x) (x)
+#endif
+
 /* Evaluate an expression as the specified type, normally a type
    cast should be enough, but compilers implement non-standard
    excess-precision handling, so when FLT_EVAL_METHOD != 0 then

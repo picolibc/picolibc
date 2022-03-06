@@ -26,7 +26,7 @@ tgamma(double x)
     int signgam_local;
     int divzero = 0;
 
-    if (isless(x, 0.0) && rint(x) == x)
+    if (isless(x, 0.0) && clang_barrier_double(rint(x)) == x)
         return __math_invalid(x);
 
     double y = exp(__math_lgamma_r(x, &signgam_local, &divzero));
