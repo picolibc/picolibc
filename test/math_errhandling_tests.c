@@ -586,8 +586,10 @@ FLOAT_T makemathname(test_scalbn_tiny)(void) { return makemathname(scalbn)(makem
  * to NAN on load, so you can't ever return a sNAN value successfully.
  */
 #define sNAN_RET        NAN
+#define sNAN_EXCEPTION  FE_INVALID
 #else
 #define sNAN_RET        sNAN
+#define sNAN_EXCEPTION  0
 #endif
 
 struct {
@@ -704,7 +706,7 @@ struct {
 	TEST(expm1_negbig, -(FLOAT_T)1.0, FE_INEXACT, 0),
 
         TEST(fabs_qnan, (FLOAT_T)NAN, 0, 0),
-        TEST(fabs_snan, (FLOAT_T)sNAN_RET, 0, 0),
+        TEST(fabs_snan, (FLOAT_T)sNAN_RET, sNAN_EXCEPTION, 0),
         TEST(fabs_0, (FLOAT_T)0.0, 0, 0),
         TEST(fabs_neg0, (FLOAT_T)0.0, 0, 0),
         TEST(fabs_inf, (FLOAT_T)INFINITY, 0, 0),
