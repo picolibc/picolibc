@@ -263,9 +263,12 @@ extern int __finitef (float);
 
 /*
  * GCC bug 66462 raises INVALID exception when __builtin_fpclassify is
- * passed snan, so we cannot use it when building with snan support
+ * passed snan, so we cannot use it when building with snan support.
+ * clang doesn't appear to have an option to control snan behavior, and
+ * it's builtin fpclassify also raises INVALID for snan, so always use
+ * our version for that.
  */
-#if (__GNUC_PREREQ (4, 4) || defined(__clang__)) && !defined(__SUPPORT_SNAN__)
+#if __GNUC_PREREQ (4, 4) && !defined(__SUPPORT_SNAN__) && !defined(__clang__)
   #define fpclassify(__x) (__builtin_fpclassify (FP_NAN, FP_INFINITE, \
 						 FP_NORMAL, FP_SUBNORMAL, \
 						 FP_ZERO, __x))
