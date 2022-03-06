@@ -183,7 +183,7 @@ pow(double x, double y)
                 z = one / z; /* z = (1/|x|) */
             if (hx < 0) {
                 if (((ix - 0x3ff00000) | yisint) == 0) {
-                    z = (z - z) / (z - z); /* (-1)**non-int is NaN */
+                    return __math_invalid(x); /* (-1)**non-int is NaN */
                 } else if (yisint == 1)
                     z = -z; /* (x<0)**odd = -(|x|**odd) */
             }
@@ -216,10 +216,14 @@ pow(double x, double y)
                 return (hy > 0) ? __math_oflow(0) : __math_uflow(0);
         }
         /* over/underflow if x is not close to one */
-        if (ix < 0x3fefffff)
-            return (hy < 0) ? __math_oflow(0) : __math_uflow(0);
-        if (ix > 0x3ff00000)
-            return (hy > 0) ? __math_oflow(0) : __math_uflow(0);
+        if (ix < 0x3fefffff) {
+            int sign = yisint & ((__uint32_t)hx>>31);
+            return (hy < 0) ? __math_oflow(sign) : __math_uflow(sign);
+        }
+        if (ix > 0x3ff00000) {
+            int sign = yisint & ((__uint32_t)hx>>31);
+            return (hy > 0) ? __math_oflow(sign) : __math_uflow(sign);
+        }
         /* now |1-x| is tiny <= 2**-20, suffice to compute
 	   log(x) by x-x^2/2+x^3/3-x^4/4 */
         t = ax - 1; /* t has 20 trailing zeros */
