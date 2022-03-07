@@ -37,8 +37,17 @@ nexttowardf (float x, long double y)
   uint32_t ux;
   uint32_t e;
 
-  if (isnan(x) || isnan(y))
-    return (long double) x + y;
+  /*
+   * We can't do this if y isn't nan as that might raise INEXACT doing
+   * long double -> float conversion, and we don't want to do this
+   * in long double for machines without long double HW as we won't
+   * get any exceptions in that case.
+   */
+  if (isnan(y))
+      return x + (issignaling(y) ? __builtin_nansf("") : (float) y);
+  if (isnan(x))
+      return x + x;
+
   if ((long double) x == y)
     return y;
   ux = asuint(x);
