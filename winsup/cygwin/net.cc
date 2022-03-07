@@ -1440,26 +1440,20 @@ cygwin_send (int fd, const void *buf, size_t len, int flags)
 
 /* Fill out an ifconf struct. */
 
-struct gaa_wa {
-  ULONG family;
-  PIP_ADAPTER_ADDRESSES *pa_ret;
-};
-
-DWORD WINAPI
-call_gaa (LPVOID param)
+bool
+get_adapters_addresses (PIP_ADAPTER_ADDRESSES *pa_ret, ULONG family)
 {
   DWORD ret, size = 0;
-  gaa_wa *p = (gaa_wa *) param;
   PIP_ADAPTER_ADDRESSES pa0 = NULL;
 
-  if (!p->pa_ret)
-    return GetAdaptersAddresses (p->family, GAA_FLAG_INCLUDE_PREFIX
-					    | GAA_FLAG_INCLUDE_ALL_INTERFACES,
+  if (!pa_ret)
+    return GetAdaptersAddresses (family, GAA_FLAG_INCLUDE_PREFIX
+					 | GAA_FLAG_INCLUDE_ALL_INTERFACES,
 				 NULL, NULL, &size);
   do
     {
-      ret = GetAdaptersAddresses (p->family, GAA_FLAG_INCLUDE_PREFIX
-					     | GAA_FLAG_INCLUDE_ALL_INTERFACES,
+      ret = GetAdaptersAddresses (family, GAA_FLAG_INCLUDE_PREFIX
+					  | GAA_FLAG_INCLUDE_ALL_INTERFACES,
 				  NULL, pa0, &size);
       if (ret == ERROR_BUFFER_OVERFLOW
 	  && !(pa0 = (PIP_ADAPTER_ADDRESSES) realloc (pa0, size)))
@@ -1471,42 +1465,11 @@ call_gaa (LPVOID param)
       if (ret != ERROR_SUCCESS)
 	{
 	  free (pa0);
-	  *p->pa_ret = NULL;
+	  *pa_ret = NULL;
 	}
       else
-	*p->pa_ret = pa0;
+	*pa_ret = pa0;
     }
-  return ret;
-}
-
-bool
-get_adapters_addresses (PIP_ADAPTER_ADDRESSES *pa_ret, ULONG family)
-{
-  DWORD ret;
-  gaa_wa param = { family, pa_ret };
-
-  if (wincap.has_gaa_largeaddress_bug ()
-      && (uintptr_t) &param >= (uintptr_t) 0x80000000L)
-    {
-      /* In Windows 7 under WOW64, GetAdaptersAddresses fails if it's running
-	 in a thread with a stack located in the large address area.  If we're
-	 running in a pthread with such a stack, we call GetAdaptersAddresses
-	 in a child thread with an OS-allocated stack.  The OS allocates stacks
-	 bottom up, so chances are good that the new stack will be located in
-	 the lower address area. */
-      HANDLE thr = CreateThread (NULL, 0, call_gaa, &param, 0, NULL);
-      SetThreadName (GetThreadId (thr), "__call_gaa");
-      if (!thr)
-	{
-	  debug_printf ("CreateThread: %E");
-	  return false;
-	}
-      WaitForSingleObject (thr, INFINITE);
-      GetExitCodeThread (thr, &ret);
-      CloseHandle (thr);
-    }
-  else
-    ret = call_gaa (&param);
   return ret == ERROR_SUCCESS || (!pa_ret && ret == ERROR_BUFFER_OVERFLOW);
 }
 
