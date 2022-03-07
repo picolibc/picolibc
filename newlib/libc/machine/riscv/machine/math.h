@@ -121,6 +121,9 @@ __declare_riscv_macro(double)
 fmax (double x, double y)
 {
 	double result;
+        if (issignaling(x) || issignaling(y))
+            return x + y;
+
 	__asm__ volatile("fmax.d\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
 	return result;
 }
@@ -129,6 +132,9 @@ __declare_riscv_macro(double)
 fmin (double x, double y)
 {
 	double result;
+        if (issignaling(x) || issignaling(y))
+            return x + y;
+
 	__asm__ volatile("fmin.d\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
 	return result;
 }
@@ -222,6 +228,9 @@ __declare_riscv_macro(float)
 fmaxf (float x, float y)
 {
 	float result;
+        if (issignaling(x) || issignaling(y))
+            return x + y;
+
 	__asm__ volatile("fmax.s\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
 	return result;
 }
@@ -230,6 +239,9 @@ __declare_riscv_macro(float)
 fminf (float x, float y)
 {
 	float result;
+        if (issignaling(x) || issignaling(y))
+            return x + y;
+
 	__asm__ volatile("fmin.s\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
 	return result;
 }

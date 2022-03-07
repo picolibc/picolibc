@@ -40,9 +40,12 @@
 float
 fminf (float x, float y)
 {
-  float result;
-  __asm__("fmin.s\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
-  return result;
+    float result;
+    if (issignaling(x) || issignaling(y))
+        return x + y;
+
+    __asm__("fmin.s\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
+    return result;
 }
 
 #else
