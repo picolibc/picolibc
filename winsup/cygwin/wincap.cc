@@ -461,14 +461,8 @@ wincapc::init ()
 
   ((wincaps *)caps)->is_server = (version.wProductType != VER_NT_WORKSTATION);
 #ifdef __x86_64__
-  wow64 = 0;
   /* 64 bit systems have one more guard page than their 32 bit counterpart. */
   ++((wincaps *)caps)->def_guard_pages;
-#else
-  if (NT_SUCCESS (NtQueryInformationProcess (NtCurrentProcess (),
-					     ProcessWow64Information,
-					     &wow64, sizeof wow64, NULL))
-      && !wow64)
 #endif
     {
       ((wincaps *)caps)->has_gaa_largeaddress_bug = false;

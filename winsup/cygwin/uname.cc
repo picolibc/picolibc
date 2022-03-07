@@ -36,9 +36,8 @@ uname_x (struct utsname *name)
 
       memset (name, 0, sizeof (*name));
       /* sysname */
-      __small_sprintf (name->sysname, "CYGWIN_%s-%u%s",
-		       wincap.osname (), wincap.build_number (),
-		       wincap.is_wow64 () ? "-WOW64" : "");
+      __small_sprintf (name->sysname, "CYGWIN_%s-%u",
+		       wincap.osname (), wincap.build_number ());
       /* nodename */
       memset (buf, 0, sizeof buf);
       cygwin_gethostname (buf, sizeof buf - 1);
@@ -99,12 +98,6 @@ uname (struct utsname *in_name)
 
       memset (name, 0, sizeof (*name));
       __small_sprintf (name->sysname, "CYGWIN_%s", wincap.osname ());
-
-      /* Add a hint to the sysname, that we're running under WOW64.  This might
-	 give an early clue if somebody encounters problems. */
-      if (wincap.is_wow64 ())
-	strncat (name->sysname, "-WOW",
-		 sizeof name->sysname - strlen (name->sysname) - 1);
 
       /* Computer name */
       cygwin_gethostname (name->nodename, sizeof (name->nodename) - 1);

@@ -49,7 +49,6 @@ class wincapc
   SYSTEM_INFO		system_info;
   RTL_OSVERSIONINFOEXW	version;
   char			osnam[40];
-  ULONG_PTR		wow64;
   void			*caps;
 
 public:
@@ -69,7 +68,6 @@ public:
 		     { return (size_t) system_info.dwAllocationGranularity; }
   const char *osname () const { return osnam; }
   const DWORD build_number () const { return version.dwBuildNumber; }
-  const bool is_wow64 () const { return !!wow64; }
 
 #define IMPLEMENT(cap) cap() const { return ((wincaps *) this->caps)->cap; }
 

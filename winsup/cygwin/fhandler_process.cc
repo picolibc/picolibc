@@ -784,11 +784,7 @@ struct thread_info
   char *fill_if_match (char *base, ULONG type, char *dest)
   {
     for (region *r = regions; r; r = r->next)
-      if ((base >= r->start && base < r->end)
-	  /* Special case WOW64.  The TEB is 8K within the region reserved
-	     for it.  No idea what the lower 8K are used for. */
-	  || (r->teb && wincap.is_wow64 ()
-	      && r->start == base + 2 * wincap.page_size ()))
+      if (base >= r->start && base < r->end)
 	{
 	  char *p = dest + __small_sprintf (dest, "[%s (tid %ld)",
 					    r->teb ? "teb" : "stack",

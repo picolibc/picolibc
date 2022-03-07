@@ -4417,8 +4417,7 @@ gethostid (void)
   int32_t hostid = 0x40291372; /* Choose a nice start value */
   WCHAR wguid[38];
 
-  reg_key key (HKEY_LOCAL_MACHINE,
-	       KEY_READ | (wincap.is_wow64() ? KEY_WOW64_64KEY : 0),
+  reg_key key (HKEY_LOCAL_MACHINE, KEY_READ,
 	       L"SOFTWARE", L"Microsoft", L"Cryptography", NULL);
   key.get_string (L"MachineGuid", wguid, 38,
 		  L"00000000-0000-0000-0000-000000000000");

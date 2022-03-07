@@ -3461,28 +3461,6 @@ restart:
 	 differ, return the final path as symlink content and set symlen
 	 to a negative value.  This forces path_conv::check to restart
 	 symlink evaluation with the new path. */
-#ifdef __i386__
-      /* On WOW64, ignore any potential problems if the path is inside
-	 the Windows dir to avoid false positives for stuff under File
-	 System Redirector control.  Believe it or not, but even
-	 GetFinalPathNameByHandleA returns the converted path for the
-	 Sysnative dir.  I. e.
-
-	     C:\Windows\Sysnative --> C:\Windows\System32
-
-	 This is obviously wrong when using this path for further
-	 file manipulation because the non-final path points to another
-	 file than the final path.  Oh well... */
-      if (!fs.is_remote_drive () && wincap.is_wow64 ())
-	{
-	  /* windows_directory_path is stored without trailing backslash,
-	     so we have to check this explicitely. */
-	  if (RtlEqualUnicodePathPrefix (&upath, &windows_directory_path, TRUE)
-	      && upath.Buffer[windows_directory_path.Length / sizeof (WCHAR)]
-		 == L'\\')
-	    goto file_not_symlink;
-	}
-#endif /* __i386__ */
       if ((pc_flags & (PC_SYM_FOLLOW | PC_SYM_NOFOLLOW_REP)) == PC_SYM_FOLLOW)
 	{
 	  PWCHAR fpbuf = tp.w_get ();
