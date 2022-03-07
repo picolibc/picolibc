@@ -31,7 +31,8 @@ twom54  =  5.55111512312578270212e-17; /* 0x3C900000, 0x00000000 */
 
 double scalbln (double x, long int n)
 {
-	__int32_t k,hx,lx;
+	__int32_t hx,lx;
+        long int k;
 	EXTRACT_WORDS(hx,lx,x);
         k = (hx&0x7ff00000)>>20;		/* extract exponent */
         if (k==0) {				/* 0 or subnormal x */

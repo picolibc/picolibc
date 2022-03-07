@@ -25,8 +25,9 @@ twom25  =  2.9802322388e-08;	/* 0x33000000 */
 
 float scalblnf (float x, long int n)
 {
-	__int32_t k,ix;
+	__int32_t ix;
         uint32_t hx;
+        long int k;
 
 	GET_FLOAT_WORD(ix,x);
 	hx = ix&0x7fffffff;
