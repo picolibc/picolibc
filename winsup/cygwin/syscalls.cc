@@ -3607,8 +3607,7 @@ seteuid32 (uid_t uid)
   debug_printf ("Found token %p", new_token);
 
   /* If no impersonation token is available, try to authenticate using
-     LSA private data stored password, LSA authentication using our own
-     LSA module, or, as last chance, NtCreateToken. */
+     LSA private data stored password, or, if that fails, S4U logon. */
   if (new_token == NULL)
     {
       if (!(new_token = lsaprivkeyauth (pw_new)))
@@ -3621,23 +3620,9 @@ seteuid32 (uid_t uid)
 	  extract_nt_dom_user (pw_new, domain, user);
 	  if (!(new_token = s4uauth (true, domain, user, status)))
 	    {
-	      if (status != STATUS_INVALID_PARAMETER)
-		{
-		  debug_printf ("s4uauth failed, bail out");
-		  cygheap->user.reimpersonate ();
-		  return -1;
-		}
-	      /* If s4uauth fails with status code STATUS_INVALID_PARAMETER,
-		 we're running on a system not implementing MsV1_0S4ULogon
-		 (Windows 7 WOW64).  Fall back to create_token in this single
-		 case only. */
-	      debug_printf ("s4uauth failed, try create_token.");
-	      if (!(new_token = create_token (usersid, groups)))
-		{
-		  debug_printf ("create_token failed, bail out");
-		  cygheap->user.reimpersonate ();
-		  return -1;
-		}
+	      debug_printf ("s4uauth failed, bail out");
+	      cygheap->user.reimpersonate ();
+	      return -1;
 	    }
 	}
 

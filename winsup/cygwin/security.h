@@ -457,8 +457,6 @@ int setacl (HANDLE, path_conv &, int, struct acl *, bool &);
 
 /* Set impersonation or restricted token.  */
 void set_imp_token (HANDLE token, int type);
-/* Function creating a token by calling NtCreateToken. */
-HANDLE create_token (cygsid &usersid, user_groups &groups);
 /* LSA private key storage authentication, same as when using service logons. */
 HANDLE lsaprivkeyauth (struct passwd *pw);
 /* Kerberos or MsV1 S4U logon. */

@@ -752,11 +752,9 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	      sa = sec_user ((PSECURITY_ATTRIBUTES) alloca (1024),
 			     ::cygheap->user.sid ());
 	      /* We're creating a window station per user, not per logon
-		 session First of all we might not have a valid logon session
-		 for the user (logon by create_token), and second, it doesn't
-		 make sense in terms of security to create a new window
-		 station for every logon of the same user.  It just fills up
-		 the system with window stations for no good reason. */
+		 session.  It doesn't make sense in terms of security to
+		 create a new window station for every logon of the same user.
+		 It just fills up the system with window stations. */
 	      hwst = CreateWindowStationW (::cygheap->user.get_windows_id (sid),
 					   0, GENERIC_READ | GENERIC_WRITE, sa);
 	      if (!hwst)
