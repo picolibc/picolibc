@@ -201,23 +201,24 @@ getopt_internal (int argc, char *const argv[], const char *shortopts,
   int arg_next = 0;
   int initial_colon = 0;
 
-  /* first, deal with silly parameters and easy stuff */
-  if (argc == 0 || argv == 0 || (shortopts == 0 && longopts == 0)
-      || data->optind >= argc || argv[data->optind] == 0)
-    return EOF;
-  if (strcmp (argv[data->optind], "--") == 0)
-    {
-      data->optind++;
-      return EOF;
-    }
-
   /* if this is our first time through */
-  if (data->optind == 0)
+  if (data->optind <= 0)
     {
       data->optind = 1;
       data->optwhere = 1;
       data->permute_from = 0;
       data->num_nonopts = 0;
+    }
+
+  /* first, deal with silly parameters and easy stuff */
+  if (argc == 0 || argv == 0 || (shortopts == 0 && longopts == 0)
+      || data->optind >= argc || argv[data->optind] == 0)
+    return EOF;
+
+  if (strcmp (argv[data->optind], "--") == 0)
+    {
+      data->optind++;
+      return EOF;
     }
 
   /* define ordering */
