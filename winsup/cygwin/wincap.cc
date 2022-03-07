@@ -19,7 +19,7 @@ details. */
    puzzled that this has never been noticed before... */
 
 wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:1,
+  def_guard_pages:2,
   mmap_storage_high:0x070000000000LL,
   {
     is_server:false,
@@ -51,7 +51,7 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
 };
 
 wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:2,
+  def_guard_pages:3,
   mmap_storage_high:0x070000000000LL,
   {
     is_server:false,
@@ -83,7 +83,7 @@ wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
 };
 
 wincaps wincap_8_1 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:2,
+  def_guard_pages:3,
   mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
@@ -115,7 +115,7 @@ wincaps wincap_8_1 __attribute__((section (".cygwin_dll_common"), shared)) = {
 };
 
 wincaps  wincap_10_1507 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:2,
+  def_guard_pages:3,
   mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
@@ -147,7 +147,7 @@ wincaps  wincap_10_1507 __attribute__((section (".cygwin_dll_common"), shared)) 
 };
 
 wincaps  wincap_10_1607 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:2,
+  def_guard_pages:3,
   mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
@@ -179,7 +179,7 @@ wincaps  wincap_10_1607 __attribute__((section (".cygwin_dll_common"), shared)) 
 };
 
 wincaps wincap_10_1703 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:2,
+  def_guard_pages:3,
   mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
@@ -211,7 +211,7 @@ wincaps wincap_10_1703 __attribute__((section (".cygwin_dll_common"), shared)) =
 };
 
 wincaps wincap_10_1709 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:2,
+  def_guard_pages:3,
   mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
@@ -243,7 +243,7 @@ wincaps wincap_10_1709 __attribute__((section (".cygwin_dll_common"), shared)) =
 };
 
 wincaps wincap_10_1803 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:2,
+  def_guard_pages:3,
   mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
@@ -275,7 +275,7 @@ wincaps wincap_10_1803 __attribute__((section (".cygwin_dll_common"), shared)) =
 };
 
 wincaps wincap_10_1809 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:2,
+  def_guard_pages:3,
   mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
@@ -307,7 +307,7 @@ wincaps wincap_10_1809 __attribute__((section (".cygwin_dll_common"), shared)) =
 };
 
 wincaps wincap_10_1903 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:2,
+  def_guard_pages:3,
   mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
@@ -339,7 +339,7 @@ wincaps wincap_10_1903 __attribute__((section (".cygwin_dll_common"), shared)) =
 };
 
 wincaps wincap_10_2004 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:2,
+  def_guard_pages:3,
   mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
@@ -371,7 +371,7 @@ wincaps wincap_10_2004 __attribute__((section (".cygwin_dll_common"), shared)) =
 };
 
 wincaps wincap_11 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:2,
+  def_guard_pages:3,
   mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
@@ -460,10 +460,6 @@ wincapc::init ()
     }
 
   ((wincaps *)caps)->is_server = (version.wProductType != VER_NT_WORKSTATION);
-#ifdef __x86_64__
-  /* 64 bit systems have one more guard page than their 32 bit counterpart. */
-  ++((wincaps *)caps)->def_guard_pages;
-#endif
     {
       ((wincaps *)caps)->has_gaa_largeaddress_bug = false;
       ((wincaps *)caps)->has_broken_prefetchvm = false;
