@@ -4765,8 +4765,7 @@ find_fast_cwd ()
       bool warn = 1;
       USHORT emulated, hosted;
 
-      /* Check if we're running in WOW64 on ARM64.  Check on 64 bit as well,
-	 given that ARM64 Windows 10 provides a x86_64 emulation soon.  Skip
+      /* Check if we're running in WOW64 on ARM64 emulating AMD64.  Skip
 	 warning as long as there's no solution for finding the FAST_CWD
 	 pointer on that system. */
       if (IsWow64Process2 (GetCurrentProcess (), &emulated, &hosted)

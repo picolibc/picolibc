@@ -1423,7 +1423,7 @@ cygheap_domain_info::init ()
      even if no NFS name mapping is configured on the machine.  Fortunately,
      the posixAccount and posixGroup schemas are already available in the
      Active Directory default setup. */
-  reg_key reg (HKEY_LOCAL_MACHINE, KEY_READ | KEY_WOW64_64KEY,
+  reg_key reg (HKEY_LOCAL_MACHINE, KEY_READ,
 	       L"SOFTWARE", L"Microsoft", L"ServicesForNFS", NULL);
   if (!reg.error ())
     {

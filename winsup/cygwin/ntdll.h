@@ -1109,7 +1109,7 @@ typedef struct _PROCESS_BASIC_INFORMATION
   NTSTATUS ExitStatus;
   PPEB PebBaseAddress;
   KAFFINITY AffinityMask;
-  KPRIORITY BasePriority;	/* !!!Broken on WOW64!!! */
+  KPRIORITY BasePriority;
   ULONG_PTR UniqueProcessId;
   ULONG_PTR InheritedFromUniqueProcessId;
 } PROCESS_BASIC_INFORMATION, *PPROCESS_BASIC_INFORMATION;

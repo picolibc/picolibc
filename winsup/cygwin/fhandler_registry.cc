@@ -448,10 +448,7 @@ fhandler_registry::set_name (path_conv &in_pc)
       prefix_len += 2;
     }
   else if (strncasematch (in_pc.get_posix (), "/proc/registry64", 16))
-    {
-      wow64 = KEY_WOW64_64KEY;
-      prefix_len += 2;
-    }
+    prefix_len += 2;
   fhandler_base::set_name (in_pc);
 }
 
