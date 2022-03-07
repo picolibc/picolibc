@@ -21,7 +21,6 @@ struct wincaps
     unsigned has_gaa_largeaddress_bug				: 1;
     unsigned has_precise_system_time				: 1;
     unsigned has_microsoft_accounts				: 1;
-    unsigned has_broken_prefetchvm				: 1;
     unsigned has_new_pebteb_region				: 1;
     unsigned has_broken_whoami					: 1;
     unsigned has_unprivileged_createsymlink			: 1;
@@ -82,7 +81,6 @@ public:
   bool	IMPLEMENT (has_gaa_largeaddress_bug)
   bool	IMPLEMENT (has_precise_system_time)
   bool	IMPLEMENT (has_microsoft_accounts)
-  bool	IMPLEMENT (has_broken_prefetchvm)
   bool	IMPLEMENT (has_new_pebteb_region)
   bool	IMPLEMENT (has_broken_whoami)
   bool	IMPLEMENT (has_unprivileged_createsymlink)

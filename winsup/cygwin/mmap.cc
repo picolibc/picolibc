@@ -1487,15 +1487,7 @@ posix_madvise (void *addr, size_t len, int advice)
 	WIN32_MEMORY_RANGE_ENTRY me = { base, size };
 	if (!PrefetchVirtualMemory (GetCurrentProcess (), 1, &me, 0)
 	    && GetLastError () != ERROR_PROC_NOT_FOUND)
-	  {
-	    /* FIXME 2015-08-27: On W10 build 10240 under WOW64,
-	       PrefetchVirtualMemory always returns ERROR_INVALID_PARAMETER
-	       for some reason.  If we're running on W10 WOW64, ignore this
-	       error.  This has been fixed in W10 1511. */
-	    if (!wincap.has_broken_prefetchvm ()
-		|| GetLastError () != ERROR_INVALID_PARAMETER)
-	      ret = EINVAL;
-	  }
+	  ret = EINVAL;
       }
       break;
     case POSIX_MADV_DONTNEED:
