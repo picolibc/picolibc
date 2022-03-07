@@ -438,12 +438,6 @@ _cygtls::inside_kernel (CONTEXT *cx)
 	checkdir += 4;
       res = wcsncasecmp (windows_system_directory, checkdir,
 			 windows_system_directory_length) == 0;
-#ifdef __i386__
-      if (!res && system_wow64_directory_length)
-	res = wcsncasecmp (system_wow64_directory, checkdir,
-			   system_wow64_directory_length) == 0;
-
-#endif
     }
   sigproc_printf ("pc %p, h %p, inside_kernel %d", cx->_GR(ip), h, res);
 # undef h

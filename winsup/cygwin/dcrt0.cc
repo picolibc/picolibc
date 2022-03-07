@@ -732,15 +732,6 @@ init_windows_system_directory ()
       RtlInitCountedUnicodeString (&windows_directory_path,
 	    windows_directory_buf,
 	    (windows_directory_length + 4) * sizeof (WCHAR));
-#ifdef __i386__
-      system_wow64_directory_length =
-	    GetSystemWow64DirectoryW (system_wow64_directory, MAX_PATH);
-      if (system_wow64_directory_length)
-	{
-	  system_wow64_directory[system_wow64_directory_length++] = L'\\';
-	  system_wow64_directory[system_wow64_directory_length] = L'\0';
-	}
-#endif /* __i386__ */
     }
 }
 

@@ -23,8 +23,6 @@ HMODULE NO_COPY hntdll;
 LONG NO_COPY sigExeced;
 WCHAR windows_system_directory[MAX_PATH];
 UINT windows_system_directory_length;
-WCHAR system_wow64_directory[MAX_PATH];
-UINT system_wow64_directory_length;
 WCHAR windows_directory_buf[MAX_PATH];
 PWCHAR windows_directory = windows_directory_buf + 4;
 UINT windows_directory_length;
