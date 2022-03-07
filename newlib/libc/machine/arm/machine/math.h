@@ -68,6 +68,14 @@ sqrt(double x)
 	return result;
 }
 
+__declare_arm_macro(double)
+fabs(double x)
+{
+    double result;
+    __asm__ ("vabs.f64\t%P0, %P1" : "=w" (result) : "w" (x));
+    return result;
+}
+
 #if __ARM_ARCH >= 8
 __declare_arm_macro(double)
 ceil (double x)
@@ -157,6 +165,14 @@ sqrtf(float x)
 	__asm__ volatile ("vsqrt.f32 %0, %1" : "=&w" (result) : "w" (x) : "cc", "memory");
 #endif
 	return result;
+}
+
+__declare_arm_macro(float)
+fabsf(float x)
+{
+    float result;
+    __asm__ ("vabs.f32\t%0, %1" : "=t" (result) : "t" (x));
+    return result;
 }
 
 #if __ARM_ARCH >= 8
