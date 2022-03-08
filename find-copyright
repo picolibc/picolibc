@@ -132,6 +132,11 @@ def get_license_type(copyright):
                 return "UCB"
         if re.search(r'FreeBSD', copyright):
                 return "FreeBSD"
+        if (re.search(r'AGPL', copyright) or
+            re.search(r'Affero General Public License', copyright)):
+                if re.search(r'version 3', copyright):
+                        return "AGPL3"
+                return "AGPL"
         if re.search(r'the GPL', copyright):
                 if re.search(r'version 2', copyright):
                         return "GPL2"
