@@ -4,7 +4,7 @@
 %rename cc1plus	picolibc_cc1plus
 
 *cpp:
--isystem %{-picolibc-prefix=*:%*/@INCLUDEDIR@; -picolibc-buildtype=*:@PREFIX@/@INCLUDEDIR/%*; :@PREFIX@/@INCLUDEDIR@} %(picolibc_cpp)
+-isystem %{-picolibc-prefix=*:%*/@INCLUDEDIR@; -picolibc-buildtype=*:@PREFIX@/@INCLUDEDIR@/%*; :@PREFIX@/@INCLUDEDIR@} %(picolibc_cpp)
 
 *cc1:
 @TLSMODEL@ %(picolibc_cc1) @CC1_SPEC@
