@@ -20,7 +20,7 @@
 float
 lgammaf(float x)
 {
-    return lgammaf_r(x, &signgam);
+    return lgammaf_r(x, &__signgam);
 }
 
 #ifdef _DOUBLE_IS_32BITS

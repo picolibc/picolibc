@@ -38,5 +38,5 @@
 double
 lgamma(double x)
 {
-    return lgamma_r(x, &signgam);
+    return lgamma_r(x, &__signgam);
 }

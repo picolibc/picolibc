@@ -640,4 +640,10 @@ __math_lgamma_r (double y, int *signgamp, int *divzero);
 HIDDEN float
 __math_lgammaf_r (float y, int *signgamp, int *divzero);
 
+#if defined(HAVE_ALIAS_ATTRIBUTE) && defined(_HAVE_WEAK_ATTRIBUTE)
+extern int __signgam;
+#else
+#define __signgam signgam
+#endif
+
 #endif
