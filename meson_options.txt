@@ -41,6 +41,9 @@ option('have-alias-attribute', type: 'combo', choices: ['true', 'false', 'auto']
 option('have-format-attribute', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
        description: 'Compiler supports __format__ attribute')
 
+option('have-weak-attribute', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
+       description: 'Compiler supports __weak__ attribute')
+
 option('multilib', type: 'boolean', value: true,
        description: 'Enable multilib compile')
 
