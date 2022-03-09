@@ -39,9 +39,7 @@ int fegetexceptflag(fexcept_t *flagp, int excepts)
 	fexcept_t __fpsr;
 
 	vmrs_fpscr(__fpsr);
-	__fpsr &= ~excepts;
-	__fpsr |= *flagp & excepts;
-	vmsr_fpscr(__fpsr);
+        *flagp = __fpsr & excepts;
 	return (0);
 }
 #endif
