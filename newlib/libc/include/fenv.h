@@ -60,6 +60,19 @@ int fegetexcept(void);
 extern fenv_t _fe_dfl_env;
 #define FE_DFL_ENV ((const fenv_t *) &_fe_dfl_env)
 
+#ifdef __STDC_WANT_IEC_60559_BFP_EXT__
+
+#ifndef FE_DFL_MODE
+typedef struct { int round, except; } femode_t;
+#define FE_DFL_MODE     ((femode_t *) 0)
+#endif
+
+int fegetmode(femode_t *modep);
+int fesetmode(femode_t *modep);
+int fesetexcept(int excepts);
+
+#endif
+
 #ifdef __cplusplus
 }
 #endif
