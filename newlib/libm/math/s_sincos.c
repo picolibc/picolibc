@@ -8,7 +8,7 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef HAVE_ALIAS_ATTRIBUTE
+#ifdef _HAVE_ALIAS_ATTRIBUTE
 extern double _sin(double);
 extern double _cos(double);
 #else

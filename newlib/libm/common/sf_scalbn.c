@@ -58,7 +58,7 @@ float scalbnf (float x, int n)
         return check_uflowf(x*twom25);
 }
 
-#if defined(HAVE_ALIAS_ATTRIBUTE)
+#if defined(_HAVE_ALIAS_ATTRIBUTE)
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif
@@ -86,7 +86,7 @@ ldexpf(float value, int exp)
 	return (double) scalbnf((float) x, n);
 }
 
-#if defined(HAVE_ALIAS_ATTRIBUTE)
+#if defined(_HAVE_ALIAS_ATTRIBUTE)
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif

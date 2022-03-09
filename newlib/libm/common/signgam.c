@@ -35,7 +35,7 @@
 
 #include <math.h>
 
-#if defined(HAVE_ALIAS_ATTRIBUTE) && defined(_HAVE_WEAK_ATTRIBUTE)
+#if defined(_HAVE_ALIAS_ATTRIBUTE) && defined(_HAVE_WEAK_ATTRIBUTE)
 int __signgam;
 
 extern __typeof(__signgam) signgam __attribute__ ((__weak__, __alias__ ("__signgam")));

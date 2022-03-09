@@ -39,7 +39,7 @@
 #include "vfprintf.c"
 
 #ifdef FORMAT_DEFAULT_FLOAT
-#ifdef HAVE_ALIAS_ATTRIBUTE
+#ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(vfprintf, __f_vfprintf);
 #else
 int __f_vfprintf (FILE * stream, const char *fmt, va_list ap) { return vfprintf(stream, fmt, ap); }

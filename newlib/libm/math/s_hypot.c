@@ -47,7 +47,7 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
-#if defined(HAVE_ALIAS_ATTRIBUTE)
+#if defined(_HAVE_ALIAS_ATTRIBUTE)
 #ifdef _LDBL_EQ_DBL
 extern long double hypotl(long double x, long double y)
     __attribute__((__alias__("hypot")));

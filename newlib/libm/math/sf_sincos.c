@@ -6,7 +6,7 @@
 
 #include <errno.h>
 
-#ifdef HAVE_ALIAS_ATTRIBUTE
+#ifdef _HAVE_ALIAS_ATTRIBUTE
 extern float _sinf(float);
 extern float _cosf(float);
 #else

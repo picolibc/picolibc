@@ -687,7 +687,7 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap_orig)
 }
 
 #if defined(FORMAT_DEFAULT_DOUBLE) && !defined(vfscanf)
-#ifdef HAVE_ALIAS_ATTRIBUTE
+#ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(vfscanf, __d_vfscanf);
 #else
 int __d_vfscanf (FILE * stream, const char *fmt, va_list ap) { return vfscanf(stream, fmt, ap); }

@@ -27,7 +27,7 @@ int finite(double x)
 	return  (int)((__uint32_t)((hx&0x7fffffff)-0x7ff00000)>>31);
 }
 
-#if defined(HAVE_ALIAS_ATTRIBUTE)
+#if defined(_HAVE_ALIAS_ATTRIBUTE)
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif

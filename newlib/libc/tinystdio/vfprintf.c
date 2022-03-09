@@ -1112,7 +1112,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
 }
 
 #if defined(FORMAT_DEFAULT_DOUBLE) && !defined(vfprintf)
-#ifdef HAVE_ALIAS_ATTRIBUTE
+#ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(vfprintf, __d_vfprintf);
 #else
 int __d_vfprintf (FILE * stream, const char *fmt, va_list ap) { return vfprintf(stream, fmt, ap); }

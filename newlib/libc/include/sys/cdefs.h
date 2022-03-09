@@ -554,7 +554,7 @@
 #endif
 
 #if defined(__GNUC__) || defined(__INTEL_COMPILER)
-#if !defined(__INTEL_COMPILER) && defined(HAVE_ALIAS_ATTRIBUTE)
+#if !defined(__INTEL_COMPILER) && defined(_HAVE_ALIAS_ATTRIBUTE)
 #define	__strong_reference(sym,aliassym)	\
 	extern __typeof (sym) aliassym __attribute__ ((__alias__ (#sym)))
 #endif

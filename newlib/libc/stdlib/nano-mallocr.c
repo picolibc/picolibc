@@ -145,7 +145,7 @@ bool __malloc_grow_chunk(chunk_t *c, size_t new_size);
 /* Work around compiler optimizing away stores to 'size' field before
  * call to free.
  */
-#ifdef HAVE_ALIAS_ATTRIBUTE
+#ifdef _HAVE_ALIAS_ATTRIBUTE
 extern __typeof(free) __malloc_free;
 extern __typeof(malloc) __malloc_malloc;
 #else
@@ -384,7 +384,7 @@ void * malloc(size_t s)
 
     return ptr;
 }
-#ifdef HAVE_ALIAS_ATTRIBUTE
+#ifdef _HAVE_ALIAS_ATTRIBUTE
 #pragma GCC diagnostic push
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
@@ -458,7 +458,7 @@ no_insert:
 
     MALLOC_UNLOCK;
 }
-#ifdef HAVE_ALIAS_ATTRIBUTE
+#ifdef _HAVE_ALIAS_ATTRIBUTE
 #pragma GCC diagnostic push
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
@@ -470,7 +470,7 @@ __strong_reference(free, cfree);
 #endif /* DEFINE_FREE */
 
 #ifdef DEFINE_CFREE
-#ifndef HAVE_ALIAS_ATTRIBUTE
+#ifndef _HAVE_ALIAS_ATTRIBUTE
 void cfree(void * ptr)
 {
     free(ptr);
@@ -775,7 +775,7 @@ void * memalign(size_t align, size_t s)
     }
     return aligned_p;
 }
-#ifdef HAVE_ALIAS_ATTRIBUTE
+#ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(memalign, aligned_alloc);
 #endif
 #endif /* DEFINE_MEMALIGN */

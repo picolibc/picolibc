@@ -354,7 +354,7 @@ pow(double x, double y)
     return s * z;
 }
 
-#if defined(HAVE_ALIAS_ATTRIBUTE)
+#if defined(_HAVE_ALIAS_ATTRIBUTE)
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif

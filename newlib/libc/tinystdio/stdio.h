@@ -584,7 +584,7 @@ extern int	fclose(FILE *__stream);
 
  */
 
-#ifdef HAVE_FORMAT_ATTRIBUTE
+#ifdef _HAVE_FORMAT_ATTRIBUTE
 #ifdef PICOLIBC_FLOAT_PRINTF_SCANF
 #pragma GCC diagnostic ignored "-Wformat"
 #define __FORMAT_ATTRIBUTE__(__a, __s, __f) __attribute__((__format__ (__a, __s, 0)))
