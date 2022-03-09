@@ -93,8 +93,8 @@ CLEANFILES += libg.a
 ## https://sourceware.org/PR28917
 AWK_UNIQUE_OBJS = $(AWK) '{ \
   for (i = NF; i > 0; --i) { \
-    split($$i, parts, "/"); \
-    name = parts[length(parts)]; \
+    count = split($$i, parts, "/"); \
+    name = parts[count]; \
     if (!(name in seen)) { \
       objs[i] = $$i; \
       seen[name] = 1; \
