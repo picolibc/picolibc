@@ -300,6 +300,31 @@ extern int __finitef (float);
   #define issubnormal(__x) (fpclassify(__x) == FP_SUBNORMAL)
 #endif
 
+#define iszero(__x) (fpclassify(__x) == FP_ZERO)
+
+#ifndef iseqsig
+int __iseqsigd(double x, double y);
+int __iseqsigf(float x, float y);
+
+#ifdef _HAVE_LONG_DOUBLE
+int __iseqsigl(long double x, long double y);
+#define iseqsig(__x,__y)                                                \
+    ((sizeof(__x) == sizeof(float) && sizeof(__y) == sizeof(float)) ?   \
+     __iseqsigf(__x, __y) :                                             \
+     (sizeof(__x) == sizeof(double) && sizeof(__y) == sizeof(double)) ? \
+     __iseqsigd(__x, __y) :                                             \
+     __iseqsigl(__x, __y))
+#else
+#ifdef _DOUBLE_IS_32BITS
+#define iseqsig(__x, __y) __iseqsigf((float)(__x), (float)(__y))
+#else
+#define iseqsig(__x,__y)                                                \
+    ((sizeof(__x) == sizeof(float) && sizeof(__y) == sizeof(float)) ?   \
+     __iseqsigf(__x, __y) : __iseqsigd(__x, __y))
+#endif
+#endif
+#endif
+
 #ifndef issignaling
 int __issignalingf(float f);
 int __issignaling(double d);
@@ -650,7 +675,7 @@ extern long double pow10l (long double);
 #endif /* __GNU_VISIBLE */
 
 #if __MISC_VISIBLE || __XSI_VISIBLE
-extern NEWLIB_THREAD_LOCAL int signgam;
+extern int signgam;
 #endif /* __MISC_VISIBLE || __XSI_VISIBLE */
 
 /* Useful constants.  */

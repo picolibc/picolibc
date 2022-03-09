@@ -306,6 +306,14 @@ issignaling_inline (double x)
 #define pick_double_except(expr,val)    (expr)
 #endif
 
+#ifdef PICOLIBC_LONG_DOUBLE_NOEXCEPT
+#define FORCE_LONG_DOUBLE       long double
+#define pick_long_double_except(expr,val)       (val)
+#else
+#define FORCE_LONG_DOUBLE       volatile long double
+#define pick_long_double_except(expr,val)       (expr)
+#endif
+
 static ALWAYS_INLINE float
 opt_barrier_float (float x)
 {
@@ -333,6 +341,15 @@ force_eval_double (double x)
   FORCE_DOUBLE y = x;
   (void) y;
 }
+
+#ifdef _HAVE_LONG_DOUBLE
+static ALWAYS_INLINE void
+force_eval_long_double (long double x)
+{
+    FORCE_LONG_DOUBLE y = x;
+    (void) y;
+}
+#endif
 
 /* Clang doesn't appear to suppor precise exceptions on
  * many targets. We introduce barriers for that compiler
@@ -409,6 +426,17 @@ HIDDEN double __math_invalid (double);
 HIDDEN void __math_set_invalid(void);
 #else
 #define __math_set_invalid()    ((void) 0)
+#endif
+
+#ifdef _HAVE_LONG_DOUBLE
+/* Invalid input unless it is a quiet NaN.  */
+HIDDEN long double __math_invalidl (long double);
+/* set invalid exception */
+#if defined(FE_INVALID) && !defined(PICOLIBC_LONG_DOUBLE_NOEXECPT)
+HIDDEN void __math_set_invalidl(void);
+#else
+#define __math_set_invalidl()    ((void) 0)
+#endif
 #endif
 
 /* Error handling using output checking, only for errno setting.  */
@@ -589,9 +617,15 @@ __math_with_errno (double y, int e);
 
 HIDDEN float
 __math_with_errnof (float y, int e);
+
+#ifdef _HAVE_LONG_DOUBLE
+HIDDEN long double
+__math_with_errnol (long double y, int e);
+#endif
 #else
 #define __math_with_errno(x, e) (x)
 #define __math_with_errnof(x, e) (x)
+#define __math_with_errnol(x, e) (x)
 #endif
 
 HIDDEN double
