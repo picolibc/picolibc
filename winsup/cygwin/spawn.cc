@@ -564,7 +564,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	 because the Ctrl-C event is sent to all processes in the console, unless
 	 they ignore it explicitely.  CREATE_NEW_PROCESS_GROUP does that for us. */
       pid_t ctty_pgid =
-	::cygheap->ctty ? ::cygheap->ctty->tc ()->getpgid () : 0;
+	::cygheap->ctty ? ::cygheap->ctty->tc_getpgid () : 0;
       if (!iscygwin () && ctty_pgid && ctty_pgid != myself->pgid)
 	c_flags |= CREATE_NEW_PROCESS_GROUP;
       refresh_cygheap ();
