@@ -1915,6 +1915,7 @@ class fhandler_termios: public fhandler_base
   };
 
  public:
+  virtual pid_t tc_getpgid () { return 0; };
   tty_min*& tc () {return _tc;}
   fhandler_termios () :
   fhandler_base ()
@@ -2158,9 +2159,10 @@ private:
 			       const handle_set_t *p);
 
  public:
-  static pid_t tc_getpgid ()
+  pid_t tc_getpgid ()
   {
-    return shared_console_info ? shared_console_info->tty_min_state.getpgid () : myself->pgid;
+    return shared_console_info ?
+      shared_console_info->tty_min_state.getpgid () : 0;
   }
   fhandler_console (fh_devices);
   static console_state *open_shared_console (HWND hw, HANDLE& h)
@@ -2343,6 +2345,8 @@ class fhandler_pty_slave: public fhandler_pty_common
   void fch_close_handles ();
 
  public:
+  pid_t tc_getpgid () { return _tc ? _tc->pgid : 0; }
+
   struct handle_set_t
   {
     HANDLE from_master_nat;
