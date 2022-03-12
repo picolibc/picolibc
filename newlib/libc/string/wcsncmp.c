@@ -74,7 +74,7 @@ wcsncmp (const wchar_t * s1,
     {
       if (*s1 != *s2++)
 	{
-	  return (*s1 - *--s2);
+          return (*s1 < *--s2 ? -1 : 1);
 	}
       if (*s1++ == 0)
 	break;
