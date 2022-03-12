@@ -86,6 +86,7 @@ srcs_tinystdio = [
     'strfromf.c',
     'strfromd.c',
     'strtof.c',
+    'strtof_l.c',
     'strtod.c',
     'strtod_l.c',
     'ungetc.c',
