@@ -319,6 +319,11 @@ if enable_native_tests
 		    'test-efcvt.c',
 		    c_args: native_c_args,
 		    dependencies: native_lib_m))
+    test('test-strtod_native',
+	 executable('test-strtod_native',
+		    'test-strtod.c',
+		    c_args: native_c_args,
+		    dependencies: native_lib_m))
   endif
 endif
 
