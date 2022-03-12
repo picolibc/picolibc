@@ -36,20 +36,49 @@
 static const char pstr_nfinity[] = "nfinity";
 static const char pstr_an[] = "an";
 
+#ifdef _HAVE_LONG_DOUBLE
+static ALWAYS_INLINE long double
+aslongdouble(_u128 i)
+{
+    union
+    {
+        _u128 i;
+        long double f;
+    } u = {i};
+    return u.f;
+}
+#endif
+
 #if defined(STRTOD) || defined(STRTOF) || defined(STRTOLD)
 # define CHECK_WIDTH()   1
-# define CHECK_RANGE(flt) do {                                  \
-        if (flt < FLOAT_MIN || flt == (FLOAT) INFINITY)         \
-            errno = ERANGE;                                     \
+# define CHECK_RANGE(flt) do {                                          \
+        if (CHECK_LONG()) {                                             \
+            if ((double) flt == 0.0 || (double) flt == (double) INFINITY) \
+                errno = ERANGE;                                         \
+        } else if (CHECK_LONG_LONG()) {                                 \
+            if (flt == (FLOAT) 0.0 || flt == (FLOAT) INFINITY)          \
+                errno = ERANGE;                                         \
+        } else {                                                        \
+            if ((float) flt == 0.0f || (float) flt == (float) INFINITY) \
+                errno = ERANGE;                                         \
+        }                                                               \
     } while (0);
 # ifdef STRTOD
 #  define CHECK_LONG()          1
 #  define CHECK_LONG_LONG()     0
-#  define FLOAT_MIN DBL_MIN
+#  define FLOAT_MIN             __DBL_MIN__
+#  define FLOAT_MANT_DIG        __DBL_MANT_DIG__
+#  define FLOAT_MAX_EXP         __DBL_MAX_EXP__
+#  define FLOAT_MIN_EXP         __DBL_MIN_EXP__
+#  define ASFLOAT(x)            _asdouble(x)
 # elif defined(STRTOLD)
 #  define CHECK_LONG()          0
 #  define CHECK_LONG_LONG()     1
-#  define FLOAT_MIN LDBL_MIN
+#  define FLOAT_MIN             __LDBL_MIN__
+#  define FLOAT_MANT_DIG        __LDBL_MANT_DIG__
+#  define FLOAT_MAX_EXP         __LDBL_MAX_EXP__
+#  define FLOAT_MIN_EXP         __LDBL_MIN_EXP__
+#  define ASFLOAT(x)            aslongdouble(x)
 typedef long double FLOAT;
 typedef _u128 UINTFLOAT;
 #define UINTFLOAT_128
@@ -57,7 +86,11 @@ typedef _u128 UINTFLOAT;
 #  define CHECK_LONG()          0
 #  define CHECK_LONG_LONG()     0
 #  define PICOLIBC_FLOAT_PRINTF_SCANF
-#  define FLOAT_MIN FLT_MIN
+#  define FLOAT_MIN             __FLT_MIN__
+#  define FLOAT_MANT_DIG        __FLT_MANT_DIG__
+#  define FLOAT_MAX_EXP         __FLT_MAX_EXP__
+#  define FLOAT_MIN_EXP         __FLT_MIN_EXP__
+#  define ASFLOAT(x)            _asfloat(x)
 # endif
 
 #define FLT_STREAM const char
@@ -85,8 +118,16 @@ static inline void scanf_ungetc(int c, const char *s, int *lenp)
 # define CHECK_RANGE(flt)
 # ifdef PICOLIBC_FLOAT_PRINTF_SCANF
 #  define CHECK_LONG()    0
+#  define FLOAT_MANT_DIG        __FLT_MANT_DIG__
+#  define FLOAT_MAX_EXP         __FLT_MAX_EXP__
+#  define FLOAT_MIN_EXP         __FLT_MIN_EXP__
+#  define ASFLOAT(x) _asfloat(x)
 # else
 #  define CHECK_LONG()    (flags & FL_LONG)
+#  define FLOAT_MANT_DIG        __DBL_MANT_DIG__
+#  define FLOAT_MAX_EXP         __DBL_MAX_EXP__
+#  define FLOAT_MIN_EXP         __DBL_MIN_EXP__
+#  define ASFLOAT(x) _asdouble(x)
 # endif
 # define CHECK_LONG_LONG()      0
 #endif
@@ -101,6 +142,16 @@ static inline void scanf_ungetc(int c, const char *s, int *lenp)
 #define UF_IS_ZERO(x)   _u128_is_zero(x)
 #define UF_TIMES_BASE(a,b)      _u128_times_base(a,b)
 #define UF_PLUS_DIGIT(a,b)      _u128_plus_64(a,b)
+#define UF_RSHIFT(a,b)          _u128_rshift(a,b)
+#define UF_LSHIFT(a,b)          _u128_lshift(a,b)
+#define UF_LSHIFT_64(a,b)       _u128_lshift_64(a,b)
+#define UF_LT(a,b)              _u128_lt(a,b)
+#define UF_GE(a,b)              _u128_ge(a,b)
+#define UF_OR_64(a,b)           _u128_or_64(a,b)
+#define UF_AND_64(a,b)          _u128_and_64(a,b)
+#define UF_AND(a,b)             _u128_and(a,b)
+#define UF_NOT(a)               _u128_not(a)
+#define UF_OR(a,b)              _u128_or(a,b)
 #else
 #define U32_TO_UF(x)    (x)
 #define U64_TO_UF(x)    (x)
@@ -111,6 +162,16 @@ static inline void scanf_ungetc(int c, const char *s, int *lenp)
 #define UF_IS_ZERO(x)   ((x) == 0)
 #define UF_TIMES_BASE(a,b)      ((a) * (b))
 #define UF_PLUS_DIGIT(a,b)      ((a) + (b))
+#define UF_RSHIFT(a,b)          ((a) >> (b))
+#define UF_LSHIFT(a,b)          ((a) << (b))
+#define UF_LSHIFT_64(a,b)       ((UINTFLOAT) (a) << (b))
+#define UF_LT(a,b)              ((a) < (b))
+#define UF_GE(a,b)              ((a) >= (b))
+#define UF_OR_64(a,b)           ((a) | (b))
+#define UF_AND_64(a,b)          ((a) & (b))
+#define UF_AND(a,b)             ((a) & (b))
+#define UF_NOT(a)               (~(a))
+#define UF_OR(a,b)              ((a) | (b))
 #endif
 
 #ifndef STRTOLD
@@ -121,6 +182,7 @@ static unsigned char
 conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t flags)
 {
     UINTFLOAT uint;
+    unsigned int overflow = 0;
     int uintdigits = 0;
     FLOAT flt;
     int i;
@@ -169,13 +231,30 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
     default:
         exp = 0;
 	uint = U32_TO_UF(0);
+#define uintdigitsmax_10_float  8
+#define uintdigitsmax_10_double 16
+#define uintdigitsmax_10_long_double    32
+#define uintdigitsmax_16_float  7
+#define uintdigitsmax_16_double 15
+#define uintdigitsmax_16_long_double    30
+
 #ifdef _WANT_IO_C99_FORMATS
         int base = 10;
-        int uintdigitsmax = 8;
 #else
 #define base 10
-#define uintdigitsmax 8
 #endif
+
+#define uintdigitsmax                                                   \
+        ((base) == 10 ?                                                 \
+            (CHECK_LONG() ?                                             \
+             uintdigitsmax_10_double :                                  \
+             (CHECK_LONG_LONG() ? uintdigitsmax_10_long_double :        \
+              uintdigitsmax_10_float)) :                                \
+            (CHECK_LONG() ?                                             \
+             uintdigitsmax_16_double :                                  \
+             (CHECK_LONG_LONG() ? uintdigitsmax_16_long_double :        \
+              uintdigitsmax_16_float)))
+
 	do {
 
 	    unsigned char c;
@@ -190,6 +269,7 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 	    if (c < base) {
 		flags |= FL_ANY;
 		if (flags & FL_OVFL) {
+                    overflow |= (c != 0);
 		    if (!(flags & FL_DOT))
 			exp += 1;
 		} else {
@@ -198,16 +278,8 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
                     uint = UF_PLUS_DIGIT(UF_TIMES_BASE(uint, base), c);
 		    if (!UF_IS_ZERO(uint)) {
 			uintdigits++;
-			if (CHECK_LONG()) {
-			    if (uintdigits > 16)
-				flags |= FL_OVFL;
-			} else if (CHECK_LONG_LONG()) {
-                            if (uintdigits > 32)
-                                flags |= FL_OVFL;
-                        } else {
-			    if (uintdigits > uintdigitsmax)
-				flags |= FL_OVFL;
-			}
+                        if (uintdigits > uintdigitsmax)
+                            flags |= FL_OVFL;
 		    }
 	        }
 
@@ -217,7 +289,6 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
             } else if (TOLOWER(i) == 'x' && (flags & FL_ANY) && UF_IS_ZERO(uint)) {
                 flags |= FL_FHEX;
                 base = 16;
-                uintdigitsmax = 7;
 #endif
 	    } else {
 		break;
@@ -269,8 +340,10 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 
             i = edig;
 	    expacc = 0;
+#define MAX_POSSIBLE_EXP        (FLOAT_MAX_EXP + FLOAT_MANT_DIG * 4)
 	    do {
-		expacc = expacc * 10 + (i - '0');
+                if (expacc < MAX_POSSIBLE_EXP)
+                    expacc = expacc * 10 + (i - '0');
 	    } while (CHECK_WIDTH() && ISDIGIT (i = scanf_getc(stream, lenp)));
 	    if (flags & FL_MEXP)
 		expacc = -expacc;
@@ -293,56 +366,93 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 #ifdef _WANT_IO_C99_FORMATS
         if (flags & FL_FHEX)
         {
-#define MAX_EXP_32      127
-#define SIG_BITS_32     23
-#define MAX_EXP_64      1023
-#define SIG_BITS_64     52
+            int sig_bits;
+            int min_exp;
+
             if (CHECK_LONG()) {
-                int64_t fi = _asint64((double) UF_TO_U64(uint));
-                int64_t s = _significand64(fi);
-                exp += _exponent64(fi);
-                if (exp > MAX_EXP_64 + MAX_EXP_64)
-                    flt = (FLOAT) INFINITY;
-                else if (exp < -SIG_BITS_64)
-                    flt = (FLOAT) 0.0;
-                else {
-                    if (exp < 0) {
-                        int shift = 1 - exp;
-                        if (shift < 64) {
-                            s |= ((int64_t) 1 << 52);
-                            s >>= shift;
-                        } else
-                            s = 0;
-                        exp = 0;
-                    }
-                    flt = (FLOAT) _asdouble(((int64_t)exp << SIG_BITS_64) | s);
-                }
+                sig_bits = __DBL_MANT_DIG__;
+                min_exp = __DBL_MIN_EXP__ - 1;
             } else if (CHECK_LONG_LONG()) {
-                flt = (FLOAT) scalbln(_u128_to_ld(UF_TO_U128(uint)), exp);
+                sig_bits = __LDBL_MANT_DIG__;
+                min_exp = __LDBL_MIN_EXP__ - 1;
             } else {
-                int32_t fi = _asint32((float) UF_TO_U32(uint));
-                int32_t s = _significand32(fi);
-                exp += _exponent32(fi);
-                if (exp > MAX_EXP_32 + MAX_EXP_32)
-                    flt = (FLOAT) INFINITY;
-                else if (exp < -SIG_BITS_32)
-                    flt = (FLOAT) 0.0;
-                else {
-                    if (exp < 0) {
-                        int shift = 1 - exp;
-                        if (shift < 32) {
-                            s |= (1 << 23);
-                            s >>= shift;
-                        } else
-                            s = 0;
-                        exp = 0;
-                    }
-                    flt = (FLOAT) _asfloat(((int32_t)exp << SIG_BITS_32) | s);
+                sig_bits = __FLT_MANT_DIG__;
+                min_exp = __FLT_MIN_EXP__ - 1;
+            }
+
+            /* We're using two guard bits, one for the
+             * 'half' value and the second to indicate whether
+             * there is any non-zero value beyond that
+             */
+            exp += (sig_bits + 2 - 1);
+
+            /* Make significand larger than 1.0 */
+            while (UF_LT(uint, UF_LSHIFT_64(1, (sig_bits + 2 - 1)))) {
+                uint = UF_LSHIFT(uint, 1);
+                exp--;
+            }
+
+            /* Now shift right until the exponent is in range and the
+             * value is less than 2.0. Capture any value > 0.5 in the
+             * LSB of uint.  This may generate a denorm.
+             */
+            while (UF_GE(uint, UF_LSHIFT_64(1, (sig_bits + 2))) || exp < min_exp) {
+                /* squash extra bits into  the second guard bit */
+                uint = UF_OR_64(UF_RSHIFT(uint, 1), UF_AND_64(uint, 1));
+                exp++;
+            }
+
+            /* Mix in the overflow bit computed while scanning the
+             * string
+             */
+            uint = UF_OR_64(uint, overflow);
+
+            /* Round even */
+            if (UF_AND_64(uint, 3) == 3 || UF_AND_64(uint, 6) == 6)
+                uint = UF_PLUS_DIGIT(uint, 4);
+
+            /* remove guard bits */
+            uint = UF_RSHIFT(uint, 2);
+
+            /* align from target to FLOAT */
+            uint = UF_LSHIFT(uint, FLOAT_MANT_DIG - sig_bits);
+
+            if (min_exp != (FLOAT_MIN_EXP - 1)) {
+
+                /* Convert from target denorm to FLOAT value */
+                while (UF_LT(uint, UF_LSHIFT_64(1, (FLOAT_MANT_DIG - 1))) && exp > FLOAT_MIN_EXP) {
+                    uint = UF_LSHIFT(uint, 1);
+                    exp--;
                 }
+            }
+
+            if (exp > FLOAT_MAX_EXP) {
+                flt = (FLOAT) INFINITY;
+            } else {
+                if (UF_LT(uint, UF_LSHIFT_64(1, (FLOAT_MANT_DIG-1)))) {
+                    exp = 0;
+                } else {
+                    exp += (FLOAT_MAX_EXP - 1);
+#if defined(UINTFLOAT_128) && (defined(__x86_64__) || defined(__i386__))
+                    /*
+                     * Intel 80-bit format is weird -- there's an
+                     * integer bit so denorms can have the 'real'
+                     * exponent value. That means we don't mask off
+                     * the integer bit
+                     */
+#define EXP_SHIFT       FLOAT_MANT_DIG
+#else
+                    uint = UF_AND(uint, UF_NOT(UF_LSHIFT_64(1, (FLOAT_MANT_DIG-1))));
+#define EXP_SHIFT       (FLOAT_MANT_DIG-1)
+#endif
+                }
+                uint = UF_OR(uint, UF_LSHIFT_64(exp, EXP_SHIFT));
+                flt = ASFLOAT(uint);
             }
         }
         else
 #endif
+        {
             if (CHECK_LONG())
             {
 		if (uintdigits + exp <= -324) {
@@ -371,6 +481,7 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
                     flt = (FLOAT) __atof_engine(UF_TO_U32(uint), exp);
                 }
             }
+        }
         CHECK_RANGE(flt)
 	break;
     } /* switch */
