@@ -188,7 +188,11 @@ typedef __uint128_t _u128;
 #define _u128_zero	(_u128) 0
 #else
 typedef struct {
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+    uint64_t	lo, hi;
+#else
     uint64_t	hi, lo;
+#endif
 } _u128;
 #define _u128_zero	(_u128) { 0, 0 }
 
