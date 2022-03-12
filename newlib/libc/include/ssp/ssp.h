@@ -71,6 +71,7 @@ __ssp_decl(rtype, fun, args) \
 __BEGIN_DECLS
 void __stack_chk_fail(void) __dead2;
 void __chk_fail(void) __dead2;
+void set_fortify_handler (void (*handler) (int sig));
 __END_DECLS
 
 #endif /* _SSP_SSP_H_ */
