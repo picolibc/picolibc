@@ -116,3 +116,156 @@ _start(void)
 }
 
 #endif
+
+#ifdef CRT0_SEMIHOST
+
+/*
+ * Trap faults, print message and exit when running under semihost
+ */
+
+#include <semihost.h>
+#include <unistd.h>
+#include <stdio.h>
+
+#define _REASON(r) #r
+#define REASON(r) _REASON(r)
+
+#if __ARM_ARCH_PROFILE == 'M'
+
+#define GET_SP  struct fault *sp; __asm__ ("mov %0, sp" : "=r" (sp))
+
+struct fault {
+    unsigned int        r0;
+    unsigned int        r1;
+    unsigned int        r2;
+    unsigned int        r3;
+    unsigned int        r12;
+    unsigned int        lr;
+    unsigned int        pc;
+    unsigned int        xpsr;
+};
+
+static const char *const reasons[] = {
+    "hardfault",
+    "memmanage",
+    "busfault",
+    "usagefault"
+};
+
+#define REASON_HARDFAULT        0
+#define REASON_MEMMANAGE        1
+#define REASON_BUSFAULT         2
+#define REASON_USAGE            3
+
+static void __attribute__((used))
+arm_fault(struct fault *f, int reason)
+{
+    printf("ARM fault: %s\n", reasons[reason]);
+    printf("\tR0:   0x%08x\n", f->r0);
+    printf("\tR1:   0x%08x\n", f->r1);
+    printf("\tR2:   0x%08x\n", f->r2);
+    printf("\tR3:   0x%08x\n", f->r3);
+    printf("\tR12:  0x%08x\n", f->r12);
+    printf("\tLR:   0x%08x\n", f->lr);
+    printf("\tPC:   0x%08x\n", f->pc);
+    printf("\tXPSR: 0x%08x\n", f->xpsr);
+    _exit(1);
+}
+
+void __attribute__((naked))
+arm_hardfault_isr(void)
+{
+    __asm__("mov r0, sp");
+    __asm__("mov r1, #" REASON(REASON_HARDFAULT));
+    __asm__("bl  arm_fault");
+}
+
+void __attribute__((naked))
+arm_memmange_isr(void)
+{
+    __asm__("mov r0, sp");
+    __asm__("mov r1, #" REASON(REASON_MEMMANAGE));
+    __asm__("bl  arm_fault");
+}
+
+void __attribute__((naked))
+arm_busfault_isr(void)
+{
+    __asm__("mov r0, sp");
+    __asm__("mov r1, #" REASON(REASON_BUSFAULT));
+    __asm__("bl  arm_fault");
+}
+
+void __attribute__((naked))
+arm_usagefault_isr(void)
+{
+    __asm__("mov r0, sp");
+    __asm__("mov r1, #" REASON(REASON_USAGE));
+    __asm__("bl  arm_fault");
+}
+
+#else
+
+struct fault {
+    unsigned int        r[7];
+    unsigned int        pc;
+};
+
+static const char *const reasons[] = {
+    "undef",
+    "svc",
+    "prefetch_abort",
+    "data_abort"
+};
+
+#define REASON_UNDEF            0
+#define REASON_SVC              1
+#define REASON_PREFETCH_ABORT   2
+#define REASON_DATA_ABORT       3
+
+static void __attribute__((used))
+arm_fault(struct fault *f, int reason)
+{
+    int r;
+    printf("ARM fault: %s\n", reasons[reason]);
+    for (r = 0; r <= 6; r++)
+        printf("\tR%d:   0x%08x\n", r, f->r[r]);
+    printf("\tPC:   0x%08x\n", f->pc);
+    _exit(1);
+}
+
+#define VECTOR_COMMON \
+    __asm__("mov r7, %0" : : "r" (__stack)); \
+    __asm__("mov sp, r7"); \
+    __asm__("push {lr}"); \
+    __asm__("push {r0-r6}"); \
+    __asm__("mov r0, sp")
+
+void __attribute__((naked)) __section(".init")
+arm_undef_vector(void)
+{
+    VECTOR_COMMON;
+    __asm__("mov r1, #" REASON(REASON_UNDEF));
+    __asm__("bl  arm_fault");
+}
+
+void __attribute__((naked)) __section(".init")
+arm_prefetch_abort_vector(void)
+{
+    VECTOR_COMMON;
+    __asm__("mov r1, #" REASON(REASON_UNDEF));
+    __asm__("bl  arm_fault");
+}
+
+void __attribute__((naked)) __section(".init")
+arm_data_abort_vector(void)
+{
+    VECTOR_COMMON;
+    __asm__("mov r1, #" REASON(REASON_UNDEF));
+    __asm__("bl  arm_fault");
+}
+
+#endif
+
+#endif
+
