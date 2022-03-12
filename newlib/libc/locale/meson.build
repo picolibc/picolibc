@@ -33,21 +33,21 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 srcs_locale = [
+    'duplocale.c',
+    'freelocale.c',
     'locale.c',
     'localeconv.c',
     'lnumeric.c',
+    'newlocale.c',
     'timelocal.c',
+    'uselocale.c',
 ]
 
 srcs_locale_info = [
-    'duplocale.c',
-    'freelocale.c',
     'lctype.c',
     'lmessages.c',
     'lmonetary.c',
-    'newlocale.c',
     'nl_langinfo.c',
-    'uselocale.c',
 ]
 
 if newlib_locale_info
