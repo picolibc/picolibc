@@ -89,10 +89,14 @@ ucs_4_convert_from_ucs (void *data,
   if (*outbytesleft < sizeof (ucs4_t))
     return (size_t)ICONV_CES_NOSPACE;
 
+  ucs4_t uc;
+
   if (*((int *)data) == UCS_4_BIG_ENDIAN)
-    *((ucs4_t *)(*outbuf)) = ICONV_HTOBEL (in);
+    uc = ICONV_HTOBEL (in);
   else
-    *((ucs4_t *)(*outbuf)) = ICONV_HTOLEL (in);
+    uc = ICONV_HTOLEL (in);
+
+  memcpy(*outbuf, &uc, sizeof (ucs4_t));
 
   *outbuf += sizeof (ucs4_t);
   *outbytesleft -= sizeof (ucs4_t);
@@ -112,10 +116,14 @@ ucs_4_convert_to_ucs (void *data,
   if (*inbytesleft < sizeof (ucs4_t))
     return (ucs4_t)ICONV_CES_BAD_SEQUENCE;
 
+  ucs4_t uc;
+
+  memcpy(&uc, *inbuf, sizeof (ucs4_t));
+
   if (*((int *)data) == UCS_4_BIG_ENDIAN)
-    res = ICONV_BETOHL (*((ucs4_t *)(*inbuf)));
+    res = ICONV_BETOHL (uc);
   else
-    res = ICONV_LETOHL (*((ucs4_t *)(*inbuf)));
+    res = ICONV_LETOHL (uc);
 
   if ((res  >= 0x0000D800 && res <= 0x0000DFFF) /* Surrogate character */
       || res > 0x7FFFFFFF || res == 0x0000FFFF || res == 0x0000FFFE)
