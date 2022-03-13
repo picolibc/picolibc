@@ -17,6 +17,10 @@ Files: *.md
 Copyright: 2019 Keith Packard
 License: BSD3-1
 
+Files: scripts/GeneratePicolibcCrossFile.sh
+Copyright: 2022 R. Diez - Licensed under the GNU AGPLv3
+License: AGPL3-1
+
 Files: newlib/libc/iconv/ccs/ccs.h
  newlib/libc/iconv/ces/us-ascii.c
  newlib/libc/iconv/lib/aliasesi.c
@@ -698,6 +702,7 @@ Files: hello-world/hello-worldpp.cpp
  newlib/libc/tinystdio/perror.c
  newlib/libc/tinystdio/setvbuf.c
  newlib/libc/tinystdio/strtod_l.c
+ newlib/libc/tinystdio/strtof_l.c
  newlib/libc/tinystdio/strtold_l.c
  newlib/libc/tinystdio/vasprintf.c
  newlib/libm/machine/arm/s_fma_arm.c
@@ -842,6 +847,34 @@ Files: newlib/empty.c
 Copyright: 2021 Keith Packard
 License: BSD3-1
 
+Files: newlib/libc/include/byteswap.h
+ newlib/libc/stdlib/nano-malloc-getpagesize.c
+ newlib/libc/stdlib/nano-malloc-posix_memalign.c
+ newlib/libc/tinystdio/ecvt_r.c
+ newlib/libc/tinystdio/ecvtf_r.c
+ newlib/libc/tinystdio/fcvt_r.c
+ newlib/libc/tinystdio/fcvtf_r.c
+ newlib/libm/common/s_iseqsig.c
+ newlib/libm/common/sf_iseqsig.c
+ newlib/libm/common/sl_iseqsig.c
+ newlib/libm/fenv/fegetmode.c
+ newlib/libm/fenv/fesetexcept.c
+ newlib/libm/fenv/fesetmode.c
+ newlib/libm/machine/arm/s_fabs.c
+ newlib/libm/machine/arm/sf_fabs.c
+ semihost/fake/fake_exit.c
+ semihost/fake/fake_io.c
+ semihost/fake/fake_kill.c
+ semihost/fake/fake_stub.c
+ semihost/fake/meson.build
+ test/test-efcvt.c
+ test/test-except.c
+ test/test-fopen.c
+ test/test-mktemp.c
+ test/test-strtod.c
+Copyright: 2022 Keith Packard
+License: BSD3-1
+
 Files: newlib/libc/machine/aarch64/meson.build
  newlib/libm/machine/aarch64/meson.build
 Copyright: 2019 Keith Packard,
@@ -866,25 +899,6 @@ License: BSD3-1
 Files: newlib/libc/machine/xtensa/meson.build
  newlib/libm/machine/xtensa/meson.build
 Copyright: 2019 Jonathan McDowell
-License: BSD3-1
-
-Files: newlib/libc/stdlib/nano-malloc-getpagesize.c
- newlib/libc/stdlib/nano-malloc-posix_memalign.c
- newlib/libc/tinystdio/ecvt_r.c
- newlib/libc/tinystdio/ecvtf_r.c
- newlib/libc/tinystdio/fcvt_r.c
- newlib/libc/tinystdio/fcvtf_r.c
- newlib/libm/machine/arm/s_fabs.c
- newlib/libm/machine/arm/sf_fabs.c
- semihost/fake/fake_exit.c
- semihost/fake/fake_io.c
- semihost/fake/fake_kill.c
- semihost/fake/fake_stub.c
- semihost/fake/meson.build
- test/test-efcvt.c
- test/test-fopen.c
- test/test-mktemp.c
-Copyright: 2022 Keith Packard
 License: BSD3-1
 
 Files: newlib/libm/machine/riscv/s_copysign.c
@@ -1923,6 +1937,8 @@ Files: newlib/libc/string/memmem.c
  newlib/libm/common/math_err_with_errno.c
  newlib/libm/common/math_errf_check_oflowf.c
  newlib/libm/common/math_errf_check_uflowf.c
+ newlib/libm/common/math_errl_invalidl.c
+ newlib/libm/common/math_errl_with_errnol.c
  newlib/libm/common/pow.c
  newlib/libm/common/pow_log_data.c
  newlib/libm/common/sincosf.c
