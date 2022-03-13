@@ -32,7 +32,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-__flash =      0x40000000,
+__flash =      0x00000000,
 __flash_size = 0x00400000;
 __ram =        0x48000000;
 __ram_size   = 0x00200000;
