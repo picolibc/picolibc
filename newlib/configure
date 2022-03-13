@@ -747,9 +747,6 @@ HAVE_LIBC_MACHINE_AMDGCN_FALSE
 HAVE_LIBC_MACHINE_AMDGCN_TRUE
 HAVE_LIBC_MACHINE_AARCH64_FALSE
 HAVE_LIBC_MACHINE_AARCH64_TRUE
-HAVE_LIBC_SYS_PHOENIX_ARM_DIR_FALSE
-HAVE_LIBC_SYS_PHOENIX_ARM_DIR_TRUE
-PHOENIX_MACHINE_DIR
 HAVE_SPU_EA_FALSE
 HAVE_SPU_EA_TRUE
 SH64_FALSE
@@ -788,8 +785,6 @@ HAVE_LIBC_SYS_RTEMS_DIR_FALSE
 HAVE_LIBC_SYS_RTEMS_DIR_TRUE
 HAVE_LIBC_SYS_RDOS_DIR_FALSE
 HAVE_LIBC_SYS_RDOS_DIR_TRUE
-HAVE_LIBC_SYS_PHOENIX_DIR_FALSE
-HAVE_LIBC_SYS_PHOENIX_DIR_TRUE
 HAVE_LIBC_SYS_OR1K_DIR_FALSE
 HAVE_LIBC_SYS_OR1K_DIR_TRUE
 HAVE_LIBC_SYS_NETWARE_DIR_FALSE
@@ -5398,13 +5393,6 @@ else
   HAVE_LIBC_SYS_OR1K_DIR_TRUE='#'
   HAVE_LIBC_SYS_OR1K_DIR_FALSE=
 fi
- if test "${sys_dir}" = phoenix; then
-  HAVE_LIBC_SYS_PHOENIX_DIR_TRUE=
-  HAVE_LIBC_SYS_PHOENIX_DIR_FALSE='#'
-else
-  HAVE_LIBC_SYS_PHOENIX_DIR_TRUE='#'
-  HAVE_LIBC_SYS_PHOENIX_DIR_FALSE=
-fi
  if test "${sys_dir}" = rdos; then
   HAVE_LIBC_SYS_RDOS_DIR_TRUE=
   HAVE_LIBC_SYS_RDOS_DIR_FALSE='#'
@@ -5693,21 +5681,6 @@ fi
 else
   HAVE_SPU_EA_TRUE='#'
   HAVE_SPU_EA_FALSE=
-fi
-
-
-if test "$sys_dir" = "phoenix"; then :
-    PHOENIX_MACHINE_DIR=machine/${machine_dir}
-
-fi
-
-
- if test "${machine_dir}" = arm; then
-  HAVE_LIBC_SYS_PHOENIX_ARM_DIR_TRUE=
-  HAVE_LIBC_SYS_PHOENIX_ARM_DIR_FALSE='#'
-else
-  HAVE_LIBC_SYS_PHOENIX_ARM_DIR_TRUE='#'
-  HAVE_LIBC_SYS_PHOENIX_ARM_DIR_FALSE=
 fi
 
 
@@ -7537,10 +7510,6 @@ if test -z "${HAVE_LIBC_SYS_OR1K_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_OR1K_DIR
   as_fn_error $? "conditional \"HAVE_LIBC_SYS_OR1K_DIR\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${HAVE_LIBC_SYS_PHOENIX_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_PHOENIX_DIR_FALSE}"; then
-  as_fn_error $? "conditional \"HAVE_LIBC_SYS_PHOENIX_DIR\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
 if test -z "${HAVE_LIBC_SYS_RDOS_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_RDOS_DIR_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_LIBC_SYS_RDOS_DIR\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -7615,10 +7584,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_SPU_EA_TRUE}" && test -z "${HAVE_SPU_EA_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_SPU_EA\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${HAVE_LIBC_SYS_PHOENIX_ARM_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_PHOENIX_ARM_DIR_FALSE}"; then
-  as_fn_error $? "conditional \"HAVE_LIBC_SYS_PHOENIX_ARM_DIR\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_LIBC_MACHINE_AARCH64_TRUE}" && test -z "${HAVE_LIBC_MACHINE_AARCH64_FALSE}"; then

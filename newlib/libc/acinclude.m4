@@ -19,7 +19,6 @@ m4_foreach_w([SYS_DIR], [
   m88kbug mmixware
   netware
   or1k
-  phoenix
   rdos rtems
   sh sysmec sysnec810 sysnecv850 sysvi386 sysvnecv70
   tic80 tirtos
@@ -39,7 +38,6 @@ m4_include([libc/machine/nds32/acinclude.m4])
 m4_include([libc/machine/powerpc/acinclude.m4])
 m4_include([libc/machine/sh/acinclude.m4])
 m4_include([libc/machine/spu/acinclude.m4])
-m4_include([libc/sys/phoenix/acinclude.m4])
 
 m4_foreach_w([MACHINE], [
   aarch64 amdgcn arc arm

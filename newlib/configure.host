@@ -427,11 +427,6 @@ case "${host}" in
 	signal_dir=
 	sys_dir=netware
 	;;
-  *-*-phoenix*)
-	sys_dir=phoenix
-	posix_dir=posix
-	unix_dir=unix
-	;;
   *-*-rtems*)			# generic RTEMS support
 	sys_dir=rtems
 	posix_dir=posix
@@ -594,11 +589,6 @@ case "${host}" in
 	CC="${CC} -I${cygwin_srcdir}/include"
 	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME -DGETREENT_PROVIDED -DSIGNAL_PROVIDED -DHAVE_BLKSIZE -DHAVE_FCNTL -DMALLOC_PROVIDED"
 	syscall_dir=syscalls
-	;;
-  *-*-phoenix*)
-	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES -DHAVE_BLKSIZE -DHAVE_NANOSLEEP"
-	default_newlib_io_long_long="yes"
-	syscall_dir=
 	;;
 # RTEMS supplies its own versions of some routines:
 #       malloc()            (reentrant version)

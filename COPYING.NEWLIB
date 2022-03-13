@@ -1023,33 +1023,7 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 
-(45) Phoenix Systems - Phoenix-RTOS targets
-
-Copyright (c) 2016 Phoenix Systems
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions
-are met:
-1. Redistributions of source code must retain the above copyright
-   notice, this list of conditions and the following disclaimer.
-2. Redistributions in binary form must reproduce the above copyright
-   notice, this list of conditions and the following disclaimer in the
-   documentation and/or other materials provided with the distribution.
-
-THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-SUCH DAMAGE.
-
-(46) embedded brains - RTEMS targets
+(45) embedded brains - RTEMS targets
 
 Copyright (c) 2017 embedded brains GmbH
 All rights reserved.
@@ -1075,7 +1049,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
 
-(47) John Baldwin - RTEMS targets
+(46) John Baldwin - RTEMS targets
 
 Copyright (c) 2015 John Baldwin <jhb@FreeBSD.org>.
 All rights reserved.
@@ -1104,8 +1078,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
 
-
-(48) Jeffrey Roberson - RTEMS targets
+(47) Jeffrey Roberson - RTEMS targets
 
 Copyright (c) 2008, Jeffrey Roberson <jeff@freebsd.org>
 All rights reserved.
@@ -1134,7 +1107,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-(49) - SiFive Inc. (riscv-* targets)
+(48) - SiFive Inc. (riscv-* targets)
 
 Copyright (c) 2017  SiFive Inc. All rights reserved.
 
@@ -1146,7 +1119,7 @@ including the implied warranties of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.  A copy of this license is available at
 http://www.opensource.org/licenses.
 
-(50) Michael R. Neilly (riscv-* targets)
+(49) Michael R. Neilly (riscv-* targets)
 
 (c) Copyright 2017 Michael R. Neilly
 All rights reserved.
@@ -1179,7 +1152,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 
-(51) Mentor Graphics (amdgcn-* targets)
+(50) Mentor Graphics (amdgcn-* targets)
 
 Copyright (c) 2014-2017 Mentor Graphics.
 
@@ -1193,7 +1166,7 @@ and need not follow the licensing terms described here, provided that
 the new terms are clearly indicated on the first page of each file where
 they apply.
 
-(52) BSD-2-Clause-FreeBSD (pru-* targets) 
+(51) BSD-2-Clause-FreeBSD (pru-* targets) 
 
 SPDX-License-Identifier: BSD-2-Clause-FreeBSD
 
@@ -1220,7 +1193,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-(53) Andrew Turner (arm-* targets)
+(52) Andrew Turner (arm-* targets)
 
 Copyright (c) 2013 Andrew Turner <andrew@FreeBSD.ORG>
 All rights reserved.
@@ -1246,7 +1219,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
 
-(54) BSD-2-Clause-FreeBSD David Schultz (arm-* targets)
+(53) BSD-2-Clause-FreeBSD David Schultz (arm-* targets)
 
 SPDX-License-Identifier: BSD-2-Clause-FreeBSD
 
@@ -1274,7 +1247,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
 
-(55) - C-SKY Microsystems (csky-* targets)
+(54) - C-SKY Microsystems (csky-* targets)
 
 Copyright (c) 2020  C-SKY Microsystems All rights reserved.
 
@@ -1286,7 +1259,7 @@ including the implied warranties of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.  A copy of this license is available at
 http://www.opensource.org/licenses.
 
-(56) BSD-3-Clause-FreeBSD Peter Wemm (rtems targets)
+(55) BSD-3-Clause-FreeBSD Peter Wemm (rtems targets)
 
 SPDX-License-Identifier: BSD-3-Clause
 
