@@ -3816,7 +3816,8 @@ EXTRA_DIST = $(am__append_42)
 PHONY = $(am__append_4)
 SUFFIXES = $(am__append_5)
 info_TEXINFOS = libc/libc.texi libm/libm.texi
-noinst_DATA = libg.a $(am__append_1) $(am__append_2) $(am__append_3)
+noinst_DATA = libg.a $(am__append_1) $(am__append_2) $(am__append_3) \
+	$(libc_iconv_mkdeps_outputs)
 INSTALL_DATA_LOCAL = $(am__append_58)
 @NEWLIB_HW_FP_FALSE@MATHDIR = math
 
@@ -4459,6 +4460,18 @@ libc_a_CPPFLAGS_libc_posix = -D_GNU_SOURCE
 @ENABLE_NEWLIB_ICONV_TRUE@	libc/iconv/ccs/binary/cns11643_plane1.cct \
 @ENABLE_NEWLIB_ICONV_TRUE@	libc/iconv/ccs/binary/cns11643_plane2.cct \
 @ENABLE_NEWLIB_ICONV_TRUE@	libc/iconv/ccs/binary/cns11643_plane14.cct
+libc_iconv_mkdeps_outputs = \
+	$(top_srcdir)/iconv.m4 \
+	$(srcdir)/libc/iconv/ccs/ccsbi.c \
+	$(srcdir)/libc/iconv/ccs/ccsbi.h \
+	$(srcdir)/libc/iconv/ccs/ccsnames.h \
+	$(srcdir)/libc/iconv/ces/cesbi.c \
+	$(srcdir)/libc/iconv/ces/cesbi.h \
+	$(srcdir)/libc/iconv/ces/cesdeps.h \
+	$(srcdir)/libc/iconv/encoding.aliases \
+	$(srcdir)/libc/iconv/lib/aliasesbi.c \
+	$(srcdir)/libc/iconv/lib/encnames.h
+
 @HAVE_XDR_DIR_TRUE@libc_xdr_ELIX_SOURCES = libc/xdr/xdr_private.c \
 @HAVE_XDR_DIR_TRUE@	libc/xdr/xdr.c libc/xdr/xdr_float.c \
 @HAVE_XDR_DIR_TRUE@	libc/xdr/xdr_array.c libc/xdr/xdr_mem.c \
@@ -24146,6 +24159,9 @@ libc_install-man: libc_man
 	$(MKDIR_P) $(DESTDIR)$(mandir)/man3
 	$(INSTALL_DATA) libc/*.3 $(DESTDIR)$(mandir)/man3/
 install-man: libc_install-man
+
+$(libc_iconv_mkdeps_outputs): @MAINTAINER_MODE_TRUE@ $(srcdir)/libc/iconv/ces/mkdeps.pl $(srcdir)/libc/iconv/lib/encoding.deps
+	$(AM_V_GEN)cd $(srcdir)/libc/iconv/ces && ./mkdeps.pl
 
 @HAVE_LIBC_SYS_PHOENIX_DIR_TRUE@libc/sys/phoenix/crt0.o: libc/sys/phoenix/$(PHOENIX_MACHINE_DIR)/crt0.o
 @HAVE_LIBC_SYS_PHOENIX_DIR_TRUE@	$(AM_V_at)rm -f $@
