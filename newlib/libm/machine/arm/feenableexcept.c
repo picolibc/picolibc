@@ -36,12 +36,15 @@
 #else
 int feenableexcept(int __mask)
 {
-	fenv_t __old_fpsr, __new_fpsr;
+        fenv_t __old_fpsr, __new_fpsr, __check_fpsr;
 
 	vmrs_fpscr(__old_fpsr);
 	__new_fpsr = __old_fpsr |
 	    ((__mask & FE_ALL_EXCEPT) << _FPU_MASK_SHIFT);
 	vmsr_fpscr(__new_fpsr);
+        vmrs_fpscr(__check_fpsr);
+        if (__check_fpsr != __new_fpsr)
+                return -1;
 	return ((__old_fpsr >> _FPU_MASK_SHIFT) & FE_ALL_EXCEPT);
 }
 #endif

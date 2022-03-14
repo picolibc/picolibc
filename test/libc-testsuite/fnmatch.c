@@ -90,7 +90,7 @@ struct {
     { "a*.c", "a/x.c", FNM_PATHNAME, FNM_NOMATCH },
     { "*/foo", "/foo", FNM_PATHNAME, 0 },
     { "-O[01]", "-O1", 0, 0 },
-#ifndef _PICOLIBC__
+#ifndef __PICOLIBC__
     { "[[?*\\]", "\\", 0, 0 },
     { "[]?*\\]", "]", 0, 0 },
 #endif
@@ -135,7 +135,7 @@ struct {
     { "*/*", "a/.b", FNM_PATHNAME|FNM_PERIOD, FNM_NOMATCH },
     { "*?*/*", "a/.b", FNM_PERIOD, 0 },
     { "*[.]/b", "a./b", FNM_PATHNAME|FNM_PERIOD, 0 },
-#ifndef _PICOLIBC__
+#ifndef __PICOLIBC__
     { "*[[:alpha:]]/*[[:alnum:]]", "a/b", FNM_PATHNAME, 0 },
 #endif
     /* These three tests should result in error according to SUSv3.

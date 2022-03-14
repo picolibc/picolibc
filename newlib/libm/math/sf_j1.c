@@ -17,7 +17,7 @@
 
 static float ponef(float), qonef(float);
 
-static const float huge = 1e30, one = 1.0,
+static const float one = 1.0,
                    invsqrtpi = 5.6418961287e-01, /* 0x3f106ebb */
     tpi = 6.3661974669e-01, /* 0x3f22f983 */
     /* R0/S0 on [0,2] */
@@ -40,7 +40,7 @@ j1f(float x)
     __int32_t hx, ix;
 
     if (isnan(x))
-        return x;
+        return x + x;
 
     if (isinf(x))
         return zero;
@@ -78,8 +78,9 @@ j1f(float x)
             return z;
     }
     if (ix < 0x32000000) { /* |x|<2**-27 */
-        if (huge + x > one)
-            return (float)0.5 * x; /* inexact if x!=0 necessary */
+        if (ix == 0)
+            return x;
+        return check_uflowf(0.5f * x); /* inexact if x!=0 necessary */
     }
     z = x * x;
     r = z * (r00 + z * (r01 + z * (r02 + z * r03)));
@@ -116,7 +117,7 @@ y1f(float x)
         return __math_divzerof(1);
 
     if (ix > 0x7f800000)
-        return x;
+        return x+x;
 
     if (hx < 0)
         return __math_invalidf(x);
@@ -157,7 +158,7 @@ y1f(float x)
         return z;
     }
     if (ix <= 0x24800000) { /* x < 2**-54 */
-        return (-tpi / x);
+        return check_oflowf(-tpi / x);
     }
     z = x * x;
     u = U0[0] + z * (U0[1] + z * (U0[2] + z * (U0[3] + z * U0[4])));

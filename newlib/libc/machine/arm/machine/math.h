@@ -56,16 +56,24 @@ sqrt(double x)
 {
 	double result;
 #ifdef _WANT_MATH_ERRNO
-        if (x < 0)
+        if (isless(x, 0.0))
             errno = EDOM;
 #endif
 #if __ARM_ARCH >= 6
-	__asm__("vsqrt.f64 %P0, %P1" : "=w" (result) : "w" (x));
+	__asm__ volatile ("vsqrt.f64 %P0, %P1" : "=w" (result) : "w" (x));
 #else
 	/* VFP9 Erratum 760019, see GCC sources "gcc/config/arm/vfp.md" */
-	__asm__("vsqrt.f64 %P0, %P1" : "=&w" (result) : "w" (x));
+        __asm__ volatile ("vsqrt.f64 %P0, %P1" : "=&w" (result) : "w" (x));
 #endif
 	return result;
+}
+
+__declare_arm_macro(double)
+fabs(double x)
+{
+    double result;
+    __asm__ ("vabs.f64\t%P0, %P1" : "=w" (result) : "w" (x));
+    return result;
 }
 
 #if __ARM_ARCH >= 8
@@ -88,9 +96,16 @@ floor (double x)
 __declare_arm_macro(double)
 nearbyint (double x)
 {
-  double result;
-  __asm__ volatile ("vrintr.f64\t%P0, %P1" : "=w" (result) : "w" (x));
-  return result;
+    if (isnan(x)) return x + x;
+#if defined(FE_INEXACT)
+    fenv_t env;
+    fegetenv(&env);
+#endif
+    __asm__ volatile ("vrintr.f64\t%P0, %P1" : "=w" (x) : "w" (x));
+#if defined(FE_INEXACT)
+    fesetenv(&env);
+#endif
+    return x;
 }
 
 __declare_arm_macro(double)
@@ -122,7 +137,7 @@ trunc (double x)
 __declare_arm_macro(double)
 fma (double x, double y, double z)
 {
-  __asm__("vfma.f64 %P0, %P1, %P2" : "+w" (z) : "w" (x), "w" (y));
+  __asm__ volatile ("vfma.f64 %P0, %P1, %P2" : "+w" (z) : "w" (x), "w" (y));
   return z;
 }
 #endif
@@ -140,16 +155,24 @@ sqrtf(float x)
 {
 	float result;
 #ifdef _WANT_MATH_ERRNO
-        if (x < 0)
+        if (isless(x, 0.0f))
             errno = EDOM;
 #endif
 #if __ARM_ARCH >= 6
-	__asm__("vsqrt.f32 %0, %1" : "=w" (result) : "w" (x));
+	__asm__ volatile ("vsqrt.f32 %0, %1" : "=w" (result) : "w" (x));
 #else
 	/* VFP9 Erratum 760019, see GCC sources "gcc/config/arm/vfp.md" */
-	__asm__("vsqrt.f32 %0, %1" : "=&w" (result) : "w" (x));
+	__asm__ volatile ("vsqrt.f32 %0, %1" : "=&w" (result) : "w" (x) : "cc", "memory");
 #endif
 	return result;
+}
+
+__declare_arm_macro(float)
+fabsf(float x)
+{
+    float result;
+    __asm__ ("vabs.f32\t%0, %1" : "=t" (result) : "t" (x));
+    return result;
 }
 
 #if __ARM_ARCH >= 8
@@ -172,9 +195,16 @@ floorf (float x)
 __declare_arm_macro(float)
 nearbyintf (float x)
 {
-  float result;
-  __asm__ volatile ("vrintr.f32\t%0, %1" : "=t" (result) : "t" (x));
-  return result;
+    if (isnan(x)) return x + x;
+#if defined(FE_INEXACT)
+    fenv_t env;
+    fegetenv(&env);
+#endif
+    __asm__ volatile ("vrintr.f32\t%0, %1" : "=t" (x) : "t" (x));
+#if defined(FE_INEXACT)
+    fesetenv(&env);
+#endif
+    return x;
 }
 
 __declare_arm_macro(float)
@@ -207,7 +237,7 @@ truncf (float x)
 __declare_arm_macro(float)
 fmaf (float x, float y, float z)
 {
-  __asm__("vfma.f32 %0, %1, %2" : "+t" (z) : "t" (x), "t" (y));
+  __asm__ volatile ("vfma.f32 %0, %1, %2" : "+t" (z) : "t" (x), "t" (y));
   return z;
 }
 #endif

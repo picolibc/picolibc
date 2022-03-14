@@ -40,7 +40,9 @@ foreach target : targets
     _libs_base += [get_variable('lib_semihost' + target)]
   endif
 
-  if is_variable('lib_crt_hosted' + target)
+  if is_variable('lib_crt_semihost' + target)
+    _libs = [get_variable('lib_crt_semihost'+ target)] + _libs_base
+  elif is_variable('lib_crt_hosted' + target)
     _libs = [get_variable('lib_crt_hosted'+ target)] + _libs_base
   else
     _libs = _libs_base
@@ -233,12 +235,33 @@ foreach target : targets
        depends: bios_bin,
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
+  t1 = 'test-except'
+  t1_src = t1 + '.c'
+  if target == ''
+    t1_name = t1
+  else
+    t1_name = t1 + '_' + target
+  endif
+
+  test(t1_name,
+       executable(t1_name, [t1_src],
+		  c_args: double_printf_compile_args + _c_args,
+		  link_args: double_printf_link_args + _link_args,
+		  link_with: _libs,
+		  link_depends:  test_link_depends,
+		  include_directories: inc),
+       depends: bios_bin,
+       env: ['MESON_SOURCE_ROOT=' + meson.source_root()],
+       should_fail: true
+      )
+
   plain_tests = ['rand', 'regex', 'ungetc', 'fenv',
 		 'math_errhandling', 'malloc', 'tls',
 		 'ffs', 'setjmp', 'atexit', 'on_exit',
 		 'math-funcs', 'timegm', 'time-tests',
                  'test-strtod', 'test-strchr',
-		 'test-memset',
+		 'test-memset', 'test-put',
+		 'test-efcvt'
 		]
 
   if have_attr_ctor_dtor
@@ -254,7 +277,12 @@ foreach target : targets
   endif
 
   if (posix_io or not tinystdio) and tests_enable_posix_io
-    plain_tests += 'posix-io'
+    plain_tests += ['posix-io']
+
+    # legacy stdio doesn't work on semihosting, so just skip it
+    if tinystdio
+      plain_tests += ['test-fopen', 'test-mktemp']
+    endif
   endif
 
   if tests_enable_stack_protector
@@ -289,17 +317,32 @@ if enable_native_tests
   if native_lib_m.found()
     test('math_errhandling_native',
 	 executable('math_errhandling_native', 'math_errhandling.c',
-		    c_args: ['-DNO_NEWLIB'],
+		    c_args: native_c_args,
 		    dependencies: native_lib_m))
     test('rounding-mode_native',
 	 executable('rounding-mode_native',
 		    ['rounding-mode.c', 'rounding-mode-sub.c'],
-		    c_args: test_c_args + ['-DNO_NEWLIB'],
+		    c_args: native_c_args,
 		    dependencies: native_lib_m))
     test('printf-tests_native',
 	 executable('printf-tests_native',
 		    'printf-tests.c',
-		    c_args: ['-DNO_NEWLIB'],
+		    c_args: native_c_args,
+		    dependencies: native_lib_m))
+    test('printf_scanf_native',
+	 executable('printf_scanf_native',
+		    'printf_scanf.c',
+		    c_args: native_c_args,
+		    dependencies: native_lib_m))
+    test('test-efcvt_native',
+	 executable('test-efcvt_native',
+		    'test-efcvt.c',
+		    c_args: native_c_args,
+		    dependencies: native_lib_m))
+    test('test-strtod_native',
+	 executable('test-strtod_native',
+		    'test-strtod.c',
+		    c_args: native_c_args,
 		    dependencies: native_lib_m))
   endif
 endif

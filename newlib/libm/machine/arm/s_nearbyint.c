@@ -30,9 +30,16 @@
 double
 nearbyint (double x)
 {
-  double result;
-  __asm__ volatile ("vrintr.f64\t%P0, %P1" : "=w" (result) : "w" (x));
-  return result;
+    if (isnan(x)) return x + x;
+#if defined(FE_INEXACT)
+    fenv_t env;
+    fegetenv(&env);
+#endif
+    __asm__ volatile ("vrintr.f64\t%P0, %P1" : "=w" (x) : "w" (x));
+#if defined(FE_INEXACT)
+    fesetenv(&env);
+#endif
+    return x;
 }
 
 #else

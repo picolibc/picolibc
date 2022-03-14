@@ -29,7 +29,7 @@
   <xi:include href="posix.xml">
       <xi:fallback/>
   </xi:include>
-  <!-- XXX: stdarg.h and vararg.h are directly described in libc.texinfo -->
+  <!-- XXX: stdarg.h and vararg.h are directly described in libc.texi -->
 
   <!-- iconv is optional -->
   <xi:include href="iconv.xml">

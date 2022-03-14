@@ -74,5 +74,5 @@ wcscmp (const wchar_t * s1,
   while (*s1 == *s2++)
     if (*s1++ == 0)
       return (0);
-  return (*s1 - *--s2);
+  return (*s1 < *--s2 ? -1 : 1);
 }

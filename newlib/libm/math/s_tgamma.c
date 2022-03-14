@@ -24,14 +24,15 @@ double
 tgamma(double x)
 {
     int signgam_local;
+    int divzero = 0;
 
-    if (x < 0.0 && floor(x) == x)
+    if (isless(x, 0.0) && clang_barrier_double(rint(x)) == x)
         return __math_invalid(x);
 
-    double y = exp(lgamma_r(x, &signgam_local));
+    double y = exp(__math_lgamma_r(x, &signgam_local, &divzero));
     if (signgam_local < 0)
         y = -y;
-    if (!finite(y) && finite(x))
+    if (isinf(y) && finite(x) && !divzero)
         return __math_oflow(signgam_local < 0);
     return y;
 }

@@ -251,6 +251,8 @@ extern int __fpclassifyf (float);
 extern int __fpclassifyd (double);
 extern int __signbitf (float);
 extern int __signbitd (double);
+extern int __finite (double);
+extern int __finitef (float);
 
 /* Note: isinf and isnan were once functions in newlib that took double
  *       arguments.  C99 specifies that these names are reserved for macros
@@ -259,7 +261,14 @@ extern int __signbitd (double);
  *       taking double arguments still exist for compatibility purposes
  *       (prototypes for them are earlier in this header).  */
 
-#if __GNUC_PREREQ (4, 4) || defined(__clang__)
+/*
+ * GCC bug 66462 raises INVALID exception when __builtin_fpclassify is
+ * passed snan, so we cannot use it when building with snan support.
+ * clang doesn't appear to have an option to control snan behavior, and
+ * it's builtin fpclassify also raises INVALID for snan, so always use
+ * our version for that.
+ */
+#if __GNUC_PREREQ (4, 4) && !defined(__SUPPORT_SNAN__) && !defined(__clang__)
   #define fpclassify(__x) (__builtin_fpclassify (FP_NAN, FP_INFINITE, \
 						 FP_NORMAL, FP_SUBNORMAL, \
 						 FP_ZERO, __x))
@@ -273,14 +282,13 @@ extern int __signbitd (double);
     #define isnan(__x) (__builtin_isnan (__x))
   #endif
   #define isnormal(__x) (__builtin_isnormal (__x))
+  #define issubnormal(__x) (__builtin_issubnormal (__x))
 #else
   #define fpclassify(__x) \
 	  ((sizeof(__x) == sizeof(float))  ? __fpclassifyf(__x) : \
 	  __fpclassifyd((double) (__x)))
   #ifndef isfinite
-    #define isfinite(__y) \
-	    (__extension__ ({int __cy = fpclassify(__y); \
-			     __cy != FP_INFINITE && __cy != FP_NAN;}))
+    #define isfinite(__x) ((sizeof(__x) == sizeof(float)) ? __finitef(__x) : __finite(__x))
   #endif
   #ifndef isinf
     #define isinf(__x) (fpclassify(__x) == FP_INFINITE)
@@ -289,6 +297,32 @@ extern int __signbitd (double);
     #define isnan(__x) (fpclassify(__x) == FP_NAN)
   #endif
   #define isnormal(__x) (fpclassify(__x) == FP_NORMAL)
+  #define issubnormal(__x) (fpclassify(__x) == FP_SUBNORMAL)
+#endif
+
+#define iszero(__x) (fpclassify(__x) == FP_ZERO)
+
+#ifndef iseqsig
+int __iseqsigd(double x, double y);
+int __iseqsigf(float x, float y);
+
+#ifdef _HAVE_LONG_DOUBLE
+int __iseqsigl(long double x, long double y);
+#define iseqsig(__x,__y)                                                \
+    ((sizeof(__x) == sizeof(float) && sizeof(__y) == sizeof(float)) ?   \
+     __iseqsigf(__x, __y) :                                             \
+     (sizeof(__x) == sizeof(double) && sizeof(__y) == sizeof(double)) ? \
+     __iseqsigd(__x, __y) :                                             \
+     __iseqsigl(__x, __y))
+#else
+#ifdef _DOUBLE_IS_32BITS
+#define iseqsig(__x, __y) __iseqsigf((float)(__x), (float)(__y))
+#else
+#define iseqsig(__x,__y)                                                \
+    ((sizeof(__x) == sizeof(float) && sizeof(__y) == sizeof(float)) ?   \
+     __iseqsigf(__x, __y) : __iseqsigd(__x, __y))
+#endif
+#endif
 #endif
 
 #ifndef issignaling
@@ -329,7 +363,7 @@ int __issignalingl(long double d);
 	                              __signbitd((double) (__x)))
 #endif
 
-#if __GNUC_PREREQ (2, 97)
+#if __GNUC_PREREQ (2, 97) && !(defined(__riscv) && defined(__clang__))
 #define isgreater(__x,__y)	(__builtin_isgreater (__x, __y))
 #define isgreaterequal(__x,__y)	(__builtin_isgreaterequal (__x, __y))
 #define isless(__x,__y)		(__builtin_isless (__x, __y))
@@ -371,6 +405,9 @@ extern double cbrt (double);
 extern double nextafter (double, double);
 extern double rint (double);
 extern double scalbn (double, int);
+extern double scalb (double, double);
+extern double getpayload(const double *x);
+extern double significand (double);
 
 extern double exp2 (double);
 extern double scalbln (double, long int);
@@ -469,8 +506,11 @@ extern float cbrtf (float);
 extern float nextafterf (float, float);
 extern float rintf (float);
 extern float scalbnf (float, int);
+extern float scalbf (float, float);
 extern float log1pf (float);
 extern float expm1f (float);
+extern float getpayloadf(const float *x);
+extern float significandf (float);
 
 #ifndef _REENT_ONLY
 extern float acoshf (float);
@@ -560,6 +600,7 @@ extern long double erfcl (long double);
 #else /* !_LDBL_EQ_DBL && !__CYGWIN__ */
 extern long double hypotl (long double, long double);
 extern long double sqrtl (long double);
+extern long double frexpl (long double, int *);
 #ifdef __i386__
 /* Other long double precision functions.  */
 extern _LONG_DOUBLE rintl (_LONG_DOUBLE);
@@ -634,7 +675,7 @@ extern long double pow10l (long double);
 #endif /* __GNU_VISIBLE */
 
 #if __MISC_VISIBLE || __XSI_VISIBLE
-extern NEWLIB_THREAD_LOCAL int signgam;
+extern int signgam;
 #endif /* __MISC_VISIBLE || __XSI_VISIBLE */
 
 /* Useful constants.  */

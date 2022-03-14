@@ -29,7 +29,14 @@
 double
 nearbyint (double x)
 {
-  double result;
-  __asm__("frinti\t%d0, %d1" : "=w" (result) : "w" (x));
-  return result;
+    if (isnan(x)) return x + x;
+#if defined(FE_INEXACT)
+    fenv_t env;
+    fegetenv(&env);
+#endif
+    __asm__("frinti\t%d0, %d1" : "=w" (x) : "w" (x));
+#if defined(FE_INEXACT)
+    fesetenv(&env);
+#endif
+    return x;
 }

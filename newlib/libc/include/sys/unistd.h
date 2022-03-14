@@ -287,7 +287,7 @@ extern int optreset;			/* getopt(3) external variable */
 pid_t   vfork (void);
 #endif
 
-#ifdef _COMPILING_NEWLIB
+#ifdef _LIBC
 /* Provide prototypes for most of the _<systemcall> names that are
    provided in newlib for some compilers.  */
 int     close (int __fildes);

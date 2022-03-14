@@ -27,7 +27,10 @@ c_link_args = [
 	'-m32',
 	'-target', 'riscv32-unknown-elf',
 	'-march=rv32imafdc',
+	'-Wl,-melf32lriscv',
 	'-nostdlib',
 	'-L/usr/lib/gcc/riscv64-unknown-elf/8.3.0/rv32imafdc/ilp32d'
 	]
 needs_exe_wrapper = true
+skip_sanity_check = true
+has_link_defsym = true

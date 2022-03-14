@@ -44,4 +44,4 @@ inc_ssp_headers = [
 ]
 
 install_headers(inc_ssp_headers,
-		subdir:'ssp')
+		install_dir: include_dir / 'ssp')

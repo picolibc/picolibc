@@ -17,6 +17,10 @@ Files: *.md
 Copyright: 2019 Keith Packard
 License: BSD3-1
 
+Files: scripts/GeneratePicolibcCrossFile.sh
+Copyright: 2022 R. Diez - Licensed under the GNU AGPLv3
+License: AGPL3-1
+
 Files: newlib/libc/iconv/ccs/ccs.h
  newlib/libc/iconv/ces/us-ascii.c
  newlib/libc/iconv/lib/aliasesi.c
@@ -161,6 +165,10 @@ License: BSD2-1
 
 Files: newlib/libc/stdlib/arc4random.h
 Copyright: 2016 embedded brains GmbH
+License: BSD2-1
+
+Files: newlib/libc/stdlib/gdtoa-ldtoa.c
+Copyright: 2003 David Schultz <das@FreeBSD.ORG>
 License: BSD2-1
 
 Files: newlib/libc/stdlib/imaxabs.c
@@ -592,6 +600,7 @@ Files: dummyhost/iob.c
  scripts/do-clang-thumbv7e+fp-configure
  scripts/do-clang-thumbv7m-configure
  scripts/do-configure
+ scripts/do-cortex-a9-configure
  scripts/do-esp32-configure
  scripts/do-freedom-tools-configure
  scripts/do-i386-configure
@@ -604,6 +613,7 @@ Files: dummyhost/iob.c
  scripts/do-zephyr-arm-configure
  scripts/do-zephyr-riscv-configure
  scripts/run-arm
+ scripts/run-cortex-a9
  scripts/run-riscv
  scripts/run-thumbv7e
  scripts/run-thumbv7m
@@ -679,27 +689,20 @@ Files: hello-world/hello-worldpp.cpp
  newlib/libc/tinystdio/asprintf.c
  newlib/libc/tinystdio/compare_exchange.c
  newlib/libc/tinystdio/ecvt.c
- newlib/libc/tinystdio/ecvt_data.c
- newlib/libc/tinystdio/ecvtbuf.c
  newlib/libc/tinystdio/ecvtf.c
- newlib/libc/tinystdio/ecvtf_data.c
- newlib/libc/tinystdio/ecvtfbuf.c
  newlib/libc/tinystdio/exchange.c
  newlib/libc/tinystdio/fcvt.c
- newlib/libc/tinystdio/fcvtbuf.c
  newlib/libc/tinystdio/fcvtf.c
- newlib/libc/tinystdio/fcvtfbuf.c
  newlib/libc/tinystdio/fflush.c
  newlib/libc/tinystdio/filestrget.c
  newlib/libc/tinystdio/filestrput.c
  newlib/libc/tinystdio/filestrputalloc.c
  newlib/libc/tinystdio/gcvt.c
- newlib/libc/tinystdio/gcvtbuf.c
  newlib/libc/tinystdio/gcvtf.c
- newlib/libc/tinystdio/gcvtfbuf.c
  newlib/libc/tinystdio/perror.c
  newlib/libc/tinystdio/setvbuf.c
  newlib/libc/tinystdio/strtod_l.c
+ newlib/libc/tinystdio/strtof_l.c
  newlib/libc/tinystdio/strtold_l.c
  newlib/libc/tinystdio/vasprintf.c
  newlib/libm/machine/arm/s_fma_arm.c
@@ -718,7 +721,9 @@ Files: hello-world/hello-worldpp.cpp
  scripts/run-rv32imafdc
  scripts/run-x86_64
  scripts/test-arm.ld
+ scripts/test-cortex-a9.ld
  scripts/test-i386.ld
+ scripts/test-m68k.ld
  scripts/test-riscv.ld
  scripts/test-riscv32.ld
  scripts/test-riscv64.ld
@@ -737,6 +742,7 @@ Files: hello-world/hello-worldpp.cpp
  test/math_errhandling_tests.c
  test/regex.c
  test/semihost/meson.build
+ test/semihost/semihost-argv.c
  test/semihost/semihost-clock.c
  test/semihost/semihost-close.c
  test/semihost/semihost-elapsed.c
@@ -801,15 +807,20 @@ Files: newlib/empty.c
  newlib/libm/common/math_inexact.c
  newlib/libm/common/math_inexactf.c
  newlib/libm/common/pow10l.c
+ newlib/libm/common/s_getpayload.c
+ newlib/libm/common/sf_getpayload.c
  newlib/libm/common/sincosl.c
  newlib/libm/machine/powerpc/meson.build
+ newlib/libm/test/scalb_vec.c
  newlib/libm/test/scalbn_vec.c
  picocrt/machine/aarch64/meson.build
  picocrt/machine/arm/meson.build
  picocrt/machine/i386/meson.build
  picocrt/machine/riscv/meson.build
  picocrt/machine/x86_64/meson.build
+ scripts/do-powerpc64-configure
  scripts/do-powerpc64le-configure
+ semihost/gettimeofday.c
  semihost/machine/aarch64/meson.build
  semihost/machine/arm/meson.build
  semihost/machine/i386/bios.S
@@ -829,10 +840,39 @@ Files: newlib/empty.c
  test/rounding-mode-sub.c
  test/rounding-mode.c
  test/test-memset.c
+ test/test-put.c
  test/test-strchr.c
  test/timegm.c
  test/timegm.h
 Copyright: 2021 Keith Packard
+License: BSD3-1
+
+Files: newlib/libc/include/byteswap.h
+ newlib/libc/stdlib/nano-malloc-getpagesize.c
+ newlib/libc/stdlib/nano-malloc-posix_memalign.c
+ newlib/libc/tinystdio/ecvt_r.c
+ newlib/libc/tinystdio/ecvtf_r.c
+ newlib/libc/tinystdio/fcvt_r.c
+ newlib/libc/tinystdio/fcvtf_r.c
+ newlib/libm/common/s_iseqsig.c
+ newlib/libm/common/sf_iseqsig.c
+ newlib/libm/common/sl_iseqsig.c
+ newlib/libm/fenv/fegetmode.c
+ newlib/libm/fenv/fesetexcept.c
+ newlib/libm/fenv/fesetmode.c
+ newlib/libm/machine/arm/s_fabs.c
+ newlib/libm/machine/arm/sf_fabs.c
+ semihost/fake/fake_exit.c
+ semihost/fake/fake_io.c
+ semihost/fake/fake_kill.c
+ semihost/fake/fake_stub.c
+ semihost/fake/meson.build
+ test/test-efcvt.c
+ test/test-except.c
+ test/test-fopen.c
+ test/test-mktemp.c
+ test/test-strtod.c
+Copyright: 2022 Keith Packard
 License: BSD3-1
 
 Files: newlib/libc/machine/aarch64/meson.build
@@ -845,6 +885,11 @@ Files: newlib/libc/machine/arm/machine/math.h
 Copyright: 2020 Keith Packard
  2017 embedded brains GmbH.
  2011, 2012 ARM Ltd.
+License: BSD3-1
+
+Files: newlib/libc/machine/m68k/meson.build
+ scripts/do-m68k-configure
+Copyright: 2020 Thomas Daede
 License: BSD3-1
 
 Files: newlib/libc/machine/powerpc/meson.build
@@ -888,7 +933,7 @@ Files: picocrt/machine/i386/crt0.S
 Copyright: 2021 Mike Haertel and Keith Packard
 License: BSD3-1
 
-Files: picocrt/machine/riscv/crt0.S
+Files: picocrt/machine/riscv/crt0.c
 Copyright: 2020 Sebastian Meyer
 License: BSD3-1
 
@@ -1868,13 +1913,6 @@ Files: newlib/libc/search/tsearch.3
 Copyright: 1997 Todd C. Miller <Todd.Miller@courtesan.com>
 License: BSD3-27
 
-Files: newlib/libc/string/strlcat.c
- newlib/libc/string/strlcpy.c
- newlib/libc/string/wcslcat.c
- newlib/libc/string/wcslcpy.c
-Copyright: 1998 Todd C. Miller <Todd.Miller@courtesan.com>
-License: BSD3-27
-
 Files: newlib/libc/stdlib/aligned_alloc.c
 Copyright: 2020 Arm Ltd.
 License: BSD3-28
@@ -1898,6 +1936,9 @@ Files: newlib/libc/string/memmem.c
  newlib/libm/common/math_err_uflow.c
  newlib/libm/common/math_err_with_errno.c
  newlib/libm/common/math_errf_check_oflowf.c
+ newlib/libm/common/math_errf_check_uflowf.c
+ newlib/libm/common/math_errl_invalidl.c
+ newlib/libm/common/math_errl_with_errnol.c
  newlib/libm/common/pow.c
  newlib/libm/common/pow_log_data.c
  newlib/libm/common/sincosf.c
@@ -2272,11 +2313,14 @@ Files: .clang-format
  .gitattributes
  .github/Dockerfile
  .github/do-build
+ .github/do-many
  .github/do-test
- .github/workflows/fortity-source.yml
+ .github/packages.txt
+ .github/workflows/head
+ .github/workflows/linux.yml
  .github/workflows/macos.yml
- .github/workflows/minsize.yml
- .github/workflows/release.yml
+ .github/workflows/steps-head
+ .github/workflows/variants
  .gitignore
  README.md
  cross.tmpl
@@ -2296,6 +2340,7 @@ Files: .clang-format
  newlib/README
  newlib/doc/doc.str
  newlib/libc/ctype/ctype.tex
+ newlib/libc/include/machine/ieee.h
  newlib/libc/include/sys/_tz_structs.h
  newlib/libc/libc.in.xml
  newlib/libc/machine/necv70/necv70.tex
@@ -2320,7 +2365,10 @@ Files: .clang-format
  scripts/cross-clang-rv32imafdc-unknown-elf.txt
  scripts/cross-clang-thumbv7e+fp-none-eabi.txt
  scripts/cross-clang-thumbv7m-none-eabi.txt
+ scripts/cross-cortex-a9-none-eabi.txt
  scripts/cross-i686-linux-gnu.txt
+ scripts/cross-m68k-linux-gnu.txt
+ scripts/cross-powerpc64-linux-gnu.txt
  scripts/cross-powerpc64le-linux-gnu.txt
  scripts/cross-riscv64-unknown-elf.txt
  scripts/cross-riscv64-zephyr-elf.txt
@@ -2523,7 +2571,6 @@ Copyright: 2007 Ralf Corsepius <ralf.corsepius@rtems.org>
 License: Default-1
 
 Files: newlib/libc/machine/arm/setjmp.S
- newlib/libc/machine/xscale/setjmp.S
 Copyright: 1997 Nick Clifton, Cygnus Solutions
 License: Default-1
 
@@ -2610,19 +2657,6 @@ Files: newlib/libc/machine/spu/vfiprintf.c
  newlib/libc/machine/spu/vsiscanf.c
  newlib/libc/machine/spu/vsniprintf.c
 Copyright: 2007 Kazunori Asayama <asayama@sm.sony.co.jp>
-License: Default-1
-
-Files: newlib/libc/machine/xscale/memchr.c
- newlib/libc/machine/xscale/memcmp.c
- newlib/libc/machine/xscale/memcpy.c
- newlib/libc/machine/xscale/memmove.c
- newlib/libc/machine/xscale/memset.c
- newlib/libc/machine/xscale/strchr.c
- newlib/libc/machine/xscale/strcmp.c
- newlib/libc/machine/xscale/strcpy.c
- newlib/libc/machine/xscale/strlen.c
- newlib/libc/machine/xscale/xscale.h
-Copyright: 2000 Nick Clifton <nickc@redhat.com>
 License: Default-1
 
 Files: newlib/libc/machine/xstormy16/mallocr.c
@@ -2853,7 +2887,6 @@ Files: newlib/libc/argz/argz_add.c
  newlib/libc/argz/envz_strip.c
  newlib/libc/include/argz.h
  newlib/libc/include/envz.h
- newlib/libc/machine/xscale/machine/profile.h
  newlib/libm/common/s_fdim.c
  newlib/libm/common/s_fma.c
  newlib/libm/common/s_fmax.c
@@ -3091,6 +3124,13 @@ License: Other-5
 
 Files: newlib/libc/stdlib/reallocarray.c
 Copyright: 2008 Otto Moerbeek <otto@drijf.net>
+License: Other-5
+
+Files: newlib/libc/string/strlcat.c
+ newlib/libc/string/strlcpy.c
+ newlib/libc/string/wcslcat.c
+ newlib/libc/string/wcslcpy.c
+Copyright: 1998, 2015 Todd C. Miller <millert@openbsd.org>
 License: Other-5
 
 Files: newlib/libc/string/timingsafe_bcmp.c
@@ -3496,13 +3536,23 @@ Files: newlib/libc/stdlib/drand48.c
 Copyright: 1993 Martin Birgmeier
 License: Other-19
 
-Files: newlib/libc/stdlib/gdtoa-gethex.c
+Files: newlib/libc/stdlib/gdtoa-dmisc.c
+ newlib/libc/stdlib/gdtoa-gethex.c
+ newlib/libc/stdlib/gdtoa-gmisc.c
  newlib/libc/stdlib/gdtoa.h
 Copyright: 1998 Lucent Technologies
 License: Other-20
 
+Files: newlib/libc/stdlib/gdtoa-gdtoa.c
+Copyright: 1998, 1999 Lucent Technologies
+License: Other-20
+
 Files: newlib/libc/stdlib/gdtoa-hexnan.c
 Copyright: 2000 Lucent Technologies
+License: Other-20
+
+Files: newlib/libc/stdlib/gdtoaimp.h
+Copyright: 1998-2000 Lucent Technologies
 License: Other-20
 
 Files: newlib/libc/stdlib/strtod.c
@@ -3896,6 +3946,7 @@ License: UCB-1
 
 Files: newlib/libc/stdio/mktemp.c
  newlib/libc/stdlib/setenv.c
+ newlib/libc/tinystdio/mktemp.c
 Copyright: 1987 Regents of the University of California.
 License: UCB-2
 
@@ -3906,6 +3957,20 @@ License: UCB-2
 Files: newlib/libc/stdlib/putenv.c
 Copyright: 1988 The Regents of the University of California.
 License: UCB-2
+
+License: AGPL3-1
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as
+ published by the Free Software Foundation, either version 3 of the
+ License, or (at your option) any later version.
+ .
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+ .
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 License: BSD2-1
  Redistribution and use in source and binary forms, with or without

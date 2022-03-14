@@ -328,12 +328,15 @@ sub process_section_encodings($)
   generate_cesbi_c (\%cesenc);
 
   # Generate ccsbi.c file
-  my @ccs = keys %ccsenc;
+  my @ccs = sort keys %ccsenc;
   generate_ccsbi_c (\@ccs);
   
   # Generate ccsnames.h header file
   generate_ccsnames_h (\%ccsenc);
 
+  # Generate iconv.m4 file
+  my @encodings = sort keys %encalias;
+  generate_iconv_m4 (\@encodings);
 }
 
 # ==============================================================================
@@ -585,7 +588,7 @@ sub generate_aliasesbi_c($)
   print ALIASESBI_C "#include <_ansi.h>\n";
   print ALIASESBI_C "#include \"encnames.h\"\n\n";
   print ALIASESBI_C "const char\n";
-  print ALIASESBI_C "$var_aliases[] =\n";
+  print ALIASESBI_C "$var_aliases\[\] =\n";
   print ALIASESBI_C "{\n";
 
   foreach my $enc (sort keys %{$_[0]})
@@ -598,7 +601,7 @@ sub generate_aliasesbi_c($)
     print ALIASESBI_C "#endif\n";
   }
   print ALIASESBI_C "  \"\"\n";
-  print ALIASESBI_C "};\n\n";
+  print ALIASESBI_C "};\n";
   
   close ALIASESBI_C or err "Error while closing ../lib/aliasesbi.c file.";
 }
@@ -927,4 +930,40 @@ sub generate_ccsnames_h($)
 
   print CCSNAMES_H "\n#endif /* !__CCSNAMES_H__ */\n\n";
   close CCSNAMES_H or err "Error while closing ../ccs/ccsnames.h file.";
+}
+
+# ==============================================================================
+#
+# Generate iconv.m4 file.
+#
+# Parameter 1 (input): array reference with encoding names
+#
+# ==============================================================================
+sub generate_iconv_m4($)
+{
+  my @encodings = @{$_[0]};
+
+  print "Debug: create \"../../../iconv.m4\" file.\n" if $verbose;
+  open (ICONV_M4, '>', "../../../iconv.m4")
+  or err "Can't create \"../../../iconv.m4\" file for writing.\nSystem error message: $!.\n";
+
+  print ICONV_M4 "$comment_automatic\n";
+  print ICONV_M4 "AC_DEFUN([NEWLIB_ICONV_DEFINES],[dnl\n";
+  foreach my $encoding (@encodings)
+  {
+    my $ucencoding = uc $encoding;
+
+    my $tovar = "_ICONV_TO_ENCODING_$ucencoding";
+    print ICONV_M4 "  if test \"\$$tovar\" = 1; then\n";
+    print ICONV_M4 "    AC_DEFINE($tovar, 1, [Support $encoding output encoding.])\n";
+    print ICONV_M4 "  fi\n";
+
+    my $fromvar = "_ICONV_FROM_ENCODING_$ucencoding";
+    print ICONV_M4 "  if test \"\$$fromvar\" = 1; then\n";
+    print ICONV_M4 "    AC_DEFINE($fromvar, 1, [Support $encoding input encoding.])\n";
+    print ICONV_M4 "  fi\n";
+  }
+  print ICONV_M4 "])\n";
+
+  close ICONV_M4 or err "Error while closing ../../../iconv.m4 file.";
 }

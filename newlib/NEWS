@@ -1,3 +1,25 @@
+*** Major changes in newlib version 4.3.0:
+
+- remove i?86-pc-linux-gnu support
+
+*** Major changes in newlib version 4.2.0:
+
+- remove use of --cygnus option for automake
+- rename configure.in files to configure.ac
+- enable automake silent rules
+- import gdtoa from OpenBSD
+- update to Unicode 14.0
+- ignore _FORTIFY_SOURCE when building newlib
+- fixes to ldtoa
+- add clock support to nvptx port
+- various pthread POSIX APIs added
+- added implementatio for sig2str/str2sig
+- strtod/strtof to set errno to ERANGE consistently for underflow
+- fixed rounding issue with sqrt/sqrtf
+- fixed heap fragmentation issue with nano-malloc
+- FTW port for newlib
+- additions to sys/tree.h
+
 *** Major changes in newlib version 4.1.0:
 
 - fixes for regressions to pow/powf and tgamma functions

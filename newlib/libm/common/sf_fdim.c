@@ -14,8 +14,7 @@
 	float y;
 #endif
 {
-  if (isnan(x)) return(x);
-  if (isnan(y)) return(y);
+  if (isnanf(x) || isnanf(y)) return(x+y);
 
   float z = x > y ? x - y : 0.0;
   if (!isinf(x) && !isinf(y))

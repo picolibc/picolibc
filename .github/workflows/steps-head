@@ -1,0 +1,17 @@
+    steps:
+      - name: Clone picolibc
+        uses: actions/checkout@v2
+        with:
+          path: picolibc
+
+      - name: Restore the Docker Image
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.IMAGE_FILE }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.HASH_FILE ) }}
+
+      - name: Load and Check the Docker Image
+        run: |
+          docker load -i $IMAGE_FILE
+          docker images -a $IMAGE
+

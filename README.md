@@ -1,5 +1,5 @@
 # Picolibc
-Copyright © 2018-2021 Keith Packard
+Copyright © 2018-2022 Keith Packard
 
 Picolibc is library offering standard C library APIs that targets
 small embedded systems with limited RAM. Picolibc was formed by blending
@@ -8,8 +8,7 @@ code from [Newlib](http://sourceware.org/newlib/) and
 
 Build status:
 
- * ![Release](https://github.com/picolibc/picolibc/workflows/Release/badge.svg?branch=main)
- * ![Minsize](https://github.com/picolibc/picolibc/workflows/Minsize/badge.svg?branch=main)
+ * ![Linux](https://github.com/picolibc/picolibc/workflows/Linux/badge.svg?branch=main)
  * ![Mac OS X](https://github.com/picolibc/picolibc/workflows/Mac%20OS%20X/badge.svg)
 
 ## License
@@ -23,14 +22,15 @@ other (mostly older) licenses with similar terms.
 
 There are two files used for testing printf, test/printf-tests.c and
 test/testcases.c which are licensed under the GPL version 2 or
-later.
+later. There is also a shell script, GeneratePicolibcCrossFile.sh
+which is licensed under the AGPL version 3 or later which is provided
+as a helper for people building the library, but not used by picolibc
+otherwise.
 
 The file COPYING.picolibc contains all of the current copyright and
 license information in the Debian standard machine-readable format. It
 was generated using the make-copyrights and find-copyright
-scripts. There are currently 78 distinct licenses: 10 versions of the
-2-clause BSD license, 37 versions of the 3-clause BSD license, and 31
-other licenses.
+scripts.
 
 ## Supported Architectures
 
@@ -40,9 +40,11 @@ at this point only has code to build for the following targets:
  * ARM (32- and 64- bit)
  * i386 (Native and Linux hosted, for testing)
  * RISC-V (both 32- and 64- bit)
- * x86_64 (Native Linux hosted, for testing)
- * PowerPC
+ * x86_64 (Native and Linux hosted, for testing)
+ * PowerPC (big and little endian)
+ * m68k
  * ESP8266 (xtensa-lx106-elf)
+ * Motorola 68000 (m68k)
 
 Supporting architectures that already have Newlib code requires:
 
@@ -121,6 +123,67 @@ use Picolibc:
  * [Copyright and license information](COPYING.picolibc)
 
 ## Releases
+
+### Picolibc version 1.7.5
+
+ 1. Fix build on big-endian systems (thanks to Thomas Daede)
+
+ 2. Add m68k support (thanks to Thomas Daede).
+
+ 3. Fix build issues with ARM Cortex-a9 target (thanks to Ilia
+    Sergachev).
+
+ 4. Fix fwrite(x,0,y,z) in both tinystdio and legacy stdio. tinystdio
+    returned the wrong value and legacy stdio caused a divide-by-zero
+    fault.
+
+ 5. Update Ryu code to match upstream (minor fixes)
+
+ 6. Fix various __NEWLIB and __PICOLIBC macros; they were using a
+    single leading underscore instead of two (thanks to Vincent
+    Palatin).
+
+ 7. Fix tinystdio error-handling bugs
+
+ 8. Merge recent newlib changes (fixed ltdoa in legacy stdio)
+
+ 9. Speed improvements for github CI system
+
+ 10. Big-endian PowerPC support
+
+ 11. Fail builds if most 'run_command' uses fail (thanks to Johan de
+     Claville Christiansen)
+
+ 12. Positional parameters in tinystdio. With this, I think tinystdio
+     is feature complete.
+
+ 13. Support for multiple build-styles of picolibc (minsize/release)
+     in one binary package. This still requires separate meson runs.
+
+ 14. Testing with glibc test code. This uncovered numerous bugs,
+     mostly math errno/exception mistakes, but also a few serious
+     bugs, including a couple of places where the nano-malloc failed
+     to check for out-of-memory. Picolibc now passes all of the glibc
+     math tests except for jn, yn, lgamma and tgamma. The picolibc
+     versions of those functions are too inaccurate. Picolibc also
+     passes most other relevant glibc tests, including stdio,
+     string and stdlib areas.
+
+ 15. Tinystdio version of fcvt now has a static buffer large enough to
+     hold the maximum return size.
+
+ 16. Tinystdio versions of ecvtbuf and fcvtbuf have been replaced
+     with ecvt_r and fcvt_r equivalents, which take a 'len' parameter
+     to prevent buffer overruns.
+
+ 17. Add the GeneratePicolibcCrossFile.sh script which provides a way
+     to isolate picolibc build scripts from the vagaries of meson
+     version shifts (thanks to R. Diez).
+
+ 18. Add 'semihost' version of crt0 that calls 'exit' after main
+     returns. The ARM and RISC-V versions of this also include trap
+     handlers for exceptions that print out information and exit when
+     an exception occurs.
 
 ### Picolibc version 1.7.4
 

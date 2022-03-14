@@ -16,8 +16,10 @@
 long
 _mrand48_r (struct _rand48 *r)
 {
+  int32_t i;
   __dorand48(r, r->_seed);
-  return ((long) r->_seed[2] << 16) + (long) r->_seed[1];
+  i = (int32_t) ((uint32_t) (r->_seed[2]) << 16 | (uint32_t) (r->_seed[1]));
+  return (long) i;
 }
 
 #ifndef _REENT_ONLY

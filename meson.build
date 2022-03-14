@@ -42,7 +42,7 @@ project('picolibc', 'c',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.53',
-	version: '1.7.4'
+	version: '1.7.5'
        )
 
 targets = []
@@ -149,6 +149,7 @@ tests_enable_full_malloc_stress = get_option('tests-enable-full-malloc-stress')
 tests_enable_posix_io = get_option('tests-enable-posix-io')
 have_alias_attribute_option = get_option('have-alias-attribute')
 have_format_attribute_option = get_option('have-format-attribute')
+have_weak_attribute_option = get_option('have-weak-attribute')
 
 newlib_iconv_encodings = get_option('newlib-iconv-encodings')
 newlib_iconv_from_encodings = get_option('newlib-iconv-from-encodings')
@@ -161,10 +162,13 @@ lite_exit = get_option('lite-exit')
 
 newlib_elix_level = get_option('newlib-elix-level')
 c_args = ['-include', '@0@/@1@'.format(meson.current_build_dir(), 'picolibc.h')]
+native_c_args = ['-DNO_NEWLIB']
 
 # Disable ssp and fortify source while building picolibc (it's enabled
 # by default by the ubuntu native compiler)
-c_args += cc.get_supported_arguments(['-fno-common', '-frounding-math', '-Wno-unsupported-floating-point-opt', '-fno-stack-protector'])
+c_flags = cc.get_supported_arguments(['-fno-common', '-frounding-math', '-fsignaling-nans', '-Wno-unsupported-floating-point-opt', '-fno-stack-protector'])
+c_args += c_flags
+native_c_args += c_flags
 
 # Select a fortify source option
 fortify_source = get_option('fortify-source')
@@ -215,11 +219,17 @@ if newlib_io_c99_formats != 'auto'
   io_c99_formats = newlib_io_c99_formats == 'true'
 endif
 
+io_pos_args = get_option('io-pos-args')
+newlib_io_pos_args = get_option('newlib-io-pos-args')
+if newlib_io_pos_args != 'auto'
+  io_pos_args = newlib_io_pos_args == 'true'
+endif
+
 # Select stdio implementation
 tinystdio = get_option('tinystdio')
 
-has_link_defsym = cc.has_link_argument('-Wl,--defsym=' + global_prefix + '_start=0')
-has_link_alias = cc.has_link_argument('-Wl,-alias,' + global_prefix + 'main,testalias')
+has_link_defsym = meson.get_cross_property('has_link_defsym', cc.has_link_argument('-Wl,--defsym=' + global_prefix + '_start=0'))
+has_link_alias = meson.get_cross_property('has_link_alias', cc.has_link_argument('-Wl,-alias,' + global_prefix + 'main,testalias'))
 
 # tinystdio options
 posix_io = tinystdio and get_option('posix-io')
@@ -300,7 +310,6 @@ if tinystdio
 endif
 
 # A bunch of newlib-stdio only options
-newlib_io_pos_args = get_option('newlib-io-pos-args')
 newlib_io_long_double = get_option('newlib-io-long-double')
 newlib_global_stdio_streams = get_option('newlib-global-stdio-streams')
 newlib_fvwrite_in_streamio = get_option('newlib-fvwrite-in-streamio')
@@ -315,9 +324,6 @@ newlib_have_fcntl = get_option('newlib-have-fcntl')
 # if they are selected while using tinystdio
 
 if tinystdio
-  if newlib_io_pos_args
-    error('tinystdio does not support positional arguments (newlib-io-pos-args)')
-  endif
   if newlib_io_long_double
     error('tinystdio does not support long double (newlib-io-long-double)')
   endif
@@ -350,7 +356,7 @@ endif
 
 if host_cpu_family == ''
   host_cmds = cc.cmd_array() + ['-dumpmachine']
-  host_cc_machine=run_command(host_cmds).stdout().strip().split('-')
+  host_cc_machine=run_command(host_cmds, check : true).stdout().strip().split('-')
   host_cpu_family=host_cc_machine[0]
   message('Computed host_cpu_family as ' + host_cpu_family)
 endif
@@ -365,6 +371,12 @@ if have_format_attribute_option == 'auto'
   have_format_attribute = cc.has_function_attribute('format')
 else
   have_format_attribute = have_format_attribute_option == 'true'
+endif
+
+if have_weak_attribute_option == 'auto'
+  have_weak_attribute = cc.has_function_attribute('weak')
+else
+  have_weak_attribute = have_weak_attribute_option == 'true'
 endif
 
 tls_model_spec = ''
@@ -382,18 +394,22 @@ if thread_local_storage
 endif
 
 if sysroot_install
-  sysroot = run_command(cc.cmd_array() + ['-print-sysroot']).stdout().split('\n')[0]
+  sysroot = run_command(cc.cmd_array() + ['-print-sysroot'], check : true).stdout().split('\n')[0]
   if sysroot == ''
     error('sysroot install requested, but compiler has no sysroot')
   endif
-  sysroot = run_command('realpath', sysroot).stdout().split('\n')[0]
-  prefix_path = run_command('realpath', prefix).stdout().split('\n')[0]
+  sysroot = run_command('realpath', sysroot, check : true).stdout().split('\n')[0]
+  prefix_path = run_command('realpath', prefix, check : true).stdout().split('\n')[0]
   if sysroot != prefix_path
     error('sysroot install requires --prefix=' + sysroot)
   endif
 endif
 
-lib_dir = join_paths(prefix, get_option('libdir'))
+build_type_subdir = get_option('build-type-subdir')
+
+lib_dir = prefix / get_option('libdir') / build_type_subdir
+
+include_dir = prefix / get_option('includedir') / build_type_subdir
 
 newlib_iconv_dir = get_option('newlib-iconv-dir')
 if newlib_iconv_dir == ''
@@ -406,11 +422,14 @@ if newlib_iconv_runtime_dir == ''
 endif
 
 specs_dir_option = get_option('specsdir')
-if specs_dir_option == ''
+if build_type_subdir != ''
+  specs_install = false
+  specs_dir = ''
+elif specs_dir_option == ''
   search_cmds = cc.cmd_array() + ['-print-search-dirs']
-  install_dir=run_command(search_cmds).stdout().split('\n')[0]
+  install_dir=run_command(search_cmds, check : true).stdout().split('\n')[0]
   # Meson 0.56 adds a 'substring' method which can be used here
-  specs_dir=run_command(['expr', install_dir, ':', 'install: *\(.*\)']).stdout().split('\n')[0]
+  specs_dir=run_command(['expr', install_dir, ':', 'install: *\(.*\)'], check : false).stdout().split('\n')[0]
   specs_install = specs_dir != ''
 elif specs_dir_option == 'none'
   specs_install = false
@@ -482,6 +501,7 @@ picolibcpp_specs = configure_file(input: 'picolibc.specs.in',
 				  install_dir: specs_dir,
 				  install: specs_install)
 
+
 test_specs = configure_file(input: 'test.specs.in',
 			    output: '@BASENAME@',
 			    configuration: specs_data,
@@ -512,7 +532,9 @@ picolibcpp_ld = configure_file(input: 'picolibc.ld.in',
 # Not all compilers necessarily support all warnings; only use these which are:
 c_warnings = ['-Werror=implicit-function-declaration', '-Werror=vla', '-Warray-bounds', '-Wold-style-definition']
 disabled_warnings = ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-Wno-unused-command-line-argument']
-c_args += cc.get_supported_arguments(c_warnings, disabled_warnings)
+c_flags = cc.get_supported_arguments(c_warnings, disabled_warnings)
+c_args += c_flags
+native_c_args += c_flags
 
 # CompCert does not support bitfields in packed structs, so avoid using this optimization
 bitfields_in_packed_structs_code = '''
@@ -572,7 +594,7 @@ if enable_multilib
 
   # Ask the compiler for the set of available multilib configurations,
   # set up the build system to compile for all desired ones
-  foreach target : run_command(cc, '--print-multi-lib').stdout().strip().split('\n')
+  foreach target : run_command(cc, '--print-multi-lib', check : true).stdout().strip().split('\n')
     tmp = target.split(';')
     flags = c_args
 
@@ -681,15 +703,16 @@ if have_long_double
   conf_data.set('_LDBL_EQ_DBL', long_double_equals_double,
 		description: 'long double is the same as double')
 endif
-conf_data.set('HAVE_ALIAS_ATTRIBUTE', have_alias_attribute)
-conf_data.set('HAVE_FORMAT_ATTRIBUTE', have_format_attribute)
+conf_data.set('_HAVE_ALIAS_ATTRIBUTE', have_alias_attribute)
+conf_data.set('_HAVE_FORMAT_ATTRIBUTE', have_format_attribute)
+conf_data.set('_HAVE_WEAK_ATTRIBUTE', have_weak_attribute)
 conf_data.set('_WANT_REGISTER_FINI', get_option('newlib-register-fini'))
 conf_data.set('_WANT_IO_LONG_LONG', io_long_long)
+conf_data.set('_WANT_IO_POS_ARGS', io_pos_args)
 conf_data.set('_WANT_IO_C99_FORMATS', io_c99_formats)
 conf_data.set('_IO_FLOAT_EXACT', io_float_exact)
 if not tinystdio
   conf_data.set('_WANT_IO_LONG_DOUBLE', newlib_io_long_double)
-  conf_data.set('_WANT_IO_POS_ARGS', newlib_io_pos_args)
   conf_data.set('NO_FLOATING_POINT', not newlib_io_float)
   conf_data.set('FLOATING_POINT', newlib_io_float)
   conf_data.set('_WANT_REENT_GLOBAL_STDIO_STREAMS', newlib_global_stdio_streams)
@@ -722,8 +745,8 @@ conf_data.set('FAST_STRCMP', fast_strcmp, description: 'Always optimize strcmp f
 conf_data.set('__HAVE_LOCALE_INFO__', newlib_locale_info, description: 'locale support')
 conf_data.set('__HAVE_LOCALE_INFO_EXTENDED__', get_option('newlib-locale-info-extended'), description: 'extended locale support')
 conf_data.set('NEWLIB_GLOBAL_ERRNO', get_option('newlib-global-errno'), description: 'use global errno variable')
-conf_data.set('HAVE_INITFINI_ARRAY', get_option('newlib-initfini-array'), description: 'compiler supports INIT_ARRAY sections')
-conf_data.set('HAVE_INIT_FINI', get_option('newlib-initfini'), description: 'Support _init() and _fini() functions')
+conf_data.set('_HAVE_INITFINI_ARRAY', get_option('newlib-initfini-array'), description: 'compiler supports INIT_ARRAY sections')
+conf_data.set('_HAVE_INIT_FINI', get_option('newlib-initfini'), description: 'Support _init() and _fini() functions')
 conf_data.set('NEWLIB_TLS', thread_local_storage, description: 'use thread local storage')
 conf_data.set('PICOLIBC_TLS', thread_local_storage, description: 'use thread local storage')
 conf_data.set('HAVE_PICOLIBC_TLS_API', thread_local_storage, description: '_set_tls and _init_tls functions available')
@@ -736,10 +759,33 @@ conf_data.set('HAVE_BUILTIN_EXPECT', have_builtin_expect, description: 'Compiler
 conf_data.set('HAVE_ALLOC_SIZE', have_alloc_size, description: 'The compiler REALLY has the attribute __alloc_size__')
 conf_data.set('_HAVE_ATTRIBUTE_ALWAYS_INLINE',
 	      cc.has_function_attribute('always_inline'),
-	      descrption: 'The compiler supports the always_inline function attribute')
+	      description: 'The compiler supports the always_inline function attribute')
 conf_data.set('_HAVE_ATTRIBUTE_GNU_INLINE',
 	      cc.has_function_attribute('gnu_inline'),
-	      descrption: 'The compiler supports the gnu_inline function attribute')
+	      description: 'The compiler supports the gnu_inline function attribute')
+conf_data.set('__PICOLIBC_CRT_RUNTIME_SIZE',
+	      get_option('crt-runtime-size'),
+	      description: 'Compute static memory area sizes at runtime instead of link time')
+errno_function=get_option('errno-function')
+if errno_function == 'auto'
+  errno_function = 'false'
+  # these symbols are from the glibc and os x system C libraries,
+  # it's useful to access them when doing testing
+  foreach e : ['__errno_location', '__error']
+    code = '''extern int @0@();
+int main(void) {
+	return @0@();
+}
+'''.format(e)
+    if cc.links(code, name : 'detect errno function')
+      errno_function = e
+      break
+    endif
+  endforeach
+endif
+if errno_function != 'false'
+  conf_data.set('__PICOLIBC_ERRNO_FUNCTION', errno_function)
+endif
 
 # Obsolete newlib options
 conf_data.set('_WANT_USE_LONG_TIME_T', get_option('newlib-long-time_t'), description: 'Obsoleted. Define time_t to long instead of using a 64-bit type')
@@ -786,7 +832,7 @@ endif
 # Dig out the list of available encodings from the encoding.aliases file. Only
 # accept the first entry from each line
 
-available_encodings = run_command(['sed', '-e', '/^#/d', '-e', '/^$/d', '-e', 's/ .*$//', files('newlib/libc/iconv/encoding.aliases')[0]]).stdout().split('\n')
+available_encodings = run_command(['sed', '-e', '/^#/d', '-e', '/^$/d', '-e', 's/ .*$//', files('newlib/libc/iconv/encoding.aliases')[0]], check : true).stdout().split('\n')
 
 # Include all available encodings if none were specified on the command line
 
@@ -831,14 +877,21 @@ else
   picolibc_patch_level = 0
 endif
 
+conf_data.set('__PICOLIBC_VERSION__', '"@0@"'.format(meson.project_version()), description: 'The Picolibc version in string format.')
+conf_data.set('__PICOLIBC__', version_array[0], description: 'The Picolibc major version number.')
+conf_data.set('__PICOLIBC_MINOR__', version_array[1], description: 'The Picolibc minor version number.')
+conf_data.set('__PICOLIBC_PATCHLEVEL__', picolibc_patch_level, description: 'The Picolibc patch level.')
+
+# Old version macros. These have just a single leading underscore,
+# which isn't consistent with the newlib macros; they were created
+# by mistake.
 conf_data.set('_PICOLIBC_VERSION', '"@0@"'.format(meson.project_version()), description: 'The Picolibc version in string format.')
 conf_data.set('_PICOLIBC__', version_array[0], description: 'The Picolibc major version number.')
 conf_data.set('_PICOLIBC_MINOR__', version_array[1], description: 'The Picolibc minor version number.')
-conf_data.set('__PICOLIBC_PATCHLEVEL__', picolibc_patch_level, description: 'The Picolibc patch level.')
 
 conf_data.set('_NEWLIB_VERSION', '"@0@"'.format(NEWLIB_VERSION), description: 'The newlib version in string format.')
-conf_data.set('_NEWLIB__', NEWLIB_MAJOR_VERSION, description: 'The newlib major version number.')
-conf_data.set('_NEWLIB_MINOR__', NEWLIB_MINOR_VERSION, description: 'The newlib minor version number.')
+conf_data.set('__NEWLIB__', NEWLIB_MAJOR_VERSION, description: 'The newlib major version number.')
+conf_data.set('__NEWLIB_MINOR__', NEWLIB_MINOR_VERSION, description: 'The newlib minor version number.')
 conf_data.set('__NEWLIB_PATCHLEVEL__', NEWLIB_PATCHLEVEL_VERSION, description: 'The newlib patch level.')
 
 if tinystdio
@@ -850,8 +903,6 @@ endif
 inc_dirs = [stdio_inc_dir, '.', 'newlib/libc/include']
 
 inc = include_directories(inc_dirs)
-
-includedir = join_paths(prefix, get_option('includedir'))
 
 # We don't need '-fdata-sections' currently as there aren't any
 # files with data used in separate code paths. This works around
@@ -899,6 +950,7 @@ conf_data.set('HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs support
 
 # disable compiler built-ins so we reach the library equivalents
 test_c_args = c_args + arg_fnobuiltin
+native_c_args += arg_fnobuiltin
 if tests_enable_stack_protector
   if cc.has_argument('-fstack-protector-all') and cc.has_argument('-fstack-protector-strong')
     test_c_args += ['-fstack-protector-all', '-fstack-protector-strong', '-DTESTS_ENABLE_STACK_PROTECTOR']
@@ -920,7 +972,13 @@ if has_semihost
   # linker's runtime, its working directory is the build dir, linker
   # scripts under scripts/ can't be found. We use the absolute path
   # for our convinience.
-  custom_script = 'scripts/test-' + host_cpu_family + '.ld'
+  cpu_script = 'scripts' / 'test-' + host_machine.cpu() + '.ld'
+  cpu_family_script = 'scripts' / 'test-' + host_cpu_family + '.ld'
+  if fs.is_file(cpu_script)
+    custom_script = cpu_script
+  else
+    custom_script = cpu_family_script
+  endif
   test_link_args = ['-nostartfiles', '-nostdlib',
                     '-T', meson.current_source_dir() / custom_script,
                     '-T', '@0@'.format(picolibc_ld), '-lgcc']
@@ -957,7 +1015,7 @@ conf_data.set('HAVE_IEEEFP_FUNCS', has_ieeefp_funcs, description: 'IEEE fp funcs
 
 configure_file(output : 'picolibc.h',
 	       configuration: conf_data,
-	       install_dir: includedir)
+	       install_dir: include_dir)
 
 # Usage as an embedded subproject:
 # If picolibc is embedded into the source as a subproject,

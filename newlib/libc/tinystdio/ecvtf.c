@@ -33,10 +33,13 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ftoa_engine.h"
+#define _GNU_SOURCE
 #include <_ansi.h>
 #include <stdlib.h>
 #include <string.h>
+#include "ftoa_engine.h"
+
+static NEWLIB_THREAD_LOCAL char ecvtf_buf[FTOA_MAX_DIG + 1];
 
 char *
 ecvtf (float invalue,
@@ -44,14 +47,7 @@ ecvtf (float invalue,
        int *decpt,
        int *sign)
 {
-	struct ftoa ftoa;
-
-	if (ndigit > FTOA_MAX_DIG)
-		ndigit = FTOA_MAX_DIG;
-	ndigit = __ftoa_engine(invalue, &ftoa, ndigit, 0);
-	*sign = ftoa.flags & FTOA_MINUS;
-	*decpt = ftoa.exp + 1;
-	memcpy(__ecvtf_buf, ftoa.digits, ndigit);
-	__ecvtf_buf[ndigit] = '\0';
-	return __ecvtf_buf;
+    if (ecvtf_r(invalue, ndigit, decpt, sign, ecvtf_buf, sizeof(ecvtf_buf)) < 0)
+        return NULL;
+    return ecvtf_buf;
 }

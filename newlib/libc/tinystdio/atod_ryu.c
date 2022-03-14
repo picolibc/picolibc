@@ -149,11 +149,12 @@ __atod_engine(uint64_t m10, int e10)
     printf("ieee_m2 = %" PRIu64 "\n", (m2 >> shift) + roundUp);
 #endif
     uint64_t ieee_m2 = (m2 >> shift) + roundUp;
-    if (ieee_m2 == (1ull << (DOUBLE_MANTISSA_BITS + 1))) {
+    assert(ieee_m2 <= (1ull << (DOUBLE_MANTISSA_BITS + 1)));
+    ieee_m2 &= (1ull << DOUBLE_MANTISSA_BITS) - 1;
+    if (ieee_m2 == 0 && roundUp) {
 	// Due to how the IEEE represents +/-Infinity, we don't need to check for overflow here.
 	ieee_e2++;
     }
-    ieee_m2 &= (1ull << DOUBLE_MANTISSA_BITS) - 1;
     uint64_t ieee = (((uint64_t)ieee_e2) << DOUBLE_MANTISSA_BITS) | ieee_m2;
     return int64Bits2Double(ieee);
 }

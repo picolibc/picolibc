@@ -175,13 +175,7 @@ a64l (const char *input)
       result = (result << 6) + digit;
     }
 
-#if LONG_MAX > 2147483647
-  /* for implementations where long is > 32 bits, the result must be sign-extended */
-  if (result & 0x80000000)
-      return (~0UL << 32) + result;
-#endif
-
-  return result;
+  return (long int) result;
 }
 
 

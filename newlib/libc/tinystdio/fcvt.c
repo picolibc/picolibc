@@ -34,10 +34,14 @@
  */
 
 #define _GNU_SOURCE
-#include "dtoa_engine.h"
 #include <_ansi.h>
 #include <stdlib.h>
 #include <string.h>
+#include "dtoa_engine.h"
+
+#define FCVT_MAXDIG (__DBL_MAX_10_EXP__ + DTOA_MAX_DIG + 1)
+
+static NEWLIB_THREAD_LOCAL char fcvt_buf[FCVT_MAXDIG];
 
 char *
 fcvt (double invalue,
@@ -45,5 +49,7 @@ fcvt (double invalue,
       int *decpt,
       int *sign)
 {
-	return fcvtbuf(invalue, ndigit, decpt, sign, __ecvt_buf);
+    if (fcvt_r(invalue, ndigit, decpt, sign, fcvt_buf, sizeof(fcvt_buf)) < 0)
+        return NULL;
+    return fcvt_buf;
 }

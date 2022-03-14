@@ -39,7 +39,7 @@ fmodf(float x, float y)
 
     /* purge off exception values */
     if (isnan(x) || isnan(y)) /* x or y nan, return nan */
-        return (float)NAN;
+        return x + y;
 
     if (isinf(x)) /* x == inf, domain error */
         return __math_invalidf(x);

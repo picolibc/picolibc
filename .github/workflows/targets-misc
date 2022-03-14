@@ -1,0 +1,3 @@
+        test: [
+          "./.github/do-many do-test do-native-configure build-native do-test do-aarch64-configure build-aarch64 do-build do-lx106-configure build-lx106 do-test do-i386-configure build-i386 do-build do-m68k-configure build-m68k end",
+        ]

@@ -20,12 +20,7 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
-	int finitef(float x)
-#else
-	int finitef(x)
-	float x;
-#endif
+int finitef(float x)
 {
 	__int32_t ix;
 	GET_FLOAT_WORD(ix,x);
@@ -33,16 +28,30 @@
 	return (FLT_UWORD_IS_FINITE(ix));
 }
 
+#if defined(_HAVE_ALIAS_ATTRIBUTE)
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(finitef, __finitef);
+#else
+
+int
+__finitef(float x)
+{
+    return finitef(x);
+}
+#endif
+
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
-	int finite(double x)
-#else
-	int finite(x)
-	double x;
-#endif
+int finite(double x)
 {
 	return finitef((float) x);
+}
+
+int __finite(double x)
+{
+    return finitef((float) x);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

@@ -436,7 +436,7 @@ int gettimeofday (struct timeval *__restrict __p,
 int futimesat (int, const char *, const struct timeval [2]);
 #endif
 
-#ifdef _COMPILING_NEWLIB
+#ifdef _LIBC
 int _gettimeofday (struct timeval *__p, void *__tz);
 #endif
 

@@ -97,7 +97,7 @@ _start64:
 	call	_set_tls
 #endif
 	
-#if defined(HAVE_INITFINI_ARRAY) && CONSTRUCTORS
+#if defined(_HAVE_INITFINI_ARRAY) && CONSTRUCTORS
 	call	__libc_init_array
 #endif
 

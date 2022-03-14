@@ -115,7 +115,7 @@ exp(double x) /* default IEEE double exp */
             __uint32_t lx;
             GET_LOW_WORD(lx, x);
             if (((hx & 0xfffff) | lx) != 0)
-                return x; /* NaN */
+                return x + x; /* NaN */
             else
                 return (xsb == 0) ? x : 0.0; /* exp(+-inf)={inf,0} */
         }

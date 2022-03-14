@@ -87,11 +87,15 @@ ucs_2_convert_from_ucs (void *data,
   if (*outbytesleft < sizeof (ucs2_t))
     return (size_t)ICONV_CES_NOSPACE;
 
+  ucs2_t uc;
+
   if (*((int *)data) == UCS_2_BIG_ENDIAN)
-    *((ucs2_t *)(*outbuf)) = ICONV_HTOBES ((ucs2_t)in);
+    uc = ICONV_HTOBES ((ucs2_t)in);
   else
-    *((ucs2_t *)(*outbuf)) = ICONV_HTOLES ((ucs2_t)in);
-    
+    uc = ICONV_HTOLES ((ucs2_t)in);
+
+  memcpy(*outbuf, &uc, sizeof(ucs2_t));
+
   *outbuf += sizeof (ucs2_t);
   *outbytesleft -= sizeof (ucs2_t);
 
@@ -106,19 +110,23 @@ ucs_2_convert_to_ucs (void *data,
                              size_t *inbytesleft)
 {
   ucs4_t res;
-  
+
   if (*inbytesleft < sizeof (ucs2_t))
     return (ucs4_t)ICONV_CES_BAD_SEQUENCE;
 
+  ucs2_t uc;
+
+  memcpy(&uc, *inbuf, sizeof(ucs2_t));
+
   if (*((int *)data) == UCS_2_BIG_ENDIAN)
-    res = (ucs4_t)ICONV_BETOHS (*((ucs2_t *)(*inbuf)));
+    res = (ucs4_t)ICONV_BETOHS (uc);
   else
-    res = (ucs4_t)ICONV_LETOHS (*((ucs2_t *)(*inbuf)));
+    res = (ucs4_t)ICONV_LETOHS (uc);
 
   if ((res  >= 0x0000D800 && res <= 0x0000DFFF) /* Surrogate character */
       || res >= 0x0000FFFE)
     return (ucs4_t)ICONV_CES_INVALID_CHARACTER;
-    
+
   *inbytesleft -= sizeof (ucs2_t);
   *inbuf += sizeof (ucs2_t);
 

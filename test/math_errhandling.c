@@ -76,7 +76,7 @@ e_to_str(int e)
 	if (e == (FE_UNDERFLOW|FE_INEXACT))
 		return "FE_UNDERFLOW|FE_INEXACT";
 #endif
-	static char buf[3][50];
+	static char buf[3][128];
         static int i = 0;
         buf[i][0] = '\0';
         while (e) {
@@ -117,9 +117,15 @@ e_to_str(int e)
                 v = tmp;
                 e = 0;
             }
+#define check_add(s) do {                                               \
+                if (strlen(buf[i]) + strlen(s) + 1 > sizeof(buf[i]))    \
+                    printf("exception buf overflow %s + %s\n", buf[i], s); \
+                else                                                    \
+                    strcat(buf[i], s);                                  \
+            } while(0)
             if (buf[i][0])
-                strcat(buf[i], " | ");
-            strcat(buf[i], v);
+                check_add(" | ");
+            check_add(v);
         }
         char *ret = buf[i];
         i = (i + 1) % 3;
@@ -139,6 +145,9 @@ e_to_str(int e)
 #define BIG 1.7e308
 #define SMALL 5e-324
 #define FLOAT_T double
+#define MIN_VAL 0x4p-1024;
+#define MAX_VAL 0xf.ffffffffffff8p+1020;
+#define sNAN __builtin_nans("")
 
 #define TEST_DOUBLE
 
@@ -149,6 +158,9 @@ e_to_str(int e)
 
 #undef BIG
 #undef SMALL
+#undef MIN_VAL
+#undef MAX_VAL
+#undef sNAN
 #undef makemathname
 #undef makemathname_r
 #undef FLOAT_T
@@ -159,6 +171,9 @@ e_to_str(int e)
 #define EXCEPTION_TEST	MATH_ERREXCEPT
 #define BIG 3e38
 #define SMALL 1e-45
+#define MIN_VAL 0x8p-152;
+#define MAX_VAL 0xf.fffffp+124;
+#define sNAN __builtin_nansf("")
 #define FLOAT_T float
 #define TEST_FLOAT
 #define makemathname(s) scat(s,f)

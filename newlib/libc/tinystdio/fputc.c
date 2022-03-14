@@ -45,7 +45,7 @@ fputc(int c, FILE *stream)
 	return c;
 }
 
-#ifdef HAVE_ALIAS_ATTRIBUTE
+#ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(fputc, putc);
 #elif !defined(getc)
 int putc(int c, FILE *stream) { return fputc(c, stream); }

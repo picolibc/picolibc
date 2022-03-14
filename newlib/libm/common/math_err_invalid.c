@@ -34,7 +34,15 @@ HIDDEN double
 __math_invalid (double x)
 {
     if (isnan(x))
-        return pick_double_except(x, VAL);
+        return pick_double_except(x + x, VAL);
     x = pick_double_except(VAL / VAL, VAL);
     return __math_with_errno (x, EDOM);
 }
+
+#ifndef __math_set_invalid
+HIDDEN void
+__math_set_invalid(void)
+{
+    force_eval_double(pick_double_except(VAL / VAL, VAL));
+}
+#endif

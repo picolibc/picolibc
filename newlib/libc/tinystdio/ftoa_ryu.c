@@ -59,7 +59,7 @@ typedef struct floating_decimal_32 {
 } floating_decimal_32;
 
 static inline floating_decimal_32
-f2d(const uint32_t ieeeMantissa, const uint32_t ieeeExponent, int max_digits, int max_decimals)
+f2d(const uint32_t ieeeMantissa, const uint32_t ieeeExponent, int max_digits, bool fmode, int max_decimals)
 {
 	int32_t e2;
 	uint32_t m2;
@@ -179,15 +179,16 @@ f2d(const uint32_t ieeeMantissa, const uint32_t ieeeExponent, int max_digits, in
 	 *               there are exp digits to the left of
 	 *               the decimal point
 	 *
-	 * max_decimals:  Only used in 'f' format. Display no more than this
-	 *               many digits (-1) to the right of the decimal point
+	 * max_decimals: Only used in 'f' format. Round to this many
+	 *               digits to the right of the decimal point
+	 *               (left if negative)
 	 *
 	 * max_digits:	 We can't convert more than this number of digits given
 	 *               the limits of the buffer
 	 */
 
 	int save_max_digits = max_digits;
-	if(max_decimals != 0) {
+	if(fmode) {
 		int exp = e10 + decimalLength9(vr) - 1;
 		/*
 		 * This covers two cases:
@@ -206,8 +207,7 @@ f2d(const uint32_t ieeeMantissa, const uint32_t ieeeExponent, int max_digits, in
 		 * A single expression gives the right answer in both
 		 * cases, which is kinda cool
 		 */
-		/* max_decimals comes in biased by 1 to flag the 'f' case */
-		max_digits = min_int(max_digits, max_int(0, max_decimals - 1 + exp + 1));
+		max_digits = min_int(max_digits, max_int(1, max_decimals + exp + 1));
 	}
 
 	for (;;) {
@@ -267,10 +267,9 @@ f2d(const uint32_t ieeeMantissa, const uint32_t ieeeExponent, int max_digits, in
 		if (len > max_digits) {
 
 			/* Recompute max digits in this case */
-			if(max_decimals != 0) {
+                        if(fmode) {
 				int exp = e10 + len - 1;
-				/* max_decimals comes in biased by 1 to flag the 'f' case */
-				max_digits = min_int(save_max_digits, max_int(0, max_decimals - 1 + exp + 1));
+				max_digits = min_int(save_max_digits, max_int(1, max_decimals + exp + 1));
 			}
 
 			if (len > max_digits) {
@@ -301,7 +300,7 @@ f2d(const uint32_t ieeeMantissa, const uint32_t ieeeExponent, int max_digits, in
 #include "ftoa_engine.h"
 
 int
-__ftoa_engine(float x, struct ftoa *ftoa, int max_digits, int max_decimals)
+__ftoa_engine(float x, struct ftoa *ftoa, int max_digits, bool fmode, int max_decimals)
 {
 	// Step 1: Decode the floating-point number, and unify normalized and subnormal cases.
 	const uint32_t bits = float_to_bits(x);
@@ -336,7 +335,7 @@ __ftoa_engine(float x, struct ftoa *ftoa, int max_digits, int max_decimals)
 
 	floating_decimal_32 v;
 
-	v = f2d(ieeeMantissa, ieeeExponent, max_digits, max_decimals);
+	v = f2d(ieeeMantissa, ieeeExponent, max_digits, fmode, max_decimals);
 
 	uint32_t mant = v.mantissa;
 	int32_t olength = v.olength;

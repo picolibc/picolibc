@@ -135,6 +135,7 @@ int	getsubopt (char **, char * const *, char **);
 long	labs (long);
 ldiv_t	ldiv (long __numer, long __denom);
 void	*malloc(size_t) __malloc_like __result_use_check __alloc_size(1) _NOTHROW;
+void    *valloc (size_t) __malloc_like __result_use_check __alloc_size(1) _NOTHROW;
 int	mblen (const char *, size_t);
 int	mbtowc (wchar_t *__restrict, const char *__restrict, size_t);
 int	wctomb (char *, wchar_t);
@@ -231,12 +232,34 @@ int	setenv (const char *__string, const char *__value, int __overwrite);
 #if __XSI_VISIBLE >= 4
 char *	gcvt (double,int,char *);
 char *	gcvtf (float,int,char *);
-char *	fcvt (double,int,int *,int *);
-char *	fcvtf (float,int,int *,int *);
+
 char *	ecvt (double,int,int *,int *);
+#ifdef TINY_STDIO
+int	ecvt_r (double,int,int *,int *, char*, size_t);
+#else
 char *	ecvtbuf (double, int, int*, int*, char *);
-char *	fcvtbuf (double, int, int*, int*, char *);
+#endif
+
 char *	ecvtf (float,int,int *,int *);
+#ifdef TINY_STDIO
+int	ecvtf_r (float,int,int *,int *, char*, size_t);
+#else
+char *	ecvtfbuf (float, int, int*, int*, char *);
+#endif
+
+char *	fcvt (double,int,int *,int *);
+#ifdef TINY_STDIO
+int	fcvt_r (double, int, int*, int*, char *, size_t);
+#else
+char *	fcvtbuf (double, int, int*, int*, char *);
+#endif
+
+char *	fcvtf (float,int,int *,int *);
+#ifdef TINY_STDIO
+int	fcvtf_r (float, int, int*, int*, char *, size_t);
+#else
+char *	fcvtfbuf (float, int, int*, int*, char *);
+#endif
 #endif
 char *	__itoa (int, char *, int);
 char *	__utoa (unsigned, char *, int);

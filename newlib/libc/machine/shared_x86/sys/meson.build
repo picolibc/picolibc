@@ -37,6 +37,5 @@ inc_sys_headers_machine = [
 ]
 
 install_headers(inc_sys_headers_machine,
-		subdir:'sys'
-	       )
+		install_dir: include_dir / 'sys')
 

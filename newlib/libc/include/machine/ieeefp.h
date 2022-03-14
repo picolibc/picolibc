@@ -80,6 +80,10 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 */
 
 #if (defined(__arm__) || defined(__thumb__)) && !defined(__MAVERICK__)
+/* arm with hard fp and soft dp cannot use new float code */
+# if (__ARM_FP & 4) && !(__ARM_FP & 8)
+#  define __OBSOLETE_MATH_DEFAULT_FLOAT 1
+# endif
 /* ARM traditionally used big-endian words; and within those words the
    byte ordering was big or little endian depending upon the target.
    Modern floating-point formats are naturally ordered; in this case
@@ -89,11 +93,6 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #  define __IEEE_LITTLE_ENDIAN
 # else
 #  define __IEEE_BIG_ENDIAN
-# endif
-# if __ARM_FP & 0x8
-#  define __OBSOLETE_MATH_DEFAULT_FLOAT 0
-# else
-#  define __OBSOLETE_MATH_DEFAULT_FLOAT 1
 # endif
 #else
 # define __IEEE_BIG_ENDIAN
@@ -112,7 +111,6 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #else
 #define __IEEE_BIG_ENDIAN
 #endif
-#define __OBSOLETE_MATH_DEFAULT_FLOAT 0
 #ifdef __ARM_FP
 # define _SUPPORTS_ERREXCEPT
 #endif
@@ -220,11 +218,6 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #endif
 #ifdef __riscv_flen
 # define _SUPPORTS_ERREXCEPT
-#endif
-#if __riscv_flen >= 64
-# define __OBSOLETE_MATH_DEFAULT_FLOAT 0
-#else
-# define __OBSOLETE_MATH_DEFAULT_FLOAT 1
 #endif
 #endif
 
@@ -532,38 +525,28 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #define __OBSOLETE_MATH_DEFAULT 0
 #endif
 
-#ifndef __OBSOLETE_MATH_DEFAULT_FLOAT
-# ifdef __OBSOLETE_MATH_DEFAULT
-#  define __OBSOLETE_MATH_DEFAULT_FLOAT __OBSOLETE_MATH_DEFAULT
-# else
-/* Use old math code by default for single-precision functions.  */
-#  define __OBSOLETE_MATH_DEFAULT_FLOAT 1
-# endif
-#endif
-
-#ifndef __OBSOLETETE_MATH_DEFAULT_DOUBLE
-# ifdef __OBSOLETE_MATH_DEFAULT
-#  define __OBSOLETE_MATH_DEFAULT_DOUBLE __OBSOLETE_MATH_DEFAULT
-# else
-/* Use new math code by default for double-precision functions. */
-#  define __OBSOLETE_MATH_DEFAULT_DOUBLE 0
-# endif
-#endif
-
 #ifndef __OBSOLETE_MATH_DEFAULT
-/* Use old math code by default.  */
 #define __OBSOLETE_MATH_DEFAULT 1
 #endif
+
 #ifndef __OBSOLETE_MATH
 #define __OBSOLETE_MATH __OBSOLETE_MATH_DEFAULT
 #endif
 
 #ifndef __OBSOLETE_MATH_FLOAT
+#ifdef __OBSOLETE_MATH_DEFAULT_FLOAT
 #define __OBSOLETE_MATH_FLOAT __OBSOLETE_MATH_DEFAULT_FLOAT
+#else
+#define __OBSOLETE_MATH_FLOAT __OBSOLETE_MATH
+#endif
 #endif
 
 #ifndef __OBSOLETE_MATH_DOUBLE
+#ifdef __OBSOLETE_MATH_DEFAULT_DOUBLE
 #define __OBSOLETE_MATH_DOUBLE __OBSOLETE_MATH_DEFAULT_DOUBLE
+#else
+#define __OBSOLETE_MATH_DOUBLE __OBSOLETE_MATH
+#endif
 #endif
 
 #ifndef __IEEE_BIG_ENDIAN

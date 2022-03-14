@@ -49,6 +49,8 @@ srcs_libm_machine = [
   'feupdateenv.c',
   's_ceil.c',
   'sf_ceil.c',
+  's_fabs.c',
+  'sf_fabs.c',
   'sf_floor.c',
   's_floor.c',
   'sf_nearbyint.c',

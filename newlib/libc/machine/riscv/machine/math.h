@@ -79,7 +79,7 @@ __declare_riscv_macro_fclass(long)
 _fclass_d(double x)
 {
 	long fclass;
-	__asm __volatile ("fclass.d\t%0, %1" : "=r" (fclass) : "f" (x));
+	__asm__ ("fclass.d\t%0, %1" : "=r" (fclass) : "f" (x));
 	return fclass;
 }
 #endif
@@ -89,7 +89,7 @@ __declare_riscv_macro_fclass(long)
 _fclass_f(float x)
 {
 	long fclass;
-	__asm __volatile ("fclass.s\t%0, %1" : "=r" (fclass) : "f" (x));
+	__asm__ ("fclass.s\t%0, %1" : "=r" (fclass) : "f" (x));
 	return fclass;
 }
 #endif
@@ -121,7 +121,10 @@ __declare_riscv_macro(double)
 fmax (double x, double y)
 {
 	double result;
-	__asm__("fmax.d\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
+        if (issignaling(x) || issignaling(y))
+            return x + y;
+
+	__asm__ volatile("fmax.d\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
 	return result;
 }
 
@@ -129,7 +132,10 @@ __declare_riscv_macro(double)
 fmin (double x, double y)
 {
 	double result;
-	__asm__("fmin.d\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
+        if (issignaling(x) || issignaling(y))
+            return x + y;
+
+	__asm__ volatile("fmin.d\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
 	return result;
 }
 
@@ -180,10 +186,10 @@ sqrt (double x)
 {
 	double result;
 #ifdef _WANT_MATH_ERRNO
-        if (x < 0)
+        if (isless(x, 0.0))
             errno = EDOM;
 #endif
-	__asm__("fsqrt.d %0, %1" : "=f" (result) : "f" (x));
+	__asm__ volatile("fsqrt.d %0, %1" : "=f" (result) : "f" (x));
 	return result;
 }
 
@@ -192,7 +198,7 @@ __declare_riscv_macro(double)
 fma (double x, double y, double z)
 {
 	double result;
-	__asm__("fmadd.d %0, %1, %2, %3" : "=f" (result) : "f" (x), "f" (y), "f" (z));
+	__asm__ volatile("fmadd.d %0, %1, %2, %3" : "=f" (result) : "f" (x), "f" (y), "f" (z));
 	return result;
 }
 #endif
@@ -222,7 +228,10 @@ __declare_riscv_macro(float)
 fmaxf (float x, float y)
 {
 	float result;
-	__asm__("fmax.s\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
+        if (issignaling(x) || issignaling(y))
+            return x + y;
+
+	__asm__ volatile("fmax.s\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
 	return result;
 }
 
@@ -230,7 +239,10 @@ __declare_riscv_macro(float)
 fminf (float x, float y)
 {
 	float result;
-	__asm__("fmin.s\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
+        if (issignaling(x) || issignaling(y))
+            return x + y;
+
+	__asm__ volatile("fmin.s\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
 	return result;
 }
 
@@ -277,10 +289,10 @@ sqrtf (float x)
 {
 	float result;
 #ifdef _WANT_MATH_ERRNO
-        if (x < 0)
+        if (isless(x, 0.0f))
             errno = EDOM;
 #endif
-	__asm__("fsqrt.s %0, %1" : "=f" (result) : "f" (x));
+	__asm__ volatile("fsqrt.s %0, %1" : "=f" (result) : "f" (x));
 	return result;
 }
 
@@ -290,15 +302,16 @@ __declare_riscv_macro(float)
 fmaf (float x, float y, float z)
 {
 	float result;
-	__asm__("fmadd.s %0, %1, %2, %3" : "=f" (result) : "f" (x), "f" (y), "f" (z));
+	__asm__ volatile("fmadd.s %0, %1, %2, %3" : "=f" (result) : "f" (x), "f" (y), "f" (z));
 	return result;
 }
 #endif
 
 #endif /* __riscv_flen >= 32 */
 
-#undef declare_riscv_macro
+#undef __declare_riscv_macro
+#undef __declare_riscv_mcaro_fclass
 
-#endif /* defined(declare_riscv_macro) */
+#endif /* __riscv_flen */
 
 #endif /* _MACHINE_MATH_H_ */

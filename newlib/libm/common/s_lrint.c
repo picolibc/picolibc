@@ -60,14 +60,11 @@ ANSI C, POSIX
  */
 
 #include "fdlibm.h"
+#include <limits.h>
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 static const double
-#else
-static double 
-#endif
 
 /* Adding a double, x, to 2^52 will cause the result to be rounded based on
    the fractional part of x, according to the implementation's current rounding
@@ -78,12 +75,7 @@ TWO52[2]={
  -4.50359962737049600000e+15, /* 0xC3300000, 0x00000000 */
 };
 
-#ifdef __STDC__
-	long int lrint(double x)
-#else
-	long int lrint(x)
-	double x;
-#endif
+long int lrint(double x)
 {
   __int32_t i0,j0,sx;
   __uint32_t i1;
@@ -103,26 +95,19 @@ TWO52[2]={
   if(j0 < 20)
     {
       /* j0 in [-1023,19] */
-      if(j0 < -1)
-        return 0;
+      /* shift amt in [0,19] */
+      w = TWO52[sx] + x;
+      t = w - TWO52[sx];
+      GET_HIGH_WORD(i0, t);
+      /* After round:  j0 in [0,20] */
+      j0 = ((i0 & 0x7ff00000) >> 20) - 1023;
+      i0 &= 0x000fffff;
+      i0 |= 0x00100000;
+      /* shift amt in [20,0] */
+      if (j0 < 0)
+        result = 0;
       else
-        {
-          /* j0 in [0,19] */
-	  /* shift amt in [0,19] */
-          w = TWO52[sx] + x;
-          t = w - TWO52[sx];
-          GET_HIGH_WORD(i0, t);
-          /* Detect the all-zeros representation of plus and
-             minus zero, which fails the calculation below. */
-          if ((i0 & ~(1L << 31)) == 0)
-              return 0;
-          /* After round:  j0 in [0,20] */
-          j0 = ((i0 & 0x7ff00000) >> 20) - 1023;
-          i0 &= 0x000fffff;
-          i0 |= 0x00100000;
-	  /* shift amt in [20,0] */
-          result = i0 >> (20 - j0);
-        }
+        result = i0 >> (20 - j0);
     }
   else if (j0 < (int)(8 * sizeof (long int)) - 1)
     {
@@ -136,10 +121,18 @@ TWO52[2]={
                    ((long int) i1 << (j0 - 52));
       else
         {
-	  /* 32bit return: j0 in [20,30] */
-	  /* 64bit return: j0 in [20,51] */
-          w = TWO52[sx] + x;
-          t = w - TWO52[sx];
+          if (sizeof (long) == 4 && x > LONG_MAX) {
+            t = nearbyint(x);
+            if (t == LONG_MAX)
+              __math_set_inexact();
+            else
+              __math_set_invalid();
+          } else {
+            /* 32bit return: j0 in [20,30] */
+            /* 64bit return: j0 in [20,51] */
+            w = TWO52[sx] + x;
+            t = w - TWO52[sx];
+          }
           EXTRACT_WORDS (i0, i1, t);
           j0 = ((i0 & 0x7ff00000) >> 20) - 1023;
           i0 &= 0x000fffff;
@@ -157,9 +150,21 @@ TWO52[2]={
     }
   else
     {
+      if (sizeof (long) == 4 && (double) LONG_MIN - 1.0 < x && x < (double) LONG_MIN) {
+        if (nearbyint(x) == LONG_MIN)
+          __math_set_inexact();
+        else
+          __math_set_invalid();
+        return LONG_MIN;
+      }
+      else if (x != LONG_MIN)
+      {
+        __math_set_invalid();
+        return sx ? LONG_MIN : LONG_MAX;
+      }
       return (long int) x;
     }
-  
+
   return sx ? -result : result;
 }
 

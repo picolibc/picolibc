@@ -42,11 +42,29 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdarg.h>
+#include <stddef.h>
 
-#ifndef TINY_STDIO
+#ifndef __PICOLIBC__
+# define _WANT_IO_C99_FORMATS
+# define _WANT_IO_LONG_LONG
+# define _WANT_IO_POS_ARGS
+# define printf_float(x) (x)
+#elif defined(TINY_STDIO)
+# ifdef PICOLIBC_INTEGER_PRINTF_SCANF
+#  ifndef _WANT_IO_POS_ARGS
+#   define NO_POS_ARGS
+#  endif
+# endif
+#else
 #define printf_float(x) ((double) (x))
 
+#ifndef _WANT_IO_POS_ARGS
+#define NO_POS_ARGS
+#endif
+
 #ifdef _NANO_FORMATTED_IO
+
 #ifndef NO_FLOATING_POINT
 extern int _printf_float();
 extern int _scanf_float();
@@ -112,6 +130,16 @@ main(void)
 	}
 #endif
 
+#ifndef NO_POS_ARGS
+        x = y = 0;
+        int r = sscanf("3 4", "%2$d %1$d", &x, &y);
+        if (x != 4 || y != 3 || r != 2) {
+            printf("pos: wanted %d %d (ret %d) got %d %d (ret %d)", 4, 3, 2, x, y, r);
+            errors++;
+            fflush(stdout);
+        }
+#endif
+
 	/*
 	 * test snprintf and vsnprintf to make sure they don't
 	 * overwrite the specified buffer length (even if that is
@@ -135,6 +163,9 @@ main(void)
 				errors++;
 			}
 			if (y > 0 && strncmp(tbuf, "123", y - 1) != 0) {
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
 				strncpy(buf, "123", y - 1);
 				buf[y-1] = '\0';
 				printf("%s: returned buffer want %s got %s\n", name, buf, tbuf);
@@ -195,12 +226,7 @@ main(void)
 #if (defined(TINY_STDIO) && !defined(_IO_FLOAT_EXACT))
 #define ERROR_MAX 1e-6
 #else
-#if (!defined(TINY_STDIO) && defined(_WANT_IO_LONG_DOUBLE))
-/* __ldtoa is really broken */
-#define ERROR_MAX 1e-5
-#else
 #define ERROR_MAX 0
-#endif
 #endif
 #else
 #define float_type double

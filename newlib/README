@@ -1,4 +1,4 @@
-                        README for newlib-4.1.0 release
+                        README for newlib-4.2.0 release
            (mostly cribbed from the README in the gdb-4.13 release)
 
 This is `newlib', a simple ANSI C library, math library, and collection
@@ -20,8 +20,8 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 Unpacking and Installation -- quick overview
 ==========================
 
-When you unpack the newlib-4.1.0.tar.gz file, you'll find a directory
-called `newlib-4.1.0', which contains:
+When you unpack the newlib-4.2.0.tar.gz file, you'll find a directory
+called `newlib-4.2.0', which contains:
 
 COPYING          config/          install-sh*      mpw-configure
 COPYING.LIB      config-ml.in     libgloss/        mpw-install
@@ -97,13 +97,13 @@ directory.  If the path to `configure' would be the same as the
 argument to `--srcdir', you can leave out the `--srcdir' option; it
 will be assumed.)
 
-   For example, with version 4.1.0, you can build NEWLIB in a separate
+   For example, with version 4.2.0, you can build NEWLIB in a separate
 directory for a Sun 4 cross m68k-aout environment like this:
 
-     cd newlib-4.1.0
+     cd newlib-4.2.0
      mkdir ../newlib-m68k-aout
      cd ../newlib-m68k-aout
-     ../newlib-4.1.0/configure --host=sun4 --target=m68k-aout
+     ../newlib-4.2.0/configure --host=sun4 --target=m68k-aout
      make
 
    When `configure' builds a configuration using a remote source
@@ -119,14 +119,17 @@ called `configure' (or one of its subdirectories).
 
    The `Makefile' that `configure' generates in each source directory
 also runs recursively.  If you type `make' in a source directory such
-as `newlib-4.1.0' (or in a separate configured directory configured with
-`--srcdir=PATH/newlib-4.1.0'), you will build all the required libraries.
+as `newlib-4.2.0' (or in a separate configured directory configured with
+`--srcdir=PATH/newlib-4.2.0'), you will build all the required libraries.
 
    When you have multiple hosts or targets configured in separate
 directories, you can run `make' on them in parallel (for example, if
 they are NFS-mounted on each of the hosts); they will not interfere
 with each other.
 
+   By default, the execution of build rules in `make' is less verbose.
+To disable, run `make V=1'; or use the `--disable-silent-rules’ option
+of `./configure'.
 
 Specifying names for hosts and targets
 ======================================
@@ -352,6 +355,16 @@ One feature can be enabled by specifying `--enable-FEATURE=yes' or
      64-bit integer on most systems.
      Disabled by default.
 
+`--enable-newlib-use-gdtoa'
+     Use gdtoa rather than legacy ldtoa.  gdtoa privides more accurate
+     output and faster conversion than legacy ldtoa, while it requires
+     more heap memory.  gdtoa sometimes requires 16KB heap memory, so
+     if the platform does not have enough heap memory, consider disabling
+     this option. Legacy ldtoa also use heap, however, only 1KB memory
+     is malloc'ed.  In addition, if malloc fails, it still works, with
+     less conversion accuracy.
+     Enabled by default.
+
 `--enable-multilib'
      Build many library versions.
      Enabled by default.
@@ -495,51 +508,17 @@ need to add the other targets you're testing to the case statement.
 Now type make check-target-newlib in the top-level build directory to
 run the testsuite.
 
-Shared newlib
-=============
-
-newlib uses libtool when it is being compiled natively (with
---target=i[34567]86-pc-linux-gnu) on an i[34567]86-pc-linux-gnu
-host. This allows newlib to be compiled as a shared library.
-
-To configure newlib, do the following from your build directory:
-
-$(source_dir)/src/configure --with-newlib --prefix=$(install_dir)
-
-configure will recognize that host == target ==
-i[34567]86-pc-linux-gnu, so it will tell newlib to compile itself using
-libtool. By default, libtool will build shared and static versions of
-newlib.
-
-To compile a program against shared newlib, do the following (where
-target_install_dir = $(install_dir)/i[34567]86-pc-linux-gnu):
-
-gcc -nostdlib $(target_install_dir)/lib/crt0.o progname.c -I $(target_install_dir)/include -L $(target_install_dir)/lib -lc -lm -lgcc
-
-To run the program, make sure that $(target_install_dir)/lib is listed
-in the LD_LIBRARY_PATH environment variable.
-
-To create a static binary linked against newlib, do the following:
-
-gcc -nostdlib -static $(target_install_dir)/lib/crt0.o progname.c -I $(target_install_dir)/include -L $(target_install_dir)/lib -lc -lm
-
-libtool can be instructed to produce only static libraries. To build
-newlib as a static library only, do the following from your build
-directory:
-
-$(source_dir)/src/configure --with-newlib --prefix=$(install_dir) --disable-shared
-
 Regenerating Configuration Files
 ================================
 
-At times you will need to make changes to configure.in and Makefile.am files.
+At times you will need to make changes to configure.ac and Makefile.am files.
 This will mean that configure and Makefile.in files will need to be
 regenerated.
 
 At the top level of newlib is the file: acinclude.m4.  This file contains
-the definition of the NEWLIB_CONFIGURE macro which is used by all configure.in
+the definition of the NEWLIB_CONFIGURE macro which is used by all configure.ac
 files in newlib.  You will notice that each directory in newlib containing
-a configure.in file also contains an aclocal.m4 file.  This file is
+a configure.ac file also contains an aclocal.m4 file.  This file is
 generated by issuing: aclocal -I${relative_path_to_toplevel_newlib_dir}
 -I${relative_path_to_toplevel_src_dir}
 The first relative directory is to access acinclude.m4.  The second relative
@@ -553,7 +532,7 @@ Note that if the top level acinclude.m4 is altered, every aclocal.m4 file
 in newlib should be regenerated.
 
 If the aclocal.m4 file is regenerated due to a change in acinclude.m4 or
-if a configure.in file is modified, the corresponding configure file in the 
+if a configure.ac file is modified, the corresponding configure file in the 
 directory must be regenerated using autoconf.  No parameters are necessary.
 In the previous example, we would issue:
 
@@ -563,48 +542,46 @@ from the newlib/libc/machine/arm directory.
 
 If you have regenerated a configure file or if you have modified a Makefile.am
 file, you will need to regenerate the appropriate Makefile.in file(s).
-For newlib, automake is a bit trickier.  First of all, all Makefile.in
-files in newlib (and libgloss) are generated using the --cygnus option
-of automake.  
+For newlib, automake is a bit trickier.
 
 Makefile.in files are generated from the nearest directory up the chain
-which contains a configure.in file.  In most cases, this is the same
-directory containing configure.in, but there are exceptions.
+which contains a configure.ac file.  In most cases, this is the same
+directory containing configure.ac, but there are exceptions.
 For example, the newlib/libc directory has a number of
-subdirectories that do not contain their own configure.in files (e.g. stdio).
+subdirectories that do not contain their own configure.ac files (e.g. stdio).
 For these directories, you must issue the automake command from newlib/libc
-which is the nearest parent directory that contains a configure.in.
+which is the nearest parent directory that contains a configure.ac.
 When you issue the automake command, you specify the subdirectory for
 the Makefile.in you are regenerating.  For example:
 
-   automake --cygnus stdio/Makefile stdlib/Makefile
+   automake stdio/Makefile stdlib/Makefile
 
 Note how multiple Makefile.in files can be created in the same step.  You
 would not specify machine/Makefile or sys/Makefile in the previous example
-because both of these subdirectories contain their own configure.in files.
+because both of these subdirectories contain their own configure.ac files.
 One would change to each of these subdirectories and in turn issue:
 
-   automake --cygnus Makefile
+   automake Makefile
 
 Let's say you create a new machine directory XXXX off of newlib/libc/machine.
-After creating a new configure.in and Makefile.am file, you would issue:
+After creating a new configure.ac and Makefile.am file, you would issue:
 
    aclocal -I ../../..
    autoconf
-   automake --cygnus Makefile
+   automake Makefile
 
 from newlib/libc/machine/XXXX
 
 It is strongly advised that you use an adequate version of autotools.
-For this latest release, the following were used: autoconf 2.69, aclocal 1.13.4, and 
-automake 1.13.4.
+For this latest release, the following were used: autoconf 2.69, aclocal 1.15.1,
+and automake 1.15.1.
 
 Reporting Bugs
 ==============
 
 The correct address for reporting bugs found in NEWLIB is
 "newlib@sourceware.org".  Please email all bug reports to that
-address.  Please include the NEWLIB version number (e.g., newlib-4.1.0),
+address.  Please include the NEWLIB version number (e.g., newlib-4.2.0),
 and how you configured it (e.g., "sun4 host and m68k-aout target").
 Since NEWLIB supports many different configurations, it is important
 that you be precise about this.

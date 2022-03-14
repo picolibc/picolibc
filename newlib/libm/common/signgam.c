@@ -35,4 +35,10 @@
 
 #include <math.h>
 
-NEWLIB_THREAD_LOCAL int signgam;
+#if defined(_HAVE_ALIAS_ATTRIBUTE) && defined(_HAVE_WEAK_ATTRIBUTE)
+int __signgam;
+
+extern __typeof(__signgam) signgam __attribute__ ((__weak__, __alias__ ("__signgam")));
+#else
+int signgam;
+#endif

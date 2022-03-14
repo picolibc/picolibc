@@ -37,6 +37,7 @@ DIR="$(dirname "$0")"
 meson setup \
         --buildtype debug \
         -Dtls-model=global-dynamic \
+	-Derrno-function=auto \
         -Dmultilib=false \
         -Dpicolib=false \
 	-Dpicocrt=false \

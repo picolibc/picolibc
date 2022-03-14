@@ -17,8 +17,10 @@ long
 _jrand48_r (struct _rand48 *r,
        unsigned short xseed[3])
 {
+  int32_t i;
   __dorand48(r, xseed);
-  return ((long) xseed[2] << 16) + (long) xseed[1];
+  i = (int32_t) ((uint32_t) (xseed[2]) << 16 | (uint32_t) (xseed[1]));
+  return i;
 }
 
 #ifndef _REENT_ONLY

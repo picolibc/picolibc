@@ -1,0 +1,40 @@
+    needs: cache-maker
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        meson_flags: [
+          "",
+
+          # Math configurations
+          "-Dnewlib-obsolete-math=false",
+          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
+          "-Dnewlib-obsolete-math-float=true -Dnewlib-obsolete-math-double=true",
+          "-Dnewlib-obsolete-math=true",
+          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
+
+          # Tinystdio configurations
+          "-Dio-float-exact=false",
+          "-Dio-long-long=true",
+          "-Dformat-default=integer",
+          "-Dformat-default=float",
+
+          # Malloc configurations
+          "-Dnewlib-nano-malloc=false",
+
+          # Original stdio configurations
+          "-Dtinystdio=false -Dnewlib-io-float=false",
+          "-Dtinystdio=false -Dnewlib-io-float=false -Dio-long-long=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
+
+          # Locale configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true",
+
+          # Iconv configurations
+          "-Dnewlib-iconv-external-ccs=true",
+
+          # Multithread disabled
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
+        ]

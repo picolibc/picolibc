@@ -31,7 +31,7 @@ sqrtf (float x)
 {
   float result;
 #ifdef _WANT_MATH_ERRNO
-  if (x < 0)
+  if (isless(x, 0.0f))
       return __math_invalidf(x);
 #endif
   __asm__("fsqrt\t%s0, %s1" : "=w" (result) : "w" (x));

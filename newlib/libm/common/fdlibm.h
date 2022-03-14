@@ -165,11 +165,6 @@
 
 #define X_TLOSS		1.41484755040568800000e+16 
 
-/* Functions that are not documented, and are not in <math.h>.  */
-
-extern double scalb (double, double);
-extern double significand (double);
-
 extern __int32_t __rem_pio2 (double,double*);
 
 /* fdlibm kernel function */
@@ -177,10 +172,6 @@ extern double __kernel_sin (double,double,int);
 extern double __kernel_cos (double,double);
 extern double __kernel_tan (double,double,int);
 extern int    __kernel_rem_pio2 (double*,double*,int,int,int,const __int32_t*);
-
-/* Undocumented float functions.  */
-extern float scalbf (float, float);
-extern float significandf (float);
 
 extern __int32_t __rem_pio2f (float,float*);
 

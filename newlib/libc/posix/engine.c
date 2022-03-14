@@ -363,11 +363,6 @@ dissect(struct match *m,
 	char *ssp;		/* start of string matched by subsubRE */
 	char *sep;		/* end of string matched by subsubRE */
 	char *oldssp;		/* previous ssp */
-#if __GNUC_PREREQ (4, 6)
-/* dp is only used for assertion testing which, for some reason, is not
-   recognized as usage. */
-#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-#endif
 	char *dp;
 
 	AT("diss", start, stop, startst, stopst);
@@ -428,6 +423,7 @@ dissect(struct match *m,
 			/* did innards match? */
 			if (slow(m, sp, rest, ssub, esub) != NULL) {
 				dp = dissect(m, sp, rest, ssub, esub);
+                                (void) dp;
 				assert(dp == rest);
 			} else		/* no */
 				assert(sp == rest);
@@ -466,6 +462,7 @@ dissect(struct match *m,
 			assert(sep == rest);	/* must exhaust substring */
 			assert(slow(m, ssp, sep, ssub, esub) == rest);
 			dp = dissect(m, ssp, sep, ssub, esub);
+                        (void) dp;
 			assert(dp == sep);
 			sp = rest;
 			break;
@@ -501,6 +498,7 @@ dissect(struct match *m,
 					assert(OP(m->g->strip[esub]) == O_CH);
 			}
 			dp = dissect(m, sp, rest, ssub, esub);
+                        (void) dp;
 			assert(dp == rest);
 			sp = rest;
 			break;

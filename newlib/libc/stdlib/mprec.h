@@ -26,7 +26,7 @@
 	dmg@research.att.com or research!dmg
  */
 
-#include <ieeefp.h>
+#include <machine/ieeefp.h>
 #include <math.h>
 #include <float.h>
 #include <errno.h>

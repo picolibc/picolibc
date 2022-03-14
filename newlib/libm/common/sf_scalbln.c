@@ -21,49 +21,41 @@ static const float
 static float
 #endif
 two25   =  3.355443200e+07,	/* 0x4c000000 */
-twom25  =  2.9802322388e-08,	/* 0x33000000 */
-huge   = 1.0e+30,
-tiny   = 1.0e-30;
+twom25  =  2.9802322388e-08;	/* 0x33000000 */
 
-#ifdef __STDC__
-	float scalblnf (float x, long int n)
-#else
-	float scalblnf (x,n)
-	float x; long int n;
-#endif
+float scalblnf (float x, long int n)
 {
-	__int32_t k,ix;
+	__int32_t ix;
+        uint32_t hx;
+        long int k;
+
 	GET_FLOAT_WORD(ix,x);
-        k = (ix&0x7f800000)>>23;		/* extract exponent */
+	hx = ix&0x7fffffff;
+        k = hx>>23;		                /* extract exponent */
         if (k==0) {				/* 0 or subnormal x */
-            if ((ix&0x7fffffff)==0) return x; /* +-0 */
+            if (hx == 0) return x;              /* +-0 */
 	    x *= two25;
 	    GET_FLOAT_WORD(ix,x);
 	    k = ((ix&0x7f800000)>>23) - 25;
+            if (n< -50000)
+                return __math_uflowf(ix<0); 	/*underflow*/
 	    }
         if (k==0xff) return x+x;		/* NaN or Inf */
         k = k+n;
         if (n> 50000 || k >  0xfe)
-	  return huge*copysignf(huge,x); /* overflow  */
-	if (n< -50000)
-	  return tiny*copysignf(tiny,x);	/*underflow*/
+            return __math_oflowf(ix < 0);       /* overflow  */
         if (k > 0) 				/* normal result */
 	    {SET_FLOAT_WORD(x,(ix&0x807fffff)|(k<<23)); return x;}
         if (k <= -25)
-	    return tiny*copysignf(tiny,x);	/*underflow*/
+	    return __math_uflowf(ix < 0);	/*underflow*/
         k += 25;				/* subnormal result */
 	SET_FLOAT_WORD(x,(ix&0x807fffff)|(k<<23));
-        return x*twom25;
+        return check_uflowf(x*twom25);
 }
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
-	double scalbln (double x, long int n)
-#else
-	double scalbln (x,n)
-	double x; long int n;
-#endif
+double scalbln (double x, long int n)
 {
 	return (double) scalblnf((float) x, n);
 }

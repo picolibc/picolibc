@@ -46,6 +46,7 @@ dsrcs_common = [
   's_expm1.c',
   's_ilogb.c',
   's_infinity.c',
+  's_iseqsig.c',
   's_isinf.c',
   's_isinfd.c',
   's_isnan.c',
@@ -63,6 +64,7 @@ dsrcs_common = [
   's_fmax.c',
   's_fmin.c',
   's_fpclassify.c',
+  's_getpayload.c',
   's_lrint.c',
   's_llrint.c',
   's_lround.c',
@@ -102,8 +104,10 @@ fsrcs_common = [
   'sf_cbrt.c',
   'sf_exp10.c',
   'sf_expm1.c',
+  'sf_getpayload.c',
   'sf_ilogb.c',
   'sf_infinity.c',
+  'sf_iseqsig.c',
   'sf_isinf.c',
   'sf_isinff.c',
   'sf_isnan.c',
@@ -149,15 +153,20 @@ fsrcs_common = [
   'math_errf_divzerof.c',
   'math_errf_invalidf.c',
   'math_errf_check_oflowf.c',
+  'math_errf_check_uflowf.c',
 ]
 
 # These have full implementations
 lsrc_full = [
   'copysignl.c',
+  'frexpl.c',
   'isinfl.c',
   'isnanl.c',
+  'math_errl_invalidl.c',
+  'math_errl_with_errnol.c',
   'nanl.c',
   'sl_finite.c',
+  'sl_iseqsig.c',
   'sl_issignaling.c',
   'sqrtl.c',
   ]

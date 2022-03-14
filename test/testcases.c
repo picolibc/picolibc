@@ -17,9 +17,10 @@
 
 */
 
-#ifndef _PICOLIBC__
+#ifndef __PICOLIBC__
 # define _WANT_IO_C99_FORMATS
 # define _WANT_IO_LONG_LONG
+# define _WANT_IO_POS_ARGS
 #elif defined(TINY_STDIO)
 # ifdef PICOLIBC_FLOAT_PRINTF_SCANF
 #  define LOW_FLOAT
@@ -29,6 +30,9 @@
 #  ifndef _WANT_IO_LONG_LONG
 #   define NO_LONGLONG
 #  endif
+#  ifndef _WANT_IO_POS_ARGS
+#   define NO_POS_ARGS
+#  endif
 # endif
 #else
 # ifdef NO_FLOATING_POINT
@@ -36,6 +40,9 @@
 # endif
 # ifndef _WANT_IO_LONG_LONG
 #  define NO_LONGLONG
+# endif
+# ifndef _WANT_IO_POS_ARGS
+#  define NO_POS_ARGS
 # endif
 # define NORMALIZED_A
 #endif
@@ -106,8 +113,24 @@
     /* 51: anti-test */
     /* 52: anti-test */
     /* 53: excluded for C */
-//    result |= test(__LINE__, "Hot Pocket", "%1$s %2$s", "Hot", "Pocket");
-//    result |= test(__LINE__, "12.0 Hot Pockets", "%1$.1f %2$s %3$ss", 12.0, "Hot", "Pocket");
+#if !defined(NO_POS_ARGS)
+    result |= test(__LINE__, "Hot Pocket", "%1$s %2$s", "Hot", "Pocket");
+    result |= test(__LINE__, "Pocket Hot", "%2$s %1$s", "Hot", "Pocket");
+    result |= test(__LINE__, "0002   1 hi", "%2$04d %1$*3$d %4$s", 1, 2, 3, "hi");
+#ifndef NO_FLOAT
+    result |= test(__LINE__, "12.0 Hot Pockets", "%1$.1f %2$s %3$ss", printf_float(12.0), "Hot", "Pocket");
+    result |= test(__LINE__, "12.0 Hot Pockets", "%1$.*4$f %2$s %3$ss", printf_float(12.0), "Hot", "Pocket", 1);
+    result |= test(__LINE__, " 12.0 Hot Pockets", "%1$*5$.*4$f %2$s %3$ss", printf_float(12.0), "Hot", "Pocket", 1, 5);
+    result |= test(__LINE__, " 12.0 Hot Pockets 5", "%1$5.*4$f %2$s %3$ss %5$d", printf_float(12.0), "Hot", "Pocket", 1, 5);
+#if !defined(TINY_STDIO) || defined(_IO_FLOAT_EXACT)
+    result |= test(__LINE__,
+                   "   12345  1234    11145401322     321.765400   3.217654e+02   5    test-string",
+                   "%1$*5$d %2$*6$hi %3$*7$lo %4$*8$f %9$*12$e %10$*13$g %11$*14$s",
+                   12345, 1234, 1234567890, printf_float(321.7654), 8, 5, 14, 14,
+                   printf_float(321.7654), printf_float(5.0000001), "test-string", 14, 3, 14);
+#endif
+#endif
+#endif
     /* 58: anti-test */
 #ifdef TINY_STDIO
     result |= test(__LINE__, "%(foo", "%(foo");
@@ -116,6 +139,16 @@
 #ifndef NO_FLOAT
     result |= test(__LINE__, "      3.14", "%*.*f", 10, 2, 3.14159265);
     result |= test(__LINE__, "3.14      ", "%-*.*f", 10, 2, 3.14159265);
+# if !(defined(TINY_STDIO) && !defined(_IO_FLOAT_EXACT))
+#  ifndef LOW_FLOAT
+#   ifdef TINY_STDIO
+#    define SQRT2_60 "1414213562373095000000000000000000000000000000000000000000000.000"
+#   else
+#    define SQRT2_60 "1414213562373095053224405813183213153460812619236586568024064.000"
+#   endif
+    result |= test(__LINE__, SQRT2_60, "%.3f", 1.4142135623730950e60);
+#  endif
+# endif
 #endif
     /* 64: anti-test */
     /* 65: anti-test */
@@ -143,6 +176,9 @@
 #endif
 #ifndef NO_LONGLONG
     result |= test(__LINE__, "    +100", "%+8lld", 100LL);
+#if defined(TINY_STDIO) || !defined(__PICOLIBC__)
+    result |= test(__LINE__, "    +100", "%+8Ld", 100LL);
+#endif
     result |= test(__LINE__, "+00000100", "%+.8lld", 100LL);
     result |= test(__LINE__, " +00000100", "%+10.8lld", 100LL);
 #ifdef TINY_STDIO
@@ -531,6 +567,10 @@
     result |= test(__LINE__, "0x1p+0", "%a", 0x1p+0);
     result |= test(__LINE__, "0x0p+0", "%a", 0.0);
     result |= test(__LINE__, "-0x0p+0", "%a", -0.0);
+    result |= test(__LINE__, "0x1.9p+4", "%.1a", 0x1.89p+4);
+    result |= test(__LINE__, "0x1.8p+4", "%.1a", 0x1.88p+4);
+    result |= test(__LINE__, "0x1.8p+4", "%.1a", 0x1.78p+4);
+    result |= test(__LINE__, "0x1.7p+4", "%.1a", 0x1.77p+4);
     result |= test(__LINE__, "0x1.fffffep+126", "%a", (double) 0x1.fffffep+126f);
     result |= test(__LINE__, "0x1.234564p-126", "%a", (double) 0x1.234564p-126f);
     result |= test(__LINE__, "0x1.234566p-126", "%a", (double) 0x1.234566p-126f);

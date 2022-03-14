@@ -677,6 +677,8 @@ test_math (int vector)
   test_modff(vector);
   test_pow_vec(vector);
   test_powf_vec(vector);
+  test_scalb(vector);
+  test_scalbf(vector);
   test_scalbn(vector);
   test_scalbnf(vector);
   test_sin(vector);

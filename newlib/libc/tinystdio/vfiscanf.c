@@ -38,7 +38,7 @@
 #include "vfscanf.c"
 
 #ifdef FORMAT_DEFAULT_INTEGER
-#ifdef HAVE_ALIAS_ATTRIBUTE
+#ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(vfscanf, __i_vfscanf);
 #else
 int __i_vfscanf (FILE * stream, const char *fmt, va_list ap) { return vfscanf(stream, fmt, ap); }

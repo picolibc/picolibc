@@ -37,8 +37,17 @@ nexttowardf (float x, long double y)
   uint32_t ux;
   uint32_t e;
 
-  if (isnan(x) || isnan(y))
-    return (long double) x + y;
+  /*
+   * We can't do this if y isn't nan as that might raise INEXACT doing
+   * long double -> float conversion, and we don't want to do this
+   * in long double for machines without long double HW as we won't
+   * get any exceptions in that case.
+   */
+  if (isnan(y))
+      return x + (issignaling(y) ? __builtin_nansf("") : (float) y);
+  if (isnan(x))
+      return x + x;
+
   if ((long double) x == y)
     return y;
   ux = asuint(x);
@@ -59,18 +68,12 @@ nexttowardf (float x, long double y)
   }
   e = ux & 0x7f800000;
   /* raise overflow if ux.value is infinite and x is finite */
-  if (e == 0x7f800000) {
-    volatile float force_eval;
-    force_eval = x + x;
-    (void) force_eval;
-  }
+  if (e == 0x7f800000)
+    return check_oflowf(opt_barrier_float(x+x));
   /* raise underflow if ux.value is subnormal or zero */
-  if (e == 0) {
-    volatile float force_eval;
-    force_eval = x*x + asfloat(ux)*asfloat(ux);
-    (void) force_eval;
-  }
-  return asfloat(ux);
+  if (e == 0)
+    force_eval_float(x*x + asfloat(ux)*asfloat(ux));
+  return check_uflowf(asfloat(ux));
 }
 
 #endif // _LDBL_EQ_DBL

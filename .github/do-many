@@ -1,0 +1,22 @@
+#!/bin/bash
+dir=`dirname $0`
+scripts=()
+configs=()
+dirs=()
+working=t
+while [ $working = t ]; do
+    if [ "$1" = "end" -o "$1" = "--" -o "$1" = "" ]; then
+	shift
+	working=f
+    else
+	scripts+=($1)
+	shift
+	configs+=($1)
+	shift
+	dirs+=($1)
+	shift
+    fi
+done
+for i in ${!scripts[@]}; do
+    "$dir"/"${scripts[$i]}" "${configs[$i]}" "${dirs[$i]}" "$@" || exit 1
+done

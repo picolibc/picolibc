@@ -181,7 +181,7 @@ ynf(int n, float x)
         return __math_divzerof(1);
 
     if (ix > 0x7f800000)
-        return x;
+        return x+x;
 
     if (hx < 0)
         return __math_invalidf(x);

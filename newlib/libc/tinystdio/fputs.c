@@ -42,7 +42,7 @@ fputs(const char *str, FILE *stream)
 		return EOF;
 
 	while ((c = *str++) != '\0')
-		if (stream->put(c, stream) != 0)
+		if (stream->put(c, stream) < 0)
 			rv = EOF;
 
 	return rv;

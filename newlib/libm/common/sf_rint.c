@@ -60,7 +60,8 @@ TWO23[2]={
 		if((i0&i)!=0) i0 = (i0&(~i))|((0x200000)>>j0);
 	    }
 	} else {
-	    if(!FLT_UWORD_IS_FINITE(ix)) return x+x; /* inf or NaN */
+	    if(!FLT_UWORD_IS_FINITE(ix))
+                return opt_barrier_float(x+x); /* inf or NaN */
 	    else
 	      return x;		/* x is integral */
 	}

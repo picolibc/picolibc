@@ -101,7 +101,7 @@ double x;
 	    return (double) ix;
 	}
 	else if (hx<0x7ff00000) return (hx>>20)-1023;	/* normal # */
-	else if (hx>0x7ff00000 || lx)  return x;	/* x==NaN */
+	else if (hx>0x7ff00000 || lx)  return x+x;	/* x==NaN */
 	else  return HUGE_VAL;	/* x==inf (+ or -) */
 }
 

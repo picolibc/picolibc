@@ -39,5 +39,5 @@
 int strfromd(char *restrict str, size_t n,
 	     const char *restrict format, double fp)
 {
-	return __d_snprintf(str, n, format, __printf_float(fp));
+    return __d_snprintf(str, n, format, fp);
 }

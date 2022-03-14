@@ -1,0 +1,4 @@
+      - name: Fortity source test
+        run: |
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} -Dfortify-source=2
+

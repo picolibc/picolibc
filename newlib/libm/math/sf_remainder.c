@@ -31,10 +31,8 @@ remainderf(float x, float p)
     hx &= 0x7fffffff;
 
     /* purge off exception values */
-    if (FLT_UWORD_IS_NAN(hx))
-        return x;
-    if (FLT_UWORD_IS_NAN(hp))
-        return p;
+    if (FLT_UWORD_IS_NAN(hx) || FLT_UWORD_IS_NAN(hp))
+        return x + p;
 
     if (isinf(x) || hp == 0)
         return __math_invalidf(x);

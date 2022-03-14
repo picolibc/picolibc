@@ -47,7 +47,7 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
-#if defined(HAVE_ALIAS_ATTRIBUTE)
+#if defined(_HAVE_ALIAS_ATTRIBUTE)
 #ifdef _LDBL_EQ_DBL
 extern long double hypotl(long double x, long double y)
     __attribute__((__alias__("hypot")));
@@ -85,10 +85,10 @@ hypot(double x, double y)
             __uint32_t low;
             w = a + b; /* for sNaN */
             GET_LOW_WORD(low, a);
-            if (((ha & 0xfffff) | low) == 0)
+            if (((ha & 0xfffff) | low) == 0 && !issignaling(b))
                 w = a;
             GET_LOW_WORD(low, b);
-            if (((hb ^ 0x7ff00000) | low) == 0)
+            if (((hb ^ 0x7ff00000) | low) == 0 && !issignaling(a))
                 w = b;
             return w;
         }

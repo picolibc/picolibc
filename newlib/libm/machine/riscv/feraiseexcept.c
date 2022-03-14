@@ -79,7 +79,7 @@ int feraiseexcept(int excepts)
    *
    */
 
-  return (excepts != 0);
+  return 0;
 }
 #else
 #include "../../fenv/feraiseexcept.c"

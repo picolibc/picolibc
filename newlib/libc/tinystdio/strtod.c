@@ -92,7 +92,7 @@ strtod (const char * nptr, char ** endptr)
 }
 
 #if defined(_HAVE_LONG_DOUBLE) && defined(_LDBL_EQ_DBL)
-#ifdef HAVE_ALIAS_ATTRIBUTE
+#ifdef _HAVE_ALIAS_ATTRIBUTE
 extern long double strtold(const char *, char **) __attribute__ ((__alias__ ("strtod")));
 #else
 long double

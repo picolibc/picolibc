@@ -64,7 +64,7 @@ int	 scandir(const char *, struct dirent ***,
 	    int (*)(const struct dirent *), int (*)(const struct dirent **,
 	    const struct dirent **));
 #endif
-#ifdef _COMPILING_NEWLIB
+#ifdef _LIBC
 void	 _seekdir(DIR *, long);
 #endif
 #if __MISC_VISIBLE || __XSI_VISIBLE

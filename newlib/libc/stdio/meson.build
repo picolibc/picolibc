@@ -33,9 +33,8 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 subdir('sys')
-install_headers(
-  'stdio.h'
-)
+install_headers('stdio.h',
+		install_dir: include_dir)
 
 general_srcs_stdio = [
   'clearerr.c',

@@ -62,7 +62,7 @@ typedef int32_t printf_float_int_t;
 #define DTOA_NAN   FTOA_NAN
 #define DTOA_CARRY FTOA_CARRY
 #define DTOA_MAX_DIG FTOA_MAX_DIG
-#define __dtoa_engine(x,dtoa,dig,dec) __ftoa_engine(x,dtoa,dig,dec)
+#define __dtoa_engine(x,dtoa,dig,f,dec) __ftoa_engine(x,dtoa,dig,f,dec)
 #include "ftoa_engine.h"
 
 #else
@@ -95,11 +95,15 @@ typedef int64_t printf_float_int_t;
 #define PRINTF_LONGLONG
 #endif
 
+#if ((PRINTF_LEVEL >= PRINTF_FLT) || defined(_WANT_IO_POS_ARGS))
+#define PRINTF_POSITIONAL
+#endif
+
 #ifdef PRINTF_LONGLONG
 typedef unsigned long long ultoa_unsigned_t;
 typedef long long ultoa_signed_t;
 #define SIZEOF_ULTOA __SIZEOF_LONG_LONG__
-#define arg_to_t(flags, _s_, _result_)                  \
+#define arg_to_t(ap, flags, _s_, _result_)              \
     if ((flags) & FL_LONG) {                            \
         if ((flags) & FL_REPD_TYPE)                     \
             (_result_) = va_arg(ap, _s_ long long);     \
@@ -118,7 +122,7 @@ typedef long long ultoa_signed_t;
 typedef unsigned long ultoa_unsigned_t;
 typedef long ultoa_signed_t;
 #define SIZEOF_ULTOA __SIZEOF_LONG__
-#define arg_to_t(flags, _s_, _result_)                  \
+#define arg_to_t(ap, flags, _s_, _result_)              \
     if ((flags) & FL_LONG) {                            \
         (_result_) = va_arg(ap, _s_ long);              \
     } else {                                            \
@@ -140,8 +144,8 @@ typedef long ultoa_signed_t;
 
 // At the call site the address of the result_var is taken (e.g. "&ap")
 // That way, it's clear that these macros *will* modify that variable
-#define arg_to_unsigned(flags, result_var) arg_to_t((flags), unsigned, (result_var))
-#define arg_to_signed(flags, result_var) arg_to_t((flags), signed, (result_var))
+#define arg_to_unsigned(ap, flags, result_var) arg_to_t(ap, flags, unsigned, result_var)
+#define arg_to_signed(ap, flags, result_var) arg_to_t(ap, flags, signed, result_var)
 
 #include "ultoa_invert.c"
 
@@ -171,12 +175,193 @@ typedef long ultoa_signed_t;
 #define FL_FLTEXP	0x4000
 #define	FL_FLTFIX	0x8000
 
-int vfprintf (FILE * stream, const char *fmt, va_list ap)
+#define CASE_CONVERT    ('a' - 'A')
+#define TOLOW(c)        ((c) | CASE_CONVERT)
+
+#ifdef PRINTF_POSITIONAL
+
+typedef struct {
+    va_list     ap;
+} my_va_list;
+
+/*
+ * Repeatedly scan the format string finding argument position values
+ * and types to slowly walk the argument vector until it points at the
+ * target_argno so that the outer printf code can then extract it.
+ */
+static void
+skip_to_arg(const char *fmt_orig, my_va_list *ap, int target_argno)
+{
+    unsigned char c;		/* holds a char from the format string */
+    uint16_t flags;
+    int current_argno = 1;
+    int argno;
+    int width;
+    const char *fmt = fmt_orig;
+
+    while (current_argno < target_argno) {
+        for (;;) {
+            c = *fmt++;
+            if (!c) return;
+            if (c == '%') {
+                c = *fmt++;
+                if (c != '%') break;
+            }
+        }
+        flags = 0;
+        width = 0;
+        argno = 0;
+
+        /*
+         * Scan the format string until we hit current_argno. This can
+         * either be a value, width or precision field.
+         */
+        do {
+	    if (flags < FL_WIDTH) {
+		switch (c) {
+		  case '0':
+		    continue;
+		  case '+':
+		    FALLTHROUGH;
+		  case ' ':
+		    continue;
+		  case '-':
+		    continue;
+		  case '#':
+		    continue;
+		}
+	    }
+
+	    if (flags < FL_LONG) {
+		if (c >= '0' && c <= '9') {
+		    c -= '0';
+                    width = 10 * width + c;
+                    flags |= FL_WIDTH;
+		    continue;
+		}
+                if (c == '$') {
+                    /*
+                     * If we've already seen the value position, any
+                     * other positions will be either width or
+                     * precisions. We can handle those in the same
+                     * fashion as they're both 'int' type
+                     */
+                    if (argno) {
+                        if (width == current_argno) {
+                            c = 'c';
+                            argno = width;
+                            break;
+                        }
+                    }
+                    else
+                        argno = width;
+                    width = 0;
+                    continue;
+                }
+
+		if (c == '*') {
+                    width = 0;
+		    continue;
+                }
+
+		if (c == '.') {
+                    width = 0;
+		    continue;
+                }
+	    }
+
+	    if (c == 'l') {
+#ifdef PRINTF_LONGLONG
+		if (flags & FL_LONG)
+		    flags |= FL_REPD_TYPE;
+#endif
+		flags |= FL_LONG;
+		continue;
+	    }
+
+	    if (c == 'h') {
+		if (flags & FL_SHORT)
+		    flags |= FL_REPD_TYPE;
+		flags |= FL_SHORT;
+		continue;
+	    }
+
+            /* alias for 'll' */
+            if (c == 'L') {
+#ifdef PRINTF_LONGLONG
+                flags |= FL_REPD_TYPE;
+#endif
+		flags |= FL_LONG;
+		continue;
+            }
+
+#ifdef _WANT_IO_C99_FORMATS
+
+#ifdef PRINTF_LONGLONG
+#define CHECK_LONGLONG(type) else if (sizeof(type) == sizeof(long long)) flags |= FL_LONG|FL_REPD_TYPE;
+#else
+#define CHECK_LONGLONG(type)
+#endif
+
+#define CHECK_INT_SIZE(letter, type)			\
+	    if (c == letter) {				\
+		if (sizeof(type) == sizeof(int))	\
+		    ;                                   \
+		else if (sizeof(type) == sizeof(long))	\
+		    flags |= FL_LONG;                   \
+                CHECK_LONGLONG(type)                    \
+		else if (sizeof(type) == sizeof(short))	\
+		    flags |= FL_SHORT;			\
+                continue;                               \
+	    }
+
+	    CHECK_INT_SIZE('j', intmax_t);
+	    CHECK_INT_SIZE('z', size_t);
+	    CHECK_INT_SIZE('t', ptrdiff_t);
+#endif
+	    break;
+	} while ( (c = *fmt++) != 0);
+        if (argno == 0)
+            break;
+        if (argno == current_argno) {
+            if ((TOLOW(c) >= 'e' && TOLOW(c) <= 'g')
+#ifdef _WANT_IO_C99_FORMATS
+                || TOLOW(c) == 'a'
+#endif
+                ) {
+                (void) PRINTF_FLOAT_ARG(ap->ap);
+            } else if (c == 'c') {
+                (void) va_arg (ap->ap, int);
+            } else if (c == 's') {
+                (void) va_arg (ap->ap, char *);
+            } else if (c == 'd' || c == 'i') {
+                ultoa_signed_t x_s;
+                arg_to_signed(ap->ap, flags, x_s);
+            } else {
+                ultoa_unsigned_t x;
+                arg_to_unsigned(ap->ap, flags, x);
+            }
+            ++current_argno;
+            fmt = fmt_orig;
+        }
+    }
+}
+#endif
+
+int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
 {
     unsigned char c;		/* holds a char from the format string */
     uint16_t flags;
     int width;
     int prec;
+#ifdef PRINTF_POSITIONAL
+    int argno;
+    my_va_list my_ap;
+    const char *fmt_orig = fmt;
+#define ap my_ap.ap
+#else
+#define ap ap_orig
+#endif
     union {
 	char __buf[PRINTF_BUF_SIZE];	/* size for -1 in octal, without '\0'	*/
 #if PRINTF_LEVEL >= PRINTF_FLT
@@ -196,6 +381,10 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
     if ((stream->flags & __SWR) == 0)
 	return EOF;
 
+#ifdef PRINTF_POSITIONAL
+    va_copy(ap, ap_orig);
+#endif
+
     for (;;) {
 
 	for (;;) {
@@ -211,6 +400,9 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	flags = 0;
 	width = 0;
 	prec = 0;
+#ifdef PRINTF_POSITIONAL
+        argno = 0;
+#endif
 
 	do {
 	    if (flags < FL_WIDTH) {
@@ -245,6 +437,15 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		    continue;
 		}
 		if (c == '*') {
+#ifdef PRINTF_POSITIONAL
+                    /*
+                     * Positional args must be used together, so wait
+                     * for the value to appear before dealing with
+                     * width and precision fields
+                     */
+                    if (argno)
+                        continue;
+#endif
 		    if (flags & FL_PREC) {
 			prec = va_arg(ap, int);
 		    } else {
@@ -263,6 +464,29 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		    flags |= FL_PREC;
 		    continue;
 		}
+#ifdef PRINTF_POSITIONAL
+                /* Check for positional args */
+                if (c == '$') {
+                    /* Check if we've already got the arg position and
+                     * are adding width or precision fields
+                     */
+                    if (argno) {
+                        va_end(ap);
+                        va_copy(ap, ap_orig);
+                        skip_to_arg(fmt_orig, &my_ap, (flags & FL_PREC) ? prec : width);
+                        if (flags & FL_PREC)
+                            prec = va_arg(ap, int);
+                        else
+                            width = va_arg(ap, int);
+                    } else {
+                        argno = width;
+                        flags = 0;
+                        width = 0;
+                        prec = 0;
+                    }
+                    continue;
+                }
+#endif
 	    }
 
 	    if (c == 'l') {
@@ -280,6 +504,15 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		flags |= FL_SHORT;
 		continue;
 	    }
+
+            /* alias for 'll' */
+            if (c == 'L') {
+#ifdef PRINTF_LONGLONG
+                flags |= FL_REPD_TYPE;
+#endif
+		flags |= FL_LONG;
+		continue;
+            }
 
 #ifdef _WANT_IO_C99_FORMATS
 
@@ -309,6 +542,15 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    break;
 	} while ( (c = *fmt++) != 0);
 
+#ifdef PRINTF_POSITIONAL
+        /* Set arg pointers for positional args */
+        if (argno) {
+            va_end(ap);
+            va_copy(ap, ap_orig);
+            skip_to_arg(fmt_orig, &my_ap, argno);
+        }
+#endif
+
 	/* This can happen only when prec is set via a '*'
 	 * specifier, in which case it works as if no precision
 	 * was specified. Set the precision to zero and clear the
@@ -325,8 +567,6 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 # error
 #endif
 
-#define CASE_CONVERT    ('a' - 'A')
-#define TOLOW(c)        ((c) | CASE_CONVERT)
 #define TOCASE(c)       ((c) - case_convert)
 
 	if ((TOLOW(c) >= 'e' && TOLOW(c) <= 'g')
@@ -401,7 +641,10 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
                     ultoa_signed_t      half = ((ultoa_signed_t) 1) << (bits - 1);
                     ultoa_signed_t      mask = ~((half << 1) - 1);
 
-                    s += half;
+                    /* round even */
+                    if ((s & ~mask) > half || ((s >> bits) & 1) != 0)
+                        s += half;
+                    /* special case rounding first digit */
                     if (s > (SIG_MASK << SIG_SHIFT))
                         _dtoa.digits[0]++;
                     s &= mask;
@@ -432,29 +675,29 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
             } else
 #endif /* _WANT_IO_C99_FORMATS */
             {
-                int ndecimal;	        /* digits after decimal (for 'f' format), 0 if no limit */
+                int ndecimal = 0;	        /* digits after decimal (for 'f' format) */
+                bool fmode = false;
 
                 if (!(flags & FL_PREC))
                     prec = 6;
                 if (c == 'e') {
                     ndigs = prec + 1;
-                    ndecimal = 0;
                     flags |= FL_FLTEXP;
                 } else if (c == 'f') {
                     ndigs = DTOA_MAX_DIG;
-                    ndecimal = prec + 1;
+                    ndecimal = prec;
                     flags |= FL_FLTFIX;
+                    fmode = true;
                 } else {
                     c += 'e' - 'g';
                     ndigs = prec;
                     if (ndigs < 1) ndigs = 1;
-                    ndecimal = 0;
                 }
 
                 if (ndigs > DTOA_MAX_DIG)
                     ndigs = DTOA_MAX_DIG;
 
-                ndigs = __dtoa_engine (fval, &_dtoa, ndigs, ndecimal);
+                ndigs = __dtoa_engine (fval, &_dtoa, ndigs, fmode, ndecimal);
                 exp = _dtoa.exp;
                 ndigs_exp = 2;
             }
@@ -723,7 +966,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
                 if (c == 'd' || c == 'i') {
                     ultoa_signed_t x_s;
 
-                    arg_to_signed(flags, x_s);
+                    arg_to_signed(ap, flags, x_s);
 
                     if (x_s < 0) {
                         x_s = -x_s;
@@ -761,7 +1004,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
                         continue;
                     }
 
-                    arg_to_unsigned(flags, x);
+                    arg_to_unsigned(ap, flags, x);
 
                     flags &= ~(FL_PLUS | FL_SPACE);
 
@@ -860,12 +1103,16 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
     } /* for (;;) */
 
   ret:
+#ifdef PRINTF_POSITIONAL
+    va_end(ap);
+#endif
     return stream_len;
 #undef my_putc
+#undef ap
 }
 
 #if defined(FORMAT_DEFAULT_DOUBLE) && !defined(vfprintf)
-#ifdef HAVE_ALIAS_ATTRIBUTE
+#ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(vfprintf, __d_vfprintf);
 #else
 int __d_vfprintf (FILE * stream, const char *fmt, va_list ap) { return vfprintf(stream, fmt, ap); }

@@ -86,5 +86,5 @@ main(void)
 		t++;
 	}
 	printf("success\n");
-	return 0;
+        exit(0);
 }

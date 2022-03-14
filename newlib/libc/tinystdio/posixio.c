@@ -80,7 +80,7 @@ __posix_putc(char c, FILE *f)
 	if (need_flush)
 		return __posix_flush(f);
 
-	return 0;
+	return (unsigned char) c;
 }
 
 int
@@ -106,7 +106,7 @@ __posix_getc(FILE *f)
 		if (pf->read_len <= 0) {
 			pf->read_len = 0;
 			__posix_unlock(f);
-			return EOF;
+			return _FDEV_EOF;
 		}
 	}
 

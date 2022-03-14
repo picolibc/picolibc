@@ -47,6 +47,10 @@
 # define SCANF_LONGLONG	(SCANF_FLOAT || defined(_WANT_IO_LONG_LONG))
 #endif
 
+#if defined(SCANF_FLOAT) || defined(_WANT_IO_POS_ARGS)
+#define SCANF_POSITIONAL
+#endif
+
 #ifdef SCANF_LONGLONG
 typedef unsigned long long uint_scanf_t;
 typedef long long int_scanf_t;
@@ -277,6 +281,29 @@ static int skip_spaces (FILE *stream, int *lenp)
     return i;
 }
 
+#ifdef SCANF_POSITIONAL
+
+typedef struct {
+    va_list     ap;
+} my_va_list;
+
+static void
+skip_to_arg(my_va_list *ap, int target_argno)
+{
+    int current_argno = 1;
+
+    /*
+     * Fortunately, all scanf args are pointers,
+     * and so are the same size as void *
+     */
+    while (current_argno < target_argno) {
+        (void) va_arg(ap->ap, void *);
+        current_argno++;
+    }
+}
+
+#endif
+
 /**
    Formatted input.  This function is the heart of the \b scanf family of
    functions.
@@ -410,12 +437,19 @@ static int skip_spaces (FILE *stream, int *lenp)
      -Wl,-u,vfscanf -lscanf_min -lm
      \endcode
 */
-int vfscanf (FILE * stream, const char *fmt, va_list ap)
+int vfscanf (FILE * stream, const char *fmt, va_list ap_orig)
 {
     unsigned char nconvs;
     unsigned char c;
     width_t width;
     void *addr;
+#ifdef SCANF_POSITIONAL
+    my_va_list my_ap;
+#define ap my_ap.ap
+    va_copy(ap, ap_orig);
+#else
+#define ap ap_orig
+#endif
     uint16_t flags;
     int i;
     int scanf_len = 0;
@@ -450,20 +484,33 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 		c = *fmt++;
 	    }
 
-	    width = 0;
-	    while ((c -= '0') < 10) {
-		flags |= FL_WIDTH;
-		width = width * 10 + c;
-		c = *fmt++;
-	    }
-	    c += '0';
-	    if (flags & FL_WIDTH) {
-		/* C99 says that width must be greater than zero.
-		   To simplify program do treat 0 as error in format.	*/
-		if (!width) break;
-	    } else {
-		width = ~0;
-	    }
+            for (;;) {
+                width = 0;
+                while ((c -= '0') < 10) {
+                    flags |= FL_WIDTH;
+                    width = width * 10 + c;
+                    c = *fmt++;
+                }
+                c += '0';
+                if (flags & FL_WIDTH) {
+#ifdef SCANF_POSITIONAL
+                    if (c == '$') {
+                        flags &= ~FL_WIDTH;
+                        va_end(ap);
+                        va_copy(ap, ap_orig);
+                        skip_to_arg(&my_ap, width);
+                        c = *fmt++;
+                        continue;
+                    }
+#endif
+                    /* C99 says that width must be greater than zero.
+                       To simplify program do treat 0 as error in format.	*/
+                    if (!width) break;
+                } else {
+                    width = ~0;
+                }
+                break;
+            }
 
 	    switch (c) {
 	      case 'h':
@@ -626,14 +673,21 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 	    if (!(flags & FL_STAR)) nconvs += 1;
 	} /* else */
     } /* while */
+#ifdef PRINTF_POSITIONAL
+    va_end(ap);
+#endif
     return nconvs;
 
   eof:
+#ifdef PRINTF_POSITIONAL
+    va_end(ap);
+#endif
+#undef ap
     return nconvs ? nconvs : EOF;
 }
 
 #if defined(FORMAT_DEFAULT_DOUBLE) && !defined(vfscanf)
-#ifdef HAVE_ALIAS_ATTRIBUTE
+#ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(vfscanf, __d_vfscanf);
 #else
 int __d_vfscanf (FILE * stream, const char *fmt, va_list ap) { return vfscanf(stream, fmt, ap); }

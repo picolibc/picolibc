@@ -41,11 +41,17 @@ option('have-alias-attribute', type: 'combo', choices: ['true', 'false', 'auto']
 option('have-format-attribute', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
        description: 'Compiler supports __format__ attribute')
 
+option('have-weak-attribute', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
+       description: 'Compiler supports __weak__ attribute')
+
 option('multilib', type: 'boolean', value: true,
        description: 'Enable multilib compile')
 
 option('multilib-list', type: 'array', value: [],
        description: 'List of multilib configurations to build for')
+
+option('build-type-subdir', type: 'string',
+       description: 'Build-type subdir. Also skips installing .specs file')
 
 option('picolib', type: 'boolean', value: true,
        description: 'Include pico lib bits')
@@ -96,6 +102,10 @@ option('io-long-long', type: 'boolean', value: false,
        description: 'enable long long type support in IO functions like printf/scanf')
 option('newlib-io-long-long', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
        description: 'enable long long type support in IO functions like printf/scanf')
+option('io-pos-args', type: 'boolean', value: false,
+       description: 'enable printf-family positional arg support (always enabled for tinystdio float)')
+option('newlib-io-pos-args', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
+       description: 'enable printf-family positional arg support (always enabled for tinystdio float)')
 
 #
 # Options applying only to tinystdio
@@ -124,8 +134,6 @@ option('newlib-global-stdio-streams', type: 'boolean', value: false,
        description: 'enable global stdio streams')
 option('newlib-io-float', type: 'boolean', value: false,
        description: 'enable printf/scanf family float support')
-option('newlib-io-pos-args', type: 'boolean', value: false,
-       description: 'enable printf-family positional arg support')
 option('newlib-io-long-double', type: 'boolean', value: false,
        description: 'enable long double type support in IO functions printf/scanf (newlib stdio only)')
 option('newlib-nano-formatted-io', type: 'boolean', value: false,
@@ -180,6 +188,10 @@ option('newlib-initfini-array', type: 'boolean', value: true,
        description: 'compiler supports INIT_ARRAY section types')
 option('newlib-register-fini', type: 'boolean', value: false,
        description: 'enable finalization function registration using atexit')
+option('fake-semihost', type: 'boolean', value: false,
+       description: 'create fake semihost library to link tests')
+option('crt-runtime-size', type: 'boolean', value: false,
+       description: 'compute crt memory space sizes at runtime')
 
 #
 # Malloc option
@@ -204,6 +216,9 @@ option('tls-model', type: 'combo', choices: ['global-dynamic', 'local-dynamic', 
        description: 'Set TLS model. No-op when thread-local-storage is false')
 option('newlib-global-errno', type: 'boolean', value: false,
        description: 'use global errno variable')
+option('errno-function', type: 'string',
+       value: 'false',
+       description: 'Use this function to compute errno address (default false, auto means autodetect)')
 
 #
 # Math options

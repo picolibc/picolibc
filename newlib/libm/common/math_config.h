@@ -306,6 +306,14 @@ issignaling_inline (double x)
 #define pick_double_except(expr,val)    (expr)
 #endif
 
+#ifdef PICOLIBC_LONG_DOUBLE_NOEXCEPT
+#define FORCE_LONG_DOUBLE       long double
+#define pick_long_double_except(expr,val)       (val)
+#else
+#define FORCE_LONG_DOUBLE       volatile long double
+#define pick_long_double_except(expr,val)       (expr)
+#endif
+
 static ALWAYS_INLINE float
 opt_barrier_float (float x)
 {
@@ -333,6 +341,31 @@ force_eval_double (double x)
   FORCE_DOUBLE y = x;
   (void) y;
 }
+
+#ifdef _HAVE_LONG_DOUBLE
+static ALWAYS_INLINE void
+force_eval_long_double (long double x)
+{
+    FORCE_LONG_DOUBLE y = x;
+    (void) y;
+}
+#endif
+
+/* Clang doesn't appear to suppor precise exceptions on
+ * many targets. We introduce barriers for that compiler
+ * to force evaluation order where needed
+ */
+#ifdef __clang__
+#define clang_barrier_double(x) opt_barrier_double(x)
+#define clang_barrier_float(x) opt_barrier_float(x)
+#define clang_force_double(x) force_eval_double(x)
+#define clang_force_float(x) force_eval_float(x)
+#else
+#define clang_barrier_double(x) (x)
+#define clang_barrier_float(x) (x)
+#define clang_force_double(x) (x)
+#define clang_force_float(x) (x)
+#endif
 
 /* Evaluate an expression as the specified type, normally a type
    cast should be enough, but compilers implement non-standard
@@ -380,8 +413,31 @@ HIDDEN double __math_divzero (uint32_t);
 
 /* Invalid input unless it is a quiet NaN.  */
 HIDDEN float __math_invalidf (float);
+/* set invalid exception */
+#if defined(FE_INVALID) && !defined(PICOLIBC_FLOAT_NOEXECPT)
+HIDDEN void __math_set_invalidf(void);
+#else
+#define __math_set_invalidf()   ((void) 0)
+#endif
 /* Invalid input unless it is a quiet NaN.  */
 HIDDEN double __math_invalid (double);
+/* set invalid exception */
+#if defined(FE_INVALID) && !defined(PICOLIBC_DOUBLE_NOEXECPT)
+HIDDEN void __math_set_invalid(void);
+#else
+#define __math_set_invalid()    ((void) 0)
+#endif
+
+#ifdef _HAVE_LONG_DOUBLE
+/* Invalid input unless it is a quiet NaN.  */
+HIDDEN long double __math_invalidl (long double);
+/* set invalid exception */
+#if defined(FE_INVALID) && !defined(PICOLIBC_LONG_DOUBLE_NOEXECPT)
+HIDDEN void __math_set_invalidl(void);
+#else
+#define __math_set_invalidl()    ((void) 0)
+#endif
+#endif
 
 /* Error handling using output checking, only for errno setting.  */
 
@@ -389,6 +445,8 @@ HIDDEN double __math_invalid (double);
 HIDDEN float __math_check_oflowf (float);
 /* Check if the result overflowed to infinity.  */
 HIDDEN double __math_check_oflow (double);
+/* Check if the result underflowed to 0.  */
+HIDDEN float __math_check_uflowf (float);
 /* Check if the result underflowed to 0.  */
 HIDDEN double __math_check_uflow (double);
 
@@ -413,13 +471,20 @@ check_uflow (double x)
   return WANT_ERRNO ? __math_check_uflow (x) : x;
 }
 
+/* Check if the result underflowed to 0.  */
+static inline float
+check_uflowf (float x)
+{
+  return WANT_ERRNO ? __math_check_uflowf (x) : x;
+}
+
 /* Set inexact exception */
 #if defined(FE_INEXACT) && !defined(PICOLIBC_DOUBLE_NOEXECPT)
 double __math_inexact(double);
 void __math_set_inexact(void);
 #else
 #define __math_inexact(val) (val)
-#define __math_set_inexact()
+#define __math_set_inexact()    ((void) 0)
 #endif
 
 #if defined(FE_INEXACT) && !defined(PICOLIBC_FLOAT_NOEXECPT)
@@ -427,7 +492,7 @@ float __math_inexactf(float val);
 void __math_set_inexactf(void);
 #else
 #define __math_inexactf(val) (val)
-#define __math_set_inexactf()
+#define __math_set_inexactf()   ((void) 0)
 #endif
 
 /* Shared between expf, exp2f and powf.  */
@@ -552,9 +617,15 @@ __math_with_errno (double y, int e);
 
 HIDDEN float
 __math_with_errnof (float y, int e);
+
+#ifdef _HAVE_LONG_DOUBLE
+HIDDEN long double
+__math_with_errnol (long double y, int e);
+#endif
 #else
 #define __math_with_errno(x, e) (x)
 #define __math_with_errnof(x, e) (x)
+#define __math_with_errnol(x, e) (x)
 #endif
 
 HIDDEN double
@@ -562,5 +633,17 @@ __math_xflow (uint32_t sign, double y);
 
 HIDDEN float
 __math_xflowf (uint32_t sign, float y);
+
+HIDDEN double
+__math_lgamma_r (double y, int *signgamp, int *divzero);
+
+HIDDEN float
+__math_lgammaf_r (float y, int *signgamp, int *divzero);
+
+#if defined(_HAVE_ALIAS_ATTRIBUTE) && defined(_HAVE_WEAK_ATTRIBUTE)
+extern int __signgam;
+#else
+#define __signgam signgam
+#endif
 
 #endif

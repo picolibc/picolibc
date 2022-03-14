@@ -56,5 +56,5 @@ sinhf(float x)
     }
 
     /* |x| > overflowthresold, sinh(x) overflow */
-    return x * shuge;
+    return __math_oflowf(x < 0);
 }

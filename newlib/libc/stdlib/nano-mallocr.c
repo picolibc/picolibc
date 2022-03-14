@@ -145,7 +145,7 @@ bool __malloc_grow_chunk(chunk_t *c, size_t new_size);
 /* Work around compiler optimizing away stores to 'size' field before
  * call to free.
  */
-#ifdef HAVE_ALIAS_ATTRIBUTE
+#ifdef _HAVE_ALIAS_ATTRIBUTE
 extern __typeof(free) __malloc_free;
 extern __typeof(malloc) __malloc_malloc;
 #else
@@ -384,7 +384,7 @@ void * malloc(size_t s)
 
     return ptr;
 }
-#ifdef HAVE_ALIAS_ATTRIBUTE
+#ifdef _HAVE_ALIAS_ATTRIBUTE
 #pragma GCC diagnostic push
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
@@ -458,7 +458,7 @@ no_insert:
 
     MALLOC_UNLOCK;
 }
-#ifdef HAVE_ALIAS_ATTRIBUTE
+#ifdef _HAVE_ALIAS_ATTRIBUTE
 #pragma GCC diagnostic push
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
@@ -470,7 +470,7 @@ __strong_reference(free, cfree);
 #endif /* DEFINE_FREE */
 
 #ifdef DEFINE_CFREE
-#ifndef HAVE_ALIAS_ATTRIBUTE
+#ifndef _HAVE_ALIAS_ATTRIBUTE
 void cfree(void * ptr)
 {
     free(ptr);
@@ -516,6 +516,12 @@ void * realloc(void * ptr, size_t size)
     if (size == 0)
     {
         free(ptr);
+        return NULL;
+    }
+
+    if (size > MALLOC_MAXSIZE)
+    {
+        errno = ENOMEM;
         return NULL;
     }
 
@@ -593,6 +599,9 @@ void * realloc(void * ptr, size_t size)
     /* No short cuts, allocate new memory and copy */
 
     mem = malloc(size);
+    if (!mem)
+        return NULL;
+
     memcpy(mem, ptr, old_size - MALLOC_HEAD);
     free(ptr);
 
@@ -709,10 +718,21 @@ void * memalign(size_t align, size_t s)
     char * allocated, * aligned_p;
 
     /* Return NULL if align isn't power of 2 */
-    if ((align & (align-1)) != 0) return NULL;
+    if ((align & (align-1)) != 0)
+    {
+        errno = EINVAL;
+        return NULL;
+    }
+
+    align = MAX(align, MALLOC_MINSIZE);
+
+    if (s > MALLOC_MAXSIZE - align)
+    {
+        errno = ENOMEM;
+        return NULL;
+    }
 
     s = ALIGN_TO(MAX(s,1), MALLOC_CHUNK_ALIGN);
-    align = MAX(align, MALLOC_MINSIZE);
 
     /* Make sure there's space to align the allocation and split
      * off chunk_t from the front
@@ -755,7 +775,7 @@ void * memalign(size_t align, size_t s)
     }
     return aligned_p;
 }
-#ifdef HAVE_ALIAS_ATTRIBUTE
+#ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(memalign, aligned_alloc);
 #endif
 #endif /* DEFINE_MEMALIGN */
@@ -779,6 +799,36 @@ void * valloc(size_t s)
 #ifdef DEFINE_PVALLOC
 void * pvalloc(size_t s)
 {
+    if (s > MALLOC_MAXSIZE - MALLOC_PAGE_ALIGN)
+    {
+        errno = ENOMEM;
+        return NULL;
+    }
+
     return valloc(ALIGN_TO(s, MALLOC_PAGE_ALIGN));
 }
 #endif /* DEFINE_PVALLOC */
+
+#ifdef DEFINE_GETPAGESIZE
+int getpagesize(void)
+{
+    return MALLOC_PAGE_ALIGN;
+}
+#endif /* DEFINE_GETPAGESIZE */
+
+#ifdef DEFINE_POSIX_MEMALIGN
+int posix_memalign(void **memptr, size_t align, size_t size)
+{
+    /* Return EINVAL if align isn't power of 2 or not a multiple of a pointer size */
+    if ((align & (align-1)) != 0 || align % sizeof(void*) != 0 || align == 0)
+        return EINVAL;
+
+    void *mem = memalign(align, size);
+
+    if (!mem)
+        return ENOMEM;
+
+    *memptr = mem;
+    return 0;
+}
+#endif

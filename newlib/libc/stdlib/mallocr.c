@@ -1035,7 +1035,7 @@ struct mallinfo mALLINFo();
 /* Work around compiler optimizing away stores to 'size' field before
  * call to free.
  */
-#ifdef HAVE_ALIAS_ATTRIBUTE
+#ifdef _HAVE_ALIAS_ATTRIBUTE
 extern __typeof(free) __malloc_free;
 #else
 #define __malloc_free(x) fREe(x)
@@ -2695,7 +2695,7 @@ void fREe(mem) RDECL Void_t* mem;
 
 #endif /* MALLOC_PROVIDED */
 }
-#ifdef HAVE_ALIAS_ATTRIBUTE
+#ifdef _HAVE_ALIAS_ATTRIBUTE
 #pragma GCC diagnostic push
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
@@ -3110,7 +3110,7 @@ Void_t* mEMALIGn(alignment, bytes) RDECL size_t alignment; size_t bytes;
 
 }
 
-#ifdef HAVE_ALIAS_ATTRIBUTE
+#ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(memalign, aligned_alloc);
 #endif
 #endif /* DEFINE_MEMALIGN */

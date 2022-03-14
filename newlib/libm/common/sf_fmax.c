@@ -6,33 +6,25 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
-	float fmaxf(float x, float y)
-#else
-	float fmaxf(x,y)
-	float x;
-	float y;
-#endif
+float fmaxf(float x, float y)
 {
-  if (__fpclassifyf(x) == FP_NAN)
-    return y;
-  if (__fpclassifyf(y) == FP_NAN)
-    return x;
-  
-  return x > y ? x : y;
+    if (issignaling(x) || issignaling(y))
+        return x + y;
+
+    if (isnan(x))
+        return y;
+
+    if (isnan(y))
+        return x;
+
+    return x > y ? x : y;
 }
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
-	double fmax(double x, double y)
-#else
-	double fmax(x,y)
-	double x;
-	double y;
-#endif
+double fmax(double x, double y)
 {
-  return (double) fmaxf((float) x, (float) y);
+    return (double) fmaxf((float) x, (float) y);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

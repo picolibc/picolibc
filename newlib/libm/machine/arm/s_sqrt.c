@@ -32,7 +32,7 @@ sqrt(double x)
 {
 	double result;
 #ifdef _WANT_MATH_ERRNO
-        if (x < 0)
+        if (isless(x, 0.0))
             return __math_invalid(x);
 #endif
 #if __ARM_ARCH >= 6

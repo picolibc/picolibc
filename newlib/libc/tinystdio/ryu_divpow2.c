@@ -33,7 +33,7 @@ static inline uint32_t mulShift32(const uint32_t m, const uint64_t factor, const
    * This function *does* get called with shift < 32 when converting
    * strings to floats, so disable this optimization
    */
-#ifdef NOT_DEFINED_RYU_32_BIT_PLATFORM
+#if defined(RYU_32_BIT_PLATFORM)
   // On 32-bit platforms we can avoid a 64-bit shift-right since we only
   // need the upper 32 bits of the result and the shift value is > 32.
   const uint32_t bits0Hi = (uint32_t)(bits0 >> 32);
@@ -41,8 +41,14 @@ static inline uint32_t mulShift32(const uint32_t m, const uint64_t factor, const
   uint32_t bits1Hi = (uint32_t)(bits1 >> 32);
   bits1Lo += bits0Hi;
   bits1Hi += (bits1Lo < bits0Hi);
-  const int32_t s = shift - 32;
-  return (bits1Hi << (32 - s)) | (bits1Lo >> s);
+  if (shift >= 64) {
+    // s2f can call this with a shift value >= 64, which we have to handle.
+    // This could now be slower than the !defined(RYU_32_BIT_PLATFORM) case.
+    return (uint32_t)(bits1Hi >> (shift - 64));
+  } else {
+    const int32_t s = shift - 32;
+    return (bits1Hi << (32 - s)) | (bits1Lo >> s);
+  }
 #else // RYU_32_BIT_PLATFORM
   const uint64_t sum = (bits0 >> 32) + bits1;
   const uint64_t shiftedSum = sum >> (shift - 32);

@@ -159,12 +159,14 @@ pow(double x, double y)
                 return (hy < 0) ? -y : zero;
         }
         if (iy == 0x3ff00000) { /* y is  +-1 */
-            if (hy < 0)
+            if (hy < 0) {
+                if (x == 0)
+                    return __math_divzero(hx < 0);
                 return one / x;
-            else
+            } else
                 return x;
         }
-        if (hy == 0x40000000)
+        if (hy == 0x40000000 && ix < 0x5ff00000 && ix > 0x1e500000)
             return x * x; /* y is  2 */
         if (hy == 0x3fe00000) { /* y is  0.5 */
             if (hx >= 0) /* x >= +0 */
@@ -181,7 +183,7 @@ pow(double x, double y)
                 z = one / z; /* z = (1/|x|) */
             if (hx < 0) {
                 if (((ix - 0x3ff00000) | yisint) == 0) {
-                    z = (z - z) / (z - z); /* (-1)**non-int is NaN */
+                    return __math_invalid(x); /* (-1)**non-int is NaN */
                 } else if (yisint == 1)
                     z = -z; /* (x<0)**odd = -(|x|**odd) */
             }
@@ -214,10 +216,14 @@ pow(double x, double y)
                 return (hy > 0) ? __math_oflow(0) : __math_uflow(0);
         }
         /* over/underflow if x is not close to one */
-        if (ix < 0x3fefffff)
-            return (hy < 0) ? __math_oflow(0) : __math_uflow(0);
-        if (ix > 0x3ff00000)
-            return (hy > 0) ? __math_oflow(0) : __math_uflow(0);
+        if (ix < 0x3fefffff) {
+            int sign = yisint & ((__uint32_t)hx>>31);
+            return (hy < 0) ? __math_oflow(sign) : __math_uflow(sign);
+        }
+        if (ix > 0x3ff00000) {
+            int sign = yisint & ((__uint32_t)hx>>31);
+            return (hy > 0) ? __math_oflow(sign) : __math_uflow(sign);
+        }
         /* now |1-x| is tiny <= 2**-20, suffice to compute
 	   log(x) by x-x^2/2+x^3/3-x^4/4 */
         t = ax - 1; /* t has 20 trailing zeros */
@@ -348,7 +354,7 @@ pow(double x, double y)
     return s * z;
 }
 
-#if defined(HAVE_ALIAS_ATTRIBUTE)
+#if defined(_HAVE_ALIAS_ATTRIBUTE)
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif

@@ -40,10 +40,8 @@ remainder(double x, double p)
     hx &= 0x7fffffff;
 
     /* purge off exception values */
-    if (isnan(x))
-        return x;
-    if (isnan(p))
-        return p;
+    if (isnan(x) || isnan(p))
+        return x + p;
 
     if (isinf(x) || (hp | lp) == 0)
         return __math_invalid(x);

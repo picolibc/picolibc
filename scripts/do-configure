@@ -67,7 +67,7 @@ case "$ARCH" in
 esac
 
 case "$ARCH" in
-    *rv[36][24]*|*riscv*|*aarch64*)
+    *rv[36][24]*|*riscv*|*aarch64*|*powerpc*)
 	case "$*" in
 	    *-Dnewlib-io-long-double=true*)
 		echo "newlib-io-long-double not supported on riscv or aarch64"

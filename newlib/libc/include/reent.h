@@ -135,7 +135,6 @@ struct stat;
 struct tms;
 struct timeval;
 struct timezone;
-struct _reent;
 
 #ifdef __cplusplus
 }

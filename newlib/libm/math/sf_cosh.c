@@ -31,13 +31,15 @@ coshf(float x)
     GET_FLOAT_WORD(ix, x);
     ix &= 0x7fffffff;
 
+    x = fabsf(x);
+
     /* x is INF or NaN */
     if (!FLT_UWORD_IS_FINITE(ix))
-        return x;
+        return x + x;
 
     /* |x| in [0,0.5*ln2], return 1+expm1(|x|)^2/(2*exp(|x|)) */
     if (ix < 0x3eb17218) {
-        t = expm1f(fabsf(x));
+        t = expm1f(x);
         w = one + t;
         if (ix < 0x24000000)
             return w; /* cosh(tiny) = 1 */
@@ -46,17 +48,17 @@ coshf(float x)
 
     /* |x| in [0.5*ln2,22], return (exp(|x|)+1/exp(|x|)/2; */
     if (ix < 0x41b00000) {
-        t = expf(fabsf(x));
+        t = expf(x);
         return half * t + half / t;
     }
 
     /* |x| in [22, log(maxdouble)] return half*exp(|x|) */
     if (ix <= FLT_UWORD_LOG_MAX)
-        return half * expf(fabsf(x));
+        return half * expf(x);
 
     /* |x| in [log(maxdouble), overflowthresold] */
     if (ix <= FLT_UWORD_LOG_2MAX) {
-        w = expf(half * fabsf(x));
+        w = expf(half * x);
         t = half * w;
         return t * w;
     }

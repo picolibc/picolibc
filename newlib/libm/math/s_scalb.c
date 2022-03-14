@@ -24,12 +24,16 @@
 double
 scalb(double x, double fn)
 {
-    if (isnan(fn))
-        return fn;
+    if (isnan(fn) || isnan(x))
+        return x + fn;
 
     if (isinf(fn)) {
         if ((x == 0.0 && fn > 0.0) || (isinf(x) && fn < 0.0))
             return __math_invalid(fn);
+        if (fn > 0.0)
+            return fn*x;
+        else
+            return x/(-fn);
     }
 
     if (rint(fn) != fn)

@@ -99,9 +99,22 @@ __atof_engine(uint32_t m10, int e10)
 		trailingZeros = e2 < e10 || (e2 - e10 < 32 && multipleOfPowerOf2_32(m10, e2 - e10));
 	} else {
 		e2 = floor_log2(m10) + e10 - ceil_log2pow5(-e10) - (FLOAT_MANTISSA_BITS + 1);
+
+		// We now compute [m10 * 10^e10 / 2^e2] = [m10 / (5^(-e10) 2^(e2-e10))].
 		int j = e2 - e10 + ceil_log2pow5(-e10) - 1 + FLOAT_POW5_INV_BITCOUNT;
 		m2 = mulPow5InvDivPow2(m10, -e10, j);
-		trailingZeros = multipleOfPowerOf5_32(m10, -e10);
+
+		// We also compute if the result is exact, i.e.,
+		//   [m10 / (5^(-e10) 2^(e2-e10))] == m10 / (5^(-e10) 2^(e2-e10))
+		//
+		// If e2-e10 >= 0, we need to check whether (5^(-e10) 2^(e2-e10)) divides m10, which is the
+		// case iff pow5(m10) >= -e10 AND pow2(m10) >= e2-e10.
+		//
+		// If e2-e10 < 0, we have actually computed [m10 * 2^(e10 e2) / 5^(-e10)] above,
+		// and we need to check whether 5^(-e10) divides (m10 * 2^(e10-e2)), which is the case iff
+		// pow5(m10 * 2^(e10-e2)) = pow5(m10) >= -e10.
+		trailingZeros = (e2 < e10 || (e2 - e10 < 32 && multipleOfPowerOf2_32(m10, e2 - e10)))
+			&& multipleOfPowerOf5_32(m10, -e10);
 	}
 
 #ifdef RYU_DEBUG
@@ -141,11 +154,14 @@ __atof_engine(uint32_t m10, int e10)
 	printf("ieee_m2 = %u\n", (m2 >> shift) + roundUp);
 #endif
 	uint32_t ieee_m2 = (m2 >> shift) + roundUp;
-	if (ieee_m2 == (1u << (FLOAT_MANTISSA_BITS + 1))) {
+        assert(ieee_m2 <= (1u << (FLOAT_MANTISSA_BITS + 1)));
+        ieee_m2 &= (1u << FLOAT_MANTISSA_BITS) - 1;
+        if (ieee_m2 == 0 && roundUp) {
+            // Rounding up may overflow the mantissa.
+            // In this case we move a trailing zero of the mantissa into the exponent.
 		// Due to how the IEEE represents +/-Infinity, we don't need to check for overflow here.
 		ieee_e2++;
 	}
-	ieee_m2 &= (1u << FLOAT_MANTISSA_BITS) - 1;
 	uint32_t ieee = (((uint32_t)ieee_e2) << FLOAT_MANTISSA_BITS) | ieee_m2;
 	return int32Bits2Float(ieee);
 }

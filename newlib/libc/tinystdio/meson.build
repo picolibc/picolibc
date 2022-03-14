@@ -35,20 +35,16 @@
 srcs_tinystdio = [
     'asprintf.c',
     'clearerr.c',
-    'ecvt_data.c',
-    'ecvtf_data.c',
+    'ecvt_r.c',
     'ecvt.c',
-    'ecvtbuf.c',
+    'ecvtf_r.c',
     'ecvtf.c',
-    'ecvtfbuf.c',
-    'fcvtbuf.c',
     'fcvt.c',
+    'fcvt_r.c',
     'fcvtf.c',
-    'fcvtfbuf.c',
+    'fcvtf_r.c',
     'gcvt.c',
-    'gcvtbuf.c',
     'gcvtf.c',
-    'gcvtfbuf.c',
     'fclose.c',
     'fdevopen.c',
     'feof.c',
@@ -71,6 +67,7 @@ srcs_tinystdio = [
     'getchar.c',
     'gets.c',
     'matchcaseprefix.c',
+    'mktemp.c',
     'perror.c',
     'printf.c',
     'putchar.c',
@@ -89,6 +86,7 @@ srcs_tinystdio = [
     'strfromf.c',
     'strfromd.c',
     'strtof.c',
+    'strtof_l.c',
     'strtod.c',
     'strtod_l.c',
     'ungetc.c',
@@ -177,9 +175,9 @@ hdrs_tinystdio = [
     'xtoa_fast.h',
 ]
 
-install_headers(
-  'stdio.h'
-)
+install_headers('stdio.h',
+		install_dir: include_dir
+	       )
 
 srcs_tinystdio_use = []
 foreach file : srcs_tinystdio

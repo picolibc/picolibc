@@ -45,6 +45,21 @@ int finite(double x)
 	long fclass = _fclass_d (x);
 	return (fclass & (FCLASS_INF | FCLASS_NAN)) == 0;
 }
+
+#if defined(_HAVE_ALIAS_ATTRIBUTE)
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(finite, __finite);
+#else
+
+int __finite(double x)
+{
+    return finite(x);
+}
+
+#endif
+
 #else
 #include "../../common/s_finite.c"
 #endif

@@ -3,6 +3,10 @@
   */
 
 #define _DEFAULT_SOURCE
+#include <newlib.h>
+#include <sys/config.h>
+
+#ifndef _USE_GDTOA
 #include <_ansi.h>
 #include <string.h>
 #include <stdlib.h>
@@ -30,10 +34,10 @@ void _IO_ldtostr (long double *, char *, int, int, char);
  /* Number of bits of precision */
 #define NBITS ((NI-4)*16)
 
- /* Maximum number of decimal digits in ASCII conversion
-  * = NBITS*log10(2)
-  */
-#define NDEC (NBITS*8/27)
+ /* Maximum number of decimal digits in ASCII conversion */
+#define NDEC 1023
+ /* Use static stack buffer for up to 44 digits */
+#define NDEC_SML 44
 
  /* The exponent of 1.0 */
 #define EXONE (0x3fff)
@@ -80,7 +84,7 @@ static void eclear (register short unsigned int *x);
 static void einfin (register short unsigned int *x, register LDPARMS * ldp);
 static void efloor (short unsigned int *x, short unsigned int *y,
 		    LDPARMS * ldp);
-static void etoasc (short unsigned int *x, char *string, int ndigs,
+static void etoasc (short unsigned int *x, char *string, int ndec, int ndigs,
 		    int outformat, LDPARMS * ldp);
 
 union uconv
@@ -214,7 +218,7 @@ static const char *const ermsg[7] = {
  *	e24toasc( &f, str, n )	single to ASCII string, n digits after decimal
  *	e53toasc( &d, str, n )	double to ASCII string, n digits after decimal
  *	e64toasc( &d, str, n )	long double to ASCII string
- *	etoasc(e,str,n,fmt,ldp)e to ASCII string, n digits after decimal
+ *	etoasc(e,str,ndec,n,fmt,ldp)e to ASCII string, n digits after decimal
  *	etoe24( e, &f )		convert e type to IEEE single precision
  *	etoe53( e, &d )		convert e type to IEEE double precision
  *	etoe64( e, &d )		convert e type to IEEE long double precision
@@ -754,6 +758,9 @@ eiisnan (short unsigned int *x)
 
 #if LDBL_MANT_DIG == 64
 
+#ifdef USE_INFINITY
+#ifdef IBMPC
+
 /* Return nonzero if internal format number is infinite. */
 static int
 eiisinf (unsigned short x[])
@@ -767,6 +774,9 @@ eiisinf (unsigned short x[])
     return (1);
   return (0);
 }
+#endif
+#endif
+
 #endif /* LDBL_MANT_DIG == 64 */
 
 /*
@@ -2791,7 +2801,8 @@ __ldtoa (long double d, int mode, int ndigits,
   LDPARMS rnd;
   LDPARMS *ldp = &rnd;
   char *outstr;
-  char outbuf[NDEC + MAX_EXP_DIGITS + 10];
+  char outbuf_sml[NDEC_SML + MAX_EXP_DIGITS + 10];
+  char *outbuf = outbuf_sml;
   union uconv du;
   du.d = d;
 
@@ -2823,11 +2834,34 @@ __ldtoa (long double d, int mode, int ndigits,
     ndigits = 20;
 
 /* This sanity limit must agree with the corresponding one in etoasc, to
-   keep straight the returned value of outexpon.  */
-  if (ndigits > NDEC)
-    ndigits = NDEC;
+   keep straight the returned value of outexpon.  Note that we use a dynamic
+   limit now, either ndec (<= NDEC) or NDEC_SML, depending on ndigits. */
+  __int32_t ndec;
+  if (mode == 3) /* %f */
+    {
+      __int32_t expon = (e[NE - 1] & 0x7fff) - (EXONE - 1); /* exponent part */
+      /* log2(10) approximately 485/146 */
+      ndec = expon * 146 / 485 + ndigits;
+    }
+  else /* %g/%e */
+    ndec = ndigits;
+  if (ndec < 0)
+    ndec = 0;
+  if (ndec > NDEC)
+    ndec = NDEC;
 
-  etoasc (e, outbuf, ndigits, mode, ldp);
+  /* Allocate buffer if more than NDEC_SML digits are requested. */
+  if (ndec > NDEC_SML)
+    {
+      outbuf = (char *) malloc (ndec + MAX_EXP_DIGITS + 10);
+      if (!outbuf)
+	{
+	  ndec = NDEC_SML;
+	  outbuf = outbuf_sml;
+	}
+    }
+
+  etoasc (e, outbuf, (int) ndec, ndigits, mode, ldp);
   s = outbuf;
   if (eisinf (e) || eisnan (e))
     {
@@ -2914,6 +2948,9 @@ stripspaces:
   if (rve)
     *rve = outstr + (s - outbuf);
 
+  if (outbuf != outbuf_sml)
+    free (outbuf);
+
   return outstr;
 }
 
@@ -2957,8 +2994,8 @@ _ldcheck (long double *d)
 }				/* _ldcheck */
 
 static void
-etoasc (short unsigned int *x, char *string, int ndigits, int outformat,
-	LDPARMS * ldp)
+etoasc (short unsigned int *x, char *string, int ndec, int ndigits,
+	int outformat, LDPARMS * ldp)
 {
   long digit;
   unsigned short y[NI], t[NI], u[NI], w[NI];
@@ -3093,7 +3130,7 @@ tnzro:
       else
 	{
 	  emovi (y, w);
-	  for (i = 0; i < NDEC + 1; i++)
+	  for (i = 0; i < ndec + 1; i++)
 	    {
 	      if ((w[NI - 1] & 0x7) != 0)
 		break;
@@ -3169,8 +3206,8 @@ isone:
 else if( ndigs < 0 )
         ndigs = 0;
 */
-  if (ndigs > NDEC)
-    ndigs = NDEC;
+  if (ndigs > ndec)
+    ndigs = ndec;
   if (digit == 10)
     {
       *s++ = '1';
@@ -3855,3 +3892,5 @@ enan (short unsigned int *nan, int size)
   for (i = 0; i < n; i++)
     *nan++ = *p++;
 }
+
+#endif /* !_USE_GDTOA */

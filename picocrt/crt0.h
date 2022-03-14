@@ -40,10 +40,19 @@
 
 extern char __data_source[];
 extern char __data_start[];
+extern char __data_end[];
 extern char __data_size[];
 extern char __bss_start[];
+extern char __bss_end[];
 extern char __bss_size[];
 extern char __tls_base[];
+extern char __tdata_end[];
+extern char __tls_end[];
+
+#ifdef __PICOLIBC_CRT_RUNTIME_SIZE
+#define __data_size (__data_end - __data_start)
+#define __bss_size (__bss_end - __bss_start)
+#endif
 
 /* These two functions must be defined in the architecture-specific
  * code
@@ -56,7 +65,7 @@ _start(void);
 int
 main(int, char **);
 
-#ifdef HAVE_INITFINI_ARRAY
+#ifdef _HAVE_INITFINI_ARRAY
 extern void __libc_init_array(void);
 #endif
 
@@ -71,6 +80,9 @@ extern void __libc_init_array(void);
 
 #include <picotls.h>
 #include <stdio.h>
+#ifdef CRT0_SEMIHOST
+#include <semihost.h>
+#endif
 
 #ifndef CONSTRUCTORS
 #define CONSTRUCTORS 1
@@ -84,10 +96,40 @@ __start(void)
 #ifdef PICOLIBC_TLS
 	_set_tls(__tls_base);
 #endif
-#if defined(HAVE_INITFINI_ARRAY) && CONSTRUCTORS
+#if defined(_HAVE_INITFINI_ARRAY) && CONSTRUCTORS
 	__libc_init_array();
 #endif
-	int ret = main(0, NULL);
+
+#ifdef CRT0_SEMIHOST
+#define CMDLINE_LEN     1024
+#define ARGV_LEN        64
+        static char cmdline[CMDLINE_LEN];
+        static char *argv[ARGV_LEN];
+        int argc = 0;
+
+        argv[argc++] = "program-name";
+        if (sys_semihost_get_cmdline(cmdline, sizeof(cmdline)) == 0)
+        {
+            char *c = cmdline;
+
+            while (*c && argc < ARGV_LEN - 1) {
+                argv[argc++] = c;
+                while (*c && *c != ' ')
+                    c++;
+                if (!*c)
+                    break;
+                *c = '\0';
+                while (*++c == ' ')
+                    ;
+            }
+        }
+        argv[argc] = NULL;
+#else
+#define argv NULL
+#define argc 0
+#endif
+
+	int ret = main(argc, argv);
 #ifdef CRT0_EXIT
 	exit(ret);
 #else

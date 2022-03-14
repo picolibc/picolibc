@@ -144,7 +144,7 @@ sin_pif(float x)
 }
 
 float
-_lgammaf_r(float x, int *signgamp)
+__math_lgammaf_r(float x, int *signgamp, int *divzero)
 {
     float t, y, z, nadj = 0.0, p, p1, p2, p3, q, r, w;
     __int32_t i, hx, ix;
@@ -155,10 +155,11 @@ _lgammaf_r(float x, int *signgamp)
     *signgamp = 1;
     ix = hx & 0x7fffffff;
     if (ix >= 0x7f800000)
-        return fabsf(x);
+        return fabsf(x+x);
     if (ix == 0) {
         if (hx < 0)
             *signgamp = -1;
+        *divzero = 1;
         return __math_divzerof(0);
     }
     if (ix < 0x1c800000) { /* |x|<2**-70, return -log(|x|) */
@@ -169,11 +170,15 @@ _lgammaf_r(float x, int *signgamp)
             return -logf(x);
     }
     if (hx < 0) {
-        if (ix >= 0x4b000000) /* |x|>=2**23, must be -integer */
+        if (ix >= 0x4b000000) { /* |x|>=2**23, must be -integer */
+            *divzero = 1;
             return __math_divzerof(0);
+        }
         t = sin_pif(x);
-        if (t == zero)
+        if (t == zero) {
+            *divzero = 1;
             return __math_divzerof(0);
+        }
         nadj = logf(pi / fabsf(t * x));
         if (t < zero)
             *signgamp = -1;
@@ -276,6 +281,6 @@ _lgammaf_r(float x, int *signgamp)
 float
 lgammaf_r(float x, int *signgamp)
 {
-    *signgamp = 0;
-    return _lgammaf_r(x, signgamp);
+    int divzero = 0;
+    return __math_lgammaf_r(x, signgamp, &divzero);
 }

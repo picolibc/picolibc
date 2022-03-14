@@ -41,7 +41,7 @@ float x;
 	    return (float) ix;
 	}
 	else if (FLT_UWORD_IS_INFINITE(hx)) return HUGE_VALF;	/* x==+|-inf */
-	else if (FLT_UWORD_IS_NAN(hx)) return x;
+	else if (FLT_UWORD_IS_NAN(hx)) return x + x;
 	else return (float) ((hx>>23)-127);
 }
 

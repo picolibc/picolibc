@@ -40,7 +40,7 @@ fmod(double x, double y)
 
     /* purge off exception values */
     if (isnan(x) || isnan(y)) /* x or y nan, return nan */
-        return (double)NAN;
+        return x + y;
 
     if (isinf(x)) /* x == inf, domain error */
         return __math_invalid(x);

@@ -15,12 +15,7 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
-	float nextafterf(float x, float y)
-#else
-	float nextafterf(x,y)
-	float x,y;
-#endif
+float nextafterf(float x, float y)
 {
 	__int32_t	hx,hy,ix,iy;
 
@@ -32,11 +27,11 @@
 	if(FLT_UWORD_IS_NAN(ix) ||
 	   FLT_UWORD_IS_NAN(iy))
 	   return x+y;
-	if(x==y) return x;		/* x=y, return x */
+	if(x==y) return y;		/* x=y, return y */
 	if(FLT_UWORD_IS_ZERO(ix)) {		/* x == 0 */
 	    SET_FLOAT_WORD(x,(hy&0x80000000)|FLT_UWORD_MIN);
-	    y = x*x;
-	    if(y==x) return y; else return x;	/* raise underflow flag */
+	    force_eval_float(x*x);             /* raise underflow flag */
+            return x;
 	}
 	if(hx>=0) {				/* x > 0 */
 	    if(hx>hy) {				/* x > y, x -= ulp */
@@ -52,26 +47,17 @@
 	    }
 	}
 	hy = hx&0x7f800000;
-	if(hy>FLT_UWORD_MAX) return x+x;	/* overflow  */
+	if(hy>FLT_UWORD_MAX) return check_oflowf(x+x);	/* overflow  */
 	if(hy<0x00800000) {		/* underflow */
-	    y = x*x;
-	    if(y!=x) {		/* raise underflow flag */
-	        SET_FLOAT_WORD(y,hx);
-		return y;
-	    }
+            force_eval_float(x*x);      /* raise underflow flag */
 	}
 	SET_FLOAT_WORD(x,hx);
-	return x;
+	return check_uflowf(x);
 }
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
-	double nextafter(double x, double y)
-#else
-	double nextafter(x,y)
-	double x,y;
-#endif
+double nextafter(double x, double y)
 {
 	return (double) nextafterf((float) x, (float) x);
 }

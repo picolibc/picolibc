@@ -51,7 +51,7 @@
 		_a < _b ? _a : _b; })
 
 int
-__dtoa_engine(double x, struct dtoa *dtoa, int max_digits, int max_decimals)
+__dtoa_engine(double x, struct dtoa *dtoa, int max_digits, bool fmode, int max_decimals)
 {
 	int	i;
 	uint8_t	flags = 0;
@@ -105,15 +105,18 @@ __dtoa_engine(double x, struct dtoa *dtoa, int max_digits, int max_decimals)
 		 *               there are exp digits to the left of
 		 *               the decimal point
 		 *
-		 * max_decimals: Only used in 'f' format. Display no more than this
-		 *               many digits (-1) to the right of the decimal point
+		 * max_decimals: Only used in 'f' format. Round to no
+		 *               more than this many digits to the
+		 *               right of the decimal point (left if
+		 *               negative)
 		 *
-		 * max_digits:	 We can't convert more than this number of digits given
-		 *               the limits of the buffer
+		 * max_digits: We can't convert more than this number
+		 *               of digits given the limits of the
+		 *               buffer
 		 */
 
 		int save_max_digits = max_digits;
-		if(max_decimals != 0) {
+		if (fmode) {
 			/*
 			 * This covers two cases:
 			 *
@@ -132,7 +135,7 @@ __dtoa_engine(double x, struct dtoa *dtoa, int max_digits, int max_decimals)
 			 * cases, which is kinda cool
 			 */
 			/* max_decimals comes in biased by 1 to flag the 'f' case */
-			max_digits = min(max_digits, max(0, max_decimals - 1 + exp + 1));
+			max_digits = min(max_digits, max(1, max_decimals + exp + 1));
 		}
 
 		/* Round nearest by adding 1/2 of the last digit
@@ -146,9 +149,9 @@ __dtoa_engine(double x, struct dtoa *dtoa, int max_digits, int max_decimals)
 			x /= 10.0;
 			exp++;
 
-			/* Redo this computation wit the new exp value */
-			if  (max_decimals != 0)
-				max_digits = min(save_max_digits, max(0, max_decimals - 1 + exp + 1));
+			/* Redo this computation with the new exp value */
+			if  (fmode)
+				max_digits = min(save_max_digits, max(1, max_decimals + exp + 1));
 		}
 
 		/* Now convert mantissa to decimal. */

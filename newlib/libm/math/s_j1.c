@@ -62,7 +62,7 @@
 
 static double pone(double), qone(double);
 
-static const double huge = 1e300, one = 1.0,
+static const double one = 1.0,
                     invsqrtpi =
                         5.64189583547756279280e-01, /* 0x3FE20DD7, 0x50429B6D */
     tpi = 6.36619772367581382433e-01, /* 0x3FE45F30, 0x6DC9C883 */
@@ -83,10 +83,10 @@ double
 j1(double x)
 {
     double z, s, c, ss, cc, r, u, v, y;
-    __int32_t hx, ix;
+    __int32_t hx, ix, lx;
 
     if (isnan(x))
-        return x;
+        return x + x;
 
     if (isinf(x))
         return 0.0;
@@ -123,8 +123,10 @@ j1(double x)
             return z;
     }
     if (ix < 0x3e400000) { /* |x|<2**-27 */
-        if (huge + x > one)
-            return 0.5 * x; /* inexact if x!=0 necessary */
+        GET_LOW_WORD(lx, x);
+        if (ix == 0 && lx == 0)
+            return x;
+        return check_uflow(0.5 * x); /* inexact if x!=0 necessary */
     }
     z = x * x;
     r = z * (r00 + z * (r01 + z * (r02 + z * r03)));
@@ -161,7 +163,7 @@ y1(double x)
         return __math_divzero(1);
 
     if (isnan(x))
-        return x;
+        return x + x;
 
     if (hx < 0)
         return __math_invalid(x);
@@ -202,7 +204,7 @@ y1(double x)
         return z;
     }
     if (ix <= 0x3c900000) { /* x < 2**-54 */
-        return (-tpi / x);
+        return check_oflow(-tpi / x);
     }
     z = x * x;
     u = U0[0] + z * (U0[1] + z * (U0[2] + z * (U0[3] + z * U0[4])));

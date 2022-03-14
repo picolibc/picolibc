@@ -65,6 +65,7 @@ PORTABILITY
 #include <_ansi.h>
 #include <sys/cdefs.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #ifndef __GNUC__
 #define inline
@@ -96,8 +97,8 @@ static inline void	 swapfunc (char *, char *, int, int);
         } while (--i > 0);				\
 }
 
-#define SWAPINIT(a, es) swaptype = ((char *)a - (char *)0) % sizeof(long) || \
-	es % sizeof(long) ? 2 : es == sizeof(long)? 0 : 1;
+#define SWAPINIT(a, es) swaptype = ((uintptr_t)(a) % sizeof(long)) ||   \
+	((es) % sizeof(long)) ? 2 : ((es) == sizeof(long)) ? 0 : 1
 
 static inline void
 swapfunc (char *a,
