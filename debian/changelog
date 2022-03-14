@@ -1,3 +1,14 @@
+picolibc (1.7.5-1) unstable; urgency=medium
+
+  * New upstream
+
+  * Fixes for bugs found with glibc test suite
+
+  * Add '--picolibc-buildtype=release' variants for applications that
+    want speed-optimized instead of space-optimized code.
+
+ -- Keith Packard <keithp@keithp.com>  Mon, 14 Mar 2022 10:30:47 -0700
+
 picolibc (1.7.4-1) unstable; urgency=medium
 
   * New upstream
