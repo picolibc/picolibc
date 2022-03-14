@@ -36,3 +36,7 @@ Bug Fixes
 - Fix a bug that the order of the console key inputs are occasionally
   swapped, especially when CPU load is high.
   Addresses: https://cygwin.com/pipermail/cygwin/2022-February/250957.html
+
+- Fix a problem that fsync() flushes the console input buffer unlike
+  linux. fsync() should return EINVAL for special files such as tty.
+  Addresses: https://cygwin.com/pipermail/cygwin/2022-March/251022.html
