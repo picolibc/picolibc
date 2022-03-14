@@ -24,6 +24,8 @@ MESON_SHARED_FLAGS = \
 	-Dc_args='-Wdate-time -ffile-prefix-map=$(BUILDPATH)=. -fdebug-prefix-map=$(BUILDPATH)=.' \
 	--prefix=/usr
 
+MESON_RELEASE_FLAGS=-Dbuild-type-subdir=release --buildtype=release
+
 MESON_RISCV_FLAGS = \
 	$(MESON_SHARED_FLAGS) \
 	--cross-file scripts/cross-$(RISCV_ARCH).txt \
@@ -66,17 +68,27 @@ override_dh_auto_configure:
 	meson . debian/$(BUILDDIR)/$(ARM_ARCH) $(MESON_ARM_FLAGS) 2>&1 | grep -v 'path separator\|This is not supported\|a hard error in the future'
 	meson . debian/$(BUILDDIR)/$(LX106_ARCH) $(MESON_LX106_FLAGS) 2>&1 | grep -v 'path separator\|This is not supported\|a hard error in the future'
 	meson . debian/$(BUILDDIR)/$(AARCH64_ARCH) $(MESON_AARCH64_FLAGS) 2>&1 | grep -v 'path separator\|This is not supported\|a hard error in the future'
+	meson . debian/$(BUILDDIR)/$(RISCV_ARCH)-release $(MESON_RELEASE_FLAGS) $(MESON_RISCV_FLAGS) 2>&1 | grep -v 'path separator\|This is not supported\|a hard error in the future'
+	meson . debian/$(BUILDDIR)/$(ARM_ARCH)-release $(MESON_RELEASE_FLAGS) $(MESON_ARM_FLAGS) 2>&1 | grep -v 'path separator\|This is not supported\|a hard error in the future'
+	meson . debian/$(BUILDDIR)/$(LX106_ARCH)-release $(MESON_RELEASE_FLAGS) $(MESON_LX106_FLAGS) 2>&1 | grep -v 'path separator\|This is not supported\|a hard error in the future'
+	meson . debian/$(BUILDDIR)/$(AARCH64_ARCH)-release $(MESON_RELEASE_FLAGS) $(MESON_AARCH64_FLAGS) 2>&1 | grep -v 'path separator\|This is not supported\|a hard error in the future'
 
 override_dh_auto_build:
 	cd debian/$(BUILDDIR)/$(RISCV_ARCH) && ninja -v
 	cd debian/$(BUILDDIR)/$(ARM_ARCH) && ninja -v
 	cd debian/$(BUILDDIR)/$(LX106_ARCH) && ninja -v
 	cd debian/$(BUILDDIR)/$(AARCH64_ARCH) && ninja -v
+	cd debian/$(BUILDDIR)/$(RISCV_ARCH)-release && ninja -v
+	cd debian/$(BUILDDIR)/$(ARM_ARCH)-release && ninja -v
+	cd debian/$(BUILDDIR)/$(LX106_ARCH)-release && ninja -v
+	cd debian/$(BUILDDIR)/$(AARCH64_ARCH)-release && ninja -v
 
 override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
 	cd debian/$(BUILDDIR)/$(ARM_ARCH) && meson test --timeout-multiplier=10
 	cd debian/$(BUILDDIR)/$(AARCH64_ARCH) && meson test --timeout-multiplier=10
+	cd debian/$(BUILDDIR)/$(ARM_ARCH)-release && meson test --timeout-multiplier=10
+	cd debian/$(BUILDDIR)/$(AARCH64_ARCH)-release && meson test --timeout-multiplier=10
 endif
 
 override_dh_auto_install:
@@ -84,3 +96,7 @@ override_dh_auto_install:
 	cd debian/$(BUILDDIR)/$(ARM_ARCH) && DESTDIR=${CURDIR}/debian/tmp ninja install
 	cd debian/$(BUILDDIR)/$(LX106_ARCH) && DESTDIR=${CURDIR}/debian/tmp ninja install
 	cd debian/$(BUILDDIR)/$(AARCH64_ARCH) && DESTDIR=${CURDIR}/debian/tmp ninja install
+	cd debian/$(BUILDDIR)/$(RISCV_ARCH)-release && DESTDIR=${CURDIR}/debian/tmp ninja install
+	cd debian/$(BUILDDIR)/$(ARM_ARCH)-release && DESTDIR=${CURDIR}/debian/tmp ninja install
+	cd debian/$(BUILDDIR)/$(LX106_ARCH)-release && DESTDIR=${CURDIR}/debian/tmp ninja install
+	cd debian/$(BUILDDIR)/$(AARCH64_ARCH)-release && DESTDIR=${CURDIR}/debian/tmp ninja install
