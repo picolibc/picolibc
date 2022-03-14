@@ -1930,7 +1930,6 @@ int def_toascii (int i) { return toascii(i); }
 int def__tolower (int i) { return _tolower(i); }
 int def__toupper (int i) { return _toupper(i); }
 
-extern int inacc;
 void
 test_is_set (int (*func)(),
        char *name,

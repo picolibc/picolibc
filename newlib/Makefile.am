@@ -6,8 +6,10 @@ ACLOCAL_AMFLAGS = -I . -I .. -I ../config
 # Variables that will accumulate in subdirs.
 CLEANFILES =
 EXTRA_DIST =
+EXTRA_PROGRAMS =
 PHONY =
 SUFFIXES =
+check_PROGRAMS =
 info_TEXINFOS =
 noinst_DATA =
 INSTALL_DATA_LOCAL =

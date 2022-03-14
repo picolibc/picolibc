@@ -47,6 +47,7 @@ endif
 include %D%/common/Makefile.inc
 include %D%/complex/Makefile.inc
 include %D%/fenv/Makefile.inc
+include %D%/test/Makefile.inc
 
 if HAVE_LIBM_MACHINE_AARCH64
 include %D%/machine/aarch64/Makefile.inc

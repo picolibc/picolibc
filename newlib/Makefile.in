@@ -89,6 +89,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+EXTRA_PROGRAMS = libm/test/test$(EXEEXT)
+check_PROGRAMS =
 @HAVE_CRT0_TRUE@@HAVE_MULTISUBDIR_TRUE@am__append_1 = $(BUILD_MULTISUBDIR)/$(CRT0)
 @HAVE_MULTISUBDIR_TRUE@am__append_2 = $(BUILD_MULTISUBDIR)/libc.a $(BUILD_MULTISUBDIR)/libm.a
 
@@ -3569,6 +3571,49 @@ am_libm_a_OBJECTS = $(am__objects_147) $(am__objects_151) \
 	$(am__objects_173) $(am__objects_175) $(am__objects_177) \
 	$(am__objects_179) $(am__objects_181) $(am__objects_183)
 libm_a_OBJECTS = $(am_libm_a_OBJECTS)
+am_libm_test_test_OBJECTS = libm/test/test.$(OBJEXT) \
+	libm/test/string.$(OBJEXT) libm/test/convert.$(OBJEXT) \
+	libm/test/conv_vec.$(OBJEXT) libm/test/iconv_vec.$(OBJEXT) \
+	libm/test/test_is.$(OBJEXT) libm/test/dvec.$(OBJEXT) \
+	libm/test/sprint_vec.$(OBJEXT) libm/test/sprint_ivec.$(OBJEXT) \
+	libm/test/math2.$(OBJEXT) libm/test/test_ieee.$(OBJEXT) \
+	libm/test/math.$(OBJEXT) libm/test/atan2_vec.$(OBJEXT) \
+	libm/test/atan2f_vec.$(OBJEXT) libm/test/jn_vec.$(OBJEXT) \
+	libm/test/jnf_vec.$(OBJEXT) libm/test/log2_vec.$(OBJEXT) \
+	libm/test/log2f_vec.$(OBJEXT) libm/test/yn_vec.$(OBJEXT) \
+	libm/test/ynf_vec.$(OBJEXT) libm/test/acos_vec.$(OBJEXT) \
+	libm/test/acosf_vec.$(OBJEXT) libm/test/acosh_vec.$(OBJEXT) \
+	libm/test/acoshf_vec.$(OBJEXT) libm/test/asin_vec.$(OBJEXT) \
+	libm/test/asinf_vec.$(OBJEXT) libm/test/asinh_vec.$(OBJEXT) \
+	libm/test/asinhf_vec.$(OBJEXT) libm/test/atan_vec.$(OBJEXT) \
+	libm/test/atanf_vec.$(OBJEXT) libm/test/atanh_vec.$(OBJEXT) \
+	libm/test/atanhf_vec.$(OBJEXT) libm/test/ceil_vec.$(OBJEXT) \
+	libm/test/ceilf_vec.$(OBJEXT) libm/test/cos_vec.$(OBJEXT) \
+	libm/test/cosf_vec.$(OBJEXT) libm/test/cosh_vec.$(OBJEXT) \
+	libm/test/coshf_vec.$(OBJEXT) libm/test/erf_vec.$(OBJEXT) \
+	libm/test/erfc_vec.$(OBJEXT) libm/test/erfcf_vec.$(OBJEXT) \
+	libm/test/erff_vec.$(OBJEXT) libm/test/exp_vec.$(OBJEXT) \
+	libm/test/expf_vec.$(OBJEXT) libm/test/fabs_vec.$(OBJEXT) \
+	libm/test/fabsf_vec.$(OBJEXT) libm/test/floor_vec.$(OBJEXT) \
+	libm/test/floorf_vec.$(OBJEXT) libm/test/gamma_vec.$(OBJEXT) \
+	libm/test/gammaf_vec.$(OBJEXT) libm/test/j0_vec.$(OBJEXT) \
+	libm/test/j0f_vec.$(OBJEXT) libm/test/j1_vec.$(OBJEXT) \
+	libm/test/j1f_vec.$(OBJEXT) libm/test/log10_vec.$(OBJEXT) \
+	libm/test/log10f_vec.$(OBJEXT) libm/test/log1p_vec.$(OBJEXT) \
+	libm/test/log1pf_vec.$(OBJEXT) libm/test/log_vec.$(OBJEXT) \
+	libm/test/logf_vec.$(OBJEXT) libm/test/sin_vec.$(OBJEXT) \
+	libm/test/sinf_vec.$(OBJEXT) libm/test/sinh_vec.$(OBJEXT) \
+	libm/test/sinhf_vec.$(OBJEXT) libm/test/sqrt_vec.$(OBJEXT) \
+	libm/test/sqrtf_vec.$(OBJEXT) libm/test/tan_vec.$(OBJEXT) \
+	libm/test/tanf_vec.$(OBJEXT) libm/test/tanh_vec.$(OBJEXT) \
+	libm/test/tanhf_vec.$(OBJEXT) libm/test/y0_vec.$(OBJEXT) \
+	libm/test/y0f_vec.$(OBJEXT) libm/test/y1_vec.$(OBJEXT) \
+	libm/test/y1f_vec.$(OBJEXT) libm/test/hypotf_vec.$(OBJEXT) \
+	libm/test/hypot_vec.$(OBJEXT) libm/test/fmod_vec.$(OBJEXT) \
+	libm/test/fmodf_vec.$(OBJEXT)
+libm_test_test_OBJECTS = $(am_libm_test_test_OBJECTS)
+am__DEPENDENCIES_1 =
+libm_test_test_DEPENDENCIES = $(am__DEPENDENCIES_1) libm.a libc.a
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -3612,7 +3657,7 @@ am__v_CCAS_ = $(am__v_CCAS_@AM_DEFAULT_V@)
 am__v_CCAS_0 = @echo "  CCAS    " $@;
 am__v_CCAS_1 = 
 SOURCES = $(libc_a_SOURCES) $(libc_machine_cris_libic_a_SOURCES) \
-	$(libm_a_SOURCES)
+	$(libm_a_SOURCES) $(libm_test_test_SOURCES)
 AM_V_DVIPS = $(am__v_DVIPS_@AM_V@)
 am__v_DVIPS_ = $(am__v_DVIPS_@AM_DEFAULT_V@)
 am__v_DVIPS_0 = @echo "  DVIPS   " $@;
@@ -4724,6 +4769,87 @@ libm_fenv_src = \
 	libm/fenv/fegetround.c libm/fenv/feholdexcept.c libm/fenv/feraiseexcept.c libm/fenv/fesetenv.c \
 	libm/fenv/fesetexceptflag.c libm/fenv/fesetround.c libm/fenv/fetestexcept.c libm/fenv/feupdateenv.c
 
+libm_test_test_SOURCES = \
+	libm/test/test.c \
+	libm/test/string.c \
+	libm/test/convert.c \
+	libm/test/conv_vec.c \
+	libm/test/iconv_vec.c \
+	libm/test/test_is.c \
+	libm/test/dvec.c \
+	libm/test/sprint_vec.c \
+	libm/test/sprint_ivec.c \
+	libm/test/math2.c \
+	libm/test/test_ieee.c \
+	libm/test/math.c \
+	libm/test/atan2_vec.c \
+	libm/test/atan2f_vec.c \
+	libm/test/jn_vec.c \
+	libm/test/jnf_vec.c \
+	libm/test/log2_vec.c \
+	libm/test/log2f_vec.c \
+	libm/test/yn_vec.c \
+	libm/test/ynf_vec.c \
+	libm/test/acos_vec.c \
+	libm/test/acosf_vec.c \
+	libm/test/acosh_vec.c \
+	libm/test/acoshf_vec.c \
+	libm/test/asin_vec.c \
+	libm/test/asinf_vec.c \
+	libm/test/asinh_vec.c \
+	libm/test/asinhf_vec.c \
+	libm/test/atan_vec.c \
+	libm/test/atanf_vec.c \
+	libm/test/atanh_vec.c \
+	libm/test/atanhf_vec.c \
+	libm/test/ceil_vec.c \
+	libm/test/ceilf_vec.c \
+	libm/test/cos_vec.c \
+	libm/test/cosf_vec.c \
+	libm/test/cosh_vec.c \
+	libm/test/coshf_vec.c \
+	libm/test/erf_vec.c \
+	libm/test/erfc_vec.c \
+	libm/test/erfcf_vec.c \
+	libm/test/erff_vec.c \
+	libm/test/exp_vec.c \
+	libm/test/expf_vec.c \
+	libm/test/fabs_vec.c \
+	libm/test/fabsf_vec.c \
+	libm/test/floor_vec.c \
+	libm/test/floorf_vec.c \
+	libm/test/gamma_vec.c \
+	libm/test/gammaf_vec.c \
+	libm/test/j0_vec.c \
+	libm/test/j0f_vec.c \
+	libm/test/j1_vec.c \
+	libm/test/j1f_vec.c \
+	libm/test/log10_vec.c \
+	libm/test/log10f_vec.c \
+	libm/test/log1p_vec.c \
+	libm/test/log1pf_vec.c \
+	libm/test/log_vec.c \
+	libm/test/logf_vec.c \
+	libm/test/sin_vec.c \
+	libm/test/sinf_vec.c \
+	libm/test/sinh_vec.c \
+	libm/test/sinhf_vec.c \
+	libm/test/sqrt_vec.c \
+	libm/test/sqrtf_vec.c \
+	libm/test/tan_vec.c \
+	libm/test/tanf_vec.c \
+	libm/test/tanh_vec.c \
+	libm/test/tanhf_vec.c \
+	libm/test/y0_vec.c \
+	libm/test/y0f_vec.c \
+	libm/test/y1_vec.c \
+	libm/test/y1f_vec.c \
+	libm/test/hypotf_vec.c \
+	libm/test/hypot_vec.c \
+	libm/test/fmod_vec.c \
+	libm/test/fmodf_vec.c
+
+libm_test_test_LDADD = $(CRT0) libm.a libc.a
 @HAVE_LIBM_MACHINE_AARCH64_TRUE@libm_machine_aarch64_src = \
 @HAVE_LIBM_MACHINE_AARCH64_TRUE@	libm/machine/aarch64/e_sqrt.c \
 @HAVE_LIBM_MACHINE_AARCH64_TRUE@	libm/machine/aarch64/ef_sqrt.c \
@@ -4892,7 +5018,7 @@ all: newlib.h _newlib_version.h
 .SUFFIXES: .def .xml .S .c .dvi .o .obj .ps .s
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/libc/Makefile.inc $(srcdir)/libc/argz/Makefile.inc $(srcdir)/libc/stdlib/Makefile.inc $(srcdir)/libc/ctype/Makefile.inc $(srcdir)/libc/search/Makefile.inc $(srcdir)/libc/stdio/Makefile.inc $(srcdir)/libc/stdio64/Makefile.inc $(srcdir)/libc/string/Makefile.inc $(srcdir)/libc/signal/Makefile.inc $(srcdir)/libc/time/Makefile.inc $(srcdir)/libc/locale/Makefile.inc $(srcdir)/libc/reent/Makefile.inc $(srcdir)/libc/errno/Makefile.inc $(srcdir)/libc/misc/Makefile.inc $(srcdir)/libc/unix/Makefile.inc $(srcdir)/libc/posix/Makefile.inc $(srcdir)/libc/syscalls/Makefile.inc $(srcdir)/libc/iconv/Makefile.inc $(srcdir)/libc/iconv/ces/Makefile.inc $(srcdir)/libc/iconv/ccs/Makefile.inc $(srcdir)/libc/iconv/ccs/binary/Makefile.inc $(srcdir)/libc/iconv/lib/Makefile.inc $(srcdir)/libc/xdr/Makefile.inc $(srcdir)/libc/ssp/Makefile.inc $(srcdir)/libc/sys/Makefile.inc $(srcdir)/libc/sys/a29khif/Makefile.inc $(srcdir)/libc/sys/amdgcn/Makefile.inc $(srcdir)/libc/sys/arm/Makefile.inc $(srcdir)/libc/sys/d10v/Makefile.inc $(srcdir)/libc/sys/epiphany/Makefile.inc $(srcdir)/libc/sys/h8300hms/Makefile.inc $(srcdir)/libc/sys/h8500hms/Makefile.inc $(srcdir)/libc/sys/m88kbug/Makefile.inc $(srcdir)/libc/sys/mmixware/Makefile.inc $(srcdir)/libc/sys/netware/Makefile.inc $(srcdir)/libc/sys/or1k/Makefile.inc $(srcdir)/libc/sys/phoenix/Makefile.inc $(srcdir)/libc/sys/phoenix/machine/arm/Makefile.inc $(srcdir)/libc/sys/rdos/Makefile.inc $(srcdir)/libc/sys/rtems/Makefile.inc $(srcdir)/libc/sys/sh/Makefile.inc $(srcdir)/libc/sys/sysmec/Makefile.inc $(srcdir)/libc/sys/sysnec810/Makefile.inc $(srcdir)/libc/sys/sysnecv850/Makefile.inc $(srcdir)/libc/sys/sysvi386/Makefile.inc $(srcdir)/libc/sys/sysvnecv70/Makefile.inc $(srcdir)/libc/sys/tic80/Makefile.inc $(srcdir)/libc/sys/tirtos/Makefile.inc $(srcdir)/libc/sys/w65/Makefile.inc $(srcdir)/libc/sys/z8ksim/Makefile.inc $(srcdir)/libc/machine/Makefile.inc $(srcdir)/libc/machine/aarch64/Makefile.inc $(srcdir)/libc/machine/amdgcn/Makefile.inc $(srcdir)/libc/machine/arc/Makefile.inc $(srcdir)/libc/machine/arm/Makefile.inc $(srcdir)/libc/machine/bfin/Makefile.inc $(srcdir)/libc/machine/cr16/Makefile.inc $(srcdir)/libc/machine/cris/Makefile.inc $(srcdir)/libc/machine/crx/Makefile.inc $(srcdir)/libc/machine/csky/Makefile.inc $(srcdir)/libc/machine/d10v/Makefile.inc $(srcdir)/libc/machine/d30v/Makefile.inc $(srcdir)/libc/machine/epiphany/Makefile.inc $(srcdir)/libc/machine/fr30/Makefile.inc $(srcdir)/libc/machine/frv/Makefile.inc $(srcdir)/libc/machine/ft32/Makefile.inc $(srcdir)/libc/machine/h8300/Makefile.inc $(srcdir)/libc/machine/h8500/Makefile.inc $(srcdir)/libc/machine/hppa/Makefile.inc $(srcdir)/libc/machine/i386/Makefile.inc $(srcdir)/libc/machine/i960/Makefile.inc $(srcdir)/libc/machine/iq2000/Makefile.inc $(srcdir)/libc/machine/lm32/Makefile.inc $(srcdir)/libc/machine/m32c/Makefile.inc $(srcdir)/libc/machine/m32r/Makefile.inc $(srcdir)/libc/machine/m68hc11/Makefile.inc $(srcdir)/libc/machine/m68k/Makefile.inc $(srcdir)/libc/machine/m88k/Makefile.inc $(srcdir)/libc/machine/mep/Makefile.inc $(srcdir)/libc/machine/microblaze/Makefile.inc $(srcdir)/libc/machine/mips/Makefile.inc $(srcdir)/libc/machine/mn10200/Makefile.inc $(srcdir)/libc/machine/mn10300/Makefile.inc $(srcdir)/libc/machine/moxie/Makefile.inc $(srcdir)/libc/machine/msp430/Makefile.inc $(srcdir)/libc/machine/mt/Makefile.inc $(srcdir)/libc/machine/nds32/Makefile.inc $(srcdir)/libc/machine/necv70/Makefile.inc $(srcdir)/libc/machine/nios2/Makefile.inc $(srcdir)/libc/machine/nvptx/Makefile.inc $(srcdir)/libc/machine/or1k/Makefile.inc $(srcdir)/libc/machine/powerpc/Makefile.inc $(srcdir)/libc/machine/pru/Makefile.inc $(srcdir)/libc/machine/riscv/Makefile.inc $(srcdir)/libc/machine/rl78/Makefile.inc $(srcdir)/libc/machine/rx/Makefile.inc $(srcdir)/libc/machine/sh/Makefile.inc $(srcdir)/libc/machine/sparc/Makefile.inc $(srcdir)/libc/machine/spu/Makefile.inc $(srcdir)/libc/machine/tic4x/Makefile.inc $(srcdir)/libc/machine/tic6x/Makefile.inc $(srcdir)/libc/machine/tic80/Makefile.inc $(srcdir)/libc/machine/v850/Makefile.inc $(srcdir)/libc/machine/visium/Makefile.inc $(srcdir)/libc/machine/w65/Makefile.inc $(srcdir)/libc/machine/x86_64/Makefile.inc $(srcdir)/libc/machine/xc16x/Makefile.inc $(srcdir)/libc/machine/xstormy16/Makefile.inc $(srcdir)/libc/machine/z8k/Makefile.inc $(srcdir)/libm/Makefile.inc $(srcdir)/libm/mathfp/Makefile.inc $(srcdir)/libm/math/Makefile.inc $(srcdir)/libm/common/Makefile.inc $(srcdir)/libm/complex/Makefile.inc $(srcdir)/libm/fenv/Makefile.inc $(srcdir)/libm/machine/aarch64/Makefile.inc $(srcdir)/libm/machine/arm/Makefile.inc $(srcdir)/libm/machine/i386/Makefile.inc $(srcdir)/libm/machine/mips/Makefile.inc $(srcdir)/libm/machine/nds32/Makefile.inc $(srcdir)/libm/machine/powerpc/Makefile.inc $(srcdir)/libm/machine/pru/Makefile.inc $(srcdir)/libm/machine/sparc/Makefile.inc $(srcdir)/libm/machine/spu/Makefile.inc $(srcdir)/libm/machine/riscv/Makefile.inc $(srcdir)/libm/machine/x86_64/Makefile.inc $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/libc/Makefile.inc $(srcdir)/libc/argz/Makefile.inc $(srcdir)/libc/stdlib/Makefile.inc $(srcdir)/libc/ctype/Makefile.inc $(srcdir)/libc/search/Makefile.inc $(srcdir)/libc/stdio/Makefile.inc $(srcdir)/libc/stdio64/Makefile.inc $(srcdir)/libc/string/Makefile.inc $(srcdir)/libc/signal/Makefile.inc $(srcdir)/libc/time/Makefile.inc $(srcdir)/libc/locale/Makefile.inc $(srcdir)/libc/reent/Makefile.inc $(srcdir)/libc/errno/Makefile.inc $(srcdir)/libc/misc/Makefile.inc $(srcdir)/libc/unix/Makefile.inc $(srcdir)/libc/posix/Makefile.inc $(srcdir)/libc/syscalls/Makefile.inc $(srcdir)/libc/iconv/Makefile.inc $(srcdir)/libc/iconv/ces/Makefile.inc $(srcdir)/libc/iconv/ccs/Makefile.inc $(srcdir)/libc/iconv/ccs/binary/Makefile.inc $(srcdir)/libc/iconv/lib/Makefile.inc $(srcdir)/libc/xdr/Makefile.inc $(srcdir)/libc/ssp/Makefile.inc $(srcdir)/libc/sys/Makefile.inc $(srcdir)/libc/sys/a29khif/Makefile.inc $(srcdir)/libc/sys/amdgcn/Makefile.inc $(srcdir)/libc/sys/arm/Makefile.inc $(srcdir)/libc/sys/d10v/Makefile.inc $(srcdir)/libc/sys/epiphany/Makefile.inc $(srcdir)/libc/sys/h8300hms/Makefile.inc $(srcdir)/libc/sys/h8500hms/Makefile.inc $(srcdir)/libc/sys/m88kbug/Makefile.inc $(srcdir)/libc/sys/mmixware/Makefile.inc $(srcdir)/libc/sys/netware/Makefile.inc $(srcdir)/libc/sys/or1k/Makefile.inc $(srcdir)/libc/sys/phoenix/Makefile.inc $(srcdir)/libc/sys/phoenix/machine/arm/Makefile.inc $(srcdir)/libc/sys/rdos/Makefile.inc $(srcdir)/libc/sys/rtems/Makefile.inc $(srcdir)/libc/sys/sh/Makefile.inc $(srcdir)/libc/sys/sysmec/Makefile.inc $(srcdir)/libc/sys/sysnec810/Makefile.inc $(srcdir)/libc/sys/sysnecv850/Makefile.inc $(srcdir)/libc/sys/sysvi386/Makefile.inc $(srcdir)/libc/sys/sysvnecv70/Makefile.inc $(srcdir)/libc/sys/tic80/Makefile.inc $(srcdir)/libc/sys/tirtos/Makefile.inc $(srcdir)/libc/sys/w65/Makefile.inc $(srcdir)/libc/sys/z8ksim/Makefile.inc $(srcdir)/libc/machine/Makefile.inc $(srcdir)/libc/machine/aarch64/Makefile.inc $(srcdir)/libc/machine/amdgcn/Makefile.inc $(srcdir)/libc/machine/arc/Makefile.inc $(srcdir)/libc/machine/arm/Makefile.inc $(srcdir)/libc/machine/bfin/Makefile.inc $(srcdir)/libc/machine/cr16/Makefile.inc $(srcdir)/libc/machine/cris/Makefile.inc $(srcdir)/libc/machine/crx/Makefile.inc $(srcdir)/libc/machine/csky/Makefile.inc $(srcdir)/libc/machine/d10v/Makefile.inc $(srcdir)/libc/machine/d30v/Makefile.inc $(srcdir)/libc/machine/epiphany/Makefile.inc $(srcdir)/libc/machine/fr30/Makefile.inc $(srcdir)/libc/machine/frv/Makefile.inc $(srcdir)/libc/machine/ft32/Makefile.inc $(srcdir)/libc/machine/h8300/Makefile.inc $(srcdir)/libc/machine/h8500/Makefile.inc $(srcdir)/libc/machine/hppa/Makefile.inc $(srcdir)/libc/machine/i386/Makefile.inc $(srcdir)/libc/machine/i960/Makefile.inc $(srcdir)/libc/machine/iq2000/Makefile.inc $(srcdir)/libc/machine/lm32/Makefile.inc $(srcdir)/libc/machine/m32c/Makefile.inc $(srcdir)/libc/machine/m32r/Makefile.inc $(srcdir)/libc/machine/m68hc11/Makefile.inc $(srcdir)/libc/machine/m68k/Makefile.inc $(srcdir)/libc/machine/m88k/Makefile.inc $(srcdir)/libc/machine/mep/Makefile.inc $(srcdir)/libc/machine/microblaze/Makefile.inc $(srcdir)/libc/machine/mips/Makefile.inc $(srcdir)/libc/machine/mn10200/Makefile.inc $(srcdir)/libc/machine/mn10300/Makefile.inc $(srcdir)/libc/machine/moxie/Makefile.inc $(srcdir)/libc/machine/msp430/Makefile.inc $(srcdir)/libc/machine/mt/Makefile.inc $(srcdir)/libc/machine/nds32/Makefile.inc $(srcdir)/libc/machine/necv70/Makefile.inc $(srcdir)/libc/machine/nios2/Makefile.inc $(srcdir)/libc/machine/nvptx/Makefile.inc $(srcdir)/libc/machine/or1k/Makefile.inc $(srcdir)/libc/machine/powerpc/Makefile.inc $(srcdir)/libc/machine/pru/Makefile.inc $(srcdir)/libc/machine/riscv/Makefile.inc $(srcdir)/libc/machine/rl78/Makefile.inc $(srcdir)/libc/machine/rx/Makefile.inc $(srcdir)/libc/machine/sh/Makefile.inc $(srcdir)/libc/machine/sparc/Makefile.inc $(srcdir)/libc/machine/spu/Makefile.inc $(srcdir)/libc/machine/tic4x/Makefile.inc $(srcdir)/libc/machine/tic6x/Makefile.inc $(srcdir)/libc/machine/tic80/Makefile.inc $(srcdir)/libc/machine/v850/Makefile.inc $(srcdir)/libc/machine/visium/Makefile.inc $(srcdir)/libc/machine/w65/Makefile.inc $(srcdir)/libc/machine/x86_64/Makefile.inc $(srcdir)/libc/machine/xc16x/Makefile.inc $(srcdir)/libc/machine/xstormy16/Makefile.inc $(srcdir)/libc/machine/z8k/Makefile.inc $(srcdir)/libm/Makefile.inc $(srcdir)/libm/mathfp/Makefile.inc $(srcdir)/libm/math/Makefile.inc $(srcdir)/libm/common/Makefile.inc $(srcdir)/libm/complex/Makefile.inc $(srcdir)/libm/fenv/Makefile.inc $(srcdir)/libm/test/Makefile.inc $(srcdir)/libm/machine/aarch64/Makefile.inc $(srcdir)/libm/machine/arm/Makefile.inc $(srcdir)/libm/machine/i386/Makefile.inc $(srcdir)/libm/machine/mips/Makefile.inc $(srcdir)/libm/machine/nds32/Makefile.inc $(srcdir)/libm/machine/powerpc/Makefile.inc $(srcdir)/libm/machine/pru/Makefile.inc $(srcdir)/libm/machine/sparc/Makefile.inc $(srcdir)/libm/machine/spu/Makefile.inc $(srcdir)/libm/machine/riscv/Makefile.inc $(srcdir)/libm/machine/x86_64/Makefile.inc $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -4914,7 +5040,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe);; \
 	esac;
-$(srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/libc/Makefile.inc $(srcdir)/libc/argz/Makefile.inc $(srcdir)/libc/stdlib/Makefile.inc $(srcdir)/libc/ctype/Makefile.inc $(srcdir)/libc/search/Makefile.inc $(srcdir)/libc/stdio/Makefile.inc $(srcdir)/libc/stdio64/Makefile.inc $(srcdir)/libc/string/Makefile.inc $(srcdir)/libc/signal/Makefile.inc $(srcdir)/libc/time/Makefile.inc $(srcdir)/libc/locale/Makefile.inc $(srcdir)/libc/reent/Makefile.inc $(srcdir)/libc/errno/Makefile.inc $(srcdir)/libc/misc/Makefile.inc $(srcdir)/libc/unix/Makefile.inc $(srcdir)/libc/posix/Makefile.inc $(srcdir)/libc/syscalls/Makefile.inc $(srcdir)/libc/iconv/Makefile.inc $(srcdir)/libc/iconv/ces/Makefile.inc $(srcdir)/libc/iconv/ccs/Makefile.inc $(srcdir)/libc/iconv/ccs/binary/Makefile.inc $(srcdir)/libc/iconv/lib/Makefile.inc $(srcdir)/libc/xdr/Makefile.inc $(srcdir)/libc/ssp/Makefile.inc $(srcdir)/libc/sys/Makefile.inc $(srcdir)/libc/sys/a29khif/Makefile.inc $(srcdir)/libc/sys/amdgcn/Makefile.inc $(srcdir)/libc/sys/arm/Makefile.inc $(srcdir)/libc/sys/d10v/Makefile.inc $(srcdir)/libc/sys/epiphany/Makefile.inc $(srcdir)/libc/sys/h8300hms/Makefile.inc $(srcdir)/libc/sys/h8500hms/Makefile.inc $(srcdir)/libc/sys/m88kbug/Makefile.inc $(srcdir)/libc/sys/mmixware/Makefile.inc $(srcdir)/libc/sys/netware/Makefile.inc $(srcdir)/libc/sys/or1k/Makefile.inc $(srcdir)/libc/sys/phoenix/Makefile.inc $(srcdir)/libc/sys/phoenix/machine/arm/Makefile.inc $(srcdir)/libc/sys/rdos/Makefile.inc $(srcdir)/libc/sys/rtems/Makefile.inc $(srcdir)/libc/sys/sh/Makefile.inc $(srcdir)/libc/sys/sysmec/Makefile.inc $(srcdir)/libc/sys/sysnec810/Makefile.inc $(srcdir)/libc/sys/sysnecv850/Makefile.inc $(srcdir)/libc/sys/sysvi386/Makefile.inc $(srcdir)/libc/sys/sysvnecv70/Makefile.inc $(srcdir)/libc/sys/tic80/Makefile.inc $(srcdir)/libc/sys/tirtos/Makefile.inc $(srcdir)/libc/sys/w65/Makefile.inc $(srcdir)/libc/sys/z8ksim/Makefile.inc $(srcdir)/libc/machine/Makefile.inc $(srcdir)/libc/machine/aarch64/Makefile.inc $(srcdir)/libc/machine/amdgcn/Makefile.inc $(srcdir)/libc/machine/arc/Makefile.inc $(srcdir)/libc/machine/arm/Makefile.inc $(srcdir)/libc/machine/bfin/Makefile.inc $(srcdir)/libc/machine/cr16/Makefile.inc $(srcdir)/libc/machine/cris/Makefile.inc $(srcdir)/libc/machine/crx/Makefile.inc $(srcdir)/libc/machine/csky/Makefile.inc $(srcdir)/libc/machine/d10v/Makefile.inc $(srcdir)/libc/machine/d30v/Makefile.inc $(srcdir)/libc/machine/epiphany/Makefile.inc $(srcdir)/libc/machine/fr30/Makefile.inc $(srcdir)/libc/machine/frv/Makefile.inc $(srcdir)/libc/machine/ft32/Makefile.inc $(srcdir)/libc/machine/h8300/Makefile.inc $(srcdir)/libc/machine/h8500/Makefile.inc $(srcdir)/libc/machine/hppa/Makefile.inc $(srcdir)/libc/machine/i386/Makefile.inc $(srcdir)/libc/machine/i960/Makefile.inc $(srcdir)/libc/machine/iq2000/Makefile.inc $(srcdir)/libc/machine/lm32/Makefile.inc $(srcdir)/libc/machine/m32c/Makefile.inc $(srcdir)/libc/machine/m32r/Makefile.inc $(srcdir)/libc/machine/m68hc11/Makefile.inc $(srcdir)/libc/machine/m68k/Makefile.inc $(srcdir)/libc/machine/m88k/Makefile.inc $(srcdir)/libc/machine/mep/Makefile.inc $(srcdir)/libc/machine/microblaze/Makefile.inc $(srcdir)/libc/machine/mips/Makefile.inc $(srcdir)/libc/machine/mn10200/Makefile.inc $(srcdir)/libc/machine/mn10300/Makefile.inc $(srcdir)/libc/machine/moxie/Makefile.inc $(srcdir)/libc/machine/msp430/Makefile.inc $(srcdir)/libc/machine/mt/Makefile.inc $(srcdir)/libc/machine/nds32/Makefile.inc $(srcdir)/libc/machine/necv70/Makefile.inc $(srcdir)/libc/machine/nios2/Makefile.inc $(srcdir)/libc/machine/nvptx/Makefile.inc $(srcdir)/libc/machine/or1k/Makefile.inc $(srcdir)/libc/machine/powerpc/Makefile.inc $(srcdir)/libc/machine/pru/Makefile.inc $(srcdir)/libc/machine/riscv/Makefile.inc $(srcdir)/libc/machine/rl78/Makefile.inc $(srcdir)/libc/machine/rx/Makefile.inc $(srcdir)/libc/machine/sh/Makefile.inc $(srcdir)/libc/machine/sparc/Makefile.inc $(srcdir)/libc/machine/spu/Makefile.inc $(srcdir)/libc/machine/tic4x/Makefile.inc $(srcdir)/libc/machine/tic6x/Makefile.inc $(srcdir)/libc/machine/tic80/Makefile.inc $(srcdir)/libc/machine/v850/Makefile.inc $(srcdir)/libc/machine/visium/Makefile.inc $(srcdir)/libc/machine/w65/Makefile.inc $(srcdir)/libc/machine/x86_64/Makefile.inc $(srcdir)/libc/machine/xc16x/Makefile.inc $(srcdir)/libc/machine/xstormy16/Makefile.inc $(srcdir)/libc/machine/z8k/Makefile.inc $(srcdir)/libm/Makefile.inc $(srcdir)/libm/mathfp/Makefile.inc $(srcdir)/libm/math/Makefile.inc $(srcdir)/libm/common/Makefile.inc $(srcdir)/libm/complex/Makefile.inc $(srcdir)/libm/fenv/Makefile.inc $(srcdir)/libm/machine/aarch64/Makefile.inc $(srcdir)/libm/machine/arm/Makefile.inc $(srcdir)/libm/machine/i386/Makefile.inc $(srcdir)/libm/machine/mips/Makefile.inc $(srcdir)/libm/machine/nds32/Makefile.inc $(srcdir)/libm/machine/powerpc/Makefile.inc $(srcdir)/libm/machine/pru/Makefile.inc $(srcdir)/libm/machine/sparc/Makefile.inc $(srcdir)/libm/machine/spu/Makefile.inc $(srcdir)/libm/machine/riscv/Makefile.inc $(srcdir)/libm/machine/x86_64/Makefile.inc $(am__empty):
+$(srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/libc/Makefile.inc $(srcdir)/libc/argz/Makefile.inc $(srcdir)/libc/stdlib/Makefile.inc $(srcdir)/libc/ctype/Makefile.inc $(srcdir)/libc/search/Makefile.inc $(srcdir)/libc/stdio/Makefile.inc $(srcdir)/libc/stdio64/Makefile.inc $(srcdir)/libc/string/Makefile.inc $(srcdir)/libc/signal/Makefile.inc $(srcdir)/libc/time/Makefile.inc $(srcdir)/libc/locale/Makefile.inc $(srcdir)/libc/reent/Makefile.inc $(srcdir)/libc/errno/Makefile.inc $(srcdir)/libc/misc/Makefile.inc $(srcdir)/libc/unix/Makefile.inc $(srcdir)/libc/posix/Makefile.inc $(srcdir)/libc/syscalls/Makefile.inc $(srcdir)/libc/iconv/Makefile.inc $(srcdir)/libc/iconv/ces/Makefile.inc $(srcdir)/libc/iconv/ccs/Makefile.inc $(srcdir)/libc/iconv/ccs/binary/Makefile.inc $(srcdir)/libc/iconv/lib/Makefile.inc $(srcdir)/libc/xdr/Makefile.inc $(srcdir)/libc/ssp/Makefile.inc $(srcdir)/libc/sys/Makefile.inc $(srcdir)/libc/sys/a29khif/Makefile.inc $(srcdir)/libc/sys/amdgcn/Makefile.inc $(srcdir)/libc/sys/arm/Makefile.inc $(srcdir)/libc/sys/d10v/Makefile.inc $(srcdir)/libc/sys/epiphany/Makefile.inc $(srcdir)/libc/sys/h8300hms/Makefile.inc $(srcdir)/libc/sys/h8500hms/Makefile.inc $(srcdir)/libc/sys/m88kbug/Makefile.inc $(srcdir)/libc/sys/mmixware/Makefile.inc $(srcdir)/libc/sys/netware/Makefile.inc $(srcdir)/libc/sys/or1k/Makefile.inc $(srcdir)/libc/sys/phoenix/Makefile.inc $(srcdir)/libc/sys/phoenix/machine/arm/Makefile.inc $(srcdir)/libc/sys/rdos/Makefile.inc $(srcdir)/libc/sys/rtems/Makefile.inc $(srcdir)/libc/sys/sh/Makefile.inc $(srcdir)/libc/sys/sysmec/Makefile.inc $(srcdir)/libc/sys/sysnec810/Makefile.inc $(srcdir)/libc/sys/sysnecv850/Makefile.inc $(srcdir)/libc/sys/sysvi386/Makefile.inc $(srcdir)/libc/sys/sysvnecv70/Makefile.inc $(srcdir)/libc/sys/tic80/Makefile.inc $(srcdir)/libc/sys/tirtos/Makefile.inc $(srcdir)/libc/sys/w65/Makefile.inc $(srcdir)/libc/sys/z8ksim/Makefile.inc $(srcdir)/libc/machine/Makefile.inc $(srcdir)/libc/machine/aarch64/Makefile.inc $(srcdir)/libc/machine/amdgcn/Makefile.inc $(srcdir)/libc/machine/arc/Makefile.inc $(srcdir)/libc/machine/arm/Makefile.inc $(srcdir)/libc/machine/bfin/Makefile.inc $(srcdir)/libc/machine/cr16/Makefile.inc $(srcdir)/libc/machine/cris/Makefile.inc $(srcdir)/libc/machine/crx/Makefile.inc $(srcdir)/libc/machine/csky/Makefile.inc $(srcdir)/libc/machine/d10v/Makefile.inc $(srcdir)/libc/machine/d30v/Makefile.inc $(srcdir)/libc/machine/epiphany/Makefile.inc $(srcdir)/libc/machine/fr30/Makefile.inc $(srcdir)/libc/machine/frv/Makefile.inc $(srcdir)/libc/machine/ft32/Makefile.inc $(srcdir)/libc/machine/h8300/Makefile.inc $(srcdir)/libc/machine/h8500/Makefile.inc $(srcdir)/libc/machine/hppa/Makefile.inc $(srcdir)/libc/machine/i386/Makefile.inc $(srcdir)/libc/machine/i960/Makefile.inc $(srcdir)/libc/machine/iq2000/Makefile.inc $(srcdir)/libc/machine/lm32/Makefile.inc $(srcdir)/libc/machine/m32c/Makefile.inc $(srcdir)/libc/machine/m32r/Makefile.inc $(srcdir)/libc/machine/m68hc11/Makefile.inc $(srcdir)/libc/machine/m68k/Makefile.inc $(srcdir)/libc/machine/m88k/Makefile.inc $(srcdir)/libc/machine/mep/Makefile.inc $(srcdir)/libc/machine/microblaze/Makefile.inc $(srcdir)/libc/machine/mips/Makefile.inc $(srcdir)/libc/machine/mn10200/Makefile.inc $(srcdir)/libc/machine/mn10300/Makefile.inc $(srcdir)/libc/machine/moxie/Makefile.inc $(srcdir)/libc/machine/msp430/Makefile.inc $(srcdir)/libc/machine/mt/Makefile.inc $(srcdir)/libc/machine/nds32/Makefile.inc $(srcdir)/libc/machine/necv70/Makefile.inc $(srcdir)/libc/machine/nios2/Makefile.inc $(srcdir)/libc/machine/nvptx/Makefile.inc $(srcdir)/libc/machine/or1k/Makefile.inc $(srcdir)/libc/machine/powerpc/Makefile.inc $(srcdir)/libc/machine/pru/Makefile.inc $(srcdir)/libc/machine/riscv/Makefile.inc $(srcdir)/libc/machine/rl78/Makefile.inc $(srcdir)/libc/machine/rx/Makefile.inc $(srcdir)/libc/machine/sh/Makefile.inc $(srcdir)/libc/machine/sparc/Makefile.inc $(srcdir)/libc/machine/spu/Makefile.inc $(srcdir)/libc/machine/tic4x/Makefile.inc $(srcdir)/libc/machine/tic6x/Makefile.inc $(srcdir)/libc/machine/tic80/Makefile.inc $(srcdir)/libc/machine/v850/Makefile.inc $(srcdir)/libc/machine/visium/Makefile.inc $(srcdir)/libc/machine/w65/Makefile.inc $(srcdir)/libc/machine/x86_64/Makefile.inc $(srcdir)/libc/machine/xc16x/Makefile.inc $(srcdir)/libc/machine/xstormy16/Makefile.inc $(srcdir)/libc/machine/z8k/Makefile.inc $(srcdir)/libm/Makefile.inc $(srcdir)/libm/mathfp/Makefile.inc $(srcdir)/libm/math/Makefile.inc $(srcdir)/libm/common/Makefile.inc $(srcdir)/libm/complex/Makefile.inc $(srcdir)/libm/fenv/Makefile.inc $(srcdir)/libm/test/Makefile.inc $(srcdir)/libm/machine/aarch64/Makefile.inc $(srcdir)/libm/machine/arm/Makefile.inc $(srcdir)/libm/machine/i386/Makefile.inc $(srcdir)/libm/machine/mips/Makefile.inc $(srcdir)/libm/machine/nds32/Makefile.inc $(srcdir)/libm/machine/powerpc/Makefile.inc $(srcdir)/libm/machine/pru/Makefile.inc $(srcdir)/libm/machine/sparc/Makefile.inc $(srcdir)/libm/machine/spu/Makefile.inc $(srcdir)/libm/machine/riscv/Makefile.inc $(srcdir)/libm/machine/x86_64/Makefile.inc $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
@@ -8903,6 +9029,94 @@ libm/machine/x86_64/libm_a-fetestexcept.$(OBJEXT):  \
 libm/machine/x86_64/libm_a-feupdateenv.$(OBJEXT):  \
 	libm/machine/x86_64/$(am__dirstamp)
 
+clean-checkPROGRAMS:
+	-test -z "$(check_PROGRAMS)" || rm -f $(check_PROGRAMS)
+libm/test/$(am__dirstamp):
+	@$(MKDIR_P) libm/test
+	@: > libm/test/$(am__dirstamp)
+libm/test/test.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/string.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/convert.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/conv_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/iconv_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/test_is.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/dvec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/sprint_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/sprint_ivec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/math2.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/test_ieee.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/math.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/atan2_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/atan2f_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/jn_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/jnf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/log2_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/log2f_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/yn_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/ynf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/acos_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/acosf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/acosh_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/acoshf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/asin_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/asinf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/asinh_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/asinhf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/atan_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/atanf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/atanh_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/atanhf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/ceil_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/ceilf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/cos_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/cosf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/cosh_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/coshf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/erf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/erfc_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/erfcf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/erff_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/exp_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/expf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/fabs_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/fabsf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/floor_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/floorf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/gamma_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/gammaf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/j0_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/j0f_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/j1_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/j1f_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/log10_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/log10f_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/log1p_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/log1pf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/log_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/logf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/sin_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/sinf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/sinh_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/sinhf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/sqrt_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/sqrtf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/tan_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/tanf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/tanh_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/tanhf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/y0_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/y0f_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/y1_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/y1f_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/hypotf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/hypot_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/fmod_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+libm/test/fmodf_vec.$(OBJEXT): libm/test/$(am__dirstamp)
+
+libm/test/test$(EXEEXT): $(libm_test_test_OBJECTS) $(libm_test_test_DEPENDENCIES) $(EXTRA_libm_test_test_DEPENDENCIES) libm/test/$(am__dirstamp)
+	@rm -f libm/test/test$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(libm_test_test_OBJECTS) $(libm_test_test_LDADD) $(LIBS)
+
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 	-rm -f libc/argz/*.$(OBJEXT)
@@ -9025,6 +9239,7 @@ mostlyclean-compile:
 	-rm -f libm/machine/x86_64/*.$(OBJEXT)
 	-rm -f libm/math/*.$(OBJEXT)
 	-rm -f libm/mathfp/*.$(OBJEXT)
+	-rm -f libm/test/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -23461,6 +23676,7 @@ distclean-DEJAGNU:
 	  rm -f $$tool.sum $$tool.log; \
 	done
 check-am: all-am
+	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
 	$(MAKE) $(AM_MAKEFLAGS) check-DEJAGNU
 check: check-am
 all-am: Makefile $(LIBRARIES) $(DATA) newlib.h _newlib_version.h \
@@ -23618,13 +23834,14 @@ distclean-generic:
 	-rm -f libm/machine/x86_64/$(am__dirstamp)
 	-rm -f libm/math/$(am__dirstamp)
 	-rm -f libm/mathfp/$(am__dirstamp)
+	-rm -f libm/test/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-aminfo clean-generic clean-local \
+clean-am: clean-aminfo clean-checkPROGRAMS clean-generic clean-local \
 	clean-toollibLIBRARIES mostlyclean-am
 
 distclean: distclean-am
@@ -23790,9 +24007,9 @@ uninstall-am: uninstall-cctDATA uninstall-dvi-am uninstall-html-am \
 .MAKE: all check-am install-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am all-local am--refresh check \
-	check-DEJAGNU check-am clean clean-aminfo clean-cscope \
-	clean-generic clean-local clean-toollibLIBRARIES cscope \
-	cscopelist-am ctags ctags-am dist-info distclean \
+	check-DEJAGNU check-am clean clean-aminfo clean-checkPROGRAMS \
+	clean-cscope clean-generic clean-local clean-toollibLIBRARIES \
+	cscope cscopelist-am ctags ctags-am dist-info distclean \
 	distclean-DEJAGNU distclean-compile distclean-generic \
 	distclean-hdr distclean-local distclean-tags dvi dvi-am html \
 	html-am info info-am install install-am install-cctDATA \
