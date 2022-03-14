@@ -3523,8 +3523,7 @@ restart:
 			{(WCHAR) towupper (upath.Buffer[4]), L':', L'\0'};
 		      WCHAR remote[MAX_PATH];
 
-
-		      int remlen = QueryDosDeviceW (drive, remote, MAX_PATH);
+		      DWORD remlen = QueryDosDeviceW (drive, remote, MAX_PATH);
 		      if (remlen < 3)
 			goto file_not_symlink; /* fallback */
 		      remlen -= 2; /* Two L'\0' */
