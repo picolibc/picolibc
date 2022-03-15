@@ -162,7 +162,7 @@ gmondump1 (char *filename)
 
   note ("file %s, gmon version 0x%x, sample rate %d\n",
         filename, hdr.version, hdr.profrate);
-  note ("  address range 0x%p..0x%p\n", hdr.lpc, hdr.hpc);
+  note ("  address range %p..%p\n", hdr.lpc, hdr.hpc);
   note ("  numbuckets %d, hitbuckets %d, hitcount %d, numrawarcs %d\n",
         numbuckets, hitbuckets, hitcount, numrawarcs);
 
@@ -175,7 +175,7 @@ gmondump1 (char *filename)
       int   incr = (hdr.hpc - hdr.lpc) / numbuckets;
       for (res = 0; res < numbuckets; ++bucket, ++res, addr += incr)
         if (*bucket)
-          note ("    address 0x%p, hitcount %d\n", addr, *bucket);
+          note ("    address %p, hitcount %d\n", addr, *bucket);
       bucket -= numbuckets;
 
       if (numrawarcs)
@@ -186,7 +186,7 @@ gmondump1 (char *filename)
             error (0, "unable to read rawarc data");
           note ("  rawarc data follows...\n");
           for (res = 0; res < numrawarcs; ++rawarc, ++res)
-            note ("    from 0x%p, self 0x%p, count %d\n",
+            note ("    from %p, self %p, count %d\n",
                   rawarc->raw_frompc, rawarc->raw_selfpc, rawarc->raw_count);
         }
     }
