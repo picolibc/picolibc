@@ -16,7 +16,7 @@ if test -z "$newlib_headers"; then
 fi
 newlib_headers="$target_builddir/newlib/targ-include $newlib_headers"
 
-AM_CPPFLAGS="-I${winsup_srcdir}/cygwin -I${target_builddir}/winsup/cygwin"
+AM_CPPFLAGS="-U_FORTIFY_SOURCE -I${winsup_srcdir}/cygwin -I${target_builddir}/winsup/cygwin"
 AM_CPPFLAGS="${AM_CPPFLAGS} -isystem ${cygwin_headers}"
 for h in ${newlib_headers}; do
     AM_CPPFLAGS="${AM_CPPFLAGS} -isystem $h"
