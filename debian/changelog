@@ -1,3 +1,15 @@
+picolibc (1.7.6-1) unstable; urgency=medium
+
+  * New upstream
+
+  * Fix use with c++ applications.
+
+  * Fix broken compiler feature auto-detection in Debian packages.
+
+  * Add -msave-restore for minsize RISC-V package build.
+
+ -- Keith Packard <keithp@keithp.com>  Fri, 25 Mar 2022 14:48:45 -0700
+
 picolibc (1.7.5-1) unstable; urgency=medium
 
   * New upstream
