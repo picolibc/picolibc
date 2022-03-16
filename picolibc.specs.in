@@ -10,7 +10,7 @@
 @TLSMODEL@ %(picolibc_cc1) @CC1_SPEC@
 
 *cc1plus:
--isystem %{-picolibc-prefix=*:%*/@INCLUDEDIR@; -picolibc-buildtype=*:@PREFIX@/@INCLUDEDIR@/%*; @PREFIX@/@INCLUDEDIR@} -idirafter %{-picolibc-prefix=*:%*/@INCLUDEDIR@; -picolibc-buildtype=*:@PREFIX@/@INCLUDEDIR@/%*; :@PREFIX@/@INCLUDEDIR@} @TLSMODEL@ %(picolibc_cc1plus) @CC1_SPEC@ @CC1PLUS_SPEC@
+-isystem %{-picolibc-prefix=*:%*/@INCLUDEDIR@; -picolibc-buildtype=*:@PREFIX@/@INCLUDEDIR@/%*; :@PREFIX@/@INCLUDEDIR@} -idirafter %{-picolibc-prefix=*:%*/@INCLUDEDIR@; -picolibc-buildtype=*:@PREFIX@/@INCLUDEDIR@/%*; :@PREFIX@/@INCLUDEDIR@} @TLSMODEL@ %(picolibc_cc1plus) @CC1_SPEC@ @CC1PLUS_SPEC@
 
 *link:
 @SPECS_PRINTF@ -L%{-picolibc-prefix=*:%*/@LIBDIR@/%M; -picolibc-buildtype=*:@PREFIX@/@LIBDIR@/%*/%M; :@PREFIX@/@LIBDIR@/%M} -L%{-picolibc-prefix=*:%*/@LIBDIR@; -picolibc-buildtype=*:@PREFIX@/@LIBDIR@/%*; :@PREFIX@/@LIBDIR@} %{!T:-T@PICOLIBC_LD@} %(picolibc_link) --gc-sections @LINK_SPEC@
