@@ -1,5 +1,5 @@
 [binaries]
-c = 'riscv64-unknown-elf-gcc'
+c = ['riscv64-unknown-elf-gcc', '-march=rv32imac', '-mabi=ilp32']
 ar = 'riscv64-unknown-elf-ar'
 as = 'riscv64-unknown-elf-as'
 nm = 'riscv64-unknown-elf-nm'
@@ -13,7 +13,6 @@ cpu = 'riscv32'
 endian = 'little'
 
 [properties]
-c_args = [ '-nostdlib', '-msave-restore', '-march=rv32imac', '-mabi=ilp32']
-c_link_args = [ '-nostdlib', '-msave-restore', '-march=rv32imac', '-mabi=ilp32']
+c_args = ['-msave-restore']
 needs_exe_wrapper = true
 skip_sanity_check = true

@@ -13,7 +13,7 @@ cpu = 'riscv'
 endian = 'little'
 
 [properties]
-c_args = [ '-nostdlib', '-msave-restore', '-fno-common' ]
+c_args = [ '-msave-restore' ]
 # default multilib is 64 bit
 c_args_ = [ '-mcmodel=medany' ]
 needs_exe_wrapper = true

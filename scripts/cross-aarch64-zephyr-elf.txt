@@ -13,6 +13,5 @@ cpu = 'aarch64'
 endian = 'little'
 
 [properties]
-c_args = [ '-nostdlib' ]
 needs_exe_wrapper = true
 skip_sanity_check = true

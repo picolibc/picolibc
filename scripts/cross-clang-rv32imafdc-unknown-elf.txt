@@ -1,5 +1,5 @@
 [binaries]
-c = 'clang'
+c = ['clang', '-m32', '-target', 'riscv32-unknown-elf', '-march=rv32imafdc']
 c_ld = '/usr/bin/riscv64-unknown-elf-ld'
 ar = 'riscv64-unknown-elf-ar'
 as = 'riscv64-unknown-elf-as'
@@ -14,23 +14,8 @@ cpu = 'riscv'
 endian = 'little'
 
 [properties]
-c_args = [
-	'-m32',
-	'-target', 'riscv32-unknown-elf',
-	'-march=rv32imafdc',
-	'-Wdouble-promotion',
-	'-Werror=double-promotion',
-        '-Wno-unsupported-floating-point-opt',
-        '-std=c17',
-	]
-c_link_args = [
-	'-m32',
-	'-target', 'riscv32-unknown-elf',
-	'-march=rv32imafdc',
-	'-Wl,-melf32lriscv',
-	'-nostdlib',
-	'-L/usr/lib/gcc/riscv64-unknown-elf/8.3.0/rv32imafdc/ilp32d'
-	]
+c_args = ['-Werror=double-promotion']
+c_link_args = ['-Wl,-melf32lriscv', '-L/usr/lib/gcc/riscv64-unknown-elf/8.3.0/rv32imafdc/ilp32d']
 needs_exe_wrapper = true
 skip_sanity_check = true
 has_link_defsym = true

@@ -1,9 +1,8 @@
 [binaries]
-c = ['x86_64-linux-gnu-gcc', '-march=core2', '-mfpmath=sse', '-msse2',
-        '-nostdlib', '-fno-pic', '-fno-PIE', '-static']
+c = ['x86_64-linux-gnu-gcc', '-march=core2', '-mfpmath=sse', '-msse2']
 ar = 'x86_64-linux-gnu-ar'
 as = 'x86_64-linux-gnu-as'
-ld = ['x86_64-linux-gnu-gcc', '-march=core2', '-mfpmath=sse', '-msse2', '-nostdlib', '-fno-pic', '-fno-PIE', '-static']
+ld = ['x86_64-linux-gnu-gcc', '-march=core2', '-mfpmath=sse', '-msse2']
 nm = 'x86_64-linux-gnu-nm'
 strip = 'x86_64-linux-gnu-strip'
 exe_wrapper = ['sh', '-c', 'test -z "$MESON_SOURCE_ROOT" || "$MESON_SOURCE_ROOT"/scripts/run-x86_64 "$@"', 'run-x86_64']
@@ -15,6 +14,8 @@ cpu='x86_64'
 endian='little'
 
 [properties]
+c_args = ['-fno-pic', '-fno-PIE', '-static']
+ld_args = ['-fno-pic', '-fno-PIE', '-static']
 skip_sanity_check = true
 needs_exe_wrapper = true
 link_spec = '--build-id=none'

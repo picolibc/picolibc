@@ -1,5 +1,5 @@
 [binaries]
-c = ['clang', '-target', 'riscv64-unknown-elf' ]
+c = ['clang', '-target', 'riscv64-unknown-elf', '-mcmodel=medany']
 c_ld = '/usr/bin/riscv64-unknown-elf-ld'
 ar = 'riscv64-unknown-elf-ar'
 as = 'riscv64-unknown-elf-as'
@@ -14,13 +14,8 @@ cpu = 'riscv'
 endian = 'little'
 
 [properties]
-c_args = [ '-nostdlib', '-Wdouble-promotion', '-mcmodel=medany']
-c_link_args = [
-	'-nostdlib',
-	'-mcmodel=medany',
-	'-L/usr/lib/gcc/riscv64-unknown-elf/8.3.0/rv64imac/lp64/'
-	]
-
+c_args = ['-Werror=double-promotion']
+c_link_args = ['-L/usr/lib/gcc/riscv64-unknown-elf/8.3.0/rv64imac/lp64/']
 needs_exe_wrapper = true
 skip_sanity_check = true
 has_link_defsym = true

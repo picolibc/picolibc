@@ -1,5 +1,5 @@
 [binaries]
-c = 'arm-none-eabi-gcc'
+c = ['arm-none-eabi-gcc', '-mcpu=cortex-a9']
 ar = 'arm-none-eabi-ar'
 as = 'arm-none-eabi-as'
 nm = 'arm-none-eabi-nm'
@@ -13,12 +13,5 @@ cpu = 'cortex-a9'
 endian = 'little'
 
 [properties]
-c_args = [
-	'-mcpu=cortex-a9',
-	]
-c_link_args = [
-	'-mcpu=cortex-a9',
-	'-nostdlib',
-	]
 needs_exe_wrapper = true
 test_link_script = 'scripts/test-cortex-a9.ld'

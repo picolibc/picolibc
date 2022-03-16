@@ -1,5 +1,5 @@
 [binaries]
-c = 'clang'
+c = ['clang', '-m32', '-target', 'thumbv7m-none-eabi', '-mfloat-abi=soft']
 c_ld = '/usr/bin/arm-none-eabi-ld'
 ar = 'arm-none-eabi-ar'
 as = 'arm-none-eab-as'
@@ -14,20 +14,6 @@ cpu = 'arm'
 endian = 'little'
 
 [properties]
-c_args = [
-	'-m32',
-	'-target', 'thumbv7m-none-eabi',
-	'-mfloat-abi=soft',
-	'-Wdouble-promotion',
-	'-Werror=double-promotion',
-        '-Wno-unsupported-floating-point-opt',
-        '-std=c17',
-	]
-c_link_args = [
-	'-m32',
-	'-target', 'thumbv7m-none-eabi',
-	'-mfloat-abi=soft',
-	'-nostdlib',
-	'-L/usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7-m/nofp/',
-	]
+c_args = ['-Werror=double-promotion', '-Wno-unsupported-floating-point-opt']
+c_link_args = ['-L/usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7-m/nofp/']
 needs_exe_wrapper = true
