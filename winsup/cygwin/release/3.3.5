@@ -40,3 +40,6 @@ Bug Fixes
 - Fix a problem that fsync() flushes the console input buffer unlike
   linux. fsync() should return EINVAL for special files such as tty.
   Addresses: https://cygwin.com/pipermail/cygwin/2022-March/251022.html
+
+- Fix a formatting problem in gmondump where all displayed addresses are
+  mistakenly prefixed with "0x0x".
