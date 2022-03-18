@@ -180,6 +180,29 @@ cons_master_thread (VOID *arg)
   return 0;
 }
 
+/* Compare two INPUT_RECORD sequences */
+static inline bool
+inrec_eq (const INPUT_RECORD *a, const INPUT_RECORD *b, DWORD n)
+{
+  for (DWORD i = 0; i < n; i++)
+    {
+      if (a[i].EventType == KEY_EVENT && b[i].EventType == KEY_EVENT)
+	{ /* wVirtualKeyCode and wVirtualScanCode of the readback
+	     key event may be different from that of written event. */
+	  const KEY_EVENT_RECORD *ak = &a[i].Event.KeyEvent;
+	  const KEY_EVENT_RECORD *bk = &b[i].Event.KeyEvent;
+	  if (ak->bKeyDown != bk->bKeyDown
+	      || ak->uChar.UnicodeChar != bk->uChar.UnicodeChar
+	      || ak->dwControlKeyState != bk->dwControlKeyState
+	      || ak->wRepeatCount != bk->wRepeatCount)
+	    return false;
+	}
+      else if (memcmp (a + i, b + i, sizeof (INPUT_RECORD)) != 0)
+	return false;
+    }
+  return true;
+}
+
 /* This thread processes signals derived from input messages.
    Without this thread, those signals can be handled only when
    the process calls read() or select(). This thread reads input
@@ -328,30 +351,25 @@ remove_record:
 	      if (n < total_read)
 		break; /* Someone has read input without acquiring
 			  input_mutex. ConEmu cygwin-connector? */
-	      if (memcmp (input_rec, tmp, m::bytes (total_read)) == 0)
+	      if (inrec_eq (input_rec, tmp, total_read))
 		break; /* OK */
 	      /* Try to fix */
-	      DWORD incr = n - total_read;
-	      DWORD ofst;
-	      for (ofst = 1; ofst <= incr; ofst++)
-		if (memcmp (input_rec, tmp + ofst, m::bytes (total_read)) == 0)
+	      acquire_attach_mutex (mutex_timeout);
+	      ReadConsoleInputW (p->input_handle, tmp, inrec_size, &n);
+	      release_attach_mutex ();
+	      for (DWORD i = 0, j = 0; j < n; j++)
+		if (i == total_read || !inrec_eq (input_rec + i, tmp + j, 1))
 		  {
-		    acquire_attach_mutex (mutex_timeout);
-		    ReadConsoleInputW (p->input_handle, tmp, inrec_size, &n);
-		    release_attach_mutex ();
-		    memcpy (input_rec, tmp + ofst, m::bytes (total_read));
-		    memcpy (input_rec + total_read, tmp, m::bytes (ofst));
-		    if (n > ofst + total_read)
-		      memcpy (input_rec + total_read + ofst,
-			      tmp + ofst + total_read,
-			      m::bytes (n - (ofst + total_read)));
-		    total_read = n;
-		    break;
+		    if (total_read + j - i >= n)
+		      { /* Something is wrong. Giving up. */
+			WriteConsoleInputW (p->input_handle, tmp, n, &n);
+			goto skip_writeback;
+		      }
+		    input_rec[total_read + j - i] = tmp[j];
 		  }
-	      if (ofst > incr)
-		break; /* Writeback was not atomic. Or someone has read
-			  input without acquiring input_mutex.
-			  Giving up because hard to fix. */
+		else
+		  i++;
+	      total_read = n;
 	    }
 	  while (true);
 	}
