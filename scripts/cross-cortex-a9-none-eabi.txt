@@ -15,3 +15,4 @@ endian = 'little'
 [properties]
 needs_exe_wrapper = true
 test_link_script = 'scripts/test-cortex-a9.ld'
+skip_sanity_check = true
