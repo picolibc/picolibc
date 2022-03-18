@@ -1,7 +1,7 @@
 if ENABLE_NEWLIB_ICONV
 
 ## The following interfaces are EL/IX level 2
-if ELIX_LEVEL_1
+if !ELIX_LEVEL_1
 libc_a_SOURCES += \
 	%D%/utf-8.c \
 	%D%/utf-16.c \

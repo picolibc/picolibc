@@ -1,7 +1,7 @@
 if ENABLE_NEWLIB_ICONV
 
 ## The following interfaces are EL/IX level 2
-if ELIX_LEVEL_1
+if !ELIX_LEVEL_1
 libc_a_SOURCES += \
 	%D%/ccsbi.c \
 	%D%/iso_8859_10.c %D%/iso_8859_13.c %D%/iso_8859_14.c %D%/iso_8859_15.c \
