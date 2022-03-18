@@ -571,8 +571,8 @@ have_builtin_expect = cc.links(builtin_expect_code, name : 'has __builtin_expect
 #  > #if __has_attribute(__alloc_size__)
 # produce a wrong result. So test if the compiler has that attribute
 alloc_size_code = '''
-void *foobar(size_t) __attribute__((__alloc_size__(1)));
-void *foobar2(size_t, size_t) __attribute__((__alloc_size__(1, 2)));
+void *foobar(int) __attribute__((__alloc_size__(1)));
+void *foobar2(int, int) __attribute__((__alloc_size__(1, 2)));
 '''
 have_alloc_size = cc.compiles(alloc_size_code, name : 'attribute __alloc_size__', args : (cc.has_argument('-Werror') ? '-Werror' : ''))
 
