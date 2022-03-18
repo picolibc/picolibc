@@ -49,6 +49,7 @@ meson setup \
 	-Dincludedir=lib/picolibc/include \
 	-Dlibdir=lib/picolibc/lib \
 	-Dspecsdir=none \
+	-Duse-stdlib=true \
 	-Dtests=true \
 	-Dc_args="-fsanitize=bounds -fsanitize-undefined-trap-on-error -Werror" \
 	"$@" \
