@@ -187,13 +187,13 @@ inrec_eq (const INPUT_RECORD *a, const INPUT_RECORD *b, DWORD n)
   for (DWORD i = 0; i < n; i++)
     {
       if (a[i].EventType == KEY_EVENT && b[i].EventType == KEY_EVENT)
-	{ /* wVirtualKeyCode and wVirtualScanCode of the readback
-	     key event may be different from that of written event. */
+	{ /* wVirtualKeyCode, wVirtualScanCode and dwControlKeyState
+	     of the readback key event may be different from that of
+	     written event. Therefore they are ignored. */
 	  const KEY_EVENT_RECORD *ak = &a[i].Event.KeyEvent;
 	  const KEY_EVENT_RECORD *bk = &b[i].Event.KeyEvent;
 	  if (ak->bKeyDown != bk->bKeyDown
 	      || ak->uChar.UnicodeChar != bk->uChar.UnicodeChar
-	      || ak->dwControlKeyState != bk->dwControlKeyState
 	      || ak->wRepeatCount != bk->wRepeatCount)
 	    return false;
 	}
