@@ -362,7 +362,9 @@ remove_record:
 		  {
 		    if (total_read + j - i >= n)
 		      { /* Something is wrong. Giving up. */
+			acquire_attach_mutex (mutex_timeout);
 			WriteConsoleInputW (p->input_handle, tmp, n, &n);
+			release_attach_mutex ();
 			goto skip_writeback;
 		      }
 		    input_rec[total_read + j - i] = tmp[j];
