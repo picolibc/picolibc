@@ -1605,26 +1605,6 @@ dump_sysinfo ()
       || osversion.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
     exit (EXIT_FAILURE);
 
-  BOOL is_wow64 = FALSE;
-  if (IsWow64Process (GetCurrentProcess (), &is_wow64) && is_wow64)
-    {
-      SYSTEM_INFO natinfo;
-      GetNativeSystemInfo (&natinfo);
-      fputs ("\nRunning under WOW64 on ", stdout);
-      switch (natinfo.wProcessorArchitecture)
-	{
-	  case PROCESSOR_ARCHITECTURE_IA64:
-	    puts ("IA64");
-	    break;
-	  case PROCESSOR_ARCHITECTURE_AMD64:
-	    puts ("AMD64");
-	    break;
-	  default:
-	    puts("??");
-	    break;
-	}
-    }
-
   if (GetSystemMetrics (SM_REMOTESESSION))
     printf ("\nRunning in Terminal Service session\n");
 

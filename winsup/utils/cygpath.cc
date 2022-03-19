@@ -536,7 +536,6 @@ do_sysfolders (char option)
 {
   WCHAR wbuf[MAX_PATH];
   char buf[PATH_MAX];
-  BOOL iswow64 = FALSE;
 
   wbuf[0] = L'\0';
   switch (option)
@@ -579,18 +578,6 @@ do_sysfolders (char option)
 
     case 'S':
       GetSystemDirectoryW (wbuf, MAX_PATH);
-      if (!windows_flag
-	  && IsWow64Process (GetCurrentProcess (), &iswow64) && iswow64)
-	{
-	  /* When calling NtQueryInformationFile(FileNameInformation) on WOW64,
-	     the returned path will point to SysWOW64.  This breaks path
-	     redirection to the network related files under device/etc.  This
-	     here is a bad hack to make sure that the conversion will convert
-	     the case *and* stick to System32. */
-	  PWCHAR last_bs = wcsrchr (wbuf, L'\\');
-	  if (last_bs)
-	    wcpcpy (last_bs + 1, L"Sysnative");
-	}
       break;
 
     case 'W':
