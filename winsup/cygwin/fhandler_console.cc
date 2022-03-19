@@ -186,7 +186,9 @@ inrec_eq (const INPUT_RECORD *a, const INPUT_RECORD *b, DWORD n)
 {
   for (DWORD i = 0; i < n; i++)
     {
-      if (a[i].EventType == KEY_EVENT && b[i].EventType == KEY_EVENT)
+      if (a[i].EventType != b[i].EventType)
+	return false;
+      else if (a[i].EventType == KEY_EVENT)
 	{ /* wVirtualKeyCode, wVirtualScanCode and dwControlKeyState
 	     of the readback key event may be different from that of
 	     written event. Therefore they are ignored. */
@@ -197,8 +199,41 @@ inrec_eq (const INPUT_RECORD *a, const INPUT_RECORD *b, DWORD n)
 	      || ak->wRepeatCount != bk->wRepeatCount)
 	    return false;
 	}
-      else if (memcmp (a + i, b + i, sizeof (INPUT_RECORD)) != 0)
-	return false;
+      else if (a[i].EventType == MOUSE_EVENT)
+	{
+	  const MOUSE_EVENT_RECORD *am = &a[i].Event.MouseEvent;
+	  const MOUSE_EVENT_RECORD *bm = &b[i].Event.MouseEvent;
+	  if (am->dwMousePosition.X != bm->dwMousePosition.X
+	      || am->dwMousePosition.Y != bm->dwMousePosition.Y
+	      || am->dwButtonState != bm->dwButtonState
+	      || am->dwControlKeyState != bm->dwControlKeyState
+	      || am->dwEventFlags != bm->dwEventFlags)
+	    return false;
+	}
+      else if (a[i].EventType == WINDOW_BUFFER_SIZE_EVENT)
+	{
+	  const WINDOW_BUFFER_SIZE_RECORD
+	    *aw = &a[i].Event.WindowBufferSizeEvent;
+	  const WINDOW_BUFFER_SIZE_RECORD
+	    *bw = &b[i].Event.WindowBufferSizeEvent;
+	  if (aw->dwSize.X != bw->dwSize.X
+	      || aw->dwSize.Y != bw->dwSize.Y)
+	    return false;
+	}
+      else if (a[i].EventType == MENU_EVENT)
+	{
+	  const MENU_EVENT_RECORD *am = &a[i].Event.MenuEvent;
+	  const MENU_EVENT_RECORD *bm = &b[i].Event.MenuEvent;
+	  if (am->dwCommandId != bm->dwCommandId)
+	    return false;
+	}
+      else if (a[i].EventType == FOCUS_EVENT)
+	{
+	  const FOCUS_EVENT_RECORD *af = &a[i].Event.FocusEvent;
+	  const FOCUS_EVENT_RECORD *bf = &b[i].Event.FocusEvent;
+	  if (af->bSetFocus != bf->bSetFocus)
+	    return false;
+	}
     }
   return true;
 }
