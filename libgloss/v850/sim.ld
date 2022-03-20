@@ -195,7 +195,7 @@ SECTIONS
   .debug_typenames 0	: { *(.debug_typenames) }
   .debug_varnames  0	: { *(.debug_varnames) }
   /* User stack.  */
-  .stack 0x300000	:
+  .stack 0x200000	:
   {
 	__stack = .;
 	*(.stack)
