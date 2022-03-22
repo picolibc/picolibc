@@ -28,6 +28,7 @@ details. */
 #include "tls_pbuf.h"
 #include "winf.h"
 #include "ntdll.h"
+#include "shared_info.h"
 
 static const suffix_info exe_suffixes[] =
 {
@@ -631,6 +632,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 
       if (!iscygwin ())
 	{
+	  bool need_send_sig = false;
 	  int fd;
 	  cygheap_fdenum cfd (false);
 	  while ((fd = cfd.next ()) >= 0)
@@ -645,14 +647,28 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 		     && (fd == fileno_stdout || fd == fileno_stderr))
 	      {
 		fhandler_pipe *pipe = (fhandler_pipe *)(fhandler_base *) cfd;
-		pipe->close_query_handle ();
 		pipe->set_pipe_non_blocking (false);
+		if (pipe->request_close_query_hdl ())
+		  need_send_sig = true;
 	      }
 	    else if (cfd->get_dev () == FH_PIPER && fd == fileno_stdin)
 	      {
 		fhandler_pipe *pipe = (fhandler_pipe *)(fhandler_base *) cfd;
 		pipe->set_pipe_non_blocking (false);
 	      }
+
+	  if (need_send_sig)
+	    {
+	      tty_min dummy_tty;
+	      dummy_tty.ntty = (fh_devices) myself->ctty;
+	      dummy_tty.pgid = myself->pgid;
+	      tty_min *t = cygwin_shared->tty.get_cttyp ();
+	      if (!t) /* If tty is not allocated, use dummy_tty instead. */
+		t = &dummy_tty;
+	      /* Emit __SIGNONCYGCHLD to let all processes in the
+		 process group close query_hdl. */
+	      t->kill_pgrp (__SIGNONCYGCHLD);
+	    }
 	}
 
       bool stdin_is_ptys = false;

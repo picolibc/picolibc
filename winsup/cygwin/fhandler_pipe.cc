@@ -599,6 +599,8 @@ fhandler_pipe::fixup_after_fork (HANDLE parent)
     fork_fixup (parent, select_sem, "select_sem");
   if (query_hdl)
     fork_fixup (parent, query_hdl, "query_hdl");
+  if (query_hdl_close_req_evt)
+    fork_fixup (parent, query_hdl_close_req_evt, "query_hdl_close_req_evt");
 
   fhandler_base::fixup_after_fork (parent);
   ReleaseMutex (hdl_cnt_mtx);
@@ -649,6 +651,16 @@ fhandler_pipe::dup (fhandler_base *child, int flags)
       ftp->close ();
       res = -1;
     }
+  else if (query_hdl_close_req_evt &&
+	   !DuplicateHandle (GetCurrentProcess (), query_hdl_close_req_evt,
+			     GetCurrentProcess (),
+			     &ftp->query_hdl_close_req_evt,
+			     0, !(flags & O_CLOEXEC), DUPLICATE_SAME_ACCESS))
+    {
+      __seterrno ();
+      ftp->close ();
+      res = -1;
+    }
   ReleaseMutex (hdl_cnt_mtx);
 
   debug_printf ("res %d", res);
@@ -668,6 +680,8 @@ fhandler_pipe::close ()
   WaitForSingleObject (hdl_cnt_mtx, INFINITE);
   if (query_hdl)
     CloseHandle (query_hdl);
+  if (query_hdl_close_req_evt)
+    CloseHandle (query_hdl_close_req_evt);
   int ret = fhandler_base::close ();
   ReleaseMutex (hdl_cnt_mtx);
   CloseHandle (hdl_cnt_mtx);
@@ -901,9 +915,18 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
 			0, sa->bInheritHandle, DUPLICATE_SAME_ACCESS))
     goto err_close_hdl_cnt_mtx0;
 
+  if (fhs[1]->query_hdl)
+    {
+      fhs[1]->query_hdl_close_req_evt = CreateEvent (sa, TRUE, FALSE, NULL);
+      if (!fhs[1]->query_hdl_close_req_evt)
+	goto err_close_hdl_cnt_mtx1;
+    }
+
   res = 0;
   goto out;
 
+err_close_hdl_cnt_mtx1:
+  CloseHandle (fhs[1]->hdl_cnt_mtx);
 err_close_hdl_cnt_mtx0:
   CloseHandle (fhs[0]->hdl_cnt_mtx);
 err_close_query_hdl:

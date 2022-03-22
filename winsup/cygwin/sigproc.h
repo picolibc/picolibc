@@ -22,7 +22,8 @@ enum
   __SIGHOLD	    = -(_NSIG + 7),
   __SIGNOHOLD	    = -(_NSIG + 8),
   __SIGSETPGRP	    = -(_NSIG + 9),
-  __SIGTHREADEXIT   = -(_NSIG + 10)
+  __SIGTHREADEXIT   = -(_NSIG + 10),
+  __SIGNONCYGCHLD   = -(_NSIG + 12),
 };
 #endif
 
