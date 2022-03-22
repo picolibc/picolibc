@@ -1,0 +1,7 @@
+# Copyright © 2021 Amazon.com, Inc. or its affiliates.
+# SPDX-License-Identifier: Apache-2.0
+
+config PICOLIBC_MODULE
+	bool "picolibc support"
+	help
+	  This option enables picolibc

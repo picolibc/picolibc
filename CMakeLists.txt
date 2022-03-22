@@ -37,6 +37,13 @@ cmake_minimum_required(VERSION 3.20.0)
 
 project(Picolibc VERSION 1.7.6 LANGUAGES C ASM)
 
+if(ZEPHYR_BASE)
+  if(NOT CONFIG_PICOLIBC)
+    return()
+  endif()
+  include(zephyr/zephyr.cmake)
+endif()
+
 include(cmake/picolibc.cmake)
 
 enable_testing()
@@ -523,6 +530,7 @@ target_compile_options(c PRIVATE
   "-Werror=vla"
   "-Warray-bounds"
   "-Wold-style-definition"
+  ${PICOLIBC_EXTRA_COMPILE_OPTIONS}
   )
 
 define_property(GLOBAL PROPERTY PICOLIBC_HEADERS
