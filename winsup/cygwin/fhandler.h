@@ -1194,6 +1194,7 @@ private:
   HANDLE hdl_cnt_mtx;
   HANDLE query_hdl_proc;
   HANDLE query_hdl_value;
+  HANDLE query_hdl_close_req_evt;
   uint64_t pipename_key;
   DWORD pipename_pid;
   LONG pipename_id;
@@ -1255,9 +1256,28 @@ public:
 	CloseHandle (query_hdl);
 	query_hdl = NULL;
       }
+    if (query_hdl_close_req_evt)
+      {
+	CloseHandle (query_hdl_close_req_evt);
+	query_hdl_close_req_evt = NULL;
+      }
   }
   bool reader_closed ();
   HANDLE temporary_query_hdl ();
+  bool need_close_query_hdl ()
+    {
+      return query_hdl_close_req_evt ?
+	IsEventSignalled (query_hdl_close_req_evt) : false;
+    }
+  bool request_close_query_hdl ()
+    {
+      if (query_hdl_close_req_evt)
+	{
+	  SetEvent (query_hdl_close_req_evt);
+	  return true;
+	}
+      return false;
+    }
 };
 
 #define CYGWIN_FIFO_PIPE_NAME_LEN     47
