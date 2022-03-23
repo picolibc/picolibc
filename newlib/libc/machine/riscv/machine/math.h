@@ -75,6 +75,10 @@
 /* We always need the fclass functions */
 
 #if __riscv_flen >= 64
+
+/* anything with a 64-bit FPU has FMA */
+#define _HAVE_FAST_FMA 1
+
 __declare_riscv_macro_fclass(long)
 _fclass_d(double x)
 {
@@ -85,6 +89,10 @@ _fclass_d(double x)
 #endif
 
 #if __riscv_flen >= 32
+
+/* anything with a 32-bit FPU has FMAF */
+#define _HAVE_FAST_FMAF 1
+
 __declare_riscv_macro_fclass(long)
 _fclass_f(float x)
 {
@@ -193,7 +201,6 @@ sqrt (double x)
 	return result;
 }
 
-#if HAVE_FAST_FMA
 __declare_riscv_macro(double)
 fma (double x, double y, double z)
 {
@@ -201,7 +208,6 @@ fma (double x, double y, double z)
 	__asm__ volatile("fmadd.d %0, %1, %2, %3" : "=f" (result) : "f" (x), "f" (y), "f" (z));
 	return result;
 }
-#endif
 
 #endif /* __riscv_flen >= 64 */
 
@@ -296,8 +302,6 @@ sqrtf (float x)
 	return result;
 }
 
-
-#if defined(HAVE_FAST_FMAF)
 __declare_riscv_macro(float)
 fmaf (float x, float y, float z)
 {
@@ -305,7 +309,6 @@ fmaf (float x, float y, float z)
 	__asm__ volatile("fmadd.s %0, %1, %2, %3" : "=f" (result) : "f" (x), "f" (y), "f" (z));
 	return result;
 }
-#endif
 
 #endif /* __riscv_flen >= 32 */
 

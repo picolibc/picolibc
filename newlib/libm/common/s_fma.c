@@ -44,7 +44,7 @@ ANSI C, POSIX.
 
 #include "fdlibm.h"
 
-#if !HAVE_FAST_FMA
+#if !_HAVE_FAST_FMA
 
 #ifndef _DOUBLE_IS_32BITS
 
@@ -63,4 +63,4 @@ ANSI C, POSIX.
 
 #endif /* _DOUBLE_IS_32BITS */
 
-#endif /* !HAVE_FAST_FMA */
+#endif /* !_HAVE_FAST_FMA */

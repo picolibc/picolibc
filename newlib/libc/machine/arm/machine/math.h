@@ -38,6 +38,14 @@
 #ifndef _MACHINE_MATH_H_
 #define _MACHINE_MATH_H_
 
+# if (__ARM_FEATURE_FMA && (__ARM_FP & 8))
+#define _HAVE_FAST_FMA  1
+#endif
+
+#if (__ARM_FEATURE_FMA && (__ARM_FP & 4))
+#define _HAVE_FAST_FMAF 1
+#endif
+
 #if defined(_HAVE_ATTRIBUTE_ALWAYS_INLINE) && defined(_HAVE_ATTRIBUTE_GNU_INLINE)
 #define __declare_arm_macro(type) extern __inline type __attribute((gnu_inline, always_inline))
 
@@ -133,13 +141,15 @@ trunc (double x)
 }
 #endif /* __ARM_ARCH >= 8 */
 
-#if HAVE_FAST_FMA
+#if _HAVE_FAST_FMA
+
 __declare_arm_macro(double)
 fma (double x, double y, double z)
 {
   __asm__ volatile ("vfma.f64 %P0, %P1, %P2" : "+w" (z) : "w" (x), "w" (y));
   return z;
 }
+
 #endif
 
 #endif /* (__ARM_FP & 0x8) && !defined(__SOFTFP__) */
@@ -232,7 +242,7 @@ truncf (float x)
 }
 #endif /* __ARM_ARCH >= 8 */
 
-#if HAVE_FAST_FMAF
+#if _HAVE_FAST_FMAF
 
 __declare_arm_macro(float)
 fmaf (float x, float y, float z)
@@ -240,6 +250,7 @@ fmaf (float x, float y, float z)
   __asm__ volatile ("vfma.f32 %0, %1, %2" : "+t" (z) : "t" (x), "t" (y));
   return z;
 }
+
 #endif
 
 #endif /* (__ARM_FP & 0x4) && !defined(__SOFTFP__) */

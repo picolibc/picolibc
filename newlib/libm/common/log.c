@@ -146,7 +146,7 @@ log (double x)
 
   /* log(x) = log1p(z/c-1) + log(c) + k*Ln2.  */
   /* r ~= z/c - 1, |r| < 1/(2*N).  */
-#if HAVE_FAST_FMA
+#if _HAVE_FAST_FMA
   /* rounding error: 0x1p-55/N.  */
   r = fma (z, invc, -1.0);
 #else

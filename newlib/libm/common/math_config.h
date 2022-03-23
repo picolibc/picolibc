@@ -92,23 +92,6 @@
 # endif
 #endif
 
-/* Compiler can inline fma as a single instruction.  */
-#ifndef HAVE_FAST_FMA
-# if __aarch64__ || (__ARM_FEATURE_FMA && (__ARM_FP & 8)) || __riscv_flen >= 64
-#   define HAVE_FAST_FMA 1
-# else
-#   define HAVE_FAST_FMA 0
-# endif
-#endif
-
-#ifndef HAVE_FAST_FMAF
-# if HAVE_FAST_FMA || (__ARM_FEATURE_FMA && (__ARM_FP & 4)) || __riscv_flen >= 32
-#  define HAVE_FAST_FMAF 1
-# else
-#  define HAVE_FAST_FMAF 0
-# endif
-#endif
-
 #if HAVE_FAST_ROUND
 /* When set, the roundtoint and converttoint functions are provided with
    the semantics documented below.  */
@@ -580,7 +563,7 @@ extern const struct log_data
   double poly[LOG_POLY_ORDER - 1]; /* First coefficient is 1.  */
   double poly1[LOG_POLY1_ORDER - 1];
   struct {double invc, logc;} tab[1 << LOG_TABLE_BITS];
-#if !HAVE_FAST_FMA
+#if !_HAVE_FAST_FMA
   struct {double chi, clo;} tab2[1 << LOG_TABLE_BITS];
 #endif
 } __log_data HIDDEN;
@@ -595,7 +578,7 @@ extern const struct log2_data
   double poly[LOG2_POLY_ORDER - 1];
   double poly1[LOG2_POLY1_ORDER - 1];
   struct {double invc, logc;} tab[1 << LOG2_TABLE_BITS];
-#if !HAVE_FAST_FMA
+#if !_HAVE_FAST_FMA
   struct {double chi, clo;} tab2[1 << LOG2_TABLE_BITS];
 #endif
 } __log2_data HIDDEN;
