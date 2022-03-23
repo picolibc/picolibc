@@ -858,7 +858,7 @@ open_temp(HTAB *hashp)
 	(void)sigprocmask(SIG_BLOCK, &set, &oset);
 	if ((hashp->fp = mkstemp(namestr)) != -1) {
 		(void)unlink(namestr);
-#ifdef HAVE_FCNTL
+#ifdef _HAVE_FCNTL
 		(void)fcntl(hashp->fp, F_SETFD, 1);
 #endif
 	}

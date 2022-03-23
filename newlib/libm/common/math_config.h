@@ -66,7 +66,7 @@
 # define NOINLINE
 #endif
 
-#ifdef HAVE_BUILTIN_EXPECT
+#ifdef _HAVE_BUILTIN_EXPECT
 # define likely(x) __builtin_expect (!!(x), 1)
 # define unlikely(x) __builtin_expect (x, 0)
 #else

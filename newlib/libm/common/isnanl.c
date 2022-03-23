@@ -31,7 +31,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "local.h"
 
-#if defined(_LDBL_EQ_DBL) || defined(HAVE_BUILTIN_ISNANL)
+#if defined(_LDBL_EQ_DBL) || defined(_HAVE_BUILTIN_ISNANL)
 /* On platforms where long double is as wide as double.  */
 int
 isnanl (long double x)

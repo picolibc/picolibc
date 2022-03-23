@@ -685,7 +685,7 @@ int main(void) { return foo(@0@); }
 '''
   builtin_code = builtin_template.format(builtin[1], builtin[2])
   have_current_builtin = cc.links(builtin_code, name : 'test for __' + builtin[0], args: core_c_args)
-  conf_data.set('HAVE_' + builtin[0].to_upper(), have_current_builtin, description: 'The compiler supports __' + builtin[0])
+  conf_data.set('_HAVE_' + builtin[0].to_upper(), have_current_builtin, description: 'The compiler supports __' + builtin[0])
 endforeach
 
 NEWLIB_VERSION='4.1.0'
@@ -737,7 +737,7 @@ conf_data.set('_REENT_GLOBAL_ATEXIT', get_option('newlib-global-atexit'))
 conf_data.set('_FVWRITE_IN_STREAMIO', newlib_fvwrite_in_streamio)
 conf_data.set('_FSEEK_OPTIMIZATION', newlib_fseek_optimization)
 conf_data.set('_WIDE_ORIENT', newlib_wide_orient)
-conf_data.set('HAVE_FCNTL', newlib_have_fcntl)
+conf_data.set('_HAVE_FCNTL', newlib_have_fcntl)
 conf_data.set('_NANO_MALLOC', newlib_nano_malloc)
 conf_data.set('_UNBUF_STREAM_OPT', get_option('newlib-unbuf-stream-opt'))
 conf_data.set('_LITE_EXIT', lite_exit)
@@ -755,14 +755,14 @@ conf_data.set('_HAVE_INITFINI_ARRAY', get_option('newlib-initfini-array'), descr
 conf_data.set('_HAVE_INIT_FINI', get_option('newlib-initfini'), description: 'Support _init() and _fini() functions')
 conf_data.set('NEWLIB_TLS', thread_local_storage, description: 'use thread local storage')
 conf_data.set('PICOLIBC_TLS', thread_local_storage, description: 'use thread local storage')
-conf_data.set('HAVE_PICOLIBC_TLS_API', thread_local_storage, description: '_set_tls and _init_tls functions available')
+conf_data.set('_HAVE_PICOLIBC_TLS_API', thread_local_storage, description: '_set_tls and _init_tls functions available')
 conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in tinystdio')
 conf_data.set('ATOMIC_UNGETC', atomic_ungetc, description: 'Use atomics for fgetc/ungetc for re-entrancy')
-conf_data.set('HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
-conf_data.set('HAVE_BUILTIN_MUL', have_builtin_mul_overflow, description: 'Compiler has __builtin_mul_overflow')
-conf_data.set('HAVE_COMPLEX', have_complex, description: 'Compiler supports _Complex')
-conf_data.set('HAVE_BUILTIN_EXPECT', have_builtin_expect, description: 'Compiler has __builtin_expect')
-conf_data.set('HAVE_ALLOC_SIZE', have_alloc_size, description: 'The compiler REALLY has the attribute __alloc_size__')
+conf_data.set('_HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
+conf_data.set('_HAVE_BUILTIN_MUL_OVERFLOW', have_builtin_mul_overflow, description: 'Compiler has __builtin_mul_overflow')
+conf_data.set('_HAVE_COMPLEX', have_complex, description: 'Compiler supports _Complex')
+conf_data.set('_HAVE_BUILTIN_EXPECT', have_builtin_expect, description: 'Compiler has __builtin_expect')
+conf_data.set('_HAVE_ALLOC_SIZE', have_alloc_size, description: 'The compiler REALLY has the attribute __alloc_size__')
 conf_data.set('_HAVE_ATTRIBUTE_ALWAYS_INLINE',
 	      cc.has_function_attribute('always_inline'),
 	      description: 'The compiler supports the always_inline function attribute')
@@ -950,7 +950,7 @@ if tinystdio
   subdir('dummyhost')
 endif
 
-conf_data.set('HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs supported')
+conf_data.set('_HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs supported')
 
 # By default, tests don't require any special arguments
 
@@ -1020,7 +1020,7 @@ if enable_tests
   subdir('test')
 endif
 
-conf_data.set('HAVE_IEEEFP_FUNCS', has_ieeefp_funcs, description: 'IEEE fp funcs available')
+conf_data.set('_HAVE_IEEEFP_FUNCS', has_ieeefp_funcs, description: 'IEEE fp funcs available')
 
 configure_file(output : 'picolibc.h',
 	       configuration: conf_data,

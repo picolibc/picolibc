@@ -100,7 +100,7 @@
  * not have it). In that case, transparently replace all
  * occurences of that builtin with just the condition:
  */
-#ifndef HAVE_BUILTIN_EXPECT
+#ifndef _HAVE_BUILTIN_EXPECT
 #define __builtin_expect(cond, exp) (cond)
 #endif
 
@@ -258,7 +258,7 @@
 #define	__section(x)	__attribute__((__section__(x)))
 #endif
 
-#ifdef HAVE_ALLOC_SIZE
+#ifdef _HAVE_ALLOC_SIZE
 #define	__alloc_size(x)	__attribute__((__alloc_size__(x)))
 #define	__alloc_size2(n, x)	__attribute__((__alloc_size__(n, x)))
 #else

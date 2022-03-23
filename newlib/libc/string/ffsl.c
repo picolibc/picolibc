@@ -29,9 +29,9 @@
 int
 ffsl(long i)
 {
-#ifdef HAVE_BUILTIN_FFSL
+#ifdef _HAVE_BUILTIN_FFSL
 	return (__builtin_ffsl(i));
-#elif defined(HAVE_BUILTIN_CTZL)
+#elif defined(_HAVE_BUILTIN_CTZL)
 	if (i == 0)
 		return 0;
 	return __builtin_ctzl((unsigned long)i) + 1;

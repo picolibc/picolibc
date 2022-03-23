@@ -1,4 +1,4 @@
-#ifdef HAVE_BUILTIN_MUL_OVERFLOW
+#ifdef _HAVE_BUILTIN_MUL_OVERFLOW
 // gcc should use the correct one here
 #define mul_overflow __builtin_mul_overflow
 #else

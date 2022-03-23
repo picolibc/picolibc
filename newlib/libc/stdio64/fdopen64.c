@@ -43,7 +43,7 @@ _fdopen64_r (struct _reent *ptr,
 {
   register FILE *fp;
   int flags, oflags;
-#ifdef HAVE_FCNTL
+#ifdef _HAVE_FCNTL
   int fdflags, fdmode;
 #endif
 
@@ -51,7 +51,7 @@ _fdopen64_r (struct _reent *ptr,
     return 0;
 
   /* make sure the mode the user wants is a subset of the actual mode */
-#ifdef HAVE_FCNTL
+#ifdef _HAVE_FCNTL
   if ((fdflags = fcntl (fd, F_GETFL, 0)) < 0)
     return 0;
   fdmode = fdflags & O_ACCMODE;
@@ -72,7 +72,7 @@ _fdopen64_r (struct _reent *ptr,
      streams.  Someone may later clear O_APPEND on fileno(fp), but the
      stream must still remain in append mode.  Rely on __sflags
      setting __SAPP properly.  */
-#ifdef HAVE_FCNTL
+#ifdef _HAVE_FCNTL
   if ((oflags & O_APPEND) && !(fdflags & O_APPEND))
     fcntl (fd, F_SETFL, fdflags | O_APPEND);
 #endif

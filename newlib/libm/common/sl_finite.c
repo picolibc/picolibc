@@ -9,7 +9,7 @@
 #define _DEFAULT_SOURCE
 #include <math.h>
 
-#if defined(_LDBL_EQ_DBL) || defined(HAVE_BUILTIN_FINITEL) || defined(HAVE_BUILTIN_ISFINITE)
+#if defined(_LDBL_EQ_DBL) || defined(_HAVE_BUILTIN_FINITEL) || defined(_HAVE_BUILTIN_ISFINITE)
 int
 finitel (long double x)
 {
@@ -21,10 +21,10 @@ finitel (long double x)
      Some architectures for example have an 80-bit long double whereas
      others use 128-bits.  We use macros and comiler builtin functions
      to avoid specific knowledge of the long double format.  */
-#ifdef HAVE_BUILTIN_FINITEL
+#ifdef _HAVE_BUILTIN_FINITEL
   return __builtin_finitel (x);
 #endif
-#ifdef HAVE_BUILTIN_ISFINITE
+#ifdef _HAVE_BUILTIN_ISFINITE
   return __builtin_isfinite (x);
 #endif
 #endif

@@ -105,7 +105,7 @@ main(void)
 
 	result = check_tls("pre-defined", false);
 
-#ifdef HAVE_PICOLIBC_TLS_API
+#ifdef _HAVE_PICOLIBC_TLS_API
 
 	void *tls = malloc(_tls_size());
 

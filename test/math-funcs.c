@@ -82,15 +82,15 @@ main(void)
 
     i1 = finite (d1);
     i1 = finitef (f1);
-#if defined(HAVE_BUILTIN_FINITEL) || defined(HAVE_BUILTIN_ISFINITE)
+#if defined(_HAVE_BUILTIN_FINITEL) || defined(_HAVE_BUILTIN_ISFINITE)
     i1 = finitel (l1);
 #endif
     i1 = isinff (f1);
     i1 = isnanf (f1);
-#ifdef HAVE_BUILTIN_ISINFL
+#ifdef _HAVE_BUILTIN_ISINFL
     i1 = isinfl (l1);
 #endif
-#ifdef HAVE_BUILTIN_ISNANL
+#ifdef _HAVE_BUILTIN_ISNANL
     i1 = isnanl (l1);
 #endif
     i1 = isinf (d1);
