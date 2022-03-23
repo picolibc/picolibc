@@ -1,8 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard, 
-# Copyright © 2020 Anthony Anderson
+# Copyright © 2022 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,50 +32,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
-srcs_machine = [
-    'memchr-stub.c',
-    'memchr.S',
-    'memcmp-stub.c',
-    'memcmp.S',
-    'memcpy-stub.c',
-    'memcpy.S',
-    'memmove-stub.c',
-    'memmove.S',
-    'memset-stub.c',
-    'memset.S',
-    'rawmemchr-stub.c',
-    'rawmemchr.S',
-    'setjmp.S',
-    'stpcpy-stub.c',
-    'stpcpy.S',
-    'strchr-stub.c',
-    'strchr.S',
-    'strchrnul-stub.c',
-    'strchrnul.S',
-    'strcmp-stub.c',
-    'strcmp.S',
-    'strcpy-stub.c',
-    'strcpy.S',
-    'strlen-stub.c',
-    'strlen.S',
-    'strncmp-stub.c',
-    'strncmp.S',
-    'strnlen-stub.c',
-    'strnlen.S',
-    'strchr-stub.c',
-    'strchr.S'
+inc_machine_headers_machine = [
+  '_types.h',
+  'fenv-fp.h',
+  'math.h',
 ]
 
-subdir('sys')
-subdir('machine')
-
-foreach target : targets
-    value = get_variable('target_' + target)
-    set_variable('lib_machine' + target,
-        static_library('machine' + target,
-            srcs_machine,
-            pic: false,
-            include_directories: inc,
-            c_args: value[1] + arg_fnobuiltin))
-endforeach
+install_headers(inc_machine_headers_machine,
+		install_dir: include_dir / 'machine')
