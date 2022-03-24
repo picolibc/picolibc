@@ -1,5 +1,5 @@
 [binaries]
-c = 'powerpc64-linux-gnu-gcc'
+c = ['powerpc64-linux-gnu-gcc', '-fno-pic', '-static']
 ar = 'powerpc64-linux-gnu-ar'
 nm = 'powerpc64-linux-gnu-nm'
 strip = 'powerpc64-linux-gnu-strip'
@@ -11,9 +11,4 @@ cpu = 'ppc64'
 endian = 'big'
 
 [properties]
-c_args = ['-fno-pic', '-static']
-needs_exe_wrapper = true
 skip_sanity_check = true
-link_spec = '--build-id=none'
-cc1_spec = '-fno-pic'
-specs_extra = ['*libgcc:', '-lgcc']

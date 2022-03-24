@@ -965,6 +965,9 @@ if tests_enable_stack_protector
   endif
 endif
 
+test_env = environment()
+test_env.prepend('PATH', meson.source_root() / 'scripts')
+
 # CompCert needs the '-WUl,' prefix to correctly pass the --spec parameters to the linker
 specs_prefix = ''
 if cc.get_id() == 'ccomp'

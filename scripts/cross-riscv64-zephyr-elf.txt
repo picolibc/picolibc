@@ -4,7 +4,8 @@ ar = 'riscv64-zephyr-elf-ar'
 as = 'riscv64-zephyr-elf-as'
 nm = 'riscv64-zephyr-elf-nm'
 strip = 'riscv64-zephyr-elf-strip'
-exe_wrapper = ['sh', '-c', 'test -z "$MESON_SOURCE_ROOT" || "$MESON_SOURCE_ROOT"/scripts/run-riscv "$@"', 'run-riscv']
+# only needed to run tests
+exe_wrapper = ['env', 'run-riscv']
 
 [host_machine]
 system = 'zephyr'
@@ -13,5 +14,4 @@ cpu = 'riscv'
 endian = 'little'
 
 [properties]
-needs_exe_wrapper = true
 skip_sanity_check = true

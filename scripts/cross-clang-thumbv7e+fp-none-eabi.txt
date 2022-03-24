@@ -5,7 +5,8 @@ ar = 'arm-none-eabi-ar'
 as = 'arm-none-eab-as'
 nm = 'arm-none-eab-nm'
 strip = 'arm-none-eabi-strip'
-exe_wrapper = ['sh', '-c', 'test -z "$MESON_SOURCE_ROOT" || "$MESON_SOURCE_ROOT"/scripts/run-thumbv7e "$@"', 'run-thumbv7e']
+# only needed to run tests
+exe_wrapper = ['env', 'run-thumbv7e']
 
 [host_machine]
 system = 'none'
@@ -16,5 +17,4 @@ endian = 'little'
 [properties]
 c_args = [ '-Werror=double-promotion', '-Wno-unsupported-floating-point-opt' ]
 c_link_args = ['-L/usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7e-m+dp/hard/']
-needs_exe_wrapper = true
 skip_sanity_check = true

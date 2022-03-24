@@ -1,10 +1,11 @@
 [binaries]
-c = ['i686-linux-gnu-gcc', '-march=core2', '-mfpmath=sse', '-msse2']
+c = ['i686-linux-gnu-gcc', '-march=core2', '-mfpmath=sse', '-msse2', '-fno-pic', '-fno-PIE', '-static']
 ar = 'i686-linux-gnu-ar'
 as = 'i686-linux-gnu-as'
 nm = 'i686-linux-gnu-nm'
 strip = 'i686-linux-gnu-strip'
-exe_wrapper = ['sh', '-c', 'test -z "$MESON_SOURCE_ROOT" || "$MESON_SOURCE_ROOT"/scripts/run-i386 "$@"', 'run-i386']
+# only needed to run tests
+exe_wrapper = ['env', 'run-i386']
 
 [host_machine]
 system='linux'
@@ -13,8 +14,6 @@ cpu='i386'
 endian='little'
 
 [properties]
-c_args = ['-fno-pic', '-fno-PIE', '-static']
-ld_args = ['-Wl,--build-id=none']
 skip_sanity_check = true
 needs_exe_wrapper = true
 link_spec = '--build-id=none'

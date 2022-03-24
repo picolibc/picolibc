@@ -4,7 +4,8 @@ ar = 'arm-zephyr-eabi-ar'
 as = 'arm-zephyr-eabi-as'
 nm = 'arm-zephyr-eabi-nm'
 strip = 'arm-zephyr-eabi-strip'
-exe_wrapper = ['sh', '-c', 'test -z "$MESON_SOURCE_ROOT" || "$MESON_SOURCE_ROOT"/scripts/run-arm "$@"', 'run-arm']
+# only needed to run tests
+exe_wrapper = ['env', 'run-arm']
 
 [host_machine]
 system = 'zephyr'
@@ -13,5 +14,4 @@ cpu = 'arm'
 endian = 'little'
 
 [properties]
-needs_exe_wrapper = true
 skip_sanity_check = true

@@ -5,7 +5,8 @@ as = 'aarch64-linux-gnu-as'
 ld = 'aarch64-linux-gnu-ld'
 nm = 'aarch64-linux-gnu-nm'
 strip = 'aarch64-linux-gnu-strip'
-exe_wrapper = ['sh', '-c', 'test -z "$MESON_SOURCE_ROOT" || "$MESON_SOURCE_ROOT"/scripts/run-aarch64 "$@"', 'run-arm']
+# only needed to run tests
+exe_wrapper = ['env', 'run-aarch64']
 
 [host_machine]
 system = 'linux'
@@ -14,8 +15,6 @@ cpu = 'aarch64'
 endian = 'little'
 
 [properties]
-c_args = '-fno-pic -mpc-relative-literal-loads'
-needs_exe_wrapper = true
 skip_sanity_check = true
 link_spec = '--build-id=none'
 specs_extra = ['*libgcc:', '-lgcc']

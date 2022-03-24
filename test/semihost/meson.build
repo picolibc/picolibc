@@ -102,7 +102,7 @@ foreach target : targets
 		    include_directories: inc),
 	 args: ['--', command_line],
          depends: bios_bin,
-	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+	 env: test_env)
   endforeach
 
   foreach semihost_fail_test : semihost_fail_tests
@@ -121,7 +121,7 @@ foreach target : targets
 		    link_depends:  test_link_depends,
 		    include_directories: inc),
 	 args: ['--', command_line],
-	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()],
+	 env: test_env,
 	 should_fail: true)
   endforeach
   
