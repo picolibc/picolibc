@@ -1303,6 +1303,13 @@ format_proc_cpuinfo (void *, char *&destbuf)
 
 	  ftcprint (features1,  3, "epb");	/* energy perf bias */
 	}
+      /* cpuid 0x00000007:1 ebx */
+      if (maxf >= 0x00000007)
+	{
+	  cpuid (&unused, &features1, &unused, &unused, 0x00000007, 1);
+
+	  ftcprint (features1,  0, "intel_ppin"); /* Prot Proc Id No */
+	}
       /* cpuid 0x00000010 ebx */
       if (maxf >= 0x00000010)
 	{
@@ -1329,8 +1336,6 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	}
 
 /*	  ftcprint (features1, 11, "pti");*//* Page Table Isolation reqd with Meltdown */
-
-/*	  ftcprint (features1, 14, "intel_ppin");*//* MSR_PPIN_CTL Prot Proc Id No */
 
       /* cpuid 0x00000010:2 ecx */
       if (maxf >= 0x00000010)
@@ -1497,6 +1502,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  ftcprint (features1,  9, "hwp_act_window"); /* HWP activity window */
 	  ftcprint (features1, 10, "hwp_epp");  /* HWP energy perf pref */
 	  ftcprint (features1, 11, "hwp_pkg_req"); /* HWP package level req */
+	  ftcprint (features1, 19, "hfi");	/* Hardware Feedback Interface */
 	}
 
       /* AMD SVM cpuid 0x8000000a edx */
@@ -1573,6 +1579,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
           ftcprint (features1, 16, "tsxldtrk");		   /* TSX Susp Ld Addr Track */
           ftcprint (features1, 18, "pconfig");		   /* platform config */
           ftcprint (features1, 19, "arch_lbr");		   /* last branch records */
+	  ftcprint (features1, 20, "ibt");		   /* Indirect Branch Tracking */
 	  ftcprint (features1, 22, "amx_bf16");	    /* Advanced Matrix eXtensions Brain Float 16 dot product */
           ftcprint (features1, 23, "avx512_fp16");	   /* avx512 fp16 */
 	  ftcprint (features1, 24, "amx_tile");	    /* Advanced Matrix eXtensions Tile matrix multiply */
