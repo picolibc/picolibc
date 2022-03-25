@@ -10,9 +10,16 @@ gloss_specs = \
 	default.specs \
 	nano.specs
 
+gloss_ldscripts =
+
 # Extra files
 
-crt0_asm      = crt0.S
+crtX_source = crt0.S
+
+libsys_qemu  := libsys_qemu.a
+libsys_openocd  := libsys_openocd.a
+
+board_outdir =
 
 # Multilib support variables.
 # TOP is used instead of MULTI{BUILD,SRC}TOP.
@@ -42,6 +49,8 @@ VPATH   := $(src_dir)
 prefix  := @prefix@
 DESTDIR ?= $(prefix)
 
+WORKDIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
 install_hdrs_dir := $(DESTDIR)$(prefix)/$(target_alias)/include/machine
 install_libs_dir  = $(DESTDIR)$(prefix)/$(target_alias)/lib${MULTISUBDIR}
 
@@ -53,8 +62,8 @@ install_libs_dir  = $(DESTDIR)$(prefix)/$(target_alias)/lib${MULTISUBDIR}
 
 CC            := @CC@
 CFLAGS        := @CFLAGS@
-CPPFLAGS      := -I$(obj_dir) -I$(src_dir)
-COMPILE       := $(CC) -MMD -MP $(CPPFLAGS) $(CFLAGS)
+CPPFLAGS      = -I$(obj_dir) -I$(src_dir) -I$(src_dir)/include
+COMPILE       = $(CC) -MMD -MP $(CPPFLAGS) $(CFLAGS)
 
 # Library creation
 
@@ -66,26 +75,96 @@ RANLIB        := @RANLIB@
 INSTALL       := @INSTALL@
 INSTALL_DATA  := @INSTALL_DATA@
 
+%_openocd.o: %.c
+	$(COMPILE) -DOPENOCD_SEMIHOSTING -c -o $@ $<
+
+%_qemu.o: %.c
+	$(COMPILE) -DQEMU_SEMIHOSTING -c -o $@ $<
+
+%.o : %.S
+	$(COMPILE) -c -o $@ $<
+
+#-------------------------------------------------------------------------
+# Append variables with board specific data
+#-------------------------------------------------------------------------
+
+TARGET_BOARD = $(strip $(patsubst xtensa-%-elf, %, $(shell $(CC) -dumpmachine)))
+
+# add board specific sources if board exists
+ifneq ("$(wildcard $(src_dir)/boards/$(TARGET_BOARD))", "")
+  CPPFLAGS += -I$(src_dir)/boards/$(TARGET_BOARD)/include
+
+  board_outdir += $(WORKDIR)/boards/$(TARGET_BOARD)
+  junk += $(WORKDIR)/boards
+
+  gloss_srcs += \
+        window-vectors.S \
+        sleep.S \
+        syscalls.c \
+        boards/$(TARGET_BOARD)/board.c
+
+  gloss_specs += \
+	sim.elf.specs \
+	board.elf.specs \
+	sys.qemu.specs \
+	sys.openocd.specs
+
+  gloss_ldscripts += \
+	boards/$(TARGET_BOARD)/memory.elf.ld \
+	app.elf.ld
+
+  syscalls_qemu_src += \
+        syscalls.c
+
+  syscalls_openocd_src += \
+        syscalls.c
+
+  crtX_source += crt1-sim.S crt1-boards.S
+
+  install_libs += $(libsys_qemu)
+  install_libs += $(libsys_openocd)
+
+endif
+
+$(board_outdir):
+	mkdir -p $@
+
 #-------------------------------------------------------------------------
 # Build Object Files from C Source
 #-------------------------------------------------------------------------
 
+# libgloss
 gloss_c_srcs = $(filter %.c, $(gloss_srcs))
-gloss_c_objs = $(patsubst %.c, %.o, $(notdir $(gloss_c_srcs)))
-gloss_c_deps = $(patsubst %.c, %.d, $(notdir $(gloss_c_srcs)))
+gloss_c_objs = $(gloss_c_srcs:%.c=%.o)
+gloss_c_deps = $(gloss_c_srcs:%.c=%.d)
 
 gloss_objs += $(gloss_c_objs)
 deps += $(gloss_c_deps)
 junk += $(gloss_c_deps) $(gloss_c_objs)
+
+# libsys_qemu
+syscalls_qemu_c_srcs = $(filter %.c, $(syscalls_qemu_src))
+syscalls_qemu_objs = $(syscalls_qemu_c_srcs:%.c=%_qemu.o)
+syscalls_qemu_c_deps = $(syscalls_qemu_c_srcs:%.c=%_qemu.d)
+
+syscalls_qemu_objs += $(syscalls_qemu_c_objs)
+deps += $(syscalls_qemu_c_deps)
+junk += $(syscalls_qemu_c_deps) $(syscalls_qemu_c_objs)
+
+# libsys_openocd
+syscalls_openocd_c_srcs = $(filter %.c, $(syscalls_openocd_src))
+syscalls_openocd_c_objs = $(syscalls_openocd_c_srcs:%.c=%_openocd.o)
+syscalls_openocd_c_deps = $(syscalls_openocd_c_srcs:%.c=%_openocd.d)
+
+syscalls_openocd_objs += $(syscalls_openocd_c_objs)
+deps += $(syscalls_openocd_c_deps)
+junk += $(syscalls_openocd_c_deps) $(syscalls_openocd_c_objs)
 
 #-------------------------------------------------------------------------
 # Build Object Files from Assembly Source
 gloss_asm_srcs = $(filter %.S, $(gloss_srcs))
 gloss_asm_objs = $(patsubst %.S, %.o, $(notdir $(gloss_asm_srcs)))
 gloss_asm_deps = $(patsubst %.S, %.d, $(notdir $(gloss_asm_srcs)))
-
-$(gloss_asm_objs) : %.o : %.S
-	$(COMPILE) -c -o $@ $<
 
 gloss_objs += $(gloss_asm_objs)
 deps += $(gloss_asm_deps)
@@ -105,21 +184,39 @@ junk += $(gloss_lib)
 install_hdrs += $(gloss_hdrs)
 install_libs += $(gloss_lib)
 install_specs += $(gloss_specs)
+install_ldscripts += $(gloss_ldscripts)
 
 #-------------------------------------------------------------------------
-# Build crt0.o
+# Build libsys_qemu.a
 #-------------------------------------------------------------------------
 
-crt0_obj  = $(patsubst %.S, %.o, $(crt0_asm))
-crt0_deps = $(patsubst %.S, %.d, $(crt0_asm))
+$(libsys_qemu) : $(syscalls_qemu_objs)
+	$(AR) rcv $@ $^
+	$(RANLIB) $@
 
-$(crt0_obj) : %.o : %.S
-	$(COMPILE) -c $<
+junk += $(libsys_qemu)
 
-deps += $(crt0_deps)
-junk += $(crt0_deps) $(crt0_obj)
+#-------------------------------------------------------------------------
+# Build libsys_openocd.a
+#-------------------------------------------------------------------------
 
-install_libs += $(crt0_obj)
+$(libsys_openocd) : $(syscalls_openocd_objs)
+	$(AR) rcv $@ $^
+	$(RANLIB) $@
+
+junk += $(libsys_openocd)
+
+#-------------------------------------------------------------------------
+# Build crtX object files
+#-------------------------------------------------------------------------
+
+crtX_obj  = $(patsubst %.S, %.o, $(crtX_source))
+crtX_deps = $(patsubst %.S, %.d, $(crtX_source))
+
+deps += $(crtX_deps)
+junk += $(crtX_deps) $(crtX_obj)
+
+install_libs += $(crtX_obj)
 
 #-------------------------------------------------------------------------
 # Autodependency files
@@ -153,7 +250,13 @@ install-specs : $(install_specs)
 		$(INSTALL_DATA) $$file $(install_libs_dir)/; \
 	done
 
-install : install-hdrs install-libs install-specs
+install-ldscripts : $(install_ldscripts)
+	test -d $(install_libs_dir) || mkdir -p $(install_libs_dir)
+	for file in $^; do \
+		$(INSTALL_DATA) $$file $(install_libs_dir)/; \
+	done
+
+install : install-hdrs install-libs install-specs install-ldscripts
 .PHONY : install install-hdrs install-libs
 
 #-------------------------------------------------------------------------
@@ -178,7 +281,7 @@ dist_junk += config.status Makefile config.log
 # Default
 #-------------------------------------------------------------------------
 
-all : $(install_libs)
+all : $(board_outdir) $(install_libs)
 .PHONY : all
 
 #-------------------------------------------------------------------------
