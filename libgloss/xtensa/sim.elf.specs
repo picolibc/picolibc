@@ -1,0 +1,5 @@
+*startfile:
+crt1-sim%O%s
+
+*lib:
+-lc --whole-archive -lgloss --no-whole-archive -lc %Tmemory.elf.ld %Tapp.elf.ld

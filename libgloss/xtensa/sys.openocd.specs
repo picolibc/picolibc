@@ -1,0 +1,8 @@
+%rename link_gcc_c_sequence    openocd_link_gcc_c_sequence
+
+*libopenocd:
+--whole-archive -lsys_openocd --no-whole-archive
+
+*link_gcc_c_sequence:
+%(openocd_link_gcc_c_sequence) --start-group %G %(libopenocd) --end-group
+
