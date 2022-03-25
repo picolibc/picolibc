@@ -397,7 +397,7 @@ def main():
 
                         # Skip very short files without a copyright
 
-                        if num_lines(name) < 15:
+                        if num_lines(name) < 10:
                                 continue
 
                         # Skip generated files

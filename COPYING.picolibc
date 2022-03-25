@@ -848,6 +848,8 @@ Copyright: 2021 Keith Packard
 License: BSD3-1
 
 Files: newlib/libc/include/byteswap.h
+ newlib/libc/machine/aarch64/machine/math.h
+ newlib/libc/machine/aarch64/machine/meson.build
  newlib/libc/stdlib/nano-malloc-getpagesize.c
  newlib/libc/stdlib/nano-malloc-posix_memalign.c
  newlib/libc/tinystdio/ecvt_r.c
@@ -2319,6 +2321,7 @@ Files: .clang-format
  .github/workflows/head
  .github/workflows/linux.yml
  .github/workflows/macos.yml
+ .github/workflows/make-workflow
  .github/workflows/steps-head
  .github/workflows/variants
  .gitignore
@@ -2343,6 +2346,7 @@ Files: .clang-format
  newlib/libc/include/machine/ieee.h
  newlib/libc/include/sys/_tz_structs.h
  newlib/libc/libc.in.xml
+ newlib/libc/machine/aarch64/sys/fcntl.h
  newlib/libc/machine/necv70/necv70.tex
  newlib/libc/machine/nvptx/clock.c
  newlib/libc/ssp/ssp.tex
@@ -2354,7 +2358,9 @@ Files: .clang-format
  newlib/libm/complex/complex.tex
  newlib/libm/fenv/fenv.tex
  newlib/libm/libm.in.xml
+ newlib/man.xsl
  newlib/newlib.hin
+ newlib/refcontainers.xslt
  picolibc.ld.in
  picolibc.specs.in
  scripts/cross-aarch64-linux-gnu.txt
@@ -2376,6 +2382,7 @@ Files: .clang-format
  scripts/cross-x86_64-linux-gnu.txt
  scripts/cross-xtensa-esp32-elf.txt
  scripts/cross-xtensa-lx106-elf.txt
+ scripts/duplicate-names
  scripts/monitor-e9
  semihost/machine/i386/bios.ld
  test/complex-funcs.c
