@@ -73,7 +73,7 @@ foreach target : targets
 		  link_depends:  test_link_depends,
 		  include_directories: inc),
        depends: bios_bin,
-       env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+       env: test_env)
 
   t1 = 'printff_scanff'
   if target == ''
@@ -90,7 +90,7 @@ foreach target : targets
 		  link_depends:  test_link_depends,
 		  include_directories: inc),
        depends: bios_bin,
-       env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+       env: test_env)
 
   t1 = 'printf-tests'
   if target == ''
@@ -106,7 +106,7 @@ foreach target : targets
 		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
-       env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+       env: test_env)
 
   t1 = 'printff-tests'
   if target == ''
@@ -122,7 +122,7 @@ foreach target : targets
 		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
-       env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+       env: test_env)
 
   t1 = 'printfi-tests'
   if target == ''
@@ -138,7 +138,7 @@ foreach target : targets
 		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
-       env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+       env: test_env)
 
   t1 = 'try-ilp32'
   if target == ''
@@ -154,7 +154,7 @@ foreach target : targets
 		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
-       env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+       env: test_env)
 
   t1 = 'hosted-exit'
   if target == ''
@@ -170,7 +170,7 @@ foreach target : targets
 		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
-       env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+       env: test_env)
 
   test(t1 + '-fail' + target,
        executable(t1_name + '-fail', 'hosted-exit.c',
@@ -179,7 +179,7 @@ foreach target : targets
 		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
-       env: ['MESON_SOURCE_ROOT=' + meson.source_root()],
+       env: test_env,
        should_fail: true
       )
 
@@ -197,7 +197,7 @@ foreach target : targets
 		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
-       env: ['MESON_SOURCE_ROOT=' + meson.source_root()],
+       env: test_env,
        should_fail: true
       )
 
@@ -216,7 +216,7 @@ foreach target : targets
 		    link_with: _libs_minimal,
 		    include_directories: inc),
          depends: bios_bin,
-	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+	 env: test_env)
   endif
 
   t1 = 'rounding-mode'
@@ -233,7 +233,7 @@ foreach target : targets
 		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
-       env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+       env: test_env)
 
   t1 = 'test-except'
   t1_src = t1 + '.c'
@@ -251,7 +251,7 @@ foreach target : targets
 		  link_depends:  test_link_depends,
 		  include_directories: inc),
        depends: bios_bin,
-       env: ['MESON_SOURCE_ROOT=' + meson.source_root()],
+       env: test_env,
        should_fail: true
       )
 
@@ -305,7 +305,7 @@ foreach target : targets
 		    link_depends:  test_link_depends,
 		    include_directories: inc),
          depends: bios_bin,
-	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+	 env: test_env)
   endforeach
 
 endforeach

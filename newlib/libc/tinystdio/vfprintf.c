@@ -222,7 +222,6 @@ skip_to_arg(const char *fmt_orig, my_va_list *ap, int target_argno)
 		  case '0':
 		    continue;
 		  case '+':
-		    FALLTHROUGH;
 		  case ' ':
 		    continue;
 		  case '-':

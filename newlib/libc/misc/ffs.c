@@ -58,16 +58,16 @@ No supporting OS subroutines are required.  */
  * builtin to implement ffs here. Instead, fall back to the ctz code
  * instead.
  */
-#if defined(HAVE_BUILTIN_FFS) && defined(__GNUC__) && __INT_WIDTH__ != __LONG_WIDTH__
-#undef HAVE_BUILTIN_FFS
+#if defined(_HAVE_BUILTIN_FFS) && defined(__GNUC__) && __INT_WIDTH__ != __LONG_WIDTH__
+#undef _HAVE_BUILTIN_FFS
 #endif
 
 int
 ffs(int i)
 {
-#ifdef HAVE_BUILTIN_FFS
+#ifdef _HAVE_BUILTIN_FFS
 	return (__builtin_ffs(i));
-#elif defined(HAVE_BUILTIN_CTZ)
+#elif defined(_HAVE_BUILTIN_CTZ)
 	if (i == 0)
 		return 0;
 	return __builtin_ctz((unsigned int)i) + 1;

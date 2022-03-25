@@ -21,50 +21,57 @@ picolibc:
     * ARM 32-bit, almost all targets (qemu)
     * ARM 64-bit
 
- 3. Verify that COPYING.picolibc includes information
+ 3. Use glibc test suite for RISC-V and ARM 32-bit
+
+ 4. Test c++ builds using hello-world example on ARM
+
+ 5. Verify that COPYING.picolibc includes information
     about the current source files
 
- 4. Add release notes to README.md
+ 6. Add release notes to README.md
  
- 5. Update meson.build file with new version number
+ 7. Update meson.build file with new version number
 
- 6. Commit release notes and meson.build
+ 8. Commit release notes and meson.build
 
 	$ git commit -m'Version <version>' README.md meson.build
 
- 7. Use native configuration to build release:
+ 9. Use native configuration to build release:
 
 	$ mkdir -p builds/build-native
 	$ cd builds/build-native
         $ ../../scripts/do-native-configure
 	$ ninja dist
 
- 8. Use arm configuration to build bits for the Arm embedded toolkit:
+ 10. Use arm configuration to build bits for the Arm embedded toolkit:
 
-        $ mkdir -p builds/build-arm
-        $ cd builds/build-arm
+        $ mkdir -p builds/build-arm-tk builds/build-arm-tk-release
+        $ cd builds/build-arm-tk
         $ PATH=$ARM_TK/bin:$PATH ../../scripts/do-arm-configure -Dsysroot-install=true
-        $ PATH=$ARM_TK/bin:$PATH DESTDIR=$PWD/dist ninja install
-        $ cd dist/$ARM_TK
+        $ PATH=$ARM_TK/bin:$PATH DESTDIR=$PWD/../dist ninja install
+	$ cd ../build-arm-tk-release
+	$ PATH=$ARM_TK/bin:$PATH ../../scripts/do-arm-configure -Dsysroot-install=true -Dbuild-type-subdir=release --buildtype=release
+        $ PATH=$ARM_TK/bin:$PATH DESTDIR=$PWD/../dist ninja install
+        $ cd ../dist/$ARM_TK
         $ zip -r picolibc-<version>-<arm-et-version>.zip .
         $ scp picolibc-<version>-<arm-et-version>.zip keithp.com:/var/www/picolibc/dist/gnu-arm-embedded
 
- 9. Tag release
+ 11. Tag release
 
 	$ git tag -m'Version <version>' <version> main
 
- 10. Push tag and branch to repositories
+ 12. Push tag and branch to repositories
 
 	$ git push origin main <version>
 
- 11. Upload release to web site:
+ 13. Upload release to web site:
 
 	$ scp build-native/meson-dist/* keithp.com:/var/www/picolibc/dist
 
- 12. Create new release on github site, pasting in relevant README.md
+ 14. Create new release on github site, pasting in relevant README.md
      section. Upload release tar and arm embedded toolkit zip files.
 
- 13. Email release message to mailing list. Paste in README.md section
+ 15. Email release message to mailing list. Paste in README.md section
      about the new release.
 
 ## Debian Packages

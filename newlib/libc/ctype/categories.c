@@ -12,7 +12,7 @@ struct _category {
   uint_least32_t first: 24;
   uint_least16_t delta;
 }
-#ifdef HAVE_BITFIELDS_IN_PACKED_STRUCTS
+#ifdef _HAVE_BITFIELDS_IN_PACKED_STRUCTS
 __attribute__((packed))
 #endif
 ;

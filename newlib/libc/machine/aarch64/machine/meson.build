@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2022 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,46 +32,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+inc_machine_headers_machine = [
+  '_types.h',
+  'fenv-fp.h',
+  'math.h',
+]
 
-tests = ['iconvjp', 'iconvnm', 'iconvru' ]
-
-iconv_data_link = custom_target('iconv_data link',
-				install: false,
-				output: 'iconv_data',
-				command: ['ln', '-sf', meson.source_root() / 'newlib/libc/iconv/ccs/binary', '@OUTPUT@'])
-
-iconv_test_c_args = ['-DTEST_NLSPATH="' + meson.current_build_dir() + '"']
-
-foreach target : targets
-  value = get_variable('target_' + target)
-
-  _libs = [get_variable('lib_c' + target)]
-  if is_variable('lib_semihost' + target)
-    _libs += [get_variable('lib_semihost' + target)]
-  endif
-  if is_variable('lib_crt_hosted' + target)
-    _libs += [get_variable('lib_crt_hosted'+ target)]
-  endif
-  
-  _c_args = value[1] + test_c_args
-  _link_args = value[1] + test_link_args
-
-  foreach test : tests
-    if target == ''
-      test_name = test
-    else
-      test_name = test + '_' + target
-    endif
-
-    src = test + '.c'
-
-    test(test_name,
-	 executable(test_name, src,
-		    c_args: ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE'] + _c_args + iconv_test_c_args,
-		    link_args: _link_args,
-		    link_with: _libs,
-		    include_directories: test_inc),
-	 depends: [iconv_data_link, bios_bin],
-	 env: test_env)
-  endforeach
-endforeach
+install_headers(inc_machine_headers_machine,
+		install_dir: include_dir / 'machine')

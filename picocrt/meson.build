@@ -74,7 +74,7 @@ foreach target : targets
 	     install : true,
 	     install_dir : instdir,
 	     c_args : value[1] + arg_fnobuiltin + ['-ffreestanding'],
-	     link_args : value[1] + ['-r', '-ffreestanding', '-nostdlib'])
+	     link_args : value[1] + ['-r', '-ffreestanding'])
 
   # Tests link against this because using the .o isn't supported under meson
   set_variable('lib_crt' + target,
@@ -91,7 +91,7 @@ foreach target : targets
              install : true,
              install_dir : instdir,
              c_args : value[1] + arg_fnobuiltin + ['-ffreestanding', '-DCRT0_EXIT'],
-             link_args : value[1] + ['-r', '-ffreestanding', '-nostdlib'])
+             link_args : value[1] + ['-r', '-ffreestanding'])
 
   # Tests link against this because using the .o isn't supported under meson
   set_variable('lib_crt_hosted' + target,
@@ -108,7 +108,7 @@ foreach target : targets
              install : true,
              install_dir : instdir,
              c_args : value[1] + arg_fnobuiltin + ['-ffreestanding', '-DCONSTRUCTORS=0'],
-             link_args : value[1] + ['-r', '-ffreestanding', '-nostdlib'])
+             link_args : value[1] + ['-r', '-ffreestanding'])
 
   # Tests link against this because using the .o isn't supported under meson
   set_variable('lib_crt_minimal' + target,
@@ -127,7 +127,7 @@ foreach target : targets
                install : true,
                install_dir : instdir,
                c_args : value[1] + arg_fnobuiltin + ['-ffreestanding', '-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
-               link_args : value[1] + ['-r', '-ffreestanding', '-nostdlib'])
+               link_args : value[1] + ['-r', '-ffreestanding'])
 
     # Tests link against this because using the .o isn't supported under meson
     set_variable('lib_crt_semihost' + target,

@@ -94,6 +94,6 @@ foreach target : targets
 		    include_directories: inc),
          depends: bios_bin,
 	 timeout: timeout,
-	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+	 env: test_env)
   endforeach
 endforeach

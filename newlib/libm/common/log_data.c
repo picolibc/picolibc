@@ -333,7 +333,7 @@ that logc + poly(z/c - 1) has small error, however near x == 1 when
 {0x1.756cadbd6130cp-1, 0x1.432eee32fe000p-2},
 #endif
 },
-#if !HAVE_FAST_FMA
+#if !_HAVE_FAST_FMA
 .tab2 = {
 # if N == 64
 {0x1.61ffff94c4fecp-1, -0x1.9fe4fc998f325p-56},
@@ -531,6 +531,6 @@ that logc + poly(z/c - 1) has small error, however near x == 1 when
 {0x1.5efffe7b87a89p+0, -0x1.47eb780ed6904p-54},
 #endif
 },
-#endif /* !HAVE_FAST_FMA */
+#endif /* !_HAVE_FAST_FMA */
 };
 #endif /* __OBSOLETE_MATH_DOUBLE */

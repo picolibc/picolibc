@@ -143,7 +143,7 @@ _freopen64_r (struct _reent *ptr,
     }
   else
     {
-#ifdef HAVE_FCNTL
+#ifdef _HAVE_FCNTL
       int oldflags;
       /*
        * Reuse the file descriptor, but only if the new access mode is

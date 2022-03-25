@@ -1,11 +1,12 @@
 [binaries]
-c = 'clang'
+c = ['clang', '-m32', '-target', 'thumbv7e-none-eabi', '-mcpu=cortex-m7', '-mfloat-abi=hard']
 c_ld = '/usr/bin/arm-none-eabi-ld'
 ar = 'arm-none-eabi-ar'
 as = 'arm-none-eab-as'
 nm = 'arm-none-eab-nm'
 strip = 'arm-none-eabi-strip'
-exe_wrapper = ['sh', '-c', 'test -z "$MESON_SOURCE_ROOT" || "$MESON_SOURCE_ROOT"/scripts/run-thumbv7e "$@"', 'run-thumbv7e']
+# only needed to run tests
+exe_wrapper = ['env', 'run-thumbv7e']
 
 [host_machine]
 system = 'none'
@@ -14,22 +15,6 @@ cpu = 'arm'
 endian = 'little'
 
 [properties]
-c_args = [
-	'-m32',
-	'-target', 'thumbv7e-none-eabi',
-	'-mcpu=cortex-m7',
-	'-mfloat-abi=hard',
-	'-Wdouble-promotion',
-	'-Werror=double-promotion',
-        '-Wno-unsupported-floating-point-opt',
-        '-std=c17',
-	]
-c_link_args = [
-	'-m32',
-	'-target', 'thumbv7e-none-eabi',
-	'-mcpu=cortex-m7',
-	'-mfloat-abi=hard',
-	'-nostdlib',
-	'-L/usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7e-m+dp/hard/'
-	]
-needs_exe_wrapper = true
+c_args = [ '-Werror=double-promotion', '-Wno-unsupported-floating-point-opt' ]
+c_link_args = ['-L/usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7e-m+dp/hard/']
+skip_sanity_check = true

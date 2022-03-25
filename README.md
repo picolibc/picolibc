@@ -124,6 +124,17 @@ use Picolibc:
 
 ## Releases
 
+### Picolibc version 1.7.6
+
+ 1. Fix use with C++ applications caused by a syntax error in
+    picolibc.specs
+
+ 2. Automatically include '-nostdlib' to options used while
+    evaluating build rules to ensure tests work as expected.
+
+ 3. Publish aarch64 inline math functions, ensure that inline fma
+    functions work in installed applications for arm and risc-v.
+
 ### Picolibc version 1.7.5
 
  1. Fix build on big-endian systems (thanks to Thomas Daede)

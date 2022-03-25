@@ -6,7 +6,7 @@
 
 #include "fdlibm.h"
 
-#if !HAVE_FAST_FMAF
+#if !_HAVE_FAST_FMAF
 
 #ifdef __STDC__
 	float fmaf(float x, float y, float z)

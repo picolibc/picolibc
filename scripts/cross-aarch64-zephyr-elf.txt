@@ -4,7 +4,8 @@ ar = 'aarch64-zephyr-elf-ar'
 as = 'aarch64-zephyr-elf-as'
 nm = 'aarch64-zephyr-elf-nm'
 strip = 'aarch64-zephyr-elf-strip'
-exe_wrapper = ['sh', '-c', 'test -z "$MESON_SOURCE_ROOT" || "$MESON_SOURCE_ROOT"/scripts/run-aarch64 "$@"', 'run-aarch64']
+# only needed to run tests
+exe_wrapper = ['env', 'run-aarch64']
 
 [host_machine]
 system = 'none'
@@ -13,6 +14,4 @@ cpu = 'aarch64'
 endian = 'little'
 
 [properties]
-c_args = [ '-nostdlib' ]
-needs_exe_wrapper = true
 skip_sanity_check = true

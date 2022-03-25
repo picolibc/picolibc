@@ -31,10 +31,6 @@
 
 #include <sys/_types.h>
 
-#ifndef	__fenv_static
-#define	__fenv_static	static
-#endif
-
 typedef	__uint64_t	fenv_t;
 typedef	__uint64_t	fexcept_t;
 
@@ -70,5 +66,10 @@ typedef	__uint64_t	fexcept_t;
 
 #define	__mrs_fpsr(__r)	__asm __volatile("mrs %0, fpsr" : "=r" (__r))
 #define	__msr_fpsr(__r)	__asm __volatile("msr fpsr, %0" : : "r" (__r))
+
+#ifndef	__fenv_static
+#define	__fenv_static	static
+#include <machine/fenv-fp.h>
+#endif
 
 #endif	/* !_FENV_H_ */

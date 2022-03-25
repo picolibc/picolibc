@@ -42,13 +42,23 @@ project('picolibc', 'c',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.53',
-	version: '1.7.5'
+	version: '1.7.6'
        )
 
 targets = []
 
-cc = meson.get_compiler('c')
 fs = import('fs')
+
+cc = meson.get_compiler('c')
+
+# these options are required for all C compiler operations, including
+# detecting many C compiler features, as we cannot expect there
+# to be a working C library on the system.
+
+core_c_args = []
+if not get_option('use-stdlib')
+  core_c_args += cc.get_supported_arguments(['-nostdlib'])
+endif
 
 # Find the picolibc name for the host cpu. Provide
 # for some common aliases
@@ -112,7 +122,7 @@ long double test()
 	 return ld;
 }
 '''
-have_long_double = cc.compiles(long_double_code, name : 'long double check')
+have_long_double = cc.compiles(long_double_code, name : 'long double check', args: core_c_args)
 
 long_double_size_code = '''
 #include <float.h>
@@ -130,10 +140,10 @@ char size_test[__LDBL_MANT_DIG__ == 113 ? 1 : -1];
 '''
 
 if have_long_double
-  long_double_equals_double = cc.compiles(long_double_size_code, name : 'long double same as double')
+  long_double_equals_double = cc.compiles(long_double_size_code, name : 'long double same as double', args: core_c_args)
   if not long_double_equals_double
-    long_double_mant_is_64 = cc.compiles(long_double_mant_64_code, name : 'long double mantissa is 64 bits')
-    long_double_mant_is_113 = cc.compiles(long_double_mant_113_code, name : 'long double mantissa is 113 bits')
+    long_double_mant_is_64 = cc.compiles(long_double_mant_64_code, name : 'long double mantissa is 64 bits', args: core_c_args)
+    long_double_mant_is_113 = cc.compiles(long_double_mant_113_code, name : 'long double mantissa is 113 bits', args: core_c_args)
   endif
 endif
 
@@ -161,7 +171,7 @@ newlib_nano_malloc = get_option('newlib-nano-malloc')
 lite_exit = get_option('lite-exit')
 
 newlib_elix_level = get_option('newlib-elix-level')
-c_args = ['-include', '@0@/@1@'.format(meson.current_build_dir(), 'picolibc.h')]
+c_args = ['-include', '@0@/@1@'.format(meson.current_build_dir(), 'picolibc.h')] + core_c_args
 native_c_args = ['-DNO_NEWLIB']
 
 # Disable ssp and fortify source while building picolibc (it's enabled
@@ -384,7 +394,7 @@ thread_local_storage = false
 if get_option('thread-local-storage') == 'auto'
   # We assume that _set_tls() is defined in the arch specific tls.c
   if fs.is_file('newlib/libc/picolib/machine' / host_cpu_family / 'tls.c')
-    thread_local_storage = not cc.has_function('__emutls_get_address', args: ['-nostdlib', '-lgcc'])
+    thread_local_storage = not cc.has_function('__emutls_get_address', args: core_c_args + ['-lgcc'])
   endif
 else
   thread_local_storage = get_option('thread-local-storage') == 'true'
@@ -541,7 +551,7 @@ bitfields_in_packed_structs_code = '''
 struct test { int part: 24; } __attribute__((packed));
 unsigned int foobar (const struct test *p) { return p->part; }
 '''
-have_bitfields_in_packed_structs = cc.compiles(bitfields_in_packed_structs_code, name : 'packed structs may contain bitfields')
+have_bitfields_in_packed_structs = cc.compiles(bitfields_in_packed_structs_code, name : 'packed structs may contain bitfields', args: core_c_args)
 
 # CompCert does not have __builtin_mul_overflow
 builtin_mul_overflow_code = '''
@@ -550,13 +560,13 @@ int overflows (size_t a, size_t b) { size_t x; return __builtin_mul_overflow(a, 
 volatile size_t aa = 42;
 int main (void) { return overflows(aa, aa); }
 '''
-have_builtin_mul_overflow = cc.links(builtin_mul_overflow_code, name : 'has __builtin_mul_overflow')
+have_builtin_mul_overflow = cc.links(builtin_mul_overflow_code, name : 'has __builtin_mul_overflow', args: core_c_args)
 
 # CompCert does not support _Complex
 complex_code = '''
 float _Complex test(float _Complex z) { return z; }
 '''
-have_complex = cc.compiles(complex_code, name : 'supports _Complex')
+have_complex = cc.compiles(complex_code, name : 'supports _Complex', args: core_c_args)
 
 # CompCert does not have __builtin_expect
 builtin_expect_code = '''
@@ -565,29 +575,25 @@ int main (void) {
   return __builtin_expect(a, 1);
 }
 '''
-have_builtin_expect = cc.links(builtin_expect_code, name : 'has __builtin_expect')
+have_builtin_expect = cc.links(builtin_expect_code, name : 'has __builtin_expect', args: core_c_args)
+
+werror_c_args = core_c_args + cc.get_supported_arguments('-Werror')
 
 # CompCert uses the GCC preprocessor, which causes to
 #  > #if __has_attribute(__alloc_size__)
 # produce a wrong result. So test if the compiler has that attribute
 alloc_size_code = '''
-void *foobar(size_t) __attribute__((__alloc_size__(1)));
-void *foobar2(size_t, size_t) __attribute__((__alloc_size__(1, 2)));
+void *foobar(int) __attribute__((__alloc_size__(1)));
+void *foobar2(int, int) __attribute__((__alloc_size__(1, 2)));
 '''
-have_alloc_size = cc.compiles(alloc_size_code, name : 'attribute __alloc_size__', args : (cc.has_argument('-Werror') ? '-Werror' : ''))
+have_alloc_size = cc.compiles(alloc_size_code, name : 'attribute __alloc_size__', args : werror_c_args)
 
 # attributes constructor/destructor are a GNU extension - if the compiler doesn't have them, don't test them.
 attr_ctor_dtor_code = '''
 void __attribute__((constructor(101))) ctor (void) {}
 void __attribute__((destructor(101))) dtor (void) {}
 '''
-have_attr_ctor_dtor = cc.compiles(attr_ctor_dtor_code, name : 'attributes constructor/destructor', args : (cc.has_argument('-Werror') ? '-Werror' : ''))
-
-# Add c_args from the cross file. This
-# means that the command line values get
-# added to the cross file values instead of
-# replacing them.
-c_args += meson.get_cross_property('c_args', [])
+have_attr_ctor_dtor = cc.compiles(attr_ctor_dtor_code, name : 'attributes constructor/destructor', args : werror_c_args)
 
 if enable_multilib
   used_libs = []
@@ -678,8 +684,8 @@ static int foo(@1@ i __attribute__((unused))) { return 0; }
 int main(void) { return foo(@0@); }
 '''
   builtin_code = builtin_template.format(builtin[1], builtin[2])
-  have_current_builtin = cc.links(builtin_code, name : 'test for __' + builtin[0])
-  conf_data.set('HAVE_' + builtin[0].to_upper(), have_current_builtin, description: 'The compiler supports __' + builtin[0])
+  have_current_builtin = cc.links(builtin_code, name : 'test for __' + builtin[0], args: core_c_args)
+  conf_data.set('_HAVE_' + builtin[0].to_upper(), have_current_builtin, description: 'The compiler supports __' + builtin[0])
 endforeach
 
 NEWLIB_VERSION='4.1.0'
@@ -694,7 +700,7 @@ conf_data.set('_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL',
 conf_data.set('_HAVE_NO_BUILTIN_ATTRIBUTE',
 	      cc.compiles('int __attribute__((no_builtin)) foo(int x) { return x + 1; }',
 			  name : 'no_builtin attribute',
-			  args : (cc.has_argument('-Werror=attributes') ? '-Werror=attributes' : '')),
+			  args : werror_c_args),
 	      description: 'Compiler attribute to prevent the optimizer from adding new builtin calls')
 
 conf_data.set('_HAVE_LONG_DOUBLE', have_long_double,
@@ -731,7 +737,7 @@ conf_data.set('_REENT_GLOBAL_ATEXIT', get_option('newlib-global-atexit'))
 conf_data.set('_FVWRITE_IN_STREAMIO', newlib_fvwrite_in_streamio)
 conf_data.set('_FSEEK_OPTIMIZATION', newlib_fseek_optimization)
 conf_data.set('_WIDE_ORIENT', newlib_wide_orient)
-conf_data.set('HAVE_FCNTL', newlib_have_fcntl)
+conf_data.set('_HAVE_FCNTL', newlib_have_fcntl)
 conf_data.set('_NANO_MALLOC', newlib_nano_malloc)
 conf_data.set('_UNBUF_STREAM_OPT', get_option('newlib-unbuf-stream-opt'))
 conf_data.set('_LITE_EXIT', lite_exit)
@@ -749,14 +755,14 @@ conf_data.set('_HAVE_INITFINI_ARRAY', get_option('newlib-initfini-array'), descr
 conf_data.set('_HAVE_INIT_FINI', get_option('newlib-initfini'), description: 'Support _init() and _fini() functions')
 conf_data.set('NEWLIB_TLS', thread_local_storage, description: 'use thread local storage')
 conf_data.set('PICOLIBC_TLS', thread_local_storage, description: 'use thread local storage')
-conf_data.set('HAVE_PICOLIBC_TLS_API', thread_local_storage, description: '_set_tls and _init_tls functions available')
+conf_data.set('_HAVE_PICOLIBC_TLS_API', thread_local_storage, description: '_set_tls and _init_tls functions available')
 conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in tinystdio')
 conf_data.set('ATOMIC_UNGETC', atomic_ungetc, description: 'Use atomics for fgetc/ungetc for re-entrancy')
-conf_data.set('HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
-conf_data.set('HAVE_BUILTIN_MUL', have_builtin_mul_overflow, description: 'Compiler has __builtin_mul_overflow')
-conf_data.set('HAVE_COMPLEX', have_complex, description: 'Compiler supports _Complex')
-conf_data.set('HAVE_BUILTIN_EXPECT', have_builtin_expect, description: 'Compiler has __builtin_expect')
-conf_data.set('HAVE_ALLOC_SIZE', have_alloc_size, description: 'The compiler REALLY has the attribute __alloc_size__')
+conf_data.set('_HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
+conf_data.set('_HAVE_BUILTIN_MUL_OVERFLOW', have_builtin_mul_overflow, description: 'Compiler has __builtin_mul_overflow')
+conf_data.set('_HAVE_COMPLEX', have_complex, description: 'Compiler supports _Complex')
+conf_data.set('_HAVE_BUILTIN_EXPECT', have_builtin_expect, description: 'Compiler has __builtin_expect')
+conf_data.set('_HAVE_ALLOC_SIZE', have_alloc_size, description: 'The compiler REALLY has the attribute __alloc_size__')
 conf_data.set('_HAVE_ATTRIBUTE_ALWAYS_INLINE',
 	      cc.has_function_attribute('always_inline'),
 	      description: 'The compiler supports the always_inline function attribute')
@@ -944,7 +950,7 @@ if tinystdio
   subdir('dummyhost')
 endif
 
-conf_data.set('HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs supported')
+conf_data.set('_HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs supported')
 
 # By default, tests don't require any special arguments
 
@@ -958,6 +964,9 @@ if tests_enable_stack_protector
     tests_enable_stack_protector = false
   endif
 endif
+
+test_env = environment()
+test_env.prepend('PATH', meson.source_root() / 'scripts')
 
 # CompCert needs the '-WUl,' prefix to correctly pass the --spec parameters to the linker
 specs_prefix = ''
@@ -979,7 +988,7 @@ if has_semihost
   else
     custom_script = cpu_family_script
   endif
-  test_link_args = ['-nostartfiles', '-nostdlib',
+  test_link_args = ['-nostartfiles',
                     '-T', meson.current_source_dir() / custom_script,
                     '-T', '@0@'.format(picolibc_ld), '-lgcc']
   test_linker_files = files(custom_script) + [picolibc_ld]
@@ -1011,7 +1020,7 @@ if enable_tests
   subdir('test')
 endif
 
-conf_data.set('HAVE_IEEEFP_FUNCS', has_ieeefp_funcs, description: 'IEEE fp funcs available')
+conf_data.set('_HAVE_IEEEFP_FUNCS', has_ieeefp_funcs, description: 'IEEE fp funcs available')
 
 configure_file(output : 'picolibc.h',
 	       configuration: conf_data,

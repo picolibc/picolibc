@@ -160,7 +160,7 @@ __hash_open (const char *file,
 #endif
 			new_table = 1;
 
-#ifdef HAVE_FCNTL
+#ifdef _HAVE_FCNTL
 		(void)fcntl(hashp->fp, F_SETFD, 1);
 #endif
 	}

@@ -1,10 +1,11 @@
 [binaries]
-c = 'arm-none-eabi-gcc'
+c = ['arm-none-eabi-gcc', '-mcpu=cortex-a9']
 ar = 'arm-none-eabi-ar'
 as = 'arm-none-eabi-as'
 nm = 'arm-none-eabi-nm'
 strip = 'arm-none-eabi-strip'
-exe_wrapper = ['sh', '-c', 'test -z "$MESON_SOURCE_ROOT" || "$MESON_SOURCE_ROOT"/scripts/run-cortex-a9 "$@"', 'run-cortex-a9']
+# only needed to run tests
+exe_wrapper = ['env', 'run-cortex-a9']
 
 [host_machine]
 system = 'none'
@@ -13,12 +14,4 @@ cpu = 'cortex-a9'
 endian = 'little'
 
 [properties]
-c_args = [
-	'-mcpu=cortex-a9',
-	]
-c_link_args = [
-	'-mcpu=cortex-a9',
-	'-nostdlib',
-	]
-needs_exe_wrapper = true
-test_link_script = 'scripts/test-cortex-a9.ld'
+skip_sanity_check = true

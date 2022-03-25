@@ -1,11 +1,12 @@
 [binaries]
-c = 'clang'
+c = ['clang', '-m32', '-target', 'riscv32-unknown-elf', '-march=rv32imafdc']
 c_ld = '/usr/bin/riscv64-unknown-elf-ld'
 ar = 'riscv64-unknown-elf-ar'
 as = 'riscv64-unknown-elf-as'
 nm = 'riscv64-unknown-elf-nm'
 strip = 'riscv64-unknown-elf-strip'
-exe_wrapper = ['sh', '-c', 'test -z "$MESON_SOURCE_ROOT" || "$MESON_SOURCE_ROOT"/scripts/run-rv32imafdc "$@"', 'run-rv32imafdc']
+# only needed to run tests
+exe_wrapper = ['env', 'run-rv32imafdc']
 
 [host_machine]
 system = 'none'
@@ -14,23 +15,7 @@ cpu = 'riscv'
 endian = 'little'
 
 [properties]
-c_args = [
-	'-m32',
-	'-target', 'riscv32-unknown-elf',
-	'-march=rv32imafdc',
-	'-Wdouble-promotion',
-	'-Werror=double-promotion',
-        '-Wno-unsupported-floating-point-opt',
-        '-std=c17',
-	]
-c_link_args = [
-	'-m32',
-	'-target', 'riscv32-unknown-elf',
-	'-march=rv32imafdc',
-	'-Wl,-melf32lriscv',
-	'-nostdlib',
-	'-L/usr/lib/gcc/riscv64-unknown-elf/8.3.0/rv32imafdc/ilp32d'
-	]
-needs_exe_wrapper = true
+c_args = ['-Werror=double-promotion']
+c_link_args = ['-Wl,-melf32lriscv', '-L/usr/lib/gcc/riscv64-unknown-elf/8.3.0/rv32imafdc/ilp32d']
 skip_sanity_check = true
 has_link_defsym = true

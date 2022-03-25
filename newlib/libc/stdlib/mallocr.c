@@ -407,7 +407,7 @@ extern void __malloc_unlock();
 
 #ifndef INTERNAL_SIZE_T
 #define INTERNAL_SIZE_T size_t
-#elif !defined(HAVE_BUILTIN_MUL_OVERFLOW)
+#elif !defined(_HAVE_BUILTIN_MUL_OVERFLOW)
 #error Compiler does not support __builtin_mul_overflow, hence INTERNAL_SIZE_T cannot be set
 #endif
 
