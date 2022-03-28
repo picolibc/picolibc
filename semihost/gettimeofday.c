@@ -50,6 +50,7 @@ gettimeofday(struct timeval *restrict tv, void *restrict tz)
         start_clock = sys_semihost_clock();
         start_elapsed = sys_semihost_elapsed();
         tick_freq = sys_semihost_tickfreq();
+        been_here = 1;
     }
 
     ticks = (uint64_t) start_clock * tick_freq + (sys_semihost_elapsed() - start_elapsed);
