@@ -356,7 +356,7 @@ __sprint_r (struct _reent *ptr,
       uio->uio_iovcnt = 0;
       return 0;
     }
-#ifdef _WIDE_ORIENT
+#if defined _WIDE_ORIENT && (!defined _ELIX_LEVEL || _ELIX_LEVEL >= 4)
     if (fp->_flags2 & __SWID)
       {
 	struct __siov *iov;
@@ -407,7 +407,7 @@ __sfputs_r (struct _reent *ptr,
 {
   register int i;
 
-#ifdef _WIDE_ORIENT
+#if defined _WIDE_ORIENT && (!defined _ELIX_LEVEL || _ELIX_LEVEL >= 4)
   if (fp->_flags2 & __SWID)
     {
       wchar_t *p;
