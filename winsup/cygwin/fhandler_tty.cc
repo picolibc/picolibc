@@ -2172,7 +2172,7 @@ fhandler_pty_master::close ()
 	    }
 	  release_output_mutex ();
 	  get_ttyp ()->stop_fwd_thread = true;
-	  WriteFile (to_master_nat, "", 0, NULL, NULL);
+	  WriteFile (to_master_nat, "", 0, &len, NULL);
 	  master_fwd_thread->detach ();
 	}
     }
