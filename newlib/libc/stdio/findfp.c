@@ -122,9 +122,8 @@ struct glue_with_file {
   FILE file;
 };
 
-struct _glue *
-__sfmoreglue (struct _reent *d,
-       register int n)
+static struct _glue *
+sfmoreglue (struct _reent *d, int n)
 {
   struct glue_with_file *g;
 
@@ -160,7 +159,7 @@ __sfp (struct _reent *d)
 	if (fp->_flags == 0)
 	  goto found;
       if (g->_next == NULL &&
-	  (g->_next = __sfmoreglue (d, NDYNAMIC)) == NULL)
+	  (g->_next = sfmoreglue (d, NDYNAMIC)) == NULL)
 	break;
     }
   _newlib_sfp_lock_exit ();
