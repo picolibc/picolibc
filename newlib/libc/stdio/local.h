@@ -183,7 +183,6 @@ extern void   __sinit (struct _reent *);
 extern void   _cleanup_r (struct _reent *);
 extern void   __smakebuf_r (struct _reent *, FILE *);
 extern int    __swhatbuf_r (struct _reent *, FILE *, size_t *, int *);
-extern int    _fwalk (struct _reent *, int (*)(FILE *));
 extern int    _fwalk_reent (struct _reent *, int (*)(struct _reent *, FILE *));
 struct _glue * __sfmoreglue (struct _reent *,int n);
 extern int __submore (struct _reent *, FILE *);

@@ -23,10 +23,10 @@
 #include "local.h"
 
 static int
-lflush (FILE *fp)
+lflush (struct _reent * ptr __unused, FILE *fp)
 {
   if ((fp->_flags & (__SLBF | __SWR)) == (__SLBF | __SWR))
-    return fflush (fp);
+    return _fflush_r (_REENT, fp);
   return 0;
 }
 
@@ -102,10 +102,10 @@ __srefill_r (struct _reent * ptr,
    */
   if (fp->_flags & (__SLBF | __SNBF))
     {
-      /* Ignore this file in _fwalk to avoid potential deadlock. */
+      /* Ignore this file in _fwalk_reent to avoid potential deadlock. */
       short orig_flags = fp->_flags;
       fp->_flags = 1;
-      (void) _fwalk (_GLOBAL_REENT, lflush);
+      (void) _fwalk_reent (_GLOBAL_REENT, lflush);
       fp->_flags = orig_flags;
 
       /* Now flush this file without locking it. */

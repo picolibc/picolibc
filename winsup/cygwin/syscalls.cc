@@ -3058,10 +3058,10 @@ _cygwin_istext_for_stdio (int fd)
 }
 
 /* internal newlib function */
-extern "C" int _fwalk (struct _reent *ptr, int (*function) (FILE *));
+extern "C" int _fwalk_reent (struct _reent *ptr, int (*function) (struct _reent *, FILE *));
 
 static int
-setmode_helper (FILE *f)
+setmode_helper (struct _reent *ptr __unused, FILE *f)
 {
   if (fileno (f) != _my_tls.locals.setmode_file)
     {
@@ -3137,7 +3137,7 @@ cygwin_setmode (int fd, int mode)
 	_my_tls.locals.setmode_mode = O_TEXT;
       else
 	_my_tls.locals.setmode_mode = O_BINARY;
-      _fwalk (_GLOBAL_REENT, setmode_helper);
+      _fwalk_reent (_GLOBAL_REENT, setmode_helper);
     }
   return res;
 }

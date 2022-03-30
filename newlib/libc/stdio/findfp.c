@@ -323,20 +323,20 @@ __sinit_lock_release (void)
 
 /* Walkable file locking routine.  */
 static int
-__fp_lock (FILE * ptr)
+__fp_lock (struct _reent * ptr __unused, FILE * fp)
 {
-  if (!(ptr->_flags2 & __SNLK))
-    _flockfile (ptr);
+  if (!(fp->_flags2 & __SNLK))
+    _flockfile (fp);
 
   return 0;
 }
 
 /* Walkable file unlocking routine.  */
 static int
-__fp_unlock (FILE * ptr)
+__fp_unlock (struct _reent * ptr __unused, FILE * fp)
 {
-  if (!(ptr->_flags2 & __SNLK))
-    _funlockfile (ptr);
+  if (!(fp->_flags2 & __SNLK))
+    _funlockfile (fp);
 
   return 0;
 }
@@ -346,13 +346,13 @@ __fp_lock_all (void)
 {
   __sfp_lock_acquire ();
 
-  (void) _fwalk (_REENT, __fp_lock);
+  (void) _fwalk_reent (_REENT, __fp_lock);
 }
 
 void
 __fp_unlock_all (void)
 {
-  (void) _fwalk (_REENT, __fp_unlock);
+  (void) _fwalk_reent (_REENT, __fp_unlock);
 
   __sfp_lock_release ();
 }
