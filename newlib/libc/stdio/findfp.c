@@ -228,14 +228,6 @@ cleanup_stdio (struct _reent *ptr)
   (void) _fwalk_reent (ptr, cleanup_func);
 }
 
-#ifndef _REENT_ONLY
-void
-_cleanup (void)
-{
-  cleanup_stdio (_GLOBAL_REENT);
-}
-#endif
-
 /*
  * __sinit() is called whenever stdio's internal variables must be set up.
  */
