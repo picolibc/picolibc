@@ -234,7 +234,7 @@ __sflush_r (struct _reent *ptr,
 }
 
 #ifdef _STDIO_BSD_SEMANTICS
-/* Called from _cleanup_r.  At exit time, we don't need file locking,
+/* Called from cleanup_stdio().  At exit time, we don't need file locking,
    and we don't want to move the underlying file pointer unless we're
    writing. */
 int

@@ -199,8 +199,8 @@ found:
  * The name `_cleanup' is, alas, fairly well known outside stdio.
  */
 
-void
-_cleanup_r (struct _reent *ptr)
+static void
+cleanup_stdio (struct _reent *ptr)
 {
   int (*cleanup_func) (struct _reent *, FILE *);
 #ifdef _STDIO_BSD_SEMANTICS
@@ -232,7 +232,7 @@ _cleanup_r (struct _reent *ptr)
 void
 _cleanup (void)
 {
-  _cleanup_r (_GLOBAL_REENT);
+  cleanup_stdio (_GLOBAL_REENT);
 }
 #endif
 
@@ -252,7 +252,7 @@ __sinit (struct _reent *s)
     }
 
   /* make sure we clean up on exit */
-  s->__cleanup = _cleanup_r;	/* conservative */
+  s->__cleanup = cleanup_stdio;	/* conservative */
 
   s->__sglue._next = NULL;
 #ifndef _REENT_SMALL

@@ -61,7 +61,6 @@ __smakebuf_r (struct _reent *ptr,
     }
   else
     {
-      ptr->__cleanup = _cleanup_r;
       fp->_flags |= __SMBF;
       fp->_bf._base = fp->_p = (unsigned char *) p;
       fp->_bf._size = size;
