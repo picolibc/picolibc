@@ -24,8 +24,6 @@ vprintf (const char *fmt,
 {
   c99_vprintf_t args;
 
-  CHECK_STD_INIT(_REENT);
-
   args.fmt = fmt;
   va_copy(args.ap,ap);
 

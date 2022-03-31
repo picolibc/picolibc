@@ -19,8 +19,6 @@ perror (const char *s)
 {
   c99_perror_t arg;
 
-  CHECK_STD_INIT(_REENT);
-
   arg.str = s;
   arg.arg_errno = errno;
   __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_PERROR, &arg);

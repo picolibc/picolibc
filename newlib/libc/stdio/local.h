@@ -220,15 +220,6 @@ extern _READ_WRITE_RETURN_TYPE __swrite64 (struct _reent *, void *,
   while (0)
 #endif /* !_REENT_SMALL || _REENT_GLOBAL_STDIO_STREAMS */
 
-#define CHECK_STD_INIT(ptr) \
-  do								\
-    {								\
-      struct _reent *_check_init_ptr = (ptr);			\
-      if ((_check_init_ptr) && !(_check_init_ptr)->__cleanup)	\
-	__sinit (_check_init_ptr);				\
-    }								\
-  while (0)
-
 /* Return true and set errno and stream error flag iff the given FILE
    cannot be written now.  */
 
