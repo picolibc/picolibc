@@ -259,10 +259,6 @@ __sinit (struct _reent *s)
   s->_stdin = __sfp(s);
   s->_stdout = __sfp(s);
   s->_stderr = __sfp(s);
-# else /* _REENT_GLOBAL_STDIO_STREAMS */
-  s->_stdin = &__sf[0];
-  s->_stdout = &__sf[1];
-  s->_stderr = &__sf[2];
 # endif /* _REENT_GLOBAL_STDIO_STREAMS */
 #endif
 
