@@ -286,7 +286,7 @@ int
 fflush (register FILE * fp)
 {
   if (fp == NULL)
-    return _fwalk_reent (_GLOBAL_REENT, _fflush_r);
+    return _fwalk_sglue (_GLOBAL_REENT, _fflush_r, &_GLOBAL_REENT->__sglue);
 
   return _fflush_r (_REENT, fp);
 }

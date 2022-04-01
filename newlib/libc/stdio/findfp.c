@@ -158,7 +158,7 @@ sfmoreglue (struct _reent *d, int n)
 static void
 stdio_exit_handler (void)
 {
-  (void) _fwalk_reent (_GLOBAL_REENT, CLEANUP_FILE);
+  (void) _fwalk_sglue (_GLOBAL_REENT, CLEANUP_FILE, &_GLOBAL_REENT->__sglue);
 }
 
 /*
@@ -240,7 +240,7 @@ cleanup_stdio (struct _reent *ptr)
   if (ptr->_stderr != &__sf[2])
     CLEANUP_FILE (ptr, ptr->_stderr);
 #endif
-  (void) _fwalk_reent (ptr, CLEANUP_FILE);
+  (void) _fwalk_sglue (ptr, CLEANUP_FILE, &ptr->__sglue);
 }
 
 /*
@@ -323,15 +323,21 @@ __fp_unlock (struct _reent * ptr __unused, FILE * fp)
 void
 __fp_lock_all (void)
 {
+  struct _reent *ptr;
+
   __sfp_lock_acquire ();
 
-  (void) _fwalk_reent (_REENT, __fp_lock);
+  ptr = _REENT;
+  (void) _fwalk_sglue (ptr, __fp_lock, &ptr->__sglue);
 }
 
 void
 __fp_unlock_all (void)
 {
-  (void) _fwalk_reent (_REENT, __fp_unlock);
+  struct _reent *ptr;
+
+  ptr = _REENT;
+  (void) _fwalk_sglue (ptr, __fp_unlock, &ptr->__sglue);
 
   __sfp_lock_release ();
 }

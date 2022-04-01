@@ -25,15 +25,13 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#include "local.h"
 
 int
-_fwalk_reent (struct _reent *ptr,
-       register int (*reent_function) (struct _reent *, FILE *))
+_fwalk_sglue (struct _reent *ptr, int (*func) (struct _reent *, FILE *),
+    struct _glue *g)
 {
-  register FILE *fp;
-  register int n, ret = 0;
-  register struct _glue *g;
+  FILE *fp;
+  int n, ret = 0;
 
   /*
    * It should be safe to walk the list without locking it;
@@ -43,10 +41,12 @@ _fwalk_reent (struct _reent *ptr,
    * Avoid locking this list while walking it or else you will
    * introduce a potential deadlock in [at least] refill.c.
    */
-  for (g = &ptr->__sglue; g != NULL; g = g->_next)
+  do {
     for (fp = g->_iobs, n = g->_niobs; --n >= 0; fp++)
       if (fp->_flags != 0 && fp->_flags != 1 && fp->_file != -1)
-	ret |= (*reent_function) (ptr, fp);
+	ret |= (*func) (ptr, fp);
+    g = g->_next;
+  } while (g != NULL);
 
   return ret;
 }

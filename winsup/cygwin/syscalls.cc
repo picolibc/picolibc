@@ -63,6 +63,7 @@ details. */
 #include "sync.h"
 #include "child_info.h"
 #include <cygwin/fs.h>  /* needed for RENAME_NOREPLACE */
+#include <sys/reent.h>  /* needed for _fwalk_sglue() declaration */
 
 #undef _close
 #undef _lseek
@@ -3057,9 +3058,6 @@ _cygwin_istext_for_stdio (int fd)
   return 1;
 }
 
-/* internal newlib function */
-extern "C" int _fwalk_reent (struct _reent *ptr, int (*function) (struct _reent *, FILE *));
-
 static int
 setmode_helper (struct _reent *ptr __unused, FILE *f)
 {
@@ -3137,7 +3135,7 @@ cygwin_setmode (int fd, int mode)
 	_my_tls.locals.setmode_mode = O_TEXT;
       else
 	_my_tls.locals.setmode_mode = O_BINARY;
-      _fwalk_reent (_GLOBAL_REENT, setmode_helper);
+      _fwalk_sglue (_GLOBAL_REENT, setmode_helper, &_GLOBAL_REENT->__sglue);
     }
   return res;
 }

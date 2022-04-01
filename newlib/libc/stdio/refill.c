@@ -102,10 +102,10 @@ __srefill_r (struct _reent * ptr,
    */
   if (fp->_flags & (__SLBF | __SNBF))
     {
-      /* Ignore this file in _fwalk_reent to avoid potential deadlock. */
+      /* Ignore this file in _fwalk_sglue to avoid potential deadlock. */
       short orig_flags = fp->_flags;
       fp->_flags = 1;
-      (void) _fwalk_reent (_GLOBAL_REENT, lflush);
+      (void) _fwalk_sglue (_GLOBAL_REENT, lflush, &_GLOBAL_REENT->__sglue);
       fp->_flags = orig_flags;
 
       /* Now flush this file without locking it. */

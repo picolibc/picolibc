@@ -841,6 +841,9 @@ extern void (*__stdio_exit_handler) (void);
 
 void _reclaim_reent (struct _reent *);
 
+extern int _fwalk_sglue (struct _reent *, int (*)(struct _reent *, __FILE *),
+			 struct _glue *);
+
 /* #define _REENT_ONLY define this to get only reentrant routines */
 
 #if defined(__DYNAMIC_REENT__) && !defined(__SINGLE_THREAD__)

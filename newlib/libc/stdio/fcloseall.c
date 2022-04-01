@@ -59,7 +59,7 @@ Required OS subroutines: <<close>>, <<fstat>>, <<isatty>>, <<lseek>>,
 int
 _fcloseall_r (struct _reent *ptr)
 {
-  return _fwalk_reent (ptr, _fclose_r);
+  return _fwalk_sglue (ptr, _fclose_r, &ptr->__sglue);
 }
 
 #ifndef _REENT_ONLY
