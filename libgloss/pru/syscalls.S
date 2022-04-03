@@ -68,7 +68,6 @@ __SC_ret_skip_errno_set:
 	   users use other methods for communicating with
 	   the host - remoteproc, rpmsg, shared memory.  */
 	SC	_exit, SYS_exit
-	SC	_open, SYS_open
 	SC	_close, SYS_close
 	SC	_read, SYS_read
 	SC	_write, SYS_write
@@ -77,3 +76,20 @@ __SC_ret_skip_errno_set:
 	SC	_getpid, SYS_getpid
 	SC	_kill, SYS_kill
 	SC	_fstat, SYS_fstat
+
+
+	/* _open is special because it has VA declaration. */
+	.section .text._open, "ax"
+	.global	_open
+	.type	_open,@function
+	.func
+_open:
+	/* Pop the second and third argument from stack, per VA ABI.
+	   Thus simulator can get all arguments from registers
+	   for any supported syscall.  */
+	lbbo    r16, sp, 4, 4
+	lbbo    r15, sp, 0, 4
+	ldi	r1, SYS_open
+	halt
+	jmp	__SC_ret
+	.endfunc
