@@ -693,6 +693,10 @@ NEWLIB_MAJOR_VERSION=4
 NEWLIB_MINOR_VERSION=1
 NEWLIB_PATCHLEVEL_VERSION=0
 
+if get_option('newlib-retargetable-locking') != get_option('newlib-multithread')
+  error('newlib-retargetable-locking and newlib-multithread must be set to the same value')
+endif
+
 conf_data.set('_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL',
 	      cc.has_argument('-fno-tree-loop-distribute-patterns'),
 	      description: 'Compiler flag to prevent detecting memcpy/memset patterns')
