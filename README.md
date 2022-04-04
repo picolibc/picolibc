@@ -118,6 +118,7 @@ use Picolibc:
  * [Operating System Support](doc/os.md).
  * [Printf and Scanf in Picolibc](doc/printf.md)
  * [Thread Local Storage](doc/tls.md)
+ * [Re-entrancy and Locking](doc/locking.md)
  * [Picolibc as embedded source](doc/embedsource.md)
  * [Releasing Picolibc](doc/releasing.md)
  * [Copyright and license information](COPYING.picolibc)
