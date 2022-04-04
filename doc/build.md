@@ -114,7 +114,7 @@ These options control which character sets are supported by iconv.
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
-| newlib-iconv-encodings      | <empty> | Comma-separated list of iconv encodings to be built-in (default all supported)       |
+| newlib-iconv-encodings      | <empty> | Comma-separated list of iconv encodings to be built-in (default all supported). <br> Set to `none` to disable all encodings. |
 | newlib-iconv-from-encodings | <empty> | Comma-separated list of "from" iconv encodings to be built-in (default iconv-encodings) |
 | newlib-iconv-to-encodings   | <empty> | Comma-separated list of "to" iconv encodings to be built-in (default iconv-encodings) |
 | newlib-iconv-external-ccs   | false   | Use file system to store iconv tables. Requires fopen. (default built-in to memory)  |
