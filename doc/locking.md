@@ -1,16 +1,11 @@
 # Locking in Picolibc
 
-By default, picolibc is built with threading support, including
-various locks, enabled. However, picolibc has no scheduling support to
-control thread execution. That means it can't provide real
-implementations of the underlying locking primitives. Instead, it
-provides dummy functions sufficient for picolibc to work in a single
-threaded environment.
-
-If you are using picolibc in a re-entrant environment, like an RTOS
-with threading support, you will need to provide an implementation of
-this API on top of the scheduling primitives provided by the
-environment.
+When newlib-multithread and newlib-retargetable-locking are enabled,
+Picolibc uses the following locking API. Picolibc provides stubs for
+all of these functions that do not actually perform any locking, so
+that a single-threaded application can still use a Picolibc compiled
+with locking enabled. An application needing locking must provide a
+real implementation of the locking API.
 
 ## Where Picolibc uses locking
 
