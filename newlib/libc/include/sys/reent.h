@@ -702,8 +702,14 @@ struct _reent
 
 #ifdef _REENT_GLOBAL_STDIO_STREAMS
 #define _REENT_STDIO_STREAM(var, index) &__sf[index]
+#define _REENT_INIT_SGLUE(_ptr) { _NULL, 0, _NULL }
+#define _REENT_INIT_SGLUE_ZEROED(_ptr) /* nothing to set */
 #else
 #define _REENT_STDIO_STREAM(var, index) &(var)->__sf[index]
+#define _REENT_INIT_SGLUE(_ptr) { _NULL, 3, &(_ptr)->__sf[0] }
+#define _REENT_INIT_SGLUE_ZEROED(_ptr) \
+  (_ptr)->__sglue._niobs = 3; \
+  (_ptr)->__sglue._iobs = &(_ptr)->__sf[0];
 #endif
 
 #define _REENT_INIT(var) \
@@ -751,7 +757,7 @@ struct _reent
     }, \
     _REENT_INIT_ATEXIT \
     _NULL, \
-    {_NULL, 0, _NULL} \
+    _REENT_INIT_SGLUE(&(var)) \
   }
 
 #define _REENT_INIT_PTR_ZEROED(var) \
@@ -766,6 +772,7 @@ struct _reent
     (var)->_new._reent._r48._mult[1] = _RAND48_MULT_1; \
     (var)->_new._reent._r48._mult[2] = _RAND48_MULT_2; \
     (var)->_new._reent._r48._add = _RAND48_ADD; \
+    _REENT_INIT_SGLUE_ZEROED(var) \
   }
 
 #define _REENT_CHECK_RAND48(ptr)	/* nothing */

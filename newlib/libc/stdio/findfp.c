@@ -246,12 +246,7 @@ __sinit (struct _reent *s)
   /* make sure we clean up on exit */
   s->__cleanup = cleanup_stdio;	/* conservative */
 
-#ifndef _REENT_SMALL
-# ifndef _REENT_GLOBAL_STDIO_STREAMS
-  s->__sglue._niobs = 3;
-  s->__sglue._iobs = &s->__sf[0];
-# endif /* _REENT_GLOBAL_STDIO_STREAMS */
-#else
+#ifdef _REENT_SMALL
 # ifndef _REENT_GLOBAL_STDIO_STREAMS
   s->_stdin = __sfp(s);
   s->_stdout = __sfp(s);
