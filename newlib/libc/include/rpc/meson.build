@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2022 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,81 +32,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-subdir('sys')
-subdir('machine')
-subdir('ssp')
-subdir('rpc')
 
-inc_headers = [
-  'alloca.h',
-  '_ansi.h',
-  'argz.h',
-  'ar.h',
-  'assert.h',
-  'byteswap.h',
-  'cpio.h',
-  'ctype.h',
-  'devctl.h',
-  'dirent.h',
-  'elf.h',
-  'endian.h',
-  'envlock.h',
-  'envz.h',
-  'errno.h',
-  'fastmath.h',
-  'fcntl.h',
-  'fenv.h',
-  'fnmatch.h',
-  'getopt.h',
-  'glob.h',
-  'grp.h',
-  'iconv.h',
-  'ieeefp.h',
-  'inttypes.h',
-  'langinfo.h',
-  'libgen.h',
-  'limits.h',
-  'locale.h',
-  'malloc.h',
-  'math.h',
-  'memory.h',
-  'newlib.h',
-  'paths.h',
-  'pwd.h',
-  'regdef.h',
-  'regex.h',
-  'sched.h',
-  'search.h',
-  'setjmp.h',
-  'signal.h',
-  'spawn.h',
-  'stdint.h',
-  'stdlib.h',
-  'string.h',
-  'strings.h',
-  '_syslist.h',
-  'tar.h',
-  'termios.h',
-  'threads.h',
-  'time.h',
-  'unctrl.h',
-  'unistd.h',
-  'utime.h',
-  'utmp.h',
-  'wchar.h',
-  'wctype.h',
-  'wordexp.h'
+inc_rpc_headers = [
+  'types.h',
+  'xdr.h',
 ]
 
-if have_complex
-  inc_headers += ['complex.h']
-endif
-
-inc_headers += ['picotls.h']
-
-if not tinystdio
-  inc_headers += ['reent.h']
-endif
-
-install_headers(inc_headers,
-		install_dir: include_dir)
+install_headers(inc_rpc_headers,
+		install_dir: include_dir / 'rpc')
