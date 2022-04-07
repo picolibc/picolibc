@@ -5,7 +5,7 @@ as = 'i686-linux-gnu-as'
 nm = 'i686-linux-gnu-nm'
 strip = 'i686-linux-gnu-strip'
 # only needed to run tests
-exe_wrapper = ['env', 'run-i386']
+exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-i386 "$@"', 'run-i386']
 
 [host_machine]
 system='linux'

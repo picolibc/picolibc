@@ -969,7 +969,18 @@ if tests_enable_stack_protector
   endif
 endif
 
-test_env = environment()
+# Meson version 0.53.2 doesn't check for the skip_sanity_check value
+# before attempting to run test fragments during configuration. That
+# means the exe_wrapper value needs to handle being run at that
+# point. To support this, the exe_wrapper becomes a script which
+# checks for a environment variable (PICOLIBC_TEST) and exits
+# indicating success if that is not present.
+#
+# This was fixed in meson version 0.54.2, so this can be removed from
+# here and the sample cross scripts once picolibc requires a version
+# of meson newer than that.
+
+test_env = environment({'PICOLIBC_TEST' : '1'})
 test_env.prepend('PATH', meson.source_root() / 'scripts')
 
 # CompCert needs the '-WUl,' prefix to correctly pass the --spec parameters to the linker

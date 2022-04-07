@@ -5,7 +5,7 @@ as = 'riscv64-zephyr-elf-as'
 nm = 'riscv64-zephyr-elf-nm'
 strip = 'riscv64-zephyr-elf-strip'
 # only needed to run tests
-exe_wrapper = ['env', 'run-riscv']
+exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-riscv "$@"', 'run-riscv']
 
 [host_machine]
 system = 'zephyr'

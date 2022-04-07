@@ -6,7 +6,7 @@ ld = 'aarch64-linux-gnu-ld'
 nm = 'aarch64-linux-gnu-nm'
 strip = 'aarch64-linux-gnu-strip'
 # only needed to run tests
-exe_wrapper = ['env', 'run-aarch64']
+exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-aarch64 "$@"', 'run-aarch64']
 
 [host_machine]
 system = 'linux'

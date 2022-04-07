@@ -5,7 +5,7 @@ as = 'x86_64-linux-gnu-as'
 nm = 'x86_64-linux-gnu-nm'
 strip = 'x86_64-linux-gnu-strip'
 # only needed to run tests
-exe_wrapper = ['env', 'run-x86_64']
+exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-x86_64 "$@"', 'run-x86_64']
 
 [host_machine]
 system='linux'

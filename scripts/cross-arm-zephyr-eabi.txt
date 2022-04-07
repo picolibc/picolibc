@@ -5,7 +5,7 @@ as = 'arm-zephyr-eabi-as'
 nm = 'arm-zephyr-eabi-nm'
 strip = 'arm-zephyr-eabi-strip'
 # only needed to run tests
-exe_wrapper = ['env', 'run-arm']
+exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-arm "$@"', 'run-arm']
 
 [host_machine]
 system = 'zephyr'
