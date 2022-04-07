@@ -1,5 +1,9 @@
 [binaries]
-c = ['arm-none-eabi-gcc', '-mcpu=cortex-a9']
+# Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
+# so we have to add -nostdlib to the compiler configuration itself or
+# early compiler tests will fail. This can be removed when picolibc
+# requires at least version 0.54.2 of meson.
+c = ['arm-none-eabi-gcc', '-mcpu=cortex-a9', '-nostdlib']
 ar = 'arm-none-eabi-ar'
 as = 'arm-none-eabi-as'
 nm = 'arm-none-eabi-nm'

@@ -1,5 +1,9 @@
 [binaries]
-c = ['clang', '-m32', '-target', 'riscv32-unknown-elf', '-march=rv32imafdc']
+# Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
+# so we have to add -nostdlib to the compiler configuration itself or
+# early compiler tests will fail. This can be removed when picolibc
+# requires at least version 0.54.2 of meson.
+c = ['clang', '-m32', '-target', 'riscv32-unknown-elf', '-march=rv32imafdc', '-nostdlib']
 c_ld = '/usr/bin/riscv64-unknown-elf-ld'
 ar = 'riscv64-unknown-elf-ar'
 as = 'riscv64-unknown-elf-as'
