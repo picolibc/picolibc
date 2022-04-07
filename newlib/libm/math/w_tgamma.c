@@ -27,8 +27,14 @@
 	double x;
 #endif
 {
+	if (__builtin_isless(x, 0.0)) {
+	  errno = EDOM;
+	  return __builtin_nanf("");
+	}
+
         double y;
 	y = __ieee754_tgamma(x);
+
 #ifdef _IEEE_LIBM
 	return y;
 #else
