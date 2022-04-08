@@ -377,7 +377,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
 
     int stream_len = 0;
 
-#define my_putc(c, stream) do { ++stream_len; putc(c, stream); } while(0)
+#define my_putc(c, stream) do { ++stream_len; if (putc(c, stream) < 0) goto fail; } while(0)
 
     if ((stream->flags & __SWR) == 0)
 	return EOF;
@@ -1116,6 +1116,9 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
     return stream_len;
 #undef my_putc
 #undef ap
+  fail:
+    stream_len = -1;
+    goto ret;
 }
 
 #if defined(FORMAT_DEFAULT_DOUBLE) && !defined(vfprintf)

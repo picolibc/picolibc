@@ -39,9 +39,9 @@ int
 __file_str_put(char c, FILE *stream)
 {
 	struct __file_str *sstream = (struct __file_str *) stream;
-	if (sstream->len >= sstream->size)
-		return EOF;
-	*sstream->buf++ = c;
-	++sstream->len;
+	if (sstream->len < sstream->size) {
+            *sstream->buf++ = c;
+            ++sstream->len;
+        }
 	return c;
 }
