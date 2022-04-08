@@ -889,8 +889,10 @@ extern FILE *fopen(const char *path, const char *mode);
 extern FILE *freopen(const char *path, const char *mode, FILE *stream);
 extern FILE *fdopen(int, const char *);
 extern int fseek(FILE *stream, long offset, int whence);
+static inline int fseeko(FILE *stream, __off_t offset, int whence) { return fseek(stream, (long) offset, whence); }
 extern int fsetpos(FILE *stream, fpos_t *pos);
 extern long ftell(FILE *stream);
+static inline __off_t ftello(FILE *stream) { return (__off_t) ftell(stream); }
 extern int fileno(FILE *);
 extern void perror(const char *s);
 extern int remove(const char *pathname);
