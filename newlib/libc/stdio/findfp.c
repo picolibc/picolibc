@@ -235,11 +235,11 @@ cleanup_stdio (struct _reent *ptr)
 void
 __sinit (struct _reent *s)
 {
-  __sinit_lock_acquire ();
+  __sfp_lock_acquire ();
 
   if (s->__cleanup)
     {
-      __sinit_lock_release ();
+      __sfp_lock_release ();
       return;
     }
 
@@ -268,13 +268,12 @@ __sinit (struct _reent *s)
   stderr_init (s->_stderr);
 #endif /* _REENT_GLOBAL_STDIO_STREAMS */
 
-  __sinit_lock_release ();
+  __sfp_lock_release ();
 }
 
 #ifndef __SINGLE_THREAD__
 
 __LOCK_INIT_RECURSIVE(static, __sfp_recursive_mutex);
-__LOCK_INIT_RECURSIVE(static, __sinit_recursive_mutex);
 
 void
 __sfp_lock_acquire (void)
@@ -286,18 +285,6 @@ void
 __sfp_lock_release (void)
 {
   __lock_release_recursive (__sfp_recursive_mutex);
-}
-
-void
-__sinit_lock_acquire (void)
-{
-  __lock_acquire_recursive (__sinit_recursive_mutex);
-}
-
-void
-__sinit_lock_release (void)
-{
-  __lock_release_recursive (__sinit_recursive_mutex);
 }
 
 /* Walkable file locking routine.  */

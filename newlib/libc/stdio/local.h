@@ -287,8 +287,6 @@ char *_llicvt (char *, long long, char);
 #else
 void __sfp_lock_acquire (void);
 void __sfp_lock_release (void);
-void __sinit_lock_acquire (void);
-void __sinit_lock_release (void);
 #endif
 
 /* Types used in positional argument support in vfprinf/vfwprintf.
