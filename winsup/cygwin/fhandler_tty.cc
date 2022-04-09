@@ -4152,7 +4152,8 @@ void
 fhandler_pty_slave::release_ownership_of_nat_pipe (tty *ttyp,
 						   fhandler_termios *fh)
 {
-  if (fh->get_major () == DEV_PTYM_MAJOR)
+  if (fh->get_major () == DEV_PTYM_MAJOR
+      && nat_pipe_owner_self (ttyp->nat_pipe_owner_pid))
     {
       fhandler_pty_master *ptym = (fhandler_pty_master *) fh;
       WaitForSingleObject (ptym->pipe_sw_mutex, INFINITE);
