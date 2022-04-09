@@ -4138,7 +4138,8 @@ void
 fhandler_pty_slave::close_pseudoconsole_if_necessary (tty *ttyp,
 						      fhandler_termios *fh)
 {
-  if (fh->get_major () == DEV_PTYM_MAJOR && ttyp->pcon_activated)
+  if (fh->get_major () == DEV_PTYM_MAJOR && ttyp->pcon_activated
+      && pcon_pid_self (ttyp->pcon_pid))
     {
       fhandler_pty_master *ptym = (fhandler_pty_master *) fh;
       WaitForSingleObject (ptym->pcon_mutex, INFINITE);
