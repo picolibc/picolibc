@@ -2122,7 +2122,7 @@ fhandler_pty_common::resize_pseudo_console (struct winsize *ws)
     OpenProcess (PROCESS_DUP_HANDLE, FALSE, get_ttyp ()->pcon_pid);
   DuplicateHandle (pcon_owner, get_ttyp ()->h_pcon_write_pipe,
 		   GetCurrentProcess (), &hpcon_local.hWritePipe,
-		   0, TRUE, DUPLICATE_SAME_ACCESS);
+		   0, FALSE, DUPLICATE_SAME_ACCESS);
   acquire_attach_mutex (mutex_timeout);
   ResizePseudoConsole ((HPCON) &hpcon_local, size);
   release_attach_mutex ();
@@ -3600,15 +3600,15 @@ fhandler_pty_slave::close_pseudoconsole (tty *ttyp, DWORD force_switch_to)
 	      DuplicateHandle (GetCurrentProcess (),
 			       ttyp->h_pcon_write_pipe,
 			       new_owner, &new_write_pipe,
-			       0, TRUE, DUPLICATE_SAME_ACCESS);
+			       0, FALSE, DUPLICATE_SAME_ACCESS);
 	      DuplicateHandle (GetCurrentProcess (),
 			       ttyp->h_pcon_condrv_reference,
 			       new_owner, &new_condrv_reference,
-			       0, TRUE, DUPLICATE_SAME_ACCESS);
+			       0, FALSE, DUPLICATE_SAME_ACCESS);
 	      DuplicateHandle (GetCurrentProcess (),
 			       ttyp->h_pcon_conhost_process,
 			       new_owner, &new_conhost_process,
-			       0, TRUE, DUPLICATE_SAME_ACCESS);
+			       0, FALSE, DUPLICATE_SAME_ACCESS);
 	      DuplicateHandle (GetCurrentProcess (), ttyp->h_pcon_in,
 			       new_owner, &new_pcon_in,
 			       0, TRUE, DUPLICATE_SAME_ACCESS);
