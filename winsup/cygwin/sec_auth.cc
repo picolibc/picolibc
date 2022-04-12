@@ -1475,8 +1475,9 @@ out:
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/* In Mingw-w64, MsV1_0S4ULogon and MSV1_0_S4U_LOGON are only defined
-   in ddk/ntifs.h.  We can't include this. */
+/* In w32api prior to 10.0.0, MsV1_0S4ULogon and MSV1_0_S4U_LOGON are only
+   defined in ddk/ntifs.h, which we can't include. */
+#if (__MINGW64_VERSION_MAJOR < 10)
 
 #define MsV1_0S4ULogon ((MSV1_0_LOGON_SUBMIT_TYPE) 12)
 
@@ -1490,6 +1491,8 @@ typedef struct _MSV1_0_S4U_LOGON
 
 /* Missing in Mingw-w64 */
 #define KERB_S4U_LOGON_FLAG_IDENTITY 0x08
+
+#endif
 
 /* If logon is true we need an impersonation token.  Otherwise we just
    need an identification token, e. g. to fetch the group list. */
