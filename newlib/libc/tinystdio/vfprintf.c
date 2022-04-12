@@ -228,6 +228,8 @@ skip_to_arg(const char *fmt_orig, my_va_list *ap, int target_argno)
 		    continue;
 		  case '#':
 		    continue;
+                  case '\'':
+                    continue;
 		}
 	    }
 
@@ -421,6 +423,12 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
 		  case '#':
 		    flags |= FL_ALT;
 		    continue;
+                  case '\'':
+                    /*
+                     * C/POSIX locale has an empty thousands_sep
+                     * value, so we can just ignore this character
+                     */
+                    continue;
 		}
 	    }
 
