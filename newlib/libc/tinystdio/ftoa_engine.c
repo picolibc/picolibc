@@ -105,7 +105,7 @@ int __ftoa_engine(float val, struct ftoa *ftoa, int maxDigits, bool fmode, int m
 
     /* Read the sign, shift the exponent in place and delete it from frac.
      */
-    if (x.u & (1 << 31))
+    if (x.u & ((uint32_t)1 << 31))
         flags = FTOA_MINUS;
 
     uint8_t exp = x.u >> 23;
