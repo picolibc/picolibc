@@ -124,7 +124,10 @@ typedef long ultoa_signed_t;
 #define SIZEOF_ULTOA __SIZEOF_LONG__
 #define arg_to_t(ap, flags, _s_, _result_)              \
     if ((flags) & FL_LONG) {                            \
-        (_result_) = va_arg(ap, _s_ long);              \
+        if ((flags) & FL_REPD_TYPE)                     \
+            (_result_) = (_s_ long) va_arg(ap, _s_ long long);\
+        else                                            \
+            (_result_) = va_arg(ap, _s_ long);          \
     } else {                                            \
         (_result_) = va_arg(ap, _s_ int);               \
         if ((flags) & FL_SHORT) {                       \
@@ -272,10 +275,8 @@ skip_to_arg(const char *fmt_orig, my_va_list *ap, int target_argno)
 	    }
 
 	    if (c == 'l') {
-#ifdef PRINTF_LONGLONG
 		if (flags & FL_LONG)
 		    flags |= FL_REPD_TYPE;
-#endif
 		flags |= FL_LONG;
 		continue;
 	    }
@@ -289,20 +290,14 @@ skip_to_arg(const char *fmt_orig, my_va_list *ap, int target_argno)
 
             /* alias for 'll' */
             if (c == 'L') {
-#ifdef PRINTF_LONGLONG
                 flags |= FL_REPD_TYPE;
-#endif
 		flags |= FL_LONG;
 		continue;
             }
 
 #ifdef _WANT_IO_C99_FORMATS
 
-#ifdef PRINTF_LONGLONG
 #define CHECK_LONGLONG(type) else if (sizeof(type) == sizeof(long long)) flags |= FL_LONG|FL_REPD_TYPE;
-#else
-#define CHECK_LONGLONG(type)
-#endif
 
 #define CHECK_INT_SIZE(letter, type)			\
 	    if (c == letter) {				\
@@ -497,10 +492,8 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
 	    }
 
 	    if (c == 'l') {
-#ifdef PRINTF_LONGLONG
 		if (flags & FL_LONG)
 		    flags |= FL_REPD_TYPE;
-#endif
 		flags |= FL_LONG;
 		continue;
 	    }
@@ -514,20 +507,14 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
 
             /* alias for 'll' */
             if (c == 'L') {
-#ifdef PRINTF_LONGLONG
                 flags |= FL_REPD_TYPE;
-#endif
 		flags |= FL_LONG;
 		continue;
             }
 
 #ifdef _WANT_IO_C99_FORMATS
 
-#ifdef PRINTF_LONGLONG
 #define CHECK_LONGLONG(type) else if (sizeof(type) == sizeof(long long)) flags |= FL_LONG|FL_REPD_TYPE;
-#else
-#define CHECK_LONGLONG(type)
-#endif
 
 #define CHECK_INT_SIZE(letter, type)			\
 	    if (c == letter) {				\
