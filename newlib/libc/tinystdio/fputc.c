@@ -42,7 +42,7 @@ fputc(int c, FILE *stream)
 	if (stream->put(c, stream) < 0)
 		return EOF;
 
-	return c;
+	return (unsigned char) c;
 }
 
 #ifdef _HAVE_ALIAS_ATTRIBUTE

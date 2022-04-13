@@ -42,7 +42,7 @@ e9_putc(char c, FILE *file)
 {
 	(void) file;
 	__asm__("out %%al, $0xe9" : : "a" ((int) c));
-	return c;
+	return (unsigned char) c;
 }
 
 static int
