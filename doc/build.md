@@ -122,7 +122,7 @@ These options control which character sets are supported by iconv.
 | newlib-iconv-dir            | libdir/locale | Directory to install external CCS files. Only used with newlib-iconv-external-ccs=true |
 | newlib-iconv-runtime-dir    | newlib-iconv-dir | Directory to read external CCS files from at runtime. |
 
-Thes options control how much Locale support is included in the
+These options control how much Locale support is included in the
 library. By default, picolibc only supports the 'C' locale.
 
 | Option                      | Default | Description                                                                          |
@@ -138,7 +138,7 @@ at startup and shutdown times.
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
-| lite-exit                   | true    | Enable light weight exit                                                             |
+| lite-exit                   | true    | Enable lightweight exit                                                             |
 | newlib-atexit-dynamic-alloc | false   | Enable dynamic allocation of atexit entries                                          |
 | newlib-global-atexit        | false   | Enable atexit data structure as global                                               |
 | newlib-initfini             | true    | Support _init() and _fini() functions in picocrt                                     |
