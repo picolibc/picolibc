@@ -142,7 +142,7 @@ at startup and shutdown times.
 | ------                      | ------- | -----------                                                                          |
 | lite-exit                   | true    | Enable light weight exit                                                             |
 | newlib-atexit-dynamic-alloc | false   | Enable dynamic allocation of atexit entries                                          |
-| newlib-global-atexit        | false   | Enable atexit data structure as global                                               |
+| newlib-global-atexit        | false   | Enable atexit data structure as global, instead of in TLS. <br> If `thread-local-storage` == false, then the atexit data structure is always global. |
 | newlib-initfini             | true    | Support _init() and _fini() functions in picocrt                                     |
 | newlib-initfini-array       | true    | Use .init_array and .fini_array sections in picocrt                                  |
 | newlib-register-fini        | false   | Enable finalization function registration using atexit                               |
