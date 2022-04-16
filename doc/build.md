@@ -42,12 +42,10 @@ These options control some general build configuration values.
 | picocrt                     | true    | Build crt0.o (C startup function)                                                    |
 | semihost                    | true    | Build the semihost library (libsemihost.a)                                           |
 | fake-semihost               | false   | Create a fake semihost library to allow tests to link                                |
-| specsdir                    | auto    | Where to install the .specs file (default is in the GCC directory)                   |
+| specsdir                    | auto    | Where to install the .specs file (default is in the GCC directory). <br> If set to `none`, then picolibc.specs will not be installed at all.|
 | sysroot-install             | false   | Install in GCC sysroot location (requires sysroot in GCC)                            |
 | tests                       | false   | Enable tests                                                                         |
 | tinystdio                   | true    | Use tiny stdio from avr libc                                                         |
-
-If you set `specsdir` to `none`, then picolibc.specs will not be installed at all.
 
 ### Options applying to both legacy stdio and tinystdio
 
@@ -146,11 +144,7 @@ at startup and shutdown times.
 | newlib-initfini             | true    | Support _init() and _fini() functions in picocrt                                     |
 | newlib-initfini-array       | true    | Use .init_array and .fini_array sections in picocrt                                  |
 | newlib-register-fini        | false   | Enable finalization function registration using atexit                               |
-| crt-runtime-size            | false   | Compute .data/.bss sizes at runtime rather than linktime                             |
-
-The crt-runtime-size option exists for targets where the link can't
-handle a symbol that is the difference between two other symbols,
-e.g. m68k.
+| crt-runtime-size            | false   | Compute .data/.bss sizes at runtime rather than linktime. <br> This option exists for targets where the linker can't handle a symbol that is the difference between two other symbols, e.g. m68k.|
 
 ### Thread local storage support
 
