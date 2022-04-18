@@ -349,7 +349,8 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 			 cygwin apps started from non-cygwin shell. */
       if (c == '\003' && p && p->ctty == ttyp->ntty && p->pgid == pgid
 	  && ((p->process_state & PID_NOTCYGWIN)
-	      || (p->process_state & PID_NEW_PG)
+	      || ((p->process_state & PID_NEW_PG)
+		  && ttyp->pcon_input_state_eq (tty::to_nat))
 	      || !(p->process_state & PID_CYGPARENT)))
 	{
 	  /* Ctrl-C event will be sent only to the processes attaching
@@ -423,6 +424,7 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	    with_debugger = true; /* inferior is cygwin app */
 	  if (!(p->process_state & PID_NOTCYGWIN)
 	      && (p->process_state & PID_NEW_PG) /* Check marker */
+	      && ttyp->pcon_input_state_eq (tty::to_nat)
 	      && p->pid == pgid)
 	    with_debugger_nat = true; /* inferior is non-cygwin app */
 	}
