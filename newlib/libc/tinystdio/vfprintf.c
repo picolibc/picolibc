@@ -350,6 +350,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
     uint16_t flags;
     int width;
     int prec;
+    int (*put)(char, FILE *) = stream->put;
 #ifdef PRINTF_POSITIONAL
     int argno;
     my_va_list my_ap;
@@ -372,7 +373,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
 
     int stream_len = 0;
 
-#define my_putc(c, stream) do { ++stream_len; if (putc(c, stream) < 0) goto fail; } while(0)
+#define my_putc(c, stream) do { ++stream_len; if (put(c, stream) < 0) goto fail; } while(0)
 
     if ((stream->flags & __SWR) == 0)
 	return EOF;
