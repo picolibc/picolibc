@@ -174,6 +174,10 @@ newlib_elix_level = get_option('newlib-elix-level')
 c_args = ['-include', '@0@/@1@'.format(meson.current_build_dir(), 'picolibc.h')] + core_c_args
 native_c_args = ['-DNO_NEWLIB']
 
+if get_option('profile')
+  c_args += ['-pg', '-no-pie']
+endif
+
 # Disable ssp and fortify source while building picolibc (it's enabled
 # by default by the ubuntu native compiler)
 c_flags = cc.get_supported_arguments(['-fno-common', '-frounding-math', '-fsignaling-nans', '-Wno-unsupported-floating-point-opt', '-fno-stack-protector'])
