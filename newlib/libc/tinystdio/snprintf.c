@@ -46,18 +46,16 @@ snprintf(char *s, size_t n, const char *fmt, ...)
 	   that f.size will be a max number of nonzero symbols.	*/
 
 	if ((int) n < 0)
-		n = (unsigned)INT_MAX;		/* 32767 */
-	else
-		n--;
+		n = (unsigned)INT_MAX + 1;
 
-	struct __file_str f = FDEV_SETUP_STRING_WRITE(s, n);
+	struct __file_str f = FDEV_SETUP_STRING_WRITE(s, n ? n - 1 : 0);
 
 	va_start(ap, fmt);
 	i = vfprintf(&f.file, fmt, ap);
 	va_end(ap);
 
-	if ((int) n >= 0 && i >= 0)
-                s[i < (int) n ? i : (int) n] = 0;
+	if (n)
+            *f.pos = '\0';
 
 	return i;
 }

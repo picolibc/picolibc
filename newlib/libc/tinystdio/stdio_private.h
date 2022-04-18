@@ -48,9 +48,9 @@
 
 struct __file_str {
 	struct __file file;	/* main file struct */
-	char	*buf;		/* buffer pointer */
-	int	len;		/* characters written so far */
-	int	size;		/* size of buffer */
+        char	*pos;		/* current buffer position */
+        char    *end;           /* end of buffer */
+        size_t  size;           /* size of allocated storage */
 };
 
 int
@@ -84,7 +84,7 @@ bool __matchcaseprefix(const char *input, const char *pattern);
 			.flags = __SRD,		\
 			.get = __file_str_get	\
 		},				\
-		.buf = (char *) (_s)		\
+		.pos = (char *) (_s)		\
 	}
 
 #define FDEV_SETUP_STRING_WRITE(_s, _size) {	\
@@ -92,9 +92,8 @@ bool __matchcaseprefix(const char *input, const char *pattern);
 			.flags = __SWR,		\
 			.put = __file_str_put	\
 		},				\
-		.buf = (_s),			\
-		.size = (_size),		\
-		.len = 0			\
+		.pos = (_s),			\
+                .end = (_s) + (_size),          \
 	}
 
 #define FDEV_SETUP_STRING_ALLOC() {		\
@@ -102,9 +101,9 @@ bool __matchcaseprefix(const char *input, const char *pattern);
 			.flags = __SWR,		\
 			.put = __file_str_put_alloc	\
 		},				\
-		.buf = NULL,			\
-		.size = 0,			\
-		.len = 0			\
+		.pos = NULL,			\
+		.end = NULL,			\
+                .size = 0,                      \
 	}
 
 #ifdef POSIX_IO

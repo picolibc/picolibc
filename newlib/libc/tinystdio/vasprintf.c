@@ -46,15 +46,15 @@ vasprintf(char **strp, const char *fmt, va_list ap)
 
 	i = vfprintf(&f.file, fmt, ap);
 	if (i >= 0) {
-		char *s = realloc(f.buf, i+1);
+                char *buf = f.end - f.size;
+		char *s = realloc(buf, i+1);
 		if (s) {
 			s[i] = 0;
 			*strp = s;
 		} else {
-			free(f.buf);
+			free(buf);
 			i = EOF;
 		}
 	}
-
 	return i;
 }
