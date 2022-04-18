@@ -48,5 +48,5 @@ __file_str_put_alloc(char c, FILE *stream)
 		sstream->buf = new;
 	}
 	sstream->buf[sstream->len++] = c;
-	return c;
+	return (unsigned char) c;
 }

@@ -43,5 +43,5 @@ __file_str_put(char c, FILE *stream)
             *sstream->buf++ = c;
             ++sstream->len;
         }
-	return c;
+	return (unsigned char) c;
 }

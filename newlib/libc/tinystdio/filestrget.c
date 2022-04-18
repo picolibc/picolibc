@@ -41,7 +41,7 @@ __file_str_get(FILE *stream)
 	struct __file_str *sstream = (struct __file_str *) stream;
 	int rv;
 
-	rv = *sstream->buf;
+	rv = (unsigned char) *sstream->buf;
 	if (rv == '\0')
 		return _FDEV_EOF;
 	sstream->buf++;
