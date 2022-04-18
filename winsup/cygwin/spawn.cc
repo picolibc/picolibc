@@ -679,8 +679,12 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  HANDLE h_stdin = handle (fileno_stdin, false);
 	  if (h_stdin == ptys_primary->get_handle_nat ())
 	    stdin_is_ptys = true;
+	  if (reset_sendsig)
+	    myself->sendsig = myself->exec_sendsig;
 	  ptys_primary->setup_for_non_cygwin_app (nopcon, envblock,
 						  stdin_is_ptys);
+	  if (reset_sendsig)
+	    myself->sendsig = NULL;
 	  ptys_primary->get_duplicated_handle_set (&ptys_handle_set);
 	  ptys_ttyp = (tty *) ptys_primary->tc ();
 	  ptys_need_cleanup = true;
