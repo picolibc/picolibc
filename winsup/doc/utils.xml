@@ -846,7 +846,7 @@ line separates the ACLs for each file.
 <screen>
 $ gmondump gmon.out.21900.zstd.exe
 file gmon.out.21900.zstd.exe, gmon version 0x51879, sample rate 100
-  address range 0x0x100401000..0x0x1004cc668
+  address range 0x100401000..0x1004cc668
   numbuckets 208282, hitbuckets 1199, hitcount 12124, numrawarcs 0
 </screen>
     </refsect1>
@@ -2951,7 +2951,7 @@ Idx Name          Size      VMA       LMA       File off  Algn
       section and the VMA of the section after it (sections are usually
       contiguous; you can also add the Size to the VMA to get the end address).
       In this case, the VMA is 0x61001000 and the ending address is either
-      0x61080000 (start of .data method) or 0x0x6107fa00 (VMA+Size method). </para>
+      0x61080000 (start of .data method) or 0x6107fa00 (VMA+Size method). </para>
 
     <para> There are two basic ways to use SSP - either profiling a whole
       program, or selectively profiling parts of the program. </para>
