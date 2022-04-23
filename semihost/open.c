@@ -41,6 +41,9 @@
 #include <string.h>
 #include <errno.h>
 
+extern struct timeval __semihost_creat_time _ATTRIBUTE((__weak__));
+extern int gettimeofday(struct timeval *restrict tv, void *restrict tz) _ATTRIBUTE((__weak__));
+
 int
 open(const char *pathname, int flags, ...)
 {
@@ -75,5 +78,8 @@ open(const char *pathname, int flags, ...)
 #endif
 	if (ret == -1)
 		errno = sys_semihost_errno();
+        else if (&__semihost_creat_time && gettimeofday)
+                gettimeofday(&__semihost_creat_time, NULL);
+
 	return ret;
 }
