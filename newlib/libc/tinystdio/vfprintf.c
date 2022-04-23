@@ -833,6 +833,13 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
                 if (sign)
                     my_putc (sign, stream);
 
+#ifdef _WANT_IO_C99_FORMATS
+                if ((flags & FL_FLTHEX)) {
+                    my_putc('0', stream);
+                    my_putc(TOCASE('x'), stream);
+                }
+#endif
+
                 if (!(flags & FL_LPAD)) {
                     while (width) {
                         my_putc ('0', stream);
@@ -880,13 +887,6 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
                     if ((flags & FL_ALT) && n == -1)
 			my_putc('.', stream);
                 } else {				/* 'e(E)' format	*/
-
-#ifdef _WANT_IO_C99_FORMATS
-                    if ((flags & FL_FLTHEX)) {
-                        my_putc('0', stream);
-                        my_putc(TOCASE('x'), stream);
-                    }
-#endif
 
                     /* mantissa	*/
                     if (_dtoa.digits[0] != '1')
