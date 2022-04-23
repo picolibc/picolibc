@@ -47,5 +47,7 @@ ungetc(int c, FILE *stream)
 	if (!__atomic_compare_exchange_ungetc(&stream->unget, 0, c | UNGETC_MARK))
 		return EOF;
 
+        stream->flags &= ~__SEOF;
+
 	return (unsigned char) c;
 }
