@@ -34,6 +34,7 @@
 #
 srcs_tinystdio = [
     'asprintf.c',
+    'bufio.c',
     'clearerr.c',
     'ecvt_r.c',
     'ecvt.c',
@@ -146,7 +147,6 @@ srcs_tinystdio_posix = [
     'fopen.c',
     'fdopen.c',
     'fclose.c',
-    'posixio.c',
     'sflags.c'
 ]
 
@@ -171,11 +171,12 @@ hdrs_tinystdio = [
     'dtoa_engine.h',
     'ftoa_engine.h',
     'stdio.h',
+    'stdio-bufio.h',
     'stdio_private.h',
     'xtoa_fast.h',
 ]
 
-install_headers('stdio.h',
+install_headers(['stdio.h', 'stdio-bufio.h'],
 		install_dir: include_dir
 	       )
 

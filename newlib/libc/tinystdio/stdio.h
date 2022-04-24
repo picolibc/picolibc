@@ -254,7 +254,9 @@ struct __file {
 #define __SWR	0x0002		/* OK to write */
 #define __SERR	0x0004		/* found error */
 #define __SEOF	0x0008		/* found EOF */
-#define __SCLOSE 0x0010		/* struct is __file_close with close function */
+#define __SCLOSE 0x0010		/* struct is __file_close */
+#define __SEXT  0x0020          /* struct is __file_ext */
+#define __SBUF  0x0040          /* struct is __file_bufio */
 	int	(*put)(char, struct __file *);	/* function to write one char to device */
 	int	(*get)(struct __file *);	/* function to read one char from device */
 	int	(*flush)(struct __file *);	/* function to flush output to device */
@@ -268,6 +270,25 @@ struct __file_close {
 	struct __file file;			/* main file struct */
 	int	(*close)(struct __file *);	/* function to close file */
 };
+
+#define FDEV_SETUP_CLOSE(put, get, flush, _close, rwflag) \
+        {                                                               \
+                .file = FDEV_SETUP_STREAM(put, get, flush, (rwflag) | __SCLOSE),   \
+                .close = (_close),                                      \
+        }
+
+struct __file_ext {
+        struct __file_close cfile;              /* close file struct */
+        __off_t (*seek)(struct __file *, __off_t offset, int whence);
+        int     (*setvbuf)(struct __file *, char *buf, int mode, size_t size);
+};
+
+#define FDEV_SETUP_EXT(put, get, flush, close, _seek, _setvbuf, rwflag) \
+        {                                                               \
+                .cfile = FDEV_SETUP_CLOSE(put, get, flush, close, (rwflag) | __SEXT), \
+                .seek = (_seek),                                        \
+                .setvbuf = (_setvbuf),                                  \
+        }
 
 #endif /* not __DOXYGEN__ */
 
@@ -379,10 +400,10 @@ extern FILE *const stderr;
 #else  /* !DOXYGEN */
 #define FDEV_SETUP_STREAM(p, g, fl, f)		\
 	{ \
-		.flags = f, \
-		.put = p, \
-		.get = g, \
-		.flush = fl, \
+                .flags = (f),                   \
+                .put = (p),                     \
+                .get = (g),                     \
+                .flush = (fl),                  \
 	}
 #endif /* DOXYGEN */
 

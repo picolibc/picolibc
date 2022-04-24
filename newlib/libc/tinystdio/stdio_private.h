@@ -29,7 +29,7 @@
 
 /* $Id: stdio_private.h 847 2005-09-06 18:49:15Z joerg_wunsch $ */
 
-#include <stdio.h>
+#include <stdio-bufio.h>
 #include <stdbool.h>
 #include <sys/lock.h>
 
@@ -108,59 +108,18 @@ bool __matchcaseprefix(const char *input, const char *pattern);
 
 #ifdef POSIX_IO
 
-struct __file_posix {
-	struct __file_close cfile;
-	int	fd;
-	char	*write_buf;
-	int	write_len;
-	char	*read_buf;
-	int	read_len;
-	int	read_off;
-#ifndef __SINGLE_THREAD__
-	_LOCK_T lock;
-#endif
-};
-
-static inline void __posix_lock_init(FILE *f) {
-	(void) f;
-	__lock_init(((struct __file_posix *) f)->lock);
-}
-
-static inline void __posix_lock_close(FILE *f) {
-	(void) f;
-	__lock_close(((struct __file_posix *) f)->lock);
-}
-
-static inline void __posix_lock(FILE *f) {
-	(void) f;
-	__lock_acquire(((struct __file_posix *) f)->lock);
-}
-
-static inline void __posix_unlock(FILE *f) {
-	(void) f;
-	__lock_release(((struct __file_posix *) f)->lock);
-}
-
-int	__d_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
-int	__f_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+#define FDEV_SETUP_POSIX(fd, buf, size, rwflags, bflags)        \
+        FDEV_SETUP_BUFIO(fd, buf, size,                         \
+                         (void *)read, (void *)write,           \
+                         lseek, close, rwflags, bflags)
 
 int
 __posix_sflags (const char *mode, int *optr);
 
-int
-__posix_flush(FILE *f);
-
-int
-__posix_putc(char c, FILE *f);
-
-int
-__posix_getc(FILE *f);
-
-int
-__posix_close(FILE *f);
-
 #endif
 
+int	__d_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int	__f_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 int	__d_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 int	__f_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 int	__d_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
