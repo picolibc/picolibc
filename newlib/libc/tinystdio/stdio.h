@@ -898,6 +898,16 @@ extern int	vsscanf(const char *__buf, const char *__fmt, va_list ap) __FORMAT_AT
  */
 extern int	fflush(FILE *stream);
 
+#ifndef SEEK_SET
+#define	SEEK_SET	0	/* set file offset to offset */
+#endif
+#ifndef SEEK_CUR
+#define	SEEK_CUR	1	/* set file offset to current plus offset */
+#endif
+#ifndef SEEK_END
+#define	SEEK_END	2	/* set file offset to EOF plus offset */
+#endif
+
 #ifndef __DOXYGEN__
 /* only mentioned for libstdc++ support, not implemented in library */
 #ifndef BUFSIZ
@@ -910,10 +920,10 @@ extern FILE *fopen(const char *path, const char *mode);
 extern FILE *freopen(const char *path, const char *mode, FILE *stream);
 extern FILE *fdopen(int, const char *);
 extern int fseek(FILE *stream, long offset, int whence);
-static inline int fseeko(FILE *stream, __off_t offset, int whence) { return fseek(stream, (long) offset, whence); }
+extern int fseeko(FILE *stream, __off_t offset, int whence);
 extern int fsetpos(FILE *stream, fpos_t *pos);
 extern long ftell(FILE *stream);
-static inline __off_t ftello(FILE *stream) { return (__off_t) ftell(stream); }
+extern __off_t ftello(FILE *stream);
 extern int fileno(FILE *);
 extern void perror(const char *s);
 extern int remove(const char *pathname);
