@@ -336,6 +336,10 @@ extern FILE *const stderr;
 */
 #define EOF	(-1)
 
+#define	_IOFBF	0		/* setvbuf should set fully buffered */
+#define	_IOLBF	1		/* setvbuf should set line buffered */
+#define	_IONBF	2		/* setvbuf should set unbuffered */
+
 #if defined(__DOXYGEN__)
 /**
    \brief Setup a user-supplied buffer as an stdio stream
@@ -913,7 +917,6 @@ extern int	fflush(FILE *stream);
 #ifndef BUFSIZ
 #define BUFSIZ 512
 #endif
-#define _IONBF 0
 __extension__ typedef long long fpos_t;
 extern int fgetpos(FILE *stream, fpos_t *pos);
 extern FILE *fopen(const char *path, const char *mode);
@@ -930,6 +933,8 @@ extern int remove(const char *pathname);
 extern int rename(const char *oldpath, const char *newpath);
 extern void rewind(FILE *stream);
 extern void setbuf(FILE *stream, char *buf);
+extern void setbuffer(FILE *stream, char *buf, size_t size);
+extern void setlinebuf(FILE *stream);
 extern int setvbuf(FILE *stream, char *buf, int mode, size_t size);
 extern FILE *tmpfile(void);
 extern char *tmpnam (char *s);

@@ -76,6 +76,8 @@ picolibc_sources(
   rewind.c
   scanf.c
   setbuf.c
+  setbuffer.c
+  setlinebuf.c
   setvbuf.c
   snprintf.c
   sprintf.c
