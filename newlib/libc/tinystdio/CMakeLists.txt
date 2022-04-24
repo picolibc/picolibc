@@ -34,6 +34,7 @@
 #
 picolibc_sources(
   asprintf.c
+  bufio.c
   clearerr.c
   ecvt_r.c
   ecvt.c
@@ -115,7 +116,6 @@ picolibc_sources(
   fopen.c
   fdopen.c
   fclose.c
-  posixio.c
   sflags.c
   )
 
@@ -127,4 +127,5 @@ endif()
 
 picolibc_headers(""
   stdio.h
+  stdio-bufio.h
   )

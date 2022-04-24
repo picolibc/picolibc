@@ -38,49 +38,32 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-static inline int
-has_mode(int flags, int mode)
-{
-	return (flags & mode) ? 1 : 0;
-}
-
 FILE *
 fdopen(int fd, const char *mode)
 {
 	int stdio_flags;
 	int open_flags;
-	struct __file_posix *pf;
-	char *buf;
+	struct __file_bufio *bf;
+        char *buf;
 
 	stdio_flags = __posix_sflags(mode, &open_flags);
 	if (stdio_flags == 0)
 		return NULL;
 
 	/* Allocate file structure and necessary buffers */
-	pf = calloc(1, sizeof(struct __file_posix) +
-		    BUFSIZ * (has_mode(stdio_flags, __SRD) + has_mode(stdio_flags, __SWR)));
-	if (pf == NULL) {
+	bf = calloc(1, sizeof(struct __file_bufio) + BUFSIZ);
+
+	if (bf == NULL) {
 		close(fd);
 		return NULL;
 	}
-	buf = (char *) pf + sizeof (*pf);
+        buf = (char *) (bf + 1);
 
-	pf->cfile.file.flags = stdio_flags | __SCLOSE;
-	pf->cfile.close = __posix_close;
-	pf->fd = fd;
-	if (stdio_flags & __SWR) {
-		pf->cfile.file.put = __posix_putc;
-		pf->cfile.file.flush = __posix_flush;
-		pf->write_buf = buf;
-		buf += BUFSIZ;
-	}
-	if (stdio_flags & __SRD) {
-		pf->cfile.file.get = __posix_getc;
-		pf->read_buf = buf;
-	}
+        *bf = (struct __file_bufio)
+                FDEV_SETUP_POSIX(fd, buf, BUFSIZ, stdio_flags, 0);
 
 	if (open_flags & O_APPEND)
-		(void) lseek(fd, 0, SEEK_END);
+                (void) fseeko(&(bf->xfile.cfile.file), 0, SEEK_END);
 
-	return &(pf->cfile.file);
+	return &(bf->xfile.cfile.file);
 }
