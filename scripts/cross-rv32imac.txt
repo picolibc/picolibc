@@ -14,5 +14,5 @@ cpu = 'riscv32'
 endian = 'little'
 
 [properties]
-c_args = ['-msave-restore']
+c_args = ['-msave-restore', '-fshort-enums']
 skip_sanity_check = true
