@@ -53,39 +53,26 @@
 #define FCLASS_SNAN          (1 << 8)
 #define FCLASS_QNAN          (1 << 9)
 
-
 #define FCLASS_INF           (FCLASS_NEG_INF | FCLASS_POS_INF)
 #define FCLASS_ZERO          (FCLASS_NEG_ZERO | FCLASS_POS_ZERO)
 #define FCLASS_NORMAL        (FCLASS_NEG_NORMAL | FCLASS_POS_NORMAL)
 #define FCLASS_SUBNORMAL     (FCLASS_NEG_SUBNORMAL | FCLASS_POS_SUBNORMAL)
 #define FCLASS_NAN           (FCLASS_SNAN | FCLASS_QNAN)
-#endif
-
-/**
- * Not availabe for all compilers.
- * In case of absence, fall back to normal function calls
- */
-#ifdef __GNUC_GNU_INLINE__
-# define __declare_riscv_macro(type) extern __inline type __attribute((gnu_inline, always_inline))
-# define __declare_riscv_macro_fclass(type) extern __inline type __attribute((gnu_inline, always_inline))
-#else
-# define __declare_riscv_macro_fclass(type) static __inline type
-#endif
-
-/* We always need the fclass functions */
 
 #if __riscv_flen >= 64
 
 /* anything with a 64-bit FPU has FMA */
 #define _HAVE_FAST_FMA 1
 
-__declare_riscv_macro_fclass(long)
-_fclass_d(double x)
-{
-	long fclass;
-	__asm__ ("fclass.d\t%0, %1" : "=r" (fclass) : "f" (x));
-	return fclass;
-}
+#define _fclass_d(_x) (__extension__(                                   \
+                               {                                        \
+                                       long __fclass;                   \
+                                       __asm__("fclass.d %0, %1" :      \
+                                               "=r" (__fclass) :        \
+                                               "f" (_x));               \
+                                       __fclass;                        \
+                               }))
+
 #endif
 
 #if __riscv_flen >= 32
@@ -93,18 +80,25 @@ _fclass_d(double x)
 /* anything with a 32-bit FPU has FMAF */
 #define _HAVE_FAST_FMAF 1
 
-__declare_riscv_macro_fclass(long)
-_fclass_f(float x)
-{
-	long fclass;
-	__asm__ ("fclass.s\t%0, %1" : "=r" (fclass) : "f" (x));
-	return fclass;
-}
+#define _fclass_f(_x) (__extension__(                                   \
+                               {                                        \
+                                       long __fclass;                   \
+                                       __asm__("fclass.s %0, %1" :      \
+                                               "=r" (__fclass) :        \
+                                               "f" (_x));               \
+                                       __fclass;                        \
+                               }))
+
 #endif
 
-#undef declare_riscv_macro_fclass
 
-#ifdef __declare_riscv_macro
+/**
+ * Not available for all compilers.
+ * In case of absence, fall back to normal function calls
+ */
+#if defined(__GNUC_GNU_INLINE__) || defined(__GNUC_STDC_INLINE__)
+
+# define __declare_riscv_macro(type) extern __inline type __attribute((gnu_inline, always_inline))
 
 #if __riscv_flen >= 64
 
@@ -148,10 +142,16 @@ fmin (double x, double y)
 }
 
 __declare_riscv_macro(int)
-finite(double x)
+__finite(double x)
 {
 	long fclass = _fclass_d (x);
 	return (fclass & (FCLASS_INF|FCLASS_NAN)) == 0;
+}
+
+__declare_riscv_macro(int)
+finite(double x)
+{
+        return __finite(x);
 }
 
 __declare_riscv_macro(int)
@@ -170,24 +170,6 @@ __fpclassifyd (double x)
   else
     return FP_NAN;
 }
-
-#ifndef isinf
-__declare_riscv_macro(int)
-isinf (double x)
-{
-	long fclass = _fclass_d (x);
-	return (fclass & FCLASS_INF);
-}
-#endif
-
-#ifndef isnan
-__declare_riscv_macro(int)
-isnan (double x)
-{
-	long fclass = _fclass_d (x);
-	return (fclass & FCLASS_NAN);
-}
-#endif
 
 __declare_riscv_macro(double)
 sqrt (double x)
@@ -253,10 +235,16 @@ fminf (float x, float y)
 }
 
 __declare_riscv_macro(int)
-finitef(float x)
+__finitef(float x)
 {
 	long fclass = _fclass_f (x);
 	return (fclass & (FCLASS_INF|FCLASS_NAN)) == 0;
+}
+
+__declare_riscv_macro(int)
+finitef(float x)
+{
+        return __finitef(x);
 }
 
 __declare_riscv_macro(int)
@@ -274,20 +262,6 @@ __fpclassifyf (float x)
     return FP_INFINITE;
   else
     return FP_NAN;
-}
-
-__declare_riscv_macro(int)
-isinff (float x)
-{
-	long fclass = _fclass_f (x);
-	return (fclass & FCLASS_INF);
-}
-
-__declare_riscv_macro(int)
-isnanf (float x)
-{
-	long fclass = _fclass_f (x);
-	return (fclass & FCLASS_NAN);
 }
 
 __declare_riscv_macro(float)
@@ -312,8 +286,7 @@ fmaf (float x, float y, float z)
 
 #endif /* __riscv_flen >= 32 */
 
-#undef __declare_riscv_macro
-#undef __declare_riscv_mcaro_fclass
+#endif /* defined(__GNUC_GNU_INLINE__) || defined(__GNUC_STDC_INLINE__) */
 
 #endif /* __riscv_flen */
 
