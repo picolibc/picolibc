@@ -922,6 +922,7 @@ extern int fgetpos(FILE *stream, fpos_t *pos);
 extern FILE *fopen(const char *path, const char *mode);
 extern FILE *freopen(const char *path, const char *mode, FILE *stream);
 extern FILE *fdopen(int, const char *);
+extern FILE *fmemopen(void *buf, size_t size, const char *mode);
 extern int fseek(FILE *stream, long offset, int whence);
 extern int fseeko(FILE *stream, __off_t offset, int whence);
 extern int fsetpos(FILE *stream, fpos_t *pos);
