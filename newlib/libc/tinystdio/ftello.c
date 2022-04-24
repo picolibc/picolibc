@@ -33,24 +33,10 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stdio_private.h"
+#include <stdio.h>
 #include <errno.h>
 
-#ifndef FSEEK_TYPE
-#define FSEEK_TYPE long
-#endif
+#define FSEEK_TYPE __off_t
+#define ftell ftello
 
-int fseek(FILE *stream, FSEEK_TYPE offset, int whence)
-{
-        struct __file_ext *xf = (struct __file_ext *) stream;
-        if ((stream->flags & __SEXT) && xf->seek) {
-                if ((xf->seek) (stream, (__off_t) offset, whence) >= 0) {
-                        stream->flags &= ~__SEOF;
-                        (void) __atomic_exchange_ungetc(&stream->unget, 0);
-                        return 0;
-                }
-                return -1;
-        }
-	errno = ESPIPE;
-	return -1;
-}
+#include "ftell.c"

@@ -29,6 +29,9 @@
 
 /* $Id: stdio_private.h 847 2005-09-06 18:49:15Z joerg_wunsch $ */
 
+#ifndef _STDIO_PRIVATE_H_
+#define _STDIO_PRIVATE_H_
+
 #include <stdio-bufio.h>
 #include <stdbool.h>
 #include <sys/lock.h>
@@ -410,3 +413,5 @@ __atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v);
 #define __atomic_exchange_ungetc(p,v) __non_atomic_exchange_ungetc(p,v)
 
 #endif /* ATOMIC_UNGETC */
+
+#endif /* _STDIO_PRIVATE_H_ */
