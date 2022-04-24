@@ -62,6 +62,7 @@ srcs_tinystdio = [
     'fputc.c',
     'fputs.c',
     'fread.c',
+    'freopen.c',
     'fscanf.c',
     'fseek.c',
     'fseeko.c',

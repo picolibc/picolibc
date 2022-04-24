@@ -62,6 +62,7 @@ picolibc_sources(
   fputc.c
   fputs.c
   fread.c
+  freopen.c
   fscanf.c
   fseek.c
   ftell.c
