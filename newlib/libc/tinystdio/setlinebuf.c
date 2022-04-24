@@ -36,7 +36,7 @@
 #include <stdio.h>
 
 void
-setbuf(FILE *stream, char *buf)
+setlinebuf(FILE *stream)
 {
-        setvbuf(stream, buf, buf ? _IOFBF : _IONBF, BUFSIZ);
+        setvbuf(stream, NULL, _IOLBF, 0);
 }

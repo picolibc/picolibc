@@ -38,9 +38,8 @@
 int
 setvbuf(FILE *stream, char *buf, int mode, size_t size)
 {
-	(void) stream;
-	(void) buf;
-	(void) mode;
-	(void) size;
-	return 0;
+        struct __file_ext *xf = (struct __file_ext *) stream;
+        if ((stream->flags & __SEXT) && xf->setvbuf)
+                return (xf->setvbuf)(stream, buf, mode, size);
+        return 0;
 }
