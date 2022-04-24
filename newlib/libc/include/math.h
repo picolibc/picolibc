@@ -272,35 +272,30 @@ extern int __finitef (float);
   #define fpclassify(__x) (__builtin_fpclassify (FP_NAN, FP_INFINITE, \
 						 FP_NORMAL, FP_SUBNORMAL, \
 						 FP_ZERO, __x))
-  #ifndef isfinite
-    #define isfinite(__x)	(__builtin_isfinite (__x))
-  #endif
-  #ifndef isinf
-    #define isinf(__x) (__builtin_isinf_sign (__x))
-  #endif
-  #ifndef isnan
-    #define isnan(__x) (__builtin_isnan (__x))
-  #endif
+  #define isfinite(__x)	(__builtin_isfinite (__x))
+  #define isinf(__x) (__builtin_isinf_sign (__x))
+  #define isnan(__x) (__builtin_isnan (__x))
   #define isnormal(__x) (__builtin_isnormal (__x))
   #define issubnormal(__x) (__builtin_issubnormal (__x))
+  #define iszero(__x) (__builtin_iszero(__x))
 #else
   #define fpclassify(__x) \
 	  ((sizeof(__x) == sizeof(float))  ? __fpclassifyf(__x) : \
 	  __fpclassifyd((double) (__x)))
-  #ifndef isfinite
-    #define isfinite(__x) ((sizeof(__x) == sizeof(float)) ? __finitef(__x) : __finite(__x))
-  #endif
-  #ifndef isinf
-    #define isinf(__x) (fpclassify(__x) == FP_INFINITE)
-  #endif
-  #ifndef isnan
-    #define isnan(__x) (fpclassify(__x) == FP_NAN)
-  #endif
+  #define isfinite(__x) ((sizeof(__x) == sizeof(float)) ?         \
+                         __finitef(__x) : __finite((double) __x))
+  #define isinf(__x) (fpclassify(__x) == FP_INFINITE)
+  #define isnan(__x) (fpclassify(__x) == FP_NAN)
   #define isnormal(__x) (fpclassify(__x) == FP_NORMAL)
   #define issubnormal(__x) (fpclassify(__x) == FP_SUBNORMAL)
+  #define iszero(__x) (fpclassify(__x) == FP_ZERO)
 #endif
 
-#define iszero(__x) (fpclassify(__x) == FP_ZERO)
+#define isfinitef(x) isfinite((float) (x))
+#define isinff(x) isinf((float) (x))
+#define isnanf(x) isnan((float) (x))
+#define isnormalf(x) isnormal((float) (x))
+#define iszerof(x) iszero((float) (x))
 
 #ifndef iseqsig
 int __iseqsigd(double x, double y);
