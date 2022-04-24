@@ -57,6 +57,7 @@ picolibc_sources(
   filestrget.c
   filestrput.c
   filestrputalloc.c
+  fmemopen.c
   fprintf.c
   fputc.c
   fputs.c
