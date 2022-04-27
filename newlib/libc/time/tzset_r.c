@@ -12,8 +12,8 @@
 #define TZNAME_MIN	3	/* POSIX min TZ abbr size local def */
 #define TZNAME_MAX	10	/* POSIX max TZ abbr size local def */
 
-static char __tzname_std[TZNAME_MAX + 1];
-static char __tzname_dst[TZNAME_MAX + 1];
+static char __tzname_std[TZNAME_MAX + 2];
+static char __tzname_dst[TZNAME_MAX + 2];
 static char *prev_tzenv = NULL;
 
 void
@@ -23,7 +23,9 @@ _tzset_unlocked_r (struct _reent *reent_ptr)
   unsigned short hh, mm, ss, m, w, d;
   int sign, n;
   int i, ch;
+  long offset0, offset1;
   __tzinfo_type *tz = __gettzinfo ();
+  struct __tzrule_struct default_tzrule = {'J', 0, 0, 0, 0, (time_t)0, 0L };
 
   if ((tzenv = _getenv_r (reent_ptr, "TZ")) == NULL)
       {
@@ -31,6 +33,8 @@ _tzset_unlocked_r (struct _reent *reent_ptr)
 	_daylight = 0;
 	_tzname[0] = "GMT";
 	_tzname[1] = "GMT";
+	tz->__tzrule[0] = default_tzrule;
+	tz->__tzrule[1] = default_tzrule;
 	free(prev_tzenv);
 	prev_tzenv = NULL;
 	return;
@@ -44,6 +48,14 @@ _tzset_unlocked_r (struct _reent *reent_ptr)
   if (prev_tzenv != NULL)
     strcpy (prev_tzenv, tzenv);
 
+  /* default to unnamed UTC in case of error */
+  _timezone = 0;
+  _daylight = 0;
+  _tzname[0] = "";
+  _tzname[1] = "";
+  tz->__tzrule[0] = default_tzrule;
+  tz->__tzrule[1] = default_tzrule;
+
   /* ignore implementation-specific format specifier */
   if (*tzenv == ':')
     ++tzenv;  
@@ -54,7 +66,7 @@ _tzset_unlocked_r (struct _reent *reent_ptr)
       ++tzenv;
 
       /* quit if no items, too few or too many chars, or no close quote '>' */
-      if (sscanf (tzenv, "%10[-+0-9A-Za-z]%n", __tzname_std, &n) <= 0
+      if (sscanf (tzenv, "%11[-+0-9A-Za-z]%n", __tzname_std, &n) <= 0
 		|| n < TZNAME_MIN || TZNAME_MAX < n || '>' != tzenv[n])
         return;
 
@@ -63,7 +75,7 @@ _tzset_unlocked_r (struct _reent *reent_ptr)
   else
     {
       /* allow POSIX unquoted alphabetic tz abbr e.g. MESZ */
-      if (sscanf (tzenv, "%10[A-Za-z]%n", __tzname_std, &n) <= 0
+      if (sscanf (tzenv, "%11[A-Za-z]%n", __tzname_std, &n) <= 0
 				|| n < TZNAME_MIN || TZNAME_MAX < n)
         return;
     }
@@ -85,8 +97,7 @@ _tzset_unlocked_r (struct _reent *reent_ptr)
   if (sscanf (tzenv, "%hu%n:%hu%n:%hu%n", &hh, &n, &mm, &n, &ss, &n) < 1)
     return;
   
-  tz->__tzrule[0].offset = sign * (ss + SECSPERMIN * mm + SECSPERHOUR * hh);
-  _tzname[0] = __tzname_std;
+  offset0 = sign * (ss + SECSPERMIN * mm + SECSPERHOUR * hh);
   tzenv += n;
 
   /* allow POSIX angle bracket < > quoted signed alphanumeric tz abbr e.g. <MESZ+0330> */
@@ -95,12 +106,16 @@ _tzset_unlocked_r (struct _reent *reent_ptr)
       ++tzenv;
 
       /* quit if no items, too few or too many chars, or no close quote '>' */
-      if (sscanf (tzenv, "%10[-+0-9A-Za-z]%n", __tzname_dst, &n) <= 0
-		|| n < TZNAME_MIN || TZNAME_MAX < n || '>' != tzenv[n])
+      if (sscanf (tzenv, "%11[-+0-9A-Za-z]%n", __tzname_dst, &n) <= 0 && tzenv[0] == '>')
 	{ /* No dst */
-	  _tzname[1] = _tzname[0];
-	  _timezone = tz->__tzrule[0].offset;
-	  _daylight = 0;
+          _tzname[0] = __tzname_std;
+          _tzname[1] = _tzname[0];
+          tz->__tzrule[0].offset = offset0;
+          _timezone = offset0;
+	  return;
+        }
+      else if (n < TZNAME_MIN || TZNAME_MAX < n || '>' != tzenv[n])
+	{ /* error */
 	  return;
 	}
 
@@ -109,17 +124,20 @@ _tzset_unlocked_r (struct _reent *reent_ptr)
   else
     {
       /* allow POSIX unquoted alphabetic tz abbr e.g. MESZ */
-      if (sscanf (tzenv, "%10[A-Za-z]%n", __tzname_dst, &n) <= 0
-				|| n < TZNAME_MIN || TZNAME_MAX < n)
+      if (sscanf (tzenv, "%11[A-Za-z]%n", __tzname_dst, &n) <= 0)
 	{ /* No dst */
-	  _tzname[1] = _tzname[0];
-	  _timezone = tz->__tzrule[0].offset;
-	  _daylight = 0;
+          _tzname[0] = __tzname_std;
+          _tzname[1] = _tzname[0];
+          tz->__tzrule[0].offset = offset0;
+          _timezone = offset0;
+	  return;
+        }
+      else if (n < TZNAME_MIN || TZNAME_MAX < n)
+	{ /* error */
 	  return;
 	}
     }
 
-  _tzname[1] = __tzname_dst;
   tzenv += n;
 
   /* otherwise we have a dst name, look for the offset */
@@ -138,9 +156,9 @@ _tzset_unlocked_r (struct _reent *reent_ptr)
   
   n  = 0;
   if (sscanf (tzenv, "%hu%n:%hu%n:%hu%n", &hh, &n, &mm, &n, &ss, &n) <= 0)
-    tz->__tzrule[1].offset = tz->__tzrule[0].offset - 3600;
+    offset1 = offset0 - 3600;
   else
-    tz->__tzrule[1].offset = sign * (ss + SECSPERMIN * mm + SECSPERHOUR * hh);
+    offset1 = sign * (ss + SECSPERMIN * mm + SECSPERHOUR * hh);
 
   tzenv += n;
 
@@ -211,13 +229,23 @@ _tzset_unlocked_r (struct _reent *reent_ptr)
       n = 0;
       
       if (*tzenv == '/')
-	sscanf (tzenv, "/%hu%n:%hu%n:%hu%n", &hh, &n, &mm, &n, &ss, &n);
+	if (sscanf (tzenv, "/%hu%n:%hu%n:%hu%n", &hh, &n, &mm, &n, &ss, &n) <= 0)
+	  {
+	    /* error in time format, restore tz rules to default and return */
+	    tz->__tzrule[0] = default_tzrule;
+	    tz->__tzrule[1] = default_tzrule;
+            return;
+          }
 
       tz->__tzrule[i].s = ss + SECSPERMIN * mm + SECSPERHOUR  * hh;
       
       tzenv += n;
     }
 
+  tz->__tzrule[0].offset = offset0;
+  tz->__tzrule[1].offset = offset1;
+  _tzname[0] = __tzname_std;
+  _tzname[1] = __tzname_dst;
   __tzcalc_limits (tz->__tzyear);
   _timezone = tz->__tzrule[0].offset;  
   _daylight = tz->__tzrule[0].offset != tz->__tzrule[1].offset;
