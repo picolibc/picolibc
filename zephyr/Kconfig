@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 config PICOLIBC_MODULE
-	bool "picolibc support"
+	bool "picolibc module support"
 	help
-	  This option enables picolibc
+	  This option builds the picolibc module. It is only used if
+	  PICOLIBC_USE_MODULE is selected.

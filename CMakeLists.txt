@@ -38,7 +38,7 @@ cmake_minimum_required(VERSION 3.20.0)
 project(Picolibc VERSION 1.7.6 LANGUAGES C ASM)
 
 if(ZEPHYR_BASE)
-  if(NOT CONFIG_PICOLIBC)
+  if(NOT CONFIG_PICOLIBC_USE_MODULE)
     return()
   endif()
   include(zephyr/zephyr.cmake)
