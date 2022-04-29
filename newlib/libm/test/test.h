@@ -30,6 +30,7 @@
    If that is not the case, please insert documentation here describing why
    they're needed.  */
 
+#ifndef _DOUBLE_IS_32BITS
 #ifdef __IEEE_BIG_ENDIAN
 
 typedef union 
@@ -108,6 +109,7 @@ typedef union
 } __ieee_double_shape_type;
 
 #endif /* __IEEE_LITTLE_ENDIAN */
+#endif /* defined(_DOUBLE_IS_32BITS) */
 
 #ifdef __IEEE_BIG_ENDIAN
 

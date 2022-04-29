@@ -36,7 +36,7 @@ project('picolibc', 'c',
 	default_options: [
 	  'buildtype=minsize',
 	  'debug=true',
-	  'c_std=c18',
+	  'c_std=c11',
 	  'b_staticpic=false',
           'warning_level=2',
 	],

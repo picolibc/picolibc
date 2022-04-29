@@ -49,7 +49,7 @@ float getpayloadf(const float *x)
 
 #ifdef _DOUBLE_IS_32BITS
 
-double getpayload(double *x)
+double getpayload(const double *x)
 {
     return (float) getpayloadf((float *) x);
 }

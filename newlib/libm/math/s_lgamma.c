@@ -35,8 +35,12 @@
 
 #include "fdlibm.h"
 
+#ifndef _DOUBLE_IS_32BITS
+
 double
 lgamma(double x)
 {
     return lgamma_r(x, &__signgam);
 }
+
+#endif /* defined(_DOUBLE_IS_32BITS) */

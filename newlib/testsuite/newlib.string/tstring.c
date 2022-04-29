@@ -10,7 +10,7 @@
 #include <stdlib.h>
 
 #ifndef MAX_1
-#ifdef __SPU__
+#if defined(__AVR__) || defined(__SPU__)
 #define MAX_1 11000
 #else
 #define MAX_1 33000
