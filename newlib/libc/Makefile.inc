@@ -24,7 +24,7 @@ $(LIBC_CHEWOUT_FILES): $(MKDOC)
 	$(AM_V_at)$(SHELL) $(newlib_basedir)/../move-if-change $@.tmp $@
 
 %C%_man.stamp: %D%/libc.xml
-	$(AM_V_GEN)xmlto --skip-validation -o %D% --searchpath $(builddir)/%D% man -m $(srcdir)/man.xsl %D%/libc.xml
+	$(AM_V_GEN)xmlto --skip-validation -o %D% --searchpath $(builddir)/%D% man -m $(srcdir)/man.xsl $(XMLTO_MAN_QUIET) %D%/libc.xml
 	$(AM_V_at)touch $@
 man: %C%_man.stamp
 

@@ -442,6 +442,9 @@ TEXI2DVI = texi2dvi -E
 
 TEXINFO_TEX = ../texinfo/texinfo.tex
 
+XMLTO_MAN_QUIET_=--stringparam man.output.quietly=1
+XMLTO_MAN_QUIET=$(XMLTO_MAN_QUIET_$(V))
+
 if HAVE_DOC
 include doc/Makefile.inc
 endif
