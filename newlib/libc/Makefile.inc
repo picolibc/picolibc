@@ -15,15 +15,13 @@ $(LIBC_CHEWOUT_FILES): $(MKDOC)
 	$(AM_V_at)touch $@
 %D%/targetdep.tex: %D%/targetdep.tex.stamp; @true
 
-%D%/libc.xml.stamp: %D%/libc.in.xml $(LIBC_CHAPTERS) $(LIBC_DOCBOOK_OUT_FILES)
+%D%/libc.xml: %D%/libc.in.xml $(LIBC_CHAPTERS) $(LIBC_DOCBOOK_OUT_FILES)
 	$(AM_V_at)\
 	for chapter in $(LIBC_CHAPTERS); do \
 	  $(TEXI2DOCBOOK) < $(srcdir)/$$chapter > %D%/`basename $${chapter%.tex}`.xml || exit 1; \
 	done
 	$(AM_V_GEN)xsltproc --xinclude --path $(builddir)/%D% --nonet $(srcdir)/refcontainers.xslt $< > $@.tmp
-	$(AM_V_at)$(SHELL) $(newlib_basedir)/../move-if-change $@.tmp $(@:.stamp=)
-	$(AM_V_at)touch $@
-%D%/libc.xml: %D%/libc.xml.stamp; @true
+	$(AM_V_at)$(SHELL) $(newlib_basedir)/../move-if-change $@.tmp $@
 
 %C%_man: %D%/libc.xml
 	$(AM_V_GEN)xmlto --skip-validation -o %D% --searchpath $(builddir)/%D% man -m $(srcdir)/man.xsl %D%/libc.xml
@@ -69,4 +67,4 @@ CLEANFILES += \
 	%D%/targetdep.tex.stamp \
 	$(LIBC_CHEWOUT_FILES) \
 	$(LIBC_DOCBOOK_OUT_FILES) \
-	%D%/*.xml %D%/*.xml.stamp %D%/*.3
+	%D%/*.xml %D%/*.3
