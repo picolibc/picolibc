@@ -696,19 +696,19 @@ struct _reent
   /* These are here last so that __FILE can grow without changing the offsets
      of the above members (on the off chance that future binary compatibility
      would be broken otherwise).  */
-  struct _glue __sglue;		/* root of glue chain */
 # ifndef _REENT_GLOBAL_STDIO_STREAMS
+  struct _glue __sglue;		/* root of glue chain */
   __FILE __sf[3];  		/* first three file descriptors */
 # endif
 };
 
 #ifdef _REENT_GLOBAL_STDIO_STREAMS
 #define _REENT_STDIO_STREAM(var, index) &__sf[index]
-#define _REENT_INIT_SGLUE(_ptr) { _NULL, 0, _NULL }
+#define _REENT_INIT_SGLUE(_ptr) /* nothing to initialize */
 #define _REENT_INIT_SGLUE_ZEROED(_ptr) /* nothing to set */
 #else
 #define _REENT_STDIO_STREAM(var, index) &(var)->__sf[index]
-#define _REENT_INIT_SGLUE(_ptr) { _NULL, 3, &(_ptr)->__sf[0] }
+#define _REENT_INIT_SGLUE(_ptr) , { _NULL, 3, &(_ptr)->__sf[0] }
 #define _REENT_INIT_SGLUE_ZEROED(_ptr) \
   (_ptr)->__sglue._niobs = 3; \
   (_ptr)->__sglue._iobs = &(_ptr)->__sf[0];
@@ -758,7 +758,7 @@ struct _reent
       } \
     }, \
     _REENT_INIT_ATEXIT \
-    _NULL, \
+    _NULL \
     _REENT_INIT_SGLUE(&(var)) \
   }
 

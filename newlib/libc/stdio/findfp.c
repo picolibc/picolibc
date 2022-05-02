@@ -242,8 +242,9 @@ cleanup_stdio (struct _reent *ptr)
     CLEANUP_FILE (ptr, ptr->_stdout);
   if (ptr->_stderr != &__sf[2])
     CLEANUP_FILE (ptr, ptr->_stderr);
-#endif
+#else
   (void) _fwalk_sglue (ptr, CLEANUP_FILE, &ptr->__sglue);
+#endif
 }
 
 /*
@@ -326,21 +327,27 @@ __fp_unlock (struct _reent * ptr __unused, FILE * fp)
 void
 __fp_lock_all (void)
 {
+#ifndef _REENT_GLOBAL_STDIO_STREAMS
   struct _reent *ptr;
+#endif
 
   __sfp_lock_acquire ();
 
+#ifndef _REENT_GLOBAL_STDIO_STREAMS
   ptr = _REENT;
   (void) _fwalk_sglue (ptr, __fp_lock, &ptr->__sglue);
+#endif
 }
 
 void
 __fp_unlock_all (void)
 {
+#ifndef _REENT_GLOBAL_STDIO_STREAMS
   struct _reent *ptr;
 
   ptr = _REENT;
   (void) _fwalk_sglue (ptr, __fp_unlock, &ptr->__sglue);
+#endif
 
   __sfp_lock_release ();
 }
