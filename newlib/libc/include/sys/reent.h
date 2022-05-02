@@ -293,6 +293,10 @@ typedef struct __sFILE   __FILE;
 #endif /* __LARGE64_FILES */
 #endif /* !__CUSTOM_FILE_IO__ */
 
+#ifdef _REENT_GLOBAL_STDIO_STREAMS
+extern __FILE __sf[3];
+#endif
+
 struct _glue
 {
   struct _glue *_next;
@@ -426,7 +430,6 @@ struct _reent
 };
 
 #ifdef _REENT_GLOBAL_STDIO_STREAMS
-extern __FILE __sf[3];
 
 # define _REENT_INIT(var) \
   { 0, \
@@ -698,7 +701,6 @@ struct _reent
 };
 
 #ifdef _REENT_GLOBAL_STDIO_STREAMS
-extern __FILE __sf[3];
 #define _REENT_STDIO_STREAM(var, index) &__sf[index]
 #else
 #define _REENT_STDIO_STREAM(var, index) &(var)->__sf[index]
