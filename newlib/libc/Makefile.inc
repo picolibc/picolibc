@@ -23,11 +23,12 @@ $(LIBC_CHEWOUT_FILES): $(MKDOC)
 	$(AM_V_GEN)xsltproc --xinclude --path $(builddir)/%D% --nonet $(srcdir)/refcontainers.xslt $< > $@.tmp
 	$(AM_V_at)$(SHELL) $(newlib_basedir)/../move-if-change $@.tmp $@
 
-%C%_man: %D%/libc.xml
+%C%_man.stamp: %D%/libc.xml
 	$(AM_V_GEN)xmlto --skip-validation -o %D% --searchpath $(builddir)/%D% man -m $(srcdir)/man.xsl %D%/libc.xml
-man: %C%_man
+	$(AM_V_at)touch $@
+man: %C%_man.stamp
 
-%C%_install-man: %C%_man
+%C%_install-man: %C%_man.stamp
 	$(MKDIR_P) $(DESTDIR)$(mandir)/man3
 	$(INSTALL_DATA) %D%/*.3 $(DESTDIR)$(mandir)/man3/
 install-man: %C%_install-man
@@ -67,4 +68,4 @@ CLEANFILES += \
 	%D%/targetdep.tex.stamp \
 	$(LIBC_CHEWOUT_FILES) \
 	$(LIBC_DOCBOOK_OUT_FILES) \
-	%D%/*.xml %D%/*.3
+	%D%/*.xml %C%_man.stamp %D%/*.3
