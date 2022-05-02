@@ -3135,7 +3135,7 @@ cygwin_setmode (int fd, int mode)
 	_my_tls.locals.setmode_mode = O_TEXT;
       else
 	_my_tls.locals.setmode_mode = O_BINARY;
-      _fwalk_sglue (_GLOBAL_REENT, setmode_helper, &_GLOBAL_REENT->__sglue);
+      _fwalk_sglue (_GLOBAL_REENT, setmode_helper, &__sglue);
     }
   return res;
 }

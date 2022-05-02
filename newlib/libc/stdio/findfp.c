@@ -39,6 +39,13 @@ const struct __sFILE_fake __sf_fake_stderr =
 
 #ifdef _REENT_GLOBAL_STDIO_STREAMS
 __FILE __sf[3];
+struct _glue __sglue = {NULL, 3, &__sf[0]};
+#else
+#ifdef _REENT_SMALL
+struct _glue __sglue = {NULL, 0, NULL};
+#else
+struct _glue __sglue = {NULL, 3, &_GLOBAL_REENT->__sf[0]};
+#endif
 #endif
 
 #ifdef _STDIO_BSD_SEMANTICS
@@ -158,7 +165,7 @@ sfmoreglue (struct _reent *d, int n)
 static void
 stdio_exit_handler (void)
 {
-  (void) _fwalk_sglue (_GLOBAL_REENT, CLEANUP_FILE, &_GLOBAL_REENT->__sglue);
+  (void) _fwalk_sglue (_GLOBAL_REENT, CLEANUP_FILE, &__sglue);
 }
 
 /*
@@ -175,15 +182,11 @@ __sfp (struct _reent *d)
   _newlib_sfp_lock_start ();
 
   if (__stdio_exit_handler == NULL) {
-#ifdef _REENT_GLOBAL_STDIO_STREAMS
-    _GLOBAL_REENT->__sglue._niobs = 3;
-    _GLOBAL_REENT->__sglue._iobs = &__sf[0];
-#endif
     __sinit (_GLOBAL_REENT);
     __stdio_exit_handler = stdio_exit_handler;
   }
 
-  for (g = &_GLOBAL_REENT->__sglue;; g = g->_next)
+  for (g = &__sglue;; g = g->_next)
     {
       for (fp = g->_iobs, n = g->_niobs; --n >= 0; fp++)
 	if (fp->_flags == 0)

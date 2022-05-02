@@ -67,7 +67,7 @@ _fcloseall_r (struct _reent *ptr)
 int
 fcloseall (void)
 {
-  return _fcloseall_r (_GLOBAL_REENT);
+  return _fwalk_sglue (_GLOBAL_REENT, _fclose_r, &__sglue);
 }
 
 #endif

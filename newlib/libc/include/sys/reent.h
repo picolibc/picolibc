@@ -304,6 +304,8 @@ struct _glue
   __FILE *_iobs;
 };
 
+extern struct _glue __sglue;
+
 /*
  * rand48 family support
  *
