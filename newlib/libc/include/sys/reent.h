@@ -837,6 +837,8 @@ extern struct _reent *_impure_ptr __ATTRIBUTE_IMPURE_PTR__;
 
 extern struct _reent _impure_data __ATTRIBUTE_IMPURE_DATA__;
 
+extern void (*__stdio_exit_handler) (void);
+
 void _reclaim_reent (struct _reent *);
 
 /* #define _REENT_ONLY define this to get only reentrant routines */

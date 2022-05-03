@@ -26,6 +26,8 @@
 #include <sys/lock.h>
 #include "local.h"
 
+void (*__stdio_exit_handler) (void);
+
 #if defined(_REENT_SMALL) && !defined(_REENT_GLOBAL_STDIO_STREAMS)
 const struct __sFILE_fake __sf_fake_stdin =
     {_NULL, 0, 0, 0, 0, {_NULL, 0}, 0, _NULL};
@@ -153,6 +155,12 @@ sfmoreglue (struct _reent *d, int n)
   return &g->glue;
 }
 
+static void
+stdio_exit_handler (void)
+{
+  (void) _fwalk_reent (_GLOBAL_REENT, CLEANUP_FILE);
+}
+
 /*
  * Find a free FILE for fopen et al.
  */
@@ -166,12 +174,13 @@ __sfp (struct _reent *d)
 
   _newlib_sfp_lock_start ();
 
-  if (_GLOBAL_REENT->__cleanup == NULL) {
+  if (__stdio_exit_handler == NULL) {
 #ifdef _REENT_GLOBAL_STDIO_STREAMS
     _GLOBAL_REENT->__sglue._niobs = 3;
     _GLOBAL_REENT->__sglue._iobs = &__sf[0];
 #endif
     __sinit (_GLOBAL_REENT);
+    __stdio_exit_handler = stdio_exit_handler;
   }
 
   for (g = &_GLOBAL_REENT->__sglue;; g = g->_next)

@@ -59,7 +59,8 @@ exit (int code)
 #endif
     __call_exitprocs (code, NULL);
 
-  if (_GLOBAL_REENT->__cleanup)
-    (*_GLOBAL_REENT->__cleanup) (_GLOBAL_REENT);
+  if (__stdio_exit_handler != NULL)
+    (*__stdio_exit_handler) ();
+
   _exit (code);
 }

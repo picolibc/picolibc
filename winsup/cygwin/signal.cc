@@ -14,6 +14,7 @@ details. */
 #include <unistd.h>
 #include <sys/cygwin.h>
 #include <sys/signalfd.h>
+#include <sys/reent.h> /* needed for __stdio_exit_handler declaration */
 #include "pinfo.h"
 #include "sigproc.h"
 #include "cygtls.h"
@@ -409,8 +410,8 @@ abort (void)
   _my_tls.call_signal_handler (); /* Call any signal handler */
 
   /* Flush all streams as per SUSv2.  */
-  if (_GLOBAL_REENT->__cleanup)
-    _GLOBAL_REENT->__cleanup (_GLOBAL_REENT);
+  if (__stdio_exit_handler)
+    (*__stdio_exit_handler) ();
   do_exit (SIGABRT);	/* signal handler didn't exit.  Goodbye. */
 }
 
