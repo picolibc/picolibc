@@ -109,8 +109,7 @@ ssize_t __reg3 check_iovec (const struct iovec *, int, bool);
 #define check_iovec_for_write(a, b) check_iovec ((a), (b), true)
 
 #ifdef __x86_64__
-extern PVOID create_new_main_thread_stack (PVOID &allocationbase,
-					   SIZE_T parent_commitsize);
+extern PVOID create_new_main_thread_stack (PVOID &allocationbase);
 #endif
 
 extern "C" DWORD WINAPI pthread_wrapper (PVOID arg);

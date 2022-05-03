@@ -629,7 +629,7 @@ thread_allocator thr_alloc NO_COPY;
    maintained by the thr_alloc class.  See the description in the x86_64-only
    code in _dll_crt0 to understand why we have to do this. */
 PVOID
-create_new_main_thread_stack (PVOID &allocationbase, SIZE_T parent_commitsize)
+create_new_main_thread_stack (PVOID &allocationbase)
 {
   PIMAGE_DOS_HEADER dosheader;
   PIMAGE_NT_HEADERS ntheader;
@@ -647,10 +647,7 @@ create_new_main_thread_stack (PVOID &allocationbase, SIZE_T parent_commitsize)
   allocationbase
 	= thr_alloc.alloc (ntheader->OptionalHeader.SizeOfStackReserve);
   guardsize = wincap.def_guard_page_size ();
-  if (parent_commitsize)
-    commitsize = (SIZE_T) parent_commitsize;
-  else
-    commitsize = ntheader->OptionalHeader.SizeOfStackCommit;
+  commitsize = ntheader->OptionalHeader.SizeOfStackCommit;
   commitsize = roundup2 (commitsize, wincap.page_size ());
   if (commitsize > stacksize - guardsize - wincap.page_size ())
     commitsize = stacksize - guardsize - wincap.page_size ();

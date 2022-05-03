@@ -1064,11 +1064,7 @@ _dll_crt0 ()
 	  /* Must be static since it's referenced after the stack and frame
 	     pointer registers have been changed. */
 	  static PVOID allocationbase;
-	  SIZE_T commitsize = in_forkee ? (PBYTE) fork_info->stackbase
-					  - (PBYTE) fork_info->stacklimit
-					: 0;
-	  PVOID stackaddr = create_new_main_thread_stack (allocationbase,
-							  commitsize);
+	  PVOID stackaddr = create_new_main_thread_stack (allocationbase);
 	  if (stackaddr)
 	    {
 	      /* Set stack pointer to new address.  Set frame pointer to
