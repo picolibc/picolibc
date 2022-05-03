@@ -39,6 +39,21 @@ const struct __sFILE_fake __sf_fake_stderr =
 __FILE __sf[3];
 #endif
 
+#ifdef _STDIO_BSD_SEMANTICS
+  /* BSD and Glibc systems only flush streams which have been written to
+     at exit time.  Calling flush rather than close for speed, as on
+     the aforementioned systems. */
+#define CLEANUP_FILE __sflushw_r
+#else
+  /* Otherwise close files and flush read streams, too.
+     Note we call flush directly if "--enable-lite-exit" is in effect.  */
+#ifdef _LITE_EXIT
+#define CLEANUP_FILE _fflush_r
+#else
+#define CLEANUP_FILE _fclose_r
+#endif
+#endif
+
 #if (defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED))
 _NOINLINE_STATIC void
 #else
@@ -208,30 +223,15 @@ found:
 static void
 cleanup_stdio (struct _reent *ptr)
 {
-  int (*cleanup_func) (struct _reent *, FILE *);
-#ifdef _STDIO_BSD_SEMANTICS
-  /* BSD and Glibc systems only flush streams which have been written to
-     at exit time.  Calling flush rather than close for speed, as on
-     the aforementioned systems. */
-  cleanup_func = __sflushw_r;
-#else
-  /* Otherwise close files and flush read streams, too.
-     Note we call flush directly if "--enable-lite-exit" is in effect.  */
-#ifdef _LITE_EXIT
-  cleanup_func = _fflush_r;
-#else
-  cleanup_func = _fclose_r;
-#endif
-#endif
 #ifdef _REENT_GLOBAL_STDIO_STREAMS
   if (ptr->_stdin != &__sf[0])
-    (*cleanup_func) (ptr, ptr->_stdin);
+    CLEANUP_FILE (ptr, ptr->_stdin);
   if (ptr->_stdout != &__sf[1])
-    (*cleanup_func) (ptr, ptr->_stdout);
+    CLEANUP_FILE (ptr, ptr->_stdout);
   if (ptr->_stderr != &__sf[2])
-    (*cleanup_func) (ptr, ptr->_stderr);
+    CLEANUP_FILE (ptr, ptr->_stderr);
 #endif
-  (void) _fwalk_reent (ptr, cleanup_func);
+  (void) _fwalk_reent (ptr, CLEANUP_FILE);
 }
 
 /*
