@@ -64,13 +64,13 @@ struct timezone {
 #if __BSD_VISIBLE
 struct bintime {
 	time_t	sec;
-	uint64_t frac;
+	__uint64_t frac;
 };
 
 static __inline void
-bintime_addx(struct bintime *_bt, uint64_t _x)
+bintime_addx(struct bintime *_bt, __uint64_t _x)
 {
-	uint64_t _u;
+	__uint64_t _u;
 
 	_u = _bt->frac;
 	_bt->frac += _x;
@@ -81,7 +81,7 @@ bintime_addx(struct bintime *_bt, uint64_t _x)
 static __inline void
 bintime_add(struct bintime *_bt, const struct bintime *_bt2)
 {
-	uint64_t _u;
+	__uint64_t _u;
 
 	_u = _bt->frac;
 	_bt->frac += _bt2->frac;
@@ -93,7 +93,7 @@ bintime_add(struct bintime *_bt, const struct bintime *_bt2)
 static __inline void
 bintime_sub(struct bintime *_bt, const struct bintime *_bt2)
 {
-	uint64_t _u;
+	__uint64_t _u;
 
 	_u = _bt->frac;
 	_bt->frac -= _bt2->frac;
@@ -105,7 +105,7 @@ bintime_sub(struct bintime *_bt, const struct bintime *_bt2)
 static __inline void
 bintime_mul(struct bintime *_bt, u_int _x)
 {
-	uint64_t _p1, _p2;
+	__uint64_t _p1, _p2;
 
 	_p1 = (_bt->frac & 0xffffffffull) * _x;
 	_p2 = (_bt->frac >> 32) * _x + (_p1 >> 32);
@@ -124,7 +124,7 @@ bintime_shift(struct bintime *_bt, int _exp)
 		_bt->frac <<= _exp;
 	} else if (_exp < 0) {
 		_bt->frac >>= -_exp;
-		_bt->frac |= (uint64_t)_bt->sec << (64 + _exp);
+		_bt->frac |= (__uint64_t)_bt->sec << (64 + _exp);
 		_bt->sec >>= -_exp;
 	}
 }
@@ -184,14 +184,14 @@ sbttobt(sbintime_t _sbt)
  *	((unit * 2^63 / SIFACTOR) + 2^31-1) >> 32
  * and use pre-computed constants that are the ceil of the 2^63 / SIFACTOR
  * term to ensure we are using exactly the right constant. We use the lesser
- * evil of ull rather than a uint64_t cast to ensure we have well defined
+ * evil of ull rather than a __uint64_t cast to ensure we have well defined
  * right shift semantics. With these changes, we get all the ns, us and ms
  * conversions back and forth right.
  */
-static __inline int64_t
+static __inline __int64_t
 sbttons(sbintime_t _sbt)
 {
-	uint64_t ns;
+	__uint64_t ns;
 
 	ns = _sbt;
 	if (ns >= SBT_1S)
@@ -203,7 +203,7 @@ sbttons(sbintime_t _sbt)
 }
 
 static __inline sbintime_t
-nstosbt(int64_t _ns)
+nstosbt(__int64_t _ns)
 {
 	sbintime_t sb = 0;
 
@@ -216,7 +216,7 @@ nstosbt(int64_t _ns)
 	return (sb);
 }
 
-static __inline int64_t
+static __inline __int64_t
 sbttous(sbintime_t _sbt)
 {
 
@@ -224,7 +224,7 @@ sbttous(sbintime_t _sbt)
 }
 
 static __inline sbintime_t
-ustosbt(int64_t _us)
+ustosbt(__int64_t _us)
 {
 	sbintime_t sb = 0;
 
@@ -237,7 +237,7 @@ ustosbt(int64_t _us)
 	return (sb);
 }
 
-static __inline int64_t
+static __inline __int64_t
 sbttoms(sbintime_t _sbt)
 {
 
@@ -245,7 +245,7 @@ sbttoms(sbintime_t _sbt)
 }
 
 static __inline sbintime_t
-mstosbt(int64_t _ms)
+mstosbt(__int64_t _ms)
 {
 	sbintime_t sb = 0;
 
@@ -277,8 +277,8 @@ bintime2timespec(const struct bintime *_bt, struct timespec *_ts)
 {
 
 	_ts->tv_sec = _bt->sec;
-	_ts->tv_nsec = ((uint64_t)1000000000 *
-	    (uint32_t)(_bt->frac >> 32)) >> 32;
+	_ts->tv_nsec = ((__uint64_t)1000000000 *
+	    (__uint32_t)(_bt->frac >> 32)) >> 32;
 }
 
 static __inline void
@@ -287,7 +287,7 @@ timespec2bintime(const struct timespec *_ts, struct bintime *_bt)
 
 	_bt->sec = _ts->tv_sec;
 	/* 18446744073 = int(2^64 / 1000000000) */
-	_bt->frac = _ts->tv_nsec * (uint64_t)18446744073LL;
+	_bt->frac = _ts->tv_nsec * (__uint64_t)18446744073LL;
 }
 
 static __inline void
@@ -295,7 +295,7 @@ bintime2timeval(const struct bintime *_bt, struct timeval *_tv)
 {
 
 	_tv->tv_sec = _bt->sec;
-	_tv->tv_usec = ((uint64_t)1000000 * (uint32_t)(_bt->frac >> 32)) >> 32;
+	_tv->tv_usec = ((__uint64_t)1000000 * (__uint32_t)(_bt->frac >> 32)) >> 32;
 }
 
 static __inline void
@@ -304,7 +304,7 @@ timeval2bintime(const struct timeval *_tv, struct bintime *_bt)
 
 	_bt->sec = _tv->tv_sec;
 	/* 18446744073709 = int(2^64 / 1000000) */
-	_bt->frac = _tv->tv_usec * (uint64_t)18446744073709LL;
+	_bt->frac = _tv->tv_usec * (__uint64_t)18446744073709LL;
 }
 
 static __inline struct timespec
@@ -313,7 +313,7 @@ sbttots(sbintime_t _sbt)
 	struct timespec _ts;
 
 	_ts.tv_sec = _sbt >> 32;
-	_ts.tv_nsec = sbttons((uint32_t)_sbt);
+	_ts.tv_nsec = sbttons((__uint32_t)_sbt);
 	return (_ts);
 }
 
@@ -330,7 +330,7 @@ sbttotv(sbintime_t _sbt)
 	struct timeval _tv;
 
 	_tv.tv_sec = _sbt >> 32;
-	_tv.tv_usec = sbttous((uint32_t)_sbt);
+	_tv.tv_usec = sbttous((__uint32_t)_sbt);
 	return (_tv);
 }
 

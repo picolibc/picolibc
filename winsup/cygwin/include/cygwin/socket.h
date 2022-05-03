@@ -31,16 +31,16 @@ struct sockaddr {
 
 /* Definition of sockaddr_storage according to SUSv3. */
 #define _SS_MAXSIZE 128			/* Maximum size. */
-#define _SS_ALIGNSIZE (sizeof (int64_t))/* Desired alignment. */
+#define _SS_ALIGNSIZE (sizeof (__int64_t))/* Desired alignment. */
 #define _SS_PAD1SIZE (_SS_ALIGNSIZE - sizeof (sa_family_t))
 #define _SS_PAD2SIZE (_SS_MAXSIZE - (sizeof (sa_family_t) \
 		      + _SS_PAD1SIZE + _SS_ALIGNSIZE))
 
 struct sockaddr_storage {
   sa_family_t		ss_family;
-  char			_ss_pad1[_SS_PAD1SIZE];
-  int64_t		__ss_align;
-  char			_ss_pad2[_SS_PAD2SIZE];
+  __int8_t		_ss_pad1[_SS_PAD1SIZE];
+  __int64_t		__ss_align;
+  __int8_t		_ss_pad2[_SS_PAD2SIZE];
 };
 #endif
 

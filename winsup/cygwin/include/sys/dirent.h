@@ -21,7 +21,7 @@
 #define _DIRENT_HAVE_D_TYPE
 struct dirent
 {
-  uint32_t __d_version;			/* Used internally */
+  __uint32_t __d_version;			/* Used internally */
   ino_t d_ino;
   unsigned char d_type;
   unsigned char __d_unused1[3];
@@ -51,7 +51,7 @@ typedef struct __DIR
   char *__d_dirname;			/* directory name with trailing '*' */
   __int32_t __d_position;			/* used by telldir/seekdir */
   int __d_fd;
-  uintptr_t __d_internal;
+  __uintptr_t __d_internal;
   void *__handle;
   void *__fh;
   unsigned __flags;

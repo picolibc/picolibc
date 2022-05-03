@@ -18,6 +18,7 @@
 
 #include <sys/types.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 /*
  * Calculate a uniformly distributed random number less than upper_bound

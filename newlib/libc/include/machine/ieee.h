@@ -12,21 +12,21 @@
 } while (0)
 #ifdef __IEEE_LITTLE_ENDIAN
 struct ieee_ext {
-    uint32_t   ext_frac:23;
-    uint32_t   ext_exp:8;
-    uint32_t   ext_sign:1;
+    __uint32_t   ext_frac:23;
+    __uint32_t   ext_exp:8;
+    __uint32_t   ext_sign:1;
 };
 #endif
 #ifdef __IEEE_BIG_ENDIAN
 struct ieee_ext {
 #ifndef ___IEEE_BYTES_LITTLE_ENDIAN
-    uint32_t   ext_sign:1;
-    uint32_t   ext_exp:8;
-    uint32_t   ext_frac:23;
+    __uint32_t   ext_sign:1;
+    __uint32_t   ext_exp:8;
+    __uint32_t   ext_frac:23;
 #else /* ARMEL without __VFP_FP__ */
-    uint32_t   ext_frac:23;
-    uint32_t   ext_exp:8;
-    uint32_t   ext_sign:1;
+    __uint32_t   ext_frac:23;
+    __uint32_t   ext_exp:8;
+    __uint32_t   ext_sign:1;
 #endif
 };
 #endif
@@ -38,24 +38,24 @@ struct ieee_ext {
 } while (0)
 #ifdef __IEEE_LITTLE_ENDIAN
 struct ieee_ext {
-    uint32_t   ext_fracl;
-    uint32_t   ext_frach:20;
-    uint32_t   ext_exp:11;
-    uint32_t   ext_sign:1;
+    __uint32_t   ext_fracl;
+    __uint32_t   ext_frach:20;
+    __uint32_t   ext_exp:11;
+    __uint32_t   ext_sign:1;
 };
 #endif
 #ifdef __IEEE_BIG_ENDIAN
 struct ieee_ext {
 #ifndef ___IEEE_BYTES_LITTLE_ENDIAN
-    uint32_t   ext_sign:1;
-    uint32_t   ext_exp:11;
-    uint32_t   ext_frach:20;
+    __uint32_t   ext_sign:1;
+    __uint32_t   ext_exp:11;
+    __uint32_t   ext_frach:20;
 #else /* ARMEL without __VFP_FP__ */
-    uint32_t   ext_frach:20;
-    uint32_t   ext_exp:11;
-    uint32_t   ext_sign:1;
+    __uint32_t   ext_frach:20;
+    __uint32_t   ext_exp:11;
+    __uint32_t   ext_sign:1;
 #endif
-    uint32_t   ext_fracl;
+    __uint32_t   ext_fracl;
 };
 #endif
 #elif LDBL_MANT_DIG == 64
@@ -65,27 +65,27 @@ struct ieee_ext {
 } while (0)
 #ifdef __IEEE_LITTLE_ENDIAN /* for Intel CPU */
 struct ieee_ext {
-    uint32_t   ext_fracl;
-    uint32_t   ext_frach;
-    uint32_t   ext_exp:15;
-    uint32_t   ext_sign:1;
-    uint32_t   ext_padl:16;
-    uint32_t   ext_padh;
+    __uint32_t   ext_fracl;
+    __uint32_t   ext_frach;
+    __uint32_t   ext_exp:15;
+    __uint32_t   ext_sign:1;
+    __uint32_t   ext_padl:16;
+    __uint32_t   ext_padh;
 };
 #endif
 #ifdef __IEEE_BIG_ENDIAN
 struct ieee_ext {
 #ifndef ___IEEE_BYTES_LITTLE_ENDIAN /* for m68k */
-    uint32_t   ext_sign:1;
-    uint32_t   ext_exp:15;
-    uint32_t   ext_pad:16;
+    __uint32_t   ext_sign:1;
+    __uint32_t   ext_exp:15;
+    __uint32_t   ext_pad:16;
 #else /* ARM FPA10 math coprocessor */
-    uint32_t   ext_exp:15;
-    uint32_t   ext_pad:16;
-    uint32_t   ext_sign:1;
+    __uint32_t   ext_exp:15;
+    __uint32_t   ext_pad:16;
+    __uint32_t   ext_sign:1;
 #endif
-    uint32_t   ext_frach;
-    uint32_t   ext_fracl;
+    __uint32_t   ext_frach;
+    __uint32_t   ext_fracl;
 };
 #endif
 #elif LDBL_MANT_DIG == 113
@@ -98,28 +98,28 @@ struct ieee_ext {
 } while (0)
 #ifdef __IEEE_LITTLE_ENDIAN
 struct ieee_ext {
-    uint32_t   ext_fracl;
-    uint32_t   ext_fraclm;
-    uint32_t   ext_frachm;
-    uint32_t   ext_frach:16;
-    uint32_t   ext_exp:15;
-    uint32_t   ext_sign:1;
+    __uint32_t   ext_fracl;
+    __uint32_t   ext_fraclm;
+    __uint32_t   ext_frachm;
+    __uint32_t   ext_frach:16;
+    __uint32_t   ext_exp:15;
+    __uint32_t   ext_sign:1;
 };
 #endif
 #ifdef __IEEE_BIG_ENDIAN
 struct ieee_ext {
 #ifndef ___IEEE_BYTES_LITTLE_ENDIAN
-    uint32_t   ext_sign:1;
-    uint32_t   ext_exp:15;
-    uint32_t   ext_frach:16;
+    __uint32_t   ext_sign:1;
+    __uint32_t   ext_exp:15;
+    __uint32_t   ext_frach:16;
 #else /* ARMEL without __VFP_FP__ */
-    uint32_t   ext_frach:16;
-    uint32_t   ext_exp:15;
-    uint32_t   ext_sign:1;
+    __uint32_t   ext_frach:16;
+    __uint32_t   ext_exp:15;
+    __uint32_t   ext_sign:1;
 #endif
-    uint32_t   ext_frachm;
-    uint32_t   ext_fraclm;
-    uint32_t   ext_fracl;
+    __uint32_t   ext_frachm;
+    __uint32_t   ext_fraclm;
+    __uint32_t   ext_fracl;
 };
 #endif
 #endif

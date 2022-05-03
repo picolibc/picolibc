@@ -13,6 +13,7 @@ details. */
 
 #include <sys/types.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #ifdef __MINGW32__
 #include <_bsd_types.h>
