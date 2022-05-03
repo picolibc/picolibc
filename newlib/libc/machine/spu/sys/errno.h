@@ -27,7 +27,6 @@ extern "C" {
 
 #include <sys/reent.h>
 
-extern struct _reent _impure_data;
 #define errno (_impure_data._errno)
 
 /* Please don't use these variables directly.

@@ -816,7 +816,7 @@ static inline void
 main_thread_sinit ()
 {
   __sinit (_impure_ptr);
-  /* At this point, _impure_ptr == _global_impure_ptr == _GLOBAL_REENT is
+  /* At this point, _impure_ptr == _GLOBAL_REENT is
      initialized, but _REENT == _my_tls.local_clib doesn't know about it.
      It has been copied over from _GLOBAL_REENT in _cygtls::init_thread
      *before* the initialization took place.

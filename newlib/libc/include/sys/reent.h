@@ -821,7 +821,12 @@ extern __FILE __sf[3];
 #endif
 
 extern struct _reent *_impure_ptr __ATTRIBUTE_IMPURE_PTR__;
-extern struct _reent *const _global_impure_ptr __ATTRIBUTE_IMPURE_PTR__;
+
+#ifndef __ATTRIBUTE_IMPURE_DATA__
+#define __ATTRIBUTE_IMPURE_DATA__
+#endif
+
+extern struct _reent _impure_data __ATTRIBUTE_IMPURE_DATA__;
 
 void _reclaim_reent (struct _reent *);
 
@@ -836,7 +841,7 @@ void _reclaim_reent (struct _reent *);
 # define _REENT _impure_ptr
 #endif /* __SINGLE_THREAD__ || !__DYNAMIC_REENT__ */
 
-#define _GLOBAL_REENT _global_impure_ptr
+#define _GLOBAL_REENT (&_impure_data)
 
 #ifdef _REENT_GLOBAL_ATEXIT
 extern struct _atexit *_global_atexit; /* points to head of LIFO stack */

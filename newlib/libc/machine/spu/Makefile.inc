@@ -3,7 +3,7 @@ libc_a_SOURCES += \
 	%D%/ferror.c %D%/fflush.c %D%/fgetc.c %D%/fgetpos.c %D%/fgets.c %D%/fileno.c %D%/fiprintf.S \
 	%D%/fiscanf.S %D%/fopen.c %D%/fprintf.S %D%/fputc.c %D%/fputs.c %D%/fread.c %D%/freopen.c \
 	%D%/fscanf.S %D%/fseek.c %D%/fsetpos.c %D%/ftell.c %D%/fwrite.c %D%/getc.c %D%/getchar.c \
-	%D%/gets.c %D%/impure.c %D%/iprintf.S %D%/iscanf.S %D%/memcmp.c %D%/memcpy.c %D%/memmove.c \
+	%D%/gets.c %D%/iprintf.S %D%/iscanf.S %D%/memcmp.c %D%/memcpy.c %D%/memmove.c \
 	%D%/memset.c %D%/perror.c %D%/printf.S %D%/putc.c %D%/putchar.c %D%/puts.c %D%/remove.c \
 	%D%/rename.c %D%/rewind.c %D%/scanf.S %D%/setbuf.c %D%/setvbuf.c %D%/siprintf.S %D%/siscanf.S \
 	%D%/sleep.c %D%/sniprintf.S %D%/snprintf.S %D%/sprintf.S %D%/sscanf.S %D%/stdio.c %D%/strcat.c \
