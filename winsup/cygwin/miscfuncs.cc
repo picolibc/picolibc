@@ -513,13 +513,14 @@ pthread_wrapper (PVOID arg)
 }
 
 #ifdef __x86_64__
-/* The memory region used for thread stacks */
-#define THREAD_STORAGE_LOW	0x080000000L
-#define THREAD_STORAGE_HIGH	0x100000000L
+/* The memory region used for thread stacks. The memory layout is outlined
+   in heap.cc, function eval_start_address(). */
+#define THREAD_STORAGE_LOW	0x600000000L
+#define THREAD_STORAGE_HIGH	0x800000000L
 /* We provide the stacks always in 1 Megabyte slots */
-#define THREAD_STACK_SLOT	0x100000L	/* 1 Meg */
+#define THREAD_STACK_SLOT	0x000100000L	/* 1 Meg */
 /* Maximum stack size returned from the pool. */
-#define THREAD_STACK_MAX	0x10000000L	/* 256 Megs */
+#define THREAD_STACK_MAX	0x040000000L	/* 1 Gig */
 
 class thread_allocator
 {
