@@ -849,7 +849,7 @@ dll_crt0_1 (void *)
   _my_tls.incyg++;
   /* Inherit "parent" exec'ed process sigmask */
   if (spawn_info && !in_forkee)
-    _my_tls.sigmask = spawn_info->moreinfo->sigmask;
+    _my_tls.sigmask = spawn_info->sigmask;
 
   if (dynamically_loaded)
     sigproc_init ();

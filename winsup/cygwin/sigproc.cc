@@ -820,7 +820,7 @@ child_info::child_info (unsigned in_cb, child_info_types chtype,
   cb (in_cb), intro (PROC_MAGIC_GENERIC), magic (CHILD_INFO_MAGIC),
   type (chtype), cygheap (::cygheap), cygheap_max (::cygheap_max),
   flag (0), retry (child_info::retry_count), rd_proc_pipe (NULL),
-  wr_proc_pipe (NULL)
+  wr_proc_pipe (NULL), sigmask (_my_tls.sigmask)
 {
   /* It appears that when running under WOW64 on Vista 64, the first DWORD
      value in the datastructure lpReserved2 is pointing to (msv_count in
@@ -922,7 +922,6 @@ cygheap_exec_info::alloc ()
 					 sizeof (cygheap_exec_info)
 					 + (chld_procs.count ()
 					    * sizeof (children[0])));
-  res->sigmask = _my_tls.sigmask;
   return res;
 }
 
@@ -1373,9 +1372,20 @@ wait_sig (VOID *)
       threadlist_t *tl_entry;
       if (!pack.mask)
 	{
+	  /* There's a short time at process startup of a forked process,
+	     when _main_tls points to the system-allocated stack, not to
+	     the parent thread. In that case find_tls fails, and we fetch
+	     the sigmask from the child_info passed from the parent. */
 	  tl_entry = cygheap->find_tls (_main_tls);
-	  dummy_mask = _main_tls->sigmask;
-	  cygheap->unlock_tls (tl_entry);
+	  if (tl_entry)
+	    {
+	      dummy_mask = _main_tls->sigmask;
+	      cygheap->unlock_tls (tl_entry);
+	    }
+	  else if (child_proc_info)
+	    dummy_mask = child_proc_info->sigmask;
+	  else
+	    dummy_mask = 0;
 	  pack.mask = &dummy_mask;
 	}
 
