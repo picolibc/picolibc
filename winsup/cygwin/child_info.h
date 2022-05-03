@@ -37,7 +37,7 @@ enum child_status
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
 /* Change this value if you get a message indicating that it is out-of-sync. */
-#define CURR_CHILD_INFO_MAGIC 0xecc930b9U
+#define CURR_CHILD_INFO_MAGIC 0xacbf4682U
 
 #include "pinfo.h"
 struct cchildren
@@ -71,6 +71,8 @@ public:
   unsigned fhandler_union_cb;
   DWORD exit_code;	// process exit code
   static int retry_count;// retry count;
+  sigset_t sigmask;
+
   child_info (unsigned, child_info_types, bool);
   child_info (): subproc_ready (NULL), parent (NULL) {}
   ~child_info ();
@@ -130,7 +132,6 @@ public:
   int envc;
   char **envp;
   HANDLE myself_pinfo;
-  sigset_t sigmask;
   int nchildren;
   cchildren children[0];
   static cygheap_exec_info *alloc ();
