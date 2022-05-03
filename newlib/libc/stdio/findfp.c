@@ -151,8 +151,14 @@ __sfp (struct _reent *d)
 
   _newlib_sfp_lock_start ();
 
-  if (_GLOBAL_REENT->__cleanup == NULL)
+  if (_GLOBAL_REENT->__cleanup == NULL) {
+#ifdef _REENT_GLOBAL_STDIO_STREAMS
+    _GLOBAL_REENT->__sglue._niobs = 3;
+    _GLOBAL_REENT->__sglue._iobs = &__sf[0];
+#endif
     __sinit (_GLOBAL_REENT);
+  }
+
   for (g = &_GLOBAL_REENT->__sglue;; g = g->_next)
     {
       for (fp = g->_iobs, n = g->_niobs; --n >= 0; fp++)
@@ -256,8 +262,6 @@ __sinit (struct _reent *s)
 
 #ifdef _REENT_GLOBAL_STDIO_STREAMS
   if (__sf[0]._cookie == NULL) {
-    _GLOBAL_REENT->__sglue._niobs = 3;
-    _GLOBAL_REENT->__sglue._iobs = &__sf[0];
     stdin_init (&__sf[0]);
     stdout_init (&__sf[1]);
     stderr_init (&__sf[2]);
