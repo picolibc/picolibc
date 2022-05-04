@@ -36,6 +36,7 @@
 #include <string.h>
 #include <errno.h>
 #include <malloc.h>
+#include <stdint.h>
 
 #if DEBUG
 #include <assert.h>
