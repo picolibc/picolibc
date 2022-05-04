@@ -248,10 +248,22 @@ struct OLD_msghdr
 #define IP_BLOCK_SOURCE                 17
 #define IP_UNBLOCK_SOURCE               18
 #define IP_PKTINFO                      19
+#define IP_RECVTTL                      21
 #define IP_UNICAST_IF                   31
+#define IP_RECVTOS                      40
+#define IP_MTU_DISCOVER                 71
+#define IP_MTU                          73
+#define IP_RECVERR                      75
+
+/* IP_MTU_DISCOVER optvals */
+#define IP_PMTUDISC_WANT                0	/* Use per route hints  */
+#define IP_PMTUDISC_DO                  1       /* Always DF            */
+#define IP_PMTUDISC_DONT                2       /* Never send DF frames */
+#define IP_PMTUDISC_PROBE               3       /* Ignore dst pmtu      */
 
 /* IPv6 options for use with getsockopt/setsockopt */
 #define IPV6_HOPOPTS                     1
+#define IPV6_HDRINCL                     2
 #define IPV6_UNICAST_HOPS                4
 #define IPV6_MULTICAST_IF                9
 #define IPV6_MULTICAST_HOPS             10
@@ -270,6 +282,15 @@ struct OLD_msghdr
 #define IPV6_RECVRTHDR                  38
 #define IPV6_TCLASS                     39
 #define IPV6_RECVTCLASS                 40
+#define IPV6_MTU_DISCOVER               71
+#define IPV6_MTU                        72
+#define IPV6_RECVERR                    75
+
+/* IPV6_MTU_DISCOVER optvals */
+#define IPV6_PMTUDISC_WANT              0	/* Use per route hints  */
+#define IPV6_PMTUDISC_DO                1       /* Always DF            */
+#define IPV6_PMTUDISC_DONT              2       /* Never send DF frames */
+#define IPV6_PMTUDISC_PROBE             3       /* Ignore dst pmtu      */
 
 /* IP agnostic options for use with getsockopt/setsockopt */
 #define MCAST_JOIN_GROUP                41
