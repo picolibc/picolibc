@@ -36,7 +36,6 @@ details. */
 #include <sys/types.h>
 #include <sys/strace.h>
 #include <sys/smallprint.h>
-#include <stdint.h>
 
 /* Declarations for functions used in C and C++ code. */
 #ifdef __cplusplus

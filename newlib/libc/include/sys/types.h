@@ -43,7 +43,7 @@ typedef __intptr_t register_t;
 
 #define _SYS_TYPES_H
 #include <sys/_types.h>
-#include <machine/_default_types.h>
+#include <sys/_stdint.h>
 
 #if __BSD_VISIBLE
 #include <machine/endian.h>

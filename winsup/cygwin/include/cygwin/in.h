@@ -148,8 +148,8 @@ struct ip_msfilter
 {
   struct in_addr imsf_multiaddr;
   struct in_addr imsf_interface;
-  __uint32_t       imsf_fmode;
-  __uint32_t       imsf_numsrc;
+  uint32_t       imsf_fmode;
+  uint32_t       imsf_numsrc;
   struct in_addr imsf_slist[1];
 };
 
@@ -160,30 +160,30 @@ struct ip_msfilter
 struct in_pktinfo
 {
   struct in_addr ipi_addr;
-  __uint32_t       ipi_ifindex;
+  uint32_t       ipi_ifindex;
 };
 
 /* Request struct for IP agnostic multicast socket ops */
 
 struct group_req
 {
-  __uint32_t                gr_interface;
+  uint32_t                gr_interface;
   struct sockaddr_storage gr_group;
 };
 
 struct group_source_req
 {
-  __uint32_t                gsr_interface;
+  uint32_t                gsr_interface;
   struct sockaddr_storage gsr_group;
   struct sockaddr_storage gsr_source;
 };
 
 struct group_filter
 {
-  __uint32_t                gf_interface;
+  uint32_t                gf_interface;
   struct sockaddr_storage gf_group;
-  __uint32_t                gf_fmode;
-  __uint32_t                gf_numsrc;
+  uint32_t                gf_fmode;
+  uint32_t                gf_numsrc;
   struct sockaddr_storage gf_slist[1];
 };
 

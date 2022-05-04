@@ -10,7 +10,6 @@ details. */
 
 #include <sys/types.h>
 #include <sys/syslog.h>
-#include <stdint.h>
 
 enum tun_bool_t {
   TUN_UNDEF = 0,
