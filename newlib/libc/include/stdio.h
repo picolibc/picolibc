@@ -58,7 +58,7 @@ typedef __gnuc_va_list va_list;
  */
 
 #include <sys/reent.h>
-#include <sys/types.h>
+#include <sys/_types.h>
 
 _BEGIN_STD_C
 
@@ -75,6 +75,16 @@ typedef _fpos_t fpos_t;
 typedef _fpos64_t fpos64_t;
 #endif
 #endif /* !__CYGWIN__ */
+
+#ifndef _OFF_T_DECLARED
+typedef __off_t off_t;
+#define	_OFF_T_DECLARED
+#endif
+
+#ifndef _SSIZE_T_DECLARED
+typedef _ssize_t ssize_t;
+#define	_SSIZE_T_DECLARED
+#endif
 
 #include <sys/stdio.h>
 
