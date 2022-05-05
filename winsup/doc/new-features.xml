@@ -25,6 +25,10 @@ The CYGWIN=pipe_byte option is now set by default, so that pipes are
 opened in byte mode rather than message mode.
 </para></listitem>
 
+<listitem><para>
+Handle UDP_SEGMENT and UDP_GRO socket options.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

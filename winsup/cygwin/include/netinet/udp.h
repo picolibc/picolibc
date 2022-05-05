@@ -33,6 +33,10 @@
 #ifndef _NETINET_UDP_H
 #define _NETINET_UDP_H
 
+#define UDP_SEGMENT	 2	/* WinSock UDP_SEND_MSG_SIZE */
+#define UDP_GRO		 3	/* WinSock UDP_RECV_MAX_COALESCED_SIZE,
+				   also == UDP_COALESCED_INFO */
+
 /*
  * Udp protocol header.
  * Per RFC 768, September, 1981.

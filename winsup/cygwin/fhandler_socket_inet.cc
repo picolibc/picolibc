@@ -25,6 +25,7 @@
 #include <w32api/mswsock.h>
 #include <w32api/mstcpip.h>
 #include <netinet/tcp.h>
+#include <netinet/udp.h>
 #include <unistd.h>
 #include <asm/byteorder.h>
 #include <sys/socket.h>
@@ -38,6 +39,7 @@
 #include "cygheap.h"
 #include "shared_info.h"
 #include "wininfo.h"
+#include "tls_pbuf.h"
 
 #define ASYNC_MASK (FD_READ|FD_WRITE|FD_OOB|FD_ACCEPT|FD_CONNECT)
 #define EVENT_MASK (FD_READ|FD_WRITE|FD_OOB|FD_ACCEPT|FD_CONNECT|FD_CLOSE)
@@ -1335,6 +1337,31 @@ fhandler_socket_wsock::recvmsg (struct msghdr *msg, int flags)
       msg->msg_controllen = wsamsg.Control.len;
       if (!CYGWIN_VERSION_CHECK_FOR_USING_ANCIENT_MSGHDR)
 	msg->msg_flags = wsamsg.dwFlags;
+      /* if a UDP_GRO packet is present, convert gso_size from Windows DWORD
+         to Linux-compatible uint16_t.  We don't have to change the
+	 msg_control block layout for that, assuming applications do as they
+	 have been told and only use CMSG_FIRSTHDR/CMSG_NXTHDR/CMSG_DATA to
+	 access control messages. The cmsghdr alignment saves our ass here! */
+      if (msg->msg_controllen && get_socket_type () == SOCK_DGRAM
+	  && (get_addr_family () == AF_INET || get_addr_family () == AF_INET6))
+	{
+	  struct cmsghdr *cmsg;
+
+	  for (cmsg = CMSG_FIRSTHDR (msg);
+	       cmsg;
+	       cmsg = CMSG_NXTHDR (msg, cmsg))
+	    {
+	      if (cmsg->cmsg_level == SOL_UDP
+		  && cmsg->cmsg_type == UDP_GRO)
+		{
+		  PDWORD gso_size_win = (PDWORD) CMSG_DATA(cmsg);
+		  uint16_t *gso_size_cyg = (uint16_t *) CMSG_DATA(cmsg);
+		  uint16_t gso_size = (uint16_t) *gso_size_win;
+		  *gso_size_cyg = gso_size;
+		  break;
+		}
+	    }
+	}
     }
   return ret;
 }
@@ -1540,16 +1567,102 @@ fhandler_socket_inet::sendto (const void *in_ptr, size_t len, int flags,
 }
 
 ssize_t
-fhandler_socket_inet::sendmsg (const struct msghdr *msg, int flags)
+fhandler_socket_inet::sendmsg (const struct msghdr *in_msg, int flags)
 {
   struct sockaddr_storage sst;
   int len = 0;
+  DWORD old_gso_size = MAXDWORD;
+  ssize_t ret;
+
+  /* Copy incoming msghdr into a local copy. We only access this from
+     here on.  Thus, make sure not to manipulate user space data. */
+  struct msghdr local_msg = *in_msg;
+  struct msghdr *msg = &local_msg;
 
   if (msg->msg_name
       && get_inet_addr_inet ((struct sockaddr *) msg->msg_name,
 			     msg->msg_namelen, &sst, &len) == SOCKET_ERROR)
     return SOCKET_ERROR;
 
+  /* Check for our optmem_max value */
+  if (msg->msg_controllen > NT_MAX_PATH)
+    {
+      set_errno (ENOBUFS);
+      return SOCKET_ERROR;
+    }
+
+  /* WSASendMsg is supported only for datagram and raw sockets. */
+  if (get_socket_type () != SOCK_DGRAM && get_socket_type () != SOCK_RAW)
+    msg->msg_controllen = 0;
+
+  /* If we actually have control data, copy it to local storage.  Control
+     messages only handled by us have to be dropped from the msg_control
+     block, and we don't want to change user space data. */
+  tmp_pathbuf tp;
+  if (msg->msg_controllen)
+    {
+      void *local_cmsg = tp.c_get ();
+      memcpy (local_cmsg, msg->msg_control, msg->msg_controllen);
+      msg->msg_control = local_cmsg;
+    }
+
+  /* Check for control message we handle inside Cygwin. Right now this
+     only affects UDP sockets, so check here early. */
+  if (msg->msg_controllen && get_socket_type () == SOCK_DGRAM)
+    {
+      struct cmsghdr *cmsg;
+      bool dropped = false;
+
+      for (cmsg = CMSG_FIRSTHDR (msg);
+	   cmsg;
+	   cmsg = dropped ? cmsg : CMSG_NXTHDR (msg, cmsg))
+	{
+	  dropped = false;
+	  /* cmsg within bounds? */
+	  if (cmsg->cmsg_len < sizeof (struct cmsghdr)
+	      || cmsg->cmsg_len > (size_t) msg->msg_controllen
+				  - ((uintptr_t) cmsg
+				     - (uintptr_t) msg->msg_control))
+	    {
+	      set_errno (EINVAL);
+	      return SOCKET_ERROR;
+	    }
+	  /* UDP_SEGMENT? Override gso_size for this single sendmsg. */
+	  if (cmsg->cmsg_level == SOL_UDP && cmsg->cmsg_type == UDP_SEGMENT)
+	    {
+	      /* 16 bit unsigned, as on Linux */
+	      DWORD gso_size = *(uint16_t *) CMSG_DATA(cmsg);
+	      int size = sizeof old_gso_size;
+	      /* Save the old gso_size and set the requested one. */
+	      if (::getsockopt (get_socket (), IPPROTO_UDP, UDP_SEGMENT,
+				(char *) &old_gso_size, &size) == SOCKET_ERROR
+		  || ::setsockopt (get_socket (), IPPROTO_UDP, UDP_SEGMENT,
+				(char *) &gso_size, sizeof gso_size)
+		     == SOCKET_ERROR)
+		{
+		  set_winsock_errno ();
+		  return SOCKET_ERROR;
+		}
+	      /* Drop message from msgbuf, Windows doesn't know it. */
+	      size_t cmsg_size = CMSG_ALIGN (cmsg->cmsg_len);
+	      struct cmsghdr *cmsg_next = CMSG_NXTHDR (msg, cmsg);
+	      if (cmsg_next)
+		memmove (cmsg, cmsg_next, (char *) msg->msg_control
+					  + msg->msg_controllen
+					  - (char *) cmsg_next);
+	      msg->msg_controllen -= cmsg_size;
+	      dropped = true;
+	      /* Avoid infinite loop */
+	      if (msg->msg_controllen <= 0)
+		{
+		  cmsg = NULL;
+		  msg->msg_controllen = 0;
+		}
+	    }
+	}
+    }
+
+  /* Copy over msg_iov into an equivalent WSABUF array. */
   WSABUF wsabuf[msg->msg_iovlen];
   WSABUF *wsaptr = wsabuf;
   const struct iovec *iovptr = msg->msg_iov;
@@ -1558,15 +1671,18 @@ fhandler_socket_inet::sendmsg (const struct msghdr *msg, int flags)
       wsaptr->len = iovptr->iov_len;
       (wsaptr++)->buf = (char *) (iovptr++)->iov_base;
     }
-  /* Disappointing but true:  Even if WSASendMsg is supported, it's only
-     supported for datagram and raw sockets. */
-  DWORD controllen = (DWORD) ((get_socket_type () == SOCK_STREAM)
-			      ? 0 : msg->msg_controllen);
+
+  /* Eventually copy over to a WSAMSG and call send_internal with that. */
   WSAMSG wsamsg = { msg->msg_name ? (struct sockaddr *) &sst : NULL, len,
 		    wsabuf, (DWORD) msg->msg_iovlen,
-		    { controllen, (char *) msg->msg_control },
+		    { (DWORD) msg->msg_controllen,
+		      msg->msg_controllen ? (char *) msg->msg_control : NULL },
 		    0 };
-  return send_internal (&wsamsg, flags);
+  ret = send_internal (&wsamsg, flags);
+  if (old_gso_size != MAXDWORD)
+    ::setsockopt (get_socket (), IPPROTO_UDP, UDP_SEGMENT,
+		  (char *) &old_gso_size, sizeof old_gso_size);
+  return ret;
 }
 
 ssize_t
@@ -1681,7 +1797,7 @@ fhandler_socket_inet::setsockopt (int level, int optname, const void *optval,
 {
   bool ignore = false;
   int ret = -1;
-  unsigned int timeout;
+  unsigned int winsock_val;
 
   /* Preprocessing setsockopt.  Set ignore to true if setsockopt call should
      get skipped entirely. */
@@ -1774,7 +1890,6 @@ fhandler_socket_inet::setsockopt (int level, int optname, const void *optval,
       break;
 
     case IPPROTO_IPV6:
-      {
       switch (optname)
 	{
 	case IPV6_TCLASS:
@@ -1785,8 +1900,6 @@ fhandler_socket_inet::setsockopt (int level, int optname, const void *optval,
 	default:
 	  break;
 	}
-      }
-    default:
       break;
 
     case IPPROTO_TCP:
@@ -1851,9 +1964,9 @@ fhandler_socket_inet::setsockopt (int level, int optname, const void *optval,
 	    {
 	      /* convert msecs to secs.  Values < 1000 ms are converted to
 		 0 secs, just as in WinSock. */
-	      timeout = *(unsigned int *) optval / MSPERSEC;
+	      winsock_val = *(unsigned int *) optval / MSPERSEC;
 	      optname = TCP_MAXRT;
-	      optval = (const void *) &timeout;
+	      optval = (const void *) &winsock_val;
 	    }
 	  break;
 
@@ -1917,6 +2030,49 @@ fhandler_socket_inet::setsockopt (int level, int optname, const void *optval,
 	default:
 	  break;
 	}
+      break;
+
+    case IPPROTO_UDP:
+      /* Check for dgram socket early on, so we don't have to do this for
+	 every option.  Also, WinSock returns EINVAL. */
+      if (type != SOCK_DGRAM)
+	{
+	  set_errno (EOPNOTSUPP);
+	  return -1;
+	}
+      if (optlen < (socklen_t) sizeof (int))
+	{
+	  set_errno (EINVAL);
+	  return ret;
+	}
+      switch (optname)
+	{
+	case UDP_SEGMENT:
+	  if (*(int *) optval < 0 || *(int *) optval > USHRT_MAX)
+	    {
+	      set_errno (EINVAL);
+	      return -1;
+	    }
+	  break;
+
+	case UDP_GRO:
+	  /* In contrast to Windows' UDP_RECV_MAX_COALESCED_SIZE option,
+	     Linux' UDP_GRO option is just a bool. The max. packet size
+	     is dynamically evaluated from the MRU.  There's no easy,
+	     reliable way to get the MRU. We assume that this is what Windows
+	     will do internally anyway and, given UDP_RECV_MAX_COALESCED_SIZE
+	     defines a *maximum* size for aggregated packages, we just choose
+	     the maximum sensible value.  FIXME? IP_MTU_DISCOVER / IP_MTU */
+	  winsock_val = *(int *) optval ? USHRT_MAX : 0;
+	  optval = &winsock_val;
+	  break;
+
+	default:
+	  break;
+	}
+      break;
+
+    default:
       break;
     }
 
@@ -2118,6 +2274,16 @@ fhandler_socket_inet::getsockopt (int level, int optname, const void *optval,
 	}
       break;
 
+    case IPPROTO_UDP:
+      /* Check for dgram socket early on, so we don't have to do this for
+	 every option.  Also, WinSock returns EINVAL. */
+      if (type != SOCK_DGRAM)
+	{
+	  set_errno (EOPNOTSUPP);
+	  return -1;
+	}
+      break;
+
     default:
       break;
     }
@@ -2155,6 +2321,7 @@ fhandler_socket_inet::getsockopt (int level, int optname, const void *optval,
 	  break;
 	}
       break;
+
     case IPPROTO_TCP:
       switch (optname)
 	{
@@ -2174,6 +2341,21 @@ fhandler_socket_inet::getsockopt (int level, int optname, const void *optval,
 	default:
 	  break;
 	}
+      break;
+
+    case IPPROTO_UDP:
+      switch (optname)
+	{
+	case UDP_GRO:
+	  /* Convert to bool option */
+	  *(unsigned int *) optval = *(unsigned int *) optval ? 1 : 0;
+	  break;
+
+	default:
+	  break;
+	}
+      break;
+
     default:
       break;
     }

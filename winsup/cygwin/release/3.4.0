@@ -7,6 +7,8 @@ What's new:
 
 - Add code to handle signal masks in /proc/<PID>/status.
 
+- Handle UDP_SEGMENT and UDP_GRO socket options.
+
 
 What changed:
 -------------
