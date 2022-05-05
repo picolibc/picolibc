@@ -1376,9 +1376,9 @@ wait_sig (VOID *)
 	     when _main_tls points to the system-allocated stack, not to
 	     the parent thread. In that case find_tls fails, and we fetch
 	     the sigmask from the child_info passed from the parent. */
-	  tl_entry = cygheap->find_tls (_main_tls);
-	  if (tl_entry)
+	  if (cygwin_finished_initializing)
 	    {
+	      tl_entry = cygheap->find_tls (_main_tls);
 	      dummy_mask = _main_tls->sigmask;
 	      cygheap->unlock_tls (tl_entry);
 	    }
