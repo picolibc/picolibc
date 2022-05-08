@@ -359,6 +359,7 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	     CTRL_C_EVENT. After sending the event, reattach to the
 	     console to which the process was previously attached.  */
 	  bool console_exists = fhandler_console::exists ();
+	  acquire_attach_mutex (mutex_timeout);
 	  pinfo pinfo_resume = pinfo (myself->ppid);
 	  DWORD resume_pid = 0;
 	  if (pinfo_resume)
@@ -366,7 +367,6 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	  else
 	    resume_pid = fhandler_pty_common::get_console_process_id
 	      (myself->dwProcessId, false);
-	  acquire_attach_mutex (mutex_timeout);
 	  if ((!console_exists || resume_pid) && fh && !fh->is_console ())
 	    {
 	      FreeConsole ();

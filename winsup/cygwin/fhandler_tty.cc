@@ -533,6 +533,7 @@ fhandler_pty_master::accept_input ()
       DWORD target_pid = 0;
       if (pinfo_target)
 	target_pid = pinfo_target->dwProcessId;
+      acquire_attach_mutex (mutex_timeout);
       pinfo pinfo_resume = pinfo (myself->ppid);
       DWORD resume_pid;
       if (pinfo_resume)
@@ -544,7 +545,6 @@ fhandler_pty_master::accept_input ()
 	{
 	  /* Slave attaches to a different console than master.
 	     Therefore reattach here. */
-	  acquire_attach_mutex (mutex_timeout);
 	  FreeConsole ();
 	  AttachConsole (target_pid);
 	  cp_to = GetConsoleCP ();
@@ -552,10 +552,10 @@ fhandler_pty_master::accept_input ()
 	  if (resume_pid && console_exists)
 	    AttachConsole (resume_pid);
 	  init_console_handler (false);
-	  release_attach_mutex ();
 	}
       else
 	cp_to = GetConsoleCP ();
+      release_attach_mutex ();
 
       if (get_ttyp ()->term_code_page != cp_to)
 	{
@@ -1244,6 +1244,7 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
 		OpenProcess (PROCESS_DUP_HANDLE, FALSE, get_ttyp ()->pcon_pid);
 	      if (pcon_owner)
 		{
+		  acquire_attach_mutex (mutex_timeout);
 		  pinfo pinfo_resume = pinfo (myself->ppid);
 		  DWORD resume_pid;
 		  if (pinfo_resume)
@@ -1257,7 +1258,6 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
 		      DuplicateHandle (pcon_owner, get_ttyp ()->h_pcon_in,
 				       GetCurrentProcess (), &h_pcon_in,
 				       0, TRUE, DUPLICATE_SAME_ACCESS);
-		      acquire_attach_mutex (mutex_timeout);
 		      FreeConsole ();
 		      AttachConsole (get_ttyp ()->pcon_pid);
 		      init_console_handler (false);
@@ -1268,9 +1268,9 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
 		      FreeConsole ();
 		      AttachConsole (resume_pid);
 		      init_console_handler (false);
-		      release_attach_mutex ();
 		      CloseHandle (h_pcon_in);
 		    }
+		  release_attach_mutex ();
 		  CloseHandle (pcon_owner);
 		}
 	    }
@@ -2878,6 +2878,7 @@ fhandler_pty_master::pty_master_fwd_thread (const master_fwd_thread_param_t *p)
       DWORD target_pid = 0;
       if (pinfo_target)
 	target_pid = pinfo_target->dwProcessId;
+      acquire_attach_mutex (mutex_timeout);
       pinfo pinfo_resume = pinfo (myself->ppid);
       DWORD resume_pid;
       if (pinfo_resume)
@@ -2889,7 +2890,6 @@ fhandler_pty_master::pty_master_fwd_thread (const master_fwd_thread_param_t *p)
 	{
 	  /* Slave attaches to a different console than master.
 	     Therefore reattach here. */
-	  acquire_attach_mutex (mutex_timeout);
 	  FreeConsole ();
 	  AttachConsole (target_pid);
 	  cp_from = GetConsoleOutputCP ();
@@ -2897,10 +2897,10 @@ fhandler_pty_master::pty_master_fwd_thread (const master_fwd_thread_param_t *p)
 	  if (resume_pid && console_exists)
 	    AttachConsole (resume_pid);
 	  init_console_handler (false);
-	  release_attach_mutex ();
 	}
       else
 	cp_from = GetConsoleOutputCP ();
+      release_attach_mutex ();
 
       if (p->ttyp->term_code_page != cp_from)
 	{
