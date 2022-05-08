@@ -335,6 +335,7 @@ tty_min::setpgid (int pid)
 	{
 	  bool attach_restore = false;
 	  HANDLE from = ptys->get_handle_nat ();
+	  WaitForSingleObject (ptys->input_mutex, mutex_timeout);
 	  acquire_attach_mutex (mutex_timeout);
 	  if (ttyp->pcon_activated && ttyp->pcon_pid
 	      && !ptys->get_console_process_id (ttyp->pcon_pid, true))
@@ -350,10 +351,8 @@ tty_min::setpgid (int pid)
 	      init_console_handler (false);
 	      attach_restore = true;
 	    }
-	  WaitForSingleObject (ptys->input_mutex, mutex_timeout);
 	  fhandler_pty_slave::transfer_input (tty::to_cyg, from, ttyp,
 				  ptys->get_input_available_event ());
-	  ReleaseMutex (ptys->input_mutex);
 	  if (attach_restore)
 	    {
 	      FreeConsole ();
@@ -363,6 +362,7 @@ tty_min::setpgid (int pid)
 	      init_console_handler (false);
 	    }
 	  release_attach_mutex ();
+	  ReleaseMutex (ptys->input_mutex);
 	}
       ReleaseMutex (ptys->pcon_mutex);
     }
