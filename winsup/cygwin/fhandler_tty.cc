@@ -2467,6 +2467,8 @@ fhandler_pty_slave::bg_check (int sig, bool dontsignal)
 void
 fhandler_pty_slave::fixup_after_fork (HANDLE parent)
 {
+  create_invisible_console ();
+
   // fork_fixup (parent, inuse, "inuse");
   // fhandler_pty_common::fixup_after_fork (parent);
   report_tty_counts (this, "inherited", "");
@@ -2475,8 +2477,6 @@ fhandler_pty_slave::fixup_after_fork (HANDLE parent)
 void
 fhandler_pty_slave::fixup_after_exec ()
 {
-  create_invisible_console ();
-
   if (!close_on_exec ())
     fixup_after_fork (NULL);	/* No parent handle required. */
 
