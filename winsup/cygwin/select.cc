@@ -1125,7 +1125,6 @@ peek_console (select_record *me, bool)
     {
       if (fh->bg_check (SIGTTIN, true) <= bg_eof)
 	{
-	  release_attach_mutex ();
 	  fh->release_input_mutex ();
 	  return me->read_ready = true;
 	}
@@ -1142,7 +1141,6 @@ peek_console (select_record *me, bool)
 	  && global_sigs[SIGWINCH].sa_handler != SIG_DFL)
 	{
 	  set_sig_errno (EINTR);
-	  release_attach_mutex ();
 	  fh->release_input_mutex ();
 	  return -1;
 	}

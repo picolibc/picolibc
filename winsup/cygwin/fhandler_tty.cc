@@ -1171,11 +1171,7 @@ fhandler_pty_slave::reset_switch_to_nat_pipe (void)
 	      bool need_restore_handles = get_ttyp ()->pcon_activated;
 	      WaitForSingleObject (pipe_sw_mutex, INFINITE);
 	      if (get_ttyp ()->pcon_activated)
-		{
-		  acquire_attach_mutex (mutex_timeout);
-		  close_pseudoconsole (get_ttyp ());
-		  release_attach_mutex ();
-		}
+		close_pseudoconsole (get_ttyp ());
 	      else
 		hand_over_only (get_ttyp ());
 	      ReleaseMutex (pipe_sw_mutex);
@@ -3244,9 +3240,11 @@ fhandler_pty_slave::setup_pseudoconsole ()
 		       GetCurrentProcess (), &hpConOut,
 		       0, TRUE, DUPLICATE_SAME_ACCESS);
       CloseHandle (pcon_owner);
+      acquire_attach_mutex (mutex_timeout);
       FreeConsole ();
       AttachConsole (get_ttyp ()->nat_pipe_owner_pid);
       init_console_handler (false);
+      release_attach_mutex ();
       goto skip_create;
     }
 
@@ -3368,9 +3366,11 @@ fhandler_pty_slave::setup_pseudoconsole ()
       HeapFree (GetProcessHeap (), 0, si.lpAttributeList);
 
       /* Attach to pseudo console */
+      acquire_attach_mutex (mutex_timeout);
       FreeConsole ();
       AttachConsole (pi.dwProcessId);
       init_console_handler (false);
+      release_attach_mutex ();
 
       /* Terminate helper process */
       SetEvent (goodbye);
@@ -3535,8 +3535,10 @@ void
 fhandler_pty_slave::close_pseudoconsole (tty *ttyp, DWORD force_switch_to)
 {
   DWORD switch_to = get_winpid_to_hand_over (ttyp, force_switch_to);
+  acquire_attach_mutex (mutex_timeout);
   ttyp->previous_code_page = GetConsoleCP ();
   ttyp->previous_output_code_page = GetConsoleOutputCP ();
+  release_attach_mutex ();
   if (nat_pipe_owner_self (ttyp->nat_pipe_owner_pid))
     { /* I am owner of the nat pipe. */
       if (switch_to)
@@ -3578,19 +3580,23 @@ fhandler_pty_slave::close_pseudoconsole (tty *ttyp, DWORD force_switch_to)
 	  ttyp->h_pcon_conhost_process = new_conhost_process;
 	  ttyp->h_pcon_in = new_pcon_in;
 	  ttyp->h_pcon_out = new_pcon_out;
+	  acquire_attach_mutex (mutex_timeout);
 	  FreeConsole ();
 	  pinfo p (myself->ppid);
 	  if (!p || !AttachConsole (p->dwProcessId))
 	    AttachConsole (ATTACH_PARENT_PROCESS);
 	  init_console_handler (false);
+	  release_attach_mutex ();
 	}
       else
 	{ /* Close pseudo console and abandon the ownership of the nat pipe. */
+	  acquire_attach_mutex (mutex_timeout);
 	  FreeConsole ();
 	  pinfo p (myself->ppid);
 	  if (!p || !AttachConsole (p->dwProcessId))
 	    AttachConsole (ATTACH_PARENT_PROCESS);
 	  init_console_handler (false);
+	  release_attach_mutex ();
 	  /* Reconstruct pseudo console handler container here for close */
 	  HPCON_INTERNAL *hp =
 	    (HPCON_INTERNAL *) HeapAlloc (GetProcessHeap (), 0,
@@ -3610,11 +3616,13 @@ fhandler_pty_slave::close_pseudoconsole (tty *ttyp, DWORD force_switch_to)
     }
   else
     { /* Just detach from the pseudo console if I am not owner. */
+      acquire_attach_mutex (mutex_timeout);
       FreeConsole ();
       pinfo p (myself->ppid);
       if (!p || !AttachConsole (p->dwProcessId))
 	AttachConsole (ATTACH_PARENT_PROCESS);
       init_console_handler (false);
+      release_attach_mutex ();
     }
 }
 
@@ -4040,11 +4048,7 @@ fhandler_pty_slave::setup_for_non_cygwin_app (bool nopcon, PWCHAR envblock,
     }
   bool pcon_enabled = false;
   if (!nopcon)
-    {
-      acquire_attach_mutex (mutex_timeout);
-      pcon_enabled = setup_pseudoconsole ();
-      release_attach_mutex ();
-    }
+    pcon_enabled = setup_pseudoconsole ();
   ReleaseMutex (pipe_sw_mutex);
   /* For pcon enabled case, transfer_input() is called in master::write() */
   if (!pcon_enabled && get_ttyp ()->getpgid () == myself->pgid
@@ -4077,11 +4081,7 @@ fhandler_pty_slave::cleanup_for_non_cygwin_app (handle_set_t *p, tty *ttyp,
     }
   WaitForSingleObject (p->pipe_sw_mutex, INFINITE);
   if (ttyp->pcon_activated)
-    {
-      acquire_attach_mutex (mutex_timeout);
-      close_pseudoconsole (ttyp, force_switch_to);
-      release_attach_mutex ();
-    }
+    close_pseudoconsole (ttyp, force_switch_to);
   else
     hand_over_only (ttyp, force_switch_to);
   ReleaseMutex (p->pipe_sw_mutex);
@@ -4111,6 +4111,7 @@ fhandler_pty_slave::setpgid_aux (pid_t pid)
       bool attach_restore = false;
       HANDLE from = get_handle_nat ();
       DWORD resume_pid = 0;
+      WaitForSingleObject (input_mutex, mutex_timeout);
       if (get_ttyp ()->pcon_activated && get_ttyp ()->nat_pipe_owner_pid
 	  && !get_console_process_id (get_ttyp ()->nat_pipe_owner_pid, true))
 	{
@@ -4126,13 +4127,12 @@ fhandler_pty_slave::setpgid_aux (pid_t pid)
 	}
       else
 	acquire_attach_mutex (mutex_timeout);
-      WaitForSingleObject (input_mutex, mutex_timeout);
       transfer_input (tty::to_cyg, from, get_ttyp (), input_available_event);
-      ReleaseMutex (input_mutex);
       if (attach_restore)
 	resume_from_temporarily_attach (resume_pid);
       else
 	release_attach_mutex ();
+      ReleaseMutex (input_mutex);
     }
   ReleaseMutex (pipe_sw_mutex);
 }
