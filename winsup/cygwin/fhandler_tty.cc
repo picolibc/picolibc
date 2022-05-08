@@ -4171,13 +4171,13 @@ DWORD
 fhandler_pty_common::attach_console_temporarily (DWORD target_pid)
 {
   DWORD resume_pid = 0;
+  acquire_attach_mutex (mutex_timeout);
   pinfo pinfo_resume (myself->ppid);
   if (pinfo_resume)
     resume_pid = pinfo_resume->dwProcessId;
   if (!resume_pid)
     resume_pid = get_console_process_id (myself->dwProcessId, false);
   bool console_exists = fhandler_console::exists ();
-  acquire_attach_mutex (mutex_timeout);
   if (!console_exists || resume_pid)
     {
       FreeConsole ();
