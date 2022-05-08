@@ -3422,6 +3422,7 @@ skip_create:
       HeapFree (GetProcessHeap (), 0, hp);
     }
 
+  acquire_attach_mutex (mutex_timeout);
   if (get_ttyp ()->previous_code_page)
     SetConsoleCP (get_ttyp ()->previous_code_page);
   if (get_ttyp ()->previous_output_code_page)
@@ -3452,6 +3453,7 @@ skip_create:
 	mode |= DISABLE_NEWLINE_AUTO_RETURN;
       SetConsoleMode (hpConOut, mode);
     }
+  release_attach_mutex ();
 
   return true;
 
