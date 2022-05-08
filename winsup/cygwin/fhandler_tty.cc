@@ -2518,6 +2518,8 @@ fhandler_pty_slave::setup_locale (void)
 void
 fhandler_pty_slave::fixup_after_fork (HANDLE parent)
 {
+  create_invisible_console ();
+
   // fork_fixup (parent, inuse, "inuse");
   // fhandler_pty_common::fixup_after_fork (parent);
   report_tty_counts (this, "inherited", "");
@@ -2527,7 +2529,6 @@ void
 fhandler_pty_slave::fixup_after_exec ()
 {
   reset_switch_to_pcon ();
-  create_invisible_console ();
 
   if (!close_on_exec ())
     fixup_after_fork (NULL);	/* No parent handle required. */
