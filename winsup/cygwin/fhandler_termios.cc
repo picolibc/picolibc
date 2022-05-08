@@ -324,9 +324,6 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
   pid_t pgid = ttyp->pgid;
 
   /* The name *_nat stands for 'native' which means non-cygwin apps. */
-  pinfo leader (pgid);
-  bool cyg_leader = /* The process leader is a cygwin process. */
-    leader && !(leader->process_state & PID_NOTCYGWIN);
   bool ctrl_c_event_sent = false;
   bool need_discard_input = false;
   bool pg_with_nat = false; /* The process group has non-cygwin processes. */
@@ -373,9 +370,9 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	     instead. */
 	  if (p->process_state & PID_NEW_PG)
 	    GenerateConsoleCtrlEvent (CTRL_BREAK_EVENT, p->dwProcessId);
-	  else if ((!fh || fh->need_send_ctrl_c_event () || cyg_leader)
-		   && !ctrl_c_event_sent) /* cyg_leader is needed by GDB
-					     with non-cygwin inferior */
+	  else if ((!fh || fh->need_send_ctrl_c_event ()
+		    || p->exec_dwProcessId == p->dwProcessId)
+		   && !ctrl_c_event_sent)
 	    {
 	      GenerateConsoleCtrlEvent (CTRL_C_EVENT, 0);
 	      ctrl_c_event_sent = true;
