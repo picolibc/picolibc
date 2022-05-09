@@ -1608,7 +1608,7 @@ fhandler_console::close ()
   if (con_ra.rabuf)
     free (con_ra.rabuf);
 
-  if (!have_execed)
+  if (!have_execed && !invisible_console)
     free_console ();
   return 0;
 }
