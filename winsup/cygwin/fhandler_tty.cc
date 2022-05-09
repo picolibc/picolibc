@@ -4184,8 +4184,7 @@ fhandler_pty_common::attach_console_temporarily (DWORD target_pid)
     {
       FreeConsole ();
       AttachConsole (target_pid);
-      init_console_handler (::cygheap->ctty
-			    && ::cygheap->ctty->is_console ());
+      init_console_handler (false);
     }
   return console_exists ? resume_pid : (DWORD) -1;
 }
@@ -4200,8 +4199,7 @@ fhandler_pty_common::resume_from_temporarily_attach (DWORD resume_pid)
       if (console_exists)
 	if (!resume_pid || !AttachConsole (resume_pid))
 	  AttachConsole (ATTACH_PARENT_PROCESS);
-      init_console_handler (::cygheap->ctty
-			    && ::cygheap->ctty->is_console ());
+      init_console_handler (false);
     }
   release_attach_mutex ();
 }
