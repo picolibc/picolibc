@@ -1092,6 +1092,11 @@ format_process_stat (void *data, char *&destbuf)
 		vmsize = 0UL, vmrss = 0UL, vmmaxrss = 0UL;
   uint64_t utime = 0ULL, stime = 0ULL, start_time = 0ULL;
   int nice = 0;
+/* ctty maj is 31:16, min is 15:0; tty_nr s/b maj 15:8, min 31:20, 7:0;
+   maj is 31:16 >> 16 & fff << 8; min is 15:0 >> 8 & ff << 20 | & ff */
+  int tty_nr =    (((p->ctty >>  8) & 0xff)  << 20)
+		| (((p->ctty >> 16) & 0xfff) <<  8)
+		|   (p->ctty        & 0xff);
 
   if (p->process_state & PID_EXITED)
     strcpy (cmd, "<defunct>");
@@ -1171,23 +1176,25 @@ format_process_stat (void *data, char *&destbuf)
   else
     start_time = (p->start_time - to_time_t (&stodi.BootTime)) * CLOCKS_PER_SEC;
   unsigned page_size = wincap.page_size ();
-  vmsize = vmc.PagefileUsage;
-  vmrss = vmc.WorkingSetSize / page_size;
-  vmmaxrss = ql.MaximumWorkingSetSize / page_size;
+  vmsize = vmc.PagefileUsage;			/* bytes */
+  vmrss = vmc.WorkingSetSize / page_size;	/* pages */
+  vmmaxrss = ql.MaximumWorkingSetSize;		/* bytes */
 
   destbuf = (char *) crealloc_abort (destbuf, strlen (cmd) + 320);
   return __small_sprintf (destbuf, "%d (%s) %c "
-				   "%d %d %d %d %d "
-				   "%u %lu %lu %u %u %lu %lu "
-				   "%U %U %d %d %d %d "
-				   "%U %lu "
-				   "%ld %lu\n",
+				   "%d %d %d %d "
+				   "%d %u %lu %lu %u %u "
+				   "%U %U %U %U "
+				   "%d %d %d %d "
+				   "%U "
+				   "%lu %ld %lu\n",
 			  p->pid, cmd, state,
-			  p->ppid, p->pgid, p->sid, p->ctty, -1,
-			  0, fault_count, fault_count, 0, 0, utime, stime,
-			  utime, stime, NZERO + nice, nice, 0, 0,
-			  start_time, vmsize,
-			  vmrss, vmmaxrss
+			  p->ppid, p->pgid, p->sid, tty_nr,
+			  -1, 0, fault_count, fault_count, 0, 0,
+			  utime, stime, utime, stime,
+			  NZERO + nice, nice, 0, 0,
+			  start_time,
+			  vmsize, vmrss, vmmaxrss
 			  );
 }
 
