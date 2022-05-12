@@ -11,6 +11,7 @@ details. */
 
 #include "winsup.h"
 #include <stdlib.h>
+#include <unistd.h>
 #include <sys/cygwin.h>
 #include <sys/signalfd.h>
 #include "pinfo.h"
@@ -174,7 +175,7 @@ sleep (unsigned int seconds)
   return 0;
 }
 
-extern "C" unsigned int
+extern "C" int
 usleep (useconds_t useconds)
 {
   struct timespec req;
