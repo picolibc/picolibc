@@ -345,9 +345,11 @@ struct _rand48 {
 #ifdef _REENT_BACKWARD_BINARY_COMPAT
 #define _REENT_INIT_RESERVED_0 0,
 #define _REENT_INIT_RESERVED_1 0,
+#define _REENT_INIT_RESERVED_2 0,
 #else
 #define _REENT_INIT_RESERVED_0 /* Nothing to initialize */
 #define _REENT_INIT_RESERVED_1 /* Nothing to initialize */
+#define _REENT_INIT_RESERVED_2 /* Nothing to initialize */
 #endif
 
 /*
@@ -661,7 +663,9 @@ struct _reent
     {
       struct
         {
-          unsigned int _unused_rand;
+#ifdef _REENT_BACKWARD_BINARY_COMPAT
+          unsigned int _reserved_2;
+#endif
           char * _strtok_last;
           char _asctime_buf[_REENT_ASCTIME_SIZE];
           struct __tm _localtime_buf;
@@ -741,7 +745,7 @@ struct _reent
     _NULL, \
     { \
       { \
-        0, \
+        _REENT_INIT_RESERVED_2 \
         _NULL, \
         "", \
         {0, 0, 0, 0, 0, 0, 0, 0, 0}, \
