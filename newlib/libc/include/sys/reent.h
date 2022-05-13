@@ -344,8 +344,10 @@ struct _rand48 {
 
 #ifdef _REENT_BACKWARD_BINARY_COMPAT
 #define _REENT_INIT_RESERVED_0 0,
+#define _REENT_INIT_RESERVED_1 0,
 #else
 #define _REENT_INIT_RESERVED_0 /* Nothing to initialize */
+#define _REENT_INIT_RESERVED_1 /* Nothing to initialize */
 #endif
 
 /*
@@ -403,9 +405,8 @@ struct _reent
 
 #ifdef _REENT_BACKWARD_BINARY_COMPAT
   int _reserved_0;
+  int _reserved_1;
 #endif
-
-  int _unspecified_locale_info;	/* unused, reserved for locale stuff */
   struct __locale_t *_locale;/* per-thread locale */
 
   struct _mprec *_mp;
@@ -447,7 +448,7 @@ struct _reent
     0,   \
     _NULL, \
     _REENT_INIT_RESERVED_0 \
-    0, \
+    _REENT_INIT_RESERVED_1 \
     _NULL, \
     _NULL, \
     _NULL, \
@@ -485,7 +486,7 @@ extern const struct __sFILE_fake __sf_fake_stderr;
     0, \
     _NULL, \
     _REENT_INIT_RESERVED_0 \
-    0, \
+    _REENT_INIT_RESERVED_1 \
     _NULL, \
     _NULL, \
     _NULL, \
@@ -635,8 +636,9 @@ struct _reent
   int  _inc;			/* used by tmpnam */
   char _emergency[_REENT_EMERGENCY_SIZE];
 
-  /* TODO */
-  int _unspecified_locale_info;	/* unused, reserved for locale stuff */
+#ifdef _REENT_BACKWARD_BINARY_COMPAT
+  int _reserved_1;
+#endif
   struct __locale_t *_locale;/* per-thread locale */
 
 #ifdef _REENT_BACKWARD_BINARY_COMPAT
@@ -727,7 +729,7 @@ struct _reent
     _REENT_STDIO_STREAM(&(var), 2), \
     0, \
     "", \
-    0, \
+    _REENT_INIT_RESERVED_1 \
     _NULL, \
     _REENT_INIT_RESERVED_0 \
     _NULL, \
