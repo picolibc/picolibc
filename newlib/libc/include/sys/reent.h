@@ -342,6 +342,12 @@ struct _rand48 {
 #define _REENT_ASCTIME_SIZE 26
 #define _REENT_SIGNAL_SIZE 24
 
+#ifdef _REENT_BACKWARD_BINARY_COMPAT
+#define _REENT_INIT_RESERVED_0 0,
+#else
+#define _REENT_INIT_RESERVED_0 /* Nothing to initialize */
+#endif
+
 /*
  * struct _reent
  *
@@ -395,9 +401,9 @@ struct _reent
 
   char *_emergency;
 
-  /* No longer used, but member retained for binary compatibility.
-     Now, the __cleanup member is used to check initialization. */
-  int _unused_sdidinit;
+#ifdef _REENT_BACKWARD_BINARY_COMPAT
+  int _reserved_0;
+#endif
 
   int _unspecified_locale_info;	/* unused, reserved for locale stuff */
   struct __locale_t *_locale;/* per-thread locale */
@@ -440,7 +446,7 @@ struct _reent
     &__sf[2], \
     0,   \
     _NULL, \
-    0, \
+    _REENT_INIT_RESERVED_0 \
     0, \
     _NULL, \
     _NULL, \
@@ -478,7 +484,7 @@ extern const struct __sFILE_fake __sf_fake_stderr;
     (__FILE *)&__sf_fake_stderr, \
     0, \
     _NULL, \
-    0, \
+    _REENT_INIT_RESERVED_0 \
     0, \
     _NULL, \
     _NULL, \
@@ -633,9 +639,9 @@ struct _reent
   int _unspecified_locale_info;	/* unused, reserved for locale stuff */
   struct __locale_t *_locale;/* per-thread locale */
 
-  /* No longer used, but member retained for binary compatibility.
-     Now, the __cleanup member is used to check initialization. */
-  int _unused_sdidinit;
+#ifdef _REENT_BACKWARD_BINARY_COMPAT
+  int _reserved_0;
+#endif
 
   void (*__cleanup) (struct _reent *);
 
@@ -723,7 +729,7 @@ struct _reent
     "", \
     0, \
     _NULL, \
-    0, \
+    _REENT_INIT_RESERVED_0 \
     _NULL, \
     _NULL, \
     0, \
