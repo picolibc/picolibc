@@ -142,16 +142,16 @@ AC_ARG_ENABLE(newlib-atexit-dynamic-alloc,
 
 dnl Support --enable-newlib-global-atexit
 dnl Enable atexit data structure as global variables to save memory usage in
-dnl _reent.
+dnl _reent.  This is no longer optional.  It is enabled in all Newlib
+dnl configurations.
 AC_ARG_ENABLE(newlib-global-atexit,
 [  --enable-newlib-global-atexit	enable atexit data structure as global],
 [if test "${newlib_global_atexit+set}" != set; then
   case "${enableval}" in
     yes) newlib_global_atexit=yes ;;
-    no)  newlib_global_atexit=no  ;;
     *)   AC_MSG_ERROR(bad value ${enableval} for newlib-global-atexit option) ;;
   esac
- fi], [newlib_global_atexit=no])dnl
+ fi], [newlib_global_atexit=yes])dnl
 
 dnl Support --enable-newlib-reent-small
 AC_ARG_ENABLE(newlib-reent-small,
@@ -468,10 +468,6 @@ fi
 
 if test "${newlib_atexit_dynamic_alloc}" = "yes"; then
   AC_DEFINE(_ATEXIT_DYNAMIC_ALLOC, 1, [If atexit() may dynamically allocate space for cleanup functions.])
-fi
-
-if test "${newlib_global_atexit}" = "yes"; then
-  AC_DEFINE(_REENT_GLOBAL_ATEXIT, 1, [Define if declare atexit data as global.])
 fi
 
 if test "${newlib_fvwrite_in_streamio}" = "yes"; then

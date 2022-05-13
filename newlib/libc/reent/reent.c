@@ -93,25 +93,6 @@ _reclaim_reent (struct _reent *ptr)
 	_free_r (ptr, ptr->_misc);
 #endif
 
-#ifndef _REENT_GLOBAL_ATEXIT
-      /* atexit stuff */
-# ifdef _REENT_SMALL
-      if (ptr->_atexit && ptr->_atexit->_on_exit_args_ptr)
-	_free_r (ptr, ptr->_atexit->_on_exit_args_ptr);
-# else
-      if ((ptr->_atexit) && (ptr->_atexit != &ptr->_atexit0))
-	{
-	  struct _atexit *p, *q;
-	  for (p = ptr->_atexit; p != &ptr->_atexit0;)
-	    {
-	      q = p;
-	      p = p->_next;
-	      _free_r (ptr, q);
-	    }
-	}
-# endif
-#endif
-
       if (ptr->_cvtbuf)
 	_free_r (ptr, ptr->_cvtbuf);
     /* We should free _sig_func to avoid a memory leak, but how to

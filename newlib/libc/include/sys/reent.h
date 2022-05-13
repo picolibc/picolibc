@@ -105,13 +105,6 @@ struct _atexit {
 # define _ATEXIT_INIT {_NULL, 0, {_NULL}, {{_NULL}, {_NULL}, 0, 0}}
 #endif
 
-#ifdef _REENT_GLOBAL_ATEXIT
-# define _REENT_INIT_ATEXIT
-#else
-# define _REENT_INIT_ATEXIT \
-  _NULL, _ATEXIT_INIT,
-#endif
-
 /*
  * Stdio buffers.
  *
@@ -346,10 +339,12 @@ struct _rand48 {
 #define _REENT_INIT_RESERVED_0 0,
 #define _REENT_INIT_RESERVED_1 0,
 #define _REENT_INIT_RESERVED_2 0,
+#define _REENT_INIT_RESERVED_6_7 _NULL, _ATEXIT_INIT,
 #else
 #define _REENT_INIT_RESERVED_0 /* Nothing to initialize */
 #define _REENT_INIT_RESERVED_1 /* Nothing to initialize */
 #define _REENT_INIT_RESERVED_2 /* Nothing to initialize */
+#define _REENT_INIT_RESERVED_6_7 /* Nothing to initialize */
 #endif
 
 /*
@@ -428,11 +423,10 @@ struct _reent
   /* signal info */
   void (**(_sig_func))(int);
 
-# ifndef _REENT_GLOBAL_ATEXIT
-  /* atexit stuff */
-  struct _atexit *_atexit;
-  struct _atexit _atexit0;
-# endif
+#ifdef _REENT_BACKWARD_BINARY_COMPAT
+  struct _atexit *_reserved_6;
+  struct _atexit _reserved_7;
+#endif
 
   struct _glue __sglue;			/* root of glue chain */
   __FILE *__sf;			        /* file descriptors */
@@ -461,7 +455,7 @@ struct _reent
     _NULL, \
     _NULL, \
     _NULL, \
-    _REENT_INIT_ATEXIT \
+    _REENT_INIT_RESERVED_6_7 \
     {_NULL, 0, _NULL}, \
     _NULL, \
     _NULL, \
@@ -499,7 +493,7 @@ extern const struct __sFILE_fake __sf_fake_stderr;
     _NULL, \
     _NULL, \
     _NULL, \
-    _REENT_INIT_ATEXIT \
+    _REENT_INIT_RESERVED_6_7 \
     {_NULL, 0, _NULL}, \
     _NULL, \
     _NULL, \
@@ -694,11 +688,10 @@ struct _reent
 #endif
     } _new;
 
-# ifndef _REENT_GLOBAL_ATEXIT
-  /* atexit stuff */
-  struct _atexit *_atexit;	/* points to head of LIFO stack */
-  struct _atexit _atexit0;	/* one guaranteed table, required by ANSI */
-# endif
+#ifdef _REENT_BACKWARD_BINARY_COMPAT
+  struct _atexit *_reserved_6;
+  struct _atexit _reserved_7;
+#endif
 
   /* signal info */
   void (**_sig_func)(int);
@@ -767,7 +760,7 @@ struct _reent
         {0, {0}} \
       } \
     }, \
-    _REENT_INIT_ATEXIT \
+    _REENT_INIT_RESERVED_6_7 \
     _NULL \
     _REENT_INIT_SGLUE(&(var)) \
   }
@@ -869,12 +862,8 @@ extern int _fwalk_sglue (struct _reent *, int (*)(struct _reent *, __FILE *),
 
 #define _GLOBAL_REENT (&_impure_data)
 
-#ifdef _REENT_GLOBAL_ATEXIT
-extern struct _atexit *_global_atexit; /* points to head of LIFO stack */
-# define _GLOBAL_ATEXIT _global_atexit
-#else
-# define _GLOBAL_ATEXIT (_GLOBAL_REENT->_atexit)
-#endif
+extern struct _atexit *__atexit; /* points to head of LIFO stack */
+extern struct _atexit __atexit0; /* one guaranteed table, required by ANSI */
 
 #ifdef __cplusplus
 }

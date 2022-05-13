@@ -242,7 +242,6 @@
 #define __FILENAME_MAX__ 255
 #define _READ_WRITE_RETURN_TYPE _ssize_t
 #define __DYNAMIC_REENT__
-#define _REENT_GLOBAL_ATEXIT
 #define _REENT_GLOBAL_STDIO_STREAMS
 #endif
 

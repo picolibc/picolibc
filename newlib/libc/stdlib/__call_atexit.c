@@ -17,9 +17,7 @@ void free(void *) _ATTRIBUTE((__weak__));
 __LOCK_INIT_RECURSIVE(, __atexit_recursive_mutex);
 #endif
 
-#ifdef _REENT_GLOBAL_ATEXIT
-struct _atexit *_global_atexit = _NULL;
-#endif
+struct _atexit *__atexit = _NULL;
 
 #ifdef _WANT_REGISTER_FINI
 
@@ -83,8 +81,8 @@ __call_exitprocs (int code, void *d)
 
  restart:
 
-  p = _GLOBAL_ATEXIT;
-  lastp = &_GLOBAL_ATEXIT;
+  p = __atexit;
+  lastp = &__atexit;
   while (p)
     {
 #ifdef _REENT_SMALL

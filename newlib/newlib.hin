@@ -378,9 +378,6 @@
 /* Verify _REENT_CHECK macros allocate memory successfully. */
 #undef _REENT_CHECK_VERIFY
 
-/* Define if declare atexit data as global. */
-#undef _REENT_GLOBAL_ATEXIT
-
 /* Define if using retargetable functions for default lock routines. */
 #undef _RETARGETABLE_LOCKING
 

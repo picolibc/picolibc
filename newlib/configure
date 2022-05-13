@@ -2373,12 +2373,11 @@ if test "${enable_newlib_global_atexit+set}" = set; then :
   enableval=$enable_newlib_global_atexit; if test "${newlib_global_atexit+set}" != set; then
   case "${enableval}" in
     yes) newlib_global_atexit=yes ;;
-    no)  newlib_global_atexit=no  ;;
     *)   as_fn_error $? "bad value ${enableval} for newlib-global-atexit option" "$LINENO" 5 ;;
   esac
  fi
 else
-  newlib_global_atexit=no
+  newlib_global_atexit=yes
 fi
 
 # Check whether --enable-newlib-reent-small was given.
@@ -6481,12 +6480,6 @@ fi
 if test "${newlib_atexit_dynamic_alloc}" = "yes"; then
 
 $as_echo "#define _ATEXIT_DYNAMIC_ALLOC 1" >>confdefs.h
-
-fi
-
-if test "${newlib_global_atexit}" = "yes"; then
-
-$as_echo "#define _REENT_GLOBAL_ATEXIT 1" >>confdefs.h
 
 fi
 

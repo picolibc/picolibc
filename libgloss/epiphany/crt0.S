@@ -113,23 +113,19 @@ _external_start:
 #else
 	; calling atexit drags in malloc, so instead poke the function
 	; address directly into the reent structure
-	mov	r2,%low(__impure_ptr)
-	movt	r2,%high(__impure_ptr)
-	ldr	r2,[r2]
-	mov	r1,%low(fini)
-	movt	r1,%high(fini)
+	mov	r1,%low(__atexit0)
+	movt	r1,%high(__atexit0)
+	mov	r2,%low(__atexit)
+	movt	r2,%high(__atexit)
 #ifdef __STRUCT_ALIGN_64__
-#error
-	add	r2,r2,need_to_find_out; &_GLOBAL_REENT->atexit0
-	str	r2, [r2,-1];??or -2?; _GLOBAL_REENT->atexit
-	mov	r0, 1
-	str	r0, [r2,1]	; _GLOBAL_REENT->atexit0._ind
-	str	r1, [r2,2]	; _GLOBAL_REENT->atexit0._fns[0]
+#error "not implemented"
 #else  /* !__STRUCT_ALIGN_64__ */
-	add	r0,r2,0x14c	; &_GLOBAL_REENT->atexit0
-	str	r0, [r0,-1]	; _GLOBAL_REENT->atexit
-	mov	r0, 1
-	strd	r0, [r2,0x2a]	; _GLOBAL_REENT->atexit0._ind
+	str	r1, [r2, 0]	; __atexit = &__atexit0
+	movr	r0, 1
+	str	r0, [r1, 4]	; __atexit0._ind = 1
+	mov	r0,%low(fini)
+	movt	r0,%high(fini)
+	str	r0, [r1, 8]	; __atexit0._fns[0] = fini
 #endif /* !__STRUCT_ALIGN_64__ */
 #endif /* !0 */
 	;; Call global and static constructors
