@@ -310,6 +310,12 @@ One feature can be enabled by specifying `--enable-FEATURE=yes' or
      Enable small reentrant struct support.
      Disabled by default.
 
+`--enable-newlib-reent-binary-compat'
+     Enable backward binary compatibility for struct _reent.  If enabled, then
+     unused members in struct _reent are preserved to maintain the structure
+     layout.
+     Disabled by default.
+
 `--disable-newlib-fvwrite-in-streamio'
      NEWLIB implements the vector buffer mechanism to support stream IO
      buffering required by C standard.  This feature is possibly

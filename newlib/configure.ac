@@ -162,6 +162,17 @@ AC_ARG_ENABLE(newlib-reent-small,
   *)   AC_MSG_ERROR(bad value ${enableval} for newlib-reent-small option) ;;
  esac], [newlib_reent_small=])dnl
 
+dnl Support --enable-newlib-reent-binary-compat
+AC_ARG_ENABLE(newlib-reent-binary-compat,
+[  --enable-newlib-reent-binary-compat   enable backward binary compatibility for struct _reent],
+[if test "${newlib_reent_binary_compat+set}" != set; then
+  case "${enableval}" in
+    yes) newlib_reent_binary_compat=yes ;;
+    no)  newlib_reent_binary_compat=no  ;;
+    *)   AC_MSG_ERROR(bad value ${enableval} for newlib-enable-reent-binary-compat option) ;;
+  esac
+ fi], [newlib_reent_binary_compat=no])dnl
+
 dnl Support --enable-newlib-global-stdio-streams
 AC_ARG_ENABLE(newlib-global-stdio-streams,
 [  --enable-newlib-global-stdio-streams   enable global stdio streams],
@@ -418,6 +429,10 @@ fi
 
 if test "${newlib_reent_small}" = "yes"; then
   AC_DEFINE(_WANT_REENT_SMALL, 1, [Optional reentrant struct support.  Used mostly on platforms with very restricted storage.])
+fi
+
+if test "${newlib_reent_binary_compat}" = "yes"; then
+  AC_DEFINE(_WANT_REENT_BACKWARD_BINARY_COMPAT, 1, [Define to enable backward binary compatibility for struct _reent.])
 fi
 
 if test "${newlib_global_stdio_streams}" = "yes"; then
