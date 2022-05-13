@@ -30,7 +30,7 @@ int errno;
 #ifndef _REENT_GLOBAL_STDIO_STREAMS
 /* Interim cleanup code */
 
-void
+static void
 cleanup_glue (struct _reent *ptr,
      struct _glue *glue)
 {

@@ -316,7 +316,6 @@ chroot SIGFE
 cimag NOSIGFE
 cimagf NOSIGFE
 cimagl NOSIGFE
-cleanup_glue NOSIGFE
 clearenv SIGFE
 clearerr SIGFE
 clearerr_unlocked SIGFE
