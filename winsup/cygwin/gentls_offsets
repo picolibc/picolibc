@@ -43,7 +43,7 @@ gawk '
   }
 ' | \
 # Now run the compiler to generate an assembler file.
-${CXXCOMPILE} -x c++ -g0 -S - -o - | \
+${CXXCOMPILE} -x c++ -g0 -O0 -S - -o - | \
 # The assembler file consists of lines like these:
 #
 #   __CYGTLS__foo
@@ -63,7 +63,7 @@ gawk '\
   /\s*\.space\s*4/ {
     if (length (varname) > 0) {
       printf (".equ _cygtls.%s, %d\n", varname, -start_offset);
-      printf (".equ _cygtls.p%s, 0\n", varname);
+      printf (".equ _cygtls.%s_p, 0\n", varname);
       varname = "";
     }
   }
@@ -75,7 +75,7 @@ gawk '\
       } else {
       	value = $2;
 	printf (".equ _cygtls.%s, %d\n", varname, value - start_offset);
-	printf (".equ _cygtls.p%s, %d\n", varname, value);
+	printf (".equ _cygtls.%s_p, %d\n", varname, value);
       }
       varname = "";
     }

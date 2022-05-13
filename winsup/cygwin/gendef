@@ -318,7 +318,7 @@ _sigdelayed_end:
 _ZN7_cygtls3popEv:
 	.seh_endprologue
 	movq	\$-8,%r11
-	xaddq	%r11,_cygtls.pstackptr(%rcx)
+	xaddq	%r11,_cygtls.stackptr_p(%rcx)
 	movq	-8(%r11),%rax
 	ret
 	.seh_endproc
@@ -332,7 +332,7 @@ _ZN7_cygtls4lockEv:
 	.seh_endprologue
 	movq	%rcx,%r12
 1:	movl	\$1,%r11d
-	xchgl	%r11d,_cygtls.pstacklock(%r12)
+	xchgl	%r11d,_cygtls.stacklock_p(%r12)
 	testl   %r11d,%r11d
 	jz	2f
 	pause
@@ -346,7 +346,7 @@ _ZN7_cygtls4lockEv:
 	.seh_proc _ZN7_cygtls6unlockEv
 _ZN7_cygtls6unlockEv:
 	.seh_endprologue
-	decl	_cygtls.pstacklock(%rcx)
+	decl	_cygtls.stacklock_p(%rcx)
 	ret
 	.seh_endproc
 
@@ -355,7 +355,7 @@ _ZN7_cygtls6unlockEv:
 	.seh_proc _ZN7_cygtls6lockedEv
 _ZN7_cygtls6lockedEv:
 	.seh_endprologue
-	movl	_cygtls.pstacklock(%rcx),%eax
+	movl	_cygtls.stacklock_p(%rcx),%eax
 	ret
 	.seh_endproc
 
@@ -528,7 +528,7 @@ __ZN7_cygtls3popEv\@4:
 1:	pushl	%ebx
 	movl	%eax,%ebx			# this
 	movl	\$-4,%eax
-	xadd	%eax,_cygtls.pstackptr(%ebx)
+	xadd	%eax,_cygtls.stackptr_p(%ebx)
 	movl	-4(%eax),%eax
 	popl	%ebx
 	ret
@@ -539,7 +539,7 @@ __ZN7_cygtls4lockEv\@4:
 	pushl	%ebx
 	movl	%eax,%ebx
 1:	movl	\$1,%eax
-	xchgl	%eax,_cygtls.pstacklock(%ebx)
+	xchgl	%eax,_cygtls.stacklock_p(%ebx)
 	testl	%eax,%eax
 	jz	2f
 	call	_yield
@@ -550,12 +550,12 @@ __ZN7_cygtls4lockEv\@4:
 # _cygtls::unlock
 	.global	__ZN7_cygtls6unlockEv\@4
 __ZN7_cygtls6unlockEv\@4:
-	decl	_cygtls.pstacklock(%eax)
+	decl	_cygtls.stacklock_p(%eax)
 	ret
 
 	.global	__ZN7_cygtls6lockedEv
 __ZN7_cygtls6lockedEv:
-	movl	_cygtls.pstacklock(%eax),%eax
+	movl	_cygtls.stacklock_p(%eax),%eax
 	ret
 
 	.extern	__ZN7_cygtls19call_signal_handlerEv\@4
