@@ -72,6 +72,7 @@ extern inline struct _reent *__getreent (void)
 #define __TM_GMTOFF tm_gmtoff
 #define __TM_ZONE   tm_zone
 #define _USE_LONG_TIME_T 1
+#define _REENT_BACKWARD_BINARY_COMPAT 1
 
 #if defined(__INSIDE_CYGWIN__) || defined(_LIBC)
 #define __EXPORT __declspec(dllexport)
