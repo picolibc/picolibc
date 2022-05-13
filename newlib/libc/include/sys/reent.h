@@ -685,15 +685,13 @@ struct _reent
           _mbstate_t _wcsrtombs_state;
 	  int _h_errno;
         } _reent;
-  /* Two next two fields were once used by malloc.  They are no longer
-     used. They are used to preserve the space used before so as to
-     allow addition of new reent fields and keep binary compatibility.   */
+#ifdef _REENT_BACKWARD_BINARY_COMPAT
       struct
         {
-#define _N_LISTS 30
-          unsigned char * _nextf[_N_LISTS];
-          unsigned int _nmalloc[_N_LISTS];
-        } _unused;
+          unsigned char * _reserved_3[30];
+          unsigned int _reserved_4[30];
+        } _reserved_5;
+#endif
     } _new;
 
 # ifndef _REENT_GLOBAL_ATEXIT
