@@ -55,16 +55,8 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
       _REENT_INIT_PTR (&local_clib);
       stackptr = stack;
       altstack.ss_flags = SS_DISABLE;
-      if (_GLOBAL_REENT)
-	{
-	  local_clib._stdin = _GLOBAL_REENT->_stdin;
-	  local_clib._stdout = _GLOBAL_REENT->_stdout;
-	  local_clib._stderr = _GLOBAL_REENT->_stderr;
-	  if (_GLOBAL_REENT->__cleanup)
-	    local_clib.__cleanup = _cygtls::cleanup_early;
-	  local_clib.__sglue._niobs = 3;
-	  local_clib.__sglue._iobs = &_GLOBAL_REENT->__sf[0];
-	}
+      if (_GLOBAL_REENT->__cleanup)
+	local_clib.__cleanup = _cygtls::cleanup_early;
     }
 
   thread_id = GetCurrentThreadId ();

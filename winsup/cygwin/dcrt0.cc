@@ -756,10 +756,6 @@ dll_crt0_0 ()
   SetErrorMode (SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
 
   lock_process::init ();
-  _impure_ptr = _GLOBAL_REENT;
-  _impure_ptr->_stdin = &_impure_ptr->__sf[0];
-  _impure_ptr->_stdout = &_impure_ptr->__sf[1];
-  _impure_ptr->_stderr = &_impure_ptr->__sf[2];
   user_data->impure_ptr = _impure_ptr;
   user_data->impure_ptr_ptr = &_impure_ptr;
 
