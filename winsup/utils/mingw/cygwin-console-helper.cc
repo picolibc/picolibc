@@ -6,11 +6,11 @@ main (int argc, char **argv)
   char *end;
   if (argc < 3)
     exit (1);
+  SetConsoleCtrlHandler (NULL, TRUE);
   HANDLE h = (HANDLE) strtoull (argv[1], &end, 0);
   SetEvent (h);
   if (argc == 4) /* Pseudo console helper mode for PTY */
     {
-      SetConsoleCtrlHandler (NULL, TRUE);
       HANDLE hPipe = (HANDLE) strtoull (argv[3], &end, 0);
       char buf[64];
       sprintf (buf, "StdHandles=%p,%p\n",

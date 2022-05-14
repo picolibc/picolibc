@@ -1984,6 +1984,7 @@ class fhandler_termios: public fhandler_base
   virtual void setpgid_aux (pid_t pid) {}
   virtual bool need_console_handler () { return false; }
   virtual bool need_send_ctrl_c_event () { return true; }
+  virtual DWORD get_helper_pid () { return 0; }
 };
 
 enum ansi_intensity
@@ -2343,7 +2344,7 @@ class fhandler_pty_common: public fhandler_termios
 				       bool cygwin = false,
 				       bool stub_only = false);
   bool to_be_read_from_nat_pipe (void);
-  static DWORD attach_console_temporarily (DWORD target_pid);
+  static DWORD attach_console_temporarily (DWORD target_pid, DWORD helper_pid);
   static void resume_from_temporarily_attach (DWORD resume_pid);
 
  protected:
@@ -2472,6 +2473,7 @@ public:
     HANDLE from_slave_nat;
     HANDLE output_mutex;
     tty *ttyp;
+    DWORD helper_pid;
   };
 private:
   int pktmode;			// non-zero if pty in a packet mode.
@@ -2483,6 +2485,9 @@ private:
   HANDLE to_master, from_master;
   cygthread *master_fwd_thread;	// Master forwarding thread
   HANDLE thread_param_copied_event;
+  HANDLE helper_goodbye;
+  HANDLE helper_h_process;
+  DWORD helper_pid;
 
 public:
   HANDLE get_echo_handle () const { return echo_r; }
@@ -2537,6 +2542,7 @@ public:
   void get_master_fwd_thread_param (master_fwd_thread_param_t *p);
   void set_mask_flusho (bool m) { get_ttyp ()->mask_flusho = m; }
   bool need_send_ctrl_c_event ();
+  DWORD get_helper_pid () { return helper_pid; }
 };
 
 class fhandler_dev_null: public fhandler_base
