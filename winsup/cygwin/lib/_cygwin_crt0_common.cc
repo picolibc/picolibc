@@ -170,7 +170,10 @@ _cygwin_crt0_common (MainFunc f, per_process *u)
   u->pseudo_reloc_end = &__RUNTIME_PSEUDO_RELOC_LIST_END__;
   u->image_base = &_image_base__;
   /* This is actually a dummy call to force the linker to load this
-     symbol for older apps which need it.  */
+     symbol for older apps which need it. Unfortunately, ld for x86_64
+     still emits this symbol when linking against static libs which
+     require pseudo relocation, so we can't drop this call and the
+     dummy function just yet. */
   _pei386_runtime_relocator (NULL);
   return 1;
 }
