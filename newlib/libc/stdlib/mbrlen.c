@@ -5,6 +5,10 @@
 #include <stdio.h>
 #include <errno.h>
 
+#ifdef _REENT_THREAD_LOCAL
+_Thread_local _mbstate_t _tls_mbrlen_state;
+#endif
+
 size_t
 mbrlen(const char *__restrict s, size_t n, mbstate_t *__restrict ps)
 {

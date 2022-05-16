@@ -42,6 +42,10 @@ effects vary with the locale.
 #include <wchar.h>
 #include "local.h"
 
+#ifdef _REENT_THREAD_LOCAL
+_Thread_local _mbstate_t _tls_mblen_state;
+#endif
+
 int
 mblen (const char *s,
         size_t n)

@@ -82,6 +82,11 @@ The global pointer <<environ>> is also required.
 #include <reent.h>
 #include <errno.h>
 
+#ifdef _REENT_THREAD_LOCAL
+_Thread_local int _tls_inc;
+_Thread_local char _tls_emergency;
+#endif
+
 /* Try to open the file specified, if it can't be opened then try
    another one.  Return nonzero if successful, otherwise zero.  */
 

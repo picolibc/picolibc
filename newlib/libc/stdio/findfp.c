@@ -32,6 +32,13 @@ __FILE __sf[3];
 
 struct _glue __sglue = {NULL, 3, &__sf[0]};
 
+#ifdef _REENT_THREAD_LOCAL
+_Thread_local __FILE *_tls_stdin = &__sf[0];
+_Thread_local __FILE *_tls_stdout = &__sf[1];
+_Thread_local __FILE *_tls_stderr = &__sf[2];
+_Thread_local void (*_tls_cleanup)(struct _reent *);
+#endif
+
 #ifdef _STDIO_BSD_SEMANTICS
   /* BSD and Glibc systems only flush streams which have been written to
      at exit time.  Calling flush rather than close for speed, as on

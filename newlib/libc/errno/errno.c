@@ -5,6 +5,10 @@
 #include <errno.h>
 #include <reent.h>
 
+#ifdef _REENT_THREAD_LOCAL
+_Thread_local int _tls_errno;
+#else /* !_REENT_THREAD_LOCAL */
+
 #ifndef _REENT_ONLY
 
 int *
@@ -14,3 +18,5 @@ __errno ()
 }
 
 #endif
+
+#endif /* _REENT_THREAD_LOCAL */

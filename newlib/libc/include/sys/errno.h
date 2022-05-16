@@ -10,10 +10,16 @@ extern "C" {
 
 #include <sys/reent.h>
 
+#ifdef _REENT_THREAD_LOCAL
+#define errno (_tls_errno)
+#else /* _REENT_THREAD_LOCAL */
+
 #ifndef _REENT_ONLY
 #define errno (*__errno())
 extern int *__errno (void);
 #endif
+
+#endif /* _REENT_THREAD_LOCAL */
 
 /* Please don't use these variables directly.
    Use strerror instead. */

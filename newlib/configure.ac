@@ -173,6 +173,17 @@ AC_ARG_ENABLE(newlib-reent-binary-compat,
   esac
  fi], [newlib_reent_binary_compat=no])dnl
 
+dnl Support --enable-newlib-reent-thread-local
+AC_ARG_ENABLE(newlib-reent-thread-local,
+[  --enable-newlib-reent-thread-local   enable thread-local storage objects as a replacment for struct _reent members],
+[if test "${newlib_reent_thread_local+set}" != set; then
+  case "${enableval}" in
+    yes) newlib_reent_thread_local=yes ;;
+    no)  newlib_reent_thread_local=no  ;;
+    *)   AC_MSG_ERROR(bad value ${enableval} for newlib-enable-reent-thread-local option) ;;
+  esac
+ fi], [newlib_reent_thread_local=no])dnl
+
 dnl Support --enable-newlib-global-stdio-streams
 dnl This is no longer optional.  It is enabled in all Newlib configurations.
 AC_ARG_ENABLE(newlib-global-stdio-streams,
@@ -433,6 +444,10 @@ fi
 
 if test "${newlib_reent_binary_compat}" = "yes"; then
   AC_DEFINE(_WANT_REENT_BACKWARD_BINARY_COMPAT, 1, [Define to enable backward binary compatibility for struct _reent.])
+fi
+
+if test "${newlib_reent_thread_local}" = "yes"; then
+  AC_DEFINE(_WANT_REENT_THREAD_LOCAL, 1, [Define to enable thread-local storage objects as a replacment for struct _reent members.])
 fi
 
 _mb_len_max=1

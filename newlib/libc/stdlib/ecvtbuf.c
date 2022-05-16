@@ -57,6 +57,11 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include "mprec.h"
 #include "local.h"
 
+#ifdef _REENT_THREAD_LOCAL
+_Thread_local char *_tls_cvtbuf;
+_Thread_local int _tls_cvtlen;
+#endif
+
 static void
 print_f (struct _reent *ptr,
 	char *buf,

@@ -166,6 +166,10 @@ No supporting OS subroutines are required.
 #include "../ctype/ctype_.h"
 #include "../stdlib/local.h"
 
+#ifdef _REENT_THREAD_LOCAL
+_Thread_local struct __locale_t *_tls_locale;
+#endif
+
 #ifdef __CYGWIN__ /* Has to be kept available as exported symbol for
 		     backward compatibility.  Set it in setlocale, but
 		     otherwise ignore it.  Applications compiled after

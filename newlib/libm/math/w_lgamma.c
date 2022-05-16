@@ -22,6 +22,10 @@
 #include <reent.h>
 #include <errno.h>
 
+#ifdef _REENT_THREAD_LOCAL
+_Thread_local int _tls_gamma_signgam;
+#endif
+
 #ifndef _DOUBLE_IS_32BITS
 
 #ifdef __STDC__

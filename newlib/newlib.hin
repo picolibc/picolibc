@@ -406,6 +406,10 @@
    restricted storage. */
 #undef _WANT_REENT_SMALL
 
+/* Define to enable thread-local storage objects as a replacment for struct
+   _reent members. */
+#undef _WANT_REENT_THREAD_LOCAL
+
 /* Register application finalization function using atexit. */
 #undef _WANT_REGISTER_FINI
 

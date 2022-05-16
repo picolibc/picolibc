@@ -45,6 +45,10 @@ effects vary with the locale.
 #include <errno.h>
 #include "local.h"
 
+#ifdef _REENT_THREAD_LOCAL
+_Thread_local _mbstate_t _tls_wctomb_state;
+#endif
+
 int
 wctomb (char *s,
         wchar_t wchar)

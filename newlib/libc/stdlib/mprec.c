@@ -86,6 +86,11 @@
 #include <reent.h>
 #include "mprec.h"
 
+#ifdef _REENT_THREAD_LOCAL
+_Thread_local struct _Bigint *_tls_mp_p5s;
+_Thread_local struct _Bigint **_tls_mp_freelist;
+#endif
+
 /* This is defined in sys/reent.h as (sizeof (size_t) << 3) now, as in NetBSD.
    The old value of 15 was wrong and made newlib vulnerable against buffer
    overrun attacks (CVE-2009-0689), same as other implementations of gdtoa

@@ -74,6 +74,10 @@ QUICKREF
 #include <_ansi.h>
 #include <reent.h>
 
+#ifdef _REENT_THREAD_LOCAL
+_Thread_local char *_tls_strtok_last;
+#endif
+
 #ifndef _REENT_ONLY
 
 extern char *__strtok_r (char *, const char *, char **, int);

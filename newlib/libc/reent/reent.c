@@ -30,7 +30,9 @@ int errno;
 void
 _reclaim_reent (struct _reent *ptr)
 {
+#ifndef _REENT_THREAD_LOCAL
   if (ptr != _impure_ptr)
+#endif
     {
       /* used by mprec routines. */
 #ifdef _REENT_SMALL

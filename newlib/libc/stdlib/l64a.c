@@ -24,6 +24,10 @@
 #include <stdlib.h>
 #include <reent.h>
 
+#ifdef _REENT_THREAD_LOCAL
+_Thread_local char _tls_l64a_buf[8];
+#endif
+
 static const char R64_ARRAY[] = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 char *

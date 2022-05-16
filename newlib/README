@@ -304,6 +304,14 @@ One feature can be enabled by specifying `--enable-FEATURE=yes' or
      layout.
      Disabled by default.
 
+`--enable-newlib-reent-thread-local'
+     Enable thread-local storage objects as a replacement for struct _reent
+     members.  If enabled, then struct _reent is not defined and dedicated
+     thread-local storage objects are provided for each member of the default
+     struct _reent.  For statically linked executables only the objects
+     required by the application are linked in.
+     Disabled by default.
+
 `--disable-newlib-fvwrite-in-streamio'
      NEWLIB implements the vector buffer mechanism to support stream IO
      buffering required by C standard.  This feature is possibly

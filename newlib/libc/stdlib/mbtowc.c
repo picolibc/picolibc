@@ -49,6 +49,10 @@ effects vary with the locale.
 #include <wchar.h>
 #include "local.h"
 
+#ifdef _REENT_THREAD_LOCAL
+_Thread_local _mbstate_t _tls_mbtowc_state;
+#endif
+
 int
 mbtowc (wchar_t *__restrict pwc,
         const char *__restrict s,

@@ -32,6 +32,11 @@
 #include <string.h>
 #include "mprec.h"
 
+#ifdef _REENT_THREAD_LOCAL
+_Thread_local struct _Bigint *_tls_mp_result;
+_Thread_local int _tls_mp_result_k;
+#endif
+
 static int
 quorem (_Bigint * b, _Bigint * S)
 {

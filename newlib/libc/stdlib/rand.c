@@ -58,6 +58,10 @@ on two different systems.
 #include <stdlib.h>
 #include <reent.h>
 
+#ifdef _REENT_THREAD_LOCAL
+_Thread_local unsigned long long _tls_rand_next = 1;
+#endif
+
 void
 srand (unsigned int seed)
 {

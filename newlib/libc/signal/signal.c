@@ -88,6 +88,10 @@ int _dummy_simulated_signal;
 #include <reent.h>
 #include <_syslist.h>
 
+#ifdef _REENT_THREAD_LOCAL
+_Thread_local void (**_tls_sig_func)(int);
+#endif
+
 int
 _init_signal_r (struct _reent *ptr)
 {

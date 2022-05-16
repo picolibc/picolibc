@@ -47,6 +47,10 @@ ANSI C requires <<gmtime>>.
 
 #define _GMT_OFFSET 0
 
+#ifdef _REENT_THREAD_LOCAL
+_Thread_local struct __tm _tls_localtime_buf;
+#endif
+
 #ifndef _REENT_ONLY
 
 struct tm *

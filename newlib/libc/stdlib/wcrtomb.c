@@ -6,6 +6,10 @@
 #include <errno.h>
 #include "local.h"
 
+#ifdef _REENT_THREAD_LOCAL
+_Thread_local _mbstate_t _tls_wcrtomb_state;
+#endif
+
 size_t
 _wcrtomb_r (struct _reent *ptr,
 	char *s,
