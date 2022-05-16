@@ -56,9 +56,6 @@ uname_x (struct utsname *name)
       /* machine */
       switch (wincap.cpu_arch ())
 	{
-	  case PROCESSOR_ARCHITECTURE_INTEL:
-	    strcat (name->release, strcpy (name->machine, "i686"));
-	    break;
 	  case PROCESSOR_ARCHITECTURE_AMD64:
 	    strcat (name->release, strcpy (name->machine, "x86_64"));
 	    break;
