@@ -531,7 +531,6 @@ struct _reent
 #define _REENT_MP_FREELIST(ptr)	((ptr)->_mp->_freelist)
 #define _REENT_ASCTIME_BUF(ptr)	((ptr)->_asctime_buf)
 #define _REENT_TM(ptr)		((ptr)->_localtime_buf)
-#define _REENT_EMERGENCY(ptr)	((ptr)->_emergency)
 #define _REENT_STRTOK_LAST(ptr)	((ptr)->_misc->_strtok_last)
 #define _REENT_MBLEN_STATE(ptr)	((ptr)->_misc->_mblen_state)
 #define _REENT_MBTOWC_STATE(ptr)((ptr)->_misc->_mbtowc_state)
@@ -704,7 +703,6 @@ struct _reent
 #define _REENT_MP_FREELIST(ptr)	((ptr)->_freelist)
 #define _REENT_ASCTIME_BUF(ptr)	((ptr)->_new._reent._asctime_buf)
 #define _REENT_TM(ptr)		(&(ptr)->_new._reent._localtime_buf)
-#define _REENT_EMERGENCY(ptr)	((ptr)->_emergency)
 #define _REENT_STRTOK_LAST(ptr)	((ptr)->_new._reent._strtok_last)
 #define _REENT_MBLEN_STATE(ptr)	((ptr)->_new._reent._mblen_state)
 #define _REENT_MBTOWC_STATE(ptr)((ptr)->_new._reent._mbtowc_state)
@@ -719,6 +717,8 @@ struct _reent
 #define _REENT_GETDATE_ERR_P(ptr) (&((ptr)->_new._reent._getdate_err))
 
 #endif /* !_REENT_SMALL */
+
+#define _REENT_EMERGENCY(_ptr)	((_ptr)->_emergency)
 
 #define _REENT_INIT_PTR(var) \
   { memset((var), 0, sizeof(*(var))); \
