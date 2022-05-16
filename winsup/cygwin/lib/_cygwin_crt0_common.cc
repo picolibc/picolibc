@@ -61,9 +61,6 @@ extern int __dynamically_loaded;
 
 extern "C"
 {
-#ifdef __i386__
-char **environ;
-#endif
 int _fmode;
 
 extern char __RUNTIME_PSEUDO_RELOC_LIST__;
@@ -114,9 +111,6 @@ _cygwin_crt0_common (MainFunc f, per_process *u)
 
   u->ctors = &__CTOR_LIST__;
   u->dtors = &__DTOR_LIST__;
-#ifdef __i386__
-  u->envptr = &environ;
-#endif
   if (uwasnull)
     _impure_ptr = u->impure_ptr;	/* Use field initialized in newer DLLs. */
   else
@@ -168,17 +162,10 @@ _cygwin_crt0_common (MainFunc f, per_process *u)
   u->hmodule = GetModuleHandle (0);
 
   /* variables for fork */
-#ifdef __x86_64__
   u->data_start = &__data_start__;
   u->data_end = &__data_end__;
   u->bss_start = &__bss_start__;
   u->bss_end = &__bss_end__;
-#else
-  u->data_start = &_data_start__;
-  u->data_end = &_data_end__;
-  u->bss_start = &_bss_start__;
-  u->bss_end = &_bss_end__;
-#endif
   u->pseudo_reloc_start = &__RUNTIME_PSEUDO_RELOC_LIST__;
   u->pseudo_reloc_end = &__RUNTIME_PSEUDO_RELOC_LIST_END__;
   u->image_base = &_image_base__;
