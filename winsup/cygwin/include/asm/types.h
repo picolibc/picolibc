@@ -20,7 +20,7 @@ typedef unsigned short __u16;
 typedef __signed__ int __s32;
 typedef unsigned int __u32;
 
-/* As on Linux.  Works for both platforms, i686 and x86_64. */
+/* As on Linux. */
 typedef __signed__ long long __s64;
 typedef unsigned long long __u64;
 

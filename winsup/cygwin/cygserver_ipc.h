@@ -63,15 +63,9 @@ public:
   operator int () const { return i; }
   int operator = (int ni) { return i = ni; }
 
-#ifndef __x86_64__
-  /* On x86_64: size_t == vm_offset_t == unsigned long */
-  operator size_t () const { return sz; }
-  size_t operator = (size_t nsz) { return sz = nsz; }
-#else
-  /* On i686: ssize_t == long == int */
+  /* size_t == vm_offset_t == unsigned long. Ssize_t needs overloading */
   operator ssize_t () const { return ssz; }
   ssize_t operator = (ssize_t nssz) { return ssz = nssz; }
-#endif
 
   operator vm_offset_t () const { return off; }
   vm_offset_t operator = (vm_offset_t noff) { return off = noff; }
