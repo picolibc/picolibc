@@ -12,8 +12,6 @@ jobs:
         include:
         - target: x86_64-pc-cygwin
           pkgarch: 64
-        - target: i686-pc-cygwin
-          pkgarch: 32
     name: Fedora cross ${{ matrix.target }}
 
     steps:
@@ -55,7 +53,6 @@ jobs:
       matrix:
         include:
         - pkgarch: x86_64
-        - pkgarch: i686
     name: Windows native ${{ matrix.pkgarch }}
 
     steps:
@@ -109,5 +106,5 @@ jobs:
         make install &&
         (cd */newlib; make info man) &&
         (cd */newlib; make install-info install-man) &&
-        (cd */winsup; test "${{ matrix.pkgarch }}" != 'x86_64' || make check || true)
+        (cd */winsup; make check || true)
       shell: C:\cygwin\bin\bash.exe --noprofile --norc -eo pipefail '{0}'

@@ -18,10 +18,6 @@ environment:
     CYGWIN_ROOT: C:\cygwin64
     PKGARCH: mingw64-x86_64
     SETUP: setup-x86_64.exe
-  - BUILD: i686-pc-cygwin
-    CYGWIN_ROOT: C:\cygwin
-    PKGARCH: mingw64-i686
-    SETUP: setup-x86.exe
 
 cache: C:\cache
 
