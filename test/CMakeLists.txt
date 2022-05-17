@@ -36,7 +36,6 @@
 set(tests
   printf_scanf
   printf-tests
-  test-except
   rand
   regex
   ungetc
@@ -60,19 +59,31 @@ set(tests
   posix-io
   )
 
+set(tests_fail
+  test-except
+  )
+  
 function(picolibc_test test)
   add_executable(${test} ${test}.c ${ARGN})
 
-  target_link_libraries(${test} LINK_PUBLIC c)
+  target_link_libraries(${test} LINK_PUBLIC ${PICOLIBC_TEST_LINK_LIBRARIES})
 
-  target_compile_options(${test} PRIVATE "-fno-builtin")
+  target_compile_options(${test} PRIVATE "-fno-builtin" ${PICOLIBC_COMPILE_OPTIONS})
 
-  add_test(${test} ${test})
+  add_test(
+    NAME ${test}
+    COMMAND "${PICOLIBC_SCRIPTS}/run-thumbv7m" $<TARGET_FILE:${test}>
+    )
   set_tests_properties(${test} PROPERTIES SKIP_RETURN_CODE 77)
 endfunction()
 
 foreach(test IN LISTS tests)
   picolibc_test(${test})
+endforeach()
+
+foreach(test IN LISTS tests_fail)
+  picolibc_test(${test})
+  set_tests_properties(${test} PROPERTIES WILL_FAIL ON)
 endforeach()
 
 picolibc_test(rounding-mode rounding-mode-sub.c)

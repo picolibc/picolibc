@@ -199,217 +199,114 @@ try_compile(_HAVE_LONG_DOUBLE ${PROJECT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/
 set(_HAVE_NO_BUILTIN_ATTRIBUTE 0)
 
 # _set_tls and _init_tls functions available
-set(_HAVE_PICOLIBC_TLS_API 0)
+if(NOT DEFINED _HAVE_PICOLIBC_TLS_API)
+  set(_HAVE_PICOLIBC_TLS_API 0)
+endif()
 
-# Semihost APIs supported
 set(_HAVE_SEMIHOST 1)
-
 set(_HAVE_WEAK_ATTRIBUTE 1)
-
 set(_ICONV_ENABLE_EXTERNAL_CCS 0)
-
 set(_ICONV_FROM_ENCODING_ 1)
-
 set(_ICONV_FROM_ENCODING_BIG5 1)
-
 set(_ICONV_FROM_ENCODING_CP775 1)
-
 set(_ICONV_FROM_ENCODING_CP850 1)
-
 set(_ICONV_FROM_ENCODING_CP852 1)
-
 set(_ICONV_FROM_ENCODING_CP855 1)
-
 set(_ICONV_FROM_ENCODING_CP866 1)
-
 set(_ICONV_FROM_ENCODING_EUC_JP 1)
-
 set(_ICONV_FROM_ENCODING_EUC_KR 1)
-
 set(_ICONV_FROM_ENCODING_EUC_TW 1)
-
 set(_ICONV_FROM_ENCODING_ISO_8859_1 1)
-
 set(_ICONV_FROM_ENCODING_ISO_8859_10 1)
-
 set(_ICONV_FROM_ENCODING_ISO_8859_11 1)
-
 set(_ICONV_FROM_ENCODING_ISO_8859_13 1)
-
 set(_ICONV_FROM_ENCODING_ISO_8859_14 1)
-
 set(_ICONV_FROM_ENCODING_ISO_8859_15 1)
-
 set(_ICONV_FROM_ENCODING_ISO_8859_2 1)
-
 set(_ICONV_FROM_ENCODING_ISO_8859_3 1)
-
 set(_ICONV_FROM_ENCODING_ISO_8859_4 1)
-
 set(_ICONV_FROM_ENCODING_ISO_8859_5 1)
-
 set(_ICONV_FROM_ENCODING_ISO_8859_6 1)
-
 set(_ICONV_FROM_ENCODING_ISO_8859_7 1)
-
 set(_ICONV_FROM_ENCODING_ISO_8859_8 1)
-
 set(_ICONV_FROM_ENCODING_ISO_8859_9 1)
-
 set(_ICONV_FROM_ENCODING_ISO_IR_111 1)
-
 set(_ICONV_FROM_ENCODING_KOI8_R 1)
-
 set(_ICONV_FROM_ENCODING_KOI8_RU 1)
-
 set(_ICONV_FROM_ENCODING_KOI8_U 1)
-
 set(_ICONV_FROM_ENCODING_KOI8_UNI 1)
-
 set(_ICONV_FROM_ENCODING_UCS_2 1)
-
 set(_ICONV_FROM_ENCODING_UCS_2BE 1)
-
 set(_ICONV_FROM_ENCODING_UCS_2LE 1)
-
 set(_ICONV_FROM_ENCODING_UCS_2_INTERNAL 1)
-
 set(_ICONV_FROM_ENCODING_UCS_4 1)
-
 set(_ICONV_FROM_ENCODING_UCS_4BE 1)
-
 set(_ICONV_FROM_ENCODING_UCS_4LE 1)
-
 set(_ICONV_FROM_ENCODING_UCS_4_INTERNAL 1)
-
 set(_ICONV_FROM_ENCODING_US_ASCII 1)
-
 set(_ICONV_FROM_ENCODING_UTF_16 1)
-
 set(_ICONV_FROM_ENCODING_UTF_16BE 1)
-
 set(_ICONV_FROM_ENCODING_UTF_16LE 1)
-
 set(_ICONV_FROM_ENCODING_UTF_8 1)
-
 set(_ICONV_FROM_ENCODING_WIN_1250 1)
-
 set(_ICONV_FROM_ENCODING_WIN_1251 1)
-
 set(_ICONV_FROM_ENCODING_WIN_1252 1)
-
 set(_ICONV_FROM_ENCODING_WIN_1253 1)
-
 set(_ICONV_FROM_ENCODING_WIN_1254 1)
-
 set(_ICONV_FROM_ENCODING_WIN_1255 1)
-
 set(_ICONV_FROM_ENCODING_WIN_1256 1)
-
 set(_ICONV_FROM_ENCODING_WIN_1257 1)
-
 set(_ICONV_FROM_ENCODING_WIN_1258 1)
-
 set(_ICONV_TO_ENCODING_ 1)
-
 set(_ICONV_TO_ENCODING_BIG5 1)
-
 set(_ICONV_TO_ENCODING_CP775 1)
-
 set(_ICONV_TO_ENCODING_CP850 1)
-
 set(_ICONV_TO_ENCODING_CP852 1)
-
 set(_ICONV_TO_ENCODING_CP855 1)
-
 set(_ICONV_TO_ENCODING_CP866 1)
-
 set(_ICONV_TO_ENCODING_EUC_JP 1)
-
 set(_ICONV_TO_ENCODING_EUC_KR 1)
-
 set(_ICONV_TO_ENCODING_EUC_TW 1)
-
 set(_ICONV_TO_ENCODING_ISO_8859_1 1)
-
 set(_ICONV_TO_ENCODING_ISO_8859_10 1)
-
 set(_ICONV_TO_ENCODING_ISO_8859_11 1)
-
 set(_ICONV_TO_ENCODING_ISO_8859_13 1)
-
 set(_ICONV_TO_ENCODING_ISO_8859_14 1)
-
 set(_ICONV_TO_ENCODING_ISO_8859_15 1)
-
 set(_ICONV_TO_ENCODING_ISO_8859_2 1)
-
 set(_ICONV_TO_ENCODING_ISO_8859_3 1)
-
 set(_ICONV_TO_ENCODING_ISO_8859_4 1)
-
 set(_ICONV_TO_ENCODING_ISO_8859_5 1)
-
 set(_ICONV_TO_ENCODING_ISO_8859_6 1)
-
 set(_ICONV_TO_ENCODING_ISO_8859_7 1)
-
 set(_ICONV_TO_ENCODING_ISO_8859_8 1)
-
 set(_ICONV_TO_ENCODING_ISO_8859_9 1)
-
 set(_ICONV_TO_ENCODING_ISO_IR_111 1)
-
 set(_ICONV_TO_ENCODING_KOI8_R 1)
-
 set(_ICONV_TO_ENCODING_KOI8_RU 1)
-
 set(_ICONV_TO_ENCODING_KOI8_U 1)
-
 set(_ICONV_TO_ENCODING_KOI8_UNI 1)
-
 set(_ICONV_TO_ENCODING_UCS_2 1)
-
 set(_ICONV_TO_ENCODING_UCS_2BE 1)
-
 set(_ICONV_TO_ENCODING_UCS_2LE 1)
-
 set(_ICONV_TO_ENCODING_UCS_2_INTERNAL 1)
-
 set(_ICONV_TO_ENCODING_UCS_4 1)
-
 set(_ICONV_TO_ENCODING_UCS_4BE 1)
-
 set(_ICONV_TO_ENCODING_UCS_4LE 1)
-
 set(_ICONV_TO_ENCODING_UCS_4_INTERNAL 1)
-
 set(_ICONV_TO_ENCODING_US_ASCII 1)
-
 set(_ICONV_TO_ENCODING_UTF_16 1)
-
 set(_ICONV_TO_ENCODING_UTF_16BE 1)
-
 set(_ICONV_TO_ENCODING_UTF_16LE 1)
-
 set(_ICONV_TO_ENCODING_UTF_8 1)
-
 set(_ICONV_TO_ENCODING_WIN_1250 1)
-
 set(_ICONV_TO_ENCODING_WIN_1251 1)
-
 set(_ICONV_TO_ENCODING_WIN_1252 1)
-
 set(_ICONV_TO_ENCODING_WIN_1253 1)
-
 set(_ICONV_TO_ENCODING_WIN_1254 1)
-
 set(_ICONV_TO_ENCODING_WIN_1255 1)
-
 set(_ICONV_TO_ENCODING_WIN_1256 1)
-
 set(_ICONV_TO_ENCODING_WIN_1257 1)
-
 set(_ICONV_TO_ENCODING_WIN_1258 1)
 
 # math library does not set errno (offering only ieee semantics)
@@ -418,7 +315,6 @@ set(_IEEE_LIBM 1)
 if(NOT DEFINED _IO_FLOAT_EXACT)
   option(_IO_FLOAT_EXACT "Provide exact binary/decimal conversion for printf/scanf" 1)
 endif()
-
 
 # is long double the same as double
 try_compile(_LDBL_EQ_DBL ${PROJECT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/ldbl-eq-dbl.c)
@@ -509,44 +405,9 @@ set(NEWLIB_PATCH 0)
 
 set(PICOLIBC_INCLUDE ${PROJECT_BINARY_DIR}/picolibc/include)
 
+set(PICOLIBC_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/scripts")
+
 configure_file(picolibc.h.in "${PICOLIBC_INCLUDE}/picolibc.h")
-
-add_library(c STATIC)
-
-target_include_directories(c SYSTEM PUBLIC "${PICOLIBC_INCLUDE}")
-
-target_compile_options(c PRIVATE
-  "--include" "${PICOLIBC_INCLUDE}/picolibc.h"
-  "-nostdlib"
-  "-fno-common"
-  "-frounding-math"
-  "-fsignaling-nans"
-  "-fno-stack-protector"
-  "-ffunction-sections"
-  "-fdata-sections"
-  "-Wall"
-  "-Wextra"
-  "-Werror=implicit-function-declaration"
-  "-Werror=vla"
-  "-Warray-bounds"
-  "-Wold-style-definition"
-  ${PICOLIBC_EXTRA_COMPILE_OPTIONS}
-  )
-
-define_property(GLOBAL PROPERTY PICOLIBC_HEADERS
-  BRIEF_DOCS "Installed header files"
-  FULL_DOCS "These are names of header files which are to be installed.")
-
-add_subdirectory(newlib)
-
-install(TARGETS c
-  LIBRARY DESTINATION lib
-  PUBLIC_HEADER DESTINATION include)
-
-option(TESTS "Enable tests" OFF)
-if(TESTS)
-  add_subdirectory(test)
-endif()
 
 set(INCLUDEDIR include)
 set(LIBDIR .)
@@ -564,5 +425,70 @@ string(APPEND SPECS_PRINTF "%{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfprintf=__f
 set(PREFIX "${PROJECT_BINARY_DIR}")
 
 configure_file(picolibc.specs.in "${PROJECT_BINARY_DIR}/picolibc.specs" @ONLY)
+
+set(PICOLIBC_COMPILE_OPTIONS
+  "--include" "${PICOLIBC_INCLUDE}/picolibc.h"
+  "-nostdlib"
+  "-fno-common"
+  "-frounding-math"
+  "-fsignaling-nans"
+  "-fno-stack-protector"
+  "-ffunction-sections"
+  "-fdata-sections"
+  "-Wall"
+  "-Wextra"
+  "-Werror=implicit-function-declaration"
+  "-Werror=vla"
+  "-Warray-bounds"
+  "-Wold-style-definition"
+  ${TLSMODEL}
+  ${TARGET_COMPILE_OPTIONS}
+  ${PICOLIBC_EXTRA_COMPILE_OPTIONS}
+  )
+
+add_library(c STATIC)
+
+target_compile_options(c PRIVATE ${PICOLIBC_COMPILE_OPTIONS})
+
+set(PICOLIBC_INCLUDE_DIRECTORIES
+  "${PICOLIBC_INCLUDE}")
+
+target_include_directories(c SYSTEM PUBLIC ${PICOLIBC_INCLUDE_DIRECTORIES})
+
+define_property(GLOBAL PROPERTY PICOLIBC_HEADERS
+  BRIEF_DOCS "Installed header files"
+  FULL_DOCS "These are names of header files which are to be installed.")
+
+add_subdirectory(newlib)
+
+install(TARGETS c
+  LIBRARY DESTINATION lib
+  PUBLIC_HEADER DESTINATION include)
+
+option(TESTS "Enable tests" OFF)
+if(TESTS)
+
+  # This could use some generalization, but it's good enough to do
+  # semihosting-based tests
+
+  add_subdirectory(semihost)
+  add_subdirectory(picocrt)
+
+  set(PICOCRT_OBJ $<TARGET_OBJECTS:picocrt>)
+  set(PICOCRT_SEMIHOST_OBJ $<TARGET_OBJECTS:picocrt-semihost>)
+
+  # semihost and libc have mutual-dependencies, so place them in a
+  # linker group
+
+  set(PICOLIBC_TEST_LINK_LIBRARIES
+    ${PICOLIBC_COMPILE_OPTIONS}
+    ${PICOCRT_SEMIHOST_OBJ}
+    -Wl,--start-group c semihost -Wl,--end-group
+    ${PICOLIBC_LINK_FLAGS}
+    )
+
+  add_subdirectory(test)
+
+endif()
 
 install(FILES picolibc.specs DESTINATION lib)

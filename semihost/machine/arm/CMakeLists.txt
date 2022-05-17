@@ -33,11 +33,4 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-picolibc_sources(interrupt.c)
-
-if(${_HAVE_PICOLIBC_TLS_API})
-  picolibc_sources(
-    tls.c
-    read_tp.S
-    )
-endif()
+target_sources(semihost PRIVATE semihost-arm.S)

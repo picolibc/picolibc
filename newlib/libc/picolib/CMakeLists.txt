@@ -39,4 +39,8 @@ picolibc_sources(
   getauxval.c
   )
 
+if(${_HAVE_PICOLIBC_TLS_API})
+  picolibc_sources(inittls.c)
+endif()
+
 add_subdirectory(machine)

@@ -33,11 +33,12 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-picolibc_sources(interrupt.c)
+add_library(picocrt OBJECT crt0.c)
+add_library(picocrt-semihost OBJECT crt0.c)
 
-if(${_HAVE_PICOLIBC_TLS_API})
-  picolibc_sources(
-    tls.c
-    read_tp.S
-    )
-endif()
+target_compile_options(picocrt PRIVATE ${PICOLIBC_COMPILE_OPTIONS})
+target_compile_options(picocrt-semihost PRIVATE -DCRT0_EXIT -DCRT0_SEMIHOST ${PICOLIBC_COMPILE_OPTIONS})
+
+target_include_directories(picocrt SYSTEM PUBLIC ${PICOLIBC_INCLUDE_DIRECTORIES})
+target_include_directories(picocrt-semihost SYSTEM PUBLIC ${PICOLIBC_INCLUDE_DIRECTORIES})
+

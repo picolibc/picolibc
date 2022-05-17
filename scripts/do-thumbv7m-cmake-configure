@@ -1,0 +1,2 @@
+#!/bin/sh
+cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -DTESTS=ON -DCMAKE_TOOLCHAIN_FILE="$(dirname $0)/../cmake/TC-arm-none-eabi.cmake" "$(dirname $0)/.."

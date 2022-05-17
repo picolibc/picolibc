@@ -33,11 +33,4 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-picolibc_sources(interrupt.c)
-
-if(${_HAVE_PICOLIBC_TLS_API})
-  picolibc_sources(
-    tls.c
-    read_tp.S
-    )
-endif()
+add_subdirectory(machine/${CMAKE_SYSTEM_PROCESSOR})
