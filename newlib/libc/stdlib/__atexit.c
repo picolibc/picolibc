@@ -133,7 +133,7 @@ __register_exitproc (int type,
 	  if (args == NULL)
 	    {
 #ifndef __SINGLE_THREAD__
-	      __lock_release(__atexit_recursive_mutex);
+	      __lock_release_recursive(__atexit_recursive_mutex);
 #endif
 	      return -1;
 	    }
