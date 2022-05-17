@@ -97,14 +97,6 @@ std (FILE *ptr,
 #else /* _STDIO_CLOSE_STD_STREAMS */
   ptr->_close = NULL;
 #endif /* _STDIO_CLOSE_STD_STREAMS */
-#if !defined(__SINGLE_THREAD__) && !(defined(_REENT_SMALL) && !defined(_REENT_GLOBAL_STDIO_STREAMS))
-  __lock_init_recursive (ptr->_lock);
-  /*
-   * #else
-   * lock is already initialized in __sfp
-   */
-#endif
-
 #ifdef __SCLE
   if (__stextmode (ptr->_file))
     ptr->_flags |= __SCLE;
