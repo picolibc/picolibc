@@ -168,6 +168,19 @@ stdio_exit_handler (void)
   (void) _fwalk_sglue (_GLOBAL_REENT, CLEANUP_FILE, &__sglue);
 }
 
+static void
+global_stdio_init (void)
+{
+  if (__stdio_exit_handler == NULL) {
+    __stdio_exit_handler = stdio_exit_handler;
+#ifdef _REENT_GLOBAL_STDIO_STREAMS
+    stdin_init (&__sf[0]);
+    stdout_init (&__sf[1]);
+    stderr_init (&__sf[2]);
+#endif
+  }
+}
+
 /*
  * Find a free FILE for fopen et al.
  */
@@ -180,11 +193,7 @@ __sfp (struct _reent *d)
   struct _glue *g;
 
   _newlib_sfp_lock_start ();
-
-  if (__stdio_exit_handler == NULL) {
-    __sinit (_GLOBAL_REENT);
-    __stdio_exit_handler = stdio_exit_handler;
-  }
+  global_stdio_init ();
 
   for (g = &__sglue;; g = g->_next)
     {
@@ -273,13 +282,9 @@ __sinit (struct _reent *s)
 # endif /* _REENT_GLOBAL_STDIO_STREAMS */
 #endif
 
-#ifdef _REENT_GLOBAL_STDIO_STREAMS
-  if (__sf[0]._cookie == NULL) {
-    stdin_init (&__sf[0]);
-    stdout_init (&__sf[1]);
-    stderr_init (&__sf[2]);
-  }
-#else /* _REENT_GLOBAL_STDIO_STREAMS */
+  global_stdio_init ();
+
+#ifndef _REENT_GLOBAL_STDIO_STREAMS
   stdin_init (s->_stdin);
   stdout_init (s->_stdout);
   stderr_init (s->_stderr);
