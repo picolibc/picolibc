@@ -6,13 +6,7 @@
    important to reduce image size for targets with very small amounts
    of memory.  */
 #ifdef _REENT_SMALL
-#ifdef _REENT_GLOBAL_STDIO_STREAMS
 extern __FILE __sf[3] _ATTRIBUTE ((weak));
-#else
-extern const struct __sFILE_fake __sf_fake_stdin _ATTRIBUTE ((weak));
-extern const struct __sFILE_fake __sf_fake_stdout _ATTRIBUTE ((weak));
-extern const struct __sFILE_fake __sf_fake_stderr _ATTRIBUTE ((weak));
-#endif
 #endif
 
 struct _reent __ATTRIBUTE_IMPURE_DATA__ _impure_data = _REENT_INIT (_impure_data);

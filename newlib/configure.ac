@@ -174,13 +174,13 @@ AC_ARG_ENABLE(newlib-reent-binary-compat,
  fi], [newlib_reent_binary_compat=no])dnl
 
 dnl Support --enable-newlib-global-stdio-streams
+dnl This is no longer optional.  It is enabled in all Newlib configurations.
 AC_ARG_ENABLE(newlib-global-stdio-streams,
 [  --enable-newlib-global-stdio-streams   enable global stdio streams],
 [case "${enableval}" in
   yes) newlib_global_stdio_streams=yes;;
-  no)  newlib_global_stdio_streams=no ;;
   *)   AC_MSG_ERROR(bad value ${enableval} for newlib-global-stdio-streams option) ;;
- esac], [newlib_global_stdio_streams=])dnl
+ esac], [newlib_global_stdio_streams=yes])dnl
  
 dnl Support --disable-newlib-fvwrite-in-streamio
 AC_ARG_ENABLE(newlib-fvwrite-in-streamio,
@@ -433,12 +433,6 @@ fi
 
 if test "${newlib_reent_binary_compat}" = "yes"; then
   AC_DEFINE(_WANT_REENT_BACKWARD_BINARY_COMPAT, 1, [Define to enable backward binary compatibility for struct _reent.])
-fi
-
-if test "${newlib_global_stdio_streams}" = "yes"; then
-  AC_DEFINE(_WANT_REENT_GLOBAL_STDIO_STREAMS, 1,
-	    [Define to move the stdio stream FILE objects out of struct _reent and make them global.
-	     The stdio stream pointers of struct _reent are initialized to point to the global stdio FILE stream objects.])
 fi
 
 _mb_len_max=1

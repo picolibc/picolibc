@@ -142,39 +142,7 @@ struct __sbuf {
  * _ub._base!=NULL) and _up and _ur save the current values of _p and _r.
  */
 
-#if defined(_REENT_SMALL) && !defined(_REENT_GLOBAL_STDIO_STREAMS)
-/*
- * struct __sFILE_fake is the start of a struct __sFILE, with only the
- * minimal fields allocated.  In __sinit() we really allocate the 3
- * standard streams, etc., and point away from this fake.
- */
-struct __sFILE_fake {
-  unsigned char *_p;	/* current position in (some) buffer */
-  int	_r;		/* read space left for getc() */
-  int	_w;		/* write space left for putc() */
-  short	_flags;		/* flags, below; this FILE is free if 0 */
-  short	_file;		/* fileno, if Unix descriptor, else -1 */
-  struct __sbuf _bf;	/* the buffer (at least 1 byte, if !NULL) */
-  int	_lbfsize;	/* 0 or -_bf._size, for inline putc */
-
-  struct _reent *_data;
-};
-
-/* Following is needed both in libc/stdio and libc/stdlib so we put it
- * here instead of libc/stdio/local.h where it was previously. */
-
-extern void   __sinit (struct _reent *);
-
-# define _REENT_SMALL_CHECK_INIT(ptr)		\
-  do						\
-    {						\
-      if ((ptr) && !(ptr)->__cleanup)		\
-	__sinit (ptr);				\
-    }						\
-  while (0)
-#else /* _REENT_SMALL && !_REENT_GLOBAL_STDIO_STREAMS */
-# define _REENT_SMALL_CHECK_INIT(ptr) /* nothing */
-#endif /* _REENT_SMALL && !_REENT_GLOBAL_STDIO_STREAMS */
+#define _REENT_SMALL_CHECK_INIT(ptr) /* nothing */
 
 struct __sFILE {
   unsigned char *_p;	/* current position in (some) buffer */
@@ -286,9 +254,7 @@ typedef struct __sFILE   __FILE;
 #endif /* __LARGE64_FILES */
 #endif /* !__CUSTOM_FILE_IO__ */
 
-#ifdef _REENT_GLOBAL_STDIO_STREAMS
 extern __FILE __sf[3];
-#endif
 
 struct _glue
 {
@@ -340,11 +306,13 @@ struct _rand48 {
 #define _REENT_INIT_RESERVED_1 0,
 #define _REENT_INIT_RESERVED_2 0,
 #define _REENT_INIT_RESERVED_6_7 _NULL, _ATEXIT_INIT,
+#define _REENT_INIT_RESERVED_8 {_NULL, 0, _NULL},
 #else
 #define _REENT_INIT_RESERVED_0 /* Nothing to initialize */
 #define _REENT_INIT_RESERVED_1 /* Nothing to initialize */
 #define _REENT_INIT_RESERVED_2 /* Nothing to initialize */
 #define _REENT_INIT_RESERVED_6_7 /* Nothing to initialize */
+#define _REENT_INIT_RESERVED_8 /* Nothing to initialize */
 #endif
 
 /*
@@ -427,15 +395,13 @@ struct _reent
 #ifdef _REENT_BACKWARD_BINARY_COMPAT
   struct _atexit *_reserved_6;
   struct _atexit _reserved_7;
+  struct _glue _reserved_8;
 #endif
 
-  struct _glue __sglue;			/* root of glue chain */
   __FILE *__sf;			        /* file descriptors */
   struct _misc_reent *_misc;            /* strtok, multibyte states */
   char *_signal_buf;                    /* strsignal */
 };
-
-#ifdef _REENT_GLOBAL_STDIO_STREAMS
 
 # define _REENT_INIT(var) \
   { 0, \
@@ -457,7 +423,7 @@ struct _reent
     _NULL, \
     _NULL, \
     _REENT_INIT_RESERVED_6_7 \
-    {_NULL, 0, _NULL}, \
+    _REENT_INIT_RESERVED_8 \
     _NULL, \
     _NULL, \
     _NULL \
@@ -468,46 +434,6 @@ struct _reent
     (var)->_stdout = &__sf[1]; \
     (var)->_stderr = &__sf[2]; \
   }
-
-#else /* _REENT_GLOBAL_STDIO_STREAMS */
-
-extern const struct __sFILE_fake __sf_fake_stdin;
-extern const struct __sFILE_fake __sf_fake_stdout;
-extern const struct __sFILE_fake __sf_fake_stderr;
-
-# define _REENT_INIT(var) \
-  { 0, \
-    (__FILE *)&__sf_fake_stdin, \
-    (__FILE *)&__sf_fake_stdout, \
-    (__FILE *)&__sf_fake_stderr, \
-    0, \
-    _NULL, \
-    _REENT_INIT_RESERVED_0 \
-    _REENT_INIT_RESERVED_1 \
-    _NULL, \
-    _NULL, \
-    _NULL, \
-    0, \
-    0, \
-    _NULL, \
-    _NULL, \
-    _NULL, \
-    _NULL, \
-    _NULL, \
-    _REENT_INIT_RESERVED_6_7 \
-    {_NULL, 0, _NULL}, \
-    _NULL, \
-    _NULL, \
-    _NULL \
-  }
-
-#define _REENT_INIT_PTR_ZEROED(var) \
-  { (var)->_stdin = (__FILE *)&__sf_fake_stdin; \
-    (var)->_stdout = (__FILE *)&__sf_fake_stdout; \
-    (var)->_stderr = (__FILE *)&__sf_fake_stderr; \
-  }
-
-#endif /* _REENT_GLOBAL_STDIO_STREAMS */
 
 /* Specify how to handle reent_check malloc failures. */
 #ifdef _REENT_CHECK_VERIFY
@@ -696,33 +622,13 @@ struct _reent
 
   /* signal info */
   void (**_sig_func)(int);
-
-  /* These are here last so that __FILE can grow without changing the offsets
-     of the above members (on the off chance that future binary compatibility
-     would be broken otherwise).  */
-# ifndef _REENT_GLOBAL_STDIO_STREAMS
-  struct _glue __sglue;		/* root of glue chain */
-  __FILE __sf[3];  		/* first three file descriptors */
-# endif
 };
-
-#ifdef _REENT_GLOBAL_STDIO_STREAMS
-#define _REENT_STDIO_STREAM(var, index) &__sf[index]
-#define _REENT_INIT_SGLUE(_ptr) /* nothing to initialize */
-#define _REENT_INIT_SGLUE_ZEROED(_ptr) /* nothing to set */
-#else
-#define _REENT_STDIO_STREAM(var, index) &(var)->__sf[index]
-#define _REENT_INIT_SGLUE(_ptr) , { _NULL, 3, &(_ptr)->__sf[0] }
-#define _REENT_INIT_SGLUE_ZEROED(_ptr) \
-  (_ptr)->__sglue._niobs = 3; \
-  (_ptr)->__sglue._iobs = &(_ptr)->__sf[0];
-#endif
 
 #define _REENT_INIT(var) \
   { 0, \
-    _REENT_STDIO_STREAM(&(var), 0), \
-    _REENT_STDIO_STREAM(&(var), 1), \
-    _REENT_STDIO_STREAM(&(var), 2), \
+    &__sf[0], \
+    &__sf[1], \
+    &__sf[2], \
     0, \
     "", \
     _REENT_INIT_RESERVED_1 \
@@ -763,13 +669,12 @@ struct _reent
     }, \
     _REENT_INIT_RESERVED_6_7 \
     _NULL \
-    _REENT_INIT_SGLUE(&(var)) \
   }
 
 #define _REENT_INIT_PTR_ZEROED(var) \
-  { (var)->_stdin = _REENT_STDIO_STREAM(var, 0); \
-    (var)->_stdout = _REENT_STDIO_STREAM(var, 1); \
-    (var)->_stderr = _REENT_STDIO_STREAM(var, 2); \
+  { (var)->_stdin = &__sf[0]; \
+    (var)->_stdout = &__sf[1]; \
+    (var)->_stderr = &__sf[2]; \
     (var)->_new._reent._rand_next = 1; \
     (var)->_new._reent._r48._seed[0] = _RAND48_SEED_0; \
     (var)->_new._reent._r48._seed[1] = _RAND48_SEED_1; \
@@ -778,7 +683,6 @@ struct _reent
     (var)->_new._reent._r48._mult[1] = _RAND48_MULT_1; \
     (var)->_new._reent._r48._mult[2] = _RAND48_MULT_2; \
     (var)->_new._reent._r48._add = _RAND48_ADD; \
-    _REENT_INIT_SGLUE_ZEROED(var) \
   }
 
 #define _REENT_CHECK_RAND48(ptr)	/* nothing */

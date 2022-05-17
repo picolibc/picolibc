@@ -242,7 +242,6 @@
 #define __FILENAME_MAX__ 255
 #define _READ_WRITE_RETURN_TYPE _ssize_t
 #define __DYNAMIC_REENT__
-#define _REENT_GLOBAL_STDIO_STREAMS
 #endif
 
 #ifndef __EXPORT
@@ -277,12 +276,6 @@
 #ifdef _WANT_REENT_SMALL
 #ifndef _REENT_SMALL
 #define _REENT_SMALL
-#endif
-#endif
-
-#ifdef _WANT_REENT_GLOBAL_STDIO_STREAMS
-#ifndef _REENT_GLOBAL_STDIO_STREAMS
-#define _REENT_GLOBAL_STDIO_STREAMS
 #endif
 #endif
 

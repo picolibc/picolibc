@@ -28,21 +28,9 @@
 
 void (*__stdio_exit_handler) (void);
 
-#if defined(_REENT_SMALL) && !defined(_REENT_GLOBAL_STDIO_STREAMS)
-const struct __sFILE_fake __sf_fake_stdin =
-    {_NULL, 0, 0, 0, 0, {_NULL, 0}, 0, _NULL};
-const struct __sFILE_fake __sf_fake_stdout =
-    {_NULL, 0, 0, 0, 0, {_NULL, 0}, 0, _NULL};
-const struct __sFILE_fake __sf_fake_stderr =
-    {_NULL, 0, 0, 0, 0, {_NULL, 0}, 0, _NULL};
-#endif
-
-#ifdef _REENT_GLOBAL_STDIO_STREAMS
 __FILE __sf[3];
+
 struct _glue __sglue = {NULL, 3, &__sf[0]};
-#else
-struct _glue __sglue = {NULL, 0, NULL};
-#endif
 
 #ifdef _STDIO_BSD_SEMANTICS
   /* BSD and Glibc systems only flush streams which have been written to
@@ -161,11 +149,9 @@ global_stdio_init (void)
 {
   if (__stdio_exit_handler == NULL) {
     __stdio_exit_handler = stdio_exit_handler;
-#ifdef _REENT_GLOBAL_STDIO_STREAMS
     stdin_init (&__sf[0]);
     stdout_init (&__sf[1]);
     stderr_init (&__sf[2]);
-#endif
   }
 }
 
@@ -232,16 +218,12 @@ found:
 static void
 cleanup_stdio (struct _reent *ptr)
 {
-#ifdef _REENT_GLOBAL_STDIO_STREAMS
   if (ptr->_stdin != &__sf[0])
     CLEANUP_FILE (ptr, ptr->_stdin);
   if (ptr->_stdout != &__sf[1])
     CLEANUP_FILE (ptr, ptr->_stdout);
   if (ptr->_stderr != &__sf[2])
     CLEANUP_FILE (ptr, ptr->_stderr);
-#else
-  (void) _fwalk_sglue (ptr, CLEANUP_FILE, &ptr->__sglue);
-#endif
 }
 
 /*
@@ -262,22 +244,7 @@ __sinit (struct _reent *s)
   /* make sure we clean up on exit */
   s->__cleanup = cleanup_stdio;	/* conservative */
 
-#ifdef _REENT_SMALL
-# ifndef _REENT_GLOBAL_STDIO_STREAMS
-  s->_stdin = __sfp(s);
-  s->_stdout = __sfp(s);
-  s->_stderr = __sfp(s);
-# endif /* _REENT_GLOBAL_STDIO_STREAMS */
-#endif
-
   global_stdio_init ();
-
-#ifndef _REENT_GLOBAL_STDIO_STREAMS
-  stdin_init (s->_stdin);
-  stdout_init (s->_stdout);
-  stderr_init (s->_stderr);
-#endif /* _REENT_GLOBAL_STDIO_STREAMS */
-
   __sfp_lock_release ();
 }
 
@@ -320,32 +287,14 @@ __fp_unlock (struct _reent * ptr __unused, FILE * fp)
 void
 __fp_lock_all (void)
 {
-#ifndef _REENT_GLOBAL_STDIO_STREAMS
-  struct _reent *ptr;
-#endif
-
   __sfp_lock_acquire ();
-
-#ifndef _REENT_GLOBAL_STDIO_STREAMS
-  ptr = _REENT;
-  (void) _fwalk_sglue (ptr, __fp_lock, &ptr->__sglue);
-#else
   (void) _fwalk_sglue (NULL, __fp_lock, &__sglue);
-#endif
 }
 
 void
 __fp_unlock_all (void)
 {
-#ifndef _REENT_GLOBAL_STDIO_STREAMS
-  struct _reent *ptr;
-
-  ptr = _REENT;
-  (void) _fwalk_sglue (ptr, __fp_unlock, &ptr->__sglue);
-#else
   (void) _fwalk_sglue (NULL, __fp_unlock, &__sglue);
-#endif
-
   __sfp_lock_release ();
 }
 #endif

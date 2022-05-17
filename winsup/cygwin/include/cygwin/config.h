@@ -48,7 +48,6 @@ extern inline struct _reent *__getreent (void)
 /* The following block of macros is required to build newlib correctly for
    Cygwin.  Changing them in applications has no or not the desired effect.
    Just leave them alone. */
-#define _REENT_GLOBAL_STDIO_STREAMS 1
 #define _READ_WRITE_RETURN_TYPE _ssize_t
 #define _READ_WRITE_BUFSIZE_TYPE size_t
 #define __LARGE64_FILES 1

@@ -27,21 +27,6 @@ int errno;
 
 #endif
 
-#ifndef _REENT_GLOBAL_STDIO_STREAMS
-/* Interim cleanup code */
-
-static void
-cleanup_glue (struct _reent *ptr,
-     struct _glue *glue)
-{
-  /* Have to reclaim these in reverse order: */
-  if (glue->_next)
-    cleanup_glue (ptr, glue->_next);
-
-  _free_r (ptr, glue);
-}
-#endif
-
 void
 _reclaim_reent (struct _reent *ptr)
 {
@@ -106,11 +91,6 @@ _reclaim_reent (struct _reent *ptr)
 	  /* cleanup won't reclaim memory 'coz usually it's run
 	     before the program exits, and who wants to wait for that? */
 	  ptr->__cleanup (ptr);
-
-#ifndef _REENT_GLOBAL_STDIO_STREAMS
-	  if (ptr->__sglue._next)
-	    cleanup_glue (ptr, ptr->__sglue._next);
-#endif
 	}
 
       /* Malloc memory not reclaimed; no good way to return memory anyway. */
