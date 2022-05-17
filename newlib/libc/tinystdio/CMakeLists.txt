@@ -65,7 +65,9 @@ picolibc_sources(
   freopen.c
   fscanf.c
   fseek.c
+  fseeko.c
   ftell.c
+  ftello.c
   fwrite.c
   getchar.c
   gets.c
