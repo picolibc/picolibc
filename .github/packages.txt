@@ -1,5 +1,6 @@
 build-essential
 meson
+cmake
 ninja-build
 gcc
 gcc-i686-linux-gnu
