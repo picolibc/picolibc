@@ -276,7 +276,6 @@ private:
 extern _cygtls *_main_tls;
 extern _cygtls *_sig_tls;
 
-#ifdef __x86_64__
 class san
 {
   san *_clemente;
@@ -305,53 +304,9 @@ public:
      earlier in the function, so this call serves as a register barrier. */
   void leave () __attribute__ ((returns_twice));
 };
-#else
-class san
-{
-  san *_clemente;
-  jmp_buf _context;
-  uint32_t _c_cnt;
-  uint32_t _w_cnt;
-public:
-  int setup () __attribute__ ((always_inline))
-  {
-    _clemente = _my_tls.andreas;
-    _my_tls.andreas = this;
-    _c_cnt = _my_tls.locals.pathbufs.c_cnt;
-    _w_cnt = _my_tls.locals.pathbufs.w_cnt;
-    return __sjfault (_context);
-  }
-  void leave () __attribute__ ((always_inline))
-  {
-    /* Restore tls_pathbuf counters in case of error. */
-    _my_tls.locals.pathbufs.c_cnt = _c_cnt;
-    _my_tls.locals.pathbufs.w_cnt = _w_cnt;
-    __ljfault (_context, 1);
-  }
-  void reset () __attribute__ ((always_inline))
-  {
-    _my_tls.andreas = _clemente;
-  }
-};
 
-class myfault
-{
-  san sebastian;
-public:
-  ~myfault () __attribute__ ((always_inline)) { sebastian.reset (); }
-  inline int faulted () __attribute__ ((always_inline))
-  {
-    return sebastian.setup ();
-  }
-};
-#endif
-
-/* Exception handling macros.  These are required because SEH differs a lot
-   between 32 and 64 bit.  Essentially, on 64 bit, we have to create compile
-   time SEH tables which define the handler and try/except labels, while on
-   32 bit we can simply set up an SJLJ handler within the myfault class. */
+/* Exception handling macros. This is a handmade SEH try/except. */
 #define __mem_barrier	__asm__ __volatile__ ("" ::: "memory")
-#ifdef __x86_64__
 #define __try \
   { \
     __label__ __l_try, __l_except, __l_endtry; \
@@ -386,31 +341,6 @@ public:
     __l_endtry: \
       __mem_barrier; \
   }
-
-#else /* !__x86_64__ */
-#define __try \
-  { \
-    __label__ __l_endtry; \
-    myfault efault; \
-    if (!efault.faulted ()) \
-      {
-
-#define __leave	\
-	goto __l_endtry
-
-#define __except(__errno) \
-	  goto __l_endtry; \
-      } \
-      { \
-	if (__errno) \
-	  set_errno (__errno);
-
-#define __endtry \
-      } \
-    __l_endtry: \
-      __mem_barrier; \
-  }
-#endif /* __x86_64__ */
 
 class wait_signal_arrived
 {
