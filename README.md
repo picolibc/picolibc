@@ -150,6 +150,8 @@ use Picolibc:
 
  9. Add enough cmake support to allow Zephyr to build picolibc as a
     module using that, rather than meson.
+
+ 10. Merge current newlib bits
  
 ### Picolibc version 1.7.6
 
