@@ -725,11 +725,6 @@ struct _reent
     _REENT_INIT_PTR_ZEROED(var); \
   }
 
-/* This value is used in stdlib/misc.c.  reent/reent.c has to know it
-   as well to make sure the freelist is correctly free'd.  Therefore
-   we define it here, rather than in stdlib/misc.c, as before. */
-#define _Kmax (sizeof (size_t) << 3)
-
 /*
  * All references to struct _reent are via this pointer.
  * Internally, newlib routines that need to reference it should use _REENT.
@@ -747,13 +742,6 @@ extern struct _reent *_impure_ptr __ATTRIBUTE_IMPURE_PTR__;
 
 extern struct _reent _impure_data __ATTRIBUTE_IMPURE_DATA__;
 
-extern void (*__stdio_exit_handler) (void);
-
-void _reclaim_reent (struct _reent *);
-
-extern int _fwalk_sglue (struct _reent *, int (*)(struct _reent *, __FILE *),
-			 struct _glue *);
-
 /* #define _REENT_ONLY define this to get only reentrant routines */
 
 #if defined(__DYNAMIC_REENT__) && !defined(__SINGLE_THREAD__)
@@ -767,8 +755,20 @@ extern int _fwalk_sglue (struct _reent *, int (*)(struct _reent *, __FILE *),
 
 #define _GLOBAL_REENT (&_impure_data)
 
+/* This value is used in stdlib/misc.c.  reent/reent.c has to know it
+   as well to make sure the freelist is correctly free'd.  Therefore
+   we define it here, rather than in stdlib/misc.c, as before. */
+#define _Kmax (sizeof (size_t) << 3)
+
 extern struct _atexit *__atexit; /* points to head of LIFO stack */
 extern struct _atexit __atexit0; /* one guaranteed table, required by ANSI */
+
+extern void (*__stdio_exit_handler) (void);
+
+void _reclaim_reent (struct _reent *);
+
+extern int _fwalk_sglue (struct _reent *, int (*)(struct _reent *, __FILE *),
+			 struct _glue *);
 
 #ifdef __cplusplus
 }
