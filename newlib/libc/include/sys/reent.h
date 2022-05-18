@@ -421,7 +421,7 @@ struct _reent
   char *_asctime_buf;
 
   /* signal info */
-  void (**(_sig_func))(int);
+  void (** _sig_func)(int);
 
 #ifdef _REENT_BACKWARD_BINARY_COMPAT
   struct _atexit *_reserved_6;
