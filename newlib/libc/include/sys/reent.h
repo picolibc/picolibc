@@ -119,7 +119,7 @@ extern void   __sinit (struct _reent *);
 # define _REENT_SMALL_CHECK_INIT(ptr)		\
   do						\
     {						\
-      if ((ptr) && !(ptr)->__sdidinit)		\
+      if ((ptr) && !(ptr)->__cleanup)		\
 	__sinit (ptr);				\
     }						\
   while (0)
@@ -237,6 +237,10 @@ typedef struct __sFILE   __FILE;
 #endif /* __LARGE64_FILES */
 #endif /* !__CUSTOM_FILE_IO__ */
 
+#ifdef _REENT_GLOBAL_STDIO_STREAMS
+extern __FILE __sf[3];
+#endif
+
 struct _glue
 {
   struct _glue *_next;
@@ -248,6 +252,12 @@ struct _glue
 
 /* How big the some arrays are.  */
 #define _REENT_SIGNAL_SIZE 24
+
+#ifdef _REENT_BACKWARD_BINARY_COMPAT
+#define _REENT_INIT_RESERVED_0 ._reserved_0 = 0,
+#else
+#define _REENT_INIT_RESERVED_0 /* Nothing to initialize */
+#endif
 
 /*
  * struct _reent
@@ -289,11 +299,11 @@ struct _reent
 
   int  _inc;			/* used by tmpnam */
 
-  int __sdidinit;		/* 1 means stdio has been init'd */
-# endif
+#ifdef _REENT_BACKWARD_BINARY_COMPAT
+  int _reserved_0;
+#endif
 
   void (*__cleanup) (struct _reent *);
-
   struct _glue __sglue;			/* root of glue chain */
   __FILE *__sf;			        /* file descriptors */
 };
@@ -306,7 +316,6 @@ struct _reent
   }
 
 #ifdef _REENT_GLOBAL_STDIO_STREAMS
-extern __FILE __sf[3];
 
 #define _REENT_INIT_PTR_ZEROED(var) \
   { (var)->_stdin = &__sf[0]; \
@@ -361,28 +370,36 @@ struct _reent
 
   int  _inc;			/* used by tmpnam */
 
-  int __sdidinit;		/* 1 means stdio has been init'd */
+#ifdef _REENT_BACKWARD_BINARY_COMPAT
+  int _reserved_0;
+#endif
 
   void (*__cleanup) (struct _reent *);
 
   /* These are here last so that __FILE can grow without changing the offsets
      of the above members (on the off chance that future binary compatibility
      would be broken otherwise).  */
-  struct _glue __sglue;		/* root of glue chain */
 # ifndef _REENT_GLOBAL_STDIO_STREAMS
+  struct _glue __sglue;		/* root of glue chain */
   __FILE __sf[3];  		/* first three file descriptors */
 # endif
 };
 
 #ifdef _REENT_GLOBAL_STDIO_STREAMS
-extern __FILE __sf[3];
 #define _REENT_STDIO_STREAM(var, index) &__sf[index]
+#define _REENT_INIT_SGLUE(_ptr) /* nothing to initialize */
+#define _REENT_INIT_SGLUE_ZEROED(_ptr) /* nothing to set */
 #else
 #define _REENT_STDIO_STREAM(var, index) &(var)->__sf[index]
+#define _REENT_INIT_SGLUE(_ptr) , { _NULL, 3, &(_ptr)->__sf[0] }
+#define _REENT_INIT_SGLUE_ZEROED(_ptr) \
+  (_ptr)->__sglue._niobs = 3; \
+  (_ptr)->__sglue._iobs = &(_ptr)->__sf[0];
 #endif
 
 #define _REENT_INIT(var) \
   { _REENT_INIT_STDIO(var)	    \
+    _REENT_INIT_RESERVED_0 \
     .__cleanup = _NULL, \
     .__sglue = _GLUE_INIT \
   }
@@ -415,9 +432,19 @@ extern __FILE __sf[3];
 #endif
 
 extern struct _reent *_impure_ptr __ATTRIBUTE_IMPURE_PTR__;
-extern struct _reent *const _global_impure_ptr __ATTRIBUTE_IMPURE_PTR__;
+
+#ifndef __ATTRIBUTE_IMPURE_DATA__
+#define __ATTRIBUTE_IMPURE_DATA__
+#endif
+
+extern struct _reent _impure_data __ATTRIBUTE_IMPURE_DATA__;
+
+extern void (*__stdio_exit_handler) (void);
 
 void _reclaim_reent (struct _reent *);
+
+extern int _fwalk_sglue (struct _reent *, int (*)(struct _reent *, __FILE *),
+			 struct _glue *);
 
 /* #define _REENT_ONLY define this to get only reentrant routines */
 
@@ -430,7 +457,7 @@ void _reclaim_reent (struct _reent *);
 # define _REENT _impure_ptr
 #endif /* __SINGLE_THREAD__ || !__DYNAMIC_REENT__ */
 
-#define _GLOBAL_REENT _global_impure_ptr
+#define _GLOBAL_REENT (&_impure_data)
 
 #ifdef __cplusplus
 }

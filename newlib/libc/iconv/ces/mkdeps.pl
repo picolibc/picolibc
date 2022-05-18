@@ -200,7 +200,7 @@ delete $sections{$section_cesdeps};
 print STDERR "Warning: section \"$_\" was ignored!\n"
 foreach (keys %sections);
 
-exit 1;
+exit 0;
 }
 
 # =============================================================================
@@ -213,7 +213,7 @@ exit 1;
 sub err($)
 {
   print STDERR "Error while running script.\n$_[0]\n";
-  exit 0;
+  exit 1;
 }
 
 

@@ -213,7 +213,7 @@ int _dummy_mallocr = 1;
      (for example, internally, `malloc' is named `mALLOc') needed
      when compiling in this case. These look funny but don't otherwise
      affect anything.
-  INTERNAL_NEWLIB	    (default: NOT defined)
+  _LIBC	                    (default: NOT defined)
      Defined only when compiled as part of the Cygnus newlib
      distribution.
   WIN32                     (default: undefined)
@@ -296,7 +296,7 @@ extern "C" {
 
  */
 
-#ifdef INTERNAL_NEWLIB
+#ifdef _LIBC
 
 #include <sys/config.h>
 #include <sys/lock.h>
@@ -330,11 +330,11 @@ extern void __malloc_lock();
 extern void __malloc_unlock();
 #endif
 
-#else /* ! INTERNAL_NEWLIB */
+#else /* ! _LIBC */
 
 #define POINTER_UINT unsigned long
 
-#endif /* ! INTERNAL_NEWLIB */
+#endif /* ! _LIBC */
 
 /*
     Debugging:
@@ -923,7 +923,7 @@ Void_t *(*__morecore)() = __default_morecore_init;
 
 #else /* INTERNAL_LINUX_C_LIB */
 
-#ifndef INTERNAL_NEWLIB
+#ifndef _LIBC
 #if __STD_C
 extern Void_t*     sbrk(ptrdiff_t);
 #else
@@ -980,7 +980,7 @@ extern Void_t*     sbrk();
 #define mALLINFo	mallinfo
 #define mALLOPt		mallopt
 
-#ifdef INTERNAL_NEWLIB
+#ifdef _LIBC
 
 #define malloc_stats			malloc_stats
 #define malloc_trim			malloc_trim
@@ -996,7 +996,7 @@ extern Void_t*     sbrk();
 #define malloc_top_pad			__malloc_top_pad
 #define malloc_trim_threshold		__malloc_trim_threshold
 
-#endif /* ! INTERNAL_NEWLIB */
+#endif /* ! _LIBC */
 #endif
 
 /* Public routines */
@@ -3251,7 +3251,7 @@ Void_t* cALLOc(n, elem_size) RDECL size_t n; size_t elem_size;
 */
 
 #if !defined(INTERNAL_LINUX_C_LIB) || !defined(__ELF__)
-#if !defined(INTERNAL_NEWLIB) || !defined(_REENT_ONLY)
+#if !defined(_LIBC) || !defined(_REENT_ONLY)
 #if __STD_C
 void cfree(Void_t *mem)
 #else

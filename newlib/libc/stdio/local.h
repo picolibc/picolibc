@@ -179,12 +179,8 @@ extern _fpos_t __sseek (struct _reent *, void *, _fpos_t, int);
 extern int    __sclose (struct _reent *, void *);
 extern int    __stextmode (int);
 extern void   __sinit (struct _reent *);
-extern void   _cleanup_r (struct _reent *);
 extern void   __smakebuf_r (struct _reent *, FILE *);
 extern int    __swhatbuf_r (struct _reent *, FILE *, size_t *, int *);
-extern int    _fwalk (struct _reent *, int (*)(FILE *));
-extern int    _fwalk_reent (struct _reent *, int (*)(struct _reent *, FILE *));
-struct _glue * __sfmoreglue (struct _reent *,int n);
 extern int __submore (struct _reent *, FILE *);
 
 #ifdef __LARGE64_FILES
@@ -201,7 +197,7 @@ extern _READ_WRITE_RETURN_TYPE __swrite64 (struct _reent *, void *,
   do								\
     {								\
       struct _reent *_check_init_ptr = (ptr);			\
-      if ((_check_init_ptr) && !(_check_init_ptr)->__sdidinit)	\
+      if ((_check_init_ptr) && !(_check_init_ptr)->__cleanup)	\
 	__sinit (_check_init_ptr);				\
       if ((fp) == (FILE *)&__sf_fake_stdin)			\
 	(fp) = _stdin_r(_check_init_ptr);			\
@@ -216,20 +212,11 @@ extern _READ_WRITE_RETURN_TYPE __swrite64 (struct _reent *, void *,
   do								\
     {								\
       struct _reent *_check_init_ptr = (ptr);			\
-      if ((_check_init_ptr) && !(_check_init_ptr)->__sdidinit)	\
+      if ((_check_init_ptr) && !(_check_init_ptr)->__cleanup)	\
 	__sinit (_check_init_ptr);				\
     }								\
   while (0)
 #endif /* !_REENT_SMALL || _REENT_GLOBAL_STDIO_STREAMS */
-
-#define CHECK_STD_INIT(ptr) \
-  do								\
-    {								\
-      struct _reent *_check_init_ptr = (ptr);			\
-      if ((_check_init_ptr) && !(_check_init_ptr)->__sdidinit)	\
-	__sinit (_check_init_ptr);				\
-    }								\
-  while (0)
 
 /* Return true and set errno and stream error flag iff the given FILE
    cannot be written now.  */

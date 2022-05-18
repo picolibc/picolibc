@@ -87,9 +87,6 @@ __register_exitproc (int type,
       p->_ind = 0;
       p->_next = _atexit;
       _atexit = p;
-      p->_on_exit_args._fntypes = 0;
-      p->_on_exit_args._is_cxa = 0;
-#endif
     }
 
   if (type != __et_atexit)

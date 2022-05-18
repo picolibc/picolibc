@@ -274,7 +274,6 @@ SUCH DAMAGE.
 #define __FILENAME_MAX__ 255
 #define _READ_WRITE_RETURN_TYPE _ssize_t
 #define __DYNAMIC_REENT__
-#define _REENT_GLOBAL_ATEXIT
 #define _REENT_GLOBAL_STDIO_STREAMS
 #endif
 
@@ -334,6 +333,12 @@ SUCH DAMAGE.
 #ifdef _WANT_USE_GDTOA
 #ifndef _USE_GDTOA
 #define _USE_GDTOA
+#endif
+#endif
+
+#ifdef _WANT_REENT_BACKWARD_BINARY_COMPAT
+#ifndef _REENT_BACKWARD_BINARY_COMPAT
+#define _REENT_BACKWARD_BINARY_COMPAT
 #endif
 #endif
 

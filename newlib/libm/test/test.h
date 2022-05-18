@@ -159,6 +159,11 @@ typedef union
 
 #endif /* __IEEE_LITTLE_ENDIAN */
 
+extern int inacc;
+extern int redo;
+extern int reduce;
+extern int verbose;
+
 void checkf();
 void enter();
 

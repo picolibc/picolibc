@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2022 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,20 +33,38 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-dirs = ['newlib.locale',
-	'newlib.search',
-	'newlib.stdio',
-	'newlib.stdlib',
-	'newlib.string',
-	'newlib.time',
-	'newlib.wctype']
+tests = ['tzset']
 
-if not newlib_iconv_external_ccs or tests_enable_posix_io
-  dirs += ['newlib.iconv']
-endif
+foreach target : targets
+  value = get_variable('target_' + target)
 
-test_inc = [include_directories('include'), inc]
+  _libs = [get_variable('lib_c' + target)]
+  if is_variable('lib_semihost' + target)
+    _libs += [get_variable('lib_semihost' + target)]
+  endif
+  if is_variable('lib_crt_hosted' + target)
+    _libs += [get_variable('lib_crt_hosted'+ target)]
+  endif
+  
+  _c_args = value[1] + test_c_args
+  _link_args = value[1] + test_link_args
 
-foreach dir : dirs
-  subdir(dir)
+  foreach test : tests
+    if target == ''
+      test_name = test
+    else
+      test_name = test + '_' + target
+    endif
+
+    src = test + '.c'
+
+    test(test_name,
+	 executable(test_name, [src],
+		    c_args: ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE'] + _c_args,
+		    link_args: _link_args,
+		    link_with: _libs,
+		    include_directories: test_inc),
+         depends: bios_bin,
+	 env: test_env)
+  endforeach
 endforeach

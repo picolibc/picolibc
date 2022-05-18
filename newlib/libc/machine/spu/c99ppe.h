@@ -104,7 +104,6 @@ FILE  *__sfp (struct _reent *);
 #define __sfp_free(fp) ( (fp)->_fp = 0 )
 
 #define CHECK_INIT(ptr) \
-  do { if ((ptr) && !(ptr)->__sdidinit) __sinit (ptr); } while (0)
-#define CHECK_STD_INIT(ptr) /* currently, do nothing */
+  do { if ((ptr) && !(ptr)->__cleanup) __sinit (ptr); } while (0)
 #define CHECK_STR_INIT(ptr) /* currently, do nothing */
 #endif /* __ASSEMBLER__ */
