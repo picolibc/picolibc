@@ -329,6 +329,8 @@ __fp_lock_all (void)
 #ifndef _REENT_GLOBAL_STDIO_STREAMS
   ptr = _REENT;
   (void) _fwalk_sglue (ptr, __fp_lock, &ptr->__sglue);
+#else
+  (void) _fwalk_sglue (NULL, __fp_lock, &__sglue);
 #endif
 }
 
@@ -340,6 +342,8 @@ __fp_unlock_all (void)
 
   ptr = _REENT;
   (void) _fwalk_sglue (ptr, __fp_unlock, &ptr->__sglue);
+#else
+  (void) _fwalk_sglue (NULL, __fp_unlock, &__sglue);
 #endif
 
   __sfp_lock_release ();
