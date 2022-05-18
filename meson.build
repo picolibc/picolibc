@@ -184,6 +184,8 @@ c_flags = cc.get_supported_arguments(['-fno-common', '-frounding-math', '-fsigna
 c_args += c_flags
 native_c_args += c_flags
 
+c_args += '-D_LIBC'
+
 # Select a fortify source option
 fortify_source = get_option('fortify-source')
 if fortify_source == 'none'
