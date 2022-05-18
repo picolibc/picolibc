@@ -125,6 +125,32 @@ use Picolibc:
 
 ## Releases
 
+### Picolibc version 1.7.7
+
+ 1. Fix semihost gettimeofday, add a test.
+
+ 2. Fix config option documentation. (Thanks to rdiez)
+
+ 3. Document how re-entrant locking APIs are used. (Thanks to rdiez)
+
+ 4. Fix some 16-bit int issues in tinystdio. (Thanks to Ayke van
+    Laethem)
+
+ 5. Make header files a bit more POSIX compliant, installing rpc
+    headers, moving byte swapping macros to arpa/inet.h
+
+ 6. Fix some stdio bugs found by Zephyr test suite: snprintf return
+    value on buffer overflow, add ftello/fseeko, fputc return value,
+    %0a formatting, clear EOF status after ungetc/fseek.
+
+ 7. Re-do buffered I/O support to handle mixed read/write files
+    correctly. This adds setbuf, setbuffer, setlinebuf, setvbuf.
+
+ 8. Add fmemopen and freopen.
+
+ 9. Add enough cmake support to allow Zephyr to build picolibc as a
+    module using that, rather than meson.
+ 
 ### Picolibc version 1.7.6
 
  1. Fix use with C++ applications caused by a syntax error in
