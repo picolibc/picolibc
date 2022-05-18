@@ -1,6 +1,7 @@
 /* Test that valid POSIX timezone strings are correctly parsed by tzset(3). */
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 // BEGIN test vectors
 #include <time.h>
@@ -156,7 +157,7 @@ void test_TimezoneStrings(void)
     }
 }
 
-int main()
+int main(void)
 {
     test_TimezoneStrings();
     exit (failed);

@@ -38,6 +38,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <stdint.h>
 
 #ifdef __arm__
 void *__aeabi_memset(void *dest, size_t n, int c);
