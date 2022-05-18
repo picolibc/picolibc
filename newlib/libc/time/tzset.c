@@ -1,17 +1,13 @@
-/* Copyright (c) 2002 Jeff Johnston <jjohnstn@redhat.com> */
 /*
 FUNCTION
 <<tzset>>---set timezone characteristics from <[TZ]> environment variable
 
 INDEX
 	tzset
-INDEX
-	_tzset_r
 
 SYNOPSIS
 	#include <time.h>
 	void tzset(void);
-	void _tzset_r (struct _reent *<[reent_ptr]>);
 
 DESCRIPTION
 <<tzset>> examines the <[TZ]> environment variable and sets up the three
@@ -93,9 +89,6 @@ Note that there is no white-space padding between fields. Also note that
 if <[TZ]> is null, the default is Universal Time which has no daylight saving
 time. If <[TZ]> is empty, the default EST5EDT is used.
 
-The function <<_tzset_r>> is identical to <<tzset>> only it is reentrant
-and is used for applications that use multiple threads.
-
 RETURNS
 There is no return value.
 
@@ -108,15 +101,17 @@ Supporting OS subroutine required: None
 #define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
-#include <time.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <time.h>
 #include "local.h"
 
-extern char *getenv(const char *);
+#define TZNAME_MIN	3	/* POSIX min TZ abbr size local def */
+#define TZNAME_MAX	10	/* POSIX max TZ abbr size local def */
 
-static char __tzname_std[11];
-static char __tzname_dst[11];
+static char __tzname_std[TZNAME_MAX + 1];
+static char __tzname_dst[TZNAME_MAX + 1];
 static char *prev_tzenv = NULL;
 
 void
@@ -151,8 +146,30 @@ _tzset_unlocked (void)
   if (*tzenv == ':')
     ++tzenv;  
 
-  if (sscanf (tzenv, "%10[^0-9,+-]%n", __tzname_std, &n) <= 0)
-    return;
+  /* allow POSIX angle bracket < > quoted signed alphanumeric tz abbr e.g. <MESZ+0330> */
+  if (*tzenv == '<')
+    {
+      ++tzenv;
+
+      /* quit if no items, too few or too many chars, or no close quote '>' */
+      if (sscanf (tzenv, "%10[-+0-9A-Za-z]%n", __tzname_std, &n) <= 0
+          || n < TZNAME_MIN || TZNAME_MAX < n)
+        return;
+      while (tzenv[n] != '>') {
+          if (!tzenv[n])
+              return;
+          n++;
+      }
+
+      ++tzenv;	/* bump for close quote '>' */
+    }
+  else
+    {
+      /* allow POSIX unquoted alphabetic tz abbr e.g. MESZ */
+      if (sscanf (tzenv, "%10[A-Za-z]%n", __tzname_std, &n) <= 0
+				|| n < TZNAME_MIN || TZNAME_MAX < n)
+        return;
+    }
  
   tzenv += n;
 
@@ -174,17 +191,43 @@ _tzset_unlocked (void)
   tz->__tzrule[0].offset = sign * (ss + SECSPERMIN * mm + SECSPERHOUR * hh);
   _tzname[0] = __tzname_std;
   tzenv += n;
-  
-  if (sscanf (tzenv, "%10[^0-9,+-]%n", __tzname_dst, &n) <= 0)
-    { /* No dst */
-      _tzname[1] = _tzname[0];
-      _timezone = tz->__tzrule[0].offset;
-      _daylight = 0;
-      return;
+
+  /* allow POSIX angle bracket < > quoted signed alphanumeric tz abbr e.g. <MESZ+0330> */
+  if (*tzenv == '<')
+    {
+      ++tzenv;
+
+      /* quit if no items, too few or too many chars, or no close quote '>' */
+      if (sscanf (tzenv, "%10[-+0-9A-Za-z]%n", __tzname_dst, &n) <= 0
+          || n < TZNAME_MIN || TZNAME_MAX < n)
+	{ /* No dst */
+	  _tzname[1] = _tzname[0];
+	  _timezone = tz->__tzrule[0].offset;
+	  _daylight = 0;
+          return;
+	}
+      while (tzenv[n] != '>') {
+          if (!tzenv[n])
+              return;
+          n++;
+      }
+
+      ++tzenv;	/* bump for close quote '>' */
     }
   else
-    _tzname[1] = __tzname_dst;
+    {
+      /* allow POSIX unquoted alphabetic tz abbr e.g. MESZ */
+      if (sscanf (tzenv, "%10[A-Za-z]%n", __tzname_dst, &n) <= 0
+				|| n < TZNAME_MIN || TZNAME_MAX < n)
+	{ /* No dst */
+	  _tzname[1] = _tzname[0];
+	  _timezone = tz->__tzrule[0].offset;
+	  _daylight = 0;
+	  return;
+	}
+    }
 
+  _tzname[1] = __tzname_dst;
   tzenv += n;
 
   /* otherwise we have a dst name, look for the offset */

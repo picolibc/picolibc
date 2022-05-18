@@ -59,7 +59,7 @@ _reclaim_reent (struct _reent *ptr)
   if (ptr != _impure_ptr)
     {
 #ifndef TINY_STDIO
-      if (ptr->__sdidinit)
+      if (ptr->__cleanup)
 	{
 	  /* cleanup won't reclaim memory 'coz usually it's run
 	     before the program exits, and who wants to wait for that? */

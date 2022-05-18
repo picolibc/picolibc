@@ -248,6 +248,8 @@ struct _glue
   __FILE *_iobs;
 };
 
+extern struct _glue __sglue;
+
 #define _GLUE_INIT	{ _NULL, 0, _NULL }
 
 /* How big the some arrays are.  */
@@ -281,8 +283,7 @@ extern __FILE __sf[3];
 	._stdin = _REENT_STDIO_STREAM(&(var), 0), \
 	._stdout = _REENT_STDIO_STREAM(&(var), 1), \
 	._stderr = _REENT_STDIO_STREAM(&(var), 2), \
-	._inc = 0, \
-	.__sdidinit = 0,
+	._inc = 0,
 #endif
 
 #ifdef _REENT_SMALL
@@ -301,6 +302,7 @@ struct _reent
 
 #ifdef _REENT_BACKWARD_BINARY_COMPAT
   int _reserved_0;
+#endif
 #endif
 
   void (*__cleanup) (struct _reent *);
