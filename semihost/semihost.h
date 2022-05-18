@@ -37,6 +37,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 /* Semihost exceptions for sys_semihost_exit */
 #define ADP_Stopped_BranchThroughZero	0x20000
