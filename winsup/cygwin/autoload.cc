@@ -473,6 +473,7 @@ LoadDLLfuncEx (PrefetchVirtualMemory, 16, kernel32, 1)
 LoadDLLfunc (QueryInterruptTime, 4, KernelBase)
 LoadDLLfunc (QueryInterruptTimePrecise, 4, KernelBase)
 LoadDLLfunc (QueryUnbiasedInterruptTimePrecise, 4, KernelBase)
+LoadDLLfuncEx (SetThreadDescription, 8, KernelBase, 1)
 LoadDLLfunc (VirtualAlloc2, 28, KernelBase)
 
 LoadDLLfunc (NtMapViewOfSectionEx, 36, ntdll)

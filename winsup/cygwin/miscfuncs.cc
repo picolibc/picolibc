@@ -18,6 +18,9 @@ details. */
 #include "tls_pbuf.h"
 #include "mmap_alloc.h"
 
+/* not yet prototyped in w32api */
+extern "C" HRESULT WINAPI SetThreadDescription (HANDLE hThread, PCWSTR lpThreadDescription);
+
 /* Get handle count of an object. */
 ULONG
 get_obj_handle_count (HANDLE h)
@@ -916,8 +919,8 @@ wmempcpy:								\n\
 
 #define MS_VC_EXCEPTION 0x406D1388
 
-void
-SetThreadName(DWORD dwThreadID, const char* threadName)
+static void
+SetThreadNameExc (DWORD dwThreadID, const char* threadName)
 {
   if (!IsDebuggerPresent ())
     return;
@@ -936,6 +939,32 @@ SetThreadName(DWORD dwThreadID, const char* threadName)
     }
   __except (NO_ERROR)
   __endtry
+}
+
+void
+SetThreadName (DWORD dwThreadID, const char* threadName)
+{
+  HANDLE hThread = OpenThread (THREAD_SET_LIMITED_INFORMATION, FALSE, dwThreadID);
+  if (hThread)
+    {
+      /* SetThreadDescription only exists in a wide-char version, so we must
+	 convert threadname to wide-char.  The encoding of threadName is
+	 unclear, so use UTF8 until we know better. */
+      int bufsize = MultiByteToWideChar (CP_UTF8, 0, threadName, -1, NULL, 0);
+      WCHAR buf[bufsize];
+      bufsize = MultiByteToWideChar (CP_UTF8, 0, threadName, -1, buf, bufsize);
+      HRESULT hr = SetThreadDescription (hThread, buf);
+      if (hr != S_OK)
+	{
+	  debug_printf ("SetThreadDescription() failed. %08x %08x\n",
+			GetLastError (), hr);
+	}
+      CloseHandle (hThread);
+    }
+
+  /* also use the older, exception-based method of setting threadname for the
+     benefit of things which don't known about GetThreadDescription. */
+  SetThreadNameExc (dwThreadID, threadName);
 }
 
 #define add_size(p,s) ((p) = ((__typeof__(p))((PBYTE)(p)+(s))))
