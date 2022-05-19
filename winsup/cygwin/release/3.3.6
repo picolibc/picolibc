@@ -3,3 +3,7 @@ Bug Fixes
 
 - Fix an issue that command "cmd /c script -c cmd" crashes if it
   is issued in console of Windows 7.
+
+- Fix killpg failing because the exec'ing as well as the exec'ed
+  process are not in the pidlist for a brief moment.
+  Addresses: https://cygwin.com/pipermail/cygwin/2022-May/251479.html

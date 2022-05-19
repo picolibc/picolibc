@@ -860,13 +860,14 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  strace.execing = 1;
 	  myself.hProcess = hExeced = pi.hProcess;
 	  HANDLE old_winpid_hdl = myself.shared_winpid_handle ();
-	  if (!real_path.iscygexec ())
-	    {
-	      /* If the child process is not a Cygwin process, we have to
-		 create a new winpid symlink on behalf of the child process
-		 not being able to do this by itself. */
-	      myself.create_winpid_symlink ();
-	    }
+	  /* We have to create a new winpid symlink on behalf of the child
+	     process. For Cygwin processes we also have to create a reference
+	     in the child. */
+	  myself.create_winpid_symlink ();
+	  if (real_path.iscygexec ())
+	    DuplicateHandle (GetCurrentProcess (),
+			     myself.shared_winpid_handle (),
+			     pi.hProcess, NULL, 0, 0, DUPLICATE_SAME_ACCESS);
 	  NtClose (old_winpid_hdl);
 	  real_path.get_wide_win32_path (myself->progname); // FIXME: race?
 	  sigproc_printf ("new process name %W", myself->progname);
