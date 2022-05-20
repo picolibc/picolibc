@@ -625,6 +625,9 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap_orig)
 
 #if  SCANF_FLOAT
 	          case 'p':
+                      if (sizeof(void *) > sizeof(int))
+                          flags |= FL_LONG;
+                      FALLTHROUGH;
 		  case 'x':
 	          case 'X':
 		    flags |= FL_HEX;
@@ -657,6 +660,10 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap_orig)
 		  case 'i':
 		    goto conv_int;
 
+                  case 'p':
+                      if (sizeof(void *) > sizeof(int))
+                          flags |= FL_LONG;
+                      FALLTHROUGH;
 		  default:			/* p,x,X	*/
 		    flags |= FL_HEX;
 		  conv_int:

@@ -513,9 +513,9 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
 		continue;
             }
 
-#ifdef _WANT_IO_C99_FORMATS
-
 #define CHECK_LONGLONG(type) else if (sizeof(type) == sizeof(long long)) flags |= FL_LONG|FL_REPD_TYPE;
+
+#ifdef _WANT_IO_C99_FORMATS
 
 #define CHECK_INT_SIZE(letter, type)			\
 	    if (c == letter) {				\
@@ -985,6 +985,8 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
                         base = 8;
                     } else if (c == 'p') {
                         flags |= FL_ALT | FL_ALTHEX;
+                        if (sizeof(void *) > sizeof(int))
+                            flags |= FL_LONG;
                         base = 16;
                     } else if (TOLOW(c) == 'x') {
                         flags |= FL_ALTHEX;
