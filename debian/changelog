@@ -1,3 +1,13 @@
+picolibc (1.7.7-1) unstable; urgency=medium
+
+  * New upstream
+
+  * Merge current newlib
+
+  * Re-do buffered I/O support
+
+ -- Keith Packard <keithp@keithp.com>  Fri, 20 May 2022 17:46:20 -0700
+
 picolibc (1.7.6-1) unstable; urgency=medium
 
   * New upstream

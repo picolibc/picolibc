@@ -10,7 +10,7 @@ Copyright: 2020 The Newlib Project
 License: Default-1
 
 Files: debian/*
-Copyright: 2019-2021 Keith Packard
+Copyright: 2019-2022 Keith Packard
 License: BSD3-1
 
 Files: *.md
@@ -460,6 +460,215 @@ Files: newlib/libm/machine/sparc/fenv.c
 Copyright: 2004-2005 David Schultz <das@FreeBSD.ORG>
 License: BSD2-12
 
+Files: CMakeLists.txt
+ cmake/picolibc.cmake
+ newlib/CMakeLists.txt
+ newlib/libc/CMakeLists.txt
+ newlib/libc/argz/CMakeLists.txt
+ newlib/libc/ctype/CMakeLists.txt
+ newlib/libc/errno/CMakeLists.txt
+ newlib/libc/iconv/CMakeLists.txt
+ newlib/libc/iconv/ccs/CMakeLists.txt
+ newlib/libc/iconv/ccs/binary/CMakeLists.txt
+ newlib/libc/iconv/ces/CMakeLists.txt
+ newlib/libc/iconv/lib/CMakeLists.txt
+ newlib/libc/include/CMakeLists.txt
+ newlib/libc/include/arpa/CMakeLists.txt
+ newlib/libc/include/byteswap.h
+ newlib/libc/include/machine/CMakeLists.txt
+ newlib/libc/include/rpc/CMakeLists.txt
+ newlib/libc/include/rpc/meson.build
+ newlib/libc/include/ssp/CMakeLists.txt
+ newlib/libc/include/sys/CMakeLists.txt
+ newlib/libc/locale/CMakeLists.txt
+ newlib/libc/machine/CMakeLists.txt
+ newlib/libc/machine/aarch64/machine/math.h
+ newlib/libc/machine/aarch64/machine/meson.build
+ newlib/libc/machine/arm/CMakeLists.txt
+ newlib/libc/machine/arm/machine/CMakeLists.txt
+ newlib/libc/machine/arm/sys/CMakeLists.txt
+ newlib/libc/machine/riscv/CMakeLists.txt
+ newlib/libc/machine/riscv/machine/CMakeLists.txt
+ newlib/libc/machine/riscv/sys/CMakeLists.txt
+ newlib/libc/machine/shared_x86/CMakeLists.txt
+ newlib/libc/machine/shared_x86/sys/CMakeLists.txt
+ newlib/libc/machine/x86_64/CMakeLists.txt
+ newlib/libc/misc/CMakeLists.txt
+ newlib/libc/picolib/CMakeLists.txt
+ newlib/libc/picolib/machine/CMakeLists.txt
+ newlib/libc/picolib/machine/arm/CMakeLists.txt
+ newlib/libc/picolib/machine/riscv/CMakeLists.txt
+ newlib/libc/posix/CMakeLists.txt
+ newlib/libc/search/CMakeLists.txt
+ newlib/libc/signal/CMakeLists.txt
+ newlib/libc/ssp/CMakeLists.txt
+ newlib/libc/stdlib/CMakeLists.txt
+ newlib/libc/stdlib/nano-malloc-getpagesize.c
+ newlib/libc/stdlib/nano-malloc-posix_memalign.c
+ newlib/libc/string/CMakeLists.txt
+ newlib/libc/time/CMakeLists.txt
+ newlib/libc/tinystdio/CMakeLists.txt
+ newlib/libc/tinystdio/ecvt_r.c
+ newlib/libc/tinystdio/ecvtf_r.c
+ newlib/libc/tinystdio/fcvt_r.c
+ newlib/libc/tinystdio/fcvtf_r.c
+ newlib/libc/tinystdio/fmemopen.c
+ newlib/libc/tinystdio/stdio-bufio.h
+ newlib/libc/xdr/CMakeLists.txt
+ newlib/libm/CMakeLists.txt
+ newlib/libm/common/CMakeLists.txt
+ newlib/libm/common/s_iseqsig.c
+ newlib/libm/common/sf_iseqsig.c
+ newlib/libm/common/sl_iseqsig.c
+ newlib/libm/fenv/CMakeLists.txt
+ newlib/libm/fenv/fegetmode.c
+ newlib/libm/fenv/fesetexcept.c
+ newlib/libm/fenv/fesetmode.c
+ newlib/libm/machine/CMakeLists.txt
+ newlib/libm/machine/arm/CMakeLists.txt
+ newlib/libm/machine/arm/s_fabs.c
+ newlib/libm/machine/arm/sf_fabs.c
+ newlib/libm/machine/riscv/CMakeLists.txt
+ newlib/libm/machine/x86_64/CMakeLists.txt
+ newlib/libm/math/CMakeLists.txt
+ newlib/testsuite/newlib.time/meson.build
+ picocrt/CMakeLists.txt
+ picocrt/machine/arm/CMakeLists.txt
+ semihost/CMakeLists.txt
+ semihost/fake/fake_exit.c
+ semihost/fake/fake_io.c
+ semihost/fake/fake_kill.c
+ semihost/fake/fake_stub.c
+ semihost/fake/meson.build
+ semihost/machine/arm/CMakeLists.txt
+ test/CMakeLists.txt
+ test/test-efcvt.c
+ test/test-except.c
+ test/test-fopen.c
+ test/test-mktemp.c
+ test/test-strtod.c
+ zephyr/zephyr.cmake
+Copyright: 2022 Keith Packard
+License: BSD3-1
+
+Files: cmake/TC-arm-none-eabi.ld
+ hello-world/hello-worldpp.cpp
+ newlib/libc/errno/errno.c
+ newlib/libc/iconv/ccs/binary/meson.build
+ newlib/libc/include/machine/math.h
+ newlib/libc/include/ssp/meson.build
+ newlib/libc/include/sys/auxv.h
+ newlib/libc/machine/aarch64/sys/meson.build
+ newlib/libc/machine/arm/machine/meson.build
+ newlib/libc/machine/arm/sys/meson.build
+ newlib/libc/machine/csky/meson.build
+ newlib/libc/machine/i386/machine/meson.build
+ newlib/libc/machine/riscv/machine/math.h
+ newlib/libc/machine/riscv/machine/meson.build
+ newlib/libc/machine/xtensa/sys/meson.build
+ newlib/libc/picolib/getauxval.c
+ newlib/libc/picolib/machine/aarch64/tls.c
+ newlib/libc/picolib/machine/arm/arm_tls.h
+ newlib/libc/picolib/machine/arm/read_tp.S
+ newlib/libc/posix/meson.build
+ newlib/libc/stdio/nano-svfprintf.c
+ newlib/libc/stdio/nano-svfscanf.c
+ newlib/libc/stdio64/meson.build
+ newlib/libc/tinystdio/asprintf.c
+ newlib/libc/tinystdio/compare_exchange.c
+ newlib/libc/tinystdio/ecvt.c
+ newlib/libc/tinystdio/ecvtf.c
+ newlib/libc/tinystdio/exchange.c
+ newlib/libc/tinystdio/fcvt.c
+ newlib/libc/tinystdio/fcvtf.c
+ newlib/libc/tinystdio/fflush.c
+ newlib/libc/tinystdio/filestrget.c
+ newlib/libc/tinystdio/filestrput.c
+ newlib/libc/tinystdio/filestrputalloc.c
+ newlib/libc/tinystdio/gcvt.c
+ newlib/libc/tinystdio/gcvtf.c
+ newlib/libc/tinystdio/perror.c
+ newlib/libc/tinystdio/setvbuf.c
+ newlib/libc/tinystdio/strtod_l.c
+ newlib/libc/tinystdio/strtof_l.c
+ newlib/libc/tinystdio/strtold_l.c
+ newlib/libc/tinystdio/vasprintf.c
+ newlib/libm/machine/arm/s_fma_arm.c
+ newlib/libm/machine/arm/sf_fma_arm.c
+ newlib/libm/machine/riscv/s_fma.c
+ newlib/libm/machine/riscv/s_fma_riscv.c
+ newlib/libm/machine/riscv/s_sqrt.c
+ newlib/libm/machine/riscv/sf_fma.c
+ newlib/libm/machine/riscv/sf_fma_riscv.c
+ newlib/libm/machine/riscv/sf_sqrt.c
+ newlib/libm/machine/x86_64/meson.build
+ newlib/libm/math/s_lgamma.c
+ scripts/run-aarch64
+ scripts/run-i386
+ scripts/run-rv32imac
+ scripts/run-rv32imafdc
+ scripts/run-x86_64
+ scripts/test-arm.ld
+ scripts/test-cortex-a9.ld
+ scripts/test-i386.ld
+ scripts/test-m68k.ld
+ scripts/test-riscv.ld
+ scripts/test-riscv32.ld
+ scripts/test-riscv64.ld
+ scripts/test-x86_64.ld
+ semihost/fstat.c
+ semihost/isatty.c
+ semihost/mapstdio.c
+ semihost/sys_iserror.c
+ semihost/sys_system.c
+ semihost/sys_tickfreq.c
+ test/fenv.c
+ test/ffs.c
+ test/malloc.c
+ test/malloc_stress.c
+ test/math_errhandling.c
+ test/math_errhandling_tests.c
+ test/regex.c
+ test/semihost/meson.build
+ test/semihost/semihost-argv.c
+ test/semihost/semihost-clock.c
+ test/semihost/semihost-close.c
+ test/semihost/semihost-elapsed.c
+ test/semihost/semihost-errno.c
+ test/semihost/semihost-exit-extended-failure.c
+ test/semihost/semihost-exit-extended.c
+ test/semihost/semihost-exit-failure.c
+ test/semihost/semihost-exit.c
+ test/semihost/semihost-flen.c
+ test/semihost/semihost-get-cmdline.c
+ test/semihost/semihost-gettimeofday.c
+ test/semihost/semihost-heapinfo.c
+ test/semihost/semihost-iserror.c
+ test/semihost/semihost-istty.c
+ test/semihost/semihost-open.c
+ test/semihost/semihost-read.c
+ test/semihost/semihost-readc.c
+ test/semihost/semihost-remove.c
+ test/semihost/semihost-rename.c
+ test/semihost/semihost-seek.c
+ test/semihost/semihost-system-failure.c
+ test/semihost/semihost-system.c
+ test/semihost/semihost-tickfreq.c
+ test/semihost/semihost-time.c
+ test/semihost/semihost-tmpnam.c
+ test/semihost/semihost-tmpname.c
+ test/semihost/semihost-write.c
+ test/semihost/semihost-write0.c
+ test/semihost/semihost-writec.c
+ test/setjmp.c
+ test/stack-smash.c
+ test/tls.c
+ test/try-ilp32-sub.c
+ test/try-ilp32.c
+ test/try-ilp32.h
+Copyright: 2020 Keith Packard
+License: BSD3-1
+
 Files: dummyhost/iob.c
  dummyhost/meson.build
  hello-world/Makefile
@@ -479,6 +688,7 @@ Files: dummyhost/iob.c
  newlib/libc/iconv/ces/meson.build
  newlib/libc/iconv/lib/meson.build
  newlib/libc/iconv/meson.build
+ newlib/libc/include/arpa/meson.build
  newlib/libc/include/endian.h
  newlib/libc/include/machine/meson.build
  newlib/libc/include/meson.build
@@ -545,16 +755,21 @@ Files: dummyhost/iob.c
  newlib/libc/stdlib/nano-malloc-valloc.c
  newlib/libc/string/meson.build
  newlib/libc/time/meson.build
+ newlib/libc/tinystdio/bufio.c
  newlib/libc/tinystdio/fdopen.c
  newlib/libc/tinystdio/fileno.c
  newlib/libc/tinystdio/fopen.c
+ newlib/libc/tinystdio/freopen.c
  newlib/libc/tinystdio/fseek.c
+ newlib/libc/tinystdio/fseeko.c
  newlib/libc/tinystdio/ftell.c
+ newlib/libc/tinystdio/ftello.c
  newlib/libc/tinystdio/ftoa_data.c
  newlib/libc/tinystdio/meson.build
- newlib/libc/tinystdio/posixio.c
  newlib/libc/tinystdio/posixiob.c
  newlib/libc/tinystdio/setbuf.c
+ newlib/libc/tinystdio/setbuffer.c
+ newlib/libc/tinystdio/setlinebuf.c
  newlib/libc/xdr/meson.build
  newlib/libm/common/meson.build
  newlib/libm/common/s_issignaling.c
@@ -664,122 +879,6 @@ Files: dummyhost/iob.c
 Copyright: 2019 Keith Packard
 License: BSD3-1
 
-Files: hello-world/hello-worldpp.cpp
- newlib/libc/errno/errno.c
- newlib/libc/iconv/ccs/binary/meson.build
- newlib/libc/include/machine/math.h
- newlib/libc/include/ssp/meson.build
- newlib/libc/include/sys/auxv.h
- newlib/libc/machine/aarch64/sys/meson.build
- newlib/libc/machine/arm/machine/meson.build
- newlib/libc/machine/arm/sys/meson.build
- newlib/libc/machine/csky/meson.build
- newlib/libc/machine/i386/machine/meson.build
- newlib/libc/machine/riscv/machine/math.h
- newlib/libc/machine/riscv/machine/meson.build
- newlib/libc/machine/xtensa/sys/meson.build
- newlib/libc/picolib/getauxval.c
- newlib/libc/picolib/machine/aarch64/tls.c
- newlib/libc/picolib/machine/arm/arm_tls.h
- newlib/libc/picolib/machine/arm/read_tp.S
- newlib/libc/posix/meson.build
- newlib/libc/stdio/nano-svfprintf.c
- newlib/libc/stdio/nano-svfscanf.c
- newlib/libc/stdio64/meson.build
- newlib/libc/tinystdio/asprintf.c
- newlib/libc/tinystdio/compare_exchange.c
- newlib/libc/tinystdio/ecvt.c
- newlib/libc/tinystdio/ecvtf.c
- newlib/libc/tinystdio/exchange.c
- newlib/libc/tinystdio/fcvt.c
- newlib/libc/tinystdio/fcvtf.c
- newlib/libc/tinystdio/fflush.c
- newlib/libc/tinystdio/filestrget.c
- newlib/libc/tinystdio/filestrput.c
- newlib/libc/tinystdio/filestrputalloc.c
- newlib/libc/tinystdio/gcvt.c
- newlib/libc/tinystdio/gcvtf.c
- newlib/libc/tinystdio/perror.c
- newlib/libc/tinystdio/setvbuf.c
- newlib/libc/tinystdio/strtod_l.c
- newlib/libc/tinystdio/strtof_l.c
- newlib/libc/tinystdio/strtold_l.c
- newlib/libc/tinystdio/vasprintf.c
- newlib/libm/machine/arm/s_fma_arm.c
- newlib/libm/machine/arm/sf_fma_arm.c
- newlib/libm/machine/riscv/s_fma.c
- newlib/libm/machine/riscv/s_fma_riscv.c
- newlib/libm/machine/riscv/s_sqrt.c
- newlib/libm/machine/riscv/sf_fma.c
- newlib/libm/machine/riscv/sf_fma_riscv.c
- newlib/libm/machine/riscv/sf_sqrt.c
- newlib/libm/machine/x86_64/meson.build
- newlib/libm/math/s_lgamma.c
- scripts/run-aarch64
- scripts/run-i386
- scripts/run-rv32imac
- scripts/run-rv32imafdc
- scripts/run-x86_64
- scripts/test-arm.ld
- scripts/test-cortex-a9.ld
- scripts/test-i386.ld
- scripts/test-m68k.ld
- scripts/test-riscv.ld
- scripts/test-riscv32.ld
- scripts/test-riscv64.ld
- scripts/test-x86_64.ld
- semihost/fstat.c
- semihost/isatty.c
- semihost/mapstdio.c
- semihost/sys_iserror.c
- semihost/sys_system.c
- semihost/sys_tickfreq.c
- test/fenv.c
- test/ffs.c
- test/malloc.c
- test/malloc_stress.c
- test/math_errhandling.c
- test/math_errhandling_tests.c
- test/regex.c
- test/semihost/meson.build
- test/semihost/semihost-argv.c
- test/semihost/semihost-clock.c
- test/semihost/semihost-close.c
- test/semihost/semihost-elapsed.c
- test/semihost/semihost-errno.c
- test/semihost/semihost-exit-extended-failure.c
- test/semihost/semihost-exit-extended.c
- test/semihost/semihost-exit-failure.c
- test/semihost/semihost-exit.c
- test/semihost/semihost-flen.c
- test/semihost/semihost-get-cmdline.c
- test/semihost/semihost-heapinfo.c
- test/semihost/semihost-iserror.c
- test/semihost/semihost-istty.c
- test/semihost/semihost-open.c
- test/semihost/semihost-read.c
- test/semihost/semihost-readc.c
- test/semihost/semihost-remove.c
- test/semihost/semihost-rename.c
- test/semihost/semihost-seek.c
- test/semihost/semihost-system-failure.c
- test/semihost/semihost-system.c
- test/semihost/semihost-tickfreq.c
- test/semihost/semihost-time.c
- test/semihost/semihost-tmpnam.c
- test/semihost/semihost-tmpname.c
- test/semihost/semihost-write.c
- test/semihost/semihost-write0.c
- test/semihost/semihost-writec.c
- test/setjmp.c
- test/stack-smash.c
- test/tls.c
- test/try-ilp32-sub.c
- test/try-ilp32.c
- test/try-ilp32.h
-Copyright: 2020 Keith Packard
-License: BSD3-1
-
 Files: meson.build
 Copyright: 2019-2021 Keith Packard
 License: BSD3-1
@@ -845,34 +944,6 @@ Files: newlib/empty.c
  test/timegm.c
  test/timegm.h
 Copyright: 2021 Keith Packard
-License: BSD3-1
-
-Files: newlib/libc/include/byteswap.h
- newlib/libc/stdlib/nano-malloc-getpagesize.c
- newlib/libc/stdlib/nano-malloc-posix_memalign.c
- newlib/libc/tinystdio/ecvt_r.c
- newlib/libc/tinystdio/ecvtf_r.c
- newlib/libc/tinystdio/fcvt_r.c
- newlib/libc/tinystdio/fcvtf_r.c
- newlib/libm/common/s_iseqsig.c
- newlib/libm/common/sf_iseqsig.c
- newlib/libm/common/sl_iseqsig.c
- newlib/libm/fenv/fegetmode.c
- newlib/libm/fenv/fesetexcept.c
- newlib/libm/fenv/fesetmode.c
- newlib/libm/machine/arm/s_fabs.c
- newlib/libm/machine/arm/sf_fabs.c
- semihost/fake/fake_exit.c
- semihost/fake/fake_io.c
- semihost/fake/fake_kill.c
- semihost/fake/fake_stub.c
- semihost/fake/meson.build
- test/test-efcvt.c
- test/test-except.c
- test/test-fopen.c
- test/test-mktemp.c
- test/test-strtod.c
-Copyright: 2022 Keith Packard
 License: BSD3-1
 
 Files: newlib/libc/machine/aarch64/meson.build
@@ -2313,21 +2384,25 @@ Files: .clang-format
  .gitattributes
  .github/Dockerfile
  .github/do-build
+ .github/do-cmake-test
  .github/do-many
  .github/do-test
  .github/packages.txt
  .github/workflows/head
  .github/workflows/linux.yml
  .github/workflows/macos.yml
+ .github/workflows/make-workflow
  .github/workflows/steps-head
  .github/workflows/variants
  .gitignore
  README.md
+ cmake/TC-arm-none-eabi.cmake
  cross.tmpl
  doc/build.md
  doc/embedsource.md
  doc/init.md
  doc/linking.md
+ doc/locking.md
  doc/os.md
  doc/picolibc.svg
  doc/printf.md
@@ -2343,6 +2418,7 @@ Files: .clang-format
  newlib/libc/include/machine/ieee.h
  newlib/libc/include/sys/_tz_structs.h
  newlib/libc/libc.in.xml
+ newlib/libc/machine/aarch64/sys/fcntl.h
  newlib/libc/machine/necv70/necv70.tex
  newlib/libc/machine/nvptx/clock.c
  newlib/libc/ssp/ssp.tex
@@ -2350,11 +2426,16 @@ Files: .clang-format
  newlib/libc/string/wcstrings.tex
  newlib/libc/sys.tex
  newlib/libc/time/strftime.c
+ newlib/libc/time/tzset.c
  newlib/libc/xdr/README
  newlib/libm/complex/complex.tex
  newlib/libm/fenv/fenv.tex
  newlib/libm/libm.in.xml
+ newlib/man.xsl
  newlib/newlib.hin
+ newlib/refcontainers.xslt
+ newlib/testsuite/newlib.time/tzset.c
+ picolibc.h.in
  picolibc.ld.in
  picolibc.specs.in
  scripts/cross-aarch64-linux-gnu.txt
@@ -2376,9 +2457,11 @@ Files: .clang-format
  scripts/cross-x86_64-linux-gnu.txt
  scripts/cross-xtensa-esp32-elf.txt
  scripts/cross-xtensa-lx106-elf.txt
+ scripts/duplicate-names
  scripts/monitor-e9
  semihost/machine/i386/bios.ld
  test/complex-funcs.c
+ test/time-sprintf.c
 Copyright: 2020 The Newlib Project
 License: Default-1
 
@@ -2481,6 +2564,13 @@ Files: newlib/libc/include/alloca.h
 Copyright: 2000 Werner Almesberger
 License: Default-1
 
+Files: newlib/libc/include/arpa/inet.h
+ newlib/libc/include/machine/endian.h
+ newlib/libc/include/machine/param.h
+ newlib/libc/machine/arm/machine/param.h
+Copyright: 2004 Jeff Johnston  <jjohnstn@redhat.com>
+License: Default-1
+
 Files: newlib/libc/include/cpio.h
  newlib/libm/complex/clog10.c
  newlib/libm/complex/clog10f.c
@@ -2513,7 +2603,6 @@ Files: newlib/libc/include/limits.h
  newlib/libc/string/strndup_r.c
  newlib/libc/string/strnlen.c
  newlib/libc/time/local.h
- newlib/libc/time/tzset.c
  newlib/testsuite/newlib.wctype/tiswctype.c
  newlib/testsuite/newlib.wctype/twctrans.c
 Copyright: 2002 Jeff Johnston  <jjohnstn@redhat.com>
@@ -2541,12 +2630,6 @@ License: Default-1
 
 Files: newlib/libc/include/machine/ansi.h
 Copyright: 2001 Jeff Johnston  <jjohnstn@redhat.com>
-License: Default-1
-
-Files: newlib/libc/include/machine/endian.h
- newlib/libc/include/machine/param.h
- newlib/libc/machine/arm/machine/param.h
-Copyright: 2004 Jeff Johnston  <jjohnstn@redhat.com>
 License: Default-1
 
 Files: newlib/libc/include/ssp/stdlib.h
@@ -2640,7 +2723,6 @@ Copyright: 2003 SuperH Ltd.
 License: Default-1
 
 Files: newlib/libc/machine/spu/assert.c
- newlib/libc/machine/spu/impure.c
  newlib/libc/machine/spu/sleep.c
 Copyright: 2008 Patrick Mansfield <patmans@us.ibm.com>
 License: Default-1
@@ -2835,6 +2917,10 @@ License: Default-1
 
 Files: newlib/libm/machine/shared_x86/fenv.c
 Copyright: 2010-2019 Red Hat, Inc.
+License: Default-1
+
+Files: zephyr/Kconfig
+Copyright: 2021 Amazon.com, Inc. or its affiliates. SPDX-License-Identifier: Apache-2.0
 License: Default-1
 
 Files: newlib/libc/include/fenv.h
@@ -3046,6 +3132,10 @@ Files: newlib/testsuite/newlib.stdlib/size_max.c
 Copyright: 2008 CodeSourcery, Inc.
 License: Other-1
 
+Files: newlib/testsuite/newlib.time/time.exp
+Copyright: 2022 jdoubleu.
+License: Other-1
+
 Files: newlib/libc/include/complex.h
 Copyright: 2010 Matthias Drochner.
 License: Other-2
@@ -3174,7 +3264,7 @@ Copyright: 2014-2017 Mentor Graphics.
 License: Other-8
 
 Files: newlib/libc/machine/amdgcn/exit-value.h
- newlib/libc/machine/amdgcn/malloc_support.c
+ newlib/libc/machine/amdgcn/mlock.c
 Copyright: 2017 Mentor Graphics.
 License: Other-8
 
