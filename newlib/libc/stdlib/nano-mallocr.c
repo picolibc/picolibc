@@ -41,6 +41,7 @@
 #include <unistd.h>
 #include <sys/config.h>
 #include <sys/lock.h>
+#include <stdint.h>
 
 #if MALLOC_DEBUG
 #include <assert.h>

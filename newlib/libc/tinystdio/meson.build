@@ -34,6 +34,7 @@
 #
 srcs_tinystdio = [
     'asprintf.c',
+    'bufio.c',
     'clearerr.c',
     'ecvt_r.c',
     'ecvt.c',
@@ -56,13 +57,17 @@ srcs_tinystdio = [
     'filestrget.c',
     'filestrput.c',
     'filestrputalloc.c',
+    'fmemopen.c',
     'fprintf.c',
     'fputc.c',
     'fputs.c',
     'fread.c',
+    'freopen.c',
     'fscanf.c',
     'fseek.c',
+    'fseeko.c',
     'ftell.c',
+    'ftello.c',
     'fwrite.c',
     'getchar.c',
     'gets.c',
@@ -75,6 +80,8 @@ srcs_tinystdio = [
     'rewind.c',
     'scanf.c',
     'setbuf.c',
+    'setbuffer.c',
+    'setlinebuf.c',
     'setvbuf.c',
     'snprintf.c',
     'sprintf.c',
@@ -146,7 +153,6 @@ srcs_tinystdio_posix = [
     'fopen.c',
     'fdopen.c',
     'fclose.c',
-    'posixio.c',
     'sflags.c'
 ]
 
@@ -171,11 +177,12 @@ hdrs_tinystdio = [
     'dtoa_engine.h',
     'ftoa_engine.h',
     'stdio.h',
+    'stdio-bufio.h',
     'stdio_private.h',
     'xtoa_fast.h',
 ]
 
-install_headers('stdio.h',
+install_headers(['stdio.h', 'stdio-bufio.h'],
 		install_dir: include_dir
 	       )
 

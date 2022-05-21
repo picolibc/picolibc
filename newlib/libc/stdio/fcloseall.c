@@ -59,7 +59,12 @@ Required OS subroutines: <<close>>, <<fstat>>, <<isatty>>, <<lseek>>,
 int
 _fcloseall_r (struct _reent *ptr)
 {
-  return _fwalk_reent (ptr, _fclose_r);
+#ifdef _REENT_GLOBAL_STDIO_STREAMS
+  /* There are no thread-specific FILE objects */
+  return 0;
+#else
+  return _fwalk_sglue (ptr, _fclose_r, &ptr->__sglue);
+#endif
 }
 
 #ifndef _REENT_ONLY
@@ -67,7 +72,7 @@ _fcloseall_r (struct _reent *ptr)
 int
 fcloseall (void)
 {
-  return _fcloseall_r (_GLOBAL_REENT);
+  return _fwalk_sglue (_GLOBAL_REENT, _fclose_r, &__sglue);
 }
 
 #endif

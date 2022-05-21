@@ -1,11 +1,15 @@
 [binaries]
-c = 'aarch64-zephyr-elf-gcc'
+# Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
+# so we have to add -nostdlib to the compiler configuration itself or
+# early compiler tests will fail. This can be removed when picolibc
+# requires at least version 0.54.2 of meson.
+c = ['aarch64-zephyr-elf-gcc', '-nostdlib']
 ar = 'aarch64-zephyr-elf-ar'
 as = 'aarch64-zephyr-elf-as'
 nm = 'aarch64-zephyr-elf-nm'
 strip = 'aarch64-zephyr-elf-strip'
 # only needed to run tests
-exe_wrapper = ['env', 'run-aarch64']
+exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-aarch64 "$@"', 'run-aarch64']
 
 [host_machine]
 system = 'none'

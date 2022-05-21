@@ -42,7 +42,7 @@ project('picolibc', 'c',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.53',
-	version: '1.7.6'
+	version: '1.7.7'
        )
 
 targets = []
@@ -174,11 +174,17 @@ newlib_elix_level = get_option('newlib-elix-level')
 c_args = ['-include', '@0@/@1@'.format(meson.current_build_dir(), 'picolibc.h')] + core_c_args
 native_c_args = ['-DNO_NEWLIB']
 
+if get_option('profile')
+  c_args += ['-pg', '-no-pie']
+endif
+
 # Disable ssp and fortify source while building picolibc (it's enabled
 # by default by the ubuntu native compiler)
 c_flags = cc.get_supported_arguments(['-fno-common', '-frounding-math', '-fsignaling-nans', '-Wno-unsupported-floating-point-opt', '-fno-stack-protector'])
 c_args += c_flags
 native_c_args += c_flags
+
+c_args += '-D_LIBC'
 
 # Select a fortify source option
 fortify_source = get_option('fortify-source')
@@ -693,6 +699,10 @@ NEWLIB_MAJOR_VERSION=4
 NEWLIB_MINOR_VERSION=1
 NEWLIB_PATCHLEVEL_VERSION=0
 
+if get_option('newlib-retargetable-locking') != get_option('newlib-multithread')
+  error('newlib-retargetable-locking and newlib-multithread must be set to the same value')
+endif
+
 conf_data.set('_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL',
 	      cc.has_argument('-fno-tree-loop-distribute-patterns'),
 	      description: 'Compiler flag to prevent detecting memcpy/memset patterns')
@@ -965,7 +975,18 @@ if tests_enable_stack_protector
   endif
 endif
 
-test_env = environment()
+# Meson version 0.53.2 doesn't check for the skip_sanity_check value
+# before attempting to run test fragments during configuration. That
+# means the exe_wrapper value needs to handle being run at that
+# point. To support this, the exe_wrapper becomes a script which
+# checks for a environment variable (PICOLIBC_TEST) and exits
+# indicating success if that is not present.
+#
+# This was fixed in meson version 0.54.2, so this can be removed from
+# here and the sample cross scripts once picolibc requires a version
+# of meson newer than that.
+
+test_env = environment({'PICOLIBC_TEST' : '1'})
 test_env.prepend('PATH', meson.source_root() / 'scripts')
 
 # CompCert needs the '-WUl,' prefix to correctly pass the --spec parameters to the linker

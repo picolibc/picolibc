@@ -40,6 +40,7 @@
 #include <string.h>
 #include <malloc.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Walloc-size-larger-than="

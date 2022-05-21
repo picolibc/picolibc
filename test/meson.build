@@ -147,6 +147,29 @@ foreach target : targets
     t1_name = t1 + '_' + target
   endif
 
+  t1 = 'time-sprintf'
+  if target == ''
+    t1_name = t1
+  else
+    t1_name = t1 + '_' + target
+  endif
+
+  test(t1_name,
+       executable(t1_name, ['time-sprintf.c'],
+		  c_args: int_printf_compile_args + _c_args + ['-fno-builtin'],
+		  link_args: int_printf_link_args + _link_args,
+		  link_with: _libs,
+		  include_directories: inc),
+       depends: bios_bin,
+       env: test_env)
+
+  t1 = 'try-ilp32'
+  if target == ''
+    t1_name = t1
+  else
+    t1_name = t1 + '_' + target
+  endif
+
   test(t1_name,
        executable(t1_name, ['try-ilp32.c', 'try-ilp32-sub.c'],
 		  c_args: _c_args,

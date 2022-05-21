@@ -4,8 +4,6 @@ FUNCTION
 <<__retarget_lock_init>>, <<__retarget_lock_init_recursive>>, <<__retarget_lock_close>>, <<__retarget_lock_close_recursive>>, <<__retarget_lock_acquire>>, <<__retarget_lock_acquire_recursive>>, <<__retarget_lock_try_acquire>>, <<__retarget_lock_try_acquire_recursive>>, <<__retarget_lock_release>>, <<__retarget_lock_release_recursive>>---locking routines
 
 INDEX
-	__lock___sinit_recursive_mutex
-INDEX
 	__lock___sfp_recursive_mutex
 INDEX
 	__lock___atexit_recursive_mutex
@@ -43,7 +41,6 @@ INDEX
 
 SYNOPSIS
 	#include <lock.h>
-	struct __lock __lock___sinit_recursive_mutex;
 	struct __lock __lock___sfp_recursive_mutex;
 	struct __lock __lock___atexit_recursive_mutex;
 	struct __lock __lock___at_quick_exit_mutex;

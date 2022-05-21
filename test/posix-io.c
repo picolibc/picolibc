@@ -33,6 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -46,15 +47,26 @@ static void test_cleanup(void)
 	unlink(file_name);
 }
 
+static int
+test_cmp(FILE *f, const char *t)
+{
+        int c;
+	while ((c = getc(f)) != EOF) {
+		if ((char) c != *t) {
+			printf("read incorrect byte %c != %c\n", c, *t);
+			return 1;
+		}
+		t++;
+	}
+        return 0;
+}
 int
 main(void)
 {
 	FILE		*f;
-	const char	*t;
-	int		c;
 
 	atexit(test_cleanup);
-	f = fopen(file_name, "w");
+	f = fopen(file_name, "w+");
 	if (!f) {
 		printf("failed to open \"%s\" for writing\n", file_name);
 		return 1;
@@ -64,6 +76,22 @@ main(void)
 		printf("failed to fprintf test string %s\n", test_string);
 		return 1;
 	}
+
+#if defined(TINY_STDIO) || !defined(_HAVE_SEMIHOST)
+        if (fseeko(f, -3, SEEK_CUR) < 0) {
+                printf("failed to seek back 3 bytes\n");
+                return 1;
+        }
+        if (test_cmp(f, test_string + sizeof(test_string) - 4))
+                return 1;
+
+        if (fseek(f, 2, SEEK_SET)) {
+                printf("failed to seek to 2 bytes\n");
+                return 1;
+        }
+        if (test_cmp(f, test_string + 2))
+                return 1;
+#endif
 
 	if (fclose(f) != 0) {
 		printf("fclose failed\n");
@@ -76,15 +104,9 @@ main(void)
 		return 1;
 	}
 
-	t = test_string;
+        if (test_cmp(f, test_string))
+                return 1;
 
-	while ((c = getc(f)) != EOF) {
-		if ((char) c != *t) {
-			printf("read incorrect byte %c != %c\n", c, *t);
-			return 1;
-		}
-		t++;
-	}
 	printf("success\n");
         exit(0);
 }

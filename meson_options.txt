@@ -77,6 +77,9 @@ option('fortify-source', type: 'combo', choices: ['none', '1', '2'], value: 'non
 option('use-stdlib', type: 'boolean', value: false,
        description: 'Do not bypass the standard system library with -nostdlib (useful for native testing)')
 
+option('profile', type: 'boolean', value: false,
+       description: 'Enable profiling by adding -pg -no-pie to compile flags')
+
 #
 # Testing options
 #

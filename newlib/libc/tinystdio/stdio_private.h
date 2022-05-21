@@ -29,7 +29,10 @@
 
 /* $Id: stdio_private.h 847 2005-09-06 18:49:15Z joerg_wunsch $ */
 
-#include <stdio.h>
+#ifndef _STDIO_PRIVATE_H_
+#define _STDIO_PRIVATE_H_
+
+#include <stdio-bufio.h>
 #include <stdbool.h>
 #include <sys/lock.h>
 
@@ -48,9 +51,9 @@
 
 struct __file_str {
 	struct __file file;	/* main file struct */
-	char	*buf;		/* buffer pointer */
-	int	len;		/* characters written so far */
-	int	size;		/* size of buffer */
+        char	*pos;		/* current buffer position */
+        char    *end;           /* end of buffer */
+        size_t  size;           /* size of allocated storage */
 };
 
 int
@@ -84,7 +87,7 @@ bool __matchcaseprefix(const char *input, const char *pattern);
 			.flags = __SRD,		\
 			.get = __file_str_get	\
 		},				\
-		.buf = (char *) (_s)		\
+		.pos = (char *) (_s)		\
 	}
 
 #define FDEV_SETUP_STRING_WRITE(_s, _size) {	\
@@ -92,9 +95,8 @@ bool __matchcaseprefix(const char *input, const char *pattern);
 			.flags = __SWR,		\
 			.put = __file_str_put	\
 		},				\
-		.buf = (_s),			\
-		.size = (_size),		\
-		.len = 0			\
+		.pos = (_s),			\
+                .end = (_s) + (_size),          \
 	}
 
 #define FDEV_SETUP_STRING_ALLOC() {		\
@@ -102,66 +104,25 @@ bool __matchcaseprefix(const char *input, const char *pattern);
 			.flags = __SWR,		\
 			.put = __file_str_put_alloc	\
 		},				\
-		.buf = NULL,			\
-		.size = 0,			\
-		.len = 0			\
+		.pos = NULL,			\
+		.end = NULL,			\
+                .size = 0,                      \
 	}
 
 #ifdef POSIX_IO
 
-struct __file_posix {
-	struct __file_close cfile;
-	int	fd;
-	char	*write_buf;
-	int	write_len;
-	char	*read_buf;
-	int	read_len;
-	int	read_off;
-#ifndef __SINGLE_THREAD__
-	_LOCK_T lock;
-#endif
-};
-
-static inline void __posix_lock_init(FILE *f) {
-	(void) f;
-	__lock_init(((struct __file_posix *) f)->lock);
-}
-
-static inline void __posix_lock_close(FILE *f) {
-	(void) f;
-	__lock_close(((struct __file_posix *) f)->lock);
-}
-
-static inline void __posix_lock(FILE *f) {
-	(void) f;
-	__lock_acquire(((struct __file_posix *) f)->lock);
-}
-
-static inline void __posix_unlock(FILE *f) {
-	(void) f;
-	__lock_release(((struct __file_posix *) f)->lock);
-}
-
-int	__d_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
-int	__f_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+#define FDEV_SETUP_POSIX(fd, buf, size, rwflags, bflags)        \
+        FDEV_SETUP_BUFIO(fd, buf, size,                         \
+                         (void *)read, (void *)write,           \
+                         lseek, close, rwflags, bflags)
 
 int
 __posix_sflags (const char *mode, int *optr);
 
-int
-__posix_flush(FILE *f);
-
-int
-__posix_putc(char c, FILE *f);
-
-int
-__posix_getc(FILE *f);
-
-int
-__posix_close(FILE *f);
-
 #endif
 
+int	__d_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int	__f_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 int	__d_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 int	__f_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 int	__d_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
@@ -452,3 +413,5 @@ __atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v);
 #define __atomic_exchange_ungetc(p,v) __non_atomic_exchange_ungetc(p,v)
 
 #endif /* ATOMIC_UNGETC */
+
+#endif /* _STDIO_PRIVATE_H_ */

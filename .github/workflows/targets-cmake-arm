@@ -1,0 +1,3 @@
+        test: [
+          "./.github/do-cmake-test do-cmake-thumbv7m-configure build-cmake-thumbv7m",
+        ]

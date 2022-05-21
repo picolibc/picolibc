@@ -193,7 +193,7 @@ main(void)
 #define CHECK_RT(type, prefix) do {                                     \
         for (x = 0; x < (int) (sizeof(type) * 8); x++) {            \
                 type v = (type) (0x123456789abcdef0LL >> (64 - sizeof(type) * 8)) >> x; \
-                type r;                                                 \
+                type r = ~v;                                            \
                 VERIFY(prefix, "d");                                    \
                 VERIFY(prefix, "u");                                    \
                 VERIFY(prefix, "x");                                    \
@@ -217,6 +217,12 @@ main(void)
         CHECK_RT(size_t, "z");
         CHECK_RT(ptrdiff_t, "t");
 
+        {
+            static int i_addr = 12;
+            void *v = &i_addr;
+            void *r = (void *) -1;
+            VERIFY("", "p");
+        }
 #if defined(TINY_STDIO) || !defined(NO_FLOATING_POINT)
 #ifdef PICOLIBC_FLOAT_PRINTF_SCANF
 #define float_type float

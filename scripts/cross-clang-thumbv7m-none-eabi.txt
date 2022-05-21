@@ -1,12 +1,16 @@
 [binaries]
-c = ['clang', '-m32', '-target', 'thumbv7m-none-eabi', '-mfloat-abi=soft']
+# Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
+# so we have to add -nostdlib to the compiler configuration itself or
+# early compiler tests will fail. This can be removed when picolibc
+# requires at least version 0.54.2 of meson.
+c = ['clang', '-m32', '-target', 'thumbv7m-none-eabi', '-mfloat-abi=soft', '-nostdlib']
 c_ld = '/usr/bin/arm-none-eabi-ld'
 ar = 'arm-none-eabi-ar'
 as = 'arm-none-eab-as'
 nm = 'arm-none-eab-nm'
 strip = 'arm-none-eabi-strip'
 # only needed to run tests
-exe_wrapper = ['env', 'run-thumbv7m']
+exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-thumbv7m "$@"', 'run-thumbv7m']
 
 [host_machine]
 system = 'none'
@@ -15,6 +19,6 @@ cpu = 'arm'
 endian = 'little'
 
 [properties]
-c_args = ['-Werror=double-promotion', '-Wno-unsupported-floating-point-opt']
+c_args = ['-Werror=double-promotion', '-Wno-unsupported-floating-point-opt', '-fshort-enums']
 c_link_args = ['-L/usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7-m/nofp/']
 skip_sanity_check = true

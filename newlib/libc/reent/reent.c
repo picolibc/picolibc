@@ -35,9 +35,12 @@ DESCRIPTION
 #endif
 #endif
 
+
+#ifndef TINY_STDIO
+#ifndef _REENT_GLOBAL_STDIO_STREAMS
 /* Interim cleanup code */
 
-void
+static void
 cleanup_glue (struct _reent *ptr,
      struct _glue *glue)
 {
@@ -47,6 +50,8 @@ cleanup_glue (struct _reent *ptr,
 
   free (glue);
 }
+#endif
+#endif
 
 void
 _reclaim_reent (struct _reent *ptr)
@@ -54,14 +59,16 @@ _reclaim_reent (struct _reent *ptr)
   if (ptr != _impure_ptr)
     {
 #ifndef TINY_STDIO
-      if (ptr->__sdidinit)
+      if (ptr->__cleanup)
 	{
 	  /* cleanup won't reclaim memory 'coz usually it's run
 	     before the program exits, and who wants to wait for that? */
 	  ptr->__cleanup (ptr);
 
+#ifndef _REENT_GLOBAL_STDIO_STREAMS
 	  if (ptr->__sglue._next)
 	    cleanup_glue (ptr, ptr->__sglue._next);
+#endif
 	}
 #endif
       /* Malloc memory not reclaimed; no good way to return memory anyway. */

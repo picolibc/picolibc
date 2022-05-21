@@ -69,7 +69,7 @@ f2d(const uint32_t ieeeMantissa, const uint32_t ieeeExponent, int max_digits, bo
 		m2 = ieeeMantissa;
 	} else {
 		e2 = (int32_t) ieeeExponent - FLOAT_BIAS - FLOAT_MANTISSA_BITS - 2;
-		m2 = (1u << FLOAT_MANTISSA_BITS) | ieeeMantissa;
+		m2 = ((uint32_t)1u << FLOAT_MANTISSA_BITS) | ieeeMantissa;
 	}
 	const bool even = (m2 & 1) == 0;
 	const bool acceptBounds = even;

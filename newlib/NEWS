@@ -1,6 +1,9 @@
 *** Major changes in newlib version 4.3.0:
 
 - remove i?86-pc-linux-gnu support
+- remove decstation & sunos support
+- remove phoenix OS support
+- build system internals heavily rewritten & updated
 
 *** Major changes in newlib version 4.2.0:
 

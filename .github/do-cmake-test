@@ -1,0 +1,17 @@
+#!/bin/sh
+CONFIGURE=$1
+DIR=$2
+shift
+shift
+
+mkdir $DIR
+cd $DIR
+../scripts/$CONFIGURE "$@"
+case $? in
+    77)
+	echo 'Configuration skipped'
+	exit 0
+	;;
+esac
+cat CMakeFiles/CMakeOutput.log
+ninja && ninja test

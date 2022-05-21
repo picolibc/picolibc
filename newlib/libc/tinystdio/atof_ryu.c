@@ -126,7 +126,7 @@ __atof_engine(uint32_t m10, int e10)
 
 	if (ieee_e2 > 0xfe) {
 		// Final IEEE exponent is larger than the maximum representable; return Infinity.
-		uint32_t ieee = (0xffu << FLOAT_MANTISSA_BITS);
+		uint32_t ieee = ((uint32_t)0xffu << FLOAT_MANTISSA_BITS);
 		return int32Bits2Float(ieee);
 	}
 
@@ -155,7 +155,7 @@ __atof_engine(uint32_t m10, int e10)
 #endif
 	uint32_t ieee_m2 = (m2 >> shift) + roundUp;
         assert(ieee_m2 <= (1u << (FLOAT_MANTISSA_BITS + 1)));
-        ieee_m2 &= (1u << FLOAT_MANTISSA_BITS) - 1;
+        ieee_m2 &= ((uint32_t)1u << FLOAT_MANTISSA_BITS) - 1;
         if (ieee_m2 == 0 && roundUp) {
             // Rounding up may overflow the mantissa.
             // In this case we move a trailing zero of the mantissa into the exponent.

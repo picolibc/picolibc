@@ -37,10 +37,10 @@
 int
 fclose(FILE *f)
 {
-	if (f->flags & __SCLOSE) {
-		struct __file_close *cf = (struct __file_close *) f;
+        struct __file_close *cf = (struct __file_close *) f;
+        if ((f->flags & __SCLOSE) && cf->close) {
 		/*
-		 * FIle has 'close' function, call it
+		 * File has 'close' function, call it
 		 */
 		return (*cf->close)(f);
 	}

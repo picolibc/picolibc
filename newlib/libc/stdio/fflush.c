@@ -235,7 +235,7 @@ __sflush_r (struct _reent *ptr,
 }
 
 #ifdef _STDIO_BSD_SEMANTICS
-/* Called from _cleanup_r.  At exit time, we don't need file locking,
+/* Called from cleanup_stdio().  At exit time, we don't need file locking,
    and we don't want to move the underlying file pointer unless we're
    writing. */
 int
@@ -287,7 +287,7 @@ int
 fflush (register FILE * fp)
 {
   if (fp == NULL)
-    return _fwalk_reent (_GLOBAL_REENT, _fflush_r);
+    return _fwalk_sglue (_GLOBAL_REENT, _fflush_r, &__sglue);
 
   return _fflush_r (_REENT, fp);
 }

@@ -98,6 +98,7 @@ jn(int n, double x)
      */
             switch (n & 3) {
             case 0:
+            default:
                 temp = cos(x) + sin(x);
                 break;
             case 1:
@@ -279,6 +280,7 @@ yn(int n, double x)
      */
         switch (n & 3) {
         case 0:
+        default:
             temp = sin(x) - cos(x);
             break;
         case 1:

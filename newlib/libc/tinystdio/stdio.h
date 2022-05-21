@@ -254,7 +254,9 @@ struct __file {
 #define __SWR	0x0002		/* OK to write */
 #define __SERR	0x0004		/* found error */
 #define __SEOF	0x0008		/* found EOF */
-#define __SCLOSE 0x0010		/* struct is __file_close with close function */
+#define __SCLOSE 0x0010		/* struct is __file_close */
+#define __SEXT  0x0020          /* struct is __file_ext */
+#define __SBUF  0x0040          /* struct is __file_bufio */
 	int	(*put)(char, struct __file *);	/* function to write one char to device */
 	int	(*get)(struct __file *);	/* function to read one char from device */
 	int	(*flush)(struct __file *);	/* function to flush output to device */
@@ -268,6 +270,25 @@ struct __file_close {
 	struct __file file;			/* main file struct */
 	int	(*close)(struct __file *);	/* function to close file */
 };
+
+#define FDEV_SETUP_CLOSE(put, get, flush, _close, rwflag) \
+        {                                                               \
+                .file = FDEV_SETUP_STREAM(put, get, flush, (rwflag) | __SCLOSE),   \
+                .close = (_close),                                      \
+        }
+
+struct __file_ext {
+        struct __file_close cfile;              /* close file struct */
+        __off_t (*seek)(struct __file *, __off_t offset, int whence);
+        int     (*setvbuf)(struct __file *, char *buf, int mode, size_t size);
+};
+
+#define FDEV_SETUP_EXT(put, get, flush, close, _seek, _setvbuf, rwflag) \
+        {                                                               \
+                .cfile = FDEV_SETUP_CLOSE(put, get, flush, close, (rwflag) | __SEXT), \
+                .seek = (_seek),                                        \
+                .setvbuf = (_setvbuf),                                  \
+        }
 
 #endif /* not __DOXYGEN__ */
 
@@ -314,6 +335,10 @@ extern FILE *const stderr;
    "end of file" is somewhat meaningless here.
 */
 #define EOF	(-1)
+
+#define	_IOFBF	0		/* setvbuf should set fully buffered */
+#define	_IOLBF	1		/* setvbuf should set line buffered */
+#define	_IONBF	2		/* setvbuf should set unbuffered */
 
 #if defined(__DOXYGEN__)
 /**
@@ -379,10 +404,10 @@ extern FILE *const stderr;
 #else  /* !DOXYGEN */
 #define FDEV_SETUP_STREAM(p, g, fl, f)		\
 	{ \
-		.flags = f, \
-		.put = p, \
-		.get = g, \
-		.flush = fl, \
+                .flags = (f),                   \
+                .put = (p),                     \
+                .get = (g),                     \
+                .flush = (fl),                  \
 	}
 #endif /* DOXYGEN */
 
@@ -877,26 +902,40 @@ extern int	vsscanf(const char *__buf, const char *__fmt, va_list ap) __FORMAT_AT
  */
 extern int	fflush(FILE *stream);
 
+#ifndef SEEK_SET
+#define	SEEK_SET	0	/* set file offset to offset */
+#endif
+#ifndef SEEK_CUR
+#define	SEEK_CUR	1	/* set file offset to current plus offset */
+#endif
+#ifndef SEEK_END
+#define	SEEK_END	2	/* set file offset to EOF plus offset */
+#endif
+
 #ifndef __DOXYGEN__
 /* only mentioned for libstdc++ support, not implemented in library */
 #ifndef BUFSIZ
 #define BUFSIZ 512
 #endif
-#define _IONBF 0
 __extension__ typedef long long fpos_t;
 extern int fgetpos(FILE *stream, fpos_t *pos);
 extern FILE *fopen(const char *path, const char *mode);
 extern FILE *freopen(const char *path, const char *mode, FILE *stream);
 extern FILE *fdopen(int, const char *);
+extern FILE *fmemopen(void *buf, size_t size, const char *mode);
 extern int fseek(FILE *stream, long offset, int whence);
+extern int fseeko(FILE *stream, __off_t offset, int whence);
 extern int fsetpos(FILE *stream, fpos_t *pos);
 extern long ftell(FILE *stream);
+extern __off_t ftello(FILE *stream);
 extern int fileno(FILE *);
 extern void perror(const char *s);
 extern int remove(const char *pathname);
 extern int rename(const char *oldpath, const char *newpath);
 extern void rewind(FILE *stream);
 extern void setbuf(FILE *stream, char *buf);
+extern void setbuffer(FILE *stream, char *buf, size_t size);
+extern void setlinebuf(FILE *stream);
 extern int setvbuf(FILE *stream, char *buf, int mode, size_t size);
 extern FILE *tmpfile(void);
 extern char *tmpnam (char *s);

@@ -1,0 +1,7 @@
+    needs: cache-maker
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        cmake_flags: [
+          "",
+        ]

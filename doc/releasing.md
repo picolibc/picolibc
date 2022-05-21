@@ -48,12 +48,12 @@ picolibc:
         $ mkdir -p builds/build-arm-tk builds/build-arm-tk-release
         $ cd builds/build-arm-tk
         $ PATH=$ARM_TK/bin:$PATH ../../scripts/do-arm-configure -Dsysroot-install=true
-        $ PATH=$ARM_TK/bin:$PATH DESTDIR=$PWD/../dist ninja install
+        $ PATH=$ARM_TK/bin:$PATH DESTDIR=$PWD/../dist ninja test install
 	$ cd ../build-arm-tk-release
 	$ PATH=$ARM_TK/bin:$PATH ../../scripts/do-arm-configure -Dsysroot-install=true -Dbuild-type-subdir=release --buildtype=release
-        $ PATH=$ARM_TK/bin:$PATH DESTDIR=$PWD/../dist ninja install
+        $ PATH=$ARM_TK/bin:$PATH DESTDIR=$PWD/../dist ninja test install
         $ cd ../dist/$ARM_TK
-        $ zip -r picolibc-<version>-<arm-et-version>.zip .
+        $ zip -r ../../../picolibc-<version>-<arm-et-version>.zip .
         $ scp picolibc-<version>-<arm-et-version>.zip keithp.com:/var/www/picolibc/dist/gnu-arm-embedded
 
  11. Tag release
@@ -68,10 +68,13 @@ picolibc:
 
 	$ scp build-native/meson-dist/* keithp.com:/var/www/picolibc/dist
 
- 14. Create new release on github site, pasting in relevant README.md
+ 14. Create new release on picolibc wiki pasting in relevant README.md
+     section.
+
+ 15. Create new release on github site, pasting in relevant README.md
      section. Upload release tar and arm embedded toolkit zip files.
 
- 15. Email release message to mailing list. Paste in README.md section
+ 16. Email release message to mailing list. Paste in README.md section
      about the new release.
 
 ## Debian Packages

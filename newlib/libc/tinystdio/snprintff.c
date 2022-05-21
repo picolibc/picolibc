@@ -33,4 +33,4 @@
 #define vfprintf __f_vfprintf
 #define snprintf __f_snprintf
 
-#include <snprintf.c>
+#include "snprintf.c"

@@ -35,6 +35,8 @@
 subdir('sys')
 subdir('machine')
 subdir('ssp')
+subdir('rpc')
+subdir('arpa')
 
 inc_headers = [
   'alloca.h',

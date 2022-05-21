@@ -40,12 +40,12 @@ These options control some general build configuration values.
 | native-tests                | false   | Build tests against native libc (used to validate tests)                             |
 | picolib                     | true    | Include picolib bits for tls and sbrk support                                        |
 | picocrt                     | true    | Build crt0.o (C startup function)                                                    |
-| specsdir                    | auto    | Where to install the .specs file (default is in the GCC directory)                   |
+| semihost                    | true    | Build the semihost library (libsemihost.a)                                           |
+| fake-semihost               | false   | Create a fake semihost library to allow tests to link                                |
+| specsdir                    | auto    | Where to install the .specs file (default is in the GCC directory). <br> If set to `none`, then picolibc.specs will not be installed at all.|
 | sysroot-install             | false   | Install in GCC sysroot location (requires sysroot in GCC)                            |
 | tests                       | false   | Enable tests                                                                         |
 | tinystdio                   | true    | Use tiny stdio from avr libc                                                         |
-
-If you set `specsdir` to `none`, then picolibc.specs will not be installed at all.
 
 ### Options applying to both legacy stdio and tinystdio
 
@@ -55,7 +55,9 @@ types and formats.
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
 | io-c99-formats              | true    | Enable C99 support in IO functions like printf/scanf                                 |
-| io-long-long                | false   | Enable long long type support in IO functions like printf/scanf.		       |
+| io-long-long                | false   | Enable long long type support in IO functions like printf/scanf. For tiny-stdio, this only affects the integer-only versions, the full version always includes long long support. |
+| io-pos-args                 | false   | Enable printf-family positional arg support. For tiny-stdio, this only affects the integer-only versions, the full version always includes positional argument support. |
+
 
 `long long` support is always enabled for the tinystdio full
 printf/scanf modes, the `io-long-long` option adds them to the limited
@@ -79,9 +81,9 @@ definitions which use the same POSIX I/O functions.
 | ------                      | ------- | -----------                                                                          |
 | atomic-ungetc               | true    | Make getc/ungetc re-entrant using atomic operations                                  |
 | io-float-exact              | true    | Provide round-trip support in float/string conversions                               |
-| io-long-long                | false   | Include long-long support in integer-only printf function                            |
 | posix-io                    | true    | Provide fopen/fdopen using POSIX I/O (requires open, close, read, write, lseek)      |
 | posix-console               | false   | Use POSIX I/O for stdin/stdout/stderr                                                |
+| format-default              | double  | Sets the default printf/scanf style ('double', 'float' or 'integer')                 |
 
 ### Options when using legacy stdio bits
 
@@ -100,7 +102,6 @@ configuration
 | newlib-global-stdio-streams | false   | Enable global stdio streams                                                          |
 | newlib-have-fcntl           | false   | System has fcntl function available                                                  |
 | newlib-io-float             | false   | Enable printf/scanf family float support                                             |
-| newlib-io-pos-args          | false   | Enable printf-family positional arg support                                          |
 | newlib-io-long-double       | false   | Enable long double type support in IO functions printf/scanf                         |
 | newlib-nano-formatted-io    | false   | Use nano version formatted IO                                                        |
 | newlib-reent-small          | false   | Enable small reentrant struct support                                                |
@@ -114,12 +115,14 @@ These options control which character sets are supported by iconv.
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
-| newlib-iconv-encodings      | <empty> | Comma-separated list of iconv encodings to be built-in (default all supported)       |
+| newlib-iconv-encodings      | <empty> | Comma-separated list of iconv encodings to be built-in (default all supported). <br> Set to `none` to disable all encodings. |
 | newlib-iconv-from-encodings | <empty> | Comma-separated list of "from" iconv encodings to be built-in (default iconv-encodings) |
 | newlib-iconv-to-encodings   | <empty> | Comma-separated list of "to" iconv encodings to be built-in (default iconv-encodings) |
 | newlib-iconv-external-ccs   | false   | Use file system to store iconv tables. Requires fopen. (default built-in to memory)  |
+| newlib-iconv-dir            | libdir/locale | Directory to install external CCS files. Only used with newlib-iconv-external-ccs=true |
+| newlib-iconv-runtime-dir    | newlib-iconv-dir | Directory to read external CCS files from at runtime. |
 
-Thes options control how much Locale support is included in the
+These options control how much Locale support is included in the
 library. By default, picolibc only supports the 'C' locale.
 
 | Option                      | Default | Description                                                                          |
@@ -135,12 +138,13 @@ at startup and shutdown times.
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
-| lite-exit                   | true    | Enable light weight exit                                                             |
+| lite-exit                   | true    | Enable lightweight exit                                                             |
 | newlib-atexit-dynamic-alloc | false   | Enable dynamic allocation of atexit entries                                          |
-| newlib-global-atexit        | false   | Enable atexit data structure as global                                               |
+| newlib-global-atexit        | false   | Enable atexit data structure as global, instead of in TLS. <br> If `thread-local-storage` == false, then the atexit data structure is always global. |
 | newlib-initfini             | true    | Support _init() and _fini() functions in picocrt                                     |
 | newlib-initfini-array       | true    | Use .init_array and .fini_array sections in picocrt                                  |
 | newlib-register-fini        | false   | Enable finalization function registration using atexit                               |
+| crt-runtime-size            | false   | Compute .data/.bss sizes at runtime rather than linktime. <br> This option exists for targets where the linker can't handle a symbol that is the difference between two other symbols, e.g. m68k.|
 
 ### Thread local storage support
 
@@ -156,6 +160,7 @@ As a separate option, you can make `errno` not use TLS if necessary.
 | thread-local-storage        | auto    | Use TLS for global variables. Default is automatic based on compiler support         |
 | tls-model                   | local-exec | Select TLS model (global-dynamic, local-dynamic, initial-exec or local-exec)      |
 | newlib-global-errno         | false   | Use single global errno even when thread-local-storage=true                          |
+| errno-function              | <empty> | If set, names a function which returns the address of errno. 'auto' will try to auto-detect. |
 
 ### Malloc option
 
@@ -176,13 +181,13 @@ protecting when accessed by multiple threads. The largest set of these
 are the legacy stdio code, but there are other functions that can use
 locking, e.g. when newlib-global-atexit is enabled, calls to atexit
 need to lock the shared global data structure if they may be called
-from multiple threads at the same time. By default, all of this is
-disabled as it would require underlying system support.
+from multiple threads at the same time. By default, these are enabled
+and use the retargetable API defined in [locking.md](locking.md).
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
-| newlib-retargetable-locking | false   | Allow locking routines to be retargeted at link time                                 |
-| newlib-multithread          | false   | Enable support for multiple threads                                                  |
+| newlib-retargetable-locking | true    | Allow locking routines to be retargeted at link time                                 |
+| newlib-multithread          | true    | Enable support for multiple threads                                                  |
 
 
 ### Legacy newlib options
@@ -201,22 +206,28 @@ newlib environments.
 ### Math library options
 
 There are two versions of many libm functions, old ones from SunPro
-and new ones from ARM. The new ones are usually better for current
-hardware, except that the float-valued functions use double-precision
-computations. On systems with HW double support, that's likely a good
-choice. On sytems without HW double support, that's going to pull in SW
-double code.
+and new ones from ARM. The new ones are generally faster for targets
+with hardware double support, except that the new float-valued
+functions use double-precision computations. On sytems without
+hardware double support, that's going to pull in soft double
+code. Measurements show the old routines are generally more accurate,
+which is why they are enabled by default.
 
 POSIX requires many of the math functions to set errno when exceptions
 occur; disabling that makes them only support fenv() exception
-reporting.
+reporting, which is what IEEE floating point and ANSI C standards
+require.
 
 | Option                      | Default | Description                                             |
 | ------                      | ------- | -----------                                             |
-| newlib-obsolete-math        | auto    | Use old code for both float and double valued functions |
+| newlib-obsolete-math        | true    | Use old code for both float and double valued functions |
 | newlib-obsolete-math-float  | auto    | Use old code for float-valued functions                 |
 | newlib-obsolete-math-double | auto    | Use old code for double-valued functions                |
 | want-math-errno             | false   | Set errno when exceptions occur                         |
+
+newlib-obsolete-math provides the default value for the
+newlib-obsolete-math-float and newlib-obsolete-math-double parameters;
+those control the compilation of the individual fucntions.
 
 ## Building for embedded RISC-V and ARM systems
 

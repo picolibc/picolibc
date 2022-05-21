@@ -124,7 +124,10 @@ typedef long ultoa_signed_t;
 #define SIZEOF_ULTOA __SIZEOF_LONG__
 #define arg_to_t(ap, flags, _s_, _result_)              \
     if ((flags) & FL_LONG) {                            \
-        (_result_) = va_arg(ap, _s_ long);              \
+        if ((flags) & FL_REPD_TYPE)                     \
+            (_result_) = (_s_ long) va_arg(ap, _s_ long long);\
+        else                                            \
+            (_result_) = va_arg(ap, _s_ long);          \
     } else {                                            \
         (_result_) = va_arg(ap, _s_ int);               \
         if ((flags) & FL_SHORT) {                       \
@@ -228,6 +231,8 @@ skip_to_arg(const char *fmt_orig, my_va_list *ap, int target_argno)
 		    continue;
 		  case '#':
 		    continue;
+                  case '\'':
+                    continue;
 		}
 	    }
 
@@ -270,10 +275,8 @@ skip_to_arg(const char *fmt_orig, my_va_list *ap, int target_argno)
 	    }
 
 	    if (c == 'l') {
-#ifdef PRINTF_LONGLONG
 		if (flags & FL_LONG)
 		    flags |= FL_REPD_TYPE;
-#endif
 		flags |= FL_LONG;
 		continue;
 	    }
@@ -287,20 +290,14 @@ skip_to_arg(const char *fmt_orig, my_va_list *ap, int target_argno)
 
             /* alias for 'll' */
             if (c == 'L') {
-#ifdef PRINTF_LONGLONG
                 flags |= FL_REPD_TYPE;
-#endif
 		flags |= FL_LONG;
 		continue;
             }
 
 #ifdef _WANT_IO_C99_FORMATS
 
-#ifdef PRINTF_LONGLONG
 #define CHECK_LONGLONG(type) else if (sizeof(type) == sizeof(long long)) flags |= FL_LONG|FL_REPD_TYPE;
-#else
-#define CHECK_LONGLONG(type)
-#endif
 
 #define CHECK_INT_SIZE(letter, type)			\
 	    if (c == letter) {				\
@@ -353,6 +350,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
     uint16_t flags;
     int width;
     int prec;
+    int (*put)(char, FILE *) = stream->put;
 #ifdef PRINTF_POSITIONAL
     int argno;
     my_va_list my_ap;
@@ -375,7 +373,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
 
     int stream_len = 0;
 
-#define my_putc(c, stream) do { ++stream_len; putc(c, stream); } while(0)
+#define my_putc(c, stream) do { ++stream_len; if (put(c, stream) < 0) goto fail; } while(0)
 
     if ((stream->flags & __SWR) == 0)
 	return EOF;
@@ -421,6 +419,12 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
 		  case '#':
 		    flags |= FL_ALT;
 		    continue;
+                  case '\'':
+                    /*
+                     * C/POSIX locale has an empty thousands_sep
+                     * value, so we can just ignore this character
+                     */
+                    continue;
 		}
 	    }
 
@@ -489,10 +493,8 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
 	    }
 
 	    if (c == 'l') {
-#ifdef PRINTF_LONGLONG
 		if (flags & FL_LONG)
 		    flags |= FL_REPD_TYPE;
-#endif
 		flags |= FL_LONG;
 		continue;
 	    }
@@ -506,20 +508,14 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
 
             /* alias for 'll' */
             if (c == 'L') {
-#ifdef PRINTF_LONGLONG
                 flags |= FL_REPD_TYPE;
-#endif
 		flags |= FL_LONG;
 		continue;
             }
 
-#ifdef _WANT_IO_C99_FORMATS
-
-#ifdef PRINTF_LONGLONG
 #define CHECK_LONGLONG(type) else if (sizeof(type) == sizeof(long long)) flags |= FL_LONG|FL_REPD_TYPE;
-#else
-#define CHECK_LONGLONG(type)
-#endif
+
+#ifdef _WANT_IO_C99_FORMATS
 
 #define CHECK_INT_SIZE(letter, type)			\
 	    if (c == letter) {				\
@@ -837,6 +833,13 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
                 if (sign)
                     my_putc (sign, stream);
 
+#ifdef _WANT_IO_C99_FORMATS
+                if ((flags & FL_FLTHEX)) {
+                    my_putc('0', stream);
+                    my_putc(TOCASE('x'), stream);
+                }
+#endif
+
                 if (!(flags & FL_LPAD)) {
                     while (width) {
                         my_putc ('0', stream);
@@ -884,13 +887,6 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
                     if ((flags & FL_ALT) && n == -1)
 			my_putc('.', stream);
                 } else {				/* 'e(E)' format	*/
-
-#ifdef _WANT_IO_C99_FORMATS
-                    if ((flags & FL_FLTHEX)) {
-                        my_putc('0', stream);
-                        my_putc(TOCASE('x'), stream);
-                    }
-#endif
 
                     /* mantissa	*/
                     if (_dtoa.digits[0] != '1')
@@ -989,6 +985,8 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
                         base = 8;
                     } else if (c == 'p') {
                         flags |= FL_ALT | FL_ALTHEX;
+                        if (sizeof(void *) > sizeof(int))
+                            flags |= FL_LONG;
                         base = 16;
                     } else if (TOLOW(c) == 'x') {
                         flags |= FL_ALTHEX;
@@ -1108,6 +1106,9 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
     return stream_len;
 #undef my_putc
 #undef ap
+  fail:
+    stream_len = -1;
+    goto ret;
 }
 
 #if defined(FORMAT_DEFAULT_DOUBLE) && !defined(vfprintf)

@@ -33,11 +33,14 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
+#include <stdio-bufio.h>
 
 int
 fileno(FILE *file)
 {
-        (void) file;
+        if (file->flags & __SBUF) {
+                struct __file_bufio *pf = (struct __file_bufio *) file;
+                return pf->fd;
+        }
 	return -1;
 }

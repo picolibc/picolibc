@@ -124,6 +124,10 @@ _fopen_r (struct _reent *ptr,
 
   if ((flags = __sflags (ptr, mode, &oflags)) == 0)
     return NULL;
+
+  if (!ptr->__cleanup)
+    __sinit(ptr);
+
   if ((fp = __sfp (ptr)) == NULL)
     return NULL;
 

@@ -158,6 +158,8 @@
     result |= test(__LINE__, " ", "%c", 32);
     result |= test(__LINE__, "$", "%c", 36);
     result |= test(__LINE__, "10", "%d", 10);
+
+    result |= test(__LINE__, "1000000", "%'d", 1000000);
     /* 72: anti-test */
     /* 73: anti-test */
     /* 74: excluded for C */

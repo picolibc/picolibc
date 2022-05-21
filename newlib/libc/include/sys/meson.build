@@ -33,6 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 inc_sys_headers_all = [
+  'auxv.h',
   'cdefs.h',
   'config.h',
   'custom_file.h',
@@ -68,6 +69,7 @@ inc_sys_headers_all = [
   'tree.h',
   '_types.h',
   'types.h',
+  '_tz_structs.h',
   'unistd.h',
   'utime.h',
   'wait.h'

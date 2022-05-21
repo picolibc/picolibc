@@ -22,7 +22,7 @@
 
   <xi:include href="time.xml"/>
   <xi:include href="locale.xml"/>
-  <!-- reent.tex contains fixed content and nothing seems to include the .def made in reent/ -->
+  <!-- reent.tex contains fixed content -->
 
   <xi:include href="misc.xml"/>
   <!-- posix is optional -->
@@ -36,6 +36,8 @@
       <xi:fallback/>
   </xi:include>
   <!-- ssp.tex contains fixed content -->
+
+  <xi:include href="sys.xml"/> <!-- sys.tex includes the .def files made in reent/ -->
 
   <!-- processing should insert index here -->
   <index/>

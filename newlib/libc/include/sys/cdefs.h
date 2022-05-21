@@ -386,16 +386,20 @@
 #define	__pure
 #endif
 
+#ifndef __always_inline
 #if __GNUC_PREREQ__(3, 1) || (defined(__INTEL_COMPILER) && __INTEL_COMPILER >= 800)
 #define	__always_inline	__inline__ __attribute__((__always_inline__))
 #else
 #define	__always_inline
 #endif
+#endif
 
+#ifndef __noinline
 #if __GNUC_PREREQ__(3, 1)
 #define	__noinline	__attribute__ ((__noinline__))
 #else
 #define	__noinline
+#endif
 #endif
 
 #if defined(__clang__) && defined(__nonnull)

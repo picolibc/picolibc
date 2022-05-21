@@ -30,7 +30,7 @@ def main():
             l = l.strip()
             l = l.lower()
             if first_node:
-                print ('<chapter id="%s" xmlns:xi="http://www.w3.org/2001/XInclude">' % l.replace(' ', '_'))
+                print ('<chapter id="%s_chapter" xmlns:xi="http://www.w3.org/2001/XInclude">' % l.replace(' ', '_'))
                 first_node = False
         elif l.startswith("@chapter "):
             l = l.replace("@chapter ", "", 1)

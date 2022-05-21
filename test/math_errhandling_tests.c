@@ -264,6 +264,50 @@ long makemathname(test_fpclassify_negsmall)(void) { return fpclassify(-makemathn
 long makemathname(test_fpclassify_two)(void) { return fpclassify(makemathname(two)); }
 long makemathname(test_fpclassify_negtwo)(void) { return fpclassify(-makemathname(two)); }
 
+long makemathname(test_isfinite_snan)(void) { return !!isfinite(makemathname(snanval)); }
+long makemathname(test_isfinite_nan)(void) { return !!isfinite(makemathname(qnanval)); }
+long makemathname(test_isfinite_inf)(void) { return !!isfinite(makemathname(infval)); }
+long makemathname(test_isfinite_neginf)(void) { return !!isfinite(-makemathname(infval)); }
+long makemathname(test_isfinite_zero)(void) { return !!isfinite(makemathname(zero)); }
+long makemathname(test_isfinite_negzero)(void) { return !!isfinite(-makemathname(zero)); }
+long makemathname(test_isfinite_small)(void) { return !!isfinite(makemathname(small)); }
+long makemathname(test_isfinite_negsmall)(void) { return !!isfinite(-makemathname(small)); }
+long makemathname(test_isfinite_two)(void) { return !!isfinite(makemathname(two)); }
+long makemathname(test_isfinite_negtwo)(void) { return !!isfinite(-makemathname(two)); }
+
+long makemathname(test_isnormal_snan)(void) { return !!isnormal(makemathname(snanval)); }
+long makemathname(test_isnormal_nan)(void) { return !!isnormal(makemathname(qnanval)); }
+long makemathname(test_isnormal_inf)(void) { return !!isnormal(makemathname(infval)); }
+long makemathname(test_isnormal_neginf)(void) { return !!isnormal(-makemathname(infval)); }
+long makemathname(test_isnormal_zero)(void) { return !!isnormal(makemathname(zero)); }
+long makemathname(test_isnormal_negzero)(void) { return !!isnormal(-makemathname(zero)); }
+long makemathname(test_isnormal_small)(void) { return !!isnormal(makemathname(small)); }
+long makemathname(test_isnormal_negsmall)(void) { return !!isnormal(-makemathname(small)); }
+long makemathname(test_isnormal_two)(void) { return !!isnormal(makemathname(two)); }
+long makemathname(test_isnormal_negtwo)(void) { return !!isnormal(-makemathname(two)); }
+
+long makemathname(test_isnan_snan)(void) { return !!isnan(makemathname(snanval)); }
+long makemathname(test_isnan_nan)(void) { return !!isnan(makemathname(qnanval)); }
+long makemathname(test_isnan_inf)(void) { return !!isnan(makemathname(infval)); }
+long makemathname(test_isnan_neginf)(void) { return !!isnan(-makemathname(infval)); }
+long makemathname(test_isnan_zero)(void) { return !!isnan(makemathname(zero)); }
+long makemathname(test_isnan_negzero)(void) { return !!isnan(-makemathname(zero)); }
+long makemathname(test_isnan_small)(void) { return !!isnan(makemathname(small)); }
+long makemathname(test_isnan_negsmall)(void) { return !!isnan(-makemathname(small)); }
+long makemathname(test_isnan_two)(void) { return !!isnan(makemathname(two)); }
+long makemathname(test_isnan_negtwo)(void) { return !!isnan(-makemathname(two)); }
+
+long makemathname(test_isinf_snan)(void) { return !!isinf(makemathname(snanval)); }
+long makemathname(test_isinf_nan)(void) { return !!isinf(makemathname(qnanval)); }
+long makemathname(test_isinf_inf)(void) { return !!isinf(makemathname(infval)); }
+long makemathname(test_isinf_neginf)(void) { return !!isinf(-makemathname(infval)); }
+long makemathname(test_isinf_zero)(void) { return !!isinf(makemathname(zero)); }
+long makemathname(test_isinf_negzero)(void) { return !!isinf(-makemathname(zero)); }
+long makemathname(test_isinf_small)(void) { return !!isinf(makemathname(small)); }
+long makemathname(test_isinf_negsmall)(void) { return !!isinf(-makemathname(small)); }
+long makemathname(test_isinf_two)(void) { return !!isinf(makemathname(two)); }
+long makemathname(test_isinf_negtwo)(void) { return !!isinf(-makemathname(two)); }
+
 FLOAT_T makemathname(test_j0_inf)(void) { return makemathname(j0)(makemathname(infval)); }
 FLOAT_T makemathname(test_j0_qnan)(void) { return makemathname(j0)(makemathname(qnanval)); }
 FLOAT_T makemathname(test_j0_snan)(void) { return makemathname(j0)(makemathname(snanval)); }
@@ -1080,6 +1124,50 @@ struct {
         TEST(fpclassify_negsmall, FP_SUBNORMAL, 0, 0),
         TEST(fpclassify_two, FP_NORMAL, 0, 0),
         TEST(fpclassify_negtwo, FP_NORMAL, 0, 0),
+
+        TEST(isfinite_snan, 0, 0, 0),
+        TEST(isfinite_nan, 0, 0, 0),
+        TEST(isfinite_inf, 0, 0, 0),
+        TEST(isfinite_neginf, 0, 0, 0),
+        TEST(isfinite_zero, 1, 0, 0),
+        TEST(isfinite_negzero, 1, 0, 0),
+        TEST(isfinite_small, 1, 0, 0),
+        TEST(isfinite_negsmall, 1, 0, 0),
+        TEST(isfinite_two, 1, 0, 0),
+        TEST(isfinite_negtwo, 1, 0, 0),
+
+        TEST(isnormal_snan, 0, 0, 0),
+        TEST(isnormal_nan, 0, 0, 0),
+        TEST(isnormal_inf, 0, 0, 0),
+        TEST(isnormal_neginf, 0, 0, 0),
+        TEST(isnormal_zero, 0, 0, 0),
+        TEST(isnormal_negzero, 0, 0, 0),
+        TEST(isnormal_small, 0, 0, 0),
+        TEST(isnormal_negsmall, 0, 0, 0),
+        TEST(isnormal_two, 1, 0, 0),
+        TEST(isnormal_negtwo, 1, 0, 0),
+
+        TEST(isnan_snan, 1, 0, 0),
+        TEST(isnan_nan, 1, 0, 0),
+        TEST(isnan_inf, 0, 0, 0),
+        TEST(isnan_neginf, 0, 0, 0),
+        TEST(isnan_zero, 0, 0, 0),
+        TEST(isnan_negzero, 0, 0, 0),
+        TEST(isnan_small, 0, 0, 0),
+        TEST(isnan_negsmall, 0, 0, 0),
+        TEST(isnan_two, 0, 0, 0),
+        TEST(isnan_negtwo, 0, 0, 0),
+
+        TEST(isinf_snan, 0, 0, 0),
+        TEST(isinf_nan, 0, 0, 0),
+        TEST(isinf_inf, 1, 0, 0),
+        TEST(isinf_neginf, 1, 0, 0),
+        TEST(isinf_zero, 0, 0, 0),
+        TEST(isinf_negzero, 0, 0, 0),
+        TEST(isinf_small, 0, 0, 0),
+        TEST(isinf_negsmall, 0, 0, 0),
+        TEST(isinf_two, 0, 0, 0),
+        TEST(isinf_negtwo, 0, 0, 0),
 
         TEST(ilogb_0, FP_ILOGB0, FE_INVALID, EDOM),
         TEST(ilogb_qnan, FP_ILOGBNAN, FE_INVALID, EDOM),

@@ -4,6 +4,8 @@
 # is freely granted, provided that this notice is preserved.
 #
 
+load_lib newlib.exp
+
 # newlib_pass_fail_all compiles and runs all the source files in the
 # test directory. If flag is -x, then the sources whose basenames are
 # listed in exclude_list are not compiled and run.

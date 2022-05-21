@@ -18,7 +18,7 @@
 #define RYU_F2S_INTRINSICS_H
 
 // Defines RYU_32_BIT_PLATFORM if applicable.
-#include "ryu/common.h"
+#include "common.h"
 
 #define FLOAT_POW5_INV_BITCOUNT (DOUBLE_POW5_INV_BITCOUNT - 64)
 #define FLOAT_POW5_BITCOUNT (DOUBLE_POW5_BITCOUNT - 64)

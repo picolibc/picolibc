@@ -38,6 +38,5 @@
 void
 setbuf(FILE *stream, char *buf)
 {
-	(void) stream;
-	(void) buf;
+        setvbuf(stream, buf, buf ? _IOFBF : _IONBF, BUFSIZ);
 }

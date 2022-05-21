@@ -40,13 +40,17 @@ int
 __file_str_put_alloc(char c, FILE *stream)
 {
 	struct __file_str *sstream = (struct __file_str *) stream;
-	if (sstream->len >= sstream->size) {
-		char *new = realloc(sstream->buf, sstream->size + 32);
+	if (sstream->pos == sstream->end) {
+                size_t old_size = sstream->size;
+                char *old = sstream->end - old_size;
+                size_t new_size = old_size + 32;
+                char *new = realloc(old, new_size);
 		if (!new)
 			return EOF;
-		sstream->size = sstream->size + 32;
-		sstream->buf = new;
+		sstream->size = new_size;
+                sstream->pos = new + old_size;
+                sstream->end = new + new_size;
 	}
-	sstream->buf[sstream->len++] = c;
-	return c;
+	*sstream->pos++ = c;
+	return (unsigned char) c;
 }

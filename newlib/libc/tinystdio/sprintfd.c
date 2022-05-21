@@ -33,4 +33,4 @@
 #define vfprintf __d_vfprintf
 #define sprintf __d_sprintf
 
-#include <sprintf.c>
+#include "sprintf.c"

@@ -42,6 +42,38 @@ jobs:
           tags: ${{ env.IMAGE }}:latest
           outputs: type=docker,dest=${{ env.IMAGE_FILE }}
 
+  cmake-arm:
+    needs: cache-maker
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        cmake_flags: [
+          "",
+        ]
+        test: [
+          "./.github/do-cmake-test do-cmake-thumbv7m-configure build-cmake-thumbv7m",
+        ]
+    steps:
+      - name: Clone picolibc
+        uses: actions/checkout@v2
+        with:
+          path: picolibc
+
+      - name: Restore the Docker Image
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.IMAGE_FILE }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.HASH_FILE ) }}
+
+      - name: Load and Check the Docker Image
+        run: |
+          docker load -i $IMAGE_FILE
+          docker images -a $IMAGE
+
+      - name: CMake test
+        run: |
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.cmake_flags }}
+
   fortify-source-arm:
     needs: cache-maker
     runs-on: ubuntu-latest
@@ -282,7 +314,7 @@ jobs:
         ]
         test: [
           "./.github/do-test do-riscv-configure build-riscv",
-          "./.github/do-many do-test do-rv32imac-configure build-rv32imac do-build do-clang-riscv-configure build-riscv-clang do-test do-clang-rv32imafdc-configure build-clang-rv32imafdc end",
+          "./.github/do-many do-test do-rv32imac-configure build-rv32imac do-test do-clang-riscv-configure build-riscv-clang do-test do-clang-rv32imafdc-configure build-clang-rv32imafdc end",
         ]
     steps:
       - name: Clone picolibc
@@ -545,7 +577,7 @@ jobs:
         ]
         test: [
           "./.github/do-test do-riscv-configure build-riscv",
-          "./.github/do-many do-test do-rv32imac-configure build-rv32imac do-build do-clang-riscv-configure build-riscv-clang do-test do-clang-rv32imafdc-configure build-clang-rv32imafdc end",
+          "./.github/do-many do-test do-rv32imac-configure build-rv32imac do-test do-clang-riscv-configure build-riscv-clang do-test do-clang-rv32imafdc-configure build-clang-rv32imafdc end",
         ]
     steps:
       - name: Clone picolibc
@@ -808,7 +840,7 @@ jobs:
         ]
         test: [
           "./.github/do-test do-riscv-configure build-riscv",
-          "./.github/do-many do-test do-rv32imac-configure build-rv32imac do-build do-clang-riscv-configure build-riscv-clang do-test do-clang-rv32imafdc-configure build-clang-rv32imafdc end",
+          "./.github/do-many do-test do-rv32imac-configure build-rv32imac do-test do-clang-riscv-configure build-riscv-clang do-test do-clang-rv32imafdc-configure build-clang-rv32imafdc end",
         ]
     steps:
       - name: Clone picolibc
