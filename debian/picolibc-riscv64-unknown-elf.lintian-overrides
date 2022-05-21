@@ -2,3 +2,4 @@ picolibc-riscv64-unknown-elf: arch-independent-package-contains-binary-or-object
 picolibc-riscv64-unknown-elf: unstripped-static-library usr/lib/picolibc/*
 picolibc-riscv64-unknown-elf: static-library-has-unneeded-sections usr/lib/picolibc/*
 picolibc-riscv64-unknown-elf: repeated-path-segment *
+picolibc-riscv64-unknown-elf: no-code-sections *
