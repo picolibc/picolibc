@@ -153,6 +153,8 @@ use Picolibc:
 
  10. Merge current newlib bits
  
+ 11. Fix %p printf/scanf on ILP64 targets.
+
 ### Picolibc version 1.7.6
 
  1. Fix use with C++ applications caused by a syntax error in
