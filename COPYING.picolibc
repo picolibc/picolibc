@@ -10,7 +10,7 @@ Copyright: 2020 The Newlib Project
 License: Default-1
 
 Files: debian/*
-Copyright: 2019-2021 Keith Packard
+Copyright: 2019-2022 Keith Packard
 License: BSD3-1
 
 Files: *.md
