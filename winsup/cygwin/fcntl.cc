@@ -79,46 +79,5 @@ fcntl64 (int fd, int cmd, ...)
   return res;
 }
 
-#ifdef __i386__
-extern "C" int
-_fcntl (int fd, int cmd, ...)
-{
-  intptr_t arg = 0;
-  va_list args;
-  struct __flock32 *src = NULL;
-  struct flock dst;
-
-  __try
-    {
-      va_start (args, cmd);
-      arg = va_arg (args, intptr_t);
-      va_end (args);
-      if (cmd == F_GETLK || cmd == F_SETLK || cmd == F_SETLKW)
-	{
-	  src = (struct __flock32 *) arg;
-	  dst.l_type = src->l_type;
-	  dst.l_whence = src->l_whence;
-	  dst.l_start = src->l_start;
-	  dst.l_len = src->l_len;
-	  dst.l_pid = src->l_pid;
-	  arg = (intptr_t) &dst;
-	}
-      int res = fcntl64 (fd, cmd, arg);
-      if (cmd == F_GETLK)
-	{
-	  src->l_type = dst.l_type;
-	  src->l_whence = dst.l_whence;
-	  src->l_start = dst.l_start;
-	  src->l_len = dst.l_len;
-	  src->l_pid = (short) dst.l_pid;
-	}
-      return res;
-    }
-  __except (EFAULT)
-  __endtry
-  return -1;
-}
-#else
 EXPORT_ALIAS (fcntl64, fcntl)
 EXPORT_ALIAS (fcntl64, _fcntl)
-#endif

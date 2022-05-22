@@ -45,13 +45,6 @@ bool check_token_membership (PSID);
 #define MAP_UNIX_TO_CYGWIN_ID(id)	(UNIX_POSIX_OFFSET \
 					 | ((id) & UNIX_POSIX_MASK))
 
-#ifdef __i386__
-#define ILLEGAL_UID16 ((__uid16_t)-1)
-#define ILLEGAL_GID16 ((__gid16_t)-1)
-#define uid16touid32(u16)  ((u16)==ILLEGAL_UID16?ILLEGAL_UID:(uid_t)(u16))
-#define gid16togid32(g16)  ((g16)==ILLEGAL_GID16?ILLEGAL_GID:(gid_t)(g16))
-#endif
-
 #define MAX_DACL_LEN(n) (sizeof (ACL) \
 		   + (n) * (sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD) \
 			    + SECURITY_MAX_SID_SIZE))

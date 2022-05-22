@@ -1625,19 +1625,8 @@ lseek64 (int fd, off_t pos, int dir)
 }
 
 EXPORT_ALIAS (lseek64, _lseek64)
-
-#ifdef __i386__
-extern "C" _off_t
-lseek (int fd, _off_t pos, int dir)
-{
-  return lseek64 (fd, (off_t) pos, dir);
-}
-EXPORT_ALIAS (lseek, _lseek)
-#else
 EXPORT_ALIAS (lseek64, lseek)
 EXPORT_ALIAS (lseek64, _lseek)
-#endif
-
 
 extern "C" int
 close (int fd)
@@ -1742,16 +1731,7 @@ chown32 (const char * name, uid_t uid, gid_t gid)
   return chown_worker (name, PC_SYM_FOLLOW, uid, gid);
 }
 
-#ifdef __i386__
-extern "C" int
-chown (const char * name, __uid16_t uid, __gid16_t gid)
-{
-  return chown_worker (name, PC_SYM_FOLLOW,
-		       uid16touid32 (uid), gid16togid32 (gid));
-}
-#else
 EXPORT_ALIAS (chown32, chown)
-#endif
 
 extern "C" int
 lchown32 (const char * name, uid_t uid, gid_t gid)
@@ -1759,16 +1739,7 @@ lchown32 (const char * name, uid_t uid, gid_t gid)
   return chown_worker (name, PC_SYM_NOFOLLOW, uid, gid);
 }
 
-#ifdef __i386__
-extern "C" int
-lchown (const char * name, __uid16_t uid, __gid16_t gid)
-{
-  return chown_worker (name, PC_SYM_NOFOLLOW,
-		       uid16touid32 (uid), gid16togid32 (gid));
-}
-#else
 EXPORT_ALIAS (lchown32, lchown)
-#endif
 
 extern "C" int
 fchown32 (int fd, uid_t uid, gid_t gid)
@@ -1791,15 +1762,7 @@ fchown32 (int fd, uid_t uid, gid_t gid)
   return res;
 }
 
-#ifdef __i386__
-extern "C" int
-fchown (int fd, __uid16_t uid, __gid16_t gid)
-{
-  return fchown32 (fd, uid16touid32 (uid), gid16togid32 (gid));
-}
-#else
 EXPORT_ALIAS (fchown32, fchown)
-#endif
 
 /* umask: POSIX 5.3.3.1 */
 extern "C" mode_t
@@ -1864,26 +1827,6 @@ fchmod (int fd, mode_t mode)
 
   return cfd->fchmod (FILTERED_MODE (mode));
 }
-
-#ifdef __i386__
-static void
-stat64_to_stat32 (struct stat *src, struct __stat32 *dst)
-{
-  dst->st_dev = ((src->st_dev >> 8) & 0xff00) | (src->st_dev & 0xff);
-  dst->st_ino = ((unsigned) (src->st_ino >> 32)) | (unsigned) src->st_ino;
-  dst->st_mode = src->st_mode;
-  dst->st_nlink = src->st_nlink;
-  dst->st_uid = src->st_uid;
-  dst->st_gid = src->st_gid;
-  dst->st_rdev = ((src->st_rdev >> 8) & 0xff00) | (src->st_rdev & 0xff);
-  dst->st_size = src->st_size;
-  dst->st_atim = src->st_atim;
-  dst->st_mtim = src->st_mtim;
-  dst->st_ctim = src->st_ctim;
-  dst->st_blksize = src->st_blksize;
-  dst->st_blocks = src->st_blocks;
-}
-#endif
 
 static struct stat dev_st;
 static bool dev_st_inited;
@@ -1968,33 +1911,8 @@ _fstat64_r (struct _reent *ptr, int fd, struct stat *buf)
   return ret;
 }
 
-#ifdef __i386__
-/* This entry point is retained only to serve old 32 bit applications
-built under Cygwin 1.3.x or earlier.  Newer 32 bit apps are redirected
-to fstat64; see NEW_FUNCTIONS in Makefile.in. */
-extern "C" int
-fstat (int fd, struct stat *buf)
-{
-  struct stat buf64;
-  int ret = fstat64 (fd, &buf64);
-  if (!ret)
-    stat64_to_stat32 (&buf64, (struct __stat32 *) buf);
-  return ret;
-}
-
-extern "C" int
-_fstat_r (struct _reent *ptr, int fd, struct stat *buf)
-{
-  int ret;
-
-  if ((ret = fstat (fd, buf)) == -1)
-    ptr->_errno = get_errno ();
-  return ret;
-}
-#else
 EXPORT_ALIAS (fstat64, fstat)
 EXPORT_ALIAS (_fstat64_r, _fstat_r)
-#endif
 
 /* fsync: P96 6.6.1.1 */
 extern "C" int
@@ -2145,31 +2063,8 @@ _stat64_r (struct _reent *__restrict ptr, const char *__restrict name,
   return ret;
 }
 
-#ifdef __i386__
-extern "C" int
-stat (const char *__restrict name, struct stat *__restrict buf)
-{
-  struct stat buf64;
-  int ret = stat64 (name, &buf64);
-  if (!ret)
-    stat64_to_stat32 (&buf64, (struct __stat32 *) buf);
-  return ret;
-}
-
-extern "C" int
-_stat_r (struct _reent *__restrict ptr, const char *__restrict name,
-	 struct stat *__restrict buf)
-{
-  int ret;
-
-  if ((ret = stat (name, buf)) == -1)
-    ptr->_errno = get_errno ();
-  return ret;
-}
-#else
 EXPORT_ALIAS (stat64, stat)
 EXPORT_ALIAS (_stat64_r, _stat_r)
-#endif
 
 /* lstat: Provided by SVR4 and 4.3+BSD, POSIX? */
 extern "C" int
@@ -2181,20 +2076,7 @@ lstat64 (const char *__restrict name, struct stat *__restrict buf)
   return stat_worker (pc, buf);
 }
 
-#ifdef __i386__
-/* lstat: Provided by SVR4 and 4.3+BSD, POSIX? */
-extern "C" int
-lstat (const char *__restrict name, struct stat *__restrict buf)
-{
-  struct stat buf64;
-  int ret = lstat64 (name, &buf64);
-  if (!ret)
-    stat64_to_stat32 (&buf64, (struct __stat32 *) buf);
-  return ret;
-}
-#else
 EXPORT_ALIAS (lstat64, lstat)
-#endif
 
 extern "C" int
 access (const char *fn, int flags)
@@ -3192,16 +3074,7 @@ ftruncate64 (int fd, off_t length)
   return res;
 }
 
-#ifdef __i386__
-/* ftruncate: P96 5.6.7.1 */
-extern "C" int
-ftruncate (int fd, _off_t length)
-{
-  return ftruncate64 (fd, (off_t)length);
-}
-#else
 EXPORT_ALIAS (ftruncate64, ftruncate)
-#endif
 
 /* truncate: Provided by SVR4 and 4.3+BSD.  Not part of POSIX.1 or XPG3 */
 extern "C" int
@@ -3222,16 +3095,7 @@ truncate64 (const char *pathname, off_t length)
   return res;
 }
 
-#ifdef __i386__
-/* truncate: Provided by SVR4 and 4.3+BSD.  Not part of POSIX.1 or XPG3 */
-extern "C" int
-truncate (const char *pathname, _off_t length)
-{
-  return truncate64 (pathname, (off_t)length);
-}
-#else
 EXPORT_ALIAS (truncate64, truncate)
-#endif
 
 extern "C" long
 _get_osfhandle (int fd)
@@ -3490,15 +3354,7 @@ mknod32 (const char *path, mode_t mode, dev_t dev)
   return -1;
 }
 
-#ifdef __i386__
-extern "C" int
-mknod (const char *_path, mode_t mode, __dev16_t dev)
-{
-  return mknod32 (_path, mode, (dev_t) dev);
-}
-#else
 EXPORT_ALIAS (mknod32, mknod)
-#endif
 
 extern "C" int
 mkfifo (const char *path, mode_t mode)
@@ -3712,15 +3568,7 @@ seteuid32 (uid_t uid)
   return 0;
 }
 
-#ifdef __i386__
-extern "C" int
-seteuid (__uid16_t uid)
-{
-  return seteuid32 (uid16touid32 (uid));
-}
-#else
 EXPORT_ALIAS (seteuid32, seteuid)
-#endif
 
 /* setuid: POSIX 4.2.2.1 */
 extern "C" int
@@ -3737,15 +3585,7 @@ setuid32 (uid_t uid)
   return ret;
 }
 
-#ifdef __i386__
-extern "C" int
-setuid (__uid16_t uid)
-{
-  return setuid32 (uid16touid32 (uid));
-}
-#else
 EXPORT_ALIAS (setuid32, setuid)
-#endif
 
 extern "C" int
 setreuid32 (uid_t ruid, uid_t euid)
@@ -3766,15 +3606,7 @@ setreuid32 (uid_t ruid, uid_t euid)
   return ret;
 }
 
-#ifdef __i386__
-extern "C" int
-setreuid (__uid16_t ruid, __uid16_t euid)
-{
-  return setreuid32 (uid16touid32 (ruid), uid16touid32 (euid));
-}
-#else
 EXPORT_ALIAS (setreuid32, setreuid)
-#endif
 
 /* setegid: from System V.  */
 extern "C" int
@@ -3826,15 +3658,7 @@ setegid32 (gid_t gid)
   return 0;
 }
 
-#ifdef __i386__
-extern "C" int
-setegid (__gid16_t gid)
-{
-  return setegid32 (gid16togid32 (gid));
-}
-#else
 EXPORT_ALIAS (setegid32, setegid)
-#endif
 
 /* setgid: POSIX 4.2.2.1 */
 extern "C" int
@@ -3846,18 +3670,7 @@ setgid32 (gid_t gid)
   return ret;
 }
 
-#ifdef __i386__
-extern "C" int
-setgid (__gid16_t gid)
-{
-  int ret = setegid32 (gid16togid32 (gid));
-  if (!ret)
-    cygheap->user.real_gid = myself->gid;
-  return ret;
-}
-#else
 EXPORT_ALIAS (setgid32, setgid)
-#endif
 
 extern "C" int
 setregid32 (gid_t rgid, gid_t egid)
@@ -3878,15 +3691,7 @@ setregid32 (gid_t rgid, gid_t egid)
   return ret;
 }
 
-#ifdef __i386__
-extern "C" int
-setregid (__gid16_t rgid, __gid16_t egid)
-{
-  return setregid32 (gid16togid32 (rgid), gid16togid32 (egid));
-}
-#else
 EXPORT_ALIAS (setregid32, setregid)
-#endif
 
 /* chroot: privileged Unix system call.  */
 /* FIXME: Not privileged here. How should this be done? */

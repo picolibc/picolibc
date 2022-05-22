@@ -237,24 +237,6 @@ internal_getgrgid (gid_t gid, cyg_ldap *pldap)
   return NULL;
 }
 
-#ifdef __i386__
-static struct __group16 *
-grp32togrp16 (struct __group16 *gp16, struct group *gp32)
-{
-  if (!gp16 || !gp32)
-    return NULL;
-
-  /* Copying the pointers is actually unnecessary.  Just having the correct
-     return type is important. */
-  gp16->gr_name = gp32->gr_name;
-  gp16->gr_passwd = gp32->gr_passwd;
-  gp16->gr_gid = (__gid16_t) gp32->gr_gid;		/* Not loss-free */
-  gp16->gr_mem = gp32->gr_mem;
-
-  return gp16;
-}
-#endif
-
 extern "C" int
 getgrgid_r (gid_t gid, struct group *grp, char *buffer, size_t bufsize,
 	    struct group **result)
@@ -325,17 +307,7 @@ getgrgid32 (gid_t gid)
   return getgr_cp (tempgr);
 }
 
-#ifdef __x86_64__
 EXPORT_ALIAS (getgrgid32, getgrgid)
-#else
-extern "C" struct __group16 *
-getgrgid (__gid16_t gid)
-{
-  static struct __group16 g16;	/* FIXME: thread-safe? */
-
-  return grp32togrp16 (&g16, getgrgid32 (gid16togid32 (gid)));
-}
-#endif
 
 extern "C" int
 getgrnam_r (const char *nam, struct group *grp, char *buffer,
@@ -375,17 +347,7 @@ getgrnam32 (const char *name)
   return getgr_cp (tempgr);
 }
 
-#ifdef __x86_64__
 EXPORT_ALIAS (getgrnam32, getgrnam)
-#else
-extern "C" struct __group16 *
-getgrnam (const char *name)
-{
-  static struct __group16 g16;	/* FIXME: thread-safe? */
-
-  return grp32togrp16 (&g16, getgrnam32 (name));
-}
-#endif
 
 /* getgrent functions are not reentrant. */
 static gr_ent grent;
@@ -502,17 +464,7 @@ getgrent32 (void)
   return grent.getgrent ();
 }
 
-#ifdef __x86_64__
 EXPORT_ALIAS (getgrent32, getgrent)
-#else
-extern "C" struct __group16 *
-getgrent ()
-{
-  static struct __group16 g16;	/* FIXME: thread-safe? */
-
-  return grp32togrp16 (&g16, getgrent32 ());
-}
-#endif
 
 extern "C" void
 endgrent (void)
@@ -701,31 +653,7 @@ getgroups32 (int gidsetsize, gid_t *grouplist)
   return internal_getgroups (gidsetsize, grouplist, &cldap);
 }
 
-#ifdef __x86_64__
 EXPORT_ALIAS (getgroups32, getgroups)
-#else
-extern "C" int
-getgroups (int gidsetsize, __gid16_t *grouplist)
-{
-  gid_t *grouplist32 = NULL;
-
-  if (gidsetsize < 0)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-  if (gidsetsize > 0 && grouplist)
-    grouplist32 = (gid_t *) alloca (gidsetsize * sizeof (gid_t));
-
-  int ret = getgroups32 (gidsetsize, grouplist32);
-
-  if (gidsetsize > 0 && grouplist)
-    for (int i = 0; i < ret; ++ i)
-      grouplist[i] = grouplist32[i];
-
-  return ret;
-}
-#endif
 
 /* Core functionality of initgroups and getgrouplist. */
 static void
@@ -759,15 +687,7 @@ initgroups32 (const char *user, gid_t gid)
   return 0;
 }
 
-#ifdef __x86_64__
 EXPORT_ALIAS (initgroups32, initgroups)
-#else
-extern "C" int
-initgroups (const char *user, __gid16_t gid)
-{
-  return initgroups32 (user, gid16togid32(gid));
-}
-#endif
 
 extern "C" int
 getgrouplist (const char *user, gid_t gid, gid_t *groups, int *ngroups)
@@ -837,22 +757,4 @@ setgroups32 (int ngroups, const gid_t *grouplist)
   return 0;
 }
 
-#ifdef __i386__
-extern "C" int
-setgroups (int ngroups, const __gid16_t *grouplist)
-{
-  gid_t *grouplist32 = NULL;
-
-  if (ngroups > 0 && grouplist)
-    {
-      grouplist32 = (gid_t *) alloca (ngroups * sizeof (gid_t));
-      if (grouplist32 == NULL)
-	return -1;
-      for (int i = 0; i < ngroups; i++)
-	grouplist32[i] = grouplist[i];
-    }
-  return setgroups32 (ngroups, grouplist32);
-}
-#else
 EXPORT_ALIAS (setgroups32, setgroups)
-#endif

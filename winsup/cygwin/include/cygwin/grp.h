@@ -17,16 +17,6 @@ extern "C" {
 #endif
 
 #ifdef __INSIDE_CYGWIN__
-#ifdef __i386__
-struct __group16
-{
-  char *gr_name;
-  char *gr_passwd;
-  __gid16_t gr_gid;
-  char **gr_mem;
-};
-#endif
-
 struct group * getgrgid32 (gid_t gid);
 struct group * getgrnam32 (const char *name);
 gid_t getgid32 ();

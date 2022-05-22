@@ -1228,16 +1228,6 @@ acl32 (const char *path, int cmd, int nentries, aclent_t *aclbufp)
   return res;
 }
 
-#ifdef __i386__
-extern "C" int
-lacl32 (const char *path, int cmd, int nentries, aclent_t *aclbufp)
-{
-  /* This call was an accident.  Make it absolutely clear. */
-  set_errno (ENOSYS);
-  return -1;
-}
-#endif
-
 extern "C" int
 facl32 (int fd, int cmd, int nentries, aclent_t *aclbufp)
 {
@@ -1975,93 +1965,6 @@ aclfromtext32 (char *acltextp, int *aclcnt)
   return (aclent_t *) __aclfromtext (acltextp, aclcnt, false);
 }
 
-#ifdef __i386__
-typedef struct __acl16 {
-    int          a_type;
-    __uid16_t    a_id;
-    mode_t       a_perm;
-} __aclent16_t;
-
-/* __aclent16_t and aclent_t have same size and same member offsets */
-static aclent_t *
-acl16to32 (__aclent16_t *aclbufp, int nentries)
-{
-  aclent_t *aclbufp32 = (aclent_t *) aclbufp;
-  if (aclbufp32)
-    for (int i = 0; i < nentries; i++)
-      aclbufp32[i].a_id &= USHRT_MAX;
-  return aclbufp32;
-}
-
-extern "C" int
-acl (const char *path, int cmd, int nentries, __aclent16_t *aclbufp)
-{
-  return acl32 (path, cmd, nentries, acl16to32 (aclbufp, nentries));
-}
-
-extern "C" int
-facl (int fd, int cmd, int nentries, __aclent16_t *aclbufp)
-{
-  return facl32 (fd, cmd, nentries, acl16to32 (aclbufp, nentries));
-}
-
-extern "C" int
-lacl (const char *path, int cmd, int nentries, __aclent16_t *aclbufp)
-{
-  /* This call was an accident.  Make it absolutely clear. */
-  set_errno (ENOSYS);
-  return -1;
-}
-
-extern "C" int
-aclcheck (__aclent16_t *aclbufp, int nentries, int *which)
-{
-  return aclcheck32 (acl16to32 (aclbufp, nentries), nentries, which);
-}
-
-extern "C" int
-aclsort (int nentries, int i, __aclent16_t *aclbufp)
-{
-  return aclsort32 (nentries, i, acl16to32 (aclbufp, nentries));
-}
-
-
-extern "C" int
-acltomode (__aclent16_t *aclbufp, int nentries, mode_t *modep)
-{
-  return acltomode32 (acl16to32 (aclbufp, nentries), nentries, modep);
-}
-
-extern "C" int
-aclfrommode (__aclent16_t *aclbufp, int nentries, mode_t *modep)
-{
-  return aclfrommode32 ((aclent_t *)aclbufp, nentries, modep);
-}
-
-extern "C" int
-acltopbits (__aclent16_t *aclbufp, int nentries, mode_t *pbitsp)
-{
-  return acltopbits32 (acl16to32 (aclbufp, nentries), nentries, pbitsp);
-}
-
-extern "C" int
-aclfrompbits (__aclent16_t *aclbufp, int nentries, mode_t *pbitsp)
-{
-  return aclfrompbits32 ((aclent_t *)aclbufp, nentries, pbitsp);
-}
-
-extern "C" char *
-acltotext (__aclent16_t *aclbufp, int aclcnt)
-{
-  return acltotext32 (acl16to32 (aclbufp, aclcnt), aclcnt);
-}
-
-extern "C" __aclent16_t *
-aclfromtext (char *acltextp, int *aclcnt)
-{
-  return (__aclent16_t *) aclfromtext32 (acltextp, aclcnt);
-}
-#else
 EXPORT_ALIAS (acl32, acl)
 EXPORT_ALIAS (facl32, facl)
 EXPORT_ALIAS (aclcheck32, aclcheck)
@@ -2072,4 +1975,3 @@ EXPORT_ALIAS (acltopbits32, acltopbits)
 EXPORT_ALIAS (aclfrompbits32, aclfrompbits)
 EXPORT_ALIAS (acltotext32, acltotext)
 EXPORT_ALIAS (aclfromtext32, aclfromtext)
-#endif

@@ -1145,15 +1145,7 @@ out:
   return ret;
 }
 
-#ifdef __i386__
-extern "C" void *
-mmap (void *addr, size_t len, int prot, int flags, int fd, _off_t off)
-{
-  return mmap64 (addr, len, prot, flags, fd, (off_t)off);
-}
-#else
 EXPORT_ALIAS (mmap64, mmap)
-#endif
 
 /* munmap () removes all mmapped pages between addr and addr+len. */
 

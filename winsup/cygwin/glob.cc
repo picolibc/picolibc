@@ -855,38 +855,7 @@ g_opendir(Char *str, glob_t *pglob)
 	return(opendir(buf));
 }
 
-#ifdef __x86_64__
 #define CYGWIN_gl_stat(sfptr) ((*pglob->sfptr) (buf, sb))
-#else
-static void
-stat32_to_stat64 (struct __stat32 *src, struct stat *dst)
-{
-  dst->st_dev = src->st_dev;
-  dst->st_ino = src->st_ino;
-  dst->st_mode = src->st_mode;
-  dst->st_nlink = src->st_nlink;
-  dst->st_uid = src->st_uid;
-  dst->st_gid = src->st_gid;
-  dst->st_rdev = src->st_rdev;
-  dst->st_size = src->st_size;
-  dst->st_atim = src->st_atim;
-  dst->st_mtim = src->st_mtim;
-  dst->st_ctim = src->st_ctim;
-  dst->st_birthtim = src->st_mtim;
-  dst->st_blksize = src->st_blksize;
-  dst->st_blocks = src->st_blocks;
-}
-
-#define CYGWIN_gl_stat(sfptr) \
-  ({ int ret;								 \
-     struct __stat32 lsb;						 \
-     if (CYGWIN_VERSION_CHECK_FOR_USING_BIG_TYPES)			 \
-       ret = (*pglob->sfptr) (buf, sb);					 \
-     else  if (!(ret = (*pglob->sfptr) (buf, (struct stat *) &lsb))) \
-       stat32_to_stat64 (&lsb, sb);					 \
-     ret;								 \
-  })
-#endif
 
 static int
 g_lstat(Char *fn, struct stat *sb, glob_t *pglob)

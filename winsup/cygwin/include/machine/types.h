@@ -32,17 +32,6 @@ typedef struct timespec timestruc_t;
 
 typedef __loff_t loff_t;
 
-#if defined (__INSIDE_CYGWIN__) && !defined (__x86_64__)
-struct __flock32 {
-	short	 l_type;	/* F_RDLCK, F_WRLCK, or F_UNLCK */
-	short	 l_whence;	/* flag to choose starting offset */
-	_off_t	 l_start;	/* relative offset, in bytes */
-	_off_t	 l_len;		/* length, in bytes; 0 means lock to EOF */
-	short	 l_pid;		/* returned with F_GETLK */
-	short	 l_xxx;		/* reserved for future use */
-};
-#endif
-
 struct flock {
 	short	 l_type;	/* F_RDLCK, F_WRLCK, or F_UNLCK */
 	short	 l_whence;	/* flag to choose starting offset */
