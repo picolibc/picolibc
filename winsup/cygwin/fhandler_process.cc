@@ -1049,7 +1049,7 @@ peb_teb_rinse_repeat:
 		  if (mount_table->conv_to_posix_path (dosname,
 						       posix_modname, 0))
 		    sys_wcstombs (posix_modname, NT_MAX_PATH, dosname);
-		  stat64 (posix_modname, &st);
+		  stat (posix_modname, &st);
 		}
 	      else if (!threads.fill_if_match (cur.abase, mb.Type,
 					       posix_modname)

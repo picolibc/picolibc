@@ -18,6 +18,7 @@ details. */
 #include "cygheap.h"
 #include "child_info.h"
 #include <sys/clipboard.h>
+#include <unistd.h>
 
 /*
  * Robert Collins:
@@ -159,8 +160,8 @@ int __reg2
 fhandler_dev_clipboard::fstat (struct stat *buf)
 {
   buf->st_mode = S_IFCHR | STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
-  buf->st_uid = geteuid32 ();
-  buf->st_gid = getegid32 ();
+  buf->st_uid = geteuid ();
+  buf->st_gid = getegid ();
   buf->st_nlink = 1;
   buf->st_blksize = PREFERRED_IO_BLKSIZE;
 

@@ -1599,7 +1599,7 @@ EXPORT_ALIAS (open, _open )
 EXPORT_ALIAS (open, _open64 )
 
 extern "C" off_t
-lseek64 (int fd, off_t pos, int dir)
+lseek (int fd, off_t pos, int dir)
 {
   off_t res;
 
@@ -1624,9 +1624,8 @@ lseek64 (int fd, off_t pos, int dir)
   return res;
 }
 
-EXPORT_ALIAS (lseek64, _lseek64)
-EXPORT_ALIAS (lseek64, lseek)
-EXPORT_ALIAS (lseek64, _lseek)
+EXPORT_ALIAS (lseek, _lseek64)
+EXPORT_ALIAS (lseek, _lseek)
 
 extern "C" int
 close (int fd)
@@ -1726,23 +1725,19 @@ chown_worker (const char *name, unsigned fmode, uid_t uid, gid_t gid)
 }
 
 extern "C" int
-chown32 (const char * name, uid_t uid, gid_t gid)
+chown (const char * name, uid_t uid, gid_t gid)
 {
   return chown_worker (name, PC_SYM_FOLLOW, uid, gid);
 }
 
-EXPORT_ALIAS (chown32, chown)
-
 extern "C" int
-lchown32 (const char * name, uid_t uid, gid_t gid)
+lchown (const char * name, uid_t uid, gid_t gid)
 {
   return chown_worker (name, PC_SYM_NOFOLLOW, uid, gid);
 }
 
-EXPORT_ALIAS (lchown32, lchown)
-
 extern "C" int
-fchown32 (int fd, uid_t uid, gid_t gid)
+fchown (int fd, uid_t uid, gid_t gid)
 {
   cygheap_fdget cfd (fd);
   if (cfd < 0)
@@ -1761,8 +1756,6 @@ fchown32 (int fd, uid_t uid, gid_t gid)
   syscall_printf ("%R = fchown(%s,...)", res, cfd->get_name ());
   return res;
 }
-
-EXPORT_ALIAS (fchown32, fchown)
 
 /* umask: POSIX 5.3.3.1 */
 extern "C" mode_t
@@ -1859,7 +1852,7 @@ fhandler_base::stat_fixup (struct stat *buf)
 	{
 	  if (!dev_st_inited)
 	    {
-	      stat64 ("/dev", &dev_st);
+	      stat ("/dev", &dev_st);
 	      dev_st_inited = true;
 	    }
 	  buf->st_dev = dev_st.st_dev;
@@ -1882,7 +1875,7 @@ fhandler_base::stat_fixup (struct stat *buf)
 }
 
 extern "C" int
-fstat64 (int fd, struct stat *buf)
+fstat (int fd, struct stat *buf)
 {
   int res;
 
@@ -1902,17 +1895,16 @@ fstat64 (int fd, struct stat *buf)
 }
 
 extern "C" int
-_fstat64_r (struct _reent *ptr, int fd, struct stat *buf)
+_fstat_r (struct _reent *ptr, int fd, struct stat *buf)
 {
   int ret;
 
-  if ((ret = fstat64 (fd, buf)) == -1)
+  if ((ret = fstat (fd, buf)) == -1)
     ptr->_errno = get_errno ();
   return ret;
 }
 
-EXPORT_ALIAS (fstat64, fstat)
-EXPORT_ALIAS (_fstat64_r, _fstat_r)
+EXPORT_ALIAS (_fstat_r, _fstat64_r)
 
 /* fsync: P96 6.6.1.1 */
 extern "C" int
@@ -2043,7 +2035,7 @@ stat_worker (path_conv &pc, struct stat *buf)
 }
 
 extern "C" int
-stat64 (const char *__restrict name, struct stat *__restrict buf)
+stat (const char *__restrict name, struct stat *__restrict buf)
 {
   syscall_printf ("entering");
   path_conv pc (name, PC_SYM_FOLLOW | PC_POSIX | PC_KEEP_HANDLE
@@ -2053,30 +2045,27 @@ stat64 (const char *__restrict name, struct stat *__restrict buf)
 }
 
 extern "C" int
-_stat64_r (struct _reent *__restrict ptr, const char *__restrict name,
+_stat_r (struct _reent *__restrict ptr, const char *__restrict name,
 	   struct stat *buf)
 {
   int ret;
 
-  if ((ret = stat64 (name, buf)) == -1)
+  if ((ret = stat (name, buf)) == -1)
     ptr->_errno = get_errno ();
   return ret;
 }
 
-EXPORT_ALIAS (stat64, stat)
-EXPORT_ALIAS (_stat64_r, _stat_r)
+EXPORT_ALIAS (_stat_r, _stat64_r)
 
 /* lstat: Provided by SVR4 and 4.3+BSD, POSIX? */
 extern "C" int
-lstat64 (const char *__restrict name, struct stat *__restrict buf)
+lstat (const char *__restrict name, struct stat *__restrict buf)
 {
   syscall_printf ("entering");
   path_conv pc (name, PC_SYM_NOFOLLOW | PC_POSIX | PC_KEEP_HANDLE,
 		stat_suffixes);
   return stat_worker (pc, buf);
 }
-
-EXPORT_ALIAS (lstat64, lstat)
 
 extern "C" int
 access (const char *fn, int flags)
@@ -3055,7 +3044,7 @@ posix_fallocate (int fd, off_t offset, off_t len)
 }
 
 extern "C" int
-ftruncate64 (int fd, off_t length)
+ftruncate (int fd, off_t length)
 {
   int res = -1;
   cygheap_fdget cfd (fd);
@@ -3074,11 +3063,9 @@ ftruncate64 (int fd, off_t length)
   return res;
 }
 
-EXPORT_ALIAS (ftruncate64, ftruncate)
-
 /* truncate: Provided by SVR4 and 4.3+BSD.  Not part of POSIX.1 or XPG3 */
 extern "C" int
-truncate64 (const char *pathname, off_t length)
+truncate (const char *pathname, off_t length)
 {
   int fd;
   int res = -1;
@@ -3087,15 +3074,13 @@ truncate64 (const char *pathname, off_t length)
 
   if (fd != -1)
     {
-      res = ftruncate64 (fd, length);
+      res = ftruncate (fd, length);
       close (fd);
     }
   syscall_printf ("%R = truncate(%s, %D)", res, pathname, length);
 
   return res;
 }
-
-EXPORT_ALIAS (truncate64, truncate)
 
 extern "C" long
 _get_osfhandle (int fd)
@@ -3293,7 +3278,7 @@ mknod_worker (path_conv &pc, mode_t mode, _major_t major, _minor_t minor)
 }
 
 extern "C" int
-mknod32 (const char *path, mode_t mode, dev_t dev)
+mknod (const char *path, mode_t mode, dev_t dev)
 {
   __try
     {
@@ -3354,17 +3339,15 @@ mknod32 (const char *path, mode_t mode, dev_t dev)
   return -1;
 }
 
-EXPORT_ALIAS (mknod32, mknod)
-
 extern "C" int
 mkfifo (const char *path, mode_t mode)
 {
-  return mknod32 (path, (mode & ~S_IFMT) | S_IFIFO, 0);
+  return mknod (path, (mode & ~S_IFMT) | S_IFIFO, 0);
 }
 
 /* seteuid: standards? */
 extern "C" int
-seteuid32 (uid_t uid)
+seteuid (uid_t uid)
 {
   debug_printf ("uid: %u myself->uid: %u myself->gid: %u",
 		uid, myself->uid, myself->gid);
@@ -3568,13 +3551,11 @@ seteuid32 (uid_t uid)
   return 0;
 }
 
-EXPORT_ALIAS (seteuid32, seteuid)
-
 /* setuid: POSIX 4.2.2.1 */
 extern "C" int
-setuid32 (uid_t uid)
+setuid (uid_t uid)
 {
-  int ret = seteuid32 (uid);
+  int ret = seteuid (uid);
   if (!ret)
     {
       cygheap->user.real_uid = myself->uid;
@@ -3585,20 +3566,18 @@ setuid32 (uid_t uid)
   return ret;
 }
 
-EXPORT_ALIAS (setuid32, setuid)
-
 extern "C" int
-setreuid32 (uid_t ruid, uid_t euid)
+setreuid (uid_t ruid, uid_t euid)
 {
   int ret = 0;
   bool tried = false;
   uid_t old_euid = myself->uid;
 
   if (ruid != ILLEGAL_UID && cygheap->user.real_uid != ruid && euid != ruid)
-    tried = !(ret = seteuid32 (ruid));
+    tried = !(ret = seteuid (ruid));
   if (!ret && euid != ILLEGAL_UID)
-    ret = seteuid32 (euid);
-  if (tried && (ret || euid == ILLEGAL_UID) && seteuid32 (old_euid))
+    ret = seteuid (euid);
+  if (tried && (ret || euid == ILLEGAL_UID) && seteuid (old_euid))
     system_printf ("Cannot restore original euid %u", old_euid);
   if (!ret && ruid != ILLEGAL_UID)
     cygheap->user.real_uid = ruid;
@@ -3606,11 +3585,9 @@ setreuid32 (uid_t ruid, uid_t euid)
   return ret;
 }
 
-EXPORT_ALIAS (setreuid32, setreuid)
-
 /* setegid: from System V.  */
 extern "C" int
-setegid32 (gid_t gid)
+setegid (gid_t gid)
 {
   debug_printf ("new egid: %u current: %u", gid, myself->gid);
 
@@ -3658,40 +3635,34 @@ setegid32 (gid_t gid)
   return 0;
 }
 
-EXPORT_ALIAS (setegid32, setegid)
-
 /* setgid: POSIX 4.2.2.1 */
 extern "C" int
-setgid32 (gid_t gid)
+setgid (gid_t gid)
 {
-  int ret = setegid32 (gid);
+  int ret = setegid (gid);
   if (!ret)
     cygheap->user.real_gid = myself->gid;
   return ret;
 }
 
-EXPORT_ALIAS (setgid32, setgid)
-
 extern "C" int
-setregid32 (gid_t rgid, gid_t egid)
+setregid (gid_t rgid, gid_t egid)
 {
   int ret = 0;
   bool tried = false;
   gid_t old_egid = myself->gid;
 
   if (rgid != ILLEGAL_GID && cygheap->user.real_gid != rgid && egid != rgid)
-    tried = !(ret = setegid32 (rgid));
+    tried = !(ret = setegid (rgid));
   if (!ret && egid != ILLEGAL_GID)
-    ret = setegid32 (egid);
-  if (tried && (ret || egid == ILLEGAL_GID) && setegid32 (old_egid))
+    ret = setegid (egid);
+  if (tried && (ret || egid == ILLEGAL_GID) && setegid (old_egid))
     system_printf ("Cannot restore original egid %u", old_egid);
   if (!ret && rgid != ILLEGAL_GID)
     cygheap->user.real_gid = rgid;
   debug_printf ("real: %u, effective: %u", cygheap->user.real_gid, myself->gid);
   return ret;
 }
-
-EXPORT_ALIAS (setregid32, setregid)
 
 /* chroot: privileged Unix system call.  */
 /* FIXME: Not privileged here. How should this be done? */
@@ -3896,13 +3867,13 @@ locked_append (int fd, const void * buf, size_t size)
   int count = 0;
 
   do
-    if ((lock_buffer.l_start = lseek64 (fd, 0, SEEK_END)) != (off_t) -1
-	&& fcntl64 (fd, F_SETLKW, &lock_buffer) != -1)
+    if ((lock_buffer.l_start = lseek (fd, 0, SEEK_END)) != (off_t) -1
+	&& fcntl (fd, F_SETLKW, &lock_buffer) != -1)
       {
-	if (lseek64 (fd, 0, SEEK_END) != (off_t) -1)
+	if (lseek (fd, 0, SEEK_END) != (off_t) -1)
 	  write (fd, buf, size);
 	lock_buffer.l_type = F_UNLCK;
-	fcntl64 (fd, F_SETLK, &lock_buffer);
+	fcntl (fd, F_SETLK, &lock_buffer);
 	break;
       }
   while (count++ < 1000
@@ -4394,22 +4365,22 @@ popen (const char *command, const char *in_type)
          end of the pipe.  Otherwise don't pass our end of the pipe to the
 	 child process. */
       if (pipe_flags & O_CLOEXEC)
-	fcntl64 (__std[stdchild], F_SETFD, 0);
+	fcntl (__std[stdchild], F_SETFD, 0);
       else
-	fcntl64 (myfd, F_SETFD, FD_CLOEXEC);
+	fcntl (myfd, F_SETFD, FD_CLOEXEC);
 
       /* Also don't pass the file handle currently associated with stdin/stdout
 	 to the child.  This function may actually fail if the stdchild fd
 	 is closed.  But that's ok. */
-      int stdchild_state = fcntl64 (stdchild, F_GETFD, 0);
-      fcntl64 (stdchild, F_SETFD, stdchild_state | FD_CLOEXEC);
+      int stdchild_state = fcntl (stdchild, F_GETFD, 0);
+      fcntl (stdchild, F_SETFD, stdchild_state | FD_CLOEXEC);
 
       /* Start a shell process to run the given command without forking. */
       pid_t pid = ch_spawn.worker ("/bin/sh", argv, cur_environ (), _P_NOWAIT,
 				   __std[0], __std[1]);
 
       /* Reinstate the close-on-exec state */
-      fcntl64 (stdchild, F_SETFD, stdchild_state);
+      fcntl (stdchild, F_SETFD, stdchild_state);
 
       /* If pid >= 0 then spawn_guts succeeded.  */
       if (pid >= 0)
@@ -4711,7 +4682,7 @@ fstatat (int dirfd, const char *__restrict pathname, struct stat *__restrict st,
 	      cwdstuff::cwd_lock.release ();
 	    }
 	  else
-	    return fstat64 (dirfd, st);
+	    return fstat (dirfd, st);
 	}
       path_conv pc (path, ((flags & AT_SYMLINK_NOFOLLOW)
 			   ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW)
@@ -4869,7 +4840,7 @@ mknodat (int dirfd, const char *pathname, mode_t mode, dev_t dev)
       char *path = tp.c_get ();
       if (gen_full_path_at (path, dirfd, pathname))
 	__leave;
-      return mknod32 (path, mode, dev);
+      return mknod (path, mode, dev);
     }
   __except (EFAULT) {}
   __endtry

@@ -101,9 +101,6 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/glob.c,v 1.28 2010/05/12 17:44:00 gordon Ex
 #include "cygheap.h"
 #include "cygwin/version.h"
 
-#define getpwuid(uid)	getpwuid32 (uid)
-#define getuid()	getuid32 ()
-
 #define CCHAR(c)	(ignore_case_with_glob ? towlower (CHAR (c)) : CHAR (c))
 #define Cchar(c)	(ignore_case_with_glob ? towlower (c) : (c))
 #endif
@@ -868,7 +865,7 @@ g_lstat(Char *fn, struct stat *sb, glob_t *pglob)
 	}
 	if (pglob->gl_flags & GLOB_ALTDIRFUNC)
 		return CYGWIN_gl_stat (gl_lstat);
-	return(lstat64(buf, sb));
+	return(lstat(buf, sb));
 }
 
 static int
@@ -882,7 +879,7 @@ g_stat(Char *fn, struct stat *sb, glob_t *pglob)
 	}
 	if (pglob->gl_flags & GLOB_ALTDIRFUNC)
 		return CYGWIN_gl_stat (gl_stat);
-	return(stat64(buf, sb));
+	return(stat(buf, sb));
 }
 
 static const Char *

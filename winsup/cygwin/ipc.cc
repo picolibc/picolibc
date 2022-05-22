@@ -18,7 +18,7 @@ ftok (const char *path, int id)
 {
   struct stat statbuf;
   key_t tmp;
-  if (stat64 (path, &statbuf))
+  if (stat (path, &statbuf))
     {
       /* stat set the appropriate errno for us */
       return (key_t) -1;

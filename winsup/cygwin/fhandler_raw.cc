@@ -47,8 +47,8 @@ fhandler_dev_raw::fstat (struct stat *buf)
 
       if (get_major () == DEV_SD_HIGHPART_END && get_minor () == 9999)
 	buf->st_ino = get_ino ();
-      buf->st_uid = geteuid32 ();
-      buf->st_gid = getegid32 ();
+      buf->st_uid = geteuid ();
+      buf->st_gid = getegid ();
       buf->st_nlink = 1;
       buf->st_blksize = PREFERRED_IO_BLKSIZE;
       time_as_timestruc_t (&buf->st_ctim);

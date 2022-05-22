@@ -103,7 +103,6 @@ extern "C" {
   int cygwin_rresvport_af(int *alport, int family);
   int cygwin_select (int, fd_set *, fd_set *, fd_set *, struct timeval *);
   int cygwin_socket (int, int, int);
-  int seteuid32 (uid_t);
 }
 #endif
 
@@ -200,7 +199,7 @@ cygwin_rcmd_af(char **ahost, in_port_t rport, const char *locuser,
 			    NULL);
 			return (-1);
 		}
-		fcntl64(s, F_SETOWN, pid);
+		fcntl(s, F_SETOWN, pid);
 		if (cygwin_connect(s, ai->ai_addr, ai->ai_addrlen) >= 0)
 			break;
 		(void)close(s);
@@ -458,10 +457,10 @@ again:
 		 * reading an NFS mounted file system, can't read files that
 		 * are protected read/write owner only.
 		 */
-		uid = geteuid32();
-		(void)seteuid32(pwd->pw_uid);
+		uid = geteuid();
+		(void)seteuid(pwd->pw_uid);
 		hostf = fopen(pbuf, "rt");
-		(void)seteuid32(uid);
+		(void)seteuid(uid);
 
 		if (hostf == NULL)
 			return (-1);
@@ -470,11 +469,11 @@ again:
 		 * user or root or if writeable by anyone but the owner, quit.
 		 */
 		cp = NULL;
-		if (lstat64(pbuf, &sbuf) < 0)
+		if (lstat(pbuf, &sbuf) < 0)
 			cp = ".rhosts lstat failed";
 		else if (!S_ISREG(sbuf.st_mode))
 			cp = ".rhosts not regular file";
-		else if (fstat64(fileno(hostf), &sbuf) < 0)
+		else if (fstat(fileno(hostf), &sbuf) < 0)
 			cp = ".rhosts fstat failed";
 		else if (sbuf.st_uid && sbuf.st_uid != pwd->pw_uid)
 			cp = "bad .rhosts owner";

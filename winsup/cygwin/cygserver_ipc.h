@@ -36,8 +36,8 @@ ipc_set_proc_info (proc &blk, bool in_fork = false)
 {
   blk.cygpid = getpid ();
   blk.winpid = GetCurrentProcessId ();
-  blk.uid = geteuid32 ();
-  blk.gid = getegid32 ();
+  blk.uid = geteuid ();
+  blk.gid = getegid ();
   blk.gidcnt = 0;
   blk.gidlist = NULL;
   blk.is_admin = false;

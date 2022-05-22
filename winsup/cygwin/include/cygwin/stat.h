@@ -32,16 +32,6 @@ struct stat
   timestruc_t   st_birthtim;
 };
 
-#if defined (__INSIDE_CYGWIN__) || defined (_LIBC)
-
-extern int fstat64 (int fd, struct stat *buf);
-extern int stat64 (const char *__restrict file_name,
-		   struct stat *__restrict buf);
-extern int lstat64 (const char *__restrict file_name,
-		    struct stat *__restrict buf);
-
-#endif
-
 #define st_atime st_atim.tv_sec
 #define st_mtime st_mtim.tv_sec
 #define st_ctime st_ctim.tv_sec

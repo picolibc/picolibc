@@ -21,9 +21,7 @@ int	access (const char *__path, int __amode);
 unsigned  alarm (unsigned __secs);
 int     chdir (const char *__path);
 int     chmod (const char *__path, mode_t __mode);
-#if !defined(__INSIDE_CYGWIN__)
 int     chown (const char *__path, uid_t __owner, gid_t __group);
-#endif
 #if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200112)
 int     chroot (const char *__path);
 #endif
@@ -79,10 +77,8 @@ int     fchdir (int __fildes);
 #if __POSIX_VISIBLE >= 199309
 int     fchmod (int __fildes, mode_t __mode);
 #endif
-#if !defined(__INSIDE_CYGWIN__)
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4 || __POSIX_VISIBLE >= 200809
 int     fchown (int __fildes, uid_t __owner, gid_t __group);
-#endif
 #endif
 #if __ATFILE_VISIBLE
 int	fchownat (int __dirfd, const char *__path, uid_t __owner, gid_t __group, int __flags);
@@ -106,11 +102,9 @@ int	getdomainname  (char *__name, size_t __len);
 #if __BSD_VISIBLE
 int     getentropy (void *, size_t);
 #endif
-#if !defined(__INSIDE_CYGWIN__)
 gid_t   getegid (void);
 uid_t   geteuid (void);
 gid_t   getgid (void);
-#endif
 int     getgroups (int __gidsetsize, gid_t __grouplist[]);
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4
 long    gethostid (void);
@@ -135,9 +129,7 @@ pid_t   getppid (void);
 #if __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE >= 4
 pid_t   getsid (pid_t);
 #endif
-#if !defined(__INSIDE_CYGWIN__)
 uid_t   getuid (void);
-#endif
 #if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
 char *	getusershell (void);
 #endif
@@ -151,10 +143,8 @@ int     isatty (int __fildes);
 #if __BSD_VISIBLE
 int        issetugid (void);
 #endif
-#if !defined(__INSIDE_CYGWIN__)
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4 || __POSIX_VISIBLE >= 200809
 int     lchown (const char *__path, uid_t __owner, gid_t __group);
-#endif
 #endif
 int     link (const char *__path1, const char *__path2);
 #if __ATFILE_VISIBLE
@@ -198,13 +188,11 @@ int	ruserok (const char *rhost, int superuser, const char *ruser, const char *lu
 #if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200112)
 void *  sbrk (ptrdiff_t __incr);
 #endif
-#if !defined(__INSIDE_CYGWIN__)
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200112
 int     setegid (gid_t __gid);
 int     seteuid (uid_t __uid);
 #endif
 int     setgid (gid_t __gid);
-#endif
 #if __BSD_VISIBLE
 int	setgroups (int ngroups, const gid_t *grouplist);
 #endif
@@ -215,14 +203,12 @@ int     setpgid (pid_t __pid, pid_t __pgid);
 #if __SVID_VISIBLE || __XSI_VISIBLE >= 500
 int     setpgrp (void);
 #endif
-#if (__BSD_VISIBLE || __XSI_VISIBLE >= 4) && !defined(__INSIDE_CYGWIN__)
+#if __BSD_VISIBLE || __XSI_VISIBLE >= 4
 int	setregid (gid_t __rgid, gid_t __egid);
 int	setreuid (uid_t __ruid, uid_t __euid);
 #endif
 pid_t   setsid (void);
-#if !defined(__INSIDE_CYGWIN__)
 int     setuid (uid_t __uid);
-#endif
 #if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
 void	setusershell (void);
 #endif

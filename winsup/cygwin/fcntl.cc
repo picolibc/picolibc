@@ -17,7 +17,7 @@ details. */
 #include "cygtls.h"
 
 extern "C" int
-fcntl64 (int fd, int cmd, ...)
+fcntl (int fd, int cmd, ...)
 {
   int res = -1;
   intptr_t arg = 0;
@@ -79,5 +79,4 @@ fcntl64 (int fd, int cmd, ...)
   return res;
 }
 
-EXPORT_ALIAS (fcntl64, fcntl)
-EXPORT_ALIAS (fcntl64, _fcntl)
+EXPORT_ALIAS (fcntl, _fcntl)

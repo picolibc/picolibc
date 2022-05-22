@@ -300,14 +300,12 @@ getgr_cp (struct group *tempgr)
 }
 
 extern "C" struct group *
-getgrgid32 (gid_t gid)
+getgrgid (gid_t gid)
 {
   struct group *tempgr = internal_getgrgid (gid);
   pthread_testcancel ();
   return getgr_cp (tempgr);
 }
-
-EXPORT_ALIAS (getgrgid32, getgrgid)
 
 extern "C" int
 getgrnam_r (const char *nam, struct group *grp, char *buffer,
@@ -340,14 +338,12 @@ getgrnam_r (const char *nam, struct group *grp, char *buffer,
 }
 
 extern "C" struct group *
-getgrnam32 (const char *name)
+getgrnam (const char *name)
 {
   struct group *tempgr = internal_getgrnam (name);
   pthread_testcancel ();
   return getgr_cp (tempgr);
 }
-
-EXPORT_ALIAS (getgrnam32, getgrnam)
 
 /* getgrent functions are not reentrant. */
 static gr_ent grent;
@@ -459,12 +455,10 @@ setgrent ()
 }
 
 extern "C" struct group *
-getgrent32 (void)
+getgrent (void)
 {
   return grent.getgrent ();
 }
-
-EXPORT_ALIAS (getgrent32, getgrent)
 
 extern "C" void
 endgrent (void)
@@ -646,14 +640,12 @@ out:
 }
 
 extern "C" int
-getgroups32 (int gidsetsize, gid_t *grouplist)
+getgroups (int gidsetsize, gid_t *grouplist)
 {
   cyg_ldap cldap;
 
   return internal_getgroups (gidsetsize, grouplist, &cldap);
 }
-
-EXPORT_ALIAS (getgroups32, getgroups)
 
 /* Core functionality of initgroups and getgrouplist. */
 static void
@@ -673,7 +665,7 @@ get_groups (const char *user, gid_t gid, cygsidlist &gsids)
 }
 
 extern "C" int
-initgroups32 (const char *user, gid_t gid)
+initgroups (const char *user, gid_t gid)
 {
   assert (user != NULL);
   cygsidlist tmp_gsids (cygsidlist_auto, 12);
@@ -686,8 +678,6 @@ initgroups32 (const char *user, gid_t gid)
   syscall_printf ( "0 = initgroups(%s, %u)", user, gid);
   return 0;
 }
-
-EXPORT_ALIAS (initgroups32, initgroups)
 
 extern "C" int
 getgrouplist (const char *user, gid_t gid, gid_t *groups, int *ngroups)
@@ -725,11 +715,11 @@ getgrouplist (const char *user, gid_t gid, gid_t *groups, int *ngroups)
   return ret;
 }
 
-/* setgroups32: standards? */
+/* setgroups: standards? */
 extern "C" int
-setgroups32 (int ngroups, const gid_t *grouplist)
+setgroups (int ngroups, const gid_t *grouplist)
 {
-  syscall_printf ("setgroups32 (%d)", ngroups);
+  syscall_printf ("setgroups (%d)", ngroups);
   if (ngroups < 0 || (ngroups > 0 && !grouplist))
     {
       set_errno (EINVAL);
@@ -756,5 +746,3 @@ setgroups32 (int ngroups, const gid_t *grouplist)
   cygheap->user.groups.update_supp (gsids);
   return 0;
 }
-
-EXPORT_ALIAS (setgroups32, setgroups)

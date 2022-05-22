@@ -438,8 +438,6 @@ bool authz_get_user_attribute (mode_t *attribute, PSECURITY_DESCRIPTOR psd,
 
 /* sec_acl.cc */
 struct acl;
-extern "C" int aclsort32 (int, int, struct acl *);
-extern "C" int acl32 (const char *, int, int, struct acl *);
 int searchace (struct acl *, int, int, uid_t id = ILLEGAL_UID);
 PSECURITY_DESCRIPTOR set_posix_access (mode_t, uid_t, gid_t, struct acl *, int,
 				       security_descriptor &, bool);

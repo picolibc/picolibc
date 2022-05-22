@@ -1186,7 +1186,7 @@ out:
       memcpy (aclbufp, lacl, pos * sizeof (aclent_t));
       for (idx = 0; idx < pos; ++idx)
 	aclbufp[idx].a_perm &= S_IRWXO;
-      aclsort32 (pos, 0, aclbufp);
+      aclsort (pos, 0, aclbufp);
     }
   if (std_acl)
     *std_acl = standard_ACEs_only;
@@ -1207,7 +1207,7 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
 }
 
 extern "C" int
-acl32 (const char *path, int cmd, int nentries, aclent_t *aclbufp)
+acl (const char *path, int cmd, int nentries, aclent_t *aclbufp)
 {
   int res = -1;
 
@@ -1229,7 +1229,7 @@ acl32 (const char *path, int cmd, int nentries, aclent_t *aclbufp)
 }
 
 extern "C" int
-facl32 (int fd, int cmd, int nentries, aclent_t *aclbufp)
+facl (int fd, int cmd, int nentries, aclent_t *aclbufp)
 {
   cygheap_fdget cfd (fd);
   if (cfd < 0)
@@ -1401,7 +1401,7 @@ __aclcheck (aclent_t *aclbufp, int nentries, int *which, bool posix)
 }
 
 extern "C" int
-aclcheck32 (aclent_t *aclbufp, int nentries, int *which)
+aclcheck (aclent_t *aclbufp, int nentries, int *which)
 {
   return __aclcheck (aclbufp, nentries, which, false);
 }
@@ -1466,10 +1466,10 @@ __aclsort (int nentries, aclent_t *aclbufp)
 }
 
 extern "C" int
-aclsort32 (int nentries, int calclass, aclent_t *aclbufp)
+aclsort (int nentries, int calclass, aclent_t *aclbufp)
 {
   if (!aclbufp || nentries < MIN_ACL_ENTRIES
-      || aclcheck32 (aclbufp, nentries, NULL))
+      || aclcheck (aclbufp, nentries, NULL))
     {
       set_errno (EINVAL);
       return -1;
@@ -1481,7 +1481,7 @@ aclsort32 (int nentries, int calclass, aclent_t *aclbufp)
 }
 
 extern "C" int
-acltomode32 (aclent_t *aclbufp, int nentries, mode_t *modep)
+acltomode (aclent_t *aclbufp, int nentries, mode_t *modep)
 {
   int pos;
 
@@ -1520,7 +1520,7 @@ acltomode32 (aclent_t *aclbufp, int nentries, mode_t *modep)
 }
 
 extern "C" int
-aclfrommode32 (aclent_t *aclbufp, int nentries, mode_t *modep)
+aclfrommode (aclent_t *aclbufp, int nentries, mode_t *modep)
 {
   int pos;
 
@@ -1557,15 +1557,15 @@ aclfrommode32 (aclent_t *aclbufp, int nentries, mode_t *modep)
 }
 
 extern "C" int
-acltopbits32 (aclent_t *aclbufp, int nentries, mode_t *pbitsp)
+acltopbits (aclent_t *aclbufp, int nentries, mode_t *pbitsp)
 {
-  return acltomode32 (aclbufp, nentries, pbitsp);
+  return acltomode (aclbufp, nentries, pbitsp);
 }
 
 extern "C" int
-aclfrompbits32 (aclent_t *aclbufp, int nentries, mode_t *pbitsp)
+aclfrompbits (aclent_t *aclbufp, int nentries, mode_t *pbitsp)
 {
-  return aclfrommode32 (aclbufp, nentries, pbitsp);
+  return aclfrommode (aclbufp, nentries, pbitsp);
 }
 
 static char *
@@ -1635,7 +1635,7 @@ __acltotext (aclent_t *aclbufp, int aclcnt, const char *prefix, char separator,
 	     int options)
 {
   if (!aclbufp || aclcnt < 0 || aclcnt > MAX_ACL_ENTRIES
-      || (aclcnt > 0 && aclsort32 (aclcnt, 0, aclbufp)))
+      || (aclcnt > 0 && aclsort (aclcnt, 0, aclbufp)))
     {
       set_errno (EINVAL);
       return NULL;
@@ -1776,7 +1776,7 @@ __acltotext (aclent_t *aclbufp, int aclcnt, const char *prefix, char separator,
 }
 
 extern "C" char *
-acltotext32 (aclent_t *aclbufp, int aclcnt)
+acltotext (aclent_t *aclbufp, int aclcnt)
 {
   return __acltotext (aclbufp, aclcnt, NULL, ',', 0);
 }
@@ -1960,18 +1960,7 @@ __aclfromtext (const char *acltextp, int *aclcnt, bool posix)
 }
 
 extern "C" aclent_t *
-aclfromtext32 (char *acltextp, int *aclcnt)
+aclfromtext (char *acltextp, int *aclcnt)
 {
   return (aclent_t *) __aclfromtext (acltextp, aclcnt, false);
 }
-
-EXPORT_ALIAS (acl32, acl)
-EXPORT_ALIAS (facl32, facl)
-EXPORT_ALIAS (aclcheck32, aclcheck)
-EXPORT_ALIAS (aclsort32, aclsort)
-EXPORT_ALIAS (acltomode32, acltomode)
-EXPORT_ALIAS (aclfrommode32, aclfrommode)
-EXPORT_ALIAS (acltopbits32, acltopbits)
-EXPORT_ALIAS (aclfrompbits32, aclfrompbits)
-EXPORT_ALIAS (acltotext32, acltotext)
-EXPORT_ALIAS (aclfromtext32, aclfromtext)

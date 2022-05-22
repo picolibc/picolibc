@@ -364,8 +364,8 @@ set_security_attribute (path_conv &pc, int attribute, PSECURITY_ATTRIBUTES psa,
   psa->lpSecurityDescriptor = sd.malloc (SECURITY_DESCRIPTOR_MIN_LENGTH);
   RtlCreateSecurityDescriptor ((PSECURITY_DESCRIPTOR) psa->lpSecurityDescriptor,
 				SECURITY_DESCRIPTOR_REVISION);
-  psa->lpSecurityDescriptor = set_posix_access (attribute, geteuid32 (),
-						getegid32 (), NULL, 0,
+  psa->lpSecurityDescriptor = set_posix_access (attribute, geteuid (),
+						getegid (), NULL, 0,
 						sd, false);
 }
 

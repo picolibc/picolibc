@@ -41,17 +41,10 @@ details. */
 #ifdef __cplusplus
 extern "C" {
 #endif
-uid_t getuid32 ();
-uid_t geteuid32 ();
-int seteuid32 (uid_t);
-gid_t getegid32 (void);
-struct passwd *getpwuid32 (uid_t);
-struct passwd *getpwnam (const char *);
 struct __sFILE64 *fopen64 (const char *, const char *);
 struct hostent *cygwin_gethostbyname (const char *name);
 /* Don't enforce definition of in_addr_t. */
 uint32_t cygwin_inet_addr (const char *cp);
-int fcntl64 (int fd, int cmd, ...);
 #ifdef __cplusplus
 }
 #endif

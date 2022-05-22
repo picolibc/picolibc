@@ -237,12 +237,12 @@ static int open_sock(struct sockaddr_in *CliAddr, int debug)
     return -1;
   }
   /* Set non-blocking */
-  if (fcntl64(fd, F_SETFL, O_NONBLOCK) < 0)  {
+  if (fcntl(fd, F_SETFL, O_NONBLOCK) < 0)  {
     DPRINTF(debug, "fcntl: %s\n", strerror(errno));
     return -1;
   }
   /* Set close on exec flag */
-  if (fcntl64(fd, F_SETFD, 1) == -1) {
+  if (fcntl(fd, F_SETFD, 1) == -1) {
     DPRINTF(debug, "fcntl: %s\n", strerror(errno));
     return -1;
   }

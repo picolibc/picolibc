@@ -1013,7 +1013,7 @@ cant_access_acl:
       switch (cmd)
 	{
 	  case SETACL:
-	    if (!aclsort32 (nentries, 0, aclbufp))
+	    if (!aclsort (nentries, 0, aclbufp))
 	      {
 		bool rw = false;
 		res = setacl (get_handle (), pc, nentries, aclbufp, rw);

@@ -395,8 +395,8 @@ void
 fhandler_socket_local::af_local_set_sockpair_cred ()
 {
   sec_pid = sec_peer_pid = getpid ();
-  sec_uid = sec_peer_uid = geteuid32 ();
-  sec_gid = sec_peer_gid = getegid32 ();
+  sec_uid = sec_peer_uid = geteuid ();
+  sec_gid = sec_peer_gid = getegid ();
 }
 
 void
@@ -592,8 +592,8 @@ void
 fhandler_socket_local::af_local_set_cred ()
 {
   sec_pid = getpid ();
-  sec_uid = geteuid32 ();
-  sec_gid = getegid32 ();
+  sec_uid = geteuid ();
+  sec_gid = getegid ();
   sec_peer_pid = (pid_t) 0;
   sec_peer_uid = (uid_t) -1;
   sec_peer_gid = (gid_t) -1;

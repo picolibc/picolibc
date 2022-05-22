@@ -100,7 +100,7 @@ _gettemp(char *path, int *doopen, int domkdir, size_t suffixlen, int flags)
 	  if (*trv == '/')
 	    {
 	      *trv = '\0';
-	      int rval = stat64 (path, &sbuf);
+	      int rval = stat (path, &sbuf);
 	      *trv = '/';
 	      if (rval != 0)
 		return 0;
@@ -131,7 +131,7 @@ _gettemp(char *path, int *doopen, int domkdir, size_t suffixlen, int flags)
 	  if (errno != EEXIST)
 	    return 0;
 	  }
-      else if (lstat64 (path, &sbuf))
+      else if (lstat (path, &sbuf))
 	return errno == ENOENT;
 
       /* If we have a collision, cycle through the space of filenames */

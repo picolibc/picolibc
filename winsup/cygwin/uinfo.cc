@@ -279,36 +279,28 @@ getlogin (void)
 }
 
 extern "C" uid_t
-getuid32 (void)
+getuid (void)
 {
   return cygheap->user.real_uid;
 }
 
-EXPORT_ALIAS (getuid32, getuid)
-
 extern "C" gid_t
-getgid32 (void)
+getgid (void)
 {
   return cygheap->user.real_gid;
 }
 
-EXPORT_ALIAS (getgid32, getgid)
-
 extern "C" uid_t
-geteuid32 (void)
+geteuid (void)
 {
   return myself->uid;
 }
 
-EXPORT_ALIAS (geteuid32, geteuid)
-
 extern "C" gid_t
-getegid32 (void)
+getegid (void)
 {
   return myself->gid;
 }
-
-EXPORT_ALIAS (getegid32, getegid)
 
 /* Not quite right - cuserid can change, getlogin can't */
 extern "C" char *

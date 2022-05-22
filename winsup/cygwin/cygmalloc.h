@@ -29,8 +29,6 @@ void dlmalloc_stats ();
 #if defined (DLMALLOC_VERSION)	/* Building malloc.cc */
 
 extern "C" void __set_ENOMEM ();
-void *mmap64 (void *, size_t, int, int, int, off_t);
-# define mmap mmap64
 # define MALLOC_FAILURE_ACTION	__set_ENOMEM ()
 # define USE_DL_PREFIX 1
 

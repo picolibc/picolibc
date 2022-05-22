@@ -102,7 +102,7 @@ public:
   user_groups groups;   /* Primary and supp SIDs */
 
   HANDLE external_token;	 /* token from set_impersonation_token call */
-  HANDLE internal_token;	 /* password-less token fetched in seteuid32 */
+  HANDLE internal_token;	 /* password-less token fetched in seteuid */
   HANDLE curr_primary_token;	 /* Just a copy of external or internal token */
   HANDLE curr_imp_token;	 /* impersonation token derived from primary
 				    token */

@@ -3720,8 +3720,8 @@ get_current_dir_name (void)
   struct stat pwdbuf, cwdbuf;
 
   if (pwd && strcmp (pwd, cwd) != 0
-      && stat64 (pwd, &pwdbuf) == 0
-      && stat64 (cwd, &cwdbuf) == 0
+      && stat (pwd, &pwdbuf) == 0
+      && stat (cwd, &cwdbuf) == 0
       && pwdbuf.st_dev == cwdbuf.st_dev
       && pwdbuf.st_ino == cwdbuf.st_ino)
     {

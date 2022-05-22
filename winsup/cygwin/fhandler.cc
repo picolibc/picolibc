@@ -1272,8 +1272,8 @@ fhandler_base::fstat (struct stat *buf)
       break;
     }
 
-  buf->st_uid = geteuid32 ();
-  buf->st_gid = getegid32 ();
+  buf->st_uid = geteuid ();
+  buf->st_gid = getegid ();
   buf->st_nlink = 1;
   buf->st_blksize = PREFERRED_IO_BLKSIZE;
 

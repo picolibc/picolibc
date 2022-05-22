@@ -238,7 +238,7 @@ MapView (HANDLE h, void *addr, size_t len, DWORD openflags,
      If it failed, and addr was not NULL and flags is not MAP_FIXED,
      try again with NULL address.
 
-     Note: Retrying the mapping might be unnecessary, now that mmap64 checks
+     Note: Retrying the mapping might be unnecessary, now that mmap checks
 	   for a valid memory area first. */
   SIZE_T commitsize = attached (prot) ? 0 : len;
   status = NtMapViewOfSection (h, NtCurrentProcess (), &base, 0, commitsize,
@@ -832,7 +832,7 @@ mmap_worker (mmap_list *map_list, fhandler_base *fh, caddr_t base, size_t len,
 }
 
 extern "C" void *
-mmap64 (void *addr, size_t len, int prot, int flags, int fd, off_t off)
+mmap (void *addr, size_t len, int prot, int flags, int fd, off_t off)
 {
   syscall_printf ("addr %p, len %lu, prot %y, flags %y, fd %d, off %Y",
 		  addr, len, prot, flags, fd, off);
@@ -1145,8 +1145,6 @@ out:
   return ret;
 }
 
-EXPORT_ALIAS (mmap64, mmap)
-
 /* munmap () removes all mmapped pages between addr and addr+len. */
 
 extern "C" int
@@ -1280,7 +1278,7 @@ mprotect (void *addr, size_t len, int prot)
 
   syscall_printf ("mprotect (addr: %p, len %lu, prot %y)", addr, len, prot);
 
-  /* See comment in mmap64 for a description. */
+  /* See comment in mmap for a description. */
   const size_t pagesize = wincap.allocation_granularity ();
   if ((uintptr_t) addr % pagesize)
     {

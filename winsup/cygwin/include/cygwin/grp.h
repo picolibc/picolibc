@@ -16,13 +16,6 @@ details. */
 extern "C" {
 #endif
 
-#ifdef __INSIDE_CYGWIN__
-struct group * getgrgid32 (gid_t gid);
-struct group * getgrnam32 (const char *name);
-gid_t getgid32 ();
-gid_t getegid32 ();
-#endif
-
 extern int getgrouplist (const char *, gid_t, gid_t *, int *);
 
 #ifdef __cplusplus

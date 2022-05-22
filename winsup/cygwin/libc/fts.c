@@ -58,16 +58,7 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/fts.c,v 1.39 2013/02/11 02:00:16 svnexp Exp
 #define _open open
 #define _close close
 #define _dirfd dirfd
-#ifdef __x86_64__
 #define _fstat fstat
-#else
-extern int stat64 (const char *path, struct stat *buf);
-extern int fstat64 (int fd, struct stat *buf);
-extern int lstat64 (const char *path, struct stat *buf);
-#define stat(a,b) stat64((a),(b))
-#define _fstat(a,b) fstat64((a),(b))
-#define lstat(a,b) lstat64((a),(b))
-#endif
 #else
 #include "un-namespace.h"
 

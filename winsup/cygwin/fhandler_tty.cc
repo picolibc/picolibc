@@ -1818,7 +1818,7 @@ fhandler_pty_slave::facl (int cmd, int nentries, aclent_t *aclbufp)
   switch (cmd)
     {
       case SETACL:
-	if (!aclsort32 (nentries, 0, aclbufp))
+	if (!aclsort (nentries, 0, aclbufp))
 	  set_errno (ENOTSUP);
 	break;
       case GETACL:

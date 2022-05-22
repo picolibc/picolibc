@@ -218,17 +218,15 @@ getpw_cp (struct passwd *temppw)
 }
 
 extern "C" struct passwd *
-getpwuid32 (uid_t uid)
+getpwuid (uid_t uid)
 {
   struct passwd *temppw = internal_getpwuid (uid);
   pthread_testcancel ();
   return getpw_cp (temppw);
 }
 
-EXPORT_ALIAS (getpwuid32, getpwuid)
-
 extern "C" int
-getpwuid_r32 (uid_t uid, struct passwd *pwd, char *buffer, size_t bufsize, struct passwd **result)
+getpwuid_r (uid_t uid, struct passwd *pwd, char *buffer, size_t bufsize, struct passwd **result)
 {
   *result = NULL;
 
@@ -259,8 +257,6 @@ getpwuid_r32 (uid_t uid, struct passwd *pwd, char *buffer, size_t bufsize, struc
   pwd->pw_comment = NULL;
   return 0;
 }
-
-EXPORT_ALIAS (getpwuid_r32, getpwuid_r)
 
 extern "C" struct passwd *
 getpwnam (const char *name)

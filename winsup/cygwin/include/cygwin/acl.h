@@ -70,7 +70,6 @@ typedef struct acl {
     mode_t       a_perm;    /* permissions */
 } aclent_t;
 
-#ifndef __INSIDE_CYGWIN__
 extern int	 acl (const char *__path, int __cmd, int __nentries,
 		      aclent_t *__aclbufp);
 extern int	 facl (int __fd, int __cmd, int __nentries,
@@ -87,7 +86,6 @@ extern int	 aclfrompbits (aclent_t *__aclbufp, int __nentries,
 			       mode_t *__pbitsp);
 extern char	*acltotext (aclent_t *__aclbufp, int __aclcnt);
 extern aclent_t *aclfromtext (char *__acltextp, int *__aclcnt);
-#endif
 
 #ifdef __cplusplus
 }
