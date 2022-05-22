@@ -7,3 +7,6 @@ Bug Fixes
 - Fix killpg failing because the exec'ing as well as the exec'ed
   process are not in the pidlist for a brief moment.
   Addresses: https://cygwin.com/pipermail/cygwin/2022-May/251479.html
+
+- Fix mknod (64-bit only), whose definition didn't match its prototype.
+  Addresses: https://cygwin.com/pipermail/cygwin-developers/2022-May/012589.html

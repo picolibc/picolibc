@@ -3490,11 +3490,15 @@ mknod32 (const char *path, mode_t mode, dev_t dev)
   return -1;
 }
 
+#ifdef __i386__
 extern "C" int
 mknod (const char *_path, mode_t mode, __dev16_t dev)
 {
   return mknod32 (_path, mode, (dev_t) dev);
 }
+#else
+EXPORT_ALIAS (mknod32, mknod)
+#endif
 
 extern "C" int
 mkfifo (const char *path, mode_t mode)
