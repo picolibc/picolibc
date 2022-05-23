@@ -763,6 +763,8 @@ extern struct _reent _impure_data __ATTRIBUTE_IMPURE_DATA__;
 # define _REENT _impure_ptr
 #endif /* __SINGLE_THREAD__ || !__DYNAMIC_REENT__ */
 
+#define _REENT_IS_NULL(_ptr) ((_ptr) == NULL)
+
 #define _GLOBAL_REENT (&_impure_data)
 
 /* This value is used in stdlib/misc.c.  reent/reent.c has to know it
