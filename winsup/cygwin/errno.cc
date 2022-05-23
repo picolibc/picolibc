@@ -314,7 +314,7 @@ const char *_sys_errlist[] =
 int NO_COPY_INIT _sys_nerr = sizeof (_sys_errlist) / sizeof (_sys_errlist[0]);
 };
 
-int __reg2
+int
 geterrno_from_win_error (DWORD code, int deferrno)
 {
   for (int i = 0; errmap[i].w != 0; ++i)
@@ -331,14 +331,14 @@ geterrno_from_win_error (DWORD code, int deferrno)
 
 /* seterrno_from_win_error: Given a Windows error code, set errno
    as appropriate. */
-void __reg3
+void
 seterrno_from_win_error (const char *file, int line, DWORD code)
 {
   syscall_printf ("%s:%d windows error %u", file, line, code);
   errno = _impure_ptr->_errno =  geterrno_from_win_error (code, EACCES);
 }
 
-int __reg2
+int
 geterrno_from_nt_status (NTSTATUS status, int deferrno)
 {
   return geterrno_from_win_error (RtlNtStatusToDosError (status));
@@ -346,7 +346,7 @@ geterrno_from_nt_status (NTSTATUS status, int deferrno)
 
 /* seterrno_from_nt_status: Given a NT status code, set errno
    as appropriate. */
-void __reg3
+void
 seterrno_from_nt_status (const char *file, int line, NTSTATUS status)
 {
   DWORD code = RtlNtStatusToDosError (status);

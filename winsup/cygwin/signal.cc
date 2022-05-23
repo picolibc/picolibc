@@ -27,7 +27,7 @@ details. */
 
 #define _SA_NORESTART	0x8000
 
-static int __reg3 sigaction_worker (int, const struct sigaction *, struct sigaction *, bool);
+static int sigaction_worker (int, const struct sigaction *, struct sigaction *, bool);
 
 #define sigtrapped(func) ((func) != SIG_IGN && (func) != SIG_DFL)
 
@@ -204,7 +204,7 @@ sigprocmask (int how, const sigset_t *set, sigset_t *oldset)
   return res;
 }
 
-int __reg3
+int
 handle_sigprocmask (int how, const sigset_t *set, sigset_t *oldset, sigset_t& opmask)
 {
   /* check that how is in right range if set is not NULL */
@@ -248,7 +248,7 @@ handle_sigprocmask (int how, const sigset_t *set, sigset_t *oldset, sigset_t& op
   return 0;
 }
 
-int __reg2
+int
 _pinfo::kill (siginfo_t& si)
 {
   int res;
@@ -415,7 +415,7 @@ abort (void)
   do_exit (SIGABRT);	/* signal handler didn't exit.  Goodbye. */
 }
 
-static int __reg3
+static int
 sigaction_worker (int sig, const struct sigaction *newact,
 		  struct sigaction *oldact, bool isinternal)
 {

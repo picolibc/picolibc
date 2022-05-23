@@ -39,7 +39,7 @@ class av
 	cfree (argv);
       }
   }
-  int unshift (const char *what) __reg2;
+  int unshift (const char *what);
   operator char **() {return argv;}
   void all_calloced () {calloced = argc;}
   void replace0_maybe (const char *arg0)
@@ -58,7 +58,7 @@ class av
     calloced = argc;
   }
   int setup (const char *, path_conv&, const char *, int, const char *const *,
-	     bool) __reg3;
+	     bool);
 };
 
 class linebuf
@@ -69,11 +69,11 @@ class linebuf
  public:
   linebuf () : ix (0), buf (NULL), alloced (0) {}
   ~linebuf () {if (buf) free (buf);}
-  void __reg3 add (const char *, int);
+  void add (const char *, int);
   void add (const char *what) {add (what, strlen (what));}
   void prepend (const char *, int);
-  void __reg2 finish (bool);
-  bool __reg3 fromargv(av&, const char *, bool);;
+  void finish (bool);
+  bool fromargv(av&, const char *, bool);;
   operator size_t () const { return ix + 1; }
   operator const char * () const { return buf; }
   operator wchar_t * ()

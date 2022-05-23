@@ -68,7 +68,7 @@ static NO_COPY uint32_t nthreads;
 #define MVMAP_OPTIONS (FILE_MAP_WRITE)
 
 extern "C" {
-static void __reg1 _cfree (void *);
+static void _cfree (void *);
 static void *__stdcall _csbrk (int);
 }
 
@@ -331,10 +331,10 @@ _csbrk (int sbs)
 
 /* Copyright (C) 1997, 2000 DJ Delorie */
 
-static void *__reg1 _cmalloc (unsigned size);
-static void *__reg2 _crealloc (void *ptr, unsigned size);
+static void *_cmalloc (unsigned size);
+static void *_crealloc (void *ptr, unsigned size);
 
-static void *__reg1
+static void *
 _cmalloc (unsigned size)
 {
   _cmalloc_entry *rvc;
@@ -371,7 +371,7 @@ _cmalloc (unsigned size)
   return rvc->data;
 }
 
-static void __reg1
+static void
 _cfree (void *ptr)
 {
   cygheap_protect.acquire ();
@@ -382,7 +382,7 @@ _cfree (void *ptr)
   cygheap_protect.release ();
 }
 
-static void *__reg2
+static void *
 _crealloc (void *ptr, unsigned size)
 {
   void *newptr;
@@ -461,26 +461,26 @@ crealloc (void *s, size_t n, const char *fn)
   return creturn (t, c, n, fn);
 }
 
-extern "C" void *__reg2
+extern "C" void *
 crealloc (void *s, size_t n)
 {
   return crealloc (s, n, NULL);
 }
 
-extern "C" void *__reg2
+extern "C" void *
 crealloc_abort (void *s, size_t n)
 {
   return crealloc (s, n, "crealloc");
 }
 
-extern "C" void __reg1
+extern "C" void
 cfree (void *s)
 {
   assert (!inheap (s));
   _cfree (tocygheap (s));
 }
 
-extern "C" void __reg2
+extern "C" void
 cfree_and_set (char *&s, char *what)
 {
   if (s && s != almost_null)
@@ -499,19 +499,19 @@ ccalloc (cygheap_types x, size_t n, size_t size, const char *fn)
   return creturn (x, c, n, fn);
 }
 
-extern "C" void *__reg3
+extern "C" void *
 ccalloc (cygheap_types x, size_t n, size_t size)
 {
   return ccalloc (x, n, size, NULL);
 }
 
-extern "C" void *__reg3
+extern "C" void *
 ccalloc_abort (cygheap_types x, size_t n, size_t size)
 {
   return ccalloc (x, n, size, "ccalloc");
 }
 
-extern "C" PWCHAR __reg1
+extern "C" PWCHAR
 cwcsdup (PCWSTR s)
 {
   PWCHAR p = (PWCHAR) cmalloc (HEAP_STR, (wcslen (s) + 1) * sizeof (WCHAR));
@@ -521,7 +521,7 @@ cwcsdup (PCWSTR s)
   return p;
 }
 
-extern "C" PWCHAR __reg1
+extern "C" PWCHAR
 cwcsdup1 (PCWSTR s)
 {
   PWCHAR p = (PWCHAR) cmalloc (HEAP_1_STR, (wcslen (s) + 1) * sizeof (WCHAR));
@@ -531,7 +531,7 @@ cwcsdup1 (PCWSTR s)
   return p;
 }
 
-extern "C" char *__reg1
+extern "C" char *
 cstrdup (const char *s)
 {
   char *p = (char *) cmalloc (HEAP_STR, strlen (s) + 1);
@@ -541,7 +541,7 @@ cstrdup (const char *s)
   return p;
 }
 
-extern "C" char *__reg1
+extern "C" char *
 cstrdup1 (const char *s)
 {
   char *p = (char *) cmalloc (HEAP_1_STR, strlen (s) + 1);
@@ -660,7 +660,7 @@ init_cygheap::add_tls (_cygtls *t)
   ++nthreads;
 }
 
-HANDLE __reg3
+HANDLE
 init_cygheap::remove_tls (_cygtls *t)
 {
   HANDLE mutex = NULL;
@@ -684,7 +684,7 @@ init_cygheap::remove_tls (_cygtls *t)
   return mutex;
 }
 
-threadlist_t __reg2 *
+threadlist_t *
 init_cygheap::find_tls (_cygtls *tls)
 {
   tls_sentry here (INFINITE);
@@ -709,7 +709,7 @@ init_cygheap::find_tls (_cygtls *tls)
   return t;
 }
 
-threadlist_t __reg3 *
+threadlist_t *
 init_cygheap::find_tls (int sig, bool& issig_wait)
 {
   debug_printf ("sig %d\n", sig);

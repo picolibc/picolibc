@@ -204,7 +204,7 @@ path_conv::get_ino_by_handle (HANDLE hdl)
    This returns the content of a struct fattr3 as defined in RFC 1813.
    The content is the NFS equivalent of struct stat. so there's not much
    to do here except for copying. */
-int __reg2
+int
 fhandler_base::fstat_by_nfs_ea (struct stat *buf)
 {
   fattr3 *nfs_attr = pc.nfsattr ();
@@ -283,7 +283,7 @@ fhandler_base::fstat_by_nfs_ea (struct stat *buf)
   return 0;
 }
 
-int __reg2
+int
 fhandler_base::fstat_by_handle (struct stat *buf)
 {
   HANDLE h = get_stat_handle ();
@@ -306,7 +306,7 @@ fhandler_base::fstat_by_handle (struct stat *buf)
   return fstat_helper (buf);
 }
 
-int __reg2
+int
 fhandler_base::fstat_by_name (struct stat *buf)
 {
   NTSTATUS status;
@@ -350,7 +350,7 @@ fhandler_base::fstat_by_name (struct stat *buf)
   return fstat_helper (buf);
 }
 
-int __reg2
+int
 fhandler_base::fstat_fs (struct stat *buf)
 {
   int res = -1;
@@ -394,7 +394,7 @@ fhandler_base::fstat_fs (struct stat *buf)
   return res;
 }
 
-int __reg2
+int
 fhandler_base::fstat_helper (struct stat *buf)
 {
   IO_STATUS_BLOCK st;
@@ -589,13 +589,13 @@ fhandler_base::fstat_helper (struct stat *buf)
   return 0;
 }
 
-int __reg2
+int
 fhandler_disk_file::fstat (struct stat *buf)
 {
   return fstat_fs (buf);
 }
 
-int __reg2
+int
 fhandler_disk_file::fstatvfs (struct statvfs *sfs)
 {
   int ret = -1, opened = 0;
@@ -635,7 +635,7 @@ out:
   return ret;
 }
 
-int __reg2
+int
 fhandler_base::fstatvfs_by_handle (HANDLE fh, struct statvfs *sfs)
 {
   int ret = -1;
@@ -704,7 +704,7 @@ fhandler_base::fstatvfs_by_handle (HANDLE fh, struct statvfs *sfs)
   return ret;
 }
 
-int __reg1
+int
 fhandler_disk_file::fchmod (mode_t mode)
 {
   int ret = -1;
@@ -849,7 +849,7 @@ out:
   return ret;
 }
 
-int __reg2
+int
 fhandler_disk_file::fchown (uid_t uid, gid_t gid)
 {
   int oret = 0;
@@ -947,7 +947,7 @@ out:
   return ret;
 }
 
-int __reg3
+int
 fhandler_disk_file::facl (int cmd, int nentries, aclent_t *aclbufp)
 {
   int res = -1;
@@ -1562,7 +1562,7 @@ fhandler_disk_file::prw_open (bool write, void *aio)
   return 0;
 }
 
-ssize_t __reg3
+ssize_t
 fhandler_disk_file::pread (void *buf, size_t count, off_t offset, void *aio)
 {
   struct aiocb *aiocb = (struct aiocb *) aio;
@@ -1666,7 +1666,7 @@ out:
   return res;
 }
 
-ssize_t __reg3
+ssize_t
 fhandler_disk_file::pwrite (void *buf, size_t count, off_t offset, void *aio)
 {
   struct aiocb *aiocb = (struct aiocb *) aio;
@@ -2025,7 +2025,7 @@ free_dir:
   return res;
 }
 
-ino_t __reg2
+ino_t
 readdir_get_ino (const char *path, bool dot_dot)
 {
   char *fname;

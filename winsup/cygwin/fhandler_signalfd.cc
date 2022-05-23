@@ -54,7 +54,7 @@ fhandler_signalfd::signalfd (const sigset_t *mask, int flags)
   return 0;
 }
 
-int __reg2
+int
 fhandler_signalfd::fstat (struct stat *buf)
 {
   int ret = fhandler_base::fstat (buf);
@@ -89,7 +89,7 @@ copy_siginfo_to_signalfd (struct signalfd_siginfo *sfd,
   sfd->ssi_addr = (uint64_t) si->si_addr;
 }
 
-void __reg3
+void
 fhandler_signalfd::read (void *ptr, size_t& len)
 {
   const LARGE_INTEGER poll = { QuadPart : 0 };

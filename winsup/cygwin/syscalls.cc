@@ -1998,7 +1998,7 @@ sync ()
 }
 
 /* Cygwin internal */
-int __reg2
+int
 stat_worker (path_conv &pc, struct stat *buf)
 {
   int res = -1;
@@ -4961,7 +4961,7 @@ unlinkat (int dirfd, const char *pathname, int flags)
   return -1;
 }
 
-static int __reg3
+static int
 pipe_worker (int filedes[2], unsigned int psize, int mode)
 {
   fhandler_pipe *fhs[2];

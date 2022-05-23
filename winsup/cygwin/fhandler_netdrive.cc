@@ -212,7 +212,7 @@ fhandler_netdrive::fhandler_netdrive ():
 {
 }
 
-int __reg2
+int
 fhandler_netdrive::fstat (struct stat *buf)
 {
   const char *path = get_name ();

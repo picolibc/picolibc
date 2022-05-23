@@ -86,7 +86,7 @@ fhandler_dev_random::pseudo_read (void *ptr, size_t len)
   return len;
 }
 
-void __reg3
+void
 fhandler_dev_random::read (void *ptr, size_t& len)
 {
   if (!len)

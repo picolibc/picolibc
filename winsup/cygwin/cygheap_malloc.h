@@ -38,18 +38,18 @@ enum cygheap_types
 };
 
 extern "C" {
-void __reg1 cfree (void *);
-void *__reg2 cmalloc (cygheap_types, size_t);
-void *__reg2 crealloc (void *, size_t);
-void *__reg3 ccalloc (cygheap_types, size_t, size_t);
-void *__reg2 cmalloc_abort (cygheap_types, size_t);
-void *__reg2 crealloc_abort (void *, size_t);
-void *__reg3 ccalloc_abort (cygheap_types, size_t, size_t);
-PWCHAR __reg1 cwcsdup (PCWSTR);
-PWCHAR __reg1 cwcsdup1 (PCWSTR);
-char *__reg1 cstrdup (const char *);
-char *__reg1 cstrdup1 (const char *);
-void __reg2 cfree_and_set (char *&, char * = NULL);
+void cfree (void *);
+void *cmalloc (cygheap_types, size_t);
+void *crealloc (void *, size_t);
+void *ccalloc (cygheap_types, size_t, size_t);
+void *cmalloc_abort (cygheap_types, size_t);
+void *crealloc_abort (void *, size_t);
+void *ccalloc_abort (cygheap_types, size_t, size_t);
+PWCHAR cwcsdup (PCWSTR);
+PWCHAR cwcsdup1 (PCWSTR);
+char *cstrdup (const char *);
+char *cstrdup1 (const char *);
+void cfree_and_set (char *&, char * = NULL);
 }
 
 #endif /*_CYGHEAP_MALLOC_H*/

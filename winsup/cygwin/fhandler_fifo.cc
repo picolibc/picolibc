@@ -1219,7 +1219,7 @@ nt_read (HANDLE h, HANDLE evt, PIO_STATUS_BLOCK pio, void *in_ptr, size_t& len)
   return status;
 }
 
-void __reg3
+void
 fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 {
   HANDLE evt;
@@ -1415,7 +1415,7 @@ out:
   CloseHandle (evt);
 }
 
-int __reg2
+int
 fhandler_fifo::fstat (struct stat *buf)
 {
   if (reader || writer || duplexer)
@@ -1438,7 +1438,7 @@ fhandler_fifo::fstat (struct stat *buf)
   return fhandler_base::fstat (buf);
 }
 
-int __reg2
+int
 fhandler_fifo::fstatvfs (struct statvfs *sfs)
 {
   if (get_flags () & O_PATH)

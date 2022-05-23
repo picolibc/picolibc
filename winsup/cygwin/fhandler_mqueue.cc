@@ -436,7 +436,7 @@ fhandler_mqueue::fill_filebuf ()
   return true;
 }
 
-void __reg3
+void
 fhandler_mqueue::read (void *in_ptr, size_t& len)
 {
   if (len == 0)
@@ -479,7 +479,7 @@ fhandler_mqueue::lseek (off_t offset, int whence)
 }
 
 
-int __reg2
+int
 fhandler_mqueue::fstat (struct stat *buf)
 {
   int ret = fhandler_disk_file::fstat (buf);

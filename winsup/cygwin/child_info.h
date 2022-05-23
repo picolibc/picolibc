@@ -78,8 +78,8 @@ public:
   ~child_info ();
   void refresh_cygheap () { cygheap_max = ::cygheap_max; }
   void ready (bool);
-  bool __reg3 sync (int, HANDLE&, DWORD);
-  DWORD __reg2 proc_retry (HANDLE);
+  bool sync (int, HANDLE&, DWORD);
+  DWORD proc_retry (HANDLE);
   bool isstraced () const {return !!(flag & _CI_STRACED);}
   bool iscygwin () const {return !!(flag & _CI_ISCYGWIN);}
   bool saw_ctrl_c () const {return !!(flag & _CI_SAW_CTRL_C);}
@@ -117,7 +117,7 @@ public:
 			// user stack
   char filler[4];
   child_info_fork ();
-  void __reg1 handle_fork ();
+  void handle_fork ();
   bool abort (const char *fmt = NULL, ...);
   void alloc_stack ();
 };
@@ -158,7 +158,7 @@ public:
   void reattach_children ();
   void *operator new (size_t, void *p) __attribute__ ((nothrow)) {return p;}
   void set (child_info_types ci, bool b) { new (this) child_info_spawn (ci, b);}
-  void __reg1 handle_spawn ();
+  void handle_spawn ();
   void set_sem (HANDLE _sem)
   {
     /* Don't leak semaphore handle into exec'ed process. */
@@ -193,7 +193,7 @@ public:
   bool get_parent_handle ();
   bool has_execed_cygwin () const { return iscygwin () && has_execed (); }
   operator HANDLE& () {return hExeced;}
-  int __reg3 worker (const char *, const char *const *, const char *const [],
+  int worker (const char *, const char *const *, const char *const [],
 		     int, int = -1, int = -1);
 };
 

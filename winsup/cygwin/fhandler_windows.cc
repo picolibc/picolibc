@@ -76,7 +76,7 @@ fhandler_windows::write (const void *buf, size_t)
   return sizeof (MSG);
 }
 
-void __reg3
+void
 fhandler_windows::read (void *buf, size_t& len)
 {
   MSG *ptr = (MSG *) buf;

@@ -243,7 +243,7 @@ sbrk (ptrdiff_t n)
   return cygheap->user_heap.sbrk (n);
 }
 
-void __reg2 *
+void *
 user_heap_info::sbrk (ptrdiff_t n)
 {
 /* FIXME: This function no longer handles "split heaps". */

@@ -203,27 +203,27 @@ public: /* Do NOT remove this public: line, it's a marker for gentls_offsets. */
   static void call (DWORD (*) (void *, void *), void *);
   void remove (DWORD);
   void push (__tlsstack_t addr) {*stackptr++ = (__tlsstack_t) addr;}
-  __tlsstack_t __reg1 pop ();
+  __tlsstack_t pop ();
   __tlsstack_t retaddr () {return stackptr[-1];}
   bool isinitialized () const
   {
     return initialized == CYGTLS_INITIALIZED;
   }
-  bool __reg3 interrupt_now (CONTEXT *, siginfo_t&, void *, struct sigaction&);
-  void __reg3 interrupt_setup (siginfo_t&, void *, struct sigaction&);
+  bool interrupt_now (CONTEXT *, siginfo_t&, void *, struct sigaction&);
+  void interrupt_setup (siginfo_t&, void *, struct sigaction&);
 
   bool inside_kernel (CONTEXT *);
-  void __reg2 signal_debugger (siginfo_t&);
+  void signal_debugger (siginfo_t&);
 
 #ifdef CYGTLS_HANDLE
   operator HANDLE () const {return tid ? tid->win32_obj_id : NULL;}
 #endif
-  int __reg1 call_signal_handler ();
-  void __reg1 remove_wq (DWORD);
-  void __reg1 fixup_after_fork ();
-  void __reg1 lock ();
-  void __reg1 unlock ();
-  bool __reg1 locked ();
+  int call_signal_handler ();
+  void remove_wq (DWORD);
+  void fixup_after_fork ();
+  void lock ();
+  void unlock ();
+  bool locked ();
   HANDLE get_signal_arrived (bool wait_for_lock = true)
   {
     if (!signal_arrived)
@@ -263,7 +263,7 @@ public: /* Do NOT remove this public: line, it's a marker for gentls_offsets. */
   void handle_SIGCONT ();
   static void cleanup_early(struct _reent *);
 private:
-  void __reg3 call2 (DWORD (*) (void *, void *), void *, void *);
+  void call2 (DWORD (*) (void *, void *), void *, void *);
   void remove_pending_sigs ();
 };
 #pragma pack(pop)

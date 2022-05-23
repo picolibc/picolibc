@@ -28,7 +28,7 @@ class cygthread
   bool is_freerange;
   static bool exiting;
   HANDLE notify_detached;
-  void __reg1 create ();
+  void create ();
   static void CALLBACK async_create (ULONG_PTR);
  public:
   bool terminate_thread ();
@@ -36,7 +36,7 @@ class cygthread
   static DWORD WINAPI simplestub (VOID *);
   static DWORD main_thread_id;
   static const char *name (DWORD = 0);
-  void __reg2 callfunc (bool) __attribute__ ((noinline, ));
+  void callfunc (bool) __attribute__ ((noinline, ));
   void auto_release () {func = NULL;}
   void release (bool);
   cygthread (LPTHREAD_START_ROUTINE start, unsigned n, LPVOID param, const char *name, HANDLE notify = NULL)

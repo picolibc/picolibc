@@ -77,7 +77,7 @@ public:
   void setsid (pid_t tsid) {sid = tsid;}
   void kill_pgrp (int, pid_t target_pgid = 0);
   int is_orphaned_process_group (int);
-  const __reg1 char *ttyname () __attribute (());
+  const char *ttyname () __attribute (());
 };
 
 
@@ -88,7 +88,7 @@ class fhandler_pty_master;
 
 class tty: public tty_min
 {
-  HANDLE __reg3 get_event (const char *fmt, PSECURITY_ATTRIBUTES sa,
+  HANDLE get_event (const char *fmt, PSECURITY_ATTRIBUTES sa,
 		    BOOL manual_reset = FALSE);
 public:
   pid_t master_pid;	/* PID of tty master process */
@@ -191,7 +191,7 @@ public:
   int connect (int);
   void init ();
   tty_min *get_cttyp ();
-  int __reg2 attach (int n);
+  int attach (int n);
   static void __stdcall init_session ();
   friend class lock_ttys;
 };

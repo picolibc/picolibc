@@ -381,9 +381,9 @@ path_conv::add_ext_from_sym (symlink_info &sym)
     }
 }
 
-static void __reg2 mkrelpath (char *dst, bool caseinsensitive);
+static void mkrelpath (char *dst, bool caseinsensitive);
 
-static void __reg2
+static void
 mkrelpath (char *path, bool caseinsensitive)
 {
   tmp_pathbuf tp;
@@ -1573,7 +1573,7 @@ normalize_win32_path (const char *src, char *dst, char *&tail)
 /* nofinalslash: Remove trailing / and \ from SRC (except for the
    first one).  It is ok for src == dst.  */
 
-void __reg2
+void
 nofinalslash (const char *src, char *dst)
 {
   int len = strlen (src);
@@ -3656,7 +3656,7 @@ readlink (const char *__restrict path, char *__restrict buf, size_t buflen)
    done during the opendir call and the hash or the filename within
    the directory.  FIXME: Not bullet-proof. */
 /* Cygwin internal */
-ino_t __reg2
+ino_t
 hash_path_name (ino_t hash, PUNICODE_STRING name)
 {
   if (name->Length == 0)
@@ -3670,7 +3670,7 @@ hash_path_name (ino_t hash, PUNICODE_STRING name)
   return hash;
 }
 
-ino_t __reg2
+ino_t
 hash_path_name (ino_t hash, PCWSTR name)
 {
   UNICODE_STRING uname;
@@ -3678,7 +3678,7 @@ hash_path_name (ino_t hash, PCWSTR name)
   return hash_path_name (hash, &uname);
 }
 
-ino_t __reg2
+ino_t
 hash_path_name (ino_t hash, const char *name)
 {
   UNICODE_STRING uname;

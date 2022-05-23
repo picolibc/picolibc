@@ -13,10 +13,10 @@ class wininfo
   static muto _lock;
 public:
   operator HWND ();
-  int __reg3 process (HWND, UINT, WPARAM, LPARAM);
+  int process (HWND, UINT, WPARAM, LPARAM);
   void lock ();
   void release ();
-  DWORD __reg1 WINAPI winthread ();
+  DWORD WINAPI winthread ();
 };
 
 extern wininfo winmsg;

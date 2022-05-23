@@ -581,7 +581,7 @@ _pinfo::set_ctty (fhandler_termios *fh, int flags)
 
 /* Test to determine if a process really exists and is processing signals.
  */
-bool __reg1
+bool
 _pinfo::exists ()
 {
   return process_state && !(process_state & (PID_EXITED | PID_REAPED));

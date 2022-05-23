@@ -1891,7 +1891,7 @@ fhandler_socket_unix::recvfrom (void *ptr, size_t len, int flags,
   return ret;
 }
 
-void __reg3
+void
 fhandler_socket_unix::read (void *ptr, size_t& len)
 {
   set_errno (EAFNOSUPPORT);
@@ -2311,7 +2311,7 @@ fhandler_socket_unix::fcntl (int cmd, intptr_t arg)
   return ret;
 }
 
-int __reg2
+int
 fhandler_socket_unix::fstat (struct stat *buf)
 {
   if (!dev ().isfs ())
@@ -2328,7 +2328,7 @@ fhandler_socket_unix::fstat (struct stat *buf)
   return ret;
 }
 
-int __reg2
+int
 fhandler_socket_unix::fstatvfs (struct statvfs *sfs)
 {
   if (!dev ().isfs ())

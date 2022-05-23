@@ -130,7 +130,7 @@ fhandler_process::fhandler_process ():
 {
 }
 
-int __reg2
+int
 fhandler_process::fstat (struct stat *buf)
 {
   const char *path = get_name ();

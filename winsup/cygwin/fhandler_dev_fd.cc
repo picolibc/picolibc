@@ -21,7 +21,7 @@ fhandler_dev_fd::exists ()
   return virt_symlink;
 }
 
-int __reg2
+int
 fhandler_dev_fd::fstat (struct stat *buf)
 {
   const char *path = get_name ();

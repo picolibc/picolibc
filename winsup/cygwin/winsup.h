@@ -79,7 +79,6 @@ uint32_t cygwin_inet_addr (const char *cp);
 #ifdef __cplusplus
 
 #include "wincap.h"
-#include "regparm.h"
 
 extern const unsigned char case_folded_lower[];
 #define cyg_tolower(c) ((char) case_folded_lower[(unsigned char)(c)])
@@ -162,7 +161,7 @@ extern "C" void _pei386_runtime_relocator (per_process *);
 extern "C" int dll_noncygwin_dllcrt0 (HMODULE, per_process *);
 #endif /* __i386__ */
 
-void __reg1 do_exit (int) __attribute__ ((noreturn));
+void do_exit (int) __attribute__ ((noreturn));
 
 /* libstdc++ malloc operator wrapper support.  */
 extern struct per_process_cxx_malloc default_cygwin_cxx_malloc;
@@ -191,13 +190,13 @@ const char *find_first_notloaded_dll (class path_conv &);
 void __stdcall set_std_handle (int);
 int __stdcall stat_dev (DWORD, int, unsigned long, struct stat *);
 
-ino_t __reg2 hash_path_name (ino_t hash, PUNICODE_STRING name);
-ino_t __reg2 hash_path_name (ino_t hash, PCWSTR name);
-ino_t __reg2 hash_path_name (ino_t hash, const char *name);
-void __reg2 nofinalslash (const char *src, char *dst);
+ino_t hash_path_name (ino_t hash, PUNICODE_STRING name);
+ino_t hash_path_name (ino_t hash, PCWSTR name);
+ino_t hash_path_name (ino_t hash, const char *name);
+void nofinalslash (const char *src, char *dst);
 
-void __reg3 *hook_or_detect_cygwin (const char *, const void *, WORD&, HANDLE h = NULL);
-void __reg3 *hook_api (const char *mname, const char *name, const void *fn);
+void *hook_or_detect_cygwin (const char *, const void *, WORD&, HANDLE h = NULL);
+void *hook_api (const char *mname, const char *name, const void *fn);
 
 /* Time related */
 void __stdcall totimeval (struct timeval *, PLARGE_INTEGER, int, int);
@@ -225,9 +224,9 @@ bool child_copy (HANDLE, bool, bool, ...);
 
 class path_conv;
 
-int __reg2 stat_worker (path_conv &pc, struct stat *buf);
+int stat_worker (path_conv &pc, struct stat *buf);
 
-ino_t __reg2 readdir_get_ino (const char *path, bool dot_dot);
+ino_t readdir_get_ino (const char *path, bool dot_dot);
 
 /* mmap functions. */
 enum mmap_region_status

@@ -86,7 +86,7 @@ fhandler_procsysvipc::fhandler_procsysvipc ():
 {
 }
 
-int __reg2
+int
 fhandler_procsysvipc::fstat (struct stat *buf)
 {
   fhandler_base::fstat (buf);

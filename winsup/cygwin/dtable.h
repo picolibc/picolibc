@@ -44,7 +44,7 @@ public:
   void vfork_parent_restore ();
   void vfork_child_fixup ();
   fhandler_base *dup_worker (fhandler_base *oldfh, int flags);
-  int extend (size_t, size_t) __reg3;
+  int extend (size_t, size_t);
   void fixup_after_fork (HANDLE);
   void fixup_close (size_t, fhandler_base *);
 
@@ -57,7 +57,7 @@ public:
   }
   int find_unused_handle (size_t start);
   int find_unused_handle () { return find_unused_handle (first_fd_for_open);}
-  void __reg2 release (int fd);
+  void release (int fd);
   void init_std_file_from_handle (int fd, HANDLE handle);
   int dup3 (int oldfd, int newfd, int flags);
   void fixup_after_exec ();

@@ -101,7 +101,7 @@ fhandler_timerfd::gettime (struct itimerspec *ovalue)
   return ret;
 }
 
-int __reg2
+int
 fhandler_timerfd::fstat (struct stat *buf)
 {
   int ret = fhandler_base::fstat (buf);
@@ -114,7 +114,7 @@ fhandler_timerfd::fstat (struct stat *buf)
   return ret;
 }
 
-void __reg3
+void
 fhandler_timerfd::read (void *ptr, size_t& len)
 {
   if (len < sizeof (LONG64))

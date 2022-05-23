@@ -411,7 +411,7 @@ win_env::add_cache (const char *in_posix, const char *in_native)
   to the beginning of the environment variable name.  *in_posix is any
   known posix value for the environment variable. Returns a pointer to
   the appropriate conversion structure.  */
-win_env * __reg3
+win_env *
 getwinenv (const char *env, const char *in_posix, win_env *temp)
 {
   if (!match_first_char (env, WC))
@@ -863,7 +863,7 @@ environ_init (char **envp, int envc)
 
 int sawTERM = 0;
 
-char ** __reg2
+char **
 win32env_to_cygenv (PWCHAR rawenv, bool posify)
 {
   tmp_pathbuf tp;
@@ -921,7 +921,7 @@ env_sort (const void *a, const void *b)
   return strcmp (*p, *q);
 }
 
-char * __reg3
+char *
 getwinenveq (const char *name, size_t namelen, int x)
 {
   WCHAR name0[namelen - 1];
@@ -956,7 +956,7 @@ struct spenv
   bool add_if_exists;		/* if true, retrieve value from cache */
   const char * (cygheap_user::*from_cygheap) (const char *, size_t);
 
-  char __reg3 *retrieve (bool, const char * const = NULL);
+  char *retrieve (bool, const char * const = NULL);
 };
 
 #define env_dontadd almost_null
@@ -1056,7 +1056,7 @@ env_compare (const void *key, const void *memb)
    child_info_spawn::worker.  If so, we're also fetching the Windows default
    environment for the new user, and merge it into the environment we propage
    to the child. */
-char ** __reg3
+char **
 build_env (const char * const *envp, PWCHAR &envblock, int &envc,
 	   bool no_envblock, HANDLE new_token)
 {

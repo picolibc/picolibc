@@ -1350,7 +1350,7 @@ fhandler_pty_common::to_be_read_from_nat_pipe (void)
   return get_ttyp ()->nat_fg (get_ttyp ()->getpgid ());
 }
 
-void __reg3
+void
 fhandler_pty_slave::read (void *ptr, size_t& len)
 {
   ssize_t totalread = 0;
@@ -1777,7 +1777,7 @@ out:
   return retval;
 }
 
-int __reg2
+int
 fhandler_pty_slave::fstat (struct stat *st)
 {
   fhandler_base::fstat (st);
@@ -1807,7 +1807,7 @@ fhandler_pty_slave::fstat (struct stat *st)
   return 0;
 }
 
-int __reg3
+int
 fhandler_pty_slave::facl (int cmd, int nentries, aclent_t *aclbufp)
 {
   int res = -1;
@@ -1918,7 +1918,7 @@ fhandler_pty_slave::fch_close_handles ()
   close_maybe (inuse);
 }
 
-int __reg1
+int
 fhandler_pty_slave::fchmod (mode_t mode)
 {
   int ret = -1;
@@ -1945,7 +1945,7 @@ errout:
   return ret;
 }
 
-int __reg2
+int
 fhandler_pty_slave::fchown (uid_t uid, gid_t gid)
 {
   int ret = -1;
@@ -2327,7 +2327,7 @@ fhandler_pty_master::write (const void *ptr, size_t len)
   return ret;
 }
 
-void __reg3
+void
 fhandler_pty_master::read (void *ptr, size_t& len)
 {
   bg_check_types bg = bg_check (SIGTTIN);

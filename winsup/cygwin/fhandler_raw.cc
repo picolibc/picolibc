@@ -32,7 +32,7 @@ fhandler_dev_raw::~fhandler_dev_raw ()
     delete [] devbufalloc;
 }
 
-int __reg2
+int
 fhandler_dev_raw::fstat (struct stat *buf)
 {
   debug_printf ("here");

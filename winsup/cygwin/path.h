@@ -245,9 +245,9 @@ class path_conv
   void set_symlink (DWORD n) {path_flags |= PATH_SYMLINK; symlink_length = n;}
   void set_exec (int x = 1) {mount_flags |= x ? MOUNT_EXEC : MOUNT_NOTEXEC;}
 
-  void __reg3 check (const UNICODE_STRING *upath, uint32_t opt = PC_SYM_FOLLOW,
+  void check (const UNICODE_STRING *upath, uint32_t opt = PC_SYM_FOLLOW,
 	      const suffix_info *suffixes = NULL);
-  void __reg3 check (const char *src, uint32_t opt = PC_SYM_FOLLOW,
+  void check (const char *src, uint32_t opt = PC_SYM_FOLLOW,
 	      const suffix_info *suffixes = NULL);
 
   path_conv (const device& in_dev)
@@ -411,7 +411,7 @@ class path_conv
 
   ino_t get_ino_by_handle (HANDLE h);
   inline const char *get_posix () const { return posix_path; }
-  void __reg2 set_posix (const char *);
+  void set_posix (const char *);
   DWORD get_symlink_length () { return symlink_length; };
 };
 
@@ -431,7 +431,7 @@ enum fe_types
   FE_CWD = 4,		/* Search CWD for program */
   FE_DLL = 8		/* Search for DLLs, not executables. */
 };
-const char *__reg3 find_exec (const char *name, path_conv& buf,
+const char *find_exec (const char *name, path_conv& buf,
 				 const char *search = "PATH",
 				 unsigned opt = FE_NADA,
 				 const char **known_suffix = NULL);
@@ -449,15 +449,15 @@ has_exec_chars (const char *buf, int len)
 	  (buf[0] == 'M' && buf[1] == 'Z'));
 }
 
-int __reg3 pathmatch (const char *path1, const char *path2, bool caseinsensitive);
-int __reg3 pathnmatch (const char *path1, const char *path2, int len, bool caseinsensitive);
-bool __reg2 has_dot_last_component (const char *dir, bool test_dot_dot);
+int pathmatch (const char *path1, const char *path2, bool caseinsensitive);
+int pathnmatch (const char *path1, const char *path2, int len, bool caseinsensitive);
+bool has_dot_last_component (const char *dir, bool test_dot_dot);
 
-int __reg3 path_prefix_p (const char *path1, const char *path2, int len1,
+int path_prefix_p (const char *path1, const char *path2, int len1,
 		   bool caseinsensitive);
 
 int normalize_win32_path (const char *, char *, char *&);
 int normalize_posix_path (const char *, char *, char *&);
-PUNICODE_STRING __reg3 get_nt_native_path (const char *, UNICODE_STRING&, bool);
+PUNICODE_STRING get_nt_native_path (const char *, UNICODE_STRING&, bool);
 
-int __reg3 symlink_worker (const char *, path_conv &, bool);
+int symlink_worker (const char *, path_conv &, bool);

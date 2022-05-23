@@ -21,7 +21,7 @@ wininfo NO_COPY winmsg;
 
 muto NO_COPY wininfo::_lock;
 
-int __reg3
+int
 wininfo::process (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 #ifndef NOSTRACE
@@ -52,7 +52,7 @@ process_window_events (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 
 /* Handle windows events.  Inherits ownership of the wininfo lock */
-DWORD __reg1 WINAPI
+DWORD WINAPI
 wininfo::winthread ()
 {
   MSG msg;

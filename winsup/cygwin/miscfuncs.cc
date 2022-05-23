@@ -34,7 +34,7 @@ get_obj_handle_count (HANDLE h)
   return hdl_cnt;
 }
 
-int __reg2
+int
 check_invalid_virtual_addr (const void *s, unsigned sz)
 {
   MEMORY_BASIC_INFORMATION mbuf;
@@ -326,7 +326,7 @@ NT_readline::gets ()
 }
 
 /* Return an address from the import jmp table of main program.  */
-void * __reg1
+void *
 __import_address (void *imp)
 {
   __try

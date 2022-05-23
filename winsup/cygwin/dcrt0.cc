@@ -1137,7 +1137,7 @@ __main (void)
   sig_dispatch_pending (true);
 }
 
-void __reg1
+void
 do_exit (int status)
 {
   syscall_printf ("do_exit (%d), exit_state %d", status, exit_state);
@@ -1332,7 +1332,7 @@ are unable to find another cygwin DLL.",
 }
 
 #ifdef DEBUGGING
-void __reg1
+void
 cygbench (const char *s)
 {
   if (GetEnvironmentVariableA ("CYGWIN_BENCH", NULL, 0))

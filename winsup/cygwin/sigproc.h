@@ -53,33 +53,33 @@ struct sigpacket
     HANDLE thread_handle;
     struct sigpacket *next;
   };
-  int __reg1 process ();
-  int __reg3 setup_handler (void *, struct sigaction&, _cygtls *);
+  int process ();
+  int setup_handler (void *, struct sigaction&, _cygtls *);
 };
 
-void __reg1 sig_dispatch_pending (bool fast = false);
-void __reg2 set_signal_mask (sigset_t&, sigset_t);
-int __reg3 handle_sigprocmask (int sig, const sigset_t *set,
+void sig_dispatch_pending (bool fast = false);
+void set_signal_mask (sigset_t&, sigset_t);
+int handle_sigprocmask (int sig, const sigset_t *set,
 				  sigset_t *oldset, sigset_t& opmask);
 
-void __reg1 sig_clear (int);
-void __reg1 sig_set_pending (int);
+void sig_clear (int);
+void sig_set_pending (int);
 int __stdcall handle_sigsuspend (sigset_t);
 
-int __reg2 proc_subproc (DWORD, uintptr_t);
+int proc_subproc (DWORD, uintptr_t);
 
 class _pinfo;
 void proc_terminate ();
 void sigproc_init ();
-bool __reg1 pid_exists (pid_t);
-sigset_t __reg3 sig_send (_pinfo *, siginfo_t&, class _cygtls * = NULL);
-sigset_t __reg3 sig_send (_pinfo *, int, class _cygtls * = NULL);
+bool pid_exists (pid_t);
+sigset_t sig_send (_pinfo *, siginfo_t&, class _cygtls * = NULL);
+sigset_t sig_send (_pinfo *, int, class _cygtls * = NULL);
 void signal_fixup_after_exec ();
 void sigalloc ();
 
 int kill_pgrp (pid_t, siginfo_t&);
-void __reg1 exit_thread (DWORD) __attribute__ ((noreturn));
-void __reg1 setup_signal_exit (int);
+void exit_thread (DWORD) __attribute__ ((noreturn));
+void setup_signal_exit (int);
 int sigwait_common (const sigset_t *, siginfo_t *, PLARGE_INTEGER);
 
 class no_thread_exit_protect

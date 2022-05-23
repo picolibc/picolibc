@@ -840,7 +840,7 @@ _cygtls::interrupt_now (CONTEXT *cx, siginfo_t& si, void *handler,
   return interrupted;
 }
 
-void __reg3
+void
 _cygtls::interrupt_setup (siginfo_t& si, void *handler, struct sigaction& siga)
 {
   push ((__tlsstack_t) sigdelayed);
@@ -1323,7 +1323,7 @@ _cygtls::handle_SIGCONT ()
   sig_clear (SIGTTOU);
 }
 
-int __reg1
+int
 sigpacket::process ()
 {
   int rc = 1;

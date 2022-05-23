@@ -24,17 +24,17 @@ public:
   // class muto *next;
 
   /* The real constructor. */
-  muto __reg2 *init (const char *);
+  muto *init (const char *);
 
 #if 0	/* FIXME: See comment in sync.cc */
   ~muto ()
 #endif
-  int __reg2 acquire (DWORD ms = INFINITE); /* Acquire the lock. */
-  int __reg2 release (_cygtls * = &_my_tls); /* Release the lock. */
+  int acquire (DWORD ms = INFINITE); /* Acquire the lock. */
+  int release (_cygtls * = &_my_tls); /* Release the lock. */
 
-  bool __reg1 acquired ();
+  bool acquired ();
   void upforgrabs () {tls = this;}  // just set to an invalid address
-  void __reg1 grab ();
+  void grab ();
   operator int () const {return !!name;}
 };
 

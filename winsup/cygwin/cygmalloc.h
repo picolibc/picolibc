@@ -9,17 +9,16 @@ details. */
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "regparm.h"
 
-void __reg1 dlfree (void *p);
-void __reg1 *dlmalloc (size_t size);
-void __reg2 *dlrealloc (void *p, size_t size);
-void __reg2 *dlcalloc (size_t nmemb, size_t size);
-void __reg2 *dlmemalign (size_t alignment, size_t bytes);
-void __reg1 *dlvalloc (size_t bytes);
-size_t __reg1 dlmalloc_usable_size (void *p);
-int __reg1 dlmalloc_trim (size_t);
-int __reg2 dlmallopt (int p, int v);
+void dlfree (void *p);
+void *dlmalloc (size_t size);
+void *dlrealloc (void *p, size_t size);
+void *dlcalloc (size_t nmemb, size_t size);
+void *dlmemalign (size_t alignment, size_t bytes);
+void *dlvalloc (size_t bytes);
+size_t dlmalloc_usable_size (void *p);
+int dlmalloc_trim (size_t);
+int dlmallopt (int p, int v);
 void dlmalloc_stats ();
 
 #ifdef __x86_64__

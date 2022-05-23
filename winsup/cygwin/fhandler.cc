@@ -189,7 +189,7 @@ fhandler_base::set_flags (int flags, int supplied_bin)
 
 /* Cover function to ReadFile to achieve (as much as possible) Posix style
    semantics and use of errno.  */
-void __reg3
+void
 fhandler_base::raw_read (void *ptr, size_t& len)
 {
   NTSTATUS status;
@@ -256,7 +256,7 @@ retry:
 
 /* Cover function to WriteFile to provide Posix interface and semantics
    (as much as possible).  */
-ssize_t __reg3
+ssize_t
 fhandler_base::raw_write (const void *ptr, size_t len)
 {
   NTSTATUS status;
@@ -812,7 +812,7 @@ fhandler_base::open_setup (int)
    an \n.  If last char is an \r, look ahead one more char, if \n then
    modify \r, if not, remember char.
 */
-void __reg3
+void
 fhandler_base::read (void *in_ptr, size_t& len)
 {
   char *ptr = (char *) in_ptr;
@@ -1145,14 +1145,14 @@ fhandler_base::lseek (off_t offset, int whence)
   return res;
 }
 
-ssize_t __reg3
+ssize_t
 fhandler_base::pread (void *, size_t, off_t, void *)
 {
   set_errno (ESPIPE);
   return -1;
 }
 
-ssize_t __reg3
+ssize_t
 fhandler_base::pwrite (void *, size_t, off_t, void *)
 {
   set_errno (ESPIPE);
@@ -1250,7 +1250,7 @@ fhandler_base::ioctl (unsigned int cmd, void *buf)
   return res;
 }
 
-int __reg2
+int
 fhandler_base::fstat (struct stat *buf)
 {
   if (is_fs_special ())
@@ -1288,7 +1288,7 @@ fhandler_base::fstat (struct stat *buf)
   return 0;
 }
 
-int __reg2
+int
 fhandler_base::fstatvfs (struct statvfs *sfs)
 {
   /* If we hit this base implementation, it's some device in /dev.

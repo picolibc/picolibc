@@ -124,7 +124,7 @@ class fs_info
 
   const char *fsname () const { return fsn[0] ? fsn : "unknown"; }
 
-  bool __reg3 update (PUNICODE_STRING, HANDLE);
+  bool update (PUNICODE_STRING, HANDLE);
   bool inited () const { return !!status.flags; }
 };
 

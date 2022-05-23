@@ -275,7 +275,7 @@ fhandler_pipe::release_select_sem (const char *from)
     ReleaseSemaphore (select_sem, n_release, NULL);
 }
 
-void __reg3
+void
 fhandler_pipe::raw_read (void *ptr, size_t& len)
 {
   size_t nbytes = 0;
@@ -395,7 +395,7 @@ fhandler_pipe::reader_closed ()
   return n_reader == n_writer;
 }
 
-ssize_t __reg3
+ssize_t
 fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 {
   size_t nbytes = 0;
@@ -1103,7 +1103,7 @@ fhandler_pipe::fcntl (int cmd, intptr_t arg)
   return res;
 }
 
-int __reg2
+int
 fhandler_pipe::fstat (struct stat *buf)
 {
   int ret = fhandler_base::fstat (buf);
@@ -1117,7 +1117,7 @@ fhandler_pipe::fstat (struct stat *buf)
   return ret;
 }
 
-int __reg2
+int
 fhandler_pipe::fstatvfs (struct statvfs *sfs)
 {
   set_errno (EBADF);

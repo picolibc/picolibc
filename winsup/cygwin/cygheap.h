@@ -191,7 +191,7 @@ public:
     return effec_cygsid.string (buf);
   }
 
-  const char __reg3 *test_uid (char *&, const char *, size_t);
+  const char *test_uid (char *&, const char *, size_t);
 };
 
 /* cwd cache stuff.  */
@@ -350,8 +350,8 @@ struct user_heap_info
   void *top;
   void *max;
   SIZE_T chunk;
-  void __reg2 *sbrk (ptrdiff_t);
-  void __reg1 init ();
+  void *sbrk (ptrdiff_t);
+  void init ();
 };
 
 class cygheap_domain_info
@@ -585,11 +585,11 @@ struct init_cygheap: public mini_cygheap
   hook_chain hooks;
   void close_ctty ();
   void init_installation_root ();
-  void __reg1 init_tls_list ();;
-  void __reg2 add_tls (_cygtls *);
-  HANDLE __reg3 remove_tls (_cygtls *);
-  threadlist_t __reg2 *find_tls (_cygtls *);
-  threadlist_t __reg3 *find_tls (int, bool&);
+  void init_tls_list ();;
+  void add_tls (_cygtls *);
+  HANDLE remove_tls (_cygtls *);
+  threadlist_t *find_tls (_cygtls *);
+  threadlist_t *find_tls (int, bool&);
   sigset_t compute_sigblkmask ();
   void unlock_tls (threadlist_t *t) { if (t) ReleaseMutex (t->mutex); }
 };

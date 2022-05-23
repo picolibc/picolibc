@@ -593,7 +593,7 @@ sec_acl (PACL acl, bool original, bool admins, PSID sid1, PSID sid2, DWORD acces
   return true;
 }
 
-PSECURITY_ATTRIBUTES __reg3
+PSECURITY_ATTRIBUTES
 __sec_user (PVOID sa_buf, PSID sid1, PSID sid2, DWORD access2, BOOL inherit)
 {
   PSECURITY_ATTRIBUTES psa = (PSECURITY_ATTRIBUTES) sa_buf;

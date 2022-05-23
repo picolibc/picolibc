@@ -127,7 +127,7 @@ fhandler_process_fd::fd_reopen (int flags, mode_t mode)
   return fh;
 }
 
-int __reg2
+int
 fhandler_process_fd::fstat (struct stat *statbuf)
 {
   if (!pc.follow_fd_symlink ())

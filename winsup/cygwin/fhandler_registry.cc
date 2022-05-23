@@ -459,7 +459,7 @@ fhandler_proc ()
   prefix_len = sizeof ("registry") - 1;
 }
 
-int __reg2
+int
 fhandler_registry::fstat (struct stat *buf)
 {
   fhandler_base::fstat (buf);

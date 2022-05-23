@@ -1026,7 +1026,7 @@ fhandler_dev_dsp::write (const void *ptr, size_t len)
   return base ()->_write (ptr, len);
 }
 
-void __reg3
+void
 fhandler_dev_dsp::read (void *ptr, size_t& len)
 {
   return base ()->_read (ptr, len);
@@ -1139,7 +1139,7 @@ fhandler_dev_dsp::_write (const void *ptr, size_t len)
   return len - len_s + written;
 }
 
-void __reg3
+void
 fhandler_dev_dsp::_read (void *ptr, size_t& len)
 {
   debug_printf ("ptr=%p len=%ld", ptr, len);
@@ -1175,7 +1175,7 @@ fhandler_dev_dsp::_read (void *ptr, size_t& len)
   audio_in_->read ((char *)ptr, (int&)len);
 }
 
-void __reg1
+void
 fhandler_dev_dsp::close_audio_in ()
 {
   if (audio_in_)
@@ -1186,7 +1186,7 @@ fhandler_dev_dsp::close_audio_in ()
     }
 }
 
-void __reg2
+void
 fhandler_dev_dsp::close_audio_out (bool immediately)
 {
   if (audio_out_)

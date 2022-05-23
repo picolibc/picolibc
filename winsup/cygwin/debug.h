@@ -53,12 +53,12 @@ details. */
 # define VerifyHandle(h) verify_handle (__PRETTY_FUNCTION__, __LINE__, (h))
 
 void debug_init ();
-void __reg3 add_handle (const char *, int, HANDLE, const char *, bool = false);
-void __reg3 verify_handle (const char *, int, HANDLE);
-bool __reg3 close_handle (const char *, int, HANDLE, const char *, bool);
+void add_handle (const char *, int, HANDLE, const char *, bool = false);
+void verify_handle (const char *, int, HANDLE);
+bool close_handle (const char *, int, HANDLE, const char *, bool);
 extern "C" void console_printf (const char *fmt,...);
-void __reg1 cygbench (const char *s);
-void __reg3 modify_handle (const char *, int, HANDLE, const char *, bool);
+void cygbench (const char *s);
+void modify_handle (const char *, int, HANDLE, const char *, bool);
 void setclexec (HANDLE, HANDLE, bool);
 void debug_fixup_after_fork_exec ();
 

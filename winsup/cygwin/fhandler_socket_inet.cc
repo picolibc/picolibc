@@ -1366,7 +1366,7 @@ fhandler_socket_wsock::recvmsg (struct msghdr *msg, int flags)
   return ret;
 }
 
-void __reg3
+void
 fhandler_socket_wsock::read (void *in_ptr, size_t& len)
 {
   char *ptr = (char *) in_ptr;

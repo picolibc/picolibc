@@ -559,14 +559,14 @@ acl_to_text (acl_t acl, ssize_t *len_p)
   return NULL;
 }
 
-acl_t __reg2
+acl_t
 fhandler_base::acl_get (acl_type_t type)
 {
   set_errno (ENOTSUP);
   return NULL;
 }
 
-acl_t __reg2
+acl_t
 fhandler_disk_file::acl_get (acl_type_t type)
 {
   acl_t acl = NULL;
@@ -663,14 +663,14 @@ acl_get_file (const char *path_p, acl_type_t type)
   return acl;
 }
 
-int __reg3
+int
 fhandler_base::acl_set (acl_t acl, acl_type_t type)
 {
   set_errno (ENOTSUP);
   return -1;
 }
 
-int __reg3
+int
 fhandler_disk_file::acl_set (acl_t acl, acl_type_t type)
 {
   int ret = -1;

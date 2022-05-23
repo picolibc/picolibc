@@ -84,7 +84,7 @@ perhaps_suffix (const char *prog, path_conv& buf, int& err, unsigned opt)
    If the file is not found and !FE_NNF then the POSIX version of name is
    placed in buf and returned.  Otherwise the contents of buf is undefined
    and NULL is returned.  */
-const char * __reg3
+const char *
 find_exec (const char *name, path_conv& buf, const char *search,
 	   unsigned opt, const char **known_suffix)
 {

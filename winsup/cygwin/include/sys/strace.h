@@ -37,17 +37,17 @@ class strace
   void write (unsigned category, const char *buf, int count);
   unsigned char _active;
 public:
-  void activate (bool) __attribute__ ((__regparm__ (2)));;
+  void activate (bool);
   strace () {}
   int microseconds ();
   int version;
   int lmicrosec;
   bool execing;
-  void dll_info () __attribute__ ((__regparm__ (1)));
-  void prntf (unsigned, const char *func, const char *, ...) /*__attribute__ ((__regparm__(3)))*/;
-  void vprntf (unsigned, const char *func, const char *, va_list ap) /*__attribute__ ((__regparm__(3)))*/;
-  void wm (int message, int word, int lon) __attribute__ ((__regparm__(3)));
-  void write_childpid (pid_t) __attribute__ ((__regparm__ (3)));
+  void dll_info ();
+  void prntf (unsigned, const char *func, const char *, ...);
+  void vprntf (unsigned, const char *func, const char *, va_list ap);
+  void wm (int message, int word, int lon);
+  void write_childpid (pid_t);
   bool attached () const {return _active == 3;}
   bool active () const {return _active & 1;}
   unsigned char& active_val () {return _active;}

@@ -191,7 +191,7 @@ fhandler_proc::fhandler_proc ():
 {
 }
 
-int __reg2
+int
 fhandler_proc::fstat (struct stat *buf)
 {
   const char *path = get_name ();

@@ -52,7 +52,7 @@ fhandler_cygdrive::fstat (struct stat *buf)
   return 0;
 }
 
-int __reg2
+int
 fhandler_cygdrive::fstatvfs (struct statvfs *sfs)
 {
   /* Virtual file system.  Just return an empty buffer with a few values

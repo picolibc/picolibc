@@ -670,7 +670,7 @@ fhandler_socket_local::fcntl (int cmd, intptr_t arg)
     return fhandler_socket_wsock::fcntl (cmd, arg);
 }
 
-int __reg2
+int
 fhandler_socket_local::fstat (struct stat *buf)
 {
   if (!dev ().isfs ())
@@ -687,7 +687,7 @@ fhandler_socket_local::fstat (struct stat *buf)
   return res;
 }
 
-int __reg2
+int
 fhandler_socket_local::fstatvfs (struct statvfs *sfs)
 {
   if (!dev ().isfs ())

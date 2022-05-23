@@ -30,7 +30,7 @@ fhandler_dev_zero::write (const void *, size_t len)
   return len;
 }
 
-void __reg3
+void
 fhandler_dev_zero::read (void *ptr, size_t& len)
 {
   memset (ptr, 0, len);

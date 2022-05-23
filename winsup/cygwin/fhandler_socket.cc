@@ -273,7 +273,7 @@ fhandler_socket::open (int flags, mode_t mode)
   return 0;
 }
 
-int __reg2
+int
 fhandler_socket::fstat (struct stat *buf)
 {
   int res;
@@ -293,7 +293,7 @@ fhandler_socket::fstat (struct stat *buf)
   return res;
 }
 
-int __reg2
+int
 fhandler_socket::fstatvfs (struct statvfs *sfs)
 {
   memset (sfs, 0, sizeof (*sfs));

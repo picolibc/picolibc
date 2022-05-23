@@ -9,7 +9,6 @@ details. */
 #ifndef _CYGERRNO_H
 #define _CYGERRNO_H
 #include <errno.h>
-#include "regparm.h"
 
 struct errmap_t
 {
@@ -18,10 +17,10 @@ struct errmap_t
   int e;		 /* errno version of error */
 };
 
-void __reg3 seterrno_from_win_error (const char *file, int line, DWORD code);
-void __reg3 seterrno_from_nt_status (const char *file, int line, NTSTATUS status);
-int __reg2 geterrno_from_win_error (DWORD code = GetLastError (), int deferrno = 13 /*EACCESS*/);
-int __reg2 geterrno_from_nt_status (NTSTATUS status, int deferrno = 13 /*EACCESS*/);
+void seterrno_from_win_error (const char *file, int line, DWORD code);
+void seterrno_from_nt_status (const char *file, int line, NTSTATUS status);
+int geterrno_from_win_error (DWORD code = GetLastError (), int deferrno = 13 /*EACCESS*/);
+int geterrno_from_nt_status (NTSTATUS status, int deferrno = 13 /*EACCESS*/);
 
 inline void __attribute__ ((always_inline))
 seterrno (const char *file, int line)
@@ -42,7 +41,7 @@ __set_errno (const char *fn, int ln, int val)
 #define set_errno(val) __set_errno (__PRETTY_FUNCTION__, __LINE__, (val))
 
 int find_winsock_errno (DWORD why);
-void __reg2 __set_winsock_errno (const char *fn, int ln);
+void __set_winsock_errno (const char *fn, int ln);
 #define set_winsock_errno() __set_winsock_errno (__FUNCTION__, __LINE__)
 
 #define get_errno()  (errno)

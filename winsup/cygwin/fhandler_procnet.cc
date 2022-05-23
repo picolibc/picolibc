@@ -69,7 +69,7 @@ fhandler_procnet::fhandler_procnet ():
 {
 }
 
-int __reg2
+int
 fhandler_procnet::fstat (struct stat *buf)
 {
   fhandler_base::fstat (buf);

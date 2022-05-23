@@ -64,7 +64,7 @@ fhandler_dev::close ()
   return fhandler_disk_file::close ();
 }
 
-int __reg2
+int
 fhandler_dev::fstat (struct stat *st)
 {
   /* If /dev really exists on disk, return correct disk information. */
@@ -78,7 +78,7 @@ fhandler_dev::fstat (struct stat *st)
   return 0;
 }
 
-int __reg2
+int
 fhandler_dev::fstatvfs (struct statvfs *sfs)
 {
   int ret = -1, opened = 0;

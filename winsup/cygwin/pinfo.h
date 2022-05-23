@@ -119,8 +119,8 @@ public:
   int siginfo (sigset_t &, sigset_t &, sigset_t &);
   bool set_ctty (class fhandler_termios *, int);
   bool alert_parent (char);
-  int __reg2 kill (siginfo_t&);
-  bool __reg1 exists ();
+  int kill (siginfo_t&);
+  bool exists ();
   const char *_ctty (char *);
 
   /* signals */
@@ -160,7 +160,7 @@ public:
   bool waiter_ready;
   class cygthread *wait_thread;
 
-  void __reg3 init (pid_t, DWORD, HANDLE);
+  void init (pid_t, DWORD, HANDLE);
   pinfo (_pinfo *x = NULL)
   : pinfo_minimal (), destroy (false), winpid_hdl (NULL), procinfo (x),
     waiter_ready (false), wait_thread (NULL) {}
@@ -171,19 +171,19 @@ public:
     init (n, flag, NULL);
   }
   pinfo (HANDLE, pinfo_minimal&, pid_t);
-  void __reg2 thisproc (HANDLE);
+  void thisproc (HANDLE);
   void create_winpid_symlink ();
   inline void _pinfo_release ();
   void release ();
-  bool __reg1 wait ();
+  bool wait ();
   ~pinfo ()
   {
     if (destroy && procinfo)
       release ();
   }
-  void __reg2 exit (DWORD n) __attribute__ ((noreturn, ));
-  void __reg1 maybe_set_exit_code_from_windows ();
-  void __reg2 set_exit_code (DWORD n);
+  void exit (DWORD n) __attribute__ ((noreturn, ));
+  void maybe_set_exit_code_from_windows ();
+  void set_exit_code (DWORD n);
   _pinfo *operator -> () const {return procinfo;}
   int operator == (pinfo *x) const {return x->procinfo == procinfo;}
   int operator == (pinfo &x) const {return x.procinfo == procinfo;}

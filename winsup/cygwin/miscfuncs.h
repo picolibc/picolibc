@@ -44,10 +44,10 @@ is_alt_numpad_event (PINPUT_RECORD pirec)
 	 && pirec->Event.KeyEvent.wVirtualScanCode == 0x38;
 }
 
-int __reg1 winprio_to_nice (DWORD);
-DWORD __reg1 nice_to_winprio (int &);
+int winprio_to_nice (DWORD);
+DWORD nice_to_winprio (int &);
 
-bool __reg3 create_pipe (PHANDLE, PHANDLE, LPSECURITY_ATTRIBUTES, DWORD);
+bool create_pipe (PHANDLE, PHANDLE, LPSECURITY_ATTRIBUTES, DWORD);
 
 BOOL WINAPI CreatePipeOverlapped (PHANDLE read_handle, PHANDLE write_handle,
 				  LPSECURITY_ATTRIBUTES sa);
@@ -78,11 +78,11 @@ public:
 extern "C" void yield ();
 
 #define import_address(x) __import_address ((void *)(x))
-void * __reg1 __import_address (void *);
+void * __import_address (void *);
 
 #define caller_return_address() \
 		__caller_return_address (__builtin_return_address (0))
-void * __reg1 __caller_return_address (void *);
+void * __caller_return_address (void *);
 
 void backslashify (const char *, char *, bool);
 void slashify (const char *, char *, bool);
@@ -102,9 +102,9 @@ PWCHAR transform_chars_af_unix (PWCHAR, const char *, __socklen_t);
 ULONG get_obj_handle_count (HANDLE h);
 
 /* Memory checking */
-int __reg2 check_invalid_virtual_addr (const void *s, unsigned sz);
+int check_invalid_virtual_addr (const void *s, unsigned sz);
 
-ssize_t __reg3 check_iovec (const struct iovec *, int, bool);
+ssize_t check_iovec (const struct iovec *, int, bool);
 #define check_iovec_for_read(a, b) check_iovec ((a), (b), false)
 #define check_iovec_for_write(a, b) check_iovec ((a), (b), true)
 

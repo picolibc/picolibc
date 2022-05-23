@@ -101,7 +101,7 @@ Static HANDLE my_readsig;
 HANDLE NO_COPY my_pendingsigs_evt;
 
 /* Function declarations */
-static int __reg1 checkstate (waitq *);
+static int checkstate (waitq *);
 static __inline__ bool get_proc_lock (DWORD, DWORD);
 static int remove_proc (int);
 static bool stopped_or_terminated (waitq *, _pinfo *);
@@ -120,7 +120,7 @@ public:
   bool pending () {retry = true; return !!start.next;}
   void clear (int sig) {sigs[sig].si.si_signo = 0;}
   void clear (_cygtls *tls);
-  friend void __reg1 sig_dispatch_pending (bool);
+  friend void sig_dispatch_pending (bool);
   friend void WINAPI wait_sig (VOID *arg);
 };
 
@@ -192,7 +192,7 @@ proc_can_be_signalled (_pinfo *p)
   return false;
 }
 
-bool __reg1
+bool
 pid_exists (pid_t pid)
 {
   pinfo p (pid);
@@ -211,7 +211,7 @@ mychild (int pid)
 
 /* Handle all subprocess requests
  */
-int __reg2
+int
 proc_subproc (DWORD what, uintptr_t val)
 {
   int slot;
@@ -433,7 +433,7 @@ proc_terminate ()
 }
 
 /* Clear pending signal */
-void __reg1
+void
 sig_clear (int sig)
 {
   sigq.clear (sig);
@@ -474,7 +474,7 @@ sigpending (sigset_t *mask)
 }
 
 /* Force the wait_sig thread to wake up and scan for pending signals */
-void __reg1
+void
 sig_dispatch_pending (bool fast)
 {
   /* Non-atomically test for any signals pending and wake up wait_sig if any are
@@ -551,7 +551,7 @@ exit_thread (DWORD res)
   ExitThread (res);
 }
 
-sigset_t __reg3
+sigset_t
 sig_send (_pinfo *p, int sig, _cygtls *tls)
 {
   siginfo_t si = {};
@@ -564,7 +564,7 @@ sig_send (_pinfo *p, int sig, _cygtls *tls)
    If pinfo *p == NULL, send to the current process.
    If sending to this process, wait for notification that a signal has
    completed before returning.  */
-sigset_t __reg3
+sigset_t
 sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 {
   int rc = 1;
@@ -1155,7 +1155,7 @@ child_info_fork::abort (const char *fmt, ...)
 /* Check the state of all of our children to see if any are stopped or
  * terminated.
  */
-static int __reg1
+static int
 checkstate (waitq *parent_w)
 {
   int potential_match = 0;

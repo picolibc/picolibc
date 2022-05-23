@@ -833,7 +833,7 @@ fhandler_console::bg_check (int sig, bool dontsignal)
   return fhandler_termios::bg_check (sig, dontsignal);
 }
 
-void __reg3
+void
 fhandler_console::read (void *pv, size_t& buflen)
 {
   termios_printf ("read(%p,%d)", pv, buflen);
@@ -1379,7 +1379,7 @@ dev_console::fillin (HANDLE h)
   return ret;
 }
 
-void __reg3
+void
 dev_console::scroll_buffer (HANDLE h, int x1, int y1, int x2, int y2,
 			    int xn, int yn)
 {
@@ -1942,7 +1942,7 @@ dev_console::scroll_window (HANDLE h, int x1, int y1, int x2, int y2)
  * Clear the screen context from x1/y1 to x2/y2 cell.
  * Negative values represents current screen dimensions
  */
-void __reg3
+void
 fhandler_console::clear_screen (cltype xc1, cltype yc1, cltype xc2, cltype yc2)
 {
   HANDLE h = get_output_handle ();
@@ -1970,7 +1970,7 @@ fhandler_console::clear_screen (cltype xc1, cltype yc1, cltype xc2, cltype yc2)
     con.clear_screen (h, x1, y1, x2, y2);
 }
 
-void __reg3
+void
 dev_console::clear_screen (HANDLE h, int x1, int y1, int x2, int y2)
 {
   COORD tlc;
@@ -1995,7 +1995,7 @@ dev_console::clear_screen (HANDLE h, int x1, int y1, int x2, int y2)
   release_attach_mutex ();
 }
 
-void __reg3
+void
 fhandler_console::cursor_set (bool rel_to_top, int x, int y)
 {
   COORD pos;
@@ -2030,7 +2030,7 @@ fhandler_console::cursor_set (bool rel_to_top, int x, int y)
   release_attach_mutex ();
 }
 
-void __reg3
+void
 fhandler_console::cursor_rel (int x, int y)
 {
   con.fillin (get_output_handle ());
@@ -2039,7 +2039,7 @@ fhandler_console::cursor_rel (int x, int y)
   cursor_set (false, x, y);
 }
 
-void __reg3
+void
 fhandler_console::cursor_get (int *x, int *y)
 {
   con.fillin (get_output_handle ());

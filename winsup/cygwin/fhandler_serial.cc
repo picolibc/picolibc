@@ -30,7 +30,7 @@ fhandler_serial::fhandler_serial ()
   need_fork_fixup (true);
 }
 
-void __reg3
+void
 fhandler_serial::raw_read (void *ptr, size_t& ulen)
 {
   OVERLAPPED ov = { 0 };
@@ -173,7 +173,7 @@ out:
 
 /* Cover function to WriteFile to provide Posix interface and semantics
    (as much as possible).  */
-ssize_t __reg3
+ssize_t
 fhandler_serial::raw_write (const void *ptr, size_t len)
 {
   DWORD bytes_written;

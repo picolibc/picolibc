@@ -251,7 +251,7 @@ unreadable:
   return false;
 }
 
-int __reg2
+int
 fhandler_procsys::fstat (struct stat *buf)
 {
   const char *path = get_name ();
@@ -426,7 +426,7 @@ fhandler_procsys::closedir (DIR *dir)
   return fhandler_virtual::closedir (dir);
 }
 
-void __reg3
+void
 fhandler_procsys::read (void *ptr, size_t& len)
 {
   fhandler_base::raw_read (ptr, len);
