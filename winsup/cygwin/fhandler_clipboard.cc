@@ -68,14 +68,6 @@ fhandler_dev_clipboard::set_clipboard (const void *buf, size_t len)
       clipbuf = (cygcb_t *) GlobalLock (hmem);
 
       clock_gettime (CLOCK_REALTIME, &clipbuf->ts);
-#ifdef __x86_64__
-      /* ts overlays cb_sec and cb_nsec such that no conversion is needed */
-#elif __i386__
-      /* Expand 32-bit timespec layout to 64-bit layout.
-         NOTE: Steps must be done in this order to avoid data loss. */
-      clipbuf->cb_nsec = clipbuf->ts.tv_nsec;
-      clipbuf->cb_sec  = clipbuf->ts.tv_sec;
-#endif
       clipbuf->cb_size = len;
       memcpy (clipbuf->cb_data, buf, len); // append user-supplied data
 
@@ -180,14 +172,6 @@ fhandler_dev_clipboard::fstat (struct stat *buf)
 	  && (hglb = GetClipboardData (format))
 	  && (clipbuf = (cygcb_t *) GlobalLock (hglb)))
 	{
-#ifdef __x86_64__
-	  /* ts overlays cb_sec and cb_nsec such that no conversion is needed */
-#elif __i386__
-	  /* Compress 64-bit timespec layout to 32-bit layout.
-	     NOTE: Steps must be done in this order to avoid data loss. */
-	  clipbuf->ts.tv_sec  = clipbuf->cb_sec;
-	  clipbuf->ts.tv_nsec = clipbuf->cb_nsec;
-#endif
 	  buf->st_atim = buf->st_mtim = clipbuf->ts;
 	  buf->st_size = clipbuf->cb_size;
 	  GlobalUnlock (hglb);
