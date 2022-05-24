@@ -19,7 +19,7 @@ struct sigdesc
   const char *str;
 };
 
-#define __signals_common \
+#define __signals \
   _s(SIGHUP, "Hangup"),				/*  1 */ \
   _s(SIGINT, "Interrupt"),			/*  2 */ \
   _s(SIGQUIT, "Quit"),				/*  3 */ \
@@ -54,11 +54,7 @@ struct sigdesc
   _s2(SIGPWR, "Power failure",			/* 29 */ \
       SIGLOST, "Resource lost"),			 \
   _s(SIGUSR1, "User defined signal 1"),		/* 30 */ \
-  _s(SIGUSR2, "User defined signal 2"),		/* 31 */
-
-#ifdef __x86_64__
-# define __signals \
-  __signals_common \
+  _s(SIGUSR2, "User defined signal 2"),		/* 31 */ \
   _s(SIGRTMIN, "Real-time signal 0"),		/* 32 */ \
   _s(SIGRTMIN + 1, "Real-time signal 1"),	/* 33 */ \
   _s(SIGRTMIN + 2, "Real-time signal 2"),	/* 34 */ \
@@ -92,12 +88,6 @@ struct sigdesc
   _s(SIGRTMIN + 30, "Real-time signal 30"),	/* 62 */ \
   _s(SIGRTMIN + 31, "Real-time signal 31"),	/* 63 */ \
   _s(SIGRTMAX, "Real-time signal 32")		/* 64 */
-#else
-# define __signals \
-  __signals_common \
-  _s2(SIGRTMIN, "Real-time signal 0",		/* 32 */ \
-      SIGRTMAX, "Real-time signal 0")
-#endif
 
 #define _s(n, s) #n
 #define _s2(n, s, n1, s1) #n

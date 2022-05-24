@@ -15,9 +15,6 @@
 
 #define __DIRENT_VERSION	2
 
-#ifdef __i386__
-#pragma pack(push,4)
-#endif
 #define _DIRENT_HAVE_D_TYPE
 struct dirent
 {
@@ -28,21 +25,11 @@ struct dirent
   __uint32_t __d_internal1;
   char d_name[NAME_MAX + 1];
 };
-#ifdef __i386__
-#pragma pack(pop)
-#endif
 
 #define d_fileno d_ino			/* BSD compatible definition */
 
-#ifdef __x86_64__
 #define __DIRENT_COOKIE 0xcdcd8484
-#else
-#define __DIRENT_COOKIE 0xdede4242
-#endif
 
-#ifdef __i386__
-#pragma pack(push,4)
-#endif
 typedef struct __DIR
 {
   /* This is first to set alignment in non _LIBC case.  */
@@ -56,9 +43,6 @@ typedef struct __DIR
   void *__fh;
   unsigned __flags;
 } DIR;
-#ifdef __i386__
-#pragma pack(pop)
-#endif
 
 #if __BSD_VISIBLE
 #ifdef _DIRENT_HAVE_D_TYPE

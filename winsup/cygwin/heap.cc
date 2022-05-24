@@ -29,7 +29,6 @@ static ptrdiff_t page_const;
 static uintptr_t
 eval_start_address ()
 {
-#ifdef __x86_64__
   /* On 64 bit, we choose a fixed address outside the 32 bit area.  The
      executable starts at 0x1:00400000L, the Cygwin DLL starts at
      0x1:80040000L, other rebased DLLs are located in the region from
@@ -38,38 +37,6 @@ eval_start_address ()
      are located in the region from 0x6:00000000L up to 0x8:00000000L.
      So the heap starts at 0x8:00000000L. */
   uintptr_t start_address = 0x800000000L;
-#else
-  /* Windows performs heap ASLR.  This spoils the entire region below
-     0x20000000 for us, because that region is used by Windows to randomize
-     heap and stack addresses.  Therefore we put our heap into a safe region
-     starting at 0x20000000.  This should work right from the start in 99%
-     of the cases. */
-  uintptr_t start_address = 0x20000000L;
-  MEMORY_BASIC_INFORMATION mbi;
-
-  if (VirtualQuery ((void *) 0xbf000000L, &mbi, sizeof mbi))
-    {
-      /* However, if we're running on a /3GB enabled 32 bit system or on
-	 a 64 bit system, and the executable is large address aware, then
-	 we know that we have spare 1 Gig (32 bit) or even 2 Gigs (64 bit)
-	 virtual address space.  This memory region is practically unused
-	 by Windows, only PEB and TEBs are allocated top-down here.
-
-	 We used to use the current TEB address as very simple test that
-	 this is a large address aware executable, but that fails on W10
-	 WOW64 because the main TEB is apparently commited in the lower
-	 2 Gigs these days.
-
-	 The above test for address 0xbf000000 is supposed to make sure
-	 that we really have 3GB on a 32 bit system.  Windows supports
-	 smaller large address regions, but then it's not that interesting
-	 for us to use it for the heap.  If the region is big enough, the
-	 heap gets allocated at its start.  What we get are 0.999 or 1.999
-	 Gigs of free contiguous memory for heap, thread stacks, and shared
-	 memory regions. */
-      start_address = 0x80000000L;
-    }
-#endif
   return start_address;
 }
 
@@ -83,27 +50,18 @@ eval_initial_heap_size ()
   dosheader = (PIMAGE_DOS_HEADER) GetModuleHandle (NULL);
   ntheader = (PIMAGE_NT_HEADERS) ((PBYTE) dosheader + dosheader->e_lfanew);
   /* LoaderFlags is an obsolete DWORD member of the PE/COFF file header.
-     It's value is ignored by the loader, so we're free to use it for
-     Cygwin.  If it's 0, we default to the usual 384 Megs on 32 bit and
-     512 on 64 bit.  Otherwise, we use it as the default initial heap size
-     in megabyte.  Valid values are between 4 and 2048/8388608 Megs. */
+     Its value is ignored by the loader, so we're free to use it for
+     Cygwin.  If it's 0, we default to 512.  Otherwise, we use it as
+     the default initial heap size in megabyte.  Valid values are
+     between 4 and 8388608 Megs. */
 
   size = ntheader->OptionalHeader.LoaderFlags;
-#ifdef __x86_64__
   if (size == 0)
     size = 512;
   else if (size < 4)
     size = 4;
   else if (size > 8388608)
     size = 8388608;
-#else
-  if (size == 0)
-    size = 384;
-  else if (size < 4)
-    size = 4;
-  else if (size > 2048)
-    size = 2048;
-#endif
   return size << 20;
 }
 

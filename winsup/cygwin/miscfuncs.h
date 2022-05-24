@@ -108,9 +108,7 @@ ssize_t check_iovec (const struct iovec *, int, bool);
 #define check_iovec_for_read(a, b) check_iovec ((a), (b), false)
 #define check_iovec_for_write(a, b) check_iovec ((a), (b), true)
 
-#ifdef __x86_64__
 extern PVOID create_new_main_thread_stack (PVOID &allocationbase);
-#endif
 
 extern "C" DWORD WINAPI pthread_wrapper (PVOID arg);
 extern "C" HANDLE WINAPI CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func,

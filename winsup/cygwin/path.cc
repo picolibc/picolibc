@@ -4489,8 +4489,6 @@ fcwd_access_t::SetVersionFromPointer (PBYTE buf_p, bool is_buffer)
    it's not exported from the DLL, unfortunately.  Therefore we have to
    use some knowledge to figure out the address. */
 
-#ifdef __x86_64__
-
 #define peek32(x)	(*(int32_t *)(x))
 
 static fcwd_access_t **
@@ -4588,106 +4586,6 @@ find_fast_cwd_pointer ()
   /* Compute address of the fcwd_access_t ** pointer. */
   return (fcwd_access_t **) (testrbx + peek32 (movrbx + 3));
 }
-#else
-
-#define peek32(x)	(*(uint32_t *)(x))
-
-static fcwd_access_t **
-find_fast_cwd_pointer ()
-{
-  /* Fetch entry points of relevant functions in ntdll.dll. */
-  HMODULE ntdll = GetModuleHandle ("ntdll.dll");
-  if (!ntdll)
-    return NULL;
-  const uint8_t *get_dir = (const uint8_t *)
-			   GetProcAddress (ntdll, "RtlGetCurrentDirectory_U");
-  const uint8_t *ent_crit = (const uint8_t *)
-			    GetProcAddress (ntdll, "RtlEnterCriticalSection");
-  if (!get_dir || !ent_crit)
-    return NULL;
-  /* Search first relative call instruction in RtlGetCurrentDirectory_U. */
-  const uint8_t *rcall = (const uint8_t *) memchr (get_dir, 0xe8, 64);
-  if (!rcall)
-    return NULL;
-  /* Fetch offset from instruction and compute address of called function.
-     This function actually fetches the current FAST_CWD instance and
-     performs some other actions, not important to us. */
-  ptrdiff_t offset = (ptrdiff_t) peek32 (rcall + 1);
-  const uint8_t *use_cwd = rcall + 5 + offset;
-  /* Find first `push %edi' instruction. */
-  const uint8_t *pushedi = (const uint8_t *) memchr (use_cwd, 0x57, 32);
-  if (!pushedi)
-    return NULL;
-  /* ...which should be followed by `mov crit-sect-addr,%edi' then
-     `push %edi', or by just a single `push crit-sect-addr'. */
-  const uint8_t *movedi = pushedi + 1;
-  const uint8_t *mov_pfast_cwd;
-  if (movedi[0] == 0x8b && movedi[1] == 0xff)	/* mov %edi,%edi -> W8 */
-    {
-      /* Windows 8 does not call RtlEnterCriticalSection.  The code manipulates
-	 the FastPebLock manually, probably because RtlEnterCriticalSection has
-	 been converted to an inline function.
-
-	 Next we search for a `mov some address,%eax'.  This address points
-	 to the LockCount member of the FastPebLock structure, so the address
-	 is equal to FastPebLock + 4. */
-      const uint8_t *moveax = (const uint8_t *) memchr (movedi, 0xb8, 16);
-      if (!moveax)
-	return NULL;
-      offset = (ptrdiff_t) peek32 (moveax + 1) - 4;
-      /* Compare the address with the known PEB lock as stored in the PEB. */
-      if ((PRTL_CRITICAL_SECTION) offset != NtCurrentTeb ()->Peb->FastPebLock)
-	return NULL;
-      /* Now search for the mov instruction fetching the address of the global
-	 PFAST_CWD *. */
-      mov_pfast_cwd = moveax;
-      do
-	{
-	  mov_pfast_cwd = (const uint8_t *) memchr (++mov_pfast_cwd, 0x8b, 48);
-	}
-      while (mov_pfast_cwd && mov_pfast_cwd[1] != 0x1d
-	     && (mov_pfast_cwd - moveax) < 48);
-      if (!mov_pfast_cwd || mov_pfast_cwd[1] != 0x1d)
-	return NULL;
-    }
-  else
-    {
-      if (movedi[0] == 0xbf && movedi[5] == 0x57)
-	rcall = movedi + 6;
-      else if (movedi[0] == 0x68)
-	rcall = movedi + 5;
-      else if (movedi[0] == 0x88 && movedi[4] == 0x83 && movedi[7] == 0x68)
-	{
-	  /* Windows 8.1 Preview: The `mov lock_addr,%edi' is actually a
-	     `mov %cl,15(%esp), followed by an `or #-1,%ebx, followed by a
-	     `push lock_addr'. */
-	  movedi += 7;
-	  rcall = movedi + 5;
-	}
-      else
-	return NULL;
-      /* Compare the address used for the critical section with the known
-	 PEB lock as stored in the PEB. */
-      if ((PRTL_CRITICAL_SECTION) peek32 (movedi + 1)
-	  != NtCurrentTeb ()->Peb->FastPebLock)
-	return NULL;
-      /* To check we are seeing the right code, we check our expectation that
-	 the next instruction is a relative call into RtlEnterCriticalSection. */
-      if (rcall[0] != 0xe8)
-	return NULL;
-      /* Check that this is a relative call to RtlEnterCriticalSection. */
-      offset = (ptrdiff_t) peek32 (rcall + 1);
-      if (rcall + 5 + offset != ent_crit)
-	return NULL;
-      mov_pfast_cwd = rcall + 5;
-    }
-  /* After locking the critical section, the code should read the global
-     PFAST_CWD * pointer that is guarded by that critical section. */
-  if (mov_pfast_cwd[0] != 0x8b)
-    return NULL;
-  return (fcwd_access_t **) peek32 (mov_pfast_cwd + 2);
-}
-#endif
 
 static fcwd_access_t **
 find_fast_cwd ()

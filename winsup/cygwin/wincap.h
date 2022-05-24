@@ -73,9 +73,7 @@ public:
   {
     return ((wincaps *) this->caps)->def_guard_pages * page_size ();
   }
-#ifdef __x86_64__
   intptr_t IMPLEMENT (mmap_storage_high)
-#endif
   bool  IMPLEMENT (is_server)
   bool	IMPLEMENT (needs_query_information)
   bool	IMPLEMENT (has_precise_system_time)

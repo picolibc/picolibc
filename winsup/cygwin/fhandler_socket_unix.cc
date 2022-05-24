@@ -2247,14 +2247,10 @@ fhandler_socket_unix::ioctl (unsigned int cmd, void *p)
   switch (cmd)
     {
     case FIOASYNC:
-#ifdef __x86_64__
     case _IOW('f', 125, int):
-#endif
       break;
     case FIONREAD:
-#ifdef __x86_64__
     case _IOR('f', 127, int):
-#endif
     case FIONBIO:
       {
 	const bool was_nonblocking = is_nonblocking ();

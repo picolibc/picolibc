@@ -36,21 +36,12 @@ __attribute__((__gnu_inline__))
 extern inline struct _reent *__getreent (void)
 {
   register char *ret;
-#ifdef __x86_64__
   __asm __volatile__ ("movq %%gs:8,%0" : "=r" (ret));
-#else
-  __asm __volatile__ ("movl %%fs:4,%0" : "=r" (ret));
-#endif
   return (struct _reent *) (ret - __CYGTLS_PADSIZE__);
 }
 #endif /* _LIBC || __INSIDE_CYGWIN__ */
 
-#ifdef __x86_64__
-# define __SYMBOL_PREFIX
-#else
-# define __SYMBOL_PREFIX "_"
-#endif
-#define _SYMSTR(x)	__SYMBOL_PREFIX #x
+#define _SYMSTR(x)	#x
 
 #define __FILENAME_MAX__ 4096	/* Keep in sync with PATH_MAX in limits.h. */
 

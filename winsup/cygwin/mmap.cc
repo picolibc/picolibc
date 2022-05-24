@@ -196,7 +196,6 @@ MapView (HANDLE h, void *addr, size_t len, DWORD openflags,
   SIZE_T viewsize = len;
   ULONG alloc_type = MEM_TOP_DOWN;
 
-#ifdef __x86_64__
   /* Don't call NtMapViewOfSectionEx during fork.  It requires autoloading
      a function under loader lock (STATUS_DLL_INIT_FAILED). */
   if (!from_fixup_after_fork && wincap.has_extended_mem_api ())
@@ -232,7 +231,6 @@ MapView (HANDLE h, void *addr, size_t len, DWORD openflags,
 		    base, status, h, addr, off, viewsize, alloc_type, protect);
       return base;
     }
-#endif
 
   /* Try mapping using the given address first, even if it's NULL.
      If it failed, and addr was not NULL and flags is not MAP_FIXED,
@@ -1063,40 +1061,8 @@ go_ahead:
     }
 
   orig_len = roundup2 (orig_len, pagesize);
-#ifdef __x86_64__
   if (!wincap.has_extended_mem_api ())
     addr = mmap_alloc.alloc (addr, orig_len ?: len, fixed (flags));
-#else
-  if (orig_len)
-    {
-      /* If the requested length is bigger than the file size, we try to
-	 allocate an area of the full size first.  This area is immediately
-	 deallocated and the address we got is used as base address for the
-	 subsequent real mappings.  This ensures that we have enough space
-	 for the whole thing. */
-      PVOID newaddr = VirtualAlloc (addr, orig_len, MEM_TOP_DOWN | MEM_RESERVE,
-				    PAGE_READWRITE);
-      if (!newaddr)
-	{
-	  /* If addr is not NULL, but MAP_FIXED isn't given, allow the OS
-	     to choose. */
-	  if (addr && !fixed (flags))
-	    newaddr = VirtualAlloc (NULL, orig_len, MEM_TOP_DOWN | MEM_RESERVE,
-				    PAGE_READWRITE);
-	  if (!newaddr)
-	    {
-	      __seterrno ();
-	      goto out_with_unlock;
-	    }
-	}
-      if (!VirtualFree (newaddr, 0, MEM_RELEASE))
-	{
-	  __seterrno ();
-	  goto out_with_unlock;
-	}
-      addr = newaddr;
-    }
-#endif
 
   base = mmap_worker (map_list, fh, (caddr_t) addr, len, prot, flags, fd, off,
 		      &st);
@@ -1600,7 +1566,6 @@ fhandler_dev_zero::mmap (caddr_t *addr, size_t len, int prot,
       DWORD protect = gen_protect (prot, flags);
       DWORD alloc_type = MEM_TOP_DOWN | MEM_RESERVE
 			 | (noreserve (flags) ? 0 : MEM_COMMIT);
-#ifdef __x86_64__
       if (wincap.has_extended_mem_api ())
 	{
 	  static const MEM_ADDRESS_REQUIREMENTS mmap_req = {
@@ -1621,7 +1586,6 @@ fhandler_dev_zero::mmap (caddr_t *addr, size_t len, int prot,
 				  protect, &mmap_ext, 1);
 	}
       else
-#endif
 	{
 	  base = VirtualAlloc (*addr, len, alloc_type, protect);
 	  if (!base && addr && !fixed (flags))

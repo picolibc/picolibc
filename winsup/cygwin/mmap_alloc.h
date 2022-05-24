@@ -1,5 +1,3 @@
-#ifdef __x86_64__
-
 /* The memory region used for memory maps */
 #define MMAP_STORAGE_LOW	0x001000000000L	/* Leave 32 Gigs for heap. */
 /* Up to Win 8 only supporting 44 bit address space, starting with Win 8.1
@@ -17,5 +15,3 @@ public:
 };
 
 extern mmap_allocator mmap_alloc;
-
-#endif

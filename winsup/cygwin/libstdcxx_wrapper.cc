@@ -20,17 +20,10 @@ details.  */
    around the standard C++ memory management operators; these are the wrappers,
    but we want the compiler to know they are the malloc operators and not have
    it think they're just any old function matching 'extern "C" _wrap_*'.  */
-#ifdef __x86_64__
 #define MANGLED_ZNWX			"__wrap__Znwm"
 #define MANGLED_ZNAX			"__wrap__Znam"
 #define MANGLED_ZNWX_NOTHROW_T		"__wrap__ZnwmRKSt9nothrow_t"
 #define MANGLED_ZNAX_NOTHROW_T		"__wrap__ZnamRKSt9nothrow_t"
-#else
-#define MANGLED_ZNWX			"___wrap__Znwj"
-#define MANGLED_ZNAX			"___wrap__Znaj"
-#define MANGLED_ZNWX_NOTHROW_T		"___wrap__ZnwjRKSt9nothrow_t"
-#define MANGLED_ZNAX_NOTHROW_T		"___wrap__ZnajRKSt9nothrow_t"
-#endif
 
 extern void *operator new(std::size_t sz) noexcept (false)
 			__asm__ (MANGLED_ZNWX);

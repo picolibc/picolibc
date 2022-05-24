@@ -873,17 +873,6 @@ dll_dllcrt0_1 (VOID *x)
     res = (PVOID) d;
 }
 
-#ifdef __i386__
-/* OBSOLETE: This function is obsolete and will go away in the
-   future.  Cygwin can now handle being loaded from a noncygwin app
-   using the same entry point. */
-extern "C" int
-dll_noncygwin_dllcrt0 (HMODULE h, per_process *p)
-{
-  return (int) dll_dllcrt0 (h, p);
-}
-#endif /* __i386__ */
-
 extern "C" void
 cygwin_detach_dll (dll *)
 {

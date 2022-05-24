@@ -14,17 +14,10 @@ details. */
    unnecessarily.  */
 #define WEAK __attribute__ ((weak))
 
-#ifdef __x86_64__
 #define REAL_ZNWX		"__real__Znwm"
 #define REAL_ZNAX		"__real__Znam"
 #define REAL_ZNWX_NOTHROW_T	"__real__ZnwmRKSt9nothrow_t"
 #define REAL_ZNAX_NOTHROW_T	"__real__ZnamRKSt9nothrow_t"
-#else
-#define REAL_ZNWX		"___real__Znwj"
-#define REAL_ZNAX		"___real__Znaj"
-#define REAL_ZNWX_NOTHROW_T	"___real__ZnwjRKSt9nothrow_t"
-#define REAL_ZNAX_NOTHROW_T	"___real__ZnajRKSt9nothrow_t"
-#endif
 #define REAL_ZDLPV		_SYMSTR (__real__ZdlPv)
 #define REAL_ZDAPV		_SYMSTR (__real__ZdaPv)
 #define REAL_ZDLPV_NOTHROW_T	_SYMSTR (__real__ZdlPvRKSt9nothrow_t)
@@ -65,12 +58,8 @@ int _fmode;
 
 extern char __RUNTIME_PSEUDO_RELOC_LIST__;
 extern char __RUNTIME_PSEUDO_RELOC_LIST_END__;
-#ifdef __x86_64__
 extern char __image_base__;
 #define _image_base__ __image_base__
-#else
-extern char _image_base__;
-#endif
 
 struct per_process_cxx_malloc __cygwin_cxx_malloc =
 {

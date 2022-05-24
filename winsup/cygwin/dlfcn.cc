@@ -272,24 +272,6 @@ dlopen (const char *name, int flags)
 	    break;
 	}
 
-#ifdef __i386__
-      /* Workaround for broken DLLs built against Cygwin versions 1.7.0-49
-	 up to 1.7.0-57.  They override the cxx_malloc pointer in their
-	 DLL initialization code even if loaded dynamically.  This is a
-	 no-no since a later dlclose lets cxx_malloc point into nirvana.
-	 The below kludge "fixes" that by reverting the original cxx_malloc
-	 pointer after LoadLibrary.  This implies that their overrides
-	 won't be applied; that's OK.  All overrides should be present at
-	 final link time, as Windows doesn't allow undefined references;
-	 it would actually be wrong for a dlopen'd DLL to opportunistically
-	 override functions in a way that wasn't known then.  We're not
-	 going to try and reproduce the full ELF dynamic loader here!  */
-
-      /* Store original cxx_malloc pointer. */
-      struct per_process_cxx_malloc *tmp_malloc;
-      tmp_malloc = __cygwin_user_data.cxx_malloc;
-#endif
-
       ret = (void *) LoadLibraryW (wpath);
       /* reference counting */
       if (ret)
@@ -298,11 +280,6 @@ dlopen (const char *name, int flags)
 	  if (d)
 	    ++d->count;
 	}
-
-#ifdef __i386__
-      /* Restore original cxx_malloc pointer. */
-      __cygwin_user_data.cxx_malloc = tmp_malloc;
-#endif
 
       if (ret && gmheflags)
 	GetModuleHandleExW (gmheflags, wpath, (HMODULE *) &ret);

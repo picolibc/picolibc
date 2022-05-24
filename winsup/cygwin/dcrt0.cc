@@ -390,14 +390,6 @@ check_sanity_and_sync (per_process *p)
   if (p->api_major > cygwin_version.api_major)
     api_fatal ("cygwin DLL and APP are out of sync -- API version mismatch %u > %u",
 	       p->api_major, cygwin_version.api_major);
-
-#ifdef __i386__
-  /* This is a kludge to work around a version of _cygwin_common_crt0
-     which overwrote the cxx_malloc field with the local DLL copy.
-     Hilarity ensues if the DLL is not loaded while the process
-     is forking. */
-  __cygwin_user_data.cxx_malloc = &default_cygwin_cxx_malloc;
-#endif
 }
 
 child_info NO_COPY *child_proc_info;
@@ -581,17 +573,10 @@ get_cygwin_startup_info ()
   return res;
 }
 
-#ifdef __x86_64__
 #define dll_data_start &__data_start__
 #define dll_data_end &__data_end__
 #define dll_bss_start &__bss_start__
 #define dll_bss_end &__bss_end__
-#else
-#define dll_data_start &_data_start__
-#define dll_data_end &_data_end__
-#define dll_bss_start &_bss_start__
-#define dll_bss_end &_bss_end__
-#endif
 
 void
 child_info_fork::handle_fork ()
@@ -791,10 +776,8 @@ dll_crt0_0 ()
   if (!dynamically_loaded)
     sigproc_init ();
 
-#ifdef __x86_64__
   /* See comment preceeding myfault_altstack_handler in exception.cc. */
   AddVectoredContinueHandler (0, myfault_altstack_handler);
-#endif
 
   debug_printf ("finished dll_crt0_0 initialization");
 }
@@ -1221,7 +1204,6 @@ cygwin_atexit (void (*fn) (void))
   int res;
 
   dll *d = dlls.find ((void *) _my_tls.retaddr ());
-#ifdef __x86_64__
   /* x86_64 DLLs created with GCC 4.8.3-3 register __gcc_deregister_frame
      as atexit function using a call to atexit, rather than __cxa_atexit.
      Due to GCC's tail call optimizing, cygwin_atexit doesn't get the correct
@@ -1243,7 +1225,6 @@ cygwin_atexit (void (*fn) (void))
      use the statically linked atexit function though, as outlined above. */
   if (!d)
     d = dlls.find ((void *) fn);
-#endif
   res = d ? __cxa_atexit ((void (*) (void *)) fn, NULL, d->handle) : atexit (fn);
   return res;
 }

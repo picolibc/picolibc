@@ -50,13 +50,8 @@ char NO_COPY myself_nowait_dummy[1] = {'0'};
    This class can allocate memory.  But there's no need to free it
    because only one instance of the class is created per process. */
 class child_procs {
-#ifdef __i386__
-    static const int _NPROCS = 256;
-    static const int _NPROCS_2 = 1023;
-#else
     static const int _NPROCS = 1024;
     static const int _NPROCS_2 = 4095;
-#endif
     int _count;
     uint8_t _procs[_NPROCS * sizeof (pinfo)] __attribute__ ((__aligned__));
     pinfo *_procs_2;

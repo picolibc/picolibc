@@ -21,9 +21,7 @@ int dlmalloc_trim (size_t);
 int dlmallopt (int p, int v);
 void dlmalloc_stats ();
 
-#ifdef __x86_64__
 #define MALLOC_ALIGNMENT ((size_t)16U)
-#endif
 
 #if defined (DLMALLOC_VERSION)	/* Building malloc.cc */
 

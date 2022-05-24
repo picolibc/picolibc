@@ -630,11 +630,7 @@ pthread::cancel ()
       threadlist_t *tl_entry = cygheap->find_tls (cygtls);
       if (!cygtls->inside_kernel (&context))
 	{
-#ifdef __x86_64__
 	  context.Rip = (ULONG_PTR) pthread::static_cancel_self;
-#else
-	  context.Eip = (DWORD) pthread::static_cancel_self;
-#endif
 	  SetThreadContext (win32_obj_id, &context);
 	}
       cygheap->unlock_tls (tl_entry);

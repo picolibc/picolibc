@@ -330,11 +330,7 @@ struct per_process
   DWORD api_minor;		/*  linked with */
   /* For future expansion, so apps won't have to be relinked if we
      add an item. */
-#ifdef __x86_64__
   DWORD_PTR unused2[4];
-#else
-  DWORD_PTR unused2[2];
-#endif
 
   int (*posix_memalign)(void **, size_t, size_t);
 

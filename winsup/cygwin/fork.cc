@@ -626,11 +626,7 @@ dofork (void **proc, bool *with_forkables)
     ischild = !!setjmp (grouped.ch.jmp);
 
     volatile char * volatile stackp;
-#ifdef __x86_64__
     __asm__ volatile ("movq %%rsp,%0": "=r" (stackp));
-#else
-    __asm__ volatile ("movl %%esp,%0": "=r" (stackp));
-#endif
 
     if (!ischild)
       res = grouped.parent (stackp);

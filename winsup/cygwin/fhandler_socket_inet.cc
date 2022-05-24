@@ -12,7 +12,6 @@
 #define USE_SYS_TYPES_FD_SET
 
 #include "winsup.h"
-#ifdef __x86_64__
 /* 2014-04-24: Current Mingw headers define sockaddr_in6 using u_long (8 byte)
    because a redefinition for LP64 systems is missing.  This leads to a wrong
    definition and size of sockaddr_in6 when building with winsock headers.
@@ -20,7 +19,6 @@
    function calls. */
 #undef u_long
 #define u_long __ms_u_long
-#endif
 #include <w32api/ws2tcpip.h>
 #include <w32api/mswsock.h>
 #include <w32api/mstcpip.h>
@@ -696,13 +694,8 @@ fhandler_socket_wsock::set_socket_handle (SOCKET sock, int af, int type,
 	debug_printf ("Reset SIO_UDP_CONNRESET: WinSock error %u",
 		      WSAGetLastError ());
     }
-#ifdef __x86_64__
   rmem () = 212992;
   wmem () = 212992;
-#else
-  rmem () = 64512;
-  wmem () = 64512;
-#endif
   return 0;
 }
 
@@ -1147,12 +1140,8 @@ fhandler_socket_inet::recv_internal (LPWSAMSG wsamsg, bool use_recvmsg)
     if ((wsamsg->dwFlags & MSG_OOB) || oobinline)
       {
 	u_long atmark = 0;
-#ifdef __x86_64__
 	/* SIOCATMARK = _IOR('s',7,u_long) */
 	int err = ::ioctlsocket (get_socket (), _IOR('s',7,u_long), &atmark);
-#else
-	int err = ::ioctlsocket (get_socket (), SIOCATMARK, &atmark);
-#endif
 	if (err)
 	  {
 	    set_winsock_errno ();
@@ -1276,7 +1265,6 @@ fhandler_socket_wsock::recvfrom (void *in_ptr, size_t len, int flags,
 {
   char *ptr = (char *) in_ptr;
 
-#ifdef __x86_64__
   /* size_t is 64 bit, but the len member in WSABUF is 32 bit.
      Split buffer if necessary. */
   DWORD bufcnt = len / UINT32_MAX + ((!len || (len % UINT32_MAX)) ? 1 : 0);
@@ -1293,13 +1281,6 @@ fhandler_socket_wsock::recvfrom (void *in_ptr, size_t len, int flags,
       len -= wsaptr->len;
       ptr += wsaptr->len;
     }
-#else
-  WSABUF wsabuf = { len, ptr };
-  WSAMSG wsamsg = { from, from && fromlen ? *fromlen : 0,
-		    &wsabuf, 1,
-		    { 0, NULL},
-		    (DWORD) flags };
-#endif
   ssize_t ret = recv_internal (&wsamsg, false);
   if (fromlen)
     *fromlen = wsamsg.namelen;
@@ -1371,7 +1352,6 @@ fhandler_socket_wsock::read (void *in_ptr, size_t& len)
 {
   char *ptr = (char *) in_ptr;
 
-#ifdef __x86_64__
   /* size_t is 64 bit, but the len member in WSABUF is 32 bit.
      Split buffer if necessary. */
   DWORD bufcnt = len / UINT32_MAX + ((!len || (len % UINT32_MAX)) ? 1 : 0);
@@ -1385,11 +1365,6 @@ fhandler_socket_wsock::read (void *in_ptr, size_t& len)
       len -= wsaptr->len;
       ptr += wsaptr->len;
     }
-#else
-  WSABUF wsabuf = { len, ptr };
-  WSAMSG wsamsg = { NULL, 0, &wsabuf, 1, { 0,  NULL }, 0 };
-#endif
-
   len = recv_internal (&wsamsg, false);
 }
 
@@ -1539,7 +1514,6 @@ fhandler_socket_inet::sendto (const void *in_ptr, size_t len, int flags,
   if (to && get_inet_addr_inet (to, tolen, &sst, &tolen) == SOCKET_ERROR)
     return SOCKET_ERROR;
 
-#ifdef __x86_64__
   /* size_t is 64 bit, but the len member in WSABUF is 32 bit.
      Split buffer if necessary. */
   DWORD bufcnt = len / UINT32_MAX + ((!len || (len % UINT32_MAX)) ? 1 : 0);
@@ -1556,13 +1530,6 @@ fhandler_socket_inet::sendto (const void *in_ptr, size_t len, int flags,
       len -= wsaptr->len;
       ptr += wsaptr->len;
     }
-#else
-  WSABUF wsabuf = { len, ptr };
-  WSAMSG wsamsg = { to ? (struct sockaddr *) &sst : NULL, tolen,
-		    &wsabuf, 1,
-		    { 0, NULL},
-		    0 };
-#endif
   return send_internal (&wsamsg, flags);
 }
 
@@ -1690,7 +1657,6 @@ fhandler_socket_wsock::write (const void *in_ptr, size_t len)
 {
   char *ptr = (char *) in_ptr;
 
-#ifdef __x86_64__
   /* size_t is 64 bit, but the len member in WSABUF is 32 bit.
      Split buffer if necessary. */
   DWORD bufcnt = len / UINT32_MAX + ((!len || (len % UINT32_MAX)) ? 1 : 0);
@@ -1704,10 +1670,6 @@ fhandler_socket_wsock::write (const void *in_ptr, size_t len)
       len -= wsaptr->len;
       ptr += wsaptr->len;
     }
-#else
-  WSABUF wsabuf = { len, ptr };
-  WSAMSG wsamsg = { NULL, 0, &wsabuf, 1, { 0, NULL }, 0 };
-#endif
   return send_internal (&wsamsg, 0);
 }
 
@@ -2395,9 +2357,7 @@ fhandler_socket_wsock::ioctl (unsigned int cmd, void *p)
        and BSD systems defined as int pointer, so the applications will
        use a type of the expected size.  Hopefully. */
     case FIOASYNC:
-#ifdef __x86_64__
     case _IOW('f', 125, u_long):
-#endif
       res = WSAAsyncSelect (get_socket (), winmsg, WM_ASYNCIO,
 	      *(int *) p ? ASYNC_MASK : 0);
       syscall_printf ("Async I/O on socket %s",
@@ -2408,9 +2368,7 @@ fhandler_socket_wsock::ioctl (unsigned int cmd, void *p)
 	WSAEventSelect (get_socket (), wsock_evt, EVENT_MASK);
       break;
     case FIONREAD:
-#ifdef __x86_64__
     case _IOR('f', 127, u_long):
-#endif
       /* Make sure to use the Winsock definition of FIONREAD. */
       res = ::ioctlsocket (get_socket (), _IOR('f', 127, u_long), (u_long *) p);
       if (res == SOCKET_ERROR)
@@ -2420,11 +2378,9 @@ fhandler_socket_wsock::ioctl (unsigned int cmd, void *p)
     case SIOCATMARK:
       /* Sockets are always non-blocking internally.  So we just note the
 	 state here. */
-#ifdef __x86_64__
       /* Convert the different idea of u_long in the definition of cmd. */
       if (((cmd >> 16) & IOCPARM_MASK) == sizeof (unsigned long))
 	cmd = (cmd & ~(IOCPARM_MASK << 16)) | (sizeof (u_long) << 16);
-#endif
       if (cmd == FIONBIO)
 	{
 	  syscall_printf ("socket is now %sblocking",
@@ -2437,14 +2393,9 @@ fhandler_socket_wsock::ioctl (unsigned int cmd, void *p)
       /* In winsock, the return value of SIOCATMARK is FALSE if
 	 OOB data exists, TRUE otherwise. This is almost opposite
 	 to expectation. */
-#ifdef __x86_64__
       /* SIOCATMARK = _IOR('s',7,u_long) */
       if (cmd == _IOR('s',7,u_long) && !res)
 	*(u_long *)p = !*(u_long *)p;
-#else
-      if (cmd == SIOCATMARK && !res)
-	*(u_long *)p = !*(u_long *)p;
-#endif
       break;
     default:
       res = fhandler_socket::ioctl (cmd, p);

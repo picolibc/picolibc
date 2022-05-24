@@ -664,7 +664,6 @@ static struct
   {0, NULL},				/* _CS_POSIX_V6_ILP32_OFF32_LDFLAGS */
   {0, NULL},				/* _CS_POSIX_V6_ILP32_OFF32_LIBS */
   {0, NULL},				/* _CS_XBS5_ILP32_OFF32_LINTFLAGS */
-#ifdef __x86_64__
   {0, NULL},				/* _CS_POSIX_V6_ILP32_OFFBIG_CFLAGS */
   {0, NULL},				/* _CS_POSIX_V6_ILP32_OFFBIG_LDFLAGS */
   {0, NULL},				/* _CS_POSIX_V6_ILP32_OFFBIG_LIBS */
@@ -678,21 +677,6 @@ static struct
   {ls ("")},				/* _CS_POSIX_V6_LPBIG_OFFBIG_LIBS */
   {ls ("")},				/* _CS_XBS5_LPBIG_OFFBIG_LINTFLAGS */
   {ls ("POSIX_V6_LP64_OFF64")},		/* _CS_POSIX_V6_WIDTH_RESTRICTED_ENVS */
-#else
-  {ls ("")},				/* _CS_POSIX_V6_ILP32_OFFBIG_CFLAGS */
-  {ls ("")},				/* _CS_POSIX_V6_ILP32_OFFBIG_LDFLAGS */
-  {ls ("")},				/* _CS_POSIX_V6_ILP32_OFFBIG_LIBS */
-  {ls ("")},				/* _CS_XBS5_ILP32_OFFBIG_LINTFLAGS */
-  {0, NULL},				/* _CS_POSIX_V6_LP64_OFF64_CFLAGS */
-  {0, NULL},				/* _CS_POSIX_V6_LP64_OFF64_LDFLAGS */
-  {0, NULL},				/* _CS_POSIX_V6_LP64_OFF64_LIBS */
-  {0, NULL},				/* _CS_XBS5_LP64_OFF64_LINTFLAGS */
-  {0, NULL},				/* _CS_POSIX_V6_LPBIG_OFFBIG_CFLAGS */
-  {0, NULL},				/* _CS_POSIX_V6_LPBIG_OFFBIG_LDFLAGS */
-  {0, NULL},				/* _CS_POSIX_V6_LPBIG_OFFBIG_LIBS */
-  {0, NULL},				/* _CS_XBS5_LPBIG_OFFBIG_LINTFLAGS */
-  {ls ("POSIX_V6_ILP32_OFFBIG")},	/* _CS_POSIX_V6_WIDTH_RESTRICTED_ENVS */
-#endif
   {ls ("")},				/* _CS_POSIX_V7_THREADS_CFLAGS */
   {ls ("")},				/* _CS_POSIX_V7_THREADS_LDFLAGS */
   {ls ("POSIXLY_CORRECT=1")},		/* _CS_V7_ENV */

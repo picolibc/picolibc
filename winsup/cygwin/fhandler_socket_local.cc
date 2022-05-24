@@ -12,7 +12,6 @@
 #define USE_SYS_TYPES_FD_SET
 
 #include "winsup.h"
-#ifdef __x86_64__
 /* 2014-04-24: Current Mingw headers define sockaddr_in6 using u_long (8 byte)
    because a redefinition for LP64 systems is missing.  This leads to a wrong
    definition and size of sockaddr_in6 when building with winsock headers.
@@ -20,7 +19,6 @@
    function calls. */
 #undef u_long
 #define u_long __ms_u_long
-#endif
 #include "ntsecapi.h"
 #include <w32api/ws2tcpip.h>
 #include <w32api/mswsock.h>
@@ -1341,7 +1339,6 @@ fhandler_socket_local::sendto (const void *in_ptr, size_t len, int flags,
   if (to && get_inet_addr_local (to, tolen, &sst, &tolen) == SOCKET_ERROR)
     return SOCKET_ERROR;
 
-#ifdef __x86_64__
   /* size_t is 64 bit, but the len member in WSABUF is 32 bit.
      Split buffer if necessary. */
   DWORD bufcnt = len / UINT32_MAX + ((!len || (len % UINT32_MAX)) ? 1 : 0);
@@ -1358,13 +1355,6 @@ fhandler_socket_local::sendto (const void *in_ptr, size_t len, int flags,
       len -= wsaptr->len;
       ptr += wsaptr->len;
     }
-#else
-  WSABUF wsabuf = { len, ptr };
-  WSAMSG wsamsg = { to ? (struct sockaddr *) &sst : NULL, tolen,
-		    &wsabuf, 1,
-		    { 0, NULL},
-		    0 };
-#endif
   return send_internal (&wsamsg, flags);
 }
 

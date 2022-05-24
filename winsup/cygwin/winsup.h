@@ -156,11 +156,6 @@ extern "C" PVOID dll_dllcrt0 (HMODULE, per_process *);
 
 extern "C" void _pei386_runtime_relocator (per_process *);
 
-#ifdef __i386__
-/* dynamically loaded dll initialization for non-cygwin apps */
-extern "C" int dll_noncygwin_dllcrt0 (HMODULE, per_process *);
-#endif /* __i386__ */
-
 void do_exit (int) __attribute__ ((noreturn));
 
 /* libstdc++ malloc operator wrapper support.  */
@@ -259,12 +254,7 @@ extern inline bool flush_file_buffers (HANDLE h)
 #define NO_R ~(S_IRUSR | S_IRGRP | S_IROTH)
 #define NO_X ~(S_IXUSR | S_IXGRP | S_IXOTH)
 
-
-#ifdef __x86_64__
 extern "C" char __data_start__, __data_end__, __bss_start__, __bss_end__;
-#else
-extern "C" char _data_start__, _data_end__, _bss_start__, _bss_end__;
-#endif
 extern "C" void (*__CTOR_LIST__) (void);
 extern "C" void (*__DTOR_LIST__) (void);
 

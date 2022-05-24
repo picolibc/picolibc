@@ -222,11 +222,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
     }
   NTSTATUS status;
   SIZE_T viewsize = ssh_entry->size;
-#ifdef __x86_64__
   vm_object_t ptr = mmap_alloc.alloc (NULL, viewsize, false);
-#else
-  vm_object_t ptr = NULL;
-#endif
 
   ULONG access = (shmflg & SHM_RDONLY) ? PAGE_READONLY : PAGE_READWRITE;
   status = NtMapViewOfSection (ssh_entry->hdl, NtCurrentProcess (), &ptr, 0,

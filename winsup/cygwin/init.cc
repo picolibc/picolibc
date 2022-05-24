@@ -19,9 +19,6 @@ unsigned threadfunc_ix[8];
 static bool dll_finished_loading;
 #define OLDFUNC_OFFSET -1
 
-#ifdef __i386__
-__attribute__ ((force_align_arg_pointer))
-#endif
 static void WINAPI
 threadfunc_fe (VOID *arg)
 {

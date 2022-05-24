@@ -1104,9 +1104,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  ftcprint (features2, 12, "acc_power"); /* accum power */
 	}
 
-#if __x86_64__
       ftuprint ("nopl");	/* NOPL (0F 1F) instructions */
-#endif
 
 /* cpuid 0x0000000b ecx[8:15] type */
 #define BAD_TYPE    0

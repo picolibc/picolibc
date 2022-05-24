@@ -257,11 +257,7 @@ cygheap_init ()
 	 The idea is to have better matching bucket sizes (not wasting
 	 space) without trading in performance compared to the old powers
 	 of 2 method. */
-#ifdef __x86_64__
       unsigned sz[2] = { 16, 24 };	/* sizeof cygheap_entry == 16 */
-#else
-      unsigned sz[2] = { 8, 12 };	/* sizeof cygheap_entry == 8 */
-#endif
       for (unsigned b = 1; b < NBUCKETS; b++, sz[b & 1] <<= 1)
 	cygheap->bucket_val[b] = sz[b & 1];
       /* Default locale settings. */

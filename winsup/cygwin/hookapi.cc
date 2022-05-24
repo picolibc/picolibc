@@ -72,11 +72,7 @@ rvadelta (PIMAGE_NT_HEADERS pnt, DWORD import_rva, DWORD &max_size)
 static void *
 putmem (PIMAGE_THUNK_DATA pi, const void *hookfn)
 {
-#ifdef __x86_64__
 #define THUNK_FUNC_TYPE ULONGLONG
-#else
-#define THUNK_FUNC_TYPE DWORD
-#endif
 
   DWORD ofl;
   if (!VirtualProtect (pi, sizeof (THUNK_FUNC_TYPE), PAGE_READWRITE, &ofl) )
@@ -282,14 +278,7 @@ find_first_notloaded_dll (path_conv& pc)
   bool is_64bit;
   pExeNTHdr = PEHeaderFromHModule (hm, is_64bit);
 
-  if (!pExeNTHdr)
-    goto out;
-
-#ifdef __x86_64__
-  if (!is_64bit)
-#else
-  if (is_64bit)
-#endif
+  if (!pExeNTHdr || !is_64bit)
     goto out;
 
   importRVA = pExeNTHdr->OptionalHeader.DataDirectory
@@ -349,17 +338,9 @@ hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys, HANDLE h)
   bool is_64bit;
   PIMAGE_NT_HEADERS pExeNTHdr = PEHeaderFromHModule (hm, is_64bit);
 
-  if (!pExeNTHdr)
-    return NULL;
-
   /* Shortcut.  We don't have to do anything further from here, if the
-     executable's architecture doesn't match, unless we want to support
-     a mix of 32 and 64 bit Cygwin at one point. */
-#ifdef __x86_64__
-  if (!is_64bit)
-#else
-  if (is_64bit)
-#endif
+     executable's architecture doesn't match. */
+  if (!pExeNTHdr || !is_64bit)
     return NULL;
 
   DWORD importRVA, importRVASize;

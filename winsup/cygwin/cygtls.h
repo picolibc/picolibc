@@ -37,11 +37,7 @@ details. */
 #include "thread.h"
 #endif
 
-#ifdef __x86_64__
 #pragma pack(push,8)
-#else
-#pragma pack(push,4)
-#endif
 
 /* Defined here to support auto rebuild of tlsoffsets.h. */
 class tls_pathbuf

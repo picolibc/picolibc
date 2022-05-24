@@ -334,12 +334,8 @@ __import_address (void *imp)
       if (*((uint16_t *) imp) == 0x25ff)
 	{
 	  const char *ptr = (const char *) imp;
-#ifdef __x86_64__
 	  const uintptr_t *jmpto = (uintptr_t *)
 				   (ptr + 6 + *(int32_t *)(ptr + 2));
-#else
-	  const uintptr_t *jmpto = (uintptr_t *) *((uintptr_t *) (ptr + 2));
-#endif
 	  return (void *) *jmpto;
 	}
     }
@@ -417,41 +413,6 @@ pthread_wrapper (PVOID arg)
   /* Initialize new _cygtls. */
   _my_tls.init_thread (wrapper_arg.stackbase - __CYGTLS_PADSIZE__,
 		       (DWORD (*)(void*, void*)) wrapper_arg.func);
-#ifdef __i386__
-  /* Copy exception list over to new stack.  I'm not quite sure how the
-     exception list is extended by Windows itself.  What's clear is that it
-     always grows downwards and that it starts right at the stackbase.
-     Therefore we first count the number of exception records and place
-     the copy at the stackbase, too, so there's still a lot of room to
-     extend the list up to where our _cygtls region starts. */
-  _exception_list *old_start = (_exception_list *) teb->Tib.ExceptionList;
-  unsigned count = 0;
-  teb->Tib.ExceptionList = NULL;
-  for (_exception_list *e_ptr = old_start;
-       e_ptr && e_ptr != (_exception_list *) -1;
-       e_ptr = e_ptr->prev)
-    ++count;
-  if (count)
-    {
-      _exception_list *new_start = (_exception_list *) wrapper_arg.stackbase
-						       - count;
-      teb->Tib.ExceptionList = (struct _EXCEPTION_REGISTRATION_RECORD *)
-			       new_start;
-      while (true)
-	{
-	  new_start->handler = old_start->handler;
-	  if (old_start->prev == (_exception_list *) -1)
-	    {
-	      new_start->prev = (_exception_list *) -1;
-	      break;
-	    }
-	  new_start->prev = new_start + 1;
-	  new_start = new_start->prev;
-	  old_start = old_start->prev;
-	}
-    }
-#endif
-#ifdef __x86_64__
   __asm__ ("\n\
 	   leaq  %[WRAPPER_ARG], %%rbx	# Load &wrapper_arg into rbx	\n\
 	   movq  (%%rbx), %%r12		# Load thread func into r12	\n\
@@ -475,44 +436,11 @@ pthread_wrapper (PVOID arg)
 	   call  *%%r12			# Call thread func		\n"
 	   : : [WRAPPER_ARG] "o" (wrapper_arg),
 	       [CYGTLS] "i" (__CYGTLS_PADSIZE__));
-#else
-  __asm__ ("\n\
-	   leal  %[WRAPPER_ARG], %%ebx	# Load &wrapper_arg into ebx	\n\
-	   movl  (%%ebx), %%eax		# Load thread func into eax	\n\
-	   movl  4(%%ebx), %%ecx	# Load thread arg into ecx	\n\
-	   movl  8(%%ebx), %%edx	# Load stackaddr into edx	\n\
-	   movl  12(%%ebx), %%ebx	# Load stackbase into ebx	\n\
-	   subl  %[CYGTLS], %%ebx	# Subtract __CYGTLS_PADSIZE__	\n\
-	   subl  $4, %%ebx		# Subtract another 4 bytes	\n\
-	   movl  %%ebx, %%esp		# Set esp			\n\
-	   xorl  %%ebp, %%ebp		# Set ebp to 0			\n\
-	   # Make gcc 3.x happy and align the stack so that it is	\n\
-	   # 16 byte aligned right before the final call opcode.	\n\
-	   andl  $-16, %%esp		# 16 byte align			\n\
-	   addl  $-12, %%esp		# 12 bytes + 4 byte arg = 16	\n\
-	   # Now we moved to the new stack.  Save thread func address	\n\
-	   # and thread arg on new stack				\n\
-	   pushl %%ecx			# Push thread arg onto stack	\n\
-	   pushl %%eax			# Push thread func onto stack	\n\
-	   # Now it's safe to release the OS stack.			\n\
-	   pushl $0x8000		# dwFreeType: MEM_RELEASE	\n\
-	   pushl $0x0			# dwSize:     0			\n\
-	   pushl %%edx			# lpAddress:  stackaddr		\n\
-	   call _VirtualFree@12		# Shoot				\n\
-	   # All set.  We can pop the thread function address from	\n\
-	   # the stack and call it.  The thread arg is still on the	\n\
-	   # stack in the expected spot.				\n\
-	   popl  %%eax			# Pop thread_func address	\n\
-	   call  *%%eax			# Call thread func		\n"
-	   : : [WRAPPER_ARG] "o" (wrapper_arg),
-	       [CYGTLS] "i" (__CYGTLS_PADSIZE__));
-#endif
   /* pthread::thread_init_wrapper calls pthread::exit, which
      in turn calls ExitThread, so we should never arrive here. */
   api_fatal ("Dumb thinko in pthread handling.  Whip the developer.");
 }
 
-#ifdef __x86_64__
 /* The memory region used for thread stacks. The memory layout is outlined
    in heap.cc, function eval_start_address(). */
 #define THREAD_STORAGE_LOW	0x600000000L
@@ -665,7 +593,6 @@ create_new_main_thread_stack (PVOID &allocationbase)
   NtCurrentTeb()->Tib.StackLimit = stacklimit;
   return ((PBYTE) allocationbase + stacksize - 16);
 }
-#endif
 
 HANDLE WINAPI
 CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
@@ -710,17 +637,7 @@ CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
       real_stacksize = roundup2 (real_stacksize,
 				 wincap.allocation_granularity ());
       /* Reserve stack. */
-#ifdef __x86_64__
       real_stackaddr = thr_alloc.alloc (real_stacksize);
-#else
-      /* FIXME? If the TOP_DOWN method tends to collide too much with
-	 other stuff, we should provide our own mechanism to find a
-	 suitable place for the stack.  Top down from the start of
-	 the Cygwin DLL comes to mind. */
-      real_stackaddr = VirtualAlloc (NULL, real_stacksize,
-				     MEM_RESERVE | MEM_TOP_DOWN,
-				     PAGE_READWRITE);
-#endif
       if (!real_stackaddr)
 	return NULL;
       /* Set up committed region.  We set up the stack like the OS does,
@@ -781,7 +698,6 @@ err:
   return thread;
 }
 
-#ifdef __x86_64__
 /* These functions are almost verbatim FreeBSD code (even if the header of
    one file mentiones NetBSD), just wrapped in the minimum required code to
    make them work with the MS AMD64 ABI.
@@ -984,8 +900,6 @@ wmempcpy:								\n\
 	.seh_endproc							\n\
 ");
 
-#endif
-
 /* Signal the thread name to any attached debugger
 
    (See "How to: Set a Thread Name in Native Code"
@@ -1004,17 +918,7 @@ SetThreadName(DWORD dwThreadID, const char* threadName)
       0x1000,                 /* type, must be 0x1000 */
       (ULONG_PTR) threadName, /* pointer to threadname */
       dwThreadID,             /* thread ID (+ flags on x86_64) */
-#ifdef _X86_
-      0,                      /* flags, must be zero */
-#endif
     };
-
-#ifdef _X86_
-  /* On x86, for __try/__except to work, we must ensure our exception handler is
-     installed, which may not be the case if this is being called during early
-     initialization. */
-  exception protect;
-#endif
 
   __try
     {

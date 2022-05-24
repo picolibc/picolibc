@@ -8,7 +8,6 @@ details. */
 
 /* From the GCC source file libgcc/unwind-seh.c. */
 
-#ifdef __x86_64__
 #define STATUS_USER_DEFINED		(1U << 29)
 #define GCC_MAGIC			(('G' << 16) | ('C' << 8) | 'C')
 #define GCC_EXCEPTION(TYPE)		\
@@ -16,4 +15,3 @@ details. */
 #define STATUS_GCC_THROW		GCC_EXCEPTION (0)
 #define STATUS_GCC_UNWIND		GCC_EXCEPTION (1)
 #define STATUS_GCC_FORCED		GCC_EXCEPTION (2)
-#endif

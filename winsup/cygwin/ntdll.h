@@ -1377,7 +1377,6 @@ typedef enum _SECTION_INHERIT
 
 typedef VOID (APIENTRY *PTIMER_APC_ROUTINE)(PVOID, ULONG, ULONG);
 
-#ifdef __x86_64__
 typedef struct _SCOPE_TABLE
 {
   ULONG Count;
@@ -1389,7 +1388,6 @@ typedef struct _SCOPE_TABLE
     ULONG JumpTarget;
   } ScopeRecord[1];
 } SCOPE_TABLE, *PSCOPE_TABLE;
-#endif
 
 #ifdef __cplusplus
 /* This is the mapping of the KUSER_SHARED_DATA structure into the user

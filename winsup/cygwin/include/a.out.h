@@ -391,9 +391,6 @@ typedef struct
   uint32_t bsize;		/* uninitialized data "   "		*/
   uint32_t entry;		/* entry pt.				*/
   uint32_t text_start;	/* base of text used for this file */
-#ifdef __i386__
-  uint32_t data_start;	/* base of all data used for this file */
-#endif
 
   /* NT extra fields; see internal.h for descriptions */
   uintptr_t ImageBase;
@@ -424,11 +421,7 @@ typedef struct
 
 
 #undef AOUTSZ
-#ifdef __x86_64__
 #define AOUTSZ (AOUTHDRSZ + 212)
-#else
-#define AOUTSZ (AOUTHDRSZ + 196)
-#endif
 
 #undef  E_FILNMLEN
 #define E_FILNMLEN	18	/* # characters in a file name		*/

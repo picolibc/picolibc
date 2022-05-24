@@ -12,13 +12,11 @@ details. */
 #define USE_SYS_TYPES_FD_SET
 #define __WSA_ERR_MACROS_DEFINED
 #include "winsup.h"
-#ifdef __x86_64__
 /* 2014-04-24: Current Mingw headers define sockaddr_in6 using u_long (8 byte)
    because a redefinition for LP64 systems is missing.  This leads to a wrong
    definition and size of sockaddr_in6 when building with winsock headers. */
 #undef u_long
 #define u_long __ms_u_long
-#endif
 #include <w32api/ws2tcpip.h>
 #include <w32api/mswsock.h>
 #include <w32api/iphlpapi.h>
@@ -290,7 +288,6 @@ realloc_ent (int sz, hostent *)
    The 'unionent' struct is a union of all of the currently used
    *ent structure.  */
 
-#ifdef __x86_64__
 /* For some baffling reason, somebody at Microsoft decided that it would be
    a good idea to exchange the s_port and s_proto members in the servent
    structure. */
@@ -302,9 +299,6 @@ struct win64_servent
   short  s_port;
 };
 #define WIN_SERVENT(x)	((win64_servent *)(x))
-#else
-#define WIN_SERVENT(x)	((servent *)(x))
-#endif
 
 #ifdef DEBUGGING
 static void *
@@ -3078,11 +3072,9 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
 	  /* sizeof addrinfo == sizeof addrinfoW */
 	  memcpy (&whints, hints, sizeof whints);
 	  whints.ai_flags &= ~AI_IDN_MASK;
-#ifdef __x86_64__
 	  /* ai_addrlen is socklen_t (4 bytes) in POSIX but size_t (8 bytes) in
 	     Winsock.  Sert upper 4 bytes explicitely to 0 to avoid EAI_FAIL. */
 	  whints.ai_addrlen &= UINT32_MAX;
-#endif
 	  /* On Windows, the default behaviour is as if AI_ADDRCONFIG is set,
 	     apparently for performance reasons.  To get the POSIX default
 	     behaviour, the AI_ALL flag has to be set. */

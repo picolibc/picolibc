@@ -66,7 +66,6 @@ bool NO_COPY wsock_started;
 /* LoadDLLprime is used to prime the DLL info information, providing an
    additional initialization routine to call prior to calling the first
    function.  */
-#ifdef __x86_64__
 #define LoadDLLprime(dllname, init_also, no_resolve_on_fork) __asm__ ("	\n\
 .ifndef " #dllname "_primed				\n\
   .section	.data_cygwin_nocopy,\"w\"		\n\
@@ -82,25 +81,6 @@ bool NO_COPY wsock_started;
   .set		" #dllname "_primed, 1			\n\
 .endif							\n\
 ");
-#else
-#define LoadDLLprime(dllname, init_also, no_resolve_on_fork) __asm__ ("	\n\
-.ifndef " #dllname "_primed				\n\
-  .section	.data_cygwin_nocopy,\"w\"		\n\
-  .align	4					\n\
-."#dllname "_info:					\n\
-  .long		_std_dll_init				\n\
-  .long		" #no_resolve_on_fork "			\n\
-  .long		-1					\n\
-  .long		" #init_also "				\n\
-  .string16	\"" #dllname ".dll\"			\n\
-  .text							\n\
-  .set		" #dllname "_primed, 1			\n\
-.endif							\n\
-");
-#endif
-
-/* Create a "decorated" name */
-#define mangle(name, n) #name "@" #n
 
 /* Standard DLL load macro.  May invoke a fatal error if the function isn't
    found. */
@@ -112,7 +92,6 @@ bool NO_COPY wsock_started;
   LoadDLLfuncEx3(name, n, dllname, notimp, err, 0)
 
 /* Main DLL setup stuff. */
-#ifdef __x86_64__
 #define LoadDLLfuncEx3(name, n, dllname, notimp, err, no_resolve_on_fork) \
   LoadDLLprime (dllname, dll_func_load, no_resolve_on_fork) \
   __asm__ ("						\n\
@@ -137,26 +116,6 @@ _win32_" #name ":					\n\
   .asciz	\"" #name "\"				\n\
   .text							\n\
 ");
-#else
-#define LoadDLLfuncEx3(name, n, dllname, notimp, err, no_resolve_on_fork) \
-  LoadDLLprime (dllname, dll_func_load, no_resolve_on_fork) \
-  __asm__ ("						\n\
-  .section	." #dllname "_autoload_text,\"wx\"	\n\
-  .global	_" mangle (name, n) "			\n\
-  .global	_win32_" mangle (name, n) "		\n\
-  .align	8					\n\
-_" mangle (name, n) ":					\n\
-_win32_" mangle (name, n) ":				\n\
-  .byte		0xe9					\n\
-  .long		-4 + 1f - .				\n\
-1:movl		(2f),%eax				\n\
-   call		*(%eax)					\n\
-2:.long		." #dllname "_info			\n\
-  .long		(" #n "+" #notimp ") | (((" #err ") & 0xff) <<16) \n\
-  .asciz	\"" #name "\"				\n\
-  .text							\n\
-");
-#endif
 
 /* DLL loader helper functions used during initialization. */
 
@@ -172,7 +131,6 @@ extern "C" void dll_chain () __asm__ ("dll_chain");
 
 extern "C" {
 
-#ifdef __x86_64__
 __asm__ ("								\n\
 	 .section .rdata,\"r\"							\n\
 msg1:									\n\
@@ -234,66 +192,6 @@ dll_chain:								\n\
 	push	%rax		# Restore 'return address'		\n\
 	jmp	*%rdx		# Jump to next init function		\n\
 ");
-#else
-__asm__ ("								\n\
-	 .text								\n\
-msg1:									\n\
-	.ascii	\"couldn't dynamically determine load address for '%s' (handle %p), %E\\0\"\n\
-									\n\
-	.align	32							\n\
-noload:									\n\
-	popl	%edx		# Get the address of the information block\n\
-	movl	4(%edx),%eax	# Should we 'ignore' the lack		\n\
-	test	$1,%eax		#  of this function?			\n\
-	jz	1f		# Nope.					\n\
-	decl	%eax		# Yes.  This is the # of bytes + 1	\n\
-	popl	%edx		# Caller's caller			\n\
-	addl	%eax,%esp	# Pop off bytes				\n\
-	andl	$0xffff0000,%eax# upper word				\n\
-	subl	%eax,%esp	# adjust for possible return value	\n\
-	pushl	%eax		# Save return value for later		\n\
-	pushl	%edx		# Save return address for later		\n\
-	movl	$127,%eax	# ERROR_PROC_NOT_FOUND			\n\
-	pushl	%eax		# First argument			\n\
-	call	_SetLastError@4	# Set it				\n\
-	popl	%edx		# Get back return address		\n\
-	popl	%eax		# Get back return value			\n\
-	sarl	$16,%eax	# return value in high order word	\n\
-	jmp	*%edx		# Return				\n\
-1:									\n\
-	movl	(%edx),%eax	# Handle value				\n\
-	pushl	4(%eax)							\n\
-	leal	8(%edx),%eax	# Location of name of function		\n\
-	pushl	%eax							\n\
-	pushl	$msg1		# The message				\n\
-	call	_api_fatal	# Print message. Never returns		\n\
-									\n\
-	.globl	dll_func_load						\n\
-dll_func_load:								\n\
-	movl	(%esp),%eax	# 'Return address' contains load info	\n\
-	addl	$8,%eax		# Address of name of function to load	\n\
-	pushl	%eax		# Second argument			\n\
-	movl	-8(%eax),%eax	# Where handle lives			\n\
-	movl	4(%eax),%eax	# Address of Handle to DLL		\n\
-	pushl	%eax		# Handle to DLL				\n\
-	call	_GetProcAddress@8# Load it				\n\
-	test	%eax,%eax	# Success?				\n\
-	jne	gotit		# Yes					\n\
-	jmp	noload		# Issue an error or return		\n\
-gotit:									\n\
-	popl	%edx		# Pointer to 'return address'		\n\
-	subl	%edx,%eax	# Make it relative			\n\
-	addl	$7,%eax		# Tweak					\n\
-	subl	$12,%edx	# Point to jmp				\n\
-	movl	%eax,1(%edx)	# Move relative address after jump	\n\
-	jmp	*%edx		# Jump to actual function		\n\
-									\n\
-	.global	dll_chain						\n\
-dll_chain:								\n\
-	pushl	%eax		# Restore 'return address'		\n\
-	jmp	*%edx		# Jump to next init function		\n\
-");
-#endif
 
 /* C representations of the two info blocks described above.
    FIXME: These structures confuse gdb for some reason.  GDB can print
@@ -311,18 +209,12 @@ struct func_info
 {
   struct dll_info *dll;
   LONG decoration;
-#ifdef __x86_64__
   UINT_PTR func_addr;
-#endif
   char name[];
 };
 
 /* Mechanism for setting up info for passing to dll_chain routines. */
-#ifdef __x86_64__
 typedef __uint128_t two_addr_t;
-#else
-typedef __uint64_t two_addr_t;
-#endif
 union retchain
 {
   struct {uintptr_t high; uintptr_t low;};
@@ -354,7 +246,6 @@ dll_load (HANDLE& handle, PWCHAR name)
 #define RETRY_COUNT 10
 
 /* The standard DLL initialization routine. */
-#ifdef __x86_64__
 
 /* On x86_64, we need assembler wrappers for std_dll_init and wsock_init.
    In the x86_64 ABI it's no safe bet that frame[1] (aka 8(%rbp)) contains
@@ -396,14 +287,7 @@ INIT_WRAPPER (std_dll_init)
 
 __attribute__ ((used, noinline)) static two_addr_t
 std_dll_init (struct func_info *func)
-#else
-__attribute__ ((used, noinline)) static two_addr_t
-std_dll_init ()
-#endif
 {
-#ifdef __i386__
-  struct func_info *func = (struct func_info *) __builtin_return_address (0);
-#endif
   struct dll_info *dll = func->dll;
   retchain ret;
 
@@ -452,37 +336,22 @@ std_dll_init ()
   ret.high = (uintptr_t) func;
 
   InterlockedDecrement (&dll->here);
-
-#ifdef __i386__
-  /* Kludge alert.  Redirects the return address to dll_chain. */
-  uintptr_t *volatile frame = (uintptr_t *) __builtin_frame_address (0);
-  frame[1] = (uintptr_t) dll_chain;
-#endif
-
   return ret.ll;
 }
 
 /* Initialization function for winsock stuff. */
 
-#ifdef __x86_64__
 /* See above comment preceeding std_dll_init. */
 INIT_WRAPPER (wsock_init)
 
 __attribute__ ((used, noinline)) static two_addr_t
 wsock_init (struct func_info *func)
-#else
-__attribute__ ((used, noinline)) static two_addr_t
-wsock_init ()
-#endif
 {
   /* CV 2016-03-09: Moved wsadata into wsock_init to workaround a problem
      with the NO_COPY definition of wsadata and here starting with gcc-5.3.0.
      See the git log for a description. */
   static WSADATA NO_COPY wsadata;
   static LONG NO_COPY here = -1L;
-#ifdef __i386__
-  struct func_info *func = (struct func_info *) __builtin_return_address (0);
-#endif
   struct dll_info *dll = func->dll;
 
   while (InterlockedIncrement (&here))
@@ -513,15 +382,7 @@ wsock_init ()
 	  wsock_started = 1;
 	}
     }
-
-#ifdef __i386__
-  /* Kludge alert.  Redirects the return address to dll_chain. */
-  uintptr_t *volatile frame = (uintptr_t *) __builtin_frame_address (0);
-  frame[1] = (uintptr_t) dll_chain;
-#endif
-
   InterlockedDecrement (&here);
-
   volatile retchain ret;
   /* Set "arguments for dll_chain. */
   ret.low = (uintptr_t) dll_func_load;
@@ -596,10 +457,6 @@ LoadDLLfunc (VirtualAlloc2, 28, KernelBase)
 
 LoadDLLfunc (NtMapViewOfSectionEx, 36, ntdll)
 
-/* ldap functions are cdecl! */
-#pragma push_macro ("mangle")
-#undef mangle
-#define mangle(name, n) #name
 LoadDLLfunc (ldap_bind_s, 0, wldap32)
 LoadDLLfunc (ldap_count_entries, 0, wldap32)
 LoadDLLfunc (ldap_count_valuesW, 0, wldap32)
@@ -620,7 +477,6 @@ LoadDLLfunc (ldap_value_freeW, 0, wldap32)
 LoadDLLfunc (ldap_value_free_len, 0, wldap32)
 LoadDLLfunc (LdapGetLastError, 0, wldap32)
 LoadDLLfunc (LdapMapErrorToWin32, 0, wldap32)
-#pragma pop_macro ("mangle")
 
 LoadDLLfunc (WNetCloseEnum, 4, mpr)
 LoadDLLfunc (WNetEnumResourceW, 16, mpr)

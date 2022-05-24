@@ -1,5 +1,3 @@
-#ifdef __x86_64__
-
 #include "winsup.h"
 #include "mmap_alloc.h"
 #include <sys/param.h>
@@ -78,5 +76,3 @@ mmap_allocator::alloc (PVOID in_addr, SIZE_T in_size, bool fixed)
 }
 
 mmap_allocator mmap_alloc;	/* Inherited by forked child. */
-
-#endif
