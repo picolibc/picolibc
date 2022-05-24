@@ -90,10 +90,11 @@ fmemreader (struct _reent *ptr,
        _READ_WRITE_BUFSIZE_TYPE n)
 {
   fmemcookie *c = (fmemcookie *) cookie;
+  (void) ptr;
   /* Can't read beyond current size, but EOF condition is not an error.  */
   if (c->pos > c->eof)
     return 0;
-  if (n >= c->eof - c->pos)
+  if (n >= 0 && (size_t) n >= c->eof - c->pos)
     n = c->eof - c->pos;
   memcpy (buf, c->buf + c->pos, n);
   c->pos += n;
@@ -111,6 +112,7 @@ fmemwriter (struct _reent *ptr,
   fmemcookie *c = (fmemcookie *) cookie;
   int adjust = 0; /* true if at EOF, but still need to write NUL.  */
 
+  (void) ptr;
   /* Append always seeks to eof; otherwise, if we have previously done
      a seek beyond eof, ensure all intermediate bytes are NUL.  */
   if (c->append)
@@ -170,6 +172,7 @@ fmemseeker (struct _reent *ptr,
   _off64_t offset = (_off64_t) pos;
 #endif /* __LARGE64_FILES */
 
+  (void) ptr;
   if (whence == SEEK_CUR)
     offset += c->pos;
   else if (whence == SEEK_END)
@@ -179,7 +182,7 @@ fmemseeker (struct _reent *ptr,
       __errno_r(ptr) = EINVAL;
       offset = -1;
     }
-  else if (offset > c->max)
+  else if (offset > (off_t) c->max)
     {
       __errno_r(ptr) = ENOSPC;
       offset = -1;
@@ -219,6 +222,7 @@ fmemseeker64 (struct _reent *ptr,
 {
   _off64_t offset = (_off64_t) pos;
   fmemcookie *c = (fmemcookie *) cookie;
+  (void) ptr;
   if (whence == SEEK_CUR)
     offset += c->pos;
   else if (whence == SEEK_END)
@@ -228,7 +232,7 @@ fmemseeker64 (struct _reent *ptr,
       __errno_r(ptr) = EINVAL;
       offset = -1;
     }
-  else if (offset > c->max)
+  else if (offset > (_off64_t) c->max)
     {
       __errno_r(ptr) = ENOSPC;
       offset = -1;
@@ -257,6 +261,7 @@ fmemcloser (struct _reent *ptr,
        void *cookie)
 {
   fmemcookie *c = (fmemcookie *) cookie;
+  (void) ptr;
   free (c->storage);
   return 0;
 }
@@ -317,7 +322,7 @@ _fmemopen_r (struct _reent *ptr,
 	case 'a':
 	  /* a/a+ and buf: position and size at first NUL.  */
 	  buf = memchr (c->buf, '\0', size);
-	  c->eof = c->pos = buf ? (char *) buf - c->buf : size;
+	  c->eof = c->pos = buf ? (size_t) ((char *) buf - c->buf) : size;
 	  if (!buf && c->writeonly)
 	    /* a: guarantee a NUL within size even if no writes.  */
 	    c->buf[size - 1] = '\0';

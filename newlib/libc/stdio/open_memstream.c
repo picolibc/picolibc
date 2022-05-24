@@ -102,6 +102,7 @@ memwriter (struct _reent *ptr,
   memstream *c = (memstream *) cookie;
   char *cbuf = *c->pbuf;
 
+  (void) ptr;
   /* size_t is unsigned, but off_t is signed.  Don't let stream get so
      big that user cannot do ftello.  */
   if (sizeof (OFF_T) == sizeof (size_t) && (ssize_t) (c->pos + n) < 0)
@@ -155,6 +156,7 @@ memseeker (struct _reent *ptr,
   memstream *c = (memstream *) cookie;
   OFF_T offset = (OFF_T) pos;
 
+  (void) ptr;
   if (whence == SEEK_CUR)
     offset += c->pos;
   else if (whence == SEEK_END)
@@ -164,7 +166,7 @@ memseeker (struct _reent *ptr,
       __errno_r(ptr) = EINVAL;
       offset = -1;
     }
-  else if ((size_t) offset != offset)
+  else if ((OFF_T) (size_t) offset != offset)
     {
       __errno_r(ptr) = ENOSPC;
       offset = -1;
@@ -222,6 +224,7 @@ memseeker64 (struct _reent *ptr,
   _off64_t offset = (_off64_t) pos;
   memstream *c = (memstream *) cookie;
 
+  (void) ptr;
   if (whence == SEEK_CUR)
     offset += c->pos;
   else if (whence == SEEK_END)
@@ -231,7 +234,7 @@ memseeker64 (struct _reent *ptr,
       __errno_r(ptr) = EINVAL;
       offset = -1;
     }
-  else if ((size_t) offset != offset)
+  else if ((_off64_t) (size_t) offset != offset)
     {
       __errno_r(ptr) = ENOSPC;
       offset = -1;
@@ -279,6 +282,7 @@ memcloser (struct _reent *ptr,
   memstream *c = (memstream *) cookie;
   char *buf;
 
+  (void) ptr;
   /* Be nice and try to reduce any unused memory.  */
   buf = realloc (*c->pbuf,
 		    c->wide > 0 ? (*c->psize + 1) * sizeof (wchar_t)

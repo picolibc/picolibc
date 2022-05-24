@@ -105,6 +105,7 @@ fcreader (struct _reent *ptr,
 {
   int result;
   fccookie *c = (fccookie *) cookie;
+  (void) ptr;
   errno = 0;
   if ((result = c->readfn (c->cookie, buf, n)) < 0 && errno)
     __errno_r(ptr) = errno;
@@ -146,6 +147,7 @@ fcseeker (struct _reent *ptr,
   _off64_t offset = (_off64_t) pos;
 #endif /* __LARGE64_FILES */
 
+  (void) ptr;
   errno = 0;
   if (c->seekfn (c->cookie, &offset, whence) < 0 && errno)
     __errno_r(ptr) = errno;
@@ -166,8 +168,9 @@ fcseeker64 (struct _reent *ptr,
        _fpos64_t pos,
        int whence)
 {
-  _off64_t offset;
+  _off64_t offset = (_off64_t) pos;
   fccookie *c = (fccookie *) cookie;
+  (void) ptr;
   errno = 0;
   if (c->seekfn (c->cookie, &offset, whence) < 0 && errno)
     __errno_r(ptr) = errno;
@@ -181,6 +184,7 @@ fccloser (struct _reent *ptr,
 {
   int result = 0;
   fccookie *c = (fccookie *) cookie;
+  (void) ptr;
   if (c->closefn)
     {
       errno = 0;
@@ -202,6 +206,7 @@ _fopencookie_r (struct _reent *ptr,
   int flags;
   int dummy;
 
+  (void) ptr;
   if ((flags = __sflags (ptr, mode, &dummy)) == 0)
     return NULL;
   if (((flags & (__SRD | __SRW)) && !functions.read)

@@ -56,7 +56,7 @@ _vswprintf_r (struct _reent *ptr,
   if (size > 0)  {
     *(wchar_t *)f._p = L'\0';	/* terminate the string */
   }
-  if(ret >= size)  {
+  if(ret >= 0 && (size_t) ret >= size)  {
     /* _svfwprintf_r() returns how many wide characters it would have printed
      * if there were enough space.  Return an error if too big to fit in str,
      * unlike snprintf, which returns the size needed.  */
