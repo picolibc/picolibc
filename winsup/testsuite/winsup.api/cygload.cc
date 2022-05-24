@@ -152,8 +152,6 @@ cygwin::connector::connector (const char *dll)
   // Pick up the function pointers for the basic infrastructure.
   get_symbol ("__errno", _errno);
   get_symbol ("strerror", _strerror);
-  get_symbol ("cygwin_conv_to_full_posix_path", _conv_to_full_posix_path);
-  get_symbol ("cygwin_conv_to_full_win32_path", _conv_to_full_win32_path);
 
   // Note that you need to be running an interruptible cygwin function if
   // you want to receive signals.  You can use the standard signal()

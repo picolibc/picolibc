@@ -4029,40 +4029,6 @@ cygwin_create_path (cygwin_conv_path_t what, const void *from)
   return to;
 }
 
-#ifdef __i386__
-
-extern "C" int
-cygwin_conv_to_win32_path (const char *path, char *win32_path)
-{
-  return cygwin_conv_path (CCP_POSIX_TO_WIN_A | CCP_RELATIVE, path, win32_path,
-			   MAX_PATH);
-}
-
-extern "C" int
-cygwin_conv_to_full_win32_path (const char *path, char *win32_path)
-{
-  return cygwin_conv_path (CCP_POSIX_TO_WIN_A | CCP_ABSOLUTE, path, win32_path,
-			   MAX_PATH);
-}
-
-/* This is exported to the world as cygwin_foo by cygwin.din.  */
-
-extern "C" int
-cygwin_conv_to_posix_path (const char *path, char *posix_path)
-{
-  return cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_RELATIVE, path, posix_path,
-			   MAX_PATH);
-}
-
-extern "C" int
-cygwin_conv_to_full_posix_path (const char *path, char *posix_path)
-{
-  return cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE, path, posix_path,
-			   MAX_PATH);
-}
-
-#endif /* __i386__ */
-
 /* The realpath function is required by POSIX:2008.  */
 
 extern "C" char *
@@ -4210,36 +4176,6 @@ env_PATH_to_posix (const void *win32, void *posix, size_t size)
   return_with_errno (conv_path_list ((const char *) win32, (char *) posix,
 				     size, ENV_CVT));
 }
-
-#ifdef __i386__
-
-extern "C" int
-cygwin_win32_to_posix_path_list_buf_size (const char *path_list)
-{
-  return conv_path_list_buf_size (path_list, true);
-}
-
-extern "C" int
-cygwin_posix_to_win32_path_list_buf_size (const char *path_list)
-{
-  return conv_path_list_buf_size (path_list, false);
-}
-
-extern "C" int
-cygwin_win32_to_posix_path_list (const char *win32, char *posix)
-{
-  return_with_errno (conv_path_list (win32, posix, MAX_PATH,
-		     CCP_WIN_A_TO_POSIX | CCP_RELATIVE));
-}
-
-extern "C" int
-cygwin_posix_to_win32_path_list (const char *posix, char *win32)
-{
-  return_with_errno (conv_path_list (posix, win32, MAX_PATH,
-		     CCP_POSIX_TO_WIN_A | CCP_RELATIVE));
-}
-
-#endif /* __i386__ */
 
 extern "C" ssize_t
 cygwin_conv_path_list (cygwin_conv_path_t what, const void *from, void *to,
