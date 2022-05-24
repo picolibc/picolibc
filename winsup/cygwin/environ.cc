@@ -626,7 +626,6 @@ _addenv (const char *name, const char *value, int overwrite)
 	}
 
       __cygwin_environ[offset + 1] = NULL;	/* NULL terminate. */
-      update_envptrs ();	/* Update any local copies of 'environ'. */
     }
 
   char *envhere;
@@ -742,7 +741,6 @@ clearenv (void)
 	  lastenviron = NULL;
 	}
       __cygwin_environ = NULL;
-      update_envptrs ();
       return 0;
     }
   __except (EFAULT) {}
@@ -845,7 +843,6 @@ environ_init (char **envp, int envc)
     out:
       findenv_func = (char * (*)(const char*, int*)) my_findenv;
       __cygwin_environ = envp;
-      update_envptrs ();
       if (envp_passed_in)
 	{
 	  p = getenv ("CYGWIN");
@@ -1311,21 +1308,3 @@ build_env (const char * const *envp, PWCHAR &envblock, int &envc,
   debug_printf ("envp %p, envc %d", newenv, envc);
   return newenv;
 }
-
-#ifdef __i386__
-/* This idiocy is necessary because the early implementers of cygwin
-   did not seem to know about importing data variables from the DLL.
-   So, we have to synchronize cygwin's idea of the environment with the
-   main program's with each reference to the environment. */
-extern "C" char ** __stdcall
-cur_environ ()
-{
-  if (*main_environ != __cygwin_environ)
-    {
-      __cygwin_environ = *main_environ;
-      update_envptrs ();
-    }
-
-  return __cygwin_environ;
-}
-#endif

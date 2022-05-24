@@ -1019,11 +1019,7 @@ dll_crt0_1 (void *)
       sig_dispatch_pending (false);
       _my_tls.call_signal_handler ();
       _my_tls.incyg--;	/* Not in Cygwin anymore */
-#ifdef __x86_64__
       cygwin_exit (user_data->main (__argc, newargv, __cygwin_environ));
-#else
-      cygwin_exit (user_data->main (__argc, newargv, *user_data->envptr));
-#endif
     }
   __asm__ ("				\n\
 	.global _cygwin_exit_return	\n\
@@ -1037,7 +1033,6 @@ __cygwin_exit_return:			\n\
 extern "C" void __stdcall
 _dll_crt0 ()
 {
-#ifdef __x86_64__
   /* Starting with Windows 10 rel 1511, the main stack of an application is
      not reproducible if a 64 bit process has been started from a 32 bit
      process.  Given that we have enough virtual address space on 64 bit
@@ -1070,11 +1065,6 @@ _dll_crt0 ()
       else
 	fork_info->alloc_stack ();
     }
-#else
-  main_environ = user_data->envptr;
-  if (in_forkee)
-    fork_info->alloc_stack ();
-#endif
 
   fesetenv (FE_DFL_ENV);
   _main_tls = &_my_tls;
@@ -1104,18 +1094,10 @@ dll_crt0 (per_process *uptr)
 extern "C" void
 cygwin_dll_init ()
 {
-#ifdef __i386__
-  static char **envp;
-#endif
   static int _fmode;
 
   user_data->magic_biscuit = sizeof (per_process);
-
-#ifdef __i386__
-  user_data->envptr = &envp;
-#endif
   user_data->fmode_ptr = &_fmode;
-
   _dll_crt0 ();
 }
 

@@ -158,9 +158,6 @@ const int __collate_load_error = 0;
   /* This is an exported copy of environ which can be used by DLLs
      which use cygwin.dll.  */
   char **__cygwin_environ;
-#ifdef __i386__
-  char ***main_environ = &__cygwin_environ;
-#endif
   /* __progname used in getopt error message */
   char *__progname;
   char *program_invocation_name;
@@ -171,9 +168,6 @@ const int __collate_load_error = 0;
    /* dll_major */ CYGWIN_VERSION_DLL_MAJOR,
    /* dll_major */ CYGWIN_VERSION_DLL_MINOR,
    /* impure_ptr_ptr */ NULL,
-#ifdef __i386__
-   /* envptr */ NULL,
-#endif
    /* malloc */ malloc, /* free */ free,
    /* realloc */ realloc,
    /* fmode_ptr */ NULL, /* main */ NULL, /* ctors */ NULL,

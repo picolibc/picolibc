@@ -293,9 +293,6 @@ struct per_process
   uint32_t dll_minor;
 
   struct _reent **impure_ptr_ptr;
-#ifdef __i386__
-  char ***envptr;
-#endif
 
   /* Used to point to the memory machine we should use.  Usually these
      point back into the dll, but they can be overridden by the user. */
