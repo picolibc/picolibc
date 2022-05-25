@@ -1362,14 +1362,21 @@ format_proc_cpuinfo (void *, char *&destbuf)
       if (maxe >= 0x80000008)
 	{
 /*	  cpuid (&unused, &features1, &unused, &unused, 0x80000008, 0); */
-/*	  from above */
+/*	  from above ^ */
 	  ftcprint (features1,  6, "mba");	/* memory bandwidth alloc */
+	}
+      /* cpuid 0x80000022 ebx AMD ExtPerfMonAndDbg */
+      if (maxe >= 0x80000022)
+	{
+	  cpuid (&features2, &unused, &unused, &unused, 0x80000022);
+
+	  ftcprint (features2,  0, "perfmon_v2"); /* Performance Monitoring Version 2 */
 	}
       /* cpuid 0x80000008 ebx */
       if (maxe >= 0x80000008)
         {
 /*	  cpuid (&unused, &features1, &unused, &unused, 0x80000008, 0); */
-/*	  from above */
+/*	  from above ^ */
 /*	  ftcprint (features1,  0, "clzero");	*//* clzero instruction */
 /*	  ftcprint (features1,  1, "irperf");   *//* instr retired count */
 /*	  ftcprint (features1,  2, "xsaveerptr");*//* save/rest FP err ptrs */
@@ -1387,6 +1394,16 @@ format_proc_cpuinfo (void *, char *&destbuf)
 /*	  ftcprint (features1, 25, "virt_ssbd");*//* vir spec store byp dis */
 /*	  ftcprint (features1, 26, "ssb_no");	*//* ssb fixed in hardware */
         }
+
+      /* cpuid 0x00000021 ebx|edx|ecx == "IntelTDX    " */
+      if (is_intel && maxf >= 0x00000021)
+	{
+	  uint32_t tdx[3];
+
+	  cpuid (&unused, &tdx[0], &tdx[2],  &tdx[1], 0x00000021, 0);
+	  if (!memcmp ("IntelTDX    ", tdx, sizeof (tdx)))
+	    ftuprint ("tdx_guest"); /* Intel Trust Domain Extensions Guest Support */
+	}
 
       /* cpuid 0x00000007 ebx */
       if (maxf >= 0x00000007)
@@ -1485,6 +1502,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  ftcprint (features1, 25, "virt_ssbd");    /* vir spec store byp dis */
 /*	  ftcprint (features1, 26, "ssb_no"); */    /* ssb fixed in hardware */
 	  ftcprint (features1, 27, "cppc");	    /* collab proc perf ctl */
+	  ftcprint (features1, 31, "brs");	    /* branch sampling */
         }
 
       /* thermal & power cpuid 0x00000006 eax */
