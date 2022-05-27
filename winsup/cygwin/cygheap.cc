@@ -183,6 +183,11 @@ init_cygheap::init_installation_root ()
 	  if (p)
 	    p = wcschr (p + 1, L'\\');  /* Skip share name */
 	}
+      else /* Long path prefix followed by drive letter path */
+	{
+	  len = 4;
+	  p += 4;
+	}
     }
   installation_root_buf[1] = L'?';
   RtlInitEmptyUnicodeString (&installation_key, installation_key_buf,
