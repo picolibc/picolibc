@@ -93,7 +93,6 @@ struct tz_test test_timezones[] = {
     {"<WINT+03>3:15<SUM+02>2:30:15",             IN_SECONDS(3, 15, 0),    IN_SECONDS(2, 30, 15)},
     {"<H3M15>3:15<H2M30S15>2:30:15",             IN_SECONDS(3, 15, 0),    IN_SECONDS(2, 30, 15)},   // requires TZNAME_MAX >= 8 + 1
     {"<+H6M20S12>6:20:12<-H4M40S14>-4:40:14",    IN_SECONDS(6, 20, 12),  -IN_SECONDS(4, 40, 14)},   // requires TZNAME_MAX >= 9 + 1
-    {"<+0123456789ABCDEF>3:33:33",               IN_SECONDS(3, 33, 33),   NO_TIME},                 // truncates the name (17 + 1)
 
     /* 
      * real-world test vectors.
@@ -111,12 +110,42 @@ struct tz_test test_timezones[] = {
     { /* Asia/Colombo */            "<+0530>-5:30",                    -IN_SECONDS(5, 30, 0),     NO_TIME},
     { /* Europe/Berlin */           "CET-1CEST,M3.5.0,M10.5.0/3",      -IN_SECONDS(1, 0, 0),     -IN_SECONDS(2, 0, 0)},
 
-    // END of list
-    {NULL, NO_TIME, NO_TIME}
-};
+    /// test parsing errors
+    // 1. names are too long
+    {"JUSTEXCEEDI1:11:11",                                      0,   NO_TIME},
+    {"AVERYLONGNAMEWHICHEXCEEDSTZNAMEMAX2:22:22",               0,   NO_TIME},
+    {"FIRSTVERYLONGNAME3:33:33SECONDVERYLONGNAME4:44:44",       0,   0},
+    {"<JUSTEXCEEDI>5:55:55",                                    0,   NO_TIME},
+    {"<FIRSTVERYLONGNAME>3:33:33<SECONDVERYLONGNAME>4:44:44",   0,   0},
+    {"<+JUSTEXCEED>5:55:55",                                    0,   NO_TIME},
 
-// helper macros
-#define FOR_TIMEZONES(iter_name) for (struct tz_test* iter_name = test_timezones; iter_name->tzstr != NULL; ++iter_name)
+    // 2. names are too short
+    {"JU6:34:47",               0,   NO_TIME},
+    {"HE6:34:47LO3:34:47",      0,   0},
+    {"<AB>2:34:47",             0,   NO_TIME},
+    {"<AB>2:34:47<CD>3:34:47",  0,   0},
+    
+    // 3. names contain invalid chars
+    {"N?ME2:10:56",     0,   NO_TIME},
+    {"N!ME2:10:56",     0,   NO_TIME},
+    {"N/ME2:10:56",     0,   NO_TIME},
+    {"N$ME2:10:56",     0,   NO_TIME},
+    {"NAME?2:10:56",    0,   NO_TIME},
+    {"?NAME2:10:56",    0,   NO_TIME},
+    {"NAME?UNK4:21:15",                 0,   NO_TIME},
+    {"NAME!UNK4:22:15NEXT/NAME4:23:15", 0,   NO_TIME},
+
+    // 4. bogus strings
+    {"NOINFO",          0,  NO_TIME},
+    {"HOUR:16:18",      0,  NO_TIME},
+    {"<BEGIN",          0,  NO_TIME},
+    {"<NEXT:55",        0,  NO_TIME},
+    {">WRONG<2:15:00",  0,  NO_TIME},
+    {"ST<ART4:30:00",   0,  NO_TIME},
+    //{"MANY8:00:00:00",  0,  NO_TIME},
+    {"\0",              0,  NO_TIME},
+    {"M\0STR7:30:36",   0,  NO_TIME}
+};
 
 // END test vectors
 
@@ -136,22 +165,24 @@ void test_TimezoneStrings(void)
 {
     char buffer[128];
 
-    FOR_TIMEZONES(ptr)
+    for (int i = 0; i < (sizeof(test_timezones) / sizeof(struct tz_test)); ++i)
     {
-        setenv("TZ", ptr->tzstr, 1);
+        struct tz_test ptr = test_timezones[i];
+
+        setenv("TZ", ptr.tzstr, 1);
         tzset();
-
-        snprintf(buffer, 128, "winter time, timezone = \"%s\"", ptr->tzstr);
-
+ 
+        snprintf(buffer, 128, "winter time, timezone = \"%s\"", ptr.tzstr);
+ 
         struct tm winter_tm_copy = winter_tm; // copy
-        TEST_ASSERT_EQUAL_INT_MESSAGE(winter_time + ptr->offset_seconds, mktime(&winter_tm_copy), buffer);
+        TEST_ASSERT_EQUAL_INT_MESSAGE(winter_time + ptr.offset_seconds, mktime(&winter_tm_copy), buffer);
 
-        if (ptr->dst_offset_seconds != NO_TIME)
+        if (ptr.dst_offset_seconds != NO_TIME)
         {
-            snprintf(buffer, 128, "summer time, timezone = \"%s\"", ptr->tzstr);
+            snprintf(buffer, 128, "summer time, timezone = \"%s\"", ptr.tzstr);
 
             struct tm summer_tm_copy = summer_tm; // copy
-            TEST_ASSERT_EQUAL_INT_MESSAGE(summer_time + ptr->dst_offset_seconds, mktime(&summer_tm_copy), buffer);
+            TEST_ASSERT_EQUAL_INT_MESSAGE(summer_time + ptr.dst_offset_seconds, mktime(&summer_tm_copy), buffer);
         }
     }
 }
@@ -161,3 +192,4 @@ int main()
     test_TimezoneStrings();
     exit (failed);
 }
+
