@@ -10,3 +10,7 @@ Bug Fixes
 
 - Fix mknod (64-bit only), whose definition didn't match its prototype.
   Addresses: https://cygwin.com/pipermail/cygwin-developers/2022-May/012589.html
+
+- Fix a regression that prevented Cygwin from starting if cygwin1.dll
+  is in the root directory.
+  Addresses: https://cygwin.com/pipermail/cygwin/2022-May/251548.html
