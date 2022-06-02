@@ -491,4 +491,5 @@ if(TESTS)
 
 endif()
 
-install(FILES picolibc.specs DESTINATION lib)
+install(FILES ${CMAKE_BINARY_DIR}/picolibc.specs DESTINATION lib)
+install(FILES ${CMAKE_BINARY_DIR}/picolibc/include/picolibc.h DESTINATION include)
