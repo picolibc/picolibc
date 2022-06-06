@@ -1241,7 +1241,7 @@ fhandler_pty_slave::reset_switch_to_nat_pipe (void)
   ReleaseMutex (pipe_sw_mutex);
 }
 
-ssize_t __stdcall
+ssize_t
 fhandler_pty_slave::write (const void *ptr, size_t len)
 {
   ssize_t towrite = len;
@@ -2171,7 +2171,7 @@ fhandler_pty_master::close ()
   return 0;
 }
 
-ssize_t __stdcall
+ssize_t
 fhandler_pty_master::write (const void *ptr, size_t len)
 {
   ssize_t ret;

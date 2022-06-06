@@ -169,8 +169,8 @@ public:
   bool exists ();
   bool not_allocated (HANDLE&, HANDLE&);
   void set_master_ctl_closed () {master_pid = -1;}
-  static void __stdcall create_master (int);
-  static void __stdcall init_session ();
+  static void create_master (int);
+  static void init_session ();
   void wait_fwd ();
   bool pty_input_state_eq (xfer_dir x) { return pty_input_state == x; }
   bool nat_fg (pid_t pgid);
@@ -192,7 +192,7 @@ public:
   void init ();
   tty_min *get_cttyp ();
   int attach (int n);
-  static void __stdcall init_session ();
+  static void init_session ();
   friend class lock_ttys;
 };
 

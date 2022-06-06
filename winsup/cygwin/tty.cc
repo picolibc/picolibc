@@ -63,7 +63,7 @@ ttyslot (void)
   return device::minor (myself->ctty);
 }
 
-void __stdcall
+void
 tty_list::init_session ()
 {
   char mutex_name[MAX_PATH];
@@ -75,7 +75,7 @@ tty_list::init_session ()
   ProtectHandle (mutex);
 }
 
-void __stdcall
+void
 tty::init_session ()
 {
   if (!myself->cygstarted && NOTSTATE (myself, PID_CYGPARENT))

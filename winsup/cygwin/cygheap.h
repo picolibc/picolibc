@@ -719,7 +719,7 @@ class cygheap_fdenum : public cygheap_fdmanip
   }
 };
 
-void __stdcall cygheap_fixup_in_child (bool);
-void __stdcall cygheap_init ();
+void cygheap_fixup_in_child (bool);
+void cygheap_init ();
 void setup_cygheap ();
 extern char _cygheap_start[] __attribute__((section(".idata")));

@@ -36,7 +36,7 @@ fhandler_dev_random::pseudo_write (const void *ptr, size_t len)
   return len;
 }
 
-ssize_t __stdcall
+ssize_t
 fhandler_dev_random::write (const void *ptr, size_t len)
 {
   if (!len)

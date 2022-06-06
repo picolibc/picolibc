@@ -1578,7 +1578,7 @@ fhandler_disk_file::pread (void *buf, size_t count, off_t offset, void *aio)
      Windows mandatory locking semantics disallow to use another HANDLE. */
   if (rbinary () && !mandatory_locking ())
     {
-      extern int __stdcall is_at_eof (HANDLE h);
+      extern int is_at_eof (HANDLE h);
       NTSTATUS status;
       IO_STATUS_BLOCK io;
       LARGE_INTEGER off = { QuadPart:offset };

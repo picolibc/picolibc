@@ -25,7 +25,7 @@ details. */
 #include <assert.h>
 #include <tls_pbuf.h>
 
-extern void __stdcall check_sanity_and_sync (per_process *);
+extern void check_sanity_and_sync (per_process *);
 
 #define fabort fork_info->abort
 

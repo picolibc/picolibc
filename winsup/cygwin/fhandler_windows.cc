@@ -54,7 +54,7 @@ fhandler_windows::open (int flags, mode_t mode)
   return fhandler_base::open ((flags & ~O_TEXT) | O_BINARY, mode);
 }
 
-ssize_t __stdcall
+ssize_t
 fhandler_windows::write (const void *buf, size_t)
 {
   MSG *ptr = (MSG *) buf;

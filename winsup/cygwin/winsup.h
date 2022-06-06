@@ -147,7 +147,7 @@ extern int cygserver_running;
 class per_process;
 /* cygwin .dll initialization */
 void dll_crt0 (per_process *) __asm__ (_SYMSTR (dll_crt0__FP11per_process));
-extern "C" void __stdcall _dll_crt0 ();
+extern "C" void _dll_crt0 ();
 void dll_crt0_1 (void *);
 void dll_dllcrt0_1 (void *);
 
@@ -182,8 +182,8 @@ const char *find_first_notloaded_dll (class path_conv &);
 
 /**************************** Miscellaneous ******************************/
 
-void __stdcall set_std_handle (int);
-int __stdcall stat_dev (DWORD, int, unsigned long, struct stat *);
+void set_std_handle (int);
+int stat_dev (DWORD, int, unsigned long, struct stat *);
 
 ino_t hash_path_name (ino_t hash, PUNICODE_STRING name);
 ino_t hash_path_name (ino_t hash, PCWSTR name);
@@ -194,16 +194,16 @@ void *hook_or_detect_cygwin (const char *, const void *, WORD&, HANDLE h = NULL)
 void *hook_api (const char *mname, const char *name, const void *fn);
 
 /* Time related */
-void __stdcall totimeval (struct timeval *, PLARGE_INTEGER, int, int);
-time_t __stdcall to_time_t (PLARGE_INTEGER);
-void __stdcall to_timestruc_t (PLARGE_INTEGER, timestruc_t *);
-void __stdcall time_as_timestruc_t (timestruc_t *);
-void __stdcall timeval_to_filetime (const struct timeval *, PLARGE_INTEGER);
-void __stdcall timespec_to_filetime (const struct timespec *, PLARGE_INTEGER);
+void totimeval (struct timeval *, PLARGE_INTEGER, int, int);
+time_t to_time_t (PLARGE_INTEGER);
+void to_timestruc_t (PLARGE_INTEGER, timestruc_t *);
+void time_as_timestruc_t (timestruc_t *);
+void timeval_to_filetime (const struct timeval *, PLARGE_INTEGER);
+void timespec_to_filetime (const struct timespec *, PLARGE_INTEGER);
 bool timeval_to_ms (const struct timeval *, DWORD &);
 
 /* Console related */
-void __stdcall set_console_title (char *);
+void set_console_title (char *);
 void init_console_handler (bool);
 
 extern bool wsock_started;

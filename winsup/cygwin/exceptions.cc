@@ -756,7 +756,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in,
    attempts to block unblockable signals will be silently ignored.
    This is counter to what appears to be documented in some UNIX
    man pages, e.g. Linux.  */
-int __stdcall
+int
 handle_sigsuspend (sigset_t tempmask)
 {
   sigset_t oldmask = _my_tls.sigmask;	// Remember for restoration
@@ -868,7 +868,7 @@ _cygtls::interrupt_setup (siginfo_t& si, void *handler, struct sigaction& siga)
 		  signal_arrived, si.si_signo);
 }
 
-extern "C" void __stdcall
+extern "C" void
 set_sig_errno (int e)
 {
   *_my_tls.errno_addr = e;
@@ -1093,7 +1093,7 @@ ctrl_c_handler (DWORD type)
 }
 
 /* Function used by low level sig wrappers. */
-extern "C" void __stdcall
+extern "C" void
 set_process_mask (sigset_t newmask)
 {
   set_signal_mask (_my_tls.sigmask, newmask);

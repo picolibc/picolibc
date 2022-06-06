@@ -364,7 +364,7 @@ write_ea (HANDLE hdl, path_conv &pc, const char *name, const char *value,
   return ret;
 }
 
-static ssize_t __stdcall
+static ssize_t
 getxattr_worker (path_conv &pc, const char *name, void *value, size_t size)
 {
   int res = -1;
@@ -468,7 +468,7 @@ flistxattr (int fd, char *list, size_t size)
   return res;
 }
 
-static int __stdcall
+static int
 setxattr_worker (path_conv &pc, const char *name, const void *value,
 		 size_t size, int flags)
 {

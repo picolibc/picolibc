@@ -404,9 +404,9 @@ public:
   virtual int fcntl (int cmd, intptr_t);
   virtual char const *ttyname () { return get_name (); }
   virtual void read (void *ptr, size_t& len);
-  virtual ssize_t __stdcall write (const void *ptr, size_t len);
-  virtual ssize_t __stdcall readv (const struct iovec *, int iovcnt, ssize_t tot = -1);
-  virtual ssize_t __stdcall writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
+  virtual ssize_t write (const void *ptr, size_t len);
+  virtual ssize_t readv (const struct iovec *, int iovcnt, ssize_t tot = -1);
+  virtual ssize_t writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
   virtual ssize_t pread (void *, size_t, off_t, void *aio = NULL);
   virtual ssize_t pwrite (void *, size_t, off_t, void *aio = NULL);
   virtual off_t lseek (off_t offset, int whence);
@@ -593,14 +593,14 @@ class fhandler_socket: public fhandler_base
 			    struct sockaddr *from, int *fromlen) = 0;
   virtual ssize_t recvmsg (struct msghdr *msg, int flags) = 0;
   virtual void read (void *ptr, size_t& len) = 0;
-  virtual ssize_t __stdcall readv (const struct iovec *, int iovcnt,
+  virtual ssize_t readv (const struct iovec *, int iovcnt,
 				   ssize_t tot = -1) = 0;
 
   virtual ssize_t sendto (const void *ptr, size_t len, int flags,
 	      const struct sockaddr *to, int tolen) = 0;
   virtual ssize_t sendmsg (const struct msghdr *msg, int flags) = 0;
-  virtual ssize_t __stdcall write (const void *ptr, size_t len) = 0;
-  virtual ssize_t __stdcall writev (const struct iovec *, int iovcnt, ssize_t tot = -1) = 0;
+  virtual ssize_t write (const void *ptr, size_t len) = 0;
+  virtual ssize_t writev (const struct iovec *, int iovcnt, ssize_t tot = -1) = 0;
   virtual int setsockopt (int level, int optname, const void *optval,
 			  __socklen_t optlen) = 0;
   virtual int getsockopt (int level, int optname, const void *optval,
@@ -712,9 +712,9 @@ class fhandler_socket_wsock: public fhandler_socket
 		    struct sockaddr *from, int *fromlen);
   ssize_t recvmsg (struct msghdr *msg, int flags);
   void read (void *ptr, size_t& len);
-  ssize_t __stdcall readv (const struct iovec *, int iovcnt, ssize_t tot = -1);
-  ssize_t __stdcall write (const void *ptr, size_t len);
-  ssize_t __stdcall writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
+  ssize_t readv (const struct iovec *, int iovcnt, ssize_t tot = -1);
+  ssize_t write (const void *ptr, size_t len);
+  ssize_t writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
   int shutdown (int how);
   int close ();
 
@@ -1121,14 +1121,14 @@ class fhandler_socket_unix : public fhandler_socket
   ssize_t recvfrom (void *ptr, size_t len, int flags,
 		    struct sockaddr *from, int *fromlen);
   void read (void *ptr, size_t& len);
-  ssize_t __stdcall readv (const struct iovec *const iov, int iovcnt,
+  ssize_t readv (const struct iovec *const iov, int iovcnt,
 			   ssize_t tot = -1);
 
   ssize_t sendmsg (const struct msghdr *msg, int flags);
   ssize_t sendto (const void *ptr, size_t len, int flags,
 		  const struct sockaddr *to, int tolen);
-  ssize_t __stdcall write (const void *ptr, size_t len);
-  ssize_t __stdcall writev (const struct iovec *const iov, int iovcnt,
+  ssize_t write (const void *ptr, size_t len);
+  ssize_t writev (const struct iovec *const iov, int iovcnt,
 			    ssize_t tot = -1);
   int setsockopt (int level, int optname, const void *optval,
 		  __socklen_t optlen);
@@ -2202,7 +2202,7 @@ private:
   int dup (fhandler_base *, int);
 
   void read (void *ptr, size_t& len);
-  ssize_t __stdcall write (const void *ptr, size_t len);
+  ssize_t write (const void *ptr, size_t len);
   void doecho (const void *str, DWORD len);
   int close ();
   static bool exists ()
@@ -2386,7 +2386,7 @@ class fhandler_pty_slave: public fhandler_pty_common
 
   int open (int flags, mode_t mode = 0);
   bool open_setup (int flags);
-  ssize_t __stdcall write (const void *ptr, size_t len);
+  ssize_t write (const void *ptr, size_t len);
   void read (void *ptr, size_t& len);
   int init (HANDLE, DWORD, mode_t);
 
@@ -2501,7 +2501,7 @@ public:
   int accept_input ();
   int open (int flags, mode_t mode = 0);
   bool open_setup (int flags);
-  ssize_t __stdcall write (const void *ptr, size_t len);
+  ssize_t write (const void *ptr, size_t len);
   void read (void *ptr, size_t& len);
   int close ();
   void cleanup ();
@@ -2571,14 +2571,14 @@ class fhandler_dev_null: public fhandler_base
     return fh;
   }
 
-  ssize_t __stdcall write (const void *ptr, size_t len);
+  ssize_t write (const void *ptr, size_t len);
 };
 
 class fhandler_dev_zero: public fhandler_base
 {
  public:
   fhandler_dev_zero ();
-  ssize_t __stdcall write (const void *ptr, size_t len);
+  ssize_t write (const void *ptr, size_t len);
   void read (void *ptr, size_t& len);
   off_t lseek (off_t, int) { return 0; }
 
@@ -2617,7 +2617,7 @@ class fhandler_dev_random: public fhandler_base
   int pseudo_read (void *ptr, size_t len);
 
  public:
-  ssize_t __stdcall write (const void *ptr, size_t len);
+  ssize_t write (const void *ptr, size_t len);
   void read (void *ptr, size_t& len);
   off_t lseek (off_t, int) { return 0; }
 
@@ -2652,7 +2652,7 @@ class fhandler_dev_clipboard: public fhandler_base
   fhandler_dev_clipboard ();
   int is_windows () { return 1; }
   int fstat (struct stat *buf);
-  ssize_t __stdcall write (const void *ptr, size_t len);
+  ssize_t write (const void *ptr, size_t len);
   void read (void *ptr, size_t& len);
   off_t lseek (off_t offset, int whence);
   int close ();
@@ -2688,7 +2688,7 @@ class fhandler_windows: public fhandler_base
   int is_windows () { return 1; }
   HWND get_hwnd () { return hWnd_; }
   int open (int flags, mode_t mode = 0);
-  ssize_t __stdcall write (const void *ptr, size_t len);
+  ssize_t write (const void *ptr, size_t len);
   void read (void *ptr, size_t& len);
   int ioctl (unsigned int cmd, void *);
   off_t lseek (off_t, int) { return 0; }
@@ -2734,7 +2734,7 @@ class fhandler_dev_dsp: public fhandler_base
   fhandler_dev_dsp *base () const {return (fhandler_dev_dsp *)archetype;}
 
   int open (int, mode_t mode = 0);
-  ssize_t __stdcall write (const void *, size_t);
+  ssize_t write (const void *, size_t);
   void read (void *, size_t&);
   int ioctl (unsigned int, void *);
   int close ();
@@ -2742,7 +2742,7 @@ class fhandler_dev_dsp: public fhandler_base
   void fixup_after_exec ();
 
  private:
-  ssize_t __stdcall _write (const void *, size_t);
+  ssize_t _write (const void *, size_t);
   void _read (void *, size_t&);
   int _ioctl (unsigned int, void *);
   void _fixup_after_fork (HANDLE);
@@ -2789,7 +2789,7 @@ class fhandler_virtual : public fhandler_base
   void seekdir (DIR *, long);
   void rewinddir (DIR *);
   int closedir (DIR *);
-  ssize_t __stdcall write (const void *ptr, size_t len);
+  ssize_t write (const void *ptr, size_t len);
   void read (void *ptr, size_t& len);
   off_t lseek (off_t, int);
   int dup (fhandler_base *child, int);
@@ -2867,7 +2867,7 @@ class fhandler_procsys: public fhandler_virtual
   int open (int flags, mode_t mode = 0);
   int close ();
   void read (void *ptr, size_t& len);
-  ssize_t __stdcall write (const void *ptr, size_t len);
+  ssize_t write (const void *ptr, size_t len);
   int fstat (struct stat *buf);
   bool fill_filebuf ();
 
@@ -3122,7 +3122,7 @@ class fhandler_signalfd : public fhandler_base
   int signalfd (const sigset_t *mask, int flags);
   int fstat (struct stat *buf);
   void read (void *ptr, size_t& len);
-  ssize_t __stdcall write (const void *, size_t);
+  ssize_t write (const void *, size_t);
 
   int poll ();
   inline sigset_t get_sigset () const { return sigset; }
@@ -3167,7 +3167,7 @@ class fhandler_timerfd : public fhandler_base
 
   int fstat (struct stat *buf);
   void read (void *ptr, size_t& len);
-  ssize_t __stdcall write (const void *, size_t);
+  ssize_t write (const void *, size_t);
   int dup (fhandler_base *child, int);
   int ioctl (unsigned int, void *);
   int close ();

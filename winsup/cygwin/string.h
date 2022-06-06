@@ -17,7 +17,7 @@ extern "C" {
 
 #undef strchrnul
 #define strchrnul cygwin_strchrnul
-static inline __stdcall char *
+static inline char *
 strchrnul (const char *s, int c)
 {
   while (*s != (char) c && *s != 0)
@@ -68,11 +68,11 @@ ascii_strncasematch (const char *cs, const char *ct, size_t n)
 
 #undef strcasecmp
 #define strcasecmp cygwin_strcasecmp
-int __stdcall cygwin_strcasecmp (const char *, const char *);
+int cygwin_strcasecmp (const char *, const char *);
 
 #undef strncasecmp
 #define strncasecmp cygwin_strncasecmp
-int __stdcall cygwin_strncasecmp (const char *, const char *, size_t);
+int cygwin_strncasecmp (const char *, const char *, size_t);
 
 #define strcasematch(s1,s2)	(!cygwin_strcasecmp ((s1),(s2)))
 #define strncasematch(s1,s2,n)	(!cygwin_strncasecmp ((s1),(s2),(n)))
@@ -82,7 +82,7 @@ char *strupr (char *);
 
 #endif /* __INSIDE_CYGWIN__ */
 
-char *__stdcall strccpy (char *__restrict s1, const char **__restrict s2,
+char *strccpy (char *__restrict s1, const char **__restrict s2,
 			 char c);
 
 #ifdef __cplusplus

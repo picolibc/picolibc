@@ -69,11 +69,11 @@ static NO_COPY uint32_t nthreads;
 
 extern "C" {
 static void _cfree (void *);
-static void *__stdcall _csbrk (int);
+static void *_csbrk (int);
 }
 
 /* Called by fork or spawn to reallocate cygwin heap */
-void __stdcall
+void
 cygheap_fixup_in_child (bool execed)
 {
   cygheap_max = cygheap = (init_cygheap *) _cygheap_start;
@@ -239,7 +239,7 @@ init_cygheap::init_installation_root ()
     }
 }
 
-void __stdcall
+void
 cygheap_init ()
 {
   cygheap_protect.init ("cygheap_protect");
@@ -293,7 +293,7 @@ setup_cygheap ()
 #define somekinda_printf malloc_printf
 #endif
 
-static void *__stdcall
+static void *
 _csbrk (int sbs)
 {
   void *prebrk = cygheap_max;

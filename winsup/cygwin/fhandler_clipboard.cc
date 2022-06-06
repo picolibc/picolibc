@@ -121,7 +121,7 @@ fhandler_dev_clipboard::set_clipboard (const void *buf, size_t len)
 }
 
 /* FIXME: arbitrary seeking is not handled */
-ssize_t __stdcall
+ssize_t
 fhandler_dev_clipboard::write (const void *buf, size_t len)
 {
   /* write to our membuffer */

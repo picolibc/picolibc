@@ -169,7 +169,7 @@ strbrk(char *&buf)
 
 /* Parse a string of the form "something=stuff somethingelse=more-stuff",
    silently ignoring unknown "somethings".  */
-static void __stdcall
+static void
 parse_options (const char *inbuf)
 {
   int istrue;
@@ -562,7 +562,7 @@ secure_getenv (const char *name)
 }
 
 /* Return number of environment entries, including terminating NULL. */
-static int __stdcall
+static int
 envsize (const char * const *in_envp)
 {
   const char * const *envp;
@@ -578,7 +578,7 @@ envsize (const char * const *in_envp)
 /* Takes similar arguments to setenv except that overwrite is
    either -1, 0, or 1.  0 or 1 signify that the function should
    perform similarly to setenv.  Otherwise putenv is assumed. */
-static int __stdcall
+static int
 _addenv (const char *name, const char *value, int overwrite)
 {
   int issetenv = overwrite >= 0;

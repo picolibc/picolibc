@@ -432,7 +432,7 @@ fhandler_procsys::read (void *ptr, size_t& len)
   fhandler_base::raw_read (ptr, len);
 }
 
-ssize_t __stdcall
+ssize_t
 fhandler_procsys::write (const void *ptr, size_t len)
 {
   return fhandler_base::raw_write (ptr, len);

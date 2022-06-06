@@ -140,7 +140,7 @@ fhandler_signalfd::read (void *ptr, size_t& len)
   return;
 }
 
-ssize_t __stdcall
+ssize_t
 fhandler_signalfd::write (const void *, size_t)
 {
   set_errno (EINVAL);

@@ -77,7 +77,7 @@ enum shared_locations
 };
 
 void memory_init ();
-void __stdcall shared_destroy ();
+void shared_destroy ();
 
 #define shared_align_past(p) \
   ((char *) (system_info.dwAllocationGranularity * \
@@ -86,12 +86,12 @@ void __stdcall shared_destroy ();
 
 HANDLE get_shared_parent_dir ();
 HANDLE get_session_parent_dir ();
-char *__stdcall shared_name (char *, const char *, int);
-WCHAR *__stdcall shared_name (WCHAR *, const WCHAR *, int);
-void *__stdcall open_shared (const WCHAR *, int, HANDLE&, DWORD,
+char *shared_name (char *, const char *, int);
+WCHAR *shared_name (WCHAR *, const WCHAR *, int);
+void *open_shared (const WCHAR *, int, HANDLE&, DWORD,
 			     shared_locations, PSECURITY_ATTRIBUTES = &sec_all,
 			     DWORD = FILE_MAP_READ | FILE_MAP_WRITE);
-void *__stdcall open_shared (const WCHAR *, int, HANDLE&, DWORD,
+void *open_shared (const WCHAR *, int, HANDLE&, DWORD,
 			     shared_locations *, PSECURITY_ATTRIBUTES = &sec_all,
 			     DWORD = FILE_MAP_READ | FILE_MAP_WRITE);
 extern void user_shared_create (bool reinit);

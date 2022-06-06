@@ -44,8 +44,8 @@ class frok
   int child_pid;
   int this_errno;
   HANDLE hchild;
-  int __stdcall parent (volatile char * volatile here);
-  int __stdcall child (volatile char * volatile here);
+  int parent (volatile char * volatile here);
+  int child (volatile char * volatile here);
   bool error (const char *fmt, ...);
   friend int dofork (void **proc, bool *with_forkables);
 };
@@ -59,7 +59,7 @@ resume_child (HANDLE forker_finished)
 }
 
 /* Notify parent that it is time for the next step. */
-static void __stdcall
+static void
 sync_with_parent (const char *s, bool hang_self)
 {
   debug_printf ("signalling parent: %s", s);
@@ -131,7 +131,7 @@ child_info::prefork (bool detached)
     }
 }
 
-int __stdcall
+int
 frok::child (volatile char * volatile here)
 {
   HANDLE& hParent = ch.parent;
@@ -202,7 +202,7 @@ frok::child (volatile char * volatile here)
   return 0;
 }
 
-int __stdcall
+int
 frok::parent (volatile char * volatile stack_here)
 {
   HANDLE forker_finished;

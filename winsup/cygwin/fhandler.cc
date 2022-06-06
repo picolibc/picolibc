@@ -142,7 +142,7 @@ char *fhandler_base::get_proc_fd_name (char *buf)
 
 /* Detect if we are sitting at EOF for conditions where Windows
    returns an error but UNIX doesn't.  */
-int __stdcall
+int
 is_at_eof (HANDLE h)
 {
   IO_STATUS_BLOCK io;
@@ -871,7 +871,7 @@ out:
   debug_printf ("returning %d, %s mode", len, rbinary () ? "binary" : "text");
 }
 
-ssize_t __stdcall
+ssize_t
 fhandler_base::write (const void *ptr, size_t len)
 {
   ssize_t res;
@@ -967,7 +967,7 @@ fhandler_base::write (const void *ptr, size_t len)
   return res;
 }
 
-ssize_t __stdcall
+ssize_t
 fhandler_base::readv (const struct iovec *const iov, const int iovcnt,
 		      ssize_t tot)
 {
@@ -1024,7 +1024,7 @@ fhandler_base::readv (const struct iovec *const iov, const int iovcnt,
   return len;
 }
 
-ssize_t __stdcall
+ssize_t
 fhandler_base::writev (const struct iovec *const iov, const int iovcnt,
 		       ssize_t tot)
 {
@@ -1501,7 +1501,7 @@ fhandler_dev_null::fhandler_dev_null () :
 {
 }
 
-ssize_t __stdcall
+ssize_t
 fhandler_dev_null::write (const void *ptr, size_t len)
 {
   /* Shortcut.  This also fixes a problem with the NUL device on 64 bit:

@@ -90,7 +90,7 @@ strace::microseconds ()
   return (int) (clk->strace_usecs () - process_start);
 }
 
-static int __stdcall
+static int
 getfunc (char *in_dst, const char *func)
 {
   const char *p;

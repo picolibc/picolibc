@@ -154,7 +154,7 @@ get_debug_priv (void)
   CloseHandle (tok);
 }
 
-static void __stdcall
+static void
 forcekill (pid_t pid, DWORD winpid, int sig, int wait)
 {
   DWORD dwpid;

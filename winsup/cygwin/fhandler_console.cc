@@ -3311,7 +3311,7 @@ do_print:
   return found + trunc_buf.len;
 }
 
-ssize_t __stdcall
+ssize_t
 fhandler_console::write (const void *vsrc, size_t len)
 {
   bg_check_types bg = bg_check (SIGTTOU);
@@ -3778,7 +3778,7 @@ fhandler_console::set_close_on_exec (bool val)
   close_on_exec (val);
 }
 
-void __stdcall
+void
 set_console_title (char *title)
 {
   wchar_t buf[TITLESIZE + 1];

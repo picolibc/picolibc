@@ -13,7 +13,7 @@ extern "C" {
 #include "winlean.h"
 struct per_process;
 typedef int (*MainFunc) (int argc, char *argv[], char **env);
-int __stdcall _cygwin_crt0_common (MainFunc, struct per_process *);
+int _cygwin_crt0_common (MainFunc, struct per_process *);
 PVOID dll_dllcrt0 (HMODULE, struct per_process *);
 
 #ifdef __cplusplus

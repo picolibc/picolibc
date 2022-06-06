@@ -82,7 +82,7 @@ pinfo::thisproc (HANDLE h)
 
 /* Initialize the process table entry for the current task.
    This is not called for forked tasks, only execed ones.  */
-void __stdcall
+void
 pinfo_init (char **envp, int envc)
 {
   if (envp)

@@ -72,7 +72,7 @@ struct per_process_cxx_malloc __cygwin_cxx_malloc =
 /* Set up pointers to various pieces so the dll can then use them,
    and then jump to the dll.  */
 
-int __stdcall
+int
 _cygwin_crt0_common (MainFunc f, per_process *u)
 {
   per_process *newu = (per_process *) cygwin_internal (CW_USER_DATA);

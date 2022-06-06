@@ -45,7 +45,7 @@ void __set_winsock_errno (const char *fn, int ln);
 #define set_winsock_errno() __set_winsock_errno (__FUNCTION__, __LINE__)
 
 #define get_errno()  (errno)
-extern "C" void __stdcall set_sig_errno (int e);
+extern "C" void set_sig_errno (int e);
 
 class save_errno
   {

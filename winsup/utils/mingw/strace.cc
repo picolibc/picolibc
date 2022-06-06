@@ -437,7 +437,7 @@ syst (long long t)
   return &st;
 }
 
-static void __stdcall
+static void
 handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
 {
   int len;

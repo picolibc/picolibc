@@ -61,7 +61,7 @@ do_global_dtors ()
     }
 }
 
-static void __stdcall
+static void
 do_global_ctors (void (**in_pfunc)(), int force)
 {
   if (!force && in_forkee)
@@ -84,7 +84,7 @@ do_global_ctors (void (**in_pfunc)(), int force)
  * A \@file is replaced with @file so that echo \@foo would print
  * @foo and not the contents of foo.
  */
-static bool __stdcall
+static bool
 insert_file (char *name, char *&cmd)
 {
   HANDLE f;
@@ -203,7 +203,7 @@ quoted (char *cmd, int winshell)
 			    && isalpha ((s)[2]) \
 			    && strchr ((s) + 3, '\\')))
 
-static int __stdcall
+static int
 globify (char *word, char **&argv, int &argc, int &argvlen)
 {
   if (*word != '~' && strpbrk (word, "?*[\"\'(){}") == NULL)
@@ -290,7 +290,7 @@ globify (char *word, char **&argv, int &argc, int &argvlen)
 
 /* Build argv, argc from string passed from Windows.  */
 
-static void __stdcall
+static void
 build_argv (char *cmd, char **&argv, int &argc, int winshell)
 {
   int argvlen = 0;
@@ -365,7 +365,7 @@ build_argv (char *cmd, char **&argv, int &argc, int winshell)
 }
 
 /* sanity and sync check */
-void __stdcall
+void
 check_sanity_and_sync (per_process *p)
 {
   /* Sanity check to make sure developers didn't change the per_process    */
@@ -1013,7 +1013,7 @@ __cygwin_exit_return:			\n\
 ");
 }
 
-extern "C" void __stdcall
+extern "C" void
 _dll_crt0 ()
 {
   /* Starting with Windows 10 rel 1511, the main stack of an application is

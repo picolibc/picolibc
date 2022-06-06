@@ -37,7 +37,7 @@ add_timeval (struct timeval *tv1, struct timeval *tv2)
 }
 
 /* add rusage values of r2 to r1 */
-void __stdcall
+void
 add_rusage (struct rusage *r1, struct rusage *r2)
 {
   add_timeval (&r1->ru_utime, &r2->ru_utime);
@@ -59,7 +59,7 @@ add_rusage (struct rusage *r1, struct rusage *r2)
 }
 
 /* FIXME: what about other fields? */
-void __stdcall
+void
 fill_rusage (struct rusage *r, HANDLE h)
 {
   KERNEL_USER_TIMES kut;

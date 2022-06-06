@@ -61,7 +61,7 @@ __BEGIN_DECLS
 # define _IOWR	_LINUX_IOWR
 #endif /*__USE_LINUX_IOCTL_DEFS */
 
-int __cdecl ioctl (int __fd, int __cmd, ...);
+int ioctl (int __fd, int __cmd, ...);
 
 __END_DECLS
 #endif

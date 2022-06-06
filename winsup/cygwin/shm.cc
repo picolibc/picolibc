@@ -117,7 +117,7 @@ static NO_COPY muto shm_guard;
 #define SLIST_LOCK()	(shm_guard.init ("shm_guard")->acquire ())
 #define SLIST_UNLOCK()	(shm_guard.release ())
 
-int __stdcall
+int
 fixup_shms_after_fork ()
 {
   if (!SLIST_FIRST (&sph_list))

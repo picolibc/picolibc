@@ -1020,7 +1020,7 @@ fhandler_dev_dsp::fhandler_dev_dsp ():
   dev ().parse (FH_OSS_DSP);
 }
 
-ssize_t __stdcall
+ssize_t
 fhandler_dev_dsp::write (const void *ptr, size_t len)
 {
   return base ()->_write (ptr, len);
@@ -1093,7 +1093,7 @@ fhandler_dev_dsp::open (int flags, mode_t)
 #define IS_WRITE() ((get_flags() & O_ACCMODE) != O_RDONLY)
 #define IS_READ() ((get_flags() & O_ACCMODE) != O_WRONLY)
 
-ssize_t __stdcall
+ssize_t
 fhandler_dev_dsp::_write (const void *ptr, size_t len)
 {
   debug_printf ("ptr=%p len=%ld", ptr, len);

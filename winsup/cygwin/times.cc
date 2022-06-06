@@ -35,7 +35,7 @@ get_system_time (PLARGE_INTEGER systime)
 }
 
 /* Cygwin internal */
-static uint64_t __stdcall
+static uint64_t
 __to_clock_t (PLARGE_INTEGER src, int flag)
 {
   uint64_t total = src->QuadPart;
@@ -154,7 +154,7 @@ timezone (void)
 }
 
 /* Cygwin internal */
-void __stdcall
+void
 totimeval (struct timeval *dst, PLARGE_INTEGER src, int sub, int flag)
 {
   int64_t x = __to_clock_t (src, flag);
@@ -194,7 +194,7 @@ gettimeofday (struct timeval *__restrict tv, void *__restrict tzvp)
 EXPORT_ALIAS (gettimeofday, _gettimeofday)
 
 /* Cygwin internal */
-void __stdcall
+void
 timespec_to_filetime (const struct timespec *time_in, PLARGE_INTEGER out)
 {
   if (time_in->tv_nsec == UTIME_OMIT)
@@ -205,7 +205,7 @@ timespec_to_filetime (const struct timespec *time_in, PLARGE_INTEGER out)
 }
 
 /* Cygwin internal */
-void __stdcall
+void
 timeval_to_filetime (const struct timeval *time_in, PLARGE_INTEGER out)
 {
   out->QuadPart = time_in->tv_sec * NS100PERSEC
@@ -230,7 +230,7 @@ timeval_to_ms (const struct timeval *time_in, DWORD &ms)
 }
 
 /* Cygwin internal */
-static timeval __stdcall
+static timeval
 time_t_to_timeval (time_t in)
 {
   timeval res;
@@ -265,7 +265,7 @@ timeval_to_timespec (const struct timeval *tvp, struct timespec *tmp)
 
 /* Cygwin internal */
 /* Convert a Win32 time to "UNIX" format. */
-time_t __stdcall
+time_t
 to_time_t (PLARGE_INTEGER ptr)
 {
   /* A file time is the number of 100ns since jan 1 1601
@@ -285,7 +285,7 @@ to_time_t (PLARGE_INTEGER ptr)
 
 /* Cygwin internal */
 /* Convert a Win32 time to "UNIX" timestruc_t format. */
-void __stdcall
+void
 to_timestruc_t (PLARGE_INTEGER ptr, timestruc_t *out)
 {
   /* A file time is the number of 100ns since jan 1 1601
@@ -309,7 +309,7 @@ to_timestruc_t (PLARGE_INTEGER ptr, timestruc_t *out)
 
 /* Cygwin internal */
 /* Get the current time as a "UNIX" timestruc_t format. */
-void __stdcall
+void
 time_as_timestruc_t (timestruc_t * out)
 {
   LARGE_INTEGER systime;

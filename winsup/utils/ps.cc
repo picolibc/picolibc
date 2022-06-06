@@ -68,7 +68,7 @@ start_time (external_pinfo *child)
 #define NSPERSEC 10000000LL
 
 /* Convert a Win32 time to "UNIX" format. */
-long __stdcall
+long
 to_time_t (FILETIME *ptr)
 {
   /* A file time is the number of 100ns since jan 1 1601

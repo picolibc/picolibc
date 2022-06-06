@@ -671,7 +671,7 @@ sys_mbstowcs_alloc (wchar_t **dst_p, int type, const char *src, size_t nms)
 /* Copy string, until c or <nul> is encountered.
    NUL-terminate the destination string (s1).
    Return pointer to terminating byte in dst string.  */
-char * __stdcall
+char *
 strccpy (char *__restrict s1, const char **__restrict s2, char c)
 {
   while (**s2 && **s2 != c)
@@ -738,7 +738,7 @@ const char isalpha_array[] = {
    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0
 };
 
-extern "C" int __stdcall
+extern "C" int
 cygwin_wcscasecmp (const wchar_t *ws, const wchar_t *wt)
 {
   UNICODE_STRING us, ut;
@@ -748,7 +748,7 @@ cygwin_wcscasecmp (const wchar_t *ws, const wchar_t *wt)
   return RtlCompareUnicodeString (&us, &ut, TRUE);
 }
 
-extern "C" int __stdcall
+extern "C" int
 cygwin_wcsncasecmp (const wchar_t  *ws, const wchar_t *wt, size_t n)
 {
   UNICODE_STRING us, ut;
@@ -763,7 +763,7 @@ cygwin_wcsncasecmp (const wchar_t  *ws, const wchar_t *wt, size_t n)
   return RtlCompareUnicodeString (&us, &ut, TRUE);
 }
 
-extern "C" int __stdcall
+extern "C" int
 cygwin_strcasecmp (const char *cs, const char *ct)
 {
   UNICODE_STRING us, ut;
@@ -782,7 +782,7 @@ cygwin_strcasecmp (const char *cs, const char *ct)
   return RtlCompareUnicodeString (&us, &ut, TRUE);
 }
 
-extern "C" int __stdcall
+extern "C" int
 cygwin_strncasecmp (const char *cs, const char *ct, size_t n)
 {
   UNICODE_STRING us, ut;

@@ -19,7 +19,7 @@ fhandler_dev_zero::fhandler_dev_zero ()
 {
 }
 
-ssize_t __stdcall
+ssize_t
 fhandler_dev_zero::write (const void *, size_t len)
 {
   if (get_device () == FH_FULL)

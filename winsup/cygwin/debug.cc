@@ -38,7 +38,7 @@ class lock_debug
 
 muto NO_COPY lock_debug::locker;
 
-static bool __stdcall mark_closed (const char *, int, HANDLE, const char *, bool);
+static bool mark_closed (const char *, int, HANDLE, const char *, bool);
 
 void
 debug_init ()
@@ -47,7 +47,7 @@ debug_init ()
 }
 
 /* Find a registered handle in the linked list of handles. */
-static handle_list * __stdcall
+static handle_list *
 find_handle (HANDLE h)
 {
   handle_list *hl;
@@ -87,7 +87,7 @@ setclexec (HANDLE oh, HANDLE nh, bool not_inheriting)
 }
 
 /* Create a new handle record */
-static handle_list * __stdcall
+static handle_list *
 newh ()
 {
   handle_list *hl;
@@ -155,7 +155,7 @@ add_handle (const char *func, int ln, HANDLE h, const char *name, bool inh)
   debug_printf ("protecting handle '%s'(%p), inherited flag %d", hl->name, hl->h, hl->inherited);
 }
 
-static void __stdcall
+static void
 delete_handle (handle_list *hl)
 {
   handle_list *hnuke = hl->next;
@@ -176,7 +176,7 @@ debug_fixup_after_fork_exec ()
       delete_handle (hl);	// removes hl->next
 }
 
-static bool __stdcall
+static bool
 mark_closed (const char *func, int ln, HANDLE h, const char *name, bool force)
 {
   handle_list *hl;

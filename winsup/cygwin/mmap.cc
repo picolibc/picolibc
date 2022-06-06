@@ -1774,7 +1774,7 @@ fhandler_disk_file::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
    none of the mapped areas are in our address space. We need to iterate
    through the map, doing the MapViewOfFile calls.  */
 
-int __stdcall
+int
 fixup_mmaps_after_fork (HANDLE parent)
 {
   /* Iterate over maps */

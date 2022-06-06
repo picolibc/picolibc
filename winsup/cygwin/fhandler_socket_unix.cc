@@ -1911,7 +1911,7 @@ fhandler_socket_unix::read (void *ptr, size_t& len)
   len = recvmsg (&msg, 0);
 }
 
-ssize_t __stdcall
+ssize_t
 fhandler_socket_unix::readv (const struct iovec *const iov, int iovcnt,
 			     ssize_t tot)
 {
@@ -1953,7 +1953,7 @@ fhandler_socket_unix::sendto (const void *in_ptr, size_t len, int flags,
   return sendmsg (&msg, flags);
 }
 
-ssize_t __stdcall
+ssize_t
 fhandler_socket_unix::write (const void *ptr, size_t len)
 {
   struct iovec iov;
@@ -1971,7 +1971,7 @@ fhandler_socket_unix::write (const void *ptr, size_t len)
   return sendmsg (&msg, 0);
 }
 
-ssize_t __stdcall
+ssize_t
 fhandler_socket_unix::writev (const struct iovec *const iov, int iovcnt,
 			      ssize_t tot)
 {

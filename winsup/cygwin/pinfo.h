@@ -254,7 +254,7 @@ public:
 pid_t create_cygwin_pid ();
 pid_t cygwin_pid (DWORD);
 
-void __stdcall pinfo_init (char **, int);
+void pinfo_init (char **, int);
 extern pinfo myself;
 
 /* Helper class to allow convenient setting and unsetting a process_state
@@ -291,9 +291,9 @@ public:
 #define myctty() myself->__ctty ()
 
 /* For mmaps across fork(). */
-int __stdcall fixup_mmaps_after_fork (HANDLE parent);
+int fixup_mmaps_after_fork (HANDLE parent);
 /* for shm areas across fork (). */
-int __stdcall fixup_shms_after_fork ();
+int fixup_shms_after_fork ();
 
-void __stdcall fill_rusage (struct rusage *, HANDLE);
-void __stdcall add_rusage (struct rusage *, struct rusage *);
+void fill_rusage (struct rusage *, HANDLE);
+void add_rusage (struct rusage *, struct rusage *);

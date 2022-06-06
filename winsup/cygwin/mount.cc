@@ -47,7 +47,7 @@ int NO_COPY mount_info::root_idx = -1;
    This function is only used to test for valid input strings.
    The later normalization drops the native prefixes. */
 
-static inline bool __stdcall
+static inline bool
 is_native_path (const char *path)
 {
   return isdirsep (path[0])
@@ -57,7 +57,7 @@ is_native_path (const char *path)
 	 && isalpha (path[4]);
 }
 
-static inline bool __stdcall
+static inline bool
 is_unc_share (const char *path)
 {
   const char *p;

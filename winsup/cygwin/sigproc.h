@@ -64,7 +64,7 @@ int handle_sigprocmask (int sig, const sigset_t *set,
 
 void sig_clear (int);
 void sig_set_pending (int);
-int __stdcall handle_sigsuspend (sigset_t);
+int handle_sigsuspend (sigset_t);
 
 int proc_subproc (DWORD, uintptr_t);
 

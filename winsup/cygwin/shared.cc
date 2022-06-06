@@ -95,14 +95,14 @@ get_session_parent_dir ()
   return session_parent_dir;
 }
 
-char * __stdcall
+char *
 shared_name (char *ret_buf, const char *str, int num)
 {
   __small_sprintf (ret_buf, "%s.%d", str, num);
   return ret_buf;
 }
 
-WCHAR * __stdcall
+WCHAR *
 shared_name (WCHAR *ret_buf, const WCHAR *str, int num)
 {
   __small_swprintf (ret_buf, L"%W.%d", str, num);
@@ -135,14 +135,14 @@ static ptrdiff_t offsets[] =
 
 #define off_addr(x)	((void *)((caddr_t) cygwin_hmodule + offsets[x]))
 
-void * __stdcall
+void *
 open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
 	     shared_locations m, PSECURITY_ATTRIBUTES psa, DWORD access)
 {
   return open_shared (name, n, shared_h, size, &m, psa, access);
 }
 
-void * __stdcall
+void *
 open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
 	     shared_locations *m, PSECURITY_ATTRIBUTES psa, DWORD access)
 {
@@ -276,7 +276,7 @@ user_info::create (bool reinit)
     user_shared->initialize ();
 }
 
-void __stdcall
+void
 shared_destroy ()
 {
   ForceCloseHandle (cygwin_shared_h);
