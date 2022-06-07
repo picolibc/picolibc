@@ -41,11 +41,7 @@ const struct __sFILE_fake __sf_fake_stderr =
 __FILE __sf[3];
 struct _glue __sglue = {NULL, 3, &__sf[0]};
 #else
-#ifdef _REENT_SMALL
 struct _glue __sglue = {NULL, 0, NULL};
-#else
-struct _glue __sglue = {NULL, 3, &_GLOBAL_REENT->__sf[0]};
-#endif
 #endif
 
 #ifdef _STDIO_BSD_SEMANTICS
