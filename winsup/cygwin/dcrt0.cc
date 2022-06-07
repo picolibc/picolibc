@@ -1013,7 +1013,7 @@ __cygwin_exit_return:			\n\
 ");
 }
 
-extern "C" void
+extern "C" void __stdcall
 _dll_crt0 ()
 {
   /* Starting with Windows 10 rel 1511, the main stack of an application is
