@@ -350,9 +350,10 @@ struct _rand48 {
 /*
  * struct _reent
  *
- * This structure contains *all* globals needed by the library.
+ * This structure contains the thread-local objects needed by the library.
  * It's raison d'etre is to facilitate threads by making all library routines
- * reentrant.  IE: All state information is contained here.
+ * reentrant.  The exit handler support and FILE maintenance use dedicated
+ * global objects which are not included in this structure.
  */
 
 #ifdef _REENT_SMALL
