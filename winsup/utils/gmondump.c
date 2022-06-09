@@ -103,6 +103,7 @@ error (int geterrno, const char *fmt, ...)
 void
 gmondump1 (char *filename)
 {
+  int        addrincr;
   ushort    *bucket = NULL;
   int        fd;
   struct gmonhdr hdr;
@@ -134,16 +135,15 @@ gmondump1 (char *filename)
   if (hdr.lpc >= hdr.hpc)
     goto notgmon;
   numbuckets = (hdr.ncnt - sizeof (hdr)) / sizeof (short);
-  if (numbuckets != (hdr.hpc - hdr.lpc) / 4)
-    goto notgmon;
+  addrincr = (hdr.hpc - hdr.lpc) / numbuckets;
   numrawarcs = 0;
   if (stat.st_size != hdr.ncnt)
     {
       numrawarcs = stat.st_size - hdr.ncnt;
-      if (numrawarcs !=
-          (int) sizeof (rawarc) * (numrawarcs / (int) sizeof (rawarc)))
+      if (numrawarcs != (int) sizeof (struct rawarc) *
+                        (numrawarcs / (int) sizeof (struct rawarc)))
         goto notgmon;
-      numrawarcs /= (int) sizeof (rawarc);
+      numrawarcs /= (int) sizeof (struct rawarc);
     }
 
   /* Looks good, so read and display the profiling info. */
@@ -162,7 +162,8 @@ gmondump1 (char *filename)
 
   note ("file %s, gmon version 0x%x, sample rate %d\n",
         filename, hdr.version, hdr.profrate);
-  note ("  address range %p..%p\n", hdr.lpc, hdr.hpc);
+  note ("  address range %p..%p, address increment %d/bucket\n",
+        hdr.lpc, hdr.hpc, addrincr);
   note ("  numbuckets %d, hitbuckets %d, hitcount %d, numrawarcs %d\n",
         numbuckets, hitbuckets, hitcount, numrawarcs);
 
@@ -171,27 +172,31 @@ gmondump1 (char *filename)
     {
       if (hitbuckets)
         note ("  bucket data follows...\n");
+      else
+        note ("  no bucket data present\n");
       char *addr = (char *) hdr.lpc;
-      int   incr = (hdr.hpc - hdr.lpc) / numbuckets;
-      for (res = 0; res < numbuckets; ++bucket, ++res, addr += incr)
+      for (res = 0; res < numbuckets; ++bucket, ++res, addr += addrincr)
         if (*bucket)
           note ("    address %p, hitcount %d\n", addr, *bucket);
       bucket -= numbuckets;
 
       if (numrawarcs)
         {
-          rawarc = (struct rawarc *) calloc (numrawarcs, sizeof (rawarc));
-          res = read (fd, rawarc, numrawarcs * (int) sizeof (rawarc));
-          if (res != numrawarcs * (int) sizeof (rawarc))
+          rawarc = (struct rawarc *) calloc (numrawarcs,
+                                             sizeof (struct rawarc));
+          res = read (fd, rawarc, numrawarcs * (int) sizeof (struct rawarc));
+          if (res != numrawarcs * (int) sizeof (struct rawarc))
             error (0, "unable to read rawarc data");
           note ("  rawarc data follows...\n");
           for (res = 0; res < numrawarcs; ++rawarc, ++res)
             note ("    from %p, self %p, count %d\n",
                   rawarc->raw_frompc, rawarc->raw_selfpc, rawarc->raw_count);
+          rawarc -= numrawarcs;
         }
+      else
+        note ("  no rawarc data present\n");
     }
 
-  note ("\n");
   if (0)
     {
 notgmon:
@@ -261,7 +266,11 @@ main(int argc, char **argv)
     usage1 (ofile);
 
   for (int i = optind; i < argc; i++)
-    gmondump1 (argv[i]);
+    {
+      gmondump1 (argv[i]);
+      if ((i + 1) < argc)
+        note ("\n");
+    }
 
   return 0;
 }
