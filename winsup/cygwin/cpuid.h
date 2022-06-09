@@ -18,6 +18,7 @@ cpuid (uint32_t *a, uint32_t *b, uint32_t *c, uint32_t *d, uint32_t ain,
 		: "a" (ain), "c" (cin));
 }
 
+#ifdef __x86_64__
 static inline bool __attribute ((always_inline))
 can_set_flag (uint32_t long flag)
 {
@@ -38,5 +39,8 @@ can_set_flag (uint32_t long flag)
   );
   return ((r1 ^ r2) & flag) != 0;
 }
+#else
+#error unimplemented for this target
+#endif
 
 #endif // !CPUID_H

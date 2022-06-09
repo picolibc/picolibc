@@ -19,6 +19,7 @@ extern "C" {
   Define a struct __mcontext, which should be identical in layout to the Win32
   API type CONTEXT with the addition of oldmask and cr2 fields at the end.
 */
+#ifdef __x86_64__
 
 struct _uc_fpxreg {
   __uint16_t significand[4];
@@ -96,6 +97,10 @@ struct __attribute__ ((__aligned__ (16))) __mcontext
   __uint64_t oldmask;
   __uint64_t cr2;
 };
+
+#else
+#error unimplemented for this target
+#endif
 
 /* Needed for GDB.  It only compiles in the context copy code if this macro is
    defined.  This is not sizeof(CONTEXT) due to historical accidents. */

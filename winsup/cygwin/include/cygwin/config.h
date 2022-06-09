@@ -36,7 +36,11 @@ __attribute__((__gnu_inline__))
 extern inline struct _reent *__getreent (void)
 {
   register char *ret;
+#ifdef __x86_64__
   __asm __volatile__ ("movq %%gs:8,%0" : "=r" (ret));
+#else
+#error unimplemented for this target
+#endif
   return (struct _reent *) (ret - __CYGTLS_PADSIZE__);
 }
 #endif /* _LIBC || __INSIDE_CYGWIN__ */

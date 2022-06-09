@@ -413,6 +413,7 @@ pthread_wrapper (PVOID arg)
   /* Initialize new _cygtls. */
   _my_tls.init_thread (wrapper_arg.stackbase - __CYGTLS_PADSIZE__,
 		       (DWORD (*)(void*, void*)) wrapper_arg.func);
+#ifdef __x86_64__
   __asm__ ("\n\
 	   leaq  %[WRAPPER_ARG], %%rbx	# Load &wrapper_arg into rbx	\n\
 	   movq  (%%rbx), %%r12		# Load thread func into r12	\n\
@@ -436,6 +437,9 @@ pthread_wrapper (PVOID arg)
 	   call  *%%r12			# Call thread func		\n"
 	   : : [WRAPPER_ARG] "o" (wrapper_arg),
 	       [CYGTLS] "i" (__CYGTLS_PADSIZE__));
+#else
+#error unimplemented for this target
+#endif
   /* pthread::thread_init_wrapper calls pthread::exit, which
      in turn calls ExitThread, so we should never arrive here. */
   api_fatal ("Dumb thinko in pthread handling.  Whip the developer.");
@@ -698,6 +702,7 @@ err:
   return thread;
 }
 
+#ifdef __x86_64__
 /* These functions are almost verbatim FreeBSD code (even if the header of
    one file mentiones NetBSD), just wrapped in the minimum required code to
    make them work with the MS AMD64 ABI.
@@ -899,6 +904,10 @@ wmempcpy:								\n\
 	jmp	_memcpy							\n\
 	.seh_endproc							\n\
 ");
+
+#else
+#error unimplemented for this target
+#endif
 
 /* Signal the thread name to any attached debugger
 

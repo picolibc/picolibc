@@ -66,6 +66,7 @@ bool NO_COPY wsock_started;
 /* LoadDLLprime is used to prime the DLL info information, providing an
    additional initialization routine to call prior to calling the first
    function.  */
+#ifdef __x86_64__
 #define LoadDLLprime(dllname, init_also, no_resolve_on_fork) __asm__ ("	\n\
 .ifndef " #dllname "_primed				\n\
   .section	.data_cygwin_nocopy,\"w\"		\n\
@@ -81,6 +82,9 @@ bool NO_COPY wsock_started;
   .set		" #dllname "_primed, 1			\n\
 .endif							\n\
 ");
+#else
+#error unimplemented for this target
+#endif
 
 /* Standard DLL load macro.  May invoke a fatal error if the function isn't
    found. */
@@ -92,6 +96,7 @@ bool NO_COPY wsock_started;
   LoadDLLfuncEx3(name, n, dllname, notimp, err, 0)
 
 /* Main DLL setup stuff. */
+#ifdef __x86_64__
 #define LoadDLLfuncEx3(name, n, dllname, notimp, err, no_resolve_on_fork) \
   LoadDLLprime (dllname, dll_func_load, no_resolve_on_fork) \
   __asm__ ("						\n\
@@ -116,6 +121,9 @@ _win32_" #name ":					\n\
   .asciz	\"" #name "\"				\n\
   .text							\n\
 ");
+#else
+#error unimplemented for this target
+#endif
 
 /* DLL loader helper functions used during initialization. */
 
@@ -131,6 +139,7 @@ extern "C" void dll_chain () __asm__ ("dll_chain");
 
 extern "C" {
 
+#ifdef __x86_64__
 __asm__ ("								\n\
 	 .section .rdata,\"r\"							\n\
 msg1:									\n\
@@ -192,6 +201,9 @@ dll_chain:								\n\
 	push	%rax		# Restore 'return address'		\n\
 	jmp	*%rdx		# Jump to next init function		\n\
 ");
+#else
+#error unimplemented for this target
+#endif
 
 /* C representations of the two info blocks described above.
    FIXME: These structures confuse gdb for some reason.  GDB can print
@@ -246,6 +258,7 @@ dll_load (HANDLE& handle, PWCHAR name)
 #define RETRY_COUNT 10
 
 /* The standard DLL initialization routine. */
+#ifdef __x86_64__
 
 /* On x86_64, we need assembler wrappers for std_dll_init and wsock_init.
    In the x86_64 ABI it's no safe bet that frame[1] (aka 8(%rbp)) contains
@@ -284,6 +297,10 @@ _" #func ":								\n\
 ");
 
 INIT_WRAPPER (std_dll_init)
+
+#else
+#error unimplemented for this target
+#endif
 
 __attribute__ ((used, noinline)) static two_addr_t
 std_dll_init (struct func_info *func)
@@ -341,8 +358,12 @@ std_dll_init (struct func_info *func)
 
 /* Initialization function for winsock stuff. */
 
+#ifdef __x86_64__
 /* See above comment preceeding std_dll_init. */
 INIT_WRAPPER (wsock_init)
+#else
+#error unimplemented for this target
+#endif
 
 __attribute__ ((used, noinline)) static two_addr_t
 wsock_init (struct func_info *func)
