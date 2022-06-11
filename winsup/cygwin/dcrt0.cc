@@ -1016,6 +1016,7 @@ __cygwin_exit_return:			\n\
 extern "C" void __stdcall
 _dll_crt0 ()
 {
+#ifdef __x86_64__
   /* Starting with Windows 10 rel 1511, the main stack of an application is
      not reproducible if a 64 bit process has been started from a 32 bit
      process.  Given that we have enough virtual address space on 64 bit
@@ -1048,6 +1049,9 @@ _dll_crt0 ()
       else
 	fork_info->alloc_stack ();
     }
+#else
+#error unimplemented for this target
+#endif
 
   fesetenv (FE_DFL_ENV);
   _main_tls = &_my_tls;
