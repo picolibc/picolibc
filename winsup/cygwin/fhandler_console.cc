@@ -597,6 +597,8 @@ fhandler_console::set_output_mode (tty::cons_mode m, const termios *t,
 				   const handle_set_t *p)
 {
   DWORD flags = ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
+  if (con.orig_virtual_terminal_processing_mode)
+    flags |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
   WaitForSingleObject (p->output_mutex, mutex_timeout);
   switch (m)
     {
@@ -1505,6 +1507,8 @@ fhandler_console::open (int flags, mode_t)
       /* Check xterm compatible mode in output */
       acquire_attach_mutex (mutex_timeout);
       GetConsoleMode (get_output_handle (), &dwMode);
+      con.orig_virtual_terminal_processing_mode =
+	!!(dwMode & ENABLE_VIRTUAL_TERMINAL_PROCESSING);
       if (!SetConsoleMode (get_output_handle (),
 			   dwMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING))
 	is_legacy = true;

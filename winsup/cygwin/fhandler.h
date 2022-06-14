@@ -2022,6 +2022,7 @@ class dev_console
 {
   pid_t owner;
   bool is_legacy;
+  bool orig_virtual_terminal_processing_mode;
 
   WORD default_color, underline_color, dim_color;
 
