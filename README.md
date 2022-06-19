@@ -258,9 +258,9 @@ use Picolibc:
 
  12. Add lots more exception and errno tests for the math functions.
 
- 13. Restructure math library to always use the __math_err functions
+ 13. Restructure math library to always use the `__math_err` functions
      to raise exceptions and set errno. This removes the w_*.c wrapper
-     functions and eliminates the __ieee names. This centralizes
+     functions and eliminates the `__ieee names`. This centralizes
      compiler work-arounds to ensure run-time evaluation of
      expressions intended to raise exceptions. In the process, all of
      the libm/math files were reformatted with clang-format.
