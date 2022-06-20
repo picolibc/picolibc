@@ -126,8 +126,17 @@ SECTIONS
 	@CPP_START@
 	.except_ordered : {
 		*(.gcc_except_table *.gcc_except_table.*)
-		KEEP (*(.eh_frame .eh_frame.*))
 		*(.ARM.extab* .gnu.linkonce.armextab.*)
+	} >flash AT>flash :text
+	.eh_frame_hdr : {
+		PROVIDE_HIDDEN ( __eh_frame_hdr_start = . );
+		*(.eh_frame_hdr) *(.eh_frame_entry .eh_frame_entry.*)
+		PROVIDE_HIDDEN ( __eh_frame_hdr_end = . );
+	} >flash AT>flash :text
+	.eh_frame : {
+		PROVIDE_HIDDEN ( __eh_frame_start = . );
+		KEEP (*(.eh_frame .eh_frame.*))
+		PROVIDE_HIDDEN ( __eh_frame_end = . );
 	} >flash AT>flash :text
 
 	.except_unordered : {
