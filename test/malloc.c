@@ -69,6 +69,13 @@ main(void)
 	free(r);
 
 	errno = 0;
+	r = malloc(PTRDIFF_MAX);
+	if (r || errno != ENOMEM) {
+                printf("malloc(%ld) should have failed. got %p error %s\n", (long) PTRDIFF_MAX, r, strerror(errno));
+		result++;
+	}
+
+	errno = 0;
 	r = malloc(SIZE_MAX);
 	if (r || errno != ENOMEM) {
 		printf("malloc(SIZE_MAX) should have failed. got %p error %s\n", r, strerror(errno));
