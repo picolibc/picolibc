@@ -2408,11 +2408,10 @@ fi
 if test "${enable_newlib_global_stdio_streams+set}" = set; then :
   enableval=$enable_newlib_global_stdio_streams; case "${enableval}" in
   yes) newlib_global_stdio_streams=yes;;
-  no)  newlib_global_stdio_streams=no ;;
   *)   as_fn_error $? "bad value ${enableval} for newlib-global-stdio-streams option" "$LINENO" 5 ;;
  esac
 else
-  newlib_global_stdio_streams=
+  newlib_global_stdio_streams=yes
 fi
 
 # Check whether --enable-newlib-fvwrite-in-streamio was given.
@@ -6435,12 +6434,6 @@ fi
 if test "${newlib_reent_binary_compat}" = "yes"; then
 
 $as_echo "#define _WANT_REENT_BACKWARD_BINARY_COMPAT 1" >>confdefs.h
-
-fi
-
-if test "${newlib_global_stdio_streams}" = "yes"; then
-
-$as_echo "#define _WANT_REENT_GLOBAL_STDIO_STREAMS 1" >>confdefs.h
 
 fi
 

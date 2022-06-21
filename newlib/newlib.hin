@@ -402,11 +402,6 @@
 /* Define to enable backward binary compatibility for struct _reent. */
 #undef _WANT_REENT_BACKWARD_BINARY_COMPAT
 
-/* Define to move the stdio stream FILE objects out of struct _reent and make
-   them global. The stdio stream pointers of struct _reent are initialized to
-   point to the global stdio FILE stream objects. */
-#undef _WANT_REENT_GLOBAL_STDIO_STREAMS
-
 /* Optional reentrant struct support. Used mostly on platforms with very
    restricted storage. */
 #undef _WANT_REENT_SMALL
