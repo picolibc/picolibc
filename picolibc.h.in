@@ -17,6 +17,9 @@
 /* use global errno variable */
 #cmakedefine NEWLIB_GLOBAL_ERRNO
 
+/* use function to get errno address */
+#cmakedefine __PICOLIBC_ERRNO_FUNCTION @__PICOLIBC_ERRNO_FUNCTION@
+
 /* use thread local storage */
 #cmakedefine NEWLIB_TLS
 
