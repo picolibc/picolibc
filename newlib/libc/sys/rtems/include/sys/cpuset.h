@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: head/sys/sys/cpuset.h 317756 2017-05-03 18:41:08Z cem $
+ * $FreeBSD$
  */
 
 #ifndef _SYS_CPUSET_H_
