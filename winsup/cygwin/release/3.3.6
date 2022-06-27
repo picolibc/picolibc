@@ -17,3 +17,8 @@ Bug Fixes
 
 - Handle setting very long window title correctly in console.
   Addresses: https://cygwin.com/pipermail/cygwin/2022-June/251662.html
+
+- Fix a bug of poll() that it returns event which is not inquired
+  if events are inquired in multiple pollfd entries on the same fd
+  at the same time.
+  Addresses: https://cygwin.com/pipermail/cygwin/2022-June/251732.html

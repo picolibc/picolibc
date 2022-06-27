@@ -104,7 +104,7 @@ poll (struct pollfd *fds, nfds_t nfds, int timeout)
 	    fds[i].revents = POLLHUP;
 	  else
 	    {
-	      if (FD_ISSET(fds[i].fd, read_fds))
+	      if ((fds[i].events & POLLIN) && FD_ISSET(fds[i].fd, read_fds))
 		/* This should be sufficient for sockets, too.  Using
 		   MSG_PEEK, as before, can be considered dangerous at
 		   best.  Quote from W. Richard Stevens: "The presence
@@ -122,9 +122,11 @@ poll (struct pollfd *fds, nfds_t nfds, int timeout)
 		fds[i].revents |= (POLLIN | POLLERR);
 	      else
 		{
-		  if (FD_ISSET(fds[i].fd, write_fds))
+		  if ((fds[i].events & POLLOUT)
+		      && FD_ISSET(fds[i].fd, write_fds))
 		    fds[i].revents |= POLLOUT;
-		  if (FD_ISSET(fds[i].fd, except_fds))
+		  if ((fds[i].events & POLLPRI)
+		      && FD_ISSET(fds[i].fd, except_fds))
 		    fds[i].revents |= POLLPRI;
 		}
 	    }
