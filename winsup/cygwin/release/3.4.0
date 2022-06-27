@@ -21,6 +21,10 @@ What changed:
   This aligns Cygwin behavior to that of Linux.
   Addresses: https://cygwin.com/pipermail/cygwin/2022-June/251672.html
 
+- Treat an empty path (empty element in PATH or PATH is absent) as
+  the current directory as Linux does.
+  Addresses: https://cygwin.com/pipermail/cygwin/2022-June/251730.html
+
 
 Bug Fixes
 ---------

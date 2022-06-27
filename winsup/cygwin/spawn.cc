@@ -95,6 +95,7 @@ find_exec (const char *name, path_conv& buf, const char *search,
   char *tmp = tp.c_get ();
   bool has_slash = !!strpbrk (name, "/\\");
   int err = 0;
+  bool eopath = false;
 
   debug_printf ("find_exec (%s)", name);
 
@@ -118,8 +119,14 @@ find_exec (const char *name, path_conv& buf, const char *search,
      the name of an environment variable. */
   if (strchr (search, '/'))
     *stpncpy (tmp, search, NT_MAX_PATH - 1) = '\0';
-  else if (has_slash || isdrive (name) || !(path = getenv (search)) || !*path)
+  else if (has_slash || isdrive (name))
     goto errout;
+  /* Search the current directory when PATH is absent. This feature is
+     added for Linux compatibility, but it is deprecated. POSIX notes
+     that a conforming application shall use an explicit path name to
+     specify the current working directory. */
+  else if (!(path = getenv (search)) || !*path)
+    strcpy (tmp, ".");
   else
     *stpncpy (tmp, path, NT_MAX_PATH - 1) = '\0';
 
@@ -130,11 +137,21 @@ find_exec (const char *name, path_conv& buf, const char *search,
   do
     {
       char *eotmp = strccpy (tmp_path, &path, ':');
+      if (*path)
+	path++;
+      else
+	eopath = true;
       /* An empty path or '.' means the current directory, but we've
 	 already tried that.  */
       if ((opt & FE_CWD) && (tmp_path[0] == '\0'
 			     || (tmp_path[0] == '.' && tmp_path[1] == '\0')))
 	continue;
+      /* An empty path means the current directory. This feature is
+	 added for Linux compatibility, but it is deprecated. POSIX
+	 notes that a conforming application shall use an explicit
+	 pathname to specify the current working directory. */
+      else if (tmp_path[0] == '\0')
+	eotmp = stpcpy (tmp_path, ".");
 
       *eotmp++ = '/';
       stpcpy (eotmp, name);
@@ -155,7 +172,7 @@ find_exec (const char *name, path_conv& buf, const char *search,
 	}
 
     }
-  while (*path && *++path);
+  while (!eopath);
 
  errout:
   /* Couldn't find anything in the given path.
