@@ -75,6 +75,7 @@ typedef cpuset_t cpu_set_t;
 
 __BEGIN_DECLS
 
+#ifndef _KERNEL
 static __inline cpu_set_t *CPU_ALLOC(int num_cpus)
 {
   return __cpuset_alloc(num_cpus);
@@ -84,6 +85,7 @@ static __inline void CPU_FREE(cpu_set_t *set)
 {
   __cpuset_free(set);
 }
+#endif
 
 static __inline void CPU_ZERO_S(size_t setsize, cpu_set_t *set)
 {
