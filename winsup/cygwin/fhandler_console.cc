@@ -289,7 +289,18 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
   const int additional_space = 128; /* Possible max number of incoming events
 				       during the process. Additional space
 				       should be left for writeback fix. */
-  const int inrec_size = INREC_SIZE + additional_space;
+  DWORD inrec_size = INREC_SIZE + additional_space;
+  INPUT_RECORD *input_rec =
+    (INPUT_RECORD *) malloc (inrec_size * sizeof (INPUT_RECORD));
+  INPUT_RECORD *input_tmp =
+    (INPUT_RECORD *) malloc (inrec_size * sizeof (INPUT_RECORD));
+
+  if (!input_rec || !input_tmp)
+    return; /* Cannot continue */
+
+  DWORD inrec_size1 =
+    wincap.cons_need_small_input_record_buf () ? INREC_SIZE : inrec_size;
+
   struct m
   {
     inline static size_t bytes (size_t n)
@@ -301,7 +312,6 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
   while (con.owner == myself->pid)
     {
       DWORD total_read, n, i;
-      INPUT_RECORD input_rec[inrec_size];
 
       if (con.disable_master_thread)
 	{
@@ -309,25 +319,55 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 	  continue;
 	}
 
+      acquire_attach_mutex (mutex_timeout);
+      GetNumberOfConsoleInputEvents (p->input_handle, &total_read);
+      release_attach_mutex ();
+      if (total_read > INREC_SIZE)
+	{
+	  cygwait (40);
+	  acquire_attach_mutex (mutex_timeout);
+	  GetNumberOfConsoleInputEvents (p->input_handle, &n);
+	  release_attach_mutex ();
+	  if (n < total_read)
+	    {
+	      /* read() seems to be called. Process special keys
+		 in process_input_message (). */
+	      con.master_thread_suspended = true;
+	      continue;
+	    }
+	  total_read = n;
+	}
+      con.master_thread_suspended = false;
+      if (total_read + additional_space > inrec_size)
+	{
+	  DWORD new_inrec_size = total_read + additional_space;
+	  INPUT_RECORD *new_input_rec = (INPUT_RECORD *)
+	    realloc (input_rec, new_inrec_size * sizeof (INPUT_RECORD));
+	  INPUT_RECORD *new_input_tmp = (INPUT_RECORD *)
+	    realloc (input_tmp, new_inrec_size * sizeof (INPUT_RECORD));
+	  if (new_input_rec && new_input_tmp)
+	    {
+	      inrec_size = new_inrec_size;
+	      input_rec = new_input_rec;
+	      input_tmp = new_input_tmp;
+	      if (!wincap.cons_need_small_input_record_buf ())
+		inrec_size1 = inrec_size;
+	    }
+	}
+
       WaitForSingleObject (p->input_mutex, mutex_timeout);
       total_read = 0;
-      bool nowait = false;
       switch (cygwait (p->input_handle, (DWORD) 0))
 	{
 	case WAIT_OBJECT_0:
-	  acquire_attach_mutex (mutex_timeout);
-	  ReadConsoleInputW (p->input_handle,
-			     input_rec, INREC_SIZE, &total_read);
-	  if (total_read == INREC_SIZE /* Working space full */
-	      && cygwait (p->input_handle, (DWORD) 0) == WAIT_OBJECT_0)
+	  total_read = 0;
+	  while (cygwait (p->input_handle, (DWORD) 0) == WAIT_OBJECT_0)
 	    {
-	      const int incr = min (con.num_processed, additional_space);
-	      ReadConsoleInputW (p->input_handle,
-				 input_rec + total_read, incr, &n);
-	      /* Discard oldest n events. */
-	      memmove (input_rec, input_rec + n, m::bytes (total_read));
-	      con.num_processed -= n;
-	      nowait = true;
+	      DWORD len;
+	      ReadConsoleInputW (p->input_handle, input_rec + total_read,
+				 min (inrec_size - total_read, inrec_size1),
+				 &len);
+	      total_read += len;
 	    }
 	  release_attach_mutex ();
 	  break;
@@ -416,33 +456,56 @@ remove_record:
 	{
 	  do
 	    {
-	      INPUT_RECORD tmp[inrec_size];
 	      /* Writeback input records other than interrupt. */
 	      acquire_attach_mutex (mutex_timeout);
-	      WriteConsoleInputW (p->input_handle, input_rec, total_read, &n);
+	      n = 0;
+	      while (n < total_read)
+		{
+		  DWORD len;
+		  WriteConsoleInputW (p->input_handle, input_rec + n,
+				      min (total_read - n, inrec_size1), &len);
+		  n += len;
+		}
 	      /* Check if writeback was successfull. */
-	      PeekConsoleInputW (p->input_handle, tmp, inrec_size, &n);
+	      PeekConsoleInputW (p->input_handle, input_tmp, inrec_size1, &n);
 	      release_attach_mutex ();
-	      if (n < total_read)
+	      if (n < min (total_read, inrec_size1))
 		break; /* Someone has read input without acquiring
 			  input_mutex. ConEmu cygwin-connector? */
-	      if (inrec_eq (input_rec, tmp, total_read))
+	      if (inrec_eq (input_rec, input_tmp,
+			    min (total_read, inrec_size1)))
 		break; /* OK */
 	      /* Try to fix */
 	      acquire_attach_mutex (mutex_timeout);
-	      ReadConsoleInputW (p->input_handle, tmp, inrec_size, &n);
+	      n = 0;
+	      while (cygwait (p->input_handle, (DWORD) 0) == WAIT_OBJECT_0)
+		{
+		  DWORD len;
+		  ReadConsoleInputW (p->input_handle, input_tmp + n,
+				     min (inrec_size - n, inrec_size1), &len);
+		  n += len;
+		}
 	      release_attach_mutex ();
 	      for (DWORD i = 0, j = 0; j < n; j++)
-		if (i == total_read || !inrec_eq (input_rec + i, tmp + j, 1))
+		if (i == total_read
+		    || !inrec_eq (input_rec + i, input_tmp + j, 1))
 		  {
 		    if (total_read + j - i >= n)
 		      { /* Something is wrong. Giving up. */
 			acquire_attach_mutex (mutex_timeout);
-			WriteConsoleInputW (p->input_handle, tmp, n, &n);
+			WriteConsoleInputW (p->input_handle, input_tmp, n, &n);
+			n = 0;
+			while (n < total_read)
+			  {
+			    DWORD len;
+			    WriteConsoleInputW (p->input_handle, input_rec + n,
+				      min (total_read - n, inrec_size1), &len);
+			    n += len;
+			  }
 			release_attach_mutex ();
 			goto skip_writeback;
 		      }
-		    input_rec[total_read + j - i] = tmp[j];
+		    input_rec[total_read + j - i] = input_tmp[j];
 		  }
 		else
 		  i++;
@@ -452,9 +515,10 @@ remove_record:
 	}
 skip_writeback:
       ReleaseMutex (p->input_mutex);
-      if (!nowait)
-	cygwait (40);
+      cygwait (40);
     }
+  free (input_rec);
+  free (input_tmp);
 }
 
 bool
@@ -549,6 +613,7 @@ fhandler_console::setup ()
       shared_console_info->tty_min_state.is_console = true;
       con.cursor_key_app_mode = false;
       con.disable_master_thread = true;
+      con.master_thread_suspended = false;
       con.num_processed = 0;
     }
 }
@@ -602,6 +667,8 @@ fhandler_console::set_input_mode (tty::cons_mode m, const termios *t,
       break;
     case tty::cygwin:
       flags |= ENABLE_WINDOW_INPUT;
+      if (con.master_thread_suspended)
+	flags |= ENABLE_PROCESSED_INPUT;
       if (wincap.has_con_24bit_colors () && !con_is_legacy)
 	flags |= ENABLE_VIRTUAL_TERMINAL_INPUT;
       else
@@ -4173,5 +4240,5 @@ fhandler_console::close_handle_set (handle_set_t *p)
 bool
 fhandler_console::need_console_handler ()
 {
-  return con.disable_master_thread;
+  return con.disable_master_thread || con.master_thread_suspended;
 }
