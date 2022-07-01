@@ -518,10 +518,11 @@ getpwnam(3), disregarding <literal>HOME</literal>.
 <question><para>How do I uninstall individual packages?</para></question>
 <answer>
 
-<para>Run the Cygwin Setup program as you would to install packages.  In the list of
-packages to install, browse the relevant category or click on the
-``View'' button to get a full listing.  Click on the cycle glyph until
-the action reads ``Uninstall''.  Proceed by clicking ``Next''.
+<para>Run the Cygwin Setup program as you would to install packages.  In the
+``Select packages to install'' dialog, choose ``Up To Date'' in the
+<literal>View</literal> drop-down menu, and locate the package.  Choose the
+``Uninstall'' action from the drop-down menu in the ``New'' column. Proceed by
+clicking ``Next''.
 </para>
 </answer></qandaentry>
 
@@ -688,7 +689,7 @@ files, reinstall the "<literal>cygwin</literal>" package using the Cygwin Setup 
 this purpose.  See <ulink url="http://rsync.samba.org/"/>,
 <ulink url="http://www.gnu.org/software/wget/"/> for utilities that can do this for you.
 For more information on setting up a custom Cygwin package server, see
-the <ulink url="https://sourceware.org/cygwin-apps/setup.html">Cygwin Setup program page</ulink>.
+the <ulink url="https://cygwin.com/package-server.html.html">Cygwin Package Server page</ulink>.
 
 </para>
 </answer></qandaentry>

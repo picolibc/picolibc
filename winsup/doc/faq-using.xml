@@ -15,13 +15,13 @@
 <para>To repair the damage, you must run the Cygwin Setup program again, and re-install the
 package which provides the missing DLL package.
 </para>
-<para>If you already installed the package at one point, the Cygwin Setup program won't
-show the option to install the package by default.  In the
-``Select packages to install'' dialog, click on the <literal>Full/Part</literal>
-button.  This lists all packages, even those that are already
-installed.  Scroll down to locate the missing package, for instance
-<literal>libncurses8</literal>.  Click on the ``cycle'' glyph until it says
-``Reinstall''.  Continue with the installation.
+<para>If you already installed the package at one point, the Cygwin Setup
+program won't show the option to install the package by default.  In the
+``Select packages to install'' dialog, choose ``Full'' in the
+<literal>View</literal> drop-down menu.  This lists all packages, even those
+that are already installed.  Scroll down to locate the missing package, for
+instance <literal>libncurses8</literal>.  Choose the ``Reinstall'' action from
+the drop-down menu in the ``New'' column.  Continue with the installation.
 </para>
 <para>For a detailed explanation of the general problem, and how to extend
 it to other missing DLLs and identify their containing packages, see
