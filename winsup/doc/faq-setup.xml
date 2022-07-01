@@ -383,9 +383,6 @@ are strongly advised not to attempt to
 at once, unless you have a lot of free disk space, a very high speed network
 connection, and the system will not be required for any other purpose for
 many hours (or days) until installation completes.
-For a 32-bit Cygwin installation, you can not install everything, as the
-installation will fail because the 4GB memory available is insufficient to allow
-all the DLLs required to run along with the programs using them.
 </para>
 </answer></qandaentry>
 

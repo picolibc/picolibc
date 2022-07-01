@@ -346,7 +346,7 @@ would be difficult.
 <question><para>Where is Objective C?</para></question>
 <answer>
 
-<para>Support for compiling Objective C is available in the <literal>gcc{4}-objc</literal>
+<para>Support for compiling Objective C is available in the <literal>gcc-objc</literal>
 package; resulting binaries will depend on the <literal>libobjc2</literal>
 package at runtime.
 </para>
@@ -684,8 +684,6 @@ installed; you at least need <literal>gcc-g++</literal>,
 </para>
 
 <para>
-Building for 32-bit Cygwin also requires
-<literal>mingw64-i686-gcc-g++</literal> and <literal>mingw64-i686-zlib</literal>.
 Building for 64-bit Cygwin also requires
 <literal>mingw64-x86_64-gcc-g++</literal> and
 <literal>mingw64-x86_64-zlib</literal>.
