@@ -861,6 +861,8 @@ class fhandler_socket_local: public fhandler_socket_wsock
   int fchmod (mode_t newmode);
   int fchown (uid_t newuid, gid_t newgid);
   int facl (int, int, struct acl *);
+  struct __acl_t *acl_get (uint32_t);
+  int acl_set (struct __acl_t *, uint32_t);
   int link (const char *);
 
   /* from here on: CLONING */
@@ -1143,6 +1145,8 @@ class fhandler_socket_unix : public fhandler_socket
   int fchmod (mode_t newmode);
   int fchown (uid_t newuid, gid_t newgid);
   int facl (int, int, struct acl *);
+  struct __acl_t *acl_get (uint32_t);
+  int acl_set (struct __acl_t *, uint32_t);
   int link (const char *);
 
   /* select.cc */

@@ -25,3 +25,5 @@ What changed:
 Bug Fixes
 ---------
 
+- Don't error out if getfacl(1) is called on a socket file.
+  Partially addresses: https://cygwin.com/pipermail/cygwin/2022-July/251768.html

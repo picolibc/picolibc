@@ -633,6 +633,44 @@ fhandler_disk_file::acl_get (acl_type_t type)
   return acl;
 }
 
+acl_t
+fhandler_socket_local::acl_get (acl_type_t type)
+{
+  if (!dev ().isfs ())
+    /* acl_get_fd on a socket. */
+    return fhandler_base::acl_get (type);
+
+  /* acl_get_fd on a socket opened with O_PATH or acl_get_file on a
+     socket file. */
+  if (get_flags () & O_PATH)
+    {
+      set_errno (EBADF);
+      return NULL;
+    }
+  fhandler_disk_file fh (pc);
+  return fh.acl_get (type);
+}
+
+#ifdef __WITH_AF_UNIX
+acl_t
+fhandler_socket_unix::acl_get (acl_type_t type)
+{
+  if (!dev ().isfs ())
+    /* acl_get_fd on a socket. */
+    return fhandler_base::acl_get (type);
+
+  /* acl_get_fd on a socket opened with O_PATH or acl_get_file on a
+     socket file. */
+  if (get_flags () & O_PATH)
+    {
+      set_errno (EBADF);
+      return NULL;
+    }
+  fhandler_disk_file fh (pc);
+  return fh.acl_get (type);
+}
+#endif
+
 extern "C" acl_t
 acl_get_fd (int fd)
 {
@@ -764,6 +802,44 @@ fhandler_disk_file::acl_set (acl_t acl, acl_type_t type)
     close_fs ();
   return ret;
 }
+
+int
+fhandler_socket_local::acl_set (acl_t acl, acl_type_t type)
+{
+  if (!dev ().isfs ())
+    /* acl_set_fd on a socket. */
+    return fhandler_base::acl_set (acl, type);
+
+  /* acl_set_fd on a socket opened with O_PATH or acl_set_file on a
+     socket file. */
+  if (get_flags () & O_PATH)
+    {
+      set_errno (EBADF);
+      return -1;
+    }
+  fhandler_disk_file fh (pc);
+  return fh.acl_set (acl, type);
+}
+
+#ifdef __WITH_AF_UNIX
+int
+fhandler_socket_unix::acl_set (acl_t acl, acl_type_t type)
+{
+  if (!dev ().isfs ())
+    /* acl_set_fd on a socket. */
+    return fhandler_base::acl_set (acl, type);
+
+  /* acl_set_fd on a socket opened with O_PATH or acl_set_file on a
+     socket file. */
+  if (get_flags () & O_PATH)
+    {
+      set_errno (EBADF);
+      return -1;
+    }
+  fhandler_disk_file fh (pc);
+  return fh.acl_set (acl, type);
+}
+#endif
 
 extern "C" int
 acl_set_fd (int fd, acl_t acl)
