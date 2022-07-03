@@ -361,7 +361,8 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 	{
 	case WAIT_OBJECT_0:
 	  total_read = 0;
-	  while (cygwait (p->input_handle, (DWORD) 0) == WAIT_OBJECT_0)
+	  while (cygwait (p->input_handle, (DWORD) 0) == WAIT_OBJECT_0
+		 && total_read < inrec_size)
 	    {
 	      DWORD len;
 	      ReadConsoleInputW (p->input_handle, input_rec + total_read,
@@ -478,7 +479,8 @@ remove_record:
 	      /* Try to fix */
 	      acquire_attach_mutex (mutex_timeout);
 	      n = 0;
-	      while (cygwait (p->input_handle, (DWORD) 0) == WAIT_OBJECT_0)
+	      while (cygwait (p->input_handle, (DWORD) 0) == WAIT_OBJECT_0
+		     && n < inrec_size)
 		{
 		  DWORD len;
 		  ReadConsoleInputW (p->input_handle, input_tmp + n,
@@ -493,14 +495,13 @@ remove_record:
 		    if (total_read + j - i >= n)
 		      { /* Something is wrong. Giving up. */
 			acquire_attach_mutex (mutex_timeout);
-			WriteConsoleInputW (p->input_handle, input_tmp, n, &n);
-			n = 0;
-			while (n < total_read)
+			DWORD l = 0;
+			while (l < n)
 			  {
 			    DWORD len;
-			    WriteConsoleInputW (p->input_handle, input_rec + n,
-				      min (total_read - n, inrec_size1), &len);
-			    n += len;
+			    WriteConsoleInputW (p->input_handle, input_tmp + l,
+					      min (n - l, inrec_size1), &len);
+			    l += len;
 			  }
 			release_attach_mutex ();
 			goto skip_writeback;
