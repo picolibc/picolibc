@@ -47,11 +47,9 @@ __srefill_r (struct _reent * ptr,
 
   fp->_r = 0;			/* largely a convenience for callers */
 
-#ifndef __CYGWIN__
   /* SysV does not make this test; take it out for compatibility */
   if (fp->_flags & __SEOF)
     return EOF;
-#endif
 
   /* if not already reading, have to be reading and writing */
   if ((fp->_flags & __SRD) == 0)
@@ -115,13 +113,7 @@ __srefill_r (struct _reent * ptr,
 
   fp->_p = fp->_bf._base;
   fp->_r = fp->_read (ptr, fp->_cookie, (char *) fp->_p, fp->_bf._size);
-#ifndef __CYGWIN__
   if (fp->_r <= 0)
-#else
-  if (fp->_r > 0)
-    fp->_flags &= ~__SEOF;
-  else
-#endif
     {
       if (fp->_r == 0)
 	fp->_flags |= __SEOF;

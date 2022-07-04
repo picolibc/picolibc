@@ -17,6 +17,10 @@ What changed:
   opened in byte mode rather than message mode.
   Addresses: https://cygwin.com/pipermail/cygwin/2021-March/247987.html
 
+- The stdio input functions no longer try again to read after EOF.
+  This aligns Cygwin behavior to that of Linux.
+  Addresses: https://cygwin.com/pipermail/cygwin/2022-June/251672.html
+
 
 Bug Fixes
 ---------
