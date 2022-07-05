@@ -342,9 +342,9 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 	{
 	  DWORD new_inrec_size = total_read + additional_space;
 	  INPUT_RECORD *new_input_rec = (INPUT_RECORD *)
-	    realloc (input_rec, new_inrec_size * sizeof (INPUT_RECORD));
+	    realloc (input_rec, m::bytes (new_inrec_size));
 	  INPUT_RECORD *new_input_tmp = (INPUT_RECORD *)
-	    realloc (input_tmp, new_inrec_size * sizeof (INPUT_RECORD));
+	    realloc (input_tmp, m::bytes (new_inrec_size));
 	  if (new_input_rec && new_input_tmp)
 	    {
 	      inrec_size = new_inrec_size;
@@ -360,6 +360,7 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
       switch (cygwait (p->input_handle, (DWORD) 0))
 	{
 	case WAIT_OBJECT_0:
+	  acquire_attach_mutex (mutex_timeout);
 	  total_read = 0;
 	  while (cygwait (p->input_handle, (DWORD) 0) == WAIT_OBJECT_0
 		 && total_read < inrec_size)
@@ -467,7 +468,30 @@ remove_record:
 				      min (total_read - n, inrec_size1), &len);
 		  n += len;
 		}
+	      release_attach_mutex ();
+
+	      acquire_attach_mutex (mutex_timeout);
+	      GetNumberOfConsoleInputEvents (p->input_handle, &n);
+	      release_attach_mutex ();
+	      if (n + additional_space > inrec_size)
+		{
+		  DWORD new_inrec_size = n + additional_space;
+		  INPUT_RECORD *new_input_rec = (INPUT_RECORD *)
+		    realloc (input_rec, m::bytes (new_inrec_size));
+		  INPUT_RECORD *new_input_tmp = (INPUT_RECORD *)
+		    realloc (input_tmp, m::bytes (new_inrec_size));
+		  if (new_input_rec && new_input_tmp)
+		    {
+		      inrec_size = new_inrec_size;
+		      input_rec = new_input_rec;
+		      input_tmp = new_input_tmp;
+		      if (!wincap.cons_need_small_input_record_buf ())
+			inrec_size1 = inrec_size;
+		    }
+		}
+
 	      /* Check if writeback was successfull. */
+	      acquire_attach_mutex (mutex_timeout);
 	      PeekConsoleInputW (p->input_handle, input_tmp, inrec_size1, &n);
 	      release_attach_mutex ();
 	      if (n < min (total_read, inrec_size1))
@@ -488,28 +512,47 @@ remove_record:
 		  n += len;
 		}
 	      release_attach_mutex ();
-	      for (DWORD i = 0, j = 0; j < n; j++)
-		if (i == total_read
-		    || !inrec_eq (input_rec + i, input_tmp + j, 1))
-		  {
-		    if (total_read + j - i >= n)
-		      { /* Something is wrong. Giving up. */
-			acquire_attach_mutex (mutex_timeout);
-			DWORD l = 0;
-			while (l < n)
-			  {
-			    DWORD len;
-			    WriteConsoleInputW (p->input_handle, input_tmp + l,
-					      min (n - l, inrec_size1), &len);
-			    l += len;
+	      bool fixed = false;
+	      for (DWORD ofs = n - total_read; ofs > 0; ofs--)
+		{
+		  if (inrec_eq (input_rec, input_tmp + ofs, total_read))
+		    {
+		      memcpy (input_rec + total_read, input_tmp,
+			      m::bytes (ofs));
+		      memcpy (input_rec + total_read + ofs,
+			      input_tmp + total_read + ofs,
+			      m::bytes (n - ofs - total_read));
+		      fixed = true;
+		      break;
+		    }
+		}
+	      if (!fixed)
+		{
+		  for (DWORD i = 0, j = 0; j < n; j++)
+		    if (i == total_read
+			|| !inrec_eq (input_rec + i, input_tmp + j, 1))
+		      {
+			if (total_read + j - i >= n)
+			  { /* Something is wrong. Giving up. */
+			    acquire_attach_mutex (mutex_timeout);
+			    DWORD l = 0;
+			    while (l < n)
+			      {
+				DWORD len;
+				WriteConsoleInputW (p->input_handle,
+						    input_tmp + l,
+						    min (n - l, inrec_size1),
+						    &len);
+				l += len;
+			      }
+			    release_attach_mutex ();
+			    goto skip_writeback;
 			  }
-			release_attach_mutex ();
-			goto skip_writeback;
+			input_rec[total_read + j - i] = input_tmp[j];
 		      }
-		    input_rec[total_read + j - i] = input_tmp[j];
-		  }
-		else
-		  i++;
+		    else
+		      i++;
+		}
 	      total_read = n;
 	    }
 	  while (true);
