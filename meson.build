@@ -505,13 +505,19 @@ specs_cpp_data.set('PICOLIBC_LD', 'picolibcpp.ld')
 specs_cpp_data.set('CRTBEGIN', 'crtbegin%O%s')
 specs_cpp_data.set('CRTEND', 'crtend%O%s')
 
-picolibc_specs = configure_file(input: 'picolibc.specs.in',
-				output: '@BASENAME@',
+if enable_multilib
+  picolibc_specs_in = 'picolibc.specs.in-multilib'
+else
+  picolibc_specs_in = 'picolibc.specs.in-singlelib'
+endif
+
+picolibc_specs = configure_file(input: picolibc_specs_in,
+				output: 'picolibc.specs',
 				configuration: specs_c_data,
 				install_dir: specs_dir,
 				install: specs_install)
 
-picolibcpp_specs = configure_file(input: 'picolibc.specs.in',
+picolibcpp_specs = configure_file(input: picolibc_specs_in,
 				  output: 'picolibcpp.specs',
 				  configuration: specs_cpp_data,
 				  install_dir: specs_dir,

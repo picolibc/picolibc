@@ -428,7 +428,7 @@ string(APPEND SPECS_PRINTF "%{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfprintf=__f
   " %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfprintf=__i_vfprintf}")
 set(PREFIX "${PROJECT_BINARY_DIR}")
 
-configure_file(picolibc.specs.in "${PROJECT_BINARY_DIR}/picolibc.specs" @ONLY)
+configure_file(picolibc.specs.in-singlelib "${PROJECT_BINARY_DIR}/picolibc.specs" @ONLY)
 
 set(PICOLIBC_COMPILE_OPTIONS
   "--include" "${PICOLIBC_INCLUDE}/picolibc.h"
