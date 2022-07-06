@@ -517,12 +517,13 @@ details. */
        pthread_rwlock_clockrdlock, pthread_rwlock_clockwrlock,
        sem_clockwait, sig2str, str2sig.
   342: Remove cleanup_glue.
+  343: Change FD_SETSIZE and NOFILE.
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 342
+#define CYGWIN_VERSION_API_MINOR 343
 
 /* There is also a compatibity version number associated with the shared memory
    regions.  It is incremented when incompatible changes are made to the shared

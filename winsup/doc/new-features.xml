@@ -33,6 +33,11 @@ Handle UDP_SEGMENT and UDP_GRO socket options.
 The stdio input functions no longer try again to read after EOF.
 </para></listitem>
 
+<listitem><para>
+The default values of FD_SETSIZE and NOFILE are now 1024 and 3200,
+respectively.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

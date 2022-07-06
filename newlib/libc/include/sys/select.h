@@ -25,10 +25,14 @@ typedef	__sigset_t	sigset_t;
  * Select uses bit masks of file descriptors in longs.
  * These macros manipulate such bit fields (the filesystem macros use chars).
  * FD_SETSIZE may be defined by the user, but the default here
- * should be >= NOFILE (param.h).
+ * should be enough for most uses.
  */
-#ifndef	FD_SETSIZE
-#define	FD_SETSIZE	64
+#ifndef FD_SETSIZE
+# ifdef __CYGWIN__
+#  define FD_SETSIZE	1024
+# else
+#  define FD_SETSIZE	64
+# endif
 #endif
 
 typedef unsigned long	__fd_mask;

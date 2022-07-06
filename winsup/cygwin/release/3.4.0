@@ -25,6 +25,10 @@ What changed:
   the current directory as Linux does.
   Addresses: https://cygwin.com/pipermail/cygwin/2022-June/251730.html
 
+- The default values of FD_SETSIZE and NOFILE are now 1024 and 3200,
+  respectively.
+  Addresses: https://cygwin.com/pipermail/cygwin/2022-July/251839.html
+
 
 Bug Fixes
 ---------
