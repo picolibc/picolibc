@@ -36,7 +36,6 @@
 #define	_SYS_IOCCOM_H_
 
 #include <sys/types.h>
-#include <stdint.h>
 
 typedef unsigned long ioctl_command_t;
 
@@ -80,14 +79,10 @@ typedef unsigned long ioctl_command_t;
 #define	IOCPARM_IVAL(x)	((int)(intptr_t)(void *)*(caddr_t *)(void *)(x))
 #endif
 
-#else
-
-#include <sys/cdefs.h>
+#endif
 
 __BEGIN_DECLS
 int	ioctl(int, ioctl_command_t, ...);
 __END_DECLS
-
-#endif
 
 #endif /* !_SYS_IOCCOM_H_ */
