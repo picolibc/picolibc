@@ -63,11 +63,13 @@ For other options, search the mailing lists with terms such as
 <screen>
     --allow-unsupported-windows    Allow old, unsupported Windows versions
  -a --arch                         Architecture to install (x86_64 or x86)
- -C --categories                   Specify entire categories to install
+ -C --categories                   Specify categories to install
+    --compact-os                   Compress installed files with Compact OS
+                                   (xpress4k, xpress8k, xpress16k, lzx)
  -o --delete-orphans               Remove orphaned packages
  -A --disable-buggy-antivirus      Disable known or suspected buggy anti virus
-                                   software packages during execution.
- -D --download                     Download packages from internet only
+                                   software packages during execution
+ -D --download                     Download packages from internet
  -f --force-current                Select the current version for all packages
  -h --help                         Print help
  -I --include-source               Automatically install source for every
@@ -75,7 +77,8 @@ For other options, search the mailing lists with terms such as
  -i --ini-basename                 Use a different basename, e.g. "foo",
                                    instead of "setup"
  -U --keep-untrusted-keys          Use untrusted keys and retain all
- -L --local-install                Install packages from local directory only
+    --lang                         Specify GUI language langid
+ -L --local-install                Install packages from local directory
  -l --local-package-dir            Local package directory
  -m --mirror-mode                  Skip package availability check when
                                    installing from local directory (requires
@@ -83,15 +86,15 @@ For other options, search the mailing lists with terms such as
  -B --no-admin                     Do not check for and enforce running as
                                    Administrator
  -d --no-desktop                   Disable creation of desktop shortcut
- -r --no-replaceonreboot           Disable replacing in-use files on next
-                                   reboot.
+ -r --no-replaceonreboot           Disable replacing in-use files on next reboot
  -n --no-shortcuts                 Disable creation of desktop and start menu
                                    shortcuts
  -N --no-startmenu                 Disable creation of start menu shortcut
  -X --no-verify                    Don't verify setup.ini signatures
     --no-version-check             Suppress checking if a newer version of
                                    setup is available
-    --old-keys                     Enable old cygwin.com keys
+ -w --no-warn-deprecated-windows   Don't warn about deprecated Windows versions
+    --enable-old-keys              Enable old cygwin.com keys
  -O --only-site                    Do not download mirror list.  Only use sites
                                    specified with -s.
  -M --package-manager              Semi-attended chooser-only mode
@@ -107,6 +110,7 @@ For other options, search the mailing lists with terms such as
  -R --root                         Root installation directory
  -S --sexpr-pubkey                 Extra DSA public key in s-expr format
  -s --site                         Download site URL
+    --symlink-type                 Symlink type (lnk, native, sys, wsl)
  -u --untrusted-keys               Use untrusted saved extra keys
  -g --upgrade-also                 Also upgrade installed packages
     --user-agent                   User agent string for HTTP requests
