@@ -194,6 +194,10 @@ typedef	_TIME_T_	__time_t;
 
 typedef	_CLOCKID_T_	__clockid_t;
 
+#ifndef __machine_daddr_t_defined
+typedef	long		__daddr_t;
+#endif
+
 #define	_TIMER_T_	unsigned long
 typedef	_TIMER_T_	__timer_t;
 
