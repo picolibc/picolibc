@@ -296,7 +296,11 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
     (INPUT_RECORD *) malloc (inrec_size * sizeof (INPUT_RECORD));
 
   if (!input_rec || !input_tmp)
-    return; /* Cannot continue */
+    { /* Cannot continue */
+      free (input_rec);
+      free (input_tmp);
+      return;
+    }
 
   DWORD inrec_size1 =
     wincap.cons_need_small_input_record_buf () ? INREC_SIZE : inrec_size;
@@ -343,13 +347,15 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 	  DWORD new_inrec_size = total_read + additional_space;
 	  INPUT_RECORD *new_input_rec = (INPUT_RECORD *)
 	    realloc (input_rec, m::bytes (new_inrec_size));
+	  if (new_input_rec)
+	    input_rec = new_input_rec;
 	  INPUT_RECORD *new_input_tmp = (INPUT_RECORD *)
 	    realloc (input_tmp, m::bytes (new_inrec_size));
+	  if (new_input_tmp)
+	    input_tmp = new_input_tmp;
 	  if (new_input_rec && new_input_tmp)
 	    {
 	      inrec_size = new_inrec_size;
-	      input_rec = new_input_rec;
-	      input_tmp = new_input_tmp;
 	      if (!wincap.cons_need_small_input_record_buf ())
 		inrec_size1 = inrec_size;
 	    }
@@ -478,13 +484,15 @@ remove_record:
 		  DWORD new_inrec_size = n + additional_space;
 		  INPUT_RECORD *new_input_rec = (INPUT_RECORD *)
 		    realloc (input_rec, m::bytes (new_inrec_size));
+		  if (new_input_rec)
+		    input_rec = new_input_rec;
 		  INPUT_RECORD *new_input_tmp = (INPUT_RECORD *)
 		    realloc (input_tmp, m::bytes (new_inrec_size));
+		  if (new_input_tmp)
+		    input_tmp = new_input_tmp;
 		  if (new_input_rec && new_input_tmp)
 		    {
 		      inrec_size = new_inrec_size;
-		      input_rec = new_input_rec;
-		      input_tmp = new_input_tmp;
 		      if (!wincap.cons_need_small_input_record_buf ())
 			inrec_size1 = inrec_size;
 		    }
