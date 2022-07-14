@@ -39,12 +39,10 @@ PEHeaderFromHModule (HMODULE hModule, bool &is_64bit)
     {
       pNTHeader = PIMAGE_NT_HEADERS (PBYTE (hModule)
 				     + PIMAGE_DOS_HEADER (hModule) ->e_lfanew);
-      if (pNTHeader->Signature != IMAGE_NT_SIGNATURE)
+      if (pNTHeader->Signature == IMAGE_NT_SIGNATURE)
 	pNTHeader = NULL;
       else if (pNTHeader->FileHeader.Machine == IMAGE_FILE_MACHINE_AMD64)
 	is_64bit = true;
-      else if (pNTHeader->FileHeader.Machine == IMAGE_FILE_MACHINE_I386)
-	is_64bit = false;
       else
 	pNTHeader = NULL;
     }
