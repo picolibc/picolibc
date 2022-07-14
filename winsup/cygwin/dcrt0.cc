@@ -1016,7 +1016,6 @@ __cygwin_exit_return:			\n\
 extern "C" void __stdcall
 _dll_crt0 ()
 {
-#ifdef __x86_64__
   /* Starting with Windows 10 rel 1511, the main stack of an application is
      not reproducible if a 64 bit process has been started from a 32 bit
      process.  Given that we have enough virtual address space on 64 bit
@@ -1033,6 +1032,7 @@ _dll_crt0 ()
 	  PVOID stackaddr = create_new_main_thread_stack (allocationbase);
 	  if (stackaddr)
 	    {
+#ifdef __x86_64__
 	      /* Set stack pointer to new address.  Set frame pointer to
 	         stack pointer and subtract 32 bytes for shadow space. */
 	      __asm__ ("\n\
@@ -1040,6 +1040,9 @@ _dll_crt0 ()
 		       movq  %%rsp, %%rbp  \n\
 		       subq  $32,%%rsp     \n"
 		       : : [ADDR] "r" (stackaddr));
+#else
+#error unimplemented for this target
+#endif
 	      /* We're on the new stack now.  Free up space taken by the former
 		 main thread stack and set DeallocationStack correctly. */
 	      VirtualFree (NtCurrentTeb ()->DeallocationStack, 0, MEM_RELEASE);
@@ -1049,9 +1052,6 @@ _dll_crt0 ()
       else
 	fork_info->alloc_stack ();
     }
-#else
-#error unimplemented for this target
-#endif
 
   fesetenv (FE_DFL_ENV);
   _main_tls = &_my_tls;
