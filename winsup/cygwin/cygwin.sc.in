@@ -2,9 +2,7 @@
 OUTPUT_FORMAT(pei-x86-64)
 SEARCH_DIR("/usr/x86_64-pc-cygwin/lib/w32api"); SEARCH_DIR("=/usr/lib/w32api");
 #else
-#undef i386
-OUTPUT_FORMAT(pei-i386)
-SEARCH_DIR("/usr/i686-pc-cygwin/lib/w32api"); SEARCH_DIR("=/usr/lib/w32api");
+#error unimplemented for this target
 #endif
 #define __CONCAT1(a,b)	a##b
 #define __CONCAT(a,b) __CONCAT1(a,b)
