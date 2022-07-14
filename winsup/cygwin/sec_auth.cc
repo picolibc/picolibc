@@ -25,7 +25,6 @@ details. */
 #include <userenv.h>
 #define SECURITY_WIN32
 #include <secext.h>
-#include "cyglsa.h"
 #include "cygserver_setpwd.h"
 #include <cygwin/version.h>
 
