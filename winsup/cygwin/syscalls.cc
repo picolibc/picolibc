@@ -5048,7 +5048,3 @@ tmpfile (void)
   set_errno (e);
   return fp;
 }
-
-#ifdef __i386__
-EXPORT_ALIAS (tmpfile, tmpfile64)
-#endif
