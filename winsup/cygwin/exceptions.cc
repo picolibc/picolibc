@@ -1649,10 +1649,9 @@ _cygtls::call_signal_handler ()
 	    NOTE:
 
 	    We DO NOT change the TEB's stack addresses and we DO NOT move the
-	    _cygtls area to the alternate stack.  This seems to work fine on
-	    32 and 64 bit, but there may be Windows functions not working
-	    correctly under these circumstances.  Especially 32 bit exception
-	    handling may be broken.
+	    _cygtls area to the alternate stack.  This seems to work fine,
+	    but there may be Windows functions not working correctly under
+	    these circumstances.
 
 	    On the other hand, if a Windows function crashed and we're handling
 	    this here, moving the TEB stack addresses may be fatal.
@@ -1752,7 +1751,7 @@ _cygtls::signal_debugger (siginfo_t& si)
 	  if (incyg)
 	    c._CX_instPtr = retaddr ();
 	  memcpy (&context.uc_mcontext, &c, sizeof (CONTEXT));
-	  /* Enough space for 32/64 bit addresses */
+	  /* Enough space for 64 bit addresses */
 	  char sigmsg[2 * sizeof (_CYGWIN_SIGNAL_STRING
 				  " ffffffff ffffffffffffffff")];
 	  __small_sprintf (sigmsg, _CYGWIN_SIGNAL_STRING " %d %y %p",

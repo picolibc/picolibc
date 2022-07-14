@@ -4175,10 +4175,6 @@ gethostid (void)
 {
   /* Fetch the globally unique MachineGuid value from
      HKLM/Software/Microsoft/Cryptography and hash it. */
-
-  /* Caution: sizeof long might become > 4 when we go 64 bit, but gethostid
-     is supposed to return a 32 bit value, despite the return type long.
-     That's why hostid is *not* long here. */
   int32_t hostid = 0x40291372; /* Choose a nice start value */
   WCHAR wguid[38];
 

@@ -1504,7 +1504,7 @@ fhandler_dev_null::fhandler_dev_null () :
 ssize_t
 fhandler_dev_null::write (const void *ptr, size_t len)
 {
-  /* Shortcut.  This also fixes a problem with the NUL device on 64 bit:
+  /* Shortcut.  This also fixes a problem with the NUL device on x86_64:
      If you write > 4 GB in a single attempt, the bytes written returned
      from by is numBytes & 0xffffffff. */
   return len;

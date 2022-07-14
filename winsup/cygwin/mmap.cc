@@ -284,7 +284,6 @@ class mmap_record
     LIST_ENTRY (mmap_record) mr_next;
 
   private:
-    /* 4 byte on 32 bit, 8 byte on 64 bit */
     HANDLE mapping_hdl;
     SIZE_T len;
     caddr_t base_address;

@@ -63,9 +63,8 @@ class mtinfo_drive
   lock_state lock;
   TAPE_GET_DRIVE_PARAMETERS _dp;
   TAPE_GET_MEDIA_PARAMETERS _mp;
-  /* sizeof(OVERLAPPED) == 20 on 32 bit, 32 on 64 bit.  A drive is always
-     opened exclusively by a single process, though, so instead of the
-     OVERLAPPED structure, we just keep track of the pointer to the
+  /* A drive is always opened exclusively by a single process, so instead
+     of the OVERLAPPED structure, we just keep track of the pointer to the
      OVERLAPPED structure in the application's fhandler. */
   LPOVERLAPPED ov;
   struct status_flags

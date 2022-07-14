@@ -35,8 +35,7 @@ bool NO_COPY wsock_started;
  *			 the call.  If this is an odd value then this
  *			 is a flag that non-existence of this function
  *			 is not a fatal error
- *  func addr (8 bytes)  (64 bit ONLY!)
- *			 Address of the actual Win32 function.  For the
+ *  func addr (8 bytes)  Address of the actual Win32 function.  For the
  *			 reason why this is necessary, see the below
  *			 description of the load_state.
  *  func name (n bytes)	 asciz string containing the name of the function
@@ -49,7 +48,7 @@ bool NO_COPY wsock_started;
  *			 gets the process's load address, changes the contents
  *			 here to point to the function address, and changes
  *			 the address argument of the initial jmp call.
- *			 On 64 bit, the jmp is not tweaked directly.  Rather,
+ *			 On x86_64, the jmp is not tweaked directly.  Rather,
  *			 the address of the Win32 function is stored in the
  *			 aforementioned Win32 function address slot and fetched
  *			 there for a jmp *%rax call.  This indirection is
