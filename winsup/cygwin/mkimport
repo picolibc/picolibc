@@ -23,8 +23,9 @@ my %text = ();
 my %import = ();
 my %symfile = ();
 
-my $is64bit = ($cpu eq 'x86_64' ? 1 : 0);
-my $sym_prefix = ($is64bit ? '' : '_');
+my $is_x86_64 = ($cpu eq 'x86_64' ? 1 : 0);
+# FIXME? Do other (non-32 bit) arches on Windows still use symbol prefixes?
+my $sym_prefix = '';
 
 while (<$nm_fd>) {
     chomp;
@@ -57,7 +58,7 @@ for my $f (keys %text) {
     } else {
 	$text{$f} = 1;
 	open my $as_fd, '|-', $as, '-o', "$dir/t-$f", "-";
-	if ($is64bit) {
+	if ($is_x86_64) {
 	    print $as_fd <<EOF;
 	.text
 	.extern	$imp_sym

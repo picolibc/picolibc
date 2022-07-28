@@ -21,8 +21,9 @@ if (!defined($cpu) || !defined($output_def)) {
     die "$0: missing required option\n";
 }
 
-my $is64bit = $cpu eq 'x86_64';
-my $sym_prefix = $is64bit ? '' : '_';
+my $is_x86_64 = $cpu eq 'x86_64';
+# FIXME? Do other (non-32 bit) arches on Windows still use symbol prefixes?
+my $sym_prefix = '';
 
 my @top = ();
 while (<>) {
@@ -88,14 +89,12 @@ sub fefunc {
     my $func = $sym_prefix . shift;
     my $fe = $sym_prefix . shift;
     my $sigfe_func;
-    if ($is64bit) {
+    if ($is_x86_64) {
 	$sigfe_func = ($fe =~ /^(.*)_${func}$/)[0];
-    } else {
-	$sigfe_func = ($fe =~ /^(.*)${func}$/)[0];
     }
     my $extra;
     my $res;
-    if ($is64bit) {
+    if ($is_x86_64) {
 	$res = <<EOF;
 	.extern	$func
 	.global	$fe
@@ -109,18 +108,9 @@ $fe:
 	.seh_endproc
 
 EOF
-    } else {
-	$res = <<EOF;
-        .extern $func
-        .global $fe
-$fe:
-        pushl   \$$func
-        jmp     $sigfe_func
-
-EOF
     }
     if (!$main::first++) {
-	if ($is64bit) {
+	if ($is_x86_64) {
 	  $res = <<EOF . longjmp () . $res;
 	.include "tlsoffsets"
 	.text
@@ -389,203 +379,13 @@ stabilize_sig_stack:
 	ret
 	.seh_endproc
 EOF
-	} else {
-	  $res = <<EOF . longjmp () . $res;
-	.text
-
-__sigfe_maybe:
-	pushl	%ebx
-	pushl	%edx
-	movl	%fs:4,%ebx			# location of bottom of stack
-	addl	\$_cygtls.initialized,%ebx	# where we will be looking
-	cmpl	%ebx,%esp			# stack loc > than tls
-	jge	0f				# yep.  we don't have a tls.
-	subl	\$_cygtls.initialized,%ebx	# where we will be looking
-	movl	_cygtls.initialized(%ebx),%eax
-	cmpl	\$0xc763173f,%eax		# initialized?
-	je	1f
-0:	popl	%edx
-	popl	%ebx
-	ret
-
-__sigfe:
-	pushl	%ebx
-	pushl	%edx
-	movl	%fs:4,%ebx			# location of bottom of stack
-1:	movl	\$1,%eax			# potential lock value
-	xchgl	%eax,_cygtls.stacklock(%ebx)	# see if we can grab it
-	movl	%eax,_cygtls.spinning(%ebx)	# flag if we are waiting for lock
-	testl	%eax,%eax			# it will be zero
-	jz	2f				#  if so
-	call	_yield				# should be a short-time thing, so
-	jmp	1b				# sleep and loop
-2:	movl	\$4,%eax			# have the lock, now increment the
-	xadd	%eax,_cygtls.stackptr(%ebx)	#  stack pointer and get pointer
-	leal	__sigbe,%edx			# new place to return to
-	xchgl	%edx,12(%esp)			# exchange with real return value
-	movl	%edx,(%eax)			# store real return value on alt stack
-	incl	_cygtls.incyg(%ebx)
-	decl	_cygtls.stacklock(%ebx)		# remove lock
-	popl	%edx				# restore saved value
-	popl	%ebx
-	ret
-
-	.global	__sigbe
-__sigbe:					# return here after cygwin syscall
-	pushl	%eax				# don't clobber
-	pushl	%ebx				# tls pointer
-1:	movl	%fs:4,%ebx			# address of bottom of tls
-	movl	\$1,%eax			# potential lock value
-	xchgl	%eax,_cygtls.stacklock(%ebx)	# see if we can grab it
-	movl	%eax,_cygtls.spinning(%ebx)	# flag if we are waiting for lock
-	testl	%eax,%eax			# it will be zero
-	jz	2f				#  if so
-	call	_yield				# sleep
-	jmp	1b				#  and loop
-2:	movl	\$-4,%eax			# now decrement aux stack
-	xadd	%eax,_cygtls.stackptr(%ebx)	#  and get pointer
-	movl	-4(%eax),%eax			# get return address from signal stack
-	xchgl	%eax,4(%esp)			# swap return address with saved eax
-	decl	_cygtls.incyg(%ebx)
-	decl	_cygtls.stacklock(%ebx)		# release lock
-	popl	%ebx
-	ret
-
-	.global	_sigdelayed
-_sigdelayed:
-	pushl   %ebp
-	movl    %esp,%ebp
-	# We could be called from an interrupted thread which doesn't know
-	# about his fate, so save and restore everything and the kitchen sink.
-	pushf
-	pushl   %esi
-	pushl   %edi
-	pushl   %edx
-	pushl   %ecx
-	pushl   %ebx
-	pushl   %eax
-	subl	\$0x84,%esp
-	fnstcw  0x80(%esp)
-	movdqu	%xmm7,0x70(%esp)
-	movdqu	%xmm6,0x60(%esp)
-	movdqu	%xmm5,0x50(%esp)
-	movdqu	%xmm4,0x40(%esp)
-	movdqu	%xmm3,0x30(%esp)
-	movdqu	%xmm2,0x20(%esp)
-	movdqu	%xmm1,0x10(%esp)
-	movdqu	%xmm0,(%esp)
-	movl	%fs:4,%ebx				# get tls
-	pushl   _cygtls.saved_errno(%ebx) # saved errno
-
-	movl	\$_cygtls.start_offset,%eax		# point to beginning
-	addl	%ebx,%eax				#  of tls block
-	call	__ZN7_cygtls19call_signal_handlerEv\@4	# call handler
-
-	movl	%fs:4,%ebx				# reget tls
-1:	movl	\$1,%eax				# potential lock value
-	xchgl	%eax,_cygtls.stacklock(%ebx)		# see if we can grab it
-	movl	%eax,_cygtls.spinning(%ebx)		# flag if we are waiting for lock
-	testl	%eax,%eax				# it will be zero
-	jz	2f					#  if so
-	call	_yield					# sleep
-	jmp	1b					#  and loop
-2:	popl	%edx					# saved errno
-	testl	%edx,%edx				# Is it < 0
-	jl	3f					# yup.  ignore it
-	movl	_cygtls.errno_addr(%ebx),%eax
-	movl	%edx,(%eax)
-3:	movl	\$-4,%eax				# now decrement aux stack
-	xadd	%eax,_cygtls.stackptr(%ebx)		#  and get pointer
-	xorl	%ebp,%ebp
-	xchgl	%ebp,-4(%eax)				# get return address from signal stack
-	xchgl	%ebp,0xa0(%esp)				# store real return address
-leave:	xorl	%eax,%eax
-	movl	%eax,_cygtls.incyg(%ebx)
-	movl	%eax,_cygtls.stacklock(%ebx)		# unlock
-
-	movdqu	(%esp),%xmm0
-	movdqu	0x10(%esp),%xmm1
-	movdqu	0x20(%esp),%xmm2
-	movdqu	0x30(%esp),%xmm3
-	movdqu	0x40(%esp),%xmm4
-	movdqu	0x50(%esp),%xmm5
-	movdqu	0x60(%esp),%xmm6
-	movdqu	0x70(%esp),%xmm7
-	fninit
-	fldcw   0x80(%esp)
-	addl	\$0x84,%esp
-	popl	%eax
-	popl	%ebx
-	popl	%ecx
-	popl	%edx
-	popl	%edi
-	popl	%esi
-	popf
-	ret
-
-	.global __ZN7_cygtls3popEv\@4
-__ZN7_cygtls3popEv\@4:
-1:	pushl	%ebx
-	movl	%eax,%ebx			# this
-	movl	\$-4,%eax
-	xadd	%eax,_cygtls.stackptr_p(%ebx)
-	movl	-4(%eax),%eax
-	popl	%ebx
-	ret
-
-# _cygtls::lock
-	.global	__ZN7_cygtls4lockEv\@4
-__ZN7_cygtls4lockEv\@4:
-	pushl	%ebx
-	movl	%eax,%ebx
-1:	movl	\$1,%eax
-	xchgl	%eax,_cygtls.stacklock_p(%ebx)
-	testl	%eax,%eax
-	jz	2f
-	call	_yield
-	jmp	1b
-2:	popl	%ebx
-	ret
-
-# _cygtls::unlock
-	.global	__ZN7_cygtls6unlockEv\@4
-__ZN7_cygtls6unlockEv\@4:
-	decl	_cygtls.stacklock_p(%eax)
-	ret
-
-	.global	__ZN7_cygtls6lockedEv
-__ZN7_cygtls6lockedEv:
-	movl	_cygtls.stacklock_p(%eax),%eax
-	ret
-
-	.extern	__ZN7_cygtls19call_signal_handlerEv\@4
-stabilize_sig_stack:
-	movl	%fs:4,%ebx
-1:	movl	\$1,%eax
-	xchgl	%eax,_cygtls.stacklock(%ebx)
-	movl	%eax,_cygtls.spinning(%ebx)		# flag if we are waiting for lock
-	testl	%eax,%eax
-	jz	2f
-	call	_yield
-	jmp	1b
-2:	incl	_cygtls.incyg(%ebx)
-	cmpl	\$0,_cygtls.sig(%ebx)
-	jz	3f
-	decl	_cygtls.stacklock(%ebx)			# unlock
-	movl	\$_cygtls.start_offset,%eax		# point to beginning
-	addl	%ebx,%eax				#  of tls block
-	call	__ZN7_cygtls19call_signal_handlerEv\@4
-	jmp	1b
-3:	decl	_cygtls.incyg(%ebx)
-	ret
-EOF
 	}
     }
     return $res;
 }
 
 sub longjmp {
-    if ($is64bit) {
+    if ($is_x86_64) {
 	return <<EOF;
 
 	.globl	sigsetjmp
@@ -714,204 +514,6 @@ longjmp:
 	incl	%eax
 0:	ret
 	.seh_endproc
-EOF
-    } else {
-	return <<EOF;
-
-	.globl	_sigsetjmp
-_sigsetjmp:
-	pushl   %ebp
-	movl    %esp,%ebp
-	pushl   %edi
-	movl	8(%ebp),%edi			# &sigjmp_buf
-	movl	12(%ebp),%eax			# savemask
-	movl	%eax,208(%edi)			# store savemask
-	testl	%eax,%eax			# savemask != 0?
-	je	1f				# no, skip fetching sigmask
-	subl	\$12,%esp
-	leal	212(%edi),%eax			# &sigjmp_buf.sigmask
-	movl	%eax,8(%esp)			# -> 3rd param "oldset"
-	xorl	%eax,%eax
-	movl	%eax,4(%esp)			# NULL -> 2nd param "set"
-	movl	%eax,(%esp)			# SIG_SETMASK -> 1st param "how"
-	call	_pthread_sigmask
-	addl	\$12,%esp
-	jmp	1f
-
-	.globl	_setjmp
-_setjmp:
-	pushl	%ebp
-	movl	%esp,%ebp
-	pushl	%edi
-	movl	8(%ebp),%edi
-1:
-	movl	%eax,0(%edi)
-	movl	%ebx,4(%edi)
-	movl	%ecx,8(%edi)
-	movl	%edx,12(%edi)
-	movl	%esi,16(%edi)
-	movl	-4(%ebp),%eax
-	movl	%eax,20(%edi)
-	movl	0(%ebp),%eax
-	movl	%eax,24(%edi)
-	movl	%esp,%eax
-	addl	\$12,%eax
-	movl	%eax,28(%edi)
-	movl	4(%ebp),%eax
-	movl	%eax,32(%edi)
-	movw	%es,%ax
-	movw	%ax,36(%edi)
-	movw	%fs,%ax
-	movw	%ax,38(%edi)
-	movw	%gs,%ax
-	movw	%ax,40(%edi)
-	movw	%ss,%ax
-	movw	%ax,42(%edi)
-	movl	%fs:0,%eax
-	movl	%eax,44(%edi)
-	fnstcw  48(%edi)
-	pushl	%ebx
-	call	stabilize_sig_stack
-	movl	_cygtls.stackptr(%ebx),%eax	# save stack pointer contents
-	decl	_cygtls.stacklock(%ebx)
-	popl	%ebx
-	movl	%eax,52(%edi)
-	popl	%edi
-	movl	\$0,%eax
-	leave
-	ret
-
-	.globl	___sjfault
-___sjfault:
-	pushl	%ebp
-	movl	%esp,%ebp
-	pushl	%edi
-	movl	8(%ebp),%edi
-	movl	%eax,0(%edi)
-	movl	%ebx,4(%edi)
-	movl	%ecx,8(%edi)
-	movl	%edx,12(%edi)
-	movl	%esi,16(%edi)
-	movl	-4(%ebp),%eax
-	movl	%eax,20(%edi)
-	movl	0(%ebp),%eax
-	movl	%eax,24(%edi)
-	movl	%esp,%eax
-	addl	\$12,%eax
-	movl	%eax,28(%edi)
-	movl	4(%ebp),%eax
-	movl	%eax,32(%edi)
-	movw	%es,%ax
-	movw	%ax,36(%edi)
-	movw	%fs,%ax
-	movw	%ax,38(%edi)
-	movw	%gs,%ax
-	movw	%ax,40(%edi)
-	movw	%ss,%ax
-	movw	%ax,42(%edi)
-	movl	%fs:0,%eax
-	movl	%eax,44(%edi)
-	popl	%edi
-	movl	\$0,%eax
-	leave
-	ret
-
-	.global	___ljfault
-___ljfault:
-	pushl	%ebp
-	movl	%esp,%ebp
-	movl	8(%ebp),%edi
-
-	movl	12(%ebp),%eax
-	testl	%eax,%eax
-	jne	0f
-	incl	%eax
-
-0:	movl	%eax,0(%edi)
-	movl	24(%edi),%ebp
-	pushfl
-	popl	%ebx
-	movl	44(%edi),%eax
-	movl	%eax,%fs:0
-	movw	42(%edi),%ax
-	movw	%ax,%ss
-	movl	28(%edi),%esp
-	pushl	32(%edi)
-	pushl	%ebx
-	movw	36(%edi),%ax
-	movw	%ax,%es
-	movw	40(%edi),%ax
-	movw	%ax,%gs
-	movl	0(%edi),%eax
-	movl	4(%edi),%ebx
-	movl	8(%edi),%ecx
-	movl	16(%edi),%esi
-	movl	12(%edi),%edx
-	movl	20(%edi),%edi
-	popfl
-	ret
-
-	.globl	_siglongjmp
-_siglongjmp:
-	pushl	%ebp
-	movl	%esp,%ebp
-	movl	8(%ebp),%edi			# &sigjmp_buf
-	movl	208(%edi),%eax			# load savemask
-	testl	%eax,%eax			# savemask != 0?
-	je	1f				# no, skip restoring sigmask
-	subl	\$12,%esp
-	leal	212(%edi),%eax			# &sigjmp_buf.sigmask
-	movl	%eax,4(%esp)			# -> 2nd param "set"
-	xorl	%eax,%eax
-	movl	%eax,8(%esp)			# NULL -> 3rd param "oldset"
-	movl	%eax,(%esp)			# SIG_SETMASK -> 1st param "how"
-	call	_pthread_sigmask
-	addl	\$12,%esp
-	jmp	1f
-
-	.globl	_longjmp
-_longjmp:
-	pushl	%ebp
-	movl	%esp,%ebp
-	movl	8(%ebp),%edi			# &jmp_buf
-1:
-	call	stabilize_sig_stack
-	movl	52(%edi),%eax			# get old signal stack
-	movl	%eax,_cygtls.stackptr(%ebx)	# restore
-	decl	_cygtls.stacklock(%ebx)		# relinquish lock
-	xorl	%eax,%eax
-	movl	%eax,_cygtls.incyg(%ebx)		# we're not in cygwin anymore
-
-	movl	12(%ebp),%eax
-	testl	%eax,%eax
-	jne	3f
-	incl	%eax
-
-3:	movl	%eax,0(%edi)
-	movl	24(%edi),%ebp
-	pushfl
-	popl	%ebx
-	fninit
-	fldcw   48(%edi)
-	movl	44(%edi),%eax
-	movl	%eax,%fs:0
-	movw	42(%edi),%ax
-	movw	%ax,%ss
-	movl	28(%edi),%esp
-	pushl	32(%edi)
-	pushl	%ebx
-	movw	36(%edi),%ax
-	movw	%ax,%es
-	movw	40(%edi),%ax
-	movw	%ax,%gs
-	movl	0(%edi),%eax
-	movl	4(%edi),%ebx
-	movl	8(%edi),%ecx
-	movl	16(%edi),%esi
-	movl	12(%edi),%edx
-	movl	20(%edi),%edi
-	popfl
-	ret
 EOF
     }
 }

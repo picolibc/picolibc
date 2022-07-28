@@ -19,9 +19,10 @@ $_ = File::Spec->rel2abs($_) for @ARGV;
 
 my $libdll = shift;
 my $lib =  pop;
-my $uscore = ($cpu eq 'x86_64' ? undef : '_');
+# FIXME? Do other (non-32 bit) arches on Windows still use symbol prefixes?
+my $sym_prefix = '';
 (my $iname = basename $lib) =~ s/\.a$//o;
-$iname = $uscore . $iname . '_dll_iname';
+$iname = $sym_prefix . $iname . '_dll_iname';
 
 open my $nm_fd, '-|', $nm, '-Apg', '--defined-only', @ARGV, $libdll or
   die "$0: execution of $nm for object files failed - $!\n";
