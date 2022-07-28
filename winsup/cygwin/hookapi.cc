@@ -29,22 +29,24 @@ struct function_hook
 
 /* Given an HMODULE, returns a pointer to the PE header. */
 static PIMAGE_NT_HEADERS
-PEHeaderFromHModule (HMODULE hModule, bool &is_64bit)
+PEHeaderFromHModule (HMODULE hModule)
 {
-  PIMAGE_NT_HEADERS pNTHeader;
-
   if (PIMAGE_DOS_HEADER (hModule) ->e_magic != IMAGE_DOS_SIGNATURE)
-    pNTHeader = NULL;
-  else
+    return NULL;
+
+  PIMAGE_NT_HEADERS pNTHeader =
+	PIMAGE_NT_HEADERS (PBYTE (hModule)
+			   + PIMAGE_DOS_HEADER (hModule) ->e_lfanew);
+  if (pNTHeader->Signature != IMAGE_NT_SIGNATURE)
+    return NULL;
+
+  /* Return valid PIMAGE_NT_HEADERS only for supported architectures. */
+  switch (pNTHeader->FileHeader.Machine)
     {
-      pNTHeader = PIMAGE_NT_HEADERS (PBYTE (hModule)
-				     + PIMAGE_DOS_HEADER (hModule) ->e_lfanew);
-      if (pNTHeader->Signature == IMAGE_NT_SIGNATURE)
-	pNTHeader = NULL;
-      else if (pNTHeader->FileHeader.Machine == IMAGE_FILE_MACHINE_AMD64)
-	is_64bit = true;
-      else
-	pNTHeader = NULL;
+    case IMAGE_FILE_MACHINE_AMD64:
+      break;
+    default:
+      return NULL;
     }
 
   return pNTHeader;
@@ -273,10 +275,8 @@ find_first_notloaded_dll (path_conv& pc)
   if (!hm)
     goto out;
 
-  bool is_64bit;
-  pExeNTHdr = PEHeaderFromHModule (hm, is_64bit);
-
-  if (!pExeNTHdr || !is_64bit)
+  pExeNTHdr = PEHeaderFromHModule (hm);
+  if (!pExeNTHdr)
     goto out;
 
   importRVA = pExeNTHdr->OptionalHeader.DataDirectory
@@ -333,12 +333,11 @@ void *
 hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys, HANDLE h)
 {
   HMODULE hm = fn ? GetModuleHandle (NULL) : (HMODULE) name;
-  bool is_64bit;
-  PIMAGE_NT_HEADERS pExeNTHdr = PEHeaderFromHModule (hm, is_64bit);
+  PIMAGE_NT_HEADERS pExeNTHdr = PEHeaderFromHModule (hm);
 
   /* Shortcut.  We don't have to do anything further from here, if the
      executable's architecture doesn't match. */
-  if (!pExeNTHdr || !is_64bit)
+  if (!pExeNTHdr)
     return NULL;
 
   DWORD importRVA, importRVASize;
