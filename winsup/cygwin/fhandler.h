@@ -2298,6 +2298,7 @@ private:
   static void cleanup_for_non_cygwin_app (handle_set_t *p);
   static void set_console_mode_to_native ();
   bool need_console_handler ();
+  static void set_disable_master_thread (bool x);
 
   friend tty_min * tty_list::get_cttyp ();
 };

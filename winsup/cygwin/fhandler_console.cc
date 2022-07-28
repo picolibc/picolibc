@@ -791,7 +791,7 @@ fhandler_console::setup_for_non_cygwin_app ()
     (get_ttyp ()->getpgid ()== myself->pgid) ? tty::native : tty::restore;
   set_input_mode (conmode, &tc ()->ti, get_handle_set ());
   set_output_mode (conmode, &tc ()->ti, get_handle_set ());
-  con.disable_master_thread = true;
+  set_disable_master_thread (true);
 }
 
 void
@@ -807,7 +807,7 @@ fhandler_console::cleanup_for_non_cygwin_app (handle_set_t *p)
     (con.owner == myself->pid) ? tty::restore : tty::cygwin;
   set_output_mode (conmode, ti, p);
   set_input_mode (conmode, ti, p);
-  con.disable_master_thread = (con.owner == myself->pid);
+  set_disable_master_thread (con.owner == myself->pid);
 }
 
 /* Return the tty structure associated with a given tty number.  If the
@@ -986,7 +986,7 @@ fhandler_console::bg_check (int sig, bool dontsignal)
   if (sig == SIGTTIN)
     {
       set_input_mode (tty::cygwin, &tc ()->ti, get_handle_set ());
-      con.disable_master_thread = false;
+      set_disable_master_thread (false);
     }
   if (sig == SIGTTOU)
     set_output_mode (tty::cygwin, &tc ()->ti, get_handle_set ());
@@ -1717,7 +1717,7 @@ fhandler_console::post_open_setup (int fd)
   if (fd == 0)
     {
       set_input_mode (tty::cygwin, &get_ttyp ()->ti, &handle_set);
-      con.disable_master_thread = false;
+      set_disable_master_thread (false);
     }
   else if (fd == 1 || fd == 2)
     set_output_mode (tty::cygwin, &get_ttyp ()->ti, &handle_set);
@@ -1745,7 +1745,7 @@ fhandler_console::close ()
 	  /* Cleaning-up console mode for cygwin apps. */
 	  set_output_mode (tty::restore, &get_ttyp ()->ti, &handle_set);
 	  set_input_mode (tty::restore, &get_ttyp ()->ti, &handle_set);
-	  con.disable_master_thread = true;
+	  set_disable_master_thread (true);
 	}
     }
 
@@ -3971,7 +3971,7 @@ fhandler_console::set_console_mode_to_native ()
 	    termios *cons_ti = &cons->tc ()->ti;
 	    set_input_mode (tty::native, cons_ti, cons->get_handle_set ());
 	    set_output_mode (tty::native, cons_ti, cons->get_handle_set ());
-	    con.disable_master_thread = true;
+	    set_disable_master_thread (true);
 	    break;
 	  }
       }
@@ -4293,4 +4293,15 @@ bool
 fhandler_console::need_console_handler ()
 {
   return con.disable_master_thread || con.master_thread_suspended;
+}
+
+void
+fhandler_console::set_disable_master_thread (bool x)
+{
+  if (cygheap->ctty->get_major () != DEV_CONS_MAJOR)
+    return;
+  fhandler_console *cons = (fhandler_console *) cygheap->ctty;
+  cons->acquire_input_mutex (mutex_timeout);
+  con.disable_master_thread = x;
+  cons->release_input_mutex ();
 }
