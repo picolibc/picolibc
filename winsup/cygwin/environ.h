@@ -33,8 +33,6 @@ struct win_env
 win_env *getwinenv (const char *name, const char *posix = NULL, win_env * = NULL);
 char *getwinenveq (const char *name, size_t len, int);
 
-extern "C" char **__cygwin_environ;
-#define cur_environ()  __cygwin_environ
 char **build_env (const char * const *envp, PWCHAR &envblock,
 			  int &envc, bool need_envblock, HANDLE new_token);
 

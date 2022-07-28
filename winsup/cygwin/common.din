@@ -18,6 +18,7 @@ _sys_errlist DATA
 _sys_nerr DATA
 _timezone DATA
 _tzname DATA
+environ DATA
 error_message_count DATA
 error_one_per_line DATA
 error_print_progname DATA

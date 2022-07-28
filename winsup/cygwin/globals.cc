@@ -155,9 +155,7 @@ const int __collate_load_error = 0;
   extern UNICODE_STRING _RDATA ro_u_mq_suffix = _ROU (L":mqueue");
   #undef _ROU
 
-  /* This is an exported copy of environ which can be used by DLLs
-     which use cygwin.dll.  */
-  char **__cygwin_environ;
+  char **environ;
   /* __progname used in getopt error message */
   char *__progname;
   char *program_invocation_name;

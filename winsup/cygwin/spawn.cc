@@ -1130,7 +1130,7 @@ spawnl (int mode, const char *path, const char *arg0, ...)
 
   va_end (args);
 
-  return spawnve (mode, path, (char * const  *) argv, cur_environ ());
+  return spawnve (mode, path, (char * const  *) argv, environ);
 }
 
 extern "C" int
@@ -1174,7 +1174,7 @@ spawnlp (int mode, const char *file, const char *arg0, ...)
   va_end (args);
 
   return spawnve (mode | _P_PATH_TYPE_EXEC, find_exec (file, buf),
-		  (char * const *) argv, cur_environ ());
+		  (char * const *) argv, environ);
 }
 
 extern "C" int
@@ -1204,7 +1204,7 @@ spawnlpe (int mode, const char *file, const char *arg0, ...)
 extern "C" int
 spawnv (int mode, const char *path, const char * const *argv)
 {
-  return spawnve (mode, path, argv, cur_environ ());
+  return spawnve (mode, path, argv, environ);
 }
 
 extern "C" int
@@ -1213,7 +1213,7 @@ spawnvp (int mode, const char *file, const char * const *argv)
   path_conv buf;
   return spawnve (mode | _P_PATH_TYPE_EXEC,
 		  find_exec (file, buf, "PATH", FE_NNF) ?: "",
-		  argv, cur_environ ());
+		  argv, environ);
 }
 
 extern "C" int

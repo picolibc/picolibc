@@ -769,7 +769,7 @@ commune_process (void *arg)
       {
 	sigproc_printf ("processing PICOM_ENVIRON");
 	unsigned n = 0;
-	char **env = cur_environ ();
+	char **env = environ;
 	if (env)
 	  for (char **e = env; *e; e++)
 	    n += strlen (*e) + 1;
@@ -1210,7 +1210,7 @@ _pinfo::environ (size_t& n)
       return cr.s;
     }
   else
-    env = cur_environ ();
+    env = ::environ;
 
   if (env == NULL)
     return NULL;

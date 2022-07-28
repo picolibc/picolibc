@@ -32,7 +32,7 @@ execl (const char *path, const char *arg0, ...)
       argv[i] = va_arg (args, const char *);
   while (argv[i++] != NULL);
   va_end (args);
-  return spawnve (_P_OVERLAY, path, (char * const  *) argv, cur_environ ());
+  return spawnve (_P_OVERLAY, path, (char * const  *) argv, environ);
 }
 
 extern "C" int
@@ -71,13 +71,13 @@ execlp (const char *file, const char *arg0, ...)
   va_end (args);
   return spawnve (_P_OVERLAY | _P_PATH_TYPE_EXEC,
 		  find_exec (file, buf, "PATH", FE_NNF) ?: "",
-		  (char * const  *) argv, cur_environ ());
+		  (char * const  *) argv, environ);
 }
 
 extern "C" int
 execv (const char *path, char * const *argv)
 {
-  return spawnve (_P_OVERLAY, path, argv, cur_environ ());
+  return spawnve (_P_OVERLAY, path, argv, environ);
 }
 
 extern "C" int
@@ -94,7 +94,7 @@ execvp (const char *file, char * const *argv)
 
   return spawnve (_P_OVERLAY | _P_PATH_TYPE_EXEC,
 		  find_exec (file, buf, "PATH", FE_NNF) ?: "",
-		  argv, cur_environ ());
+		  argv, environ);
 }
 
 extern "C" int

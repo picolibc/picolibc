@@ -422,7 +422,7 @@ getwinenv (const char *env, const char *in_posix, win_env *temp)
       {
 	win_env *we = conv_envvars + i;
 	const char *val;
-	if (!cur_environ () || !(val = in_posix ?: getenv (we->name)))
+	if (!environ || !(val = in_posix ?: getenv (we->name)))
 	  debug_printf ("can't set native for %s since no environ yet",
 			we->name);
 	else if (!we->posix || strcmp (val, we->posix) != 0)
@@ -486,7 +486,7 @@ my_findenv (const char *name, int *offset)
   char **p;
   const char *c;
 
-  if (cur_environ () == NULL)
+  if (!environ)
     return NULL;
 
   c = name;
@@ -497,11 +497,11 @@ my_findenv (const char *name, int *offset)
       len++;
     }
 
-  for (p = cur_environ (); *p; ++p)
+  for (p = environ; *p; ++p)
     if (!strncmp (*p, name, len))
       if (*(c = *p + len) == '=')
 	{
-	  *offset = p - cur_environ ();
+	  *offset = p - environ;
 	  return (char *) (++c);
 	}
   return NULL;
@@ -602,7 +602,7 @@ _addenv (const char *name, const char *value, int overwrite)
     }
   else
     {				/* Create new slot. */
-      int sz = envsize (cur_environ ());
+      int sz = envsize (environ);
 
       /* If sz == 0, we need two new slots, one for the terminating NULL. */
       int newsz = sz == 0 ? 2 : sz + 1;
@@ -611,11 +611,11 @@ _addenv (const char *name, const char *value, int overwrite)
       offset = newsz - 2;
 
       /* Allocate space for additional element. */
-      if (cur_environ () == lastenviron)
-	lastenviron = __cygwin_environ = (char **) realloc (lastenviron,
+      if (environ == lastenviron)
+	lastenviron = environ = (char **) realloc (lastenviron,
 							    allocsz);
       else if ((lastenviron = (char **) realloc (lastenviron, allocsz)) != NULL)
-	__cygwin_environ = (char **) memcpy (lastenviron, __cygwin_environ,
+	environ = (char **) memcpy (lastenviron, environ,
 					     sz * sizeof (char *));
       if (!lastenviron)
 	{
@@ -625,13 +625,13 @@ _addenv (const char *name, const char *value, int overwrite)
 	  return -1;				/* Oops.  No more memory. */
 	}
 
-      __cygwin_environ[offset + 1] = NULL;	/* NULL terminate. */
+      environ[offset + 1] = NULL;	/* NULL terminate. */
     }
 
   char *envhere;
   if (!issetenv)
     /* Not setenv. Just overwrite existing. */
-    envhere = cur_environ ()[offset] = (char *) (ENVMALLOC ? strdup (name) : name);
+    envhere = environ[offset] = (char *) (ENVMALLOC ? strdup (name) : name);
   else
     {				/* setenv */
       /* Look for an '=' in the name and ignore anything after that if found. */
@@ -640,7 +640,7 @@ _addenv (const char *name, const char *value, int overwrite)
 
       int namelen = p - name;	/* Length of name. */
       /* Allocate enough space for name + '=' + value + '\0' */
-      envhere = cur_environ ()[offset] = (char *) malloc (namelen + valuelen + 2);
+      envhere = environ[offset] = (char *) malloc (namelen + valuelen + 2);
       if (!envhere)
 	return -1;		/* Oops.  No more memory. */
 
@@ -718,7 +718,7 @@ unsetenv (const char *name)
 
       while (my_findenv (name, &offset))	/* if set multiple times */
 	/* Move up the rest of the array */
-	for (e = cur_environ () + offset; ; e++)
+	for (e = environ + offset; ; e++)
 	  if (!(*e = *(e + 1)))
 	    break;
 
@@ -735,12 +735,12 @@ clearenv (void)
 {
   __try
     {
-      if (cur_environ () == lastenviron)
+      if (environ == lastenviron)
 	{
 	  free (lastenviron);
 	  lastenviron = NULL;
 	}
-      __cygwin_environ = NULL;
+      environ = NULL;
       return 0;
     }
   __except (EFAULT) {}
@@ -842,7 +842,7 @@ environ_init (char **envp, int envc)
 
     out:
       findenv_func = (char * (*)(const char*, int*)) my_findenv;
-      __cygwin_environ = envp;
+      environ = envp;
       if (envp_passed_in)
 	{
 	  p = getenv ("CYGWIN");
