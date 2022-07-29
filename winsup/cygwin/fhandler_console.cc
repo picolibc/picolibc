@@ -791,7 +791,7 @@ fhandler_console::setup_for_non_cygwin_app ()
     (get_ttyp ()->getpgid ()== myself->pgid) ? tty::native : tty::restore;
   set_input_mode (conmode, &tc ()->ti, get_handle_set ());
   set_output_mode (conmode, &tc ()->ti, get_handle_set ());
-  set_disable_master_thread (true);
+  set_disable_master_thread (true, this);
 }
 
 void
@@ -986,7 +986,7 @@ fhandler_console::bg_check (int sig, bool dontsignal)
   if (sig == SIGTTIN)
     {
       set_input_mode (tty::cygwin, &tc ()->ti, get_handle_set ());
-      set_disable_master_thread (false);
+      set_disable_master_thread (false, this);
     }
   if (sig == SIGTTOU)
     set_output_mode (tty::cygwin, &tc ()->ti, get_handle_set ());
@@ -1721,7 +1721,7 @@ fhandler_console::post_open_setup (int fd)
   if (fd == 0)
     {
       set_input_mode (tty::cygwin, &get_ttyp ()->ti, &handle_set);
-      set_disable_master_thread (false);
+      set_disable_master_thread (false, this);
     }
   else if (fd == 1 || fd == 2)
     set_output_mode (tty::cygwin, &get_ttyp ()->ti, &handle_set);
@@ -1749,7 +1749,7 @@ fhandler_console::close ()
 	  /* Cleaning-up console mode for cygwin apps. */
 	  set_output_mode (tty::restore, &get_ttyp ()->ti, &handle_set);
 	  set_input_mode (tty::restore, &get_ttyp ()->ti, &handle_set);
-	  set_disable_master_thread (true);
+	  set_disable_master_thread (true, this);
 	}
     }
 
@@ -3975,7 +3975,7 @@ fhandler_console::set_console_mode_to_native ()
 	    termios *cons_ti = &cons->tc ()->ti;
 	    set_input_mode (tty::native, cons_ti, cons->get_handle_set ());
 	    set_output_mode (tty::native, cons_ti, cons->get_handle_set ());
-	    set_disable_master_thread (true);
+	    set_disable_master_thread (true, cons);
 	    break;
 	  }
       }
@@ -4321,11 +4321,17 @@ fhandler_console::need_console_handler ()
 }
 
 void
-fhandler_console::set_disable_master_thread (bool x)
+fhandler_console::set_disable_master_thread (bool x, fhandler_console *cons)
 {
-  if (cygheap->ctty->get_major () != DEV_CONS_MAJOR)
+  if (con.disable_master_thread == x)
     return;
-  fhandler_console *cons = (fhandler_console *) cygheap->ctty;
+  if (cons == NULL)
+    {
+      if (cygheap->ctty && cygheap->ctty->get_major () == DEV_CONS_MAJOR)
+	cons = (fhandler_console *) cygheap->ctty;
+      else
+	return;
+    }
   cons->acquire_input_mutex (mutex_timeout);
   con.disable_master_thread = x;
   cons->release_input_mutex ();
