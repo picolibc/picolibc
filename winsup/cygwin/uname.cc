@@ -118,30 +118,8 @@ uname (struct utsname *in_name)
       /* CPU type */
       switch (wincap.cpu_arch ())
 	{
-	  case PROCESSOR_ARCHITECTURE_INTEL:
-	    unsigned int ptype;
-	    if (wincap.cpu_level () < 3) /* Shouldn't happen. */
-	      ptype = 3;
-	    else if (wincap.cpu_level () > 9) /* P4 */
-	      ptype = 6;
-	    else
-	      ptype = wincap.cpu_level ();
-	    __small_sprintf (name->machine, "i%d86", ptype);
-	    break;
-	  case PROCESSOR_ARCHITECTURE_IA64:
-	    strcpy (name->machine, "ia64");
-	    break;
 	  case PROCESSOR_ARCHITECTURE_AMD64:
 	    strcpy (name->machine, "x86_64");
-	    break;
-	  case PROCESSOR_ARCHITECTURE_IA32_ON_WIN64:
-	    strcpy (name->machine, "ia32-win64");
-	    break;
-	  case PROCESSOR_ARCHITECTURE_ALPHA:
-	    strcpy (name->machine, "alpha");
-	    break;
-	  case PROCESSOR_ARCHITECTURE_MIPS:
-	    strcpy (name->machine, "mips");
 	    break;
 	  default:
 	    strcpy (name->machine, "unknown");
