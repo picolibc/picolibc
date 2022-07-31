@@ -227,7 +227,12 @@ is_console_app (WCHAR *filename)
   if (p && p + id_offset <= buf + n)
     return p[id_offset] == '\003'; /* 02: GUI, 03: console */
   else
-    return false;
+    {
+      wchar_t *e = wcsrchr (filename, L'.');
+      if (e && (wcscasecmp (e, L".bat") == 0 || wcscasecmp (e, L".cmd") == 0))
+	return true;
+    }
+  return false;
 }
 
 int

@@ -26,3 +26,8 @@ Bug Fixes
 - Fix a console problem that the text longer than 1024 bytes cannot
   be pasted correctly.
   Addresses: https://cygwin.com/pipermail/cygwin/2022-June/251764.html
+
+- Fix a pty problem that pty failed to switch I/O pipe to that for
+  native apps if *.bat or *.cmd is executed directly from cygwin
+  shell.
+  Addresses: https://cygwin.com/pipermail/cygwin/2022-July/251993.html
