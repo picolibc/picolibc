@@ -967,7 +967,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
 
                     flags &= ~FL_ALT;
 
-                    if ((flags & FL_PREC) && prec == 0 && x_s == 0)
+                    if (x_s == 0 && (flags & FL_PREC) && prec == 0)
                         buf_len = 0;
                     else
                         buf_len = __ultoa_invert (x_s, buf, 10) - buf;
@@ -1005,7 +1005,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
                     if (x == 0)
                         flags &= ~FL_ALT;
 
-                    if ((flags & FL_PREC) && prec == 0 && x == 0)
+                    if (x == 0 && (flags & FL_PREC) && prec == 0)
                         buf_len = 0;
                     else
                         buf_len = __ultoa_invert (x, buf, base) - buf;
