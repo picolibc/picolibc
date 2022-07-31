@@ -1001,10 +1001,12 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
 
                     arg_to_unsigned(ap, flags, x);
 
-                    if ((flags & FL_PREC) && prec == 0 && x == 0) {
-                        buf_len = 0;
+                    /* Zero gets no special alternate treatment */
+                    if (x == 0)
                         flags &= ~FL_ALT;
-                    }
+
+                    if ((flags & FL_PREC) && prec == 0 && x == 0)
+                        buf_len = 0;
                     else
                         buf_len = __ultoa_invert (x, buf, base) - buf;
                 }
@@ -1031,14 +1033,9 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
                 /* Alternate mode for octal/hex */
                 if (flags & FL_ALT) {
 
-                    /* Zero gets no special alternate treatment */
-                    if (buf[buf_len-1] == '0') {
-                        flags &= ~FL_ALT;
-                    } else {
+                    len += 1;
+                    if (c != '\0')
                         len += 1;
-                        if (c != '\0')
-                            len += 1;
-                    }
                 } else if (flags & (FL_NEGATIVE | FL_PLUS | FL_SPACE)) {
                     len += 1;
                 }
