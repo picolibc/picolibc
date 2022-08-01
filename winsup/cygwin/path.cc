@@ -1929,7 +1929,11 @@ symlink_wsl (const char *oldpath, path_conv &win32_newpath)
      cygdrive prefix is not "/", otherwise suffer random "/mnt" symlinks... */
   if (mount_table->cygdrive_len > 1
       && path_prefix_p (mount_table->cygdrive, oldpath,
-			mount_table->cygdrive_len, false))
+			mount_table->cygdrive_len, false)
+      && (strlen (oldpath + mount_table->cygdrive_len - 1) < 2
+	  || (islower (oldpath[mount_table->cygdrive_len])
+	      && (oldpath[mount_table->cygdrive_len + 1] == '/'
+		  || oldpath[mount_table->cygdrive_len + 1] == '\0'))))
     stpcpy (stpcpy (path_buf, "/mnt"),
 	    oldpath + mount_table->cygdrive_len - 1);
   else
