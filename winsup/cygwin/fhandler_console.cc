@@ -3986,7 +3986,7 @@ fhandler_console::set_console_mode_to_native ()
 DEF_HOOK (CreateProcessA);
 DEF_HOOK (CreateProcessW);
 DEF_HOOK (ContinueDebugEvent);
-DEF_HOOK (LoadLibraryA); /* Hooked for ConEmu cygwin connector */
+DEF_HOOK (GetProcAddress); /* Hooked for ConEmu cygwin connector */
 
 static BOOL WINAPI
 CreateProcessA_Hooked
@@ -4029,17 +4029,12 @@ ContinueDebugEvent_Hooked
 }
 
 /* Hooked for ConEmu cygwin connector */
-static HMODULE WINAPI
-LoadLibraryA_Hooked (LPCSTR m)
+static FARPROC WINAPI
+GetProcAddress_Hooked (HMODULE h, LPCSTR n)
 {
-  const char *p;
-  if ((p = strrchr(m, '\\')))
-    p++;
-  else
-    p = m;
-  if (strcasecmp(p, "ConEmuHk64.dll") == 0)
+  if (strcmp(n, "RequestTermConnector") == 0)
     fhandler_console::set_disable_master_thread (true);
-  return LoadLibraryA_Orig (m);
+  return GetProcAddress_Orig (h, n);
 }
 
 void
@@ -4068,7 +4063,7 @@ fhandler_console::fixup_after_fork_exec (bool execing)
 static void
 hook_conemu_cygwin_connector()
 {
-  DO_HOOK (NULL, LoadLibraryA);
+  DO_HOOK (NULL, GetProcAddress);
 }
 
 /* Ugly workaround to create invisible console required since Windows 7.
