@@ -22,6 +22,9 @@
 # define _WANT_IO_LONG_LONG
 # define _WANT_IO_POS_ARGS
 #elif defined(TINY_STDIO)
+# ifdef _WANT_IO_PERCENT_B
+#  define BINARY_FORMAT
+# endif
 # ifdef PICOLIBC_FLOAT_PRINTF_SCANF
 #  define LOW_FLOAT
 # endif
@@ -238,7 +241,7 @@
     result |= test(__LINE__, "f", "%.*s", 1, "foo");
     result |= test(__LINE__, "foo  ", "%*s", -5, "foo");
     result |= test(__LINE__, "hello", "hello");
-#ifdef TINY_STDIO
+#if defined(TINY_STDIO) && !defined(_WANT_IO_PERCENT_B)
     result |= test(__LINE__, "%b", "%b");
 #endif
     result |= test(__LINE__, "  a", "%3c", 'a');
@@ -295,6 +298,12 @@
     result |= test(__LINE__, "edcb5433", "%x", 3989525555U);
     result |= test(__LINE__, "1234ABCD", "%X", 305441741);
     result |= test(__LINE__, "EDCB5433", "%X", 3989525555U);
+#ifdef BINARY_FORMAT
+    result |= test(__LINE__, "10010001101001010101111001101", "%b", 305441741);
+    result |= test(__LINE__, "11101101110010110101010000110011", "%b", 3989525555U);
+    result |= test(__LINE__, "10010001101001010101111001101", "%B", 305441741);
+    result |= test(__LINE__, "11101101110010110101010000110011", "%B", 3989525555U);
+#endif
     result |= test(__LINE__, "x", "%c", 'x');
     result |= test(__LINE__, "%", "%%");
     result |= test(__LINE__, "Hallo heimur", "%+s", "Hallo heimur");
@@ -345,9 +354,13 @@
     result |= test(__LINE__, "0xedcb5433", "%#x", 3989525555U);
     result |= test(__LINE__, "0X1234ABCD", "%#X", 305441741);
     result |= test(__LINE__, "0XEDCB5433", "%#X", 3989525555U);
-#ifndef _NANO_FORMATTED_IO
-    result |= test(__LINE__, "0", "%#o", 0U);
+#ifdef BINARY_FORMAT
+    result |= test(__LINE__, "0b10010001101001010101111001101", "%#b", 305441741);
+    result |= test(__LINE__, "0b11101101110010110101010000110011", "%#b", 3989525555U);
+    result |= test(__LINE__, "0B10010001101001010101111001101", "%#B", 305441741);
+    result |= test(__LINE__, "0B11101101110010110101010000110011", "%#B", 3989525555U);
 #endif
+    result |= test(__LINE__, "0", "%#o", 0U);
     result |= test(__LINE__, "0", "%#x", 0U);
     result |= test(__LINE__, "0", "%#X", 0U);
     result |= test(__LINE__, "Hallo heimur", "%1s", "Hallo heimur");
