@@ -236,9 +236,6 @@
     result |= test(__LINE__, "f", "%.*s", 1, "foo");
     result |= test(__LINE__, "foo  ", "%*s", -5, "foo");
     result |= test(__LINE__, "hello", "hello");
-#ifdef TINY_STDIO
-    result |= test(__LINE__, "%b", "%b");
-#endif
     result |= test(__LINE__, "  a", "%3c", 'a');
     result |= test(__LINE__, "1234", "%3d", 1234);
     /* 150: excluded for C */
