@@ -140,9 +140,17 @@ typedef long ultoa_signed_t;
 #endif
 
 #if SIZEOF_ULTOA <= 4
+#ifdef _WANT_IO_PERCENT_B
+#define PRINTF_BUF_SIZE 32
+#else
 #define PRINTF_BUF_SIZE 11
+#endif
+#else
+#ifdef _WANT_IO_PERCENT_B
+#define PRINTF_BUF_SIZE 64
 #else
 #define PRINTF_BUF_SIZE 22
+#endif
 #endif
 
 // At the call site the address of the result_var is taken (e.g. "&ap")
@@ -357,7 +365,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
 #define ap ap_orig
 #endif
     union {
-	char __buf[PRINTF_BUF_SIZE];	/* size for -1 in octal, without '\0'	*/
+	char __buf[PRINTF_BUF_SIZE];	/* size for -1 in smallest base, without '\0'	*/
 #if PRINTF_LEVEL >= PRINTF_FLT
 	struct dtoa __dtoa;
 #endif
@@ -991,6 +999,10 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
                         base = 16;
                         if (c == 'X')
                             base = 16 | XTOA_UPPER;
+#ifdef _WANT_IO_PERCENT_B
+                    } else if (TOLOW(c) == 'b') {
+                        base = 2;
+#endif
                     } else {
                         my_putc('%', stream);
                         my_putc(c, stream);
