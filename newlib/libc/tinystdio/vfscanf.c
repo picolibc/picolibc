@@ -96,33 +96,18 @@ putval (void *addr, int_scanf_t val, uint16_t flags)
     }
 }
 
-static uint_scanf_t
-mulacc (uint_scanf_t val, uint16_t flags, unsigned char c)
-{
-    unsigned char cnt;
-
-    if (flags & FL_OCT) {
-	cnt = 3;
-    } else if (flags & FL_HEX) {
-	cnt = 4;
-    } else {
-	val += (val << 2);
-	cnt = 1;
-    }
-
-    do { val <<= 1; } while (--cnt);
-    return val + c;
-}
+#define CASE_CONVERT    ('a' - 'A')
+#define TOLOW(c)        ((c) | CASE_CONVERT)
 
 static unsigned char
-conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
+conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags, unsigned int base)
 {
     uint_scanf_t val;
     int i;
 
     i = scanf_getc (stream, lenp);			/* after scanf_ungetc()	*/
 
-    switch ((unsigned char)i) {
+    switch (i) {
       case '-':
         flags |= FL_MINUS;
 	FALLTHROUGH;
@@ -132,21 +117,23 @@ conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
     }
 
     val = 0;
-    flags &= ~FL_WIDTH;
 
-    if (!(flags & (FL_DEC | FL_OCT)) && (unsigned char)i == '0') {
+    /* Leading '0' digit -- check for base indication */
+    if ((unsigned char)i == '0') {
 	if (!--width || (i = scanf_getc (stream, lenp)) < 0)
 	    goto putval;
-	flags |= FL_WIDTH;
-	if ((unsigned char)(i) == 'x' || (unsigned char)(i) == 'X') {
-	    flags |= FL_HEX;
+
+        flags |= FL_ANY;
+
+        if (TOLOW(i) == 'x' && (base == 0 || base == 16)) {
+            base = 16;
 	    if (!--width || (i = scanf_getc(stream, lenp)) < 0)
 		goto putval;
-	} else {
-	    if (!(flags & FL_HEX))
-		flags |= FL_OCT;
-	}
-    }
+	} else if (base == 0 || base == 8) {
+            base = 8;
+        }
+    } else if (base == 0)
+        base = 10;
 
 /* This fact is used below to parse hexidecimal digit.	*/
 #if	('A' - '0') != (('a' - '0') & ~('A' ^ 'a'))
@@ -155,26 +142,18 @@ conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
     do {
 	unsigned char c = i;
 	c -= '0';
-	if (c > 7) {
-	    if (flags & FL_OCT) goto unget;
-	    if (c > 9) {
-		if (!(flags & FL_HEX)) goto unget;
-		c &= ~('A' ^ 'a');
-		c += '0' - 'A';
-		if (c > 5) {
-		  unget:
-		    scanf_ungetc (i, stream, lenp);
-		    break;
-		}
-		c += 10;
-	    }
+        if (TOLOW(c) >= 'a' - '0')
+            c = TOLOW(c) + ('0' - 'a') + 10;
+        if (c >= base) {
+            scanf_ungetc (i, stream, lenp);
+            break;
 	}
-	val = mulacc (val, flags, c);
-	flags |= FL_WIDTH;
+        flags |= FL_ANY;
+        val = val * base + c;
 	if (!--width) goto putval;
     } while ((i = scanf_getc(stream, lenp)) >= 0);
-    if (!(flags & FL_WIDTH))
-	goto err;
+    if (!(flags & FL_ANY))
+        goto err;
 
   putval:
     if (flags & FL_MINUS) val = -val;
@@ -600,6 +579,8 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap_orig)
 
 	    } else {
 
+                unsigned int base = 0;
+
 		if (skip_spaces (stream, lenp) < 0)
 		    goto eof;
 
@@ -630,20 +611,20 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap_orig)
                       FALLTHROUGH;
 		  case 'x':
 	          case 'X':
-		    flags |= FL_HEX;
+                    base = 16;
 		    goto conv_int;
 
 	          case 'd':
 		  case 'u':
-		    flags |= FL_DEC;
+                    base = 10;
 		    goto conv_int;
 
 	          case 'o':
-		    flags |= FL_OCT;
+                    base = 8;
 		    FALLTHROUGH;
 		  case 'i':
 		  conv_int:
-		    c = conv_int (stream, lenp, width, addr, flags);
+                    c = conv_int (stream, lenp, width, addr, flags, base);
 		    break;
 
 	          default:		/* e,E,f,F,g,G	*/
@@ -651,11 +632,11 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap_orig)
 #else
 	          case 'd':
 		  case 'u':
-		    flags |= FL_DEC;
+                    base = 10;
 		    goto conv_int;
 
 	          case 'o':
-		    flags |= FL_OCT;
+                    base = 8;
 		    FALLTHROUGH;
 		  case 'i':
 		    goto conv_int;
@@ -665,9 +646,9 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap_orig)
                           flags |= FL_LONG;
                       FALLTHROUGH;
 		  default:			/* p,x,X	*/
-		    flags |= FL_HEX;
+                    base = 16;
 		  conv_int:
-		    c = conv_int (stream, lenp, width, addr, flags);
+		    c = conv_int (stream, lenp, width, addr, flags, base);
 #endif
 		}
 	    } /* else */
