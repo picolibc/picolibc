@@ -50,6 +50,9 @@ int test_sscanf(void)
 	int err=0;
 	char a[100], b[100];
 	int x, y, z, u, v;
+#ifdef _WANT_IO_PERCENT_B
+        int w;
+#endif
 	double d, t;
 //	long lo[10];
 
@@ -84,6 +87,19 @@ int test_sscanf(void)
 	TEST(i, z, 9, "%d != %d");
 	TEST(i, u, 256, "%d != %d");
 	TEST(i, v, 256, "%d != %d");
+
+#pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic ignored "-Wformat-extra-args"
+
+#ifdef _WANT_IO_PERCENT_B
+	TEST(i, sscanf("011 0x100 0b101 11 100 101", "%i %i %i %o %x %b\n", &x, &y, &z, &u, &v, &w), 6, "only %d fields, expected %d");
+	TEST(i, x, 9, "%d != %d");
+	TEST(i, y, 256, "%d != %d");
+	TEST(i, z, 5, "%d != %d");
+	TEST(i, u, 9, "%d != %d");
+	TEST(i, v, 256, "%d != %d");
+	TEST(i, w, 5, "%d != %d");
+#endif
 
 	TEST(i, sscanf("20 xyz", "%d %d\n", &x, &y), 1, "only %d fields, expected %d");
 	TEST(i, x, 20, "%d != %d");

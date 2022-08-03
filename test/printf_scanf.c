@@ -56,6 +56,9 @@
 #   define NO_POS_ARGS
 #  endif
 # endif
+# ifdef _WANT_IO_PERCENT_B
+#  define BINARY_FORMAT
+# endif
 #else
 #define printf_float(x) ((double) (x))
 
@@ -180,24 +183,40 @@ main(void)
 
 #define FMT(prefix,conv) "%" prefix conv
 
-#define VERIFY(prefix, conv) do {                                       \
-        sprintf(buf, FMT(prefix, conv), v);                             \
-        sscanf(buf, FMT(prefix, conv), &r);                             \
-        if (v != r) {                                                   \
-                printf("\t%3d: " prefix " " conv " wanted " FMT(prefix, conv) " got " FMT(prefix, conv) "\n", x, v, r); \
+#define VERIFY_BOTH(prefix, oconv, iconv) do {                          \
+            int __n;                                                    \
+            sprintf(buf, FMT(prefix, oconv), v);                        \
+            __n = sscanf(buf, FMT(prefix, iconv), &r);                  \
+            if (v != r || __n != 1) {                                   \
+                printf("\t%3d: " prefix " " oconv " wanted " FMT(prefix, oconv) " got " FMT(prefix, oconv) "\n", x, v, r); \
                 errors++;                                               \
                 fflush(stdout);                                         \
-        }                                                               \
-} while(0)
+            }                                                           \
+        } while(0)
+
+#define VERIFY(prefix, conv) VERIFY_BOTH(prefix, conv, conv)
+
+#ifdef BINARY_FORMAT
+#define VERIFY_BINARY(prefix) VERIFY(prefix, "b")
+#pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic ignored "-Wformat-extra-args"
+#else
+#define VERIFY_BINARY(prefix)
+#endif
 
 #define CHECK_RT(type, prefix) do {                                     \
-        for (x = 0; x < (int) (sizeof(type) * 8); x++) {            \
+        for (x = 0; x < (int) (sizeof(type) * 8); x++) {                \
                 type v = (type) (0x123456789abcdef0LL >> (64 - sizeof(type) * 8)) >> x; \
                 type r = ~v;                                            \
                 VERIFY(prefix, "d");                                    \
+                r = ~v;                                                 \
                 VERIFY(prefix, "u");                                    \
+                r = ~v;                                                 \
                 VERIFY(prefix, "x");                                    \
+                r = ~v;                                                 \
                 VERIFY(prefix, "o");                                    \
+                r = ~v;                                                 \
+                VERIFY_BINARY(prefix);                                  \
         }                                                               \
         } while(0)
 
