@@ -54,8 +54,6 @@ extern inline struct _reent *__getreent (void)
    Just leave them alone. */
 #define _READ_WRITE_RETURN_TYPE _ssize_t
 #define _READ_WRITE_BUFSIZE_TYPE size_t
-#define __LARGE64_FILES 1
-#define __USE_INTERNAL_STAT64 1
 #define __LINUX_ERRNO_EXTENSIONS__ 1
 #define _MB_EXTENDED_CHARSETS_ALL 1
 #define __HAVE_LOCALE_INFO__ 1

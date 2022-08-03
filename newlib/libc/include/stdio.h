@@ -67,14 +67,10 @@ typedef __FILE FILE;
 # define __FILE_defined
 #endif
 
-#ifdef __CYGWIN__
-typedef _fpos64_t fpos_t;
-#else
 typedef _fpos_t fpos_t;
 #ifdef __LARGE64_FILES
 typedef _fpos64_t fpos64_t;
 #endif
-#endif /* !__CYGWIN__ */
 
 #ifndef _OFF_T_DECLARED
 typedef __off_t off_t;

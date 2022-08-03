@@ -420,7 +420,6 @@ fi
 case "${host}" in
   *-*-cygwin*)
 	posix_dir=posix
-	stdio64_dir=stdio64
 	xdr_dir=xdr
 	;;
   *-*-netware*)
