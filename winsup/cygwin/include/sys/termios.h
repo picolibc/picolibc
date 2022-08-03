@@ -282,53 +282,6 @@ struct termios
   speed_t	c_ospeed;
 };
 
-#ifdef CYGWIN_VERSION_DLL_IS_OLD_TERMIOS
-#ifdef __GNUC__
-# define __tonew_termios(ti) \
-  ({ \
-    struct termios *__newti; \
-   \
-    if (!CYGWIN_VERSION_DLL_IS_OLD_TERMIOS) \
-      __newti = (struct termios *) ti; \
-    else \
-      { \
-	__newti = (struct termios *) alloca(sizeof(struct termios)); \
-	__newti->c_iflag = ((struct __oldtermios *)ti)->c_iflag; \
-	__newti->c_oflag = ((struct __oldtermios *)ti)->c_oflag; \
-	__newti->c_cflag = ((struct __oldtermios *)ti)->c_cflag; \
-	__newti->c_lflag = ((struct __oldtermios *)ti)->c_lflag; \
-	__newti->c_line = ((struct __oldtermios *)ti)->c_line; \
-	__newti->c_ispeed = ((struct __oldtermios *)ti)->c_ispeed; \
-	__newti->c_ospeed = ((struct __oldtermios *)ti)->c_ospeed; \
-	memcpy (__newti->c_cc, ((struct __oldtermios *)ti)->c_cc, sizeof(__newti->c_cc)); \
-      } \
-    __newti; \
-  })
-
-# define __makenew_termios(ti) \
-  (CYGWIN_VERSION_DLL_IS_OLD_TERMIOS ? \
-   (struct termios *) alloca (sizeof (struct termios)) : (ti))
-
-# define __toapp_termios(toti, fromti) \
-  ({ \
-    if (!CYGWIN_VERSION_DLL_IS_OLD_TERMIOS) \
-      toti = fromti; \
-    else \
-      { \
-	((struct __oldtermios *)toti)->c_iflag = fromti->c_iflag; \
-	((struct __oldtermios *)toti)->c_oflag = fromti->c_oflag; \
-	((struct __oldtermios *)toti)->c_cflag = fromti->c_cflag; \
-	((struct __oldtermios *)toti)->c_lflag = fromti->c_lflag; \
-	((struct __oldtermios *)toti)->c_line = fromti->c_line; \
-	((struct __oldtermios *)toti)->c_ispeed = fromti->c_ispeed; \
-	((struct __oldtermios *)toti)->c_ospeed = fromti->c_ospeed; \
-	memcpy (((struct __oldtermios*)toti)->c_cc, fromti->c_cc, sizeof(fromti->c_cc)); \
-      } \
-    toti; \
-  })
-#endif /*__GNUC__*/
-#endif
-
 #define termio termios
 
 #ifdef __cplusplus

@@ -112,7 +112,6 @@ extern "C" int
 tcsetattr (int fd, int a, const struct termios *t)
 {
   int res;
-  t = __tonew_termios (t);
   int e = get_errno ();
 
   while (1)
@@ -165,21 +164,20 @@ tcsetattr (int fd, int a, const struct termios *t)
 
 /* tcgetattr: POSIX 7.2.1.1 */
 extern "C" int
-tcgetattr (int fd, struct termios *in_t)
+tcgetattr (int fd, struct termios *t)
 {
   int res = -1;
-  struct termios *t = __makenew_termios (in_t);
 
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     /* saw an error */;
   else if (!cfd->is_tty ())
     set_errno (ENOTTY);
-  else if ((res = cfd->tcgetattr (t)) == 0)
-    __toapp_termios (in_t, t);
+  else
+    res = cfd->tcgetattr (t);
 
   if (res)
-    termios_printf ("%R = tcgetattr(%d, %p)", res, fd, in_t);
+    termios_printf ("%R = tcgetattr(%d, %p)", res, fd, t);
   else
     termios_printf ("iflag %y, oflag %y, cflag %y, lflag %y, VMIN %d, VTIME %d",
 	  t->c_iflag, t->c_oflag, t->c_cflag, t->c_lflag, t->c_cc[VMIN],
@@ -247,14 +245,14 @@ tcsetpgrp (int fd, pid_t pgid)
 extern "C" speed_t
 cfgetospeed (const struct termios *tp)
 {
-  return __tonew_termios (tp)->c_ospeed;
+  return tp->c_ospeed;
 }
 
 /* cfgetispeed: POSIX96 7.1.3.1 */
 extern "C" speed_t
 cfgetispeed (const struct termios *tp)
 {
-  return __tonew_termios (tp)->c_ispeed;
+  return tp->c_ispeed;
 }
 
 static inline int
@@ -307,22 +305,16 @@ setspeed (speed_t &set_speed, speed_t from_speed)
 
 /* cfsetospeed: POSIX96 7.1.3.1 */
 extern "C" int
-cfsetospeed (struct termios *in_tp, speed_t speed)
+cfsetospeed (struct termios *tp, speed_t speed)
 {
-  struct termios *tp = __tonew_termios (in_tp);
-  int res = setspeed (tp->c_ospeed, speed);
-  __toapp_termios (in_tp, tp);
-  return res;
+  return setspeed (tp->c_ospeed, speed);
 }
 
 /* cfsetispeed: POSIX96 7.1.3.1 */
 extern "C" int
-cfsetispeed (struct termios *in_tp, speed_t speed)
+cfsetispeed (struct termios *tp, speed_t speed)
 {
-  struct termios *tp = __tonew_termios (in_tp);
-  int res = setspeed (tp->c_ispeed, speed);
-  __toapp_termios (in_tp, tp);
-  return res;
+  return setspeed (tp->c_ispeed, speed);
 }
 
 struct speed_struct
@@ -384,9 +376,8 @@ convert_speed (speed_t speed)
 /* cfsetspeed: 4.4BSD */
 /* Following Linux (undocumented), allow speed to be a numerical baud rate. */
 extern "C" int
-cfsetspeed (struct termios *in_tp, speed_t speed)
+cfsetspeed (struct termios *tp, speed_t speed)
 {
-  struct termios *tp = __tonew_termios (in_tp);
   int res;
 
   speed = convert_speed (speed);
@@ -394,7 +385,6 @@ cfsetspeed (struct termios *in_tp, speed_t speed)
      identical results in both calls */
   if ((res = setspeed (tp->c_ospeed, speed)) == 0)
     setspeed (tp->c_ispeed, speed);
-  __toapp_termios (in_tp, tp);
   return res;
 }
 

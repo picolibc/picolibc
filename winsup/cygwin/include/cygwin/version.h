@@ -34,12 +34,6 @@ details. */
 #define CYGWIN_VERSION_USER_API_VERSION_COMBINED \
   CYGWIN_VERSION_PER_PROCESS_API_VERSION_COMBINED (user_data)
 
-/* API versions <= this had a termios structure whose members were too small
-   to accomodate modern settings. */
-#define CYGWIN_VERSION_DLL_OLD_TERMIOS		5
-#define CYGWIN_VERSION_DLL_IS_OLD_TERMIOS \
-  (CYGWIN_VERSION_USER_API_VERSION_COMBINED <= CYGWIN_VERSION_DLL_OLD_TERMIOS)
-
 #define CYGWIN_VERSION_DLL_MALLOC_ENV		28
 
 /* Old APIs had getc/putc macros that conflict with new CR/LF handling in the
