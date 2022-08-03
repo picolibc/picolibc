@@ -177,27 +177,6 @@ get_ext_funcptr (SOCKET sock, void *funcptr)
 		   &bret, NULL, NULL);
 }
 
-static int
-convert_ws1_ip_optname (int optname)
-{
-  static int ws2_optname[] =
-  {
-    0,
-    IP_OPTIONS,
-    IP_MULTICAST_IF,
-    IP_MULTICAST_TTL,
-    IP_MULTICAST_LOOP,
-    IP_ADD_MEMBERSHIP,
-    IP_DROP_MEMBERSHIP,
-    IP_TTL,
-    IP_TOS,
-    IP_DONTFRAGMENT
-  };
-  return (optname < 1 || optname > _WS1_IP_DONTFRAGMENT)
-	 ? optname
-	 : ws2_optname[optname];
-}
-
 fhandler_socket_wsock::fhandler_socket_wsock () :
   fhandler_socket (),
   wsock_events (NULL),
@@ -1832,9 +1811,6 @@ fhandler_socket_inet::setsockopt (int level, int optname, const void *optval,
       break;
 
     case IPPROTO_IP:
-      /* Old applications still use the old WinSock1 IPPROTO_IP values. */
-      if (CYGWIN_VERSION_CHECK_FOR_USING_WINSOCK1_VALUES)
-	optname = convert_ws1_ip_optname (optname);
       switch (optname)
 	{
 	case IP_TOS:
@@ -2158,9 +2134,6 @@ fhandler_socket_inet::getsockopt (int level, int optname, const void *optval,
       break;
 
     case IPPROTO_IP:
-      /* Old applications still use the old WinSock1 IPPROTO_IP values. */
-      if (CYGWIN_VERSION_CHECK_FOR_USING_WINSOCK1_VALUES)
-	optname = convert_ws1_ip_optname (optname);
       break;
 
     case IPPROTO_TCP:
