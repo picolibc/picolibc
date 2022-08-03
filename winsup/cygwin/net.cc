@@ -1674,51 +1674,6 @@ get_hwaddr (struct ifall *ifp, PIP_ADAPTER_ADDRESSES pap)
 }
 
 /*
- * Generate short, unique interface name for usage with aged
- * applications still using the old pre-1.7 ifreq structure.
- */
-static void
-gen_old_if_name (char *name, PIP_ADAPTER_ADDRESSES pap, DWORD idx)
-{
-  /* Note: The returned name must be < 16 chars. */
-  const char *prefix;
-
-  switch (pap->IfType)
-    {
-      case IF_TYPE_ISO88025_TOKENRING:
-	prefix = "tok";
-	break;
-      case IF_TYPE_PPP:
-	prefix = "ppp";
-	break;
-      case IF_TYPE_SOFTWARE_LOOPBACK:
-	prefix = "lo";
-	break;
-      case IF_TYPE_ATM:
-	prefix = "atm";
-	break;
-      case IF_TYPE_IEEE80211:
-	prefix = "wlan";
-	break;
-      case IF_TYPE_SLIP:
-      case IF_TYPE_RS232:
-      case IF_TYPE_MODEM:
-	prefix = "slp";
-	break;
-      case IF_TYPE_TUNNEL:
-	prefix = "tun";
-	break;
-      default:
-	prefix = "eth";
-	break;
-    }
-  if (idx)
-    __small_sprintf (name, "%s%u:%u", prefix, pap->IfIndex, idx);
-  else
-    __small_sprintf (name, "%s%u", prefix, pap->IfIndex, idx);
-}
-
-/*
  * Get network interfaces.  Use IP Helper function GetAdaptersAddresses.
  */
 static struct ifall *
@@ -1760,9 +1715,7 @@ get_ifs (ULONG family)
 	    ifp->ifa_ifa.ifa_next = (struct ifaddrs *) &ifp[1].ifa_ifa;
 	    /* Interface name */
 
-	    if (CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ)
-	      gen_old_if_name (ifp->ifa_name, pap, idx);
-	    else if (idx)
+	    if (idx)
 	      __small_sprintf (ifp->ifa_name, "%s:%u", pap->AdapterName, idx);
 	    else
 	      strcpy (ifp->ifa_name, pap->AdapterName);
@@ -1808,9 +1761,7 @@ get_ifs (ULONG family)
 	    /* Next in chain */
 	    ifp->ifa_ifa.ifa_next = (struct ifaddrs *) &ifp[1].ifa_ifa;
 	    /* Interface name */
-	    if (CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ)
-	      gen_old_if_name (ifp->ifa_name, pap, idx);
-	    else if (sa->sa_family == AF_INET && idx)
+	    if (sa->sa_family == AF_INET && idx)
 	      __small_sprintf (ifp->ifa_name, "%s:%u", pap->AdapterName, idx);
 	    else
 	      strcpy (ifp->ifa_name, pap->AdapterName);

@@ -100,36 +100,12 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	  set_errno (EINVAL);
 	  return -1;
 	}
-      if (CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ)
-	{
-	  ifc.ifc_len = ifcp->ifc_len / sizeof (struct __old_ifreq)
-			* sizeof (struct ifreq);
-	  ifc.ifc_buf = (caddr_t) alloca (ifc.ifc_len);
-	}
-      else
-	{
-	  ifc.ifc_len = ifcp->ifc_len;
-	  ifc.ifc_buf = ifcp->ifc_buf;
-	}
+      ifc.ifc_len = ifcp->ifc_len;
+      ifc.ifc_buf = ifcp->ifc_buf;
       res = get_ifconf (&ifc, cmd);
       if (res)
 	debug_printf ("error in get_ifconf");
-      if (CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ)
-	{
-	  struct __old_ifreq *ifr = (struct __old_ifreq *) ifcp->ifc_buf;
-	  for (ifrp = ifc.ifc_req;
-	       (caddr_t) ifrp < ifc.ifc_buf + ifc.ifc_len;
-	       ++ifrp, ++ifr)
-	    {
-	      memcpy (&ifr->ifr_ifrn, &ifrp->ifr_ifrn, sizeof ifr->ifr_ifrn);
-	      ifr->ifr_name[__OLD_IFNAMSIZ - 1] = '\0';
-	      memcpy (&ifr->ifr_ifru, &ifrp->ifr_ifru, sizeof ifr->ifr_ifru);
-	    }
-	  ifcp->ifc_len = ifc.ifc_len / sizeof (struct ifreq)
-			  * sizeof (struct __old_ifreq);
-	}
-      else
-	ifcp->ifc_len = ifc.ifc_len;
+      ifcp->ifc_len = ifc.ifc_len;
       break;
     case OLD_SIOCGIFFLAGS:
     case OLD_SIOCGIFADDR:
@@ -159,12 +135,6 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	    return -1;
 	  }
 
-	if (cmd > SIOCGIFINDEX && CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ)
-	  {
-	    debug_printf ("cmd not supported on this platform");
-	    set_errno (EINVAL);
-	    return -1;
-	  }
 	ifc.ifc_len = 64 * sizeof (struct ifreq);
 	ifc.ifc_buf = (caddr_t) alloca (ifc.ifc_len);
 	if (cmd == SIOCGIFFRNDLYNAM)
@@ -182,45 +152,26 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	    break;
 	  }
 
-	if (CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ)
+	struct ifreq *ifr = (struct ifreq *) p;
+	debug_printf ("    name: %s", ifr->ifr_name);
+	for (ifrp = ifc.ifc_req;
+	     (caddr_t) ifrp < ifc.ifc_buf + ifc.ifc_len;
+	     ++ifrp)
 	  {
-	    struct __old_ifreq *ifr = (struct __old_ifreq *) p;
-	    debug_printf ("    name: %s", ifr->ifr_name);
-	    for (ifrp = ifc.ifc_req;
-		 (caddr_t) ifrp < ifc.ifc_buf + ifc.ifc_len;
-		 ++ifrp)
+	    debug_printf ("testname: %s", ifrp->ifr_name);
+	    if (! strcmp (ifrp->ifr_name, ifr->ifr_name))
 	      {
-		debug_printf ("testname: %s", ifrp->ifr_name);
-		if (! strcmp (ifrp->ifr_name, ifr->ifr_name))
-		  {
-		    memcpy (&ifr->ifr_ifru, &ifrp->ifr_ifru,
-			    sizeof ifr->ifr_ifru);
-		    break;
-		  }
+		if (cmd == SIOCGIFFRNDLYNAM)
+		  /* The application has to care for the space. */
+		  memcpy (ifr->ifr_frndlyname, ifrp->ifr_frndlyname,
+			  sizeof (struct ifreq_frndlyname));
+		else
+		  memcpy (&ifr->ifr_ifru, &ifrp->ifr_ifru,
+			  sizeof ifr->ifr_ifru);
+		break;
 	      }
 	  }
-	else
-	  {
-	    struct ifreq *ifr = (struct ifreq *) p;
-	    debug_printf ("    name: %s", ifr->ifr_name);
-	    for (ifrp = ifc.ifc_req;
-		 (caddr_t) ifrp < ifc.ifc_buf + ifc.ifc_len;
-		 ++ifrp)
-	      {
-		debug_printf ("testname: %s", ifrp->ifr_name);
-		if (! strcmp (ifrp->ifr_name, ifr->ifr_name))
-		  {
-		    if (cmd == SIOCGIFFRNDLYNAM)
-		      /* The application has to care for the space. */
-		      memcpy (ifr->ifr_frndlyname, ifrp->ifr_frndlyname,
-			      sizeof (struct ifreq_frndlyname));
-		    else
-		      memcpy (&ifr->ifr_ifru, &ifrp->ifr_ifru,
-			      sizeof ifr->ifr_ifru);
-		    break;
-		  }
-	      }
-	  }
+
 	if ((caddr_t) ifrp >= ifc.ifc_buf + ifc.ifc_len)
 	  {
 	    set_errno (EINVAL);
