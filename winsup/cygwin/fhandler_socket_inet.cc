@@ -1316,8 +1316,7 @@ fhandler_socket_wsock::recvmsg (struct msghdr *msg, int flags)
     {
       msg->msg_namelen = wsamsg.namelen;
       msg->msg_controllen = wsamsg.Control.len;
-      if (!CYGWIN_VERSION_CHECK_FOR_USING_ANCIENT_MSGHDR)
-	msg->msg_flags = wsamsg.dwFlags;
+      msg->msg_flags = wsamsg.dwFlags;
       /* if a UDP_GRO packet is present, convert gso_size from Windows DWORD
          to Linux-compatible uint16_t.  We don't have to change the
 	 msg_control block layout for that, assuming applications do as they
