@@ -34,11 +34,6 @@ details. */
 #define CYGWIN_VERSION_USER_API_VERSION_COMBINED \
   CYGWIN_VERSION_PER_PROCESS_API_VERSION_COMBINED (user_data)
 
-/* Old APIs had getc/putc macros that conflict with new CR/LF handling in the
-   stdio buffers */
-#define CYGWIN_VERSION_OLD_STDIO_CRLF_HANDLING \
-  (CYGWIN_VERSION_USER_API_VERSION_COMBINED <= 20)
-
 #define CYGWIN_VERSION_CHECK_FOR_S_IEXEC \
   (CYGWIN_VERSION_USER_API_VERSION_COMBINED >= 36)
 

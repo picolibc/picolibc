@@ -2898,12 +2898,6 @@ ctermid (char *str)
 extern "C" int
 _cygwin_istext_for_stdio (int fd)
 {
-  if (CYGWIN_VERSION_OLD_STDIO_CRLF_HANDLING)
-    {
-      syscall_printf ("fd %d: old API", fd);
-      return 0; /* we do it for old apps, due to getc/putc macros */
-    }
-
   cygheap_fdget cfd (fd, false, false);
   if (cfd < 0)
     {
