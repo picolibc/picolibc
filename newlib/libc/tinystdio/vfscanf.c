@@ -129,6 +129,10 @@ conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags, un
             base = 16;
 	    if (!--width || (i = scanf_getc(stream, lenp)) < 0)
 		goto putval;
+        } else if (i == 'b' && base <= 2) {
+            base = 2;
+	    if (!--width || (i = scanf_getc(stream, lenp)) < 0)
+		goto putval;
 	} else if (base == 0 || base == 8) {
             base = 8;
         }
@@ -537,7 +541,7 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap_orig)
 #endif
 	    }
 
-#define CNV_BASE	"cdinopsuxX"
+#define CNV_BASE	"cdinopsuxXb"
 #if	SCANF_BRACKET
 # define CNV_BRACKET	"["
 #else
@@ -614,6 +618,10 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap_orig)
                     base = 16;
 		    goto conv_int;
 
+                  case 'b':
+                    base = 2;
+                    goto conv_int;
+
 	          case 'd':
 		  case 'u':
                     base = 10;
@@ -634,6 +642,10 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap_orig)
 		  case 'u':
                     base = 10;
 		    goto conv_int;
+
+                  case 'b':
+                    base = 2;
+                    goto conv_int;
 
 	          case 'o':
                     base = 8;
