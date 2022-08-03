@@ -40,8 +40,6 @@ details. */
 #define CYGWIN_VERSION_CHECK_FOR_EXTRA_TM_MEMBERS \
   (CYGWIN_VERSION_USER_API_VERSION_COMBINED >= 272)
 
-#define CYGWIN_VERSION_CYGWIN_CONV 181
-
 /* API_MAJOR 0.0: Initial version.  API_MINOR changes:
     1: Export cygwin32_ calls as cygwin_ as well.
     2: Export j1, jn, y1, yn.
