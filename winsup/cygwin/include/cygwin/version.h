@@ -13,10 +13,6 @@ details. */
 #define CYGWIN_VERSION_DLL_MAJOR 3004
 #define CYGWIN_VERSION_DLL_MINOR 0
 
-/* Major numbers before CYGWIN_VERSION_DLL_EPOCH are incompatible. */
-
-#define CYGWIN_VERSION_DLL_EPOCH 19
-
 /* CYGWIN_VERSION_DLL_COMBINED gives us a single number representing the
    combined DLL major and minor numbers. */
 

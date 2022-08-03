@@ -374,14 +374,7 @@ check_sanity_and_sync (per_process *p)
   if (sizeof (per_process) != SIZEOF_PER_PROCESS)
     api_fatal ("per_process sanity check failed");
 
-  /* Make sure that the app and the dll are in sync. */
-
-  /* Complain if older than last incompatible change */
-  if (p->dll_major < CYGWIN_VERSION_DLL_EPOCH)
-    api_fatal ("cygwin DLL and APP are out of sync -- DLL version mismatch %u < %u",
-	       p->dll_major, CYGWIN_VERSION_DLL_EPOCH);
-
-  /* magic_biscuit != 0 if using the old style version numbering scheme.  */
+  /* magic_biscuit must be SIZEOF_PER_PROCESS.  */
   if (p->magic_biscuit != SIZEOF_PER_PROCESS)
     api_fatal ("Incompatible cygwin .dll -- incompatible per_process info %u != %u",
 	       p->magic_biscuit, SIZEOF_PER_PROCESS);
