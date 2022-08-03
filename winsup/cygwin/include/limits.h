@@ -90,11 +90,7 @@ details. */
 /* Minimum and maximum values a `signed long int' can hold.
    (Same as `int').  */
 #ifndef __LONG_MAX__
-#if __WORDSIZE == 64
 #define __LONG_MAX__ 9223372036854775807L
-#else
-#define __LONG_MAX__ 2147483647L
-# endif /* __alpha__ */
 #endif
 #undef LONG_MIN
 #define LONG_MIN (-LONG_MAX-1L)
@@ -135,16 +131,10 @@ details. */
 
 /* Maximum size of ssize_t. Sadly, gcc doesn't give us __SSIZE_MAX__
    the way it does for __SIZE_MAX__.  On the other hand, we happen to
-   know that for Cygwin, ssize_t is 'int' on 32-bit and 'long' on
-   64-bit, and this particular header is specific to Cygwin, so we
-   don't have to jump through hoops. */
+   know that for Cygwin, ssize_t is 'long' and this particular header
+   is specific to Cygwin, so we don't have to jump through hoops. */
 #undef SSIZE_MAX
-#if __WORDSIZE == 64
 #define SSIZE_MAX (__LONG_MAX__)
-#else
-#define SSIZE_MAX (__INT_MAX__)
-#endif
-
 
 /* Runtime Invariant Values */
 

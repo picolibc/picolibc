@@ -39,13 +39,7 @@ details. */
    threads in the same allocation granularity slot.  Oh well. */
 #define __PTHREAD_STACK_MIN 65536
 
-/* FIXME: We only support one realtime signal in 32 bit mode, but
-	 _POSIX_RTSIG_MAX is 8. */
-#if __WORDSIZE == 64
 #define __RTSIG_MAX 33
-#else
-#define __RTSIG_MAX 1
-#endif
 #define __SEM_VALUE_MAX 1147483648
 #define __SIGQUEUE_MAX 32
 #define __STREAM_MAX 20

@@ -383,11 +383,7 @@ struct sigaction
 #define	SIGUSR1 30	/* user defined signal 1 */
 #define	SIGUSR2 31	/* user defined signal 2 */
 
-#if __WORDSIZE == 64
 #define _NSIG	65      /* signal 0 implied */
-#else
-#define _NSIG	33      /* signal 0 implied */
-#endif
 
 #if __MISC_VISIBLE
 #define NSIG	_NSIG
