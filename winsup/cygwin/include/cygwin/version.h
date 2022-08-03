@@ -218,8 +218,7 @@ details. */
   143: Export clock_getres, clock_setres
   144: Export timelocal, timegm.
   145: Add MAP_NORESERVE flag to mmap.
-  146: Change SI_USER definition.  FIXME: Need to develop compatibility
-       macro for this?
+  146: Change SI_USER definition.
   147: Eliminate problematic d_ino from dirent structure.  unsetenv now
        returns int, as per linux.
   148: Add open(2) flags O_SYNC, O_RSYNC, O_DSYNC and O_DIRECT.

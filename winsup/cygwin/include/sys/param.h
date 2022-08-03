@@ -25,7 +25,6 @@
 #define NGROUPS		NGROUPS_MAX
 
 /* Ticks/second for system calls such as times() */
-/* FIXME: is this the appropriate value? */
 #define HZ		1000
 
 /* Max hostname size that can be dealt with (== Win32 MAX_HOSTNAME_LEN) */

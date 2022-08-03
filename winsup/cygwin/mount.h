@@ -152,10 +152,9 @@ class mount_item
   int build_win32 (char *, const char *, unsigned *, unsigned);
 };
 
-/* Warning: Decreasing this value will cause cygwin.dll to ignore existing
-   higher numbered registry entries.  Don't change this number willy-nilly.
-   What we need is to have a more dynamic allocation scheme, but the current
-   scheme should be satisfactory for a long while yet.  */
+/* Don't change this number willy-nilly.  What we need is to have a more
+   dynamic allocation scheme, but the current scheme should be satisfactory
+   for a long while yet.  */
 #define MAX_MOUNTS 64
 
 class reg_key;

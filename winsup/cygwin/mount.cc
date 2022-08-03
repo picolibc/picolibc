@@ -1276,8 +1276,8 @@ static mount_item *mounts_for_sort;
 
 /* sort_by_posix_name: qsort callback to sort the mount entries.  Sort
    user mounts ahead of system mounts to the same POSIX path. */
-/* FIXME: should the user should be able to choose whether to
-   prefer user or system mounts??? */
+/* FIXME: should the user be able to choose whether to prefer user or
+   system mounts??? */
 static int
 sort_by_posix_name (const void *a, const void *b)
 {
@@ -1312,8 +1312,8 @@ sort_by_posix_name (const void *a, const void *b)
 
 /* sort_by_native_name: qsort callback to sort the mount entries.  Sort
    user mounts ahead of system mounts to the same POSIX path. */
-/* FIXME: should the user should be able to choose whether to
-   prefer user or system mounts??? */
+/* FIXME: should the user be able to choose whether to prefer user or
+   system mounts??? */
 static int
 sort_by_native_name (const void *a, const void *b)
 {
