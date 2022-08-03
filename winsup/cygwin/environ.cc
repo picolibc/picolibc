@@ -291,10 +291,6 @@ env_path_to_win32 (const void *posix, void *win32, size_t size)
 			   win32, size);
 }
 
-#define ENVMALLOC \
-  (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) \
-	  <= CYGWIN_VERSION_DLL_MALLOC_ENV)
-
 #define NL(x) x, (sizeof (x) - 1)
 /* List of names which are converted from dos to unix
    on the way in and back again on the way out.
@@ -631,7 +627,7 @@ _addenv (const char *name, const char *value, int overwrite)
   char *envhere;
   if (!issetenv)
     /* Not setenv. Just overwrite existing. */
-    envhere = environ[offset] = (char *) (ENVMALLOC ? strdup (name) : name);
+    envhere = environ[offset] = (char *) name;
   else
     {				/* setenv */
       /* Look for an '=' in the name and ignore anything after that if found. */
@@ -817,13 +813,6 @@ environ_init (char **envp, int envc)
 	  /* Older applications relied on the fact that cygwin malloced elements of the
 	     environment list.  */
 	  envp = newenv;
-	  if (ENVMALLOC)
-	    for (char **e = newenv; *e; e++)
-	      {
-		char *p = *e;
-		*e = strdup (p);
-		cfree (p);
-	      }
 	  envp_passed_in = 1;
 	  goto out;
 	}

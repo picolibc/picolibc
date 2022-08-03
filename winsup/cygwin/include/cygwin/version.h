@@ -34,8 +34,6 @@ details. */
 #define CYGWIN_VERSION_USER_API_VERSION_COMBINED \
   CYGWIN_VERSION_PER_PROCESS_API_VERSION_COMBINED (user_data)
 
-#define CYGWIN_VERSION_DLL_MALLOC_ENV		28
-
 /* Old APIs had getc/putc macros that conflict with new CR/LF handling in the
    stdio buffers */
 #define CYGWIN_VERSION_OLD_STDIO_CRLF_HANDLING \
