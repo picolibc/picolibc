@@ -34,6 +34,9 @@ details. */
 #define CYGWIN_VERSION_USER_API_VERSION_COMBINED \
   CYGWIN_VERSION_PER_PROCESS_API_VERSION_COMBINED (user_data)
 
+/* Please note that the first API_VERSION of the 64 bit build was 0.263.
+   For macros checking for older versions, bisect the git repo. */
+
 #define CYGWIN_VERSION_CHECK_FOR_EXTRA_TM_MEMBERS \
   (CYGWIN_VERSION_USER_API_VERSION_COMBINED >= 272)
 
