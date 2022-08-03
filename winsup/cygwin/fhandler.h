@@ -15,15 +15,6 @@ details. */
 #include <cygwin/_ucred.h>
 #include <sys/un.h>
 
-/* newlib used to define O_NDELAY differently from O_NONBLOCK.  Now it
-   properly defines both to be the same.  Unfortunately, we have to
-   behave properly the old version, too, to accommodate older executables. */
-#define OLD_O_NDELAY	(CYGWIN_VERSION_CHECK_FOR_OLD_O_NONBLOCK ? 4 : 0)
-
-/* Care for the old O_NDELAY flag. If one of the flags is set,
-   both flags are set. */
-#define O_NONBLOCK_MASK (O_NONBLOCK | OLD_O_NDELAY)
-
 /* It appears that 64K is the block size used for buffered I/O on NT.
    Using this blocksize in read/write calls in the application results
    in a much better performance than using smaller values. */

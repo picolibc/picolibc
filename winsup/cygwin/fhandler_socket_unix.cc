@@ -2289,10 +2289,8 @@ fhandler_socket_unix::fcntl (int cmd, intptr_t arg)
     case F_SETFL:
       {
 	const bool was_nonblocking = is_nonblocking ();
-	const int allowed_flags = O_APPEND | O_NONBLOCK_MASK;
+	const int allowed_flags = O_APPEND | O_NONBLOCK;
 	int new_flags = arg & allowed_flags;
-	if ((new_flags & OLD_O_NDELAY) && (new_flags & O_NONBLOCK))
-	  new_flags &= ~OLD_O_NDELAY;
 	set_flags ((get_flags () & ~allowed_flags) | new_flags);
 	const bool now_nonblocking = is_nonblocking ();
 	if (was_nonblocking != now_nonblocking)

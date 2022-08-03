@@ -1360,17 +1360,12 @@ int fhandler_base::fcntl (int cmd, intptr_t arg)
       break;
     case F_SETFL:
       {
-	/* Only O_APPEND, O_ASYNC and O_NONBLOCK/O_NDELAY are allowed.
+	/* Only O_APPEND, O_ASYNC and O_NONBLOCK are allowed.
 	   Each other flag will be ignored.
 	   Since O_ASYNC isn't defined in fcntl.h it's currently
 	   ignored as well.  */
-	const int allowed_flags = O_APPEND | O_NONBLOCK_MASK;
+	const int allowed_flags = O_APPEND | O_NONBLOCK;
 	int new_flags = arg & allowed_flags;
-	/* Carefully test for the O_NONBLOCK or deprecated OLD_O_NDELAY flag.
-	   Set only the flag that has been passed in.  If both are set, just
-	   record O_NONBLOCK.   */
-	if ((new_flags & OLD_O_NDELAY) && (new_flags & O_NONBLOCK))
-	  new_flags &= ~OLD_O_NDELAY;
 	set_flags ((get_flags () & ~allowed_flags) | new_flags);
       }
       res = 0;
@@ -1573,15 +1568,15 @@ fhandler_base::fixup_after_exec ()
 bool
 fhandler_base::is_nonblocking ()
 {
-  return (openflags & O_NONBLOCK_MASK) != 0;
+  return (openflags & O_NONBLOCK) != 0;
 }
 
 void
 fhandler_base::set_nonblocking (int yes)
 {
-  int current = openflags & O_NONBLOCK_MASK;
+  int current = openflags & O_NONBLOCK;
   int new_flags = yes ? (!current ? O_NONBLOCK : current) : 0;
-  openflags = (openflags & ~O_NONBLOCK_MASK) | new_flags;
+  openflags = (openflags & ~O_NONBLOCK) | new_flags;
 }
 
 int
