@@ -120,7 +120,6 @@ const int __collate_load_error = 0;
   extern UNICODE_STRING _RDATA ro_u_empty = _ROU (L"");
   extern UNICODE_STRING _RDATA ro_u_lnk = _ROU (L".lnk");
   extern UNICODE_STRING _RDATA ro_u_exe = _ROU (L".exe");
-  extern UNICODE_STRING _RDATA ro_u_dll = _ROU (L".dll");
   extern UNICODE_STRING _RDATA ro_u_com = _ROU (L".com");
   extern UNICODE_STRING _RDATA ro_u_scr = _ROU (L".scr");
   extern UNICODE_STRING _RDATA ro_u_sys = _ROU (L".sys");
