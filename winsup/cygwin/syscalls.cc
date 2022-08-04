@@ -6,17 +6,6 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#define fstat __FOOfstat__
-#define lstat __FOOlstat__
-//#define stat __FOOstat__
-#define _close __FOO_close__
-#define _lseek __FOO_lseek__
-#define _open __FOO_open__
-#define _read __FOO_read__
-#define _write __FOO_write__
-#define pread __FOO_pread
-#define pwrite __FOO_pwrite
-
 #include "winsup.h"
 #include "miscfuncs.h"
 #include <sys/stat.h>
@@ -37,12 +26,6 @@ details. */
 #include <iptypes.h>
 #include "ntdll.h"
 
-#undef fstat
-#undef lstat
-//#undef stat
-#undef pread
-#undef pwrite
-
 #include <cygwin/version.h>
 #include "cygerrno.h"
 #include "perprocess.h"
@@ -61,12 +44,6 @@ details. */
 #include "child_info.h"
 #include <cygwin/fs.h>  /* needed for RENAME_NOREPLACE */
 #include <sys/reent.h>  /* needed for _fwalk_sglue() declaration */
-
-#undef _close
-#undef _lseek
-#undef _open
-#undef _read
-#undef _write
 
 static int mknod_worker (path_conv &, mode_t, _major_t, _minor_t);
 
@@ -1412,7 +1389,7 @@ writev (const int fd, const struct iovec *const iov, const int iovcnt)
 }
 
 extern "C" ssize_t
-pwrite (int fd, void *ptr, size_t len, off_t off)
+pwrite (int fd, const void *ptr, size_t len, off_t off)
 {
   pthread_testcancel ();
 
@@ -1426,7 +1403,7 @@ pwrite (int fd, void *ptr, size_t len, off_t off)
       res = -1;
     }
   else
-    res = cfd->pwrite (ptr, len, off);
+    res = cfd->pwrite (const_cast<void *> (ptr), len, off);
 
   syscall_printf ("%lR = pwrite(%d, %p, %d, %d)", res, fd, ptr, len, off);
   return res;
