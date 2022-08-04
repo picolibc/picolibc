@@ -86,11 +86,5 @@ int WINAPI _cygwin_dll_entry (HINSTANCE h, DWORD reason, void *ptr)	      \
   }									      \
   return ret;								      \
 }									      \
-									      \
-/* OBSOLETE: This is only provided for source level compatibility. */         \
-int WINAPI _cygwin_noncygwin_dll_entry (HINSTANCE h, DWORD reason, void *ptr) \
-{									      \
-  return _cygwin_dll_entry (h, reason, ptr);				      \
-}									      \
 
 #endif /* __CYGWIN_CYGWIN_DLL_H__ */
