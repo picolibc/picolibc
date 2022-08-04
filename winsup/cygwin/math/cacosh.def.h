@@ -80,6 +80,27 @@ __FLT_ABI(cacosh) (__FLT_TYPE __complex__ z)
     return ret;
   }
 
+  /* cacosh(z) = log(z + sqrt(z*z - 1)) */
+
+  if (__FLT_ABI(fabs) (__real__ z) >= __FLT_CST(1.0)/__FLT_EPSILON
+      || __FLT_ABI(fabs) (__imag__ z) >= __FLT_CST(1.0)/__FLT_EPSILON)
+  {
+    /* For large z, z + sqrt(z*z - 1) is approximately 2*z.
+    Use that approximation to avoid overflow when squaring.
+    Additionally, use symmetries to perform the calculation in the positive
+    half plane. */
+    __real__ x = __real__ z;
+    __imag__ x = __FLT_ABI(fabs) (__imag__ z);
+    x = __FLT_ABI(clog) (x);
+    __real__ x += M_LN2;
+
+    /* adjust signs for input */
+    __real__ ret = __real__ x;
+    __imag__ ret = __FLT_ABI(copysign) (__imag__ x, __imag__ z);
+
+    return ret;
+  }
+
   __real__ x = (__real__ z - __imag__ z) * (__real__ z + __imag__ z) - __FLT_CST(1.0);
   __imag__ x = __FLT_CST(2.0) * __real__ z * __imag__ z;
 
