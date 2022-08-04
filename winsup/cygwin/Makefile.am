@@ -68,6 +68,45 @@ LIB_FILES= \
 	lib/premain3.c \
 	lib/pseudo-reloc-dummy.c
 
+FHANDLER_FILES= \
+	fhandler/base.cc \
+	fhandler/clipboard.cc \
+	fhandler/console.cc \
+	fhandler/cygdrive.cc \
+	fhandler/dev.cc \
+	fhandler/dev_fd.cc \
+	fhandler/disk_file.cc \
+	fhandler/dsp.cc \
+	fhandler/fifo.cc \
+	fhandler/floppy.cc \
+	fhandler/mqueue.cc \
+	fhandler/netdrive.cc \
+	fhandler/nodevice.cc \
+	fhandler/null.cc \
+	fhandler/pipe.cc \
+	fhandler/proc.cc \
+	fhandler/process.cc \
+	fhandler/process_fd.cc \
+	fhandler/procnet.cc \
+	fhandler/procsys.cc \
+	fhandler/procsysvipc.cc \
+	fhandler/random.cc \
+	fhandler/raw.cc \
+	fhandler/registry.cc \
+	fhandler/serial.cc \
+	fhandler/signalfd.cc \
+	fhandler/socket.cc \
+	fhandler/socket_inet.cc \
+	fhandler/socket_local.cc \
+	fhandler/socket_unix.cc \
+	fhandler/tape.cc \
+	fhandler/termios.cc \
+	fhandler/timerfd.cc \
+	fhandler/tty.cc \
+	fhandler/virtual.cc \
+	fhandler/windows.cc \
+	fhandler/zero.cc
+
 LIBC_FILES= \
 	libc/arc4random_stir.c \
 	libc/base64.c \
@@ -196,6 +235,13 @@ REGEX_FILES = \
 	regex/regexec.c \
 	regex/regfree.c
 
+SEC_FILES= \
+	sec/acl.cc \
+	sec/auth.cc \
+	sec/base.cc \
+	sec/helper.cc \
+	sec/posixacl.cc
+
 TZCODE_FILES= \
 	tzcode/localtime_wrapper.c
 
@@ -226,42 +272,6 @@ DLL_FILES= \
 	external.cc \
 	fcntl.cc \
 	fenv.c \
-	fhandler.cc \
-	fhandler_clipboard.cc \
-	fhandler_console.cc \
-	fhandler_cygdrive.cc \
-	fhandler_dev.cc \
-	fhandler_dev_fd.cc \
-	fhandler_disk_file.cc \
-	fhandler_dsp.cc \
-	fhandler_fifo.cc \
-	fhandler_floppy.cc \
-	fhandler_mqueue.cc \
-	fhandler_netdrive.cc \
-	fhandler_nodevice.cc \
-	fhandler_pipe.cc \
-	fhandler_proc.cc \
-	fhandler_process.cc \
-	fhandler_process_fd.cc \
-	fhandler_procnet.cc \
-	fhandler_procsys.cc \
-	fhandler_procsysvipc.cc \
-	fhandler_random.cc \
-	fhandler_raw.cc \
-	fhandler_registry.cc \
-	fhandler_serial.cc \
-	fhandler_signalfd.cc \
-	fhandler_socket.cc \
-	fhandler_socket_inet.cc \
-	fhandler_socket_local.cc \
-	fhandler_socket_unix.cc \
-	fhandler_tape.cc \
-	fhandler_termios.cc \
-	fhandler_timerfd.cc \
-	fhandler_tty.cc \
-	fhandler_virtual.cc \
-	fhandler_windows.cc \
-	fhandler_zero.cc \
 	flock.cc \
 	fork.cc \
 	forkable.cc \
@@ -305,11 +315,6 @@ DLL_FILES= \
 	resource.cc \
 	scandir.cc \
 	sched.cc \
-	sec_acl.cc \
-	sec_auth.cc \
-	sec_helper.cc \
-	sec_posixacl.cc \
-	security.cc \
 	select.cc \
 	sem.cc \
 	setlsapwd.cc \
@@ -359,8 +364,10 @@ libdll_a_SOURCES= \
 	$(DLL_FILES) \
 	$(REGEX_FILES) \
 	$(MALLOC_FILES) \
+	$(FHANDLER_FILES) \
 	$(LIBC_FILES) \
 	$(MATH_FILES) \
+	$(SEC_FILES) \
 	$(TZCODE_FILES) \
 	$(GENERATED_FILES)
 
@@ -368,13 +375,13 @@ libdll_a_SOURCES= \
 # generated sources
 #
 
-shared_info_magic.h: cygmagic shared_info.h
-	$(AM_V_GEN)$(srcdir)/cygmagic $@ "$(CC) $(INCLUDES) $(CPPFLAGS) -E -x c++" $(word 2,$^) SHARED_MAGIC 'class shared_info' USER_MAGIC 'class user_info'
+shared_info_magic.h: scripts/cygmagic local_includes/shared_info.h
+	$(AM_V_GEN)$(srcdir)/scripts/cygmagic $@ "$(CC) $(INCLUDES) $(CPPFLAGS) -E -x c++" $(word 2,$^) SHARED_MAGIC 'class shared_info' USER_MAGIC 'class user_info'
 
-child_info_magic.h: cygmagic child_info.h
-	$(AM_V_GEN)$(srcdir)/cygmagic $@ "$(CC) $(INCLUDES) $(CPPFLAGS) -E -x c++" $(word 2,$^) CHILD_INFO_MAGIC 'class child_info'
+child_info_magic.h: scripts/cygmagic local_includes/child_info.h
+	$(AM_V_GEN)$(srcdir)/scripts/cygmagic $@ "$(CC) $(INCLUDES) $(CPPFLAGS) -E -x c++" $(word 2,$^) CHILD_INFO_MAGIC 'class child_info'
 
-globals.h: mkglobals_h globals.cc
+globals.h: scripts/mkglobals_h globals.cc
 	$(AM_V_GEN)$^ > $@
 
 localtime.patched.c: tzcode/localtime.c tzcode/localtime.c.patch
@@ -382,10 +389,10 @@ localtime.patched.c: tzcode/localtime.c tzcode/localtime.c.patch
 		    $(srcdir)/tzcode/localtime.c \
 		    $(srcdir)/tzcode/localtime.c.patch
 
-$(srcdir)/devices.cc: gendevices devices.in devices.h
+$(srcdir)/devices.cc: scripts/gendevices devices.in local_includes/devices.h
 	$(wordlist 1,2,$^) $@
 
-tlsoffsets: gentls_offsets cygtls.h
+tlsoffsets: scripts/gentls_offsets local_includes/cygtls.h
 	$(AM_V_GEN)CXXCOMPILE="$(CXXCOMPILE)" $^ $@
 
 BUILT_SOURCES = \
@@ -402,7 +409,7 @@ src_files := $(foreach dir,$(dirs),$(find_src_files))
 
 # mkvers.sh creates version.cc in the first place, winver.o always
 # second, so version.cc is always older than winver.o
-version.cc: mkvers.sh include/cygwin/version.h winver.rc $(src_files)
+version.cc: scripts/mkvers.sh include/cygwin/version.h winver.rc $(src_files)
 	@echo "Making version.cc and winver.o";\
 	export CC="$(CC)";\
 	/bin/sh $(word 1,$^) $(word 2,$^) $(word 3,$^) $(WINDRES) $(CFLAGS)
@@ -486,7 +493,7 @@ localtime_wrapper_CFLAGS=-I$(srcdir)/tzcode -fwrapv
 # required since gcc 9.x
 exec_CFLAGS=-fno-builtin-execve
 
-fhandler_proc_CFLAGS=-DUSERNAME="\"$(USER)\"" -DHOSTNAME="\"$(HOSTNAME)\"" \
+proc_CFLAGS=-DUSERNAME="\"$(USER)\"" -DHOSTNAME="\"$(HOSTNAME)\"" \
 		     -DGCC_VERSION="\"`$(CC) -v 2>&1 | tail -n 1`\""
 
 dtable_CFLAGS=-fcheck-new
@@ -608,8 +615,8 @@ $(NEW_DLL_NAME): $(PRE_DLL_NAME) $(DBG_DLL_NAME)
 # cygwin import library
 toolopts=--cpu=@target_cpu@ --ar=@AR@ --as=@AS@ --nm=@NM@ --objcopy=@OBJCOPY@
 
-$(DEF_FILE): gendef $(DIN_FILE) common.din
-	$(AM_V_GEN)$(srcdir)/gendef --cpu=@target_cpu@ --output-def=$(DEF_FILE) $(srcdir)/$(DIN_FILE) $(srcdir)/common.din
+$(DEF_FILE): scripts/gendef $(DIN_FILE) common.din
+	$(AM_V_GEN)$(srcdir)/scripts/gendef --cpu=@target_cpu@ --output-def=$(DEF_FILE) $(srcdir)/$(DIN_FILE) $(srcdir)/common.din
 
 sigfe.s: $(DEF_FILE) tlsoffsets
 	@[ -s $@ ] || \
@@ -618,7 +625,7 @@ sigfe.s: $(DEF_FILE) tlsoffsets
 
 LIBCOS=$(addsuffix .o,$(basename $(LIB_FILES)))
 $(LIB_NAME): $(DEF_FILE) $(LIBCOS) | $(NEW_DLL_NAME)
-	$(AM_V_GEN)$(srcdir)/mkimport $(toolopts) $(NEW_FUNCTIONS) $@ cygdll.a $(wordlist 2,99,$^)
+	$(AM_V_GEN)$(srcdir)/scripts/mkimport $(toolopts) $(NEW_FUNCTIONS) $@ cygdll.a $(wordlist 2,99,$^)
 
 # cygwin import library used by testsuite
 $(TEST_LIB_NAME): $(LIB_NAME)
@@ -627,7 +634,7 @@ $(TEST_LIB_NAME): $(LIB_NAME)
 # sublibs
 # import libraries for some subset of symbols indicated by given objects
 speclib=\
-	$(srcdir)/speclib $(toolopts) \
+	$(srcdir)/scripts/speclib $(toolopts) \
 	--exclude='cygwin' \
 	--exclude='(?i:dll)' \
 	--exclude='reloc' \
@@ -656,7 +663,7 @@ libresolv.a: $(LIB_NAME) libc/minires.o
 librt.a: $(LIB_NAME) posix_ipc.o
 	$(AM_V_GEN)$(speclib) $^ $(@F)
 
-libacl.a: $(LIB_NAME) sec_posixacl.o
+libacl.a: $(LIB_NAME) sec/posixacl.o
 	$(AM_V_GEN)$(speclib) $^ $(@F)
 
 libssp.a: $(LIB_NAME) $(wildcard $(newlib_build)/libc/ssp/*.o)

@@ -41,7 +41,7 @@ ldh_SOURCES = ldh.cc
 strace_SOURCES = \
 	path.cc \
 	strace.cc
-strace_CPPFLAGS=-I$(srcdir)/.. -idirafter ${top_srcdir}/cygwin -idirafter ${top_srcdir}/cygwin/include
+strace_CPPFLAGS=-I$(srcdir)/.. -idirafter ${top_srcdir}/cygwin/local_includes -idirafter ${top_srcdir}/cygwin/include
 strace_LDADD = -lntdll
 
 noinst_PROGRAMS = path-testsuite

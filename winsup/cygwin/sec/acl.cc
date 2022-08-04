@@ -1,4 +1,4 @@
-/* sec_acl.cc: Solaris compatible ACL functions.
+/* sec/acl.cc: Solaris compatible ACL functions.
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 

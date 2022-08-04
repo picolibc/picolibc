@@ -1,4 +1,4 @@
-/* sec_auth.cc: NT authentication functions
+/* sec/auth.cc: NT authentication functions
 
 This file is part of Cygwin.
 

@@ -1,4 +1,4 @@
-/* sec_helper.cc: NT security helper functions
+/* sec/helper.cc: NT security helper functions
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 

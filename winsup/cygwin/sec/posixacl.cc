@@ -1,4 +1,4 @@
-/* sec_posixacl.cc: POSIX ACL functions based on Solaris ACLs.
+/* sec/posixacl.cc: POSIX ACL functions based on Solaris ACLs.
 
 This file is part of Cygwin.
 

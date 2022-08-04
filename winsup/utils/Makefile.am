@@ -83,7 +83,7 @@ ldd_LDADD = $(LDADD) -lpsapi -lntdll
 mount_CXXFLAGS = -DFSTAB_ONLY $(AM_CXXFLAGS)
 minidumper_LDADD = $(LDADD) -ldbghelp
 pldd_LDADD = $(LDADD) -lpsapi
-profiler_CXXFLAGS = -I$(srcdir) -idirafter ${top_srcdir}/cygwin -idirafter ${top_srcdir}/cygwin/include $(AM_CXXFLAGS)
+profiler_CXXFLAGS = -I$(srcdir) -idirafter ${top_srcdir}/cygwin/local_includes -idirafter ${top_srcdir}/cygwin/include $(AM_CXXFLAGS)
 profiler_LDADD = $(LDADD) -lntdll
 cygps_LDADD = $(LDADD) -lpsapi -lntdll
 

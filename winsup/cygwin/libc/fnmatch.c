@@ -64,11 +64,7 @@ __FBSDID("$FreeBSD: head/lib/libc/gen/fnmatch.c 288309 2015-09-27 12:52:18Z jill
 #include <wchar.h>
 #include <wctype.h>
 
-#ifdef __CYGWIN__
-#include "../collate.h"
-#else
 #include "collate.h"
-#endif
 
 #define	EOS	'\0'
 
