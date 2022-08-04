@@ -228,7 +228,7 @@ out:
   return 0;
 }
 
-static DWORD WINAPI
+static DWORD
 timer_thread (VOID *x)
 {
   timer_tracker *tt = ((timer_tracker *) x);

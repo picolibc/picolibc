@@ -642,7 +642,7 @@ lockf_t::create_lock_obj_attr (lockfattr_t *attr, ULONG flags, void *sd_buf)
   return &attr->attr;
 }
 
-DWORD WINAPI
+DWORD
 create_lock_in_parent (PVOID param)
 {
   HANDLE lf_obj;
@@ -721,7 +721,7 @@ err:
   return 1;
 }
 
-DWORD WINAPI
+DWORD
 delete_lock_in_parent (PVOID param)
 {
   inode_t *node, *next_node;
@@ -1870,7 +1870,7 @@ struct lock_parms {
   NTSTATUS	   status;
 };
 
-static DWORD WINAPI
+static DWORD
 blocking_lock_thr (LPVOID param)
 {
   struct lock_parms *lp = (struct lock_parms *) param;

@@ -198,7 +198,7 @@ console_unit::console_unit (HWND me0):
     api_fatal ("console device allocation failure - too many consoles in use, max consoles is 32");
 }
 
-static DWORD WINAPI
+static DWORD
 cons_master_thread (VOID *arg)
 {
   fhandler_console *fh = (fhandler_console *) arg;
@@ -3988,7 +3988,7 @@ DEF_HOOK (CreateProcessW);
 DEF_HOOK (ContinueDebugEvent);
 DEF_HOOK (GetProcAddress); /* Hooked for ConEmu cygwin connector */
 
-static BOOL WINAPI
+static BOOL
 CreateProcessA_Hooked
      (LPCSTR n, LPSTR c, LPSECURITY_ATTRIBUTES pa, LPSECURITY_ATTRIBUTES ta,
       BOOL inh, DWORD f, LPVOID e, LPCSTR d,
@@ -4003,7 +4003,7 @@ CreateProcessA_Hooked
   return CreateProcessA_Orig (n, c, pa, ta, inh, f, e, d, si, pi);
 }
 
-static BOOL WINAPI
+static BOOL
 CreateProcessW_Hooked
      (LPCWSTR n, LPWSTR c, LPSECURITY_ATTRIBUTES pa, LPSECURITY_ATTRIBUTES ta,
       BOOL inh, DWORD f, LPVOID e, LPCWSTR d,
@@ -4018,7 +4018,7 @@ CreateProcessW_Hooked
   return CreateProcessW_Orig (n, c, pa, ta, inh, f, e, d, si, pi);
 }
 
-static BOOL WINAPI
+static BOOL
 ContinueDebugEvent_Hooked
      (DWORD p, DWORD t, DWORD s)
 {
@@ -4029,7 +4029,7 @@ ContinueDebugEvent_Hooked
 }
 
 /* Hooked for ConEmu cygwin connector */
-static FARPROC WINAPI
+static FARPROC
 GetProcAddress_Hooked (HMODULE h, LPCSTR n)
 {
   if (strcmp(n, "RequestTermConnector") == 0)

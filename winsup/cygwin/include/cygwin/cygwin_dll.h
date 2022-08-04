@@ -22,7 +22,7 @@ details. */
 #define DECLARE_CYGWIN_DLL(Entry)					      \
 									      \
 CDECL_BEGIN								      \
-  int WINAPI Entry (HINSTANCE h, DWORD reason, void *ptr);	              \
+  int Entry (HINSTANCE h, DWORD reason, void *ptr);	              \
   typedef int (*mainfunc) (int, char **, char **);			      \
   extern PVOID cygwin_attach_dll (HMODULE, mainfunc);			      \
   extern void cygwin_detach_dll (PVOID);				      \
@@ -42,7 +42,7 @@ static int __dllMain (int a __attribute__ ((__unused__)),		      \
 									      \
 static PVOID dll_index;							      \
 									      \
-int WINAPI _cygwin_dll_entry (HINSTANCE h, DWORD reason, void *ptr)	      \
+int _cygwin_dll_entry (HINSTANCE h, DWORD reason, void *ptr)	      \
 {									      \
   int ret;								      \
   ret = 1;								      \

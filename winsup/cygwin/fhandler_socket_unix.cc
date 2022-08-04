@@ -928,7 +928,7 @@ struct conn_wait_info_t
 };
 
 /* Just hop to the wait_pipe_thread method. */
-DWORD WINAPI
+DWORD
 connect_wait_func (LPVOID param)
 {
   conn_wait_info_t *wait_info = (conn_wait_info_t *) param;

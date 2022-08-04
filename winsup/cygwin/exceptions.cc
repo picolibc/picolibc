@@ -55,7 +55,7 @@ PWCHAR debugger_command;
 extern uint8_t _sigbe;
 extern uint8_t _sigdelayed_end;
 
-static BOOL WINAPI ctrl_c_handler (DWORD);
+static BOOL ctrl_c_handler (DWORD);
 
 static const struct
 {
@@ -528,7 +528,7 @@ exception::myfault (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in,
    TODO: What we do here is to handle only __try/__except blocks in Cygwin.
          "Normal" exceptions will simply exit the process.  Still, better
 	 than nothing... */
-LONG WINAPI
+LONG
 myfault_altstack_handler (EXCEPTION_POINTERS *exc)
 {
   _cygtls& me = _my_tls;
@@ -976,7 +976,7 @@ has_visible_window_station ()
 }
 
 /* Keyboard interrupt handler.  */
-static BOOL WINAPI
+static BOOL
 ctrl_c_handler (DWORD type)
 {
   static bool saw_close;
@@ -1207,7 +1207,7 @@ set_signal_mask (sigset_t& setmask, sigset_t newmask)
 }
 
 
-DWORD WINAPI
+DWORD
 dumpstack_overflow_wrapper (PVOID arg)
 {
   cygwin_exception *exc = (cygwin_exception *) arg;

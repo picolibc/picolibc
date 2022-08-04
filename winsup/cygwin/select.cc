@@ -770,7 +770,7 @@ out:
 
 static int start_thread_pipe (select_record *me, select_stuff *stuff);
 
-static DWORD WINAPI
+static DWORD
 thread_pipe (void *arg)
 {
   select_pipe_info *pi = (select_pipe_info *) arg;
@@ -973,7 +973,7 @@ out:
 
 static int start_thread_fifo (select_record *me, select_stuff *stuff);
 
-static DWORD WINAPI
+static DWORD
 thread_fifo (void *arg)
 {
   select_fifo_info *pi = (select_fifo_info *) arg;
@@ -1161,7 +1161,7 @@ verify_console (select_record *me, fd_set *rfds, fd_set *wfds,
 
 static int console_startup (select_record *me, select_stuff *stuff);
 
-static DWORD WINAPI
+static DWORD
 thread_console (void *arg)
 {
   select_console_info *ci = (select_console_info *) arg;
@@ -1397,7 +1397,7 @@ out:
 
 static int pty_slave_startup (select_record *me, select_stuff *stuff);
 
-static DWORD WINAPI
+static DWORD
 thread_pty_slave (void *arg)
 {
   select_pipe_info *pi = (select_pipe_info *) arg;
@@ -1773,7 +1773,7 @@ peek_socket (select_record *me, bool)
 
 static int start_thread_socket (select_record *, select_stuff *);
 
-static DWORD WINAPI
+static DWORD
 thread_socket (void *arg)
 {
   select_socket_info *si = (select_socket_info *) arg;

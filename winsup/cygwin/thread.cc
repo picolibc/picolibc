@@ -1989,7 +1989,7 @@ pthread_spinlock::unlock ()
   return result;
 }
 
-DWORD WINAPI
+DWORD
 pthread::thread_init_wrapper (void *arg)
 {
   exception protect;

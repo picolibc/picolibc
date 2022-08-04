@@ -52,7 +52,7 @@ process_window_events (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 
 /* Handle windows events.  Inherits ownership of the wininfo lock */
-DWORD WINAPI
+DWORD
 wininfo::winthread ()
 {
   MSG msg;
@@ -92,7 +92,7 @@ wininfo::winthread ()
   return 0;
 }
 
-static DWORD WINAPI
+static DWORD
 winthread (VOID *arg)
 {
   return  ((wininfo *) arg)->winthread ();

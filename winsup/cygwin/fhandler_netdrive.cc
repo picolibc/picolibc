@@ -63,7 +63,7 @@ wnet_dbg_out (const char *func, DWORD ndi_ret)
     debug_printf ("WNetGetLastError failed: %u", gle_ret);
 }
 
-static DWORD WINAPI
+static DWORD
 thread_netdrive (void *arg)
 {
   netdriveinf *ndi = (netdriveinf *) arg;

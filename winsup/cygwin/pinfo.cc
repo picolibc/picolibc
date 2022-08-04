@@ -597,7 +597,7 @@ _pinfo::alive ()
   return !!h;
 }
 
-DWORD WINAPI
+DWORD
 commune_process (void *arg)
 {
   siginfo_t& si = *((siginfo_t *) arg);
@@ -1234,7 +1234,7 @@ _pinfo::environ (size_t& n)
    is received on the pipe, it is assumed that the cygwin pid has exited.
    Otherwise, various "signals" can be sent to the parent to inform the
    parent to perform a certain action. */
-static DWORD WINAPI
+static DWORD
 proc_waiter (void *arg)
 {
   pinfo vchild = *(pinfo *) arg;

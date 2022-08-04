@@ -200,7 +200,7 @@ aionotify (struct aiocb *aio)
     }
 }
 
-static DWORD WINAPI __attribute__ ((noreturn))
+static DWORD __attribute__ ((noreturn))
 aiowaiter (void *unused)
 { /* One instance, called on its own cygthread; runs until program exits */
   struct aiocb *aio;
@@ -327,7 +327,7 @@ asyncwrite (struct aiocb *aio)
 }
 
 /* Have to forward ref because of chicken v. egg situation */
-static DWORD WINAPI __attribute__ ((noreturn)) aioworker (void *);
+static DWORD __attribute__ ((noreturn)) aioworker (void *);
 
 static void
 aioinit (void)
@@ -400,7 +400,7 @@ aioqueue (struct aiocb *aio)
   return 0;
 }
 
-static DWORD WINAPI __attribute__ ((noreturn))
+static DWORD __attribute__ ((noreturn))
 aioworker (void *unused)
 { /* Multiple instances; called on own cygthreads; runs 'til program exits */
   struct aiocb *aio;

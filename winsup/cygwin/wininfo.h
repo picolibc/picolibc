@@ -16,7 +16,7 @@ public:
   int process (HWND, UINT, WPARAM, LPARAM);
   void lock ();
   void release ();
-  DWORD WINAPI winthread ();
+  DWORD winthread ();
 };
 
 extern wininfo winmsg;

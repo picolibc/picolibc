@@ -430,7 +430,7 @@ public:
   virtual void pop_cleanup_handler (int const execute);
 
   static pthread* self ();
-  static DWORD WINAPI thread_init_wrapper (void *);
+  static DWORD thread_init_wrapper (void *);
 
   virtual unsigned long getsequence_np();
 

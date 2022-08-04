@@ -22,7 +22,7 @@ details. */
 /* Implement CreateEvent/OpenEvent so that named objects are always created in
    Cygwin shared object namespace. */
 
-HANDLE WINAPI
+HANDLE
 CreateEventW (LPSECURITY_ATTRIBUTES lpEventAttributes, BOOL bManualReset,
 	      BOOL bInitialState, LPCWSTR lpName)
 {
@@ -57,7 +57,7 @@ CreateEventW (LPSECURITY_ATTRIBUTES lpEventAttributes, BOOL bManualReset,
   return evt;
 }
 
-HANDLE WINAPI
+HANDLE
 CreateEventA (LPSECURITY_ATTRIBUTES lpEventAttributes, BOOL bManualReset,
 	      BOOL bInitialState, LPCSTR lpName)
 {
@@ -72,7 +72,7 @@ CreateEventA (LPSECURITY_ATTRIBUTES lpEventAttributes, BOOL bManualReset,
 		       lpName ? name : NULL);
 }
 
-HANDLE WINAPI
+HANDLE
 OpenEventW (DWORD dwDesiredAccess, BOOL bInheritHandle, LPCWSTR lpName)
 {
   HANDLE evt;
@@ -100,7 +100,7 @@ OpenEventW (DWORD dwDesiredAccess, BOOL bInheritHandle, LPCWSTR lpName)
   return evt;
 }
 
-HANDLE WINAPI
+HANDLE
 OpenEventA (DWORD dwDesiredAccess, BOOL bInheritHandle, LPCSTR lpName)
 {
   WCHAR name[MAX_PATH];
@@ -116,7 +116,7 @@ OpenEventA (DWORD dwDesiredAccess, BOOL bInheritHandle, LPCSTR lpName)
 /* Implement CreateMutex/OpenMutex so that named objects are always created in
    Cygwin shared object namespace. */
 
-HANDLE WINAPI
+HANDLE
 CreateMutexW (LPSECURITY_ATTRIBUTES lpMutexAttributes, BOOL bInitialOwner,
 	      LPCWSTR lpName)
 {
@@ -148,7 +148,7 @@ CreateMutexW (LPSECURITY_ATTRIBUTES lpMutexAttributes, BOOL bInitialOwner,
   return mtx;
 }
 
-HANDLE WINAPI
+HANDLE
 CreateMutexA (LPSECURITY_ATTRIBUTES lpMutexAttributes, BOOL bInitialOwner,
 	      LPCSTR lpName)
 {
@@ -162,7 +162,7 @@ CreateMutexA (LPSECURITY_ATTRIBUTES lpMutexAttributes, BOOL bInitialOwner,
   return CreateMutexW (lpMutexAttributes, bInitialOwner, lpName ? name : NULL);
 }
 
-HANDLE WINAPI
+HANDLE
 OpenMutexW (DWORD dwDesiredAccess, BOOL bInheritHandle, LPCWSTR lpName)
 {
   HANDLE mtx;
@@ -190,7 +190,7 @@ OpenMutexW (DWORD dwDesiredAccess, BOOL bInheritHandle, LPCWSTR lpName)
   return mtx;
 }
 
-HANDLE WINAPI
+HANDLE
 OpenMutexA (DWORD dwDesiredAccess, BOOL bInheritHandle, LPCSTR lpName)
 {
   WCHAR name[MAX_PATH];
@@ -206,7 +206,7 @@ OpenMutexA (DWORD dwDesiredAccess, BOOL bInheritHandle, LPCSTR lpName)
 /* Implement CreateSemaphore/OpenSemaphore so that named objects are always
    created in Cygwin shared object namespace. */
 
-HANDLE WINAPI
+HANDLE
 CreateSemaphoreW (LPSECURITY_ATTRIBUTES lpSemaphoreAttributes,
 		  LONG lInitialCount, LONG lMaximumCount, LPCWSTR lpName)
 {
@@ -240,7 +240,7 @@ CreateSemaphoreW (LPSECURITY_ATTRIBUTES lpSemaphoreAttributes,
   return sem;
 }
 
-HANDLE WINAPI
+HANDLE
 CreateSemaphoreA (LPSECURITY_ATTRIBUTES lpSemaphoreAttributes,
 		  LONG lInitialCount, LONG lMaximumCount, LPCSTR lpName)
 {
@@ -255,7 +255,7 @@ CreateSemaphoreA (LPSECURITY_ATTRIBUTES lpSemaphoreAttributes,
 			   lpName ? name : NULL);
 }
 
-HANDLE WINAPI
+HANDLE
 OpenSemaphoreW (DWORD dwDesiredAccess, BOOL bInheritHandle, LPCWSTR lpName)
 {
   HANDLE sem;
@@ -283,7 +283,7 @@ OpenSemaphoreW (DWORD dwDesiredAccess, BOOL bInheritHandle, LPCWSTR lpName)
   return sem;
 }
 
-HANDLE WINAPI
+HANDLE
 OpenSemaphoreA (DWORD dwDesiredAccess, BOOL bInheritHandle, LPCSTR lpName)
 {
   WCHAR name[MAX_PATH];
@@ -299,7 +299,7 @@ OpenSemaphoreA (DWORD dwDesiredAccess, BOOL bInheritHandle, LPCSTR lpName)
 /* Implement CreateFileMapping/OpenFileMapping so that named objects are always
    created in Cygwin shared object namespace. */
 
-HANDLE WINAPI
+HANDLE
 CreateFileMappingW (HANDLE hFile, LPSECURITY_ATTRIBUTES lpAttributes,
 		    DWORD flProtect, DWORD dwMaximumSizeHigh,
 		    DWORD dwMaximumSizeLow, LPCWSTR lpName)
@@ -354,7 +354,7 @@ CreateFileMappingW (HANDLE hFile, LPSECURITY_ATTRIBUTES lpAttributes,
   return sect;
 }
 
-HANDLE WINAPI
+HANDLE
 CreateFileMappingA (HANDLE hFile, LPSECURITY_ATTRIBUTES lpAttributes,
 		    DWORD flProtect, DWORD dwMaximumSizeHigh,
 		    DWORD dwMaximumSizeLow, LPCSTR lpName)
@@ -370,7 +370,7 @@ CreateFileMappingA (HANDLE hFile, LPSECURITY_ATTRIBUTES lpAttributes,
 			     dwMaximumSizeLow, lpName ? name : NULL);
 }
 
-HANDLE WINAPI
+HANDLE
 OpenFileMappingW (DWORD dwDesiredAccess, BOOL bInheritHandle, LPCWSTR lpName)
 {
   HANDLE sect;
@@ -398,7 +398,7 @@ OpenFileMappingW (DWORD dwDesiredAccess, BOOL bInheritHandle, LPCWSTR lpName)
   return sect;
 }
 
-HANDLE WINAPI
+HANDLE
 OpenFileMappingA (DWORD dwDesiredAccess, BOOL bInheritHandle, LPCSTR lpName)
 {
   WCHAR name[MAX_PATH];
@@ -433,7 +433,7 @@ ucmd ()
 /* Cygwin replacement for GetCommandLineW.  Returns a concatenated wide string
    representing the argv list, constructed using roughly the same mechanism as
    child_info_spawn::worker */
-extern "C" LPWSTR WINAPI
+extern "C" LPWSTR
 cygwin_GetCommandLineW (void)
 {
   return ucmd ()->Buffer;
@@ -442,7 +442,7 @@ cygwin_GetCommandLineW (void)
 /* Cygwin replacement for GetCommandLineA.  Returns a concatenated string
    representing the argv list, constructed using roughly the same mechanism
    as child_info_spawn::worker */
-extern "C" LPSTR WINAPI
+extern "C" LPSTR
 cygwin_GetCommandLineA (void)
 {
   static ANSI_STRING cmd;

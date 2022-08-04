@@ -19,7 +19,7 @@ details. */
 #include "mmap_alloc.h"
 
 /* not yet prototyped in w32api */
-extern "C" HRESULT WINAPI SetThreadDescription (HANDLE hThread, PCWSTR lpThreadDescription);
+extern "C" HRESULT SetThreadDescription (HANDLE hThread, PCWSTR lpThreadDescription);
 
 /* Get handle count of an object. */
 ULONG
@@ -202,7 +202,7 @@ nice_to_winprio (int &nice)
 
 /* Minimal overlapped pipe I/O implementation for signal and commune stuff. */
 
-BOOL WINAPI
+BOOL
 CreatePipeOverlapped (PHANDLE hr, PHANDLE hw, LPSECURITY_ATTRIBUTES sa)
 {
   int ret = fhandler_pipe::create (sa, hr, hw, 0, NULL,
@@ -212,7 +212,7 @@ CreatePipeOverlapped (PHANDLE hr, PHANDLE hw, LPSECURITY_ATTRIBUTES sa)
   return ret == 0;
 }
 
-BOOL WINAPI
+BOOL
 ReadPipeOverlapped (HANDLE h, PVOID buf, DWORD len, LPDWORD ret_len,
 		    DWORD timeout)
 {
@@ -232,7 +232,7 @@ ReadPipeOverlapped (HANDLE h, PVOID buf, DWORD len, LPDWORD ret_len,
   return ret;
 }
 
-BOOL WINAPI
+BOOL
 WritePipeOverlapped (HANDLE h, LPCVOID buf, DWORD len, LPDWORD ret_len,
 		     DWORD timeout)
 {
@@ -376,7 +376,7 @@ struct pthread_wrapper_arg
   ULONG guardsize;
 };
 
-DWORD WINAPI
+DWORD
 pthread_wrapper (PVOID arg)
 {
   /* Just plain paranoia. */
@@ -601,7 +601,7 @@ create_new_main_thread_stack (PVOID &allocationbase)
   return ((PBYTE) allocationbase + stacksize - 16);
 }
 
-HANDLE WINAPI
+HANDLE
 CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
 		    PVOID stackaddr, ULONG stacksize, ULONG guardsize,
 		    DWORD creation_flags, LPDWORD thread_id)

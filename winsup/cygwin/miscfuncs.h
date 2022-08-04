@@ -49,12 +49,12 @@ DWORD nice_to_winprio (int &);
 
 bool create_pipe (PHANDLE, PHANDLE, LPSECURITY_ATTRIBUTES, DWORD);
 
-BOOL WINAPI CreatePipeOverlapped (PHANDLE read_handle, PHANDLE write_handle,
-				  LPSECURITY_ATTRIBUTES sa);
-BOOL WINAPI ReadPipeOverlapped (HANDLE h, PVOID buf, DWORD len,
-				LPDWORD ret_len, DWORD timeout);
-BOOL WINAPI WritePipeOverlapped (HANDLE h, LPCVOID buf, DWORD len,
-				 LPDWORD ret_len, DWORD timeout);
+BOOL CreatePipeOverlapped (PHANDLE read_handle, PHANDLE write_handle,
+			   LPSECURITY_ATTRIBUTES sa);
+BOOL ReadPipeOverlapped (HANDLE h, PVOID buf, DWORD len,
+			 LPDWORD ret_len, DWORD timeout);
+BOOL WritePipeOverlapped (HANDLE h, LPCVOID buf, DWORD len,
+			  LPDWORD ret_len, DWORD timeout);
 
 /* class for per-line reading using native functions.  The caller provides
    the file as an POBJECT_ATTRIBUTES, and the buffer space. */
@@ -110,12 +110,11 @@ ssize_t check_iovec (const struct iovec *, int, bool);
 
 extern PVOID create_new_main_thread_stack (PVOID &allocationbase);
 
-extern "C" DWORD WINAPI pthread_wrapper (PVOID arg);
-extern "C" HANDLE WINAPI CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func,
-					     PVOID thread_arg, PVOID stackaddr,
-					     ULONG stacksize, ULONG guardsize,
-					     DWORD creation_flags,
-					     LPDWORD thread_id);
+extern "C" DWORD pthread_wrapper (PVOID arg);
+extern "C" HANDLE CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func,
+				      PVOID thread_arg, PVOID stackaddr,
+				      ULONG stacksize, ULONG guardsize,
+				      DWORD creation_flags, LPDWORD thread_id);
 
 void SetThreadName (DWORD dwThreadID, const char* threadName);
 

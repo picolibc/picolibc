@@ -225,7 +225,7 @@ canceled:
   return 0;
 }
 
-static DWORD WINAPI
+static DWORD
 timerfd_thread (VOID *arg)
 {
   timerfd_tracker *tt = ((timerfd_tracker *) arg);

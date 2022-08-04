@@ -268,7 +268,7 @@ atexit_func (void)
 DEF_HOOK (CreateProcessA);
 DEF_HOOK (CreateProcessW);
 
-static BOOL WINAPI
+static BOOL
 CreateProcessA_Hooked
      (LPCSTR n, LPSTR c, LPSECURITY_ATTRIBUTES pa, LPSECURITY_ATTRIBUTES ta,
       BOOL inh, DWORD f, LPVOID e, LPCSTR d,
@@ -307,7 +307,7 @@ CreateProcessA_Hooked
   return ret;
 }
 
-static BOOL WINAPI
+static BOOL
 CreateProcessW_Hooked
      (LPCWSTR n, LPWSTR c, LPSECURITY_ATTRIBUTES pa, LPSECURITY_ATTRIBUTES ta,
       BOOL inh, DWORD f, LPVOID e, LPCWSTR d,
@@ -2666,7 +2666,7 @@ reply:
   return 0;
 }
 
-static DWORD WINAPI
+static DWORD
 pty_master_thread (VOID *arg)
 {
   fhandler_pty_master::master_thread_param_t p;
@@ -2873,7 +2873,7 @@ fhandler_pty_master::pty_master_fwd_thread (const master_fwd_thread_param_t *p)
   return 0;
 }
 
-static DWORD WINAPI
+static DWORD
 pty_master_fwd_thread (VOID *arg)
 {
   fhandler_pty_master::master_fwd_thread_param_t p;

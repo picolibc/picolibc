@@ -131,7 +131,7 @@ public:
   friend class pinfo_minimal;
 };
 
-DWORD WINAPI commune_process (void *);
+DWORD commune_process (void *);
 
 enum parent_alerter
 {

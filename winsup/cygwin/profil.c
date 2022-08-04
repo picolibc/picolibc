@@ -153,7 +153,7 @@ profile_on (struct profinfo *p)
       return -1;
     }
 
-  p->profthr = CreateThread (0, 0, (DWORD (WINAPI *)(LPVOID)) profthr_func,
+  p->profthr = CreateThread (0, 0, (DWORD (*)(LPVOID)) profthr_func,
                              (void *) p, 0, &thrid);
 
   if (!p->profthr)

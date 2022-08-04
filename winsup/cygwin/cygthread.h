@@ -7,7 +7,7 @@ details. */
 #ifndef _CYGTHREAD_H
 #define _CYGTHREAD_H
 
-typedef void WINAPI (*LPVOID_THREAD_START_ROUTINE) (void *) __attribute__((noreturn));		// Input queue thread
+typedef void (*LPVOID_THREAD_START_ROUTINE) (void *) __attribute__((noreturn));		// Input queue thread
 
 class cygthread
 {
@@ -32,8 +32,8 @@ class cygthread
   static void CALLBACK async_create (ULONG_PTR);
  public:
   bool terminate_thread ();
-  static DWORD WINAPI stub (VOID *);
-  static DWORD WINAPI simplestub (VOID *);
+  static DWORD stub (VOID *);
+  static DWORD simplestub (VOID *);
   static DWORD main_thread_id;
   static const char *name (DWORD = 0);
   void callfunc (bool) __attribute__ ((noinline, ));

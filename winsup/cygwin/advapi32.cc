@@ -21,7 +21,7 @@ details. */
    is not easy to understand.  In all other case, use the ntdll.dll
    equivalent. */
 
-BOOL WINAPI
+BOOL
 RevertToSelf ()
 {
   HANDLE tok = NULL;
@@ -31,7 +31,7 @@ RevertToSelf ()
   DEFAULT_NTSTATUS_TO_BOOL_RETURN
 }
 
-BOOL WINAPI
+BOOL
 DuplicateTokenEx (HANDLE tok, DWORD access, LPSECURITY_ATTRIBUTES sec_attr,
 		  SECURITY_IMPERSONATION_LEVEL level, TOKEN_TYPE type,
 		  PHANDLE new_tok)
@@ -46,7 +46,7 @@ DuplicateTokenEx (HANDLE tok, DWORD access, LPSECURITY_ATTRIBUTES sec_attr,
   DEFAULT_NTSTATUS_TO_BOOL_RETURN
 }
 
-BOOL WINAPI
+BOOL
 ImpersonateLoggedOnUser (HANDLE tok)
 {
   NTSTATUS status;
@@ -86,7 +86,7 @@ ImpersonateLoggedOnUser (HANDLE tok)
   DEFAULT_NTSTATUS_TO_BOOL_RETURN
 }
 
-BOOL WINAPI
+BOOL
 ImpersonateNamedPipeClient (HANDLE pipe)
 {
   IO_STATUS_BLOCK io;

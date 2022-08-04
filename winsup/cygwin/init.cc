@@ -19,7 +19,7 @@ unsigned threadfunc_ix[8];
 static bool dll_finished_loading;
 #define OLDFUNC_OFFSET -1
 
-static void WINAPI
+static void
 threadfunc_fe (VOID *arg)
 {
   _cygtls::call ((DWORD (*)  (void *, void *)) TlsGetValue (_my_oldfunc), arg);
@@ -70,7 +70,7 @@ void dll_crt0_0 ();
    need the alloca'd space in the DLL_PROCESS_ATTACH case below... */
 void *alloca_dummy;
 
-extern "C" BOOL WINAPI
+extern "C" BOOL
 dll_entry (HANDLE h, DWORD reason, void *static_load)
 {
   BOOL test_stack_marker;

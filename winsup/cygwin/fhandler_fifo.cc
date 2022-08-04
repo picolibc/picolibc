@@ -446,7 +446,7 @@ fhandler_fifo::update_shared_handlers ()
   return 0;
 }
 
-static DWORD WINAPI
+static DWORD
 fifo_reader_thread (LPVOID param)
 {
   fhandler_fifo *fh = (fhandler_fifo *) param;

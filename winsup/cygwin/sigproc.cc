@@ -100,7 +100,7 @@ static int checkstate (waitq *);
 static __inline__ bool get_proc_lock (DWORD, DWORD);
 static int remove_proc (int);
 static bool stopped_or_terminated (waitq *, _pinfo *);
-static void WINAPI wait_sig (VOID *arg);
+static void wait_sig (VOID *arg);
 
 /* wait_sig bookkeeping */
 
@@ -116,7 +116,7 @@ public:
   void clear (int sig) {sigs[sig].si.si_signo = 0;}
   void clear (_cygtls *tls);
   friend void sig_dispatch_pending (bool);
-  friend void WINAPI wait_sig (VOID *arg);
+  friend void wait_sig (VOID *arg);
 };
 
 Static pending_signals sigq;
@@ -1313,7 +1313,7 @@ pending_signals::add (sigpacket& pack)
 
 /* Process signals by waiting for signal data to arrive in a pipe.
    Set a completion event if one was specified. */
-static void WINAPI
+static void
 wait_sig (VOID *)
 {
   _sig_tls = &_my_tls;

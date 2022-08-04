@@ -52,7 +52,7 @@ cygthread::callfunc (bool issimplestub)
 /* Initial stub called by cygthread constructor. Performs initial
    per-thread initialization and loops waiting for another thread function
    to execute.  */
-DWORD WINAPI
+DWORD
 cygthread::stub (VOID *arg)
 {
   cygthread *info = (cygthread *) arg;
@@ -122,7 +122,7 @@ cygthread::stub (VOID *arg)
 
 /* Overflow stub called by cygthread constructor. Calls specified function
    and then exits the thread.  */
-DWORD WINAPI
+DWORD
 cygthread::simplestub (VOID *arg)
 {
   cygthread *info = (cygthread *) arg;
