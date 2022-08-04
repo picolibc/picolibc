@@ -882,7 +882,7 @@ slashify (const char *src, char *dst, bool trailing_slash_p)
 
 static WCHAR hex_wchars[] = L"0123456789abcdef";
 
-NTSTATUS NTAPI
+NTSTATUS
 RtlInt64ToHexUnicodeString (ULONGLONG value, PUNICODE_STRING dest,
 			    BOOLEAN append)
 {

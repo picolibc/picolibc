@@ -131,8 +131,8 @@ extern "C"
 #endif
   /* We need these declarations, otherwise g++ complains that the below
      inline methods use an undefined function, if ntdll.h isn't included. */
-  BOOLEAN NTAPI RtlEqualSid (PSID, PSID);
-  NTSTATUS NTAPI RtlCopySid (ULONG, PSID, PSID);
+  BOOLEAN RtlEqualSid (PSID, PSID);
+  NTSTATUS RtlCopySid (ULONG, PSID, PSID);
 #ifdef __cplusplus
 }
 #endif
