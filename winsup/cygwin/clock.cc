@@ -142,9 +142,6 @@ clk_thread_t::now (clockid_t clockid, struct timespec *ts)
   return 0;
 }
 
-extern "C" void WINAPI QueryUnbiasedInterruptTimePrecise (PULONGLONG);
-extern "C" void WINAPI QueryInterruptTimePrecise (PULONGLONG);
-
 int
 clk_monotonic_t::now (clockid_t clockid, struct timespec *ts)
 {
