@@ -205,11 +205,12 @@ __set_winsock_errno (const char *fn, int ln)
   syscall_printf ("%s:%d - winsock error %u -> errno %d", fn, ln, werr, err);
 }
 
-/*
- * Since the member `s' isn't used for debug output we can use it
- * for the error text returned by herror and hstrerror.
- */
-static const errmap_t host_errmap[] = {
+static const struct host_errmap_t
+{
+  DWORD w;		 /* windows version of error */
+  const char *s;	 /* error text returned by herror and hstrerror */
+  int e;		 /* errno version of error */
+} host_errmap[] = {
   {WSAHOST_NOT_FOUND, "Unknown host", HOST_NOT_FOUND},
   {WSATRY_AGAIN, "Host name lookup failure", TRY_AGAIN},
   {WSANO_RECOVERY, "Unknown server error", NO_RECOVERY},
