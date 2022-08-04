@@ -25,142 +25,8 @@ details. */
 #undef _sys_errlist
 #undef strerror_r
 
-/* Table to map Windows error codes to Errno values.  */
-/* FIXME: Doing things this way is a little slow.  It's trivial to change
-   this into a big case statement if necessary.  Left as is for now. */
-
-#define X(w, e) {ERROR_##w, #w, e}
-
-static const errmap_t errmap[] =
-{
-  /* FIXME: Some of these choices are arbitrary! */
-  X (ACCESS_DENIED,		EACCES),
-  X (ACTIVE_CONNECTIONS,	EAGAIN),
-  X (ALREADY_EXISTS,		EEXIST),
-  X (BAD_DEVICE,		ENODEV),
-  X (BAD_EXE_FORMAT,		ENOEXEC),
-  X (BAD_NETPATH,		ENOENT),
-  X (BAD_NET_NAME,		ENOENT),
-  X (BAD_NET_RESP,		ENOSYS),
-  X (BAD_PATHNAME,		ENOENT),
-  X (BAD_PIPE,			EINVAL),
-  X (BAD_UNIT,			ENODEV),
-  X (BAD_USERNAME,		EINVAL),
-  X (BEGINNING_OF_MEDIA,	EIO),
-  X (BROKEN_PIPE,		EPIPE),
-  X (BUSY,			EBUSY),
-  X (BUS_RESET,			EIO),
-  X (CALL_NOT_IMPLEMENTED,	ENOSYS),
-  X (CANCELLED,			EINTR),
-  X (CANNOT_MAKE,		EPERM),
-  X (CASE_DIFFERING_NAMES_IN_DIR, EINVAL),
-  X (CHILD_NOT_COMPLETE,	EBUSY),
-  X (COMMITMENT_LIMIT,		EAGAIN),
-  X (CONNECTION_REFUSED,	ECONNREFUSED),
-  X (CRC,			EIO),
-  X (DEVICE_DOOR_OPEN,		EIO),
-  X (DEVICE_IN_USE,		EAGAIN),
-  X (DEVICE_REQUIRES_CLEANING,	EIO),
-  X (DEV_NOT_EXIST,		ENOENT),
-  X (DIRECTORY,			ENOTDIR),
-  X (DIR_NOT_EMPTY,		ENOTEMPTY),
-  X (DISK_CORRUPT,		EIO),
-  X (DISK_FULL,			ENOSPC),
-  X (DS_GENERIC_ERROR,		EIO),
-  X (DUP_NAME,			ENOTUNIQ),
-  X (EAS_DIDNT_FIT,		ENOSPC),
-  X (EAS_NOT_SUPPORTED,		ENOTSUP),
-  X (EA_LIST_INCONSISTENT,	EINVAL),
-  X (EA_TABLE_FULL,		ENOSPC),
-  X (END_OF_MEDIA,		ENOSPC),
-  X (EOM_OVERFLOW,		EIO),
-  X (EXE_MACHINE_TYPE_MISMATCH,	ENOEXEC),
-  X (EXE_MARKED_INVALID,	ENOEXEC),
-  X (FILEMARK_DETECTED,		EIO),
-  X (FILENAME_EXCED_RANGE,	ENAMETOOLONG),
-  X (FILE_CORRUPT,		EEXIST),
-  X (FILE_EXISTS,		EEXIST),
-  X (FILE_INVALID,		ENXIO),
-  X (FILE_NOT_FOUND,		ENOENT),
-  X (HANDLE_DISK_FULL,		ENOSPC),
-  X (HANDLE_EOF,		ENODATA),
-  X (INVALID_ADDRESS,		EINVAL),
-  X (INVALID_AT_INTERRUPT_TIME,	EINTR),
-  X (INVALID_BLOCK_LENGTH,	EIO),
-  X (INVALID_DATA,		EINVAL),
-  X (INVALID_DRIVE,		ENODEV),
-  X (INVALID_EA_NAME,		EINVAL),
-  X (INVALID_EXE_SIGNATURE,	ENOEXEC),
-  X (INVALID_FUNCTION,		EBADRQC),
-  X (INVALID_HANDLE,		EBADF),
-  X (INVALID_NAME,		ENOENT),
-  X (INVALID_PARAMETER,		EINVAL),
-  X (INVALID_SIGNAL_NUMBER,	EINVAL),
-  X (IOPL_NOT_ENABLED,		ENOEXEC),
-  X (IO_DEVICE,			EIO),
-  X (IO_INCOMPLETE,		EAGAIN),
-  X (IO_PENDING,		EAGAIN),
-  X (LOCK_VIOLATION,		EBUSY),
-  X (MAX_THRDS_REACHED,		EAGAIN),
-  X (META_EXPANSION_TOO_LONG,	EINVAL),
-  X (MOD_NOT_FOUND,		ENOENT),
-  X (MORE_DATA,			EMSGSIZE),
-  X (NEGATIVE_SEEK,		EINVAL),
-  X (NETNAME_DELETED,		ENOENT),
-  X (NOACCESS,			EFAULT),
-  X (NONE_MAPPED,		EINVAL),
-  X (NONPAGED_SYSTEM_RESOURCES,	EAGAIN),
-  X (NOT_CONNECTED,		ENOLINK),
-  X (NOT_ENOUGH_MEMORY,		ENOMEM),
-  X (NOT_ENOUGH_QUOTA,		EIO),
-  X (NOT_OWNER,			EPERM),
-  X (NOT_READY,			ENOMEDIUM),
-  X (NOT_SAME_DEVICE,		EXDEV),
-  X (NOT_SUPPORTED,		ENOSYS),
-  X (NO_DATA,			EPIPE),
-  X (NO_DATA_DETECTED,		EIO),
-  X (NO_MEDIA_IN_DRIVE,		ENOMEDIUM),
-  X (NO_MORE_FILES,		ENMFILE),
-  X (NO_MORE_ITEMS,		ENMFILE),
-  X (NO_MORE_SEARCH_HANDLES,	ENFILE),
-  X (NO_PROC_SLOTS,		EAGAIN),
-  X (NO_SIGNAL_SENT,		EIO),
-  X (NO_SYSTEM_RESOURCES,	EFBIG),
-  X (NO_TOKEN,			EINVAL),
-  X (OPEN_FAILED,		EIO),
-  X (OPEN_FILES,		EAGAIN),
-  X (OUTOFMEMORY,		ENOMEM),
-  X (PAGED_SYSTEM_RESOURCES,	EAGAIN),
-  X (PAGEFILE_QUOTA,		EAGAIN),
-  X (PATH_NOT_FOUND,		ENOENT),
-  X (PIPE_BUSY,			EBUSY),
-  X (PIPE_CONNECTED,		EBUSY),
-  X (PIPE_LISTENING,		ECOMM),
-  X (PIPE_NOT_CONNECTED,	ECOMM),
-  X (POSSIBLE_DEADLOCK,		EDEADLOCK),
-  X (PRIVILEGE_NOT_HELD,	EPERM),
-  X (PROCESS_ABORTED,		EFAULT),
-  X (PROC_NOT_FOUND,		ESRCH),
-  X (REM_NOT_LIST,		ENONET),
-  X (SECTOR_NOT_FOUND,		EINVAL),
-  X (SEEK,			EINVAL),
-  X (SERVICE_REQUEST_TIMEOUT,	EBUSY),
-  X (SETMARK_DETECTED,		EIO),
-  X (SHARING_BUFFER_EXCEEDED,	ENOLCK),
-  X (SHARING_VIOLATION,		EBUSY),
-  X (SIGNAL_PENDING,		EBUSY),
-  X (SIGNAL_REFUSED,		EIO),
-  X (SXS_CANT_GEN_ACTCTX,	ELIBBAD),
-  X (THREAD_1_INACTIVE,		EINVAL),
-  X (TIMEOUT,			EBUSY),
-  X (TOO_MANY_LINKS,		EMLINK),
-  X (TOO_MANY_OPEN_FILES,	EMFILE),
-  X (UNEXP_NET_ERR,		EIO),
-  X (WAIT_NO_CHILDREN,		ECHILD),
-  X (WORKING_SET_QUOTA,		EAGAIN),
-  X (WRITE_PROTECT,		EROFS),
-  { 0, NULL, 0}
-};
+/* Table to map Windows error codes to errno values. */
+#include "errmap.h"
 
 extern "C" {
 const char *_sys_errlist[] =
@@ -317,12 +183,13 @@ int NO_COPY_INIT _sys_nerr = sizeof (_sys_errlist) / sizeof (_sys_errlist[0]);
 int
 geterrno_from_win_error (DWORD code, int deferrno)
 {
-  for (int i = 0; errmap[i].w != 0; ++i)
-    if (code == errmap[i].w)
-      {
-	syscall_printf ("windows error %u == errno %d", code, errmap[i].e);
-	return errmap[i].e;
-      }
+  /* A 0-value in errmap means, we don't handle this windows error
+     explicitely.  Fall back to deferrno in these cases. */
+  if (code < sizeof errmap / sizeof errmap[0] && errmap[code])
+    {
+      syscall_printf ("windows error %u == errno %d", code, errmap[code]);
+      return errmap[code];
+    }
 
   syscall_printf ("unknown windows error %u, setting errno to %d", code,
 		  deferrno);

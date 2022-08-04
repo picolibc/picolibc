@@ -10,13 +10,6 @@ details. */
 #define _CYGERRNO_H
 #include <errno.h>
 
-struct errmap_t
-{
-  DWORD w;		 /* windows version of error */
-  const char *s;	 /* text of windows version */
-  int e;		 /* errno version of error */
-};
-
 void seterrno_from_win_error (const char *file, int line, DWORD code);
 void seterrno_from_nt_status (const char *file, int line, NTSTATUS status);
 int geterrno_from_win_error (DWORD code = GetLastError (), int deferrno = 13 /*EACCESS*/);
