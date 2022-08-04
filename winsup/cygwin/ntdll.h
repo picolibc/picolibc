@@ -1465,12 +1465,6 @@ extern "C"
   NTSTATUS NTAPI NtMapViewOfSection (HANDLE, HANDLE, PVOID *, ULONG_PTR, SIZE_T,
 				     PLARGE_INTEGER, PSIZE_T, SECTION_INHERIT,
 				     ULONG, ULONG);
-
-/* For the extended memory API. */
-#if __MINGW64_VERSION_MAJOR < 8
-#error "Version >= 8 of the w32api headers is required"
-#endif
-
   NTSTATUS NTAPI NtMapViewOfSectionEx (HANDLE, HANDLE, PVOID *, PLARGE_INTEGER,
 				       PSIZE_T, ULONG, ULONG,
 				       PMEM_EXTENDED_PARAMETER, ULONG);

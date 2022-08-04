@@ -99,11 +99,6 @@ details. */
 extern "C" {
 #endif
 
-/* For the extended memory API. */
-#if __MINGW64_VERSION_MAJOR < 8
-#error "Version >= 8 of the w32api headers is required"
-#endif
-
 /* IsWow64Process2 should be declared in <w32api/wow64apiset.h> but
    isn't yet. */
 BOOL WINAPI IsWow64Process2(HANDLE, USHORT *, USHORT *);
