@@ -9,7 +9,7 @@ details. */
 #undef __INSIDE_CYGWIN__
 #include "crt0.h"
 
-extern void __stdcall _dll_crt0 ()
+extern void _dll_crt0 ()
   __declspec (dllimport) __attribute__ ((noreturn));
 
 /* for main module */
