@@ -403,7 +403,7 @@ BUILT_SOURCES = \
 
 # Every time we touch a source file, the version info has to be rebuilt
 # to maintain a correct build date, especially in uname release output
-dirs = $(srcdir) $(srcdir)/regex $(srcdir)/lib $(srcdir)/libc $(srcdir)/math $(srcdir)/tzcode
+dirs = $(srcdir) $(srcdir)/fhandler $(srcdir)/lib $(srcdir)/libc $(srcdir)/math $(srcdir)/regex $(srcdir)/sec $(srcdir)/tzcode
 find_src_files = $(wildcard $(dir)/*.[chS]) $(wildcard $(dir)/*.cc)
 src_files := $(foreach dir,$(dirs),$(find_src_files))
 
