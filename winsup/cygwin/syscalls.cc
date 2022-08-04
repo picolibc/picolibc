@@ -14,9 +14,6 @@ details. */
 #define _open __FOO_open__
 #define _read __FOO_read__
 #define _write __FOO_write__
-#define _open64 __FOO_open64__
-#define _lseek64 __FOO_lseek64__
-#define _fstat64 __FOO_fstat64__
 #define pread __FOO_pread
 #define pwrite __FOO_pwrite
 
@@ -70,9 +67,6 @@ details. */
 #undef _open
 #undef _read
 #undef _write
-#undef _open64
-#undef _lseek64
-#undef _fstat64
 
 static int mknod_worker (path_conv &, mode_t, _major_t, _minor_t);
 
@@ -1596,7 +1590,6 @@ open (const char *unix_path, int flags, ...)
 }
 
 EXPORT_ALIAS (open, _open )
-EXPORT_ALIAS (open, _open64 )
 
 extern "C" off_t
 lseek (int fd, off_t pos, int dir)
@@ -1624,7 +1617,6 @@ lseek (int fd, off_t pos, int dir)
   return res;
 }
 
-EXPORT_ALIAS (lseek, _lseek64)
 EXPORT_ALIAS (lseek, _lseek)
 
 extern "C" int
@@ -1904,8 +1896,6 @@ _fstat_r (struct _reent *ptr, int fd, struct stat *buf)
   return ret;
 }
 
-EXPORT_ALIAS (_fstat_r, _fstat64_r)
-
 /* fsync: P96 6.6.1.1 */
 extern "C" int
 fsync (int fd)
@@ -2054,8 +2044,6 @@ _stat_r (struct _reent *__restrict ptr, const char *__restrict name,
     _REENT_ERRNO(ptr) = get_errno ();
   return ret;
 }
-
-EXPORT_ALIAS (_stat_r, _stat64_r)
 
 /* lstat: Provided by SVR4 and 4.3+BSD, POSIX? */
 extern "C" int
