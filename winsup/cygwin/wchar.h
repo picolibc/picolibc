@@ -91,6 +91,16 @@ sys_mbstowcs (wchar_t * dst, size_t dlen, const char *src,
 
 size_t sys_mbstowcs_alloc (wchar_t **, int, const char *, size_t = (size_t) -1);
 
+static inline size_t
+sys_mbstouni_alloc (PUNICODE_STRING dst, int type, const char *src,
+		    size_t nms = (size_t) -1)
+{
+  size_t len = sys_mbstowcs_alloc (&dst->Buffer, type, src, nms);
+  dst->MaximumLength = len * sizeof (WCHAR);
+  dst->Length = dst->MaximumLength - sizeof (WCHAR);
+  return dst->MaximumLength;
+}
+
 #endif /* __cplusplus */
 #endif /* __INSIDE_CYGWIN__ */
 

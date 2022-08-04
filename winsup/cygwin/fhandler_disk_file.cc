@@ -40,7 +40,7 @@ class __DIR_mounts
 {
   int		 count;
   const char	*parent_dir;
-  int		 parent_dir_len;
+  size_t	 parent_dir_len;
   UNICODE_STRING mounts[MAX_MOUNTS];
   bool		 found[MAX_MOUNTS + 3];
   UNICODE_STRING cygdrive;
@@ -60,9 +60,7 @@ public:
     }
   ~__DIR_mounts ()
     {
-      for (int i = 0; i < count; ++i)
-	RtlFreeUnicodeString (&mounts[i]);
-      RtlFreeUnicodeString (&cygdrive);
+      mount_table->free_mounts_here (mounts, count, &cygdrive);
     }
   /* For an entry within this dir, check if a mount point exists. */
   bool check_mount (PUNICODE_STRING fname)

@@ -723,12 +723,12 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
   return rc;
 }
 
-int
-mount_info::get_mounts_here (const char *parent_dir, int parent_dir_len,
+size_t
+mount_info::get_mounts_here (const char *parent_dir, size_t parent_dir_len,
 			     PUNICODE_STRING mount_points,
 			     PUNICODE_STRING cygd)
 {
-  int n_mounts = 0;
+  size_t n_mounts = 0;
 
   for (int i = 0; i < nmounts; i++)
     {
@@ -739,18 +739,27 @@ mount_info::get_mounts_here (const char *parent_dir, int parent_dir_len,
       if (last_slash == mi->posix_path)
 	{
 	  if (parent_dir_len == 1 && mi->posix_pathlen > 1)
-	    RtlCreateUnicodeStringFromAsciiz (&mount_points[n_mounts++],
-					      last_slash + 1);
+	    sys_mbstouni_alloc (&mount_points[n_mounts++], HEAP_NOTHEAP,
+			        last_slash + 1);
 	}
-      else if (parent_dir_len == last_slash - mi->posix_path
+      else if (parent_dir_len == (size_t) (last_slash - mi->posix_path)
 	       && strncasematch (parent_dir, mi->posix_path, parent_dir_len))
-	RtlCreateUnicodeStringFromAsciiz (&mount_points[n_mounts++],
-					  last_slash + 1);
+	sys_mbstouni_alloc (&mount_points[n_mounts++], HEAP_NOTHEAP,
+			    last_slash + 1);
     }
-  RtlCreateUnicodeStringFromAsciiz (cygd, cygdrive + 1);
+  sys_mbstouni_alloc (cygd, HEAP_NOTHEAP, cygdrive + 1);
   if (cygd->Length)
     cygd->Length -= 2;	// Strip trailing slash
   return n_mounts;
+}
+
+void
+mount_info::free_mounts_here (PUNICODE_STRING mount_points, int n_mounts,
+			      PUNICODE_STRING cygd)
+{
+  for (int i = 0; i < n_mounts; ++i)
+    free (mount_points[i].Buffer);
+  free (cygd->Buffer);
 }
 
 /* cygdrive_posix_path: Build POSIX path used as the
