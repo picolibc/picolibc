@@ -2883,7 +2883,7 @@ bad:
 }
 
 /* Cygwin specific wrappers around the gai functions. */
-static struct gai_errmap_t
+static const struct gai_errmap_t
 {
   int w32_errval;
   const char *errtxt;
