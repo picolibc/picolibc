@@ -87,6 +87,27 @@ __FLT_ABI(casinh) (__FLT_TYPE __complex__ z)
   if (r_class == FP_ZERO && i_class == FP_ZERO)
     return z;
 
+  /* casinh(z) = log(z + sqrt(z*z + 1)) */
+
+  if (__FLT_ABI(fabs) (__real__ z) >= __FLT_CST(1.0)/__FLT_EPSILON
+      || __FLT_ABI(fabs) (__imag__ z) >= __FLT_CST(1.0)/__FLT_EPSILON)
+  {
+    /* For large z, z + sqrt(z*z + 1) is approximately 2*z.
+    Use that approximation to avoid overflow when squaring.
+    Additionally, use symmetries to perform the calculation in the first
+    quadrant. */
+    __real__ x = __FLT_ABI(fabs) (__real__ z);
+    __imag__ x = __FLT_ABI(fabs) (__imag__ z);
+    x = __FLT_ABI(clog) (x);
+    __real__ x += M_LN2;
+
+    /* adjust signs for input quadrant */
+    __real__ ret = __FLT_ABI(copysign) (__real__ x, __real__ z);
+    __imag__ ret = __FLT_ABI(copysign) (__imag__ x, __imag__ z);
+
+    return ret;
+  }
+
   __real__ x = (__real__ z - __imag__ z) * (__real__ z + __imag__ z) + __FLT_CST(1.0);
   __imag__ x = __FLT_CST(2.0) * __real__ z * __imag__ z;
 
