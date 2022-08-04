@@ -94,17 +94,4 @@ details. */
 #define GetWindowsDirectoryW dont_use_GetWindowsDirectory
 #define GetWindowsDirectoryA dont_use_GetWindowsDirectory
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/* IsWow64Process2 should be declared in <w32api/wow64apiset.h> but
-   isn't yet. */
-BOOL WINAPI IsWow64Process2(HANDLE, USHORT *, USHORT *);
-
-#ifdef __cplusplus
-}
-#endif
-
 #endif /*_WINLEAN_H*/
