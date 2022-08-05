@@ -224,7 +224,7 @@ is_console_app (WCHAR *filename)
   ReadFile (h, buf, sizeof (buf), &n, 0);
   CloseHandle (h);
   char *p = (char *) memmem (buf, n, "PE\0\0", 4);
-  if (p && p + id_offset <= buf + n)
+  if (p && p + id_offset < buf + n)
     return p[id_offset] == '\003'; /* 02: GUI, 03: console */
   else
     {
