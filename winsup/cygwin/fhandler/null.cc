@@ -7,15 +7,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <unistd.h>
-#include <stdlib.h>
-#include <sys/uio.h>
-#include <cygwin/acl.h>
-#include <sys/param.h>
-#include "cygerrno.h"
-#include "perprocess.h"
-#include "security.h"
-#include "cygwin/version.h"
 #include "path.h"
 #include "fhandler.h"
 
