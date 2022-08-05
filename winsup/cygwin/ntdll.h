@@ -1556,7 +1556,8 @@ extern "C"
   NTSTATUS RtlCreateAcl (PACL, ULONG, ULONG);
   PDEBUG_BUFFER RtlCreateQueryDebugBuffer (ULONG, BOOLEAN);
   NTSTATUS RtlCreateSecurityDescriptor (PSECURITY_DESCRIPTOR, ULONG);
-  BOOLEAN RtlCreateUnicodeStringFromAsciiz (PUNICODE_STRING, PCSTR);
+  /* Don't use this function! It's almost always wrong! */
+  // BOOLEAN RtlCreateUnicodeStringFromAsciiz (PUNICODE_STRING, PCSTR);
   NTSTATUS RtlDeleteSecurityObject (PSECURITY_DESCRIPTOR *);
   NTSTATUS RtlDestroyQueryDebugBuffer (PDEBUG_BUFFER);
   NTSTATUS RtlDowncaseUnicodeString (PUNICODE_STRING, PUNICODE_STRING, BOOLEAN);

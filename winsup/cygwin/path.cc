@@ -3686,9 +3686,11 @@ ino_t
 hash_path_name (ino_t hash, const char *name)
 {
   UNICODE_STRING uname;
-  RtlCreateUnicodeStringFromAsciiz (&uname, name);
+  tmp_pathbuf tp;
+
+  tp.u_get (&uname);
+  sys_mbstouni (&uname, HEAP_NOTHEAP, name);
   ino_t ret = hash_path_name (hash, &uname);
-  RtlFreeUnicodeString (&uname);
   return ret;
 }
 
