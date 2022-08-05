@@ -115,6 +115,13 @@ picolibc_sources(
   wctob.c
   wctomb.c
   wctomb_r.c
+  pico-atexit.c
+  pico-exit.c
+  pico-onexit.c
+  pico-cxa-atexit.c
+  )
+
+picolibc_sources_flags("-fno-builtin-malloc;-fno-builtin-free"
   nano-malloc-calloc.c
   nano-malloc-cfree.c
   nano-malloc-free.c
@@ -129,8 +136,4 @@ picolibc_sources(
   nano-malloc-pvalloc.c
   nano-malloc-realloc.c
   nano-malloc-valloc.c
-  pico-atexit.c
-  pico-exit.c
-  pico-onexit.c
-  pico-cxa-atexit.c
   )
