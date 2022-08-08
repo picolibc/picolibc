@@ -67,3 +67,11 @@ L1:     rep
 	movq	16(%rsp),%rdi
 	ret
 	.seh_endproc
+
+	.globl  wmemset
+	.seh_proc wmemset
+wmemset:
+	.seh_endprologue
+	shlq	$1,%r8		/* cnt * sizeof (wchar_t) */
+	jmp	memset
+	.seh_endproc
