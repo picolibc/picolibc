@@ -66,7 +66,6 @@ esac
 ])
 
 DLL_ENTRY="dll_entry"
-DIN_FILE="${target_cpu}.din"
 
 case "$target_cpu" in
    x86_64)	;;
@@ -74,7 +73,6 @@ case "$target_cpu" in
 esac
 
 AC_SUBST(DLL_ENTRY)
-AC_SUBST(DIN_FILE)
 
 AM_CONDITIONAL(TARGET_X86_64, [test $target_cpu = "x86_64"])
 

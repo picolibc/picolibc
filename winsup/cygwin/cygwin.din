@@ -1,3 +1,6 @@
+LIBRARY "cygwin1.dll" BASE=0x180040000
+
+EXPORTS
 # Exported variables
 __argc DATA
 __argv DATA
@@ -122,10 +125,16 @@ __wrap__ZdaPv NOSIGFE               # void operator delete[](void *p) throw()
 __wrap__ZdaPvRKSt9nothrow_t NOSIGFE # void operator delete[](void *p, const std::nothrow_t &nt) throw()
 __wrap__ZdlPv NOSIGFE               # void operator delete(void *p) throw()
 __wrap__ZdlPvRKSt9nothrow_t NOSIGFE # void operator delete(void *p, const std::nothrow_t &nt) throw()
+__wrap__Znam NOSIGFE                # void *operator new[](std::size_t sz) throw (std::bad_alloc)
+__wrap__ZnamRKSt9nothrow_t NOSIGFE  # void *operator new[](std::size_t sz, const std::nothrow_t &nt) throw()
+__wrap__Znwm NOSIGFE                # void *operator new(std::size_t sz) throw (std::bad_alloc)
+__wrap__ZnwmRKSt9nothrow_t NOSIGFE  # void *operator new(std::size_t sz, const std::nothrow_t &nt) throw()
 __xdrrec_getrec SIGFE
 __xdrrec_setnonblock SIGFE
 __xpg_sigpause SIGFE
 __xpg_strerror_r SIGFE
+_alloca = __alloca NOSIGFE
+_dll_crt0 NOSIGFE
 _Exit SIGFE
 _exit SIGFE
 _feinitialise NOSIGFE
@@ -421,6 +430,7 @@ dlerror NOSIGFE
 dlfork NOSIGFE
 dll_crt0__FP11per_process NOSIGFE # dll_crt0(per_process *)
 dll_dllcrt0 NOSIGFE
+dll_entry NOSIGFE
 dlopen SIGFE
 dlsym SIGFE
 dn_comp = __dn_comp SIGFE

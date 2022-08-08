@@ -43,7 +43,6 @@ DLL_NAME=cygwin1.dll
 PRE_DLL_NAME=cygwin0.dll
 DBG_DLL_NAME=cygwin1.dbg
 NEW_DLL_NAME=new-cygwin1.dll
-DIN_FILE=@DIN_FILE@
 DEF_FILE=cygwin.def
 LIB_NAME=libcygwin.a
 TEST_LIB_NAME=libcygwin0.a
@@ -622,8 +621,8 @@ $(NEW_DLL_NAME): $(PRE_DLL_NAME) $(DBG_DLL_NAME)
 # cygwin import library
 toolopts=--cpu=@target_cpu@ --ar=@AR@ --as=@AS@ --nm=@NM@ --objcopy=@OBJCOPY@
 
-$(DEF_FILE): scripts/gendef $(DIN_FILE) common.din
-	$(AM_V_GEN)$(srcdir)/scripts/gendef --cpu=@target_cpu@ --output-def=$(DEF_FILE) $(srcdir)/$(DIN_FILE) $(srcdir)/common.din
+$(DEF_FILE): scripts/gendef cygwin.din
+	$(AM_V_GEN)$(srcdir)/scripts/gendef --cpu=@target_cpu@ --output-def=$(DEF_FILE) $(srcdir)/cygwin.din
 
 sigfe.s: $(DEF_FILE) tlsoffsets
 	@[ -s $@ ] || \
