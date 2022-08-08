@@ -53,6 +53,12 @@ TEST_LIB_NAME=libcygwin0.a
 #
 
 # These objects are included directly into the import library
+if TARGET_X86_64
+TARGET_FILES= \
+	x86_64/memcpy.s \
+	x86_64/memset.s
+endif
+
 LIB_FILES= \
 	lib/_cygwin_crt0_common.cc \
 	lib/atexit.c \
@@ -361,6 +367,7 @@ liblib_a_SOURCES= \
 	$(LIB_FILES)
 
 libdll_a_SOURCES= \
+	$(TARGET_FILES) \
 	$(DLL_FILES) \
 	$(REGEX_FILES) \
 	$(MALLOC_FILES) \
