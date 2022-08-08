@@ -133,7 +133,6 @@ __xdrrec_getrec SIGFE
 __xdrrec_setnonblock SIGFE
 __xpg_sigpause SIGFE
 __xpg_strerror_r SIGFE
-_alloca = __alloca NOSIGFE
 _dll_crt0 NOSIGFE
 _Exit SIGFE
 _exit SIGFE
