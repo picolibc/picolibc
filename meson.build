@@ -479,6 +479,13 @@ if tinystdio
 		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfscanf=__i_vfscanf}')
 endif
 
+specs_flags=''
+if cc.links('int main(void) { return 0; }',
+	    name: 'check for no-warn-rwx-segments',
+	    args: core_c_args + ['-Wl,--no-warn-rwx-segments'])
+  specs_flags='--no-warn-rwx-segments'
+endif
+
 specs_data = configuration_data()
 specs_data.set('PREFIX', sysroot_install? '%R' : prefix)
 specs_data.set('INCLUDEDIR', get_option('includedir'))
@@ -490,6 +497,7 @@ specs_data.set('CC1PLUS_SPEC', meson.get_cross_property('cc1plus_spec', ''))
 specs_data.set('ADDITIONAL_LIBS', additional_libs)
 specs_data.set('SPECS_EXTRA', specs_extra)
 specs_data.set('SPECS_PRINTF', specs_printf)
+specs_data.set('SPECS_FLAGS', specs_flags)
 
 # Create C and C++ specific specs data,
 # that includes setting the correct linker script
