@@ -314,7 +314,7 @@ DLL_FILES= \
 	posix_ipc.cc \
 	posix_timer.cc \
 	pseudo-reloc.cc \
-	pthread.cc \
+	thread.cc \
 	quotactl.cc \
 	random.cc \
 	registry.cc \
@@ -339,7 +339,6 @@ DLL_FILES= \
 	sysconf.cc \
 	syslog.cc \
 	termios.cc \
-	thread.cc \
 	timerfd.cc \
 	times.cc \
 	tls_pbuf.cc \
@@ -653,7 +652,7 @@ libc.a: $(LIB_NAME) libm.a libpthread.a libutil.a
 libm.a: $(LIB_NAME) $(newlib_build)/libm.a $(addsuffix .o,$(basename $(MATH_FILES)))
 	$(AM_V_GEN)$(speclib) $^ $(@F)
 
-libpthread.a: $(LIB_NAME) pthread.o thread.o libc/call_once.o libc/cnd.o \
+libpthread.a: $(LIB_NAME) thread.o libc/call_once.o libc/cnd.o \
 	      libc/mtx.o libc/thrd.o libc/tss.o
 	$(AM_V_GEN)$(speclib) $^ $(@F)
 
