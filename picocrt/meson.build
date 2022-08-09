@@ -36,6 +36,7 @@
 src_picocrt = []
 
 machine_dir = 'machine' / host_cpu_family
+picocrt_march_add=''
 if fs.is_dir(machine_dir)
   subdir(machine_dir)
 else
@@ -46,6 +47,17 @@ foreach target : targets
   value = get_variable('target_' + target)
 
   instdir = join_paths(lib_dir, value[0])
+
+  if picocrt_march_add != ''
+    new_cflags=[]
+    foreach cflag : value[1]
+      if cflag.startswith('-march')
+	cflag = cflag + picocrt_march_add
+      endif
+      new_cflags += cflag
+    endforeach
+    value = [value[0], new_cflags]
+  endif
 
   if target == ''
     crt_name = 'crt0.o'

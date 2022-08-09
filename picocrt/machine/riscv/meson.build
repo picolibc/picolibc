@@ -33,3 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 src_picocrt += files('crt0.c')
+
+if cc.compiles('int i;', args: core_c_args + ['-march=rv32imac_zicsr', '-mabi=ilp32'])
+  picocrt_march_add='_zicsr'
+endif
