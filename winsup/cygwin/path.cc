@@ -3027,19 +3027,16 @@ symlink_info::parse_device (const char *contents)
 /* Check if PATH is a symlink.  PATH must be a valid Win32 path name.
 
    If PATH is a symlink, put the value of the symlink--the file to
-   which it points--into BUF.  The value stored in BUF is not
-   necessarily null terminated.  BUFLEN is the length of BUF; only up
-   to BUFLEN characters will be stored in BUF.  BUF may be NULL, in
-   which case nothing will be stored.
+   which it points--into CONTENTS.
 
-   Set *SYML if PATH is a symlink.
+   Set PATH_SYMLINK if PATH is a symlink.
 
-   Set *EXEC if PATH appears to be executable.  This is an efficiency
-   hack because we sometimes have to open the file anyhow.  *EXEC will
-   not be set for every executable file.
-
-   Return -1 on error, 0 if PATH is not a symlink, or the length
-   stored into BUF if PATH is a symlink.  */
+   If PATH is a symlink, return the length stored into CONTENTS.  If
+   the inner components of PATH contain native symlinks or junctions,
+   or if the drive is a virtual drive, compare PATH with the result
+   returned by GetFinalPathNameByHandleA.  If they differ, store the
+   final path in CONTENTS and return the negative of its length.  In
+   all other cases, return 0.  */
 
 int
 symlink_info::check (char *path, const suffix_info *suffixes, fs_info &fs,
@@ -3094,6 +3091,7 @@ restart:
 
   while (suffix.next ())
     {
+      res = 0;
       error = 0;
       get_nt_native_path (suffix.path, upath, mount_flags & MOUNT_DOS);
       if (h)
@@ -3344,8 +3342,6 @@ restart:
 	  set_error (ENOENT);
 	  continue;
 	}
-
-      res = -1;
 
       /* Reparse points are potentially symlinks.  This check must be
 	 performed before checking the SYSTEM attribute for sysfile

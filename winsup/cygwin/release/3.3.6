@@ -35,3 +35,7 @@ Bug Fixes
 - Fix a problem that prevented some symbolic links to /cygdrive/C,
   /cygdrive/./c, /cygdrive//c, etc. from working.
   Addresses: https://cygwin.com/pipermail/cygwin/2022-July/251994.html
+
+- Fix a path handling bug that could cause a non-existing file to be
+  treated as the current directory.
+  Addresses: https://cygwin.com/pipermail/cygwin/2022-August/252030.html
