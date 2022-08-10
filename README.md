@@ -125,6 +125,30 @@ use Picolibc:
 
 ## Releases
 
+### Picolibc version 1.7.8
+
+ 1. Fix el/ix level 4 code type errors
+
+ 2. Fix out-of-source CMake build (thanks Max Behensky)
+
+ 3. Improve build.md docs (thanks Kalle Raiskila)
+
+ 4. Fix cmake build for various architectures
+
+ 5. Initialize lock in fdopen
+
+ 6. Remove %M from linker paths in single-arch builds
+
+ 7. Shrink tinystdio vfprintf and vfscanf a bit
+
+ 8. Use -fno-builtin-malloc -fno-builtin-free (GCC 12 compat)
+
+ 9. Use -fno-builtin-copysignl (GCC 12 compat)
+
+ 10. Add _zicsr to -march for risc-v picocrt (binutils 2.38 compat)
+
+ 11. Add -no-warn-rwx-segments to link spec (binutils 2.38 compat)
+
 ### Picolibc version 1.7.7
 
  1. Fix semihost gettimeofday, add a test.
