@@ -298,12 +298,11 @@ strdup (const char *s)
   return p;
 }
 
-/* We use a critical section to lock access to the malloc data
-   structures.  This permits malloc to be called from different
-   threads.  Note that it does not make malloc reentrant, and it does
-   not permit a signal handler to call malloc.  The malloc code in
-   newlib will call __malloc_lock and __malloc_unlock at appropriate
-   times.  */
+/* We use a SRW lock to lock access to the malloc data structures.  This
+   permits malloc to be called from different threads.  Note that it does
+   not make malloc reentrant, and it does not permit a signal handler to
+   call malloc.  The malloc code in newlib will call __malloc_lock and
+   __malloc_unlock at appropriate times.  */
 
 SRWLOCK NO_COPY mallock = SRWLOCK_INIT;
 
