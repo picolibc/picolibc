@@ -518,3 +518,51 @@ sem_unlink (const char *name)
     return -1;
   return 0;
 }
+
+extern "C" int
+sem_init (sem_t * sem, int pshared, unsigned int value)
+{
+  return semaphore::init (sem, pshared, value);
+}
+
+extern "C" int
+sem_destroy (sem_t * sem)
+{
+  return semaphore::destroy (sem);
+}
+
+extern "C" int
+sem_wait (sem_t * sem)
+{
+  return semaphore::wait (sem);
+}
+
+extern "C" int
+sem_trywait (sem_t * sem)
+{
+  return semaphore::trywait (sem);
+}
+
+extern "C" int
+sem_clockwait (sem_t * sem, clockid_t clock_id, const struct timespec *abstime)
+{
+  return semaphore::clockwait (sem, clock_id, abstime);
+}
+
+extern "C" int
+sem_timedwait (sem_t * sem, const struct timespec *abstime)
+{
+  return semaphore::clockwait (sem, CLOCK_REALTIME, abstime);
+}
+
+extern "C" int
+sem_post (sem_t *sem)
+{
+  return semaphore::post (sem);
+}
+
+extern "C" int
+sem_getvalue (sem_t * sem, int *sval)
+{
+  return semaphore::getvalue (sem, sval);
+}
