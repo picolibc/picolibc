@@ -235,6 +235,15 @@ MATH_FILES= \
 	math/tgammal.c \
 	math/truncl.c
 
+MM_FILES = \
+	mm/cygheap.cc \
+	mm/heap.cc \
+	mm/malloc.cc \
+	mm/malloc_wrapper.cc \
+	mm/mmap.cc \
+	mm/mmap_alloc.cc \
+	mm/shared.cc
+
 REGEX_FILES = \
 	regex/regcomp.c \
 	regex/regerror.c \
@@ -259,7 +268,6 @@ DLL_FILES= \
 	clock.cc \
 	ctype.cc \
 	cxx.cc \
-	cygheap.cc \
 	cygthread.cc \
 	cygtls.cc \
 	cygwait.cc \
@@ -285,7 +293,6 @@ DLL_FILES= \
 	glob_pattern_p.cc \
 	globals.cc \
 	grp.cc \
-	heap.cc \
 	hookapi.cc \
 	init.cc \
 	ioctl.cc \
@@ -295,11 +302,8 @@ DLL_FILES= \
 	libstdcxx_wrapper.cc \
 	loadavg.cc \
 	lsearch.cc \
-	malloc_wrapper.cc \
 	miscfuncs.cc \
 	mktemp.cc \
-	mmap.cc \
-	mmap_alloc.cc \
 	msg.cc \
 	mount.cc \
 	net.cc \
@@ -324,7 +328,6 @@ DLL_FILES= \
 	select.cc \
 	sem.cc \
 	setlsapwd.cc \
-	shared.cc \
 	shm.cc \
 	signal.cc \
 	sigproc.cc \
@@ -350,9 +353,6 @@ DLL_FILES= \
 	window.cc \
 	winf.cc
 
-MALLOC_FILES= \
-	malloc.cc
-
 GMON_FILES= \
 	gmon.c \
 	mcount.c \
@@ -368,10 +368,10 @@ libdll_a_SOURCES= \
 	$(TARGET_FILES) \
 	$(DLL_FILES) \
 	$(REGEX_FILES) \
-	$(MALLOC_FILES) \
 	$(FHANDLER_FILES) \
 	$(LIBC_FILES) \
 	$(MATH_FILES) \
+	$(MM_FILES) \
 	$(SEC_FILES) \
 	$(TZCODE_FILES) \
 	$(GENERATED_FILES)
@@ -408,7 +408,7 @@ BUILT_SOURCES = \
 
 # Every time we touch a source file, the version info has to be rebuilt
 # to maintain a correct build date, especially in uname release output
-dirs = $(srcdir) $(srcdir)/fhandler $(srcdir)/lib $(srcdir)/libc $(srcdir)/math $(srcdir)/regex $(srcdir)/sec $(srcdir)/tzcode
+dirs = $(srcdir) $(srcdir)/fhandler $(srcdir)/lib $(srcdir)/libc $(srcdir)/math $(srcdir)/mm $(srcdir)/regex $(srcdir)/sec $(srcdir)/tzcode
 find_src_files = $(wildcard $(dir)/*.[chS]) $(wildcard $(dir)/*.cc)
 src_files := $(foreach dir,$(dirs),$(find_src_files))
 
