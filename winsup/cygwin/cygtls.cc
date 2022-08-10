@@ -12,6 +12,7 @@ details. */
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
+#include "create_posix_thread.h"
 #include "cygheap.h"
 #include "sigproc.h"
 #include "exception.h"

@@ -98,14 +98,6 @@ ssize_t check_iovec (const struct iovec *, int, bool);
 #define check_iovec_for_read(a, b) check_iovec ((a), (b), false)
 #define check_iovec_for_write(a, b) check_iovec ((a), (b), true)
 
-extern PVOID create_new_main_thread_stack (PVOID &allocationbase);
-
-extern "C" DWORD pthread_wrapper (PVOID arg);
-extern "C" HANDLE CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func,
-				      PVOID thread_arg, PVOID stackaddr,
-				      ULONG stacksize, ULONG guardsize,
-				      DWORD creation_flags, LPDWORD thread_id);
-
 void SetThreadName (DWORD dwThreadID, const char* threadName);
 
 WORD __get_cpus_per_group (void);

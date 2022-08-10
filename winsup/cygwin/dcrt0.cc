@@ -7,7 +7,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include "miscfuncs.h"
+#include "create_posix_thread.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include "glob.h"

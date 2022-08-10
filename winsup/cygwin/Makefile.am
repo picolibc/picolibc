@@ -266,6 +266,7 @@ DLL_FILES= \
 	assert.cc \
 	autoload.cc \
 	clock.cc \
+	create_posix_thread.cc \
 	ctype.cc \
 	cxx.cc \
 	cygthread.cc \

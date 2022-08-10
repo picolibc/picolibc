@@ -21,7 +21,7 @@ details. */
    R.Collins, April 2001.  */
 
 #include "winsup.h"
-#include "miscfuncs.h"
+#include "create_posix_thread.h"
 #include "path.h"
 #include <sched.h>
 #include <stdlib.h>
@@ -504,8 +504,8 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
   ULONG stacksize = attr.stacksize ?: get_rlimit_stack ();
   PVOID stackaddr = attr.stackaddr ? ((caddr_t) attr.stackaddr - stacksize)
 				   : NULL;
-  win32_obj_id = CygwinCreateThread (thread_init_wrapper, this, stackaddr,
-				     stacksize, attr.guardsize, 0, &thread_id);
+  win32_obj_id = create_posix_thread (thread_init_wrapper, this, stackaddr,
+				      stacksize, attr.guardsize, 0, &thread_id);
 
   if (!win32_obj_id)
     {
