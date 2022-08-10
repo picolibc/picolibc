@@ -77,9 +77,6 @@ public:
 
 extern "C" void yield ();
 
-#define import_address(x) __import_address ((void *)(x))
-void * __import_address (void *);
-
 #define caller_return_address() \
 		__caller_return_address (__builtin_return_address (0))
 void * __caller_return_address (void *);

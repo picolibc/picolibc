@@ -315,25 +315,6 @@ NT_readline::gets ()
     }
 }
 
-/* Return an address from the import jmp table of main program.  */
-void *
-__import_address (void *imp)
-{
-  __try
-    {
-      if (*((uint16_t *) imp) == 0x25ff)
-	{
-	  const char *ptr = (const char *) imp;
-	  const uintptr_t *jmpto = (uintptr_t *)
-				   (ptr + 6 + *(int32_t *)(ptr + 2));
-	  return (void *) *jmpto;
-	}
-    }
-  __except (NO_ERROR) {}
-  __endtry
-  return NULL;
-}
-
 /* Helper function to generate the correct caller address.  For external
    calls, the return address on the stack is _sigbe.  In that case the
    actual caller return address is on the cygtls stack.  Use this function

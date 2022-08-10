@@ -27,6 +27,25 @@ extern "C" struct mallinfo dlmallinfo ();
 static bool use_internal = true;
 static bool internal_malloc_determined;
 
+/* Return an address from the import jmp table of main program.  */
+static inline void *
+import_address (void *imp)
+{
+  __try
+    {
+      if (*((uint16_t *) imp) == 0x25ff)
+	{
+	  const char *ptr = (const char *) imp;
+	  const uintptr_t *jmpto = (uintptr_t *)
+				   (ptr + 6 + *(int32_t *)(ptr + 2));
+	  return (void *) *jmpto;
+	}
+    }
+  __except (NO_ERROR) {}
+  __endtry
+  return NULL;
+}
+
 /* These routines are used by the application if it
    doesn't provide its own malloc. */
 
@@ -284,7 +303,8 @@ malloc_init ()
       /* Decide if we are using our own version of malloc by testing the import
 	 address from user_data.  */
       use_internal = user_data->malloc == malloc
-		     || import_address (user_data->malloc) == &_sigfe_malloc;
+		     || import_address ((void *) user_data->malloc)
+			== &_sigfe_malloc;
       malloc_printf ("using %s malloc", use_internal ? "internal" : "external");
       internal_malloc_determined = true;
     }
