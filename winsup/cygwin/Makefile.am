@@ -521,19 +521,12 @@ SUBLIBS = \
 	libacl.a \
 	libssp.a
 
-EXTRALIBS = \
-	libautomode.a \
-	libbinmode.a \
-	libtextmode.a \
-	libtextreadmode.a
-
 noinst_LIBRARIES = \
 	libdll.a \
 	liblib.a
 
 toollib_LIBRARIES = \
-	libgmon.a \
-	$(EXTRALIBS)
+	libgmon.a
 
 CYGWIN_START=crt0.o
 GMON_START=gcrt0.o
@@ -548,18 +541,6 @@ toollib_DATA = \
 
 libgmon_a_SOURCES = $(GMON_FILES)
 libgmon_a_LIBADD =
-
-libautomode_a_SOURCES =
-libautomode_a_LIBADD = automode.o
-
-libbinmode_a_SOURCES =
-libbinmode_a_LIBADD = binmode.o
-
-libtextmode_a_SOURCES =
-libtextmode_a_LIBADD = textmode.o
-
-libtextreadmode_a_SOURCES =
-libtextreadmode_a_LIBADD = textreadmode.o
 
 # cygserver library
 cygserver_blddir = ${target_builddir}/winsup/cygserver
