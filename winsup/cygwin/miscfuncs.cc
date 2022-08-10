@@ -37,19 +37,6 @@ get_obj_handle_count (HANDLE h)
   return hdl_cnt;
 }
 
-int
-check_invalid_virtual_addr (const void *s, unsigned sz)
-{
-  MEMORY_BASIC_INFORMATION mbuf;
-  const void *end;
-
-  for (end = (char *) s + sz; s < end;
-       s = (char *) mbuf.BaseAddress + mbuf.RegionSize)
-    if (!VirtualQuery (s, &mbuf, sizeof mbuf))
-      return EINVAL;
-  return 0;
-}
-
 static char __attribute__ ((noinline))
 dummytest (volatile char *p)
 {

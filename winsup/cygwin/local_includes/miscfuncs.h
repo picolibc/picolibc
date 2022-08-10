@@ -101,9 +101,6 @@ PWCHAR transform_chars_af_unix (PWCHAR, const char *, __socklen_t);
 /* Get handle count of an object. */
 ULONG get_obj_handle_count (HANDLE h);
 
-/* Memory checking */
-int check_invalid_virtual_addr (const void *s, unsigned sz);
-
 ssize_t check_iovec (const struct iovec *, int, bool);
 #define check_iovec_for_read(a, b) check_iovec ((a), (b), false)
 #define check_iovec_for_write(a, b) check_iovec ((a), (b), true)
