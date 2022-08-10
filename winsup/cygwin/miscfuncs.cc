@@ -315,19 +315,6 @@ NT_readline::gets ()
     }
 }
 
-/* Helper function to generate the correct caller address.  For external
-   calls, the return address on the stack is _sigbe.  In that case the
-   actual caller return address is on the cygtls stack.  Use this function
-   via the macro caller_return_address. */
-extern "C" void _sigbe ();
-
-void *
-__caller_return_address (void *builtin_ret_addr)
-{
-  return builtin_ret_addr == &_sigbe
-	 ? (void *) _my_tls.retaddr () : builtin_ret_addr;
-}
-
 /* CygwinCreateThread.
 
    Replacement function for CreateThread.  What we do here is to remove

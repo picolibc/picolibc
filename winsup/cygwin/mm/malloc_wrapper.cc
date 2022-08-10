@@ -27,6 +27,23 @@ extern "C" struct mallinfo dlmallinfo ();
 static bool use_internal = true;
 static bool internal_malloc_determined;
 
+/* Helper function to generate the correct caller address.  For external
+   calls, the return address on the stack is _sigbe.  In that case the
+   actual caller return address is on the cygtls stack.  Use this function
+   via the macro caller_return_address. */
+extern "C" void _sigbe ();
+
+static inline void *
+__caller_return_address (void *builtin_ret_addr)
+{
+  return builtin_ret_addr == &_sigbe
+	 ? (void *) _my_tls.retaddr () : builtin_ret_addr;
+}
+
+#define caller_return_address() \
+		__caller_return_address (__builtin_return_address (0))
+void * __caller_return_address (void *);
+
 /* Return an address from the import jmp table of main program.  */
 static inline void *
 import_address (void *imp)

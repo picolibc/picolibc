@@ -77,10 +77,6 @@ public:
 
 extern "C" void yield ();
 
-#define caller_return_address() \
-		__caller_return_address (__builtin_return_address (0))
-void * __caller_return_address (void *);
-
 void backslashify (const char *, char *, bool);
 void slashify (const char *, char *, bool);
 #define isslash(c) ((c) == '/')
