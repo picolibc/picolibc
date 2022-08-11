@@ -169,14 +169,11 @@ typedef long ultoa_signed_t;
 
 #define FL_NEGATIVE	0x0400
 
-#define FL_ALTUPP	0x0800
-#define FL_ALTHEX	0x1000
-
 #ifdef _WANT_IO_C99_FORMATS
-#define FL_FLTHEX       0x2000
+#define FL_FLTHEX       0x0800
 #endif
-#define FL_FLTEXP	0x4000
-#define	FL_FLTFIX	0x8000
+#define FL_FLTEXP	0x1000
+#define	FL_FLTFIX	0x2000
 
 #define CASE_CONVERT    ('a' - 'A')
 #define TOLOW(c)        ((c) | CASE_CONVERT)
@@ -970,7 +967,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
 
                     flags &= ~FL_ALT;
 
-                    if ((flags & FL_PREC) && prec == 0 && x_s == 0)
+                    if (x_s == 0 && (flags & FL_PREC) && prec == 0)
                         buf_len = 0;
                     else
                         buf_len = __ultoa_invert (x_s, buf, 10) - buf;
@@ -983,32 +980,33 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
                         base = 10;
                     } else if (c == 'o') {
                         base = 8;
+                        c = '\0';
                     } else if (c == 'p') {
-                        flags |= FL_ALT | FL_ALTHEX;
+                        base = 16;
+                        flags |= FL_ALT;
+                        c = 'x';
                         if (sizeof(void *) > sizeof(int))
                             flags |= FL_LONG;
-                        base = 16;
                     } else if (TOLOW(c) == 'x') {
-                        flags |= FL_ALTHEX;
                         base = 16;
-                        if (c == 'X') {
+                        if (c == 'X')
                             base = 16 | XTOA_UPPER;
-                            flags |= (FL_ALTHEX | FL_ALTUPP);
-                        }
                     } else {
                         my_putc('%', stream);
                         my_putc(c, stream);
                         continue;
                     }
 
-                    arg_to_unsigned(ap, flags, x);
-
                     flags &= ~(FL_PLUS | FL_SPACE);
 
-                    if ((flags & FL_PREC) && prec == 0 && x == 0) {
-                        buf_len = 0;
+                    arg_to_unsigned(ap, flags, x);
+
+                    /* Zero gets no special alternate treatment */
+                    if (x == 0)
                         flags &= ~FL_ALT;
-                    }
+
+                    if (x == 0 && (flags & FL_PREC) && prec == 0)
+                        buf_len = 0;
                     else
                         buf_len = __ultoa_invert (x, buf, base) - buf;
                 }
@@ -1027,7 +1025,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
                         len = prec;
 
                         /* Don't add the leading '0' for alternate octal mode */
-                        if (!(flags & FL_ALTHEX))
+                        if (c == '\0')
                             flags &= ~FL_ALT;
                     }
                 }
@@ -1035,14 +1033,9 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
                 /* Alternate mode for octal/hex */
                 if (flags & FL_ALT) {
 
-                    /* Zero gets no special alternate treatment */
-                    if (buf[buf_len-1] == '0') {
-                        flags &= ~FL_ALT;
-                    } else {
+                    len += 1;
+                    if (c != '\0')
                         len += 1;
-                        if (flags & FL_ALTHEX)
-                            len += 1;
-                    }
                 } else if (flags & (FL_NEGATIVE | FL_PLUS | FL_SPACE)) {
                     len += 1;
                 }
@@ -1072,8 +1065,8 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
                 /* Output leading characters */
                 if (flags & FL_ALT) {
                     my_putc ('0', stream);
-                    if (flags & FL_ALTHEX)
-                        my_putc (flags & FL_ALTUPP ? 'X' : 'x', stream);
+                    if (c != '\0')
+                        my_putc (c, stream);
                 } else if (flags & (FL_NEGATIVE | FL_PLUS | FL_SPACE)) {
                     unsigned char z = ' ';
                     if (flags & FL_PLUS) z = '+';

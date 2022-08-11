@@ -355,7 +355,7 @@ Because Picolibc targets smaller systems like the SiFive FE310 or ARM
 Cortex-M0 parts with only a few kB of RAM and flash, the default
 values for all of the configuration options are designed to minimize
 the library code size. Here's the
-[do-riscv-configure](../do-riscv-configure) script from the repository
+[do-riscv-configure](../scripts/do-riscv-configure) script from the repository
 that configures the library for small RISC-V systems:
 
     #!/bin/sh
@@ -371,7 +371,11 @@ This script is designed to be run from a build directory, so you'd do:
 
     $ mkdir build-riscv64-unknown-elf
     $ cd build-riscv64-unknown-elf
-    $ ../do-riscv-configure
+    $ ../scripts/do-riscv-configure
+
+You can select the installation directory by passing it to the meson script:
+
+    $ ../scripts/do-riscv-configure -Dprefix=/path/to/install/dir/
 
 ### Compiling
 

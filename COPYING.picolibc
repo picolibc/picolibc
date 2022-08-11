@@ -484,6 +484,8 @@ Files: CMakeLists.txt
  newlib/libc/machine/CMakeLists.txt
  newlib/libc/machine/aarch64/machine/math.h
  newlib/libc/machine/aarch64/machine/meson.build
+ newlib/libc/machine/arc/CMakeLists.txt
+ newlib/libc/machine/arc/meson.build
  newlib/libc/machine/arm/CMakeLists.txt
  newlib/libc/machine/arm/machine/CMakeLists.txt
  newlib/libc/machine/arm/sys/CMakeLists.txt
@@ -808,6 +810,8 @@ Files: dummyhost/iob.c
  picocrt/shared/crt0.c
  scripts/do-aarch64-configure
  scripts/do-aarch64-zephyr-elf-configure
+ scripts/do-arc-configure
+ scripts/do-arc64-configure
  scripts/do-arm-configure
  scripts/do-clang-arm-configure
  scripts/do-clang-riscv-configure
@@ -2394,6 +2398,7 @@ Files: .clang-format
  .github/workflows/make-workflow
  .github/workflows/steps-head
  .github/workflows/variants
+ .github/workflows/variants-cmake
  .gitignore
  README.md
  cmake/TC-arm-none-eabi.cmake
@@ -2437,9 +2442,12 @@ Files: .clang-format
  newlib/testsuite/newlib.time/tzset.c
  picolibc.h.in
  picolibc.ld.in
- picolibc.specs.in
+ picolibc.specs.in-multilib
+ picolibc.specs.in-singlelib
  scripts/cross-aarch64-linux-gnu.txt
  scripts/cross-aarch64-zephyr-elf.txt
+ scripts/cross-arc-zephyr-elf.txt
+ scripts/cross-arc64-zephyr-elf.txt
  scripts/cross-arm-none-eabi.txt
  scripts/cross-arm-zephyr-eabi.txt
  scripts/cross-clang-riscv64-unknown-elf.txt

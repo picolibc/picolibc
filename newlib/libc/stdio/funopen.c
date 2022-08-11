@@ -112,6 +112,7 @@ funreader (struct _reent *ptr,
 {
   int result;
   funcookie *c = (funcookie *) cookie;
+  (void) ptr;
   errno = 0;
   if ((result = c->readfn (c->cookie, buf, n)) < 0 && errno)
     __errno_r(ptr) = errno;
@@ -126,6 +127,7 @@ funwriter (struct _reent *ptr,
 {
   int result;
   funcookie *c = (funcookie *) cookie;
+  (void) ptr;
   errno = 0;
   if ((result = c->writefn (c->cookie, buf, n)) < 0 && errno)
     __errno_r(ptr) = errno;
@@ -155,6 +157,7 @@ funseeker (struct _reent *ptr,
       result = -1;
     }
 #endif /* __LARGE64_FILES */
+  (void) ptr;
   return result;
 }
 
@@ -167,6 +170,7 @@ funseeker64 (struct _reent *ptr,
 {
   _fpos64_t result;
   funcookie *c = (funcookie *) cookie;
+  (void) ptr;
   errno = 0;
   if ((result = c->seekfn (c->cookie, off, whence)) < 0 && errno)
     __errno_r(ptr) = errno;
@@ -180,6 +184,7 @@ funcloser (struct _reent *ptr,
 {
   int result = 0;
   funcookie *c = (funcookie *) cookie;
+  (void) ptr;
   if (c->closefn)
     {
       errno = 0;

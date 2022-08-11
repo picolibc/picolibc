@@ -168,3 +168,7 @@ level2pt:
 	page256(base), \
 	page256((base)+256)
 	.quad page512(0)
+
+#if defined(__linux__) && defined(__ELF__)
+.section .note.GNU-stack,"",%progbits
+#endif

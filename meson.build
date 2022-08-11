@@ -42,7 +42,7 @@ project('picolibc', 'c',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.53',
-	version: '1.7.7'
+	version: '1.7.8'
        )
 
 targets = []
@@ -180,7 +180,9 @@ endif
 
 # Disable ssp and fortify source while building picolibc (it's enabled
 # by default by the ubuntu native compiler)
-c_flags = cc.get_supported_arguments(['-fno-common', '-frounding-math', '-fsignaling-nans', '-Wno-unsupported-floating-point-opt', '-fno-stack-protector'])
+c_flags = cc.get_supported_arguments(['-fno-common', '-frounding-math', '-fsignaling-nans',
+				      '-Wno-unsupported-floating-point-opt', '-fno-stack-protector',
+				      '-fno-builtin-copysignl'])
 c_args += c_flags
 native_c_args += c_flags
 
@@ -505,13 +507,19 @@ specs_cpp_data.set('PICOLIBC_LD', 'picolibcpp.ld')
 specs_cpp_data.set('CRTBEGIN', 'crtbegin%O%s')
 specs_cpp_data.set('CRTEND', 'crtend%O%s')
 
-picolibc_specs = configure_file(input: 'picolibc.specs.in',
-				output: '@BASENAME@',
+if enable_multilib
+  picolibc_specs_in = 'picolibc.specs.in-multilib'
+else
+  picolibc_specs_in = 'picolibc.specs.in-singlelib'
+endif
+
+picolibc_specs = configure_file(input: picolibc_specs_in,
+				output: 'picolibc.specs',
 				configuration: specs_c_data,
 				install_dir: specs_dir,
 				install: specs_install)
 
-picolibcpp_specs = configure_file(input: 'picolibc.specs.in',
+picolibcpp_specs = configure_file(input: picolibc_specs_in,
 				  output: 'picolibcpp.specs',
 				  configuration: specs_cpp_data,
 				  install_dir: specs_dir,
@@ -739,6 +747,7 @@ conf_data.set('_MB_CAPABLE', newlib_mb)
 conf_data.set('_MB_LEN_MAX', newlib_mb ? '8' : '1')
 conf_data.set('__SINGLE_THREAD__', get_option('newlib-multithread') == false)
 conf_data.set('_ICONV_ENABLE_EXTERNAL_CCS', newlib_iconv_external_ccs)
+conf_data.set('_ELIX_LEVEL', newlib_elix_level)
 if newlib_iconv_external_ccs
   conf_data.set_quoted('ICONV_DEFAULT_NLSPATH', newlib_iconv_runtime_dir)
 endif

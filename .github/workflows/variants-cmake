@@ -4,4 +4,8 @@
       matrix:
         cmake_flags: [
           "",
+	  "-DCMAKE_BUILD_TYPE=Debug",
+	  "-DCMAKE_BUILD_TYPE=Release",
+	  "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
+	  "-DCMAKE_BUILD_TYPE=MinSizeRel",
         ]

@@ -11,7 +11,7 @@
 #include <wchar.h>
 #include "check.h"
 
-int main()
+int main(void)
 {
 #if defined(INTEGER_ONLY) || defined(NO_FLOATING_POINT)
 

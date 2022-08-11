@@ -130,7 +130,7 @@ option('format-default', type: 'combo', choices: ['double', 'float', 'integer'],
 #
 # Options applying to only legacy stdio
 #
-option('newlib-elix-level', type: 'integer', value: 2,
+option('newlib-elix-level', type: 'integer', value: 4,
        description: 'desired elix library level (0-4)')
 option('newlib-fseek-optimization', type: 'boolean', value: false,
        description: 'enable fseek optimization')

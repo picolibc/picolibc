@@ -118,3 +118,7 @@ gdt:
 	.quad 0x00CF9B000000FFFF        # 0x10: ring 0 32-bit code segment
 	.quad 0x00CF93000000FFFF        # 0x18: ring 0 data segment
 gdt_end:
+
+#if defined(__linux__) && defined(__ELF__)
+.section .note.GNU-stack,"",%progbits
+#endif

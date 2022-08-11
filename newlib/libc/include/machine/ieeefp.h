@@ -563,6 +563,22 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #endif
 #endif
 
+/* Use __FLOAT_WORD_ORDER__ if we don't have
+ * more specific platform knowledge
+ */
+#ifndef __IEEE_BIG_ENDIAN
+# ifndef __IEEE_LITTLE_ENDIAN
+#  ifdef __FLOAT_WORD_ORDER__
+#   if __FLOAT_WORD_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#    define __IEEE_LITTLE_ENDIAN
+#   endif
+#   if __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__
+#    define __IEEE_BIG_ENDIAN
+#   endif
+#  endif
+# endif
+#endif
+
 #ifndef __IEEE_BIG_ENDIAN
 #ifndef __IEEE_LITTLE_ENDIAN
 #error Endianess not declared!!

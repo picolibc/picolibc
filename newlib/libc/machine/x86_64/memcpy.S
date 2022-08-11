@@ -111,3 +111,7 @@ quadword_copy:
   andq    $7, rcx
   rep     movsb                   /* Copy the remaining bytes */
   ret
+
+#if defined(__linux__) && defined(__ELF__)
+.section .note.GNU-stack,"",%progbits
+#endif
