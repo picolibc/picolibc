@@ -1,3 +1,15 @@
+picolibc (1.7.8-1) unstable; urgency=medium
+
+  * New upstream
+
+  * Doc updates
+
+  * GCC 12 fixes
+
+  * vprintf/vscanf code size reductions
+
+ -- Keith Packard <keithp@keithp.com>  Thu, 11 Aug 2022 08:17:37 -0700
+
 picolibc (1.7.7-1) unstable; urgency=medium
 
   * New upstream
