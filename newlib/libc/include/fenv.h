@@ -12,6 +12,10 @@
 #ifndef _FENV_H
 #define _FENV_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <sys/fenv.h>
 
 #ifndef FE_TONEAREST
@@ -20,10 +24,6 @@
 
 #ifndef FE_ALL_EXCEPT
 #define FE_ALL_EXCEPT	0
-#endif
-
-#ifdef __cplusplus
-extern "C" {
 #endif
 
 /* Exception */
