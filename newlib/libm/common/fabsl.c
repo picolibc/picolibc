@@ -36,7 +36,7 @@ POSSIBILITY OF SUCH DAMAGE.
 long double
 fabsl (long double x)
 {
-  return fabs(x);
+  return (long double) fabs((double) x);
 }
 #endif
 

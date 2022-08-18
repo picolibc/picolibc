@@ -11,7 +11,7 @@ long double
 cabsl (long double complex z)
 {
 #ifdef _LDBL_EQ_DBL
-  return cabs (z);
+  return (long double complex) cabs ((double complex) z);
 #else
   return hypotl (creall (z), cimagl (z));
 #endif
