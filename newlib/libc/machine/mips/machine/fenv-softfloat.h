@@ -54,14 +54,15 @@
 __fenv_static inline int
 feclearexcept(int excepts)
 {
-
+        (void) excepts;
 	return (0);
 }
 
 __fenv_static inline int
 fegetexceptflag(fexcept_t *flagp, int excepts)
 {
-
+        (void) excepts;
+        (void) flagp;
 	return (0);
 
 }
@@ -69,7 +70,8 @@ fegetexceptflag(fexcept_t *flagp, int excepts)
 __fenv_static inline int
 fesetexceptflag(const fexcept_t *flagp, int excepts)
 {
-
+        (void) excepts;
+        (void) flagp;
 	return (0);
 }
 
@@ -84,7 +86,7 @@ feraiseexcept(int excepts)
 __fenv_static inline int
 fetestexcept(int excepts)
 {
-
+        (void) excepts;
 	return (0);
 }
 
@@ -103,6 +105,7 @@ fegetround(void)
 __fenv_static inline int
 fesetround(int rounding_mode)
 {
+        (void) rounding_mode;
 
 	return (0);
 }
@@ -110,28 +113,28 @@ fesetround(int rounding_mode)
 __fenv_static inline int
 fegetenv(fenv_t *envp)
 {
-
+        (void) envp;
 	return (0);
 }
 
 __fenv_static inline int
 feholdexcept(fenv_t *envp)
 {
-
+        (void) envp;
 	return (0);
 }
 
 __fenv_static inline int
 fesetenv(const fenv_t *envp)
 {
-
-
+        (void) envp;
 	return (0);
 }
 
 __fenv_static inline int
 feupdateenv(const fenv_t *envp)
 {
+        (void) envp;
 
 #if defined FE_NOMASK_ENV && FE_ALL_EXCEPT != 0
 	  if (envp == FE_NOMASK_ENV)
@@ -148,14 +151,14 @@ feupdateenv(const fenv_t *envp)
 __fenv_static inline int
 feenableexcept(int __mask)
 {
-
+        (void) __mask;
 	return (0);
 }
 
 __fenv_static inline int
 fedisableexcept(int __mask)
 {
-
+        (void) __mask;
 	return (0);
 }
 
