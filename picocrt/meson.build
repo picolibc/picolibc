@@ -51,7 +51,7 @@ foreach target : targets
   if picocrt_march_add != ''
     new_cflags=[]
     foreach cflag : value[1]
-      if cflag.startswith('-march')
+      if cflag.startswith('-march') and not cflag.contains(picocrt_march_add)
 	cflag = cflag + picocrt_march_add
       endif
       new_cflags += cflag
