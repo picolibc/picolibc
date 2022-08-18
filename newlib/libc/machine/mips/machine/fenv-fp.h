@@ -159,16 +159,12 @@ feupdateenv(const fenv_t *envp)
 
 	return (0);
 }
+
 #if __BSD_VISIBLE
 
 /* We currently provide no external definitions of the functions below. */
 
-#ifdef __mips_soft_float
-int feenableexcept(int __mask);
-int fedisableexcept(int __mask);
-int fegetexcept(void);
-#else
-static inline int
+__fenv_static inline int
 feenableexcept(int __mask)
 {
 	fenv_t __old_fcsr, __new_fcsr;
@@ -180,7 +176,7 @@ feenableexcept(int __mask)
 	return ((__old_fcsr >> _ENABLE_SHIFT) & FE_ALL_EXCEPT);
 }
 
-static inline int
+__fenv_static inline int
 fedisableexcept(int __mask)
 {
 	fenv_t __old_fcsr, __new_fcsr;
@@ -192,7 +188,7 @@ fedisableexcept(int __mask)
 	return ((__old_fcsr >> _ENABLE_SHIFT) & FE_ALL_EXCEPT);
 }
 
-static inline int
+__fenv_static inline int
 fegetexcept(void)
 {
 	fexcept_t fcsr;
@@ -201,7 +197,5 @@ fegetexcept(void)
 
 	return ((fcsr & _ENABLE_MASK) >> _ENABLE_SHIFT);
 }
-
-#endif /* !__mips_soft_float */
 
 #endif /* __BSD_VISIBLE */

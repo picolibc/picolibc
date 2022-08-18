@@ -28,9 +28,12 @@
  * $FreeBSD$
  */
 
+#define _DEFAULT_SOURCE
 #define	__fenv_static
 #include <fenv.h>
-#ifndef	__mips_soft_float
+#ifdef	__mips_soft_float
+#include <machine/fenv-softfloat.h>
+#else
 #include <machine/fenv-fp.h>
 #endif
 
@@ -43,10 +46,6 @@
  * Hopefully the system ID byte is immutable, so it's valid to use
  * this as a default environment.
  */
-
-#ifdef	__mips_soft_float
-#include <machine/fenv-softfloat.h>
-#endif
 
 extern inline int feclearexcept(int excepts);
 extern inline int fegetexceptflag(fexcept_t *flagp, int excepts);
