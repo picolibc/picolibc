@@ -1,0 +1,3 @@
+        test: [
+          "./.github/do-many do-build do-mips-configure build-mips do-build do-mipsel-configure build-mipsel end",
+        ]

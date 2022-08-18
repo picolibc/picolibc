@@ -341,6 +341,71 @@ jobs:
         run: |
           docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} -Dfortify-source=2
 
+  fortify-source-mips:
+    needs: cache-maker
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        meson_flags: [
+          "",
+
+          # Math configurations
+          "-Dnewlib-obsolete-math=false",
+          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
+          "-Dnewlib-obsolete-math-float=true -Dnewlib-obsolete-math-double=true",
+          "-Dnewlib-obsolete-math=true",
+          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
+
+          # Tinystdio configurations
+          "-Dio-float-exact=false",
+          "-Dio-long-long=true",
+          "-Dformat-default=integer",
+          "-Dformat-default=float",
+
+          # Malloc configurations
+          "-Dnewlib-nano-malloc=false",
+
+          # Original stdio configurations
+          "-Dtinystdio=false -Dnewlib-io-float=false",
+          "-Dtinystdio=false -Dnewlib-io-float=false -Dio-long-long=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
+
+          # Locale configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true",
+
+          # Iconv configurations
+          "-Dnewlib-iconv-external-ccs=true",
+
+          # Multithread disabled
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
+        ]
+        test: [
+          "./.github/do-many do-build do-mips-configure build-mips do-build do-mipsel-configure build-mipsel end",
+        ]
+    steps:
+      - name: Clone picolibc
+        uses: actions/checkout@v2
+        with:
+          path: picolibc
+
+      - name: Restore the Docker Image
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.IMAGE_FILE }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.HASH_FILE ) }}
+
+      - name: Load and Check the Docker Image
+        run: |
+          docker load -i $IMAGE_FILE
+          docker images -a $IMAGE
+
+      - name: Fortity source test
+        run: |
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} -Dfortify-source=2
+
   minsize-arm:
     needs: cache-maker
     runs-on: ubuntu-latest
@@ -604,6 +669,71 @@ jobs:
         run: |
           docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
 
+  minsize-mips:
+    needs: cache-maker
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        meson_flags: [
+          "",
+
+          # Math configurations
+          "-Dnewlib-obsolete-math=false",
+          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
+          "-Dnewlib-obsolete-math-float=true -Dnewlib-obsolete-math-double=true",
+          "-Dnewlib-obsolete-math=true",
+          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
+
+          # Tinystdio configurations
+          "-Dio-float-exact=false",
+          "-Dio-long-long=true",
+          "-Dformat-default=integer",
+          "-Dformat-default=float",
+
+          # Malloc configurations
+          "-Dnewlib-nano-malloc=false",
+
+          # Original stdio configurations
+          "-Dtinystdio=false -Dnewlib-io-float=false",
+          "-Dtinystdio=false -Dnewlib-io-float=false -Dio-long-long=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
+
+          # Locale configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true",
+
+          # Iconv configurations
+          "-Dnewlib-iconv-external-ccs=true",
+
+          # Multithread disabled
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
+        ]
+        test: [
+          "./.github/do-many do-build do-mips-configure build-mips do-build do-mipsel-configure build-mipsel end",
+        ]
+    steps:
+      - name: Clone picolibc
+        uses: actions/checkout@v2
+        with:
+          path: picolibc
+
+      - name: Restore the Docker Image
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.IMAGE_FILE }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.HASH_FILE ) }}
+
+      - name: Load and Check the Docker Image
+        run: |
+          docker load -i $IMAGE_FILE
+          docker images -a $IMAGE
+
+      - name: Minsize test
+        run: |
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
+
   release-arm:
     needs: cache-maker
     runs-on: ubuntu-latest
@@ -845,6 +975,71 @@ jobs:
         test: [
           "./.github/do-test do-riscv-configure build-riscv",
           "./.github/do-many do-test do-rv32imac-configure build-rv32imac do-test do-clang-riscv-configure build-riscv-clang do-test do-clang-rv32imafdc-configure build-clang-rv32imafdc end",
+        ]
+    steps:
+      - name: Clone picolibc
+        uses: actions/checkout@v2
+        with:
+          path: picolibc
+
+      - name: Restore the Docker Image
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.IMAGE_FILE }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.HASH_FILE ) }}
+
+      - name: Load and Check the Docker Image
+        run: |
+          docker load -i $IMAGE_FILE
+          docker images -a $IMAGE
+
+      - name: Release test
+        run: |
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
+
+  release-mips:
+    needs: cache-maker
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        meson_flags: [
+          "",
+
+          # Math configurations
+          "-Dnewlib-obsolete-math=false",
+          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
+          "-Dnewlib-obsolete-math-float=true -Dnewlib-obsolete-math-double=true",
+          "-Dnewlib-obsolete-math=true",
+          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
+
+          # Tinystdio configurations
+          "-Dio-float-exact=false",
+          "-Dio-long-long=true",
+          "-Dformat-default=integer",
+          "-Dformat-default=float",
+
+          # Malloc configurations
+          "-Dnewlib-nano-malloc=false",
+
+          # Original stdio configurations
+          "-Dtinystdio=false -Dnewlib-io-float=false",
+          "-Dtinystdio=false -Dnewlib-io-float=false -Dio-long-long=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
+
+          # Locale configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true",
+
+          # Iconv configurations
+          "-Dnewlib-iconv-external-ccs=true",
+
+          # Multithread disabled
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
+        ]
+        test: [
+          "./.github/do-many do-build do-mips-configure build-mips do-build do-mipsel-configure build-mipsel end",
         ]
     steps:
       - name: Clone picolibc
