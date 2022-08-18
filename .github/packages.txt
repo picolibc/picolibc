@@ -9,6 +9,8 @@ gcc-riscv64-unknown-elf
 gcc-aarch64-linux-gnu
 gcc-xtensa-lx106
 gcc-m68k-linux-gnu
+gcc-mips-linux-gnu
+gcc-mipsel-linux-gnu
 gcc-powerpc64-linux-gnu
 gcc-powerpc64le-linux-gnu
 qemu-system-x86
