@@ -42,8 +42,6 @@ bool no_thread_exit_protect::flag;
    required. */
 char NO_COPY myself_nowait_dummy[1] = {'0'};
 
-#define Static static NO_COPY
-
 /* All my children info.  Avoid expensive constructor ops at DLL
    startup.
 
@@ -79,18 +77,18 @@ class child_procs {
     }
     int max_child_procs () const { return _NPROCS + _NPROCS_2; }
 };
-Static child_procs chld_procs;
+static NO_COPY child_procs chld_procs;
 
 /* Start of queue for waiting threads. */
-Static waitq waitq_head;
+static NO_COPY waitq waitq_head;
 
 /* Controls access to subproc stuff. */
-Static muto sync_proc_subproc;
+static NO_COPY muto sync_proc_subproc;
 
 _cygtls NO_COPY *_sig_tls;
 
-Static HANDLE my_sendsig;
-Static HANDLE my_readsig;
+static NO_COPY HANDLE my_sendsig;
+static NO_COPY HANDLE my_readsig;
 
 /* Used in select if a signalfd is part of the read descriptor set */
 HANDLE NO_COPY my_pendingsigs_evt;
@@ -119,7 +117,7 @@ public:
   friend void wait_sig (VOID *arg);
 };
 
-Static pending_signals sigq;
+static NO_COPY pending_signals sigq;
 
 /* Functions */
 void
@@ -156,7 +154,7 @@ get_proc_lock (DWORD what, DWORD val)
 {
   if (!cygwin_finished_initializing)
     return true;
-  Static int lastwhat = -1;
+  static NO_COPY int lastwhat = -1;
   if (!sync_proc_subproc)
     {
       sigproc_printf ("sync_proc_subproc is NULL");
