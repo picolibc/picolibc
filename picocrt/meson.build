@@ -49,9 +49,9 @@ foreach target : targets
   instdir = join_paths(lib_dir, value[0])
 
   if picocrt_march_add != ''
-    new_cflags=[]
+    new_cflags = []
     foreach cflag : value[1]
-      if cflag.startswith('-march')
+      if cflag.startswith('-march') and not cflag.contains(picocrt_march_add)
 	cflag = cflag + picocrt_march_add
       endif
       new_cflags += cflag
