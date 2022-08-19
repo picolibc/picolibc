@@ -90,6 +90,8 @@ cpu_family_aliases = {
 		       # riscv
 		       'riscv32' : 'riscv',
 		       'riscv64' : 'riscv',
+		       # sparc
+		       'sparc64' : 'sparc',
 		       # x86_64
 		       'amd64' : 'x86_64',
 		     }
