@@ -72,10 +72,6 @@ typedef	uint32_t	fexcept_t;
 
 
 
-/* Default floating-point environment */
-extern const fenv_t *_fe_dfl_env;
-#define FE_DFL_ENV _fe_dfl_env
-
 /* We need to be able to map status flag positions to mask flag positions */
 #define	_FPUSW_SHIFT	18
 #define	_ENABLE_MASK	(FE_ALL_EXCEPT << _FPUSW_SHIFT)
