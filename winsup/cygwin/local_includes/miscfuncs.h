@@ -1,4 +1,4 @@
-/* miscfuncs.h: main Cygwin header file.
+/* miscfuncs.h: Internal functions not having a better home
 
 This file is part of Cygwin.
 
