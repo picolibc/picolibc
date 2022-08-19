@@ -66,6 +66,8 @@ endif
 cpu_family_aliases = {
 		       # aarch64
 		       'arm64' : 'aarch64',
+		       # arc
+		       'arc64' : 'arc',
 		       # cris
 		       'crisv32' : 'cris',
 		       # i386
