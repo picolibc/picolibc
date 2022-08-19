@@ -82,7 +82,7 @@ public:
 WCHAR tmpbuf::buf[NT_MAX_PATH];
 NO_COPY muto tmpbuf::lock;
 
-static char __fastcall *
+static char *
 __rn (char *dst, int base, int dosign, long long val, int len, int pad, unsigned long long mask)
 {
   /* longest number is ULLONG_MAX, 18446744073709551615, 20 digits */
@@ -425,7 +425,7 @@ console_printf (const char *fmt, ...)
 #define wrnarg(dst, base, dosign, len, pad) __wrn ((dst), (base), (dosign), va_arg (ap, long), len, pad, LMASK)
 #define wrnargLL(dst, base, dosign, len, pad) __wrn ((dst), (base), (dosign), va_arg (ap, unsigned long long), len, pad, LLMASK)
 
-static PWCHAR __fastcall
+static PWCHAR
 __wrn (PWCHAR dst, int base, int dosign, long long val, int len, int pad, unsigned long long mask)
 {
   /* longest number is ULLONG_MAX, 18446744073709551615, 20 digits */
