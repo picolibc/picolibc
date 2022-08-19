@@ -1,0 +1,3 @@
+        test: [
+          "./.github/do-build do-sparc64-configure build-sparc64",
+        ]

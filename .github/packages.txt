@@ -13,6 +13,7 @@ gcc-mips-linux-gnu
 gcc-mipsel-linux-gnu
 gcc-powerpc64-linux-gnu
 gcc-powerpc64le-linux-gnu
+gcc-sparc64-linux-gnu
 qemu-system-x86
 qemu-system-arm
 qemu-system-misc
