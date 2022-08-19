@@ -744,7 +744,18 @@ if enable_multilib
 
   # Ask the compiler for the set of available multilib configurations,
   # set up the build system to compile for all desired ones
-  foreach target : run_command(cc, '--print-multi-lib', check : true).stdout().strip().split('\n')
+
+  target_list = run_command(cc, '--print-multi-lib', check : true).stdout().strip().split('\n')
+
+  has_mcmodel = false
+  foreach target : target_list
+    if target.contains('mcmodel=')
+      has_mcmodel = true
+    endif
+  endforeach
+
+  foreach target : target_list
+    message('target ' + target)
     tmp = target.split(';')
     flags = c_args
 
@@ -770,7 +781,7 @@ if enable_multilib
 
       # rv64 needs to use a non-default mcmodel so that variables can
       # live in a broader range of memory addresses
-      if name.startswith('rv64')
+      if not has_mcmodel and name.startswith('rv64')
 	flags += [ '-mcmodel=medany' ]
       endif
 
