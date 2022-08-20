@@ -39,6 +39,11 @@ typedef uint16_t u_int16_t; // Non-standard sized type needed by ancient gmon.h
 #undef ExitThread
 #endif
 
+/* Undo this #define from debug.h. */
+#ifdef CloseHandle
+#undef CloseHandle
+#endif
+
 #define SCALE_SHIFT 2 // == 4 bytes of address space per bucket
 #define MS_VC_EXCEPTION 0x406D1388 // thread name notification from child
 
