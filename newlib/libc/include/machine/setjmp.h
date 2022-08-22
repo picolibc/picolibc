@@ -287,8 +287,9 @@ _BEGIN_STD_C
 #define _JBLEN 16
 #endif
 
-#ifdef __arc__
+#if defined(__arc__) || defined(__ARC64__)
 #define _JBLEN 25 /* r13-r30,blink,lp_count,lp_start,lp_end,mlo,mhi,status32 */
+#define _JBTYPE unsigned long
 #endif
 
 #ifdef __MMIX__
