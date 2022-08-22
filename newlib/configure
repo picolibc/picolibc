@@ -6396,6 +6396,19 @@ $as_echo "$newlib_cv_build_exeext" >&6; }
 fi
 
 
+
+$as_echo "#define _NEWLIB_VERSION \"4.2.0\"" >>confdefs.h
+
+
+$as_echo "#define __NEWLIB__ 4" >>confdefs.h
+
+
+$as_echo "#define __NEWLIB_MINOR__ 2" >>confdefs.h
+
+
+$as_echo "#define __NEWLIB_PATCHLEVEL__ 0" >>confdefs.h
+
+
 if test "${newlib_elix_level}" -gt "0"; then
 
 cat >>confdefs.h <<_ACEOF
