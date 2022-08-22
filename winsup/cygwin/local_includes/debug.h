@@ -21,7 +21,6 @@ details. */
 # define ProtectHandleINH(h) do {} while (0)
 # define ProtectHandle1INH(h,n) do {} while (0)
 # define ProtectHandle2INH(h,n) do {} while (0)
-# define debug_init() do {} while (0)
 # define setclexec(h, nh, b) do {} while (0)
 # define debug_fixup_after_fork_exec() do {} while (0)
 # define VerifyHandle(h) do {} while (0)
@@ -52,7 +51,6 @@ details. */
 # define ProtectHandle2INH(h, n) add_handle (__PRETTY_FUNCTION__, __LINE__, (h), n, 1)
 # define VerifyHandle(h) verify_handle (__PRETTY_FUNCTION__, __LINE__, (h))
 
-void debug_init ();
 void add_handle (const char *, int, HANDLE, const char *, bool = false);
 void verify_handle (const char *, int, HANDLE);
 bool close_handle (const char *, int, HANDLE, const char *, bool);
