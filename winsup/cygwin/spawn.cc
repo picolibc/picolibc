@@ -619,7 +619,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	SetHandleInformation (my_wr_proc_pipe, HANDLE_FLAG_INHERIT, 0);
       parent_winpid = GetCurrentProcessId ();
 
-      PSECURITY_ATTRIBUTES sa = (PSECURITY_ATTRIBUTES) tp.w_get ();
+      PSECURITY_ATTRIBUTES sa = (PSECURITY_ATTRIBUTES) alloca (1024);
       if (!sec_user_nih (sa, cygheap->user.sid (),
 			 well_known_authenticated_users_sid,
 			 PROCESS_QUERY_LIMITED_INFORMATION))
