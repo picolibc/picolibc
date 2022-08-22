@@ -421,6 +421,9 @@ set(CC1_SPEC "")
 set(CC1PLUS_SPEC "")
 set(ADDITIONAL_LIBS "")
 set(SPECS_EXTRA "")
+set(SPECS_ISYSTEM "-isystem ${PROJECT_BINARY_DIR}/${include}")
+set(SPECS_LIBPATH "-L${PROJECT_BINARY_DIR}")
+set(SPECS_STARTFILE "${PROJECT_BINARY_DIR}/crt0.o")
 string(APPEND SPECS_PRINTF "%{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfprintf=__f_vfprintf}"
   " %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfscanf=__f_vfscanf}"
   " %{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfprintf=__d_vfprintf}"
@@ -428,7 +431,7 @@ string(APPEND SPECS_PRINTF "%{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfprintf=__f
   " %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfprintf=__i_vfprintf}")
 set(PREFIX "${PROJECT_BINARY_DIR}")
 
-configure_file(picolibc.specs.in-singlelib "${PROJECT_BINARY_DIR}/picolibc.specs" @ONLY)
+configure_file(picolibc.specs.in "${PROJECT_BINARY_DIR}/picolibc.specs" @ONLY)
 
 set(PICOLIBC_COMPILE_OPTIONS
   "--include" "${PICOLIBC_INCLUDE}/picolibc.h"
