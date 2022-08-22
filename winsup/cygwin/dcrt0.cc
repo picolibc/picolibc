@@ -854,10 +854,6 @@ dll_crt0_1 (void *)
   strace.microseconds ();
 #endif
 
-  /* Initialize debug muto, if DLL is built with --enable-debugging.
-     Need to do this before any helper threads start. */
-  debug_init ();
-
   cygbench ("pre-forkee");
   if (in_forkee)
     {

@@ -22,29 +22,15 @@ details. */
 
 class lock_debug
 {
-  static muto locker;
+  static NO_COPY SRWLOCK lock;
  public:
-  lock_debug ()
-  {
-    locker.acquire (INFINITE);
-  }
-  void unlock ()
-  {
-    locker.release ();
-  }
-  ~lock_debug () {unlock ();}
-  friend void debug_init ();
+  lock_debug () { AcquireSRWLockExclusive (&lock); }
+  ~lock_debug () { ReleaseSRWLockExclusive (&lock); }
 };
 
-muto NO_COPY lock_debug::locker;
+SRWLOCK NO_COPY lock_debug::lock = SRWLOCK_INIT;
 
 static bool mark_closed (const char *, int, HANDLE, const char *, bool);
-
-void
-debug_init ()
-{
-  lock_debug::locker.init ("debug_lock");
-}
 
 /* Find a registered handle in the linked list of handles. */
 static handle_list *
@@ -138,7 +124,6 @@ add_handle (const char *func, int ln, HANDLE h, const char *name, bool inh)
 
   if ((hl = newh ()) == NULL)
     {
-      here.unlock ();
       debug_printf ("couldn't allocate memory for %s(%d): %s(%p)",
 		    func, ln, name, h);
       return;
