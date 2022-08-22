@@ -62,7 +62,7 @@ public:
   operator WCHAR * ()
   {
     if (!buf)
-      buf = (PWCHAR) HeapAlloc (GetProcessHeap (), HEAP_ZERO_MEMORY,
+      buf = (PWCHAR) HeapAlloc (GetProcessHeap (), 0,
 				NT_MAX_PATH * sizeof (WCHAR));
     return buf;
   }
