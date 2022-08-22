@@ -56,31 +56,25 @@ static const char hex_str_lower[] = "0123456789abcdef";
 
 class tmpbuf
 {
-  static WCHAR buf[NT_MAX_PATH];
-  static muto lock;
-  bool locked;
+  PWCHAR buf;
+
 public:
   operator WCHAR * ()
   {
-    if (!locked)
-      {
-	lock.init ("smallprint_buf")->acquire ();
-	locked = true;
-      }
+    if (!buf)
+      buf = (PWCHAR) HeapAlloc (GetProcessHeap (), HEAP_ZERO_MEMORY,
+				NT_MAX_PATH * sizeof (WCHAR));
     return buf;
   }
-  operator char * () {return (char *) ((WCHAR *) *this);}
+  operator char * ()  { return (char *) ((WCHAR *) *this); }
 
-  tmpbuf (): locked (false) {};
+  tmpbuf () : buf (NULL) {}
   ~tmpbuf ()
   {
-    if (locked)
-      lock.release ();
+    if (buf)
+      HeapFree (GetProcessHeap (), 0, buf);
   }
 };
-
-WCHAR tmpbuf::buf[NT_MAX_PATH];
-NO_COPY muto tmpbuf::lock;
 
 static char *
 __rn (char *dst, int base, int dosign, long long val, int len, int pad, unsigned long long mask)
