@@ -707,7 +707,18 @@ _everyone_sd (void *buf, ACCESS_MASK access)
   return psd;
 }
 
-static NO_COPY muto authz_guard;
+static NO_COPY SRWLOCK authz_lock = SRWLOCK_INIT;
+#define AUTHZ_LOCK()    (AcquireSRWLockExclusive (&authz_lock))
+#define AUTHZ_UNLOCK()  (ReleaseSRWLockExclusive (&authz_lock))
+
+static NO_COPY SRWLOCK user_ctx_lock = SRWLOCK_INIT;
+#define USER_CTX_LOCK()    (AcquireSRWLockExclusive (&user_ctx_lock))
+#define USER_CTX_UNLOCK()  (ReleaseSRWLockExclusive (&user_ctx_lock))
+
+static NO_COPY SRWLOCK slist_lock = SRWLOCK_INIT;
+#define SLIST_LOCK()    (AcquireSRWLockExclusive (&slist_lock))
+#define SLIST_UNLOCK()  (ReleaseSRWLockExclusive (&slist_lock))
+
 static LUID authz_dummy_luid = { 0 };
 
 class authz_ctx_cache_entry
@@ -766,13 +777,13 @@ authz_ctx::operator AUTHZ_RESOURCE_MANAGER_HANDLE ()
   if (!authz_hdl)
     {
       /* Create handle to Authz resource manager */
-      authz_guard.init ("authz_guard")->acquire ();
+      AUTHZ_LOCK ();
       if (!authz_hdl
 	  && !AuthzInitializeResourceManager (AUTHZ_RM_FLAG_NO_AUDIT,
 					      NULL, NULL, NULL, NULL,
 					      &authz_hdl))
 	debug_printf ("AuthzInitializeResourceManager, %E");
-      authz_guard.release ();
+      AUTHZ_UNLOCK ();
     }
   return authz_hdl;
 }
@@ -805,9 +816,9 @@ authz_ctx_cache::context (PSID user_sid)
   else
     {
       entry->set (user_sid, ctx_hdl);
-      authz_guard.acquire ();
+      SLIST_LOCK ();
       SLIST_INSERT_HEAD (&ctx_list, entry, ctx_next);
-      authz_guard.release ();
+      SLIST_UNLOCK ();
       return entry->context ();
     }
   delete entry;
@@ -830,7 +841,7 @@ authz_ctx::get_user_attribute (mode_t *attribute, PSECURITY_DESCRIPTOR psd,
       /* Avoid lock in default case. */
       if (!user_ctx_hdl)
 	{
-	  authz_guard.acquire ();
+	  USER_CTX_LOCK ();
 	  /* Check user_ctx_hdl again under lock to avoid overwriting
 	     user_ctx_hdl if it has already been initialized. */
 	  if (!user_ctx_hdl
@@ -838,7 +849,7 @@ authz_ctx::get_user_attribute (mode_t *attribute, PSECURITY_DESCRIPTOR psd,
 						   authz_dummy_luid, NULL,
 						   &user_ctx_hdl))
 	    debug_printf ("AuthzInitializeContextFromToken, %E");
-	  authz_guard.release ();
+	  USER_CTX_UNLOCK ();
 	}
       if (user_ctx_hdl)
 	ctx_hdl = user_ctx_hdl;
