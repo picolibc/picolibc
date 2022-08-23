@@ -97,8 +97,7 @@ case "${target}" in
 	target_makefile_frag=${srcdir}/config/mips.mt
 	;;
   riscv*-*-*)
-	AC_CONFIG_FILES([riscv/Makefile])
-	subdirs="$subdirs riscv"
+	config_riscv=true
 	;;
   powerpc-*-*|powerpcle-*-*)
 	AC_CONFIG_FILES([rs6000/Makefile])
@@ -239,7 +238,7 @@ esac
 dnl These subdirs have converted to non-recursive make.  Hopefully someday all
 dnl the ports above will too!
 m4_foreach_w([SUBDIR], [
-  bfin iq2000 libnosys lm32 wince
+  bfin iq2000 libnosys lm32 riscv wince
 ], [dnl
   AM_CONDITIONAL([CONFIG_]m4_toupper(SUBDIR), [test x$config_]SUBDIR = xtrue)
 ])
