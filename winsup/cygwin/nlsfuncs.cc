@@ -1583,7 +1583,7 @@ internal_setlocale ()
       _sys_mbstowcs (cygheap->locale.mbtowc, w_path, 32768, path);
     }
   w_cwd = tp.w_get ();
-  cwdstuff::cwd_lock.acquire ();
+  cwdstuff::acquire_write ();
   _sys_mbstowcs (cygheap->locale.mbtowc, w_cwd, 32768,
 		   cygheap->cwd.get_posix ());
   /* Set charset for internal conversion functions. */
@@ -1592,7 +1592,7 @@ internal_setlocale ()
     cygheap->locale.mbtowc = __utf8_mbtowc;
   /* Restore CWD and PATH in new charset. */
   cygheap->cwd.reset_posix (w_cwd);
-  cwdstuff::cwd_lock.release ();
+  cwdstuff::release_write ();
   if (w_path)
     {
       char *c_path = tp.c_get ();

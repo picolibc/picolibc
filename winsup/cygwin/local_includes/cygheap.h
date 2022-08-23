@@ -303,25 +303,30 @@ private:
 
 public:
   UNICODE_STRING win32;
-  static muto cwd_lock;
+  static SRWLOCK NO_COPY cwd_lock;
+
+  static void acquire_read () { AcquireSRWLockShared (&cwd_lock); }
+  static void release_read () { ReleaseSRWLockShared (&cwd_lock); }
+  static void acquire_write () { AcquireSRWLockExclusive (&cwd_lock); }
+  static void release_write () { ReleaseSRWLockExclusive (&cwd_lock); }
   const char *get_posix () const { return posix; };
   void reset_posix (wchar_t *w_cwd);
   char *get (char *buf, int need_posix = 1, int with_chroot = 0,
 	     unsigned ulen = NT_MAX_PATH);
   PWCHAR get (PWCHAR buf, unsigned buflen = NT_MAX_PATH)
   {
-    cwd_lock.acquire ();
+    acquire_read ();
     buf[0] = L'\0';
     wcsncat (buf, win32.Buffer, buflen - 1);
-    cwd_lock.release ();
+    release_read ();
     return buf;
   }
   HANDLE get_handle () { return dir; }
   DWORD get_drive (char * dst)
   {
-    cwd_lock.acquire ();
+    acquire_read ();
     DWORD ret = sys_wcstombs (dst, NT_MAX_PATH, win32.Buffer, drive_length);
-    cwd_lock.release ();
+    release_read ();
     return ret;
   }
   int get_error () const { return error; }

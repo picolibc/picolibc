@@ -103,7 +103,7 @@ struct symlink_info
   bool set_error (int);
 };
 
-muto NO_COPY cwdstuff::cwd_lock;
+SRWLOCK NO_COPY cwdstuff::cwd_lock;
 
 static const GUID GUID_shortcut
 			= { 0x00021401L, 0, 0, {0xc0, 0, 0, 0, 0, 0, 0, 0x46}};
@@ -4737,12 +4737,10 @@ cwdstuff::override_win32_cwd (bool init, ULONG old_dismount_count)
     }
 }
 
-/* Initialize cygcwd 'muto' for serializing access to cwd info. */
+/* Initialize cwdstuff */
 void
 cwdstuff::init ()
 {
-  cwd_lock.init ("cwd_lock");
-
   /* Cygwin processes inherit the cwd from their parent.  If the win32 path
      buffer is not NULL, the cwd struct is already set up, and we only
      have to override the Win32 CWD with ours. */
@@ -4800,8 +4798,6 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
      Win32 CWD to a "weird" directory in which all relative filesystem-related
      calls fail. */
 
-  cwd_lock.acquire ();
-
   if (nat_cwd)
     {
       upath = *nat_cwd->get_nt_native_path ();
@@ -4824,6 +4820,8 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
 	    }
 	}
     }
+
+  acquire_write ();
 
   /* Memorize old DismountCount before opening the dir.  This value is
      stored in the FAST_CWD structure.  It would be simpler to fetch the
@@ -4888,7 +4886,7 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
 	  /* Called from chdir?  Just fail. */
 	  if (nat_cwd)
 	    {
-	      cwd_lock.release ();
+	      release_write ();
 	      __seterrno_from_nt_status (status);
 	      return -1;
 	    }
@@ -4905,7 +4903,7 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
 			peb.ProcessParameters->CurrentDirectoryHandle,
 			GetCurrentProcess (), &h, 0, TRUE, 0))
 	    {
-	      cwd_lock.release ();
+	      release_write ();
 	      if (peb.ProcessParameters->CurrentDirectoryHandle)
 		debug_printf ("...and DuplicateHandle failed with %E.");
 	      dir = NULL;
@@ -5027,7 +5025,7 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
   posix = (char *) crealloc_abort (posix, strlen (posix_cwd) + 1);
   stpcpy (posix, posix_cwd);
 
-  cwd_lock.release ();
+  release_write ();
   return 0;
 }
 
@@ -5079,7 +5077,7 @@ cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
       goto out;
     }
 
-  cwd_lock.acquire ();
+  acquire_read ();
 
   char *tocopy;
   if (!need_posix)
@@ -5106,7 +5104,7 @@ cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
 	strcpy (buf, "/");
     }
 
-  cwd_lock.release ();
+  release_read ();
 
 out:
   syscall_printf ("(%s) = cwdstuff::get (%p, %u, %d, %d), errno %d",

@@ -4437,9 +4437,9 @@ gen_full_path_at (char *path_ret, int dirfd, const char *pathname,
 
       if (dirfd == AT_FDCWD)
 	{
-	  cwdstuff::cwd_lock.acquire ();
+	  cwdstuff::acquire_read ();
 	  p = stpcpy (path_ret, cygheap->cwd.get_posix ());
-	  cwdstuff::cwd_lock.release ();
+	  cwdstuff::release_read ();
 	}
       else
 	{
@@ -4581,9 +4581,9 @@ fchownat (int dirfd, const char *pathname, uid_t uid, gid_t gid, int flags)
 	  /* pathname is an empty string.  Operate on dirfd. */
 	  if (dirfd == AT_FDCWD)
 	    {
-	      cwdstuff::cwd_lock.acquire ();
+	      cwdstuff::acquire_read ();
 	      strcpy (path, cygheap->cwd.get_posix ());
-	      cwdstuff::cwd_lock.release ();
+	      cwdstuff::release_read ();
 	    }
 	  else
 	    {
@@ -4626,9 +4626,9 @@ fstatat (int dirfd, const char *__restrict pathname, struct stat *__restrict st,
 	  /* pathname is an empty string.  Operate on dirfd. */
 	  if (dirfd == AT_FDCWD)
 	    {
-	      cwdstuff::cwd_lock.acquire ();
+	      cwdstuff::acquire_read ();
 	      strcpy (path, cygheap->cwd.get_posix ());
-	      cwdstuff::cwd_lock.release ();
+	      cwdstuff::release_read ();
 	    }
 	  else
 	    return fstat (dirfd, st);
