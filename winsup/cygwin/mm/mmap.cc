@@ -48,9 +48,11 @@ details. */
 static fhandler_dev_zero fh_anonymous;
 
 /* Used for thread synchronization while accessing mmap bookkeeping lists. */
-static NO_COPY muto mmap_guard;
-#define LIST_LOCK()    (mmap_guard.init ("mmap_guard")->acquire ())
-#define LIST_UNLOCK()  (mmap_guard.release ())
+static NO_COPY SRWLOCK mmap_lock = SRWLOCK_INIT;
+#define LIST_WRITE_LOCK()    (AcquireSRWLockExclusive (&mmap_lock))
+#define LIST_WRITE_UNLOCK()  (ReleaseSRWLockExclusive (&mmap_lock))
+#define LIST_READ_LOCK()    (AcquireSRWLockShared (&mmap_lock))
+#define LIST_READ_UNLOCK()  (ReleaseSRWLockShared (&mmap_lock))
 
 /* Small helpers to avoid having lots of flag bit tests in the code. */
 static inline bool
@@ -703,12 +705,12 @@ is_mmapped_region (caddr_t start_addr, caddr_t end_address)
 {
   size_t len = end_address - start_addr;
 
-  LIST_LOCK ();
+  LIST_READ_LOCK ();
   mmap_list *map_list = mmapped_areas.get_list_by_fd (-1, NULL);
 
   if (!map_list)
     {
-      LIST_UNLOCK ();
+      LIST_READ_UNLOCK ();
       return false;
     }
 
@@ -725,7 +727,7 @@ is_mmapped_region (caddr_t start_addr, caddr_t end_address)
 	  break;
 	}
     }
-  LIST_UNLOCK ();
+  LIST_READ_UNLOCK ();
   return ret;
 }
 
@@ -753,7 +755,7 @@ mmap_is_attached_or_noreserve (void *addr, size_t len)
 {
   mmap_region_status ret = MMAP_NONE;
 
-  LIST_LOCK ();
+  LIST_READ_LOCK ();
   mmap_list *map_list = mmapped_areas.get_list_by_fd (-1, NULL);
 
   const size_t pagesize = wincap.allocation_granularity ();
@@ -800,7 +802,7 @@ mmap_is_attached_or_noreserve (void *addr, size_t len)
 	}
     }
 out:
-  LIST_UNLOCK ();
+  LIST_READ_UNLOCK ();
   return ret;
 }
 
@@ -1043,7 +1045,7 @@ go_ahead:
   if (noreserve (flags) && (!anonymous (flags) || !priv (flags)))
     flags &= ~MAP_NORESERVE;
 
-  LIST_LOCK ();
+  LIST_WRITE_LOCK ();
   map_list = mmapped_areas.get_list_by_fd (fd, &st);
 
   /* Test if an existing anonymous mapping can be recycled. */
@@ -1096,7 +1098,7 @@ go_ahead:
   ret = base;
 
 out_with_unlock:
-  LIST_UNLOCK ();
+  LIST_WRITE_UNLOCK ();
 
 out:
 
@@ -1144,7 +1146,7 @@ munmap (void *addr, size_t len)
     }
   len = roundup2 (len, pagesize);
 
-  LIST_LOCK ();
+  LIST_WRITE_LOCK ();
 
   /* Iterate over maps, unmap pages between addr and addr+len in all maps. */
   mmap_list *map_list, *next_map_list;
@@ -1180,7 +1182,7 @@ munmap (void *addr, size_t len)
 	}
     }
 
-  LIST_UNLOCK ();
+  LIST_WRITE_UNLOCK ();
   syscall_printf ("0 = munmap(): %p", addr);
   return 0;
 }
@@ -1197,18 +1199,19 @@ msync (void *addr, size_t len, int flags)
 
   pthread_testcancel ();
 
-  LIST_LOCK ();
-
   if (((uintptr_t) addr % wincap.allocation_granularity ())
       || (flags & ~(MS_ASYNC | MS_SYNC | MS_INVALIDATE))
       || ((flags & (MS_ASYNC | MS_SYNC)) == (MS_ASYNC | MS_SYNC)))
     {
       set_errno (EINVAL);
-      goto out;
+      syscall_printf ("%R = msync()", ret);
+      return ret;
     }
 #if 0 /* If I only knew why I did that... */
   len = roundup2 (len, wincap.allocation_granularity ());
 #endif
+
+  LIST_READ_LOCK ();
 
   /* Iterate over maps, looking for the mmapped area.  Error if not found. */
   LIST_FOREACH (map_list, &mmapped_areas.lists, ml_next)
@@ -1239,7 +1242,7 @@ msync (void *addr, size_t len, int flags)
   set_errno (ENOMEM);
 
 out:
-  LIST_UNLOCK ();
+  LIST_READ_UNLOCK ();
   syscall_printf ("%R = msync()", ret);
   return ret;
 }
@@ -1265,7 +1268,7 @@ mprotect (void *addr, size_t len, int prot)
     }
   len = roundup2 (len, pagesize);
 
-  LIST_LOCK ();
+  LIST_WRITE_LOCK ();
 
   /* Iterate over maps, protect pages between addr and addr+len in all maps. */
   mmap_list *map_list;
@@ -1300,7 +1303,7 @@ mprotect (void *addr, size_t len, int prot)
 	}
     }
 
-  LIST_UNLOCK ();
+  LIST_WRITE_UNLOCK ();
 
   if (!in_mapped)
     {
