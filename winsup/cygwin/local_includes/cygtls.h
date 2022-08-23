@@ -54,10 +54,13 @@ class tls_pathbuf
 	};
       uint64_t _counters;
     };
+  HANDLE tls_heap;
   char  *c_buf[TP_NUM_C_BUFS];
   WCHAR *w_buf[TP_NUM_W_BUFS];
 
 public:
+  void clear () { memset (this, 0, sizeof *this); }
+  void create ();
   void destroy ();
   friend class tmp_pathbuf;
   friend class san;
