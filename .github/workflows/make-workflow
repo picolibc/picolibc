@@ -14,7 +14,7 @@ for build in cmake; do
 done
 
 for build in fortify-source minsize release; do
-    for arch in arm misc ppc riscv mips sparc64; do
+    for arch in arm misc ppc riscv mips; do
 	echo "  $build-$arch:"
 	cat variants
 	cat targets-$arch
