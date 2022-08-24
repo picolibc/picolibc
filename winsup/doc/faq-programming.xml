@@ -697,9 +697,8 @@ Building these programs can be disabled with the <literal>--without-cross-bootst
 option to <literal>configure</literal>.
 </para>
 
-<!-- If you want to run the tests, <literal>dejagnu</literal>,
-     <literal>busybox</literal> and <literal>cygutils-extra<literal> are also
-     required. -->
+<!-- If you want to run the tests <literal>busybox</literal> and
+     <literal>cygutils-extra<literal> are also required. -->
 
 <para>
 Building the documentation also requires the <literal>dblatex</literal>,

@@ -12,7 +12,7 @@ AC_PREREQ([2.59])
 AC_INIT([Cygwin],[0],[cygwin@cygwin.com],[cygwin],[https://cygwin.com])
 AC_CONFIG_AUX_DIR(..)
 AC_CANONICAL_TARGET
-AM_INIT_AUTOMAKE([dejagnu foreign no-define no-dist subdir-objects -Wall -Wno-portability -Wno-extra-portability])
+AM_INIT_AUTOMAKE([foreign no-define no-dist subdir-objects -Wall -Wno-portability -Wno-extra-portability])
 AM_SILENT_RULES([yes])
 
 realdirpath() {

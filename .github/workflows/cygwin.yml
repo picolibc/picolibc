@@ -119,5 +119,5 @@ jobs:
         export MAKEFLAGS=-j$(nproc) &&
         cd build &&
         (export PATH=${{ matrix.target }}/winsup/testsuite/testinst/bin:${PATH} && cmd /c $(cygpath -wa ${{ matrix.target }}/winsup/cygserver/cygserver) &) &&
-        (cd ${{ matrix.target }}/winsup; make check || true)
+        (cd ${{ matrix.target }}/winsup; make check AM_COLOR_TESTS=always || true)
       shell: C:\cygwin\bin\bash.exe --noprofile --norc -eo pipefail '{0}'

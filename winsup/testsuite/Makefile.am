@@ -328,19 +328,23 @@ LDADD = $(builddir)/libltp.a $(builddir)/../cygwin/binmode.o $(LDADD_FOR_TESTDLL
 # additional flags for specific test executables
 winsup_api_devdsp_LDADD = -lwinmm $(LDADD)
 
-DEJATOOL = winsup
+# all tests
+TESTS = $(check_PROGRAMS) \
+	mingw/cygload
 
-# Add '-v' to RUNTESTFLAGS if V=1
-RUNTESTFLAGS_1 = -v
-RUNTESTFLAGS = $(RUNTESTFLAGS_$(V))
+# expected fail tests
+XFAIL_TESTS = \
+	winsup.api/ltp/setgroups01 \
+	winsup.api/ltp/setuid02 \
+	winsup.api/ltp/ulimit01 \
+	winsup.api/ltp/unlink08 \
+	winsup.api/samples/sample-fail
 
-site-extra.exp: ../config.status Makefile
-	@rm -f ./tmp0
-	@echo "set runtime_root \"`pwd`/testinst/bin\"" >> ./tmp0
-	@echo "set cygrun \"`pwd`/mingw/cygrun\"" >> ./tmp0
-	@mv ./tmp0 site-extra.exp
+# cygrun.sh test-runner script, and variables used by it:
+LOG_COMPILER = $(srcdir)/cygrun.sh
 
-EXTRA_DEJAGNU_SITE_CONFIG = site-extra.exp
+export runtime_root=$(abs_builddir)/testinst/bin
+export cygrun=$(builddir)/mingw/cygrun
 
 # Set up things in the Cygwin 'installation' at testsuite/testinst/ to provide
 # things which tests need to work
@@ -369,7 +373,8 @@ check-local:
 check_programs: $(check_PROGRAMS)
 
 clean-local:
-	rm -f *.log *.exe *.exp *.bak *.stackdump winsup.sum
+	rm -f *.stackdump
+	rm -rf ${builddir}/testinst/tmp
 
 if CROSS_BOOTSTRAP
 SUBDIRS = mingw

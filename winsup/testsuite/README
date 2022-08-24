@@ -1,5 +1,3 @@
-1999-12-23  DJ Delorie  <dj@cygnus.com>
-
 Here are some notes about adding and using this testsuite.
 
 The testsuite adds a directory containing the just built cygwin1.dll to the PATH
@@ -20,18 +18,18 @@ The testsuite/winsup.api subdirectory is for testing the API to
 cygwin1.dll ONLY.  Create other subdirs under testsuite/ for other
 classes of testing.
 
-Tests in winsup.api/*.c or winsup.api/*/*.c (only one subdirectory
-level is allowed) either run, and exit(0) or they fail.
-Either abort or exit with a non-zero code to indicate failure.  Don't
-print anything to the screen if you can avoid it (except for failure
-reasons, of course).  One .c file per test, no compile options are
-allowed (we're testing the api, not the compiler).
+Tests under winsup.api/ either run successfully and exit(0), exit(77) to
+indicate a skipped test, or any other exit status to indicate a failure.
 
-Tests whose filename is mentioned in known-bugs.tcl will be *expected*
-to fail, and will "fail" if they compile, run, and return zero.
+Don't print anything to the screen if you can avoid it (except for failure
+reasons, of course).  One .c file per test, no compile options are allowed
+(we're testing the api, not the compiler).
+
+Tests whose filename is mentioned in XFAIL_TESTS are expected to fail,
+effectively reversing the result of those.
 
 "make check" will only work if you run it *on* an NT machine.
 Cross-checking is not supported.
 
-To test a subset of the test-suite, use
-$ make check CYGWIN_TESTSUITE_TESTS=regexp
+To run selected tests, use e.g:
+$ make check TESTS="winsup.api/ltp/umask03 winsup.api/ltp/stat06"
