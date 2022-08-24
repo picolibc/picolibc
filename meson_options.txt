@@ -68,6 +68,9 @@ option('specsdir', type: 'string',
 option('sysroot-install', type: 'boolean', value: false,
        description: 'Install in gcc sysroot')
 
+option('system-libc', type: 'boolean', value: false,
+       description: 'Install as system C library')
+					      
 option('picoexit', type: 'boolean', value: true,
        description: 'Smaller exit/atexit/onexit code')
 
