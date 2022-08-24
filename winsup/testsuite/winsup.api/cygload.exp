@@ -14,33 +14,17 @@ proc ws_spawn {cmd args} {
     verbose send "catchCode = $rv\n"
 }
 
-if { [string match "i686" $target_alias] } {
-    set entrypoint "_cygloadCRTStartup@0"
+if { $verbose } {
+    set redirect_output "./mingw-cygwin.log"
 } else {
-    set entrypoint "cygloadCRTStartup"
+    set redirect_output /dev/null
 }
 
-ws_spawn "$MINGW_CXX $srcdir/$subdir/cygload.cc -o mingw-cygload.exe -static -Wl,-e,$entrypoint"
-
+set windows_runtime_root [exec cygpath -m $runtime_root]
+ws_spawn "./mingw/cygload.exe -cygwin $windows_runtime_root/cygwin1.dll > $redirect_output"
 if { $rv != {0 {}} } {
-    verbose -log "$rv"
-    fail "cygload (compile)"
+    verbose -log "cygload: $rv"
+    fail "cygload"
 } else {
-    if { $verbose } {
-        set redirect_output "./mingw-cygwin.log"
-    } else {
-        set redirect_output /dev/null
-    }
-    set windows_runtime_root [exec cygpath -m $runtime_root]
-    ws_spawn "./mingw-cygload.exe -cygwin $windows_runtime_root/cygwin1.dll > $redirect_output"
-    if { $rv != {0 {}} } {
-        verbose -log "cygload: $rv"
-        fail "cygload (execute)"
-    } else {
-        pass "cygload"
-    }
-    catch { file delete "mingw-cygload.exe" } err
-    if { $err != "" } {
-        note "error deleting mingw-cygload.exe: $err"
-    }
+    pass "cygload"
 }

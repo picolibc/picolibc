@@ -8,12 +8,6 @@ if { ! [isnative] } {
 
 set rv ""
 
-set ltp_includes "-I$ltp_includes"
-set ltp_libs "$ltp_libs"
-
-set add_includes $ltp_includes
-set add_libs $ltp_libs
-
 set orig_path "$env(PATH)"
 
 set test_filter ""
@@ -48,7 +42,9 @@ foreach src [lsort [glob -nocomplain $srcdir/$subdir/*.c $srcdir/$subdir/*/*.{cc
     regsub "^$srcdir/$subdir/" $src "" testcase
     regsub ".c$" $testcase "" base
     regsub ".*/" $base "" basename
-    regsub "/" $base "-" base
+    regsub "/" $base "-" tmpfile
+
+    set exec "./winsup.api/$base.exe"
 
     if { [lsearch -exact $xfail_list $basename] >= 0 } {
         set xfail_expected 1
@@ -61,37 +57,20 @@ foreach src [lsort [glob -nocomplain $srcdir/$subdir/*.c $srcdir/$subdir/*/*.{cc
     if [ file exists "$srcdir/$subdir/$basename.exp" ] then {
 	source "$srcdir/$subdir/$basename.exp"
     } else {
-	ws_spawn "$CC -nodefaultlibs -mwin32 $CFLAGS $src $add_includes $add_libs $libdir/binmode.o -lgcc $libdir/libcygwin.a -lkernel32 -luser32 -o $base.exe"
-	if { $rv } {
-	    fail "$testcase (compile)"
-	} else {
 	    if { $verbose } {
-	       set redirect_output "./$base.log"
+	       set redirect_output "./$tmpfile.log"
 	    } else {
 	       set redirect_output /dev/null
 	    }
-	    file mkdir $tmpdir/$base
+	    file mkdir $tmpdir/$tmpfile
 	    set env(PATH) "$runtime_root:$env(PATH)"
-	    ws_spawn "$cygrun ./$base.exe $testdll_tmpdir/$base > $redirect_output"
-	    file delete -force $tmpdir/$base
+	    ws_spawn "$cygrun $exec $testdll_tmpdir/$tmpfile > $redirect_output"
+	    file delete -force $tmpdir/$tmpfile
 	    set env(PATH) "$orig_path"
 	    if { $rv } {
-		fail "$testcase (execute)"
-		if { $xfail_expected } {
-		    catch { file delete "$base.exe" } err
-		    if { $err != "" } {
-			note "error deleting $base.exe: $err"
-		    }
-		}
+		fail "$testcase"
 	    } else {
 		pass "$testcase"
-		if { ! $xfail_expected } {
-		    catch { file delete "$base.exe" } err
-		    if { $err != "" } {
-			note "error deleting $base.exe: $err"
-		    }
-		}
 	    }
-	}
     }
 }

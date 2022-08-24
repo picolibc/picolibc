@@ -21,7 +21,7 @@ cygwin1.dll ONLY.  Create other subdirs under testsuite/ for other
 classes of testing.
 
 Tests in winsup.api/*.c or winsup.api/*/*.c (only one subdirectory
-level is allowed) either compile, run, and exit(0) or they fail.
+level is allowed) either run, and exit(0) or they fail.
 Either abort or exit with a non-zero code to indicate failure.  Don't
 print anything to the screen if you can avoid it (except for failure
 reasons, of course).  One .c file per test, no compile options are

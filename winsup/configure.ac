@@ -126,7 +126,7 @@ AC_CONFIG_FILES([
     utils/Makefile
     utils/mingw/Makefile
     testsuite/Makefile
-    testsuite/cygrun/Makefile
+    testsuite/mingw/Makefile
 ])
 
 AC_OUTPUT
