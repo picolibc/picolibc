@@ -113,7 +113,7 @@ _fputws_r (struct _reent *ptr,
   iov.iov_base = buf;
   do
     {
-      nbytes = _wcsrtombs_r(ptr, buf, &ws, sizeof (buf), &fp->_mbstate);
+      nbytes = wcsrtombs(buf, &ws, sizeof (buf), &fp->_mbstate);
       if (nbytes == (size_t) -1)
 	goto error;
       iov.iov_len = uio.uio_resid = nbytes;
