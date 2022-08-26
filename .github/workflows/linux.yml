@@ -97,8 +97,8 @@ jobs:
           # Original stdio
           "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
 
-          # Locale, iconv and original malloc configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false",
+          # Locale, iconv, original malloc and original atexit/onexit configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
 
           # Multithread disabled
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
@@ -148,8 +148,8 @@ jobs:
           # Original stdio
           "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
 
-          # Locale, iconv and original malloc configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false",
+          # Locale, iconv, original malloc and original atexit/onexit configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
 
           # Multithread disabled
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
@@ -198,8 +198,8 @@ jobs:
           # Original stdio
           "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
 
-          # Locale, iconv and original malloc configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false",
+          # Locale, iconv, original malloc and original atexit/onexit configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
 
           # Multithread disabled
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
@@ -249,8 +249,8 @@ jobs:
           # Original stdio
           "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
 
-          # Locale, iconv and original malloc configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false",
+          # Locale, iconv, original malloc and original atexit/onexit configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
 
           # Multithread disabled
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
@@ -300,8 +300,8 @@ jobs:
           # Original stdio
           "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
 
-          # Locale, iconv and original malloc configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false",
+          # Locale, iconv, original malloc and original atexit/onexit configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
 
           # Multithread disabled
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
@@ -350,8 +350,8 @@ jobs:
           # Original stdio
           "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
 
-          # Locale, iconv and original malloc configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false",
+          # Locale, iconv, original malloc and original atexit/onexit configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
 
           # Multithread disabled
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
@@ -401,8 +401,8 @@ jobs:
           # Original stdio
           "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
 
-          # Locale, iconv and original malloc configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false",
+          # Locale, iconv, original malloc and original atexit/onexit configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
 
           # Multithread disabled
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
@@ -451,8 +451,8 @@ jobs:
           # Original stdio
           "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
 
-          # Locale, iconv and original malloc configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false",
+          # Locale, iconv, original malloc and original atexit/onexit configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
 
           # Multithread disabled
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
@@ -502,8 +502,8 @@ jobs:
           # Original stdio
           "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
 
-          # Locale, iconv and original malloc configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false",
+          # Locale, iconv, original malloc and original atexit/onexit configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
 
           # Multithread disabled
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
@@ -553,8 +553,8 @@ jobs:
           # Original stdio
           "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
 
-          # Locale, iconv and original malloc configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false",
+          # Locale, iconv, original malloc and original atexit/onexit configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
 
           # Multithread disabled
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
@@ -603,8 +603,8 @@ jobs:
           # Original stdio
           "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
 
-          # Locale, iconv and original malloc configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false",
+          # Locale, iconv, original malloc and original atexit/onexit configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
 
           # Multithread disabled
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
@@ -654,8 +654,8 @@ jobs:
           # Original stdio
           "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
 
-          # Locale, iconv and original malloc configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false",
+          # Locale, iconv, original malloc and original atexit/onexit configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
 
           # Multithread disabled
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
@@ -704,8 +704,8 @@ jobs:
           # Original stdio
           "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
 
-          # Locale, iconv and original malloc configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false",
+          # Locale, iconv, original malloc and original atexit/onexit configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
 
           # Multithread disabled
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
@@ -755,8 +755,8 @@ jobs:
           # Original stdio
           "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
 
-          # Locale, iconv and original malloc configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false",
+          # Locale, iconv, original malloc and original atexit/onexit configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
 
           # Multithread disabled
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
@@ -806,8 +806,8 @@ jobs:
           # Original stdio
           "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
 
-          # Locale, iconv and original malloc configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false",
+          # Locale, iconv, original malloc and original atexit/onexit configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
 
           # Multithread disabled
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
