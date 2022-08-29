@@ -296,7 +296,10 @@ frok::parent (volatile char * volatile stack_here)
   si.lpReserved2 = (LPBYTE) &ch;
   si.cbReserved2 = sizeof (ch);
 
-  bool locked = __malloc_trylock ();
+  /* NEVER, EVER, call a function which in turn calls malloc&friends while this
+     malloc lock is active! */
+  __malloc_lock ();
+  bool locked = true;
 
   /* Remove impersonation */
   cygheap->user.deimpersonate ();
@@ -308,8 +311,7 @@ frok::parent (volatile char * volatile stack_here)
 
   ch.silentfail (!*with_forkables); /* fail silently without forkables */
 
-  tmp_pathbuf tp;
-  PSECURITY_ATTRIBUTES sa = (PSECURITY_ATTRIBUTES) tp.w_get ();
+  PSECURITY_ATTRIBUTES sa = (PSECURITY_ATTRIBUTES) alloca (1024);
   if (!sec_user_nih (sa, cygheap->user.saved_sid (),
 		     well_known_authenticated_users_sid,
 		     PROCESS_QUERY_LIMITED_INFORMATION))

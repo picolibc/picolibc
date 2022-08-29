@@ -32,7 +32,6 @@ extern "C" void __set_ENOMEM ();
 #elif defined (__INSIDE_CYGWIN__)
 
 # define __malloc_lock() AcquireSRWLockExclusive (&mallock)
-# define __malloc_trylock() TryAcquireSRWLockExclusive (&mallock)
 # define __malloc_unlock() ReleaseSRWLockExclusive (&mallock)
 extern SRWLOCK NO_COPY mallock;
 void malloc_init ();
