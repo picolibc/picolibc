@@ -98,3 +98,12 @@ gawk -v start_offset="$start_offset" '\
     }
   }
 ' ${tmp_file} > "${output_file}"
+# Check if the `context' member is 16 bytes aligned.  Delete output_file
+# and bail out with error if not.
+MOD=$(awk '/_cygtls.context_p/{ print $3 % 16; }' "${output_file}")
+if [ $MOD -ne 0 ]
+then
+  echo "Error: _cygtls.context member is not 16 bytes aligned!"
+  rm "${output_file}"
+  exit 1
+fi

@@ -178,11 +178,14 @@ public: /* Do NOT remove this public: line, it's a marker for gentls_offsets. */
   siginfo_t *sigwait_info;
   HANDLE signal_arrived;
   bool will_wait_for_signal;
+#if 0
   long __align;			/* Needed to align context to 16 byte. */
+#endif
   /* context MUST be aligned to 16 byte, otherwise RtlCaptureContext fails.
      If you prepend cygtls members here, make sure context stays 16 byte
-     aligned. */
-  ucontext_t context;
+     aligned. The gentls_offsets script checks for that now and fails
+     if the alignment is wrong. */
+  ucontext_t __attribute__((__aligned__(__alignof__(long double)))) context;
   DWORD thread_id;
   siginfo_t infodata;
   struct pthread *tid;
