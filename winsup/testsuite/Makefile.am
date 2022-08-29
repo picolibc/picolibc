@@ -38,7 +38,7 @@ RUNTESTFLAGS_1 = -v
 RUNTESTFLAGS = $(RUNTESTFLAGS_$(V))
 
 # a temporary directory, to be used for files created by tests
-tmpdir = $(abspath $(objdir)/testsuite/tmp/)
+tmpdir = $(abspath $(builddir)/tmp/)
 # the same temporary directory, as an absolute, /cygdrive path (so it can be
 # understood by the test DLL, which will have a different mount table)
 testdll_tmpdir = $(shell cygpath -ma $(tmpdir) | sed -e 's#^\([A-Z]\):#/cygdrive/\L\1#')
