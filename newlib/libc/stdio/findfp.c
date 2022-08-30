@@ -88,6 +88,10 @@ std (FILE *ptr,
 #else /* _STDIO_CLOSE_STD_STREAMS */
   ptr->_close = NULL;
 #endif /* _STDIO_CLOSE_STD_STREAMS */
+#ifndef __SINGLE_THREAD__
+  if (ptr == &__sf[0] || ptr == &__sf[1] || ptr == &__sf[2])
+    __lock_init_recursive (ptr->_lock);
+#endif
 #ifdef __SCLE
   if (__stextmode (ptr->_file))
     ptr->_flags |= __SCLE;
