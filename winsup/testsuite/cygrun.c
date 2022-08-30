@@ -33,22 +33,6 @@ main (int argc, char **argv)
     SetEnvironmentVariable ("TDIRECTORY", argv[2]);
 
   SetEnvironmentVariable ("CYGWIN_TESTING", "1");
-  if ((p = getenv ("CYGWIN")) == NULL || (strstr (p, "ntsec") == NULL))
-    {
-      char buf[4096];
-      if (!p)
-	{
-	  p = buf;
-	  p[0] = '\0';
-	}
-      else
-	{
-	  strcpy (buf, p);
-	  strcat (buf, " ");
-	}
-      strcat(buf, "ntsec");
-      SetEnvironmentVariable ("CYGWIN", buf);
-    }
 
   memset (&sa, 0, sizeof (sa));
   memset (&pi, 0, sizeof (pi));
