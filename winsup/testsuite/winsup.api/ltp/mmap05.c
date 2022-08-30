@@ -125,12 +125,12 @@ main(int ac, char **av)
 		 * Call mmap to map the temporary file 'TEMPFILE'
 	 	 * with no access.
 		 */
-		
-		TEST(mmap(0, page_sz, PROT_NONE,
-			  MAP_FILE|MAP_SHARED, fildes, 0));
+		errno = 0;
+		addr = mmap(0, page_sz, PROT_NONE,
+			    MAP_FILE|MAP_SHARED, fildes, 0);
 
 		/* Check for the return value of mmap() */
-		if (TEST_RETURN == (int)MAP_FAILED) {
+		if (addr == MAP_FAILED) {
 			tst_resm(TFAIL, "mmap() Failed on %s, errno=%d : %s",
 				 TEMPFILE, errno, strerror(errno));
 			continue;
@@ -264,7 +264,7 @@ setup()
  *   is not accessible.
  */
 void
-sig_handler(sig)
+sig_handler(int sig)
 {
 	if (sig == SIGSEGV) {
 		/* set the global variable and jump back */

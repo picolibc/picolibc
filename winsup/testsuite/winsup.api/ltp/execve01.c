@@ -133,7 +133,7 @@ int exp_enos[]={0, 0};		/* Zero terminated list of expected errnos */
 
 int pid;			/* process id from fork */
 int status;			/* status returned from waitpid */
-const char *const args[2]={"/usr/bin/test", 0};	/* argument list for execve call */
+char *const args[2]={"/usr/bin/test", 0};	/* argument list for execve call */
 extern char **environ;		/* pointer to this processes env, to pass along */
 
 int

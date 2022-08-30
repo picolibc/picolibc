@@ -210,7 +210,7 @@ extern void STD_opts_help();
  *	SCALL = system call and parameters to execute
  *
  ***********************************************************************/
-#define TEST(SCALL) TEST_RETURN = SCALL;  TEST_ERRNO=errno;
+#define TEST(SCALL) TEST_RETURN = (long) SCALL;  TEST_ERRNO=errno;
 
 /***********************************************************************
  * TEST_VOID: calls a system call

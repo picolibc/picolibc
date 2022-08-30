@@ -133,7 +133,7 @@ int exp_enos[]={0, 0};		/* Zero terminated list of expected errnos */
 
 int pid;		/* process id from fork */
 int status;		/* status returned from waitpid */
-const char *const args[2]={"/usr/bin/test", 0};	/* argument list for execvp call */
+char *const args[2]={"/usr/bin/test", 0};	/* argument list for execvp call */
 
 int
 main(int ac, char **av)

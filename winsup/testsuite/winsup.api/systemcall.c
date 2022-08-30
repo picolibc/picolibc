@@ -61,7 +61,7 @@ main (int argc, char **argv)
     }
   if (n != 0)
     {
-      fprintf (stderr, "system() call returned %p\n", (void *) n);
+      fprintf (stderr, "system() call returned %x\n", n);
       exit (1);
     }
   exit (0);

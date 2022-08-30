@@ -145,7 +145,7 @@ main(int argc, char **argv)
       unlink ("y.txt");
       if (!WIFEXITED (status) || WEXITSTATUS (status))
 	{
-	  printf ("forked process exited with status %p\n", (char *) status);
+	  printf ("forked process exited with status %x\n", status);
 	  return 1;
 	}
     }
