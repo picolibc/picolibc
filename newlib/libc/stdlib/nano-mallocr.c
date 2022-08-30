@@ -336,6 +336,15 @@ void * nano_malloc(RARG malloc_size_t s)
                if (sbrk_aligned(RCALL alloc_size) != (void *)-1)
                {
                    p->size += alloc_size;
+
+                   /* Remove chunk from free_list */
+                   r = free_list;
+                   while (r && p != r->next)
+                   {
+                     r = r->next;
+                   }
+                   r->next = NULL;
+
                    r = p;
                }
                else
