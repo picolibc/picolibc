@@ -328,10 +328,6 @@ void * nano_malloc(RARG malloc_size_t s)
                /* The last free item has the heap end as neighbour.
                 * Let's ask for a smaller amount and merge */
                alloc_size -= p->size;
-               alloc_size = ALIGN_SIZE(alloc_size, CHUNK_ALIGN); /* size of aligned data load */
-               alloc_size += MALLOC_PADDING; /* padding */
-               alloc_size += CHUNK_OFFSET; /* size of chunk head */
-               alloc_size = MAX(alloc_size, MALLOC_MINCHUNK);
 
                if (sbrk_aligned(RCALL alloc_size) != (void *)-1)
                {
