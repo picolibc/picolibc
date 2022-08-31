@@ -53,6 +53,8 @@ _vswscanf_r (struct _reent *ptr, const wchar_t *str, const wchar_t *fmt,
   f._read = __seofread;
   f._ub._base = NULL;
   f._lb._base = NULL;
+  f._flags2 = 0;
+  f._ur = 0;
   f._file = -1;  /* No file. */
   return __ssvfwscanf_r (ptr, &f, fmt, ap);
 }

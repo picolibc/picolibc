@@ -427,6 +427,8 @@ swscanf (const wchar_t *__restrict str, const wchar_t *__restrict fmt, ...)
   f._read = __seofread;
   f._ub._base = NULL;
   f._lb._base = NULL;
+  f._flags2 = 0;
+  f._ur = 0;
   f._file = -1;  /* No file. */
   va_start (ap, fmt);
   ret = __ssvfwscanf_r (_REENT, &f, fmt, ap);

@@ -37,6 +37,8 @@ time (time_t * t)
 {
   struct timeval now;
 
+  now.tv_sec = (time_t) -1;
+
   if (_gettimeofday_r (_REENT, &now, NULL) < 0)
     now.tv_sec = (time_t) -1;
 
