@@ -25,7 +25,7 @@ void * wrfunc(void * arg)
   ba = bankAccount;
   assert(pthread_rwlock_unlock(&rwlock1) == 0);
 
-  return ((void *) ba);
+  return ((void *)(size_t)ba);
 }
 
 void * rdfunc(void * arg)
@@ -36,7 +36,7 @@ void * rdfunc(void * arg)
   ba = bankAccount;
   assert(pthread_rwlock_unlock(&rwlock1) == 0);
 
-  return ((void *) ba);
+  return ((void *)(size_t)ba);
 }
 
 int
@@ -45,9 +45,9 @@ main()
   pthread_t wrt1;
   pthread_t wrt2;
   pthread_t rdt;
-  int wr1Result = 0;
-  int wr2Result = 0;
-  int rdResult = 0;
+  void* wr1Result = 0;
+  void* wr2Result = 0;
+  void* rdResult = 0;
 
   bankAccount = 0;
 
@@ -57,13 +57,13 @@ main()
   Sleep(500);
   assert(pthread_create(&wrt2, NULL, wrfunc, NULL) == 0);
 
-  assert(pthread_join(wrt1, (void **) &wr1Result) == 0);
-  assert(pthread_join(rdt, (void **) &rdResult) == 0);
-  assert(pthread_join(wrt2, (void **) &wr2Result) == 0);
+  assert(pthread_join(wrt1, &wr1Result) == 0);
+  assert(pthread_join(rdt, &rdResult) == 0);
+  assert(pthread_join(wrt2, &wr2Result) == 0);
 
-  assert(wr1Result == 10);
-  assert(rdResult == 20);
-  assert(wr2Result == 20);
+  assert((int)(size_t)wr1Result == 10);
+  assert((int)(size_t)rdResult == 20);
+  assert((int)(size_t)wr2Result == 20);
 
   return 0;
 }

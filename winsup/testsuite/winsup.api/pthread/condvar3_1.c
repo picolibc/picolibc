@@ -89,7 +89,7 @@ main()
 {
   int i;
   pthread_t t[NUMTHREADS + 1];
-  int result = 0;
+  void* result = 0;
   struct timeb currSysTime;
   const DWORD NANOSEC_PER_MILLISEC = 1000000;
 
@@ -110,7 +110,7 @@ main()
 
   for (i = 1; i <= NUMTHREADS; i++)
     {
-      assert(pthread_create(&t[i], NULL, mythread, (void *) i) == 0);
+      assert(pthread_create(&t[i], NULL, mythread, (void *)(size_t)i) == 0);
     }
 
   do {
@@ -127,8 +127,8 @@ main()
 
   for (i = 1; i <= NUMTHREADS; i++)
     {
-      assert(pthread_join(t[i], (void **) &result) == 0);
-        assert(result == i);
+      assert(pthread_join(t[i], &result) == 0);
+      assert((int)(size_t)result == i);
     }
 
   printf("awk = %d\n", awoken);
@@ -138,8 +138,8 @@ main()
   assert(signaled == awoken);
   assert(timedout == NUMTHREADS - signaled);
 
-  result = pthread_cond_destroy(&cv);
-  assert(result == 0);
+  int result2 = pthread_cond_destroy(&cv);
+  assert(result2 == 0);
 
   return 0;
 }

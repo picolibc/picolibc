@@ -24,7 +24,7 @@ main(int argc, char * argv[])
 	/* Create a few threads and then exit. */
 	for (i = 0; i < 4; i++)
 	  {
-	    assert(pthread_create(&id[i], NULL, func, (void *) i) == 0);
+	    assert(pthread_create(&id[i], NULL, func, (void *)(size_t)i) == 0);
 	  }
 
 	Sleep(1000);

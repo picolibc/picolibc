@@ -52,7 +52,7 @@ void * func(void * arg)
   assert(pthread_getschedparam(pthread_self(), &policy, &param) == 0);
   assert(pthread_mutex_unlock(&startMx) == 0);
   assert(policy == SCHED_OTHER);
-  return (void *) param.sched_priority;
+  return (void *) (size_t)param.sched_priority;
 }
  
 int
@@ -73,7 +73,7 @@ main()
       assert(pthread_setschedparam(t, SCHED_OTHER, &param) == 0);
       assert(pthread_mutex_unlock(&startMx) == 0);
       pthread_join(t, &result);
-      assert((int) result == param.sched_priority);
+      assert((int)(size_t)result == param.sched_priority);
     }
 
   return 0;
