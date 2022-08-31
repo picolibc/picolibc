@@ -2,7 +2,7 @@
  * mutex7d.c
  *
  * Test the default (type not set) mutex type.
- * Should be the same as PTHREAD_MUTEX_ERRORCHECK.
+ * Should be the same as PTHREAD_MUTEX_NORMAL.
  * Thread locks then trylocks mutex (attempted recursive lock).
  * The thread should lock first time and EBUSY second time.
  *
@@ -25,7 +25,6 @@ void * locker(void * arg)
   assert(pthread_mutex_trylock(&mutex) == EBUSY);
   lockCount++;
   assert(pthread_mutex_unlock(&mutex) == 0);
-  assert(pthread_mutex_unlock(&mutex) == EPERM);
 
   return 0;
 }

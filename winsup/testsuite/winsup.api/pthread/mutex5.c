@@ -23,7 +23,7 @@ main()
     {
       assert(pthread_mutexattr_init(&mxAttr) == 0);
       assert(pthread_mutexattr_gettype(&mxAttr, &mxType) == 0);
-      assert(mxType == PTHREAD_MUTEX_ERRORCHECK);
+      assert(mxType == PTHREAD_MUTEX_NORMAL);
     }
 
   return 0;
