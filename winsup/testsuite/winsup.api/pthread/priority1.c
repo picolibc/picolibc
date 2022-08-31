@@ -47,7 +47,7 @@ void * func(void * arg)
   struct sched_param param;
 
   assert(pthread_getschedparam(pthread_self(), &policy, &param) == 0);
-  assert(policy == SCHED_OTHER);
+  assert(policy == SCHED_FIFO);
   return (void *)(size_t)param.sched_priority;
 }
  
@@ -58,8 +58,8 @@ main()
   pthread_attr_t attr;
   void * result = NULL;
   struct sched_param param;
-  int maxPrio = sched_get_priority_max(SCHED_OTHER);
-  int minPrio = sched_get_priority_min(SCHED_OTHER);
+  int maxPrio = sched_get_priority_max(SCHED_FIFO);
+  int minPrio = sched_get_priority_min(SCHED_FIFO);
 
   assert(pthread_attr_init(&attr) == 0);
   assert(pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED) == 0);

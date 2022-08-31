@@ -51,7 +51,7 @@ void * func(void * arg)
   assert(pthread_mutex_lock(&startMx) == 0);
   assert(pthread_getschedparam(pthread_self(), &policy, &param) == 0);
   assert(pthread_mutex_unlock(&startMx) == 0);
-  assert(policy == SCHED_OTHER);
+  assert(policy == SCHED_FIFO);
   return (void *) (size_t)param.sched_priority;
 }
  
@@ -61,8 +61,8 @@ main()
   pthread_t t;
   void * result = NULL;
   struct sched_param param;
-  int maxPrio = sched_get_priority_max(SCHED_OTHER);
-  int minPrio = sched_get_priority_min(SCHED_OTHER);
+  int maxPrio = sched_get_priority_max(SCHED_FIFO);
+  int minPrio = sched_get_priority_min(SCHED_FIFO);
 
   for (param.sched_priority = minPrio;
        param.sched_priority <= maxPrio;
@@ -70,7 +70,7 @@ main()
     {
       assert(pthread_mutex_lock(&startMx) == 0);
       assert(pthread_create(&t, NULL, func, NULL) == 0);
-      assert(pthread_setschedparam(t, SCHED_OTHER, &param) == 0);
+      assert(pthread_setschedparam(t, SCHED_FIFO, &param) == 0);
       assert(pthread_mutex_unlock(&startMx) == 0);
       pthread_join(t, &result);
       assert((int)(size_t)result == param.sched_priority);
