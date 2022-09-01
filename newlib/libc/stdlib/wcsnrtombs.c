@@ -104,7 +104,7 @@ _wcsnrtombs_l (char *dst, const wchar_t **src, size_t nwc,
       int bytes = loc->wctomb (buff, *pwcs, ps);
       if (bytes == -1)
 	{
-	  __errno_r(r) = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  ps->__count = 0;
 	  return (size_t)-1;
 	}

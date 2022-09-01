@@ -42,7 +42,7 @@ _asnprintf_r (struct _reent *__restrict ptr,
      for _size.  */
   if (len > INT_MAX)
     {
-      __errno_r(ptr) = EOVERFLOW;
+      _REENT_ERRNO(ptr) = EOVERFLOW;
       return NULL;
     }
   f._bf._size = f._w = len;
@@ -94,7 +94,7 @@ asnprintf (char *__restrict buf,
      for _size.  */
   if (len > INT_MAX)
     {
-      __errno_r(ptr) = EOVERFLOW;
+      _REENT_ERRNO(ptr) = EOVERFLOW;
       return NULL;
     }
   f._bf._size = f._w = len;

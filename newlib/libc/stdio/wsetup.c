@@ -46,7 +46,7 @@ __swsetup_r (struct _reent *ptr,
     {
       if ((fp->_flags & __SRW) == 0)
         {
-	  __errno_r(ptr) = EBADF;
+	  _REENT_ERRNO(ptr) = EBADF;
 	  fp->_flags |= __SERR;
 	  return EOF;
         }

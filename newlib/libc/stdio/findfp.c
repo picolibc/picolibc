@@ -28,24 +28,15 @@
 
 void (*__stdio_exit_handler) (void);
 
-#if defined(_REENT_SMALL) && !defined(_REENT_GLOBAL_STDIO_STREAMS)
-const struct __sFILE_fake __sf_fake_stdin =
-    {_NULL, 0, 0, 0, 0, {_NULL, 0}, 0, _NULL};
-const struct __sFILE_fake __sf_fake_stdout =
-    {_NULL, 0, 0, 0, 0, {_NULL, 0}, 0, _NULL};
-const struct __sFILE_fake __sf_fake_stderr =
-    {_NULL, 0, 0, 0, 0, {_NULL, 0}, 0, _NULL};
-#endif
-
-#ifdef _REENT_GLOBAL_STDIO_STREAMS
 __FILE __sf[3];
+
 struct _glue __sglue = {NULL, 3, &__sf[0]};
-#else
-#ifdef _REENT_SMALL
-struct _glue __sglue = {NULL, 0, NULL};
-#else
-struct _glue __sglue = {NULL, 3, &_GLOBAL_REENT->__sf[0]};
-#endif
+
+#ifdef _REENT_THREAD_LOCAL
+_Thread_local __FILE *_tls_stdin = &__sf[0];
+_Thread_local __FILE *_tls_stdout = &__sf[1];
+_Thread_local __FILE *_tls_stderr = &__sf[2];
+_Thread_local void (*_tls_cleanup)(struct _reent *);
 #endif
 
 #ifdef _STDIO_BSD_SEMANTICS
@@ -97,14 +88,10 @@ std (FILE *ptr,
 #else /* _STDIO_CLOSE_STD_STREAMS */
   ptr->_close = NULL;
 #endif /* _STDIO_CLOSE_STD_STREAMS */
-#if !defined(__SINGLE_THREAD__) && !(defined(_REENT_SMALL) && !defined(_REENT_GLOBAL_STDIO_STREAMS))
-  __lock_init_recursive (ptr->_lock);
-  /*
-   * #else
-   * lock is already initialized in __sfp
-   */
+#ifndef __SINGLE_THREAD__
+  if (ptr == &__sf[0] || ptr == &__sf[1] || ptr == &__sf[2])
+    __lock_init_recursive (ptr->_lock);
 #endif
-
 #ifdef __SCLE
   if (__stextmode (ptr->_file))
     ptr->_flags |= __SCLE;
@@ -174,11 +161,9 @@ global_stdio_init (void)
 {
   if (__stdio_exit_handler == NULL) {
     __stdio_exit_handler = stdio_exit_handler;
-#ifdef _REENT_GLOBAL_STDIO_STREAMS
     stdin_init (&__sf[0]);
     stdout_init (&__sf[1]);
     stderr_init (&__sf[2]);
-#endif
   }
 }
 
@@ -206,7 +191,7 @@ __sfp (struct _reent *d)
 	break;
     }
   _newlib_sfp_lock_exit ();
-  __errno_r(d) = ENOMEM;
+  _REENT_ERRNO(d) = ENOMEM;
   return NULL;
 
 found:
@@ -245,16 +230,12 @@ found:
 static void
 cleanup_stdio (struct _reent *ptr)
 {
-#ifdef _REENT_GLOBAL_STDIO_STREAMS
-  if (ptr->_stdin != &__sf[0])
-    CLEANUP_FILE (ptr, ptr->_stdin);
-  if (ptr->_stdout != &__sf[1])
-    CLEANUP_FILE (ptr, ptr->_stdout);
-  if (ptr->_stderr != &__sf[2])
-    CLEANUP_FILE (ptr, ptr->_stderr);
-#else
-  (void) _fwalk_sglue (ptr, CLEANUP_FILE, &ptr->__sglue);
-#endif
+  if (_REENT_STDIN(ptr) != &__sf[0])
+    CLEANUP_FILE (ptr, _REENT_STDIN(ptr));
+  if (_REENT_STDOUT(ptr) != &__sf[1])
+    CLEANUP_FILE (ptr, _REENT_STDOUT(ptr));
+  if (_REENT_STDERR(ptr) != &__sf[2])
+    CLEANUP_FILE (ptr, _REENT_STDERR(ptr));
 }
 
 /*
@@ -264,33 +245,19 @@ cleanup_stdio (struct _reent *ptr)
 void
 __sinit (struct _reent *s)
 {
+  (void) s;
   __sfp_lock_acquire ();
 
-  if (s->__cleanup)
+  if (_REENT_CLEANUP(s))
     {
       __sfp_lock_release ();
       return;
     }
 
   /* make sure we clean up on exit */
-  s->__cleanup = cleanup_stdio;	/* conservative */
-
-#ifdef _REENT_SMALL
-# ifndef _REENT_GLOBAL_STDIO_STREAMS
-  s->_stdin = __sfp(s);
-  s->_stdout = __sfp(s);
-  s->_stderr = __sfp(s);
-# endif /* _REENT_GLOBAL_STDIO_STREAMS */
-#endif
+  _REENT_CLEANUP(s) = cleanup_stdio;	/* conservative */
 
   global_stdio_init ();
-
-#ifndef _REENT_GLOBAL_STDIO_STREAMS
-  stdin_init (s->_stdin);
-  stdout_init (s->_stdout);
-  stderr_init (s->_stderr);
-#endif /* _REENT_GLOBAL_STDIO_STREAMS */
-
   __sfp_lock_release ();
 }
 
@@ -320,28 +287,14 @@ __fp_unlock (struct _reent * ptr __unused, FILE * fp)
 void
 __fp_lock_all (void)
 {
-#ifndef _REENT_GLOBAL_STDIO_STREAMS
-  struct _reent *ptr;
-#endif
-
   __sfp_lock_acquire ();
-
-#ifndef _REENT_GLOBAL_STDIO_STREAMS
-  ptr = _REENT;
-  (void) _fwalk_sglue (ptr, __fp_lock, &ptr->__sglue);
-#endif
+  (void) _fwalk_sglue (NULL, __fp_lock, &__sglue);
 }
 
 void
 __fp_unlock_all (void)
 {
-#ifndef _REENT_GLOBAL_STDIO_STREAMS
-  struct _reent *ptr;
-
-  ptr = _REENT;
-  (void) _fwalk_sglue (ptr, __fp_unlock, &ptr->__sglue);
-#endif
-
+  (void) _fwalk_sglue (NULL, __fp_unlock, &__sglue);
   __sfp_lock_release ();
 }
 #endif

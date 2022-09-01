@@ -163,7 +163,7 @@ iconv (iconv_t cd,
        || (ic->handlers != &_iconv_null_conversion_handlers
            && ic->handlers != &_iconv_ucs_conversion_handlers))
     {
-      errno = EBADF;
+      _REENT_ERRNO (rptr) = EBADF;
       return (size_t)-1;
     }
 
@@ -209,19 +209,19 @@ iconv (iconv_t cd,
            ic->handlers->set_state (ic->data, &state_save, 1);
         }
        
-      errno = E2BIG;
+      _REENT_ERRNO (rptr) = E2BIG;
       return (size_t)-1;
     }
   
   if (*inbytesleft == 0)
     {
-      errno = EINVAL;
+      _REENT_ERRNO (rptr) = EINVAL;
       return (size_t)-1;
     }
    
   if (*outbytesleft == 0 || *outbuf == NULL)
     {
-      errno = E2BIG;
+      _REENT_ERRNO (rptr) = E2BIG;
       return (size_t)-1;
     }
 
@@ -245,7 +245,7 @@ iconv_close (iconv_t cd)
        || (ic->handlers != &_iconv_null_conversion_handlers
            && ic->handlers != &_iconv_ucs_conversion_handlers))
     {
-      errno = EBADF;
+      _REENT_ERRNO (rptr) = EBADF;
       return -1;
     }
 

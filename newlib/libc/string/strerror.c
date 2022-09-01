@@ -899,7 +899,7 @@ _strerror_r (
 #endif
     default:
       if (!errptr)
-        errptr = &__errno_r(ptr);
+        errptr = &_REENT_ERRNO(ptr);
       if ((error = _user_strerror (errnum, internal, errptr)) == 0)
         error = "";
       break;

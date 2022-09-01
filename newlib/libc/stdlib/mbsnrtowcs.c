@@ -61,8 +61,6 @@ PORTABILITY
 #include <stdio.h>
 #include <errno.h>
 
-#ifndef _REENT_ONLY
-
 size_t
 mbsnrtowcs (
 	wchar_t *dst,
@@ -119,12 +117,10 @@ mbsnrtowcs (
       else
 	{
 	  ps->__count = 0;
-	  __errno_r(r) = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return (size_t)-1;
 	}
     }
 
   return (size_t)max;
 }
-
-#endif /* !_REENT_ONLY */

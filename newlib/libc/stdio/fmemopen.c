@@ -151,7 +151,7 @@ fmemwriter (struct _reent *ptr,
     memcpy (c->buf + c->pos - n, buf, n - adjust);
   else
     {
-      __errno_r(ptr) = ENOSPC;
+      _REENT_ERRNO(ptr) = ENOSPC;
       return EOF;
     }
   return n;
@@ -179,18 +179,18 @@ fmemseeker (struct _reent *ptr,
     offset += c->eof;
   if (offset < 0)
     {
-      __errno_r(ptr) = EINVAL;
+      _REENT_ERRNO(ptr) = EINVAL;
       offset = -1;
     }
   else if (offset > (off_t) c->max)
     {
-      __errno_r(ptr) = ENOSPC;
+      _REENT_ERRNO(ptr) = ENOSPC;
       offset = -1;
     }
 #ifdef __LARGE64_FILES
   else if ((_fpos_t) offset != offset)
     {
-      __errno_r(ptr) = EOVERFLOW;
+      _REENT_ERRNO(ptr) = EOVERFLOW;
       offset = -1;
     }
 #endif /* __LARGE64_FILES */
@@ -229,12 +229,12 @@ fmemseeker64 (struct _reent *ptr,
     offset += c->eof;
   if (offset < 0)
     {
-      __errno_r(ptr) = EINVAL;
+      _REENT_ERRNO(ptr) = EINVAL;
       offset = -1;
     }
   else if (offset > (_off64_t) c->max)
     {
-      __errno_r(ptr) = ENOSPC;
+      _REENT_ERRNO(ptr) = ENOSPC;
       offset = -1;
     }
   else
@@ -283,7 +283,7 @@ _fmemopen_r (struct _reent *ptr,
     return NULL;
   if (!size || !(buf || flags & __SRW))
     {
-      __errno_r(ptr) = EINVAL;
+      _REENT_ERRNO(ptr) = EINVAL;
       return NULL;
     }
   if ((fp = __sfp (ptr)) == NULL)

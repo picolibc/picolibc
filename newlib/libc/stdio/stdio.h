@@ -36,14 +36,182 @@
 #include <stddef.h>
 
 #include <stdarg.h>
+#include <reent.h>
+
+#ifndef __machine_flock_t_defined
+#include <sys/lock.h>
+typedef _LOCK_RECURSIVE_T _flock_t;
+#endif
 
 /*
- * <sys/reent.h> defines __FILE, _fpos_t.
- * They must be defined there because struct _reent needs them (and we don't
- * want reent.h to include this file.
+ * Stdio buffers.
  */
 
-#include <sys/reent.h>
+struct __sbuf {
+	unsigned char *_base;
+	int	_size;
+};
+
+/*
+ * Stdio state variables.
+ *
+ * The following always hold:
+ *
+ *	if (_flags&(__SLBF|__SWR)) == (__SLBF|__SWR),
+ *		_lbfsize is -_bf._size, else _lbfsize is 0
+ *	if _flags&__SRD, _w is 0
+ *	if _flags&__SWR, _r is 0
+ *
+ * This ensures that the getc and putc macros (or inline functions) never
+ * try to write or read from a file that is in `read' or `write' mode.
+ * (Moreover, they can, and do, automatically switch from read mode to
+ * write mode, and back, on "r+" and "w+" files.)
+ *
+ * _lbfsize is used only to make the inline line-buffered output stream
+ * code as compact as possible.
+ *
+ * _ub, _up, and _ur are used when ungetc() pushes back more characters
+ * than fit in the current _bf, or when ungetc() pushes back a character
+ * that does not match the previous one in _bf.  When this happens,
+ * _ub._base becomes non-nil (i.e., a stream has ungetc() data iff
+ * _ub._base!=NULL) and _up and _ur save the current values of _p and _r.
+ */
+
+#define _REENT_SMALL_CHECK_INIT(ptr) /* nothing */
+
+struct __sFILE {
+  unsigned char *_p;	/* current position in (some) buffer */
+  int	_r;		/* read space left for getc() */
+  int	_w;		/* write space left for putc() */
+  short	_flags;		/* flags, below; this FILE is free if 0 */
+  short	_file;		/* fileno, if Unix descriptor, else -1 */
+  struct __sbuf _bf;	/* the buffer (at least 1 byte, if !NULL) */
+  int	_lbfsize;	/* 0 or -_bf._size, for inline putc */
+
+#ifdef _REENT_SMALL
+  struct _reent *_data;
+#endif
+
+  /* operations */
+  void *	_cookie;	/* cookie passed to io functions */
+
+  _READ_WRITE_RETURN_TYPE (*_read) (struct _reent *, void *,
+					   char *, _READ_WRITE_BUFSIZE_TYPE);
+  _READ_WRITE_RETURN_TYPE (*_write) (struct _reent *, void *,
+					    const char *,
+					    _READ_WRITE_BUFSIZE_TYPE);
+  _fpos_t (*_seek) (struct _reent *, void *, _fpos_t, int);
+  int (*_close) (struct _reent *, void *);
+
+  /* separate buffer for long sequences of ungetc() */
+  struct __sbuf _ub;	/* ungetc buffer */
+  unsigned char *_up;	/* saved _p when _p is doing ungetc data */
+  int	_ur;		/* saved _r when _r is counting ungetc data */
+
+  /* tricks to meet minimum requirements even when malloc() fails */
+  unsigned char _ubuf[3];	/* guarantee an ungetc() buffer */
+  unsigned char _nbuf[1];	/* guarantee a getc() buffer */
+
+  /* separate buffer for fgetline() when line crosses buffer boundary */
+  struct __sbuf _lb;	/* buffer for fgetline() */
+
+  /* Unix stdio files get aligned to block boundaries on fseek() */
+  int	_blksize;	/* stat.st_blksize (may be != _bf._size) */
+  _off_t _offset;	/* current lseek offset */
+
+#ifndef _REENT_SMALL
+  struct _reent *_data;	/* Here for binary compatibility? Remove? */
+#endif
+
+#ifndef __SINGLE_THREAD__
+  _flock_t _lock;	/* for thread-safety locking */
+#endif
+  _mbstate_t _mbstate;	/* for wide char stdio functions. */
+  int   _flags2;        /* for future use */
+};
+
+#ifdef __CUSTOM_FILE_IO__
+
+/* Get custom _FILE definition.  */
+#include <sys/custom_file.h>
+
+#else /* !__CUSTOM_FILE_IO__ */
+#ifdef __LARGE64_FILES
+struct __sFILE64 {
+  unsigned char *_p;	/* current position in (some) buffer */
+  int	_r;		/* read space left for getc() */
+  int	_w;		/* write space left for putc() */
+  short	_flags;		/* flags, below; this FILE is free if 0 */
+  short	_file;		/* fileno, if Unix descriptor, else -1 */
+  struct __sbuf _bf;	/* the buffer (at least 1 byte, if !NULL) */
+  int	_lbfsize;	/* 0 or -_bf._size, for inline putc */
+
+  struct _reent *_data;
+
+  /* operations */
+  void *	_cookie;	/* cookie passed to io functions */
+
+  _READ_WRITE_RETURN_TYPE (*_read) (struct _reent *, void *,
+					   char *, _READ_WRITE_BUFSIZE_TYPE);
+  _READ_WRITE_RETURN_TYPE (*_write) (struct _reent *, void *,
+					    const char *,
+					    _READ_WRITE_BUFSIZE_TYPE);
+  _fpos_t (*_seek) (struct _reent *, void *, _fpos_t, int);
+  int (*_close) (struct _reent *, void *);
+
+  /* separate buffer for long sequences of ungetc() */
+  struct __sbuf _ub;	/* ungetc buffer */
+  unsigned char *_up;	/* saved _p when _p is doing ungetc data */
+  int	_ur;		/* saved _r when _r is counting ungetc data */
+
+  /* tricks to meet minimum requirements even when malloc() fails */
+  unsigned char _ubuf[3];	/* guarantee an ungetc() buffer */
+  unsigned char _nbuf[1];	/* guarantee a getc() buffer */
+
+  /* separate buffer for fgetline() when line crosses buffer boundary */
+  struct __sbuf _lb;	/* buffer for fgetline() */
+
+  /* Unix stdio files get aligned to block boundaries on fseek() */
+  int	_blksize;	/* stat.st_blksize (may be != _bf._size) */
+  int   _flags2;        /* for future use */
+
+  _off64_t _offset;     /* current lseek offset */
+  _fpos64_t (*_seek64) (struct _reent *, void *, _fpos64_t, int);
+
+#ifndef __SINGLE_THREAD__
+  _flock_t _lock;	/* for thread-safety locking */
+#endif
+  _mbstate_t _mbstate;	/* for wide char stdio functions. */
+};
+typedef struct __sFILE64 __FILE;
+#else
+typedef struct __sFILE   __FILE;
+#endif /* __LARGE64_FILES */
+#endif /* !__CUSTOM_FILE_IO__ */
+
+extern __FILE __sf[3];
+
+extern _Thread_local __FILE *_tls_stdin;
+#define _REENT_STDIN(_ptr) (_tls_stdin)
+extern _Thread_local __FILE *_tls_stdout;
+#define _REENT_STDOUT(_ptr) (_tls_stdout)
+extern _Thread_local __FILE *_tls_stderr;
+#define _REENT_STDERR(_ptr) (_tls_stderr)
+
+extern void (*__stdio_exit_handler) (void);
+
+struct _glue
+{
+  struct _glue *_next;
+  int _niobs;
+  __FILE *_iobs;
+};
+
+extern struct _glue __sglue;
+
+extern int _fwalk_sglue (struct _reent *, int (*)(struct _reent *, __FILE *),
+			 struct _glue *);
+
 #include <sys/_types.h>
 
 _BEGIN_STD_C
@@ -53,14 +221,10 @@ typedef __FILE FILE;
 # define __FILE_defined
 #endif
 
-#ifdef __CYGWIN__
-typedef _fpos64_t fpos_t;
-#else
 typedef _fpos_t fpos_t;
 #ifdef __LARGE64_FILES
 typedef _fpos64_t fpos64_t;
 #endif
-#endif /* !__CYGWIN__ */
 
 #ifndef _OFF_T_DECLARED
 typedef __off_t off_t;
@@ -153,13 +317,13 @@ typedef _ssize_t ssize_t;
 
 #define	TMP_MAX		26
 
-#define	stdin	(_REENT->_stdin)
-#define	stdout	(_REENT->_stdout)
-#define	stderr	(_REENT->_stderr)
+#define	stdin	_REENT_STDIN(_REENT)
+#define	stdout	_REENT_STDOUT(_REENT)
+#define	stderr	_REENT_STDERR(_REENT)
 
-#define _stdin_r(x)	((x)->_stdin)
-#define _stdout_r(x)	((x)->_stdout)
-#define _stderr_r(x)	((x)->_stderr)
+#define _stdin_r(x)	_REENT_STDIN(x)
+#define _stdout_r(x)	_REENT_STDOUT(x)
+#define _stderr_r(x)	_REENT_STDERR(x)
 
 /*
  * Functions defined in ANSI C standard.

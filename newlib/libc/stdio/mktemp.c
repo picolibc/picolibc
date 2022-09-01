@@ -161,7 +161,7 @@ _gettemp (struct _reent *ptr,
     continue;
   if (trv - path < (ptrdiff_t) suffixlen)
     {
-      __errno_r(ptr) = EINVAL;
+      _REENT_ERRNO(ptr) = EINVAL;
       return 0;
     }
   trv -= suffixlen;
@@ -173,7 +173,7 @@ _gettemp (struct _reent *ptr,
     }
   if (end - trv < 6)
     {
-      __errno_r(ptr) = EINVAL;
+      _REENT_ERRNO(ptr) = EINVAL;
       return 0;
     }
 
@@ -197,7 +197,7 @@ _gettemp (struct _reent *ptr,
 	    return (0);
 	  if (!(sbuf.st_mode & S_IFDIR))
 	    {
-	      __errno_r(ptr) = ENOTDIR;
+	      _REENT_ERRNO(ptr) = ENOTDIR;
 	      return (0);
 	    }
 	  *trv = '/';
@@ -213,10 +213,10 @@ _gettemp (struct _reent *ptr,
 #ifdef HAVE_MKDIR
 	  if (_mkdir_r (ptr, path, 0700) == 0)
 	    return 1;
-	  if (__errno_r(ptr) != EEXIST)
+	  if (_REENT_ERRNO(ptr) != EEXIST)
 	    return 0;
 #else /* !HAVE_MKDIR */
-	  __errno_r(ptr) = ENOSYS;
+	  _REENT_ERRNO(ptr) = ENOSYS;
 	  return 0;
 #endif /* !HAVE_MKDIR */
 	}
@@ -227,7 +227,7 @@ _gettemp (struct _reent *ptr,
 	  if ((*doopen = open (path, O_CREAT | O_EXCL | O_RDWR | flags,
 				  0600)) >= 0)
 	    return 1;
-	  if (__errno_r(ptr) != EEXIST)
+	  if (_REENT_ERRNO(ptr) != EEXIST)
 	    return 0;
 	}
 #ifdef __USE_INTERNAL_STAT64
@@ -235,7 +235,7 @@ _gettemp (struct _reent *ptr,
 #else
       else if (stat (path, &sbuf))
 #endif
-	return (__errno_r(ptr) == ENOENT ? 1 : 0);
+	return (_REENT_ERRNO(ptr) == ENOENT ? 1 : 0);
 
       /* tricky little algorithm for backward compatibility */
       for (trv = start;;)

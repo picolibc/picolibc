@@ -175,7 +175,7 @@ _iconv_nls_conv (
        || (ic->handlers != &_iconv_null_conversion_handlers
            && ic->handlers != &_iconv_ucs_conversion_handlers))
     {
-      errno = EBADF;
+      _REENT_ERRNO (rptr) = EBADF;
       return (size_t)-1;
     }
   
@@ -187,7 +187,7 @@ _iconv_nls_conv (
   
   if (outbytesleft == NULL || *outbytesleft == 0)
     {
-      errno = E2BIG;
+      _REENT_ERRNO (rptr) = E2BIG;
       return (size_t)-1;
     }
 

@@ -58,6 +58,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <stdio.h>
 #include <string.h>
 #include "local.h"
+#include <errno.h>
 
 #define WRITE_STR(str) \
 { \
@@ -91,7 +92,7 @@ _perror_r (struct _reent *ptr,
       WRITE_STR (": ");
     }
 
-  if ((error = _strerror_r (__errno_r(ptr), 1, &dummy)) != NULL)
+  if ((error = _strerror_r (_REENT_ERRNO(ptr), 1, &dummy)) != NULL)
     WRITE_STR (error);
 
 #ifdef __SCLE

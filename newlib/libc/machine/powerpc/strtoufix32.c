@@ -27,7 +27,7 @@ SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
  * Ignores `locale' stuff.
  */
 __uint32_t
-_strtoufix32_r (struct _reent *rptr,
+_strtoufix32 (
 	const char *nptr,
 	char **endptr)
 {
@@ -35,17 +35,17 @@ _strtoufix32_r (struct _reent *rptr,
   int exp, negexp;
   __uint32_t tmp, tmp2, result = 0;
 
-  dbl.d = _strtod_r (rptr, nptr, endptr);
+  dbl.d = strtod (nptr, endptr);
 
   /* treat NAN as domain error, +/- infinity as saturation */
   if (!finite(dbl.d))
     {
       if (isnan (dbl.d))
 	{
-	  __errno_r(rptr) = EDOM;
+	  _REENT_ERRNO(rptr) = EDOM;
 	  return 0;
 	}
-      __errno_r(rptr) = ERANGE;
+      _REENT_ERRNO(rptr) = ERANGE;
       if (word0(dbl) & Sign_bit)
 	return 0;
       return ULONG_MAX;
@@ -54,12 +54,12 @@ _strtoufix32_r (struct _reent *rptr,
   /* check for normal saturation */
   if (dbl.d >= 1.0)
     {
-      __errno_r(rptr) = ERANGE;
+      _REENT_ERRNO(rptr) = ERANGE;
       return ULONG_MAX;
     }
   else if (dbl.d < 0)
     {
-      __errno_r(rptr) = ERANGE;
+      _REENT_ERRNO(rptr) = ERANGE;
       return 0;
     }
 
@@ -91,23 +91,12 @@ _strtoufix32_r (struct _reent *rptr,
       /* if rounding causes carry, then saturation has occurred */
       if (result < tmp)
 	{
-	  __errno_r(rptr) = ERANGE;
+	  _REENT_ERRNO(rptr) = ERANGE;
 	  return ULONG_MAX;
 	}
     }
 
   return result;
 }
-
-#ifndef _REENT_ONLY
-
-__uint32_t
-strtoufix32 (const char *s,
-	char **ptr)
-{
-  return _strtoufix32_r (_REENT, s, ptr);
-}
-
-#endif
 
 #endif /* __SPE__ */

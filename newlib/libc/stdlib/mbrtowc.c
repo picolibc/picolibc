@@ -34,7 +34,7 @@ mbrtowc (wchar_t *__restrict pwc,
   if (retval == -1)
     {
       ps->__count = 0;
-      __errno_r(reent) = EILSEQ;
+      _REENT_ERRNO(reent) = EILSEQ;
       return (size_t)(-1);
     }
   else

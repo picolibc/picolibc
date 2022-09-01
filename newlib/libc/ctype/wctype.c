@@ -127,7 +127,7 @@ wctype (const char *c)
     }
 
   /* otherwise invalid */
-  __errno_r(r) = EINVAL;
+  _REENT_ERRNO(r) = EINVAL;
   return 0;
 }
 #endif /* !_REENT_ONLY */

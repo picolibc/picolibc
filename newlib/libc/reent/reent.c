@@ -35,40 +35,19 @@ DESCRIPTION
 #endif
 #endif
 
-
-#ifndef TINY_STDIO
-#ifndef _REENT_GLOBAL_STDIO_STREAMS
-/* Interim cleanup code */
-
-static void
-cleanup_glue (struct _reent *ptr,
-     struct _glue *glue)
-{
-  /* Have to reclaim these in reverse order: */
-  if (glue->_next)
-    cleanup_glue (ptr, glue->_next);
-
-  free (glue);
-}
-#endif
-#endif
-
 void
 _reclaim_reent (struct _reent *ptr)
 {
+#ifndef _REENT_THREAD_LOCAL
   if (ptr != _impure_ptr)
+#endif
     {
 #ifndef TINY_STDIO
-      if (ptr->__cleanup)
+      if (_REENT_CLEANUP(ptr))
 	{
 	  /* cleanup won't reclaim memory 'coz usually it's run
 	     before the program exits, and who wants to wait for that? */
-	  ptr->__cleanup (ptr);
-
-#ifndef _REENT_GLOBAL_STDIO_STREAMS
-	  if (ptr->__sglue._next)
-	    cleanup_glue (ptr, ptr->__sglue._next);
-#endif
+	  _REENT_CLEANUP(ptr) (ptr);
 	}
 #endif
       /* Malloc memory not reclaimed; no good way to return memory anyway. */

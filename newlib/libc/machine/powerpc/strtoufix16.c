@@ -105,7 +105,7 @@ PORTABILITY
  * Ignores `locale' stuff.
  */
 __uint16_t
-_strtoufix16_r (struct _reent *rptr,
+_strtoufix16 (
 	const char *nptr,
 	char **endptr)
 {
@@ -113,17 +113,17 @@ _strtoufix16_r (struct _reent *rptr,
   unsigned long tmp, tmp2, result;
   int exp, negexp;
 
-  dbl.d = _strtod_r (rptr, nptr, endptr);
+  dbl.d = strtod (nptr, endptr);
 
   /* treat NAN as domain error, +/- infinity as saturation */
   if (!finite(dbl.d))
     {
       if (isnan (dbl.d))
 	{
-	  __errno_r(rptr) = EDOM;
+	  _REENT_ERRNO(rptr) = EDOM;
 	  return 0;
 	}
-      __errno_r(rptr) = ERANGE;
+      _REENT_ERRNO(rptr) = ERANGE;
       if (word0(dbl) & Sign_bit)
 	return 0;
       return USHRT_MAX;
@@ -132,12 +132,12 @@ _strtoufix16_r (struct _reent *rptr,
   /* check for normal saturation */
   if (dbl.d >= 1.0)
     {
-      __errno_r(rptr) = ERANGE;
+      _REENT_ERRNO(rptr) = ERANGE;
       return USHRT_MAX;
     }
   else if (dbl.d < 0)
     {
-      __errno_r(rptr) = ERANGE;
+      _REENT_ERRNO(rptr) = ERANGE;
       return 0;
     }
 
@@ -161,7 +161,7 @@ _strtoufix16_r (struct _reent *rptr,
       if (negexp == 0)
 	{
 	  /* we have overflow which means saturation */
-	  __errno_r(rptr) = ERANGE;
+	  _REENT_ERRNO(rptr) = ERANGE;
 	  return USHRT_MAX;
 	}
       result |= (1 << (16 - negexp));
@@ -169,16 +169,5 @@ _strtoufix16_r (struct _reent *rptr,
 
   return (__uint16_t)result;
 }
-
-#ifndef _REENT_ONLY
-
-__uint16_t
-strtoufix16 (const char *s,
-	char **ptr)
-{
-  return _strtoufix16_r (_REENT, s, ptr);
-}
-
-#endif
 
 #endif /* __SPE__ */

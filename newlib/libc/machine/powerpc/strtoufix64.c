@@ -27,7 +27,7 @@ SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
  * Ignores `locale' stuff.
  */
 __uint64_t
-_strtoufix64_r (struct _reent *rptr,
+_strtoufix64 (
 	const char *nptr,
 	char **endptr)
 {
@@ -45,10 +45,10 @@ _strtoufix64_r (struct _reent *rptr,
     {
       if (ld_type == 1)
 	{
-	  __errno_r(rptr) = EDOM;
+	  _REENT_ERRNO(rptr) = EDOM;
 	  return 0;
 	}
-      __errno_r(rptr) = ERANGE;
+      _REENT_ERRNO(rptr) = ERANGE;
       if (word0(ldbl) & Sign_bit)
 	return 0;
       return ULONG_LONG_MAX;
@@ -74,14 +74,14 @@ _strtoufix64_r (struct _reent *rptr,
   /* check for saturation */
   if (sign)
     {
-      __errno_r(rptr) = ERANGE;
+      _REENT_ERRNO(rptr) = ERANGE;
       return 0;
     }
   else
     {
       if (exp > 0 || (exp == 0 && tmp >= 0x8000000000000000LL))
 	{
-	  __errno_r(rptr) = ERANGE;
+	  _REENT_ERRNO(rptr) = ERANGE;
 	  return ULONG_LONG_MAX;
 	}
     }
@@ -103,7 +103,7 @@ _strtoufix64_r (struct _reent *rptr,
 	  /* if rounding causes carry, then saturation has occurred */
 	  if (result < tmp)
 	    {
-	      __errno_r(rptr) = ERANGE;
+	      _REENT_ERRNO(rptr) = ERANGE;
 	      return ULONG_LONG_MAX;
 	    }
 	}
@@ -113,16 +113,5 @@ _strtoufix64_r (struct _reent *rptr,
 
   return result;
 }
-
-#ifndef _REENT_ONLY
-
-__uint64_t
-strtoufix64 (const char *s,
-	char **ptr)
-{
-  return _strtoufix64_r (_REENT, s, ptr);
-}
-
-#endif
 
 #endif /* __SPE__ */

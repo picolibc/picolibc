@@ -17,7 +17,7 @@ int _dummy_getreent;
 struct _reent *
 __getreent (void)
 {
-  return _impure_ptr;
+  return _REENT;
 }
 
 #endif

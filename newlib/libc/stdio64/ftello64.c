@@ -93,7 +93,7 @@ _ftello64_r (struct _reent *ptr,
 
   if (fp->_seek64 == NULL)
     {
-      __errno_r(ptr) = ESPIPE;
+      _REENT_ERRNO(ptr) = ESPIPE;
       _newlib_flockfile_exit(fp);
       return (_off64_t) -1;
     }

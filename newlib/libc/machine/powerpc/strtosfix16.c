@@ -106,7 +106,7 @@ PORTABILITY
  * Ignores `locale' stuff.
  */
 __int16_t
-_strtosfix16_r (struct _reent *rptr,
+_strtosfix16 (
 	const char *nptr,
 	char **endptr)
 {
@@ -115,17 +115,17 @@ _strtosfix16_r (struct _reent *rptr,
   int exp, negexp, sign;
   __int16_t result;
 
-  dbl.d = _strtod_r (rptr, nptr, endptr);
+  dbl.d = strtod (nptr, endptr);
 
   /* treat NAN as domain error, +/- infinity as saturation */
   if (!finite(dbl.d))
     {
       if (isnan (dbl.d))
 	{
-	  __errno_r(rptr) = EDOM;
+	  _REENT_ERRNO(rptr) = EDOM;
 	  return 0;
 	}
-      __errno_r(rptr) = ERANGE;
+      _REENT_ERRNO(rptr) = ERANGE;
       if (word0(dbl) & Sign_bit)
 	return SHRT_MIN;
       return SHRT_MAX;
@@ -134,12 +134,12 @@ _strtosfix16_r (struct _reent *rptr,
   /* check for normal saturation */
   if (dbl.d >= 1.0)
     {
-      __errno_r(rptr) = ERANGE;
+      _REENT_ERRNO(rptr) = ERANGE;
       return SHRT_MAX;
     }
   else if (dbl.d < -1.0)
     {
-      __errno_r(rptr) = ERANGE;
+      _REENT_ERRNO(rptr) = ERANGE;
       return SHRT_MIN;
     }
 
@@ -166,7 +166,7 @@ _strtosfix16_r (struct _reent *rptr,
       /* check if positive saturation has occurred because of rounding */
       if (!sign && result < 0)
 	{
-	  __errno_r(rptr) = ERANGE;
+	  _REENT_ERRNO(rptr) = ERANGE;
 	  return SHRT_MAX;
 	}
     }
@@ -178,16 +178,5 @@ _strtosfix16_r (struct _reent *rptr,
 
   return  sign ? -result : result;
 }
-
-#ifndef _REENT_ONLY
-
-__int16_t
-strtosfix16 (const char *s,
-	char **ptr)
-{
-  return _strtosfix16_r (_REENT, s, ptr);
-}
-
-#endif
 
 #endif /* __SPE__ */

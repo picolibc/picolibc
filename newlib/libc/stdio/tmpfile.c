@@ -82,15 +82,15 @@ _tmpfile_r (struct _reent *ptr)
       fd = open (f, O_RDWR | O_CREAT | O_EXCL | O_BINARY,
 		    S_IRUSR | S_IWUSR);
     }
-  while (fd < 0 && __errno_r(ptr) == EEXIST);
+  while (fd < 0 && _REENT_ERRNO(ptr) == EEXIST);
   if (fd < 0)
     return NULL;
   fp = _fdopen_r (ptr, fd, "wb+");
-  e = __errno_r(ptr);
+  e = _REENT_ERRNO(ptr);
   if (!fp)
     close (fd);
   (void) remove (f);
-  __errno_r(ptr) = e;
+  _REENT_ERRNO(ptr) = e;
   return fp;
 }
 

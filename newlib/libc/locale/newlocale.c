@@ -220,7 +220,8 @@ newlocale (int category_mask, const char *locale,
 	if (tmp_locale.lc_cat[i].buf == (const void *) -1)
 	  {
 	    tmp_locale.lc_cat[i].buf = base->lc_cat[i].buf;
-	    base->lc_cat[i].ptr = base->lc_cat[i].buf = NULL;
+	    if (base != __get_C_locale ())
+	      base->lc_cat[i].ptr = base->lc_cat[i].buf = NULL;
 	  }
 #endif /* __HAVE_LOCALE_INFO__ */
       freelocale (base);

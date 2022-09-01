@@ -65,6 +65,7 @@ int
 _putchar_unlocked_r (struct _reent *ptr,
        int c)
 {
+  (void) ptr;
   return putc_unlocked (c, _stdout_r (ptr));
 }
 

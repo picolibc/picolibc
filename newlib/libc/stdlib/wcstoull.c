@@ -151,7 +151,7 @@ wcstoull_l (const wchar_t *nptr, wchar_t **endptr,
 	register int neg = 0, any, cutlim;
 
 	if(base < 0  ||  base == 1  ||  base > 36)  {
-		__errno_r(rptr) = EINVAL;
+		_REENT_ERRNO(rptr) = EINVAL;
 		return(0ULL);
 	}
 	/*
@@ -196,7 +196,7 @@ wcstoull_l (const wchar_t *nptr, wchar_t **endptr,
 	}
 	if (any < 0) {
 		acc = ULLONG_MAX;
-		__errno_r(rptr) = ERANGE;
+		_REENT_ERRNO(rptr) = ERANGE;
 	} else if (neg)
 		acc = -acc;
 	if (endptr != 0)

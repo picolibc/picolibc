@@ -201,7 +201,7 @@ __ssputs_r (struct _reent *ptr,
 	  str = (unsigned char *)malloc (newsize);
 	  if (!str)
 	    {
-	      errno = ENOMEM;
+	      _REENT_ERRNO(ptr) = ENOMEM;
 	      goto err;
 	    }
 	  memcpy (str, fp->_bf._base, curpos);
@@ -215,7 +215,7 @@ __ssputs_r (struct _reent *ptr,
 	      /* Free unneeded buffer.  */
 	      free (fp->_bf._base);
 	      /* Ensure correct errno, even if free changed it.  */
-	      errno = ENOMEM;
+	      _REENT_ERRNO(ptr) = ENOMEM;
 	      goto err;
 	    }
 	}
@@ -291,7 +291,7 @@ __ssprint_r (struct _reent *ptr,
 	      str = (unsigned char *)malloc (newsize);
 	      if (!str)
 		{
-		  errno = ENOMEM;
+		  _REENT_ERRNO(ptr) = ENOMEM;
 		  goto err;
 		}
 	      memcpy (str, fp->_bf._base, curpos);
@@ -306,7 +306,7 @@ __ssprint_r (struct _reent *ptr,
 		  /* Free unneeded buffer.  */
 		  free (fp->_bf._base);
 		  /* Ensure correct errno, even if free changed it.  */
-		  errno = ENOMEM;
+		  _REENT_ERRNO(ptr) = ENOMEM;
 		  goto err;
 		}
 	    }
@@ -501,7 +501,7 @@ _VFPRINTF_R (struct _reent *data,
       fp->_bf._base = fp->_p = malloc (64);
       if (!fp->_p)
 	{
-	  errno = ENOMEM;
+	  _REENT_ERRNO(data) = ENOMEM;
 	  return EOF;
 	}
       fp->_bf._size = 64;

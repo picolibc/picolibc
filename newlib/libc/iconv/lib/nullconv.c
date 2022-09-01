@@ -76,7 +76,7 @@ null_conversion_convert (
     {
       result = (size_t)-1;
       len = *outbytesleft;
-      errno = E2BIG;
+      _REENT_ERRNO (rptr) = E2BIG;
     }
   
   if ((flags & 1) == 0)

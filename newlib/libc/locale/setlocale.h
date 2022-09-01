@@ -41,7 +41,6 @@ __BEGIN_DECLS
 
 extern struct __locale_t __global_locale;
 
-#define __get_current_locale() _locale
 #define __get_global_locale() (&__global_locale)
 
 #define ENCODING_LEN 31
@@ -211,11 +210,22 @@ extern size_t _wcsnrtombs_l (char *, const wchar_t **,
 
 #ifdef __HAVE_LOCALE_INFO__
 #define NEWLIB_THREAD_LOCAL_LOCALE NEWLIB_THREAD_LOCAL
-#else
-#define NEWLIB_THREAD_LOCAL_LOCALE
+extern NEWLIB_THREAD_LOCAL_LOCALE struct __locale_t *_locale;
 #endif
 
-extern NEWLIB_THREAD_LOCAL_LOCALE struct __locale_t *_locale;
+/* In POSIX terms the current locale is the locale used by all functions
+   using locale info without providing a locale as parameter (*_l functions).
+   The current locale is either the locale of the current thread, if the
+   thread called uselocale, or the global locale if not. */
+_ELIDABLE_INLINE struct __locale_t *
+__get_current_locale (void)
+{
+#ifdef __HAVE_LOCALE_INFO__
+  return _locale ?: __get_global_locale ();
+#else
+  return __get_global_locale();
+#endif
+}
 
 /* Only access fixed "C" locale using this function.  Fake for !_MB_CAPABLE
    targets by returning ptr to globale locale. */
@@ -393,7 +403,7 @@ __current_locale_charset (void)
 #ifdef __HAVE_LOCALE_INFO__
   return __get_current_ctype_locale ()->codeset;
 #else
-  return _locale->ctype_codeset;
+  return __get_current_locale()->ctype_codeset;
 #endif
 }
 
@@ -407,14 +417,14 @@ __locale_msgcharset (void)
   return (char *) __get_current_ctype_locale ()->codeset;
 #endif
 #else
-  return (char *) _locale->message_codeset;
+  return (char *) __get_current_locale()->message_codeset;
 #endif
 }
 
 _ELIDABLE_INLINE int
 __locale_cjk_lang (void)
 {
-  return _locale->cjk_lang;
+  return __get_current_locale()->cjk_lang;
 }
 
 int __ctype_load_locale (struct __locale_t *, const char *, void *,

@@ -31,7 +31,7 @@ __ascii_wctomb (
   if ((size_t)wchar >= 0x100)
 #endif
     {
-      __errno_r(r) = EILSEQ;
+      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
 
@@ -129,7 +129,7 @@ __utf8_wctomb (
       return 4;
     }
 
-  __errno_r(r) = EILSEQ;
+  _REENT_ERRNO(r) = EILSEQ;
   return -1;
 }
 
@@ -162,7 +162,7 @@ __sjis_wctomb (
 	}
       else
 	{
-	  __errno_r(r) = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
@@ -202,7 +202,7 @@ __eucjp_wctomb (
 	}
       else
 	{
-	  __errno_r(r) = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
@@ -242,7 +242,7 @@ __jis_wctomb (
 	  *s = (char)char2;
 	  return cnt + 2;
 	}
-      __errno_r(r) = EILSEQ;
+      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
   if (state->__state != 0)
@@ -282,14 +282,14 @@ ___iso_wctomb (char *s, wchar_t _wchar, int iso_idx,
 		*s = (char) (mb + 0xa0);
 		return 1;
 	      }
-	  __errno_r(r) = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
  
   if ((size_t)wchar >= 0x100)
     {
-      __errno_r(r) = EILSEQ;
+      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
 
@@ -438,14 +438,14 @@ ___cp_wctomb (char *s, wchar_t _wchar, int cp_idx,
 		*s = (char) (mb + 0x80);
 		return 1;
 	      }
-	  __errno_r(r) = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
 
   if ((size_t)wchar >= 0x100)
     {
-      __errno_r(r) = EILSEQ;
+      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
 

@@ -107,7 +107,7 @@ memwriter (struct _reent *ptr,
      big that user cannot do ftello.  */
   if (sizeof (OFF_T) == sizeof (size_t) && (ssize_t) (c->pos + n) < 0)
     {
-      __errno_r(ptr) = EFBIG;
+      _REENT_ERRNO(ptr) = EFBIG;
       return EOF;
     }
   /* Grow the buffer, if necessary.  Choose a geometric growth factor
@@ -163,18 +163,18 @@ memseeker (struct _reent *ptr,
     offset += c->eof;
   if (offset < 0)
     {
-      __errno_r(ptr) = EINVAL;
+      _REENT_ERRNO(ptr) = EINVAL;
       offset = -1;
     }
   else if ((OFF_T) (size_t) offset != offset)
     {
-      __errno_r(ptr) = ENOSPC;
+      _REENT_ERRNO(ptr) = ENOSPC;
       offset = -1;
     }
 #ifdef __LARGE64_FILES
   else if ((_fpos_t) offset != offset)
     {
-      __errno_r(ptr) = EOVERFLOW;
+      _REENT_ERRNO(ptr) = EOVERFLOW;
       offset = -1;
     }
 #endif /* __LARGE64_FILES */
@@ -231,12 +231,12 @@ memseeker64 (struct _reent *ptr,
     offset += c->eof;
   if (offset < 0)
     {
-      __errno_r(ptr) = EINVAL;
+      _REENT_ERRNO(ptr) = EINVAL;
       offset = -1;
     }
   else if ((_off64_t) (size_t) offset != offset)
     {
-      __errno_r(ptr) = ENOSPC;
+      _REENT_ERRNO(ptr) = ENOSPC;
       offset = -1;
     }
   else
@@ -306,7 +306,7 @@ internal_open_memstream_r (struct _reent *ptr,
 
   if (!buf || !size)
     {
-      __errno_r(ptr) = EINVAL;
+      _REENT_ERRNO(ptr) = EINVAL;
       return NULL;
     }
   if ((fp = __sfp (ptr)) == NULL)
