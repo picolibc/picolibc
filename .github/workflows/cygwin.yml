@@ -101,7 +101,7 @@ jobs:
         (cd winsup; ./autogen.sh) &&
         cd build &&
         ../configure --prefix=$(realpath $(pwd)/../install) -v &&
-        export MAKEFLAGS=-j$(ncores) &&
+        export MAKEFLAGS=-j$(nproc) &&
         make &&
         make install &&
         (cd */newlib; make info man) &&
