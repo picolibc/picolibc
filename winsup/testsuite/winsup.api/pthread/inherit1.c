@@ -50,6 +50,23 @@ void * func(void * arg)
   return (void *) (size_t)param.sched_priority;
 }
 
+// Windows only supports 7 thread priority levels, which we map onto the 32
+// required by POSIX.  The exact mapping also depends on the overall process
+// priority class. So only a subset of values will be returned exactly by
+// pthread_getschedparam() after pthread_setschedparam().
+int doable_pri(int pri)
+{
+  switch (GetPriorityClass(GetCurrentProcess()))
+    {
+    case BELOW_NORMAL_PRIORITY_CLASS:
+      return (pri == 2) || (pri ==  8) || (pri == 10) || (pri == 12) || (pri == 14) || (pri == 16) || (pri == 30);
+    case NORMAL_PRIORITY_CLASS:
+      return (pri == 2) || (pri == 12) || (pri == 14) || (pri == 16) || (pri == 18) || (pri == 20) || (pri == 30);
+    }
+
+  return TRUE;
+}
+
 int
 main()
 {
@@ -81,7 +98,9 @@ main()
       assert(pthread_setschedparam(mainThread, SCHED_FIFO, &mainParam) == 0);
       assert(pthread_getschedparam(mainThread, &policy, &mainParam) == 0);
       assert(policy == SCHED_FIFO);
-      assert(mainParam.sched_priority == prio);
+
+      if (doable_pri(prio))
+        assert(mainParam.sched_priority == prio);
 
       for (param.sched_priority = prio;
            param.sched_priority <= maxPrio;
