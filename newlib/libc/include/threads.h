@@ -48,7 +48,7 @@ enum {
 };
 
 #if !defined(__cplusplus) || __cplusplus < 201103L
-#define	thread_local		_Thread_local
+#define	thread_local		NEWLIB_THREAD_LOCAL
 #endif
 
 __BEGIN_DECLS

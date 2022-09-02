@@ -191,11 +191,11 @@ typedef struct __sFILE   __FILE;
 
 extern __FILE __sf[3];
 
-extern _Thread_local __FILE *_tls_stdin;
+extern NEWLIB_THREAD_LOCAL __FILE *_tls_stdin;
 #define _REENT_STDIN(_ptr) (_tls_stdin)
-extern _Thread_local __FILE *_tls_stdout;
+extern NEWLIB_THREAD_LOCAL __FILE *_tls_stdout;
 #define _REENT_STDOUT(_ptr) (_tls_stdout)
-extern _Thread_local __FILE *_tls_stderr;
+extern NEWLIB_THREAD_LOCAL __FILE *_tls_stderr;
 #define _REENT_STDERR(_ptr) (_tls_stderr)
 
 extern void (*__stdio_exit_handler) (void);

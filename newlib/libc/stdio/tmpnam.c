@@ -100,8 +100,8 @@ The global pointer <<environ>> is also required.
 #include <unistd.h>
 
 #ifdef _REENT_THREAD_LOCAL
-_Thread_local int _tls_inc;
-_Thread_local char _tls_emergency;
+NEWLIB_THREAD_LOCAL int _tls_inc;
+NEWLIB_THREAD_LOCAL char _tls_emergency;
 #endif
 
 /* Try to open the file specified, if it can't be opened then try

@@ -315,8 +315,6 @@
 #endif
 #endif
 
-#define	_Thread_local		NEWLIB_THREAD_LOCAL
-
 #endif /* __STDC_VERSION__ || __STDC_VERSION__ < 201112L */
 
 /*
