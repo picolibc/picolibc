@@ -40,7 +40,11 @@
 void  _ATTRIBUTE((__noreturn__))
 _exit(int code)
 {
-	printf("%cexit %d\n", 0xe9, code);
+        char buf[15];
+        int n;
+        /* Can't use printf because stdout has already been cleaned up */
+        n = snprintf(buf, sizeof(buf), "%cexit %d\n", 0xe9, code);
+        write(1, buf, n);
 	while(1)
 		__asm__("hlt");
 }
