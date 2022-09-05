@@ -185,7 +185,7 @@ public: /* Do NOT remove this public: line, it's a marker for gentls_offsets. */
      If you prepend cygtls members here, make sure context stays 16 byte
      aligned. The gentls_offsets script checks for that now and fails
      if the alignment is wrong. */
-  ucontext_t __attribute__((__aligned__(__alignof__(long double)))) context;
+  ucontext_t context;
   DWORD thread_id;
   siginfo_t infodata;
   struct pthread *tid;
