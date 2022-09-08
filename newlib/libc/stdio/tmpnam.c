@@ -99,10 +99,7 @@ The global pointer <<environ>> is also required.
 #include <errno.h>
 #include <unistd.h>
 
-#ifdef _REENT_THREAD_LOCAL
-NEWLIB_THREAD_LOCAL int _tls_inc;
-NEWLIB_THREAD_LOCAL char _tls_emergency;
-#endif
+static NEWLIB_THREAD_LOCAL int _tls_inc;
 
 /* Try to open the file specified, if it can't be opened then try
    another one.  Return nonzero if successful, otherwise zero.  */
@@ -160,9 +157,9 @@ _tmpnam_r (struct _reent *p,
     }
   pid = getpid ();
 
-  if (worker (p, result, P_tmpdir, "t", pid, &_REENT_INC(p)))
+  if (worker (p, result, P_tmpdir, "t", pid, &_tls_inc))
     {
-      _REENT_INC(p)++;
+      _tls_inc++;
       return result;
     }
 
@@ -187,7 +184,7 @@ _tempnam_r (struct _reent *p,
   if (filename)
     {
       if (! worker (p, filename, dir, prefix,
-		    getpid () ^ (int) (_POINTER_INT) p, &_REENT_INC(p)))
+		    getpid () ^ (int) (_POINTER_INT) p, &_tls_inc))
 	return NULL;
     }
   return filename;
