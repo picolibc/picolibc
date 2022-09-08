@@ -33,8 +33,6 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 srcs_reent = [
-    'getreent.c',
-    'impure.c',
     'reent.c',
 ]
 
