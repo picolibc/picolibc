@@ -34,7 +34,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
  */
 
 int
-__swbuf_r (struct _reent *ptr,
+_swbuf (
        register int c,
        register FILE *fp)
 {
@@ -72,14 +72,14 @@ __swbuf_r (struct _reent *ptr,
   n = fp->_p - fp->_bf._base;
   if (n >= fp->_bf._size)
     {
-      if (_fflush_r (ptr, fp))
+      if (fflush ( fp))
 	return EOF;
       n = 0;
     }
   fp->_w--;
   *fp->_p++ = c;
   if (++n == fp->_bf._size || (fp->_flags & __SLBF && c == '\n'))
-    if (_fflush_r (ptr, fp))
+    if (fflush ( fp))
       return EOF;
   return c;
 }
@@ -91,5 +91,5 @@ int
 __swbuf (register int c,
        register FILE *fp)
 {
-  return __swbuf_r (_REENT, c, fp);
+  return _swbuf ( c, fp);
 }

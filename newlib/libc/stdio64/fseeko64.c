@@ -86,12 +86,12 @@ Supporting OS subroutines required: <<close>>, <<fstat64>>, <<isatty>>,
  */
 
 _off64_t
-_fseeko64_r (struct _reent *ptr,
+fseeko64 (
      register FILE *fp,
      _off64_t offset,
      int whence)
 {
-  _fpos64_t (*seekfn) (struct _reent *, void *, _fpos64_t, int);
+  _fpos64_t (*seekfn) (void *, _fpos64_t, int);
   _fpos64_t curoff;
 #if _FSEEK_OPTIMIZATION
   _fpos64_t target;
@@ -108,7 +108,7 @@ _fseeko64_r (struct _reent *ptr,
 	  _REENT_ERRNO(ptr) = EOVERFLOW;
 	  return EOF;
 	}
-      return (_off64_t) _fseeko_r (ptr, fp, offset, whence);
+      return (_off64_t) fseeko (fp, offset, whence);
     }
 
   /* Make sure stdio is set up.  */
@@ -125,7 +125,7 @@ _fseeko64_r (struct _reent *ptr,
   if (fp->_flags & __SAPP && fp->_flags & __SWR)
     {
       /* So flush the buffer and seek to the end.  */
-      _fflush_r (ptr, fp);
+      fflush (fp);
     }
 
   /* Have to be able to seek.  */
@@ -150,12 +150,12 @@ _fseeko64_r (struct _reent *ptr,
        * we have to first find the current stream offset a la
        * ftell (see ftell for details).
        */
-      _fflush_r (ptr, fp);   /* may adjust seek offset on append stream */
+      fflush (fp);   /* may adjust seek offset on append stream */
       if (fp->_flags & __SOFF)
 	curoff = fp->_offset;
       else
 	{
-	  curoff = seekfn (ptr, fp->_cookie, (_fpos64_t) 0, SEEK_CUR);
+	  curoff = seekfn (fp->_cookie, (_fpos64_t) 0, SEEK_CUR);
 	  if (curoff == -1L)
 	    {
 	      _newlib_flockfile_exit(fp);
@@ -198,7 +198,7 @@ _fseeko64_r (struct _reent *ptr,
    */
 
   if (fp->_bf._base == NULL)
-    __smakebuf_r (ptr, fp);
+    _smakebuf (fp);
 
 #if _FSEEK_OPTIMIZATION
   if (fp->_flags & (__SWR | __SRW | __SNBF | __SNPT))
@@ -326,8 +326,8 @@ _fseeko64_r (struct _reent *ptr,
 dumb:
 #endif
 
-  if (_fflush_r (ptr, fp)
-      || seekfn (ptr, fp->_cookie, offset, whence) == POS_ERR)
+  if (fflush (fp)
+      || seekfn (fp->_cookie, offset, whence) == POS_ERR)
     {
       _newlib_flockfile_exit(fp);
       return EOF;
@@ -342,17 +342,5 @@ dumb:
   _newlib_flockfile_end (fp);
   return 0;
 }
-
-#ifndef _REENT_ONLY
-
-_off64_t
-fseeko64 (register FILE *fp,
-     _off64_t offset,
-     int whence)
-{
-  return _fseeko64_r (_REENT, fp, offset, whence);
-}
-
-#endif /* !_REENT_ONLY */
 
 #endif /* __LARGE64_FILES */

@@ -23,7 +23,7 @@
 #include <stdarg.h>
 
 int
-_fwprintf_r (struct _reent *ptr,
+fwprintf (
        FILE *fp,
        const wchar_t *fmt, ...)
 {
@@ -31,24 +31,7 @@ _fwprintf_r (struct _reent *ptr,
   va_list ap;
 
   va_start (ap, fmt);
-  ret = _vfwprintf_r (ptr, fp, fmt, ap);
+  ret = vfwprintf ( fp, fmt, ap);
   va_end (ap);
   return ret;
 }
-
-#ifndef _REENT_ONLY
-
-int
-fwprintf (FILE *__restrict fp,
-       const wchar_t *__restrict fmt, ...)
-{
-  int ret;
-  va_list ap;
-
-  va_start (ap, fmt);
-  ret = _vfwprintf_r (_REENT, fp, fmt, ap);
-  va_end (ap);
-  return ret;
-}
-
-#endif /* ! _REENT_ONLY */

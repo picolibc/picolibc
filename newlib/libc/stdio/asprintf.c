@@ -25,39 +25,6 @@
 #include "local.h"
 
 int
-_asprintf_r (struct _reent *ptr,
-       char **__restrict strp,
-       const char *__restrict fmt, ...)
-{
-  int ret;
-  va_list ap;
-  FILE f;
-
-  /* mark a zero-length reallocatable buffer */
-  f._flags = __SWR | __SSTR | __SMBF;
-  f._bf._base = f._p = NULL;
-  f._bf._size = f._w = 0;
-  f._file = -1;  /* No file. */
-  va_start (ap, fmt);
-  ret = _svfprintf_r (ptr, &f, fmt, ap);
-  va_end (ap);
-  if (ret >= 0)
-    {
-      *f._p = 0;
-      *strp = (char *) f._bf._base;
-    }
-  return (ret);
-}
-
-#ifdef _NANO_FORMATTED_IO
-int
-_asiprintf_r (struct _reent *, char **, const char *, ...)
-       _ATTRIBUTE ((__alias__("_asprintf_r")));
-#endif
-
-#ifndef _REENT_ONLY
-
-int
 asprintf (char **__restrict strp,
        const char *__restrict fmt, ...)
 {
@@ -71,7 +38,7 @@ asprintf (char **__restrict strp,
   f._bf._size = f._w = 0;
   f._file = -1;  /* No file. */
   va_start (ap, fmt);
-  ret = _svfprintf_r (_REENT, &f, fmt, ap);
+  ret = svfprintf ( &f, fmt, ap);
   va_end (ap);
   if (ret >= 0)
     {
@@ -86,4 +53,3 @@ int
 asiprintf (char **, const char *, ...)
        _ATTRIBUTE ((__alias__("asprintf")));
 #endif
-#endif /* ! _REENT_ONLY */

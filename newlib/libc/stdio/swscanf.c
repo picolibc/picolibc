@@ -41,10 +41,10 @@ SYNOPSIS
         int swscanf(const wchar_t *__restrict <[str]>, 
                     const wchar_t *__restrict <[format]>, ...);
 
-        int _wscanf_r(struct _reent *<[ptr]>, const wchar_t *<[format]>, ...);
-        int _fwscanf_r(struct _reent *<[ptr]>, FILE *<[fd]>, 
+        int wscanf( const wchar_t *<[format]>, ...);
+        int fwscanf( FILE *<[fd]>, 
                       const wchar_t *<[format]>, ...);
-        int _swscanf_r(struct _reent *<[ptr]>, const wchar_t *<[str]>,
+        int swscanf( const wchar_t *<[str]>,
                       const wchar_t *<[format]>, ...);
 
 DESCRIPTION
@@ -412,8 +412,6 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <stdarg.h>
 #include "local.h"
 
-#ifndef _REENT_ONLY 
-
 int 
 swscanf (const wchar_t *__restrict str, const wchar_t *__restrict fmt, ...)
 {
@@ -431,29 +429,7 @@ swscanf (const wchar_t *__restrict str, const wchar_t *__restrict fmt, ...)
   f._ur = 0;
   f._file = -1;  /* No file. */
   va_start (ap, fmt);
-  ret = __ssvfwscanf_r (_REENT, &f, fmt, ap);
-  va_end (ap);
-  return ret;
-}
-
-#endif /* !_REENT_ONLY */
-
-int 
-_swscanf_r (struct _reent *ptr, const wchar_t *str, const wchar_t *fmt, ...)
-{
-  int ret;
-  va_list ap;
-  FILE f;
-
-  f._flags = __SRD | __SSTR;
-  f._bf._base = f._p = (unsigned char *) str;
-  f._bf._size = f._r = wcslen (str) * sizeof (wchar_t);
-  f._read = __seofread;
-  f._ub._base = NULL;
-  f._lb._base = NULL;
-  f._file = -1;  /* No file. */
-  va_start (ap, fmt);
-  ret = __ssvfwscanf_r (ptr, &f, fmt, ap);
+  ret = _ssvfwscanf ( &f, fmt, ap);
   va_end (ap);
   return ret;
 }

@@ -46,11 +46,11 @@
 
 /* Decode and print non-floating point data.  */
 int
-_printf_common (struct _reent *data,
+_printf_common (
 		struct _prt_data_t *pdata,
 		int *realsz,
 		FILE *fp,
-		int (*pfunc)(struct _reent *, FILE *,
+		int (*pfunc)(FILE *,
 			     const char *, size_t len))
 {
   int n;
@@ -105,8 +105,8 @@ error:
   return -1;
 }
 int
-_printf_i (struct _reent *data, struct _prt_data_t *pdata, FILE *fp,
-	   int (*pfunc)(struct _reent *, FILE *, const char *, size_t len),
+_printf_i (struct _prt_data_t *pdata, FILE *fp,
+	   int (*pfunc)(FILE *, const char *, size_t len),
 	   va_list *ap)
 {
   /* Field size expanded by dprec.  */
@@ -153,6 +153,7 @@ _printf_i (struct _reent *data, struct _prt_data_t *pdata, FILE *fp,
       pdata->flags |= HEXPREFIX;
       if (sizeof (void*) > sizeof (int))
 	pdata->flags |= LONGINT;
+      FALLTHROUGH;
       /* NOSTRICT.  */
     case 'x':
       pdata->l_buf[2] = 'x';
@@ -207,6 +208,7 @@ number:
 	*GET_ARG (N, *ap, short_ptr_t) = pdata->ret;
       else
 	*GET_ARG (N, *ap, int_ptr_t) = pdata->ret;
+      FALLTHROUGH;
     case '\0':
       pdata->size = 0;
       break;
@@ -216,6 +218,8 @@ number:
 	 string, and take prec == -1 into consideration.
 	 Use normal Newlib approach here to support case where cp is not
 	 nul-terminated.  */
+      if (cp == NULL)
+          cp = "(null)";
       char *p = memchr (cp, 0, pdata->prec);
 
       if (p != NULL)
@@ -234,7 +238,7 @@ non_number_nosign:
     }
 
     /* Output.  */
-    n = _printf_common (data, pdata, &realsz, fp, pfunc);
+    n = _printf_common (pdata, &realsz, fp, pfunc);
     if (n == -1)
       goto error;
 

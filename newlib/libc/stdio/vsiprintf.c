@@ -28,20 +28,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 #include "local.h"
 
-#ifndef _REENT_ONLY
-
-int
-vsiprintf (char *str,
-       const char *fmt,
-       va_list ap)
-{
-  return _vsiprintf_r (_REENT, str, fmt, ap);
-}
-
-#endif /* !_REENT_ONLY */
-
-int
-_vsiprintf_r (struct _reent *ptr,
+vsiprintf (
        char *str,
        const char *fmt,
        va_list ap)
@@ -53,7 +40,7 @@ _vsiprintf_r (struct _reent *ptr,
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = INT_MAX;
   f._file = -1;  /* No file. */
-  ret = _svfiprintf_r (ptr, &f, fmt, ap);
+  ret = svfiprintf ( &f, fmt, ap);
   *f._p = 0;
   return ret;
 }

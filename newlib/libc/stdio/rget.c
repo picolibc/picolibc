@@ -33,14 +33,14 @@ static char sccsid[] = "%W% (Berkeley) %G%";
  */
 
 int
-__srget_r (struct _reent *ptr,
+_srget (
        register FILE *fp)
 {
   /* Ensure that any fake std stream is resolved before
      we call __srefill_r so we may access the true read buffer. */
   CHECK_INIT(ptr, fp);
 
-  if (__srefill_r (ptr, fp) == 0)
+  if (_srefill ( fp) == 0)
     {
       fp->_r--;
       return *fp->_p++;
@@ -54,5 +54,5 @@ __srget_r (struct _reent *ptr,
 int
 __srget (register FILE *fp)
 {
-  return __srget_r (_REENT, fp);
+  return _srget ( fp);
 }

@@ -57,8 +57,8 @@
 #define _newlib_flockfile_start(x) {}
 #define _newlib_flockfile_exit(x) {}
 #define _newlib_flockfile_end(x) {}
-#define _ungetc_r _sungetc_r
-#define __srefill_r __ssrefill_r
+#define ungetc sungetc
+#define _srefill _ssrefill
 #endif
 
 #ifdef FLOATING_POINT
@@ -155,23 +155,23 @@ struct _scan_data_t
   int code;             /* Current conversion specifier.  */
   char buf[BUF];        /* Internal buffer for scan.  */
   /* Internal buffer for scan.  */
-  int (*pfn_ungetc)(struct _reent*, int, FILE*);
+  int (*pfn_ungetc)(int, FILE*);
   /* Internal buffer for scan.  */
-  int (*pfn_refill)(struct _reent*, FILE*);
+  int (*pfn_refill)(FILE*);
 };
 
 extern int
-_scanf_chars (struct _reent *rptr,
+_scanf_chars (
 	      struct _scan_data_t *pdata,
 	      FILE *fp, va_list *ap);
 extern int
-_scanf_i (struct _reent *rptr,
+_scanf_i (
 	  struct _scan_data_t *pdata,
 	  FILE *fp, va_list *ap);
 /* Make _scanf_float weak symbol, so it won't be linked in if target program
    does not need it.  */
 extern int
-_scanf_float (struct _reent *rptr,
+_scanf_float (
 	      struct _scan_data_t *pdata,
 	      FILE *fp, va_list *ap) _ATTRIBUTE((__weak__));
 

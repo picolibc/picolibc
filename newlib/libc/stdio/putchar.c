@@ -28,7 +28,7 @@ SYNOPSIS
 	#include <stdio.h>
 	int putchar(int <[ch]>);
 
-	int _putchar_r(struct _reent *<[reent]>, int <[ch]>);
+	int putchar( int <[ch]>);
 
 DESCRIPTION
 <<putchar>> is a macro, defined in <<stdio.h>>.  <<putchar>>
@@ -67,22 +67,9 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #undef putchar
 
 int
-_putchar_r (struct _reent *ptr,
+putchar (
        int c)
 {
   _REENT_SMALL_CHECK_INIT (ptr);
-  return _putc_r (ptr, c, _stdout_r (ptr));
+  return putc ( c, stdout );
 }
-
-#ifndef _REENT_ONLY
-
-int
-putchar (int c)
-{
-  struct _reent *reent = _REENT;
-
-  _REENT_SMALL_CHECK_INIT (reent);
-  return _putc_r (reent, c, _stdout_r (reent));
-}
-
-#endif

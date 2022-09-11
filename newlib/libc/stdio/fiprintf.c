@@ -22,7 +22,7 @@
 #include <stdarg.h>
 
 int
-_fiprintf_r (struct _reent *ptr,
+fiprintf (
        FILE * fp,
        const char *fmt, ...)
 {
@@ -30,24 +30,7 @@ _fiprintf_r (struct _reent *ptr,
   va_list ap;
 
   va_start (ap, fmt);
-  ret = _vfiprintf_r (ptr, fp, fmt, ap);
+  ret = vfiprintf ( fp, fmt, ap);
   va_end (ap);
   return ret;
 }
-
-#ifndef _REENT_ONLY
-
-int
-fiprintf (FILE * fp,
-       const char *fmt, ...)
-{
-  int ret;
-  va_list ap;
-
-  va_start (ap, fmt);
-  ret = _vfiprintf_r (_REENT, fp, fmt, ap);
-  va_end (ap);
-  return ret;
-}
-
-#endif /* ! _REENT_ONLY */

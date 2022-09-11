@@ -30,7 +30,7 @@
 _off64_t lseek64(int fd, _off64_t offset, int whence);
 
 fpos64_t
-__sseek64 (struct _reent *ptr,
+__sseek64 (
        void *cookie,
        _fpos64_t offset,
        int whence)
@@ -38,7 +38,6 @@ __sseek64 (struct _reent *ptr,
   register FILE *fp = (FILE *) cookie;
   register _off64_t ret;
 
-  (void) ptr;
   ret = lseek64 (fp->_file, (_off64_t) offset, whence);
   if (ret == (_fpos64_t)-1L)
     fp->_flags &= ~__SOFF;
@@ -51,7 +50,7 @@ __sseek64 (struct _reent *ptr,
 }
 
 _READ_WRITE_RETURN_TYPE
-__swrite64 (struct _reent *ptr,
+__swrite64 (
        void *cookie,
        char const *buf,
        _READ_WRITE_BUFSIZE_TYPE n)
@@ -62,7 +61,6 @@ __swrite64 (struct _reent *ptr,
   int oldmode=0;
 #endif
 
-  (void) ptr;
   if (fp->_flags & __SAPP)
     (void) lseek64 (fp->_file, (_off64_t)0, SEEK_END);
   fp->_flags &= ~__SOFF;	/* in case O_APPEND mode is set */

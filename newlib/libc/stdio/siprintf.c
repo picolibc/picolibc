@@ -56,16 +56,16 @@ SYNOPSIS
         char *asniprintf(char *<[str]>, size_t *<[size]>, 
 			const char *<[format]>, ...);
 
-        int _iprintf_r(struct _reent *<[ptr]>, const char *<[format]>, ...);
-        int _fiprintf_r(struct _reent *<[ptr]>, FILE *<[fd]>,
+        int iprintf( const char *<[format]>, ...);
+        int fiprintf( FILE *<[fd]>,
                         const char *<[format]>, ...);
-        int _siprintf_r(struct _reent *<[ptr]>, char *<[str]>,
+        int siprintf( char *<[str]>,
                         const char *<[format]>, ...);
-        int _sniprintf_r(struct _reent *<[ptr]>, char *<[str]>, size_t <[size]>,
+        int sniprintf( char *<[str]>, size_t <[size]>,
                          const char *<[format]>, ...);
-        int _asiprintf_r(struct _reent *<[ptr]>, char **<[strp]>,
+        int asiprintf( char **<[strp]>,
                          const char *<[format]>, ...);
-        char *_asniprintf_r(struct _reent *<[ptr]>, char *<[str]>,
+        char *asniprintf( char *<[str]>,
                             size_t *<[size]>, const char *<[format]>, ...);
 
 DESCRIPTION
@@ -99,7 +99,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include "local.h"
 
 int
-_siprintf_r (struct _reent *ptr,
+siprintf (
        char *str,
        const char *fmt, ...)
 {
@@ -112,31 +112,8 @@ _siprintf_r (struct _reent *ptr,
   f._bf._size = f._w = INT_MAX;
   f._file = -1;  /* No file. */
   va_start (ap, fmt);
-  ret = _svfiprintf_r (ptr, &f, fmt, ap);
+  ret = svfiprintf ( &f, fmt, ap);
   va_end (ap);
   *f._p = 0;
   return (ret);
 }
-
-#ifndef _REENT_ONLY
-
-int
-siprintf (char *str,
-       const char *fmt, ...)
-{
-  int ret;
-  va_list ap;
-  FILE f;
-
-  f._flags = __SWR | __SSTR;
-  f._bf._base = f._p = (unsigned char *) str;
-  f._bf._size = f._w = INT_MAX;
-  f._file = -1;  /* No file. */
-  va_start (ap, fmt);
-  ret = _svfiprintf_r (_REENT, &f, fmt, ap);
-  va_end (ap);
-  *f._p = 0;
-  return (ret);
-}
-
-#endif

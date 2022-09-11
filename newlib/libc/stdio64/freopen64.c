@@ -76,7 +76,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #ifdef __LARGE64_FILES
 
 FILE *
-_freopen64_r (struct _reent *ptr,
+freopen64 (
 	const char *file,
 	const char *mode,
 	register FILE *fp)
@@ -98,14 +98,14 @@ _freopen64_r (struct _reent *ptr,
   if (!(oflags2 & __SNLK))
     _flockfile (fp);
 
-  if ((flags = __sflags (ptr, mode, &oflags)) == 0)
+  if ((flags = __sflags (mode, &oflags)) == 0)
     {
       if (!(oflags2 & __SNLK))
 	_funlockfile (fp);
 #ifdef _STDIO_WITH_THREAD_CANCELLATION_SUPPORT
       pthread_setcancelstate (__oldcancel, &__oldcancel);
 #endif
-      _fclose_r (ptr, fp);
+      fclose (fp);
       return NULL;
     }
 
@@ -122,13 +122,13 @@ _freopen64_r (struct _reent *ptr,
   else
     {
       if (fp->_flags & __SWR)
-	_fflush_r (ptr, fp);
+	fflush (fp);
       /*
        * If close is NULL, closing is a no-op, hence pointless.
        * If file is NULL, the file should not be closed.
        */
       if (fp->_close != NULL && file != NULL)
-	fp->_close (ptr, fp->_cookie);
+	fp->_close (fp->_cookie);
     }
 
   /*
@@ -174,7 +174,7 @@ _freopen64_r (struct _reent *ptr,
 	{
 	  e = EBADF;
 	  if (fp->_close != NULL)
-	    fp->_close (ptr, fp->_cookie);
+	    fp->_close (fp->_cookie);
 	}
     }
 
@@ -243,17 +243,5 @@ _freopen64_r (struct _reent *ptr,
 #endif
   return fp;
 }
-
-#ifndef _REENT_ONLY
-
-FILE *
-freopen64 (const char *file,
-	const char *mode,
-	register FILE *fp)
-{
-  return _freopen64_r (_REENT, file, mode, fp);
-}
-
-#endif /* !_REENT_ONLY */
 
 #endif /* __LARGE64_FILES */

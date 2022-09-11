@@ -71,17 +71,17 @@ SYNOPSIS
 	char *vasnprintf(char *<[str]>, size_t *<[size]>, const char *<[fmt]>,
                          va_list <[list]>);
 
-	int _vprintf_r(struct _reent *<[reent]>, const char *<[fmt]>,
+	int vprintf( const char *<[fmt]>,
                         va_list <[list]>);
-	int _vfprintf_r(struct _reent *<[reent]>, FILE *<[fp]>,
+	int vfprintf( FILE *<[fp]>,
                         const char *<[fmt]>, va_list <[list]>);
-	int _vsprintf_r(struct _reent *<[reent]>, char *<[str]>,
+	int vsprintf( char *<[str]>,
                         const char *<[fmt]>, va_list <[list]>);
-	int _vasprintf_r(struct _reent *<[reent]>, char **<[str]>,
+	int vasprintf( char **<[str]>,
                          const char *<[fmt]>, va_list <[list]>);
-	int _vsnprintf_r(struct _reent *<[reent]>, char *<[str]>,
+	int vsnprintf( char *<[str]>,
                          size_t <[size]>, const char *<[fmt]>, va_list <[list]>);
-	char *_vasnprintf_r(struct _reent *<[reent]>, char *<[str]>,
+	char *vasnprintf( char *<[str]>,
                             size_t *<[size]>, const char *<[fmt]>, va_list <[list]>);
 
 DESCRIPTION
@@ -122,18 +122,16 @@ static char *rcsid = "$Id$";
 #include <newlib.h>
 
 #ifdef INTEGER_ONLY
-# define VFPRINTF vfiprintf
 # ifdef STRING_ONLY
-#   define _VFPRINTF_R _svfiprintf_r
+#   define VFPRINTF svfiprintf
 # else
-#   define _VFPRINTF_R _vfiprintf_r
+#   define VFPRINTF vfiprintf
 # endif
 #else
-# define VFPRINTF vfprintf
 # ifdef STRING_ONLY
-#   define _VFPRINTF_R _svfprintf_r
+#   define VFPRINTF svfprintf
 # else
-#   define _VFPRINTF_R _vfprintf_r
+#   define VFPRINTF vfprintf
 # endif
 # ifndef NO_FLOATING_POINT
 #  define FLOATING_POINT
@@ -176,15 +174,15 @@ static char *rcsid = "$Id$";
 
 #ifdef STRING_ONLY
 # ifdef _FVWRITE_IN_STREAMIO
-#  define __SPRINT __ssprint_r
+#  define __SPRINT _ssprint
 # else
-#  define __SPRINT __ssputs_r
+#  define __SPRINT _ssputs
 # endif
 #else
 # ifdef _FVWRITE_IN_STREAMIO
-#  define __SPRINT __sprint_r
+#  define __SPRINT _sprint
 # else
-#  define __SPRINT __sfputs_r
+#  define __SPRINT _sfputs
 # endif
 #endif
 
@@ -195,14 +193,13 @@ static char *rcsid = "$Id$";
 #ifdef INTEGER_ONLY
 #ifndef _FVWRITE_IN_STREAMIO
 int
-__ssputs_r (struct _reent *ptr,
+_ssputs (
        FILE *fp,
        const char *buf,
        size_t len)
 {
 	register int w;
 
-        (void) ptr;
 	w = fp->_w;
 	if (len >= (size_t) w && fp->_flags & (__SMBF | __SOPT)) {
 		/* must be asprintf family */
@@ -264,7 +261,7 @@ err:
 #endif
 
 int
-__ssprint_r (struct _reent *ptr,
+_ssprint (
        FILE *fp,
        register struct __suio *uio)
 {
@@ -273,7 +270,6 @@ __ssprint_r (struct _reent *ptr,
 	register struct __siov *iov;
 	register const char *p = NULL;
 
-        (void) ptr;
 	iov = uio->uio_iov;
 	len = 0;
 
@@ -356,9 +352,9 @@ err:
 }
 #else /* !INTEGER_ONLY */
 #ifndef _FVWRITE_IN_STREAMIO
-int __ssputs_r (struct _reent *, FILE *, const char *, size_t);
+int _ssputs ( FILE *, const char *, size_t);
 #endif
-int __ssprint_r (struct _reent *, FILE *, register struct __suio *);
+int _ssprint ( FILE *, register struct __suio *);
 #endif /* !INTEGER_ONLY */
 
 #else /* !STRING_ONLY */
@@ -366,7 +362,7 @@ int __ssprint_r (struct _reent *, FILE *, register struct __suio *);
 
 #ifndef _FVWRITE_IN_STREAMIO
 int
-__sfputs_r (struct _reent *ptr,
+_sfputs (
        FILE *fp,
        const char *buf,
        size_t len)
@@ -379,7 +375,7 @@ __sfputs_r (struct _reent *ptr,
 
 		p = (wchar_t *) buf;
 		for (i = 0; i < (len / sizeof (wchar_t)); i++) {
-			if (_fputwc_r (ptr, p[i], fp) == WEOF)
+			if (fputwc ( p[i], fp) == WEOF)
 				return -1;
 		}
 	} else {
@@ -387,7 +383,7 @@ __sfputs_r (struct _reent *ptr,
 	{
 #endif
                 for (i = 0; (size_t) i < len; i++) {
-			if (_fputc_r (ptr, buf[i], fp) == EOF)
+			if (fputc ( buf[i], fp) == EOF)
 				return -1;
 		}
 	}
@@ -399,7 +395,7 @@ __sfputs_r (struct _reent *ptr,
  * then reset it so that it can be reused.
  */
 int
-__sprint_r (struct _reent *ptr,
+_sprint (
        FILE *fp,
        register struct __suio *uio)
 {
@@ -421,7 +417,7 @@ __sprint_r (struct _reent *ptr,
 			p = (wchar_t *) iov->iov_base;
 			len = iov->iov_len / sizeof (wchar_t);
 			for (i = 0; i < len; i++) {
-				if (_fputwc_r (ptr, p[i], fp) == WEOF) {
+				if (fputwc ( p[i], fp) == WEOF) {
 					err = -1;
 					goto out;
 				}
@@ -431,16 +427,16 @@ out:
 		;
 	} else
 #endif
-		err = __sfvwrite_r(ptr, fp, uio);
+		err = _sfvwrite( fp, uio);
 	uio->uio_resid = 0;
 	uio->uio_iovcnt = 0;
 	return (err);
 }
 #else /* !INTEGER_ONLY */
 #ifndef _FVWRITE_IN_STREAMIO
-int __sfputs_r (struct _reent *, FILE *, const char *buf, size_t);
+int _sfputs ( FILE *, const char *buf, size_t);
 #endif
-int __sprint_r (struct _reent *, FILE *, register struct __suio *);
+int _sprint ( FILE *, register struct __suio *);
 #endif /* !INTEGER_ONLY */
 
 #ifdef _UNBUF_STREAM_OPT
@@ -477,8 +473,8 @@ __sbprintf (struct _reent *rptr,
 #endif
 
 	/* do the work, then copy any error status */
-	ret = _VFPRINTF_R (rptr, &fake, fmt, ap);
-	if (ret >= 0 && _fflush_r (rptr, &fake))
+	ret = VFPRINTF (&fake, fmt, ap);
+	if (ret >= 0 && fflush ( &fake))
 		ret = EOF;
 	if (fake._flags & __SERR)
 		fp->_flags |= __SERR;
@@ -518,7 +514,7 @@ extern int _ldcheck (_LONG_DOUBLE *);
 #  define FREXP frexpl
 # endif /* !_NO_LONGDBL */
 
-static char *cvt(struct _reent *, _PRINTF_FLOAT_TYPE, int, int, char *, int *,
+static char *cvt(_PRINTF_FLOAT_TYPE, int, int, char *, int *,
                  int, int *, char *);
 
 static int exponent(char *, int, int);
@@ -630,22 +626,8 @@ get_arg (struct _reent *data, int n, char *fmt,
 # define GROUPING	0x400		/* use grouping ("'" flag) */
 #endif
 
-int _VFPRINTF_R (struct _reent *, FILE *, const char *, va_list);
-
-#ifndef STRING_ONLY
 int
-VFPRINTF (FILE * fp,
-       const char *fmt0,
-       va_list ap)
-{
-  int result;
-  result = _VFPRINTF_R (_REENT, fp, fmt0, ap);
-  return result;
-}
-#endif /* STRING_ONLY */
-
-int
-_VFPRINTF_R (struct _reent *data,
+VFPRINTF (
        FILE * fp,
        const char *fmt0,
        va_list ap)
@@ -768,7 +750,7 @@ _VFPRINTF_R (struct _reent *data,
 }
 #else
 #define PRINT(ptr, len) {		\
-	if (__SPRINT (data, fp, (ptr), (len)) == EOF) \
+	if (__SPRINT (fp, (ptr), (len)) == EOF) \
 		goto error;		\
 }
 #define	PAD(howmany, with) {		\
@@ -1304,7 +1286,7 @@ reswitch:	switch (ch) {
 
 			flags |= FPT;
 
-			cp = cvt (data, _fpvalue, prec, flags, &softsign,
+			cp = cvt (_fpvalue, prec, flags, &softsign,
 				  &expt, ch, &ndig, cp);
 			if (!cp)
 				goto error;
@@ -1376,7 +1358,7 @@ reswitch:	switch (ch) {
 		case 'm':  /* extension */
 			{
 				int dummy;
-				cp = _strerror_r (data, _REENT_ERRNO(data), 1, &dummy);
+				cp = strerror ( _REENT_ERRNO(data), 1, &dummy);
 			}
 			flags &= ~LONGINT;
 			goto string;
@@ -1791,7 +1773,7 @@ error:
    [aAeEfFgG]; if it is [aA], then the return string lives in BUF,
    otherwise the return value shares the mprec reentrant storage.  */
 static char *
-cvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
+cvt(_PRINTF_FLOAT_TYPE value, int ndigits, int flags,
     char *sign, int *decpt, int ch, int *length, char *buf)
 {
 	int mode, dsgn;
@@ -1820,7 +1802,6 @@ cvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 		*sign = '\000';
 # endif /* !_NO_LONGDBL */
 
-        (void) data;
 # ifdef _WANT_IO_C99_FORMATS
 	if (ch == 'a' || ch == 'A') {
 		/* This code assumes FLT_RADIX is a power of 2.  The initial

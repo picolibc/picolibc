@@ -36,8 +36,9 @@ DESCRIPTION
 #endif
 
 void
-_reclaim_reent (struct _reent *ptr)
+_reclaim_reent (void *ptr)
 {
+  (void) ptr;
 #ifndef _REENT_THREAD_LOCAL
   if (ptr != _impure_ptr)
 #endif
@@ -47,7 +48,7 @@ _reclaim_reent (struct _reent *ptr)
 	{
 	  /* cleanup won't reclaim memory 'coz usually it's run
 	     before the program exits, and who wants to wait for that? */
-	  _REENT_CLEANUP(ptr) (ptr);
+	  _REENT_CLEANUP(ptr) ();
 	}
 #endif
       /* Malloc memory not reclaimed; no good way to return memory anyway. */

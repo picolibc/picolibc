@@ -91,21 +91,17 @@ C99, POSIX-1.2008
 
 #ifdef INTEGER_ONLY
 #define VFWSCANF vfiwscanf
-#define _VFWSCANF_R _vfiwscanf_r
-#define __SVFWSCANF __svfiwscanf
 #ifdef STRING_ONLY
-#  define __SVFWSCANF_R __ssvfiwscanf_r
+#  define _SVFWSCANF _ssvfiwscanf
 #else
-#  define __SVFWSCANF_R __svfiwscanf_r
+#  define _SVFWSCANF _svfiwscanf
 #endif
 #else
 #define VFWSCANF vfwscanf
-#define _VFWSCANF_R _vfwscanf_r
-#define __SVFWSCANF __svfwscanf
 #ifdef STRING_ONLY
-#  define __SVFWSCANF_R __ssvfwscanf_r
+#  define _SVFWSCANF _ssvfwscanf
 #else
-#  define __SVFWSCANF_R __svfwscanf_r
+#  define _SVFWSCANF _svfwscanf
 #endif
 #ifndef NO_FLOATING_POINT
 #define FLOATING_POINT
@@ -119,9 +115,9 @@ C99, POSIX-1.2008
 #define _newlib_flockfile_start(x) {}
 #define _newlib_flockfile_exit(x) {}
 #define _newlib_flockfile_end(x) {}
-#define _ungetwc_r _sungetwc_r
-#define __srefill_r __ssrefill_r
-#define _fgetwc_r _sfgetwc_r
+#define ungetwc sungetwc
+#define _srefill _ssrefill
+#define fgetwc sfgetwc
 #endif
 
 #ifdef FLOATING_POINT
@@ -138,7 +134,6 @@ C99, POSIX-1.2008
 #define _NO_LONGDBL
 #if defined _WANT_IO_LONG_DOUBLE && (LDBL_MANT_DIG > DBL_MANT_DIG)
 #undef _NO_LONGDBL
-extern _LONG_DOUBLE _wcstold_r (wchar_t *s, wchar_t **sptr);
 #endif
 
 #include "floatio.h"
@@ -223,37 +218,14 @@ static void * get_arg (int, va_list *, int *, void **);
 
 #ifndef STRING_ONLY
 
-#ifndef _REENT_ONLY
-
 int
-VFWSCANF (register FILE *__restrict fp,
-       const wchar_t *__restrict fmt,
-       va_list ap)
-{
-  struct _reent *reent = _REENT;
-
-  CHECK_INIT(reent, fp);
-  return __SVFWSCANF_R (reent, fp, fmt, ap);
-}
-
-int
-__SVFWSCANF (register FILE *fp,
-       wchar_t const *fmt0,
-       va_list ap)
-{
-  return __SVFWSCANF_R (_REENT, fp, fmt0, ap);
-}
-
-#endif /* !_REENT_ONLY */
-
-int
-_VFWSCANF_R (struct _reent *data,
+VFWSCANF (
        register FILE *fp,
        const wchar_t *fmt,
        va_list ap)
 {
   CHECK_INIT(data, fp);
-  return __SVFWSCANF_R (data, fp, fmt, ap);
+  return _SVFWSCANF (fp, fmt, ap);
 }
 #endif /* !STRING_ONLY */
 
@@ -262,11 +234,10 @@ _VFWSCANF_R (struct _reent *data,
  * regular ungetwc which will drag in file I/O items we don't need.
  * So, we create our own trimmed-down version.  */
 static wint_t
-_sungetwc_r (struct _reent *data,
+sungetwc (
 	wint_t wc,
 	register FILE *fp)
 {
-  (void) data;
   if (wc == WEOF)
     return (WEOF);
 
@@ -285,15 +256,15 @@ _sungetwc_r (struct _reent *data,
   return wc;
 }
 
-extern int __ssrefill_r (struct _reent *ptr, register FILE * fp);
+extern int _ssrefill ( register FILE * fp);
 
 static size_t
-_sfgetwc_r (struct _reent * ptr,
+sfgetwc (
        FILE * fp)
 {
   wchar_t wc;
 
-  if (fp->_r <= 0 && __ssrefill_r (ptr, fp))
+  if (fp->_r <= 0 && _ssrefill ( fp))
     return (WEOF);
   wc = *(wchar_t *) fp->_p;
   fp->_p += sizeof (wchar_t);
@@ -303,7 +274,7 @@ _sfgetwc_r (struct _reent * ptr,
 #endif /* STRING_ONLY */
 
 int
-__SVFWSCANF_R (struct _reent *rptr,
+_SVFWSCANF (
        register FILE *fp,
        wchar_t const *fmt0,
        va_list ap)
@@ -529,10 +500,10 @@ __SVFWSCANF_R (struct _reent *rptr,
 	goto all_done;
       if (iswspace (c))
 	{
-	  while ((c = _fgetwc_r (rptr, fp)) != WEOF && iswspace(c))
+	  while ((c = fgetwc ( fp)) != WEOF && iswspace(c))
 	    ;
 	  if (c != WEOF)
-	    _ungetwc_r (rptr, c, fp);
+	    ungetwc ( c, fp);
 	  continue;
 	}
       if (c != L'%')
@@ -556,11 +527,11 @@ __SVFWSCANF_R (struct _reent *rptr,
 	{
 	case L'%':
 	literal:
-	  if ((wi = _fgetwc_r (rptr, fp)) == WEOF)
+	  if ((wi = fgetwc ( fp)) == WEOF)
 	    goto input_failure;
 	  if (wi != c)
 	    {
-	      _ungetwc_r (rptr, wi, fp);
+	      ungetwc ( wi, fp);
 	      goto input_failure;
 	    }
 	  nread++;
@@ -826,11 +797,11 @@ __SVFWSCANF_R (struct _reent *rptr,
        */
       if ((flags & NOSKIP) == 0)
 	{
-	  while ((wi = _fgetwc_r (rptr, fp)) != WEOF && iswspace (wi))
+	  while ((wi = fgetwc ( fp)) != WEOF && iswspace (wi))
 	    nread++;
 	  if (wi == WEOF)
 	    goto input_failure;
-	  _ungetwc_r (rptr, wi, fp);
+	  ungetwc ( wi, fp);
 	}
 
       /*
@@ -860,7 +831,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 	      else
 		p = GET_ARG(N, ap, wchar_t *);
 	      n = 0;
-	      while (width-- != 0 && (wi = _fgetwc_r (rptr, fp)) != WEOF)
+	      while (width-- != 0 && (wi = fgetwc ( fp)) != WEOF)
 		{
 		  if (!(flags & SUPPRESS))
 		    {
@@ -899,7 +870,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 		mbp = GET_ARG(N, ap, char *);
 	      n = 0;
 	      memset ((void *)&mbs, '\0', sizeof (mbstate_t));
-	      while (width != 0 && (wi = _fgetwc_r (rptr, fp)) != WEOF)
+	      while (width != 0 && (wi = fgetwc ( fp)) != WEOF)
 		{
 		  nconv = wcrtomb (mbp, wi, &mbs);
 		  if (nconv == (size_t) -1)
@@ -935,11 +906,11 @@ __SVFWSCANF_R (struct _reent *rptr,
 	  if ((flags & SUPPRESS) && (flags & LONG))
 	    {
 	      n = 0;
-	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
+	      while ((wi = fgetwc ( fp)) != WEOF
 		     && width-- != 0 && INCCL (wi))
 		n++;
 	      if (wi != WEOF)
-		_ungetwc_r (rptr, wi, fp);
+		ungetwc ( wi, fp);
 	      if (n == 0)
 		goto match_failure;
 	    }
@@ -954,7 +925,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 	      else
 #endif
 		p0 = p = GET_ARG(N, ap, wchar_t *);
-	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
+	      while ((wi = fgetwc ( fp)) != WEOF
 		     && width-- != 0 && INCCL (wi))
 		{
 		  *p++ = (wchar_t) wi;
@@ -963,7 +934,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 #endif
 		}
 	      if (wi != WEOF)
-		_ungetwc_r (rptr, wi, fp);
+		ungetwc ( wi, fp);
 	      n = p - p0;
 	      if (n == 0)
 		goto match_failure;
@@ -991,7 +962,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 		mbp = GET_ARG(N, ap, char *);
 	      n = 0;
 	      memset ((void *) &mbs, '\0', sizeof (mbstate_t));
-	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
+	      while ((wi = fgetwc ( fp)) != WEOF
 		     && width != 0 && INCCL (wi))
 		{
 		  nconv = wcrtomb (mbp, wi, &mbs);
@@ -1010,7 +981,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 		  n++;
 		}
 	      if (wi != WEOF)
-		_ungetwc_r (rptr, wi, fp);
+		ungetwc ( wi, fp);
 	      if (!(flags & SUPPRESS))
 		{
 		  *mbp = 0;
@@ -1029,11 +1000,11 @@ __SVFWSCANF_R (struct _reent *rptr,
             width = SIZE_MAX;
 	  if ((flags & SUPPRESS) && (flags & LONG))
 	    {
-	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
+	      while ((wi = fgetwc ( fp)) != WEOF
 		     && width-- != 0 && !iswspace (wi))
 		nread++;
 	      if (wi != WEOF)
-		_ungetwc_r (rptr, wi, fp);
+		ungetwc ( wi, fp);
 	    }
 	  else if (flags & LONG)
 	    {
@@ -1046,7 +1017,7 @@ __SVFWSCANF_R (struct _reent *rptr,
               else
 #endif
 		p0 = p = GET_ARG(N, ap, wchar_t *);
-	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
+	      while ((wi = fgetwc ( fp)) != WEOF
 		     && width-- != 0 && !iswspace (wi))
 		{
 		  *p++ = (wchar_t) wi;
@@ -1056,7 +1027,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 		  nread++;
 		}
 	      if (wi != WEOF)
-		_ungetwc_r (rptr, wi, fp);
+		ungetwc ( wi, fp);
 	      *p = L'\0';
 #ifdef _WANT_IO_POSIX_EXTENSIONS
 	      shrink_m_ptr (wchar_t, p_p, p - p0 + 1, p_siz);
@@ -1080,7 +1051,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 	      else
 		mbp = GET_ARG(N, ap, char *);
 	      memset ((void *) &mbs, '\0', sizeof (mbstate_t));
-	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
+	      while ((wi = fgetwc ( fp)) != WEOF
 		     && width != 0 && !iswspace (wi))
 		{
 		  nconv = wcrtomb(mbp, wi, &mbs);
@@ -1099,7 +1070,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 		  nread++;
 		}
 	      if (wi != WEOF)
-		_ungetwc_r (rptr, wi, fp);
+		ungetwc ( wi, fp);
 	      if (!(flags & SUPPRESS))
 		{
 		  *mbp = 0;
@@ -1119,7 +1090,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 	  flags |= SIGNOK | NDIGITS | NZDIGITS;
 	  for (p = buf; width; width--)
 	    {
-	      c = _fgetwc_r (rptr, fp);
+	      c = fgetwc ( fp);
 	      /*
 	       * Switch on the character; `goto ok' if we
 	       * accept it as a part of number.
@@ -1215,7 +1186,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 	       * for a number.  Stop accumulating digits.
 	       */
 	      if (c != WEOF)
-		_ungetwc_r (rptr, c, fp);
+		ungetwc ( c, fp);
 	      break;
 	    ok:
 	      /*
@@ -1234,14 +1205,14 @@ __SVFWSCANF_R (struct _reent *rptr,
 	  if (flags & NDIGITS)
 	    {
 	      if (p > buf)
-		_ungetwc_r (rptr, *--p, fp); /* [-+xX] */
+		ungetwc ( *--p, fp); /* [-+xX] */
 	      goto match_failure;
 	    }
 	  c = p[-1];
 	  if (c == L'x' || c == L'X')
 	    {
 	      --p;
-	      _ungetwc_r (rptr, c, fp);
+	      ungetwc ( c, fp);
 	    }
 	  if ((flags & SUPPRESS) == 0)
 	    {
@@ -1331,7 +1302,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 	  exp_adjust = 0;
 	  for (p = buf; width; )
 	    {
-	      c = _fgetwc_r (rptr, fp);
+	      c = fgetwc ( fp);
 	      /*
 	       * This code mimicks the integer conversion
 	       * code, but is much simpler.
@@ -1471,7 +1442,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 		  break;
 		}
 	      if (c != WEOF)
-		_ungetwc_r (rptr, c, fp);
+		ungetwc ( c, fp);
 	      break;
 	    fok:
 	      *p++ = c;
@@ -1496,7 +1467,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 		 guarantee that in all implementations of ungetc.  */
 	      while (p > buf)
 		{
-		  _ungetwc_r (rptr, *--p, fp); /* [-+nNaA] */
+		  ungetwc ( *--p, fp); /* [-+nNaA] */
 		  --nread;
 		}
 	      goto match_failure;
@@ -1509,14 +1480,14 @@ __SVFWSCANF_R (struct _reent *rptr,
 	      if (infcount >= 3) /* valid 'inf', but short of 'infinity' */
 		while (infcount-- > 3)
 		  {
-		    _ungetwc_r (rptr, *--p, fp); /* [iInNtT] */
+		    ungetwc ( *--p, fp); /* [iInNtT] */
 		    --nread;
 		  }
 	      else
 		{
 		  while (p > buf)
 		    {
-		      _ungetwc_r (rptr, *--p, fp); /* [-+iInN] */
+		      ungetwc ( *--p, fp); /* [-+iInN] */
 		      --nread;
 		    }
 		  goto match_failure;
@@ -1534,7 +1505,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 		  /* no digits at all */
 		  while (p > buf)
 		    {
-		      _ungetwc_r (rptr, *--p, fp); /* [-+.] */
+		      ungetwc ( *--p, fp); /* [-+.] */
 		      --nread;
 		    }
 		  goto match_failure;
@@ -1544,11 +1515,11 @@ __SVFWSCANF_R (struct _reent *rptr,
 	      --nread;
 	      if (c != L'e' && c != L'E')
 		{
-		  _ungetwc_r (rptr, c, fp); /* [-+] */
+		  ungetwc ( c, fp); /* [-+] */
 		  c = *--p;
 		  --nread;
 		}
-	      _ungetwc_r (rptr, c, fp); /* [eE] */
+	      ungetwc ( c, fp); /* [eE] */
 	    }
 	  if ((flags & SUPPRESS) == 0)
 	    {

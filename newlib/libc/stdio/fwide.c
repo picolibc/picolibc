@@ -36,7 +36,7 @@ SYNOPSIS
 	#include <wchar.h>
 	int fwide(FILE *<[fp]>, int <[mode]>);
 
-	int _fwide_r(struct _reent *<[ptr]>, FILE *<[fp]>, int <[mode]>);
+	int fwide( FILE *<[fp]>, int <[mode]>);
 
 DESCRIPTION
 When <[mode]> is zero, the <<fwide>> function determines the current
@@ -74,7 +74,7 @@ C99, POSIX.1-2001.
 #include "local.h"
 
 int
-_fwide_r (struct _reent *ptr,
+fwide (
 	FILE *fp,
 	int mode)
 {
@@ -92,11 +92,4 @@ _fwide_r (struct _reent *ptr,
     ret = (fp->_flags2 & __SWID) ? 1 : -1;
   _newlib_flockfile_end (fp);
   return ret;
-}
-
-int
-fwide (FILE *fp,
-	int mode)
-{
-  return _fwide_r (_REENT, fp, mode);
 }

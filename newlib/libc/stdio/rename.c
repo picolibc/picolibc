@@ -57,7 +57,7 @@ int
 rename (const char *old,
        const char *new)
 {
-  return _rename_r (_REENT, old, new);
+  return rename ( old, new);
 }
 
 #endif

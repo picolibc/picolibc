@@ -41,11 +41,11 @@ SYNOPSIS
 	int vfiscanf(FILE *<[fp]>, const char *<[fmt]>, va_list <[list]>);
 	int vsiscanf(const char *<[str]>, const char *<[fmt]>, va_list <[list]>);
 
-	int _viscanf_r(struct _reent *<[reent]>, const char *<[fmt]>, 
+	int viscanf( const char *<[fmt]>, 
                        va_list <[list]>);
-	int _vfiscanf_r(struct _reent *<[reent]>, FILE *<[fp]>, const char *<[fmt]>, 
+	int vfiscanf( FILE *<[fp]>, const char *<[fmt]>, 
                        va_list <[list]>);
-	int _vsiscanf_r(struct _reent *<[reent]>, const char *<[str]>,
+	int vsiscanf( const char *<[str]>,
                        const char *<[fmt]>, va_list <[list]>);
 
 DESCRIPTION
@@ -82,26 +82,12 @@ Supporting OS subroutines required:
 #include <stdarg.h>
 #include "local.h"
 
-#ifndef _REENT_ONLY
-
 int
-viscanf (const char *fmt,
-       va_list ap)
-{
-  struct _reent *reent = _REENT;
-
-  _REENT_SMALL_CHECK_INIT (reent);
-  return __svfiscanf_r (reent, _stdin_r (reent), fmt, ap);
-}
-
-#endif /* !_REENT_ONLY */
-
-int
-_viscanf_r (struct _reent *ptr,
+viscanf (
        const char *fmt,
        va_list ap)
 {
   _REENT_SMALL_CHECK_INIT (ptr);
-  return __svfiscanf_r (ptr, _stdin_r (ptr), fmt, ap);
+  return _svfiscanf ( _stdin_r (ptr), fmt, ap);
 }
 

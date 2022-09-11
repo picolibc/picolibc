@@ -27,7 +27,7 @@ INDEX
 SYNOPSIS
 	#include <stdio.h>
 	int fgetpos(FILE *restrict <[fp]>, fpos_t *restrict <[pos]>);
-	int _fgetpos_r(struct _reent *<[ptr]>, FILE *restrict <[fp]>, fpos_t *restrict <[pos]>);
+	int fgetpos( FILE *restrict <[fp]>, fpos_t *restrict <[pos]>);
 
 DESCRIPTION
 Objects of type <<FILE>> can have a ``position'' that records how much
@@ -65,11 +65,11 @@ No supporting OS subroutines are required.
 #include <stdio.h>
 
 int
-_fgetpos_r (struct _reent * ptr,
+fgetpos (
        FILE *__restrict fp,
        _fpos_t *__restrict pos)
 {
-  *pos = _ftell_r (ptr, fp);
+  *pos = ftell ( fp);
 
   if (*pos != -1)
     {
@@ -77,14 +77,3 @@ _fgetpos_r (struct _reent * ptr,
     }
   return 1;
 }
-
-#ifndef _REENT_ONLY
-
-int
-fgetpos (FILE *__restrict fp,
-       _fpos_t *__restrict pos)
-{
-  return _fgetpos_r (_REENT, fp, pos);
-}
-
-#endif /* !_REENT_ONLY */

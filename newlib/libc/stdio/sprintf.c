@@ -56,16 +56,16 @@ SYNOPSIS
         char *asnprintf(char *restrict <[str]>, size_t *restrict <[size]>, const char *restrict <[format]>,
                         ...);
 
-        int _printf_r(struct _reent *<[ptr]>, const char *restrict <[format]>, ...);
-        int _fprintf_r(struct _reent *<[ptr]>, FILE *restrict <[fd]>,
+        int printf( const char *restrict <[format]>, ...);
+        int fprintf( FILE *restrict <[fd]>,
                        const char *restrict <[format]>, ...);
-        int _sprintf_r(struct _reent *<[ptr]>, char *restrict <[str]>,
+        int sprintf( char *restrict <[str]>,
                        const char *restrict <[format]>, ...);
-        int _snprintf_r(struct _reent *<[ptr]>, char *restrict <[str]>, size_t <[size]>,
+        int snprintf( char *restrict <[str]>, size_t <[size]>,
                         const char *restrict <[format]>, ...);
-        int _asprintf_r(struct _reent *<[ptr]>, char **restrict <[strp]>,
+        int asprintf( char **restrict <[strp]>,
                         const char *restrict <[format]>, ...);
-        char *_asnprintf_r(struct _reent *<[ptr]>, char *restrict <[str]>,
+        char *asnprintf( char *restrict <[str]>,
                            size_t *restrict <[size]>, const char *restrict <[format]>, ...);
 
 DESCRIPTION
@@ -574,8 +574,10 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <limits.h>
 #include "local.h"
 
+#undef sprintf
+
 int
-_sprintf_r (struct _reent *ptr,
+sprintf (
        char *__restrict str,
        const char *__restrict fmt, ...)
 {
@@ -588,44 +590,14 @@ _sprintf_r (struct _reent *ptr,
   f._bf._size = f._w = INT_MAX;
   f._file = -1;  /* No file. */
   va_start (ap, fmt);
-  ret = _svfprintf_r (ptr, &f, fmt, ap);
+  ret = svfprintf ( &f, fmt, ap);
   va_end (ap);
   *f._p = '\0';	/* terminate the string */
   return (ret);
 }
 
 #ifdef _NANO_FORMATTED_IO
-int
-_siprintf_r (struct _reent *, char *, const char *, ...)
-       _ATTRIBUTE ((__alias__("_sprintf_r")));
-#endif
-
-#ifndef _REENT_ONLY
-
-#undef sprintf
-
-int
-sprintf (char *__restrict str,
-       const char *__restrict fmt, ...)
-{
-  int ret;
-  va_list ap;
-  FILE f;
-
-  f._flags = __SWR | __SSTR;
-  f._bf._base = f._p = (unsigned char *) str;
-  f._bf._size = f._w = INT_MAX;
-  f._file = -1;  /* No file. */
-  va_start (ap, fmt);
-  ret = _svfprintf_r (_REENT, &f, fmt, ap);
-  va_end (ap);
-  *f._p = '\0';	/* terminate the string */
-  return (ret);
-}
-
-#ifdef _NANO_FORMATTED_IO
-int
-siprintf (char *, const char *, ...)
+int __nonnull((1, 2)) _NOTHROW
+siprintf ( char *, const char *, ...)
        _ATTRIBUTE ((__alias__("sprintf")));
-#endif
 #endif

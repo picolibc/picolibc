@@ -28,7 +28,7 @@ SYNOPSIS
 	#include <stdio.h>
 	FILE *freopen(const char *restrict <[file]>, const char *restrict <[mode]>,
 		      FILE *restrict <[fp]>);
-	FILE *_freopen_r(struct _reent *<[ptr]>, const char *restrict <[file]>,
+	FILE *freopen( const char *restrict <[file]>,
 		      const char *restrict <[mode]>, FILE *restrict <[fp]>);
 
 DESCRIPTION
@@ -75,7 +75,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
  */
 
 FILE *
-_freopen_r (struct _reent *ptr,
+freopen (
        const char *__restrict file,
        const char *__restrict mode,
        register FILE *__restrict fp)
@@ -96,14 +96,14 @@ _freopen_r (struct _reent *ptr,
   if (!(oflags2 & __SNLK))
     _flockfile (fp);
 
-  if ((flags = __sflags (ptr, mode, &oflags)) == 0)
+  if ((flags = __sflags (mode, &oflags)) == 0)
     {
       if (!(oflags2 & __SNLK))
 	_funlockfile (fp);
 #ifdef _STDIO_WITH_THREAD_CANCELLATION_SUPPORT
       pthread_setcancelstate (__oldcancel, &__oldcancel);
 #endif
-      _fclose_r (ptr, fp);
+      fclose ( fp);
       return NULL;
     }
 
@@ -120,13 +120,13 @@ _freopen_r (struct _reent *ptr,
   else
     {
       if (fp->_flags & __SWR)
-	_fflush_r (ptr, fp);
+	fflush ( fp);
       /*
        * If close is NULL, closing is a no-op, hence pointless.
        * If file is NULL, the file should not be closed.
        */
       if (fp->_close != NULL && file != NULL)
-	fp->_close (ptr, fp->_cookie);
+	fp->_close (fp->_cookie);
     }
 
   /*
@@ -163,7 +163,7 @@ _freopen_r (struct _reent *ptr,
       /*
        * F_SETFL doesn't change textmode.  Don't mess with modes of ttys.
        */
-      if (0 <= f && ! _isatty_r (ptr, f)
+      if (0 <= f && ! isatty ( f)
 	  && setmode (f, oflags & (O_BINARY | O_TEXT)) == -1)
 	f = -1;
 #endif
@@ -172,7 +172,7 @@ _freopen_r (struct _reent *ptr,
 	{
 	  e = EBADF;
 	  if (fp->_close != NULL)
-	    fp->_close (ptr, fp->_cookie);
+	    fp->_close (fp->_cookie);
 	}
     }
 
@@ -238,15 +238,3 @@ _freopen_r (struct _reent *ptr,
 #endif
   return fp;
 }
-
-#ifndef _REENT_ONLY
-
-FILE *
-freopen (const char *__restrict file,
-       const char *__restrict mode,
-       register FILE *__restrict fp)
-{
-  return _freopen_r (_REENT, file, mode, fp);
-}
-
-#endif /*!_REENT_ONLY */

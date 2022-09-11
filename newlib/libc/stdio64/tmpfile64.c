@@ -70,7 +70,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<getpid>>,
 #ifdef __LARGE64_FILES
 
 FILE *
-_tmpfile64_r (struct _reent *ptr)
+tmpfile64 (void)
 {
   FILE *fp;
   int e;
@@ -80,7 +80,7 @@ _tmpfile64_r (struct _reent *ptr)
 
   do
   {
-     if ((f = _tmpnam_r (ptr, buf)) == NULL)
+     if ((f = tmpnam (buf)) == NULL)
 	return NULL;
       fd = open64 (f, O_RDWR | O_CREAT | O_EXCL | O_BINARY,
 		      S_IRUSR | S_IWUSR);
@@ -88,23 +88,13 @@ _tmpfile64_r (struct _reent *ptr)
   while (fd < 0 && _REENT_ERRNO(ptr) == EEXIST);
   if (fd < 0)
     return NULL;
-  fp = _fdopen64_r (ptr, fd, "wb+");
+  fp = fdopen64 (fd, "wb+");
   e = _REENT_ERRNO(ptr);
   if (!fp)
     close (fd);
-  (void) _remove_r (ptr, f);
+  (void) remove (f);
   _REENT_ERRNO(ptr) = e;
   return fp;
 }
-
-#ifndef _REENT_ONLY
-
-FILE *
-tmpfile64 (void)
-{
-  return _tmpfile64_r (_REENT);
-}
-
-#endif
 
 #endif /* __LARGE64_FILES */

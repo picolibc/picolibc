@@ -24,33 +24,14 @@
 #include "local.h"
 
 int
-_wprintf_r (struct _reent *ptr,
-       const wchar_t *fmt, ...)
-{
-  int ret;
-  va_list ap;
-
-  _REENT_SMALL_CHECK_INIT (ptr);
-  va_start (ap, fmt);
-  ret = _vfwprintf_r (ptr, _stdout_r (ptr), fmt, ap);
-  va_end (ap);
-  return ret;
-}
-
-#ifndef _REENT_ONLY
-
-int
 wprintf (const wchar_t *__restrict fmt, ...)
 {
   int ret;
   va_list ap;
-  struct _reent *ptr = _REENT;
 
   _REENT_SMALL_CHECK_INIT (ptr);
   va_start (ap, fmt);
-  ret = _vfwprintf_r (ptr, _stdout_r (ptr), fmt, ap);
+  ret = vfwprintf ( _stdout_r (ptr), fmt, ap);
   va_end (ap);
   return ret;
 }
-
-#endif /* ! _REENT_ONLY */

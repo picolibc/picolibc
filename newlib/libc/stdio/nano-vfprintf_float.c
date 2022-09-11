@@ -49,7 +49,7 @@
 #include "vfieeefp.h"
 #include "nano-vfprintf_local.h"
 
-char *__cvt (struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits,
+char *__cvt (_PRINTF_FLOAT_TYPE value, int ndigits,
 	     int flags, char *sign, int *decpt, int ch, int *length,
 	     char *buf);
 

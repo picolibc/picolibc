@@ -38,7 +38,7 @@ SYNOPSIS
         #include <wchar.h>
         wint_t ungetwc(wint_t <[wc]>, FILE *<[stream]>);
 
-        wint_t _ungetwc_r(struct _reent *<[reent]>, wint_t <[wc]>, FILE *<[stream]>);
+        wint_t ungetwc( wint_t <[wc]>, FILE *<[stream]>);
 
 DESCRIPTION
 <<ungetwc>> is used to return wide characters back to <[stream]> to be
@@ -74,7 +74,7 @@ C99
 #include "local.h"
 
 wint_t
-_ungetwc_r (struct _reent *ptr,
+ungetwc (
 	wint_t wc,
 	register FILE *fp)
 {
@@ -92,24 +92,11 @@ _ungetwc_r (struct _reent *ptr,
     }
   else
     while (len-- != 0)
-      if (_ungetc_r(ptr, (unsigned char)buf[len], fp) == EOF)
+      if (ungetc( (unsigned char)buf[len], fp) == EOF)
 	{
 	  wc = WEOF;
 	  break;
 	}
   _newlib_flockfile_end (fp);
   return wc;
-}
-
-/*
- * MT-safe version.
- */
-wint_t
-ungetwc (wint_t wc,
-	FILE *fp)
-{
-  struct _reent *reent = _REENT;
-
-  CHECK_INIT (reent, fp);
-  return _ungetwc_r (reent, wc, fp);
 }

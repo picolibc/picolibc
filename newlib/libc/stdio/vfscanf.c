@@ -39,11 +39,11 @@ SYNOPSIS
 	int vfscanf(FILE *<[fp]>, const char *<[fmt]>, va_list <[list]>);
 	int vsscanf(const char *<[str]>, const char *<[fmt]>, va_list <[list]>);
 
-	int _vscanf_r(struct _reent *<[reent]>, const char *<[fmt]>,
+	int vscanf( const char *<[fmt]>,
                        va_list <[list]>);
-	int _vfscanf_r(struct _reent *<[reent]>, FILE *<[fp]>, const char *<[fmt]>,
+	int vfscanf( FILE *<[fp]>, const char *<[fmt]>,
                        va_list <[list]>);
-	int _vsscanf_r(struct _reent *<[reent]>, const char *<[str]>,
+	int vsscanf( const char *<[str]>,
                        const char *<[fmt]>, va_list <[list]>);
 
 DESCRIPTION
@@ -92,21 +92,17 @@ Supporting OS subroutines required:
 
 #ifdef INTEGER_ONLY
 #define VFSCANF vfiscanf
-#define _VFSCANF_R _vfiscanf_r
-#define __SVFSCANF __svfiscanf
 #ifdef STRING_ONLY
-#  define __SVFSCANF_R __ssvfiscanf_r
+#  define _SVFSCANF _ssvfiscanf
 #else
-#  define __SVFSCANF_R __svfiscanf_r
+#  define _SVFSCANF _svfiscanf
 #endif
 #else
 #define VFSCANF vfscanf
-#define _VFSCANF_R _vfscanf_r
-#define __SVFSCANF __svfscanf
 #ifdef STRING_ONLY
-#  define __SVFSCANF_R __ssvfscanf_r
+#  define _SVFSCANF _ssvfscanf
 #else
-#  define __SVFSCANF_R __svfscanf_r
+#  define _SVFSCANF _svfscanf
 #endif
 #ifndef NO_FLOATING_POINT
 #define FLOATING_POINT
@@ -218,41 +214,18 @@ typedef unsigned long long u_long_long;
  * vfscanf
  */
 
-#define BufferEmpty (fp->_r <= 0 && __srefill_r(rptr, fp))
+#define BufferEmpty (fp->_r <= 0 && _srefill( fp))
 
 #ifndef STRING_ONLY
 
-#ifndef _REENT_ONLY
-
 int
-VFSCANF (register FILE *fp,
-       const char *fmt,
-       va_list ap)
-{
-  struct _reent *reent = _REENT;
-
-  CHECK_INIT(reent, fp);
-  return __SVFSCANF_R (reent, fp, fmt, ap);
-}
-
-int
-__SVFSCANF (register FILE *fp,
-       char const *fmt0,
-       va_list ap)
-{
-  return __SVFSCANF_R (_REENT, fp, fmt0, ap);
-}
-
-#endif /* !_REENT_ONLY */
-
-int
-_VFSCANF_R (struct _reent *data,
+VFSCANF (
        register FILE *fp,
        const char *fmt,
        va_list ap)
 {
   CHECK_INIT(data, fp);
-  return __SVFSCANF_R (data, fp, fmt, ap);
+  return _SVFSCANF (fp, fmt, ap);
 }
 #endif /* !STRING_ONLY */
 
@@ -261,7 +234,7 @@ _VFSCANF_R (struct _reent *data,
  * regular ungetc which will drag in file I/O items we don't need.
  * So, we create our own trimmed-down version.  */
 int
-_sungetc_r (struct _reent *data,
+sungetc (
 	int c,
 	register FILE *fp)
 {
@@ -279,7 +252,7 @@ _sungetc_r (struct _reent *data,
 
   if (HASUB (fp))
     {
-      if (fp->_r >= fp->_ub._size && __submore (data, fp))
+      if (fp->_r >= fp->_ub._size && __submore (fp))
         {
           return EOF;
         }
@@ -318,14 +291,13 @@ _sungetc_r (struct _reent *data,
 
 /* String only version of __srefill_r for sscanf family.  */
 int
-__ssrefill_r (struct _reent * ptr,
+_ssrefill (
        register FILE * fp)
 {
   /*
    * Our only hope of further input is the ungetc buffer.
    * If there is anything in that buffer to read, return.
    */
-  (void) ptr;
   if (HASUB (fp))
     {
       FREEUB (ptr, fp);
@@ -344,7 +316,7 @@ __ssrefill_r (struct _reent * ptr,
 }
 
 size_t
-_sfread_r (struct _reent * ptr,
+sfread (
        void *buf,
        size_t size,
        size_t count,
@@ -368,7 +340,7 @@ _sfread_r (struct _reent * ptr,
       fp->_r = 0;
       p += r;
       resid -= r;
-      if (__ssrefill_r (ptr, fp))
+      if (_ssrefill ( fp))
         {
           /* no more input: return partial result */
           return (total - resid) / size;
@@ -380,18 +352,17 @@ _sfread_r (struct _reent * ptr,
   return count;
 }
 #else /* !STRING_ONLY || !INTEGER_ONLY */
-int _sungetc_r (struct _reent *, int, register FILE *);
-int __ssrefill_r (struct _reent *, register FILE *);
-size_t _sfread_r (struct _reent *, void *buf, size_t, size_t, FILE *);
+int sungetc ( int, register FILE *);
+int _ssrefill ( register FILE *);
+size_t sfread ( void *buf, size_t, size_t, FILE *);
 #endif /* !STRING_ONLY || !INTEGER_ONLY */
 
 static inline int
-__wctob (struct _reent *rptr, wint_t wc)
+__wctob (wint_t wc)
 {
   mbstate_t mbs;
   unsigned char pmb[MB_LEN_MAX];
 
-  (void) rptr;
   if (wc == WEOF)
     return EOF;
   memset (&mbs, '\0', sizeof (mbs));
@@ -399,7 +370,7 @@ __wctob (struct _reent *rptr, wint_t wc)
 }
 
 int
-__SVFSCANF_R (struct _reent *rptr,
+_SVFSCANF (
        register FILE *fp,
        char const *fmt0,
        va_list ap)
@@ -932,7 +903,7 @@ __SVFSCANF_R (struct _reent *rptr,
 	      if (--fp->_r > 0)
 		fp->_p++;
 	      else
-	      if (__srefill_r (rptr, fp))
+	      if (_srefill ( fp))
 		goto input_failure;
 	    }
 	  /*
@@ -1027,7 +998,7 @@ __SVFSCANF_R (struct _reent *rptr,
 		      sum += n;
 		      width -= n;
 		      fp->_p += n;
-		      if (__srefill_r (rptr, fp))
+		      if (_srefill ( fp))
 			{
 			  if (sum == 0)
 			    goto input_failure;
@@ -1054,7 +1025,7 @@ __SVFSCANF_R (struct _reent *rptr,
 	      else
 #endif
 		p = GET_ARG (N, ap, char *);
-	      r = _fread_r (rptr, p, 1, width, fp);
+	      r = fread ( p, 1, width, fp);
 	      if (r == 0)
 		goto input_failure;
 #ifdef _WANT_IO_POSIX_EXTENSIONS
@@ -1105,10 +1076,10 @@ __SVFSCANF_R (struct _reent *rptr,
                     *wcp = L'\0';
                   if (mbslen != (size_t)-2) /* Incomplete sequence */
                     {
-                      if (!ccltab[__wctob (rptr, *wcp)])
+                      if (!ccltab[__wctob (*wcp)])
                         {
                           while (s != 0)
-                            _ungetc_r (rptr, (unsigned char) buf[--s], fp);
+                            ungetc ( (unsigned char) buf[--s], fp);
                           break;
                         }
                       nread += s;
@@ -1245,7 +1216,7 @@ __SVFSCANF_R (struct _reent *rptr,
                       if (iswspace(*wcp))
                         {
                           while (s != 0)
-                            _ungetc_r (rptr, (unsigned char) buf[--s], fp);
+                            ungetc ( (unsigned char) buf[--s], fp);
                           break;
                         }
                       nread += s;
@@ -1462,7 +1433,7 @@ __SVFSCANF_R (struct _reent *rptr,
 	      if (--fp->_r > 0)
 		fp->_p++;
 	      else
-	      if (__srefill_r (rptr, fp))
+	      if (_srefill ( fp))
 		break;		/* EOF */
 	    }
 	  /*
@@ -1476,7 +1447,7 @@ __SVFSCANF_R (struct _reent *rptr,
 	  if (flags & NDIGITS)
 	    {
 	      if (p > buf)
-		_ungetc_r (rptr, *--p, fp); /* [-+xX] */
+		ungetc ( *--p, fp); /* [-+xX] */
 	      if (p == buf)
 		goto match_failure;
 	    }
@@ -1792,7 +1763,7 @@ __SVFSCANF_R (struct _reent *rptr,
 			  ++nread;
 			  if (--fp->_r > 0)
 			    fp->_p++;
-			  else if (__srefill_r (rptr, fp))
+			  else if (_srefill ( fp))
 			    break;		/* EOF */
 			  c = *fp->_p;
 			}
@@ -1803,7 +1774,7 @@ __SVFSCANF_R (struct _reent *rptr,
 			     so back off. */
 			  while (decptpos-- > 0)
 			    {
-			      _ungetc_r (rptr, (unsigned char) decpt[decptpos],
+			      ungetc ( (unsigned char) decpt[decptpos],
 					 fp);
 			      --nread;
 			    }
@@ -1821,7 +1792,7 @@ __SVFSCANF_R (struct _reent *rptr,
 	      if (--fp->_r > 0)
 		fp->_p++;
 	      else
-	      if (__srefill_r (rptr, fp))
+	      if (_srefill ( fp))
 		break;		/* EOF */
 	    }
 	  if (zeroes)
@@ -1841,7 +1812,7 @@ __SVFSCANF_R (struct _reent *rptr,
 		 guarantee that in all implementations of ungetc.  */
 	      while (p > buf)
 		{
-		  _ungetc_r (rptr, *--p, fp); /* [-+nNaA] */
+		  ungetc ( *--p, fp); /* [-+nNaA] */
 		  --nread;
 		}
 	      goto match_failure;
@@ -1854,14 +1825,14 @@ __SVFSCANF_R (struct _reent *rptr,
 	      if (infcount >= 3) /* valid 'inf', but short of 'infinity' */
 		while (infcount-- > 3)
 		  {
-		    _ungetc_r (rptr, *--p, fp); /* [iInNtT] */
+		    ungetc ( *--p, fp); /* [iInNtT] */
 		    --nread;
 		  }
 	      else
 		{
 		  while (p > buf)
 		    {
-		      _ungetc_r (rptr, *--p, fp); /* [-+iInN] */
+		      ungetc ( *--p, fp); /* [-+iInN] */
 		      --nread;
 		    }
 		  goto match_failure;
@@ -1879,7 +1850,7 @@ __SVFSCANF_R (struct _reent *rptr,
 		  /* no digits at all */
 		  while (p > buf)
 		    {
-		      _ungetc_r (rptr, *--p, fp); /* [-+.] */
+		      ungetc ( *--p, fp); /* [-+.] */
 		      --nread;
 		    }
 		  goto match_failure;
@@ -1889,11 +1860,11 @@ __SVFSCANF_R (struct _reent *rptr,
 	      --nread;
 	      if (c != 'e' && c != 'E')
 		{
-		  _ungetc_r (rptr, c, fp); /* [-+] */
+		  ungetc ( c, fp); /* [-+] */
 		  c = *--p;
 		  --nread;
 		}
-	      _ungetc_r (rptr, c, fp); /* [eE] */
+	      ungetc ( c, fp); /* [eE] */
 	    }
 	  if ((flags & SUPPRESS) == 0)
 	    {

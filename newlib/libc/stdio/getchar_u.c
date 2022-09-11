@@ -70,19 +70,9 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #undef getchar_unlocked
 
 int
-_getchar_unlocked_r (struct _reent *ptr)
-{
-  return _getc_unlocked_r (ptr, _stdin_r (ptr));
-}
-
-#ifndef _REENT_ONLY
-
-int
 getchar_unlocked (void)
 {
   /* CHECK_INIT is called (eventually) by __srefill_r.  */
 
-  return _getc_unlocked_r (_REENT, _stdin_r (_REENT));
+  return getc_unlocked ( stdin );
 }
-
-#endif

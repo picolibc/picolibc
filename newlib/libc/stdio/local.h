@@ -139,66 +139,77 @@
 
 #endif /* __SINGLE_THREAD__ || __IMPL_UNLOCKED__ */
 
-extern wint_t __fgetwc (struct _reent *, FILE *);
-extern wint_t __fputwc (struct _reent *, wchar_t, FILE *);
+extern wint_t __fgetwc (FILE *);
+extern wint_t __fputwc (wchar_t, FILE *);
 extern u_char *__sccl (char *, u_char *fmt);
-extern int    __svfscanf_r (struct _reent *,FILE *, const char *,va_list);
-extern int    __ssvfscanf_r (struct _reent *,FILE *, const char *,va_list);
-extern int    __svfiscanf_r (struct _reent *,FILE *, const char *,va_list);
-extern int    __ssvfiscanf_r (struct _reent *,FILE *, const char *,va_list);
-extern int    __svfwscanf_r (struct _reent *,FILE *, const wchar_t *,va_list);
-extern int    __ssvfwscanf_r (struct _reent *,FILE *, const wchar_t *,va_list);
-extern int    __svfiwscanf_r (struct _reent *,FILE *, const wchar_t *,va_list);
-extern int    __ssvfiwscanf_r (struct _reent *,FILE *, const wchar_t *,va_list);
-int	      _svfprintf_r (struct _reent *, FILE *, const char *, 
+extern int    _svfscanf (FILE *, const char *,va_list);
+extern int    _ssvfscanf (FILE *, const char *,va_list);
+extern int    _svfiscanf (FILE *, const char *,va_list);
+extern int    _ssvfiscanf (FILE *, const char *,va_list);
+extern int    _svfwscanf (FILE *, const wchar_t *,va_list);
+extern int    _ssvfwscanf (FILE *, const wchar_t *,va_list);
+extern int    _svfiwscanf (FILE *, const wchar_t *,va_list);
+extern int    _ssvfiwscanf (FILE *, const wchar_t *,va_list);
+int	      svfprintf ( FILE *, const char *, 
 				  va_list)
-               			_ATTRIBUTE ((__format__ (__printf__, 3, 0)));
-int	      _svfiprintf_r (struct _reent *, FILE *, const char *, 
+               			_ATTRIBUTE ((__format__ (__printf__, 2, 0)));
+int	      svfiprintf ( FILE *, const char *, 
 				  va_list)
-               			_ATTRIBUTE ((__format__ (__printf__, 3, 0)));
-int	      _svfwprintf_r (struct _reent *, FILE *, const wchar_t *, 
+               			_ATTRIBUTE ((__format__ (__printf__, 2, 0)));
+int	      svfwprintf ( FILE *, const wchar_t *, 
 				  va_list);
-int	      _svfiwprintf_r (struct _reent *, FILE *, const wchar_t *, 
+int	      svfiwprintf ( FILE *, const wchar_t *, 
 				  va_list);
-extern FILE  *__sfp (struct _reent *);
-extern int    __sflags (struct _reent *,const char*, int*);
-extern int    __sflush_r (struct _reent *,FILE *);
+extern FILE  *__sfp (void);
+extern int    __sflags (const char*, int*);
+extern int    _sflush (FILE *);
 #ifdef _STDIO_BSD_SEMANTICS
-extern int    __sflushw_r (struct _reent *,FILE *);
+extern int    _sflushw (FILE *);
 #endif
-extern int    __srefill_r (struct _reent *,FILE *);
-extern _READ_WRITE_RETURN_TYPE __sread (struct _reent *, void *, char *,
+extern int    _srefill (FILE *);
+extern _READ_WRITE_RETURN_TYPE __sread (void *, char *,
 					       _READ_WRITE_BUFSIZE_TYPE);
-extern _READ_WRITE_RETURN_TYPE __seofread (struct _reent *, void *,
+extern _READ_WRITE_RETURN_TYPE __seofread (void *,
 						  char *,
 						  _READ_WRITE_BUFSIZE_TYPE);
-extern _READ_WRITE_RETURN_TYPE __swrite (struct _reent *, void *,
+extern _READ_WRITE_RETURN_TYPE __swrite (void *,
 						const char *,
 						_READ_WRITE_BUFSIZE_TYPE);
-extern _fpos_t __sseek (struct _reent *, void *, _fpos_t, int);
-extern int    __sclose (struct _reent *, void *);
+extern _fpos_t __sseek (void *, _fpos_t, int);
+extern int    __sclose (void *);
 extern int    __stextmode (int);
-extern void   __sinit (struct _reent *);
-extern void   __smakebuf_r (struct _reent *, FILE *);
-extern int    __swhatbuf_r (struct _reent *, FILE *, size_t *, int *);
-extern int __submore (struct _reent *, FILE *);
+extern void   __sinit (void);
+extern void   _smakebuf ( FILE *);
+extern int    _swhatbuf ( FILE *, size_t *, int *);
+extern int __submore (FILE *);
 
 #ifdef __LARGE64_FILES
-extern _fpos64_t __sseek64 (struct _reent *, void *, _fpos64_t, int);
-extern _READ_WRITE_RETURN_TYPE __swrite64 (struct _reent *, void *,
+extern _fpos64_t __sseek64 (void *, _fpos64_t, int);
+extern _READ_WRITE_RETURN_TYPE __swrite64 (void *,
 						  const char *,
 						  _READ_WRITE_BUFSIZE_TYPE);
 #endif
+
+extern NEWLIB_THREAD_LOCAL void (*_tls_cleanup)(void);
+#define _REENT_CLEANUP(_ptr) (_tls_cleanup)
+extern NEWLIB_THREAD_LOCAL struct _Bigint **_tls_mp_freelist;
+#define _REENT_MP_FREELIST(_ptr) (_tls_mp_freelist)
+extern NEWLIB_THREAD_LOCAL struct _Bigint *_tls_mp_p5s;
+#define _REENT_MP_P5S(_ptr) (_tls_mp_p5s)
+extern NEWLIB_THREAD_LOCAL struct _Bigint *_tls_mp_result;
+#define _REENT_MP_RESULT(_ptr) (_tls_mp_result)
+extern NEWLIB_THREAD_LOCAL int _tls_mp_result_k;
+#define _REENT_MP_RESULT_K(_ptr) (_tls_mp_result_k)
+
+void _reclaim_reent (void *);
 
 /* Called by the main entry point fns to ensure stdio has been initialized.  */
 
 #define CHECK_INIT(ptr, fp) \
   do								\
     {								\
-      struct _reent *_check_init_ptr = (ptr);			\
-      if (!_REENT_IS_NULL(_check_init_ptr) &&			\
-	  !_REENT_CLEANUP(_check_init_ptr))			\
-	__sinit (_check_init_ptr);				\
+      if (!_tls_cleanup)			                \
+	__sinit ();				                \
     }								\
   while (0)
 
@@ -207,7 +218,7 @@ extern _READ_WRITE_RETURN_TYPE __swrite64 (struct _reent *, void *,
 
 #define	cantwrite(ptr, fp)                                     \
   ((((fp)->_flags & __SWR) == 0 || (fp)->_bf._base == NULL) && \
-   __swsetup_r(ptr, fp))
+   _swsetup( fp))
 
 /* Test whether the given stdio file has an active ungetc buffer;
    release such a buffer, without restoring ordinary unread data.  */
@@ -249,7 +260,7 @@ extern _READ_WRITE_RETURN_TYPE __swrite64 (struct _reent *, void *,
 
 /* WARNING: _dcvt is defined in the stdlib directory, not here!  */
 
-char *_dcvt (struct _reent *, char *, double, int, int, char, int);
+char *_dcvt (char *, double, int, int, char, int);
 char *_sicvt (char *, short, char);
 char *_icvt (char *, int, char);
 char *_licvt (char *, long, char);

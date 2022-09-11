@@ -37,11 +37,11 @@ SYNOPSIS
 	int fflush_unlocked(FILE *<[fp]>);
 
 	#include <stdio.h>
-	int _fflush_r(struct _reent *<[reent]>, FILE *<[fp]>);
+	int fflush( FILE *<[fp]>);
 
 	#define _BSD_SOURCE
 	#include <stdio.h>
-	int _fflush_unlocked_r(struct _reent *<[reent]>, FILE *<[fp]>);
+	int fflush_unlocked( FILE *<[fp]>);
 
 DESCRIPTION
 The <<stdio>> output functions can buffer output before delivering it
@@ -101,7 +101,7 @@ No supporting OS subroutines are required.
 /* Core function which does not lock file pointer.  This gets called
    directly from __srefill. */
 int
-__sflush_r (struct _reent *ptr,
+_sflush (
        register FILE * fp)
 {
   register unsigned char *p;
@@ -149,10 +149,10 @@ __sflush_r (struct _reent *ptr,
 		 Only ESPIPE and EINVAL are ignorable.  */
 #ifdef __LARGE64_FILES
 	      if (fp->_flags & __SL64)
-		curoff = fp->_seek64 (ptr, fp->_cookie, 0, SEEK_CUR);
+		curoff = fp->_seek64 (fp->_cookie, 0, SEEK_CUR);
 	      else
 #endif
-		curoff = fp->_seek (ptr, fp->_cookie, 0, SEEK_CUR);
+		curoff = fp->_seek (fp->_cookie, 0, SEEK_CUR);
 	      if (curoff == -1L && _REENT_ERRNO(ptr) != 0)
 		{
 		  int result = EOF;
@@ -177,10 +177,10 @@ __sflush_r (struct _reent *ptr,
 	  /* Now physically seek to after byte last read.  */
 #ifdef __LARGE64_FILES
 	  if (fp->_flags & __SL64)
-	    curoff = fp->_seek64 (ptr, fp->_cookie, curoff, SEEK_SET);
+	    curoff = fp->_seek64 (fp->_cookie, curoff, SEEK_SET);
 	  else
 #endif
-	    curoff = fp->_seek (ptr, fp->_cookie, curoff, SEEK_SET);
+	    curoff = fp->_seek (fp->_cookie, curoff, SEEK_SET);
 	  if (curoff != -1 || _REENT_ERRNO(ptr) == 0
 	      || _REENT_ERRNO(ptr) == ESPIPE || _REENT_ERRNO(ptr) == EINVAL)
 	    {
@@ -222,7 +222,7 @@ __sflush_r (struct _reent *ptr,
 
   while (n > 0)
     {
-      t = fp->_write (ptr, fp->_cookie, (char *) p, n);
+      t = fp->_write (fp->_cookie, (char *) p, n);
       if (t <= 0)
 	{
           fp->_flags |= __SERR;
@@ -239,19 +239,21 @@ __sflush_r (struct _reent *ptr,
    and we don't want to move the underlying file pointer unless we're
    writing. */
 int
-__sflushw_r (struct _reent *ptr,
+_sflushw (
        register FILE *fp)
 {
-  return (fp->_flags & __SWR) ?  __sflush_r (ptr, fp) : 0;
+  return (fp->_flags & __SWR) ?  _sflush ( fp) : 0;
 }
 #endif
 
 #endif /* __IMPL_UNLOCKED__ */
 
 int
-_fflush_r (struct _reent *ptr,
-       register FILE * fp)
+fflush (register FILE * fp)
 {
+  if (fp == NULL)
+    return _fwalk_sglue (fflush, &__sglue);
+
   int ret;
 
 #ifdef _REENT_SMALL
@@ -276,20 +278,7 @@ _fflush_r (struct _reent *ptr,
     return 0;
 
   _newlib_flockfile_start (fp);
-  ret = __sflush_r (ptr, fp);
+  ret = _sflush ( fp);
   _newlib_flockfile_end (fp);
   return ret;
 }
-
-#ifndef _REENT_ONLY
-
-int
-fflush (register FILE * fp)
-{
-  if (fp == NULL)
-    return _fwalk_sglue (_GLOBAL_REENT, _fflush_r, &__sglue);
-
-  return _fflush_r (_REENT, fp);
-}
-
-#endif /* _REENT_ONLY */

@@ -32,12 +32,6 @@
 
 #undef getwchar_unlocked
 
-wint_t
-_getwchar_unlocked_r (struct _reent *ptr)
-{
-  return _fgetwc_unlocked_r (ptr, stdin);
-}
-
 /*
  * Synonym for fgetwc_unlocked(stdin).
  */

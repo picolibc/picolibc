@@ -21,8 +21,6 @@
 #include <stdarg.h>
 #include "local.h"
 
-#ifndef _REENT_ONLY
-
 int
 iscanf(const char *fmt, ...)
 {
@@ -31,23 +29,7 @@ iscanf(const char *fmt, ...)
 
   _REENT_SMALL_CHECK_INIT (_REENT);
   va_start (ap, fmt);
-  ret = __svfiscanf_r (_REENT, _stdin_r (_REENT), fmt, ap);
+  ret = _svfiscanf ( _stdin_r (_REENT), fmt, ap);
   va_end (ap);
   return ret;
 }
-
-#endif /* !_REENT_ONLY */
-
-int
-_iscanf_r(struct _reent *ptr, const char *fmt, ...)
-{
-  int ret;
-  va_list ap;
-
-  _REENT_SMALL_CHECK_INIT (ptr);
-  va_start (ap, fmt);
-  ret = __svfiscanf_r (ptr, _stdin_r (ptr), fmt, ap);
-  va_end (ap);
-  return (ret);
-}
-

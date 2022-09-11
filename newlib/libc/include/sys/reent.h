@@ -29,7 +29,7 @@ struct _reent;
 
 #define _REENT_CHECK_MP(ptr)		/* nothing */
 
-extern NEWLIB_THREAD_LOCAL void (*_tls_cleanup)(struct _reent *);
+extern NEWLIB_THREAD_LOCAL void (*_tls_cleanup)(void);
 #define _REENT_CLEANUP(_ptr) (_tls_cleanup)
 extern NEWLIB_THREAD_LOCAL struct _Bigint **_tls_mp_freelist;
 #define _REENT_MP_FREELIST(_ptr) (_tls_mp_freelist)
@@ -40,7 +40,7 @@ extern NEWLIB_THREAD_LOCAL struct _Bigint *_tls_mp_result;
 extern NEWLIB_THREAD_LOCAL int _tls_mp_result_k;
 #define _REENT_MP_RESULT_K(_ptr) (_tls_mp_result_k)
 
-void _reclaim_reent (struct _reent *);
+void _reclaim_reent (void *);
 
 #ifdef __cplusplus
 }

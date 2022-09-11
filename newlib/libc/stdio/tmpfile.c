@@ -67,7 +67,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<getpid>>,
 #endif
 
 FILE *
-_tmpfile_r (struct _reent *ptr)
+tmpfile (void)
 {
   FILE *fp;
   int e;
@@ -77,7 +77,7 @@ _tmpfile_r (struct _reent *ptr)
 
   do
     {
-      if ((f = _tmpnam_r (ptr, buf)) == NULL)
+      if ((f = tmpnam ( buf)) == NULL)
 	return NULL;
       fd = open (f, O_RDWR | O_CREAT | O_EXCL | O_BINARY,
 		    S_IRUSR | S_IWUSR);
@@ -85,7 +85,7 @@ _tmpfile_r (struct _reent *ptr)
   while (fd < 0 && _REENT_ERRNO(ptr) == EEXIST);
   if (fd < 0)
     return NULL;
-  fp = _fdopen_r (ptr, fd, "wb+");
+  fp = fdopen ( fd, "wb+");
   e = _REENT_ERRNO(ptr);
   if (!fp)
     close (fd);
@@ -93,13 +93,3 @@ _tmpfile_r (struct _reent *ptr)
   _REENT_ERRNO(ptr) = e;
   return fp;
 }
-
-#ifndef _REENT_ONLY
-
-FILE *
-tmpfile (void)
-{
-  return _tmpfile_r (_REENT);
-}
-
-#endif

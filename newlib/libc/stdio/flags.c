@@ -23,6 +23,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/types.h>
+#include "local.h"
 
 /*
  * Return the (stdio) flags for a given mode.  Store the flags
@@ -31,13 +32,12 @@
  */
 
 int
-__sflags (struct _reent *ptr,
-       register char *mode,
+__sflags (
+       const char *mode,
        int *optr)
 {
   register int ret, m, o;
 
-  (void) ptr;
   switch (mode[0])
     {
     case 'r':			/* open for reading */

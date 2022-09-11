@@ -46,11 +46,11 @@ SYNOPSIS
 	int fputws_unlocked(const wchar_t *__restrict <[ws]>, FILE *__restrict <[fp]>);
 
 	#include <wchar.h>
-	int _fputws_r(struct _reent *<[ptr]>, const wchar_t *<[ws]>,
+	int fputws( const wchar_t *<[ws]>,
                       FILE *<[fp]>);
 
 	#include <wchar.h>
-	int _fputws_unlocked_r(struct _reent *<[ptr]>, const wchar_t *<[ws]>,
+	int fputws_unlocked( const wchar_t *<[ws]>,
                                FILE *<[fp]>);
 
 DESCRIPTION
@@ -94,7 +94,7 @@ PORTABILITY
 #endif
 
 int
-_fputws_r (struct _reent *ptr,
+fputws (
 	const wchar_t *ws,
 	FILE *fp)
 {
@@ -117,7 +117,7 @@ _fputws_r (struct _reent *ptr,
       if (nbytes == (size_t) -1)
 	goto error;
       iov.iov_len = uio.uio_resid = nbytes;
-      if (__sfvwrite_r(ptr, fp, &uio) != 0)
+      if (_sfvwrite( fp, &uio) != 0)
 	goto error;
     }
   while (ws != NULL);
@@ -141,7 +141,7 @@ error:
 	goto error;
       while (i < nbytes)
         {
-	  if (__sputc_r (ptr, buf[i], fp) == EOF)
+	  if (_sputc ( buf[i], fp) == EOF)
 	    goto error;
 	  i++;
         }
@@ -154,14 +154,4 @@ error:
   _newlib_flockfile_end (fp);
   return (-1);
 #endif
-}
-
-int
-fputws (const wchar_t *__restrict ws,
-	FILE *__restrict fp)
-{
-  struct _reent *reent = _REENT;
-
-  CHECK_INIT (reent, fp);
-  return _fputws_r (reent, ws, fp);
 }

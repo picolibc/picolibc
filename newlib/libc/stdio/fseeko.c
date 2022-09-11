@@ -32,9 +32,9 @@ SYNOPSIS
 	#include <stdio.h>
 	int fseek(FILE *<[fp]>, long <[offset]>, int <[whence]>)
 	int fseeko(FILE *<[fp]>, off_t <[offset]>, int <[whence]>)
-	int _fseek_r(struct _reent *<[ptr]>, FILE *<[fp]>,
+	int fseek( FILE *<[fp]>,
 	             long <[offset]>, int <[whence]>)
-	int _fseeko_r(struct _reent *<[ptr]>, FILE *<[fp]>,
+	int fseeko( FILE *<[fp]>,
 	             off_t <[offset]>, int <[whence]>)
 
 DESCRIPTION
@@ -93,12 +93,12 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
  */
 
 int
-_fseeko_r (struct _reent *ptr,
+fseeko (
        register FILE *fp,
        _off_t offset,
        int whence)
 {
-  _fpos_t (*seekfn) (struct _reent *, void *, _fpos_t, int);
+  _fpos_t (*seekfn) (void *, _fpos_t, int);
 #ifdef _FSEEK_OPTIMIZATION
   _fpos_t target;
   size_t n;
@@ -123,7 +123,7 @@ _fseeko_r (struct _reent *ptr,
   if (fp->_flags & __SAPP && fp->_flags & __SWR)
     {
       /* So flush the buffer and seek to the end.  */
-      _fflush_r (ptr, fp);
+      fflush ( fp);
     }
 
   /* Have to be able to seek.  */
@@ -148,12 +148,12 @@ _fseeko_r (struct _reent *ptr,
        * we have to first find the current stream offset a la
        * ftell (see ftell for details).
        */
-      _fflush_r (ptr, fp);   /* may adjust seek offset on append stream */
+      fflush ( fp);   /* may adjust seek offset on append stream */
       if (fp->_flags & __SOFF)
 	curoff = fp->_offset;
       else
 	{
-	  curoff = seekfn (ptr, fp->_cookie, (_fpos_t) 0, SEEK_CUR);
+	  curoff = seekfn (fp->_cookie, (_fpos_t) 0, SEEK_CUR);
 	  if (curoff == -1L)
 	    {
 	      _newlib_flockfile_exit (fp);
@@ -197,7 +197,7 @@ _fseeko_r (struct _reent *ptr,
    */
 
   if (fp->_bf._base == NULL)
-    __smakebuf_r (ptr, fp);
+    _smakebuf ( fp);
 
 #ifdef _FSEEK_OPTIMIZATION
   if (fp->_flags & (__SWR | __SRW | __SNBF | __SNPT))
@@ -209,7 +209,7 @@ _fseeko_r (struct _reent *ptr,
 #ifdef __USE_INTERNAL_STAT64
 	  || _fstat64_r (ptr, fp->_file, &st)
 #else
-	  || _fstat_r (ptr, fp->_file, &st)
+	  || fstat ( fp->_file, &st)
 #endif
 	  || (st.st_mode & S_IFMT) != S_IFREG)
 	{
@@ -236,7 +236,7 @@ _fseeko_r (struct _reent *ptr,
 #ifdef __USE_INTERNAL_STAT64
       if (_fstat64_r (ptr, fp->_file, &st))
 #else
-      if (_fstat_r (ptr, fp->_file, &st))
+      if (fstat ( fp->_file, &st))
 #endif
 	goto dumb;
       target = st.st_size + offset;
@@ -318,7 +318,7 @@ _fseeko_r (struct _reent *ptr,
   n = target - curoff;
   if (n)
     {
-      if (__srefill_r (ptr, fp) || fp->_r < n)
+      if (_srefill ( fp) || fp->_r < n)
 	goto dumb;
       fp->_p += n;
       fp->_r -= n;
@@ -334,8 +334,8 @@ _fseeko_r (struct _reent *ptr,
 dumb:
 #endif
 
-  if (_fflush_r (ptr, fp)
-      || seekfn (ptr, fp->_cookie, offset, whence) == POS_ERR)
+  if (fflush ( fp)
+      || seekfn (fp->_cookie, offset, whence) == POS_ERR)
     {
       _newlib_flockfile_exit (fp);
       return EOF;
@@ -358,15 +358,3 @@ dumb:
   _newlib_flockfile_end (fp);
   return 0;
 }
-
-#ifndef _REENT_ONLY
-
-int
-fseeko (register FILE *fp,
-       _off_t offset,
-       int whence)
-{
-  return _fseeko_r (_REENT, fp, offset, whence);
-}
-
-#endif /* !_REENT_ONLY */

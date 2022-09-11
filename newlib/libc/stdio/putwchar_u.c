@@ -33,13 +33,6 @@
 
 #undef putwchar_unlocked
 
-wint_t
-_putwchar_unlocked_r (struct _reent *ptr,
-	wchar_t wc)
-{
-  return _fputwc_unlocked_r (ptr, wc, stdout);
-}
-
 /*
  * Synonym for fputwc_unlocked(wc, stdout).
  */

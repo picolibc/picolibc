@@ -164,14 +164,14 @@ typedef short *  short_ptr_t;
    so it is not worth to rewrite them into functions. This situation may
    change in the future.  */
 #define PRINT(ptr, len) {		\
-	if (pfunc (data, fp, (ptr), (len)) == EOF) \
+	if (pfunc (fp, (ptr), (len)) == EOF) \
 		goto error;		\
 }
 #define PAD(howmany, ch) {             \
        int temp_i = 0;                 \
        while (temp_i < (howmany))      \
        {                               \
-               if (pfunc (data, fp, &(ch), 1) == EOF) \
+               if (pfunc (fp, &(ch), 1) == EOF) \
                        goto error;     \
                temp_i++;               \
        }			       \
@@ -207,25 +207,25 @@ struct _prt_data_t
 };
 
 extern int
-_printf_common (struct _reent *data,
+_printf_common (
 		struct _prt_data_t *pdata,
 		int *realsz,
 		FILE *fp,
-		int (*pfunc)(struct _reent *, FILE *,
+		int (*pfunc)(FILE *,
 			     const char *, size_t len));
 
 extern int
-_printf_i (struct _reent *data, struct _prt_data_t *pdata, FILE *fp,
-	   int (*pfunc)(struct _reent *, FILE *, const char *, size_t len),
+_printf_i (struct _prt_data_t *pdata, FILE *fp,
+	   int (*pfunc)(FILE *, const char *, size_t len),
 	   va_list *ap);
 
 /* Make _printf_float weak symbol, so it won't be linked in if target program
    does not need it.  */
 extern int
-_printf_float (struct _reent *data,
+_printf_float (
 	       struct _prt_data_t *pdata,
 	       FILE *fp,
-	       int (*pfunc)(struct _reent *, FILE *,
+	       int (*pfunc)(FILE *,
 			    const char *, size_t len),
 	       va_list *ap) _ATTRIBUTE((__weak__));
 #endif

@@ -28,7 +28,7 @@ SYNOPSIS
 	#include <stdio.h>
 	int puts(const char *<[s]>);
 
-	int _puts_r(struct _reent *<[reent]>, const char *<[s]>);
+	int puts( const char *<[s]>);
 
 DESCRIPTION
 <<puts>> writes the string at <[s]> (followed by a newline, instead of
@@ -65,7 +65,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
  */
 
 int
-_puts_r (struct _reent *ptr,
+puts (
        const char * s)
 {
 #ifdef _FVWRITE_IN_STREAMIO
@@ -88,7 +88,7 @@ _puts_r (struct _reent *ptr,
   CHECK_INIT (ptr, fp);
   _newlib_flockfile_start (fp);
   ORIENT (fp, -1);
-  result = (__sfvwrite_r (ptr, fp, &uio) ? EOF : '\n');
+  result = (_sfvwrite ( fp, &uio) ? EOF : '\n');
   _newlib_flockfile_end (fp);
   return result;
 #else
@@ -107,10 +107,10 @@ _puts_r (struct _reent *ptr,
 
   while (*p)
     {
-      if (__sputc_r (ptr, *p++, fp) == EOF)
+      if (_sputc ( *p++, fp) == EOF)
 	goto err;
     }
-  if (__sputc_r (ptr, '\n', fp) == EOF)
+  if (_sputc ( '\n', fp) == EOF)
     goto err;
 
   result = '\n';
@@ -120,13 +120,3 @@ err:
   return result;
 #endif
 }
-
-#ifndef _REENT_ONLY
-
-int
-puts (char const * s)
-{
-  return _puts_r (_REENT, s);
-}
-
-#endif

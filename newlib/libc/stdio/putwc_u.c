@@ -33,13 +33,6 @@
 
 #undef putwc_unlocked
 
-wint_t
-_putwc_unlocked_r (struct _reent *ptr,
-	wchar_t wc,
-	FILE *fp)
-{
-  return _fputwc_unlocked_r (ptr, wc, fp);
-}
 /*
  * Synonym for fputwc_unlocked(). The only difference is that putwc_unlocked(),
  * if it is a macro, may evaluate `fp' more than once.

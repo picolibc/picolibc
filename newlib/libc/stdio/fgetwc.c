@@ -57,11 +57,11 @@ SYNOPSIS
 
 	#include <stdio.h>
 	#include <wchar.h>
-	wint_t _fgetwc_r(struct _reent *<[ptr]>, FILE *<[fp]>);
+	wint_t fgetwc( FILE *<[fp]>);
 
 	#include <stdio.h>
 	#include <wchar.h>
-	wint_t _fgetwc_unlocked_r(struct _reent *<[ptr]>, FILE *<[fp]>);
+	wint_t fgetwc_unlocked( FILE *<[fp]>);
 
 	#include <stdio.h>
 	#include <wchar.h>
@@ -74,11 +74,11 @@ SYNOPSIS
 
 	#include <stdio.h>
 	#include <wchar.h>
-	wint_t _getwc_r(struct _reent *<[ptr]>, FILE *<[fp]>);
+	wint_t getwc( FILE *<[fp]>);
 
 	#include <stdio.h>
 	#include <wchar.h>
-	wint_t _getwc_unlocked_r(struct _reent *<[ptr]>, FILE *<[fp]>);
+	wint_t getwc_unlocked( FILE *<[fp]>);
 
 DESCRIPTION
 Use <<fgetwc>> to get the next wide character from the file or stream
@@ -125,13 +125,13 @@ PORTABILITY
 #include "local.h"
 
 wint_t
-__fgetwc (struct _reent *ptr,
+__fgetwc (
 	register FILE *fp)
 {
   wchar_t wc;
   size_t nconv;
 
-  if (fp->_r <= 0 && __srefill_r (ptr, fp))
+  if (fp->_r <= 0 && _srefill ( fp))
     return (WEOF);
   if (MB_CUR_MAX == 1)
     {
@@ -164,30 +164,21 @@ __fgetwc (struct _reent *ptr,
 	  return (wc);
 	}
     }
-  while (__srefill_r(ptr, fp) == 0);
+  while (_srefill( fp) == 0);
   fp->_flags |= __SERR;
   errno = EILSEQ;
   return (WEOF);
 }
 
 wint_t
-_fgetwc_r (struct _reent *ptr,
+fgetwc (
 	register FILE *fp)
 {
   wint_t r;
 
   _newlib_flockfile_start (fp);
   ORIENT(fp, 1);
-  r = __fgetwc (ptr, fp);
+  r = __fgetwc (fp);
   _newlib_flockfile_end (fp);
   return r;
-}
-
-wint_t
-fgetwc (FILE *fp)
-{
-  struct _reent *reent = _REENT;
-
-  CHECK_INIT(reent, fp);
-  return _fgetwc_r (reent, fp);
 }

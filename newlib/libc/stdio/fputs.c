@@ -37,10 +37,10 @@ SYNOPSIS
 	int fputs_unlocked(const char *restrict <[s]>, FILE *restrict <[fp]>);
 
 	#include <stdio.h>
-	int _fputs_r(struct _reent *<[ptr]>, const char *restrict <[s]>, FILE *restrict <[fp]>);
+	int fputs( const char *restrict <[s]>, FILE *restrict <[fp]>);
 
 	#include <stdio.h>
-	int _fputs_unlocked_r(struct _reent *<[ptr]>, const char *restrict <[s]>, FILE *restrict <[fp]>);
+	int fputs_unlocked( const char *restrict <[s]>, FILE *restrict <[fp]>);
 
 DESCRIPTION
 <<fputs>> writes the string at <[s]> (but without the trailing null)
@@ -87,7 +87,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
  * Write the given string to the given file.
  */
 int
-_fputs_r (struct _reent * ptr,
+fputs (
        char const *__restrict s,
        FILE *__restrict fp)
 {
@@ -105,7 +105,7 @@ _fputs_r (struct _reent * ptr,
 
   _newlib_flockfile_start (fp);
   ORIENT (fp, -1);
-  result = __sfvwrite_r (ptr, fp, &uio);
+  result = _sfvwrite ( fp, &uio);
   _newlib_flockfile_end (fp);
   return result;
 #else
@@ -121,7 +121,7 @@ _fputs_r (struct _reent * ptr,
 
   while (*p)
     {
-      if (__sputc_r (ptr, *p++, fp) == EOF)
+      if (_sputc ( *p++, fp) == EOF)
 	goto error;
     }
   _newlib_flockfile_exit (fp);
@@ -132,12 +132,3 @@ error:
   return EOF;
 #endif
 }
-
-#ifndef _REENT_ONLY
-int
-fputs (char const *__restrict s,
-       FILE *__restrict fp)
-{
-  return _fputs_r (_REENT, s, fp);
-}
-#endif /* !_REENT_ONLY */

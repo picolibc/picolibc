@@ -18,7 +18,7 @@ SYNOPSIS
 	#include <stdio.h>
 	int fpurge(FILE *<[fp]>);
 
-	int _fpurge_r(struct _reent *<[reent]>, FILE *<[fp]>);
+	int fpurge( FILE *<[fp]>);
 
 	#include <stdio.h>
 	#include <stdio_ext.h>
@@ -61,7 +61,7 @@ No supporting OS subroutines are required.
 /* Discard I/O from a single file.  */
 
 int
-_fpurge_r (struct _reent *ptr,
+fpurge (
        register FILE * fp)
 {
   int t;
@@ -89,23 +89,3 @@ _fpurge_r (struct _reent *ptr,
   _newlib_flockfile_end (fp);
   return 0;
 }
-
-#ifndef _REENT_ONLY
-
-int
-fpurge (register FILE * fp)
-{
-  return _fpurge_r (_REENT, fp);
-}
-
-#ifndef __rtems__
-
-void
-__fpurge (register FILE * fp)
-{
-  _fpurge_r (_REENT, fp);
-}
-
-#endif
-
-#endif /* _REENT_ONLY */

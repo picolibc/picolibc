@@ -27,7 +27,7 @@ INDEX
 SYNOPSIS
 	#include <stdio.h>
 	FILE *fdopen(int <[fd]>, const char *<[mode]>);
-	FILE *_fdopen_r(struct _reent *<[reent]>,
+	FILE *fdopen(
                         int <[fd]>, const char *<[mode]>);
 
 DESCRIPTION
@@ -53,7 +53,7 @@ PORTABILITY
 #include <_syslist.h>
 
 FILE *
-_fdopen_r (struct _reent *ptr,
+fdopen (
        int fd,
        const char *mode)
 {
@@ -63,7 +63,7 @@ _fdopen_r (struct _reent *ptr,
   int fdflags, fdmode;
 #endif
 
-  if ((flags = __sflags (ptr, mode, &oflags)) == 0)
+  if ((flags = __sflags (mode, &oflags)) == 0)
     return 0;
 
   /* make sure the mode the user wants is a subset of the actual mode */
@@ -78,7 +78,7 @@ _fdopen_r (struct _reent *ptr,
     }
 #endif
 
-  if ((fp = __sfp (ptr)) == 0)
+  if ((fp = __sfp ()) == 0)
     return 0;
 
   _newlib_flockfile_start (fp);
@@ -118,14 +118,3 @@ _fdopen_r (struct _reent *ptr,
   _newlib_flockfile_end (fp);
   return fp;
 }
-
-#ifndef _REENT_ONLY
-
-FILE *
-fdopen (int fd,
-       const char *mode)
-{
-  return _fdopen_r (_REENT, fd, mode);
-}
-
-#endif

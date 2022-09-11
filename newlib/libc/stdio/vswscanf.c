@@ -30,19 +30,8 @@
  * vsscanf
  */
 
-#ifndef _REENT_ONLY
-
 int
-vswscanf (const wchar_t *__restrict str, const wchar_t * __restrict fmt,
-  va_list ap)
-{
-  return _vswscanf_r (_REENT, str, fmt, ap);
-}
-
-#endif /* !_REENT_ONLY */
-
-int
-_vswscanf_r (struct _reent *ptr, const wchar_t *str, const wchar_t *fmt,
+vswscanf ( const wchar_t *str, const wchar_t *fmt,
 	     va_list ap)
 {
   FILE f;
@@ -56,5 +45,5 @@ _vswscanf_r (struct _reent *ptr, const wchar_t *str, const wchar_t *fmt,
   f._flags2 = 0;
   f._ur = 0;
   f._file = -1;  /* No file. */
-  return __ssvfwscanf_r (ptr, &f, fmt, ap);
+  return _ssvfwscanf ( &f, fmt, ap);
 }

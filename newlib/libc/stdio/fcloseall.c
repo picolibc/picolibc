@@ -57,19 +57,7 @@ Required OS subroutines: <<close>>, <<fstat>>, <<isatty>>, <<lseek>>,
 #include "local.h"
 
 int
-_fcloseall_r (struct _reent *ptr)
-{
-  (void) ptr;
-  /* There are no thread-specific FILE objects */
-  return 0;
-}
-
-#ifndef _REENT_ONLY
-
-int
 fcloseall (void)
 {
-  return _fwalk_sglue (_GLOBAL_REENT, _fclose_r, &__sglue);
+  return _fwalk_sglue (fclose, &__sglue);
 }
-
-#endif

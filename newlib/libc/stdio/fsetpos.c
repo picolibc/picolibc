@@ -27,7 +27,7 @@ INDEX
 SYNOPSIS
 	#include <stdio.h>
 	int fsetpos(FILE *<[fp]>, const fpos_t *<[pos]>);
-	int _fsetpos_r(struct _reent *<[ptr]>, FILE *<[fp]>,
+	int fsetpos( FILE *<[fp]>,
 	               const fpos_t *<[pos]>);
 
 DESCRIPTION
@@ -59,24 +59,13 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <stdio.h>
 
 int
-_fsetpos_r (struct _reent * ptr,
+fsetpos (
        FILE * iop,
        const _fpos_t * pos)
 {
-  int x = _fseek_r (ptr, iop, *pos, SEEK_SET);
+  int x = fseek ( iop, *pos, SEEK_SET);
 
   if (x != 0)
     return 1;
   return 0;
 }
-
-#ifndef _REENT_ONLY
-
-int
-fsetpos (FILE * iop,
-       const _fpos_t * pos)
-{
-  return _fsetpos_r (_REENT, iop, pos);
-}
-
-#endif /* !_REENT_ONLY */

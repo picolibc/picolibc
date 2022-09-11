@@ -60,13 +60,13 @@ SYNOPSIS
 	int mkostemp(char *<[path]>, int <[flags]>);
 	int mkostemps(char *<[path]>, int <[suffixlen]>, int <[flags]>);
 
-	char *_mktemp_r(struct _reent *<[reent]>, char *<[path]>);
-	char *_mkdtemp_r(struct _reent *<[reent]>, char *<[path]>);
-	int *_mkstemp_r(struct _reent *<[reent]>, char *<[path]>);
-	int *_mkstemps_r(struct _reent *<[reent]>, char *<[path]>, int <[len]>);
-	int *_mkostemp_r(struct _reent *<[reent]>, char *<[path]>,
+	char *mktemp( char *<[path]>);
+	char *mkdtemp( char *<[path]>);
+	int *mkstemp( char *<[path]>);
+	int *mkstemps( char *<[path]>, int <[len]>);
+	int *mkostemp( char *<[path]>,
 			 int <[flags]>);
-	int *_mkostemps_r(struct _reent *<[reent]>, char *<[path]>, int <[len]>,
+	int *mkostemps( char *<[path]>, int <[len]>,
 			  int <[flags]>);
 
 DESCRIPTION
@@ -139,7 +139,7 @@ Supporting OS subroutines required: <<getpid>>, <<mkdir>>, <<open>>, <<stat>>.
 #include <unistd.h>
 
 static int
-_gettemp (struct _reent *ptr,
+_gettemp (
        char *path,
        register int *doopen,
        int domkdir,
@@ -155,7 +155,6 @@ _gettemp (struct _reent *ptr,
 #endif
   unsigned int pid;
 
-  (void) ptr;
   pid = getpid ();
   for (trv = path; *trv; ++trv)		/* extra X's get set to 0's */
     continue;
@@ -211,7 +210,7 @@ _gettemp (struct _reent *ptr,
       if (domkdir)
 	{
 #ifdef HAVE_MKDIR
-	  if (_mkdir_r (ptr, path, 0700) == 0)
+	  if (mkdir ( path, 0700) == 0)
 	    return 1;
 	  if (_REENT_ERRNO(ptr) != EEXIST)
 	    return 0;
@@ -263,111 +262,57 @@ _gettemp (struct _reent *ptr,
 #endif
 
 int
-_mkstemp_r (struct _reent *ptr,
+mkstemp (
        char *path)
 {
   int fd;
 
-  return (_gettemp (ptr, path, &fd, 0, 0, O_BINARY) ? fd : -1);
+  return (_gettemp (path, &fd, 0, 0, O_BINARY) ? fd : -1);
 }
 
 #if !defined _ELIX_LEVEL || _ELIX_LEVEL >= 4
 char *
-_mkdtemp_r (struct _reent *ptr,
+mkdtemp (
        char *path)
 {
-  return (_gettemp (ptr, path, (int *) NULL, 1, 0, 0) ? path : NULL);
+  return (_gettemp (path, (int *) NULL, 1, 0, 0) ? path : NULL);
 }
 
 int
-_mkstemps_r (struct _reent *ptr,
+mkstemps (
        char *path,
        int len)
 {
   int fd;
 
-  return (_gettemp (ptr, path, &fd, 0, len, O_BINARY) ? fd : -1);
+  return (_gettemp (path, &fd, 0, len, O_BINARY) ? fd : -1);
 }
 
 int
-_mkostemp_r (struct _reent *ptr,
+mkostemp (
        char *path,
        int flags)
 {
   int fd;
 
-  return (_gettemp (ptr, path, &fd, 0, 0, flags & ~O_ACCMODE) ? fd : -1);
+  return (_gettemp (path, &fd, 0, 0, flags & ~O_ACCMODE) ? fd : -1);
 }
 
 int
-_mkostemps_r (struct _reent *ptr,
+mkostemps (
        char *path,
        int len,
        int flags)
 {
   int fd;
 
-  return (_gettemp (ptr, path, &fd, 0, len, flags & ~O_ACCMODE) ? fd : -1);
+  return (_gettemp (path, &fd, 0, len, flags & ~O_ACCMODE) ? fd : -1);
 }
 #endif /* _ELIX_LEVEL */
 
 char *
-_mktemp_r (struct _reent *ptr,
+mktemp (
        char *path)
 {
-  return (_gettemp (ptr, path, (int *) NULL, 0, 0, 0) ? path : (char *) NULL);
+  return (_gettemp (path, (int *) NULL, 0, 0, 0) ? path : (char *) NULL);
 }
-
-#ifndef _REENT_ONLY
-
-int
-mkstemp (char *path)
-{
-  int fd;
-
-  return (_gettemp (_REENT, path, &fd, 0, 0, O_BINARY) ? fd : -1);
-}
-
-# if !defined _ELIX_LEVEL || _ELIX_LEVEL >= 4
-char *
-mkdtemp (char *path)
-{
-  return (_gettemp (_REENT, path, (int *) NULL, 1, 0, 0) ? path : NULL);
-}
-
-int
-mkstemps (char *path,
-       int len)
-{
-  int fd;
-
-  return (_gettemp (_REENT, path, &fd, 0, len, O_BINARY) ? fd : -1);
-}
-
-int
-mkostemp (char *path,
-       int flags)
-{
-  int fd;
-
-  return (_gettemp (_REENT, path, &fd, 0, 0, flags & ~O_ACCMODE) ? fd : -1);
-}
-
-int
-mkostemps (char *path,
-       int len,
-       int flags)
-{
-  int fd;
-
-  return (_gettemp (_REENT, path, &fd, 0, len, flags & ~O_ACCMODE) ? fd : -1);
-}
-# endif /* _ELIX_LEVEL */
-
-char *
-mktemp (char *path)
-{
-  return (_gettemp (_REENT, path, (int *) NULL, 0, 0, 0) ? path : (char *) NULL);
-}
-
-#endif /* ! defined (_REENT_ONLY) */

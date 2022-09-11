@@ -30,26 +30,9 @@
 #include "local.h"
 
 int
-_fgetc_unlocked_r (struct _reent * ptr,
+fgetc_unlocked (
        FILE * fp)
 {
   CHECK_INIT(ptr, fp);
-  return __sgetc_r (ptr, fp);
+  return _sgetc ( fp);
 }
-
-#ifndef _REENT_ONLY
-
-int
-fgetc_unlocked (FILE * fp)
-{
-#if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
-  struct _reent *reent = _REENT;
-
-  CHECK_INIT(reent, fp);
-  return __sgetc_r (reent, fp);
-#else
-  return _fgetc_unlocked_r (_REENT, fp);
-#endif
-}
-
-#endif /* !_REENT_ONLY */

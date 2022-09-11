@@ -28,7 +28,7 @@ SYNOPSIS
 	#include <stdio.h>
 	void perror(char *<[prefix]>);
 
-	void _perror_r(struct _reent *<[reent]>, char *<[prefix]>);
+	void perror( char *<[prefix]>);
 
 DESCRIPTION
 Use <<perror>> to print (on standard error) an error message
@@ -75,17 +75,17 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 }
 
 void
-_perror_r (struct _reent *ptr,
+perror (
        const char *s)
 {
   char *error;
   int dummy;
-  FILE *fp = _stderr_r (ptr);
+  FILE *fp = stderr;
 
   CHECK_INIT (ptr, fp);
 
   _newlib_flockfile_start(fp);
-  _fflush_r (ptr, fp);
+  fflush ( fp);
   if (s != NULL && *s != '\0')
     {
       WRITE_STR (s);
@@ -103,13 +103,3 @@ _perror_r (struct _reent *ptr,
   fp->_flags &= ~__SOFF;
   _newlib_flockfile_end(fp);
 }
-
-#ifndef _REENT_ONLY
-
-void
-perror (const char *s)
-{
-  _perror_r (_REENT, s);
-}
-
-#endif

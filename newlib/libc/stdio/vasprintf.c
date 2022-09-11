@@ -29,26 +29,8 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 #include "local.h"
 
-#ifndef _REENT_ONLY
-
 int
-vasprintf (char **strp,
-       const char *fmt,
-       va_list ap)
-{
-  return _vasprintf_r (_REENT, strp, fmt, ap);
-}
-
-#ifdef _NANO_FORMATTED_IO
-int
-vasiprintf (char **, const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("vasprintf")));
-#endif
-
-#endif /* !_REENT_ONLY */
-
-int
-_vasprintf_r (struct _reent *ptr,
+vasprintf (
        char **strp,
        const char *fmt,
        va_list ap)
@@ -60,7 +42,7 @@ _vasprintf_r (struct _reent *ptr,
   f._bf._base = f._p = NULL;
   f._bf._size = f._w = 0;
   f._file = -1;  /* No file. */
-  ret = _svfprintf_r (ptr, &f, fmt, ap);
+  ret = svfprintf ( &f, fmt, ap);
   if (ret >= 0)
     {
       *f._p = 0;
@@ -71,6 +53,6 @@ _vasprintf_r (struct _reent *ptr,
 
 #ifdef _NANO_FORMATTED_IO
 int
-_vasiprintf_r (struct _reent *, char **, const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("_vasprintf_r")));
+vasiprintf (char **, const char *, __VALIST)
+       _ATTRIBUTE ((__alias__("vasprintf")));
 #endif

@@ -80,7 +80,6 @@ general_srcs_stdio = [
   'puts.c',
   'refill.c',
   'remove.c',
-  'rename.c',
   'rewind.c',
   'rget.c',
   'scanf.c',

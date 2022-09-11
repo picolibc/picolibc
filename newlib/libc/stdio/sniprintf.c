@@ -27,7 +27,7 @@
 #include "local.h"
 
 int
-_sniprintf_r (struct _reent *ptr,
+sniprintf (
 	char *str,
 	size_t size,
 	const char *fmt, ...)
@@ -46,7 +46,7 @@ _sniprintf_r (struct _reent *ptr,
   f._bf._size = f._w = (size > 0 ? size - 1 : 0);
   f._file = -1;  /* No file. */
   va_start (ap, fmt);
-  ret = _svfiprintf_r (ptr, &f, fmt, ap);
+  ret = svfiprintf ( &f, fmt, ap);
   va_end (ap);
   if (ret < EOF)
     _REENT_ERRNO(ptr) = EOVERFLOW;
@@ -54,36 +54,3 @@ _sniprintf_r (struct _reent *ptr,
     *f._p = 0;
   return (ret);
 }
-
-#ifndef _REENT_ONLY
-
-int
-sniprintf (char *str,
-	size_t size,
-	const char *fmt, ...)
-{
-  int ret;
-  va_list ap;
-  FILE f;
-  struct _reent *ptr = _REENT;
-
-  if (size > INT_MAX)
-    {
-      _REENT_ERRNO(ptr) = EOVERFLOW;
-      return EOF;
-    }
-  f._flags = __SWR | __SSTR;
-  f._bf._base = f._p = (unsigned char *) str;
-  f._bf._size = f._w = (size > 0 ? size - 1 : 0);
-  f._file = -1;  /* No file. */
-  va_start (ap, fmt);
-  ret = _svfiprintf_r (ptr, &f, fmt, ap);
-  va_end (ap);
-  if (ret < EOF)
-    _REENT_ERRNO(ptr) = EOVERFLOW;
-  if (size > 0)
-    *f._p = 0;
-  return (ret);
-}
-
-#endif

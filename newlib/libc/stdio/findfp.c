@@ -36,7 +36,7 @@ struct _glue __sglue = {NULL, 3, &__sf[0]};
 NEWLIB_THREAD_LOCAL __FILE *_tls_stdin = &__sf[0];
 NEWLIB_THREAD_LOCAL __FILE *_tls_stdout = &__sf[1];
 NEWLIB_THREAD_LOCAL __FILE *_tls_stderr = &__sf[2];
-NEWLIB_THREAD_LOCAL void (*_tls_cleanup)(struct _reent *);
+NEWLIB_THREAD_LOCAL void (*_tls_cleanup)(void);
 #endif
 
 #ifdef _STDIO_BSD_SEMANTICS
@@ -48,9 +48,9 @@ NEWLIB_THREAD_LOCAL void (*_tls_cleanup)(struct _reent *);
   /* Otherwise close files and flush read streams, too.
      Note we call flush directly if "--enable-lite-exit" is in effect.  */
 #ifdef _LITE_EXIT
-#define CLEANUP_FILE _fflush_r
+#define CLEANUP_FILE fflush
 #else
-#define CLEANUP_FILE _fclose_r
+#define CLEANUP_FILE fclose
 #endif
 #endif
 
@@ -134,11 +134,10 @@ struct glue_with_file {
 };
 
 static struct _glue *
-sfmoreglue (struct _reent *d, int n)
+sfmoreglue (int n)
 {
   struct glue_with_file *g;
 
-  (void) d;
   g = (struct glue_with_file *)
     malloc (sizeof (*g) + (n - 1) * sizeof (FILE));
   if (g == NULL)
@@ -153,7 +152,7 @@ sfmoreglue (struct _reent *d, int n)
 static void
 stdio_exit_handler (void)
 {
-  (void) _fwalk_sglue (_GLOBAL_REENT, CLEANUP_FILE, &__sglue);
+  (void) _fwalk_sglue (CLEANUP_FILE, &__sglue);
 }
 
 static void
@@ -172,7 +171,7 @@ global_stdio_init (void)
  */
 
 FILE *
-__sfp (struct _reent *d)
+__sfp (void)
 {
   FILE *fp;
   int n;
@@ -187,7 +186,7 @@ __sfp (struct _reent *d)
 	if (fp->_flags == 0)
 	  goto found;
       if (g->_next == NULL &&
-	  (g->_next = sfmoreglue (d, NDYNAMIC)) == NULL)
+	  (g->_next = sfmoreglue (NDYNAMIC)) == NULL)
 	break;
     }
   _newlib_sfp_lock_exit ();
@@ -228,14 +227,14 @@ found:
  */
 
 static void
-cleanup_stdio (struct _reent *ptr)
+cleanup_stdio (void)
 {
   if (_REENT_STDIN(ptr) != &__sf[0])
-    CLEANUP_FILE (ptr, _REENT_STDIN(ptr));
+    CLEANUP_FILE (_REENT_STDIN(ptr));
   if (_REENT_STDOUT(ptr) != &__sf[1])
-    CLEANUP_FILE (ptr, _REENT_STDOUT(ptr));
+    CLEANUP_FILE (_REENT_STDOUT(ptr));
   if (_REENT_STDERR(ptr) != &__sf[2])
-    CLEANUP_FILE (ptr, _REENT_STDERR(ptr));
+    CLEANUP_FILE (_REENT_STDERR(ptr));
 }
 
 /*
@@ -243,9 +242,8 @@ cleanup_stdio (struct _reent *ptr)
  */
 
 void
-__sinit (struct _reent *s)
+__sinit (void)
 {
-  (void) s;
   __sfp_lock_acquire ();
 
   if (_REENT_CLEANUP(s))
@@ -266,7 +264,7 @@ __sinit (struct _reent *s)
 
 /* Walkable file locking routine.  */
 static int
-__fp_lock (struct _reent * ptr __unused, FILE * fp)
+__fp_lock (FILE * fp)
 {
   if (!(fp->_flags2 & __SNLK))
     _flockfile (fp);
@@ -276,7 +274,7 @@ __fp_lock (struct _reent * ptr __unused, FILE * fp)
 
 /* Walkable file unlocking routine.  */
 static int
-__fp_unlock (struct _reent * ptr __unused, FILE * fp)
+__fp_unlock (FILE * fp)
 {
   if (!(fp->_flags2 & __SNLK))
     _funlockfile (fp);
@@ -288,13 +286,13 @@ void
 __fp_lock_all (void)
 {
   __sfp_lock_acquire ();
-  (void) _fwalk_sglue (NULL, __fp_lock, &__sglue);
+  (void) _fwalk_sglue (__fp_lock, &__sglue);
 }
 
 void
 __fp_unlock_all (void)
 {
-  (void) _fwalk_sglue (NULL, __fp_unlock, &__sglue);
+  (void) _fwalk_sglue (__fp_unlock, &__sglue);
   __sfp_lock_release ();
 }
 #endif
