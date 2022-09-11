@@ -201,13 +201,16 @@ main(void)
         }                                                               \
         } while(0)
 
+#ifndef _NANO_FORMATTED_IO
 	CHECK_RT(unsigned char, "hh");
+#endif
 	CHECK_RT(unsigned short, "h");
         CHECK_RT(unsigned int, "");
         CHECK_RT(unsigned long, "l");
 #if defined(_WANT_IO_LONG_LONG) || defined(TINY_STDIO)
         CHECK_RT(unsigned long long, "ll");
 #endif
+#ifndef _NANO_FORMATTED_IO
 #if !defined(_WANT_IO_LONG_LONG) && !defined(TINY_STDIO)
 	if (sizeof(intmax_t) <= sizeof(long))
 #endif
@@ -216,6 +219,7 @@ main(void)
 	}
         CHECK_RT(size_t, "z");
         CHECK_RT(ptrdiff_t, "t");
+#endif
 
         {
             static int i_addr = 12;
