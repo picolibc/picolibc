@@ -166,6 +166,7 @@ have_format_attribute_option = get_option('have-format-attribute')
 have_weak_attribute_option = get_option('have-weak-attribute')
 
 newlib_iconv_encodings = get_option('newlib-iconv-encodings')
+newlib_iconv_encodings_exclude = get_option('newlib-iconv-encodings-exclude')
 newlib_iconv_from_encodings = get_option('newlib-iconv-from-encodings')
 newlib_iconv_to_encodings = get_option('newlib-iconv-to-encodings')
 newlib_iconv_external_ccs = get_option('newlib-iconv-external-ccs')
@@ -1031,7 +1032,10 @@ foreach from : newlib_iconv_from_encodings
   if not available_encodings.contains(from)
     error('Requested from encoding ' + from + ' is not available. Look in newlib/libc/iconv/encoding.aliases')
   endif
-  conf_data.set('_ICONV_FROM_ENCODING_' + from.to_upper(), true)
+  encoding_include = true
+  if from not in newlib_iconv_encodings_exclude
+    conf_data.set('_ICONV_FROM_ENCODING_' + from.to_upper(), true)
+  endif
 endforeach
 
 # Set config variables for each requested 'to' encoding
@@ -1040,7 +1044,9 @@ foreach to : newlib_iconv_to_encodings
   if not available_encodings.contains(to)
     error('Requested to encoding ' + to + ' is not available. Look in newlib/libc/iconv/encoding.aliases')
   endif
-  conf_data.set('_ICONV_TO_ENCODING_' + to.to_upper(), true)
+  if to not in newlib_iconv_encodings_exclude
+    conf_data.set('_ICONV_TO_ENCODING_' + to.to_upper(), true)
+  endif
 endforeach
 
 version_array = meson.project_version().split('.')
