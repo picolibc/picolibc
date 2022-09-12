@@ -79,11 +79,15 @@ double scalbn (double x, int n)
 	    x *= two54; 
 	    GET_HIGH_WORD(hx,x);
 	    k = ((hx&0x7ff00000)>>20) - 54; 
+#if __SIZEOF_INT__ > 2
             if (n< -50000) return __math_uflow(hx<0); 	/*underflow*/
+#endif
 	    }
         if (k==0x7ff) return x+x;		/* NaN or Inf */
+#if __SIZEOF_INT__ > 2
         if (n > 50000) 	/* in case integer overflow in n+k */
             return __math_oflow(hx<0);	        /*overflow*/
+#endif
         k = k+n; 
         if (k >  0x7fe) return __math_oflow(hx<0); /* overflow  */
         if (k > 0) 				/* normal result */

@@ -281,7 +281,7 @@ __find_bigpair(HTAB *hashp,
 	kkey = key;
 
 	for (bytes = hashp->BSIZE - bp[ndx];
-	    bytes <= size && bp[ndx + 1] == PARTIAL_KEY;
+             (int) bytes <= size && bp[ndx + 1] == PARTIAL_KEY;
 	    bytes = hashp->BSIZE - bp[ndx]) {
 		if (memcmp(p + bp[ndx], kkey, bytes))
 			return (-2);
@@ -295,7 +295,7 @@ __find_bigpair(HTAB *hashp,
 		ndx = 1;
 	}
 
-	if (bytes != ksize || memcmp(p + bp[ndx], kkey, bytes)) {
+	if ((int) bytes != ksize || memcmp(p + bp[ndx], kkey, bytes)) {
 #ifdef HASH_STATISTICS
 		++hash_collisions;
 #endif

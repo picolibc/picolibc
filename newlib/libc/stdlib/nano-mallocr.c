@@ -58,10 +58,15 @@
 #define MAX(a,b) ((a) >= (b) ? (a) : (b))
 #endif
 
+#if __SIZEOF_POINTER__ == __SIZEOF_LONG__
 #define ALIGN_TO(size, align) \
     (((size) + (align) -1L) & ~((align) -1L))
+#else
+#define ALIGN_TO(size, align) \
+    (((size) + (align) -1) & ~((align) -1))
+#endif
 
-#define ALIGN_PTR(ptr, align)	(void *) ALIGN_TO((uintptr_t) ptr, align)
+#define ALIGN_PTR(ptr, align)	(void *) (uintptr_t) ALIGN_TO((uintptr_t) ptr, align)
 
 typedef struct {
     char c;

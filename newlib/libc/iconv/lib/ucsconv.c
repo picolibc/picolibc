@@ -218,7 +218,7 @@ ucs_based_conversion_convert (
                                          (ucs4_t)DEFAULT_CHARACTER,
                                          outbuf,
                                          outbytesleft);
-          if ((__int32_t)bytes < 0)
+          if ((ssize_t)bytes < 0)
             {
               _REENT_ERRNO (rptr) = E2BIG;
               return (size_t)-1;

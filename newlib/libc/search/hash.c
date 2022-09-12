@@ -649,7 +649,7 @@ hash_access(HTAB *hashp,
 	for (bp = (__uint16_t *)rbufp->page, n = *bp++, ndx = 1; ndx < n;)
 		if (bp[1] >= REAL_KEY) {
 			/* Real key/data pair */
-			if (size == off - *bp &&
+                        if (size == off - (int) *bp &&
 			    memcmp(kp, rbufp->page + *bp, size) == 0)
 				goto found;
 			off = bp[1];
