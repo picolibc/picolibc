@@ -26,13 +26,11 @@ DESCRIPTION
 	non-reentrant functions, such as strtok.
 */
 
-#include <stdlib.h>
-#include <reent.h>
+#define _DEFAULT_SOURCE
 
-#ifdef _REENT_ONLY
-#ifndef REENTRANT_SYSCALLS_PROVIDED
-#define REENTRANT_SYSCALLS_PROVIDED
-#endif
+#include <stdlib.h>
+#ifndef TINY_STDIO
+#include "../stdio/local.h"
 #endif
 
 void

@@ -57,7 +57,6 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<getpid>>,
 */
 
 #include <stdio.h>
-#include <reent.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>

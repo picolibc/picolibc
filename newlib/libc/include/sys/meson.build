@@ -75,10 +75,6 @@ inc_sys_headers_all = [
   'wait.h'
 ]
 
-if not tinystdio
-  inc_sys_headers_all += ['reent.h']
-endif
-
 inc_sys_headers = []
 foreach file : inc_sys_headers_all
   if not (file in inc_sys_headers_machine)
