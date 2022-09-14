@@ -129,7 +129,7 @@ memmem (const void *haystack, size_t hs_len, const void *needle, size_t ne_len)
 
   if (ne_len == 2)
     {
-      uint32_t nw = ne[0] << 16 | ne[1], hw = hs[0] << 16 | hs[1];
+      uint32_t nw = (uint32_t) ne[0] << 16 | ne[1], hw = (uint32_t) hs[0] << 16 | hs[1];
       for (hs++; hs <= end && hw != nw; )
 	hw = hw << 16 | *++hs;
       return hw == nw ? (void *)(hs - 1) : NULL;

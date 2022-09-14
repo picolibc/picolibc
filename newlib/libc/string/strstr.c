@@ -117,7 +117,7 @@ strstr (const char *hs, const char *ne)
 static inline char *
 strstr2 (const unsigned char *hs, const unsigned char *ne)
 {
-  uint32_t h1 = (ne[0] << 16) | ne[1];
+  uint32_t h1 = ((uint32_t) ne[0] << 16) | ne[1];
   uint32_t h2 = 0;
   int c;
   for (c = hs[0]; h1 != h2 && c != 0; c = *++hs)
@@ -128,7 +128,7 @@ strstr2 (const unsigned char *hs, const unsigned char *ne)
 static inline char *
 strstr3 (const unsigned char *hs, const unsigned char *ne)
 {
-  uint32_t h1 = (ne[0] << 24) | (ne[1] << 16) | (ne[2] << 8);
+  uint32_t h1 = ((uint32_t) ne[0] << 24) | ((uint32_t) ne[1] << 16) | ((uint32_t) ne[2] << 8);
   uint32_t h2 = 0;
   int c;
   for (c = hs[0]; h1 != h2 && c != 0; c = *++hs)
@@ -139,7 +139,7 @@ strstr3 (const unsigned char *hs, const unsigned char *ne)
 static inline char *
 strstr4 (const unsigned char *hs, const unsigned char *ne)
 {
-  uint32_t h1 = (ne[0] << 24) | (ne[1] << 16) | (ne[2] << 8) | ne[3];
+  uint32_t h1 = ((uint32_t) ne[0] << 24) | ((uint32_t) ne[1] << 16) | ((uint32_t) ne[2] << 8) | ne[3];
   uint32_t h2 = 0;
   int c;
   for (c = hs[0]; c != 0 && h1 != h2; c = *++hs)

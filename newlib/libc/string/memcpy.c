@@ -46,10 +46,11 @@ QUICKREF
 #include <_ansi.h>
 #include <string.h>
 #include "local.h"
+#include <stdint.h>
 
 /* Nonzero if either X or Y is not aligned on a "long" boundary.  */
 #define UNALIGNED(X, Y) \
-  (((long)X & (sizeof (long) - 1)) | ((long)Y & (sizeof (long) - 1)))
+  (((uintptr_t)X & (sizeof (long) - 1)) | ((uintptr_t)Y & (sizeof (long) - 1)))
 
 /* How many bytes are copied each iteration of the 4X unrolled loop.  */
 #define BIGBLOCKSIZE    (sizeof (long) << 2)

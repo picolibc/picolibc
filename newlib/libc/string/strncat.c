@@ -53,10 +53,11 @@ QUICKREF
 
 #include <string.h>
 #include <limits.h>
+#include <stdint.h>
 
 /* Nonzero if X is aligned on a "long" boundary.  */
 #define ALIGNED(X) \
-  (((long)X & (sizeof (long) - 1)) == 0)
+  (((uintptr_t)X & (sizeof (long) - 1)) == 0)
 
 #if LONG_MAX == 2147483647L
 #define DETECTNULL(X) (((X) - 0x01010101) & ~(X) & 0x80808080)

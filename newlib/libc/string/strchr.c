@@ -45,9 +45,10 @@ QUICKREF
 
 #include <string.h>
 #include <limits.h>
+#include <stdint.h>
 
 /* Nonzero if X is not aligned on a "long" boundary.  */
-#define UNALIGNED(X) ((long)X & (sizeof (long) - 1))
+#define UNALIGNED(X) ((uintptr_t)X & (sizeof (long) - 1))
 
 /* How many bytes are loaded each iteration of the word copy loop.  */
 #define LBLOCKSIZE (sizeof (long))
