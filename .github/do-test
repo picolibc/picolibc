@@ -4,6 +4,10 @@ DIR=$2
 shift
 shift
 
+for p in /opt/*/bin; do
+    PATH="$p":$PATH
+done
+
 mkdir $DIR
 cd $DIR
 ../scripts/$CONFIGURE -Dwerror=true "$@"
