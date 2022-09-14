@@ -268,7 +268,7 @@ void* __malloc_sbrk_aligned(size_t s)
          * aligned to the right value as chunk sizes are selected to
          * make them abut in memory
 	 */
-	size_t adjust = align_p - p;
+	intptr_t adjust = align_p - p;
         char *extra = sbrk(adjust);
         if (extra != p + s)
             return (void *) -1;
@@ -647,7 +647,7 @@ struct mallinfo mallinfo(void)
     chunk_t * pf;
     size_t free_size = 0;
     size_t total_size;
-    int ordblks = 0;
+    size_t ordblks = 0;
     struct mallinfo current_mallinfo;
 
     MALLOC_LOCK;
@@ -752,7 +752,7 @@ void * memalign(size_t align, size_t s)
 
     aligned_p = ALIGN_PTR(allocated, align);
 
-    offset = aligned_p - allocated;
+    offset = (size_t) (aligned_p - allocated);
 
     /* Split off the front piece if necessary */
     if (offset)
