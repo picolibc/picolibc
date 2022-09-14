@@ -192,7 +192,7 @@ specialcase (double_t tmp, uint64_t sbits, uint64_t ki)
   return check_uflow (y);
 }
 
-#define SIGN_BIAS (0x800 << EXP_TABLE_BITS)
+#define SIGN_BIAS ((int32_t) 0x800 << EXP_TABLE_BITS)
 
 /* Computes sign*exp(x+xtail) where |xtail| < 2^-8/N and |xtail| <= |x|.
    The sign_bias argument is SIGN_BIAS or 0 and sets the sign to -1 or 1.  */

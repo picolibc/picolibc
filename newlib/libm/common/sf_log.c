@@ -72,7 +72,7 @@ logf (float x)
 	return __math_invalidf (x);
       /* x is subnormal, normalize it.  */
       ix = asuint (x * 0x1p23f);
-      ix -= 23 << 23;
+      ix -= (int32_t) 23 << 23;
     }
 
   /* x = 2^k z; where z is in range [OFF,2*OFF] and exact.
@@ -81,7 +81,7 @@ logf (float x)
   tmp = ix - OFF;
   i = (tmp >> (23 - LOGF_TABLE_BITS)) % N;
   k = (int32_t) tmp >> 23; /* arithmetic shift */
-  iz = ix - (tmp & 0x1ff << 23);
+  iz = ix - (tmp & (uint32_t) 0x1ff << 23);
   invc = T[i].invc;
   logc = T[i].logc;
   z = (double_t) asfloat (iz);

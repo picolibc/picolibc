@@ -89,7 +89,7 @@ log2_inline (uint32_t ix)
 #undef T
 #define N (1 << EXP2F_TABLE_BITS)
 #define T __exp2f_data.tab
-#define SIGN_BIAS (1 << (EXP2F_TABLE_BITS + 11))
+#define SIGN_BIAS ((uint32_t) 1 << (EXP2F_TABLE_BITS + 11))
 
 /* The output of log2 and thus the input of exp2 is either scaled by N
    (in case of fast toint intrinsics) or not.  The unscaled xd must be
@@ -149,7 +149,7 @@ checkint (uint32_t iy)
 static inline int
 zeroinfnan (uint32_t ix)
 {
-  return 2 * ix - 1 >= 2u * 0x7f800000 - 1;
+  return 2 * ix - 1 >= 2u * (uint32_t) 0x7f800000 - 1;
 }
 
 float
@@ -171,11 +171,11 @@ powf (float x, float y)
 	    return issignalingf_inline (x) ? x + y : 1.0f;
 	  if (ix == 0x3f800000)
 	    return issignalingf_inline (y) ? x + y : 1.0f;
-	  if (2 * ix > 2u * 0x7f800000 || 2 * iy > 2u * 0x7f800000)
+	  if (2 * ix > 2u * (uint32_t) 0x7f800000 || 2 * iy > 2u * (uint32_t) 0x7f800000)
 	    return x + y;
-	  if (2 * ix == 2 * 0x3f800000)
+	  if (2 * ix == 2 * (uint32_t) 0x3f800000)
 	    return 1.0f;
-	  if ((2 * ix < 2 * 0x3f800000) == !(iy & 0x80000000))
+	  if ((2 * ix < 2 * (uint32_t) 0x3f800000) == !(iy & (uint32_t) 0x80000000))
 	    return 0.0f; /* |x|<1 && y==inf or |x|>1 && y==-inf.  */
 	  return y * y;
 	}
@@ -211,7 +211,7 @@ powf (float x, float y)
 	  /* Normalize subnormal x so exponent becomes negative.  */
 	  ix = asuint (x * 0x1p23f);
 	  ix &= 0x7fffffff;
-	  ix -= 23 << 23;
+	  ix -= (uint32_t) 23 << 23;
 	}
     }
   double_t logx = log2_inline (ix);
