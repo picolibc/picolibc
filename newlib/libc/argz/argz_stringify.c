@@ -21,6 +21,6 @@ argz_stringify (char *argz,
     for (i = 0; i < argz_len - 1; i++)
       {
 	if (argz[i] == '\0')
-	  argz[i] = sep;
+          argz[i] = (char) sep;
       }
 }

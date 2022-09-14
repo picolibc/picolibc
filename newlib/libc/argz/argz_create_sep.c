@@ -17,7 +17,7 @@ argz_create_sep (const char *string,
        char **argz,
        size_t *argz_len)
 {
-  int len = 0;
+  size_t len = 0;
   int i = 0;
   int num_strings = 0;
   char delim[2];
@@ -34,7 +34,7 @@ argz_create_sep (const char *string,
       return 0;
     }
 
-  delim[0] = sep;
+  delim[0] = (char) sep;
   delim[1] = '\0';
 
   running = strdup(string);

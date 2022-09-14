@@ -14,7 +14,7 @@ argz_extract (char *argz,
        char **argv)
 {
   size_t i = 0;
-  int j = 0;
+  size_t j = 0;
   const size_t count = argz_count(argz, argz_len);
 
   if (argz_len > 1)
