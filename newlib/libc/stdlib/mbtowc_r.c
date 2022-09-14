@@ -633,7 +633,7 @@ __utf8_mbtowc (
   if (ch >= 0xf0 && ch <= 0xf4)
     {
       /* four-byte sequence */
-      wint_t tmp;
+      uint32_t tmp;
       state->__value.__wchb[0] = ch;
       if (state->__count == 0)
 	state->__count = 1;
@@ -685,9 +685,9 @@ __utf8_mbtowc (
 	     The second half of the surrogate pair is returned in case we
 	     recognize the special __count value of four, and the next
 	     byte is actually a valid value.  See below. */
-	  tmp = (wint_t)((state->__value.__wchb[0] & 0x07) << 18)
-	    |   (wint_t)((state->__value.__wchb[1] & 0x3f) << 12)
-	    |   (wint_t)((state->__value.__wchb[2] & 0x3f) << 6);
+            tmp = (uint32_t)((state->__value.__wchb[0] & (uint32_t) 0x07) << 18)
+                |   (uint32_t)((state->__value.__wchb[1] & (uint32_t) 0x3f) << 12)
+                |   (uint32_t)((state->__value.__wchb[2] & (uint32_t) 0x3f) << 6);
 	  state->__count = 4;
 	  *pwc = 0xd800 | ((tmp - 0x10000) >> 10);
 	  return i;
@@ -700,10 +700,10 @@ __utf8_mbtowc (
 	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
-      tmp = (wint_t)((state->__value.__wchb[0] & 0x07) << 18)
-	|   (wint_t)((state->__value.__wchb[1] & 0x3f) << 12)
-	|   (wint_t)((state->__value.__wchb[2] & 0x3f) << 6)
-	|   (wint_t)(ch & 0x3f);
+      tmp = (((uint32_t)state->__value.__wchb[0] & 0x07) << 18)
+        |   (((uint32_t)state->__value.__wchb[1] & 0x3f) << 12)
+        |   (((uint32_t)state->__value.__wchb[2] & 0x3f) << 6)
+        |   ((uint32_t)ch & 0x3f);
       if (state->__count == 4 && sizeof(wchar_t) == 2)
 	/* Create the second half of the surrogate pair for systems with
 	   wchar_t == UTF-16 . */

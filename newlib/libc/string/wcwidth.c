@@ -99,8 +99,8 @@ PORTABILITY
 #ifdef _MB_CAPABLE
 struct interval
 {
-  wint_t first;
-  wint_t last;
+  uint32_t first;
+  uint32_t last;
 };
 
 /* auxiliary function for binary search in interval table */
