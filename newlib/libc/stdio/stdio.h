@@ -699,7 +699,7 @@ _ELIDABLE_INLINE int _sputc( int _c, FILE *_p) {
 	  _sputc ( '\r', _p);
 #endif
 	if (--_p->_w >= 0 || (_p->_w >= _p->_lbfsize && (char)_c != '\n'))
-		return (*_p->_p++ = _c);
+                return (*_p->_p++ = (unsigned char) _c);
 	else
 		return (_swbuf( _c, _p));
 }
