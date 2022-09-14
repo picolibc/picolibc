@@ -723,13 +723,13 @@ _strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 				e2 += ((word0(rv) & Exp_mask)
 					>> Exp_shift1) - Bias;
 				word0(rv) &= ~Exp_mask;
-				word0(rv) |= Bias << Exp_shift1;
+				word0(rv) |= (uint32_t) Bias << Exp_shift1;
 				dval(rv) *= bigtens[n_bigtens-1];
 				e1 -= 1 << (n_bigtens-1);
 				}
 			e2 += ((word0(rv) & Exp_mask) >> Exp_shift1) - Bias;
 			word0(rv) &= ~Exp_mask;
-			word0(rv) |= Bias << Exp_shift1;
+			word0(rv) |= (uint32_t) Bias << Exp_shift1;
 			for(j = 0; e1 > 0; j++, e1 >>= 1)
 				if (e1 & 1)
 					dval(rv) *= bigtens[j];
@@ -745,13 +745,13 @@ _strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 				e2 += ((word0(rv) & Exp_mask)
 					>> Exp_shift1) - Bias;
 				word0(rv) &= ~Exp_mask;
-				word0(rv) |= Bias << Exp_shift1;
+				word0(rv) |= (uint32_t) Bias << Exp_shift1;
 				dval(rv) *= tinytens[n_bigtens-1];
 				e1 -= 1 << (n_bigtens-1);
 				}
 			e2 += ((word0(rv) & Exp_mask) >> Exp_shift1) - Bias;
 			word0(rv) &= ~Exp_mask;
-			word0(rv) |= Bias << Exp_shift1;
+			word0(rv) |= (uint32_t) Bias << Exp_shift1;
 			for(j = 0; e1 > 0; j++, e1 >>= 1)
 				if (e1 & 1)
 					dval(rv) *= tinytens[j];
