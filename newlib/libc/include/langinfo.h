@@ -317,7 +317,7 @@ enum
 /* As an extension, nl_langinfo can retrive the name of a locale
    category, with this mapping from setlocale() category (other than
    LC_ALL) to nl_item. */
-#define _NL_LOCALE_NAME_BASE 100000
+#define _NL_LOCALE_NAME_BASE ((nl_item) 100000)
 #if __GNU_VISIBLE
 #define NL_LOCALE_NAME(category) (_NL_LOCALE_NAME_BASE + (category))
 #endif
