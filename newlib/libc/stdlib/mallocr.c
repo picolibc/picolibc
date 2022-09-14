@@ -3043,7 +3043,7 @@ Void_t* mEMALIGn(alignment, bytes) RDECL size_t alignment; size_t bytes;
 
   p = mem2chunk(m);
 
-  if ((((unsigned long)(m)) % alignment) == 0) /* aligned */
+  if ((((uintptr_t)(m)) % alignment) == 0) /* aligned */
   {
 #if HAVE_MMAP
     if(chunk_is_mmapped(p))
@@ -3064,7 +3064,7 @@ Void_t* mEMALIGn(alignment, bytes) RDECL size_t alignment; size_t bytes;
       this is always possible.
     */
 
-    brk = (char*)mem2chunk(((unsigned long)(m + alignment - 1)) & -alignment);
+    brk = (char*)mem2chunk(((uintptr_t)(m + alignment - 1)) & -alignment);
     if ((long)(brk - (char*)(p)) < (long)MINSIZE) brk = brk + alignment;
 
     newp = (mchunkptr)brk;
