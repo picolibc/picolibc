@@ -91,6 +91,7 @@ PORTABILITY
 
 #include <_ansi.h>
 #include <wchar.h>
+#include <stdint.h>
 #ifndef _MB_CAPABLE
 #include <wctype.h> /* iswprint, iswcntrl */
 #endif
@@ -105,7 +106,7 @@ struct interval
 
 /* auxiliary function for binary search in interval table */
 static int
-bisearch(wint_t ucs, const struct interval *table, int max)
+bisearch(uint32_t ucs, const struct interval *table, int max)
 {
   int min = 0;
   int mid;
@@ -165,8 +166,9 @@ bisearch(wint_t ucs, const struct interval *table, int max)
  */
 
 int
-__wcwidth (const wint_t ucs)
+__wcwidth (const wint_t _ucs)
 {
+  uint32_t ucs = (uint32_t) _ucs;
 #ifdef _MB_CAPABLE
   /* sorted list of non-overlapping intervals of East Asian Ambiguous chars */
   static const struct interval ambiguous[] =
@@ -195,7 +197,7 @@ __wcwidth (const wint_t ucs)
     return -1;
 
   /* Test for surrogate pair values. */
-  if (ucs >= 0xd800 && ucs <= 0xdfff)
+  if (ucs >= (uint32_t) 0xd800 && ucs <= (uint32_t) 0xdfff)
     return -1;
 
   /* check CJK width mode (1: ambiguous-wide, 0: normal, -1: disabled) */
