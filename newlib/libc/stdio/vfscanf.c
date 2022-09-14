@@ -507,7 +507,7 @@ _SVFSCANF (
 	  {								\
 	    if (nassigned == EOF)					\
 	      {								\
-		int i;							\
+		unsigned i;						\
 		for (i = 0; i < m_ptr->m_cnt; ++i)			\
 		  {							\
 		    free (*m_ptr->m_arr[i]);				\
