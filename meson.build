@@ -475,11 +475,15 @@ else
   specs_install = true
 endif
 
-# When passing the specs file to CompCert, the libcompcert needs to be included there as well
-additional_libs = ''
+# Let targets add more support libraries 
+additional_libs_list = meson.get_cross_property('additional_libs', [])
+
 if cc.get_id() == 'ccomp'
-  additional_libs = '-lcompcert'
+  # When passing the specs file to CompCert, the libcompcert needs to be included there as well
+  additional_libs_list += '-lcompcert'
 endif
+
+additional_libs = ' '.join(additional_libs_list)
 
 specs_extra = ''
 specs_extra_list = meson.get_cross_property('specs_extra', [])
@@ -1175,7 +1179,7 @@ if has_semihost
   endif
   test_link_args = ['-nostartfiles',
                     '-T', meson.current_source_dir() / custom_script,
-                    '-T', '@0@'.format(picolibc_ld), '-lgcc']
+                    '-T', '@0@'.format(picolibc_ld), '-lgcc'] + additional_libs_list
   test_linker_files = files(custom_script) + [picolibc_ld]
   specs = picolibc_specs
 else
