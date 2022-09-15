@@ -151,6 +151,12 @@ if have_long_double
   endif
 endif
 
+float_double_code = '''
+char size_test[sizeof(float) == sizeof(double) ? 1 : -1];
+'''
+
+double_equals_float = cc.compiles(float_double_code, name : 'double same as float', args : core_c_args)
+
 enable_multilib = get_option('multilib')
 multilib_list = get_option('multilib-list')
 enable_picolib = get_option('picolib')
