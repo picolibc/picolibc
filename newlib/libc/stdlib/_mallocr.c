@@ -320,10 +320,12 @@ extern "C" {
 #endif
 
 #ifndef _WIN32
+#ifndef HAVE_SYSCONF_PAGESIZE
 #ifdef SMALL_MEMORY
 #define malloc_getpagesize (128)
 #else
 #define malloc_getpagesize (4096)
+#endif
 #endif
 #endif
 

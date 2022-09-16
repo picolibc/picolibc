@@ -628,6 +628,7 @@ newlib_cflags="${newlib_cflags} -DCLOCK_PROVIDED -DMALLOC_PROVIDED -DEXIT_PROVID
 	;;
   arm*-*-pe)
 	syscall_dir=syscalls
+	newlib_cflags="${newlib_cflags} -DHAVE_SYSCONF_PAGESIZE"
 	;;
   arm*-*-*)
 	syscall_dir=syscalls
@@ -642,6 +643,7 @@ newlib_cflags="${newlib_cflags} -DCLOCK_PROVIDED -DMALLOC_PROVIDED -DEXIT_PROVID
 #         newlib_cflags="${newlib_cflags} -DARM_RDP_MONITOR"
 	  newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
 	fi
+	newlib_cflags="${newlib_cflags} -DHAVE_SYSCONF_PAGESIZE"
 	;;
   avr*)
 	newlib_cflags="${newlib_cflags} -DNO_EXEC -DSMALL_MEMORY -DMISSING_SYSCALL_NAMES"
