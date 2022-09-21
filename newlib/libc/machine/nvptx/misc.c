@@ -37,8 +37,19 @@ gettimeofday (struct timeval *tv, void *tz) {
 }
 
 int
+getpid (void) {
+  return 0;
+}
+
+int
 isatty (int fd) {
   return fd == 1;
+}
+
+int
+kill (int pid, int sig) {
+  errno = ESRCH;
+  return -1;
 }
 
 off_t
@@ -54,6 +65,12 @@ open (const char *pathname, int flags, ...) {
 int
 read(int fd, void *buf, size_t count) {
   return 0;
+}
+
+int
+stat (const char *file, struct stat *pstat) {
+  errno = EACCES;
+  return -1;
 }
 
 void
