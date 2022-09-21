@@ -938,11 +938,6 @@ fi
 # Target-specific defaults
 case "${host_cpu}" in
   nvptx*)
-	if [ "x${newlib_elix_level}" = "x0" ]; then
-		newlib_elix_level=1;
-	elif [ "x${newlib_elix_level}" != "x1" ]; then
-		newlib_msg_warn="nvptx does not support elix level > 1";
-	fi
 	if [[ -z ${newlib_global_stdio_streams} ]]; then
 		newlib_global_stdio_streams="yes";
 	fi

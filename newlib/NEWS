@@ -13,6 +13,7 @@
 - use global stdio streams for all configurations
 - use global atexit data for all configurations
 - vectorized math routines added for amdgcn platform
+- nvptx: remove newlib ELIX level 1 restriction
 
 *** Major changes in newlib version 4.2.0:
 
