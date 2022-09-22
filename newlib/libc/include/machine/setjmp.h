@@ -173,10 +173,18 @@ _BEGIN_STD_C
 #endif
 
 #ifdef __PPC__
+#ifdef __powerpc64__
+#ifdef __ALTIVEC__
+#define _JBLEN 70
+#else
+#define _JBLEN 43
+#endif
+#else
 #ifdef __ALTIVEC__
 #define _JBLEN 64
 #else
 #define _JBLEN 32
+#endif
 #endif
 #define _JBTYPE double
 #endif
