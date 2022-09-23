@@ -37,3 +37,6 @@ Bug Fixes
 - Fix a permission problem when writing DOS attributes on Samba.
   Addresses: https://cygwin.com/pipermail/cygwin/2022-January/250629.html
 
+- For Linux compatibility, select(2) no longer reports read ready on a
+  FIFO that has never been opened for writing.
+  Addresses: https://cygwin.com/pipermail/cygwin/2022-September/252223.html

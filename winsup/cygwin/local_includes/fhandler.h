@@ -1327,6 +1327,8 @@ struct fifo_reader_id_t
 class fifo_shmem_t
 {
   LONG _nreaders, _nwriters;
+  /* Set to 1 the first time a writer opens. */
+  LONG _writer_opened;
   fifo_reader_id_t _owner, _prev_owner, _pending_owner;
   af_unix_spinlock_t _owner_lock, _reading_lock, _nreaders_lock, _nwriters_lock;
 
@@ -1342,6 +1344,9 @@ public:
   int nwriters () const { return (int) _nwriters; }
   int inc_nwriters () { return (int) InterlockedIncrement (&_nwriters); }
   int dec_nwriters () { return (int) InterlockedDecrement (&_nwriters); }
+
+  bool writer_opened () const { return (bool) _writer_opened; }
+  void set_writer_opened () { InterlockedExchange (&_writer_opened, 1); }
 
   fifo_reader_id_t get_owner () const { return _owner; }
   void set_owner (fifo_reader_id_t fr_id) { _owner = fr_id; }
@@ -1425,6 +1430,8 @@ class fhandler_fifo: public fhandler_pipe_fifo
   int nwriters () const { return shmem->nwriters (); }
   int inc_nwriters () { return shmem->inc_nwriters (); }
   int dec_nwriters () { return shmem->dec_nwriters (); }
+  bool writer_opened () const { return shmem->writer_opened (); }
+  void set_writer_opened () { shmem->set_writer_opened (); }
   void nreaders_lock () { shmem->nreaders_lock (); }
   void nreaders_unlock () { shmem->nreaders_unlock (); }
   void nwriters_lock () { shmem->nwriters_lock (); }
@@ -1480,6 +1487,8 @@ public:
   /* Called if we appear to be at EOF after polling fc_handlers. */
   bool hit_eof () const
   { return !nwriters () && !IsEventSignalled (writer_opening); }
+  /* Special EOF test needed by select.cc:peek_fifo(). */
+  bool select_hit_eof () const { return hit_eof () && writer_opened (); }
   int get_nhandlers () const { return nhandlers; }
   fifo_client_handler &get_fc_handler (int i) { return fc_handler[i]; }
   PUNICODE_STRING get_pipe_name ();

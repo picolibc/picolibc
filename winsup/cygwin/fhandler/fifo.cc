@@ -1043,6 +1043,7 @@ writer_shmem:
   set_pipe_non_blocking (get_handle (), flags & O_NONBLOCK);
   nwriters_lock ();
   inc_nwriters ();
+  set_writer_opened ();
   SetEvent (write_ready);
   ResetEvent (writer_opening);
   nwriters_unlock ();

@@ -950,7 +950,17 @@ peek_fifo (select_record *s, bool from_select)
 	    }
 	}
       fh->fifo_client_unlock ();
-      if (!nconnected && fh->hit_eof ())
+      /* According to POSIX and the Linux man page, we're supposed to
+	 report read ready if the FIFO is at EOF, i.e., if the pipe is
+	 empty and there are no writers.  But there seems to be an
+	 undocumented exception, observed on Linux and other platforms
+	 (https://cygwin.com/pipermail/cygwin/2022-September/252223.html):
+	 If no writer has ever been opened, then we do not report read
+	 ready.  This can happen if a reader is opened with O_NONBLOCK
+	 before any writers have opened.  To be consistent with other
+	 platforms, we use a special EOF test that returns false if
+	 there's never been a writer opened. */
+      if (!nconnected && fh->select_hit_eof ())
 	{
 	  select_printf ("read: %s, saw EOF", fh->get_name ());
 	  gotone += s->read_ready = true;
