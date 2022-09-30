@@ -54,7 +54,7 @@ __bswap64(__uint64_t _x)
 #endif /* !__GNUC__ */
 
 /* endian(3) - similar to linux <endian.h> */
-#if __BYTE_ORDER == __LITTLE_ENDIAN
+#if _BYTE_ORDER == _LITTLE_ENDIAN
 #define htobe16(_x) __bswap16(_x)
 #define htole16(_x) ((__uint16_t)(_x))
 #define be16toh(_x) __bswap16(_x)
