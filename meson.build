@@ -437,11 +437,13 @@ if sysroot_install
     message('computed sysroot is ' + sysroot)
     specs_prefix_format = '%:getenv(GCC_EXEC_PREFIX ../../@0@)'
   endif
-  if sysroot == ''
-    error('sysroot install requested, but compiler has no sysroot')
-  endif
-  if not fs.is_samepath(sysroot, prefix)
-    error('sysroot install requires --prefix=' + sysroot)
+  if not get_option('sysroot-install-skip-checks')
+    if sysroot == ''
+      error('sysroot install requested, but compiler has no sysroot')
+    endif
+    if not fs.is_samepath(sysroot, prefix)
+      error('sysroot install requires --prefix=' + sysroot)
+    endif
   endif
 else
   specs_prefix_format = prefix + '/@0@'
