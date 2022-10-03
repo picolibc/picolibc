@@ -107,3 +107,7 @@ inc_headers += ['picotls.h']
 
 install_headers(inc_headers,
 		install_dir: include_dir)
+
+# For compatibility with libc++'s __mbstate_t.h:
+install_headers(['bits/types/mbstate_t.h'],
+		install_dir: include_dir / 'bits/types')
