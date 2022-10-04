@@ -70,11 +70,6 @@ cpu_family_aliases = {
 		       'arc64' : 'arc',
 		       # cris
 		       'crisv32' : 'cris',
-		       # i386
-		       'i486' : 'i386',
-		       'i586' : 'i386',
-		       'i686' : 'i386',
-		       'x86' : 'i386',
 		       # m68hc11
 		       'm6811' : 'm68hc11',
 		       'm6812' : 'm68hc11',
@@ -94,8 +89,12 @@ cpu_family_aliases = {
 		       'riscv64' : 'riscv',
 		       # sparc
 		       'sparc64' : 'sparc',
-		       # x86_64
-		       'amd64' : 'x86_64',
+		       # x86
+		       'amd64' : 'x86',
+		       'i486' : 'x86',
+		       'i586' : 'x86',
+		       'i686' : 'x86',
+		       'x86_64' : 'x86',
 		     }
 
 # Check for an alias, default to provided name

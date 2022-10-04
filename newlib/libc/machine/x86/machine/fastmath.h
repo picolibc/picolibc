@@ -2,6 +2,8 @@
 #ifndef _MACHFASTMATH_H
 #define _MACHFASTMATH_H
 
+#ifndef __x86_64
+
 #if defined(__GNUC__) && __STDC__ - 0 > 0
 
 #define __str1__(__x) #__x
@@ -120,4 +122,7 @@ long double EXFUN(_f_rintl,(long double));
 #endif
 
 #endif /* GCC */
+
+#endif /* !__x86_64 */
+
 #endif /* _MACHFASTMATH_H */

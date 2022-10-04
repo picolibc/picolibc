@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2022 Keith Packard
+# Copyright © 2019 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,4 +32,52 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-add_subdirectory(sys)
+
+srcs_machine_common = [
+  'memcpy.S',
+  'memset.S',
+  'setjmp.S',
+]
+
+srcs_machine_64 = [
+  'memchr.c',
+  'memcmp.c',
+  'memmove.c',
+  'strchr.c',
+  'strlen.c'
+]
+
+srcs_machine_32 = [
+  'memchr.S',
+  'memcmp.S',
+  'memmove.S',
+  'strchr.S',
+  'strlen.S',
+]
+
+srcs_machine = srcs_machine_common + srcs_machine_64
+
+subdir('sys')
+subdir('machine')
+
+x86_64_code = '''#ifndef __x86_64
+#error not x86_64
+#endif
+'''
+
+is_x86_64 = cc.compiles(x86_64_code, name : 'x86_64 check')
+
+foreach target : targets
+  value = get_variable('target_' + target)
+  if target == '32' or (target == '' and not is_x86_64)
+    srcs_machine_target = srcs_machine_common + srcs_machine_32
+  else
+    srcs_machine_target = srcs_machine_common + srcs_machine_64
+  endif
+  set_variable('lib_machine' + target,
+	       static_library('machine' + target,
+			      srcs_machine_target,
+			      pic: false,
+			      include_directories: inc,
+			      c_args: value[1] + arg_fnobuiltin))
+endforeach

@@ -75,8 +75,8 @@ foreach target : targets
 
     bios_ld = '@0@/@1@'.format(meson.current_source_dir(), 'bios.ld')
     bios = executable('bios' + target, 'bios.S',
-		      c_args: value[1],
-		      link_args: ['-nostartfiles', '-Wl,--build-id=none', '-T', bios_ld])
+		      c_args: ['-m32'],
+		      link_args: ['-nostartfiles', '-m32', '-Wl,--build-id=none', '-T', bios_ld])
 
     bios_bin = custom_target('bios' + target + '.bin',
 		             build_by_default: true,

@@ -8,6 +8,10 @@
  * ====================================================
  */
 
+#ifndef __x86_64
+#include "../i386/setjmp.S"
+#else
+
  /*
  **  jmp_buf:
  **   rbx rbp r12 r13 r14 r15 rsp rip
@@ -59,3 +63,5 @@ SYM (longjmp):
 #if defined(__linux__) && defined(__ELF__)
 .section .note.GNU-stack,"",%progbits
 #endif
+#endif
+

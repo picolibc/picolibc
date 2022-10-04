@@ -8,6 +8,9 @@
  * ====================================================
  */
 
+#ifndef __x86_64
+#include "../i386/memset.S"
+#else
   #include "x86_64mach.h"
 
   .global SYM (memset)
@@ -88,4 +91,5 @@ quadword_set:
 
 #if defined(__linux__) && defined(__ELF__)
 .section .note.GNU-stack,"",%progbits
+#endif
 #endif

@@ -33,11 +33,6 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-shared_dirs = {
-		'i386': 'shared_x86',
-		'x86_64': 'shared_x86'
-	      }
-
 libdirs = ['argz', 'ctype', 'errno', 'iconv', 'misc',
 	   'posix', 'search', 'signal', 'ssp', 'stdlib',
 	   'string', 'time', 'xdr', 'locale']
@@ -63,18 +58,6 @@ srcs_machine = []
 
 machine_dir = 'machine' / host_cpu_family
 if fs.is_dir(machine_dir)
-
-  if shared_dirs.has_key(host_cpu_family)
-    shared_dir = 'machine' / shared_dirs[host_cpu_family]
-    shared_inc_dir = shared_dir / 'include'
-    if fs.is_dir(shared_inc_dir)
-      inc = [include_directories(shared_inc_dir), inc]
-    endif
-
-    inc = [include_directories(shared_dir), inc]
-
-    libdirs = [shared_dir] + libdirs
-  endif
 
   machine_inc_dir = machine_dir / 'include'
   if fs.is_dir(machine_inc_dir)

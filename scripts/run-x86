@@ -1,7 +1,8 @@
+#!/bin/sh
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2020 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,17 +33,29 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-srcs_machine = [
-  'memchr.S',
-  'memcmp.S',
-  'memcpy.S',
-  'memmove.S',
-  'memset.S',
-  'setjmp.S',
-  'strchr.S',
-  'strlen.S',
-]
 
-subdir('machine')
+dir="$(dirname "$0")"
 
-set_variable('src_machine', files(srcs_machine))
+# select the program
+elf="$1"
+shift
+
+case "$elf" in
+    *_32)
+	qemu="qemu-system-i386"
+	;;
+    *)
+	qemu="qemu-system-x86_64"
+	;;
+esac
+
+"$dir"/monitor-e9 $qemu \
+	-cpu core2duo \
+	-bios semihost/machine/x86/bios.bin \
+	-monitor none \
+	-serial none \
+	-debugcon stdio \
+	-nic none \
+	-device loader,file="$elf" \
+	-nographic \
+	"$@" < /dev/null

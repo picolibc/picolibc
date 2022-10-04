@@ -37,13 +37,7 @@ has_arm_semihost = false
 
 src_semihost = []
 
-# i386 holds code for both i386 and x86_64
-semihost_family = host_cpu_family
-if semihost_family == 'x86_64'
-  semihost_family = 'i386'
-endif
-
-machine_dir = 'machine' / semihost_family
+machine_dir = 'machine' / host_cpu_family
 if fs.is_dir(machine_dir)
   subdir(machine_dir)
 endif

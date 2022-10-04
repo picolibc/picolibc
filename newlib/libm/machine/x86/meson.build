@@ -32,7 +32,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-srcs_libm_machine_real = [
+srcs_libm_machine_common = [
+  'fenv.c',
+]
+
+srcs_libm_machine_32 = [
   'f_atan2f.S',
   'f_atan2.S',
   'f_exp.c',
@@ -59,11 +63,9 @@ srcs_libm_machine_real = [
   'f_rintl.c',
   'f_tanf.S',
   'f_tan.S',
-  'fenv.c',
-  'i386mach.h',
 ]
 
-srcs_libm_machine = srcs_libm_machine_real + [
+srcs_libm_machine = srcs_libm_machine_common + [
   'feclearexcept.c',
   'fedisableexcept.c',
   'feenableexcept.c',
@@ -80,4 +82,13 @@ srcs_libm_machine = srcs_libm_machine_real + [
   'feupdateenv.c',
 ]
 
-src_libm_machine = files(srcs_libm_machine_real)
+src_libm_machine = []
+
+foreach target : targets
+  if target == '32' or (target == '' and not is_x86_64)
+    src_libm_machine_target = srcs_libm_machine_common + srcs_libm_machine_32
+  else
+    src_libm_machine_target = srcs_libm_machine_common
+  endif
+  set_variable('src_libm_machine' + target, files(src_libm_machine_target))
+endforeach
