@@ -69,7 +69,7 @@ is_x86_64 = cc.compiles(x86_64_code, name : 'x86_64 check')
 
 foreach target : targets
   value = get_variable('target_' + target)
-  if target == '32' or (target == '' and not is_x86_64)
+  if target.startswith('32') or (target == '' and not is_x86_64)
     srcs_machine_target = srcs_machine_common + srcs_machine_32
   else
     srcs_machine_target = srcs_machine_common + srcs_machine_64

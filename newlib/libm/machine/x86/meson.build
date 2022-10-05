@@ -85,7 +85,7 @@ srcs_libm_machine = srcs_libm_machine_common + [
 src_libm_machine = []
 
 foreach target : targets
-  if target == '32' or (target == '' and not is_x86_64)
+  if target.startswith('32') or (target == '' and not is_x86_64)
     src_libm_machine_target = srcs_libm_machine_common + srcs_libm_machine_32
   else
     src_libm_machine_target = srcs_libm_machine_common
