@@ -4,6 +4,8 @@ cmake
 file
 ninja-build
 gcc
+libx32gcc-12-dev
+lib32gcc-12-dev
 gcc-i686-linux-gnu
 gcc-arm-none-eabi
 gcc-riscv64-unknown-elf
