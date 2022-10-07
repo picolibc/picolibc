@@ -522,16 +522,13 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #if (defined(__XTENSA__))
 #ifdef __XTENSA_EB__
 #define __IEEE_BIG_ENDIAN
-#else
+#endif
+#ifdef __XTENSA_EL__
 #define __IEEE_LITTLE_ENDIAN
 #endif
 #endif
 
 #ifdef __AMDGCN__
-#define __IEEE_LITTLE_ENDIAN
-#endif
-
-#ifdef __XTENSA_EL__
 #define __IEEE_LITTLE_ENDIAN
 #endif
 

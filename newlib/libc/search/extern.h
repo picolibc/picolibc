@@ -55,7 +55,7 @@ void	 __reclaim_buf(HTAB *, BUFHEAD *);
 int	 __split_page(HTAB *, __uint32_t, __uint32_t);
 
 /* Default hash routine. */
-extern __uint32_t (*__default_hash)(const void *, size_t);
+extern __uint32_t (* const __default_hash)(const void *, size_t);
 
 #ifdef HASH_STATISTICS
 extern int hash_accesses, hash_collisions, hash_expansions, hash_overflows;

@@ -56,6 +56,9 @@ __strncpy_aux:
 	j	.Lfill
 
 .Lret:
+#ifdef PSRAM_FIX
+	memw
+#endif
 	leaf_return
 
 
@@ -122,7 +125,11 @@ strncpy:
 	addi	a10, a10, 1
 	bnez    a4, .Lfillcleanup
 
-2:	leaf_return
+2:
+#ifdef PSRAM_FIX
+	memw
+#endif
+	leaf_return
 
 .Lfill1mod2: // dst address is odd
 	s8i	a9, a10, 0	// store byte 0
@@ -241,6 +248,11 @@ strncpy:
 #endif
 1:	l8ui	a8, a3, 0
 	addi	a3, a3, 1
+#ifdef PSRAM_FIX
+	nop
+	nop
+	nop
+#endif
 	s8i	a8, a10, 0
 	addi	a4, a4, -1
 	beqz	a4, 3f
@@ -252,7 +264,11 @@ strncpy:
 #endif
 2:	j	.Lfill
 
-3:	leaf_return
+3:
+#ifdef PSRAM_FIX
+	memw
+#endif
+	leaf_return
 .end schedule
 
 	.size	strncpy, . - strncpy
