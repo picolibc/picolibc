@@ -3,7 +3,7 @@ meson
 cmake
 file
 ninja-build
-gcc
+gcc-12
 libx32gcc-12-dev
 lib32gcc-12-dev
 gcc-i686-linux-gnu

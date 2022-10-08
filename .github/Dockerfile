@@ -14,6 +14,7 @@ RUN apt-get update && \
      xargs -a packages.txt apt-get install -y || \
      xargs -a packages.txt apt-get install -y || \
      xargs -a packages.txt apt-get install -y) && \
+    dpkg -l && \
     mkdir -p /opt && \
     (cd /opt && while read file; do wget $file && tar xf `basename $file`; done) < extra-files.txt
 
