@@ -68,7 +68,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.HASH_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
 
       - name: Load and Check the Docker Image
         run: |
@@ -119,7 +119,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.HASH_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
 
       - name: Load and Check the Docker Image
         run: |
@@ -169,7 +169,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.HASH_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
 
       - name: Load and Check the Docker Image
         run: |
@@ -220,7 +220,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.HASH_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
 
       - name: Load and Check the Docker Image
         run: |
@@ -271,7 +271,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.HASH_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
 
       - name: Load and Check the Docker Image
         run: |
@@ -321,7 +321,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.HASH_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
 
       - name: Load and Check the Docker Image
         run: |
@@ -372,7 +372,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.HASH_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
 
       - name: Load and Check the Docker Image
         run: |
@@ -422,7 +422,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.HASH_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
 
       - name: Load and Check the Docker Image
         run: |
@@ -473,7 +473,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.HASH_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
 
       - name: Load and Check the Docker Image
         run: |
@@ -524,7 +524,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.HASH_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
 
       - name: Load and Check the Docker Image
         run: |
@@ -574,7 +574,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.HASH_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
 
       - name: Load and Check the Docker Image
         run: |
@@ -625,7 +625,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.HASH_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
 
       - name: Load and Check the Docker Image
         run: |
@@ -675,7 +675,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.HASH_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
 
       - name: Load and Check the Docker Image
         run: |
@@ -726,7 +726,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.HASH_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
 
       - name: Load and Check the Docker Image
         run: |
@@ -777,7 +777,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.HASH_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
 
       - name: Load and Check the Docker Image
         run: |
@@ -827,7 +827,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.HASH_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
 
       - name: Load and Check the Docker Image
         run: |
