@@ -1,0 +1,10 @@
+#!/bin/bash
+here=`dirname "$0"`
+export ZEPHYR_SDK_INSTALL_DIR=/opt/zephyr-sdk-0.15.1
+
+for dir in "$ZEPHYR_SDK_INSTALL_DIR"/*; do
+    if [ -d "$dir" -a -d "$dir"/bin ]; then
+       PATH="$dir"/bin:$PATH
+    fi
+done
+exec "$@"

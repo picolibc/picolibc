@@ -332,6 +332,56 @@ jobs:
         run: |
           docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} -Dfortify-source=2
 
+  fortify-source-xtensa:
+    needs: cache-maker
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        meson_flags: [
+          "",
+
+          # Math configurations
+          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
+          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
+
+          # Tinystdio configurations
+          "-Dio-float-exact=false -Dio-long-long=true",
+          "-Dformat-default=integer",
+
+          # Original stdio
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
+
+          # Locale, iconv, original malloc and original atexit/onexit configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
+
+          # Multithread disabled
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
+        ]
+        test: [
+          "./.github/do-zephyr ./.github/do-many do-build do-xtensa-espressif_esp32s2-configure build-xtensa-espressif_esp32s2 do-build do-xtensa-espressif_esp32-configure build-xtensa-espressif_esp32 do-build do-xtensa-intel_apl_adsp-configure build-xtensa-intel_apl_adsp do-build do-xtensa-intel_bdw_adsp-configure build-xtensa-intel_bdw_adsp do-build do-xtensa-intel_byt_adsp-configure build-xtensa-intel_byt_adsp do-build do-xtensa-intel_s1000-configure build-xtensa-intel_s1000 do-build do-xtensa-nxp_imx8m_adsp-configure build-xtensa-nxp_imx8m_adsp do-build do-xtensa-nxp_imx_adsp-configure build-xtensa-nxp_imx_adsp do-build do-xtensa-sample_controller-configure build-xtensa-sample_controller end",
+        ]
+    steps:
+      - name: Clone picolibc
+        uses: actions/checkout@v2
+        with:
+          path: picolibc
+
+      - name: Restore the Docker Image
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.IMAGE_FILE }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+
+      - name: Load and Check the Docker Image
+        run: |
+          docker load -i $IMAGE_FILE
+          docker images -a $IMAGE
+
+      - name: Fortity source test
+        run: |
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} -Dfortify-source=2
+
   minsize-arm:
     needs: cache-maker
     runs-on: ubuntu-latest
@@ -585,6 +635,56 @@ jobs:
         run: |
           docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
 
+  minsize-xtensa:
+    needs: cache-maker
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        meson_flags: [
+          "",
+
+          # Math configurations
+          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
+          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
+
+          # Tinystdio configurations
+          "-Dio-float-exact=false -Dio-long-long=true",
+          "-Dformat-default=integer",
+
+          # Original stdio
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
+
+          # Locale, iconv, original malloc and original atexit/onexit configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
+
+          # Multithread disabled
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
+        ]
+        test: [
+          "./.github/do-zephyr ./.github/do-many do-build do-xtensa-espressif_esp32s2-configure build-xtensa-espressif_esp32s2 do-build do-xtensa-espressif_esp32-configure build-xtensa-espressif_esp32 do-build do-xtensa-intel_apl_adsp-configure build-xtensa-intel_apl_adsp do-build do-xtensa-intel_bdw_adsp-configure build-xtensa-intel_bdw_adsp do-build do-xtensa-intel_byt_adsp-configure build-xtensa-intel_byt_adsp do-build do-xtensa-intel_s1000-configure build-xtensa-intel_s1000 do-build do-xtensa-nxp_imx8m_adsp-configure build-xtensa-nxp_imx8m_adsp do-build do-xtensa-nxp_imx_adsp-configure build-xtensa-nxp_imx_adsp do-build do-xtensa-sample_controller-configure build-xtensa-sample_controller end",
+        ]
+    steps:
+      - name: Clone picolibc
+        uses: actions/checkout@v2
+        with:
+          path: picolibc
+
+      - name: Restore the Docker Image
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.IMAGE_FILE }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+
+      - name: Load and Check the Docker Image
+        run: |
+          docker load -i $IMAGE_FILE
+          docker images -a $IMAGE
+
+      - name: Minsize test
+        run: |
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
+
   release-arm:
     needs: cache-maker
     runs-on: ubuntu-latest
@@ -816,6 +916,56 @@ jobs:
         ]
         test: [
           "./.github/do-many do-build do-mips-configure build-mips do-build do-mipsel-configure build-mipsel end",
+        ]
+    steps:
+      - name: Clone picolibc
+        uses: actions/checkout@v2
+        with:
+          path: picolibc
+
+      - name: Restore the Docker Image
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.IMAGE_FILE }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+
+      - name: Load and Check the Docker Image
+        run: |
+          docker load -i $IMAGE_FILE
+          docker images -a $IMAGE
+
+      - name: Release test
+        run: |
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
+
+  release-xtensa:
+    needs: cache-maker
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        meson_flags: [
+          "",
+
+          # Math configurations
+          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
+          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
+
+          # Tinystdio configurations
+          "-Dio-float-exact=false -Dio-long-long=true",
+          "-Dformat-default=integer",
+
+          # Original stdio
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
+
+          # Locale, iconv, original malloc and original atexit/onexit configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
+
+          # Multithread disabled
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
+        ]
+        test: [
+          "./.github/do-zephyr ./.github/do-many do-build do-xtensa-espressif_esp32s2-configure build-xtensa-espressif_esp32s2 do-build do-xtensa-espressif_esp32-configure build-xtensa-espressif_esp32 do-build do-xtensa-intel_apl_adsp-configure build-xtensa-intel_apl_adsp do-build do-xtensa-intel_bdw_adsp-configure build-xtensa-intel_bdw_adsp do-build do-xtensa-intel_byt_adsp-configure build-xtensa-intel_byt_adsp do-build do-xtensa-intel_s1000-configure build-xtensa-intel_s1000 do-build do-xtensa-nxp_imx8m_adsp-configure build-xtensa-nxp_imx8m_adsp do-build do-xtensa-nxp_imx_adsp-configure build-xtensa-nxp_imx_adsp do-build do-xtensa-sample_controller-configure build-xtensa-sample_controller end",
         ]
     steps:
       - name: Clone picolibc
