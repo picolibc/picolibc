@@ -161,7 +161,7 @@ No supporting OS subroutines are required.
 int __EXPORT __mb_cur_max = 6;
 #endif
 
-#ifdef _MB_CAPABLE
+#ifdef __HAVE_LOCALE_INFO__
 NEWLIB_THREAD_LOCAL struct __locale_t *_locale = &__global_locale;
 #endif
 
