@@ -55,7 +55,7 @@
 /* Operations */
 typedef enum {
 	HASH_GET, HASH_PUT, HASH_PUTNEW, HASH_DELETE, HASH_FIRST, HASH_NEXT
-} ACTION;
+} HASH_ACTION;
 
 /* Buffer Management structures */
 typedef struct _bufhead BUFHEAD;

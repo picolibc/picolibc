@@ -58,7 +58,7 @@ static char sccsid[] = "@(#)hash.c	8.9 (Berkeley) 6/16/94";
 
 static int   alloc_segs(HTAB *, int);
 static int   flush_meta(HTAB *);
-static int   hash_access(HTAB *, ACTION, DBT *, DBT *);
+static int   hash_access(HTAB *, HASH_ACTION, DBT *, DBT *);
 static int   hash_close(DB *);
 static int   hash_delete(const DB *, const DBT *, u_int);
 static int   hash_fd(const DB *);
@@ -621,7 +621,7 @@ hash_delete(const DB *dbp,
  */
 static int
 hash_access(HTAB *hashp,
-            ACTION action,
+            HASH_ACTION action,
             DBT *key,
             DBT *val)
 {
