@@ -1,0 +1,19 @@
+[binaries]
+# Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
+# so we have to add -nostdlib to the compiler configuration itself or
+# early compiler tests will fail. This can be removed when picolibc
+# requires at least version 0.54.2 of meson.
+c = ['xtensa-sample_controller_zephyr-elf-gcc', '-nostdlib']
+ar = 'xtensa-sample_controller_zephyr-elf-ar'
+as = 'xtensa-sample_controller_zephyr-elf-as'
+nm = 'xtensa-sample_controller_zephyr-elf-nm'
+strip = 'xtensa-sample_controller_zephyr-elf-strip'
+
+[host_machine]
+system = 'zephyr'
+cpu_family = 'xtensa'
+cpu = 'xtensa'
+endian = 'little'
+
+[properties]
+skip_sanity_check = true
