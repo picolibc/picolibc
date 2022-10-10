@@ -1,0 +1,19 @@
+[binaries]
+# Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
+# so we have to add -nostdlib to the compiler configuration itself or
+# early compiler tests will fail. This can be removed when picolibc
+# requires at least version 0.54.2 of meson.
+c = ['nios2-zephyr-elf-gcc', '-nostdlib']
+ar = 'nios2-zephyr-elf-ar'
+as = 'nios2-zephyr-elf-as'
+nm = 'nios2-zephyr-elf-nm'
+strip = 'nios2-zephyr-elf-strip'
+
+[host_machine]
+system = 'zephyr'
+cpu_family = 'nios2'
+cpu = 'nios2'
+endian = 'little'
+
+[properties]
+skip_sanity_check = true
