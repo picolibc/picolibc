@@ -786,7 +786,29 @@ if enable_multilib
       if tmp.length() > 1
 	foreach flag : tmp[1].strip('@').split('@')
 	  if flag != ''
-	    flags += '-' + flag
+	    if host_cpu_family == 'nios2'
+	      # Hacks for NIOS II to get rid of -fsingle-precision-constant
+	      # mode (which breaks libm). We don't need fph2 as that
+	      # doesn't set the single precision constant flag
+	      if flag == 'mcustom-fpu-cfg=60-1'
+		flags += ['-mcustom-fmuls=252', '-mcustom-fadds=253',
+			  '-mcustom-fsubs=254']
+	      elif flag == 'mcustom-fpu-cfg=60-2'
+		flags += ['-mcustom-fmuls=252', '-mcustom-fadds=253',
+			  '-mcustom-fsubs=254', '-mcustom-fdivs=255']
+	      elif flag == 'mcustom-fpu-cfg=72-3'
+		flags += ['-mcustom-floatus=243', '-mcustom-fixsi=244',
+			  '-mcustom-floatis=245','-mcustom-fcmpgts=246',
+			  '-mcustom-fcmples=249', '-mcustom-fcmpeqs=250',
+			  '-mcustom-fcmpnes=251', '-mcustom-fmuls=252',
+			  '-mcustom-fadds=253', '-mcustom-fsubs=254',
+			  '-mcustom-fdivs=255']
+	      else
+		flags += '-' + flag
+	      endif
+	    else
+	      flags += '-' + flag
+	    endif
 	  endif
 	endforeach
 	if tmp[0] == '.'
