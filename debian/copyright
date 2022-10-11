@@ -119,7 +119,7 @@ Files: newlib/libc/machine/mips/machine/fenv-softfloat.h
 Copyright: 2004-2011 David Schultz <das@FreeBSD.ORG>
 License: BSD2-1
 
-Files: newlib/libc/machine/shared_x86/sys/fenv.h
+Files: newlib/libc/machine/x86/sys/fenv.h
 Copyright: 2010-2019 Red Hat, Inc.
 License: BSD2-1
 
@@ -489,12 +489,19 @@ Files: CMakeLists.txt
  newlib/libc/machine/arm/CMakeLists.txt
  newlib/libc/machine/arm/machine/CMakeLists.txt
  newlib/libc/machine/arm/sys/CMakeLists.txt
+ newlib/libc/machine/mips/machine/meson.build
+ newlib/libc/machine/mips/meson.build
+ newlib/libc/machine/mips/sys/meson.build
+ newlib/libc/machine/msp430/meson.build
+ newlib/libc/machine/nios2/meson.build
  newlib/libc/machine/riscv/CMakeLists.txt
  newlib/libc/machine/riscv/machine/CMakeLists.txt
  newlib/libc/machine/riscv/sys/CMakeLists.txt
- newlib/libc/machine/shared_x86/CMakeLists.txt
- newlib/libc/machine/shared_x86/sys/CMakeLists.txt
- newlib/libc/machine/x86_64/CMakeLists.txt
+ newlib/libc/machine/sparc/machine/meson.build
+ newlib/libc/machine/sparc/meson.build
+ newlib/libc/machine/sparc/sys/meson.build
+ newlib/libc/machine/x86/CMakeLists.txt
+ newlib/libc/machine/x86/sys/CMakeLists.txt
  newlib/libc/misc/CMakeLists.txt
  newlib/libc/picolib/CMakeLists.txt
  newlib/libc/picolib/machine/CMakeLists.txt
@@ -530,8 +537,10 @@ Files: CMakeLists.txt
  newlib/libm/machine/arm/CMakeLists.txt
  newlib/libm/machine/arm/s_fabs.c
  newlib/libm/machine/arm/sf_fabs.c
+ newlib/libm/machine/mips/meson.build
  newlib/libm/machine/riscv/CMakeLists.txt
- newlib/libm/machine/x86_64/CMakeLists.txt
+ newlib/libm/machine/sparc/meson.build
+ newlib/libm/machine/x86/CMakeLists.txt
  newlib/libm/math/CMakeLists.txt
  newlib/testsuite/newlib.time/meson.build
  picocrt/CMakeLists.txt
@@ -542,6 +551,7 @@ Files: CMakeLists.txt
  semihost/fake/fake_kill.c
  semihost/fake/fake_stub.c
  semihost/fake/meson.build
+ semihost/getentropy.c
  semihost/machine/arm/CMakeLists.txt
  test/CMakeLists.txt
  test/test-efcvt.c
@@ -564,9 +574,9 @@ Files: cmake/TC-arm-none-eabi.ld
  newlib/libc/machine/arm/machine/meson.build
  newlib/libc/machine/arm/sys/meson.build
  newlib/libc/machine/csky/meson.build
- newlib/libc/machine/i386/machine/meson.build
  newlib/libc/machine/riscv/machine/math.h
  newlib/libc/machine/riscv/machine/meson.build
+ newlib/libc/machine/x86/machine/meson.build
  newlib/libc/machine/xtensa/sys/meson.build
  newlib/libc/picolib/getauxval.c
  newlib/libc/picolib/machine/aarch64/tls.c
@@ -603,12 +613,12 @@ Files: cmake/TC-arm-none-eabi.ld
  newlib/libm/machine/riscv/sf_fma.c
  newlib/libm/machine/riscv/sf_fma_riscv.c
  newlib/libm/machine/riscv/sf_sqrt.c
- newlib/libm/machine/x86_64/meson.build
  newlib/libm/math/s_lgamma.c
  scripts/run-aarch64
  scripts/run-i386
  scripts/run-rv32imac
  scripts/run-rv32imafdc
+ scripts/run-x86
  scripts/run-x86_64
  scripts/test-arm.ld
  scripts/test-cortex-a9.ld
@@ -617,6 +627,7 @@ Files: cmake/TC-arm-none-eabi.ld
  scripts/test-riscv.ld
  scripts/test-riscv32.ld
  scripts/test-riscv64.ld
+ scripts/test-x86.ld
  scripts/test-x86_64.ld
  semihost/fstat.c
  semihost/isatty.c
@@ -699,10 +710,9 @@ Files: dummyhost/iob.c
  newlib/libc/include/sys/meson.build
  newlib/libc/locale/meson.build
  newlib/libc/machine/arm/meson.build
- newlib/libc/machine/i386/meson.build
  newlib/libc/machine/riscv/meson.build
  newlib/libc/machine/riscv/sys/meson.build
- newlib/libc/machine/x86_64/meson.build
+ newlib/libc/machine/x86/meson.build
  newlib/libc/meson.build
  newlib/libc/misc/meson.build
  newlib/libc/picolib/dso_handle.c
@@ -781,8 +791,8 @@ Files: dummyhost/iob.c
  newlib/libm/complex/meson.build
  newlib/libm/fenv/meson.build
  newlib/libm/machine/arm/meson.build
- newlib/libm/machine/i386/meson.build
  newlib/libm/machine/riscv/meson.build
+ newlib/libm/machine/x86/meson.build
  newlib/libm/math/meson.build
  newlib/libm/meson.build
  newlib/libm/test/copysign_vec.c
@@ -814,8 +824,10 @@ Files: dummyhost/iob.c
  scripts/do-arc64-configure
  scripts/do-arm-configure
  scripts/do-clang-arm-configure
+ scripts/do-clang-msp430-configure
  scripts/do-clang-riscv-configure
  scripts/do-clang-rv32imafdc-configure
+ scripts/do-clang-thumbv6m-configure
  scripts/do-clang-thumbv7e+fp-configure
  scripts/do-clang-thumbv7m-configure
  scripts/do-configure
@@ -824,16 +836,32 @@ Files: dummyhost/iob.c
  scripts/do-freedom-tools-configure
  scripts/do-i386-configure
  scripts/do-lx106-configure
+ scripts/do-mips-configure
+ scripts/do-mipsel-configure
+ scripts/do-msp430-configure
  scripts/do-native-configure
+ scripts/do-nios2-configure
  scripts/do-riscv-configure
  scripts/do-rv32imac-configure
+ scripts/do-sparc64-configure
+ scripts/do-x86-configure
  scripts/do-x86_64-configure
+ scripts/do-xtensa-espressif_esp32-configure
+ scripts/do-xtensa-espressif_esp32s2-configure
+ scripts/do-xtensa-intel_apl_adsp-configure
+ scripts/do-xtensa-intel_bdw_adsp-configure
+ scripts/do-xtensa-intel_byt_adsp-configure
+ scripts/do-xtensa-intel_s1000-configure
+ scripts/do-xtensa-nxp_imx8m_adsp-configure
+ scripts/do-xtensa-nxp_imx_adsp-configure
+ scripts/do-xtensa-sample_controller-configure
  scripts/do-zephyr-aarch64-configure
  scripts/do-zephyr-arm-configure
  scripts/do-zephyr-riscv-configure
  scripts/run-arm
  scripts/run-cortex-a9
  scripts/run-riscv
+ scripts/run-thumbv6m
  scripts/run-thumbv7e
  scripts/run-thumbv7m
  semihost/close.c
@@ -889,8 +917,7 @@ License: BSD3-1
 
 Files: newlib/empty.c
  newlib/libc/machine/arm/memmove.c
- newlib/libc/machine/shared_x86/meson.build
- newlib/libc/machine/shared_x86/sys/meson.build
+ newlib/libc/machine/x86/sys/meson.build
  newlib/libc/machine/xtensa/machine/meson.build
  newlib/libc/picolib/machine/aarch64/meson.build
  newlib/libc/picolib/machine/arm/meson.build
@@ -918,21 +945,20 @@ Files: newlib/empty.c
  newlib/libm/test/scalbn_vec.c
  picocrt/machine/aarch64/meson.build
  picocrt/machine/arm/meson.build
- picocrt/machine/i386/meson.build
  picocrt/machine/riscv/meson.build
- picocrt/machine/x86_64/meson.build
+ picocrt/machine/x86/meson.build
  scripts/do-powerpc64-configure
  scripts/do-powerpc64le-configure
  semihost/gettimeofday.c
  semihost/machine/aarch64/meson.build
  semihost/machine/arm/meson.build
- semihost/machine/i386/bios.S
- semihost/machine/i386/e9_exit.c
- semihost/machine/i386/e9_io.c
- semihost/machine/i386/e9_kill.c
- semihost/machine/i386/e9_stub.c
- semihost/machine/i386/meson.build
  semihost/machine/riscv/meson.build
+ semihost/machine/x86/bios.S
+ semihost/machine/x86/e9_exit.c
+ semihost/machine/x86/e9_io.c
+ semihost/machine/x86/e9_kill.c
+ semihost/machine/x86/e9_stub.c
+ semihost/machine/x86/meson.build
  test/atexit.c
  test/constructor-skip.c
  test/constructor.c
@@ -1003,13 +1029,13 @@ Files: newlib/libm/machine/riscv/s_copysign.c
 Copyright: 2020 Kito Cheng
 License: BSD3-1
 
-Files: picocrt/machine/i386/crt0.S
- picocrt/machine/x86_64/crt0.S
-Copyright: 2021 Mike Haertel and Keith Packard
-License: BSD3-1
-
 Files: picocrt/machine/riscv/crt0.c
 Copyright: 2020 Sebastian Meyer
+License: BSD3-1
+
+Files: picocrt/machine/x86/crt0-32.S
+ picocrt/machine/x86/crt0-64.S
+Copyright: 2021 Mike Haertel and Keith Packard
 License: BSD3-1
 
 Files: scripts/do-freedom-tools-package
@@ -1061,7 +1087,6 @@ Files: newlib/libc/include/sys/_timespec.h
  newlib/libc/include/sys/fcntl.h
  newlib/libc/include/sys/file.h
  newlib/libc/include/sys/param.h
- newlib/libc/include/sys/reent.h
  newlib/libc/include/sys/resource.h
  newlib/libc/include/sys/select.h
  newlib/libc/include/sys/signal.h
@@ -1091,28 +1116,6 @@ Files: newlib/libc/include/unctrl.h
  newlib/libc/misc/misc.tex
  newlib/libc/misc/unctrl.c
 Copyright: 1981, 1993 The Regents of the University of California.
-License: BSD3-2
-
-Files: newlib/libc/machine/msp430/tiny-printf.c
- newlib/libc/machine/powerpc/machine/malloc.h
- newlib/libc/machine/powerpc/machine/stdlib.h
- newlib/libc/machine/powerpc/vec_calloc.c
- newlib/libc/machine/powerpc/vec_free.c
- newlib/libc/machine/powerpc/vec_malloc.c
- newlib/libc/machine/powerpc/vec_mallocr.c
- newlib/libc/machine/powerpc/vec_realloc.c
- newlib/libc/machine/powerpc/vfprintf.c
- newlib/libc/stdio/nano-vfprintf.c
- newlib/libc/stdio/nano-vfprintf_float.c
- newlib/libc/stdio/nano-vfprintf_local.h
- newlib/libc/stdio/vfprintf.c
- newlib/libc/stdlib/strtol.c
- newlib/libc/stdlib/strtoll.c
- newlib/libc/stdlib/wcstol.c
- newlib/libc/stdlib/wcstoll.c
- newlib/libc/stdlib/wcstoll_r.c
- newlib/libc/stdlib/wcstoull_r.c
-Copyright: 1990 The Regents of the University of California.
 License: BSD3-2
 
 Files: newlib/libc/posix/cclass.h
@@ -1147,6 +1150,19 @@ License: BSD3-2
 
 Files: newlib/libc/search/qsort.c
 Copyright: 1992, 1993 The Regents of the University of California.
+License: BSD3-2
+
+Files: newlib/libc/stdio/nano-vfprintf.c
+ newlib/libc/stdio/nano-vfprintf_float.c
+ newlib/libc/stdio/nano-vfprintf_local.h
+ newlib/libc/stdio/vfprintf.c
+ newlib/libc/stdlib/strtol.c
+ newlib/libc/stdlib/strtoll.c
+ newlib/libc/stdlib/wcstol.c
+ newlib/libc/stdlib/wcstoll.c
+ newlib/libc/stdlib/wcstoll_r.c
+ newlib/libc/stdlib/wcstoull_r.c
+Copyright: 1990 The Regents of the University of California.
 License: BSD3-2
 
 Files: newlib/libc/stdlib/div.c
@@ -1220,7 +1236,6 @@ Files: newlib/libc/include/_ansi.h
  newlib/libc/include/malloc.h
  newlib/libc/include/math.h
  newlib/libc/include/paths.h
- newlib/libc/include/reent.h
  newlib/libc/include/regdef.h
  newlib/libc/include/setjmp.h
  newlib/libc/include/signal.h
@@ -2391,6 +2406,7 @@ Files: .clang-format
  .github/do-cmake-test
  .github/do-many
  .github/do-test
+ .github/do-zephyr
  .github/packages.txt
  .github/workflows/head
  .github/workflows/linux.yml
@@ -2426,10 +2442,12 @@ Files: .clang-format
  newlib/libc/machine/aarch64/sys/fcntl.h
  newlib/libc/machine/necv70/necv70.tex
  newlib/libc/machine/nvptx/clock.c
+ newlib/libc/machine/xtensa/xtensa.tex
  newlib/libc/ssp/ssp.tex
  newlib/libc/stdlib/mul_overflow.h
  newlib/libc/string/wcstrings.tex
  newlib/libc/sys.tex
+ newlib/libc/sys/rtems/include/README
  newlib/libc/time/strftime.c
  newlib/libc/time/tzset.c
  newlib/libc/xdr/README
@@ -2442,32 +2460,52 @@ Files: .clang-format
  newlib/testsuite/newlib.time/tzset.c
  picolibc.h.in
  picolibc.ld.in
- picolibc.specs.in-multilib
- picolibc.specs.in-singlelib
+ picolibc.specs.in
  scripts/cross-aarch64-linux-gnu.txt
  scripts/cross-aarch64-zephyr-elf.txt
  scripts/cross-arc-zephyr-elf.txt
  scripts/cross-arc64-zephyr-elf.txt
  scripts/cross-arm-none-eabi.txt
  scripts/cross-arm-zephyr-eabi.txt
+ scripts/cross-clang-msp430.txt
+ scripts/cross-clang-old-riscv64-unknown-elf.txt
+ scripts/cross-clang-old-rv32imafdc-unknown-elf.txt
  scripts/cross-clang-riscv64-unknown-elf.txt
  scripts/cross-clang-rv32imafdc-unknown-elf.txt
+ scripts/cross-clang-thumbv6m-none-eabi.txt
  scripts/cross-clang-thumbv7e+fp-none-eabi.txt
  scripts/cross-clang-thumbv7m-none-eabi.txt
  scripts/cross-cortex-a9-none-eabi.txt
  scripts/cross-i686-linux-gnu.txt
  scripts/cross-m68k-linux-gnu.txt
+ scripts/cross-mips-linux-gnu.txt
+ scripts/cross-mipsel-linux-gnu.txt
+ scripts/cross-msp430.txt
+ scripts/cross-nios2-zephyr-elf.txt
+ scripts/cross-old-clang-riscv64-unknown-elf.txt
  scripts/cross-powerpc64-linux-gnu.txt
  scripts/cross-powerpc64le-linux-gnu.txt
  scripts/cross-riscv64-unknown-elf.txt
  scripts/cross-riscv64-zephyr-elf.txt
  scripts/cross-rv32imac.txt
+ scripts/cross-rv32imac_zicsr.txt
+ scripts/cross-sparc64-linux-gnu.txt
+ scripts/cross-x86-linux-gnu.txt
  scripts/cross-x86_64-linux-gnu.txt
  scripts/cross-xtensa-esp32-elf.txt
+ scripts/cross-xtensa-espressif_esp32_zephyr-elf.txt
+ scripts/cross-xtensa-espressif_esp32s2_zephyr-elf.txt
+ scripts/cross-xtensa-intel_apl_adsp_zephyr-elf.txt
+ scripts/cross-xtensa-intel_bdw_adsp_zephyr-elf.txt
+ scripts/cross-xtensa-intel_byt_adsp_zephyr-elf.txt
+ scripts/cross-xtensa-intel_s1000_zephyr-elf.txt
  scripts/cross-xtensa-lx106-elf.txt
+ scripts/cross-xtensa-nxp_imx8m_adsp_zephyr-elf.txt
+ scripts/cross-xtensa-nxp_imx_adsp_zephyr-elf.txt
+ scripts/cross-xtensa-sample_controller_zephyr-elf.txt
  scripts/duplicate-names
  scripts/monitor-e9
- semihost/machine/i386/bios.ld
+ semihost/machine/x86/bios.ld
  test/complex-funcs.c
  test/time-sprintf.c
 Copyright: 2020 The Newlib Project
@@ -2598,7 +2636,6 @@ Files: newlib/libc/include/limits.h
  newlib/libc/include/machine/termios.h
  newlib/libc/include/sys/lock.h
  newlib/libc/include/wctype.h
- newlib/libc/reent/getreent.c
  newlib/libc/stdlib/_Exit.c
  newlib/libc/stdlib/a64l.c
  newlib/libc/stdlib/l64a.c
@@ -2649,7 +2686,7 @@ License: Default-1
 
 Files: newlib/libc/include/sys/_default_fcntl.h
  newlib/libc/include/sys/custom_file.h
- newlib/libc/machine/i386/machine/fastmath.h
+ newlib/libc/machine/x86/machine/fastmath.h
 Copyright: 2007 Jeff Johnston  <jjohnstn@redhat.com>
 License: Default-1
 
@@ -2808,26 +2845,21 @@ Files: newlib/libc/stdlib/abort.c
  newlib/libc/stdlib/exit.c
  newlib/libc/stdlib/labs.c
  newlib/libc/stdlib/local.h
- newlib/libc/stdlib/malign.c
- newlib/libc/stdlib/malloc.c
  newlib/libc/stdlib/mallocr.c
  newlib/libc/stdlib/mbctype.h
  newlib/libc/stdlib/mblen.c
  newlib/libc/stdlib/mbstowcs.c
  newlib/libc/stdlib/mbtowc.c
  newlib/libc/stdlib/mbtowc_r.c
- newlib/libc/stdlib/msize.c
  newlib/libc/stdlib/mstats.c
  newlib/libc/stdlib/mtrim.c
  newlib/libc/stdlib/on_exit.c
  newlib/libc/stdlib/rand.c
  newlib/libc/stdlib/rand_r.c
- newlib/libc/stdlib/realloc.c
  newlib/libc/stdlib/srand.c
  newlib/libc/stdlib/std.h
  newlib/libc/stdlib/stdlib.tex
  newlib/libc/stdlib/system.c
- newlib/libc/stdlib/valloc.c
  newlib/libc/stdlib/wcstombs.c
  newlib/libc/stdlib/wctomb.c
  newlib/libc/stdlib/wctomb_r.c
@@ -2835,8 +2867,6 @@ Copyright: 1990 Regents of the University of California.
 License: Default-1
 
 Files: newlib/libc/stdlib/getenv_r.c
- newlib/libc/stdlib/putenv_r.c
- newlib/libc/stdlib/setenv_r.c
 Copyright: 1991 DJ Delorie.
 License: Default-1
 
@@ -2918,12 +2948,7 @@ Files: newlib/libm/fenv/fenv_stub.c
 Copyright: 2019 Joel Sherrill <joel@rtems.org
 License: Default-1
 
-Files: newlib/libm/machine/i386/fenv.c
- newlib/libm/machine/x86_64/fenv.c
-Copyright: 2019 Joel Sherrill <joel@rtems.org>
-License: Default-1
-
-Files: newlib/libm/machine/shared_x86/fenv.c
+Files: newlib/libm/machine/x86/fenv.c
 Copyright: 2010-2019 Red Hat, Inc.
 License: Default-1
 
@@ -3026,41 +3051,41 @@ Files: newlib/libc/include/wordexp.h
 Copyright: 2002, 2010 Red Hat, Incorporated.
 License: Other-1
 
-Files: newlib/libc/machine/i386/memchr.S
- newlib/libc/machine/i386/memset.S
- newlib/libc/machine/i386/strchr.S
- newlib/libc/machine/i386/strlen.S
+Files: newlib/libc/machine/x86/memchr-32.S
+ newlib/libc/machine/x86/memset-32.S
+ newlib/libc/machine/x86/strchr-32.S
+ newlib/libc/machine/x86/strlen-32.S
 Copyright: 1998, 2002, 2008 Red Hat Inc.
 License: Other-1
 
-Files: newlib/libc/machine/i386/memcmp.S
- newlib/libc/machine/i386/memcpy.S
- newlib/libc/machine/i386/memmove.S
- newlib/libm/machine/i386/f_atan2.S
- newlib/libm/machine/i386/f_atan2f.S
- newlib/libm/machine/i386/f_exp.c
- newlib/libm/machine/i386/f_expf.c
- newlib/libm/machine/i386/f_frexp.S
- newlib/libm/machine/i386/f_frexpf.S
- newlib/libm/machine/i386/f_ldexp.S
- newlib/libm/machine/i386/f_ldexpf.S
- newlib/libm/machine/i386/f_log.S
- newlib/libm/machine/i386/f_log10.S
- newlib/libm/machine/i386/f_log10f.S
- newlib/libm/machine/i386/f_logf.S
- newlib/libm/machine/i386/f_math.h
- newlib/libm/machine/i386/f_pow.c
- newlib/libm/machine/i386/f_powf.c
- newlib/libm/machine/i386/f_tan.S
- newlib/libm/machine/i386/f_tanf.S
- newlib/libm/machine/i386/i386mach.h
+Files: newlib/libc/machine/x86/memcmp-32.S
+ newlib/libc/machine/x86/memcpy-32.S
+ newlib/libc/machine/x86/memmove-32.S
+ newlib/libm/machine/x86/f_atan2.S
+ newlib/libm/machine/x86/f_atan2f.S
+ newlib/libm/machine/x86/f_exp.c
+ newlib/libm/machine/x86/f_expf.c
+ newlib/libm/machine/x86/f_frexp.S
+ newlib/libm/machine/x86/f_frexpf.S
+ newlib/libm/machine/x86/f_ldexp.S
+ newlib/libm/machine/x86/f_ldexpf.S
+ newlib/libm/machine/x86/f_log.S
+ newlib/libm/machine/x86/f_log10.S
+ newlib/libm/machine/x86/f_log10f.S
+ newlib/libm/machine/x86/f_logf.S
+ newlib/libm/machine/x86/f_math.h
+ newlib/libm/machine/x86/f_pow.c
+ newlib/libm/machine/x86/f_powf.c
+ newlib/libm/machine/x86/f_tan.S
+ newlib/libm/machine/x86/f_tanf.S
+ newlib/libm/machine/x86/i386mach.h
 Copyright: 1998, 2002 Red Hat Inc.
 License: Other-1
 
-Files: newlib/libc/machine/x86_64/memcpy.S
- newlib/libc/machine/x86_64/memset.S
- newlib/libc/machine/x86_64/setjmp.S
- newlib/libc/machine/x86_64/x86_64mach.h
+Files: newlib/libc/machine/x86/memcpy-64.S
+ newlib/libc/machine/x86/memset-64.S
+ newlib/libc/machine/x86/setjmp-64.S
+ newlib/libc/machine/x86/x86_64mach.h
 Copyright: 2007 Ellips BV.
 License: Other-1
 
@@ -3245,7 +3270,7 @@ Files: newlib/libc/include/machine/fastmath.h
  newlib/libc/include/machine/setjmp.h
  newlib/libc/include/machine/time.h
  newlib/libc/include/machine/types.h
- newlib/libc/machine/i386/setjmp.S
+ newlib/libc/machine/x86/setjmp-32.S
 Copyright: 1991 DJ Delorie
 License: Other-6
 
@@ -3267,7 +3292,6 @@ Files: newlib/libc/machine/amdgcn/abort.c
  newlib/libc/machine/amdgcn/exit.c
  newlib/libc/machine/amdgcn/getreent.c
  newlib/libc/machine/amdgcn/signal.c
- newlib/libc/machine/msp430/tiny-puts.c
 Copyright: 2014-2017 Mentor Graphics.
 License: Other-8
 
@@ -3431,53 +3455,33 @@ Files: newlib/libc/machine/msp430/setjmp.S
 Copyright: 2013  Red Hat, Inc.
 License: Other-12
 
-Files: newlib/libc/machine/powerpc/atosfix16.c
- newlib/libc/machine/powerpc/atosfix32.c
- newlib/libc/machine/powerpc/atosfix64.c
- newlib/libc/machine/powerpc/atoufix16.c
- newlib/libc/machine/powerpc/atoufix32.c
- newlib/libc/machine/powerpc/atoufix64.c
- newlib/libc/machine/powerpc/fix64.h
- newlib/libc/machine/powerpc/simdldtoa.c
- newlib/libc/machine/powerpc/strtosfix16.c
- newlib/libc/machine/powerpc/strtosfix32.c
- newlib/libc/machine/powerpc/strtosfix64.c
- newlib/libc/machine/powerpc/strtoufix16.c
- newlib/libc/machine/powerpc/strtoufix32.c
- newlib/libc/machine/powerpc/strtoufix64.c
- newlib/libc/machine/powerpc/ufix64toa.c
- newlib/libc/stdlib/ldtoa.c
-Copyright: 1984,2000 S.L. Moshier
-License: Other-13
-
 Files: newlib/libc/machine/tic4x/setjmp.S
 Copyright: 2004 Michael Hayes <m.hayes@elec.canterbury.ac.nz>.
-License: Other-14
+License: Other-13
 
 Files: newlib/libc/machine/xc16x/putchar.c
  newlib/libc/machine/xc16x/puts.c
  newlib/libc/machine/xc16x/setjmp.S
 Copyright: 2006 KPIT Cummins
  2009 Conny Marco Menebröcker
-License: Other-15
+License: Other-14
 
 Files: newlib/libc/machine/z8k/memcmp.S
  newlib/libc/machine/z8k/memcpy.S
  newlib/libc/machine/z8k/memmove.S
  newlib/libc/machine/z8k/memset.S
 Copyright: 2004 Christian Groessler <chris@groessler.org>
-License: Other-16
+License: Other-15
 
 Files: newlib/libc/misc/fini.c
 Copyright: 2010 CodeSourcery, Inc.
-License: Other-16
+License: Other-15
 
 Files: newlib/libc/misc/init.c
 Copyright: 2004 CodeSourcery, LLC
-License: Other-16
+License: Other-15
 
-Files: newlib/libc/reent/impure.c
- newlib/libc/reent/reent.c
+Files: newlib/libc/reent/reent.c
  newlib/libc/reent/reent.tex
  newlib/libc/signal/raise.c
  newlib/libc/signal/signal.c
@@ -3611,14 +3615,14 @@ Files: newlib/libc/reent/impure.c
  newlib/libm/test/yn_vec.c
  newlib/libm/test/ynf_vec.c
 Copyright: 1994 Cygnus Support.
-License: Other-17
+License: Other-16
 
 Files: newlib/libc/stdio/vfieeefp.h
  newlib/libc/stdlib/dtoa.c
  newlib/libc/stdlib/mprec.c
  newlib/libc/stdlib/mprec.h
 Copyright: 1991 AT&T.
-License: Other-18
+License: Other-17
 
 Files: newlib/libc/stdlib/drand48.c
  newlib/libc/stdlib/erand48.c
@@ -3632,38 +3636,42 @@ Files: newlib/libc/stdlib/drand48.c
  newlib/libc/stdlib/seed48.c
  newlib/libc/stdlib/srand48.c
 Copyright: 1993 Martin Birgmeier
-License: Other-19
+License: Other-18
 
 Files: newlib/libc/stdlib/gdtoa-dmisc.c
  newlib/libc/stdlib/gdtoa-gethex.c
  newlib/libc/stdlib/gdtoa-gmisc.c
  newlib/libc/stdlib/gdtoa.h
 Copyright: 1998 Lucent Technologies
-License: Other-20
+License: Other-19
 
 Files: newlib/libc/stdlib/gdtoa-gdtoa.c
 Copyright: 1998, 1999 Lucent Technologies
-License: Other-20
+License: Other-19
 
 Files: newlib/libc/stdlib/gdtoa-hexnan.c
 Copyright: 2000 Lucent Technologies
-License: Other-20
+License: Other-19
 
 Files: newlib/libc/stdlib/gdtoaimp.h
 Copyright: 1998-2000 Lucent Technologies
-License: Other-20
+License: Other-19
 
 Files: newlib/libc/stdlib/strtod.c
  newlib/libc/stdlib/strtodg.c
 Copyright: 1998-2001 Lucent Technologies
-License: Other-20
+License: Other-19
 
 Files: newlib/libc/stdlib/strtorx.c
 Copyright: 1998, 2000 Lucent Technologies
-License: Other-20
+License: Other-19
 
 Files: newlib/libc/stdlib/getopt.c
 Copyright: 1997 Gregory Pietsch
+License: Other-20
+
+Files: newlib/libc/stdlib/ldtoa.c
+Copyright: 1984,2000 S.L. Moshier
 License: Other-21
 
 Files: newlib/libc/string/wcsnlen.c
@@ -3847,15 +3855,15 @@ Files: newlib/libm/common/s_remquo.c
 Copyright: 1993 Sun Microsystems, Inc.
 License: Other-26
 
-Files: newlib/libm/machine/i386/f_llrint.c
- newlib/libm/machine/i386/f_llrintf.c
- newlib/libm/machine/i386/f_llrintl.c
- newlib/libm/machine/i386/f_lrint.c
- newlib/libm/machine/i386/f_lrintf.c
- newlib/libm/machine/i386/f_lrintl.c
- newlib/libm/machine/i386/f_rint.c
- newlib/libm/machine/i386/f_rintf.c
- newlib/libm/machine/i386/f_rintl.c
+Files: newlib/libm/machine/x86/f_llrint.c
+ newlib/libm/machine/x86/f_llrintf.c
+ newlib/libm/machine/x86/f_llrintl.c
+ newlib/libm/machine/x86/f_lrint.c
+ newlib/libm/machine/x86/f_lrintf.c
+ newlib/libm/machine/x86/f_lrintl.c
+ newlib/libm/machine/x86/f_rint.c
+ newlib/libm/machine/x86/f_rintf.c
+ newlib/libm/machine/x86/f_rintl.c
 Copyright: 2007 Dave Korn
 License: Other-27
 
@@ -3879,7 +3887,6 @@ Files: newlib/libc/machine/d10v/setjmp.S
  newlib/libc/machine/h8500/setjmp.S
  newlib/libc/machine/h8500/shifts.c
  newlib/libc/machine/hppa/DEFS.h
- newlib/libc/machine/i386/i386mach.h
  newlib/libc/machine/m32r/setjmp.S
  newlib/libc/machine/m68k/setjmp.S
  newlib/libc/machine/m68k/strcpy.c
@@ -3900,7 +3907,6 @@ Files: newlib/libc/machine/d10v/setjmp.S
  newlib/libc/machine/necv70/machine/registers.h
  newlib/libc/machine/necv70/setjmp.S
  newlib/libc/machine/powerpc/setjmp.S
- newlib/libc/machine/powerpc/vfscanf.c
  newlib/libc/machine/sh/asm.h
  newlib/libc/machine/sh/setjmp.S
  newlib/libc/machine/sparc/machine/sparclet.h
@@ -3916,6 +3922,7 @@ Files: newlib/libc/machine/d10v/setjmp.S
  newlib/libc/machine/w65/smulhi3.S
  newlib/libc/machine/w65/udivhi3.S
  newlib/libc/machine/w65/umodhi3.S
+ newlib/libc/machine/x86/i386mach.h
  newlib/libc/machine/z8k/args.h
  newlib/libc/machine/z8k/setjmp.S
  newlib/libc/stdio/asiprintf.c
@@ -5472,18 +5479,6 @@ License: Other-12
  permission of Red Hat, Inc.
 
 License: Other-13
- Permission to use, copy, modify, and distribute this software for any
- purpose without fee is hereby granted, provided that this entire notice
- is included in all copies of any software which is or includes a copy
- or modification of this software and in all copies of the supporting
- documentation for such software.
- .
- THIS SOFTWARE IS BEING PROVIDED "AS IS", WITHOUT ANY EXPRESS OR IMPLIED
- WARRANTY.  IN PARTICULAR,  THE AUTHOR MAKES NO REPRESENTATION
- OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY OF THIS
- SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
-
-License: Other-14
  The author hereby grant permission to use, copy, modify, distribute,
  and license this software and its documentation for any purpose, provided
  that existing copyright notices are retained in all copies and that this
@@ -5494,7 +5489,7 @@ License: Other-14
  the new terms are clearly indicated on the first page of each file where
  they apply.
 
-License: Other-15
+License: Other-14
  Redistribution and use in source and binary forms is permitted
  provided that the above copyright notice and following paragraph are
  duplicated in all such forms.
@@ -5502,7 +5497,7 @@ License: Other-15
  This file is distributed WITHOUT ANY WARRANTY; without even the implied
  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-License: Other-16
+License: Other-15
  Permission to use, copy, modify, and distribute this file
  for any purpose is hereby granted without fee, provided that
  the above copyright notice and this notice appears in all
@@ -5511,7 +5506,7 @@ License: Other-16
  This file is distributed WITHOUT ANY WARRANTY; without even the implied
  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-License: Other-17
+License: Other-16
  Redistribution and use in source and binary forms are permitted
  provided that the above copyright notice and this paragraph are
  duplicated in all such forms and that any documentation,
@@ -5524,7 +5519,7 @@ License: Other-17
  IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-License: Other-18
+License: Other-17
  Permission to use, copy, modify, and distribute this software for any
  purpose without fee is hereby granted, provided that this entire notice
  is included in all copies of any software which is or includes a copy
@@ -5536,7 +5531,7 @@ License: Other-18
  REPRESENTATION OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY
  OF THIS SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
 
-License: Other-19
+License: Other-18
  You may redistribute unmodified or modified versions of this source
  code provided that the above copyright notice and this and the
  following conditions are retained.
@@ -5545,7 +5540,7 @@ License: Other-19
  of any kind. I shall in no event be liable for anything that happens
  to anyone/anything when using this software.
 
-License: Other-20
+License: Other-19
  Permission to use, copy, modify, and distribute this software and
  its documentation for any purpose and without fee is hereby
  granted, provided that the above copyright notice appear in all
@@ -5565,13 +5560,25 @@ License: Other-20
  ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
  THIS SOFTWARE.
 
-License: Other-21
+License: Other-20
  This file and the accompanying getopt.h header file are hereby placed in the
  public domain without restrictions.  Just give the author credit, don't
  claim you wrote it or prevent anyone else from using it.
  .
  Gregory Pietsch's current e-mail address:
  gpietsch@comcast.net
+
+License: Other-21
+ Permission to use, copy, modify, and distribute this software for any
+ purpose without fee is hereby granted, provided that this entire notice
+ is included in all copies of any software which is or includes a copy
+ or modification of this software and in all copies of the supporting
+ documentation for such software.
+ .
+ THIS SOFTWARE IS BEING PROVIDED "AS IS", WITHOUT ANY EXPRESS OR IMPLIED
+ WARRANTY.  IN PARTICULAR,  THE AUTHOR MAKES NO REPRESENTATION
+ OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY OF THIS
+ SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
 
 License: Other-22
  Redistribution and use in source and binary forms, with or without

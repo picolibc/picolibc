@@ -1,3 +1,11 @@
+picolibc (1.7.9-1) unstable; urgency=medium
+
+  * New upstream
+
+  * ARC, ESP32, MIPS, MSP430, NIOS II, and SPARC support added
+
+ -- Keith Packard <keithp@keithp.com>  Mon, 10 Oct 2022 22:30:43 -0700
+
 picolibc (1.7.8-1) unstable; urgency=medium
 
   * New upstream
