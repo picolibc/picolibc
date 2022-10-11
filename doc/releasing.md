@@ -10,7 +10,7 @@ picolibc:
    ** RISC-V
    ** ARM 32-bit
    ** ARM 64-bit (aarch64)
-   ** ESP8266 (xtensa-lx106)
+   ** Xtensa (ESP8266, ESP32)
  
  2. Test on architectures that can do so
 
@@ -23,6 +23,11 @@ picolibc:
 
  3. Use glibc test suite for RISC-V and ARM 32-bit
 
+    * Build and install minsize and release builds, using
+    --buildtype=release -Dbuild-type-subdir=release
+
+    * Build and run glibc test suite against all four builds
+
  4. Test c++ builds using hello-world example on ARM
 
  5. Verify that COPYING.picolibc includes information
@@ -30,11 +35,11 @@ picolibc:
 
  6. Add release notes to README.md
  
- 7. Update meson.build file with new version number
+ 7. Update meson.build and CMakeLists.txt with new version number
 
  8. Commit release notes and meson.build
 
-	$ git commit -m'Version <version>' README.md meson.build
+	$ git commit -m'Version <version>' README.md meson.build CMakeLists.txt
 
  9. Use native configuration to build release:
 
