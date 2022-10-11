@@ -5,8 +5,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#if defined(__AMDGCN__)
-/* GCN does not support constructors, yet.  */
+#if defined(__AMDGCN__) || defined(__nvptx__)
+/* Global constructors not supported on this target, yet.  */
 uintptr_t __stack_chk_guard = 0x00000aff; /* 0, 0, '\n', 255  */
 
 #else
