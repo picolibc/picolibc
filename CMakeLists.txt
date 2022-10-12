@@ -455,6 +455,7 @@ set(PICOLIBC_COMPILE_OPTIONS
   "-Werror=vla"
   "-Warray-bounds"
   "-Wold-style-definition"
+  "-D_LIBC"
   ${TLSMODEL}
   ${TARGET_COMPILE_OPTIONS}
   ${PICOLIBC_EXTRA_COMPILE_OPTIONS}
