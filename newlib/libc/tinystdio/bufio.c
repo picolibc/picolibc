@@ -36,6 +36,7 @@
 #include <stdio-bufio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdbool.h>
 
 /* Buffered I/O routines for tiny stdio */
 
@@ -133,7 +134,9 @@ __bufio_get(FILE *f)
 {
 	struct __file_bufio *bf = (struct __file_bufio *) f;
         int ret;
+        bool flushed = false;
 
+again:
 	__bufio_lock(f);
         if (__bufio_setdir_locked(f, __SRD) < 0) {
                 ret = _FDEV_ERR;
@@ -143,10 +146,11 @@ __bufio_get(FILE *f)
 	if (bf->off >= bf->len) {
 
 		/* Flush stdout if reading from stdin */
-		if (f == stdin) {
+		if (f == stdin && !flushed) {
+                        flushed = true;
 			__bufio_unlock(f);
 			fflush(stdout);
-			return __bufio_get(f);
+                        goto again;
 		}
 
 		/* Reset read pointer, read some data */
