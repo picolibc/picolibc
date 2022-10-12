@@ -33,40 +33,50 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-picolibc_sources_flags("-fno-builtin"
-  setjmp.S
+picolibc_sources(
+  fenv.c
+  s_ceil.c
+  s_fabs.c
+  s_floor.c
+  s_fma.c
+  s_fmax.c
+  s_fmin.c
+  s_llrint.c
+  s_llround.c
+  s_lrint.c
+  s_lround.c
+  s_sqrt.c
+  s_trunc.c
+  sf_ceil.c
+  sf_fabs.c
+  sf_floor.c
+  sf_fma.c
+  sf_fmax.c
+  sf_fmin.c
+  sf_llrint.c
+  sf_llround.c
+  sf_lrint.c
+  sf_lround.c
+  sf_nearbyint.c
+  sf_rint.c
+  sf_round.c
+  sf_sqrt.c
+  sf_trunc.c
   )
 
-if(NOT DEFINED CONFIG_64BIT)
-  picolibc_sources_flags("-fno-builtin"
-    memcmp-bs-norm.S
-    memcmp.S
-    memcmp-stub.c
-    memcpy-archs.S
-    memcpy-bs.S
-    memcpy.S
-    memcpy-stub.c
-    memset-archs.S
-    memset-bs.S
-    memset.S
-    memset-stub.c
-    strchr-bs-norm.S
-    strchr-bs.S
-    strchr.S
-    strchr-stub.c
-    strcmp-archs.S
-    strcmp.S
-    strcmp-stub.c
-    strcpy-bs-arc600.S
-    strcpy-bs.S
-    strcpy.S
-    strcpy-stub.c
-    strlen-bs-norm.S
-    strlen-bs.S
-    strlen.S
-    strlen-stub.c
-    strncpy-bs.S
-    strncpy.S
-    strncpy-stub.c
-    )
-endif()
+picolibc_sources_fake(
+  feclearexcept.c
+  fedisableexcept.c
+  feenableexcept.c
+  fegetenv.c
+  fegetexcept.c
+  fegetexceptflag.c
+  fegetround.c
+  feholdexcept.c
+  feraiseexcept.c
+  fesetenv.c
+  fesetexceptflag.c
+  fesetround.c
+  fetestexcept.c
+  feupdateenv.c
+  )

@@ -33,40 +33,23 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-picolibc_sources_flags("-fno-builtin"
-  setjmp.S
+picolibc_sources(
+  fenv.c
   )
 
-if(NOT DEFINED CONFIG_64BIT)
-  picolibc_sources_flags("-fno-builtin"
-    memcmp-bs-norm.S
-    memcmp.S
-    memcmp-stub.c
-    memcpy-archs.S
-    memcpy-bs.S
-    memcpy.S
-    memcpy-stub.c
-    memset-archs.S
-    memset-bs.S
-    memset.S
-    memset-stub.c
-    strchr-bs-norm.S
-    strchr-bs.S
-    strchr.S
-    strchr-stub.c
-    strcmp-archs.S
-    strcmp.S
-    strcmp-stub.c
-    strcpy-bs-arc600.S
-    strcpy-bs.S
-    strcpy.S
-    strcpy-stub.c
-    strlen-bs-norm.S
-    strlen-bs.S
-    strlen.S
-    strlen-stub.c
-    strncpy-bs.S
-    strncpy.S
-    strncpy-stub.c
-    )
-endif()
+picolibc_sources_fake(
+  feclearexcept.c
+  fedisableexcept.c
+  feenableexcept.c
+  fegetenv.c
+  fegetexcept.c
+  fegetexceptflag.c
+  fegetround.c
+  feholdexcept.c
+  feraiseexcept.c
+  fesetenv.c
+  fesetexceptflag.c
+  fesetround.c
+  fetestexcept.c
+  feupdateenv.c
+  )

@@ -32,41 +32,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
-picolibc_sources_flags("-fno-builtin"
-  setjmp.S
+picolibc_headers(machine
+  asm.h
+  fenv-fp.h
+  fenv-softfloat.h
+  regdef.h
   )
-
-if(NOT DEFINED CONFIG_64BIT)
-  picolibc_sources_flags("-fno-builtin"
-    memcmp-bs-norm.S
-    memcmp.S
-    memcmp-stub.c
-    memcpy-archs.S
-    memcpy-bs.S
-    memcpy.S
-    memcpy-stub.c
-    memset-archs.S
-    memset-bs.S
-    memset.S
-    memset-stub.c
-    strchr-bs-norm.S
-    strchr-bs.S
-    strchr.S
-    strchr-stub.c
-    strcmp-archs.S
-    strcmp.S
-    strcmp-stub.c
-    strcpy-bs-arc600.S
-    strcpy-bs.S
-    strcpy.S
-    strcpy-stub.c
-    strlen-bs-norm.S
-    strlen-bs.S
-    strlen.S
-    strlen-stub.c
-    strncpy-bs.S
-    strncpy.S
-    strncpy-stub.c
-    )
-endif()

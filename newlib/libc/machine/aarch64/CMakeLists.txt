@@ -32,41 +32,39 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
 picolibc_sources_flags("-fno-builtin"
+  memchr-stub.c
+  memchr.S
+  memcmp-stub.c
+  memcmp.S
+  memcpy-stub.c
+  memcpy.S
+  memmove-stub.c
+  memmove.S
+  memset-stub.c
+  memset.S
+  rawmemchr-stub.c
+  rawmemchr.S
   setjmp.S
+  stpcpy-stub.c
+  stpcpy.S
+  strchr-stub.c
+  strchr.S
+  strchrnul-stub.c
+  strchrnul.S
+  strcmp-stub.c
+  strcmp.S
+  strcpy-stub.c
+  strcpy.S
+  strlen-stub.c
+  strlen.S
+  strncmp-stub.c
+  strncmp.S
+  strnlen-stub.c
+  strnlen.S
+  strchr-stub.c
+  strchr.S
   )
 
-if(NOT DEFINED CONFIG_64BIT)
-  picolibc_sources_flags("-fno-builtin"
-    memcmp-bs-norm.S
-    memcmp.S
-    memcmp-stub.c
-    memcpy-archs.S
-    memcpy-bs.S
-    memcpy.S
-    memcpy-stub.c
-    memset-archs.S
-    memset-bs.S
-    memset.S
-    memset-stub.c
-    strchr-bs-norm.S
-    strchr-bs.S
-    strchr.S
-    strchr-stub.c
-    strcmp-archs.S
-    strcmp.S
-    strcmp-stub.c
-    strcpy-bs-arc600.S
-    strcpy-bs.S
-    strcpy.S
-    strcpy-stub.c
-    strlen-bs-norm.S
-    strlen-bs.S
-    strlen.S
-    strlen-stub.c
-    strncpy-bs.S
-    strncpy.S
-    strncpy-stub.c
-    )
-endif()
+add_subdirectory(sys)
+add_subdirectory(machine)
