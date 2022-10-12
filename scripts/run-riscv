@@ -73,6 +73,10 @@ fi
 
 all_options="i e g m a f d c s u"
 
+if $qemu --version | grep -q 'version [789]'; then
+    all_options="h $all_options"
+fi
+
 for o in $all_options; do
     if echo "$options" | grep -q "$o"; then
 	value=true
