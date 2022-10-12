@@ -21,9 +21,9 @@ SYNOPSIS
 	#include <stdarg.h>
 	int diprintf(int <[fd]>, const char *<[format]>, ...);
 	int vdiprintf(int <[fd]>, const char *<[format]>, va_list <[ap]>);
-	int _diprintf_r(struct _reent *<[ptr]>, int <[fd]>,
+	int diprintf( int <[fd]>,
 			const char *<[format]>, ...);
-	int _vdiprintf_r(struct _reent *<[ptr]>, int <[fd]>,
+	int vdiprintf( int <[fd]>,
 			const char *<[format]>, va_list <[ap]>);
 
 DESCRIPTION
@@ -49,22 +49,6 @@ Supporting OS subroutines required: <<sbrk>>, <<write>>.
 #include <stdarg.h>
 
 int
-_diprintf_r (struct _reent *ptr,
-       int fd,
-       const char *format, ...)
-{
-  va_list ap;
-  int n;
-
-  va_start (ap, format);
-  n = _vdiprintf_r (ptr, fd, format, ap);
-  va_end (ap);
-  return n;
-}
-
-#ifndef _REENT_ONLY
-
-int
 diprintf (int fd,
        const char *format, ...)
 {
@@ -72,9 +56,7 @@ diprintf (int fd,
   int n;
 
   va_start (ap, format);
-  n = _vdiprintf_r (_REENT, fd, format, ap);
+  n = vdiprintf ( fd, format, ap);
   va_end (ap);
   return n;
 }
-
-#endif /* ! _REENT_ONLY */

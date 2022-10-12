@@ -29,7 +29,7 @@ SYNOPSIS
 	int putc(int <[ch]>, FILE *<[fp]>);
 
 	#include <stdio.h>
-	int _putc_r(struct _reent *<[ptr]>, int <[ch]>, FILE *<[fp]>);
+	int putc( int <[ch]>, FILE *<[fp]>);
 
 DESCRIPTION
 <<putc>> is a macro, defined in <<stdio.h>>.  <<putc>>
@@ -79,35 +79,14 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #undef putc
 
 int
-_putc_r (struct _reent *ptr,
+putc (
        int c,
        register FILE *fp)
 {
   int result;
   CHECK_INIT (ptr, fp);
   _newlib_flockfile_start (fp);
-  result = __sputc_r (ptr, c, fp);
+  result = _sputc ( c, fp);
   _newlib_flockfile_end (fp);
   return result;
 }
-
-#ifndef _REENT_ONLY
-int
-putc (int c,
-       register FILE *fp)
-{
-#if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
-  int result;
-  struct _reent *reent = _REENT;
-
-  CHECK_INIT (reent, fp);
-  _newlib_flockfile_start (fp);
-  result = __sputc_r (reent, c, fp);
-  _newlib_flockfile_end (fp);
-  return result;
-#else
-  return _putc_r (_REENT, c, fp);
-#endif
-}
-#endif /* !_REENT_ONLY */
-

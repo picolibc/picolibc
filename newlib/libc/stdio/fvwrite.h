@@ -32,5 +32,5 @@ struct __suio {
 };
 
 
-extern int __sfvwrite_r (struct _reent *, FILE *, struct __suio *);
-extern int __swsetup_r (struct _reent *, FILE *);
+extern int _sfvwrite ( FILE *, struct __suio *);
+extern int _swsetup ( FILE *);

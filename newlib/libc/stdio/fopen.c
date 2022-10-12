@@ -28,7 +28,7 @@ SYNOPSIS
 	#include <stdio.h>
 	FILE *fopen(const char *<[file]>, const char *<[mode]>);
 
-	FILE *_fopen_r(struct _reent *<[reent]>, 
+	FILE *fopen( 
                        const char *<[file]>, const char *<[mode]>);
 
 DESCRIPTION
@@ -114,7 +114,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include "local.h"
 
 FILE *
-_fopen_r (struct _reent *ptr,
+fopen (
        const char *__restrict file,
        const char *__restrict mode)
 {
@@ -122,13 +122,9 @@ _fopen_r (struct _reent *ptr,
   register int f;
   int flags, oflags;
 
-  if ((flags = __sflags (ptr, mode, &oflags)) == 0)
+  if ((flags = __sflags (mode, &oflags)) == 0)
     return NULL;
-
-  if (!ptr->__cleanup)
-    __sinit(ptr);
-
-  if ((fp = __sfp (ptr)) == NULL)
+  if ((fp = __sfp ()) == NULL)
     return NULL;
 
   if ((f = open (file, oflags, 0666)) < 0)
@@ -153,7 +149,7 @@ _fopen_r (struct _reent *ptr,
   fp->_close = __sclose;
 
   if (fp->_flags & __SAPP)
-    _fseek_r (ptr, fp, 0, SEEK_END);
+    fseek ( fp, 0, SEEK_END);
 
 #ifdef __SCLE
   if (__stextmode (fp->_file))
@@ -163,14 +159,3 @@ _fopen_r (struct _reent *ptr,
   _newlib_flockfile_end (fp);
   return fp;
 }
-
-#ifndef _REENT_ONLY
-
-FILE *
-fopen (const char *file,
-       const char *mode)
-{
-  return _fopen_r (_REENT, file, mode);
-}
-
-#endif

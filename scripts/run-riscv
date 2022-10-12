@@ -50,9 +50,18 @@ case "$elf" in
 	cpu=rv64
 	;;
     *)
-	qemu="qemu-system-riscv64"
-	options="i m a f d c"
-	cpu=rv64
+	case `file "$elf"` in
+	    *64-bit*)
+		qemu="qemu-system-riscv64"
+		options="i m a f d c"
+		cpu=rv64
+		;;
+	    *32-bit*)
+		qemu="qemu-system-riscv32"
+		options="i m a"
+		cpu=rv32
+		;;
+	esac
 	;;
 esac
 
@@ -63,6 +72,10 @@ if [ -z "$options" ]; then
 fi
 
 all_options="i e g m a f d c s u"
+
+if $qemu --version | grep -q 'version [789]'; then
+    all_options="h $all_options"
+fi
 
 for o in $all_options; do
     if echo "$options" | grep -q "$o"; then

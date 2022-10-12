@@ -33,7 +33,7 @@ wctomb_f __big5_wctomb;
 #endif
 #endif
 
-#define __WCTOMB (_locale->wctomb)
+#define __WCTOMB (__get_current_locale()->wctomb)
 
 typedef int mbtowc_f (wchar_t *, const char *, size_t,
 		      mbstate_t *);
@@ -54,7 +54,7 @@ mbtowc_f __big5_mbtowc;
 #endif
 #endif
 
-#define __MBTOWC (_locale->mbtowc)
+#define __MBTOWC (__get_current_locale()->mbtowc)
 
 extern wchar_t __iso_8859_conv[14][0x60];
 int __iso_8859_val_index (int);

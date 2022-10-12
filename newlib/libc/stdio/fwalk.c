@@ -27,7 +27,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include <errno.h>
 
 int
-_fwalk_sglue (struct _reent *ptr, int (*func) (struct _reent *, FILE *),
+_fwalk_sglue (int (*func) (FILE *),
     struct _glue *g)
 {
   FILE *fp;
@@ -44,7 +44,7 @@ _fwalk_sglue (struct _reent *ptr, int (*func) (struct _reent *, FILE *),
   do {
     for (fp = g->_iobs, n = g->_niobs; --n >= 0; fp++)
       if (fp->_flags != 0 && fp->_flags != 1 && fp->_file != -1)
-	ret |= (*func) (ptr, fp);
+	ret |= (*func) (fp);
     g = g->_next;
   } while (g != NULL);
 

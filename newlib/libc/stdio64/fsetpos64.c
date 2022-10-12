@@ -58,26 +58,15 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #ifdef __LARGE64_FILES
 
 int
-_fsetpos64_r (struct _reent *ptr,
+fsetpos64 (
 	FILE * iop,
 	const _fpos64_t * pos)
 {
-  int x = _fseeko64_r (ptr, iop, (_off64_t)(*pos), SEEK_SET);
+  int x = fseeko64 (iop, (_off64_t)(*pos), SEEK_SET);
 
   if (x != 0)
     return 1;
   return 0;
 }
-
-#ifndef _REENT_ONLY
-
-int
-fsetpos64 (FILE * iop,
-	const _fpos64_t * pos)
-{
-  return _fsetpos64_r (_REENT, iop, pos);
-}
-
-#endif /* !_REENT_ONLY */
 
 #endif /* __LARGE64_FILES */

@@ -23,34 +23,15 @@
 #include <stdarg.h>
 #include "local.h"
 
-#ifndef _REENT_ONLY
-
 int
 wscanf(const wchar_t *__restrict fmt, ...)
 {
   int ret;
   va_list ap;
-  struct _reent *reent = _REENT;
 
   _REENT_SMALL_CHECK_INIT (reent);
   va_start (ap, fmt);
-  ret = _vfwscanf_r (reent, _stdin_r (reent), fmt, ap);
+  ret = vfwscanf ( _stdin_r (reent), fmt, ap);
   va_end (ap);
   return ret;
 }
-
-#endif /* !_REENT_ONLY */
-
-int
-_wscanf_r(struct _reent *ptr, const wchar_t *fmt, ...)
-{
-  int ret;
-  va_list ap;
-
-  _REENT_SMALL_CHECK_INIT (ptr);
-  va_start (ap, fmt);
-  ret = _vfwscanf_r (ptr, _stdin_r (ptr), fmt, ap);
-  va_end (ap);
-  return (ret);
-}
-

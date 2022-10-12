@@ -70,7 +70,6 @@ strncpy (char *dst0, const char *src0, size_t count)
 
 #else
   unsigned char *dst;
-  unsigned char *dst_end;
   unsigned char *end;
   const unsigned char *src;
   int ch0, ch1;
@@ -79,7 +78,6 @@ strncpy (char *dst0, const char *src0, size_t count)
 #endif
   int ch;
   int odd_bytes;
-  size_t long_count;
 
   dst = (unsigned char *)dst0;
   src = (unsigned const char *)src0;
@@ -165,7 +163,6 @@ strncpy (char *dst0, const char *src0, size_t count)
  found_null0:
   count++;			/* add 1 to cover remaining byte */
   dst -= 1;			/* adjust dst += 4 gets correct ptr */
-  FALLTHROUGH;
 
   /* Found null byte in second byte, count has been decremented by 4, null has
      been stored in dst[1].  */
@@ -173,14 +170,12 @@ strncpy (char *dst0, const char *src0, size_t count)
 #if UNROLL_FACTOR > 2
   count++;			/* add 1 to cover remaining byte */
   dst -= 1;			/* adjust dst += 4 gets correct ptr */
-  FALLTHROUGH;
 
   /* Found null byte in third byte, count has been decremented by 4, null has
      been stored in dst[2].  */
  found_null2:
   count++;			/* add 1 to cover remaining byte */
   dst -= 1;			/* adjust dst += 4 gets correct ptr */
-  FALLTHROUGH;
 
   /* Found null byte in fourth byte, count is accurate, dst has not been
      updated yet.  */

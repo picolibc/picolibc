@@ -29,7 +29,7 @@ SYNOPSIS
 	int getc(FILE *<[fp]>);
 
 	#include <stdio.h>
-	int _getc_r(struct _reent *<[ptr]>, FILE *<[fp]>);
+	int getc( FILE *<[fp]>);
 
 DESCRIPTION
 <<getc>> is a macro, defined in <<stdio.h>>.  You can use <<getc>>
@@ -77,30 +77,13 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #undef getc
 
 int
-_getc_r (struct _reent *ptr,
+getc (
        register FILE *fp)
 {
   int result;
   CHECK_INIT (ptr, fp);
   _newlib_flockfile_start (fp);
-  result = __sgetc_r (ptr, fp);
+  result = _sgetc ( fp);
   _newlib_flockfile_end (fp);
   return result;
 }
-
-#ifndef _REENT_ONLY
-
-int
-getc (register FILE *fp)
-{
-  int result;
-  struct _reent *reent = _REENT;
-
-  CHECK_INIT (reent, fp);
-  _newlib_flockfile_start (fp);
-  result = __sgetc_r (reent, fp);
-  _newlib_flockfile_end (fp);
-  return result;
-}
-
-#endif /* !_REENT_ONLY */

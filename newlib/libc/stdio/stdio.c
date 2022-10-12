@@ -30,7 +30,7 @@
  */
 
 _READ_WRITE_RETURN_TYPE
-__sread (struct _reent *ptr,
+__sread (
        void *cookie,
        char *buf,
        _READ_WRITE_BUFSIZE_TYPE n)
@@ -38,7 +38,6 @@ __sread (struct _reent *ptr,
   register FILE *fp = (FILE *) cookie;
   register ssize_t ret;
 
-  (void) ptr;
 #ifdef __SCLE
   int oldmode = 0;
   if (fp->_flags & __SCLE)
@@ -63,12 +62,11 @@ __sread (struct _reent *ptr,
 
 /* Dummy function used in sscanf/swscanf. */
 _READ_WRITE_RETURN_TYPE
-__seofread (struct _reent *_ptr,
+__seofread (
        void *cookie,
        char *buf,
        _READ_WRITE_BUFSIZE_TYPE len)
 {
-  (void) _ptr;
   (void) cookie;
   (void) buf;
   (void) len;
@@ -76,7 +74,7 @@ __seofread (struct _reent *_ptr,
 }
 
 _READ_WRITE_RETURN_TYPE
-__swrite (struct _reent *ptr,
+__swrite (
        void *cookie,
        char const *buf,
        _READ_WRITE_BUFSIZE_TYPE n)
@@ -87,7 +85,6 @@ __swrite (struct _reent *ptr,
   int oldmode=0;
 #endif
 
-  (void) ptr;
   if (fp->_flags & __SAPP)
     lseek (fp->_file, (_off_t) 0, SEEK_END);
   fp->_flags &= ~__SOFF;	/* in case O_APPEND mode is set */
@@ -108,7 +105,7 @@ __swrite (struct _reent *ptr,
 }
 
 _fpos_t
-__sseek (struct _reent *ptr,
+__sseek (
        void *cookie,
        _fpos_t offset,
        int whence)
@@ -116,7 +113,6 @@ __sseek (struct _reent *ptr,
   register FILE *fp = (FILE *) cookie;
   register _off_t ret;
 
-  (void) ptr;
   ret = lseek (fp->_file, (_off_t) offset, whence);
   if (ret == -1L)
     fp->_flags &= ~__SOFF;
@@ -129,12 +125,11 @@ __sseek (struct _reent *ptr,
 }
 
 int
-__sclose (struct _reent *ptr,
+__sclose (
        void *cookie)
 {
   FILE *fp = (FILE *) cookie;
 
-  (void) ptr;
   return close (fp->_file);
 }
 

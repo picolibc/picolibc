@@ -63,7 +63,11 @@ SUCH DAMAGE.
 #else
 #define _BEGIN_STD_C
 #define _END_STD_C
+#if __GNUC_PREREQ (3, 3)
+#define _NOTHROW __attribute__ ((__nothrow__))
+#else
 #define _NOTHROW
+#endif
 #endif
 
 #ifndef _LONG_DOUBLE

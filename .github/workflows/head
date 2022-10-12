@@ -11,7 +11,8 @@ on:
 env:
   IMAGE_FILE: dockerimg.tar
   IMAGE: picolibc
-  HASH_FILE: picolibc/.github/packages.txt
+  PACKAGES_FILE: picolibc/.github/packages.txt
+  EXTRA_FILE: picolibc/.github/extra-files.txt
 
 jobs:
   cache-maker:
@@ -27,7 +28,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.HASH_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
 
       - name: Set up Docker Buildx
         if: steps.cache.outputs.cache-hit != 'true'

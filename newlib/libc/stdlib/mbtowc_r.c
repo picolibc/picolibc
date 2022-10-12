@@ -34,7 +34,7 @@ __ascii_mbtowc (
 #ifdef __CYGWIN__
   if ((wchar_t)*t >= 0x80)
     {
-      __errno_r(r) = EILSEQ;
+      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
 #endif
@@ -112,7 +112,7 @@ ___iso_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
 	  *pwc = __iso_8859_conv[iso_idx][*t - 0xa0];
 	  if (*pwc == 0) /* Invalid character */
 	    {
-	      __errno_r(r) = EILSEQ;
+	      _REENT_ERRNO(r) = EILSEQ;
 	      return -1;
 	    }
 	  return 1;
@@ -285,7 +285,7 @@ ___cp_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
 	  *pwc = __cp_conv[cp_idx][*t - 0x80];
 	  if (*pwc == 0) /* Invalid character */
 	    {
-	      __errno_r(r) = EILSEQ;
+	      _REENT_ERRNO(r) = EILSEQ;
 	      return -1;
 	    }
 	  return 1;
@@ -573,13 +573,13 @@ __utf8_mbtowc (
       ch = t[i++];
       if (ch < 0x80 || ch > 0xbf)
 	{
-	  __errno_r(r) = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
       if (state->__value.__wchb[0] < 0xc2)
 	{
 	  /* overlong UTF-8 sequence */
-	  __errno_r(r) = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
       state->__count = 0;
@@ -602,12 +602,12 @@ __utf8_mbtowc (
       if (state->__value.__wchb[0] == 0xe0 && ch < 0xa0)
 	{
 	  /* overlong UTF-8 sequence */
-	  __errno_r(r) = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
       if (ch < 0x80 || ch > 0xbf)
 	{
-	  __errno_r(r) = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
       state->__value.__wchb[1] = ch;
@@ -620,7 +620,7 @@ __utf8_mbtowc (
       ch = t[i++];
       if (ch < 0x80 || ch > 0xbf)
 	{
-	  __errno_r(r) = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
       state->__count = 0;
@@ -633,7 +633,7 @@ __utf8_mbtowc (
   if (ch >= 0xf0 && ch <= 0xf4)
     {
       /* four-byte sequence */
-      wint_t tmp;
+      uint32_t tmp;
       state->__value.__wchb[0] = ch;
       if (state->__count == 0)
 	state->__count = 1;
@@ -646,12 +646,12 @@ __utf8_mbtowc (
 	  || (state->__value.__wchb[0] == 0xf4 && ch >= 0x90))
 	{
 	  /* overlong UTF-8 sequence or result is > 0x10ffff */
-	  __errno_r(r) = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
       if (ch < 0x80 || ch > 0xbf)
 	{
-	  __errno_r(r) = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
       state->__value.__wchb[1] = ch;
@@ -664,7 +664,7 @@ __utf8_mbtowc (
       ch = (state->__count == 2) ? t[i++] : state->__value.__wchb[2];
       if (ch < 0x80 || ch > 0xbf)
 	{
-	  __errno_r(r) = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
       state->__value.__wchb[2] = ch;
@@ -685,9 +685,9 @@ __utf8_mbtowc (
 	     The second half of the surrogate pair is returned in case we
 	     recognize the special __count value of four, and the next
 	     byte is actually a valid value.  See below. */
-	  tmp = (wint_t)((state->__value.__wchb[0] & 0x07) << 18)
-	    |   (wint_t)((state->__value.__wchb[1] & 0x3f) << 12)
-	    |   (wint_t)((state->__value.__wchb[2] & 0x3f) << 6);
+            tmp = (uint32_t)((state->__value.__wchb[0] & (uint32_t) 0x07) << 18)
+                |   (uint32_t)((state->__value.__wchb[1] & (uint32_t) 0x3f) << 12)
+                |   (uint32_t)((state->__value.__wchb[2] & (uint32_t) 0x3f) << 6);
 	  state->__count = 4;
 	  *pwc = 0xd800 | ((tmp - 0x10000) >> 10);
 	  return i;
@@ -697,13 +697,13 @@ __utf8_mbtowc (
       ch = t[i++];
       if (ch < 0x80 || ch > 0xbf)
 	{
-	  __errno_r(r) = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
-      tmp = (wint_t)((state->__value.__wchb[0] & 0x07) << 18)
-	|   (wint_t)((state->__value.__wchb[1] & 0x3f) << 12)
-	|   (wint_t)((state->__value.__wchb[2] & 0x3f) << 6)
-	|   (wint_t)(ch & 0x3f);
+      tmp = (((uint32_t)state->__value.__wchb[0] & 0x07) << 18)
+        |   (((uint32_t)state->__value.__wchb[1] & 0x3f) << 12)
+        |   (((uint32_t)state->__value.__wchb[2] & 0x3f) << 6)
+        |   ((uint32_t)ch & 0x3f);
       if (state->__count == 4 && sizeof(wchar_t) == 2)
 	/* Create the second half of the surrogate pair for systems with
 	   wchar_t == UTF-16 . */
@@ -714,7 +714,7 @@ __utf8_mbtowc (
       return i;
     }
 
-  __errno_r(r) = EILSEQ;
+  _REENT_ERRNO(r) = EILSEQ;
   return -1;
 }
 
@@ -764,7 +764,7 @@ __sjis_mbtowc (
 	}
       else  
 	{
-	  __errno_r(r) = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
@@ -831,7 +831,7 @@ __eucjp_mbtowc (
 	}
       else
 	{
-	  __errno_r(r) = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
@@ -846,7 +846,7 @@ __eucjp_mbtowc (
 	}
       else
 	{
-	  __errno_r(r) = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
@@ -950,7 +950,7 @@ __jis_mbtowc (
 	  break;
 	case ERROR:
 	default:
-	  __errno_r(r) = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
 

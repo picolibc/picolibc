@@ -28,7 +28,7 @@ SYNOPSIS
 	#include <stdio.h>
 	int remove(char *<[filename]>);
 
-	int _remove_r(struct _reent *<[reent]>, char *<[filename]>);
+	int remove( char *<[filename]>);
 
 DESCRIPTION
 Use <<remove>> to dissolve the association between a particular
@@ -60,22 +60,11 @@ Supporting OS subroutine required: <<unlink>>.
 #include <unistd.h>
 
 int
-_remove_r (struct _reent *ptr,
+remove (
        const char *filename)
 {
-  (void) ptr;
   if (unlink (filename) == -1)
     return -1;
 
   return 0;
 }
-
-#ifndef _REENT_ONLY
-
-int
-remove (const char *filename)
-{
-  return _remove_r (_REENT, filename);
-}
-
-#endif

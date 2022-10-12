@@ -25,7 +25,7 @@
 #include "local.h"
 
 int
-_asiprintf_r (struct _reent *ptr,
+asiprintf (
        char **strp,
        const char *fmt, ...)
 {
@@ -39,7 +39,7 @@ _asiprintf_r (struct _reent *ptr,
   f._bf._size = f._w = 0;
   f._file = -1;  /* No file. */
   va_start (ap, fmt);
-  ret = _svfiprintf_r (ptr, &f, fmt, ap);
+  ret = svfiprintf ( &f, fmt, ap);
   va_end (ap);
   if (ret >= 0)
     {
@@ -48,31 +48,3 @@ _asiprintf_r (struct _reent *ptr,
     }
   return (ret);
 }
-
-#ifndef _REENT_ONLY
-
-int
-asiprintf (char **strp,
-       const char *fmt, ...)
-{
-  int ret;
-  va_list ap;
-  FILE f;
-
-  /* mark a zero-length reallocatable buffer */
-  f._flags = __SWR | __SSTR | __SMBF;
-  f._bf._base = f._p = NULL;
-  f._bf._size = f._w = 0;
-  f._file = -1;  /* No file. */
-  va_start (ap, fmt);
-  ret = _svfiprintf_r (_REENT, &f, fmt, ap);
-  va_end (ap);
-  if (ret >= 0)
-    {
-      *f._p = 0;
-      *strp = (char *) f._bf._base;
-    }
-  return (ret);
-}
-
-#endif /* ! _REENT_ONLY */

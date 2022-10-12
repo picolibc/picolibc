@@ -71,7 +71,7 @@ log2f (float x)
 	return __math_invalidf (x);
       /* x is subnormal, normalize it.  */
       ix = asuint (x * 0x1p23f);
-      ix -= 23 << 23;
+      ix -= (uint32_t) 23 << 23;
     }
 
   /* x = 2^k z; where z is in range [OFF,2*OFF] and exact.

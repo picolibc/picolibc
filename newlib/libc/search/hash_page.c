@@ -182,8 +182,8 @@ __split_page(HTAB *hashp,
 	__uint16_t *ino;
 	char *np;
 	DBT key, val;
-	int n, ndx, retval;
-	__uint16_t copyto, diff, off, moved;
+	int ndx, retval;
+	__uint16_t n, copyto, diff, off, moved;
 	char *op;
 
 	copyto = (__uint16_t)hashp->BSIZE;

@@ -230,47 +230,6 @@ wint_t putwc (wchar_t, __FILE *);
 wint_t putwchar (wchar_t);
 wint_t ungetwc (wint_t wc, __FILE *);
 
-#ifndef TINY_STDIO
-
-struct _reent;
-
-wint_t _fgetwc_r (struct _reent *, __FILE *);
-wint_t _fgetwc_unlocked_r (struct _reent *, __FILE *);
-wchar_t *_fgetws_r (struct _reent *, wchar_t *, int, __FILE *);
-wchar_t *_fgetws_unlocked_r (struct _reent *, wchar_t *, int, __FILE *);
-wint_t _fputwc_r (struct _reent *, wchar_t, __FILE *);
-wint_t _fputwc_unlocked_r (struct _reent *, wchar_t, __FILE *);
-int _fputws_r (struct _reent *, const wchar_t *, __FILE *);
-int _fputws_unlocked_r (struct _reent *, const wchar_t *, __FILE *);
-int _fwide_r (struct _reent *, __FILE *, int);
-wint_t _getwc_r (struct _reent *, __FILE *);
-wint_t _getwc_unlocked_r (struct _reent *, __FILE *);
-wint_t _getwchar_r (struct _reent *);
-wint_t _getwchar_unlocked_r (struct _reent *);
-wint_t _putwc_r (struct _reent *, wchar_t, __FILE *);
-wint_t _putwc_unlocked_r (struct _reent *, wchar_t, __FILE *);
-wint_t _putwchar_r (struct _reent *, wchar_t);
-wint_t _putwchar_unlocked_r (struct _reent *, wchar_t);
-wint_t _ungetwc_r (struct _reent *, wint_t wc, __FILE *);
-
-int	_fwprintf_r (struct _reent *, __FILE *, const wchar_t *, ...);
-int	_swprintf_r (struct _reent *, wchar_t *, size_t, const wchar_t *, ...);
-int	_vfwprintf_r (struct _reent *, __FILE *, const wchar_t *, va_list);
-int	_vswprintf_r (struct _reent *, wchar_t *, size_t, const wchar_t *, va_list);
-int	_vwprintf_r (struct _reent *, const wchar_t *, va_list);
-int	_wprintf_r (struct _reent *, const wchar_t *, ...);
-
-int	_fwscanf_r (struct _reent *, __FILE *, const wchar_t *, ...);
-int	_swscanf_r (struct _reent *, const wchar_t *, const wchar_t *, ...);
-int	_vfwscanf_r (struct _reent *, __FILE *, const wchar_t *, va_list);
-int	_vswscanf_r (struct _reent *, const wchar_t *, const wchar_t *, va_list);
-int	_vwscanf_r (struct _reent *, const wchar_t *, va_list);
-int	_wscanf_r (struct _reent *, const wchar_t *, ...);
-
-__FILE *_open_wmemstream_r (struct _reent *, wchar_t **, size_t *);
-
-#endif
-
 #if __GNU_VISIBLE
 wint_t fgetwc_unlocked (__FILE *);
 wchar_t *fgetws_unlocked (wchar_t *__restrict, int, __FILE *__restrict);

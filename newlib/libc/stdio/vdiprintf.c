@@ -13,7 +13,7 @@
 #include "local.h"
 
 int
-_vdiprintf_r (struct _reent *ptr,
+vdiprintf (
        int fd,
        const char *format,
        va_list ap)
@@ -23,7 +23,7 @@ _vdiprintf_r (struct _reent *ptr,
   size_t n = sizeof buf;
 
   _REENT_SMALL_CHECK_INIT (ptr);
-  p = _vasniprintf_r (ptr, buf, &n, format, ap);
+  p = vasniprintf ( buf, &n, format, ap);
   if (!p)
     return -1;
   n = write (fd, p, n);
@@ -31,15 +31,3 @@ _vdiprintf_r (struct _reent *ptr,
     free (p);
   return n;
 }
-
-#ifndef _REENT_ONLY
-
-int
-vdiprintf (int fd,
-       const char *format,
-       va_list ap)
-{
-  return _vdiprintf_r (_REENT, fd, format, ap);
-}
-
-#endif /* ! _REENT_ONLY */

@@ -63,7 +63,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #ifdef __LARGE64_FILES
 
 FILE *
-_fopen64_r (struct _reent *ptr,
+fopen64 (
 	const char *file,
 	const char *mode)
 {
@@ -71,9 +71,9 @@ _fopen64_r (struct _reent *ptr,
   register int f;
   int flags, oflags;
 
-  if ((flags = __sflags (ptr, mode, &oflags)) == 0)
+  if ((flags = __sflags (mode, &oflags)) == 0)
     return NULL;
-  if ((fp = __sfp (ptr)) == NULL)
+  if ((fp = __sfp ()) == NULL)
     return NULL;
 
   if ((f = open64 (file, oflags, 0666)) < 0)
@@ -99,7 +99,7 @@ _fopen64_r (struct _reent *ptr,
   fp->_close = __sclose;
 
   if (fp->_flags & __SAPP)
-    _fseeko64_r (ptr, fp, 0, SEEK_END);
+    fseeko64 (fp, 0, SEEK_END);
 
 #ifdef __SCLE
   if (__stextmode (fp->_file))
@@ -111,16 +111,5 @@ _fopen64_r (struct _reent *ptr,
   _newlib_flockfile_end (fp);
   return fp;
 }
-
-#ifndef _REENT_ONLY
-
-FILE *
-fopen64 (const char *file,
-	const char *mode)
-{
-  return _fopen64_r (_REENT, file, mode);
-}
-
-#endif
 
 #endif /* __LARGE64_FILES */

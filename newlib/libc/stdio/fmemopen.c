@@ -84,13 +84,12 @@ typedef struct fmemcookie {
 /* Read up to non-zero N bytes into BUF from stream described by
    COOKIE; return number of bytes read (0 on EOF).  */
 static _READ_WRITE_RETURN_TYPE
-fmemreader (struct _reent *ptr,
+fmemreader (
        void *cookie,
        char *buf,
        _READ_WRITE_BUFSIZE_TYPE n)
 {
   fmemcookie *c = (fmemcookie *) cookie;
-  (void) ptr;
   /* Can't read beyond current size, but EOF condition is not an error.  */
   if (c->pos > c->eof)
     return 0;
@@ -104,7 +103,7 @@ fmemreader (struct _reent *ptr,
 /* Write up to non-zero N bytes of BUF into the stream described by COOKIE,
    returning the number of bytes written or EOF on failure.  */
 static _READ_WRITE_RETURN_TYPE
-fmemwriter (struct _reent *ptr,
+fmemwriter (
        void *cookie,
        const char *buf,
        _READ_WRITE_BUFSIZE_TYPE n)
@@ -112,7 +111,6 @@ fmemwriter (struct _reent *ptr,
   fmemcookie *c = (fmemcookie *) cookie;
   int adjust = 0; /* true if at EOF, but still need to write NUL.  */
 
-  (void) ptr;
   /* Append always seeks to eof; otherwise, if we have previously done
      a seek beyond eof, ensure all intermediate bytes are NUL.  */
   if (c->append)
@@ -151,7 +149,7 @@ fmemwriter (struct _reent *ptr,
     memcpy (c->buf + c->pos - n, buf, n - adjust);
   else
     {
-      __errno_r(ptr) = ENOSPC;
+      _REENT_ERRNO(ptr) = ENOSPC;
       return EOF;
     }
   return n;
@@ -160,7 +158,7 @@ fmemwriter (struct _reent *ptr,
 /* Seek to position POS relative to WHENCE within stream described by
    COOKIE; return resulting position or fail with EOF.  */
 static _fpos_t
-fmemseeker (struct _reent *ptr,
+fmemseeker (
        void *cookie,
        _fpos_t pos,
        int whence)
@@ -172,25 +170,24 @@ fmemseeker (struct _reent *ptr,
   _off64_t offset = (_off64_t) pos;
 #endif /* __LARGE64_FILES */
 
-  (void) ptr;
   if (whence == SEEK_CUR)
     offset += c->pos;
   else if (whence == SEEK_END)
     offset += c->eof;
   if (offset < 0)
     {
-      __errno_r(ptr) = EINVAL;
+      _REENT_ERRNO(ptr) = EINVAL;
       offset = -1;
     }
   else if (offset > (off_t) c->max)
     {
-      __errno_r(ptr) = ENOSPC;
+      _REENT_ERRNO(ptr) = ENOSPC;
       offset = -1;
     }
 #ifdef __LARGE64_FILES
   else if ((_fpos_t) offset != offset)
     {
-      __errno_r(ptr) = EOVERFLOW;
+      _REENT_ERRNO(ptr) = EOVERFLOW;
       offset = -1;
     }
 #endif /* __LARGE64_FILES */
@@ -215,26 +212,25 @@ fmemseeker (struct _reent *ptr,
    COOKIE; return resulting position or fail with EOF.  */
 #ifdef __LARGE64_FILES
 static _fpos64_t
-fmemseeker64 (struct _reent *ptr,
+fmemseeker64 (
        void *cookie,
        _fpos64_t pos,
        int whence)
 {
   _off64_t offset = (_off64_t) pos;
   fmemcookie *c = (fmemcookie *) cookie;
-  (void) ptr;
   if (whence == SEEK_CUR)
     offset += c->pos;
   else if (whence == SEEK_END)
     offset += c->eof;
   if (offset < 0)
     {
-      __errno_r(ptr) = EINVAL;
+      _REENT_ERRNO(ptr) = EINVAL;
       offset = -1;
     }
   else if (offset > (_off64_t) c->max)
     {
-      __errno_r(ptr) = ENOSPC;
+      _REENT_ERRNO(ptr) = ENOSPC;
       offset = -1;
     }
   else
@@ -257,11 +253,10 @@ fmemseeker64 (struct _reent *ptr,
 
 /* Reclaim resources used by stream described by COOKIE.  */
 static int
-fmemcloser (struct _reent *ptr,
+fmemcloser (
        void *cookie)
 {
   fmemcookie *c = (fmemcookie *) cookie;
-  (void) ptr;
   free (c->storage);
   return 0;
 }
@@ -269,7 +264,7 @@ fmemcloser (struct _reent *ptr,
 /* Open a memstream around buffer BUF of SIZE bytes, using MODE.
    Return the new stream, or fail with NULL.  */
 FILE *
-_fmemopen_r (struct _reent *ptr,
+fmemopen (
        void *__restrict buf,
        size_t size,
        const char *__restrict mode)
@@ -279,14 +274,14 @@ _fmemopen_r (struct _reent *ptr,
   int flags;
   int dummy;
 
-  if ((flags = __sflags (ptr, mode, &dummy)) == 0)
+  if ((flags = __sflags (mode, &dummy)) == 0)
     return NULL;
   if (!size || !(buf || flags & __SRW))
     {
-      __errno_r(ptr) = EINVAL;
+      _REENT_ERRNO(ptr) = EINVAL;
       return NULL;
     }
-  if ((fp = __sfp (ptr)) == NULL)
+  if ((fp = __sfp ()) == NULL)
     return NULL;
   if ((c = (fmemcookie *) malloc (sizeof *c + (buf ? 0 : size)))
       == NULL)
@@ -358,13 +353,3 @@ _fmemopen_r (struct _reent *ptr,
   _newlib_flockfile_end (fp);
   return fp;
 }
-
-#ifndef _REENT_ONLY
-FILE *
-fmemopen (void *__restrict buf,
-       size_t size,
-       const char *__restrict mode)
-{
-  return _fmemopen_r (_REENT, buf, size, mode);
-}
-#endif /* !_REENT_ONLY */

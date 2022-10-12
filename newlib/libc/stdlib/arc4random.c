@@ -87,6 +87,8 @@ _rs_stir(void)
 {
 	unsigned char rnd[KEYSZ + IVSZ];
 
+	memset(rnd, 0, (KEYSZ + IVSZ) * sizeof(u_char));
+
 	if (getentropy(rnd, sizeof rnd) == -1)
 		_getentropy_fail();
 

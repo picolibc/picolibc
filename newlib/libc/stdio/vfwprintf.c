@@ -37,15 +37,9 @@ FUNCTION
 INDEX
 	vfwprintf
 INDEX
-	_vfwprintf_r
-INDEX
 	vwprintf
 INDEX
-	_vwprintf_r
-INDEX
 	vswprintf
-INDEX
-	_vswprintf_r
 
 SYNOPSIS
 	#include <stdio.h>
@@ -57,11 +51,11 @@ SYNOPSIS
 	int vswprintf(wchar_t * __restrict <[str]>, size_t <[size]>,
 		const wchar_t *__ restrict <[fmt]>, va_list <[list]>);
 
-	int _vwprintf_r(struct _reent *<[reent]>, const wchar_t *<[fmt]>,
+	int vwprintf( const wchar_t *<[fmt]>,
 		va_list <[list]>);
-	int _vfwprintf_r(struct _reent *<[reent]>, FILE *<[fp]>,
+	int vfwprintf( FILE *<[fp]>,
 		const wchar_t *<[fmt]>, va_list <[list]>);
-	int _vswprintf_r(struct _reent *<[reent]>, wchar_t *<[str]>,
+	int vswprintf( wchar_t *<[str]>,
 		size_t <[size]>, const wchar_t *<[fmt]>, va_list <[list]>);
 
 DESCRIPTION
@@ -70,9 +64,6 @@ of <<wprintf>>, <<fwprintf>> and <<swprintf>>.  They differ only in allowing
 their caller to pass the variable argument list as a <<va_list>> object
 (initialized by <<va_start>>) rather than directly accepting a variable
 number of arguments.  The caller is responsible for calling <<va_end>>.
-
-<<_vwprintf_r>>, <<_vfwprintf_r>> and <<_vswprintf_r>> are reentrant
-versions of the above.
 
 RETURNS
 The return values are consistent with the corresponding functions.
@@ -96,18 +87,16 @@ SEEALSO
 #include <newlib.h>
 
 #ifdef INTEGER_ONLY
-# define VFWPRINTF vfiwprintf
 # ifdef STRING_ONLY
-#   define _VFWPRINTF_R _svfiwprintf_r
+#   define VFWPRINTF svfiwprintf
 # else
-#   define _VFWPRINTF_R _vfiwprintf_r
+#   define VFWPRINTF vfiwprintf
 # endif
 #else
-# define VFWPRINTF vfwprintf
 # ifdef STRING_ONLY
-#   define _VFWPRINTF_R _svfwprintf_r
+#   define VFWPRINTF svfwprintf
 # else
-#   define _VFWPRINTF_R _vfwprintf_r
+#   define VFWPRINTF vfwprintf
 # endif
 # ifndef NO_FLOATING_POINT
 #  define FLOATING_POINT
@@ -150,22 +139,21 @@ SEEALSO
 # undef _NO_LONGLONG
 #endif
 
-int _VFWPRINTF_R (struct _reent *, FILE *, const wchar_t *, va_list);
 /* Defined in vfprintf.c. */
 #ifdef _FVWRITE_IN_STREAMIO
 # ifdef STRING_ONLY
-#  define __SPRINT __ssprint_r
+#  define __SPRINT _ssprint
 # else
-#  define __SPRINT __sprint_r
+#  define __SPRINT _sprint
 # endif
-int __SPRINT (struct _reent *, FILE *, register struct __suio *);
+int __SPRINT (FILE *, register struct __suio *);
 #else
 # ifdef STRING_ONLY
-#  define __SPRINT __ssputs_r
+#  define __SPRINT _ssputs
 # else
-#  define __SPRINT __sfputs_r
+#  define __SPRINT _sfputs
 # endif
-int __SPRINT (struct _reent *, FILE *, const char *, size_t);
+int __SPRINT (FILE *, const char *, size_t);
 #endif
 #ifndef STRING_ONLY
 #ifdef _UNBUF_STREAM_OPT
@@ -175,7 +163,7 @@ int __SPRINT (struct _reent *, FILE *, const char *, size_t);
  * worries about ungetc buffers and so forth.
  */
 static int
-__sbwprintf (struct _reent *rptr,
+__sbwprintf (
        register FILE *fp,
        const wchar_t *fmt,
        va_list ap)
@@ -201,7 +189,7 @@ __sbwprintf (struct _reent *rptr,
 
 	/* do the work, then copy any error status */
 	ret = _VFWPRINTF_R (rptr, &fake, fmt, ap);
-	if (ret >= 0 && _fflush_r (rptr, &fake))
+	if (ret >= 0 && fflush ( &fake))
 		ret = EOF;
 	if (fake._flags & __SERR)
 		fp->_flags |= __SERR;
@@ -241,7 +229,7 @@ extern int _ldcheck (_LONG_DOUBLE *);
 #  define FREXP frexpl
 # endif /* !_NO_LONGDBL */
 
-static wchar_t *wcvt(struct _reent *, _PRINTF_FLOAT_TYPE, int, int, wchar_t *,
+static wchar_t *wcvt(_PRINTF_FLOAT_TYPE, int, int, wchar_t *,
 		    int *, int, int *, wchar_t *, int);
 
 static int wexponent(wchar_t *, int, int);
@@ -316,7 +304,7 @@ union arg_val
 };
 
 static union arg_val *
-get_arg (struct _reent *data, int n, wchar_t *fmt,
+get_arg (int n, wchar_t *fmt,
                  va_list *ap, int *numargs, union arg_val *args,
                  int *arg_type, wchar_t **last_fmt);
 #endif /* !_NO_POS_ARGS */
@@ -355,20 +343,8 @@ get_arg (struct _reent *data, int n, wchar_t *fmt,
 # define GROUPING	0x400		/* use grouping ("'" flag) */
 #endif
 
-#ifndef STRING_ONLY
 int
-VFWPRINTF (FILE *__restrict fp,
-       const wchar_t *__restrict fmt0,
-       va_list ap)
-{
-  int result;
-  result = _VFWPRINTF_R (_REENT, fp, fmt0, ap);
-  return result;
-}
-#endif /* STRING_ONLY */
-
-int
-_VFWPRINTF_R (struct _reent *data,
+VFWPRINTF (
        FILE * fp,
        const wchar_t *fmt0,
        va_list ap)
@@ -508,7 +484,7 @@ _VFWPRINTF_R (struct _reent *data,
 }
 #else
 #define PRINT(ptr, len) {		\
-	if (__SPRINT (data, fp, (const char *)(ptr), (len) * sizeof (wchar_t)) == EOF) \
+	if (__SPRINT (fp, (const char *)(ptr), (len) * sizeof (wchar_t)) == EOF) \
 		goto error;		\
 }
 #define	PAD(howmany, with) {		\
@@ -606,7 +582,7 @@ _VFWPRINTF_R (struct _reent *data,
 		fp->_bf._base = fp->_p = malloc (64);
 		if (!fp->_p)
 		{
-			__errno_r(data) = ENOMEM;
+			_REENT_ERRNO(data) = ENOMEM;
 			return EOF;
 		}
 		fp->_bf._size = 64;
@@ -1033,7 +1009,7 @@ reswitch:	switch (ch) {
 
 			flags |= FPT;
 
-			cp = wcvt (data, _fpvalue, prec, flags, &softsign,
+			cp = wcvt (_fpvalue, prec, flags, &softsign,
 				   &expt, ch, &ndig, cp, BUF);
 
 			/* If buf is not large enough for the converted wchar_t
@@ -1048,7 +1024,7 @@ reswitch:	switch (ch) {
 				    fp->_flags |= __SERR;
 				    goto error;
 				  }
-				cp = wcvt (data, _fpvalue, prec, flags, &softsign,
+				cp = wcvt (_fpvalue, prec, flags, &softsign,
 					   &expt, ch, &ndig, malloc_buf, ndig);
 			}
 
@@ -1116,7 +1092,7 @@ reswitch:	switch (ch) {
 		case L'm':  /* GNU extension */
 			{
 				int dummy;
-				cp = (wchar_t *) _strerror_r (data, __errno_r(data), 1, &dummy);
+				cp = (wchar_t *) strerror ( _REENT_ERRNO(data), 1, &dummy);
 			}
 			flags &= ~LONGINT;
 			goto string;
@@ -1533,7 +1509,7 @@ error:
 
 #ifdef FLOATING_POINT
 
-/* Using reentrant DATA, convert finite VALUE into a string of digits
+/* Convert finite VALUE into a string of digits
    with no decimal point, using NDIGITS precision and FLAGS as guides
    to whether trailing zeros must be included.  Set *SIGN to nonzero
    if VALUE was negative.  Set *DECPT to the exponent plus one.  Set
@@ -1545,7 +1521,7 @@ error:
    of characters will be returned in BUF, but *LENGTH will be set to
    the full length of the string before the truncation.  */
 static wchar_t *
-wcvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
+wcvt(_PRINTF_FLOAT_TYPE value, int ndigits, int flags,
      wchar_t *sign, int *decpt, int ch, int *length, wchar_t *buf, int len)
 {
 	int mode, dsgn;
@@ -1573,7 +1549,6 @@ wcvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 		*sign = L'\0';
 # endif /* !_NO_LONGDBL */
 
-        (void) data;
 # ifdef _WANT_IO_C99_FORMATS
 	if (ch == L'a' || ch == L'A') {
 		wchar_t *digits, *bp, *rve;
@@ -1726,7 +1701,7 @@ wexponent(wchar_t *p0, int exp, int fmtch)
 
 /* function to get positional parameter N where n = N - 1 */
 static union arg_val *
-get_arg (struct _reent *data,
+get_arg (
        int n,
        wchar_t *fmt,
        va_list *ap,

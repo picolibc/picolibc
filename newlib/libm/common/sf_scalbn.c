@@ -40,8 +40,10 @@ float scalbnf (float x, int n)
 	    x *= two25;
 	    GET_FLOAT_WORD(ix,x);
 	    k = ((ix&0x7f800000)>>23) - 25; 
+#if __SIZEOF_INT__ > 2
             if (n< -50000)
                 return __math_uflowf(ix<0); 	/*underflow*/
+#endif
         }
         if (k == 0xff)  return x + x;	/* NaN or Inf */
         if (n > OVERFLOW_INT) 	/* in case integer overflow in n+k */

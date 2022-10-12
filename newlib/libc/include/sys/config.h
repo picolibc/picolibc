@@ -274,7 +274,6 @@ SUCH DAMAGE.
 #define __FILENAME_MAX__ 255
 #define _READ_WRITE_RETURN_TYPE _ssize_t
 #define __DYNAMIC_REENT__
-#define _REENT_GLOBAL_STDIO_STREAMS
 #endif
 
 #ifndef __EXPORT
@@ -318,12 +317,6 @@ SUCH DAMAGE.
 #endif
 #endif
 
-#ifdef _WANT_REENT_GLOBAL_STDIO_STREAMS
-#ifndef _REENT_GLOBAL_STDIO_STREAMS
-#define _REENT_GLOBAL_STDIO_STREAMS
-#endif
-#endif
-
 #ifdef _WANT_USE_LONG_TIME_T
 #ifndef _USE_LONG_TIME_T
 #define _USE_LONG_TIME_T
@@ -341,6 +334,8 @@ SUCH DAMAGE.
 #define _REENT_BACKWARD_BINARY_COMPAT
 #endif
 #endif
+
+#define _REENT_THREAD_LOCAL
 
 /* If _MB_EXTENDED_CHARSETS_ALL is set, we want all of the extended
    charsets.  The extended charsets add a few functions and a couple

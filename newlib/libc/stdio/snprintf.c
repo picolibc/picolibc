@@ -25,43 +25,6 @@
 #include <errno.h>
 #include "local.h"
 
-int
-_snprintf_r (struct _reent *ptr,
-       char *__restrict str,
-       size_t size,
-       const char *__restrict fmt, ...)
-{
-  int ret;
-  va_list ap;
-  FILE f;
-
-  if (size > INT_MAX)
-    {
-      __errno_r(ptr) = EOVERFLOW;
-      return EOF;
-    }
-  f._flags = __SWR | __SSTR;
-  f._bf._base = f._p = (unsigned char *) str;
-  f._bf._size = f._w = (size > 0 ? size - 1 : 0);
-  f._file = -1;  /* No file. */
-  va_start (ap, fmt);
-  ret = _svfprintf_r (ptr, &f, fmt, ap);
-  va_end (ap);
-  if (ret < EOF)
-    __errno_r(ptr) = EOVERFLOW;
-  if (size > 0)
-    *f._p = 0;
-  return (ret);
-}
-
-#ifdef _NANO_FORMATTED_IO
-int
-_sniprintf_r (struct _reent *, char *, size_t, const char *, ...)
-       _ATTRIBUTE ((__alias__("_snprintf_r")));
-#endif
-
-#ifndef _REENT_ONLY
-
 #undef snprintf
 
 int
@@ -72,11 +35,10 @@ snprintf (char *__restrict str,
   int ret;
   va_list ap;
   FILE f;
-  struct _reent *ptr = _REENT;
 
   if (size > INT_MAX)
     {
-      __errno_r(ptr) = EOVERFLOW;
+      _REENT_ERRNO(ptr) = EOVERFLOW;
       return EOF;
     }
   f._flags = __SWR | __SSTR;
@@ -84,18 +46,17 @@ snprintf (char *__restrict str,
   f._bf._size = f._w = (size > 0 ? size - 1 : 0);
   f._file = -1;  /* No file. */
   va_start (ap, fmt);
-  ret = _svfprintf_r (ptr, &f, fmt, ap);
+  ret = svfprintf ( &f, fmt, ap);
   va_end (ap);
   if (ret < EOF)
-    __errno_r(ptr) = EOVERFLOW;
+    _REENT_ERRNO(ptr) = EOVERFLOW;
   if (size > 0)
     *f._p = 0;
   return (ret);
 }
 
 #ifdef _NANO_FORMATTED_IO
-int
+int __nonnull((1, 3)) _NOTHROW
 sniprintf (char *, size_t, const char *, ...)
        _ATTRIBUTE ((__alias__("snprintf")));
-#endif
 #endif

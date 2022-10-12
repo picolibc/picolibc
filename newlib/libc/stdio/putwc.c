@@ -32,13 +32,6 @@
 
 #undef putwc
 
-wint_t
-_putwc_r (struct _reent *ptr,
-	wchar_t wc,
-	FILE *fp)
-{
-  return _fputwc_r (ptr, wc, fp);
-}
 /*
  * Synonym for fputwc(). The only difference is that putwc(), if it is a
  * macro, may evaluate `fp' more than once.

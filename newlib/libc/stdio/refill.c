@@ -24,10 +24,10 @@
 #include "local.h"
 
 static int
-lflush (struct _reent * ptr __unused, FILE *fp)
+lflush (FILE *fp)
 {
   if ((fp->_flags & (__SLBF | __SWR)) == (__SLBF | __SWR))
-    return _fflush_r (_REENT, fp);
+    return fflush ( fp);
   return 0;
 }
 
@@ -37,7 +37,7 @@ lflush (struct _reent * ptr __unused, FILE *fp)
  */
 
 int
-__srefill_r (struct _reent * ptr,
+_srefill (
        register FILE * fp)
 {
   /* make sure stdio is set up */
@@ -48,25 +48,23 @@ __srefill_r (struct _reent * ptr,
 
   fp->_r = 0;			/* largely a convenience for callers */
 
-#ifndef __CYGWIN__
   /* SysV does not make this test; take it out for compatibility */
   if (fp->_flags & __SEOF)
     return EOF;
-#endif
 
   /* if not already reading, have to be reading and writing */
   if ((fp->_flags & __SRD) == 0)
     {
       if ((fp->_flags & __SRW) == 0)
 	{
-	  __errno_r(ptr) = EBADF;
+	  _REENT_ERRNO(ptr) = EBADF;
 	  fp->_flags |= __SERR;
 	  return EOF;
 	}
       /* switch to reading */
       if (fp->_flags & __SWR)
 	{
-	  if (_fflush_r (ptr, fp))
+	  if (fflush ( fp))
 	    return EOF;
 	  fp->_flags &= ~__SWR;
 	  fp->_w = 0;
@@ -94,7 +92,7 @@ __srefill_r (struct _reent * ptr,
     }
 
   if (fp->_bf._base == NULL)
-    __smakebuf_r (ptr, fp);
+    _smakebuf ( fp);
 
   /*
    * Before reading from a line buffered or unbuffered file,
@@ -106,23 +104,17 @@ __srefill_r (struct _reent * ptr,
       /* Ignore this file in _fwalk_sglue to avoid potential deadlock. */
       short orig_flags = fp->_flags;
       fp->_flags = 1;
-      (void) _fwalk_sglue (_GLOBAL_REENT, lflush, &__sglue);
+      (void) _fwalk_sglue (lflush, &__sglue);
       fp->_flags = orig_flags;
 
       /* Now flush this file without locking it. */
       if ((fp->_flags & (__SLBF|__SWR)) == (__SLBF|__SWR))
-	__sflush_r (ptr, fp);
+	_sflush ( fp);
     }
 
   fp->_p = fp->_bf._base;
-  fp->_r = fp->_read (ptr, fp->_cookie, (char *) fp->_p, fp->_bf._size);
-#ifndef __CYGWIN__
+  fp->_r = fp->_read (fp->_cookie, (char *) fp->_p, fp->_bf._size);
   if (fp->_r <= 0)
-#else
-  if (fp->_r > 0)
-    fp->_flags &= ~__SEOF;
-  else
-#endif
     {
       if (fp->_r == 0)
 	fp->_flags |= __SEOF;

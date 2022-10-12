@@ -234,6 +234,10 @@ typedef	_TIME_T_	__time_t;
 
 typedef	_CLOCKID_T_	__clockid_t;
 
+#ifndef __machine_daddr_t_defined
+typedef	long		__daddr_t;
+#endif
+
 #define	_TIMER_T_	unsigned long
 typedef	_TIMER_T_	__timer_t;
 
@@ -245,7 +249,7 @@ typedef	__uint8_t	__sa_family_t;
 typedef	__uint32_t	__socklen_t;
 #endif
 
-typedef	int		__nl_item;
+typedef	__int32_t	__nl_item;
 typedef	unsigned short	__nlink_t;
 typedef	long		__suseconds_t;	/* microseconds (signed) */
 typedef	unsigned long	__useconds_t;	/* microseconds (unsigned) */

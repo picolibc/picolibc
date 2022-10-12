@@ -59,7 +59,7 @@ float nextafterf(float x, float y)
 
 double nextafter(double x, double y)
 {
-	return (double) nextafterf((float) x, (float) x);
+	return (double) nextafterf((float) x, (float) y);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

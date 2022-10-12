@@ -175,7 +175,7 @@ _strtoull_l (const char *__restrict nptr,
 	}
 	if (any < 0) {
 		acc = ULLONG_MAX;
-		__errno_r(rptr) = ERANGE;
+		_REENT_ERRNO(rptr) = ERANGE;
 	} else if (neg)
 		acc = -acc;
 	if (endptr != 0)

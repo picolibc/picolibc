@@ -1,0 +1,26 @@
+%rename link	picolibc_link
+%rename cpp	picolibc_cpp
+%rename cc1	picolibc_cc1
+%rename cc1plus	picolibc_cc1plus
+
+*cpp:
+@SPECS_ISYSTEM@ %(picolibc_cpp)
+
+*cc1:
+@TLSMODEL@ %(picolibc_cc1) @CC1_SPEC@
+
+*cc1plus:
+@SPECS_ISYSTEM@ @TLSMODEL@ %(picolibc_cc1plus) @CC1_SPEC@ @CC1PLUS_SPEC@
+
+*link:
+@SPECS_PRINTF@ @SPECS_LIBPATH@ %{!T:-T@PICOLIBC_LD@} %(picolibc_link) --gc-sections @LINK_SPEC@
+
+*lib:
+--start-group %(libgcc) @ADDITIONAL_LIBS@ -lc %{-oslib=*:-l%*} --end-group
+
+*endfile:
+@CRTEND@
+
+*startfile:
+@SPECS_STARTFILE@ @CRTBEGIN@
+@SPECS_EXTRA@

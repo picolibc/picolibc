@@ -15,7 +15,7 @@ argz_add (char **argz,
        size_t *argz_len,
        const char *str)
 {
-  int len_to_add = 0;
+  size_t len_to_add = 0;
   size_t last = *argz_len;
 
   if (str == NULL)

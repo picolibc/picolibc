@@ -27,7 +27,7 @@ INDEX
 SYNOPSIS
 	#include <stdio.h>
 	void rewind(FILE *<[fp]>);
-	void _rewind_r(struct _reent *<[ptr]>, FILE *<[fp]>);
+	void rewind( FILE *<[fp]>);
 
 DESCRIPTION
 <<rewind>> returns the file position indicator (if any) for the file
@@ -52,19 +52,9 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include <stdio.h>
 
 void
-_rewind_r (struct _reent * ptr,
+rewind (
        register FILE * fp)
 {
-  (void) _fseek_r (ptr, fp, 0L, SEEK_SET);
+  (void) fseek ( fp, 0L, SEEK_SET);
   clearerr (fp);
 }
-
-#ifndef _REENT_ONLY
-
-void
-rewind (register FILE * fp)
-{
-  _rewind_r (_REENT, fp);
-}
-
-#endif /* !_REENT_ONLY */

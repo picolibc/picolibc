@@ -28,20 +28,7 @@
  * vsiscanf
  */
 
-#ifndef _REENT_ONLY
-
-int
-vsiscanf (const char *str,
-       const char *fmt,
-       va_list ap)
-{
-  return _vsiscanf_r (_REENT, str, fmt, ap);
-}
-
-#endif /* !_REENT_ONLY */
-
-int
-_vsiscanf_r (struct _reent *ptr,
+vsiscanf (
        const char *str,
        const char *fmt,
        va_list ap)
@@ -55,5 +42,5 @@ _vsiscanf_r (struct _reent *ptr,
   f._ub._base = NULL;
   f._lb._base = NULL;
   f._file = -1;  /* No file. */
-  return __ssvfiscanf_r (ptr, &f, fmt, ap);
+  return _ssvfiscanf ( &f, fmt, ap);
 }

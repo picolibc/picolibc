@@ -37,21 +37,25 @@ scripts.
 Picolibc inherited code for a *lot* of architectures from Newlib, but
 at this point only has code to build for the following targets:
 
+ * ARC (32- and 64- bit)
  * ARM (32- and 64- bit)
  * i386 (Native and Linux hosted, for testing)
- * RISC-V (both 32- and 64- bit)
- * x86_64 (Native and Linux hosted, for testing)
- * PowerPC (big and little endian)
- * m68k
- * ESP8266 (xtensa-lx106-elf)
  * Motorola 68000 (m68k)
+ * MIPS
+ * MSP430
+ * Nios II
+ * PowerPC (big and little endian)
+ * RISC-V (both 32- and 64- bit)
+ * Sparc64
+ * x86_64 (Native and Linux hosted, for testing)
+ * Xtensa (ESP8266, ESP32)
 
 Supporting architectures that already have Newlib code requires:
 
  1. newlib/libc/machine/_architecture_/meson.build to build the
     architecture-specific libc bits. This should at least include
     setjmp/longjmp support as these cannot be performed in
-    architecture independent code.
+    architecture independent code and are needed by libstdc++.
 
  2. newlib/libm/machine/_architecture_/meson.build to build any
     architecture-specific libm bits
@@ -124,6 +128,42 @@ use Picolibc:
  * [Copyright and license information](COPYING.picolibc)
 
 ## Releases
+
+### Picolibc version 1.7.9
+
+ * Support all Zephyr SDK targets
+
+ * Support relocating the toolchain by using GCC_EXEC_PREFIX for
+   sysroot-install when compiler doesn't use sysroot.
+
+ * Add MIPS, SPARC and ARC support
+
+ * Deal with RISC-V changes in gcc that don't reliably include zicsr
+
+ * Support Picolibc as default C library with -Dsystem-libc option.
+   With this, you can use picolibc without any extra compiler options.
+
+ * Merge current newlib bits to get code that doesn't use struct _reent
+
+ * Get rid of struct _reent in legacy stdio code
+
+ * Support 16-bit int targets by fixing a few places assuming
+   sizeof(int) == 4, object sizes not using size_t, wint_t for
+   ucs-4 values
+
+ * Add MSP430 support
+
+ * Fix a couple of clang bugs (one on Cortex M0)
+
+ * Support libc++ by adding non-standard mbstate_t.h
+
+ * Merge i686 and x86_64 code to allow x86 multilib builds
+
+ * Merge Xtensa newlib bits
+
+ * Support Xtensa ESP32 targets
+
+ * Add Nios II support
 
 ### Picolibc version 1.7.8
 

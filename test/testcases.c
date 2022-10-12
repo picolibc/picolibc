@@ -159,7 +159,9 @@
     result |= test(__LINE__, "$", "%c", 36);
     result |= test(__LINE__, "10", "%d", 10);
 
+#ifndef _NANO_FORMATTED_IO
     result |= test(__LINE__, "1000000", "%'d", 1000000);
+#endif
     /* 72: anti-test */
     /* 73: anti-test */
     /* 74: excluded for C */
@@ -275,8 +277,10 @@
 #endif
     result |= test(__LINE__, "%0", "%%0");
     result |= test(__LINE__, "2345", "%hx", 74565);
+#ifndef _NANO_FORMATTED_IO
     result |= test(__LINE__, "61", "%hhx", 'a');
     result |= test(__LINE__, "61", "%hhx", 'a' + 256);
+#endif
     result |= test(__LINE__, "Hallo heimur", "Hallo heimur");
     result |= test(__LINE__, "Hallo heimur", "%s", "Hallo heimur");
     result |= test(__LINE__, "1024", "%d", 1024);
@@ -341,7 +345,9 @@
     result |= test(__LINE__, "0xedcb5433", "%#x", 3989525555U);
     result |= test(__LINE__, "0X1234ABCD", "%#X", 305441741);
     result |= test(__LINE__, "0XEDCB5433", "%#X", 3989525555U);
+#ifndef _NANO_FORMATTED_IO
     result |= test(__LINE__, "0", "%#o", 0U);
+#endif
     result |= test(__LINE__, "0", "%#x", 0U);
     result |= test(__LINE__, "0", "%#X", 0U);
     result |= test(__LINE__, "Hallo heimur", "%1s", "Hallo heimur");
@@ -518,7 +524,9 @@
     result |= test(__LINE__, "1.000e-308", "%.3e", 1e-308);
 #endif
 #endif
+#ifndef _NANO_FORMATTED_IO
     result |= test(__LINE__, "1, 1", "%-*.llu, %-*.llu",1,(int64_t)1,1,(int64_t)1);
+#endif
 #ifndef NO_FLOAT
     result |= test(__LINE__, "1e-09", "%g", 0.000000001);
     result |= test(__LINE__, "1e-08", "%g", 0.00000001);
@@ -562,9 +570,13 @@
 #ifndef _WANT_IO_LONG_LONG
     if (sizeof (intmax_t) <= sizeof(long))
 #endif
+#ifndef _NANO_FORMATTED_IO
     result |= test(__LINE__, "  42", "%4jd", (intmax_t)42L);
     result |= test(__LINE__, "64", "%zu", sizeof c);
     result |= test(__LINE__, "12", "%td", (c+12) - c);
+#else
+    (void) c;
+#endif
 #ifndef NO_FLOAT
     result |= test(__LINE__, "0x1p+0", "%a", 0x1p+0);
     result |= test(__LINE__, "0x0p+0", "%a", 0.0);

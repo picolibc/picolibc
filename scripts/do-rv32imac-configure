@@ -33,6 +33,16 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-exec "$(dirname "$0")"/do-configure rv32imac \
+version=`riscv64-unknown-elf-gcc --version | awk '/gcc/ { print $NF }'`
+echo "version" "$version"
+case "$version" in
+    8*|9*|10*)
+	arch=rv32imac
+	;;
+    *)
+	arch=rv32imac_zicsr
+	;;
+esac
+exec "$(dirname "$0")"/do-configure "$arch" \
      -Dtests=true \
      -Dmultilib=false "$@"

@@ -23,36 +23,15 @@
 #include <stdarg.h>
 #include "local.h"
 
-#ifndef _REENT_ONLY
-
 int
 vscanf (const char *fmt,
        va_list ap)
 {
-  struct _reent *reent = _REENT;
-
   _REENT_SMALL_CHECK_INIT (reent);
-  return __svfscanf_r (reent, _stdin_r (reent), fmt, ap);
+  return _svfscanf ( _stdin_r (reent), fmt, ap);
 }
 
 #ifdef _NANO_FORMATTED_IO
-int
+int __nonnull((1))
 viscanf (const char *, __VALIST) _ATTRIBUTE ((__alias__("vscanf")));
-#endif
-
-#endif /* !_REENT_ONLY */
-
-int
-_vscanf_r (struct _reent *ptr,
-       const char *__restrict fmt,
-       va_list ap)
-{
-  _REENT_SMALL_CHECK_INIT (ptr);
-  return __svfscanf_r (ptr, _stdin_r (ptr), fmt, ap);
-}
-
-#ifdef _NANO_FORMATTED_IO
-int
-_viscanf_r (struct _reent *, const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("_vscanf_r")));
 #endif

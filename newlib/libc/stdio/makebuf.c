@@ -36,7 +36,7 @@
  */
 
 void
-__smakebuf_r (struct _reent *ptr,
+_smakebuf (
        register FILE *fp)
 {
   register void *p;
@@ -50,7 +50,7 @@ __smakebuf_r (struct _reent *ptr,
       fp->_bf._size = 1;
       return;
     }
-  flags = __swhatbuf_r (ptr, fp, &size, &couldbetty);
+  flags = _swhatbuf ( fp, &size, &couldbetty);
   if ((p = malloc (size)) == NULL)
     {
       if (!(fp->_flags & __SSTR))
@@ -75,7 +75,7 @@ __smakebuf_r (struct _reent *ptr,
  * Internal routine to determine `proper' buffering for a file.
  */
 int
-__swhatbuf_r (struct _reent *ptr,
+_swhatbuf (
 	FILE *fp,
 	size_t *bufsize,
 	int *couldbetty)
@@ -86,7 +86,6 @@ __swhatbuf_r (struct _reent *ptr,
   const int snpt = 0;
 #endif
 
-  (void) ptr;
 #ifdef __USE_INTERNAL_STAT64
   struct stat64 st;
 

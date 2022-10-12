@@ -45,7 +45,7 @@
 #include "nano-vfscanf_local.h"
 
 int
-_scanf_chars (struct _reent *rptr,
+_scanf_chars (
 	      struct _scan_data_t *pdata,
 	      FILE *fp, va_list *ap)
 {
@@ -72,7 +72,7 @@ _scanf_chars (struct _reent *rptr,
       if (--pdata->width == 0)
 	break;
 
-      if ((fp->_r <= 0 && pdata->pfn_refill (rptr, fp)))
+      if ((fp->_r <= 0 && pdata->pfn_refill (fp)))
 	break;
     }
   /* For CT_CHAR, it is impossible to have input_failure(n == 0) here.
@@ -91,7 +91,7 @@ _scanf_chars (struct _reent *rptr,
   return 0;
 }
 int
-_scanf_i (struct _reent *rptr,
+_scanf_i (
 	  struct _scan_data_t *pdata,
 	  FILE *fp, va_list *ap)
 {
@@ -153,7 +153,7 @@ _scanf_i (struct _reent *rptr,
 	{
 	  *p++ = *fp->_p++;
 	  fp->_r--;
-	  if ((fp->_r <= 0 && pdata->pfn_refill (rptr, fp)))
+	  if ((fp->_r <= 0 && pdata->pfn_refill (fp)))
 	    goto match_end;
 	}
     }
@@ -191,7 +191,7 @@ _scanf_i (struct _reent *rptr,
 skip:
       if (--fp->_r > 0)
 	fp->_p++;
-      else if (pdata->pfn_refill (rptr, fp))
+      else if (pdata->pfn_refill (fp))
 	/* "EOF".  */
 	break;
     }
@@ -205,7 +205,7 @@ match_end:
   if (pdata->flags & NDIGITS)
     {
       if (p > pdata->buf)
-	pdata->pfn_ungetc (rptr, *--p, fp); /* "[-+xX]".  */
+	pdata->pfn_ungetc (*--p, fp); /* "[-+xX]".  */
 
       if (p == pdata->buf)
 	return MATCH_FAILURE;

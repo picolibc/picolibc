@@ -32,8 +32,8 @@ SYNOPSIS
 	#include <stdio.h>
 	long ftell(FILE *<[fp]>);
 	off_t ftello(FILE *<[fp]>);
-	long _ftell_r(struct _reent *<[ptr]>, FILE *<[fp]>);
-	off_t _ftello_r(struct _reent *<[ptr]>, FILE *<[fp]>);
+	long ftell( FILE *<[fp]>);
+	off_t ftello( FILE *<[fp]>);
 
 DESCRIPTION
 Objects of type <<FILE>> can have a ``position'' that records how much
@@ -83,26 +83,16 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include "local.h"
 
 long
-_ftell_r (struct _reent *ptr,
+ftell (
        register FILE * fp)
 {
   _fpos_t pos;
 
-  pos = _ftello_r (ptr, fp);
+  pos = ftello ( fp);
   if ((long)pos != pos)
     {
       pos = -1;
-      __errno_r(ptr) = EOVERFLOW;
+      _REENT_ERRNO(ptr) = EOVERFLOW;
     }
   return (long)pos;
 }
-
-#ifndef _REENT_ONLY
-
-long
-ftell (register FILE * fp)
-{
-  return _ftell_r (_REENT, fp);
-}
-
-#endif /* !_REENT_ONLY */

@@ -2,6 +2,8 @@ FROM debian:testing
 
 COPY .github/packages.txt /
 
+COPY .github/extra-files.txt /
+
 RUN apt-get update && \
     apt-get install -y wget gnupg && \
     wget -O /etc/apt/trusted.gpg.d/altusmetrum.gpg https://maps.altusmetrum.org/archive/archive-key.gpg && \
@@ -11,6 +13,8 @@ RUN apt-get update && \
     (xargs -a packages.txt apt-get install -y || \
      xargs -a packages.txt apt-get install -y || \
      xargs -a packages.txt apt-get install -y || \
-     xargs -a packages.txt apt-get install -y)
+     xargs -a packages.txt apt-get install -y) && \
+    mkdir -p /opt && \
+    (cd /opt && while read file; do wget $file && tar xf `basename $file`; done) < extra-files.txt
 
 RUN apt-get clean

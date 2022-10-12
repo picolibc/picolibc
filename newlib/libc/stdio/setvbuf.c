@@ -95,7 +95,6 @@ setvbuf (register FILE * fp,
        register size_t size)
 {
   int ret = 0;
-  struct _reent *reent = _REENT;
   size_t iosize;
   int ttyflag;
 
@@ -118,7 +117,7 @@ setvbuf (register FILE * fp,
    * non buffer flags, and clear malloc flag.
    */
   _newlib_flockfile_start (fp);
-  _fflush_r (reent, fp);
+  fflush ( fp);
   if (HASUB(fp))
     FREEUB(reent, fp);
   fp->_r = fp->_lbfsize = 0;
@@ -134,7 +133,7 @@ setvbuf (register FILE * fp,
    * a `tty flag' to suggest that we check isatty(fd), but we do not
    * care since our caller told us how to buffer.
    */
-  fp->_flags |= __swhatbuf_r (reent, fp, &iosize, &ttyflag);
+  fp->_flags |= _swhatbuf ( fp, &iosize, &ttyflag);
   if (size == 0)
     {
       buf = NULL;
@@ -175,8 +174,8 @@ nbf:
    * We're committed to buffering from here, so make sure we've
    * registered to flush buffers on exit.
    */
-  if (!reent->__cleanup)
-    __sinit(reent);
+  if (!_REENT_CLEANUP(reent))
+    __sinit();
 
 #ifdef _FSEEK_OPTIMIZATION
   /*

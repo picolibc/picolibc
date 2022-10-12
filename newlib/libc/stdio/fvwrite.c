@@ -46,7 +46,7 @@
  */
 
 int
-__sfvwrite_r (struct _reent *ptr,
+_sfvwrite (
        register FILE *fp,
        register struct __suio *uio)
 {
@@ -96,7 +96,7 @@ __sfvwrite_r (struct _reent *ptr,
       do
 	{
 	  GETIOV (;);
-	  w = fp->_write (ptr, fp->_cookie, p,
+	  w = fp->_write (fp->_cookie, p,
 			  MIN (len, INT_MAX - INT_MAX % BUFSIZ));
 	  if (w <= 0)
 	    goto err;
@@ -146,7 +146,7 @@ __sfvwrite_r (struct _reent *ptr,
 		      str = (unsigned char *)malloc (newsize);
 		      if (!str)
 			{
-			  __errno_r(ptr) = ENOMEM;
+			  _REENT_ERRNO(ptr) = ENOMEM;
 			  goto err;
 			}
 		      memcpy (str, fp->_bf._base, curpos);
@@ -163,7 +163,7 @@ __sfvwrite_r (struct _reent *ptr,
 			  free (fp->_bf._base);
 			  fp->_flags &=  ~__SMBF;
 			  /* Ensure correct errno, even if free changed it.  */
-			  __errno_r(ptr) = ENOMEM;
+			  _REENT_ERRNO(ptr) = ENOMEM;
 			  goto err;
 			}
 		    }
@@ -187,14 +187,14 @@ __sfvwrite_r (struct _reent *ptr,
 	      COPY (w);
 	      fp->_w -= w;
 	      fp->_p += w;
-	      if (fp->_w == 0 && _fflush_r (ptr, fp))
+	      if (fp->_w == 0 && fflush ( fp))
 		goto err;
 	    }
 	  else
 	    {
 	      /* write directly */
 	      w = ((int)MIN (len, INT_MAX)) / fp->_bf._size * fp->_bf._size;
-	      w = fp->_write (ptr, fp->_cookie, p, w);
+	      w = fp->_write (fp->_cookie, p, w);
 	      if (w <= 0)
 		goto err;
 	    }
@@ -230,12 +230,12 @@ __sfvwrite_r (struct _reent *ptr,
 	      COPY (w);
 	      /* fp->_w -= w; */
 	      fp->_p += w;
-	      if (_fflush_r (ptr, fp))
+	      if (fflush ( fp))
 		goto err;
 	    }
 	  else if (s >= (w = fp->_bf._size))
 	    {
-	      w = fp->_write (ptr, fp->_cookie, p, w);
+	      w = fp->_write (fp->_cookie, p, w);
 	      if (w <= 0)
 		goto err;
 	    }
@@ -249,7 +249,7 @@ __sfvwrite_r (struct _reent *ptr,
 	  if ((nldist -= w) == 0)
 	    {
 	      /* copied the newline: flush and forget */
-	      if (_fflush_r (ptr, fp))
+	      if (fflush ( fp))
 		goto err;
 	      nlknown = 0;
 	    }

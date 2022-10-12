@@ -87,6 +87,7 @@ __register_exitproc (int type,
       p->_ind = 0;
       p->_next = _atexit;
       _atexit = p;
+#endif
     }
 
   if (type != __et_atexit)

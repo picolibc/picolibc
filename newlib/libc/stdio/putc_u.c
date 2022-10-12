@@ -29,7 +29,7 @@ SYNOPSIS
 	int putc_unlocked(int <[ch]>, FILE *<[fp]>);
 
 	#include <stdio.h>
-	int _putc_unlocked_r(struct _reent *<[ptr]>, int <[ch]>, FILE *<[fp]>);
+	int putc_unlocked( int <[ch]>, FILE *<[fp]>);
 
 DESCRIPTION
 <<putc_unlocked>> is a non-thread-safe version of <<putc>> declared in
@@ -71,22 +71,11 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #undef putc_unlocked
 
 int
-_putc_unlocked_r (struct _reent *ptr,
+putc_unlocked (
        int c,
        register FILE *fp)
 {
   /* CHECK_INIT is (eventually) called by __swbuf.  */
 
-  return __sputc_r (ptr, c, fp);
+  return _sputc ( c, fp);
 }
-
-#ifndef _REENT_ONLY
-int
-putc_unlocked (int c,
-       register FILE *fp)
-{
-  /* CHECK_INIT is (eventually) called by __swbuf.  */
-
-  return __sputc_r (_REENT, c, fp);
-}
-#endif /* !_REENT_ONLY */

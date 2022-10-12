@@ -39,11 +39,11 @@ SYNOPSIS
 		     FILE *restrict <[fp]>);
 
 	#include <stdio.h>
-	size_t _fread_r(struct _reent *<[ptr]>, void *restrict <[buf]>,
+	size_t fread( void *restrict <[buf]>,
 	                size_t <[size]>, size_t <[count]>, FILE *restrict <[fp]>);
 
 	#include <stdio.h>
-	size_t _fread_unlocked_r(struct _reent *<[ptr]>, void *restrict <[buf]>,
+	size_t fread_unlocked( void *restrict <[buf]>,
 	                size_t <[size]>, size_t <[count]>, FILE *restrict <[fp]>);
 
 DESCRIPTION
@@ -117,7 +117,7 @@ crlf_r (struct _reent * ptr,
     {
       if (*s == '\r')
         {
-          int c = __sgetc_raw_r (ptr, fp);
+          int c = _sgetc_raw ( fp);
           if (c == '\n')
             *s = '\n';
           else
@@ -129,7 +129,7 @@ crlf_r (struct _reent * ptr,
 
   while (d < e)
     {
-      r = _getc_r (ptr, fp);
+      r = getc ( fp);
       if (r == EOF)
         return count - (e-d);
       *d++ = r;
@@ -142,7 +142,7 @@ crlf_r (struct _reent * ptr,
 #endif
 
 size_t
-_fread_r (struct _reent * ptr,
+fread (
        void *__restrict buf,
        size_t size,
        size_t count,
@@ -194,7 +194,7 @@ _fread_r (struct _reent * ptr,
 	  fp->_bf._base = (unsigned char *) p;
 	  fp->_bf._size = resid;
 	  fp->_p = (unsigned char *) p;
-	  rc = __srefill_r (ptr, fp);
+	  rc = _srefill ( fp);
 	  /* restore fp buffering back to original state */
 	  fp->_bf._base = old_base;
 	  fp->_bf._size = old_size;
@@ -226,7 +226,7 @@ _fread_r (struct _reent * ptr,
 	  /* fp->_r = 0 ... done in __srefill */
 	  p += r;
 	  resid -= r;
-	  if (__srefill_r (ptr, fp))
+	  if (_srefill ( fp))
 	    {
 	      /* no more input: return partial result */
 #ifdef __SCLE
@@ -256,14 +256,3 @@ _fread_r (struct _reent * ptr,
   _newlib_flockfile_end (fp);
   return count;
 }
-
-#ifndef _REENT_ONLY
-size_t
-fread (void *__restrict  buf,
-       size_t size,
-       size_t count,
-       FILE *__restrict fp)
-{
-   return _fread_r (_REENT, buf, size, count, fp);
-}
-#endif

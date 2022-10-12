@@ -33,7 +33,7 @@
  * Size-optimized tables will be linked instead of speed-optimized if
  * TABLE_USE_SIZE_OPTIMISATION macro is defined.
  */
-#if defined (PREFER_SIZE_OVER_SPEED) || defined (__OPTIMIZE_SIZE__)
+#if defined (PREFER_SIZE_OVER_SPEED) || defined (__OPTIMIZE_SIZE__) || __SIZEOF_SIZE_T__ == 2
 #  define TABLE_USE_SIZE_OPTIMIZATION
 #endif
 

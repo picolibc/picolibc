@@ -32,34 +32,40 @@
    these are the stack mappings for the registers
    as stored in the ABI for ARC */
 
+#ifdef __ARC64__
+#define ARC_REGSIZE	8
+#else
+#define ARC_REGSIZE	4
+#endif
+
        .file "setjmp.S"
 
 ABIr13	= 0
-ABIr14	= ABIr13 + 4
-ABIr15	= ABIr14 + 4
-ABIr16	= ABIr15 + 4
-ABIr17	= ABIr16 + 4
-ABIr18	= ABIr17 + 4
-ABIr19	= ABIr18 + 4
-ABIr20	= ABIr19 + 4
-ABIr21	= ABIr20 + 4
-ABIr22	= ABIr21 + 4
-ABIr23	= ABIr22 + 4
-ABIr24	= ABIr23 + 4
-ABIr25	= ABIr24 + 4
-ABIr26	= ABIr25 + 4
-ABIr27	= ABIr26 + 4
-ABIr28	= ABIr27 + 4
-ABIr29	= ABIr28 + 4
-ABIr30	= ABIr29 + 4
-ABIr31	= ABIr30 + 4
-ABIlpc	= ABIr31 + 4
-ABIlps	= ABIlpc + 4
-ABIlpe	= ABIlps + 4
+ABIr14	= ABIr13 + ARC_REGSIZE
+ABIr15	= ABIr14 + ARC_REGSIZE
+ABIr16	= ABIr15 + ARC_REGSIZE
+ABIr17	= ABIr16 + ARC_REGSIZE
+ABIr18	= ABIr17 + ARC_REGSIZE
+ABIr19	= ABIr18 + ARC_REGSIZE
+ABIr20	= ABIr19 + ARC_REGSIZE
+ABIr21	= ABIr20 + ARC_REGSIZE
+ABIr22	= ABIr21 + ARC_REGSIZE
+ABIr23	= ABIr22 + ARC_REGSIZE
+ABIr24	= ABIr23 + ARC_REGSIZE
+ABIr25	= ABIr24 + ARC_REGSIZE
+ABIr26	= ABIr25 + ARC_REGSIZE
+ABIr27	= ABIr26 + ARC_REGSIZE
+ABIr28	= ABIr27 + ARC_REGSIZE
+ABIr29	= ABIr28 + ARC_REGSIZE
+ABIr30	= ABIr29 + ARC_REGSIZE
+ABIr31	= ABIr30 + ARC_REGSIZE
+ABIlpc	= ABIr31 + ARC_REGSIZE
+ABIlps	= ABIlpc + ARC_REGSIZE
+ABIlpe	= ABIlps + ARC_REGSIZE
 
-ABIflg	= ABIlpe + 4
-ABImlo	= ABIflg + 4
-ABImhi	= ABImlo + 4
+ABIflg	= ABIlpe + ARC_REGSIZE
+ABImlo	= ABIflg + ARC_REGSIZE
+ABImhi	= ABImlo + ARC_REGSIZE
 
 	.text
 	.align 4

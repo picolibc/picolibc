@@ -22,7 +22,7 @@
 #include <stdarg.h>
 
 int
-_fprintf_r (struct _reent *ptr,
+fprintf (
        FILE *__restrict fp,
        const char *__restrict fmt, ...)
 {
@@ -30,35 +30,13 @@ _fprintf_r (struct _reent *ptr,
   va_list ap;
 
   va_start (ap, fmt);
-  ret = _vfprintf_r (ptr, fp, fmt, ap);
+  ret = vfprintf ( fp, fmt, ap);
   va_end (ap);
   return ret;
 }
 
 #ifdef _NANO_FORMATTED_IO
-int
-_fiprintf_r (struct _reent *, FILE *, const char *, ...)
-       _ATTRIBUTE ((__alias__("_fprintf_r")));
-#endif
-
-#ifndef _REENT_ONLY
-
-int
-fprintf (FILE *__restrict fp,
-       const char *__restrict fmt, ...)
-{
-  int ret;
-  va_list ap;
-
-  va_start (ap, fmt);
-  ret = _vfprintf_r (_REENT, fp, fmt, ap);
-  va_end (ap);
-  return ret;
-}
-
-#ifdef _NANO_FORMATTED_IO
-int
-fiprintf (FILE *, const char *, ...)
+int __nonnull((1))
+fiprintf ( FILE *__restrict, const char *__restrict, ...)
        _ATTRIBUTE ((__alias__("fprintf")));
 #endif
-#endif /* ! _REENT_ONLY */

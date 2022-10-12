@@ -31,7 +31,7 @@ __ascii_wctomb (
   if ((size_t)wchar >= 0x100)
 #endif
     {
-      __errno_r(r) = EILSEQ;
+      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
 
@@ -49,7 +49,7 @@ __utf8_wctomb (
         wchar_t        _wchar,
         mbstate_t     *state)
 {
-  wint_t wchar = _wchar;
+  uint32_t wchar = _wchar;
   int ret = 0;
 
   if (s == NULL)
@@ -62,8 +62,8 @@ __utf8_wctomb (
 	 of the surrogate and proceed to convert the given character.  Note
 	 to return extra 3 bytes. */
       wchar_t tmp;
-      tmp = (state->__value.__wchb[0] << 16 | state->__value.__wchb[1] << 8)
-	    - (0x10000 >> 10 | 0xd80d);
+      tmp = ((uint32_t) state->__value.__wchb[0] << 16 | (uint32_t) state->__value.__wchb[1] << 8)
+          - ((uint32_t) 0x10000 >> 10 | (uint32_t) 0xd80d);
       *s++ = 0xe0 | ((tmp & 0xf000) >> 12);
       *s++ = 0x80 | ((tmp &  0xfc0) >> 6);
       *s++ = 0x80 |  (tmp &   0x3f);
@@ -86,7 +86,7 @@ __utf8_wctomb (
       /* No UTF-16 surrogate handling in UCS-4 */
       if (sizeof (wchar_t) == 2 && wchar >= 0xd800 && wchar <= 0xdfff)
 	{
-	  wint_t tmp;
+	  uint32_t tmp;
 	  if (wchar <= 0xdbff)
 	    {
 	      /* First half of a surrogate pair.  Store the state and
@@ -103,7 +103,7 @@ __utf8_wctomb (
 	      /* Second half of a surrogate pair.  Reconstruct the full
 		 Unicode value and return the trailing three bytes of the
 		 UTF-8 character. */
-	      tmp = (state->__value.__wchb[0] << 16)
+              tmp = ((uint32_t) state->__value.__wchb[0] << 16)
 		    | (state->__value.__wchb[1] << 8)
 		    | (wchar & 0x3ff);
 	      state->__count = 0;
@@ -120,7 +120,7 @@ __utf8_wctomb (
       *s   = 0x80 |  (wchar &   0x3f);
       return ret + 3;
     }
-  if (wchar >= 0x10000 && wchar <= 0x10ffff)
+  if (wchar >= (uint32_t) 0x10000 && wchar <= (uint32_t) 0x10ffff)
     {
       *s++ = 0xf0 | ((wchar & 0x1c0000) >> 18);
       *s++ = 0x80 | ((wchar &  0x3f000) >> 12);
@@ -129,7 +129,7 @@ __utf8_wctomb (
       return 4;
     }
 
-  __errno_r(r) = EILSEQ;
+  _REENT_ERRNO(r) = EILSEQ;
   return -1;
 }
 
@@ -162,7 +162,7 @@ __sjis_wctomb (
 	}
       else
 	{
-	  __errno_r(r) = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
@@ -202,7 +202,7 @@ __eucjp_wctomb (
 	}
       else
 	{
-	  __errno_r(r) = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
@@ -242,7 +242,7 @@ __jis_wctomb (
 	  *s = (char)char2;
 	  return cnt + 2;
 	}
-      __errno_r(r) = EILSEQ;
+      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
   if (state->__state != 0)
@@ -282,14 +282,14 @@ ___iso_wctomb (char *s, wchar_t _wchar, int iso_idx,
 		*s = (char) (mb + 0xa0);
 		return 1;
 	      }
-	  __errno_r(r) = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
  
   if ((size_t)wchar >= 0x100)
     {
-      __errno_r(r) = EILSEQ;
+      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
 
@@ -438,14 +438,14 @@ ___cp_wctomb (char *s, wchar_t _wchar, int cp_idx,
 		*s = (char) (mb + 0x80);
 		return 1;
 	      }
-	  __errno_r(r) = EILSEQ;
+	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
 
   if ((size_t)wchar >= 0x100)
     {
-      __errno_r(r) = EILSEQ;
+      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
 

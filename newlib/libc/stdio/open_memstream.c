@@ -94,7 +94,7 @@ typedef struct memstream {
 /* Write up to non-zero N bytes of BUF into the stream described by COOKIE,
    returning the number of bytes written or EOF on failure.  */
 static _READ_WRITE_RETURN_TYPE
-memwriter (struct _reent *ptr,
+memwriter (
        void *cookie,
        const char *buf,
        _READ_WRITE_BUFSIZE_TYPE n)
@@ -102,12 +102,11 @@ memwriter (struct _reent *ptr,
   memstream *c = (memstream *) cookie;
   char *cbuf = *c->pbuf;
 
-  (void) ptr;
   /* size_t is unsigned, but off_t is signed.  Don't let stream get so
      big that user cannot do ftello.  */
   if (sizeof (OFF_T) == sizeof (size_t) && (ssize_t) (c->pos + n) < 0)
     {
-      __errno_r(ptr) = EFBIG;
+      _REENT_ERRNO(ptr) = EFBIG;
       return EOF;
     }
   /* Grow the buffer, if necessary.  Choose a geometric growth factor
@@ -148,7 +147,7 @@ memwriter (struct _reent *ptr,
 /* Seek to position POS relative to WHENCE within stream described by
    COOKIE; return resulting position or fail with EOF.  */
 static _fpos_t
-memseeker (struct _reent *ptr,
+memseeker (
        void *cookie,
        _fpos_t pos,
        int whence)
@@ -156,25 +155,24 @@ memseeker (struct _reent *ptr,
   memstream *c = (memstream *) cookie;
   OFF_T offset = (OFF_T) pos;
 
-  (void) ptr;
   if (whence == SEEK_CUR)
     offset += c->pos;
   else if (whence == SEEK_END)
     offset += c->eof;
   if (offset < 0)
     {
-      __errno_r(ptr) = EINVAL;
+      _REENT_ERRNO(ptr) = EINVAL;
       offset = -1;
     }
   else if ((OFF_T) (size_t) offset != offset)
     {
-      __errno_r(ptr) = ENOSPC;
+      _REENT_ERRNO(ptr) = ENOSPC;
       offset = -1;
     }
 #ifdef __LARGE64_FILES
   else if ((_fpos_t) offset != offset)
     {
-      __errno_r(ptr) = EOVERFLOW;
+      _REENT_ERRNO(ptr) = EOVERFLOW;
       offset = -1;
     }
 #endif /* __LARGE64_FILES */
@@ -216,7 +214,7 @@ memseeker (struct _reent *ptr,
    COOKIE; return resulting position or fail with EOF.  */
 #ifdef __LARGE64_FILES
 static _fpos64_t
-memseeker64 (struct _reent *ptr,
+memseeker64 (
        void *cookie,
        _fpos64_t pos,
        int whence)
@@ -224,19 +222,18 @@ memseeker64 (struct _reent *ptr,
   _off64_t offset = (_off64_t) pos;
   memstream *c = (memstream *) cookie;
 
-  (void) ptr;
   if (whence == SEEK_CUR)
     offset += c->pos;
   else if (whence == SEEK_END)
     offset += c->eof;
   if (offset < 0)
     {
-      __errno_r(ptr) = EINVAL;
+      _REENT_ERRNO(ptr) = EINVAL;
       offset = -1;
     }
   else if ((_off64_t) (size_t) offset != offset)
     {
-      __errno_r(ptr) = ENOSPC;
+      _REENT_ERRNO(ptr) = ENOSPC;
       offset = -1;
     }
   else
@@ -276,13 +273,12 @@ memseeker64 (struct _reent *ptr,
 
 /* Reclaim resources used by stream described by COOKIE.  */
 static int
-memcloser (struct _reent *ptr,
+memcloser (
        void *cookie)
 {
   memstream *c = (memstream *) cookie;
   char *buf;
 
-  (void) ptr;
   /* Be nice and try to reduce any unused memory.  */
   buf = realloc (*c->pbuf,
 		    c->wide > 0 ? (*c->psize + 1) * sizeof (wchar_t)
@@ -296,7 +292,7 @@ memcloser (struct _reent *ptr,
 /* Open a memstream that tracks a dynamic buffer in BUF and SIZE.
    Return the new stream, or fail with NULL.  */
 static FILE *
-internal_open_memstream_r (struct _reent *ptr,
+internalopen_memstream (
        char **buf,
        size_t *size,
        int wide)
@@ -306,10 +302,10 @@ internal_open_memstream_r (struct _reent *ptr,
 
   if (!buf || !size)
     {
-      __errno_r(ptr) = EINVAL;
+      _REENT_ERRNO(ptr) = EINVAL;
       return NULL;
     }
-  if ((fp = __sfp (ptr)) == NULL)
+  if ((fp = __sfp ()) == NULL)
     return NULL;
   if ((c = (memstream *) malloc (sizeof *c)) == NULL)
     {
@@ -378,33 +374,17 @@ internal_open_memstream_r (struct _reent *ptr,
 }
 
 FILE *
-_open_memstream_r (struct _reent *ptr,
+open_memstream (
        char **buf,
        size_t *size)
 {
-  return internal_open_memstream_r (ptr, buf, size, -1);
+  return internalopen_memstream ( buf, size, -1);
 }
 
 FILE *
-_open_wmemstream_r (struct _reent *ptr,
+open_wmemstream (
        wchar_t **buf,
        size_t *size)
 {
-  return internal_open_memstream_r (ptr, (char **)buf, size, 1);
+  return internalopen_memstream ( (char **)buf, size, 1);
 }
-
-#ifndef _REENT_ONLY
-FILE *
-open_memstream (char **buf,
-       size_t *size)
-{
-  return _open_memstream_r (_REENT, buf, size);
-}
-
-FILE *
-open_wmemstream (wchar_t **buf,
-       size_t *size)
-{
-  return _open_wmemstream_r (_REENT, buf, size);
-}
-#endif /* !_REENT_ONLY */

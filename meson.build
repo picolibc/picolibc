@@ -42,7 +42,7 @@ project('picolibc', 'c',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.53',
-	version: '1.7.8'
+	version: '1.7.9'
        )
 
 targets = []
@@ -66,13 +66,10 @@ endif
 cpu_family_aliases = {
 		       # aarch64
 		       'arm64' : 'aarch64',
+		       # arc
+		       'arc64' : 'arc',
 		       # cris
 		       'crisv32' : 'cris',
-		       # i386
-		       'i486' : 'i386',
-		       'i586' : 'i386',
-		       'i686' : 'i386',
-		       'x86' : 'i386',
 		       # m68hc11
 		       'm6811' : 'm68hc11',
 		       'm6812' : 'm68hc11',
@@ -90,8 +87,14 @@ cpu_family_aliases = {
 		       # riscv
 		       'riscv32' : 'riscv',
 		       'riscv64' : 'riscv',
-		       # x86_64
-		       'amd64' : 'x86_64',
+		       # sparc
+		       'sparc64' : 'sparc',
+		       # x86
+		       'amd64' : 'x86',
+		       'i486' : 'x86',
+		       'i586' : 'x86',
+		       'i686' : 'x86',
+		       'x86_64' : 'x86',
 		     }
 
 # Check for an alias, default to provided name
@@ -147,6 +150,12 @@ if have_long_double
   endif
 endif
 
+float_double_code = '''
+char size_test[sizeof(float) == sizeof(double) ? 1 : -1];
+'''
+
+double_equals_float = cc.compiles(float_double_code, name : 'double same as float', args : core_c_args)
+
 enable_multilib = get_option('multilib')
 multilib_list = get_option('multilib-list')
 enable_picolib = get_option('picolib')
@@ -162,6 +171,7 @@ have_format_attribute_option = get_option('have-format-attribute')
 have_weak_attribute_option = get_option('have-weak-attribute')
 
 newlib_iconv_encodings = get_option('newlib-iconv-encodings')
+newlib_iconv_encodings_exclude = get_option('newlib-iconv-encodings-exclude')
 newlib_iconv_from_encodings = get_option('newlib-iconv-from-encodings')
 newlib_iconv_to_encodings = get_option('newlib-iconv-to-encodings')
 newlib_iconv_external_ccs = get_option('newlib-iconv-external-ccs')
@@ -211,6 +221,7 @@ newlib_obsolete_math_float = get_option('newlib-obsolete-math-float')
 newlib_obsolete_math_double = get_option('newlib-obsolete-math-double')
 
 sysroot_install = get_option('sysroot-install')
+system_libc = get_option('system-libc')
 prefix = get_option('prefix')
 
 nm = find_program('nm', required : false)
@@ -413,14 +424,28 @@ endif
 
 if sysroot_install
   sysroot = run_command(cc.cmd_array() + ['-print-sysroot'], check : true).stdout().split('\n')[0]
-  if sysroot == ''
-    error('sysroot install requested, but compiler has no sysroot')
+  if sysroot != ''
+    specs_prefix_format = '%R/@0@'
+  else
+    paths = run_command(cc.cmd_array() + ['-print-search-dirs'], check : true).stdout().split('\n')
+    foreach path : paths
+      if path.startswith('install: ')
+	sysroot = path.substring(9) + '../../../..'
+      endif
+    endforeach
+    message('computed sysroot is ' + sysroot)
+    specs_prefix_format = '%:getenv(GCC_EXEC_PREFIX ../../@0@)'
   endif
-  sysroot = run_command('realpath', sysroot, check : true).stdout().split('\n')[0]
-  prefix_path = run_command('realpath', prefix, check : true).stdout().split('\n')[0]
-  if sysroot != prefix_path
-    error('sysroot install requires --prefix=' + sysroot)
+  if not get_option('sysroot-install-skip-checks')
+    if sysroot == ''
+      error('sysroot install requested, but compiler has no sysroot')
+    endif
+    if not fs.is_samepath(sysroot, prefix)
+      error('sysroot install requires --prefix=' + sysroot)
+    endif
   endif
+else
+  specs_prefix_format = prefix + '/@0@'
 endif
 
 build_type_subdir = get_option('build-type-subdir')
@@ -457,11 +482,15 @@ else
   specs_install = true
 endif
 
-# When passing the specs file to CompCert, the libcompcert needs to be included there as well
-additional_libs = ''
+# Let targets add more support libraries 
+additional_libs_list = meson.get_cross_property('additional_libs', [])
+
 if cc.get_id() == 'ccomp'
-  additional_libs = '-lcompcert'
+  # When passing the specs file to CompCert, the libcompcert needs to be included there as well
+  additional_libs_list += '-lcompcert'
 endif
+
+additional_libs = ' '.join(additional_libs_list)
 
 specs_extra = ''
 specs_extra_list = meson.get_cross_property('specs_extra', [])
@@ -479,10 +508,137 @@ if tinystdio
 		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfscanf=__i_vfscanf}')
 endif
 
+if system_libc
+  specs_isystem = ''
+  specs_libpath = ''
+  specs_startfile = 'crt0%O%s'
+else
+
+#
+# Construct path values for specs file
+#
+# Each of these needs to handle --picolibc-prefix and
+# --picolibc-buildtype options, system-root vs absolute paths and
+# multilib stuff. That makes this all unreasonably complicated.
+#
+# Each option is computed in three parts, the 'prefix' value
+# (corresponding to --picolibc-prefix), the 'buildtype' value
+# (corresponding to --picolibc-buildtype) and the 'gen' value (for
+# when neither of these options is specifed).
+#
+# Because 'getenv' appends a space afterwards in GCC spec files, the
+# entire final path elements must be specified inside the parens;
+# e.g. %:getenv(FOO a/b/c) instead of %:getenv(FOO)/a/b/c. That means
+# we use the specs_prefix_format value computed above to build paths
+# instead of simple concatenation
+#
+
+#
+# How to format each of the three option-selected
+# values
+#
+picolibc_prefix_format = '-picolibc-prefix=*:@0@'
+picolibc_buildtype_format = '-picolibc-buildtype=*:@0@'
+gen_format = '@0@'
+
+#
+# How to glue the three options together
+#
+specs_option_format = '%{@0@; @1@; :@2@}'
+
+#
+# Build the -isystem value
+#
+
+prefix_include_dir = '%*/@0@/'.format(get_option('includedir'))
+isystem_prefix = picolibc_prefix_format.format(prefix_include_dir)
+
+buildtype_include_dir = specs_prefix_format.format(get_option('includedir') / '%*')
+isystem_buildtype = picolibc_buildtype_format.format(buildtype_include_dir)
+
+gen_include_dir = specs_prefix_format.format(get_option('includedir'))
+isystem_gen = gen_format.format(gen_include_dir)
+
+specs_isystem = '-isystem ' + specs_option_format.format(isystem_prefix, isystem_buildtype, isystem_gen)
+
+#
+# Build the non-multilib -L value
+#
+
+prefix_lib_dir = '%*/@0@'.format(get_option('libdir'))
+lib_prefix = picolibc_prefix_format.format(prefix_lib_dir)
+
+buildtype_lib_dir = specs_prefix_format.format(get_option('libdir') / '%*')
+lib_buildtype = picolibc_buildtype_format.format(buildtype_lib_dir)
+
+gen_lib_dir = specs_prefix_format.format(get_option('libdir'))
+lib_gen = gen_format.format(gen_lib_dir)
+
+specs_libpath = '-L' + specs_option_format.format(lib_prefix, lib_buildtype, lib_gen)
+
+#
+# Build the non-multilib *startfile options
+#
+crt0_expr = 'crt0%{-crt0=*:-%*%O;:%O}%s'
+
+prefix_crt0_path = '%*/@0@'.format(get_option('libdir')) / crt0_expr
+crt0_prefix = picolibc_prefix_format.format(prefix_crt0_path)
+
+buildtype_crt0_path = specs_prefix_format.format(get_option('libdir') / '%*' / crt0_expr)
+crt0_buildtype = picolibc_buildtype_format.format(buildtype_crt0_path)
+
+gen_crt0_path = specs_prefix_format.format(get_option('libdir') / crt0_expr)
+crt0_gen = gen_format.format(gen_crt0_path)
+
+#
+# Now build multilib versions of the -L and *startfile values
+#
+if enable_multilib
+
+  #
+  # Build the multilib -L value
+  #
+  prefix_multilib_dir = '%*/@0@'.format(get_option('libdir') / '%M')
+  multilib_prefix = picolibc_prefix_format.format(prefix_multilib_dir)
+
+  buildtype_multilib_dir = specs_prefix_format.format(get_option('libdir') / '%*/%M')
+  multilib_buildtype = picolibc_buildtype_format.format(buildtype_multilib_dir)
+
+  gen_multilib_dir = specs_prefix_format.format(get_option('libdir') / '%M')
+  multilib_gen = gen_format.format(gen_multilib_dir)
+
+  specs_multilibpath = '-L' + specs_option_format.format(multilib_prefix, multilib_buildtype, multilib_gen)
+
+  #
+  # Prepend the multilib -L option to the non-multilib option
+  #
+  specs_libpath = specs_multilibpath + ' ' + specs_libpath
+
+  #
+  # Build the multilib *startfile options
+  #
+  prefix_multilib_crt0_path = '%*/@0@'.format(get_option('libdir')) / '%M' / crt0_expr
+  crt0_prefix = picolibc_prefix_format.format(prefix_multilib_crt0_path)
+
+  buildtype_multilib_crt0_path = specs_prefix_format.format(get_option('libdir') / '%*/%M' / crt0_expr)
+  crt0_buildtype = picolibc_buildtype_format.format(buildtype_multilib_crt0_path)
+
+  gen_multilib_crt0_path = specs_prefix_format.format(get_option('libdir') / '%M' / crt0_expr)
+  crt0_gen = gen_format.format(gen_multilib_crt0_path)
+endif
+  
+#
+# Construct the *startfile value from the options computed
+# above. As there's only one value, it's either the
+# multilib path or the non-multilib path
+#
+specs_startfile = specs_option_format.format(crt0_prefix, crt0_buildtype, crt0_gen)
+endif
+
 specs_data = configuration_data()
-specs_data.set('PREFIX', sysroot_install? '%R' : prefix)
-specs_data.set('INCLUDEDIR', get_option('includedir'))
-specs_data.set('LIBDIR', get_option('libdir'))
+specs_data.set('SPECS_ISYSTEM', specs_isystem)
+specs_data.set('SPECS_LIBPATH', specs_libpath)
+specs_data.set('SPECS_STARTFILE', specs_startfile)
 specs_data.set('TLSMODEL', tls_model_spec)
 specs_data.set('LINK_SPEC', meson.get_cross_property('link_spec', ''))
 specs_data.set('CC1_SPEC', meson.get_cross_property('cc1_spec', ''))
@@ -507,19 +663,13 @@ specs_cpp_data.set('PICOLIBC_LD', 'picolibcpp.ld')
 specs_cpp_data.set('CRTBEGIN', 'crtbegin%O%s')
 specs_cpp_data.set('CRTEND', 'crtend%O%s')
 
-if enable_multilib
-  picolibc_specs_in = 'picolibc.specs.in-multilib'
-else
-  picolibc_specs_in = 'picolibc.specs.in-singlelib'
-endif
-
-picolibc_specs = configure_file(input: picolibc_specs_in,
+picolibc_specs = configure_file(input: 'picolibc.specs.in',
 				output: 'picolibc.specs',
 				configuration: specs_c_data,
 				install_dir: specs_dir,
 				install: specs_install)
 
-picolibcpp_specs = configure_file(input: picolibc_specs_in,
+picolibcpp_specs = configure_file(input: 'picolibc.specs.in',
 				  output: 'picolibcpp.specs',
 				  configuration: specs_cpp_data,
 				  install_dir: specs_dir,
@@ -614,7 +764,18 @@ if enable_multilib
 
   # Ask the compiler for the set of available multilib configurations,
   # set up the build system to compile for all desired ones
-  foreach target : run_command(cc, '--print-multi-lib', check : true).stdout().strip().split('\n')
+
+  target_list = run_command(cc, '--print-multi-lib', check : true).stdout().strip().split('\n')
+
+  has_mcmodel = false
+  foreach target : target_list
+    if target.contains('mcmodel=')
+      has_mcmodel = true
+    endif
+  endforeach
+
+  foreach target : target_list
+    message('target ' + target)
     tmp = target.split(';')
     flags = c_args
 
@@ -625,7 +786,29 @@ if enable_multilib
       if tmp.length() > 1
 	foreach flag : tmp[1].strip('@').split('@')
 	  if flag != ''
-	    flags += '-' + flag
+	    if host_cpu_family == 'nios2'
+	      # Hacks for NIOS II to get rid of -fsingle-precision-constant
+	      # mode (which breaks libm). We don't need fph2 as that
+	      # doesn't set the single precision constant flag
+	      if flag == 'mcustom-fpu-cfg=60-1'
+		flags += ['-mcustom-fmuls=252', '-mcustom-fadds=253',
+			  '-mcustom-fsubs=254']
+	      elif flag == 'mcustom-fpu-cfg=60-2'
+		flags += ['-mcustom-fmuls=252', '-mcustom-fadds=253',
+			  '-mcustom-fsubs=254', '-mcustom-fdivs=255']
+	      elif flag == 'mcustom-fpu-cfg=72-3'
+		flags += ['-mcustom-floatus=243', '-mcustom-fixsi=244',
+			  '-mcustom-floatis=245','-mcustom-fcmpgts=246',
+			  '-mcustom-fcmples=249', '-mcustom-fcmpeqs=250',
+			  '-mcustom-fcmpnes=251', '-mcustom-fmuls=252',
+			  '-mcustom-fadds=253', '-mcustom-fsubs=254',
+			  '-mcustom-fdivs=255']
+	      else
+		flags += '-' + flag
+	      endif
+	    else
+	      flags += '-' + flag
+	    endif
 	  endif
 	endforeach
 	if tmp[0] == '.'
@@ -640,7 +823,7 @@ if enable_multilib
 
       # rv64 needs to use a non-default mcmodel so that variables can
       # live in a broader range of memory addresses
-      if name.startswith('rv64')
+      if not has_mcmodel and name.startswith('rv64')
 	flags += [ '-mcmodel=medany' ]
       endif
 
@@ -882,7 +1065,10 @@ foreach from : newlib_iconv_from_encodings
   if not available_encodings.contains(from)
     error('Requested from encoding ' + from + ' is not available. Look in newlib/libc/iconv/encoding.aliases')
   endif
-  conf_data.set('_ICONV_FROM_ENCODING_' + from.to_upper(), true)
+  encoding_include = true
+  if from not in newlib_iconv_encodings_exclude
+    conf_data.set('_ICONV_FROM_ENCODING_' + from.to_upper(), true)
+  endif
 endforeach
 
 # Set config variables for each requested 'to' encoding
@@ -891,7 +1077,9 @@ foreach to : newlib_iconv_to_encodings
   if not available_encodings.contains(to)
     error('Requested to encoding ' + to + ' is not available. Look in newlib/libc/iconv/encoding.aliases')
   endif
-  conf_data.set('_ICONV_TO_ENCODING_' + to.to_upper(), true)
+  if to not in newlib_iconv_encodings_exclude
+    conf_data.set('_ICONV_TO_ENCODING_' + to.to_upper(), true)
+  endif
 endforeach
 
 version_array = meson.project_version().split('.')
@@ -1020,7 +1208,7 @@ if has_semihost
   endif
   test_link_args = ['-nostartfiles',
                     '-T', meson.current_source_dir() / custom_script,
-                    '-T', '@0@'.format(picolibc_ld), '-lgcc']
+                    '-T', '@0@'.format(picolibc_ld), '-lgcc'] + additional_libs_list
   test_linker_files = files(custom_script) + [picolibc_ld]
   specs = picolibc_specs
 else

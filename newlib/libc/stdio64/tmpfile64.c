@@ -57,7 +57,6 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<getpid>>,
 */
 
 #include <stdio.h>
-#include <reent.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -70,7 +69,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<getpid>>,
 #ifdef __LARGE64_FILES
 
 FILE *
-_tmpfile64_r (struct _reent *ptr)
+tmpfile64 (void)
 {
   FILE *fp;
   int e;
@@ -80,31 +79,21 @@ _tmpfile64_r (struct _reent *ptr)
 
   do
   {
-     if ((f = _tmpnam_r (ptr, buf)) == NULL)
+     if ((f = tmpnam (buf)) == NULL)
 	return NULL;
       fd = open64 (f, O_RDWR | O_CREAT | O_EXCL | O_BINARY,
 		      S_IRUSR | S_IWUSR);
   }
-  while (fd < 0 && __errno_r(ptr) == EEXIST);
+  while (fd < 0 && _REENT_ERRNO(ptr) == EEXIST);
   if (fd < 0)
     return NULL;
-  fp = _fdopen64_r (ptr, fd, "wb+");
-  e = __errno_r(ptr);
+  fp = fdopen64 (fd, "wb+");
+  e = _REENT_ERRNO(ptr);
   if (!fp)
     close (fd);
-  (void) _remove_r (ptr, f);
-  __errno_r(ptr) = e;
+  (void) remove (f);
+  _REENT_ERRNO(ptr) = e;
   return fp;
 }
-
-#ifndef _REENT_ONLY
-
-FILE *
-tmpfile64 (void)
-{
-  return _tmpfile64_r (_REENT);
-}
-
-#endif
 
 #endif /* __LARGE64_FILES */

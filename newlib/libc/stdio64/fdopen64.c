@@ -37,7 +37,7 @@ File pointer or <<NULL>>, as for <<fopen>>.
 extern int __sflags ();
 
 FILE *
-_fdopen64_r (struct _reent *ptr,
+fdopen64 (
 	int fd,
 	const char *mode)
 {
@@ -47,7 +47,7 @@ _fdopen64_r (struct _reent *ptr,
   int fdflags, fdmode;
 #endif
 
-  if ((flags = __sflags (ptr, mode, &oflags)) == 0)
+  if ((flags = __sflags (mode, &oflags)) == 0)
     return 0;
 
   /* make sure the mode the user wants is a subset of the actual mode */
@@ -57,12 +57,12 @@ _fdopen64_r (struct _reent *ptr,
   fdmode = fdflags & O_ACCMODE;
   if (fdmode != O_RDWR && (fdmode != (oflags & O_ACCMODE)))
     {
-      __errno_r(ptr) = EBADF;
+      _REENT_ERRNO(ptr) = EBADF;
       return 0;
     }
 #endif
 
-  if ((fp = __sfp (ptr)) == 0)
+  if ((fp = __sfp ()) == 0)
     return 0;
 
   _newlib_flockfile_start(fp);
@@ -105,14 +105,3 @@ _fdopen64_r (struct _reent *ptr,
   _newlib_flockfile_end(fp);
   return fp;
 }
-
-#ifndef _REENT_ONLY
-
-FILE *
-fdopen64 (int fd,
-	const char *mode)
-{
-  return _fdopen64_r (_REENT, fd, mode);
-}
-
-#endif

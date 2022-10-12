@@ -14,7 +14,7 @@
 #include "local.h"
 
 char *
-_vasniprintf_r (struct _reent *ptr,
+vasniprintf (
        char *buf,
        size_t *lenp,
        const char *fmt,
@@ -42,28 +42,15 @@ _vasniprintf_r (struct _reent *ptr,
      for _size.  */
   if (len > INT_MAX)
     {
-      __errno_r(ptr) = EOVERFLOW;
+      _REENT_ERRNO(ptr) = EOVERFLOW;
       return NULL;
     }
   f._bf._size = f._w = len;
   f._file = -1;  /* No file. */
-  ret = _svfiprintf_r (ptr, &f, fmt, ap);
+  ret = svfiprintf ( &f, fmt, ap);
   if (ret < 0)
     return NULL;
   *lenp = ret;
   *f._p = '\0';
   return (char *) f._bf._base;
 }
-
-#ifndef _REENT_ONLY
-
-char *
-vasniprintf (char *buf,
-       size_t *lenp,
-       const char *fmt,
-       va_list ap)
-{
-  return _vasniprintf_r (_REENT, buf, lenp, fmt, ap);
-}
-
-#endif /* ! _REENT_ONLY */

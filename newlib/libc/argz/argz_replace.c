@@ -19,9 +19,9 @@ argz_replace (char **argz,
        const char *with,
        unsigned *replace_count)
 {
-  const int str_len = strlen(str);
-  const int with_len = strlen(with);
-  const int len_diff = with_len - str_len;
+  const size_t str_len = strlen(str);
+  const size_t with_len = strlen(with);
+  const ssize_t len_diff = with_len - str_len;
 
   char *buf_iter = *argz;
   size_t buf_len = *argz_len;

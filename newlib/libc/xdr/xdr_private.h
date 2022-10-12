@@ -54,7 +54,7 @@ _ELIDABLE_INLINE uint32_t xdr_ntohl (uint32_t x)
   return x;
 #elif BYTE_ORDER == LITTLE_ENDIAN
   u_char *s = (u_char *)&x;
-  return (uint32_t)(s[0] << 24 | s[1] << 16 | s[2] << 8 | s[3]);
+  return (uint32_t)((uint32_t) s[0] << 24 | (uint32_t) s[1] << 16 | (uint32_t) s[2] << 8 | (uint32_t) s[3]);
 #else
 # error Unsupported endian type
 #endif

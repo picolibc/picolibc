@@ -88,7 +88,7 @@ x_inline (XDR * xdrs,
     return NULL;
   if (xdrs->x_op != XDR_ENCODE)
     return NULL;
-  if (len < (u_int) (long int) xdrs->x_base)
+  if (len < (u_int) (uintptr_t) xdrs->x_base)
     {
       /* x_private was already allocated */
       xdrs->x_handy += len;

@@ -35,8 +35,8 @@ SYNOPSIS
 	#include <stdio.h>
 	char *tmpnam(char *<[s]>);
 	char *tempnam(char *<[dir]>, char *<[pfx]>);
-	char *_tmpnam_r(struct _reent *<[reent]>, char *<[s]>);
-	char *_tempnam_r(struct _reent *<[reent]>, char *<[dir]>, char *<[pfx]>);
+	char *tmpnam( char *<[s]>);
+	char *tempnam( char *<[dir]>, char *<[pfx]>);
 
 DESCRIPTION
 Use either of these functions to generate a name for a temporary file.
@@ -99,11 +99,13 @@ The global pointer <<environ>> is also required.
 #include <errno.h>
 #include <unistd.h>
 
+static NEWLIB_THREAD_LOCAL int _tls_inc;
+
 /* Try to open the file specified, if it can't be opened then try
    another one.  Return nonzero if successful, otherwise zero.  */
 
 static int
-worker (struct _reent *ptr,
+worker (
        char *result,
        const char *part1,
        const char *part2,
@@ -116,12 +118,12 @@ worker (struct _reent *ptr,
   while (1)
     {
       int t;
-      _sprintf_r (ptr, result, "%s/%s%x.%x", part1, part2, part3, *part4);
+      sprintf ( result, "%s/%s%x.%x", part1, part2, part3, *part4);
       (*part4)++;
       t = open (result, O_RDONLY, 0);
       if (t == -1)
 	{
-	  if (__errno_r(ptr) == ENOSYS)
+	  if (_REENT_ERRNO(ptr) == ENOSYS)
 	    {
 	      result[0] = '\0';
 	      return 0;
@@ -138,7 +140,7 @@ worker (struct _reent *ptr,
 static NEWLIB_THREAD_LOCAL char _tmpnam_buf[_TMPNAM_SIZE];
 
 char *
-_tmpnam_r (struct _reent *p,
+tmpnam (
        char *s)
 {
   char *result;
@@ -155,9 +157,9 @@ _tmpnam_r (struct _reent *p,
     }
   pid = getpid ();
 
-  if (worker (p, result, P_tmpdir, "t", pid, &p->_inc))
+  if (worker (result, P_tmpdir, "t", pid, &_tls_inc))
     {
-      p->_inc++;
+      _tls_inc++;
       return result;
     }
 
@@ -165,7 +167,7 @@ _tmpnam_r (struct _reent *p,
 }
 
 char *
-_tempnam_r (struct _reent *p,
+tempnam (
        const char *dir,
        const char *pfx)
 {
@@ -181,26 +183,9 @@ _tempnam_r (struct _reent *p,
   filename = malloc (length);
   if (filename)
     {
-      if (! worker (p, filename, dir, prefix,
-		    getpid () ^ (int) (_POINTER_INT) p, &p->_inc))
+      if (! worker (filename, dir, prefix,
+		    getpid (), &_tls_inc))
 	return NULL;
     }
   return filename;
 }
-
-#ifndef _REENT_ONLY
-
-char *
-tempnam (const char *dir,
-       const char *pfx)
-{
-  return _tempnam_r (_REENT, dir, pfx);
-}
-
-char *
-tmpnam (char *s)
-{
-  return _tmpnam_r (_REENT, s);
-}
-
-#endif

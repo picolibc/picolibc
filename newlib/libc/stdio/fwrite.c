@@ -39,11 +39,11 @@ SYNOPSIS
 		      size_t <[count]>, FILE *restrict <[fp]>);
 
 	#include <stdio.h>
-	size_t _fwrite_r(struct _reent *<[ptr]>, const void *restrict <[buf]>, size_t <[size]>,
+	size_t fwrite( const void *restrict <[buf]>, size_t <[size]>,
 		      size_t <[count]>, FILE *restrict <[fp]>);
 
 	#include <stdio.h>
-	size_t _fwrite_unlocked_r(struct _reent *<[ptr]>, const void *restrict <[buf]>, size_t <[size]>,
+	size_t fwrite_unlocked( const void *restrict <[buf]>, size_t <[size]>,
 		      size_t <[count]>, FILE *restrict <[fp]>);
 
 DESCRIPTION
@@ -109,7 +109,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
  */
 
 size_t
-_fwrite_r (struct _reent * ptr,
+fwrite (
        const void *__restrict buf,
        size_t size,
        size_t count,
@@ -136,7 +136,7 @@ _fwrite_r (struct _reent * ptr,
 
   _newlib_flockfile_start (fp);
   ORIENT (fp, -1);
-  if (__sfvwrite_r (ptr, fp, &uio) == 0)
+  if (_sfvwrite ( fp, &uio) == 0)
     {
       _newlib_flockfile_exit (fp);
       return count;
@@ -158,7 +158,7 @@ _fwrite_r (struct _reent * ptr,
 
   while (i < n)
     {
-      if (__sputc_r (ptr, p[i], fp) == EOF)
+      if (_sputc ( p[i], fp) == EOF)
 	break;
 
       i++;
@@ -169,14 +169,3 @@ ret:
   return i / size;
 #endif
 }
-
-#ifndef _REENT_ONLY
-size_t
-fwrite (const void *__restrict buf,
-       size_t size,
-       size_t count,
-       FILE * fp)
-{
-  return _fwrite_r (_REENT, buf, size, count, fp);
-}
-#endif

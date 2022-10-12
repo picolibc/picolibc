@@ -31,7 +31,7 @@
  */
 
 int
-__swsetup_r (struct _reent *ptr,
+_swsetup (
        register FILE * fp)
 {
   /* Make sure stdio is set up.  */
@@ -46,7 +46,7 @@ __swsetup_r (struct _reent *ptr,
     {
       if ((fp->_flags & __SRW) == 0)
         {
-	  __errno_r(ptr) = EBADF;
+	  _REENT_ERRNO(ptr) = EBADF;
 	  fp->_flags |= __SERR;
 	  return EOF;
         }
@@ -69,7 +69,7 @@ __swsetup_r (struct _reent *ptr,
    */
   if (fp->_bf._base == NULL
         && (!(fp->_flags & __SSTR) || (fp->_flags & __SMBF)))
-    __smakebuf_r (ptr, fp);
+    _smakebuf ( fp);
 
   if (fp->_flags & __SLBF)
     {

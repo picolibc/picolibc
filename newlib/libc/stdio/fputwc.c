@@ -57,11 +57,11 @@ SYNOPSIS
 
 	#include <stdio.h>
 	#include <wchar.h>
-	wint_t _fputwc_r(struct _reent *<[ptr]>, wchar_t <[wc]>, FILE *<[fp]>);
+	wint_t fputwc( wchar_t <[wc]>, FILE *<[fp]>);
 
 	#include <stdio.h>
 	#include <wchar.h>
-	wint_t _fputwc_unlocked_r(struct _reent *<[ptr]>, wchar_t <[wc]>, FILE *<[fp]>);
+	wint_t fputwc_unlocked( wchar_t <[wc]>, FILE *<[fp]>);
 
 	#include <stdio.h>
 	#include <wchar.h>
@@ -74,11 +74,11 @@ SYNOPSIS
 
 	#include <stdio.h>
 	#include <wchar.h>
-	wint_t _putwc_r(struct _reent *<[ptr]>, wchar_t <[wc]>, FILE *<[fp]>);
+	wint_t putwc( wchar_t <[wc]>, FILE *<[fp]>);
 
 	#include <stdio.h>
 	#include <wchar.h>
-	wint_t _putwc_unlocked_r(struct _reent *<[ptr]>, wchar_t <[wc]>, FILE *<[fp]>);
+	wint_t putwc_unlocked( wchar_t <[wc]>, FILE *<[fp]>);
 
 DESCRIPTION
 <<fputwc>> writes the wide character argument <[wc]> to the file or
@@ -128,7 +128,7 @@ PORTABILITY
 #include "local.h"
 
 wint_t
-__fputwc (struct _reent *ptr,
+__fputwc (
 	wchar_t wc,
 	FILE *fp)
 {
@@ -155,14 +155,14 @@ __fputwc (struct _reent *ptr,
     }
 
   for (i = 0; i < len; i++)
-    if (__sputc_r (ptr, (unsigned char) buf[i], fp) == EOF)
+    if (_sputc ( (unsigned char) buf[i], fp) == EOF)
       return WEOF;
 
   return (wint_t) wc;
 }
 
 wint_t
-_fputwc_r (struct _reent *ptr,
+fputwc (
 	wchar_t wc,
 	FILE *fp)
 {
@@ -170,17 +170,7 @@ _fputwc_r (struct _reent *ptr,
 
   _newlib_flockfile_start (fp);
   ORIENT(fp, 1);
-  r = __fputwc(ptr, wc, fp);
+  r = __fputwc(wc, fp);
   _newlib_flockfile_end (fp);
   return r;
-}
-
-wint_t
-fputwc (wchar_t wc,
-	FILE *fp)
-{
-  struct _reent *reent = _REENT;
-
-  CHECK_INIT(reent, fp);
-  return _fputwc_r (reent, wc, fp);
 }

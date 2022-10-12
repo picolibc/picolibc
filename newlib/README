@@ -294,12 +294,6 @@ One feature can be enabled by specifying `--enable-FEATURE=yes' or
      Disable dynamic allocation of atexit entries.
      Most hosts and targets have it enabled in configure.host.
 
-`--enable-newlib-global-stdio-streams'
-     Enable to move the stdio stream FILE objects out of struct _reent and make
-     them global.  The stdio stream pointers of struct _reent are initialized
-     to point to the global stdio FILE stream objects.
-     Disabled by default.
-
 `--enable-newlib-reent-small'
      Enable small reentrant struct support.
      Disabled by default.
@@ -308,6 +302,14 @@ One feature can be enabled by specifying `--enable-FEATURE=yes' or
      Enable backward binary compatibility for struct _reent.  If enabled, then
      unused members in struct _reent are preserved to maintain the structure
      layout.
+     Disabled by default.
+
+`--enable-newlib-reent-thread-local'
+     Enable thread-local storage objects as a replacement for struct _reent
+     members.  If enabled, then struct _reent is not defined and dedicated
+     thread-local storage objects are provided for each member of the default
+     struct _reent.  For statically linked executables only the objects
+     required by the application are linked in.
      Disabled by default.
 
 `--disable-newlib-fvwrite-in-streamio'

@@ -96,12 +96,12 @@ __jp2uc (wint_t c, int type)
   /* find conversion in jp2uc arrays */
 
   /* handle larger ranges first */
-  if (byte1 >= 0xb0 && byte1 <= 0xcf && c <= 0xcfd3)
+  if (byte1 >= 0xb0 && byte1 <= 0xcf && c <= (wint_t) 0xcfd3)
     {
       index = (byte1 - 0xb0) * 0xfe + (byte2 - 0xa1);
       return b02cf[index];
     }
-  else if (byte1 >= 0xd0 && byte1 <= 0xf4 && c <= 0xf4a6)
+  else if (byte1 >= 0xd0 && byte1 <= 0xf4 && c <= (wint_t) 0xf4a6)
     {
       index = (byte1 - 0xd0) * 0xfe + (byte2 - 0xa1);
       return d02f4[index];

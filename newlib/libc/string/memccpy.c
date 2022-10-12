@@ -32,10 +32,11 @@ PORTABILITY
 #include <stddef.h>
 #include <string.h>
 #include <limits.h>
+#include <stdint.h>
 
 /* Nonzero if either X or Y is not aligned on a "long" boundary.  */
 #define UNALIGNED(X, Y) \
-  (((long)X & (sizeof (long) - 1)) | ((long)Y & (sizeof (long) - 1)))
+  (((uintptr_t)X & (sizeof (long) - 1)) | ((uintptr_t)Y & (sizeof (long) - 1)))
 
 /* How many bytes are copied each iteration of the word copy loop.  */
 #define LITTLEBLOCKSIZE (sizeof (long))

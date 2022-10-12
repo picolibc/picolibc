@@ -77,11 +77,11 @@ main(void)
 		ch[0] = 'a' + i;
 		e.key = strdup(ch);	/* ptr to provided key is kept! */
 		TEST(e.key != NULL);
-		e.data = (void *)(long)i;
+		e.data = (void *)(uintptr_t)i;
 		ep = hsearch(e, ENTER);
 		TEST(ep != NULL);
 		TEST(strcmp(ep->key, ch) == 0);
-		TEST((long)ep->data == i);
+		TEST((int) (uintptr_t)ep->data == i);
 	}
 
 	/* e.key should be constant from here on down. */
@@ -93,7 +93,7 @@ main(void)
 		ep = hsearch(e, FIND);
 		TEST(ep != NULL);
 		TEST(strcmp(ep->key, ch) == 0);
-		TEST((long)ep->data == i);
+		TEST((int) (uintptr_t)ep->data == i);
 	}
 
 	/* Check duplicate entry.  Should _not_ overwrite existing data.  */
@@ -102,7 +102,7 @@ main(void)
 	ep = hsearch(e, FIND);
 	TEST(ep != NULL);
 	TEST(strcmp(ep->key, ch) == 0);
-	TEST((long)ep->data == 0);
+	TEST((uintptr_t)ep->data == 0);
 
 	/* Check for something that's not there. */
 	ch[0] = 'A';
@@ -115,9 +115,9 @@ main(void)
 	ch[0] = 'b';
 	ep2 = hsearch(e, FIND);
 	TEST(ep != NULL);
-	TEST(strcmp(ep->key, "a") == 0 && (long)ep->data == 0);
+	TEST(strcmp(ep->key, "a") == 0 && (uintptr_t)ep->data == 0);
 	TEST(ep2 != NULL);
-	TEST(strcmp(ep2->key, "b") == 0 && (long)ep2->data == 1);
+	TEST(strcmp(ep2->key, "b") == 0 && (uintptr_t)ep2->data == 1);
 
 	hdestroy();
 

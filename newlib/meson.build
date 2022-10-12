@@ -97,5 +97,7 @@ endforeach
 
 if enable_tests
   subdir('testsuite')
-  subdir('libm/test')
+  if not double_equals_float
+    subdir('libm/test')
+  endif
 endif

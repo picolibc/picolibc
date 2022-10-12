@@ -176,7 +176,7 @@ void __attribute__((naked))
 arm_hardfault_isr(void)
 {
     __asm__("mov r0, sp");
-    __asm__("mov r1, #" REASON(REASON_HARDFAULT));
+    __asm__("movs r1, #" REASON(REASON_HARDFAULT));
     __asm__("bl  arm_fault");
 }
 
@@ -184,7 +184,7 @@ void __attribute__((naked))
 arm_memmange_isr(void)
 {
     __asm__("mov r0, sp");
-    __asm__("mov r1, #" REASON(REASON_MEMMANAGE));
+    __asm__("movs r1, #" REASON(REASON_MEMMANAGE));
     __asm__("bl  arm_fault");
 }
 
@@ -192,7 +192,7 @@ void __attribute__((naked))
 arm_busfault_isr(void)
 {
     __asm__("mov r0, sp");
-    __asm__("mov r1, #" REASON(REASON_BUSFAULT));
+    __asm__("movs r1, #" REASON(REASON_BUSFAULT));
     __asm__("bl  arm_fault");
 }
 
@@ -200,7 +200,7 @@ void __attribute__((naked))
 arm_usagefault_isr(void)
 {
     __asm__("mov r0, sp");
-    __asm__("mov r1, #" REASON(REASON_USAGE));
+    __asm__("movs r1, #" REASON(REASON_USAGE));
     __asm__("bl  arm_fault");
 }
 

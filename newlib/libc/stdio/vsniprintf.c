@@ -29,21 +29,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 #include "local.h"
 
-#ifndef _REENT_ONLY
-
-int
-vsniprintf (char *str,
-       size_t size,
-       const char *fmt,
-       va_list ap)
-{
-  return _vsniprintf_r (_REENT, str, size, fmt, ap);
-}
-
-#endif /* !_REENT_ONLY */
-
-int
-_vsniprintf_r (struct _reent *ptr,
+vsniprintf (
        char *str,
        size_t size,
        const char *fmt,
@@ -54,16 +40,16 @@ _vsniprintf_r (struct _reent *ptr,
 
   if (size > INT_MAX)
     {
-      __errno_r(ptr) = EOVERFLOW;
+      _REENT_ERRNO(ptr) = EOVERFLOW;
       return EOF;
     }
   f._flags = __SWR | __SSTR;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = (size > 0 ? size - 1 : 0);
   f._file = -1;  /* No file. */
-  ret = _svfiprintf_r (ptr, &f, fmt, ap);
+  ret = svfiprintf ( &f, fmt, ap);
   if (ret < EOF)
-    __errno_r(ptr) = EOVERFLOW;
+    _REENT_ERRNO(ptr) = EOVERFLOW;
   if (size > 0)
     *f._p = 0;
   return ret;

@@ -48,11 +48,11 @@ SYNOPSIS
                         FILE *__restrict <[fp]>);
 
 	#include <wchar.h>
-	wchar_t *_fgetws_r(struct _reent *<[ptr]>, wchar_t *<[ws]>,
+	wchar_t *fgetws( wchar_t *<[ws]>,
                            int <[n]>, FILE *<[fp]>);
 
 	#include <wchar.h>
-	wchar_t *_fgetws_unlocked_r(struct _reent *<[ptr]>, wchar_t *<[ws]>,
+	wchar_t *fgetws_unlocked( wchar_t *<[ws]>,
                            int <[n]>, FILE *<[fp]>);
 
 DESCRIPTION
@@ -99,7 +99,7 @@ PORTABILITY
 #endif
 
 wchar_t *
-_fgetws_r (struct _reent *ptr,
+fgetws (
 	wchar_t * ws,
 	int n,
 	FILE * fp)
@@ -118,7 +118,7 @@ _fgetws_r (struct _reent *ptr,
       goto error;
     }
 
-  if (fp->_r <= 0 && __srefill_r (ptr, fp))
+  if (fp->_r <= 0 && _srefill ( fp))
     /* EOF */
     goto error;
   wsp = ws;
@@ -154,7 +154,7 @@ _fgetws_r (struct _reent *ptr,
       wsp += nconv;
     }
   while (wsp[-1] != L'\n' && n > 1 && (fp->_r > 0
-	 || __srefill_r (ptr, fp) == 0));
+	 || _srefill ( fp) == 0));
   if (wsp == ws)
     /* EOF */
     goto error;
@@ -168,15 +168,4 @@ _fgetws_r (struct _reent *ptr,
 error:
   _newlib_flockfile_end (fp);
   return NULL;
-}
-
-wchar_t *
-fgetws (wchar_t *__restrict ws,
-	int n,
-	FILE *__restrict fp)
-{
-  struct _reent *reent = _REENT;
-
-  CHECK_INIT (reent, fp);
-  return _fgetws_r (reent, ws, n, fp);
 }

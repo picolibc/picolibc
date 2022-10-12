@@ -14,7 +14,7 @@
 #include "local.h"
 
 char *
-_vasnprintf_r (struct _reent *ptr,
+vasnprintf (
        char *buf,
        size_t *lenp,
        const char *fmt,
@@ -42,12 +42,12 @@ _vasnprintf_r (struct _reent *ptr,
      for _size.  */
   if (len > INT_MAX)
     {
-      __errno_r(ptr) = EOVERFLOW;
+      _REENT_ERRNO(ptr) = EOVERFLOW;
       return NULL;
     }
   f._bf._size = f._w = len;
   f._file = -1;  /* No file. */
-  ret = _svfprintf_r (ptr, &f, fmt, ap);
+  ret = svfprintf ( &f, fmt, ap);
   if (ret < 0)
     return NULL;
   *lenp = ret;
@@ -57,25 +57,6 @@ _vasnprintf_r (struct _reent *ptr,
 
 #ifdef _NANO_FORMATTED_IO
 char *
-_vasniprintf_r (struct _reent*, char *, size_t *,
-			const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("_vasnprintf_r")));
-#endif
-
-#ifndef _REENT_ONLY
-
-char *
-vasnprintf (char *buf,
-       size_t *lenp,
-       const char *fmt,
-       va_list ap)
-{
-  return _vasnprintf_r (_REENT, buf, lenp, fmt, ap);
-}
-
-#ifdef _NANO_FORMATTED_IO
-char *
 vasniprintf (char *, size_t *, const char *, __VALIST)
        _ATTRIBUTE ((__alias__("vasnprintf")));
 #endif
-#endif /* ! _REENT_ONLY */

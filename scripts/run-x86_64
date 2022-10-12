@@ -44,7 +44,7 @@ shift
 
 "$dir"/monitor-e9 "$qemu" \
 	-cpu core2duo \
-	-bios semihost/machine/i386/bios.bin \
+	-bios semihost/machine/x86/bios.bin \
 	-monitor none \
 	-serial none \
 	-debugcon stdio \

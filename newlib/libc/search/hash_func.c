@@ -47,10 +47,6 @@ static __uint32_t hash1(const void *, size_t);
 static __uint32_t hash2(const void *, size_t);
 static __uint32_t hash3(const void *, size_t);
 #endif
-static __uint32_t hash4(const void *, size_t);
-
-/* Global default hash function */
-__uint32_t (*__default_hash)(const void *, size_t) = hash4;
 
 /*
  * HASH FUNCTIONS
@@ -167,8 +163,8 @@ hash3(keyarg, len)
 #endif
 
 /* Hash function from Chris Torek. */
-static __uint32_t
-hash4(const void *keyarg, size_t len)
+__uint32_t
+__default_hash(const void *keyarg, size_t len)
 {
 	const u_char *key;
 	__uint32_t h;

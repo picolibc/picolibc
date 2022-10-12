@@ -27,7 +27,7 @@ SYNOPSIS
 	#include <stdio.h>
 	int ungetc(int <[c]>, FILE *<[stream]>);
 
-	int _ungetc_r(struct _reent *<[reent]>, int <[c]>, FILE *<[stream]>);
+	int ungetc( int <[c]>, FILE *<[stream]>);
 
 DESCRIPTION
 <<ungetc>> is used to return bytes back to <[stream]> to be read again.
@@ -77,13 +77,12 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 /*static*/
 int
-__submore (struct _reent *rptr,
+__submore (
        register FILE *fp)
 {
   register int i;
   register unsigned char *p;
 
-  (void) rptr;
   if (fp->_ub._base == fp->_ubuf)
     {
       /*
@@ -111,7 +110,7 @@ __submore (struct _reent *rptr,
 }
 
 int
-_ungetc_r (struct _reent *rptr,
+ungetc (
        int c,
        register FILE *fp)
 {
@@ -144,7 +143,7 @@ _ungetc_r (struct _reent *rptr,
         }
       if (fp->_flags & __SWR)
 	{
-	  if (_fflush_r (rptr, fp))
+	  if (fflush ( fp))
             {
               _newlib_flockfile_exit (fp);
               return EOF;
@@ -164,7 +163,7 @@ _ungetc_r (struct _reent *rptr,
 
   if (HASUB (fp))
     {
-      if (fp->_r >= fp->_ub._size && __submore (rptr, fp))
+      if (fp->_r >= fp->_ub._size && __submore (fp))
         {
           _newlib_flockfile_exit (fp);
           return EOF;
@@ -204,12 +203,3 @@ _ungetc_r (struct _reent *rptr,
   _newlib_flockfile_end (fp);
   return c;
 }
-
-#ifndef _REENT_ONLY
-int
-ungetc (int c,
-       register FILE *fp)
-{
-  return _ungetc_r (_REENT, c, fp);
-}
-#endif /* !_REENT_ONLY */

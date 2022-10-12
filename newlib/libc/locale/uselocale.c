@@ -91,13 +91,14 @@ uselocale (struct __locale_t *newloc)
 {
   struct __locale_t *current_locale;
 
-  current_locale = _locale;
-  if (!current_locale)
-    current_locale = LC_GLOBAL_LOCALE;
+  (void) newloc;
+  current_locale = __get_current_locale();
+#ifdef __HAVE_LOCALE_INFO__
   if (newloc == LC_GLOBAL_LOCALE)
     _locale = NULL;
   else if (newloc)
     _locale = newloc;
+#endif
   return current_locale;
 }
 

@@ -55,10 +55,10 @@ struct passwd {
 	char	*pw_shell;		/* default shell */
 };
 
-#ifndef __INSIDE_CYGWIN__
 struct passwd	*getpwuid (uid_t);
 struct passwd	*getpwnam (const char *);
 
+#ifndef __INSIDE_CYGWIN__
 #if __MISC_VISIBLE || __POSIX_VISIBLE
 int 		 getpwnam_r (const char *, struct passwd *,
 			char *, size_t , struct passwd **);

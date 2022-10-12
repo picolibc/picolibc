@@ -44,6 +44,8 @@
 #define TCB_SIZE	16
 #endif
 
+#pragma GCC diagnostic ignored "-Warray-bounds"
+
 static inline void
 _set_tls(void *tls)
 {

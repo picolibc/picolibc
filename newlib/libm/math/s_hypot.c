@@ -49,6 +49,9 @@
 
 #if defined(_HAVE_ALIAS_ATTRIBUTE)
 #ifdef _LDBL_EQ_DBL
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wattribute-alias="
 extern long double hypotl(long double x, long double y)
     __attribute__((__alias__("hypot")));
 #endif

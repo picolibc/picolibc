@@ -596,7 +596,7 @@ strtod_l (const char *__restrict s00, char **__restrict se,
 			if (e1 > DBL_MAX_10_EXP) {
  ovfl:
 #ifndef NO_ERRNO
-				errno = ERANGE;
+				_REENT_ERRNO(ptr) = ERANGE;
 #endif
 				/* Can't trust HUGE_VAL */
 #ifdef IEEE_Arith
@@ -703,7 +703,7 @@ strtod_l (const char *__restrict s00, char **__restrict se,
  undfl:
 					dval(rv) = 0.;
 #ifndef NO_ERRNO
-					errno = ERANGE;
+					_REENT_ERRNO(ptr) = ERANGE;
 #endif
 					if (bd0)
 						goto retfree;
@@ -1250,7 +1250,7 @@ strtod_l (const char *__restrict s00, char **__restrict se,
 #ifndef NO_ERRNO
 		/* try to avoid the bug of testing an 8087 register value */
 		if ((dword0(rv) & Exp_mask) == 0)
-			errno = ERANGE;
+			_REENT_ERRNO(ptr) = ERANGE;
 #endif
 		}
 #endif /* Avoid_Underflow */
@@ -1282,6 +1282,9 @@ strtod (const char *__restrict s00,
 
 #if defined(_HAVE_LONG_DOUBLE) && defined(_LDBL_EQ_DBL)
 #ifdef _HAVE_ALIAS_ATTRIBUTE
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wattribute-alias="
 extern long double strtold(const char *, char **) __attribute__ ((__alias__ ("strtod")));
 #else
 long double
@@ -1324,7 +1327,7 @@ strtof (const char *__restrict s00,
   float retval = (float) val;
 #ifndef NO_ERRNO
   if ((isinf (retval) && !isinf (val)) || (isdenormf(retval) && !isdenorm(val)))
-    errno = ERANGE;
+    _REENT_ERRNO(_REENT) = ERANGE;
 #endif
   return retval;
 }

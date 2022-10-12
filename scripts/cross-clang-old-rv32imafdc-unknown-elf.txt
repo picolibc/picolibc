@@ -1,0 +1,25 @@
+[binaries]
+# Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
+# so we have to add -nostdlib to the compiler configuration itself or
+# early compiler tests will fail. This can be removed when picolibc
+# requires at least version 0.54.2 of meson.
+c = ['clang', '-m32', '-target', 'riscv32-unknown-elf', '-march=rv32imafdc', '-mabi=ilp32d', '-nostdlib']
+c_ld = '/usr/bin/riscv64-unknown-elf-ld'
+ar = 'riscv64-unknown-elf-ar'
+as = 'riscv64-unknown-elf-as'
+nm = 'riscv64-unknown-elf-nm'
+strip = 'riscv64-unknown-elf-strip'
+# only needed to run tests
+exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-rv32imafdc "$@"', 'run-rv32imafdc']
+
+[host_machine]
+system = 'none'
+cpu_family = 'riscv32'
+cpu = 'riscv'
+endian = 'little'
+
+[properties]
+c_args = ['-Werror=double-promotion']
+c_link_args = ['-Wl,-melf32lriscv', '-L/usr/lib/gcc/riscv64-unknown-elf/8.3.0/rv32imafdc/ilp32d']
+skip_sanity_check = true
+has_link_defsym = true

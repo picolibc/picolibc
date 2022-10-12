@@ -299,7 +299,7 @@ static __inline ucs2_t
 find_code_speed (ucs2_t code,
                         const __uint16_t *tblp)
 {
-  int idx = tblp[code >> 8];
+  __uint16_t idx = tblp[code >> 8];
 
   if (idx == INVBLK)
     return (ucs2_t)INVALC;
@@ -321,7 +321,7 @@ static __inline ucs2_t
 find_code_speed_8bit (ucs2_t code,
                              const unsigned char *tblp)
 {
-  int idx;
+  __uint16_t idx;
   unsigned char ccs;
 
   if (code == ((ucs2_t *)tblp)[0])
@@ -398,7 +398,7 @@ find_code_size (ucs2_t code,
  
       do
         {
-          int c;
+          __uint16_t c;
 
           center = (last - first)/2;
           cur = center + first;

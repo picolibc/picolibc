@@ -17,7 +17,7 @@ envz_remove (char **envz,
        const char *name)
 {
   char *entry = NULL;
-  int len = 0;
+  size_t len = 0;
   entry = envz_entry (*envz, *envz_len, name);
 
   if (entry)

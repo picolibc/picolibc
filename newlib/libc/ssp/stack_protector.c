@@ -30,8 +30,10 @@ __stack_chk_init (void)
     /* If getentropy is not available, use the "terminator canary". */
     ((unsigned char *)&__stack_chk_guard)[0] = 0;
     ((unsigned char *)&__stack_chk_guard)[1] = 0;
+#if __SIZEOF_POINTER__ > 2
     ((unsigned char *)&__stack_chk_guard)[2] = '\n';
     ((unsigned char *)&__stack_chk_guard)[3] = 255;
+#endif
   }
 }
 #endif

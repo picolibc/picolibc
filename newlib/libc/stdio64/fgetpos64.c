@@ -62,11 +62,11 @@ No supporting OS subroutines are required.
 #ifdef __LARGE64_FILES
 
 int
-_fgetpos64_r (struct _reent * ptr,
+fgetpos64 (
 	FILE * fp,
 	_fpos64_t * pos)
 {
-  *pos = (_fpos64_t)_ftello64_r (ptr, fp);
+  *pos = (_fpos64_t)ftello64 (fp);
 
   if (*pos != -1)
     {
@@ -74,16 +74,5 @@ _fgetpos64_r (struct _reent * ptr,
     }
   return 1;
 }
-
-#ifndef _REENT_ONLY
-
-int
-fgetpos64 (FILE * fp,
-	_fpos64_t * pos)
-{
-  return _fgetpos64_r (_REENT, fp, pos);
-}
-
-#endif /* !_REENT_ONLY */
 
 #endif /* __LARGE64_FILES */

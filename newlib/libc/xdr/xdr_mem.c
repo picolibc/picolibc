@@ -108,7 +108,7 @@ xdrmem_create (XDR * xdrs,
 	enum xdr_op op)
 {
   xdrs->x_op = op;
-  xdrs->x_ops = ((unsigned long)addr & (sizeof (int32_t) - 1))
+  xdrs->x_ops = ((uintptr_t)addr & (sizeof (int32_t) - 1))
     ? (struct xdr_ops *)&xdrmem_ops_unaligned
     : (struct xdr_ops *)&xdrmem_ops_aligned;
   xdrs->x_private = xdrs->x_base = addr;
@@ -205,7 +205,7 @@ static u_int
 xdrmem_getpos (XDR * xdrs)
 {
   /* XXX w/64-bit pointers, u_int not enough! */
-  return (u_int) ((u_long) xdrs->x_private - (u_long) xdrs->x_base);
+  return (u_int) ((uintptr_t) xdrs->x_private - (uintptr_t) xdrs->x_base);
 }
 
 static bool_t

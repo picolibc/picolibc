@@ -37,10 +37,10 @@ SYNOPSIS
 	char *fgets_unlocked(char *restrict <[buf]>, int <[n]>, FILE *restrict <[fp]>);
 
         #include <stdio.h>
-	char *_fgets_r(struct _reent *<[ptr]>, char *restrict <[buf]>, int <[n]>, FILE *restrict <[fp]>);
+	char *fgets( char *restrict <[buf]>, int <[n]>, FILE *restrict <[fp]>);
 
         #include <stdio.h>
-	char *_fgets_unlocked_r(struct _reent *<[ptr]>, char *restrict <[buf]>, int <[n]>, FILE *restrict <[fp]>);
+	char *fgets_unlocked( char *restrict <[buf]>, int <[n]>, FILE *restrict <[fp]>);
 
 DESCRIPTION
 	Reads at most <[n-1]> characters from <[fp]> until a newline
@@ -95,7 +95,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
  */
 
 char *
-_fgets_r (struct _reent * ptr,
+fgets (
        char *__restrict buf,
        int n,
        FILE *__restrict fp)
@@ -117,7 +117,7 @@ _fgets_r (struct _reent * ptr,
     {
       int c = 0;
       /* Sorry, have to do it the slow way */
-      while (--n > 0 && (c = __sgetc_r (ptr, fp)) != EOF)
+      while (--n > 0 && (c = _sgetc ( fp)) != EOF)
 	{
 	  *s++ = c;
 	  if (c == '\n')
@@ -142,7 +142,7 @@ _fgets_r (struct _reent * ptr,
        */
       if ((len = fp->_r) <= 0)
 	{
-	  if (__srefill_r (ptr, fp))
+	  if (_srefill ( fp))
 	    {
 	      /* EOF: stop with partial or no line */
 	      if (s == buf)
@@ -185,15 +185,3 @@ _fgets_r (struct _reent * ptr,
   _newlib_flockfile_end (fp);
   return buf;
 }
-
-#ifndef _REENT_ONLY
-
-char *
-fgets (char *__restrict buf,
-       int n,
-       FILE *__restrict fp)
-{
-  return _fgets_r (_REENT, buf, n, fp);
-}
-
-#endif /* !_REENT_ONLY */
