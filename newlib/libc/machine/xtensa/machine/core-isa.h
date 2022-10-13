@@ -1,3 +1,7 @@
+#ifdef _XTENSA_HAVE_CONFIG_CORE_ISA_H
+#include <xtensa/config/core-isa.h>
+#else
+
 /* 
  * xtensa/config/core-isa.h -- HAL definitions that are dependent on Xtensa
  *				processor CORE configuration
@@ -457,3 +461,4 @@
 
 #endif /* _XTENSA_CORE_CONFIGURATION_H */
 
+#endif
