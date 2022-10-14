@@ -37,7 +37,7 @@ picolibc_sources_flags("-fno-builtin"
   setjmp.S
   )
 
-if(NOT DEFINED CONFIG_64BIT)
+if(NOT DEFINED CONFIG_ISA_ARCV3)
   picolibc_sources_flags("-fno-builtin"
     memcmp-bs-norm.S
     memcmp.S
