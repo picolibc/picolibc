@@ -410,9 +410,11 @@ endif
 
 tls_model_spec = ''
 thread_local_storage = false
-if get_option('thread-local-storage') == 'auto'
+thread_local_storage_option = get_option('thread-local-storage')
+have_picolibc_tls_api = fs.is_file('newlib/libc/picolib/machine' / host_cpu_family / 'tls.c')
+if thread_local_storage_option == 'auto' or thread_local_storage_option == 'picolibc'
   # We assume that _set_tls() is defined in the arch specific tls.c
-  if fs.is_file('newlib/libc/picolib/machine' / host_cpu_family / 'tls.c')
+  if thread_local_storage_option == 'auto' or have_picolibc_tls_api
     thread_local_storage = not cc.has_function('__emutls_get_address', args: core_c_args + ['-lgcc'])
   endif
 else
@@ -957,7 +959,7 @@ conf_data.set('_HAVE_INITFINI_ARRAY', get_option('newlib-initfini-array'), descr
 conf_data.set('_HAVE_INIT_FINI', get_option('newlib-initfini'), description: 'Support _init() and _fini() functions')
 conf_data.set('NEWLIB_TLS', thread_local_storage, description: 'use thread local storage')
 conf_data.set('PICOLIBC_TLS', thread_local_storage, description: 'use thread local storage')
-conf_data.set('_HAVE_PICOLIBC_TLS_API', thread_local_storage, description: '_set_tls and _init_tls functions available')
+conf_data.set('_HAVE_PICOLIBC_TLS_API', thread_local_storage and have_picolibc_tls_api, description: '_set_tls and _init_tls functions available')
 conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in tinystdio')
 conf_data.set('ATOMIC_UNGETC', atomic_ungetc, description: 'Use atomics for fgetc/ungetc for re-entrancy')
 conf_data.set('_HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')

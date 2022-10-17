@@ -224,8 +224,8 @@ option('newlib-retargetable-locking', type: 'boolean', value: true,
 #
 # Thread-local storage support
 #
-option('thread-local-storage', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
-       description: 'use thread local storage for static data (default: automatically detect support)')
+option('thread-local-storage', type: 'combo', choices: ['true', 'false', 'auto', 'picolibc'], value: 'picolibc',
+       description: 'use thread local storage for static data ("picolibc": picolibc and toolchain support) ("auto": toolchain supports) (default: "picolibc")')
 option('tls-model', type: 'combo', choices: ['global-dynamic', 'local-dynamic', 'initial-exec', 'local-exec'], value: 'local-exec',
        description: 'Set TLS model. No-op when thread-local-storage is false')
 option('newlib-global-errno', type: 'boolean', value: false,
