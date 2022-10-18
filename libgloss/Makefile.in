@@ -212,8 +212,9 @@ am__uninstall_files_from_dir = { \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
 am__installdirs = "$(DESTDIR)$(multilibtooldir)" "$(DESTDIR)$(bindir)" \
-	"$(DESTDIR)$(infodir)" "$(DESTDIR)$(includesystooldir)" \
-	"$(DESTDIR)$(includetooldir)" "$(DESTDIR)$(multilibtooldir)"
+	"$(DESTDIR)$(infodir)" "$(DESTDIR)$(includemachinetooldir)" \
+	"$(DESTDIR)$(includesystooldir)" "$(DESTDIR)$(includetooldir)" \
+	"$(DESTDIR)$(multilibtooldir)"
 LIBRARIES = $(multilibtool_LIBRARIES) $(noinst_LIBRARIES)
 ARFLAGS = cru
 AM_V_AR = $(am__v_AR_@AM_V@)
@@ -471,7 +472,8 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-DATA = $(includesystool_DATA) $(includetool_DATA) $(multilibtool_DATA)
+DATA = $(includemachinetool_DATA) $(includesystool_DATA) \
+	$(includetool_DATA) $(multilibtool_DATA)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 am__recursive_targets = \
@@ -610,7 +612,6 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
-runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -791,6 +792,8 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 @CONFIG_RISCV_TRUE@	riscv/semihost-sys_unlink.c \
 @CONFIG_RISCV_TRUE@	riscv/semihost-sys_write.c
 
+@CONFIG_RISCV_TRUE@includemachinetooldir = $(tooldir)/include/machine
+@CONFIG_RISCV_TRUE@includemachinetool_DATA = riscv/machine/syscall.h
 @CONFIG_WINCE_TRUE@gdbdir = ${dir ${patsubst %/,%,${dir @srcdir@}}}gdb
 @CONFIG_WINCE_TRUE@wince_stub_exe_SOURCES = wince-stub.c
 @CONFIG_WINCE_TRUE@wince_stub_exe_CPPFLAGS = $(AM_CPPFLAGS) -I$(gdbdir)
@@ -2504,6 +2507,27 @@ maintainer-clean-aminfo:
 	  echo " rm -f $$i $$i-[0-9] $$i-[0-9][0-9] $$i_i[0-9] $$i_i[0-9][0-9]"; \
 	  rm -f $$i $$i-[0-9] $$i-[0-9][0-9] $$i_i[0-9] $$i_i[0-9][0-9]; \
 	done
+install-includemachinetoolDATA: $(includemachinetool_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(includemachinetool_DATA)'; test -n "$(includemachinetooldir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(includemachinetooldir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(includemachinetooldir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(includemachinetooldir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(includemachinetooldir)" || exit $$?; \
+	done
+
+uninstall-includemachinetoolDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(includemachinetool_DATA)'; test -n "$(includemachinetooldir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(includemachinetooldir)'; $(am__uninstall_files_from_dir)
 install-includesystoolDATA: $(includesystool_DATA)
 	@$(NORMAL_INSTALL)
 	@list='$(includesystool_DATA)'; test -n "$(includesystooldir)" || list=; \
@@ -2680,7 +2704,7 @@ all-am: Makefile $(INFO_DEPS) $(LIBRARIES) $(PROGRAMS) $(DATA) \
 		config.h all-local
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(multilibtooldir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(infodir)" "$(DESTDIR)$(includesystooldir)" "$(DESTDIR)$(includetooldir)" "$(DESTDIR)$(multilibtooldir)"; do \
+	for dir in "$(DESTDIR)$(multilibtooldir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(infodir)" "$(DESTDIR)$(includemachinetooldir)" "$(DESTDIR)$(includesystooldir)" "$(DESTDIR)$(includetooldir)" "$(DESTDIR)$(multilibtooldir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -2750,7 +2774,8 @@ info: info-recursive
 
 info-am: $(INFO_DEPS)
 
-install-data-am: install-includesystoolDATA install-includetoolDATA \
+install-data-am: install-includemachinetoolDATA \
+	install-includesystoolDATA install-includetoolDATA \
 	install-info-am install-multilibtoolDATA \
 	install-multilibtoolLIBRARIES
 
@@ -2893,10 +2918,10 @@ ps: ps-recursive
 ps-am: $(PSS)
 
 uninstall-am: uninstall-binPROGRAMS uninstall-dvi-am uninstall-html-am \
-	uninstall-includesystoolDATA uninstall-includetoolDATA \
-	uninstall-info-am uninstall-multilibtoolDATA \
-	uninstall-multilibtoolLIBRARIES uninstall-pdf-am \
-	uninstall-ps-am
+	uninstall-includemachinetoolDATA uninstall-includesystoolDATA \
+	uninstall-includetoolDATA uninstall-info-am \
+	uninstall-multilibtoolDATA uninstall-multilibtoolLIBRARIES \
+	uninstall-pdf-am uninstall-ps-am
 
 .MAKE: $(am__recursive_targets) all check-am install-am install-strip
 
@@ -2910,17 +2935,18 @@ uninstall-am: uninstall-binPROGRAMS uninstall-dvi-am uninstall-html-am \
 	html-am info info-am install install-am install-binPROGRAMS \
 	install-data install-data-am install-dvi install-dvi-am \
 	install-exec install-exec-am install-exec-local install-html \
-	install-html-am install-includesystoolDATA \
-	install-includetoolDATA install-info install-info-am \
-	install-man install-multilibtoolDATA \
-	install-multilibtoolLIBRARIES install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs installdirs-am maintainer-clean \
-	maintainer-clean-aminfo maintainer-clean-generic \
-	maintainer-clean-local mostlyclean mostlyclean-aminfo \
-	mostlyclean-compile mostlyclean-generic mostlyclean-local pdf \
-	pdf-am ps ps-am tags tags-am uninstall uninstall-am \
-	uninstall-binPROGRAMS uninstall-dvi-am uninstall-html-am \
+	install-html-am install-includemachinetoolDATA \
+	install-includesystoolDATA install-includetoolDATA \
+	install-info install-info-am install-man \
+	install-multilibtoolDATA install-multilibtoolLIBRARIES \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-aminfo \
+	maintainer-clean-generic maintainer-clean-local mostlyclean \
+	mostlyclean-aminfo mostlyclean-compile mostlyclean-generic \
+	mostlyclean-local pdf pdf-am ps ps-am tags tags-am uninstall \
+	uninstall-am uninstall-binPROGRAMS uninstall-dvi-am \
+	uninstall-html-am uninstall-includemachinetoolDATA \
 	uninstall-includesystoolDATA uninstall-includetoolDATA \
 	uninstall-info-am uninstall-multilibtoolDATA \
 	uninstall-multilibtoolLIBRARIES uninstall-pdf-am \
