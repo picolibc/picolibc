@@ -37,11 +37,19 @@
 #include <string.h>
 #include <stdint.h>
 
+#ifdef __ARC_TLS_REGNO__
+#define TLS_REGNO __ARC_TLS_REGNO__
+#elif defined(__ARC64__)
+#define TLS_REGNO 30
+#else
+#define TLS_REGNO 26
+#endif
+
 #define _REG(n) "r" # n
 #define REG(n) _REG(n)
 
 void
 _set_tls(void *tls)
 {
-    __asm__("mov " REG(__ARC_TLS_REGNO__) ", %0" : : "r" (tls));
+    __asm__("mov " REG(TLS_REGNO) ", %0" : : "r" (tls));
 }
