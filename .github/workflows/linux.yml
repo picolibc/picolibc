@@ -332,7 +332,7 @@ jobs:
         run: |
           docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} -Dfortify-source=2
 
-  fortify-source-xtensa:
+  fortify-source-zephyr:
     needs: cache-maker
     runs-on: ubuntu-latest
     strategy:
@@ -359,7 +359,7 @@ jobs:
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
         ]
         test: [
-          "./.github/do-zephyr ./.github/do-many do-build do-xtensa-espressif_esp32s2-configure build-xtensa-espressif_esp32s2 do-build do-xtensa-espressif_esp32-configure build-xtensa-espressif_esp32 do-build do-xtensa-intel_apl_adsp-configure build-xtensa-intel_apl_adsp do-build do-xtensa-intel_bdw_adsp-configure build-xtensa-intel_bdw_adsp do-build do-xtensa-intel_byt_adsp-configure build-xtensa-intel_byt_adsp do-build do-xtensa-intel_s1000-configure build-xtensa-intel_s1000 do-build do-xtensa-nxp_imx8m_adsp-configure build-xtensa-nxp_imx8m_adsp do-build do-xtensa-nxp_imx_adsp-configure build-xtensa-nxp_imx_adsp do-build do-xtensa-sample_controller-configure build-xtensa-sample_controller end",
+          "./.github/do-zephyr ./.github/do-many do-build do-arc-configure build-arc do-build do-arc64-configure build-arc64 do-build do-xtensa-espressif_esp32s2-configure build-xtensa-espressif_esp32s2 do-build do-xtensa-espressif_esp32-configure build-xtensa-espressif_esp32 do-build do-xtensa-intel_apl_adsp-configure build-xtensa-intel_apl_adsp do-build do-xtensa-intel_bdw_adsp-configure build-xtensa-intel_bdw_adsp do-build do-xtensa-intel_byt_adsp-configure build-xtensa-intel_byt_adsp do-build do-xtensa-intel_s1000-configure build-xtensa-intel_s1000 do-build do-xtensa-nxp_imx8m_adsp-configure build-xtensa-nxp_imx8m_adsp do-build do-xtensa-nxp_imx_adsp-configure build-xtensa-nxp_imx_adsp do-build do-xtensa-sample_controller-configure build-xtensa-sample_controller end",
         ]
     steps:
       - name: Clone picolibc
@@ -635,7 +635,7 @@ jobs:
         run: |
           docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
 
-  minsize-xtensa:
+  minsize-zephyr:
     needs: cache-maker
     runs-on: ubuntu-latest
     strategy:
@@ -662,7 +662,7 @@ jobs:
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
         ]
         test: [
-          "./.github/do-zephyr ./.github/do-many do-build do-xtensa-espressif_esp32s2-configure build-xtensa-espressif_esp32s2 do-build do-xtensa-espressif_esp32-configure build-xtensa-espressif_esp32 do-build do-xtensa-intel_apl_adsp-configure build-xtensa-intel_apl_adsp do-build do-xtensa-intel_bdw_adsp-configure build-xtensa-intel_bdw_adsp do-build do-xtensa-intel_byt_adsp-configure build-xtensa-intel_byt_adsp do-build do-xtensa-intel_s1000-configure build-xtensa-intel_s1000 do-build do-xtensa-nxp_imx8m_adsp-configure build-xtensa-nxp_imx8m_adsp do-build do-xtensa-nxp_imx_adsp-configure build-xtensa-nxp_imx_adsp do-build do-xtensa-sample_controller-configure build-xtensa-sample_controller end",
+          "./.github/do-zephyr ./.github/do-many do-build do-arc-configure build-arc do-build do-arc64-configure build-arc64 do-build do-xtensa-espressif_esp32s2-configure build-xtensa-espressif_esp32s2 do-build do-xtensa-espressif_esp32-configure build-xtensa-espressif_esp32 do-build do-xtensa-intel_apl_adsp-configure build-xtensa-intel_apl_adsp do-build do-xtensa-intel_bdw_adsp-configure build-xtensa-intel_bdw_adsp do-build do-xtensa-intel_byt_adsp-configure build-xtensa-intel_byt_adsp do-build do-xtensa-intel_s1000-configure build-xtensa-intel_s1000 do-build do-xtensa-nxp_imx8m_adsp-configure build-xtensa-nxp_imx8m_adsp do-build do-xtensa-nxp_imx_adsp-configure build-xtensa-nxp_imx_adsp do-build do-xtensa-sample_controller-configure build-xtensa-sample_controller end",
         ]
     steps:
       - name: Clone picolibc
@@ -938,7 +938,7 @@ jobs:
         run: |
           docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
 
-  release-xtensa:
+  release-zephyr:
     needs: cache-maker
     runs-on: ubuntu-latest
     strategy:
@@ -965,7 +965,7 @@ jobs:
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
         ]
         test: [
-          "./.github/do-zephyr ./.github/do-many do-build do-xtensa-espressif_esp32s2-configure build-xtensa-espressif_esp32s2 do-build do-xtensa-espressif_esp32-configure build-xtensa-espressif_esp32 do-build do-xtensa-intel_apl_adsp-configure build-xtensa-intel_apl_adsp do-build do-xtensa-intel_bdw_adsp-configure build-xtensa-intel_bdw_adsp do-build do-xtensa-intel_byt_adsp-configure build-xtensa-intel_byt_adsp do-build do-xtensa-intel_s1000-configure build-xtensa-intel_s1000 do-build do-xtensa-nxp_imx8m_adsp-configure build-xtensa-nxp_imx8m_adsp do-build do-xtensa-nxp_imx_adsp-configure build-xtensa-nxp_imx_adsp do-build do-xtensa-sample_controller-configure build-xtensa-sample_controller end",
+          "./.github/do-zephyr ./.github/do-many do-build do-arc-configure build-arc do-build do-arc64-configure build-arc64 do-build do-xtensa-espressif_esp32s2-configure build-xtensa-espressif_esp32s2 do-build do-xtensa-espressif_esp32-configure build-xtensa-espressif_esp32 do-build do-xtensa-intel_apl_adsp-configure build-xtensa-intel_apl_adsp do-build do-xtensa-intel_bdw_adsp-configure build-xtensa-intel_bdw_adsp do-build do-xtensa-intel_byt_adsp-configure build-xtensa-intel_byt_adsp do-build do-xtensa-intel_s1000-configure build-xtensa-intel_s1000 do-build do-xtensa-nxp_imx8m_adsp-configure build-xtensa-nxp_imx8m_adsp do-build do-xtensa-nxp_imx_adsp-configure build-xtensa-nxp_imx_adsp do-build do-xtensa-sample_controller-configure build-xtensa-sample_controller end",
         ]
     steps:
       - name: Clone picolibc
