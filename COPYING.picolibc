@@ -2104,6 +2104,13 @@ Files: newlib/libc/tinystdio/atod_engine.c
  newlib/libc/tinystdio/atof_engine.c
  newlib/libc/tinystdio/conv_flt.c
  newlib/libc/tinystdio/scanf_private.h
+ newlib/libc/tinystdio/strtoi.h
+ newlib/libc/tinystdio/strtoimax.c
+ newlib/libc/tinystdio/strtol.c
+ newlib/libc/tinystdio/strtoll.c
+ newlib/libc/tinystdio/strtoul.c
+ newlib/libc/tinystdio/strtoull.c
+ newlib/libc/tinystdio/strtoumax.c
  newlib/libc/tinystdio/vfscanf.c
 Copyright: 2002,2004,2005 Joerg Wunsch
  2008  Dmitry Xmelkov

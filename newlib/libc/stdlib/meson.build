@@ -143,12 +143,6 @@ srcs_stdlib = [
     'srand.c',
     'srand48.c',
     'srandom.c',
-    'strtoimax.c',
-    'strtol.c',
-    'strtoll.c',
-    'strtoul.c',
-    'strtoull.c',
-    'strtoumax.c',
     'system.c',
     'utoa.c',
     'wcrtomb.c',
@@ -176,6 +170,12 @@ srcs_stdlib_stdio = [
     'mprec.c',
     'strtod.c',
     'strtodg.c',
+    'strtol.c',
+    'strtoul.c',
+    'strtoll.c',
+    'strtoull.c',
+    'strtoimax.c',
+    'strtoumax.c',
 ]
 
 lsrcs_stdlib = [
