@@ -482,31 +482,49 @@ Files: CMakeLists.txt
  newlib/libc/include/sys/CMakeLists.txt
  newlib/libc/locale/CMakeLists.txt
  newlib/libc/machine/CMakeLists.txt
+ newlib/libc/machine/aarch64/CMakeLists.txt
+ newlib/libc/machine/aarch64/machine/CMakeLists.txt
  newlib/libc/machine/aarch64/machine/math.h
  newlib/libc/machine/aarch64/machine/meson.build
+ newlib/libc/machine/aarch64/sys/CMakeLists.txt
  newlib/libc/machine/arc/CMakeLists.txt
  newlib/libc/machine/arc/meson.build
  newlib/libc/machine/arm/CMakeLists.txt
  newlib/libc/machine/arm/machine/CMakeLists.txt
  newlib/libc/machine/arm/sys/CMakeLists.txt
+ newlib/libc/machine/mips/CMakeLists.txt
+ newlib/libc/machine/mips/machine/CMakeLists.txt
  newlib/libc/machine/mips/machine/meson.build
  newlib/libc/machine/mips/meson.build
+ newlib/libc/machine/mips/sys/CMakeLists.txt
  newlib/libc/machine/mips/sys/meson.build
  newlib/libc/machine/msp430/meson.build
+ newlib/libc/machine/nios2/CMakeLists.txt
  newlib/libc/machine/nios2/meson.build
  newlib/libc/machine/riscv/CMakeLists.txt
  newlib/libc/machine/riscv/machine/CMakeLists.txt
  newlib/libc/machine/riscv/sys/CMakeLists.txt
+ newlib/libc/machine/sparc/CMakeLists.txt
+ newlib/libc/machine/sparc/machine/CMakeLists.txt
  newlib/libc/machine/sparc/machine/meson.build
  newlib/libc/machine/sparc/meson.build
+ newlib/libc/machine/sparc/sys/CMakeLists.txt
  newlib/libc/machine/sparc/sys/meson.build
  newlib/libc/machine/x86/CMakeLists.txt
+ newlib/libc/machine/x86/machine/CMakeLists.txt
  newlib/libc/machine/x86/sys/CMakeLists.txt
+ newlib/libc/machine/xtensa/CMakeLists.txt
+ newlib/libc/machine/xtensa/machine/CMakeLists.txt
+ newlib/libc/machine/xtensa/sys/CMakeLists.txt
  newlib/libc/misc/CMakeLists.txt
  newlib/libc/picolib/CMakeLists.txt
  newlib/libc/picolib/machine/CMakeLists.txt
+ newlib/libc/picolib/machine/arc/CMakeLists.txt
+ newlib/libc/picolib/machine/arc/tls.c
  newlib/libc/picolib/machine/arm/CMakeLists.txt
  newlib/libc/picolib/machine/riscv/CMakeLists.txt
+ newlib/libc/picolib/machine/xtensa/CMakeLists.txt
+ newlib/libc/picolib/machine/xtensa/tls.c
  newlib/libc/posix/CMakeLists.txt
  newlib/libc/search/CMakeLists.txt
  newlib/libc/signal/CMakeLists.txt
@@ -534,13 +552,17 @@ Files: CMakeLists.txt
  newlib/libm/fenv/fesetexcept.c
  newlib/libm/fenv/fesetmode.c
  newlib/libm/machine/CMakeLists.txt
+ newlib/libm/machine/aarch64/CMakeLists.txt
  newlib/libm/machine/arm/CMakeLists.txt
  newlib/libm/machine/arm/s_fabs.c
  newlib/libm/machine/arm/sf_fabs.c
+ newlib/libm/machine/mips/CMakeLists.txt
  newlib/libm/machine/mips/meson.build
  newlib/libm/machine/riscv/CMakeLists.txt
+ newlib/libm/machine/sparc/CMakeLists.txt
  newlib/libm/machine/sparc/meson.build
  newlib/libm/machine/x86/CMakeLists.txt
+ newlib/libm/machine/xtensa/CMakeLists.txt
  newlib/libm/math/CMakeLists.txt
  newlib/testsuite/newlib.time/meson.build
  picocrt/CMakeLists.txt
@@ -920,8 +942,10 @@ Files: newlib/empty.c
  newlib/libc/machine/x86/sys/meson.build
  newlib/libc/machine/xtensa/machine/meson.build
  newlib/libc/picolib/machine/aarch64/meson.build
+ newlib/libc/picolib/machine/arc/meson.build
  newlib/libc/picolib/machine/arm/meson.build
  newlib/libc/picolib/machine/riscv/meson.build
+ newlib/libc/picolib/machine/xtensa/meson.build
  newlib/libc/stdlib/pico-atexit.c
  newlib/libc/stdlib/pico-cxa-atexit.c
  newlib/libc/stdlib/pico-exit.c
