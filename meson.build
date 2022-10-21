@@ -992,7 +992,14 @@ int main(void) {
       break
     endif
   endforeach
+elif errno_function == 'zephyr'
+  if thread_local_storage
+    errno_function = 'false'
+  else
+    errno_function = 'z_errno_wrap'
+  endif
 endif
+
 if errno_function != 'false'
   conf_data.set('__PICOLIBC_ERRNO_FUNCTION', errno_function)
 endif
