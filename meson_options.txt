@@ -232,7 +232,7 @@ option('newlib-global-errno', type: 'boolean', value: false,
        description: 'use global errno variable')
 option('errno-function', type: 'string',
        value: 'false',
-       description: 'Use this function to compute errno address (default false, auto means autodetect)')
+       description: 'Use this function to compute errno address (default false, auto means autodetect, zephyr means use z_errno_wrap if !tls)')
 
 #
 # Math options
