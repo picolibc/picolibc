@@ -141,9 +141,9 @@ conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags, un
 #endif
     do {
 	unsigned char c = i;
-	c -= '0';
-        if (TOLOW(c) >= 'a' - '0')
+        if (TOLOW(c) > '9')
             c = TOLOW(c) + ('0' - 'a') + 10;
+	c -= '0';
         if (c >= base) {
             scanf_ungetc (i, stream, lenp);
             break;
