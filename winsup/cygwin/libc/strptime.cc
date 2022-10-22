@@ -570,6 +570,14 @@ literal:
 			LEGAL_ALT(0);
 			continue;
 
+		case 'q':	/* The quarter year. GNU extension. */
+			LEGAL_ALT(0);
+			i = 1;
+			bp = conv_num(bp, &i, 1, 4, ALT_DIGITS);
+			tm->tm_mon = (i - 1)*3;
+			ymd |= SET_MON;
+			continue;
+
 		case 'S':	/* The seconds. */
 			LEGAL_ALT(ALT_O);
 			bp = conv_num(bp, &tm->tm_sec, 0, 61, ALT_DIGITS);
@@ -655,7 +663,7 @@ literal:
 			got_eoff = 0;
 			continue;
 
-		case 'y':	/* The year within 100 years of the epoch. */
+		case 'y':	/* The year within 100 years of the century or era. */
 			/* LEGAL_ALT(ALT_E | ALT_O); */
 			ymd |= SET_YEAR;
 			if ((alt_format & ALT_E) && *era_info)
