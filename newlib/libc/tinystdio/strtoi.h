@@ -65,9 +65,8 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
         return 0;
     }
 
-#define FLAG_NEG        0x1     /* Negative */
-#define FLAG_ANY        0x2     /* Any digits converted */
-#define FLAG_OFLOW      0x4     /* Value overflow */
+#define FLAG_NEG        0x1     /* Negative. Must be 1 for ucutoff below */
+#define FLAG_OFLOW      0x2     /* Value overflow */
 
     const unsigned char *s = (const unsigned char *) nptr;
     strtoi_type val = 0;
@@ -93,10 +92,7 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
     if (i == '0') {
         if (TOLOW(*s) == 'x' && (base == 0 || base == 16)) {
             base = 16;
-            /*
-             * Move initial pointer so that empty value past
-             * 0x still recognises the '0' when storing endptr
-             */
+            /* Parsed the '0' */
             nptr = (const char *) s;
             i = s[1];
             s += 2;
@@ -110,8 +106,8 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
 #ifndef USE_OVERFLOW
     /* Compute values used to detect overflow. */
 #ifdef strtoi_signed
-    /* flags can only contain FLAG_NEG here */
-    strtoi_utype ucutoff = (flags) ? -(strtoi_utype)strtoi_min : strtoi_max;
+    /* works because strtoi_min = (strtoi_type) ((strtoi_utype) strtoi_max + 1) */
+    strtoi_utype ucutoff = (strtoi_utype) strtoi_max + flags;
     strtoi_type cutoff = ucutoff / base;
     unsigned cutlim = ucutoff % base;
 #else
@@ -126,7 +122,7 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
 #endif
 
     for(;;) {
-        if (TOLOW(i) >= 'a')
+        if (TOLOW(i) > '9')
             i = TOLOW(i) + (('0' - 'a') + 10);
 	i -= '0';
 
@@ -138,7 +134,9 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
 #ifdef USE_OVERFLOW
         /*
          * This isn't used for signed values as it's tricky and
-         * generates larger code
+         * generates larger code. Yes, it avoids doing the divmod
+         * above, but we'll assume an app doing math with signed
+         * values will probably end up doing a divide somewhere
          */
         if (__builtin_mul_overflow(val, (strtoi_type) base, &val) ||
             __builtin_add_overflow(val, (strtoi_type) i, &val))
@@ -147,10 +145,11 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
         }
 #else
         if (val > cutoff || (val == cutoff && i > cutlim))
-            flags |= 4;
+            flags |= FLAG_OFLOW;
         val = val * (strtoi_type) base + i;
 #endif
-        flags |= FLAG_ANY;
+        /* Parsed another digit */
+        nptr = (const char *) s;
         i = *s++;
     }
 
@@ -159,15 +158,16 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
 
     if (flags & FLAG_OFLOW) {
 #ifdef strtoi_signed
-        val = (strtoi_type) ((strtoi_utype) strtoi_max + (strtoi_utype) (flags & FLAG_NEG));
+        val = (strtoi_type) ucutoff;
 #else
         val = strtoi_max;
 #endif
         errno = ERANGE;
     }
 
+    /* Mark the end of the parsed region */
     if (endptr != NULL)
-        *endptr = (char *) ((flags & FLAG_ANY) ? ((const char *) s - 1) : nptr);
+        *endptr = (char *) nptr;
 
     return val;
 }
