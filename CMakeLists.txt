@@ -184,6 +184,9 @@ set(_HAVE_BUILTIN_ISNANL 1)
 # Compiler has __builtin_mul_overflow
 set(_HAVE_BUILTIN_MUL_OVERFLOW 1)
 
+# Compiler has __builtin_add_overflow
+set(_HAVE_BUILTIN_ADD_OVERFLOW 1)
+
 # Compiler flag to prevent detecting memcpy/memset patterns
 set(_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL 1)
 

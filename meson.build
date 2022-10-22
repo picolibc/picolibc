@@ -728,6 +728,15 @@ int main (void) { return overflows(aa, aa); }
 '''
 have_builtin_mul_overflow = cc.links(builtin_mul_overflow_code, name : 'has __builtin_mul_overflow', args: core_c_args)
 
+# CompCert does not have __builtin_add_overflow
+builtin_add_overflow_code = '''
+#include <stddef.h>
+int overflows (size_t a, size_t b) { size_t x; return __builtin_add_overflow(a, b, &x); }
+volatile size_t aa = 42;
+int main (void) { return overflows(aa, aa); }
+'''
+have_builtin_add_overflow = cc.links(builtin_add_overflow_code, name : 'has __builtin_add_overflow', args: core_c_args)
+
 # CompCert does not support _Complex
 complex_code = '''
 float _Complex test(float _Complex z) { return z; }
@@ -964,6 +973,7 @@ conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in t
 conf_data.set('ATOMIC_UNGETC', atomic_ungetc, description: 'Use atomics for fgetc/ungetc for re-entrancy')
 conf_data.set('_HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
 conf_data.set('_HAVE_BUILTIN_MUL_OVERFLOW', have_builtin_mul_overflow, description: 'Compiler has __builtin_mul_overflow')
+conf_data.set('_HAVE_BUILTIN_ADD_OVERFLOW', have_builtin_add_overflow, description: 'Compiler has __builtin_add_overflow')
 conf_data.set('_HAVE_COMPLEX', have_complex, description: 'Compiler supports _Complex')
 conf_data.set('_HAVE_BUILTIN_EXPECT', have_builtin_expect, description: 'Compiler has __builtin_expect')
 conf_data.set('_HAVE_ALLOC_SIZE', have_alloc_size, description: 'The compiler REALLY has the attribute __alloc_size__')

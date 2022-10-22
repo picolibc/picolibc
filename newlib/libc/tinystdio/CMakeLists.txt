@@ -96,6 +96,12 @@ picolibc_sources(
   strtof_l.c
   strtod.c
   strtod_l.c
+  strtoimax.c
+  strtol.c
+  strtoll.c
+  strtoul.c
+  strtoull.c
+  strtoumax.c
   ungetc.c
   vasprintf.c
   vfiprintf.c

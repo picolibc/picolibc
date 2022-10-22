@@ -112,6 +112,9 @@
 /* Compiler has __builtin_mul_overflow */
 #cmakedefine _HAVE_BUILTIN_MUL_OVERFLOW
 
+/* Compiler has __builtin_add_overflow */
+#cmakedefine _HAVE_BUILTIN_ADD_OVERFLOW
+
 /* Compiler flag to prevent detecting memcpy/memset patterns */
 #cmakedefine _HAVE_CC_INHIBIT_LOOP_TO_LIBCALL
 

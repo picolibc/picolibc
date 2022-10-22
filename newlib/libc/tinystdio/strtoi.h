@@ -39,97 +39,135 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include "scanf_private.h"
+#include <stdbool.h>
 
 #define CASE_CONVERT    ('a' - 'A')
 #define TOLOW(c)        ((c) | CASE_CONVERT)
 
-strtoi_type
-strtoi(const char *__restrict nptr, char **__restrict endptr, int base)
-{
-    const char *s = nptr;
-    strtoi_type val = 0;
-    strtoi_type cutoff;
-    int cutlim;
-    int i;
-    int neg = 0;
-    int any = 0;
+#if defined(_HAVE_BUILTIN_MUL_OVERFLOW) && defined(_HAVE_BUILTIN_ADD_OVERFLOW) && !defined(strtoi_signed)
+#define USE_OVERFLOW
+#endif
 
-    if ((unsigned int) base > 36 || base == 1) {
+static inline bool
+ISSPACE(unsigned char c)
+{
+    return ('\011' <= c && c <= '\015') || c == ' ';
+}
+
+strtoi_type
+strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
+{
+    /* Check for invalid base value */
+    if ((unsigned int) ibase > 36 || ibase == 1) {
         errno = EINVAL;
-        goto bail;
+        if (endptr)
+            *endptr = (char *) nptr;
+        return 0;
     }
+
+#define FLAG_NEG        0x1     /* Negative */
+#define FLAG_ANY        0x2     /* Any digits converted */
+#define FLAG_OFLOW      0x4     /* Value overflow */
+
+    const unsigned char *s = (const unsigned char *) nptr;
+    strtoi_type val = 0;
+    unsigned char flags = 0;
+    unsigned char base = (unsigned char) ibase;
+    unsigned char i;
+
+    /* Skip leading spaces */
     do {
         i = *s++;
     } while (ISSPACE(i));
 
+    /* Parse a leading sign */
     switch (i) {
     case '-':
-        neg = 1;
+        flags = FLAG_NEG;
 	FALLTHROUGH;
     case '+':
         i = *s++;
     }
 
     /* Leading '0' digit -- check for base indication */
-    if ((unsigned char)i == '0') {
-        i = *s++;
-
-        any = 1;
-        if (TOLOW(i) == 'x' && (base == 0 || base == 16)) {
+    if (i == '0') {
+        if (TOLOW(*s) == 'x' && (base == 0 || base == 16)) {
             base = 16;
-            any = 2;    /* mark special hex case */
-            i = *s++;
-	} else if (base == 0 || base == 8) {
+            /*
+             * Move initial pointer so that empty value past
+             * 0x still recognises the '0' when storing endptr
+             */
+            nptr = (const char *) s;
+            i = s[1];
+            s += 2;
+	} else if (base == 0) {
             base = 8;
         }
     } else if (base == 0) {
         base = 10;
     }
 
+#ifndef USE_OVERFLOW
+    /* Compute values used to detect overflow. */
 #ifdef strtoi_signed
-    strtoi_utype ucutoff = neg ? -(strtoi_utype)strtoi_min : strtoi_max;
-    cutlim = ucutoff % base;
-    cutoff = ucutoff / base;
+    /* flags can only contain FLAG_NEG here */
+    strtoi_utype ucutoff = (flags) ? -(strtoi_utype)strtoi_min : strtoi_max;
+    strtoi_type cutoff = ucutoff / base;
+    unsigned cutlim = ucutoff % base;
 #else
-    cutoff = strtoi_max / base;
-    cutlim = strtoi_max % base;
+    strtoi_type cutoff = strtoi_max / base;
+    unsigned cutlim = strtoi_max % base;
+#endif
 #endif
 
 /* This fact is used below to parse hexidecimal digit.	*/
 #if	('A' - '0') != (('a' - '0') & ~('A' ^ 'a'))
 # error
 #endif
+
     for(;;) {
-	unsigned char c = i;
-        if (TOLOW(c) >= 'a')
-            c = TOLOW(c) + ('0' - 'a') + 10;
-	c -= '0';
-        if (c >= base) {
-            /* hex case? Back up over 'x' */
-            if (any == 2)
-                s--;
+        if (TOLOW(i) >= 'a')
+            i = TOLOW(i) + (('0' - 'a') + 10);
+	i -= '0';
+
+        /* detect invalid char */
+        if (i >= base)
             break;
-	}
-        if (any < 0 || val > cutoff || (val == cutoff && c > cutlim))
-            any = -1;
-        else {
-            any = 1;
-            val = val * base + c;
+
+        /* Add the new digit, checking for overflow */
+#ifdef USE_OVERFLOW
+        /*
+         * This isn't used for signed values as it's tricky and
+         * generates larger code
+         */
+        if (__builtin_mul_overflow(val, (strtoi_type) base, &val) ||
+            __builtin_add_overflow(val, (strtoi_type) i, &val))
+        {
+            flags |= FLAG_OFLOW;
         }
+#else
+        if (val > cutoff || (val == cutoff && i > cutlim))
+            flags |= 4;
+        val = val * (strtoi_type) base + i;
+#endif
+        flags |= FLAG_ANY;
         i = *s++;
     }
-    if (any < 0) {
+
+    if (flags & FLAG_NEG)
+        val = -val;
+
+    if (flags & FLAG_OFLOW) {
 #ifdef strtoi_signed
-        val = neg ? strtoi_min : strtoi_max;
+        val = (strtoi_type) ((strtoi_utype) strtoi_max + (strtoi_utype) (flags & FLAG_NEG));
 #else
         val = strtoi_max;
 #endif
         errno = ERANGE;
-    } else if (neg)
-        val = -val;
-bail:
+    }
+
     if (endptr != NULL)
-        *endptr = (char *) (any ? (s - 1) : nptr);
+        *endptr = (char *) ((flags & FLAG_ANY) ? ((const char *) s - 1) : nptr);
+
     return val;
 }
