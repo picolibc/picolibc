@@ -215,6 +215,8 @@ handle (int fd, bool writing)
 static bool
 is_console_app (WCHAR *filename)
 {
+  if (filename == NULL)
+    return true; /* The command executed is command.com or cmd.exe. */
   HANDLE h;
   const int id_offset = 92;
   h = CreateFileW (filename, GENERIC_READ, FILE_SHARE_READ,
