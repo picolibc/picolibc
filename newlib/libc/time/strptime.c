@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1999 Kungliga Tekniska Högskolan
+ * Copyright (c) 1999 Kungliga Tekniska HÃ¶gskolan
  * (Royal Institute of Technology, Stockholm, Sweden). 
  * All rights reserved. 
  *
@@ -297,6 +297,14 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 			timeptr->tm_hour = 12;
 		} else
 		    timeptr->tm_hour += 12;
+		break;
+	    case 'q' :		/* quarter year - GNU extension */
+		ret = strtol_l (buf, &s, 10, locale);
+		if (s == buf)
+		    return NULL;
+		timeptr->tm_mon = (ret - 1)*3;
+		buf = s;
+		ymd |= SET_MON;
 		break;
 	    case 'r' :		/* %I:%M:%S %p */
 		s = strptime_l (buf, _ctloc (ampm_fmt), timeptr, locale);
