@@ -91,8 +91,35 @@ int test_strtol(void)
 		TEST(ul, strtoul(s="-2147483649", &c, 0), -2147483649UL, "rejected negative %lu != %lu");
 		TEST2(i, c-s, 11, "wrong final position %d != %d");
 		TEST2(i, errno, 0, "spurious errno %d != %d");
-//	} else {
-//		TEST(i, 0, 1, "64bit tests not implemented");
+	} else {
+		errno = 0;
+		TEST(l, strtol(s="9223372036854775808", &c, 0), 9223372036854775807L, "uncaught overflow %ld != %ld");
+		TEST2(i, c-s, 19, "wrong final position %d != %d");
+		TEST2(i, errno, ERANGE, "missing errno %d != %d");
+		errno = 0;
+		TEST(l, strtol(s="-9223372036854775809", &c, 0), -9223372036854775807L-1, "uncaught overflow %ld != %ld");
+		TEST2(i, c-s, 20, "wrong final position %d != %d");
+		TEST2(i, errno, ERANGE, "missing errno %d != %d");
+		errno = 0;
+		TEST(ul, strtoul(s="18446744073709551616", &c, 0), 18446744073709551615UL, "uncaught overflow %lu != %lu");
+		TEST2(i, c-s, 20, "wrong final position %d != %d");
+		TEST2(i, errno, ERANGE, "missing errno %d != %d");
+		errno = 0;
+		TEST(ul, strtoul(s="-1", &c, 0), -1UL, "rejected negative %lu != %lu");
+		TEST2(i, c-s, 2, "wrong final position %d != %d");
+		TEST2(i, errno, 0, "spurious errno %d != %d");
+		errno = 0;
+		TEST(ul, strtoul(s="-2", &c, 0), -2UL, "rejected negative %lu != %lu");
+		TEST2(i, c-s, 2, "wrong final position %d != %d");
+		TEST2(i, errno, 0, "spurious errno %d != %d");
+		errno = 0;
+		TEST(ul, strtoul(s="-9223372036854775808", &c, 0), -9223372036854775808UL, "rejected negative %lu != %lu");
+		TEST2(i, c-s, 20, "wrong final position %d != %d");
+		TEST2(i, errno, 0, "spurious errno %d != %d");
+		errno = 0;
+		TEST(ul, strtoul(s="-9223372036854775809", &c, 0), -9223372036854775809UL, "rejected negative %lu != %lu");
+		TEST2(i, c-s, 20, "wrong final position %d != %d");
+		TEST2(i, errno, 0, "spurious errno %d != %d");
 	}
 
 	TEST(l, strtol("z", 0, 36), 35, "%ld != %ld");
@@ -104,6 +131,9 @@ int test_strtol(void)
 
 	TEST(l, strtol(s="0x1234", &c, 16), 0x1234, "%ld != %ld");
 	TEST2(i, c-s, 6, "wrong final position %ld != %ld");
+
+	TEST(l, strtol(s="1234:", &c, 16), 0x1234, "%ld != %ld");
+	TEST2(i, c-s, 4, "wrong final position %ld != %ld");
 
 	errno = 0;
 	c = NULL;
