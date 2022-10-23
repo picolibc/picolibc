@@ -116,15 +116,11 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
 #endif
 #endif
 
-/* This fact is used below to parse hexidecimal digit.	*/
-#if	('A' - '0') != (('a' - '0') & ~('A' ^ 'a'))
-# error
-#endif
-
     for(;;) {
-        if (TOLOW(i) > '9')
-            i = TOLOW(i) + (('0' - 'a') + 10);
-	i -= '0';
+        /* Map digits to 0..35, non-digits above 35. */
+        if (i > '9')
+            i = TOLOW(i-1) + ('0' - 'a' + 11);
+        i -= '0';
 
         /* detect invalid char */
         if (i >= base)

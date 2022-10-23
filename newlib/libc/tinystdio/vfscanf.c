@@ -135,15 +135,14 @@ conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags, un
     } else if (base == 0)
         base = 10;
 
-/* This fact is used below to parse hexidecimal digit.	*/
-#if	('A' - '0') != (('a' - '0') & ~('A' ^ 'a'))
-# error
-#endif
     do {
 	unsigned char c = i;
-        if (TOLOW(c) > '9')
-            c = TOLOW(c) + ('0' - 'a') + 10;
+
+        /* Map digits to 0..35, non-digits above 35. */
+        if (c > '9')
+            c = TOLOW(c-1) + ('0' - 'a' + 11);
 	c -= '0';
+
         if (c >= base) {
             scanf_ungetc (i, stream, lenp);
             break;
