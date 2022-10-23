@@ -132,8 +132,30 @@ int test_strtol(void)
 	TEST(l, strtol(s="0x1234", &c, 16), 0x1234, "%ld != %ld");
 	TEST2(i, c-s, 6, "wrong final position %ld != %ld");
 
-	TEST(l, strtol(s="1234:", &c, 16), 0x1234, "%ld != %ld");
-	TEST2(i, c-s, 4, "wrong final position %ld != %ld");
+        char delim_buf[6] = "09af:";
+
+        for (int j = 0; j < 256; j++) {
+            delim_buf[4] = j;
+            if (('0' <= j && j <= '9') ||
+                ('A' <= j && j <= 'F') ||
+                ('a' <= j && j <= 'f'))
+            {
+                int k;
+                if ('0' <= j && j <= '9')
+                    k = j - '0';
+                else if ('A' <= j && j <= 'Z')
+                    k = j - 'A' + 10;
+                else if ('a' <= j && j <= 'z')
+                    k = j - 'a' + 10;
+                else
+                    k = 0xffffffff;
+                TEST(l, strtol(s=delim_buf, &c, 16), 0x09af0 | k, "%ld != %ld");
+                TEST2(i, c-s, 5, "wrong final position %ld != %ld");
+            } else {
+                TEST(l, strtol(s=delim_buf, &c, 16), 0x09af, "%ld != %ld");
+                TEST2(i, c-s, 4, "wrong final position %ld != %ld");
+            }
+        }
 
 	errno = 0;
 	c = NULL;
