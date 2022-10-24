@@ -42,30 +42,34 @@ FUNC_START(setjmp)
 	   store instruction uses an offset of 4.  */
 	addi	3,3,164
 #elif __powerpc64__
-	/* In the first store, add 16 to r3 so that the subsequent floating
+	/* In the first store, add 8 to r3 so that the subsequent floating
 	   point stores are aligned on an 8 byte boundary and the Altivec
 	   stores are aligned on a 16 byte boundary.  */
-	stdu	1,16(3)		# offset 16
-	stdu	2,8(3)		# offset 24
-	stdu	13,8(3)		# offset 32
-	stdu	14,8(3)		# offset 40
-	stdu	15,8(3)		# offset 48
-	stdu	16,8(3)		# offset 56
-	stdu	17,8(3)		# offset 64
-	stdu	18,8(3)		# offset 72
-	stdu	19,8(3)		# offset 80
-	stdu	20,8(3)		# offset 88
-	stdu	21,8(3)		# offset 96
-	stdu	22,8(3)		# offset 104
-	stdu	23,8(3)		# offset 112
-	stdu	24,8(3)		# offset 120
-	stdu	25,8(3)		# offset 128
-	stdu	26,8(3)		# offset 136
-	stdu	27,8(3)		# offset 144
-	stdu	28,8(3)		# offset 152
-	stdu	29,8(3)		# offset 160
-	stdu	30,8(3)		# offset 168
-	stdu	31,8(3)		# offset 176
+	stdu	1,8(3)		# offset 8
+	stdu	2,8(3)		# offset 16
+	stdu	13,8(3)		# offset 24
+	stdu	14,8(3)		# offset 32
+	stdu	15,8(3)		# offset 40
+	stdu	16,8(3)		# offset 48
+	stdu	17,8(3)		# offset 56
+	stdu	18,8(3)		# offset 64
+	stdu	19,8(3)		# offset 72
+	stdu	20,8(3)		# offset 80
+	stdu	21,8(3)		# offset 88
+	stdu	22,8(3)		# offset 96
+	stdu	23,8(3)		# offset 104
+	stdu	24,8(3)		# offset 112
+	stdu	25,8(3)		# offset 120
+	stdu	26,8(3)		# offset 128
+	stdu	27,8(3)		# offset 136
+	stdu	28,8(3)		# offset 144
+	stdu	29,8(3)		# offset 152
+	stdu	30,8(3)		# offset 160
+	stdu	31,8(3)		# offset 168
+	mflr	4
+	stdu	4,8(3)		# offset 176
+	mfcr	4
+	stwu	4,8(3)		# offset 184
 #else
 	stw	1,0(3)		# offset 0
 	stwu	2,4(3)		# offset 4
@@ -90,20 +94,16 @@ FUNC_START(setjmp)
 	stwu	31,4(3)		# offset 80
 #endif
 
+#if !__powerpc64__
 	/* If __SPE__, then add 84 to the offset shown from this point on until
 	   the end of this function.  This difference comes from the fact that
-	   we save 21 64-bit registers instead of 21 32-bit registers above.
-
-	   If __powerpc64__, then add 96 to the offset shown from this point on until
-	   the end of this function.  This difference comes from the fact that
-	   we save 21 64-bit registers instead of 21 32-bit registers above and
-	   we take alignement requirements of floating point and Altivec stores
-	   into account.  */
+	   we save 21 64-bit registers instead of 21 32-bit registers above.  */
 	mflr	4
 	stwu	4,4(3)		# offset 84
 	mfcr	4
 	stwu	4,4(3)		# offset 88
 				# one word pad to get floating point aligned on 8 byte boundary
+#endif
 
 	/* Check whether we need to save FPRs.  Checking __NO_FPRS__
 	   on its own would be enough for GCC 4.1 and above, but older
@@ -117,6 +117,13 @@ FUNC_START(setjmp)
 	andi.	5,5,0x2000
 	beq	1f
 #endif
+
+	/* If __powerpc64__, then add 96 to the offset shown from this point on until
+	   the end of this function.  This difference comes from the fact that
+	   we save 23 64-bit registers instead of 23 32-bit registers above and
+	   we take alignement requirements of floating point and Altivec stores
+	   into account.  */
+
 	stfdu	14,8(3)		# offset 96
 	stfdu	15,8(3)		# offset 104
 	stfdu	16,8(3)		# offset 112
@@ -220,30 +227,34 @@ FUNC_START(longjmp)
 	   load instruction uses an offset of 4.  */
 	addi	3,3,164
 #elif __powerpc64__
-	/* In the first load, add 16 to r3 so that the subsequent floating
+	/* In the first load, add 8 to r3 so that the subsequent floating
 	   point loades are aligned on an 8 byte boundary and the Altivec
 	   loads are aligned on a 16 byte boundary.  */
-	ldu	1,16(3)		# offset 16
-	ldu	2,8(3)		# offset 24
-	ldu	13,8(3)		# offset 32
-	ldu	14,8(3)		# offset 40
-	ldu	15,8(3)		# offset 48
-	ldu	16,8(3)		# offset 56
-	ldu	17,8(3)		# offset 64
-	ldu	18,8(3)		# offset 72
-	ldu	19,8(3)		# offset 80
-	ldu	20,8(3)		# offset 88
-	ldu	21,8(3)		# offset 96
-	ldu	22,8(3)		# offset 104
-	ldu	23,8(3)		# offset 112
-	ldu	24,8(3)		# offset 120
-	ldu	25,8(3)		# offset 128
-	ldu	26,8(3)		# offset 136
-	ldu	27,8(3)		# offset 144
-	ldu	28,8(3)		# offset 152
-	ldu	29,8(3)		# offset 160
-	ldu	30,8(3)		# offset 168
-	ldu	31,8(3)		# offset 176
+	ldu	1,8(3)		# offset 8
+	ldu	2,8(3)		# offset 16
+	ldu	13,8(3)		# offset 24
+	ldu	14,8(3)		# offset 32
+	ldu	15,8(3)		# offset 40
+	ldu	16,8(3)		# offset 48
+	ldu	17,8(3)		# offset 56
+	ldu	18,8(3)		# offset 64
+	ldu	19,8(3)		# offset 72
+	ldu	20,8(3)		# offset 80
+	ldu	21,8(3)		# offset 88
+	ldu	22,8(3)		# offset 96
+	ldu	23,8(3)		# offset 104
+	ldu	24,8(3)		# offset 112
+	ldu	25,8(3)		# offset 120
+	ldu	26,8(3)		# offset 128
+	ldu	27,8(3)		# offset 136
+	ldu	28,8(3)		# offset 144
+	ldu	29,8(3)		# offset 152
+	ldu	30,8(3)		# offset 160
+	ldu	31,8(3)		# offset 168
+	ldu	5,8(3)		# offset 176
+	mtlr	5
+	lwzu	5,8(3)		# offset 184
+	mtcrf	255,5
 #else
 	lwz	1,0(3)		# offset 0 
 	lwzu	2,4(3)		# offset 4 
@@ -269,18 +280,15 @@ FUNC_START(longjmp)
 #endif
 	/* If __SPE__, then add 84 to the offset shown from this point on until
 	   the end of this function.  This difference comes from the fact that
-	   we restore 21 64-bit registers instead of 21 32-bit registers above.
+	   we restore 22 64-bit registers instead of 22 32-bit registers above.  */
 
-	   If __powerpc64__, then add 96 to the offset shown from this point on until
-	   the end of this function.  This difference comes from the fact that
-	   we restore 21 64-bit registers instead of 21 32-bit registers above and
-	   we take alignement requirements of floating point and Altivec loads
-	   into account.  */
+#if !__powerpc64__
 	lwzu	5,4(3)		# offset 84
 	mtlr	5
 	lwzu	5,4(3)		# offset 88
 	mtcrf	255,5
 				# one word pad to get floating point aligned on 8 byte boundary
+#endif
 
 	/* Check whether we need to restore FPRs.  Checking
 	   __NO_FPRS__ on its own would be enough for GCC 4.1 and
@@ -292,6 +300,13 @@ FUNC_START(longjmp)
 	andi.	5,5,0x2000
 	beq	1f
 #endif
+
+	/* If __powerpc64__, then add 96 to the offset shown from this point on until
+	   the end of this function.  This difference comes from the fact that
+	   we restore 23 64-bit registers instead of 23 32-bit registers above and
+	   we take alignement requirements of floating point and Altivec loads
+	   into account.  */
+
 	lfdu	14,8(3)         # offset 96 
 	lfdu	15,8(3)         # offset 104
 	lfdu	16,8(3)         # offset 112
