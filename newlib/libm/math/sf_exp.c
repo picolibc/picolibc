@@ -52,7 +52,7 @@ expf(float x) /* default IEEE double exp */
     if (FLT_UWORD_IS_NAN(hx))
         return x + x; /* NaN */
     if (FLT_UWORD_IS_INFINITE(hx))
-        return (xsb == 0) ? x : 0.0; /* exp(+-inf)={inf,0} */
+        return (xsb == 0) ? x : (float)0.0; /* exp(+-inf)={inf,0} */
     if (sx > FLT_UWORD_LOG_MAX)
         return __math_oflowf(0); /* overflow */
     if (sx < 0 && hx > FLT_UWORD_LOG_MIN)

@@ -59,7 +59,7 @@ Q5  =  -2.0109921195e-07; /* 0xb457edbb */
 	    if(FLT_UWORD_IS_NAN(hx))
 	        return x+x;
 	    if(FLT_UWORD_IS_INFINITE(hx))
-		return (xsb==0)? x:-1.0;/* exp(+-inf)={inf,-1} */
+		return (xsb==0)? x:(float)-1.0;/* exp(+-inf)={inf,-1} */
 	    if(xsb == 0 && hx > FLT_UWORD_LOG_MAX) /* if x>=o_threshold */
 		return __math_oflowf (0); /* overflow */
 	    if(xsb!=0) { /* x < -27*ln2, return -1.0 with inexact */
