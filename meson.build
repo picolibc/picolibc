@@ -706,8 +706,19 @@ picolibcpp_ld = configure_file(input: 'picolibc.ld.in',
 			     install_dir: lib_dir)
 
 # Not all compilers necessarily support all warnings; only use these which are:
-c_warnings = ['-Werror=implicit-function-declaration', '-Werror=vla', '-Warray-bounds', '-Wold-style-definition']
-disabled_warnings = ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-Wno-unused-command-line-argument']
+c_warnings = [
+  '-Werror=implicit-function-declaration',
+  '-Werror=vla',
+  '-Warray-bounds',
+  '-Wold-style-definition',
+  '-Werror=double-promotion',
+]
+disabled_warnings = [
+  '-Wno-missing-braces',
+  '-Wno-implicit-int',
+  '-Wno-return-type',
+  '-Wno-unused-command-line-argument',
+]
 c_flags = cc.get_supported_arguments(c_warnings, disabled_warnings)
 c_args += c_flags
 native_c_args += c_flags
