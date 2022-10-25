@@ -16,7 +16,7 @@
 {
   if (isnanf(x) || isnanf(y)) return(x+y);
 
-  float z = x > y ? x - y : (float)0.0;
+  float z = x > y ? x - y : 0.0f;
   if (!isinf(x) && !isinf(y))
     z = check_oflowf(z);
   return z;
