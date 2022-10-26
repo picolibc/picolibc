@@ -7,24 +7,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-/* We use fixed addresses outside the low 32 bit arena, which is exclusively
-   used by the OS now:
-     - The executable starts at 0x1:00400000L
-     - The Cygwin DLL starts at 0x1:80040000L
-     - Rebased DLLs are located from 0x2:00000000L up to 0x4:00000000L
-     - auto-image-based DLLs are located from 0x4:00000000L up to 0x6:00000000L
-     - Thread stacks are located from 0x6:00000000L up to 0x8:00000000L.
-     - So the heap starts at 0x8:00000000L. */
-
-  /* TODO: Make Cygwin work with ASLR.
-     - The executable starts at 0x1:00400000L
-     - Rebased non-ASLRed DLLs from 0x2:00000000L up to 0x4:00000000L
-     - auto-image-based non-ASLRed DLLs from 0x4:00000000L up to 0x6:00000000L
-     - Thread stacks are located from 0x6:00000000L up to 0x8:00000000L.
-     - cygheap from 0x8:00000000L up to 0xa:00000000L.
-     - So the heap starts at 0xa:00000000L. */
-
-/* This is where the Cygwin executables are loaded to. */
+/* This is where Cygwin executables are loaded to, unless dynamicbase is
+   enabled in the PE/COFF header of the executable file. */
 #define EXECUTABLE_ADDRESS		0x100400000UL
 
 /* Fixed address set by the linker. The Cygwin DLL will have this address set
@@ -64,7 +48,7 @@ details. */
 
 /* This is where the user heap starts.  There's no defined end address.
    The user heap pontentially grows into the mmap arena.  However,
-   the user heap grows upwar4ds and the mmap arena grows downwards,
+   the user heap grows upwards and the mmap arena grows downwards,
    so there's not much chance to meet unluckily. */
 #define USERHEAP_START			0xa00000000UL
 
