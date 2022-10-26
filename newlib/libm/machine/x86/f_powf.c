@@ -29,7 +29,7 @@ set errno as normal.
 float _f_powf (float x, float y)
 {
   /* following sequence handles the majority of cases for pow() */
-  if (x > 0.0 && check_finitef(y))
+  if (x > 0.0f && check_finitef(y))
     {
       float result;
       /* calculate x ** y as 2 ** (y log2(x)).  On Intel, can only
