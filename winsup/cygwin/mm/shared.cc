@@ -19,6 +19,7 @@ details. */
 #include "shared_info_magic.h"
 #include "registry.h"
 #include "cygwin_version.h"
+#include "memory_layout.h"
 #include "spinlock.h"
 #include <alloca.h>
 #include <wchar.h>
@@ -112,28 +113,15 @@ shared_name (WCHAR *ret_buf, const WCHAR *str, int num)
 #define page_const ((ptrdiff_t) 65535)
 #define pround(n) ((ptrdiff_t)(((n) + page_const) & ~page_const))
 
-/* The order in offsets is so that the constant blocks shared_info
-   and user_info are right below the cygwin DLL, then the pinfo block
-   which changes with each process.  Below that is the console_state,
-   an optional block which only exists when running in a Windows console
-   window.  Therefore, if we are not running in a console, we have 64K
-   more of contiguous memory below the Cygwin DLL. */
-static ptrdiff_t offsets[] =
+/* FIXME: With ASLR, maybe we should ASLR the shared regions, too? */
+static uintptr_t region_address[] =
 {
-  - pround (sizeof (shared_info)),		/* SH_CYGWIN_SHARED */
-  - pround (sizeof (shared_info))		/* SH_USER_SHARED */
-  - pround (sizeof (user_info)),
-  - pround (sizeof (shared_info))		/* SH_MYSELF */
-  - pround (sizeof (user_info))
-  - pround (sizeof (_pinfo)),
-  - pround (sizeof (shared_info))		/* SH_SHARED_CONSOLE */
-  - pround (sizeof (user_info))
-  - pround (sizeof (_pinfo))
-  - pround (sizeof (fhandler_console::console_state)),
+  CYGWIN_REGION_ADDRESS,		/* SH_CYGWIN_SHARED */
+  USER_REGION_ADDRESS,			/* SH_USER_SHARED */
+  PINFO_REGION_ADDRESS,			/* SH_MYSELF */
+  SHARED_CONSOLE_REGION_ADDRESS,	/* SH_SHARED_CONSOLE */
   0
 };
-
-#define off_addr(x)	((void *)((caddr_t) cygwin_hmodule + offsets[x]))
 
 void *
 open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
@@ -152,10 +140,7 @@ open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
   if (*m == SH_JUSTCREATE || *m == SH_JUSTOPEN)
     addr = NULL;
   else
-    {
-      addr = off_addr (*m);
-      VirtualFree (addr, 0, MEM_RELEASE);
-    }
+    addr = (void *) region_address[*m];
 
   WCHAR map_buf[MAX_PATH];
   WCHAR *mapname = NULL;
@@ -185,32 +170,8 @@ open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
 
   shared = (shared_info *) MapViewOfFileEx (shared_h, access, 0, 0, 0, addr);
 
-  if (!shared && addr)
-    {
-      shared = (shared_info *) MapViewOfFileEx (shared_h,
-				       FILE_MAP_READ|FILE_MAP_WRITE,
-				       0, 0, 0, NULL);
-#ifdef DEBUGGING
-      system_printf ("relocating shared object %W(%d) from %p to %p", name, n, addr, shared);
-#endif
-      offsets[0] = 0;
-    }
-
   if (!shared)
     api_fatal ("MapViewOfFileEx '%W'(%p), %E.  Terminating.", mapname, shared_h);
-
-  if (*m == SH_CYGWIN_SHARED && offsets[0])
-    {
-      /* Reserve subsequent shared memory areas in non-relocated case only.
-	 There's no good reason to reserve the console shmem, because it's
-	 not yet known if we will allocate it at all. */
-      for (int i = SH_USER_SHARED; i < SH_SHARED_CONSOLE; i++)
-	{
-	  DWORD size = offsets[i - 1] - offsets[i];
-	  if (!VirtualAlloc (off_addr (i), size, MEM_RESERVE, PAGE_NOACCESS))
-	    continue;  /* oh well */
-	}
-    }
 
   debug_printf ("name %W, n %d, shared %p (wanted %p), h %p, *m %d",
 		mapname, n, shared, addr, shared_h, *m);

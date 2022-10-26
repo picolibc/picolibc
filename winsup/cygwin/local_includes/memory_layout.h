@@ -32,6 +32,16 @@ details. */
    dynamicbase is accidentally not set in the PE/COFF header of the DLL. */
 #define CYGWIN_DLL_ADDRESS		0x180040000UL
 
+/* New with ASLR: We need a fixed place for the global shared memory areas.
+   Prior to ASLR, the addresses were relative to the address the Cygwin DLL
+   was loaded to. */
+#define SHARED_REGIONS_ADDRESS_LOW	0x1f0000000UL
+#define CYGWIN_REGION_ADDRESS		0x1f0000000UL
+#define USER_REGION_ADDRESS		0x1f2000000UL
+#define PINFO_REGION_ADDRESS		0x1f4000000UL
+#define SHARED_CONSOLE_REGION_ADDRESS	0x1f6000000UL
+#define SHARED_REGIONS_ADDRESS_HIGH	0x200000000UL
+
 /* Rebased DLLs are located in this 16 Gigs arena.  Will be kept for
    backward compatibility. */
 #define REBASED_DLL_STORAGE_LOW		0x200000000UL
