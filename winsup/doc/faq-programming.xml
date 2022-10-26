@@ -1051,7 +1051,7 @@ a Windows environment which Cygwin handles automatically.
 <question><para>How should I port my Unix GUI to Windows?</para></question>
 <answer>
 
-<para>Like other Unix-like platforms, the Cygwin distribtion includes many of
+<para>Like other Unix-like platforms, the Cygwin distribution includes many of
 the common GUI toolkits, including X11, X Athena widgets, Motif, Tk, GTK+,
 and Qt. Many programs which rely on these toolkits will work with little, if
 any, porting work if they are otherwise portable.  However, there are a few
