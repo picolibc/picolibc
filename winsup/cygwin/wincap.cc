@@ -11,6 +11,7 @@ details. */
 #include "miscfuncs.h"
 #include "security.h"
 #include "ntdll.h"
+#include "memory_layout.h"
 
 /* CV, 2008-10-23: All wincapc's have to be in the .cygwin_dll_common section,
    same as wincap itself.  Otherwise the capability changes made in
@@ -20,7 +21,7 @@ details. */
 
 wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:2,
-  mmap_storage_high:0x070000000000LL,
+  mmap_storage_high:__MMAP_STORAGE_HIGH_LEGACY,
   {
     is_server:false,
     needs_query_information:true,
@@ -51,7 +52,7 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
 
 wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:3,
-  mmap_storage_high:0x070000000000LL,
+  mmap_storage_high:__MMAP_STORAGE_HIGH_LEGACY,
   {
     is_server:false,
     needs_query_information:true,
@@ -82,7 +83,7 @@ wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
 
 wincaps wincap_8_1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:3,
-  mmap_storage_high:0x700000000000LL,
+  mmap_storage_high:__MMAP_STORAGE_HIGH,
   {
     is_server:false,
     needs_query_information:false,
@@ -113,7 +114,7 @@ wincaps wincap_8_1 __attribute__((section (".cygwin_dll_common"), shared)) = {
 
 wincaps  wincap_10_1507 __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:3,
-  mmap_storage_high:0x700000000000LL,
+  mmap_storage_high:__MMAP_STORAGE_HIGH,
   {
     is_server:false,
     needs_query_information:false,
@@ -144,7 +145,7 @@ wincaps  wincap_10_1507 __attribute__((section (".cygwin_dll_common"), shared)) 
 
 wincaps  wincap_10_1607 __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:3,
-  mmap_storage_high:0x700000000000LL,
+  mmap_storage_high:__MMAP_STORAGE_HIGH,
   {
     is_server:false,
     needs_query_information:false,
@@ -175,7 +176,7 @@ wincaps  wincap_10_1607 __attribute__((section (".cygwin_dll_common"), shared)) 
 
 wincaps wincap_10_1703 __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:3,
-  mmap_storage_high:0x700000000000LL,
+  mmap_storage_high:__MMAP_STORAGE_HIGH,
   {
     is_server:false,
     needs_query_information:false,
@@ -206,7 +207,7 @@ wincaps wincap_10_1703 __attribute__((section (".cygwin_dll_common"), shared)) =
 
 wincaps wincap_10_1709 __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:3,
-  mmap_storage_high:0x700000000000LL,
+  mmap_storage_high:__MMAP_STORAGE_HIGH,
   {
     is_server:false,
     needs_query_information:false,
@@ -237,7 +238,7 @@ wincaps wincap_10_1709 __attribute__((section (".cygwin_dll_common"), shared)) =
 
 wincaps wincap_10_1803 __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:3,
-  mmap_storage_high:0x700000000000LL,
+  mmap_storage_high:__MMAP_STORAGE_HIGH,
   {
     is_server:false,
     needs_query_information:false,
@@ -268,7 +269,7 @@ wincaps wincap_10_1803 __attribute__((section (".cygwin_dll_common"), shared)) =
 
 wincaps wincap_10_1809 __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:3,
-  mmap_storage_high:0x700000000000LL,
+  mmap_storage_high:__MMAP_STORAGE_HIGH,
   {
     is_server:false,
     needs_query_information:false,
@@ -299,7 +300,7 @@ wincaps wincap_10_1809 __attribute__((section (".cygwin_dll_common"), shared)) =
 
 wincaps wincap_10_1903 __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:3,
-  mmap_storage_high:0x700000000000LL,
+  mmap_storage_high:__MMAP_STORAGE_HIGH,
   {
     is_server:false,
     needs_query_information:false,
@@ -330,7 +331,7 @@ wincaps wincap_10_1903 __attribute__((section (".cygwin_dll_common"), shared)) =
 
 wincaps wincap_10_2004 __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:3,
-  mmap_storage_high:0x700000000000LL,
+  mmap_storage_high:__MMAP_STORAGE_HIGH,
   {
     is_server:false,
     needs_query_information:false,
@@ -361,7 +362,7 @@ wincaps wincap_10_2004 __attribute__((section (".cygwin_dll_common"), shared)) =
 
 wincaps wincap_11 __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:3,
-  mmap_storage_high:0x700000000000LL,
+  mmap_storage_high:__MMAP_STORAGE_HIGH,
   {
     is_server:false,
     needs_query_information:false,
