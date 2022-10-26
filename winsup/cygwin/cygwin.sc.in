@@ -111,6 +111,11 @@ SECTIONS
     SORT(*)(.idata$7)
     . = ALIGN(16);
   }
+  .rsrc BLOCK(__section_alignment__) :
+  {
+    *(.rsrc)
+    *(SORT(.rsrc$*))
+  }
   .gnu_debuglink_overlay ALIGN(__section_alignment__) (NOLOAD):
   {
     BYTE(0)	/* c */
@@ -126,22 +131,6 @@ SECTIONS
     BYTE(0)	/* g */
     BYTE(0)	/* \0 */
     LONG(0)	/* checksum */
-  }
-  .rsrc BLOCK(__section_alignment__) :
-  {
-    *(.rsrc)
-    *(SORT(.rsrc$*))
-    _SYM (_cygheap_start) = .;
-  }
-  .cygheap ALIGN(__section_alignment__) :
-  {
-#ifdef __x86_64__
-    . = . + (3072 * 1024);
-#else
-    . = . + (2048 * 1024);
-#endif
-    . = ALIGN(0x10000);
-    _SYM (_cygheap_end) = .;
   }
   /DISCARD/ :
   {

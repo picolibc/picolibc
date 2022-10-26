@@ -527,9 +527,6 @@ get_cygwin_startup_info ()
     {
       if ((res->intro & OPROC_MAGIC_MASK) == OPROC_MAGIC_GENERIC)
 	multiple_cygwin_problem ("proc intro", res->intro, 0);
-      else if (res->cygheap != (void *) &_cygheap_start)
-	multiple_cygwin_problem ("cygheap base", (uintptr_t) res->cygheap,
-				 (uintptr_t) &_cygheap_start);
 
       unsigned should_be_cb = 0;
       switch (res->type)

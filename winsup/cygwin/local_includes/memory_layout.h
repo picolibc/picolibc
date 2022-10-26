@@ -46,11 +46,17 @@ details. */
 #define THREAD_STORAGE_LOW		0x600000000UL
 #define THREAD_STORAGE_HIGH		0x800000000UL
 
+/* That's where the cygheap is located. CYGHEAP_STORAGE_INITIAL defines the
+   end of the initially committed heap area. */
+#define CYGHEAP_STORAGE_LOW		0x800000000UL
+#define CYGHEAP_STORAGE_INITIAL		0x800300000UL
+#define CYGHEAP_STORAGE_HIGH		0xa00000000UL
+
 /* This is where the user heap starts.  There's no defined end address.
    The user heap pontentially grows into the mmap arena.  However,
    the user heap grows upwar4ds and the mmap arena grows downwards,
    so there's not much chance to meet unluckily. */
-#define USERHEAP_START			0x800000000UL
+#define USERHEAP_START			0xa00000000UL
 
 /* The memory region used for memory maps.
    Up to Win 8 only 44 bit address space, 48 bit starting witrh 8.1, so
