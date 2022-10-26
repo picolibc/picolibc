@@ -1,8 +1,4 @@
-/* The memory region used for memory maps */
-#define MMAP_STORAGE_LOW	0x001000000000L	/* Leave 32 Gigs for heap. */
-/* Up to Win 8 only supporting 44 bit address space, starting with Win 8.1
-   48 bit address space. */
-#define MMAP_STORAGE_HIGH	wincap.mmap_storage_high ()
+#include "memory_layout.h"
 
 class mmap_allocator
 {

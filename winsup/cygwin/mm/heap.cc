@@ -15,6 +15,7 @@ details. */
 #include "cygheap.h"
 #include "child_info.h"
 #include "ntdll.h"
+#include "memory_layout.h"
 #include <sys/param.h>
 
 #define assert(x)
@@ -25,21 +26,6 @@ static ptrdiff_t page_const;
 #define MINHEAP_SIZE (4 * 1024 * 1024)
 /* Chunksize of subsequent heap reservations. */
 #define RAISEHEAP_SIZE (1 * 1024 * 1024)
-
-static uintptr_t
-eval_start_address ()
-{
-  /* We choose a fixed address outside the low 32 bit arena, which is
-     exclusively used by the OS now:
-     - The executable starts at 0x1:00400000L
-     - The Cygwin DLL starts at 0x1:80040000L
-     - Rebased DLLs are located from 0x2:00000000L up to 0x4:00000000L
-     - auto-image-based DLLs are located from 0x4:00000000L up to 0x6:00000000L
-     - Thread stacks are located from 0x6:00000000L up to 0x8:00000000L.
-     - So the heap starts at 0x8:00000000L. */
-  uintptr_t start_address = 0x800000000L;
-  return start_address;
-}
 
 static SIZE_T
 eval_initial_heap_size ()
@@ -77,7 +63,7 @@ user_heap_info::init ()
   page_const = wincap.page_size ();
   if (!base)
     {
-      uintptr_t start_address = eval_start_address ();
+      uintptr_t start_address = USERHEAP_START;
       PVOID largest_found = NULL;
       SIZE_T largest_found_size = 0;
       SIZE_T ret;

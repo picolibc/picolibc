@@ -107,10 +107,6 @@ pthread_wrapper (PVOID arg)
   api_fatal ("Dumb thinko in pthread handling.  Whip the developer.");
 }
 
-/* The memory region used for thread stacks. The memory layout is outlined
-   in heap.cc, function eval_start_address(). */
-#define THREAD_STORAGE_LOW	0x600000000L
-#define THREAD_STORAGE_HIGH	0x800000000L
 /* We provide the stacks always in 1 Megabyte slots */
 #define THREAD_STACK_SLOT	0x000100000L	/* 1 Meg */
 /* Maximum stack size returned from the pool. */
