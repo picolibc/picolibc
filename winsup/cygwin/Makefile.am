@@ -576,28 +576,16 @@ $(PRE_DLL_NAME): $(LDSCRIPT) libdll.a $(VERSION_OFILES) $(LIBSERVER)\
 
 # create cygwin1.dbg file
 $(DBG_DLL_NAME): $(PRE_DLL_NAME)
-	$(AM_V_GEN)$(OBJCOPY) -R .gnu_debuglink_overlay \
-			      --add-gnu-debuglink=/dev/null \
+	$(AM_V_GEN)$(OBJCOPY) --add-gnu-debuglink=/dev/null \
 			      --only-keep-debug \
 			      $(PRE_DLL_NAME) \
 			      $(DBG_DLL_NAME)
 
-# create stripped, temporary DLL, append .gnu_debuglink section, move
-# .gnu_debuglink section in place of .gnu_debuglink_overlay placeholder
-# section and store result in new-cygwin1.dll
+# create stripped release DLL, append .gnu_debuglink section
 $(NEW_DLL_NAME): $(PRE_DLL_NAME) $(DBG_DLL_NAME)
-	$(AM_V_GEN)TMP_DLL_NAME=$$( mktemp --suffix=.dll ) && \
-	$(OBJCOPY) -g \
-		   --keep-section=.gnu_debuglink_overlay \
-		   --add-gnu-debuglink=$(DBG_DLL_NAME) \
-		   $(PRE_DLL_NAME) $${TMP_DLL_NAME} && \
-	vma=$$( objdump --headers $${TMP_DLL_NAME} | \
-	       awk '/.gnu_debuglink_overlay/{print $$4;}' ) && \
-	$(OBJCOPY) -R .gnu_debuglink_overlay \
-		   --change-section-address .gnu_debuglink=0x$${vma} \
-		   --set-section-flag .gnu_debuglink=contents,readonly,debug,noload \
-		   $${TMP_DLL_NAME} $(NEW_DLL_NAME) && \
-	rm $${TMP_DLL_NAME}
+	$(AM_V_GEN)$(OBJCOPY) -g \
+			      --add-gnu-debuglink=$(DBG_DLL_NAME) \
+			      $(PRE_DLL_NAME) $(NEW_DLL_NAME)
 
 # cygwin import library
 toolopts=--cpu=@target_cpu@ --ar=@AR@ --as=@AS@ --nm=@NM@ --objcopy=@OBJCOPY@
