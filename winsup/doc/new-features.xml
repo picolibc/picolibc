@@ -13,6 +13,10 @@ Drop support for Vista and Server 2008.
 </para></listitem>
 
 <listitem><para>
+Drop support for 32 bit Windows and WOW64.
+</para></listitem>
+
+<listitem><para>
 Add code to handle setrlimit(RLIMIT_AS).
 </para></listitem>
 

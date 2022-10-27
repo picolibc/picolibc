@@ -3,6 +3,8 @@ What's new:
 
 - Drop support for Vista and Server 2008.
 
+- Drop support for 32 bit Windows and WOW64.
+
 - Add code to handle setrlimit(RLIMIT_AS).
 
 - Add code to handle signal masks in /proc/<PID>/status.
