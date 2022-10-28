@@ -324,6 +324,34 @@ stack_info::walk ()
   return 1;
 }
 
+/*
+  Walk the list of modules in the current process to find the one containing
+   'func_va'.
+
+   This implementation requires no allocation of memory and minimal system
+   calls, so it should be safe in the context of an exception handler.
+*/
+static char *
+prettyprint_va (PVOID func_va)
+{
+  static char buf[256];
+  buf[0] = '\0';
+
+  PLIST_ENTRY head = &NtCurrentTeb()->Peb->Ldr->InMemoryOrderModuleList;
+  for (PLIST_ENTRY x = head->Flink; x != head; x = x->Flink)
+    {
+      PLDR_DATA_TABLE_ENTRY mod = CONTAINING_RECORD (x, LDR_DATA_TABLE_ENTRY,
+						     InMemoryOrderLinks);
+      if (mod->DllBase > func_va)
+	continue;
+
+      __small_sprintf (buf, "%S+0x%x", &mod->BaseDllName,
+		       (DWORD_PTR)func_va - (DWORD_PTR)mod->DllBase);
+    }
+
+  return buf;
+}
+
 void
 cygwin_exception::dumpstack ()
 {
@@ -350,7 +378,7 @@ cygwin_exception::dumpstack ()
 	  for (unsigned j = 0; j < NPARAMS; j++)
 	    small_printf ("%s%012X", j == 0 ? " (" : ", ",
 			  thestack.sf.Params[j]);
-	  small_printf (")\r\n");
+	  small_printf (") %s\r\n", prettyprint_va((PVOID)thestack.sf.AddrPC.Offset));
 	}
       small_printf ("End of stack trace%s\r\n",
 		    i == DUMPSTACK_FRAME_LIMIT ?
