@@ -345,7 +345,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
   PWCHAR runpath = tp.w_get ();
   int c_flags;
 
-  bool null_app_name = false;
   STARTUPINFOW si = {};
   int looped = 0;
 
@@ -397,47 +396,27 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  __leave;
 	}
 
-      if (ac == 3 && argv[1][0] == '/' && tolower (argv[1][1]) == 'c' &&
-	  (iscmd (argv[0], "command.com") || iscmd (argv[0], "cmd.exe")))
+      if (real_path.iscygexec ())
 	{
-	  real_path.check (prog_arg);
-	  cmd.add ("\"");
-	  if (!real_path.error)
-	    cmd.add (real_path.get_win32 ());
-	  else
-	    cmd.add (argv[0]);
-	  cmd.add ("\"");
-	  cmd.add (" ");
-	  cmd.add (argv[1]);
-	  cmd.add (" ");
-	  cmd.add (argv[2]);
-	  real_path.set_path (argv[0]);
-	  null_app_name = true;
+	  moreinfo->argc = newargv.argc;
+	  moreinfo->argv = newargv;
 	}
+      if ((wincmdln || !real_path.iscygexec ())
+	   && !cmd.fromargv (newargv, real_path.get_win32 (),
+			     real_path.iscygexec ()))
+	{
+	  res = -1;
+	  __leave;
+	}
+
+
+      if (mode != _P_OVERLAY || !real_path.iscygexec ()
+	  || !DuplicateHandle (GetCurrentProcess (), myself.shared_handle (),
+			       GetCurrentProcess (), &moreinfo->myself_pinfo,
+			       0, TRUE, DUPLICATE_SAME_ACCESS))
+	moreinfo->myself_pinfo = NULL;
       else
-	{
-	  if (real_path.iscygexec ())
-	    {
-	      moreinfo->argc = newargv.argc;
-	      moreinfo->argv = newargv;
-	    }
-	  if ((wincmdln || !real_path.iscygexec ())
-	       && !cmd.fromargv (newargv, real_path.get_win32 (),
-				 real_path.iscygexec ()))
-	    {
-	      res = -1;
-	      __leave;
-	    }
-
-
-	  if (mode != _P_OVERLAY || !real_path.iscygexec ()
-	      || !DuplicateHandle (GetCurrentProcess (), myself.shared_handle (),
-				   GetCurrentProcess (), &moreinfo->myself_pinfo,
-				   0, TRUE, DUPLICATE_SAME_ACCESS))
-	    moreinfo->myself_pinfo = NULL;
-	  else
-	    VerifyHandle (moreinfo->myself_pinfo);
-	}
+	VerifyHandle (moreinfo->myself_pinfo);
 
       PROCESS_INFORMATION pi;
       pi.hProcess = pi.hThread = NULL;
@@ -507,42 +486,37 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	    }
 	}
 
-      if (null_app_name)
-	runpath = NULL;
+      USHORT len = real_path.get_nt_native_path ()->Length / sizeof (WCHAR);
+      if (RtlEqualUnicodePathPrefix (real_path.get_nt_native_path (),
+				     &ro_u_natp, FALSE))
+	{
+	  runpath = real_path.get_wide_win32_path (runpath);
+	  /* If the executable path length is < MAX_PATH, make sure the long
+	     path win32 prefix is removed from the path to make subsequent
+	     not long path aware native Win32 child processes happy. */
+	  if (len < MAX_PATH + 4)
+	    {
+	      if (runpath[5] == ':')
+		runpath += 4;
+	      else if (len < MAX_PATH + 6)
+		*(runpath += 6) = L'\\';
+	    }
+	}
+      else if (len < NT_MAX_PATH - ro_u_globalroot.Length / sizeof (WCHAR))
+	{
+	  UNICODE_STRING rpath;
+
+	  RtlInitEmptyUnicodeString (&rpath, runpath,
+				     (NT_MAX_PATH - 1) * sizeof (WCHAR));
+	  RtlCopyUnicodeString (&rpath, &ro_u_globalroot);
+	  RtlAppendUnicodeStringToString (&rpath,
+					  real_path.get_nt_native_path ());
+	}
       else
 	{
-	  USHORT len = real_path.get_nt_native_path ()->Length / sizeof (WCHAR);
-	  if (RtlEqualUnicodePathPrefix (real_path.get_nt_native_path (),
-					 &ro_u_natp, FALSE))
-	    {
-	      runpath = real_path.get_wide_win32_path (runpath);
-	      /* If the executable path length is < MAX_PATH, make sure the long
-		 path win32 prefix is removed from the path to make subsequent
-		 not long path aware native Win32 child processes happy. */
-	      if (len < MAX_PATH + 4)
-		{
-		  if (runpath[5] == ':')
-		    runpath += 4;
-		  else if (len < MAX_PATH + 6)
-		    *(runpath += 6) = L'\\';
-		}
-	    }
-	  else if (len < NT_MAX_PATH - ro_u_globalroot.Length / sizeof (WCHAR))
-	    {
-	      UNICODE_STRING rpath;
-
-	      RtlInitEmptyUnicodeString (&rpath, runpath,
-					 (NT_MAX_PATH - 1) * sizeof (WCHAR));
-	      RtlCopyUnicodeString (&rpath, &ro_u_globalroot);
-	      RtlAppendUnicodeStringToString (&rpath,
-					      real_path.get_nt_native_path ());
-	    }
-	  else
-	    {
-	      set_errno (ENAMETOOLONG);
-	      res = -1;
-	      __leave;
-	    }
+	  set_errno (ENAMETOOLONG);
+	  res = -1;
+	  __leave;
 	}
 
       cygbench ("spawn-worker");
