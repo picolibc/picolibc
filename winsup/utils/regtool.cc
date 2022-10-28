@@ -151,8 +151,8 @@ usage (FILE *where = stderr)
       " -h, --help     output usage information and exit\n"
       " -q, --quiet    no error output, just nonzero return if KEY/VALUE missing\n"
       " -v, --verbose  verbose output, including VALUE contents when applicable\n"
-      " -w, --wow64    access 64 bit registry view (ignored on 32 bit Windows)\n"
-      " -W, --wow32    access 32 bit registry view (ignored on 32 bit Windows)\n"
+      " -w, --wow64    access 64 bit registry view\n"
+      " -W, --wow32    access 32 bit registry view\n"
       " -V, --version  output version information and exit\n"
       "\n");
       fprintf (where, ""
