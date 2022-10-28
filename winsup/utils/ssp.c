@@ -49,12 +49,7 @@ typedef DWORD64 CONTEXT_REG;
 #define CONTEXT_REG_FMT "%016llx"
 #define ADDR_SSCANF_FMT "%lli"
 #else
-#define KERNEL_ADDR 0x77000000
-#define CONTEXT_SP Esp
-#define CONTEXT_IP Eip
-typedef DWORD CONTEXT_REG;
-#define CONTEXT_REG_FMT "%08lx"
-#define ADDR_SSCANF_FMT "%li"
+#error unimplemented for this target
 #endif
 
 #define TRACE_SSP 0
@@ -263,10 +258,7 @@ dump_registers (HANDLE thread)
   printf ("esi %016llx edi %016llx ebp %016llx esp %016llx %016llx\n",
 	  context.Rsi, context.Rdi, context.Rbp, context.Rsp, context.Rip);
 #else
-  printf ("eax %08lx ebx %08lx ecx %08lx edx %08lx eip\n",
-	  context.Eax, context.Ebx, context.Ecx, context.Edx);
-  printf ("esi %08lx edi %08lx ebp %08lx esp %08lx %08lx\n",
-	  context.Esi, context.Edi, context.Ebp, context.Esp, context.Eip);
+#error unimplemented for this target
 #endif
 }
 
@@ -947,8 +939,7 @@ main (int argc, char **argv)
       /*       1234567 123% 1234567 123% 1234567812345678 xxxxxxxxxxx */
       printf (" Main-Thread Other-Thread BaseAddr         DLL Name\n");
 #else
-      /*       1234567 123% 1234567 123% 12345678 xxxxxxxxxxx */
-      printf (" Main-Thread Other-Thread BaseAddr DLL Name\n");
+#error unimplemented for this target
 #endif
 
       total_pcount = 0;

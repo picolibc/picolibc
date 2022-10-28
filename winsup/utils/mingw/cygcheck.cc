@@ -625,12 +625,7 @@ dll_info (const char *path, HANDLE fh, int lvl, int recurse)
     }
   int base_off = 108;
 #else
-  if (arch != IMAGE_FILE_MACHINE_I386)
-    {
-      puts (verbose ? " (not x86 dll)" : "\n");
-      return;
-    }
-  int base_off = 92;
+#error unimplemented for this target
 #endif
   int opthdr_ofs = pe_header_offset + 4 + 20;
   unsigned short v[6];
@@ -2019,7 +2014,7 @@ static const char base_url[] =
 #ifdef __x86_64__
 #define ARCH_STR  "&arch=x86_64"
 #else
-#define ARCH_STR  "&arch=x86"
+#error unimplemented for this target
 #endif
 static const char *ARCH_str = ARCH_STR;
 

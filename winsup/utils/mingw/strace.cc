@@ -494,11 +494,7 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
   buf[len] = '\0';
   char *s = strtok (buf, " ");
 
-#ifdef __x86_64__
   unsigned long long n = strtoull (s, NULL, 16);
-#else
-  unsigned long n = strtoul (s, NULL, 16);
-#endif
 
   s = strchr (s, '\0') + 1;
 
@@ -635,11 +631,7 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
   if (include_hex)
     {
       s -= 8;
-#ifdef __x86_64__
       sprintf (s, "%012llx", n);
-#else
-      sprintf (s, "%08lx", n);
-#endif
       strchr (s, '\0')[0] = ' ';
     }
   child->last_usecs = usecs;
@@ -791,13 +783,11 @@ proc_child (unsigned mask, FILE *ofile, pid_t pid)
 	    case STATUS_BREAKPOINT:
 	    case 0x406d1388:		/* SetThreadName exception. */
 	      break;
-#ifdef __x86_64__
 	    case STATUS_GCC_THROW:
 	    case STATUS_GCC_UNWIND:
 	    case STATUS_GCC_FORCED:
 	      status = DBG_EXCEPTION_NOT_HANDLED;
 	      break;
-#endif
 	    default:
 	      status = DBG_EXCEPTION_NOT_HANDLED;
 	      if (ev.u.Exception.dwFirstChance)
