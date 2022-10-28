@@ -564,7 +564,8 @@ $(PRE_DLL_NAME): $(LDSCRIPT) libdll.a $(VERSION_OFILES) $(LIBSERVER)\
 		  $(newlib_build)/libm.a $(newlib_build)/libc.a
 	$(AM_V_CXXLD)$(CXX) $(CXXFLAGS) \
 	-mno-use-libstdc-wrappers \
-	-Wl,--gc-sections -nostdlib -Wl,-T$(LDSCRIPT) -static \
+	-Wl,--gc-sections -nostdlib -Wl,-T$(LDSCRIPT) \
+	-Wl,--dynamicbase -static \
 	-Wl,--heap=0 -Wl,--out-implib,cygdll.a -shared -o $@ \
 	-e @DLL_ENTRY@ $(DEF_FILE) \
 	-Wl,-whole-archive libdll.a -Wl,-no-whole-archive \
