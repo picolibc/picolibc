@@ -22,7 +22,9 @@
 
 from __future__ import print_function
 
+import fcntl
 import sys
+import os
 import re
 from optparse import OptionParser
 import lxml.etree
@@ -796,7 +798,15 @@ def p_error(t):
     print('parse error at line %d, token %s, next token %s' % (t.lineno, t, parser.token()), file=sys.stderr)
     exit(1)
 
-parser = yacc.yacc(start='input')
+# protect creating the parser with a lockfile, so that when multiple processes
+# are running this script simultaneously, we don't get one of them generating a
+# parsetab.py file, while another one attempts to read it...
+#
+# see also https://github.com/dabeaz/ply/pull/184
+with open(os.path.join(os.path.dirname(__file__), 'parsetab.lock'), 'w+') as lockfile:
+    fcntl.flock(lockfile.fileno(), fcntl.LOCK_EX)
+    parser = yacc.yacc(start='input')
+    fcntl.flock(lockfile.fileno(), fcntl.LOCK_UN)
 
 #
 #
@@ -829,11 +839,7 @@ def main(file):
 if __name__ == '__main__' :
     options = OptionParser()
     options.add_option('-v', '--verbose', action='count', dest = 'verbose', default = 0)
-    options.add_option('-c', '--cache', action='store_true', dest = 'cache', help="just ensure PLY cache is up to date")
     (opts, args) = options.parse_args()
-
-    if opts.cache:
-        sys.exit()
 
     verbose = opts.verbose
 

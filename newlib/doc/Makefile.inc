@@ -14,11 +14,6 @@ doc/makedoc.o: doc/makedoc.c
 	$(MKDIR_P) doc
 	$(CC_FOR_BUILD) -g $(CFLAGS_FOR_BUILD) -o $@ -c $<
 
-man-cache:
-	${srcdir}/doc/makedocbook.py --cache
-
-PHONY += man-cache
-
 #
 # Subdir documentation rules.
 #
