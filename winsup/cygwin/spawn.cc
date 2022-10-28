@@ -34,7 +34,6 @@ static const suffix_info exe_suffixes[] =
 {
   suffix_info ("", 1),
   suffix_info (".exe", 1),
-  suffix_info (".com"),
   suffix_info (NULL)
 };
 
@@ -1366,8 +1365,6 @@ av::setup (const char *prog_arg, path_conv& real_path, const char *ext,
 		set_errno (ENOEXEC);
 		return -1;
 	      }
-	    if (ascii_strcasematch (ext, ".com"))
-	      break;
 	    pgm = (char *) "/bin/sh";
 	    arg1 = NULL;
 	  }

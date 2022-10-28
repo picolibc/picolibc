@@ -2097,7 +2097,6 @@ nt_path_has_executable_suffix (PUNICODE_STRING upath)
 {
   static const PUNICODE_STRING blessed_executable_suffixes[] =
   {
-    &ro_u_com,
     &ro_u_exe,
     &ro_u_scr,
     &ro_u_sys,

@@ -518,8 +518,7 @@ fhandler_base::fstat_helper (struct stat *buf)
 	      PUNICODE_STRING path = pc.get_nt_native_path ();
 
 	      if (RtlEqualUnicodePathSuffix (path, &ro_u_exe, TRUE)
-		  || RtlEqualUnicodePathSuffix (path, &ro_u_lnk, TRUE)
-		  || RtlEqualUnicodePathSuffix (path, &ro_u_com, TRUE))
+		  || RtlEqualUnicodePathSuffix (path, &ro_u_lnk, TRUE))
 		pc.set_exec ();
 	    }
 	  /* No known suffix, check file header.  This catches binaries and
