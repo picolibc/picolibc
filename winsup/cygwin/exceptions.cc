@@ -342,7 +342,7 @@ cygwin_exception::dumpstack ()
       int i;
 
       thestack.init (framep, 1, ctx);	/* Initialize from the input CONTEXT */
-      small_printf ("Stack trace:\r\nFrame        Function    Args\r\n");
+      small_printf ("Stack trace:\r\nFrame         Function      Args\r\n");
       for (i = 0; i < DUMPSTACK_FRAME_LIMIT && thestack++; i++)
 	{
 	  small_printf ("%012X  %012X", thestack.sf.AddrFrame.Offset,
@@ -352,9 +352,9 @@ cygwin_exception::dumpstack ()
 			  thestack.sf.Params[j]);
 	  small_printf (")\r\n");
 	}
-      small_printf ("End of stack trace%s\n",
+      small_printf ("End of stack trace%s\r\n",
 		    i == DUMPSTACK_FRAME_LIMIT ?
-		        " (more stack frames may be present)" : "");
+		    " (more stack frames may be present)" : "");
       if (h)
 	NtClose (h);
     }
