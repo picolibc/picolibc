@@ -17,6 +17,10 @@ Drop support for 32 bit Windows and WOW64.
 </para></listitem>
 
 <listitem><para>
+Allow to run with full ASLR enabled and enable on Cygwin DLL by default.
+</para></listitem>
+
+<listitem><para>
 Remove any special handling for the .com filename suffix. It has to
 be used always explicitely.
 </para></listitem>
