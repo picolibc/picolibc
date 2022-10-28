@@ -195,9 +195,9 @@ cygwin_exception::dump_exception ()
 
 #ifdef __x86_64__
   if (exception_name)
-    small_printf ("Exception: %s at rip=%011X\r\n", exception_name, ctx->Rip);
+    small_printf ("Exception: %s at rip=%012X\r\n", exception_name, ctx->Rip);
   else
-    small_printf ("Signal %d at rip=%011X\r\n", e->ExceptionCode, ctx->Rip);
+    small_printf ("Signal %d at rip=%012X\r\n", e->ExceptionCode, ctx->Rip);
   small_printf ("rax=%016X rbx=%016X rcx=%016X\r\n",
 		ctx->Rax, ctx->Rbx, ctx->Rcx);
   small_printf ("rdx=%016X rsi=%016X rdi=%016X\r\n",
@@ -345,10 +345,10 @@ cygwin_exception::dumpstack ()
       small_printf ("Stack trace:\r\nFrame        Function    Args\r\n");
       for (i = 0; i < DUMPSTACK_FRAME_LIMIT && thestack++; i++)
 	{
-	  small_printf ("%011X  %011X", thestack.sf.AddrFrame.Offset,
+	  small_printf ("%012X  %012X", thestack.sf.AddrFrame.Offset,
 			thestack.sf.AddrPC.Offset);
 	  for (unsigned j = 0; j < NPARAMS; j++)
-	    small_printf ("%s%011X", j == 0 ? " (" : ", ",
+	    small_printf ("%s%012X", j == 0 ? " (" : ", ",
 			  thestack.sf.Params[j]);
 	  small_printf (")\r\n");
 	}
