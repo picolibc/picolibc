@@ -1066,6 +1066,8 @@ peb_teb_rinse_repeat:
 		    strcpy (posix_modname, "[cygwin-user-shared]");
 		  else if (cur.abase == (char *) *proc_pinfo)
 		    strcpy (posix_modname, "[procinfo]");
+		  else if (cur.abase == (char *) cygheap)
+		    strcpy (posix_modname, "[cygheap]");
 		  else if (cur.abase == user_heap.base)
 		    strcpy (posix_modname, "[heap]");
 		  else
