@@ -555,7 +555,6 @@ struct threadlist_t
 struct init_cygheap: public mini_cygheap
 {
   _cmalloc_entry *chain;
-  unsigned bucket_val[NBUCKETS];
   char *buckets[NBUCKETS];
   UNICODE_STRING installation_root;
   WCHAR installation_root_buf[PATH_MAX];
