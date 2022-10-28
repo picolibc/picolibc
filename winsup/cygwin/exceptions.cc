@@ -383,6 +383,16 @@ cygwin_exception::dumpstack ()
       small_printf ("End of stack trace%s\r\n",
 		    i == DUMPSTACK_FRAME_LIMIT ?
 		    " (more stack frames may be present)" : "");
+
+      small_printf ("Loaded modules:\r\n");
+      PLIST_ENTRY head = &NtCurrentTeb()->Peb->Ldr->InMemoryOrderModuleList;
+      for (PLIST_ENTRY x = head->Flink; x != head; x = x->Flink)
+	{
+	  PLDR_DATA_TABLE_ENTRY mod = CONTAINING_RECORD (x, LDR_DATA_TABLE_ENTRY,
+							 InMemoryOrderLinks);
+	  small_printf ("%012X %S\r\n", mod->DllBase, &mod->BaseDllName);
+	}
+
       if (h)
 	NtClose (h);
     }
