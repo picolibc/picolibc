@@ -450,9 +450,6 @@ command_dispatch_dict = {
 def line_markup_convert(p):
     s = p
 
-    # process the texinfo escape for an @
-    s = s.replace('@@', '@')
-
     # escape characters not allowed in XML
     s = s.replace('&', '&amp;')
     s = s.replace('<', '&lt;')
@@ -481,6 +478,14 @@ def line_markup_convert(p):
 
     # very hacky way of dealing with @* to force a newline
     s = s.replace('@*', '</para><para>')
+
+    # fail if there are unhandled texinfo commands
+    match = re.search(r'(?<!@)@[^@\s]+', s)
+    if match:
+        sys.exit("texinfo command '%s' remains in output" % match.group(0))
+
+    # process the texinfo escape for an @
+    s = s.replace('@@', '@')
 
     if (verbose > 3) and (s != p):
         print('%s-> line_markup_convert ->\n%s' % (p, s), file=sys.stderr)
@@ -823,10 +828,6 @@ def main(file):
 
     print(s)
 
-    # warn about texinfo commands which didn't get processed
-    match = re.search(r'@[a-z*]+', s)
-    if match:
-        print('texinfo command %s remains in output' % match.group(), file=sys.stderr)
 
 #
 #
