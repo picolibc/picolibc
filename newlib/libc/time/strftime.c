@@ -1260,7 +1260,7 @@ recurse:
 	       format. Recurse to avoid need to replicate %b and %Y formation. */
 	    CHAR fmtbuf[32], *fmt = fmtbuf;
 	    STRCPY (fmt, CQ("%e-%b-%"));
-	    fmt += strlen (fmt);
+	    fmt += STRLEN (fmt);
 	    if (pad) /* '0' or '+' */
 	      *fmt++ = pad;
 	    else
