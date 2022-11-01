@@ -214,8 +214,7 @@ def function(c, l):
 
     # FUNCTION implies starting a new refentry
     if refentry is not None:
-        print("multiple FUNCTIONs without NEWPAGE", file=sys.stderr)
-        exit(1)
+        sys.exit("multiple FUNCTIONs without NEWPAGE")
 
     # create the refentry
     refentry = lxml.etree.SubElement(rootelement, 'refentry')
@@ -308,17 +307,15 @@ def synopsis(c, t):
 
             # a prototype without a terminating ';' is an error
             if s.endswith(')'):
-                print("'%s' missing terminating semicolon" % l, file=sys.stderr)
+                sys.exit("'%s' missing terminating semicolon" % l)
                 s = s + ';'
-                exit(1)
 
             if ';' in s:
                 synopsis_for_prototype(funcsynopsis, s)
                 s = ''
 
     if s.strip():
-        print("surplus synopsis '%s'" % s, file=sys.stderr)
-        exit(1)
+        sys.exit("surplus synopsis '%s'" % s)
 
 def synopsis_for_prototype(funcsynopsis, s):
     s = s.strip()
@@ -591,8 +588,7 @@ def t_eof(t):
 
 # Error handling rule
 def t_error(t):
-    print("tokenization error, remaining text '%s'" % t.value, file=sys.stderr)
-    exit(1)
+    sys.exit("tokenization error, remaining text '%s'" % t.value)
 
 lexer = lex.lex()
 
@@ -795,8 +791,8 @@ def p_multitable(p):
     parser_verbose(p)
 
 def p_error(t):
-    print('parse error at line %d, token %s, next token %s' % (t.lineno, t, parser.token()), file=sys.stderr)
-    exit(1)
+    sys.exit('parse error at line %d, token %s, next token %s' % (t.lineno, t, parser.token()))
+
 
 # protect creating the parser with a lockfile, so that when multiple processes
 # are running this script simultaneously, we don't get one of them generating a
