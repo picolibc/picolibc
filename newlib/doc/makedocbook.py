@@ -107,7 +107,7 @@ def remove_noncomments(src):
 
 # A command is a single word of at least 3 characters, all uppercase, and alone on a line
 def iscommand(l):
-    if re.match('^[A-Z_]{3,}\s*$', l):
+    if re.match(r'^[A-Z_]{3,}\s*$', l):
 
         return True
     return False
@@ -198,7 +198,7 @@ def function(c, l):
     descr = line_markup_convert(', '.join(descrlist))
 
     # fpclassify includes an 'and' we need to discard
-    namelist = map(lambda v: re.sub('^and ', '', v.strip(), 1), namelist)
+    namelist = map(lambda v: re.sub(r'^and ', r'', v.strip(), 1), namelist)
     # strip off << >> surrounding name
     namelist = map(lambda v: v.strip().lstrip('<').rstrip('>'), namelist)
     # instantiate list to make it subscriptable
@@ -297,11 +297,11 @@ def synopsis(c, t):
 
     s = ''
     for l in t.splitlines():
-        if re.match('\s*(#|\[|struct)', l):
+        if re.match(r'\s*(#|\[|struct)', l):
             # preprocessor # directives, structs, comments in square brackets
             funcsynopsisinfo = lxml.etree.SubElement(funcsynopsis, 'funcsynopsisinfo')
             funcsynopsisinfo.text = l.strip() + '\n'
-        elif re.match('[Ll]ink with', l):
+        elif re.match(r'[Ll]ink with', l):
             pass
         else:
             s = s + l
@@ -348,7 +348,7 @@ def synopsis_for_prototype(funcsynopsis, s):
                 void = lxml.etree.SubElement(funcprototype, 'void')
             else:
                 # Split parameters on ',' except if it is inside ()
-                for p in re.split(',(?![^()]*\))', match.group(3)):
+                for p in re.split(r',(?![^()]*\))', match.group(3)):
                     p = p.strip()
 
                     if verbose:
@@ -361,7 +361,7 @@ def synopsis_for_prototype(funcsynopsis, s):
                         parameter = lxml.etree.SubElement(paramdef, 'parameter')
 
                         # <[ ]> enclose the parameter name
-                        match2 = re.match('(.*)<\[(.*)\]>(.*)', p)
+                        match2 = re.match(r'(.*)<\[(.*)\]>(.*)', p)
 
                         if verbose:
                             print(match2.groups(), file=sys.stderr)
@@ -472,16 +472,16 @@ def line_markup_convert(p):
 
     # also convert some simple texinfo markup
     # convert @emph{foo} to <emphasis>foo</emphasis>
-    s = re.sub('@emph{(.*?)}', '<emphasis>\\1</emphasis>', s)
+    s = re.sub(r'@emph{(.*?)}', r'<emphasis>\1</emphasis>', s)
     # convert @strong{foo} to <emphasis role=strong>foo</emphasis>
-    s = re.sub('@strong{(.*?)}', '<emphasis role="strong">\\1</emphasis>', s)
+    s = re.sub(r'@strong{(.*?)}', r'<emphasis role="strong">\1</emphasis>', s)
     # convert @minus{} to U+2212 MINUS SIGN
     s = s.replace('@minus{}', '&#x2212;')
     # convert @dots{} to U+2026 HORIZONTAL ELLIPSIS
     s = s.replace('@dots{}', '&#x2026;')
 
     # convert xref and pxref
-    s = re.sub('@xref{(.*?)}', "See <xref linkend='\\1'/>", s)
+    s = re.sub(r'@xref{(.*?)}', r"See <xref linkend='\1'/>", s)
 
     # very hacky way of dealing with @* to force a newline
     s = s.replace('@*', '</para><para>')
@@ -562,7 +562,7 @@ def t_TABLEEND(t):
 
 def t_ITEM(t):
     r'o\s.*\n'
-    t.value = re.sub('o\s', '', lexer.lexmatch.group(0), 1)
+    t.value = re.sub(r'o\s', r'', lexer.lexmatch.group(0), 1)
     t.value = line_markup_convert(t.value)
     return t
 
@@ -828,7 +828,7 @@ def main(file):
     print(s)
 
     # warn about texinfo commands which didn't get processed
-    match = re.search('@[a-z*]+', s)
+    match = re.search(r'@[a-z*]+', s)
     if match:
         print('texinfo command %s remains in output' % match.group(), file=sys.stderr)
 
