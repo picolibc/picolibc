@@ -335,6 +335,8 @@ try_compile(_LDBL_EQ_DBL ${PROJECT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake
 
 set(_LITE_EXIT 1)
 
+set(_PICO_EXIT 1)
+
 if(NOT DEFINED _MB_CAPABLE)
   option(_MB_CAPABLE "Enable multi-byte support" 0)
 endif()
