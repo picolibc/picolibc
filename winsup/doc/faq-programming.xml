@@ -844,6 +844,12 @@ Guide here: <ulink url="https://cygwin.com/cygwin-ug-net/dll.html"/>.
   Note that the DllMain entrypoints for linked DLLs will have been executed
   before this breakpoint is hit.
 </para>
+
+<para>
+  (It may be necessary to use the <command>gdb</command> command <command>set
+  disable-randomization on</command> to turn off ASLR for the debugee to
+  prevent the base address getting randomized.)
+</para>
 </answer></qandaentry>
 
 <qandaentry id="faq.programming.debug">
