@@ -31,11 +31,11 @@ import lxml.etree
 import ply.lex as lex
 import ply.yacc as yacc
 
-rootelement = None # root element of the XML tree
-refentry = None # the current refentry
+rootelement = None  # root element of the XML tree
+refentry = None     # the current refentry
 verbose = 0
 
-def dump(s, stage, threshold = 1):
+def dump(s, stage, threshold=1):
     if verbose > threshold:
         print('*' * 40, file=sys.stderr)
         print(stage, file=sys.stderr)
@@ -49,7 +49,7 @@ def dump(s, stage, threshold = 1):
 
 def skip_whitespace_and_stars(i, src):
 
-    while i < len(src) and (src[i].isspace() or (src[i] == '*' and src[i+1] != '/')):
+    while i < len(src) and (src[i].isspace() or (src[i] == '*' and src[i + 1] != '/')):
         i += 1
 
     return i
@@ -62,7 +62,7 @@ def comment_contents_generator(src):
     i = 0
 
     while i < len(src) - 2:
-        if src[i] == '\n' and src[i+1] == '/' and src[i+2] == '*':
+        if src[i] == '\n' and src[i + 1] == '/' and src[i + 2] == '*':
             i = i + 3
 
             i = skip_whitespace_and_stars(i, src)
@@ -82,7 +82,7 @@ def comment_contents_generator(src):
 
                     i = skip_whitespace_and_stars(i, src)
 
-                elif src[i] == '*' and src[i+1] == '/':
+                elif src[i] == '*' and src[i + 1] == '/':
                     i = i + 2
                     # If we have just output \n\n, this adds another blank line.
                     # This is the only way a double blank line can occur.
@@ -177,10 +177,10 @@ def function(c, l):
         spliton = ';'
         o = ''
         for i in l.splitlines():
-             if separator in i:
-                 o += i + ';'
-             else:
-                 o += i
+            if separator in i:
+                o += i + ';'
+            else:
+                o += i
         l = o[:-1]
     else:
         spliton = '\n'
@@ -265,7 +265,7 @@ def index(c, l):
     primary.text = l
 
     # to validate, it seems we need to maintain refentry elements in a certain order
-    refentry[:] = sorted(refentry, key = lambda x: x.tag if isinstance(x.tag, str) else '')
+    refentry[:] = sorted(refentry, key=lambda x: x.tag if isinstance(x.tag, str) else '')
 
     # adds another alternate refname
     refnamediv = refentry.find('refnamediv')
@@ -281,7 +281,7 @@ def index(c, l):
             print('duplicate refname %s discarded' % l, file=sys.stderr)
 
     # to validate, it seems we need to maintain refnamediv elements in a certain order
-    refnamediv[:] = sorted(refnamediv, key = lambda x: x.tag)
+    refnamediv[:] = sorted(refnamediv, key=lambda x: x.tag)
 
 
 # SYNOPSIS aka ANSI_SYNOPSIS
@@ -378,14 +378,13 @@ def synopsis_for_prototype(funcsynopsis, s):
 # sscanf, have very complex layout using nested tables and itemized lists, which
 # it is best to parse in order to transform correctly.
 #
-
 def refsect(t, s):
     refsect = lxml.etree.SubElement(refentry, 'refsect1')
     title = lxml.etree.SubElement(refsect, 'title')
     title.text = t.title()
 
     if verbose:
-        print('%s has %d paragraphs' % (t, len(s.split('\n\n'))) , file=sys.stderr)
+        print('%s has %d paragraphs' % (t, len(s.split('\n\n'))), file=sys.stderr)
 
     if verbose > 1:
         dump(s, 'before lexing')
@@ -422,25 +421,25 @@ def discarded(c, t):
     return
 
 command_dispatch_dict = {
-    'FUNCTION'          : function,
-    'TYPEDEF'           : function,     # TYPEDEF is not currently used, but described in doc.str
-    'INDEX'             : index,
-    'TRAD_SYNOPSIS'     : discarded,    # K&R-style synopsis, obsolete and discarded
-    'ANSI_SYNOPSIS'     : synopsis,
-    'SYNOPSIS'          : synopsis,
-    'DESCRIPTION'       : refsect,
-    'RETURNS'           : refsect,
-    'ERRORS'            : refsect,
-    'PORTABILITY'       : refsect,
-    'BUGS'              : refsect,
-    'WARNINGS'          : refsect,
-    'SEEALSO'           : seealso,
-    'NOTES'             : refsect,      # NOTES is not described in doc.str, so is currently discarded by makedoc, but that doesn't seem right
-    'QUICKREF'          : discarded,    # The intent of QUICKREF and MATHREF is not obvious, but they don't generate any output currently
-    'MATHREF'           : discarded,
-    'START'             : discarded,    # a START command is inserted to contain the text before the first command
-    'END'               : discarded,    # an END command is inserted merely to terminate the text for the last command in a comment block
-    'NEWPAGE'           : newpage,
+    'FUNCTION':      function,
+    'TYPEDEF':       function,     # TYPEDEF is not currently used, but described in doc.str
+    'INDEX':         index,
+    'TRAD_SYNOPSIS': discarded,    # K&R-style synopsis, obsolete and discarded
+    'ANSI_SYNOPSIS': synopsis,
+    'SYNOPSIS':      synopsis,
+    'DESCRIPTION':   refsect,
+    'RETURNS':       refsect,
+    'ERRORS':        refsect,
+    'PORTABILITY':   refsect,
+    'BUGS':          refsect,
+    'WARNINGS':      refsect,
+    'SEEALSO':       seealso,
+    'NOTES':         refsect,      # NOTES is not described in doc.str, so is currently discarded by makedoc, but that doesn't seem right
+    'QUICKREF':      discarded,    # The intent of QUICKREF and MATHREF is not obvious, but they don't generate any output currently
+    'MATHREF':       discarded,
+    'START':         discarded,    # a START command is inserted to contain the text before the first command
+    'END':           discarded,    # an END command is inserted merely to terminate the text for the last command in a comment block
+    'NEWPAGE':       newpage,
 }
 
 #
@@ -455,17 +454,17 @@ def line_markup_convert(p):
     s = s.replace('@@', '@')
 
     # escape characters not allowed in XML
-    s = s.replace('&','&amp;')
-    s = s.replace('<','&lt;')
-    s = s.replace('>','&gt;')
+    s = s.replace('&', '&amp;')
+    s = s.replace('<', '&lt;')
+    s = s.replace('>', '&gt;')
 
     # convert <<somecode>> to <code>somecode</code> and <[var]> to
     # <varname>var</varname>
     # also handle nested << <[ ]> >> correctly
-    s = s.replace('&lt;&lt;','<code>')
-    s = s.replace('&lt;[','<varname>')
-    s = s.replace(']&gt;','</varname>')
-    s = s.replace('&gt;&gt;','</code>')
+    s = s.replace('&lt;&lt;', '<code>')
+    s = s.replace('&lt;[', '<varname>')
+    s = s.replace(']&gt;', '</varname>')
+    s = s.replace('&gt;&gt;', '</code>')
 
     # also convert some simple texinfo markup
     # convert @emph{foo} to <emphasis>foo</emphasis>
@@ -493,18 +492,18 @@ def line_markup_convert(p):
 #
 
 texinfo_commands = {
-    'ifnottex' : 'IFNOTTEX',
-    'end ifnottex' : 'ENDIFNOTTEX',
-    'tex' : 'IFTEX',
-    'end tex' : 'ENDIFTEX',
-    'comment' : 'COMMENT',
-    'c ' : 'COMMENT',
-    'multitable' : 'MULTICOLUMNTABLE',
-    'end multitable' : 'ENDMULTICOLUMNTABLE',
-    'headitem' : 'MCT_HEADITEM',
-    'tab' : 'MCT_COLUMN_SEPARATOR',
-    'item' : 'MCT_ITEM',
-    }
+    'ifnottex': 'IFNOTTEX',
+    'end ifnottex': 'ENDIFNOTTEX',
+    'tex': 'IFTEX',
+    'end tex': 'ENDIFTEX',
+    'comment': 'COMMENT',
+    'c ': 'COMMENT',
+    'multitable': 'MULTICOLUMNTABLE',
+    'end multitable': 'ENDMULTICOLUMNTABLE',
+    'headitem': 'MCT_HEADITEM',
+    'tab': 'MCT_COLUMN_SEPARATOR',
+    'item': 'MCT_ITEM',
+}
 
 # token names
 tokens = [
@@ -575,9 +574,9 @@ def t_BLANKLINE(t):
     return t
 
 def t_eof(t):
-    if hasattr(t.lexer,'at_eof'):
+    if hasattr(t.lexer, 'at_eof'):
         # remove eof flag ready for lexing next input
-        delattr(t.lexer,'at_eof')
+        delattr(t.lexer, 'at_eof')
         t.lexer.lineno = 0
         return None
 
@@ -787,8 +786,9 @@ def p_multitable(p):
     colspec = '\n'.join(['<colspec colwidth="%s*"/>' % (c) for c in colfrac])
     header = '<thead>' + p[2] + '</thead>\n'
     body = '<tbody>' + p[3] + '</tbody>\n'
-    p[0] = '<informaltable><tgroup cols="' + str(len(colfrac)) +'">' + colspec + header + body  + '</tgroup></informaltable>'
+    p[0] = '<informaltable><tgroup cols="' + str(len(colfrac)) + '">' + colspec + header + body + '</tgroup></informaltable>'
     parser_verbose(p)
+
 
 def p_error(t):
     sys.exit('parse error at line %d, token %s, next token %s' % (t.lineno, t, parser.token()))
@@ -831,10 +831,9 @@ def main(file):
 #
 #
 #
-
-if __name__ == '__main__' :
+if __name__ == '__main__':
     options = OptionParser()
-    options.add_option('-v', '--verbose', action='count', dest = 'verbose', default = 0)
+    options.add_option('-v', '--verbose', action='count', dest='verbose', default=0)
     (opts, args) = options.parse_args()
 
     verbose = opts.verbose
