@@ -342,11 +342,13 @@ prettyprint_va (PVOID func_va)
     {
       PLDR_DATA_TABLE_ENTRY mod = CONTAINING_RECORD (x, LDR_DATA_TABLE_ENTRY,
 						     InMemoryOrderLinks);
-      if (mod->DllBase > func_va)
+      if ((func_va < mod->DllBase) ||
+	  (func_va > (PVOID)((DWORD_PTR)mod->DllBase + mod->SizeOfImage)))
 	continue;
 
       __small_sprintf (buf, "%S+0x%x", &mod->BaseDllName,
 		       (DWORD_PTR)func_va - (DWORD_PTR)mod->DllBase);
+      break;
     }
 
   return buf;
