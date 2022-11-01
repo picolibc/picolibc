@@ -449,7 +449,7 @@ command_dispatch_dict = {
 
 # apply transformations which are easy to do in-place
 def line_markup_convert(p):
-    s = p;
+    s = p
 
     # process the texinfo escape for an @
     s = s.replace('@@', '@')
@@ -582,7 +582,7 @@ def t_eof(t):
         return None
 
     t.type = 'EOF'
-    t.lexer.at_eof = True;
+    t.lexer.at_eof = True
 
     return t
 
