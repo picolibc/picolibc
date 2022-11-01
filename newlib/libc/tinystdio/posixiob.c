@@ -56,6 +56,13 @@ __weak_reference(__posix_stdin,stdin);
 __weak_reference(__posix_stdout,stdout);
 __weak_reference(__posix_stderr,stderr);
 
+__attribute__((constructor))
+static void posix_init(void)
+{
+    __bufio_lock_init(&__stdin.xfile.cfile.file);
+    __bufio_lock_init(&__stdout.xfile.cfile.file);
+}
+
 /*
  * Add a destructor function to get stdout flushed on
  * exit
