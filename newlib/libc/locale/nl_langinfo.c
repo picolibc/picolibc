@@ -204,7 +204,9 @@ char *nl_langinfo_l (nl_item item, struct __locale_t *locale)
 #ifdef _MB_CAPABLE
 		ret = (char *) __locale_charset (locale);
 #endif
+#ifdef __HAVE_LOCALE_INFO__
 do_codeset:
+#endif
 #ifdef __CYGWIN__
 		/* Convert charset to Linux compatible codeset string. */
 		if (ret[0] == 'A'/*SCII*/)
