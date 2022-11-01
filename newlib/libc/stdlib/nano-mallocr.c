@@ -367,8 +367,6 @@ void * malloc(size_t s)
 	}
     }
 
-    MALLOC_UNLOCK;
-
     /* Failed to find a appropriate chunk_t. Ask for more memory */
     if (r == NULL)
     {
@@ -383,6 +381,8 @@ void * malloc(size_t s)
         }
         r->size = alloc_size;
     }
+
+    MALLOC_UNLOCK;
 
     ptr = (char *)r + MALLOC_HEAD;
 
