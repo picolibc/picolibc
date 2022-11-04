@@ -36,7 +36,6 @@
 #define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
 
 static const char file_name[] = "posix-io-test-file";
@@ -44,7 +43,7 @@ static const char test_string[] = "hello, world\n";
 
 static void test_cleanup(void)
 {
-	unlink(file_name);
+	remove(file_name);
 }
 
 static int
