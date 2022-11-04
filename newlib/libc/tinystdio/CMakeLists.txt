@@ -77,6 +77,7 @@ picolibc_sources(
   printf.c
   putchar.c
   puts.c
+  remove.c
   rewind.c
   scanf.c
   setbuf.c
