@@ -939,6 +939,23 @@ extern void setlinebuf(FILE *stream);
 extern int setvbuf(FILE *stream, char *buf, int mode, size_t size);
 extern FILE *tmpfile(void);
 extern char *tmpnam (char *s);
+
+/*
+ * The format of tmpnam names is TXXXXXX, which works with mktemp
+ */
+#define L_tmpnam        8
+
+/*
+ * tmpnam files are created in the current directory
+ */
+#define P_tmpdir        ""
+
+/*
+ * We don't have any way of knowing any underlying POSIX limits,
+ * so just use a reasonably small value here
+ */
+#define TMP_MAX         32
+
 #endif	/* !__DOXYGEN__ */
 
 #ifdef __cplusplus

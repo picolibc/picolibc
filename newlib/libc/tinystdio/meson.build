@@ -107,6 +107,8 @@ srcs_tinystdio = [
     'strtoll_l.c',
     'strtoul_l.c',
     'strtoull_l.c',
+    'tmpnam.c',
+    'tmpfile.c',
     'ungetc.c',
     'vasprintf.c',
     'vfiprintf.c',
