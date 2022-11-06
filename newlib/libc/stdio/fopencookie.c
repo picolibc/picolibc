@@ -97,11 +97,11 @@ typedef struct fccookie {
   cookie_close_function_t *closefn;
 } fccookie;
 
-static _READ_WRITE_RETURN_TYPE
+static ssize_t
 fcreader (
        void *cookie,
        char *buf,
-       _READ_WRITE_BUFSIZE_TYPE n)
+       size_t n)
 {
   int result;
   fccookie *c = (fccookie *) cookie;
@@ -111,11 +111,11 @@ fcreader (
   return result;
 }
 
-static _READ_WRITE_RETURN_TYPE
+static ssize_t
 fcwriter (
        void *cookie,
        const char *buf,
-       _READ_WRITE_BUFSIZE_TYPE n)
+       size_t n)
 {
   int result;
   fccookie *c = (fccookie *) cookie;

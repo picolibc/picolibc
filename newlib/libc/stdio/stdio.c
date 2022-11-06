@@ -29,11 +29,11 @@
  * These maintain the `known seek offset' for seek optimisation.
  */
 
-_READ_WRITE_RETURN_TYPE
+ssize_t
 __sread (
        void *cookie,
        char *buf,
-       _READ_WRITE_BUFSIZE_TYPE n)
+       size_t n)
 {
   register FILE *fp = (FILE *) cookie;
   register ssize_t ret;
@@ -61,11 +61,11 @@ __sread (
 }
 
 /* Dummy function used in sscanf/swscanf. */
-_READ_WRITE_RETURN_TYPE
+ssize_t
 __seofread (
        void *cookie,
        char *buf,
-       _READ_WRITE_BUFSIZE_TYPE len)
+       size_t len)
 {
   (void) cookie;
   (void) buf;
@@ -73,11 +73,11 @@ __seofread (
   return 0;
 }
 
-_READ_WRITE_RETURN_TYPE
+ssize_t
 __swrite (
        void *cookie,
        char const *buf,
-       _READ_WRITE_BUFSIZE_TYPE n)
+       size_t n)
 {
   register FILE *fp = (FILE *) cookie;
   ssize_t w;

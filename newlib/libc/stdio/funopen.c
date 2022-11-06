@@ -86,9 +86,9 @@ Supporting OS subroutines required: <<sbrk>>.
 #include <sys/lock.h>
 #include "local.h"
 
-typedef int (*funread)(void *_cookie, char *_buf, _READ_WRITE_BUFSIZE_TYPE _n);
+typedef int (*funread)(void *_cookie, char *_buf, size_t _n);
 typedef int (*funwrite)(void *_cookie, const char *_buf,
-			_READ_WRITE_BUFSIZE_TYPE _n);
+			size_t _n);
 #ifdef __LARGE64_FILES
 typedef _fpos64_t (*funseek)(void *_cookie, _fpos64_t _off, int _whence);
 #else
@@ -104,11 +104,11 @@ typedef struct funcookie {
   funclose closefn;
 } funcookie;
 
-static _READ_WRITE_RETURN_TYPE
+static ssize_t
 funreader (
        void *cookie,
        char *buf,
-       _READ_WRITE_BUFSIZE_TYPE n)
+       size_t n)
 {
   int result;
   funcookie *c = (funcookie *) cookie;
@@ -118,11 +118,11 @@ funreader (
   return result;
 }
 
-static _READ_WRITE_RETURN_TYPE
+static ssize_t
 funwriter (
        void *cookie,
        const char *buf,
-       _READ_WRITE_BUFSIZE_TYPE n)
+       size_t n)
 {
   int result;
   funcookie *c = (funcookie *) cookie;

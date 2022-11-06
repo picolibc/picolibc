@@ -31,6 +31,7 @@
 #define	_FSTDIO			/* ``function stdio'' */
 
 #define __need_size_t
+#define __need_ssize_t
 #define __need_NULL
 #include <sys/cdefs.h>
 #include <stddef.h>
@@ -92,11 +93,11 @@ struct __sFILE {
   /* operations */
   void *	_cookie;	/* cookie passed to io functions */
 
-  _READ_WRITE_RETURN_TYPE (*_read) (void *,
-					   char *, _READ_WRITE_BUFSIZE_TYPE);
-  _READ_WRITE_RETURN_TYPE (*_write) (void *,
+  _ssize_t (*_read) (void *,
+					   char *, size_t);
+  _ssize_t (*_write) (void *,
 					    const char *,
-					    _READ_WRITE_BUFSIZE_TYPE);
+					    size_t);
   _fpos_t (*_seek) (void *, _fpos_t, int);
   int (*_close) (void *);
 
@@ -142,11 +143,11 @@ struct __sFILE64 {
   /* operations */
   void *	_cookie;	/* cookie passed to io functions */
 
-  _READ_WRITE_RETURN_TYPE (*_read) (void *,
-					   char *, _READ_WRITE_BUFSIZE_TYPE);
-  _READ_WRITE_RETURN_TYPE (*_write) (void *,
+  _ssize_t (*_read) (void *,
+					   char *, size_t);
+  _ssize_t (*_write) (void *,
 					    const char *,
-					    _READ_WRITE_BUFSIZE_TYPE);
+					    size_t);
   _fpos_t (*_seek) (void *, _fpos_t, int);
   int (*_close) (void *);
 
@@ -594,31 +595,31 @@ int	_swbuf ( int, FILE *);
 # ifdef __LARGE64_FILES
 FILE	*funopen (const void *__cookie,
 		int (*__readfn)(void *__c, char *__buf,
-				_READ_WRITE_BUFSIZE_TYPE __n),
+				size_t __n),
 		int (*__writefn)(void *__c, const char *__buf,
-				 _READ_WRITE_BUFSIZE_TYPE __n),
+				 size_t __n),
 		_fpos64_t (*__seekfn)(void *__c, _fpos64_t __off, int __whence),
 		int (*__closefn)(void *__c));
 FILE	*funopen ( const void *__cookie,
 		int (*__readfn)(void *__c, char *__buf,
-				_READ_WRITE_BUFSIZE_TYPE __n),
+				size_t __n),
 		int (*__writefn)(void *__c, const char *__buf,
-				 _READ_WRITE_BUFSIZE_TYPE __n),
+				 size_t __n),
 		_fpos64_t (*__seekfn)(void *__c, _fpos64_t __off, int __whence),
 		int (*__closefn)(void *__c));
 # else
 FILE	*funopen (const void *__cookie,
 		int (*__readfn)(void *__cookie, char *__buf,
-				_READ_WRITE_BUFSIZE_TYPE __n),
+				size_t __n),
 		int (*__writefn)(void *__cookie, const char *__buf,
-				 _READ_WRITE_BUFSIZE_TYPE __n),
+				 size_t __n),
 		fpos_t (*__seekfn)(void *__cookie, fpos_t __off, int __whence),
 		int (*__closefn)(void *__cookie));
 FILE	*funopen ( const void *__cookie,
 		int (*__readfn)(void *__cookie, char *__buf,
-				_READ_WRITE_BUFSIZE_TYPE __n),
+				size_t __n),
 		int (*__writefn)(void *__cookie, const char *__buf,
-				 _READ_WRITE_BUFSIZE_TYPE __n),
+				 size_t __n),
 		fpos_t (*__seekfn)(void *__cookie, fpos_t __off, int __whence),
 		int (*__closefn)(void *__cookie));
 # endif /* !__LARGE64_FILES */

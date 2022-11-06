@@ -109,10 +109,6 @@ SUCH DAMAGE.
 #define _POINTER_INT short
 #endif
 
-#if defined(__m68k__) || defined(__mc68000__) || defined(__riscv)
-#define _READ_WRITE_RETURN_TYPE _ssize_t
-#endif
-
 #ifdef ___AM29K__
 #define _FLOAT_RET double
 #endif
@@ -126,7 +122,6 @@ SUCH DAMAGE.
 /* we want the reentrancy structure to be returned by a function */
 #define __DYNAMIC_REENT__
 #define HAVE_GETDATE
-#define _READ_WRITE_RETURN_TYPE _ssize_t
 #ifndef __LARGE64_FILES
 #define __LARGE64_FILES 1
 #endif
@@ -272,7 +267,6 @@ SUCH DAMAGE.
 
 #if defined(__rtems__)
 #define __FILENAME_MAX__ 255
-#define _READ_WRITE_RETURN_TYPE _ssize_t
 #define __DYNAMIC_REENT__
 #endif
 
@@ -282,19 +276,6 @@ SUCH DAMAGE.
 
 #ifndef __IMPORT
 #define __IMPORT
-#endif
-
-/* Define return type of read/write routines.  In POSIX, the return type
-   for read()/write() is "ssize_t" but legacy newlib code has been using
-   "int" for some time.  If not specified, "int" is defaulted.  */
-#ifndef _READ_WRITE_RETURN_TYPE
-#define _READ_WRITE_RETURN_TYPE int
-#endif
-/* Define `count' parameter of read/write routines.  In POSIX, the `count'
-   parameter is "size_t" but legacy newlib code has been using "int" for some
-   time.  If not specified, "int" is defaulted.  */
-#ifndef _READ_WRITE_BUFSIZE_TYPE
-#define _READ_WRITE_BUFSIZE_TYPE int
 #endif
 
 #ifndef __WCHAR_MAX__

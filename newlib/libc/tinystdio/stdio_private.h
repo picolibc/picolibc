@@ -113,7 +113,7 @@ bool __matchcaseprefix(const char *input, const char *pattern);
 
 #define FDEV_SETUP_POSIX(fd, buf, size, rwflags, bflags)        \
         FDEV_SETUP_BUFIO(fd, buf, size,                         \
-                         (void *)read, (void *)write,           \
+                         read, write,                           \
                          lseek, close, rwflags, bflags)
 
 int

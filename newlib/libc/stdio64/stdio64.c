@@ -49,14 +49,14 @@ __sseek64 (
   return ret;
 }
 
-_READ_WRITE_RETURN_TYPE
+ssize_t
 __swrite64 (
        void *cookie,
        char const *buf,
-       _READ_WRITE_BUFSIZE_TYPE n)
+       size_t n)
 {
   register FILE *fp = (FILE *) cookie;
-  _READ_WRITE_RETURN_TYPE w;
+  ssize_t w;
 #ifdef __SCLE
   int oldmode=0;
 #endif

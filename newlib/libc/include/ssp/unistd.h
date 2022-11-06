@@ -70,7 +70,7 @@ __ssp_redirect0(ssize_t, pread, (int __fd, void *__buf, size_t __len, off_t __of
     (__fd, __buf, __len, __off));
 #endif
 
-__ssp_redirect0(_READ_WRITE_RETURN_TYPE, read, \
+__ssp_redirect0(ssize_t, read, \
     (int __fd, void *__buf, size_t __len), (__fd, __buf, __len));
 
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200112 || __XSI_VISIBLE >= 4

@@ -67,8 +67,8 @@ freopen(const char *pathname, const char *mode, FILE *stream)
         pf->fd = fd;
 
         /* Switch to POSIX backend */
-        pf->read = (void *) read;
-        pf->write = (void *) write;
+        pf->read = read;
+        pf->write = write;
         pf->lseek = lseek;
         pf->close = close;
 

@@ -167,14 +167,14 @@ extern int    _sflush (FILE *);
 extern int    _sflushw (FILE *);
 #endif
 extern int    _srefill (FILE *);
-extern _READ_WRITE_RETURN_TYPE __sread (void *, char *,
-					       _READ_WRITE_BUFSIZE_TYPE);
-extern _READ_WRITE_RETURN_TYPE __seofread (void *,
+extern ssize_t __sread (void *, char *,
+					       size_t);
+extern ssize_t __seofread (void *,
 						  char *,
-						  _READ_WRITE_BUFSIZE_TYPE);
-extern _READ_WRITE_RETURN_TYPE __swrite (void *,
+						  size_t);
+extern ssize_t __swrite (void *,
 						const char *,
-						_READ_WRITE_BUFSIZE_TYPE);
+						size_t);
 extern _fpos_t __sseek (void *, _fpos_t, int);
 extern int    __sclose (void *);
 extern int    __stextmode (int);
@@ -185,9 +185,9 @@ extern int __submore (FILE *);
 
 #ifdef __LARGE64_FILES
 extern _fpos64_t __sseek64 (void *, _fpos64_t, int);
-extern _READ_WRITE_RETURN_TYPE __swrite64 (void *,
+extern ssize_t __swrite64 (void *,
 						  const char *,
-						  _READ_WRITE_BUFSIZE_TYPE);
+						  size_t);
 #endif
 
 extern NEWLIB_THREAD_LOCAL void (*_tls_cleanup)(void);

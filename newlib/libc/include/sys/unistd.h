@@ -204,7 +204,7 @@ int     pipe2 (int __fildes[2], int flags);
 ssize_t pread (int __fd, void *__buf, size_t __nbytes, off_t __offset);
 ssize_t pwrite (int __fd, const void *__buf, size_t __nbytes, off_t __offset);
 #endif
-_READ_WRITE_RETURN_TYPE read (int __fd, void *__buf, size_t __nbyte);
+ssize_t read (int __fd, void *__buf, size_t __nbyte);
 #if __BSD_VISIBLE
 int	rresvport (int *__alport);
 int	revoke (char *__path);
@@ -256,7 +256,7 @@ int 	usleep (useconds_t __useconds);
 #if __BSD_VISIBLE
 int     vhangup (void);
 #endif
-_READ_WRITE_RETURN_TYPE write (int __fd, const void *__buf, size_t __nbyte);
+ssize_t write (int __fd, const void *__buf, size_t __nbyte);
 
 #ifdef __CYGWIN__
 # define __UNISTD_GETOPT__
@@ -285,11 +285,8 @@ _off_t  lseek (int __fildes, _off_t __offset, int __whence);
 #ifdef __LARGE64_FILES
 _off64_t lseek64 (int __filedes, _off64_t __offset, int __whence);
 #endif
-_READ_WRITE_RETURN_TYPE _read (int __fd, void *__buf, size_t __nbyte);
 void *  sbrk (ptrdiff_t __incr);
 int     unlink (const char *__path);
-_READ_WRITE_RETURN_TYPE _write (int __fd, const void *__buf, size_t __nbyte);
-int     execve (const char *__path, char * const __argv[], char * const __envp[]);
 #endif
 
 #if !defined(__INSIDE_CYGWIN__)
