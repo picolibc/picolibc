@@ -408,7 +408,9 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 #ifdef __AVR__
 #define __IEEE_LITTLE_ENDIAN
+#if !defined(__SIZEOF_DOUBLE__) || __SIZEOF_DOUBLE__ == 4
 #define _DOUBLE_IS_32BITS
+#endif
 #endif
 
 #if defined(__or1k__) || defined(__OR1K__) || defined(__OR1KND__)
