@@ -8,10 +8,18 @@
 FUNC_START(setjmp)
 #ifdef __ALTIVEC__
 	addi	3,3,15		# align Altivec to 16 byte boundary
+#if __powerpc64__
+	clrrdi	3,3,4
+#else
 	rlwinm	3,3,0,0,27
+#endif
 #else
 	addi	3,3,7		# align to 8 byte boundary
+#if __powerpc64__
+	clrrdi	3,3,3
+#else
 	rlwinm	3,3,0,0,28
+#endif
 #endif
 #if __SPE__
 	/* If we are E500, then save 64-bit registers.  */
@@ -193,10 +201,18 @@ FUNC_END(setjmp)
 FUNC_START(longjmp)
 #ifdef __ALTIVEC__
 	addi	3,3,15		# align Altivec to 16 byte boundary
+#if __powerpc64__
+	clrrdi	3,3,4
+#else
 	rlwinm	3,3,0,0,27
+#endif
 #else
 	addi	3,3,7		# align to 8 byte boundary
+#if __powerpc64__
+	clrrdi	3,3,3
+#else
 	rlwinm	3,3,0,0,28
+#endif
 #endif
 #if __SPE__
 	/* If we are E500, then restore 64-bit registers.  */
