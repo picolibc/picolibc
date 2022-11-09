@@ -118,6 +118,8 @@ option('io-pos-args', type: 'boolean', value: false,
        description: 'enable printf-family positional arg support (always enabled for tinystdio float)')
 option('newlib-io-pos-args', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
        description: 'enable printf-family positional arg support (always enabled for tinystdio float)')
+option('io-percent-b', type: 'boolean', value: false,
+       description: 'enable proposed %b/%B format in printf and scanf in tinystdio (default: false)')
 
 #
 # Options applying only to tinystdio

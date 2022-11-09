@@ -266,6 +266,7 @@ posix_console = posix_io and get_option('posix-console')
 io_float_exact = not tinystdio or get_option('io-float-exact')
 atomic_ungetc = tinystdio and get_option('atomic-ungetc')
 format_default = get_option('format-default')
+io_percent_b = tinystdio and get_option('io-percent-b')
 
 double_printf_compile_args=['-DPICOLIBC_DOUBLE_PRINTF_SCANF']
 double_printf_link_args=double_printf_compile_args
@@ -940,6 +941,7 @@ conf_data.set('_WANT_IO_LONG_LONG', io_long_long)
 conf_data.set('_WANT_IO_POS_ARGS', io_pos_args)
 conf_data.set('_WANT_IO_C99_FORMATS', io_c99_formats)
 conf_data.set('_IO_FLOAT_EXACT', io_float_exact)
+conf_data.set('_WANT_IO_PERCENT_B', io_percent_b)
 if not tinystdio
   conf_data.set('_WANT_IO_LONG_DOUBLE', newlib_io_long_double)
   conf_data.set('NO_FLOATING_POINT', not newlib_io_float)
