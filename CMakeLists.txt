@@ -365,6 +365,10 @@ endif()
 
 option(__IO_FLOAT "Support floating point in printf/scanf by default" OFF)
 
+if(NOT DEFINED _WANT_IO_PERCENT_B)
+  option(_WANT_IO_PERCENT_B "Support %b/%B formats in printf/scanf" OFF)
+endif()
+
 if(NOT DEFINED FORMAT_DEFAULT_DOUBLE)
   set(FORMAT_DEFAULT_DOUBLE ${__IO_FLOAT})
 endif()
