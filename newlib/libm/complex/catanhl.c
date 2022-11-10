@@ -31,6 +31,8 @@
 
 #include <complex.h>
 
+#ifdef _HAVE_LONG_DOUBLE_MATH
+
 long double complex
 catanhl(long double complex z)
 {
@@ -39,3 +41,5 @@ catanhl(long double complex z)
 	w = -1.0L * (double complex) I * catanl(z * (double complex) I);
 	return w;
 }
+
+#endif

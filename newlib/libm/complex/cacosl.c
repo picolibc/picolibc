@@ -33,6 +33,8 @@
 #include <math.h>
 #include "cephes_subrl.h"
 
+#ifdef _HAVE_LONG_DOUBLE_MATH
+
 long double complex
 cacosl(long double complex z)
 {
@@ -43,3 +45,4 @@ cacosl(long double complex z)
 	return w;
 }
 
+#endif

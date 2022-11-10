@@ -33,7 +33,7 @@
 #include <math.h>
 #include "cephes_subrl.h"
 
-#ifdef _HAVE_LONG_DOUBLE_COMPLEX
+#ifdef _HAVE_LONG_DOUBLE_MATH
 /* calculate cosh and sinh */
 
 void
