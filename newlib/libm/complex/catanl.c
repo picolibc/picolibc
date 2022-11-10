@@ -33,6 +33,8 @@
 #include <math.h>
 #include "cephes_subrl.h"
 
+#ifdef _HAVE_LONG_DOUBLE_COMPLEX
+
 #ifdef __weak_alias
 __weak_alias(catanl, _catanl)
 #endif
@@ -75,3 +77,4 @@ ovrf:
 	return w;
 }
 
+#endif

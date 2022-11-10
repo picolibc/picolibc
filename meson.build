@@ -112,7 +112,7 @@ Unsupported architecture: "@0@"
   error(message.format(host_cpu_family))
 endif
 
-# Find out about long double type
+# Find out about float types
 
 long_double_code = '''
 #include <float.h>
@@ -127,34 +127,29 @@ long double test()
 '''
 have_long_double = cc.compiles(long_double_code, name : 'long double check', args: core_c_args)
 
-long_double_size_code = '''
+have_sizeof_float = cc.get_define('__SIZEOF_FLOAT__') != ''
+have_sizeof_double = cc.get_define('__SIZEOF_DOUBLE__') != ''
+have_sizeof_long_double = have_long_double and cc.get_define('__SIZEOF_LONG_DOUBLE__') != ''
+
+set_double_equals_float = not have_sizeof_float or not have_sizeof_double
+
+if set_double_equals_float
+  float_double_code = '''
+char size_test[sizeof(float) == sizeof(double) ? 1 : -1];
+'''
+  set_double_equals_float = 
+  double_equals_float = cc.compiles(float_double_code, name : 'double same as float', args : core_c_args)
+endif
+
+set_long_double_equals_double = not have_sizeof_double or not have_sizeof_long_double
+
+if set_long_double_equals_double
+  long_double_size_code = '''
 #include <float.h>
 char size_test[sizeof(double) == sizeof(long double) ? 1 : -1];
 '''
-
-long_double_mant_64_code = '''
-#include <float.h>
-char size_test[__LDBL_MANT_DIG__ == 64 ? 1 : -1];
-'''
-
-long_double_mant_113_code = '''
-#include <float.h>
-char size_test[__LDBL_MANT_DIG__ == 113 ? 1 : -1];
-'''
-
-if have_long_double
   long_double_equals_double = cc.compiles(long_double_size_code, name : 'long double same as double', args: core_c_args)
-  if not long_double_equals_double
-    long_double_mant_is_64 = cc.compiles(long_double_mant_64_code, name : 'long double mantissa is 64 bits', args: core_c_args)
-    long_double_mant_is_113 = cc.compiles(long_double_mant_113_code, name : 'long double mantissa is 113 bits', args: core_c_args)
-  endif
 endif
-
-float_double_code = '''
-char size_test[sizeof(float) == sizeof(double) ? 1 : -1];
-'''
-
-double_equals_float = cc.compiles(float_double_code, name : 'double same as float', args : core_c_args)
 
 enable_multilib = get_option('multilib')
 multilib_list = get_option('multilib-list')
@@ -378,9 +373,6 @@ if tinystdio
 else
   if posix_console
     error('newlib stdio does not support the posix-console option (posix-console)')
-  endif
-  if newlib_io_long_double and not long_double_equals_double and not long_double_mant_is_64
-    error('newlib-io-long-double not supported on target')
   endif
 endif
 
@@ -929,7 +921,11 @@ conf_data.set('_HAVE_NO_BUILTIN_ATTRIBUTE',
 
 conf_data.set('_HAVE_LONG_DOUBLE', have_long_double,
 	      description: 'Compiler has long double type')
-if have_long_double
+if set_double_equals_float
+  conf_data.set('_DBL_EQ_FLT', double_equals_float,
+		description: 'double is the same as float')
+endif
+if set_long_double_equals_double
   conf_data.set('_LDBL_EQ_DBL', long_double_equals_double,
 		description: 'long double is the same as double')
 endif

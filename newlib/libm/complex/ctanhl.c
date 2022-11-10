@@ -32,6 +32,8 @@
 #include <complex.h>
 #include <math.h>
 
+#ifdef _HAVE_LONG_DOUBLE_COMPLEX
+
 long double complex
 ctanhl(long double complex z)
 {
@@ -45,3 +47,5 @@ ctanhl(long double complex z)
 
 	return w;
 }
+
+#endif

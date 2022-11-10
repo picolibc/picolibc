@@ -13,6 +13,7 @@
 #define I _Complex_I
 
 #include <sys/cdefs.h>
+#include <ieeefp.h>
 
 __BEGIN_DECLS
 
@@ -131,6 +132,7 @@ float complex clog10f(float complex);
 #endif
 
 #if defined(__CYGWIN__) || defined(_LDBL_EQ_DBL)
+#define _HAVE_LONG_DOUBLE_COMPLEX
 long double complex cacosl(long double complex);
 long double complex ccosl(long double complex);
 long double complex csinl(long double complex);

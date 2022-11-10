@@ -32,6 +32,8 @@
 #include <complex.h>
 #include <math.h>
 
+#ifdef _HAVE_LONG_DOUBLE_COMPLEX
+
 long double complex
 cpowl(long double complex a, long double complex z)
 {
@@ -54,3 +56,5 @@ cpowl(long double complex a, long double complex z)
 	w = r * cosl(theta) + (r * sinl(theta)) * (double complex) I;
 	return w;
 }
+
+#endif

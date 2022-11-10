@@ -32,6 +32,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <complex.h>
 #include <math.h>
 
+#ifdef _HAVE_LONG_DOUBLE_COMPLEX
+
 long double
 cargl(long double complex z)
 {     
@@ -41,3 +43,5 @@ cargl(long double complex z)
          return atan2l (cimagl (z), creall (z));
        #endif
 }
+
+#endif

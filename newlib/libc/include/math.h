@@ -114,7 +114,6 @@ _BEGIN_STD_C
 
 /* Reentrant ANSI C functions.  */
 
-#ifndef __math_68881
 extern double atan (double);
 extern double cos (double);
 extern double sin (double);
@@ -125,12 +124,7 @@ extern double modf (double, double *);
 extern double ceil (double);
 extern double fabs (double);
 extern double floor (double);
-#endif /* ! defined (__math_68881) */
 
-/* Non reentrant ANSI C functions.  */
-
-#ifndef _REENT_ONLY
-#ifndef __math_68881
 extern double acos (double);
 extern double asin (double);
 extern double atan2 (double, double);
@@ -143,8 +137,6 @@ extern double log10 (double);
 extern double pow (double, double);
 extern double sqrt (double);
 extern double fmod (double, double);
-#endif /* ! defined (__math_68881) */
-#endif /* ! defined (_REENT_ONLY) */
 
 #if __MISC_VISIBLE
 extern int finite (double);
@@ -429,12 +421,9 @@ extern double fmax (double, double);
 extern double fmin (double, double);
 extern double fma (double, double, double);
 
-#ifndef __math_68881
 extern double log1p (double);
 extern double expm1 (double);
-#endif /* ! defined (__math_68881) */
 
-#ifndef _REENT_ONLY
 extern double acosh (double);
 extern double atanh (double);
 extern double remainder (double, double);
@@ -447,11 +436,7 @@ extern double log2 (double);
 #define log2(x) (log (x) / _M_LN2)
 #endif
 
-#ifndef __math_68881
 extern double hypot (double, double);
-#endif
-
-#endif /* ! defined (_REENT_ONLY) */
 
 /* Single precision versions of ANSI functions.  */
 
@@ -466,7 +451,6 @@ extern float ceilf (float);
 extern float fabsf (float);
 extern float floorf (float);
 
-#ifndef _REENT_ONLY
 extern float acosf (float);
 extern float asinf (float);
 extern float atan2f (float, float);
@@ -479,7 +463,6 @@ extern float log10f (float);
 extern float powf (float, float);
 extern float sqrtf (float);
 extern float fmodf (float, float);
-#endif /* ! defined (_REENT_ONLY) */
 
 /* Other single precision functions.  */
 
@@ -516,7 +499,6 @@ extern float expm1f (float);
 extern float getpayloadf(const float *x);
 extern float significandf (float);
 
-#ifndef _REENT_ONLY
 extern float acoshf (float);
 extern float atanhf (float);
 extern float remainderf (float, float);
@@ -526,7 +508,19 @@ extern float erff (float);
 extern float erfcf (float);
 extern float log2f (float);
 extern float hypotf (float, float);
-#endif /* ! defined (_REENT_ONLY) */
+
+#ifdef _HAVE_LONG_DOUBLE
+
+/* These functions are always available for long double */
+
+extern long double hypotl (long double, long double);
+extern long double sqrtl (long double);
+extern long double frexpl (long double, int *);
+
+/* Other long double precision functions.  */
+extern long double rintl (long double);
+extern long int lrintl (long double);
+extern long long int llrintl (long double);
 
 /* Newlib doesn't fully support long double math functions so far.
    On platforms where long double equals double the long double functions
@@ -534,23 +528,20 @@ extern float hypotf (float, float);
    are implemented independently from newlib to be able to use optimized
    assembler functions despite using the Microsoft x86_64 ABI. */
 #if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__)
-/* Reentrant ANSI C functions.  */
-#ifndef __math_68881
+#define _HAVE_LONG_DOUBLE_MATH
+#endif
+
+#ifdef _HAVE_LONG_DOUBLE_MATH
 extern long double atanl (long double);
 extern long double cosl (long double);
 extern long double sinl (long double);
 extern long double tanl (long double);
 extern long double tanhl (long double);
-extern long double frexpl (long double, int *);
 extern long double modfl (long double, long double *);
 extern long double ceill (long double);
 extern long double floorl (long double);
 extern long double log1pl (long double);
 extern long double expm1l (long double);
-#endif /* ! defined (__math_68881) */
-/* Non reentrant ANSI C functions.  */
-#ifndef _REENT_ONLY
-#ifndef __math_68881
 extern long double acosl (long double);
 extern long double asinl (long double);
 extern long double atan2l (long double, long double);
@@ -561,11 +552,7 @@ extern long double ldexpl (long double, int);
 extern long double logl (long double);
 extern long double log10l (long double);
 extern long double powl (long double, long double);
-extern long double sqrtl (long double);
 extern long double fmodl (long double, long double);
-extern long double hypotl (long double, long double);
-#endif /* ! defined (__math_68881) */
-#endif /* ! defined (_REENT_ONLY) */
 extern long double nanl (const char *);
 extern int ilogbl (long double);
 extern long double asinhl (long double);
@@ -576,14 +563,11 @@ extern double nexttoward (double, long double);
 extern long double nexttowardl (long double, long double);
 extern long double logbl (long double);
 extern long double log2l (long double);
-extern long double rintl (long double);
 extern long double scalbnl (long double, int);
 extern long double exp2l (long double);
 extern long double scalblnl (long double, long);
 extern long double tgammal (long double);
 extern long double nearbyintl (long double);
-extern long int lrintl (long double);
-extern long long int llrintl (long double);
 extern long double roundl (long double);
 extern long lroundl (long double);
 extern long long int llroundl (long double);
@@ -593,25 +577,15 @@ extern long double fdiml (long double, long double);
 extern long double fmaxl (long double, long double);
 extern long double fminl (long double, long double);
 extern long double fmal (long double, long double, long double);
-#ifndef _REENT_ONLY
 extern long double acoshl (long double);
 extern long double atanhl (long double);
 extern long double remainderl (long double, long double);
 extern long double lgammal (long double);
 extern long double erfl (long double);
 extern long double erfcl (long double);
-#endif /* ! defined (_REENT_ONLY) */
-#else /* !_LDBL_EQ_DBL && !__CYGWIN__ */
-extern long double hypotl (long double, long double);
-extern long double sqrtl (long double);
-extern long double frexpl (long double, int *);
-#ifdef __i386__
-/* Other long double precision functions.  */
-extern _LONG_DOUBLE rintl (_LONG_DOUBLE);
-extern long int lrintl (_LONG_DOUBLE);
-extern long long int llrintl (_LONG_DOUBLE);
-#endif /* __i386__ */
-#endif /* !_LDBL_EQ_DBL && !__CYGWIN__ */
+#endif /* _HAVE_LONG_DOUBLE_MATH */
+
+#endif /* _HAVE_LONG_DOUBLE */
 
 #endif /* __ISO_C_VISIBLE >= 1999 */
 
@@ -624,7 +598,7 @@ extern long double copysignl (long double, long double);
 #if __MISC_VISIBLE
 extern double drem (double, double);
 extern float dremf (float, float);
-#if defined(_LDBL_EQ_DBL) || defined(__CYGWIN__)
+#ifdef _HAVE_LONG_DOUBLE_MATH
 extern long double dreml (long double, long double);
 #endif
 extern double lgamma_r (double, int *);
@@ -653,28 +627,16 @@ extern float jnf (int, float);
 #if __GNU_VISIBLE
 extern void sincos (double, double *, double *);
 extern void sincosf (float, float *, float *);
-#if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__)
+#ifdef _HAVE_LONG_DOUBLE_MATH
 extern void sincosl (long double, long double *, long double *);
 #endif
-# ifndef exp10
 extern double exp10 (double);
-# endif
-# ifndef pow10
 extern double pow10 (double);
-# endif
-# ifndef exp10f
 extern float exp10f (float);
-# endif
-# ifndef pow10f
 extern float pow10f (float);
-# endif
-#if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__)
-# ifndef exp10l
+#ifdef _HAVE_LONG_DOUBLE_MATH
 extern long double exp10l (long double);
-# endif
-# ifndef pow10l
 extern long double pow10l (long double);
-# endif
 #endif
 #endif /* __GNU_VISIBLE */
 

@@ -154,9 +154,7 @@ else
   srcs_tinystdio += srcs_dtoa_float
 endif
 
-if have_long_double and not long_double_equals_double
-  srcs_tinystdio += ['strtold.c', 'strtold_l.c', 'atold_engine.c']
-endif
+srcs_tinystdio += ['strtold.c', 'strtold_l.c', 'atold_engine.c']
 
 if atomic_ungetc
   srcs_tinystdio += ['exchange.c', 'compare_exchange.c']

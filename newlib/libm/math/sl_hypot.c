@@ -6,7 +6,7 @@
 
 #include "fdlibm.h"
 
-#if !defined(_LDBL_EQ_DBL) || !defined(_HAVE_ALIAS_ATTRIBUTE)
+#if (!defined(_LDBL_EQ_DBL) || !defined(_HAVE_ALIAS_ATTRIBUTE))
 
 long double
 hypotl(long double x, long double y)

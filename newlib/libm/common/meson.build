@@ -238,9 +238,7 @@ srcs_common += dsrcs_common + fsrcs_common
 
 if have_long_double
   srcs_common += lsrc_full
-  if long_double_equals_double
-    srcs_common += lsrc_wrap
-  endif
+  srcs_common += lsrc_wrap
 endif
 
 srcs_common_use = []

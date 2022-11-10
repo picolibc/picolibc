@@ -46,12 +46,27 @@
 #define NPOW_10 10
 #elif __LDBL_MAX_10_EXP__ >= 256
 #define NPOW_10 9
+#elif __LDBL_MAX_10_EXP__ >= 128
+#define NPOW_10 8
+#elif __LDBL_MAX_10_EXP__ >= 64
+#define NPOW_10 7
+#elif __LDBL_MAX_10_EXP__ >= 32
+#define NPOW_10 6
 #else
 #error __LDBL_MAX_10_EXP__ too small
 #endif
 
 static const long double pwr_p10 [NPOW_10] = {
-    1e+1L, 1e+2L, 1e+4L, 1e+8L, 1e+16L, 1e+32L, 1e+64L, 1e+128L, 1e+256L,
+    1e+1L, 1e+2L, 1e+4L, 1e+8L, 1e+16L, 1e+32L,
+#if NPOW_10 >= 7
+    1e+64L,
+#endif
+#if NPOW_10 >= 8
+    1e+128L,
+    #endif
+#if NPOW_10 >= 9
+    1e+256L,
+#endif
 #if NPOW_10 >= 10
     1e+512L,
 #endif
@@ -67,7 +82,16 @@ static const long double pwr_p10 [NPOW_10] = {
 };
 
 static const long double pwr_m10 [NPOW_10] = {
-    1e-1L, 1e-2L, 1e-4L, 1e-8L, 1e-16L, 1e-32L, 1e-64L, 1e-128L, 1e-256L,
+    1e-1L, 1e-2L, 1e-4L, 1e-8L, 1e-16L, 1e-32L,
+#if NPOW_10 >= 7
+    1e-64L,
+#endif
+#if NPOW_10 >= 8
+    1e-128L,
+#endif
+#if NPOW_10 >= 9
+    1e-256L,
+#endif
 #if NPOW_10 >= 10
     1e-512L,
 #endif
