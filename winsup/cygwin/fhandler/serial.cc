@@ -391,50 +391,39 @@ fhandler_serial::tcflow (int action)
 int
 fhandler_serial::switch_modem_lines (int set, int clr)
 {
-  int res = 0;
+  if ((set & (TIOCM_RTS | TIOCM_DTR)) || (clr & (TIOCM_RTS | TIOCM_DTR)))
+    {
+      DCB dcb;
 
-  if (set & TIOCM_RTS)
-    {
-      if (EscapeCommFunction (get_handle (), SETRTS))
-	rts = TIOCM_RTS;
+      memset(&dcb,0,sizeof(dcb));
+      dcb.DCBlength = sizeof(dcb);
+
+      if (!GetCommState(get_handle(), &dcb))
+        {
+          __seterrno ();
+          return -1;
+        }
+
+      if (set & TIOCM_RTS)
+        dcb.fRtsControl = RTS_CONTROL_ENABLE;
       else
-	{
-	  __seterrno ();
-	  res = -1;
-	}
-    }
-  else if (clr & TIOCM_RTS)
-    {
-      if (EscapeCommFunction (get_handle (), CLRRTS))
-	rts = 0;
+      if (clr & TIOCM_RTS)
+        dcb.fRtsControl = RTS_CONTROL_DISABLE;
+
+      if (set & TIOCM_DTR)
+        dcb.fRtsControl = DTR_CONTROL_ENABLE;
       else
-	{
-	  __seterrno ();
-	  res = -1;
-	}
-    }
-  if (set & TIOCM_DTR)
-    {
-      if (EscapeCommFunction (get_handle (), SETDTR))
-	rts = TIOCM_DTR;
-      else
-	{
-	  __seterrno ();
-	  res = -1;
-	}
-    }
-  else if (clr & TIOCM_DTR)
-    {
-      if (EscapeCommFunction (get_handle (), CLRDTR))
-	rts = 0;
-      else
-	{
-	  __seterrno ();
-	  res = -1;
-	}
+      if (clr & TIOCM_DTR)
+        dcb.fRtsControl = DTR_CONTROL_DISABLE;
+
+      if (!SetCommState(get_handle(), &dcb))
+        {
+          __seterrno ();
+          return -1;
+        }
     }
 
-  return res;
+  return 0;
 }
 
 /* ioctl: */
