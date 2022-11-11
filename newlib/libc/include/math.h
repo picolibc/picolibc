@@ -112,8 +112,6 @@ _BEGIN_STD_C
 
 #endif /* !gcc >= 3.3  */
 
-/* Reentrant ANSI C functions.  */
-
 extern double atan (double);
 extern double cos (double);
 extern double sin (double);
@@ -521,15 +519,6 @@ extern long double frexpl (long double, int *);
 extern long double rintl (long double);
 extern long int lrintl (long double);
 extern long long int llrintl (long double);
-
-/* Newlib doesn't fully support long double math functions so far.
-   On platforms where long double equals double the long double functions
-   simply call the double functions.  On Cygwin the long double functions
-   are implemented independently from newlib to be able to use optimized
-   assembler functions despite using the Microsoft x86_64 ABI. */
-#if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__)
-#define _HAVE_LONG_DOUBLE_MATH
-#endif
 
 #ifdef _HAVE_LONG_DOUBLE_MATH
 extern long double atanl (long double);
