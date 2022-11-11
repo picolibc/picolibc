@@ -42,3 +42,6 @@ Bug Fixes
 
 - Don't error out if getfacl(1) is called on a socket file.
   Partially addresses: https://cygwin.com/pipermail/cygwin/2022-July/251768.html
+
+- Make serial ioctl(TIOCMBIS/TIOCMBIC) work on USB CDC devices.
+  Addresses: https://cygwin.com/pipermail/cygwin/2022-November/252443.html
