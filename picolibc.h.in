@@ -359,9 +359,6 @@
 
 #cmakedefine _IO_FLOAT_EXACT
 
-/* long double is the same as double */
-#cmakedefine _LDBL_EQ_DBL
-
 #cmakedefine _LITE_EXIT
 
 #cmakedefine _MB_CAPABLE

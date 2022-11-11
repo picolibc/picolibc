@@ -191,7 +191,7 @@ set(_HAVE_BUILTIN_ADD_OVERFLOW 1)
 set(_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL 1)
 
 # Compiler supports _Complex
-set(_HAVE_COMPLEX 1)
+try_compile(_HAVE_COMPLEX ${PROJECT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/have-complex.c)
 
 set(_HAVE_FCNTL 0)
 
@@ -329,9 +329,6 @@ set(_IEEE_LIBM 1)
 if(NOT DEFINED _IO_FLOAT_EXACT)
   option(_IO_FLOAT_EXACT "Provide exact binary/decimal conversion for printf/scanf" 1)
 endif()
-
-# is long double the same as double
-try_compile(_LDBL_EQ_DBL ${PROJECT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/ldbl-eq-dbl.c)
 
 set(_LITE_EXIT 1)
 
