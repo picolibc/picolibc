@@ -1,0 +1,19 @@
+[binaries]
+# Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
+# so we have to add -nostdlib to the compiler configuration itself or
+# early compiler tests will fail. This can be removed when picolibc
+# requires at least version 0.54.2 of meson.
+c = ['avr-gcc', '-nostdlib', '-D__COMPILING_AVR_LIBC__']
+ar = 'avr-ar'
+as = 'avr-as'
+nm = 'avr-nm'
+strip = 'avr-strip'
+
+[host_machine]
+system = 'none'
+cpu_family = 'avr'
+cpu = 'avr'
+endian = 'little'
+
+[properties]
+skip_sanity_check = true
