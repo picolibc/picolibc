@@ -186,7 +186,7 @@ lsrcs_stdlib = [
 
 if not tinystdio
   srcs_stdlib += srcs_stdlib_stdio
-  if have_long_double and not long_double_equals_double
+  if have_long_double
     srcs_stdlib += lsrcs_stdlib
     if newlib_io_long_double
       srcs_stdlib += 'ldtoa.c'

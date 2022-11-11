@@ -34,7 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "mprec.h"
 #undef FLT_ROUNDS
 
-#if defined(_HAVE_LONG_DOUBLE) && __LDBL_MANT_DIG__ == 64
+#if defined(_HAVE_LONG_DOUBLE) && __LDBL_MANT_DIG__ == 64 && !defined(_LDBL_EQ_DBL)
 
 /* Intel MCU has no x87 floating point unit */
 #if (defined (__x86_64__) || defined (__i386__)) && !defined (__iamcu__)
@@ -62,29 +62,19 @@ __flt_rounds(void)
 long double
 strtold_l (const char *__restrict s00, char **__restrict se, locale_t loc)
 {
-#ifdef _LDBL_EQ_DBL
-  /* On platforms where long double is as wide as double.  */
-  return strtod_l (s00, se, loc);
-#else
   long double result;
 
   _strtorx_l (s00, se, FLT_ROUNDS, &result, loc);
   return result;
-#endif
 }
 
 long double
 strtold (const char *__restrict s00, char **__restrict se)
 {
-#ifdef _LDBL_EQ_DBL
-  /* On platforms where long double is as wide as double.  */
-  return strtod (s00, se);
-#else
   long double result;
 
   _strtorx_l (s00, se, FLT_ROUNDS, &result, __get_current_locale ());
   return result;
-#endif
 }
 
 #endif /* _HAVE_LONG_DOUBLE */
