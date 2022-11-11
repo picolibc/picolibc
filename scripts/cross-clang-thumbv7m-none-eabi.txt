@@ -20,5 +20,5 @@ endian = 'little'
 
 [properties]
 c_args = ['-Werror=double-promotion', '-Wno-unsupported-floating-point-opt', '-fshort-enums']
-c_link_args = ['-L/usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7-m/nofp/']
+c_link_args = ['-L/usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7-m/nofp/', '-L/usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7-m/nofp/']
 skip_sanity_check = true
