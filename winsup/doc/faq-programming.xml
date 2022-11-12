@@ -847,7 +847,7 @@ Guide here: <ulink url="https://cygwin.com/cygwin-ug-net/dll.html"/>.
 
 <para>
   (It may be necessary to use the <command>gdb</command> command <command>set
-  disable-randomization on</command> to turn off ASLR for the debugee to
+  disable-randomization on</command> to turn off ASLR for the debuggee to
   prevent the base address getting randomized.)
 </para>
 </answer></qandaentry>
