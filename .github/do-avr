@@ -1,0 +1,4 @@
+#!/bin/bash
+export AVR_SDK_INSTALL_DIR=/opt/avr-gcc-12.1.0-x64-linux
+PATH=$AVR_SDK_INSTALL_DIR/bin:$PATH
+exec "$@"
