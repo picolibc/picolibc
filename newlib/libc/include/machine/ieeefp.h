@@ -572,6 +572,14 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #define __IEEE_LITTLE_ENDIAN
 #endif
 
+/* New math code requires 64-bit doubles */
+#ifdef _DOUBLE_IS_32BITS
+#undef __OBSOLETE_MATH
+#undef __OBSOLETE_MATH_DOUBLE
+#undef __OBSOLETE_MATH_FLOAT
+#define __OBSOLETE_MATH 1
+#endif
+
 #ifdef __CYGWIN__
 #define __OBSOLETE_MATH_DEFAULT 0
 #endif
