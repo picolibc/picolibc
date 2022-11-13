@@ -44,3 +44,13 @@ atanhf(float x)
     else
         return -t;
 }
+
+#ifdef _DOUBLE_IS_32BITS
+
+double
+atanh(double x)
+{
+    return (double) atanhf((float) x);
+}
+
+#endif

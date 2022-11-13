@@ -214,3 +214,20 @@ ynf(int n, float x)
     else
         return -b;
 }
+
+
+#ifdef _DOUBLE_IS_32BITS
+
+double
+jn(int n, double x)
+{
+    return (double) jnf(n, (float) x);
+}
+
+double
+yn(int n, double x)
+{
+    return (double) ynf(n, (float) x);
+}
+
+#endif

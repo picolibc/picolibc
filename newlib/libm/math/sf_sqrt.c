@@ -79,3 +79,13 @@ sqrtf(float x)
     SET_FLOAT_WORD(z, ix);
     return z;
 }
+
+#ifdef _DOUBLE_IS_32BITS
+
+double
+sqrt(double x)
+{
+    return (double)sqrtf((float)x);
+}
+
+#endif

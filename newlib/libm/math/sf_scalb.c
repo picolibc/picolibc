@@ -42,3 +42,13 @@ scalbf(float x, float fn)
 
     return scalbnf(x, (int)fn);
 }
+
+#ifdef _DOUBLE_IS_32BITS
+
+double
+scalb(double x, double fn)
+{
+    return (double) scalbf((float) x, (float) fn);
+}
+
+#endif

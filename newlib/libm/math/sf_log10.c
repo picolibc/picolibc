@@ -48,3 +48,13 @@ log10f(float x)
     z = y * log10_2lo + ivln10 * logf(x);
     return z + y * log10_2hi;
 }
+
+#ifdef _DOUBLE_IS_32BITS
+
+double
+log10(double x)
+{
+    return (double) log10f((float) x);
+}
+
+#endif

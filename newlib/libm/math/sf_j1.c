@@ -379,3 +379,20 @@ qonef(float x)
              z * (q[1] + z * (q[2] + z * (q[3] + z * (q[4] + z * q[5])))));
     return ((float).375 + r / s) / x;
 }
+
+
+#ifdef _DOUBLE_IS_32BITS
+
+double
+j1(double x)
+{
+    return (double) j1f((float) x);
+}
+
+double
+y1(double x)
+{
+    return (double) y1f((float) x);
+}
+
+#endif

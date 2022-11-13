@@ -95,4 +95,14 @@ expf(float x) /* default IEEE double exp */
         return y * twom100;
     }
 }
+
+#ifdef _DOUBLE_IS_32BITS
+
+double __inhibit_new_builtin_calls
+exp(double x)
+{
+    return (double)expf((float)x);
+}
+
+#endif /* defined(_DOUBLE_IS_32BITS) */
 #endif /* __OBSOLETE_MATH_FLOAT */

@@ -107,3 +107,13 @@ atan2f(float y, float x)
         return (z - pi_lo) - pi; /* atan(-,-) */
     }
 }
+
+#ifdef _DOUBLE_IS_32BITS
+
+double
+atan2(double y, double x)
+{
+    return (double) atan2f((float) y, (float) x);
+}
+
+#endif

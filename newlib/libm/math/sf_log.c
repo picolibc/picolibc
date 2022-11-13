@@ -95,4 +95,15 @@ logf(float x)
             return dk * ln2_hi - ((s * (f - R) - dk * ln2_lo) - f);
     }
 }
+
+#ifdef _DOUBLE_IS_32BITS
+
+double
+log(double x)
+{
+    return (double) logf((float) x);
+}
+
+#endif
+
 #endif /* __OBSOLETE_MATH_FLOAT */

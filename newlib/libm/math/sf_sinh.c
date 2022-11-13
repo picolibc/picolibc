@@ -58,3 +58,13 @@ sinhf(float x)
     /* |x| > overflowthresold, sinh(x) overflow */
     return __math_oflowf(x < 0);
 }
+
+#ifdef _DOUBLE_IS_32BITS
+
+double
+sinh(double x)
+{
+    return (double) sinhf((float) x);
+}
+
+#endif

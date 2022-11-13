@@ -88,3 +88,39 @@ hypotf(float x, float y)
     }
     return check_oflowf(w);
 }
+
+#ifdef _DOUBLE_IS_32BITS
+
+#if defined(_HAVE_ALIAS_ATTRIBUTE)
+
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wattribute-alias="
+extern double hypot(double x, double y) __attribute__((__alias__("hypotf")));
+
+#else
+
+double
+hypot(double x, double y)
+{
+    return (double) hypotf((float) x, (float)y);
+}
+
+#endif
+
+#ifdef _LDBL_EQ_DBL
+#if defined(_HAVE_ALIAS_ATTRIBUTE)
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wattribute-alias="
+extern long double hypotl(long double x, long double y)
+    __attribute__((__alias__("hypot")));
+#else
+long double hypotl(long double x, long double y)
+{
+    return (double) hypot((double) x, (double) y);
+}
+#endif
+#endif
+
+#endif

@@ -20,6 +20,8 @@
 
 #include "fdlibm.h"
 
+#ifndef _DOUBLE_IS_32BITS
+
 double
 tgamma(double x)
 {
@@ -36,3 +38,5 @@ tgamma(double x)
         return __math_oflow(signgam_local < 0);
     return y;
 }
+
+#endif

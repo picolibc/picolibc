@@ -76,3 +76,13 @@ acosf(float x)
         return (float)2.0 * (df + w);
     }
 }
+
+#ifdef _DOUBLE_IS_32BITS
+
+double
+acos(double x)
+{
+    return (double) acosf((float) x);
+}
+
+#endif

@@ -41,3 +41,13 @@ acoshf(float x)
         return log1pf(t + sqrtf((float)2.0 * t + t * t));
     }
 }
+
+#ifdef _DOUBLE_IS_32BITS
+
+double
+acosh(double x)
+{
+    return (double) acoshf((float) x);
+}
+
+#endif

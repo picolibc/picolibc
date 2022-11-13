@@ -20,3 +20,13 @@ dremf(float x, float y)
 {
     return remainderf(x, y);
 }
+
+#ifdef _DOUBLE_IS_32BITS
+
+double
+drem(double x, double y)
+{
+    return (double) dremf((float) x, (float) y);
+}
+
+#endif

@@ -15,8 +15,12 @@ is preserved.
 
 #include "fdlibm.h"
 
+#ifndef _DOUBLE_IS_32BITS
+
 double
 drem(double x, double y)
 {
     return remainder(x, y);
 }
+
+#endif

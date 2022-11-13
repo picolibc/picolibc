@@ -61,3 +61,13 @@ remainderf(float x, float p)
     SET_FLOAT_WORD(x, hx ^ sx);
     return x;
 }
+
+#ifdef _DOUBLE_IS_32BITS
+
+double
+remainder(double x, double p)
+{
+    return (double) remainderf((float) x, (float) p);
+}
+
+#endif

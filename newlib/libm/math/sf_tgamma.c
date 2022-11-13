@@ -38,3 +38,13 @@ tgammaf(float x)
         return __math_oflowf(signgam_local < 0);
     return y;
 }
+
+#ifdef _DOUBLE_IS_32BITS
+
+double
+tgamma(double x)
+{
+    return (double) tgammaf((float) x);
+}
+
+#endif
