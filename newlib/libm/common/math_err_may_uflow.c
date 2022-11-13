@@ -28,7 +28,7 @@
 
 #include "math_config.h"
 
-#if WANT_ERRNO_UFLOW
+#if WANT_ERRNO_UFLOW && !defined(_DOUBLE_IS_32BITS)
 
 static const FORCE_DOUBLE VAL = pick_double_except(0x1.8p-538, 0.0);
 
