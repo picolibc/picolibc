@@ -269,6 +269,8 @@ strtod_l (const char *__restrict s00, char **__restrict se,
 #else
 	const char *decimal_point = ".";
 	const int dec_len = 1;
+
+        (void) loc;
 #endif
 
 	delta = bs = bd = NULL;
