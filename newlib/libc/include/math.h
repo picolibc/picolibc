@@ -253,6 +253,9 @@ extern int __signbitf (float);
 extern int __signbitd (double);
 extern int __finite (double);
 extern int __finitef (float);
+#if defined(_HAVE_LONG_DOUBLE)
+extern int __finitel (long double);
+#endif
 
 /* Note: isinf and isnan were once functions in newlib that took double
  *       arguments.  C99 specifies that these names are reserved for macros
@@ -573,6 +576,12 @@ extern long double remainderl (long double, long double);
 extern long double lgammal (long double);
 extern long double erfl (long double);
 extern long double erfcl (long double);
+extern long double j0l(long double);
+extern long double y0l(long double);
+extern long double j1l(long double);
+extern long double y1l(long double);
+extern long double jnl(int, long double);
+extern long double ynl(int, long double);
 #endif /* _HAVE_LONG_DOUBLE_MATH */
 
 #endif /* _HAVE_LONG_DOUBLE */
@@ -590,6 +599,7 @@ extern double drem (double, double);
 extern float dremf (float, float);
 #ifdef _HAVE_LONG_DOUBLE_MATH
 extern long double dreml (long double, long double);
+extern long double lgammal_r (long double, int *);
 #endif
 extern double lgamma_r (double, int *);
 extern float lgammaf_r (float, int *);
