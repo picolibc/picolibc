@@ -302,9 +302,6 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
       return;
     }
 
-  DWORD inrec_size1 =
-    wincap.cons_need_small_input_record_buf () ? INREC_SIZE : inrec_size;
-
   struct m
   {
     inline static size_t bytes (size_t n)
@@ -354,11 +351,7 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 	  if (new_input_tmp)
 	    input_tmp = new_input_tmp;
 	  if (new_input_rec && new_input_tmp)
-	    {
-	      inrec_size = new_inrec_size;
-	      if (!wincap.cons_need_small_input_record_buf ())
-		inrec_size1 = inrec_size;
-	    }
+	    inrec_size = new_inrec_size;
 	}
 
       WaitForSingleObject (p->input_mutex, mutex_timeout);
@@ -373,7 +366,7 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 	    {
 	      DWORD len;
 	      ReadConsoleInputW (p->input_handle, input_rec + total_read,
-				 min (inrec_size - total_read, inrec_size1),
+				 min (inrec_size - total_read, inrec_size),
 				 &len);
 	      total_read += len;
 	    }
@@ -471,7 +464,7 @@ remove_record:
 		{
 		  DWORD len;
 		  WriteConsoleInputW (p->input_handle, input_rec + n,
-				      min (total_read - n, inrec_size1), &len);
+				      min (total_read - n, inrec_size), &len);
 		  n += len;
 		}
 	      release_attach_mutex ();
@@ -491,22 +484,18 @@ remove_record:
 		  if (new_input_tmp)
 		    input_tmp = new_input_tmp;
 		  if (new_input_rec && new_input_tmp)
-		    {
-		      inrec_size = new_inrec_size;
-		      if (!wincap.cons_need_small_input_record_buf ())
-			inrec_size1 = inrec_size;
-		    }
+		    inrec_size = new_inrec_size;
 		}
 
 	      /* Check if writeback was successfull. */
 	      acquire_attach_mutex (mutex_timeout);
-	      PeekConsoleInputW (p->input_handle, input_tmp, inrec_size1, &n);
+	      PeekConsoleInputW (p->input_handle, input_tmp, inrec_size, &n);
 	      release_attach_mutex ();
-	      if (n < min (total_read, inrec_size1))
+	      if (n < min (total_read, inrec_size))
 		break; /* Someone has read input without acquiring
 			  input_mutex. ConEmu cygwin-connector? */
 	      if (inrec_eq (input_rec, input_tmp,
-			    min (total_read, inrec_size1)))
+			    min (total_read, inrec_size)))
 		break; /* OK */
 	      /* Try to fix */
 	      acquire_attach_mutex (mutex_timeout);
@@ -516,7 +505,7 @@ remove_record:
 		{
 		  DWORD len;
 		  ReadConsoleInputW (p->input_handle, input_tmp + n,
-				     min (inrec_size - n, inrec_size1), &len);
+				     min (inrec_size - n, inrec_size), &len);
 		  n += len;
 		}
 	      release_attach_mutex ();
@@ -549,7 +538,7 @@ remove_record:
 				DWORD len;
 				WriteConsoleInputW (p->input_handle,
 						    input_tmp + l,
-						    min (n - l, inrec_size1),
+						    min (n - l, inrec_size),
 						    &len);
 				l += len;
 			      }
