@@ -29,9 +29,7 @@ details. */
 static inline void __attribute__ ((always_inline))
 get_system_time (PLARGE_INTEGER systime)
 {
-  wincap.has_precise_system_time ()
-	? GetSystemTimePreciseAsFileTime ((LPFILETIME) systime)
-	: GetSystemTimeAsFileTime ((LPFILETIME) systime);
+  GetSystemTimePreciseAsFileTime ((LPFILETIME) systime);
 }
 
 /* Cygwin internal */

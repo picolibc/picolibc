@@ -24,7 +24,6 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   mmap_storage_high:__MMAP_STORAGE_HIGH_LEGACY,
   {
     is_server:false,
-    has_precise_system_time:false,
     has_microsoft_accounts:false,
     has_new_pebteb_region:false,
     has_broken_whoami:true,
@@ -54,7 +53,6 @@ wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
   mmap_storage_high:__MMAP_STORAGE_HIGH_LEGACY,
   {
     is_server:false,
-    has_precise_system_time:true,
     has_microsoft_accounts:true,
     has_new_pebteb_region:false,
     has_broken_whoami:false,
@@ -84,7 +82,6 @@ wincaps wincap_8_1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   mmap_storage_high:__MMAP_STORAGE_HIGH,
   {
     is_server:false,
-    has_precise_system_time:true,
     has_microsoft_accounts:true,
     has_new_pebteb_region:false,
     has_broken_whoami:false,
@@ -114,7 +111,6 @@ wincaps  wincap_10_1507 __attribute__((section (".cygwin_dll_common"), shared)) 
   mmap_storage_high:__MMAP_STORAGE_HIGH,
   {
     is_server:false,
-    has_precise_system_time:true,
     has_microsoft_accounts:true,
     has_new_pebteb_region:false,
     has_broken_whoami:false,
@@ -144,7 +140,6 @@ wincaps  wincap_10_1607 __attribute__((section (".cygwin_dll_common"), shared)) 
   mmap_storage_high:__MMAP_STORAGE_HIGH,
   {
     is_server:false,
-    has_precise_system_time:true,
     has_microsoft_accounts:true,
     has_new_pebteb_region:false,
     has_broken_whoami:false,
@@ -174,7 +169,6 @@ wincaps wincap_10_1703 __attribute__((section (".cygwin_dll_common"), shared)) =
   mmap_storage_high:__MMAP_STORAGE_HIGH,
   {
     is_server:false,
-    has_precise_system_time:true,
     has_microsoft_accounts:true,
     has_new_pebteb_region:true,
     has_broken_whoami:false,
@@ -204,7 +198,6 @@ wincaps wincap_10_1709 __attribute__((section (".cygwin_dll_common"), shared)) =
   mmap_storage_high:__MMAP_STORAGE_HIGH,
   {
     is_server:false,
-    has_precise_system_time:true,
     has_microsoft_accounts:true,
     has_new_pebteb_region:true,
     has_broken_whoami:false,
@@ -234,7 +227,6 @@ wincaps wincap_10_1803 __attribute__((section (".cygwin_dll_common"), shared)) =
   mmap_storage_high:__MMAP_STORAGE_HIGH,
   {
     is_server:false,
-    has_precise_system_time:true,
     has_microsoft_accounts:true,
     has_new_pebteb_region:true,
     has_broken_whoami:false,
@@ -264,7 +256,6 @@ wincaps wincap_10_1809 __attribute__((section (".cygwin_dll_common"), shared)) =
   mmap_storage_high:__MMAP_STORAGE_HIGH,
   {
     is_server:false,
-    has_precise_system_time:true,
     has_microsoft_accounts:true,
     has_new_pebteb_region:true,
     has_broken_whoami:false,
@@ -294,7 +285,6 @@ wincaps wincap_10_1903 __attribute__((section (".cygwin_dll_common"), shared)) =
   mmap_storage_high:__MMAP_STORAGE_HIGH,
   {
     is_server:false,
-    has_precise_system_time:true,
     has_microsoft_accounts:true,
     has_new_pebteb_region:true,
     has_broken_whoami:false,
@@ -324,7 +314,6 @@ wincaps wincap_10_2004 __attribute__((section (".cygwin_dll_common"), shared)) =
   mmap_storage_high:__MMAP_STORAGE_HIGH,
   {
     is_server:false,
-    has_precise_system_time:true,
     has_microsoft_accounts:true,
     has_new_pebteb_region:true,
     has_broken_whoami:false,
@@ -354,7 +343,6 @@ wincaps wincap_11 __attribute__((section (".cygwin_dll_common"), shared)) = {
   mmap_storage_high:__MMAP_STORAGE_HIGH,
   {
     is_server:false,
-    has_precise_system_time:true,
     has_microsoft_accounts:true,
     has_new_pebteb_region:true,
     has_broken_whoami:false,

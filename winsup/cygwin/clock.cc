@@ -40,13 +40,8 @@ clk_t::init ()
 void inline
 clk_realtime_t::init ()
 {
-  if (wincap.has_precise_system_time ())
-    {
-      if (!ticks_per_sec)
-	InterlockedExchange64 (&ticks_per_sec, system_qpc_tickspersec ());
-    }
-  else if (!period)
-    InterlockedExchange64 (&period, system_tickcount_period ());
+  if (!ticks_per_sec)
+    InterlockedExchange64 (&ticks_per_sec, system_qpc_tickspersec ());
 }
 
 void inline
@@ -74,9 +69,7 @@ clk_realtime_t::now (clockid_t clockid, struct timespec *ts)
 {
   LARGE_INTEGER now;
 
-  wincap.has_precise_system_time ()
-      ? GetSystemTimePreciseAsFileTime ((LPFILETIME) &now)
-      : GetSystemTimeAsFileTime ((LPFILETIME) &now);
+  GetSystemTimePreciseAsFileTime ((LPFILETIME) &now);
   /* Add conversion factor for UNIX vs. Windows base time */
   now.QuadPart -= FACTOR;
   ts->tv_sec = now.QuadPart / NS100PERSEC;
@@ -236,10 +229,7 @@ clk_realtime_t::resolution (struct timespec *ts)
 {
   init ();
   ts->tv_sec = 0;
-  if (wincap.has_precise_system_time ())
-    ts->tv_nsec = NSPERSEC / ticks_per_sec;
-  else
-    ts->tv_nsec = period * (NSPERSEC/NS100PERSEC);
+  ts->tv_nsec = NSPERSEC / ticks_per_sec;
 }
 
 void
