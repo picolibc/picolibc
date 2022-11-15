@@ -137,7 +137,7 @@ SECTIONS
 		PROVIDE(__preserve_end__ = .);
 	} >ram AT>ram :ram
 
-	.data : ALIGN_WITH_INPUT {
+	.data : @LDSCRIPT_ALIGN_WITH_INPUT@ {
 		*(.data .data.*)
 		*(.gnu.linkonce.d.*)
 
@@ -159,7 +159,7 @@ SECTIONS
 	 * into the allocate ram addresses by the existing
 	 * data initialization code in crt0
 	 */
-	.tdata : ALIGN_WITH_INPUT {
+	.tdata : @LDSCRIPT_ALIGN_WITH_INPUT@ {
 		*(.tdata .tdata.* .gnu.linkonce.td.*)
 		PROVIDE(__data_end = .);
 		PROVIDE(__tdata_end = .);
@@ -168,12 +168,14 @@ SECTIONS
 	PROVIDE( __tdata_start = ADDR(.tdata));
 	PROVIDE( __tdata_source = LOADADDR(.tdata) );
 	PROVIDE( __tdata_source_end = LOADADDR(.tdata) + SIZEOF(.tdata) );
+	PROVIDE( __data_source_end = __tdata_source_end );
 	PROVIDE( __tdata_size = SIZEOF(.tdata) );
 
 	PROVIDE( __edata = __data_end );
 	PROVIDE( _edata = __data_end );
 	PROVIDE( edata = __data_end );
 	PROVIDE( __data_size = __data_end - __data_start );
+	PROVIDE( __data_source_size = __data_source_end - __data_source );
 
 	.tbss (NOLOAD) : {
 		*(.tbss .tbss.* .gnu.linkonce.tb.*)
@@ -241,3 +243,9 @@ SECTIONS
 
 	@C_END@
 }
+/*
+ * Check that sections that are copied from flash to RAM have matching
+ * padding, so that a single memcpy() of __data_size copies the correct bytes.
+ */
+ASSERT( __data_size == __data_source_size,
+	"ERROR: .data/.tdata flash size does not match RAM size");

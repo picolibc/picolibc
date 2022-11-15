@@ -682,7 +682,19 @@ test_specs = configure_file(input: 'test.specs.in',
 			    configuration: specs_data,
 			    install: false)
 
+picolibc_linker_type_data = configuration_data()
+if cc.get_linker_id() == 'ld.lld'
+    # ld.lld does not implement ALIGN_WITH_INPUT, but this flag is not needed
+    # with ld.lld's output section LMA/VMA algorithm.
+    # An added ASSERT() statement in the linker script ensures that we don't
+    # get silent failures in case this changes in the future.
+    picolibc_linker_type_data.set('LDSCRIPT_ALIGN_WITH_INPUT', '')
+else
+    picolibc_linker_type_data.set('LDSCRIPT_ALIGN_WITH_INPUT', 'ALIGN_WITH_INPUT')
+endif
+
 picolibc_ld_data = configuration_data()
+picolibc_ld_data.merge_from(picolibc_linker_type_data)
 picolibc_ld_data.set('CPP_START', '/*')
 picolibc_ld_data.set('CPP_END', '*/')
 picolibc_ld_data.set('C_START', '')
@@ -694,6 +706,7 @@ picolibc_ld = configure_file(input: 'picolibc.ld.in',
 			     install_dir: lib_dir)
 
 picolibcpp_ld_data = configuration_data()
+picolibcpp_ld_data.merge_from(picolibc_linker_type_data)
 picolibcpp_ld_data.set('CPP_START', '')
 picolibcpp_ld_data.set('CPP_END', '')
 picolibcpp_ld_data.set('C_START', '/*')
