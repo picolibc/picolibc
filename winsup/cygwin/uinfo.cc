@@ -2578,18 +2578,6 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	}
       acc_type = SidTypeUnknown;
     }
-  else if (sid_id_auth (sid) == 18)
-    {
-      /* Authentication assertion SIDs.
-
-         Available when using a 2012R2 DC, but not supported by
-	 LookupAccountXXX on pre Windows 8/2012 machines */
-      uid = 0x11200 + sid_sub_auth_rid (sid);
-      wcpcpy (name = namebuf, sid_sub_auth_rid (sid) == 1
-	      ? (PWCHAR) L"Authentication authority asserted identity"
-	      : (PWCHAR) L"Service asserted identity");
-      acc_type = SidTypeUnknown;
-    }
   else if (sid_id_auth (sid) == 22)
     {
       /* Samba UNIX Users/Groups
