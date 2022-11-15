@@ -462,10 +462,10 @@ LoadDLLfunc (GetUdpTable, 12, iphlpapi)
 LoadDLLfunc (if_indextoname, 8, iphlpapi)
 LoadDLLfunc (if_nametoindex, 4, iphlpapi)
 
-LoadDLLfuncEx2 (DiscardVirtualMemory, 8, kernel32, 1, 127)
-LoadDLLfunc (GetSystemTimePreciseAsFileTime, 4, kernel32)
+LoadDLLfuncEx (ClosePseudoConsole, 4, kernel32, 1)
+LoadDLLfuncEx (CreatePseudoConsole, 20, kernel32, 1)
 LoadDLLfuncEx (IsWow64Process2, 12, kernel32, 1)
-LoadDLLfuncEx (PrefetchVirtualMemory, 16, kernel32, 1)
+LoadDLLfuncEx (ResizePseudoConsole, 8, kernel32, 1)
 
 /* MSDN claims these are exported by kernel32.dll, but only
    QueryUnbiasedInterruptTime actually is.  The others are only
@@ -637,7 +637,4 @@ LoadDLLfunc (PdhAddEnglishCounterW, 16, pdh)
 LoadDLLfunc (PdhCollectQueryData, 4, pdh)
 LoadDLLfunc (PdhGetFormattedCounterValue, 16, pdh)
 LoadDLLfunc (PdhOpenQueryW, 12, pdh)
-LoadDLLfuncEx (CreatePseudoConsole, 20, kernel32, 1)
-LoadDLLfuncEx (ResizePseudoConsole, 8, kernel32, 1)
-LoadDLLfuncEx (ClosePseudoConsole, 4, kernel32, 1)
 }
