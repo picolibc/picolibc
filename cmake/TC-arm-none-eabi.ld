@@ -156,12 +156,14 @@ SECTIONS
 	PROVIDE( __tdata_start = ADDR(.tdata));
 	PROVIDE( __tdata_source = LOADADDR(.tdata) );
 	PROVIDE( __tdata_source_end = LOADADDR(.tdata) + SIZEOF(.tdata) );
+	PROVIDE( __data_source_end = __tdata_source_end );
 	PROVIDE( __tdata_size = SIZEOF(.tdata) );
 
 	PROVIDE( __edata = __data_end );
 	PROVIDE( _edata = __data_end );
 	PROVIDE( edata = __data_end );
 	PROVIDE( __data_size = __data_end - __data_start );
+	PROVIDE( __data_source_size = __data_source_end - __data_source );
 
 	.tbss (NOLOAD) : {
 		*(.tbss .tbss.* .gnu.linkonce.tb.*)
@@ -225,3 +227,9 @@ SECTIONS
 		*(.ARM.exidx*)
 	}
 }
+/*
+ * Check that sections that are copied from flash to RAM have matching
+ * padding, so that a single memcpy() of __data_size copies the correct bytes.
+ */
+ASSERT( __data_size == __data_source_size,
+	"ERROR: .data/.tdata flash size does not match RAM size");
