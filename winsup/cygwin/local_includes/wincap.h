@@ -18,7 +18,6 @@ struct wincaps
   struct  __attribute__ ((aligned (8))) {
     unsigned is_server						: 1;
     unsigned has_new_pebteb_region				: 1;
-    unsigned has_broken_whoami					: 1;
     unsigned has_unprivileged_createsymlink			: 1;
     unsigned has_precise_interrupt_time				: 1;
     unsigned has_posix_unlink_semantics				: 1;
@@ -74,7 +73,6 @@ public:
   intptr_t IMPLEMENT (mmap_storage_high)
   bool  IMPLEMENT (is_server)
   bool	IMPLEMENT (has_new_pebteb_region)
-  bool	IMPLEMENT (has_broken_whoami)
   bool	IMPLEMENT (has_unprivileged_createsymlink)
   bool	IMPLEMENT (has_precise_interrupt_time)
   bool	IMPLEMENT (has_posix_unlink_semantics)

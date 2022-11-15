@@ -25,7 +25,6 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   {
     is_server:false,
     has_new_pebteb_region:false,
-    has_broken_whoami:true,
     has_unprivileged_createsymlink:false,
     has_precise_interrupt_time:false,
     has_posix_unlink_semantics:false,
@@ -53,7 +52,6 @@ wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
   {
     is_server:false,
     has_new_pebteb_region:false,
-    has_broken_whoami:false,
     has_unprivileged_createsymlink:false,
     has_precise_interrupt_time:false,
     has_posix_unlink_semantics:false,
@@ -81,7 +79,6 @@ wincaps wincap_8_1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   {
     is_server:false,
     has_new_pebteb_region:false,
-    has_broken_whoami:false,
     has_unprivileged_createsymlink:false,
     has_precise_interrupt_time:false,
     has_posix_unlink_semantics:false,
@@ -109,7 +106,6 @@ wincaps  wincap_10_1507 __attribute__((section (".cygwin_dll_common"), shared)) 
   {
     is_server:false,
     has_new_pebteb_region:false,
-    has_broken_whoami:false,
     has_unprivileged_createsymlink:false,
     has_precise_interrupt_time:true,
     has_posix_unlink_semantics:false,
@@ -137,7 +133,6 @@ wincaps  wincap_10_1607 __attribute__((section (".cygwin_dll_common"), shared)) 
   {
     is_server:false,
     has_new_pebteb_region:false,
-    has_broken_whoami:false,
     has_unprivileged_createsymlink:false,
     has_precise_interrupt_time:true,
     has_posix_unlink_semantics:false,
@@ -165,7 +160,6 @@ wincaps wincap_10_1703 __attribute__((section (".cygwin_dll_common"), shared)) =
   {
     is_server:false,
     has_new_pebteb_region:true,
-    has_broken_whoami:false,
     has_unprivileged_createsymlink:true,
     has_precise_interrupt_time:true,
     has_posix_unlink_semantics:false,
@@ -193,7 +187,6 @@ wincaps wincap_10_1709 __attribute__((section (".cygwin_dll_common"), shared)) =
   {
     is_server:false,
     has_new_pebteb_region:true,
-    has_broken_whoami:false,
     has_unprivileged_createsymlink:true,
     has_precise_interrupt_time:true,
     has_posix_unlink_semantics:true,
@@ -221,7 +214,6 @@ wincaps wincap_10_1803 __attribute__((section (".cygwin_dll_common"), shared)) =
   {
     is_server:false,
     has_new_pebteb_region:true,
-    has_broken_whoami:false,
     has_unprivileged_createsymlink:true,
     has_precise_interrupt_time:true,
     has_posix_unlink_semantics:true,
@@ -249,7 +241,6 @@ wincaps wincap_10_1809 __attribute__((section (".cygwin_dll_common"), shared)) =
   {
     is_server:false,
     has_new_pebteb_region:true,
-    has_broken_whoami:false,
     has_unprivileged_createsymlink:true,
     has_precise_interrupt_time:true,
     has_posix_unlink_semantics:true,
@@ -277,7 +268,6 @@ wincaps wincap_10_1903 __attribute__((section (".cygwin_dll_common"), shared)) =
   {
     is_server:false,
     has_new_pebteb_region:true,
-    has_broken_whoami:false,
     has_unprivileged_createsymlink:true,
     has_precise_interrupt_time:true,
     has_posix_unlink_semantics:true,
@@ -305,7 +295,6 @@ wincaps wincap_10_2004 __attribute__((section (".cygwin_dll_common"), shared)) =
   {
     is_server:false,
     has_new_pebteb_region:true,
-    has_broken_whoami:false,
     has_unprivileged_createsymlink:true,
     has_precise_interrupt_time:true,
     has_posix_unlink_semantics:true,
@@ -333,7 +322,6 @@ wincaps wincap_11 __attribute__((section (".cygwin_dll_common"), shared)) = {
   {
     is_server:false,
     has_new_pebteb_region:true,
-    has_broken_whoami:false,
     has_unprivileged_createsymlink:true,
     has_precise_interrupt_time:true,
     has_posix_unlink_semantics:true,
