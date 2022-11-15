@@ -2200,7 +2200,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	      bool its_ok = false;
 	      if (sid_id_auth (sid) == 12)
 		its_ok = true;
-	      else if (wincap.has_microsoft_accounts ())
+	      else /* Microsoft Account */
 		{
 		  USER_INFO_24 *ui24;
 		  if (NetUserGetInfo (NULL, name, 24, (PBYTE *) &ui24)
