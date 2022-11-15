@@ -56,3 +56,6 @@ details. */
    Set the lowest address to leave ~32 Gigs for heap. */
 #define MMAP_STORAGE_LOW		0x001000000000UL
 #define MMAP_STORAGE_HIGH		0x700000000000UL
+
+/* Default number of pages used as thread stack guard pages. */
+#define DEFAULT_GUARD_PAGE_COUNT	3

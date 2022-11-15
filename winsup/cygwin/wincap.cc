@@ -20,7 +20,6 @@ details. */
    puzzled that this has never been noticed before... */
 
 wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:2,
   {
     is_server:false,
     has_new_pebteb_region:false,
@@ -43,7 +42,6 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
 };
 
 wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:3,
   {
     is_server:false,
     has_new_pebteb_region:false,
@@ -66,7 +64,6 @@ wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
 };
 
 wincaps wincap_8_1 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:3,
   {
     is_server:false,
     has_new_pebteb_region:false,
@@ -89,7 +86,6 @@ wincaps wincap_8_1 __attribute__((section (".cygwin_dll_common"), shared)) = {
 };
 
 wincaps  wincap_10_1507 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:3,
   {
     is_server:false,
     has_new_pebteb_region:false,
@@ -112,7 +108,6 @@ wincaps  wincap_10_1507 __attribute__((section (".cygwin_dll_common"), shared)) 
 };
 
 wincaps  wincap_10_1607 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:3,
   {
     is_server:false,
     has_new_pebteb_region:false,
@@ -135,7 +130,6 @@ wincaps  wincap_10_1607 __attribute__((section (".cygwin_dll_common"), shared)) 
 };
 
 wincaps wincap_10_1703 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:3,
   {
     is_server:false,
     has_new_pebteb_region:true,
@@ -158,7 +152,6 @@ wincaps wincap_10_1703 __attribute__((section (".cygwin_dll_common"), shared)) =
 };
 
 wincaps wincap_10_1709 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:3,
   {
     is_server:false,
     has_new_pebteb_region:true,
@@ -181,7 +174,6 @@ wincaps wincap_10_1709 __attribute__((section (".cygwin_dll_common"), shared)) =
 };
 
 wincaps wincap_10_1803 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:3,
   {
     is_server:false,
     has_new_pebteb_region:true,
@@ -204,7 +196,6 @@ wincaps wincap_10_1803 __attribute__((section (".cygwin_dll_common"), shared)) =
 };
 
 wincaps wincap_10_1809 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:3,
   {
     is_server:false,
     has_new_pebteb_region:true,
@@ -227,7 +218,6 @@ wincaps wincap_10_1809 __attribute__((section (".cygwin_dll_common"), shared)) =
 };
 
 wincaps wincap_10_1903 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:3,
   {
     is_server:false,
     has_new_pebteb_region:true,
@@ -250,7 +240,6 @@ wincaps wincap_10_1903 __attribute__((section (".cygwin_dll_common"), shared)) =
 };
 
 wincaps wincap_10_2004 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:3,
   {
     is_server:false,
     has_new_pebteb_region:true,
@@ -273,7 +262,6 @@ wincaps wincap_10_2004 __attribute__((section (".cygwin_dll_common"), shared)) =
 };
 
 wincaps wincap_11 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:3,
   {
     is_server:false,
     has_new_pebteb_region:true,
