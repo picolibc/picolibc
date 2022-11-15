@@ -163,6 +163,8 @@ lsrc_full = [
   'isinfl.c',
   'isnanl.c',
   'math_errl_invalidl.c',
+  'math_errl_oflowl.c',
+  'math_errl_uflowl.c',
   'math_errl_with_errnol.c',
   'nanl.c',
   'sl_finite.c',
