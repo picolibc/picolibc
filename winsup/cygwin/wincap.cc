@@ -19,50 +19,6 @@ details. */
    in the same session.  I'm only writing this longish comment because I'm
    puzzled that this has never been noticed before... */
 
-wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  {
-    is_server:false,
-    has_new_pebteb_region:false,
-    has_unprivileged_createsymlink:false,
-    has_precise_interrupt_time:false,
-    has_posix_unlink_semantics:false,
-    has_posix_unlink_semantics_with_ignore_readonly:false,
-    has_case_sensitive_dirs:false,
-    has_posix_rename_semantics:false,
-    has_con_24bit_colors:false,
-    has_con_broken_csi3j:false,
-    has_con_broken_il_dl:false,
-    has_con_esc_rep:false,
-    has_extended_mem_api:false,
-    has_tcp_fastopen:false,
-    has_linux_tcp_keepalive_sockopts:false,
-    has_tcp_maxrtms:false,
-    has_con_broken_tabs:false,
-  },
-};
-
-wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  {
-    is_server:false,
-    has_new_pebteb_region:false,
-    has_unprivileged_createsymlink:false,
-    has_precise_interrupt_time:false,
-    has_posix_unlink_semantics:false,
-    has_posix_unlink_semantics_with_ignore_readonly:false,
-    has_case_sensitive_dirs:false,
-    has_posix_rename_semantics:false,
-    has_con_24bit_colors:false,
-    has_con_broken_csi3j:false,
-    has_con_broken_il_dl:false,
-    has_con_esc_rep:false,
-    has_extended_mem_api:false,
-    has_tcp_fastopen:false,
-    has_linux_tcp_keepalive_sockopts:false,
-    has_tcp_maxrtms:false,
-    has_con_broken_tabs:false,
-  },
-};
-
 wincaps wincap_8_1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   {
     is_server:false,
@@ -304,19 +260,7 @@ wincapc::init ()
   switch (version.dwMajorVersion)
     {
       case 6:
-	switch (version.dwMinorVersion)
-	  {
-	    case 1:
-	      caps = &wincap_7;
-	      break;
-	    case 2:
-	      caps = &wincap_8;
-	      break;
-	    case 3:
-	    default:
-	      caps = &wincap_8_1;
-	      break;
-	  }
+	caps = &wincap_8_1;
 	break;
       case 10:
       default:
