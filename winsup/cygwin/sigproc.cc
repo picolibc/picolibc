@@ -846,14 +846,7 @@ child_info::child_info (unsigned in_cb, child_info_types chtype,
   DWORD perms = PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_VM_READ
 		| PROCESS_VM_OPERATION | SYNCHRONIZE;
   if (type == _CH_FORK)
-    {
-      perms |= PROCESS_DUP_HANDLE;
-      /* VirtualQueryEx is documented to require PROCESS_QUERY_INFORMATION.
-	 That's true for Windows 7, but PROCESS_QUERY_LIMITED_INFORMATION
-	 appears to be sufficient on Windows 8 and later. */
-      if (wincap.needs_query_information ())
-	perms |= PROCESS_QUERY_INFORMATION;
-    }
+    perms |= PROCESS_DUP_HANDLE;
 
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),
 			GetCurrentProcess (), &parent, perms, TRUE, 0))
