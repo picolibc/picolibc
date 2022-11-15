@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2022 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,61 +33,20 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-libdirs = ['math', 'common', 'fenv', 'ld']
+srcs_ld_common_use = []
 
-if have_complex
-  libdirs = libdirs + ['complex']
-endif
+srcs_ld_common = [
+]
 
-libnames = libdirs
-
-libm_machine_dir = 'machine' / host_cpu_family
-if fs.is_dir(libm_machine_dir)
-  libdirs = [libm_machine_dir] + libdirs
-  libnames = ['machine'] + libnames
-else
-  srcs_libm_machine = []
-endif
-
-inc = [include_directories('common'), inc]
-
-foreach libdir : libdirs
-  subdir(libdir)
-endforeach
-
-src_mpart = []
-
-foreach libname : libnames
-  src_mpart += get_variable('src_libm_' + libname, [])
-endforeach
-
-foreach target : targets
-  value = get_variable('target_' + target)
-  libobjs = []
-  libsrcs_target = []
-
-  foreach libname : libnames
-    if is_variable('lib_' + libname + target)
-      libobjs += get_variable('lib_' + libname + target).extract_all_objects(recursive:true)
-    endif
-    libsrcs_target += get_variable('src_libm_' + libname + target, [])
-  endforeach
-
-  set_variable('src_mpart_' + target, libsrcs_target)
-
-  if target == ''
-    libmpart_name = 'mpart'
+foreach file : srcs_ld_common
+  s_file = fs.replace_suffix(file, '.S')
+  if file in srcs_libm_machine
+    message('libm/ld/common/' + file + ': machine overrides generic')
+  elif s_file in srcs_libm_machine
+    message('libm/ld/common/' + s_file + ': machine overrides generic')
   else
-    libmpart_name = 'mpart' + '_' + target
-  endif
-
-  if libobjs != []
-    local_lib_mpart_target = static_library(libmpart_name,
-					    pic: false,
-					    objects : libobjs,
-					    include_directories: inc,
-					    c_args: value[1] + ['-D_LIBC'])
-    set_variable('lib_mpart' + target, local_lib_mpart_target)
+    srcs_ld_common_use += file
   endif
 endforeach
 
+src_libm_ld_common = files(srcs_ld_common_use)

@@ -340,7 +340,7 @@ SUCH DAMAGE.
    simply call the double functions.  On Cygwin the long double functions
    are implemented independently from newlib to be able to use optimized
    assembler functions despite using the Microsoft x86_64 ABI. */
-#if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__) || (defined(__SIZEOF_LONG_DOUBLE__) && __SIZEOF_LONG_DOUBLE__ <= 8)
+#if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__) || (defined(__SIZEOF_LONG_DOUBLE__) && __SIZEOF_LONG_DOUBLE__ <= 8) || (LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113)
 #define _HAVE_LONG_DOUBLE_MATH
 #endif
 

@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2022 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,61 +33,93 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-libdirs = ['math', 'common', 'fenv', 'ld']
+srcs_ld_use = []
 
-if have_complex
-  libdirs = libdirs + ['complex']
-endif
+if have_long_double
 
-libnames = libdirs
+srcs_ld_arch = [
+    'e_acoshl.c',
+    'e_atanhl.c',
+    'e_coshl.c',
+    'e_expl.c',
+    'e_fmodl.c',
+    'e_hypotl.c',
+    'e_lgammal_r.c',
+    'e_log10l.c',
+    'e_log2l.c',
+    'e_logl.c',
+    'e_powl.c',
+    'e_sinhl.c',
+    'e_tgammal.c',
+    'invtrig.c',
+    'k_cosl.c',
+    'k_sinl.c',
+    'k_tanl.c',
+    's_asinhl.c',
+    's_ceill.c',
+    's_copysignl.c',
+    's_erfl.c',
+    's_exp2l.c',
+    's_expm1l.c',
+    's_floorl.c',
+    's_log1pl.c',
+    's_modfl.c',
+    's_nanl.c',
+    's_nextafterl.c',
+    's_nexttoward.c',
+    's_nexttowardf.c',
+    's_remquol.c',
+    's_tanhl.c',
+    's_truncl.c',
+   ]
 
-libm_machine_dir = 'machine' / host_cpu_family
-if fs.is_dir(libm_machine_dir)
-  libdirs = [libm_machine_dir] + libdirs
-  libnames = ['machine'] + libnames
-else
-  srcs_libm_machine = []
-endif
+srcs_ld_common = [
+  'e_acosl.c',
+  'e_asinl.c',
+  'e_atan2l.c',
+  'e_lgammal.c',
+  'e_remainderl.c',
+  'e_sqrtl.c',
+  'k_rem_pio2.c',
+  'polevll.c',
+  's_atanl.c',
+  's_ilogbl.c',
+  's_cbrtl.c',
+  's_cosl.c',
+  's_fabsl.c',
+  's_fdiml.c',
+  's_fmal.c',
+  's_fmaxl.c',
+  's_fminl.c',
+  's_frexpl.c',
+  's_isnanl.c',
+  's_llrintl.c',
+  's_llroundl.c',
+  's_logbl.c',
+  's_lrintl.c',
+  's_lroundl.c',
+  's_rintl.c',
+  's_roundl.c',
+  's_scalbln.c',
+  's_scalbnl.c',
+  's_sincosl.c',
+  's_sinl.c',
+  's_tanl.c',
+]
 
-inc = [include_directories('common'), inc]
+srcs_ld = srcs_ld_arch + srcs_ld_common
 
-foreach libdir : libdirs
-  subdir(libdir)
-endforeach
-
-src_mpart = []
-
-foreach libname : libnames
-  src_mpart += get_variable('src_libm_' + libname, [])
-endforeach
-
-foreach target : targets
-  value = get_variable('target_' + target)
-  libobjs = []
-  libsrcs_target = []
-
-  foreach libname : libnames
-    if is_variable('lib_' + libname + target)
-      libobjs += get_variable('lib_' + libname + target).extract_all_objects(recursive:true)
-    endif
-    libsrcs_target += get_variable('src_libm_' + libname + target, [])
-  endforeach
-
-  set_variable('src_mpart_' + target, libsrcs_target)
-
-  if target == ''
-    libmpart_name = 'mpart'
+foreach file : srcs_ld
+  s_file = fs.replace_suffix(file, '.S')
+  if file in srcs_libm_machine
+    message('libm/ld/' + file + ': machine overrides generic')
+  elif s_file in srcs_libm_machine
+    message('libm/ld/' + s_file + ': machine overrides generic')
   else
-    libmpart_name = 'mpart' + '_' + target
-  endif
-
-  if libobjs != []
-    local_lib_mpart_target = static_library(libmpart_name,
-					    pic: false,
-					    objects : libobjs,
-					    include_directories: inc,
-					    c_args: value[1] + ['-D_LIBC'])
-    set_variable('lib_mpart' + target, local_lib_mpart_target)
+    srcs_ld_use += file
   endif
 endforeach
 
+endif
+
+src_libm_ld = files(srcs_ld_use)
