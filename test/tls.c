@@ -37,24 +37,64 @@
 #include <picotls.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include <string.h>
 
-#define DATA_VAL	0x600df00d
+#define DATA_VAL 0x600df00d
+#define DATA_VAL2 0x0a0a0a0a
 
 NEWLIB_THREAD_LOCAL volatile int data_var = DATA_VAL;
 NEWLIB_THREAD_LOCAL volatile int bss_var;
+_Alignas(128) NEWLIB_THREAD_LOCAL volatile int overaligned_data_var = DATA_VAL2;
 
 volatile int *volatile data_addr;
+volatile int *volatile overaligned_data_addr;
 volatile int *volatile bss_addr;
 
+#ifdef PICOLIBC_TLS
+extern char __tdata_start, __tdata_end;
+extern char __tdata_source, __tdata_source_end;
+extern char __data_start, __data_source;
+
+static bool
+inside_tls_region(void *ptr, const void *tls)
+{
+	return (uintptr_t)ptr >= (uintptr_t)tls &&
+	       (uintptr_t)ptr < (uintptr_t)tls + _tls_size();
+}
+
+#define check_inside_tls_region(ptr, tls_start)                                \
+	if (!inside_tls_region(__DEVOLATILE(void *, ptr), tls_start)) {        \
+		printf("%s (%p) is not inside TLS region [%p-%p)\n", #ptr,     \
+		       ptr, tls_start, (char *)tls_start + _tls_size());       \
+		result++;                                                      \
+	}
+#endif
+
 int
-check_tls(char *where, bool check_addr)
+check_tls(char *where, bool check_addr, void *tls_region)
 {
 	int result = 0;
 
-	printf("tls check %s %p %p\n", where, &data_var, &bss_var);
+	printf("tls check %s %p %p %p\n", where, &data_var,
+	       &overaligned_data_var, &bss_var);
+	if (!__is_aligned(tls_region, 128)) {
+		printf("TLS data region (%p) is not aligned\n", tls_region);
+		result++;
+	}
+	if (!__is_aligned((uintptr_t)&overaligned_data_var, 128)) {
+		printf("overaligned_data_var (%p) is not aligned\n",
+		       &overaligned_data_var);
+		result++;
+	}
 	if (data_var != DATA_VAL) {
 		printf("%s: initialized thread var has wrong value (0x%x instead of 0x%x)\n",
 		       where, data_var, DATA_VAL);
+		result++;
+	}
+	if (overaligned_data_var != DATA_VAL2) {
+		printf("%s: initialized overaligned thread var has wrong value (0x%x instead of 0x%x)\n",
+		       where, overaligned_data_var, DATA_VAL2);
 		result++;
 	}
 
@@ -72,6 +112,14 @@ check_tls(char *where, bool check_addr)
 		result++;
 	}
 
+	overaligned_data_var = ~overaligned_data_var;
+
+	if (overaligned_data_var != ~DATA_VAL2) {
+		printf("%s: initialized thread var set to wrong value (0x%x instead of 0x%x)\n",
+		       where, overaligned_data_var, ~DATA_VAL2);
+		result++;
+	}
+
 	bss_var = ~bss_var;
 
 	if (bss_var != ~0) {
@@ -86,33 +134,93 @@ check_tls(char *where, bool check_addr)
 			result++;
 		}
 
+                if (overaligned_data_addr == &overaligned_data_var) {
+			printf("_set_tls didn't affect initialized addr %p\n", overaligned_data_addr);
+			result++;
+		}
+
 		if (bss_addr == &bss_var) {
 			printf("_set_tls didn't affect uninitialized addr %p\n", bss_addr);
 			result++;
 		}
 	}
-
+#ifdef PICOLIBC_TLS
+	check_inside_tls_region(&data_var, tls_region);
+	check_inside_tls_region(&overaligned_data_var, tls_region);
+	check_inside_tls_region(&bss_var, tls_region);
+#endif
 	return result;
+}
+
+void
+hexdump(const void *ptr, int length, const char *hdr)
+{
+	const unsigned char *cp = ptr;
+
+	for (int i = 0; i < length; i += 16) {
+		printf("%s%08zx  ", hdr, i + (size_t)ptr);
+		for (int j = 0; j < 16; j++) {
+			int offset = i + j;
+			if (offset < length)
+				printf(" %02x", cp[offset]);
+			else
+				printf("   ");
+		}
+		printf("\n");
+	}
 }
 
 int
 main(void)
 {
-	int result;
+	int result = 0;
 
 	data_addr = &data_var;
+	overaligned_data_addr = &overaligned_data_var;
 	bss_addr = &bss_var;
 
-	result = check_tls("pre-defined", false);
+#ifdef PICOLIBC_TLS
+        printf("TLS region: %p-%p (%zd bytes)\n", &__tdata_start,
+	       &__tdata_start + _tls_size(), _tls_size());
+	size_t tdata_source_size = &__tdata_source_end - &__tdata_source;
+	size_t tdata_size = &__tdata_end - &__tdata_start;
+
+	if (&__tdata_start - &__data_start != &__tdata_source - &__data_source) {
+		printf("ROM/RAM .tdata offset from .data mismatch. "
+		       "VMA offset=%zd, LMA offset =%zd."
+		       "Linker behaviour changed?\n",
+		       &__tdata_start - &__data_start,
+		       &__tdata_source - &__data_source);
+	}
+
+	if (tdata_source_size != tdata_size ||
+	    memcmp(&__tdata_source, &__tdata_start, tdata_size) != 0) {
+		printf("TLS data in RAM does not match ROM\n");
+		hexdump(&__tdata_source, tdata_source_size, "ROM:");
+		hexdump(&__tdata_start, tdata_size, "RAM:");
+		result++;
+	}
+        result += check_tls("pre-defined", false, &__tdata_start);
+#else
+        result += check_tls("pre-defined", false, NULL);
+#endif
+
 
 #ifdef _HAVE_PICOLIBC_TLS_API
 
-	void *tls = malloc(_tls_size());
+	void *tls = aligned_alloc(128, _tls_size());
 
 	_init_tls(tls);
 	_set_tls(tls);
 
-	result += check_tls("allocated", true);
+	if (memcmp(tls, &__tdata_source, tdata_size) != 0) {
+		printf("New TLS data in RAM does not match ROM\n");
+		hexdump(&__tdata_source, tdata_source_size, "ROM:");
+		hexdump(tls, tdata_size, "RAM:");
+		result++;
+	}
+
+	result += check_tls("allocated", true, tls);
 #endif
 
 	printf("tls test result %d\n", result);
