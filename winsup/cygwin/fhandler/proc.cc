@@ -650,7 +650,6 @@ format_proc_cpuinfo (void *, char *&destbuf)
   char *buf = tp.c_get ();
   char *bufptr = buf;
 
-  //WORD num_cpu_groups = 1;	/* Pre Windows 7, only one group... */
   WORD num_cpu_per_group = __get_cpus_per_group ();
 
   cpu_num_p = wcpcpy (cpu_key, L"\\Registry\\Machine\\HARDWARE\\DESCRIPTION"

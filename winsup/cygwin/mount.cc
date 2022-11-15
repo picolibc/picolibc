@@ -294,13 +294,13 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
   if (is_remote_drive ())
     {
 /* Should be reevaluated for each new OS.  Right now this mask is valid up
-   to Windows 8.  The important point here is to test only flags indicating
+   to Windows 11.  The important point here is to test only flags indicating
    capabilities and to ignore flags indicating a specific state of this
    volume.  At present these flags to ignore are FILE_VOLUME_IS_COMPRESSED,
    FILE_READ_ONLY_VOLUME, and FILE_SEQUENTIAL_WRITE_ONCE.  The additional
    filesystem flags supported since Windows 7 are also ignored for now.
-   They add information, but only on W7 and later, and only for filesystems
-   also supporting these flags, right now only NTFS. */
+   They add information only for filesystems also supporting these flags,
+   right now only NTFS. */
 #define GETVOLINFO_VALID_MASK (0x002701ffUL)
 #define TEST_GVI(f,m) (((f) & GETVOLINFO_VALID_MASK) == (m))
 

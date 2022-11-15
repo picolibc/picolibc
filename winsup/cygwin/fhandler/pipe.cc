@@ -1179,9 +1179,6 @@ cache_err:
   return get_query_hdl_per_process (name, ntfn); /* Since Win8 */
 }
 
-/* This function is faster than get_query_hdl_per_system(), however,
-   only works since Windows 8 because ProcessHandleInformation is not
-   suppoted by NtQueryInformationProcess() before Windows 8. */
 HANDLE
 fhandler_pipe::get_query_hdl_per_process (WCHAR *name,
 					  OBJECT_NAME_INFORMATION *ntfn)

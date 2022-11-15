@@ -961,8 +961,7 @@ typedef struct _LDR_DATA_TABLE_ENTRY
   ULONG Flags;
   USHORT LoadCount;
   /* More follows.  Left out since it's just not used.  The aforementioned
-     part of the structure is stable from at least NT4 up to Windows 8,
-     including WOW64. */
+     part of the structure is stable from at least NT4 up to Windows 11. */
 } LDR_DATA_TABLE_ENTRY, *PLDR_DATA_TABLE_ENTRY;
 
 typedef struct _PEB_LDR_DATA
