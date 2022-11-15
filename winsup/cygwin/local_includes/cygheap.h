@@ -196,12 +196,6 @@ public:
 
 /* cwd cache stuff.  */
 
-enum fcwd_version_t {
-  FCWD_OLD,
-  FCWD_W7,
-  FCWD_W8
-};
-
 /* This class is used to store the CWD.  The CWD storage in the
    RTL_USER_PROCESS_PARAMETERS block is only an afterthought now.  The actual
    CWD storage is a FAST_CWD structure which is allocated on the process heap.
@@ -211,64 +205,17 @@ enum fcwd_version_t {
    details depending on OS version from the calling functions.
    The layout of all structures has been tested on 32 and 64 bit. */
 class fcwd_access_t {
-  /* This is the layout used in Windows 8 and later. */
-  struct FAST_CWD_8 {
-    LONG           ReferenceCount;	/* Only release when this is 0. */
-    HANDLE         DirectoryHandle;
-    ULONG          OldDismountCount;	/* Reflects the system DismountCount
+  LONG           ReferenceCount;	/* Only release when this is 0. */
+  HANDLE         DirectoryHandle;
+  ULONG          OldDismountCount;	/* Reflects the system DismountCount
 					   at the time the CWD has been set. */
-    UNICODE_STRING Path;		/* Path's Buffer member always refers
+  UNICODE_STRING Path;			/* Path's Buffer member always refers
 					   to the following Buffer array. */
-    LONG           FSCharacteristics;	/* Taken from FileFsDeviceInformation */
-    WCHAR          Buffer[MAX_PATH] __attribute ((aligned (8)));
-  };
-  /* This is the layout used in Windows 7. */
-  struct FAST_CWD_7 {
-    UNICODE_STRING Path;		/* Path's Buffer member always refers
-					   to the following Buffer array. */
-    HANDLE         DirectoryHandle;
-    LONG           FSCharacteristics;	/* Taken from FileFsDeviceInformation */
-    LONG           ReferenceCount;	/* Only release when this is 0. */
-    ULONG          OldDismountCount;	/* Reflects the system DismountCount
-					   at the time the CWD has been set. */
-    WCHAR          Buffer[MAX_PATH] __attribute ((aligned (8)));
-  };
-  /* This is the old FAST_CWD structure up to the patch from KB 2393802,
-     release in February 2011. */
-  struct FAST_CWD_OLD {
-    LONG           ReferenceCount;	/* Only release when this is 0. */
-    HANDLE         DirectoryHandle;
-    ULONG          OldDismountCount;	/* Reflects the system DismountCount
-					   at the time the CWD has been set. */
-    UNICODE_STRING Path;		/* Path's Buffer member always refers
-					   to the following Buffer array. */
-    WCHAR          Buffer[MAX_PATH];
-  };
-  union {
-    FAST_CWD_OLD fold;
-    FAST_CWD_7   f7;
-    FAST_CWD_8   f8;
-  };
-
-#define IMPLEMENT(type, name) \
-  type name () { \
-    switch (fast_cwd_version ()) { \
-      case FCWD_OLD: \
-      default: \
-	return fold.name; \
-      case FCWD_W7: \
-	return f7.name; \
-      case FCWD_W8: \
-	return f8.name; \
-    } \
-  }
-  IMPLEMENT (LONG &, ReferenceCount)
-  IMPLEMENT (HANDLE &, DirectoryHandle)
-  IMPLEMENT (ULONG &, OldDismountCount)
-  IMPLEMENT (UNICODE_STRING &, Path)
-  IMPLEMENT (WCHAR *, Buffer)
-  void SetFSCharacteristics (LONG val);
-  static fcwd_version_t &fast_cwd_version (void);
+  LONG           FSCharacteristics;	/* Taken from FileFsDeviceInformation */
+  /* fcwd_access_t is dynamically allocated with a size of
+     sizeof(fcwd_access_t) + cwd.Length.  Preallocating 2 chars
+     here allows to append a trailing backslash and NUL. */
+  WCHAR          Buffer[2] __attribute ((aligned (8)));
 
 public:
   void CopyPath (UNICODE_STRING &target);
@@ -295,10 +242,6 @@ private:
      ntdll.dll pointing to the FAST_CWD structure which constitutes the CWD.
      Unfortunately RtlpCurDirRef is not exported from ntdll.dll. */
   fcwd_access_t **fast_cwd_ptr;
-  /* Type of FAST_CWD used on this system.  Keeping this information
-     available in shared memory avoids to test for the version every time
-     around.  Default to new version. */
-  fcwd_version_t fast_cwd_version;
   void override_win32_cwd (bool init, ULONG old_dismount_count);
 
 public:

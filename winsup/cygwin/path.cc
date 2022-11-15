@@ -4312,17 +4312,6 @@ cygwin_split_path (const char *path, char *dir, char *file)
   file[end - last_slash - 1] = 0;
 }
 
-static inline void
-copy_cwd_str (PUNICODE_STRING tgt, PUNICODE_STRING src)
-{
-  RtlCopyUnicodeString (tgt, src);
-  if (tgt->Buffer[tgt->Length / sizeof (WCHAR) - 1] != L'\\')
-    {
-      tgt->Buffer[tgt->Length / sizeof (WCHAR)] = L'\\';
-      tgt->Length += sizeof (WCHAR);
-    }
-}
-
 /*****************************************************************************/
 
 /* The find_fast_cwd_pointer function and parts of the
@@ -4358,35 +4347,12 @@ copy_cwd_str (PUNICODE_STRING tgt, PUNICODE_STRING src)
    DAMAGE. */
 
 void
-fcwd_access_t::SetFSCharacteristics (LONG val)
-{
-  /* Special case FSCharacteristics.  Didn't exist originally. */
-  switch (fast_cwd_version ())
-    {
-    case FCWD_OLD:
-      break;
-    case FCWD_W7:
-      f7.FSCharacteristics = val;
-      break;
-    case FCWD_W8:
-      f8.FSCharacteristics = val;
-      break;
-    }
-}
-
-fcwd_version_t &
-fcwd_access_t::fast_cwd_version ()
-{
-  return cygheap->cwd.fast_cwd_version;
-}
-
-void
 fcwd_access_t::CopyPath (UNICODE_STRING &target)
 {
   /* Copy the Path contents over into the UNICODE_STRING referenced by
      target.  This is used to set the CurrentDirectoryName in the
      user parameter block. */
-  target = Path ();
+  target = Path;
 }
 
 void
@@ -4394,12 +4360,12 @@ fcwd_access_t::Free (PVOID heap)
 {
   /* Decrement the reference count.  If it's down to 0, free
      structure from heap. */
-  if (InterlockedDecrement (&ReferenceCount ()) == 0)
+  if (InterlockedDecrement (&ReferenceCount) == 0)
     {
       /* The handle on init is always a fresh one, not the handle inherited
 	 from the parent process.  We always have to close it here.
 	 Note: The handle could be NULL, if we cd'ed into a virtual dir. */
-      HANDLE h = DirectoryHandle ();
+      HANDLE h = DirectoryHandle;
       if (h)
 	NtClose (h);
       RtlFreeHeap (heap, 0, this);
@@ -4408,34 +4374,35 @@ fcwd_access_t::Free (PVOID heap)
 
 void
 fcwd_access_t::FillIn (HANDLE dir, PUNICODE_STRING name,
-			ULONG old_dismount_count)
+		       ULONG old_dismount_count)
 {
   /* Fill in all values into this FAST_CWD structure. */
-  DirectoryHandle () = dir;
-  ReferenceCount () = 1;
-  OldDismountCount () = old_dismount_count;
-  /* The new structure stores the device characteristics of the
+  DirectoryHandle = dir;
+  ReferenceCount = 1;
+  OldDismountCount = old_dismount_count;
+  /* The fcwd structure stores the device characteristics of the
      volume holding the dir.  RtlGetCurrentDirectory_U checks
      if the FILE_REMOVABLE_MEDIA flag is set and, if so, checks if
      the volume is still the same as the one used when opening
      the directory handle.
      We don't call NtQueryVolumeInformationFile for the \\?\PIPE,
      though.  It just returns STATUS_INVALID_HANDLE anyway. */
-  if (fast_cwd_version () != FCWD_OLD)
+  FSCharacteristics = 0;
+  if (name != &ro_u_pipedir)
     {
-      SetFSCharacteristics (0);
-      if (name != &ro_u_pipedir)
-	{
-	  IO_STATUS_BLOCK io;
-	  FILE_FS_DEVICE_INFORMATION ffdi;
-	  if (NT_SUCCESS (NtQueryVolumeInformationFile (dir, &io, &ffdi,
-			  sizeof ffdi, FileFsDeviceInformation)))
-	    SetFSCharacteristics (ffdi.Characteristics);
-	}
+      IO_STATUS_BLOCK io;
+      FILE_FS_DEVICE_INFORMATION ffdi;
+      if (NT_SUCCESS (NtQueryVolumeInformationFile (dir, &io, &ffdi,
+		      sizeof ffdi, FileFsDeviceInformation)))
+	FSCharacteristics = ffdi.Characteristics;
     }
-  RtlInitEmptyUnicodeString (&Path (), Buffer (),
-			     MAX_PATH * sizeof (WCHAR));
-  copy_cwd_str (&Path (), name);
+  RtlInitEmptyUnicodeString (&Path, Buffer, name->MaximumLength);
+  RtlCopyUnicodeString (&Path, name);
+  if (Path.Buffer[Path.Length / sizeof (WCHAR) - 1] != L'\\')
+    {
+      Path.Buffer[Path.Length / sizeof (WCHAR)] = L'\\';
+      Path.Length += sizeof (WCHAR);
+    }
 }
 
 void
@@ -4447,43 +4414,9 @@ fcwd_access_t::SetDirHandleFromBufferPointer (PWCHAR buf_p, HANDLE dir)
      on the version and overwrites the directory handle.  It is only
      used if we couldn't figure out the address of fast_cwd_ptr. */
   fcwd_access_t *f_cwd;
-  switch (fast_cwd_version ())
-    {
-    case FCWD_OLD:
-    default:
-      f_cwd = (fcwd_access_t *)
-	((PBYTE) buf_p - __builtin_offsetof (FAST_CWD_OLD, Buffer));
-      break;
-    case FCWD_W7:
-      f_cwd = (fcwd_access_t *)
-	((PBYTE) buf_p - __builtin_offsetof (FAST_CWD_7, Buffer));
-      break;
-    case FCWD_W8:
-      f_cwd = (fcwd_access_t *)
-	((PBYTE) buf_p - __builtin_offsetof (FAST_CWD_8, Buffer));
-      break;
-    }
-  f_cwd->DirectoryHandle () = dir;
-}
-
-void
-fcwd_access_t::SetVersionFromPointer (PBYTE buf_p, bool is_buffer)
-{
-  /* Given a pointer to the FAST_CWD structure (is_buffer == false) or a
-     pointer to the Buffer within (is_buffer == true), this function
-     computes the FAST_CWD version by checking that Path.MaximumLength
-     equals MAX_PATH, and that Path.Buffer == Buffer. */
-  if (is_buffer)
-    buf_p -= __builtin_offsetof (FAST_CWD_8, Buffer);
-  fcwd_access_t *f_cwd = (fcwd_access_t *) buf_p;
-  if (f_cwd->f8.Path.MaximumLength == MAX_PATH * sizeof (WCHAR)
-      && f_cwd->f8.Path.Buffer == f_cwd->f8.Buffer)
-    fast_cwd_version () = FCWD_W8;
-  else if (f_cwd->f7.Path.MaximumLength == MAX_PATH * sizeof (WCHAR)
-	   && f_cwd->f7.Path.Buffer == f_cwd->f7.Buffer)
-    fast_cwd_version () = FCWD_W7;
-  else
-    fast_cwd_version () = FCWD_OLD;
+  f_cwd = (fcwd_access_t *)
+	  ((PBYTE) buf_p - __builtin_offsetof (fcwd_access_t, Buffer));
+  f_cwd->DirectoryHandle = dir;
 }
 
 /* This function scans the code in ntdll.dll to find the address of the
@@ -4615,36 +4548,6 @@ find_fast_cwd ()
 "  available Cygwin version from https://cygwin.com/.  If the problem persists,\n"
 "  please see https://cygwin.com/problems.html\n\n");
     }
-  if (f_cwd_ptr && *f_cwd_ptr)
-    {
-      /* Just evaluate structure version. */
-      fcwd_access_t::SetVersionFromPointer ((PBYTE) *f_cwd_ptr, false);
-    }
-  else
-    {
-      /* If we couldn't fetch fast_cwd_ptr, or if fast_cwd_ptr is NULL(*)
-	 we have to figure out the version from the Buffer pointer in the
-	 ProcessParameters.
-
-	 (*) This is very unlikely to happen when starting the first
-	 Cygwin process, since it only happens when starting the
-	 process in a directory which can't be used as CWD by Win32, or
-	 if the directory doesn't exist.  But *if* it happens, we have
-	 no valid FAST_CWD structure, even though upp_cwd_str.Buffer is
-	 not NULL in that case.  So we let the OS create a valid
-	 FAST_CWD structure temporarily to have something to work with.
-	 We know the pipe FS works. */
-      PEB &peb = *NtCurrentTeb ()->Peb;
-
-      if (f_cwd_ptr	/* so *f_cwd_ptr == NULL */
-	  && !NT_SUCCESS (RtlSetCurrentDirectory_U (&ro_u_pipedir)))
-	api_fatal ("Couldn't set directory to %S temporarily.\n"
-		   "Cannot continue.", &ro_u_pipedir);
-      RtlEnterCriticalSection (peb.FastPebLock);
-      fcwd_access_t::SetVersionFromPointer
-	((PBYTE) peb.ProcessParameters->CurrentDirectoryName.Buffer, true);
-      RtlLeaveCriticalSection (peb.FastPebLock);
-    }
   /* Eventually, after we set the version as well, set fast_cwd_ptr. */
   return f_cwd_ptr;
 }
@@ -4657,6 +4560,7 @@ cwdstuff::override_win32_cwd (bool init, ULONG old_dismount_count)
   PEB &peb = *NtCurrentTeb ()->Peb;
   UNICODE_STRING &upp_cwd_str = peb.ProcessParameters->CurrentDirectoryName;
   HANDLE &upp_cwd_hdl = peb.ProcessParameters->CurrentDirectoryHandle;
+  PUNICODE_STRING win32_cwd_ptr = error ? &ro_u_pipedir : &win32;
 
   if (fast_cwd_ptr == (fcwd_access_t **) -1)
     fast_cwd_ptr = find_fast_cwd ();
@@ -4665,20 +4569,18 @@ cwdstuff::override_win32_cwd (bool init, ULONG old_dismount_count)
       /* If we got a valid value for fast_cwd_ptr, we can simply replace
 	 the RtlSetCurrentDirectory_U function entirely. */
       PVOID heap = peb.ProcessHeap;
-      /* First allocate a new fcwd_access_t structure on the heap.
-	 The new fcwd_access_t structure is 4 byte bigger than the old one,
-	 but we simply don't care, so we allocate always room for the
-	 new one. */
+      /* First allocate a new fcwd_access_t structure on the heap. */
       fcwd_access_t *f_cwd = (fcwd_access_t *)
-			RtlAllocateHeap (heap, 0, sizeof (fcwd_access_t));
+			RtlAllocateHeap (heap, 0,
+					 sizeof (fcwd_access_t)
+					 + win32_cwd_ptr->MaximumLength);
       if (!f_cwd)
 	{
 	  debug_printf ("RtlAllocateHeap failed");
 	  return;
 	}
       /* Fill in the values. */
-      f_cwd->FillIn (dir, error ? &ro_u_pipedir : &win32,
-		     old_dismount_count);
+      f_cwd->FillIn (dir, win32_cwd_ptr, old_dismount_count);
       /* Use PEB lock when switching fast_cwd_ptr to the new FAST_CWD
 	 structure and writing the CWD to the user process parameter
 	 block.  This is equivalent to calling RtlAcquirePebLock/
@@ -4718,12 +4620,12 @@ cwdstuff::override_win32_cwd (bool init, ULONG old_dismount_count)
       if (!init)
 	{
 	  NTSTATUS status =
-	    RtlSetCurrentDirectory_U (error ? &ro_u_pipedir : &win32);
+	    RtlSetCurrentDirectory_U (win32_cwd_ptr);
 	  if (!NT_SUCCESS (status))
 	    {
 	      RtlLeaveCriticalSection (peb.FastPebLock);
 	      debug_printf ("RtlSetCurrentDirectory_U(%S) failed, %y",
-			    error ? &ro_u_pipedir : &win32, status);
+			    win32_cwd_ptr);
 	      return;
 	    }
 	}
@@ -4750,7 +4652,6 @@ cwdstuff::init ()
     {
       /* Initialize fast_cwd stuff. */
       fast_cwd_ptr = (fcwd_access_t **) -1;
-      fast_cwd_version = FCWD_W7;
       /* Initially re-open the cwd to allow POSIX semantics. */
       set (NULL, NULL);
     }
