@@ -547,8 +547,7 @@ fhandler_pty_master::accept_input ()
 	{
 	  /* Slave attaches to a different console than master.
 	     Therefore reattach here. */
-	  DWORD resume_pid =
-	    attach_console_temporarily (target_pid, helper_pid);
+	  DWORD resume_pid = attach_console_temporarily (target_pid);
 	  cp_to = GetConsoleCP ();
 	  resume_from_temporarily_attach (resume_pid);
 	}
@@ -2111,7 +2110,6 @@ fhandler_pty_master::close ()
 	      WaitForSingleObject (helper_h_process, INFINITE);
 	      CloseHandle (helper_h_process);
 	      CloseHandle (helper_goodbye);
-	      helper_pid = 0;
 	      helper_h_process = 0;
 	      helper_goodbye = NULL;
 	    }
@@ -2838,7 +2836,7 @@ fhandler_pty_master::pty_master_fwd_thread (const master_fwd_thread_param_t *p)
 	  /* Slave attaches to a different console than master.
 	     Therefore reattach here. */
 	  DWORD resume_pid =
-	    attach_console_temporarily (target_pid, p->helper_pid);
+	    attach_console_temporarily (target_pid);
 	  cp_from = GetConsoleOutputCP ();
 	  resume_from_temporarily_attach (resume_pid);
 	}
@@ -3021,56 +3019,6 @@ fhandler_pty_master::setup ()
       goto err;
     }
   WaitForSingleObject (thread_param_copied_event, INFINITE);
-
-  if (wincap.has_broken_attach_console ()
-      && _major (myself->ctty) == DEV_CONS_MAJOR
-      && !(!pinfo (myself->ppid) && getenv ("ConEmuPID")))
-    {
-      HANDLE hello = CreateEvent (&sec_none, true, false, NULL);
-      HANDLE goodbye = CreateEvent (&sec_none, true, false, NULL);
-      WCHAR cmd[MAX_PATH];
-      path_conv helper ("/bin/cygwin-console-helper.exe");
-      size_t len = helper.get_wide_win32_path_len ();
-      helper.get_wide_win32_path (cmd);
-      __small_swprintf (cmd + len, L" %p %p", hello, goodbye);
-
-      STARTUPINFOEXW si;
-      PROCESS_INFORMATION pi;
-      ZeroMemory (&si, sizeof (si));
-      si.StartupInfo.cb = sizeof (STARTUPINFOEXW);
-
-      SIZE_T bytesRequired;
-      InitializeProcThreadAttributeList (NULL, 1, 0, &bytesRequired);
-      si.lpAttributeList = (PPROC_THREAD_ATTRIBUTE_LIST)
-	HeapAlloc (GetProcessHeap (), 0, bytesRequired);
-      InitializeProcThreadAttributeList (si.lpAttributeList,
-					 1, 0, &bytesRequired);
-      HANDLE handles_to_inherit[] = {hello, goodbye};
-      UpdateProcThreadAttribute (si.lpAttributeList,
-				 0,
-				 PROC_THREAD_ATTRIBUTE_HANDLE_LIST,
-				 handles_to_inherit,
-				 sizeof (handles_to_inherit),
-				 NULL, NULL);
-      if (CreateProcessW (NULL, cmd, &sec_none, &sec_none,
-			  TRUE, EXTENDED_STARTUPINFO_PRESENT,
-			  NULL, NULL, &si.StartupInfo, &pi))
-	{
-	  WaitForSingleObject (hello, INFINITE);
-	  CloseHandle (hello);
-	  CloseHandle (pi.hThread);
-	  helper_goodbye = goodbye;
-	  helper_pid = pi.dwProcessId;
-	  helper_h_process = pi.hProcess;
-	}
-      else
-	{
-	  CloseHandle (hello);
-	  CloseHandle (goodbye);
-	}
-      DeleteProcThreadAttributeList (si.lpAttributeList);
-      HeapFree (GetProcessHeap (), 0, si.lpAttributeList);
-    }
 
   master_fwd_thread = new cygthread (::pty_master_fwd_thread, this, "ptymf");
   if (!master_fwd_thread)
@@ -3877,7 +3825,6 @@ fhandler_pty_master::get_master_fwd_thread_param (master_fwd_thread_param_t *p)
   p->from_slave_nat = from_slave_nat;
   p->output_mutex = output_mutex;
   p->ttyp = get_ttyp ();
-  p->helper_pid = helper_pid;
   SetEvent (thread_param_copied_event);
 }
 
@@ -4189,7 +4136,7 @@ fhandler_pty_slave::setpgid_aux (pid_t pid)
 			   0, TRUE, DUPLICATE_SAME_ACCESS);
 	  CloseHandle (pcon_owner);
 	  DWORD target_pid = get_ttyp ()->nat_pipe_owner_pid;
-	  resume_pid = attach_console_temporarily (target_pid, 0);
+	  resume_pid = attach_console_temporarily (target_pid);
 	  attach_restore = true;
 	}
       else
@@ -4235,15 +4182,12 @@ fhandler_pty_slave::release_ownership_of_nat_pipe (tty *ttyp,
 }
 
 DWORD
-fhandler_pty_common::attach_console_temporarily (DWORD target_pid,
-						 DWORD helper_pid)
+fhandler_pty_common::attach_console_temporarily (DWORD target_pid)
 {
   DWORD resume_pid = 0;
   acquire_attach_mutex (mutex_timeout);
   pinfo pinfo_resume (myself->ppid);
-  if (helper_pid)
-    resume_pid = helper_pid;
-  else if (pinfo_resume)
+  if (pinfo_resume)
     resume_pid = pinfo_resume->dwProcessId;
   if (!resume_pid)
     resume_pid = get_console_process_id (myself->dwProcessId, false);

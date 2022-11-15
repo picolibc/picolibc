@@ -359,8 +359,7 @@ fhandler_termios::process_sigs (char c, tty* ttyp, fhandler_termios *fh)
 	  DWORD resume_pid = 0;
 	  if (fh && !fh->is_console ())
 	    resume_pid =
-	      fhandler_pty_common::attach_console_temporarily
-				    (p->dwProcessId, fh->get_helper_pid ());
+	      fhandler_pty_common::attach_console_temporarily (p->dwProcessId);
 	  if (fh && p == myself && being_debugged ())
 	    { /* Avoid deadlock in gdb on console. */
 	      fh->tcflush(TCIFLUSH);
