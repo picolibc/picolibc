@@ -1195,7 +1195,6 @@ private:
   LONG pipename_id;
   void release_select_sem (const char *);
   HANDLE get_query_hdl_per_process (WCHAR *, OBJECT_NAME_INFORMATION *);
-  HANDLE get_query_hdl_per_system (WCHAR *, OBJECT_NAME_INFORMATION *);
 public:
   fhandler_pipe ();
 

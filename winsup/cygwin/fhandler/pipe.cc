@@ -1176,10 +1176,7 @@ cache_err:
 	       &pipename_key, &pipename_pid, &pipename_id) != 3)
     return NULL; /* Non cygwin pipe? */
 
-  if (wincap.has_query_process_handle_info ())
-    return get_query_hdl_per_process (name, ntfn); /* Since Win8 */
-  else
-    return get_query_hdl_per_system (name, ntfn); /* Win7 */
+  return get_query_hdl_per_process (name, ntfn); /* Since Win8 */
 }
 
 /* This function is faster than get_query_hdl_per_system(), however,
@@ -1310,76 +1307,5 @@ close_proc:
       CloseHandle (proc);
     }
   HeapFree (GetProcessHeap (), 0, proc_pids);
-  return NULL;
-}
-
-/* This function is slower than get_query_hdl_per_process(), however,
-   works even before Windows 8. */
-HANDLE
-fhandler_pipe::get_query_hdl_per_system (WCHAR *name,
-					 OBJECT_NAME_INFORMATION *ntfn)
-{
-  NTSTATUS status;
-  SIZE_T n_handle = 65536;
-  PSYSTEM_HANDLE_INFORMATION shi;
-  do
-    { /* Enumerate handles */
-      SIZE_T nbytes =
-	sizeof (ULONG) + n_handle * sizeof (SYSTEM_HANDLE_TABLE_ENTRY_INFO);
-      shi = (PSYSTEM_HANDLE_INFORMATION) HeapAlloc (GetProcessHeap (),
-						    0, nbytes);
-      if (!shi)
-	return NULL;
-      status = NtQuerySystemInformation (SystemHandleInformation,
-					 shi, nbytes, NULL);
-      if (NT_SUCCESS (status))
-	break;
-      HeapFree (GetProcessHeap (), 0, shi);
-      n_handle *= 2;
-    }
-  while (n_handle < (1L<<23) && status == STATUS_INFO_LENGTH_MISMATCH);
-  if (!NT_SUCCESS (status))
-    return NULL;
-
-  for (LONG i = (LONG) shi->NumberOfHandles - 1; i >= 0; i--)
-    {
-      /* Check for the peculiarity of cygwin read pipe */
-      const ULONG access = FILE_READ_DATA | FILE_READ_EA
-	| FILE_WRITE_EA /* marker */
-	| FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES
-	| READ_CONTROL | SYNCHRONIZE;
-      if (shi->Handles[i].GrantedAccess != access)
-	continue;
-
-      /* Retrieve handle */
-      HANDLE proc = OpenProcess (PROCESS_DUP_HANDLE, 0,
-				 shi->Handles[i].UniqueProcessId);
-      if (!proc)
-	continue;
-      HANDLE h = (HANDLE)(intptr_t) shi->Handles[i].HandleValue;
-      BOOL res  = DuplicateHandle (proc, h, GetCurrentProcess (), &h,
-				   FILE_READ_DATA, 0, 0);
-      if (!res)
-	goto close_proc;
-
-      /* Check object name */
-      ULONG len;
-      status = NtQueryObject (h, ObjectNameInformation, ntfn, 65536, &len);
-      if (!NT_SUCCESS (status) || !ntfn->Name.Buffer)
-	goto close_handle;
-      ntfn->Name.Buffer[ntfn->Name.Length / sizeof (WCHAR)] = L'\0';
-      if (wcscmp (name, ntfn->Name.Buffer) == 0)
-	{
-	  query_hdl_proc = proc;
-	  query_hdl_value = (HANDLE)(intptr_t) shi->Handles[i].HandleValue;
-	  HeapFree (GetProcessHeap (), 0, shi);
-	  return h;
-	}
-close_handle:
-      CloseHandle (h);
-close_proc:
-      CloseHandle (proc);
-    }
-  HeapFree (GetProcessHeap (), 0, shi);
   return NULL;
 }
