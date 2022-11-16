@@ -331,6 +331,12 @@ if tinystdio
       int_printf_link_args += '-Wl,-alias,' + __i_vfprintf_symbol +  ',' + vfprintf_symbol
       int_printf_link_args += '-Wl,-alias,' + __i_vfscanf_symbol + ',' + vfscanf_symbol
     endif
+  else
+    if enable_tests
+      # If the alias flag is not supported and we are building tests, emit an
+      # error here to avoid surprising test failures.
+      error('Symbol alias linker flag not supported - printf tests will fail!')
+    endif
   endif
 endif
 
