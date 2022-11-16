@@ -43,6 +43,7 @@ _BEGIN_STD_C
 
 /* Natural log of 2 */
 #define _M_LN2        0.693147180559945309417
+#define _M_LN2_LD     0.693147180559945309417232121458176568l
 
 #if __GNUC_PREREQ (3, 3) || defined(__clang__) || defined(__COMPCERT__)
  /* gcc >= 3.3 implicitly defines builtins for HUGE_VALx values.  */
