@@ -43,42 +43,6 @@ jobs:
           tags: ${{ env.IMAGE }}:latest
           outputs: type=docker,dest=${{ env.IMAGE_FILE }}
 
-  cmake-arm:
-    needs: cache-maker
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        cmake_flags: [
-          "",
-          "-DCMAKE_BUILD_TYPE=Debug",
-          "-DCMAKE_BUILD_TYPE=Release",
-          "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
-          "-DCMAKE_BUILD_TYPE=MinSizeRel",
-        ]
-        test: [
-          "./.github/do-cmake-test do-cmake-thumbv7m-configure build-cmake-thumbv7m",
-        ]
-    steps:
-      - name: Clone picolibc
-        uses: actions/checkout@v2
-        with:
-          path: picolibc
-
-      - name: Restore the Docker Image
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
-
-      - name: Load and Check the Docker Image
-        run: |
-          docker load -i $IMAGE_FILE
-          docker images -a $IMAGE
-
-      - name: CMake test
-        run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.cmake_flags }}
-
   fortify-source-arm:
     needs: cache-maker
     runs-on: ubuntu-latest
