@@ -805,18 +805,18 @@ lgammal_r(long double x, int *signgamp)
 	{
 	case 0:
 	  /* log gamma (x + 1) = log(x) + log gamma(x) */
-	  if (x <= 0.125)
+	  if (x <= 0.125L)
 	    {
 	      p = x * neval (x, RN1, NRN1) / deval (x, RD1, NRD1);
 	    }
-	  else if (x <= 0.375)
+	  else if (x <= 0.375L)
 	    {
 	      z = x - 0.25L;
 	      p = z * neval (z, RN1r25, NRN1r25) / deval (z, RD1r25, NRD1r25);
 	      p += lgam1r25b;
 	      p += lgam1r25a;
 	    }
-	  else if (x <= 0.625)
+	  else if (x <= 0.625L)
 	    {
 	      z = x + (1.0L - x0a);
 	      z = z - x0b;
@@ -825,7 +825,7 @@ lgammal_r(long double x, int *signgamp)
 	      p = p + y0b;
 	      p = p + y0a;
 	    }
-	  else if (x <= 0.875)
+	  else if (x <= 0.875L)
 	    {
 	      z = x - 0.75L;
 	      p = z * neval (z, RN1r75, NRN1r75) / deval (z, RD1r75, NRD1r75);
@@ -843,7 +843,7 @@ lgammal_r(long double x, int *signgamp)
 	case 1:
 	  if (x < 0.875L)
 	    {
-	      if (x <= 0.625)
+	      if (x <= 0.625L)
 		{
 		  z = x + (1.0L - x0a);
 		  z = z - x0b;
@@ -852,7 +852,7 @@ lgammal_r(long double x, int *signgamp)
 		  p = p + y0b;
 		  p = p + y0a;
 		}
-	      else if (x <= 0.875)
+	      else if (x <= 0.875L)
 		{
 		  z = x - 0.75L;
 		  p = z * neval (z, RN1r75, NRN1r75)
@@ -879,7 +879,7 @@ lgammal_r(long double x, int *signgamp)
 	      z = x - 1.0L;
 	      p = z * neval (z, RN1, NRN1) / deval (z, RD1, NRD1);
 	    }
-	  else if (x <= 1.375)
+	  else if (x <= 1.375L)
 	    {
 	      z = x - 1.25L;
 	      p = z * neval (z, RN1r25, NRN1r25) / deval (z, RD1r25, NRD1r25);
@@ -932,7 +932,7 @@ lgammal_r(long double x, int *signgamp)
 	  break;
 
 	case 3:
-	  if (x < 2.75)
+	  if (x < 2.75L)
 	    {
 	      z = x - 2.5L;
 	      p = z * neval (z, RN2r5, NRN2r5) / deval (z, RD2r5, NRD2r5);

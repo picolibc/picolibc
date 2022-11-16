@@ -56,8 +56,8 @@ atanhl(long double x)
 
 	if(ix<0x3ffe0000) {		/* x < 0.5 */
 	    t = u.value+u.value;
-	    t = 0.5*log1pl(t+t*u.value/(one-u.value));
+	    t = 0.5L*log1pl(t+t*u.value/(one-u.value));
 	} else
-	    t = 0.5*log1pl((u.value+u.value)/(one-u.value));
+	    t = 0.5L*log1pl((u.value+u.value)/(one-u.value));
 	if(jx & 0x80000000) return -t; else return t;
 }

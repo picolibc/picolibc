@@ -100,7 +100,7 @@ int n;
 if( isnan(x) )
 	return(x);
 if( x > MAXLOGL)
-	return( INFINITY );
+        return( (long double) INFINITY );
 
 if( x < MINLOGL )
 	return(0.0L);

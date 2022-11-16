@@ -23,14 +23,14 @@
 #include "invtrig.h"
 
 static const long double
-one =  1.00000000000000000000e+00,
-huge = 1.000e+300;
+one =  1.00000000000000000000e+00L,
+huge = 1.000e+300L;
 
 long double
 asinl(long double x)
 {
 	union IEEEl2bits u;
-	long double t=0.0,w,p,q,c,r,s;
+	long double t=0.0L,w,p,q,c,r,s;
 	int16_t expsign, expt;
 	u.e = x;
 	expsign = u.xbits.expsign;
@@ -52,21 +52,21 @@ asinl(long double x)
 	}
 	/* 1> |x|>= 0.5 */
 	w = one-fabsl(x);
-	t = w*0.5;
+	t = w*0.5L;
 	p = P(t);
 	q = Q(t);
 	s = sqrtl(t);
 	if(u.bits.manh>=THRESH) { 	/* if |x| is close to 1 */
 	    w = p/q;
-	    t = pio2_hi-(2.0*(s+s*w)-pio2_lo);
+	    t = pio2_hi-(2.0L*(s+s*w)-pio2_lo);
 	} else {
 	    u.e = s;
 	    u.bits.manl = 0;
 	    w = u.e;
 	    c  = (t-w*w)/(s+w);
 	    r  = p/q;
-	    p  = 2.0*s*r-(pio2_lo-2.0*c);
-	    q  = pio4_hi-2.0*w;
+	    p  = 2.0L*s*r-(pio2_lo-2.0L*c);
+	    q  = pio4_hi-2.0L*w;
 	    t  = pio4_hi-(p-q);
 	}    
 	if(expsign>0) return t; else return -t;    

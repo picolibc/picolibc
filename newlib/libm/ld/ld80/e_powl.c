@@ -225,11 +225,11 @@ if( !isfinite(y) && x == -1.0L )
 if( y >= LDBL_MAX )
 	{
 	if( x > 1.0L )
-		return( INFINITY );
+		return( (long double)INFINITY );
 	if( x > 0.0L && x < 1.0L )
 		return( 0.0L );
 	if( x < -1.0L )
-		return( INFINITY );
+		return( (long double)INFINITY );
 	if( x > -1.0L && x < 0.0L )
 		return( 0.0L );
 	}
@@ -238,16 +238,16 @@ if( y <= -LDBL_MAX )
 	if( x > 1.0L )
 		return( 0.0L );
 	if( x > 0.0L && x < 1.0L )
-		return( INFINITY );
+		return( (long double)INFINITY );
 	if( x < -1.0L )
 		return( 0.0L );
 	if( x > -1.0L && x < 0.0L )
-		return( INFINITY );
+		return( (long double)INFINITY );
 	}
 if( x >= LDBL_MAX )
 	{
 	if( y > 0.0L )
-		return( INFINITY );
+		return( (long double)INFINITY );
 	return( 0.0L );
 	}
 
@@ -273,14 +273,14 @@ if( x <= -LDBL_MAX )
 	if( y > 0.0L )
 		{
 		if( yoddint )
-			return( -INFINITY );
-		return( INFINITY );
+			return( -(long double)INFINITY );
+		return( (long double)INFINITY );
 		}
 	if( y < 0.0L )
 		{
 		if( yoddint )
 			return( -0.0L );
-		return( 0.0 );
+		return( 0.0L );
 		}
 	}
 
@@ -290,17 +290,17 @@ if( x <= 0.0L )
 	{
 	if( x == 0.0L )
 		{
-		if( y < 0.0 )
+		if( y < 0.0L )
 			{
 			if( signbit(x) && yoddint )
-				return( -INFINITY );
-			return( INFINITY );
+				return( -(long double)INFINITY );
+			return( (long double)INFINITY );
 			}
-		if( y > 0.0 )
+		if( y > 0.0L )
 			{
 			if( signbit(x) && yoddint )
 				return( -0.0L );
-			return( 0.0 );
+			return( 0.0L );
 			}
 		if( y == 0.0L )
 			return( 1.0L );  /*   0**0   */
@@ -321,7 +321,7 @@ if( iyflg )
 	{
 	i = w;
 	w = floorl(x);
-	if( (w == x) && (fabsl(y) < 32768.0) )
+	if( (w == x) && (fabsl(y) < 32768.0L) )
 		{
 		w = powil( x, (int) y );
 		return( w );

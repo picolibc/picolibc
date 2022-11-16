@@ -95,7 +95,7 @@ sqrtl(long double x)
 
 	if (u.bits.exp == 0) {
 		/* Adjust subnormal numbers. */
-		u.e *= 0x1.0p514;
+		u.e *= 0x1.0p514L;
 		k = -514;
 	} else {
 		k = 0;
@@ -116,9 +116,9 @@ sqrtl(long double x)
 	 * Newton's iteration.
 	 * Split u.e into a high and low part to achieve additional precision.
 	 */
-	xn = sqrt(u.e);			/* 53-bit estimate of sqrtl(x). */
+	xn = (long double)sqrt((double)u.e);			/* 53-bit estimate of sqrtl(x). */
 #if LDBL_MANT_DIG > 100
-	xn = (xn + (u.e / xn)) * 0.5;	/* 106-bit estimate. */
+	xn = (xn + (u.e / xn)) * 0.5L;	/* 106-bit estimate. */
 #endif
 	lo = u.e;
 	u.bits.manl = 0;		/* Zero out lower bits. */

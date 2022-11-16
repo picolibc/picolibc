@@ -25,14 +25,14 @@
 #include "invtrig.h"
 
 static const long double
-one=  1.00000000000000000000e+00;
+one=  1.00000000000000000000e+00L;
 
 #ifdef __i386__
 /* XXX Work around the fact that gcc truncates long double constants on i386 */
 static volatile double
 pi1 =  3.14159265358979311600e+00,	/*  0x1.921fb54442d18p+1  */
 pi2 =  1.22514845490862001043e-16;	/*  0x1.1a80000000000p-53 */
-#define	pi	((long double)pi1 + pi2)
+#define	pi	((long double)pi1 + (long double)pi2)
 #else
 static const long double
 pi =  3.14159265358979323846264338327950280e+00L;
@@ -49,8 +49,8 @@ acosl(long double x)
 	expt = expsign & 0x7fff;
 	if(expt >= BIAS) {	/* |x| >= 1 */
 	    if(expt==BIAS && ((u.bits.manh&~LDBL_NBIT)|u.bits.manl)==0) {
-		if (expsign>0) return 0.0;	/* acos(1) = 0  */
-		else return pi+2.0*pio2_lo;	/* acos(-1)= pi */
+		if (expsign>0) return 0.0L;	/* acos(1) = 0  */
+		else return pi+2.0L*pio2_lo;	/* acos(-1)= pi */
 	    }
 	    return (x-x)/(x-x);		/* acos(|x|>1) is NaN */
 	}
@@ -62,15 +62,15 @@ acosl(long double x)
 	    r = p/q;
 	    return pio2_hi - (x - (pio2_lo-x*r));
 	} else  if (expsign<0) {	/* x < -0.5 */
-	    z = (one+x)*0.5;
+	    z = (one+x)*0.5L;
 	    p = P(z);
 	    q = Q(z);
 	    s = sqrtl(z);
 	    r = p/q;
 	    w = r*s-pio2_lo;
-	    return pi - 2.0*(s+w);
+	    return pi - 2.0L*(s+w);
 	} else {			/* x > 0.5 */
-	    z = (one-x)*0.5;
+	    z = (one-x)*0.5L;
 	    s = sqrtl(z);
 	    u.e = s;
 	    u.bits.manl = 0;
@@ -80,6 +80,6 @@ acosl(long double x)
 	    q = Q(z);
 	    r = p/q;
 	    w = r*s+c;
-	    return 2.0*(df+w);
+	    return 2.0L*(df+w);
 	}
 }

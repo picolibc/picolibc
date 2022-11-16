@@ -53,7 +53,7 @@ catanl(long double complex z)
 
 	x2 = x * x;
 	a = 1.0L - x2 - (y * y);
-	if (a == 0.0)
+	if (a == 0.0L)
 		goto ovrf;
 
 	t = 0.5L * atan2l(2.0L * x, a);
@@ -66,14 +66,14 @@ catanl(long double complex z)
 
 	t = y + 1.0L;
 	a = (x2 + (t * t))/a;
-	w = w + (0.25L * logl(a)) * (double complex) I;
+	w = w + (0.25L * logl(a)) * (long double complex) I;
 	return w;
 
 ovrf:
 #if 0
 	mtherr ("catanl", OVERFLOW);
 #endif
-	w = HUGE_VALL + HUGE_VALL * (double complex) I;
+	w = HUGE_VALL + HUGE_VALL * (long double complex) I;
 	return w;
 }
 

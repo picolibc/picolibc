@@ -36,7 +36,7 @@ fn(type x, type y)			\
 		return (x);		\
 	if (isnan(y))			\
 		return (y);		\
-	return (x > y ? x - y : 0.0);	\
+	return (x > y ? x - y : (type) 0.0);	\
 }
 
 DECL(long double, fdiml)

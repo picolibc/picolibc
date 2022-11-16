@@ -218,10 +218,10 @@ long double p, q, z;
 int i;
 
 if( isnan(x) )
-	return(NAN);
-if(x == INFINITY)
-	return(INFINITY);
-if(x == -INFINITY)
+	return((long double) NAN);
+if(x == (long double) INFINITY)
+	return((long double) INFINITY);
+if(x == -(long double) INFINITY)
 	return(x - x);
 if( x == 0.0L )
 	return( 1.0L / x );
@@ -251,7 +251,7 @@ if( q > 13.0L )
 		if( z <= PIL/LDBL_MAX )
 			{
 goverf:
-			return( sign * INFINITY);
+			return( sign * (long double) INFINITY);
 			}
 		z = PIL/z;
 		}

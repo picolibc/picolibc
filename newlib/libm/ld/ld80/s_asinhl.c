@@ -43,7 +43,7 @@ asinhl(long double x)
 	    w = logl(fabsl(x))+ln2;
 	} else if (ix>0x4000) {	/* 2**34 > |x| > 2.0 */
 	    t = fabsl(x);
-	    w = logl(2.0*t+one/(sqrtl(x*x+one)+t));
+	    w = logl(2.0l*t+one/(sqrtl(x*x+one)+t));
 	} else {		/* 2.0 > |x| > 2**-28 */
 	    t = x*x;
 	    w =log1pl(fabsl(x)+t/(one+sqrtl(one+t)));

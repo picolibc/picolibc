@@ -38,7 +38,7 @@ casinhl(long double complex z)
 {
 	long double complex w;
 
-	w = -1.0L * (double complex) I * casinl(z * (double complex) I);
+	w = -1.0L * (long double complex) I * casinl(z * (long double complex) I);
 	return w;
 }
 

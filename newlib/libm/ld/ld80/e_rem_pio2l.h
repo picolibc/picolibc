@@ -53,10 +53,10 @@ pio2_2thi =  6.3683171635109499e-25,	/*  0x18a2e03707344a.0p-133 */
 pio2_2tlo =  2.3183081793789774e-41,	/*  0x10280000000000.0p-187 */
 pio2_3thi = -2.7529965190440717e-37,	/* -0x176b7ed8fbbacc.0p-174 */
 pio2_3tlo = -4.2006647512740502e-54;	/* -0x19c00000000000.0p-230 */
-#define	invpio2	((long double)invpio2hi + invpio2lo)
-#define	pio2_1t	((long double)pio2_1thi + pio2_1tlo)
-#define	pio2_2t	((long double)pio2_2thi + pio2_2tlo)
-#define	pio2_3t	((long double)pio2_3thi + pio2_3tlo)
+#define	invpio2	((long double)invpio2hi + (long double)invpio2lo)
+#define	pio2_1t	((long double)pio2_1thi + (long double)pio2_1tlo)
+#define	pio2_2t	((long double)pio2_2thi + (long double)pio2_2tlo)
+#define	pio2_3t	((long double)pio2_3thi + (long double)pio2_3tlo)
 #else
 static const long double
 invpio2 =  6.36619772367581343076e-01L,	/*  0xa2f9836e4e44152a.0p-64 */
@@ -84,14 +84,14 @@ __ieee754_rem_pio2l(long double x, long double *y)
 	if (ex < BIAS + 25 || (ex == BIAS + 25 && u.bits.manh < 0xc90fdaa2)) {
 	    /* |x| ~< 2^25*(pi/2), medium size */
 	    /* Use a specialized rint() to get fn.  Assume round-to-nearest. */
-	    fn = x*invpio2+0x1.8p63;
-	    fn = fn-0x1.8p63;
+	    fn = x*invpio2+0x1.8p63L;
+	    fn = fn-0x1.8p63L;
 #ifdef HAVE_EFFICIENT_IRINT
 	    n  = irint(fn);
 #else
 	    n  = fn;
 #endif
-	    r  = x-fn*pio2_1;
+	    r  = x-fn*(long double)pio2_1;
 	    w  = fn*pio2_1t;	/* 1st round good to 102 bit */
 	    {
 		union IEEEl2bits u2;
@@ -103,7 +103,7 @@ __ieee754_rem_pio2l(long double x, long double *y)
 	        i = j-ex1;
 	        if(i>22) {  /* 2nd iteration needed, good to 141 */
 		    t  = r;
-		    w  = fn*pio2_2;
+		    w  = fn*(long double)pio2_2;
 		    r  = t-w;
 		    w  = fn*pio2_2t-((t-r)-w);
 		    y[0] = r-w;
@@ -112,7 +112,7 @@ __ieee754_rem_pio2l(long double x, long double *y)
 		    i = j-ex1;
 		    if(i>61) {	/* 3rd iteration need, 180 bits acc */
 		    	t  = r;	/* will cover all possible cases */
-		    	w  = fn*pio2_3;
+		    	w  = fn*(long double)pio2_3;
 		    	r  = t-w;
 		    	w  = fn*pio2_3t-((t-r)-w);
 		    	y[0] = r-w;
@@ -135,14 +135,14 @@ __ieee754_rem_pio2l(long double x, long double *y)
 	z = u1.e;
 	for(i=0;i<2;i++) {
 		tx[i] = (double)((int32_t)(z));
-		z     = (z-tx[i])*two24;
+		z     = (z-(long double)tx[i])*(long double)two24;
 	}
 	tx[2] = z;
 	nx = 3;
 	while(tx[nx-1]==zero) nx--;	/* skip zero term */
 	n  =  __kernel_rem_pio2(tx,ty,e0,nx,2);
-	r = (long double)ty[0] + ty[1];
-	w = ty[1] - (r - ty[0]);
+	r = (long double)ty[0] + (long double)ty[1];
+	w = (long double)ty[1] - (r - (long double)ty[0]);
 	if(expsign<0) {y[0] = -r; y[1] = -w; return -n;}
 	y[0] = r; y[1] = w; return n;
 }

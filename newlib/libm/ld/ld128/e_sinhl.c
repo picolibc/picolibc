@@ -46,7 +46,7 @@
 
 
 
-static const long double one = 1.0, shuge = 1.0e4931L,
+static const long double one = 1.0L, shuge = 1.0e4931L,
 ovf_thresh = 1.1357216553474703894801348310092223067821E4L;
 
 long double
@@ -65,7 +65,7 @@ sinhl(long double x)
   if (ix >= 0x7fff0000)
     return x + x;
 
-  h = 0.5;
+  h = 0.5L;
   if (jx & 0x80000000)
     h = -h;
 
@@ -80,7 +80,7 @@ sinhl(long double x)
 	  return x;		/* sinh(tiny) = tiny with inexact */
       t = expm1l (u.value);
       if (ix < 0x3fff0000)
-	return h * (2.0 * t - t * t / (t + one));
+	return h * (2.0L * t - t * t / (t + one));
       return h * (t + t / (t + one));
     }
 
@@ -92,7 +92,7 @@ sinhl(long double x)
      Overflow threshold is log(2 * maxdouble).  */
   if (u.value <= ovf_thresh)
     {
-      w = expl (0.5 * u.value);
+      w = expl (0.5L * u.value);
       t = h * w;
       return t * w;
     }

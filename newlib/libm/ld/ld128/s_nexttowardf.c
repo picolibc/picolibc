@@ -27,7 +27,7 @@ nexttowardf(float x, long double y)
 	if((ix>0x7f800000) ||   /* x is nan */
 	   ((iy>=0x7fff000000000000LL)&&((iy-0x7fff000000000000LL)|ly)!=0))
 				/* y is nan */
-	   return x+y;
+            return x+(float)y;
 	if((long double) x==y) return y;	/* x=y, return y */
 	if(ix==0) {				/* x == 0 */
 	    volatile float u;

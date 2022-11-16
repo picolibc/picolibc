@@ -26,7 +26,7 @@
 #define	MANH_SIZE	(EXT_FRACHBITS + EXT_FRACHMBITS)
 #endif
 
-static const long double huge = 1.0e300;
+static const long double huge = 1.0e300L;
 static const float zero[] = { 0.0, -0.0 };
 
 long double
@@ -40,13 +40,13 @@ truncl(long double x)
 
 	if (e < MANH_SIZE - 1) {
 		if (e < 0) {			/* raise inexact if x != 0 */
-			if (huge + x > 0.0)
-				return (zero[((ix0>>48)&0x8000)!=0]);
+			if (huge + x > 0.0L)
+				return (long double)(zero[((ix0>>48)&0x8000)!=0]);
 		} else {
 			uint64_t m = ((1llu << MANH_SIZE) - 1) >> (e + 1);
 			if (((ix0 & m) | ix1) == 0)
 				return (x);	/* x is integral */
-			if (huge + x > 0.0) {	/* raise inexact flag */
+			if (huge + x > 0.0L) {	/* raise inexact flag */
 				ix0 &= ~m;
 				ix1 = 0;
 			}
@@ -55,7 +55,7 @@ truncl(long double x)
 		uint64_t m = (uint64_t)-1 >> (64 - LDBL_MANT_DIG + e + 1);
 		if ((ix1 & m) == 0)
 			return (x);	/* x is integral */
-		if (huge + x > 0.0)		/* raise inexact flag */
+		if (huge + x > 0.0L)		/* raise inexact flag */
 			ix1 &= ~m;
 	}
 	SET_LDOUBLE_WORDS64(x,ix0,ix1);

@@ -33,7 +33,7 @@ floorl(long double x)
 	jj0 = (se&0x7fff)-0x3fff;
 	if(jj0<31) {
 	    if(jj0<0) {	/* raise inexact if x != 0 */
-		if(huge+x>0.0) {
+		if(huge+x>0.0L) {
 		    if(sx==0)
 			return 0.0L;
 		    else if(((se&0x7fff)|i0|i1)!=0)
@@ -42,7 +42,7 @@ floorl(long double x)
 	    } else {
 		i = (0x7fffffff)>>jj0;
 		if(((i0&i)|i1)==0) return x; /* x is integral */
-		if(huge+x>0.0) {	/* raise inexact flag */
+		if(huge+x>0.0L) {	/* raise inexact flag */
 		    if(sx) {
 			if (jj0>0 && (i0+(0x80000000>>jj0))>i0)
 			  i0 += (0x80000000)>>jj0;
@@ -61,7 +61,7 @@ floorl(long double x)
 	} else {
 	    i = ((u_int32_t)(0xffffffff))>>(jj0-31);
 	    if((i1&i)==0) return x;	/* x is integral */
-	    if(huge+x>0.0) {		/* raise inexact flag */
+	    if(huge+x>0.0L) {		/* raise inexact flag */
 		if(sx) {
 		    if(jj0==31) i0+=1;
 		    else {

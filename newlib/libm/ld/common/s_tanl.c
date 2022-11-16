@@ -62,7 +62,7 @@ tanl(long double x)
 		return ((x - x) / (x - x));
 
 	/* Optimize the case where x is already within range. */
-	if (z.e < M_PI_4) {
+	if (z.e < _M_PI_4L) {
 		hi = __kernel_tanl(z.e, 0, 0);
 		return (s ? -hi : hi);
 	}

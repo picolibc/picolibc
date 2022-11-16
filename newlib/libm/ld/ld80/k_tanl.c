@@ -38,11 +38,11 @@ pio4_hi =  0.78539816339744828,		/*  0x1921fb54442d18.0p-53 */
 pio4_lo =  3.0628711372715500e-17,	/*  0x11a80000000000.0p-107 */
 pio4lo_hi = -1.2541394031670831e-20,	/* -0x1d9cceba3f91f2.0p-119 */
 pio4lo_lo =  6.1493048227390915e-37;	/*  0x1a280000000000.0p-173 */
-#define	T3	((long double)T3hi + T3lo)
-#define	T5	((long double)T5hi + T5lo)
-#define	T7	((long double)T7hi + T7lo)
-#define	pio4	((long double)pio4_hi + pio4_lo)
-#define	pio4lo	((long double)pio4lo_hi + pio4lo_lo)
+#define	T3	((long double)T3hi + (long double)T3lo)
+#define	T5	((long double)T5hi + (long double)T5lo)
+#define	T7	((long double)T7hi + (long double)T7lo)
+#define	pio4	((long double)pio4_hi + (long double)pio4_lo)
+#define	pio4lo	((long double)pio4lo_hi + (long double)pio4lo_lo)
 #else
 static const long double
 T3 =   0.333333333333333333180L,	/*  0xaaaaaaaaaaaaaaa5.0p-65 */
@@ -74,8 +74,8 @@ __kernel_tanl(long double x, long double y, int iy) {
 	int i;
 
 	iy = (iy == 1 ? -1 : 1);	/* XXX recover original interface */
-	osign = (x >= 0 ? 1.0 : -1.0);	/* XXX slow, probably wrong for -0 */
-	if (fabsl(x) >= 0.67434) {
+	osign = (x >= 0 ? 1.0l : -1.0l);	/* XXX slow, probably wrong for -0 */
+	if (fabsl(x) >= 0.67434l) {
 		if (x < 0) {
 			x = -x;
 			y = -y;
@@ -83,16 +83,16 @@ __kernel_tanl(long double x, long double y, int iy) {
 		z = pio4 - x;
 		w = pio4lo - y;
 		x = z + w;
-		y = 0.0;
+		y = 0.0l;
 		i = 1;
 	} else
 		i = 0;
 	z = x * x;
 	w = z * z;
-	r = T5 + w * (T9 + w * (T13 + w * (T17 + w * (T21 +
-	    w * (T25 + w * (T29 + w * T33))))));
-	v = z * (T7 + w * (T11 + w * (T15 + w * (T19 + w * (T23 +
-	    w * (T27 + w * T31))))));
+	r = T5 + w * ((long double)T9 + w * ((long double)T13 + w * ((long double)T17 + w * ((long double)T21 +
+	    w * ((long double)T25 + w * ((long double)T29 + w * (long double)T33))))));
+	v = z * ((long double)T7 + w * ((long double)T11 + w * ((long double)T15 + w * ((long double)T19 + w * ((long double)T23 +
+	    w * ((long double)T27 + w * (long double)T31))))));
 	s = z * x;
 	r = y + z * (s * (r + v) + y);
 	r += T3 * s;
@@ -100,7 +100,7 @@ __kernel_tanl(long double x, long double y, int iy) {
 	if (i == 1) {
 		v = (long double) iy;
 		return osign *
-			(v - 2.0 * (x - (w * w / (w + v) - r)));
+			(v - 2.0L * (x - (w * w / (w + v) - r)));
 	}
 	if (iy == 1)
 		return w;
@@ -112,11 +112,11 @@ __kernel_tanl(long double x, long double y, int iy) {
 		/* compute -1.0 / (x+r) accurately */
 		long double a, t;
 		z = w;
-		z = z + 0x1p32 - 0x1p32;
+		z = z + 0x1p32L - 0x1p32L;
 		v = r - (z - x);	/* z+v = r+x */
-		t = a = -1.0 / w;	/* a = -1.0/w */
-		t = t + 0x1p32 - 0x1p32;
-		s = 1.0 + t * z;
+		t = a = -1.0L / w;	/* a = -1.0/w */
+		t = t + 0x1p32L - 0x1p32L;
+		s = 1.0L + t * z;
 		return t + a * (s + t * v);
 	}
 }

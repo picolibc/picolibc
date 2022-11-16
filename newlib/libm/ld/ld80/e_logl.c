@@ -119,15 +119,15 @@ int e;
 
 if( isnan(x) )
 	return(x);
-if( x == INFINITY )
+if( x == (long double) INFINITY )
 	return(x);
 /* Test for domain */
 if( x <= 0.0L )
 	{
 	if( x == 0.0L )
-		return( -INFINITY );
+                return( -(long double) INFINITY );
 	else
-		return( NAN );
+		return( (long double) NAN );
 	}
 
 /* separate mantissa from exponent */

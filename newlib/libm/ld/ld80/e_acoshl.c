@@ -25,7 +25,7 @@
  */
 
 static const long double
-one	= 1.0,
+one	= 1.0l,
 ln2	= 6.931471805599453094287e-01L; /* 0x3FFE, 0xB17217F7, 0xD1CF79AC */
 
 long double
@@ -42,12 +42,12 @@ acoshl(long double x)
 	    } else
 		return logl(x)+ln2;	/* acoshl(huge)=logl(2x) */
 	} else if(((se-0x3fff)|i0|i1)==0) {
-	    return 0.0;			/* acosh(1) = 0 */
+	    return 0.0l;			/* acosh(1) = 0 */
 	} else if (se > 0x4000) {	/* 2**28 > x > 2 */
 	    t=x*x;
-	    return logl(2.0*x-one/(x+sqrtl(t-one)));
+	    return logl(2.0l*x-one/(x+sqrtl(t-one)));
 	} else {			/* 1<x<2 */
 	    t = x-one;
-	    return log1pl(t+sqrtl(2.0*t+t*t));
+	    return log1pl(t+sqrtl(2.0l*t+t*t));
 	}
 }

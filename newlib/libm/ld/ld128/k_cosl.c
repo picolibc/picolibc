@@ -52,8 +52,8 @@ __kernel_cosl(long double x, long double y)
 
 	z  = x*x;
 	r  = z*(C1+z*(C2+z*(C3+z*(C4+z*(C5+z*(C6+z*(C7+
-	    z*(C8+z*(C9+z*(C10+z*C11))))))))));
-	hz = 0.5*z;
-	w  = one-hz;
-	return w + (((one-w)-hz) + (z*r-x*y));
+            z*((long double)C8+z*((long double)C9+z*((long double)C10+z*(long double)C11))))))))));
+	hz = 0.5L*z;
+	w  = (long double)one-hz;
+	return w + ((((long double)one-w)-hz) + (z*r-x*y));
 }

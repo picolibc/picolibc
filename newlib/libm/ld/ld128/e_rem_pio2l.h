@@ -74,8 +74,8 @@ __ieee754_rem_pio2l(long double x, long double *y)
 	    u.bits.manh < 0x921fb54442d1LL) {
 	    /* |x| ~< 2^45*(pi/2), medium size */
 	    /* Use a specialized rint() to get fn.  Assume round-to-nearest. */
-	    fn = x*invpio2+0x1.8p112;
-	    fn = fn-0x1.8p112;
+	    fn = x*invpio2+0x1.8p112L;
+	    fn = fn-0x1.8p112L;
 #ifdef HAVE_EFFICIENT_I64RINT
 	    n  = i64rint(fn);
 #else
@@ -125,15 +125,15 @@ __ieee754_rem_pio2l(long double x, long double *y)
 	z = u1.e;
 	for(i=0;i<4;i++) {
 		tx[i] = (double)((int32_t)(z));
-		z     = (z-tx[i])*two24;
+		z     = (z-(long double)tx[i])*(long double)two24;
 	}
 	tx[4] = z;
 	nx = 5;
 	while(tx[nx-1]==zero) nx--;	/* skip zero term */
 	n  =  __kernel_rem_pio2(tx,ty,e0,nx,3);
-	t = (long double)ty[2] + ty[1];
-	r = t + ty[0];
-	w = ty[0] - (r - t);
+	t = (long double)ty[2] + (long double)ty[1];
+	r = t + (long double)ty[0];
+	w = (long double)ty[0] - (r - t);
 	if(expsign<0) {y[0] = -r; y[1] = -w; return -n;}
 	y[0] = r; y[1] = w; return n;
 }

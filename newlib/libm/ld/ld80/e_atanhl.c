@@ -30,9 +30,9 @@
 
 
 
-static const long double one = 1.0, huge = 1e4900L;
+static const long double one = 1.0l, huge = 1e4900L;
 
-static const long double zero = 0.0;
+static const long double zero = 0.0l;
 
 long double
 atanhl(long double x)
@@ -51,8 +51,8 @@ atanhl(long double x)
 	SET_LDOUBLE_EXP(x,ix);
 	if(ix<0x3ffe) {		/* x < 0.5 */
 	    t = x+x;
-	    t = 0.5*log1pl(t+t*x/(one-x));
+	    t = 0.5l*log1pl(t+t*x/(one-x));
 	} else
-	    t = 0.5*log1pl((x+x)/(one-x));
+	    t = 0.5l*log1pl((x+x)/(one-x));
 	if(se<=0x7fff) return t; else return -t;
 }

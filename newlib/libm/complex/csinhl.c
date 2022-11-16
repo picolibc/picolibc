@@ -42,7 +42,7 @@ csinhl(long double complex z)
 
 	x = creall(z);
 	y = cimagl(z);
-	w = sinhl(x) * cosl(y) + (coshl(x) * sinl(y)) * (double complex) I;
+	w = sinhl(x) * cosl(y) + (coshl(x) * sinl(y)) * (long double complex) I;
 	return w;
 }
 

@@ -114,7 +114,7 @@ hypotl(long double x, long double y)
 	}
 	if(k!=0) {
 	    u_int32_t es;
-	    t1 = 1.0;
+	    t1 = 1.0L;
 	    GET_LDOUBLE_EXP(es,t1);
 	    SET_LDOUBLE_EXP(t1,es+k);
 	    return t1*w;

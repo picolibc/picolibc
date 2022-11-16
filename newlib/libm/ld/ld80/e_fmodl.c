@@ -32,7 +32,7 @@
 
 #define	MANL_SHIFT	(EXT_FRACLBITS - 1)
 
-static const long double one = 1.0, Zero[] = {0.0, -0.0,};
+static const long double one = 1.0l, Zero[] = {0.0l, -0.0l,};
 
 /*
  * fmodl(x,y)
@@ -81,7 +81,7 @@ fmodl(long double x, long double y)
 
     /* determine ix = ilogb(x) */
 	if(ux.bits.ext_exp == 0) {	/* subnormal x */
-	    ux.e *= 0x1.0p512;
+	    ux.e *= 0x1.0p512l;
 	    ix = ux.bits.ext_exp - (BIAS + 512);
 	} else {
 	    ix = ux.bits.ext_exp - BIAS;
@@ -89,7 +89,7 @@ fmodl(long double x, long double y)
 
     /* determine iy = ilogb(y) */
 	if(uy.bits.ext_exp == 0) {	/* subnormal y */
-	    uy.e *= 0x1.0p512;
+	    uy.e *= 0x1.0p512l;
 	    iy = uy.bits.ext_exp - (BIAS + 512);
 	} else {
 	    iy = uy.bits.ext_exp - BIAS;
@@ -127,7 +127,7 @@ fmodl(long double x, long double y)
 	ux.bits.ext_fracl = lx;
 	if (iy < LDBL_MIN_EXP) {
 	    ux.bits.ext_exp = iy + (BIAS + 512);
-	    ux.e *= 0x1p-512;
+	    ux.e *= 0x1p-512l;
 	} else {
 	    ux.bits.ext_exp = iy + BIAS;
 	}

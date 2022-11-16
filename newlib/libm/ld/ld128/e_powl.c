@@ -68,13 +68,13 @@ static const long double bp[] = {
 
 /* log_2(1.5) */
 static const long double dp_h[] = {
-  0.0,
+  0.0L,
   5.8496250072115607565592654282227158546448E-1L
 };
 
 /* Low part of log_2(1.5) */
 static const long double dp_l[] = {
-  0.0,
+  0.0L,
   1.0579781240112554492329533686862998106046E-16L
 };
 
@@ -192,7 +192,7 @@ powl(long double x, long double y)
 	{
 	  if (floorl (y) == y)
 	    {
-	      z = 0.5 * y;
+	      z = 0.5L * y;
 	      if (floorl (z) == z)
 		yisint = 2;
 	      else
@@ -329,12 +329,12 @@ powl(long double x, long double y)
   r = s2 * s2 * u / v;
   r += s_l * (s_h + s);
   s2 = s_h * s_h;
-  t_h = 3.0 + s2 + r;
+  t_h = 3.0L + s2 + r;
   o.value = t_h;
   o.parts32.lswlo = 0;
   o.parts32.lswhi &= 0xf8000000;
   t_h = o.value;
-  t_l = r - ((t_h - 3.0) - s2);
+  t_l = r - ((t_h - 3.0L) - s2);
   /* u+v = s*(1+...) */
   u = s_h * t_h;
   v = s_l * t_h + t_l * s;

@@ -18,9 +18,6 @@
  */
 
 
-static const double
-half =  0.5;
-
 /*
  * Domain [-0.7854, 0.7854], range ~[-1.89e-22, 1.915e-22]
  * |sin(x)/x - s(x)| < 2**-72.1
@@ -32,7 +29,7 @@ half =  0.5;
 static const volatile double
 S1hi = -0.16666666666666666,		/* -0x15555555555555.0p-55 */
 S1lo = -9.2563760475949941e-18;		/* -0x15580000000000.0p-109 */
-#define	S1	((long double)S1hi + S1lo)
+#define	S1	((long double)S1hi + (long double)S1lo)
 #else
 static const long double
 S1 = -0.166666666666666666671L;		/* -0xaaaaaaaaaaaaaaab.0p-66 */
@@ -54,7 +51,7 @@ __kernel_sinl(long double x, long double y, int iy)
 
 	z	=  x*x;
 	v	=  z*x;
-	r	=  S2+z*(S3+z*(S4+z*(S5+z*(S6+z*(S7+z*S8)))));
+	r	=  (long double) S2+z*((long double) S3+z*((long double) S4+z*((long double) S5+z*((long double) S6+z*((long double) S7+z*(long double) S8)))));
 	if(iy==0) return x+v*(S1+z*r);
-	else      return x-((z*(half*y-v*r)-y)-v*S1);
+	else      return x-((z*(0.5l*y-v*r)-y)-v*S1);
 }

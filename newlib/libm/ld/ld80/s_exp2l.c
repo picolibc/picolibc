@@ -218,14 +218,14 @@ exp2l(long double x)
 			if (u.xbits.man != 1ULL << 63 || (hx & 0x8000) == 0)
 				return (x + x);	/* x is +Inf or NaN */
 			else
-				return (0.0);	/* x is -Inf */
+				return (0.0l);	/* x is -Inf */
 		}
 		if (x >= 16384)
 			return (huge * huge);	/* overflow */
 		if (x <= -16446)
 			return (twom10000 * twom10000);	/* underflow */
 	} else if (ix <= BIAS - 66) {		/* |x| < 0x1p-66 */
-		return (1.0 + x);
+		return (1.0l + x);
 	}
 
 #ifdef __i386__
@@ -252,11 +252,11 @@ exp2l(long double x)
 	 * XXX If the exponent is negative, the computation of k depends on
 	 *     '>>' doing sign extension.
 	 */
-	u.e = x + redux;
+	u.e = x + (long double)redux;
 	i0 = u.bits.manl + TBLSIZE / 2;
 	k = (int)i0 >> TBLBITS;
 	i0 = (i0 & (TBLSIZE - 1)) << 1;
-	u.e -= redux;
+	u.e -= (long double)redux;
 	z = x - u.e;
 	v.xbits.man = 1ULL << 63;
 	if (k >= LDBL_MIN_EXP) {
@@ -268,16 +268,16 @@ exp2l(long double x)
 	}
 
 	/* Compute r = exp2l(y) = exp2lt[i0] * p(z). */
-	long double t_hi = tbl[i0];
-	long double t_lo = tbl[i0 + 1];
+	long double t_hi = (long double)tbl[i0];
+	long double t_lo = (long double)tbl[i0 + 1];
 	/* XXX This gives > 1 ulp errors outside of FE_TONEAREST mode */
-	r = t_lo + (t_hi + t_lo) * z * (P1 + z * (P2 + z * (P3 + z * (P4
-	    + z * (P5 + z * P6))))) + t_hi;
+	r = t_lo + (t_hi + t_lo) * z * ((long double)P1 + z * ((long double)P2 + z * ((long double)P3 + z * ((long double)P4
+	    + z * ((long double)P5 + z * (long double)P6))))) + t_hi;
 
 	/* Scale by 2**k. */
 	if (k >= LDBL_MIN_EXP) {
 		if (k == LDBL_MAX_EXP)
-			return (r * 2.0 * 0x1p16383L);
+			return (r * 2.0l * 0x1p16383L);
 		return (r * twopk);
 	} else {
 		return (r * twopkp10000 * twom10000);

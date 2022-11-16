@@ -35,7 +35,7 @@ nexttoward64(__float64 x, long double y)
 	if(((ix>=0x7ff00000)&&((ix-0x7ff00000)|lx)!=0) ||   /* x is nan */
 	   ((iy>=0x7fff000000000000LL)&&((iy-0x7fff000000000000LL)|ly)!=0))
 							    /* y is nan */
-	   return x+y;
+            return x+(__float64)y;
 	if((long double) x==y) return y;	/* x=y, return y */
 	if((ix|lx)==0) {			/* x == 0 */
 	    volatile double u;

@@ -42,7 +42,7 @@ ccosl(long double complex z)
 	long double ch, sh;
 
 	_cchshl(cimagl(z), &ch, &sh);
-	w = cosl(creall(z)) * ch - (sinl(creall(z)) * sh) * (double complex) I;
+	w = cosl(creall(z)) * ch - (sinl(creall(z)) * sh) * (long double complex) I;
 	return w;
 }
 

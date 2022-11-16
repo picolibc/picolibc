@@ -774,7 +774,7 @@ erfl(long double x)
       if (ix < 0x3fc60000) /* |x|<2**-57 */
 	{
 	  if (ix < 0x00080000)
-	    return 0.125 * (8.0 * x + efx8 * x);	/*avoid underflow */
+	    return 0.125L * (8.0L * x + efx8 * x);	/*avoid underflow */
 	  return x + efx * x;
 	}
       y = a + a * neval (z, TN1, NTN1) / deval (z, TD1, NTD1);
@@ -817,7 +817,7 @@ erfcl(long double x)
   if (ix < 0x3fff4000) /* 1.25 */
     {
       x = u.value;
-      i = 8.0 * x;
+      i = 8.0L * x;
       switch (i)
 	{
         default:
@@ -875,7 +875,7 @@ erfcl(long double x)
 
       x = fabsl (x);
       z = one / (x * x);
-      i = 8.0 / x;
+      i = 8.0L / x;
       switch (i)
 	{
 	default:
@@ -908,7 +908,7 @@ erfcl(long double x)
       u.parts32.lswlo = 0;
       u.parts32.lswhi &= 0xfe000000;
       z = u.value;
-      r = expl (-z * z - 0.5625) *
+      r = expl (-z * z - 0.5625L) *
 	expl ((z - x) * (z + x) + p);
       if ((sign & 0x80000000) == 0)
 	return r / x;

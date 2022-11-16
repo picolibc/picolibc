@@ -368,14 +368,14 @@ exp2l(long double x)
 			    || (hx & 0x8000) == 0)
 				return (x + x);	/* x is NaN or +Inf */
 			else 
-				return (0.0);	/* x is -Inf */
+				return (0.0L);	/* x is -Inf */
 		}
 		if (x >= 16384)
 			return (huge * huge); /* overflow */
 		if (x <= -16495)
 			return (twom10000 * twom10000); /* underflow */
 	} else if (ix <= BIAS - 115) {		/* |x| < 0x1p-115 */
-		return (1.0 + x);
+		return (1.0L + x);
 	}
 
 	/*
@@ -392,11 +392,11 @@ exp2l(long double x)
 	 * XXX If the exponent is negative, the computation of k depends on
 	 *     '>>' doing sign extension.
 	 */
-	u.e = x + redux;
+	u.e = x + (long double)redux;
 	i0 = (u.bits.manl & 0xffffffff) + TBLSIZE / 2;
 	k = (int)i0 >> TBLBITS;
 	i0 = i0 & (TBLSIZE - 1);
-	u.e -= redux;
+	u.e -= (long double)redux;
 	z = x - u.e;
 	v.xbits.manh = 0;
 	v.xbits.manl = 0;
@@ -410,14 +410,14 @@ exp2l(long double x)
 
 	/* Compute r = exp2(y) = exp2t[i0] * p(z - eps[i]). */
 	t = tbl[i0];		/* exp2t[i0] */
-	z -= eps[i0];		/* eps[i0]   */
+	z -= (long double)eps[i0];		/* eps[i0]   */
 	r = t + t * z * (P1 + z * (P2 + z * (P3 + z * (P4 + z * (P5 + z * (P6
-	    + z * (P7 + z * (P8 + z * (P9 + z * P10)))))))));
+	    + z * ((long double)P7 + z * ((long double)P8 + z * ((long double)P9 + z * (long double)P10)))))))));
 
 	/* Scale by 2**k. */
 	if(k >= LDBL_MIN_EXP) {
 		if (k == LDBL_MAX_EXP)
-			return (r * 2.0 * 0x1p16383L);
+			return (r * 2.0L * 0x1p16383L);
 		return (r * twopk);
 	} else {
 		return (r * twopkp10000 * twom10000);

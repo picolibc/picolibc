@@ -75,8 +75,8 @@ long double __kernel_tanl(long double, long double, int);
 #endif
 #endif
 
-#include "math_private_openbsd.h"
 #include "fpmath.h"
+#include "math_private_openbsd.h"
 
 #ifndef EXT_FRACLMBITS
 #define EXT_FRACLMBITS 0

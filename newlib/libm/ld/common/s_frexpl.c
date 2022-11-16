@@ -42,7 +42,7 @@ frexpl(long double x, int *ex)
 		if ((u.bits.manl | u.bits.manh) == 0) {
 			*ex = 0;
 		} else {
-			u.e *= 0x1.0p514;
+			u.e *= 0x1.0p514L;
 			*ex = u.bits.exp - 0x4200;
 			u.bits.exp = 0x3ffe;
 		}

@@ -34,9 +34,9 @@
  * that everything is in range.  At compile time, INRANGE(x) should reduce to
  * two floating-point comparisons in the former case, or TRUE otherwise.
  */
-static const type dtype_min = DTYPE_MIN - 0.5;
-static const type dtype_max = DTYPE_MAX + 0.5;
-#define	INRANGE(x)	(dtype_max - DTYPE_MAX != 0.5 || \
+static const type dtype_min = DTYPE_MIN - (type)0.5;
+static const type dtype_max = DTYPE_MAX + (type)0.5;
+#define	INRANGE(x)	(dtype_max - DTYPE_MAX != (type)0.5 ||  \
 			 ((x) > dtype_min && (x) < dtype_max))
 
 dtype

@@ -113,7 +113,7 @@ static const long double
 
 
   tc =  1.4616321449683623412626595423257213284682E0L,
-  tf = -1.2148629053584961146050602565082954242826E-1,/* double precision */
+  tf = -1.2148629053584961146050602565082954242826E-1L,/* double precision */
 /* tt = (tail of tf), i.e. tf + tt has extended precision. */
   tt = 3.3649914684731379602768989080467587736363E-18L,
   /* lgam ( 1.4616321449683623412626595423257213284682E0 ) =
@@ -217,9 +217,9 @@ sin_pi(long double x)
   z = floorl (y);
   if (z != y)
     {				/* inexact anyway */
-      y  *= 0.5;
-      y = 2.0*(y - floorl(y));		/* y = |x| mod 2.0 */
-      n = (int) (y*4.0);
+      y  *= 0.5L;
+      y = 2.0L*(y - floorl(y));		/* y = |x| mod 2.0 */
+      n = (int) (y*4.0L);
     }
   else
     {
@@ -253,10 +253,10 @@ sin_pi(long double x)
       break;
     case 5:
     case 6:
-      y = -cosl (pi * (y - 1.5));
+      y = -cosl (pi * (y - 1.5L));
       break;
     default:
-      y = sinl (pi * (y - 2.0));
+      y = sinl (pi * (y - 2.0L));
       break;
     }
   return -y;
@@ -342,7 +342,7 @@ lgammal_r(long double x, int *signgamp)
 	  if (ix >= 0x3fffdda6) /* 1.73162841796875 */
 	    {
 	      /* [1.7316,2] */
-	      y = x - 2.0;
+	      y = x - 2.0L;
 	      i = 0;
 	    }
 	  else if (ix >= 0x3fff9da6)/* 1.23162841796875 */
@@ -382,7 +382,7 @@ lgammal_r(long double x, int *signgamp)
       /* x < 8.0 */
       i = (int) x;
       t = zero;
-      y = x - (double) i;
+      y = x - (long double) i;
   p = y *
      (s0 + y * (s1 + y * (s2 + y * (s3 + y * (s4 + y * (s5 + y * s6))))));
   q = r0 + y * (r1 + y * (r2 + y * (r3 + y * (r4 + y * (r5 + y * (r6 + y))))));
@@ -391,15 +391,15 @@ lgammal_r(long double x, int *signgamp)
       switch (i)
 	{
 	case 7:
-	  z *= (y + 6.0);	/* FALLTHRU */
+	  z *= (y + 6.0L);	/* FALLTHRU */
 	case 6:
-	  z *= (y + 5.0);	/* FALLTHRU */
+	  z *= (y + 5.0L);	/* FALLTHRU */
 	case 5:
-	  z *= (y + 4.0);	/* FALLTHRU */
+	  z *= (y + 4.0L);	/* FALLTHRU */
 	case 4:
-	  z *= (y + 3.0);	/* FALLTHRU */
+	  z *= (y + 3.0L);	/* FALLTHRU */
 	case 3:
-	  z *= (y + 2.0);	/* FALLTHRU */
+	  z *= (y + 2.0L);	/* FALLTHRU */
 	  r += logl (z);
 	  break;
 	}

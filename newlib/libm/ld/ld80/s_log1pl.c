@@ -116,9 +116,9 @@ int e;
 
 if( isnan(xm1) )
 	return(xm1);
-if( xm1 == INFINITY )
+if( xm1 == (long double) INFINITY )
 	return(xm1);
-if(xm1 == 0.0)
+if(xm1 == 0.0l)
 	return(xm1);
 
 x = xm1 + 1.0L;
@@ -127,9 +127,9 @@ x = xm1 + 1.0L;
 if( x <= 0.0L )
 	{
 	if( x == 0.0L )
-		return( -INFINITY );
+		return( -(long double) INFINITY );
 	else
-		return( NAN );
+		return( (long double) NAN );
 	}
 
 /* Separate mantissa from exponent.
@@ -168,7 +168,7 @@ if( x < SQRTH )
 	{
 	e -= 1;
 	if (e != 0)
-	  x = 2.0 * x - 1.0L;
+	  x = 2.0l * x - 1.0L;
 	else
 	  x = xm1;
 	}	
@@ -182,7 +182,7 @@ else
 z = x*x;
 y = x * ( z * __polevll( x, P, 6 ) / __p1evll( x, Q, 6 ) );
 y = y + e * C2;
-z = y - 0.5 * z;
+z = y - 0.5l * z;
 z = z + x;
 z = z + e * C1;
 return( z );

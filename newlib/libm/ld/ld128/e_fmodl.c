@@ -18,7 +18,7 @@
 
 
 
-static const long double one = 1.0, Zero[] = {0.0, -0.0,};
+static const long double one = 1.0L, Zero[] = {0.0L, -0.0L,};
 
 long double
 fmodl(long double x, long double y)

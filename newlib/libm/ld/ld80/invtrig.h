@@ -88,7 +88,7 @@ static inline long double
 Q(long double x)
 {
 
-	return (1.0 + x * (qS1 + x * (qS2 + x * (qS3 + x * (qS4 + x * qS5)))));
+	return (1.0l + x * (qS1 + x * (qS2 + x * (qS3 + x * (qS4 + x * qS5)))));
 }
 
 static inline long double

@@ -41,7 +41,7 @@ scalbnl (long double x, int n)
         k = u.bits.exp;				/* extract exponent */
         if (k==0) {				/* 0 or subnormal x */
             if ((u.bits.manh|u.bits.manl)==0) return x;	/* +-0 */
-	    u.e *= 0x1p+128;
+	    u.e *= 0x1p+128L;
 	    k = u.bits.exp - 128;
             if (n< -50000) return tiny*x; 	/*underflow*/
 	    }
@@ -52,12 +52,12 @@ scalbnl (long double x, int n)
 	    {u.bits.exp = k; return u.e;}
         if (k <= -128) {
             if (n > 50000) 	/* in case integer overflow in n+k */
-		return huge*copysign(huge,x);	/*overflow*/
-	    else return tiny*copysign(tiny,x); 	/*underflow*/
+		return huge*copysignl(huge,x);	/*overflow*/
+	    else return tiny*copysignl(tiny,x); 	/*underflow*/
         }
 	k += 128;				/* subnormal result */
 	u.bits.exp = k;
-        return u.e*0x1p-128;
+        return u.e*0x1p-128L;
 }
 
 #ifdef _HAVE_ALIAS_ATTRIBUTE

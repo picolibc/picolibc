@@ -133,8 +133,8 @@ if( x <= 0.0L )
 	else
 		return (x - x) / (x - x);
 	}
-if( x == INFINITY )
-	return(INFINITY);
+if( x == (long double) INFINITY )
+	return((long double) INFINITY);
 /* separate mantissa from exponent */
 
 /* Note, frexp is used so that denormal numbers

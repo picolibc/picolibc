@@ -36,7 +36,7 @@
 
 
 
-static const long double one=1.0, two=2.0, tiny = 1.0e-4900L;
+static const long double one=1.0L, two=2.0L, tiny = 1.0e-4900L;
 
 long double
 tanhl(long double x)

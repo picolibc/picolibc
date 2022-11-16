@@ -22,7 +22,7 @@
 
 
 
-static const long double one = 1.0;
+static const long double one = 1.0L;
 
 long double
 modfl(long double x, long double *iptr)

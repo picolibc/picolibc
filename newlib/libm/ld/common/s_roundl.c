@@ -36,15 +36,15 @@ roundl(long double x)
 	if (!isfinite(x))
 		return (x);
 
-	if (x >= 0.0) {
+	if (x >= 0.0L) {
 		t = floorl(x);
-		if (t - x <= -0.5)
-			t += 1.0;
+		if (t - x <= -0.5L)
+			t += 1.0L;
 		return (t);
 	} else {
 		t = floorl(-x);
-		if (t + x <= -0.5)
-			t += 1.0;
+		if (t + x <= -0.5L)
+			t += 1.0L;
 		return (-t);
 	}
 }

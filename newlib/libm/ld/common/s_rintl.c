@@ -71,15 +71,15 @@ rintl(long double x)
 	 * evaluated in less precision (as on i386), results will be
 	 * wildly incorrect.
 	 */
-	x += shift[sign];
-	x -= shift[sign];
+	x += (long double)shift[sign];
+	x -= (long double)shift[sign];
 
 	/*
 	 * If the result is +-0, then it must have the same sign as x, but
 	 * the above calculation doesn't always give this.  Fix up the sign.
 	 */
 	if (ex < BIAS && x == 0.0L)
-		return (zero[sign]);
+		return ((long double)zero[sign]);
 
 	return (x);
 }

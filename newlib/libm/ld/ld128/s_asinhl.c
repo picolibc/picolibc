@@ -53,7 +53,7 @@ asinhl(long double x)
   else if (ix >0x40000000)
     {				/* 2^ 54 > |x| > 2.0 */
       t = u.value;
-      w = logl (2.0 * t + one / (sqrtl (x * x + one) + t));
+      w = logl (2.0L * t + one / (sqrtl (x * x + one) + t));
     }
   else
     {				/* 2.0 > |x| > 2 ^ -56 */

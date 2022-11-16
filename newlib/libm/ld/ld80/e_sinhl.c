@@ -30,7 +30,7 @@
 
 
 
-static const long double one = 1.0, shuge = 1.0e4931L;
+static const long double one = 1.0l, shuge = 1.0e4931L;
 
 long double
 sinhl(long double x)
@@ -45,14 +45,14 @@ sinhl(long double x)
     /* x is INF or NaN */
 	if(ix==0x7fff) return x+x;
 
-	h = 0.5;
+	h = 0.5l;
 	if (jx & 0x8000) h = -h;
     /* |x| in [0,25], return sign(x)*0.5*(E+E/(E+1))) */
 	if (ix < 0x4003 || (ix == 0x4003 && i0 <= 0xc8000000)) { /* |x|<25 */
 	    if (ix<0x3fdf)		 /* |x|<2**-32 */
 		if(shuge+x>one) return x;/* sinh(tiny) = tiny with inexact */
 	    t = expm1l(fabsl(x));
-	    if(ix<0x3fff) return h*(2.0*t-t*t/(t+one));
+	    if(ix<0x3fff) return h*(2.0l*t-t*t/(t+one));
 	    return h*(t+t/(t+one));
 	}
 
@@ -64,7 +64,7 @@ sinhl(long double x)
 	if (ix<0x400c || (ix == 0x400c && (i0 < 0xb174ddc0
 					   || (i0 == 0xb174ddc0
 					       && i1 <= 0x31aec0ea)))) {
-	    w = expl(0.5*fabsl(x));
+	    w = expl(0.5l*fabsl(x));
 	    t = h*w;
 	    return t*w;
 	}

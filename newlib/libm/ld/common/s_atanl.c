@@ -21,8 +21,8 @@
 #include "invtrig.h"
 
 static const long double
-one   = 1.0,
-huge   = 1.0e300;
+one   = 1.0l,
+huge   = 1.0e300l;
 
 long double
 atanl(long double x)
@@ -55,15 +55,15 @@ atanl(long double x)
 	x = fabsl(x);
 	if (expman < (BIAS << 8) + 0x30) {		/* |x| < 1.1875 */
 	    if (expman < ((BIAS - 1) << 8) + 0x60) {	/* 7/16 <=|x|<11/16 */
-		id = 0; x = (2.0*x-one)/(2.0+x);
+		id = 0; x = (2.0l*x-one)/(2.0l+x);
 	    } else {			/* 11/16<=|x|< 19/16 */
 		id = 1; x  = (x-one)/(x+one);
 	    }
 	} else {
 	    if (expman < ((BIAS + 1) << 8) + 0x38) {	/* |x| < 2.4375 */
-		id = 2; x  = (x-1.5)/(one+1.5*x);
+		id = 2; x  = (x-1.5l)/(one+1.5l*x);
 	    } else {			/* 2.4375 <= |x| < 2^ATAN_CONST */
-		id = 3; x  = -1.0/x;
+		id = 3; x  = -1.0l/x;
 	    }
 	}}
     /* end of argument reduction */

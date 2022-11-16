@@ -271,7 +271,7 @@ logl(long double x)
 	 + l5) * z
 	+ l4) * z
        + l3) * z * w;
-  y -= 0.5 * w;
+  y -= 0.5L * w;
   y += e * ln2b;  /* Base 2 exponent offset times ln(2).  */
   y += z;
   y += logtbl[k-26]; /* log(t) - (t-1) */

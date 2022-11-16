@@ -41,15 +41,13 @@
  * almost for free from the complications needed to search for the best
  * higher coefficients.
  */
-static const double
-one = 1.0;
 
 #if defined(__amd64__) || defined(__i386__)
 /* Long double constants are slow on these arches, and broken on i386. */
 static const volatile double
 C1hi = 0.041666666666666664,		/*  0x15555555555555.0p-57 */
 C1lo = 2.2598839032744733e-18;		/*  0x14d80000000000.0p-111 */
-#define	C1	((long double)C1hi + C1lo)
+#define	C1	((long double)C1hi + (long double) C1lo)
 #else
 static const long double
 C1 =  0.0416666666666666666136L;	/*  0xaaaaaaaaaaaaaa9b.0p-68 */
@@ -69,8 +67,8 @@ __kernel_cosl(long double x, long double y)
 	long double hz,z,r,w;
 
 	z  = x*x;
-	r  = z*(C1+z*(C2+z*(C3+z*(C4+z*(C5+z*(C6+z*C7))))));
-	hz = 0.5*z;
-	w  = one-hz;
-	return w + (((one-w)-hz) + (z*r-x*y));
+	r  = z*(C1+z*((long double) C2+z*((long double) C3+z*((long double) C4+z*((long double) C5+z*((long double) C6+z*(long double) C7))))));
+	hz = 0.5l*z;
+	w  = 1.0l-hz;
+	return w + (((1.0l-w)-hz) + (z*r-x*y));
 }

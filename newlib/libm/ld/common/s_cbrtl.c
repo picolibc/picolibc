@@ -62,7 +62,7 @@ cbrtl(long double x)
 			return (x);
 	    	}
 		/* Adjust subnormal numbers. */
-		u.e *= 0x1.0p514;
+		u.e *= 0x1.0p514l;
 		k = u.bits.exp;
 		k -= BIAS + 514;
  	} else
@@ -98,7 +98,7 @@ cbrtl(long double x)
 
 	/* ~16-bit estimate: */
 	dx = x;
-	dt = ft;
+	dt = (double)ft;
 	dr = dt * dt * dt;
 	dt = dt * (dx + dx + dr) / (dx + dr + dr);
 
@@ -114,9 +114,9 @@ cbrtl(long double x)
 	 */
 	volatile double vd2 = 0x1.0p32;
 	volatile double vd1 = 0x1.0p-31;
-	#define vd ((long double)vd2 + vd1)
+	#define vd ((long double)vd2 + (long double)vd1)
 
-	t = dt + vd - 0x1.0p32;
+	t = (long double)dt + vd - 0x1.0p32l;
 #elif LDBL_MANT_DIG == 113
 	/*
 	 * Round dt away from zero to 47 bits.  Since we don't trust the 47,
@@ -126,7 +126,7 @@ cbrtl(long double x)
 	 * for rounding up might not apply to either case in cbrtl() since
 	 * dt is much more accurate than needed.
 	 */
-	t = dt + 0x2.0p-46 + 0x1.0p60L - 0x1.0p60;
+	t = (long double)dt + 0x2.0p-46L + 0x1.0p60L - 0x1.0p60L;
 #else
 #error "Unsupported long double format"
 #endif

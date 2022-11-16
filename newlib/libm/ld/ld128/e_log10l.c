@@ -228,7 +228,7 @@ log10l(long double x)
   if (x < SQRTH)
     {
       e -= 1;
-      x = 2.0 * x - 1.0L;	/*  2x - 1  */
+      x = 2.0L * x - 1.0L;	/*  2x - 1  */
     }
   else
     {
@@ -236,7 +236,7 @@ log10l(long double x)
     }
   z = x * x;
   y = x * (z * neval (x, P, 12) / deval (x, Q, 11));
-  y = y - 0.5 * z;
+  y = y - 0.5L * z;
 
 done:
 

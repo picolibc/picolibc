@@ -46,7 +46,7 @@
  *      only coshl(0)=1 is exact for finite x.
  */
 
-static const long double one = 1.0, half = 0.5, huge = 1.0e4900L,
+static const long double one = 1.0L, half = 0.5L, huge = 1.0e4900L,
 ovf_thresh = 1.1357216553474703894801348310092223067821E4L;
 
 long double

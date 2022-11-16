@@ -27,7 +27,7 @@
 
 
 static const long double
-one	= 1.0,
+one	= 1.0L,
 ln2	= 0.6931471805599453094172321214581766L;
 
 long double

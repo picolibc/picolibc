@@ -47,34 +47,6 @@
 #include "riscv_fpmath.h"
 #endif
 
-/* Definitions provided directly by GCC and Clang. */
-#if !(defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && defined(__ORDER_BIG_ENDIAN__))
-
-#if defined(__GLIBC__)
-
-#include <features.h>
-#include <endian.h>
-#define __ORDER_LITTLE_ENDIAN__  __LITTLE_ENDIAN
-#define __ORDER_BIG_ENDIAN__     __BIG_ENDIAN
-#define __BYTE_ORDER__           __BYTE_ORDER
-
-#elif defined(__APPLE__)
-
-#include <machine/endian.h>
-#define __ORDER_LITTLE_ENDIAN__  LITTLE_ENDIAN
-#define __ORDER_BIG_ENDIAN__     BIG_ENDIAN
-#define __BYTE_ORDER__           BYTE_ORDER
-
-#elif defined(_WIN32)
-
-#define __ORDER_LITTLE_ENDIAN__  1234
-#define __ORDER_BIG_ENDIAN__     4321
-#define __BYTE_ORDER__           __ORDER_LITTLE_ENDIAN__
-
-#endif
-
-#endif /* __BYTE_ORDER__, __ORDER_LITTLE_ENDIAN__ and __ORDER_BIG_ENDIAN__ */
-
 #ifndef __FLOAT_WORD_ORDER__
 #define __FLOAT_WORD_ORDER__     __BYTE_ORDER__
 #endif

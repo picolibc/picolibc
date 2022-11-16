@@ -25,7 +25,7 @@ nexttowardf(float x, long double y)
 
 	if((ix>0x7f800000) ||			/* x is nan */
 	   (iy>=0x7fff&&((hy|ly)!=0)))		/* y is nan */
-	   return x+y;
+	   return (long double)x+y;
 	if((long double) x==y) return y;	/* x=y, return y */
 	if(ix==0) {				/* x == 0 */
 	    volatile float u;
@@ -37,7 +37,7 @@ nexttowardf(float x, long double y)
 	if(hx>=0) {				/* x > 0 */
 	    if(esy>=0x8000||((ix>>23)&0xff)>iy-0x3f80
 	       || (((ix>>23)&0xff)==iy-0x3f80
-		   && ((ix&0x7fffff)<<8)>(hy&0x7fffffff))) {/* x > y, x -= ulp */
+		   && ((u_int32_t)(ix&0x7fffff)<<8)>(hy&0x7fffffff))) {/* x > y, x -= ulp */
 		hx -= 1;
 	    } else {				/* x < y, x += ulp */
 		hx += 1;
@@ -45,7 +45,7 @@ nexttowardf(float x, long double y)
 	} else {				/* x < 0 */
 	    if(esy<0x8000||((ix>>23)&0xff)>iy-0x3f80
 	       || (((ix>>23)&0xff)==iy-0x3f80
-		   && ((ix&0x7fffff)<<8)>(hy&0x7fffffff))) {/* x < y, x -= ulp */
+		   && ((u_int32_t)(ix&0x7fffff)<<8)>(hy&0x7fffffff))) {/* x < y, x -= ulp */
 		hx -= 1;
 	    } else {				/* x > y, x += ulp */
 		hx += 1;

@@ -24,9 +24,9 @@
 #include "invtrig.h"
 
 static volatile long double
-tiny  = 1.0e-300;
+tiny  = 1.0e-300l;
 static const long double
-zero  = 0.0;
+zero  = 0.0l;
 
 #ifdef __i386__
 /* XXX Work around the fact that gcc truncates long double constants on i386 */
@@ -80,10 +80,10 @@ atan2l(long double y, long double x)
 	if(exptx==BIAS+LDBL_MAX_EXP) {
 	    if(expty==BIAS+LDBL_MAX_EXP) {
 		switch(m) {
-		    case 0: return  pio2_hi*0.5+tiny;/* atan(+INF,+INF) */
-		    case 1: return -pio2_hi*0.5-tiny;/* atan(-INF,+INF) */
-		    case 2: return  1.5*pio2_hi+tiny;/*atan(+INF,-INF)*/
-		    case 3: return -1.5*pio2_hi-tiny;/*atan(-INF,-INF)*/
+		    case 0: return  pio2_hi*0.5l+tiny;/* atan(+INF,+INF) */
+		    case 1: return -pio2_hi*0.5l-tiny;/* atan(-INF,+INF) */
+		    case 2: return  1.5l*pio2_hi+tiny;/*atan(+INF,-INF)*/
+		    case 3: return -1.5l*pio2_hi-tiny;/*atan(-INF,-INF)*/
 		}
 	    } else {
 		switch(m) {
@@ -104,7 +104,7 @@ atan2l(long double y, long double x)
 	    z=pio2_hi+pio2_lo;
 	    m&=1;
 	}
-	else if(expsignx<0&&k<-LDBL_MANT_DIG-2) z=0.0; 	/* |y/x| tiny, x<0 */
+	else if(expsignx<0&&k<-LDBL_MANT_DIG-2) z=0.0l; 	/* |y/x| tiny, x<0 */
 	else z=atanl(fabsl(y/x));		/* safe to do y/x */
 	switch (m) {
 	    case 0: return       z  ;	/* atan(+,+) */

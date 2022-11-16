@@ -75,7 +75,7 @@ add_adjusted(long double a, long double b)
 	if (sum.lo != 0) {
 		u.e = sum.hi;
 		if ((u.bits.manl & 1) == 0)
-			sum.hi = nextafterl(sum.hi, INFINITY * sum.lo);
+			sum.hi = nextafterl(sum.hi, (long double)INFINITY * sum.lo);
 	}
 	return (sum.hi);
 }
@@ -108,9 +108,9 @@ add_and_denormalize(long double a, long double b, int scale)
 		u.e = sum.hi;
 		bits_lost = -u.bits.exp - scale + 1;
 		if ((bits_lost != 1) ^ (int)(u.bits.manl & 1))
-			sum.hi = nextafterl(sum.hi, INFINITY * sum.lo);
+			sum.hi = nextafterl(sum.hi, (long double)INFINITY * sum.lo);
 	}
-	return (ldexp(sum.hi, scale));
+	return (ldexpl(sum.hi, scale));
 }
 
 /*
@@ -122,9 +122,9 @@ static inline struct dd
 dd_mul(long double a, long double b)
 {
 #if LDBL_MANT_DIG == 64
-	static const long double split = 0x1p32L + 1.0;
+	static const long double split = 0x1p32L + 1.0L;
 #elif LDBL_MANT_DIG == 113
-	static const long double split = 0x1p57L + 1.0;
+	static const long double split = 0x1p57L + 1.0L;
 #endif
 	struct dd ret;
 	long double ha, hb, la, lb, p, q;
@@ -170,9 +170,9 @@ fmal(long double x, long double y, long double z)
 	 * return values here are crucial in handling special cases involving
 	 * infinities, NaNs, overflows, and signed zeroes correctly.
 	 */
-	if (x == 0.0 || y == 0.0)
+	if (x == 0.0L || y == 0.0L)
 		return (x * y + z);
-	if (z == 0.0)
+	if (z == 0.0L)
 		return (x * y);
 	if (!isfinite(x) || !isfinite(y))
 		return (x * y + z);
@@ -203,22 +203,22 @@ fmal(long double x, long double y, long double z)
 			return (z);
 #ifdef FE_TOWARDZERO
 		case FE_TOWARDZERO:
-			if ((x > 0.0) ^ (y < 0.0) ^ (z < 0.0))
+			if ((x > 0.0L) ^ (y < 0.0L) ^ (z < 0.0L))
 				return (z);
 			else
 				return (nextafterl(z, 0));
 #endif
 #ifdef FE_DOWNWARD
 		case FE_DOWNWARD:
-			if ((x > 0.0) ^ (y < 0.0))
+			if ((x > 0.0L) ^ (y < 0.0L))
 				return (z);
 			else
-				return (nextafterl(z, -INFINITY));
+				return (nextafterl(z, -(long double)INFINITY));
 #endif
 #ifdef FE_UPWARD
                 case FE_UPWARD:
-			if ((x > 0.0) ^ (y < 0.0))
-				return (nextafterl(z, INFINITY));
+			if ((x > 0.0L) ^ (y < 0.0L))
+				return (nextafterl(z, (long double)INFINITY));
 			else
 				return (z);
 #endif
@@ -244,7 +244,7 @@ fmal(long double x, long double y, long double z)
 
 	spread = ex + ey;
 
-	if (r.hi == 0.0) {
+	if (r.hi == 0.0L) {
 		/*
 		 * When the addends cancel to 0, ensure that the result has
 		 * the correct sign.

@@ -265,7 +265,7 @@ erfl(long double x)
       if (ix < 0x3fde8000) /* |x|<2**-33 */
 	{
 	  if (ix < 0x00080000)
-	    return 0.125 * (8.0 * x + efx8 * x);	/*avoid underflow */
+	    return 0.125L * (8.0L * x + efx8 * x);	/*avoid underflow */
 	  return x + efx * x;
 	}
       z = x * x;
@@ -316,7 +316,7 @@ erfl(long double x)
   i1 = 0;
   SET_LDOUBLE_WORDS (z, i, i0, i1);
   r =
-    expl (-z * z - 0.5625) * expl ((z - x) * (z + x) + R / S);
+    expl (-z * z - 0.5625L) * expl ((z - x) * (z + x) + R / S);
   if ((se & 0x8000) == 0)
     return one - r / x;
   else
@@ -411,7 +411,7 @@ erfcl(long double x)
       i1 = 0;
       i0 &= 0xffffff00;
       SET_LDOUBLE_WORDS (z, hx, i0, i1);
-      r = expl (-z * z - 0.5625) *
+      r = expl (-z * z - 0.5625L) *
 	expl ((z - x) * (z + x) + R / S);
       if ((se & 0x8000) == 0)
 	return r / x;

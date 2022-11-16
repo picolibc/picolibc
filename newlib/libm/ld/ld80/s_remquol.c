@@ -87,7 +87,7 @@ remquol(long double x, long double y, int *quo)
 
     /* determine ix = ilogb(x) */
 	if(esx == 0) {				/* subnormal x */
-	    x *= 0x1.0p512;
+	    x *= 0x1.0p512L;
 	    GET_LDOUBLE_WORDS(esx,hx,lx,x);
 	    ix = esx - (BIAS + 512);
 	} else {
@@ -96,7 +96,7 @@ remquol(long double x, long double y, int *quo)
 
     /* determine iy = ilogb(y) */
 	if(esy == 0) {				/* subnormal y */
-	    y *= 0x1.0p512;
+	    y *= 0x1.0p512L;
 	    GET_LDOUBLE_WORDS(esy,hy,ly,y);
 	    iy = esy - (BIAS + 512);
 	} else {
@@ -132,7 +132,7 @@ remquol(long double x, long double y, int *quo)
 	if (iy < LDBL_MIN_EXP) {
 	    esx = (iy + BIAS + 512) & 0x7fff;
 	    SET_LDOUBLE_WORDS(x,esx,hx,lx);
-	    x *= 0x1p-512;
+	    x *= 0x1p-512L;
 	    GET_LDOUBLE_WORDS(esx,hx,lx,x);
 	} else {
 	    esx = (iy + BIAS) & 0x7fff;
@@ -145,7 +145,7 @@ fixup:
 		q++;
 		x-=y;
 	    }
-	} else if (x>0.5*y || (x==0.5*y && (q & 1))) {
+	} else if (x>0.5L*y || (x==0.5L*y && (q & 1))) {
 	    q++;
 	    x-=y;
 	}

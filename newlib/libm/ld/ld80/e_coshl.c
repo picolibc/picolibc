@@ -31,7 +31,7 @@
  *	only coshl(0)=1 is exact for finite x.
  */
 
-static const long double one = 1.0, half=0.5, huge = 1.0e4900L;
+static const long double one = 1.0l, half=0.5l, huge = 1.0e4900L;
 
 long double
 coshl(long double x)
