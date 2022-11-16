@@ -42,15 +42,20 @@
  * TLS relocations are generated relative to
  * a location this far *before* the first thread
  * variable (!)
+ * NB: The actual size before tp also includes padding
+ * to align up to the alignment of .tdata/.tbss.
  */
 #if __SIZE_WIDTH__ == 32
-#define TCB_SIZE	8
+extern char __arm32_tls_tcb_offset;
+#define TP_OFFSET ((size_t)&__arm32_tls_tcb_offset)
 #else
-#define TCB_SIZE	16
+extern char __arm64_tls_tcb_offset;
+#define TP_OFFSET ((size_t)&__arm64_tls_tcb_offset)
 #endif
+
 
 void
 _set_tls(void *tls)
 {
-	__asm__ volatile("msr tpidr_el0, %0" : : "r" (tls - TCB_SIZE));
+	__asm__ volatile("msr tpidr_el0, %0" : : "r" (tls - TP_OFFSET));
 }

@@ -173,6 +173,9 @@ SECTIONS
 	PROVIDE( __tbss_start = ADDR(.tbss));
 	PROVIDE( __tbss_size = SIZEOF(.tbss) );
 	PROVIDE( __tls_size = __tls_end - __tls_base );
+	PROVIDE( __tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
+	PROVIDE( __arm32_tls_tcb_offset = MAX(8, __tls_align) );
+	PROVIDE( __arm64_tls_tcb_offset = MAX(16, __tls_align) );
 
 	/*
 	 * The linker special cases .tbss segments which are
