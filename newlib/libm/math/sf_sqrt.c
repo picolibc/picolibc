@@ -80,12 +80,4 @@ sqrtf(float x)
     return z;
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double
-sqrt(double x)
-{
-    return (double)sqrtf((float)x);
-}
-
-#endif
+_MATH_ALIAS_f_f(sqrt)

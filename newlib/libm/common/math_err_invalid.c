@@ -28,14 +28,14 @@
 
 #include "math_config.h"
 
-static const FORCE_DOUBLE VAL = pick_double_except(0.0, (double) NAN);
+static const FORCE_FLOAT64 VAL = pick_float64_except(_F_64(0.0), (__float64) NAN);
 
-HIDDEN double
-__math_invalid (double x)
+HIDDEN __float64
+__math_invalid (__float64 x)
 {
     if (isnan(x))
-        return pick_double_except(x + x, VAL);
-    x = pick_double_except(VAL / VAL, VAL);
+        return pick_float64_except(x + x, VAL);
+    x = pick_float64_except(VAL / VAL, VAL);
     return __math_with_errno (x, EDOM);
 }
 
@@ -43,6 +43,6 @@ __math_invalid (double x)
 HIDDEN void
 __math_set_invalid(void)
 {
-    force_eval_double(pick_double_except(VAL / VAL, VAL));
+    force_eval_float64(pick_float64_except(VAL / VAL, VAL));
 }
 #endif

@@ -44,6 +44,8 @@ sqrt(double x)
 	return result;
 }
 
+_MATH_ALIAS_d_d(sqrt)
+
 #else
 #include "../../math/s_sqrt.c"
 #endif

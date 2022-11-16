@@ -88,12 +88,14 @@ QUICKREF
  * no branching!
  */
 
+#define __isnan __isnand
+
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
 int
-__isnand (double x)
+__isnan64 (__float64 x)
 {
 	__int32_t hx,lx;
 	EXTRACT_WORDS(hx,lx,x);
@@ -103,4 +105,6 @@ __isnand (double x)
 	return (int)(((__uint32_t)(hx))>>31);
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_i_d(__isnan)
+
+#endif /* _NEED_FLOAT64 */

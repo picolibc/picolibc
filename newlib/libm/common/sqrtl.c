@@ -28,18 +28,9 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <math.h>
-#include "local.h"
+#include "math_config.h"
 
-#ifdef _LDBL_EQ_DBL
-/* On platforms where long double is as wide as double.  */
-long double
-sqrtl (long double x)
-{
-  return sqrt(x);
-}
-
-#else
+#if defined(_NEED_FLOAT_HUGE) && !defined(_HAVE_LONG_DOUBLE_MATH)
 
   /* This code is based upon the version in the BSD math's library.
      That code is...
@@ -171,6 +162,6 @@ sqrtl (long double x)
 
   return ux.extu_ld;
 }
-#endif /* ! _LDBL_EQ_DBL */
+#endif
 
 

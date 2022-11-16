@@ -35,16 +35,4 @@
         return x;
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-#ifdef __STDC__
-	double copysign(double x, double y)
-#else
-	double copysign(x,y)
-	double x,y;
-#endif
-{
-	return (double) copysignf((float) x, (float) y);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_ff(copysign)

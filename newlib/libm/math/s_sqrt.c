@@ -83,12 +83,12 @@
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-double
-sqrt(double x)
+__float64
+sqrt64(__float64 x)
 {
-    double z;
+    __float64 z;
     __uint32_t sign = 0x80000000;
     __uint32_t r, t1, s1, ix1, q1;
     __int32_t ix0, s0, q, m, t, i;
@@ -190,7 +190,9 @@ sqrt(double x)
     return z;
 }
 
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_d_d(sqrt)
+
+#endif /* _NEED_FLOAT64 */
 
 /*
 Other methods  (use floating-point arithmetic)

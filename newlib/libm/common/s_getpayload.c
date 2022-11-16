@@ -35,9 +35,10 @@
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-double getpayload(const double *x)
+__float64
+getpayload64(const __float64 *x)
 {
     __int32_t hx, lx;
     EXTRACT_WORDS(hx, lx, *x);
@@ -46,7 +47,9 @@ double getpayload(const double *x)
         ((hx & 0xfffff) | lx) == 0)
         return -1;
     hx &= 0x7ffff;
-    return (double) ((((int64_t) hx) << 32) | (uint32_t) lx);
+    return (__float64) ((((int64_t) hx) << 32) | (uint32_t) lx);
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_d_D(getpayload)
+
+#endif /* _NEED_FLOAT64 */

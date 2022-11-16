@@ -58,17 +58,17 @@ Neither <<asinh>> nor <<asinhf>> are ANSI C.
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-static const double one =
-                        1.00000000000000000000e+00, /* 0x3FF00000, 0x00000000 */
-    ln2 = 6.93147180559945286227e-01, /* 0x3FE62E42, 0xFEFA39EF */
-    huge = 1.00000000000000000000e+300;
+static const __float64
+    one = _F_64(1.00000000000000000000e+00), /* 0x3FF00000, 0x00000000 */
+    ln2 = _F_64(6.93147180559945286227e-01), /* 0x3FE62E42, 0xFEFA39EF */
+    huge = _F_64(1.00000000000000000000e+300);
 
-double
-asinh(double x)
+__float64
+asinh64(__float64 x)
 {
-    double t, w;
+    __float64 t, w;
     __int32_t hx, ix;
     GET_HIGH_WORD(hx, x);
     ix = hx & 0x7fffffff;
@@ -79,13 +79,13 @@ asinh(double x)
             return x; /* return x inexact except 0 */
     }
     if (ix > 0x41b00000) { /* |x| > 2**28 */
-        w = log(fabs(x)) + ln2;
+        w = log64(fabs64(x)) + ln2;
     } else if (ix > 0x40000000) { /* 2**28 > |x| > 2.0 */
-        t = fabs(x);
-        w = log(2.0 * t + one / (sqrt(x * x + one) + t));
+        t = fabs64(x);
+        w = log64(_F_64(2.0) * t + one / (sqrt64(x * x + one) + t));
     } else { /* 2.0 > |x| > 2**-28 */
         t = x * x;
-        w = log1p(fabs(x) + t / (one + sqrt(one + t)));
+        w = log1p64(fabs64(x) + t / (one + sqrt64(one + t)));
     }
     if (hx > 0)
         return w;
@@ -93,4 +93,6 @@ asinh(double x)
         return -w;
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_d_d(asinh)
+
+#endif /* _NEED_FLOAT64 */

@@ -13,6 +13,8 @@
  * __isnanf(x) returns 1 is x is nan, else 0;
  */
 
+#define _ADD_D_TO_DOUBLE_FUNCS
+
 #include "fdlibm.h"
 
 int
@@ -24,12 +26,4 @@ __isnanf (float x)
 	return FLT_UWORD_IS_NAN(ix);
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-int
-__isnand (double x)
-{
-	return __isnanf((float) x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_i_f(__isnan)

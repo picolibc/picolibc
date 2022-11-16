@@ -18,27 +18,32 @@
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-int finite(double x)
+int
+finite64(__float64 x)
 {
 	__int32_t hx;
 	GET_HIGH_WORD(hx,x);
 	return  (int)((__uint32_t)((hx&0x7fffffff)-0x7ff00000)>>31);
 }
 
+_MATH_ALIAS_i_d(finite)
+
 #if defined(_HAVE_ALIAS_ATTRIBUTE)
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif
-__strong_reference(finite, __finite);
+__strong_reference(finite64, __finite64);
 #else
 
-int __finite(double x)
+int __finite64(__float64 x)
 {
-    return finite(x);
+    return finite64(x);
 }
 
 #endif
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_i_d(__finite)
+
+#endif /* _NEED_FLOAT64 */

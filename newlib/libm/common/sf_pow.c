@@ -242,4 +242,12 @@ powf (float x, float y)
     }
   return (float) exp2_inline (ylogx, sign_bias);
 }
+
+#if defined(_HAVE_ALIAS_ATTRIBUTE)
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(powf, _powf);
+#endif
+
 #endif /* !__OBSOLETE_MATH_FLOAT */

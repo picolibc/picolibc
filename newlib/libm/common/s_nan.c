@@ -38,11 +38,12 @@ QUICKREF
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-	double nan(const char *unused)
+__float64
+nan64(const char *unused)
 {
-	double x;
+	__float64 x;
 
         (void) unused;
 #if __GNUC_PREREQ (3, 3)
@@ -53,4 +54,6 @@ QUICKREF
 	return x;
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_d_s(nan)
+
+#endif /* _NEED_FLOAT64 */

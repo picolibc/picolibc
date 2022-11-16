@@ -67,12 +67,4 @@ coshf(float x)
     return __math_oflowf(0);
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double
-cosh(double x)
-{
-    return (double) coshf((float) x);
-}
-
-#endif
+_MATH_ALIAS_f_f(cosh)

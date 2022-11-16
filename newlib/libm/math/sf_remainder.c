@@ -62,12 +62,4 @@ remainderf(float x, float p)
     return x;
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double
-remainder(double x, double p)
-{
-    return (double) remainderf((float) x, (float) p);
-}
-
-#endif
+_MATH_ALIAS_f_ff(remainder)

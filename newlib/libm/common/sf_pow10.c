@@ -22,26 +22,13 @@
 #include <errno.h>
 #include <math.h>
 
-#ifdef __STDC__
-	float pow10f(float x)		/* wrapper pow10f */
-#else
-	float pow10f(x)			/* wrapper pow10f */
-	float x;
-#endif
+float
+pow10f(float x)		/* wrapper pow10f */
 {
-  return powf(10.0, x);
+  return _powf(10.0, x);
 }
 
-#ifdef _DOUBLE_IS_32BITS
+#undef pow10
+#undef pow10l
 
-#ifdef __STDC__
-	double pow10(double x)
-#else
-	double pow10(x)
-	double x;
-#endif
-{
-	return (double) pow10f((float) x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_f(pow10)

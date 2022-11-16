@@ -289,14 +289,13 @@ powf(float x, float y)
     return s * z;
 }
 
-#ifdef _DOUBLE_IS_32BITS
+#if defined(_HAVE_ALIAS_ATTRIBUTE)
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(powf, _powf);
+#endif
 
-double __inhibit_new_builtin_calls
-pow(double x, double y)
-{
-    return (double)powf((float)x, (float) y);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_ff(pow)
 
 #endif /* __OBSOLETE_MATH_FLOAT */

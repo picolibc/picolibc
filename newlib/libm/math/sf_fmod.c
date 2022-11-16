@@ -120,12 +120,4 @@ fmodf(float x, float y)
     return x; /* exact output */
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double
-fmod(double x, double y)
-{
-    return (double) fmodf((float) x, (float)y);
-}
-
-#endif
+_MATH_ALIAS_f_ff(fmod)

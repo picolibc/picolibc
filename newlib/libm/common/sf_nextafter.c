@@ -55,11 +55,4 @@ float nextafterf(float x, float y)
 	return check_uflowf(x);
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double nextafter(double x, double y)
-{
-	return (double) nextafterf((float) x, (float) y);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_ff(nextafter)

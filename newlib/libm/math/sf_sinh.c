@@ -59,12 +59,4 @@ sinhf(float x)
     return __math_oflowf(x < 0);
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double
-sinh(double x)
-{
-    return (double) sinhf((float) x);
-}
-
-#endif
+_MATH_ALIAS_f_f(sinh)

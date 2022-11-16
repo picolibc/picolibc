@@ -35,12 +35,31 @@
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-double
-lgamma(double x)
+__float64
+lgamma64(__float64 x)
 {
-    return lgamma_r(x, &__signgam);
+    return lgamma64_r(x, &__signgam);
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+#  ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wattribute-alias="
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(lgamma64, gamma64);
+#else
+__float64
+gamma64(__float64 x)
+{
+    return lgamma64(x);
+}
+#endif
+
+_MATH_ALIAS_d_d(lgamma)
+_MATH_ALIAS_d_d(gamma)
+
+#endif /* _NEED_FLOAT64 */

@@ -28,12 +28,12 @@
 
 #include "math_config.h"
 
-static const FORCE_DOUBLE VAL = pick_double_except(0.0, (double) INFINITY);
+static const FORCE_FLOAT64 VAL = pick_float64_except(_F_64(0.0), (__float64) INFINITY);
 
-HIDDEN double
+HIDDEN __float64
 __math_divzero (uint32_t sign)
 {
-    double y = pick_double_except(1.0 / VAL, VAL);
+    __float64 y = pick_float64_except(_F_64(1.0) / VAL, VAL);
     if (sign)
         y = -y;
     return __math_with_errno (y, ERANGE);

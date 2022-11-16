@@ -108,12 +108,4 @@ atan2f(float y, float x)
     }
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double
-atan2(double y, double x)
-{
-    return (double) atan2f((float) y, (float) x);
-}
-
-#endif
+_MATH_ALIAS_f_ff(atan2)

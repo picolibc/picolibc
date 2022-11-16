@@ -75,32 +75,5 @@ ldexpf(float value, int exp)
 
 #endif
 
-#ifdef _DOUBLE_IS_32BITS
-
-#ifdef __STDC__
-	double scalbn(double x, int n)
-#else
-	double scalbn(x,n)
-	double x;
-	int n;
-#endif
-{
-	return (double) scalbnf((float) x, n);
-}
-
-#if defined(_HAVE_ALIAS_ATTRIBUTE)
-#ifndef __clang__
-#pragma GCC diagnostic ignored "-Wmissing-attributes"
-#endif
-__strong_reference(scalbn, ldexp);
-#else
-
-double
-ldexp(double value, int exp)
-{
-    return scalbn(value, exp);
-}
-
-#endif
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_fi(scalbn)
+_MATH_ALIAS_f_fi(ldexp)

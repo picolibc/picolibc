@@ -28,10 +28,14 @@
 
 #include "math_config.h"
 
+#ifdef _NEED_FLOAT64
+
 /* Check result and set errno if necessary.  */
 
-HIDDEN double
-__math_check_uflow (double y)
+HIDDEN __float64
+__math_check_uflow (__float64 y)
 {
   return y == 0.0 ? __math_with_errno (y, ERANGE) : y;
 }
+
+#endif /* _NEED_FLOAT64 */

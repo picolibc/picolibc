@@ -28,13 +28,17 @@
 
 #include "math_config.h"
 
-static const FORCE_DOUBLE VAL = pick_double_except(DBL_MIN, 0.0);
+#ifdef _NEED_FLOAT64
 
-HIDDEN double
+static const FORCE_FLOAT64 VAL = pick_float64_except(_FLOAT64_MIN, _F_64(0.0));
+
+HIDDEN __float64
 __math_uflow (uint32_t sign)
 {
-    double y = pick_double_except(VAL * VAL, VAL);
+    __float64 y = pick_float64_except(VAL * VAL, VAL);
     if (sign)
         y = -y;
     return __math_with_errno (y, ERANGE);
 }
+
+#endif /* _NEED_FLOAT64 */

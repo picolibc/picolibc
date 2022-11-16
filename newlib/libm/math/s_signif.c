@@ -19,12 +19,14 @@
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-double
-significand(double x)
+__float64
+significand64(__float64 x)
 {
-    return scalbn(x, -ilogb(x));
+    return scalbn64(x, -ilogb64(x));
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_d_d(significand)
+
+#endif /* _NEED_FLOAT64 */

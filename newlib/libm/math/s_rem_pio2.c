@@ -20,7 +20,7 @@
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
 /*
  * Table of constants for 2/pi, 396 Hex digits (476 decimal) of 2/pi
@@ -57,23 +57,23 @@ static const __int32_t npio2_hw[] = {
  * pio2_3t:  pi/2 - (pio2_1+pio2_2+pio2_3)
  */
 
-static const double zero =
-                        0.00000000000000000000e+00, /* 0x00000000, 0x00000000 */
-    half = 5.00000000000000000000e-01, /* 0x3FE00000, 0x00000000 */
-    two24 = 1.67772160000000000000e+07, /* 0x41700000, 0x00000000 */
-    invpio2 = 6.36619772367581382433e-01, /* 0x3FE45F30, 0x6DC9C883 */
-    pio2_1 = 1.57079632673412561417e+00, /* 0x3FF921FB, 0x54400000 */
-    pio2_1t = 6.07710050650619224932e-11, /* 0x3DD0B461, 0x1A626331 */
-    pio2_2 = 6.07710050630396597660e-11, /* 0x3DD0B461, 0x1A600000 */
-    pio2_2t = 2.02226624879595063154e-21, /* 0x3BA3198A, 0x2E037073 */
-    pio2_3 = 2.02226624871116645580e-21, /* 0x3BA3198A, 0x2E000000 */
-    pio2_3t = 8.47842766036889956997e-32; /* 0x397B839A, 0x252049C1 */
+static const __float64
+    zero = _F_64(0.00000000000000000000e+00), /* 0x00000000, 0x00000000 */
+    half = _F_64(5.00000000000000000000e-01), /* 0x3FE00000, 0x00000000 */
+    two24 = _F_64(1.67772160000000000000e+07), /* 0x41700000, 0x00000000 */
+    invpio2 = _F_64(6.36619772367581382433e-01), /* 0x3FE45F30, 0x6DC9C883 */
+    pio2_1 = _F_64(1.57079632673412561417e+00), /* 0x3FF921FB, 0x54400000 */
+    pio2_1t = _F_64(6.07710050650619224932e-11), /* 0x3DD0B461, 0x1A626331 */
+    pio2_2 = _F_64(6.07710050630396597660e-11), /* 0x3DD0B461, 0x1A600000 */
+    pio2_2t = _F_64(2.02226624879595063154e-21), /* 0x3BA3198A, 0x2E037073 */
+    pio2_3 = _F_64(2.02226624871116645580e-21), /* 0x3BA3198A, 0x2E000000 */
+    pio2_3t = _F_64(8.47842766036889956997e-32); /* 0x397B839A, 0x252049C1 */
 
 __int32_t
-__rem_pio2(double x, double *y)
+__rem_pio2(__float64 x, __float64 *y)
 {
-    double z = 0.0, w, t, r, fn;
-    double tx[3];
+    __float64 z = _F_64(0.0), w, t, r, fn;
+    __float64 tx[3];
     __int32_t i, j, n, ix, hx;
     int e0, nx;
     __uint32_t low;
@@ -112,9 +112,9 @@ __rem_pio2(double x, double *y)
         }
     }
     if (ix <= 0x413921fb) { /* |x| ~<= 2^19*(pi/2), medium size */
-        t = fabs(x);
+        t = _NAME_64(fabs)(x);
         n = (__int32_t)(t * invpio2 + half);
-        fn = (double)n;
+        fn = (__float64)n;
         r = t - fn * pio2_1;
         w = fn * pio2_1t; /* 1st round good to 85 bit */
         if (n < 32 && ix != npio2_hw[n - 1]) {
@@ -163,7 +163,7 @@ __rem_pio2(double x, double *y)
     e0 = (int)((ix >> 20) - 1046); /* e0 = ilogb(z)-23; */
     SET_HIGH_WORD(z, ix - ((__int32_t)e0 << 20));
     for (i = 0; i < 2; i++) {
-        tx[i] = (double)((__int32_t)(z));
+        tx[i] = (__float64)((__int32_t)(z));
         z = (z - tx[i]) * two24;
     }
     tx[2] = z;
@@ -179,4 +179,4 @@ __rem_pio2(double x, double *y)
     return n;
 }
 
-#endif /* defined(_DOUBLE_IS_32BITS) */
+#endif /* _NEED_FLOAT64 */

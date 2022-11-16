@@ -6,21 +6,15 @@
 #include <errno.h>
 #include <math.h>
 
-#ifndef _DOUBLE_IS_32BITS
-
-#ifdef _HAVE_ALIAS_ATTRIBUTE
-extern double _sin(double);
-extern double _cos(double);
-#else
-#define _sin sin
-#define _cos cos
-#endif
+#ifdef _NEED_FLOAT64
 
 void __inhibit_new_builtin_calls
-sincos(double x, double *sinx, double *cosx)
+sincos64(__float64 x, __float64 *sinx, __float64 *cosx)
 {
-    *sinx = _sin(x);
-    *cosx = _cos(x);
+    *sinx = _sin64(x);
+    *cosx = _cos64(x);
 }
 
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_v_dDD(sincos)
+
+#endif /* _NEED_FLOAT64 */

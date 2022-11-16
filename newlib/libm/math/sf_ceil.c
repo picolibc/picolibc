@@ -48,12 +48,4 @@ ceilf(float x)
     return x;
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double
-ceil(double x)
-{
-    return (double)ceilf((float)x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_f(ceil)

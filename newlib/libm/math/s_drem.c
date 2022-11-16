@@ -15,12 +15,14 @@ is preserved.
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-double
-drem(double x, double y)
+__float64
+drem64(__float64 x, __float64 y)
 {
-    return remainder(x, y);
+    return remainder64(x, y);
 }
+
+_MATH_ALIAS_d_dd(drem)
 
 #endif

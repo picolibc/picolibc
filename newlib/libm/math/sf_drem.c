@@ -21,12 +21,4 @@ dremf(float x, float y)
     return remainderf(x, y);
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double
-drem(double x, double y)
-{
-    return (double) dremf((float) x, (float) y);
-}
-
-#endif
+_MATH_ALIAS_f_ff(drem)

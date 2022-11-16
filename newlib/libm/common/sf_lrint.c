@@ -80,11 +80,4 @@ long int lrintf(float x)
   return sx ? -result : result;
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-long int lrint(double x)
-{
-  return lrintf((float) x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_j_f(lrint)

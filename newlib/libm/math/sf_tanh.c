@@ -52,12 +52,4 @@ tanhf(float x)
     return (jx >= 0) ? z : -z;
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double
-tanh(double x)
-{
-    return (double)tanhf((float)x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_f(tanh)

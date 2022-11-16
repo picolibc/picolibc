@@ -28,18 +28,12 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <math.h>
-#include "local.h"
+#include "math_config.h"
 
-#if defined(_LDBL_EQ_DBL) || defined(_HAVE_BUILTIN_ISNANL)
-/* On platforms where long double is as wide as double.  */
+#if defined(_NEED_FLOAT_HUGE) && defined(_HAVE_BUILTIN_ISNANL)
 int
 isnanl (long double x)
 {
-#ifdef _LDBL_EQ_DBL
-  return isnan(x);
-#else
   return __builtin_isnanl(x);
-#endif
 }
 #endif

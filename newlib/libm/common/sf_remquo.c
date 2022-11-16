@@ -128,3 +128,5 @@ fixup:
 	*quo = (sxy ? -q : q);
 	return x;
 }
+
+_MATH_ALIAS_f_ffI(remquo)

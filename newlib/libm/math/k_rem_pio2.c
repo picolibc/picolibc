@@ -128,36 +128,36 @@
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
 static const int init_jk[] = { 2, 3, 4, 6 }; /* initial value for jk */
 
-static const double PIo2[] = {
-    1.57079625129699707031e+00, /* 0x3FF921FB, 0x40000000 */
-    7.54978941586159635335e-08, /* 0x3E74442D, 0x00000000 */
-    5.39030252995776476554e-15, /* 0x3CF84698, 0x80000000 */
-    3.28200341580791294123e-22, /* 0x3B78CC51, 0x60000000 */
-    1.27065575308067607349e-29, /* 0x39F01B83, 0x80000000 */
-    1.22933308981111328932e-36, /* 0x387A2520, 0x40000000 */
-    2.73370053816464559624e-44, /* 0x36E38222, 0x80000000 */
-    2.16741683877804819444e-51, /* 0x3569F31D, 0x00000000 */
+static const __float64 PIo2[] = {
+    _F_64(1.57079625129699707031e+00), /* 0x3FF921FB, 0x40000000 */
+    _F_64(7.54978941586159635335e-08), /* 0x3E74442D, 0x00000000 */
+    _F_64(5.39030252995776476554e-15), /* 0x3CF84698, 0x80000000 */
+    _F_64(3.28200341580791294123e-22), /* 0x3B78CC51, 0x60000000 */
+    _F_64(1.27065575308067607349e-29), /* 0x39F01B83, 0x80000000 */
+    _F_64(1.22933308981111328932e-36), /* 0x387A2520, 0x40000000 */
+    _F_64(2.73370053816464559624e-44), /* 0x36E38222, 0x80000000 */
+    _F_64(2.16741683877804819444e-51), /* 0x3569F31D, 0x00000000 */
 };
 
-static const double zero = 0.0, one = 1.0,
-                    two24 =
-                        1.67772160000000000000e+07, /* 0x41700000, 0x00000000 */
-    twon24 = 5.96046447753906250000e-08; /* 0x3E700000, 0x00000000 */
+static const __float64
+    zero = _F_64(0.0), one = _F_64(1.0),
+    two24 = _F_64(1.67772160000000000000e+07), /* 0x41700000, 0x00000000 */
+    twon24 = _F_64(5.96046447753906250000e-08); /* 0x3E700000, 0x00000000 */
 
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 
 int
-__kernel_rem_pio2(double *x, double *y, int e0, int nx, int prec,
+__kernel_rem_pio2(__float64 *x, __float64 *y, int e0, int nx, int prec,
                   const __int32_t *ipio2)
 {
     __int32_t jz, jx, jv, jp, jk, carry, n, iq[20], i, j, k, m, q0, ih;
-    double z, fw, f[20], fq[20], q[20];
+    __float64 z, fw, f[20], fq[20], q[20];
 
     /* initialize jk*/
     jk = init_jk[prec];
@@ -174,11 +174,11 @@ __kernel_rem_pio2(double *x, double *y, int e0, int nx, int prec,
     j = jv - jx;
     m = jx + jk;
     for (i = 0; i <= m; i++, j++)
-        f[i] = (j < 0) ? zero : (double)ipio2[j];
+        f[i] = (j < 0) ? zero : (__float64)ipio2[j];
 
     /* compute q[0],q[1],...q[jk] */
     for (i = 0; i <= jk; i++) {
-        for (j = 0, fw = 0.0; j <= jx; j++)
+        for (j = 0, fw = _F_64(0.0); j <= jx; j++)
             fw += x[j] * f[jx + i - j];
         q[i] = fw;
     }
@@ -187,16 +187,16 @@ __kernel_rem_pio2(double *x, double *y, int e0, int nx, int prec,
 recompute:
     /* distill q[] into iq[] reversingly */
     for (i = 0, j = jz, z = q[jz]; j > 0; i++, j--) {
-        fw = (double)((__int32_t)(twon24 * z));
+        fw = (__float64)((__int32_t)(twon24 * z));
         iq[i] = (__int32_t)(z - two24 * fw);
         z = q[j - 1] + fw;
     }
 
     /* compute n */
     z = scalbn(z, (int)q0); /* actual value of z */
-    z -= 8.0 * floor(z * 0.125); /* trim off integer >= 8 */
+    z -= _F_64(8.0) * floor(z * _F_64(0.125)); /* trim off integer >= 8 */
     n = (__int32_t)z;
-    z -= (double)n;
+    z -= (__float64)n;
     ih = 0;
     if (q0 > 0) { /* need iq[jz-1] to determine n */
         i = (iq[jz - 1] >> (24 - q0));
@@ -205,7 +205,7 @@ recompute:
         ih = iq[jz - 1] >> (23 - q0);
     } else if (q0 == 0)
         ih = iq[jz - 1] >> 23;
-    else if (z >= 0.5)
+    else if (z >= _F_64(0.5))
         ih = 2;
 
     if (ih > 0) { /* q > 0.5 */
@@ -248,8 +248,8 @@ recompute:
                 ; /* k = no. of terms needed */
 
             for (i = jz + 1; i <= jz + k; i++) { /* add q[jz+1] to q[jz+k] */
-                f[jx + i] = (double)ipio2[jv + i];
-                for (j = 0, fw = 0.0; j <= jx; j++)
+                f[jx + i] = (__float64)ipio2[jv + i];
+                for (j = 0, fw = _F_64(0.0); j <= jx; j++)
                     fw += x[j] * f[jx + i - j];
                 q[i] = fw;
             }
@@ -259,7 +259,7 @@ recompute:
     }
 
     /* chop off zero terms */
-    if (z == 0.0) {
+    if (z == _F_64(0.0)) {
         jz -= 1;
         q0 -= 24;
         while (iq[jz] == 0) {
@@ -269,7 +269,7 @@ recompute:
     } else { /* break z into 24-bit if necessary */
         z = scalbn(z, -(int)q0);
         if (z >= two24) {
-            fw = (double)((__int32_t)(twon24 * z));
+            fw = (__float64)((__int32_t)(twon24 * z));
             iq[jz] = (__int32_t)(z - two24 * fw);
             jz += 1;
             q0 += 24;
@@ -281,13 +281,13 @@ recompute:
     /* convert integer "bit" chunk to floating-point value */
     fw = scalbn(one, (int)q0);
     for (i = jz; i >= 0; i--) {
-        q[i] = fw * (double)iq[i];
+        q[i] = fw * (__float64)iq[i];
         fw *= twon24;
     }
 
     /* compute PIo2[0,...,jp]*q[jz,...,0] */
     for (i = jz; i >= 0; i--) {
-        for (fw = 0.0, k = 0; k <= jp && k <= jz - i; k++)
+        for (fw = _F_64(0.0), k = 0; k <= jp && k <= jz - i; k++)
             fw += PIo2[k] * q[i + k];
         fq[jz - i] = fw;
     }
@@ -295,14 +295,14 @@ recompute:
     /* compress fq[] into y[] */
     switch (prec) {
     case 0:
-        fw = 0.0;
+        fw = _F_64(0.0);
         for (i = jz; i >= 0; i--)
             fw += fq[i];
         y[0] = (ih == 0) ? fw : -fw;
         break;
     case 1:
     case 2:
-        fw = 0.0;
+        fw = _F_64(0.0);
         for (i = jz; i >= 0; i--)
             fw += fq[i];
         y[0] = (ih == 0) ? fw : -fw;
@@ -322,7 +322,7 @@ recompute:
             fq[i] += fq[i - 1] - fw;
             fq[i - 1] = fw;
         }
-        for (fw = 0.0, i = jz; i >= 2; i--)
+        for (fw = _F_64(0.0), i = jz; i >= 2; i--)
             fw += fq[i];
         if (ih == 0) {
             y[0] = fq[0];
@@ -337,4 +337,4 @@ recompute:
     return n & 7;
 }
 
-#endif /* defined(_DOUBLE_IS_32BITS) */
+#endif /* _NEED_FLOAT64 */

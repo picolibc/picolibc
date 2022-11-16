@@ -20,11 +20,7 @@
 #define const
 #endif
 
-#ifdef __STDC__
 static const float
-#else
-static float
-#endif
 one		= 1.0,
 huge		= 1.0e+30,
 tiny		= 1.0e-30,
@@ -38,12 +34,7 @@ Q3  =  -7.9365076090e-05, /* 0xb8a670cd */
 Q4  =   4.0082177293e-06, /* 0x36867e54 */
 Q5  =  -2.0109921195e-07; /* 0xb457edbb */
 
-#ifdef __STDC__
-	float expm1f(float x)
-#else
-	float expm1f(x)
-	float x;
-#endif
+float expm1f(float x)
 {
 	float y,hi,lo,c,t,e,hxs,hfx,r1;
 	__int32_t k,xsb;
@@ -131,16 +122,4 @@ Q5  =  -2.0109921195e-07; /* 0xb457edbb */
 	return y;
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-#ifdef __STDC__
-	double expm1(double x)
-#else
-	double expm1(x)
-	double x;
-#endif
-{
-	return (double) expm1f((float) x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_f(expm1)

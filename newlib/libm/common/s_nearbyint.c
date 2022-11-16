@@ -49,20 +49,23 @@ SEEALSO
 #include <math.h>
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-double nearbyint(double x)
+__float64
+nearbyint64(__float64 x)
 {
     if (isnan(x)) return x + x;
 #if defined(FE_INEXACT) && !defined(PICOLIBC_DOUBLE_NOEXECPT)
     fenv_t env;
     fegetenv(&env);
 #endif
-    x = rint(x);
+    x = rint64(x);
 #if defined(FE_INEXACT) && !defined(PICOLIBC_DOUBLE_NOEXECPT)
     fesetenv(&env);
 #endif
     return x;
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_d_d(nearbyint)
+
+#endif /* _NEED_FLOAT64 */

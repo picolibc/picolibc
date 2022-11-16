@@ -22,12 +22,4 @@ __isinff (float x)
 	return FLT_UWORD_IS_INFINITE(ix);
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-int
-__isinfd (double x)
-{
-	return __isinff((float) x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_f(__isinf)

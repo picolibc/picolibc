@@ -383,18 +383,7 @@ qzerof(float x)
     return (-(float).125 + r / s) / x;
 }
 
-#ifdef _DOUBLE_IS_32BITS
+_MATH_ALIAS_f_f(j0)
 
-double
-j0(double x)
-{
-    return (double) j0f((float) x);
-}
+_MATH_ALIAS_f_f(y0)
 
-double
-y0(double x)
-{
-    return (double) y0f((float) x);
-}
-
-#endif

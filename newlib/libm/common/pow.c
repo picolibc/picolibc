@@ -396,4 +396,14 @@ pow (double x, double y)
 #endif
   return exp_inline (ehi, elo, sign_bias);
 }
+
+#if defined(_HAVE_ALIAS_ATTRIBUTE)
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(pow, _pow);
+#endif
+
+_MATH_ALIAS_d_dd(pow)
+
 #endif

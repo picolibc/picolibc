@@ -45,6 +45,8 @@ fabsf(float x)
 	return result;
 }
 
+_MATH_ALIAS_f_f(fabs)
+
 #else
 #include "../../math/sf_fabs.c"
 #endif

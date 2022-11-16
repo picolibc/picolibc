@@ -67,13 +67,13 @@ PORTABILITY
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
 static const double two54 =
-    1.80143985094819840000e+16; /* 0x43500000, 0x00000000 */
+    _F_64(1.80143985094819840000e+16); /* 0x43500000, 0x00000000 */
 
-double
-frexp(double x, int *eptr)
+__float64
+frexp64(__float64 x, int *eptr)
 {
     __int32_t hx, ix, lx;
     EXTRACT_WORDS(hx, lx, x);
@@ -93,4 +93,6 @@ frexp(double x, int *eptr)
     return x;
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_d_dI(frexp)
+
+#endif /* _NEED_FLOAT64 */

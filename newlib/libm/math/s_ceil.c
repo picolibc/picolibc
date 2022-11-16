@@ -22,10 +22,10 @@
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-double
-ceil(double x)
+__float64
+ceil64(__float64 x)
 {
     __int32_t i0, i1, j0, j;
     __uint32_t i;
@@ -74,4 +74,6 @@ ceil(double x)
     return x;
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_d_d(ceil)
+
+#endif /* _NEED_FLOAT64 */

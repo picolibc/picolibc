@@ -33,20 +33,19 @@
  */
 
 #include "fdlibm.h"
-#include "math_config.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-static const double one = 1.0, half = 0.5;
+static const __float64 one = _F_64(1.0), half = _F_64(0.5);
 
-double
-cosh(double x)
+__float64
+cosh64(__float64 x)
 {
-    double t, w;
+    __float64 t, w;
     __int32_t ix;
     __uint32_t lx;
 
-    x = fabs(x);
+    x = fabs64(x);
 
     /* High word of |x|. */
     GET_HIGH_WORD(ix, x);
@@ -87,4 +86,6 @@ cosh(double x)
     return __math_oflow(0);
 }
 
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_d_d(cosh)
+
+#endif /* _NEED_FLOAT64 */

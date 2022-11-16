@@ -12,12 +12,14 @@ is preserved.
  * Added by Cygnus Support.
  */
 
+#define __isinf __isinfd
+
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
 int
-__isinfd (double x)
+__isinf64 (__float64 x)
 {
 	__int32_t hx,lx;
 	EXTRACT_WORDS(hx,lx,x);
@@ -27,4 +29,6 @@ __isinfd (double x)
 	return 1 - (int)((__uint32_t)(hx|(-hx))>>31);
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_i_d(__isinf)
+
+#endif /* _NEED_FLOAT64 */

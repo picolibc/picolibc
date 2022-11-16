@@ -4,10 +4,14 @@
  * is freely granted, provided that this notice is preserved.
  */
 
+#define _ADD_D_TO_DOUBLE_FUNCS
+
 #include "fdlibm.h"
 
+#ifdef _NEED_FLOAT64
+
 int
-__fpclassifyd (double x)
+__fpclassify64 (__float64 x)
 {
   __uint32_t msw, lsw;
 
@@ -26,3 +30,7 @@ __fpclassifyd (double x)
   else
     return FP_NAN;
 }
+
+_MATH_ALIAS_i_d(__fpclassify)
+
+#endif /* _NEED_FLOAT64 */

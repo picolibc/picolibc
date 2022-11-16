@@ -17,7 +17,7 @@
 /* __rem_pio2f(x,y)
  *
  * return the remainder of x rem pi/2 in y[0]+y[1]
- * use __kernel_rem_pio2f()
+ * use __kernel_rem_pio2_32()
  */
 
 #include "fdlibm.h"

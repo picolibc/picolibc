@@ -32,16 +32,16 @@
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-static const double one = 1.0, huge = 1e300;
+static const __float64 one = _F_64(1.0), huge = _F_64(1e300);
 
-static const double zero = 0.0;
+static const __float64 zero = _F_64(0.0);
 
-double
-atanh(double x)
+__float64
+atanh64(__float64 x)
 {
-    double t;
+    __float64 t;
     __int32_t hx, ix;
     __uint32_t lx;
     EXTRACT_WORDS(hx, lx, x);
@@ -55,13 +55,15 @@ atanh(double x)
     SET_HIGH_WORD(x, ix);
     if (ix < 0x3fe00000) { /* x < 0.5 */
         t = x + x;
-        t = 0.5 * log1p(t + t * x / (one - x));
+        t = _F_64(0.5) * log1p64(t + t * x / (one - x));
     } else
-        t = 0.5 * log1p((x + x) / (one - x));
+        t = _F_64(0.5) * log1p64((x + x) / (one - x));
     if (hx >= 0)
         return t;
     else
         return -t;
 }
 
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_d_d(atanh)
+
+#endif /* _NEED_FLOAT64 */

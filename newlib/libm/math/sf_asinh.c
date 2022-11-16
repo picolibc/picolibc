@@ -47,12 +47,4 @@ asinhf(float x)
         return -w;
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double
-asinh(double x)
-{
-    return (double)asinhf((float)x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_f(asinh)

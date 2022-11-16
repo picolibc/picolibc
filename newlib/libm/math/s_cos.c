@@ -44,12 +44,12 @@
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-double
-cos(double x)
+__float64
+cos64(__float64 x)
 {
-    double y[2], z = 0.0;
+    __float64 y[2], z = 0.0;
     __int32_t n, ix;
 
     /* High word of x. */
@@ -84,7 +84,9 @@ cos(double x)
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif
-__strong_reference(cos, _cos);
+__strong_reference(_NAME_64(cos), _NAME_64(_cos));
 #endif
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_d_d(cos)
+
+#endif /* _NEED_FLOAT64 */

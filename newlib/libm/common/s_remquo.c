@@ -59,7 +59,7 @@ C99, POSIX.
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
 #include <limits.h>
 #include <math.h>
@@ -72,7 +72,7 @@ C99, POSIX.
   #define QUO_MASK INT_MAX
 #endif
 
-static const double Zero[] = {0.0, -0.0,};
+static const __float64 Zero[] = {_F_64(0.0), _F_64(-0.0),};
 
 /*
  * Return the IEEE remainder and set *quo to the last n bits of the
@@ -82,8 +82,8 @@ static const double Zero[] = {0.0, -0.0,};
  * method.  In practice, this is far more bits than are needed to use
  * remquo in reduction algorithms.
  */
-double
-remquo(double x, double y, int *quo)
+__float64
+remquo64(__float64 x, __float64 y, int *quo)
 {
 	__int32_t n,hx,hy,hz,ix,iy,sx,i;
 	__uint32_t lx,ly,lz,q,sxy;
@@ -193,13 +193,13 @@ remquo(double x, double y, int *quo)
 	}
 fixup:
 	INSERT_WORDS(x,hx,lx);
-	y = fabs(y);
-	if (y < 0x1p-1021) {
+	y = fabs64(y);
+	if (y < _F_64(0x1p-1021)) {
 	    if (x+x>y || (x+x==y && (q & 1))) {
 		q++;
 		x-=y;
 	    }
-	} else if (x>0.5*y || (x==0.5*y && (q & 1))) {
+	} else if (x>_F_64(0.5)*y || (x==_F_64(0.5)*y && (q & 1))) {
 	    q++;
 	    x-=y;
 	}
@@ -210,4 +210,6 @@ fixup:
 	return x;
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_d_ddI(remquo)
+
+#endif /* _NEED_FLOAT64 */

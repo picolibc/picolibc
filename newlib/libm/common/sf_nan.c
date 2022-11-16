@@ -26,12 +26,4 @@ is preserved.
 	return x;
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-	double nan(const char *arg)
-{
-	return (double) nanf(arg);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
-
+_MATH_ALIAS_f_s(nan)

@@ -11,12 +11,8 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
-	float truncf(float x)
-#else
-	float truncf(x)
-	float x;
-#endif
+float
+truncf(float x)
 {
     int32_t ix = _asint32 (x);
     int32_t mask;
@@ -38,16 +34,4 @@
     return _asfloat(ix & mask);
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-#ifdef __STDC__
-	double trunc(double x)
-#else
-	double trunc(x)
-	double x;
-#endif
-{
-    return (double) truncf((float) x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_f(trunc)

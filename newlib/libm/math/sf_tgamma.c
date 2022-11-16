@@ -39,12 +39,4 @@ tgammaf(float x)
     return y;
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double
-tgamma(double x)
-{
-    return (double) tgammaf((float) x);
-}
-
-#endif
+_MATH_ALIAS_f_f(tgamma)

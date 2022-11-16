@@ -49,12 +49,4 @@ log10f(float x)
     return z + y * log10_2hi;
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double
-log10(double x)
-{
-    return (double) log10f((float) x);
-}
-
-#endif
+_MATH_ALIAS_f_f(log10)

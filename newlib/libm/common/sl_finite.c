@@ -7,15 +7,12 @@
 /* finitel(x) returns 1 is x is finite, else 0; */
 
 #define _DEFAULT_SOURCE
-#include <math.h>
+#include "math_config.h"
 
-#if defined(_LDBL_EQ_DBL) || defined(_HAVE_BUILTIN_FINITEL) || defined(_HAVE_BUILTIN_ISFINITE)
+#if defined(_NEED_FLOAT_HUGE) && (defined(_HAVE_BUILTIN_FINITEL) || defined(_HAVE_BUILTIN_ISFINITE))
 int
 finitel (long double x)
 {
-#ifdef _LDBL_EQ_DBL
-  return finite (x);
-#else
   /* Let the compiler do this for us.
      Note - we do not know how many bits there are in a long double.
      Some architectures for example have an 80-bit long double whereas
@@ -26,7 +23,6 @@ finitel (long double x)
 #endif
 #ifdef _HAVE_BUILTIN_ISFINITE
   return __builtin_isfinite (x);
-#endif
 #endif
 }
 #endif

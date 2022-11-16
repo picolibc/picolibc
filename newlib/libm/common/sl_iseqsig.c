@@ -35,6 +35,8 @@
 
 #include "fdlibm.h"
 
+#ifdef _NEED_MATH_HUGE
+
 int
 __iseqsigl(long double x, long double y)
 {
@@ -44,3 +46,5 @@ __iseqsigl(long double x, long double y)
         return __math_invalid(y);
     return x == y;
 }
+
+#endif

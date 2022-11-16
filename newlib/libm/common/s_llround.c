@@ -12,10 +12,10 @@
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
 long long int
-llround(double x)
+llround64(__float64 x)
 {
   __int32_t sign, exponent_less_1023;
   /* Most significant word, least significant word. */
@@ -81,4 +81,6 @@ llround(double x)
   return sign * result;
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_k_d(llround)
+
+#endif /* _NEED_FLOAT64 */

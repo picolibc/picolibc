@@ -82,12 +82,4 @@ asinf(float x)
         return -t;
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double
-asin(double x)
-{
-    return (double) asinf((float) x);
-}
-
-#endif
+_MATH_ALIAS_f_f(asin)

@@ -41,19 +41,19 @@
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-static const double tiny = 1.0e-300, zero = 0.0,
-                    pi_o_4 =
-                        7.8539816339744827900E-01, /* 0x3FE921FB, 0x54442D18 */
-    pi_o_2 = 1.5707963267948965580E+00, /* 0x3FF921FB, 0x54442D18 */
-    pi = 3.1415926535897931160E+00, /* 0x400921FB, 0x54442D18 */
-    pi_lo = 1.2246467991473531772E-16; /* 0x3CA1A626, 0x33145C07 */
+static const __float64
+    tiny = _F_64(1.0e-300), zero = _F_64(0.0),
+    pi_o_4 = _F_64(7.8539816339744827900E-01), /* 0x3FE921FB, 0x54442D18 */
+    pi_o_2 = _F_64(1.5707963267948965580E+00), /* 0x3FF921FB, 0x54442D18 */
+    pi = _F_64(3.1415926535897931160E+00), /* 0x400921FB, 0x54442D18 */
+    pi_lo = _F_64(1.2246467991473531772E-16); /* 0x3CA1A626, 0x33145C07 */
 
-double
-atan2(double y, double x)
+__float64
+atan264(__float64 y, __float64 x)
 {
-    double z;
+    __float64 z;
     __int32_t k, m, hx, hy, ix, iy;
     __uint32_t lx, ly;
 
@@ -65,7 +65,7 @@ atan2(double y, double x)
         ((iy | ((ly | -ly) >> 31)) > 0x7ff00000)) /* x or y is NaN */
         return x + y;
     if (((hx - 0x3ff00000) | lx) == 0)
-        return atan(y); /* x=1.0 */
+        return atan64(y); /* x=1.0 */
     m = ((hy >> 31) & 1) | ((hx >> 30) & 2); /* 2*sign(x)+sign(y) */
 
     /* when y = 0 */
@@ -93,9 +93,9 @@ atan2(double y, double x)
             case 1:
                 return -pi_o_4 - tiny; /* atan(-INF,+INF) */
             case 2:
-                return 3.0 * pi_o_4 + tiny; /*atan(+INF,-INF)*/
+                return _F_64(3.0) * pi_o_4 + tiny; /*atan(+INF,-INF)*/
             case 3:
-                return -3.0 * pi_o_4 - tiny; /*atan(-INF,-INF)*/
+                return _F_64(-3.0) * pi_o_4 - tiny; /*atan(-INF,-INF)*/
             }
         } else {
             switch (m) {
@@ -117,11 +117,11 @@ atan2(double y, double x)
     /* compute y/x */
     k = (iy - ix) >> 20;
     if (k > 60)
-        z = pi_o_2 + 0.5 * pi_lo; /* |y/x| >  2**60 */
+        z = pi_o_2 + _F_64(0.5) * pi_lo; /* |y/x| >  2**60 */
     else if (hx < 0 && k < -60)
-        z = 0.0; /* |y|/x < -2**60 */
+        z = _F_64(0.0); /* |y|/x < -2**60 */
     else
-        z = atan(check_uflow(fabs(y / x))); /* safe to do y/x */
+        z = atan64(check_uflow(fabs64(y / x))); /* safe to do y/x */
     switch (m) {
     case 0:
         return z; /* atan(+,+) */
@@ -138,4 +138,6 @@ atan2(double y, double x)
     }
 }
 
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_d_dd(atan2)
+
+#endif /* _NEED_FLOAT64 */

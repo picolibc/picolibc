@@ -45,22 +45,12 @@
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-#if defined(_HAVE_ALIAS_ATTRIBUTE)
-#ifdef _LDBL_EQ_DBL
-#pragma GCC diagnostic ignored "-Wpragmas"
-#pragma GCC diagnostic ignored "-Wunknown-warning-option"
-#pragma GCC diagnostic ignored "-Wattribute-alias="
-extern long double hypotl(long double x, long double y)
-    __attribute__((__alias__("hypot")));
-#endif
-#endif
-
-double
-hypot(double x, double y)
+__float64
+hypot64(__float64 x, __float64 y)
 {
-    double a = x, b = y, t1, t2, y1, y2, w;
+    __float64 a = x, b = y, t1, t2, y1, y2, w;
     __int32_t j, k, ha, hb;
 
     GET_HIGH_WORD(ha, x);
@@ -127,7 +117,7 @@ hypot(double x, double y)
         t1 = 0;
         SET_HIGH_WORD(t1, ha);
         t2 = a - t1;
-        w = sqrt(t1 * t1 - (b * (-b) - t2 * (a + t1)));
+        w = sqrt64(t1 * t1 - (b * (-b) - t2 * (a + t1)));
     } else {
         a = a + a;
         y1 = 0;
@@ -136,11 +126,11 @@ hypot(double x, double y)
         t1 = 0;
         SET_HIGH_WORD(t1, ha + 0x00100000);
         t2 = a - t1;
-        w = sqrt(t1 * y1 - (w * (-w) - (t1 * y2 + t2 * b)));
+        w = sqrt64(t1 * y1 - (w * (-w) - (t1 * y2 + t2 * b)));
     }
     if (k != 0) {
         __uint32_t high;
-        t1 = 1.0;
+        t1 = _F_64(1.0);
         GET_HIGH_WORD(high, t1);
         SET_HIGH_WORD(t1, high + (k << 20));
         w *= t1;
@@ -148,4 +138,6 @@ hypot(double x, double y)
     return check_oflow(w);
 }
 
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_d_dd(hypot)
+
+#endif /* _NEED_FLOAT64 */

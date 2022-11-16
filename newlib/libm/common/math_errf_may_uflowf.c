@@ -44,16 +44,4 @@ __math_may_uflowf (uint32_t sign)
     return __math_with_errnof (y, ERANGE);
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-HIDDEN double
-__math_may_uflow(uint32_t sign)
-{
-    return (double)__math_may_uflowf(sign);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
-
-
-
 #endif

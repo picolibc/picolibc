@@ -11,6 +11,9 @@
  * ====================================================
  */
 
+#ifndef _FDLIBM_H_
+#define _FDLIBM_H_
+
 /* REDHAT LOCAL: Include files.  */
 #ifndef _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE
@@ -165,13 +168,13 @@
 
 #define X_TLOSS		1.41484755040568800000e+16 
 
-extern __int32_t __rem_pio2 (double,double*);
+extern __int32_t __rem_pio2 (__float64,__float64*);
 
 /* fdlibm kernel function */
-extern double __kernel_sin (double,double,int);
-extern double __kernel_cos (double,double);
-extern double __kernel_tan (double,double,int);
-extern int    __kernel_rem_pio2 (double*,double*,int,int,int,const __int32_t*);
+extern __float64 __kernel_sin (__float64,__float64,int);
+extern __float64 __kernel_cos (__float64,__float64);
+extern __float64 __kernel_tan (__float64,__float64,int);
+extern int    __kernel_rem_pio2 (__float64*,__float64*,int,int,int,const __int32_t*);
 
 extern __int32_t __rem_pio2f (float,float*);
 
@@ -338,3 +341,4 @@ typedef union {
 
 #endif  /* _COMPLEX_H */
 
+#endif /* _FDLIBM_H_ */

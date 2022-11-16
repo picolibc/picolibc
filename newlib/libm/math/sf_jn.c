@@ -215,19 +215,6 @@ ynf(int n, float x)
         return -b;
 }
 
+_MATH_ALIAS_f_if(jn)
 
-#ifdef _DOUBLE_IS_32BITS
-
-double
-jn(int n, double x)
-{
-    return (double) jnf(n, (float) x);
-}
-
-double
-yn(int n, double x)
-{
-    return (double) ynf(n, (float) x);
-}
-
-#endif
+_MATH_ALIAS_f_if(yn)

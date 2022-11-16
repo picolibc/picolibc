@@ -73,15 +73,10 @@ frexp, ilogb
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-double
-#ifdef __STDC__
-logb(double x)
-#else
-logb(x)
-double x;
-#endif
+__float64
+logb64(__float64 x)
 {
 	__int32_t hx,lx,ix;
 
@@ -90,7 +85,7 @@ double x;
 	if(hx<0x00100000) {		/* 0 or subnormal */
 	    if((hx|lx)==0)  {
 		/* arg==0:  return -inf and raise divide-by-zero exception */
-		return -1./fabs(x);	/* logb(0) = -inf */
+		return -1./fabs64(x);	/* logb(0) = -inf */
 		}
 	    else			/* subnormal x */
 		if(hx==0) {
@@ -98,11 +93,13 @@ double x;
 		} else {
 		    for (ix = -1022,hx<<=11; hx>0; hx<<=1) ix -=1;
 		}
-	    return (double) ix;
+	    return (__float64) ix;
 	}
 	else if (hx<0x7ff00000) return (hx>>20)-1023;	/* normal # */
 	else if (hx>0x7ff00000 || lx)  return x+x;	/* x==NaN */
 	else  return HUGE_VAL;	/* x==inf (+ or -) */
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_d_d(logb)
+
+#endif /* _NEED_FLOAT64 */

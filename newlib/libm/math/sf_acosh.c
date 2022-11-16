@@ -42,12 +42,4 @@ acoshf(float x)
     }
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double
-acosh(double x)
-{
-    return (double) acoshf((float) x);
-}
-
-#endif
+_MATH_ALIAS_f_f(acosh)

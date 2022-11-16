@@ -77,12 +77,4 @@ acosf(float x)
     }
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double
-acos(double x)
-{
-    return (double) acosf((float) x);
-}
-
-#endif
+_MATH_ALIAS_f_f(acos)

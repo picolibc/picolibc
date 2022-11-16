@@ -380,19 +380,6 @@ qonef(float x)
     return ((float).375 + r / s) / x;
 }
 
+_MATH_ALIAS_f_f(j1)
 
-#ifdef _DOUBLE_IS_32BITS
-
-double
-j1(double x)
-{
-    return (double) j1f((float) x);
-}
-
-double
-y1(double x)
-{
-    return (double) y1f((float) x);
-}
-
-#endif
+_MATH_ALIAS_f_f(y1)

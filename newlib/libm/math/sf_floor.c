@@ -57,12 +57,4 @@ floorf(float x)
     return x;
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double
-floor(double x)
-{
-    return (double)floorf((float)x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_f(floor)

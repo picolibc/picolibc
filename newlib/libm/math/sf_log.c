@@ -96,14 +96,6 @@ logf(float x)
     }
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double
-log(double x)
-{
-    return (double) logf((float) x);
-}
-
-#endif
+_MATH_ALIAS_f_f(log)
 
 #endif /* __OBSOLETE_MATH_FLOAT */

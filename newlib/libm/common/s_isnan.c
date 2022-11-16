@@ -188,16 +188,12 @@ QUICKREF
 #include "fdlibm.h"
 #include <ieeefp.h>
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
 #undef isnan
 
-#ifdef __STDC__
-	int isnan(double x)
-#else
-	int isnan(x)
-	double x;
-#endif
+int
+isnan64(__float64 x)
 {
 	__int32_t hx,lx;
 	EXTRACT_WORDS(hx,lx,x);
@@ -207,4 +203,6 @@ QUICKREF
 	return (int)(((__uint32_t)(hx))>>31);
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_i_d(isnan)
+
+#endif /* _NEED_FLOAT64 */
