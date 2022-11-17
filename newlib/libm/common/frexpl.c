@@ -30,7 +30,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "math_config.h"
 
-#ifdef _NEED_FLOAT_HUGE
+#if defined(_NEED_FLOAT_HUGE) && !defined(_HAVE_LONG_DOUBLE_MATH)
 # if (LDBL_MANT_DIG == 53) /* 64-bit long double */
 static const long double scale = 0x1p54;
 

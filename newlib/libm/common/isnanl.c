@@ -30,7 +30,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "math_config.h"
 
-#if defined(_NEED_FLOAT_HUGE) && defined(_HAVE_BUILTIN_ISNANL)
+#if defined(_NEED_FLOAT_HUGE) && defined(_HAVE_BUILTIN_ISNANL) && !defined(_HAVE_LONG_DOUBLE_MATH)
 int
 isnanl (long double x)
 {
