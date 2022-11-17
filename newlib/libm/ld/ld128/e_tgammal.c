@@ -22,6 +22,8 @@ long double
 tgammal(long double x)
 {
 	int64_t i0,i1;
+        int sign;
+        long double y;
 
 	GET_LDOUBLE_WORDS64(i0,i1,x);
 	if (((i0&0x7fffffffffffffffLL)|i1) == 0)
@@ -33,5 +35,6 @@ tgammal(long double x)
 	if ((uint64_t) i0==0xffff000000000000ULL && i1==0)
 		return (x-x);
 
-	return expl(lgammal(x));
+        y = lgammal_r(x, &sign);
+	return expl(y) * (long double) sign;
 }

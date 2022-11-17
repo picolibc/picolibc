@@ -773,6 +773,7 @@ lgammal_r(long double x, int *signgamp)
 
   if (x < 0.0L)
     {
+      int discard;
       q = -x;
       p = floorl (q);
       if (p == q)
@@ -791,7 +792,7 @@ lgammal_r(long double x, int *signgamp)
       z = q * sinl (PIL * z);
       if (z == 0.0L)
 	return (*signgamp * huge * huge);
-      w = lgammal (q);
+      w = lgammal_r (q, &discard);
       z = logl (PIL / z) - w;
       return (z);
     }
