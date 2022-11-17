@@ -45,6 +45,8 @@
 #include "s390_fpmath.h"
 #elif defined(__riscv)
 #include "riscv_fpmath.h"
+#else
+#include "gen_fpmath.h"
 #endif
 
 #ifndef __FLOAT_WORD_ORDER__
