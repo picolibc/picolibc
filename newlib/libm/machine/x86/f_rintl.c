@@ -38,10 +38,5 @@ long double _f_rintl (long double x)
   return _result;
 }
 
-/* For now, we only have the fast math version.  */
-long double rintl (long double x) {
-  return _f_rintl(x);
-} 
-
 #endif /* !_SOFT_FLOAT */
 #endif /* __GNUC__ */
