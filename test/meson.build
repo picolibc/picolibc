@@ -278,7 +278,7 @@ foreach target : targets
        should_fail: true
       )
 
-  plain_tests = ['rand', 'regex', 'ungetc', 'fenv',
+  plain_tests = ['rand', 'regex', 'ungetc', 'fenv', 'long_double',
 		 'math_errhandling', 'malloc', 'tls',
 		 'ffs', 'setjmp', 'atexit', 'on_exit',
 		 'math-funcs', 'timegm', 'time-tests',
@@ -338,6 +338,10 @@ if enable_native_tests
   native_lib_m = cc.find_library('m', required: false)
 
   if native_lib_m.found()
+    test('long_double_native',
+	 executable('long_double_native', 'long_double.c',
+		    c_args: native_c_args,
+		    dependencies: native_lib_m))
     test('math_errhandling_native',
 	 executable('math_errhandling_native', 'math_errhandling.c',
 		    c_args: native_c_args,
