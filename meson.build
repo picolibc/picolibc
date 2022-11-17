@@ -692,6 +692,16 @@ if cc.get_linker_id() == 'ld.lld'
     # The i MEMORY attribute is also not implemented, but it would does not
     # make any difference on the output even if it was.
     picolibc_linker_type_data.set('LDSCRIPT_MEMORY_ATTR_I', '')
+    if host_cpu_family == 'riscv'
+        # ld.lld before version 15 did not support linker relaxations, disable
+        # them if we are using an older version.
+        # There is no `cc.get_linker_version()` function, so we detect ld.lld
+        # version 15 by checking for a newly added linker flag.
+        if not cc.has_link_argument('--package-metadata=1')
+            message('Linking for RISCV with ld.lld < 15, forcing -mno-relax')
+            c_args += ['-mno-relax']
+        endif
+    endif
 else
     picolibc_linker_type_data.set('LDSCRIPT_ALIGN_WITH_INPUT', 'ALIGN_WITH_INPUT')
     picolibc_linker_type_data.set('LDSCRIPT_MEMORY_ATTR_I', 'i')
