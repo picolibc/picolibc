@@ -228,16 +228,6 @@ exp2l(long double x)
 		return (1.0l + x);
 	}
 
-#ifdef __i386__
-	/*
-	 * The default precision on i386 is 53 bits, so long doubles are
-	 * broken. Call exp2() to get an accurate (double precision) result.
-	 */
-	if (__fpgetprec() != FP_PE)
-		return (exp2(x));
-#endif
-
-
 	/*
 	 * Reduce x, computing z, i0, and k. The low bits of x + redux
 	 * contain the 16-bit integer part of the exponent (k) followed by
