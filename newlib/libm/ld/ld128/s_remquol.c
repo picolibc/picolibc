@@ -104,8 +104,8 @@ remquol(long double x, long double y, int *quo)
 	}
 
     /* set up {hx,lx}, {hy,ly} and align y to x */
-	_hx = SET_NBIT(hx) & 0x0000ffffffffffffLL;
-	hy = SET_NBIT(hy);
+	_hx = SET_NBIT(hx & 0x0000ffffffffffffLL);
+	hy = SET_NBIT(hy & 0x0000ffffffffffffLL);
 
     /* fix point fmod */
 	n = ix - iy;
@@ -153,7 +153,7 @@ fixup:
 	}
 
 	GET_LDOUBLE_MSW64(hx,x);
-	hx ^= sx;
+        hx ^= (sx << 48);
 	SET_LDOUBLE_MSW64(x,hx);
 
 	q &= 0x7fffffff;
