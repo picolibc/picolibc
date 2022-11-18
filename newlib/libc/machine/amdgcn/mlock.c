@@ -39,11 +39,15 @@ sbrk (ptrdiff_t nbytes)
 {
   if (__heap_ptr == (char *)-1)
     {
-      /* Find the heap from kernargs.
-         The kernargs pointer is in s[8:9].
-	 This will break if the enable_sgpr_* flags are ever changed.  */
+      /* Find the heap from kernargs.  */
       char *kernargs;
+#if defined(__has_builtin) && __has_builtin(__builtin_gcn_kernarg_ptr)
+      kernargs = __builtin_gcn_kernarg_ptr ();
+#else
+      /* The kernargs pointer is in s[8:9].
+	 This will break if the enable_sgpr_* flags are ever changed.  */
       asm ("s_mov_b64 %0, s[8:9]" : "=Sg"(kernargs));
+#endif
 
       /* The heap data is at kernargs[3].  */
       struct heap *heap = *(struct heap **)(kernargs + 24);

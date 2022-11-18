@@ -56,7 +56,11 @@ _READ_WRITE_RETURN_TYPE write (int fd, const void *buf, size_t count)
     }
 
   /* The output data is at ((void*)kernargs)[2].  */
+#if defined(__has_builtin) && __has_builtin(__builtin_gcn_kernarg_ptr)
+  register void **kernargs = __builtin_gcn_kernarg_ptr ();
+#else
   register void **kernargs asm("s8");
+#endif
   struct output *data = (struct output *)kernargs[2];
 
   /* Each output slot allows 256 bytes, so reserve as many as we need. */
