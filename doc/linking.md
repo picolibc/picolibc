@@ -46,6 +46,11 @@ this with gcc, the command line would look like this:
 
 	gcc -specs=picolibc.specs -Tsample.ld
 
+Alternatively, you can specify those values using `--defsym` and use
+picolibc.ld as the linker script:
+
+	cc -Wl,--defsym=__flash=__0x08000000 -Wl,--defsym=__flash_size=128K ... -Tpicolibc.ld
+
 ### Defining Memory Regions
 
 Picolibc.ld defines only two memory regions: `flash` and `ram`. Flash
