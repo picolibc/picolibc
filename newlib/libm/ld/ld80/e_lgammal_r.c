@@ -266,7 +266,7 @@ sin_pi(long double x)
 long double
 lgammal_r(long double x, int *signgamp)
 {
-  long double t, y, z, nadj, p, p1, p2, q, r, w;
+  long double t, y, z, nadj = 0, p, p1, p2, q, r, w;
   int i, ix;
   u_int32_t se, i0, i1;
 

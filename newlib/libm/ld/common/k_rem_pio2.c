@@ -289,7 +289,7 @@ int
 __kernel_rem_pio2(double *x, double *y, int e0, int nx, int prec)
 {
 	int32_t jz,jx,jv,jp,jk,carry,n,iq[20],i,j,k,m,q0,ih;
-	double z,fw,f[20],fq[20],q[20];
+	double z,fw,f[20],fq[20] = {0},q[20];
 
     /* initialize jk*/
 	jk = init_jk[prec];
