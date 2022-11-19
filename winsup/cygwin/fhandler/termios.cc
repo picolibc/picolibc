@@ -692,6 +692,29 @@ fhandler_termios::tcgetsid ()
   return -1;
 }
 
+static bool
+is_console_app (const WCHAR *filename)
+{
+  HANDLE h;
+  const int id_offset = 92;
+  h = CreateFileW (filename, GENERIC_READ, FILE_SHARE_READ,
+		   NULL, OPEN_EXISTING, 0, NULL);
+  char buf[1024];
+  DWORD n;
+  ReadFile (h, buf, sizeof (buf), &n, 0);
+  CloseHandle (h);
+  char *p = (char *) memmem (buf, n, "PE\0\0", 4);
+  if (p && p + id_offset < buf + n)
+    return p[id_offset] == '\003'; /* 02: GUI, 03: console */
+  else
+    {
+      wchar_t *e = wcsrchr (filename, L'.');
+      if (e && (wcscasecmp (e, L".bat") == 0 || wcscasecmp (e, L".cmd") == 0))
+	return true;
+    }
+  return false;
+}
+
 int
 fhandler_termios::ioctl (int cmd, void *varg)
 {
@@ -717,4 +740,80 @@ fhandler_termios::ioctl (int cmd, void *varg)
   myself->ctty = -1;
   myself->set_ctty (this, 0);
   return 0;
+}
+
+void
+fhandler_termios::spawn_worker::setup (bool iscygwin, HANDLE h_stdin,
+				       const WCHAR *runpath, bool nopcon,
+				       bool reset_sendsig,
+				       const WCHAR *envblock)
+{
+  fhandler_pty_slave *ptys_primary = NULL;
+  fhandler_console *cons_native = NULL;
+
+  for (int i = 0; i < 3; i ++)
+    {
+      const int chk_order[] = {1, 0, 2};
+      int fd = chk_order[i];
+      fhandler_base *fh = ::cygheap->fdtab[fd];
+      if (fh && fh->get_major () == DEV_PTYS_MAJOR && ptys_primary == NULL)
+	ptys_primary = (fhandler_pty_slave *) fh;
+      else if (fh && fh->get_major () == DEV_CONS_MAJOR
+	       && !iscygwin && cons_native == NULL)
+	cons_native = (fhandler_console *) fh;
+    }
+  if (cons_native)
+    {
+      cons_native->setup_for_non_cygwin_app ();
+      /* Console handles will be already closed by close_all_files()
+	 when cleaning up, therefore, duplicate them here. */
+      cons_native->get_duplicated_handle_set (&cons_handle_set);
+      cons_need_cleanup = true;
+    }
+  if (!iscygwin)
+    {
+      int fd;
+      cygheap_fdenum cfd (false);
+      while ((fd = cfd.next ()) >= 0)
+	if (cfd->get_major () == DEV_PTYS_MAJOR)
+	  {
+	    fhandler_pty_slave *ptys
+	      = (fhandler_pty_slave *)(fhandler_base *) cfd;
+	    ptys->create_invisible_console ();
+	    ptys->setup_locale ();
+	  }
+    }
+  if (!iscygwin && ptys_primary && is_console_app (runpath))
+    {
+      if (h_stdin == ptys_primary->get_handle_nat ())
+	stdin_is_ptys = true;
+      if (reset_sendsig)
+	myself->sendsig = myself->exec_sendsig;
+      ptys_primary->setup_for_non_cygwin_app (nopcon, envblock, stdin_is_ptys);
+      if (reset_sendsig)
+	myself->sendsig = NULL;
+      ptys_primary->get_duplicated_handle_set (&ptys_handle_set);
+      ptys_ttyp = (tty *) ptys_primary->tc ();
+      ptys_need_cleanup = true;
+    }
+}
+
+void
+fhandler_termios::spawn_worker::cleanup ()
+{
+  if (ptys_need_cleanup)
+    fhandler_pty_slave::cleanup_for_non_cygwin_app (&ptys_handle_set,
+						    ptys_ttyp, stdin_is_ptys);
+  if (cons_need_cleanup)
+    fhandler_console::cleanup_for_non_cygwin_app (&cons_handle_set);
+  close_handle_set ();
+}
+
+void
+fhandler_termios::spawn_worker::close_handle_set ()
+{
+  if (ptys_need_cleanup)
+    fhandler_pty_slave::close_handle_set (&ptys_handle_set);
+  if (cons_need_cleanup)
+    fhandler_console::close_handle_set (&cons_handle_set);
 }

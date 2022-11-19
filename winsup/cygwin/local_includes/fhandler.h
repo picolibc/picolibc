@@ -1989,6 +1989,40 @@ class fhandler_termios: public fhandler_base
   virtual bool need_console_handler () { return false; }
   virtual bool need_send_ctrl_c_event () { return true; }
   virtual DWORD get_helper_pid () { return 0; }
+
+  struct ptys_handle_set_t
+  {
+    HANDLE from_master_nat;
+    HANDLE input_available_event;
+    HANDLE input_mutex;
+    HANDLE pipe_sw_mutex;
+  };
+  struct cons_handle_set_t
+  {
+    HANDLE input_handle;
+    HANDLE output_handle;
+    HANDLE input_mutex;
+    HANDLE output_mutex;
+  };
+  class spawn_worker
+  {
+  private:
+    ptys_handle_set_t ptys_handle_set;
+    cons_handle_set_t cons_handle_set;
+    bool ptys_need_cleanup;
+    bool cons_need_cleanup;
+    bool stdin_is_ptys;
+    tty *ptys_ttyp;
+  public:
+    spawn_worker () :
+      ptys_need_cleanup (false), cons_need_cleanup (false),
+      stdin_is_ptys (false), ptys_ttyp (NULL) {}
+    void setup (bool iscygwin, HANDLE h_stdin, const WCHAR *runpath,
+		bool nopcon, bool reset_sendsig, const WCHAR *envblock);
+    bool need_cleanup () { return ptys_need_cleanup || cons_need_cleanup; }
+    void cleanup ();
+    void close_handle_set ();
+  };
 };
 
 enum ansi_intensity
@@ -2133,13 +2167,7 @@ public:
     input_signalled = 2,
     input_winch = 3
   };
-  struct handle_set_t
-  {
-    HANDLE input_handle;
-    HANDLE output_handle;
-    HANDLE input_mutex;
-    HANDLE output_mutex;
-  };
+  typedef cons_handle_set_t handle_set_t;
   HANDLE thread_sync_event;
 private:
   static const unsigned MAX_WRITE_CHARS;
@@ -2375,13 +2403,7 @@ class fhandler_pty_slave: public fhandler_pty_common
  public:
   pid_t tc_getpgid () { return _tc ? _tc->pgid : 0; }
 
-  struct handle_set_t
-  {
-    HANDLE from_master_nat;
-    HANDLE input_available_event;
-    HANDLE input_mutex;
-    HANDLE pipe_sw_mutex;
-  };
+  typedef ptys_handle_set_t handle_set_t;
 
   /* Constructor */
   fhandler_pty_slave (int);
@@ -2450,7 +2472,7 @@ class fhandler_pty_slave: public fhandler_pty_common
   void cleanup_before_exit ();
   void get_duplicated_handle_set (handle_set_t *p);
   static void close_handle_set (handle_set_t *p);
-  void setup_for_non_cygwin_app (bool nopcon, PWCHAR envblock,
+  void setup_for_non_cygwin_app (bool nopcon, const WCHAR *envblock,
 				 bool stdin_is_ptys);
   static void cleanup_for_non_cygwin_app (handle_set_t *p, tty *ttyp,
 					  bool stdin_is_ptys,

@@ -247,7 +247,7 @@ atexit_func (void)
 	    tty *ttyp = (tty *) ptys->tc ();
 	    bool stdin_is_ptys =
 		GetStdHandle (STD_INPUT_HANDLE) == ptys->get_handle ();
-	    struct fhandler_pty_slave::handle_set_t handles =
+	    fhandler_pty_slave::handle_set_t handles =
 	      {
 		ptys->get_handle_nat (),
 		ptys->get_input_available_event (),
@@ -4096,7 +4096,8 @@ fhandler_pty_slave::close_handle_set (handle_set_t *p)
 }
 
 void
-fhandler_pty_slave::setup_for_non_cygwin_app (bool nopcon, PWCHAR envblock,
+fhandler_pty_slave::setup_for_non_cygwin_app (bool nopcon,
+					      const WCHAR *envblock,
 					      bool stdin_is_ptys)
 {
   if (disable_pcon || !term_has_pcon_cap (envblock))
