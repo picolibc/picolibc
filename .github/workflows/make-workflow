@@ -3,15 +3,15 @@
 cat head
 
 
-#for build in cmake; do
-#    for arch in arm; do
-#	echo "  $build-$arch:"
-#	cat variants-cmake
-#	cat targets-cmake-$arch
-#	cat steps-head
-#	cat steps-$build
-#    done
-#done
+for build in cmake; do
+    for arch in arm; do
+	echo "  $build-$arch:"
+	cat variants-cmake
+	cat targets-cmake-$arch
+	cat steps-head
+	cat steps-$build
+    done
+done
 
 for build in fortify-source minsize release; do
     for arch in arm misc ppc riscv mips zephyr; do
