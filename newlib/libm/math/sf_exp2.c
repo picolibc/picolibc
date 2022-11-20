@@ -30,4 +30,6 @@ exp2f(float x) /* wrapper exp2f */
 
 _MATH_ALIAS_f_f(exp2)
 
+#else
+#include "../common/sf_exp2.c"
 #endif /* __OBSOLETE_MATH_FLOAT */

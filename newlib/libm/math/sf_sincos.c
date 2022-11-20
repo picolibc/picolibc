@@ -15,4 +15,6 @@ sincosf(float x, float *sinx, float *cosx)
 
 _MATH_ALIAS_v_fFF(sincos)
 
+#else
+#include "../common/sincosf.c"
 #endif /* __OBSOLETE_MATH_FLOAT */

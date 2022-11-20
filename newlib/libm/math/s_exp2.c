@@ -63,4 +63,6 @@ exp264(__float64 x) /* wrapper exp2 */
 _MATH_ALIAS_d_d(exp2)
 
 #endif /* _NEED_FLOAT64 */
+#else
+#include "../common/exp2.c"
 #endif /* __OBSOLETE_MATH_DOUBLE */

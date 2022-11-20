@@ -98,4 +98,6 @@ expf(float x) /* default IEEE double exp */
 
 _MATH_ALIAS_f_f(exp)
 
+#else
+#include "../common/sf_exp.c"
 #endif /* __OBSOLETE_MATH_FLOAT */

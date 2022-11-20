@@ -98,4 +98,6 @@ logf(float x)
 
 _MATH_ALIAS_f_f(log)
 
+#else
+#include "../common/sf_log.c"
 #endif /* __OBSOLETE_MATH_FLOAT */

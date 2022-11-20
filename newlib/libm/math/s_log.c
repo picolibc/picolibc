@@ -151,4 +151,6 @@ log64(__float64 x)
 _MATH_ALIAS_d_d(log)
 
 #endif /* _NEED_FLOAT64 */
+#else
+#include "../common/log.c"
 #endif /*__OBSOLETE_MATH_DOUBLE */

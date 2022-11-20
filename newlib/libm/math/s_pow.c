@@ -363,4 +363,6 @@ __strong_reference(pow64, _pow64);
 _MATH_ALIAS_d_dd(pow)
 
 #endif /* _NEED_FLOAT64 */
+#else
+#include "../common/pow.c"
 #endif /* __OBSOLETE_MATH_DOUBLE */

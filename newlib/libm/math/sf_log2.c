@@ -34,4 +34,6 @@ log2f(float x) /* wrapper log2f */
 
 _MATH_ALIAS_f_f(log2)
 
+#else
+#include "../common/sf_log2.c"
 #endif /* __OBSOLETE_MATH_FLOAT */

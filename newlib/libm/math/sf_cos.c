@@ -57,4 +57,6 @@ __strong_reference(cosf, _cosf);
 #endif
 
 _MATH_ALIAS_f_f(cos)
+#else
+#include "../common/cosf.c"
 #endif /* __OBSOLETE_MATH_FLOAT */

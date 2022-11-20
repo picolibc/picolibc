@@ -57,8 +57,8 @@ dsrcs_common = [
   's_nextafter.c',
   's_pow10.c',
   's_rint.c',
-  's_logb.c',
   's_log2.c',
+  's_logb.c',
   's_fdim.c',
   's_fma.c',
   's_fmax.c',
@@ -75,8 +75,6 @@ dsrcs_common = [
   's_scalbln.c',
   's_signbit.c',
   's_trunc.c',
-  'exp.c',
-  'exp2.c',
   'exp_data.c',
   'math_err_with_errno.c',
   'math_err_uflow.c',
@@ -88,11 +86,8 @@ dsrcs_common = [
   'math_err_check_oflow.c',
   'math_inexact.c',
   'math_inexactf.c',
-  'log.c',
   'log_data.c',
-  'log2.c',
   'log2_data.c',
-  'pow.c',
   'pow_log_data.c',
 ]
 
@@ -133,18 +128,10 @@ fsrcs_common = [
   'sf_round.c',
   'sf_scalbln.c',
   'sf_trunc.c',
-  'sf_exp.c',
-  'sf_exp2.c',
   'sf_exp2_data.c',
-  'sf_log.c',
   'sf_log_data.c',
-  'sf_log2.c',
   'sf_log2_data.c',
   'sf_pow_log2_data.c',
-  'sf_pow.c',
-  'sinf.c',
-  'cosf.c',
-  'sincosf.c',
   'sincosf_data.c',
   'math_errf_with_errnof.c',
   'math_errf_uflowf.c',
@@ -156,8 +143,7 @@ fsrcs_common = [
   'math_errf_check_uflowf.c',
 ]
 
-# These have full implementations
-lsrc_full = [
+lsrcs_common = [
   'copysignl.c',
   'frexpl.c',
   'exp10l.c',
@@ -170,22 +156,18 @@ lsrc_full = [
   'math_errl_uflowl.c',
   'math_errl_with_errnol.c',
   'nanl.c',
+  'nexttoward.c',
+  'nexttowardf.c',
   'sl_finite.c',
   'sl_iseqsig.c',
   'sl_issignaling.c',
   'sqrtl.c',
   ]
 
-lsrc_wrap = [
-  'nexttowardf.c',
-  'nexttoward.c',
-]
-
 srcs_common += dsrcs_common + fsrcs_common
 
 if have_long_double
-  srcs_common += lsrc_full
-  srcs_common += lsrc_wrap
+  srcs_common += lsrcs_common
 endif
 
 srcs_common_use = []

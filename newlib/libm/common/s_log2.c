@@ -77,4 +77,6 @@ log264(__float64 x)		/* wrapper log2 */
 _MATH_ALIAS_d_d(log2)
 
 #endif /* _NEED_FLOAT64 */
+#else
+#include "log2.c"
 #endif /* __OBSOLETE_MATH_DOUBLE */

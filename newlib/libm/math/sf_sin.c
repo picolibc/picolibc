@@ -58,4 +58,6 @@ __strong_reference(sinf, _sinf);
 
 _MATH_ALIAS_f_f(sin)
 
+#else
+#include "../common/sinf.c"
 #endif /* __OBSOLETE_MATH_FLOAT */

@@ -166,4 +166,6 @@ exp64(__float64 x) /* default IEEE double exp */
 _MATH_ALIAS_d_d(exp)
 
 #endif /* _NEED_FLOAT64 */
+#else
+#include "../common/exp.c"
 #endif /* __OBSOLETE_MATH_DOUBLE */
