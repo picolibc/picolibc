@@ -95,7 +95,11 @@ typedef struct {
     long double y;
 } long_double_test_f_ff_t;
 
+#if LDBL_MANT_DIG == 64
 #define DEFAULT_PREC 1e-16L
+#else
+#define DEFAULT_PREC 1e-31L
+#endif
 
 #include "long_double_vec.h"
 
