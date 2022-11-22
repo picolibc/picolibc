@@ -278,7 +278,26 @@ foreach target : targets
        should_fail: true
       )
 
-  plain_tests = ['rand', 'regex', 'ungetc', 'fenv', 'long_double',
+  t1 = 'long_double'
+  t1_src = t1 + '.c'
+  if target == ''
+    t1_name = t1
+  else
+    t1_name = t1 + '_' + target
+  endif
+
+  test(t1_name,
+       executable(t1_name, t1_src,
+		  c_args: double_printf_compile_args + _c_args,
+		  link_args: double_printf_link_args + _link_args,
+		  link_with: _libs,
+		  link_depends:  test_link_depends,
+		  include_directories: inc),
+       depends: bios_bin,
+       env: test_env,
+      )
+
+  plain_tests = ['rand', 'regex', 'ungetc', 'fenv',
 		 'math_errhandling', 'malloc', 'tls',
 		 'ffs', 'setjmp', 'atexit', 'on_exit',
 		 'math-funcs', 'timegm', 'time-tests',
