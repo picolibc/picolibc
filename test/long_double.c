@@ -41,10 +41,13 @@
 
 #if LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113
 
+static long double max_error;
+
 bool
 within_error(long double expect, long double result, long double error)
 {
     long double difference;
+    long double e = 1.0L;
 
     if (isnan(expect) && isnan(result))
         return true;
@@ -53,9 +56,12 @@ within_error(long double expect, long double result, long double error)
         return true;
 
     if (expect != 0)
-        error = error * fabsl(expect);
+        e = exp2l(-logbl(expect));
 
-    difference = fabsl(expect - result);
+    difference = fabsl(expect - result) * e;
+
+    if (difference > max_error)
+        max_error = difference;
 
     return difference <= error;
 }
