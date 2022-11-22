@@ -100,7 +100,11 @@ real expm1(real x) {
 
 	return imprecise(exp(x) - 1, bits);
 }
-real lgamma(real x) { return log(gamma(x)); }
+real lgamma(real x) {
+	if (x < 0 && x == floor(x))
+		raise infinity(1);
+	return log(gamma(x));
+}
 real log1p(real x) { return log(1+x); }
 real logb(real x) {
 	if (x == 0)
