@@ -70,17 +70,21 @@ int
 check_long_double(const char *name, int i, long double prec, long double expect, long double result)
 {
     if (!within_error(expect, result, prec)) {
+        long double diff = fabsl(expect - result);
 #ifdef __PICOLIBC__
-        printf("%s test %d got %.15g expect %.15g\n", name, i, (double) result, (double) expect);
+        printf("%s test %d got %.15g expect %.15g diff %.15g\n", name, i, (double) result, (double) expect, (double) diff);
 #else
-        printf("%s test %d got %.33Lg expect %.33Lg\n", name, i, result, expect);
+        printf("%s test %d got %.33Lg expect %.33Lg diff %.33Lg\n", name, i, result, expect, diff);
 #endif
         return 1;
     }
     return 0;
 }
 
-typedef int (*long_double_test_t)(void);
+typedef struct {
+    const char *name;
+    int (*test)(void);
+} long_double_test_t;
 
 typedef struct {
     int line;
@@ -109,9 +113,9 @@ int main(void)
     unsigned int i;
 
     for (i = 0; i < sizeof(long_double_tests) / sizeof(long_double_tests[0]); i++) {
-        result += long_double_tests[i]();
+        result += long_double_tests[i].test();
     }
-    return result;
+    return result != 0;
 }
 
 #else

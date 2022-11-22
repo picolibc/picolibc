@@ -430,9 +430,9 @@ main()
 
 	printf("long_double_test_t long_double_tests[] = {\n");
 	for (int i = 0; i < dim(funcs_f_f); i++)
-		printf("    test_%s,\n", funcs_f_f[i].name);
+		printf("    { .name = \"%s\", .test = test_%s },\n", funcs_f_f[i].name, funcs_f_f[i].name);
 	for (int i = 0; i < dim(funcs_f_ff); i++)
-		printf("    test_%s,\n", funcs_f_ff[i].name);
+		printf("    { .name = \"%s\", .test = test_%s },\n", funcs_f_ff[i].name, funcs_f_ff[i].name);
 	printf("};\n");
 }
 
