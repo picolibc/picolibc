@@ -38,17 +38,17 @@ CFLAGS=--oslib=semihost -Os
 CFLAGS_RISCV=$(CFLAGS) -march=rv32imac -mabi=ilp32 -Triscv.ld
 CC_RISCV=riscv64-unknown-elf-gcc -specs=picolibc.specs $(CFLAGS_RISCV)
 CXXFLAGS_RISCV=$(CFLAGS) -march=rv32imac -mabi=ilp32 -Triscv-cpp.ld
-CXX_RISCV=riscv64-unknown-elf-g++ -specs=picolibcpp.specs $(CXXFLAGS_RISCV)
+CXX_RISCV=riscv64-unknown-elf-g++ -specs=picolibc.specs $(CXXFLAGS_RISCV)
 
 CFLAGS_ARM=$(CFLAGS) -mcpu=cortex-m3 -Tarm.ld
 CC_ARM=arm-none-eabi-gcc -specs=picolibc.specs $(CFLAGS_ARM)
 CXXFLAGS_ARM=$(CFLAGS) -mcpu=cortex-m3 -Tarm-cpp.ld
-CXX_ARM=arm-none-eabi-g++ -specs=picolibcpp.specs $(CXXFLAGS_ARM)
+CXX_ARM=arm-none-eabi-g++ -specs=picolibc.specs $(CXXFLAGS_ARM)
 
 CFLAGS_AARCH64=$(CFLAGS) -Taarch64.ld
 CC_AARCH64=aarch64-linux-gnu-gcc -specs=picolibc.specs $(CFLAGS_AARCH64)
 CXXFLAGS_AARCH64=$(CFLAGS) -Taarch64-cpp.ld
-CXX_AARCH64=aarch64-linux-gnu-g++ -specs=picolibcpp.specs $(CXXFLAGS_AARCH64)
+CXX_AARCH64=aarch64-linux-gnu-g++ -specs=picolibc.specs $(CXXFLAGS_AARCH64)
 
 all: \
 	hello-world-arm.elf hello-world-aarch64.elf \

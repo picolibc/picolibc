@@ -42,8 +42,8 @@ ENTRY(_start)
 
 MEMORY
 {
-	flash (rxa@LDSCRIPT_MEMORY_ATTR_I@!w) : ORIGIN = DEFINED(__flash) ? __flash : 0x10000000, LENGTH = DEFINED(__flash_size) ? __flash_size : 0x10000
-	ram (wxa!r@LDSCRIPT_MEMORY_ATTR_I@)   : ORIGIN = DEFINED(__ram  ) ? __ram   : 0x20000000, LENGTH = DEFINED(__ram_size  ) ? __ram_size   : 0x08000
+	flash (rxa!w) : ORIGIN = DEFINED(__flash) ? __flash : 0x10000000, LENGTH = DEFINED(__flash_size) ? __flash_size : 0x10000
+	ram (wa!rx)   : ORIGIN = DEFINED(__ram  ) ? __ram   : 0x20000000, LENGTH = DEFINED(__ram_size  ) ? __ram_size   : 0x08000
 }
 
 PHDRS
@@ -111,7 +111,6 @@ SECTIONS
 	} >flash AT>flash :text
 
         /* additional sections when compiling with C++ exception support */
-	@CPP_START@
         .except_ordered : {
 		*(.gcc_except_table *.gcc_except_table.*)
 		KEEP (*(.eh_frame .eh_frame.*))
@@ -125,7 +124,6 @@ SECTIONS
 		*(.ARM.exidx*)
         	PROVIDE(__exidx_end = .);
         } >flash AT>flash :text
-	@CPP_END@
 
 	/*
 	 * Data values which are preserved across reset
@@ -137,7 +135,7 @@ SECTIONS
 		PROVIDE(__preserve_end__ = .);
 	} >ram AT>ram :ram
 
-	.data : @LDSCRIPT_ALIGN_WITH_INPUT@ {
+	.data : ALIGN(8) {
 		*(.data .data.*)
 		*(.gnu.linkonce.d.*)
 
@@ -159,7 +157,7 @@ SECTIONS
 	 * into the allocate ram addresses by the existing
 	 * data initialization code in crt0
 	 */
-	.tdata : @LDSCRIPT_ALIGN_WITH_INPUT@ {
+	.tdata : ALIGN(8) {
 		*(.tdata .tdata.* .gnu.linkonce.td.*)
 		PROVIDE(__data_end = .);
 		PROVIDE(__tdata_end = .);
@@ -229,19 +227,6 @@ SECTIONS
 	.stack (NOLOAD) : {
 		. += (DEFINED(__stack_size) ? __stack_size : 0x800);
 	} >ram :ram
-
-	/* Throw away C++ exception handling information */
-
-	@C_START@
-
-	/DISCARD/ : {
-		*(.note .note.*)
-		*(.eh_frame .eh_frame.*)
-		*(.ARM.extab* .gnu.linkonce.armextab.*)
-		*(.ARM.exidx*)
-	}
-
-	@C_END@
 }
 /*
  * Check that sections that are copied from flash to RAM have matching
