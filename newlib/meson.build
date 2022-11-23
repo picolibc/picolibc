@@ -72,7 +72,7 @@ foreach target : targets
 				      pic: false,
 				      objects : libobjs,
 				      include_directories: inc,
-				      c_args: value[1] + ['-D_LIBC'])
+				      c_args: value[1])
 
   set_variable('lib_c' + target, local_lib_c_target)
 
