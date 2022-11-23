@@ -108,7 +108,7 @@ FHANDLER_FILES= \
 	fhandler/tape.cc \
 	fhandler/termios.cc \
 	fhandler/timerfd.cc \
-	fhandler/tty.cc \
+	fhandler/pty.cc \
 	fhandler/virtual.cc \
 	fhandler/windows.cc \
 	fhandler/zero.cc
