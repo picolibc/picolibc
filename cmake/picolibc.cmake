@@ -34,11 +34,11 @@
 #
 
 # Add sources to libc, eliding any duplicate basenames
-function(picolibc_sources_flags flags)
+function(picolibc_sources_flags_internal target flags)
 
   # Get current sources
-  get_property(current_sources_real TARGET c PROPERTY SOURCES)
-  get_property(current_sources_fake TARGET c PROPERTY SOURCES_FAKE)
+  get_property(current_sources_real TARGET ${target} PROPERTY SOURCES)
+  get_property(current_sources_fake TARGET ${target} PROPERTY SOURCES_FAKE)
   set(current_sources ${current_sources_real} ${current_sources_fake})
   set(sources ${ARGN})
 
@@ -54,28 +54,47 @@ function(picolibc_sources_flags flags)
   endforeach()
 
   # Add all files that aren't duplicated
-  target_sources(c PRIVATE ${sources})
+  target_sources(${target} PRIVATE ${sources})
 
   # Set flags if specified
   if(flags)
     foreach(flag ${flags})
       foreach(source ${sources})
 	set_property(SOURCE ${source}
-	  TARGET_DIRECTORY c
+	  TARGET_DIRECTORY ${target}
 	  APPEND PROPERTY COMPILE_OPTIONS ${flag})
       endforeach()
     endforeach()
   endif()
 endfunction()
 
+function(picolibc_sources_flags flags)
+  picolibc_sources_flags_internal(c "${flags}" ${ARGN})
+endfunction()
+
+function(picolibm_sources_flags flags)
+  picolibc_sources_flags_internal(mobjs "${flags}" ${ARGN})
+endfunction()
+
 function(picolibc_sources)
   picolibc_sources_flags(0 ${ARGN})
 endfunction()
 
-function(picolibc_sources_fake)
-  get_property(current_sources_fake TARGET c PROPERTY SOURCES_FAKE)
+function(picolibm_sources)
+  picolibm_sources_flags(0 ${ARGN})
+endfunction()
+
+function(picolibc_sources_fake target)
+  if(NOT target)
+    set(target c)
+  endif()
+  get_property(current_sources_fake TARGET ${target} PROPERTY SOURCES_FAKE)
   list(APPEND current_sources_fake ${ARGN})
-  set_property(TARGET c PROPERTY SOURCES_FAKE ${current_sources_fake})
+  set_property(TARGET ${target} PROPERTY SOURCES_FAKE ${current_sources_fake})
+endfunction()
+
+function(picolibm_sources_fake)
+  picolibc_sources_fake(mobjs)
 endfunction()
 
 function(picolibc_headers subdir)

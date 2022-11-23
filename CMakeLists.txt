@@ -472,13 +472,20 @@ set(PICOLIBC_COMPILE_OPTIONS
   )
 
 add_library(c STATIC)
+add_library(mobjs OBJECT)
+add_library(m STATIC)
 
 target_compile_options(c PRIVATE ${PICOLIBC_COMPILE_OPTIONS})
+target_compile_options(mobjs PRIVATE ${PICOLIBC_COMPILE_OPTIONS})
 
 set(PICOLIBC_INCLUDE_DIRECTORIES
   "${PICOLIBC_INCLUDE}")
 
 target_include_directories(c SYSTEM PUBLIC ${PICOLIBC_INCLUDE_DIRECTORIES})
+target_include_directories(mobjs SYSTEM PUBLIC ${PICOLIBC_INCLUDE_DIRECTORIES})
+
+target_link_libraries(c PRIVATE mobjs)
+target_link_libraries(m PRIVATE mobjs)
 
 define_property(GLOBAL PROPERTY PICOLIBC_HEADERS
   BRIEF_DOCS "Installed header files"
@@ -487,6 +494,10 @@ define_property(GLOBAL PROPERTY PICOLIBC_HEADERS
 add_subdirectory(newlib)
 
 install(TARGETS c
+  LIBRARY DESTINATION lib
+  PUBLIC_HEADER DESTINATION include)
+
+install(TARGETS m
   LIBRARY DESTINATION lib
   PUBLIC_HEADER DESTINATION include)
 

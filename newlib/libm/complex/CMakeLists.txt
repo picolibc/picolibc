@@ -8,7 +8,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-picolibc_sources(
+picolibm_sources(
   cabs.c
   cacos.c
   cacosh.c
@@ -60,7 +60,7 @@ picolibc_sources(
   )
 
 if(${_HAVE_LONG_DOUBLE})
-  picolibc_sources(
+  picolibm_sources(
     cabsl.c
     creall.c
     cimagl.c

@@ -35,25 +35,26 @@
 subdir('libc')
 subdir('libm')
 
-libnames = ['cpart', 'mpart']
-
-libsrcs = []
-
-foreach libname : libnames
-  libsrcs += get_variable('src_' + libname, [])
-endforeach
+libcsrcs = get_variable('src_cpart', [])
+libmsrcs = get_variable('src_mpart', [])
 
 foreach target : targets
   value = get_variable('target_' + target)
-  libobjs = []
-  libsrcs_target = libsrcs
 
-  foreach libname : libnames
-    if is_variable('lib_' + libname + target)
-      libobjs += get_variable('lib_' + libname + target).extract_all_objects(recursive:true)
-    endif
-    libsrcs_target += get_variable('src_' + libname + target, [])
-  endforeach
+  libcsrcs_target = libcsrcs + get_variable('src_cpart' + target, [])
+  libmsrcs_target = libmsrcs + get_variable('src_mpart' + target, [])
+
+  if is_variable('lib_cpart' + target)
+    libcobjs = get_variable('lib_cpart' + target).extract_all_objects(recursive:true)
+  else
+    libcobjs = []
+  endif
+
+  if is_variable('lib_mpart' + target)
+    libmobjs = get_variable('lib_mpart' + target).extract_all_objects(recursive:true)
+  else
+    libmobjs = []
+  endif
 
   instdir = join_paths(lib_dir, value[0])
 
@@ -65,31 +66,41 @@ foreach target : targets
     libm_name = join_paths(target, 'libm')
   endif
 
-  local_lib_c_target = static_library(libc_name,
-				      libsrcs_target,
-				      install : true,
-				      install_dir : instdir,
+  local_lib_m_target = static_library(libm_name,
+				      libmsrcs_target,
+				      install: true,
+				      install_dir: instdir,
 				      pic: false,
-				      objects : libobjs,
+				      objects: libmobjs,
 				      include_directories: inc,
 				      c_args: value[1] + ['-D_LIBC'])
 
-  set_variable('lib_c' + target, local_lib_c_target)
-
-  local_lib_m_target = static_library(libm_name,
-                                      ['empty.c'],
-                                      install : true,
-                                      install_dir : instdir,
-                                      pic: false,
-                                      objects : [])
-
   set_variable('lib_m' + target, local_lib_m_target)
+
+  local_lib_c_target = static_library(libc_name,
+				      libcsrcs_target,
+				      install: true,
+				      install_dir: instdir,
+				      pic: false,
+				      objects: libcobjs,
+				      include_directories: inc,
+				      link_whole: local_lib_m_target,
+				      c_args: value[1] + ['-D_LIBC'])
+
+  set_variable('lib_c' + target, local_lib_c_target)
 
   if check_duplicate_names
     custom_target('libc_duplicates' + target,
 		  build_by_default: true,
 		  input: local_lib_c_target,
 		  output: 'libc_duplicates' + target,
+		  command: [duplicate_names, nm, '@INPUT@', '@OUTPUT@'],
+		  install: false)
+
+    custom_target('libm_duplicates' + target,
+		  build_by_default: true,
+		  input: local_lib_m_target,
+		  output: 'libm_duplicates' + target,
 		  command: [duplicate_names, nm, '@INPUT@', '@OUTPUT@'],
 		  install: false)
   endif

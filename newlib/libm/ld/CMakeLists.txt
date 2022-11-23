@@ -33,7 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 if(_HAVE_LONG_DOUBLE)
-  picolibc_sources(
+  picolibm_sources(
     e_acoshl.c
     e_atanhl.c
     e_coshl.c

@@ -33,11 +33,11 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-picolibc_sources(
+picolibm_sources(
   fenv.c
   )
 
-picolibc_sources_fake(
+picolibm_sources_fake(
   feclearexcept.c
   fedisableexcept.c
   feenableexcept.c

@@ -33,8 +33,9 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 target_include_directories(c PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+target_include_directories(mobjs PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 
-picolibc_sources(
+picolibm_sources(
   signgam.c
   s_finite.c
   s_copysign.c
@@ -143,7 +144,7 @@ picolibc_sources(
 )
 
 if(_HAVE_LONG_DOUBLE)
-  picolibc_sources(
+  picolibm_sources(
     copysignl.c
     frexpl.c
     exp10l.c
