@@ -13,7 +13,7 @@
  * they apply.
  */
 
-#include <stdlib.h>
+#include <unistd.h>
 
 /* Sadly, PTX doesn't support weak declarations, only weak
    definitions.  Weakly define it here in case we're not using crt0
@@ -23,7 +23,7 @@
 int *__attribute((weak)) __exitval_ptr;
 
 void __attribute__((noreturn))
-exit (int status)
+_exit (int status)
 {
   if (__exitval_ptr)
     *__exitval_ptr = status;
