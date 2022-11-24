@@ -42,11 +42,15 @@ uname_x (struct utsname *name)
       cygwin_gethostname (buf, sizeof buf - 1);
       strncat (name->nodename, buf, sizeof (name->nodename) - 1);
       /* release */
-      __small_sprintf (name->release, "%d.%d.%d-%d.",
+#ifdef CYGPORT_RELEASE_INFO
+      stpcpy (name->release, __XSTRING (CYGPORT_RELEASE_INFO));
+#else
+      __small_sprintf (name->release, "%d.%d.%d-0.%d.local.",
 		       cygwin_version.dll_major / 1000,
 		       cygwin_version.dll_major % 1000,
 		       cygwin_version.dll_minor,
 		       cygwin_version.api_minor);
+#endif
       /* version */
       stpcpy (name->version, cygwin_version.dll_build_date);
       strcat (name->version, " UTC");
