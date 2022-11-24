@@ -32,7 +32,6 @@ uname_x (struct utsname *name)
   __try
     {
       char buf[NI_MAXHOST + 1] ATTRIBUTE_NONSTRING;
-      char *snp = strstr (cygwin_version.dll_build_date, "SNP");
 
       memset (name, 0, sizeof (*name));
       /* sysname */
@@ -50,8 +49,6 @@ uname_x (struct utsname *name)
 		       cygwin_version.api_minor);
       /* version */
       stpcpy (name->version, cygwin_version.dll_build_date);
-      if (snp)
-	name->version[snp - cygwin_version.dll_build_date] = '\0';
       strcat (name->version, " UTC");
       /* machine */
       switch (wincap.cpu_arch ())
@@ -63,8 +60,6 @@ uname_x (struct utsname *name)
 	    strcpy (name->machine, "unknown");
 	    break;
 	}
-      if (snp)
-	strcat (name->release, ".snap");
       /* domainame */
       memset (buf, 0, sizeof buf);
       getdomainname (buf, sizeof buf - 1);
@@ -91,8 +86,6 @@ uname (struct utsname *in_name)
   struct old_utsname *name = (struct old_utsname *) in_name;
   __try
     {
-      char *snp = strstr  (cygwin_version.dll_build_date, "SNP");
-
       memset (name, 0, sizeof (*name));
       __small_sprintf (name->sysname, "CYGWIN_%s", wincap.osname ());
 
@@ -100,11 +93,10 @@ uname (struct utsname *in_name)
       cygwin_gethostname (name->nodename, sizeof (name->nodename) - 1);
 
       /* Cygwin dll release */
-      __small_sprintf (name->release, "%d.%d.%d%s(%d.%d/%d/%d)",
+      __small_sprintf (name->release, "%d.%d.%d(%d.%d/%d/%d)",
 		       cygwin_version.dll_major / 1000,
 		       cygwin_version.dll_major % 1000,
 		       cygwin_version.dll_minor,
-		       snp ? "s" : "",
 		       cygwin_version.api_major,
 		       cygwin_version.api_minor,
 		       cygwin_version.shared_data,
@@ -112,8 +104,6 @@ uname (struct utsname *in_name)
 
       /* Cygwin "version" aka build date */
       strcpy (name->version, cygwin_version.dll_build_date);
-      if (snp)
-	name->version[snp - cygwin_version.dll_build_date] = '\0';
 
       /* CPU type */
       switch (wincap.cpu_arch ())

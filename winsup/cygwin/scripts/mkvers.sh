@@ -105,15 +105,6 @@ wv_cvs_tag="$cvs_tag"
 # and set dir accordingly.
 dir=$(echo $dir | sed -e 's%/include/cygwin.*$%%' -e 's%include/cygwin.*$%.%')
 
-# Look in $dir for a a ".snapshot-date" file.  If one is found then this
-# information will be saved for output to the DLL.
-#
-if [ -r "$dir/.snapshot-date" ]; then
-  read snapshotdate < "$dir/.snapshot-date"
-  snapshot="snapshot date
-$snapshotdate"
-fi
-
 #
 # Scan the version.h file for strings that begin with CYGWIN_INFO or
 # CYGWIN_VERSION.  Perform crude parsing on the lines to get the values
@@ -129,7 +120,6 @@ fi
 \2%p' $incfile | sed -e 's/["\\]//g'  -e '/^_/y/ABCDEFGHIJKLMNOPQRSTUVWXYZ_/abcdefghijklmnopqrstuvwxyz /';
   echo ' build date'; echo $build_date;
   [ -n "$cvs_tag" ] && echo "$cvs_tag";
-  [ -n "$snapshot" ] && echo "$snapshot"
 ) | while read var; do
     read val
 cat <<EOF
@@ -138,13 +128,6 @@ EOF
 done | tee /tmp/mkvers.$$ 1>&9
 
 trap "rm -f /tmp/mkvers.$$" 0 1 2 15
-
-if [ -n "$snapshotdate" ]; then
-  usedate="$(echo $snapshotdate \
-	     | sed -e 's/\(....\)\(..\)\(..\)-\(..:..\).*$/\1-\2-\3 \4SNP/')"
-else
-  usedate="$builddate"
-fi
 
 #
 # Finally, output the shared ID and set up the cygwin_version structure
@@ -163,7 +146,7 @@ cygwin_version_info cygwin_version =
   CYGWIN_VERSION_DLL_MAJOR, CYGWIN_VERSION_DLL_MINOR,
   CYGWIN_VERSION_SHARED_DATA,
   CYGWIN_VERSION_MOUNT_REGISTRY,
-  "$usedate",
+  "$builddate",
 #ifdef DEBUGGING
   CYGWIN_VERSION_DLL_IDENTIFIER "S" shared_data_version "-$builddate"
 #else
