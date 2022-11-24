@@ -465,7 +465,7 @@ force_eval_long_double (long double x)
 #ifdef _LDBL_EQ_DBL
 # ifdef _DOUBLE_IS_32BITS
 #  ifdef _HAVE_ALIAS_ATTRIBUTE
-#   define _MATH_ALIAS_l_to_f(name) extern long double _LD_NAME(name)() __attribute__((__alias__(_FLOAT_ALIAS(name))));
+#   define _MATH_ALIAS_l_to_f(name) extern long double _LD_NAME(name)(void) __attribute__((__alias__(_FLOAT_ALIAS(name))));
 #   define _MATH_ALIAS_l_l_to_f(name) extern long double _LD_NAME(name)(long double x) __attribute__((__alias__(_FLOAT_ALIAS(name))));
 #   define _MATH_ALIAS_l_L_to_f(name) extern long double _LD_NAME(name)(const long double *x) __attribute__((__alias__(_FLOAT_ALIAS(name))));
 #   define _MATH_ALIAS_l_s_to_f(name) extern long double _LD_NAME(name)(const char *x) __attribute__((__alias__(_FLOAT_ALIAS(name))));
@@ -483,7 +483,7 @@ force_eval_long_double (long double x)
 #   define _MATH_ALIAS_i_ll_to_f(name) extern int _LD_NAME(name)(long double x, long double y) __attribute__((__alias__(_FLOAT_ALIAS(name))));
 #   define _MATH_ALIAS_v_lLL_to_f(name) extern void _LD_NAME(name)(long double x, long double *y, long double *z) __attribute__((__alias__(_FLOAT_ALIAS(name))));
 #  else
-#   define _MATH_ALIAS_l_to_f(name) long double _LD_NAME(name)() { return (long double) _FLOAT_NAME(name)(); }
+#   define _MATH_ALIAS_l_to_f(name) long double _LD_NAME(name)(void) { return (long double) _FLOAT_NAME(name)(); }
 #   define _MATH_ALIAS_l_l_to_f(name) long double _LD_NAME(name)(long double x) { return (long double) _FLOAT_NAME(name)((float) x); }
 #   define _MATH_ALIAS_l_L_to_f(name) long double _LD_NAME(name)(const long double *x) { return (long double) _FLOAT_NAME(name)((float *) x); }
 #   define _MATH_ALIAS_l_s_to_f(name) long double _LD_NAME(name)(const char *x) { return (long double) _FLOAT_NAME(name)(x); }
@@ -536,7 +536,7 @@ force_eval_long_double (long double x)
 #  define _MATH_ALIAS_i_ll_to_f(name)
 #  define _MATH_ALIAS_v_lLL_to_f(name)
 #  ifdef _HAVE_ALIAS_ATTRIBUTE
-#   define _MATH_ALIAS_l_to_d(name) extern long double _LD_NAME(name)() __attribute__((__alias__(_D_ALIAS(name))));
+#   define _MATH_ALIAS_l_to_d(name) extern long double _LD_NAME(name)(void) __attribute__((__alias__(_D_ALIAS(name))));
 #   define _MATH_ALIAS_l_l_to_d(name) extern long double _LD_NAME(name)(long double x) __attribute__((__alias__(_D_ALIAS(name))));
 #   define _MATH_ALIAS_l_L_to_d(name) extern long double _LD_NAME(name)(long double *x) __attribute__((__alias__(_D_ALIAS(name))));
 #   define _MATH_ALIAS_l_s_to_d(name) extern long double _LD_NAME(name)(const char *x) __attribute__((__alias__(_D_ALIAS(name))));
@@ -554,7 +554,7 @@ force_eval_long_double (long double x)
 #   define _MATH_ALIAS_i_ll_to_d(name) extern int _LD_NAME(name)(long double x, long double y) __attribute__((__alias__(_D_ALIAS(name))));
 #   define _MATH_ALIAS_v_lLL_to_d(name) extern void _LD_NAME(name)(long double x, long double *y, long double *z) __attribute__((__alias__(_D_ALIAS(name))));
 #  else
-#   define _MATH_ALIAS_l_to_d(name) long double _LD_NAME(name)() { return (long double) _D_NAME(name)(); }
+#   define _MATH_ALIAS_l_to_d(name) long double _LD_NAME(name)(void) { return (long double) _D_NAME(name)(); }
 #   define _MATH_ALIAS_l_l_to_d(name) long double _LD_NAME(name)(long double x) { return (long double) _D_NAME(name)((double) x); }
 #   define _MATH_ALIAS_l_L_to_d(name) long double _LD_NAME(name)(long double *x) { return (long double) _D_NAME(name)((double *) x); }
 #   define _MATH_ALIAS_l_s_to_d(name) long double _LD_NAME(name)(const char *x) { return (long double) _D_NAME(name)(x); }
