@@ -679,6 +679,8 @@ if cc.get_linker_id() == 'ld.lld'
     endif
 endif
 
+install_data(sources: 'picolibc.ld', install_dir: lib_dir)
+
 # Not all compilers necessarily support all warnings; only use these which are:
 c_warnings = [
   '-Werror=implicit-function-declaration',
