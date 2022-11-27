@@ -785,7 +785,7 @@ demonstrates the bug is always welcome).
 <answer>
 
 <para>Unfortunately, this will be difficult.  Exception handling and signals
-support semantics and args have been designed for x86 so you would need
+support semantics and args have been designed for x86_64 so you would need
 to write specific support for your platform.  We don't know of any other
 incompatibilities. Please send us patches if you do this work!
 </para>
