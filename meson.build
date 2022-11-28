@@ -187,7 +187,7 @@ endif
 # by default by the ubuntu native compiler)
 c_flags = cc.get_supported_arguments(['-fno-common', '-frounding-math', '-fsignaling-nans',
 				      '-Wno-unsupported-floating-point-opt', '-fno-stack-protector',
-				      '-fno-builtin-copysignl'])
+				      '-fno-builtin-copysignl', '-fno-asynchronous-unwind-tables'])
 c_args += c_flags
 native_c_args += c_flags
 
