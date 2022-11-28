@@ -871,8 +871,6 @@ Files: dummyhost/iob.c
  scripts/do-xtensa-espressif_esp32-configure
  scripts/do-xtensa-espressif_esp32s2-configure
  scripts/do-xtensa-intel_apl_adsp-configure
- scripts/do-xtensa-intel_bdw_adsp-configure
- scripts/do-xtensa-intel_byt_adsp-configure
  scripts/do-xtensa-intel_s1000-configure
  scripts/do-xtensa-nxp_imx8m_adsp-configure
  scripts/do-xtensa-nxp_imx_adsp-configure
@@ -2527,8 +2525,6 @@ Files: .clang-format
  scripts/cross-xtensa-espressif_esp32_zephyr-elf.txt
  scripts/cross-xtensa-espressif_esp32s2_zephyr-elf.txt
  scripts/cross-xtensa-intel_apl_adsp_zephyr-elf.txt
- scripts/cross-xtensa-intel_bdw_adsp_zephyr-elf.txt
- scripts/cross-xtensa-intel_byt_adsp_zephyr-elf.txt
  scripts/cross-xtensa-intel_s1000_zephyr-elf.txt
  scripts/cross-xtensa-lx106-elf.txt
  scripts/cross-xtensa-nxp_imx8m_adsp_zephyr-elf.txt
