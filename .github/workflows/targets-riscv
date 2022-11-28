@@ -1,4 +1,0 @@
-        test: [
-          "./.github/do-test do-riscv-configure build-riscv",
-          "./.github/do-many do-test do-rv32imac-configure build-rv32imac do-test do-clang-riscv-configure build-riscv-clang do-test do-clang-rv32imafdc-configure build-clang-rv32imafdc end",
-        ]

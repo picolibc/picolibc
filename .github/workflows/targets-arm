@@ -1,4 +1,0 @@
-        test: [
-          "./.github/do-test do-arm-configure build-arm",
-          "./.github/do-many do-test do-clang-thumbv7e+fp-configure build-clang-thumbv7e+fp do-test do-clang-thumbv7m-configure build-clang-thumbv7m do-test do-cortex-a9-configure build-cortex-a9 do-test do-clang-thumbv6m-configure build-clang-thumbv6m end",
-        ]
