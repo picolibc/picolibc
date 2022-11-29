@@ -8,6 +8,7 @@ ar = 'x86_64-linux-gnu-ar'
 as = 'x86_64-linux-gnu-as'
 nm = 'x86_64-linux-gnu-nm'
 strip = 'x86_64-linux-gnu-strip'
+objcopy = 'x86_64-linux-gnu-objcopy'
 # only needed to run tests
 exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-x86_64 "$@"', 'run-x86_64']
 
