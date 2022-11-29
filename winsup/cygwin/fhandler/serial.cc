@@ -411,10 +411,10 @@ fhandler_serial::switch_modem_lines (int set, int clr)
         dcb.fRtsControl = RTS_CONTROL_DISABLE;
 
       if (set & TIOCM_DTR)
-        dcb.fRtsControl = DTR_CONTROL_ENABLE;
+        dcb.fDtrControl = DTR_CONTROL_ENABLE;
       else
       if (clr & TIOCM_DTR)
-        dcb.fRtsControl = DTR_CONTROL_DISABLE;
+        dcb.fDtrControl = DTR_CONTROL_DISABLE;
 
       if (!SetCommState(get_handle(), &dcb))
         {
