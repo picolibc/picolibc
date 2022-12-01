@@ -620,7 +620,6 @@ bool
 child_info_spawn::get_parent_handle ()
 {
   parent = OpenProcess (PROCESS_VM_READ, FALSE, parent_winpid);
-  moreinfo->myself_pinfo = NULL;
   return !!parent;
 }
 
@@ -632,6 +631,8 @@ child_info_spawn::handle_spawn ()
   if (!dynamically_loaded || get_parent_handle ())
       {
 	cygheap_fixup_in_child (true);
+	if (dynamically_loaded)
+	  moreinfo->myself_pinfo = NULL;
 	memory_init ();
       }
 
