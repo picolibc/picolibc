@@ -1262,7 +1262,7 @@ api_fatal (const char *fmt, ...)
 void
 multiple_cygwin_problem (const char *what, uintptr_t magic_version, uintptr_t version)
 {
-  if (_cygwin_testing && (strstr (what, "proc") || strstr (what, "cygheap")))
+  if (_cygwin_testing && (strstr (what, "proc")))
     {
       child_proc_info->type = _CH_WHOOPS;
       return;
