@@ -69,7 +69,7 @@ SECTIONS
                 /* code */
 		*(.text.unlikely .text.unlikely.*)
 		*(.text.startup .text.startup.*)
-		*(.text .text.*)
+		*(.text .text.* .opd .opd.*)
 		*(.gnu.linkonce.t.*)
 		KEEP (*(.fini .fini.*))
 		__text_end = .;
@@ -108,6 +108,11 @@ SECTIONS
 		KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
 		KEEP (*(.fini_array .dtors))
 		PROVIDE_HIDDEN ( __fini_array_end = . );
+
+	} >flash AT>flash :text
+
+	.toc : {
+		*(.toc .toc.*)
 	} >flash AT>flash :text
 
         /* additional sections when compiling with C++ exception support */
