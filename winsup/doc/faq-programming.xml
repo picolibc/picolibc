@@ -764,10 +764,10 @@ operation e.g. when checking a pointer is valid)
 </para>
 
 <para>
-It is also a good
-idea to use the latest code in case the bug has been fixed, so we
-recommend trying the latest snapshot from
-<ulink url="https://cygwin.com/snapshots/"/> or building the DLL from git.
+It is also a good idea to use the latest code in case the bug has been fixed,
+so we recommend trying the latest cygwin test release (see
+<ulink url="https://cygwin.com/faq/faq-setup.html#faq.setup.testrels"/>)
+or building the DLL from git.
 </para>
 
 <para>To build a debugging version of the Cygwin DLL, you will need to follow

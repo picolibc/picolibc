@@ -30,13 +30,24 @@ User's Guide.
 <question><para>Are development snapshots for the Cygwin library available?</para></question>
 <answer>
 
-<para>Yes.  They're made whenever anything interesting happens inside the
-Cygwin library (usually roughly on a nightly basis, depending on how much
-is going on).  They are only intended for those people who wish to
-contribute code to the project.  If you aren't going to be happy
-debugging problems in a buggy snapshot, avoid these and wait for a real
-release.  The snapshots are available from
-<ulink url="https://cygwin.com/snapshots/"/>.
+<para>Starting December 2022, the old developer snapshots have been
+deprecated by regular, automated test releases.  See the next FAQ entry
+<ulink url="https://cygwin.com/faq/faq-api.html#faq.api.testrels"/>)
+</para>
+</answer></qandaentry>
+
+<qandaentry id="faq.api.testrels">
+<question><para>Are test releases for the Cygwin library available?</para></question>
+<answer>
+
+<para>Yes.  Starting December 2022, regular, automated test releases
+are created whenever a considerable patch is pushed to the Cygwin git
+repo at
+<ulink url="https://cygwin.com/git/newlib-cygwin.git"/>.
+You can download the cygwin package test releases just like any other
+test release for any Cgywin package using the Cygwin Setup program.
+For more info, see
+<ulink url="https://cygwin.com/faq/faq-setup.html#faq.setup.testrels"/>
 </para>
 </answer></qandaentry>
 
