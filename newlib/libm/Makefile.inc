@@ -51,6 +51,9 @@ include %D%/test/Makefile.inc
 if HAVE_LIBM_MACHINE_AARCH64
 include %D%/machine/aarch64/Makefile.inc
 endif
+if HAVE_LIBM_MACHINE_AMDGCN
+include %D%/machine/amdgcn/Makefile.inc
+endif
 if HAVE_LIBM_MACHINE_ARM
 include %D%/machine/arm/Makefile.inc
 endif

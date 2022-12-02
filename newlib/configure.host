@@ -119,6 +119,7 @@ case "${host_cpu}" in
   amdgcn*)
 	newlib_cflags="${newlib_cflags} -D__DYNAMIC_REENT__"
 	machine_dir=amdgcn
+	libm_machine_dir=amdgcn
 	newlib_cv_initfinit_array=yes
 	;;
   arc*)

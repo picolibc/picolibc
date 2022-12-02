@@ -623,6 +623,8 @@ HAVE_LIBM_MACHINE_I386_FALSE
 HAVE_LIBM_MACHINE_I386_TRUE
 HAVE_LIBM_MACHINE_ARM_FALSE
 HAVE_LIBM_MACHINE_ARM_TRUE
+HAVE_LIBM_MACHINE_AMDGCN_FALSE
+HAVE_LIBM_MACHINE_AMDGCN_TRUE
 HAVE_LIBM_MACHINE_AARCH64_FALSE
 HAVE_LIBM_MACHINE_AARCH64_TRUE
 HAS_NDS32_FPU_DP_FALSE
@@ -6216,6 +6218,14 @@ else
   HAVE_LIBM_MACHINE_AARCH64_FALSE=
 fi
 
+   if test "${libm_machine_dir}" = "amdgcn"; then
+  HAVE_LIBM_MACHINE_AMDGCN_TRUE=
+  HAVE_LIBM_MACHINE_AMDGCN_FALSE='#'
+else
+  HAVE_LIBM_MACHINE_AMDGCN_TRUE='#'
+  HAVE_LIBM_MACHINE_AMDGCN_FALSE=
+fi
+
    if test "${libm_machine_dir}" = "arm"; then
   HAVE_LIBM_MACHINE_ARM_TRUE=
   HAVE_LIBM_MACHINE_ARM_FALSE='#'
@@ -7873,6 +7883,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_LIBM_MACHINE_AARCH64_TRUE}" && test -z "${HAVE_LIBM_MACHINE_AARCH64_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_LIBM_MACHINE_AARCH64\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBM_MACHINE_AMDGCN_TRUE}" && test -z "${HAVE_LIBM_MACHINE_AMDGCN_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBM_MACHINE_AMDGCN\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_LIBM_MACHINE_ARM_TRUE}" && test -z "${HAVE_LIBM_MACHINE_ARM_FALSE}"; then
