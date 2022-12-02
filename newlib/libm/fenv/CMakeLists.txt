@@ -33,7 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-picolibc_sources(
+picolibm_sources(
   feclearexcept.c
   fe_dfl_env.c
   fedisableexcept.c

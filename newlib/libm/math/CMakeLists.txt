@@ -32,7 +32,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-picolibc_sources(
+picolibm_sources(
   k_cos.c
   k_rem_pio2.c
   k_sin.c
@@ -121,7 +121,7 @@ picolibc_sources(
 )
 
 if(_HAVE_LONG_DOUBLE)
-  picolibc_sources(
+  picolibm_sources(
     sl_hypot.c
     )
 endif()

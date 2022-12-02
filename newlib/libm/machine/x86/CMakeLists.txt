@@ -32,12 +32,12 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-picolibc_sources(
+picolibm_sources(
   fenv.c
   )
 
 if(${CMAKE_SYSTEM_SUB_PROCESSOR} STREQUAL "i686")
-  picolibc_sources(
+  picolibm_sources(
     f_atan2f.S
     f_atan2.S
     f_exp.c
@@ -66,7 +66,7 @@ if(${CMAKE_SYSTEM_SUB_PROCESSOR} STREQUAL "i686")
     )
 endif()
 
-picolibc_sources_fake(
+picolibm_sources_fake(
   feclearexcept.c
   fedisableexcept.c
   feenableexcept.c
