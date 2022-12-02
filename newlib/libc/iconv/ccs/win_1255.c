@@ -14,9 +14,9 @@
 #include "ccs.h"
 #include "ccsnames.h"
 
-#if (BYTE_ORDER == LITTLE_ENDIAN)
+#if (_BYTE_ORDER == _LITTLE_ENDIAN)
 #  define W(word) (word) & 0xFF, (word) >> 8
-#elif (BYTE_ORDER == BIG_ENDIAN)
+#elif (_BYTE_ORDER == _BIG_ENDIAN)
 #  define W(word) (word) >> 8, (word) & 0xFF
 #else
 #  error "Unknown byte order."

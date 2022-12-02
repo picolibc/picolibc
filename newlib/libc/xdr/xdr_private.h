@@ -50,9 +50,9 @@ void xdr_warnx (const char *, ...)
  * of this, but we don't have access to that here.*/
 _ELIDABLE_INLINE uint32_t xdr_ntohl (uint32_t x)
 {
-#if BYTE_ORDER == BIG_ENDIAN
+#if _BYTE_ORDER == _BIG_ENDIAN
   return x;
-#elif BYTE_ORDER == LITTLE_ENDIAN
+#elif _BYTE_ORDER == _LITTLE_ENDIAN
   u_char *s = (u_char *)&x;
   return (uint32_t)((uint32_t) s[0] << 24 | (uint32_t) s[1] << 16 | (uint32_t) s[2] << 8 | (uint32_t) s[3]);
 #else

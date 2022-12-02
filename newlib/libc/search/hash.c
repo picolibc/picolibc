@@ -70,7 +70,7 @@ static int   hash_sync(const DB *, u_int);
 static int   hdestroy(HTAB *);
 static HTAB *init_hash(HTAB *, const char *, const HASHINFO *);
 static int   init_htab(HTAB *, int);
-#if (BYTE_ORDER == LITTLE_ENDIAN)
+#if (_BYTE_ORDER == _LITTLE_ENDIAN)
 static void  swap_header(HTAB *);
 static void  swap_header_copy(HASHHDR *, HASHHDR *);
 #endif
@@ -175,7 +175,7 @@ __hash_open (const char *file,
 			hashp->hash = __default_hash;
 
 		hdrsize = read(hashp->fp, &hashp->hdr, sizeof(HASHHDR));
-#if (BYTE_ORDER == LITTLE_ENDIAN)
+#if (_BYTE_ORDER == _LITTLE_ENDIAN)
 		swap_header(hashp);
 #endif
 		if (hdrsize == -1)
@@ -516,7 +516,7 @@ static int
 flush_meta(HTAB *hashp)
 {
 	HASHHDR *whdrp;
-#if (BYTE_ORDER == LITTLE_ENDIAN)
+#if (_BYTE_ORDER == _LITTLE_ENDIAN)
 	HASHHDR whdr;
 #endif
 	int fp, i, wsize;
@@ -529,7 +529,7 @@ flush_meta(HTAB *hashp)
 
 	fp = hashp->fp;
 	whdrp = &hashp->hdr;
-#if (BYTE_ORDER == LITTLE_ENDIAN)
+#if (_BYTE_ORDER == _LITTLE_ENDIAN)
 	whdrp = &whdr;
 	swap_header_copy(&hashp->hdr, whdrp);
 #endif
@@ -953,7 +953,7 @@ alloc_segs(HTAB *hashp, int nsegs)
 	return (0);
 }
 
-#if (BYTE_ORDER == LITTLE_ENDIAN)
+#if (_BYTE_ORDER == _LITTLE_ENDIAN)
 /*
  * Hashp->hdr needs to be byteswapped.
  */
