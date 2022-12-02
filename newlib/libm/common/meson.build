@@ -151,6 +151,7 @@ lsrcs_common = [
   'frexpl.c',
   'isinfl.c',
   'isnanl.c',
+  'math_errl_divzerol.c',
   'math_errl_invalidl.c',
   'math_errl_oflowl.c',
   'math_errl_uflowl.c',
