@@ -163,11 +163,20 @@ internal_getlogin (cygheap_user &user)
 
       user.set_name (pwd->pw_name);
       myself->uid = pwd->pw_uid;
-      myself->gid = pwd->pw_gid;
+      myself->gid = pgrp ? pgrp->gr_gid : pwd->pw_gid;
+
       /* If the primary group in the passwd DB is different from the primary
-	 group in the user token, we have to find the SID of that group and
-	 try to override the token primary group. */
-      if (!pgrp || myself->gid != pgrp->gr_gid)
+	 group in the user token, and if the primary group is the default
+	 group of a local user ("None", localized), we have to find the SID
+	 of that group and try to override the token primary group.  Also
+	 makes sure we're not on a domain controller, where account_sid ()
+	 == primary_sid (). */
+      gsid = cygheap->dom.account_sid ();
+      gsid.append (DOMAIN_GROUP_RID_USERS);
+      if (!pgrp
+	  || (myself->gid != pgrp->gr_gid
+	      && cygheap->dom.account_sid () != cygheap->dom.primary_sid ()
+	      && RtlEqualSid (gsid, user.groups.pgsid)))
 	{
 	  if (gsid.getfromgr (grp = internal_getgrgid (pwd->pw_gid, &cldap)))
 	    {
