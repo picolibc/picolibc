@@ -215,4 +215,49 @@ struct Double __log__D(double);
 long double __p1evll(long double, const long double *, int);
 long double __polevll(long double, const long double *, int);
 
+#if LDBL_MANT_DIG == 64
+
+static ALWAYS_INLINE int
+issignalingl(long double x)
+{
+    u_int32_t high;
+    if (!isnanl(x))
+        return 0;
+    GET_LDOUBLE_MSW(high, x);
+    return (high & 0x40000000U) == 0;
+}
+
+static ALWAYS_INLINE int
+__signbitl(long double x)
+{
+    int exp;
+    GET_LDOUBLE_EXP(exp, x);
+    return (exp & 0x8000) != 0;
+}
+
+#elif LDBL_MANT_DIG == 113
+
+static ALWAYS_INLINE int
+issignalingl(long double x)
+{
+    u_int64_t high;
+    if (!isnanl(x))
+        return 0;
+    GET_LDOUBLE_MSW64(high, x);
+    if (!IEEE_754_2008_SNAN)
+        return (high & 0x0000800000000000ULL) != 0;
+    else
+        return (high & 0x0000800000000000ULL) == 0;
+}
+
+static ALWAYS_INLINE int
+__signbitl(long double x)
+{
+    int64_t high;
+    GET_LDOUBLE_MSW64(high, x);
+    return high < 0;
+}
+
+#endif
+
 #endif /* _MATH_PRIVATE_OPENBSD_H_ */
