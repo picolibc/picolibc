@@ -62,6 +62,7 @@ srcs_ld_arch = [
     's_exp2l.c',
     's_expm1l.c',
     's_floorl.c',
+    's_fpclassifyl.c',
     's_log1pl.c',
     's_modfl.c',
     's_nanl.c',

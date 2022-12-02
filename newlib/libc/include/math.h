@@ -254,6 +254,7 @@ extern int __signbitd (double);
 extern int __finite (double);
 extern int __finitef (float);
 #if defined(_HAVE_LONG_DOUBLE)
+extern int __fpclassifyl (long double);
 extern int __finitel (long double);
 #endif
 
@@ -282,11 +283,22 @@ extern int __finitel (long double);
   #define issubnormal(__x) (__builtin_issubnormal (__x))
   #define iszero(__x) (__builtin_iszero(__x))
 #else
+#if defined(_HAVE_LONG_DOUBLE)
+  #define fpclassify(__x)                                                 \
+      ((sizeof(__x) == sizeof(float)  ? __fpclassifyf(__x)                \
+        : (sizeof(__x) == sizeof(double)) ?  __fpclassifyd((double) (__x)) \
+        : __fpclassifyl((long double) (__x))))
+  #define isfinite(__x)                                           \
+      ((sizeof(__x) == sizeof(float)) ? __finitef(__x)            \
+       : (sizeof(__x) == sizeof(double)) ? __finite((double) (__x))     \
+       : __finitel((long double) (__x)))
+#else
   #define fpclassify(__x) \
 	  ((sizeof(__x) == sizeof(float))  ? __fpclassifyf(__x) : \
 	  __fpclassifyd((double) (__x)))
   #define isfinite(__x) ((sizeof(__x) == sizeof(float)) ?         \
                          __finitef(__x) : __finite((double) __x))
+#endif
   #define isinf(__x) (fpclassify(__x) == FP_INFINITE)
   #define isnan(__x) (fpclassify(__x) == FP_NAN)
   #define isnormal(__x) (fpclassify(__x) == FP_NORMAL)
@@ -559,6 +571,7 @@ extern long double log2l (long double);
 extern long double scalbnl (long double, int);
 extern long double exp2l (long double);
 extern long double scalblnl (long double, long);
+extern long double scalbl (long double, long double);
 extern long double tgammal (long double);
 extern long double nearbyintl (long double);
 extern long double roundl (long double);
@@ -574,6 +587,7 @@ extern long double acoshl (long double);
 extern long double atanhl (long double);
 extern long double remainderl (long double, long double);
 extern long double lgammal (long double);
+extern long double gammal (long double);
 extern long double erfl (long double);
 extern long double erfcl (long double);
 extern long double j0l(long double);
@@ -656,6 +670,7 @@ extern int signgam;
 #define M_LN2		_M_LN2
 #define M_LN10		2.30258509299404568402
 #define M_PI		3.14159265358979323846
+#define _M_PI_L         3.141592653589793238462643383279502884L
 #define M_PI_2		1.57079632679489661923
 #define _M_PI_2		1.57079632679489661923
 #define _M_PI_2L	1.5707963267948966192313216916397514420985846996875529104874722961539082031431L

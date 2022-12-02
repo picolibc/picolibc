@@ -25,4 +25,19 @@ finitel (long double x)
   return __builtin_isfinite (x);
 #endif
 }
+
+#if defined(_HAVE_ALIAS_ATTRIBUTE)
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(finitel, __finitel);
+#else
+
+int __finitel(long double x)
+{
+    return finitel(x);
+}
+
+#endif
+
 #endif
