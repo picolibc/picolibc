@@ -1855,7 +1855,6 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
   gid_t gid = ILLEGAL_GID;
   bool is_domain_account = true;
   PCWSTR domain = NULL;
-  bool is_current_user = false;
   char *shell = NULL;
   char *home = NULL;
   char *gecos = NULL;
@@ -2314,18 +2313,9 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	    uid = posix_offset + sid_sub_auth_rid (sid);
 	  if (!is_group () && acc_type == SidTypeUser)
 	    {
-	      /* Default primary group.  If the sid is the current user, fetch
-		 the default group from the current user token, otherwise make
-		 the educated guess that the user is in group "Domain Users"
-		 or "None". */
-	      if (sid == cygheap->user.sid ())
-		{
-		  is_current_user = true;
-		  gid = posix_offset
-			+ sid_sub_auth_rid (cygheap->user.groups.pgsid);
-		}
-	      else
-		gid = posix_offset + DOMAIN_GROUP_RID_USERS;
+	      /* Default primary group.  Make the educated guess that the user
+		 is in group "Domain Users" or "None". */
+	      gid = posix_offset + DOMAIN_GROUP_RID_USERS;
 	    }
 
 	  if (is_domain_account)
@@ -2336,11 +2326,9 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	      /* On AD machines, use LDAP to fetch domain account infos. */
 	      if (cygheap->dom.primary_dns_name ())
 		{
-		  /* For the current user we got correctly cased username and
-		     the primary group via process token.  For any other user
-		     we fetch it from AD and overwrite it. */
-		  if (!is_current_user
-		      && cldap->fetch_ad_account (sid, false, domain))
+		  /* Fetch primary group from AD and overwrite the one we
+		     just guessed above. */
+		  if (cldap->fetch_ad_account (sid, false, domain))
 		    {
 		      if ((val = cldap->get_account_name ()))
 			wcscpy (name, val);
