@@ -212,7 +212,7 @@ void __scan_nan(uint32_t *__words, int __num_words, const char *__s);
  */
 double __exp__D(double, double);
 struct Double __log__D(double);
-long double __p1evll(long double, void *, int);
-long double __polevll(long double, void *, int);
+long double __p1evll(long double, const long double *, int);
+long double __polevll(long double, const long double *, int);
 
 #endif /* _MATH_PRIVATE_OPENBSD_H_ */

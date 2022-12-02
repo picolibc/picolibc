@@ -66,12 +66,10 @@
  *  P[0] x^n  +  P[1] x^(n-1)  +  ...  +  P[n]
  */
 long double
-__polevll(long double x, void *PP, int n)
+__polevll(long double x, const long double *P, int n)
 {
 	long double y;
-	long double *P;
 
-	P = (long double *)PP;
 	y = *P++;
 	do {
 		y = y * x + *P++;
@@ -85,12 +83,10 @@ __polevll(long double x, void *PP, int n)
  *  x^n  +  P[0] x^(n-1)  +  P[1] x^(n-2)  +  ...  +  P[n]
  */
 long double
-__p1evll(long double x, void *PP, int n)
+__p1evll(long double x, const long double *P, int n)
 {
 	long double y;
-	long double *P;
 
-	P = (long double *)PP;
 	n -= 1;
 	y = x + *P++;
 	do {
