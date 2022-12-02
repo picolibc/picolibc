@@ -26,6 +26,52 @@
  * $FreeBSD$
  */
 
+#if __LDBL_MANT_DIG__ == 113
+
+union IEEEl2bits {
+	long double	e;
+	struct {
+#if __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__
+		uint64_t	sign	:1;
+		uint64_t	exp	:15;
+		uint64_t	manh	:48;
+		uint64_t	manl	:64;
+#else
+		uint64_t	manl	:64;
+		uint64_t	manh	:48;
+		uint64_t	exp	:15;
+		uint64_t	sign	:1;
+#endif
+	} bits;
+	struct {
+#if __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__
+		uint64_t	expsign	:16;
+		uint64_t	manh	:48;
+		uint64_t	manl	:64;
+#else
+		uint64_t	manl	:64;
+		uint64_t	manh	:48;
+		uint64_t	expsign	:16;
+#endif
+	} xbits;
+};
+
+#define	LDBL_NBIT	0
+#define	LDBL_IMPLICIT_NBIT
+#define	mask_nbit_l(u)	((void)0)
+
+#define	LDBL_MANH_SIZE	48
+#define	LDBL_MANL_SIZE	64
+
+#define	LDBL_TO_ARRAY32(u, a) do {			\
+	(a)[0] = (uint32_t)(u).bits.manl;		\
+	(a)[1] = (uint32_t)((u).bits.manl >> 32);	\
+	(a)[2] = (uint32_t)(u).bits.manh;		\
+	(a)[3] = (uint32_t)((u).bits.manh >> 32);	\
+} while(0)
+
+#else
+
 union IEEEl2bits {
 	long double	e;
 	struct {
@@ -47,3 +93,5 @@ union IEEEl2bits {
 	(a)[0] = (uint32_t)(u).bits.manl;		\
 	(a)[1] = (uint32_t)(u).bits.manh;		\
 } while(0)
+
+#endif
