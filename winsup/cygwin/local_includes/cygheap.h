@@ -393,13 +393,11 @@ public:
     { return rfc2307_domain_buf ?: NULL; }
 };
 
+#define NSS_SEPARATOR_STRING	L"+"
+#define NSS_SEPARATOR_CHAR	(NSS_SEPARATOR_STRING[0])
+
 class cygheap_pwdgrp
 {
-  enum nss_pfx_t {
-    NSS_PFX_AUTO = 0,
-    NSS_PFX_PRIMARY,
-    NSS_PFX_ALWAYS
-  };
 public:
   enum nss_scheme_method {
     NSS_SCHEME_FALLBACK = 0,
@@ -418,8 +416,6 @@ private:
   bool		nss_inited;
   uint32_t	pwd_src;
   uint32_t	grp_src;
-  nss_pfx_t	prefix;
-  WCHAR		separator[2];
   bool		caching;
 
 #define NSS_SCHEME_MAX	4
@@ -458,10 +454,6 @@ public:
   inline bool nss_grp_files () const { return !!(grp_src & NSS_SRC_FILES); }
   inline bool nss_grp_db () const { return !!(grp_src & NSS_SRC_DB); }
   inline int  nss_grp_src () const { return grp_src; } /* CW_GETNSS_GRP_SRC */
-  inline bool nss_prefix_auto () const { return prefix == NSS_PFX_AUTO; }
-  inline bool nss_prefix_primary () const { return prefix == NSS_PFX_PRIMARY; }
-  inline bool nss_prefix_always () const { return prefix == NSS_PFX_ALWAYS; }
-  inline PCWSTR nss_separator () const { return separator; }
   inline bool nss_cygserver_caching () const { return caching; }
   inline void nss_disable_cygserver_caching () { caching = false; }
 

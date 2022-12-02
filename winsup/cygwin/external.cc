@@ -604,7 +604,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	break;
 
       case CW_GETNSSSEP:
-	res = (uintptr_t) cygheap->pg.nss_separator ();
+	res = (uintptr_t) NSS_SEPARATOR_STRING;
 	break;
 
       case CW_GETNSS_PWD_SRC:
