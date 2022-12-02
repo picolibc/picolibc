@@ -32,22 +32,21 @@ User's Guide.
 
 <para>Starting December 2022, the old developer snapshots have been
 deprecated by regular, automated test releases.  See the next FAQ entry
-<ulink url="https://cygwin.com/faq/faq-api.html#faq.api.testrels"/>)
+<xref linkend="faq.api.testrels"></xref>
 </para>
 </answer></qandaentry>
 
-<qandaentry id="faq.api.testrels">
+<qandaentry id="faq.api.testrels" xreflabel="Test Releases">
 <question><para>Are test releases for the Cygwin library available?</para></question>
 <answer>
 
 <para>Yes.  Starting December 2022, regular, automated test releases
 are created whenever a considerable patch is pushed to the Cygwin git
-repo at
-<ulink url="https://cygwin.com/git/newlib-cygwin.git"/>.
+repo at <ulink url="https://cygwin.com/git/newlib-cygwin.git"/>.
 You can download the cygwin package test releases just like any other
 test release for any Cgywin package using the Cygwin Setup program.
 For more info, see
-<ulink url="https://cygwin.com/faq/faq-setup.html#faq.setup.testrels"/>
+<xref linkend="faq.setup.testrels"></xref>.
 </para>
 </answer></qandaentry>
 

@@ -23,7 +23,7 @@ is available on using the Cygwin Setup program.
 <para>If you do it any other way, you're on your own!
 If something doesn't work right for you, and it's not covered here or in
 the latest Cygwin test package (see
-<ulink url="https://cygwin.com/faq/faq-api.html#faq.api.testrels"/>),
+<xref linkend="faq.setup.testrels"></xref>),
 then by all means report it to the mailing list.
 </para>
 <para>For a searchable list of packages that can be installed with Cygwin,
@@ -183,7 +183,7 @@ and that installing the older version will not help improve Cygwin.
 </para>
 </answer></qandaentry>
 
-<qandaentry id="faq.setup.install-security">
+<qandaentry id="faq.setup.install-security" xreflable="Secure Installation">
 <question><para>How does Cygwin secure the installation and update process?</para></question>
 <answer>
 
@@ -292,7 +292,7 @@ We also provide automatic mechanisms
 do not want to perform the signature checking on the Cygwin Setup program itself.
 Once the correct Setup program is running, it will counter other attacks
 as described in
-<ulink url="https://cygwin.com/faq/faq.html#faq.setup.install-security"/>.
+<xref linkend="faq.setup.install-security"></xref>.
 </para>
 </answer></qandaentry>
 
@@ -339,12 +339,12 @@ disk if you are paranoid.
 <para>This should be safe, but only if the Cygwin Setup program is not substituted by
 something malicious.
 See also
-<ulink url="https://cygwin.com/faq/faq.html#faq.setup.install-security"/>
+<xref linkend="faq.setup.install-security"></xref>
 for a description of how the
 Cygwin project counters man-in-the-middle (MITM) attacks.
 </para>
 
-<para>See also <ulink url="https://cygwin.com/faq/faq.html#faq.using.bloda"/>
+<para>See also <xref linkend="faq.using.bloda"></xref>
 for a list of applications that have been known, at one time or another, to
 interfere with the normal functioning of Cygwin.
 </para>
@@ -627,7 +627,7 @@ directory has been stored in the registry at all.
 
 </answer></qandaentry>
 
-<qandaentry id="faq.setup.testrels">
+<qandaentry id="faq.setup.testrels" xreflabel="Install Test Releases">
 <question><para>How do I install Cygwin test releases?</para></question>
 <answer>
 

@@ -357,7 +357,7 @@ package at runtime.
 <answer>
 
 <para>Beware of using non-portable shell features in your Makefiles (see tips
-at <ulink url="https://cygwin.com/faq/faq.html#faq.using.shell-scripts"/>).
+at <xref linkend="faq.using.shell-scripts"></xref>).
 </para>
 <para>Errors of <literal>make: execvp: /bin/sh: Illegal Argument</literal> or 
 <literal>make: execvp: /bin/sh: Argument list too long</literal> are often
@@ -671,7 +671,7 @@ rewriting the runtime library in question from specs...
 </para>
 </answer></qandaentry>
 
-<qandaentry id="faq.programming.building-cygwin">
+<qandaentry id="faq.programming.building-cygwin" xreflabel="Build Cygwin">
 <question><para>How do I build Cygwin on my own?</para></question>
 <answer>
 
@@ -766,12 +766,11 @@ operation e.g. when checking a pointer is valid)
 <para>
 It is also a good idea to use the latest code in case the bug has been fixed,
 so we recommend trying the latest cygwin test release (see
-<ulink url="https://cygwin.com/faq/faq-setup.html#faq.setup.testrels"/>)
-or building the DLL from git.
+<xref linkend="faq.setup.testrels"></xref>) or building the DLL from git.
 </para>
 
 <para>To build a debugging version of the Cygwin DLL, you will need to follow
-the instructions at <ulink url="https://cygwin.com/faq/faq.html#faq.programming.building-cygwin"/>.
+the instructions at <xref linkend="faq.programming.building-cygwin"></xref>.
 </para>
 
 <para>
