@@ -54,3 +54,6 @@ Bug Fixes
   process of a non-Cygwin process will have reverted its primary group
   to the default primary group erroneously.
   Addresses: https://cygwin.com/pipermail/cygwin-apps/2022-September/042245.html
+
+- Fix parsing Windows command line when non-ASCII chars are in the input.
+  Addresses: https://cygwin.com/pipermail/cygwin/2022-November/252481.html
