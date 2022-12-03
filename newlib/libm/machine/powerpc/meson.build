@@ -32,9 +32,19 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+
 srcs_libm_machine_real = [
   'fenv.c',
 ]
+
+srcs_libm_machine_complex128 = [
+  'complex128.c'
+]
+
+if cc.has_function('__mulkc3_hw', args: core_c_args + ['-lgcc'])
+  srcs_libm_machine_real += srcs_libm_machine_complex128
+endif
+
 srcs_libm_machine = srcs_libm_machine_real + [
   'feclearexcept.c',
   'fedisableexcept.c',
