@@ -24,9 +24,7 @@
  */
 
 
-#if LDBL_MAX_EXP != 0x4000
-#error "Unsupported long double format"
-#endif
+#if LDBL_MAX_EXP == 0x4000
 
 static const long double
 huge = 0x1p16000L,
@@ -59,6 +57,28 @@ scalbnl (long double x, int n)
 	u.bits.exp = k;
         return u.e*0x1p-128L;
 }
+
+#else
+
+long double
+scalbnl (long double x, int n)
+{
+    long double factor = 2.0L;
+
+    if (n < 0) {
+        factor = 0.5;
+        n = -n;
+    }
+
+    while (n != 0) {
+        if (n & 1)
+            x *= factor;
+        factor *= factor;
+        n >>= 1;
+    }
+    return x;
+}
+#endif
 
 #ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(scalbnl, ldexpl);

@@ -530,8 +530,8 @@ extern float hypotf (float, float);
 extern long double hypotl (long double, long double);
 extern long double sqrtl (long double);
 extern long double frexpl (long double, int *);
-
-/* Other long double precision functions.  */
+extern long double scalbnl (long double, int);
+extern long double scalblnl (long double, long);
 extern long double rintl (long double);
 extern long int lrintl (long double);
 extern long long int llrintl (long double);
@@ -568,9 +568,7 @@ extern double nexttoward (double, long double);
 extern long double nexttowardl (long double, long double);
 extern long double logbl (long double);
 extern long double log2l (long double);
-extern long double scalbnl (long double, int);
 extern long double exp2l (long double);
-extern long double scalblnl (long double, long);
 extern long double scalbl (long double, long double);
 extern long double tgammal (long double);
 extern long double nearbyintl (long double);
