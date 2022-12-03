@@ -624,6 +624,8 @@ FLOAT_T makemathname(test_scalbn_tiny)(void) { return makemathname(scalbn)(makem
 #define FE_UNDERFLOW 0
 #endif
 
+#define MY_EXCEPT (FE_DIVBYZERO|FE_INEXACT|FE_INVALID|FE_OVERFLOW|FE_UNDERFLOW)
+
 #ifdef __i386__
 /*
  * i386 ABI returns floats in the 8087 registers, which convert sNAN
@@ -1237,7 +1239,7 @@ makemathname(run_tests)(void) {
 		feclearexcept(FE_ALL_EXCEPT);
 		v = makemathname(tests)[t].func();
 		err = errno;
-		except = fetestexcept(FE_ALL_EXCEPT);
+		except = fetestexcept(MY_EXCEPT);
 		if (!makemathname(is_equal)(v, makemathname(tests)[t].value))
 		{
                         PRINT;
@@ -1250,7 +1252,7 @@ makemathname(run_tests)(void) {
 		}
 		if (math_errhandling & EXCEPTION_TEST) {
                     int expect_except = makemathname(tests)[t].except;
-                    int mask = FE_ALL_EXCEPT;
+                    int mask = MY_EXCEPT;
 
                     /* underflow can be set for inexact operations */
                     if (expect_except & FE_INEXACT)
@@ -1292,7 +1294,7 @@ makemathname(run_tests)(void) {
 		feclearexcept(FE_ALL_EXCEPT);
 		iv = makemathname(itests)[t].func();
 		err = errno;
-		except = fetestexcept(FE_ALL_EXCEPT);
+		except = fetestexcept(MY_EXCEPT);
 		if (iv != makemathname(itests)[t].value)
 		{
                         IPRINT;
@@ -1301,7 +1303,7 @@ makemathname(run_tests)(void) {
 		}
 		if (math_errhandling & EXCEPTION_TEST) {
                         int expect_except = makemathname(itests)[t].except;
-                        int mask = FE_ALL_EXCEPT;
+                        int mask = MY_EXCEPT;
 
                         /* underflow can be set for inexact operations */
                         if (expect_except & FE_INEXACT)
