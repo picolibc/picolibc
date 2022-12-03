@@ -45,3 +45,12 @@ Bug Fixes
 
 - Make serial ioctl(TIOCMBIS/TIOCMBIC) work on USB CDC devices.
   Addresses: https://cygwin.com/pipermail/cygwin/2022-November/252443.html
+
+- Fix a SEGV when running a process with changed primary group.
+  Addresses: https://cygwin.com/pipermail/cygwin-apps/2022-September/042245.html
+
+- Fix primary group handling when running a process tree containing
+  non-Cygwin processes and with changed primary group.  The Cygwin child
+  process of a non-Cygwin process will have reverted its primary group
+  to the default primary group erroneously.
+  Addresses: https://cygwin.com/pipermail/cygwin-apps/2022-September/042245.html
