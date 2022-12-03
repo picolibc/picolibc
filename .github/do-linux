@@ -21,6 +21,8 @@ HERE=`dirname "$0"`
 "$HERE"/do-avr-build avr "$@"
 "$HERE"/do-build powerpc64 "$@"
 "$HERE"/do-build powerpc64le "$@"
+"$HERE"/do-test power9 "$@"
+"$HERE"/do-test power9-fp128 "$@"
 "$HERE"/do-test riscv "$@"
 "$HERE"/do-test rv32imac "$@"
 "$HERE"/do-test clang-riscv "$@"
