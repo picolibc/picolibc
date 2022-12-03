@@ -71,6 +71,7 @@ aslongdouble(_u128 i)
 #  define FLOAT_MAX_EXP         __DBL_MAX_EXP__
 #  define FLOAT_MIN_EXP         __DBL_MIN_EXP__
 #  define ASFLOAT(x)            _asdouble(x)
+#  define TOFLOAT(x)            ((double) (x))
 # elif defined(STRTOLD)
 #  define CHECK_LONG()          0
 #  define CHECK_LONG_LONG()     1
@@ -79,6 +80,7 @@ aslongdouble(_u128 i)
 #  define FLOAT_MAX_EXP         __LDBL_MAX_EXP__
 #  define FLOAT_MIN_EXP         __LDBL_MIN_EXP__
 #  define ASFLOAT(x)            aslongdouble(x)
+#  define TOFLOAT(x)            _u128_to_ld(x)
 typedef long double FLOAT;
 typedef _u128 UINTFLOAT;
 #define UINTFLOAT_128
@@ -91,6 +93,7 @@ typedef _u128 UINTFLOAT;
 #  define FLOAT_MAX_EXP         __FLT_MAX_EXP__
 #  define FLOAT_MIN_EXP         __FLT_MIN_EXP__
 #  define ASFLOAT(x)            _asfloat(x)
+#  define TOFLOAT(x)            ((float) (x))
 # endif
 
 #define FLT_STREAM const char
@@ -429,6 +432,7 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
             if (exp > FLOAT_MAX_EXP) {
                 flt = (FLOAT) INFINITY;
             } else {
+#if !defined(UINTFLOAT_128) || __LDBL_IS_IEC_60559__ != 0
                 if (UF_LT(uint, UF_LSHIFT_64(1, (FLOAT_MANT_DIG-1)))) {
                     exp = 0;
                 } else {
@@ -448,6 +452,9 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
                 }
                 uint = UF_OR(uint, UF_LSHIFT_64(exp, EXP_SHIFT));
                 flt = ASFLOAT(uint);
+#else /* !defined(UINTFLOAT_128) || __LDBL_IS_IEC_60559__ != 0 */
+                flt = scalbnl(TOFLOAT(uint), exp - (FLOAT_MANT_DIG-1));
+#endif
             }
         }
         else
