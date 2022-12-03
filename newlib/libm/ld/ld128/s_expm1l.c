@@ -112,7 +112,7 @@ expm1l(long double x)
 	    return x;
 	}
       /* NaN. No invalid exception. */
-      return x;
+      return x + x;
     }
 
   /* expm1(+- 0) = +- 0.  */
@@ -121,11 +121,11 @@ expm1l(long double x)
 
   /* Overflow.  */
   if (x > maxlog)
-      return (big * big);
+      return __math_oflowl(0);
 
   /* Minimum value.  */
   if (x < minarg)
-    return (4.0L/big - 1.0L);
+      return __math_inexactl(-1.0L);
 
   /* Express x = ln 2 (k + remainder), remainder not exceeding 1/2. */
   xx = C1 + C2;			/* ln 2. */

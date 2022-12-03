@@ -768,7 +768,7 @@ lgammal_r(long double x, int *signgamp)
     {
       if (signbit (x))
 	*signgamp = -1;
-      return one / fabsl (x);
+      return __math_divzerol(0);
     }
 
   if (x < 0.0L)
@@ -777,7 +777,7 @@ lgammal_r(long double x, int *signgamp)
       q = -x;
       p = floorl (q);
       if (p == q)
-	return (one / (p - p));
+        return __math_divzerol(0);
       i = p;
       if ((i & 1) == 0)
 	*signgamp = -1;
@@ -791,7 +791,7 @@ lgammal_r(long double x, int *signgamp)
 	}
       z = q * sinl (PIL * z);
       if (z == 0.0L)
-	return (*signgamp * huge * huge);
+          return __math_oflowl(*signgamp < 0);
       w = lgammal_r (q, &discard);
       z = logl (PIL / z) - w;
       return (z);
@@ -1023,7 +1023,7 @@ lgammal_r(long double x, int *signgamp)
     }
 
   if (x > MAXLGM)
-    return (*signgamp * huge * huge);
+    return __math_oflowl(*signgamp < 0);
 
   q = ls2pi - x;
   q = (x - 0.5L) * logl (x) + q;

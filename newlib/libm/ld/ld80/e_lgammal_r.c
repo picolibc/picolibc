@@ -278,7 +278,7 @@ lgammal_r(long double x, int *signgamp)
     {
       if (se & 0x8000)
 	*signgamp = -1;
-      return one / fabsl (x);
+      return __math_divzerol(0);
     }
 
   ix = (ix << 16) | (i0 >> 16);
@@ -301,7 +301,7 @@ lgammal_r(long double x, int *signgamp)
     {
       t = sin_pi (x);
       if (t == zero)
-	return one / fabsl (t);	/* -integer */
+          return __math_divzerol(0);	/* -integer */
       nadj = logl (pi / fabsl (t * x));
       if (t < zero)
 	*signgamp = -1;
@@ -416,7 +416,7 @@ lgammal_r(long double x, int *signgamp)
     }
   else
     /* 2**66 <= x <= inf */
-    r = x * (logl (x) - one);
+    r = check_oflowl(x * (logl (x) - one));
   if (se & 0x8000)
     r = nadj - r;
   return r;

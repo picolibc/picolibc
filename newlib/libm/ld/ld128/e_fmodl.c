@@ -32,10 +32,15 @@ fmodl(long double x, long double y)
 	hx ^=sx;				/* |x| */
 	hy &= 0x7fffffffffffffffLL;		/* |y| */
 
-    /* purge off exception values */
-	if((hy|ly)==0||(hx>=0x7fff000000000000LL)|| /* y=0,or x not finite */
-	  ((hy|((ly|-ly)>>63))>0x7fff000000000000LL))	/* or y is NaN */
-	    return (x*y)/(x*y);
+        if (isnanl(x) || isnanl(y))
+            return x + y;
+
+        if (isinfl(x))
+            return __math_invalidl(x);
+
+        if (y == 0.0L)
+            return __math_invalidl(y);
+
 	if(hx<=hy) {
 	    if((hx<hy)||(lx<ly)) return x;	/* |x|<|y| return x */
 	    if(lx==ly)

@@ -124,14 +124,14 @@ volatile long double z;
 int e;
 
 if( isnan(x) )
-	return(x);
+	return(x + x);
 /* Test for domain */
 if( x <= 0.0L )
 	{
 	if( x == 0.0L )
-		return (-1.0L / (x - x));
+                return __math_divzerol(1);
 	else
-		return (x - x) / (x - x);
+		return __math_invalidl(x);
 	}
 if( x == (long double) INFINITY )
 	return((long double) INFINITY);

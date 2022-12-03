@@ -200,12 +200,12 @@ logl(long double x)
   /* log(0) = -infinity. */
   if ((k | u.parts32.mswlo | u.parts32.lswhi | u.parts32.lswlo) == 0)
     {
-      return -0.5L / ZERO;
+      return __math_divzerol(1);
     }
   /* log ( x < 0 ) = NaN */
   if (m & 0x80000000)
     {
-      return (x - x) / ZERO;
+      return __math_invalidl(x);
     }
   /* log (infinity or NaN) */
   if (k >= 0x7fff0000)

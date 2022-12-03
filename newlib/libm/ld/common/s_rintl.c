@@ -91,16 +91,20 @@ rintl(long double x)
  * because the only exception defined for rint() is overflow, and
  * rounding can't overflow as long as emax >= p.
  */
-#define	DECL(type, fn, rint)	\
-type				\
-fn(type x)			\
-{				\
-	type ret;		\
-	fenv_t env;		\
-				\
-	fegetenv(&env);		\
-	ret = rint(x);		\
-	fesetenv(&env);		\
-	return (ret);		\
+long double
+nearbyintl(long double x)
+{
+	long double ret;
+
+        if (isnan(x))
+            return x + x;
+#if defined(FE_INEXACT) && !defined(PICOLIBC_DOUBLE_NOEXECPT)
+	fenv_t env;
+	fegetenv(&env);
+#endif
+	ret = rintl(x);
+#if defined(FE_INEXACT) && !defined(PICOLIBC_DOUBLE_NOEXECPT)
+	fesetenv(&env);
+#endif
+	return (ret);
 }
-DECL(long double, nearbyintl, rintl)

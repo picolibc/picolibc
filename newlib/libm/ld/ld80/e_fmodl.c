@@ -60,12 +60,15 @@ fmodl(long double x, long double y)
 	uy.e = y;
 	sx = ux.bits.ext_sign;
 
-    /* purge off exception values */
-	if((uy.bits.ext_exp|uy.bits.ext_frach|uy.bits.ext_fracl)==0 || /* y=0 */
-	   (ux.bits.ext_exp == BIAS + LDBL_MAX_EXP) ||	 /* or x not finite */
-	   (uy.bits.ext_exp == BIAS + LDBL_MAX_EXP &&
-	    ((uy.bits.ext_frach&~LDBL_NBIT)|uy.bits.ext_fracl)!=0)) /* or y is NaN */
-	    return (x*y)/(x*y);
+        if (isnanl(x) || isnanl(y))
+            return x + y;
+
+        if (isinfl(x))
+            return __math_invalidl(x);
+
+        if (y == 0.0L)
+            return __math_invalidl(y);
+
 	if(ux.bits.ext_exp<=uy.bits.ext_exp) {
 	    if((ux.bits.ext_exp<uy.bits.ext_exp) ||
 	       (ux.bits.ext_frach<=uy.bits.ext_frach &&

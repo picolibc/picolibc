@@ -82,13 +82,13 @@
 /* log(1+x) =  x - .5x^2 + x^3 *  P(z)/Q(z)
  * on the domain  2^(-1/32) - 1  <=  x  <=  2^(1/32) - 1
  */
-static long double P[] = {
+static const long double P[] = {
  8.3319510773868690346226E-4L,
  4.9000050881978028599627E-1L,
  1.7500123722550302671919E0L,
  1.4000100839971580279335E0L,
 };
-static long double Q[] = {
+static const long double Q[] = {
 /* 1.0000000000000000000000E0L,*/
  5.2500282295834889175431E0L,
  8.4000598057587009834666E0L,
@@ -97,7 +97,7 @@ static long double Q[] = {
 /* A[i] = 2^(-i/32), rounded to IEEE long double precision.
  * If i is even, A[i] + B[i/2] gives additional accuracy.
  */
-static long double A[33] = {
+static const long double A[33] = {
  1.0000000000000000000000E0L,
  9.7857206208770013448287E-1L,
  9.5760328069857364691013E-1L,
@@ -132,7 +132,7 @@ static long double A[33] = {
  5.1094857432705833910408E-1L,
  5.0000000000000000000000E-1L,
 };
-static long double B[17] = {
+static const long double B[17] = {
  0.0000000000000000000000E0L,
  2.6176170809902549338711E-20L,
 -1.0126791927256478897086E-20L,
@@ -155,7 +155,7 @@ static long double B[17] = {
 /* 2^x = 1 + x P(x),
  * on the interval -1/32 <= x <= 0
  */
-static long double R[] = {
+static const long double R[] = {
  1.5089970579127659901157E-5L,
  1.5402715328927013076125E-4L,
  1.3333556028915671091390E-3L,
@@ -173,27 +173,11 @@ static long double R[] = {
 /* log2(e) - 1 */
 #define LOG2EA 0.44269504088896340735992L
 
-#define F W
-#define Fa Wa
-#define Fb Wb
-#define G W
-#define Ga Wa
-#define Gb u
-#define H W
-#define Ha Wb
-#define Hb Wb
-
 static const long double MAXLOGL = 1.1356523406294143949492E4L;
 static const long double MINLOGL = -1.13994985314888605586758E4L;
 static const long double LOGE2L = 6.9314718055994530941723E-1L;
-static volatile long double z;
-static long double w, W, Wa, Wb, ya, yb, u;
 static const long double huge = 0x1p10000L;
-#if 0 /* XXX Prevent gcc from erroneously constant folding this. */
 static const long double twom10000 = 0x1p-10000L;
-#else
-static volatile long double twom10000 = 0x1p-10000L;
-#endif
 
 static long double reducl( long double );
 static long double powil ( long double, int );
@@ -201,42 +185,79 @@ static long double powil ( long double, int );
 long double
 powl(long double x, long double y)
 {
-/* double F, Fa, Fb, G, Ga, Gb, H, Ha, Hb */
+long double w, ya, yb, z;
+long double F, Fa, Fb, G, Ga, Gb, H, Ha, Hb;
 int i, nflg, iyflg, yoddint;
 long e;
 
-if( y == 0.0L )
+if( y == 0.0L ) {
+        if (issignalingl(x))
+                return x + y;
 	return( 1.0L );
+}
 
-if( x == 1.0L )
+if( x == 1.0L ) {
+        if (issignalingl(y))
+                return x + y;
 	return( 1.0L );
+}
 
-if( isnan(x) )
+w = floorl(y);
+/* Set iyflg to 1 if y is an integer.  */
+iyflg = (w == y);
+
+/* Test for odd integer y.  */
+yoddint = 0;
+if( iyflg )
+	{
+        ya = ldexpl(y, -1);
+        yoddint = (ya != floorl(ya));
+	}
+
+if( x == 0.0L) {
+        if( y < 0 )
+                return __math_divzerol(__signbitl(x) && yoddint);
+}
+
+if( isnanl(x) )
 	return( x );
-if( isnan(y) )
+if( isnanl(y) )
 	return( y );
 
 if( y == 1.0L )
 	return( x );
 
-if( !isfinite(y) && x == -1.0L )
-	return( 1.0L );
+if( !isfinite(y) ) {
+        if (x == -1.0L)
+                return( 1.0L );
+        if (y < 0) {
+                if (fabsl(x) < 1)
+                        return( (long double)INFINITY );
+                return( 0.0L );
+        } else {
+                if (fabsl(x) < 1)
+                        return( 0.0L );
+                return( (long double)INFINITY );
+        }
+}
 
-if( y >= LDBL_MAX )
+/* y >= 2**80, infinity (x > 1) or zero (x < 1) */
+if( y >= 0x1p80L)
 	{
 	if( x > 1.0L )
-		return( (long double)INFINITY );
+		return __math_oflowl(0);
 	if( x > 0.0L && x < 1.0L )
 		return( 0.0L );
 	if( x < -1.0L )
-		return( (long double)INFINITY );
+		return __math_oflowl(1);
 	if( x > -1.0L && x < 0.0L )
-		return( 0.0L );
+		return( -0.0L );
 	}
-if( y <= -LDBL_MAX )
+/* y <= -2**80, zero (x > 1) or infinity (x < 1) */
+if( y <= -0x1p80L)
 	{
 	if( x > 1.0L )
-		return( 0.0L );
+		return __math_uflowl(0);
 	if( x > 0.0L && x < 1.0L )
 		return( (long double)INFINITY );
 	if( x < -1.0L )
@@ -251,22 +272,7 @@ if( x >= LDBL_MAX )
 	return( 0.0L );
 	}
 
-w = floorl(y);
-/* Set iyflg to 1 if y is an integer.  */
-iyflg = 0;
-if( w == y )
-	iyflg = 1;
 
-/* Test for odd integer y.  */
-yoddint = 0;
-if( iyflg )
-	{
-	ya = fabsl(y);
-	ya = floorl(0.5L * ya);
-	yb = 0.5L * fabsl(w);
-	if( ya != yb )
-		yoddint = 1;
-	}
 
 if( x <= -LDBL_MAX )
 	{
@@ -310,7 +316,7 @@ if( x <= 0.0L )
 	else
 		{
 		if( iyflg == 0 )
-			return (x - x) / (x - x); /* (x<0)**(non-int) is NaN */
+                        return __math_invalidl(x); /* (x<0)**(non-int) is NaN */
 		nflg = 1;
 		}
 	}
@@ -410,10 +416,10 @@ w = ldexpl( Ga+Ha, LNXT );
 
 /* Test the power of 2 for overflow */
 if( w > MEXP )
-	return (huge * huge);		/* overflow */
+	return __math_oflowl(0);		/* overflow */
 
 if( w < MNEXP )
-	return (twom10000 * twom10000);	/* underflow */
+	return __math_uflowl(0);	        /* underflow */
 
 e = w;
 Hb = H - Ha;
@@ -466,11 +472,13 @@ return( z );
 static long double
 reducl(long double x)
 {
-long double t;
+long double t = x;
 
-t = ldexpl( x, LNXT );
-t = floorl( t );
-t = ldexpl( t, -LNXT );
+if (t < LDBL_MAX / NXT) {
+        t = ldexpl( t, LNXT );
+        t = floorl( t );
+        t = ldexpl( t, -LNXT );
+}
 return(t);
 }
 
@@ -570,10 +578,11 @@ else
 	}
 
 if( s > MAXLOGL )
-	return (huge * huge);		/* overflow */
+	return __math_oflowl(asign < 0 && (nn & 1));		/* overflow */
 
 if( s < MINLOGL )
-	return (twom10000 * twom10000);	/* underflow */
+	return __math_uflowl(asign < 0 && (nn & 1));	/* underflow */
+
 /* Handle tiny denormal answer, but with less accuracy
  * since roundoff error in 1.0/x will be amplified.
  * The precise demarcation should be the gradual underflow threshold.

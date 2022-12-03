@@ -45,13 +45,13 @@ cosl(long double x)
 	z.e = x;
 	z.bits.sign = 0;
 
-	/* If x = +-0 or x is a subnormal number, then cos(x) = 1 */
-	if (z.bits.exp == 0)
+	/* If x = +-0, then cos(x) = 1 */
+	if (x == 0)
 		return (1.0L);
 
 	/* If x = NaN or Inf, then cos(x) = NaN. */
 	if (z.bits.exp == 32767)
-		return ((x - x) / (x - x));
+                return __math_invalidl(x);
 
 	/* Optimize the case where x is already within range. */
 	if (z.e < _M_PI_4L)

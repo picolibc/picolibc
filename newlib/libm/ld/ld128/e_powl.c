@@ -159,12 +159,18 @@ powl(long double x, long double y)
 
 
   /* y==zero: x**0 = 1 */
-  if ((iy | q.parts32.mswlo | q.parts32.lswhi | q.parts32.lswlo) == 0)
+  if ((iy | q.parts32.mswlo | q.parts32.lswhi | q.parts32.lswlo) == 0) {
+    if (issignalingl(x))
+      return x + y;
     return one;
+  }
 
   /* 1.0**y = 1; -1.0**+-Inf = 1 */
-  if (x == one)
+  if (x == one) {
+    if (issignalingl(y))
+      return x + y;
     return one;
+  }
   if (x == -1.0L && iy == 0x7fff0000
       && (q.parts32.mswlo | q.parts32.lswhi | q.parts32.lswlo) == 0)
     return one;
@@ -208,7 +214,7 @@ powl(long double x, long double y)
 	{
 	  if (((ix - 0x3fff0000) | p.parts32.mswlo | p.parts32.lswhi |
 	    p.parts32.lswlo) == 0)
-	    return y - y;	/* +-1**inf is NaN */
+            return __math_invalidl(y);	/* +-1**inf is NaN */
 	  else if (ix >= 0x3fff0000)	/* (|x|>1)**+-inf = inf,0 */
 	    return (hy >= 0) ? y : zero;
 	  else			/* (|x|<1)**-,+inf = inf,0 */
@@ -236,14 +242,18 @@ powl(long double x, long double y)
     {
       if (ix == 0x7fff0000 || ix == 0 || ix == 0x3fff0000)
 	{
-	  z = ax;		/*x is +-0,+-inf,+-1 */
+	  z = ax;		/*x is +-inf,+-1 */
 	  if (hy < 0)
-	    z = one / z;	/* z = (1/|x|) */
+            {
+              if (ix == 0)
+                  return __math_divzerol(hx < 0 && yisint == 1);
+              z = one / z;	/* z = (1/|x|) */
+            }
 	  if (hx < 0)
 	    {
 	      if (((ix - 0x3fff0000) | yisint) == 0)
 		{
-		  z = (z - z) / (z - z);	/* (-1)**non-int is NaN */
+                    z = __math_invalidl(z);	/* (-1)**non-int is NaN */
 		}
 	      else if (yisint == 1)
 		z = -z;		/* (x<0)**odd = -(|x|**odd) */
@@ -254,7 +264,7 @@ powl(long double x, long double y)
 
   /* (x<0)**(non-int) is NaN */
   if (((((u_int32_t) hx >> 31) - 1) | yisint) == 0)
-    return (x - x) / (x - x);
+    return __math_invalidl(x);
 
   /* |y| is huge.
      2^-16495 = 1/2 of smallest representable value.
@@ -265,15 +275,15 @@ powl(long double x, long double y)
       if (iy > 0x407d654b)
 	{
 	  if (ix <= 0x3ffeffff)
-	    return (hy < 0) ? huge * huge : tiny * tiny;
+	    return (hy < 0) ? __math_oflowl(0) : __math_uflowl(0);
 	  if (ix >= 0x3fff0000)
-	    return (hy > 0) ? huge * huge : tiny * tiny;
+	    return (hy > 0) ? __math_oflowl(0) : __math_uflowl(0);
 	}
       /* over/underflow if x is not close to one */
       if (ix < 0x3ffeffff)
-	return (hy < 0) ? huge * huge : tiny * tiny;
+	return (hy < 0) ? __math_oflowl(0) : __math_uflowl(0);
       if (ix > 0x3fff0000)
-	return (hy > 0) ? huge * huge : tiny * tiny;
+	return (hy > 0) ? __math_oflowl(0) : __math_uflowl(0);
     }
 
   n = 0;
@@ -377,11 +387,11 @@ powl(long double x, long double y)
       /* if z > 16384 */
       if (((j - 0x400d0000) | o.parts32.mswlo | o.parts32.lswhi |
 	o.parts32.lswlo) != 0)
-	return s * huge * huge;	/* overflow */
+	return __math_oflowl(s<0);	/* overflow */
       else
 	{
 	  if (p_l + ovt > z - p_h)
-	    return s * huge * huge;	/* overflow */
+	    return __math_oflowl(s<0);	/* overflow */
 	}
     }
   else if ((j & 0x7fffffff) >= 0x400d01b9)	/* z <= -16495 */
@@ -390,11 +400,11 @@ powl(long double x, long double y)
       if (((j - 0xc00d01bc) | o.parts32.mswlo | o.parts32.lswhi |
 	o.parts32.lswlo)
 	  != 0)
-	return s * tiny * tiny;	/* underflow */
+	return __math_uflowl(s<0);	/* underflow */
       else
 	{
 	  if (p_l <= z - p_h)
-	    return s * tiny * tiny;	/* underflow */
+	    return __math_uflowl(s<0);	/* underflow */
 	}
     }
   /* compute 2**(p_h+p_l) */

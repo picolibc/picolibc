@@ -35,7 +35,7 @@ acoshl(long double x)
 	u_int32_t se,i0,i1;
 	GET_LDOUBLE_WORDS(se,i0,i1,x);
 	if(se<0x3fff || se & 0x8000) {	/* x < 1 */
-	    return (x-x)/(x-x);
+	    return __math_invalidl(x);
 	} else if(se >=0x401d) {	/* x > 2**30 */
 	    if(se >=0x7fff) {		/* x is inf of NaN */
 		return x+x;

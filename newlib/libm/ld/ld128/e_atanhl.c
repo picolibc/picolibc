@@ -48,9 +48,9 @@ atanhl(long double x)
 	if (ix >= 0x3fff0000) /* |x| >= 1.0 or infinity or NaN */
 	  {
 	    if (u.value == one)
-	      return x/zero;
+                return __math_divzerol(ix != jx);
 	    else
-	      return (x-x)/(x-x);
+                return __math_invalidl(x);
 	  }
 	if(ix<0x3fc60000 && (huge+x)>zero) return x;	/* x < 2^-57 */
 

@@ -26,58 +26,52 @@
 
 #if LDBL_MAX_EXP == 0x4000
 
-static const long double
-huge = 0x1p16000L,
-tiny = 0x1p-16000L;
-
 long double
 scalbnl (long double x, int n)
 {
 	union IEEEl2bits u;
-	int k;
+	__int32_t k;
 	u.e = x;
         k = u.bits.exp;				/* extract exponent */
         if (k==0) {				/* 0 or subnormal x */
             if ((u.bits.manh|u.bits.manl)==0) return x;	/* +-0 */
 	    u.e *= 0x1p+128L;
 	    k = u.bits.exp - 128;
-            if (n< -50000) return tiny*x; 	/*underflow*/
+            if (n< -50000) return __math_uflowl(u.bits.sign);
 	    }
         if (k==0x7fff) return x+x;		/* NaN or Inf */
+#if __SIZEOF_INT__ > 2
+        if (n > 50000) 	/* in case integer overflow in n+k */
+            return __math_oflowl(u.bits.sign);	/*overflow*/
+#endif
         k = k+n;
-        if (k >= 0x7fff) return huge*copysignl(huge,x); /* overflow  */
+        if (k >= 0x7fff) return __math_oflowl(u.bits.sign); /* overflow  */
         if (k > 0) 				/* normal result */
 	    {u.bits.exp = k; return u.e;}
         if (k <= -128) {
             if (n > 50000) 	/* in case integer overflow in n+k */
-		return huge*copysignl(huge,x);	/*overflow*/
-	    else return tiny*copysignl(tiny,x); 	/*underflow*/
+		return __math_oflowl(u.bits.sign);	/*overflow*/
+	    else return __math_uflowl(u.bits.sign); 	/*underflow*/
         }
 	k += 128;				/* subnormal result */
 	u.bits.exp = k;
         return u.e*0x1p-128L;
 }
 
-#else
+#elif defined(_DOUBLE_DOUBLE_FLOAT)
 
 long double
-scalbnl (long double x, int n)
+scalbnl(long double x, int n)
 {
-    long double factor = 2.0L;
+	union IEEEl2bits u;
+        double dh, dl;
 
-    if (n < 0) {
-        factor = 0.5;
-        n = -n;
-    }
-
-    while (n != 0) {
-        if (n & 1)
-            x *= factor;
-        factor *= factor;
-        n >>= 1;
-    }
-    return x;
+        u.e = x;
+        dh = scalbn(u.dbits.dh, n);
+        dl = scalbn(u.dbits.dl, n);
+        return (long double) dh + (long double) dl;
 }
+
 #endif
 
 #ifdef _HAVE_ALIAS_ATTRIBUTE

@@ -64,9 +64,11 @@ hypotl(long double x, long double y)
 	       u_int64_t low;
 	       w = a+b;			/* for sNaN */
 	       GET_LDOUBLE_LSW64(low,a);
-	       if(((ha&0xffffffffffffLL)|low)==0) w = a;
+	       if(((ha&0xffffffffffffLL)|low)==0 && !issignalingl(b))
+                   w = a;
 	       GET_LDOUBLE_LSW64(low,b);
-	       if(((hb^0x7fff000000000000LL)|low)==0) w = b;
+	       if(((hb^0x7fff000000000000LL)|low)==0 && !issignalingl(a))
+                   w = b;
 	       return w;
 	   }
 	   /* scale a and b by 2**-9600 */
@@ -115,6 +117,6 @@ hypotl(long double x, long double y)
 	    t1 = 1.0L;
 	    GET_LDOUBLE_MSW64(high,t1);
 	    SET_LDOUBLE_MSW64(t1,high+(k<<48));
-	    return t1*w;
+	    return check_oflowl(t1*w);
 	} else return w;
 }

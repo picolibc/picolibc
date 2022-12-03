@@ -83,7 +83,6 @@ C1 = 6.93145751953125E-1L,
 C2 = 1.428606820309417232121458176568075500134E-6L,
 /* ln 2^-65 */
 minarg = -4.5054566736396445112120088E1L;
-static const long double huge = 0x1p10000L;
 
 long double
 expm1l(long double x)
@@ -91,16 +90,25 @@ expm1l(long double x)
 long double px, qx, xx;
 int k;
 
+if( isnan(x) )
+  return(x + x);
+
 /* Overflow.  */
-if (x > MAXLOGL)
-  return (huge*huge);	/* overflow */
+if (x > MAXLOGL) {
+  if (isinf(x))
+    return x;
+  return __math_oflowl(0);
+}
 
 if (x == 0.0l)
   return x;
 
 /* Minimum value.  */
-if (x < minarg)
-  return -1.0L;
+if (x < minarg) {
+  if (isinf(x))
+    return -1.0L;
+  return __LDBL_DENORM_MIN__ - 1.0L;
+}
 
 xx = C1 + C2;
 

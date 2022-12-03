@@ -35,7 +35,7 @@
 
 #include "math_ld.h"
 
-#if LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113
+#ifdef _NEED_FLOAT_HUGE
 
 #include "common/s_scalbl.c"
 

@@ -75,5 +75,5 @@ coshl(long double x)
 	}
 
     /* |x| >= log(2*maxdouble), cosh(x) overflow */
-	return huge*huge;
+	return __math_oflowl(0);
 }

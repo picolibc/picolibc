@@ -52,7 +52,7 @@ acosl(long double x)
 		if (expsign>0) return 0.0L;	/* acos(1) = 0  */
 		else return pi+2.0L*pio2_lo;	/* acos(-1)= pi */
 	    }
-	    return (x-x)/(x-x);		/* acos(|x|>1) is NaN */
+	    return __math_invalidl(x);		/* acos(|x|>1) is NaN */
 	}
 	if(expt<BIAS-1) {	/* |x| < 0.5 */
 	    if(expt<ACOS_CONST) return pio2_hi+pio2_lo;/*x tiny: acosl=pi/2*/

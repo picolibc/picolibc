@@ -59,7 +59,7 @@ tanl(long double x)
 
 	/* If x = NaN or Inf, then tan(x) = NaN. */
 	if (z.bits.exp == 32767)
-		return ((x - x) / (x - x));
+            return __math_invalidl(x);
 
 	/* Optimize the case where x is already within range. */
 	if (z.e < _M_PI_4L) {

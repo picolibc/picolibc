@@ -69,8 +69,7 @@ nextafter64(__float64 x, __float64 y)
 	if(x==y) return y;		/* x=y, return y (follow y sign for 0) */
 	if((ix|lx)==0) {			/* x == 0 */
 	    INSERT_WORDS(x,hy&0x80000000,1);	/* return +-minsubnormal */
-            force_eval_float64(x*x);             /* raise underflow flag */
-            return x;
+            return __math_uflow(x);
 	} 
 	if(hx>=0) {				/* x > 0 */
 	    if(hx>hy||((hx==hy)&&(lx>ly))) {	/* x > y, x -= ulp */
@@ -90,7 +89,8 @@ nextafter64(__float64 x, __float64 y)
 	    }
 	}
 	hy = hx&0x7ff00000;
-	if(hy>=0x7ff00000) return check_oflow(x+x);	/* overflow  */
+	if(hy>=0x7ff00000)
+            return __math_oflow(hx<0);	/* overflow  */
 	if(hy<0x00100000) {		/* underflow */
             force_eval_float64(x*x);     /* raise underflow flag */
 	}

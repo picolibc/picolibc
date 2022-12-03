@@ -130,7 +130,7 @@ log1pl(long double xm1)
   u.value = xm1;
   hx = u.parts32.mswhi;
   if (hx >= 0x7fff0000)
-    return xm1;
+    return xm1 + xm1;
 
   /* log1p(+- 0) = +- 0.  */
   if (((hx & 0x7fffffff) == 0)
@@ -143,9 +143,9 @@ log1pl(long double xm1)
   if (x <= 0.0L)
     {
       if (x == 0.0L)
-	return (-1.0L / (x - x));
+        return __math_divzerol(1);
       else
-	return (zero / (x - x));
+	return __math_invalidl(xm1);
     }
 
   /* Separate mantissa from exponent.  */

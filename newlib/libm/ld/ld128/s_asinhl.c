@@ -38,7 +38,7 @@ asinhl(long double x)
   u.value = x;
   sign = u.parts32.mswhi;
   ix = sign & 0x7fffffff;
-  if (ix == 0x7fff0000)
+  if (ix >= 0x7fff0000)
     return x + x;		/* x is inf or NaN */
   if (ix < 0x3fc70000)
     {				/* |x| < 2^ -56 */

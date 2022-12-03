@@ -38,7 +38,7 @@ acoshl(long double x)
 	int64_t hx;
 	GET_LDOUBLE_WORDS64(hx,lx,x);
 	if(hx<0x3fff000000000000LL) {		/* x < 1 */
-	    return (x-x)/(x-x);
+	    return __math_invalidl(x);
 	} else if(hx >=0x4035000000000000LL) {	/* x > 2**54 */
 	    if(hx >=0x7fff000000000000LL) {	/* x is inf of NaN */
 		return x+x;

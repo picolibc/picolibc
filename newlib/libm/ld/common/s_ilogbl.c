@@ -23,8 +23,10 @@ ilogbl(long double x)
 
 	u.e = x;
 	if (u.bits.exp == 0) {
-		if ((u.bits.manl | u.bits.manh) == 0)
+                if ((u.bits.manl | u.bits.manh) == 0) {
+                        (void) __math_invalidl(x);
 			return (FP_ILOGB0);
+                }
 		/* denormalized */
 #ifdef LDBL_MANL_SIZE
 		if (u.bits.manh == 0) {
@@ -44,8 +46,11 @@ ilogbl(long double x)
 		return (LDBL_MIN_EXP - b - 1);
 	} else if (u.bits.exp < (LDBL_MAX_EXP << 1) - 1)
 		return (u.bits.exp - LDBL_MAX_EXP + 1);
-	else if (u.bits.manl != 0 || u.bits.manh != 0)
+	else if (u.bits.manl != 0 || u.bits.manh != 0) {
+                (void) __math_invalidl(0.0L);
 		return (FP_ILOGBNAN);
-	else
+	} else {
+                (void) __math_invalidl(0.0L);
 		return (INT_MAX);
+        }
 }

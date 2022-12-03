@@ -39,7 +39,7 @@ asinl(long double x)
 		if(expt==BIAS && ((u.bits.manh&~LDBL_NBIT)|u.bits.manl)==0)
 		    /* asin(1)=+-pi/2 with inexact */
 		    return x*pio2_hi+x*pio2_lo;	
-	    return (x-x)/(x-x);		/* asin(|x|>1) is NaN */   
+                return __math_invalidl(x);		/* asin(|x|>1) is NaN */   
 	} else if (expt<BIAS-1) {	/* |x|<0.5 */
 	    if(expt<ASIN_LINEAR) {	/* if |x| is small, asinl(x)=x */
 		if(huge+x>one) return x;/* return x with inexact if x!=0*/

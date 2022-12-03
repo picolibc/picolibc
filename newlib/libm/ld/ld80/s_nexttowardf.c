@@ -22,6 +22,7 @@ nexttowardf(float x, long double y)
 	GET_LDOUBLE_WORDS(esy,hy,ly,y);
 	ix = hx&0x7fffffff;		/* |x| */
 	iy = esy&0x7fff;		/* |y| */
+        hy &= 0x7fffffff;               /* mask off leading 1 */
 
 	if((ix>0x7f800000) ||			/* x is nan */
 	   (iy>=0x7fff&&((hy|ly)!=0)))		/* y is nan */
@@ -37,7 +38,7 @@ nexttowardf(float x, long double y)
 	if(hx>=0) {				/* x > 0 */
 	    if(esy>=0x8000||((ix>>23)&0xff)>iy-0x3f80
 	       || (((ix>>23)&0xff)==iy-0x3f80
-		   && ((u_int32_t)(ix&0x7fffff)<<8)>(hy&0x7fffffff))) {/* x > y, x -= ulp */
+		   && ((u_int32_t)(ix&0x7fffff)<<8)>hy)) {/* x > y, x -= ulp */
 		hx -= 1;
 	    } else {				/* x < y, x += ulp */
 		hx += 1;
@@ -45,7 +46,7 @@ nexttowardf(float x, long double y)
 	} else {				/* x < 0 */
 	    if(esy<0x8000||((ix>>23)&0xff)>iy-0x3f80
 	       || (((ix>>23)&0xff)==iy-0x3f80
-		   && ((u_int32_t)(ix&0x7fffff)<<8)>(hy&0x7fffffff))) {/* x < y, x -= ulp */
+		   && ((u_int32_t)(ix&0x7fffff)<<8)>hy)) {/* x < y, x -= ulp */
 		hx -= 1;
 	    } else {				/* x > y, x += ulp */
 		hx += 1;

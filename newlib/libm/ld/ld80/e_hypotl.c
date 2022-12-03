@@ -65,9 +65,11 @@ hypotl(long double x, long double y)
 	       w = a+b;			/* for sNaN */
 	       GET_LDOUBLE_WORDS(es,high,low,a);
                (void) es;
-	       if(((high&0x7fffffff)|low)==0) w = a;
+	       if(((high&0x7fffffff)|low)==0 && !issignalingl(b))
+                   w = a;
 	       GET_LDOUBLE_WORDS(es,high,low,b);
-	       if(((eb^0x7fff)|(high&0x7fffffff)|low)==0) w = b;
+	       if(((eb^0x7fff)|(high&0x7fffffff)|low)==0 && !issignalingl(a))
+                   w = b;
 	       return w;
 	   }
 	   /* scale a and b by 2**-9600 */
@@ -117,6 +119,6 @@ hypotl(long double x, long double y)
 	    t1 = 1.0L;
 	    GET_LDOUBLE_EXP(es,t1);
 	    SET_LDOUBLE_EXP(t1,es+k);
-	    return t1*w;
+	    return check_oflowl(t1*w);
 	} else return w;
 }

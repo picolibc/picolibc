@@ -147,6 +147,19 @@ dd_mul(long double a, long double b)
 	return (ret);
 }
 
+#ifdef _WANT_MATH_ERRNO
+static long double
+_scalbnl_no_errno(long double x, int n)
+{
+        int save_errno = errno;
+        x = scalbnl(x, n);
+        errno = save_errno;
+        return x;
+}
+#else
+#define _scalbnl_no_errno(a,b) scalbnl(a,b)
+#endif
+
 /*
  * Fused multiply-add: Compute x * y + z with a single rounding error.
  *
@@ -225,7 +238,7 @@ fmal(long double x, long double y, long double z)
 		}
 	}
 	if (spread <= LDBL_MANT_DIG * 2)
-		zs = ldexpl(zs, -spread);
+		zs = _scalbnl_no_errno(zs, -spread);
 	else
 		zs = copysignl(LDBL_MIN, zs);
 
@@ -251,7 +264,7 @@ fmal(long double x, long double y, long double z)
 		 */
 		fesetround(oround);
 		volatile long double vzs = zs; /* XXX gcc CSE bug workaround */
-		return (xy.hi + vzs + ldexpl(xy.lo, spread));
+		return (xy.hi + vzs + _scalbnl_no_errno(xy.lo, spread));
 	}
 
 	if (oround != FE_TONEAREST) {
@@ -261,12 +274,12 @@ fmal(long double x, long double y, long double z)
 		 */
 		fesetround(oround);
 		adj = r.lo + xy.lo;
-		return (ldexpl(r.hi + adj, spread));
+		return (_scalbnl_no_errno(r.hi + adj, spread));
 	}
 
 	adj = add_adjusted(r.lo, xy.lo);
 	if (spread + ilogbl(r.hi) > -16383)
-		return (ldexpl(r.hi + adj, spread));
+		return (_scalbnl_no_errno(r.hi + adj, spread));
 	else
 		return (add_and_denormalize(r.hi, adj, spread));
 }

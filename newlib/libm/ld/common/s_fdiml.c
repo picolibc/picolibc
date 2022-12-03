@@ -27,16 +27,13 @@
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_fdim.c,v 1.1 2004/06/30 07:04:01 das Exp $");
 
 
-#define	DECL(type, fn)			\
-type					\
-fn(type x, type y)			\
-{					\
-					\
-	if (isnan(x))			\
-		return (x);		\
-	if (isnan(y))			\
-		return (y);		\
-	return (x > y ? x - y : (type) 0.0);	\
+long double
+fdiml(long double x, long double y)
+{
+        if (isnanl(x) || isnanl(y))
+		return (x + y);
+        long double z = x > y ? x - y : 0.0L;
+        if (!isinfl(x) && !isinfl(y))
+                z = check_oflowl(z);
+	return z;
 }
-
-DECL(long double, fdiml)

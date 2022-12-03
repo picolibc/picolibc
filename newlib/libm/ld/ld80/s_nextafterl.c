@@ -70,14 +70,10 @@ nextafterl(long double x, long double y)
 	    }
 	}
 	esy = esx&0x7fff;
-	if(esy==0x7fff) return x+x;		/* overflow  */
-	if(esy==0) {
-	    volatile long double u = x*x;	/* underflow */
-	    if(u==x) {
-		SET_LDOUBLE_WORDS(x,esx,hx,lx);
-		return x;
-	    }
-	}
+	if(esy==0x7fff)
+            return __math_oflowl(esx & 0x8000);		/* overflow  */
+	if(esy==0)
+            return __math_uflowl(esx & 0x8000);
 	SET_LDOUBLE_WORDS(x,esx,hx,lx);
 	return x;
 }

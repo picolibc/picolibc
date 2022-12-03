@@ -46,12 +46,15 @@ sinl(long double x)
 	z.bits.sign = 0;
 
 	/* If x = +-0 or x is a subnormal number, then sin(x) = x */
-	if (z.bits.exp == 0)
+	if (z.bits.exp == 0) {
+                if (x != 0.0L)
+                        __math_set_inexactl();
 		return (x);
+        }
 
 	/* If x = NaN or Inf, then sin(x) = NaN. */
 	if (z.bits.exp == 32767)
-		return ((x - x) / (x - x));
+                return __math_invalidl(x);
 
 	/* Optimize the case where x is already within range. */
 	if (z.e < _M_PI_4L) {

@@ -221,9 +221,9 @@ exp2l(long double x)
 				return (0.0l);	/* x is -Inf */
 		}
 		if (x >= 16384)
-			return (huge * huge);	/* overflow */
+                        return __math_oflowl(0);	/* overflow */
 		if (x <= -16446)
-			return (twom10000 * twom10000);	/* underflow */
+			return __math_uflowl(0);	/* underflow */
 	} else if (ix <= BIAS - 66) {		/* |x| < 0x1p-66 */
 		return (1.0l + x);
 	}

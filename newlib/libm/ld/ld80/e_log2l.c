@@ -119,17 +119,18 @@ long double y;
 int e;
 
 if( isnan(x) )
-	return(x);
-if( x == (long double) INFINITY )
-	return(x);
+	return(x + x);
 /* Test for domain */
 if( x <= 0.0L )
 	{
 	if( x == 0.0L )
-                return( -(long double) INFINITY );
+                return __math_divzerol(1);
 	else
-		return( (long double) NAN );
+		return __math_invalidl(x);
 	}
+
+if( isinf(x) )
+	return(x);
 
 /* separate mantissa from exponent */
 

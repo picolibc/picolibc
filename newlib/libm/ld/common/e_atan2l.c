@@ -93,7 +93,7 @@ atan2l(long double y, long double x)
 	    m&=1;
 	}
 	else if(expsignx<0&&k<-LDBL_MANT_DIG-2) z=0.0l; 	/* |y/x| tiny, x<0 */
-	else z=atanl(fabsl(y/x));		/* safe to do y/x */
+	else z=atanl(check_uflowl(fabsl(y/x)));		/* safe to do y/x */
 	switch (m) {
 	    case 0: return       z  ;	/* atan(+,+) */
 	    case 1: return      -z  ;	/* atan(-,+) */

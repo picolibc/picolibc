@@ -55,9 +55,9 @@ nexttowardf(float x, long double y)
 	}
 	ix = hx&0x7f800000;
 	if(ix>=0x7f800000)
-            return __math_oflowf(hy<0);
-	if(hy<0x00800000)
-            return __math_uflowf(hy<0);
+            return __math_oflowf(hx<0);
+	if(ix<0x00800000)
+            return __math_uflowf(hx<0);
 	SET_FLOAT_WORD(x,hx);
 	return x;
 }

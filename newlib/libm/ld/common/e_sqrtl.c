@@ -85,8 +85,11 @@ sqrtl(long double x)
 	/* If x = NaN, then sqrt(x) = NaN. */
 	/* If x = Inf, then sqrt(x) = Inf. */
 	/* If x = -Inf, then sqrt(x) = NaN. */
-	if (u.bits.exp == LDBL_INF_NAN_EXP)
-		return (x * x + x);
+	if (u.bits.exp == LDBL_INF_NAN_EXP) {
+                if (x == -(long double)INFINITY)
+                        return __math_invalidl(x);
+                return x + x;
+        }
 
 	/* If x = +-0, then sqrt(x) = +-0. */
 	if ((u.bits.manh | u.bits.manl | u.bits.exp) == 0)
@@ -94,7 +97,7 @@ sqrtl(long double x)
 
 	/* If x < 0, then raise invalid and return NaN */
 	if (u.bits.sign)
-		return ((x - x) / (x - x));
+                return __math_invalidl(x);
 
 	feholdexcept(&env);
 

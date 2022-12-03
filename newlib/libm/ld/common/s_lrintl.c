@@ -42,15 +42,20 @@ fn(long double x)
 {
 	dtype d;
 
+        if (!__finitel(x))
+            __math_set_invalidl();
 #ifdef FE_INVALID
 	fenv_t env;
 	feholdexcept(&env);
 #endif
-	d = (dtype)rintl(x);
+	x = rintl(x);
+        d = (dtype) x;
 #ifdef FE_INVALID
 	if (fetestexcept(FE_INVALID))
 		feclearexcept(FE_INVALID);
 	feupdateenv(&env);
 #endif
+        if ((long double) d != x)
+            __math_set_invalidl();
 	return (d);
 }

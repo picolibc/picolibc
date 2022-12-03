@@ -29,6 +29,7 @@ nexttoward(__float64 x, long double y)
 	GET_LDOUBLE_WORDS(esy,hy,ly,y);
 	ix = hx&0x7fffffff;		/* |x| */
 	iy = esy&0x7fff;		/* |y| */
+        hy &= 0x7fffffff;               /* mask off leading 1 */
 
 	if(((ix>=0x7ff00000)&&((ix-0x7ff00000)|lx)!=0) ||   /* x is nan */
 	   ((iy>=0x7fff)&&(hy|ly)!=0))		/* y is nan */
@@ -44,8 +45,8 @@ nexttoward(__float64 x, long double y)
 	if(hx>=0) {				/* x > 0 */
 	    if (esy>=0x8000||((ix>>20)&0x7ff)>iy-0x3c00
 		|| (((ix>>20)&0x7ff)==iy-0x3c00
-		    && (((hx<<11)|(lx>>21))>(hy&0x7fffffff)
-			|| (((hx<<11)|(lx>>21))==(hy&0x7fffffff)
+		    && (((hx<<11)|(lx>>21))>hy
+			|| (((hx<<11)|(lx>>21))==hy
 			    && (lx<<11)>ly)))) {	/* x > y, x -= ulp */
 		if(lx==0) hx -= 1;
 		lx -= 1;
@@ -56,8 +57,8 @@ nexttoward(__float64 x, long double y)
 	} else {				/* x < 0 */
 	    if (esy<0x8000||((ix>>20)&0x7ff)>iy-0x3c00
 		|| (((ix>>20)&0x7ff)==iy-0x3c00
-		    && (((hx<<11)|(lx>>21))>(hy&0x7fffffff)
-			|| (((hx<<11)|(lx>>21))==(hy&0x7fffffff)
+		    && (((hx<<11)|(lx>>21))>hy
+			|| (((hx<<11)|(lx>>21))==hy
 			    && (lx<<11)>ly))))	{/* x < y, x -= ulp */
 		if(lx==0) hx -= 1;
 		lx -= 1;
@@ -68,15 +69,10 @@ nexttoward(__float64 x, long double y)
 	}
 	hy = hx&0x7ff00000;
 	if(hy>=0x7ff00000) {
-	  x = x+x;	/* overflow  */
-	  return x;
+          return __math_oflow(hx<0);
 	}
 	if(hy<0x00100000) {
-	    volatile __float64 u = x*x;		/* underflow */
-	    if(u==x) {
-		INSERT_WORDS(x,hx,lx);
-		return x;
-	    }
+            return __math_uflow(hx<0);
 	}
 	INSERT_WORDS(x,hx,lx);
 	return x;

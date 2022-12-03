@@ -185,9 +185,9 @@ log10l(long double x)
 /* Test for domain */
   GET_LDOUBLE_WORDS64 (hx, lx, x);
   if (((hx & 0x7fffffffffffffffLL) | lx) == 0)
-    return (-1.0L / (x - x));
+    return __math_divzerol(1);
   if (hx < 0)
-    return (x - x) / (x - x);
+    return __math_invalidl(x);
   if (hx >= 0x7fff000000000000LL)
     return (x + x);
 

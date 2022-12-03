@@ -113,11 +113,19 @@ expl(long double x)
 long double px, xx;
 int n;
 
-if( x > MAXLOGL)
-	return (huge*huge);		/* overflow */
+if( isnan(x) )
+	return(x + x);
+if( x > MAXLOGL) {
+        if (isinf(x))
+                return x;
+        return __math_oflowl(0);
+}
 
-if( x < MINLOGL )
-	return (twom10000*twom10000);	/* underflow */
+if( x < MINLOGL ) {
+        if (isinf(x))
+                return 0.0L;
+	return __math_uflowl(0);
+}
 
 /* Express e**x = e**g 2**n
  *   = e**g e**( n loge(2) )

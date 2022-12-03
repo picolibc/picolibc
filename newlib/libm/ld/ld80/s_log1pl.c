@@ -115,7 +115,7 @@ long double x, y, z;
 int e;
 
 if( isnan(xm1) )
-	return(xm1);
+	return(xm1 + xm1);
 if( xm1 == (long double) INFINITY )
 	return(xm1);
 if(xm1 == 0.0l)
@@ -127,9 +127,9 @@ x = xm1 + 1.0L;
 if( x <= 0.0L )
 	{
 	if( x == 0.0L )
-		return( -(long double) INFINITY );
+                return __math_divzerol(1);
 	else
-		return( (long double) NAN );
+		return __math_invalidl(xm1);
 	}
 
 /* Separate mantissa from exponent.
