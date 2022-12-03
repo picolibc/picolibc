@@ -272,10 +272,11 @@ struct __locale_t __global_locale =
     { NULL, NULL },			/* LC_ALL */
 #ifdef __CYGWIN__
     { &_C_collate_locale, NULL },	/* LC_COLLATE */
+    { &_C_utf8_ctype_locale, NULL },	/* LC_CTYPE */
 #else
     { NULL, NULL },			/* LC_COLLATE */
-#endif
     { &_C_ctype_locale, NULL },		/* LC_CTYPE */
+#endif
     { &_C_monetary_locale, NULL },	/* LC_MONETARY */
     { &_C_numeric_locale, NULL },	/* LC_NUMERIC */
     { &_C_time_locale, NULL },		/* LC_TIME */

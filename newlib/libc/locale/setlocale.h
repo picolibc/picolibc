@@ -64,6 +64,9 @@ struct lc_ctype_T
 #endif
 };
 extern const struct lc_ctype_T _C_ctype_locale;
+#ifdef __CYGWIN__
+extern const struct lc_ctype_T _C_utf8_ctype_locale;
+#endif
 
 struct lc_monetary_T
 {
