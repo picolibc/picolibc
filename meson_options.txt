@@ -134,6 +134,8 @@ option('posix-console', type: 'boolean', value: false,
        description: 'Use POSIX I/O for stdin/stdout/stderr')
 option('format-default', type: 'combo', choices: ['double', 'float', 'integer'], value: 'double',
        description: 'which printf/scanf versions should be the default')
+option('printf-aliases', type: 'boolean', value: true,
+       description: 'Allow link-time printf aliases')
 
 #
 # Options applying to only legacy stdio

@@ -261,15 +261,33 @@ posix_console = posix_io and get_option('posix-console')
 io_float_exact = not tinystdio or get_option('io-float-exact')
 atomic_ungetc = tinystdio and get_option('atomic-ungetc')
 format_default = get_option('format-default')
+printf_aliases = get_option('printf-aliases')
 io_percent_b = tinystdio and get_option('io-percent-b')
 
-double_printf_compile_args=['-DPICOLIBC_DOUBLE_PRINTF_SCANF']
+if printf_aliases
+  double_printf_compile_args=['-DPICOLIBC_DOUBLE_PRINTF_SCANF']
+  float_printf_compile_args=['-DPICOLIBC_FLOAT_PRINTF_SCANF']
+  int_printf_compile_args=['-DPICOLIBC_INTEGER_PRINTF_SCANF']
+else
+  double_printf_compile_args=[]
+  float_printf_compile_args=[]
+  int_printf_compile_args=[]
+endif
 double_printf_link_args=double_printf_compile_args
-float_printf_compile_args=['-DPICOLIBC_FLOAT_PRINTF_SCANF']
 float_printf_link_args=float_printf_compile_args
-int_printf_compile_args=['-DPICOLIBC_INTEGER_PRINTF_SCANF']
 int_printf_link_args=int_printf_compile_args
+
 if tinystdio
+  if format_default == 'double'
+    c_args += '-DFORMAT_DEFAULT_DOUBLE'
+  elif format_default == 'float'
+    c_args += '-DFORMAT_DEFAULT_FLOAT'
+  elif format_default == 'integer'
+    c_args += '-DFORMAT_DEFAULT_INTEGER'
+  endif
+endif
+
+if tinystdio and printf_aliases
   vfprintf_symbol = global_prefix + 'vfprintf'
   __d_vfprintf_symbol = global_prefix + '__d_vfprintf'
   __f_vfprintf_symbol = global_prefix + '__f_vfprintf'
@@ -278,14 +296,6 @@ if tinystdio
   __d_vfscanf_symbol = global_prefix + '__d_vfscanf'
   __f_vfscanf_symbol = global_prefix + '__f_vfscanf'
   __i_vfscanf_symbol = global_prefix + '__i_vfscanf'
-
-  if format_default == 'double'
-    c_args += '-DFORMAT_DEFAULT_DOUBLE'
-  elif format_default == 'float'
-    c_args += '-DFORMAT_DEFAULT_FLOAT'
-  elif format_default == 'integer'
-    c_args += '-DFORMAT_DEFAULT_INTEGER'
-  endif
 
   if has_link_defsym
     if format_default != 'double'
@@ -500,7 +510,7 @@ if specs_extra_list != []
 endif
 
 specs_printf = ''
-if tinystdio
+if tinystdio and printf_aliases
   specs_printf=('%{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfprintf=__f_vfprintf}' +
 		' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfscanf=__f_vfscanf}' +
 		' %{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfprintf=__d_vfprintf}' +
