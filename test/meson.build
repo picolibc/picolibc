@@ -303,7 +303,7 @@ foreach target : targets
 		 'math-funcs', 'timegm', 'time-tests',
                  'test-strtod', 'test-strchr',
 		 'test-memset', 'test-put',
-		 'test-efcvt'
+		 'test-efcvt',
 		]
 
   if have_attr_ctor_dtor
@@ -347,6 +347,7 @@ foreach target : targets
 		    link_depends:  test_link_depends,
 		    include_directories: inc),
          depends: bios_bin,
+	 timeout: 60,
 	 env: test_env)
   endforeach
 
