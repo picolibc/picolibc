@@ -1,0 +1,18 @@
+[binaries]
+c = ['powerpc64-linux-gnu-gcc', '-fno-pic', '-fno-pie', '-static', '-mabi=ieeelongdouble', '-mlong-double-128', '-mfloat128-hardware', '-mvsx', '-mfloat128', '-mpower9-vector', '-mcpu=power9', '-Wno-psabi']
+ar = 'powerpc64-linux-gnu-ar'
+nm = 'powerpc64-linux-gnu-nm'
+strip = 'powerpc64-linux-gnu-strip'
+objcopy = 'powerpc64-linux-gnu-objcopy'
+exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-power9 "$@"', 'run-power9']
+
+[host_machine]
+system = 'linux'
+cpu_family = 'powerpc'
+cpu = 'power9'
+endian = 'big'
+
+[properties]
+skip_sanity_check = true
+needs_exe_wrapper = true
+link_spec = '--build-id=none'
