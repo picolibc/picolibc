@@ -29,4 +29,4 @@ trap 'rm -rf "$DIR"' 0 1 15
 	 ;;
  esac
  cat meson-logs/*
- ninja && meson test -v) || exit 1
+ ninja && meson test -t 4 -v) || exit 1
