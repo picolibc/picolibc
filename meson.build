@@ -652,46 +652,21 @@ specs_data.set('SPECS_PRINTF', specs_printf)
 # that includes setting the correct linker script
 # and adding the C++ startup/shutdown files
 
-specs_c_data = specs_data
-
-specs_c_data.set('PICOLIBC_LD', 'picolibc.ld')
-specs_c_data.set('CRTBEGIN', '')
-specs_c_data.set('CRTEND', '')
-
-specs_cpp_data = specs_data
-
-specs_cpp_data.set('PICOLIBC_LD', 'picolibcpp.ld')
-specs_cpp_data.set('CRTBEGIN', 'crtbegin%O%s')
-specs_cpp_data.set('CRTEND', 'crtend%O%s')
+specs_data.set('CRTBEGIN', 'crtbegin%O%s')
+specs_data.set('CRTEND', 'crtend%O%s')
 
 picolibc_specs = configure_file(input: 'picolibc.specs.in',
 				output: 'picolibc.specs',
-				configuration: specs_c_data,
+				configuration: specs_data,
 				install_dir: specs_dir,
 				install: specs_install)
-
-picolibcpp_specs = configure_file(input: 'picolibc.specs.in',
-				  output: 'picolibcpp.specs',
-				  configuration: specs_cpp_data,
-				  install_dir: specs_dir,
-				  install: specs_install)
-
 
 test_specs = configure_file(input: 'test.specs.in',
 			    output: '@BASENAME@',
 			    configuration: specs_data,
 			    install: false)
 
-picolibc_linker_type_data = configuration_data()
 if cc.get_linker_id() == 'ld.lld'
-    # ld.lld does not implement ALIGN_WITH_INPUT, but this flag is not needed
-    # with ld.lld's output section LMA/VMA algorithm.
-    # An added ASSERT() statement in the linker script ensures that we don't
-    # get silent failures in case this changes in the future.
-    picolibc_linker_type_data.set('LDSCRIPT_ALIGN_WITH_INPUT', '')
-    # The i MEMORY attribute is also not implemented, but it would does not
-    # make any difference on the output even if it was.
-    picolibc_linker_type_data.set('LDSCRIPT_MEMORY_ATTR_I', '')
     if host_cpu_family == 'riscv'
         # ld.lld before version 15 did not support linker relaxations, disable
         # them if we are using an older version.
@@ -702,34 +677,9 @@ if cc.get_linker_id() == 'ld.lld'
             c_args += ['-mno-relax']
         endif
     endif
-else
-    picolibc_linker_type_data.set('LDSCRIPT_ALIGN_WITH_INPUT', 'ALIGN_WITH_INPUT')
-    picolibc_linker_type_data.set('LDSCRIPT_MEMORY_ATTR_I', 'i')
 endif
 
-picolibc_ld_data = configuration_data()
-picolibc_ld_data.merge_from(picolibc_linker_type_data)
-picolibc_ld_data.set('CPP_START', '/*')
-picolibc_ld_data.set('CPP_END', '*/')
-picolibc_ld_data.set('C_START', '')
-picolibc_ld_data.set('C_END', '')
-
-picolibc_ld = configure_file(input: 'picolibc.ld.in',
-			     output: 'picolibc.ld',
-			     configuration: picolibc_ld_data,
-			     install_dir: lib_dir)
-
-picolibcpp_ld_data = configuration_data()
-picolibcpp_ld_data.merge_from(picolibc_linker_type_data)
-picolibcpp_ld_data.set('CPP_START', '')
-picolibcpp_ld_data.set('CPP_END', '')
-picolibcpp_ld_data.set('C_START', '/*')
-picolibcpp_ld_data.set('C_END', '*/')
-
-picolibcpp_ld = configure_file(input: 'picolibc.ld.in',
-			     output: 'picolibcpp.ld',
-			     configuration: picolibcpp_ld_data,
-			     install_dir: lib_dir)
+install_data(sources: 'picolibc.ld', install_dir: lib_dir)
 
 # Not all compilers necessarily support all warnings; only use these which are:
 c_warnings = [
@@ -1270,8 +1220,8 @@ if has_semihost
   endif
   test_link_args = ['-nostartfiles',
                     '-T', meson.current_source_dir() / custom_script,
-                    '-T', '@0@'.format(picolibc_ld), '-lgcc'] + additional_libs_list
-  test_linker_files = files(custom_script) + [picolibc_ld]
+                    '-Tpicolibc.ld', '-lgcc'] + additional_libs_list
+  test_linker_files = files(custom_script) + files('picolibc.ld')
   specs = picolibc_specs
 else
   test_link_args = []

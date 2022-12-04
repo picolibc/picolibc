@@ -517,4 +517,5 @@ if(TESTS)
 endif()
 
 install(FILES ${CMAKE_BINARY_DIR}/picolibc.specs DESTINATION lib)
+install(FILES ${CMAKE_SOURCE_DIR}/picolibc.ld DESTINATION lib)
 install(FILES ${CMAKE_BINARY_DIR}/picolibc/include/picolibc.h DESTINATION include)
