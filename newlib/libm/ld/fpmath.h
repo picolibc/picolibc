@@ -29,68 +29,25 @@
 #ifndef _FPMATH_H_
 #define _FPMATH_H_
 
-#if defined(__aarch64__)
-#include "aarch64_fpmath.h"
-#elif defined(__i386__) || defined(__x86_64__)
+/* Guess long double layout based on compiler defines */
+
+#if __LDBL_MANT_DIG__ == 64 && 16383 <= __LDBL_MAX_EXP__ && __LDBL_MAX_EXP__ <= 16384
+#define _INTEL80_FLOAT
 #ifdef __LP64__
-#include "amd64_fpmath.h"
-#else 
-#include "i386_fpmath.h"
+#define _INTEL80_FLOAT_PAD
 #endif
-#elif defined(__powerpc__)
-#include "powerpc_fpmath.h"
-#elif defined(__mips__)
-#include "mips_fpmath.h"
-#elif defined(__s390__)
-#include "s390_fpmath.h"
-#elif defined(__riscv)
-#include "riscv_fpmath.h"
-#else
-#include "gen_fpmath.h"
+#endif
+
+#if __LDBL_MANT_DIG__ == 113 && 16383 <= __LDBL_MAX_EXP__ && __LDBL_MAX_EXP__ <= 16384
+#define _IEEE128_FLOAT
+#endif
+
+#if __LDBL_MANT_DIG__ == 106 && __LDBL_MAX_EXP__ == 1024
+#define _DOUBLE_DOUBLE_FLOAT
 #endif
 
 #ifndef __FLOAT_WORD_ORDER__
 #define __FLOAT_WORD_ORDER__     __BYTE_ORDER__
 #endif
 
-union IEEEf2bits {
-	float	f;
-	struct {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		unsigned int	man	:23;
-		unsigned int	exp	:8;
-		unsigned int	sign	:1;
-#else /* _BIG_ENDIAN */
-		unsigned int	sign	:1;
-		unsigned int	exp	:8;
-		unsigned int	man	:23;
-#endif
-	} bits;
-};
-
-#define	DBL_MANH_SIZE	20
-#define	DBL_MANL_SIZE	32
-
-union IEEEd2bits {
-	double	d;
-	struct {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#if __FLOAT_WORD_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		unsigned int	manl	:32;
-#endif
-		unsigned int	manh	:20;
-		unsigned int	exp	:11;
-		unsigned int	sign	:1;
-#if __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__
-		unsigned int	manl	:32;
-#endif
-#else /* _BIG_ENDIAN */
-		unsigned int	sign	:1;
-		unsigned int	exp	:11;
-		unsigned int	manh	:20;
-		unsigned int	manl	:32;
-#endif
-	} bits;
-};
-
-#endif
+#endif /* _FPMATH_H_ */
