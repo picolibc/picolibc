@@ -25,11 +25,14 @@ logbl(long double x)
 			return (1.0L / u.e);
 		}
 		/* denormalized */
+#ifdef LDBL_MANL_SIZE
 		if (u.bits.manh == 0) {
 			m = 1llu << (LDBL_MANL_SIZE - 1);
 			for (b = LDBL_MANH_SIZE; !(u.bits.manl & m); m >>= 1)
 				b++;
-		} else {
+		} else
+#endif
+                {
 			m = 1llu << (LDBL_MANH_SIZE - 1);
 			for (b = 0; !(u.bits.manh & m); m >>= 1)
 				b++;
