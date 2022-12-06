@@ -23,21 +23,9 @@
 
 #include "invtrig.h"
 
-static volatile long double
-tiny  = 1.0e-300l;
-static const long double
-zero  = 0.0l;
-
-#ifdef __i386__
-/* XXX Work around the fact that gcc truncates long double constants on i386 */
-static volatile double
-pi1 =  3.14159265358979311600e+00,	/*  0x1.921fb54442d18p+1  */
-pi2 =  1.22514845490862001043e-16;	/*  0x1.1a80000000000p-53 */
-#define	pi	((long double)pi1 + pi2)
-#else
-static const long double
-pi =  3.14159265358979323846264338327950280e+00L;
-#endif
+static const long double tiny = 1.0e-300l;
+static const long double zero = 0.0l;
+static const long double pi   = _M_PI_L;
 
 long double
 atan2l(long double y, long double x)
