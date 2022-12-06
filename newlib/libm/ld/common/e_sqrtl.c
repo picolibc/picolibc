@@ -26,6 +26,7 @@
 
 //__FBSDID("$FreeBSD: src/lib/msun/src/e_sqrtl.c,v 1.1 2008/03/02 01:47:58 das Exp $");
 
+#ifndef _DOUBLE_DOUBLE_FLOAT
 /* Return (x + ulp) for normal positive x. Assumes no overflow. */
 static inline long double
 inc(long double x)
@@ -62,10 +63,14 @@ dec(long double x)
 #pragma STDC FENV_ACCESS ON
 #endif
 
+#endif
+
 /*
  * This is slow, but simple and portable. You should use hardware sqrt
  * if possible.
  */
+
+#define BIAS    (LDBL_MAX_EXP-1)
 
 long double
 sqrtl(long double x)
@@ -80,7 +85,7 @@ sqrtl(long double x)
 	/* If x = NaN, then sqrt(x) = NaN. */
 	/* If x = Inf, then sqrt(x) = Inf. */
 	/* If x = -Inf, then sqrt(x) = NaN. */
-	if (u.bits.exp == LDBL_MAX_EXP * 2 - 1)
+	if (u.bits.exp == LDBL_INF_NAN_EXP)
 		return (x * x + x);
 
 	/* If x = +-0, then sqrt(x) = +-0. */
@@ -104,12 +109,18 @@ sqrtl(long double x)
 	 * u.e is a normal number, so break it into u.e = e*2^n where
 	 * u.e = (2*e)*2^2k for odd n and u.e = (4*e)*2^2k for even n.
 	 */
-	if ((u.bits.exp - 0x3ffe) & 1) {	/* n is odd.     */
-		k += u.bits.exp - 0x3fff;	/* 2k = n - 1.   */
-		u.bits.exp = 0x3fff;		/* u.e in [1,2). */
+	if ((u.bits.exp - (BIAS-1)) & 1) {	/* n is odd.     */
+		k += u.bits.exp - BIAS;	/* 2k = n - 1.   */
+#ifdef _DOUBLE_DOUBLE_FLOAT
+                u.dbits.dl = scalbn(u.dbits.dl, BIAS - u.bits.exp);
+#endif
+		u.bits.exp = BIAS;		/* u.e in [1,2). */
 	} else {
-		k += u.bits.exp - 0x4000;	/* 2k = n - 2.   */
-		u.bits.exp = 0x4000;		/* u.e in [2,4). */
+                k += u.bits.exp - (BIAS + 1);	/* 2k = n - 2.   */
+#ifdef _DOUBLE_DOUBLE_FLOAT
+                u.dbits.dl = scalbn(u.dbits.dl, (BIAS + 1) - u.bits.exp);
+#endif
+		u.bits.exp = (BIAS + 1);	/* u.e in [2,4). */
 	}
 
 	/*
@@ -117,17 +128,24 @@ sqrtl(long double x)
 	 * Split u.e into a high and low part to achieve additional precision.
 	 */
 	xn = (long double)sqrt((double)u.e);			/* 53-bit estimate of sqrtl(x). */
-#if LDBL_MANT_DIG > 100
 	xn = (xn + (u.e / xn)) * 0.5L;	/* 106-bit estimate. */
-#endif
+
 	lo = u.e;
+#ifdef _DOUBLE_DOUBLE_FLOAT
+        u.dbits.dl = 0.0;               /* Zero out lower double */
+#else
 	u.bits.manl = 0;		/* Zero out lower bits. */
+#endif
 	lo = (lo - u.e) / xn;		/* Low bits divided by xn. */
 	xn = xn + (u.e / xn);		/* High portion of estimate. */
 	u.e = xn + lo;			/* Combine everything. */
-	u.bits.exp += (k >> 1) - 1;
 
-#if defined(FE_INEXACT) && defined(FE_TOWARDZERO) && defined(FE_TONEAREST) && defined(FE_UPWARD)
+	u.bits.exp += (k >> 1) - 1;
+#ifdef _DOUBLE_DOUBLE_FLOAT
+        u.dbits.dl = scalbn(u.dbits.dl, (k>>1) -1);
+#endif
+
+#if defined(FE_INEXACT) && defined(FE_TOWARDZERO) && defined(FE_TONEAREST) && defined(FE_UPWARD) && !defined(_DOUBLE_DOUBLE_FLOAT)
         {
                 int r;
                 feclearexcept(FE_INEXACT);
