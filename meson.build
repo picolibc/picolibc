@@ -1321,5 +1321,5 @@ configure_file(output : 'picolibc.h',
 # provide a dependency to be used by the main project:
 #   dependency('libc', fallback: ['picolibc', 'libc_dep'])
 if not enable_multilib and meson.is_subproject()
-  picolibc_dep = declare_dependency(include_directories: inc, link_with: [lib_c, lib_m])
+  picolibc_dep = declare_dependency(include_directories: inc, link_with: [lib_c])
 endif
