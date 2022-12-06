@@ -13,6 +13,25 @@ typedef struct  {
 	string name;
 } func_f_ff_t;
 
+string[] limited_funcs = {
+	"ilogbl",
+	"nanl",
+	"ldexpl",
+	"scalbnl",
+	"scalblnl",
+	"logbl",
+	"sqrtl",
+};
+
+bool
+is_full_func(string name)
+{
+	for (int i = 0; i < dim(limited_funcs); i++)
+		if (limited_funcs[i] == name)
+			return false;
+	return true;
+}
+
 exception infinity(real v);
 exception nan();
 
@@ -48,6 +67,8 @@ gen_real_f_f(func_f_f_t f)
 	real x, y;
 	string vec = sprintf("%s_vec", f.name);
 	printf("\n");
+	if (is_full_func(f.name))
+		printf("#ifdef FULL_LONG_DOUBLE\n");
 	string prec_name = make_prec(f.name);
 	printf("long_double_test_f_f_t %s[] = {\n", vec);
 	for (x = -10; x <= 10; x += .1) {
@@ -83,6 +104,8 @@ gen_real_f_f(func_f_f_t f)
 	printf("    }\n");
 	printf("    return result;\n");
 	printf("}\n");
+	if (is_full_func(f.name))
+		printf("#endif /* FULL_LONG_DOUBLE */\n");
 }
 
 real cbrt(real x) { return x**(1/3); }
@@ -264,6 +287,7 @@ func_f_f_t[] funcs_f_f = {
 	{ .f = round, .name = "roundl" },
 	{ .f = sinh, .name = "sinhl" },
 	{ .f = sin, .name = "sinl" },
+	{ .f = sqrt, .name = "sqrtl" },
 	{ .f = tanh, .name = "tanhl" },
 	{ .f = tan, .name = "tanl" },
 	{ .f = tgamma, .name = "tgammal" },
@@ -280,6 +304,8 @@ gen_real_f_ff(func_f_ff_t f)
 	string vec = sprintf("%s_vec", f.name);
 
 	printf("\n");
+	if (is_full_func(f.name))
+		printf("#ifdef FULL_LONG_DOUBLE\n");
 	string prec_name = make_prec(f.name);
 	printf("long_double_test_f_ff_t %s[] = {\n", vec);
 	for (x0 = -4; x0 <= 4; x0 += .25) {
@@ -317,6 +343,8 @@ gen_real_f_ff(func_f_ff_t f)
 	printf("    }\n");
 	printf("    return result;\n");
 	printf("}\n");
+	if (is_full_func(f.name))
+		printf("#endif /* FULL_LONG_DOUBLE */\n");
 }
 
 real fmod(real x, real y) {
@@ -429,10 +457,20 @@ main()
 		gen_real_f_f(funcs_f_f[i]);
 
 	printf("long_double_test_t long_double_tests[] = {\n");
-	for (int i = 0; i < dim(funcs_f_f); i++)
+	for (int i = 0; i < dim(funcs_f_f); i++) {
+		if (is_full_func(funcs_f_f[i].name))
+			printf("#ifdef FULL_LONG_DOUBLE\n");
 		printf("    { .name = \"%s\", .test = test_%s },\n", funcs_f_f[i].name, funcs_f_f[i].name);
-	for (int i = 0; i < dim(funcs_f_ff); i++)
+		if (is_full_func(funcs_f_f[i].name))
+			printf("#endif /* FULL_LONG_DOUBLE */\n");
+	}
+	for (int i = 0; i < dim(funcs_f_ff); i++) {
+		if (is_full_func(funcs_f_f[i].name))
+			printf("#ifdef FULL_LONG_DOUBLE\n");
 		printf("    { .name = \"%s\", .test = test_%s },\n", funcs_f_ff[i].name, funcs_f_ff[i].name);
+		if (is_full_func(funcs_f_f[i].name))
+			printf("#endif /* FULL_LONG_DOUBLE */\n");
+	}
 	printf("};\n");
 }
 

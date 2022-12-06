@@ -39,7 +39,7 @@
 #include <stdio.h>
 #include <float.h>
 
-#if LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113
+#ifdef LDBL_MANT_DIG
 
 static long double max_error;
 
@@ -56,7 +56,7 @@ within_error(long double expect, long double result, long double error)
         return true;
 
     if (expect != 0)
-        e = exp2l(-logbl(expect));
+        e = scalbnl(1.0L, -ilogbl(expect));
 
     difference = fabsl(expect - result) * e;
 
@@ -74,7 +74,8 @@ check_long_double(const char *name, int i, long double prec, long double expect,
 #ifdef __PICOLIBC__
         printf("%s test %d got %.15g expect %.15g diff %.15g\n", name, i, (double) result, (double) expect, (double) diff);
 #else
-        printf("%s test %d got %.33Lg expect %.33Lg diff %.33Lg\n", name, i, result, expect, diff);
+//        printf("%s test %d got %.33Lg expect %.33Lg diff %.33Lg\n", name, i, result, expect, diff);
+        printf("%s test %d got %La expect %La diff %La\n", name, i, result, expect, diff);
 #endif
         return 1;
     }
@@ -99,11 +100,31 @@ typedef struct {
     long double y;
 } long_double_test_f_ff_t;
 
+/*
+ * sqrtl is "exact", but can have up to one bit of error as it might
+ * not have enough guard bits to correctly perform rounding, leading
+ * to some answers getting rounded to an even value instead of the
+ * (more accurate) odd value
+ */
 #if LDBL_MANT_DIG == 64
 #define DEFAULT_PREC 1e-16L
-#else
+#define SQRTL_PREC 0x8.0p-63
+#define FULL_LONG_DOUBLE
+#elif LDBL_MANT_DIG == 113
+#define FULL_LONG_DOUBLE
 #define DEFAULT_PREC 1e-31L
+#define SQRTL_PREC 0x8.0p-112
+#elif LDBL_MANT_DIG == 106
+#define DEFAULT_PREC 1e-29L
+#define SQRTL_PREC 0x8.0p-105
 #endif
+
+#define CEILL_PREC      0
+#define FLOORL_PREC     0
+#define LOGBL_PREC      0
+#define NEARBYINTL_PREC 0
+#define ROUNDL_PREC     0
+#define TRUNCL_PREC     0
 
 #include "long_double_vec.h"
 
@@ -112,6 +133,7 @@ int main(void)
     int result = 0;
     unsigned int i;
 
+    printf("LDBL_MANT_DIG %d\n", LDBL_MANT_DIG);
     for (i = 0; i < sizeof(long_double_tests) / sizeof(long_double_tests[0]); i++) {
         result += long_double_tests[i].test();
     }
@@ -121,7 +143,7 @@ int main(void)
 #else
 int main(void)
 {
-    printf("LDBL_MANT_DIG %d\n", LDBL_MANT_DIG);
+    printf("no long double support\n");
     return 0;
 }
 #endif

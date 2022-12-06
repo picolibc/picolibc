@@ -1,4 +1,5 @@
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef ATAN2L_PREC
 #define ATAN2L_PREC DEFAULT_PREC
 #endif
@@ -1103,7 +1104,9 @@ int test_atan2l(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef POWL_PREC
 #define POWL_PREC DEFAULT_PREC
 #endif
@@ -2080,7 +2083,9 @@ int test_powl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef FMODL_PREC
 #define FMODL_PREC DEFAULT_PREC
 #endif
@@ -3185,7 +3190,9 @@ int test_fmodl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef FDIML_PREC
 #define FDIML_PREC DEFAULT_PREC
 #endif
@@ -4290,7 +4297,9 @@ int test_fdiml(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef FMAXL_PREC
 #define FMAXL_PREC DEFAULT_PREC
 #endif
@@ -5395,7 +5404,9 @@ int test_fmaxl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef FMINL_PREC
 #define FMINL_PREC DEFAULT_PREC
 #endif
@@ -6500,7 +6511,9 @@ int test_fminl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef REMAINDERL_PREC
 #define REMAINDERL_PREC DEFAULT_PREC
 #endif
@@ -7605,7 +7618,9 @@ int test_remainderl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef ACOSHL_PREC
 #define ACOSHL_PREC DEFAULT_PREC
 #endif
@@ -7822,7 +7837,9 @@ int test_acoshl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef ACOSL_PREC
 #define ACOSL_PREC DEFAULT_PREC
 #endif
@@ -7859,7 +7876,9 @@ int test_acosl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef ASINHL_PREC
 #define ASINHL_PREC DEFAULT_PREC
 #endif
@@ -8076,7 +8095,9 @@ int test_asinhl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef ASINL_PREC
 #define ASINL_PREC DEFAULT_PREC
 #endif
@@ -8113,7 +8134,9 @@ int test_asinl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef ATANHL_PREC
 #define ATANHL_PREC DEFAULT_PREC
 #endif
@@ -8330,7 +8353,9 @@ int test_atanhl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef ATANL_PREC
 #define ATANL_PREC DEFAULT_PREC
 #endif
@@ -8547,7 +8572,9 @@ int test_atanl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef CBRTL_PREC
 #define CBRTL_PREC DEFAULT_PREC
 #endif
@@ -8764,7 +8791,9 @@ int test_cbrtl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef CEILL_PREC
 #define CEILL_PREC DEFAULT_PREC
 #endif
@@ -8981,7 +9010,9 @@ int test_ceill(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef COSHL_PREC
 #define COSHL_PREC DEFAULT_PREC
 #endif
@@ -9198,7 +9229,9 @@ int test_coshl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef COSL_PREC
 #define COSL_PREC DEFAULT_PREC
 #endif
@@ -9415,7 +9448,9 @@ int test_cosl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef ERFCL_PREC
 #define ERFCL_PREC DEFAULT_PREC
 #endif
@@ -9631,7 +9666,9 @@ int test_erfcl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef ERFL_PREC
 #define ERFL_PREC DEFAULT_PREC
 #endif
@@ -9847,7 +9884,9 @@ int test_erfl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef EXP10L_PREC
 #define EXP10L_PREC DEFAULT_PREC
 #endif
@@ -10064,7 +10103,9 @@ int test_exp10l(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef EXP2L_PREC
 #define EXP2L_PREC DEFAULT_PREC
 #endif
@@ -10281,7 +10322,9 @@ int test_exp2l(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef EXPL_PREC
 #define EXPL_PREC DEFAULT_PREC
 #endif
@@ -10498,7 +10541,9 @@ int test_expl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef EXPM1L_PREC
 #define EXPM1L_PREC DEFAULT_PREC
 #endif
@@ -10715,7 +10760,9 @@ int test_expm1l(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef FLOORL_PREC
 #define FLOORL_PREC DEFAULT_PREC
 #endif
@@ -10932,7 +10979,9 @@ int test_floorl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef LGAMMAL_PREC
 #define LGAMMAL_PREC DEFAULT_PREC
 #endif
@@ -11103,7 +11152,9 @@ int test_lgammal(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef LOG10L_PREC
 #define LOG10L_PREC DEFAULT_PREC
 #endif
@@ -11219,7 +11270,9 @@ int test_log10l(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef LOG1PL_PREC
 #define LOG1PL_PREC DEFAULT_PREC
 #endif
@@ -11345,7 +11398,9 @@ int test_log1pl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef LOG2L_PREC
 #define LOG2L_PREC DEFAULT_PREC
 #endif
@@ -11461,6 +11516,7 @@ int test_log2l(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
 #ifndef LOGBL_PREC
 #define LOGBL_PREC DEFAULT_PREC
@@ -11679,6 +11735,7 @@ int test_logbl(void) {
     return result;
 }
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef LOGL_PREC
 #define LOGL_PREC DEFAULT_PREC
 #endif
@@ -11794,7 +11851,9 @@ int test_logl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef NEARBYINTL_PREC
 #define NEARBYINTL_PREC DEFAULT_PREC
 #endif
@@ -12011,7 +12070,9 @@ int test_nearbyintl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef ROUNDL_PREC
 #define ROUNDL_PREC DEFAULT_PREC
 #endif
@@ -12228,7 +12289,9 @@ int test_roundl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef SINHL_PREC
 #define SINHL_PREC DEFAULT_PREC
 #endif
@@ -12445,7 +12508,9 @@ int test_sinhl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef SINL_PREC
 #define SINL_PREC DEFAULT_PREC
 #endif
@@ -12662,7 +12727,126 @@ int test_sinl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifndef SQRTL_PREC
+#define SQRTL_PREC DEFAULT_PREC
+#endif
+long_double_test_f_f_t sqrtl_vec[] = {
+    { .line = __LINE__, .x = 0L, .y = 0e-2L },
+    { .line = __LINE__, .x = 1.e-1L, .y = 3.16227766016837933199889354443271853371955513932521682686e-1L },
+    { .line = __LINE__, .x = 2.e-1L, .y = 4.47213595499957939281834733746255247088123671922305144854e-1L },
+    { .line = __LINE__, .x = 3.e-1L, .y = 5.47722557505166113456969782800802133952744694997983254227e-1L },
+    { .line = __LINE__, .x = 4.e-1L, .y = 6.32455532033675866399778708886543706743911027865043365371e-1L },
+    { .line = __LINE__, .x = 5.e-1L, .y = 7.07106781186547524400844362104849039284835937688474036588e-1L },
+    { .line = __LINE__, .x = 0.6L, .y = 7.74596669241483377035853079956479922166584341058318165317e-1L },
+    { .line = __LINE__, .x = 0.7L, .y = 8.36660026534075547978172025785187489392815369298672199811e-1L },
+    { .line = __LINE__, .x = 0.8L, .y = 8.94427190999915878563669467492510494176247343844610289708e-1L },
+    { .line = __LINE__, .x = 0.9L, .y = 9.48683298050513799599668063329815560115866541797565048057e-1L },
+    { .line = __LINE__, .x = 1L, .y = 1e0L },
+    { .line = __LINE__, .x = 1.1L, .y = 1.04880884817015154699145351367993759847527185768150398488e0L },
+    { .line = __LINE__, .x = 1.2L, .y = 1.09544511501033222691393956560160426790548938999596650845e0L },
+    { .line = __LINE__, .x = 1.3L, .y = 1.1401754250991379791360490255667544790760053109164103753e0L },
+    { .line = __LINE__, .x = 1.4L, .y = 1.18321595661992320851346565831232340968310024615886806458e0L },
+    { .line = __LINE__, .x = 1.5L, .y = 1.22474487139158904909864203735294569598297374032833506422e0L },
+    { .line = __LINE__, .x = 1.6L, .y = 1.26491106406735173279955741777308741348782205573008673074e0L },
+    { .line = __LINE__, .x = 1.7L, .y = 1.30384048104052974291659431148583688330561875578201309179e0L },
+    { .line = __LINE__, .x = 1.8L, .y = 1.34164078649987381784550420123876574126437101576691543456e0L },
+    { .line = __LINE__, .x = 1.9L, .y = 1.37840487520902217679559125529341754271981635583990014791e0L },
+    { .line = __LINE__, .x = 2L, .y = 1.41421356237309504880168872420969807856967187537694807318e0L },
+    { .line = __LINE__, .x = 2.1L, .y = 1.44913767461894385737186641571697717231401328747589730887e0L },
+    { .line = __LINE__, .x = 2.2L, .y = 1.48323969741913258974227948816014261219598086381950031975e0L },
+    { .line = __LINE__, .x = 2.3L, .y = 1.51657508881031011085136508725641431090992842790349245065e0L },
+    { .line = __LINE__, .x = 2.4L, .y = 1.54919333848296675407170615991295984433316868211663633063e0L },
+    { .line = __LINE__, .x = 2.5L, .y = 1.58113883008418966599944677221635926685977756966260841343e0L },
+    { .line = __LINE__, .x = 2.6L, .y = 1.61245154965970993047332264606075422622687926112171467759e0L },
+    { .line = __LINE__, .x = 2.7L, .y = 1.64316767251549834037090934840240640185823408499394976268e0L },
+    { .line = __LINE__, .x = 2.8L, .y = 1.67332005306815109595634405157037497878563073859734439962e0L },
+    { .line = __LINE__, .x = 2.9L, .y = 1.70293863659264011661333218238773227063897151909784216273e0L },
+    { .line = __LINE__, .x = 3L, .y = 1.73205080756887729352744634150587236694280525381038062806e0L },
+    { .line = __LINE__, .x = 3.1L, .y = 1.7606816861659009145769228176496579286155228680517596834e0L },
+    { .line = __LINE__, .x = 3.2L, .y = 1.78885438199983175712733893498502098835249468768922057942e0L },
+    { .line = __LINE__, .x = 3.3L, .y = 1.81659021245849499925351968583091621951684150008600769938e0L },
+    { .line = __LINE__, .x = 3.4L, .y = 1.8439088914585774620004548563525586314493610097444928016e0L },
+    { .line = __LINE__, .x = 3.5L, .y = 1.87082869338697069279187436615827465087800990388936347315e0L },
+    { .line = __LINE__, .x = 3.6L, .y = 1.89736659610102759919933612665963112023173308359513009611e0L },
+    { .line = __LINE__, .x = 3.7L, .y = 1.92353840616713447518553629212133738737818670911196145723e0L },
+    { .line = __LINE__, .x = 3.8L, .y = 1.9493588689617927813676826399799200598505167800674982064e0L },
+    { .line = __LINE__, .x = 3.9L, .y = 1.97484176581314990174384610437230990660852618680820080988e0L },
+    { .line = __LINE__, .x = 4L, .y = 2e0L },
+    { .line = __LINE__, .x = 4.1L, .y = 2.02484567313165869332469022899011700842278393843458062176e0L },
+    { .line = __LINE__, .x = 4.2L, .y = 2.04939015319191967664420773610421039814700653269096658591e0L },
+    { .line = __LINE__, .x = 4.3L, .y = 2.07364413533277208745589867998499263240118443458486895752e0L },
+    { .line = __LINE__, .x = 4.4L, .y = 2.09761769634030309398290702735987519695054371536300796975e0L },
+    { .line = __LINE__, .x = 4.5L, .y = 2.12132034355964257320253308631454711785450781306542210976e0L },
+    { .line = __LINE__, .x = 4.6L, .y = 2.14476105895272166096283193443085694101804237111005751129e0L },
+    { .line = __LINE__, .x = 4.7L, .y = 2.16794833886787994189896244807320993582686574872204202527e0L },
+    { .line = __LINE__, .x = 4.8L, .y = 2.19089023002066445382787913120320853581097877999193301691e0L },
+    { .line = __LINE__, .x = 4.9L, .y = 2.2135943621178655323992254811029029736036885975276517788e0L },
+    { .line = __LINE__, .x = 5L, .y = 2.23606797749978969640917366873127623544061835961152572427e0L },
+    { .line = __LINE__, .x = 5.1L, .y = 2.25831795812724298497204998596911539535997040397390263907e0L },
+    { .line = __LINE__, .x = 5.2L, .y = 2.28035085019827595827209805113350895815201062183282075059e0L },
+    { .line = __LINE__, .x = 5.3L, .y = 2.30217288664426764419484158642020185018583028263367517943e0L },
+    { .line = __LINE__, .x = 5.4L, .y = 2.32379000772445013110755923986943976649975302317495449595e0L },
+    { .line = __LINE__, .x = 5.5L, .y = 2.3452078799117147772828150567722331402941141767058685768e0L },
+    { .line = __LINE__, .x = 5.6L, .y = 2.36643191323984641702693131662464681936620049231773612915e0L },
+    { .line = __LINE__, .x = 5.7L, .y = 2.38746727726266438979364646142840753846778605032853340069e0L },
+    { .line = __LINE__, .x = 5.8L, .y = 2.40831891575845909602564820607572161048507048101076679041e0L },
+    { .line = __LINE__, .x = 5.9L, .y = 2.42899156029822384395420923959430625958487092885743584987e0L },
+    { .line = __LINE__, .x = 6L, .y = 2.44948974278317809819728407470589139196594748065667012843e0L },
+    { .line = __LINE__, .x = 6.1L, .y = 2.46981780704569380590709946162877517919414492582021285823e0L },
+    { .line = __LINE__, .x = 6.2L, .y = 2.48997991959774647496719413335644124873160039833356188622e0L },
+    { .line = __LINE__, .x = 6.3L, .y = 2.50998007960222664393451607735556246817844610789601659943e0L },
+    { .line = __LINE__, .x = 6.4L, .y = 2.52982212813470346559911483554617482697564411146017346149e0L },
+    { .line = __LINE__, .x = 6.5L, .y = 2.54950975679639241501411205451139099478188547304979820379e0L },
+    { .line = __LINE__, .x = 6.6L, .y = 2.56904651573302580402337969552798808389347050231205277406e0L },
+    { .line = __LINE__, .x = 6.7L, .y = 2.58843582110895691413554433089845182218482507596919484194e0L },
+    { .line = __LINE__, .x = 6.8L, .y = 2.60768096208105948583318862297167376661123751156402618358e0L },
+    { .line = __LINE__, .x = 6.9L, .y = 2.62678510731273942937392214499769386019785178056633462227e0L },
+    { .line = __LINE__, .x = 7L, .y = 2.64575131106459059050161575363926042571025918308245018037e0L },
+    { .line = __LINE__, .x = 7.1L, .y = 2.66458251889484556079325958827907403511172183242952905546e0L },
+    { .line = __LINE__, .x = 7.2L, .y = 2.68328157299974763569100840247753148252874203153383086912e0L },
+    { .line = __LINE__, .x = 7.3L, .y = 2.70185121722125920617468337148687431884897680087640217801e0L },
+    { .line = __LINE__, .x = 7.4L, .y = 2.72029410174708866900598747441147763059875109206355306649e0L },
+    { .line = __LINE__, .x = 7.5L, .y = 2.73861278752583056728484891400401066976372347498991627113e0L },
+    { .line = __LINE__, .x = 7.6L, .y = 2.75680975041804435359118251058683508543963271167980029581e0L },
+    { .line = __LINE__, .x = 7.7L, .y = 2.77488738510232158934794578922223727410847286397514460357e0L },
+    { .line = __LINE__, .x = 7.8L, .y = 2.79284800875378823397678490821727520412803594478496880204e0L },
+    { .line = __LINE__, .x = 7.9L, .y = 2.81069386451103920290531486589069175516821292744299970863e0L },
+    { .line = __LINE__, .x = 8L, .y = 2.82842712474619009760337744841939615713934375075389614635e0L },
+    { .line = __LINE__, .x = 8.1L, .y = 2.84604989415154139879900418998944668034759962539269514417e0L },
+    { .line = __LINE__, .x = 8.2L, .y = 2.86356421265527063088792024620674840675936890059141643159e0L },
+    { .line = __LINE__, .x = 8.3L, .y = 2.88097205817758669910162366529661589943630388444191968108e0L },
+    { .line = __LINE__, .x = 8.4L, .y = 2.89827534923788771474373283143395434462802657495179461774e0L },
+    { .line = __LINE__, .x = 8.5L, .y = 2.91547594742265023543707643877279153826069916744298597722e0L },
+    { .line = __LINE__, .x = 8.6L, .y = 2.93257565972303602900449820939494581409585987734002291245e0L },
+    { .line = __LINE__, .x = 8.7L, .y = 2.94957624075052516686883672040572594177567633472515882063e0L },
+    { .line = __LINE__, .x = 8.8L, .y = 2.96647939483826517948455897632028522439196172763900063949e0L },
+    { .line = __LINE__, .x = 8.9L, .y = 2.98328677803525955291160358635968751426814843009872695268e0L },
+    { .line = __LINE__, .x = 9L, .y = 3e0L },
+    { .line = __LINE__, .x = 9.1L, .y = 3.01662062579967121725167644245938650254922307527105193694e0L },
+    { .line = __LINE__, .x = 9.2L, .y = 3.03315017762062022170273017451282862181985685580698490129e0L },
+    { .line = __LINE__, .x = 9.3L, .y = 3.04959013639538124736439560500214291968268001253503603585e0L },
+    { .line = __LINE__, .x = 9.4L, .y = 3.06594194335117833131073639831440974213865465191129391713e0L },
+    { .line = __LINE__, .x = 9.5L, .y = 3.08220700148448822512509619072712211261781201172228727244e0L },
+    { .line = __LINE__, .x = 9.6L, .y = 3.09838667696593350814341231982591968866633736423327266127e0L },
+    { .line = __LINE__, .x = 9.7L, .y = 3.11448230047948739342170797367345067862709821573271678958e0L },
+    { .line = __LINE__, .x = 9.8L, .y = 3.13049516849970557497284313622378672961686570345613601398e0L },
+    { .line = __LINE__, .x = 9.9L, .y = 3.14642654451045464097436054103981279542581557304451195463e0L },
+    { .line = __LINE__, .x = 10L, .y = 3.16227766016837933199889354443271853371955513932521682686e0L },
+};
+
+int test_sqrtl(void) {
+    unsigned int i;
+    int result = 0;
+    for (i = 0; i < sizeof(sqrtl_vec)/sizeof(sqrtl_vec[0]); i++) {
+        long double y = sqrtl(sqrtl_vec[i].x);
+        result += check_long_double("sqrtl", sqrtl_vec[i].line, SQRTL_PREC, sqrtl_vec[i].y, y);
+    }
+    return result;
+}
+
+#ifdef FULL_LONG_DOUBLE
 #ifndef TANHL_PREC
 #define TANHL_PREC DEFAULT_PREC
 #endif
@@ -12879,7 +13063,9 @@ int test_tanhl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef TANL_PREC
 #define TANL_PREC DEFAULT_PREC
 #endif
@@ -13096,7 +13282,9 @@ int test_tanl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef TGAMMAL_PREC
 #define TGAMMAL_PREC DEFAULT_PREC
 #endif
@@ -13313,7 +13501,9 @@ int test_tgammal(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 
+#ifdef FULL_LONG_DOUBLE
 #ifndef TRUNCL_PREC
 #define TRUNCL_PREC DEFAULT_PREC
 #endif
@@ -13530,43 +13720,119 @@ int test_truncl(void) {
     }
     return result;
 }
+#endif /* FULL_LONG_DOUBLE */
 long_double_test_t long_double_tests[] = {
+#ifdef FULL_LONG_DOUBLE
     { .name = "acoshl", .test = test_acoshl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "acosl", .test = test_acosl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "asinhl", .test = test_asinhl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "asinl", .test = test_asinl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "atanhl", .test = test_atanhl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "atanl", .test = test_atanl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "cbrtl", .test = test_cbrtl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "ceill", .test = test_ceill },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "coshl", .test = test_coshl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "cosl", .test = test_cosl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "erfcl", .test = test_erfcl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "erfl", .test = test_erfl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "exp10l", .test = test_exp10l },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "exp2l", .test = test_exp2l },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "expl", .test = test_expl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "expm1l", .test = test_expm1l },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "floorl", .test = test_floorl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "lgammal", .test = test_lgammal },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "log10l", .test = test_log10l },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "log1pl", .test = test_log1pl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "log2l", .test = test_log2l },
+#endif /* FULL_LONG_DOUBLE */
     { .name = "logbl", .test = test_logbl },
+#ifdef FULL_LONG_DOUBLE
     { .name = "logl", .test = test_logl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "nearbyintl", .test = test_nearbyintl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "roundl", .test = test_roundl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "sinhl", .test = test_sinhl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "sinl", .test = test_sinl },
+#endif /* FULL_LONG_DOUBLE */
+    { .name = "sqrtl", .test = test_sqrtl },
+#ifdef FULL_LONG_DOUBLE
     { .name = "tanhl", .test = test_tanhl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "tanl", .test = test_tanl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "tgammal", .test = test_tgammal },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "truncl", .test = test_truncl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "atan2l", .test = test_atan2l },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "powl", .test = test_powl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "fmodl", .test = test_fmodl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "fdiml", .test = test_fdiml },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "fmaxl", .test = test_fmaxl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "fminl", .test = test_fminl },
+#endif /* FULL_LONG_DOUBLE */
+#ifdef FULL_LONG_DOUBLE
     { .name = "remainderl", .test = test_remainderl },
+#endif /* FULL_LONG_DOUBLE */
 };
