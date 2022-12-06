@@ -58,4 +58,9 @@ __scan_nan(uint32_t *bits, int len, const char *s)
 
 #include "ld128/s_nanl.c"
 
+#elif defined(_DOUBLE_DOUBLE_FLOAT)
+
+#include "ldd/s_nanl.c"
+
 #endif
+

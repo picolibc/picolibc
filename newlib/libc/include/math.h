@@ -537,6 +537,20 @@ extern long int lrintl (long double);
 extern long long int llrintl (long double);
 extern int ilogbl (long double);
 extern long double logbl (long double);
+extern long double ldexpl (long double, int);
+extern long double nearbyintl (long double);
+extern long double ceill (long double);
+extern long double fmaxl (long double, long double);
+extern long double fminl (long double, long double);
+extern long double roundl (long double);
+extern long lroundl (long double);
+extern long long int llroundl (long double);
+extern long double truncl (long double);
+extern long double nanl (const char *);
+extern long double floorl (long double);
+/* Compiler provides these */
+extern long double fabsl (long double);
+extern long double copysignl (long double, long double);
 
 #ifdef _HAVE_LONG_DOUBLE_MATH
 extern long double atanl (long double);
@@ -545,8 +559,6 @@ extern long double sinl (long double);
 extern long double tanl (long double);
 extern long double tanhl (long double);
 extern long double modfl (long double, long double *);
-extern long double ceill (long double);
-extern long double floorl (long double);
 extern long double log1pl (long double);
 extern long double expm1l (long double);
 extern long double acosl (long double);
@@ -555,12 +567,10 @@ extern long double atan2l (long double, long double);
 extern long double coshl (long double);
 extern long double sinhl (long double);
 extern long double expl (long double);
-extern long double ldexpl (long double, int);
 extern long double logl (long double);
 extern long double log10l (long double);
 extern long double powl (long double, long double);
 extern long double fmodl (long double, long double);
-extern long double nanl (const char *);
 extern long double asinhl (long double);
 extern long double cbrtl (long double);
 extern long double nextafterl (long double, long double);
@@ -571,15 +581,8 @@ extern long double log2l (long double);
 extern long double exp2l (long double);
 extern long double scalbl (long double, long double);
 extern long double tgammal (long double);
-extern long double nearbyintl (long double);
-extern long double roundl (long double);
-extern long lroundl (long double);
-extern long long int llroundl (long double);
-extern long double truncl (long double);
 extern long double remquol (long double, long double, int *);
 extern long double fdiml (long double, long double);
-extern long double fmaxl (long double, long double);
-extern long double fminl (long double, long double);
 extern long double fmal (long double, long double, long double);
 extern long double acoshl (long double);
 extern long double atanhl (long double);
@@ -599,12 +602,6 @@ extern long double ynl(int, long double);
 #endif /* _HAVE_LONG_DOUBLE */
 
 #endif /* __ISO_C_VISIBLE >= 1999 */
-
-#ifdef _HAVE_LONG_DOUBLE
-/* Compiler provides these */
-extern long double fabsl (long double);
-extern long double copysignl (long double, long double);
-#endif
 
 #if __MISC_VISIBLE
 extern double drem (double, double);

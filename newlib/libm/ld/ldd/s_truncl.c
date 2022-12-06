@@ -33,18 +33,19 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "math_ld.h"
+long double
+truncl(long double x)
+{
+    union IEEEl2bits u;
+    double dh, dl;
 
-#if LDBL_MANT_DIG == 64
-
-#include "ld80/s_floorl.c"
-
-#elif LDBL_MANT_DIG == 113
-
-#include "ld128/s_floorl.c"
-
-#elif defined(_DOUBLE_DOUBLE_FLOAT)
-
-#include "ldd/s_floorl.c"
-
-#endif
+    u.e = x;
+    if (u.bits.exp == LDBL_INF_NAN_EXP)
+        return x + x;
+    dh = trunc(u.dbits.dh);
+    if (dh != u.dbits.dh)
+        dl = 0;
+    else
+        dl = dh > 0 ? floor(u.dbits.dl) : ceil(u.dbits.dl);
+    return (long double) dh + (long double) dl;
+}

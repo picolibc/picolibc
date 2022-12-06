@@ -43,4 +43,8 @@
 
 #include "ld128/s_ceill.c"
 
+#elif defined(_DOUBLE_DOUBLE_FLOAT)
+
+#include "ldd/s_ceill.c"
+
 #endif

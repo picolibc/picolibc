@@ -637,6 +637,27 @@ typedef double __float64;
 
 #if __SIZEOF_LONG_DOUBLE__ > 8
 # define _NEED_FLOAT_HUGE
+/* Guess long double layout based on compiler defines */
+
+#if __LDBL_MANT_DIG__ == 64 && 16383 <= __LDBL_MAX_EXP__ && __LDBL_MAX_EXP__ <= 16384
+#define _INTEL80_FLOAT
+#ifdef __LP64__
+#define _INTEL80_FLOAT_PAD
+#endif
+#endif
+
+#if __LDBL_MANT_DIG__ == 113 && 16383 <= __LDBL_MAX_EXP__ && __LDBL_MAX_EXP__ <= 16384
+#define _IEEE128_FLOAT
+#endif
+
+#if __LDBL_MANT_DIG__ == 106 && __LDBL_MAX_EXP__ == 1024
+#define _DOUBLE_DOUBLE_FLOAT
+#endif
+
+#ifndef __FLOAT_WORD_ORDER__
+#define __FLOAT_WORD_ORDER__     __BYTE_ORDER__
+#endif
+
 #endif
 
 #define _MATH_ALIAS_f(name) \
@@ -898,6 +919,14 @@ void __math_set_inexactf(void);
 #else
 #define __math_inexactf(val) (val)
 #define __math_set_inexactf()   ((void) 0)
+#endif
+
+#if defined(FE_INEXACT) && !defined(PICOLIBC_LONG_DOUBLE_NOEXECPT) && defined(_NEED_FLOAT_HUGE)
+long double __math_inexactl(long double val);
+void __math_set_inexactl(void);
+#else
+#define __math_inexactl(val) (val)
+#define __math_set_inexactl()   ((void) 0)
 #endif
 
 /* Shared between expf, exp2f and powf.  */

@@ -43,4 +43,9 @@
 
 #include "ld128/s_truncl.c"
 
+#elif defined(_DOUBLE_DOUBLE_FLOAT)
+
+#include "ldd/s_truncl.c"
+
 #endif
+

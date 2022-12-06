@@ -33,18 +33,34 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "math_ld.h"
+long double
+nearbyintl(long double x)
+{
+    union IEEEl2bits u;
+    double dh, dl, frac;
 
-#if LDBL_MANT_DIG == 64
+    u.e = x;
+    if (u.bits.exp == LDBL_INF_NAN_EXP)
+        return x + x;
+    dh = nearbyint(u.dbits.dh);
+    frac = u.dbits.dh - dh;
+    if (frac != 0.0) {
+        /* Adjust rounding when upper fraction is 0.5 */
+        if (u.dbits.dl > 0 && frac == 0.5)
+            dh += 1.0;
+        else if(u.dbits.dl < 0 && frac == -0.5)
+            dh -= 1.0;
+        dl = 0;
+    } else
+        dl = nearbyint(u.dbits.dl);
+    return (long double) dh + (long double) dl;
+}
 
-#include "ld80/s_floorl.c"
-
-#elif LDBL_MANT_DIG == 113
-
-#include "ld128/s_floorl.c"
-
-#elif defined(_DOUBLE_DOUBLE_FLOAT)
-
-#include "ldd/s_floorl.c"
-
-#endif
+long double
+rintl(long double x)
+{
+    long double y = nearbyintl(x);
+    if (x != y)
+        return __math_inexactl(y);
+    return y;
+}

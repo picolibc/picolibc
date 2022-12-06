@@ -38,9 +38,9 @@ fmaxl(long double x, long double y)
 	mask_nbit_l(u[1]);
 
 	/* Check for NaNs to avoid raising spurious exceptions. */
-	if (u[0].bits.exp == 32767 && (u[0].bits.manh | u[0].bits.manl) != 0)
+	if (u[0].bits.exp == LDBL_INF_NAN_EXP && (u[0].bits.manh | u[0].bits.manl) != 0)
 		return (y);
-	if (u[1].bits.exp == 32767 && (u[1].bits.manh | u[1].bits.manl) != 0)
+	if (u[1].bits.exp == LDBL_INF_NAN_EXP && (u[1].bits.manh | u[1].bits.manl) != 0)
 		return (x);
 
 	/* Handle comparisons of signed zeroes. */

@@ -77,27 +77,6 @@ long double __kernel_tanl(long double, long double, int);
 
 #endif
 
-/* Guess long double layout based on compiler defines */
-
-#if __LDBL_MANT_DIG__ == 64 && 16383 <= __LDBL_MAX_EXP__ && __LDBL_MAX_EXP__ <= 16384
-#define _INTEL80_FLOAT
-#ifdef __LP64__
-#define _INTEL80_FLOAT_PAD
-#endif
-#endif
-
-#if __LDBL_MANT_DIG__ == 113 && 16383 <= __LDBL_MAX_EXP__ && __LDBL_MAX_EXP__ <= 16384
-#define _IEEE128_FLOAT
-#endif
-
-#if __LDBL_MANT_DIG__ == 106 && __LDBL_MAX_EXP__ == 1024
-#define _DOUBLE_DOUBLE_FLOAT
-#endif
-
-#ifndef __FLOAT_WORD_ORDER__
-#define __FLOAT_WORD_ORDER__     __BYTE_ORDER__
-#endif
-
 #include "math_private_openbsd.h"
 
 #ifndef EXT_FRACLMBITS

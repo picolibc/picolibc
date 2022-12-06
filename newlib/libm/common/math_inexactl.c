@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2022 Keith Packard
+ * Copyright © 2021 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,18 +33,30 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "math_ld.h"
+#include "math_config.h"
 
-#if LDBL_MANT_DIG == 64
+#if defined(FE_INEXACT) && !defined(PICOLIBC_LONG_DOUBLE_NOEXECPT) && defined(_NEED_FLOAT_HUGE)
 
-#include "ld80/s_floorl.c"
+#ifdef _DOUBLE_DOUBLE_FLOAT
+static const FORCE_LONG_DOUBLE VAL = pick_long_double_except(LDBL_MIN, 0.0L);
+static const FORCE_LONG_DOUBLE VAL1 = pick_long_double_except(LDBL_MAX, 0.0L);
+#define eqn (1.0L + VAL + VAL1)
+#else
+static const FORCE_LONG_DOUBLE VAL = pick_long_double_except(LDBL_MIN, 0.0L);
+#define eqn (1.0L + VAL)
+#endif
 
-#elif LDBL_MANT_DIG == 113
+HIDDEN void
+__math_set_inexactl(void)
+{
+    force_eval_long_double(eqn);
+}
 
-#include "ld128/s_floorl.c"
-
-#elif defined(_DOUBLE_DOUBLE_FLOAT)
-
-#include "ldd/s_floorl.c"
+HIDDEN long double
+__math_inexactl(long double val)
+{
+    force_eval_long_double(eqn);
+    return val;
+}
 
 #endif

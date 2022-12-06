@@ -35,8 +35,13 @@
 
 #include "math_ld.h"
 
-#if LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113
+#if defined(_IEEE128_FLOAT) || defined(_INTEL80_FLOAT)
 
 #include "common/s_rintl.c"
 
+#elif defined(_DOUBLE_DOUBLE_FLOAT)
+
+#include "ldd/s_nearbyintl.c"
+
 #endif
+

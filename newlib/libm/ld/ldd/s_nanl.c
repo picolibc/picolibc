@@ -33,18 +33,12 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "math_ld.h"
+long double
+nanl(const char *s)
+{
+    union IEEEl2bits u;
 
-#if LDBL_MANT_DIG == 64
-
-#include "ld80/s_floorl.c"
-
-#elif LDBL_MANT_DIG == 113
-
-#include "ld128/s_floorl.c"
-
-#elif defined(_DOUBLE_DOUBLE_FLOAT)
-
-#include "ldd/s_floorl.c"
-
-#endif
+    u.dbits.dh = nan(s);
+    u.dbits.dl = 0.0;
+    return u.e;
+}
