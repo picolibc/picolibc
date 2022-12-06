@@ -82,6 +82,17 @@ check_long_double(const char *name, int i, long double prec, long double expect,
     return 0;
 }
 
+int
+check_long_long(const char *name, int i, long long expect, long long result)
+{
+    if (expect != result) {
+        long long diff = expect - result;
+        printf("%s test %d got %lld expect %lld diff %lld\n", name, i, result, expect, diff);
+        return 1;
+    }
+    return 0;
+}
+
 typedef struct {
     const char *name;
     int (*test)(void);
@@ -100,6 +111,19 @@ typedef struct {
     long double y;
 } long_double_test_f_ff_t;
 
+typedef struct {
+    int line;
+    long double x0;
+    int x1;
+    long double y;
+} long_double_test_f_fi_t;
+
+typedef struct {
+    int line;
+    long double x;
+    long long y;
+} long_double_test_i_f_t;
+
 /*
  * sqrtl is "exact", but can have up to one bit of error as it might
  * not have enough guard bits to correctly perform rounding, leading
@@ -108,15 +132,15 @@ typedef struct {
  */
 #if LDBL_MANT_DIG == 64
 #define DEFAULT_PREC 1e-16L
-#define SQRTL_PREC 0x8.0p-63
+#define SQRTL_PREC 0x8.0p-63L
 #define FULL_LONG_DOUBLE
 #elif LDBL_MANT_DIG == 113
 #define FULL_LONG_DOUBLE
 #define DEFAULT_PREC 1e-31L
-#define SQRTL_PREC 0x8.0p-112
+#define SQRTL_PREC 0x8.0p-112L
 #elif LDBL_MANT_DIG == 106
 #define DEFAULT_PREC 1e-29L
-#define SQRTL_PREC 0x8.0p-105
+#define SQRTL_PREC 0x8.0p-105L
 #endif
 
 #define CEILL_PREC      0
