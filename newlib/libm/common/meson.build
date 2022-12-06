@@ -162,7 +162,6 @@ lsrcs_common = [
   'sl_finite.c',
   'sl_iseqsig.c',
   'sl_issignaling.c',
-  'sqrtl.c',
   ]
 
 srcs_common += dsrcs_common + fsrcs_common
