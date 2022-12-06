@@ -35,6 +35,9 @@ fabsl(long double x)
 	union IEEEl2bits u;
 
 	u.e = x;
+#ifdef _DOUBLE_DOUBLE_FLOAT
+        u.bits.signl ^= u.bits.sign;
+#endif
 	u.bits.sign = 0;
 	return (u.e);
 }
