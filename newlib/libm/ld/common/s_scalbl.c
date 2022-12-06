@@ -43,7 +43,7 @@ scalbl (long double x, long double fn)
             return x/(-fn);
     }
 
-    if (rintl(fn) != fn)
+    if (floorl(fn) != fn)
         return __math_invalidl(fn);
 
     if (fn > 4.0L * __LDBL_MAX_EXP__)
