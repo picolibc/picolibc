@@ -75,6 +75,8 @@ long double __kernel_tanl(long double, long double, int);
 #endif
 #endif
 
+#endif
+
 /* Guess long double layout based on compiler defines */
 
 #if __LDBL_MANT_DIG__ == 64 && 16383 <= __LDBL_MAX_EXP__ && __LDBL_MAX_EXP__ <= 16384
@@ -104,6 +106,4 @@ long double __kernel_tanl(long double, long double, int);
 
 #ifndef EXT_FRACHMBITS
 #define EXT_FRACHMBITS 0
-#endif
-
 #endif

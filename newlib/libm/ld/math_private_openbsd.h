@@ -527,6 +527,10 @@ union IEEEl2bits {
                 u_int64_t       expsignl:12;
 #endif
 	} xbits;
+        struct {
+                double  dh;
+                double  dl;
+        } dbits;
 };
 
 #define	LDBL_NBIT	        0
