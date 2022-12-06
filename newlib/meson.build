@@ -59,9 +59,11 @@ foreach target : targets
 
   if target == ''
     libc_name = 'c'
+    libg_name = 'g'
     libm_name = 'm'
   else
     libc_name = join_paths(target, 'libc')
+    libg_name = join_paths(target, 'libg')
     libm_name = join_paths(target, 'libm')
   endif
 
@@ -76,6 +78,12 @@ foreach target : targets
 
   set_variable('lib_c' + target, local_lib_c_target)
   static_library(libm_name,
+		 ['empty.c'],
+		 install : true,
+		 install_dir : instdir,
+		 pic: false,
+		 objects : [])
+  static_library(libg_name,
 		 ['empty.c'],
 		 install : true,
 		 install_dir : instdir,
