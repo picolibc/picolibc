@@ -230,96 +230,82 @@ main(void)
     f1 = log2f (f1);
     f1 = hypotf (f1, f2);
 
-#ifdef _HAVE_LONG_DOUBLE_MATH
-    l1 = atanl (l1);
-    l1 = cosl (l1);
-    l1 = sinl (l1);
-    l1 = tanl (l1);
-    l1 = tanhl (l1);
+#ifdef _HAVE_LONG_DOUBLE
     l1 = frexpl (l1, &i1);
-    l1 = modfl (l1, &l2);
-    l1 = ceill (l1);
-    l1 = floorl (l1);
-    l1 = log1pl (l1);
-    l1 = expm1l (l1);
-#endif
-
-#ifdef _HAVE_LONG_DOUBLE_MATH
-    l1 = acosl (l1);
-    l1 = asinl (l1);
-    l1 = atan2l (l1, l2);
-    l1 = coshl (l1);
-    l1 = sinhl (l1);
-    l1 = expl (l1);
     l1 = ldexpl (l1, i1);
-    l1 = logl (l1);
-    l1 = log10l (l1);
-    l1 = powl (l1, l2);
-#endif
     l1 = sqrtl (l1);
-#ifdef _HAVE_LONG_DOUBLE_MATH
-    l1 = fmodl (l1, l2);
-#endif
     l1 = hypotl (l1, l2);
-
-#ifdef _HAVE_LONG_DOUBLE_MATH
     l1 = nanl ("");
     i1 = ilogbl (l1);
-    l1 = asinhl (l1);
-    l1 = cbrtl (l1);
-    l1 = nextafterl (l1, l2);
-    f1 = nexttowardf (f1, l1);
-    d1 = nexttoward (d1, l1);
-    l1 = nexttowardl (l1, l2);
     l1 = logbl (l1);
-    l1 = log2l (l1);
-    l1 = rintl (l1);
     l1 = scalbnl (l1, i1);
-    l1 = exp2l (l1);
     l1 = scalblnl (l1, li1);
-    l1 = tgammal (l1);
     l1 = nearbyintl (l1);
+    l1 = rintl (l1);
     li1 = lrintl (l1);
     lli1 = llrintl (l1);
     l1 = roundl (l1);
     l1 = lroundl (l1);
     lli1 = llroundl (l1);
     l1 = truncl (l1);
-    l1 = remquol (l1, l2, &i1);
-    l1 = fdiml (l1, l2);
     l1 = fmaxl (l1, l2);
     l1 = fminl (l1, l2);
-    l1 = fmal (l1, l2, l3);
-#endif
+    l1 = hypotl (l1, l2);
+    l1 = sqrtl (l1);
+    l1 = fabsl (l1);
+    l1 = copysignl (l1, l2);
+
+    l1 = ceill (l1);
+    l1 = floorl (l1);
 
 #ifdef _HAVE_LONG_DOUBLE_MATH
+    l1 = atanl (l1);
+    l1 = cosl (l1);
+    l1 = sinl (l1);
+    l1 = tanl (l1);
+    l1 = tanhl (l1);
+    l1 = modfl (l1, &l2);
+    l1 = log1pl (l1);
+    l1 = expm1l (l1);
+
+    l1 = acosl (l1);
+    l1 = asinl (l1);
+    l1 = atan2l (l1, l2);
+    l1 = coshl (l1);
+    l1 = sinhl (l1);
+    l1 = expl (l1);
+    l1 = logl (l1);
+    l1 = log10l (l1);
+    l1 = powl (l1, l2);
+    l1 = fmodl (l1, l2);
+
+    l1 = asinhl (l1);
+    l1 = cbrtl (l1);
+    l1 = log2l (l1);
+    l1 = exp2l (l1);
+    l1 = tgammal (l1);
+    l1 = remquol (l1, l2, &i1);
+    l1 = fdiml (l1, l2);
+    l1 = fmal (l1, l2, l3);
     l1 = acoshl (l1);
     l1 = atanhl (l1);
     l1 = remainderl (l1, l2);
     l1 = lgammal (l1);
     l1 = erfl (l1);
     l1 = erfcl (l1);
-#endif
-
-    l1 = hypotl (l1, l2);
-    l1 = sqrtl (l1);
-
-#ifdef _HAVE_LONG_DOUBLE_MATH
-    l1 = rintl (l1);
-    li1 = lrintl (l1);
-    lli1 = llrintl (l1);
-#endif
-
-#ifdef _HAVE_LONG_DOUBLE_MATH
-    l1 = fabsl (l1);
-    l1 = copysignl (l1, l2);
-#endif
+    f1 = dreml (l1, l2);
+    sincosl (l1, &l2, &l3);
+    l1 = exp10l (l1);
+    l1 = pow10l (l1);
+    f1 = nexttowardf (f1, l1);
+    d1 = nexttoward (d1, l1);
+    l1 = nextafterl (l1, l2);
+    l1 = nexttowardl (l1, l2);
+#endif /* _HAVE_LONG_DOUBLE_MATH */
+#endif /* _HAVE_LONG_DOUBLE */
 
     d1 = drem (d1, d2);
     f1 = dremf (f1, f2);
-#ifdef _HAVE_LONG_DOUBLE_MATH
-    f1 = dreml (l1, l2);
-#endif
     d1 = lgamma_r (d1, &i1);
     f1 = lgammaf_r (f1, &i1);
 
@@ -339,17 +325,10 @@ main(void)
 
     sincos (d1, &d2, &d3);
     sincosf (f1, &f2, &f3);
-#ifdef _HAVE_LONG_DOUBLE_MATH
-    sincosl (l1, &l2, &l3);
-#endif
     d1 = exp10 (d1);
     d1 = pow10 (d1);
     f1 = exp10f (f1);
     f1 = pow10f (f1);
-#ifdef _HAVE_LONG_DOUBLE_MATH
-    l1 = exp10l (l1);
-    l1 = pow10l (l1);
-#endif
 
 #ifdef _HAVE_COMPLEX
     cd1 = cacos(cd1);
