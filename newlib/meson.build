@@ -75,15 +75,12 @@ foreach target : targets
 				      c_args: value[1])
 
   set_variable('lib_c' + target, local_lib_c_target)
-
-  local_lib_m_target = static_library(libm_name,
-                                      ['empty.c'],
-                                      install : true,
-                                      install_dir : instdir,
-                                      pic: false,
-                                      objects : [])
-
-  set_variable('lib_m' + target, local_lib_m_target)
+  static_library(libm_name,
+		 ['empty.c'],
+		 install : true,
+		 install_dir : instdir,
+		 pic: false,
+		 objects : [])
 
   if check_duplicate_names
     custom_target('libc_duplicates' + target,
