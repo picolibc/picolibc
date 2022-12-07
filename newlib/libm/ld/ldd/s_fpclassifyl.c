@@ -36,24 +36,8 @@
 int
 __fpclassifyl (long double x)
 {
-    int ret = FP_NORMAL;
-#if defined(FE_INVALID) && !defined(PICOLIBC_DOUBLE_NOEXECPT)
-    fenv_t env;
-    fegetenv(&env);
-#endif
-    if (!(x > 0) && !(x < 0))
-        ret = FP_NAN;
-    else if (x == 0)
-        return FP_ZERO;
-    else {
-        x = fabsl(x);
-        if (x == (long double) INFINITY)
-            ret = FP_INFINITE;
-        if (x < __LDBL_MIN__)
-            ret = FP_SUBNORMAL;
-    }
-#if defined(FE_INVALID) && !defined(PICOLIBC_DOUBLE_NOEXECPT)
-    fesetenv(&env);
-#endif
-    return ret;
+    union IEEEl2bits u;
+
+    u.e = x;
+    return __fpclassifyd(u.dbits.dh);
 }

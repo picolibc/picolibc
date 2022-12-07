@@ -45,6 +45,6 @@
 
 #elif defined(_NEED_FLOAT_HUGE)
 
-#include "common/s_fpclassifyl.c"
+#include "ldd/s_fpclassifyl.c"
 
 #endif
