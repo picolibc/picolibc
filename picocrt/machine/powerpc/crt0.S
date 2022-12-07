@@ -32,13 +32,16 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#ifdef _CALL_ELF
+	.abiversion _CALL_ELF
+#endif
 #define PPC_BIT(bit)            (0x8000000000000000ULL >> (bit))
 	.text
 	.section	.text.init.enter
 	.global _start
 	.type	_start, @function
 _start:
-
+	.cfi_startproc
 	/* Where are we? */
 	bl	here
 here:	mflr	%r2
@@ -69,6 +72,9 @@ here:	mflr	%r2
 	mr	%r3, %r8
 	mr	%r4, %r9
 	bl	_cstart
+	.cfi_endproc
+	.size _start,.-_start
+
 	.align	3
 #ifdef __PPC64__
 toc:	
@@ -82,3 +88,6 @@ stackaddr:
 	.long	__stack
 #endif
 	
+#if defined(__linux__) && defined(__ELF__)
+.section .note.GNU-stack,"",%progbits
+#endif

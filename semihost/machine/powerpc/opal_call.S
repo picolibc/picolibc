@@ -32,7 +32,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
+#ifdef _CALL_ELF
+	.abiversion _CALL_ELF
+#endif
 	.text
 	.section	.text.opal_call
 	.align		2
@@ -41,8 +43,8 @@
  * void
  * opal_call(void *r3, void *r4, void *r5, int call_r6, void *base_r7, void *entry_r8);
  */
-#ifdef __PPC64__
 	.global		opal_call
+#if defined(__PPC64__) && _CALL_ELF == 1
 	.section	".opd","aw"
 	.align		3
 opal_call:
@@ -91,3 +93,7 @@ opal_call:
 
 	.cfi_endproc
 	.size		opal_call,.-.opal_call
+
+#if defined(__linux__) && defined(__ELF__)
+.section .note.GNU-stack,"",%progbits
+#endif

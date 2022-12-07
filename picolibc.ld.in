@@ -111,10 +111,6 @@ SECTIONS
 
 	} >flash AT>flash :text
 
-	.toc : {
-		*(.toc .toc.*)
-	} >flash AT>flash :text
-
         /* additional sections when compiling with C++ exception support */
 	@CPP_START@
         .except_ordered : {
@@ -208,6 +204,11 @@ SECTIONS
 	.tbss_space (NOLOAD) : {
 		. = . + SIZEOF(.tbss);
 	} >ram AT>ram :ram
+
+	/* PowerPC ABI */
+	.toc (NOLOAD) : {
+		*(.toc .toc.*)
+	} >ram AT>ram : ram
 
 	.bss (NOLOAD) : {
 		*(.sbss*)
