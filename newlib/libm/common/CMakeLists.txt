@@ -162,7 +162,6 @@ if(_HAVE_LONG_DOUBLE)
     nanl.c
     nexttoward.c
     nexttowardf.c
-    sl_finite.c
     sl_iseqsig.c
     sl_issignaling.c
   )

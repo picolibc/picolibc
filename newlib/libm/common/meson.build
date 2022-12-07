@@ -162,7 +162,6 @@ lsrcs_common = [
   'nanl.c',
   'nexttoward.c',
   'nexttowardf.c',
-  'sl_finite.c',
   'sl_iseqsig.c',
   'sl_issignaling.c',
   ]

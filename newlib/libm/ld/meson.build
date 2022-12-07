@@ -89,6 +89,7 @@ srcs_ld_common = [
   's_cosl.c',
   's_fabsl.c',
   's_fdiml.c',
+  's_finitel.c',
   's_fmal.c',
   's_fmaxl.c',
   's_fminl.c',
