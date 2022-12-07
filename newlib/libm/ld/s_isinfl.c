@@ -28,12 +28,10 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "math_config.h"
+#include "math_ld.h"
 
-#if defined(_NEED_FLOAT_HUGE) && defined(_HAVE_BUILTIN_ISNANL)
-int
-isnanl (long double x)
-{
-  return __builtin_isnanl(x);
-}
+#if defined(_NEED_FLOAT_HUGE) && !defined(_HAVE_BUILTIN_ISINFL)
+
+#include "common/s_isinfl.c"
+
 #endif

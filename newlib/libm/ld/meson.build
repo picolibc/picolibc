@@ -93,6 +93,7 @@ srcs_ld_common = [
   's_fmaxl.c',
   's_fminl.c',
   's_frexpl.c',
+  's_isinfl.c',
   's_isnanl.c',
   's_llrintl.c',
   's_llroundl.c',

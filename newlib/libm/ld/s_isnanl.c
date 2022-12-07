@@ -35,7 +35,7 @@
 
 #include "math_ld.h"
 
-#if LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113
+#if defined(_NEED_FLOAT_HUGE) && !defined(_HAVE_BUILTIN_ISNANL)
 
 #include "common/s_isnanl.c"
 
