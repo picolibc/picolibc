@@ -60,8 +60,16 @@ uname_x (struct utsname *name)
 		__XSTRING (CYGPORT_RELEASE_INFO), name->machine);
 #else
       extern const char *uname_dev_version;
-      snprintf (name->release, _UTSNAME_LENGTH, "%s.%s",
-		uname_dev_version, name->machine);
+      if (uname_dev_version && uname_dev_version[0])
+	snprintf (name->release, _UTSNAME_LENGTH, "%s.%s",
+		  uname_dev_version, name->machine);
+      else
+	__small_sprintf (name->release, "%d.%d.%d-api-%d.%s",
+			 cygwin_version.dll_major / 1000,
+			 cygwin_version.dll_major % 1000,
+			 cygwin_version.dll_minor,
+			 cygwin_version.api_minor,
+			 name->machine);
 #endif
 #pragma GCC diagnostic pop
       /* version */

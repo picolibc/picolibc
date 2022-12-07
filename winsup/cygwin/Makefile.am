@@ -421,7 +421,10 @@ src_files := $(foreach dir,$(dirs),$(find_src_files))
 
 uname_version.c: .FORCE
 	$(AM_V_GEN)cd $(srcdir) && \
-	echo "const char *uname_dev_version = \"$$(git describe --dirty | sed -e 's/cygwin-//')\";" > $(abs_builddir)/uname_version.c
+	echo "const char *uname_dev_version = \
+	\"$$(git rev-parse --git-dir >/dev/null 2>&1 && \
+	     git describe --dirty | sed -e 's/cygwin-//')\";" \
+	     > $(abs_builddir)/uname_version.c
 .FORCE:
 
 # mkvers.sh creates version.cc in the first place, winver.o always
