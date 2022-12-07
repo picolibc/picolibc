@@ -9,6 +9,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include <stdio.h>
 #include <sys/utsname.h>
 #include <netdb.h>
 #include "cygwin_version.h"
@@ -41,29 +42,31 @@ uname_x (struct utsname *name)
       memset (buf, 0, sizeof buf);
       cygwin_gethostname (buf, sizeof buf - 1);
       strncat (name->nodename, buf, sizeof (name->nodename) - 1);
-      /* release */
-#ifdef CYGPORT_RELEASE_INFO
-      stpcpy (name->release, __XSTRING (CYGPORT_RELEASE_INFO));
-#else
-      __small_sprintf (name->release, "%d.%d.%d-0.%d.local.",
-		       cygwin_version.dll_major / 1000,
-		       cygwin_version.dll_major % 1000,
-		       cygwin_version.dll_minor,
-		       cygwin_version.api_minor);
-#endif
-      /* version */
-      stpcpy (name->version, cygwin_version.dll_build_date);
-      strcat (name->version, " UTC");
       /* machine */
       switch (wincap.cpu_arch ())
 	{
 	  case PROCESSOR_ARCHITECTURE_AMD64:
-	    strcat (name->release, strcpy (name->machine, "x86_64"));
+	    strcpy (name->machine, "x86_64");
 	    break;
 	  default:
 	    strcpy (name->machine, "unknown");
 	    break;
 	}
+      /* release */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-truncation="
+#ifdef CYGPORT_RELEASE_INFO
+      snprintf (name->release, _UTSNAME_LENGTH, "%s.%s",
+		__XSTRING (CYGPORT_RELEASE_INFO), name->machine);
+#else
+      extern const char *uname_dev_version;
+      snprintf (name->release, _UTSNAME_LENGTH, "%s.%s",
+		uname_dev_version, name->machine);
+#endif
+#pragma GCC diagnostic pop
+      /* version */
+      stpcpy (name->version, cygwin_version.dll_build_date);
+      strcat (name->version, " UTC");
       /* domainame */
       memset (buf, 0, sizeof buf);
       getdomainname (buf, sizeof buf - 1);

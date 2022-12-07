@@ -365,7 +365,8 @@ GMON_FILES= \
 	profil.c
 
 GENERATED_FILES= \
-	sigfe.s
+	sigfe.s \
+	uname_version.c
 
 liblib_a_SOURCES= \
 	$(LIB_FILES)
@@ -417,6 +418,11 @@ BUILT_SOURCES = \
 dirs = $(srcdir) $(srcdir)/fhandler $(srcdir)/lib $(srcdir)/libc $(srcdir)/math $(srcdir)/mm $(srcdir)/regex $(srcdir)/sec $(srcdir)/tzcode
 find_src_files = $(wildcard $(dir)/*.[chS]) $(wildcard $(dir)/*.cc)
 src_files := $(foreach dir,$(dirs),$(find_src_files))
+
+uname_version.c: .FORCE
+	$(AM_V_GEN)cd $(srcdir) && \
+	echo "const char *uname_dev_version = \"$$(git describe --dirty | sed -e 's/cygwin-//')\";" > $(abs_builddir)/uname_version.c
+.FORCE:
 
 # mkvers.sh creates version.cc in the first place, winver.o always
 # second, so version.cc is always older than winver.o
