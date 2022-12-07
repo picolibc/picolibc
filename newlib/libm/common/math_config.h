@@ -871,10 +871,16 @@ HIDDEN void __math_set_invalidl(void);
 HIDDEN float __math_check_oflowf (float);
 /* Check if the result overflowed to infinity.  */
 HIDDEN __float64 __math_check_oflow (__float64);
+#ifdef _NEED_FLOAT_HUGE
+HIDDEN long double __math_check_oflowl(long double);
+#endif
 /* Check if the result underflowed to 0.  */
 HIDDEN float __math_check_uflowf (float);
 /* Check if the result underflowed to 0.  */
 HIDDEN __float64 __math_check_uflow (__float64);
+#ifdef _NEED_FLOAT_HUGE
+HIDDEN long double __math_check_uflowl(long double);
+#endif
 
 /* Check if the result overflowed to infinity.  */
 static inline __float64
@@ -890,6 +896,14 @@ check_oflowf (float x)
   return WANT_ERRNO ? __math_check_oflowf (x) : x;
 }
 
+#ifdef _NEED_FLOAT_HUGE
+static inline long double
+check_oflowl (long double x)
+{
+  return WANT_ERRNO ? __math_check_oflowl (x) : x;
+}
+#endif
+
 /* Check if the result underflowed to 0.  */
 static inline __float64
 check_uflow (__float64 x)
@@ -903,6 +917,14 @@ check_uflowf (float x)
 {
   return WANT_ERRNO ? __math_check_uflowf (x) : x;
 }
+
+#ifdef _NEED_FLOAT_HUGE
+static inline long double
+check_uflowl (long double x)
+{
+  return WANT_ERRNO ? __math_check_uflowl (x) : x;
+}
+#endif
 
 /* Set inexact exception */
 #if defined(FE_INEXACT) && !defined(PICOLIBC_DOUBLE_NOEXECPT)
