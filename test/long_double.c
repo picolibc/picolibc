@@ -141,6 +141,11 @@ typedef struct {
 #elif LDBL_MANT_DIG == 106
 #define DEFAULT_PREC 1e-29L
 #define SQRTL_PREC 0x8.0p-105L
+#elif LDBL_MANT_DIG == 53
+#define DEFAULT_PREC 1e-13L
+#define SQRTL_PREC 0x8.0p-52L
+#else
+#error unsupported long double
 #endif
 
 #define CEILL_PREC      0
