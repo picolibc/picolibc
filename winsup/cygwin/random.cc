@@ -307,6 +307,7 @@ srandomdev()
 		gettimeofday(&tv, NULL);
 		/* Avoid a compiler warning when we really want to get at the
 		   junk in an uninitialized variable. */
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 		srandom((getpid() << 16) ^ tv.tv_sec ^ tv.tv_usec ^ junk);
 #pragma GCC diagnostic pop
