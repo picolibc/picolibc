@@ -40,30 +40,41 @@ qemu="qemu-system-riscv32"
 elf="$1"
 shift
 
-case "$elf" in
-    *rv32*_ilp32*)
-	qemu="qemu-system-riscv32"
-	cpu=rv32
-	;;
-    *rv64*_lp64*)
-	qemu="qemu-system-riscv64"
-	cpu=rv64
-	;;
-    *)
-	case `file "$elf"` in
-	    *64-bit*)
-		qemu="qemu-system-riscv64"
-		options="i m a f d c"
-		cpu=rv64
-		;;
-	    *32-bit*)
-		qemu="qemu-system-riscv32"
-		options="i m a"
-		cpu=rv32
-		;;
-	esac
-	;;
-esac
+archstring=""
+# If readelf is installed, we can use the .riscv.attributes section
+# in the file to determine required extensions that we need in QEMU.
+# This will give us a string such as "rv64i2p0_m2p0_a2p0_f2p0_d2p0_c2p0"
+if command -v readelf >/dev/null 2>/dev/null; then
+    # LLVM-based toolchains readelf produces different output from GNU, so
+    # check --version output first.
+    if readelf --version | grep LLVM >/dev/null; then
+        archstring=$(readelf --arch-specific "$elf" | grep "Value: rv" | cut -d: -f2)
+    else
+        archstring=$(readelf --arch-specific "$elf" | grep Tag_RISCV_arch | cut -d: -f2 | tr -d '"')
+    fi
+fi
+if [ -z "$archstring" ]; then
+    echo "Could not determine architecture for $elf, is readelf installed?" >&2
+    exit 1
+fi
+if [ "${archstring#*rv64}" != "$archstring" ]; then
+    qemu="qemu-system-riscv64"
+    cpu="rv64"
+elif [ "${archstring#*rv32}" != "$archstring" ]; then
+    qemu="qemu-system-riscv32"
+    cpu="rv32"
+else
+    echo "Unknown architecture for $elf: $archstring" >&2
+    exit 1
+fi
+# The I extension is always required, and since it's the first one there is
+# no preceding _ to match on. Just assume it's always there
+options="i"
+test "${archstring#*_m}" != "$archstring" && options="$options m"
+test "${archstring#*_a}" != "$archstring" && options="$options a"
+test "${archstring#*_f}" != "$archstring" && options="$options f"
+test "${archstring#*_d}" != "$archstring" && options="$options d"
+test "${archstring#*_c}" != "$archstring" && options="$options c"
 
 cpu="$cpu,mmu=false,pmp=false"
 
