@@ -55,8 +55,7 @@ TEST_LIB_NAME=libcygwin0.a
 if TARGET_X86_64
 TARGET_FILES= \
 	x86_64/memcpy.s \
-	x86_64/memset.s \
-	x86_64/mcountFunc.S
+	x86_64/memset.s
 endif
 
 LIB_FILES= \
@@ -354,7 +353,13 @@ DLL_FILES= \
 	window.cc \
 	winf.cc
 
+if TARGET_X86_64
+GMON_TARGET_FILES = \
+	x86_64/mcountFunc.S
+endif
+
 GMON_FILES= \
+	$(GMON_TARGET_FILES) \
 	gmon.c \
 	mcount.c \
 	profil.c
