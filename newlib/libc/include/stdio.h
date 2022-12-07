@@ -620,10 +620,8 @@ FILE	*_funopen_r (struct _reent *, const void *__cookie,
 		int (*__closefn)(void *__cookie));
 # endif /* !__LARGE64_FILES */
 
-# define	fropen(__cookie, __fn) funopen(__cookie, __fn, (int (*)())0, \
-					       (fpos_t (*)())0, (int (*)())0)
-# define	fwopen(__cookie, __fn) funopen(__cookie, (int (*)())0, __fn, \
-					       (fpos_t (*)())0, (int (*)())0)
+# define	fropen(__cookie, __fn) funopen(__cookie, __fn, NULL, NULL, NULL)
+# define	fwopen(__cookie, __fn) funopen(__cookie, NULL, __fn, NULL, NULL)
 #endif /* __BSD_VISIBLE */
 
 #if __GNU_VISIBLE
