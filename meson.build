@@ -699,9 +699,6 @@ if cc.get_linker_id() == 'ld.lld'
     # An added ASSERT() statement in the linker script ensures that we don't
     # get silent failures in case this changes in the future.
     picolibc_linker_type_data.set('LDSCRIPT_ALIGN_WITH_INPUT', '')
-    # The i MEMORY attribute is also not implemented, but it would does not
-    # make any difference on the output even if it was.
-    picolibc_linker_type_data.set('LDSCRIPT_MEMORY_ATTR_I', '')
     if host_cpu_family == 'riscv'
         # ld.lld before version 15 did not support linker relaxations, disable
         # them if we are using an older version.
@@ -714,7 +711,6 @@ if cc.get_linker_id() == 'ld.lld'
     endif
 else
     picolibc_linker_type_data.set('LDSCRIPT_ALIGN_WITH_INPUT', 'ALIGN_WITH_INPUT')
-    picolibc_linker_type_data.set('LDSCRIPT_MEMORY_ATTR_I', 'i')
 endif
 
 picolibc_ld_data = configuration_data()
