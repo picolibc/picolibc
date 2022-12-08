@@ -49,6 +49,12 @@ extern inline struct _reent *__getreent (void)
 
 #define __FILENAME_MAX__ 4096	/* Keep in sync with PATH_MAX in limits.h. */
 
+/* Unfortunately we defined __LARGE64_FILES until Cygwin 3.3.6, so
+   FILE was based on `struct __sFILE64'.  The name is exposed into
+   userspace and consequentially used in C++ name mangling.  We must
+   redefine __sFILE as __sFILE64 to stay backward compatible. */
+#define __sFILE	__sFILE64
+
 /* The following block of macros is required to build newlib correctly for
    Cygwin.  Changing them in applications has no or not the desired effect.
    Just leave them alone. */
