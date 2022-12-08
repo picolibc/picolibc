@@ -144,6 +144,11 @@ struct __sbuf {
 
 #define _REENT_SMALL_CHECK_INIT(ptr) /* nothing */
 
+/* Cygwin must use __sFILE64 for backward compatibility, even though
+   it's not defining __LARGE64_FILES anymore.  To make sure that __sFILE
+   is never defined, disable it here explicitely. */
+#ifndef __CYGWIN__
+
 struct __sFILE {
   unsigned char *_p;	/* current position in (some) buffer */
   int	_r;		/* read space left for getc() */
@@ -195,13 +200,24 @@ struct __sFILE {
   int   _flags2;        /* for future use */
 };
 
+#endif /* !__CYGWIN__ */
+
 #ifdef __CUSTOM_FILE_IO__
 
 /* Get custom _FILE definition.  */
 #include <sys/custom_file.h>
 
 #else /* !__CUSTOM_FILE_IO__ */
-#ifdef __LARGE64_FILES
+/* Cygwin must use __sFILE64 for backward compatibility, even though
+   it's not defining __LARGE64_FILES anymore.  It also has to make
+   sure the name is the same to satisfy C++ name mangling.  Overloading
+   _fpos64_t just fixes a build problem.  The _seek64 function is
+   actually never used without __LARGE64_FILES being defined. */
+#if defined (__LARGE64_FILES) || defined (__CYGWIN__)
+#ifdef __CYGWIN__
+#define _fpos64_t _fpos_t
+#endif
+
 struct __sFILE64 {
   unsigned char *_p;	/* current position in (some) buffer */
   int	_r;		/* read space left for getc() */
