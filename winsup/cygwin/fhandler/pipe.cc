@@ -281,6 +281,8 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
   size_t nbytes = 0;
   NTSTATUS status = STATUS_SUCCESS;
   IO_STATUS_BLOCK io;
+  ULONGLONG t0 = GetTickCount64 (); /* Init timer */
+  const ULONGLONG t0_threshold = 20;
 
   if (!len)
     return;
@@ -312,6 +314,7 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
     {
       ULONG_PTR nbytes_now = 0;
       ULONG len1 = (ULONG) (len - nbytes);
+      DWORD select_sem_timeout = 0;
 
       FILE_PIPE_LOCAL_INFORMATION fpli;
       status = NtQueryInformationFile (get_handle (), &io,
@@ -358,7 +361,18 @@ fhandler_pipe::raw_read (void *ptr, size_t& len)
 		  nbytes = (size_t) -1;
 		  break;
 		}
-	      waitret = cygwait (select_sem, 1);
+	      /* If the pipe is a non-cygwin pipe, select_sem trick
+		 does not work. As a result, the following cygwait()
+		 will return only after timeout occurs. This causes
+		 performance degradation. However, setting timeout
+		 to zero causes high CPU load. So, set timeout to
+		 non-zero only when select_sem is valid or pipe is
+		 not ready to read for more than t0_threshold.
+		 This prevents both the performance degradation and
+		 the high CPU load. */
+	      if (select_sem || GetTickCount64 () - t0 > t0_threshold)
+		select_sem_timeout = 1;
+	      waitret = cygwait (select_sem, select_sem_timeout);
 	      if (waitret == WAIT_CANCELED)
 		pthread::static_cancel_self ();
 	      else if (waitret == WAIT_SIGNALED)
