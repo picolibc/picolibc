@@ -134,48 +134,14 @@ e_to_str(int e)
 
 #define scat(a,b) a ## b
 
-/* Tests with doubles */
-#ifdef PICOLIBC_DOUBLE_NOEXCEPT
-#define EXCEPTION_TEST 0
-#else
-#define EXCEPTION_TEST	MATH_ERREXCEPT
-#endif
-#define DOUBLE_EXCEPTION_TEST EXCEPTION_TEST
-
-#define BIG 1.7e308
-#define SMALL 5e-324
-#define FLOAT_T double
-#define MIN_VAL 0x4p-1024;
-#define MAX_VAL 0xf.ffffffffffff8p+1020;
-#define sNAN __builtin_nans("")
-#define PI_VAL M_PI
-
-#define TEST_DOUBLE
-
-#define makemathname(s) s
-#define makemathname_r(s) scat(s,_r)
-
-#include "math_errhandling_tests.c"
-
-#undef BIG
-#undef SMALL
-#undef MIN_VAL
-#undef MAX_VAL
-#undef sNAN
-#undef makemathname
-#undef makemathname_r
-#undef FLOAT_T
-#undef EXCEPTION_TEST
-#undef TEST_DOUBLE
-#undef PI_VAL
-
+/* Tests with long doubles */
 #ifdef __SIZEOF_LONG_DOUBLE__
 
 #if defined(__PICOLIBC__) && !defined(_HAVE_LONG_DOUBLE_MATH)
 #define SIMPLE_MATH_ONLY
+#define NO_NEXTTOWARD
 #endif
 
-/* Tests with long doubles */
 #ifdef PICOLIBC_LONG_DOUBLE_NOEXCEPT
 #define EXCEPTION_TEST 0
 #else
@@ -200,6 +166,7 @@ e_to_str(int e)
 #define FLOAT_T long double
 #define MIN_VAL __LDBL_DENORM_MIN__
 #define MAX_VAL __LDBL_MAX__
+#define EPSILON_VAL __LDBL_EPSILON__
 #define sNAN __builtin_nansl("")
 
 #define TEST_LONG_DOUBLE
@@ -213,6 +180,7 @@ e_to_str(int e)
 #undef SMALL
 #undef MIN_VAL
 #undef MAX_VAL
+#undef EPSILON_VAL
 #undef sNAN
 #undef makemathname
 #undef makemathname_r
@@ -224,12 +192,50 @@ e_to_str(int e)
 #undef SIMPLE_MATH_ONLY
 #endif
 
+/* Tests with doubles */
+#ifdef PICOLIBC_DOUBLE_NOEXCEPT
+#define EXCEPTION_TEST 0
+#else
+#define EXCEPTION_TEST	MATH_ERREXCEPT
+#endif
+#define DOUBLE_EXCEPTION_TEST EXCEPTION_TEST
+
+#define BIG 1.7e308
+#define SMALL 5e-324
+#define FLOAT_T double
+#define MIN_VAL __DBL_DENORM_MIN__
+#define MAX_VAL __DBL_MAX__
+#define EPSILON_VAL __DBL_EPSILON__
+#define sNAN __builtin_nans("")
+#define PI_VAL M_PI
+
+#define TEST_DOUBLE
+
+#define makemathname(s) s
+#define makemathname_r(s) scat(s,_r)
+
+#include "math_errhandling_tests.c"
+
+#undef BIG
+#undef SMALL
+#undef MIN_VAL
+#undef MAX_VAL
+#undef EPSILON_VAL
+#undef sNAN
+#undef makemathname
+#undef makemathname_r
+#undef FLOAT_T
+#undef EXCEPTION_TEST
+#undef TEST_DOUBLE
+#undef PI_VAL
+
 /* Tests with floats */
 #define EXCEPTION_TEST	MATH_ERREXCEPT
 #define BIG 3e38
 #define SMALL 1e-45
-#define MIN_VAL 0x8p-152;
-#define MAX_VAL 0xf.fffffp+124;
+#define MIN_VAL 0x8p-152f
+#define MAX_VAL 0xf.fffffp+124f
+#define EPSILON_VAL 0x1p-23f
 #define sNAN __builtin_nansf("")
 #define FLOAT_T float
 #define TEST_FLOAT

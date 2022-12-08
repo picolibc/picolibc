@@ -33,6 +33,8 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define makelname(s) scat(s,l)
+
 volatile FLOAT_T makemathname(zero) = (FLOAT_T) 0.0;
 volatile FLOAT_T makemathname(negzero) = (FLOAT_T) -0.0;
 volatile FLOAT_T makemathname(one) = (FLOAT_T) 1.0;
@@ -383,6 +385,36 @@ long makemathname(test_lround_big)(void) { makemathname(lround)(makemathname(big
 long makemathname(test_lround_negbig)(void) { makemathname(lround)(-makemathname(big)); return 0; }
 
 #ifndef SIMPLE_MATH_ONLY
+
+FLOAT_T makemathname(test_nextafter_0_neg0)(void) { return makemathname(nextafter)(makemathname(zero), -makemathname(zero)); }
+FLOAT_T makemathname(test_nextafter_neg0_0)(void) { return makemathname(nextafter)(-makemathname(zero), makemathname(zero)); }
+FLOAT_T makemathname(test_nextafter_qnan_1)(void) { return makemathname(nextafter)(makemathname(qnanval), makemathname(one)); }
+FLOAT_T makemathname(test_nextafter_snan_1)(void) { return makemathname(nextafter)(makemathname(snanval), makemathname(one)); }
+FLOAT_T makemathname(test_nextafter_1_qnan)(void) { return makemathname(nextafter)(makemathname(one), makemathname(qnanval)); }
+FLOAT_T makemathname(test_nextafter_1_snan)(void) { return makemathname(nextafter)(makemathname(one), makemathname(snanval)); }
+FLOAT_T makemathname(test_nextafter_max_inf)(void) { return makemathname(nextafter)(makemathname(max_val), makemathname(infval)); }
+FLOAT_T makemathname(test_nextafter_negmax_neginf)(void) { return makemathname(nextafter)(-makemathname(max_val), -makemathname(infval)); }
+FLOAT_T makemathname(test_nextafter_min_0)(void) { return makemathname(nextafter)(makemathname(min_val), makemathname(zero)); }
+FLOAT_T makemathname(test_nextafter_negmin_0)(void) { return makemathname(nextafter)(-makemathname(min_val), makemathname(zero)); }
+FLOAT_T makemathname(test_nextafter_1_2)(void) {return makemathname(nextafter)(makemathname(one), makemathname(two)); }
+FLOAT_T makemathname(test_nextafter_neg1_neg2)(void) {return makemathname(nextafter)(-makemathname(one), -makemathname(two)); }
+
+#if defined(__SIZEOF_LONG_DOUBLE__) && !defined(NO_NEXTTOWARD)
+
+FLOAT_T makemathname(test_nexttoward_0_neg0)(void) { return makemathname(nexttoward)(makemathname(zero), -makelname(zero)); }
+FLOAT_T makemathname(test_nexttoward_neg0_0)(void) { return makemathname(nexttoward)(-makemathname(zero), makelname(zero)); }
+FLOAT_T makemathname(test_nexttoward_qnan_1)(void) { return makemathname(nexttoward)(makemathname(qnanval), makelname(one)); }
+FLOAT_T makemathname(test_nexttoward_snan_1)(void) { return makemathname(nexttoward)(makemathname(snanval), makelname(one)); }
+FLOAT_T makemathname(test_nexttoward_1_qnan)(void) { return makemathname(nexttoward)(makemathname(one), makelname(qnanval)); }
+FLOAT_T makemathname(test_nexttoward_1_snan)(void) { return makemathname(nexttoward)(makemathname(one), makelname(snanval)); }
+FLOAT_T makemathname(test_nexttoward_max_inf)(void) { return makemathname(nexttoward)(makemathname(max_val), makelname(infval)); }
+FLOAT_T makemathname(test_nexttoward_negmax_neginf)(void) { return makemathname(nexttoward)(-makemathname(max_val), -makelname(infval)); }
+FLOAT_T makemathname(test_nexttoward_min_0)(void) { return makemathname(nexttoward)(makemathname(min_val), makelname(zero)); }
+FLOAT_T makemathname(test_nexttoward_negmin_0)(void) { return makemathname(nexttoward)(-makemathname(min_val), makelname(zero)); }
+FLOAT_T makemathname(test_nexttoward_1_2)(void) {return makemathname(nexttoward)(makemathname(one), makelname(two)); }
+FLOAT_T makemathname(test_nexttoward_neg1_neg2)(void) {return makemathname(nexttoward)(-makemathname(one), -makelname(two)); }
+
+#endif
 
 FLOAT_T makemathname(test_sin_inf)(void) { return makemathname(sin)(makemathname(infval)); }
 FLOAT_T makemathname(test_sin_qnan)(void) { return makemathname(sin)(makemathname(qnanval)); }
@@ -1101,6 +1133,30 @@ struct {
         TEST(scalbn_tiny, (FLOAT_T)0.0, FE_UNDERFLOW, ERANGE),
 
 #ifndef SIMPLE_MATH_ONLY
+
+        TEST(nextafter_0_neg0, -(FLOAT_T)0, 0, 0),
+        TEST(nextafter_neg0_0, (FLOAT_T)0, 0, 0),
+        TEST(nextafter_qnan_1, (FLOAT_T)NAN, 0, 0),
+        TEST(nextafter_snan_1, (FLOAT_T)NAN, FE_INVALID, 0),
+        TEST(nextafter_max_inf, (FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
+        TEST(nextafter_negmax_neginf, -(FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
+        TEST(nextafter_min_0, (FLOAT_T)0, FE_UNDERFLOW, ERANGE),
+        TEST(nextafter_negmin_0, (FLOAT_T)0, FE_UNDERFLOW, ERANGE),
+        TEST(nextafter_1_2, (FLOAT_T)1.0 + EPSILON_VAL, 0, 0),
+        TEST(nextafter_neg1_neg2, -(FLOAT_T)1.0 - EPSILON_VAL, 0, 0),
+
+#if defined(__SIZEOF_LONG_DOUBLE__) && !defined(NO_NEXTTOWARD)
+        TEST(nexttoward_0_neg0, -(FLOAT_T)0, 0, 0),
+        TEST(nexttoward_neg0_0, (FLOAT_T)0, 0, 0),
+        TEST(nexttoward_qnan_1, (FLOAT_T)NAN, 0, 0),
+        TEST(nexttoward_snan_1, (FLOAT_T)NAN, FE_INVALID, 0),
+        TEST(nexttoward_max_inf, (FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
+        TEST(nexttoward_negmax_neginf, -(FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
+        TEST(nexttoward_min_0, (FLOAT_T)0, FE_UNDERFLOW, ERANGE),
+        TEST(nexttoward_negmin_0, (FLOAT_T)0, FE_UNDERFLOW, ERANGE),
+        TEST(nexttoward_1_2, (FLOAT_T)1.0 + EPSILON_VAL, 0, 0),
+        TEST(nexttoward_neg1_neg2, -(FLOAT_T)1.0 - EPSILON_VAL, 0, 0),
+#endif
 
         TEST(sin_inf, (FLOAT_T)NAN, FE_INVALID, EDOM),
         TEST(sin_qnan, (FLOAT_T)NAN, 0, 0),
