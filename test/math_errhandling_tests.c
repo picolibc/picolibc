@@ -626,7 +626,9 @@ FLOAT_T makemathname(test_scalbn_tiny)(void) { return makemathname(scalbn)(makem
 
 #define MY_EXCEPT (FE_DIVBYZERO|FE_INEXACT|FE_INVALID|FE_OVERFLOW|FE_UNDERFLOW)
 
-#ifdef __i386__
+#undef sNAN_RET
+#undef sNAN_EXCEPTION
+#if defined(__i386__) && !defined(TEST_LONG_DOUBLE)
 /*
  * i386 ABI returns floats in the 8087 registers, which convert sNAN
  * to NAN on load, so you can't ever return a sNAN value successfully.
