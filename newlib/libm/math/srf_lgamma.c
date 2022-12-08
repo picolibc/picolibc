@@ -14,6 +14,8 @@
  *
  */
 
+#define _ADD_UNDER_R_TO_FUNCS
+
 #include "fdlibm.h"
 
 static const float two23 = 8.3886080000e+06, /* 0x4b000000 */
@@ -284,3 +286,5 @@ lgammaf_r(float x, int *signgamp)
     int divzero = 0;
     return __math_lgammaf_r(x, signgamp, &divzero);
 }
+
+_MATH_ALIAS_f_fI(lgamma)

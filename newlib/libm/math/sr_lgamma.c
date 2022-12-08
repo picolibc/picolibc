@@ -79,9 +79,13 @@
  *
  */
 
+#define _ADD_UNDER_R_TO_FUNCS
+
 #include "fdlibm.h"
 
-static const double two52 =
+#ifdef _NEED_FLOAT64
+
+static const __float64 two52 =
                         4.50359962737049600000e+15, /* 0x43300000, 0x00000000 */
     half = 5.00000000000000000000e-01, /* 0x3FE00000, 0x00000000 */
     one = 1.00000000000000000000e+00, /* 0x3FF00000, 0x00000000 */
@@ -149,12 +153,12 @@ static const double two52 =
     w5 = 8.36339918996282139126e-04, /* 0x3F4B67BA, 0x4CDAD5D1 */
     w6 = -1.63092934096575273989e-03; /* 0xBF5AB89D, 0x0B9E43E4 */
 
-static const double zero = 0.00000000000000000000e+00;
+static const __float64 zero = 0.00000000000000000000e+00;
 
-static double
-sin_pi(double x)
+static __float64
+sin_pi(__float64 x)
 {
-    double y, z;
+    __float64 y, z;
     __int32_t n, ix;
 
     GET_HIGH_WORD(ix, x);
@@ -209,10 +213,10 @@ sin_pi(double x)
     return -y;
 }
 
-double
-__math_lgamma_r(double x, int *signgamp, int *divzero)
+__float64
+__math_lgamma_r(__float64 x, int *signgamp, int *divzero)
 {
-    double t, y, z, nadj = 0.0, p, p1, p2, p3, q, r, w;
+    __float64 t, y, z, nadj = 0.0, p, p1, p2, p3, q, r, w;
     __int32_t i, hx, lx, ix;
 
     EXTRACT_WORDS(hx, lx, x);
@@ -221,7 +225,7 @@ __math_lgamma_r(double x, int *signgamp, int *divzero)
     *signgamp = 1;
     ix = hx & 0x7fffffff;
     if (ix >= 0x7ff00000)
-        return fabs(x+x);
+        return fabs64(x+x);
     if ((ix | lx) == 0) {
         if (hx < 0)
             *signgamp = -1;
@@ -245,7 +249,7 @@ __math_lgamma_r(double x, int *signgamp, int *divzero)
             *divzero = 1;
             return __math_divzero(0);
         }
-        nadj = log(pi / fabs(t * x));
+        nadj = log(pi / fabs64(t * x));
         if (t < zero)
             *signgamp = -1;
         x = -x;
@@ -309,7 +313,7 @@ __math_lgamma_r(double x, int *signgamp, int *divzero)
     } else if (ix < 0x40200000) { /* x < 8.0 */
         i = (__int32_t)x;
         t = zero;
-        y = x - (double)i;
+        y = x - (__float64)i;
         p = y * (s0 +
                  y * (s1 + y * (s2 + y * (s3 + y * (s4 + y * (s5 + y * s6))))));
         q = one + y * (r1 + y * (r2 + y * (r3 + y * (r4 + y * (r5 + y * r6)))));
@@ -344,9 +348,13 @@ __math_lgamma_r(double x, int *signgamp, int *divzero)
     return check_oflow(r);
 }
 
-double
-lgamma_r(double x, int *signgamp)
+__float64
+lgamma64_r(__float64 x, int *signgamp)
 {
     int divzero = 0;
     return __math_lgamma_r(x, signgamp, &divzero);
 }
+
+_MATH_ALIAS_d_dI(lgamma)
+
+#endif /* _NEED_FLOAT64 */

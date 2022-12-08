@@ -350,6 +350,18 @@ force_eval_long_double (long double x)
 #define clang_force_float(x) (x)
 #endif
 
+#ifdef _ADD_UNDER_R_TO_FUNCS
+
+#define __FLOAT_NAME(x) x ## f_r
+#define _FLOAT_NAME(x) __FLOAT_NAME(x)
+#define _FLOAT_ALIAS(x) # x "f_r"
+
+#define __LD_NAME(x) x ## l_r
+#define _LD_NAME(x) __LD_NAME(x)
+#define _LD_ALIAS(x) # x "l_r"
+
+#else
+
 #define __FLOAT_NAME(x) x ## f
 #define _FLOAT_NAME(x) __FLOAT_NAME(x)
 #define _FLOAT_ALIAS(x) # x "f"
@@ -358,11 +370,25 @@ force_eval_long_double (long double x)
 #define _LD_NAME(x) __LD_NAME(x)
 #define _LD_ALIAS(x) # x "l"
 
+#endif
+
+#define __FLOAT_NAME_REG(x) x ## f
+#define _FLOAT_NAME_REG(x) __FLOAT_NAME_REG(x)
+
+#define __LD_NAME_REG(x) x ## l
+#define _LD_NAME_REG(x) __LD_NAME_REG(x)
+
 #ifdef _ADD_D_TO_DOUBLE_FUNCS
 
 #define __D_NAME(x) x ## d
 #define _D_NAME(x) __D_NAME(x)
 #define _D_ALIAS(x) # x "d"
+
+#elif defined(_ADD_UNDER_R_TO_FUNCS)
+
+#define __D_NAME(x) x ## _r
+#define _D_NAME(x) __D_NAME(x)
+#define _D_ALIAS(x) # x "_r"
 
 #else
 
@@ -371,6 +397,9 @@ force_eval_long_double (long double x)
 #define _D_ALIAS(x) # x
 
 #endif
+
+#define __D_NAME_REG(x) x
+#define _D_NAME_REG(x) __D_NAME_REG(x)
 
 /*
  * Figure out how to map the 32- and 64- bit functions to
@@ -575,7 +604,7 @@ force_eval_long_double (long double x)
 # endif
 #else
 # if __SIZEOF_LONG_DOUBLE__ == 8
-#  define _NAME_64(x) _LD_NAME(x)
+#  define _NAME_64(x) _LD_NAME_REG(x)
 # define _NAME_64_SPECIAL(d,l) l
    typedef long double __float64;
 #  define FORCE_FLOAT64 FORCE_LONG_DOUBLE
@@ -624,7 +653,7 @@ force_eval_long_double (long double x)
 #endif
 
 #ifndef _NAME_64
-# define _NAME_64(x) _D_NAME(x)
+# define _NAME_64(x) _D_NAME_REG(x)
 # define _NAME_64_SPECIAL(d,l) d
 # define _F_64(x) x
 # define _FLOAT64_MIN DBL_MIN
@@ -1090,8 +1119,8 @@ __math_xflow (uint32_t sign, double y);
 HIDDEN float
 __math_xflowf (uint32_t sign, float y);
 
-HIDDEN double
-__math_lgamma_r (double y, int *signgamp, int *divzero);
+HIDDEN __float64
+__math_lgamma_r (__float64 y, int *signgamp, int *divzero);
 
 HIDDEN float
 __math_lgammaf_r (float y, int *signgamp, int *divzero);
