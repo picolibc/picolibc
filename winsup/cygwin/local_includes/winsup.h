@@ -41,7 +41,6 @@ details. */
 #ifdef __cplusplus
 extern "C" {
 #endif
-struct __sFILE64 *fopen64 (const char *, const char *);
 struct hostent *cygwin_gethostbyname (const char *name);
 /* Don't enforce definition of in_addr_t. */
 uint32_t cygwin_inet_addr (const char *cp);
