@@ -70,8 +70,7 @@ __ieee754_rem_pio2l(long double x, long double *y)
 	u.e = x;
 	expsign = u.xbits.expsign;
 	ex = expsign & 0x7fff;
-	if ((ex < BIAS + 45 || ex == BIAS + 45) &&
-	    u.bits.manh < 0x921fb54442d1LL) {
+	if (ex < BIAS + 45 || (ex == BIAS + 45 && u.bits.manh < 0x921fb54442d1LL)) {
 	    /* |x| ~< 2^45*(pi/2), medium size */
 	    /* Use a specialized rint() to get fn.  Assume round-to-nearest. */
 	    fn = x*invpio2+0x1.8p112L;
