@@ -131,26 +131,36 @@ typedef struct {
  * (more accurate) odd value
  */
 #if LDBL_MANT_DIG == 64
-#define DEFAULT_PREC 1e-16L
-#define SQRTL_PREC 0x8.0p-63L
+#define DEFAULT_PREC 0x1p-55L
+#define SQRTL_PREC 0x1.0p-63L
 #define FULL_LONG_DOUBLE
 #elif LDBL_MANT_DIG == 113
 #define FULL_LONG_DOUBLE
-#define DEFAULT_PREC 1e-31L
-#define SQRTL_PREC 0x8.0p-112L
+#define DEFAULT_PREC 0x1p-105L
+#define SQRTL_PREC 0x1.0p-112L
 #elif LDBL_MANT_DIG == 106
-#define DEFAULT_PREC 1e-29L
-#define SQRTL_PREC 0x8.0p-105L
+#define DEFAULT_PREC 0x1p-97L
+#define SQRTL_PREC 0x1.0p-105L
+#define PART_LONG_DOUBLE
 #elif LDBL_MANT_DIG == 53
-#define DEFAULT_PREC 1e-13L
-#define SQRTL_PREC 0x8.0p-52L
+#define DEFAULT_PREC 0x1p-48L
+#define SQRTL_PREC 0x1.0p-52L
 #else
 #error unsupported long double
 #endif
 
+#define HYPOTL_PREC     SQRTL_PREC
+#define CBRTL_PREC      SQRTL_PREC
 #define CEILL_PREC      0
 #define FLOORL_PREC     0
 #define LOGBL_PREC      0
+#define RINTL_PREC      0
+#define FMINL_PREC      0
+#define FMAXL_PREC      0
+#define SCALBNL_PREC    0
+#define SCALBL_PREC     0
+#define LDEXPL_PREC     0
+#define COPYSIGNL_PREC  0
 #define NEARBYINTL_PREC 0
 #define ROUNDL_PREC     0
 #define TRUNCL_PREC     0
