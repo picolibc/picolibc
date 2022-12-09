@@ -2691,7 +2691,7 @@ fhandler_pty_master::pty_master_fwd_thread (const master_fwd_thread_param_t *p)
   termios_printf ("Started.");
   for (;;)
     {
-      p->ttyp->fwd_last_time = GetTickCount ();
+      p->ttyp->fwd_last_time = GetTickCount64 ();
       DWORD n;
       p->ttyp->fwd_not_empty =
 	::bytes_available (n, p->from_slave_nat) && n;
