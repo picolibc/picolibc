@@ -59,6 +59,8 @@ if src_semihost != []
     'lseek64.c',
     'open.c',
     'read.c',
+    'sysconf.c',
+    'times.c',
     'unlink.c',
     'write.c',
     'sys_clock.c',
