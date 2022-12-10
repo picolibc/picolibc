@@ -151,7 +151,7 @@ into another language, under the above conditions for modified versions.
 * Posix::
 * Syscalls::
 * Arglists::
-* Iconv::
+* Encoding conversions::
 * Overflow Protection::
 
 * Document Index::
