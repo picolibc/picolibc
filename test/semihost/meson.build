@@ -50,6 +50,7 @@ semihost_tests = [
   'semihost-seek',
   'semihost-system',
   'semihost-time',
+  'semihost-times',
   'semihost-writec',
   'semihost-write0',
 ]
@@ -97,7 +98,7 @@ foreach target : targets
     test(semihost_test_name,
 	 executable(semihost_test_name, [semihost_test_src],
 		    c_args: _c_args,
-		    link_args: _link_args,
+		    link_args: double_printf_link_args + _link_args,
 		    link_with: _libs,
 		    link_depends:  test_link_depends,
 		    include_directories: inc),
