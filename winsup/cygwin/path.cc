@@ -3024,6 +3024,65 @@ symlink_info::parse_device (const char *contents)
   return isdevice = true;
 }
 
+/* Probably we have a virtual drive input path and the resulting full path
+   starts with the substitution.  Retrieve the target path of the virtual
+   drive and try to revert what GetFinalPathNameByHandleW did to the
+   drive letter. */
+static bool
+revert_virtual_drive (PUNICODE_STRING upath, PUNICODE_STRING fpath,
+		      bool is_remote, ULONG ci_flag)
+{
+  /* Get the drive's target path. */
+  WCHAR drive[3] = {(WCHAR) towupper (upath->Buffer[4]), L':', L'\0'};
+  WCHAR target[MAX_PATH];
+  UNICODE_STRING tpath;
+  WCHAR *p;
+
+  DWORD remlen = QueryDosDeviceW (drive, target, MAX_PATH);
+  if (remlen < 3)
+    return false;
+  remlen -= 2; /* Two L'\0' */
+
+  if (target[remlen - 1] == L'\\')
+    remlen--;
+  RtlInitCountedUnicodeString (&tpath, target, remlen * sizeof (WCHAR));
+
+  const USHORT uncp_len = is_remote ? ro_u_uncp.Length / sizeof (WCHAR) - 1 : 0;
+
+  if (is_remote)
+    {
+      /* target path starts with \??\UNC\. */
+      if (RtlEqualUnicodePathPrefix (&tpath, &ro_u_uncp, TRUE))
+	{
+	  remlen -= uncp_len;
+	  p = target + uncp_len;
+	}
+      /* target path starts with \Device\<redirector>. */
+      else if ((p = wcschr (target, L';'))
+	       && p + 3 < target + remlen
+	       && wcsncmp (p + 1, drive, 2) == 0
+	       && (p = wcschr (p + 3, L'\\')))
+	remlen -= p - target;
+      else
+	return false;
+      if (wcsncasecmp (fpath->Buffer + uncp_len, p, remlen))
+	return false;
+    }
+  else if (!RtlEqualUnicodePathPrefix (fpath, &tpath, TRUE))
+    return false;
+  /* Replace fpath with source drive letter and append reminder of
+     final path after skipping target path */
+  fpath->Buffer[4] = drive[0]; /* Drive letter */
+  fpath->Buffer[5] = L':';
+  WCHAR *to = fpath->Buffer + 6; /* Next to L':' */
+  WCHAR *from = fpath->Buffer + uncp_len + remlen;
+  memmove (to, from, (wcslen (from) + 1) * sizeof (WCHAR));
+  fpath->Length -= (from - to) * sizeof (WCHAR);
+  if (RtlEqualUnicodeString (upath, fpath, !!ci_flag))
+    return false;
+  return true;
+}
+
 /* Check if PATH is a symlink.  PATH must be a valid Win32 path name.
 
    If PATH is a symlink, put the value of the symlink--the file to
@@ -3343,6 +3402,14 @@ restart:
 	  continue;
 	}
 
+      /* Consider the situation where a virtual drive points to a native
+         symlink.  Opening the virtual drive with FILE_OPEN_REPARSE_POINT
+	 actually opens the symlink.  If this symlink points to another
+	 directory using a relative path, symlink evaluation goes totally
+	 awry.  We never want a virtual drive evaluated as symlink. */
+      if (upath.Length <= 14)
+	  goto file_not_symlink;
+
       /* Reparse points are potentially symlinks.  This check must be
 	 performed before checking the SYSTEM attribute for sysfile
 	 symlinks, since reparse points can have this flag set, too. */
@@ -3490,80 +3557,38 @@ restart:
 	      RtlInitCountedUnicodeString (&fpath, fpbuf, ret * sizeof (WCHAR));
 	      if (!RtlEqualUnicodeString (&upath, &fpath, !!ci_flag))
 	        {
-		  /* Check if the final path is an UNC path and the incoming
-		     path isn't.  If so... */
-		  if (RtlEqualUnicodePathPrefix (&fpath, &ro_u_uncp, TRUE)
-		      && !RtlEqualUnicodePathPrefix (&upath, &ro_u_uncp, TRUE))
+		  /* If the incoming path is a local drive letter path... */
+		  if (!RtlEqualUnicodePathPrefix (&upath, &ro_u_uncp, TRUE))
 		    {
-		      /* ...get the remote path, replace remote path
-			 with drive letter, check again. */
-		      WCHAR drive[3] =
-			{(WCHAR) towupper (upath.Buffer[4]), L':', L'\0'};
-		      WCHAR remote[MAX_PATH];
-
-		      DWORD remlen = QueryDosDeviceW (drive, remote, MAX_PATH);
-		      if (remlen < 3)
-			goto file_not_symlink; /* fallback */
-		      remlen -= 2; /* Two L'\0' */
-
-		      if (remote[remlen - 1] == L'\\')
-			remlen--;
-		      WCHAR *p;
-		      UNICODE_STRING rpath;
-		      RtlInitCountedUnicodeString (&rpath, remote,
-						   remlen * sizeof (WCHAR));
-		      const USHORT uncp_len =
-			ro_u_uncp.Length / sizeof (WCHAR) - 1;
-		      if (RtlEqualUnicodePathPrefix (&rpath, &ro_u_uncp, TRUE))
+		      /* ...and the final path is an UNC path, revert to the
+			 drive letter path syntax. */
+		      if (RtlEqualUnicodePathPrefix (&fpath, &ro_u_uncp, TRUE))
 			{
-			  remlen -= uncp_len;
-			  p = remote + uncp_len;
+			  if (!revert_virtual_drive (&upath, &fpath, true,
+						     ci_flag))
+			    goto file_not_symlink;
 			}
-		      else if ((p = wcschr (remote, L';'))
-			       && p + 3 < remote + remlen
-			       && wcsncmp (p + 1, drive, 2) == 0
-			       && (p = wcschr (p + 3, L'\\')))
-			remlen -= p - remote;
-		      else
-			goto file_not_symlink; /* fallback */
-		      if (wcsncasecmp (fpath.Buffer + uncp_len, p, remlen))
-			goto file_not_symlink; /* fallback (not expected) */
-		      /* Hackfest */
-		      fpath.Buffer[4] = drive[0]; /* Drive letter */
-		      fpath.Buffer[5] = L':';
-		      WCHAR *to = fpath.Buffer + 6; /* Next to L':' */
-		      WCHAR *from = fpath.Buffer + uncp_len + remlen;
-		      memmove (to, from,
-			       (wcslen (from) + 1) * sizeof (WCHAR));
-		      fpath.Length -= (from - to) * sizeof (WCHAR);
-		      if (RtlEqualUnicodeString (&upath, &fpath, !!ci_flag))
-			goto file_not_symlink;
+		      /* ...otherwise, if the final path changes the drive
+			 letter, let revert_virtual_drive check for a
+			 virtual drive and revert that. */
+		      else if (upath.Buffer[5] == L':'
+			       && (WCHAR) towupper (upath.Buffer[4])
+				  != (WCHAR) towupper (fpath.Buffer[4]))
+			{
+			  if (!revert_virtual_drive (&upath, &fpath, false,
+						     ci_flag))
+			    goto file_not_symlink;
+			}
 		    }
 		  issymlink = true;
 		  /* upath.Buffer is big enough and unused from this point on.
 		     Reuse it here, avoiding yet another buffer allocation. */
 		  char *nfpath = (char *) upath.Buffer;
 		  sys_wcstombs (nfpath, NT_MAX_PATH, fpbuf);
-		  res = posixify (nfpath);
-
-		  /* If the incoming path consisted of a drive prefix only,
-		     we just handle a virtual drive, created with, e.g.
-
-		       subst X: C:\foo\bar
-
-		     Treat it like a symlink.  This is required to tell an
-		     lstat caller that the "drive" is actually pointing
-		     somewhere else, thus, it's a symlink in POSIX speak. */
-		  if (upath.Length == 14)	/* \??\X:\ */
-		    {
-		      fileattr &= ~FILE_ATTRIBUTE_DIRECTORY;
-		      path_flags |= PATH_SYMLINK;
-		    }
 		  /* For final paths differing in inner path components return
 		     length as negative value.  This informs path_conv::check
 		     to skip realpath handling on the last path component. */
-		  else
-		    res = -res;
+		  res = -posixify (nfpath);
 		  break;
 	        }
 	    }
