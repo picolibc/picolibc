@@ -111,10 +111,12 @@ AM_CONDITIONAL(CROSS_BOOTSTRAP, [test "x$with_cross_bootstrap" != "xyes"])
 
 AC_EXEEXT
 
-AC_CHECK_LIB([bfd], [bfd_init], [true],
-	     AC_MSG_WARN([Not building dumper.exe since some required libraries or headers are missing]))
+AC_ARG_ENABLE([dumper],
+	      [AS_HELP_STRING([--disable-dumper], [do not build the 'dumper' utility])],
+	      [build_dumper=$enableval],
+	      [build_dumper=yes])
 
-AM_CONDITIONAL(BUILD_DUMPER, [test "x$ac_cv_lib_bfd_bfd_init" = "xyes"])
+AM_CONDITIONAL(BUILD_DUMPER, [test "x$build_dumper" = "xyes"])
 
 AC_CONFIG_FILES([
     Makefile
