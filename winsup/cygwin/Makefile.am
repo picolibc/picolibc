@@ -419,12 +419,20 @@ dirs = $(srcdir) $(srcdir)/fhandler $(srcdir)/lib $(srcdir)/libc $(srcdir)/math 
 find_src_files = $(wildcard $(dir)/*.[chS]) $(wildcard $(dir)/*.cc)
 src_files := $(foreach dir,$(dirs),$(find_src_files))
 
+# Regenerate uname_version.c only if it doesn't exist or if it differs
+# from the former uname_version.c
 uname_version.c: .FORCE
 	$(AM_V_GEN)cd $(srcdir) && \
 	echo "const char *uname_dev_version = \
 	\"$$(git rev-parse --git-dir >/dev/null 2>&1 && \
 	     git describe --dirty | sed -e 's/cygwin-//')\";" \
-	     > $(abs_builddir)/uname_version.c
+	     > $(abs_builddir)/uname_version-pre.c && \
+	if [ -f $(abs_builddir)/uname_version.c ] && \
+	   cmp $(abs_builddir)/uname_version.c \
+	       $(abs_builddir)/uname_version-pre.c >/dev/null 2>&1 ; \
+	then :; else \
+	       mv $(abs_builddir)/uname_version-pre.c \
+		  $(abs_builddir)/uname_version.c; fi
 .FORCE:
 
 # mkvers.sh creates version.cc in the first place, winver.o always
