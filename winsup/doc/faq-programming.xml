@@ -679,14 +679,21 @@ rewriting the runtime library in question from specs...
 installed; you at least need <literal>gcc-g++</literal>,
 <literal>make</literal>, <literal>automake</literal>,
 <literal>autoconf</literal>, <literal>git</literal>, <literal>perl</literal>,
-<literal>gettext-devel</literal>, <literal>libiconv-devel</literal>
-<literal>zlib-devel</literal>, <literal>cocom</literal> and <literal>patch</literal>.
+<literal>cocom</literal> and <literal>patch</literal>.
 </para>
 
 <para>
-Building for 64-bit Cygwin also requires
-<literal>mingw64-x86_64-gcc-g++</literal> and
-<literal>mingw64-x86_64-zlib</literal>.
+Additionally, building the <code>dumper</code> utility requires
+<literal>gettext-devel</literal>, <literal>libiconv-devel</literal>
+<literal>zlib-devel</literal>.
+</para>
+
+<para>
+Building those Cygwin utilities which are not themselves Cygwin programs
+(e.g. <code>cygcheck</code> and <code>strace</code>) also requires
+<literal>mingw64-x86_64-gcc-g++</literal> and <literal>mingw64-x86_64-zlib</literal>.
+Building these programs can be disabled with the <literal>--without-cross-bootstrap</literal>
+option to <literal>configure</literal>.
 </para>
 
 <!-- If you want to run the tests, <literal>dejagnu</literal> is also required. -->
