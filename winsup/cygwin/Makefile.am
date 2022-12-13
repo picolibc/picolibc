@@ -40,8 +40,6 @@ toolincludedir=$(tooldir)/include
 # Parameters used in building the cygwin.dll.
 
 DLL_NAME=cygwin1.dll
-PRE_DLL_NAME=cygwin0.dll
-DBG_DLL_NAME=cygwin1.dbg
 NEW_DLL_NAME=new-cygwin1.dll
 DEF_FILE=cygwin.def
 LIB_NAME=libcygwin.a
@@ -582,7 +580,7 @@ $(LDSCRIPT): $(LDSCRIPT).in
 	$(AM_V_GEN)$(CC) -E - -P < $^ -o $@
 
 # cygwin dll
-$(PRE_DLL_NAME): $(LDSCRIPT) libdll.a $(VERSION_OFILES) $(LIBSERVER)\
+$(NEW_DLL_NAME): $(LDSCRIPT) libdll.a $(VERSION_OFILES) $(LIBSERVER)\
 		  $(newlib_build)/libm.a $(newlib_build)/libc.a
 	$(AM_V_CXXLD)$(CXX) $(CXXFLAGS) \
 	-mno-use-libstdc-wrappers \
@@ -596,19 +594,6 @@ $(PRE_DLL_NAME): $(LDSCRIPT) libdll.a $(VERSION_OFILES) $(LIBSERVER)\
 	$(newlib_build)/libm.a \
 	$(newlib_build)/libc.a \
 	-lgcc -lkernel32 -lntdll -Wl,-Map,cygwin.map
-
-# create cygwin1.dbg file
-$(DBG_DLL_NAME): $(PRE_DLL_NAME)
-	$(AM_V_GEN)$(OBJCOPY) --add-gnu-debuglink=/dev/null \
-			      --only-keep-debug \
-			      $(PRE_DLL_NAME) \
-			      $(DBG_DLL_NAME)
-
-# create stripped release DLL, append .gnu_debuglink section
-$(NEW_DLL_NAME): $(PRE_DLL_NAME) $(DBG_DLL_NAME)
-	$(AM_V_GEN)$(OBJCOPY) -g \
-			      --add-gnu-debuglink=$(DBG_DLL_NAME) \
-			      $(PRE_DLL_NAME) $(NEW_DLL_NAME)
 
 # cygwin import library
 toolopts=--cpu=@target_cpu@ --ar=@AR@ --as=@AS@ --nm=@NM@ --objcopy=@OBJCOPY@
@@ -681,7 +666,7 @@ clean-local:
 	-rm -f $(BUILT_SOURCES)
 	-rm -f $(DEF_FILE) sigfe.s
 	-rm -f cygwin.sc cygdll.a cygwin.map
-	-rm -f $(PRE_DLL_NAME) $(DBG_DLL_NAME) $(NEW_DLL_NAME)
+	-rm -f $(NEW_DLL_NAME)
 	-rm -f $(LIB_NAME) $(TEST_LIB_NAME) $(SUBLIBS)
 	-rm -f version.cc
 	-rm -f tlsoffsets
