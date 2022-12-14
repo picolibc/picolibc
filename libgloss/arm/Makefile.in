@@ -97,8 +97,6 @@ IQ80310_INSTALL	= install-iq80310
 # Host specific makefile fragment comes in here.
 @host_makefile_frag@
 
-INCLUDES += `if [ -d ${objroot}/newlib ]; then echo -I$(srcroot)/newlib/libc/machine/arm; fi`
-
 #
 # build a test program for each target board. Just trying to get
 # it to link is a good test, so we ignore all the errors for now.

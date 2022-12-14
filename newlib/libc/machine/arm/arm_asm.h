@@ -29,7 +29,7 @@
 #ifndef ARM_ASM__H
 #define ARM_ASM__H
 
-#include "acle-compat.h"
+#include "arm-acle-compat.h"
 
 #if __ARM_ARCH >= 7 && defined (__ARM_ARCH_ISA_ARM)
 # define _ISA_ARM_7

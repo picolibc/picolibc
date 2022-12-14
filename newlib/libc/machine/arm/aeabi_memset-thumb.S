@@ -26,7 +26,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "acle-compat.h"
+#include "arm-acle-compat.h"
 
 	.thumb
 	.syntax unified

@@ -11,6 +11,7 @@ PHONY =
 
 SUBDIRS = @subdirs@ .
 
+srcroot = $(top_srcdir)/..
 tooldir = $(exec_prefix)/$(target_alias)
 
 multilibtooldir = $(tooldir)/lib$(MULTISUBDIR)
@@ -22,6 +23,8 @@ includetool_DATA =
 
 includesystooldir = $(tooldir)/include/sys
 includesystool_DATA =
+
+AM_CPPFLAGS = -idirafter $(srcroot)/include
 
 # A fake library so automake will generate rules for plain objects that we want
 # to install (e.g. our crt0.o objects).
