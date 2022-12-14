@@ -29,15 +29,8 @@ MULTISRCTOP =
 MULTIBUILDTOP =
 MULTIDIRS =
 MULTISUBDIR =
-MULTILIBNAME =
 MULTIDO = true
 MULTICLEAN = true
-MULTI_FLAGS_FOR_TARGET = MULTI_DEFAULT_FLAGS
-MULTI_DEFAULT_FLAGS = -DSEMIHOST_V2
-
-MULTIDIRS += semihv2m
-MULTIDIR_semihv2m_FLAGS = $(MULTI_DEFAULT_FLAGS) -DSEMIHOST_V2_MIXED_MODE
-MULTIDIR_semihv2m_NAME = -v2m
 
 SHELL =	/bin/sh
 
@@ -84,15 +77,15 @@ RDPMON_OBJS	= ftruncate.o libcfunc.o syscalls.o trap.o truncate.o _exit.o _kill.
 RDPMON_SCRIPTS	= rdpmon.specs
 RDPMON_INSTALL	= install-rdpmon
 
-RDIMON_CRT0	= rdimon-crt0${${MULTILIBNAME}}.o
-RDIMON_BSP	= librdimon${${MULTILIBNAME}}.a
+RDIMON_CRT0	= rdimon-crt0.o rdimon-crt0-v2m.o
+RDIMON_BSP	= librdimon.a librdimon-v2m.a
 RDIMON_OBJS	= $(patsubst %,rdimon-%,$(RDPMON_OBJS))
-RDIMON_SCRIPTS	= rdimon${${MULTILIBNAME}}.specs \
-		  aprofile-validation${${MULTILIBNAME}}.specs \
-		  aprofile-ve${${MULTILIBNAME}}.specs
+_RDIMON_SCRIPTS	= rdimon.specs \
+		  aprofile-validation.specs \
+		  aprofile-ve.specs
+RDIMON_SCRIPTS	= $(_RDIMON_SCRIPTS) $(patsubst %.specs,%-v2m.specs,$(_RDIMON_SCRIPTS))
 RDIMON_INSTALL	= install-rdimon
-
-CFLAGS		= -g
+RDIMON_SEMIHV2M_OBJS = $(patsubst %.o,rdimon-%-v2m.o,$(RDPMON_OBJS))
 
 # Here is all of the eval board stuff
 PID_SCRIPTS	= pid.specs
@@ -121,7 +114,6 @@ all: ${CRT0} ${LINUX_CRT0} ${LINUX_BSP} ${REDBOOT_CRT0} ${REDBOOT_OBJS} ${RDPMON
 	    else true; fi; \
 	  else true; fi; \
 	done
-	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
 #
 # here's where we build the test programs for each target
@@ -133,34 +125,58 @@ test:
 crt0.o: crt0.S
 redboot-crt0.o: redboot-crt0.S
 redboot-syscalls.o: redboot-syscalls.c $(srcdir)/../syscall.h
-	$(CC) $(CFLAGS_FOR_TARGET) $($(MULTI_FLAGS_FOR_TARGET)) $(CFLAGS) $(INCLUDES) -o $@ -c $<
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DSEMIHOST_V2 -o $@ -c $<
 
 rdpmon-crt0.o: crt0.S
-	$(CC) $(CFLAGS_FOR_TARGET) $($(MULTI_FLAGS_FOR_TARGET)) $(CFLAGS) $(INCLUDES) -DARM_RDP_MONITOR -o $@ -c $<
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DSEMIHOST_V2 -DARM_RDP_MONITOR -o $@ -c $<
 
-rdimon-crt0${${MULTILIBNAME}}.o: crt0.S
-	$(CC) $(CFLAGS_FOR_TARGET) $($(MULTI_FLAGS_FOR_TARGET)) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+rdimon-crt0.o: crt0.S
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DSEMIHOST_V2 -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-ftruncate.o: ftruncate.c
-	$(CC) $(CFLAGS_FOR_TARGET) $($(MULTI_FLAGS_FOR_TARGET)) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DSEMIHOST_V2 -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-trap.o: trap.S
-	$(CC) $(CFLAGS_FOR_TARGET) $($(MULTI_FLAGS_FOR_TARGET)) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DSEMIHOST_V2 -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-truncate.o: truncate.c
-	$(CC) $(CFLAGS_FOR_TARGET) $($(MULTI_FLAGS_FOR_TARGET)) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DSEMIHOST_V2 -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-_exit.o: _exit.c
-	$(CC) $(CFLAGS_FOR_TARGET) $($(MULTI_FLAGS_FOR_TARGET)) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DSEMIHOST_V2 -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-_kill.o: _kill.c
-	$(CC) $(CFLAGS_FOR_TARGET) $($(MULTI_FLAGS_FOR_TARGET)) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DSEMIHOST_V2 -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-syscalls.o: syscalls.c
-	$(CC) $(CFLAGS_FOR_TARGET) $($(MULTI_FLAGS_FOR_TARGET)) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DSEMIHOST_V2 -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-libcfunc.o: libcfunc.c
-	$(CC) $(CFLAGS_FOR_TARGET) $($(MULTI_FLAGS_FOR_TARGET)) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DSEMIHOST_V2 -DARM_RDI_MONITOR -o $@ -c $<
+
+rdimon-crt0-v2m.o: crt0.S
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DSEMIHOST_V2 -DSEMIHOST_V2_MIXED_MODE -DARM_RDI_MONITOR -o $@ -c $<
+
+rdimon-ftruncate-v2m.o: ftruncate.c
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DSEMIHOST_V2 -DSEMIHOST_V2_MIXED_MODE -DARM_RDI_MONITOR -o $@ -c $<
+
+rdimon-trap-v2m.o: trap.S
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DSEMIHOST_V2 -DSEMIHOST_V2_MIXED_MODE -DARM_RDI_MONITOR -o $@ -c $<
+
+rdimon-truncate-v2m.o: truncate.c
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DSEMIHOST_V2 -DSEMIHOST_V2_MIXED_MODE -DARM_RDI_MONITOR -o $@ -c $<
+
+rdimon-_exit-v2m.o: _exit.c
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DSEMIHOST_V2 -DSEMIHOST_V2_MIXED_MODE -DARM_RDI_MONITOR -o $@ -c $<
+
+rdimon-_kill-v2m.o: _kill.c
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DSEMIHOST_V2 -DSEMIHOST_V2_MIXED_MODE -DARM_RDI_MONITOR -o $@ -c $<
+
+rdimon-syscalls-v2m.o: syscalls.c
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DSEMIHOST_V2 -DSEMIHOST_V2_MIXED_MODE -DARM_RDI_MONITOR -o $@ -c $<
+
+rdimon-libcfunc-v2m.o: libcfunc.c
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DSEMIHOST_V2 -DSEMIHOST_V2_MIXED_MODE -DARM_RDI_MONITOR -o $@ -c $<
 
 $(LINUX_BSP): $(LINUX_OBJS)
 	${AR} ${ARFLAGS} $@ $^
@@ -170,26 +186,16 @@ $(RDPMON_BSP): $(RDPMON_OBJS)
 	${AR} ${ARFLAGS} $@ $^
 	${RANLIB} $@
 
-$(RDIMON_BSP): $(RDIMON_OBJS)
+librdimon.a: $(RDIMON_OBJS)
+	${AR} ${ARFLAGS} $@ $^
+	${RANLIB} $@
+
+librdimon-v2m.a: $(RDIMON_SEMIHV2M_OBJS)
 	${AR} ${ARFLAGS} $@ $^
 	${RANLIB} $@
 
 # Multilib support.
 .PHONY:  libgloss-multi-do all-multi clean-multi install-multi
-
-all-recursive: all-multi
-clean-recursive: clean-multi
-install-recursive: install-multi
-
-# The $(MAKE) comments below are to enable parallel building.
-all-multi:
-	$(MAKE) $(AM_MAKEFLAGS) DO=all libgloss-multi-do
-
-clean-multi:
-	$(MAKE) $(AM_MAKEFLAGS) DO=clean libgloss-multi-do
-
-install-multi:
-	$(MAKE) $(AM_MAKEFLAGS) DO=install libgloss-multi-do
 
 clean mostlyclean:
 	rm -f a.out core *.i *.o *-test *.srec *.dis *.x $(SIM_BSP) $(IQ80310_BSP)
@@ -202,7 +208,6 @@ clean mostlyclean:
 	    else true; fi; \
 	  else true; fi; \
 	done
-	$(MAKE) $(AM_MAKEFLAGS) clean-recursive
 
 distclean maintainer-clean realclean: clean
 	rm -f Makefile config.status *~
@@ -218,7 +223,6 @@ install: ${CRT0_INSTALL} ${LINUX_INSTALL} ${REDBOOT_INSTALL} ${RDPMON_INSTALL} $
 	    else true; fi; \
 	  else true; fi; \
 	done
-	$(MAKE) $(AM_MAKEFLAGS) install-recursive
 
 install-nano:
 	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
@@ -268,5 +272,3 @@ Makefile: Makefile.in config.status @host_makefile_frag_path@
 
 config.status: configure
 	$(SHELL) config.status --recheck
-
-include $(srcdir)/../multi-build.in
