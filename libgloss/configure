@@ -602,8 +602,6 @@ MCORE_BSP_PREFIX
 M68K_TARGET
 I386_CPPFLAGS
 ARM_OBJTYPE
-ARM_BUILD_CRT0_FALSE
-ARM_BUILD_CRT0_TRUE
 AARCH64_OBJTYPE
 CPP
 RANLIB
@@ -644,6 +642,8 @@ CONFIG_IQ2000_FALSE
 CONFIG_IQ2000_TRUE
 CONFIG_BFIN_FALSE
 CONFIG_BFIN_TRUE
+CONFIG_ARM_FALSE
+CONFIG_ARM_TRUE
 CONFIG_AARCH64_FALSE
 CONFIG_AARCH64_TRUE
 subdirs
@@ -693,6 +693,8 @@ build
 INSTALL_DATA
 INSTALL_SCRIPT
 INSTALL_PROGRAM
+MAY_SUPPLY_SYSCALLS_FALSE
+MAY_SUPPLY_SYSCALLS_TRUE
 target_alias
 host_alias
 build_alias
@@ -1953,6 +1955,15 @@ else
   newlib_may_supply_syscalls=yes
 fi
 
+ if test x${newlib_may_supply_syscalls} = xyes; then
+  MAY_SUPPLY_SYSCALLS_TRUE=
+  MAY_SUPPLY_SYSCALLS_FALSE='#'
+else
+  MAY_SUPPLY_SYSCALLS_TRUE='#'
+  MAY_SUPPLY_SYSCALLS_FALSE=
+fi
+
+
 # Find a good install program.  We prefer a C program (faster),
 # so one script is as good as another.  But avoid the broken or
 # incompatible versions:
@@ -2935,9 +2946,7 @@ case "${target}" in
 	subdirs="$subdirs rx"
 	;;
   arm*-*-elf | arm*-*-coff | arm*-*-*)
-	ac_config_files="$ac_config_files arm/Makefile arm/cpu-init/Makefile"
-
-	subdirs="$subdirs arm arm/cpu-init"
+	config_arm=true
 	;;
   spu-*-elf)
 	ac_config_files="$ac_config_files spu/Makefile"
@@ -2980,6 +2989,14 @@ esac
 else
   CONFIG_AARCH64_TRUE='#'
   CONFIG_AARCH64_FALSE=
+fi
+
+   if test x$config_arm = xtrue; then
+  CONFIG_ARM_TRUE=
+  CONFIG_ARM_FALSE='#'
+else
+  CONFIG_ARM_TRUE='#'
+  CONFIG_ARM_FALSE=
 fi
 
    if test x$config_bfin = xtrue; then
@@ -4853,16 +4870,6 @@ case "${target}" in
 esac
 
 
-if test "x$newlib_may_supply_syscalls" = "xyes"; then
-  ARM_BUILD_CRT0_TRUE='#'
-  ARM_BUILD_CRT0_FALSE=
-else
-  ARM_BUILD_CRT0_TRUE=
-  ARM_BUILD_CRT0_FALSE='#'
-fi
-
-
-
 ARM_OBJTYPE=
 case "${target}" in
   *-*-elf | *-*-eabi* | *-*-tirtos*)
@@ -5228,6 +5235,10 @@ LIBOBJS=$ac_libobjs
 LTLIBOBJS=$ac_ltlibobjs
 
 
+if test -z "${MAY_SUPPLY_SYSCALLS_TRUE}" && test -z "${MAY_SUPPLY_SYSCALLS_FALSE}"; then
+  as_fn_error $? "conditional \"MAY_SUPPLY_SYSCALLS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking that generated files are newer than configure" >&5
 $as_echo_n "checking that generated files are newer than configure... " >&6; }
    if test -n "$am_sleep_pid"; then
@@ -5258,6 +5269,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${CONFIG_AARCH64_TRUE}" && test -z "${CONFIG_AARCH64_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_AARCH64\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${CONFIG_ARM_TRUE}" && test -z "${CONFIG_ARM_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_ARM\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${CONFIG_BFIN_TRUE}" && test -z "${CONFIG_BFIN_FALSE}"; then
@@ -5940,8 +5955,6 @@ do
     "msp430/Makefile") CONFIG_FILES="$CONFIG_FILES msp430/Makefile" ;;
     "rl78/Makefile") CONFIG_FILES="$CONFIG_FILES rl78/Makefile" ;;
     "rx/Makefile") CONFIG_FILES="$CONFIG_FILES rx/Makefile" ;;
-    "arm/Makefile") CONFIG_FILES="$CONFIG_FILES arm/Makefile" ;;
-    "arm/cpu-init/Makefile") CONFIG_FILES="$CONFIG_FILES arm/cpu-init/Makefile" ;;
     "spu/Makefile") CONFIG_FILES="$CONFIG_FILES spu/Makefile" ;;
     "tic6x/Makefile") CONFIG_FILES="$CONFIG_FILES tic6x/Makefile" ;;
     "or1k/Makefile") CONFIG_FILES="$CONFIG_FILES or1k/Makefile" ;;

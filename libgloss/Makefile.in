@@ -101,13 +101,22 @@ check_PROGRAMS = $(am__EXEEXT_2) $(am__EXEEXT_3)
 
 @CONFIG_AARCH64_TRUE@am__append_4 = $(aarch64_SPECS) \
 @CONFIG_AARCH64_TRUE@	$(aarch64_cpu_initcpuinit_DATA)
+@CONFIG_ARM_TRUE@@MAY_SUPPLY_SYSCALLS_FALSE@am__append_5 = arm/crt0.o
+@CONFIG_ARM_TRUE@am__append_6 = arm/linux-crt0.o arm/redboot-crt0.o \
+@CONFIG_ARM_TRUE@	arm/redboot-syscalls.o arm/rdpmon-crt0.o \
+@CONFIG_ARM_TRUE@	arm/rdimon-crt0.o arm/rdimon-crt0-v2m.o \
+@CONFIG_ARM_TRUE@	$(arm_SPECS)
+@CONFIG_ARM_TRUE@am__append_7 = arm/libgloss-linux.a arm/librdpmon.a \
+@CONFIG_ARM_TRUE@	arm/librdimon.a arm/librdimon-v2m.a
+@CONFIG_ARM_TRUE@am__append_8 = $(arm_SPECS) \
+@CONFIG_ARM_TRUE@	$(arm_cpu_initcpuinit_DATA)
 
 # Here is all of the simulator stuff.
-@CONFIG_BFIN_TRUE@am__append_5 = bfin/libsim.a bfin/libbfinbsp.a
-@CONFIG_BFIN_TRUE@am__append_6 = bfin/sim-test
+@CONFIG_BFIN_TRUE@am__append_9 = bfin/libsim.a bfin/libbfinbsp.a
+@CONFIG_BFIN_TRUE@am__append_10 = bfin/sim-test
 
 # Here is all of the development board stuff.
-@CONFIG_BFIN_TRUE@am__append_7 = \
+@CONFIG_BFIN_TRUE@am__append_11 = \
 @CONFIG_BFIN_TRUE@	bfin/crt0.o \
 @CONFIG_BFIN_TRUE@	bfin/basiccrt.o \
 @CONFIG_BFIN_TRUE@	bfin/basiccrts.o \
@@ -118,11 +127,11 @@ check_PROGRAMS = $(am__EXEEXT_2) $(am__EXEEXT_3)
 # 	bfin/basiccrt60x.o \
 #	bfin/basiccrt60xs.o \
 #	bfin/basiccrt60xc1.o
-@CONFIG_BFIN_TRUE@am__append_8 = \
+@CONFIG_BFIN_TRUE@am__append_12 = \
 @CONFIG_BFIN_TRUE@	bfin/crt0.S \
 @CONFIG_BFIN_TRUE@	bfin/basiccrt.S
 
-@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_9 = \
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_13 = \
 @CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bfin-common-sc.ld bfin/bfin-common-mc.ld bfin/bfin-common-mc0.ld \
 @CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf504.ld bfin/bf506.ld \
 @CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf512.ld bfin/bf514.ld bfin/bf516.ld bfin/bf518.ld \
@@ -138,27 +147,27 @@ check_PROGRAMS = $(am__EXEEXT_2) $(am__EXEEXT_3)
 @CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf609.ld bfin/bf609c0.ld bfin/bf609c1.ld bfin/bf609m.ld \
 @CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf592.ld
 
-@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_10 = $(wildcard $(srcdir)/bfin/include/*.h)
-@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_11 = $(wildcard $(srcdir)/bfin/include/sys/*.h)
-@CONFIG_IQ2000_TRUE@am__append_12 = iq2000/crt0.o iq2000/sim.ld
-@CONFIG_IQ2000_TRUE@am__append_13 = iq2000/libeval.a
-@CONFIG_IQ2000_TRUE@am__append_14 = iq2000/crt0.S iq2000/test.o
-@CONFIG_IQ2000_TRUE@am__append_15 = iq2000/test
-@CONFIG_LIBNOSYS_TRUE@am__append_16 = libnosys/nosys.specs
-@CONFIG_LIBNOSYS_TRUE@am__append_17 = libnosys/libnosys.a
-@CONFIG_LM32_TRUE@am__append_18 = lm32/crt0.o lm32/sim.ld
-@CONFIG_LM32_TRUE@am__append_19 = lm32/libgloss.a
-@CONFIG_LM32_TRUE@am__append_20 = lm32/crt0.S
-@CONFIG_RISCV_TRUE@am__append_21 = \
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_14 = $(wildcard $(srcdir)/bfin/include/*.h)
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_15 = $(wildcard $(srcdir)/bfin/include/sys/*.h)
+@CONFIG_IQ2000_TRUE@am__append_16 = iq2000/crt0.o iq2000/sim.ld
+@CONFIG_IQ2000_TRUE@am__append_17 = iq2000/libeval.a
+@CONFIG_IQ2000_TRUE@am__append_18 = iq2000/crt0.S iq2000/test.o
+@CONFIG_IQ2000_TRUE@am__append_19 = iq2000/test
+@CONFIG_LIBNOSYS_TRUE@am__append_20 = libnosys/nosys.specs
+@CONFIG_LIBNOSYS_TRUE@am__append_21 = libnosys/libnosys.a
+@CONFIG_LM32_TRUE@am__append_22 = lm32/crt0.o lm32/sim.ld
+@CONFIG_LM32_TRUE@am__append_23 = lm32/libgloss.a
+@CONFIG_LM32_TRUE@am__append_24 = lm32/crt0.S
+@CONFIG_RISCV_TRUE@am__append_25 = \
 @CONFIG_RISCV_TRUE@	riscv/nano.specs \
 @CONFIG_RISCV_TRUE@	riscv/sim.specs \
 @CONFIG_RISCV_TRUE@	riscv/semihost.specs \
 @CONFIG_RISCV_TRUE@	riscv/crt0.o
 
-@CONFIG_RISCV_TRUE@am__append_22 = riscv/libgloss.a \
+@CONFIG_RISCV_TRUE@am__append_26 = riscv/libgloss.a \
 @CONFIG_RISCV_TRUE@	riscv/libsemihost.a
-@CONFIG_WINCE_TRUE@am__append_23 = $(gdbdir)
-@CONFIG_WINCE_TRUE@am__append_24 = wince/stub.exe
+@CONFIG_WINCE_TRUE@am__append_27 = $(gdbdir)
+@CONFIG_WINCE_TRUE@am__append_28 = wince/stub.exe
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../config/depstand.m4 \
@@ -190,8 +199,8 @@ CONFIG_CLEAN_FILES = arc/Makefile csky/Makefile epiphany/Makefile \
 	mcore/Makefile mep/Makefile moxie/Makefile microblaze/Makefile \
 	mt/Makefile v850/Makefile visium/Makefile xc16x/Makefile \
 	xstormy16/Makefile m32c/Makefile msp430/Makefile rl78/Makefile \
-	rx/Makefile arm/Makefile arm/cpu-init/Makefile spu/Makefile \
-	tic6x/Makefile or1k/Makefile pru/Makefile nios2/Makefile
+	rx/Makefile spu/Makefile tic6x/Makefile or1k/Makefile \
+	pru/Makefile nios2/Makefile
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -223,6 +232,7 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(multilibtooldir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(infodir)" \
 	"$(DESTDIR)$(aarch64_cpu_initcpuinitdir)" \
+	"$(DESTDIR)$(arm_cpu_initcpuinitdir)" \
 	"$(DESTDIR)$(includemachinetooldir)" \
 	"$(DESTDIR)$(includesystooldir)" "$(DESTDIR)$(includetooldir)" \
 	"$(DESTDIR)$(multilibtooldir)"
@@ -242,6 +252,42 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @CONFIG_AARCH64_TRUE@	aarch64/aarch64_librdimon_a-syscalls.$(OBJEXT) \
 @CONFIG_AARCH64_TRUE@	aarch64/aarch64_librdimon_a-truncate.$(OBJEXT)
 aarch64_librdimon_a_OBJECTS = $(am_aarch64_librdimon_a_OBJECTS)
+arm_libgloss_linux_a_AR = $(AR) $(ARFLAGS)
+arm_libgloss_linux_a_LIBADD =
+@CONFIG_ARM_TRUE@am_arm_libgloss_linux_a_OBJECTS =  \
+@CONFIG_ARM_TRUE@	arm/linux-syscalls0.$(OBJEXT) \
+@CONFIG_ARM_TRUE@	arm/linux-syscalls1.$(OBJEXT)
+arm_libgloss_linux_a_OBJECTS = $(am_arm_libgloss_linux_a_OBJECTS)
+arm_librdimon_v2m_a_AR = $(AR) $(ARFLAGS)
+arm_librdimon_v2m_a_LIBADD =
+@CONFIG_ARM_TRUE@am__objects_1 =  \
+@CONFIG_ARM_TRUE@	arm/arm_librdimon_v2m_a-_exit.$(OBJEXT) \
+@CONFIG_ARM_TRUE@	arm/arm_librdimon_v2m_a-_kill.$(OBJEXT) \
+@CONFIG_ARM_TRUE@	arm/arm_librdimon_v2m_a-ftruncate.$(OBJEXT) \
+@CONFIG_ARM_TRUE@	arm/arm_librdimon_v2m_a-libcfunc.$(OBJEXT) \
+@CONFIG_ARM_TRUE@	arm/arm_librdimon_v2m_a-syscalls.$(OBJEXT) \
+@CONFIG_ARM_TRUE@	arm/arm_librdimon_v2m_a-trap.$(OBJEXT) \
+@CONFIG_ARM_TRUE@	arm/arm_librdimon_v2m_a-truncate.$(OBJEXT)
+@CONFIG_ARM_TRUE@am_arm_librdimon_v2m_a_OBJECTS = $(am__objects_1)
+arm_librdimon_v2m_a_OBJECTS = $(am_arm_librdimon_v2m_a_OBJECTS)
+arm_librdimon_a_AR = $(AR) $(ARFLAGS)
+arm_librdimon_a_LIBADD =
+@CONFIG_ARM_TRUE@am__objects_2 = arm/arm_librdimon_a-_exit.$(OBJEXT) \
+@CONFIG_ARM_TRUE@	arm/arm_librdimon_a-_kill.$(OBJEXT) \
+@CONFIG_ARM_TRUE@	arm/arm_librdimon_a-ftruncate.$(OBJEXT) \
+@CONFIG_ARM_TRUE@	arm/arm_librdimon_a-libcfunc.$(OBJEXT) \
+@CONFIG_ARM_TRUE@	arm/arm_librdimon_a-syscalls.$(OBJEXT) \
+@CONFIG_ARM_TRUE@	arm/arm_librdimon_a-trap.$(OBJEXT) \
+@CONFIG_ARM_TRUE@	arm/arm_librdimon_a-truncate.$(OBJEXT)
+@CONFIG_ARM_TRUE@am_arm_librdimon_a_OBJECTS = $(am__objects_2)
+arm_librdimon_a_OBJECTS = $(am_arm_librdimon_a_OBJECTS)
+arm_librdpmon_a_AR = $(AR) $(ARFLAGS)
+arm_librdpmon_a_LIBADD =
+@CONFIG_ARM_TRUE@am_arm_librdpmon_a_OBJECTS = arm/_exit.$(OBJEXT) \
+@CONFIG_ARM_TRUE@	arm/_kill.$(OBJEXT) arm/ftruncate.$(OBJEXT) \
+@CONFIG_ARM_TRUE@	arm/libcfunc.$(OBJEXT) arm/syscalls.$(OBJEXT) \
+@CONFIG_ARM_TRUE@	arm/trap.$(OBJEXT) arm/truncate.$(OBJEXT)
+arm_librdpmon_a_OBJECTS = $(am_arm_librdpmon_a_OBJECTS)
 bfin_libbfinbsp_a_AR = $(AR) $(ARFLAGS)
 bfin_libbfinbsp_a_LIBADD =
 @CONFIG_BFIN_TRUE@am_bfin_libbfinbsp_a_OBJECTS = bfin/bfin_libbfinbsp_a-clear_cache_range.$(OBJEXT) \
@@ -306,12 +352,12 @@ libnosys_libnosys_a_LIBADD =
 libnosys_libnosys_a_OBJECTS = $(am_libnosys_libnosys_a_OBJECTS)
 libobjs_a_AR = $(AR) $(ARFLAGS)
 libobjs_a_LIBADD =
-@CONFIG_BFIN_TRUE@am__objects_1 = bfin/crt0.$(OBJEXT) \
+@CONFIG_BFIN_TRUE@am__objects_3 = bfin/crt0.$(OBJEXT) \
 @CONFIG_BFIN_TRUE@	bfin/basiccrt.$(OBJEXT)
-@CONFIG_IQ2000_TRUE@am__objects_2 = iq2000/crt0.$(OBJEXT)
-@CONFIG_LM32_TRUE@am__objects_3 = lm32/crt0.$(OBJEXT)
-am_libobjs_a_OBJECTS = $(am__objects_1) $(am__objects_2) \
-	$(am__objects_3)
+@CONFIG_IQ2000_TRUE@am__objects_4 = iq2000/crt0.$(OBJEXT)
+@CONFIG_LM32_TRUE@am__objects_5 = lm32/crt0.$(OBJEXT)
+am_libobjs_a_OBJECTS = $(am__objects_3) $(am__objects_4) \
+	$(am__objects_5)
 libobjs_a_OBJECTS = $(am_libobjs_a_OBJECTS)
 lm32_libgloss_a_AR = $(AR) $(ARFLAGS)
 lm32_libgloss_a_LIBADD =
@@ -412,16 +458,16 @@ DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 CPPASCOMPILE = $(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS)
 AM_V_CPPAS = $(am__v_CPPAS_@AM_V@)
 am__v_CPPAS_ = $(am__v_CPPAS_@AM_DEFAULT_V@)
 am__v_CPPAS_0 = @echo "  CPPAS   " $@;
 am__v_CPPAS_1 = 
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 AM_V_CC = $(am__v_CC_@AM_V@)
@@ -434,12 +480,14 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(aarch64_librdimon_a_SOURCES) $(bfin_libbfinbsp_a_SOURCES) \
-	$(bfin_libsim_a_SOURCES) $(iq2000_libeval_a_SOURCES) \
-	$(libnosys_libnosys_a_SOURCES) $(libobjs_a_SOURCES) \
-	$(lm32_libgloss_a_SOURCES) $(riscv_libgloss_a_SOURCES) \
-	$(riscv_libsemihost_a_SOURCES) bfin/sim-test.c iq2000/test.c \
-	$(wince_stub_exe_SOURCES)
+SOURCES = $(aarch64_librdimon_a_SOURCES) \
+	$(arm_libgloss_linux_a_SOURCES) $(arm_librdimon_v2m_a_SOURCES) \
+	$(arm_librdimon_a_SOURCES) $(arm_librdpmon_a_SOURCES) \
+	$(bfin_libbfinbsp_a_SOURCES) $(bfin_libsim_a_SOURCES) \
+	$(iq2000_libeval_a_SOURCES) $(libnosys_libnosys_a_SOURCES) \
+	$(libobjs_a_SOURCES) $(lm32_libgloss_a_SOURCES) \
+	$(riscv_libgloss_a_SOURCES) $(riscv_libsemihost_a_SOURCES) \
+	bfin/sim-test.c iq2000/test.c $(wince_stub_exe_SOURCES)
 AM_V_DVIPS = $(am__v_DVIPS_@AM_V@)
 am__v_DVIPS_ = $(am__v_DVIPS_@AM_DEFAULT_V@)
 am__v_DVIPS_0 = @echo "  DVIPS   " $@;
@@ -493,9 +541,9 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-DATA = $(aarch64_cpu_initcpuinit_DATA) $(includemachinetool_DATA) \
-	$(includesystool_DATA) $(includetool_DATA) \
-	$(multilibtool_DATA)
+DATA = $(aarch64_cpu_initcpuinit_DATA) $(arm_cpu_initcpuinit_DATA) \
+	$(includemachinetool_DATA) $(includesystool_DATA) \
+	$(includetool_DATA) $(multilibtool_DATA)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 am__recursive_targets = \
@@ -526,14 +574,12 @@ ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
 DIST_SUBDIRS = $(SUBDIRS)
-VPATH = @srcdir@ $(am__append_23)
+VPATH = @srcdir@ $(am__append_27)
 AARCH64_OBJTYPE = @AARCH64_OBJTYPE@
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
-ARM_BUILD_CRT0_FALSE = @ARM_BUILD_CRT0_FALSE@
-ARM_BUILD_CRT0_TRUE = @ARM_BUILD_CRT0_TRUE@
 ARM_OBJTYPE = @ARM_OBJTYPE@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
@@ -654,28 +700,28 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I . -I .. -I ../config
 info_TEXINFOS = $(am__append_1)
-CLEANFILES = $(am__append_4)
+CLEANFILES = $(am__append_4) $(am__append_8)
 PHONY = 
 SUBDIRS = @subdirs@ .
 srcroot = $(top_srcdir)/..
 tooldir = $(exec_prefix)/$(target_alias)
 multilibtooldir = $(tooldir)/lib$(MULTISUBDIR)
-multilibtool_DATA = $(am__append_3) $(am__append_7) $(am__append_9) \
-	$(am__append_12) $(am__append_16) $(am__append_18) \
-	$(am__append_21)
-multilibtool_LIBRARIES = $(am__append_2) $(am__append_5) \
-	$(am__append_13) $(am__append_17) $(am__append_19) \
-	$(am__append_22)
+multilibtool_DATA = $(am__append_3) $(am__append_5) $(am__append_6) \
+	$(am__append_11) $(am__append_13) $(am__append_16) \
+	$(am__append_20) $(am__append_22) $(am__append_25)
+multilibtool_LIBRARIES = $(am__append_2) $(am__append_7) \
+	$(am__append_9) $(am__append_17) $(am__append_21) \
+	$(am__append_23) $(am__append_26)
 includetooldir = $(tooldir)/include
-includetool_DATA = $(am__append_10)
+includetool_DATA = $(am__append_14)
 includesystooldir = $(tooldir)/include/sys
-includesystool_DATA = $(am__append_11)
+includesystool_DATA = $(am__append_15)
 AM_CPPFLAGS = -idirafter $(srcroot)/include
 
 # A fake library so automake will generate rules for plain objects that we want
 # to install (e.g. our crt0.o objects).
 noinst_LIBRARIES = libobjs.a
-libobjs_a_SOURCES = $(am__append_8) $(am__append_14) $(am__append_20)
+libobjs_a_SOURCES = $(am__append_12) $(am__append_18) $(am__append_24)
 FLAGS_TO_PASS = \
 	"CC=$(CC)" \
 	"CFLAGS=$(CFLAGS)" \
@@ -729,6 +775,38 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 @CONFIG_AARCH64_TRUE@aarch64_cpu_initcpuinit_DATA = \
 @CONFIG_AARCH64_TRUE@	aarch64/cpu-init/rdimon-aem-el3.o \
 @CONFIG_AARCH64_TRUE@	aarch64/cpu-init/rdimon-aem-v8-r.o
+
+@CONFIG_ARM_TRUE@arm_SPECS = arm/nano.specs arm/linux.specs \
+@CONFIG_ARM_TRUE@	arm/redboot.ld arm/redboot.specs \
+@CONFIG_ARM_TRUE@	arm/rdpmon.specs arm/rdimon.specs \
+@CONFIG_ARM_TRUE@	arm/rdimon-v2m.specs \
+@CONFIG_ARM_TRUE@	arm/aprofile-validation.specs \
+@CONFIG_ARM_TRUE@	arm/aprofile-validation-v2m.specs \
+@CONFIG_ARM_TRUE@	arm/aprofile-ve-v2m.specs \
+@CONFIG_ARM_TRUE@	arm/aprofile-ve.specs arm/pid.specs \
+@CONFIG_ARM_TRUE@	arm/iq80310.specs
+@CONFIG_ARM_TRUE@arm_libgloss_linux_a_SOURCES = \
+@CONFIG_ARM_TRUE@	arm/linux-syscalls0.c \
+@CONFIG_ARM_TRUE@	arm/linux-syscalls1.c
+
+@CONFIG_ARM_TRUE@arm_librdpmon_a_SOURCES = \
+@CONFIG_ARM_TRUE@	arm/_exit.c \
+@CONFIG_ARM_TRUE@	arm/_kill.c \
+@CONFIG_ARM_TRUE@	arm/ftruncate.c \
+@CONFIG_ARM_TRUE@	arm/libcfunc.c \
+@CONFIG_ARM_TRUE@	arm/syscalls.c \
+@CONFIG_ARM_TRUE@	arm/trap.S \
+@CONFIG_ARM_TRUE@	arm/truncate.c
+
+@CONFIG_ARM_TRUE@arm_RDIMON_CPPFLAGS = -DSEMIHOST_V2 -DARM_RDI_MONITOR
+@CONFIG_ARM_TRUE@arm_RDIMON_V2M_CPPFLAGS = $(arm_RDIMON_CPPFLAGS) -DSEMIHOST_V2_MIXED_MODE
+@CONFIG_ARM_TRUE@arm_librdimon_a_SOURCES = $(arm_librdpmon_a_SOURCES)
+@CONFIG_ARM_TRUE@arm_librdimon_a_CPPFLAGS = $(AM_CPPFLAGS) $(arm_RDIMON_CPPFLAGS)
+@CONFIG_ARM_TRUE@arm_librdimon_v2m_a_SOURCES = $(arm_librdpmon_a_SOURCES)
+@CONFIG_ARM_TRUE@arm_librdimon_v2m_a_CPPFLAGS = $(AM_CPPFLAGS) $(arm_RDIMON_V2M_CPPFLAGS)
+@CONFIG_ARM_TRUE@arm_cpu_initcpuinitdir = $(tooldir)/lib$(MULTISUBDIR)/cpu-init
+@CONFIG_ARM_TRUE@arm_cpu_initcpuinit_DATA = \
+@CONFIG_ARM_TRUE@	arm/cpu-init/rdimon-aem.o
 
 @CONFIG_BFIN_TRUE@bfin_CPPFLAGS = -I$(srcdir)/bfin/include
 @CONFIG_BFIN_TRUE@bfin_libsim_a_SOURCES = \
@@ -860,7 +938,7 @@ all: config.h
 .SUFFIXES: .S .c .dvi .o .obj .ps
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/wince/Makefile.inc $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/wince/Makefile.inc $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -882,7 +960,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe);; \
 	esac;
-$(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/wince/Makefile.inc $(am__empty):
+$(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/wince/Makefile.inc $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
@@ -979,10 +1057,6 @@ rl78/Makefile: $(top_builddir)/config.status $(top_srcdir)/rl78/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 rx/Makefile: $(top_builddir)/config.status $(top_srcdir)/rx/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
-arm/Makefile: $(top_builddir)/config.status $(top_srcdir)/arm/Makefile.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-arm/cpu-init/Makefile: $(top_builddir)/config.status $(top_srcdir)/arm/cpu-init/Makefile.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
 spu/Makefile: $(top_builddir)/config.status $(top_srcdir)/spu/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 tic6x/Makefile: $(top_builddir)/config.status $(top_srcdir)/tic6x/Makefile.in
@@ -1050,6 +1124,75 @@ aarch64/librdimon.a: $(aarch64_librdimon_a_OBJECTS) $(aarch64_librdimon_a_DEPEND
 	$(AM_V_at)-rm -f aarch64/librdimon.a
 	$(AM_V_AR)$(aarch64_librdimon_a_AR) aarch64/librdimon.a $(aarch64_librdimon_a_OBJECTS) $(aarch64_librdimon_a_LIBADD)
 	$(AM_V_at)$(RANLIB) aarch64/librdimon.a
+arm/$(am__dirstamp):
+	@$(MKDIR_P) arm
+	@: > arm/$(am__dirstamp)
+arm/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) arm/$(DEPDIR)
+	@: > arm/$(DEPDIR)/$(am__dirstamp)
+arm/linux-syscalls0.$(OBJEXT): arm/$(am__dirstamp) \
+	arm/$(DEPDIR)/$(am__dirstamp)
+arm/linux-syscalls1.$(OBJEXT): arm/$(am__dirstamp) \
+	arm/$(DEPDIR)/$(am__dirstamp)
+
+arm/libgloss-linux.a: $(arm_libgloss_linux_a_OBJECTS) $(arm_libgloss_linux_a_DEPENDENCIES) $(EXTRA_arm_libgloss_linux_a_DEPENDENCIES) arm/$(am__dirstamp)
+	$(AM_V_at)-rm -f arm/libgloss-linux.a
+	$(AM_V_AR)$(arm_libgloss_linux_a_AR) arm/libgloss-linux.a $(arm_libgloss_linux_a_OBJECTS) $(arm_libgloss_linux_a_LIBADD)
+	$(AM_V_at)$(RANLIB) arm/libgloss-linux.a
+arm/arm_librdimon_v2m_a-_exit.$(OBJEXT): arm/$(am__dirstamp) \
+	arm/$(DEPDIR)/$(am__dirstamp)
+arm/arm_librdimon_v2m_a-_kill.$(OBJEXT): arm/$(am__dirstamp) \
+	arm/$(DEPDIR)/$(am__dirstamp)
+arm/arm_librdimon_v2m_a-ftruncate.$(OBJEXT): arm/$(am__dirstamp) \
+	arm/$(DEPDIR)/$(am__dirstamp)
+arm/arm_librdimon_v2m_a-libcfunc.$(OBJEXT): arm/$(am__dirstamp) \
+	arm/$(DEPDIR)/$(am__dirstamp)
+arm/arm_librdimon_v2m_a-syscalls.$(OBJEXT): arm/$(am__dirstamp) \
+	arm/$(DEPDIR)/$(am__dirstamp)
+arm/arm_librdimon_v2m_a-trap.$(OBJEXT): arm/$(am__dirstamp) \
+	arm/$(DEPDIR)/$(am__dirstamp)
+arm/arm_librdimon_v2m_a-truncate.$(OBJEXT): arm/$(am__dirstamp) \
+	arm/$(DEPDIR)/$(am__dirstamp)
+
+arm/librdimon-v2m.a: $(arm_librdimon_v2m_a_OBJECTS) $(arm_librdimon_v2m_a_DEPENDENCIES) $(EXTRA_arm_librdimon_v2m_a_DEPENDENCIES) arm/$(am__dirstamp)
+	$(AM_V_at)-rm -f arm/librdimon-v2m.a
+	$(AM_V_AR)$(arm_librdimon_v2m_a_AR) arm/librdimon-v2m.a $(arm_librdimon_v2m_a_OBJECTS) $(arm_librdimon_v2m_a_LIBADD)
+	$(AM_V_at)$(RANLIB) arm/librdimon-v2m.a
+arm/arm_librdimon_a-_exit.$(OBJEXT): arm/$(am__dirstamp) \
+	arm/$(DEPDIR)/$(am__dirstamp)
+arm/arm_librdimon_a-_kill.$(OBJEXT): arm/$(am__dirstamp) \
+	arm/$(DEPDIR)/$(am__dirstamp)
+arm/arm_librdimon_a-ftruncate.$(OBJEXT): arm/$(am__dirstamp) \
+	arm/$(DEPDIR)/$(am__dirstamp)
+arm/arm_librdimon_a-libcfunc.$(OBJEXT): arm/$(am__dirstamp) \
+	arm/$(DEPDIR)/$(am__dirstamp)
+arm/arm_librdimon_a-syscalls.$(OBJEXT): arm/$(am__dirstamp) \
+	arm/$(DEPDIR)/$(am__dirstamp)
+arm/arm_librdimon_a-trap.$(OBJEXT): arm/$(am__dirstamp) \
+	arm/$(DEPDIR)/$(am__dirstamp)
+arm/arm_librdimon_a-truncate.$(OBJEXT): arm/$(am__dirstamp) \
+	arm/$(DEPDIR)/$(am__dirstamp)
+
+arm/librdimon.a: $(arm_librdimon_a_OBJECTS) $(arm_librdimon_a_DEPENDENCIES) $(EXTRA_arm_librdimon_a_DEPENDENCIES) arm/$(am__dirstamp)
+	$(AM_V_at)-rm -f arm/librdimon.a
+	$(AM_V_AR)$(arm_librdimon_a_AR) arm/librdimon.a $(arm_librdimon_a_OBJECTS) $(arm_librdimon_a_LIBADD)
+	$(AM_V_at)$(RANLIB) arm/librdimon.a
+arm/_exit.$(OBJEXT): arm/$(am__dirstamp) arm/$(DEPDIR)/$(am__dirstamp)
+arm/_kill.$(OBJEXT): arm/$(am__dirstamp) arm/$(DEPDIR)/$(am__dirstamp)
+arm/ftruncate.$(OBJEXT): arm/$(am__dirstamp) \
+	arm/$(DEPDIR)/$(am__dirstamp)
+arm/libcfunc.$(OBJEXT): arm/$(am__dirstamp) \
+	arm/$(DEPDIR)/$(am__dirstamp)
+arm/syscalls.$(OBJEXT): arm/$(am__dirstamp) \
+	arm/$(DEPDIR)/$(am__dirstamp)
+arm/trap.$(OBJEXT): arm/$(am__dirstamp) arm/$(DEPDIR)/$(am__dirstamp)
+arm/truncate.$(OBJEXT): arm/$(am__dirstamp) \
+	arm/$(DEPDIR)/$(am__dirstamp)
+
+arm/librdpmon.a: $(arm_librdpmon_a_OBJECTS) $(arm_librdpmon_a_DEPENDENCIES) $(EXTRA_arm_librdpmon_a_DEPENDENCIES) arm/$(am__dirstamp)
+	$(AM_V_at)-rm -f arm/librdpmon.a
+	$(AM_V_AR)$(arm_librdpmon_a_AR) arm/librdpmon.a $(arm_librdpmon_a_OBJECTS) $(arm_librdpmon_a_LIBADD)
+	$(AM_V_at)$(RANLIB) arm/librdpmon.a
 bfin/$(am__dirstamp):
 	@$(MKDIR_P) bfin
 	@: > bfin/$(am__dirstamp)
@@ -1412,6 +1555,7 @@ wince/stub.exe$(EXEEXT): $(wince_stub_exe_OBJECTS) $(wince_stub_exe_DEPENDENCIES
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 	-rm -f aarch64/*.$(OBJEXT)
+	-rm -f arm/*.$(OBJEXT)
 	-rm -f bfin/*.$(OBJEXT)
 	-rm -f iq2000/*.$(OBJEXT)
 	-rm -f libnosys/*.$(OBJEXT)
@@ -1428,6 +1572,29 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@aarch64/$(DEPDIR)/aarch64_librdimon_a-libcfunc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@aarch64/$(DEPDIR)/aarch64_librdimon_a-syscalls.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@aarch64/$(DEPDIR)/aarch64_librdimon_a-truncate.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/_exit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/_kill.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/arm_librdimon_a-_exit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/arm_librdimon_a-_kill.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/arm_librdimon_a-ftruncate.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/arm_librdimon_a-libcfunc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/arm_librdimon_a-syscalls.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/arm_librdimon_a-trap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/arm_librdimon_a-truncate.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/arm_librdimon_v2m_a-_exit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/arm_librdimon_v2m_a-_kill.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/arm_librdimon_v2m_a-ftruncate.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/arm_librdimon_v2m_a-libcfunc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/arm_librdimon_v2m_a-syscalls.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/arm_librdimon_v2m_a-trap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/arm_librdimon_v2m_a-truncate.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/ftruncate.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/libcfunc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/linux-syscalls0.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/linux-syscalls1.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/syscalls.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/trap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/truncate.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@bfin/$(DEPDIR)/basiccrt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@bfin/$(DEPDIR)/bfin_libbfinbsp_a-_exit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@bfin/$(DEPDIR)/bfin_libbfinbsp_a-clear_cache_range.Po@am__quote@
@@ -1559,6 +1726,34 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CPPASCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
+arm/arm_librdimon_v2m_a-trap.o: arm/trap.S
+@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT arm/arm_librdimon_v2m_a-trap.o -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_v2m_a-trap.Tpo -c -o arm/arm_librdimon_v2m_a-trap.o `test -f 'arm/trap.S' || echo '$(srcdir)/'`arm/trap.S
+@am__fastdepCCAS_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_v2m_a-trap.Tpo arm/$(DEPDIR)/arm_librdimon_v2m_a-trap.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='arm/trap.S' object='arm/arm_librdimon_v2m_a-trap.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o arm/arm_librdimon_v2m_a-trap.o `test -f 'arm/trap.S' || echo '$(srcdir)/'`arm/trap.S
+
+arm/arm_librdimon_v2m_a-trap.obj: arm/trap.S
+@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT arm/arm_librdimon_v2m_a-trap.obj -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_v2m_a-trap.Tpo -c -o arm/arm_librdimon_v2m_a-trap.obj `if test -f 'arm/trap.S'; then $(CYGPATH_W) 'arm/trap.S'; else $(CYGPATH_W) '$(srcdir)/arm/trap.S'; fi`
+@am__fastdepCCAS_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_v2m_a-trap.Tpo arm/$(DEPDIR)/arm_librdimon_v2m_a-trap.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='arm/trap.S' object='arm/arm_librdimon_v2m_a-trap.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o arm/arm_librdimon_v2m_a-trap.obj `if test -f 'arm/trap.S'; then $(CYGPATH_W) 'arm/trap.S'; else $(CYGPATH_W) '$(srcdir)/arm/trap.S'; fi`
+
+arm/arm_librdimon_a-trap.o: arm/trap.S
+@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT arm/arm_librdimon_a-trap.o -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_a-trap.Tpo -c -o arm/arm_librdimon_a-trap.o `test -f 'arm/trap.S' || echo '$(srcdir)/'`arm/trap.S
+@am__fastdepCCAS_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_a-trap.Tpo arm/$(DEPDIR)/arm_librdimon_a-trap.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='arm/trap.S' object='arm/arm_librdimon_a-trap.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o arm/arm_librdimon_a-trap.o `test -f 'arm/trap.S' || echo '$(srcdir)/'`arm/trap.S
+
+arm/arm_librdimon_a-trap.obj: arm/trap.S
+@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT arm/arm_librdimon_a-trap.obj -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_a-trap.Tpo -c -o arm/arm_librdimon_a-trap.obj `if test -f 'arm/trap.S'; then $(CYGPATH_W) 'arm/trap.S'; else $(CYGPATH_W) '$(srcdir)/arm/trap.S'; fi`
+@am__fastdepCCAS_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_a-trap.Tpo arm/$(DEPDIR)/arm_librdimon_a-trap.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='arm/trap.S' object='arm/arm_librdimon_a-trap.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o arm/arm_librdimon_a-trap.obj `if test -f 'arm/trap.S'; then $(CYGPATH_W) 'arm/trap.S'; else $(CYGPATH_W) '$(srcdir)/arm/trap.S'; fi`
+
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
@@ -1658,6 +1853,174 @@ aarch64/aarch64_librdimon_a-truncate.obj: aarch64/truncate.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='aarch64/truncate.c' object='aarch64/aarch64_librdimon_a-truncate.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aarch64_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o aarch64/aarch64_librdimon_a-truncate.obj `if test -f 'aarch64/truncate.c'; then $(CYGPATH_W) 'aarch64/truncate.c'; else $(CYGPATH_W) '$(srcdir)/aarch64/truncate.c'; fi`
+
+arm/arm_librdimon_v2m_a-_exit.o: arm/_exit.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_v2m_a-_exit.o -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_v2m_a-_exit.Tpo -c -o arm/arm_librdimon_v2m_a-_exit.o `test -f 'arm/_exit.c' || echo '$(srcdir)/'`arm/_exit.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_v2m_a-_exit.Tpo arm/$(DEPDIR)/arm_librdimon_v2m_a-_exit.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arm/_exit.c' object='arm/arm_librdimon_v2m_a-_exit.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arm/arm_librdimon_v2m_a-_exit.o `test -f 'arm/_exit.c' || echo '$(srcdir)/'`arm/_exit.c
+
+arm/arm_librdimon_v2m_a-_exit.obj: arm/_exit.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_v2m_a-_exit.obj -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_v2m_a-_exit.Tpo -c -o arm/arm_librdimon_v2m_a-_exit.obj `if test -f 'arm/_exit.c'; then $(CYGPATH_W) 'arm/_exit.c'; else $(CYGPATH_W) '$(srcdir)/arm/_exit.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_v2m_a-_exit.Tpo arm/$(DEPDIR)/arm_librdimon_v2m_a-_exit.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arm/_exit.c' object='arm/arm_librdimon_v2m_a-_exit.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arm/arm_librdimon_v2m_a-_exit.obj `if test -f 'arm/_exit.c'; then $(CYGPATH_W) 'arm/_exit.c'; else $(CYGPATH_W) '$(srcdir)/arm/_exit.c'; fi`
+
+arm/arm_librdimon_v2m_a-_kill.o: arm/_kill.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_v2m_a-_kill.o -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_v2m_a-_kill.Tpo -c -o arm/arm_librdimon_v2m_a-_kill.o `test -f 'arm/_kill.c' || echo '$(srcdir)/'`arm/_kill.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_v2m_a-_kill.Tpo arm/$(DEPDIR)/arm_librdimon_v2m_a-_kill.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arm/_kill.c' object='arm/arm_librdimon_v2m_a-_kill.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arm/arm_librdimon_v2m_a-_kill.o `test -f 'arm/_kill.c' || echo '$(srcdir)/'`arm/_kill.c
+
+arm/arm_librdimon_v2m_a-_kill.obj: arm/_kill.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_v2m_a-_kill.obj -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_v2m_a-_kill.Tpo -c -o arm/arm_librdimon_v2m_a-_kill.obj `if test -f 'arm/_kill.c'; then $(CYGPATH_W) 'arm/_kill.c'; else $(CYGPATH_W) '$(srcdir)/arm/_kill.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_v2m_a-_kill.Tpo arm/$(DEPDIR)/arm_librdimon_v2m_a-_kill.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arm/_kill.c' object='arm/arm_librdimon_v2m_a-_kill.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arm/arm_librdimon_v2m_a-_kill.obj `if test -f 'arm/_kill.c'; then $(CYGPATH_W) 'arm/_kill.c'; else $(CYGPATH_W) '$(srcdir)/arm/_kill.c'; fi`
+
+arm/arm_librdimon_v2m_a-ftruncate.o: arm/ftruncate.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_v2m_a-ftruncate.o -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_v2m_a-ftruncate.Tpo -c -o arm/arm_librdimon_v2m_a-ftruncate.o `test -f 'arm/ftruncate.c' || echo '$(srcdir)/'`arm/ftruncate.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_v2m_a-ftruncate.Tpo arm/$(DEPDIR)/arm_librdimon_v2m_a-ftruncate.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arm/ftruncate.c' object='arm/arm_librdimon_v2m_a-ftruncate.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arm/arm_librdimon_v2m_a-ftruncate.o `test -f 'arm/ftruncate.c' || echo '$(srcdir)/'`arm/ftruncate.c
+
+arm/arm_librdimon_v2m_a-ftruncate.obj: arm/ftruncate.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_v2m_a-ftruncate.obj -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_v2m_a-ftruncate.Tpo -c -o arm/arm_librdimon_v2m_a-ftruncate.obj `if test -f 'arm/ftruncate.c'; then $(CYGPATH_W) 'arm/ftruncate.c'; else $(CYGPATH_W) '$(srcdir)/arm/ftruncate.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_v2m_a-ftruncate.Tpo arm/$(DEPDIR)/arm_librdimon_v2m_a-ftruncate.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arm/ftruncate.c' object='arm/arm_librdimon_v2m_a-ftruncate.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arm/arm_librdimon_v2m_a-ftruncate.obj `if test -f 'arm/ftruncate.c'; then $(CYGPATH_W) 'arm/ftruncate.c'; else $(CYGPATH_W) '$(srcdir)/arm/ftruncate.c'; fi`
+
+arm/arm_librdimon_v2m_a-libcfunc.o: arm/libcfunc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_v2m_a-libcfunc.o -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_v2m_a-libcfunc.Tpo -c -o arm/arm_librdimon_v2m_a-libcfunc.o `test -f 'arm/libcfunc.c' || echo '$(srcdir)/'`arm/libcfunc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_v2m_a-libcfunc.Tpo arm/$(DEPDIR)/arm_librdimon_v2m_a-libcfunc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arm/libcfunc.c' object='arm/arm_librdimon_v2m_a-libcfunc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arm/arm_librdimon_v2m_a-libcfunc.o `test -f 'arm/libcfunc.c' || echo '$(srcdir)/'`arm/libcfunc.c
+
+arm/arm_librdimon_v2m_a-libcfunc.obj: arm/libcfunc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_v2m_a-libcfunc.obj -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_v2m_a-libcfunc.Tpo -c -o arm/arm_librdimon_v2m_a-libcfunc.obj `if test -f 'arm/libcfunc.c'; then $(CYGPATH_W) 'arm/libcfunc.c'; else $(CYGPATH_W) '$(srcdir)/arm/libcfunc.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_v2m_a-libcfunc.Tpo arm/$(DEPDIR)/arm_librdimon_v2m_a-libcfunc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arm/libcfunc.c' object='arm/arm_librdimon_v2m_a-libcfunc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arm/arm_librdimon_v2m_a-libcfunc.obj `if test -f 'arm/libcfunc.c'; then $(CYGPATH_W) 'arm/libcfunc.c'; else $(CYGPATH_W) '$(srcdir)/arm/libcfunc.c'; fi`
+
+arm/arm_librdimon_v2m_a-syscalls.o: arm/syscalls.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_v2m_a-syscalls.o -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_v2m_a-syscalls.Tpo -c -o arm/arm_librdimon_v2m_a-syscalls.o `test -f 'arm/syscalls.c' || echo '$(srcdir)/'`arm/syscalls.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_v2m_a-syscalls.Tpo arm/$(DEPDIR)/arm_librdimon_v2m_a-syscalls.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arm/syscalls.c' object='arm/arm_librdimon_v2m_a-syscalls.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arm/arm_librdimon_v2m_a-syscalls.o `test -f 'arm/syscalls.c' || echo '$(srcdir)/'`arm/syscalls.c
+
+arm/arm_librdimon_v2m_a-syscalls.obj: arm/syscalls.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_v2m_a-syscalls.obj -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_v2m_a-syscalls.Tpo -c -o arm/arm_librdimon_v2m_a-syscalls.obj `if test -f 'arm/syscalls.c'; then $(CYGPATH_W) 'arm/syscalls.c'; else $(CYGPATH_W) '$(srcdir)/arm/syscalls.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_v2m_a-syscalls.Tpo arm/$(DEPDIR)/arm_librdimon_v2m_a-syscalls.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arm/syscalls.c' object='arm/arm_librdimon_v2m_a-syscalls.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arm/arm_librdimon_v2m_a-syscalls.obj `if test -f 'arm/syscalls.c'; then $(CYGPATH_W) 'arm/syscalls.c'; else $(CYGPATH_W) '$(srcdir)/arm/syscalls.c'; fi`
+
+arm/arm_librdimon_v2m_a-truncate.o: arm/truncate.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_v2m_a-truncate.o -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_v2m_a-truncate.Tpo -c -o arm/arm_librdimon_v2m_a-truncate.o `test -f 'arm/truncate.c' || echo '$(srcdir)/'`arm/truncate.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_v2m_a-truncate.Tpo arm/$(DEPDIR)/arm_librdimon_v2m_a-truncate.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arm/truncate.c' object='arm/arm_librdimon_v2m_a-truncate.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arm/arm_librdimon_v2m_a-truncate.o `test -f 'arm/truncate.c' || echo '$(srcdir)/'`arm/truncate.c
+
+arm/arm_librdimon_v2m_a-truncate.obj: arm/truncate.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_v2m_a-truncate.obj -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_v2m_a-truncate.Tpo -c -o arm/arm_librdimon_v2m_a-truncate.obj `if test -f 'arm/truncate.c'; then $(CYGPATH_W) 'arm/truncate.c'; else $(CYGPATH_W) '$(srcdir)/arm/truncate.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_v2m_a-truncate.Tpo arm/$(DEPDIR)/arm_librdimon_v2m_a-truncate.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arm/truncate.c' object='arm/arm_librdimon_v2m_a-truncate.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arm/arm_librdimon_v2m_a-truncate.obj `if test -f 'arm/truncate.c'; then $(CYGPATH_W) 'arm/truncate.c'; else $(CYGPATH_W) '$(srcdir)/arm/truncate.c'; fi`
+
+arm/arm_librdimon_a-_exit.o: arm/_exit.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_a-_exit.o -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_a-_exit.Tpo -c -o arm/arm_librdimon_a-_exit.o `test -f 'arm/_exit.c' || echo '$(srcdir)/'`arm/_exit.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_a-_exit.Tpo arm/$(DEPDIR)/arm_librdimon_a-_exit.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arm/_exit.c' object='arm/arm_librdimon_a-_exit.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arm/arm_librdimon_a-_exit.o `test -f 'arm/_exit.c' || echo '$(srcdir)/'`arm/_exit.c
+
+arm/arm_librdimon_a-_exit.obj: arm/_exit.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_a-_exit.obj -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_a-_exit.Tpo -c -o arm/arm_librdimon_a-_exit.obj `if test -f 'arm/_exit.c'; then $(CYGPATH_W) 'arm/_exit.c'; else $(CYGPATH_W) '$(srcdir)/arm/_exit.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_a-_exit.Tpo arm/$(DEPDIR)/arm_librdimon_a-_exit.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arm/_exit.c' object='arm/arm_librdimon_a-_exit.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arm/arm_librdimon_a-_exit.obj `if test -f 'arm/_exit.c'; then $(CYGPATH_W) 'arm/_exit.c'; else $(CYGPATH_W) '$(srcdir)/arm/_exit.c'; fi`
+
+arm/arm_librdimon_a-_kill.o: arm/_kill.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_a-_kill.o -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_a-_kill.Tpo -c -o arm/arm_librdimon_a-_kill.o `test -f 'arm/_kill.c' || echo '$(srcdir)/'`arm/_kill.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_a-_kill.Tpo arm/$(DEPDIR)/arm_librdimon_a-_kill.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arm/_kill.c' object='arm/arm_librdimon_a-_kill.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arm/arm_librdimon_a-_kill.o `test -f 'arm/_kill.c' || echo '$(srcdir)/'`arm/_kill.c
+
+arm/arm_librdimon_a-_kill.obj: arm/_kill.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_a-_kill.obj -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_a-_kill.Tpo -c -o arm/arm_librdimon_a-_kill.obj `if test -f 'arm/_kill.c'; then $(CYGPATH_W) 'arm/_kill.c'; else $(CYGPATH_W) '$(srcdir)/arm/_kill.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_a-_kill.Tpo arm/$(DEPDIR)/arm_librdimon_a-_kill.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arm/_kill.c' object='arm/arm_librdimon_a-_kill.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arm/arm_librdimon_a-_kill.obj `if test -f 'arm/_kill.c'; then $(CYGPATH_W) 'arm/_kill.c'; else $(CYGPATH_W) '$(srcdir)/arm/_kill.c'; fi`
+
+arm/arm_librdimon_a-ftruncate.o: arm/ftruncate.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_a-ftruncate.o -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_a-ftruncate.Tpo -c -o arm/arm_librdimon_a-ftruncate.o `test -f 'arm/ftruncate.c' || echo '$(srcdir)/'`arm/ftruncate.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_a-ftruncate.Tpo arm/$(DEPDIR)/arm_librdimon_a-ftruncate.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arm/ftruncate.c' object='arm/arm_librdimon_a-ftruncate.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arm/arm_librdimon_a-ftruncate.o `test -f 'arm/ftruncate.c' || echo '$(srcdir)/'`arm/ftruncate.c
+
+arm/arm_librdimon_a-ftruncate.obj: arm/ftruncate.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_a-ftruncate.obj -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_a-ftruncate.Tpo -c -o arm/arm_librdimon_a-ftruncate.obj `if test -f 'arm/ftruncate.c'; then $(CYGPATH_W) 'arm/ftruncate.c'; else $(CYGPATH_W) '$(srcdir)/arm/ftruncate.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_a-ftruncate.Tpo arm/$(DEPDIR)/arm_librdimon_a-ftruncate.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arm/ftruncate.c' object='arm/arm_librdimon_a-ftruncate.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arm/arm_librdimon_a-ftruncate.obj `if test -f 'arm/ftruncate.c'; then $(CYGPATH_W) 'arm/ftruncate.c'; else $(CYGPATH_W) '$(srcdir)/arm/ftruncate.c'; fi`
+
+arm/arm_librdimon_a-libcfunc.o: arm/libcfunc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_a-libcfunc.o -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_a-libcfunc.Tpo -c -o arm/arm_librdimon_a-libcfunc.o `test -f 'arm/libcfunc.c' || echo '$(srcdir)/'`arm/libcfunc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_a-libcfunc.Tpo arm/$(DEPDIR)/arm_librdimon_a-libcfunc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arm/libcfunc.c' object='arm/arm_librdimon_a-libcfunc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arm/arm_librdimon_a-libcfunc.o `test -f 'arm/libcfunc.c' || echo '$(srcdir)/'`arm/libcfunc.c
+
+arm/arm_librdimon_a-libcfunc.obj: arm/libcfunc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_a-libcfunc.obj -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_a-libcfunc.Tpo -c -o arm/arm_librdimon_a-libcfunc.obj `if test -f 'arm/libcfunc.c'; then $(CYGPATH_W) 'arm/libcfunc.c'; else $(CYGPATH_W) '$(srcdir)/arm/libcfunc.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_a-libcfunc.Tpo arm/$(DEPDIR)/arm_librdimon_a-libcfunc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arm/libcfunc.c' object='arm/arm_librdimon_a-libcfunc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arm/arm_librdimon_a-libcfunc.obj `if test -f 'arm/libcfunc.c'; then $(CYGPATH_W) 'arm/libcfunc.c'; else $(CYGPATH_W) '$(srcdir)/arm/libcfunc.c'; fi`
+
+arm/arm_librdimon_a-syscalls.o: arm/syscalls.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_a-syscalls.o -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_a-syscalls.Tpo -c -o arm/arm_librdimon_a-syscalls.o `test -f 'arm/syscalls.c' || echo '$(srcdir)/'`arm/syscalls.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_a-syscalls.Tpo arm/$(DEPDIR)/arm_librdimon_a-syscalls.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arm/syscalls.c' object='arm/arm_librdimon_a-syscalls.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arm/arm_librdimon_a-syscalls.o `test -f 'arm/syscalls.c' || echo '$(srcdir)/'`arm/syscalls.c
+
+arm/arm_librdimon_a-syscalls.obj: arm/syscalls.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_a-syscalls.obj -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_a-syscalls.Tpo -c -o arm/arm_librdimon_a-syscalls.obj `if test -f 'arm/syscalls.c'; then $(CYGPATH_W) 'arm/syscalls.c'; else $(CYGPATH_W) '$(srcdir)/arm/syscalls.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_a-syscalls.Tpo arm/$(DEPDIR)/arm_librdimon_a-syscalls.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arm/syscalls.c' object='arm/arm_librdimon_a-syscalls.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arm/arm_librdimon_a-syscalls.obj `if test -f 'arm/syscalls.c'; then $(CYGPATH_W) 'arm/syscalls.c'; else $(CYGPATH_W) '$(srcdir)/arm/syscalls.c'; fi`
+
+arm/arm_librdimon_a-truncate.o: arm/truncate.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_a-truncate.o -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_a-truncate.Tpo -c -o arm/arm_librdimon_a-truncate.o `test -f 'arm/truncate.c' || echo '$(srcdir)/'`arm/truncate.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_a-truncate.Tpo arm/$(DEPDIR)/arm_librdimon_a-truncate.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arm/truncate.c' object='arm/arm_librdimon_a-truncate.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arm/arm_librdimon_a-truncate.o `test -f 'arm/truncate.c' || echo '$(srcdir)/'`arm/truncate.c
+
+arm/arm_librdimon_a-truncate.obj: arm/truncate.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_a-truncate.obj -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_a-truncate.Tpo -c -o arm/arm_librdimon_a-truncate.obj `if test -f 'arm/truncate.c'; then $(CYGPATH_W) 'arm/truncate.c'; else $(CYGPATH_W) '$(srcdir)/arm/truncate.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_a-truncate.Tpo arm/$(DEPDIR)/arm_librdimon_a-truncate.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arm/truncate.c' object='arm/arm_librdimon_a-truncate.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arm/arm_librdimon_a-truncate.obj `if test -f 'arm/truncate.c'; then $(CYGPATH_W) 'arm/truncate.c'; else $(CYGPATH_W) '$(srcdir)/arm/truncate.c'; fi`
 
 bfin/bfin_libbfinbsp_a-clear_cache_range.o: bfin/clear_cache_range.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bfin_libbfinbsp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bfin/bfin_libbfinbsp_a-clear_cache_range.o -MD -MP -MF bfin/$(DEPDIR)/bfin_libbfinbsp_a-clear_cache_range.Tpo -c -o bfin/bfin_libbfinbsp_a-clear_cache_range.o `test -f 'bfin/clear_cache_range.c' || echo '$(srcdir)/'`bfin/clear_cache_range.c
@@ -2701,6 +3064,27 @@ uninstall-aarch64_cpu_initcpuinitDATA:
 	@list='$(aarch64_cpu_initcpuinit_DATA)'; test -n "$(aarch64_cpu_initcpuinitdir)" || list=; \
 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
 	dir='$(DESTDIR)$(aarch64_cpu_initcpuinitdir)'; $(am__uninstall_files_from_dir)
+install-arm_cpu_initcpuinitDATA: $(arm_cpu_initcpuinit_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(arm_cpu_initcpuinit_DATA)'; test -n "$(arm_cpu_initcpuinitdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(arm_cpu_initcpuinitdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(arm_cpu_initcpuinitdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(arm_cpu_initcpuinitdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(arm_cpu_initcpuinitdir)" || exit $$?; \
+	done
+
+uninstall-arm_cpu_initcpuinitDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(arm_cpu_initcpuinit_DATA)'; test -n "$(arm_cpu_initcpuinitdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(arm_cpu_initcpuinitdir)'; $(am__uninstall_files_from_dir)
 install-includemachinetoolDATA: $(includemachinetool_DATA)
 	@$(NORMAL_INSTALL)
 	@list='$(includemachinetool_DATA)'; test -n "$(includemachinetooldir)" || list=; \
@@ -2898,7 +3282,7 @@ all-am: Makefile $(INFO_DEPS) $(LIBRARIES) $(PROGRAMS) $(DATA) \
 		config.h all-local
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(multilibtooldir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(infodir)" "$(DESTDIR)$(aarch64_cpu_initcpuinitdir)" "$(DESTDIR)$(includemachinetooldir)" "$(DESTDIR)$(includesystooldir)" "$(DESTDIR)$(includetooldir)" "$(DESTDIR)$(multilibtooldir)"; do \
+	for dir in "$(DESTDIR)$(multilibtooldir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(infodir)" "$(DESTDIR)$(aarch64_cpu_initcpuinitdir)" "$(DESTDIR)$(arm_cpu_initcpuinitdir)" "$(DESTDIR)$(includemachinetooldir)" "$(DESTDIR)$(includesystooldir)" "$(DESTDIR)$(includetooldir)" "$(DESTDIR)$(multilibtooldir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -2930,6 +3314,8 @@ distclean-generic:
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
 	-rm -f aarch64/$(DEPDIR)/$(am__dirstamp)
 	-rm -f aarch64/$(am__dirstamp)
+	-rm -f arm/$(DEPDIR)/$(am__dirstamp)
+	-rm -f arm/$(am__dirstamp)
 	-rm -f bfin/$(DEPDIR)/$(am__dirstamp)
 	-rm -f bfin/$(am__dirstamp)
 	-rm -f doc/$(am__dirstamp)
@@ -2954,7 +3340,7 @@ clean-am: clean-aminfo clean-binPROGRAMS clean-checkPROGRAMS \
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) bfin/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) riscv/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) riscv/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-local distclean-tags
@@ -2972,9 +3358,10 @@ info: info-recursive
 info-am: $(INFO_DEPS)
 
 install-data-am: install-aarch64_cpu_initcpuinitDATA \
-	install-includemachinetoolDATA install-includesystoolDATA \
-	install-includetoolDATA install-info-am \
-	install-multilibtoolDATA install-multilibtoolLIBRARIES
+	install-arm_cpu_initcpuinitDATA install-includemachinetoolDATA \
+	install-includesystoolDATA install-includetoolDATA \
+	install-info-am install-multilibtoolDATA \
+	install-multilibtoolLIBRARIES
 
 install-dvi: install-dvi-recursive
 
@@ -3096,7 +3483,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) bfin/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) riscv/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) riscv/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-aminfo \
 	maintainer-clean-generic maintainer-clean-local
@@ -3115,7 +3502,8 @@ ps: ps-recursive
 ps-am: $(PSS)
 
 uninstall-am: uninstall-aarch64_cpu_initcpuinitDATA \
-	uninstall-binPROGRAMS uninstall-dvi-am uninstall-html-am \
+	uninstall-arm_cpu_initcpuinitDATA uninstall-binPROGRAMS \
+	uninstall-dvi-am uninstall-html-am \
 	uninstall-includemachinetoolDATA uninstall-includesystoolDATA \
 	uninstall-includetoolDATA uninstall-info-am \
 	uninstall-multilibtoolDATA uninstall-multilibtoolLIBRARIES \
@@ -3132,9 +3520,10 @@ uninstall-am: uninstall-aarch64_cpu_initcpuinitDATA \
 	distclean-hdr distclean-local distclean-tags dvi dvi-am html \
 	html-am info info-am install \
 	install-aarch64_cpu_initcpuinitDATA install-am \
-	install-binPROGRAMS install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-exec-local \
-	install-html install-html-am install-includemachinetoolDATA \
+	install-arm_cpu_initcpuinitDATA install-binPROGRAMS \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-exec-local install-html \
+	install-html-am install-includemachinetoolDATA \
 	install-includesystoolDATA install-includetoolDATA \
 	install-info install-info-am install-man \
 	install-multilibtoolDATA install-multilibtoolLIBRARIES \
@@ -3145,7 +3534,8 @@ uninstall-am: uninstall-aarch64_cpu_initcpuinitDATA \
 	mostlyclean-aminfo mostlyclean-compile mostlyclean-generic \
 	mostlyclean-local pdf pdf-am ps ps-am tags tags-am uninstall \
 	uninstall-aarch64_cpu_initcpuinitDATA uninstall-am \
-	uninstall-binPROGRAMS uninstall-dvi-am uninstall-html-am \
+	uninstall-arm_cpu_initcpuinitDATA uninstall-binPROGRAMS \
+	uninstall-dvi-am uninstall-html-am \
 	uninstall-includemachinetoolDATA uninstall-includesystoolDATA \
 	uninstall-includetoolDATA uninstall-info-am \
 	uninstall-multilibtoolDATA uninstall-multilibtoolLIBRARIES \
@@ -3198,6 +3588,32 @@ maintainer-clean-local: maintainer-clean-multi
 
 @CONFIG_AARCH64_TRUE@aarch64/cpu-init/rdimon-aem-v8-r.$(OBJEXT): aarch64/cpu-init/rdimon-aem-el3.S aarch64/cpu-init/$(am__dirstamp)
 @CONFIG_AARCH64_TRUE@	$(AM_V_CC)$(COMPILE) $(aarch64_cpu_init_CPPFLAGS) -DARM_RDI_MONITOR -DBUILD_FOR_R_PROFILE -o $@ -c $<
+
+@CONFIG_ARM_TRUE@arm/redboot-syscalls.o: arm/redboot-syscalls.c
+@CONFIG_ARM_TRUE@	$(AM_V_CC)$(COMPILE) -DSEMIHOST_V2 -o $@ -c $<
+
+@CONFIG_ARM_TRUE@arm/rdpmon-crt0.o: arm/crt0.S
+@CONFIG_ARM_TRUE@	$(AM_V_CPPAS)$(CPPASCOMPILE) -DSEMIHOST_V2 -DARM_RDP_MONITOR -o $@ -c $<
+
+@CONFIG_ARM_TRUE@arm/rdimon-crt0.o: arm/crt0.S
+@CONFIG_ARM_TRUE@	$(AM_V_CPPAS)$(CPPASCOMPILE) $(arm_RDIMON_CPPFLAGS) -o $@ -c $<
+
+@CONFIG_ARM_TRUE@arm/rdimon-crt0-v2m.o: arm/crt0.S
+@CONFIG_ARM_TRUE@	$(AM_V_CPPAS)$(CPPASCOMPILE) $(arm_RDIMON_V2M_CPPFLAGS) -o $@ -c $<
+
+@CONFIG_ARM_TRUE@arm/%.specs: arm/$(ARM_OBJTYPE)%.specs
+@CONFIG_ARM_TRUE@	$(AM_V_GEN)cp $< $@
+
+@CONFIG_ARM_TRUE@arm/%.ld: arm/$(ARM_OBJTYPE)%.ld
+@CONFIG_ARM_TRUE@	$(AM_V_GEN)cp $< $@
+
+@CONFIG_ARM_TRUE@arm/cpu-init/$(am__dirstamp):
+@CONFIG_ARM_TRUE@	@$(MKDIR_P) arm/cpu-init
+@CONFIG_ARM_TRUE@	@: > $@
+
+@CONFIG_ARM_TRUE@arm/cpu-init/rdimon-aem.$(OBJEXT): arm/cpu-init/rdimon-aem.S arm/cpu-init/$(am__dirstamp)
+@CONFIG_ARM_TRUE@	@$(MKDIR_P) arm/cpu-init
+@CONFIG_ARM_TRUE@	$(AM_V_CC)$(COMPILE) -DARM_RDI_MONITOR -o $@ -c $<
 
 @CONFIG_BFIN_TRUE@bfin/basiccrt.$(OBJEXT): bfin/basiccrt.S
 @CONFIG_BFIN_TRUE@	$(AM_V_CPPAS)$(CPPASCOMPILE) $(bfin_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),,-mcpu=bf532-any)

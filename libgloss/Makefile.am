@@ -66,6 +66,9 @@ endif
 if CONFIG_AARCH64
 include aarch64/Makefile.inc
 endif
+if CONFIG_ARM
+include arm/Makefile.inc
+endif
 if CONFIG_BFIN
 include bfin/Makefile.inc
 endif

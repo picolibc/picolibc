@@ -18,6 +18,8 @@ AC_ARG_ENABLE(newlib-supplied-syscalls,
   *)   AC_MSG_ERROR(bad value ${enableval} for newlib-supplied-syscalls option) ;;
  esac], [newlib_may_supply_syscalls=yes])dnl
 
+AM_CONDITIONAL(MAY_SUPPLY_SYSCALLS, test x[$]{newlib_may_supply_syscalls} = xyes)
+
 AC_PROG_INSTALL
 
 AC_CANONICAL_SYSTEM
@@ -214,8 +216,7 @@ case "${target}" in
 	subdirs="$subdirs rx"
 	;;
   arm*-*-elf | arm*-*-coff | arm*-*-*)
-	AC_CONFIG_FILES([arm/Makefile arm/cpu-init/Makefile])
-	subdirs="$subdirs arm arm/cpu-init"
+	config_arm=true
 	;;
   spu-*-elf)
 	AC_CONFIG_FILES([spu/Makefile])
@@ -250,7 +251,7 @@ AC_SUBST(subdirs)
 dnl These subdirs have converted to non-recursive make.  Hopefully someday all
 dnl the ports above will too!
 m4_foreach_w([SUBDIR], [
-  aarch64 bfin iq2000 libnosys lm32 riscv wince
+  aarch64 arm bfin iq2000 libnosys lm32 riscv wince
 ], [dnl
   AM_CONDITIONAL([CONFIG_]m4_toupper(SUBDIR), [test x$config_]SUBDIR = xtrue)
 ])
