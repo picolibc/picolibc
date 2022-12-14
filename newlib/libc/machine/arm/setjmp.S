@@ -182,12 +182,6 @@ SYM (\name):
 	vstm		r0, { d8-d15 }
 #endif
 
-#if 0	/* Simulator does not cope with FP instructions yet.  */
-#ifndef __SOFTFP__
-	/* Save the floating point registers.  */
-	sfmea		f4, 4, [a1]
-#endif
-#endif
 	/* When setting up the jump buffer return 0.  */
 	mov		r0, #0
 
@@ -212,12 +206,6 @@ SYM (\name):
 	vldm		r0, { d8-d15 }
 #endif
 
-#if 0	/* Simulator does not cope with FP instructions yet.  */
-#ifndef __SOFTFP__
-	/* Restore floating point registers as well.  */
-	lfmfd		f4, 4, [a1]
-#endif
-#endif
 	/* Put the return value into the integer result register.
 	   But if it is zero then return 1 instead.  */
 	movs		r0, r1
