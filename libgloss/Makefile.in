@@ -2983,21 +2983,21 @@ distclean-local: distclean-multi
 maintainer-clean-local: maintainer-clean-multi
 
 @CONFIG_BFIN_TRUE@bfin/basiccrt.$(OBJEXT): bfin/basiccrt.S
-@CONFIG_BFIN_TRUE@	$(AM_V_CC)$(COMPILE) $(bfin_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),,-mcpu=bf532-any)
+@CONFIG_BFIN_TRUE@	$(AM_V_CPPAS)$(CPPASCOMPILE) $(bfin_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),,-mcpu=bf532-any)
 @CONFIG_BFIN_TRUE@bfin/basiccrts.$(OBJEXT): bfin/basiccrt.S
-@CONFIG_BFIN_TRUE@	$(AM_V_CC)$(COMPILE) $(bfin_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),,-mcpu=bf532-any) -D__BFIN_SDRAM
+@CONFIG_BFIN_TRUE@	$(AM_V_CPPAS)$(CPPASCOMPILE) $(bfin_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),,-mcpu=bf532-any) -D__BFIN_SDRAM
 @CONFIG_BFIN_TRUE@bfin/basiccrt561.$(OBJEXT): bfin/basiccrt.S
-@CONFIG_BFIN_TRUE@	$(AM_V_CC)$(COMPILE) $(bfin_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf561-any,-mcpu=bf561-none)
+@CONFIG_BFIN_TRUE@	$(AM_V_CPPAS)$(CPPASCOMPILE) $(bfin_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf561-any,-mcpu=bf561-none)
 @CONFIG_BFIN_TRUE@bfin/basiccrt561s.$(OBJEXT): bfin/basiccrt.S
-@CONFIG_BFIN_TRUE@	$(AM_V_CC)$(COMPILE) $(bfin_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf561-any,-mcpu=bf561-none) -D__BFIN_SDRAM
+@CONFIG_BFIN_TRUE@	$(AM_V_CPPAS)$(CPPASCOMPILE) $(bfin_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf561-any,-mcpu=bf561-none) -D__BFIN_SDRAM
 @CONFIG_BFIN_TRUE@bfin/basiccrt561b.$(OBJEXT): bfin/basiccrt.S
-@CONFIG_BFIN_TRUE@	$(AM_V_CC)$(COMPILE) $(bfin_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf561-any,-mcpu=bf561-none) -D__ADSPBF561_COREB__
+@CONFIG_BFIN_TRUE@	$(AM_V_CPPAS)$(CPPASCOMPILE) $(bfin_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf561-any,-mcpu=bf561-none) -D__ADSPBF561_COREB__
 @CONFIG_BFIN_TRUE@bfin/basiccrt60x.$(OBJEXT): bfin/basiccrt.S
-@CONFIG_BFIN_TRUE@	$(AM_V_CC)$(COMPILE) $(bfin_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf608-any,-mcpu=bf608-none)
+@CONFIG_BFIN_TRUE@	$(AM_V_CPPAS)$(CPPASCOMPILE) $(bfin_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf608-any,-mcpu=bf608-none)
 @CONFIG_BFIN_TRUE@bfin/basiccrt60xs.$(OBJEXT): bfin/basiccrt.S
-@CONFIG_BFIN_TRUE@	$(AM_V_CC)$(COMPILE) $(bfin_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf608-any,-mcpu=bf608-none) -D__BFIN_SDRAM
+@CONFIG_BFIN_TRUE@	$(AM_V_CPPAS)$(CPPASCOMPILE) $(bfin_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf608-any,-mcpu=bf608-none) -D__BFIN_SDRAM
 @CONFIG_BFIN_TRUE@bfin/basiccrt60xc1.$(OBJEXT): bfin/basiccrt.S
-@CONFIG_BFIN_TRUE@	$(AM_V_CC)$(COMPILE) $(bfin_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf608-any,-mcpu=bf608-none) -D__ADSPBF60x_CORE1__
+@CONFIG_BFIN_TRUE@	$(AM_V_CPPAS)$(CPPASCOMPILE) $(bfin_CPPFLAGS) -o $@ -c $< $(if $(findstring mcpu=,$(CFLAGS)),-mcpu=bf608-any,-mcpu=bf608-none) -D__ADSPBF60x_CORE1__
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
