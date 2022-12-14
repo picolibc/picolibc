@@ -389,8 +389,8 @@ install-mbx:
 
 install-xil:
 	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
-	set -e; for x in ${XIL_CRT0} ${XIL_BSP}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib/$$x; done
-	set -e; for x in ${XIL_SCRIPTS} ${XIL_SPECS}; do ${INSTALL_DATA} $(srcdir)/$$x $(DESTDIR)${tooldir}/lib/$$x; done
+	set -e; for x in ${XIL_CRT0} ${XIL_BSP}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
+	set -e; for x in ${XIL_SCRIPTS} ${XIL_SPECS}; do ${INSTALL_DATA} $(srcdir)/$$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 doc:
 info:
