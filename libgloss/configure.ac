@@ -46,8 +46,7 @@ target_makefile_frag=${srcdir}/config/default.mt
 
 case "${target}" in
   aarch64*-*-*)
-	AC_CONFIG_FILES([aarch64/Makefile aarch64/cpu-init/Makefile])
-	subdirs="$subdirs aarch64 aarch64/cpu-init"
+	config_aarch64=true
 	config_testsuite=true
 	;;
   arc*-*-*)
@@ -251,7 +250,7 @@ AC_SUBST(subdirs)
 dnl These subdirs have converted to non-recursive make.  Hopefully someday all
 dnl the ports above will too!
 m4_foreach_w([SUBDIR], [
-  bfin iq2000 libnosys lm32 riscv wince
+  aarch64 bfin iq2000 libnosys lm32 riscv wince
 ], [dnl
   AM_CONDITIONAL([CONFIG_]m4_toupper(SUBDIR), [test x$config_]SUBDIR = xtrue)
 ])

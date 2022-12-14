@@ -644,6 +644,8 @@ CONFIG_IQ2000_FALSE
 CONFIG_IQ2000_TRUE
 CONFIG_BFIN_FALSE
 CONFIG_BFIN_TRUE
+CONFIG_AARCH64_FALSE
+CONFIG_AARCH64_TRUE
 subdirs
 HAVE_MULTISUBDIR_FALSE
 HAVE_MULTISUBDIR_TRUE
@@ -2729,9 +2731,7 @@ target_makefile_frag=${srcdir}/config/default.mt
 
 case "${target}" in
   aarch64*-*-*)
-	ac_config_files="$ac_config_files aarch64/Makefile aarch64/cpu-init/Makefile"
-
-	subdirs="$subdirs aarch64 aarch64/cpu-init"
+	config_aarch64=true
 	config_testsuite=true
 	;;
   arc*-*-*)
@@ -2973,6 +2973,14 @@ case "${target}" in
 	;;
 esac
 
+
+   if test x$config_aarch64 = xtrue; then
+  CONFIG_AARCH64_TRUE=
+  CONFIG_AARCH64_FALSE='#'
+else
+  CONFIG_AARCH64_TRUE='#'
+  CONFIG_AARCH64_FALSE=
+fi
 
    if test x$config_bfin = xtrue; then
   CONFIG_BFIN_TRUE=
@@ -5248,6 +5256,10 @@ if test -z "${HAVE_MULTISUBDIR_TRUE}" && test -z "${HAVE_MULTISUBDIR_FALSE}"; th
   as_fn_error $? "conditional \"HAVE_MULTISUBDIR\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${CONFIG_AARCH64_TRUE}" && test -z "${CONFIG_AARCH64_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_AARCH64\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${CONFIG_BFIN_TRUE}" && test -z "${CONFIG_BFIN_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_BFIN\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -5892,8 +5904,6 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
-    "aarch64/Makefile") CONFIG_FILES="$CONFIG_FILES aarch64/Makefile" ;;
-    "aarch64/cpu-init/Makefile") CONFIG_FILES="$CONFIG_FILES aarch64/cpu-init/Makefile" ;;
     "arc/Makefile") CONFIG_FILES="$CONFIG_FILES arc/Makefile" ;;
     "csky/Makefile") CONFIG_FILES="$CONFIG_FILES csky/Makefile" ;;
     "epiphany/Makefile") CONFIG_FILES="$CONFIG_FILES epiphany/Makefile" ;;

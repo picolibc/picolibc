@@ -6,6 +6,7 @@ ACLOCAL_AMFLAGS = -I . -I .. -I ../config
 bin_PROGRAMS =
 check_PROGRAMS =
 info_TEXINFOS =
+CLEANFILES =
 PHONY =
 
 SUBDIRS = @subdirs@ .
@@ -58,6 +59,9 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 
 if HAVE_DOC
 include doc/Makefile.inc
+endif
+if CONFIG_AARCH64
+include aarch64/Makefile.inc
 endif
 if CONFIG_BFIN
 include bfin/Makefile.inc
