@@ -398,9 +398,7 @@ any target that has migrated to @value{automake}.
 
 Libgloss automatically builds itself for all multilib configurations that the
 active toolchain supports.  This logic is provided by common code from the
-combined toolchain source tree.  This should @strong{not} be confused with the
-Libgloss-specific @file{multi-build.in} file.  That is used by a few ports to
-further produce multiple targets.
+combined toolchain source tree.
 
 @node GCC, Libraries, Libgloss, Top
 @chapter Porting GCC
