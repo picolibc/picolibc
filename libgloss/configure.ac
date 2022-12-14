@@ -141,8 +141,7 @@ case "${target}" in
 	subdirs="$subdirs crx"
 	;;
   d30v-*-*)
-	AC_CONFIG_FILES([d30v/Makefile])
-	subdirs="$subdirs d30v"
+	config_d30v=true
 	;;
   fr30-*-*)
 	AC_CONFIG_FILES([fr30/Makefile])
@@ -250,7 +249,7 @@ AC_SUBST(subdirs)
 dnl These subdirs have converted to non-recursive make.  Hopefully someday all
 dnl the ports above will too!
 m4_foreach_w([SUBDIR], [
-  aarch64 arc arm bfin iq2000 libnosys lm32 riscv wince
+  aarch64 arc arm bfin d30v iq2000 libnosys lm32 riscv wince
 ], [dnl
   AM_CONDITIONAL([CONFIG_]m4_toupper(SUBDIR), [test x$config_]SUBDIR = xtrue)
 ])

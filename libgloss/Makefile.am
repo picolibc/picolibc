@@ -75,6 +75,9 @@ endif
 if CONFIG_BFIN
 include bfin/Makefile.inc
 endif
+if CONFIG_D30V
+include d30v/Makefile.inc
+endif
 if CONFIG_IQ2000
 include iq2000/Makefile.inc
 endif

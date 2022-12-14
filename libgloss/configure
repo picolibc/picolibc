@@ -640,6 +640,8 @@ CONFIG_LIBNOSYS_FALSE
 CONFIG_LIBNOSYS_TRUE
 CONFIG_IQ2000_FALSE
 CONFIG_IQ2000_TRUE
+CONFIG_D30V_FALSE
+CONFIG_D30V_TRUE
 CONFIG_BFIN_FALSE
 CONFIG_BFIN_TRUE
 CONFIG_ARM_FALSE
@@ -2855,9 +2857,7 @@ case "${target}" in
 	subdirs="$subdirs crx"
 	;;
   d30v-*-*)
-	ac_config_files="$ac_config_files d30v/Makefile"
-
-	subdirs="$subdirs d30v"
+	config_d30v=true
 	;;
   fr30-*-*)
 	ac_config_files="$ac_config_files fr30/Makefile"
@@ -3013,6 +3013,14 @@ fi
 else
   CONFIG_BFIN_TRUE='#'
   CONFIG_BFIN_FALSE=
+fi
+
+   if test x$config_d30v = xtrue; then
+  CONFIG_D30V_TRUE=
+  CONFIG_D30V_FALSE='#'
+else
+  CONFIG_D30V_TRUE='#'
+  CONFIG_D30V_FALSE=
 fi
 
    if test x$config_iq2000 = xtrue; then
@@ -5291,6 +5299,10 @@ if test -z "${CONFIG_BFIN_TRUE}" && test -z "${CONFIG_BFIN_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_BFIN\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${CONFIG_D30V_TRUE}" && test -z "${CONFIG_D30V_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_D30V\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${CONFIG_IQ2000_TRUE}" && test -z "${CONFIG_IQ2000_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_IQ2000\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -5949,7 +5961,6 @@ do
     "cr16/Makefile") CONFIG_FILES="$CONFIG_FILES cr16/Makefile" ;;
     "cris/Makefile") CONFIG_FILES="$CONFIG_FILES cris/Makefile" ;;
     "crx/Makefile") CONFIG_FILES="$CONFIG_FILES crx/Makefile" ;;
-    "d30v/Makefile") CONFIG_FILES="$CONFIG_FILES d30v/Makefile" ;;
     "fr30/Makefile") CONFIG_FILES="$CONFIG_FILES fr30/Makefile" ;;
     "frv/Makefile") CONFIG_FILES="$CONFIG_FILES frv/Makefile" ;;
     "ft32/Makefile") CONFIG_FILES="$CONFIG_FILES ft32/Makefile" ;;
