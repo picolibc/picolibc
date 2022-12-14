@@ -101,22 +101,29 @@ check_PROGRAMS = $(am__EXEEXT_2) $(am__EXEEXT_3)
 
 @CONFIG_AARCH64_TRUE@am__append_4 = $(aarch64_SPECS) \
 @CONFIG_AARCH64_TRUE@	$(aarch64_cpu_initcpuinit_DATA)
-@CONFIG_ARM_TRUE@@MAY_SUPPLY_SYSCALLS_FALSE@am__append_5 = arm/crt0.o
-@CONFIG_ARM_TRUE@am__append_6 = arm/linux-crt0.o arm/redboot-crt0.o \
+@CONFIG_ARC_TRUE@am__append_5 = arc/libnsim.a
+@CONFIG_ARC_TRUE@am__append_6 = \
+@CONFIG_ARC_TRUE@	arc/crt0.o \
+@CONFIG_ARC_TRUE@	arc/gcrt0.o \
+@CONFIG_ARC_TRUE@	arc/nano.specs \
+@CONFIG_ARC_TRUE@	arc/nsim.specs
+
+@CONFIG_ARM_TRUE@@MAY_SUPPLY_SYSCALLS_FALSE@am__append_7 = arm/crt0.o
+@CONFIG_ARM_TRUE@am__append_8 = arm/linux-crt0.o arm/redboot-crt0.o \
 @CONFIG_ARM_TRUE@	arm/redboot-syscalls.o arm/rdpmon-crt0.o \
 @CONFIG_ARM_TRUE@	arm/rdimon-crt0.o arm/rdimon-crt0-v2m.o \
 @CONFIG_ARM_TRUE@	$(arm_SPECS)
-@CONFIG_ARM_TRUE@am__append_7 = arm/libgloss-linux.a arm/librdpmon.a \
+@CONFIG_ARM_TRUE@am__append_9 = arm/libgloss-linux.a arm/librdpmon.a \
 @CONFIG_ARM_TRUE@	arm/librdimon.a arm/librdimon-v2m.a
-@CONFIG_ARM_TRUE@am__append_8 = $(arm_SPECS) \
+@CONFIG_ARM_TRUE@am__append_10 = $(arm_SPECS) \
 @CONFIG_ARM_TRUE@	$(arm_cpu_initcpuinit_DATA)
 
 # Here is all of the simulator stuff.
-@CONFIG_BFIN_TRUE@am__append_9 = bfin/libsim.a bfin/libbfinbsp.a
-@CONFIG_BFIN_TRUE@am__append_10 = bfin/sim-test
+@CONFIG_BFIN_TRUE@am__append_11 = bfin/libsim.a bfin/libbfinbsp.a
+@CONFIG_BFIN_TRUE@am__append_12 = bfin/sim-test
 
 # Here is all of the development board stuff.
-@CONFIG_BFIN_TRUE@am__append_11 = \
+@CONFIG_BFIN_TRUE@am__append_13 = \
 @CONFIG_BFIN_TRUE@	bfin/crt0.o \
 @CONFIG_BFIN_TRUE@	bfin/basiccrt.o \
 @CONFIG_BFIN_TRUE@	bfin/basiccrts.o \
@@ -127,11 +134,11 @@ check_PROGRAMS = $(am__EXEEXT_2) $(am__EXEEXT_3)
 # 	bfin/basiccrt60x.o \
 #	bfin/basiccrt60xs.o \
 #	bfin/basiccrt60xc1.o
-@CONFIG_BFIN_TRUE@am__append_12 = \
+@CONFIG_BFIN_TRUE@am__append_14 = \
 @CONFIG_BFIN_TRUE@	bfin/crt0.S \
 @CONFIG_BFIN_TRUE@	bfin/basiccrt.S
 
-@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_13 = \
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_15 = \
 @CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bfin-common-sc.ld bfin/bfin-common-mc.ld bfin/bfin-common-mc0.ld \
 @CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf504.ld bfin/bf506.ld \
 @CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf512.ld bfin/bf514.ld bfin/bf516.ld bfin/bf518.ld \
@@ -147,27 +154,27 @@ check_PROGRAMS = $(am__EXEEXT_2) $(am__EXEEXT_3)
 @CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf609.ld bfin/bf609c0.ld bfin/bf609c1.ld bfin/bf609m.ld \
 @CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf592.ld
 
-@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_14 = $(wildcard $(srcdir)/bfin/include/*.h)
-@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_15 = $(wildcard $(srcdir)/bfin/include/sys/*.h)
-@CONFIG_IQ2000_TRUE@am__append_16 = iq2000/crt0.o iq2000/sim.ld
-@CONFIG_IQ2000_TRUE@am__append_17 = iq2000/libeval.a
-@CONFIG_IQ2000_TRUE@am__append_18 = iq2000/crt0.S iq2000/test.o
-@CONFIG_IQ2000_TRUE@am__append_19 = iq2000/test
-@CONFIG_LIBNOSYS_TRUE@am__append_20 = libnosys/nosys.specs
-@CONFIG_LIBNOSYS_TRUE@am__append_21 = libnosys/libnosys.a
-@CONFIG_LM32_TRUE@am__append_22 = lm32/crt0.o lm32/sim.ld
-@CONFIG_LM32_TRUE@am__append_23 = lm32/libgloss.a
-@CONFIG_LM32_TRUE@am__append_24 = lm32/crt0.S
-@CONFIG_RISCV_TRUE@am__append_25 = \
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_16 = $(wildcard $(srcdir)/bfin/include/*.h)
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_17 = $(wildcard $(srcdir)/bfin/include/sys/*.h)
+@CONFIG_IQ2000_TRUE@am__append_18 = iq2000/crt0.o iq2000/sim.ld
+@CONFIG_IQ2000_TRUE@am__append_19 = iq2000/libeval.a
+@CONFIG_IQ2000_TRUE@am__append_20 = iq2000/crt0.S iq2000/test.o
+@CONFIG_IQ2000_TRUE@am__append_21 = iq2000/test
+@CONFIG_LIBNOSYS_TRUE@am__append_22 = libnosys/nosys.specs
+@CONFIG_LIBNOSYS_TRUE@am__append_23 = libnosys/libnosys.a
+@CONFIG_LM32_TRUE@am__append_24 = lm32/crt0.o lm32/sim.ld
+@CONFIG_LM32_TRUE@am__append_25 = lm32/libgloss.a
+@CONFIG_LM32_TRUE@am__append_26 = lm32/crt0.S
+@CONFIG_RISCV_TRUE@am__append_27 = \
 @CONFIG_RISCV_TRUE@	riscv/nano.specs \
 @CONFIG_RISCV_TRUE@	riscv/sim.specs \
 @CONFIG_RISCV_TRUE@	riscv/semihost.specs \
 @CONFIG_RISCV_TRUE@	riscv/crt0.o
 
-@CONFIG_RISCV_TRUE@am__append_26 = riscv/libgloss.a \
+@CONFIG_RISCV_TRUE@am__append_28 = riscv/libgloss.a \
 @CONFIG_RISCV_TRUE@	riscv/libsemihost.a
-@CONFIG_WINCE_TRUE@am__append_27 = $(gdbdir)
-@CONFIG_WINCE_TRUE@am__append_28 = wince/stub.exe
+@CONFIG_WINCE_TRUE@am__append_29 = $(gdbdir)
+@CONFIG_WINCE_TRUE@am__append_30 = wince/stub.exe
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../config/depstand.m4 \
@@ -190,10 +197,10 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(SHELL) $(top_srcdir)/../mkinstalldirs
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES = arc/Makefile csky/Makefile epiphany/Makefile \
-	i386/Makefile m32r/Makefile m68hc11/Makefile nds32/Makefile \
-	m68k/Makefile pa/Makefile i960/Makefile sparc_leon/Makefile \
-	sparc/Makefile mips/Makefile rs6000/Makefile mn10200/Makefile \
+CONFIG_CLEAN_FILES = csky/Makefile epiphany/Makefile i386/Makefile \
+	m32r/Makefile m68hc11/Makefile nds32/Makefile m68k/Makefile \
+	pa/Makefile i960/Makefile sparc_leon/Makefile sparc/Makefile \
+	mips/Makefile rs6000/Makefile mn10200/Makefile \
 	mn10300/Makefile cr16/Makefile cris/Makefile crx/Makefile \
 	d30v/Makefile fr30/Makefile frv/Makefile ft32/Makefile \
 	mcore/Makefile mep/Makefile moxie/Makefile microblaze/Makefile \
@@ -252,6 +259,13 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @CONFIG_AARCH64_TRUE@	aarch64/aarch64_librdimon_a-syscalls.$(OBJEXT) \
 @CONFIG_AARCH64_TRUE@	aarch64/aarch64_librdimon_a-truncate.$(OBJEXT)
 aarch64_librdimon_a_OBJECTS = $(am_aarch64_librdimon_a_OBJECTS)
+arc_libnsim_a_AR = $(AR) $(ARFLAGS)
+arc_libnsim_a_LIBADD =
+@CONFIG_ARC_TRUE@am_arc_libnsim_a_OBJECTS = arc/libcfunc.$(OBJEXT) \
+@CONFIG_ARC_TRUE@	arc/mcount.$(OBJEXT) \
+@CONFIG_ARC_TRUE@	arc/nsim-syscalls.$(OBJEXT) \
+@CONFIG_ARC_TRUE@	arc/sbrk.$(OBJEXT)
+arc_libnsim_a_OBJECTS = $(am_arc_libnsim_a_OBJECTS)
 arm_libgloss_linux_a_AR = $(AR) $(ARFLAGS)
 arm_libgloss_linux_a_LIBADD =
 @CONFIG_ARM_TRUE@am_arm_libgloss_linux_a_OBJECTS =  \
@@ -480,7 +494,7 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(aarch64_librdimon_a_SOURCES) \
+SOURCES = $(aarch64_librdimon_a_SOURCES) $(arc_libnsim_a_SOURCES) \
 	$(arm_libgloss_linux_a_SOURCES) $(arm_librdimon_v2m_a_SOURCES) \
 	$(arm_librdimon_a_SOURCES) $(arm_librdpmon_a_SOURCES) \
 	$(bfin_libbfinbsp_a_SOURCES) $(bfin_libsim_a_SOURCES) \
@@ -574,7 +588,7 @@ ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
 DIST_SUBDIRS = $(SUBDIRS)
-VPATH = @srcdir@ $(am__append_27)
+VPATH = @srcdir@ $(am__append_29)
 AARCH64_OBJTYPE = @AARCH64_OBJTYPE@
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
@@ -700,28 +714,29 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I . -I .. -I ../config
 info_TEXINFOS = $(am__append_1)
-CLEANFILES = $(am__append_4) $(am__append_8)
+CLEANFILES = $(am__append_4) $(am__append_10)
 PHONY = 
 SUBDIRS = @subdirs@ .
 srcroot = $(top_srcdir)/..
 tooldir = $(exec_prefix)/$(target_alias)
 multilibtooldir = $(tooldir)/lib$(MULTISUBDIR)
-multilibtool_DATA = $(am__append_3) $(am__append_5) $(am__append_6) \
-	$(am__append_11) $(am__append_13) $(am__append_16) \
-	$(am__append_20) $(am__append_22) $(am__append_25)
-multilibtool_LIBRARIES = $(am__append_2) $(am__append_7) \
-	$(am__append_9) $(am__append_17) $(am__append_21) \
-	$(am__append_23) $(am__append_26)
+multilibtool_DATA = $(am__append_3) $(am__append_6) $(am__append_7) \
+	$(am__append_8) $(am__append_13) $(am__append_15) \
+	$(am__append_18) $(am__append_22) $(am__append_24) \
+	$(am__append_27)
+multilibtool_LIBRARIES = $(am__append_2) $(am__append_5) \
+	$(am__append_9) $(am__append_11) $(am__append_19) \
+	$(am__append_23) $(am__append_25) $(am__append_28)
 includetooldir = $(tooldir)/include
-includetool_DATA = $(am__append_14)
+includetool_DATA = $(am__append_16)
 includesystooldir = $(tooldir)/include/sys
-includesystool_DATA = $(am__append_15)
+includesystool_DATA = $(am__append_17)
 AM_CPPFLAGS = -idirafter $(srcroot)/include
 
 # A fake library so automake will generate rules for plain objects that we want
 # to install (e.g. our crt0.o objects).
 noinst_LIBRARIES = libobjs.a
-libobjs_a_SOURCES = $(am__append_12) $(am__append_18) $(am__append_24)
+libobjs_a_SOURCES = $(am__append_14) $(am__append_20) $(am__append_26)
 FLAGS_TO_PASS = \
 	"CC=$(CC)" \
 	"CFLAGS=$(CFLAGS)" \
@@ -775,6 +790,12 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 @CONFIG_AARCH64_TRUE@aarch64_cpu_initcpuinit_DATA = \
 @CONFIG_AARCH64_TRUE@	aarch64/cpu-init/rdimon-aem-el3.o \
 @CONFIG_AARCH64_TRUE@	aarch64/cpu-init/rdimon-aem-v8-r.o
+
+@CONFIG_ARC_TRUE@arc_libnsim_a_SOURCES = \
+@CONFIG_ARC_TRUE@	arc/libcfunc.c \
+@CONFIG_ARC_TRUE@	arc/mcount.c \
+@CONFIG_ARC_TRUE@	arc/nsim-syscalls.c \
+@CONFIG_ARC_TRUE@	arc/sbrk.c
 
 @CONFIG_ARM_TRUE@arm_SPECS = arm/nano.specs arm/linux.specs \
 @CONFIG_ARM_TRUE@	arm/redboot.ld arm/redboot.specs \
@@ -938,7 +959,7 @@ all: config.h
 .SUFFIXES: .S .c .dvi .o .obj .ps
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/wince/Makefile.inc $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arc/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/wince/Makefile.inc $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -960,7 +981,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe);; \
 	esac;
-$(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/wince/Makefile.inc $(am__empty):
+$(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arc/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/wince/Makefile.inc $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
@@ -985,8 +1006,6 @@ $(srcdir)/config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
-arc/Makefile: $(top_builddir)/config.status $(top_srcdir)/arc/Makefile.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
 csky/Makefile: $(top_builddir)/config.status $(top_srcdir)/csky/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 epiphany/Makefile: $(top_builddir)/config.status $(top_srcdir)/epiphany/Makefile.in
@@ -1124,6 +1143,24 @@ aarch64/librdimon.a: $(aarch64_librdimon_a_OBJECTS) $(aarch64_librdimon_a_DEPEND
 	$(AM_V_at)-rm -f aarch64/librdimon.a
 	$(AM_V_AR)$(aarch64_librdimon_a_AR) aarch64/librdimon.a $(aarch64_librdimon_a_OBJECTS) $(aarch64_librdimon_a_LIBADD)
 	$(AM_V_at)$(RANLIB) aarch64/librdimon.a
+arc/$(am__dirstamp):
+	@$(MKDIR_P) arc
+	@: > arc/$(am__dirstamp)
+arc/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) arc/$(DEPDIR)
+	@: > arc/$(DEPDIR)/$(am__dirstamp)
+arc/libcfunc.$(OBJEXT): arc/$(am__dirstamp) \
+	arc/$(DEPDIR)/$(am__dirstamp)
+arc/mcount.$(OBJEXT): arc/$(am__dirstamp) \
+	arc/$(DEPDIR)/$(am__dirstamp)
+arc/nsim-syscalls.$(OBJEXT): arc/$(am__dirstamp) \
+	arc/$(DEPDIR)/$(am__dirstamp)
+arc/sbrk.$(OBJEXT): arc/$(am__dirstamp) arc/$(DEPDIR)/$(am__dirstamp)
+
+arc/libnsim.a: $(arc_libnsim_a_OBJECTS) $(arc_libnsim_a_DEPENDENCIES) $(EXTRA_arc_libnsim_a_DEPENDENCIES) arc/$(am__dirstamp)
+	$(AM_V_at)-rm -f arc/libnsim.a
+	$(AM_V_AR)$(arc_libnsim_a_AR) arc/libnsim.a $(arc_libnsim_a_OBJECTS) $(arc_libnsim_a_LIBADD)
+	$(AM_V_at)$(RANLIB) arc/libnsim.a
 arm/$(am__dirstamp):
 	@$(MKDIR_P) arm
 	@: > arm/$(am__dirstamp)
@@ -1555,6 +1592,7 @@ wince/stub.exe$(EXEEXT): $(wince_stub_exe_OBJECTS) $(wince_stub_exe_DEPENDENCIES
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 	-rm -f aarch64/*.$(OBJEXT)
+	-rm -f arc/*.$(OBJEXT)
 	-rm -f arm/*.$(OBJEXT)
 	-rm -f bfin/*.$(OBJEXT)
 	-rm -f iq2000/*.$(OBJEXT)
@@ -1572,6 +1610,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@aarch64/$(DEPDIR)/aarch64_librdimon_a-libcfunc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@aarch64/$(DEPDIR)/aarch64_librdimon_a-syscalls.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@aarch64/$(DEPDIR)/aarch64_librdimon_a-truncate.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/libcfunc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/mcount.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/nsim-syscalls.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/sbrk.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/_exit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/_kill.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/arm_librdimon_a-_exit.Po@am__quote@
@@ -3314,6 +3356,8 @@ distclean-generic:
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
 	-rm -f aarch64/$(DEPDIR)/$(am__dirstamp)
 	-rm -f aarch64/$(am__dirstamp)
+	-rm -f arc/$(DEPDIR)/$(am__dirstamp)
+	-rm -f arc/$(am__dirstamp)
 	-rm -f arm/$(DEPDIR)/$(am__dirstamp)
 	-rm -f arm/$(am__dirstamp)
 	-rm -f bfin/$(DEPDIR)/$(am__dirstamp)
@@ -3340,7 +3384,7 @@ clean-am: clean-aminfo clean-binPROGRAMS clean-checkPROGRAMS \
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) riscv/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) riscv/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-local distclean-tags
@@ -3483,7 +3527,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) riscv/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) riscv/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-aminfo \
 	maintainer-clean-generic maintainer-clean-local
