@@ -29,36 +29,28 @@ nexttowardf(float x, long double y)
 	   return (long double)x+y;
 	if((long double) x==y) return y;	/* x=y, return y */
 	if(ix==0) {				/* x == 0 */
-	    volatile float u;
 	    SET_FLOAT_WORD(x,((esy&0x8000)<<16)|1);/* return +-minsub*/
-	    u = x;
-	    u = u * u;				/* raise underflow flag */
+            force_eval_float(x*x);
 	    return x;
 	}
 	if(hx>=0) {				/* x > 0 */
-	    if(esy>=0x8000||((ix>>23)&0xff)>iy-0x3f80
-	       || (((ix>>23)&0xff)==iy-0x3f80
-		   && ((u_int32_t)(ix&0x7fffff)<<8)>hy)) {/* x > y, x -= ulp */
+	    if((long double) x > y) {           /* x > y, x -= ulp */
 		hx -= 1;
 	    } else {				/* x < y, x += ulp */
 		hx += 1;
 	    }
 	} else {				/* x < 0 */
-	    if(esy<0x8000||((ix>>23)&0xff)>iy-0x3f80
-	       || (((ix>>23)&0xff)==iy-0x3f80
-		   && ((u_int32_t)(ix&0x7fffff)<<8)>hy)) {/* x < y, x -= ulp */
+	    if((long double) x < y) {           /* x < y, x -= ulp */
 		hx -= 1;
 	    } else {				/* x > y, x += ulp */
 		hx += 1;
 	    }
 	}
 	hy = hx&0x7f800000;
-	if(hy>=0x7f800000) {
+	if(hy>=0x7f800000)
             return __math_oflowf(hx<0);
-	}
-	if(hy<0x00800000) {
-            return __math_uflowf(hx<0);
-	}
 	SET_FLOAT_WORD(x,hx);
+	if(hy<0x00800000)
+            return __math_denormf(x);
 	return x;
 }

@@ -32,24 +32,21 @@ nexttoward64(__float64 x, long double y)
 	ix = hx&0x7fffffff;		/* |x| */
 	iy = hy&0x7fffffffffffffffLL;	/* |y| */
 
-	if(((ix>=0x7ff00000)&&((ix-0x7ff00000)|lx)!=0) ||   /* x is nan */
-	   ((iy>=0x7fff000000000000LL)&&((iy-0x7fff000000000000LL)|ly)!=0))
-							    /* y is nan */
-            return x+(__float64)y;
+	if((ix>=0x7ff00000)&&((ix-0x7ff00000)|lx)!=0) {   /* x is nan */
+            force_eval_long_double(y+y);
+            return x + x;
+        }
+	if((iy>=0x7fff000000000000LL)&&((iy-0x7fff000000000000LL)|ly)!=0) { /* y is nan */
+            return (__float64) (y + y);
+        }
 	if((long double) x==y) return y;	/* x=y, return y */
 	if((ix|lx)==0) {			/* x == 0 */
-	    volatile double u;
 	    INSERT_WORDS(x,(u_int32_t)((hy>>32)&0x80000000),1);/* return +-minsub */
-	    u = x;
-	    u = u * u;				/* raise underflow flag */
+            force_eval_float64(x*x);
 	    return x;
 	}
 	if(hx>=0) {				/* x > 0 */
-	    if (hy<0||(ix>>20)>(iy>>48)-0x3c00
-		|| ((ix>>20)==(iy>>48)-0x3c00
-		    && (((((int64_t)hx)<<28)|(lx>>4))>(hy&0x0000ffffffffffffLL)
-			|| (((((int64_t)hx)<<28)|(lx>>4))==(hy&0x0000ffffffffffffLL)
-			    && (lx&0xf)>(ly>>60))))) {	/* x > y, x -= ulp */
+	    if ((long double) x > y) {	        /* x > y, x -= ulp */
 		if(lx==0) hx -= 1;
 		lx -= 1;
 	    } else {				/* x < y, x += ulp */
@@ -57,11 +54,7 @@ nexttoward64(__float64 x, long double y)
 		if(lx==0) hx += 1;
 	    }
 	} else {				/* x < 0 */
-	    if (hy>=0||(ix>>20)>(iy>>48)-0x3c00
-		|| ((ix>>20)==(iy>>48)-0x3c00
-		    && (((((int64_t)hx)<<28)|(lx>>4))>(hy&0x0000ffffffffffffLL)
-			|| (((((int64_t)hx)<<28)|(lx>>4))==(hy&0x0000ffffffffffffLL)
-			    && (lx&0xf)>(ly>>60))))) {	/* x < y, x -= ulp */
+            if ((long double) x < y) {	        /* x < y, x -= ulp */
 		if(lx==0) hx -= 1;
 		lx -= 1;
 	    } else {				/* x > y, x += ulp */
@@ -71,10 +64,10 @@ nexttoward64(__float64 x, long double y)
 	}
 	ix = hx&0x7ff00000;
 	if(ix>=0x7ff00000)
-          return __math_oflowl(hy < 0);
-	if(ix<0x00100000)
-          return __math_uflowl(hy < 0);
+            return __math_oflow(hy < 0);
 	INSERT_WORDS(x,hx,lx);
+	if(ix<0x00100000)
+            return __math_denorm(x);
 	return x;
 }
 

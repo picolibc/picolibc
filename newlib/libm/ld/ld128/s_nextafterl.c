@@ -35,11 +35,9 @@ nextafterl(long double x, long double y)
 	   return x+y;
 	if(x==y) return y;		/* x=y, return y */
 	if((ix|lx)==0) {			/* x == 0 */
-	    volatile long double u;
 	    SET_LDOUBLE_WORDS64(x,hy&0x8000000000000000ULL,1);/* return +-minsubnormal */
-	    u = x;
-	    u = u * u;				/* raise underflow flag */
-	    return x;
+            force_eval_long_double(x*x);
+            return x;
 	}
 	if(hx>=0) {			/* x > 0 */
 	    if(hx>hy||((hx==hy)&&(lx>ly))) {	/* x > y, x -= ulp */
@@ -61,9 +59,9 @@ nextafterl(long double x, long double y)
 	ix = hx&0x7fff000000000000LL;
 	if(ix==0x7fff000000000000LL)
             return __math_oflowl(hy<0);
-	if(hy==0)
-            return __math_uflowl(hy<0);
 	SET_LDOUBLE_WORDS64(x,hx,lx);
+	if(ix==0)
+            return __math_denorml(x);
 	return x;
 }
 

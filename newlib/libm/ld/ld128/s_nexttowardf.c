@@ -10,7 +10,7 @@
  * ====================================================
  */
 
-
+#include <stdio.h>
 
 float
 nexttowardf(float x, long double y)
@@ -24,40 +24,37 @@ nexttowardf(float x, long double y)
 	ix = hx&0x7fffffff;		/* |x| */
 	iy = hy&0x7fffffffffffffffLL;	/* |y| */
 
-	if((ix>0x7f800000) ||   /* x is nan */
-	   ((iy>=0x7fff000000000000LL)&&((iy-0x7fff000000000000LL)|ly)!=0))
-				/* y is nan */
-            return x+(float)y;
+	if(ix>0x7f800000) {       /* x is nan */
+            force_eval_long_double(y+y);
+            return x + x;
+        }
+        if((iy>=0x7fff000000000000LL)&&((iy-0x7fff000000000000LL)|ly)!=0) { /* y is nan */
+            return (float) (y + y);
+        }
 	if((long double) x==y) return y;	/* x=y, return y */
 	if(ix==0) {				/* x == 0 */
-	    volatile float u;
 	    SET_FLOAT_WORD(x,(u_int32_t)((hy>>32)&0x80000000)|1);/* return +-minsub*/
-	    u = x;
-	    u = u * u;				/* raise underflow flag */
+            force_eval_float(x*x);
 	    return x;
 	}
 	if(hx>=0) {				/* x > 0 */
-	    if(hy<0||(ix>>23)>(iy>>48)-0x3f80
-	       || ((ix>>23)==(iy>>48)-0x3f80
-		   && (ix&0x7fffff)>((hy>>25)&0x7fffff))) {/* x > y, x -= ulp */
+	    if((long double) x > y) {           /* x > y, x -= ulp */
 		hx -= 1;
 	    } else {				/* x < y, x += ulp */
 		hx += 1;
-	    }
+            }
 	} else {				/* x < 0 */
-	    if(hy>=0||(ix>>23)>(iy>>48)-0x3f80
-	       || ((ix>>23)==(iy>>48)-0x3f80
-		   && (ix&0x7fffff)>((hy>>25)&0x7fffff))) {/* x < y, x -= ulp */
+	    if((long double) x < y) {           /* x < y, x -= ulp */
 		hx -= 1;
 	    } else {				/* x > y, x += ulp */
 		hx += 1;
-	    }
+            }
 	}
 	ix = hx&0x7f800000;
 	if(ix>=0x7f800000)
             return __math_oflowf(hx<0);
-	if(ix<0x00800000)
-            return __math_uflowf(hx<0);
 	SET_FLOAT_WORD(x,hx);
+	if(ix<0x00800000)
+            return __math_denormf(x);
 	return x;
 }

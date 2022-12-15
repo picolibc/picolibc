@@ -36,18 +36,12 @@ nexttoward(__float64 x, long double y)
 	   return (long double)x+y;
 	if((long double) x==y) return y;	/* x=y, return y */
 	if((ix|lx)==0) {			/* x == 0 */
-	    volatile __float64 u;
 	    INSERT_WORDS(x,(esy&0x8000)<<16,1); /* return +-minsub */
-	    u = x;
-	    u = u * u;				/* raise underflow flag */
+            force_eval_double(x*x);
 	    return x;
 	}
 	if(hx>=0) {				/* x > 0 */
-	    if (esy>=0x8000||((ix>>20)&0x7ff)>iy-0x3c00
-		|| (((ix>>20)&0x7ff)==iy-0x3c00
-		    && (((hx<<11)|(lx>>21))>hy
-			|| (((hx<<11)|(lx>>21))==hy
-			    && (lx<<11)>ly)))) {	/* x > y, x -= ulp */
+	    if ((long double) x > y) {	        /* x > y, x -= ulp */
 		if(lx==0) hx -= 1;
 		lx -= 1;
 	    } else {				/* x < y, x += ulp */
@@ -55,11 +49,7 @@ nexttoward(__float64 x, long double y)
 		if(lx==0) hx += 1;
 	    }
 	} else {				/* x < 0 */
-	    if (esy<0x8000||((ix>>20)&0x7ff)>iy-0x3c00
-		|| (((ix>>20)&0x7ff)==iy-0x3c00
-		    && (((hx<<11)|(lx>>21))>hy
-			|| (((hx<<11)|(lx>>21))==hy
-			    && (lx<<11)>ly))))	{/* x < y, x -= ulp */
+	    if ((long double) x < y) {          /* x < y, x -= ulp */
 		if(lx==0) hx -= 1;
 		lx -= 1;
 	    } else {				/* x > y, x += ulp */
@@ -68,13 +58,11 @@ nexttoward(__float64 x, long double y)
 	    }
 	}
 	hy = hx&0x7ff00000;
-	if(hy>=0x7ff00000) {
+	if(hy>=0x7ff00000)
           return __math_oflow(hx<0);
-	}
-	if(hy<0x00100000) {
-            return __math_uflow(hx<0);
-	}
 	INSERT_WORDS(x,hx,lx);
+	if(hy<0x00100000)
+            return __math_denorm(x);
 	return x;
 }
 

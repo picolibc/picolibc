@@ -36,7 +36,9 @@ nextafterl(long double x, long double y)
 	   return x+y;
 	if(x==y) return y;		/* x=y, return y */
 	if((ix|hx|lx)==0) {			/* x == 0 */
-            return __math_uflowl(esy < 0);
+            SET_LDOUBLE_WORDS(x,esy & 0x8000,hx,1);
+            force_eval_long_double(x*x);
+            return x;
 	}
 	if(esx<0x8000) {			/* x > 0 */
 	    if(ix>iy||((ix==iy) && (hx>hy||((hx==hy)&&(lx>ly))))) {
@@ -72,9 +74,9 @@ nextafterl(long double x, long double y)
 	esy = esx&0x7fff;
 	if(esy==0x7fff)
             return __math_oflowl(esx & 0x8000);		/* overflow  */
-	if(esy==0)
-            return __math_uflowl(esx & 0x8000);
 	SET_LDOUBLE_WORDS(x,esx,hx,lx);
+	if(esy==0)
+            return __math_denorml(x);
 	return x;
 }
 
