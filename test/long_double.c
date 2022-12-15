@@ -167,12 +167,54 @@ typedef struct {
 
 #include "long_double_vec.h"
 
+#if defined(_WANT_IO_LONG_DOUBLE) && (defined(TINY_STDIO) || defined(FLOATING_POINT))
+#define TEST_IO_LONG_DOUBLE
+#endif
+
+#ifdef TEST_IO_LONG_DOUBLE
+static long double vals[] = {
+    1.0L,
+    0x1.8p0L,
+    3.141592653589793238462643383279502884197169L,
+    0.0L,
+};
+
+#define NVALS   (sizeof(vals)/sizeof(vals[0]))
+
+static int
+test_io(void)
+{
+    int e;
+    int result = 0;
+    char buf[80];
+    unsigned i;
+
+    for (e = __LDBL_MIN_EXP__ - __LDBL_MANT_DIG__; e <= __LDBL_MAX_EXP__; e++)
+    {
+        long double v, r;
+        for (i = 0; i < NVALS; i++) {
+            v = ldexpl(vals[i], e);
+            sprintf(buf, "%La", v);
+            sscanf(buf, "%Lf", &r);
+            if (v != r) {
+                printf("%d: \"%s\", is %La should be %La\n", e, buf, r, v);
+                result++;
+            }
+        }
+    }
+    return result;
+}
+#endif
+
 int main(void)
 {
     int result = 0;
     unsigned int i;
 
     printf("LDBL_MANT_DIG %d\n", LDBL_MANT_DIG);
+#ifdef TEST_IO_LONG_DOUBLE
+    result += test_io();
+#endif
     for (i = 0; i < sizeof(long_double_tests) / sizeof(long_double_tests[0]); i++) {
         result += long_double_tests[i].test();
     }
