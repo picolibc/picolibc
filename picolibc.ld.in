@@ -66,7 +66,7 @@ SECTIONS
 
 	.text : {
 
-                /* code */
+		/* code */
 		*(.text.unlikely .text.unlikely.*)
 		*(.text.startup .text.startup.*)
 		*(.text .text.* .opd .opd.*)
@@ -74,11 +74,11 @@ SECTIONS
 		KEEP (*(.fini .fini.*))
 		__text_end = .;
 
-	        PROVIDE (__etext = __text_end);
-	        PROVIDE (_etext = __text_end);
-	        PROVIDE (etext = __text_end);
+		PROVIDE (__etext = __text_end);
+		PROVIDE (_etext = __text_end);
+		PROVIDE (etext = __text_end);
 
-                /* read-only data */
+		/* read-only data */
 		*(.rdata)
 		*(.rodata .rodata.*)
 		*(.gnu.linkonce.r.*)
@@ -91,10 +91,10 @@ SECTIONS
 		*(.data.rel.ro .data.rel.ro.*)
 		*(.got .got.*)
 
-                /* Need to pre-align so that the symbols come after padding */
+		/* Need to pre-align so that the symbols come after padding */
 		. = ALIGN(8);
 
-                /* lists of constructors and destructors */
+		/* lists of constructors and destructors */
 		PROVIDE_HIDDEN ( __preinit_array_start = . );
 		KEEP (*(.preinit_array))
 		PROVIDE_HIDDEN ( __preinit_array_end = . );
@@ -115,21 +115,21 @@ SECTIONS
 		*(.toc .toc.*)
 	} >flash AT>flash :text
 
-        /* additional sections when compiling with C++ exception support */
+	/* additional sections when compiling with C++ exception support */
 	@CPP_START@
-        .except_ordered : {
+	.except_ordered : {
 		*(.gcc_except_table *.gcc_except_table.*)
 		KEEP (*(.eh_frame .eh_frame.*))
 		*(.ARM.extab* .gnu.linkonce.armextab.*)
 	} >flash AT>flash :text
 
 	.except_unordered : {
-                . = ALIGN(8);
+		. = ALIGN(8);
 
-        	PROVIDE(__exidx_start = .);
+		PROVIDE(__exidx_start = .);
 		*(.ARM.exidx*)
-        	PROVIDE(__exidx_end = .);
-        } >flash AT>flash :text
+		PROVIDE(__exidx_end = .);
+	} >flash AT>flash :text
 	@CPP_END@
 
 	/*
@@ -146,8 +146,8 @@ SECTIONS
 		*(.data .data.*)
 		*(.gnu.linkonce.d.*)
 
-                /* Need to pre-align so that the symbols come after padding */
- 		. = ALIGN(8);
+		/* Need to pre-align so that the symbols come after padding */
+		. = ALIGN(8);
 
 		PROVIDE( __global_pointer$ = . + 0x800 );
 		*(.sdata .sdata.* .sdata2.*)
@@ -216,7 +216,7 @@ SECTIONS
 		*(.gnu.linkonce.b.*)
 		*(COMMON)
 
-                /* Align the heap */
+		/* Align the heap */
 		. = ALIGN(8);
 		__bss_end = .;
 	} >ram AT>ram :ram
