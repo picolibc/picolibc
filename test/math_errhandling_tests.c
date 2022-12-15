@@ -388,6 +388,10 @@ long makemathname(test_lround_negbig)(void) { makemathname(lround)(-makemathname
 
 FLOAT_T makemathname(test_nextafter_0_neg0)(void) { return makemathname(nextafter)(makemathname(zero), -makemathname(zero)); }
 FLOAT_T makemathname(test_nextafter_neg0_0)(void) { return makemathname(nextafter)(-makemathname(zero), makemathname(zero)); }
+FLOAT_T makemathname(test_nextafter_0_1)(void) { return makemathname(nextafter)(makemathname(zero), makemathname(one)); }
+FLOAT_T makemathname(test_nextafter_0_neg1)(void) { return makemathname(nextafter)(makemathname(zero), -makemathname(one)); }
+FLOAT_T makemathname(test_nextafter_min_1)(void) { return makemathname(nextafter)(makemathname(min_val), makemathname(one)); }
+FLOAT_T makemathname(test_nextafter_negmin_neg1)(void) { return makemathname(nextafter)(-makemathname(min_val), -makemathname(one)); }
 FLOAT_T makemathname(test_nextafter_qnan_1)(void) { return makemathname(nextafter)(makemathname(qnanval), makemathname(one)); }
 FLOAT_T makemathname(test_nextafter_snan_1)(void) { return makemathname(nextafter)(makemathname(snanval), makemathname(one)); }
 FLOAT_T makemathname(test_nextafter_1_qnan)(void) { return makemathname(nextafter)(makemathname(one), makemathname(qnanval)); }
@@ -403,6 +407,10 @@ FLOAT_T makemathname(test_nextafter_neg1_neg2)(void) {return makemathname(nextaf
 
 FLOAT_T makemathname(test_nexttoward_0_neg0)(void) { return makemathname(nexttoward)(makemathname(zero), -makelname(zero)); }
 FLOAT_T makemathname(test_nexttoward_neg0_0)(void) { return makemathname(nexttoward)(-makemathname(zero), makelname(zero)); }
+FLOAT_T makemathname(test_nexttoward_0_1)(void) { return makemathname(nexttoward)(makemathname(zero), makelname(one)); }
+FLOAT_T makemathname(test_nexttoward_0_neg1)(void) { return makemathname(nexttoward)(makemathname(zero), -makelname(one)); }
+FLOAT_T makemathname(test_nexttoward_min_1)(void) { return makemathname(nexttoward)(makemathname(min_val), makelname(one)); }
+FLOAT_T makemathname(test_nexttoward_negmin_neg1)(void) { return makemathname(nexttoward)(-makemathname(min_val), -makelname(one)); }
 FLOAT_T makemathname(test_nexttoward_qnan_1)(void) { return makemathname(nexttoward)(makemathname(qnanval), makelname(one)); }
 FLOAT_T makemathname(test_nexttoward_snan_1)(void) { return makemathname(nexttoward)(makemathname(snanval), makelname(one)); }
 FLOAT_T makemathname(test_nexttoward_1_qnan)(void) { return makemathname(nexttoward)(makemathname(one), makelname(qnanval)); }
@@ -1136,6 +1144,10 @@ struct {
 
         TEST(nextafter_0_neg0, -(FLOAT_T)0, 0, 0),
         TEST(nextafter_neg0_0, (FLOAT_T)0, 0, 0),
+        TEST(nextafter_0_1, (FLOAT_T) MIN_VAL, FE_UNDERFLOW, 0),
+        TEST(nextafter_0_neg1, -(FLOAT_T) MIN_VAL, FE_UNDERFLOW, 0),
+        TEST(nextafter_min_1, (FLOAT_T) MIN_VAL + (FLOAT_T) MIN_VAL, FE_UNDERFLOW, ERANGE),
+        TEST(nextafter_negmin_neg1, -(FLOAT_T) MIN_VAL - (FLOAT_T) MIN_VAL, FE_UNDERFLOW, ERANGE),
         TEST(nextafter_qnan_1, (FLOAT_T)NAN, 0, 0),
         TEST(nextafter_snan_1, (FLOAT_T)NAN, FE_INVALID, 0),
         TEST(nextafter_max_inf, (FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
@@ -1148,6 +1160,10 @@ struct {
 #if defined(__SIZEOF_LONG_DOUBLE__) && !defined(NO_NEXTTOWARD)
         TEST(nexttoward_0_neg0, -(FLOAT_T)0, 0, 0),
         TEST(nexttoward_neg0_0, (FLOAT_T)0, 0, 0),
+        TEST(nexttoward_0_1, (FLOAT_T) MIN_VAL, FE_UNDERFLOW, 0),
+        TEST(nexttoward_0_neg1, -(FLOAT_T) MIN_VAL, FE_UNDERFLOW, 0),
+        TEST(nexttoward_min_1, (FLOAT_T) MIN_VAL + (FLOAT_T) MIN_VAL, FE_UNDERFLOW, ERANGE),
+        TEST(nexttoward_negmin_neg1, -(FLOAT_T) MIN_VAL - (FLOAT_T) MIN_VAL, FE_UNDERFLOW, ERANGE),
         TEST(nexttoward_qnan_1, (FLOAT_T)NAN, 0, 0),
         TEST(nexttoward_snan_1, (FLOAT_T)NAN, FE_INVALID, 0),
         TEST(nexttoward_max_inf, (FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
