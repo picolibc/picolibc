@@ -762,8 +762,15 @@ erfl(long double x)
 
   if (ix >= 0x3fff0000) /* |x| >= 1.0 */
     {
-      y = erfcl (x);
-      return (one - y);
+        /* Don't call if erfcl would underflow */
+        if (ix < 0x4005ac00) {
+            u.parts32.mswhi = ix;
+            y = one - erfcl (u.value);
+        } else
+            y = one;
+        if (sign < 0)
+            y = -y;
+        return y;
       /*    return (one - erfcl (x)); */
     }
   u.parts32.mswhi = ix;
@@ -918,7 +925,7 @@ erfcl(long double x)
   else
     {
       if ((sign & 0x80000000) == 0)
-	return tiny * tiny;
+        return __math_uflowl(0);
       else
 	return two - tiny;
     }
