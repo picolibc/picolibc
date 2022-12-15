@@ -597,6 +597,10 @@ extern long double j1l(long double);
 extern long double y1l(long double);
 extern long double jnl(int, long double);
 extern long double ynl(int, long double);
+
+extern long double getpayloadl(const long double *x);
+extern long double significandl(long double);
+
 #endif /* _HAVE_LONG_DOUBLE_MATH */
 
 #endif /* _HAVE_LONG_DOUBLE */
@@ -660,6 +664,7 @@ extern int signgam;
 #define MAXFLOAT	3.40282347e+38F
 
 #define M_E		2.7182818284590452354
+#define _M_E_L          2.718281828459045235360287471352662498L
 #define M_LOG2E		1.4426950408889634074
 #define M_LOG10E	0.43429448190325182765
 #define M_LN2		_M_LN2
@@ -668,14 +673,21 @@ extern int signgam;
 #define _M_PI_L         3.141592653589793238462643383279502884L
 #define M_PI_2		1.57079632679489661923
 #define _M_PI_2		1.57079632679489661923
-#define _M_PI_2L	1.5707963267948966192313216916397514420985846996875529104874722961539082031431L
+#define _M_PI_2L	1.570796326794896619231321691639751442L
 #define M_PI_4		0.78539816339744830962
-#define _M_PI_4L	0.78539816339744830961566084581987572104929234984377645524373614807695410157155L
+#define _M_PI_4L	0.785398163397448309615660845819875721L
 #define M_1_PI		0.31830988618379067154
 #define M_2_PI		0.63661977236758134308
 #define M_2_SQRTPI	1.12837916709551257390
 #define M_SQRT2		1.41421356237309504880
 #define M_SQRT1_2	0.70710678118654752440
+
+#ifdef __GNU_VISIBLE
+#define M_PIl           _M_PI_L
+#define M_PI_2l         _M_PI_2L
+#define M_PI_4l         _M_PI_4L
+#define M_El            _M_E_L
+#endif
 
 #endif
 
