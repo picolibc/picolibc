@@ -63,6 +63,7 @@ srcs_ld_arch = [
     's_expm1l.c',
     's_floorl.c',
     's_fpclassifyl.c',
+    's_getpayloadl.c',
     's_log1pl.c',
     's_modfl.c',
     's_nanl.c',
@@ -70,6 +71,7 @@ srcs_ld_arch = [
     's_nexttoward.c',
     's_nexttowardf.c',
     's_remquol.c',
+    's_significandl.c',
     's_tanhl.c',
     's_truncl.c',
    ]
