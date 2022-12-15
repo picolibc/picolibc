@@ -132,7 +132,8 @@ static const long double
   lg2 = 6.9314718055994530941723212145817656807550E-1L,
   lg2_h = 6.9314718055994528622676398299518041312695E-1L,
   lg2_l = 2.3190468138462996154948554638754786504121E-17L,
-  ovt = 8.0085662595372944372e-0017L,
+  ovt = 1.38926478993351112510650782611372039878722890e-34L,
+//  ovt = 8.0085662595372944372e-0017L,
   /* 2/(3*log(2)) */
   cp = 9.6179669392597560490661645400126142495110E-1L,
   cp_h = 9.6179669392597555432899980587535537779331E-1L,
@@ -207,6 +208,33 @@ powl(long double x, long double y)
 	}
     }
 
+  ax = fabsl (x);
+  /* special value of x */
+  if ((p.parts32.mswlo | p.parts32.lswhi | p.parts32.lswlo) == 0)
+    {
+      if (ix == 0x7fff0000 || ix == 0 || ix == 0x3fff0000)
+	{
+	  z = ax;		/*x is +-inf,+-1 */
+	  if (hy < 0)
+            {
+              if (ix == 0 && iy != 0x7fff0000) {
+                  return __math_divzerol(hx < 0 && yisint == 1);
+              }
+              z = one / z;	/* z = (1/|x|) */
+            }
+	  if (hx < 0)
+	    {
+	      if (((ix - 0x3fff0000) | yisint) == 0)
+		{
+                    z = __math_invalidl(z);	/* (-1)**non-int is NaN */
+		}
+	      else if (yisint == 1)
+		z = -z;		/* (x<0)**odd = -(|x|**odd) */
+	    }
+	  return z;
+	}
+    }
+
   /* special value of y */
   if ((q.parts32.mswlo | q.parts32.lswhi | q.parts32.lswlo) == 0)
     {
@@ -223,42 +251,16 @@ powl(long double x, long double y)
       if (iy == 0x3fff0000)
 	{			/* y is  +-1 */
 	  if (hy < 0)
-	    return one / x;
+	    return check_oflowl(one / x);
 	  else
 	    return x;
 	}
       if (hy == 0x40000000)
-	return x * x;		/* y is  2 */
+	return check_uflowl(check_oflowl(x * x));		/* y is  2 */
       if (hy == 0x3ffe0000)
 	{			/* y is  0.5 */
 	  if (hx >= 0)		/* x >= +0 */
 	    return sqrtl (x);
-	}
-    }
-
-  ax = fabsl (x);
-  /* special value of x */
-  if ((p.parts32.mswlo | p.parts32.lswhi | p.parts32.lswlo) == 0)
-    {
-      if (ix == 0x7fff0000 || ix == 0 || ix == 0x3fff0000)
-	{
-	  z = ax;		/*x is +-inf,+-1 */
-	  if (hy < 0)
-            {
-              if (ix == 0)
-                  return __math_divzerol(hx < 0 && yisint == 1);
-              z = one / z;	/* z = (1/|x|) */
-            }
-	  if (hx < 0)
-	    {
-	      if (((ix - 0x3fff0000) | yisint) == 0)
-		{
-                    z = __math_invalidl(z);	/* (-1)**non-int is NaN */
-		}
-	      else if (yisint == 1)
-		z = -z;		/* (x<0)**odd = -(|x|**odd) */
-	    }
-	  return z;
 	}
     }
 
@@ -271,19 +273,20 @@ powl(long double x, long double y)
      If (1 - 1/131072)^y underflows, y > 1.4986e9 */
   if (iy > 0x401d654b)
     {
+      int neg = (hx < 0) & yisint;
       /* if (1 - 2^-113)^y underflows, y > 1.1873e38 */
       if (iy > 0x407d654b)
 	{
 	  if (ix <= 0x3ffeffff)
-	    return (hy < 0) ? __math_oflowl(0) : __math_uflowl(0);
+            return (hy < 0) ? __math_oflowl(neg) : __math_uflowl(neg);
 	  if (ix >= 0x3fff0000)
-	    return (hy > 0) ? __math_oflowl(0) : __math_uflowl(0);
+	    return (hy > 0) ? __math_oflowl(neg) : __math_uflowl(neg);
 	}
       /* over/underflow if x is not close to one */
       if (ix < 0x3ffeffff)
-	return (hy < 0) ? __math_oflowl(0) : __math_uflowl(0);
+	return (hy < 0) ? __math_oflowl(neg) : __math_uflowl(neg);
       if (ix > 0x3fff0000)
-	return (hy > 0) ? __math_oflowl(0) : __math_uflowl(0);
+	return (hy > 0) ? __math_oflowl(neg) : __math_uflowl(neg);
     }
 
   n = 0;
