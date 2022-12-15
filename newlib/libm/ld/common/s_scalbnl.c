@@ -48,14 +48,11 @@ scalbnl (long double x, int n)
         if (k >= 0x7fff) return __math_oflowl(u.bits.sign); /* overflow  */
         if (k > 0) 				/* normal result */
 	    {u.bits.exp = k; return u.e;}
-        if (k <= -128) {
-            if (n > 50000) 	/* in case integer overflow in n+k */
-		return __math_oflowl(u.bits.sign);	/*overflow*/
-	    else return __math_uflowl(u.bits.sign); 	/*underflow*/
-        }
+        if (k <= -128)
+	    return __math_uflowl(u.bits.sign); 	/*underflow*/
 	k += 128;				/* subnormal result */
 	u.bits.exp = k;
-        return u.e*0x1p-128L;
+        return check_uflowl(u.e*0x1p-128L);
 }
 
 #elif defined(_DOUBLE_DOUBLE_FLOAT)
