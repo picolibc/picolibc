@@ -80,7 +80,7 @@ remquol(long double x, long double y, int *quo)
 	    }
 	    if((hx&0x0000ffffffffffffLL)==(hy&0x0000ffffffffffffLL) &&
 		lx==ly) {
-		*quo = 1;
+		*quo = sxy? -1 : 1;
 		return Zero[sx!=0];	/* |x|=|y| return x*0*/
 	    }
 	}
