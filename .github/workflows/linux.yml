@@ -88,11 +88,11 @@ jobs:
           "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
 
           # Tinystdio configurations
-          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true",
+          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true",
           "-Dformat-default=integer",
 
           # Original stdio
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true",
 
           # Locale, iconv, original malloc and original atexit/onexit configurations
           "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
@@ -138,11 +138,11 @@ jobs:
           "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
 
           # Tinystdio configurations
-          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true",
+          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true",
           "-Dformat-default=integer",
 
           # Original stdio
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true",
 
           # Locale, iconv, original malloc and original atexit/onexit configurations
           "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
@@ -188,11 +188,11 @@ jobs:
           "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
 
           # Tinystdio configurations
-          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true",
+          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true",
           "-Dformat-default=integer",
 
           # Original stdio
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true",
 
           # Locale, iconv, original malloc and original atexit/onexit configurations
           "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
