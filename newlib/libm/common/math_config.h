@@ -567,7 +567,7 @@ force_eval_long_double (long double x)
 #  ifdef _HAVE_ALIAS_ATTRIBUTE
 #   define _MATH_ALIAS_l_to_d(name) extern long double _LD_NAME(name)(void) __attribute__((__alias__(_D_ALIAS(name))));
 #   define _MATH_ALIAS_l_l_to_d(name) extern long double _LD_NAME(name)(long double x) __attribute__((__alias__(_D_ALIAS(name))));
-#   define _MATH_ALIAS_l_L_to_d(name) extern long double _LD_NAME(name)(long double *x) __attribute__((__alias__(_D_ALIAS(name))));
+#   define _MATH_ALIAS_l_L_to_d(name) extern long double _LD_NAME(name)(const long double *x) __attribute__((__alias__(_D_ALIAS(name))));
 #   define _MATH_ALIAS_l_s_to_d(name) extern long double _LD_NAME(name)(const char *x) __attribute__((__alias__(_D_ALIAS(name))));
 #   define _MATH_ALIAS_l_ll_to_d(name) extern long double _LD_NAME(name)(long double x, long double y) __attribute__((__alias__(_D_ALIAS(name))));
 #   define _MATH_ALIAS_l_lL_to_d(name) extern long double _LD_NAME(name)(long double x, long double *y) __attribute__((__alias__(_D_ALIAS(name))));
@@ -585,7 +585,7 @@ force_eval_long_double (long double x)
 #  else
 #   define _MATH_ALIAS_l_to_d(name) long double _LD_NAME(name)(void) { return (long double) _D_NAME(name)(); }
 #   define _MATH_ALIAS_l_l_to_d(name) long double _LD_NAME(name)(long double x) { return (long double) _D_NAME(name)((double) x); }
-#   define _MATH_ALIAS_l_L_to_d(name) long double _LD_NAME(name)(long double *x) { return (long double) _D_NAME(name)((double *) x); }
+#   define _MATH_ALIAS_l_L_to_d(name) long double _LD_NAME(name)(const long double *x) { return (long double) _D_NAME(name)((double *) x); }
 #   define _MATH_ALIAS_l_s_to_d(name) long double _LD_NAME(name)(const char *x) { return (long double) _D_NAME(name)(x); }
 #   define _MATH_ALIAS_l_ll_to_d(name) long double _LD_NAME(name)(long double x, long double y) { return (long double) _D_NAME(name)((double) x, (double) y); }
 #   define _MATH_ALIAS_l_lL_to_d(name) long double _LD_NAME(name)(long double x, long double *y) { return (long double) _D_NAME(name)((double) x, (double *) y); }
