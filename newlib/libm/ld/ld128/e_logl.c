@@ -214,8 +214,21 @@ logl(long double x)
     }
 
   /* Extract exponent and reduce domain to 0.703125 <= u < 1.40625  */
-  e = (int) (m >> 16) - (int) 0x3ffe;
+  e = (int) (m >> 16);
+
+  if (e == 0) {
+      /* Handle denorm */
+      e = 1;
+      while (!(m & 0x10000)) {
+          m = (m << 1) | ((int32_t) u.parts32.mswlo < 0);
+          u.parts32.mswlo = (u.parts32.mswlo << 1) | ((int32_t) u.parts32.lswhi < 0);
+          u.parts32.lswhi = (u.parts32.lswhi << 1) | ((int32_t) u.parts32.lswlo < 0);
+          u.parts32.lswlo = (u.parts32.lswlo << 1);
+          e--;
+      }
+  }
   m &= 0xffff;
+  e -= (int) 0x3ffe;
   u.parts32.mswhi = m | 0x3ffe0000;
   m |= 0x10000;
   /* Find lookup table index k from high order bits of the significand. */
