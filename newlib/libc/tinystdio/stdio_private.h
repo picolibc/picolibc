@@ -136,26 +136,33 @@ __atof_engine(uint32_t m10, int e10);
 
 #ifdef __SIZEOF_INT128__
 typedef __uint128_t _u128;
+typedef __int128_t _i128;
 #define to_u128(x)              (x)
 #define from_u128(x)            (x)
 #define _u128_to_ld(a)          ((long double) (a))
 #define _u128_is_zero(a)        ((a) == 0)
+#define _i128_lt_zero(a)        ((_i128) (a) < 0)
 #define _u128_plus_64(a,b) ((a) + (b))
 #define _u128_plus(a,b) ((a) + (b))
+#define _u128_minus(a,b) ((a) - (b))
+#define _u128_minus_64(a,b) ((a) - (b))
 #define _u128_times_10(a) ((a) * 10)
 #define _u128_times_base(a,b)   ((a) * (b))
 #define _u128_to_ld(a) ((long double) (a))
 #define _u128_oflow(a)	((a) >= (((((_u128) 0xffffffffffffffffULL) << 64) | 0xffffffffffffffffULL) - 9 / 10))
 #define _u128_zero	(_u128) 0
-#define _u128_lshift(a,b)       ((a) << (b))
+#define _u128_lshift(a,b)       ((_u128) (a) << (b))
 #define _u128_lshift_64(a,b)    ((_u128) (a) << (b))
 #define _u128_rshift(a,b)       ((a) >> (b))
+#define _i128_rshift(a,b)       ((_i128) (a) >> (b))
 #define _u128_or_64(a,b)        ((a) | (_u128) (b))
 #define _u128_and_64(a,b)       ((uint64_t) (a) & (b))
 #define _u128_or(a,b)           ((a) | (b))
 #define _u128_and(a,b)          ((a) & (b))
 #define _u128_ge(a,b)           ((a) >= (b))
+#define _i128_ge(a,b)           ((_i128)(a) >= (_i128)(b))
 #define _u128_lt(a,b)           ((a) < (b))
+#define _i128_lt(a,b)           ((_i128)(a) < (_i128)(b))
 #define _u128_not(a)            (~(a))
 #else
 typedef struct {
@@ -191,6 +198,12 @@ _u128_is_zero(_u128 a)
 }
 
 static inline bool
+_i128_lt_zero(_u128 a)
+{
+    return (int64_t) a.hi < 0;
+}
+
+static inline bool
 _u128_lt(_u128 a, _u128 b)
 {
     if (a.hi == b.hi)
@@ -199,11 +212,35 @@ _u128_lt(_u128 a, _u128 b)
 }
 
 static inline bool
+_i128_lt(_u128 a, _u128 b)
+{
+    if (a.hi == b.hi) {
+        if ((int64_t) a.hi < 0)
+            return a.lo > b.lo;
+        else
+            return a.lo < b.lo;
+    }
+    return (int64_t) a.hi < (int64_t) b.hi;
+}
+
+static inline bool
 _u128_ge(_u128 a, _u128 b)
 {
     if (a.hi == b.hi)
         return a.lo >= b.lo;
     return a.hi >= b.hi;
+}
+
+static inline bool
+_i128_ge(_u128 a, _u128 b)
+{
+    if (a.hi == b.hi) {
+        if ((int64_t) a.hi < 0)
+            return a.lo <= b.lo;
+        else
+            return a.lo >= b.lo;
+    }
+    return (int64_t) a.hi >= (int64_t) b.hi;
 }
 
 static inline _u128
@@ -227,6 +264,30 @@ _u128_plus(_u128 a, _u128 b)
     v.hi = a.hi + b.hi;
     if (v.lo < a.lo)
 	v.hi++;
+    return v;
+}
+
+static inline _u128
+_u128_minus_64(_u128 a, uint64_t b)
+{
+    _u128 v;
+
+    v.lo = a.lo - b;
+    v.hi = a.hi;
+    if (v.lo > a.lo)
+	v.hi--;
+    return v;
+}
+
+static inline _u128
+_u128_minus(_u128 a, _u128 b)
+{
+    _u128 v;
+
+    v.lo = a.lo - b.lo;
+    v.hi = a.hi - b.hi;
+    if (v.lo > a.lo)
+	v.hi--;
     return v;
 }
 
@@ -348,6 +409,36 @@ _u128_oflow(_u128 a)
     return a.hi >= (0xffffffffffffffffULL - 9) / 10;
 }
 #endif
+
+static inline _u128
+asuint128(long double f)
+{
+    union {
+        long double     f;
+        _u128           i;
+    } v;
+
+    v.f = f;
+    return v.i;
+}
+
+static inline long double
+aslongdouble(_u128 i)
+{
+    union {
+        long double     f;
+        _u128           i;
+    } v;
+
+    v.i = i;
+    return v.f;
+}
+
+static inline bool
+_u128_gt(_u128 a, _u128 b)
+{
+    return _u128_lt(b, a);
+}
 
 long double
 __atold_engine(_u128 m10, int e10);

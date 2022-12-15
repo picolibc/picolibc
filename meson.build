@@ -263,6 +263,7 @@ atomic_ungetc = tinystdio and get_option('atomic-ungetc')
 format_default = get_option('format-default')
 printf_aliases = get_option('printf-aliases')
 io_percent_b = tinystdio and get_option('io-percent-b')
+io_long_double = get_option('io-long-double') or get_option('newlib-io-long-double')
 
 if printf_aliases
   double_printf_compile_args=['-DPICOLIBC_DOUBLE_PRINTF_SCANF']
@@ -351,7 +352,6 @@ if tinystdio and printf_aliases
 endif
 
 # A bunch of newlib-stdio only options
-newlib_io_long_double = get_option('newlib-io-long-double')
 newlib_global_stdio_streams = get_option('newlib-global-stdio-streams')
 newlib_fvwrite_in_streamio = get_option('newlib-fvwrite-in-streamio')
 newlib_fseek_optimization = get_option('newlib-fseek-optimization')
@@ -365,9 +365,6 @@ newlib_have_fcntl = get_option('newlib-have-fcntl')
 # if they are selected while using tinystdio
 
 if tinystdio
-  if newlib_io_long_double
-    error('tinystdio does not support long double (newlib-io-long-double)')
-  endif
   if newlib_io_float
     error('tinystdio uses a run-time mechanism to select floating point io (newlib-io-float)')
   endif
@@ -977,8 +974,8 @@ conf_data.set('_WANT_IO_POS_ARGS', io_pos_args)
 conf_data.set('_WANT_IO_C99_FORMATS', io_c99_formats)
 conf_data.set('_IO_FLOAT_EXACT', io_float_exact)
 conf_data.set('_WANT_IO_PERCENT_B', io_percent_b)
+conf_data.set('_WANT_IO_LONG_DOUBLE', io_long_double)
 if not tinystdio
-  conf_data.set('_WANT_IO_LONG_DOUBLE', newlib_io_long_double)
   conf_data.set('NO_FLOATING_POINT', not newlib_io_float)
   conf_data.set('FLOATING_POINT', newlib_io_float)
   conf_data.set('_WANT_REENT_GLOBAL_STDIO_STREAMS', newlib_global_stdio_streams)

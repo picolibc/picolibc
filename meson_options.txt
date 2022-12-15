@@ -120,6 +120,10 @@ option('newlib-io-pos-args', type: 'combo', choices: ['true', 'false', 'auto'], 
        description: 'enable printf-family positional arg support (always enabled for tinystdio float)')
 option('io-percent-b', type: 'boolean', value: false,
        description: 'enable proposed %b/%B format in printf and scanf in tinystdio (default: false)')
+option('io-long-double', type: 'boolean', value: false,
+       description: 'enable long double type support in IO functions printf/scanf')
+option('newlib-io-long-double', type: 'boolean', value: false,
+       description: 'enable long double type support in IO functions printf/scanf')
 
 #
 # Options applying only to tinystdio
@@ -150,8 +154,6 @@ option('newlib-global-stdio-streams', type: 'boolean', value: false,
        description: 'enable global stdio streams')
 option('newlib-io-float', type: 'boolean', value: false,
        description: 'enable printf/scanf family float support')
-option('newlib-io-long-double', type: 'boolean', value: false,
-       description: 'enable long double type support in IO functions printf/scanf (newlib stdio only)')
 option('newlib-nano-formatted-io', type: 'boolean', value: false,
        description: 'Use nano version formatted IO')
 option('newlib-reent-small', type: 'boolean', value: false,

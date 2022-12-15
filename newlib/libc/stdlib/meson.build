@@ -188,7 +188,7 @@ if not tinystdio
   srcs_stdlib += srcs_stdlib_stdio
   if have_long_double
     srcs_stdlib += lsrcs_stdlib
-    if newlib_io_long_double
+    if io_long_double
       srcs_stdlib += 'ldtoa.c'
     endif
   endif

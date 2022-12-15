@@ -515,6 +515,12 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap_orig)
                 }
 #endif
 		break;
+#ifdef SCANF_LONGLONG
+              case 'L':
+                flags |= FL_LONGLONG;
+                c = *fmt++;
+                break;
+#endif
 #ifdef _WANT_IO_C99_FORMATS
 #ifdef SCANF_LONGLONG
 #define CHECK_LONGLONG(type)                                    \

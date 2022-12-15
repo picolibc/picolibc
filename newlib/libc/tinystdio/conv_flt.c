@@ -36,19 +36,6 @@
 static const char pstr_nfinity[] = "nfinity";
 static const char pstr_an[] = "an";
 
-#ifdef _HAVE_LONG_DOUBLE
-static ALWAYS_INLINE long double
-aslongdouble(_u128 i)
-{
-    union
-    {
-        _u128 i;
-        long double f;
-    } u = {i};
-    return u.f;
-}
-#endif
-
 #if defined(STRTOD) || defined(STRTOF) || defined(STRTOLD)
 # define CHECK_WIDTH()   1
 # define CHECK_RANGE(flt) do {                                          \
@@ -121,18 +108,42 @@ static inline void scanf_ungetc(int c, const char *s, int *lenp)
 # define CHECK_RANGE(flt)
 # ifdef PICOLIBC_FLOAT_PRINTF_SCANF
 #  define CHECK_LONG()    0
+#  define CHECK_LONG_LONG()     0
 #  define FLOAT_MANT_DIG        __FLT_MANT_DIG__
 #  define FLOAT_MAX_EXP         __FLT_MAX_EXP__
 #  define FLOAT_MIN_EXP         __FLT_MIN_EXP__
 #  define ASFLOAT(x) _asfloat(x)
+#  define TOFLOAT(x) ((float) (x))
 # else
-#  define CHECK_LONG()    (flags & FL_LONG)
-#  define FLOAT_MANT_DIG        __DBL_MANT_DIG__
-#  define FLOAT_MAX_EXP         __DBL_MAX_EXP__
-#  define FLOAT_MIN_EXP         __DBL_MIN_EXP__
-#  define ASFLOAT(x) _asdouble(x)
+#  if __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#   define CHECK_LONG()         (flags & (FL_LONG|FL_LONGLONG))
+#   define CHECK_LONG_LONG()    0
+#  else
+#   define CHECK_LONG()    (flags & FL_LONG)
+#   if defined(_WANT_IO_LONG_DOUBLE)
+#    define CHECK_LONG_LONG()     (flags & FL_LONGLONG)
+#    define FLOAT_MANT_DIG        __LDBL_MANT_DIG__
+#    define FLOAT_MAX_EXP         __LDBL_MAX_EXP__
+#    define FLOAT_MIN_EXP         __LDBL_MIN_EXP__
+#    define UINTFLOAT_128
+
+typedef long double FLOAT;
+typedef _u128 UINTFLOAT;
+
+#    define ASFLOAT(x) aslongdouble(x)
+#    define TOFLOAT(x) _u128_to_ld(x)
+#   else
+#    define CHECK_LONG_LONG()     0
+#   endif
+#  endif
+#  if __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__ || !defined(_WANT_IO_LONG_DOUBLE)
+#   define FLOAT_MANT_DIG        __DBL_MANT_DIG__
+#   define FLOAT_MAX_EXP         __DBL_MAX_EXP__
+#   define FLOAT_MIN_EXP         __DBL_MIN_EXP__
+#   define ASFLOAT(x) _asdouble(x)
+#   define TOFLOAT(x) ((double) (x))
+#  endif
 # endif
-# define CHECK_LONG_LONG()      0
 #endif
 
 #ifdef UINTFLOAT_128
@@ -177,7 +188,7 @@ static inline void scanf_ungetc(int c, const char *s, int *lenp)
 #define UF_OR(a,b)              ((a) | (b))
 #endif
 
-#ifndef STRTOLD
+#ifndef UINTFLOAT_128
 #include "dtoa_engine.h"
 #endif
 
