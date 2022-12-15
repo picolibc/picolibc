@@ -903,9 +903,9 @@ HIDDEN __float64 __math_check_oflow (__float64);
 #ifdef _NEED_FLOAT_HUGE
 HIDDEN long double __math_check_oflowl(long double);
 #endif
+
 /* Check if the result underflowed to 0.  */
 HIDDEN float __math_check_uflowf (float);
-/* Check if the result underflowed to 0.  */
 HIDDEN __float64 __math_check_uflow (__float64);
 #ifdef _NEED_FLOAT_HUGE
 HIDDEN long double __math_check_uflowl(long double);
@@ -1111,6 +1111,25 @@ __math_with_errnol (long double y, int e);
 #define __math_with_errno(x, e) (x)
 #define __math_with_errnof(x, e) (x)
 #define __math_with_errnol(x, e) (x)
+#endif
+
+/* Check if the result is a denorm. */
+#if (defined(FE_UNDERFLOW) && !defined(PICOLIBC_FLOAT_NOEXCEPT)) || WANT_ERRNO
+float __math_denormf (float x);
+#else
+#define __math_denormf(x) (x)
+#endif
+
+#if (defined(FE_UNDERFLOW) && !defined(PICOLIBC_DOUBLE_NOEXCEPT)) || WANT_ERRNO
+__float64 __math_denorm (__float64 x);
+#else
+#define __math_denorm(x) (x)
+#endif
+
+#if defined(_NEED_FLOAT_HUGE) && ((defined(FE_UNDERFLOW) && !defined(PICOLIBC_LONG_DOUBLE_NOEXCEPT)) || WANT_ERRNO)
+long double __math_denorml(long double x);
+#else
+#define __math_denorml(x) (x)
 #endif
 
 HIDDEN double
