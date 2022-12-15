@@ -93,6 +93,7 @@ srcs_tinystdio = [
     'sscanf.c',
     'strfromf.c',
     'strfromd.c',
+    'strfroml.c',
     'strtof.c',
     'strtof_l.c',
     'strtod.c',
