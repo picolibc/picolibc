@@ -139,7 +139,12 @@ qx = x + (0.5l * xx + xx * px / qx);
 /* exp(x) = exp(k ln 2) exp(remainder ln 2) = 2^k exp(remainder ln 2).
    We have qx = exp(remainder ln 2) - 1, so
    exp(x) - 1  =  2^k (qx + 1) - 1  =  2^k qx + 2^k - 1.  */
-px = ldexpl(1.0L, k);
-x = px * qx + (px - 1.0l);
+if (k == __LDBL_MAX_EXP__)
+    px = __LDBL_MAX__;
+else
+    px = ldexpl (1.0L, k);
+x = px - 1.0L;
+if (!isinfl(x))
+    x += px * qx;
 return x;
 }
