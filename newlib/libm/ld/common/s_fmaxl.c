@@ -32,6 +32,11 @@ fmaxl(long double x, long double y)
 {
 	union IEEEl2bits u[2];
 
+        if (issignalingl(x))
+            return x + x;
+        if (issignalingl(y))
+            return y + y;
+
 	u[0].e = x;
 	mask_nbit_l(u[0]);
 	u[1].e = y;
