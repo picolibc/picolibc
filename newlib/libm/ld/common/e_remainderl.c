@@ -32,6 +32,9 @@ remainderl(long double x, long double y)
 {
 	int quo;
 
+        if (isnanl(x) || isnanl(y))
+            return x + y;
+
         if (isinfl(x) || y == 0.0L)
             return __math_invalidl(x);
 
