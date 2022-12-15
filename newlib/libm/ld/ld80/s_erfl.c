@@ -421,7 +421,7 @@ erfcl(long double x)
   else
     {
       if ((se & 0x8000) == 0)
-	return tiny * tiny;
+        return __math_uflowl(0);
       else
 	return two - tiny;
     }
