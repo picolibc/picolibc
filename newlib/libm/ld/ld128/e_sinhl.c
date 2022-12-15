@@ -53,7 +53,8 @@ long double
 sinhl(long double x)
 {
   long double t, w, h;
-  u_int32_t jx, ix;
+  int32_t jx;
+  u_int32_t ix;
   ieee_quad_shape_type u;
 
   /* Words of |x|. */
@@ -66,7 +67,7 @@ sinhl(long double x)
     return x + x;
 
   h = 0.5L;
-  if (jx & 0x80000000)
+  if (jx < 0)
     h = -h;
 
   /* Absolute value of x.  */
@@ -98,5 +99,5 @@ sinhl(long double x)
     }
 
   /* |x| > overflowthreshold, sinhl(x) overflow */
-  return x * shuge;
+  return __math_oflowl(jx < 0);
 }
