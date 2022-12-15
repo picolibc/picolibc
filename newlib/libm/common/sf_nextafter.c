@@ -30,7 +30,7 @@ float nextafterf(float x, float y)
 	if(x==y) return y;		/* x=y, return y */
 	if(FLT_UWORD_IS_ZERO(ix)) {		/* x == 0 */
 	    SET_FLOAT_WORD(x,(hy&0x80000000)|FLT_UWORD_MIN);
-	    force_eval_float(x*x);             /* raise underflow flag */
+            force_eval_float(x*x);
             return x;
 	}
 	if(hx>=0) {				/* x > 0 */
@@ -48,11 +48,10 @@ float nextafterf(float x, float y)
 	}
 	hy = hx&0x7f800000;
 	if(hy>FLT_UWORD_MAX) return check_oflowf(x+x);	/* overflow  */
-	if(hy<0x00800000) {		/* underflow */
-            force_eval_float(x*x);      /* raise underflow flag */
-	}
 	SET_FLOAT_WORD(x,hx);
-	return check_uflowf(x);
+	if(hy<0x00800000)		/* underflow */
+            return __math_denormf(x);
+	return x;
 }
 
 _MATH_ALIAS_f_ff(nextafter)
