@@ -53,6 +53,9 @@ nexttowardf (float x, long double y)
     ux = 1;
     if (signbit(y))
       ux |= 0x80000000;
+    x = asfloat(ux);
+    force_eval_float(x*x);
+    return x;
   } else if ((long double) x < y) {
     if (signbit(x))
       ux--;
@@ -69,9 +72,10 @@ nexttowardf (float x, long double y)
   if (e == 0x7f800000)
     return check_oflowf(opt_barrier_float(x+x));
   /* raise underflow if ux.value is subnormal or zero */
+  x = asfloat(ux);
   if (e == 0)
-    force_eval_float(x*x + asfloat(ux)*asfloat(ux));
-  return check_uflowf(asfloat(ux));
+      return __math_denormf(x);
+  return x;
 }
 
 _MATH_ALIAS_f_fl(nexttoward)
