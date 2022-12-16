@@ -47,7 +47,7 @@ nexttowardf (float x, long double y)
       return x + x;
 
   if ((long double) x == y)
-    return x;
+      return (float) y;
   ux = asuint(x);
   if (x == 0) {
     ux = 1;
