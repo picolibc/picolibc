@@ -68,7 +68,7 @@
 
 #define FPR_LAYOUT		\
 	and $8, $4, 4;	 	\
-	bne $8, $0, 1f;		\
+	beq $8, $0, 1f;		\
 	GPR_OFFSET ($31, 22);	\
 	addiu $4, $4, -4;	\
 1:				\
