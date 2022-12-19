@@ -618,6 +618,7 @@ Files: CMakeLists.txt
  newlib/libm/fenv/fesetmode.c
  newlib/libm/ld/CMakeLists.txt
  newlib/libm/ld/common/meson.build
+ newlib/libm/ld/common/s_significandl.c
  newlib/libm/ld/e_acoshl.c
  newlib/libm/ld/e_acosl.c
  newlib/libm/ld/e_asinl.c
@@ -669,6 +670,7 @@ Files: CMakeLists.txt
  newlib/libm/ld/s_fminl.c
  newlib/libm/ld/s_fpclassifyl.c
  newlib/libm/ld/s_frexpl.c
+ newlib/libm/ld/s_getpayloadl.c
  newlib/libm/ld/s_ilogbl.c
  newlib/libm/ld/s_isnanl.c
  newlib/libm/ld/s_llrintl.c
@@ -688,6 +690,7 @@ Files: CMakeLists.txt
  newlib/libm/ld/s_scalbl.c
  newlib/libm/ld/s_scalbln.c
  newlib/libm/ld/s_scalbnl.c
+ newlib/libm/ld/s_significandl.c
  newlib/libm/ld/s_sincosl.c
  newlib/libm/ld/s_sinl.c
  newlib/libm/ld/s_tanhl.c
@@ -840,6 +843,7 @@ Files: cmake/TC-arm-none-eabi.ld
  test/semihost/semihost-system.c
  test/semihost/semihost-tickfreq.c
  test/semihost/semihost-time.c
+ test/semihost/semihost-times.c
  test/semihost/semihost-tmpnam.c
  test/semihost/semihost-tmpname.c
  test/semihost/semihost-write.c
@@ -1072,6 +1076,8 @@ Files: dummyhost/iob.c
  semihost/sys_tmpnam.c
  semihost/sys_write.c
  semihost/sys_write0.c
+ semihost/sysconf.c
+ semihost/times.c
  semihost/unlink.c
  semihost/write.c
  test/libc-testsuite/meson.build
@@ -1106,12 +1112,15 @@ Files: newlib/empty.c
  newlib/libc/tinystdio/rewind.c
  newlib/libc/tinystdio/strfromd.c
  newlib/libc/tinystdio/strfromf.c
+ newlib/libc/tinystdio/strfroml.c
  newlib/libm/common/exp10l.c
  newlib/libm/common/math_inexact.c
  newlib/libm/common/math_inexactf.c
  newlib/libm/common/math_inexactl.c
  newlib/libm/common/s_getpayload.c
  newlib/libm/common/sf_getpayload.c
+ newlib/libm/ld/ld128/s_getpayloadl.c
+ newlib/libm/ld/ld80/s_getpayloadl.c
  newlib/libm/machine/powerpc/meson.build
  newlib/libm/test/scalb_vec.c
  newlib/libm/test/scalbn_vec.c
@@ -1779,6 +1788,7 @@ License: BSD3-13
 Files: newlib/libc/tinystdio/dtoa_data.c
  newlib/libc/tinystdio/dtoa_engine.c
  newlib/libc/tinystdio/dtoa_engine.h
+ newlib/libc/tinystdio/ldtoa_engine.h
  newlib/libc/tinystdio/make-dtoa-data
  newlib/libc/tinystdio/sprintfd.c
  newlib/libc/tinystdio/sprintff.c
@@ -2269,6 +2279,9 @@ Files: newlib/libc/string/memmem.c
  newlib/libm/common/log2.c
  newlib/libm/common/log2_data.c
  newlib/libm/common/log_data.c
+ newlib/libm/common/math_denorm.c
+ newlib/libm/common/math_denormf.c
+ newlib/libm/common/math_denorml.c
  newlib/libm/common/math_err_check_oflow.c
  newlib/libm/common/math_err_check_uflow.c
  newlib/libm/common/math_err_divzero.c
