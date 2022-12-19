@@ -2565,10 +2565,10 @@ check_reparse_point_target (HANDLE h, bool remote, PREPARSE_DATA_BUFFER rp,
     }
   if (rp->ReparseTag == IO_REPARSE_TAG_SYMLINK)
     {
-      /* Windows evaluates native symlink literally.  If a remote symlink points
-         to, say, C:\foo, it will be handled as if the target is the local file
-         C:\foo.  That comes in handy since that's how symlinks are treated under
-         POSIX as well. */
+      /* Windows evaluates native symlink literally.  If a remote symlink
+	 points to, say, C:\foo, it will be handled as if the target is the
+	 local file C:\foo.  That comes in handy since that's how symlinks
+	 are treated under POSIX as well. */
       RtlInitCountedUnicodeString (psymbuf,
 		(PWCHAR)((PBYTE) rp->SymbolicLinkReparseBuffer.PathBuffer
 			 + rp->SymbolicLinkReparseBuffer.SubstituteNameOffset),
