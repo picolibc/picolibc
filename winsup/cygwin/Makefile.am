@@ -58,6 +58,7 @@ TARGET_FILES= \
 	x86_64/memmove.S \
 	x86_64/mempcpy.S \
 	x86_64/memset.S \
+	x86_64/swab.S \
 	x86_64/wmemcpy.S \
 	x86_64/wmemmove.S \
 	x86_64/wmempcpy.S
