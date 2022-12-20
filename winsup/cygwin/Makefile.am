@@ -52,9 +52,15 @@ TEST_LIB_NAME=libcygwin0.a
 # These objects are included directly into the import library
 if TARGET_X86_64
 TARGET_FILES= \
+	x86_64/bcopy.S \
 	x86_64/memchr.S \
 	x86_64/memcpy.S \
-	x86_64/memset.S
+	x86_64/memmove.S \
+	x86_64/mempcpy.S \
+	x86_64/memset.S \
+	x86_64/wmemcpy.S \
+	x86_64/wmemmove.S \
+	x86_64/wmempcpy.S
 endif
 
 LIB_FILES= \
