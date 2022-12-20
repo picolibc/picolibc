@@ -1,69 +1,93 @@
-/* These functions are almost verbatim FreeBSD code (even if the header of
-   one file mentiones NetBSD), just wrapped in the minimum required code to
-   make them work under the MS AMD64 ABI.
-   See FreeBSD src/lib/libc/amd64/string/memset.S */
+/*	$NetBSD: memset.S,v 1.5 2014/05/22 16:47:31 pooka Exp $	*/
 
-/*
- * Written by J.T. Conklin <jtc@NetBSD.org>.
- * Public domain.
- * Adapted for NetBSD/x86_64 by
- * Frank van der Linden <fvdl@wasabisystems.com>
+/*-
+ * Copyright (c) 2009 The NetBSD Foundation, Inc.
+ * All rights reserved.
+ *
+ * This code is derived from software contributed to The NetBSD Foundation
+ * by David Laight.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE NETBSD FOUNDATION, INC. AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+ * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION OR CONTRIBUTORS
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 
-	.globl	memset
-	.seh_proc memset
-memset:
-	movq	%rsi,8(%rsp)
-	movq	%rdi,16(%rsp)
-	.seh_endprologue
-	movq	%rcx,%rdi
-	movq	%rdx,%rsi
-	movq	%r8,%rdx
+#include <machine/asm.h>
 
-	movq    %rsi,%rax
-	andq    $0xff,%rax
-	movq    %rdx,%rcx
-	movq    %rdi,%r11
+#if defined(LIBC_SCCS)
+	RCSID("$NetBSD: memset.S,v 1.5 2014/05/22 16:47:31 pooka Exp $")
+#endif
 
-	cld			/* set fill direction forward */
+#ifndef _KERNEL
+/* bzero, %rdi is buffer, %rsi length */
 
-	/* if the string is too short, it's really not worth the
-	 * overhead of aligning to word boundries, etc.  So we jump to
-	 * a plain unaligned set. */
-	cmpq    $0x0f,%rcx
-	jle     L1
+ENTRY2(bzero)
+	mov	%rsi,%rdx		/* length */
+	xor	%eax,%eax		/* value to write */
+	jmp	1f
+END(bzero)
+#endif
 
-	movb    %al,%ah		/* copy char to all bytes in word */
-	movl    %eax,%edx
-	sall    $16,%eax
-	orl     %edx,%eax
+/* memset, %rdi is buffer, %rsi char to fill, %rdx length */
 
-	movl    %eax,%edx
-	salq    $32,%rax
-	orq     %rdx,%rax
+ENTRY3(memset)
+	movzbq	%sil,%rax		/* byte value to fill */
+	mov	%rdx,%rsi		/* copy of length */
+	mov	$0x0101010101010101,%r9
+	imul	%r9,%rax		/* fill value in all bytes */
 
-	movq    %rdi,%rdx	/* compute misalignment */
-	negq    %rdx
-	andq    $7,%rdx
-	movq    %rcx,%r8
-	subq    %rdx,%r8
+1:
+	mov	%rdi,%r9		/* Need to return buffer address */
+	or	%edi,%edx		/* address | length */
+	mov	%rsi,%rcx
+	cmp	$7,%rsi
+	jbe	10f			/* jump if short fill */
+	test	$7,%dl			/* check for misaligned fill */
+	jnz	20f			/* jump if misaligned */
 
-	movq    %rdx,%rcx	/* set until word aligned */
-	rep
-	stosb
-
-	movq    %r8,%rcx
-	shrq    $3,%rcx		/* set by words */
-	rep
-	stosq
-
-	movq    %r8,%rcx	/* set remainder by bytes */
-	andq    $7,%rcx
-L1:     rep
-	stosb
-	movq    %r11,%rax
-
-	movq	8(%rsp),%rsi
-	movq	16(%rsp),%rdi
+/* Target aligned and length multiple of 8 */
+2:
+	shr	$3,%rcx
+	rep	stosq
+	mov	%r9,%rax
 	ret
-	.seh_endproc
+
+/*
+ * Short transfer, any faffing here will generate mispredicted branches.
+ * So we keep it simple.
+ */
+10:	rep	stosb
+	mov	%r9,%rax
+	ret
+
+/*
+ * Buffer or length misaligned.
+ * Write pattern to first and last word of buffer, then fill middle.
+ * (This writes to some bytes more than once - possibly three times!.)
+ */
+20:
+	mov	%rax,(%rdi)
+	movzbq	%dil,%rdx		/* low address for alignment */
+	mov	%rax,-8(%rcx,%rdi)
+	and	$7,%dl			/* offset in word */
+	sub	%rdx,%rcx		/* adjust length ... */
+	add	%rdx,%rdi		/* ... and target */
+	jmp	2b
+END(memset)
