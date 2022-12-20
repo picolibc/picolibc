@@ -737,7 +737,11 @@ fhandler_termios::ioctl (int cmd, void *varg)
     }
 
   myself->ctty = -1;
-  myself->set_ctty (this, 0);
+  if (!myself->set_ctty (this, 0))
+    {
+      set_errno (EPERM);
+      return -1;
+    }
   return 0;
 }
 

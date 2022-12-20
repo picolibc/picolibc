@@ -530,24 +530,30 @@ _pinfo::set_ctty (fhandler_termios *fh, int flags)
   debug_printf ("old %s, ctty device number %y, tc.ntty device number %y flags & O_NOCTTY %y", __ctty (), ctty, tc.ntty, flags & O_NOCTTY);
   if (fh && (ctty <= 0 || ctty == tc.ntty) && !(flags & O_NOCTTY))
     {
-      ctty = tc.ntty;
-      if (cygheap->ctty != fh->archetype)
+      if (tc.getsid () && tc.getsid () != sid)
+	; /* Do nothing if another session is associated with the TTY. */
+      else
 	{
-	  debug_printf ("cygheap->ctty %p, archetype %p", cygheap->ctty, fh->archetype);
-	  if (!cygheap->ctty)
-	    syscall_printf ("ctty was NULL");
-	  else
+	  ctty = tc.ntty;
+	  if (cygheap->ctty != fh->archetype)
 	    {
-	      syscall_printf ("ctty %p, usecount %d", cygheap->ctty,
-			      cygheap->ctty->archetype_usecount (0));
-	      cygheap->ctty->close ();
-	    }
-	  cygheap->ctty = (fhandler_termios *) fh->archetype;
-	  if (cygheap->ctty)
-	    {
-	      fh->archetype_usecount (1);
-	      /* guard ctty fh */
-	      report_tty_counts (cygheap->ctty, "ctty", "");
+	      debug_printf ("cygheap->ctty %p, archetype %p",
+			    cygheap->ctty, fh->archetype);
+	      if (!cygheap->ctty)
+		syscall_printf ("ctty was NULL");
+	      else
+		{
+		  syscall_printf ("ctty %p, usecount %d", cygheap->ctty,
+				  cygheap->ctty->archetype_usecount (0));
+		  cygheap->ctty->close ();
+		}
+	      cygheap->ctty = (fhandler_termios *) fh->archetype;
+	      if (cygheap->ctty)
+		{
+		  fh->archetype_usecount (1);
+		  /* guard ctty fh */
+		  report_tty_counts (cygheap->ctty, "ctty", "");
+		}
 	    }
 	}
 

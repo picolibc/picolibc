@@ -127,6 +127,8 @@ void
 init_cygheap::close_ctty ()
 {
   debug_printf ("closing cygheap->ctty %p", cygheap->ctty);
+  if (cygheap->ctty->tc ()->getsid () == pid)
+    cygheap->ctty->tc ()->setsid (0); /* Release CTTY ownership */
   cygheap->ctty->close_with_arch ();
   cygheap->ctty = NULL;
 }
