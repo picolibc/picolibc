@@ -43,7 +43,6 @@ DLL_NAME=cygwin1.dll
 NEW_DLL_NAME=new-cygwin1.dll
 DEF_FILE=cygwin.def
 LIB_NAME=libcygwin.a
-TEST_LIB_NAME=libcygwin0.a
 
 #
 # sources
@@ -618,10 +617,6 @@ LIBCOS=$(addsuffix .o,$(basename $(LIB_FILES)))
 $(LIB_NAME): $(DEF_FILE) $(LIBCOS) | $(NEW_DLL_NAME)
 	$(AM_V_GEN)$(srcdir)/scripts/mkimport $(toolopts) $(NEW_FUNCTIONS) $@ cygdll.a $(wordlist 2,99,$^)
 
-# cygwin import library used by testsuite
-$(TEST_LIB_NAME): $(LIB_NAME)
-	$(AM_V_GEN)perl -p -e 'BEGIN{binmode(STDIN); binmode(STDOUT);}; s/cygwin1/cygwin0/g' < $? > $@
-
 # sublibs
 # import libraries for some subset of symbols indicated by given objects
 speclib=\
@@ -664,7 +659,7 @@ libssp.a: $(LIB_NAME) $(wildcard $(newlib_build)/libc/ssp/*.o)
 # all
 #
 
-all-local: $(LIB_NAME) $(TEST_LIB_NAME) $(SUBLIBS)
+all-local: $(LIB_NAME) $(SUBLIBS)
 
 #
 # clean
@@ -675,7 +670,7 @@ clean-local:
 	-rm -f $(DEF_FILE) sigfe.s
 	-rm -f cygwin.sc cygdll.a cygwin.map
 	-rm -f $(NEW_DLL_NAME)
-	-rm -f $(LIB_NAME) $(TEST_LIB_NAME) $(SUBLIBS)
+	-rm -f $(LIB_NAME) $(SUBLIBS)
 	-rm -f version.cc
 	-rm -f tlsoffsets
 

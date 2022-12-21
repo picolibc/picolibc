@@ -61,7 +61,7 @@ foreach src [lsort [glob -nocomplain $srcdir/$subdir/*.c $srcdir/$subdir/*/*.{cc
     if [ file exists "$srcdir/$subdir/$basename.exp" ] then {
 	source "$srcdir/$subdir/$basename.exp"
     } else {
-	ws_spawn "$CC -nodefaultlibs -mwin32 $CFLAGS $src $add_includes $add_libs $runtime_root/binmode.o -lgcc $runtime_root/libcygwin0.a -lkernel32 -luser32 -o $base.exe"
+	ws_spawn "$CC -nodefaultlibs -mwin32 $CFLAGS $src $add_includes $add_libs $runtime_root/binmode.o -lgcc $runtime_root/libcygwin.a -lkernel32 -luser32 -o $base.exe"
 	if { $rv } {
 	    fail "$testcase (compile)"
 	} else {
