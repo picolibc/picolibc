@@ -44,12 +44,14 @@
 #define DATA_VAL2 0x0a0a0a0a
 
 NEWLIB_THREAD_LOCAL volatile int data_var = DATA_VAL;
-NEWLIB_THREAD_LOCAL volatile int bss_var;
 _Alignas(128) NEWLIB_THREAD_LOCAL volatile int overaligned_data_var = DATA_VAL2;
+NEWLIB_THREAD_LOCAL volatile int bss_var;
+_Alignas(128) NEWLIB_THREAD_LOCAL volatile int overaligned_bss_var;
 
 volatile int *volatile data_addr;
-volatile int *volatile overaligned_data_addr;
 volatile int *volatile bss_addr;
+volatile int *volatile overaligned_data_addr;
+volatile int *volatile overaligned_bss_addr;
 
 #ifdef PICOLIBC_TLS
 extern char __tdata_start, __tdata_end;
@@ -76,8 +78,8 @@ check_tls(char *where, bool check_addr, void *tls_region)
 {
 	int result = 0;
 
-	printf("tls check %s %p %p %p\n", where, &data_var,
-	       &overaligned_data_var, &bss_var);
+	printf("tls check %s %p %p %p %p\n", where, &data_var,
+	       &overaligned_data_var, &bss_var, &overaligned_bss_var);
 	if (!__is_aligned(tls_region, 128)) {
 		printf("TLS data region (%p) is not aligned\n", tls_region);
 		result++;
@@ -85,6 +87,11 @@ check_tls(char *where, bool check_addr, void *tls_region)
 	if (!__is_aligned((uintptr_t)&overaligned_data_var, 128)) {
 		printf("overaligned_data_var (%p) is not aligned\n",
 		       &overaligned_data_var);
+		result++;
+	}
+	if (!__is_aligned((uintptr_t)&overaligned_bss_var, 128)) {
+		printf("overaligned_bss_var (%p) is not aligned\n",
+		       &overaligned_bss_var);
 		result++;
 	}
 	if (data_var != DATA_VAL) {
@@ -101,6 +108,11 @@ check_tls(char *where, bool check_addr, void *tls_region)
 	if (bss_var != 0) {
 		printf("%s: uninitialized thread var has wrong value (0x%x instead of 0x%x)\n",
 		       where, bss_var, 0);
+		result++;
+	}
+	if (overaligned_bss_var != 0) {
+		printf("%s: uninitialized thread var has wrong value (0x%x instead of 0x%x)\n",
+		       where, overaligned_bss_var, 0);
 		result++;
 	}
 
@@ -128,6 +140,14 @@ check_tls(char *where, bool check_addr, void *tls_region)
 		result++;
 	}
 
+	overaligned_bss_var = ~overaligned_bss_var;
+
+	if (overaligned_bss_var != ~0) {
+		printf("%s: uninitialized thread var has wrong value (0x%x instead of 0x%x)\n",
+		       where, overaligned_bss_var, ~0);
+		result++;
+	}
+
 	if (check_addr) {
 		if (data_addr == &data_var) {
 			printf("_set_tls didn't affect initialized addr %p\n", data_addr);
@@ -143,11 +163,17 @@ check_tls(char *where, bool check_addr, void *tls_region)
 			printf("_set_tls didn't affect uninitialized addr %p\n", bss_addr);
 			result++;
 		}
+
+		if (overaligned_bss_addr == &overaligned_bss_var) {
+			printf("_set_tls didn't affect uninitialized addr %p\n", overaligned_bss_addr);
+			result++;
+		}
 	}
 #ifdef PICOLIBC_TLS
 	check_inside_tls_region(&data_var, tls_region);
 	check_inside_tls_region(&overaligned_data_var, tls_region);
 	check_inside_tls_region(&bss_var, tls_region);
+	check_inside_tls_region(&overaligned_bss_var, tls_region);
 #endif
 	return result;
 }
@@ -178,6 +204,7 @@ main(void)
 	data_addr = &data_var;
 	overaligned_data_addr = &overaligned_data_var;
 	bss_addr = &bss_var;
+	overaligned_bss_addr = &overaligned_bss_var;
 
 #ifdef PICOLIBC_TLS
         printf("TLS region: %p-%p (%zd bytes)\n", &__tdata_start,
