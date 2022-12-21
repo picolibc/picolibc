@@ -26,14 +26,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "arm_asm.h"
+
 	.thumb
 	.syntax unified
 	.global __aeabi_memset
 	.type	__aeabi_memset, %function
+	.fnstart
+	.cfi_startproc
 	ASM_ALIAS __aeabi_memset4 __aeabi_memset
 	ASM_ALIAS __aeabi_memset8 __aeabi_memset
 __aeabi_memset:
-	push	{r4, r5, r6}
+	prologue 4 6
 	lsls	r4, r0, #30
 	beq	10f
 	subs	r4, r1, #1
@@ -98,10 +102,14 @@ __aeabi_memset:
 	cmp	r3, r4
 	bne	8b
 9:
-	pop	{r4, r5, r6}
-	bx	lr
+	.cfi_remember_state
+	epilogue 4 6
 10:
+	.cfi_restore_state
 	mov	r4, r1
 	mov	r3, r0
 	b	3b
+	.cfi_endproc
+	.cantunwind
+	.fnend
 	.size __aeabi_memset, . - __aeabi_memset
