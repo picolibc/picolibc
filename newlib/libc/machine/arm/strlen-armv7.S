@@ -59,6 +59,7 @@
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  */
 
 #include "acle-compat.h"
+#include "arm_asm.h"
 
 	.macro def_fn f p2align=0
 	.text
@@ -78,7 +79,11 @@
 
 	/* This code requires Thumb.  */
 #if __ARM_ARCH_PROFILE == 'M'
+#if __ARM_ARCH >= 8
+	/* keep config inherited from -march=.  */
+#else
 	.arch   armv7e-m
+#endif /* if __ARM_ARCH >= 8 */
 #else
 	.arch	armv6t2
 #endif
@@ -100,8 +105,10 @@
 #define tmp2		r5
 
 def_fn	strlen p2align=6
+	.fnstart
+	.cfi_startproc
+	prologue 4 5 push_ip=HAVE_PAC_LEAF
 	pld	[srcin, #0]
-	strd	r4, r5, [sp, #-8]!
 	bic	src, srcin, #7
 	mvn	const_m1, #0
 	ands	tmp1, srcin, #7		/* (8 - bytes) to alignment.  */
@@ -151,6 +158,7 @@ def_fn	strlen p2align=6
 	beq	.Lloop_aligned
 
 .Lnull_found:
+	.cfi_remember_state
 	cmp	data1a, #0
 	itt	eq
 	addeq	result, result, #4
@@ -159,11 +167,11 @@ def_fn	strlen p2align=6
 	rev	data1a, data1a
 #endif
 	clz	data1a, data1a
-	ldrd	r4, r5, [sp], #8
 	add	result, result, data1a, lsr #3	/* Bits -> Bytes.  */
-	bx	lr
+	epilogue 4 5 push_ip=HAVE_PAC_LEAF
 
 .Lmisaligned8:
+	.cfi_restore_state
 	ldrd	data1a, data1b, [src]
 	and	tmp2, tmp1, #3
 	rsb	result, tmp1, #0
@@ -177,4 +185,7 @@ def_fn	strlen p2align=6
 	movne	data1a, const_m1
 	mov	const_0, #0
 	b	.Lstart_realigned
+	.cfi_endproc
+	.cantunwind
+	.fnend
 	.size	strlen, . - strlen

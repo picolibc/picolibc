@@ -25,6 +25,7 @@
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  */
 
 #include "acle-compat.h"
+#include "arm_asm.h"
 
 	.macro def_fn f p2align=0
 	.text
@@ -33,8 +34,9 @@
 	.type \f, %function
 \f:
 	.endm
-
-#if __ARM_ARCH_ISA_THUMB >= 2 && __ARM_ARCH >= 7
+#if __ARM_ARCH_PROFILE == 'M' && __ARM_ARCH >= 8
+	/* keep config inherited from -march=.  */
+#elif __ARM_ARCH_ISA_THUMB >= 2 && __ARM_ARCH >= 7
 	.arch   armv7
 #else
 	.arch	armv6t2
@@ -44,11 +46,17 @@
 	.syntax unified
 
 def_fn	strlen p2align=1
+	.fnstart
+	.cfi_startproc
+	prologue
 	mov     r3, r0
 1:	ldrb.w  r2, [r3], #1
 	cmp     r2, #0
 	bne	1b
 	subs    r0, r3, r0
 	subs    r0, #1
-	bx      lr
+	epilogue
+	.cfi_endproc
+	.cantunwind
+	.fnend
 	.size	strlen, . - strlen
