@@ -45,6 +45,8 @@
 	.thumb
 	.syntax unified
 
+#include "arm_asm.h"
+
 /* Parameters and result.  */
 #define src1		r0
 #define src2		r1
@@ -91,8 +93,9 @@
 	ldrd	r4, r5, [sp], #16
 	.cfi_restore 4
 	.cfi_restore 5
+	.cfi_adjust_cfa_offset -16
 	sub	result, result, r1, lsr #24
-	bx	lr
+	epilogue push_ip=HAVE_PAC_LEAF
 #else
 	/* To use the big-endian trick we'd have to reverse all three words.
 	   that's slower than this approach.  */
@@ -112,22 +115,21 @@
 	ldrd	r4, r5, [sp], #16
 	.cfi_restore 4
 	.cfi_restore 5
+	.cfi_adjust_cfa_offset -16
 	sub	result, result, r1
 
-	bx	lr
+	epilogue push_ip=HAVE_PAC_LEAF
 #endif
 	.endm
 
+
 	.text
 	.p2align	5
-.Lstrcmp_start_addr:
-#ifndef STRCMP_NO_PRECHECK
-.Lfastpath_exit:
-	sub	r0, r2, r3
-	bx	lr
-	nop
-#endif
 def_fn	strcmp
+	.fnstart
+	.cfi_sections .debug_frame
+	.cfi_startproc
+	prologue push_ip=HAVE_PAC_LEAF
 #ifndef STRCMP_NO_PRECHECK
 	ldrb	r2, [src1]
 	ldrb	r3, [src2]
@@ -136,16 +138,14 @@ def_fn	strcmp
 	cmpcs	r2, r3
 	bne	.Lfastpath_exit
 #endif
-	.cfi_sections .debug_frame
-	.cfi_startproc
 	strd	r4, r5, [sp, #-16]!
-	.cfi_def_cfa_offset 16
-	.cfi_offset 4, -16
-	.cfi_offset 5, -12
+	.cfi_adjust_cfa_offset 16
+	.cfi_rel_offset 4, 0
+	.cfi_rel_offset 5, 4
 	orr	tmp1, src1, src2
 	strd	r6, r7, [sp, #8]
-	.cfi_offset 6, -8
-	.cfi_offset 7, -4
+	.cfi_rel_offset 6, 8
+	.cfi_rel_offset 7, 12
 	mvn	const_m1, #0
 	lsl	r2, tmp1, #29
 	cbz	r2, .Lloop_aligned8
@@ -270,7 +270,6 @@ def_fn	strcmp
 	ldr	data1, [src1], #4
 	beq	.Laligned_m2
 	bcs	.Laligned_m1
-
 #ifdef STRCMP_NO_PRECHECK
 	ldrb	data2, [src2, #1]
 	uxtb	tmp1, data1, ror #BYTE1_OFFSET
@@ -314,10 +313,19 @@ def_fn	strcmp
 	mov	result, tmp1
 	ldr	r4, [sp], #16
 	.cfi_restore 4
-	bx	lr
+	.cfi_adjust_cfa_offset -16
+	epilogue push_ip=HAVE_PAC_LEAF
 
 #ifndef STRCMP_NO_PRECHECK
+.Lfastpath_exit:
+	.cfi_restore_state
+	.cfi_remember_state
+	sub	r0, r2, r3
+	epilogue push_ip=HAVE_PAC_LEAF
+
 .Laligned_m1:
+	.cfi_restore_state
+	.cfi_remember_state
 	add	src2, src2, #4
 #endif
 .Lsrc1_aligned:
@@ -364,8 +372,9 @@ def_fn	strcmp
 	/* R6/7 Not used in this sequence.  */
 	.cfi_restore 6
 	.cfi_restore 7
+	.cfi_adjust_cfa_offset -16
 	neg	result, result
-	bx	lr
+	epilogue push_ip=HAVE_PAC_LEAF
 
 6:
 	.cfi_restore_state
@@ -441,7 +450,8 @@ def_fn	strcmp
 	/* R6/7 not used in this sequence.  */
 	.cfi_restore 6
 	.cfi_restore 7
-	bx	lr
+	.cfi_adjust_cfa_offset -16
+	epilogue push_ip=HAVE_PAC_LEAF
 
 .Lstrcmp_tail:
 	.cfi_restore_state
@@ -463,7 +473,10 @@ def_fn	strcmp
 	/* R6/7 not used in this sequence.  */
 	.cfi_restore 6
 	.cfi_restore 7
+	.cfi_adjust_cfa_offset -16
 	sub	result, result, data2, lsr #24
-	bx	lr
+	epilogue push_ip=HAVE_PAC_LEAF
 	.cfi_endproc
-	.size strcmp, . - .Lstrcmp_start_addr
+	.cantunwind
+	.fnend
+	.size strcmp, . - strcmp

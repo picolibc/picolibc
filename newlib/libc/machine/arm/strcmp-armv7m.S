@@ -29,6 +29,8 @@
 /* Very similar to the generic code, but uses Thumb2 as implemented
    in ARMv7-M.  */
 
+#include "arm_asm.h"
+
 /* Parameters and result.  */
 #define src1		r0
 #define src2		r1
@@ -44,8 +46,10 @@
 	.thumb
 	.syntax unified
 def_fn strcmp
+	.fnstart
 	.cfi_sections .debug_frame
 	.cfi_startproc
+	prologue push_ip=HAVE_PAC_LEAF
 	eor	tmp1, src1, src2
 	tst	tmp1, #3
 	/* Strings not at same byte offset from a word boundary.  */
@@ -82,6 +86,7 @@ def_fn strcmp
 	ldreq	data2, [src2], #4
 	beq	4b
 2:
+	.cfi_remember_state
 	/* There's a zero or a different byte in the word */
 	S2HI	result, data1, #24
 	S2LO	data1, data1, #8
@@ -106,7 +111,7 @@ def_fn strcmp
 	lsrs	result, result, #24
 	subs	result, result, data2
 #endif
-	bx	lr
+	epilogue push_ip=HAVE_PAC_LEAF
 
 
 #if 0
@@ -205,8 +210,10 @@ def_fn strcmp
 
 	/* First of all, compare bytes until src1(sp1) is word-aligned. */
 .Lstrcmp_unaligned:
+	.cfi_restore_state
 	tst	src1, #3
 	beq	2f
+	.cfi_remember_state
 	ldrb	data1, [src1], #1
 	ldrb	data2, [src2], #1
 	cmp	data1, #1
@@ -214,12 +221,13 @@ def_fn strcmp
 	cmpcs	data1, data2
 	beq	.Lstrcmp_unaligned
 	sub	result, data1, data2
-	bx	lr
+	epilogue push_ip=HAVE_PAC_LEAF
 
 2:
+	.cfi_restore_state
 	stmfd	sp!, {r5}
-	.cfi_def_cfa_offset 4
-	.cfi_offset 5, -4
+	.cfi_adjust_cfa_offset 4
+	.cfi_rel_offset 5, 0
 
 	ldr	data1, [src1], #4
 	and	tmp2, src2, #3
@@ -355,8 +363,8 @@ def_fn strcmp
 	.cfi_remember_state
 	ldmfd	sp!, {r5}
 	.cfi_restore 5
-	.cfi_def_cfa_offset 0
-	bx	lr
+	.cfi_adjust_cfa_offset -4
+	epilogue push_ip=HAVE_PAC_LEAF
 
 .Lstrcmp_tail:
 	.cfi_restore_state
@@ -372,7 +380,9 @@ def_fn strcmp
 	sub	result, r2, result
 	ldmfd	sp!, {r5}
 	.cfi_restore 5
-	.cfi_def_cfa_offset 0
-	bx	lr
+	.cfi_adjust_cfa_offset -4
+	epilogue push_ip=HAVE_PAC_LEAF
 	.cfi_endproc
+	.cantunwind
+	.fnend
 	.size strcmp, . - strcmp
