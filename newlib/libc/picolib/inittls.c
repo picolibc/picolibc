@@ -44,13 +44,12 @@
  * These addresses must be defined by the loader configuration file
  */
 
-extern char __tdata_source[];	/* Source of TLS initialization data (in ROM) */
+extern char __tdata_start[];	/* Source of TLS initialization data (in ROM) */
+extern char __tdata_end[];      /* End of static tdata area */
 extern char __tdata_size[];	/* Size of TLS initized data */
 extern char __tbss_start[];     /* Start of static zero-initialized TLS data */
 extern char __tbss_end[];       /* End of static zero-initialized TLS data */
 extern char __tbss_size[];	/* Size of TLS zero-filled data */
-extern char __tdata_start[];    /* Start of static tdata area */
-extern char __tdata_end[];      /* End of static tdata area */
 
 #ifdef __PICOLIBC_CRT_RUNTIME_SIZE
 #define __tdata_size (__tdata_end - __tdata_start)
@@ -63,7 +62,7 @@ _init_tls(void *__tls)
 	char *tls = __tls;
 
 	/* Copy tls initialized data */
-	memcpy(tls, __tdata_source, (uintptr_t) __tdata_size);
+	memcpy(tls, __tdata_start, (uintptr_t) __tdata_size);
 
 	/* Clear tls zero data */
 	memset(tls + (uintptr_t) __tdata_size, '\0', (uintptr_t) __tbss_size);

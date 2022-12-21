@@ -51,6 +51,7 @@ PHDRS
 	text PT_LOAD;
 	ram PT_LOAD;
 	ram_init PT_LOAD;
+	tls_load PT_LOAD;
 	tls PT_TLS;
 }
 
@@ -133,6 +134,48 @@ SECTIONS
 	@CPP_END@
 
 	/*
+	 * Thread local initialized data. This is used as a template for TLS data
+	 * blocks allocated at runtime.
+	 */
+	.tdata : {
+		*(.tdata .tdata.* .gnu.linkonce.td.*)
+		PROVIDE( __tdata_end = . );
+	} >flash AT>flash :tls_load :tls
+	PROVIDE( __tdata_start = ADDR(.tdata) );
+	PROVIDE( __tdata_size = __tdata_end - __tdata_start );
+	PROVIDE( __tdata_align = ALIGNOF(.tdata) );
+
+	/*
+	 * Thread local zero-initialized data. Although we place this in flash, it
+	 * will not take up any space because . (dot) is not incremented by NOLOAD
+	 * TLS output sections. We need to place this right after the .tdata
+	 * section without any padding in order to compute the correct size of the
+	 * complete TLS segment in RAM with alignment included for the
+	 * initialization code to be able to set up the area in RAM at runtime.
+	 */
+	.tbss : {
+		*(.tbss .tbss.* .gnu.linkonce.tb.*)
+		*(.tcommon)
+	} >flash AT>flash :tls
+	PROVIDE( __tbss_align = ALIGNOF(.tbss) );
+	PROVIDE( __tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
+	/*
+	 * Align the size of .tdata when calculating the total TLS size to also
+	 * include the size of the padding between .tdata and .tbss
+	 */
+	PROVIDE( __tls_size = ALIGN(SIZEOF(.tdata), ALIGNOF(.tbss)) + SIZEOF(.tbss) );
+	/*
+	 * We use the difference between total TLS size and initialized TLS
+	 * variables to account for any alignment padding bytes required between
+	 * the end of .tdata and the beginning of .tbss. This means that we can
+	 * simply memset(x + __tdata_size, 0, __tbss_size) to initialize the tbss
+	 * area in _init_tls()
+	 */
+	PROVIDE( __tbss_size = __tls_size - __tdata_size );
+	PROVIDE( __arm32_tls_tcb_offset = MAX(8, __tls_align) );
+	PROVIDE( __arm64_tls_tcb_offset = MAX(16, __tls_align) );
+
+	/*
 	 * Data values which are preserved across reset
 	 */
 	.preserve (NOLOAD) : {
@@ -142,7 +185,7 @@ SECTIONS
 		PROVIDE(__preserve_end__ = .);
 	} >ram AT>ram :ram
 
-	.data : @LDSCRIPT_ALIGN_WITH_INPUT@ {
+	.data : {
 		*(.data .data.*)
 		*(.gnu.linkonce.d.*)
 
@@ -152,61 +195,37 @@ SECTIONS
 		PROVIDE( __global_pointer$ = . + 0x800 );
 		*(.sdata .sdata.* .sdata2.*)
 		*(.gnu.linkonce.s.*)
-	} >ram AT>flash :ram_init
-	PROVIDE(__data_start = ADDR(.data));
-	PROVIDE(__data_source = LOADADDR(.data));
-
-	/* Thread local initialized data. This gets
-	 * space allocated as it is expected to be placed
-	 * in ram to be used as a template for TLS data blocks
-	 * allocated at runtime. We're slightly abusing that
-	 * by placing the data in flash where it will be copied
-	 * into the allocate ram addresses by the existing
-	 * data initialization code in crt0
-	 */
-	.tdata : @LDSCRIPT_ALIGN_WITH_INPUT@ {
-		*(.tdata .tdata.* .gnu.linkonce.td.*)
 		PROVIDE(__data_end = .);
-		PROVIDE(__tdata_end = .);
-	} >ram AT>flash :tls :ram_init
-	PROVIDE( __tls_base = ADDR(.tdata));
-	PROVIDE( __tdata_start = ADDR(.tdata));
-	PROVIDE( __tdata_source = LOADADDR(.tdata) );
-	PROVIDE( __tdata_source_end = LOADADDR(.tdata) + SIZEOF(.tdata) );
-	PROVIDE( __data_source_end = __tdata_source_end );
-	PROVIDE( __tdata_size = SIZEOF(.tdata) );
-
+	} >ram AT>flash :ram_init
+	PROVIDE( __data_start = ADDR(.data) );
+	PROVIDE( __data_source = LOADADDR(.data) );
+	PROVIDE( __data_source_end = LOADADDR(.data) + SIZEOF(.data) );
 	PROVIDE( __edata = __data_end );
 	PROVIDE( _edata = __data_end );
 	PROVIDE( edata = __data_end );
 	PROVIDE( __data_size = __data_end - __data_start );
 	PROVIDE( __data_source_size = __data_source_end - __data_source );
 
-	.tbss (NOLOAD) : {
-		*(.tbss .tbss.* .gnu.linkonce.tb.*)
-		*(.tcommon)
-		PROVIDE( __tls_end = . );
-		PROVIDE( __tbss_end = . );
-	} >ram AT>ram :tls :ram
-	PROVIDE( __bss_start = ADDR(.tbss));
-	PROVIDE( __tbss_start = ADDR(.tbss));
-	PROVIDE( __tbss_size = SIZEOF(.tbss) );
-	PROVIDE( __tls_size = __tls_end - __tls_base );
-	PROVIDE( __tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
-	PROVIDE( __arm32_tls_tcb_offset = MAX(8, __tls_align) );
-	PROVIDE( __arm64_tls_tcb_offset = MAX(16, __tls_align) );
 
 	/*
 	 * The linker special cases .tbss segments which are
 	 * identified as segments which are not loaded and are
 	 * thread_local.
 	 *
-	 * For these segments, the linker does not advance 'dot'
-	 * across them.  We actually need memory allocated for tbss,
-	 * so we create a special segment here just to make room
+	 * For these segments, the linker does not advance 'dot' across them.  We
+	 * need to allocate a piece of RAM to hold TLS variables for the initial
+	 * thread so that we can point the TLS pointer register at something before
+	 * we run constructors and jump to main().
+	 *
+	 * A threading library or operating system will also need to do this for
+	 * any subsequent threads and ensure that the thread pointer register is
+	 * updated when thread switches occur.
 	 */
-	.tbss_space (NOLOAD) : {
-		. = . + SIZEOF(.tbss);
+	.tls_space (NOLOAD) : {
+		. = ALIGN(__tls_align);
+		PROVIDE( __tls_base = . );
+		. = . + __tls_size;
+		PROVIDE( __tls_end = . );
 	} >ram AT>ram :ram
 
 	.bss (NOLOAD) : {
@@ -220,6 +239,7 @@ SECTIONS
 		. = ALIGN(8);
 		__bss_end = .;
 	} >ram AT>ram :ram
+	PROVIDE( __bss_start = ADDR(.bss));
 	PROVIDE( __end = __bss_end );
 	PROVIDE( _end = __bss_end );
 	PROVIDE( end = __bss_end );
@@ -296,9 +316,3 @@ SECTIONS
 	.debug_sup      0 : { *(.debug_sup) }
 	.gnu.attributes 0 : { KEEP (*(.gnu.attributes)) }
 }
-/*
- * Check that sections that are copied from flash to RAM have matching
- * padding, so that a single memcpy() of __data_size copies the correct bytes.
- */
-ASSERT( __data_size == __data_source_size,
-	"ERROR: .data/.tdata flash size does not match RAM size");

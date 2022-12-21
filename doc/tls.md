@@ -61,12 +61,13 @@ the normal data/bss initialization process for the application.
 | bss | |
 |     | __bss_end 
 
-The crt0 code copies __data_end - __data_start bytes from _data_source
-to _data_start. This initializes the regular data segment *and* the
-initial TLS data segment. Then, it clears memory from __bss_start to
-__bss_end, initializing the TLS bss segment *and* the regular bss
-segment. Finally, it sets the architecture-specific TLS data pointer
-to __tls_base. Once that is set, access to TLS variables will
+The crt0 code copies __data_end - __data_start bytes from __data_source to
+__data_start. This initializes the regular data segment. Then, it clears memory
+from __bss_start to __bss_end, initializing the regular bss segment. Then
+__tdata_end - __tdata_start bytes are copied from __tdata_start to __tls_base,
+and memory is cleared from __tls_base + __tdata_size to __tls_end, this
+initializes TLS data variables. Finally, it sets the architecture-specific TLS
+data pointer to __tls_base. Once that is set, access to TLS variables will
 reference this initial TLS block.
 
 ## Creating more TLS blocks

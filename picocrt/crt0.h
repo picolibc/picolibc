@@ -45,9 +45,9 @@ extern char __data_size[];
 extern char __bss_start[];
 extern char __bss_end[];
 extern char __bss_size[];
+#ifdef PICOLIBC_TLS
 extern char __tls_base[];
-extern char __tdata_end[];
-extern char __tls_end[];
+#endif
 
 #ifdef __PICOLIBC_CRT_RUNTIME_SIZE
 #define __data_size (__data_end - __data_start)
@@ -69,13 +69,13 @@ main(int, char **);
 extern void __libc_init_array(void);
 #endif
 
-/* After the architecture-specific chip initialization is done, this
- * function initializes the data and bss segments. Note that a static
- * block of TLS data is carefully interleaved with the regular data
- * and bss segments in picolibc.ld so that this one operation
- * initializes both. Then it runs the application code, starting with
- * any initialization functions, followed by the main application
- * entry point and finally any cleanup functions
+/*
+ * After the architecture-specific chip initialization is done, this function
+ * initializes the data and bss segments. If the system uses thread local
+ * storage, the TLS area is initialized and the thread pointer register is set
+ * up to point to this area. Then it runs the application code, starting with
+ * any initialization functions, followed by the main application entry point
+ * and finally any cleanup functions.
  */
 
 #include <picotls.h>
@@ -94,6 +94,9 @@ __start(void)
 	memcpy(__data_start, __data_source, (uintptr_t) __data_size);
 	memset(__bss_start, '\0', (uintptr_t) __bss_size);
 #ifdef PICOLIBC_TLS
+	/* Initialize thread local variables for the initial thread */
+	_init_tls(__tls_base);
+	/* Set the TLS pointer for the initial thread */
 	_set_tls(__tls_base);
 #endif
 #if defined(_HAVE_INITFINI_ARRAY) && CONSTRUCTORS
