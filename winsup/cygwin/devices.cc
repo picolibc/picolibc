@@ -9,6 +9,8 @@
 #include "path.h"
 #include "fhandler.h"
 #include "ntdll.h"
+#include "dtable.h"
+#include "cygheap.h"
 
 typedef const _device *KR_device_t;
 
@@ -76,7 +78,8 @@ exists_console (const device& dev)
     case FH_CONSOLE:
     case FH_CONIN:
     case FH_CONOUT:
-      return fhandler_console::exists ();
+      return cygheap && cygheap->ctty && cygheap->ctty->is_console ()
+	&& fhandler_console::exists ();
     default:
       /* Only show my own console device (for now?) */
       return iscons_dev (myself->ctty) && myself->ctty == devn;
