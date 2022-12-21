@@ -88,7 +88,12 @@ _start32:
 	addl	$12, %esp
 
 #ifdef PICOLIBC_TLS
-	// call to _set_tls(__tls_base)
+	/* Initialize thread local variables for the initial thread */
+	pushl	$__tls_base
+	call	_init_tls
+	addl	$4, %esp
+
+	/* Set the TLS pointer for the initial thread */
 	pushl	$__tls_base
 	call	_set_tls
 	addl	$4, %esp

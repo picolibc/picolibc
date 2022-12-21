@@ -55,8 +55,8 @@ volatile int *volatile overaligned_bss_addr;
 
 #ifdef PICOLIBC_TLS
 extern char __tdata_start, __tdata_end;
-extern char __tdata_source, __tdata_source_end;
 extern char __data_start, __data_source;
+extern char __tls_base;
 
 static bool
 inside_tls_region(void *ptr, const void *tls)
@@ -207,42 +207,26 @@ main(void)
 	overaligned_bss_addr = &overaligned_bss_var;
 
 #ifdef PICOLIBC_TLS
-        printf("TLS region: %p-%p (%zd bytes)\n", &__tdata_start,
-	       &__tdata_start + _tls_size(), _tls_size());
-	size_t tdata_source_size = &__tdata_source_end - &__tdata_source;
 	size_t tdata_size = &__tdata_end - &__tdata_start;
+	printf("TLS template region: %p-%p (%zd bytes)\n", &__tdata_start,
+	       &__tdata_start + tdata_size, tdata_size);
 
-	if (&__tdata_start - &__data_start != &__tdata_source - &__data_source) {
-		printf("ROM/RAM .tdata offset from .data mismatch. "
-		       "VMA offset=%zd, LMA offset =%zd."
-		       "Linker behaviour changed?\n",
-		       &__tdata_start - &__data_start,
-		       &__tdata_source - &__data_source);
-	}
-
-	if (tdata_source_size != tdata_size ||
-	    memcmp(&__tdata_source, &__tdata_start, tdata_size) != 0) {
-		printf("TLS data in RAM does not match ROM\n");
-		hexdump(&__tdata_source, tdata_source_size, "ROM:");
-		hexdump(&__tdata_start, tdata_size, "RAM:");
-		result++;
-	}
-        result += check_tls("pre-defined", false, &__tdata_start);
+	result += check_tls("pre-defined", false, &__tls_base);
 #else
-        result += check_tls("pre-defined", false, NULL);
+	result += check_tls("pre-defined", false, NULL);
 #endif
 
 
 #ifdef _HAVE_PICOLIBC_TLS_API
 
-	void *tls = aligned_alloc(128, _tls_size());
+	void *tls = aligned_alloc(_tls_align(), _tls_size());
 
 	_init_tls(tls);
 	_set_tls(tls);
 
-	if (memcmp(tls, &__tdata_source, tdata_size) != 0) {
+	if (memcmp(tls, &__tdata_start, tdata_size) != 0) {
 		printf("New TLS data in RAM does not match ROM\n");
-		hexdump(&__tdata_source, tdata_source_size, "ROM:");
+		hexdump(&__tdata_start, tdata_size, "ROM:");
 		hexdump(tls, tdata_size, "RAM:");
 		result++;
 	}

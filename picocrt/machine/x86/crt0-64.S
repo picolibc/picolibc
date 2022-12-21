@@ -92,7 +92,11 @@ _start64:
 	call	memset
 
 #ifdef PICOLIBC_TLS
-	// call to _set_tls(__tls_base)
+	/* Initialize thread local variables for the initial thread */
+	mov	$__tls_base, %rdi
+	call	_init_tls
+
+	/* Set the TLS pointer for the initial thread */
 	mov	$__tls_base, %rdi
 	call	_set_tls
 #endif
