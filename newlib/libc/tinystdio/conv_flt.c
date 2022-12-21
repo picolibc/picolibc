@@ -422,8 +422,13 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
             uint = UF_OR_64(uint, overflow);
 
             /* Round even */
-            if (UF_AND_64(uint, 3) == 3 || UF_AND_64(uint, 6) == 6)
+            if (UF_AND_64(uint, 3) == 3 || UF_AND_64(uint, 6) == 6) {
                 uint = UF_PLUS_DIGIT(uint, 4);
+                if (UF_GE(uint, UF_LSHIFT_64(1, FLOAT_MANT_DIG + 2))) {
+                    uint = UF_RSHIFT(uint, 1);
+                    exp++;
+                }
+            }
 
             /* remove guard bits */
             uint = UF_RSHIFT(uint, 2);
@@ -440,7 +445,7 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
                 }
             }
 
-            if (exp > FLOAT_MAX_EXP) {
+            if (exp >= FLOAT_MAX_EXP) {
                 flt = (FLOAT) INFINITY;
             } else {
 #if !defined(UINTFLOAT_128) || __LDBL_IS_IEC_60559__ != 0
