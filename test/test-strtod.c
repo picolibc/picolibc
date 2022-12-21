@@ -35,6 +35,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 #if defined (TINY_STDIO) || !defined(__PICOLIBC__)
 #define FULL_TESTS
@@ -66,6 +67,32 @@ struct {
     { "0x10000000000000801p0@", 0x1.0000000000001p64, 0x1p64f, 0x1.0000000000000801p64l },
     { "0x10000000000000800.0000000000001p0@", 0x1.0000000000001p64, 0x1p64f, 0x1.00000000000008p64l },
     { "0x10000000000001800p0@", 0x1.0000000000002p64, 0x1p64f, 0x1.00000000000018p64l },
+    /* Check max values for floats */
+    { "0x1.fffffep126@", 0x1.fffffep126,  0x1.fffffep126f, 0x1.fffffep126l },
+    { "0x1.ffffffp126@", 0x1.ffffffp126,  0x1.000000p127f, 0x1.ffffffp126l },
+    { "0x1.fffffep127@", 0x1.fffffep127,  0x1.fffffep127f, 0x1.fffffep127l },
+    { "0x1.ffffffp127@", 0x1.ffffffp127, (float) INFINITY, 0x1.ffffffp127l },   /* rounds up to INFINITY for float */
+    /* Check max values for doubles */
+    { "0x1.fffffffffffffp1022@",  0x1.fffffffffffffp1022, (float) INFINITY, 0x1.fffffffffffffp1022l },
+    { "0x1.fffffffffffff8p1022@", 0x1.0000000000000p1023, (float) INFINITY, 0x1.fffffffffffff8p1022l }, /* rounds up for double */
+    { "0x1.fffffffffffffp1023@",  0x1.fffffffffffffp1023, (float) INFINITY, 0x1.fffffffffffffp1023l },
+#if __LDBL_MANT_DIG__ > __DBL_MANT_DIG__
+    { "0x1.fffffffffffff8p1023@",      (double) INFINITY, (float) INFINITY, 0x1.fffffffffffff8p1023l }, /* rounds up to INFINITY for double */
+#else
+    { "0x1.fffffffffffff8p1023@",      (double) INFINITY, (float) INFINITY, (long double) INFINITY }, /* rounds up to INFINITY for double */
+#endif
+    /* Check max values for long doubles */
+#if __LDBL_MANT_DIG__ == 113
+    { "0x1.ffffffffffffffffffffffffffffp16382@",  (double) INFINITY, (float) INFINITY, 0x1.ffffffffffffffffffffffffffffp16382l },
+    { "0x1.ffffffffffffffffffffffffffff8p16382@", (double) INFINITY, (float) INFINITY, 0x1.0000000000000000000000000000p16383l }, /* rounds up for long double */
+    { "0x1.ffffffffffffffffffffffffffffp16383@",  (double) INFINITY, (float) INFINITY, 0x1.ffffffffffffffffffffffffffffp16383l },
+    { "0x1.ffffffffffffffffffffffffffff8p16383@", (double) INFINITY, (float) INFINITY, (long double) INFINITY },                  /* rounds up to INFINITY for long oduble */
+#elif __LDBL_MANT_DIG__ == 64
+    { "0x1.fffffffffffffffep16382@", (double) INFINITY, (float) INFINITY, 0x1.fffffffffffffffep16382l },
+    { "0x1.ffffffffffffffffp16382@", (double) INFINITY, (float) INFINITY, 0x1.0000000000000000p16383l },        /* rounds up for long double */
+    { "0x1.fffffffffffffffep16383@", (double) INFINITY, (float) INFINITY, 0x1.fffffffffffffffep16383l },
+    { "0x1.ffffffffffffffffp16383@", (double) INFINITY, (float) INFINITY, (long double) INFINITY },             /* rounds up to INFINITY for long double */
+#endif
 #endif
 };
 
@@ -108,13 +135,8 @@ int main(void)
         if (sizeof(long double) > sizeof(double)) {
             ld = strtold(tests[i].string, &end);
             if (ld != tests[i].ldvalue) {
-#ifdef __PICOLIBC__
-                printf("strtold(\"%s\"): got %.17e %a want %.17e %a\n", tests[i].string,
-                       (double) ld, (double) ld, (double) tests[i].ldvalue, (double) tests[i].ldvalue);
-#else
                 printf("strtold(\"%s\"): got %.17Le %La want %.17Le %La\n", tests[i].string,
                        ld, ld, tests[i].ldvalue, tests[i].ldvalue);
-#endif
                 ret = 1;
             }
             if (*end != '@') {
