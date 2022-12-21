@@ -46,7 +46,7 @@
 NEWLIB_THREAD_LOCAL volatile int data_var = DATA_VAL;
 _Alignas(128) NEWLIB_THREAD_LOCAL volatile int overaligned_data_var = DATA_VAL2;
 NEWLIB_THREAD_LOCAL volatile int bss_var;
-_Alignas(128) NEWLIB_THREAD_LOCAL volatile int overaligned_bss_var;
+_Alignas(256) NEWLIB_THREAD_LOCAL volatile int overaligned_bss_var;
 
 volatile int *volatile data_addr;
 volatile int *volatile bss_addr;
@@ -89,7 +89,7 @@ check_tls(char *where, bool check_addr, void *tls_region)
 		       &overaligned_data_var);
 		result++;
 	}
-	if (!__is_aligned((uintptr_t)&overaligned_bss_var, 128)) {
+	if (!__is_aligned((uintptr_t)&overaligned_bss_var, 256)) {
 		printf("overaligned_bss_var (%p) is not aligned\n",
 		       &overaligned_bss_var);
 		result++;
