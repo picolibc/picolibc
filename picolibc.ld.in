@@ -223,6 +223,7 @@ SECTIONS
 		. = ALIGN(8);
 		__bss_end = .;
 	} >ram AT>ram :ram
+	PROVIDE( __non_tls_bss_start = ADDR(.bss) );
 	PROVIDE( __end = __bss_end );
 	PROVIDE( _end = __bss_end );
 	PROVIDE( end = __bss_end );
