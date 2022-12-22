@@ -1475,6 +1475,10 @@ format_proc_cpuinfo (void *, char *&destbuf)
 
 	  ftcprint (features1,  4, "avx_vnni");	    /* vex enc NN vec */
 	  ftcprint (features1,  5, "avx512_bf16");  /* vec bfloat16 short */
+/*	  ftcprint (features1,  7, "cmpccxadd"); */ /* CMPccXADD instructions */
+/*	  ftcprint (features1, 21, "amx_fp16");	 */ /* AMX fp16 Support */
+/*	  ftcprint (features1, 23, "avx_ifma");	 */ /* Support for VPMADD52[H,L]UQ */
+	  ftcprint (features1, 26, "lam");	    /* Linear Address Masking */
 	}
 
       /* AMD cpuid 0x80000008 ebx */
