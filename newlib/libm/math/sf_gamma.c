@@ -23,12 +23,4 @@ gammaf(float x)
     return lgammaf(x);
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double
-gamma(double x)
-{
-    return (double)lgammaf((float)x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_f(gamma)

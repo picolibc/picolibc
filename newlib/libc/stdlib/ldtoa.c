@@ -1774,10 +1774,9 @@ e113toe (short unsigned int *pe, short unsigned int *y, LDPARMS * ldp)
   register unsigned short r;
   unsigned short *e, *p;
   unsigned short yy[NI];
-  int denorm, i;
+  int i;
 
   e = pe;
-  denorm = 0;
   ecleaz (yy);
 #ifdef IBMPC
   e += 7;

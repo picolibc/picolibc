@@ -44,3 +44,5 @@ atanhf(float x)
     else
         return -t;
 }
+
+_MATH_ALIAS_f_f(atanh)

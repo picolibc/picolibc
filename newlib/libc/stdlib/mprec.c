@@ -719,7 +719,10 @@ ulp (double _x)
 double
 b2d (_Bigint * a, int *e)
 {
-  __ULong *xa, *xa0, w, y, z;
+  __ULong *xa, *xa0, y, z;
+#if !defined(Pack_32) || !defined(_DOUBLE_IS_32BITS)
+  __ULong w;
+#endif
   int k;
   union double_union d;
 #ifdef VAX
@@ -742,8 +745,8 @@ b2d (_Bigint * a, int *e)
   if (k < Ebits)
     {
       d0 = Exp_1 | y >> (Ebits - k);
-      w = xa > xa0 ? *--xa : 0;
 #ifndef _DOUBLE_IS_32BITS
+      w = xa > xa0 ? *--xa : 0;
       d1 = y << ((32 - Ebits) + k) | w >> (Ebits - k);
 #endif
       goto ret_d;
@@ -802,7 +805,10 @@ d2b (
   union double_union d;
   _Bigint *b;
   int de, i, k;
-  __ULong *x, y, z;
+  __ULong *x, z;
+#if !defined(Pack_32) || !defined(_DOUBLE_IS_32BITS)
+  __ULong y;
+#endif
 #ifdef VAX
   __ULong d0, d1;
 #endif

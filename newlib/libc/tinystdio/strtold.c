@@ -41,6 +41,8 @@
 #include <stdbool.h>
 #include "stdio_private.h"
 
+#if defined(_HAVE_LONG_DOUBLE) && !defined(_LDBL_EQ_DBL)
+
 /**  The strtold() function converts the initial portion of the string pointed
      to by \a nptr to long double representation.
 
@@ -67,10 +69,6 @@
      returned and \c ERANGE is stored in \c errno.
  */
 
-#ifdef __SIZEOF_INT128__
-#else
-#endif
-
 #define STRTOLD
 #include "conv_flt.c"
 
@@ -93,3 +91,5 @@ strtold (const char * nptr, char ** endptr)
         *endptr = (char *) nptr + len;
     return flt;
 }
+
+#endif

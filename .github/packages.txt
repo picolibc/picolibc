@@ -20,5 +20,6 @@ gcc-sparc64-linux-gnu
 qemu-system-x86
 qemu-system-arm
 qemu-system-misc
+qemu-system-ppc64
 clang
 lld

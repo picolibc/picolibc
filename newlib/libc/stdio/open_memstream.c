@@ -93,11 +93,11 @@ typedef struct memstream {
 
 /* Write up to non-zero N bytes of BUF into the stream described by COOKIE,
    returning the number of bytes written or EOF on failure.  */
-static _READ_WRITE_RETURN_TYPE
+static ssize_t
 memwriter (
        void *cookie,
        const char *buf,
-       _READ_WRITE_BUFSIZE_TYPE n)
+       size_t n)
 {
   memstream *c = (memstream *) cookie;
   char *cbuf = *c->pbuf;

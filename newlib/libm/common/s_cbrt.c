@@ -38,39 +38,27 @@ PORTABILITY
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
 /* cbrt(x)
  * Return cube root of x
  */
-#ifdef __STDC__
 static const __uint32_t 
-#else
-static __uint32_t 
-#endif
-	B1 = 715094163, /* B1 = (682-0.03306235651)*2**20 */
-	B2 = 696219795; /* B2 = (664-0.03306235651)*2**20 */
+    B1 = 715094163, /* B1 = (682-0.03306235651)*2**20 */
+    B2 = 696219795; /* B2 = (664-0.03306235651)*2**20 */
 
-#ifdef __STDC__
-static const double
-#else
-static double
-#endif
-C =  5.42857142857142815906e-01, /* 19/35     = 0x3FE15F15, 0xF15F15F1 */
-D = -7.05306122448979611050e-01, /* -864/1225 = 0xBFE691DE, 0x2532C834 */
-E =  1.41428571428571436819e+00, /* 99/70     = 0x3FF6A0EA, 0x0EA0EA0F */
-F =  1.60714285714285720630e+00, /* 45/28     = 0x3FF9B6DB, 0x6DB6DB6E */
-G =  3.57142857142857150787e-01; /* 5/14      = 0x3FD6DB6D, 0xB6DB6DB7 */
+static const __float64
+    C =  _F_64(5.42857142857142815906e-01), /* 19/35     = 0x3FE15F15, 0xF15F15F1 */
+    D = _F_64(-7.05306122448979611050e-01), /* -864/1225 = 0xBFE691DE, 0x2532C834 */
+    E =  _F_64(1.41428571428571436819e+00), /* 99/70     = 0x3FF6A0EA, 0x0EA0EA0F */
+    F =  _F_64(1.60714285714285720630e+00), /* 45/28     = 0x3FF9B6DB, 0x6DB6DB6E */
+    G =  _F_64(3.57142857142857150787e-01); /* 5/14      = 0x3FD6DB6D, 0xB6DB6DB7 */
 
-#ifdef __STDC__
-	double cbrt(double x) 
-#else
-	double cbrt(x) 
-	double x;
-#endif
+__float64
+cbrt64(__float64 x) 
 {
 	__int32_t	hx;
-	double r,s,t=0.0,w;
+	__float64 r,s,t=_F_64(0.0),w;
 	__uint32_t sign;
 	__uint32_t high,low;
 
@@ -115,4 +103,6 @@ G =  3.57142857142857150787e-01; /* 5/14      = 0x3FD6DB6D, 0xB6DB6DB7 */
 	return(t);
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_d_d(cbrt)
+
+#endif /* _NEED_FLOAT64 */

@@ -20,11 +20,7 @@
 #define const
 #endif
 
-#ifdef __STDC__
 static const float
-#else
-static float
-#endif
 one		= 1.0,
 huge		= 1.0e+30,
 tiny		= 1.0e-30,
@@ -38,12 +34,7 @@ Q3  =  -7.9365076090e-05, /* 0xb8a670cd */
 Q4  =   4.0082177293e-06, /* 0x36867e54 */
 Q5  =  -2.0109921195e-07; /* 0xb457edbb */
 
-#ifdef __STDC__
-	float expm1f(float x)
-#else
-	float expm1f(x)
-	float x;
-#endif
+float expm1f(float x)
 {
 	float y,hi,lo,c,t,e,hxs,hfx,r1;
 	__int32_t k,xsb;
@@ -59,11 +50,11 @@ Q5  =  -2.0109921195e-07; /* 0xb457edbb */
 	    if(FLT_UWORD_IS_NAN(hx))
 	        return x+x;
 	    if(FLT_UWORD_IS_INFINITE(hx))
-		return (xsb==0)? x:-1.0;/* exp(+-inf)={inf,-1} */
+		return (xsb==0)? x:-1.0f;/* exp(+-inf)={inf,-1} */
 	    if(xsb == 0 && hx > FLT_UWORD_LOG_MAX) /* if x>=o_threshold */
 		return __math_oflowf (0); /* overflow */
 	    if(xsb!=0) { /* x < -27*ln2, return -1.0 with inexact */
-		if(x+tiny<(float)0.0)	/* raise inexact */
+		if(x+tiny<0.0f)	/* raise inexact */
 		return tiny-one;	/* return -1 */
 	    }
 	}
@@ -76,7 +67,7 @@ Q5  =  -2.0109921195e-07; /* 0xb457edbb */
 		else
 		    {hi = x + ln2_hi; lo = -ln2_lo;  k = -1;}
 	    } else {
-		k  = invln2*x+((xsb==0)?(float)0.5:(float)-0.5);
+		k  = invln2*x+((xsb==0)?0.5f:-0.5f);
 		t  = k;
 		hi = x - t*ln2_hi;	/* t*ln2_hi is exact here */
 		lo = t*ln2_lo;
@@ -91,19 +82,19 @@ Q5  =  -2.0109921195e-07; /* 0xb457edbb */
 	else k = 0;
 
     /* x is now in primary range */
-	hfx = (float)0.5*x;
+	hfx = 0.5f*x;
 	hxs = x*hfx;
 	r1 = one+hxs*(Q1+hxs*(Q2+hxs*(Q3+hxs*(Q4+hxs*Q5))));
-	t  = (float)3.0-r1*hfx;
-	e  = hxs*((r1-t)/((float)6.0 - x*t));
+	t  = 3.0f-r1*hfx;
+	e  = hxs*((r1-t)/(6.0f - x*t));
 	if(k==0) return x - (x*e-hxs);		/* c is 0 */
 	else {
 	    e  = (x*(e-c)-c);
 	    e -= hxs;
-	    if(k== -1) return (float)0.5*(x-e)-(float)0.5;
+	    if(k== -1) return 0.5f*(x-e)-0.5f;
            if(k==1) {
-	       	if(x < (float)-0.25) return -(float)2.0*(e-(x+(float)0.5));
-	       	else 	      return  one+(float)2.0*(x-e);
+	       	if(x < -0.25f) return -2.0f*(e-(x+0.5f));
+	       	else 	      return  one+2.0f*(x-e);
            }
 	    if (k <= -2 || k>56) {   /* suffice to return exp(x)-1 */
 	        __int32_t i;
@@ -131,16 +122,4 @@ Q5  =  -2.0109921195e-07; /* 0xb457edbb */
 	return y;
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-#ifdef __STDC__
-	double expm1(double x)
-#else
-	double expm1(x)
-	double x;
-#endif
-{
-	return (double) expm1f((float) x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_f(expm1)

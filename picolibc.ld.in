@@ -42,8 +42,8 @@ ENTRY(_start)
 
 MEMORY
 {
-	flash (rxai!w) : ORIGIN = DEFINED(__flash) ? __flash : 0x10000000, LENGTH = DEFINED(__flash_size) ? __flash_size : 0x10000
-	ram (wxa!ri)   : ORIGIN = DEFINED(__ram  ) ? __ram   : 0x20000000, LENGTH = DEFINED(__ram_size  ) ? __ram_size   : 0x08000
+	flash (rx!w) : ORIGIN = DEFINED(__flash) ? __flash : 0x10000000, LENGTH = DEFINED(__flash_size) ? __flash_size : 0x10000
+	ram (w!rx)   : ORIGIN = DEFINED(__ram  ) ? __ram   : 0x20000000, LENGTH = DEFINED(__ram_size  ) ? __ram_size   : 0x08000
 }
 
 PHDRS
@@ -66,19 +66,19 @@ SECTIONS
 
 	.text : {
 
-                /* code */
+		/* code */
 		*(.text.unlikely .text.unlikely.*)
 		*(.text.startup .text.startup.*)
-		*(.text .text.*)
+		*(.text .text.* .opd .opd.*)
 		*(.gnu.linkonce.t.*)
 		KEEP (*(.fini .fini.*))
 		__text_end = .;
 
-	        PROVIDE (__etext = __text_end);
-	        PROVIDE (_etext = __text_end);
-	        PROVIDE (etext = __text_end);
+		PROVIDE (__etext = __text_end);
+		PROVIDE (_etext = __text_end);
+		PROVIDE (etext = __text_end);
 
-                /* read-only data */
+		/* read-only data */
 		*(.rdata)
 		*(.rodata .rodata.*)
 		*(.gnu.linkonce.r.*)
@@ -91,10 +91,10 @@ SECTIONS
 		*(.data.rel.ro .data.rel.ro.*)
 		*(.got .got.*)
 
-                /* Need to pre-align so that the symbols come after padding */
+		/* Need to pre-align so that the symbols come after padding */
 		. = ALIGN(8);
 
-                /* lists of constructors and destructors */
+		/* lists of constructors and destructors */
 		PROVIDE_HIDDEN ( __preinit_array_start = . );
 		KEEP (*(.preinit_array))
 		PROVIDE_HIDDEN ( __preinit_array_end = . );
@@ -108,23 +108,28 @@ SECTIONS
 		KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
 		KEEP (*(.fini_array .dtors))
 		PROVIDE_HIDDEN ( __fini_array_end = . );
+
 	} >flash AT>flash :text
 
-        /* additional sections when compiling with C++ exception support */
+	.toc : {
+		*(.toc .toc.*)
+	} >flash AT>flash :text
+
+	/* additional sections when compiling with C++ exception support */
 	@CPP_START@
-        .except_ordered : {
+	.except_ordered : {
 		*(.gcc_except_table *.gcc_except_table.*)
 		KEEP (*(.eh_frame .eh_frame.*))
 		*(.ARM.extab* .gnu.linkonce.armextab.*)
 	} >flash AT>flash :text
 
 	.except_unordered : {
-                . = ALIGN(8);
+		. = ALIGN(8);
 
-        	PROVIDE(__exidx_start = .);
+		PROVIDE(__exidx_start = .);
 		*(.ARM.exidx*)
-        	PROVIDE(__exidx_end = .);
-        } >flash AT>flash :text
+		PROVIDE(__exidx_end = .);
+	} >flash AT>flash :text
 	@CPP_END@
 
 	/*
@@ -137,12 +142,12 @@ SECTIONS
 		PROVIDE(__preserve_end__ = .);
 	} >ram AT>ram :ram
 
-	.data : ALIGN_WITH_INPUT {
+	.data : @LDSCRIPT_ALIGN_WITH_INPUT@ {
 		*(.data .data.*)
 		*(.gnu.linkonce.d.*)
 
-                /* Need to pre-align so that the symbols come after padding */
- 		. = ALIGN(8);
+		/* Need to pre-align so that the symbols come after padding */
+		. = ALIGN(8);
 
 		PROVIDE( __global_pointer$ = . + 0x800 );
 		*(.sdata .sdata.* .sdata2.*)
@@ -159,7 +164,7 @@ SECTIONS
 	 * into the allocate ram addresses by the existing
 	 * data initialization code in crt0
 	 */
-	.tdata : ALIGN_WITH_INPUT {
+	.tdata : @LDSCRIPT_ALIGN_WITH_INPUT@ {
 		*(.tdata .tdata.* .gnu.linkonce.td.*)
 		PROVIDE(__data_end = .);
 		PROVIDE(__tdata_end = .);
@@ -168,12 +173,15 @@ SECTIONS
 	PROVIDE( __tdata_start = ADDR(.tdata));
 	PROVIDE( __tdata_source = LOADADDR(.tdata) );
 	PROVIDE( __tdata_source_end = LOADADDR(.tdata) + SIZEOF(.tdata) );
+	PROVIDE( __data_source_end = __tdata_source_end );
 	PROVIDE( __tdata_size = SIZEOF(.tdata) );
+	PROVIDE( __tls_align = MAX(ALIGNOF(.tdata),ALIGNOF(.tbss)) );
 
 	PROVIDE( __edata = __data_end );
 	PROVIDE( _edata = __data_end );
 	PROVIDE( edata = __data_end );
 	PROVIDE( __data_size = __data_end - __data_start );
+	PROVIDE( __data_source_size = __data_source_end - __data_source );
 
 	.tbss (NOLOAD) : {
 		*(.tbss .tbss.* .gnu.linkonce.tb.*)
@@ -183,8 +191,12 @@ SECTIONS
 	} >ram AT>ram :tls :ram
 	PROVIDE( __bss_start = ADDR(.tbss));
 	PROVIDE( __tbss_start = ADDR(.tbss));
+	PROVIDE( __tbss_offset = ADDR(.tbss) - ADDR(.tdata) );
 	PROVIDE( __tbss_size = SIZEOF(.tbss) );
 	PROVIDE( __tls_size = __tls_end - __tls_base );
+	PROVIDE( __tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
+	PROVIDE( __arm32_tls_tcb_offset = MAX(8, __tls_align) );
+	PROVIDE( __arm64_tls_tcb_offset = MAX(16, __tls_align) );
 
 	/*
 	 * The linker special cases .tbss segments which are
@@ -196,6 +208,7 @@ SECTIONS
 	 * so we create a special segment here just to make room
 	 */
 	.tbss_space (NOLOAD) : {
+		. = ADDR(.tbss);
 		. = . + SIZEOF(.tbss);
 	} >ram AT>ram :ram
 
@@ -206,10 +219,11 @@ SECTIONS
 		*(.gnu.linkonce.b.*)
 		*(COMMON)
 
-                /* Align the heap */
+		/* Align the heap */
 		. = ALIGN(8);
 		__bss_end = .;
 	} >ram AT>ram :ram
+	PROVIDE( __non_tls_bss_start = ADDR(.bss) );
 	PROVIDE( __end = __bss_end );
 	PROVIDE( _end = __bss_end );
 	PROVIDE( end = __bss_end );
@@ -237,4 +251,58 @@ SECTIONS
 	}
 
 	@C_END@
+
+	/* Stabs debugging sections.  */
+	.stab          0 : { *(.stab) }
+	.stabstr       0 : { *(.stabstr) }
+	.stab.excl     0 : { *(.stab.excl) }
+	.stab.exclstr  0 : { *(.stab.exclstr) }
+	.stab.index    0 : { *(.stab.index) }
+	.stab.indexstr 0 : { *(.stab.indexstr) }
+	.comment       0 : { *(.comment) }
+	.gnu.build.attributes : { *(.gnu.build.attributes .gnu.build.attributes.*) }
+	/* DWARF debug sections.
+	   Symbols in the DWARF debugging sections are relative to the beginning
+	   of the section so we begin them at 0.  */
+	/* DWARF 1.  */
+	.debug          0 : { *(.debug) }
+	.line           0 : { *(.line) }
+	/* GNU DWARF 1 extensions.  */
+	.debug_srcinfo  0 : { *(.debug_srcinfo) }
+	.debug_sfnames  0 : { *(.debug_sfnames) }
+	/* DWARF 1.1 and DWARF 2.  */
+	.debug_aranges  0 : { *(.debug_aranges) }
+	.debug_pubnames 0 : { *(.debug_pubnames) }
+	/* DWARF 2.  */
+	.debug_info     0 : { *(.debug_info .gnu.linkonce.wi.*) }
+	.debug_abbrev   0 : { *(.debug_abbrev) }
+	.debug_line     0 : { *(.debug_line .debug_line.* .debug_line_end) }
+	.debug_frame    0 : { *(.debug_frame) }
+	.debug_str      0 : { *(.debug_str) }
+	.debug_loc      0 : { *(.debug_loc) }
+	.debug_macinfo  0 : { *(.debug_macinfo) }
+	/* SGI/MIPS DWARF 2 extensions.  */
+	.debug_weaknames 0 : { *(.debug_weaknames) }
+	.debug_funcnames 0 : { *(.debug_funcnames) }
+	.debug_typenames 0 : { *(.debug_typenames) }
+	.debug_varnames  0 : { *(.debug_varnames) }
+	/* DWARF 3.  */
+	.debug_pubtypes 0 : { *(.debug_pubtypes) }
+	.debug_ranges   0 : { *(.debug_ranges) }
+	/* DWARF 5.  */
+	.debug_addr     0 : { *(.debug_addr) }
+	.debug_line_str 0 : { *(.debug_line_str) }
+	.debug_loclists 0 : { *(.debug_loclists) }
+	.debug_macro    0 : { *(.debug_macro) }
+	.debug_names    0 : { *(.debug_names) }
+	.debug_rnglists 0 : { *(.debug_rnglists) }
+	.debug_str_offsets 0 : { *(.debug_str_offsets) }
+	.debug_sup      0 : { *(.debug_sup) }
+	.gnu.attributes 0 : { KEEP (*(.gnu.attributes)) }
 }
+/*
+ * Check that sections that are copied from flash to RAM have matching
+ * padding, so that a single memcpy() of __data_size copies the correct bytes.
+ */
+ASSERT( __data_size == __data_source_size,
+	"ERROR: .data/.tdata flash size does not match RAM size");

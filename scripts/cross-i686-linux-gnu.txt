@@ -8,6 +8,7 @@ ar = 'i686-linux-gnu-ar'
 as = 'i686-linux-gnu-as'
 nm = 'i686-linux-gnu-nm'
 strip = 'i686-linux-gnu-strip'
+objcopy = 'i686-linux-gnu-objcopy'
 # only needed to run tests
 exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-i386 "$@"', 'run-i386']
 

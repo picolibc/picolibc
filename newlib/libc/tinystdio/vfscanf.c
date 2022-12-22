@@ -129,21 +129,26 @@ conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags, un
             base = 16;
 	    if (!--width || (i = scanf_getc(stream, lenp)) < 0)
 		goto putval;
+#ifdef _WANT_IO_PERCENT_B
+        } else if (i == 'b' && base <= 2) {
+            base = 2;
+	    if (!--width || (i = scanf_getc(stream, lenp)) < 0)
+		goto putval;
+#endif
 	} else if (base == 0 || base == 8) {
             base = 8;
         }
     } else if (base == 0)
         base = 10;
 
-/* This fact is used below to parse hexidecimal digit.	*/
-#if	('A' - '0') != (('a' - '0') & ~('A' ^ 'a'))
-# error
-#endif
     do {
 	unsigned char c = i;
+
+        /* Map digits to 0..35, non-digits above 35. */
+        if (c > '9')
+            c = TOLOW(c-1) + ('0' - 'a' + 11);
 	c -= '0';
-        if (TOLOW(c) >= 'a' - '0')
-            c = TOLOW(c) + ('0' - 'a') + 10;
+
         if (c >= base) {
             scanf_ungetc (i, stream, lenp);
             break;
@@ -510,6 +515,12 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap_orig)
                 }
 #endif
 		break;
+#ifdef SCANF_LONGLONG
+              case 'L':
+                flags |= FL_LONGLONG;
+                c = *fmt++;
+                break;
+#endif
 #ifdef _WANT_IO_C99_FORMATS
 #ifdef SCANF_LONGLONG
 #define CHECK_LONGLONG(type)                                    \
@@ -537,7 +548,12 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap_orig)
 #endif
 	    }
 
+#ifdef _WANT_IO_PERCENT_B
+#define CNV_BASE	"cdinopsuxXb"
+#else
 #define CNV_BASE	"cdinopsuxX"
+#endif
+
 #if	SCANF_BRACKET
 # define CNV_BRACKET	"["
 #else
@@ -614,6 +630,12 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap_orig)
                     base = 16;
 		    goto conv_int;
 
+#ifdef _WANT_IO_PERCENT_B
+                  case 'b':
+                    base = 2;
+                    goto conv_int;
+#endif
+
 	          case 'd':
 		  case 'u':
                     base = 10;
@@ -634,6 +656,12 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap_orig)
 		  case 'u':
                     base = 10;
 		    goto conv_int;
+
+#ifdef _WANT_IO_PERCENT_B
+                  case 'b':
+                    base = 2;
+                    goto conv_int;
+#endif
 
 	          case 'o':
                     base = 8;

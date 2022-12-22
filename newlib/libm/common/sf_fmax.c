@@ -20,11 +20,4 @@ float fmaxf(float x, float y)
     return x > y ? x : y;
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double fmax(double x, double y)
-{
-    return (double) fmaxf((float) x, (float) y);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_ff(fmax)

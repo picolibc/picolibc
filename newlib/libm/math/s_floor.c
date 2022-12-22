@@ -64,10 +64,10 @@ PORTABILITY
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-double
-floor(double x)
+__float64
+floor64(__float64 x)
 {
     __int32_t i0, i1, j0, j;
     __uint32_t i;
@@ -115,4 +115,6 @@ floor(double x)
     return x;
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_d_d(floor)
+
+#endif /* _NEED_FLOAT64 */

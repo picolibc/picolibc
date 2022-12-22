@@ -33,7 +33,11 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-if(NOT DEFINED CONFIG_64BIT)
+picolibc_sources_flags("-fno-builtin"
+  setjmp.S
+  )
+
+if(NOT DEFINED CONFIG_ISA_ARCV3)
   picolibc_sources_flags("-fno-builtin"
     memcmp-bs-norm.S
     memcmp.S
@@ -46,7 +50,6 @@ if(NOT DEFINED CONFIG_64BIT)
     memset-bs.S
     memset.S
     memset-stub.c
-    setjmp.S
     strchr-bs-norm.S
     strchr-bs.S
     strchr.S

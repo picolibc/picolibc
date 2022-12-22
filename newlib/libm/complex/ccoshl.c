@@ -32,6 +32,8 @@
 #include <complex.h>
 #include <math.h>
 
+#ifdef _HAVE_LONG_DOUBLE_MATH
+
 long double complex
 ccoshl(long double complex z)
 {
@@ -40,6 +42,8 @@ ccoshl(long double complex z)
 
 	x = creall(z);
 	y = cimagl(z);
-	w = coshl(x) * cosl(y) + (sinhl(x) * sinl(y)) * (double complex) I;
+	w = coshl(x) * cosl(y) + (sinhl(x) * sinl(y)) * (long double complex) I;
 	return w;
 }
+
+#endif

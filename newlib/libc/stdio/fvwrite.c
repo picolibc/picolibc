@@ -53,7 +53,7 @@ _sfvwrite (
   register size_t len;
   register const char *p = NULL;
   register struct __siov *iov;
-  register _READ_WRITE_RETURN_TYPE w, s;
+  register ssize_t w, s;
   char *nl;
   int nlknown, nldist;
 

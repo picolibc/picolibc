@@ -33,6 +33,8 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _ADD_D_TO_DOUBLE_FUNCS
+
 #include "fdlibm.h"
 
 int
@@ -44,3 +46,5 @@ __iseqsigf(float x, float y)
         return __math_invalidf(y);
     return x == y;
 }
+
+_MATH_ALIAS_i_ff(__iseqsig)

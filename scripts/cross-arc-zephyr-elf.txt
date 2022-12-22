@@ -3,7 +3,7 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['arc-zephyr-elf-gcc', '-nostdlib']
+c = ['arc-zephyr-elf-gcc', '-nostdlib', '-mtp-regno=26']
 ar = 'arc-zephyr-elf-ar'
 as = 'arc-zephyr-elf-as'
 nm = 'arc-zephyr-elf-nm'

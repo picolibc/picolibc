@@ -32,18 +32,10 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "local.h"
 
 /* On platforms where long double is as wide as double.  */
-#ifdef _LDBL_EQ_DBL
+#if defined(_NEED_FLOAT_HUGE) && defined(_HAVE_BUILTIN_NANL)
 long double
 nanl (const char *tagp)
 {
-  return nan(tagp);
-}
-#elif __GNUC_PREREQ (3, 3)
-long double
-nanl (const char *tagp)
-{
-  (void) tagp;
   return __builtin_nanl("");
 }
 #endif
-

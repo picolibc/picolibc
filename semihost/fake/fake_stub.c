@@ -40,7 +40,7 @@
 #include <string.h>
 #include <errno.h>
 
-_READ_WRITE_RETURN_TYPE
+ssize_t
 read(int fd, void *buf, size_t count)
 {
         (void) fd;
@@ -49,17 +49,12 @@ read(int fd, void *buf, size_t count)
 	return 0;
 }
 
-_READ_WRITE_RETURN_TYPE
+ssize_t
 write(int fd, const void *buf, size_t count)
 {
-	const uint8_t *b = buf;
-	size_t c = count;
-
         (void) fd;
-        (void) b;
-	while (c--) {
-	}
-	return count;
+        (void) buf;
+	return (ssize_t) count;
 }
 
 int

@@ -249,18 +249,6 @@ erfcf(float x)
     }
 }
 
-#ifdef _DOUBLE_IS_32BITS
+_MATH_ALIAS_f_f(erf)
 
-double
-erf(double x)
-{
-    return (double)erff((float)x);
-}
-
-double
-erfc(double x)
-{
-    return (double)erfcf((float)x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_f(erfc)

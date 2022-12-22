@@ -34,15 +34,28 @@
  */
 
 #define _GNU_SOURCE
-#include <math.h>
-#include "local.h"
+#include "math_config.h"
 
-/* On platforms where long double is as wide as double.  */
-#ifdef _LDBL_EQ_DBL
+#if defined(_HAVE_LONG_DOUBLE_MATH) && defined(_NEED_FLOAT_HUGE)
+
 long double
 exp10l (long double x)
 {
-  return exp10(x);
+    return _powl(10.0l, x);
+}
+
+#if defined(_HAVE_ALIAS_ATTRIBUTE)
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(exp10l, pow10l);
+#else
+
+long double
+pow10l (long double x)
+{
+    return exp10l(x);
 }
 #endif
 
+#endif

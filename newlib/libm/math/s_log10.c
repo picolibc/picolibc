@@ -46,18 +46,18 @@
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-static const double two54 =
-                        1.80143985094819840000e+16, /* 0x43500000, 0x00000000 */
-    ivln10 = 4.34294481903251816668e-01, /* 0x3FDBCB7B, 0x1526E50E */
-    log10_2hi = 3.01029995663611771306e-01, /* 0x3FD34413, 0x509F6000 */
-    log10_2lo = 3.69423907715893078616e-13; /* 0x3D59FEF3, 0x11F12B36 */
+static const __float64
+    two54 = _F_64(1.80143985094819840000e+16), /* 0x43500000, 0x00000000 */
+    ivln10 = _F_64(4.34294481903251816668e-01), /* 0x3FDBCB7B, 0x1526E50E */
+    log10_2hi = _F_64(3.01029995663611771306e-01), /* 0x3FD34413, 0x509F6000 */
+    log10_2lo = _F_64(3.69423907715893078616e-13); /* 0x3D59FEF3, 0x11F12B36 */
 
-double
-log10(double x)
+__float64
+log1064(__float64 x)
 {
-    double y, z;
+    __float64 y, z;
     __int32_t i, k, hx;
     __uint32_t lx;
 
@@ -78,10 +78,12 @@ log10(double x)
     k += (hx >> 20) - 1023;
     i = ((__uint32_t)k & 0x80000000) >> 31;
     hx = (hx & 0x000fffff) | ((0x3ff - i) << 20);
-    y = (double)(k + i);
+    y = (__float64)(k + i);
     SET_HIGH_WORD(x, hx);
     z = y * log10_2lo + ivln10 * log(x);
     return z + y * log10_2hi;
 }
 
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_d_d(log10)
+
+#endif /* _NEED_FLOAT64 */

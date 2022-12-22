@@ -21,15 +21,13 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <math.h>
-#include <inttypes.h>
-#include "local.h"
 #include "math_config.h"
 
 // This is only necessary because the implementation of isnan only works
 // properly when long double == double.
 // See: https://sourceware.org/ml/newlib/2014/msg00684.html
-#ifdef _LDBL_EQ_DBL
+
+#if !defined(_NEED_FLOAT_HUGE)
 
 float
 nexttowardf (float x, long double y)
@@ -49,12 +47,15 @@ nexttowardf (float x, long double y)
       return x + x;
 
   if ((long double) x == y)
-    return y;
+      return (float) y;
   ux = asuint(x);
   if (x == 0) {
     ux = 1;
     if (signbit(y))
       ux |= 0x80000000;
+    x = asfloat(ux);
+    force_eval_float(x*x);
+    return x;
   } else if ((long double) x < y) {
     if (signbit(x))
       ux--;
@@ -71,9 +72,12 @@ nexttowardf (float x, long double y)
   if (e == 0x7f800000)
     return check_oflowf(opt_barrier_float(x+x));
   /* raise underflow if ux.value is subnormal or zero */
+  x = asfloat(ux);
   if (e == 0)
-    force_eval_float(x*x + asfloat(ux)*asfloat(ux));
-  return check_uflowf(asfloat(ux));
+      return __math_denormf(x);
+  return x;
 }
 
-#endif // _LDBL_EQ_DBL
+_MATH_ALIAS_f_fl(nexttoward)
+
+#endif /* _NEED_FLOAT_HUGE */

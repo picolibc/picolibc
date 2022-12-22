@@ -28,6 +28,8 @@
 
 #include "math_config.h"
 
+#ifdef _NEED_FLOAT_HUGE
+
 static const FORCE_LONG_DOUBLE VAL = pick_long_double_except((long double) 0.0, (long double) NAN);
 
 HIDDEN long double
@@ -45,4 +47,6 @@ __math_set_invalidl(void)
 {
     force_eval_long_double(pick_long_double_except(VAL / VAL, VAL));
 }
+#endif
+
 #endif

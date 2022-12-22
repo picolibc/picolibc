@@ -41,18 +41,11 @@ srcs_locale = [
     'newlocale.c',
     'timelocal.c',
     'uselocale.c',
-]
-
-srcs_locale_info = [
     'lctype.c',
     'lmessages.c',
     'lmonetary.c',
     'nl_langinfo.c',
 ]
-
-if newlib_locale_info
-  srcs_locale += srcs_locale_info
-endif
 
 hdrs_locale = [
     'setlocale.h',

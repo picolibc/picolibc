@@ -45,4 +45,6 @@ fma (double x, double y, double z)
   return z;
 }
 
+_MATH_ALIAS_d_ddd(fma)
+
 #endif

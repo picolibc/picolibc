@@ -1,3 +1,0 @@
-        test: [
-          "./.github/do-many do-test do-native-configure build-native do-test do-aarch64-configure build-aarch64 do-build do-lx106-configure build-lx106 do-test do-i386-configure build-i386 do-build do-m68k-configure build-m68k do-build do-clang-msp430-configure build-clang-msp430 do-build do-msp430-configure build-msp430 do-zephyr-build do-nios2-configure build-nios2 do-build do-sparc64-configure build-sparc64 do-test do-x86_64-configure build-x86_64 do-test do-x86-configure build-x86 end",
-        ]

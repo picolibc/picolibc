@@ -48,3 +48,5 @@ log10f(float x)
     z = y * log10_2lo + ivln10 * logf(x);
     return z + y * log10_2hi;
 }
+
+_MATH_ALIAS_f_f(log10)

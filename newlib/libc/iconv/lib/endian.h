@@ -27,7 +27,7 @@
 
 #include <sys/param.h>
 
-#if (BYTE_ORDER == LITTLE_ENDIAN)
+#if (_BYTE_ORDER == _LITTLE_ENDIAN)
 
 #  define ICONV_BETOHS(s) \
      ((((s) << 8) & 0xFF00) | (((s) >> 8) & 0x00FF))
@@ -46,7 +46,7 @@
 #  define ICONV_HTOBES(s) ICONV_BETOHS (s)
 #  define ICONV_HTOBEL(l) ICONV_BETOHL (l)
 
-#elif (BYTE_ORDER == BIG_ENDIAN)
+#elif (_BYTE_ORDER == _BIG_ENDIAN)
 
 #  define ICONV_BETOHS(s) (s)
 #  define ICONV_BETOHL(l) (l)

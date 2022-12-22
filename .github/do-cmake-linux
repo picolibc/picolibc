@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+HERE=`dirname "$0"`
+"$HERE"/do-cmake-test cmake-thumbv7m "$@"
+"$HERE"/do-cmake-test cmake-thumbv7m -DCMAKE_BUILD_TYPE=Debug "$@"
+"$HERE"/do-cmake-test cmake-thumbv7m -DCMAKE_BUILD_TYPE=Release "$@"
+"$HERE"/do-cmake-test cmake-thumbv7m -DCMAKE_BUILD_TYPE=RelWithDebInfo "$@"
+"$HERE"/do-cmake-test cmake-thumbv7m -DCMAKE_BUILD_TYPE=MinSizeRel "$@"

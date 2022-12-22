@@ -22,26 +22,9 @@
 #include <errno.h>
 #include <math.h>
 
-#ifdef __STDC__
-	float exp10f(float x)		/* wrapper exp10f */
-#else
-	float exp10f(x)			/* wrapper exp10f */
-	float x;
-#endif
+float exp10f(float x)		/* wrapper exp10f */
 {
-  return powf(10.0, x);
+  return _powf(10.0, x);
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-#ifdef __STDC__
-	double exp10(double x)
-#else
-	double exp10(x)
-	double x;
-#endif
-{
-	return (double) exp10f((float) x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_f(exp10)

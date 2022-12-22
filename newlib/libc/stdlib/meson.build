@@ -143,12 +143,6 @@ srcs_stdlib = [
     'srand.c',
     'srand48.c',
     'srandom.c',
-    'strtoimax.c',
-    'strtol.c',
-    'strtoll.c',
-    'strtoul.c',
-    'strtoull.c',
-    'strtoumax.c',
     'system.c',
     'utoa.c',
     'wcrtomb.c',
@@ -176,6 +170,12 @@ srcs_stdlib_stdio = [
     'mprec.c',
     'strtod.c',
     'strtodg.c',
+    'strtol.c',
+    'strtoul.c',
+    'strtoll.c',
+    'strtoull.c',
+    'strtoimax.c',
+    'strtoumax.c',
 ]
 
 lsrcs_stdlib = [
@@ -186,9 +186,9 @@ lsrcs_stdlib = [
 
 if not tinystdio
   srcs_stdlib += srcs_stdlib_stdio
-  if have_long_double and not long_double_equals_double
+  if have_long_double
     srcs_stdlib += lsrcs_stdlib
-    if newlib_io_long_double
+    if io_long_double
       srcs_stdlib += 'ldtoa.c'
     endif
   endif

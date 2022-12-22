@@ -43,14 +43,10 @@ SEEALSO
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-#ifdef __STDC__
-	double round(double x)
-#else
-	double round(x)
-	double x;
-#endif
+__float64
+round64(__float64 x)
 {
   /* Most significant word, least significant word. */
   __int32_t msw, exponent_less_1023;
@@ -112,4 +108,6 @@ SEEALSO
   return x;
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_d_d(round)
+
+#endif /* _NEED_FLOAT64 */

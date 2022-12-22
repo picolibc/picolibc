@@ -1,0 +1,695 @@
+#!/usr/bin/nickle
+
+# Use nickle's extended precision floating point implementation
+# to generate some simple test vectors for long double math functions
+
+typedef struct  {
+	real(real a) f;
+	string name;
+} func_f_f_t;
+
+typedef struct  {
+	real(real a, real b) f;
+	string name;
+} func_f_ff_t;
+
+typedef struct  {
+	real(real a, int b) f;
+	string name;
+} func_f_fi_t;
+
+typedef struct  {
+	int(real a) f;
+	string name;
+} func_i_f_t;
+
+string[] limited_funcs = {
+	"ceill",
+	"copysignl",
+	"fabsl",
+	"floorl",
+	"fmaxl",
+	"fminl",
+	"frexpl",
+	"hypotl",
+	"ilogbl",
+	"ldexpl",
+	"logbl",
+	"llrintl",
+	"lrintl",
+	"lroundl",
+	"llroundl",
+	"nanl",
+	"nearbyintl",
+	"rintl",
+	"roundl",
+	"scalbnl",
+	"scalblnl",
+	"truncl",
+	"logbl",
+	"sqrtl",
+};
+
+bool
+is_full_func(string name)
+{
+	for (int i = 0; i < dim(limited_funcs); i++)
+		if (limited_funcs[i] == name)
+			return false;
+	return true;
+}
+
+exception infinity(real v);
+exception nan();
+
+int prec = 512;
+int out_prec = 192;
+
+string
+toupper(string s)
+{
+	string o = "";
+	for (int i = 0; i < String::length(s); i++) {
+		int c = s[i];
+		if ('a' <= c && c <= 'z')
+			c = c - 'a' + 'A';
+		o = o + String::new(c);
+	}
+	return o;
+}
+
+string
+make_prec(string name)
+{
+	string prec = toupper(name) + "_PREC";
+	printf("#ifndef %s\n", prec);
+	printf("#define %s DEFAULT_PREC\n", prec);
+	printf("#endif\n");
+	return prec;
+}
+
+void
+gen_real_f_f(func_f_f_t f)
+{
+	real x, y;
+	string vec = sprintf("%s_vec", f.name);
+	printf("\n");
+	if (is_full_func(f.name))
+		printf("#ifdef FULL_LONG_DOUBLE\n");
+	string prec_name = make_prec(f.name);
+	printf("long_double_test_f_f_t %s[] = {\n", vec);
+	for (x = -10; x <= 10; x += .1) {
+		try {
+			string sy;
+			try {
+				try {
+					y = imprecise(f.f(imprecise(x, prec)), out_prec);
+					sy = sprintf("%.-eL", y);
+				} catch divide_by_zero(real x, real y) {
+					if (x == 0)
+						raise invalid_argument(f.name, 0, x);
+					raise infinity(x);
+				}
+			} catch infinity(real v) {
+				sy = "(long double) INFINITY";
+				if (v < 0)
+					sy = "-" + sy;
+			} catch nan() {
+				sy = "(long double) NAN";
+			}
+			printf("    { .line = __LINE__, .x = %.-eL, .y = %s },\n", x, sy);
+		} catch invalid_argument(string s, int i, poly x) {
+		}
+	}
+	printf("};\n\n");
+	printf("int test_%s(void) {\n", f.name);
+	printf("    unsigned int i;\n");
+	printf("    int result = 0;\n");
+	printf("    for (i = 0; i < sizeof(%s)/sizeof(%s[0]); i++) {\n", vec, vec);
+	printf("        long double y = %s(%s[i].x);\n", f.name, vec);
+	printf("        result += check_long_double(\"%s\", %s[i].line, %s, %s[i].y, y);\n", f.name, vec, prec_name, vec);
+	printf("    }\n");
+	printf("    return result;\n");
+	printf("}\n");
+	if (is_full_func(f.name))
+		printf("#endif /* FULL_LONG_DOUBLE */\n");
+}
+
+real cbrt(real x) { return x**(1/3); }
+real exp10(real x) { return 10**x; }
+real exp2(real x) { return 2**x; }
+real expm1(real x) {
+	x = imprecise(x);
+	int bits = precision(x);
+	int obits = bits;
+
+	if (0 < x && x < 1)
+		obits -= exponent(x);
+
+	x = imprecise(x, obits);
+
+	return imprecise(exp(x) - 1, bits);
+}
+real lgamma(real x) {
+	if (x < 0 && x == floor(x))
+		raise infinity(1);
+	return log(gamma(x));
+}
+real log1p(real x) { return log(1+x); }
+real logb(real x) {
+	if (x == 0)
+		raise infinity(-1);
+	return exponent(imprecise(x)) - 1;
+}
+real pow10(real x) { return 10**x; }
+
+real round(x) { if (x < 0) return -round(-x); return floor(x+0.5); }
+real trunc(x) { if (x < 0) return -trunc(-x); return floor(x); }
+
+real acosh(x) {
+	if (x < 1)
+		raise nan();
+	return log(x + sqrt(x*x-1));
+}
+
+real asinh(x) {
+	if (x == 0) return 0;
+	real sign = 1;
+	if (x < 0) {
+		sign = -1;
+		x = -x;
+	}
+	return sign * log(x + sqrt(x*x+1));
+}
+
+real atanh(x) {
+	if (abs(x) > 1)
+		raise nan();
+	if (abs(x) == 1)
+		raise infinity(x);
+	return 0.5 * log((1 + x) / (1 - x));
+}
+
+real cosh(x) {
+	return (exp(x) + exp(-x)) / 2;
+}
+
+real sinh(x) {
+	return (exp(x) - exp(-x)) / 2;
+}
+
+real tanh(x) {
+	return sinh(x) / cosh(x);
+}
+
+real tgamma(real x) {
+	if (x == 0)
+		raise infinity(1);
+	if (x < 0 && x == floor(x))
+		raise nan();
+	return gamma(x);
+}
+
+real nearbyint(real x) {
+	real y;
+
+	if (x < 0)
+		y = ceil(x-0.5);
+	else
+		y = floor(x+0.5);
+	if (abs(x-y) == 0.5) {
+		if (y % 2 != 0) {
+			if (y > 0)
+				y--;
+			else
+				y++;
+		}
+	}
+	return y;
+}
+
+real _erf(real x, real off)
+{
+	x = imprecise(x);
+	int bits = precision(x);
+	int obits = bits + 512;
+	real factor = 2 / sqrt(pi_value(obits));
+
+	x = imprecise(x, obits);
+	off = imprecise(off, obits) / factor;
+	real val = x - off;
+
+	for (int n = 1; ; n++) {
+		int f = 2 * n + 1;
+		real a = ((-1)**n * x**f) / (n! * f);
+		val += a;
+		if (exponent(val) - exponent(a) > obits)
+			break;
+	}
+	return imprecise(val * factor, bits);
+}
+
+real erf(real x)
+{
+	return _erf(x, 0);
+}
+
+real erfc(real x)
+{
+	return -_erf(x, 1);
+}
+
+real jn(real x, int n)
+{
+	x = imprecise(x);
+	int bits = precision(x);
+	int obits = bits + 512;
+
+	x = imprecise(x, obits);
+	real val = imprecise(0, obits);
+
+	for (int m = 0; ; m++) {
+		real a = ((-1)**m / (m! * gamma(m + n + 1))) * (x/2)**(2 * m + n);
+		val += a;
+		if (exponent(val) - exponent(a) > obits)
+			break;
+	}
+	return imprecise(val, bits);
+}
+
+real scalbnl(real x, int exp)
+{
+	return x * (2 ** exp);
+}
+
+real ldexpl(real x, int exp)
+{
+	return x * (2 ** exp);
+}
+
+real rintl(real x) {
+	return nearbyint(x);
+}
+
+real j0(real x) = jn(x,0);
+real j1(real x) = jn(x,1);
+
+real default_prec = 1e-20;
+
+func_f_f_t[] funcs_f_f = {
+	{ .f = acosh, .name = "acoshl" },
+	{ .f = acos, .name = "acosl" },
+	{ .f = asinh, .name = "asinhl" },
+	{ .f = asin, .name = "asinl" },
+	{ .f = atanh, .name = "atanhl" },
+	{ .f = atan, .name = "atanl" },
+	{ .f = cbrt, .name = "cbrtl" },
+	{ .f = ceil, .name = "ceill" },
+	{ .f = cosh, .name = "coshl" },
+	{ .f = cos, .name = "cosl" },
+	{ .f = erfc, .name = "erfcl" },
+	{ .f = erf, .name = "erfl" },
+	{ .f = exp10, .name = "exp10l" },
+	{ .f = exp2, .name = "exp2l" },
+	{ .f = exp, .name = "expl" },
+	{ .f = expm1, .name = "expm1l" },
+	{ .f = floor, .name = "floorl" },
+#	{ .f = j0, .name = "j0l" },
+#	{ .f = j1, .name = "j1l" },
+#	{ .f = jn, .name = "jnl" },
+	{ .f = lgamma, .name = "lgammal" },
+	{ .f = log10, .name = "log10l" },
+	{ .f = log1p, .name = "log1pl" },
+	{ .f = log2, .name = "log2l" },
+	{ .f = logb, .name = "logbl" },
+	{ .f = log, .name = "logl" },
+	{ .f = nearbyint, .name = "nearbyintl" },
+#	{ .f = pow10, .name = "pow10l" },	/* an alias for exp10 */
+        { .f = rintl, .name = "rintl" },
+	{ .f = round, .name = "roundl" },
+	{ .f = sinh, .name = "sinhl" },
+	{ .f = sin, .name = "sinl" },
+	{ .f = sqrt, .name = "sqrtl" },
+	{ .f = tanh, .name = "tanhl" },
+	{ .f = tan, .name = "tanl" },
+	{ .f = tgamma, .name = "tgammal" },
+	{ .f = trunc, .name = "truncl" },
+#	{ .f = y0, .name = "y0l" },
+#	{ .f = y1, .name = "y1l" },
+#	{ .f = yn, .name = "ynl" },
+};
+
+void
+gen_real_f_ff(func_f_ff_t f)
+{
+	real x0, x1, y;
+	string vec = sprintf("%s_vec", f.name);
+
+	printf("\n");
+	if (is_full_func(f.name))
+		printf("#ifdef FULL_LONG_DOUBLE\n");
+	string prec_name = make_prec(f.name);
+	printf("long_double_test_f_ff_t %s[] = {\n", vec);
+	for (x0 = -4; x0 <= 4; x0 += .25) {
+		for (x1 = -4; x1 <= 4; x1 += 0.25) {
+			try {
+				string sy;
+				try {
+					try {
+						y = imprecise(f.f(imprecise(x0, prec), imprecise(x1, prec)), out_prec);
+						sy = sprintf("%.-eL", y);
+					} catch divide_by_zero(real x, real y) {
+						if (x == 0)
+							raise invalid_argument(f.name, 0, x);
+						raise infinity(x);
+					}
+				} catch infinity(real v) {
+					sy = "(long double) INFINITY";
+					if (v < 0)
+						sy = "-" + sy;
+				} catch nan() {
+					sy = "(long double) NAN";
+				}
+				printf("    { .line = __LINE__, .x0 = %.-eL, .x1 = %.-eL, .y = %s },\n", x0, x1, sy);
+			} catch invalid_argument(string s, int i, poly x) {
+			}
+		}
+	}
+	printf("};\n\n");
+	printf("int test_%s(void) {\n", f.name);
+	printf("    unsigned int i;\n");
+	printf("    int result = 0;\n");
+	printf("    for (i = 0; i < sizeof(%s)/sizeof(%s[0]); i++) {\n", vec, vec);
+	printf("        long double y = %s(%s[i].x0, %s[i].x1);\n", f.name, vec, vec);
+	printf("        result += check_long_double(\"%s\", %s[i].line, %s, %s[i].y, y);\n", f.name, vec,prec_name, vec);
+	printf("    }\n");
+	printf("    return result;\n");
+	printf("}\n");
+	if (is_full_func(f.name))
+		printf("#endif /* FULL_LONG_DOUBLE */\n");
+}
+
+real fmod(real x, real y) {
+	if (y == 0)
+		raise nan();
+	real n = x / y;
+	if (n < 0)
+		n = ceil(n);
+	else
+		n = floor(n);
+	return x - n * y;
+}
+real fdim(real x, real y) { return max(x-y, 0); }
+real fmax(real x, real y) { return max(x,y); }
+real fmin(real x, real y) { return min(x,y); }
+
+real hypot(real x, real y) { return sqrt(x*x + y*y); }
+
+/* Compute an IEEE remainder */
+real remainder(real x, real y) {
+	if (y == 0)
+		raise nan();
+	real q = x / y;
+	int n;
+	if (q < 0)
+		n = ceil(q - 0.5);
+	else
+		n = floor(q + 0.5);
+	if (abs(q-n) == 0.5) {
+		if (n % 2 != 0) {
+			if (n > 0)
+				n--;
+			else
+				n++;
+		}
+	}
+	return x - n * y;
+}
+
+real drem(real x, real y) {
+	return remainder (x, y);
+}
+
+real copysign(real x, real y) {
+	x = abs(x);
+	if (y < 0)
+		x = -x;
+	return x;
+}
+
+bool
+isoddint(real x) {
+	return x == floor(x) && (floor(x) & 1) == 1;
+}
+
+bool
+isevenint(real x) {
+	return x == floor(x) && (floor(x) & 1) == 0;
+}
+
+bool
+isint(real x) {
+	return x == floor(x);
+}
+
+/* Deal with the oddities of IEEE pow */
+real powl(real x, real y) {
+	if (x == 0 && isoddint(y) && y < 0)
+		raise infinity(1);
+	if (x == 0 && y < 0)
+		raise infinity(1);
+	if (x == 0 && y > 0)
+		return 0;
+	if (x == 1)
+		return 1;
+	if (y == 0)
+		return 1;
+	if (x < 0 && !isint(y))
+		raise nan();
+	return pow(x, y);
+}
+
+real scalb(real x, real y) {
+	if (!isint(y))
+		raise nan();
+	return x * 2 ** y;
+}
+
+/* Functions of the form f(x,y) */
+func_f_ff_t[] funcs_f_ff = {
+        { .f = atan2, .name = "atan2l" },
+        { .f = powl, .name = "powl" },
+        { .f = fmod, .name = "fmodl" },
+#        { .f = nextafter, .name = "nextafterl" },
+#        { .f = nexttoward, .name = "nexttowardl" },
+        { .f = fdim, .name = "fdiml" },
+        { .f = fmax, .name = "fmaxl" },
+        { .f = fmin, .name = "fminl" },
+	{ .f = hypot, .name = "hypotl" },
+	{ .f = scalb, .name = "scalbl" },
+        { .f = remainder, .name = "remainderl" },
+        { .f = drem, .name = "dreml" },
+        { .f = copysign, .name = "copysignl" },
+};
+
+void
+gen_real_f_fi(func_f_fi_t f)
+{
+	real x0, y;
+	int x1;
+	string vec = sprintf("%s_vec", f.name);
+
+	printf("\n");
+	if (is_full_func(f.name))
+		printf("#ifdef FULL_LONG_DOUBLE\n");
+	string prec_name = make_prec(f.name);
+	printf("long_double_test_f_fi_t %s[] = {\n", vec);
+	for (x0 = -4; x0 <= 4; x0 += .25) {
+		for (x1 = -16; x1 <= 16; x1 += 1) {
+			try {
+				string sy;
+				try {
+					try {
+						y = imprecise(f.f(imprecise(x0, prec), x1), out_prec);
+						sy = sprintf("%.-eL", y);
+					} catch divide_by_zero(real x, real y) {
+						if (x == 0)
+							raise invalid_argument(f.name, 0, x);
+						raise infinity(x);
+					}
+				} catch infinity(real v) {
+					sy = "(long double) INFINITY";
+					if (v < 0)
+						sy = "-" + sy;
+				} catch nan() {
+					sy = "(long double) NAN";
+				}
+				printf("    { .line = __LINE__, .x0 = %.-eL, .x1 = %d, .y = %s },\n", x0, x1, sy);
+			} catch invalid_argument(string s, int i, poly x) {
+			}
+		}
+	}
+	printf("};\n\n");
+	printf("int test_%s(void) {\n", f.name);
+	printf("    unsigned int i;\n");
+	printf("    int result = 0;\n");
+	printf("    for (i = 0; i < sizeof(%s)/sizeof(%s[0]); i++) {\n", vec, vec);
+	printf("        long double y = %s(%s[i].x0, %s[i].x1);\n", f.name, vec, vec);
+	printf("        result += check_long_double(\"%s\", %s[i].line, %s, %s[i].y, y);\n", f.name, vec,prec_name, vec);
+	printf("    }\n");
+	printf("    return result;\n");
+	printf("}\n");
+	if (is_full_func(f.name))
+		printf("#endif /* FULL_LONG_DOUBLE */\n");
+}
+
+/* Functions of the form f(x,y) */
+func_f_fi_t[] funcs_f_fi = {
+	{ .f = ldexpl, .name = "ldexpl" },
+	{ .f = scalbnl, .name = "scalbnl" },
+};
+
+exception invalid_int(string y);
+
+void
+gen_real_i_f(func_i_f_t f)
+{
+	real x;
+	int y;
+	string vec = sprintf("%s_vec", f.name);
+
+	printf("\n");
+	if (is_full_func(f.name))
+		printf("#ifdef FULL_LONG_DOUBLE\n");
+	printf("long_double_test_i_f_t %s[] = {\n", vec);
+	for (x = -10; x <= 10; x += .1) {
+		try {
+			string sy;
+			try {
+				y = f.f(imprecise(x, prec));
+				sy = sprintf("%d", y);
+			} catch invalid_int(string s) {
+				sy = s;
+			}
+			printf("    { .line = __LINE__, .x = %.-eL, .y = %s },\n", x, sy);
+		} catch invalid_argument(string s, int i, poly x) {
+		}
+	}
+	printf("};\n\n");
+	printf("int test_%s(void) {\n", f.name);
+	printf("    unsigned int i;\n");
+	printf("    int result = 0;\n");
+	printf("    for (i = 0; i < sizeof(%s)/sizeof(%s[0]); i++) {\n", vec, vec);
+	printf("        long long y = %s(%s[i].x);\n", f.name, vec);
+	printf("        result += check_long_long(\"%s\", %s[i].line, %s[i].y, y);\n", f.name, vec, vec);
+	printf("    }\n");
+	printf("    return result;\n");
+	printf("}\n");
+	if (is_full_func(f.name))
+		printf("#endif /* FULL_LONG_DOUBLE */\n");
+}
+
+int finite(real x) {
+	return 1;
+}
+
+int ilogb(real x) {
+	if (x == 0)
+		raise invalid_int("FP_ILOGB0");
+	return exponent(imprecise(x)) - 1;
+}
+
+int isinf(real x) {
+	return 0;
+}
+
+int isnan(real x) {
+	return 0;
+}
+
+int lrint(real x) {
+	return rintl(x);
+}
+
+int lround(real x) {
+	int ix = floor(x);
+	real diff = x - ix;
+	if ((diff == 0.5) && (x > 0) || (diff > 0.5))
+		ix++;
+	return ix;
+}
+
+/* Functions of the form i(x) */
+func_i_f_t[] funcs_i_f = {
+	{ .f = finite, .name = "finitel" },
+	{ .f = ilogb, .name = "ilogb" },
+	{ .f = isinf, .name = "isinfl" },
+	{ .f = isnan, .name = "isnanl" },
+	{ .f = lrint, .name = "lrintl" },
+	{ .f = lrint, .name = "llrintl" },
+	{ .f = lround, .name = "lroundl" },
+	{ .f = lround, .name = "llroundl" },
+};
+
+
+/*
+ * These functions aren't tested yet
+ *
+ *  long double modfl (long double, long double *);
+ *  float nexttowardf (float, long double);
+ *  double nexttoward (double, long double);
+ *  long double nextowardl (long double, long double);
+ *  long double remquol (long double, long double, int *);
+ *  long double fmal (long double, long double, long double);
+ *  long double lgammal_r (long double, int *);
+ *  void sincosl (long double, long double *, long double *);
+ */
+
+void
+main()
+{
+	for (int i = 0; i < dim(funcs_i_f); i++)
+		gen_real_i_f(funcs_i_f[i]);
+
+	for (int i = 0; i < dim(funcs_f_fi); i++)
+		gen_real_f_fi(funcs_f_fi[i]);
+
+	for (int i = 0; i < dim(funcs_f_ff); i++)
+		gen_real_f_ff(funcs_f_ff[i]);
+
+	for (int i = 0; i < dim(funcs_f_f); i++)
+		gen_real_f_f(funcs_f_f[i]);
+
+	printf("long_double_test_t long_double_tests[] = {\n");
+	for (int i = 0; i < dim(funcs_f_f); i++) {
+		if (is_full_func(funcs_f_f[i].name))
+			printf("#ifdef FULL_LONG_DOUBLE\n");
+		printf("    { .name = \"%s\", .test = test_%s },\n", funcs_f_f[i].name, funcs_f_f[i].name);
+		if (is_full_func(funcs_f_f[i].name))
+			printf("#endif /* FULL_LONG_DOUBLE */\n");
+	}
+	for (int i = 0; i < dim(funcs_f_ff); i++) {
+		if (is_full_func(funcs_f_ff[i].name))
+			printf("#ifdef FULL_LONG_DOUBLE\n");
+		printf("    { .name = \"%s\", .test = test_%s },\n", funcs_f_ff[i].name, funcs_f_ff[i].name);
+		if (is_full_func(funcs_f_ff[i].name))
+			printf("#endif /* FULL_LONG_DOUBLE */\n");
+	}
+	for (int i = 0; i < dim(funcs_f_fi); i++) {
+		if (is_full_func(funcs_f_fi[i].name))
+			printf("#ifdef FULL_LONG_DOUBLE\n");
+		printf("    { .name = \"%s\", .test = test_%s },\n", funcs_f_fi[i].name, funcs_f_fi[i].name);
+		if (is_full_func(funcs_f_fi[i].name))
+			printf("#endif /* FULL_LONG_DOUBLE */\n");
+	}
+	for (int i = 0; i < dim(funcs_i_f); i++) {
+		if (is_full_func(funcs_i_f[i].name))
+			printf("#ifdef FULL_LONG_DOUBLE\n");
+		printf("    { .name = \"%s\", .test = test_%s },\n", funcs_i_f[i].name, funcs_i_f[i].name);
+		if (is_full_func(funcs_i_f[i].name))
+			printf("#endif /* FULL_LONG_DOUBLE */\n");
+	}
+	printf("};\n");
+}
+
+main();

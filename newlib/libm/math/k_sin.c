@@ -41,21 +41,21 @@
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-static const double half =
-                        5.00000000000000000000e-01, /* 0x3FE00000, 0x00000000 */
-    S1 = -1.66666666666666324348e-01, /* 0xBFC55555, 0x55555549 */
-    S2 = 8.33333333332248946124e-03, /* 0x3F811111, 0x1110F8A6 */
-    S3 = -1.98412698298579493134e-04, /* 0xBF2A01A0, 0x19C161D5 */
-    S4 = 2.75573137070700676789e-06, /* 0x3EC71DE3, 0x57B1FE7D */
-    S5 = -2.50507602534068634195e-08, /* 0xBE5AE5E6, 0x8A2B9CEB */
-    S6 = 1.58969099521155010221e-10; /* 0x3DE5D93A, 0x5ACFD57C */
+static const __float64
+    half = _F_64(5.00000000000000000000e-01), /* 0x3FE00000, 0x00000000 */
+    S1 = _F_64(-1.66666666666666324348e-01), /* 0xBFC55555, 0x55555549 */
+    S2 = _F_64(8.33333333332248946124e-03), /* 0x3F811111, 0x1110F8A6 */
+    S3 = _F_64(-1.98412698298579493134e-04), /* 0xBF2A01A0, 0x19C161D5 */
+    S4 = _F_64(2.75573137070700676789e-06), /* 0x3EC71DE3, 0x57B1FE7D */
+    S5 = _F_64(-2.50507602534068634195e-08), /* 0xBE5AE5E6, 0x8A2B9CEB */
+    S6 = _F_64(1.58969099521155010221e-10); /* 0x3DE5D93A, 0x5ACFD57C */
 
-double
-__kernel_sin(double x, double y, int iy)
+__float64
+__kernel_sin(__float64 x, __float64 y, int iy)
 {
-    double z, r, v;
+    __float64 z, r, v;
     __int32_t ix;
     GET_HIGH_WORD(ix, x);
     ix &= 0x7fffffff; /* high word of x */
@@ -70,4 +70,4 @@ __kernel_sin(double x, double y, int iy)
         return x - ((z * (half * y - v * r) - y) - v * S1);
 }
 
-#endif /* defined(_DOUBLE_IS_32BITS) */
+#endif /* _NEED_FLOAT64 */

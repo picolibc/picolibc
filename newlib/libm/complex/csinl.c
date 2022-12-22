@@ -33,6 +33,8 @@
 #include <math.h>
 #include "cephes_subrl.h"
 
+#ifdef _HAVE_LONG_DOUBLE_MATH
+
 long double complex
 csinl(long double complex z)
 {
@@ -40,6 +42,8 @@ csinl(long double complex z)
 	long double ch, sh;
 
 	_cchshl(cimagl(z), &ch, &sh);
-	w = sinl(creall(z)) * ch + (cosl(creall(z)) * sh) * (double complex) I;
+	w = sinl(creall(z)) * ch + (cosl(creall(z)) * sh) * (long double complex) I;
 	return w;
 }
+
+#endif

@@ -155,4 +155,7 @@ double
 #endif
   return y;
 }
+
+_MATH_ALIAS_d_d(log2)
+
 #endif

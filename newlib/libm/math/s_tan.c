@@ -71,12 +71,12 @@ PORTABILITY
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-double
-tan(double x)
+__float64
+tan64(__float64 x)
 {
-    double y[2], z = 0.0;
+    __float64 y[2], z = _F_64(0.0);
     __int32_t n, ix;
 
     /* High word of x. */
@@ -99,4 +99,6 @@ tan(double x)
     }
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_d_d(tan)
+
+#endif /* _NEED_FLOAT64 */

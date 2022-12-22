@@ -40,14 +40,10 @@ ANSI C, POSIX
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-#ifdef __STDC__
-	double trunc(double x)
-#else
-	double trunc(x)
-	double x;
-#endif
+__float64
+trunc64(__float64 x)
 {
     int64_t ix = _asint64(x);
     int64_t mask;
@@ -71,4 +67,6 @@ ANSI C, POSIX
     return _asdouble(ix & mask);
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_d_d(trunc)
+
+#endif /* _NEED_FLOAT64 */

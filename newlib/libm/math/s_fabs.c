@@ -47,10 +47,10 @@ PORTABILITY
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-double
-fabs(double x)
+__float64
+fabs64(__float64 x)
 {
     __uint32_t high;
     GET_HIGH_WORD(high, x);
@@ -58,4 +58,6 @@ fabs(double x)
     return x;
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_d_d(fabs)
+
+#endif /* _NEED_FLOAT64 */

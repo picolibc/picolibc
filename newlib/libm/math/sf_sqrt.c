@@ -79,3 +79,5 @@ sqrtf(float x)
     SET_FLOAT_WORD(z, ix);
     return z;
 }
+
+_MATH_ALIAS_f_f(sqrt)

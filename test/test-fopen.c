@@ -35,7 +35,6 @@
 #define _DEFAULT_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 #define TEST_FILE_NAME "FOPEN.TXT"
 
@@ -44,7 +43,7 @@
             printf("%s: %s\n", message, #condition);    \
             if (f)                                      \
                 fclose(f);                              \
-            (void) unlink(TEST_FILE_NAME);              \
+            (void) remove(TEST_FILE_NAME);              \
             exit(1);                                    \
         }                                               \
     } while(0)
@@ -99,7 +98,7 @@ main(void)
     fclose(f);
     check_contents(0);
 
-    (void) unlink(TEST_FILE_NAME);
+    (void) remove(TEST_FILE_NAME);
 
     exit(0);
 }

@@ -35,7 +35,7 @@
 
 #include "math_config.h"
 
-#if defined(_HAVE_LONG_DOUBLE)
+#ifdef _NEED_FLOAT_HUGE
 int
 __issignalingl(long double x)
 {

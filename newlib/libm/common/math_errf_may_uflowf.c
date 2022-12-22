@@ -43,4 +43,5 @@ __math_may_uflowf (uint32_t sign)
         y = -y;
     return __math_with_errnof (y, ERANGE);
 }
+
 #endif

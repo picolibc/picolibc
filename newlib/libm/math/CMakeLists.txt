@@ -59,7 +59,6 @@ picolibc_sources(
   s_floor.c
   s_fmod.c
   s_frexp.c
-  s_gamma.c
   s_hypot.c
   s_j0.c
   s_j1.c
@@ -97,7 +96,6 @@ picolibc_sources(
   sf_floor.c
   sf_fmod.c
   sf_frexp.c
-  sf_gamma.c
   sf_hypot.c
   sf_j0.c
   sf_j1.c
@@ -120,7 +118,7 @@ picolibc_sources(
   sf_tgamma.c
   sr_lgamma.c
   srf_lgamma.c
-  )
+)
 
 if(_HAVE_LONG_DOUBLE)
   picolibc_sources(

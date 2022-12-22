@@ -19,12 +19,12 @@ is preserved.
 #include "fdlibm.h"
 #include <ieeefp.h>
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
 #undef isinf
 
 int
-isinf (double x)
+isinf64(__float64 x)
 {
 	__int32_t hx,lx;
 	EXTRACT_WORDS(hx,lx,x);
@@ -34,4 +34,6 @@ isinf (double x)
 	return 1 - (int)((__uint32_t)(hx|(-hx))>>31);
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_i_d(isinf)
+
+#endif /* _NEED_FLOAT64 */

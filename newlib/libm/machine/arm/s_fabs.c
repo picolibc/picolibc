@@ -45,6 +45,8 @@ fabs(double x)
 	return result;
 }
 
+_MATH_ALIAS_d_d(fabs)
+
 #else
 #include "../../math/s_fabs.c"
 #endif

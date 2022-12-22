@@ -22,16 +22,16 @@
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-static const double zero = 0.0;
+static const __float64 zero = _F_64(0.0);
 
-double
-remainder(double x, double p)
+__float64
+remainder64(__float64 x, __float64 p)
 {
     __int32_t hx, hp;
     __uint32_t sx, lx, lp;
-    double p_half;
+    __float64 p_half;
 
     EXTRACT_WORDS(hx, lx, x);
     EXTRACT_WORDS(hp, lp, p);
@@ -54,8 +54,8 @@ remainder(double x, double p)
 
     if (((hx - hp) | (lx - lp)) == 0)
         return zero * x;
-    x = fabs(x);
-    p = fabs(p);
+    x = fabs64(x);
+    p = fabs64(p);
     if (hp < 0x00200000) {
         if (x + x > p) {
             x -= p;
@@ -63,7 +63,7 @@ remainder(double x, double p)
                 x -= p;
         }
     } else {
-        p_half = 0.5 * p;
+        p_half = _F_64(0.5) * p;
         if (x > p_half) {
             x -= p;
             if (x >= p_half)
@@ -75,4 +75,6 @@ remainder(double x, double p)
     return x;
 }
 
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_d_dd(remainder)
+
+#endif /* _NEED_FLOAT64 */

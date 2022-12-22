@@ -38,3 +38,5 @@ tgammaf(float x)
         return __math_oflowf(signgam_local < 0);
     return y;
 }
+
+_MATH_ALIAS_f_f(tgamma)

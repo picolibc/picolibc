@@ -21,12 +21,4 @@ significandf(float x)
     return scalbnf(x, -ilogbf(x));
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double
-significand(double x)
-{
-    return (double)significandf((float)x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_f(significand)

@@ -1,4 +1,3 @@
-
 /* @(#)e_jn.c 5.1 93/09/24 */
 /*
  * ====================================================
@@ -39,27 +38,27 @@
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-static const double invsqrtpi =
-                        5.64189583547756279280e-01, /* 0x3FE20DD7, 0x50429B6D */
-    two = 2.00000000000000000000e+00, /* 0x40000000, 0x00000000 */
-    one = 1.00000000000000000000e+00; /* 0x3FF00000, 0x00000000 */
+static const __float64
+    invsqrtpi = _F_64(5.64189583547756279280e-01), /* 0x3FE20DD7, 0x50429B6D */
+    two = _F_64(2.00000000000000000000e+00), /* 0x40000000, 0x00000000 */
+    one = _F_64(1.00000000000000000000e+00); /* 0x3FF00000, 0x00000000 */
 
-static const double zero = 0.00000000000000000000e+00;
+static const __float64 zero = _F_64(0.00000000000000000000e+00);
 
-double
-jn(int n, double x)
+__float64
+jn64(int n, __float64 x)
 {
     __int32_t i, hx, ix, lx, sgn;
-    double a, b, temp, di;
-    double z, w;
+    __float64 a, b, temp, di;
+    __float64 z, w;
 
     if (isnan(x))
         return x + x;
 
     if (isinf(x))
-        return 0.0;
+        return _F_64(0.0);
 
     /* J(-n,x) = (-1)^n * J(n, x), J(n, -x) = (-1)^n * J(n, x)
      * Thus, J(-n,x) = J(n,-x)
@@ -73,14 +72,14 @@ jn(int n, double x)
         hx ^= 0x80000000;
     }
     if (n == 0)
-        return (j0(x));
+        return (j064(x));
     if (n == 1)
-        return (j1(x));
+        return (j164(x));
     sgn = (n & 1) & (hx >> 31); /* even n -- 0, odd n -- sign(x) */
-    x = fabs(x);
+    x = fabs64(x);
     if ((ix | lx) == 0 || ix >= 0x7ff00000) /* if x is 0 or inf */
         b = zero;
-    else if ((double)n <= x) {
+    else if ((__float64)n <= x) {
         /* Safe to use J(n+1,x)=2n/x *J(n,x)-J(n-1,x) */
         if (ix >= 0x52D00000) { /* x > 2**302 */
             /* (x >> n**2)
@@ -99,25 +98,25 @@ jn(int n, double x)
             switch (n & 3) {
             case 0:
             default:
-                temp = cos(x) + sin(x);
+                temp = cos64(x) + sin64(x);
                 break;
             case 1:
-                temp = -cos(x) + sin(x);
+                temp = -cos64(x) + sin64(x);
                 break;
             case 2:
-                temp = -cos(x) - sin(x);
+                temp = -cos64(x) - sin64(x);
                 break;
             case 3:
-                temp = cos(x) - sin(x);
+                temp = cos64(x) - sin64(x);
                 break;
             }
-            b = invsqrtpi * temp / sqrt(x);
+            b = invsqrtpi * temp / sqrt64(x);
         } else {
-            a = j0(x);
-            b = j1(x);
+            a = j064(x);
+            b = j164(x);
             for (i = 1; i < n; i++) {
                 temp = b;
-                b = b * ((double)(i + i) / x) - a; /* avoid underflow */
+                b = b * ((__float64)(i + i) / x) - a; /* avoid underflow */
                 a = temp;
             }
         }
@@ -129,10 +128,10 @@ jn(int n, double x)
             if (n > 33) /* underflow */
                 b = zero;
             else {
-                temp = x * 0.5;
+                temp = x * _F_64(0.5);
                 b = temp;
                 for (a = one, i = 2; i <= n; i++) {
-                    a *= (double)i; /* a = n! */
+                    a *= (__float64)i; /* a = n! */
                     b *= temp; /* b = (x/2)^n */
                 }
                 b = b / a;
@@ -167,16 +166,16 @@ jn(int n, double x)
 		 * When Q(k) > 1e17	good for quadruple
 		 */
             /* determine k */
-            double t, v;
-            double q0, q1, h, tmp;
+            __float64 t, v;
+            __float64 q0, q1, h, tmp;
             __int32_t k, m;
-            w = (n + n) / (double)x;
-            h = 2.0 / (double)x;
+            w = (n + n) / (__float64)x;
+            h = _F_64(2.0) / (__float64)x;
             q0 = w;
             z = w + h;
-            q1 = w * z - 1.0;
+            q1 = w * z - _F_64(1.0);
             k = 1;
-            while (q1 < 1.0e9) {
+            while (q1 < _F_64(1.0e9)) {
                 k += 1;
                 z += h;
                 tmp = z * q1 - q0;
@@ -198,9 +197,9 @@ jn(int n, double x)
 		 */
             tmp = n;
             v = two / x;
-            tmp = tmp * log(fabs(v * tmp));
-            if (tmp < 7.09782712893383973096e+02) {
-                for (i = n - 1, di = (double)(i + i); i > 0; i--) {
+            tmp = tmp * log(fabs64(v * tmp));
+            if (tmp < _F_64(7.09782712893383973096e+02)) {
+                for (i = n - 1, di = (__float64)(i + i); i > 0; i--) {
                     temp = b;
                     b *= di;
                     b = b / x - a;
@@ -208,21 +207,21 @@ jn(int n, double x)
                     di -= two;
                 }
             } else {
-                for (i = n - 1, di = (double)(i + i); i > 0; i--) {
+                for (i = n - 1, di = (__float64)(i + i); i > 0; i--) {
                     temp = b;
                     b *= di;
                     b = b / x - a;
                     a = temp;
                     di -= two;
                     /* scale b to avoid spurious overflow */
-                    if (b > 1e100) {
+                    if (b > _F_64(1e100)) {
                         a /= b;
                         t /= b;
                         b = one;
                     }
                 }
             }
-            b = (t * j0(x) / b);
+            b = (t * j064(x) / b);
         }
     }
     if (sgn == 1)
@@ -231,12 +230,14 @@ jn(int n, double x)
         return b;
 }
 
-double
-yn(int n, double x)
+_MATH_ALIAS_d_id(jn)
+
+__float64
+yn64(int n, __float64 x)
 {
     __int32_t i, hx, ix, lx;
     __int32_t sign;
-    double a, b, temp;
+    __float64 a, b, temp;
 
     EXTRACT_WORDS(hx, lx, x);
     ix = 0x7fffffff & hx;
@@ -252,7 +253,7 @@ yn(int n, double x)
         return __math_invalid(x);
 
     if (ix == 0x7ff00000)
-        return 0.0;
+        return _F_64(0.0);
 
     sign = 1;
     if (n < 0) {
@@ -260,9 +261,9 @@ yn(int n, double x)
         sign = 1 - ((n & 1) << 1);
     }
     if (n == 0)
-        return (y0(x));
+        return (y064(x));
     if (n == 1)
-        return (sign * y1(x));
+        return (sign * y164(x));
 
     if (ix >= 0x52D00000) { /* x > 2**302 */
         /* (x >> n**2)
@@ -281,28 +282,28 @@ yn(int n, double x)
         switch (n & 3) {
         case 0:
         default:
-            temp = sin(x) - cos(x);
+            temp = sin64(x) - cos64(x);
             break;
         case 1:
-            temp = -sin(x) - cos(x);
+            temp = -sin64(x) - cos64(x);
             break;
         case 2:
-            temp = -sin(x) + cos(x);
+            temp = -sin64(x) + cos64(x);
             break;
         case 3:
-            temp = sin(x) + cos(x);
+            temp = sin64(x) + cos64(x);
             break;
         }
-        b = invsqrtpi * temp / sqrt(x);
+        b = invsqrtpi * temp / sqrt64(x);
     } else {
         __uint32_t high;
-        a = y0(x);
-        b = y1(x);
+        a = y064(x);
+        b = y164(x);
         /* quit if b is -inf */
         GET_HIGH_WORD(high, b);
         for (i = 1; i < n && high != 0xfff00000; i++) {
             temp = b;
-            b = ((double)(i + i) / x) * b - a;
+            b = ((__float64)(i + i) / x) * b - a;
             GET_HIGH_WORD(high, b);
             a = temp;
         }
@@ -313,4 +314,6 @@ yn(int n, double x)
         return -b;
 }
 
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_d_id(yn)
+
+#endif /* _NEED_FLOAT64 */

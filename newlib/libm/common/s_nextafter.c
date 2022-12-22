@@ -50,9 +50,10 @@ PORTABILITY
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-double nextafter(double x, double y)
+__float64
+nextafter64(__float64 x, __float64 y)
 {
 	__int32_t	hx,hy,ix,iy;
 	__uint32_t lx,ly;
@@ -68,7 +69,7 @@ double nextafter(double x, double y)
 	if(x==y) return y;		/* x=y, return y (follow y sign for 0) */
 	if((ix|lx)==0) {			/* x == 0 */
 	    INSERT_WORDS(x,hy&0x80000000,1);	/* return +-minsubnormal */
-            force_eval_double(x*x);             /* raise underflow flag */
+            force_eval_float64(x*x);
             return x;
 	} 
 	if(hx>=0) {				/* x > 0 */
@@ -89,12 +90,14 @@ double nextafter(double x, double y)
 	    }
 	}
 	hy = hx&0x7ff00000;
-	if(hy>=0x7ff00000) return check_oflow(x+x);	/* overflow  */
-	if(hy<0x00100000) {		/* underflow */
-            force_eval_double(x*x);     /* raise underflow flag */
-	}
+	if(hy>=0x7ff00000)
+            return __math_oflow(hx<0);	/* overflow  */
 	INSERT_WORDS(x,hx,lx);
-	return check_uflow(x);
+	if(hy<0x00100000)		/* underflow */
+            return __math_denorm(x);
+	return (x);
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_d_dd(nextafter)
+
+#endif /* _NEED_FLOAT64 */

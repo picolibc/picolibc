@@ -88,3 +88,5 @@ hypotf(float x, float y)
     }
     return check_oflowf(w);
 }
+
+_MATH_ALIAS_f_ff(hypot)

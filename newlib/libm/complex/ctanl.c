@@ -34,6 +34,8 @@
 #include <math.h>
 #include "cephes_subrl.h"
 
+#ifdef _HAVE_LONG_DOUBLE_MATH
+
 long double complex
 ctanl(long double complex z)
 {
@@ -47,10 +49,12 @@ ctanl(long double complex z)
 
 	if (d == 0.0L) {
 		/* mtherr ("ctan", OVERFLOW); */
-		w = HUGE_VALL + HUGE_VALL * (double complex) I;
+		w = HUGE_VALL + HUGE_VALL * (long double complex) I;
 		return w;
 	}
 
-	w = sinl(2.0L * creall(z)) / d + (sinhl(2.0L * cimagl(z)) / d) * (double complex) I;
+	w = sinl(2.0L * creall(z)) / d + (sinhl(2.0L * cimagl(z)) / d) * (long double complex) I;
 	return w;
 }
+
+#endif

@@ -58,48 +58,47 @@
  */
 
 #include "fdlibm.h"
-#include "math_config.h"
 
 #if __OBSOLETE_MATH_DOUBLE
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-static const double
-bp[] = {1.0, 1.5,},
-dp_h[] = { 0.0, 5.84962487220764160156e-01,}, /* 0x3FE2B803, 0x40000000 */
-dp_l[] = { 0.0, 1.35003920212974897128e-08,}, /* 0x3E4CFDEB, 0x43CFD006 */
-zero    =  0.0,
-one	=  1.0,
-two	=  2.0,
-two53	=  9007199254740992.0,	/* 0x43400000, 0x00000000 */
+static const __float64
+bp[] = {_F_64(1.0), _F_64(1.5),},
+dp_h[] = { _F_64(0.0), _F_64(5.84962487220764160156e-01),}, /* 0x3FE2B803, 0x40000000 */
+dp_l[] = { _F_64(0.0), _F_64(1.35003920212974897128e-08),}, /* 0x3E4CFDEB, 0x43CFD006 */
+zero    =  _F_64(0.0),
+one	=  _F_64(1.0),
+two	=  _F_64(2.0),
+two53	=  _F_64(9007199254740992.0),	/* 0x43400000, 0x00000000 */
 	/* poly coefs for (3/2)*(log(x)-2s-2/3*s**3 */
-L1  =  5.99999999999994648725e-01, /* 0x3FE33333, 0x33333303 */
-L2  =  4.28571428578550184252e-01, /* 0x3FDB6DB6, 0xDB6FABFF */
-L3  =  3.33333329818377432918e-01, /* 0x3FD55555, 0x518F264D */
-L4  =  2.72728123808534006489e-01, /* 0x3FD17460, 0xA91D4101 */
-L5  =  2.30660745775561754067e-01, /* 0x3FCD864A, 0x93C9DB65 */
-L6  =  2.06975017800338417784e-01, /* 0x3FCA7E28, 0x4A454EEF */
-P1   =  1.66666666666666019037e-01, /* 0x3FC55555, 0x5555553E */
-P2   = -2.77777777770155933842e-03, /* 0xBF66C16C, 0x16BEBD93 */
-P3   =  6.61375632143793436117e-05, /* 0x3F11566A, 0xAF25DE2C */
-P4   = -1.65339022054652515390e-06, /* 0xBEBBBD41, 0xC5D26BF1 */
-P5   =  4.13813679705723846039e-08, /* 0x3E663769, 0x72BEA4D0 */
-lg2  =  6.93147180559945286227e-01, /* 0x3FE62E42, 0xFEFA39EF */
-lg2_h  =  6.93147182464599609375e-01, /* 0x3FE62E43, 0x00000000 */
-lg2_l  = -1.90465429995776804525e-09, /* 0xBE205C61, 0x0CA86C39 */
-ovt =  8.0085662595372944372e-0017, /* -(1024-log2(ovfl+.5ulp)) */
-cp    =  9.61796693925975554329e-01, /* 0x3FEEC709, 0xDC3A03FD =2/(3ln2) */
-cp_h  =  9.61796700954437255859e-01, /* 0x3FEEC709, 0xE0000000 =(float)cp */
-cp_l  = -7.02846165095275826516e-09, /* 0xBE3E2FE0, 0x145B01F5 =tail of cp_h*/
-ivln2    =  1.44269504088896338700e+00, /* 0x3FF71547, 0x652B82FE =1/ln2 */
-ivln2_h  =  1.44269502162933349609e+00, /* 0x3FF71547, 0x60000000 =24b 1/ln2*/
-ivln2_l  =  1.92596299112661746887e-08; /* 0x3E54AE0B, 0xF85DDF44 =1/ln2 tail*/
+L1  =  _F_64(5.99999999999994648725e-01), /* 0x3FE33333, 0x33333303 */
+L2  =  _F_64(4.28571428578550184252e-01), /* 0x3FDB6DB6, 0xDB6FABFF */
+L3  =  _F_64(3.33333329818377432918e-01), /* 0x3FD55555, 0x518F264D */
+L4  =  _F_64(2.72728123808534006489e-01), /* 0x3FD17460, 0xA91D4101 */
+L5  =  _F_64(2.30660745775561754067e-01), /* 0x3FCD864A, 0x93C9DB65 */
+L6  =  _F_64(2.06975017800338417784e-01), /* 0x3FCA7E28, 0x4A454EEF */
+P1   =  _F_64(1.66666666666666019037e-01), /* 0x3FC55555, 0x5555553E */
+P2   = _F_64(-2.77777777770155933842e-03), /* 0xBF66C16C, 0x16BEBD93 */
+P3   =  _F_64(6.61375632143793436117e-05), /* 0x3F11566A, 0xAF25DE2C */
+P4   = _F_64(-1.65339022054652515390e-06), /* 0xBEBBBD41, 0xC5D26BF1 */
+P5   =  _F_64(4.13813679705723846039e-08), /* 0x3E663769, 0x72BEA4D0 */
+lg2  =  _F_64(6.93147180559945286227e-01), /* 0x3FE62E42, 0xFEFA39EF */
+lg2_h  =  _F_64(6.93147182464599609375e-01), /* 0x3FE62E43, 0x00000000 */
+lg2_l  = _F_64(-1.90465429995776804525e-09), /* 0xBE205C61, 0x0CA86C39 */
+ovt =  _F_64(8.0085662595372944372e-0017), /* -(1024-log2(ovfl+.5ulp)) */
+cp    =  _F_64(9.61796693925975554329e-01), /* 0x3FEEC709, 0xDC3A03FD =2/(3ln2) */
+cp_h  =  _F_64(9.61796700954437255859e-01), /* 0x3FEEC709, 0xE0000000 =(float)cp */
+cp_l  = _F_64(-7.02846165095275826516e-09), /* 0xBE3E2FE0, 0x145B01F5 =tail of cp_h*/
+ivln2    =  _F_64(1.44269504088896338700e+00), /* 0x3FF71547, 0x652B82FE =1/ln2 */
+ivln2_h  =  _F_64(1.44269502162933349609e+00), /* 0x3FF71547, 0x60000000 =24b 1/ln2*/
+ivln2_l  =  _F_64(1.92596299112661746887e-08); /* 0x3E54AE0B, 0xF85DDF44 =1/ln2 tail*/
 
-double
-pow(double x, double y)
+__float64
+pow64(__float64 x, __float64 y)
 {
-    double z, ax, z_h, z_l, p_h, p_l;
-    double y1, t1, t2, r, s, t, u, v, w;
+    __float64 z, ax, z_h, z_l, p_h, p_l;
+    __float64 y1, t1, t2, r, s, t, u, v, w;
     __int32_t i, j, k, yisint, n;
     __int32_t hx, hy, ix, iy;
     __uint32_t lx, ly;
@@ -174,7 +173,7 @@ pow(double x, double y)
         }
     }
 
-    ax = fabs(x);
+    ax = fabs64(x);
     /* special value of x */
     if (lx == 0) {
         if (ix == 0x7ff00000 || ix == 0x3ff00000) {
@@ -227,14 +226,14 @@ pow(double x, double y)
         /* now |1-x| is tiny <= 2**-20, suffice to compute
 	   log(x) by x-x^2/2+x^3/3-x^4/4 */
         t = ax - 1; /* t has 20 trailing zeros */
-        w = (t * t) * (0.5 - t * (0.3333333333333333333333 - t * 0.25));
+        w = (t * t) * (_F_64(0.5) - t * (_F_64(0.3333333333333333333333) - t * _F_64(0.25)));
         u = ivln2_h * t; /* ivln2_h has 21 sig. bits */
         v = t * ivln2_l - w * ivln2;
         t1 = u + v;
         SET_LOW_WORD(t1, 0);
         t2 = v - (t1 - u);
     } else {
-        double s2, s_h, s_l, t_h, t_l;
+        __float64 s2, s_h, s_l, t_h, t_l;
         n = 0;
         /* take care subnormal number */
         if (ix < 0x00100000) {
@@ -274,9 +273,9 @@ pow(double x, double y)
             (L1 + s2 * (L2 + s2 * (L3 + s2 * (L4 + s2 * (L5 + s2 * L6)))));
         r += s_l * (s_h + s);
         s2 = s_h * s_h;
-        t_h = 3.0 + s2 + r;
+        t_h = _F_64(3.0) + s2 + r;
         SET_LOW_WORD(t_h, 0);
-        t_l = r - ((t_h - 3.0) - s2);
+        t_l = r - ((t_h - _F_64(3.0)) - s2);
         /* u+v = s*(1+...) */
         u = s_h * t_h;
         v = s_l * t_h + t_l * s;
@@ -287,7 +286,7 @@ pow(double x, double y)
         z_h = cp_h * p_h; /* cp_h+cp_l = 2/(3*log2) */
         z_l = cp_l * p_h + p_l * cp + dp_l[k];
         /* log2(ax) = (s+..)*2/(3*log2) = n + dp_h + z_h + z_l */
-        t = (double)n;
+        t = (__float64)n;
         t1 = (((z_h + z_l) + dp_h[k]) + t);
         SET_LOW_WORD(t1, 0);
         t2 = z_l - (((t1 - t) - dp_h[k]) - z_h);
@@ -358,8 +357,12 @@ pow(double x, double y)
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif
-__strong_reference(pow, _pow);
+__strong_reference(pow64, _pow64);
 #endif
 
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_d_dd(pow)
+
+#endif /* _NEED_FLOAT64 */
+#else
+#include "../common/pow.c"
 #endif /* __OBSOLETE_MATH_DOUBLE */

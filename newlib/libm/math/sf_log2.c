@@ -32,13 +32,8 @@ log2f(float x) /* wrapper log2f */
     return logf(x) * log2_inv;
 }
 
-#ifdef _DOUBLE_IS_32BITS
+_MATH_ALIAS_f_f(log2)
 
-double
-log2(double x)
-{
-    return (double)log2f((float)x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+#else
+#include "../common/sf_log2.c"
 #endif /* __OBSOLETE_MATH_FLOAT */

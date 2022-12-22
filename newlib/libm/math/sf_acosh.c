@@ -41,3 +41,5 @@ acoshf(float x)
         return log1pf(t + sqrtf((float)2.0 * t + t * t));
     }
 }
+
+_MATH_ALIAS_f_f(acosh)

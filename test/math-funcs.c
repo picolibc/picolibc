@@ -37,6 +37,9 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#ifdef _HAVE_COMPLEX
+#include <complex.h>
+#endif
 
 double d1, d2, d3;
 float f1, f2, f3;
@@ -46,6 +49,16 @@ long long int lli1;
 
 #ifdef _HAVE_LONG_DOUBLE
 long double l1, l2, l3;
+#endif
+
+#ifdef _HAVE_COMPLEX
+double complex cd1, cd2, cd3;
+float complex cf1, cf2, cf3;
+
+#ifdef _HAVE_LONG_DOUBLE
+long double complex cl1, cl2, cl3;
+#endif
+
 #endif
 
 /*
@@ -217,96 +230,82 @@ main(void)
     f1 = log2f (f1);
     f1 = hypotf (f1, f2);
 
-#ifdef _LDBL_EQ_DBL
-    l1 = atanl (l1);
-    l1 = cosl (l1);
-    l1 = sinl (l1);
-    l1 = tanl (l1);
-    l1 = tanhl (l1);
+#ifdef _HAVE_LONG_DOUBLE
     l1 = frexpl (l1, &i1);
-    l1 = modfl (l1, &l2);
-    l1 = ceill (l1);
-    l1 = floorl (l1);
-    l1 = log1pl (l1);
-    l1 = expm1l (l1);
-#endif
-
-#ifdef _LDBL_EQ_DBL
-    l1 = acosl (l1);
-    l1 = asinl (l1);
-    l1 = atan2l (l1, l2);
-    l1 = coshl (l1);
-    l1 = sinhl (l1);
-    l1 = expl (l1);
     l1 = ldexpl (l1, i1);
-    l1 = logl (l1);
-    l1 = log10l (l1);
-    l1 = powl (l1, l2);
-#endif
     l1 = sqrtl (l1);
-#ifdef _LDBL_EQ_DBL
-    l1 = fmodl (l1, l2);
-#endif
     l1 = hypotl (l1, l2);
-
-#ifdef _LDBL_EQ_DBL
     l1 = nanl ("");
     i1 = ilogbl (l1);
-    l1 = asinhl (l1);
-    l1 = cbrtl (l1);
-    l1 = nextafterl (l1, l2);
-    f1 = nexttowardf (f1, l1);
-    d1 = nexttoward (d1, l1);
-    l1 = nexttowardl (l1, l2);
     l1 = logbl (l1);
-    l1 = log2l (l1);
-    l1 = rintl (l1);
     l1 = scalbnl (l1, i1);
-    l1 = exp2l (l1);
     l1 = scalblnl (l1, li1);
-    l1 = tgammal (l1);
     l1 = nearbyintl (l1);
+    l1 = rintl (l1);
     li1 = lrintl (l1);
     lli1 = llrintl (l1);
     l1 = roundl (l1);
     l1 = lroundl (l1);
     lli1 = llroundl (l1);
     l1 = truncl (l1);
-    l1 = remquol (l1, l2, &i1);
-    l1 = fdiml (l1, l2);
     l1 = fmaxl (l1, l2);
     l1 = fminl (l1, l2);
-    l1 = fmal (l1, l2, l3);
-#endif
+    l1 = hypotl (l1, l2);
+    l1 = sqrtl (l1);
+    l1 = fabsl (l1);
+    l1 = copysignl (l1, l2);
 
-#ifdef _LDBL_EQ_DBL
+    l1 = ceill (l1);
+    l1 = floorl (l1);
+
+#ifdef _HAVE_LONG_DOUBLE_MATH
+    l1 = atanl (l1);
+    l1 = cosl (l1);
+    l1 = sinl (l1);
+    l1 = tanl (l1);
+    l1 = tanhl (l1);
+    l1 = modfl (l1, &l2);
+    l1 = log1pl (l1);
+    l1 = expm1l (l1);
+
+    l1 = acosl (l1);
+    l1 = asinl (l1);
+    l1 = atan2l (l1, l2);
+    l1 = coshl (l1);
+    l1 = sinhl (l1);
+    l1 = expl (l1);
+    l1 = logl (l1);
+    l1 = log10l (l1);
+    l1 = powl (l1, l2);
+    l1 = fmodl (l1, l2);
+
+    l1 = asinhl (l1);
+    l1 = cbrtl (l1);
+    l1 = log2l (l1);
+    l1 = exp2l (l1);
+    l1 = tgammal (l1);
+    l1 = remquol (l1, l2, &i1);
+    l1 = fdiml (l1, l2);
+    l1 = fmal (l1, l2, l3);
     l1 = acoshl (l1);
     l1 = atanhl (l1);
     l1 = remainderl (l1, l2);
     l1 = lgammal (l1);
     l1 = erfl (l1);
     l1 = erfcl (l1);
-#endif
-
-    l1 = hypotl (l1, l2);
-    l1 = sqrtl (l1);
-
-#ifdef _LDBL_EQ_DBL
-    l1 = rintl (l1);
-    li1 = lrintl (l1);
-    lli1 = llrintl (l1);
-#endif
-
-#ifdef _LDBL_EQ_DBL
-    l1 = fabsl (l1);
-    l1 = copysignl (l1, l2);
-#endif
+    f1 = dreml (l1, l2);
+    sincosl (l1, &l2, &l3);
+    l1 = exp10l (l1);
+    l1 = pow10l (l1);
+    f1 = nexttowardf (f1, l1);
+    d1 = nexttoward (d1, l1);
+    l1 = nextafterl (l1, l2);
+    l1 = nexttowardl (l1, l2);
+#endif /* _HAVE_LONG_DOUBLE_MATH */
+#endif /* _HAVE_LONG_DOUBLE */
 
     d1 = drem (d1, d2);
     f1 = dremf (f1, f2);
-#ifdef _LDBL_EQ_DBL
-    f1 = dreml (l1, l2);
-#endif
     d1 = lgamma_r (d1, &i1);
     f1 = lgammaf_r (f1, &i1);
 
@@ -326,17 +325,141 @@ main(void)
 
     sincos (d1, &d2, &d3);
     sincosf (f1, &f2, &f3);
-#ifdef _LDBL_EQ_DBL
-    sincosl (l1, &l2, &l3);
-#endif
     d1 = exp10 (d1);
     d1 = pow10 (d1);
     f1 = exp10f (f1);
     f1 = pow10f (f1);
-#ifdef _LDBL_EQ_DBL
-    l1 = exp10l (l1);
-    l1 = pow10l (l1);
+
+#ifdef _HAVE_COMPLEX
+    cd1 = cacos(cd1);
+    cf1 = cacosf(cf1);
+
+/* 7.3.5.2 The casin functions */
+    cd1 = casin(cd1);
+    cf1 = casinf(cf1);
+
+/* 7.3.5.1 The catan functions */
+    cd1 = catan(cd1);
+    cf1 = catanf(cf1);
+
+/* 7.3.5.1 The ccos functions */
+    cd1 = ccos(cd1);
+    cf1 = ccosf(cf1);
+
+/* 7.3.5.1 The csin functions */
+    cd1 = csin(cd1);
+    cf1 = csinf(cf1);
+
+/* 7.3.5.1 The ctan functions */
+    cd1 = ctan(cd1);
+    cf1 = ctanf(cf1);
+
+/* 7.3.6 Hyperbolic functions */
+/* 7.3.6.1 The cacosh functions */
+    cd1 = cacosh(cd1);
+    cf1 = cacoshf(cf1);
+
+/* 7.3.6.2 The casinh functions */
+    cd1 = casinh(cd1);
+    cf1 = casinhf(cf1);
+
+/* 7.3.6.3 The catanh functions */
+    cd1 = catanh(cd1);
+    cf1 = catanhf(cf1);
+
+/* 7.3.6.4 The ccosh functions */
+    cd1 = ccosh(cd1);
+    cf1 = ccoshf(cf1);
+
+/* 7.3.6.5 The csinh functions */
+    cd1 = csinh(cd1);
+    cf1 = csinhf(cf1);
+
+/* 7.3.6.6 The ctanh functions */
+    cd1 = ctanh(cd1);
+    cf1 = ctanhf(cf1);
+
+/* 7.3.7 Exponential and logarithmic functions */
+/* 7.3.7.1 The cexp functions */
+    cd1 = cexp(cd1);
+    cf1 = cexpf(cf1);
+
+/* 7.3.7.2 The clog functions */
+    cd1 = clog(cd1);
+    cf1 = clogf(cf1);
+
+/* 7.3.8 Power and absolute-value functions */
+/* 7.3.8.1 The cabs functions */
+    d1 = cabs(cd1) ;
+    f1 = cabsf(cf1) ;
+
+/* 7.3.8.2 The cpow functions */
+    cd1 = cpow(cd1, cd2);
+    cf1 = cpowf(cf1, cf2);
+
+/* 7.3.8.3 The csqrt functions */
+    cd1 = csqrt(cd1);
+    cf1 = csqrtf(cf1);
+
+/* 7.3.9 Manipulation functions */
+/* 7.3.9.1 The carg functions */ 
+    d1 = carg(cd1);
+    f1 = cargf(cf1);
+
+/* 7.3.9.2 The cimag functions */
+    d1 = cimag(cd1);
+    f1 = cimagf(cf1);
+
+/* 7.3.9.3 The conj functions */
+    cd1 = conj(cd1);
+    cf1 = conjf(cf1);
+
+/* 7.3.9.4 The cproj functions */
+    cd1 = cproj(cd1);
+    cf1 = cprojf(cf1);
+
+/* 7.3.9.5 The creal functions */
+    d1 = creal(cd1);
+    f1 = crealf(cf1);
+
+#if __GNU_VISIBLE
+    cd1 = clog10(cd1);
+    cf1 = clog10f(cf1);
 #endif
 
+#ifdef _HAVE_LONG_DOUBLE
+    cl1 =  csqrtl(cl1);
+    l1 = cabsl(cl1) ;
+    cl1 = cprojl(cl1);
+    l1 = creall(cl1);
+    cl1 = conjl(cl1);
+    l1 = cimagl(cl1);
+
+#ifdef _HAVE_LONG_DOUBLE_MATH
+    l1 = cargl(cl1);
+    cl1 = casinl(cl1);
+    cl1 = cacosl(cl1);
+    cl1 = catanl(cl1);
+    cl1 = ccosl(cl1);
+    cl1 = csinl(cl1);
+    cl1 = ctanl(cl1);
+    cl1 = cacoshl(cl1);
+    cl1 = casinhl(cl1);
+    cl1 = catanhl(cl1);
+    cl1 = ccoshl(cl1);
+    cl1 = csinhl(cl1);
+    cl1 = ctanhl(cl1);
+    cl1 = cexpl(cl1);
+    cl1 = clogl(cl1);
+    cl1 = cpowl(cl1, cl2);
+#if __GNU_VISIBLE
+    cl1 = clog10l(cl1);
+#endif
+#endif /* _HAVE_LONG_DOUBLE_MATH */
+
+#endif /* _HAVE_LONG_DOUBLE */
+
+#endif /* _HAVE_COMPLEX */
+    
     return 0;
 }

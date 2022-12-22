@@ -6,14 +6,6 @@
 
 #include <errno.h>
 
-#ifdef _HAVE_ALIAS_ATTRIBUTE
-extern float _sinf(float);
-extern float _cosf(float);
-#else
-#define _sinf sinf
-#define _cosf cosf
-#endif
-
 void __inhibit_new_builtin_calls
 sincosf(float x, float *sinx, float *cosx)
 {
@@ -21,13 +13,8 @@ sincosf(float x, float *sinx, float *cosx)
     *cosx = _cosf(x);
 }
 
-#ifdef _DOUBLE_IS_32BITS
+_MATH_ALIAS_v_fFF(sincos)
 
-void __inhibit_new_builtin_calls
-sincos(double x, double *sinx, double *cosx)
-{
-    *sinx = _sinf((float)x);
-    *cosx = _cosf((float)x);
-}
-#endif /* defined(_DOUBLE_IS_32BITS) */
+#else
+#include "../common/sincosf.c"
 #endif /* __OBSOLETE_MATH_FLOAT */

@@ -118,6 +118,12 @@ option('io-pos-args', type: 'boolean', value: false,
        description: 'enable printf-family positional arg support (always enabled for tinystdio float)')
 option('newlib-io-pos-args', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
        description: 'enable printf-family positional arg support (always enabled for tinystdio float)')
+option('io-percent-b', type: 'boolean', value: false,
+       description: 'enable proposed %b/%B format in printf and scanf in tinystdio (default: false)')
+option('io-long-double', type: 'boolean', value: false,
+       description: 'enable long double type support in IO functions printf/scanf')
+option('newlib-io-long-double', type: 'boolean', value: false,
+       description: 'enable long double type support in IO functions printf/scanf')
 
 #
 # Options applying only to tinystdio
@@ -132,6 +138,8 @@ option('posix-console', type: 'boolean', value: false,
        description: 'Use POSIX I/O for stdin/stdout/stderr')
 option('format-default', type: 'combo', choices: ['double', 'float', 'integer'], value: 'double',
        description: 'which printf/scanf versions should be the default')
+option('printf-aliases', type: 'boolean', value: true,
+       description: 'Allow link-time printf aliases')
 
 #
 # Options applying to only legacy stdio
@@ -146,8 +154,6 @@ option('newlib-global-stdio-streams', type: 'boolean', value: false,
        description: 'enable global stdio streams')
 option('newlib-io-float', type: 'boolean', value: false,
        description: 'enable printf/scanf family float support')
-option('newlib-io-long-double', type: 'boolean', value: false,
-       description: 'enable long double type support in IO functions printf/scanf (newlib stdio only)')
 option('newlib-nano-formatted-io', type: 'boolean', value: false,
        description: 'Use nano version formatted IO')
 option('newlib-reent-small', type: 'boolean', value: false,
@@ -224,15 +230,15 @@ option('newlib-retargetable-locking', type: 'boolean', value: true,
 #
 # Thread-local storage support
 #
-option('thread-local-storage', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
-       description: 'use thread local storage for static data (default: automatically detect support)')
+option('thread-local-storage', type: 'combo', choices: ['true', 'false', 'auto', 'picolibc'], value: 'picolibc',
+       description: 'use thread local storage for static data ("picolibc": picolibc and toolchain support) ("auto": toolchain supports) (default: "picolibc")')
 option('tls-model', type: 'combo', choices: ['global-dynamic', 'local-dynamic', 'initial-exec', 'local-exec'], value: 'local-exec',
        description: 'Set TLS model. No-op when thread-local-storage is false')
 option('newlib-global-errno', type: 'boolean', value: false,
        description: 'use global errno variable')
 option('errno-function', type: 'string',
        value: 'false',
-       description: 'Use this function to compute errno address (default false, auto means autodetect)')
+       description: 'Use this function to compute errno address (default false, auto means autodetect, zephyr means use z_errno_wrap if !tls)')
 
 #
 # Math options

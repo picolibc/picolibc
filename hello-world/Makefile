@@ -37,18 +37,18 @@ CFLAGS=--oslib=semihost -Os
 
 CFLAGS_RISCV=$(CFLAGS) -march=rv32imac -mabi=ilp32 -Triscv.ld
 CC_RISCV=riscv64-unknown-elf-gcc -specs=picolibc.specs $(CFLAGS_RISCV)
-CPPFLAGS_RISCV=$(CFLAGS) -march=rv32imac -mabi=ilp32 -Triscv-cpp.ld
-CPP_RISCV=riscv64-unknown-elf-g++ -specs=picolibcpp.specs $(CPPFLAGS_RISCV)
+CXXFLAGS_RISCV=$(CFLAGS) -march=rv32imac -mabi=ilp32 -Triscv-cpp.ld
+CXX_RISCV=riscv64-unknown-elf-g++ -specs=picolibcpp.specs $(CXXFLAGS_RISCV)
 
 CFLAGS_ARM=$(CFLAGS) -mcpu=cortex-m3 -Tarm.ld
 CC_ARM=arm-none-eabi-gcc -specs=picolibc.specs $(CFLAGS_ARM)
-CPPFLAGS_ARM=$(CFLAGS) -mcpu=cortex-m3 -Tarm-cpp.ld
-CPP_ARM=arm-none-eabi-c++ -specs=picolibcpp.specs $(CPPFLAGS_ARM)
+CXXFLAGS_ARM=$(CFLAGS) -mcpu=cortex-m3 -Tarm-cpp.ld
+CXX_ARM=arm-none-eabi-g++ -specs=picolibcpp.specs $(CXXFLAGS_ARM)
 
 CFLAGS_AARCH64=$(CFLAGS) -Taarch64.ld
 CC_AARCH64=aarch64-linux-gnu-gcc -specs=picolibc.specs $(CFLAGS_AARCH64)
-CPPFLAGS_AARCH64=$(CFLAGS) -Taarch64-cpp.ld
-CPP_AARCH64=aarch64-linux-gnu-g++ -specs=picolibcpp.specs $(CPPFLAGS_AARCH64)
+CXXFLAGS_AARCH64=$(CFLAGS) -Taarch64-cpp.ld
+CXX_AARCH64=aarch64-linux-gnu-g++ -specs=picolibcpp.specs $(CXXFLAGS_AARCH64)
 
 all: \
 	hello-world-arm.elf hello-world-aarch64.elf \
@@ -84,13 +84,13 @@ hello-worldpp-native.elf: hello-worldpp.cpp
 	c++ -o $@ $^
 
 hello-worldpp-arm.elf:  hello-worldpp.cpp
-	$(CPP_ARM) -Wl,-Map=hello-worldpp-arm.map -o $@ $^
+	$(CXX_ARM) -Wl,-Map=hello-worldpp-arm.map -o $@ $^
 
 hello-worldpp-aarch64.elf:  hello-worldpp.cpp
-	$(CPP_AARCH64) -Wl,-Map=hello-worldpp-aarch64.map -o $@ $^
+	$(CXX_AARCH64) -Wl,-Map=hello-worldpp-aarch64.map -o $@ $^
 
 hello-worldpp-riscv.elf:  hello-worldpp.cpp
-	$(CPP_RISCV) -Wl,-Map=hello-worldpp-riscv.map -o $@ $^
+	$(CXX_RISCV) -Wl,-Map=hello-worldpp-riscv.map -o $@ $^
 
 clean:
 	rm -f *.elf *.map

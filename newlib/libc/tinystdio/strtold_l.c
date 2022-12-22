@@ -39,6 +39,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#if defined(_HAVE_LONG_DOUBLE) && !defined(_LDBL_EQ_DBL)
+
 long double
 strtold_l (const char *__restrict s00,
 	  char **__restrict se,
@@ -47,3 +49,5 @@ strtold_l (const char *__restrict s00,
         (void) loc;
 	return strtold (s00, se);
 }
+
+#endif

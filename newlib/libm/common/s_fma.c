@@ -46,21 +46,17 @@ ANSI C, POSIX.
 
 #if !_HAVE_FAST_FMA
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-#ifdef __STDC__
-	double fma(double x, double y, double z)
-#else
-	double fma(x,y)
-	double x;
-	double y;
-        double z;
-#endif
+__float64
+fma64(__float64 x, __float64 y, __float64 z)
 {
   /* Implementation defined. */
   return (x * y) + z;
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_d_ddd(fma)
+
+#endif /* _NEED_FLOAT64 */
 
 #endif /* !_HAVE_FAST_FMA */

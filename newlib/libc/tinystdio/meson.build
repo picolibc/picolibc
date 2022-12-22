@@ -77,6 +77,7 @@ srcs_tinystdio = [
     'printf.c',
     'putchar.c',
     'puts.c',
+    'remove.c',
     'rewind.c',
     'scanf.c',
     'setbuf.c',
@@ -92,10 +93,23 @@ srcs_tinystdio = [
     'sscanf.c',
     'strfromf.c',
     'strfromd.c',
+    'strfroml.c',
     'strtof.c',
     'strtof_l.c',
     'strtod.c',
     'strtod_l.c',
+    'strtoimax.c',
+    'strtoumax.c',
+    'strtol.c',
+    'strtoll.c',
+    'strtoul.c',
+    'strtoull.c',
+    'strtol_l.c',
+    'strtoll_l.c',
+    'strtoul_l.c',
+    'strtoull_l.c',
+    'tmpnam.c',
+    'tmpfile.c',
     'ungetc.c',
     'vasprintf.c',
     'vfiprintf.c',
@@ -141,9 +155,7 @@ else
   srcs_tinystdio += srcs_dtoa_float
 endif
 
-if have_long_double and not long_double_equals_double
-  srcs_tinystdio += ['strtold.c', 'strtold_l.c', 'atold_engine.c']
-endif
+srcs_tinystdio += ['strtold.c', 'strtold_l.c', 'atold_engine.c']
 
 if atomic_ungetc
   srcs_tinystdio += ['exchange.c', 'compare_exchange.c']

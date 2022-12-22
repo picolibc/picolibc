@@ -40,6 +40,7 @@ set(tests
   regex
   ungetc
   fenv
+  long_double
   math_errhandling
   malloc
   tls

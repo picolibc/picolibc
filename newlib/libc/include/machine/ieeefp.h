@@ -79,6 +79,44 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 	exception based error handling.
 */
 
+#if !defined(__IEEE_BIG_ENDIAN) && !defined(__IEEE_LITTLE_ENDIAN)
+# if defined(__ORDER_BIG_ENDIAN__) && defined(__ORDER_LITTLE_ENDIAN__) && defined(__FLOAT_WORD_ORDER__)
+#  if __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__
+#   define __IEEE_BIG_ENDIAN
+#  else
+#   define __IEEE_LITTLE_ENDIAN
+#  endif
+# endif
+#endif
+
+#if __SIZEOF_DOUBLE__ == 4
+# define _DOUBLE_IS_32BITS
+#endif
+
+#if _SIZEOF_LONG_DOUBLE__ == 4
+# define _LONG_DOUBLE_IS_32BITS
+#endif
+
+#if defined(__SIZEOF_LONG_DOUBLE__)
+#define _HAVE_LONG_DOUBLE
+#endif
+
+#if defined(__SIZEOF_DOUBLE__) && defined(__SIZEOF_LONG_DOUBLE__)
+# if __SIZEOF_DOUBLE__ == __SIZEOF_LONG_DOUBLE__
+#  define _LDBL_EQ_DBL
+# else
+#  undef _LDBL_EQ_DBL
+# endif
+#endif
+
+#if defined(__SIZEOF_FLOAT__) && defined(__SIZEOF_DOUBLE__)
+# if __SIZEOF_FLOAT__ == __SIZEOF_DOUBLE__
+#  define _DBL_EQ_FLT
+# else
+#  undef _DBL_EQ_FLT
+#endif
+#endif
+
 #if (defined(__arm__) || defined(__thumb__)) && !defined(__MAVERICK__)
 /* arm with hard fp and soft dp cannot use new float code */
 # if (__ARM_FP & 4) && !(__ARM_FP & 8)
@@ -408,7 +446,9 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 #ifdef __AVR__
 #define __IEEE_LITTLE_ENDIAN
+#if !defined(__SIZEOF_DOUBLE__) || __SIZEOF_DOUBLE__ == 4
 #define _DOUBLE_IS_32BITS
+#endif
 #endif
 
 #if defined(__or1k__) || defined(__OR1K__) || defined(__OR1KND__)
@@ -530,6 +570,14 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 #ifdef __AMDGCN__
 #define __IEEE_LITTLE_ENDIAN
+#endif
+
+/* New math code requires 64-bit doubles */
+#ifdef _DOUBLE_IS_32BITS
+#undef __OBSOLETE_MATH
+#undef __OBSOLETE_MATH_DOUBLE
+#undef __OBSOLETE_MATH_FLOAT
+#define __OBSOLETE_MATH 1
 #endif
 
 #ifdef __CYGWIN__

@@ -66,7 +66,7 @@ foreach target : targets
   endif
 
   test(t1_name,
-       executable(t1_name, 'printf_scanf.c',
+       executable(t1_name, ['printf_scanf.c', 'lock-valid.c'],
 		  c_args: double_printf_compile_args + _c_args,
 		  link_args: double_printf_link_args + _link_args,
 		  link_with: _libs,
@@ -83,7 +83,7 @@ foreach target : targets
   endif
 
   test(t1_name,
-       executable(t1_name, 'printf_scanf.c',
+       executable(t1_name, ['printf_scanf.c', 'lock-valid.c'],
 		  c_args: float_printf_compile_args + _c_args,
 		  link_args: float_printf_link_args + _link_args,
 		  link_with: _libs,
@@ -100,7 +100,7 @@ foreach target : targets
   endif
 
   test(t1_name,
-       executable(t1_name, ['printf-tests.c'],
+       executable(t1_name, ['printf-tests.c', 'lock-valid.c'],
 		  c_args: double_printf_compile_args + _c_args,
 		  link_args: double_printf_link_args + _link_args,
 		  link_with: _libs,
@@ -116,7 +116,7 @@ foreach target : targets
   endif
 
   test(t1_name,
-       executable(t1_name, ['printf-tests.c'],
+       executable(t1_name, ['printf-tests.c', 'lock-valid.c'],
 		  c_args: float_printf_compile_args + _c_args,
 		  link_args: float_printf_link_args + _link_args,
 		  link_with: _libs,
@@ -132,7 +132,7 @@ foreach target : targets
   endif
 
   test(t1_name,
-       executable(t1_name, ['printf-tests.c'],
+       executable(t1_name, ['printf-tests.c', 'lock-valid.c'],
 		  c_args: int_printf_compile_args + _c_args,
 		  link_args: int_printf_link_args + _link_args,
 		  link_with: _libs,
@@ -155,7 +155,7 @@ foreach target : targets
   endif
 
   test(t1_name,
-       executable(t1_name, ['time-sprintf.c'],
+       executable(t1_name, ['time-sprintf.c', 'lock-valid.c'],
 		  c_args: int_printf_compile_args + _c_args + ['-fno-builtin'],
 		  link_args: int_printf_link_args + _link_args,
 		  link_with: _libs,
@@ -171,7 +171,7 @@ foreach target : targets
   endif
 
   test(t1_name,
-       executable(t1_name, ['try-ilp32.c', 'try-ilp32-sub.c'],
+       executable(t1_name, ['try-ilp32.c', 'try-ilp32-sub.c', 'lock-valid.c'],
 		  c_args: _c_args,
 		  link_args: _link_args,
 		  link_with: _libs,
@@ -187,7 +187,7 @@ foreach target : targets
   endif
 
   test(t1_name,
-       executable(t1_name, 'hosted-exit.c',
+       executable(t1_name, ['hosted-exit.c', 'lock-valid.c'],
 		  c_args: _c_args,
 		  link_args:  _link_args,
 		  link_with: _libs,
@@ -196,7 +196,7 @@ foreach target : targets
        env: test_env)
 
   test(t1 + '-fail' + target,
-       executable(t1_name + '-fail', 'hosted-exit.c',
+       executable(t1_name + '-fail', ['hosted-exit.c', 'lock-valid.c'],
 		  c_args: _c_args + ['-DRETVAL=1'],
 		  link_args:  _link_args,
 		  link_with: _libs,
@@ -214,7 +214,7 @@ foreach target : targets
   endif
 
   test(t1_name,
-       executable(t1_name, 'abort.c',
+       executable(t1_name, ['abort.c', 'lock-valid.c'],
 		  c_args: _c_args,
 		  link_args:  _link_args,
 		  link_with: _libs,
@@ -233,7 +233,7 @@ foreach target : targets
     endif
 
     test(t1_name,
-	 executable(t1_name, 'constructor-skip.c',
+	 executable(t1_name, ['constructor-skip.c', 'lock-valid.c'],
 		    c_args: _c_args,
 		    link_args:  _link_args,
 		    link_with: _libs_minimal,
@@ -267,7 +267,7 @@ foreach target : targets
   endif
 
   test(t1_name,
-       executable(t1_name, [t1_src],
+       executable(t1_name, [t1_src, 'lock-valid.c'],
 		  c_args: double_printf_compile_args + _c_args,
 		  link_args: double_printf_link_args + _link_args,
 		  link_with: _libs,
@@ -278,13 +278,32 @@ foreach target : targets
        should_fail: true
       )
 
+  t1 = 'long_double'
+  t1_src = t1 + '.c'
+  if target == ''
+    t1_name = t1
+  else
+    t1_name = t1 + '_' + target
+  endif
+
+  test(t1_name,
+       executable(t1_name, t1_src,
+		  c_args: double_printf_compile_args + _c_args,
+		  link_args: double_printf_link_args + _link_args,
+		  link_with: _libs,
+		  link_depends:  test_link_depends,
+		  include_directories: inc),
+       depends: bios_bin,
+       env: test_env,
+      )
+
   plain_tests = ['rand', 'regex', 'ungetc', 'fenv',
 		 'math_errhandling', 'malloc', 'tls',
 		 'ffs', 'setjmp', 'atexit', 'on_exit',
 		 'math-funcs', 'timegm', 'time-tests',
                  'test-strtod', 'test-strchr',
 		 'test-memset', 'test-put',
-		 'test-efcvt'
+		 'test-efcvt',
 		]
 
   if have_attr_ctor_dtor
@@ -321,13 +340,14 @@ foreach target : targets
     endif
 
     test(t1_name,
-	 executable(t1_name, [t1_src],
+	 executable(t1_name, [t1_src, 'lock-valid.c'],
 		    c_args: double_printf_compile_args + _c_args,
 		    link_args: double_printf_link_args + _link_args,
 		    link_with: _libs,
 		    link_depends:  test_link_depends,
 		    include_directories: inc),
          depends: bios_bin,
+	 timeout: 60,
 	 env: test_env)
   endforeach
 
@@ -338,6 +358,10 @@ if enable_native_tests
   native_lib_m = cc.find_library('m', required: false)
 
   if native_lib_m.found()
+    test('long_double_native',
+	 executable('long_double_native', 'long_double.c',
+		    c_args: native_c_args,
+		    dependencies: native_lib_m))
     test('math_errhandling_native',
 	 executable('math_errhandling_native', 'math_errhandling.c',
 		    c_args: native_c_args,

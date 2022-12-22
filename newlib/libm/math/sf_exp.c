@@ -52,7 +52,7 @@ expf(float x) /* default IEEE double exp */
     if (FLT_UWORD_IS_NAN(hx))
         return x + x; /* NaN */
     if (FLT_UWORD_IS_INFINITE(hx))
-        return (xsb == 0) ? x : 0.0; /* exp(+-inf)={inf,0} */
+        return (xsb == 0) ? x : 0.0f; /* exp(+-inf)={inf,0} */
     if (sx > FLT_UWORD_LOG_MAX)
         return __math_oflowf(0); /* overflow */
     if (sx < 0 && hx > FLT_UWORD_LOG_MIN)
@@ -80,9 +80,9 @@ expf(float x) /* default IEEE double exp */
     t = x * x;
     c = x - t * (P1 + t * (P2 + t * (P3 + t * (P4 + t * P5))));
     if (k == 0)
-        return one - ((x * c) / (c - (float)2.0) - x);
+        return one - ((x * c) / (c - 2.0f) - x);
     else
-        y = one - ((lo - (x * c) / ((float)2.0 - c)) - hi);
+        y = one - ((lo - (x * c) / (2.0f - c)) - hi);
     if (k >= -125) {
         __uint32_t hy;
         GET_FLOAT_WORD(hy, y);
@@ -95,4 +95,9 @@ expf(float x) /* default IEEE double exp */
         return y * twom100;
     }
 }
+
+_MATH_ALIAS_f_f(exp)
+
+#else
+#include "../common/sf_exp.c"
 #endif /* __OBSOLETE_MATH_FLOAT */

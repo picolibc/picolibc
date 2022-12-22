@@ -32,6 +32,8 @@
 #include <complex.h>
 #include <math.h>
 
+#ifdef _HAVE_LONG_DOUBLE_MATH
+
 long double complex
 clogl(long double complex z)
 {
@@ -41,6 +43,8 @@ clogl(long double complex z)
 	rr = cabsl(z);
 	p = logl(rr);
 	rr = atan2l(cimagl(z), creall(z));
-	w = p + rr * (double complex) I;
+	w = p + rr * (long double complex) I;
 	return w;
 }
+
+#endif

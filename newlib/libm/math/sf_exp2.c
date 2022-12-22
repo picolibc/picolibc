@@ -25,16 +25,11 @@
 float __inhibit_new_builtin_calls
 exp2f(float x) /* wrapper exp2f */
 {
-    return powf(2.0, x);
+    return _powf(2.0, x);
 }
 
-#ifdef _DOUBLE_IS_32BITS
+_MATH_ALIAS_f_f(exp2)
 
-double __inhibit_new_builtin_calls
-exp2(double x)
-{
-    return (double)exp2f((float)x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+#else
+#include "../common/sf_exp2.c"
 #endif /* __OBSOLETE_MATH_FLOAT */

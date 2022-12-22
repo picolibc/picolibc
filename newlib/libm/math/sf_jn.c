@@ -214,3 +214,7 @@ ynf(int n, float x)
     else
         return -b;
 }
+
+_MATH_ALIAS_f_if(jn)
+
+_MATH_ALIAS_f_if(yn)

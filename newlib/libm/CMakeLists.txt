@@ -36,4 +36,8 @@
 add_subdirectory(machine)
 add_subdirectory(common)
 add_subdirectory(math)
+add_subdirectory(ld)
 add_subdirectory(fenv)
+if(${_HAVE_COMPLEX})
+  add_subdirectory(complex)
+endif()

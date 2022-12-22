@@ -89,6 +89,7 @@ static inline void __bufio_lock_init(FILE *f) {
 
 static inline void __bufio_lock_close(FILE *f) {
 	(void) f;
+        __lock_release(((struct __file_bufio *) f)->lock);
 	__lock_close(((struct __file_bufio *) f)->lock);
 }
 

@@ -79,16 +79,4 @@ G =  3.5714286566e-01; /* 5/14      = 0x3eb6db6e */
 	return(t);
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-#ifdef __STDC__
-	double cbrt(double x)
-#else
-	double cbrt(x)
-	double x;
-#endif
-{
-	return (double) cbrtf((float) x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_f(cbrt)

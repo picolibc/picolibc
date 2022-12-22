@@ -181,9 +181,16 @@ int strfromd(char *__restrict str, size_t n,
 #endif
 #if __ISO_C_VISIBLE >= 1999
 float	strtof (const char *__restrict __n, char **__restrict __end_PTR);
+#ifdef _HAVE_LONG_DOUBLE
+long double strtold (const char *__restrict __n, char **__restrict __end_PTR);
+#endif
 #ifdef TINY_STDIO
 int strfromf(char *__restrict str, size_t n,
 	     const char *__restrict format, float fp);
+#ifdef _HAVE_LONG_DOUBLE
+int strfroml (char *__restrict str, size_t n,
+               const char *__restrict format, long double fp);
+#endif
 #endif
 #endif
 #if __MISC_VISIBLE

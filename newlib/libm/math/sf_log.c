@@ -95,4 +95,9 @@ logf(float x)
             return dk * ln2_hi - ((s * (f - R) - dk * ln2_lo) - f);
     }
 }
+
+_MATH_ALIAS_f_f(log)
+
+#else
+#include "../common/sf_log.c"
 #endif /* __OBSOLETE_MATH_FLOAT */

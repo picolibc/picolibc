@@ -107,3 +107,5 @@ atan2f(float y, float x)
         return (z - pi_lo) - pi; /* atan(-,-) */
     }
 }
+
+_MATH_ALIAS_f_ff(atan2)

@@ -63,14 +63,10 @@ C99, POSIX
 #include <limits.h>
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-#ifdef __STDC__
-	int ilogb(double x)
-#else
-	int ilogb(x)
-	double x;
-#endif
+int
+ilogb64(__float64 x)
 {
 	__int32_t hx,lx,ix;
 
@@ -78,7 +74,7 @@ C99, POSIX
 	hx &= 0x7fffffff;
 	if(hx<0x00100000) {
 	    if((hx|lx)==0) {
-                (void) __math_invalid(0.0);
+                (void) __math_invalid(_F_64(0.0));
 		return FP_ILOGB0;	/* ilogb(0) = special case error */
 	    } else			/* subnormal x */
 		if(hx==0) {
@@ -91,14 +87,16 @@ C99, POSIX
 	else if (hx<0x7ff00000) return (hx>>20)-1023;
 #if FP_ILOGBNAN != INT_MAX
 	else if (hx>0x7ff00000) {
-            (void) __math_invalid(0.0);
+            (void) __math_invalid(_F_64(0.0));
             return FP_ILOGBNAN;	/* NAN */
         }
 #endif
 	else {
-            (void) __math_invalid(0.0);
+            (void) __math_invalid(_F_64(0.0));
             return INT_MAX;	/* infinite (or, possibly, NAN) */
         }
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_i_d(ilogb)
+
+#endif /* _NEED_FLOAT64 */

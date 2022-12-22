@@ -42,16 +42,5 @@ __finitef(float x)
 }
 #endif
 
-#ifdef _DOUBLE_IS_32BITS
-
-int finite(double x)
-{
-	return finitef((float) x);
-}
-
-int __finite(double x)
-{
-    return finitef((float) x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_i_f(finite)
+_MATH_ALIAS_i_f(__finite)

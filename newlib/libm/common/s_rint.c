@@ -67,29 +67,25 @@ SEEALSO
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
 #ifdef __STDC__
-static const double
+static const __float64
 #else
-static double 
+static __float64 
 #endif
 TWO52[2]={
-  4.50359962737049600000e+15, /* 0x43300000, 0x00000000 */
- -4.50359962737049600000e+15, /* 0xC3300000, 0x00000000 */
+    _F_64(4.50359962737049600000e+15), /* 0x43300000, 0x00000000 */
+    _F_64(-4.50359962737049600000e+15), /* 0xC3300000, 0x00000000 */
 };
 
-#ifdef __STDC__
-	double rint(double x)
-#else
-	double rint(x)
-	double x;
-#endif
+__float64
+rint64(__float64 x)
 {
 	__int32_t i0,j0,sx;
 	__uint32_t i,i1;
-	double t;
-	volatile double w;
+	__float64 t;
+	volatile __float64 w;
 	EXTRACT_WORDS(i0,i1,x);
 	sx = (i0>>31)&1;		/* sign */
 	j0 = ((i0>>20)&0x7ff)-0x3ff;	/* exponent */
@@ -135,4 +131,6 @@ TWO52[2]={
 	return w-TWO52[sx];
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_d_d(rint)
+
+#endif /* _NEED_FLOAT64 */

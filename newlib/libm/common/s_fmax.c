@@ -31,9 +31,10 @@ ANSI C, POSIX.
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-double fmax(double x, double y)
+__float64
+fmax64(__float64 x, __float64 y)
 {
     if (issignaling(x) || issignaling(y))
         return x + y;
@@ -47,4 +48,6 @@ double fmax(double x, double y)
     return x > y ? x : y;
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_d_dd(fmax)
+
+#endif /* _NEED_FLOAT64 */

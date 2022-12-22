@@ -1,17 +1,28 @@
 #!/bin/sh
-CONFIGURE=$1
-DIR=$2
-shift
+TARGET=$1
+DIR=build-"$TARGET"
+CONFIGURE=do-"$TARGET"-configure
 shift
 
 mkdir $DIR
-cd $DIR
-../scripts/$CONFIGURE "$@"
-case $? in
-    77)
-	echo 'Configuration skipped'
-	exit 0
-	;;
-esac
-cat CMakeFiles/CMakeOutput.log
-ninja && ninja test
+trap 'rm -rf "$DIR"' 0
+(cd $DIR || exit 1
+ echo '##################################################'
+ echo '##########' ../scripts/"$CONFIGURE" -Dwerror=true "$@"
+ echo '##################################################'
+ ../scripts/$CONFIGURE "$@"
+ case $? in
+     0)
+	 echo 'Configuration succeeded'
+	 ;;
+     77)
+	 echo 'Configuration skipped'
+	 exit 0
+	 ;;
+     *)
+	 echo 'Configuration failed'
+	 exit 1
+	 ;;
+ esac
+ cat CMakeFiles/CMakeOutput.log
+ ninja && ninja test) || exit 1

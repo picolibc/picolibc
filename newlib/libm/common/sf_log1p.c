@@ -16,11 +16,7 @@
 #include "fdlibm.h"
 #include "math_config.h"
 
-#ifdef __STDC__
 static const float
-#else
-static float
-#endif
 ln2_hi =   6.9313812256e-01,	/* 0x3f317180 */
 ln2_lo =   9.0580006145e-06,	/* 0x3717f7d1 */
 two25 =    3.355443200e+07,	/* 0x4c000000 */
@@ -32,18 +28,10 @@ Lp5 = 1.8183572590e-01, /* 3E3A3325 */
 Lp6 = 1.5313838422e-01, /* 3E1CD04F */
 Lp7 = 1.4798198640e-01; /* 3E178897 */
 
-#ifdef __STDC__
 static const float zero = 0.0;
-#else
-static float zero = 0.0;
-#endif
 
-#ifdef __STDC__
-	float log1pf(float x)
-#else
-	float log1pf(x)
-	float x;
-#endif
+float
+log1pf(float x)
 {
 	float hfsq,f,c=0,s,z,R,u;
 	__int32_t k,hx,hu,ax;
@@ -109,16 +97,4 @@ static float zero = 0.0;
 		 return k*ln2_hi-((hfsq-(s*(hfsq+R)+(k*ln2_lo+c)))-f);
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-#ifdef __STDC__
-	double log1p(double x)
-#else
-	double log1p(x)
-	double x;
-#endif
-{
-	return (double) log1pf((float) x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_f(log1p)

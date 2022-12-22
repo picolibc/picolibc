@@ -33,7 +33,8 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-libdirs = ['math', 'common', 'fenv']
+libdirs = ['math', 'common', 'fenv', 'ld']
+
 if have_complex
   libdirs = libdirs + ['complex']
 endif
@@ -85,7 +86,7 @@ foreach target : targets
 					    pic: false,
 					    objects : libobjs,
 					    include_directories: inc,
-					    c_args: value[1] + ['-D_LIBC'])
+					    c_args: value[1])
     set_variable('lib_mpart' + target, local_lib_mpart_target)
   endif
 endforeach

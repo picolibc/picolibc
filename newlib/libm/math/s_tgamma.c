@@ -20,8 +20,10 @@
 
 #include "fdlibm.h"
 
-double
-tgamma(double x)
+#ifdef _NEED_FLOAT64
+
+__float64
+tgamma64(__float64 x)
 {
     int signgam_local;
     int divzero = 0;
@@ -29,10 +31,14 @@ tgamma(double x)
     if (isless(x, 0.0) && clang_barrier_double(rint(x)) == x)
         return __math_invalid(x);
 
-    double y = exp(__math_lgamma_r(x, &signgam_local, &divzero));
+    __float64 y = exp64(__math_lgamma_r(x, &signgam_local, &divzero));
     if (signgam_local < 0)
         y = -y;
     if (isinf(y) && finite(x) && !divzero)
         return __math_oflow(signgam_local < 0);
     return y;
 }
+
+_MATH_ALIAS_d_d(tgamma)
+
+#endif

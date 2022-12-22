@@ -33,10 +33,14 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _ADD_D_TO_DOUBLE_FUNCS
+
 #include "fdlibm.h"
 
+#ifdef _NEED_FLOAT64
+
 int
-__iseqsigd(double x, double y)
+__iseqsig64(__float64 x, __float64 y)
 {
     if (isnan(x))
         return __math_invalid(x);
@@ -44,3 +48,7 @@ __iseqsigd(double x, double y)
         return __math_invalid(y);
     return x == y;
 }
+
+_MATH_ALIAS_i_dd(__iseqsig)
+
+#endif

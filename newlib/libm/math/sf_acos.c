@@ -76,3 +76,5 @@ acosf(float x)
         return (float)2.0 * (df + w);
     }
 }
+
+_MATH_ALIAS_f_f(acos)

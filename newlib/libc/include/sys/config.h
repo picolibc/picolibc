@@ -109,10 +109,6 @@ SUCH DAMAGE.
 #define _POINTER_INT short
 #endif
 
-#if defined(__m68k__) || defined(__mc68000__) || defined(__riscv)
-#define _READ_WRITE_RETURN_TYPE _ssize_t
-#endif
-
 #ifdef ___AM29K__
 #define _FLOAT_RET double
 #endif
@@ -126,7 +122,6 @@ SUCH DAMAGE.
 /* we want the reentrancy structure to be returned by a function */
 #define __DYNAMIC_REENT__
 #define HAVE_GETDATE
-#define _READ_WRITE_RETURN_TYPE _ssize_t
 #ifndef __LARGE64_FILES
 #define __LARGE64_FILES 1
 #endif
@@ -272,7 +267,6 @@ SUCH DAMAGE.
 
 #if defined(__rtems__)
 #define __FILENAME_MAX__ 255
-#define _READ_WRITE_RETURN_TYPE _ssize_t
 #define __DYNAMIC_REENT__
 #endif
 
@@ -282,19 +276,6 @@ SUCH DAMAGE.
 
 #ifndef __IMPORT
 #define __IMPORT
-#endif
-
-/* Define return type of read/write routines.  In POSIX, the return type
-   for read()/write() is "ssize_t" but legacy newlib code has been using
-   "int" for some time.  If not specified, "int" is defaulted.  */
-#ifndef _READ_WRITE_RETURN_TYPE
-#define _READ_WRITE_RETURN_TYPE int
-#endif
-/* Define `count' parameter of read/write routines.  In POSIX, the `count'
-   parameter is "size_t" but legacy newlib code has been using "int" for some
-   time.  If not specified, "int" is defaulted.  */
-#ifndef _READ_WRITE_BUFSIZE_TYPE
-#define _READ_WRITE_BUFSIZE_TYPE int
 #endif
 
 #ifndef __WCHAR_MAX__
@@ -352,6 +333,15 @@ SUCH DAMAGE.
 #if LDBL_MANT_DIG == DBL_MANT_DIG && LDBL_MIN_EXP == DBL_MIN_EXP && \
     LDBL_MAX_EXP == DBL_MAX_EXP
 #define _LDBL_EQ_DBL
+#endif
+
+/* Newlib doesn't fully support long double math functions so far.
+   On platforms where long double equals double the long double functions
+   simply call the double functions.  On Cygwin the long double functions
+   are implemented independently from newlib to be able to use optimized
+   assembler functions despite using the Microsoft x86_64 ABI. */
+#if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__) || (defined(__SIZEOF_LONG_DOUBLE__) && __SIZEOF_LONG_DOUBLE__ <= 8) || (LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113)
+#define _HAVE_LONG_DOUBLE_MATH
 #endif
 
 #endif /* __SYS_CONFIG_H__ */

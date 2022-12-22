@@ -44,7 +44,7 @@
 extern struct timeval __semihost_write_time _ATTRIBUTE((__weak__));
 int gettimeofday(struct timeval *restrict tv, void *restrict tz) _ATTRIBUTE((__weak__));
 
-_READ_WRITE_RETURN_TYPE
+ssize_t
 write(int fd, const void *buf, size_t count)
 {
 #ifndef TINY_STDIO
@@ -55,6 +55,6 @@ write(int fd, const void *buf, size_t count)
         if (&__semihost_write_time && gettimeofday)
             gettimeofday(&__semihost_write_time, NULL);
 
-	_READ_WRITE_RETURN_TYPE put = (_READ_WRITE_RETURN_TYPE) count - (_READ_WRITE_RETURN_TYPE) ret;
+	ssize_t put = (ssize_t) (count - ret);
 	return put;
 }

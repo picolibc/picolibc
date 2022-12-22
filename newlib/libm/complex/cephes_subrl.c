@@ -33,6 +33,7 @@
 #include <math.h>
 #include "cephes_subrl.h"
 
+#ifdef _HAVE_LONG_DOUBLE_MATH
 /* calculate cosh and sinh */
 
 void
@@ -98,11 +99,11 @@ _ctansl(long double complex z)
 
 	x = x * x;
 	y = y * y;
-	x2 = 1.0;
-	y2 = 1.0;
-	f = 1.0;
-	rn = 0.0;
-	d = 0.0;
+	x2 = 1.0L;
+	y2 = 1.0L;
+	f = 1.0L;
+	rn = 0.0L;
+	d = 0.0L;
 	do {
 		rn += 1.0L;
 		f *= rn;
@@ -126,3 +127,5 @@ _ctansl(long double complex z)
 	} while (fabsl(t/d) > MACHEPL);
 	return d;
 }
+
+#endif

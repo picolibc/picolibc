@@ -47,11 +47,4 @@ float getpayloadf(const float *x)
     return (float) ix;
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double getpayload(const double *x)
-{
-    return (float) getpayloadf((float *) x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_F(getpayload)

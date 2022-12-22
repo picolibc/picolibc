@@ -432,6 +432,7 @@ run_vector_1 (int vector,
   double result;
   float fresult;
 
+#if 0
   if (vector)
   {
 
@@ -483,6 +484,7 @@ run_vector_1 (int vector,
       return;
     }
   }
+#endif
 
   newfunc(name);
   while (p->line)

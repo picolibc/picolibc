@@ -35,7 +35,7 @@
 
 cmake_minimum_required(VERSION 3.20.0)
 
-project(Picolibc VERSION 1.7.9 LANGUAGES C ASM)
+project(Picolibc VERSION 1.8 LANGUAGES C ASM)
 
 if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "arm64")
   set(CMAKE_SYSTEM_PROCESSOR "aarch64")
@@ -184,11 +184,14 @@ set(_HAVE_BUILTIN_ISNANL 1)
 # Compiler has __builtin_mul_overflow
 set(_HAVE_BUILTIN_MUL_OVERFLOW 1)
 
+# Compiler has __builtin_add_overflow
+set(_HAVE_BUILTIN_ADD_OVERFLOW 1)
+
 # Compiler flag to prevent detecting memcpy/memset patterns
 set(_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL 1)
 
 # Compiler supports _Complex
-set(_HAVE_COMPLEX 1)
+try_compile(_HAVE_COMPLEX ${PROJECT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/have-complex.c)
 
 set(_HAVE_FCNTL 0)
 
@@ -327,10 +330,9 @@ if(NOT DEFINED _IO_FLOAT_EXACT)
   option(_IO_FLOAT_EXACT "Provide exact binary/decimal conversion for printf/scanf" 1)
 endif()
 
-# is long double the same as double
-try_compile(_LDBL_EQ_DBL ${PROJECT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/ldbl-eq-dbl.c)
-
 set(_LITE_EXIT 1)
+
+set(_PICO_EXIT 1)
 
 if(NOT DEFINED _MB_CAPABLE)
   option(_MB_CAPABLE "Enable multi-byte support" 0)
@@ -359,6 +361,10 @@ if(NOT DEFINED _WANT_IO_POS_ARGS)
 endif()
 
 option(__IO_FLOAT "Support floating point in printf/scanf by default" OFF)
+
+if(NOT DEFINED _WANT_IO_PERCENT_B)
+  option(_WANT_IO_PERCENT_B "Support %b/%B formats in printf/scanf" OFF)
+endif()
 
 if(NOT DEFINED FORMAT_DEFAULT_DOUBLE)
   set(FORMAT_DEFAULT_DOUBLE ${__IO_FLOAT})
@@ -418,6 +424,10 @@ set(PICOLIBC_INCLUDE ${PROJECT_BINARY_DIR}/picolibc/include)
 
 set(PICOLIBC_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/scripts")
 
+include(CheckIncludeFile)
+
+CHECK_INCLUDE_FILE(xtensa/config/core-isa.h _XTENSA_HAVE_CONFIG_CORE_ISA_H)
+
 configure_file(picolibc.h.in "${PICOLIBC_INCLUDE}/picolibc.h")
 
 set(INCLUDEDIR include)
@@ -455,6 +465,7 @@ set(PICOLIBC_COMPILE_OPTIONS
   "-Werror=vla"
   "-Warray-bounds"
   "-Wold-style-definition"
+  "-D_LIBC"
   ${TLSMODEL}
   ${TARGET_COMPILE_OPTIONS}
   ${PICOLIBC_EXTRA_COMPILE_OPTIONS}

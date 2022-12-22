@@ -31,6 +31,8 @@
 
 #include <complex.h>
 
+#ifdef _HAVE_LONG_DOUBLE_MATH
+
 long double complex
 cacoshl(long double complex z)
 {
@@ -43,3 +45,5 @@ cacoshl(long double complex z)
 #endif
 	return w;
 }
+
+#endif

@@ -58,3 +58,5 @@ sinhf(float x)
     /* |x| > overflowthresold, sinh(x) overflow */
     return __math_oflowf(x < 0);
 }
+
+_MATH_ALIAS_f_f(sinh)

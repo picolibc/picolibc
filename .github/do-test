@@ -1,21 +1,32 @@
 #!/bin/sh
-CONFIGURE=$1
-DIR=$2
-shift
+TARGET=$1
+DIR=build-"$TARGET"
+CONFIGURE=do-"$TARGET"-configure
 shift
 
 for p in /opt/*/bin; do
     PATH="$p":$PATH
 done
 
-mkdir $DIR
-cd $DIR
-../scripts/$CONFIGURE -Dwerror=true "$@"
-case $? in
-    77)
-	echo 'Configuration skipped'
-	exit 0
-	;;
-esac
-cat meson-logs/*
-ninja && meson test -v
+mkdir "$DIR"
+trap 'rm -rf "$DIR"' 0 1 15
+(cd "$DIR" || exit 1
+ echo '##################################################'
+ echo '##########' ../scripts/"$CONFIGURE" -Dwerror=true "$@"
+ echo '##################################################'
+ ../scripts/"$CONFIGURE" -Dwerror=true "$@"
+ case $? in
+     0)
+	 echo 'Configuration succeeded'
+	 ;;
+     77)
+	 echo 'Configuration skipped'
+	 exit 0
+	 ;;
+     *)
+	 echo 'Configuration failed with' "$?"
+	 exit 1
+	 ;;
+ esac
+ cat meson-logs/*
+ ninja && meson test -t 4 -v) || exit 1

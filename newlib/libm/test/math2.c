@@ -27,6 +27,10 @@ randi (void)
   return ((next >> 16) & 0xffff);
 }
 
+#ifndef __FLOAT_WORD_ORDER__
+#define __FLOAT_WORD_ORDER__ __BYTE_ORDER__
+#endif
+
 double randx (void)
 {
   double res;
@@ -38,10 +42,17 @@ double randx (void)
 	double res;
       } u;
 
+#if __FLOAT_WORD_ORDER__ == __ORDER_LITTLE_ENDIAN__
     u.parts[0] = randi();
     u.parts[1] = randi();
     u.parts[2] = randi();
     u.parts[3] = randi();
+#else
+    u.parts[3] = randi();
+    u.parts[2] = randi();
+    u.parts[1] = randi();
+    u.parts[0] = randi();
+#endif
     res = u.res;
 
   } while (!finite(res));

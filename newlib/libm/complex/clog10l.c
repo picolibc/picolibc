@@ -34,6 +34,8 @@ PORTABILITY
 #include <complex.h>
 #include <math.h>
 
+#ifdef _HAVE_LONG_DOUBLE_MATH
+
 long double complex
 clog10l(long double complex z)
 {
@@ -42,7 +44,9 @@ clog10l(long double complex z)
 
 	rr = cabsl(z);
 	p = log10l(rr);
-	rr = atan2l(cimagl(z), creall(z)) * M_IVLN10;
+	rr = atan2l(cimagl(z), creall(z)) * _M_IVLN10L;
 	w = p + rr * (long double complex) I;
 	return w;
 }
+
+#endif

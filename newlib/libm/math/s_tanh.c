@@ -70,14 +70,14 @@ PORTABILITY
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-static const volatile double one = 1.0, two = 2.0, tiny = 1.0e-300;
+static const volatile __float64 one = _F_64(1.0), two = _F_64(2.0), tiny = _F_64(1.0e-300);
 
-double
-tanh(double x)
+__float64
+tanh64(__float64 x)
 {
-    double t, z;
+    __float64 t, z;
     __int32_t jx, ix;
 
     /* High word of |x|. */
@@ -97,10 +97,10 @@ tanh(double x)
         if (ix < 0x3c800000) /* |x|<2**-55 */
             return x * (one + x); /* tanh(small) = small */
         if (ix >= 0x3ff00000) { /* |x|>=1  */
-            t = expm1(two * fabs(x));
+            t = expm164(two * fabs64(x));
             z = one - two / (t + two);
         } else {
-            t = expm1(-two * fabs(x));
+            t = expm164(-two * fabs64(x));
             z = -t / (t + two);
         }
         /* |x| > 22, return +-1 */
@@ -110,4 +110,6 @@ tanh(double x)
     return (jx >= 0) ? z : -z;
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_d_d(tanh)
+
+#endif /* _NEED_FLOAT64 */

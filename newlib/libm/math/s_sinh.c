@@ -31,14 +31,14 @@
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-static const double one = 1.0, shuge = 1.0e307;
+static const __float64 one = _F_64(1.0), shuge = _F_64(1.0e307);
 
-double
-sinh(double x)
+__float64
+sinh64(__float64 x)
 {
-    double t, w, h;
+    __float64 t, w, h;
     __int32_t ix, jx;
     __uint32_t lx;
 
@@ -50,7 +50,7 @@ sinh(double x)
     if (ix >= 0x7ff00000)
         return x + x;
 
-    h = 0.5;
+    h = _F_64(0.5);
     if (jx < 0)
         h = -h;
     /* |x| in [0,22], return sign(x)*0.5*(E+E/(E+1))) */
@@ -58,20 +58,20 @@ sinh(double x)
         if (ix < 0x3e300000) /* |x|<2**-28 */
             if (shuge + x > one)
                 return x; /* sinh(tiny) = tiny with inexact */
-        t = expm1(fabs(x));
+        t = expm164(fabs64(x));
         if (ix < 0x3ff00000)
-            return h * (2.0 * t - t * t / (t + one));
+            return h * (_F_64(2.0) * t - t * t / (t + one));
         return h * (t + t / (t + one));
     }
 
     /* |x| in [22, log(maxdouble)] return 0.5*exp(|x|) */
     if (ix < 0x40862E42)
-        return h * exp(fabs(x));
+        return h * exp64(fabs64(x));
 
     /* |x| in [log(maxdouble), overflowthresold] */
     GET_LOW_WORD(lx, x);
     if (ix < 0x408633CE || (ix == 0x408633ce && lx <= (__uint32_t)0x8fb9f87d)) {
-        w = exp(0.5 * fabs(x));
+        w = exp64(_F_64(0.5) * fabs64(x));
         t = h * w;
         return t * w;
     }
@@ -80,4 +80,6 @@ sinh(double x)
     return __math_oflow(x < 0);
 }
 
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_d_d(sinh)
+
+#endif /* _NEED_FLOAT64 */

@@ -56,13 +56,8 @@ sinf(float x)
 __strong_reference(sinf, _sinf);
 #endif
 
-#ifdef _DOUBLE_IS_32BITS
+_MATH_ALIAS_f_f(sin)
 
-double
-sin(double x)
-{
-    return (double)sinf((float)x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+#else
+#include "../common/sinf.c"
 #endif /* __OBSOLETE_MATH_FLOAT */

@@ -119,3 +119,5 @@ fmodf(float x, float y)
     }
     return x; /* exact output */
 }
+
+_MATH_ALIAS_f_ff(fmod)

@@ -77,6 +77,7 @@ picolibc_sources(
   printf.c
   putchar.c
   puts.c
+  remove.c
   rewind.c
   scanf.c
   setbuf.c
@@ -96,6 +97,14 @@ picolibc_sources(
   strtof_l.c
   strtod.c
   strtod_l.c
+  strtoimax.c
+  strtol.c
+  strtoll.c
+  strtoul.c
+  strtoull.c
+  strtoumax.c
+  tmpnam.c
+  tmpfile.c
   ungetc.c
   vasprintf.c
   vfiprintf.c

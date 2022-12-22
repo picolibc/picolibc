@@ -66,3 +66,5 @@ coshf(float x)
     /* |x| > overflowthresold, cosh(x) overflow */
     return __math_oflowf(0);
 }
+
+_MATH_ALIAS_f_f(cosh)

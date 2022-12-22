@@ -44,14 +44,17 @@ QUICKREF
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-double infinity(void)
+__float64
+infinity64(void)
 {
-	double x;
+	__float64 x;
 
 	INSERT_WORDS(x,0x7ff00000,0);
 	return x;
 }
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_d(infinity)
+
+#endif /* _NEED_FLOAT64 */

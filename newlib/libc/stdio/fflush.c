@@ -105,8 +105,8 @@ _sflush (
        register FILE * fp)
 {
   register unsigned char *p;
-  register _READ_WRITE_BUFSIZE_TYPE n;
-  register _READ_WRITE_RETURN_TYPE t;
+  register size_t n;
+  register ssize_t t;
   short flags;
 
   flags = fp->_flags;

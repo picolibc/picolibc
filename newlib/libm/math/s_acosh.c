@@ -28,16 +28,16 @@
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-static const double one = 1.0,
-                    ln2 =
-                        6.93147180559945286227e-01; /* 0x3FE62E42, 0xFEFA39EF */
+static const __float64
+    one = _F_64(1.0),
+    ln2 = _F_64(6.93147180559945286227e-01); /* 0x3FE62E42, 0xFEFA39EF */
 
-double
-acosh(double x)
+__float64
+acosh64(__float64 x)
 {
-    double t;
+    __float64 t;
     __int32_t hx;
     __uint32_t lx;
     EXTRACT_WORDS(hx, lx, x);
@@ -47,16 +47,18 @@ acosh(double x)
         if (hx >= 0x7ff00000) { /* x is inf of NaN */
             return x + x;
         } else
-            return log(x) + ln2; /* acosh(huge)=log(2x) */
+            return log64(x) + ln2; /* acosh(huge)=log(2x) */
     } else if (((hx - 0x3ff00000) | lx) == 0) {
-        return 0.0; /* acosh(1) = 0 */
+        return _F_64(0.0); /* acosh(1) = 0 */
     } else if (hx > 0x40000000) { /* 2**28 > x > 2 */
         t = x * x;
-        return log(2.0 * x - one / (x + sqrt(t - one)));
+        return log64(_F_64(2.0) * x - one / (x + sqrt64(t - one)));
     } else { /* 1<x<2 */
         t = x - one;
-        return log1p(t + sqrt(2.0 * t + t * t));
+        return log1p64(t + sqrt64(_F_64(2.0) * t + t * t));
     }
 }
 
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_d_d(acosh)
+
+#endif /* _NEED_FLOAT64 */

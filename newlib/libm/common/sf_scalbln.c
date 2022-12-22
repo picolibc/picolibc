@@ -15,15 +15,12 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 static const float
-#else
-static float
-#endif
 two25   =  3.355443200e+07,	/* 0x4c000000 */
 twom25  =  2.9802322388e-08;	/* 0x33000000 */
 
-float scalblnf (float x, long int n)
+float
+scalblnf (float x, long int n)
 {
 	__int32_t ix;
         uint32_t hx;
@@ -53,11 +50,4 @@ float scalblnf (float x, long int n)
         return check_uflowf(x*twom25);
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double scalbln (double x, long int n)
-{
-	return (double) scalblnf((float) x, n);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_fj(scalbln)

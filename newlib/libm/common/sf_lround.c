@@ -42,11 +42,4 @@ long int lroundf(float x)
   return sign * result;
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-long int lround(double x)
-{
-	return lroundf((float) x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_j_f(lround)

@@ -11,12 +11,8 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
-	float roundf(float x)
-#else
-	float roundf(x)
-	float x;
-#endif
+float
+roundf(float x)
 {
   __uint32_t w;
   /* Most significant word, least significant word. */
@@ -59,16 +55,4 @@
   return x;
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-#ifdef __STDC__
-	double round(double x)
-#else
-	double round(x)
-	double x;
-#endif
-{
-	return (double) roundf((float) x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_f(round)

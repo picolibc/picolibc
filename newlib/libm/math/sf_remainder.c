@@ -61,3 +61,5 @@ remainderf(float x, float p)
     SET_FLOAT_WORD(x, hx ^ sx);
     return x;
 }
+
+_MATH_ALIAS_f_ff(remainder)

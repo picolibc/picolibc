@@ -93,12 +93,6 @@ picolibc_sources(
   srand.c
   srand48.c
   srandom.c
-  strtoimax.c
-  strtol.c
-  strtoll.c
-  strtoul.c
-  strtoull.c
-  strtoumax.c
   system.c
   utoa.c
   wcrtomb.c

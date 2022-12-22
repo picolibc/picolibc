@@ -157,4 +157,7 @@ exp2 (double x)
      is no spurious underflow here even without fma.  */
   return scale + scale * tmp;
 }
+
+_MATH_ALIAS_d_d(exp2)
+
 #endif

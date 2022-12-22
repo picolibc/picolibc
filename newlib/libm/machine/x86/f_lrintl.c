@@ -38,10 +38,5 @@ long int _f_lrintl (long double x)
   return _result;
 }
 
-/* For now, there is only the fast math version so we use it.  */
-long int lrintl (long double x) {
-  return _f_lrintl(x);
-}
-
 #endif /* !_SOFT_FLOAT */
 #endif /* __GNUC__ */

@@ -19,15 +19,14 @@
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-static const double one = 1.0, Zero[] = {
-    0.0,
-    -0.0,
-};
+static const __float64
+    one = _F_64(1.0),
+    Zero[] = { _F_64(0.0), _F_64(-0.0) };
 
-double
-fmod(double x, double y)
+__float64
+fmod64(__float64 x, __float64 y)
 {
     __int32_t n, hx, hy, hz, ix, iy, sx, i;
     __uint32_t lx, ly, lz;
@@ -160,4 +159,6 @@ fmod(double x, double y)
     return x; /* exact output */
 }
 
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_d_dd(fmod)
+
+#endif /* _NEED_FLOAT64 */

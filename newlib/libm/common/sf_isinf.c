@@ -29,14 +29,6 @@ isinff (float x)
 	return FLT_UWORD_IS_INFINITE(ix);
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
 #undef isinf
 
-int
-isinf (double x)
-{
-	return isinff((float) x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_i_f(isinf)

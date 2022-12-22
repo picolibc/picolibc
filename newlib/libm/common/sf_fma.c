@@ -8,14 +8,7 @@
 
 #if !_HAVE_FAST_FMAF
 
-#ifdef __STDC__
-	float fmaf(float x, float y, float z)
-#else
-	float fmaf(x,y,z)
-	float x;
-	float y;
-        float z;
-#endif
+float fmaf(float x, float y, float z)
 {
   /*
    * Better to just get a double-rounded answer than invoke double
@@ -24,20 +17,6 @@
   return x * y + z;
 }
 
+_MATH_ALIAS_f_fff(fma)
+
 #endif
-
-#ifdef _DOUBLE_IS_32BITS
-
-#ifdef __STDC__
-	double fma(double x, double y, double z)
-#else
-	double fma(x,y,z)
-	double x;
-	double y;
-        double z;
-#endif
-{
-  return (double) fmaf((float) x, (float) y, (float) z);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */

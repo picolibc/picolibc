@@ -25,7 +25,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #if __ARM_ARCH >= 8 && (__ARM_FP & 0x8) && !defined (__SOFTFP__)
-#include <math.h>
+#include "math_config.h"
 
 double
 trunc (double x)
@@ -34,6 +34,8 @@ trunc (double x)
   __asm__ volatile ("vrintz.f64\t%P0, %P1" : "=w" (result) : "w" (x));
   return result;
 }
+
+_MATH_ALIAS_d_d(trunc)
 
 #else
 #include "../../common/s_trunc.c"

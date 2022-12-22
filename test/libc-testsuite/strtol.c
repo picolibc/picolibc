@@ -91,8 +91,35 @@ int test_strtol(void)
 		TEST(ul, strtoul(s="-2147483649", &c, 0), -2147483649UL, "rejected negative %lu != %lu");
 		TEST2(i, c-s, 11, "wrong final position %d != %d");
 		TEST2(i, errno, 0, "spurious errno %d != %d");
-//	} else {
-//		TEST(i, 0, 1, "64bit tests not implemented");
+	} else {
+		errno = 0;
+		TEST(l, strtol(s="9223372036854775808", &c, 0), 9223372036854775807L, "uncaught overflow %ld != %ld");
+		TEST2(i, c-s, 19, "wrong final position %d != %d");
+		TEST2(i, errno, ERANGE, "missing errno %d != %d");
+		errno = 0;
+		TEST(l, strtol(s="-9223372036854775809", &c, 0), -9223372036854775807L-1, "uncaught overflow %ld != %ld");
+		TEST2(i, c-s, 20, "wrong final position %d != %d");
+		TEST2(i, errno, ERANGE, "missing errno %d != %d");
+		errno = 0;
+		TEST(ul, strtoul(s="18446744073709551616", &c, 0), 18446744073709551615UL, "uncaught overflow %lu != %lu");
+		TEST2(i, c-s, 20, "wrong final position %d != %d");
+		TEST2(i, errno, ERANGE, "missing errno %d != %d");
+		errno = 0;
+		TEST(ul, strtoul(s="-1", &c, 0), -1UL, "rejected negative %lu != %lu");
+		TEST2(i, c-s, 2, "wrong final position %d != %d");
+		TEST2(i, errno, 0, "spurious errno %d != %d");
+		errno = 0;
+		TEST(ul, strtoul(s="-2", &c, 0), -2UL, "rejected negative %lu != %lu");
+		TEST2(i, c-s, 2, "wrong final position %d != %d");
+		TEST2(i, errno, 0, "spurious errno %d != %d");
+		errno = 0;
+		TEST(ul, strtoul(s="-9223372036854775808", &c, 0), -9223372036854775808UL, "rejected negative %lu != %lu");
+		TEST2(i, c-s, 20, "wrong final position %d != %d");
+		TEST2(i, errno, 0, "spurious errno %d != %d");
+		errno = 0;
+		TEST(ul, strtoul(s="-9223372036854775809", &c, 0), -9223372036854775809UL, "rejected negative %lu != %lu");
+		TEST2(i, c-s, 20, "wrong final position %d != %d");
+		TEST2(i, errno, 0, "spurious errno %d != %d");
 	}
 
 	TEST(l, strtol("z", 0, 36), 35, "%ld != %ld");
@@ -104,6 +131,31 @@ int test_strtol(void)
 
 	TEST(l, strtol(s="0x1234", &c, 16), 0x1234, "%ld != %ld");
 	TEST2(i, c-s, 6, "wrong final position %ld != %ld");
+
+        char delim_buf[6] = "09af:";
+
+        for (int j = 0; j < 256; j++) {
+            delim_buf[4] = j;
+            if (('0' <= j && j <= '9') ||
+                ('A' <= j && j <= 'F') ||
+                ('a' <= j && j <= 'f'))
+            {
+                int k;
+                if ('0' <= j && j <= '9')
+                    k = j - '0';
+                else if ('A' <= j && j <= 'Z')
+                    k = j - 'A' + 10;
+                else if ('a' <= j && j <= 'z')
+                    k = j - 'a' + 10;
+                else
+                    k = 0xffffffff;
+                TEST(l, strtol(s=delim_buf, &c, 16), 0x09af0 | k, "%ld != %ld");
+                TEST2(i, c-s, 5, "wrong final position %ld != %ld");
+            } else {
+                TEST(l, strtol(s=delim_buf, &c, 16), 0x09af, "%ld != %ld");
+                TEST2(i, c-s, 4, "wrong final position %ld != %ld");
+            }
+        }
 
 	errno = 0;
 	c = NULL;

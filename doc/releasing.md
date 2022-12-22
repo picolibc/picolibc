@@ -23,6 +23,8 @@ picolibc:
 
  3. Use glibc test suite for RISC-V and ARM 32-bit
 
+    * Enable errno in the math functions using -Dwant-math-errno=true
+
     * Build and install minsize and release builds, using
     --buildtype=release -Dbuild-type-subdir=release
 

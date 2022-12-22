@@ -50,16 +50,19 @@ PORTABILITY
 
 #include "fdlibm.h"
 #if __OBSOLETE_MATH_DOUBLE
-#include <errno.h>
-#include <math.h>
+#ifdef _NEED_FLOAT64
 
-#ifndef _DOUBLE_IS_32BITS
+extern __float64 _pow64(__float64, __float64);
 
-double __inhibit_new_builtin_calls
-exp2(double x) /* wrapper exp2 */
+__float64 __inhibit_new_builtin_calls
+exp264(__float64 x) /* wrapper exp2 */
 {
-    return pow(2.0, x);
+    return _pow64(2.0, x);
 }
 
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_d_d(exp2)
+
+#endif /* _NEED_FLOAT64 */
+#else
+#include "../common/exp2.c"
 #endif /* __OBSOLETE_MATH_DOUBLE */

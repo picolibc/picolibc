@@ -296,4 +296,8 @@ powf(float x, float y)
 __strong_reference(powf, _powf);
 #endif
 
+_MATH_ALIAS_f_ff(pow)
+
+#else
+#include "../common/sf_pow.c"
 #endif /* __OBSOLETE_MATH_FLOAT */

@@ -43,21 +43,17 @@ jobs:
           tags: ${{ env.IMAGE }}:latest
           outputs: type=docker,dest=${{ env.IMAGE_FILE }}
 
-  cmake-arm:
+  cmake-linux:
     needs: cache-maker
     runs-on: ubuntu-latest
     strategy:
       matrix:
         cmake_flags: [
           "",
-          "-DCMAKE_BUILD_TYPE=Debug",
-          "-DCMAKE_BUILD_TYPE=Release",
-          "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
-          "-DCMAKE_BUILD_TYPE=MinSizeRel",
         ]
         test: [
-          "./.github/do-cmake-test do-cmake-thumbv7m-configure build-cmake-thumbv7m",
-        ]
+	  "./.github/do-cmake-linux",
+	]
     steps:
       - name: Clone picolibc
         uses: actions/checkout@v2
@@ -79,7 +75,7 @@ jobs:
         run: |
           docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.cmake_flags }}
 
-  fortify-source-arm:
+  fortify-source-linux:
     needs: cache-maker
     runs-on: ubuntu-latest
     strategy:
@@ -92,11 +88,11 @@ jobs:
           "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
 
           # Tinystdio configurations
-          "-Dio-float-exact=false -Dio-long-long=true",
+          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true",
           "-Dformat-default=integer",
 
           # Original stdio
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true",
 
           # Locale, iconv, original malloc and original atexit/onexit configurations
           "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
@@ -106,9 +102,8 @@ jobs:
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
         ]
         test: [
-          "./.github/do-test do-arm-configure build-arm",
-          "./.github/do-many do-test do-clang-thumbv7e+fp-configure build-clang-thumbv7e+fp do-test do-clang-thumbv7m-configure build-clang-thumbv7m do-test do-cortex-a9-configure build-cortex-a9 do-test do-clang-thumbv6m-configure build-clang-thumbv6m end",
-        ]
+	  "./.github/do-linux",
+	]
     steps:
       - name: Clone picolibc
         uses: actions/checkout@v2
@@ -130,7 +125,7 @@ jobs:
         run: |
           docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} -Dfortify-source=2
 
-  fortify-source-misc:
+  minsize-linux:
     needs: cache-maker
     runs-on: ubuntu-latest
     strategy:
@@ -143,11 +138,11 @@ jobs:
           "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
 
           # Tinystdio configurations
-          "-Dio-float-exact=false -Dio-long-long=true",
+          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true",
           "-Dformat-default=integer",
 
           # Original stdio
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true",
 
           # Locale, iconv, original malloc and original atexit/onexit configurations
           "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
@@ -157,261 +152,8 @@ jobs:
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
         ]
         test: [
-          "./.github/do-many do-test do-native-configure build-native do-test do-aarch64-configure build-aarch64 do-build do-lx106-configure build-lx106 do-test do-i386-configure build-i386 do-build do-m68k-configure build-m68k do-build do-clang-msp430-configure build-clang-msp430 do-build do-msp430-configure build-msp430 do-zephyr-build do-nios2-configure build-nios2 do-build do-sparc64-configure build-sparc64 do-test do-x86_64-configure build-x86_64 do-test do-x86-configure build-x86 end",
-        ]
-    steps:
-      - name: Clone picolibc
-        uses: actions/checkout@v2
-        with:
-          path: picolibc
-
-      - name: Restore the Docker Image
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
-
-      - name: Load and Check the Docker Image
-        run: |
-          docker load -i $IMAGE_FILE
-          docker images -a $IMAGE
-
-      - name: Fortity source test
-        run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} -Dfortify-source=2
-
-  fortify-source-ppc:
-    needs: cache-maker
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        meson_flags: [
-          "",
-
-          # Math configurations
-          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
-          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
-
-          # Tinystdio configurations
-          "-Dio-float-exact=false -Dio-long-long=true",
-          "-Dformat-default=integer",
-
-          # Original stdio
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
-
-          # Locale, iconv, original malloc and original atexit/onexit configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
-
-          # Multithread disabled
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
-        ]
-        test: [
-          "./.github/do-many do-build do-powerpc64-configure build-powerpc64 do-build do-powerpc64le-configure build-powerpc64le end",
-        ]
-
-    steps:
-      - name: Clone picolibc
-        uses: actions/checkout@v2
-        with:
-          path: picolibc
-
-      - name: Restore the Docker Image
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
-
-      - name: Load and Check the Docker Image
-        run: |
-          docker load -i $IMAGE_FILE
-          docker images -a $IMAGE
-
-      - name: Fortity source test
-        run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} -Dfortify-source=2
-
-  fortify-source-riscv:
-    needs: cache-maker
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        meson_flags: [
-          "",
-
-          # Math configurations
-          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
-          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
-
-          # Tinystdio configurations
-          "-Dio-float-exact=false -Dio-long-long=true",
-          "-Dformat-default=integer",
-
-          # Original stdio
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
-
-          # Locale, iconv, original malloc and original atexit/onexit configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
-
-          # Multithread disabled
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
-        ]
-        test: [
-          "./.github/do-test do-riscv-configure build-riscv",
-          "./.github/do-many do-test do-rv32imac-configure build-rv32imac do-test do-clang-riscv-configure build-riscv-clang do-test do-clang-rv32imafdc-configure build-clang-rv32imafdc end",
-        ]
-    steps:
-      - name: Clone picolibc
-        uses: actions/checkout@v2
-        with:
-          path: picolibc
-
-      - name: Restore the Docker Image
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
-
-      - name: Load and Check the Docker Image
-        run: |
-          docker load -i $IMAGE_FILE
-          docker images -a $IMAGE
-
-      - name: Fortity source test
-        run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} -Dfortify-source=2
-
-  fortify-source-mips:
-    needs: cache-maker
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        meson_flags: [
-          "",
-
-          # Math configurations
-          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
-          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
-
-          # Tinystdio configurations
-          "-Dio-float-exact=false -Dio-long-long=true",
-          "-Dformat-default=integer",
-
-          # Original stdio
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
-
-          # Locale, iconv, original malloc and original atexit/onexit configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
-
-          # Multithread disabled
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
-        ]
-        test: [
-          "./.github/do-many do-build do-mips-configure build-mips do-build do-mipsel-configure build-mipsel end",
-        ]
-    steps:
-      - name: Clone picolibc
-        uses: actions/checkout@v2
-        with:
-          path: picolibc
-
-      - name: Restore the Docker Image
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
-
-      - name: Load and Check the Docker Image
-        run: |
-          docker load -i $IMAGE_FILE
-          docker images -a $IMAGE
-
-      - name: Fortity source test
-        run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} -Dfortify-source=2
-
-  fortify-source-xtensa:
-    needs: cache-maker
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        meson_flags: [
-          "",
-
-          # Math configurations
-          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
-          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
-
-          # Tinystdio configurations
-          "-Dio-float-exact=false -Dio-long-long=true",
-          "-Dformat-default=integer",
-
-          # Original stdio
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
-
-          # Locale, iconv, original malloc and original atexit/onexit configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
-
-          # Multithread disabled
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
-        ]
-        test: [
-          "./.github/do-zephyr ./.github/do-many do-build do-xtensa-espressif_esp32s2-configure build-xtensa-espressif_esp32s2 do-build do-xtensa-espressif_esp32-configure build-xtensa-espressif_esp32 do-build do-xtensa-intel_apl_adsp-configure build-xtensa-intel_apl_adsp do-build do-xtensa-intel_bdw_adsp-configure build-xtensa-intel_bdw_adsp do-build do-xtensa-intel_byt_adsp-configure build-xtensa-intel_byt_adsp do-build do-xtensa-intel_s1000-configure build-xtensa-intel_s1000 do-build do-xtensa-nxp_imx8m_adsp-configure build-xtensa-nxp_imx8m_adsp do-build do-xtensa-nxp_imx_adsp-configure build-xtensa-nxp_imx_adsp do-build do-xtensa-sample_controller-configure build-xtensa-sample_controller end",
-        ]
-    steps:
-      - name: Clone picolibc
-        uses: actions/checkout@v2
-        with:
-          path: picolibc
-
-      - name: Restore the Docker Image
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
-
-      - name: Load and Check the Docker Image
-        run: |
-          docker load -i $IMAGE_FILE
-          docker images -a $IMAGE
-
-      - name: Fortity source test
-        run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} -Dfortify-source=2
-
-  minsize-arm:
-    needs: cache-maker
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        meson_flags: [
-          "",
-
-          # Math configurations
-          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
-          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
-
-          # Tinystdio configurations
-          "-Dio-float-exact=false -Dio-long-long=true",
-          "-Dformat-default=integer",
-
-          # Original stdio
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
-
-          # Locale, iconv, original malloc and original atexit/onexit configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
-
-          # Multithread disabled
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
-        ]
-        test: [
-          "./.github/do-test do-arm-configure build-arm",
-          "./.github/do-many do-test do-clang-thumbv7e+fp-configure build-clang-thumbv7e+fp do-test do-clang-thumbv7m-configure build-clang-thumbv7m do-test do-cortex-a9-configure build-cortex-a9 do-test do-clang-thumbv6m-configure build-clang-thumbv6m end",
-        ]
+	  "./.github/do-linux",
+	]
     steps:
       - name: Clone picolibc
         uses: actions/checkout@v2
@@ -433,7 +175,7 @@ jobs:
         run: |
           docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
 
-  minsize-misc:
+  release-linux:
     needs: cache-maker
     runs-on: ubuntu-latest
     strategy:
@@ -446,11 +188,11 @@ jobs:
           "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
 
           # Tinystdio configurations
-          "-Dio-float-exact=false -Dio-long-long=true",
+          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true",
           "-Dformat-default=integer",
 
           # Original stdio
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true",
 
           # Locale, iconv, original malloc and original atexit/onexit configurations
           "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
@@ -460,513 +202,8 @@ jobs:
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
         ]
         test: [
-          "./.github/do-many do-test do-native-configure build-native do-test do-aarch64-configure build-aarch64 do-build do-lx106-configure build-lx106 do-test do-i386-configure build-i386 do-build do-m68k-configure build-m68k do-build do-clang-msp430-configure build-clang-msp430 do-build do-msp430-configure build-msp430 do-zephyr-build do-nios2-configure build-nios2 do-build do-sparc64-configure build-sparc64 do-test do-x86_64-configure build-x86_64 do-test do-x86-configure build-x86 end",
-        ]
-    steps:
-      - name: Clone picolibc
-        uses: actions/checkout@v2
-        with:
-          path: picolibc
-
-      - name: Restore the Docker Image
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
-
-      - name: Load and Check the Docker Image
-        run: |
-          docker load -i $IMAGE_FILE
-          docker images -a $IMAGE
-
-      - name: Minsize test
-        run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
-
-  minsize-ppc:
-    needs: cache-maker
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        meson_flags: [
-          "",
-
-          # Math configurations
-          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
-          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
-
-          # Tinystdio configurations
-          "-Dio-float-exact=false -Dio-long-long=true",
-          "-Dformat-default=integer",
-
-          # Original stdio
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
-
-          # Locale, iconv, original malloc and original atexit/onexit configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
-
-          # Multithread disabled
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
-        ]
-        test: [
-          "./.github/do-many do-build do-powerpc64-configure build-powerpc64 do-build do-powerpc64le-configure build-powerpc64le end",
-        ]
-
-    steps:
-      - name: Clone picolibc
-        uses: actions/checkout@v2
-        with:
-          path: picolibc
-
-      - name: Restore the Docker Image
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
-
-      - name: Load and Check the Docker Image
-        run: |
-          docker load -i $IMAGE_FILE
-          docker images -a $IMAGE
-
-      - name: Minsize test
-        run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
-
-  minsize-riscv:
-    needs: cache-maker
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        meson_flags: [
-          "",
-
-          # Math configurations
-          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
-          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
-
-          # Tinystdio configurations
-          "-Dio-float-exact=false -Dio-long-long=true",
-          "-Dformat-default=integer",
-
-          # Original stdio
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
-
-          # Locale, iconv, original malloc and original atexit/onexit configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
-
-          # Multithread disabled
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
-        ]
-        test: [
-          "./.github/do-test do-riscv-configure build-riscv",
-          "./.github/do-many do-test do-rv32imac-configure build-rv32imac do-test do-clang-riscv-configure build-riscv-clang do-test do-clang-rv32imafdc-configure build-clang-rv32imafdc end",
-        ]
-    steps:
-      - name: Clone picolibc
-        uses: actions/checkout@v2
-        with:
-          path: picolibc
-
-      - name: Restore the Docker Image
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
-
-      - name: Load and Check the Docker Image
-        run: |
-          docker load -i $IMAGE_FILE
-          docker images -a $IMAGE
-
-      - name: Minsize test
-        run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
-
-  minsize-mips:
-    needs: cache-maker
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        meson_flags: [
-          "",
-
-          # Math configurations
-          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
-          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
-
-          # Tinystdio configurations
-          "-Dio-float-exact=false -Dio-long-long=true",
-          "-Dformat-default=integer",
-
-          # Original stdio
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
-
-          # Locale, iconv, original malloc and original atexit/onexit configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
-
-          # Multithread disabled
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
-        ]
-        test: [
-          "./.github/do-many do-build do-mips-configure build-mips do-build do-mipsel-configure build-mipsel end",
-        ]
-    steps:
-      - name: Clone picolibc
-        uses: actions/checkout@v2
-        with:
-          path: picolibc
-
-      - name: Restore the Docker Image
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
-
-      - name: Load and Check the Docker Image
-        run: |
-          docker load -i $IMAGE_FILE
-          docker images -a $IMAGE
-
-      - name: Minsize test
-        run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
-
-  minsize-xtensa:
-    needs: cache-maker
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        meson_flags: [
-          "",
-
-          # Math configurations
-          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
-          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
-
-          # Tinystdio configurations
-          "-Dio-float-exact=false -Dio-long-long=true",
-          "-Dformat-default=integer",
-
-          # Original stdio
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
-
-          # Locale, iconv, original malloc and original atexit/onexit configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
-
-          # Multithread disabled
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
-        ]
-        test: [
-          "./.github/do-zephyr ./.github/do-many do-build do-xtensa-espressif_esp32s2-configure build-xtensa-espressif_esp32s2 do-build do-xtensa-espressif_esp32-configure build-xtensa-espressif_esp32 do-build do-xtensa-intel_apl_adsp-configure build-xtensa-intel_apl_adsp do-build do-xtensa-intel_bdw_adsp-configure build-xtensa-intel_bdw_adsp do-build do-xtensa-intel_byt_adsp-configure build-xtensa-intel_byt_adsp do-build do-xtensa-intel_s1000-configure build-xtensa-intel_s1000 do-build do-xtensa-nxp_imx8m_adsp-configure build-xtensa-nxp_imx8m_adsp do-build do-xtensa-nxp_imx_adsp-configure build-xtensa-nxp_imx_adsp do-build do-xtensa-sample_controller-configure build-xtensa-sample_controller end",
-        ]
-    steps:
-      - name: Clone picolibc
-        uses: actions/checkout@v2
-        with:
-          path: picolibc
-
-      - name: Restore the Docker Image
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
-
-      - name: Load and Check the Docker Image
-        run: |
-          docker load -i $IMAGE_FILE
-          docker images -a $IMAGE
-
-      - name: Minsize test
-        run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
-
-  release-arm:
-    needs: cache-maker
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        meson_flags: [
-          "",
-
-          # Math configurations
-          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
-          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
-
-          # Tinystdio configurations
-          "-Dio-float-exact=false -Dio-long-long=true",
-          "-Dformat-default=integer",
-
-          # Original stdio
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
-
-          # Locale, iconv, original malloc and original atexit/onexit configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
-
-          # Multithread disabled
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
-        ]
-        test: [
-          "./.github/do-test do-arm-configure build-arm",
-          "./.github/do-many do-test do-clang-thumbv7e+fp-configure build-clang-thumbv7e+fp do-test do-clang-thumbv7m-configure build-clang-thumbv7m do-test do-cortex-a9-configure build-cortex-a9 do-test do-clang-thumbv6m-configure build-clang-thumbv6m end",
-        ]
-    steps:
-      - name: Clone picolibc
-        uses: actions/checkout@v2
-        with:
-          path: picolibc
-
-      - name: Restore the Docker Image
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
-
-      - name: Load and Check the Docker Image
-        run: |
-          docker load -i $IMAGE_FILE
-          docker images -a $IMAGE
-
-      - name: Release test
-        run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
-
-  release-misc:
-    needs: cache-maker
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        meson_flags: [
-          "",
-
-          # Math configurations
-          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
-          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
-
-          # Tinystdio configurations
-          "-Dio-float-exact=false -Dio-long-long=true",
-          "-Dformat-default=integer",
-
-          # Original stdio
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
-
-          # Locale, iconv, original malloc and original atexit/onexit configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
-
-          # Multithread disabled
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
-        ]
-        test: [
-          "./.github/do-many do-test do-native-configure build-native do-test do-aarch64-configure build-aarch64 do-build do-lx106-configure build-lx106 do-test do-i386-configure build-i386 do-build do-m68k-configure build-m68k do-build do-clang-msp430-configure build-clang-msp430 do-build do-msp430-configure build-msp430 do-zephyr-build do-nios2-configure build-nios2 do-build do-sparc64-configure build-sparc64 do-test do-x86_64-configure build-x86_64 do-test do-x86-configure build-x86 end",
-        ]
-    steps:
-      - name: Clone picolibc
-        uses: actions/checkout@v2
-        with:
-          path: picolibc
-
-      - name: Restore the Docker Image
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
-
-      - name: Load and Check the Docker Image
-        run: |
-          docker load -i $IMAGE_FILE
-          docker images -a $IMAGE
-
-      - name: Release test
-        run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
-
-  release-ppc:
-    needs: cache-maker
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        meson_flags: [
-          "",
-
-          # Math configurations
-          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
-          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
-
-          # Tinystdio configurations
-          "-Dio-float-exact=false -Dio-long-long=true",
-          "-Dformat-default=integer",
-
-          # Original stdio
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
-
-          # Locale, iconv, original malloc and original atexit/onexit configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
-
-          # Multithread disabled
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
-        ]
-        test: [
-          "./.github/do-many do-build do-powerpc64-configure build-powerpc64 do-build do-powerpc64le-configure build-powerpc64le end",
-        ]
-
-    steps:
-      - name: Clone picolibc
-        uses: actions/checkout@v2
-        with:
-          path: picolibc
-
-      - name: Restore the Docker Image
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
-
-      - name: Load and Check the Docker Image
-        run: |
-          docker load -i $IMAGE_FILE
-          docker images -a $IMAGE
-
-      - name: Release test
-        run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
-
-  release-riscv:
-    needs: cache-maker
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        meson_flags: [
-          "",
-
-          # Math configurations
-          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
-          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
-
-          # Tinystdio configurations
-          "-Dio-float-exact=false -Dio-long-long=true",
-          "-Dformat-default=integer",
-
-          # Original stdio
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
-
-          # Locale, iconv, original malloc and original atexit/onexit configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
-
-          # Multithread disabled
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
-        ]
-        test: [
-          "./.github/do-test do-riscv-configure build-riscv",
-          "./.github/do-many do-test do-rv32imac-configure build-rv32imac do-test do-clang-riscv-configure build-riscv-clang do-test do-clang-rv32imafdc-configure build-clang-rv32imafdc end",
-        ]
-    steps:
-      - name: Clone picolibc
-        uses: actions/checkout@v2
-        with:
-          path: picolibc
-
-      - name: Restore the Docker Image
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
-
-      - name: Load and Check the Docker Image
-        run: |
-          docker load -i $IMAGE_FILE
-          docker images -a $IMAGE
-
-      - name: Release test
-        run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
-
-  release-mips:
-    needs: cache-maker
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        meson_flags: [
-          "",
-
-          # Math configurations
-          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
-          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
-
-          # Tinystdio configurations
-          "-Dio-float-exact=false -Dio-long-long=true",
-          "-Dformat-default=integer",
-
-          # Original stdio
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
-
-          # Locale, iconv, original malloc and original atexit/onexit configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
-
-          # Multithread disabled
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
-        ]
-        test: [
-          "./.github/do-many do-build do-mips-configure build-mips do-build do-mipsel-configure build-mipsel end",
-        ]
-    steps:
-      - name: Clone picolibc
-        uses: actions/checkout@v2
-        with:
-          path: picolibc
-
-      - name: Restore the Docker Image
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
-
-      - name: Load and Check the Docker Image
-        run: |
-          docker load -i $IMAGE_FILE
-          docker images -a $IMAGE
-
-      - name: Release test
-        run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
-
-  release-xtensa:
-    needs: cache-maker
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        meson_flags: [
-          "",
-
-          # Math configurations
-          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
-          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
-
-          # Tinystdio configurations
-          "-Dio-float-exact=false -Dio-long-long=true",
-          "-Dformat-default=integer",
-
-          # Original stdio
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-io-long-double=true",
-
-          # Locale, iconv, original malloc and original atexit/onexit configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
-
-          # Multithread disabled
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
-        ]
-        test: [
-          "./.github/do-zephyr ./.github/do-many do-build do-xtensa-espressif_esp32s2-configure build-xtensa-espressif_esp32s2 do-build do-xtensa-espressif_esp32-configure build-xtensa-espressif_esp32 do-build do-xtensa-intel_apl_adsp-configure build-xtensa-intel_apl_adsp do-build do-xtensa-intel_bdw_adsp-configure build-xtensa-intel_bdw_adsp do-build do-xtensa-intel_byt_adsp-configure build-xtensa-intel_byt_adsp do-build do-xtensa-intel_s1000-configure build-xtensa-intel_s1000 do-build do-xtensa-nxp_imx8m_adsp-configure build-xtensa-nxp_imx8m_adsp do-build do-xtensa-nxp_imx_adsp-configure build-xtensa-nxp_imx_adsp do-build do-xtensa-sample_controller-configure build-xtensa-sample_controller end",
-        ]
+	  "./.github/do-linux",
+	]
     steps:
       - name: Clone picolibc
         uses: actions/checkout@v2

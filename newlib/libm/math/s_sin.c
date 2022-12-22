@@ -82,12 +82,12 @@ QUICKREF
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-double
-sin(double x)
+__float64
+sin64(__float64 x)
 {
-    double y[2], z = 0.0;
+    __float64 y[2], z = _F_64(0.0);
     __int32_t n, ix;
 
     /* High word of x. */
@@ -122,7 +122,9 @@ sin(double x)
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif
-__strong_reference(sin, _sin);
+__strong_reference(_NAME_64(sin), _NAME_64(_sin));
 #endif
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_d_d(sin)
+
+#endif /* _NEED_FLOAT64 */

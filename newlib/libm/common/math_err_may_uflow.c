@@ -28,16 +28,16 @@
 
 #include "math_config.h"
 
-#if WANT_ERRNO_UFLOW
+#if WANT_ERRNO_UFLOW && defined(_NEED_FLOAT64)
 
-static const FORCE_DOUBLE VAL = pick_double_except(0x1.8p-538, 0.0);
+static const FORCE_FLOAT64 VAL = pick_float64_except(_F_64(0x1.8p-538), _F_64(0.0));
 
 /* Underflows to zero in some non-nearest rounding mode, setting errno
    is valid even if the result is non-zero, but in the subnormal range.  */
-HIDDEN double
+HIDDEN __float64
 __math_may_uflow (uint32_t sign)
 {
-    double y = pick_float_except(VAL * VAL, VAL);
+    __float64 y = pick_float64_except(VAL * VAL, VAL);
     if (sign)
         y = -y;
     return __math_with_errno (y, ERANGE);

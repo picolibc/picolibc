@@ -156,12 +156,14 @@ SECTIONS
 	PROVIDE( __tdata_start = ADDR(.tdata));
 	PROVIDE( __tdata_source = LOADADDR(.tdata) );
 	PROVIDE( __tdata_source_end = LOADADDR(.tdata) + SIZEOF(.tdata) );
+	PROVIDE( __data_source_end = __tdata_source_end );
 	PROVIDE( __tdata_size = SIZEOF(.tdata) );
 
 	PROVIDE( __edata = __data_end );
 	PROVIDE( _edata = __data_end );
 	PROVIDE( edata = __data_end );
 	PROVIDE( __data_size = __data_end - __data_start );
+	PROVIDE( __data_source_size = __data_source_end - __data_source );
 
 	.tbss (NOLOAD) : {
 		*(.tbss .tbss.* .gnu.linkonce.tb.*)
@@ -171,8 +173,12 @@ SECTIONS
 	} >ram AT>ram :tls :ram
 	PROVIDE( __bss_start = ADDR(.tbss));
 	PROVIDE( __tbss_start = ADDR(.tbss));
+	PROVIDE( __tbss_offset = ADDR(.tbss) - ADDR(.tdata) );
 	PROVIDE( __tbss_size = SIZEOF(.tbss) );
 	PROVIDE( __tls_size = __tls_end - __tls_base );
+	PROVIDE( __tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
+	PROVIDE( __arm32_tls_tcb_offset = MAX(8, __tls_align) );
+	PROVIDE( __arm64_tls_tcb_offset = MAX(16, __tls_align) );
 
 	/*
 	 * The linker special cases .tbss segments which are
@@ -184,6 +190,7 @@ SECTIONS
 	 * so we create a special segment here just to make room
 	 */
 	.tbss_space (NOLOAD) : {
+		. = ADDR(.tbss);
 		. = . + SIZEOF(.tbss);
 	} >ram AT>ram :ram
 
@@ -198,6 +205,7 @@ SECTIONS
 		. = ALIGN(8);
 		__bss_end = .;
 	} >ram AT>ram :ram
+	PROVIDE( __non_tls_bss_start = ADDR(.bss) );
 	PROVIDE( __end = __bss_end );
 	PROVIDE( _end = __bss_end );
 	PROVIDE( end = __bss_end );
@@ -222,3 +230,9 @@ SECTIONS
 		*(.ARM.exidx*)
 	}
 }
+/*
+ * Check that sections that are copied from flash to RAM have matching
+ * padding, so that a single memcpy() of __data_size copies the correct bytes.
+ */
+ASSERT( __data_size == __data_source_size,
+	"ERROR: .data/.tdata flash size does not match RAM size");

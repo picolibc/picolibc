@@ -56,13 +56,7 @@ cosf(float x)
 __strong_reference(cosf, _cosf);
 #endif
 
-#ifdef _DOUBLE_IS_32BITS
-
-double
-cos(double x)
-{
-    return (double)cosf((float)x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_f(cos)
+#else
+#include "../common/cosf.c"
 #endif /* __OBSOLETE_MATH_FLOAT */

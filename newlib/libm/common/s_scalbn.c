@@ -63,13 +63,14 @@ SEEALSO
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-static const double
-two54   =  1.80143985094819840000e+16, /* 0x43500000, 0x00000000 */
-twom54  =  5.55111512312578270212e-17; /* 0x3C900000, 0x00000000 */
+static const __float64
+two54   =  _F_64(1.80143985094819840000e+16), /* 0x43500000, 0x00000000 */
+twom54  =  _F_64(5.55111512312578270212e-17); /* 0x3C900000, 0x00000000 */
 
-double scalbn (double x, int n)
+__float64
+scalbn64(__float64 x, int n)
 {
 	__int32_t  k,hx,lx;
 	EXTRACT_WORDS(hx,lx,x);
@@ -103,15 +104,18 @@ double scalbn (double x, int n)
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif
-__strong_reference(scalbn, ldexp);
+__strong_reference(scalbn64, ldexp64);
 #else
 
-double
-ldexp(double value, int exp)
+__float64
+ldexp64(__float64 value, int exp)
 {
-    return scalbn(value, exp);
+    return scalbn64(value, exp);
 }
 
 #endif
 
-#endif /* _DOUBLE_IS_32BITS */
+_MATH_ALIAS_d_di(scalbn)
+_MATH_ALIAS_d_di(ldexp)
+
+#endif /* _NEED_FLOAT64 */

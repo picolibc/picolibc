@@ -42,3 +42,5 @@ scalbf(float x, float fn)
 
     return scalbnf(x, (int)fn);
 }
+
+_MATH_ALIAS_f_ff(scalb)

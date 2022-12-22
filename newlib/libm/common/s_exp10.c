@@ -54,16 +54,14 @@ PORTABILITY
 #include <errno.h>
 #include <math.h>
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-#ifdef __STDC__
-	double exp10(double x)		/* wrapper exp10 */
-#else
-	double exp10(x)			/* wrapper exp10 */
-	double x;
-#endif
+__float64
+exp1064(__float64 x)		/* wrapper exp10 */
 {
-  return pow(10.0, x);
+  return _pow64(_F_64(10.0), x);
 }
 
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_d_d(exp10);
+
+#endif /* _NEED_FLOAT64 */

@@ -23,12 +23,21 @@ lgammaf(float x)
     return lgammaf_r(x, &__signgam);
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double
-lgamma(double x)
+#  ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wattribute-alias="
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(lgammaf, gammaf);
+#else
+float
+gammaf(float x)
 {
-    return (double)lgammaf((float)x);
+    return lgammaf(x);
 }
+#endif
 
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f_f(lgamma)
+_MATH_ALIAS_f_f(gamma)

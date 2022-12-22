@@ -32,14 +32,6 @@ isnanf (float x)
 	return FLT_UWORD_IS_NAN(ix);
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
 #undef isnan
 
-int
-isnan (double x)
-{
-	return isnanf((float) x);
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_i_f(isnan)

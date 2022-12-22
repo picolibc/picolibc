@@ -20,3 +20,5 @@ dremf(float x, float y)
 {
     return remainderf(x, y);
 }
+
+_MATH_ALIAS_f_ff(drem)

@@ -25,7 +25,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #if __ARM_ARCH >= 8 && (__ARM_FP & 0x8) && !defined (__SOFTFP__)
-#include <math.h>
+#include "math_config.h"
 
 double
 nearbyint (double x)
@@ -41,6 +41,8 @@ nearbyint (double x)
 #endif
     return x;
 }
+
+_MATH_ALIAS_d_d(nearbyint)
 
 #else
 #include "../../common/s_nearbyint.c"

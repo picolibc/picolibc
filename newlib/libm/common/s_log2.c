@@ -66,17 +66,17 @@ C99, POSIX, System V Interface Definition (Issue 6).
 #include <math.h>
 #undef log2
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-#ifdef __STDC__
-	double log2(double x)		/* wrapper log2 */
-#else
-	double log2(x)			/* wrapper log2 */
-	double x;
-#endif
+__float64
+log264(__float64 x)		/* wrapper log2 */
 {
-  return (log(x) / M_LN2);
+    return (log64(x) / (__float64) _M_LN2_LD);
 }
 
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_d_d(log2)
+
+#endif /* _NEED_FLOAT64 */
+#else
+#include "log2.c"
 #endif /* __OBSOLETE_MATH_DOUBLE */

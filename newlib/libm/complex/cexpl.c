@@ -32,6 +32,8 @@
 #include <complex.h>
 #include <math.h>
 
+#ifdef _HAVE_LONG_DOUBLE_MATH
+
 long double complex
 cexpl(long double complex z)
 {
@@ -41,6 +43,8 @@ cexpl(long double complex z)
 	x = creall(z);
 	y = cimagl(z);
 	r = expl(x);
-	w = r * cosl(y) + r * sinl(y) * (double complex) I;
+	w = r * cosl(y) + r * sinl(y) * (long double complex) I;
 	return w;
 }
+
+#endif

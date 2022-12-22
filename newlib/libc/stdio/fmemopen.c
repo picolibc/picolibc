@@ -83,17 +83,17 @@ typedef struct fmemcookie {
 
 /* Read up to non-zero N bytes into BUF from stream described by
    COOKIE; return number of bytes read (0 on EOF).  */
-static _READ_WRITE_RETURN_TYPE
+static ssize_t
 fmemreader (
        void *cookie,
        char *buf,
-       _READ_WRITE_BUFSIZE_TYPE n)
+       size_t n)
 {
   fmemcookie *c = (fmemcookie *) cookie;
   /* Can't read beyond current size, but EOF condition is not an error.  */
   if (c->pos > c->eof)
     return 0;
-  if (n >= 0 && (size_t) n >= c->eof - c->pos)
+  if (n >= c->eof - c->pos)
     n = c->eof - c->pos;
   memcpy (buf, c->buf + c->pos, n);
   c->pos += n;
@@ -102,11 +102,11 @@ fmemreader (
 
 /* Write up to non-zero N bytes of BUF into the stream described by COOKIE,
    returning the number of bytes written or EOF on failure.  */
-static _READ_WRITE_RETURN_TYPE
+static ssize_t
 fmemwriter (
        void *cookie,
        const char *buf,
-       _READ_WRITE_BUFSIZE_TYPE n)
+       size_t n)
 {
   fmemcookie *c = (fmemcookie *) cookie;
   int adjust = 0; /* true if at EOF, but still need to write NUL.  */

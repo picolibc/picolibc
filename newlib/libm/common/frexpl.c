@@ -28,20 +28,11 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <math.h>
-#include <float.h>
-#include "local.h"
+#include "math_config.h"
 
-/* On platforms where long double is as wide as double.  */
-#if defined(_LDBL_EQ_DBL)
-long double
-frexpl (long double x, int *eptr)
-{
-  return frexp(x, eptr);
-}
-#else  /* !_DBL_EQ_DBL */
+#if defined(_NEED_FLOAT_HUGE) && !defined(_HAVE_LONG_DOUBLE_MATH)
 # if (LDBL_MANT_DIG == 53) /* 64-bit long double */
-static const double scale = 0x1p54;
+static const long double scale = 0x1p54;
 
 union ldbl {
   long double x;
@@ -95,7 +86,7 @@ union ldbl {
   } u32;
 };
 # elif (LDBL_MANT_DIG == 106) /* 128-bit double double */
-static const double scale = 0x1p107;
+static const long double scale = 0x1p107l;
 
 #define EXP_EXTRA_BIAS 100
 
@@ -125,7 +116,7 @@ union ldbl {
   } u32;
 };
 # elif (LDBL_MANT_DIG == 113) /* 128-bit long double */
-static const double scale = 0x1p114;
+static const long double scale = 0x1p114l;
 
 union ldbl {
   long double x;
@@ -183,4 +174,4 @@ frexpl (long double x, int *eptr)
 #endif
   return u.x;
 }
-#endif /* !_LDBL_EQ_DBL */
+#endif /* _NEED_FLOAT_HUGE */

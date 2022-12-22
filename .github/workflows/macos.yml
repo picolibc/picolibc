@@ -39,7 +39,7 @@ jobs:
           "-Dnewlib-iconv-external-ccs=true"
         ]
         test: [
-          "./.github/do-test do-native-configure build-native -Dnative-tests=false -Dtests-enable-posix-io=false",
+          "./.github/do-test native -Dnative-tests=false -Dtests-enable-posix-io=false",
         ]
 
     steps:

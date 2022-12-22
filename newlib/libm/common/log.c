@@ -176,4 +176,7 @@ log (double x)
 #endif
   return y;
 }
+
+_MATH_ALIAS_d_d(log)
+
 #endif

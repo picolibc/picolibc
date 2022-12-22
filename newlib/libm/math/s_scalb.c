@@ -19,10 +19,10 @@
 
 #include "fdlibm.h"
 
-#ifndef _DOUBLE_IS_32BITS
+#ifdef _NEED_FLOAT64
 
-double
-scalb(double x, double fn)
+__float64
+scalb64(__float64 x, __float64 fn)
 {
     if (isnan(fn) || isnan(x))
         return x + fn;
@@ -36,7 +36,7 @@ scalb(double x, double fn)
             return x/(-fn);
     }
 
-    if (rint(fn) != fn)
+    if (rint64(fn) != fn)
         return __math_invalid(fn);
 
     if (fn > 4 * __DBL_MAX_EXP__)
@@ -45,7 +45,9 @@ scalb(double x, double fn)
     if (fn < -4 * __DBL_MAX_EXP__)
         fn = -4 * __DBL_MAX_EXP__;
 
-    return scalbn(x, (int)fn);
+    return scalbn64(x, (int)fn);
 }
 
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_d_dd(scalb)
+
+#endif /* _NEED_FLOAT64 */

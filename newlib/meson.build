@@ -59,9 +59,11 @@ foreach target : targets
 
   if target == ''
     libc_name = 'c'
+    libg_name = 'g'
     libm_name = 'm'
   else
     libc_name = join_paths(target, 'libc')
+    libg_name = join_paths(target, 'libg')
     libm_name = join_paths(target, 'libm')
   endif
 
@@ -72,18 +74,21 @@ foreach target : targets
 				      pic: false,
 				      objects : libobjs,
 				      include_directories: inc,
-				      c_args: value[1] + ['-D_LIBC'])
+				      c_args: value[1])
 
   set_variable('lib_c' + target, local_lib_c_target)
-
-  local_lib_m_target = static_library(libm_name,
-                                      ['empty.c'],
-                                      install : true,
-                                      install_dir : instdir,
-                                      pic: false,
-                                      objects : [])
-
-  set_variable('lib_m' + target, local_lib_m_target)
+  static_library(libm_name,
+		 ['empty.c'],
+		 install : true,
+		 install_dir : instdir,
+		 pic: false,
+		 objects : [])
+  static_library(libg_name,
+		 ['empty.c'],
+		 install : true,
+		 install_dir : instdir,
+		 pic: false,
+		 objects : [])
 
   if check_duplicate_names
     custom_target('libc_duplicates' + target,
@@ -97,7 +102,5 @@ endforeach
 
 if enable_tests
   subdir('testsuite')
-  if not double_equals_float
-    subdir('libm/test')
-  endif
+  subdir('libm/test')
 endif

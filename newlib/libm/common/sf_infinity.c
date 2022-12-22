@@ -21,11 +21,4 @@ float infinityf(void)
 	return x;
 }
 
-#ifdef _DOUBLE_IS_32BITS
-
-double infinity(void)
-{
-	return (double) infinityf();
-}
-
-#endif /* defined(_DOUBLE_IS_32BITS) */
+_MATH_ALIAS_f(infinity)

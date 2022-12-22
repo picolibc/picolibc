@@ -32,6 +32,8 @@
 #include <complex.h>
 #include <math.h>
 
+#ifdef _HAVE_LONG_DOUBLE_MATH
+
 long double complex
 ctanhl(long double complex z)
 {
@@ -41,7 +43,9 @@ ctanhl(long double complex z)
 	x = creall(z);
 	y = cimagl(z);
 	d = coshl(2.0L * x) + cosl(2.0L * y);
-	w = sinhl(2.0L * x) / d  +  (sinl(2.0L * y) / d) * (double complex) I;
+	w = sinhl(2.0L * x) / d  +  (sinl(2.0L * y) / d) * (long double complex) I;
 
 	return w;
 }
+
+#endif

@@ -25,14 +25,15 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <math.h>
-#include "local.h"
+#include "math_config.h"
 
-#ifdef _LDBL_EQ_DBL
-double
-nexttoward (double x, long double y)
+#if defined(_NEED_FLOAT64) && !defined(_NEED_FLOAT_HUGE)
+__float64
+nexttoward64 (__float64 x, long double y)
 {
-  return nextafter(x, y);
+    return nextafter64(x, y);
 }
+
+_MATH_ALIAS_d_dl(nexttoward)
 #endif
 

@@ -382,3 +382,8 @@ qzerof(float x)
              z * (q[1] + z * (q[2] + z * (q[3] + z * (q[4] + z * q[5])))));
     return (-(float).125 + r / s) / x;
 }
+
+_MATH_ALIAS_f_f(j0)
+
+_MATH_ALIAS_f_f(y0)
+

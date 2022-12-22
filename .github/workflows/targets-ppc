@@ -1,4 +1,0 @@
-        test: [
-          "./.github/do-many do-build do-powerpc64-configure build-powerpc64 do-build do-powerpc64le-configure build-powerpc64le end",
-        ]
-
