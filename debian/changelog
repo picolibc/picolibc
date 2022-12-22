@@ -1,3 +1,11 @@
+picolibc (1.8-1) unstable; urgency=medium
+
+  * New upstream
+
+  * long double math library support
+
+ -- Keith Packard <keithp@keithp.com>  Thu, 22 Dec 2022 12:35:12 -0800
+
 picolibc (1.7.9-1) unstable; urgency=medium
 
   * New upstream
