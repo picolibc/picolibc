@@ -928,7 +928,11 @@ fhandler_console::send_winch_maybe ()
       if (wincap.has_con_24bit_colors () && !con_is_legacy
 	  && wincap.has_con_broken_tabs ())
 	fix_tab_position (get_output_handle ());
+      /* longjmp() may be called in the signal handler like less,
+	 so release input_mutex temporarily before kill_pgrp(). */
+      release_input_mutex ();
       get_ttyp ()->kill_pgrp (SIGWINCH);
+      acquire_input_mutex (mutex_timeout);
       return true;
     }
   return false;

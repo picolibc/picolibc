@@ -3,3 +3,7 @@ Bug Fixes
 
 - Fix an uninitialized variable having weird side-effects in path handling.
   Addresses: https://cygwin.com/pipermail/cygwin/2022-December/252734.html
+
+- Fix hang-up of less on quit which occurs when it is started from non-cygwin
+  shell and window is resized.
+  Addresses: https://cygwin.com/pipermail/cygwin/2022-December/252737.html
