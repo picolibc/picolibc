@@ -2001,6 +2001,7 @@ class fhandler_termios: public fhandler_base
     HANDLE output_handle;
     HANDLE input_mutex;
     HANDLE output_mutex;
+    _minor_t unit;
   };
   class spawn_worker
   {
@@ -2147,6 +2148,8 @@ class dev_console
   friend class fhandler_console;
 };
 
+#define MAX_CONS_DEV (sizeof (unsigned long) * 8)
+
 /* This is a input and output console handle */
 class fhandler_console: public fhandler_termios
 {
@@ -2169,10 +2172,11 @@ public:
   HANDLE thread_sync_event;
 private:
   static const unsigned MAX_WRITE_CHARS;
-  static console_state *shared_console_info;
+  static console_state *shared_console_info[MAX_CONS_DEV + 1];
   static bool invisible_console;
   HANDLE input_mutex, output_mutex;
   handle_set_t handle_set;
+  _minor_t unit;
 
   /* Used when we encounter a truncated multi-byte sequence.  The
      lead bytes are stored here and revisited in the next write call. */
@@ -2196,13 +2200,14 @@ private:
   const unsigned char *write_normal (unsigned const char*, unsigned const char *);
   void char_command (char);
   bool set_raw_win32_keyboard_mode (bool);
+  void set_console_title (char *);
 
 /* Input calls */
   int igncr_enabled ();
   void set_cursor_maybe ();
   static bool create_invisible_console_workaround (bool force);
   static console_state *open_shared_console (HWND, HANDLE&, bool&);
-  static void fix_tab_position (HANDLE h);
+  static void fix_tab_position (HANDLE h, pid_t owner);
 
 /* console mode calls */
   const handle_set_t *get_handle_set (void) {return &handle_set;}
@@ -2214,8 +2219,8 @@ private:
  public:
   pid_t tc_getpgid ()
   {
-    return shared_console_info ?
-      shared_console_info->tty_min_state.getpgid () : 0;
+    return shared_console_info[unit] ?
+      shared_console_info[unit]->tty_min_state.getpgid () : 0;
   }
   fhandler_console (fh_devices);
   static console_state *open_shared_console (HWND hw, HANDLE& h)
@@ -2252,12 +2257,12 @@ private:
   int ioctl (unsigned int cmd, void *);
   int init (HANDLE, DWORD, mode_t);
   bool mouse_aware (MOUSE_EVENT_RECORD& mouse_event);
-  bool focus_aware () {return shared_console_info->con.use_focus;}
+  bool focus_aware () {return shared_console_info[unit]->con.use_focus;}
   bool get_cons_readahead_valid ()
   {
     acquire_input_mutex (INFINITE);
-    bool ret = shared_console_info->con.cons_rapoi != NULL &&
-      *shared_console_info->con.cons_rapoi;
+    bool ret = shared_console_info[unit]->con.cons_rapoi != NULL &&
+      *shared_console_info[unit]->con.cons_rapoi;
     release_input_mutex ();
     return ret;
   }
@@ -2302,11 +2307,9 @@ private:
   void acquire_input_mutex_if_necessary (DWORD ms)
   {
     acquire_input_mutex (ms);
-    acquire_attach_mutex (ms);
   }
   void release_input_mutex_if_necessary (void)
   {
-    release_attach_mutex ();
     release_input_mutex ();
   }
 
@@ -2325,6 +2328,12 @@ private:
   static void set_console_mode_to_native ();
   bool need_console_handler ();
   static void set_disable_master_thread (bool x, fhandler_console *cons = NULL);
+  static DWORD attach_console (pid_t, bool *err = NULL);
+  static void detach_console (DWORD, pid_t);
+  pid_t get_owner ();
+  void wpbuf_put (char c);
+  void wpbuf_send ();
+  int fstat (struct stat *buf);
 
   friend tty_min * tty_list::get_cttyp ();
 };

@@ -1141,7 +1141,9 @@ peek_console (select_record *me, bool)
       else
 	{
 	  acquire_attach_mutex (mutex_timeout);
+	  DWORD resume_pid = fh->attach_console (fh->get_owner ());
 	  BOOL r = PeekConsoleInputW (h, &irec, 1, &events_read);
+	  fh->detach_console (resume_pid, fh->get_owner ());
 	  release_attach_mutex ();
 	  if (!r || !events_read)
 	    break;

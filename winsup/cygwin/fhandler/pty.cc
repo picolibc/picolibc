@@ -58,7 +58,7 @@ struct pipe_reply {
   DWORD error;
 };
 
-HANDLE attach_mutex;
+HANDLE NO_COPY attach_mutex;
 
 DWORD acquire_attach_mutex (DWORD t)
 {
@@ -2993,7 +2993,7 @@ fhandler_pty_master::setup ()
     goto err;
 
   if (!attach_mutex)
-    attach_mutex = CreateMutex (&sa, FALSE, NULL);
+    attach_mutex = CreateMutex (&sec_none_nih, FALSE, NULL);
 
   /* Create master control pipe which allows the master to duplicate
      the pty pipe handles to processes which deserve it. */

@@ -202,7 +202,6 @@ void timespec_to_filetime (const struct timespec *, PLARGE_INTEGER);
 bool timeval_to_ms (const struct timeval *, DWORD &);
 
 /* Console related */
-void set_console_title (char *);
 void init_console_handler (bool);
 
 extern bool wsock_started;
