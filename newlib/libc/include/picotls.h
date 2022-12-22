@@ -44,6 +44,10 @@ extern char __tls_size[];
 
 static inline size_t _tls_size(void) { return (size_t) (uintptr_t) __tls_size; }
 
+extern char __tls_align[];
+
+static inline size_t _tls_align(void) { return (size_t) (uintptr_t) __tls_align; }
+
 /*
  * Initialize a TLS block, copying the data segment from flash and
  * zeroing the BSS segment.
