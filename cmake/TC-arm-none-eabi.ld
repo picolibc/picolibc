@@ -173,6 +173,7 @@ SECTIONS
 	} >ram AT>ram :tls :ram
 	PROVIDE( __bss_start = ADDR(.tbss));
 	PROVIDE( __tbss_start = ADDR(.tbss));
+	PROVIDE( __tbss_offset = ADDR(.tbss) - ADDR(.tdata) );
 	PROVIDE( __tbss_size = SIZEOF(.tbss) );
 	PROVIDE( __tls_size = __tls_end - __tls_base );
 	PROVIDE( __tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
@@ -189,6 +190,7 @@ SECTIONS
 	 * so we create a special segment here just to make room
 	 */
 	.tbss_space (NOLOAD) : {
+		. = ADDR(.tbss);
 		. = . + SIZEOF(.tbss);
 	} >ram AT>ram :ram
 
@@ -203,6 +205,7 @@ SECTIONS
 		. = ALIGN(8);
 		__bss_end = .;
 	} >ram AT>ram :ram
+	PROVIDE( __non_tls_bss_start = ADDR(.bss) );
 	PROVIDE( __end = __bss_end );
 	PROVIDE( _end = __bss_end );
 	PROVIDE( end = __bss_end );
