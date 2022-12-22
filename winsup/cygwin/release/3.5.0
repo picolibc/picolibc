@@ -3,3 +3,6 @@ What's new:
 
 - Drop support for Windows 7, Windows 8, Server 2008 R2 and Server 2012.
 
+- The console device gets accessible from other terminals such as other
+  consoles and ptys. Thanks to this new feature, GNU screen and tmux
+  now work in the console.
