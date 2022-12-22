@@ -129,6 +129,63 @@ use Picolibc:
 
 ## Releases
 
+### Picolibc version 1.8
+
+With the addition of nearly complete long double support in the math
+library, it seems like it's time to declare a larger version increment
+than usual.
+
+ * Improve arc and xtensa support, adding TLS helpers and other build fixes
+
+ * Fix FPSCR state for Arm8.1-M low overhead loops (thanks to David
+   Green)
+
+ * Add -Werror=double-promotion to default error set and fix related
+   errors. (thanks to Ryan McClelland)
+
+ * Fix locking bug in malloc out-of-memory path and freeing a locked
+   mutex in the tinystdio bufio code. These were found with lock
+   debugging code in Zephyr.
+
+ * Add some missing functions in tinystdio, strto*l_l, remove,
+   tmpname/tmpfile which were published in stdio.h but not included in
+   the library.
+
+ * Switch read/write functions to use POSIX types instead of legacy
+   cygwin types. This makes mapping to existing an POSIX api work
+   right.
+
+ * Add %b support to tinystdio printf and scanf. These are disabled by
+   default as they aren't yet standardized.
+
+ * Fix avr math function support. The avr version of gcc has modes
+   where double and long double are 32 or 64 bits, so the math library
+   code now detects all of that at compile time rather than build time
+   and reconfigures the functions to match the compiler types.
+
+ * Add nearly complete long double support from openlibm for 80-bit
+   Intel and 128-bit IEEE values (in addition to supporting 64-bit
+   long doubles). Still missing are Bessel functions and decimal
+   printf/scanf support.
+
+ * Add limited long double support for IBM 'double double' form. This
+   is enough to run some simple tests, but doesn't have any
+   significant math functions yet.
+
+ * Get Power9 code running under qemu with OPAL. This was mostly
+   needed to validate the big-endian and exception code for 128-bit
+   long doubles, but was also used to validate the double double
+   support.
+
+ * Provide times() and sysconf() implementations in semihosting. You
+   can now build and run the dhrystone benchmark without any further
+   code.
+
+ * Fix use of TLS variables with stricter alignment requirements in
+   the default linker script and startup code. (thanks to Joakim
+   Nohlgård and Alexander Richardson who found this issue while
+   working on lld support).
+
 ### Picolibc version 1.7.9
 
  * Support all Zephyr SDK targets
