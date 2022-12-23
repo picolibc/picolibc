@@ -1,7 +1,7 @@
 proc winsup_version {} {
     global env
     global runtime_root
-    clone_output "\n[exec grep -a ^%%% $runtime_root/cygwin0.dll]\n"
+    clone_output "\n[exec grep -a ^%%% $runtime_root/cygwin1.dll]\n"
     if { [info exists env(CYGWIN)] } {
         clone_output "CYGWIN=$env(CYGWIN)\n"
     } else {

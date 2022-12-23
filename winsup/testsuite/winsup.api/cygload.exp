@@ -32,7 +32,7 @@ if { $rv != {0 {}} } {
         set redirect_output /dev/null
     }
     set windows_runtime_root [exec cygpath -m $runtime_root]
-    ws_spawn "./mingw-cygload.exe -cygwin $windows_runtime_root/cygwin0.dll > $redirect_output"
+    ws_spawn "./mingw-cygload.exe -cygwin $windows_runtime_root/cygwin1.dll > $redirect_output"
     if { $rv != {0 {}} } {
         verbose -log "cygload: $rv"
         fail "cygload (execute)"

@@ -9,7 +9,7 @@
 # This will do a crude test to see if the (NO)?SIGFE stuff is used properly
 # in cygwin.din.  It is not perfect so do not use it to do a wholesale replacement.
 #
-# Input is the output of 'objdump --disassemble --demangle cygwin0.dll'.
+# Input is the output of 'objdump --disassemble --demangle new-cygwin1.dll'.
 #
 use strict;
 use vars qw'$v';

@@ -45,7 +45,8 @@ testdll_tmpdir = $(shell cygpath -ma $(tmpdir) | sed -e 's#^\([A-Z]\):#/cygdrive
 
 site-extra.exp: ../config.status Makefile
 	@rm -f ./tmp0
-	@echo "set runtime_root \"`pwd`/../cygwin\"" >> ./tmp0
+	@echo "set runtime_root \"`pwd`/runtime\"" >> ./tmp0
+	@echo "set libdir \"`pwd`/../cygwin\"" >> ./tmp0
 	@echo "set CC \"$(CC)\"" >> ./tmp0
 	@echo "set CFLAGS \"\"" >> ./tmp0
 	@echo "set MINGW_CXX \"$(MINGW_CXX)\"" >> ./tmp0

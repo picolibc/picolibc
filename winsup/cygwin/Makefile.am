@@ -577,9 +577,9 @@ LIBSERVER = $(cygserver_blddir)/libcygserver.a
 $(LIBSERVER):
 	$(MAKE) -C $(cygserver_blddir) libcygserver.a
 
-# We build as cygwin0.dll and rename at install time to overcome native
+# We build as new-cygwin1.dll and rename at install time to overcome native
 # rebuilding issues (we don't want the build tools to see a partially built
-# cygwin.dll and attempt to use it instead of the old one).
+# cygwin1.dll and attempt to use it instead of the old one).
 
 # linker script
 LDSCRIPT=cygwin.sc
@@ -601,6 +601,8 @@ $(NEW_DLL_NAME): $(LDSCRIPT) libdll.a $(VERSION_OFILES) $(LIBSERVER)\
 	$(newlib_build)/libm.a \
 	$(newlib_build)/libc.a \
 	-lgcc -lkernel32 -lntdll -Wl,-Map,cygwin.map
+	@$(MKDIR_P) ${target_builddir}/winsup/testsuite/runtime/
+	$(AM_V_at)$(INSTALL_PROGRAM) $(NEW_DLL_NAME) ${target_builddir}/winsup/testsuite/runtime/$(DLL_NAME)
 
 # cygwin import library
 toolopts=--cpu=@target_cpu@ --ar=@AR@ --as=@AS@ --nm=@NM@ --objcopy=@OBJCOPY@
@@ -712,7 +714,7 @@ install-ldif:
 uninstall-hook: uninstall-headers uninstall-ldif uninstall-libs
 
 uninstall-libs:
-	rm -f $(DESTDIR)$(bindir)/cygwin1.dll
+	rm -f $(DESTDIR)$(bindir)/$(DLL_NAME)
 	rm -f $(DESTDIR)$(toollibdir)/libg.a
 
 uninstall-headers:

@@ -14,9 +14,9 @@ set ltp_libs "$ltp_libs"
 set add_includes $ltp_includes
 set add_libs $ltp_libs
 
-set test_filter ""
+set orig_path "$env(PATH)"
 
-set env(PATH) "$runtime_root:$env(PATH)"
+set test_filter ""
 
 if { [info exists env(CYGWIN_TESTSUITE_TESTS)] } {
     set test_filter "$env(CYGWIN_TESTSUITE_TESTS)"
@@ -61,7 +61,7 @@ foreach src [lsort [glob -nocomplain $srcdir/$subdir/*.c $srcdir/$subdir/*/*.{cc
     if [ file exists "$srcdir/$subdir/$basename.exp" ] then {
 	source "$srcdir/$subdir/$basename.exp"
     } else {
-	ws_spawn "$CC -nodefaultlibs -mwin32 $CFLAGS $src $add_includes $add_libs $runtime_root/binmode.o -lgcc $runtime_root/libcygwin.a -lkernel32 -luser32 -o $base.exe"
+	ws_spawn "$CC -nodefaultlibs -mwin32 $CFLAGS $src $add_includes $add_libs $libdir/binmode.o -lgcc $libdir/libcygwin.a -lkernel32 -luser32 -o $base.exe"
 	if { $rv } {
 	    fail "$testcase (compile)"
 	} else {
@@ -71,8 +71,10 @@ foreach src [lsort [glob -nocomplain $srcdir/$subdir/*.c $srcdir/$subdir/*/*.{cc
 	       set redirect_output /dev/null
 	    }
 	    file mkdir $tmpdir/$base
+	    set env(PATH) "$runtime_root:$env(PATH)"
 	    ws_spawn "$cygrun ./$base.exe $testdll_tmpdir/$base > $redirect_output"
 	    file delete -force $tmpdir/$base
+	    set env(PATH) "$orig_path"
 	    if { $rv } {
 		fail "$testcase (execute)"
 		if { $xfail_expected } {
