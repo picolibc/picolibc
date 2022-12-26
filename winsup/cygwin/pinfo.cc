@@ -530,7 +530,7 @@ _pinfo::set_ctty (fhandler_termios *fh, int flags)
   debug_printf ("old %s, ctty device number %y, tc.ntty device number %y flags & O_NOCTTY %y", __ctty (), ctty, tc.ntty, flags & O_NOCTTY);
   if (fh && (ctty <= 0 || ctty == tc.ntty) && !(flags & O_NOCTTY))
     {
-      if (tc.getsid () && tc.getsid () != sid)
+      if (tc.getsid () && tc.getsid () != sid && ctty == -2)
 	; /* Do nothing if another session is associated with the TTY. */
       else
 	{
@@ -576,7 +576,8 @@ _pinfo::set_ctty (fhandler_termios *fh, int flags)
 	 an obvious bug surfaces. */
       if (sid == pid && !tc.getsid ())
 	tc.setsid (sid);
-      sid = tc.getsid ();
+      if (ctty > 0)
+	sid = tc.getsid ();
       /* See above */
       if ((!tc.getpgid () || being_debugged ()) && pgid == pid)
 	tc.setpgid (pgid);
