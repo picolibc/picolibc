@@ -413,7 +413,11 @@ if(NOT DEFINED __SINGLE_THREAD__)
   option(__SINGLE_THREAD__ "Disable multithreading support" 0)
 endif()
 
-set(_RETARGETABLE_LOCKING NOT ${__SINGLE_THREAD__})
+if(__SINGLE_THREAD__)
+  set(_RETARGETABLE_LOCKING 0)
+else()
+  set(_RETARGETABLE_LOCKING 1)
+endif()
 
 set(NEWLIB_VERSION 4.3.0)
 set(NEWLIB_MAJOR 4)
