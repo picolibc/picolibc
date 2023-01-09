@@ -478,12 +478,13 @@ details. */
   342: Remove cleanup_glue.
   343: Change FD_SETSIZE and NOFILE.
   344: Remove _alloca.
+  345: Reinstantiate _alloca.
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 344
+#define CYGWIN_VERSION_API_MINOR 345
 
 /* There is also a compatibity version number associated with the shared memory
    regions.  It is incremented when incompatible changes are made to the shared
