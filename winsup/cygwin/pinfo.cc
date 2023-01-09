@@ -603,6 +603,19 @@ _pinfo::alive ()
   return !!h;
 }
 
+static commune_result
+commune_process_siginfo ()
+{
+  commune_result res = { 0 };
+
+  res.pnd = sig_send (myself, __SIGPENDINGALL, NULL);
+  res.blk = cygheap->compute_sigblkmask ();
+  for (int sig = 1; sig < NSIG; ++sig)
+    if (global_sigs[sig].sa_handler == SIG_IGN)
+      res.ign |= SIGTOMASK (sig);
+  return res;
+}
+
 DWORD
 commune_process (void *arg)
 {
@@ -679,13 +692,7 @@ commune_process (void *arg)
     case PICOM_SIGINFO:
       {
 	sigproc_printf ("processing PICOM_SIGINFO");
-	commune_result cr;
-	sigpending (&cr.pnd);
-	cr.pnd = sig_send (myself, __SIGPENDINGALL, NULL);
-	cr.blk = cygheap->compute_sigblkmask ();
-	for (int sig = 1; sig < NSIG; ++sig)
-	  if (global_sigs[sig].sa_handler == SIG_IGN)
-	    cr.ign |= SIGTOMASK (sig);
+	commune_result cr = commune_process_siginfo ();
 	if (!WritePipeOverlapped (tothem, &cr, sizeof cr, &nr, 1000L))
 	  sigproc_printf ("WritePipeOverlapped siginfo failed, %E");
 	break;
@@ -1026,24 +1033,17 @@ _pinfo::root (size_t& n)
 int
 _pinfo::siginfo (sigset_t &pnd, sigset_t &blk, sigset_t &ign)
 {
+  commune_result cr;
+
   if (!pid)
     return -1;
   if (pid != myself->pid && !ISSTATE (this, PID_NOTCYGWIN))
-    {
-      commune_result cr = commune_request (PICOM_SIGINFO);
-      pnd = cr.pnd;
-      blk = cr.blk;
-      ign = cr.ign;
-    }
+    cr = commune_request (PICOM_SIGINFO);
   else
-    {
-      pnd = sig_send (myself, __SIGPENDINGALL, NULL);
-      blk = cygheap->compute_sigblkmask ();
-      ign = 0;
-      for (int sig = 1; sig < NSIG; ++sig)
-	if (global_sigs[sig].sa_handler == SIG_IGN)
-	  ign |= SIGTOMASK (sig);
-    }
+    cr = commune_process_siginfo ();
+  pnd = cr.pnd;
+  blk = cr.blk;
+  ign = cr.ign;
   return -1;
 }
 
