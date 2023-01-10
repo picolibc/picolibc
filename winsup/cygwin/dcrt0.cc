@@ -631,8 +631,6 @@ child_info_spawn::handle_spawn ()
   if (!dynamically_loaded || get_parent_handle ())
       {
 	cygheap_fixup_in_child (true);
-	if (dynamically_loaded)
-	  moreinfo->myself_pinfo = NULL;
 	memory_init ();
       }
 

@@ -95,6 +95,8 @@ cygheap_fixup_in_child (bool execed)
   cygheap = (init_cygheap *) VirtualAlloc ((LPVOID) CYGHEAP_STORAGE_LOW,
 					   commit_size, MEM_COMMIT,
 					   PAGE_READWRITE);
+  if (dynamically_loaded && execed)
+    spawn_info->moreinfo->myself_pinfo = NULL;
   cygheap_max = child_proc_info->cygheap_max;
   child_copy (child_proc_info->parent, false, child_proc_info->silentfail (),
 	      "cygheap", cygheap, cygheap_max, NULL);
