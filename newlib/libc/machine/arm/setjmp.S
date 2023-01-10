@@ -22,6 +22,11 @@
 #define SIZE(x)
 #endif
 
+/* Jump buffer allocation sizes.  */
+#define JUMPBUF_CORE_REGS_SIZE (10 * 4)
+#define JUMPBUF_FP_REGS_SIZE (8 * 8)
+#define JUMPBUF_PAC (JUMPBUF_CORE_REGS_SIZE + JUMPBUF_FP_REGS_SIZE + 0)
+
 /* Arm/Thumb interworking support:
 
    The interworking scheme expects functions to use a BX instruction
@@ -155,6 +160,8 @@ SYM (.arm_start_of.\name):
 	.align 2
 	MODE
 	.globl SYM (\name)
+	.fnstart
+	.cfi_startproc
 	TYPE (\name)
 SYM (\name):
 	PROLOGUE \name
@@ -162,6 +169,8 @@ SYM (\name):
 
 .macro FUNC_END name
 	RET
+	.cfi_endproc
+	.fnend
 	SIZE (\name)
 .endm
 
@@ -170,6 +179,21 @@ SYM (\name):
    -------------------------------------------------------------------- */
 
 	FUNC_START setjmp
+
+#if __ARM_FEATURE_PAC_DEFAULT
+# if __ARM_FEATURE_BTI_DEFAULT
+	pacbti	ip, lr, sp
+# else
+	pac	ip, lr, sp
+# endif /* __ARM_FEATURE_BTI_DEFAULT */
+	mov r3, ip
+	str r3, [r0, #JUMPBUF_PAC]
+	.cfi_register 143, 12
+#else
+# if __ARM_FEATURE_BTI_DEFAULT
+	bti
+# endif /* __ARM_FEATURE_BTI_DEFAULT */
+#endif /* __ARM_FEATURE_PAC_DEFAULT */
 
 	/* Save all the callee-preserved registers into the jump buffer.  */
 #ifdef __thumb2__
@@ -184,6 +208,10 @@ SYM (\name):
 
 	/* When setting up the jump buffer return 0.  */
 	mov		r0, #0
+#if __ARM_FEATURE_PAC_DEFAULT
+	mov ip, r3
+	aut ip, lr, sp
+#endif /* __ARM_FEATURE_PAC_DEFAULT */
 
 	FUNC_END setjmp
 
@@ -192,6 +220,16 @@ SYM (\name):
    -------------------------------------------------------------------- */
 
 	FUNC_START longjmp
+
+#if __ARM_FEATURE_BTI_DEFAULT
+	bti
+#endif /* __ARM_FEATURE_BTI_DEFAULT */
+
+#if __ARM_FEATURE_PAC_DEFAULT
+	/* Keep original jmpbuf address for retrieving pac-code
+	   for authentication.  */
+	mov	r2, r0
+#endif /* __ARM_FEATURE_PAC_DEFAULT */
 
 	/* If we have stack extension code it ought to be handled here.  */
 
@@ -211,6 +249,11 @@ SYM (\name):
 	movs		r0, r1
 	it		eq
 	moveq		r0, #1
+
+#if __ARM_FEATURE_PAC_DEFAULT
+	ldr ip, [r2, #JUMPBUF_PAC]
+	aut ip, lr, sp
+#endif /* __ARM_FEATURE_PAC_DEFAULT */
 
 	FUNC_END longjmp
 #endif
