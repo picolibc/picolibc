@@ -1375,7 +1375,8 @@ wait_sig (VOID *)
 	    *pack.mask = 0;
 	    while ((q = q->next))
 	      {
-		if (q->sigtls->sigmask & (bit = SIGTOMASK (q->si.si_signo)))
+		_cygtls *sigtls = q->sigtls ?: _main_tls;
+		if (sigtls->sigmask & (bit = SIGTOMASK (q->si.si_signo)))
 		  {
 		    tl_entry = cygheap->find_tls (q->si.si_signo, issig_wait);
 		    if (tl_entry)
