@@ -97,7 +97,7 @@ pinfo_init (char **envp, int envc)
 
       myself.thisproc (NULL);
       myself->pgid = myself->sid = myself->pid;
-      myself->ctty = -1;
+      myself->ctty = -1; /* -1 means not initialized yet. */
       myself->uid = ILLEGAL_UID;
       myself->gid = ILLEGAL_GID;
       environ_init (NULL, 0);	/* call after myself has been set up */
@@ -531,6 +531,9 @@ _pinfo::set_ctty (fhandler_termios *fh, int flags)
   if (fh && (ctty <= 0 || ctty == tc.ntty) && !(flags & O_NOCTTY))
     {
       if (tc.getsid () && tc.getsid () != sid && ctty == -2)
+	/* ctty == -2 means CTTY has been released by setsid().
+	   Can be associated only with a new TTY which is not
+	   associated with any other session. */
 	; /* Do nothing if another session is associated with the TTY. */
       else
 	{
