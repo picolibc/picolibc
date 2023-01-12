@@ -313,7 +313,7 @@ struct namepart {
   bool create_dir;
 };
 /* mutex name is formed along dir names */
-static namepart NO_COPY_RO const
+static namepart const
 forkable_nameparts[] = {
  /* text             textfunc  mutex_from_dir  create */
   { L"<cygroot>",    rootname,          false, false, },

@@ -10,6 +10,12 @@ details. */
 
 #define __INSIDE_CYGWIN__
 
+/* Use "static NO_COPY_RO" instead of "static const", if the datastructure
+   should be R/O, but without the "const" qualifier.  Typically this is only
+   required if the static datastructure is "const" in reality, but the Windows
+   function is defined with a R/W type as argument.  Unfortunately this is
+   often the case.  However, make sure to try "const" first, and use
+   "NO_COPY_RO" as seldom as possible.  */
 #define NO_COPY_RO __attribute__((nocommon)) __attribute__((section(".rdata_cygwin_nocopy")))
 #define NO_COPY __attribute__((nocommon)) __attribute__((section(".data_cygwin_nocopy")))
 #define NO_COPY_INIT __attribute__((section(".data_cygwin_nocopy")))
