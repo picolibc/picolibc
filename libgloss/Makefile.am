@@ -87,6 +87,9 @@ endif
 if CONFIG_LM32
 include lm32/Makefile.inc
 endif
+if CONFIG_NIOS2
+include nios2/Makefile.inc
+endif
 if CONFIG_RISCV
 include riscv/Makefile.inc
 endif

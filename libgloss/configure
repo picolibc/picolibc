@@ -634,6 +634,8 @@ CONFIG_WINCE_FALSE
 CONFIG_WINCE_TRUE
 CONFIG_RISCV_FALSE
 CONFIG_RISCV_TRUE
+CONFIG_NIOS2_FALSE
+CONFIG_NIOS2_TRUE
 CONFIG_LM32_FALSE
 CONFIG_LM32_TRUE
 CONFIG_LIBNOSYS_FALSE
@@ -2976,9 +2978,7 @@ case "${target}" in
 	subdirs="$subdirs pru"
 	;;
   nios2-*-*)
-	ac_config_files="$ac_config_files nios2/Makefile"
-
-	subdirs="$subdirs nios2"
+	config_nios2=true
 	;;
 esac
 
@@ -3045,6 +3045,14 @@ fi
 else
   CONFIG_LM32_TRUE='#'
   CONFIG_LM32_FALSE=
+fi
+
+   if test x$config_nios2 = xtrue; then
+  CONFIG_NIOS2_TRUE=
+  CONFIG_NIOS2_FALSE='#'
+else
+  CONFIG_NIOS2_TRUE='#'
+  CONFIG_NIOS2_FALSE=
 fi
 
    if test x$config_riscv = xtrue; then
@@ -5315,6 +5323,10 @@ if test -z "${CONFIG_LM32_TRUE}" && test -z "${CONFIG_LM32_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_LM32\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${CONFIG_NIOS2_TRUE}" && test -z "${CONFIG_NIOS2_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_NIOS2\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${CONFIG_RISCV_TRUE}" && test -z "${CONFIG_RISCV_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_RISCV\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -5981,7 +5993,6 @@ do
     "tic6x/Makefile") CONFIG_FILES="$CONFIG_FILES tic6x/Makefile" ;;
     "or1k/Makefile") CONFIG_FILES="$CONFIG_FILES or1k/Makefile" ;;
     "pru/Makefile") CONFIG_FILES="$CONFIG_FILES pru/Makefile" ;;
-    "nios2/Makefile") CONFIG_FILES="$CONFIG_FILES nios2/Makefile" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "default-1") CONFIG_COMMANDS="$CONFIG_COMMANDS default-1" ;;
     "default-2") CONFIG_COMMANDS="$CONFIG_COMMANDS default-2" ;;

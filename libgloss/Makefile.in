@@ -169,16 +169,20 @@ check_PROGRAMS = $(am__EXEEXT_2) $(am__EXEEXT_3)
 @CONFIG_LM32_TRUE@am__append_26 = lm32/crt0.o lm32/sim.ld
 @CONFIG_LM32_TRUE@am__append_27 = lm32/libgloss.a
 @CONFIG_LM32_TRUE@am__append_28 = lm32/crt0.S
-@CONFIG_RISCV_TRUE@am__append_29 = \
+@CONFIG_NIOS2_TRUE@am__append_29 = \
+@CONFIG_NIOS2_TRUE@	nios2/qemu-hosted.ld
+
+@CONFIG_NIOS2_TRUE@am__append_30 = nios2/libnios2.a
+@CONFIG_RISCV_TRUE@am__append_31 = \
 @CONFIG_RISCV_TRUE@	riscv/nano.specs \
 @CONFIG_RISCV_TRUE@	riscv/sim.specs \
 @CONFIG_RISCV_TRUE@	riscv/semihost.specs \
 @CONFIG_RISCV_TRUE@	riscv/crt0.o
 
-@CONFIG_RISCV_TRUE@am__append_30 = riscv/libgloss.a \
+@CONFIG_RISCV_TRUE@am__append_32 = riscv/libgloss.a \
 @CONFIG_RISCV_TRUE@	riscv/libsemihost.a
-@CONFIG_WINCE_TRUE@am__append_31 = $(gdbdir)
-@CONFIG_WINCE_TRUE@am__append_32 = wince/stub.exe
+@CONFIG_WINCE_TRUE@am__append_33 = $(gdbdir)
+@CONFIG_WINCE_TRUE@am__append_34 = wince/stub.exe
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../config/depstand.m4 \
@@ -211,7 +215,7 @@ CONFIG_CLEAN_FILES = csky/Makefile epiphany/Makefile i386/Makefile \
 	v850/Makefile visium/Makefile xc16x/Makefile \
 	xstormy16/Makefile m32c/Makefile msp430/Makefile rl78/Makefile \
 	rx/Makefile spu/Makefile tic6x/Makefile or1k/Makefile \
-	pru/Makefile nios2/Makefile
+	pru/Makefile
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -390,6 +394,30 @@ lm32_libgloss_a_LIBADD =
 @CONFIG_LM32_TRUE@am_lm32_libgloss_a_OBJECTS = lm32/isatty.$(OBJEXT) \
 @CONFIG_LM32_TRUE@	lm32/scall.$(OBJEXT)
 lm32_libgloss_a_OBJECTS = $(am_lm32_libgloss_a_OBJECTS)
+nios2_libnios2_a_AR = $(AR) $(ARFLAGS)
+nios2_libnios2_a_LIBADD =
+@CONFIG_NIOS2_TRUE@am_nios2_libnios2_a_OBJECTS =  \
+@CONFIG_NIOS2_TRUE@	nios2/nios2_libnios2_a-crt0.$(OBJEXT) \
+@CONFIG_NIOS2_TRUE@	nios2/nios2_libnios2_a-io-close.$(OBJEXT) \
+@CONFIG_NIOS2_TRUE@	nios2/nios2_libnios2_a-io-exit.$(OBJEXT) \
+@CONFIG_NIOS2_TRUE@	nios2/nios2_libnios2_a-io-fstat.$(OBJEXT) \
+@CONFIG_NIOS2_TRUE@	nios2/nios2_libnios2_a-io-gdb.$(OBJEXT) \
+@CONFIG_NIOS2_TRUE@	nios2/nios2_libnios2_a-io-gettimeofday.$(OBJEXT) \
+@CONFIG_NIOS2_TRUE@	nios2/nios2_libnios2_a-io-isatty.$(OBJEXT) \
+@CONFIG_NIOS2_TRUE@	nios2/nios2_libnios2_a-io-lseek.$(OBJEXT) \
+@CONFIG_NIOS2_TRUE@	nios2/nios2_libnios2_a-io-nios2.$(OBJEXT) \
+@CONFIG_NIOS2_TRUE@	nios2/nios2_libnios2_a-io-open.$(OBJEXT) \
+@CONFIG_NIOS2_TRUE@	nios2/nios2_libnios2_a-io-read.$(OBJEXT) \
+@CONFIG_NIOS2_TRUE@	nios2/nios2_libnios2_a-io-rename.$(OBJEXT) \
+@CONFIG_NIOS2_TRUE@	nios2/nios2_libnios2_a-io-stat.$(OBJEXT) \
+@CONFIG_NIOS2_TRUE@	nios2/nios2_libnios2_a-io-system.$(OBJEXT) \
+@CONFIG_NIOS2_TRUE@	nios2/nios2_libnios2_a-io-time.$(OBJEXT) \
+@CONFIG_NIOS2_TRUE@	nios2/nios2_libnios2_a-io-unlink.$(OBJEXT) \
+@CONFIG_NIOS2_TRUE@	nios2/nios2_libnios2_a-io-write.$(OBJEXT) \
+@CONFIG_NIOS2_TRUE@	nios2/nios2_libnios2_a-getpid.$(OBJEXT) \
+@CONFIG_NIOS2_TRUE@	nios2/nios2_libnios2_a-kill.$(OBJEXT) \
+@CONFIG_NIOS2_TRUE@	nios2/nios2_libnios2_a-sbrk.$(OBJEXT)
+nios2_libnios2_a_OBJECTS = $(am_nios2_libnios2_a_OBJECTS)
 riscv_libgloss_a_AR = $(AR) $(ARFLAGS)
 riscv_libgloss_a_LIBADD =
 @CONFIG_RISCV_TRUE@am_riscv_libgloss_a_OBJECTS = riscv/riscv_libgloss_a-sys_access.$(OBJEXT) \
@@ -512,9 +540,9 @@ SOURCES = $(aarch64_librdimon_a_SOURCES) $(arc_libnsim_a_SOURCES) \
 	$(bfin_libbfinbsp_a_SOURCES) $(bfin_libsim_a_SOURCES) \
 	$(d30v_libsim_a_SOURCES) $(iq2000_libeval_a_SOURCES) \
 	$(libnosys_libnosys_a_SOURCES) $(libobjs_a_SOURCES) \
-	$(lm32_libgloss_a_SOURCES) $(riscv_libgloss_a_SOURCES) \
-	$(riscv_libsemihost_a_SOURCES) bfin/sim-test.c iq2000/test.c \
-	$(wince_stub_exe_SOURCES)
+	$(lm32_libgloss_a_SOURCES) $(nios2_libnios2_a_SOURCES) \
+	$(riscv_libgloss_a_SOURCES) $(riscv_libsemihost_a_SOURCES) \
+	bfin/sim-test.c iq2000/test.c $(wince_stub_exe_SOURCES)
 AM_V_DVIPS = $(am__v_DVIPS_@AM_V@)
 am__v_DVIPS_ = $(am__v_DVIPS_@AM_DEFAULT_V@)
 am__v_DVIPS_0 = @echo "  DVIPS   " $@;
@@ -601,7 +629,7 @@ ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
 DIST_SUBDIRS = $(SUBDIRS)
-VPATH = @srcdir@ $(am__append_31)
+VPATH = @srcdir@ $(am__append_33)
 AARCH64_OBJTYPE = @AARCH64_OBJTYPE@
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
@@ -736,11 +764,11 @@ multilibtooldir = $(tooldir)/lib$(MULTISUBDIR)
 multilibtool_DATA = $(am__append_3) $(am__append_6) $(am__append_7) \
 	$(am__append_8) $(am__append_13) $(am__append_15) \
 	$(am__append_19) $(am__append_20) $(am__append_24) \
-	$(am__append_26) $(am__append_29)
+	$(am__append_26) $(am__append_29) $(am__append_31)
 multilibtool_LIBRARIES = $(am__append_2) $(am__append_5) \
 	$(am__append_9) $(am__append_11) $(am__append_18) \
 	$(am__append_21) $(am__append_25) $(am__append_27) \
-	$(am__append_30)
+	$(am__append_30) $(am__append_32)
 includetooldir = $(tooldir)/include
 includetool_DATA = $(am__append_16)
 includesystooldir = $(tooldir)/include/sys
@@ -905,6 +933,32 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 @CONFIG_LM32_TRUE@	lm32/isatty.c \
 @CONFIG_LM32_TRUE@	lm32/scall.S
 
+@CONFIG_NIOS2_TRUE@nios2_libnios2_a_SOURCES = \
+@CONFIG_NIOS2_TRUE@	nios2/crt0.S \
+@CONFIG_NIOS2_TRUE@	nios2/io-close.c \
+@CONFIG_NIOS2_TRUE@	nios2/io-exit.c \
+@CONFIG_NIOS2_TRUE@	nios2/io-fstat.c \
+@CONFIG_NIOS2_TRUE@	nios2/io-gdb.c \
+@CONFIG_NIOS2_TRUE@	nios2/io-gettimeofday.c \
+@CONFIG_NIOS2_TRUE@	nios2/io-isatty.c \
+@CONFIG_NIOS2_TRUE@	nios2/io-lseek.c \
+@CONFIG_NIOS2_TRUE@	nios2/io-nios2.S \
+@CONFIG_NIOS2_TRUE@	nios2/io-open.c \
+@CONFIG_NIOS2_TRUE@	nios2/io-read.c \
+@CONFIG_NIOS2_TRUE@	nios2/io-rename.c \
+@CONFIG_NIOS2_TRUE@	nios2/io-stat.c \
+@CONFIG_NIOS2_TRUE@	nios2/io-system.c \
+@CONFIG_NIOS2_TRUE@	nios2/io-time.c \
+@CONFIG_NIOS2_TRUE@	nios2/io-unlink.c \
+@CONFIG_NIOS2_TRUE@	nios2/io-write.c \
+@CONFIG_NIOS2_TRUE@	nios2/getpid.c \
+@CONFIG_NIOS2_TRUE@	nios2/kill.c \
+@CONFIG_NIOS2_TRUE@	nios2/sbrk.c
+
+@CONFIG_NIOS2_TRUE@nios2_libnios2_a_CPPFLAGS = \
+@CONFIG_NIOS2_TRUE@	$(AM_CPPFLAGS) \
+@CONFIG_NIOS2_TRUE@	-DHOSTED=1
+
 @CONFIG_RISCV_TRUE@riscv_libgloss_a_CPPFLAGS = -I$(srcdir)/riscv
 @CONFIG_RISCV_TRUE@riscv_libgloss_a_SOURCES = \
 @CONFIG_RISCV_TRUE@	riscv/sys_access.c \
@@ -982,7 +1036,7 @@ all: config.h
 .SUFFIXES: .S .c .dvi .o .obj .ps
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arc/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/d30v/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/wince/Makefile.inc $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arc/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/d30v/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/nios2/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/wince/Makefile.inc $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -1004,7 +1058,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe);; \
 	esac;
-$(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arc/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/d30v/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/wince/Makefile.inc $(am__empty):
+$(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arc/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/d30v/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/nios2/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/wince/Makefile.inc $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
@@ -1104,8 +1158,6 @@ tic6x/Makefile: $(top_builddir)/config.status $(top_srcdir)/tic6x/Makefile.in
 or1k/Makefile: $(top_builddir)/config.status $(top_srcdir)/or1k/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 pru/Makefile: $(top_builddir)/config.status $(top_srcdir)/pru/Makefile.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-nios2/Makefile: $(top_builddir)/config.status $(top_srcdir)/nios2/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-multilibtoolLIBRARIES: $(multilibtool_LIBRARIES)
 	@$(NORMAL_INSTALL)
@@ -1430,6 +1482,57 @@ lm32/libgloss.a: $(lm32_libgloss_a_OBJECTS) $(lm32_libgloss_a_DEPENDENCIES) $(EX
 	$(AM_V_at)-rm -f lm32/libgloss.a
 	$(AM_V_AR)$(lm32_libgloss_a_AR) lm32/libgloss.a $(lm32_libgloss_a_OBJECTS) $(lm32_libgloss_a_LIBADD)
 	$(AM_V_at)$(RANLIB) lm32/libgloss.a
+nios2/$(am__dirstamp):
+	@$(MKDIR_P) nios2
+	@: > nios2/$(am__dirstamp)
+nios2/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) nios2/$(DEPDIR)
+	@: > nios2/$(DEPDIR)/$(am__dirstamp)
+nios2/nios2_libnios2_a-crt0.$(OBJEXT): nios2/$(am__dirstamp) \
+	nios2/$(DEPDIR)/$(am__dirstamp)
+nios2/nios2_libnios2_a-io-close.$(OBJEXT): nios2/$(am__dirstamp) \
+	nios2/$(DEPDIR)/$(am__dirstamp)
+nios2/nios2_libnios2_a-io-exit.$(OBJEXT): nios2/$(am__dirstamp) \
+	nios2/$(DEPDIR)/$(am__dirstamp)
+nios2/nios2_libnios2_a-io-fstat.$(OBJEXT): nios2/$(am__dirstamp) \
+	nios2/$(DEPDIR)/$(am__dirstamp)
+nios2/nios2_libnios2_a-io-gdb.$(OBJEXT): nios2/$(am__dirstamp) \
+	nios2/$(DEPDIR)/$(am__dirstamp)
+nios2/nios2_libnios2_a-io-gettimeofday.$(OBJEXT):  \
+	nios2/$(am__dirstamp) nios2/$(DEPDIR)/$(am__dirstamp)
+nios2/nios2_libnios2_a-io-isatty.$(OBJEXT): nios2/$(am__dirstamp) \
+	nios2/$(DEPDIR)/$(am__dirstamp)
+nios2/nios2_libnios2_a-io-lseek.$(OBJEXT): nios2/$(am__dirstamp) \
+	nios2/$(DEPDIR)/$(am__dirstamp)
+nios2/nios2_libnios2_a-io-nios2.$(OBJEXT): nios2/$(am__dirstamp) \
+	nios2/$(DEPDIR)/$(am__dirstamp)
+nios2/nios2_libnios2_a-io-open.$(OBJEXT): nios2/$(am__dirstamp) \
+	nios2/$(DEPDIR)/$(am__dirstamp)
+nios2/nios2_libnios2_a-io-read.$(OBJEXT): nios2/$(am__dirstamp) \
+	nios2/$(DEPDIR)/$(am__dirstamp)
+nios2/nios2_libnios2_a-io-rename.$(OBJEXT): nios2/$(am__dirstamp) \
+	nios2/$(DEPDIR)/$(am__dirstamp)
+nios2/nios2_libnios2_a-io-stat.$(OBJEXT): nios2/$(am__dirstamp) \
+	nios2/$(DEPDIR)/$(am__dirstamp)
+nios2/nios2_libnios2_a-io-system.$(OBJEXT): nios2/$(am__dirstamp) \
+	nios2/$(DEPDIR)/$(am__dirstamp)
+nios2/nios2_libnios2_a-io-time.$(OBJEXT): nios2/$(am__dirstamp) \
+	nios2/$(DEPDIR)/$(am__dirstamp)
+nios2/nios2_libnios2_a-io-unlink.$(OBJEXT): nios2/$(am__dirstamp) \
+	nios2/$(DEPDIR)/$(am__dirstamp)
+nios2/nios2_libnios2_a-io-write.$(OBJEXT): nios2/$(am__dirstamp) \
+	nios2/$(DEPDIR)/$(am__dirstamp)
+nios2/nios2_libnios2_a-getpid.$(OBJEXT): nios2/$(am__dirstamp) \
+	nios2/$(DEPDIR)/$(am__dirstamp)
+nios2/nios2_libnios2_a-kill.$(OBJEXT): nios2/$(am__dirstamp) \
+	nios2/$(DEPDIR)/$(am__dirstamp)
+nios2/nios2_libnios2_a-sbrk.$(OBJEXT): nios2/$(am__dirstamp) \
+	nios2/$(DEPDIR)/$(am__dirstamp)
+
+nios2/libnios2.a: $(nios2_libnios2_a_OBJECTS) $(nios2_libnios2_a_DEPENDENCIES) $(EXTRA_nios2_libnios2_a_DEPENDENCIES) nios2/$(am__dirstamp)
+	$(AM_V_at)-rm -f nios2/libnios2.a
+	$(AM_V_AR)$(nios2_libnios2_a_AR) nios2/libnios2.a $(nios2_libnios2_a_OBJECTS) $(nios2_libnios2_a_LIBADD)
+	$(AM_V_at)$(RANLIB) nios2/libnios2.a
 riscv/$(am__dirstamp):
 	@$(MKDIR_P) riscv
 	@: > riscv/$(am__dirstamp)
@@ -1637,6 +1740,7 @@ mostlyclean-compile:
 	-rm -f iq2000/*.$(OBJEXT)
 	-rm -f libnosys/*.$(OBJEXT)
 	-rm -f lm32/*.$(OBJEXT)
+	-rm -f nios2/*.$(OBJEXT)
 	-rm -f riscv/*.$(OBJEXT)
 
 distclean-compile:
@@ -1739,6 +1843,26 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@lm32/$(DEPDIR)/crt0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lm32/$(DEPDIR)/isatty.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lm32/$(DEPDIR)/scall.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@nios2/$(DEPDIR)/nios2_libnios2_a-crt0.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@nios2/$(DEPDIR)/nios2_libnios2_a-getpid.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@nios2/$(DEPDIR)/nios2_libnios2_a-io-close.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@nios2/$(DEPDIR)/nios2_libnios2_a-io-exit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@nios2/$(DEPDIR)/nios2_libnios2_a-io-fstat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@nios2/$(DEPDIR)/nios2_libnios2_a-io-gdb.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@nios2/$(DEPDIR)/nios2_libnios2_a-io-gettimeofday.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@nios2/$(DEPDIR)/nios2_libnios2_a-io-isatty.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@nios2/$(DEPDIR)/nios2_libnios2_a-io-lseek.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@nios2/$(DEPDIR)/nios2_libnios2_a-io-nios2.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@nios2/$(DEPDIR)/nios2_libnios2_a-io-open.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@nios2/$(DEPDIR)/nios2_libnios2_a-io-read.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@nios2/$(DEPDIR)/nios2_libnios2_a-io-rename.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@nios2/$(DEPDIR)/nios2_libnios2_a-io-stat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@nios2/$(DEPDIR)/nios2_libnios2_a-io-system.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@nios2/$(DEPDIR)/nios2_libnios2_a-io-time.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@nios2/$(DEPDIR)/nios2_libnios2_a-io-unlink.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@nios2/$(DEPDIR)/nios2_libnios2_a-io-write.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@nios2/$(DEPDIR)/nios2_libnios2_a-kill.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@nios2/$(DEPDIR)/nios2_libnios2_a-sbrk.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libgloss_a-sys_access.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libgloss_a-sys_chdir.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libgloss_a-sys_chmod.Po@am__quote@
@@ -1841,6 +1965,34 @@ arm/arm_librdimon_a-trap.obj: arm/trap.S
 @AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='arm/trap.S' object='arm/arm_librdimon_a-trap.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o arm/arm_librdimon_a-trap.obj `if test -f 'arm/trap.S'; then $(CYGPATH_W) 'arm/trap.S'; else $(CYGPATH_W) '$(srcdir)/arm/trap.S'; fi`
+
+nios2/nios2_libnios2_a-crt0.o: nios2/crt0.S
+@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT nios2/nios2_libnios2_a-crt0.o -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-crt0.Tpo -c -o nios2/nios2_libnios2_a-crt0.o `test -f 'nios2/crt0.S' || echo '$(srcdir)/'`nios2/crt0.S
+@am__fastdepCCAS_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-crt0.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-crt0.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='nios2/crt0.S' object='nios2/nios2_libnios2_a-crt0.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o nios2/nios2_libnios2_a-crt0.o `test -f 'nios2/crt0.S' || echo '$(srcdir)/'`nios2/crt0.S
+
+nios2/nios2_libnios2_a-crt0.obj: nios2/crt0.S
+@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT nios2/nios2_libnios2_a-crt0.obj -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-crt0.Tpo -c -o nios2/nios2_libnios2_a-crt0.obj `if test -f 'nios2/crt0.S'; then $(CYGPATH_W) 'nios2/crt0.S'; else $(CYGPATH_W) '$(srcdir)/nios2/crt0.S'; fi`
+@am__fastdepCCAS_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-crt0.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-crt0.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='nios2/crt0.S' object='nios2/nios2_libnios2_a-crt0.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o nios2/nios2_libnios2_a-crt0.obj `if test -f 'nios2/crt0.S'; then $(CYGPATH_W) 'nios2/crt0.S'; else $(CYGPATH_W) '$(srcdir)/nios2/crt0.S'; fi`
+
+nios2/nios2_libnios2_a-io-nios2.o: nios2/io-nios2.S
+@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT nios2/nios2_libnios2_a-io-nios2.o -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-nios2.Tpo -c -o nios2/nios2_libnios2_a-io-nios2.o `test -f 'nios2/io-nios2.S' || echo '$(srcdir)/'`nios2/io-nios2.S
+@am__fastdepCCAS_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-nios2.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-nios2.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='nios2/io-nios2.S' object='nios2/nios2_libnios2_a-io-nios2.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o nios2/nios2_libnios2_a-io-nios2.o `test -f 'nios2/io-nios2.S' || echo '$(srcdir)/'`nios2/io-nios2.S
+
+nios2/nios2_libnios2_a-io-nios2.obj: nios2/io-nios2.S
+@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT nios2/nios2_libnios2_a-io-nios2.obj -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-nios2.Tpo -c -o nios2/nios2_libnios2_a-io-nios2.obj `if test -f 'nios2/io-nios2.S'; then $(CYGPATH_W) 'nios2/io-nios2.S'; else $(CYGPATH_W) '$(srcdir)/nios2/io-nios2.S'; fi`
+@am__fastdepCCAS_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-nios2.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-nios2.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='nios2/io-nios2.S' object='nios2/nios2_libnios2_a-io-nios2.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o nios2/nios2_libnios2_a-io-nios2.obj `if test -f 'nios2/io-nios2.S'; then $(CYGPATH_W) 'nios2/io-nios2.S'; else $(CYGPATH_W) '$(srcdir)/nios2/io-nios2.S'; fi`
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -2165,6 +2317,258 @@ bfin/bfin_libsim_a-syscalls.obj: bfin/syscalls.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='bfin/syscalls.c' object='bfin/bfin_libsim_a-syscalls.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bfin_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bfin/bfin_libsim_a-syscalls.obj `if test -f 'bfin/syscalls.c'; then $(CYGPATH_W) 'bfin/syscalls.c'; else $(CYGPATH_W) '$(srcdir)/bfin/syscalls.c'; fi`
+
+nios2/nios2_libnios2_a-io-close.o: nios2/io-close.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-close.o -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-close.Tpo -c -o nios2/nios2_libnios2_a-io-close.o `test -f 'nios2/io-close.c' || echo '$(srcdir)/'`nios2/io-close.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-close.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-close.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-close.c' object='nios2/nios2_libnios2_a-io-close.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-close.o `test -f 'nios2/io-close.c' || echo '$(srcdir)/'`nios2/io-close.c
+
+nios2/nios2_libnios2_a-io-close.obj: nios2/io-close.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-close.obj -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-close.Tpo -c -o nios2/nios2_libnios2_a-io-close.obj `if test -f 'nios2/io-close.c'; then $(CYGPATH_W) 'nios2/io-close.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-close.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-close.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-close.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-close.c' object='nios2/nios2_libnios2_a-io-close.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-close.obj `if test -f 'nios2/io-close.c'; then $(CYGPATH_W) 'nios2/io-close.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-close.c'; fi`
+
+nios2/nios2_libnios2_a-io-exit.o: nios2/io-exit.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-exit.o -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-exit.Tpo -c -o nios2/nios2_libnios2_a-io-exit.o `test -f 'nios2/io-exit.c' || echo '$(srcdir)/'`nios2/io-exit.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-exit.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-exit.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-exit.c' object='nios2/nios2_libnios2_a-io-exit.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-exit.o `test -f 'nios2/io-exit.c' || echo '$(srcdir)/'`nios2/io-exit.c
+
+nios2/nios2_libnios2_a-io-exit.obj: nios2/io-exit.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-exit.obj -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-exit.Tpo -c -o nios2/nios2_libnios2_a-io-exit.obj `if test -f 'nios2/io-exit.c'; then $(CYGPATH_W) 'nios2/io-exit.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-exit.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-exit.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-exit.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-exit.c' object='nios2/nios2_libnios2_a-io-exit.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-exit.obj `if test -f 'nios2/io-exit.c'; then $(CYGPATH_W) 'nios2/io-exit.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-exit.c'; fi`
+
+nios2/nios2_libnios2_a-io-fstat.o: nios2/io-fstat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-fstat.o -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-fstat.Tpo -c -o nios2/nios2_libnios2_a-io-fstat.o `test -f 'nios2/io-fstat.c' || echo '$(srcdir)/'`nios2/io-fstat.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-fstat.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-fstat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-fstat.c' object='nios2/nios2_libnios2_a-io-fstat.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-fstat.o `test -f 'nios2/io-fstat.c' || echo '$(srcdir)/'`nios2/io-fstat.c
+
+nios2/nios2_libnios2_a-io-fstat.obj: nios2/io-fstat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-fstat.obj -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-fstat.Tpo -c -o nios2/nios2_libnios2_a-io-fstat.obj `if test -f 'nios2/io-fstat.c'; then $(CYGPATH_W) 'nios2/io-fstat.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-fstat.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-fstat.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-fstat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-fstat.c' object='nios2/nios2_libnios2_a-io-fstat.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-fstat.obj `if test -f 'nios2/io-fstat.c'; then $(CYGPATH_W) 'nios2/io-fstat.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-fstat.c'; fi`
+
+nios2/nios2_libnios2_a-io-gdb.o: nios2/io-gdb.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-gdb.o -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-gdb.Tpo -c -o nios2/nios2_libnios2_a-io-gdb.o `test -f 'nios2/io-gdb.c' || echo '$(srcdir)/'`nios2/io-gdb.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-gdb.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-gdb.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-gdb.c' object='nios2/nios2_libnios2_a-io-gdb.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-gdb.o `test -f 'nios2/io-gdb.c' || echo '$(srcdir)/'`nios2/io-gdb.c
+
+nios2/nios2_libnios2_a-io-gdb.obj: nios2/io-gdb.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-gdb.obj -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-gdb.Tpo -c -o nios2/nios2_libnios2_a-io-gdb.obj `if test -f 'nios2/io-gdb.c'; then $(CYGPATH_W) 'nios2/io-gdb.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-gdb.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-gdb.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-gdb.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-gdb.c' object='nios2/nios2_libnios2_a-io-gdb.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-gdb.obj `if test -f 'nios2/io-gdb.c'; then $(CYGPATH_W) 'nios2/io-gdb.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-gdb.c'; fi`
+
+nios2/nios2_libnios2_a-io-gettimeofday.o: nios2/io-gettimeofday.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-gettimeofday.o -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-gettimeofday.Tpo -c -o nios2/nios2_libnios2_a-io-gettimeofday.o `test -f 'nios2/io-gettimeofday.c' || echo '$(srcdir)/'`nios2/io-gettimeofday.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-gettimeofday.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-gettimeofday.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-gettimeofday.c' object='nios2/nios2_libnios2_a-io-gettimeofday.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-gettimeofday.o `test -f 'nios2/io-gettimeofday.c' || echo '$(srcdir)/'`nios2/io-gettimeofday.c
+
+nios2/nios2_libnios2_a-io-gettimeofday.obj: nios2/io-gettimeofday.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-gettimeofday.obj -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-gettimeofday.Tpo -c -o nios2/nios2_libnios2_a-io-gettimeofday.obj `if test -f 'nios2/io-gettimeofday.c'; then $(CYGPATH_W) 'nios2/io-gettimeofday.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-gettimeofday.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-gettimeofday.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-gettimeofday.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-gettimeofday.c' object='nios2/nios2_libnios2_a-io-gettimeofday.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-gettimeofday.obj `if test -f 'nios2/io-gettimeofday.c'; then $(CYGPATH_W) 'nios2/io-gettimeofday.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-gettimeofday.c'; fi`
+
+nios2/nios2_libnios2_a-io-isatty.o: nios2/io-isatty.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-isatty.o -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-isatty.Tpo -c -o nios2/nios2_libnios2_a-io-isatty.o `test -f 'nios2/io-isatty.c' || echo '$(srcdir)/'`nios2/io-isatty.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-isatty.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-isatty.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-isatty.c' object='nios2/nios2_libnios2_a-io-isatty.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-isatty.o `test -f 'nios2/io-isatty.c' || echo '$(srcdir)/'`nios2/io-isatty.c
+
+nios2/nios2_libnios2_a-io-isatty.obj: nios2/io-isatty.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-isatty.obj -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-isatty.Tpo -c -o nios2/nios2_libnios2_a-io-isatty.obj `if test -f 'nios2/io-isatty.c'; then $(CYGPATH_W) 'nios2/io-isatty.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-isatty.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-isatty.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-isatty.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-isatty.c' object='nios2/nios2_libnios2_a-io-isatty.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-isatty.obj `if test -f 'nios2/io-isatty.c'; then $(CYGPATH_W) 'nios2/io-isatty.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-isatty.c'; fi`
+
+nios2/nios2_libnios2_a-io-lseek.o: nios2/io-lseek.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-lseek.o -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-lseek.Tpo -c -o nios2/nios2_libnios2_a-io-lseek.o `test -f 'nios2/io-lseek.c' || echo '$(srcdir)/'`nios2/io-lseek.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-lseek.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-lseek.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-lseek.c' object='nios2/nios2_libnios2_a-io-lseek.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-lseek.o `test -f 'nios2/io-lseek.c' || echo '$(srcdir)/'`nios2/io-lseek.c
+
+nios2/nios2_libnios2_a-io-lseek.obj: nios2/io-lseek.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-lseek.obj -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-lseek.Tpo -c -o nios2/nios2_libnios2_a-io-lseek.obj `if test -f 'nios2/io-lseek.c'; then $(CYGPATH_W) 'nios2/io-lseek.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-lseek.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-lseek.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-lseek.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-lseek.c' object='nios2/nios2_libnios2_a-io-lseek.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-lseek.obj `if test -f 'nios2/io-lseek.c'; then $(CYGPATH_W) 'nios2/io-lseek.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-lseek.c'; fi`
+
+nios2/nios2_libnios2_a-io-open.o: nios2/io-open.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-open.o -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-open.Tpo -c -o nios2/nios2_libnios2_a-io-open.o `test -f 'nios2/io-open.c' || echo '$(srcdir)/'`nios2/io-open.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-open.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-open.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-open.c' object='nios2/nios2_libnios2_a-io-open.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-open.o `test -f 'nios2/io-open.c' || echo '$(srcdir)/'`nios2/io-open.c
+
+nios2/nios2_libnios2_a-io-open.obj: nios2/io-open.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-open.obj -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-open.Tpo -c -o nios2/nios2_libnios2_a-io-open.obj `if test -f 'nios2/io-open.c'; then $(CYGPATH_W) 'nios2/io-open.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-open.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-open.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-open.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-open.c' object='nios2/nios2_libnios2_a-io-open.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-open.obj `if test -f 'nios2/io-open.c'; then $(CYGPATH_W) 'nios2/io-open.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-open.c'; fi`
+
+nios2/nios2_libnios2_a-io-read.o: nios2/io-read.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-read.o -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-read.Tpo -c -o nios2/nios2_libnios2_a-io-read.o `test -f 'nios2/io-read.c' || echo '$(srcdir)/'`nios2/io-read.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-read.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-read.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-read.c' object='nios2/nios2_libnios2_a-io-read.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-read.o `test -f 'nios2/io-read.c' || echo '$(srcdir)/'`nios2/io-read.c
+
+nios2/nios2_libnios2_a-io-read.obj: nios2/io-read.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-read.obj -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-read.Tpo -c -o nios2/nios2_libnios2_a-io-read.obj `if test -f 'nios2/io-read.c'; then $(CYGPATH_W) 'nios2/io-read.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-read.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-read.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-read.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-read.c' object='nios2/nios2_libnios2_a-io-read.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-read.obj `if test -f 'nios2/io-read.c'; then $(CYGPATH_W) 'nios2/io-read.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-read.c'; fi`
+
+nios2/nios2_libnios2_a-io-rename.o: nios2/io-rename.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-rename.o -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-rename.Tpo -c -o nios2/nios2_libnios2_a-io-rename.o `test -f 'nios2/io-rename.c' || echo '$(srcdir)/'`nios2/io-rename.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-rename.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-rename.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-rename.c' object='nios2/nios2_libnios2_a-io-rename.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-rename.o `test -f 'nios2/io-rename.c' || echo '$(srcdir)/'`nios2/io-rename.c
+
+nios2/nios2_libnios2_a-io-rename.obj: nios2/io-rename.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-rename.obj -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-rename.Tpo -c -o nios2/nios2_libnios2_a-io-rename.obj `if test -f 'nios2/io-rename.c'; then $(CYGPATH_W) 'nios2/io-rename.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-rename.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-rename.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-rename.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-rename.c' object='nios2/nios2_libnios2_a-io-rename.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-rename.obj `if test -f 'nios2/io-rename.c'; then $(CYGPATH_W) 'nios2/io-rename.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-rename.c'; fi`
+
+nios2/nios2_libnios2_a-io-stat.o: nios2/io-stat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-stat.o -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-stat.Tpo -c -o nios2/nios2_libnios2_a-io-stat.o `test -f 'nios2/io-stat.c' || echo '$(srcdir)/'`nios2/io-stat.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-stat.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-stat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-stat.c' object='nios2/nios2_libnios2_a-io-stat.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-stat.o `test -f 'nios2/io-stat.c' || echo '$(srcdir)/'`nios2/io-stat.c
+
+nios2/nios2_libnios2_a-io-stat.obj: nios2/io-stat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-stat.obj -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-stat.Tpo -c -o nios2/nios2_libnios2_a-io-stat.obj `if test -f 'nios2/io-stat.c'; then $(CYGPATH_W) 'nios2/io-stat.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-stat.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-stat.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-stat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-stat.c' object='nios2/nios2_libnios2_a-io-stat.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-stat.obj `if test -f 'nios2/io-stat.c'; then $(CYGPATH_W) 'nios2/io-stat.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-stat.c'; fi`
+
+nios2/nios2_libnios2_a-io-system.o: nios2/io-system.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-system.o -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-system.Tpo -c -o nios2/nios2_libnios2_a-io-system.o `test -f 'nios2/io-system.c' || echo '$(srcdir)/'`nios2/io-system.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-system.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-system.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-system.c' object='nios2/nios2_libnios2_a-io-system.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-system.o `test -f 'nios2/io-system.c' || echo '$(srcdir)/'`nios2/io-system.c
+
+nios2/nios2_libnios2_a-io-system.obj: nios2/io-system.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-system.obj -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-system.Tpo -c -o nios2/nios2_libnios2_a-io-system.obj `if test -f 'nios2/io-system.c'; then $(CYGPATH_W) 'nios2/io-system.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-system.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-system.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-system.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-system.c' object='nios2/nios2_libnios2_a-io-system.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-system.obj `if test -f 'nios2/io-system.c'; then $(CYGPATH_W) 'nios2/io-system.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-system.c'; fi`
+
+nios2/nios2_libnios2_a-io-time.o: nios2/io-time.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-time.o -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-time.Tpo -c -o nios2/nios2_libnios2_a-io-time.o `test -f 'nios2/io-time.c' || echo '$(srcdir)/'`nios2/io-time.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-time.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-time.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-time.c' object='nios2/nios2_libnios2_a-io-time.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-time.o `test -f 'nios2/io-time.c' || echo '$(srcdir)/'`nios2/io-time.c
+
+nios2/nios2_libnios2_a-io-time.obj: nios2/io-time.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-time.obj -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-time.Tpo -c -o nios2/nios2_libnios2_a-io-time.obj `if test -f 'nios2/io-time.c'; then $(CYGPATH_W) 'nios2/io-time.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-time.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-time.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-time.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-time.c' object='nios2/nios2_libnios2_a-io-time.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-time.obj `if test -f 'nios2/io-time.c'; then $(CYGPATH_W) 'nios2/io-time.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-time.c'; fi`
+
+nios2/nios2_libnios2_a-io-unlink.o: nios2/io-unlink.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-unlink.o -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-unlink.Tpo -c -o nios2/nios2_libnios2_a-io-unlink.o `test -f 'nios2/io-unlink.c' || echo '$(srcdir)/'`nios2/io-unlink.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-unlink.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-unlink.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-unlink.c' object='nios2/nios2_libnios2_a-io-unlink.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-unlink.o `test -f 'nios2/io-unlink.c' || echo '$(srcdir)/'`nios2/io-unlink.c
+
+nios2/nios2_libnios2_a-io-unlink.obj: nios2/io-unlink.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-unlink.obj -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-unlink.Tpo -c -o nios2/nios2_libnios2_a-io-unlink.obj `if test -f 'nios2/io-unlink.c'; then $(CYGPATH_W) 'nios2/io-unlink.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-unlink.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-unlink.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-unlink.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-unlink.c' object='nios2/nios2_libnios2_a-io-unlink.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-unlink.obj `if test -f 'nios2/io-unlink.c'; then $(CYGPATH_W) 'nios2/io-unlink.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-unlink.c'; fi`
+
+nios2/nios2_libnios2_a-io-write.o: nios2/io-write.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-write.o -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-write.Tpo -c -o nios2/nios2_libnios2_a-io-write.o `test -f 'nios2/io-write.c' || echo '$(srcdir)/'`nios2/io-write.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-write.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-write.c' object='nios2/nios2_libnios2_a-io-write.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-write.o `test -f 'nios2/io-write.c' || echo '$(srcdir)/'`nios2/io-write.c
+
+nios2/nios2_libnios2_a-io-write.obj: nios2/io-write.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-write.obj -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-write.Tpo -c -o nios2/nios2_libnios2_a-io-write.obj `if test -f 'nios2/io-write.c'; then $(CYGPATH_W) 'nios2/io-write.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-write.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-io-write.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-io-write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/io-write.c' object='nios2/nios2_libnios2_a-io-write.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-io-write.obj `if test -f 'nios2/io-write.c'; then $(CYGPATH_W) 'nios2/io-write.c'; else $(CYGPATH_W) '$(srcdir)/nios2/io-write.c'; fi`
+
+nios2/nios2_libnios2_a-getpid.o: nios2/getpid.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-getpid.o -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-getpid.Tpo -c -o nios2/nios2_libnios2_a-getpid.o `test -f 'nios2/getpid.c' || echo '$(srcdir)/'`nios2/getpid.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-getpid.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-getpid.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/getpid.c' object='nios2/nios2_libnios2_a-getpid.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-getpid.o `test -f 'nios2/getpid.c' || echo '$(srcdir)/'`nios2/getpid.c
+
+nios2/nios2_libnios2_a-getpid.obj: nios2/getpid.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-getpid.obj -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-getpid.Tpo -c -o nios2/nios2_libnios2_a-getpid.obj `if test -f 'nios2/getpid.c'; then $(CYGPATH_W) 'nios2/getpid.c'; else $(CYGPATH_W) '$(srcdir)/nios2/getpid.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-getpid.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-getpid.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/getpid.c' object='nios2/nios2_libnios2_a-getpid.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-getpid.obj `if test -f 'nios2/getpid.c'; then $(CYGPATH_W) 'nios2/getpid.c'; else $(CYGPATH_W) '$(srcdir)/nios2/getpid.c'; fi`
+
+nios2/nios2_libnios2_a-kill.o: nios2/kill.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-kill.o -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-kill.Tpo -c -o nios2/nios2_libnios2_a-kill.o `test -f 'nios2/kill.c' || echo '$(srcdir)/'`nios2/kill.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-kill.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-kill.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/kill.c' object='nios2/nios2_libnios2_a-kill.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-kill.o `test -f 'nios2/kill.c' || echo '$(srcdir)/'`nios2/kill.c
+
+nios2/nios2_libnios2_a-kill.obj: nios2/kill.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-kill.obj -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-kill.Tpo -c -o nios2/nios2_libnios2_a-kill.obj `if test -f 'nios2/kill.c'; then $(CYGPATH_W) 'nios2/kill.c'; else $(CYGPATH_W) '$(srcdir)/nios2/kill.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-kill.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-kill.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/kill.c' object='nios2/nios2_libnios2_a-kill.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-kill.obj `if test -f 'nios2/kill.c'; then $(CYGPATH_W) 'nios2/kill.c'; else $(CYGPATH_W) '$(srcdir)/nios2/kill.c'; fi`
+
+nios2/nios2_libnios2_a-sbrk.o: nios2/sbrk.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-sbrk.o -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-sbrk.Tpo -c -o nios2/nios2_libnios2_a-sbrk.o `test -f 'nios2/sbrk.c' || echo '$(srcdir)/'`nios2/sbrk.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-sbrk.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-sbrk.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/sbrk.c' object='nios2/nios2_libnios2_a-sbrk.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-sbrk.o `test -f 'nios2/sbrk.c' || echo '$(srcdir)/'`nios2/sbrk.c
+
+nios2/nios2_libnios2_a-sbrk.obj: nios2/sbrk.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-sbrk.obj -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-sbrk.Tpo -c -o nios2/nios2_libnios2_a-sbrk.obj `if test -f 'nios2/sbrk.c'; then $(CYGPATH_W) 'nios2/sbrk.c'; else $(CYGPATH_W) '$(srcdir)/nios2/sbrk.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) nios2/$(DEPDIR)/nios2_libnios2_a-sbrk.Tpo nios2/$(DEPDIR)/nios2_libnios2_a-sbrk.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nios2/sbrk.c' object='nios2/nios2_libnios2_a-sbrk.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nios2/nios2_libnios2_a-sbrk.obj `if test -f 'nios2/sbrk.c'; then $(CYGPATH_W) 'nios2/sbrk.c'; else $(CYGPATH_W) '$(srcdir)/nios2/sbrk.c'; fi`
 
 riscv/riscv_libgloss_a-sys_access.o: riscv/sys_access.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libgloss_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libgloss_a-sys_access.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libgloss_a-sys_access.Tpo -c -o riscv/riscv_libgloss_a-sys_access.o `test -f 'riscv/sys_access.c' || echo '$(srcdir)/'`riscv/sys_access.c
@@ -3417,6 +3821,8 @@ distclean-generic:
 	-rm -f libnosys/$(am__dirstamp)
 	-rm -f lm32/$(DEPDIR)/$(am__dirstamp)
 	-rm -f lm32/$(am__dirstamp)
+	-rm -f nios2/$(DEPDIR)/$(am__dirstamp)
+	-rm -f nios2/$(am__dirstamp)
 	-rm -f riscv/$(DEPDIR)/$(am__dirstamp)
 	-rm -f riscv/$(am__dirstamp)
 	-rm -f wince/$(am__dirstamp)
@@ -3432,7 +3838,7 @@ clean-am: clean-aminfo clean-binPROGRAMS clean-checkPROGRAMS \
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) d30v/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) riscv/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) d30v/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) nios2/$(DEPDIR) riscv/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-local distclean-tags
@@ -3575,7 +3981,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) d30v/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) riscv/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) d30v/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) nios2/$(DEPDIR) riscv/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-aminfo \
 	maintainer-clean-generic maintainer-clean-local
