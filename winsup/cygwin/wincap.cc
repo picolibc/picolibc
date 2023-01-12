@@ -13,15 +13,8 @@ details. */
 #include "ntdll.h"
 #include "memory_layout.h"
 
-/* CV, 2008-10-23: All wincapc's have to be in the .cygwin_dll_common section,
-   same as wincap itself.  Otherwise the capability changes made in
-   wincapc::init() are not propagated to any subsequently started process
-   in the same session.  I'm only writing this longish comment because I'm
-   puzzled that this has never been noticed before... */
-
-wincaps wincap_8_1 __attribute__((section (".cygwin_dll_common"), shared)) = {
+static const wincaps wincap_8_1 = {
   {
-    is_server:false,
     has_new_pebteb_region:false,
     has_unprivileged_createsymlink:false,
     has_precise_interrupt_time:false,
@@ -41,9 +34,8 @@ wincaps wincap_8_1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   },
 };
 
-wincaps  wincap_10_1507 __attribute__((section (".cygwin_dll_common"), shared)) = {
+static const wincaps  wincap_10_1507 = {
   {
-    is_server:false,
     has_new_pebteb_region:false,
     has_unprivileged_createsymlink:false,
     has_precise_interrupt_time:true,
@@ -63,9 +55,8 @@ wincaps  wincap_10_1507 __attribute__((section (".cygwin_dll_common"), shared)) 
   },
 };
 
-wincaps  wincap_10_1607 __attribute__((section (".cygwin_dll_common"), shared)) = {
+static const wincaps  wincap_10_1607 = {
   {
-    is_server:false,
     has_new_pebteb_region:false,
     has_unprivileged_createsymlink:false,
     has_precise_interrupt_time:true,
@@ -85,9 +76,8 @@ wincaps  wincap_10_1607 __attribute__((section (".cygwin_dll_common"), shared)) 
   },
 };
 
-wincaps wincap_10_1703 __attribute__((section (".cygwin_dll_common"), shared)) = {
+static const wincaps wincap_10_1703 = {
   {
-    is_server:false,
     has_new_pebteb_region:true,
     has_unprivileged_createsymlink:true,
     has_precise_interrupt_time:true,
@@ -107,9 +97,8 @@ wincaps wincap_10_1703 __attribute__((section (".cygwin_dll_common"), shared)) =
   },
 };
 
-wincaps wincap_10_1709 __attribute__((section (".cygwin_dll_common"), shared)) = {
+static const wincaps wincap_10_1709 = {
   {
-    is_server:false,
     has_new_pebteb_region:true,
     has_unprivileged_createsymlink:true,
     has_precise_interrupt_time:true,
@@ -129,9 +118,8 @@ wincaps wincap_10_1709 __attribute__((section (".cygwin_dll_common"), shared)) =
   },
 };
 
-wincaps wincap_10_1803 __attribute__((section (".cygwin_dll_common"), shared)) = {
+static const wincaps wincap_10_1803 = {
   {
-    is_server:false,
     has_new_pebteb_region:true,
     has_unprivileged_createsymlink:true,
     has_precise_interrupt_time:true,
@@ -151,9 +139,8 @@ wincaps wincap_10_1803 __attribute__((section (".cygwin_dll_common"), shared)) =
   },
 };
 
-wincaps wincap_10_1809 __attribute__((section (".cygwin_dll_common"), shared)) = {
+static const wincaps wincap_10_1809 = {
   {
-    is_server:false,
     has_new_pebteb_region:true,
     has_unprivileged_createsymlink:true,
     has_precise_interrupt_time:true,
@@ -173,9 +160,8 @@ wincaps wincap_10_1809 __attribute__((section (".cygwin_dll_common"), shared)) =
   },
 };
 
-wincaps wincap_10_1903 __attribute__((section (".cygwin_dll_common"), shared)) = {
+static const wincaps wincap_10_1903 = {
   {
-    is_server:false,
     has_new_pebteb_region:true,
     has_unprivileged_createsymlink:true,
     has_precise_interrupt_time:true,
@@ -195,9 +181,8 @@ wincaps wincap_10_1903 __attribute__((section (".cygwin_dll_common"), shared)) =
   },
 };
 
-wincaps wincap_10_2004 __attribute__((section (".cygwin_dll_common"), shared)) = {
+static const wincaps wincap_10_2004 = {
   {
-    is_server:false,
     has_new_pebteb_region:true,
     has_unprivileged_createsymlink:true,
     has_precise_interrupt_time:true,
@@ -217,9 +202,8 @@ wincaps wincap_10_2004 __attribute__((section (".cygwin_dll_common"), shared)) =
   },
 };
 
-wincaps wincap_11 __attribute__((section (".cygwin_dll_common"), shared)) = {
+static const wincaps wincap_11 = {
   {
-    is_server:false,
     has_new_pebteb_region:true,
     has_unprivileged_createsymlink:true,
     has_precise_interrupt_time:true,
@@ -284,7 +268,7 @@ wincapc::init ()
 	  caps = & wincap_10_1507;
     }
 
-  ((wincaps *)caps)->is_server = (version.wProductType != VER_NT_WORKSTATION);
+  _is_server = (version.wProductType != VER_NT_WORKSTATION);
 
   __small_sprintf (osnam, "NT-%d.%d", version.dwMajorVersion,
 		   version.dwMinorVersion);
