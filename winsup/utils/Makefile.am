@@ -31,6 +31,7 @@ bin_PROGRAMS = \
 	mkgroup \
 	mkpasswd \
 	mount \
+	newgrp \
 	passwd \
 	pldd \
 	profiler \
