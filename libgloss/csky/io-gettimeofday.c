@@ -43,7 +43,7 @@ int gettimeofday (struct timeval *tv, void *tzvp)
       return -1;
     }
   parameters[0] = (uint32_t) &gtv;
-  parameters[1] = NULL;
+  parameters[1] = 0;
   ret = __hosted (HOSTED_GETTIMEOFDAY, parameters);
   __hosted_from_gdb_timeval (&gtv, tv);
   errno = __hosted_from_gdb_errno (parameters[0]);
