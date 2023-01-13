@@ -55,8 +55,7 @@ case "${target}" in
 	config_arc=true
 	;;
   csky*-*-*)
-	AC_CONFIG_FILES([csky/Makefile])
-	subdirs="$subdirs csky"
+	config_csky=true
 	;;
   epiphany-*-*)
 	AC_CONFIG_FILES([epiphany/Makefile])
@@ -248,7 +247,7 @@ AC_SUBST(subdirs)
 dnl These subdirs have converted to non-recursive make.  Hopefully someday all
 dnl the ports above will too!
 m4_foreach_w([SUBDIR], [
-  aarch64 arc arm bfin d30v iq2000 libnosys lm32 nios2 riscv wince
+  aarch64 arc arm bfin csky d30v iq2000 libnosys lm32 nios2 riscv wince
 ], [dnl
   AM_CONDITIONAL([CONFIG_]m4_toupper(SUBDIR), [test x$config_]SUBDIR = xtrue)
 ])

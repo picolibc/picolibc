@@ -644,6 +644,8 @@ CONFIG_IQ2000_FALSE
 CONFIG_IQ2000_TRUE
 CONFIG_D30V_FALSE
 CONFIG_D30V_TRUE
+CONFIG_CSKY_FALSE
+CONFIG_CSKY_TRUE
 CONFIG_BFIN_FALSE
 CONFIG_BFIN_TRUE
 CONFIG_ARM_FALSE
@@ -2755,9 +2757,7 @@ case "${target}" in
 	config_arc=true
 	;;
   csky*-*-*)
-	ac_config_files="$ac_config_files csky/Makefile"
-
-	subdirs="$subdirs csky"
+	config_csky=true
 	;;
   epiphany-*-*)
 	ac_config_files="$ac_config_files epiphany/Makefile"
@@ -3013,6 +3013,14 @@ fi
 else
   CONFIG_BFIN_TRUE='#'
   CONFIG_BFIN_FALSE=
+fi
+
+   if test x$config_csky = xtrue; then
+  CONFIG_CSKY_TRUE=
+  CONFIG_CSKY_FALSE='#'
+else
+  CONFIG_CSKY_TRUE='#'
+  CONFIG_CSKY_FALSE=
 fi
 
    if test x$config_d30v = xtrue; then
@@ -5307,6 +5315,10 @@ if test -z "${CONFIG_BFIN_TRUE}" && test -z "${CONFIG_BFIN_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_BFIN\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${CONFIG_CSKY_TRUE}" && test -z "${CONFIG_CSKY_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_CSKY\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${CONFIG_D30V_TRUE}" && test -z "${CONFIG_D30V_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_D30V\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -5955,7 +5967,6 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
-    "csky/Makefile") CONFIG_FILES="$CONFIG_FILES csky/Makefile" ;;
     "epiphany/Makefile") CONFIG_FILES="$CONFIG_FILES epiphany/Makefile" ;;
     "i386/Makefile") CONFIG_FILES="$CONFIG_FILES i386/Makefile" ;;
     "m32r/Makefile") CONFIG_FILES="$CONFIG_FILES m32r/Makefile" ;;

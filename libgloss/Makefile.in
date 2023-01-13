@@ -156,33 +156,40 @@ check_PROGRAMS = $(am__EXEEXT_2) $(am__EXEEXT_3)
 
 @CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_16 = $(wildcard $(srcdir)/bfin/include/*.h)
 @CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_17 = $(wildcard $(srcdir)/bfin/include/sys/*.h)
-@CONFIG_D30V_TRUE@am__append_18 = d30v/libsim.a
-@CONFIG_D30V_TRUE@am__append_19 = \
+@CONFIG_CSKY_TRUE@am__append_18 = \
+@CONFIG_CSKY_TRUE@	csky/crt0.o
+
+@CONFIG_CSKY_TRUE@am__append_19 = \
+@CONFIG_CSKY_TRUE@	csky/crt0.S
+
+@CONFIG_CSKY_TRUE@am__append_20 = csky/libsemi.a
+@CONFIG_D30V_TRUE@am__append_21 = d30v/libsim.a
+@CONFIG_D30V_TRUE@am__append_22 = \
 @CONFIG_D30V_TRUE@	d30v/crt0.o
 
-@CONFIG_IQ2000_TRUE@am__append_20 = iq2000/crt0.o iq2000/sim.ld
-@CONFIG_IQ2000_TRUE@am__append_21 = iq2000/libeval.a
-@CONFIG_IQ2000_TRUE@am__append_22 = iq2000/crt0.S iq2000/test.o
-@CONFIG_IQ2000_TRUE@am__append_23 = iq2000/test
-@CONFIG_LIBNOSYS_TRUE@am__append_24 = libnosys/nosys.specs
-@CONFIG_LIBNOSYS_TRUE@am__append_25 = libnosys/libnosys.a
-@CONFIG_LM32_TRUE@am__append_26 = lm32/crt0.o lm32/sim.ld
-@CONFIG_LM32_TRUE@am__append_27 = lm32/libgloss.a
-@CONFIG_LM32_TRUE@am__append_28 = lm32/crt0.S
-@CONFIG_NIOS2_TRUE@am__append_29 = \
+@CONFIG_IQ2000_TRUE@am__append_23 = iq2000/crt0.o iq2000/sim.ld
+@CONFIG_IQ2000_TRUE@am__append_24 = iq2000/libeval.a
+@CONFIG_IQ2000_TRUE@am__append_25 = iq2000/crt0.S iq2000/test.o
+@CONFIG_IQ2000_TRUE@am__append_26 = iq2000/test
+@CONFIG_LIBNOSYS_TRUE@am__append_27 = libnosys/nosys.specs
+@CONFIG_LIBNOSYS_TRUE@am__append_28 = libnosys/libnosys.a
+@CONFIG_LM32_TRUE@am__append_29 = lm32/crt0.o lm32/sim.ld
+@CONFIG_LM32_TRUE@am__append_30 = lm32/libgloss.a
+@CONFIG_LM32_TRUE@am__append_31 = lm32/crt0.S
+@CONFIG_NIOS2_TRUE@am__append_32 = \
 @CONFIG_NIOS2_TRUE@	nios2/qemu-hosted.ld
 
-@CONFIG_NIOS2_TRUE@am__append_30 = nios2/libnios2.a
-@CONFIG_RISCV_TRUE@am__append_31 = \
+@CONFIG_NIOS2_TRUE@am__append_33 = nios2/libnios2.a
+@CONFIG_RISCV_TRUE@am__append_34 = \
 @CONFIG_RISCV_TRUE@	riscv/nano.specs \
 @CONFIG_RISCV_TRUE@	riscv/sim.specs \
 @CONFIG_RISCV_TRUE@	riscv/semihost.specs \
 @CONFIG_RISCV_TRUE@	riscv/crt0.o
 
-@CONFIG_RISCV_TRUE@am__append_32 = riscv/libgloss.a \
+@CONFIG_RISCV_TRUE@am__append_35 = riscv/libgloss.a \
 @CONFIG_RISCV_TRUE@	riscv/libsemihost.a
-@CONFIG_WINCE_TRUE@am__append_33 = $(gdbdir)
-@CONFIG_WINCE_TRUE@am__append_34 = wince/stub.exe
+@CONFIG_WINCE_TRUE@am__append_36 = $(gdbdir)
+@CONFIG_WINCE_TRUE@am__append_37 = wince/stub.exe
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../config/depstand.m4 \
@@ -205,17 +212,16 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(SHELL) $(top_srcdir)/../mkinstalldirs
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES = csky/Makefile epiphany/Makefile i386/Makefile \
-	m32r/Makefile m68hc11/Makefile nds32/Makefile m68k/Makefile \
-	pa/Makefile i960/Makefile sparc_leon/Makefile sparc/Makefile \
-	mips/Makefile rs6000/Makefile mn10200/Makefile \
-	mn10300/Makefile cr16/Makefile cris/Makefile crx/Makefile \
-	fr30/Makefile frv/Makefile ft32/Makefile mcore/Makefile \
-	mep/Makefile moxie/Makefile microblaze/Makefile mt/Makefile \
-	v850/Makefile visium/Makefile xc16x/Makefile \
-	xstormy16/Makefile m32c/Makefile msp430/Makefile rl78/Makefile \
-	rx/Makefile spu/Makefile tic6x/Makefile or1k/Makefile \
-	pru/Makefile
+CONFIG_CLEAN_FILES = epiphany/Makefile i386/Makefile m32r/Makefile \
+	m68hc11/Makefile nds32/Makefile m68k/Makefile pa/Makefile \
+	i960/Makefile sparc_leon/Makefile sparc/Makefile mips/Makefile \
+	rs6000/Makefile mn10200/Makefile mn10300/Makefile \
+	cr16/Makefile cris/Makefile crx/Makefile fr30/Makefile \
+	frv/Makefile ft32/Makefile mcore/Makefile mep/Makefile \
+	moxie/Makefile microblaze/Makefile mt/Makefile v850/Makefile \
+	visium/Makefile xc16x/Makefile xstormy16/Makefile \
+	m32c/Makefile msp430/Makefile rl78/Makefile rx/Makefile \
+	spu/Makefile tic6x/Makefile or1k/Makefile pru/Makefile
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -320,6 +326,31 @@ bfin_libsim_a_LIBADD =
 @CONFIG_BFIN_TRUE@am_bfin_libsim_a_OBJECTS = bfin/bfin_libsim_a-clear_cache_range.$(OBJEXT) \
 @CONFIG_BFIN_TRUE@	bfin/bfin_libsim_a-syscalls.$(OBJEXT)
 bfin_libsim_a_OBJECTS = $(am_bfin_libsim_a_OBJECTS)
+csky_libsemi_a_AR = $(AR) $(ARFLAGS)
+csky_libsemi_a_LIBADD =
+@CONFIG_CSKY_TRUE@am_csky_libsemi_a_OBJECTS =  \
+@CONFIG_CSKY_TRUE@	csky/csky_libsemi_a-io-semi.$(OBJEXT) \
+@CONFIG_CSKY_TRUE@	csky/csky_libsemi_a-sbrk.$(OBJEXT) \
+@CONFIG_CSKY_TRUE@	csky/csky_libsemi_a-io-gdb.$(OBJEXT) \
+@CONFIG_CSKY_TRUE@	csky/csky_libsemi_a-io-exit.$(OBJEXT) \
+@CONFIG_CSKY_TRUE@	csky/csky_libsemi_a-io-close.$(OBJEXT) \
+@CONFIG_CSKY_TRUE@	csky/csky_libsemi_a-io-fstat.$(OBJEXT) \
+@CONFIG_CSKY_TRUE@	csky/csky_libsemi_a-io-gettimeofday.$(OBJEXT) \
+@CONFIG_CSKY_TRUE@	csky/csky_libsemi_a-io-lseek.$(OBJEXT) \
+@CONFIG_CSKY_TRUE@	csky/csky_libsemi_a-io-read.$(OBJEXT) \
+@CONFIG_CSKY_TRUE@	csky/csky_libsemi_a-io-system.$(OBJEXT) \
+@CONFIG_CSKY_TRUE@	csky/csky_libsemi_a-io-unlink.$(OBJEXT) \
+@CONFIG_CSKY_TRUE@	csky/csky_libsemi_a-io-exit.$(OBJEXT) \
+@CONFIG_CSKY_TRUE@	csky/csky_libsemi_a-io-gdb.$(OBJEXT) \
+@CONFIG_CSKY_TRUE@	csky/csky_libsemi_a-io-isatty.$(OBJEXT) \
+@CONFIG_CSKY_TRUE@	csky/csky_libsemi_a-io-open.$(OBJEXT) \
+@CONFIG_CSKY_TRUE@	csky/csky_libsemi_a-io-rename.$(OBJEXT) \
+@CONFIG_CSKY_TRUE@	csky/csky_libsemi_a-io-stat.$(OBJEXT) \
+@CONFIG_CSKY_TRUE@	csky/csky_libsemi_a-io-time.$(OBJEXT) \
+@CONFIG_CSKY_TRUE@	csky/csky_libsemi_a-io-write.$(OBJEXT) \
+@CONFIG_CSKY_TRUE@	csky/csky_libsemi_a-kill.$(OBJEXT) \
+@CONFIG_CSKY_TRUE@	csky/csky_libsemi_a-getpid.$(OBJEXT)
+csky_libsemi_a_OBJECTS = $(am_csky_libsemi_a_OBJECTS)
 d30v_libsim_a_AR = $(AR) $(ARFLAGS)
 d30v_libsim_a_LIBADD =
 @CONFIG_D30V_TRUE@am_d30v_libsim_a_OBJECTS = isatty.$(OBJEXT) \
@@ -384,10 +415,11 @@ libobjs_a_AR = $(AR) $(ARFLAGS)
 libobjs_a_LIBADD =
 @CONFIG_BFIN_TRUE@am__objects_3 = bfin/crt0.$(OBJEXT) \
 @CONFIG_BFIN_TRUE@	bfin/basiccrt.$(OBJEXT)
-@CONFIG_IQ2000_TRUE@am__objects_4 = iq2000/crt0.$(OBJEXT)
-@CONFIG_LM32_TRUE@am__objects_5 = lm32/crt0.$(OBJEXT)
+@CONFIG_CSKY_TRUE@am__objects_4 = csky/crt0.$(OBJEXT)
+@CONFIG_IQ2000_TRUE@am__objects_5 = iq2000/crt0.$(OBJEXT)
+@CONFIG_LM32_TRUE@am__objects_6 = lm32/crt0.$(OBJEXT)
 am_libobjs_a_OBJECTS = $(am__objects_3) $(am__objects_4) \
-	$(am__objects_5)
+	$(am__objects_5) $(am__objects_6)
 libobjs_a_OBJECTS = $(am_libobjs_a_OBJECTS)
 lm32_libgloss_a_AR = $(AR) $(ARFLAGS)
 lm32_libgloss_a_LIBADD =
@@ -538,11 +570,12 @@ SOURCES = $(aarch64_librdimon_a_SOURCES) $(arc_libnsim_a_SOURCES) \
 	$(arm_libgloss_linux_a_SOURCES) $(arm_librdimon_v2m_a_SOURCES) \
 	$(arm_librdimon_a_SOURCES) $(arm_librdpmon_a_SOURCES) \
 	$(bfin_libbfinbsp_a_SOURCES) $(bfin_libsim_a_SOURCES) \
-	$(d30v_libsim_a_SOURCES) $(iq2000_libeval_a_SOURCES) \
-	$(libnosys_libnosys_a_SOURCES) $(libobjs_a_SOURCES) \
-	$(lm32_libgloss_a_SOURCES) $(nios2_libnios2_a_SOURCES) \
-	$(riscv_libgloss_a_SOURCES) $(riscv_libsemihost_a_SOURCES) \
-	bfin/sim-test.c iq2000/test.c $(wince_stub_exe_SOURCES)
+	$(csky_libsemi_a_SOURCES) $(d30v_libsim_a_SOURCES) \
+	$(iq2000_libeval_a_SOURCES) $(libnosys_libnosys_a_SOURCES) \
+	$(libobjs_a_SOURCES) $(lm32_libgloss_a_SOURCES) \
+	$(nios2_libnios2_a_SOURCES) $(riscv_libgloss_a_SOURCES) \
+	$(riscv_libsemihost_a_SOURCES) bfin/sim-test.c iq2000/test.c \
+	$(wince_stub_exe_SOURCES)
 AM_V_DVIPS = $(am__v_DVIPS_@AM_V@)
 am__v_DVIPS_ = $(am__v_DVIPS_@AM_DEFAULT_V@)
 am__v_DVIPS_0 = @echo "  DVIPS   " $@;
@@ -629,7 +662,7 @@ ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
 DIST_SUBDIRS = $(SUBDIRS)
-VPATH = @srcdir@ $(am__append_33)
+VPATH = @srcdir@ $(am__append_36)
 AARCH64_OBJTYPE = @AARCH64_OBJTYPE@
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
@@ -763,12 +796,13 @@ tooldir = $(exec_prefix)/$(target_alias)
 multilibtooldir = $(tooldir)/lib$(MULTISUBDIR)
 multilibtool_DATA = $(am__append_3) $(am__append_6) $(am__append_7) \
 	$(am__append_8) $(am__append_13) $(am__append_15) \
-	$(am__append_19) $(am__append_20) $(am__append_24) \
-	$(am__append_26) $(am__append_29) $(am__append_31)
+	$(am__append_18) $(am__append_22) $(am__append_23) \
+	$(am__append_27) $(am__append_29) $(am__append_32) \
+	$(am__append_34)
 multilibtool_LIBRARIES = $(am__append_2) $(am__append_5) \
-	$(am__append_9) $(am__append_11) $(am__append_18) \
-	$(am__append_21) $(am__append_25) $(am__append_27) \
-	$(am__append_30) $(am__append_32)
+	$(am__append_9) $(am__append_11) $(am__append_20) \
+	$(am__append_21) $(am__append_24) $(am__append_28) \
+	$(am__append_30) $(am__append_33) $(am__append_35)
 includetooldir = $(tooldir)/include
 includetool_DATA = $(am__append_16)
 includesystooldir = $(tooldir)/include/sys
@@ -778,7 +812,8 @@ AM_CPPFLAGS = -idirafter $(srcroot)/include
 # A fake library so automake will generate rules for plain objects that we want
 # to install (e.g. our crt0.o objects).
 noinst_LIBRARIES = libobjs.a
-libobjs_a_SOURCES = $(am__append_14) $(am__append_22) $(am__append_28)
+libobjs_a_SOURCES = $(am__append_14) $(am__append_19) $(am__append_25) \
+	$(am__append_31)
 FLAGS_TO_PASS = \
 	"CC=$(CC)" \
 	"CFLAGS=$(CFLAGS)" \
@@ -887,6 +922,34 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 @CONFIG_BFIN_TRUE@bfin_libbfinbsp_a_CPPFLAGS = \
 @CONFIG_BFIN_TRUE@	$(AM_CPPFLAGS) \
 @CONFIG_BFIN_TRUE@	$(bfin_CPPFLAGS)
+
+@CONFIG_CSKY_TRUE@csky_libsemi_a_SOURCES = \
+@CONFIG_CSKY_TRUE@	csky/io-semi.S \
+@CONFIG_CSKY_TRUE@	csky/sbrk.c \
+@CONFIG_CSKY_TRUE@	csky/io-gdb.c \
+@CONFIG_CSKY_TRUE@	csky/io-exit.c \
+@CONFIG_CSKY_TRUE@	csky/io-close.c \
+@CONFIG_CSKY_TRUE@	csky/io-fstat.c \
+@CONFIG_CSKY_TRUE@	csky/io-gettimeofday.c \
+@CONFIG_CSKY_TRUE@	csky/io-lseek.c \
+@CONFIG_CSKY_TRUE@	csky/io-read.c \
+@CONFIG_CSKY_TRUE@	csky/io-system.c \
+@CONFIG_CSKY_TRUE@	csky/io-unlink.c \
+@CONFIG_CSKY_TRUE@	csky/io-exit.c \
+@CONFIG_CSKY_TRUE@	csky/io-gdb.c \
+@CONFIG_CSKY_TRUE@	csky/io-isatty.c \
+@CONFIG_CSKY_TRUE@	csky/io-open.c \
+@CONFIG_CSKY_TRUE@	csky/io-rename.c \
+@CONFIG_CSKY_TRUE@	csky/io-stat.c \
+@CONFIG_CSKY_TRUE@	csky/io-time.c \
+@CONFIG_CSKY_TRUE@	csky/io-write.c \
+@CONFIG_CSKY_TRUE@	csky/kill.c \
+@CONFIG_CSKY_TRUE@	csky/getpid.c
+
+@CONFIG_CSKY_TRUE@csky_libsemi_a_CPPFLAGS = \
+@CONFIG_CSKY_TRUE@	$(AM_CPPFLAGS) \
+@CONFIG_CSKY_TRUE@	-nostdlib \
+@CONFIG_CSKY_TRUE@	-DHOSTED=1
 
 @CONFIG_D30V_TRUE@d30v_libsim_a_SOURCES = \
 @CONFIG_D30V_TRUE@	isatty.c \
@@ -1036,7 +1099,7 @@ all: config.h
 .SUFFIXES: .S .c .dvi .o .obj .ps
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arc/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/d30v/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/nios2/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/wince/Makefile.inc $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arc/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/csky/Makefile.inc $(srcdir)/d30v/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/nios2/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/wince/Makefile.inc $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -1058,7 +1121,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe);; \
 	esac;
-$(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arc/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/d30v/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/nios2/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/wince/Makefile.inc $(am__empty):
+$(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arc/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/csky/Makefile.inc $(srcdir)/d30v/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/nios2/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/wince/Makefile.inc $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
@@ -1083,8 +1146,6 @@ $(srcdir)/config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
-csky/Makefile: $(top_builddir)/config.status $(top_srcdir)/csky/Makefile.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
 epiphany/Makefile: $(top_builddir)/config.status $(top_srcdir)/epiphany/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 i386/Makefile: $(top_builddir)/config.status $(top_srcdir)/i386/Makefile.in
@@ -1327,6 +1388,55 @@ bfin/libsim.a: $(bfin_libsim_a_OBJECTS) $(bfin_libsim_a_DEPENDENCIES) $(EXTRA_bf
 	$(AM_V_at)-rm -f bfin/libsim.a
 	$(AM_V_AR)$(bfin_libsim_a_AR) bfin/libsim.a $(bfin_libsim_a_OBJECTS) $(bfin_libsim_a_LIBADD)
 	$(AM_V_at)$(RANLIB) bfin/libsim.a
+csky/$(am__dirstamp):
+	@$(MKDIR_P) csky
+	@: > csky/$(am__dirstamp)
+csky/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) csky/$(DEPDIR)
+	@: > csky/$(DEPDIR)/$(am__dirstamp)
+csky/csky_libsemi_a-io-semi.$(OBJEXT): csky/$(am__dirstamp) \
+	csky/$(DEPDIR)/$(am__dirstamp)
+csky/csky_libsemi_a-sbrk.$(OBJEXT): csky/$(am__dirstamp) \
+	csky/$(DEPDIR)/$(am__dirstamp)
+csky/csky_libsemi_a-io-gdb.$(OBJEXT): csky/$(am__dirstamp) \
+	csky/$(DEPDIR)/$(am__dirstamp)
+csky/csky_libsemi_a-io-exit.$(OBJEXT): csky/$(am__dirstamp) \
+	csky/$(DEPDIR)/$(am__dirstamp)
+csky/csky_libsemi_a-io-close.$(OBJEXT): csky/$(am__dirstamp) \
+	csky/$(DEPDIR)/$(am__dirstamp)
+csky/csky_libsemi_a-io-fstat.$(OBJEXT): csky/$(am__dirstamp) \
+	csky/$(DEPDIR)/$(am__dirstamp)
+csky/csky_libsemi_a-io-gettimeofday.$(OBJEXT): csky/$(am__dirstamp) \
+	csky/$(DEPDIR)/$(am__dirstamp)
+csky/csky_libsemi_a-io-lseek.$(OBJEXT): csky/$(am__dirstamp) \
+	csky/$(DEPDIR)/$(am__dirstamp)
+csky/csky_libsemi_a-io-read.$(OBJEXT): csky/$(am__dirstamp) \
+	csky/$(DEPDIR)/$(am__dirstamp)
+csky/csky_libsemi_a-io-system.$(OBJEXT): csky/$(am__dirstamp) \
+	csky/$(DEPDIR)/$(am__dirstamp)
+csky/csky_libsemi_a-io-unlink.$(OBJEXT): csky/$(am__dirstamp) \
+	csky/$(DEPDIR)/$(am__dirstamp)
+csky/csky_libsemi_a-io-isatty.$(OBJEXT): csky/$(am__dirstamp) \
+	csky/$(DEPDIR)/$(am__dirstamp)
+csky/csky_libsemi_a-io-open.$(OBJEXT): csky/$(am__dirstamp) \
+	csky/$(DEPDIR)/$(am__dirstamp)
+csky/csky_libsemi_a-io-rename.$(OBJEXT): csky/$(am__dirstamp) \
+	csky/$(DEPDIR)/$(am__dirstamp)
+csky/csky_libsemi_a-io-stat.$(OBJEXT): csky/$(am__dirstamp) \
+	csky/$(DEPDIR)/$(am__dirstamp)
+csky/csky_libsemi_a-io-time.$(OBJEXT): csky/$(am__dirstamp) \
+	csky/$(DEPDIR)/$(am__dirstamp)
+csky/csky_libsemi_a-io-write.$(OBJEXT): csky/$(am__dirstamp) \
+	csky/$(DEPDIR)/$(am__dirstamp)
+csky/csky_libsemi_a-kill.$(OBJEXT): csky/$(am__dirstamp) \
+	csky/$(DEPDIR)/$(am__dirstamp)
+csky/csky_libsemi_a-getpid.$(OBJEXT): csky/$(am__dirstamp) \
+	csky/$(DEPDIR)/$(am__dirstamp)
+
+csky/libsemi.a: $(csky_libsemi_a_OBJECTS) $(csky_libsemi_a_DEPENDENCIES) $(EXTRA_csky_libsemi_a_DEPENDENCIES) csky/$(am__dirstamp)
+	$(AM_V_at)-rm -f csky/libsemi.a
+	$(AM_V_AR)$(csky_libsemi_a_AR) csky/libsemi.a $(csky_libsemi_a_OBJECTS) $(csky_libsemi_a_LIBADD)
+	$(AM_V_at)$(RANLIB) csky/libsemi.a
 d30v/$(am__dirstamp):
 	@$(MKDIR_P) d30v
 	@: > d30v/$(am__dirstamp)
@@ -1458,6 +1568,8 @@ bfin/crt0.$(OBJEXT): bfin/$(am__dirstamp) \
 	bfin/$(DEPDIR)/$(am__dirstamp)
 bfin/basiccrt.$(OBJEXT): bfin/$(am__dirstamp) \
 	bfin/$(DEPDIR)/$(am__dirstamp)
+csky/crt0.$(OBJEXT): csky/$(am__dirstamp) \
+	csky/$(DEPDIR)/$(am__dirstamp)
 iq2000/crt0.$(OBJEXT): iq2000/$(am__dirstamp) \
 	iq2000/$(DEPDIR)/$(am__dirstamp)
 lm32/$(am__dirstamp):
@@ -1736,6 +1848,7 @@ mostlyclean-compile:
 	-rm -f arc/*.$(OBJEXT)
 	-rm -f arm/*.$(OBJEXT)
 	-rm -f bfin/*.$(OBJEXT)
+	-rm -f csky/*.$(OBJEXT)
 	-rm -f d30v/*.$(OBJEXT)
 	-rm -f iq2000/*.$(OBJEXT)
 	-rm -f libnosys/*.$(OBJEXT)
@@ -1791,6 +1904,26 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@bfin/$(DEPDIR)/bfin_libsim_a-syscalls.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@bfin/$(DEPDIR)/crt0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@bfin/$(DEPDIR)/sim-test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@csky/$(DEPDIR)/crt0.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@csky/$(DEPDIR)/csky_libsemi_a-getpid.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@csky/$(DEPDIR)/csky_libsemi_a-io-close.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@csky/$(DEPDIR)/csky_libsemi_a-io-exit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@csky/$(DEPDIR)/csky_libsemi_a-io-fstat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@csky/$(DEPDIR)/csky_libsemi_a-io-gdb.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@csky/$(DEPDIR)/csky_libsemi_a-io-gettimeofday.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@csky/$(DEPDIR)/csky_libsemi_a-io-isatty.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@csky/$(DEPDIR)/csky_libsemi_a-io-lseek.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@csky/$(DEPDIR)/csky_libsemi_a-io-open.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@csky/$(DEPDIR)/csky_libsemi_a-io-read.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@csky/$(DEPDIR)/csky_libsemi_a-io-rename.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@csky/$(DEPDIR)/csky_libsemi_a-io-semi.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@csky/$(DEPDIR)/csky_libsemi_a-io-stat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@csky/$(DEPDIR)/csky_libsemi_a-io-system.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@csky/$(DEPDIR)/csky_libsemi_a-io-time.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@csky/$(DEPDIR)/csky_libsemi_a-io-unlink.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@csky/$(DEPDIR)/csky_libsemi_a-io-write.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@csky/$(DEPDIR)/csky_libsemi_a-kill.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@csky/$(DEPDIR)/csky_libsemi_a-sbrk.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@d30v/$(DEPDIR)/inbyte.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@d30v/$(DEPDIR)/outbyte.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@d30v/$(DEPDIR)/syscalls.Po@am__quote@
@@ -1965,6 +2098,20 @@ arm/arm_librdimon_a-trap.obj: arm/trap.S
 @AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='arm/trap.S' object='arm/arm_librdimon_a-trap.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o arm/arm_librdimon_a-trap.obj `if test -f 'arm/trap.S'; then $(CYGPATH_W) 'arm/trap.S'; else $(CYGPATH_W) '$(srcdir)/arm/trap.S'; fi`
+
+csky/csky_libsemi_a-io-semi.o: csky/io-semi.S
+@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT csky/csky_libsemi_a-io-semi.o -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-semi.Tpo -c -o csky/csky_libsemi_a-io-semi.o `test -f 'csky/io-semi.S' || echo '$(srcdir)/'`csky/io-semi.S
+@am__fastdepCCAS_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-semi.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-semi.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='csky/io-semi.S' object='csky/csky_libsemi_a-io-semi.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o csky/csky_libsemi_a-io-semi.o `test -f 'csky/io-semi.S' || echo '$(srcdir)/'`csky/io-semi.S
+
+csky/csky_libsemi_a-io-semi.obj: csky/io-semi.S
+@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT csky/csky_libsemi_a-io-semi.obj -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-semi.Tpo -c -o csky/csky_libsemi_a-io-semi.obj `if test -f 'csky/io-semi.S'; then $(CYGPATH_W) 'csky/io-semi.S'; else $(CYGPATH_W) '$(srcdir)/csky/io-semi.S'; fi`
+@am__fastdepCCAS_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-semi.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-semi.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='csky/io-semi.S' object='csky/csky_libsemi_a-io-semi.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o csky/csky_libsemi_a-io-semi.obj `if test -f 'csky/io-semi.S'; then $(CYGPATH_W) 'csky/io-semi.S'; else $(CYGPATH_W) '$(srcdir)/csky/io-semi.S'; fi`
 
 nios2/nios2_libnios2_a-crt0.o: nios2/crt0.S
 @am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT nios2/nios2_libnios2_a-crt0.o -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-crt0.Tpo -c -o nios2/nios2_libnios2_a-crt0.o `test -f 'nios2/crt0.S' || echo '$(srcdir)/'`nios2/crt0.S
@@ -2317,6 +2464,258 @@ bfin/bfin_libsim_a-syscalls.obj: bfin/syscalls.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='bfin/syscalls.c' object='bfin/bfin_libsim_a-syscalls.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bfin_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bfin/bfin_libsim_a-syscalls.obj `if test -f 'bfin/syscalls.c'; then $(CYGPATH_W) 'bfin/syscalls.c'; else $(CYGPATH_W) '$(srcdir)/bfin/syscalls.c'; fi`
+
+csky/csky_libsemi_a-sbrk.o: csky/sbrk.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-sbrk.o -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-sbrk.Tpo -c -o csky/csky_libsemi_a-sbrk.o `test -f 'csky/sbrk.c' || echo '$(srcdir)/'`csky/sbrk.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-sbrk.Tpo csky/$(DEPDIR)/csky_libsemi_a-sbrk.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/sbrk.c' object='csky/csky_libsemi_a-sbrk.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-sbrk.o `test -f 'csky/sbrk.c' || echo '$(srcdir)/'`csky/sbrk.c
+
+csky/csky_libsemi_a-sbrk.obj: csky/sbrk.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-sbrk.obj -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-sbrk.Tpo -c -o csky/csky_libsemi_a-sbrk.obj `if test -f 'csky/sbrk.c'; then $(CYGPATH_W) 'csky/sbrk.c'; else $(CYGPATH_W) '$(srcdir)/csky/sbrk.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-sbrk.Tpo csky/$(DEPDIR)/csky_libsemi_a-sbrk.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/sbrk.c' object='csky/csky_libsemi_a-sbrk.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-sbrk.obj `if test -f 'csky/sbrk.c'; then $(CYGPATH_W) 'csky/sbrk.c'; else $(CYGPATH_W) '$(srcdir)/csky/sbrk.c'; fi`
+
+csky/csky_libsemi_a-io-gdb.o: csky/io-gdb.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-gdb.o -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-gdb.Tpo -c -o csky/csky_libsemi_a-io-gdb.o `test -f 'csky/io-gdb.c' || echo '$(srcdir)/'`csky/io-gdb.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-gdb.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-gdb.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-gdb.c' object='csky/csky_libsemi_a-io-gdb.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-gdb.o `test -f 'csky/io-gdb.c' || echo '$(srcdir)/'`csky/io-gdb.c
+
+csky/csky_libsemi_a-io-gdb.obj: csky/io-gdb.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-gdb.obj -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-gdb.Tpo -c -o csky/csky_libsemi_a-io-gdb.obj `if test -f 'csky/io-gdb.c'; then $(CYGPATH_W) 'csky/io-gdb.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-gdb.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-gdb.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-gdb.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-gdb.c' object='csky/csky_libsemi_a-io-gdb.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-gdb.obj `if test -f 'csky/io-gdb.c'; then $(CYGPATH_W) 'csky/io-gdb.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-gdb.c'; fi`
+
+csky/csky_libsemi_a-io-exit.o: csky/io-exit.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-exit.o -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-exit.Tpo -c -o csky/csky_libsemi_a-io-exit.o `test -f 'csky/io-exit.c' || echo '$(srcdir)/'`csky/io-exit.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-exit.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-exit.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-exit.c' object='csky/csky_libsemi_a-io-exit.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-exit.o `test -f 'csky/io-exit.c' || echo '$(srcdir)/'`csky/io-exit.c
+
+csky/csky_libsemi_a-io-exit.obj: csky/io-exit.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-exit.obj -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-exit.Tpo -c -o csky/csky_libsemi_a-io-exit.obj `if test -f 'csky/io-exit.c'; then $(CYGPATH_W) 'csky/io-exit.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-exit.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-exit.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-exit.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-exit.c' object='csky/csky_libsemi_a-io-exit.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-exit.obj `if test -f 'csky/io-exit.c'; then $(CYGPATH_W) 'csky/io-exit.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-exit.c'; fi`
+
+csky/csky_libsemi_a-io-close.o: csky/io-close.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-close.o -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-close.Tpo -c -o csky/csky_libsemi_a-io-close.o `test -f 'csky/io-close.c' || echo '$(srcdir)/'`csky/io-close.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-close.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-close.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-close.c' object='csky/csky_libsemi_a-io-close.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-close.o `test -f 'csky/io-close.c' || echo '$(srcdir)/'`csky/io-close.c
+
+csky/csky_libsemi_a-io-close.obj: csky/io-close.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-close.obj -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-close.Tpo -c -o csky/csky_libsemi_a-io-close.obj `if test -f 'csky/io-close.c'; then $(CYGPATH_W) 'csky/io-close.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-close.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-close.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-close.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-close.c' object='csky/csky_libsemi_a-io-close.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-close.obj `if test -f 'csky/io-close.c'; then $(CYGPATH_W) 'csky/io-close.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-close.c'; fi`
+
+csky/csky_libsemi_a-io-fstat.o: csky/io-fstat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-fstat.o -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-fstat.Tpo -c -o csky/csky_libsemi_a-io-fstat.o `test -f 'csky/io-fstat.c' || echo '$(srcdir)/'`csky/io-fstat.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-fstat.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-fstat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-fstat.c' object='csky/csky_libsemi_a-io-fstat.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-fstat.o `test -f 'csky/io-fstat.c' || echo '$(srcdir)/'`csky/io-fstat.c
+
+csky/csky_libsemi_a-io-fstat.obj: csky/io-fstat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-fstat.obj -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-fstat.Tpo -c -o csky/csky_libsemi_a-io-fstat.obj `if test -f 'csky/io-fstat.c'; then $(CYGPATH_W) 'csky/io-fstat.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-fstat.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-fstat.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-fstat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-fstat.c' object='csky/csky_libsemi_a-io-fstat.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-fstat.obj `if test -f 'csky/io-fstat.c'; then $(CYGPATH_W) 'csky/io-fstat.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-fstat.c'; fi`
+
+csky/csky_libsemi_a-io-gettimeofday.o: csky/io-gettimeofday.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-gettimeofday.o -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-gettimeofday.Tpo -c -o csky/csky_libsemi_a-io-gettimeofday.o `test -f 'csky/io-gettimeofday.c' || echo '$(srcdir)/'`csky/io-gettimeofday.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-gettimeofday.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-gettimeofday.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-gettimeofday.c' object='csky/csky_libsemi_a-io-gettimeofday.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-gettimeofday.o `test -f 'csky/io-gettimeofday.c' || echo '$(srcdir)/'`csky/io-gettimeofday.c
+
+csky/csky_libsemi_a-io-gettimeofday.obj: csky/io-gettimeofday.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-gettimeofday.obj -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-gettimeofday.Tpo -c -o csky/csky_libsemi_a-io-gettimeofday.obj `if test -f 'csky/io-gettimeofday.c'; then $(CYGPATH_W) 'csky/io-gettimeofday.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-gettimeofday.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-gettimeofday.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-gettimeofday.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-gettimeofday.c' object='csky/csky_libsemi_a-io-gettimeofday.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-gettimeofday.obj `if test -f 'csky/io-gettimeofday.c'; then $(CYGPATH_W) 'csky/io-gettimeofday.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-gettimeofday.c'; fi`
+
+csky/csky_libsemi_a-io-lseek.o: csky/io-lseek.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-lseek.o -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-lseek.Tpo -c -o csky/csky_libsemi_a-io-lseek.o `test -f 'csky/io-lseek.c' || echo '$(srcdir)/'`csky/io-lseek.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-lseek.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-lseek.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-lseek.c' object='csky/csky_libsemi_a-io-lseek.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-lseek.o `test -f 'csky/io-lseek.c' || echo '$(srcdir)/'`csky/io-lseek.c
+
+csky/csky_libsemi_a-io-lseek.obj: csky/io-lseek.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-lseek.obj -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-lseek.Tpo -c -o csky/csky_libsemi_a-io-lseek.obj `if test -f 'csky/io-lseek.c'; then $(CYGPATH_W) 'csky/io-lseek.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-lseek.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-lseek.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-lseek.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-lseek.c' object='csky/csky_libsemi_a-io-lseek.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-lseek.obj `if test -f 'csky/io-lseek.c'; then $(CYGPATH_W) 'csky/io-lseek.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-lseek.c'; fi`
+
+csky/csky_libsemi_a-io-read.o: csky/io-read.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-read.o -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-read.Tpo -c -o csky/csky_libsemi_a-io-read.o `test -f 'csky/io-read.c' || echo '$(srcdir)/'`csky/io-read.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-read.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-read.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-read.c' object='csky/csky_libsemi_a-io-read.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-read.o `test -f 'csky/io-read.c' || echo '$(srcdir)/'`csky/io-read.c
+
+csky/csky_libsemi_a-io-read.obj: csky/io-read.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-read.obj -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-read.Tpo -c -o csky/csky_libsemi_a-io-read.obj `if test -f 'csky/io-read.c'; then $(CYGPATH_W) 'csky/io-read.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-read.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-read.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-read.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-read.c' object='csky/csky_libsemi_a-io-read.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-read.obj `if test -f 'csky/io-read.c'; then $(CYGPATH_W) 'csky/io-read.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-read.c'; fi`
+
+csky/csky_libsemi_a-io-system.o: csky/io-system.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-system.o -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-system.Tpo -c -o csky/csky_libsemi_a-io-system.o `test -f 'csky/io-system.c' || echo '$(srcdir)/'`csky/io-system.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-system.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-system.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-system.c' object='csky/csky_libsemi_a-io-system.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-system.o `test -f 'csky/io-system.c' || echo '$(srcdir)/'`csky/io-system.c
+
+csky/csky_libsemi_a-io-system.obj: csky/io-system.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-system.obj -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-system.Tpo -c -o csky/csky_libsemi_a-io-system.obj `if test -f 'csky/io-system.c'; then $(CYGPATH_W) 'csky/io-system.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-system.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-system.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-system.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-system.c' object='csky/csky_libsemi_a-io-system.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-system.obj `if test -f 'csky/io-system.c'; then $(CYGPATH_W) 'csky/io-system.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-system.c'; fi`
+
+csky/csky_libsemi_a-io-unlink.o: csky/io-unlink.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-unlink.o -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-unlink.Tpo -c -o csky/csky_libsemi_a-io-unlink.o `test -f 'csky/io-unlink.c' || echo '$(srcdir)/'`csky/io-unlink.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-unlink.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-unlink.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-unlink.c' object='csky/csky_libsemi_a-io-unlink.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-unlink.o `test -f 'csky/io-unlink.c' || echo '$(srcdir)/'`csky/io-unlink.c
+
+csky/csky_libsemi_a-io-unlink.obj: csky/io-unlink.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-unlink.obj -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-unlink.Tpo -c -o csky/csky_libsemi_a-io-unlink.obj `if test -f 'csky/io-unlink.c'; then $(CYGPATH_W) 'csky/io-unlink.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-unlink.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-unlink.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-unlink.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-unlink.c' object='csky/csky_libsemi_a-io-unlink.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-unlink.obj `if test -f 'csky/io-unlink.c'; then $(CYGPATH_W) 'csky/io-unlink.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-unlink.c'; fi`
+
+csky/csky_libsemi_a-io-isatty.o: csky/io-isatty.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-isatty.o -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-isatty.Tpo -c -o csky/csky_libsemi_a-io-isatty.o `test -f 'csky/io-isatty.c' || echo '$(srcdir)/'`csky/io-isatty.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-isatty.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-isatty.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-isatty.c' object='csky/csky_libsemi_a-io-isatty.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-isatty.o `test -f 'csky/io-isatty.c' || echo '$(srcdir)/'`csky/io-isatty.c
+
+csky/csky_libsemi_a-io-isatty.obj: csky/io-isatty.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-isatty.obj -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-isatty.Tpo -c -o csky/csky_libsemi_a-io-isatty.obj `if test -f 'csky/io-isatty.c'; then $(CYGPATH_W) 'csky/io-isatty.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-isatty.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-isatty.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-isatty.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-isatty.c' object='csky/csky_libsemi_a-io-isatty.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-isatty.obj `if test -f 'csky/io-isatty.c'; then $(CYGPATH_W) 'csky/io-isatty.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-isatty.c'; fi`
+
+csky/csky_libsemi_a-io-open.o: csky/io-open.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-open.o -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-open.Tpo -c -o csky/csky_libsemi_a-io-open.o `test -f 'csky/io-open.c' || echo '$(srcdir)/'`csky/io-open.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-open.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-open.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-open.c' object='csky/csky_libsemi_a-io-open.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-open.o `test -f 'csky/io-open.c' || echo '$(srcdir)/'`csky/io-open.c
+
+csky/csky_libsemi_a-io-open.obj: csky/io-open.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-open.obj -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-open.Tpo -c -o csky/csky_libsemi_a-io-open.obj `if test -f 'csky/io-open.c'; then $(CYGPATH_W) 'csky/io-open.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-open.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-open.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-open.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-open.c' object='csky/csky_libsemi_a-io-open.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-open.obj `if test -f 'csky/io-open.c'; then $(CYGPATH_W) 'csky/io-open.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-open.c'; fi`
+
+csky/csky_libsemi_a-io-rename.o: csky/io-rename.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-rename.o -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-rename.Tpo -c -o csky/csky_libsemi_a-io-rename.o `test -f 'csky/io-rename.c' || echo '$(srcdir)/'`csky/io-rename.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-rename.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-rename.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-rename.c' object='csky/csky_libsemi_a-io-rename.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-rename.o `test -f 'csky/io-rename.c' || echo '$(srcdir)/'`csky/io-rename.c
+
+csky/csky_libsemi_a-io-rename.obj: csky/io-rename.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-rename.obj -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-rename.Tpo -c -o csky/csky_libsemi_a-io-rename.obj `if test -f 'csky/io-rename.c'; then $(CYGPATH_W) 'csky/io-rename.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-rename.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-rename.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-rename.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-rename.c' object='csky/csky_libsemi_a-io-rename.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-rename.obj `if test -f 'csky/io-rename.c'; then $(CYGPATH_W) 'csky/io-rename.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-rename.c'; fi`
+
+csky/csky_libsemi_a-io-stat.o: csky/io-stat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-stat.o -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-stat.Tpo -c -o csky/csky_libsemi_a-io-stat.o `test -f 'csky/io-stat.c' || echo '$(srcdir)/'`csky/io-stat.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-stat.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-stat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-stat.c' object='csky/csky_libsemi_a-io-stat.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-stat.o `test -f 'csky/io-stat.c' || echo '$(srcdir)/'`csky/io-stat.c
+
+csky/csky_libsemi_a-io-stat.obj: csky/io-stat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-stat.obj -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-stat.Tpo -c -o csky/csky_libsemi_a-io-stat.obj `if test -f 'csky/io-stat.c'; then $(CYGPATH_W) 'csky/io-stat.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-stat.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-stat.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-stat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-stat.c' object='csky/csky_libsemi_a-io-stat.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-stat.obj `if test -f 'csky/io-stat.c'; then $(CYGPATH_W) 'csky/io-stat.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-stat.c'; fi`
+
+csky/csky_libsemi_a-io-time.o: csky/io-time.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-time.o -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-time.Tpo -c -o csky/csky_libsemi_a-io-time.o `test -f 'csky/io-time.c' || echo '$(srcdir)/'`csky/io-time.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-time.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-time.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-time.c' object='csky/csky_libsemi_a-io-time.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-time.o `test -f 'csky/io-time.c' || echo '$(srcdir)/'`csky/io-time.c
+
+csky/csky_libsemi_a-io-time.obj: csky/io-time.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-time.obj -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-time.Tpo -c -o csky/csky_libsemi_a-io-time.obj `if test -f 'csky/io-time.c'; then $(CYGPATH_W) 'csky/io-time.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-time.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-time.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-time.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-time.c' object='csky/csky_libsemi_a-io-time.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-time.obj `if test -f 'csky/io-time.c'; then $(CYGPATH_W) 'csky/io-time.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-time.c'; fi`
+
+csky/csky_libsemi_a-io-write.o: csky/io-write.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-write.o -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-write.Tpo -c -o csky/csky_libsemi_a-io-write.o `test -f 'csky/io-write.c' || echo '$(srcdir)/'`csky/io-write.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-write.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-write.c' object='csky/csky_libsemi_a-io-write.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-write.o `test -f 'csky/io-write.c' || echo '$(srcdir)/'`csky/io-write.c
+
+csky/csky_libsemi_a-io-write.obj: csky/io-write.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-io-write.obj -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-io-write.Tpo -c -o csky/csky_libsemi_a-io-write.obj `if test -f 'csky/io-write.c'; then $(CYGPATH_W) 'csky/io-write.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-write.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-io-write.Tpo csky/$(DEPDIR)/csky_libsemi_a-io-write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/io-write.c' object='csky/csky_libsemi_a-io-write.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-io-write.obj `if test -f 'csky/io-write.c'; then $(CYGPATH_W) 'csky/io-write.c'; else $(CYGPATH_W) '$(srcdir)/csky/io-write.c'; fi`
+
+csky/csky_libsemi_a-kill.o: csky/kill.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-kill.o -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-kill.Tpo -c -o csky/csky_libsemi_a-kill.o `test -f 'csky/kill.c' || echo '$(srcdir)/'`csky/kill.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-kill.Tpo csky/$(DEPDIR)/csky_libsemi_a-kill.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/kill.c' object='csky/csky_libsemi_a-kill.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-kill.o `test -f 'csky/kill.c' || echo '$(srcdir)/'`csky/kill.c
+
+csky/csky_libsemi_a-kill.obj: csky/kill.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-kill.obj -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-kill.Tpo -c -o csky/csky_libsemi_a-kill.obj `if test -f 'csky/kill.c'; then $(CYGPATH_W) 'csky/kill.c'; else $(CYGPATH_W) '$(srcdir)/csky/kill.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-kill.Tpo csky/$(DEPDIR)/csky_libsemi_a-kill.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/kill.c' object='csky/csky_libsemi_a-kill.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-kill.obj `if test -f 'csky/kill.c'; then $(CYGPATH_W) 'csky/kill.c'; else $(CYGPATH_W) '$(srcdir)/csky/kill.c'; fi`
+
+csky/csky_libsemi_a-getpid.o: csky/getpid.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-getpid.o -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-getpid.Tpo -c -o csky/csky_libsemi_a-getpid.o `test -f 'csky/getpid.c' || echo '$(srcdir)/'`csky/getpid.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-getpid.Tpo csky/$(DEPDIR)/csky_libsemi_a-getpid.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/getpid.c' object='csky/csky_libsemi_a-getpid.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-getpid.o `test -f 'csky/getpid.c' || echo '$(srcdir)/'`csky/getpid.c
+
+csky/csky_libsemi_a-getpid.obj: csky/getpid.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT csky/csky_libsemi_a-getpid.obj -MD -MP -MF csky/$(DEPDIR)/csky_libsemi_a-getpid.Tpo -c -o csky/csky_libsemi_a-getpid.obj `if test -f 'csky/getpid.c'; then $(CYGPATH_W) 'csky/getpid.c'; else $(CYGPATH_W) '$(srcdir)/csky/getpid.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) csky/$(DEPDIR)/csky_libsemi_a-getpid.Tpo csky/$(DEPDIR)/csky_libsemi_a-getpid.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csky/getpid.c' object='csky/csky_libsemi_a-getpid.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(csky_libsemi_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o csky/csky_libsemi_a-getpid.obj `if test -f 'csky/getpid.c'; then $(CYGPATH_W) 'csky/getpid.c'; else $(CYGPATH_W) '$(srcdir)/csky/getpid.c'; fi`
 
 nios2/nios2_libnios2_a-io-close.o: nios2/io-close.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nios2_libnios2_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nios2/nios2_libnios2_a-io-close.o -MD -MP -MF nios2/$(DEPDIR)/nios2_libnios2_a-io-close.Tpo -c -o nios2/nios2_libnios2_a-io-close.o `test -f 'nios2/io-close.c' || echo '$(srcdir)/'`nios2/io-close.c
@@ -3812,6 +4211,8 @@ distclean-generic:
 	-rm -f arm/$(am__dirstamp)
 	-rm -f bfin/$(DEPDIR)/$(am__dirstamp)
 	-rm -f bfin/$(am__dirstamp)
+	-rm -f csky/$(DEPDIR)/$(am__dirstamp)
+	-rm -f csky/$(am__dirstamp)
 	-rm -f d30v/$(DEPDIR)/$(am__dirstamp)
 	-rm -f d30v/$(am__dirstamp)
 	-rm -f doc/$(am__dirstamp)
@@ -3838,7 +4239,7 @@ clean-am: clean-aminfo clean-binPROGRAMS clean-checkPROGRAMS \
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) d30v/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) nios2/$(DEPDIR) riscv/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) csky/$(DEPDIR) d30v/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) nios2/$(DEPDIR) riscv/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-local distclean-tags
@@ -3981,7 +4382,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) d30v/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) nios2/$(DEPDIR) riscv/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) csky/$(DEPDIR) d30v/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) nios2/$(DEPDIR) riscv/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-aminfo \
 	maintainer-clean-generic maintainer-clean-local
