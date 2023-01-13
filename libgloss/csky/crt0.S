@@ -150,6 +150,8 @@ __start:
 	 * Assember start up done, C codes start here.
 	 */
 __goto_c:
+	lrw     r0, __libc_fini_array   # Register global termination functions
+	jbsr    atexit                  #  to be called upon exit
 	/*jsri	main*/
 	lrw	r5, __libc_init_array
 	jsr	r5
