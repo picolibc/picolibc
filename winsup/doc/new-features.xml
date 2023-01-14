@@ -4,6 +4,28 @@
 
 <sect1 id="ov-new"><title>What's new and what changed in Cygwin</title>
 
+<sect2 id="ov-new3.5"><title>What's new and what changed in 3.5</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+Drop support for Windows 7, Windows 8, Server 2008 R2 and Server 2012.
+</para></listitem>
+
+<listitem><para>
+The console device gets accessible from other terminals such as other
+consoles and ptys. Thanks to this new feature, GNU screen and tmux now
+work in the console.
+</para></listitem>
+
+<listitem><para>
+newgrp(1) tool.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new3.4"><title>What's new and what changed in 3.4</title>
 
 <itemizedlist mark="bullet">

@@ -6,3 +6,5 @@ What's new:
 - The console device gets accessible from other terminals such as other
   consoles and ptys. Thanks to this new feature, GNU screen and tmux
   now work in the console.
+
+- newgrp(1) tool.
