@@ -1967,26 +1967,32 @@ D: on /d type fat (binary,user,noumount)
       <para><command>newgrp</command> changes the primary group for a
         command.</para>
 
-      <para>If the '-' flag is given as first argument, the user's environment
-        will be reinitialized as though the user had logged in, otherwise the
-	current environment, including current working directory, remains
-	unchanged.</para>
+      <para>If the <option>-</option> flag is given as first argument, the
+	user's environment will be reinitialized as though the user had logged
+	in, otherwise the current environment, including current working
+	directory, remains unchanged.</para>
 
       <para><command>newgrp</command> changes the current primary group to the
         named group, or to the default group listed in /etc/passwd if no group
 	name is given.</para>
 
       <para>By default, the user's standard shell is started, called as login
-        shell if the '-' flag has been specified.  If a group has been given
-	as argument, a command and its arguments can be specified on the
-	command line.</para>
+        shell if the <option>-</option> flag has been specified.  If a group
+	has been given as argument, a command and its arguments can be
+	specified on the command line.</para>
 
       <para>Please note that setting the primary group to any arbitrary group
-        is no privileged operation on Windows.  However, if this group is not
-	in your current user token, or if the group is in your user token but
-	marked as <literal>deny-only</literal>, no additional permissions can
-	be obtained by setting this group as primary group.</para>
+        is no privileged operation on Windows.  However, even if this group is
+	not in your current user token, or if the group is in your user token
+	but marked as <literal>deny-only</literal>, no additional permissions
+	can be obtained by setting this group as primary group.</para>
     </refsect1>
+
+    <refsect1 id="newgrp-seealso">
+      <title>See also</title>
+      <para><command>id</command>(1), <command>login</command>(1).</para>
+    </refsect1>
+
   </refentry>
 
   <refentry id="passwd">
