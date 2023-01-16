@@ -659,8 +659,6 @@ format_proc_cpuinfo (void *, char *&destbuf)
       __small_swprintf (cpu_num_p, L"%d", cpu_number);
       if (!NT_SUCCESS (RtlCheckRegistryKey (RTL_REGISTRY_ABSOLUTE, cpu_key)))
 	break;
-      if (cpu_number)
-	print ("\n");
 
       WORD cpu_group = cpu_number / num_cpu_per_group;
       KAFFINITY cpu_mask = 1L << (cpu_number % num_cpu_per_group);
@@ -1703,6 +1701,8 @@ format_proc_cpuinfo (void *, char *&destbuf)
 				NULL);
       print ("\n");
     }
+
+  print ("\n");
 
   destbuf = (char *) crealloc_abort (destbuf, bufptr - buf);
   memcpy (destbuf, buf, bufptr - buf);
