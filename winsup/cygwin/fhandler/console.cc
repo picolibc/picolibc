@@ -211,15 +211,14 @@ beep ()
 }
 
 fhandler_console::console_state *
-fhandler_console::open_shared_console (HWND hw, HANDLE& h, bool& create)
+fhandler_console::open_shared_console (HWND hw, HANDLE& h, bool& created)
 {
   wchar_t namebuf[(sizeof "XXXXXXXXXXXXXXXXXX-consNNNNNNNNNN")];
   __small_swprintf (namebuf, L"%S-cons%p", &cygheap->installation_key, hw);
 
-  shared_locations m = create ? SH_SHARED_CONSOLE : SH_JUSTOPEN;
+  shared_locations m = created ? SH_SHARED_CONSOLE : SH_JUSTOPEN;
   console_state *res = (console_state *)
-    open_shared (namebuf, 0, h, sizeof (console_state), &m);
-  create = m != SH_JUSTOPEN;
+    open_shared (namebuf, 0, h, sizeof (console_state), m, created);
   return res;
 }
 

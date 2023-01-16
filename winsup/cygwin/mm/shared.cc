@@ -127,54 +127,57 @@ void *
 open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
 	     shared_locations m, PSECURITY_ATTRIBUTES psa, DWORD access)
 {
-  return open_shared (name, n, shared_h, size, &m, psa, access);
+  bool created_dummy;
+  return open_shared (name, n, shared_h, size, m, created_dummy, psa, access);
 }
 
 void *
 open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
-	     shared_locations *m, PSECURITY_ATTRIBUTES psa, DWORD access)
+	     shared_locations m, bool &created, PSECURITY_ATTRIBUTES psa,
+	     DWORD access)
 {
-  void *shared;
-
-  void *addr;
-  if (*m == SH_JUSTCREATE || *m == SH_JUSTOPEN)
-    addr = NULL;
-  else
-    addr = (void *) region_address[*m];
-
   WCHAR map_buf[MAX_PATH];
   WCHAR *mapname = NULL;
+  void *shared;
+  void *addr;
 
-  if (shared_h)
-    *m = SH_JUSTOPEN;
+  if (m == SH_JUSTCREATE || m == SH_JUSTOPEN)
+    addr = NULL;
   else
+    addr = (void *) region_address[m];
+
+  created = false;
+  if (!shared_h)
     {
       if (name)
 	mapname = shared_name (map_buf, name, n);
-      if (*m == SH_JUSTOPEN)
-	shared_h = OpenFileMappingW (access, FALSE, mapname);
+      if (m == SH_JUSTOPEN)
+	shared_h = OpenFileMappingW (FILE_MAP_READ | FILE_MAP_WRITE, FALSE,
+				     mapname);
       else
 	{
+	  created = true;
 	  shared_h = CreateFileMappingW (INVALID_HANDLE_VALUE, psa,
 					PAGE_READWRITE, 0, size, mapname);
 	  if (GetLastError () == ERROR_ALREADY_EXISTS)
-	    *m = SH_JUSTOPEN;
+	    created = false;
 	}
       if (shared_h)
 	/* ok! */;
-      else if (*m != SH_JUSTOPEN)
+      else if (m != SH_JUSTOPEN)
 	api_fatal ("CreateFileMapping %W, %E.  Terminating.", mapname);
       else
 	return NULL;
     }
 
-  shared = (shared_info *) MapViewOfFileEx (shared_h, access, 0, 0, 0, addr);
+  shared = MapViewOfFileEx (shared_h, FILE_MAP_READ | FILE_MAP_WRITE,
+			    0, 0, 0, addr);
 
   if (!shared)
     api_fatal ("MapViewOfFileEx '%W'(%p), %E.  Terminating.", mapname, shared_h);
 
-  debug_printf ("name %W, n %d, shared %p (wanted %p), h %p, *m %d",
-		mapname, n, shared, addr, shared_h, *m);
+  debug_printf ("name %W, n %d, shared %p (wanted %p), h %p, m %d",
+		mapname, n, shared, addr, shared_h, m);
 
   return shared;
 }

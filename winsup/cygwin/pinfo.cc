@@ -387,8 +387,10 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 
   for (int i = 0; i < 20; i++)
     {
+      bool created;
+
       procinfo = (_pinfo *) open_shared (L"cygpid", n, h0, sizeof (_pinfo),
-					 &shloc, sec_attribs, access);
+					 shloc, created, sec_attribs, access);
       if (!h0)
 	{
 	  if (createit)
@@ -408,8 +410,6 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 	  yield ();
 	  continue;
 	}
-
-      bool created = shloc != SH_JUSTOPEN;
 
       /* Just fetching info for ps or /proc, don't do anything rash. */
       if (!created && !(flag & PID_NEW) && !procinfo->ppid
