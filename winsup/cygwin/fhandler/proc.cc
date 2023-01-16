@@ -671,7 +671,8 @@ format_proc_cpuinfo (void *, char *&destbuf)
 
       if (!SetThreadGroupAffinity (GetCurrentThread (), &affinity,
 				   &orig_group_affinity))
-	system_printf ("SetThreadGroupAffinity(%x,%d (%x/%d)) failed %E", cpu_mask, cpu_group, cpu_number, cpu_number);
+	system_printf ("SetThreadGroupAffinity(%x,%d (%x/%d)) failed %E",
+		       cpu_mask, cpu_group, cpu_number, cpu_number);
       orig_affinity_mask = 1; /* Just mark success. */
       /* I'm not sure whether the thread changes processor immediately
 	 and I'm not sure whether this function will cause the thread
@@ -950,8 +951,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  core_id = (initial_apic_id & ((1 << logical_bits) - 1)) >> ht_bits;
 
 	  bufptr += __small_sprintf (bufptr, "physical id\t: %d\n", phys_id);
-	  if (siblings > 0)
-	    bufptr += __small_sprintf (bufptr, "siblings\t: %u\n", siblings);
+	  bufptr += __small_sprintf (bufptr, "siblings\t: %u\n", siblings);
 	  bufptr += __small_sprintf (bufptr, "core id\t\t: %d\n"
 					     "cpu cores\t: %d\n",
 				     core_id, cpu_cores);
@@ -960,6 +960,18 @@ format_proc_cpuinfo (void *, char *&destbuf)
 					       "initial apicid\t: %d\n",
 				       apic_id, initial_apic_id);
 
+	}
+      else
+	{
+	  /* Linux prints all this info depending on CONFIG_SMP.  There's no
+	     check if the CPU is actually a multicore CPU. */
+	  bufptr += __small_sprintf (bufptr, "physical id\t: %d\n", cpu_number);
+	  bufptr += __small_sprintf (bufptr, "siblings\t: 1\n");
+	  bufptr += __small_sprintf (bufptr, "core id\t\t: 0\n"
+					     "cpu cores\t: 1\n");
+	  bufptr += __small_sprintf (bufptr, "apicid\t\t: %d\n"
+					     "initial apicid\t: %d\n",
+				     apic_id, apic_id);
 	}
 
       /* level is number of non-zero leafs exc. sub-leafs */
