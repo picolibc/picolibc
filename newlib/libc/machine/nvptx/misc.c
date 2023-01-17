@@ -16,6 +16,8 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/time.h>
+
 #undef errno
 extern int errno;
 
@@ -26,6 +28,11 @@ close(int fd) {
 
 int
 fstat (int fd, struct stat *buf) {
+  return -1;
+}
+
+int
+gettimeofday (struct timeval *tv, void *tz) {
   return -1;
 }
 
