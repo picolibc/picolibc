@@ -860,8 +860,11 @@ format_process_maps (void *data, char *&destbuf)
   /* The heap info on the cygheap is also in the same spot in each process
      because the cygheap is located at the same address. */
   user_heap_info user_heap;
+  shared_region_info region_info;
   ReadProcessMemory (proc, &cygheap->user_heap, &user_heap,
 		     sizeof user_heap, NULL);
+  ReadProcessMemory (proc, &cygheap->shared_regions, &region_info,
+		     sizeof region_info, NULL);
 
   off_t len = 0;
 
@@ -1060,12 +1063,14 @@ peb_teb_rinse_repeat:
 		    strcpy (posix_modname, "[peb]");
 		  else if (cur.abase == (char *) &SharedUserData)
 		    strcpy (posix_modname, "[shared-user-data]");
-		  else if (cur.abase == (char *) cygwin_shared)
+		  else if (cur.abase == region_info.cygwin_shared_addr)
 		    strcpy (posix_modname, "[cygwin-shared]");
-		  else if (cur.abase == (char *) user_shared)
+		  else if (cur.abase == region_info.user_shared_addr)
 		    strcpy (posix_modname, "[cygwin-user-shared]");
-		  else if (cur.abase == (char *) *proc_pinfo)
+		  else if (cur.abase == region_info.myself_shared_addr)
 		    strcpy (posix_modname, "[procinfo]");
+		  else if (cur.abase == region_info.console_shared_addr)
+		    strcpy (posix_modname, "[cygwin-shared-console]");
 		  else if (cur.abase == (char *) cygheap)
 		    strcpy (posix_modname, "[cygheap]");
 		  else if (cur.abase == user_heap.base)

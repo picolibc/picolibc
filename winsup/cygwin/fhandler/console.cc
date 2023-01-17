@@ -219,6 +219,8 @@ fhandler_console::open_shared_console (HWND hw, HANDLE& h, bool& created)
   shared_locations m = created ? SH_SHARED_CONSOLE : SH_JUSTOPEN;
   console_state *res = (console_state *)
     open_shared (namebuf, 0, h, sizeof (console_state), m, created);
+  if (m == SH_SHARED_CONSOLE)
+    cygheap->shared_regions.console_shared_addr = res;
   return res;
 }
 

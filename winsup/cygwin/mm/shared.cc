@@ -274,6 +274,7 @@ user_info::create (bool reinit)
   debug_printf ("user shared version %x", user_shared->version);
   if (reinit)
     user_shared->initialize ();
+  cygheap->shared_regions.user_shared_addr = user_shared;
 }
 
 void
@@ -315,6 +316,7 @@ shared_info::create ()
 					       SH_CYGWIN_SHARED,
 					       &sec_all_nih);
   cygwin_shared->initialize ();
+  cygheap->shared_regions.cygwin_shared_addr = cygwin_shared;
 }
 
 void

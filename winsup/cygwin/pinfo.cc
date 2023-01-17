@@ -466,6 +466,8 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
       h = h0;
       _pinfo_release ();
     }
+  if (shloc == SH_MYSELF)
+    cygheap->shared_regions.myself_shared_addr = procinfo;
 }
 
 void

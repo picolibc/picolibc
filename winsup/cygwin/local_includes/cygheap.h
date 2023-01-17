@@ -302,6 +302,15 @@ struct user_heap_info
   void init ();
 };
 
+/* This info is maintained for /proc/<PID>/maps ONLY! */
+struct shared_region_info
+{
+  void *cygwin_shared_addr;
+  void *user_shared_addr;
+  void *myself_shared_addr;
+  void *console_shared_addr;
+};
+
 class cygheap_domain_info
 {
   PWCHAR pdom_name;
@@ -503,6 +512,7 @@ struct init_cygheap: public mini_cygheap
   cygheap_ugid_cache ugid_cache;
   cygheap_user user;
   user_heap_info user_heap;
+  shared_region_info shared_regions;
   mode_t umask;
   LONG rlim_as_id;
   unsigned long rlim_core;
