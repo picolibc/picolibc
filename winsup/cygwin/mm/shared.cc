@@ -122,6 +122,7 @@ static uintptr_t region_address[] =
   SHARED_CONSOLE_REGION_ADDRESS,	/* SH_SHARED_CONSOLE */
   0
 };
+static NO_COPY uintptr_t next_address = SHARED_REGIONS_ADDRESS_LOW;
 
 void *
 open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
@@ -138,13 +139,8 @@ open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
 {
   WCHAR map_buf[MAX_PATH];
   WCHAR *mapname = NULL;
-  void *shared;
+  void *shared = NULL;
   void *addr;
-
-  if (m == SH_JUSTCREATE || m == SH_JUSTOPEN)
-    addr = NULL;
-  else
-    addr = (void *) region_address[m];
 
   created = false;
   if (!shared_h)
@@ -170,14 +166,54 @@ open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
 	return NULL;
     }
 
-  shared = MapViewOfFileEx (shared_h, FILE_MAP_READ | FILE_MAP_WRITE,
-			    0, 0, 0, addr);
+  if (m < SH_TOTAL_SIZE && !dynamically_loaded)
+    {
+      /* Fixed regions.  Don't do that if Cygwin gets dynamically loaded.
+	 The process loading the DLL might be configured with High-Entropy
+	 ASLR.  Chances for collisions are pretty high.
+
+	 Note that we don't actually *need* fixed addresses.  The only
+	 advantage is reproducibility to help /proc/<PID>/maps along. */
+      addr = (void *) region_address[m];
+      shared = MapViewOfFileEx (shared_h, FILE_MAP_READ | FILE_MAP_WRITE,
+				0, 0, 0, addr);
+    }
+  /* Also catch the unlikely case that a fixed region can't be mapped at the
+     fixed address. */
+  if (!shared)
+    {
+      /* Locate shared regions in the area between SHARED_REGIONS_ADDRESS_LOW
+	 and SHARED_REGIONS_ADDRESS_HIGH, retrying until we have a slot.
+	 Don't use MapViewOfFile3 (loader deadlock during fork. */
+      bool loop = false;
+
+      addr = (void *) next_address;
+      do
+	{
+	  shared = MapViewOfFileEx (shared_h, FILE_MAP_READ | FILE_MAP_WRITE,
+				    0, 0, 0, addr);
+	  if (!shared)
+	    {
+	      next_address += wincap.allocation_granularity ();
+	      if (next_address >= SHARED_REGIONS_ADDRESS_HIGH)
+		{
+		  if (loop)
+		    break;
+		  next_address = SHARED_REGIONS_ADDRESS_LOW;
+		  loop = true;
+		}
+	      addr = (void *) next_address;
+	    }
+	}
+      while (!shared);
+    }
 
   if (!shared)
-    api_fatal ("MapViewOfFileEx '%W'(%p), %E.  Terminating.", mapname, shared_h);
+    api_fatal ("MapViewOfFileEx '%W'(%p, size %u, m %d, created %d), %E.  "
+	       "Terminating.", mapname, shared_h, size, m, created);
 
-  debug_printf ("name %W, n %d, shared %p (wanted %p), h %p, m %d",
-		mapname, n, shared, addr, shared_h, m);
+  debug_printf ("name %W, shared %p (wanted %p), h %p, m %d, created %d",
+		mapname, shared, addr, shared_h, m, created);
 
   return shared;
 }

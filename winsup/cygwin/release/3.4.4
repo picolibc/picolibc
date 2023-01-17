@@ -16,3 +16,9 @@ Bug Fixes
 
 - Fix vmstat(1) printing an error message on single core CPUs.
   Addresses: https://cygwin.com/pipermail/cygwin/2023-January/252857.html
+
+- Fix potential process termination during process initialization.
+  Most easily reproducible is the case of non-Cygwin processes running
+  with high-entropy VA enabled and loading the Cygwin DLL dynamically.
+  Addresses: https://cygwin.com/pipermail/cygwin/2023-January/252765.html
+	     https://cygwin.com/pipermail/cygwin/2023-January/252865.html
