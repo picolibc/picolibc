@@ -319,14 +319,13 @@ shared_info::initialize ()
   else if (cb != sizeof (*this))
     system_printf ("size of shared memory region changed from %lu to %u",
 		   sizeof (*this), cb);
-  /* FIXME? Shouldn't this be in memory_init? */
-  cygheap->user_heap.init ();
 }
 
 void
 memory_init ()
 {
   shared_info::create ();	/* Initialize global shared memory */
+  cygheap->user_heap.init ();	/* Initialize user heap */
   user_info::create (false);	/* Initialize per-user shared memory */
   /* Initialize tty list session stuff.  Doesn't really belong here but
      this needs to be initialized before any tty or console manipulation
