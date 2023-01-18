@@ -159,25 +159,21 @@ open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
 
   /* Locate shared regions in the area between SHARED_REGIONS_ADDRESS_LOW
      and SHARED_REGIONS_ADDRESS_HIGH, retrying until we have a slot.
-     Don't use MapViewOfFile3 (loader deadlock during fork. */
+     Don't use MapViewOfFile3 (STATUS_DLL_INIT_FAILED during fork). */
   bool loop = false;
 
-  addr = (void *) next_address;
   do
     {
+      addr = (void *) next_address;
       shared = MapViewOfFileEx (shared_h, FILE_MAP_READ | FILE_MAP_WRITE,
 				0, 0, 0, addr);
-      if (!shared)
+      next_address += wincap.allocation_granularity ();
+      if (next_address >= SHARED_REGIONS_ADDRESS_HIGH)
 	{
-	  next_address += wincap.allocation_granularity ();
-	  if (next_address >= SHARED_REGIONS_ADDRESS_HIGH)
-	    {
-	      if (loop)
-		break;
-	      next_address = SHARED_REGIONS_ADDRESS_LOW;
-	      loop = true;
-	    }
-	  addr = (void *) next_address;
+	  if (!shared && loop)
+	    break;
+	  next_address = SHARED_REGIONS_ADDRESS_LOW;
+	  loop = true;
 	}
     }
   while (!shared);
