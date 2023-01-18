@@ -16,16 +16,9 @@ details. */
    dynamicbase is accidentally not set in the PE/COFF header of the DLL. */
 #define CYGWIN_DLL_ADDRESS		0x180040000UL
 
-/* Default addresses of required standard shared regions (Cygwin shared,
-   user shared, myself, shared console). */
-#define CYGWIN_REGION_ADDRESS		0x1a0000000UL
-#define USER_REGION_ADDRESS		0x1a1000000UL
-#define MYSELF_REGION_ADDRESS		0x1a2000000UL
-#define SHARED_CONSOLE_REGION_ADDRESS	0x1a3000000UL
-
 /* Area for non-fixed-address Cygwin-specific shared memory regions.  Fallback
    for standard shared regions if the can't load at their default address. */
-#define SHARED_REGIONS_ADDRESS_LOW	0x1a4000000UL
+#define SHARED_REGIONS_ADDRESS_LOW	0x1a0000000UL
 #define SHARED_REGIONS_ADDRESS_HIGH	0x200000000UL
 
 /* Rebased DLLs are located in this 16 Gigs arena.  Will be kept for

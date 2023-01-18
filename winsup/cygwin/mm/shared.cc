@@ -113,15 +113,6 @@ shared_name (WCHAR *ret_buf, const WCHAR *str, int num)
 #define page_const ((ptrdiff_t) 65535)
 #define pround(n) ((ptrdiff_t)(((n) + page_const) & ~page_const))
 
-/* FIXME: With ASLR, maybe we should ASLR the shared regions, too? */
-static uintptr_t region_address[] =
-{
-  CYGWIN_REGION_ADDRESS,		/* SH_CYGWIN_SHARED */
-  USER_REGION_ADDRESS,			/* SH_USER_SHARED */
-  MYSELF_REGION_ADDRESS,		/* SH_MYSELF */
-  SHARED_CONSOLE_REGION_ADDRESS,	/* SH_SHARED_CONSOLE */
-  0
-};
 static NO_COPY uintptr_t next_address = SHARED_REGIONS_ADDRESS_LOW;
 
 void *
@@ -139,7 +130,7 @@ open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
 {
   WCHAR map_buf[MAX_PATH];
   WCHAR *mapname = NULL;
-  void *shared = NULL;
+  void *shared;
   void *addr;
 
   created = false;
@@ -166,47 +157,30 @@ open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
 	return NULL;
     }
 
-  if (m < SH_TOTAL_SIZE && !dynamically_loaded)
-    {
-      /* Fixed regions.  Don't do that if Cygwin gets dynamically loaded.
-	 The process loading the DLL might be configured with High-Entropy
-	 ASLR.  Chances for collisions are pretty high.
+  /* Locate shared regions in the area between SHARED_REGIONS_ADDRESS_LOW
+     and SHARED_REGIONS_ADDRESS_HIGH, retrying until we have a slot.
+     Don't use MapViewOfFile3 (loader deadlock during fork. */
+  bool loop = false;
 
-	 Note that we don't actually *need* fixed addresses.  The only
-	 advantage is reproducibility to help /proc/<PID>/maps along. */
-      addr = (void *) region_address[m];
+  addr = (void *) next_address;
+  do
+    {
       shared = MapViewOfFileEx (shared_h, FILE_MAP_READ | FILE_MAP_WRITE,
 				0, 0, 0, addr);
-    }
-  /* Also catch the unlikely case that a fixed region can't be mapped at the
-     fixed address. */
-  if (!shared)
-    {
-      /* Locate shared regions in the area between SHARED_REGIONS_ADDRESS_LOW
-	 and SHARED_REGIONS_ADDRESS_HIGH, retrying until we have a slot.
-	 Don't use MapViewOfFile3 (loader deadlock during fork. */
-      bool loop = false;
-
-      addr = (void *) next_address;
-      do
+      if (!shared)
 	{
-	  shared = MapViewOfFileEx (shared_h, FILE_MAP_READ | FILE_MAP_WRITE,
-				    0, 0, 0, addr);
-	  if (!shared)
+	  next_address += wincap.allocation_granularity ();
+	  if (next_address >= SHARED_REGIONS_ADDRESS_HIGH)
 	    {
-	      next_address += wincap.allocation_granularity ();
-	      if (next_address >= SHARED_REGIONS_ADDRESS_HIGH)
-		{
-		  if (loop)
-		    break;
-		  next_address = SHARED_REGIONS_ADDRESS_LOW;
-		  loop = true;
-		}
-	      addr = (void *) next_address;
+	      if (loop)
+		break;
+	      next_address = SHARED_REGIONS_ADDRESS_LOW;
+	      loop = true;
 	    }
+	  addr = (void *) next_address;
 	}
-      while (!shared);
     }
+  while (!shared);
 
   if (!shared)
     api_fatal ("MapViewOfFileEx '%W'(%p, size %u, m %d, created %d), %E.  "
