@@ -77,11 +77,11 @@ user_heap_info::init ()
 	  if (base)
 	    break;
 
-	  /* Ok, so we are at the 1% which didn't work with 0x20000000 out
+	  /* Ok, so we are at the 1% which didn't work with USERHEAP_START out
 	     of the box.  What we do now is to search for the next free
 	     region which matches our desired heap size.  While doing that,
 	     we keep track of the largest region we found, including the
-	     region starting at 0x20000000. */
+	     region starting at USERHEAP_START. */
 	  while ((ret = VirtualQuery ((LPCVOID) start_address, &mbi,
 				      sizeof mbi)) != 0)
 	    {

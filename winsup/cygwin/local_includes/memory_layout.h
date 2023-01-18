@@ -16,8 +16,7 @@ details. */
    dynamicbase is accidentally not set in the PE/COFF header of the DLL. */
 #define CYGWIN_DLL_ADDRESS		0x180040000UL
 
-/* Area for non-fixed-address Cygwin-specific shared memory regions.  Fallback
-   for standard shared regions if the can't load at their default address. */
+/* Area for Cygwin-specific shared memory regions. */
 #define SHARED_REGIONS_ADDRESS_LOW	0x1a0000000UL
 #define SHARED_REGIONS_ADDRESS_HIGH	0x200000000UL
 
