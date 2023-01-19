@@ -12,6 +12,7 @@
 - add 64-bit powerpc setjmp/longjmp support
 - use global stdio streams for all configurations
 - use global atexit data for all configurations
+- vectorized math routines added for amdgcn platform
 
 *** Major changes in newlib version 4.2.0:
 
