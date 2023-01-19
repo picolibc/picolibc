@@ -1038,6 +1038,12 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *buf)
   return base ()->_ioctl (cmd, buf);
 }
 
+int
+fhandler_dev_dsp::fcntl (int cmd, intptr_t arg)
+{
+  return base ()->_fcntl (cmd, arg);
+}
+
 void
 fhandler_dev_dsp::fixup_after_fork (HANDLE parent)
 {
@@ -1415,6 +1421,12 @@ fhandler_dev_dsp::_ioctl (unsigned int cmd, void *buf)
 
 #undef CASE
     }
+}
+
+int
+fhandler_dev_dsp::_fcntl (int cmd, intptr_t arg)
+{
+  return fhandler_base::fcntl(cmd, arg);
 }
 
 void
