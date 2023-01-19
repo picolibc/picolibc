@@ -32,7 +32,7 @@ cygcheck_SOURCES = \
 	dump_setup.cc \
 	path.cc
 cygcheck_CPPFLAGS=-I$(srcdir)/.. -idirafter ${top_srcdir}/cygwin/include
-cygcheck_LDFLAGS = -Wl,--disable-high-entropy-va
+cygcheck_LDFLAGS = ${AM_LDFLAGS} -Wl,--disable-high-entropy-va
 cygcheck_LDADD = -lz -lwininet -lpsapi -lntdll
 
 cygwin_console_helper_SOURCES = cygwin-console-helper.cc
@@ -43,7 +43,7 @@ strace_SOURCES = \
 	path.cc \
 	strace.cc
 strace_CPPFLAGS=-I$(srcdir)/.. -idirafter ${top_srcdir}/cygwin/local_includes -idirafter ${top_srcdir}/cygwin/include
-strace_LDFLAGS = -Wl,--disable-high-entropy-va
+strace_LDFLAGS = ${AM_LDFLAGS} -Wl,--disable-high-entropy-va
 strace_LDADD = -lntdll
 
 noinst_PROGRAMS = path-testsuite
