@@ -5,6 +5,8 @@
 - remove phoenix OS support
 - remove unused members from struct _reent (see also --enable-newlib-reent-binary-compat)
 - build system internals heavily rewritten & updated
+- make arm jmp_buf size and alignment ABI-conformant
+- fixed bug in arm setjmp/longjmp to preserve floating-point register values
 - add --enable-newlib-reent-thread-local configuration option
 - add --enable-newlib-reent-binary-compat configuration option
 - add 64-bit powerpc setjmp/longjmp support
