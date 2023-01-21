@@ -193,8 +193,8 @@ const _device dev_error_storage =
 "/dev/ttyS%(0-127)d", BRACK(FHDEV(DEV_SERIAL_MAJOR, {$1})), "\\??\\COM{$1 + 1}", exists_ntdev, S_IFCHR
 ":pipe", BRACK(FH_PIPE), "/dev/pipe", exists_internal, S_IFCHR
 ":fifo", BRACK(FH_FIFO), "/dev/fifo", exists_internal, S_IFCHR
-"/dev/st%(0-127)d", BRACK(FHDEV(DEV_TAPE_MAJOR, {$1})), "\\Device\\Tape{$1}", exists_ntdev, S_IFBLK
-"/dev/nst%(0-127)d", BRACK(FHDEV(DEV_TAPE_MAJOR, {$1 + 128})), "\\Device\\Tape{$1}", exists_ntdev, S_IFBLK
+"/dev/st%(0-127)d", BRACK(FHDEV(DEV_TAPE_MAJOR, {$1})), "\\Device\\Tape{$1}", exists_ntdev, S_IFCHR
+"/dev/nst%(0-127)d", BRACK(FHDEV(DEV_TAPE_MAJOR, {$1 + 128})), "\\Device\\Tape{$1}", exists_ntdev, S_IFCHR
 "/dev/fd%(0-15)d", BRACK(FHDEV(DEV_FLOPPY_MAJOR, {$1})), "\\Device\\Floppy{$1}", exists_ntdev, S_IFBLK
 "/dev/scd%(0-15)d", BRACK(FHDEV(DEV_CDROM_MAJOR, {$1})), "\\Device\\CdRom{$1}", exists_ntdev, S_IFBLK
 "/dev/sr%(0-15)d", BRACK(FHDEV(DEV_CDROM_MAJOR, {$1})), "\\Device\\CdRom{$1}", exists_ntdev, S_IFBLK
