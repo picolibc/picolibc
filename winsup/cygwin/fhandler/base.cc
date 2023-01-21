@@ -1728,7 +1728,8 @@ fhandler_base::utimens (const struct timespec *tvp)
 int
 fhandler_base::fsync ()
 {
-  if (!get_handle () || nohandle () || pc.isspecial ())
+  if (!get_handle () || nohandle ()
+      || (pc.isspecial () && !S_ISBLK (pc.dev.mode ())))
     {
       set_errno (EINVAL);
       return -1;
