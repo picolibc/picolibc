@@ -42,10 +42,19 @@ bool NO_COPY mount_info::got_usr_bin;
 bool NO_COPY mount_info::got_usr_lib;
 int NO_COPY mount_info::root_idx = -1;
 
-/* is_unc_share: Return non-zero if PATH begins with //server/share
+/* is_native_path: Return non-zero if PATH starts with \??\[a-zA-Z] or
+		   with \\?\[a-zA-Z] or with \\.\[a-zA-Z].
+
+   is_unc_share: Return non-zero if PATH begins with //server/share
 		 or with one of the native prefixes //./ or //?/
+
    This function is only used to test for valid input strings.
    The later normalization drops the native prefixes. */
+
+/* list of invalid chars in UNC filenames.  These are a few more than
+   for "normal" filenames. */
+const char _invalid_char[] = "\"/\\[]:|<>+=;,?*";
+#define valid_share_char(_c)	(strchr (_invalid_char, (_c)) == NULL)
 
 static inline bool
 is_native_path (const char *path)
@@ -63,9 +72,9 @@ is_unc_share (const char *path)
   const char *p;
   return (isdirsep (path[0])
 	 && isdirsep (path[1])
-	 && isalnum (path[2])
+	 && valid_share_char (path[2])
 	 && ((p = strpbrk (path + 3, "\\/")) != NULL)
-	 && isalnum (p[1]));
+	 && valid_share_char (p[1]));
 }
 
 /* Return true if src_path is a valid, internally supported device name.
