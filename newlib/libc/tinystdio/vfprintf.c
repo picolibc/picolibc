@@ -1094,7 +1094,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
                 pnt = va_arg (ap, char *);
                 if (!pnt)
                     pnt = "(null)";
-                size = strnlen (pnt, (flags & FL_PREC) ? prec : ~0);
+                size = strnlen (pnt, (flags & FL_PREC) ? (size_t) prec : SIZE_MAX);
 
             str_lpad:
                 if (!(flags & FL_LPAD)) {
