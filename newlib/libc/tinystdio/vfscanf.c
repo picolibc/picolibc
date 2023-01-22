@@ -96,9 +96,6 @@ putval (void *addr, int_scanf_t val, uint16_t flags)
     }
 }
 
-#define CASE_CONVERT    ('a' - 'A')
-#define TOLOW(c)        ((c) | CASE_CONVERT)
-
 static unsigned char
 conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags, unsigned int base)
 {
@@ -142,13 +139,7 @@ conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags, un
         base = 10;
 
     do {
-	unsigned char c = i;
-
-        /* Map digits to 0..35, non-digits above 35. */
-        if (c > '9')
-            c = TOLOW(c-1) + ('0' - 'a' + 11);
-	c -= '0';
-
+	unsigned char c = digit_to_val((unsigned char) i);
         if (c >= base) {
             scanf_ungetc (i, stream, lenp);
             break;

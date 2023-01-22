@@ -188,9 +188,6 @@ typedef long ultoa_signed_t;
 #define FL_FLTEXP	0x1000
 #define	FL_FLTFIX	0x2000
 
-#define CASE_CONVERT    ('a' - 'A')
-#define TOLOW(c)        ((c) | CASE_CONVERT)
-
 #ifdef PRINTF_POSITIONAL
 
 typedef struct {

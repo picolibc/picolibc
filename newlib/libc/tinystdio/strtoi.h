@@ -40,9 +40,7 @@
 #include <string.h>
 #include <errno.h>
 #include <stdbool.h>
-
-#define CASE_CONVERT    ('a' - 'A')
-#define TOLOW(c)        ((c) | CASE_CONVERT)
+#include "stdio_private.h"
 
 #if defined(_HAVE_BUILTIN_MUL_OVERFLOW) && defined(_HAVE_BUILTIN_ADD_OVERFLOW) && !defined(strtoi_signed)
 #define USE_OVERFLOW
@@ -117,11 +115,7 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
 #endif
 
     for(;;) {
-        /* Map digits to 0..35, non-digits above 35. */
-        if (i > '9')
-            i = TOLOW(i-1) + ('0' - 'a' + 11);
-        i -= '0';
-
+        i = digit_to_val(i);
         /* detect invalid char */
         if (i >= base)
             break;
