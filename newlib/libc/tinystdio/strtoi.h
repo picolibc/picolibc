@@ -55,8 +55,10 @@ ISSPACE(unsigned char c)
 strtoi_type
 strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
 {
+    unsigned int base = ibase;
+
     /* Check for invalid base value */
-    if ((unsigned int) ibase > 36 || ibase == 1) {
+    if (base > 36 || base == 1) {
         errno = EINVAL;
         if (endptr)
             *endptr = (char *) nptr;
@@ -69,8 +71,7 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
     const unsigned char *s = (const unsigned char *) nptr;
     strtoi_type val = 0;
     unsigned char flags = 0;
-    unsigned char base = (unsigned char) ibase;
-    unsigned char i;
+    unsigned int i;
 
     /* Skip leading spaces */
     do {
@@ -88,7 +89,7 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
 
     /* Leading '0' digit -- check for base indication */
     if (i == '0') {
-        if (TOLOW(*s) == 'x' && (base == 0 || base == 16)) {
+        if (TOLOW(*s) == 'x' && ((base | 16) == 16)) {
             base = 16;
             /* Parsed the '0' */
             nptr = (const char *) s;
@@ -136,7 +137,7 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
 #else
         if (val > cutoff || (val == cutoff && i > cutlim))
             flags |= FLAG_OFLOW;
-        val = val * (strtoi_type) base + i;
+        val = val * (strtoi_type) base + (strtoi_type) i;
 #endif
         /* Parsed another digit */
         nptr = (const char *) s;

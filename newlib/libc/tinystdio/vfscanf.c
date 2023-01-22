@@ -116,7 +116,7 @@ conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags, un
     val = 0;
 
     /* Leading '0' digit -- check for base indication */
-    if ((unsigned char)i == '0') {
+    if (i == '0') {
 	if (!--width || (i = scanf_getc (stream, lenp)) < 0)
 	    goto putval;
 
@@ -139,7 +139,7 @@ conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags, un
         base = 10;
 
     do {
-	unsigned char c = digit_to_val((unsigned char) i);
+	unsigned int c = digit_to_val(i);
         if (c >= base) {
             scanf_ungetc (i, stream, lenp);
             break;
