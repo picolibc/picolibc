@@ -51,10 +51,23 @@ int NO_COPY mount_info::root_idx = -1;
    This function is only used to test for valid input strings.
    The later normalization drops the native prefixes. */
 
+/* list of invalid chars in server names.  Note that underscore is ok,
+   but it cripples interoperability. */
+const char _invalid_server_char[] = ",~:!@#$%^&'.(){} ";
+#define valid_server_char(_c)	({				\
+		const char __c = (_c);				\
+		!iscntrl(__c)					\
+		&& strchr (_invalid_server_char, (_c)) == NULL;	\
+	})
+
 /* list of invalid chars in UNC filenames.  These are a few more than
    for "normal" filenames. */
-const char _invalid_char[] = "\"/\\[]:|<>+=;,?*";
-#define valid_share_char(_c)	(strchr (_invalid_char, (_c)) == NULL)
+const char _invalid_share_char[] = "\"/\\[]:|<>+=;,?*";
+#define valid_share_char(_c)	({				\
+		const char __c = (_c);				\
+		!iscntrl(__c)					\
+		&& strchr (_invalid_share_char, __c) == NULL;	\
+	})
 
 static inline bool
 is_native_path (const char *path)
@@ -72,7 +85,7 @@ is_unc_share (const char *path)
   const char *p;
   return (isdirsep (path[0])
 	 && isdirsep (path[1])
-	 && valid_share_char (path[2])
+	 && valid_server_char (path[2])
 	 && ((p = strpbrk (path + 3, "\\/")) != NULL)
 	 && valid_share_char (p[1]));
 }
