@@ -103,3 +103,56 @@ function(picolibc_headers subdir)
   install(FILES ${orig_headers} DESTINATION "include/${subdir}")
 endfunction()
 
+function(_picolibc_supported_compile_options var)
+  set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+  foreach(flag ${ARGN})
+    string(MAKE_C_IDENTIFIER ${flag} flag_under)
+    try_compile(${flag_under} "${PROJECT_BINARY_DIR}"
+      "${CMAKE_CURRENT_SOURCE_DIR}/cmake/simple-main.c"
+      COMPILE_DEFINITIONS "${PICOLIBC_TEST_COMPILE_OPTIONS};${PICOLIBC_FLAG_OPTIONS};${flag}"
+      )
+    if(${${flag_under}})
+      list(APPEND options ${flag})
+    endif()
+  endforeach()
+  set(${var} ${options} PARENT_SCOPE)
+endfunction()
+
+# These flags are needed to generate errors for invalid command line flags
+# instead of just warnings
+_picolibc_supported_compile_options(PICOLIBC_FLAG_OPTIONS
+  -Werror=missing-declarations
+  -Werror=unknown-attributes
+  -Werror=attributes
+  -Werror=unsupported-floating-point-opt
+  -Werror=ignored-optimization-argument
+  -Wno-unused-command-line-argument
+  )
+
+function(picolibc_supported_compile_options)
+  _picolibc_supported_compile_options(options ${ARGN})
+  set(PICOLIBC_COMPILE_OPTIONS ${PICOLIBC_COMPILE_OPTIONS} ${options} PARENT_SCOPE)
+endfunction()
+
+function(picolibc_flag flag)
+
+  string(REPLACE "_" "-" flag_dash ${flag})
+  string(REGEX REPLACE "^-" "" flag_trim ${flag_dash})
+  string(TOLOWER ${flag_trim} flag_lower)
+  set(flag_file "${CMAKE_CURRENT_SOURCE_DIR}/cmake/${flag_lower}.c")
+
+  if (NOT EXISTS "${flag_file}")
+    message(ERROR " Missing compiler test file ${flag_file}")
+  endif()
+
+  set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+
+  try_compile(${flag} "${PROJECT_BINARY_DIR}" "${flag_file}"
+    COMPILE_DEFINITIONS "${PICOLIBC_FLAG_OPTIONS}"
+    )
+
+  if (${flag})
+    set(${flag} ${flag} PARENT_SCOPE)
+  endif()
+endfunction()
+
