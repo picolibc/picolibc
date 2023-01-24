@@ -178,3 +178,7 @@ def_fn	strlen p2align=6
 	mov	const_0, #0
 	b	.Lstart_realigned
 	.size	strlen, . - strlen
+
+#if defined(__linux__) && defined(__ELF__)
+.section .note.GNU-stack,"",%progbits
+#endif
