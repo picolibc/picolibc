@@ -11,8 +11,8 @@
 long double
 hypotl(long double x, long double y)
 {
-    if ((isinf(x) && isnanl(y) && !__issignalingl(y)) ||
-        (isinf(y) && isnanl(x) && !__issignaling(x)))
+    if ((isinf(x) && isnan(y) && !issignaling(y)) ||
+        (isinf(y) && isnan(x) && !issignaling(x)))
         return (long double)INFINITY;
 
     /* Keep it simple for now...  */
