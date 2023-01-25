@@ -1093,6 +1093,8 @@ fhandler_dev_dsp::open (int flags, mode_t)
 
   debug_printf ("ACCMODE=%y audio_in=%d audio_out=%d, err=%d, ret=%d",
 		flags & O_ACCMODE, num_in, num_out, err, ret);
+  if (ret)
+    being_closed = false;
   return ret;
 }
 
@@ -1105,6 +1107,12 @@ fhandler_dev_dsp::_write (const void *ptr, size_t len)
   debug_printf ("ptr=%p len=%ld", ptr, len);
   int len_s = len;
   const char *ptr_s = static_cast <const char *> (ptr);
+
+  if (being_closed)
+    {
+      set_errno (EBADF);
+      return -1;
+    }
 
   if (audio_out_)
     /* nothing to do */;
@@ -1207,6 +1215,7 @@ int
 fhandler_dev_dsp::close ()
 {
   debug_printf ("audio_in=%p audio_out=%p", audio_in_, audio_out_);
+  being_closed = true;
   close_audio_in ();
   close_audio_out ();
   return fhandler_base::close ();
