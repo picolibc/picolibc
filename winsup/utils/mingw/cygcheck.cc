@@ -2008,7 +2008,7 @@ check_keys ()
 static const char safe_chars[] = "$-_.!*'(),";
 
 /* the URL to query.  */
-static const char base_url[] =
+static const char grep_base_url[] =
 	"http://cygwin.com/cgi-bin2/package-grep.cgi?text=1&grep=";
 
 #ifdef __x86_64__
@@ -2018,20 +2018,69 @@ static const char base_url[] =
 #endif
 static const char *ARCH_str = ARCH_STR;
 
+static int
+fetch_url (const char *url, FILE *outstream)
+{
+  DWORD rc = 0, rc_s = sizeof (DWORD);
+  HINTERNET hi = NULL, hurl = NULL;
+  char buf[4096];
+  DWORD numread;
+
+  /* Connect to the net and open the URL.  */
+  if (InternetAttemptConnect (0) != ERROR_SUCCESS)
+    {
+      fputs ("An internet connection is required for this function.\n", stderr);
+      return 1;
+    }
+
+  /* Initialize WinInet and attempt to fetch our URL.  */
+  if (!(hi = InternetOpenA ("cygcheck", INTERNET_OPEN_TYPE_PRECONFIG,
+			    NULL, NULL, 0)))
+    return display_internet_error ("InternetOpen() failed", NULL);
+
+  if (!(hurl = InternetOpenUrlA (hi, url, NULL, 0, 0, 0)))
+    return display_internet_error ("unable to contact cygwin.com site, "
+				   "InternetOpenUrl() failed", hi, NULL);
+
+  /* Check the HTTP response code.  */
+  if (!HttpQueryInfoA (hurl, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER,
+		      (void *) &rc, &rc_s, NULL))
+    return display_internet_error ("HttpQueryInfo() failed", hurl, hi, NULL);
+
+  /* Fetch result and print to outstream.  */
+  do
+    {
+      if (!InternetReadFile (hurl, (void *) buf, sizeof (buf), &numread))
+	return display_internet_error ("InternetReadFile failed", hurl, hi, NULL);
+      if (numread)
+	fwrite ((void *) buf, (size_t) numread, 1, outstream);
+    }
+  while (numread);
+
+  if (rc != HTTP_STATUS_OK)
+    {
+      sprintf (buf, "error retrieving results from cygwin.com site, "
+		    "HTTP status code %lu", rc);
+      return display_internet_error (buf, hurl, hi, NULL);
+    }
+
+  InternetCloseHandle (hurl);
+  InternetCloseHandle (hi);
+  return 0;
+}
+
 /* Queries Cygwin web site for packages containing files matching a regexp.
    Return value is 1 if there was a problem, otherwise 0.  */
 static int
 package_grep (char *search)
 {
-  char buf[1024];
-
   /* construct the actual URL by escaping  */
-  char *url = (char *) alloca (sizeof (base_url) + strlen (ARCH_str)
+  char *url = (char *) alloca (sizeof (grep_base_url) + strlen (ARCH_str)
 			       + strlen (search) * 3);
-  strcpy (url, base_url);
+  strcpy (url, grep_base_url);
 
   char *dest;
-  for (dest = &url[sizeof (base_url) - 1]; *search; search++)
+  for (dest = &url[sizeof (grep_base_url) - 1]; *search; search++)
     {
       if (isalnum (*search)
 	  || memchr (safe_chars, *search, sizeof (safe_chars) - 1))
@@ -2047,50 +2096,7 @@ package_grep (char *search)
     }
   strcpy (dest, ARCH_str);
 
-  /* Connect to the net and open the URL.  */
-  if (InternetAttemptConnect (0) != ERROR_SUCCESS)
-    {
-      fputs ("An internet connection is required for this function.\n", stderr);
-      return 1;
-    }
-
-  /* Initialize WinInet and attempt to fetch our URL.  */
-  HINTERNET hi = NULL, hurl = NULL;
-  if (!(hi = InternetOpenA ("cygcheck", INTERNET_OPEN_TYPE_PRECONFIG,
-			    NULL, NULL, 0)))
-    return display_internet_error ("InternetOpen() failed", NULL);
-
-  if (!(hurl = InternetOpenUrlA (hi, url, NULL, 0, 0, 0)))
-    return display_internet_error ("unable to contact cygwin.com site, "
-				   "InternetOpenUrl() failed", hi, NULL);
-
-  /* Check the HTTP response code.  */
-  DWORD rc = 0, rc_s = sizeof (DWORD);
-  if (!HttpQueryInfoA (hurl, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER,
-		      (void *) &rc, &rc_s, NULL))
-    return display_internet_error ("HttpQueryInfo() failed", hurl, hi, NULL);
-
-  if (rc != HTTP_STATUS_OK)
-    {
-      sprintf (buf, "error retrieving results from cygwin.com site, "
-		    "HTTP status code %lu", rc);
-      return display_internet_error (buf, hurl, hi, NULL);
-    }
-
-  /* Fetch result and print to stdout.  */
-  DWORD numread;
-  do
-    {
-      if (!InternetReadFile (hurl, (void *) buf, sizeof (buf), &numread))
-	return display_internet_error ("InternetReadFile failed", hurl, hi, NULL);
-      if (numread)
-	fwrite ((void *) buf, (size_t) numread, 1, stdout);
-    }
-  while (numread);
-
-  InternetCloseHandle (hurl);
-  InternetCloseHandle (hi);
-  return 0;
+  return fetch_url (url, stdout);
 }
 
 static void __attribute__ ((__noreturn__))
