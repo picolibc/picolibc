@@ -108,10 +108,10 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
     /* works because strtoi_min = (strtoi_type) ((strtoi_utype) strtoi_max + 1) */
     strtoi_utype ucutoff = (strtoi_utype) strtoi_max + flags;
     strtoi_type cutoff = ucutoff / base;
-    unsigned cutlim = ucutoff % base;
+    unsigned int cutlim = ucutoff % base;
 #else
     strtoi_type cutoff = strtoi_max / base;
-    unsigned cutlim = strtoi_max % base;
+    unsigned int cutlim = strtoi_max % base;
 #endif
 #endif
 
@@ -144,6 +144,10 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
         i = *s++;
     }
 
+    /* Mark the end of the parsed region */
+    if (endptr != NULL)
+        *endptr = (char *) nptr;
+
     if (flags & FLAG_NEG)
         val = -val;
 
@@ -155,10 +159,6 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
 #endif
         errno = ERANGE;
     }
-
-    /* Mark the end of the parsed region */
-    if (endptr != NULL)
-        *endptr = (char *) nptr;
 
     return val;
 }
