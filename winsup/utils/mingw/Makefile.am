@@ -33,7 +33,7 @@ cygcheck_SOURCES = \
 	path.cc
 cygcheck_CPPFLAGS=-I$(srcdir)/.. -idirafter ${top_srcdir}/cygwin/include
 cygcheck_LDFLAGS = ${AM_LDFLAGS} -Wl,--disable-high-entropy-va
-cygcheck_LDADD = -lz -lwininet -lpsapi -lntdll
+cygcheck_LDADD = -lz -lwininet -lshlwapi -lpsapi -lntdll
 
 cygwin_console_helper_SOURCES = cygwin-console-helper.cc
 

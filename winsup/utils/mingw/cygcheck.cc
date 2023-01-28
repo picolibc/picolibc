@@ -6,25 +6,27 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
-#define cygwin_internal cygwin_internal_dontuse
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
 #include <sys/time.h>
+#include <sys/stat.h>
 #include <ctype.h>
 #include <fcntl.h>
 #include <io.h>
 #include <windows.h>
 #include <wininet.h>
+#include <shlwapi.h>
 #include "path.h"
 #include "wide_path.h"
 #include <getopt.h>
 #include <cygwin/version.h>
+#define cygwin_internal cygwin_internal_dontuse
 #include <sys/cygwin.h>
+#undef cygwin_internal
 #define _NOMNTENT_MACROS
 #include <mntent.h>
-#undef cygwin_internal
 #include "loadlib.h"
 
 #ifndef max
@@ -34,6 +36,11 @@
 #ifndef alloca
 #define alloca __builtin_alloca
 #endif
+
+extern "C" {
+uintptr_t (*cygwin_internal) (cygwin_getinfo_types, ...);
+WCHAR cygwin_dll_path[32768];
+};
 
 int verbose = 0;
 int registry = 0;
@@ -45,6 +52,8 @@ int dump_only = 0;
 int find_package = 0;
 int list_package = 0;
 int grep_packages = 0;
+int info_packages = 0;
+int search_packages = 0;
 int del_orphaned_reg = 0;
 
 static char emptystr[] = "";
@@ -236,6 +245,14 @@ display_internet_error (const char *message, ...)
   va_end (hptr);
 
   return 1;
+}
+
+static inline char *
+stpcpy (char *d, const char *s)
+{
+  while ((*d++ = *s++))
+    ;
+  return --d;
 }
 
 static void
@@ -2069,10 +2086,462 @@ fetch_url (const char *url, FILE *outstream)
   return 0;
 }
 
+struct passwd {
+  char    *pw_name;    /* user name */
+  char    *pw_passwd;  /* encrypted password */
+  uint32_t pw_uid;     /* user uid */
+  uint32_t pw_gid;     /* user gid */
+  char    *pw_comment; /* comment */
+  char    *pw_gecos;   /* Honeywell login info */
+  char    *pw_dir;     /* home directory */
+  char    *pw_shell;   /* default shell */
+};
+
+struct sidbuf {
+  PSID psid;
+  int buffer[10];
+};
+
+/* Downloads setup.ini from cygwin.com, if it hasn't been downloaded
+   already or is older than 24h. */
+static FILE *
+maybe_download_setup_ini ()
+{
+  time_t t24h_before;
+  char *path;
+  struct stat st;
+  FILE *fp;
+  struct passwd *pw;
+  sidbuf curr_user;
+
+  t24h_before = time (NULL) - 24 * 60 * 60;
+  for (int i = 0; i < 2; ++i)
+    {
+      /* Check for the system-wide setup.ini file first.  If that's too
+	 old and not writable, check for ~/.setup.ini. */
+      if (i == 0)
+	path = cygpath ("/etc/setup/setup.ini", NULL);
+      else
+	{
+	  BOOL ret;
+	  DWORD len;
+	  HANDLE ptok;
+
+	  if (!OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &ptok))
+	    return NULL;
+	  ret = GetTokenInformation (ptok, TokenUser, &curr_user,
+				     sizeof curr_user, &len);
+	  CloseHandle (ptok);
+	  if (!ret)
+	    return NULL;
+	  pw = (struct passwd *) cygwin_internal (CW_GETPWSID, FALSE,
+						  curr_user.psid);
+	  if (!pw)
+	    return NULL;
+	  path = cygpath (pw->pw_dir, "/.setup.ini", NULL);
+	}
+      /* If file exists, and has been downloaded less than 24h ago,
+         and if we can open it for reading, just use it. */
+      if (stat (path, &st) == 0
+	  && st.st_mtime > t24h_before
+	  && (fp = fopen (path, "rt")) != NULL)
+	return fp;
+      /* Otherwise, try to open it for writing and fetch from cygwin.com. */
+      if ((fp = fopen (path, "w+")) != NULL)
+	{
+	  fputs ("Fetching setup.ini from cygwin.com...\n", stderr);
+	  if (!fetch_url ("https://cygwin.com/ftp/cygwin/x86_64/setup.ini", fp))
+	    {
+	      fclose (fp);
+	      fp = fopen (path, "rt");
+	      return fp;
+	    }
+	  fclose (fp);
+	}
+    }
+  return NULL;
+}
+
+struct vers_info
+{
+  char *version;
+  char *install;
+  char *source;
+  char *depends2;
+};
+
+struct ini_package_info
+{
+  char *name;
+  char *sdesc;
+  char *ldesc;
+  char *category;
+  char *url;
+  char *license;
+  vers_info curr;
+  size_t prev_count;
+  vers_info *prev;
+  size_t test_count;
+  vers_info *test;
+};
+
+static void
+free_pkg_info (ini_package_info *pi)
+{
+  free (pi->name);
+  free (pi->sdesc);
+  free (pi->ldesc);
+  free (pi->category);
+  free (pi->url);
+  free (pi->license);
+  free (pi->curr.version);
+  free (pi->curr.install);
+  free (pi->curr.source);
+  free (pi->curr.depends2);
+  if (pi->prev)
+    {
+      for (size_t i = 0; i < pi->prev_count; ++i)
+	{
+	  free (pi->prev[i].version);
+	  free (pi->prev[i].install);
+	  free (pi->prev[i].source);
+	  free (pi->prev[i].depends2);
+	}
+      free (pi->prev);
+    }
+  if (pi->test)
+    {
+      for (size_t i = 0; i < pi->test_count; ++i)
+	{
+	  free (pi->test[i].version);
+	  free (pi->test[i].install);
+	  free (pi->test[i].source);
+	  free (pi->test[i].depends2);
+	}
+      free (pi->test);
+    }
+}
+
+static void
+collect_quoted_string (char *&tgt, FILE *fp, char *buf, size_t size, size_t offset)
+{
+  bool found = false;
+  char *cp, *s;
+
+  cp = buf + offset;
+  if (*cp != '"')	/* just 'til end of line */
+    {
+      if ((s = strchr (cp, '\n')))
+	*s = '\0';
+      tgt = strdup (cp);
+      return;
+    }
+  /* text starts with a quote, collect 'til the closing quote */
+  ++cp;
+  do
+    {
+      if ((s = strrchr (cp, '"')) && (s == cp || s[-1] != '\\'))
+	{
+	  *s = '\0';
+	  found = true;
+	}
+      if (!tgt)
+	s = (char *) calloc (strlen (cp) + 1, sizeof *s);
+      else
+	s = (char *) realloc (tgt, strlen (tgt) + strlen (cp) + 1);
+      if (s)
+	{
+	  tgt = s;
+	  strcat (tgt, cp);
+	}
+    }
+  while (!found && (cp = fgets (buf, size, fp)));
+}
+
+static ini_package_info *
+collect_pkg_info (FILE *fp, ini_package_info *pi)
+{
+  vers_info *vinfo = &pi->curr;
+  char buf[4096];
+  char *s;
+
+  memset (pi, 0, sizeof *pi);
+  /* Search next line starting with "@ ". */
+  while ((s = fgets (buf, sizeof buf, fp)))
+    {
+      if (s[0] == '@' && s[1] == ' ')
+	break;
+    }
+  if (!s)
+    goto error;
+  /* Extract package name */
+  if ((s = strchr (buf, '\n')))
+    *s = '\0';
+  pi->name = strdup (buf + 2);
+  /* collect all of this package block. */
+  while ((s = fgets (buf, sizeof buf, fp)))
+    {
+      /* empty line? EOR. */
+      if (s[0] == '\n')
+	break;
+      /* prev or test version? */
+      if (buf[0] == '[')
+	{
+	  vers_info **vers_p = NULL;
+	  size_t *vers_cnt_p = NULL;
+
+	  if (!strncmp (buf, "[prev]", strlen ("[prev]")))
+	    {
+	      vers_p = &pi->prev;
+	      vers_cnt_p = &pi->prev_count;
+	    }
+	  else if (!strncmp (buf, "[test]", strlen ("[test]")))
+	    {
+	      vers_p = &pi->test;
+	      vers_cnt_p = &pi->test_count;
+	    }
+	  if (vers_p)
+	    {
+	      vers_info *v;
+
+	      v = (vers_info *) realloc (*vers_p, (*vers_cnt_p + 1)
+						  * sizeof (vers_info));
+	      if (!v)
+		goto error;
+	      *vers_p = v;
+	      vinfo = *vers_p + *vers_cnt_p;
+	      memset (vinfo, 0, sizeof *vinfo);
+	      ++(*vers_cnt_p);
+	    }
+	}
+      else if (!strncmp (buf, "sdesc: ", strlen ("sdesc: ")))
+	collect_quoted_string (pi->sdesc, fp, buf, sizeof buf,
+			       strlen ("sdesc: "));
+      else if (!strncmp (buf, "ldesc: ", strlen ("ldesc: ")))
+	collect_quoted_string (pi->ldesc, fp, buf, sizeof buf,
+			       strlen ("ldesc: "));
+      else
+        {
+	  if ((s = strchr (buf, '\n')))
+	    *s = '\0';
+	  if (!strncmp (buf, "category: ", strlen ("category: ")))
+	    pi->category = strdup (buf + strlen ("category: "));
+	  else if (!strncmp (buf, "url: ", strlen ("url: ")))
+	    pi->url = strdup (buf + strlen ("url: "));
+	  else if (!strncmp (buf, "license: ", strlen ("license: ")))
+	    pi->license = strdup (buf + strlen ("license: "));
+	  else if (!strncmp (buf, "version: ", strlen ("version: ")))
+	    vinfo->version = strdup (buf + strlen ("version: "));
+	  else if (!strncmp (buf, "install: ", strlen ("install: ")))
+	    vinfo->install = strdup (buf + strlen ("install: "));
+	  else if (!strncmp (buf, "source: ", strlen ("source: ")))
+	    vinfo->source = strdup (buf + strlen ("source: "));
+	  else if (!strncmp (buf, "depends2: ", strlen ("depends2: ")))
+	    vinfo->depends2 = strdup (buf + strlen ("depends2: "));
+	}
+    }
+  return pi;
+error:
+  free_pkg_info (pi);
+  return NULL;
+}
+
+static void
+package_info_print (ini_package_info *pi, vers_info *vers)
+{
+  char buf[4096];
+
+  printf ("Name         : %s\n", pi->name);
+  if (vers->version)
+    {
+      char *version = strcpy (buf, vers->version);
+      char *release = NULL;
+
+      release = strrchr (version, '-');
+      if (release)
+	*release++ = '\0';
+      printf ("Version      : %s\n", version);
+      if (release)
+	printf ("Release      : %s\n", release);
+    }
+  if (vers->install)
+    {
+      char *arch = strcpy (buf, vers->install);
+      char *size = NULL;
+      char *cp;
+
+      cp = strchr (arch, '/');
+      if (cp)
+	{
+	  *cp++ = '\0';
+	  cp = strchr (cp, ' ');
+	  if (cp)
+	    {
+	      size = ++cp;
+	      cp = strchr (cp, ' ');
+	      if (cp)
+		*cp = '\0';
+	    }
+	}
+      if (cp)
+	{
+	  printf ("Architecture : %s\n", arch);
+	  printf ("Size         : %s\n", size); /* FIXME: human-readable */
+	}
+    }
+  if (vers->source)
+    {
+      char *source = strcpy (buf, vers->source);
+      char *cp = strchr (source, ' ');
+      if (cp)
+	{
+	  *cp = '\0';
+	  cp = strrchr (source, '/');
+	  if (cp)
+	    printf ("Source       : %s\n", cp + 1);
+	}
+    }
+  if (pi->sdesc)
+    printf ("Summary      : %s\n", pi->sdesc);
+  if (pi->url)
+    printf ("Url          : %s\n", pi->url);
+  if (pi->license)
+    printf ("License      : %s\n", pi->license);
+  if (pi->ldesc)
+    {
+      char *ldesc = strcpy (buf, pi->ldesc);
+
+      while (ldesc)
+	{
+	  char *nl = strchr (ldesc, '\n');
+	  if (nl)
+	    *nl = '\0';
+	  printf ("%s : %s\n", ldesc == buf ? "Description " : "            ",
+			       ldesc);
+	  ldesc = nl ? nl + 1 : NULL;
+	}
+    }
+  puts ("");
+}
+
+/* Print full info for the package matching the search string in terms of
+   name/version. */
+static int
+package_info (char **search)
+{
+  FILE *fp = maybe_download_setup_ini ();
+  ini_package_info pi_buf, *pi;
+
+  if (!fp)
+    return 1;
+
+  while (search && *search)
+    {
+      rewind (fp);
+      while ((pi = collect_pkg_info (fp, &pi_buf)))
+	{
+	  /* Name matches?  Print all versions */
+	  if (PathMatchSpecA (pi->name, *search))
+	    {
+	      if (pi->curr.version)
+		package_info_print (pi, &pi->curr);
+	      for (size_t i = 0; i < pi->prev_count; ++i)
+		package_info_print (pi, pi->prev + i);
+	      for (size_t i = 0; i < pi->test_count; ++i)
+		package_info_print (pi, pi->test + i);
+	    }
+	  else
+	    {
+	      /* Check if search matches name-version string */
+	      char nv_buf[4096], *nvp, *cp;
+
+	      nvp = stpcpy (nv_buf, pi->name);
+	      *nvp++ = '-';
+
+	      if (pi->curr.version)
+		{
+		  stpcpy (nvp, pi->curr.version);
+		  if (PathMatchSpecA (nv_buf, *search))
+		    package_info_print (pi, &pi->curr);
+		  else if ((cp = strrchr (nvp, '-'))) /* try w/o release */
+		    {
+		      *cp = '\0';
+		      if (PathMatchSpecA (nv_buf, *search))
+			package_info_print (pi, &pi->curr);
+		    }
+		}
+	      for (size_t i = 0; i < pi->prev_count; ++i)
+		{
+		  stpcpy (nvp, pi->prev[i].version);
+		  if (PathMatchSpecA (nv_buf, *search))
+		    package_info_print (pi, pi->prev + i);
+		  else if ((cp = strrchr (nvp, '-'))) /* try w/o release */
+		    {
+		      *cp = '\0';
+		      if (PathMatchSpecA (nv_buf, *search))
+			package_info_print (pi, pi->prev + i);
+		    }
+		}
+	      for (size_t i = 0; i < pi->test_count; ++i)
+		{
+		  stpcpy (nvp, pi->test[i].version);
+		  if (PathMatchSpecA (nv_buf, *search))
+		    package_info_print (pi, pi->test + i);
+		  else if ((cp = strrchr (nvp, '-'))) /* try w/o release */
+		    {
+		      *cp = '\0';
+		      if (PathMatchSpecA (nv_buf, *search))
+			package_info_print (pi, pi->test + i);
+		    }
+		}
+	    }
+	  free_pkg_info (&pi_buf);
+	}
+      ++search;
+    }
+  return 0;
+}
+
+/* Search for the search string in name and sdesc of available packages. */
+static int
+package_search (char **search)
+{
+  FILE *fp = maybe_download_setup_ini ();
+  ini_package_info pi_buf, *pi;
+  char *ext_search, *ep;
+
+  if (!fp)
+    return 1;
+
+  while (search && *search)
+    {
+      ext_search = (char *) malloc (strlen (*search) + 3);
+      ep = ext_search;
+      if (*(search)[0] != '*')
+	*ep++ = '*';
+      ep = stpcpy (ep, *search);
+      if (ep[-1] != '*')
+	stpcpy (ep, "*");
+
+      rewind (fp);
+      while ((pi = collect_pkg_info (fp, &pi_buf)))
+	{
+	  if (PathMatchSpecA (pi->name, ext_search)
+	      || (pi->sdesc && PathMatchSpecA (pi->sdesc, ext_search)))
+	    printf ("%s : %s\n", pi->name, pi->sdesc);
+	  free_pkg_info (&pi_buf);
+	}
+      free (ext_search);
+      ++search;
+    }
+
+  return 0;
+}
+
 /* Queries Cygwin web site for packages containing files matching a regexp.
    Return value is 1 if there was a problem, otherwise 0.  */
 static int
-package_grep (char *search)
+package_grep (const char *search)
 {
   /* construct the actual URL by escaping  */
   char *url = (char *) alloca (sizeof (grep_base_url) + strlen (ARCH_str)
@@ -2109,6 +2578,8 @@ Usage: cygcheck [-v] [-h] PROGRAM\n\
        cygcheck -k\n\
        cygcheck -f FILE [FILE]...\n\
        cygcheck -l [PACKAGE]...\n\
+       cygcheck -i [PATTERN]...\n\
+       cygcheck -e [PATTERN]...\n\
        cygcheck -p REGEXP\n\
        cygcheck --delete-orphaned-installation-keys\n\
        cygcheck -h\n\n\
@@ -2124,8 +2595,12 @@ At least one command option or a PROGRAM is required, as shown above.\n\
   -r, --registry       also scan registry for Cygwin settings (with -s)\n\
   -k, --keycheck       perform a keyboard check session (must be run from a\n\
 		       plain console only, not from a pty/rxvt/xterm)\n\
-  -f, --find-package   find the package to which FILE belongs\n\
-  -l, --list-package   list contents of PACKAGE (or all packages if none given)\n\
+  -f, --find-package   find the installed package to which FILE belongs\n\
+  -l, --list-package   list contents of the installed PACKAGE (or all\n\
+                       installed packages if none given)\n\
+  -i, --info-package   print full info on packages matching PATTERN, installed\n\
+                       and available packages\n\
+  -e, --search-package list all available packages matching PATTERN\n\
   -p, --package-query  search for REGEXP in the entire cygwin.com package\n\
 		       repository (requires internet connectivity)\n\
   --delete-orphaned-installation-keys\n\
@@ -2153,6 +2628,8 @@ struct option longopts[] = {
   {"keycheck", no_argument, NULL, 'k'},
   {"find-package", no_argument, NULL, 'f'},
   {"list-package", no_argument, NULL, 'l'},
+  {"info-packages", no_argument, NULL, 'i'},
+  {"search-packages", no_argument, NULL, 'e'},
   {"package-query", no_argument, NULL, 'p'},
   {"delete-orphaned-installation-keys", no_argument, NULL, CO_DELETE_KEYS},
   {"help", no_argument, NULL, 'h'},
@@ -2160,7 +2637,7 @@ struct option longopts[] = {
   {0, no_argument, NULL, 0}
 };
 
-static char opts[] = "cdsrvkflphV";
+static char opts[] = "cdsrvkfliephV";
 
 static void
 print_version ()
@@ -2188,11 +2665,6 @@ nuke (char *ev)
   putenv (s);
 }
 
-extern "C" {
-uintptr_t (*cygwin_internal) (int, ...);
-WCHAR cygwin_dll_path[32768];
-};
-
 static void
 load_cygwin (int& argc, char **&argv)
 {
@@ -2201,8 +2673,8 @@ load_cygwin (int& argc, char **&argv)
   if (!(h = LoadLibrary ("cygwin1.dll")))
     return;
   GetModuleFileNameW (h, cygwin_dll_path, 32768);
-  if ((cygwin_internal = (uintptr_t (*) (int, ...))
-  			 GetProcAddress (h, "cygwin_internal")))
+  if ((cygwin_internal = (uintptr_t (*) (cygwin_getinfo_types, ...))
+			 GetProcAddress (h, "cygwin_internal")))
     {
       char **av = (char **) cygwin_internal (CW_ARGV);
       if (av && ((uintptr_t) av != (uintptr_t) -1))
@@ -2239,6 +2711,7 @@ load_cygwin (int& argc, char **&argv)
 	    putenv (path);
 	}
     }
+
   /* GDB chokes when the DLL got unloaded and, for some reason, fails to set
      any breakpoint after the fact. */
   if (!IsDebuggerPresent ())
@@ -2287,6 +2760,12 @@ main (int argc, char **argv)
       case 'l':
 	list_package = 1;
 	break;
+      case 'i':
+	info_packages = 1;
+	break;
+      case 'e':
+	search_packages = 1;
+	break;
       case 'p':
 	grep_packages = 1;
 	break;
@@ -2310,7 +2789,7 @@ main (int argc, char **argv)
     putenv ("POSIXLY_CORRECT=");
 
   if ((argc == 0) && !sysinfo && !keycheck && !check_setup && !list_package
-      && !del_orphaned_reg)
+      && !del_orphaned_reg && !info_packages && !search_packages)
     {
       if (givehelp)
 	usage (stdout, 0);
@@ -2319,18 +2798,20 @@ main (int argc, char **argv)
     }
 
   if ((check_setup || sysinfo || find_package || list_package || grep_packages
-       || del_orphaned_reg)
+       || del_orphaned_reg || info_packages || search_packages)
       && keycheck)
     usage (stderr, 1);
 
-  if ((find_package || list_package || grep_packages)
+  if ((find_package || list_package || grep_packages
+       || info_packages || search_packages)
       && (check_setup || del_orphaned_reg))
     usage (stderr, 1);
 
   if (dump_only && !check_setup && !sysinfo)
     usage (stderr, 1);
 
-  if (find_package + list_package + grep_packages > 1)
+  if (find_package + list_package + grep_packages
+      + info_packages + search_packages > 1)
     usage (stderr, 1);
 
   if (keycheck)
@@ -2339,6 +2820,10 @@ main (int argc, char **argv)
     del_orphaned_reg_installations ();
   if (grep_packages)
     return package_grep (*argv);
+  if (info_packages)
+    return package_info (argv);
+  if (search_packages)
+    return package_search (argv);
 
   init_paths ();
 
