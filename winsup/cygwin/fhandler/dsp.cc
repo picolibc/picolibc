@@ -46,6 +46,8 @@ details. */
      children. They only inherit the settings from the parent.
  */
 
+enum { DEFAULT_BLOCKS = 12, MAX_BLOCKS = 256 };
+
 class fhandler_dev_dsp::Audio
 { // This class contains functionality common to Audio_in and Audio_out
  public:
@@ -67,7 +69,6 @@ class fhandler_dev_dsp::Audio
   void (fhandler_dev_dsp::Audio::*convert_)
     (unsigned char *buffer, int size_bytes);
 
-  enum { MAX_BLOCKS = 12 };
   int bufferIndex_;  // offset into pHdr_->lpData
   WAVEHDR *pHdr_;    // data to be filled by write
   WAVEHDR wavehdr_[MAX_BLOCKS];
@@ -126,7 +127,6 @@ class fhandler_dev_dsp::Audio_out: public Audio
   bool waitforspace ();
   bool sendcurrent ();
 
-  enum { MAX_BLOCKS = 12 };
   HWAVEOUT dev_;     // The wave device
   /* Private copies of audiofreq_, audiobits_, audiochannels_,
      possibly set from wave file */
@@ -235,9 +235,9 @@ fhandler_dev_dsp::Audio::queue::query ()
 fhandler_dev_dsp::Audio::Audio (fhandler_dev_dsp *my_fh)
 {
   bigwavebuffer_ = NULL;
-  Qisr2app_ = new queue (MAX_BLOCKS);
-  convert_ = &fhandler_dev_dsp::Audio::convert_none;
   fh = my_fh;
+  Qisr2app_ = new queue (fh->fragstotal_);
+  convert_ = &fhandler_dev_dsp::Audio::convert_none;
 }
 
 fhandler_dev_dsp::Audio::~Audio ()
@@ -389,14 +389,13 @@ fhandler_dev_dsp::Audio_out::start ()
 {
   WAVEFORMATEX format;
   MMRESULT rc;
-  unsigned bSize = blockSize (freq_, bits_, channels_);
 
   if (dev_)
     return true;
 
   /* In case of fork bigwavebuffer may already exist */
   if (!bigwavebuffer_)
-    bigwavebuffer_ = new char[MAX_BLOCKS * bSize];
+    bigwavebuffer_ = new char[fh->fragstotal_ * fh->fragsize_];
 
   if (!isvalid ())
     return false;
@@ -405,7 +404,7 @@ fhandler_dev_dsp::Audio_out::start ()
   rc = waveOutOpen (&dev_, WAVE_MAPPER, &format, (DWORD_PTR) waveOut_callback,
 		     (DWORD_PTR) this, CALLBACK_FUNCTION);
   if (rc == MMSYSERR_NOERROR)
-    init (bSize);
+    init (fh->fragsize_);
 
   debug_printf ("%u = waveOutOpen(freq=%d bits=%d channels=%d)", rc, freq_, bits_, channels_);
 
@@ -450,7 +449,7 @@ fhandler_dev_dsp::Audio_out::init (unsigned blockSize)
 
   // internally queue all of our buffer for later use by write
   Qisr2app_->reset ();
-  for (i = 0; i < MAX_BLOCKS; i++)
+  for (i = 0; i < fh->fragstotal_; i++)
     {
       wavehdr_[i].lpData = &bigwavebuffer_[i * blockSize];
       wavehdr_[i].dwUser = (int) blockSize;
@@ -505,8 +504,8 @@ fhandler_dev_dsp::Audio_out::buf_info (audio_buf_info *p,
     {
       /* If the device is running we use the internal values,
 	 possibly set from the wave file. */
-      p->fragstotal = MAX_BLOCKS;
-      p->fragsize = blockSize (freq_, bits_, channels_);
+      p->fragstotal = fh->fragstotal_;
+      p->fragsize = fh->fragsize_;
       p->fragments = Qisr2app_->query ();
       if (pHdr_ != NULL)
 	p->bytes = (int)pHdr_->dwUser - bufferIndex_
@@ -523,10 +522,10 @@ fhandler_dev_dsp::Audio_out::buf_info (audio_buf_info *p,
 void fhandler_dev_dsp::Audio_out::default_buf_info (audio_buf_info *p,
                                                 int rate, int bits, int channels)
 {
-      p->fragstotal = MAX_BLOCKS;
-      p->fragsize = blockSize (rate, bits, channels);
-      p->fragments = MAX_BLOCKS;
-      p->bytes = p->fragsize * p->fragments;
+  p->fragstotal = DEFAULT_BLOCKS;
+  p->fragsize = blockSize (rate, bits, channels);
+  p->fragments = p->fragstotal;
+  p->bytes = p->fragsize * p->fragments;
 }
 
 /* This is called on an interupt so use locking.. Note Qisr2app_
@@ -552,8 +551,8 @@ fhandler_dev_dsp::Audio_out::waitforspace ()
 	  set_errno (EAGAIN);
 	  return false;
 	}
-      debug_printf ("100ms");
-      switch (cygwait (100))
+      debug_printf ("1ms");
+      switch (cygwait (1))
 	{
 	case WAIT_SIGNALED:
 	  if (!_my_tls.call_signal_handler ())
@@ -584,7 +583,7 @@ fhandler_dev_dsp::Audio_out::waitforspace ()
 void
 fhandler_dev_dsp::Audio_out::waitforallsent ()
 {
-  while (Qisr2app_->query () != MAX_BLOCKS)
+  while (Qisr2app_->query () != fh->fragstotal_)
     {
       debug_printf ("%d blocks in Qisr2app", Qisr2app_->query ());
       Sleep (100);
@@ -771,14 +770,13 @@ fhandler_dev_dsp::Audio_in::start (int rate, int bits, int channels)
 {
   WAVEFORMATEX format;
   MMRESULT rc;
-  unsigned bSize = blockSize (rate, bits, channels);
 
   if (dev_)
     return true;
 
   /* In case of fork bigwavebuffer may already exist */
   if (!bigwavebuffer_)
-    bigwavebuffer_ = new char[MAX_BLOCKS * bSize];
+    bigwavebuffer_ = new char[fh->fragstotal_ * fh->fragsize_];
 
   if (!isvalid ())
     return false;
@@ -790,7 +788,7 @@ fhandler_dev_dsp::Audio_in::start (int rate, int bits, int channels)
 
   if (rc == MMSYSERR_NOERROR)
     {
-      if (!init (bSize))
+      if (!init (fh->fragsize_))
 	return false;
     }
   return (rc == MMSYSERR_NOERROR);
@@ -855,7 +853,7 @@ fhandler_dev_dsp::Audio_in::init (unsigned blockSize)
 
   // try to queue all of our buffer for reception
   Qisr2app_->reset ();
-  for (i = 0; i < MAX_BLOCKS; i++)
+  for (i = 0; i < fh->fragstotal_; i++)
     {
       wavehdr_[i].lpData = &bigwavebuffer_[i * blockSize];
       wavehdr_[i].dwBufferLength = blockSize;
@@ -963,7 +961,7 @@ fhandler_dev_dsp::Audio_in::waitfordata ()
 void fhandler_dev_dsp::Audio_in::default_buf_info (audio_buf_info *p,
                                                 int rate, int bits, int channels)
 {
-  p->fragstotal = MAX_BLOCKS;
+  p->fragstotal = DEFAULT_BLOCKS;
   p->fragsize = blockSize (rate, bits, channels);
   p->fragments = 0;
   p->bytes = 0;
@@ -975,8 +973,8 @@ fhandler_dev_dsp::Audio_in::buf_info (audio_buf_info *p,
 {
   if (dev_)
     {
-      p->fragstotal = MAX_BLOCKS;
-      p->fragsize = blockSize (rate, bits, channels);
+      p->fragstotal = fh->fragstotal_;
+      p->fragsize = fh->fragsize_;
       p->fragments = Qisr2app_->query ();
       if (pHdr_ != NULL)
 	p->bytes = pHdr_->dwBytesRecorded - bufferIndex_
@@ -1068,6 +1066,8 @@ fhandler_dev_dsp::open (int flags, mode_t)
   audiofreq_ = 8000;
   audiobits_ = 8;
   audiochannels_ = 1;
+  fragstotal_ = DEFAULT_BLOCKS;
+  fragment_has_been_set = false;
   switch (flags & O_ACCMODE)
     {
     case O_RDWR:
@@ -1118,6 +1118,8 @@ fhandler_dev_dsp::_write (const void *ptr, size_t len)
     /* nothing to do */;
   else if (IS_WRITE ())
     {
+      if (!fragment_has_been_set)
+	fragsize_ = Audio::blockSize (audiofreq_, audiobits_, audiochannels_);
       debug_printf ("Allocating");
       if (!(audio_out_ = new Audio_out (this)))
 	return -1;
@@ -1162,6 +1164,8 @@ fhandler_dev_dsp::_read (void *ptr, size_t& len)
     /* nothing to do */;
   else if (IS_READ ())
     {
+      if (!fragment_has_been_set)
+	fragsize_ = Audio::blockSize (audiofreq_, audiobits_, audiochannels_);
       debug_printf ("Allocating");
       if (!(audio_in_ = new Audio_in (this)))
 	{
@@ -1237,19 +1241,9 @@ fhandler_dev_dsp::_ioctl (unsigned int cmd, void *buf)
 	break;
 
       CASE (SNDCTL_DSP_GETBLKSIZE)
-	/* This is valid even if audio_X is NULL */
-	if (IS_WRITE ())
-	  {
-	    *intbuf = audio_out_->blockSize (audiofreq_,
-					     audiobits_,
-					     audiochannels_);
-	  }
-	else
-	  { // I am very sure that IS_READ is valid
-	    *intbuf = audio_in_->blockSize (audiofreq_,
-					    audiobits_,
-					    audiochannels_);
-	  }
+	if (!fragment_has_been_set)
+	  fragsize_ = Audio::blockSize (audiofreq_, audiobits_, audiochannels_);
+	*intbuf = fragsize_;
 	return 0;
 
       CASE (SNDCTL_DSP_SETFMT)
@@ -1404,9 +1398,15 @@ fhandler_dev_dsp::_ioctl (unsigned int cmd, void *buf)
       }
 
       CASE (SNDCTL_DSP_SETFRAGMENT)
-	// Fake!! esound & mikmod require this on non PowerPC platforms.
-	//
+      {
+	if (audio_out_ || audio_in_)
+	  return 0; /* Too late to set fragment. Ignore. */
+	int *p = (int *) buf;
+	fragstotal_ = min (*p >> 16, MAX_BLOCKS);
+	fragsize_ = 1 << (*p & 0xffff);
+	fragment_has_been_set = true;
 	return 0;
+      }
 
       CASE (SNDCTL_DSP_GETFMTS)
 	*intbuf = AFMT_S16_LE | AFMT_U8; // only native formats returned here
