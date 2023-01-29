@@ -2143,7 +2143,7 @@ maybe_download_setup_ini ()
       /* Otherwise, try to open it for writing and fetch from cygwin.com. */
       if ((fp = fopen (path, "w+")) != NULL)
 	{
-	  fprintf (stderr, "Fetching %s from cygwin.com...\n", path);
+	  fputs ("Fetching setup.ini from cygwin.com...\n", stderr);
 	  if (!fetch_url ("https://cygwin.com/ftp/cygwin/x86_64/setup.ini", fp))
 	    {
 	      fclose (fp);
