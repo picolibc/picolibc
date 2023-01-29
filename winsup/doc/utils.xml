@@ -133,6 +133,20 @@
 	</cmdsynopsis>
 	<cmdsynopsis>
 	  <command>cygcheck</command>
+	  <arg choice="plain">-e</arg>
+	  <arg choice="plain" rep="repeat"><replaceable>PATTERN</replaceable></arg>
+	</cmdsynopsis>
+	<cmdsynopsis>
+	  <command>cygcheck</command>
+	  <arg choice="plain">-i</arg>
+	  <arg>--inst</arg>
+	  <arg>--curr</arg>
+	  <arg>--prev</arg>
+	  <arg>--test</arg>
+	  <arg choice="plain" rep="repeat"><replaceable>PATTERN</replaceable></arg>
+	</cmdsynopsis>
+	<cmdsynopsis>
+	  <command>cygcheck</command>
 	  <arg choice="plain">-f</arg>
 	  <arg choice="plain" rep="repeat"><replaceable>FILE</replaceable></arg>
 	</cmdsynopsis>
@@ -171,6 +185,16 @@ At least one command option or a PROGRAM is required, as shown above.
   -r, --registry       also scan registry for Cygwin settings (with -s)
   -k, --keycheck       perform a keyboard check session (must be run from a
                        plain console only, not from a pty/rxvt/xterm)
+  -e, --search-package list all available packages matching PATTERN
+                       PATTERN is a glob pattern with * and ? as wildcard chars
+  -i, --info-package   print full info on packages matching PATTERN, installed
+                       and available packages
+                       PATTERN is a glob pattern with * and ? as wildcard chars
+      info selection specifiers (multiple allowed):
+      --inst           only print info on installed package
+      --curr           only print info on most recent available package
+      --prev           only print info on older, but still  available packages
+      --test           only print info on test packages
   -f, --find-package   find the package to which FILE belongs
   -l, --list-package   list contents of PACKAGE (or all packages if none given)
   -p, --package-query  search for REGEXP in the entire cygwin.com package
@@ -184,9 +208,11 @@ At least one command option or a PROGRAM is required, as shown above.
                        with another command, otherwise print this help
   -V, --version        print the version of cygcheck and exit
 
-Note: -c, -f, and -l only report on packages that are currently installed. To
-  search all official Cygwin packages use -p instead.  The -p REGEXP matches
-  package names, descriptions, and names of files/paths within all packages.
+Notes:
+  -c, -f, and -l only report on packages that are currently installed.
+  -i and -e report on available packages, too.  To search for files within
+  uninstalled Cygwin packages, use -p.  The -p REGEXP matches package names,
+  descriptions, and names of files/paths within all packages.
 </screen>
       </refsect1>
 
@@ -218,6 +244,57 @@ Note: -c, -f, and -l only report on packages that are currently installed. To
       list one or more programs on the command line and specify
       <literal>-s</literal>, <command>cygcheck</command> will report on
       both.</para>
+    <para> The <literal>-e</literal> option allows to seach for available
+      packages in the Cygwin distribution.  <literal>PATTERN</literal> is
+      a glob pattern, using * and ? as wildcard characters, just as in
+      filename patterns.  <literal>PATTERN</literal> is searched for in
+      the package name and the summary of a package.</para>
+    <para> The <literal>-i</literal> option prints a lot of information
+      available for installed packages, as well as for available packages
+      in the Cygwin distribution.  <literal>PATTERN</literal> is a glob
+      pattern, using * and ? as wildcard characters, just as in filename
+      patterns.  <literal>PATTERN</literal> is compared against the
+      package name as well as against the combined package name and version.
+      With additional info selectors, <literal>--inst</literal>,
+      <literal>--curr</literal>, <literal>--prev</literal>, and
+      <literal>--test</literal>, allow to specify that only information
+      in terms of installed, current latest available, older available,
+      as well as test packages respectively, is requested.</para>
+
+    <example
+      id="utils-cygcheck-eiex"><title>Example <command>cygcheck</command> -e/-i
+      usage</title>
+      <screen>
+$ cygcheck -e grep
+grep : search for regular expression matches in text files
+grep-debuginfo : Debug info for grep
+grepmail : search mailboxes for mail matching an expression
+pdfgrep : Command-line utility for searching text in PDFs
+pdfgrep-debuginfo : Debug info for pdfgrep
+sgrep : Search indexed text regions like SGML,XML and HTML files
+
+$ cygcheck -i --curr grep
+Latest available package:
+-------------------------
+
+Name        : grep
+Version     : 3.8
+Release     : 2
+Architecture: x86_64
+Size        : 401340 (392 K)
+Source      : grep-3.8-2-src.tar.xz
+Summary     : search for regular expression matches in text files
+Description :
+GNU grep searches one or more input files for lines containing a
+match to a specified pattern. By default, grep outputs the matching lines.
+The GNU implementation includes several useful extensions over POSIX.
+
+</screen>
+      </example>
+
+    <para> Note that <literal>-e</literal> and <literal>-i</literal>
+      options fetch info from a distribution db file.  This file will be
+      downloading on demand and refreshed if it's older than 24 hours.</para>
     <para> The <literal>-f</literal> option helps you to track down which
       package a file came from, and <literal>-l</literal> lists all files in a
       package. For example, to find out about
@@ -225,7 +302,7 @@ Note: -c, -f, and -l only report on packages that are currently installed. To
     </para>
 
     <example
-      id="utils-cygcheck-ex"><title>Example <command>cygcheck</command>
+      id="utils-cygcheck-ex"><title>Example <command>cygcheck</command> -f/-l
       usage</title>
       <screen>
 $ cygcheck -f /usr/bin/less

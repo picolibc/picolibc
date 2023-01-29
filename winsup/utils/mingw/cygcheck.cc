@@ -2738,7 +2738,7 @@ Usage: cygcheck [-v] [-h] PROGRAM\n\
        cygcheck -k\n\
        cygcheck -f FILE [FILE]...\n\
        cygcheck -l [PACKAGE]...\n\
-       cygcheck -i [--inst,--curr,--prev,--test] [PATTERN]...\n\
+       cygcheck -i [--inst] [--curr] [--prev] [--test] [PATTERN]...\n\
        cygcheck -e [PATTERN]...\n\
        cygcheck -p REGEXP\n\
        cygcheck --delete-orphaned-installation-keys\n\
@@ -2760,7 +2760,7 @@ At least one command option or a PROGRAM is required, as shown above.\n\
   -i, --info-package   print full info on packages matching PATTERN, installed\n\
                        and available packages\n\
                        PATTERN is a glob pattern with * and ? as wildcard chars\n\
-    info selection specifiers (multiple allowed):\n\
+      info selection specifiers (multiple allowed):\n\
       --inst           only print info on installed package\n\
       --curr           only print info on most recent available package\n\
       --prev           only print info on older, but still  available packages\n\
@@ -2780,9 +2780,10 @@ At least one command option or a PROGRAM is required, as shown above.\n\
   -V, --version        print the version of cygcheck and exit\n\
 \n\
 Notes:\n\
-  -c, -f, and -l only report on packages that are currently installed. To\n\
-  search all official Cygwin packages use -p instead.  The -p REGEXP matches\n\
-  package names, descriptions, and names of files/paths within all packages.\n\
+  -c, -f, and -l only report on packages that are currently installed.\n\
+  -i and -e report on available packages, too.  To search for files within\n\
+  uninstalled Cygwin packages, use -p.  The -p REGEXP matches package names,\n\
+  descriptions, and names of files/paths within all packages.\n\
 \n");
   exit (status);
 }
