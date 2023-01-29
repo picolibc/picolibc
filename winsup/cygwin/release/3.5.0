@@ -8,3 +8,7 @@ What's new:
   now work in the console.
 
 - newgrp(1) tool.
+
+- cygcheck has new options searching for available packages in the
+  cygwin distro, as well as getting extended info on available and
+  installed packages.

@@ -22,6 +22,12 @@ work in the console.
 newgrp(1) tool.
 </para></listitem>
 
+<listitem><para>
+cygcheck has new options searching for available packages in the
+cygwin distro, as well as getting extended info on available and
+installed packages.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
