@@ -2050,6 +2050,7 @@ fetch_url (const char *url, FILE *outstream)
   HINTERNET hi = NULL, hurl = NULL;
   char buf[4096];
   DWORD numread;
+  int ret;
 
   /* Connect to the net and open the URL.  */
   if (InternetAttemptConnect (0) != ERROR_SUCCESS)
@@ -2064,34 +2065,49 @@ fetch_url (const char *url, FILE *outstream)
     return display_internet_error ("InternetOpen() failed", NULL);
 
   if (!(hurl = InternetOpenUrlA (hi, url, NULL, 0, 0, 0)))
-    return display_internet_error ("unable to contact cygwin.com site, "
-				   "InternetOpenUrl() failed", hi, NULL);
+    {
+      ret = display_internet_error ("unable to contact cygwin.com site, "
+				    "InternetOpenUrl() failed", hi, NULL);
+      goto out_open;
+    }
 
   /* Check the HTTP response code.  */
   if (!HttpQueryInfoA (hurl, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER,
 		      (void *) &rc, &rc_s, NULL))
-    return display_internet_error ("HttpQueryInfo() failed", hurl, hi, NULL);
-
-  /* Fetch result and print to outstream.  */
-  do
     {
-      if (!InternetReadFile (hurl, (void *) buf, sizeof (buf), &numread))
-	return display_internet_error ("InternetReadFile failed", hurl, hi, NULL);
-      if (numread)
-	fwrite ((void *) buf, (size_t) numread, 1, outstream);
+      ret = display_internet_error ("HttpQueryInfo() failed", hurl, hi, NULL);
+      goto out_open_url;
     }
-  while (numread);
 
   if (rc != HTTP_STATUS_OK)
     {
       sprintf (buf, "error retrieving results from cygwin.com site, "
 		    "HTTP status code %lu", rc);
-      return display_internet_error (buf, hurl, hi, NULL);
+      ret = display_internet_error (buf, hurl, hi, NULL);
+      goto out_open_url;
     }
 
+  /* Fetch result and print to outstream.  */
+  do
+    {
+      if (!InternetReadFile (hurl, (void *) buf, sizeof (buf), &numread))
+	{
+	  ret = display_internet_error ("InternetReadFile failed", hurl, hi,
+					NULL);
+	  goto out_open_url;
+	}
+      if (numread)
+	fwrite ((void *) buf, (size_t) numread, 1, outstream);
+    }
+  while (numread);
+
+  ret = 0;
+
+out_open_url:
   InternetCloseHandle (hurl);
+out_open:
   InternetCloseHandle (hi);
-  return 0;
+  return ret;
 }
 
 struct passwd {
