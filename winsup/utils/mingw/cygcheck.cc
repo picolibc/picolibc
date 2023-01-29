@@ -2126,12 +2126,12 @@ struct passwd {
 static FILE *
 maybe_download_setup_ini ()
 {
-  time_t t24h_before;
+  time_t t3h_before;
   char *path;
   struct stat st;
   FILE *fp;
 
-  t24h_before = time (NULL) - 24 * 60 * 60;
+  t3h_before = time (NULL) - 3 * 60 * 60;
   for (int i = 0; i < 2; ++i)
     {
       /* Check for the system-wide setup.ini file first.  If that's too
@@ -2150,10 +2150,10 @@ maybe_download_setup_ini ()
 	  cp = stpcpy (path, localappdata);
 	  stpcpy (cp, "\\.setup.ini");
 	}
-      /* If file exists, and has been downloaded less than 24h ago,
+      /* If file exists, and has been downloaded less than 3h ago,
          and if we can open it for reading, just use it. */
       if (stat (path, &st) == 0
-	  && st.st_mtime > t24h_before
+	  && st.st_mtime > t3h_before
 	  && (fp = fopen (path, "rt")) != NULL)
 	return fp;
       /* Otherwise, try to open it for writing and fetch from cygwin.com. */
