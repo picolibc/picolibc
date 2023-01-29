@@ -14,6 +14,7 @@
 #include <sys/stat.h>
 #include <ctype.h>
 #include <fcntl.h>
+#include <math.h>
 #include <io.h>
 #include <windows.h>
 #include <wininet.h>
@@ -2343,6 +2344,27 @@ error:
   return NULL;
 }
 
+static const char *
+human_readable (char *buf, size_t bytes)
+{
+  const char *siz[] = { "B", "K", "M", "G", NULL };
+  double db = bytes;
+  int idx = 0;
+  int prec;
+
+  while (bytes > 1023 && siz[idx + 1])
+    {
+      bytes >>= 10;
+      db /= 1024.0;
+      ++idx;
+    }
+  prec = log10 (db) + 1;
+  if (prec < 2)
+    prec = 2;
+  sprintf (buf, "%.*g %s", prec, db, siz[idx]);
+  return buf;
+}
+
 static void
 package_info_print (ini_package_info *pi, vers_info *vers)
 {
@@ -2364,7 +2386,9 @@ package_info_print (ini_package_info *pi, vers_info *vers)
   if (vers->install)
     {
       char *arch = strcpy (buf, vers->install);
-      char *size = NULL;
+      char *sizep;
+      size_t size = 0;
+
       char *cp;
 
       cp = strchr (arch, '/');
@@ -2374,10 +2398,13 @@ package_info_print (ini_package_info *pi, vers_info *vers)
 	  cp = strchr (cp, ' ');
 	  if (cp)
 	    {
-	      size = ++cp;
+	      sizep = ++cp;
 	      cp = strchr (cp, ' ');
 	      if (cp)
-		*cp = '\0';
+		{
+		  *cp = '\0';
+		  size = strtoull (sizep, NULL, 10);
+		}
 	    }
 	}
       if (cp)
@@ -2385,7 +2412,9 @@ package_info_print (ini_package_info *pi, vers_info *vers)
 	  printf ("Architecture: %s\n", arch);
 	  if (vers->install_date)
 	    printf ("Install Date: %s", ctime (&vers->install_date));
-	  printf ("Size        : %s\n", size); /* FIXME: human-readable */
+
+	  printf ("Size        : %llu (%s)\n", size,
+					       human_readable (buf, size));
 	}
     }
   if (vers->source)
