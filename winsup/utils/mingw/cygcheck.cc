@@ -20,6 +20,7 @@
 #include <shlwapi.h>
 #include "path.h"
 #include "wide_path.h"
+#include "cygcheck.h"
 #include <getopt.h>
 #include <cygwin/version.h>
 #define cygwin_internal cygwin_internal_dontuse
@@ -53,8 +54,14 @@ int find_package = 0;
 int list_package = 0;
 int grep_packages = 0;
 int info_packages = 0;
+int info_selector = 0;
 int search_packages = 0;
 int del_orphaned_reg = 0;
+
+#define INFO_INST	0x01
+#define INFO_CURR	0x02
+#define INFO_PREV	0x04
+#define INFO_TEST	0x08
 
 static char emptystr[] = "";
 
@@ -2097,11 +2104,6 @@ struct passwd {
   char    *pw_shell;   /* default shell */
 };
 
-struct sidbuf {
-  PSID psid;
-  int buffer[10];
-};
-
 /* Downloads setup.ini from cygwin.com, if it hasn't been downloaded
    already or is older than 24h. */
 static FILE *
@@ -2111,8 +2113,6 @@ maybe_download_setup_ini ()
   char *path;
   struct stat st;
   FILE *fp;
-  struct passwd *pw;
-  sidbuf curr_user;
 
   t24h_before = time (NULL) - 24 * 60 * 60;
   for (int i = 0; i < 2; ++i)
@@ -2123,22 +2123,15 @@ maybe_download_setup_ini ()
 	path = cygpath ("/etc/setup/setup.ini", NULL);
       else
 	{
-	  BOOL ret;
-	  DWORD len;
-	  HANDLE ptok;
+	  char *localappdata = getenv ("LOCALAPPDATA");
+	  char *cp;
 
-	  if (!OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &ptok))
+	  if (!localappdata)
 	    return NULL;
-	  ret = GetTokenInformation (ptok, TokenUser, &curr_user,
-				     sizeof curr_user, &len);
-	  CloseHandle (ptok);
-	  if (!ret)
-	    return NULL;
-	  pw = (struct passwd *) cygwin_internal (CW_GETPWSID, FALSE,
-						  curr_user.psid);
-	  if (!pw)
-	    return NULL;
-	  path = cygpath (pw->pw_dir, "/.setup.ini", NULL);
+	  path = (char *) malloc (strlen (localappdata)
+				  + strlen ("\\.setup.ini") + 1);
+	  cp = stpcpy (path, localappdata);
+	  stpcpy (cp, "\\.setup.ini");
 	}
       /* If file exists, and has been downloaded less than 24h ago,
          and if we can open it for reading, just use it. */
@@ -2149,11 +2142,12 @@ maybe_download_setup_ini ()
       /* Otherwise, try to open it for writing and fetch from cygwin.com. */
       if ((fp = fopen (path, "w+")) != NULL)
 	{
-	  fputs ("Fetching setup.ini from cygwin.com...\n", stderr);
+	  fprintf (stderr, "Fetching %s from cygwin.com...\n", path);
 	  if (!fetch_url ("https://cygwin.com/ftp/cygwin/x86_64/setup.ini", fp))
 	    {
 	      fclose (fp);
 	      fp = fopen (path, "rt");
+	      fputs ("\n", stderr);
 	      return fp;
 	    }
 	  fclose (fp);
@@ -2168,6 +2162,9 @@ struct vers_info
   char *install;
   char *source;
   char *depends2;
+  time_t install_date;
+  bool matches;
+  bool installed;
 };
 
 struct ini_package_info
@@ -2351,7 +2348,7 @@ package_info_print (ini_package_info *pi, vers_info *vers)
 {
   char buf[4096];
 
-  printf ("Name         : %s\n", pi->name);
+  printf ("Name        : %s\n", pi->name);
   if (vers->version)
     {
       char *version = strcpy (buf, vers->version);
@@ -2360,9 +2357,9 @@ package_info_print (ini_package_info *pi, vers_info *vers)
       release = strrchr (version, '-');
       if (release)
 	*release++ = '\0';
-      printf ("Version      : %s\n", version);
+      printf ("Version     : %s\n", version);
       if (release)
-	printf ("Release      : %s\n", release);
+	printf ("Release     : %s\n", release);
     }
   if (vers->install)
     {
@@ -2385,8 +2382,10 @@ package_info_print (ini_package_info *pi, vers_info *vers)
 	}
       if (cp)
 	{
-	  printf ("Architecture : %s\n", arch);
-	  printf ("Size         : %s\n", size); /* FIXME: human-readable */
+	  printf ("Architecture: %s\n", arch);
+	  if (vers->install_date)
+	    printf ("Install Date: %s", ctime (&vers->install_date));
+	  printf ("Size        : %s\n", size); /* FIXME: human-readable */
 	}
     }
   if (vers->source)
@@ -2398,103 +2397,235 @@ package_info_print (ini_package_info *pi, vers_info *vers)
 	  *cp = '\0';
 	  cp = strrchr (source, '/');
 	  if (cp)
-	    printf ("Source       : %s\n", cp + 1);
+	    printf ("Source      : %s\n", cp + 1);
 	}
     }
   if (pi->sdesc)
-    printf ("Summary      : %s\n", pi->sdesc);
+    printf ("Summary     : %s\n", pi->sdesc);
   if (pi->url)
-    printf ("Url          : %s\n", pi->url);
+    printf ("Url         : %s\n", pi->url);
   if (pi->license)
-    printf ("License      : %s\n", pi->license);
+    printf ("License     : %s\n", pi->license);
   if (pi->ldesc)
-    {
-      char *ldesc = strcpy (buf, pi->ldesc);
-
-      while (ldesc)
-	{
-	  char *nl = strchr (ldesc, '\n');
-	  if (nl)
-	    *nl = '\0';
-	  printf ("%s : %s\n", ldesc == buf ? "Description " : "            ",
-			       ldesc);
-	  ldesc = nl ? nl + 1 : NULL;
-	}
-    }
+    printf ("Description :\n%s\n", pi->ldesc);
   puts ("");
+}
+
+static void
+package_info_check (ini_package_info *pi, vers_info *vi, pkgver *pv,
+		    bool &am, bool &ai)
+{
+  vi->matches = true;
+  if (pv && !strcmp (vi->version, pv->ver))
+    vi->installed = true;
+  am |= vi->matches;
+  ai |= vi->installed;
+}
+
+static inline bool
+check_name_version (char *pkg_name, char *pkg_version, char *search)
+{
+  char nv_buf[4096];
+  char *nvp, *cp;
+
+  nvp = stpcpy (nv_buf, pkg_name);
+  *nvp++ = '-';
+  stpcpy (nvp, pkg_version);
+  if (PathMatchSpecA (nv_buf, search))
+    return true;
+  if ((cp = strrchr (nvp, '-'))) /* try w/o release */
+    {
+      *cp = '\0';
+      if (PathMatchSpecA (nv_buf, search))
+	return true;
+    }
+  return false;
+}
+
+static void
+package_info_vers_check (ini_package_info *pi, vers_info *vi, char *search,
+			 pkgver *pv, bool &am, bool &ai)
+{
+  vi->matches = check_name_version (pi->name, vi->version, search);
+  if (pv && !strcmp (vi->version, pv->ver))
+    vi->installed = true;
+  am |= vi->matches;
+  ai |= vi->installed;
+}
+
+int
+pkg_comp (const void *a, const void *b)
+{
+  pkgver *pa = (pkgver *) a;
+  pkgver *pb = (pkgver *) b;
+
+  return strcmp (pa->name, pb->name);
 }
 
 /* Print full info for the package matching the search string in terms of
    name/version. */
 static int
-package_info (char **search)
+package_info (char **search, int selector)
 {
   FILE *fp = maybe_download_setup_ini ();
   ini_package_info pi_buf, *pi;
+  size_t inst_pkg_count;
+  pkgver *inst_pkgs;
 
   if (!fp)
     return 1;
+
+  if (selector == 0)
+    selector = INFO_CURR | INFO_PREV | INFO_TEST | INFO_INST;
+
+  inst_pkgs = get_installed_packages (NULL, &inst_pkg_count);
 
   while (search && *search)
     {
       rewind (fp);
       while ((pi = collect_pkg_info (fp, &pi_buf)))
 	{
+	  pkgver pv = { pi->name, NULL }, *inst_pkg = NULL;
+	  bool avail_installed = false;
+	  bool avail_matches = false;
+	  bool inst_matches = false;
+
+	  if (selector & INFO_INST)
+	    {
+	      inst_pkg = (pkgver *) bsearch (&pv, inst_pkgs, inst_pkg_count,
+					     sizeof *inst_pkgs, pkg_comp);
+	      if (inst_pkg)
+		{
+		  if (PathMatchSpecA (inst_pkg->name, *search))
+		    inst_matches = true;
+		  else
+		    inst_matches = check_name_version (inst_pkg->name,
+						       inst_pkg->ver,
+						       *search);
+		}
+	    }
+
 	  /* Name matches?  Print all versions */
 	  if (PathMatchSpecA (pi->name, *search))
 	    {
 	      if (pi->curr.version)
-		package_info_print (pi, &pi->curr);
+		package_info_check (pi, &pi->curr, inst_pkg,
+				    avail_matches, avail_installed);
 	      for (size_t i = 0; i < pi->prev_count; ++i)
-		package_info_print (pi, pi->prev + i);
+		package_info_check (pi, pi->prev + i, inst_pkg,
+				    avail_matches, avail_installed);
 	      for (size_t i = 0; i < pi->test_count; ++i)
-		package_info_print (pi, pi->test + i);
+		package_info_check (pi, pi->test + i, inst_pkg,
+				    avail_matches, avail_installed);
 	    }
 	  else
 	    {
 	      /* Check if search matches name-version string */
-	      char nv_buf[4096], *nvp, *cp;
-
-	      nvp = stpcpy (nv_buf, pi->name);
-	      *nvp++ = '-';
-
 	      if (pi->curr.version)
-		{
-		  stpcpy (nvp, pi->curr.version);
-		  if (PathMatchSpecA (nv_buf, *search))
-		    package_info_print (pi, &pi->curr);
-		  else if ((cp = strrchr (nvp, '-'))) /* try w/o release */
-		    {
-		      *cp = '\0';
-		      if (PathMatchSpecA (nv_buf, *search))
-			package_info_print (pi, &pi->curr);
-		    }
-		}
+		package_info_vers_check (pi, &pi->curr, *search, inst_pkg,
+					 avail_matches, avail_installed);
 	      for (size_t i = 0; i < pi->prev_count; ++i)
-		{
-		  stpcpy (nvp, pi->prev[i].version);
-		  if (PathMatchSpecA (nv_buf, *search))
-		    package_info_print (pi, pi->prev + i);
-		  else if ((cp = strrchr (nvp, '-'))) /* try w/o release */
-		    {
-		      *cp = '\0';
-		      if (PathMatchSpecA (nv_buf, *search))
-			package_info_print (pi, pi->prev + i);
-		    }
-		}
+		package_info_vers_check (pi, pi->prev + i, *search, inst_pkg,
+					 avail_matches, avail_installed);
 	      for (size_t i = 0; i < pi->test_count; ++i)
+		package_info_vers_check (pi, pi->test + i, *search, inst_pkg,
+					 avail_matches, avail_installed);
+	    }
+
+	  /* First print installed package(s) */
+	  if (inst_pkg && inst_matches)
+	    {
+	      time_t install_ts = 0;
+	      struct stat st;
+	      char *path;
+
+	      printf ("Installed package:\n"
+	              "------------------\n\n");
+	      /* fetch timestamp of last install. */
+
+	      path = cygpath ("/etc/setup/", inst_pkg->name, ".lst.gz", NULL);
+	      if (path)
 		{
-		  stpcpy (nvp, pi->test[i].version);
-		  if (PathMatchSpecA (nv_buf, *search))
-		    package_info_print (pi, pi->test + i);
-		  else if ((cp = strrchr (nvp, '-'))) /* try w/o release */
+		  if (stat (path, &st) == 0)
+		    install_ts = st.st_mtime;
+		  free (path);
+		}
+
+	      /* Fake min info if installed package is not available anymore */
+	      if (!avail_installed)
+		{
+		  ini_package_info inst_pi = { 0 };
+
+		  inst_pi.name = inst_pkg->name;
+		  inst_pi.sdesc = pi->sdesc;
+		  inst_pi.ldesc = pi->ldesc;
+		  inst_pi.url = pi->url;
+		  inst_pi.license = pi->license;
+		  inst_pi.curr.version = inst_pkg->ver;
+		  inst_pi.curr.install_date = install_ts;
+		  package_info_print (&inst_pi, &pi->curr);
+		}
+	      else
+		{
+		  if (pi->curr.installed)
 		    {
-		      *cp = '\0';
-		      if (PathMatchSpecA (nv_buf, *search))
-			package_info_print (pi, pi->test + i);
+		      pi->curr.install_date = install_ts;
+		      package_info_print (pi, &pi->curr);
 		    }
+		  for (size_t i = 0; i < pi->prev_count; ++i)
+		    if (pi->prev[i].installed)
+		      {
+			pi->prev[i].install_date = install_ts;
+			package_info_print (pi, pi->prev + i);
+		      }
+		  for (size_t i = 0; i < pi->test_count; ++i)
+		    if (pi->test[i].installed)
+		      {
+			pi->test[i].install_date = install_ts;
+			package_info_print (pi, pi->test + i);
+		      }
 		}
 	    }
+
+	  /* Next print available, matching packages */
+	  if (avail_matches)
+	    {
+	      if ((selector & INFO_CURR) && pi->curr.matches)
+		{
+		  puts ("Latest available package:\n"
+			"-------------------------\n");
+		  package_info_print (pi, &pi->curr);
+		}
+	      if (selector & INFO_PREV)
+		{
+		  uint32_t header_printed = 0;
+
+		  for (size_t i = 0; i < pi->prev_count; ++i)
+		    if (pi->prev[i].matches)
+		      {
+			printf ("%s", header_printed++
+				      ? ""
+				      : "Older available packages:\n"
+					"-------------------------\n\n");
+			package_info_print (pi, pi->prev + i);
+		      }
+		}
+	      if (selector & INFO_TEST)
+		{
+		  uint32_t header_printed = 0;
+
+		  for (size_t i = 0; i < pi->test_count; ++i)
+		    if (pi->test[i].matches)
+		      {
+			printf ("%s", header_printed++
+				      ? ""
+				      : "Available test packages:\n"
+					"------------------------\n\n");
+			package_info_print (pi, pi->test + i);
+		      }
+		}
+	    }
+
 	  free_pkg_info (&pi_buf);
 	}
       ++search;
@@ -2578,7 +2709,7 @@ Usage: cygcheck [-v] [-h] PROGRAM\n\
        cygcheck -k\n\
        cygcheck -f FILE [FILE]...\n\
        cygcheck -l [PACKAGE]...\n\
-       cygcheck -i [PATTERN]...\n\
+       cygcheck -i [--inst,--curr,--prev,--test] [PATTERN]...\n\
        cygcheck -e [PATTERN]...\n\
        cygcheck -p REGEXP\n\
        cygcheck --delete-orphaned-installation-keys\n\
@@ -2595,12 +2726,19 @@ At least one command option or a PROGRAM is required, as shown above.\n\
   -r, --registry       also scan registry for Cygwin settings (with -s)\n\
   -k, --keycheck       perform a keyboard check session (must be run from a\n\
 		       plain console only, not from a pty/rxvt/xterm)\n\
+  -e, --search-package list all available packages matching PATTERN\n\
+                       PATTERN is a glob pattern with * and ? as wildcard chars\n\
+  -i, --info-package   print full info on packages matching PATTERN, installed\n\
+                       and available packages\n\
+                       PATTERN is a glob pattern with * and ? as wildcard chars\n\
+    info selection specifiers (multiple allowed):\n\
+      --inst           only print info on installed package\n\
+      --curr           only print info on most recent available package\n\
+      --prev           only print info on older, but still  available packages\n\
+      --test           only print info on test packages\n\
   -f, --find-package   find the installed package to which FILE belongs\n\
   -l, --list-package   list contents of the installed PACKAGE (or all\n\
                        installed packages if none given)\n\
-  -i, --info-package   print full info on packages matching PATTERN, installed\n\
-                       and available packages\n\
-  -e, --search-package list all available packages matching PATTERN\n\
   -p, --package-query  search for REGEXP in the entire cygwin.com package\n\
 		       repository (requires internet connectivity)\n\
   --delete-orphaned-installation-keys\n\
@@ -2612,7 +2750,8 @@ At least one command option or a PROGRAM is required, as shown above.\n\
 		       with another command, otherwise print this help\n\
   -V, --version        print the version of cygcheck and exit\n\
 \n\
-Note: -c, -f, and -l only report on packages that are currently installed. To\n\
+Notes:\n\
+  -c, -f, and -l only report on packages that are currently installed. To\n\
   search all official Cygwin packages use -p instead.  The -p REGEXP matches\n\
   package names, descriptions, and names of files/paths within all packages.\n\
 \n");
@@ -2629,6 +2768,10 @@ struct option longopts[] = {
   {"find-package", no_argument, NULL, 'f'},
   {"list-package", no_argument, NULL, 'l'},
   {"info-packages", no_argument, NULL, 'i'},
+  {"inst", no_argument, NULL, 0x1001},
+  {"curr", no_argument, NULL, 0x1002},
+  {"prev", no_argument, NULL, 0x1004},
+  {"test", no_argument, NULL, 0x1008},
   {"search-packages", no_argument, NULL, 'e'},
   {"package-query", no_argument, NULL, 'p'},
   {"delete-orphaned-installation-keys", no_argument, NULL, CO_DELETE_KEYS},
@@ -2763,6 +2906,12 @@ main (int argc, char **argv)
       case 'i':
 	info_packages = 1;
 	break;
+      case 0x1001:
+      case 0x1002:
+      case 0x1004:
+      case 0x1008:
+	info_selector |= (i & 0xf);
+	break;
       case 'e':
 	search_packages = 1;
 	break;
@@ -2821,7 +2970,7 @@ main (int argc, char **argv)
   if (grep_packages)
     return package_grep (*argv);
   if (info_packages)
-    return package_info (argv);
+    return package_info (argv, info_selector);
   if (search_packages)
     return package_search (argv);
 

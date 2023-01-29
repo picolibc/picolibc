@@ -21,6 +21,7 @@ details. */
 #include <winternl.h>
 #include <ntstatus.h>
 #include "path.h"
+#include "cygcheck.h"
 #include <zlib.h>
 
 static int package_len = 20;
@@ -150,12 +151,6 @@ dump_file (const char *msg, const char *fn)
     }
   return printed;
 }
-
-struct pkgver
-{
-  char *name;
-  char *ver;
-};
 
 extern "C" {
 int
@@ -403,8 +398,8 @@ check_package_files (int verbose, char *package)
  * Returns a calloc'd sorted list of packages or NULL if no info.
  * The last entry in the list is {NULL,NULL}.
  */
-static pkgver *
-get_packages (char **argv)
+pkgver *
+get_installed_packages (char **argv, size_t *count)
 {
   char *setup = cygpath ("/etc/setup/installed.db", NULL);
   FILE *fp = fopen (setup, "rt");
@@ -464,13 +459,16 @@ get_packages (char **argv)
 
   fclose (fp);
 
+  if (count)
+    *count = n;
+
   return packages;
 }
 
 void
 dump_setup (int verbose, char **argv, bool check_files)
 {
-  pkgver *packages = get_packages(argv);
+  pkgver *packages = get_installed_packages (argv);
 
   puts ("Cygwin Package Information");
   if (packages == NULL)
@@ -509,7 +507,7 @@ dump_setup (int verbose, char **argv, bool check_files)
 void
 package_list (int verbose, char **argv)
 {
-  pkgver *packages = get_packages(argv);
+  pkgver *packages = get_installed_packages (argv);
   if (packages == NULL)
     {
       puts ("No setup information found");
@@ -549,7 +547,7 @@ package_list (int verbose, char **argv)
 void
 package_find (int verbose, char **argv)
 {
-  pkgver *packages = get_packages(NULL);
+  pkgver *packages = get_installed_packages (NULL);
   if (packages == NULL)
     {
       puts ("No setup information found");
