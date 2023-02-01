@@ -118,6 +118,11 @@ AC_ARG_ENABLE([dumper],
 
 AM_CONDITIONAL(BUILD_DUMPER, [test "x$build_dumper" = "xyes"])
 
+AC_CHECK_LIB([sframe], [sframe_decode],
+	     AC_MSG_NOTICE([Detected libsframe; Assuming that libbfd depends on it]), [true])
+
+AM_CONDITIONAL(HAVE_LIBSFRAME, [test "x$ac_cv_lib_sframe_sframe_decode" = "xyes"])
+
 AC_CONFIG_FILES([
     Makefile
     cygwin/Makefile

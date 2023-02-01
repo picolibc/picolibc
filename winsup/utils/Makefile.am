@@ -89,6 +89,10 @@ profiler_LDADD = $(LDADD) -lntdll
 cygps_LDADD = $(LDADD) -lpsapi -lntdll
 newgrp_LDADD = $(LDADD) -luserenv
 
+if HAVE_LIBSFRAME
+dumper_LDADD += -lsframe
+endif
+
 if CROSS_BOOTSTRAP
 SUBDIRS = mingw
 endif
