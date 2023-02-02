@@ -215,7 +215,7 @@ picolibc_flag(_HAVE_LONG_DOUBLE)
 picolibc_flag(_HAVE_NO_BUILTIN_ATTRIBUTE)
 
 # _set_tls and _init_tls functions available
-if(NOT DEFINED _HAVE_PICOLIBC_TLS_API)
+if(NOT DEFINED _HAVE_PICOLIBC_TLS_API OR NOT PICOLIBC_TLS)
   set(_HAVE_PICOLIBC_TLS_API 0)
 endif()
 
@@ -438,7 +438,9 @@ configure_file(picolibc.h.in "${PICOLIBC_INCLUDE}/picolibc.h")
 
 set(INCLUDEDIR include)
 set(LIBDIR .)
-set(TLSMODEL "-ftls-model=${TLS_MODEL}")
+if(PICOLIBC_TLS)
+  set(TLSMODEL "-ftls-model=${TLS_MODEL}")
+endif()
 set(LINK_SPEC "")
 set(CC1_SPEC "")
 set(CC1PLUS_SPEC "")
