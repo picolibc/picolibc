@@ -64,6 +64,28 @@
 
 	.syntax unified
 
+/*  GCC 12.1 and later will tell the assembler exactly which floating
+    point (or MVE) unit is required and we don't want to override
+    that.  Conversely, older versions of the compiler don't pass this
+    information so we need to enable the VFP version that is most
+    appropriate.  The choice here should support all suitable VFP
+    versions that the older toolchains can handle.  */
+#if __GNUC__ && __GNUC__ < 12
+/*  Ensure that FPU instructions are correctly compiled and, likewise,
+    the appropriate build attributes are added to the resulting object
+    file.  Check whether the MVE extension is present and whether
+    we have support for hardware floating point-operations.  VFPxd
+    covers all the cases we need in this file for hardware
+    floating-point and should be compatible with all required FPUs
+    that we need to support.  */
+# if __ARM_FP
+	.fpu vfpxd
+# endif
+# if __ARM_FEATURE_MVE
+	.arch_extension mve
+# endif
+#endif
+
 #if __ARM_ARCH_ISA_THUMB == 1 && !__ARM_ARCH_ISA_ARM
 /* ARMv6-M-like has to be implemented in Thumb mode.  */
 
