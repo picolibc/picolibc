@@ -262,6 +262,12 @@
 #define	__alignof(x)	__offsetof(struct { char __a; x __b; }, __b)
 #endif
 
+#if __GNUC_PREREQ__(4,5) || defined(__clang__)
+#define __deprecated(m) __attribute__((__deprecated__(m)))
+#else
+#define __deprecated(m) _ATTRIBUTE(__deprecated__)
+#endif
+
 /*
  * Keywords added in C11.
  */
