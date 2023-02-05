@@ -516,10 +516,12 @@ if tinystdio and printf_aliases
 		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfscanf=__i_vfscanf}')
 endif
 
+crt0_expr = '%{-crt0=*:crt0-%*%O%s; :crt0%O%s}'
+
 if system_libc
   specs_isystem = ''
   specs_libpath = ''
-  specs_startfile = 'crt0%O%s'
+  specs_startfile = crt0_expr
 else
 
 #
@@ -587,7 +589,6 @@ specs_libpath = '-L' + specs_option_format.format(lib_prefix, lib_buildtype, lib
 #
 # Build the non-multilib *startfile options
 #
-crt0_expr = 'crt0%{-crt0=*:-%*%O;:%O}%s'
 
 prefix_crt0_path = '%*/@0@'.format(get_option('libdir')) / crt0_expr
 crt0_prefix = picolibc_prefix_format.format(prefix_crt0_path)
