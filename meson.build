@@ -684,12 +684,6 @@ picolibcpp_specs = configure_file(input: 'picolibc.specs.in',
 				  install_dir: specs_dir,
 				  install: specs_install)
 
-
-test_specs = configure_file(input: 'test.specs.in',
-			    output: '@BASENAME@',
-			    configuration: specs_data,
-			    install: false)
-
 picolibc_linker_type_data = configuration_data()
 if cc.get_linker_id() == 'ld.lld'
     # ld.lld does not implement ALIGN_WITH_INPUT, but this flag is not needed
@@ -710,6 +704,26 @@ if cc.get_linker_id() == 'ld.lld'
 else
     picolibc_linker_type_data.set('LDSCRIPT_ALIGN_WITH_INPUT', 'ALIGN_WITH_INPUT')
 endif
+
+picolibc_linker_type_data.set('DEFAULT_FLASH_ADDR',
+			      meson.get_cross_property('default_flash_addr',
+						       '0x10000000'))
+
+picolibc_linker_type_data.set('DEFAULT_FLASH_SIZE',
+			      meson.get_cross_property('default_flash_size',
+						       '0x00010000'))
+
+picolibc_linker_type_data.set('DEFAULT_RAM_ADDR',
+			      meson.get_cross_property('default_ram_addr',
+						       '0x20000000'))
+
+picolibc_linker_type_data.set('DEFAULT_RAM_SIZE',
+			      meson.get_cross_property('default_ram_size',
+						       '0x00008000'))
+
+picolibc_linker_type_data.set('DEFAULT_STACK_SIZE',
+			      meson.get_cross_property('default_stack_size',
+						       '0x00001000'))
 
 picolibc_ld_data = configuration_data()
 picolibc_ld_data.merge_from(picolibc_linker_type_data)
@@ -1259,28 +1273,17 @@ if cc.get_id() == 'ccomp'
 endif
 
 if has_semihost
-  # If we're using semihosting, we assume that there's a custom linker
-  # script that includes picolibc.specs.  Linker args must be strings
-  # (seems like a bug), so compute the path by hand.  Because at the
-  # linker's runtime, its working directory is the build dir, linker
-  # scripts under scripts/ can't be found. We use the absolute path
-  # for our convinience.
-  cpu_script = 'scripts' / 'test-' + host_machine.cpu() + '.ld'
-  cpu_family_script = 'scripts' / 'test-' + host_cpu_family + '.ld'
-  if fs.is_file(cpu_script)
-    custom_script = cpu_script
-  else
-    custom_script = cpu_family_script
-  endif
-  test_link_args = ['-nostartfiles',
-                    '-T', meson.current_source_dir() / custom_script,
-                    '-T', '@0@'.format(picolibc_ld), '-lgcc'] + additional_libs_list
-  test_linker_files = files(custom_script) + [picolibc_ld]
+  test_link_args = ['-nostartfiles', '-T', '@0@'.format(picolibc_ld),
+		    '-lgcc'] + additional_libs_list
+  test_linker_files = [picolibc_ld]
   specs = picolibc_specs
 else
+  specs = configure_file(input: 'test.specs.in',
+			 output: '@BASENAME@',
+			 configuration: specs_data,
+			 install: false)
   test_link_args = []
   test_linker_files = []
-  specs = test_specs
 endif
 
 # Clang does not support spec files

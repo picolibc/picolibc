@@ -15,3 +15,7 @@ endian = 'big'
 [properties]
 link_spec = '--build-id=none'
 skip_sanity_check = true
+default_flash_addr = '0x00000000'
+default_flash_size = '0x00400000'
+default_ram_addr   = '0x00400000'
+default_ram_size   = '0x00200000'
