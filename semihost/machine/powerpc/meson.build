@@ -33,54 +33,58 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-lib_semihost_srcs = [
-  'opal_call.S',
-  'opal_console_write.c',
-  'opal_cec_power_down.c',
-  'powerpc_exit.c',
-  'powerpc_kill.c',
-  'powerpc_stub.c',
+if cc.get_define('_CALL_ELF') == '1'
+
+  lib_semihost_srcs = [
+    'opal_call.S',
+    'opal_console_write.c',
+    'opal_cec_power_down.c',
+    'powerpc_exit.c',
+    'powerpc_kill.c',
+    'powerpc_stub.c',
   ]
 
-if tinystdio
-  lib_semihost_srcs += 'powerpc_io.c'
-endif
-
-has_semihost = true
-
-foreach target : targets
-  value = get_variable('target_' + target)
-
-  instdir = join_paths(lib_dir, value[0])
-
-  test_flags = []
-  skipping = false
-  foreach tf : value[1]
-    if skipping
-      skipping = false
-    elif tf == '-include'
-      skipping = true
-    else
-      test_flags += tf
-    endif
-  endforeach
-
-  if cc.get_define('__PPC64__', args : test_flags) != ''
-    if target == ''
-      libsemihost_name = 'semihost'
-    else
-      libsemihost_name = join_paths(target, 'libsemihost')
-    endif
-
-    local_lib_semihost_target = static_library(libsemihost_name,
-					       lib_semihost_srcs,
-					       install : true,
-					       install_dir : instdir,
-					       include_directories : inc,
-					       c_args : value[1],
-					       pic: false)
-
-    set_variable('lib_semihost' + target, local_lib_semihost_target)
+  if tinystdio
+    lib_semihost_srcs += 'powerpc_io.c'
   endif
 
-endforeach
+  has_semihost = true
+
+  foreach target : targets
+    value = get_variable('target_' + target)
+
+    instdir = join_paths(lib_dir, value[0])
+
+    test_flags = []
+    skipping = false
+    foreach tf : value[1]
+      if skipping
+	skipping = false
+      elif tf == '-include'
+	skipping = true
+      else
+	test_flags += tf
+      endif
+    endforeach
+
+    if cc.get_define('__PPC64__', args : test_flags) != ''
+      if target == ''
+	libsemihost_name = 'semihost'
+      else
+	libsemihost_name = join_paths(target, 'libsemihost')
+      endif
+
+      local_lib_semihost_target = static_library(libsemihost_name,
+						 lib_semihost_srcs,
+						 install : true,
+						 install_dir : instdir,
+						 include_directories : inc,
+						 c_args : value[1],
+						 pic: false)
+
+      set_variable('lib_semihost' + target, local_lib_semihost_target)
+    endif
+
+  endforeach
+
+endif
