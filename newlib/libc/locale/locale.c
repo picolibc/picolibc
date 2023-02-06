@@ -289,7 +289,8 @@ struct __locale_t __global_locale =
 /* Renamed from current_locale_string to make clear this is only the
    *global* string for setlocale (LC_ALL, NULL).  There's no equivalent
    functionality for uselocale. */
-static char global_locale_string[_LC_LAST * (ENCODING_LEN + 1/*"/"*/ + 1)];
+static char global_locale_string[_LC_LAST * (ENCODING_LEN + 1/*"/"*/ + 1)]
+	    = "C";
 static char *currentlocale (void);
 
 #endif /* _MB_CAPABLE */
@@ -312,6 +313,7 @@ _setlocale_r (struct _reent *p,
   static char saved_categories[_LC_LAST][ENCODING_LEN + 1];
   int i, j, len, saverr;
   const char *env, *r;
+  char *ret;
 
   if (category < LC_ALL || category >= _LC_LAST)
     {
@@ -321,7 +323,7 @@ _setlocale_r (struct _reent *p,
 
   if (locale == NULL)
     return category != LC_ALL ? __get_global_locale ()->categories[category]
-			      : currentlocale();
+			      : global_locale_string;
 
   /*
    * Default to the current locale for everything.
@@ -415,8 +417,12 @@ _setlocale_r (struct _reent *p,
     }
 
   if (category != LC_ALL)
-    return __loadlocale (__get_global_locale (), category,
-			 new_categories[category]);
+    {
+      ret = __loadlocale (__get_global_locale (), category,
+			  new_categories[category]);
+      currentlocale ();
+      return ret;
+    }
 
   for (i = 1; i < _LC_LAST; ++i)
     {
