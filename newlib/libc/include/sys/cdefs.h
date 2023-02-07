@@ -620,37 +620,6 @@
 #endif
 #endif
 
-#if defined(__ELF__)
-#ifdef __STDC__
-#define	__warn_references(sym,msg)	\
-	__asm__(".section .gnu.warning." #sym);	\
-	__asm__(".asciz \"" msg "\"");	\
-	__asm__(".previous")
-#define	__sym_compat(sym,impl,verid)	\
-	__asm__(".symver " #impl ", " #sym "@" #verid)
-#define	__sym_default(sym,impl,verid)	\
-	__asm__(".symver " #impl ", " #sym "@@" #verid)
-#else
-#define	__warn_references(sym,msg)	\
-	__asm__(".section .gnu.warning.sym"); \
-	__asm__(".asciz \"msg\"");	\
-	__asm__(".previous")
-#define	__sym_compat(sym,impl,verid)	\
-	__asm__(".symver impl, sym@verid")
-#define	__sym_default(impl,sym,verid)	\
-	__asm__(".symver impl, sym@@verid")
-#endif	/* __STDC__ */
-#else	/* !__ELF__ */
-#ifdef __STDC__
-#define	__warn_references(sym,msg)	\
-	__asm__(".stabs \"" msg "\",30,0,0,0");		\
-	__asm__(".stabs \"_" #sym "\",1,0,0,0")
-#else
-#define	__warn_references(sym,msg)	\
-	__asm__(".stabs msg,30,0,0,0");			\
-	__asm__(".stabs \"_/**/sym\",1,0,0,0")
-#endif	/* __STDC__ */
-#endif	/* __ELF__ */
 #endif	/* __GNUC__ */
 
 #ifndef	__FBSDID
