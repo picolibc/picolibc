@@ -542,6 +542,11 @@
     extern __typeof (sym) aliassym __attribute__ ((__alias__ (__STRING(sym))))
 #endif
 
+#if defined(_HAVE_WEAK_ATTRIBUTE) && defined(_HAVE_ALIAS_ATTRIBUTE)
+#define	__weak_reference(sym,aliassym)	\
+    extern __typeof (sym) aliassym __attribute__ ((__weak__, __alias__ (__STRING(sym))))
+#endif
+
 /*
    Taken from glibc:
    Add the compiler optimization to inhibit loop transformation to library
@@ -569,6 +574,7 @@
 #define __inhibit_new_builtin_calls
 #endif
 
+#ifndef __weak_reference
 #ifdef __ELF__
 #ifdef __STDC__
 #define	__weak_reference(sym,alias)	\
@@ -610,6 +616,7 @@
 #define	__weak_reference(sym,alias)	\
 	__asm__(".stabs \"_/**/alias\",11,0,0,0");	\
 	__asm__(".stabs \"_/**/sym\",1,0,0,0")
+#endif
 #endif
 #endif
 
