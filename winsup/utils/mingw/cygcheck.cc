@@ -2237,6 +2237,7 @@ struct vers_info
   char *install;
   char *source;
   char *depends2;
+  char *build_depends;
   time_t install_date;
   bool matches;
   bool installed;
@@ -2270,6 +2271,7 @@ free_pkg_info (ini_package_info *pi)
   free (pi->curr.install);
   free (pi->curr.source);
   free (pi->curr.depends2);
+  free (pi->curr.build_depends);
   if (pi->prev)
     {
       for (size_t i = 0; i < pi->prev_count; ++i)
@@ -2278,6 +2280,7 @@ free_pkg_info (ini_package_info *pi)
 	  free (pi->prev[i].install);
 	  free (pi->prev[i].source);
 	  free (pi->prev[i].depends2);
+	  free (pi->prev[i].build_depends);
 	}
       free (pi->prev);
     }
@@ -2289,6 +2292,7 @@ free_pkg_info (ini_package_info *pi)
 	  free (pi->test[i].install);
 	  free (pi->test[i].source);
 	  free (pi->test[i].depends2);
+	  free (pi->test[i].build_depends);
 	}
       free (pi->test);
     }
@@ -2410,6 +2414,8 @@ collect_pkg_info (FILE *fp, ini_package_info *pi)
 	    vinfo->source = strdup (buf + strlen ("source: "));
 	  else if (!strncmp (buf, "depends2: ", strlen ("depends2: ")))
 	    vinfo->depends2 = strdup (buf + strlen ("depends2: "));
+	  else if (!strncmp (buf, "build-depends: ", strlen ("build-depends: ")))
+	    vinfo->build_depends = strdup (buf + strlen ("build-depends: "));
 	}
     }
   return pi;
@@ -2503,6 +2509,12 @@ package_info_print (ini_package_info *pi, vers_info *vers)
 	    printf ("Source      : %s\n", cp + 1);
 	}
     }
+#if 0 /* FIXME: needs CLI options */
+  if (vers->depends2)
+    printf ("Dependencies: %s\n", vers->depends2);
+  if (vers->build_depends)
+    printf ("Build Deps  : %s\n", vers->build_depends);
+#endif
   if (pi->sdesc)
     printf ("Summary     : %s\n", pi->sdesc);
   if (pi->url)
