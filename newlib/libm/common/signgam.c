@@ -35,10 +35,9 @@
 
 #include <math.h>
 
-#if defined(_HAVE_ALIAS_ATTRIBUTE) && defined(_HAVE_WEAK_ATTRIBUTE)
+#ifdef __weak_reference
 int __signgam;
-
-extern __typeof(__signgam) signgam __attribute__ ((__weak__, __alias__ ("__signgam")));
+__weak_reference(__signgam, signgam);
 #else
 int signgam;
 #endif

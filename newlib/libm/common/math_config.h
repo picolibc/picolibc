@@ -1144,7 +1144,7 @@ __math_lgamma_r (__float64 y, int *signgamp, int *divzero);
 HIDDEN float
 __math_lgammaf_r (float y, int *signgamp, int *divzero);
 
-#if defined(_HAVE_ALIAS_ATTRIBUTE) && defined(_HAVE_WEAK_ATTRIBUTE)
+#ifdef __weak_reference
 extern int __signgam;
 #else
 #define __signgam signgam
