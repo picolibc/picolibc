@@ -536,7 +536,6 @@
 #define	__printf0like(fmtarg, firstvararg)
 #endif
 
-#if defined(__GNUC__)
 #if defined(_HAVE_ALIAS_ATTRIBUTE)
 #define	__strong_reference(sym,aliassym)	\
     extern __typeof (sym) aliassym __attribute__ ((__alias__ (__STRING(sym))))
@@ -574,6 +573,7 @@
 #define __inhibit_new_builtin_calls
 #endif
 
+#if defined(__GNUC__)
 #ifndef __weak_reference
 #ifdef __ELF__
 #ifdef __STDC__
