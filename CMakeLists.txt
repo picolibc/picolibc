@@ -197,6 +197,9 @@ picolibc_flag(_HAVE_COMPLEX)
 # Compiler supports format function attribute
 picolibc_flag(_HAVE_FORMAT_ATTRIBUTE 1)
 
+# Compiler supports weak attribute
+picolibc_flag(_HAVE_WEAK_ATTRIBUTE)
+
 set(_HAVE_FCNTL 0)
 
 # IEEE fp funcs available
@@ -220,7 +223,6 @@ if(NOT DEFINED _HAVE_PICOLIBC_TLS_API OR NOT PICOLIBC_TLS)
 endif()
 
 set(_HAVE_SEMIHOST 1)
-set(_HAVE_WEAK_ATTRIBUTE 1)
 set(_ICONV_ENABLE_EXTERNAL_CCS 0)
 set(_ICONV_FROM_ENCODING_ 1)
 set(_ICONV_FROM_ENCODING_BIG5 1)
