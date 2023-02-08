@@ -1241,8 +1241,8 @@ conf_data.set('_HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs suppor
 
 # By default, tests don't require any special arguments
 
-# disable compiler built-ins so we reach the library equivalents
-test_c_args = c_args + arg_fnobuiltin
+test_c_args = c_args
+# disable compiler built-ins so we don't use native equivalents
 native_c_args += arg_fnobuiltin
 if tests_enable_stack_protector
   if cc.has_argument('-fstack-protector-all') and cc.has_argument('-fstack-protector-strong')

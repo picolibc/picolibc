@@ -242,6 +242,22 @@ foreach target : targets
 	 env: test_env)
   endif
 
+  t1 = 'math_errhandling'
+  if target == ''
+    t1_name = t1
+  else
+    t1_name = t1 + '_' + target
+  endif
+
+  test(t1_name,
+       executable(t1_name, ['math_errhandling.c'],
+		  c_args: arg_fnobuiltin + _c_args,
+		  link_args: _link_args,
+		  link_with: _libs,
+		  include_directories: inc),
+       depends: bios_bin,
+       env: test_env)
+
   t1 = 'rounding-mode'
   if target == ''
     t1_name = t1
@@ -251,7 +267,7 @@ foreach target : targets
 
   test(t1_name,
        executable(t1_name, ['rounding-mode.c', 'rounding-mode-sub.c'],
-		  c_args: _c_args,
+		  c_args: arg_fnobuiltin + _c_args,
 		  link_args: _link_args,
 		  link_with: _libs,
 		  include_directories: inc),
@@ -268,7 +284,7 @@ foreach target : targets
 
   test(t1_name,
        executable(t1_name, [t1_src, 'lock-valid.c'],
-		  c_args: double_printf_compile_args + _c_args,
+		  c_args: double_printf_compile_args + arg_fnobuiltin + _c_args,
 		  link_args: double_printf_link_args + _link_args,
 		  link_with: _libs,
 		  link_depends:  test_link_depends,
@@ -298,7 +314,7 @@ foreach target : targets
       )
 
   plain_tests = ['rand', 'regex', 'ungetc', 'fenv',
-		 'math_errhandling', 'malloc', 'tls',
+		 'malloc', 'tls',
 		 'ffs', 'setjmp', 'atexit', 'on_exit',
 		 'math-funcs', 'timegm', 'time-tests',
                  'test-strtod', 'test-strchr',
