@@ -538,9 +538,8 @@
 
 #if defined(__GNUC__)
 #if defined(_HAVE_ALIAS_ATTRIBUTE)
-#define __strong_reference_alias(n) #n
 #define	__strong_reference(sym,aliassym)	\
-    extern __typeof (sym) aliassym __attribute__ ((__alias__ (__strong_reference_alias(sym))))
+    extern __typeof (sym) aliassym __attribute__ ((__alias__ (__STRING(sym))))
 #endif
 
 /*
