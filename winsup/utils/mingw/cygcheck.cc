@@ -57,12 +57,19 @@ int grep_packages = 0;
 int info_packages = 0;
 int info_selector = 0;
 int search_packages = 0;
+int search_selector = 0;
 int del_orphaned_reg = 0;
 
 #define INFO_INST	0x01
 #define INFO_CURR	0x02
 #define INFO_PREV	0x04
 #define INFO_TEST	0x08
+#define INFO_ALL	0x0f
+#define INFO_DEPS	0x10
+#define INFO_BLDDEPS	0x20
+
+#define SRCH_REQS	0x40
+#define SRCH_BLDREQS	0x80
 
 static char emptystr[] = "";
 
@@ -2335,7 +2342,7 @@ collect_quoted_string (char *&tgt, FILE *fp, char *buf, size_t size, size_t offs
 }
 
 static ini_package_info *
-collect_pkg_info (FILE *fp, ini_package_info *pi)
+collect_pkg_info (FILE *fp, ini_package_info *pi, bool search)
 {
   vers_info *vinfo = &pi->curr;
   char buf[4096];
@@ -2413,9 +2420,40 @@ collect_pkg_info (FILE *fp, ini_package_info *pi)
 	  else if (!strncmp (buf, "source: ", strlen ("source: ")))
 	    vinfo->source = strdup (buf + strlen ("source: "));
 	  else if (!strncmp (buf, "depends2: ", strlen ("depends2: ")))
-	    vinfo->depends2 = strdup (buf + strlen ("depends2: "));
-	  else if (!strncmp (buf, "build-depends: ", strlen ("build-depends: ")))
-	    vinfo->build_depends = strdup (buf + strlen ("build-depends: "));
+	    {
+	      if (!search)
+		vinfo->depends2 = strdup (buf + strlen ("depends2: "));
+	      else
+		{
+		  /* For pattern matching we need a standarized format.
+		     Make sure all deps are prepended by a space and all deps
+		     are trailed by a comma.  Note the missing space, that's
+		     deliberate to keep it in the stored string. */
+		  char *start = buf + strlen ("depends2:");
+		  size_t len = strlen (start);
+
+		  vinfo->depends2 = (char *) calloc (len + 2, 1);
+		  if (vinfo->depends2)
+		    *stpcpy (vinfo->depends2, start) = ',';
+		}
+	    }
+	  else if (!strncmp (buf, "build-depends: ",
+			     strlen ("build-depends: ")))
+	    {
+	      if (!search)
+		vinfo->build_depends = strdup (buf
+					       + strlen ("build-depends: "));
+	      else
+		{
+		  /* Ditto */
+		  char *start = buf + strlen ("build-depends:");
+		  size_t len = strlen (start);
+
+		  vinfo->build_depends = (char *) calloc (len + 2, 1);
+		  if (vinfo->build_depends)
+		    *stpcpy (vinfo->build_depends, start) = ',';
+		}
+	    }
 	}
     }
   return pi;
@@ -2446,7 +2484,7 @@ human_readable (char *buf, size_t bytes)
 }
 
 static void
-package_info_print (ini_package_info *pi, vers_info *vers)
+package_info_print (ini_package_info *pi, vers_info *vers, int selector)
 {
   char buf[4096];
 
@@ -2511,12 +2549,10 @@ package_info_print (ini_package_info *pi, vers_info *vers)
 	    printf ("Source      : %s\n", cp + 1);
 	}
     }
-#if 0 /* FIXME: needs CLI options */
-  if (vers->depends2)
+  if ((selector & INFO_DEPS) && vers->depends2)
     printf ("Dependencies: %s\n", vers->depends2);
-  if (vers->build_depends)
+  if ((selector & INFO_BLDDEPS) && vers->build_depends)
     printf ("Build Deps  : %s\n", vers->build_depends);
-#endif
   if (pi->sdesc)
     printf ("Summary     : %s\n", pi->sdesc);
   if (pi->url)
@@ -2592,15 +2628,15 @@ package_info (char **search, int selector)
   if (!fp)
     return 1;
 
-  if (selector == 0)
-    selector = INFO_CURR | INFO_PREV | INFO_TEST | INFO_INST;
+  if ((selector & INFO_ALL) == 0)
+    selector = INFO_ALL;
 
   inst_pkgs = get_installed_packages (NULL, &inst_pkg_count);
 
   while (search && *search)
     {
       rewind (fp);
-      while ((pi = collect_pkg_info (fp, &pi_buf)))
+      while ((pi = collect_pkg_info (fp, &pi_buf, false)))
 	{
 	  pkgver pv = { pi->name, NULL }, *inst_pkg = NULL;
 	  bool avail_installed = false;
@@ -2680,26 +2716,26 @@ package_info (char **search, int selector)
 		  inst_pi.license = pi->license;
 		  inst_pi.curr.version = inst_pkg->ver;
 		  inst_pi.curr.install_date = install_ts;
-		  package_info_print (&inst_pi, &pi->curr);
+		  package_info_print (&inst_pi, &pi->curr, selector);
 		}
 	      else
 		{
 		  if (pi->curr.installed)
 		    {
 		      pi->curr.install_date = install_ts;
-		      package_info_print (pi, &pi->curr);
+		      package_info_print (pi, &pi->curr, selector);
 		    }
 		  for (size_t i = 0; i < pi->prev_count; ++i)
 		    if (pi->prev[i].installed)
 		      {
 			pi->prev[i].install_date = install_ts;
-			package_info_print (pi, pi->prev + i);
+			package_info_print (pi, pi->prev + i, selector);
 		      }
 		  for (size_t i = 0; i < pi->test_count; ++i)
 		    if (pi->test[i].installed)
 		      {
 			pi->test[i].install_date = install_ts;
-			package_info_print (pi, pi->test + i);
+			package_info_print (pi, pi->test + i, selector);
 		      }
 		}
 	    }
@@ -2711,7 +2747,7 @@ package_info (char **search, int selector)
 		{
 		  puts ("Latest available package:\n"
 			"-------------------------\n");
-		  package_info_print (pi, &pi->curr);
+		  package_info_print (pi, &pi->curr, selector);
 		}
 	      if (selector & INFO_PREV)
 		{
@@ -2724,7 +2760,7 @@ package_info (char **search, int selector)
 				      ? ""
 				      : "Older available packages:\n"
 					"-------------------------\n\n");
-			package_info_print (pi, pi->prev + i);
+			package_info_print (pi, pi->prev + i, selector);
 		      }
 		}
 	      if (selector & INFO_TEST)
@@ -2738,7 +2774,7 @@ package_info (char **search, int selector)
 				      ? ""
 				      : "Available test packages:\n"
 					"------------------------\n\n");
-			package_info_print (pi, pi->test + i);
+			package_info_print (pi, pi->test + i, selector);
 		      }
 		}
 	    }
@@ -2750,9 +2786,10 @@ package_info (char **search, int selector)
   return 0;
 }
 
-/* Search for the search string in name and sdesc of available packages. */
+/* Search for the search string in name and sdesc of available packages.
+   The selector is used to search for dependencies. */
 static int
-package_search (char **search)
+package_search (char **search, int selector)
 {
   FILE *fp = maybe_download_setup_ini ();
   ini_package_info pi_buf, *pi;
@@ -2763,18 +2800,40 @@ package_search (char **search)
 
   while (search && *search)
     {
-      ext_search = (char *) malloc (strlen (*search) + 3);
-      ep = ext_search;
-      if (*(search)[0] != '*')
-	*ep++ = '*';
-      ep = stpcpy (ep, *search);
-      if (ep[-1] != '*')
-	stpcpy (ep, "*");
-
       rewind (fp);
-      while ((pi = collect_pkg_info (fp, &pi_buf)))
+
+      ext_search = (char *) malloc (strlen (*search) + 5);
+      ep = ext_search;
+      if (selector)
 	{
-	  if (PathMatchSpecA (pi->name, ext_search)
+	  ep = stpcpy (ep, "* ");
+	  ep = stpcpy (ep, *search);
+	  ep = stpcpy (ep, ",*");
+	}
+      else
+	{
+	  if (*(search)[0] != '*')
+	    *ep++ = '*';
+	  ep = stpcpy (ep, *search);
+	  if (ep[-1] != '*')
+	    stpcpy (ep, "*");
+	}
+
+      while ((pi = collect_pkg_info (fp, &pi_buf, true)))
+	{
+	  /* Skip debuginfo packages */
+	  if (PathMatchSpecA (pi->name, "*-debuginfo"))
+	    continue;
+	  if (selector)
+	    {
+	      /* search only curr version info for the dependency */
+	      if (((selector & SRCH_REQS) && pi->curr.depends2
+		   && PathMatchSpecA (pi->curr.depends2, ext_search))
+		  || ((selector & SRCH_BLDREQS) && pi->curr.build_depends
+		      && PathMatchSpecA (pi->curr.build_depends, ext_search)))
+	      printf ("%s : %s\n", pi->name, pi->sdesc);
+	    }
+	  else if (PathMatchSpecA (pi->name, ext_search)
 	      || (pi->sdesc && PathMatchSpecA (pi->sdesc, ext_search)))
 	    printf ("%s : %s\n", pi->name, pi->sdesc);
 	  free_pkg_info (&pi_buf);
@@ -2837,34 +2896,42 @@ At least one command option or a PROGRAM is required, as shown above.\n\
 \n\
   PROGRAM              list library (DLL) dependencies of PROGRAM\n\
   -c, --check-setup    show installed version of PACKAGE and verify integrity\n\
-		       (or for all installed packages if none specified)\n\
+                       (or for all installed packages if none specified)\n\
   -d, --dump-only      just list packages, do not verify (with -c)\n\
   -s, --sysinfo        produce diagnostic system information (implies -c)\n\
   -r, --registry       also scan registry for Cygwin settings (with -s)\n\
   -k, --keycheck       perform a keyboard check session (must be run from a\n\
-		       plain console only, not from a pty/rxvt/xterm)\n\
+                       plain console only, not from a pty/rxvt/xterm)\n\
   -e, --search-package list all available packages matching PATTERN\n\
                        PATTERN is a glob pattern with * and ? as wildcard chars\n\
+      search selection specifiers (multiple allowed):\n\
+      --requires       list packages depending on packages matching PATTERN\n\
+      --build-reqs     list packages depending on packages matching PATTERN\n\
+                       when building these packages\n\
+                       only the most recent available releases are checked\n\
+                       to collect requirements info\n\
   -i, --info-package   print full info on packages matching PATTERN, installed\n\
-                       and available packages\n\
+                       and available releases\n\
                        PATTERN is a glob pattern with * and ? as wildcard chars\n\
       info selection specifiers (multiple allowed):\n\
-      --inst           only print info on installed package\n\
-      --curr           only print info on most recent available package\n\
-      --prev           only print info on older, but still  available packages\n\
-      --test           only print info on test packages\n\
+      --inst           only print info on installed package release\n\
+      --curr           only print info on most recent available release\n\
+      --prev           only print info on older, still available releases\n\
+      --test           only print info on test releases\n\
+      --deps           additionally print package dependencies\n\
+      --build-deps     additionally print package build dependencies\n\
   -f, --find-package   find the installed package to which FILE belongs\n\
   -l, --list-package   list contents of the installed PACKAGE (or all\n\
                        installed packages if none given)\n\
   -p, --package-query  search for REGEXP in the entire cygwin.com package\n\
-		       repository (requires internet connectivity)\n\
+                       repository (requires internet connectivity)\n\
   --delete-orphaned-installation-keys\n\
-		       Delete installation keys of old, now unused\n\
-		       installations from the registry.  Requires the right\n\
-		       to change the registry.\n\
+                       Delete installation keys of old, now unused\n\
+                       installations from the registry.  Requires the right\n\
+                       to change the registry.\n\
   -v, --verbose        produce more verbose output\n\
   -h, --help           annotate output with explanatory comments when given\n\
-		       with another command, otherwise print this help\n\
+                       with another command, otherwise print this help\n\
   -V, --version        print the version of cygcheck and exit\n\
 \n\
 Notes:\n\
@@ -2890,6 +2957,10 @@ struct option longopts[] = {
   {"curr", no_argument, NULL, 0x1002},
   {"prev", no_argument, NULL, 0x1004},
   {"test", no_argument, NULL, 0x1008},
+  {"deps", no_argument, NULL, 0x1010},
+  {"build-deps", no_argument, NULL, 0x1020},
+  {"requires", no_argument, NULL, 0x1040},
+  {"build-reqs", no_argument, NULL, 0x1080},
   {"search-packages", no_argument, NULL, 'e'},
   {"package-query", no_argument, NULL, 'p'},
   {"delete-orphaned-installation-keys", no_argument, NULL, CO_DELETE_KEYS},
@@ -3028,10 +3099,16 @@ main (int argc, char **argv)
       case 0x1002:
       case 0x1004:
       case 0x1008:
-	info_selector |= (i & 0xf);
+      case 0x1010:
+      case 0x1020:
+	info_selector |= (i & 0x3f);
 	break;
       case 'e':
 	search_packages = 1;
+	break;
+      case 0x1040:
+      case 0x1080:
+	search_selector |= (i & 0xc0);
 	break;
       case 'p':
 	grep_packages = 1;
@@ -3081,6 +3158,12 @@ main (int argc, char **argv)
       + info_packages + search_packages > 1)
     usage (stderr, 1);
 
+  if (!info_packages && info_selector)
+    usage (stderr, 1);
+
+  if (!search_packages && search_selector)
+    usage (stderr, 1);
+
   if (keycheck)
     return check_keys ();
   if (del_orphaned_reg)
@@ -3090,7 +3173,7 @@ main (int argc, char **argv)
   if (info_packages)
     return package_info (argv, info_selector);
   if (search_packages)
-    return package_search (argv);
+    return package_search (argv, search_selector);
 
   init_paths ();
 

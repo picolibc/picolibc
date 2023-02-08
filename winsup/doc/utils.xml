@@ -134,6 +134,8 @@
 	<cmdsynopsis>
 	  <command>cygcheck</command>
 	  <arg choice="plain">-e</arg>
+	  <arg>--requires</arg>
+	  <arg>--build-reqs</arg>
 	  <arg choice="plain" rep="repeat"><replaceable>PATTERN</replaceable></arg>
 	</cmdsynopsis>
 	<cmdsynopsis>
@@ -143,6 +145,8 @@
 	  <arg>--curr</arg>
 	  <arg>--prev</arg>
 	  <arg>--test</arg>
+	  <arg>--deps</arg>
+	  <arg>--build-deps</arg>
 	  <arg choice="plain" rep="repeat"><replaceable>PATTERN</replaceable></arg>
 	</cmdsynopsis>
 	<cmdsynopsis>
@@ -187,14 +191,22 @@ At least one command option or a PROGRAM is required, as shown above.
                        plain console only, not from a pty/rxvt/xterm)
   -e, --search-package list all available packages matching PATTERN
                        PATTERN is a glob pattern with * and ? as wildcard chars
+      search selection specifiers (multiple allowed):\n\
+      --requires       list packages depending on packages matching PATTERN
+      --build-reqs     list packages depending on packages matching PATTERN
+                       when building these packages
+                       only the most recent available releases are checked
+                       to collect requirements info
   -i, --info-package   print full info on packages matching PATTERN, installed
-                       and available packages
+                       and available releases
                        PATTERN is a glob pattern with * and ? as wildcard chars
       info selection specifiers (multiple allowed):
-      --inst           only print info on installed package
-      --curr           only print info on most recent available package
-      --prev           only print info on older, but still  available packages
-      --test           only print info on test packages
+      --inst           only print info on installed package release
+      --curr           only print info on most recent available release
+      --prev           only print info on older, still available releases
+      --test           only print info on test releases
+      --deps           additionally print package dependencies
+      --build-deps     additionally print package build dependencies
   -f, --find-package   find the package to which FILE belongs
   -l, --list-package   list contents of PACKAGE (or all packages if none given)
   -p, --package-query  search for REGEXP in the entire cygwin.com package
@@ -248,7 +260,10 @@ Notes:
       packages in the Cygwin distribution.  <literal>PATTERN</literal> is
       a glob pattern, using * and ? as wildcard characters, just as in
       filename patterns.  <literal>PATTERN</literal> is searched for in
-      the package name and the summary of a package.</para>
+      the package name and the summary of a package.
+      The <literal>--requires</literal> and <literal>--build-reqs</literal>
+      options allow to search for packages which have a certain dependency,
+      either at runtime or at build time.</para>
     <para> The <literal>-i</literal> option prints a lot of information
       available for installed packages, as well as for available packages
       in the Cygwin distribution.  <literal>PATTERN</literal> is a glob
@@ -259,7 +274,9 @@ Notes:
       <literal>--curr</literal>, <literal>--prev</literal>, and
       <literal>--test</literal>, allow to specify that only information
       in terms of installed, current latest available, older available,
-      as well as test packages respectively, is requested.</para>
+      as well as test packages respectively, is requested.
+      The <literal>--deps</literal> and <literal>--build-deps</literal>
+      options allow to print additional dependency information.</para>
 
     <example
       id="utils-cygcheck-eiex"><title>Example <command>cygcheck</command> -e/-i
@@ -273,7 +290,7 @@ pdfgrep : Command-line utility for searching text in PDFs
 pdfgrep-debuginfo : Debug info for pdfgrep
 sgrep : Search indexed text regions like SGML,XML and HTML files
 
-$ cygcheck -i --curr grep
+$ cygcheck -i --curr --deps grep
 Latest available package:
 -------------------------
 
@@ -283,6 +300,7 @@ Release     : 2
 Architecture: x86_64
 Size        : 401340 (392 K)
 Source      : grep-3.8-2-src.tar.xz
+Dependencies: bash, cygwin, libintl8, libpcre2_8_0
 Summary     : search for regular expression matches in text files
 Description :
 GNU grep searches one or more input files for lines containing a
