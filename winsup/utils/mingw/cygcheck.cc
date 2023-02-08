@@ -2497,6 +2497,8 @@ package_info_print (ini_package_info *pi, vers_info *vers)
 					       human_readable (buf, size));
 	}
     }
+  if (pi->category)
+    printf ("Categories  : %s\n", pi->category);
   if (vers->source)
     {
       char *source = strcpy (buf, vers->source);
