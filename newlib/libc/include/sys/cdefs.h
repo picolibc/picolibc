@@ -358,12 +358,18 @@
 #endif
 
 #if __GNUC_PREREQ__(2, 96)
-#define	__malloc_like	__attribute__((__malloc__))
-#define	__pure		__attribute__((__pure__))
+# if __GNUC_PREREQ__(11, 0)
+#  define       __malloc_like_with_free(_f,_a) __attribute__((__malloc__, __malloc__(_f,_a)))
+# else
+#  define       __malloc_like_with_free(_f,_a) __attribute__((__malloc__))
+# endif
+# define	__pure		__attribute__((__pure__))
 #else
-#define	__malloc_like
+#define __malloc_like_with_free(free,free_arg)
 #define	__pure
 #endif
+
+#define	__malloc_like __malloc_like_with_free(free, 1)
 
 #ifndef __always_inline
 #if __GNUC_PREREQ__(3, 1)

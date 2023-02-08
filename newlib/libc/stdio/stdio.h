@@ -337,6 +337,7 @@ char *	cuserid (char *);
 FILE *	tmpfile (void);
 char *	tmpnam (char *);
 #if __BSD_VISIBLE || __XSI_VISIBLE || __POSIX_VISIBLE >= 200112
+void	free (void *) _NOTHROW;
 char *	tempnam (const char *, const char *) __malloc_like __result_use_check;
 #endif
 int	fclose (FILE *);

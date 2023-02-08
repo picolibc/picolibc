@@ -118,11 +118,11 @@ void *	bsearch (const void *__key,
 		       size_t __nmemb,
 		       size_t __size,
 		       __compar_fn_t _compar);
+void	free (void *) _NOTHROW;
 void	*calloc(size_t, size_t) __malloc_like __result_use_check
 	     __alloc_size2(1, 2) _NOTHROW;
 div_t	div (int __numer, int __denom);
 void	exit (int __status) _ATTRIBUTE ((__noreturn__));
-void	free (void *) _NOTHROW;
 char *  getenv (const char *__string);
 #if __GNU_VISIBLE
 char *  secure_getenv (const char *__string);
