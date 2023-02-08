@@ -44,6 +44,7 @@
 #include <inttypes.h>
 #include <stdarg.h>
 #include <sys/_types.h>
+#include <sys/cdefs.h>
 
 #ifndef __DOXYGEN__
 #define __need_NULL
@@ -919,10 +920,10 @@ extern int	fflush(FILE *stream);
 #endif
 __extension__ typedef long long fpos_t;
 extern int fgetpos(FILE *stream, fpos_t *pos);
-extern FILE *fopen(const char *path, const char *mode);
+extern FILE *fopen(const char *path, const char *mode) __malloc_like_with_free(fclose, 1);
 extern FILE *freopen(const char *path, const char *mode, FILE *stream);
-extern FILE *fdopen(int, const char *);
-extern FILE *fmemopen(void *buf, size_t size, const char *mode);
+extern FILE *fdopen(int, const char *) __malloc_like_with_free(fclose, 1);
+extern FILE *fmemopen(void *buf, size_t size, const char *mode) __malloc_like_with_free(fclose, 1);
 extern int fseek(FILE *stream, long offset, int whence);
 extern int fseeko(FILE *stream, __off_t offset, int whence);
 extern int fsetpos(FILE *stream, fpos_t *pos);
