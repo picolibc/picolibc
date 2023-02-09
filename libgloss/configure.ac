@@ -214,6 +214,7 @@ case "${target}" in
 	;;
   arm*-*-elf | arm*-*-coff | arm*-*-*)
 	config_arm=true
+	host_makefile_frag=${srcdir}/config/arm.mh
 	;;
   spu-*-elf)
 	AC_CONFIG_FILES([spu/Makefile])
@@ -251,6 +252,9 @@ m4_foreach_w([SUBDIR], [
 ], [dnl
   AM_CONDITIONAL([CONFIG_]m4_toupper(SUBDIR), [test x$config_]SUBDIR = xtrue)
 ])
+
+dnl arm platforms have a special header file found in the main include directory
+AM_CONDITIONAL([NEED_TOP_INCLUDE_DIR], [[test x$config_arm] = xtrue])
 
 dnl For now, don't bother configuring testsuite
 dnl

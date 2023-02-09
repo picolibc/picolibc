@@ -1,7 +1,7 @@
 NEWLIB_CFLAGS = `if [ -d ${objroot}/newlib ]; then echo -I${objroot}/newlib/targ-include -I${srcroot}/newlib/libc/include; fi`
 NEWLIB_LDFLAGS = `if [ -d ${objroot}/newlib ]; then echo -B${objroot}/newlib/ -L${objroot}/newlib/; fi`
 
-INCLUDES = -I. -I$(srcdir)/.. -I$(objdir)/..
+INCLUDES = -I. -I$(srcdir)/.. -I$(objdir)/.. -idirafter $(srcroot)/include
 # Note that when building the library, ${MULTILIB} is not the way multilib
 # options are passed; they're passed in $(CFLAGS).
 CFLAGS_FOR_TARGET = -O2 -g ${MULTILIB} ${INCLUDES} ${NEWLIB_CFLAGS}

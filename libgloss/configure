@@ -630,6 +630,8 @@ CPPFLAGS
 LDFLAGS
 CFLAGS
 CC
+NEED_TOP_INCLUDE_DIR_FALSE
+NEED_TOP_INCLUDE_DIR_TRUE
 CONFIG_WINCE_FALSE
 CONFIG_WINCE_TRUE
 CONFIG_RISCV_FALSE
@@ -2949,6 +2951,7 @@ case "${target}" in
 	;;
   arm*-*-elf | arm*-*-coff | arm*-*-*)
 	config_arm=true
+	host_makefile_frag=${srcdir}/config/arm.mh
 	;;
   spu-*-elf)
 	ac_config_files="$ac_config_files spu/Makefile"
@@ -3079,6 +3082,15 @@ else
   CONFIG_WINCE_FALSE=
 fi
 
+
+
+ if test x$config_arm = xtrue; then
+  NEED_TOP_INCLUDE_DIR_TRUE=
+  NEED_TOP_INCLUDE_DIR_FALSE='#'
+else
+  NEED_TOP_INCLUDE_DIR_TRUE='#'
+  NEED_TOP_INCLUDE_DIR_FALSE=
+fi
 
 
 
@@ -5345,6 +5357,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${CONFIG_WINCE_TRUE}" && test -z "${CONFIG_WINCE_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_WINCE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${NEED_TOP_INCLUDE_DIR_TRUE}" && test -z "${NEED_TOP_INCLUDE_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"NEED_TOP_INCLUDE_DIR\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${AMDEP_TRUE}" && test -z "${AMDEP_FALSE}"; then
