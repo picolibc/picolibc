@@ -764,11 +764,12 @@ fhandler_disk_file::fchmod (mode_t mode)
       aclent_t *aclp;
       bool standard_acl = false;
       int nentries, idx;
+      mode_t attr = pc.isdir () ? S_IFDIR : 0;
 
       if (!get_file_sd (get_handle (), pc, sd, false))
 	{
 	  aclp = (aclent_t *) tp.c_get ();
-	  if ((nentries = get_posix_access (sd, NULL, &uid, &gid,
+	  if ((nentries = get_posix_access (sd, &attr, &uid, &gid,
 					    aclp, MAX_ACL_ENTRIES,
 					    &standard_acl)) >= 0)
 	    {
