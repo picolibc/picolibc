@@ -31,6 +31,10 @@
 #include <mntent.h>
 #include "loadlib.h"
 
+#ifndef PRODUCT_IOTENTERPRISES
+#define PRODUCT_IOTENTERPRISES 0x000000bf
+#endif
+
 #ifndef max
 #define max __max
 #endif
@@ -1423,24 +1427,24 @@ dump_sysinfo ()
 	      {
 	      case 0:
 		strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
-				? "Vista" : "2008");
+				? "Vista" : "Server 2008");
 		break;
 	      case 1:
 		strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
-				? "7" : "2008 R2");
+				? "7" : "Server 2008 R2");
 		break;
 	      case 2:
 		strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
-				? "8" : "2012");
+				? "8" : "Server 2012");
 		break;
 	      case 3:
 		strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
-				? "8.1" : "2012 R2");
+				? "8.1" : "Server 2012 R2");
 		break;
 	      case 4:
 	      default:
 		strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
-				? "10 Preview" : "2016 Preview");
+				? "10 Preview" : "Server 2016 Preview");
 		break;
 	      }
 	  else if (osversion.dwMajorVersion == 10)
@@ -1450,13 +1454,13 @@ dump_sysinfo ()
 	      else
 		{
 		  if (osversion.dwBuildNumber <= 14393)
-		    strcpy (osname, "2016");
+		    strcpy (osname, "Server 2016");
 		  else if (osversion.dwBuildNumber <= 17763)
-		    strcpy (osname, "2019");
+		    strcpy (osname, "Server 2019");
 		  else if (osversion.dwBuildNumber <= 20348)
-		    strcpy (osname, "2022");
+		    strcpy (osname, "Server 2022");
 		  else
-		    strcpy (osname, "20??");
+		    strcpy (osname, "Server 20??");
 		}
 	    }
 	  DWORD prod;
@@ -1663,7 +1667,7 @@ dump_sysinfo ()
 		};
 	      if (prod == PRODUCT_UNLICENSED)
 		strcat (osname, "Unlicensed");
-	      else if (prod > 0x000000bf)
+	      else if (prod > PRODUCT_IOTENTERPRISES)
 		strcat (osname, "");
 	      else
 		strcat (osname, products[prod]);
