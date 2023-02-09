@@ -276,7 +276,7 @@ get_reg_sd (HANDLE handle, security_descriptor &sd_ret)
 }
 
 int
-get_reg_attribute (HKEY hkey, mode_t *attribute, uid_t *uidret,
+get_reg_attribute (HKEY hkey, mode_t &attribute, uid_t *uidret,
 		   gid_t *gidret)
 {
   security_descriptor sd;
@@ -292,7 +292,7 @@ get_reg_attribute (HKEY hkey, mode_t *attribute, uid_t *uidret,
 
 int
 get_file_attribute (HANDLE handle, path_conv &pc,
-		    mode_t *attribute, uid_t *uidret, gid_t *gidret)
+		    mode_t &attribute, uid_t *uidret, gid_t *gidret)
 {
   if (pc.has_acls ())
     {
@@ -399,7 +399,7 @@ get_object_sd (HANDLE handle, security_descriptor &sd)
 
 int
 get_object_attribute (HANDLE handle, uid_t *uidret, gid_t *gidret,
-		      mode_t *attribute)
+		      mode_t &attribute)
 {
   security_descriptor sd;
 
@@ -462,7 +462,7 @@ set_created_file_access (HANDLE handle, path_conv &pc, mode_t attr)
 	attr |= S_IFDIR;
       attr_rd = attr;
       aclp = (aclent_t *) tp.c_get ();
-      if ((nentries = get_posix_access (sd, &attr_rd, &uid, &gid, aclp,
+      if ((nentries = get_posix_access (sd, attr_rd, &uid, &gid, aclp,
 					MAX_ACL_ENTRIES, &std_acl)) >= 0)
 	{
 	  if (S_ISLNK (attr))

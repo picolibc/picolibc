@@ -552,7 +552,7 @@ fhandler_registry::fstat (struct stat *buf)
 		}
 	      uid_t uid;
 	      gid_t gid;
-	      if (get_reg_attribute (hKey, &buf->st_mode, &uid, &gid) == 0)
+	      if (get_reg_attribute (hKey, buf->st_mode, &uid, &gid) == 0)
 		{
 		  buf->st_uid = uid;
 		  buf->st_gid = gid;

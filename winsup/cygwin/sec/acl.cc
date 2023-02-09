@@ -577,7 +577,7 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
 
   if (get_file_sd (handle, pc, sd, false))
     return -1;
-  if (get_posix_access (sd, &attr, &uid, &gid, NULL, 0) < 0)
+  if (get_posix_access (sd, attr, &uid, &gid, NULL, 0) < 0)
     return -1;
   if (!set_posix_access (attr, uid, gid, aclbufp, nentries,
 			 sd_ret, pc.fs_is_samba ()))
@@ -644,7 +644,7 @@ getace (aclent_t &acl, int type, int id, DWORD win_ace_mask,
    stock POSIX perms even if Administrators and SYSTEM is in the ACE. */
 int
 get_posix_access (PSECURITY_DESCRIPTOR psd,
-		  mode_t *attr_ret, uid_t *uid_ret, gid_t *gid_ret,
+		  mode_t &attr_ret, uid_t *uid_ret, gid_t *gid_ret,
 		  aclent_t *aclbufp, int nentries, bool *std_acl)
 {
   tmp_pathbuf tp;
@@ -689,8 +689,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
      unreadable. */
   if (!psd)
     {
-      if (attr_ret)
-        *attr_ret &= S_IFMT;
+      attr_ret &= S_IFMT;
       if (uid_ret)
         *uid_ret = ACL_UNDEFINED_ID;
       if (gid_ret)
@@ -732,11 +731,8 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
   /* Set uidret, gidret, and initalize attributes. */
   uid = owner_sid.get_uid (&cldap);
   gid = group_sid.get_gid (&cldap);
-  if (attr_ret)
-    {
-      attr = *attr_ret & S_IFMT;
-      just_created = *attr_ret & S_JUSTCREATED;
-    }
+  attr = attr_ret & S_IFMT;
+  just_created = attr_ret & S_JUSTCREATED;
   /* Remember the fact that owner and group are the same account. */
   owner_eq_group = owner_sid == group_sid;
 
@@ -1174,8 +1170,7 @@ out:
     *uid_ret = uid;
   if (gid_ret)
     *gid_ret = gid;
-  if (attr_ret)
-    *attr_ret = attr;
+  attr_ret = attr;
   if (aclbufp)
     {
       if (pos > nentries)
@@ -1201,7 +1196,7 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
 
   if (get_file_sd (handle, pc, sd, false))
     return -1;
-  int pos = get_posix_access (sd, &attr, NULL, NULL, aclbufp, nentries);
+  int pos = get_posix_access (sd, attr, NULL, NULL, aclbufp, nentries);
   syscall_printf ("%R = getacl(%S)", pos, pc.get_nt_native_path ());
   return pos;
 }

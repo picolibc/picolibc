@@ -251,7 +251,7 @@ fhandler_mqueue::mqinfo_open (int flags)
       __seterrno_from_nt_status (status);
       return NULL;
     }
-  if (get_file_attribute (get_handle (), pc, &mode, NULL, NULL))
+  if (get_file_attribute (get_handle (), pc, mode, NULL, NULL))
     mode = STD_RBITS | STD_WBITS;
 
   return _mqinfo (fsi.EndOfFile.QuadPart, mode, flags, true);

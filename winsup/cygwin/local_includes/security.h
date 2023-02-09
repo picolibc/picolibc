@@ -411,17 +411,17 @@ legal_sid_type (SID_NAME_USE type)
 
 class path_conv;
 /* File manipulation */
-int get_file_attribute (HANDLE, path_conv &, mode_t *,
+int get_file_attribute (HANDLE, path_conv &, mode_t &,
 				  uid_t *, gid_t *);
 int set_created_file_access (HANDLE, path_conv &, mode_t);
 int get_object_sd (HANDLE, security_descriptor &);
-int get_object_attribute (HANDLE, uid_t *, gid_t *, mode_t *);
+int get_object_attribute (HANDLE, uid_t *, gid_t *, mode_t &);
 int set_object_attribute (HANDLE, uid_t, gid_t, mode_t);
 int create_object_sd_from_attribute (uid_t, gid_t, mode_t,
 					    security_descriptor &);
 int set_object_sd (HANDLE, security_descriptor &, bool);
 
-int get_reg_attribute (HKEY hkey, mode_t *, uid_t *, gid_t *);
+int get_reg_attribute (HKEY hkey, mode_t &, uid_t *, gid_t *);
 LONG get_file_sd (HANDLE fh, path_conv &, security_descriptor &, bool);
 LONG set_file_sd (HANDLE fh, path_conv &, security_descriptor &, bool);
 bool add_access_allowed_ace (PACL, DWORD, PSID, size_t &, DWORD);
@@ -441,7 +441,7 @@ struct acl;
 int searchace (struct acl *, int, int, uid_t id = ILLEGAL_UID);
 PSECURITY_DESCRIPTOR set_posix_access (mode_t, uid_t, gid_t, struct acl *, int,
 				       security_descriptor &, bool);
-int get_posix_access (PSECURITY_DESCRIPTOR, mode_t *, uid_t *, gid_t *,
+int get_posix_access (PSECURITY_DESCRIPTOR, mode_t &, uid_t *, gid_t *,
 		      struct acl *, int, bool * = NULL);
 int getacl (HANDLE, path_conv &, int, struct acl *);
 int setacl (HANDLE, path_conv &, int, struct acl *, bool &);

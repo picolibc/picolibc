@@ -1793,7 +1793,7 @@ fhandler_pty_slave::fstat (struct stat *st)
   st->st_mode = S_IFCHR;
   if (!input_available_event
       || get_object_attribute (input_available_event, &st->st_uid, &st->st_gid,
-			       &st->st_mode))
+			       st->st_mode))
     {
       /* If we can't access the ACL, or if the tty doesn't actually exist,
 	 then fake uid and gid to strict, system-like values. */
@@ -1839,7 +1839,7 @@ fhandler_pty_slave::facl (int cmd, int nentries, aclent_t *aclbufp)
 	if (!input_available_event
 	    || get_object_sd (input_available_event, sd))
 	  {
-	    res = get_posix_access (NULL, &attr, NULL, NULL, aclbufp, nentries);
+	    res = get_posix_access (NULL, attr, NULL, NULL, aclbufp, nentries);
 	    if (aclbufp && res == MIN_ACL_ENTRIES)
 	      {
 		aclbufp[0].a_perm = S_IROTH | S_IWOTH;
@@ -1849,9 +1849,9 @@ fhandler_pty_slave::facl (int cmd, int nentries, aclent_t *aclbufp)
 	    break;
 	  }
 	if (cmd == GETACL)
-	  res = get_posix_access (sd, &attr, NULL, NULL, aclbufp, nentries);
+	  res = get_posix_access (sd, attr, NULL, NULL, aclbufp, nentries);
 	else
-	  res = get_posix_access (sd, &attr, NULL, NULL, NULL, 0);
+	  res = get_posix_access (sd, attr, NULL, NULL, NULL, 0);
 	break;
       default:
 	set_errno (EINVAL);
@@ -1935,7 +1935,7 @@ fhandler_pty_slave::fchmod (mode_t mode)
     }
   sd.malloc (sizeof (SECURITY_DESCRIPTOR));
   RtlCreateSecurityDescriptor (sd, SECURITY_DESCRIPTOR_REVISION);
-  if (!get_object_attribute (input_available_event, &uid, &gid, &orig_mode)
+  if (!get_object_attribute (input_available_event, &uid, &gid, orig_mode)
       && !create_object_sd_from_attribute (uid, gid, S_IFCHR | mode, sd))
     ret = fch_set_sd (sd, false);
 errout:
@@ -1964,7 +1964,7 @@ fhandler_pty_slave::fchown (uid_t uid, gid_t gid)
     }
   sd.malloc (sizeof (SECURITY_DESCRIPTOR));
   RtlCreateSecurityDescriptor (sd, SECURITY_DESCRIPTOR_REVISION);
-  if (!get_object_attribute (input_available_event, &o_uid, &o_gid, &mode))
+  if (!get_object_attribute (input_available_event, &o_uid, &o_gid, mode))
     {
       if (uid == ILLEGAL_UID)
 	uid = o_uid;

@@ -464,16 +464,16 @@ fhandler_base::fstat_helper (struct stat *buf)
   else if (pc.issymlink ())
     {
       buf->st_size = pc.get_symlink_length ();
+      get_file_attribute (h, pc, buf->st_mode,
+			  &buf->st_uid, &buf->st_gid);
       /* symlinks are everything for everyone! */
       buf->st_mode = S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
-      get_file_attribute (h, pc, NULL,
-			  &buf->st_uid, &buf->st_gid);
       goto done;
     }
   else if (pc.issocket ())
     buf->st_mode = S_IFSOCK;
 
-  if (!get_file_attribute (h, pc, &buf->st_mode, &buf->st_uid, &buf->st_gid))
+  if (!get_file_attribute (h, pc, buf->st_mode, &buf->st_uid, &buf->st_gid))
     {
       /* If read-only attribute is set, modify ntsec return value */
       if (::has_attribute (attributes, FILE_ATTRIBUTE_READONLY)
@@ -769,7 +769,7 @@ fhandler_disk_file::fchmod (mode_t mode)
       if (!get_file_sd (get_handle (), pc, sd, false))
 	{
 	  aclp = (aclent_t *) tp.c_get ();
-	  if ((nentries = get_posix_access (sd, &attr, &uid, &gid,
+	  if ((nentries = get_posix_access (sd, attr, &uid, &gid,
 					    aclp, MAX_ACL_ENTRIES,
 					    &standard_acl)) >= 0)
 	    {
@@ -879,7 +879,7 @@ fhandler_disk_file::fchown (uid_t uid, gid_t gid)
     goto out;
 
   aclp = (aclent_t *) tp.c_get ();
-  if ((nentries = get_posix_access (sd, &attr, &old_uid, &old_gid,
+  if ((nentries = get_posix_access (sd, attr, &old_uid, &old_gid,
 				    aclp, MAX_ACL_ENTRIES)) < 0)
     goto out;
 
