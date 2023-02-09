@@ -495,23 +495,25 @@ set_created_file_access (HANDLE handle, path_conv &pc, mode_t attr)
 	     S_ISGID bit is set, propagate it. */
 	  if (S_ISDIR (attr))
 	    {
+	      mode_t def_attr = attr & ~cygheap->umask;
+
 	      if (searchace (aclp, nentries, DEF_USER_OBJ) < 0)
 		{
 		  aclp[nentries].a_type = DEF_USER_OBJ;
 		  aclp[nentries].a_id = ILLEGAL_UID;
-		  aclp[nentries++].a_perm = (attr >> 6) & S_IRWXO;
+		  aclp[nentries++].a_perm = (def_attr >> 6) & S_IRWXO;
 		}
 	      if (searchace (aclp, nentries, DEF_GROUP_OBJ) < 0)
 		{
 		  aclp[nentries].a_type = DEF_GROUP_OBJ;
 		  aclp[nentries].a_id = ILLEGAL_GID;
-		  aclp[nentries++].a_perm = (attr >> 3) & S_IRWXO;
+		  aclp[nentries++].a_perm = (def_attr >> 3) & S_IRWXO;
 		}
 	      if (searchace (aclp, nentries, DEF_OTHER_OBJ) < 0)
 		{
 		  aclp[nentries].a_type = DEF_OTHER_OBJ;
 		  aclp[nentries].a_id = ILLEGAL_UID;
-		  aclp[nentries++].a_perm = attr & S_IRWXO;
+		  aclp[nentries++].a_perm = def_attr & S_IRWXO;
 		}
 	      if (attr_rd & S_ISGID)
 		attr |= S_ISGID;
