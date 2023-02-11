@@ -2430,15 +2430,22 @@ collect_pkg_info (FILE *fp, ini_package_info *pi, bool search)
 	      else
 		{
 		  /* For pattern matching we need a standarized format.
-		     Make sure all deps are prepended by a space and all deps
-		     are trailed by a comma.  Note the missing space, that's
-		     deliberate to keep it in the stored string. */
+		     Make sure all deps are prepended and trailed by a comma.
+		     Note the missing space after the colon, that's deliberate
+		     to keep it in the stored string.  Originally we kept the
+		     spaces in, but spaces are filtered out by PathMatchSpecA,
+		     so we now replace all space by comma here. */
 		  char *start = buf + strlen ("depends2:");
 		  size_t len = strlen (start);
 
 		  vinfo->depends2 = (char *) calloc (len + 2, 1);
 		  if (vinfo->depends2)
-		    *stpcpy (vinfo->depends2, start) = ',';
+		    {
+		      *stpcpy (vinfo->depends2, start) = ',';
+		      char *cp = vinfo->depends2;
+		      while ((cp = strchr (cp, ' ')))
+			*cp = ',';
+		    }
 		}
 	    }
 	  else if (!strncmp (buf, "build-depends: ",
@@ -2455,7 +2462,12 @@ collect_pkg_info (FILE *fp, ini_package_info *pi, bool search)
 
 		  vinfo->build_depends = (char *) calloc (len + 2, 1);
 		  if (vinfo->build_depends)
-		    *stpcpy (vinfo->build_depends, start) = ',';
+		    {
+		      *stpcpy (vinfo->build_depends, start) = ',';
+		      char *cp = vinfo->build_depends;
+		      while ((cp = strchr (cp, ' ')))
+			*cp++ = ',';
+		    }
 		}
 	    }
 	}
@@ -2810,7 +2822,7 @@ package_search (char **search, int selector)
       ep = ext_search;
       if (selector)
 	{
-	  ep = stpcpy (ep, "* ");
+	  ep = stpcpy (ep, "*,");
 	  ep = stpcpy (ep, *search);
 	  ep = stpcpy (ep, ",*");
 	}
