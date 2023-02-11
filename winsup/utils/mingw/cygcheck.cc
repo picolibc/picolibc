@@ -2645,7 +2645,7 @@ package_info (char **search, int selector)
     return 1;
 
   if ((selector & INFO_ALL) == 0)
-    selector = INFO_ALL;
+    selector |= INFO_ALL;
 
   inst_pkgs = get_installed_packages (NULL, &inst_pkg_count);
 
