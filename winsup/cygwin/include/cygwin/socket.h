@@ -225,6 +225,8 @@ struct OLD_msghdr
 #define	IPTOS_LOWDELAY		0x10
 #define	IPTOS_THROUGHPUT	0x08
 #define	IPTOS_RELIABILITY	0x04
+#define	IPTOS_LOWCOST		0x02
+#define	IPTOS_MINCOST		IPTOS_LOWCOST
 #endif
 
 /* These need to appear somewhere around here */
