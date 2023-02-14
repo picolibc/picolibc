@@ -68,9 +68,9 @@ static __inline size_t
 xmbrtowc(wint_t *wi, const char *s, size_t n, mbstate_t *mbs, wint_t dummy)
 {
 	size_t nr;
-	wchar_t wc;
+	wint_t wc;
 
-	nr = mbrtowc(&wc, s, n, mbs);
+	nr = mbrtowi(&wc, s, n, mbs);
 	if (wi != NULL)
 		*wi = wc;
 	if (nr == 0)
@@ -80,24 +80,8 @@ xmbrtowc(wint_t *wi, const char *s, size_t n, mbstate_t *mbs, wint_t dummy)
 		if (wi != NULL)
 			*wi = dummy;
 		return (1);
-	} else {
-		if (sizeof (wchar_t) == 2 && wc >= 0xd800 && wc <= 0xdbff) {
-			/* UTF-16 surrogate pair.  Fetch second half and
-			   compute UTF-32 value */
-			size_t n2 = mbrtowc(&wc, s + nr, n - nr, mbs);
-			if (n2 == 0 || n2 == (size_t)-1 || n2 == (size_t)-2) {
-				memset(mbs, 0, sizeof(*mbs));
-				if (wi != NULL)
-					*wi = dummy;
-				return (1);
-			}
-			if (wi != NULL)
-				*wi = (((*wi & 0x3ff) << 10) | (wc & 0x3ff))
-				      + 0x10000;
-			nr += n2;
-		  }
+	} else
                 return (nr);
-	}
 }
 
 static __inline size_t

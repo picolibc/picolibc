@@ -921,7 +921,7 @@ p_b_coll_elem(struct parse *p,
 	struct cname *cp;
 	int len;
 	mbstate_t mbs;
-	wchar_t wc;
+	wint_t wc;
 	size_t clen;
 
 	while (MORE() && !SEETWO(endc, ']'))
@@ -935,7 +935,7 @@ p_b_coll_elem(struct parse *p,
 		if (strncmp(cp->name, sp, len) == 0 && cp->name[len] == '\0')
 			return(cp->code);	/* known name */
 	memset(&mbs, 0, sizeof(mbs));
-	if ((clen = mbrtowc(&wc, sp, len, &mbs)) == len)
+	if ((clen = mbrtowi(&wc, sp, len, &mbs)) == len)
 		return (wc);			/* single character */
 	else if (clen == (size_t)-1 || clen == (size_t)-2)
 		SETERROR(REG_ILLSEQ);
@@ -1119,8 +1119,7 @@ static wint_t
 wgetnext(struct parse *p)
 {
 	mbstate_t mbs;
-	wchar_t wc;
-	wint_t ret;
+	wint_t wc;
 	size_t n;
 
 #ifdef __CYGWIN__
@@ -1136,29 +1135,15 @@ wgetnext(struct parse *p)
 	  return (wint_t) (unsigned char) *p->next++;
 #endif
 	memset(&mbs, 0, sizeof(mbs));
-	n = mbrtowc(&wc, p->next, p->end - p->next, &mbs);
+	n = mbrtowi(&wc, p->next, p->end - p->next, &mbs);
 	if (n == (size_t)-1 || n == (size_t)-2) {
 		SETERROR(REG_ILLSEQ);
 		return (0);
 	}
-	ret = wc;
 	if (n == 0)
 		n = 1;
-	else if (sizeof (wchar_t) == 2 && wc >= 0xd800 && wc <= 0xdbff) {
-		/* UTF-16 surrogate pair.  Fetch second half and
-		   compute UTF-32 value */
-		size_t n2 = mbrtowc(&wc, p->next + n,
-				    p->end - p->next - n, &mbs);
-		if (n2 == 0 || n2 == (size_t)-1 || n2 == (size_t)-2) {
-			SETERROR(REG_ILLSEQ);
-			return (0);
-		}
-		ret = (((ret & 0x3ff) << 10) | (wc & 0x3ff))
-		      + 0x10000;
-		n += n2;
-	  }
 	p->next += n;
-	return (ret);
+	return (wc);
 }
 
 static size_t
