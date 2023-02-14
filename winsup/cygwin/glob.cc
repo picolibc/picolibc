@@ -71,7 +71,7 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/glob.c,v 1.28 2010/05/12 17:44:00 gordon Ex
  *    GLOB_NOCHECK is specified.
  * 2. Illegal byte sequences in filenames are handled by treating them as
  *    single-byte characters with a value of the first byte of the sequence
- *    cast to wchar_t.
+ *    cast to wint_t.
  * 3. State-dependent encodings are not currently supported.
  */
 
@@ -162,7 +162,7 @@ static int	 compare(const void *, const void *);
 static int	 g_Ctoc(const Char *, char *, size_t);
 static int	 g_lstat(Char *, struct stat *, glob_t *);
 static DIR	*g_opendir(Char *, glob_t *);
-static const Char *g_strchr(const Char *, wchar_t);
+static const Char *g_strchr(const Char *, wint_t);
 #ifdef notdef
 static Char	*g_strcat(Char *, const Char *);
 #endif
@@ -188,7 +188,7 @@ glob(const char *__restrict pattern, int flags, int (*errfunc)(const char *, int
 	size_t limit;
 	Char *bufnext, *bufend, patbuf[MAXPATHLEN], prot;
 	mbstate_t mbs;
-	wchar_t wc;
+	wint_t wc;
 	size_t clen;
 
 	patnext = pattern;
@@ -213,7 +213,7 @@ glob(const char *__restrict pattern, int flags, int (*errfunc)(const char *, int
 	if (flags & GLOB_NOESCAPE) {
 		memset(&mbs, 0, sizeof(mbs));
 		while (bufend - bufnext >= MB_CUR_MAX) {
-			clen = mbrtowc(&wc, patnext, MB_LEN_MAX, &mbs);
+			clen = mbrtowi(&wc, patnext, MB_LEN_MAX, &mbs);
 			if (clen == (size_t)-1 || clen == (size_t)-2)
 				return (GLOB_NOMATCH);
 			else if (clen == 0)
@@ -233,7 +233,7 @@ glob(const char *__restrict pattern, int flags, int (*errfunc)(const char *, int
 				prot = M_PROTECT;
 			} else
 				prot = 0;
-			clen = mbrtowc(&wc, patnext, MB_LEN_MAX, &mbs);
+			clen = mbrtowi(&wc, patnext, MB_LEN_MAX, &mbs);
 			if (clen == (size_t)-1 || clen == (size_t)-2)
 				return (GLOB_NOMATCH);
 			else if (clen == 0)
@@ -663,7 +663,7 @@ glob3(Char *pathbuf, Char *pathend, Char *pathend_last,
 	while ((dp = (*readdirfunc)(dirp))) {
 		char *sc;
 		Char *dc;
-		wchar_t wc;
+		wint_t wc;
 		size_t clen;
 		mbstate_t mbs;
 
@@ -674,7 +674,7 @@ glob3(Char *pathbuf, Char *pathend, Char *pathend_last,
 		dc = pathend;
 		sc = dp->d_name;
 		while (dc < pathend_last) {
-			clen = mbrtowc(&wc, sc, MB_LEN_MAX, &mbs);
+			clen = mbrtowi(&wc, sc, MB_LEN_MAX, &mbs);
 			if (clen == (size_t)-1 || clen == (size_t)-2) {
 				wc = *sc;
 				clen = 1;
@@ -883,7 +883,7 @@ g_stat(Char *fn, struct stat *sb, glob_t *pglob)
 }
 
 static const Char *
-g_strchr(const Char *str, wchar_t ch)
+g_strchr(const Char *str, wint_t ch)
 {
 
 	do {
