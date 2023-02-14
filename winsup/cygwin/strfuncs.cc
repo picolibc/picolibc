@@ -112,6 +112,38 @@ transform_chars_af_unix (PWCHAR out, const char *path, __socklen_t len)
   return out;
 }
 
+/* replacement function for mbrtowc, returning a wint_t representing
+   a UTF-32 value. */
+extern "C" wint_t
+mbrtowi (wint_t *pwi, const char *s, size_t n, mbstate_t *ps)
+{
+  size_t len, len2;
+  wchar_t w1, w2;
+
+  len = mbrtowc (&w1, s, n, ps);
+  if (len == (size_t) -1 || len == (size_t) -2)
+    return len;
+  *pwi = w1;
+  /* Convert surrogate pair to wint_t value */
+  if (len > 0 && w1 >= 0xd800 && w1 <= 0xdbff)
+    {
+      s += len;
+      n -= len;
+      len2 = mbrtowc (&w2, s, n, ps);
+      if (len2 > 0 && w2 >= 0xdc00 && w2 <= 0xdfff)
+	{
+	  len += len2;
+	  *pwi = (((w1 & 0x3ff) << 10) | (w2 & 0x3ff)) + 0x10000;
+	}
+      else
+	{
+	  len = (size_t) -1;
+	  errno = EILSEQ;
+	}
+    }
+  return len;
+}
+
 /* The SJIS, JIS and eucJP conversion in newlib does not use UTF as
    wchar_t character representation.  That's unfortunate for us since
    we require UTF for the OS.  What we do here is to have our own
