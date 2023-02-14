@@ -52,7 +52,7 @@ __FBSDID("$FreeBSD: head/lib/libc/gen/fnmatch.c 288309 2015-09-27 12:52:18Z jill
  * 1. Patterns with illegal byte sequences match nothing.
  * 2. Illegal byte sequences in the "string" argument are handled by treating
  *    them as single-byte characters with a value of the first byte of the
- *    sequence cast to wchar_t.
+ *    sequence cast to wint_t.
  * 3. Multibyte conversion state objects (mbstate_t) are passed around and
  *    used for most, but not all, conversions. Further work will be required
  *    to support state-dependent encodings.
@@ -72,7 +72,7 @@ __FBSDID("$FreeBSD: head/lib/libc/gen/fnmatch.c 288309 2015-09-27 12:52:18Z jill
 #define RANGE_NOMATCH   0
 #define RANGE_ERROR     (-1)
 
-static int rangematch(const char *, wchar_t, int, char **, mbstate_t *);
+static int rangematch(const char *, wint_t, int, char **, mbstate_t *);
 static int fnmatch1(const char *, const char *, const char *, int, mbstate_t,
 		mbstate_t);
 
@@ -92,16 +92,16 @@ fnmatch1(const char *pattern, const char *string, const char *stringstart,
 	mbstate_t bt_patmbs, bt_strmbs;
 	char *newp;
 	char c;
-	wchar_t pc, sc;
+	wint_t pc, sc;
 	size_t pclen, sclen;
 
 	bt_pattern = bt_string = NULL;
 	for (;;) {
-		pclen = mbrtowc(&pc, pattern, MB_LEN_MAX, &patmbs);
+		pclen = mbrtowi(&pc, pattern, MB_LEN_MAX, &patmbs);
 		if (pclen == (size_t)-1 || pclen == (size_t)-2)
 			return (FNM_NOMATCH);
 		pattern += pclen;
-		sclen = mbrtowc(&sc, string, MB_LEN_MAX, &strmbs);
+		sclen = mbrtowi(&sc, string, MB_LEN_MAX, &strmbs);
 		if (sclen == (size_t)-1 || sclen == (size_t)-2) {
 			sc = (unsigned char)*string;
 			sclen = 1;
@@ -183,7 +183,7 @@ fnmatch1(const char *pattern, const char *string, const char *stringstart,
 			break;
 		case '\\':
 			if (!(flags & FNM_NOESCAPE)) {
-				pclen = mbrtowc(&pc, pattern, MB_LEN_MAX,
+				pclen = mbrtowi(&pc, pattern, MB_LEN_MAX,
 				    &patmbs);
 				if (pclen == (size_t)-1 || pclen == (size_t)-2)
 					return (FNM_NOMATCH);
@@ -208,7 +208,7 @@ fnmatch1(const char *pattern, const char *string, const char *stringstart,
 				 */
 				if (bt_pattern == NULL)
 					return (FNM_NOMATCH);
-				sclen = mbrtowc(&sc, bt_string, MB_LEN_MAX,
+				sclen = mbrtowi(&sc, bt_string, MB_LEN_MAX,
 				    &bt_strmbs);
 				if (sclen == (size_t)-1 ||
 				    sclen == (size_t)-2) {
@@ -232,11 +232,11 @@ fnmatch1(const char *pattern, const char *string, const char *stringstart,
 }
 
 static int
-rangematch(const char *pattern, wchar_t test, int flags, char **newp,
+rangematch(const char *pattern, wint_t test, int flags, char **newp,
     mbstate_t *patmbs)
 {
 	int negate, ok;
-	wchar_t c, c2;
+	wint_t c, c2;
 	size_t pclen;
 	const char *origpat;
 #ifndef __CYGWIN__
@@ -274,7 +274,7 @@ rangematch(const char *pattern, wchar_t test, int flags, char **newp,
 			return (RANGE_NOMATCH);
 		} else if (*pattern == '\\' && !(flags & FNM_NOESCAPE))
 			pattern++;
-		pclen = mbrtowc(&c, pattern, MB_LEN_MAX, patmbs);
+		pclen = mbrtowi(&c, pattern, MB_LEN_MAX, patmbs);
 		if (pclen == (size_t)-1 || pclen == (size_t)-2)
 			return (RANGE_NOMATCH);
 		pattern += pclen;
@@ -287,7 +287,7 @@ rangematch(const char *pattern, wchar_t test, int flags, char **newp,
 			if (*++pattern == '\\' && !(flags & FNM_NOESCAPE))
 				if (*pattern != EOS)
 					pattern++;
-			pclen = mbrtowc(&c2, pattern, MB_LEN_MAX, patmbs);
+			pclen = mbrtowi(&c2, pattern, MB_LEN_MAX, patmbs);
 			if (pclen == (size_t)-1 || pclen == (size_t)-2)
 				return (RANGE_NOMATCH);
 			pattern += pclen;
