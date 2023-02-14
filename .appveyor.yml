@@ -35,6 +35,7 @@ patch,\
 cocom,\
 gettext-devel,\
 libiconv-devel,\
+libzstd-devel,\
 zlib-devel,\
 %PKGARCH%-gcc-core,\
 %PKGARCH%-gcc-g++,\

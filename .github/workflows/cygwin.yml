@@ -81,6 +81,7 @@ jobs:
           gettext-devel,
           libiconv,
           libiconv-devel,
+          libzstd-devel,
           make,
           mingw64-${{ matrix.pkgarch }}-gcc-g++,
           mingw64-${{ matrix.pkgarch }}-zlib,

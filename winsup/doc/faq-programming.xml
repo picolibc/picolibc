@@ -684,7 +684,7 @@ installed; you at least need <literal>gcc-g++</literal>,
 
 <para>
 Additionally, building the <code>dumper</code> utility requires
-<literal>gettext-devel</literal>, <literal>libiconv-devel</literal>
+<literal>gettext-devel</literal>, <literal>libiconv-devel</literal>, <literal>libzstd-devel</literal> and
 <literal>zlib-devel</literal>.  Building this program can be disabled with the
 <literal>--disable-dumper</literal> option to <literal>configure</literal>.
 </para>
