@@ -1176,8 +1176,20 @@ strcoll (const char *__restrict s1, const char *__restrict s2)
 extern "C" int
 __collate_range_cmp (int c1, int c2)
 {
-  wchar_t s1[2] = { (wchar_t) c1, L'\0' };
-  wchar_t s2[2] = { (wchar_t) c2, L'\0' };
+  wchar_t s1[3] = { (wchar_t) c1, L'\0', L'\0' };
+  wchar_t s2[3] = { (wchar_t) c2, L'\0', L'\0' };
+
+  /* Handle Unicode values >= 0x10000, convert to surrogate pair */
+  if (c1 > 0xffff)
+    {
+      s1[0] = ((c1 - 0x10000) >> 10) + 0xd800;
+      s1[1] = ((c1 - 0x10000) & 0x3ff) + 0xdc00;
+    }
+  if (c2 > 0xffff)
+    {
+      s2[0] = ((c2 - 0x10000) >> 10) + 0xd800;
+      s2[1] = ((c2 - 0x10000) & 0x3ff) + 0xdc00;
+    }
   return wcscoll (s1, s2);
 }
 
