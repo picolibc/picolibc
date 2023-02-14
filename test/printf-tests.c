@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <math.h>
+#include <wchar.h>
 
 #ifndef TINY_STDIO
 #define printf_float(x) x
@@ -26,6 +27,7 @@ int (*_reference_scanf_float)() = _scanf_float;
 #endif
 
 static char buf[1024];
+static wchar_t wbuf[1024];
 
 static void failmsg(int serial, char *fmt, ...) {
     va_list ap;
@@ -130,6 +132,87 @@ static int test(int serial, char *expect, char *fmt, ...) {
     }
     free(abuf);
 #endif
+    return 0;
+}
+
+static void failmsgw(int serial, wchar_t *fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    printf("test %d failed: ", serial);
+    static wchar_t f_wbuf[1024];
+    static char f_buf[1024];
+    vswprintf(f_wbuf, 1024, fmt, ap);
+    wcstombs(f_buf, f_wbuf, 1024);
+    printf("%s\n", f_buf);
+    va_end(ap);
+}
+
+static int testw(int serial, wchar_t *expect, wchar_t *fmt, ...) {
+    va_list ap;
+    wchar_t *abuf = NULL;
+    va_start(ap, fmt);
+    int n;
+#ifdef TEST_ASPRINTF
+    int an;
+    va_list aap;
+    va_copy(aap, ap);
+#endif
+#ifndef NO_FLOATING_POINT
+    double dv;
+    wchar_t *star;
+#endif
+    switch (fmt[wcslen(fmt)-1]) {
+    case 'e':
+    case 'E':
+    case 'f':
+    case 'F':
+    case 'g':
+    case 'G':
+    case 'a':
+    case 'A':
+#ifdef NO_FLOATING_POINT
+	    return 0;
+#else
+	    star = wcschr(fmt, '*');
+	    if (star) {
+		    if (wcschr(star+1, '*')) {
+			    int iv1 = va_arg(ap, int);
+			    int iv2 = va_arg(ap, int);
+			    dv = va_arg(ap, double);
+			    n = swprintf(wbuf, 1024, fmt, iv1, iv2, printf_float(dv));
+		    } else  {
+			    int iv = va_arg(ap, int);
+			    dv = va_arg(ap, double);
+			    n = swprintf(wbuf, 1024, fmt, iv, printf_float(dv));
+		    }
+	    } else {
+		    dv = va_arg(ap, double);
+		    n = swprintf(wbuf, 1024, fmt, printf_float(dv));
+	    }
+	    break;
+#endif
+    default:
+	    n = vswprintf(wbuf, 1024, fmt, ap);
+	    break;
+    }
+    va_end(ap);
+//    printf("serial %d expect \"%s\" got \"%s\"\n", serial, expect, wbuf);
+    if (n >= 1024) {
+        failmsgw(serial, L"buffer overflow");
+	free(abuf);
+        return 1;
+    }
+    if (n != (int) wcslen(expect)) {
+        failmsgw(serial, L"expected \"%s\" (%d), got \"%s\" (%d)",
+		expect, wcslen(expect), wbuf, n);
+	free(abuf);
+        return 1;
+    }
+    if (wcscmp(wbuf, expect)) {
+        failmsgw(serial, L"expected \"%ls\", got \"%ls\"", expect, wbuf);
+	free(abuf);
+        return 1;
+    }
     return 0;
 }
 
