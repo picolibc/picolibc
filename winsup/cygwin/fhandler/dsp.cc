@@ -1369,11 +1369,17 @@ fhandler_dev_dsp::_ioctl (unsigned int cmd, void *buf)
 	    return -1;
 	  }
 	audio_buf_info *p = (audio_buf_info *) buf;
-        if (audio_out_) {
-            audio_out_->buf_info (p, audiofreq_, audiobits_, audiochannels_);
-        } else {
-            Audio_out::default_buf_info(p, audiofreq_, audiobits_, audiochannels_);
-        }
+	if (audio_out_)
+	  audio_out_->buf_info (p, audiofreq_, audiobits_, audiochannels_);
+	else if (fragment_has_been_set)
+	  {
+	    p->bytes = fragsize_ * fragstotal_;
+	    p->fragsize = fragsize_;
+	    p->fragstotal = fragstotal_;
+	    p->fragments = fragstotal_;
+	  }
+	else
+	  Audio_out::default_buf_info(p, audiofreq_, audiobits_, audiochannels_);
         debug_printf ("buf=%p frags=%d fragsize=%d bytes=%d",
                       buf, p->fragments, p->fragsize, p->bytes);
 	return 0;
@@ -1387,11 +1393,17 @@ fhandler_dev_dsp::_ioctl (unsigned int cmd, void *buf)
 	    return -1;
 	  }
 	audio_buf_info *p = (audio_buf_info *) buf;
-        if (audio_in_) {
-            audio_in_->buf_info (p, audiofreq_, audiobits_, audiochannels_);
-        } else {
-            Audio_in::default_buf_info(p, audiofreq_, audiobits_, audiochannels_);
-        }
+	if (audio_in_)
+	  audio_in_->buf_info (p, audiofreq_, audiobits_, audiochannels_);
+	else if (fragment_has_been_set)
+	  {
+	    p->bytes = 0;
+	    p->fragsize = fragsize_;
+	    p->fragstotal = fragstotal_;
+	    p->fragments = 0;
+	  }
+	else
+	  Audio_in::default_buf_info(p, audiofreq_, audiobits_, audiochannels_);
         debug_printf ("buf=%p frags=%d fragsize=%d bytes=%d",
                       buf, p->fragments, p->fragsize, p->bytes);
 	return 0;
