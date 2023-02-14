@@ -44,7 +44,7 @@ ungetc(int c, FILE *stream)
 	if ((stream->flags & __SRD) == 0 || c == EOF)
 		return EOF;
 
-	if (!__atomic_compare_exchange_ungetc(&stream->unget, 0, c | UNGETC_MARK))
+	if (!__atomic_compare_exchange_ungetc(&stream->unget, 0, (__ungetc_t) c + 1 ))
 		return EOF;
 
         stream->flags &= ~__SEOF;

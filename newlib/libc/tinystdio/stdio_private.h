@@ -44,11 +44,6 @@
 #define SCANF_STD 1
 #define SCANF_FLT 2
 
-/* This is OR'd into the char stored in unget to make it non-zero to
- * flag the unget buffer as being full
- */
-#define UNGETC_MARK	0x0100
-
 struct __file_str {
 	struct __file file;	/* main file struct */
         char	*pos;		/* current buffer position */
