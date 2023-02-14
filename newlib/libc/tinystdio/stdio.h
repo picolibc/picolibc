@@ -43,12 +43,13 @@
 
 #include <inttypes.h>
 #include <stdarg.h>
-#include <sys/_types.h>
+#include <sys/types.h>
 #include <sys/cdefs.h>
 
 #ifndef __DOXYGEN__
 #define __need_NULL
 #define __need_size_t
+#define __need_ssize_t
 #include <stddef.h>
 #endif	/* !__DOXYGEN__ */
 
@@ -258,6 +259,7 @@ struct __file {
 #define __SCLOSE 0x0010		/* struct is __file_close */
 #define __SEXT  0x0020          /* struct is __file_ext */
 #define __SBUF  0x0040          /* struct is __file_bufio */
+#define __SWIDE 0x0080          /* wchar output mode */
 	int	(*put)(char, struct __file *);	/* function to write one char to device */
 	int	(*get)(struct __file *);	/* function to read one char from device */
 	int	(*flush)(struct __file *);	/* function to flush output to device */
@@ -940,6 +942,10 @@ extern void setlinebuf(FILE *stream);
 extern int setvbuf(FILE *stream, char *buf, int mode, size_t size);
 extern FILE *tmpfile(void);
 extern char *tmpnam (char *s);
+extern _ssize_t getline(char **restrict lineptr, size_t *restrict n,
+                    FILE *restrict stream);
+extern _ssize_t getdelim(char **restrict lineptr, size_t *restrict n,
+                     int delim, FILE *restrict stream);
 
 /*
  * The format of tmpnam names is TXXXXXX, which works with mktemp

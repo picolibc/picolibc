@@ -42,6 +42,17 @@
 #include "stdio_private.h"
 #include "../../libm/common/math_config.h"
 
+#ifdef WIDE_CHARS
+#include <wchar.h>
+#define CHAR wchar_t
+#define UCHAR wchar_t
+#undef vfprintf
+#define vfprintf vfwprintf
+#else
+#define CHAR char
+#define UCHAR unsigned char
+#endif
+
 #ifdef PICOLIBC_FLOAT_PRINTF_SCANF
 static inline float
 printf_float_get(uint32_t u)
@@ -200,14 +211,14 @@ typedef struct {
  * target_argno so that the outer printf code can then extract it.
  */
 static void
-skip_to_arg(const char *fmt_orig, my_va_list *ap, int target_argno)
+skip_to_arg(const CHAR *fmt_orig, my_va_list *ap, int target_argno)
 {
-    unsigned char c;		/* holds a char from the format string */
+    unsigned c;		/* holds a char from the format string */
     uint16_t flags;
     int current_argno = 1;
     int argno;
     int width;
-    const char *fmt = fmt_orig;
+    const CHAR *fmt = fmt_orig;
 
     while (current_argno < target_argno) {
         for (;;) {
@@ -356,17 +367,16 @@ skip_to_arg(const char *fmt_orig, my_va_list *ap, int target_argno)
 }
 #endif
 
-int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
+int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 {
-    unsigned char c;		/* holds a char from the format string */
+    unsigned c;		/* holds a char from the format string */
     uint16_t flags;
     int width;
     int prec;
-    int (*put)(char, FILE *) = stream->put;
 #ifdef PRINTF_POSITIONAL
     int argno;
     my_va_list my_ap;
-    const char *fmt_orig = fmt;
+    const CHAR *fmt_orig = fmt;
 #define ap my_ap.ap
 #else
 #define ap ap_orig
@@ -388,7 +398,10 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
 
     int stream_len = 0;
 
+#ifndef my_putc
+    int (*put)(char, FILE *) = stream->put;
 #define my_putc(c, stream) do { ++stream_len; if (put(c, stream) < 0) goto fail; } while(0)
+#endif
 
     if ((stream->flags & __SWR) == 0)
 	return EOF;
@@ -1084,14 +1097,36 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
 #endif
         } else {
             int len, buf_len;
+#ifdef WIDE_CHARS
+            CHAR *wstr = NULL;
+            CHAR c_arg;
+
+            pnt = NULL;
+#endif
 
             if (c == 'c') {
+#ifdef WIDE_CHARS
+                c_arg = va_arg (ap, int);
+                if (!(flags & FL_LONG))
+                    c_arg = (char) c_arg;
+                wstr = &c_arg;
+#else
                 buf[0] = va_arg (ap, int);
                 pnt = buf;
+#endif
                 size = 1;
                 goto str_lpad;
             } else if (c == 's') {
-                pnt = va_arg (ap, char *);
+#ifdef WIDE_CHARS
+                if (flags & FL_LONG) {
+                    wstr = va_arg(ap, CHAR *);
+                    if (wstr) {
+                        size = wcsnlen(wstr, (flags & FL_PREC) ? (size_t) prec : SIZE_MAX);
+                        goto str_lpad;
+                    }
+                } else
+#endif
+                    pnt = va_arg (ap, char *);
                 if (!pnt)
                     pnt = "(null)";
                 size = strnlen (pnt, (flags & FL_PREC) ? (size_t) prec : SIZE_MAX);
@@ -1105,7 +1140,12 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap_orig)
                 }
                 width -= size;
                 while (size--) {
-                    my_putc (*pnt++, stream);
+#ifdef WIDE_CHARS
+                    if (wstr)
+                        my_putc(*wstr++, stream);
+                    else
+#endif
+                        my_putc (*pnt++, stream);
                 }
 
             } else {

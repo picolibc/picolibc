@@ -55,6 +55,9 @@ int
 __file_str_get(FILE *stream);
 
 int
+__file_wstr_get(FILE *stream);
+
+int
 __file_str_put(char c, FILE *stream);
 
 int
@@ -83,6 +86,15 @@ bool __matchcaseprefix(const char *input, const char *pattern);
 			.get = __file_str_get	\
 		},				\
 		.pos = (char *) (_s)		\
+	}
+
+#define FDEV_SETUP_WSTRING_READ(_s) {		\
+		.file = {			\
+			.flags = __SRD,		\
+			.get = __file_wstr_get	\
+		},				\
+                .pos = (char *) (_s),           \
+                .end = (char *) (_s)            \
 	}
 
 #define FDEV_SETUP_STRING_WRITE(_s, _size) {	\

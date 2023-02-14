@@ -59,20 +59,39 @@ typedef unsigned long uint_scanf_t;
 typedef long int_scanf_t;
 #endif
 
-static int
+#ifdef WIDE_CHARS
+#include <wchar.h>
+#define INT wint_t
+#define CHAR wchar_t
+#define UCHAR wchar_t
+#define GETC(s) getwc(s)
+#define UNGETC(c,s) ungetwc(c,s)
+#undef vfscanf
+#define vfscanf vfwscanf
+#define IS_EOF(c)       ((c) == WEOF)
+#else
+#define INT int
+#define CHAR char
+#define UCHAR unsigned char
+#define GETC(s) getc(s)
+#define UNGETC(c,s) ungetc(c,s)
+#define IS_EOF(c)       ((c) < 0)
+#endif
+
+static INT
 scanf_getc(FILE *stream, int *lenp)
 {
-	int c = getc(stream);
-	if (c >= 0)
+	INT c = GETC(stream);
+	if (!IS_EOF(c))
 		++(*lenp);
 	return c;
 }
 
-static int
-scanf_ungetc(int c, FILE *stream, int *lenp)
+static INT
+scanf_ungetc(INT c, FILE *stream, int *lenp)
 {
-	c = ungetc(c, stream);
-	if (c >= 0)
+	c = UNGETC(c, stream);
+	if (!IS_EOF(c))
 		--(*lenp);
 	return c;
 }
@@ -100,7 +119,7 @@ static unsigned char
 conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags, unsigned int base)
 {
     uint_scanf_t val;
-    int i;
+    INT i;
 
     i = scanf_getc (stream, lenp);			/* after scanf_ungetc()	*/
 
@@ -109,7 +128,7 @@ conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags, un
         flags |= FL_MINUS;
 	FALLTHROUGH;
       case '+':
-	if (!--width || (i = scanf_getc(stream, lenp)) < 0)
+        if (!--width || IS_EOF(i = scanf_getc(stream, lenp)))
 	    goto err;
     }
 
@@ -117,19 +136,19 @@ conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags, un
 
     /* Leading '0' digit -- check for base indication */
     if (i == '0') {
-	if (!--width || (i = scanf_getc (stream, lenp)) < 0)
+	if (!--width || IS_EOF(i = scanf_getc (stream, lenp)))
 	    goto putval;
 
         flags |= FL_ANY;
 
         if (TOLOW(i) == 'x' && (base == 0 || base == 16)) {
             base = 16;
-	    if (!--width || (i = scanf_getc(stream, lenp)) < 0)
+            if (!--width || IS_EOF(i = scanf_getc (stream, lenp)))
 		goto putval;
 #ifdef _WANT_IO_PERCENT_B
         } else if (i == 'b' && base <= 2) {
             base = 2;
-	    if (!--width || (i = scanf_getc(stream, lenp)) < 0)
+            if (!--width || IS_EOF(i = scanf_getc (stream, lenp)))
 		goto putval;
 #endif
 	} else if (base == 0 || base == 8) {
@@ -147,7 +166,7 @@ conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags, un
         flags |= FL_ANY;
         val = val * base + c;
 	if (!--width) goto putval;
-    } while ((i = scanf_getc(stream, lenp)) >= 0);
+    } while (!IS_EOF(i = scanf_getc(stream, lenp)));
     if (!(flags & FL_ANY))
         goto err;
 
@@ -161,14 +180,14 @@ conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags, un
 }
 
 #if  SCANF_BRACKET
-static const char *
-conv_brk (FILE *stream, int *lenp, width_t width, char *addr, const char *fmt)
+static const CHAR *
+conv_brk (FILE *stream, int *lenp, width_t width, CHAR *addr, const CHAR *fmt)
 {
     unsigned char msk[32];
     unsigned char fnegate;
     unsigned char frange;
     unsigned char cabove;
-    int i;
+    INT i;
 
     memset (msk, 0, sizeof(msk));
     fnegate = 0;
@@ -222,7 +241,7 @@ conv_brk (FILE *stream, int *lenp, width_t width, char *addr, const char *fmt)
        Note, there is no method to include NUL into symbol list.	*/
     do {
 	i = scanf_getc (stream, lenp);
-	if (i < 0) break;
+	if (IS_EOF(i)) break;
 	if (!((msk[(unsigned char)i >> 3] >> (i & 7)) & 1)) {
 	    scanf_ungetc (i, stream, lenp);
 	    break;
@@ -245,11 +264,11 @@ conv_brk (FILE *stream, int *lenp, width_t width, char *addr, const char *fmt)
 #include "conv_flt.c"
 #endif	/* SCANF_FLOAT	*/
 
-static int skip_spaces (FILE *stream, int *lenp)
+static INT skip_spaces (FILE *stream, int *lenp)
 {
-    int i;
+    INT i;
     do {
-	if ((i = scanf_getc (stream, lenp)) < 0)
+	if (IS_EOF(i = scanf_getc (stream, lenp)))
 	    return i;
     } while (ISSPACE (i));
     scanf_ungetc (i, stream, lenp);
@@ -412,10 +431,10 @@ skip_to_arg(my_va_list *ap, int target_argno)
      -Wl,-u,vfscanf -lscanf_min -lm
      \endcode
 */
-int vfscanf (FILE * stream, const char *fmt, va_list ap_orig)
+int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 {
     unsigned char nconvs;
-    unsigned char c;
+    UCHAR c;
     width_t width;
     void *addr;
 #ifdef SCANF_POSITIONAL
@@ -426,7 +445,7 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap_orig)
 #define ap ap_orig
 #endif
     uint16_t flags;
-    int i;
+    INT i;
     int scanf_len = 0;
 #define lenp (&scanf_len)
 
@@ -444,9 +463,9 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap_orig)
 		   || (c = *fmt++) == '%')
 	{
 	    /* Ordinary character.	*/
-	    if ((i = scanf_getc (stream, lenp)) < 0)
+	    if (IS_EOF(i = scanf_getc (stream, lenp)))
 		goto eof;
-	    if ((unsigned char)i != c) {
+	    if ((UCHAR)i != c) {
 		scanf_ungetc (i, stream, lenp);
 		break;
 	    }
@@ -569,12 +588,20 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap_orig)
 	    if (c == 'c') {
 		if (!(flags & FL_WIDTH)) width = 1;
 		do {
-		    if ((i = scanf_getc (stream, lenp)) < 0)
+		    if (IS_EOF(i = scanf_getc (stream, lenp)))
 			goto eof;
 		    if (addr) {
-			*(char *)addr = i;
-			addr = (char*)addr + 1;
-		    }
+#ifdef WIDE_CHARS
+                            if (flags & FL_LONG) {
+                                *(wchar_t *)addr = i;
+                                addr = (wchar_t *)addr + 1;
+                            } else
+#endif
+                            {
+                                *(char *)addr = i;
+                                addr = (char*)addr + 1;
+                            }
+                    }
 		} while (--width);
 		c = 1;			/* no matter with smart GCC	*/
 
@@ -588,7 +615,7 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap_orig)
 
                 unsigned int base = 0;
 
-		if (skip_spaces (stream, lenp) < 0)
+		if (IS_EOF(skip_spaces (stream, lenp)))
 		    goto eof;
 
 		switch (c) {
@@ -596,18 +623,33 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap_orig)
 		  case 's':
 		    /* Now we have 1 nospace symbol.	*/
 		    do {
-			if ((i = scanf_getc (stream, lenp)) < 0)
+			if (IS_EOF(i = scanf_getc (stream, lenp)))
 			    break;
 			if (ISSPACE (i)) {
 			    scanf_ungetc (i, stream, lenp);
 			    break;
 			}
 			if (addr) {
-			    *(char *)addr = i;
-			    addr = (char*)addr + 1;
+#ifdef WIDE_CHARS
+                            if (flags & FL_LONG) {
+                                *(wchar_t *)addr = i;
+                                addr = (wchar_t *)addr + 1;
+                            } else
+#endif
+                            {
+                                *(char *)addr = i;
+                                addr = (char*)addr + 1;
+                            }
 			}
 		    } while (--width);
-		    if (addr) *(char *)addr = 0;
+                    if (addr){
+#ifdef WIDE_CHARS
+                        if (flags & FL_LONG)
+                            *(wchar_t *)addr = 0;
+                        else
+#endif
+                            *(char *)addr = 0;
+                    }
 		    c = 1;		/* no matter with smart GCC	*/
 		    break;
 
