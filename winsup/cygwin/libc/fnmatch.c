@@ -274,6 +274,29 @@ rangematch(const char *pattern, wint_t test, int flags, char **newp,
 			return (RANGE_NOMATCH);
 		} else if (*pattern == '\\' && !(flags & FNM_NOESCAPE))
 			pattern++;
+		if (*pattern == '[' && (pattern[1] == ':' || pattern[1] == '.'
+					|| pattern[1] == '=')) {
+			const char ctype = *++pattern;
+			const char *class_p = ++pattern;
+
+			while (*pattern
+			       && (*pattern != ctype || pattern[1] != ']'))
+				++pattern;
+			if (!*pattern)
+				return (RANGE_ERROR);
+			if (ctype == ':') {
+				size_t clen = pattern - class_p;
+				char class[clen + 1];
+
+				*stpncpy (class, class_p, clen) = '\0';
+				if (iswctype (test, wctype (class)))
+					ok = 1;
+			}
+			pattern += 2;
+			/* TODO: [. and [= are just ignored for now */
+			continue;
+
+		}
 		pclen = mbrtowi(&c, pattern, MB_LEN_MAX, patmbs);
 		if (pclen == (size_t)-1 || pclen == (size_t)-2)
 			return (RANGE_NOMATCH);
