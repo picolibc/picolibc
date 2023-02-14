@@ -41,7 +41,7 @@ extern wctomb_f __utf8_wctomb;
 
 /* replacement function for mbrtowc, returning a wint_t representing
    a UTF-32 value. Defined in strfuncs.cc */
-extern wint_t mbrtowi (wint_t *, const char *, size_t, mbstate_t *);
+extern size_t mbrtowi (wint_t *, const char *, size_t, mbstate_t *);
 
 #ifdef __cplusplus
 }

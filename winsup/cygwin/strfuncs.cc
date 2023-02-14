@@ -114,7 +114,7 @@ transform_chars_af_unix (PWCHAR out, const char *path, __socklen_t len)
 
 /* replacement function for mbrtowc, returning a wint_t representing
    a UTF-32 value. */
-extern "C" wint_t
+extern "C" size_t
 mbrtowi (wint_t *pwi, const char *s, size_t n, mbstate_t *ps)
 {
   size_t len, len2;
