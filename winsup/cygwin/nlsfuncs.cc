@@ -11,6 +11,7 @@ details. */
 #include <stdlib.h>
 #include <locale.h>
 #include <wchar.h>
+#include <wctype.h>
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
@@ -1110,6 +1111,7 @@ __collate_load_locale (struct __locale_t *locale, const char *name,
 /* We use the Windows functions for locale-specific string comparison and
    transformation.  The advantage is that we don't need any files with
    collation information. */
+
 extern "C" int
 wcscoll_l (const wchar_t *__restrict ws1, const wchar_t *__restrict ws2,
 	   struct __locale_t *locale)
@@ -1191,6 +1193,52 @@ __collate_range_cmp (int c1, int c2)
       s2[1] = ((c2 - 0x10000) & 0x3ff) + 0xdc00;
     }
   return wcscoll (s1, s2);
+}
+
+/* Check if UTF-32 input character `test' is in the same equivalence class
+   as the multibyte char in `equiv'.
+   Note that we only recognize input in Unicode normalization form C, that
+   is, we expect all letters to be composed.  A single character is all we
+   look at.
+   To check equivalence, decompose pattern letter and input letter and check
+   the base character for equality.  Also, convert all digits to the ASCII
+   digits 0 - 9 and compare. */
+extern "C" int
+is_unicode_equiv (wint_t test, wint_t eqv)
+{
+	wchar_t decomp_testc[5] = { 0 };
+	wchar_t decomp_eqvc[5] = { 0 };
+	wchar_t testc[3] = { 0 };
+	wchar_t eqvc[3] = { 0 };
+
+	/* For equivalence classes, case doesn't matter.  However, be careful.
+	   Only convert chars which have a "upper" to "lower". */
+	if (iswupper (eqv))
+		eqv = towlower (eqv);
+	if (iswupper (test))
+		test = towlower (test);
+	/* Convert to UTF-16 string */
+	if (eqv > 0x10000) {
+		eqvc[0] = ((eqv - 0x10000) >> 10) + 0xd800;
+		eqvc[1] = ((eqv - 0x10000) & 0x3ff) + 0xdc00;
+	} else
+		eqvc[0] = eqv;
+	if (test > 0x10000) {
+		testc[0] = ((test - 0x10000) >> 10) + 0xd800;
+		testc[1] = ((test - 0x10000) & 0x3ff) + 0xdc00;
+	} else
+		testc[0] = test;
+	/* Convert to denormalized form */
+	FoldStringW (MAP_COMPOSITE | MAP_FOLDDIGITS, eqvc, -1, decomp_eqvc, 5);
+	FoldStringW (MAP_COMPOSITE | MAP_FOLDDIGITS, testc, -1, decomp_testc, 5);
+	/* If they are equivalent, the base char must be the same. */
+	if (decomp_eqvc[0] != decomp_testc[0])
+		return 0;
+	/* If it's a surrogate pair, check the second char, too */
+	if (decomp_eqvc[0] >= 0xd800 && decomp_eqvc[0] <= 0xdbff &&
+	    decomp_eqvc[1] != decomp_testc[1])
+		return 0;
+	return 1;
 }
 
 extern "C" size_t

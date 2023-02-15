@@ -15,6 +15,8 @@ extern const int __collate_load_error;
 
 extern int __collate_range_cmp (int c1, int c2);
 
+int is_unicode_equiv (wint_t, wint_t);
+
 #ifdef __cplusplus
 };
 #endif
