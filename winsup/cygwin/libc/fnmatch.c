@@ -284,16 +284,25 @@ rangematch(const char *pattern, wint_t test, int flags, char **newp,
 				++pattern;
 			if (!*pattern)
 				return (RANGE_ERROR);
-			if (ctype == ':') {
+			if (ctype == ':') { /* named character class */
 				size_t clen = pattern - class_p;
 				char class[clen + 1];
 
 				*stpncpy (class, class_p, clen) = '\0';
 				if (iswctype (test, wctype (class)))
 					ok = 1;
+			} else if (ctype == '=') { /* equivalence class */
+				size_t elen = pattern - class_p;
+				char equiv[elen + 1];
+				wint_t eqv;
+
+				*stpncpy (equiv, class_p, elen) = '\0';
+				if (mbrtowi(&eqv, equiv, elen, patmbs) == elen
+				    && is_unicode_equiv (test, eqv))
+					ok = 1;
 			}
+			/* TODO: [. is just ignored for now */
 			pattern += 2;
-			/* TODO: [. and [= are just ignored for now */
 			continue;
 
 		}
