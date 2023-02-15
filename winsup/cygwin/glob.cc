@@ -110,6 +110,8 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/glob.c,v 1.28 2010/05/12 17:44:00 gordon Ex
 
 #define	DOLLAR		'$'
 #define	DOT		'.'
+#define	COLON		':'
+#define	EQUALS		'='
 #define	EOS		'\0'
 #define	LBRACKET	'['
 #define	NOT		'!'
@@ -155,8 +157,8 @@ typedef char Char;
 #define	M_ONE		META('?')
 #define	M_RNG		META('-')
 #define	M_SET		META('[')
+#define	M_NAMED		META(':')
 #define	ismeta(c)	(((c)&M_QUOTE) != 0)
-
 
 static int	 compare(const void *, const void *);
 static int	 g_Ctoc(const Char *, char *, size_t);
@@ -180,6 +182,39 @@ static int	 match(Char *, Char *, Char *);
 #ifdef DEBUG
 static void	 qprintf(const char *, Char *);
 #endif
+
+/* Return value is either EOS, COLON, DOT, EQUALS, or LBRACKET if no class
+   expression found. */
+static inline Char
+check_classes_expr(const Char *&cptr, char *classbuf = NULL,
+		   size_t classbufsize = 0)
+{
+	const Char *ctype = NULL;
+
+	if (*cptr == LBRACKET &&
+	    (cptr[1] == COLON || cptr[1] == DOT || cptr[1] == EQUALS)) {
+		ctype = ++cptr;
+		while (*++cptr != EOS &&
+		       (*cptr != *ctype || cptr[1] != RBRACKET))
+			;
+		if (*cptr == EOS)
+			return EOS;
+		if (classbuf) {
+			const Char *class_p = ctype + 1;
+			size_t clen = cptr - class_p;
+			size_t idx;
+
+			if (clen < classbufsize) {
+				for (idx = 0; idx < clen; ++idx)
+				    classbuf[idx] = class_p[idx];
+				classbuf[idx] = '\0';
+			} else
+				ctype = NULL;
+		}
+		cptr++; /* Advance cptr to closing RBRACKET of class expr */
+	}
+	return ctype ? *ctype : LBRACKET;
+}
 
 int
 glob(const char *__restrict pattern, int flags, int (*errfunc)(const char *, int), glob_t *__restrict pglob)
@@ -296,8 +331,10 @@ globexp2(const Char *ptr, const Char *pattern, glob_t *pglob, int *rv, size_t *l
 	for (i = 0, pe = ++ptr; *pe; pe++)
 		if (*pe == LBRACKET) {
 			/* Ignore everything between [] */
-			for (pm = pe++; *pe != RBRACKET && *pe != EOS; pe++)
-				continue;
+			for (pm = pe++; *pe != RBRACKET && *pe != EOS; pe++) {
+				if (check_classes_expr (pe) == EOS)
+					break;
+			}
 			if (*pe == EOS) {
 				/*
 				 * We could not find a matching RBRACKET.
@@ -324,8 +361,10 @@ globexp2(const Char *ptr, const Char *pattern, glob_t *pglob, int *rv, size_t *l
 		switch (*pm) {
 		case LBRACKET:
 			/* Ignore everything between [] */
-			for (pm1 = pm++; *pm != RBRACKET && *pm != EOS; pm++)
-				continue;
+			for (pm1 = pm++; *pm != RBRACKET && *pm != EOS; pm++) {
+				if (check_classes_expr (pm) == EOS)
+					break;
+			}
 			if (*pm == EOS) {
 				/*
 				 * We could not find a matching RBRACKET.
@@ -451,7 +490,7 @@ globtilde(const Char *pattern, Char *patbuf, size_t patbuf_len, glob_t *pglob)
 static int
 glob0(const Char *pattern, glob_t *pglob, size_t *limit)
 {
-	const Char *qpatnext;
+	const Char *qpatnext, *qpatrbsrch;
 	int err;
 	size_t oldpathc;
 	Char *bufnext, c, patbuf[MAXPATHLEN];
@@ -467,8 +506,13 @@ glob0(const Char *pattern, glob_t *pglob, size_t *limit)
 			c = *qpatnext;
 			if (c == NOT)
 				++qpatnext;
-			if (*qpatnext == EOS ||
-			    g_strchr(qpatnext+1, RBRACKET) == NULL) {
+			for (qpatrbsrch = qpatnext;
+			     *qpatrbsrch != RBRACKET && *qpatrbsrch != EOS;
+			     ++qpatrbsrch) {
+				if (check_classes_expr (qpatrbsrch) == EOS)
+					break;
+			}
+			if (*qpatrbsrch == EOS) {
 				*bufnext++ = LBRACKET;
 				if (c == NOT)
 					--qpatnext;
@@ -477,8 +521,24 @@ glob0(const Char *pattern, glob_t *pglob, size_t *limit)
 			*bufnext++ = M_SET;
 			if (c == NOT)
 				*bufnext++ = M_NOT;
-			c = *qpatnext++;
+			c = *qpatnext;
 			do {
+				char cclass[64];
+				wctype_t type;
+				Char ctype;
+
+				ctype = check_classes_expr(qpatnext, cclass,
+							   sizeof cclass);
+				if (ctype) {
+					if (ctype == COLON &&
+					    (type = wctype (cclass))) {
+					    *bufnext++ = M_NAMED;
+					    *bufnext++ = CHAR (type);
+					}
+					/* TODO: [. and [= are ignored yet */
+					qpatnext++;
+					continue;
+				}
 				*bufnext++ = CHAR(c);
 				if (*qpatnext == RANGE &&
 				    (c = qpatnext[1]) != RBRACKET) {
@@ -795,7 +855,10 @@ match(Char *name, Char *pat, Char *patend)
 			if ((negate_range = ((*pat & M_MASK) == M_NOT)) != EOS)
 				++pat;
 			while (((c = *pat++) & M_MASK) != M_END)
-				if ((*pat & M_MASK) == M_RNG) {
+				if ((c & M_MASK) == M_NAMED) {
+					if (iswctype (k, *pat++))
+						ok = 1;
+				} else if ((*pat & M_MASK) == M_RNG) {
 					if (__collate_load_error ?
 					    CCHAR(c) <= CCHAR(k) && CCHAR(k) <= CCHAR(pat[1]) :
 					       __collate_range_cmp(CCHAR(c), CCHAR(k)) <= 0
