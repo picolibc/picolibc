@@ -70,6 +70,8 @@ srcs_tinystdio = [
     'ftello.c',
     'fwrite.c',
     'getchar.c',
+    'getdelim.c',
+    'getline.c',
     'gets.c',
     'matchcaseprefix.c',
     'mktemp.c',
