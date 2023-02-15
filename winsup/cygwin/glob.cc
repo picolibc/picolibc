@@ -158,6 +158,7 @@ typedef char Char;
 #define	M_RNG		META('-')
 #define	M_SET		META('[')
 #define	M_NAMED		META(':')
+#define	M_EQUIV		META('=')
 #define	ismeta(c)	(((c)&M_QUOTE) != 0)
 
 static int	 compare(const void *, const void *);
@@ -186,7 +187,7 @@ static void	 qprintf(const char *, Char *);
 /* Return value is either EOS, COLON, DOT, EQUALS, or LBRACKET if no class
    expression found. */
 static inline Char
-check_classes_expr(const Char *&cptr, char *classbuf = NULL,
+check_classes_expr(const Char *&cptr, wint_t *classbuf = NULL,
 		   size_t classbufsize = 0)
 {
 	const Char *ctype = NULL;
@@ -206,7 +207,7 @@ check_classes_expr(const Char *&cptr, char *classbuf = NULL,
 
 			if (clen < classbufsize) {
 				for (idx = 0; idx < clen; ++idx)
-				    classbuf[idx] = class_p[idx];
+				    classbuf[idx] = CHAR(class_p[idx]);
 				classbuf[idx] = '\0';
 			} else
 				ctype = NULL;
@@ -480,6 +481,11 @@ globtilde(const Char *pattern, Char *patbuf, size_t patbuf_len, glob_t *pglob)
 	return patbuf;
 }
 
+static void
+wcitoascii(char *dst, wint_t *src)
+{
+	while ((*dst++ = *src++));
+}
 
 /*
  * The main glob() routine: compiles the pattern (optionally processing
@@ -523,19 +529,30 @@ glob0(const Char *pattern, glob_t *pglob, size_t *limit)
 				*bufnext++ = M_NOT;
 			c = *qpatnext;
 			do {
-				char cclass[64];
-				wctype_t type;
+				wint_t wclass[64];
 				Char ctype;
 
-				ctype = check_classes_expr(qpatnext, cclass,
-							   sizeof cclass);
+				ctype = check_classes_expr(qpatnext, wclass,
+							   64);
 				if (ctype) {
-					if (ctype == COLON &&
-					    (type = wctype (cclass))) {
-					    *bufnext++ = M_NAMED;
-					    *bufnext++ = CHAR (type);
+					wctype_t type;
+
+					if (ctype == COLON) {
+					    char cclass[64];
+
+					    /* No worries, char classes are
+					       ASCII-only anyway */
+					    wcitoascii (cclass, wclass);
+					    if ((type = wctype (cclass))) {
+						*bufnext++ = M_NAMED;
+						*bufnext++ = CHAR (type);
+					    }
+					} else if (ctype == EQUALS &&
+						   wclass[0] && !wclass[1]) {
+					    *bufnext++ = M_EQUIV;
+					    *bufnext++ = CHAR (wclass[0]);
 					}
-					/* TODO: [. and [= are ignored yet */
+					/* TODO: [. is ignored yet */
 					qpatnext++;
 					continue;
 				}
@@ -857,6 +874,9 @@ match(Char *name, Char *pat, Char *patend)
 			while (((c = *pat++) & M_MASK) != M_END)
 				if ((c & M_MASK) == M_NAMED) {
 					if (iswctype (k, *pat++))
+						ok = 1;
+				} else if ((c & M_MASK) == M_EQUIV) {
+					if (is_unicode_equiv (k, *pat++))
 						ok = 1;
 				} else if ((*pat & M_MASK) == M_RNG) {
 					if (__collate_load_error ?
