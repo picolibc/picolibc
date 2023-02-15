@@ -12,3 +12,6 @@ What's new:
 - cygcheck has new options searching for available packages in the
   cygwin distro, as well as getting extended info on available and
   installed packages.
+
+- fnmatch(3) and glob(3) now support named character classes in the
+  search pattern, i.e., [:alnum:], etc.

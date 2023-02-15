@@ -28,6 +28,11 @@ cygwin distro, as well as getting extended info on available and
 installed packages.
 </para></listitem>
 
+<listitem><para>
+fnmatch(3) and glob(3) now support named character classes in the
+search pattern, i.e., [:alnum:], etc.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
