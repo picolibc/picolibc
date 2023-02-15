@@ -430,7 +430,8 @@ uname_version.c: .FORCE
 	$(AM_V_GEN)cd $(srcdir) && \
 	echo "const char *uname_dev_version = \
 	\"$$(git rev-parse --git-dir >/dev/null 2>&1 && \
-	     git describe --dirty | sed -e 's/cygwin-//')\";" \
+	     git describe --abbrev=12 --long --match 'cygwin*' --dirty | \
+	     sed -e 's/cygwin-//')\";" \
 	     > $(abs_builddir)/uname_version-pre.c && \
 	if [ -f $(abs_builddir)/uname_version.c ] && \
 	   cmp $(abs_builddir)/uname_version.c \
