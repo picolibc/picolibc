@@ -1196,7 +1196,7 @@ __collate_range_cmp (int c1, int c2)
 }
 
 /* Check if UTF-32 input character `test' is in the same equivalence class
-   as the multibyte char in `equiv'.
+   as UTF-32 character 'eqv'.
    Note that we only recognize input in Unicode normalization form C, that
    is, we expect all letters to be composed.  A single character is all we
    look at.
