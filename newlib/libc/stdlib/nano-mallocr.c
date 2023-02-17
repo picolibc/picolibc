@@ -333,14 +333,23 @@ void * nano_malloc(RARG malloc_size_t s)
                {
                    p->size += alloc_size;
 
-                   /* Remove chunk from free_list */
+                   /* Remove chunk from free_list. Since p != NULL there is
+                      at least one chunk */
                    r = free_list;
-                   while (r && p != r->next)
+                   if (r->next == NULL)
                    {
-                     r = r->next;
+                       /* There is only a single chunk, remove it */
+                       free_list = NULL;
                    }
-                   r->next = NULL;
-
+                   else
+                   {
+                       /* Search for the chunk before the one to be removed */
+                       while (p != r->next)
+                       {
+                           r = r->next;
+                       }
+                       r->next = NULL;
+                   }
                    r = p;
                }
                else
