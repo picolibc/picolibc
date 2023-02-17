@@ -89,7 +89,7 @@ then
 	diff=-1
   }
   item () {
-	if [ "$1" == "#error" ]
+	if [ "$1" = "#error" ]
 	then	echo "$*"
 		return
 	fi
