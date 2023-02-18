@@ -1200,14 +1200,14 @@ __collate_range_cmp (int c1, int c2)
    Note that we only recognize input in Unicode normalization form C, that
    is, we expect all letters to be composed.  A single character is all we
    look at.
-   To check equivalence, decompose pattern letter and input letter and check
-   the base character for equality.  Also, convert all digits to the ASCII
-   digits 0 - 9 and compare. */
+   To check equivalence, decompose pattern letter and input letter into
+   normalization form KD and check the base character for equality.  Also,
+   convert all digits to the ASCII digits 0 - 9 and compare. */
 extern "C" int
 is_unicode_equiv (wint_t test, wint_t eqv)
 {
-	wchar_t decomp_testc[5] = { 0 };
-	wchar_t decomp_eqvc[5] = { 0 };
+	wchar_t decomp_testc[24] = { 0 };
+	wchar_t decomp_eqvc[24] = { 0 };
 	wchar_t testc[3] = { 0 };
 	wchar_t eqvc[3] = { 0 };
 
@@ -1229,8 +1229,10 @@ is_unicode_equiv (wint_t test, wint_t eqv)
 	} else
 		testc[0] = test;
 	/* Convert to denormalized form */
-	FoldStringW (MAP_COMPOSITE | MAP_FOLDDIGITS, eqvc, -1, decomp_eqvc, 5);
-	FoldStringW (MAP_COMPOSITE | MAP_FOLDDIGITS, testc, -1, decomp_testc, 5);
+	FoldStringW (MAP_COMPOSITE | MAP_FOLDCZONE | MAP_FOLDDIGITS,
+		     eqvc, -1, decomp_eqvc, 24);
+	FoldStringW (MAP_COMPOSITE | MAP_FOLDCZONE | MAP_FOLDDIGITS,
+		     testc, -1, decomp_testc, 24);
 	/* If they are equivalent, the base char must be the same. */
 	if (decomp_eqvc[0] != decomp_testc[0])
 		return 0;
