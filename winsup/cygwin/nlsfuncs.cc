@@ -1172,11 +1172,9 @@ strcoll (const char *__restrict s1, const char *__restrict s2)
   return strcoll_l (s1, s2, __get_current_locale ());
 }
 
-/* BSD.  Used from glob.cc, fnmatch.c and regcomp.c.  Make sure caller is
-   using wide chars.  Unfortunately the definition of this functions hides
-   the required input type. */
+/* BSD.  Used from glob.cc, fnmatch.c and regcomp.c. */
 extern "C" int
-__collate_range_cmp (int c1, int c2)
+__wcollate_range_cmp (wint_t c1, wint_t c2)
 {
   wchar_t s1[3] = { (wchar_t) c1, L'\0', L'\0' };
   wchar_t s2[3] = { (wchar_t) c2, L'\0', L'\0' };

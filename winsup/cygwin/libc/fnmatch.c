@@ -330,18 +330,14 @@ rangematch(const char *pattern, wint_t test, int flags, char **newp,
 				c2 = towlower(c2);
 
 #ifdef __CYGWIN__
-			if (__collate_load_error ?
-			    c <= test && test <= c2 :
-			       __collate_range_cmp(c, test) <= 0
-			    && __collate_range_cmp(test, c2) <= 0
-			   )
+			if ((!__get_current_collate_locale ()->lcid) ?
 #else
 			if (table->__collate_load_error ?
-			    c <= test && test <= c2 :
-			       __collate_range_cmp(table, c, test) <= 0
-			    && __collate_range_cmp(table, test, c2) <= 0
-			   )
 #endif
+			    c <= test && test <= c2 :
+			       __wcollate_range_cmp(c, test) <= 0
+			    && __wcollate_range_cmp(test, c2) <= 0
+			   )
 				ok = 1;
 		} else if (c == test)
 			ok = 1;

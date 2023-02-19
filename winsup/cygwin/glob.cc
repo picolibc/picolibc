@@ -879,10 +879,14 @@ match(Char *name, Char *pat, Char *patend)
 					if (is_unicode_equiv (k, *pat++))
 						ok = 1;
 				} else if ((*pat & M_MASK) == M_RNG) {
+#ifdef __CYGWIN__
+					if ((!__get_current_collate_locale ()->lcid) ?
+#else
 					if (__collate_load_error ?
+#endif
 					    CCHAR(c) <= CCHAR(k) && CCHAR(k) <= CCHAR(pat[1]) :
-					       __collate_range_cmp(CCHAR(c), CCHAR(k)) <= 0
-					    && __collate_range_cmp(CCHAR(k), CCHAR(pat[1])) <= 0
+					       __wcollate_range_cmp(CCHAR(c), CCHAR(k)) <= 0
+					    && __wcollate_range_cmp(CCHAR(k), CCHAR(pat[1])) <= 0
 					   )
 						ok = 1;
 					pat += 2;

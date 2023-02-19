@@ -96,9 +96,6 @@ char NO_COPY almost_null[1];
 
 extern "C" {
 
-/* We never have a collate load error. */
-const int __collate_load_error = 0;
-
   /* Heavily-used const UNICODE_STRINGs are defined here once.  The idea is a
      speed improvement by not having to initialize a UNICODE_STRING every time
      we make a string comparison.  The _RDATA trick allows defining the strings
