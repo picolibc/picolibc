@@ -130,12 +130,13 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/glob.c,v 1.28 2010/05/12 17:44:00 gordon Ex
 
 #ifndef DEBUG
 
-#define	M_QUOTE		0x8000000000ULL
-#define	M_PROTECT	0x4000000000ULL
-#define	M_MASK		0xffffffffffULL
-#define	M_CHAR		0x00ffffffffULL
+#define	M_QUOTE		0x40000000U
+#define	M_PROTECT	0x20000000U
+#define	M_MASK		0x70ffffffU
+#define	M_COLL_MASK	0x700000ffU
+#define	M_CHAR		0x0fffffffU
 
-typedef uint_fast64_t Char;
+typedef wint_t Char;
 
 #else
 
