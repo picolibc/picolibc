@@ -39,9 +39,55 @@ extern wctomb_f __utf8_wctomb;
 
 #define __WCTOMB (__get_current_locale ()->wctomb)
 
+/* convert wint_t string to wchar_t string.  Make sure dest
+   has room for at least twice as much characters to account
+   for surrogate pairs, plus a wchar_t NUL. */
+void wcintowcs (wchar_t *, wint_t *, size_t);
+
 /* replacement function for mbrtowc, returning a wint_t representing
    a UTF-32 value. Defined in strfuncs.cc */
 extern size_t mbrtowi (wint_t *, const char *, size_t, mbstate_t *);
+
+/* like wcslen, just for wint_t */
+static inline size_t
+wcilen (const wint_t *wcs)
+{
+  size_t ret = 0;
+
+  if (wcs)
+    while (*wcs++)
+      ++ret;
+  return ret;
+}
+
+/* like wcscmp, just for wint_t */
+static inline int
+wcicmp (const wint_t *s1, const wint_t *s2)
+{
+  while (*s1 == *s2++)
+    if (*s1++ == 0)
+      return (0);
+  return (*s1 - *--s2);
+}
+
+/* like wcsncmp, just for wint_t */
+static inline int
+wcincmp (const wint_t *s1, const wint_t *s2, size_t n)
+{
+  if (n == 0)
+    return (0);
+  do
+    {
+      if (*s1 != *s2++)
+        {
+          return (*s1 - *--s2);
+        }
+      if (*s1++ == 0)
+        break;
+    }
+  while (--n != 0);
+  return (0);
+}
 
 #ifdef __cplusplus
 }

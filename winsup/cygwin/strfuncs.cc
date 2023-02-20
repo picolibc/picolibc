@@ -112,6 +112,23 @@ transform_chars_af_unix (PWCHAR out, const char *path, __socklen_t len)
   return out;
 }
 
+/* convert wint_t string to wchar_t string.  Make sure dest
+   has room for at least twice as much characters to account
+   for surrogate pairs, plus a wchar_t NUL. */
+extern "C" void
+wcintowcs (wchar_t *dest, wint_t *src, size_t len)
+{
+  while (*src && len-- > 0)
+    if (*src > 0xffff)
+      {
+	*dest++ = ((*src - 0x10000) >> 10) + 0xd800;
+	*dest++ = ((*src++ - 0x10000) & 0x3ff) + 0xdc00;
+      }
+    else
+	*dest++ = *src++;
+  *dest = '\0';
+}
+
 /* replacement function for mbrtowc, returning a wint_t representing
    a UTF-32 value. */
 extern "C" size_t
