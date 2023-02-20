@@ -1195,6 +1195,25 @@ __wcollate_range_cmp (wint_t c1, wint_t c2)
   return wcscoll (s1, s2);
 }
 
+/* Not so much BSD.  Used from glob.cc, fnmatch.c and regcomp.c.
+
+   First arg is always from pattern space, second arg is the tested string.
+   len is the length of the pattern in the first arg. */
+extern "C" int
+__wscollate_range_cmp (wint_t *c1, wint_t *c2,
+		       size_t c1len, size_t c2len)
+{
+  wchar_t s1[c1len * 2 + 1] = { 0 };	/* # of chars if all are surrogates */
+  wchar_t s2[c2len * 2 + 1] = { 0 };
+
+  wcintowcs (s1, c1, c1len);
+  wcintowcs (s2, c2, c2len);
+  return wcscoll_l (s1, s2, __get_current_locale ());
+}
+
+const size_t ce_size = sizeof collating_element / sizeof *collating_element;
+const size_t ce_e_size = sizeof *collating_element;
+
 /* Check if UTF-32 input character `test' is in the same equivalence class
    as UTF-32 character 'eqv'.
    Note that we only recognize input in Unicode normalization form C, that

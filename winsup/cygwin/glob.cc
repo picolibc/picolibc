@@ -160,6 +160,9 @@ typedef char Char;
 #define	M_SET		META('[')
 #define	M_NAMED		META(':')
 #define	M_EQUIV		META('=')
+#define	M_COLL(_ccnt)	META('.' | ((_ccnt) << 8))
+#define M_COLL_P(_c)	(((_c) & M_COLL_MASK) == META('.'))
+#define M_COLL_CNT(_c)	(((_c) & ~M_COLL_MASK) >> 8)
 #define	ismeta(c)	(((c)&M_QUOTE) != 0)
 
 static int	 compare(const void *, const void *);
@@ -528,41 +531,61 @@ glob0(const Char *pattern, glob_t *pglob, size_t *limit)
 			*bufnext++ = M_SET;
 			if (c == NOT)
 				*bufnext++ = M_NOT;
-			c = *qpatnext;
+			c = *qpatnext++;
 			do {
 				wint_t wclass[64];
 				Char ctype;
 
-				ctype = check_classes_expr(qpatnext, wclass,
+				ctype = check_classes_expr(--qpatnext, wclass,
 							   64);
-				if (ctype) {
+				++qpatnext;
+				if (ctype == COLON) {
 					wctype_t type;
+					char cclass[64];
 
-					if (ctype == COLON) {
-					    char cclass[64];
-
-					    /* No worries, char classes are
-					       ASCII-only anyway */
-					    wcitoascii (cclass, wclass);
-					    if ((type = wctype (cclass))) {
-						*bufnext++ = M_NAMED;
-						*bufnext++ = CHAR (type);
-					    }
-					} else if (ctype == EQUALS &&
-						   wclass[0] && !wclass[1]) {
+					/* No worries, char classes are
+					   ASCII-only anyway */
+					wcitoascii (cclass, wclass);
+					if ((type = wctype (cclass))) {
+					    *bufnext++ = M_NAMED;
+					    *bufnext++ = CHAR (type);
+					}
+					continue;
+				}
+				if (ctype == EQUALS) {
+					if (wclass[0] && !wclass[1]) {
 					    *bufnext++ = M_EQUIV;
 					    *bufnext++ = CHAR (wclass[0]);
 					}
-					/* TODO: [. is ignored yet */
-					qpatnext++;
 					continue;
 				}
-				*bufnext++ = CHAR(c);
+				if (ctype == DOT &&
+				    is_unicode_coll_elem (wclass)) {
+					*bufnext++ =
+					    M_COLL (wcilen (wclass));
+					wint_t *wcp = wclass;
+					while ((*bufnext++ = *wcp++))
+					    ;
+					--bufnext; /* drop NUL */
+				} else
+					*bufnext++ = CHAR(c);
 				if (*qpatnext == RANGE &&
 				    (c = qpatnext[1]) != RBRACKET) {
 					*bufnext++ = M_RNG;
-					*bufnext++ = CHAR(c);
-					qpatnext += 2;
+
+					ctype = check_classes_expr(++qpatnext,
+								   wclass, 64);
+					if (ctype == DOT &&
+					    is_unicode_coll_elem (wclass)) {
+						*bufnext++ =
+						    M_COLL (wcilen (wclass));
+						wint_t *wcp = wclass;
+						while ((*bufnext++ = *wcp++))
+						    ;
+						--bufnext; /* drop NUL */
+					} else
+						*bufnext++ = CHAR(c);
+					++qpatnext;
 				}
 			} while ((c = *qpatnext++) != RBRACKET);
 			pglob->gl_flags |= GLOB_MAGCHAR;
@@ -849,11 +872,12 @@ static int
 match(Char *name, Char *pat, Char *patend)
 {
 	int ok, negate_range;
-	Char c, k;
+	Char *c, *k;
+	size_t k_len;
 
 	while (pat < patend) {
-		c = *pat++;
-		switch (c & M_MASK) {
+		c = pat++;
+		switch (*c & M_MASK) {
 		case M_ALL:
 			if (pat == patend)
 				return(1);
@@ -868,36 +892,53 @@ match(Char *name, Char *pat, Char *patend)
 			break;
 		case M_SET:
 			ok = 0;
-			if ((k = *name++) == EOS)
+			if (*(k = name) == EOS)
 				return(0);
+			k_len = next_unicode_char (k);
+			name += k_len;
 			if ((negate_range = ((*pat & M_MASK) == M_NOT)) != EOS)
 				++pat;
-			while (((c = *pat++) & M_MASK) != M_END)
-				if ((c & M_MASK) == M_NAMED) {
-					if (iswctype (k, *pat++))
+			while ((*(c = pat++) & M_MASK) != M_END) {
+				size_t len1 = 1, len2 = 1;
+
+				if ((*c & M_MASK) == M_NAMED) {
+					if (iswctype (*k, *pat++))
 						ok = 1;
-				} else if ((c & M_MASK) == M_EQUIV) {
-					if (is_unicode_equiv (k, *pat++))
+					continue;
+				}
+				if ((*c & M_MASK) == M_EQUIV) {
+					if (is_unicode_equiv (*k, *pat++))
 						ok = 1;
-				} else if ((*pat & M_MASK) == M_RNG) {
+					continue;
+				}
+				if (M_COLL_P(*c)) {
+					len1 = M_COLL_CNT(*c);
+					++c;
+					pat += len1;
+				}
+				if ((*pat & M_MASK) == M_RNG) {
+					if (M_COLL_P(pat[1]))
+						len2 = M_COLL_CNT(*++pat);
 #ifdef __CYGWIN__
 					if ((!__get_current_collate_locale ()->lcid) ?
 #else
 					if (__collate_load_error ?
 #endif
-					    CCHAR(c) <= CCHAR(k) && CCHAR(k) <= CCHAR(pat[1]) :
-					       __wcollate_range_cmp(CCHAR(c), CCHAR(k)) <= 0
-					    && __wcollate_range_cmp(CCHAR(k), CCHAR(pat[1])) <= 0
+					    *c <= *k && *k <= pat[1] :
+					       __wscollate_range_cmp(c, k, len1, k_len) <= 0
+					    && __wscollate_range_cmp(k, pat + 1, k_len, len2) <= 0
 					   )
 						ok = 1;
-					pat += 2;
-				} else if (c == k)
+					pat += len2 + 1;
+				} else if (len1 == k_len &&
+					   wcincmp (c, k, len1) == 0)
 					ok = 1;
+			}
 			if (ok == negate_range)
 				return(0);
 			break;
 		default:
-			if (Cchar(*name++) != Cchar(c))
+			if (Cchar(*name++) != Cchar(*c))
 				return(0);
 			break;
 		}
