@@ -17,8 +17,10 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "tls_pbuf.h"
+#include "collate.h"
 #include "lc_msg.h"
 #include "lc_era.h"
+#include "lc_collelem.h"
 
 #define _LC(x)	&lc_##x##_ptr,lc_##x##_end-lc_##x##_ptr
 
@@ -1239,6 +1241,83 @@ is_unicode_equiv (wint_t test, wint_t eqv)
 	    decomp_eqvc[1] != decomp_testc[1])
 		return 0;
 	return 1;
+}
+
+static int
+comp_coll_elem (const void *key, const void *array_member)
+{
+  collating_element_t *ckey = (collating_element_t *) key;
+  collating_element_t *carray_member = (collating_element_t *) array_member;
+
+  int ret = wcicmp ((const wint_t *) ckey->element,
+		    (const wint_t *) carray_member->element);
+  /* The locale in the collating_element array never has a codeset
+     attached.  So the length of the collating_element locale is
+     always <= length of the key locale, and that's all we need to
+     check.  Also, if the collating_element locale is empty, we're
+     all set. */
+  if (ret == 0 && carray_member->locale[0])
+    ret = strncmp (ckey->locale, carray_member->locale,
+		   strlen (carray_member->locale));
+  return ret;
+}
+
+extern "C" int
+is_unicode_coll_elem (const wint_t *test)
+{
+  collating_element_t ct = {
+    (const char32_t *) test,
+    __get_current_locale ()->categories[LC_COLLATE]
+  };
+  collating_element_t *cmatch;
+
+  if (wcilen (test) == 1)
+    return 1;
+  cmatch = (collating_element_t *)
+	   bsearch (&ct, collating_element, ce_size, ce_e_size, comp_coll_elem);
+  return !!cmatch;
+}
+
+static int
+comp_coll_elem_n (const void *key, const void *array_member)
+{
+  collating_element_t *ckey = (collating_element_t *) key;
+  collating_element_t *carray_member = (collating_element_t *) array_member;
+
+  int ret = wcincmp ((const wint_t *) ckey->element,
+		     (const wint_t *) carray_member->element,
+		     wcilen ((const wint_t *) carray_member->element));
+  /* The locale in the collating_element array never has a codeset
+     attached.  So the length of the collating_element locale is
+     always <= length of the key locale, and that's all we need to
+     check.  Also, if the collating_element locale is empty, we're
+     all set. */
+  if (ret == 0 && carray_member->locale[0])
+    ret = strncmp (ckey->locale, carray_member->locale,
+		   strlen (carray_member->locale));
+  return ret;
+}
+
+/* Return the number of UTF-32 chars making up the next full character in
+   inp, taking valid collation elements in the current locale into account. */
+extern "C" size_t
+next_unicode_char (wint_t *inp)
+{
+  collating_element_t ct = {
+    (const char32_t *) inp,
+    __get_current_locale ()->categories[LC_COLLATE]
+  };
+  collating_element_t *cmatch;
+
+  if (wcilen (inp) > 1)
+    {
+      cmatch = (collating_element_t *)
+	       bsearch (&ct, collating_element, ce_size, ce_e_size,
+			comp_coll_elem_n);
+      if (cmatch)
+	return wcilen ((const wint_t *) cmatch->element);
+    }
+  return 1;
 }
 
 extern "C" size_t
