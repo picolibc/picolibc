@@ -1,0 +1,10 @@
+These scripts and helper applications are used to create locale data
+required for complete locale support, but either missing in Windows
+or implemented in a non-POSIXy way.
+
+The script has to run from inside a glibc git clone.
+The C tools can be built without any special options.
+
+All three tools generate the new locale headers (lc_collelem.h,
+lc_era.h, lc_msg.h) in the current working directory.  They can just
+be copied to local_includes and commited without further changes.
