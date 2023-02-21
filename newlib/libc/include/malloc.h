@@ -41,6 +41,7 @@ SUCH DAMAGE.
 #define __need_size_t
 #include <stddef.h>
 
+#include <sys/cdefs.h>
 /* include any machine-specific extensions */
 #include <machine/malloc.h>
 
