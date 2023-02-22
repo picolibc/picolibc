@@ -1206,6 +1206,12 @@ __wscollate_range_cmp (wint_t *c1, wint_t *c2,
   wchar_t s1[c1len * 2 + 1] = { 0 };	/* # of chars if all are surrogates */
   wchar_t s2[c2len * 2 + 1] = { 0 };
 
+  /* wcscoll() ignores case in many locales. but we don't want that
+     for filenames... */
+  if ((iswupper (*c1) && !iswupper (*c2))
+      || (iswlower (*c1) && !iswlower (*c2)))
+    return *c1 - *c2;
+
   wcintowcs (s1, c1, c1len);
   wcintowcs (s2, c2, c2len);
   return wcscoll_l (s1, s2, __get_current_locale ());
