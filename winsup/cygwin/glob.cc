@@ -1024,7 +1024,7 @@ g_Ctoc(const Char *str, char *buf, size_t len)
 
 	memset(&mbs, 0, sizeof(mbs));
 	while (len >= (size_t) MB_CUR_MAX) {
-		clen = wcrtomb(buf, *str, &mbs);
+		clen = wirtomb(buf, *str, &mbs);
 		if (clen == (size_t)-1)
 			return (1);
 		if (*str == L'\0')

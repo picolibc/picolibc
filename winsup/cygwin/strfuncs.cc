@@ -129,6 +129,25 @@ wcintowcs (wchar_t *dest, wint_t *src, size_t len)
   *dest = '\0';
 }
 
+/* replacement function for wcrtomb, converting a UTF-32 char to a
+   multibyte string. */
+extern "C" size_t
+wirtomb (char *s, wint_t wi, mbstate_t *ps)
+{
+    wchar_t wc[3] = { (wchar_t) wi, '\0', '\0' };
+    const wchar_t *wcp = wc;
+    size_t nwc = 1;
+
+    if (wi >= 0x10000)
+      {
+	wi -= 0x10000;
+	wc[0] = (wi >> 10) + 0xd800;
+	wc[1] = (wi & 0x3ff) + 0xdc00;
+	nwc = 2;
+      }
+    return wcsnrtombs (s, &wcp, nwc, SIZE_MAX, ps);
+}
+
 /* replacement function for mbrtowc, returning a wint_t representing
    a UTF-32 value. */
 extern "C" size_t
