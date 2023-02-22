@@ -221,6 +221,11 @@
 #ifdef __riscv_flen
 # define _SUPPORTS_ERREXCEPT
 #endif
+#if __riscv_flen == 64
+# define __OBSOLETE_MATH_DEFAULT 0
+#else
+# define __OBSOLETE_MATH_DEFAULT 1
+#endif
 #endif
 
 #ifdef __i960__
