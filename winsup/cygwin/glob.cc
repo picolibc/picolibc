@@ -90,17 +90,11 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/glob.c,v 1.28 2010/05/12 17:44:00 gordon Ex
 #include <string.h>
 #include <unistd.h>
 #include <wchar.h>
+#include <wctype.h>
 
 #include "collate.h"
 
 #ifdef __CYGWIN__
-#include <wctype.h>
-#include "path.h"
-#include "fhandler.h"
-#include "dtable.h"
-#include "cygheap.h"
-#include "cygwin/version.h"
-
 #define CCHAR(c)	(ignore_case_with_glob ? towlower (CHAR (c)) : CHAR (c))
 #define Cchar(c)	(ignore_case_with_glob ? towlower (c) : (c))
 #endif
