@@ -929,7 +929,7 @@ match(Char *name, Char *pat, Char *patend)
 					if (M_COLL_P(pat[1]))
 						len2 = M_COLL_CNT(*++pat);
 #ifdef __CYGWIN__
-					if ((!__get_current_collate_locale ()->lcid) ?
+					if ((!__get_current_collate_locale ()->win_locale[0]) ?
 #else
 					if (__collate_load_error ?
 #endif

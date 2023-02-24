@@ -46,7 +46,7 @@ __BEGIN_DECLS
 #ifdef __CYGWIN__
 struct lc_collate_T
 {
-  __uint32_t	 lcid;
+  wchar_t	 win_locale[ENCODING_LEN + 1];
   int	       (*mbtowc) (struct _reent *, wchar_t *, const char *, size_t,
 			  mbstate_t *);
   char		 codeset[ENCODING_LEN + 1];

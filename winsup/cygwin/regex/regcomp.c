@@ -827,7 +827,7 @@ p_b_term(struct parse *p, cset *cs)
 			CHadd(p, cs, start);
 		else {
 #ifdef __CYGWIN__
-			if (!__get_current_collate_locale ()->lcid) {
+			if (!__get_current_collate_locale ()->win_locale[0]) {
 #else
 			if (__collate_load_error) {
 #endif
