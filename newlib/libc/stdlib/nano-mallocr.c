@@ -38,6 +38,7 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <malloc.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <sys/config.h>
 #include <sys/lock.h>
