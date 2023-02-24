@@ -50,10 +50,10 @@ but uses the UTF-8 charset.
 
 The following charsets are recognized:
 <<"UTF-8">>, <<"JIS">>, <<"EUCJP">>, <<"SJIS">>, <<"KOI8-R">>, <<"KOI8-U">>,
-<<"GEORGIAN-PS">>, <<"PT154">>, <<"TIS-620">>, <<"ISO-8859-x">> with
-1 <= x <= 16, or <<"CPxxx">> with xxx in [437, 720, 737, 775, 850, 852, 855,
-857, 858, 862, 866, 874, 932, 1125, 1250, 1251, 1252, 1253, 1254, 1255, 1256,
-1257, 1258].
+<<"KOI8-T">>, <<"GEORGIAN-PS">>, <<"PT154">>, <<"TIS-620">>, <<"ISO-8859-x">>
+with 1 <= x <= 16, or <<"CPxxx">> with xxx in [437, 720, 737, 775, 850, 852,
+855, 857, 858, 862, 866, 874, 932, 1125, 1250, 1251, 1252, 1253, 1254, 1255,
+1256, 1257, 1258].
 
 Charsets are case insensitive.  For instance, <<"EUCJP">> and <<"eucJP">>
 are equivalent.  Charset names with dashes can also be written without
@@ -769,7 +769,7 @@ restart:
     break;
     case 'K':
     case 'k':
-      /* KOI8-R, KOI8-U and the aliases without dash */
+      /* KOI8-R, KOI8-U, KOI8-T and the aliases without dash */
       if (strncasecmp (charset, "KOI8", 4))
 	FAIL;
       c = charset + 4;
@@ -784,6 +784,11 @@ restart:
 	{
 	  val = 21866;
 	  strcpy (charset, "CP21866");
+	}
+      else if (*c == 'T' || *c == 't')
+	{
+	  val = 103;
+	  strcpy (charset, "CP103");
 	}
       else
 	FAIL;

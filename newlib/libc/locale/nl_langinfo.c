@@ -233,6 +233,8 @@ do_codeset:
 		      ret = "GEORGIAN-PS";
 		    else if (strcmp (ret + 2, "102") == 0)
 		      ret = "PT154";
+		    else if (strcmp (ret + 2, "103") == 0)
+		      ret = "KOI8-T";
 		  }
 		else if (ret[0] == 'S'/*JIS*/)
 		  {

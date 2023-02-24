@@ -486,6 +486,7 @@ print_charmaps ()
     "ISO-8859-8",
     "ISO-8859-9",
     "KOI8-R",
+    "KOI8-T",
     "KOI8-U",
     "PT154",
     "SJIS",

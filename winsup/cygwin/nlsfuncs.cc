@@ -1510,6 +1510,8 @@ __set_charset_from_locale (const char *locale, char *charset)
 	cs = "CP1251";
       else if (lcid == 0x0422)		/* uk_UA (Ukrainian/Ukraine) */
 	cs = "KOI8-U";
+      else if (lcid == 0x0428)		/* tg_TJ (Tajik/Tajikistan) */
+	cs = "KOI8-T";
       else
 	cs = "ISO-8859-5";
       break;
