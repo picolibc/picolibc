@@ -1125,7 +1125,18 @@ endif
 # Dig out the list of available encodings from the encoding.aliases file. Only
 # accept the first entry from each line
 
-available_encodings = run_command(['sed', '-e', '/^#/d', '-e', '/^$/d', '-e', 's/ .*$//', files('newlib/libc/iconv/encoding.aliases')[0]], check : true).stdout().split('\n')
+available_encodings = []
+# fs.read was added in meson version 0.57.0. The sed invocation can be
+# removed once picolibc requires a version of meson newer than that.
+if meson.version().version_compare('>=0.57')
+  foreach line : fs.read('newlib/libc/iconv/encoding.aliases').split('\n')
+    if line != '' and not line.startswith('#')
+      available_encodings += [line.split()[0]]
+    endif
+  endforeach
+else
+  available_encodings = run_command(['sed', '-e', '/^#/d', '-e', '/^$/d', '-e', 's/ .*$//', files('newlib/libc/iconv/encoding.aliases')[0]], check : true).stdout().split('\n')
+endif
 
 # Include all available encodings if none were specified on the command line
 
