@@ -51,6 +51,21 @@ fs = import('fs')
 
 cc = meson.get_compiler('c')
 
+# Find the compiler installation directory by parsing the output of
+# cc -print-search-dirs
+
+cc_install_dir = ''
+foreach _line : run_command(cc.cmd_array() + ['-print-search-dirs'], check : false).stdout().split('\n')
+  if _line.startswith('install: ')
+    if meson.version().version_compare('>=0.56')
+      # trim off the leading 'install: '
+      cc_install_dir = _line.substring(9)
+    else
+      cc_install_dir = run_command(['expr', _line, ':', 'install: *\(.*\)'], check : false).stdout().split('\n')[0]
+    endif
+  endif
+endforeach
+
 # these options are required for all C compiler operations, including
 # detecting many C compiler features, as we cannot expect there
 # to be a working C library on the system.
@@ -390,8 +405,7 @@ else
 endif
 
 if host_cpu_family == ''
-  host_cmds = cc.cmd_array() + ['-dumpmachine']
-  host_cc_machine=run_command(host_cmds, check : true).stdout().strip().split('-')
+  host_cc_machine=run_command(cc.cmd_array() + ['-dumpmachine'], check : true).stdout().strip().split('-')
   host_cpu_family=host_cc_machine[0]
   message('Computed host_cpu_family as ' + host_cpu_family)
 endif
@@ -435,13 +449,7 @@ if sysroot_install
   if sysroot != ''
     specs_prefix_format = '%R/@0@'
   else
-    paths = run_command(cc.cmd_array() + ['-print-search-dirs'], check : true).stdout().split('\n')
-    foreach path : paths
-      if path.startswith('install: ')
-	sysroot = path.substring(9) + '../../../..'
-      endif
-    endforeach
-    message('computed sysroot is ' + sysroot)
+    sysroot = cc_install_dir + '../../../..'
     specs_prefix_format = '%:getenv(GCC_EXEC_PREFIX ../../@0@)'
   endif
   if not get_option('sysroot-install-skip-checks')
@@ -474,17 +482,14 @@ endif
 
 specs_dir_option = get_option('specsdir')
 if build_type_subdir != ''
-  specs_install = false
   specs_dir = ''
+  specs_install = false
 elif specs_dir_option == ''
-  search_cmds = cc.cmd_array() + ['-print-search-dirs']
-  install_dir=run_command(search_cmds, check : true).stdout().split('\n')[0]
-  # Meson 0.56 adds a 'substring' method which can be used here
-  specs_dir=run_command(['expr', install_dir, ':', 'install: *\(.*\)'], check : false).stdout().split('\n')[0]
+  specs_dir = cc_install_dir
   specs_install = specs_dir != ''
 elif specs_dir_option == 'none'
-  specs_install = false
   specs_dir = ''
+  specs_install = false
 else
   specs_dir = join_paths(prefix, specs_dir_option)
   specs_install = true
@@ -831,7 +836,7 @@ if enable_multilib
   # Ask the compiler for the set of available multilib configurations,
   # set up the build system to compile for all desired ones
 
-  target_list = run_command(cc, '--print-multi-lib', check : true).stdout().strip().split('\n')
+  target_list = run_command(cc.cmd_array() +  ['--print-multi-lib'], check : true).stdout().strip().split('\n')
 
   has_mcmodel = false
   foreach target : target_list
