@@ -21,6 +21,7 @@ details. */
 #include "lc_msg.h"
 #include "lc_era.h"
 #include "lc_collelem.h"
+#include "lc_def_codesets.h"
 
 #define _LC(x)	&lc_##x##_ptr,lc_##x##_end-lc_##x##_ptr
 
@@ -474,7 +475,8 @@ __set_lc_time_from_win (const char *name,
 	 locale. */
       lc_era_t locale_key = { locale, NULL, NULL, NULL, NULL, NULL ,
 				      NULL, NULL, NULL, NULL, NULL };
-      lc_era_t *era = (lc_era_t *) bsearch ((void *) &locale_key, (void *) lc_era,
+      lc_era_t *era = (lc_era_t *) bsearch ((void *) &locale_key,
+					    (void *) lc_era,
 					    sizeof lc_era / sizeof *lc_era,
 					    sizeof *lc_era, locale_cmp);
 
@@ -1455,34 +1457,42 @@ strxfrm (char *__restrict s1, const char *__restrict s2, size_t sn)
 /* Fetch default ANSI codepage from locale info and generate a setlocale
    compatible character set code.  Called from newlib's setlocale(), if the
    charset isn't given explicitely in the POSIX compatible locale specifier. */
-
-/* FIXME: Check all locales against their Linux counterpart again and
-	  make sure the codeset conversion is correct.
-   FIXME: Perhaps, convert to locale names only.
-   FIXME: Perhaps, maintain a sorted list of Linux locales and their
-	  default codesets. */
 extern "C" void
-__set_charset_from_locale (const char *locale, char *charset)
+__set_charset_from_locale (const char *loc, char *charset)
 {
-  UINT cp;
   wchar_t win_locale[ENCODING_LEN + 1];
+  char locale[ENCODING_LEN + 1];
+  const char *modifier;
+  char *c;
+  UINT cp;
 
-  int ret = __get_rfc5646_from_locale (locale, win_locale);
-  wchar_t wbuf[9];
+  /* Cut out explicit codeset */
+  stpcpy (locale, loc);
+  modifier = strchr (loc, '@');
+  if ((c = strchr (locale, '.')))
+    stpcpy (c, modifier ?: "");
+
+  default_codeset_t srch_dc = { locale, NULL };
+  default_codeset_t *dc = (default_codeset_t *)
+	 bsearch ((void *) &srch_dc, (void *) default_codeset,
+		  sizeof default_codeset / sizeof *default_codeset,
+		  sizeof *default_codeset, locale_cmp);
+  if (dc)
+    {
+      stpcpy (charset, dc->codeset);
+      return;
+    }
 
   /* "C" locale, or invalid locale? */
-  if (ret <= 0)
+  if (__get_rfc5646_from_locale (locale, win_locale) <= 0)
     cp = 20127;
-  else if (!GetLocaleInfoEx (win_locale,
+  else if (GetLocaleInfoEx (win_locale,
 			    LOCALE_IDEFAULTANSICODEPAGE | LOCALE_RETURN_NUMBER,
 			    (PWCHAR) &cp, sizeof cp))
     cp = 0;
-  /* For simplicity, we still convert to LCID here. */
-  LCID lcid = LocaleNameToLCID (win_locale, 0);
   /* Translate codepage and lcid to a charset closely aligned with the default
      charsets defined in Glibc. */
   const char *cs;
-  const char *modifier = strchr (locale, '@') ?: "";
   switch (cp)
     {
     case 20127:
@@ -1504,131 +1514,33 @@ __set_charset_from_locale (const char *locale, char *charset)
       cs = "BIG5";
       break;
     case 1250:
-      if (lcid == 0x181a		/* sr_BA (Serbian/Bosnia
-						  and Herzegovina) */
-	  || lcid == 0x241a		/* sr_RS (Serbian/Serbia) */
-	  || lcid == 0x2c1a		/* sr_ME (Serbian/Montenegro)*/
-	  || lcid == 0x0442		/* tk_TM (Turkmen/Turkmenistan) */
-	  || !wcscmp (win_locale, L"sr-Latn-XK")) /* (Serbian/Kosovo) */
-	cs = "UTF-8";
-      else if (lcid == 0x041c)		/* sq_AL (Albanian/Albania) */
-	cs = "ISO-8859-1";
-      else
-	cs = "ISO-8859-2";
+      cs = "ISO-8859-2";
       break;
     case 1251:
-      if (lcid == 0x1c1a		/* sr_BA (Serbian Language/Bosnia
-						  and Herzegovina) */
-	  || lcid == 0x281a		/* sr_RS (Serbian Language/Serbia) */
-	  || lcid == 0x301a		/* sr_ME (Serbian Language/Montenegro)*/
-	  || lcid == 0x0440		/* ky_KG (Kyrgyz/Kyrgyzstan) */
-	  || lcid == 0x082c		/* az_AZ@cyrillic (Azerbaijani/Azerbaijan) */
-	  || lcid == 0x0843		/* uz_UZ (Uzbek/Uzbekistan) */
-					/* tt_RU (Tatar/Russia),
-						 IQTElif alphabet */
-	  || (lcid == 0x0444 && has_modifier ("@iqtelif"))
-	  || lcid == 0x0450		/* mn_MN (Mongolian/Mongolia) */
-	  || !wcscmp (win_locale, L"sr-Cyrl-XK")) /* (Serbian/Kosovo) */
-	cs = "UTF-8";
-      else if (lcid == 0x0423)		/* be_BY (Belarusian/Belarus) */
-	cs = has_modifier ("@latin") ? "UTF-8" : "CP1251";
-      else if (lcid == 0x0402		/* bg_BG (Bulgarian/Bulgaria) */
-	       || lcid == 0x0423)	/* be_BY (Belarusian/Belarus) */
-	cs = "CP1251";
-      else if (lcid == 0x0422		/* uk_UA (Ukrainian/Ukraine) */
-	      || !wcscmp (win_locale, L"ru-UA")) /* (Russian/Ukraine) */
-	cs = "KOI8-U";
-      else if (lcid == 0x0428)		/* tg_TJ (Tajik/Tajikistan) */
-	cs = "KOI8-T";
-      else
-	cs = "ISO-8859-5";
+      cs = "ISO-8859-5";
       break;
     case 1252:
-      if (lcid == 0x0452)		/* cy_GB (Welsh/Great Britain) */
-	cs = "ISO-8859-14";
-      else if (lcid == 0x4009		/* en_IN (English/India) */
-	       || lcid == 0x0867	/* ff_SN (Fulah/Senegal) */
-	       || lcid == 0x0464	/* fil_PH (Filipino/Philippines) */
-	       || lcid == 0x0462	/* fy_NL (Frisian/Netherlands) */
-	       || lcid == 0x0468	/* ha_NG (Hausa/Nigeria) */
-	       || lcid == 0x0475	/* haw_US (Hawaiian/United States) */
-	       || lcid == 0x0470	/* ig_NG (Igbo/Nigeria) */
-	       || lcid == 0x085d	/* iu_CA (Inuktitut/Canada) */
-	       || lcid == 0x046c	/* nso_ZA (Northern Sotho/South Africa) */
-	       || lcid == 0x0487	/* rw_RW (Kinyarwanda/Rwanda) */
-	       || lcid == 0x043b	/* se_NO (Northern Saami/Norway) */
-	       || lcid == 0x0832	/* tn_BW (Tswana/Botswana) */
-	       || lcid == 0x0432	/* tn_ZA (Tswana/South Africa) */
-	       || lcid == 0x0488	/* wo_SN (Wolof/Senegal) */
-	       || lcid == 0x046a	/* yo_NG (Yoruba/Nigeria) */
-	       || lcid == 0x085f)	/* ber_DZ (Tamazight/Algeria) */
-	cs = "UTF-8";
-      else if (lcid == 0x042e)		/* hsb_DE (Upper Sorbian/Germany) */
-	cs = "ISO-8859-2";
-      else if (lcid == 0x0491		/* gd_GB (Scots Gaelic/Great Britain) */
-	       || (has_modifier ("@euro")
-		   && GetLocaleInfoW (lcid, LOCALE_SINTLSYMBOL, wbuf, 9)
-		   && !wcsncmp (wbuf, L"EUR", 3)))
-	cs = "ISO-8859-15";
-      else
-	cs = "ISO-8859-1";
+      cs = "ISO-8859-1";
       break;
     case 1253:
       cs = "ISO-8859-7";
       break;
     case 1254:
-      if (lcid == 0x042c)		/* az_AZ (Azeri/Azerbaijan) */
-	cs = "UTF-8";
-      else if (lcid == 0x0443)		/* uz_UZ (Uzbek/Uzbekistan) */
-	cs = "ISO-8859-1";
-      else
-	cs = "ISO-8859-9";
+      cs = "ISO-8859-9";
       break;
     case 1255:
       cs = "ISO-8859-8";
       break;
     case 1256:
-      if (lcid == 0x0429		/* fa_IR (Persian/Iran) */
-	  || lcid == 0x0846		/* pa_PK (Punjabi/Pakistan) */
-	  || lcid == 0x0859		/* sd_PK (Sindhi/Pakistan) */
-	  || lcid == 0x0480		/* ug_CN (Uyghur/China) */
-	  || lcid == 0x0420)		/* ur_PK (Urdu/Pakistan) */
-	cs = "UTF-8";
-      else
-	cs = "ISO-8859-6";
+      cs = "ISO-8859-6";
       break;
     case 1257:
-      if (lcid == 0x0425)		/* et_EE (Estonian/Estonia) */
-	cs = "ISO-8859-15";
-      else
-	cs = "ISO-8859-13";
+      cs = "ISO-8859-13";
       break;
     case 1258:
     default:
-      if (lcid == 0x3c09		/* en_HK (English/Hong Kong) */
-	  || lcid == 0x200c		/* fr_RE (French/Réunion) */
-	  || lcid == 0x240c		/* fr_CD (French/Congo) */
-	  || lcid == 0x280c		/* fr_SN (French/Senegal) */
-	  || lcid == 0x2c0c		/* fr_CM (French/Cameroon) */
-	  || lcid == 0x300c		/* fr_CI (French/Ivory Coast) */
-	  || lcid == 0x340c		/* fr_ML (French/Mali) */
-	  || lcid == 0x380c		/* fr_MA (French/Morocco) */
-	  || lcid == 0x3c0c		/* fr_HT (French/Haiti) */
-	  || lcid == 0x0477		/* so_SO (Somali/Somali) */
-	  || lcid == 0x0430)		/* st_ZA (Sotho/South Africa) */
-	cs = "ISO-8859-1";
-      else if (lcid == 0x818)		/* ro_MD (Romanian/Moldovia) */
-	cs = "ISO-8859-2";
-      else if (lcid == 0x043a)		/* mt_MT (Maltese/Malta) */
-	cs = "ISO-8859-3";
-      else if (lcid == 0x0481)		/* mi_NZ (Maori/New Zealand) */
-	cs = "ISO-8859-13";
-      else if (lcid == 0x0437)		/* ka_GE (Georgian/Georgia) */
-	cs = "GEORGIAN-PS";
-      else if (lcid == 0x043f)		/* kk_KZ (Kazakh/Kazakhstan) */
-	cs = "PT154";
-      else
-	cs = "UTF-8";
+      cs = "UTF-8";
+      break;
     }
   stpcpy (charset, cs);
 }
