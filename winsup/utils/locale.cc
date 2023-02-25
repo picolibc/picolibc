@@ -380,7 +380,7 @@ print_all_locales_proc (LPWSTR loc_name, DWORD info, LPARAM param)
 	      else if (!wcscmp (iso15924, L"Cyrl;"))
 		stpcpy (c, "@cyrillic");
 	      else if (!wcscmp (iso15924, L"Deva;"))
-		stpcpy (c, "@devanagari");
+		stpcpy (c, "@devanagar");
 	      else if (!wcscmp (iso15924, L"Adlm;"))
 		stpcpy (c, "@adlam");
 	      else
