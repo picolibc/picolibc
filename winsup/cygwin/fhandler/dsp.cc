@@ -133,6 +133,8 @@ class fhandler_dev_dsp::Audio_out: public Audio
   int freq_;
   int bits_;
   int channels_;
+
+  friend fhandler_dev_dsp;
 };
 
 static void CALLBACK waveIn_callback (HWAVEIN hWave, UINT msg,
@@ -1429,11 +1431,16 @@ fhandler_dev_dsp::_ioctl (unsigned int cmd, void *buf)
 	return 0;
 
       CASE (SNDCTL_DSP_POST)
+	if (audio_out_)
+	  audio_out_->sendcurrent (); // force out last block whatever size..
+	return 0;
+
       CASE (SNDCTL_DSP_SYNC)
-	// Stop audio out device
-	close_audio_out ();
-	// Stop audio in device
-	close_audio_in ();
+	if (audio_out_)
+	  {
+	    audio_out_->sendcurrent (); // force out last block whatever size..
+	    audio_out_->waitforallsent (); // block till finished..
+	  }
 	return 0;
 
     default:
