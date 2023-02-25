@@ -469,13 +469,31 @@
 	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L, \
 	_L,	_L,	_L,	_L,	_L,	_L,	_L
 #define _CTYPE_PT154_255 _L
+#define _CTYPE_CP103_128_254 \
+   	_L,	_L,	_P,	_U,	_P,	_P,	_P,	_P, \
+	0,	_P,	_L,	_P,	_U,	_L,	_U,	0,  \
+	_U,	_P,	_P,	_P,	_P,	_P,	_P,	_P, \
+	0,	_P,	0,	_P,	0,	0,	0,	0,  \
+	0,	_L,	_U,	_L,	_P,	_L,	_P,	_P, \
+	0,	0,	0,	_P,	_P,	_P,	_P,	0,  \
+	_P,	_P,	_P,	_U,	0,	_U,	_P,	_P, \
+	0,	_P,	0,	_P,	0,	0,	0,	_P, \
+	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L, \
+	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L, \
+	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L, \
+	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L, \
+	_U,	_U,	_U,	_U,	_U,	_U,	_U,	_U, \
+	_U,	_U,	_U,	_U,	_U,	_U,	_U,	_U, \
+	_U,	_U,	_U,	_U,	_U,	_U,	_U,	_U, \
+	_U,	_U,	_U,	_U,	_U,	_U,	_U
+#define _CTYPE_CP103_255 _U
 
 #if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
 
 #ifndef __CYGWIN__
 static const
 #endif
-char __ctype_cp[26][128 + 256] = {
+char __ctype_cp[27][128 + 256] = {
   { _CTYPE_CP437_128_254,
     0,
     _CTYPE_DATA_0_127,
@@ -632,11 +650,17 @@ char __ctype_cp[26][128 + 256] = {
     _CTYPE_PT154_128_254,
     _CTYPE_PT154_255
   },
+  { _CTYPE_CP103_128_254,
+    0,
+    _CTYPE_DATA_0_127,
+    _CTYPE_CP103_128_254,
+    _CTYPE_CP103_255
+  },
 };
 
 #else /* !defined(ALLOW_NEGATIVE_CTYPE_INDEX) */
 
-static const char __ctype_cp[26][1 + 256] = {
+static const char __ctype_cp[27][1 + 256] = {
   { 0,
     _CTYPE_DATA_0_127,
     _CTYPE_CP437_128_254,
@@ -766,6 +790,11 @@ static const char __ctype_cp[26][1 + 256] = {
     _CTYPE_DATA_0_127,
     _CTYPE_PT154_128_254,
     _CTYPE_PT154_255
+  },
+  { 0,
+    _CTYPE_DATA_0_127,
+    _CTYPE_CP103_128_254,
+    _CTYPE_CP103_255
   },
 };
 

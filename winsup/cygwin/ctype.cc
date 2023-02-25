@@ -16,7 +16,7 @@ extern char _ctype_b[128 + 256];
    time-critical anyway. */
 extern int __iso_8859_index (const char *charset_ext);	/* Newlib */
 extern int __cp_index (const char *charset_ext);	/* Newlib */
-extern const char __ctype_cp[22][128 + 256];		/* Newlib */
+extern const char __ctype_cp[27][128 + 256];		/* Newlib */
 extern const char __ctype_iso[15][128 + 256];		/* Newlib */
 
 void
