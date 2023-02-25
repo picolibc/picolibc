@@ -221,7 +221,7 @@ compare_locales (const void *a, const void *b)
   return strcmp (la->name, lb->name);
 }
 
-void
+size_t
 add_locale (const char *name, const wchar_t *language, const wchar_t *territory,
 	    bool alias = false)
 {
@@ -246,7 +246,7 @@ add_locale (const char *name, const wchar_t *language, const wchar_t *territory,
   locale[loc_num].codeset = strdup (nl_langinfo (CODESET));
   setlocale (LC_CTYPE, orig_locale);
   locale[loc_num].alias = alias;
-  ++loc_num;
+  return loc_num++;
 }
 
 void
@@ -304,7 +304,6 @@ print_all_locales_proc (LPWSTR loc_name, DWORD info, LPARAM param)
   wchar_t iso639[32] = { 0 };
   wchar_t iso3166[32] = { 0 };
   wchar_t iso15924[32] = { 0 };
-  DWORD cp;
 
 #if 0
   struct {
@@ -391,18 +390,18 @@ print_all_locales_proc (LPWSTR loc_name, DWORD info, LPARAM param)
       /* Print */
       GetLocaleInfoEx (loc_name, LOCALE_SENGLISHLANGUAGENAME, language, 256);
       GetLocaleInfoEx (loc_name, LOCALE_SENGLISHCOUNTRYNAME, country, 256);
-      add_locale (posix_loc, language, country);
+      size_t idx = add_locale (posix_loc, language, country);
       /* Check for locales sporting an additional modifier for
 	 changing the codeset and other stuff. */
       if (!wcscmp (iso639, L"be") && !wcscmp (iso3166, L"BY"))
 	stpcpy (c, "@latin");
       if (!wcscmp (iso639, L"tt") && !wcscmp (iso3166, L"RU"))
 	stpcpy (c, "@iqtelif");
-      else if (GetLocaleInfoEx (loc_name,
-				LOCALE_IDEFAULTANSICODEPAGE
-				| LOCALE_RETURN_NUMBER,
-				(PWCHAR) &cp, sizeof cp)
-	       && cp == 1252 /* Latin1*/
+       /* If the base locale is ISO-8859-1 and the locale defines currency
+          as EUR, add a @euro locale. For historical reasons there's also
+	  a greek @euro locale, albeit it doesn't change the codeset. */
+      else if ((!strcmp (locale[idx].codeset, "ISO-8859-1")
+		|| !strcmp (posix_loc, "el_GR"))
 	       && GetLocaleInfoEx (loc_name, LOCALE_SINTLSYMBOL, currency, 9)
 	       && !wcsncmp (currency, L"EUR", 3))
 	stpcpy (c, "@euro");
