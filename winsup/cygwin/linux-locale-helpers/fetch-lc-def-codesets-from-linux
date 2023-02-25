@@ -10,39 +10,17 @@
 	} default_codeset[] =
 	{
 	EOF
-  while read line
-  do
-    locale=$(echo "${line}" | awk '/^locale:/{ print $2; }')
-    if [ -z "${locale}" ]
-    then
-      continue
-    fi
-    # No aliases
-    idx=$(expr index "${locale}" '_')
-    if [ "${idx}" -eq 0 ]
-    then
-      continue
-    fi
-    # No explicit codesets
-    idx=$(expr index "${locale}" '.')
-    if [ "${idx}" -ne 0 ]
-    then
-      continue
-    fi
-    while read line2
-    do
-      codeset=$(echo "${line2}" | awk '/codeset/{ print $3; }')
-      if [ -n "${codeset}" ]
-      then
-	# Translate into internal codeset names. */
-	case "${codeset}" in
-	  BIG5*)	codeset="BIG5";;
-	  *)		;;
-	esac
-	printf "  { \"%s\", \"%s\" },\n" "${locale}" "${codeset}"
-	break
-      fi
-    done
-  done <<<$(locale -av)
+  locale -av | \
+  awk '/^locale:/{
+		   if ( index ($2, "_") == 0 ) next # No aliases
+		   if ( index ($2, ".") > 0 ) next # No explicit codesets
+		   locale=$2;
+		 }
+       /codeset/ {
+		   if ( length (locale) == 0 ) next
+		   codeset = gensub (/BIG5.*/, "BIG5", 1, $3);
+		   printf "  { \"%s\", \"%s\" },\n", locale, codeset;
+		   locale = "";
+		 }'
   echo "};"
 ) > lc_def_codesets.h
