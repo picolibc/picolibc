@@ -367,7 +367,7 @@ print_all_locales_proc (LPWSTR loc_name, DWORD info, LPARAM param)
 	  wchar_t scriptless_win_locale[32];
 	  wchar_t default_iso15924[32];
 
-	  wcpcpy (wcpcpy (wcpcpy (scriptless_win_locale, iso639), L"_"),
+	  wcpcpy (wcpcpy (wcpcpy (scriptless_win_locale, iso639), L"-"),
 		  iso3166);
 	  if ((GetLocaleInfoEx (scriptless_win_locale, LOCALE_SSCRIPTS,
 				default_iso15924, 32)
