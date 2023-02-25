@@ -35,24 +35,24 @@
 foreach target : targets
   value = get_variable('target_' + target)
 
-  _libs_base = [get_variable('lib_c' + target)]
+  _libs = [get_variable('lib_c' + target)]
   if is_variable('lib_semihost' + target)
-    _libs_base += [get_variable('lib_semihost' + target)]
+    _libs += [get_variable('lib_semihost' + target)]
   endif
 
-  if is_variable('lib_crt_semihost' + target)
-    _libs = [get_variable('lib_crt_semihost'+ target)] + _libs_base
-  elif is_variable('lib_crt_hosted' + target)
-    _libs = [get_variable('lib_crt_hosted'+ target)] + _libs_base
+  if is_variable('crt0_semihost' + target)
+    _objs = [get_variable('crt0_semihost'+ target)]
+  elif is_variable('crt0_hosted' + target)
+    _objs = [get_variable('crt0_hosted'+ target)]
   else
-    _libs = _libs_base
+    _objs = []
   endif
 
-  have_crt_minimal = is_variable('lib_crt_minimal' + target)
+  have_crt_minimal = is_variable('crt0_minimal' + target)
   if have_crt_minimal
-    _libs_minimal = [get_variable('lib_crt_minimal'+ target)] + _libs_base
+    _objs_minimal = [get_variable('crt0_minimal'+ target)]
   else
-    _libs_minimal = _libs_base
+    _objs_minimal = _objs
   endif
 
   _c_args = value[1] + test_c_args
@@ -69,6 +69,7 @@ foreach target : targets
        executable(t1_name, ['printf_scanf.c', 'lock-valid.c'],
 		  c_args: double_printf_compile_args + _c_args,
 		  link_args: double_printf_link_args + _link_args,
+		  objects: _objs,
 		  link_with: _libs,
 		  link_depends:  test_link_depends,
 		  include_directories: inc),
@@ -86,6 +87,7 @@ foreach target : targets
        executable(t1_name, ['printf_scanf.c', 'lock-valid.c'],
 		  c_args: float_printf_compile_args + _c_args,
 		  link_args: float_printf_link_args + _link_args,
+		  objects: _objs,
 		  link_with: _libs,
 		  link_depends:  test_link_depends,
 		  include_directories: inc),
@@ -103,6 +105,7 @@ foreach target : targets
        executable(t1_name, ['printf-tests.c', 'lock-valid.c'],
 		  c_args: double_printf_compile_args + _c_args,
 		  link_args: double_printf_link_args + _link_args,
+		  objects: _objs,
 		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
@@ -119,6 +122,7 @@ foreach target : targets
        executable(t1_name, ['printf-tests.c', 'lock-valid.c'],
 		  c_args: float_printf_compile_args + _c_args,
 		  link_args: float_printf_link_args + _link_args,
+		  objects: _objs,
 		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
@@ -135,6 +139,7 @@ foreach target : targets
        executable(t1_name, ['printf-tests.c', 'lock-valid.c'],
 		  c_args: int_printf_compile_args + _c_args,
 		  link_args: int_printf_link_args + _link_args,
+		  objects: _objs,
 		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
@@ -158,6 +163,7 @@ foreach target : targets
        executable(t1_name, ['time-sprintf.c', 'lock-valid.c'],
 		  c_args: int_printf_compile_args + _c_args + ['-fno-builtin'],
 		  link_args: int_printf_link_args + _link_args,
+		  objects: _objs,
 		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
@@ -174,6 +180,7 @@ foreach target : targets
        executable(t1_name, ['try-ilp32.c', 'try-ilp32-sub.c', 'lock-valid.c'],
 		  c_args: _c_args,
 		  link_args: _link_args,
+		  objects: _objs,
 		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
@@ -190,6 +197,7 @@ foreach target : targets
        executable(t1_name, ['hosted-exit.c', 'lock-valid.c'],
 		  c_args: _c_args,
 		  link_args:  _link_args,
+		  objects: _objs,
 		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
@@ -199,6 +207,7 @@ foreach target : targets
        executable(t1_name + '-fail', ['hosted-exit.c', 'lock-valid.c'],
 		  c_args: _c_args + ['-DRETVAL=1'],
 		  link_args:  _link_args,
+		  objects: _objs,
 		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
@@ -217,6 +226,7 @@ foreach target : targets
        executable(t1_name, ['abort.c', 'lock-valid.c'],
 		  c_args: _c_args,
 		  link_args:  _link_args,
+		  objects: _objs,
 		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
@@ -236,7 +246,8 @@ foreach target : targets
 	 executable(t1_name, ['constructor-skip.c', 'lock-valid.c'],
 		    c_args: _c_args,
 		    link_args:  _link_args,
-		    link_with: _libs_minimal,
+		    objects: _objs_minimal,
+		    link_with: _libs,
 		    include_directories: inc),
          depends: bios_bin,
 	 env: test_env)
@@ -253,6 +264,7 @@ foreach target : targets
        executable(t1_name, ['math_errhandling.c'],
 		  c_args: arg_fnobuiltin + _c_args,
 		  link_args: _link_args,
+		  objects: _objs,
 		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
@@ -269,6 +281,7 @@ foreach target : targets
        executable(t1_name, ['rounding-mode.c', 'rounding-mode-sub.c'],
 		  c_args: arg_fnobuiltin + _c_args,
 		  link_args: _link_args,
+		  objects: _objs,
 		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
@@ -286,6 +299,7 @@ foreach target : targets
        executable(t1_name, [t1_src, 'lock-valid.c'],
 		  c_args: double_printf_compile_args + arg_fnobuiltin + _c_args,
 		  link_args: double_printf_link_args + _link_args,
+		  objects: _objs,
 		  link_with: _libs,
 		  link_depends:  test_link_depends,
 		  include_directories: inc),
@@ -306,6 +320,7 @@ foreach target : targets
        executable(t1_name, t1_src,
 		  c_args: double_printf_compile_args + _c_args,
 		  link_args: double_printf_link_args + _link_args,
+		  objects: _objs,
 		  link_with: _libs,
 		  link_depends:  test_link_depends,
 		  include_directories: inc),
@@ -359,6 +374,7 @@ foreach target : targets
 	 executable(t1_name, [t1_src, 'lock-valid.c'],
 		    c_args: double_printf_compile_args + _c_args,
 		    link_args: double_printf_link_args + _link_args,
+		    objects: _objs,
 		    link_with: _libs,
 		    link_depends:  test_link_depends,
 		    include_directories: inc),

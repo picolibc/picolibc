@@ -138,8 +138,10 @@ foreach target : targets
   if is_variable('lib_semihost' + target)
     libs += [get_variable('lib_semihost' + target)]
   endif
-  if is_variable('lib_crt_hosted' + target)
-    libs += [get_variable('lib_crt_hosted'+ target)]
+  if is_variable('crt0_hosted' + target)
+    objs = [get_variable('crt0_hosted'+ target)]
+  else
+    objs = []
   endif
 
   if target == ''
@@ -151,6 +153,7 @@ foreach target : targets
   test(test_name,
        executable(test_name, math_test_src,
 		  c_args: value[1] + double_printf_compile_args + test_c_args,
+		  objects: objs,
 		  link_with: libs,
 		  link_args: value[1] + double_printf_link_args + test_link_args,
 		  include_directories: inc),

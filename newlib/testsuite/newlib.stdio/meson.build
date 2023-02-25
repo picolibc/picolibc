@@ -46,8 +46,10 @@ foreach target : targets
   if is_variable('lib_semihost' + target)
     _libs += [get_variable('lib_semihost' + target)]
   endif
-  if is_variable('lib_crt_hosted' + target)
-    _libs += [get_variable('lib_crt_hosted'+ target)]
+  if is_variable('crt0_hosted' + target)
+    _objs = [get_variable('crt0_hosted'+ target)]
+  else
+    _objs = []
   endif
   
   _c_args = value[1] + test_c_args
@@ -66,6 +68,7 @@ foreach target : targets
 	 executable(test_name, src,
 		    c_args: ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE'] + _c_args,
 		    link_args: _link_args,
+		    objects: _objs,
 		    link_with: _libs,
 		    include_directories: test_inc),
 	 depends: bios_bin,
