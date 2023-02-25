@@ -1,4 +1,4 @@
-/* ctype table definitions for ISO-8859-x charsets. 
+/* ctype table definitions for ISO-8859-x charsets.
    Included by ctype_.c. */
 
 #define _CTYPE_ISO_8859_1_128_254 \
@@ -20,7 +20,7 @@
         _L,     _L,     _L,     _L,     _L,     _L,     _L
 #define _CTYPE_ISO_8859_1_255 _L
 #define _CTYPE_ISO_8859_2_128_254 \
-   	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
+	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
@@ -38,7 +38,7 @@
         _L,     _L,     _L,     _L,     _L,     _L,     _L
 #define _CTYPE_ISO_8859_2_255 _P
 #define _CTYPE_ISO_8859_3_128_254 \
-   	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
+	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
@@ -56,7 +56,7 @@
 	_L,	_L,	_L,	_L,	_L,	_L,	_L
 #define _CTYPE_ISO_8859_3_255 _P
 #define _CTYPE_ISO_8859_4_128_254 \
-   	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
+	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
@@ -74,7 +74,7 @@
         _L,     _L,     _L,     _L,     _L,     _L,     _L
 #define _CTYPE_ISO_8859_4_255 _L
 #define _CTYPE_ISO_8859_5_128_254 \
-   	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
+	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
@@ -92,7 +92,7 @@
         _L,     _L,     _L,     _L,     _L,     _P,     _L
 #define _CTYPE_ISO_8859_5_255 _L
 #define _CTYPE_ISO_8859_6_128_254 \
-   	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
+	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
@@ -110,7 +110,7 @@
 	0,	0,	0,	0,	0,	0,	0
 #define _CTYPE_ISO_8859_6_255 0
 #define _CTYPE_ISO_8859_7_128_254 \
-   	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
+	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
@@ -128,7 +128,7 @@
 	_L,	_L,	_L,	_L,	_L,	_L,	_L
 #define _CTYPE_ISO_8859_7_255 0
 #define _CTYPE_ISO_8859_8_128_254 \
-   	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
+	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
@@ -146,7 +146,7 @@
 	_U|_L,	_U|_L,	_U|_L,	0,	0,	_P,	_P
 #define _CTYPE_ISO_8859_8_255 0
 #define _CTYPE_ISO_8859_9_128_254 \
-   	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
+	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
@@ -164,7 +164,7 @@
 	_L,	_L,	_L,	_L,	_L,	_L,	_L
 #define _CTYPE_ISO_8859_9_255 _L
 #define _CTYPE_ISO_8859_10_128_254 \
-   	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
+	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
@@ -182,7 +182,7 @@
 	_L,	_L,	_L,	_L,	_L,	_L,	_L
 #define _CTYPE_ISO_8859_10_255 _L
 #define _CTYPE_ISO_8859_11_128_254 \
-   	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
+	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
@@ -200,7 +200,7 @@
 	_U|_L,	_U|_L,	_U|_L,	_U|_L,	0,	0,	0
 #define _CTYPE_ISO_8859_11_255 0
 #define _CTYPE_ISO_8859_13_128_254 \
-   	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
+	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
@@ -218,7 +218,7 @@
 	_L,	_L,	_L,	_L,	_L,	_L,	_L
 #define _CTYPE_ISO_8859_13_255 _P
 #define _CTYPE_ISO_8859_14_128_254 \
-   	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
+	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
@@ -236,7 +236,7 @@
 	_L,	_L,	_L,	_L,	_L,	_L,	_L
 #define _CTYPE_ISO_8859_14_255 _L
 #define _CTYPE_ISO_8859_15_128_254 \
-   	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
+	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
@@ -254,7 +254,7 @@
         _L,     _L,     _L,     _L,     _L,     _L,     _L
 #define _CTYPE_ISO_8859_15_255 _L
 #define _CTYPE_ISO_8859_16_128_254 \
-   	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
+	_C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
         _C,     _C,     _C,     _C,     _C,     _C,     _C,     _C, \
