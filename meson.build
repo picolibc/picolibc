@@ -1264,7 +1264,7 @@ endif
 # of meson newer than that.
 
 test_env = environment({'PICOLIBC_TEST' : '1'})
-test_env.prepend('PATH', meson.source_root() / 'scripts')
+test_env.prepend('PATH', meson.current_source_dir() / 'scripts')
 
 # CompCert needs the '-WUl,' prefix to correctly pass the --spec parameters to the linker
 specs_prefix = ''
