@@ -2214,7 +2214,7 @@ format_proc_locale_proc (LPWSTR win_locale, DWORD info, LPARAM param)
 	  else if (!wcscmp (iso15924, L"Cyrl;"))
 	    stpcpy (modifier, "@cyrillic");
 	  else if (!wcscmp (iso15924, L"Deva;"))
-	    stpcpy (modifier, "@devanagar");
+	    stpcpy (modifier, "@devanagari");
 	  else if (!wcscmp (iso15924, L"Adlm;"))
 	    stpcpy (modifier, "@adlam");
 	  else

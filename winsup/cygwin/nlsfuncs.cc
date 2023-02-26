@@ -126,7 +126,7 @@ __get_rfc5646_from_locale (const char *name, wchar_t *win_locale)
 	idx = 0;
       else if (!strcmp (modifier, "cyrillic"))
 	idx = 1;
-      else if (!strcmp (modifier, "devanagar"))
+      else if (!strcmp (modifier, "devanagari"))
 	idx = 2;
       else if (!strcmp (modifier, "adlam"))
 	idx = 3;
