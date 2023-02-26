@@ -11,6 +11,7 @@ details. */
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <langinfo.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -49,16 +50,20 @@ static off_t format_proc_filesystems (void *, char *&);
 static off_t format_proc_swaps (void *, char *&);
 static off_t format_proc_devices (void *, char *&);
 static off_t format_proc_misc (void *, char *&);
+static off_t format_proc_locales (void *, char *&);
+static off_t format_proc_codesets (void *, char *&);
 
 /* names of objects in /proc */
 static const virt_tab_t proc_tab[] = {
   { _VN ("."),		 FH_PROC,	virt_directory,	NULL },
   { _VN (".."),		 FH_PROC,	virt_directory,	NULL },
+  { _VN ("codesets"),	 FH_PROC,	virt_file,	format_proc_codesets },
   { _VN ("cpuinfo"),	 FH_PROC,	virt_file,	format_proc_cpuinfo },
   { _VN ("cygdrive"),	 FH_PROC,	virt_symlink,	format_proc_cygdrive },
   { _VN ("devices"),	 FH_PROC,	virt_file,	format_proc_devices },
   { _VN ("filesystems"), FH_PROC,	virt_file,	format_proc_filesystems },
   { _VN ("loadavg"),	 FH_PROC,	virt_file,	format_proc_loadavg },
+  { _VN ("locales"),	 FH_PROC,	virt_file,	format_proc_locales },
   { _VN ("meminfo"),	 FH_PROC,	virt_file,	format_proc_meminfo },
   { _VN ("misc"),	 FH_PROC,	virt_file,	format_proc_misc },
   { _VN ("mounts"),	 FH_PROC,	virt_symlink,	format_proc_mounts },
@@ -2065,6 +2070,284 @@ format_proc_misc (void *, char *&destbuf)
 			     "%3d clipboard\n"
 			     "%3d windows\n",
 			     _minor (FH_CLIPBOARD), _minor (FH_WINDOWS));
+
+  destbuf = (char *) crealloc_abort (destbuf, bufptr - buf);
+  memcpy (destbuf, buf, bufptr - buf);
+  return bufptr - buf;
+}
+
+static char *
+add_locale (char *bufptr, const char *posix_locale, const char *codeset,
+	    bool explicit_utf8, const char *modifier, const wchar_t *win_locale)
+{
+  const char *start = bufptr;
+  bufptr = stpcpy (bufptr, posix_locale);
+  if (explicit_utf8)
+    bufptr = stpcpy (bufptr, ".utf8");
+  if (modifier && modifier[0])
+    bufptr = stpcpy (bufptr, modifier);
+  if (bufptr - start < 16)
+    {
+      if (bufptr - start < 8)
+	bufptr = stpcpy (bufptr, "\t");
+      bufptr = stpcpy (bufptr, "\t");
+    }
+  bufptr = stpcpy (bufptr, "\t");
+  start = bufptr;
+  bufptr = stpcpy (bufptr, codeset);
+  if (win_locale && win_locale[0])
+    {
+      if (bufptr - start < 16)
+	{
+	  if (bufptr - start < 8)
+	    bufptr = stpcpy (bufptr, "\t");
+	  bufptr = stpcpy (bufptr, "\t");
+	}
+      bufptr = stpcpy (bufptr, "\t");
+      bufptr += wcstombs (bufptr, win_locale, wcslen (win_locale) * 2);
+    }
+  bufptr = stpcpy (bufptr, "\n");
+  return bufptr;
+}
+
+static BOOL
+format_proc_locale_proc (LPWSTR win_locale, DWORD info, LPARAM param)
+{
+  char **bufptr_p = (char **) param;
+  wchar_t iso15924_postfix[32] = { 0 };
+  wchar_t iso15924[32] = { 0 };
+  wchar_t iso3166[32] = { 0 };
+  wchar_t iso639[32] = { 0 };
+  wchar_t currency[9] = { 0 };
+  char modifier[32] = { 0 };
+  char posix_loc[32];
+  char *codeset;
+  locale_t loc;
+  wchar_t *cp;
+
+  /* Skip language-only locales, e. g. "en" */
+  if (!(cp = wcschr (win_locale, L'-')))
+    return TRUE;
+  ++cp;
+  /* Script inside?  Scripts are Upper/Lower, e. g. "Latn" */
+  if (iswupper (cp[0]) && iswlower (cp[1]))
+    {
+      wchar_t *cp2;
+
+      /* Skip language-Script locales, missing country  */
+      if (!(cp2 = wcschr (cp + 2, L'-')))
+        return TRUE;
+      /* Otherwise, store in iso15924 */
+      if (iso15924)
+        wcpcpy (wcpncpy (iso15924, cp, cp2 - cp), L";");
+    }
+  cp = wcsrchr (win_locale, L'-');
+  if (cp)
+    {
+      /* Skip numeric iso3166 country name. */
+      if (iswdigit (cp[1]))
+        return TRUE;
+      /* Special case postfix after iso3166 country name: ca-ES-valencia.
+         Use the postfix thingy as script so it will become a @modifier */
+      if (iswlower (cp[1]))
+        wcpcpy (iso15924_postfix, cp + 1);
+    }
+
+  if (!GetLocaleInfoEx (win_locale, LOCALE_SISO639LANGNAME, iso639, 10))
+    return TRUE;
+  GetLocaleInfoEx (win_locale, LOCALE_SISO3166CTRYNAME, iso3166, 10);
+
+  snprintf (posix_loc, sizeof posix_loc, "%.3ls_%.3ls", iso639, iso3166);
+  /* Inuktitut: equivalent @latin due to lack of info on Linux */
+  if (!wcscmp (iso639, L"iu"))
+    {
+      if (wcscmp (iso15924, L"Latn;"))
+	return TRUE;
+    }
+  /* Javanese: only use @latin locale. */
+  else if (!wcscmp (iso639, L"jv"))
+    {
+      if (wcscmp (iso15924, L"Latn;"))
+	return TRUE;
+    }
+  /* Mongolian: only use @mongolian locale. */
+  else if (!wcscmp (iso639, L"mn"))
+    {
+      if (wcscmp (iso15924, L"Mong;"))
+	return TRUE;
+    }
+  /* Serbian: Windows default is Latin, Linux default is Cyrillic.
+     We want the Linux default and attach @latin otherwise */
+  else if (!wcscmp (iso639, L"sr")  && !wcscmp (iso15924, L"Latn;"))
+    stpcpy (modifier, "@latin");
+  /* Tamazight: no modifier, iso639 is "ber" on Linux.
+     "zgh-Tfng-MA" is equivalent to "ber_MA". */
+  else if (!wcscmp (iso639, L"zgh"))
+    snprintf (posix_loc, sizeof posix_loc, "ber_%.27ls", iso3166);
+  /* Tamazight: "tzm-Latn-DZ" is equivalent to "ber_DZ",
+		skip everything else. */
+  else if (!wcscmp (iso639, L"tzm"))
+    {
+      if (!wcscmp (iso3166, L"DZ") && !wcscmp (iso15924, L"Latn;"))
+	snprintf (posix_loc, sizeof posix_loc, "ber_%.27ls", iso3166);
+      else
+	return TRUE;
+    }
+  /* In all other cases, we check if the script from the Windows
+     locale is the default locale in that language.  If not, we
+     add it as modifier if possible, or skip it */
+  else if (iso15924[0])
+    {
+      wchar_t scriptless_win_locale[32];
+      wchar_t default_iso15924[32];
+
+      wcpcpy (wcpcpy (wcpcpy (scriptless_win_locale, iso639), L"-"),
+	      iso3166);
+      if ((GetLocaleInfoEx (scriptless_win_locale, LOCALE_SSCRIPTS,
+			    default_iso15924, 32)
+	   || GetLocaleInfoEx (iso639, LOCALE_SSCRIPTS,
+			       default_iso15924, 32))
+	  && !wcsstr (default_iso15924, iso15924))
+	{
+	  if (!wcscmp (iso15924, L"Latn;"))
+	    stpcpy (modifier, "@latin");
+	  else if (!wcscmp (iso15924, L"Cyrl;"))
+	    stpcpy (modifier, "@cyrillic");
+	  else if (!wcscmp (iso15924, L"Deva;"))
+	    stpcpy (modifier, "@devanagar");
+	  else if (!wcscmp (iso15924, L"Adlm;"))
+	    stpcpy (modifier, "@adlam");
+	  else
+	    return TRUE;
+	}
+    }
+  else if (iso15924_postfix[0])
+    {
+      modifier[0] = '@';
+      wcstombs (modifier + 1, iso15924_postfix, 31);
+    }
+
+  loc = newlocale (LC_CTYPE_MASK, posix_loc, (locale_t) 0);
+  codeset = nl_langinfo_l (CODESET, loc);
+  *bufptr_p = add_locale (*bufptr_p, posix_loc, codeset, false, modifier,
+			  win_locale);
+  *bufptr_p = add_locale (*bufptr_p, posix_loc, "UTF-8", true, modifier,
+			  win_locale);
+
+  /* Only one cross each */
+  if (modifier[0])
+    return TRUE;
+
+  /* Check for locales sporting an additional modifier for
+     changing the codeset and other stuff. */
+  if (!wcscmp (iso639, L"be") && !wcscmp (iso3166, L"BY"))
+    stpcpy (modifier, "@latin");
+  if (!wcscmp (iso639, L"tt") && !wcscmp (iso3166, L"RU"))
+    stpcpy (modifier, "@iqtelif");
+   /* If the base locale is ISO-8859-1 and the locale defines currency
+      as EUR, add a @euro locale. For historical reasons there's also
+      a greek @euro locale, albeit it doesn't change the codeset. */
+  else if ((!strcmp (codeset, "ISO-8859-1")
+	    || !strcmp (posix_loc, "el_GR"))
+	   && GetLocaleInfoEx (win_locale, LOCALE_SINTLSYMBOL, currency, 9)
+	   && !wcsncmp (currency, L"EUR", 3))
+    stpcpy (modifier, "@euro");
+  else if (!wcscmp (iso639, L"ja")
+	   || !wcscmp (iso639, L"ko")
+	   || !wcscmp (iso639, L"zh"))
+    stpcpy (modifier, "@cjknarrow");
+  else
+    return TRUE;
+
+  *bufptr_p = add_locale (*bufptr_p, posix_loc, codeset, false, modifier,
+			  win_locale);
+  *bufptr_p = add_locale (*bufptr_p, posix_loc, "UTF-8", true, modifier,
+			  win_locale);
+
+  freelocale (loc);
+  return TRUE;
+}
+
+static off_t
+format_proc_locales (void *, char *&destbuf)
+{
+  tmp_pathbuf tp;
+  char *buf = tp.t_get ();
+  char *bufptr = buf;
+
+  bufptr = stpcpy (bufptr, "Locale:\t\t\tCodeset:\t\tWindows-Locale:\n");
+  bufptr = add_locale (bufptr, "C", "ANSI_X3.4-1968", false, NULL, NULL);
+  bufptr = add_locale (bufptr, "C", "UTF-8", true, NULL, NULL);
+  bufptr = add_locale (bufptr, "POSIX", "ANSI_X3.4-1968", false, NULL, NULL);
+
+  EnumSystemLocalesEx (format_proc_locale_proc,
+		       LOCALE_WINDOWS | LOCALE_SUPPLEMENTAL,
+		       (LPARAM) &bufptr, NULL);
+
+  destbuf = (char *) crealloc_abort (destbuf, bufptr - buf);
+  memcpy (destbuf, buf, bufptr - buf);
+  return bufptr - buf;
+}
+
+static off_t
+format_proc_codesets (void *, char *&destbuf)
+{
+  tmp_pathbuf tp;
+  char *buf = tp.c_get ();
+  char *bufptr = stpcpy (buf,
+			 "ASCII\n"
+			 "BIG5\n"
+			 "CP1125\n"
+			 "CP1250\n"
+			 "CP1251\n"
+			 "CP1252\n"
+			 "CP1253\n"
+			 "CP1254\n"
+			 "CP1255\n"
+			 "CP1256\n"
+			 "CP1257\n"
+			 "CP1258\n"
+			 "CP437\n"
+			 "CP720\n"
+			 "CP737\n"
+			 "CP775\n"
+			 "CP850\n"
+			 "CP852\n"
+			 "CP855\n"
+			 "CP857\n"
+			 "CP858\n"
+			 "CP862\n"
+			 "CP866\n"
+			 "CP874\n"
+			 "CP932\n"
+			 "EUC-CN\n"
+			 "EUC-JP\n"
+			 "EUC-KR\n"
+			 "GB2312\n"
+			 "GBK\n"
+			 "GEORGIAN-PS\n"
+			 "ISO-8859-1\n"
+			 "ISO-8859-10\n"
+			 "ISO-8859-11\n"
+			 "ISO-8859-13\n"
+			 "ISO-8859-14\n"
+			 "ISO-8859-15\n"
+			 "ISO-8859-16\n"
+			 "ISO-8859-2\n"
+			 "ISO-8859-3\n"
+			 "ISO-8859-4\n"
+			 "ISO-8859-5\n"
+			 "ISO-8859-6\n"
+			 "ISO-8859-7\n"
+			 "ISO-8859-8\n"
+			 "ISO-8859-9\n"
+			 "KOI8-R\n"
+			 "KOI8-T\n"
+			 "KOI8-U\n"
+			 "PT154\n"
+			 "SJIS\n"
+			 "TIS-620\n"
+			 "UTF-8\n");
 
   destbuf = (char *) crealloc_abort (destbuf, bufptr - buf);
   memcpy (destbuf, buf, bufptr - buf);

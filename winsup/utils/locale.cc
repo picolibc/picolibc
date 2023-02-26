@@ -159,58 +159,46 @@ size_t loc_max;
 size_t loc_num;
 
 void
-print_locale_with_codeset (int verbose, loc_t *locale, bool utf8,
-			   const char *modifier)
+print_locale (int verbose, loc_t *locale)
 {
-  static const char *sysroot;
-  char locname[32];
+  static const char *kernel32;
+  static const char *cygwin1;
 
   if (verbose
       && (!strcmp (locale->name, "C") || !strcmp (locale->name, "POSIX")))
     return;
-  if (!sysroot)
+  if (!kernel32)
     {
-      WCHAR sysbuf[PATH_MAX];
-      HMODULE k32 = GetModuleHandleW (L"kernel32.dll");
-      if (GetModuleFileNameW (k32, sysbuf, PATH_MAX))
-	sysroot = (const char *) cygwin_create_path (CCP_WIN_W_TO_POSIX,
-						     sysbuf);
-      if (!sysroot)
-	sysroot = "kernel32.dll";
+      WCHAR dllpathbuf[PATH_MAX];
+      HMODULE dll;
+
+      dll = GetModuleHandleW (L"kernel32.dll");
+      if (GetModuleFileNameW (dll, dllpathbuf, PATH_MAX))
+	kernel32 = (const char *) cygwin_create_path (CCP_WIN_W_TO_POSIX,
+						      dllpathbuf);
+      if (!kernel32)
+	kernel32 = "kernel32.dll";
+      dll = GetModuleHandleW (L"cygwin1.dll");
+      if (GetModuleFileNameW (dll, dllpathbuf, PATH_MAX))
+	cygwin1 = (const char *) cygwin_create_path (CCP_WIN_W_TO_POSIX,
+						     dllpathbuf);
+      if (!cygwin1)
+	cygwin1 = "cygwin1.dll";
     }
-  snprintf (locname, 32, "%s%s%s%s", locale->name, utf8 ? ".utf8" : "",
-				     modifier ? "@" : "", modifier ?: "");
-  if (verbose)
-    fputs ("locale: ", stdout);
   if (verbose)
     {
-      printf ("%-15s ", locname);
+      printf ("locale: %-15s ", locale->name);
       printf ("archive: %s\n",
-      locale->alias ? LOCALE_ALIAS : sysroot);
+	      locale->alias ? LOCALE_ALIAS
+			    : !strcmp (locale->name, "C.utf8") ? cygwin1
+							       : kernel32);
       puts ("-------------------------------------------------------------------------------");
       printf (" language | %ls\n", locale->language);
       printf ("territory | %ls\n", locale->territory);
-      printf ("  codeset | %s\n\n", utf8 ? "UTF-8" : locale->codeset);
+      printf ("  codeset | %s\n\n", locale->codeset);
     }
   else
-    printf ("%s\n", locname);
-}
-
-void
-print_locale (int verbose, loc_t *locale)
-{
-  print_locale_with_codeset (verbose, locale, false, NULL);
-  char *modifier = strchr (locale->name, '@');
-  if (!locale->alias)
-    {
-      if (!modifier)
-	print_locale_with_codeset (verbose, locale, true, NULL);
-      else if (strcmp (modifier, "@euro"))
-	{
-	  *modifier++ = '\0';
-	  print_locale_with_codeset (verbose, locale, true, modifier);
-	}
-    }
+    printf ("%s\n", locale->name);
 }
 
 int
@@ -222,10 +210,10 @@ compare_locales (const void *a, const void *b)
 }
 
 size_t
-add_locale (const char *name, const wchar_t *language, const wchar_t *territory,
+add_locale (const char *name, const char *codeset, const wchar_t *language, const wchar_t *territory,
 	    bool alias = false)
 {
-  char orig_locale[32];
+  locale_t loc;
 
   if (loc_num >= loc_max)
     {
@@ -241,10 +229,9 @@ add_locale (const char *name, const wchar_t *language, const wchar_t *territory,
   locale[loc_num].name = strdup (name);
   locale[loc_num].language = wcsdup (language);
   locale[loc_num].territory = wcsdup (territory);
-  strcpy (orig_locale, setlocale (LC_CTYPE, NULL));
-  setlocale (LC_CTYPE, name);
-  locale[loc_num].codeset = strdup (nl_langinfo (CODESET));
-  setlocale (LC_CTYPE, orig_locale);
+  loc = newlocale (LC_CTYPE_MASK, name, (locale_t) 0);
+  locale[loc_num].codeset = strdup (nl_langinfo_l (CODESET, loc));
+  freelocale (loc);
   locale[loc_num].alias = alias;
   return loc_num++;
 }
@@ -257,6 +244,7 @@ add_locale_alias_locales ()
   char orig_locale[32];
   loc_t search, *loc;
   size_t orig_loc_num = loc_num;
+  locale_t sysloc;
 
   FILE *fp = fopen (LOCALE_ALIAS, "rt");
   if (!fp)
@@ -292,138 +280,66 @@ add_locale_alias_locales ()
       loc = (loc_t *) bsearch (&search, locale, orig_loc_num, sizeof (loc_t),
 			       compare_locales);
 
-      add_locale (alias, loc ? loc->language : L"", loc ? loc->territory : L"",
-		  true);
+      sysloc = newlocale (LC_CTYPE_MASK, alias, (locale_t) 0);
+      add_locale (alias, nl_langinfo_l (CODESET, sysloc),
+		  loc ? loc->language : L"", loc ? loc->territory : L"", true);
+      freelocale (sysloc);
     }
   fclose (fp);
-}
-
-BOOL
-print_all_locales_proc (LPWSTR loc_name, DWORD info, LPARAM param)
-{
-  wchar_t iso639[32] = { 0 };
-  wchar_t iso3166[32] = { 0 };
-  wchar_t iso15924[32] = { 0 };
-
-#if 0
-  struct {
-    wchar_t language[256];
-    wchar_t country[256];
-    char loc[32];
-  } loc_list[32];
-  int lcnt = 0;
-#endif
-
-  if (getlocale (loc_name, iso639, iso3166, iso15924))
-    {
-      char *c, posix_loc[32];
-      wchar_t language[256];
-      wchar_t country[256];
-      wchar_t currency[9];
-
-      c = posix_loc + snprintf (posix_loc, sizeof posix_loc, "%ls_%ls",
-				iso639, iso3166);
-      /* Inuktitut: equivalent @latin due to lack of info on Linux */
-      if (!wcscmp (iso639, L"iu"))
-	{
-	  if (wcscmp (iso15924, L"Latn;"))
-	    return TRUE;
-	}
-      /* Javanese: only use @latin locale. */
-      else if (!wcscmp (iso639, L"jv"))
-	{
-	  if (wcscmp (iso15924, L"Latn;"))
-	    return TRUE;
-	}
-      /* Mongolian: only use @mongolian locale. */
-      else if (!wcscmp (iso639, L"mn"))
-	{
-	  if (wcscmp (iso15924, L"Mong;"))
-	    return TRUE;
-	}
-      /* Serbian: Windows default is Latin, Linux default is Cyrillic.
-	 We want the Linux default and attach @latin otherwise */
-      else if (!wcscmp (iso639, L"sr")  && !wcscmp (iso15924, L"Latn;"))
-	stpcpy (c, "@latin");
-      /* Tamazight: no modifier, iso639 is "ber" on Linux.
-	 "zgh-Tfng-MA" is equivalent to "ber_MA". */
-      else if (!wcscmp (iso639, L"zgh"))
-	snprintf (posix_loc, sizeof posix_loc, "ber_%.27ls", iso3166);
-      /* Tamazight: "tzm-Latn-DZ" is equivalent to "ber_DZ",
-		    skip everything else. */
-      else if (!wcscmp (iso639, L"tzm"))
-	{
-	  if (!wcscmp (iso3166, L"DZ") && !wcscmp (iso15924, L"Latn;"))
-	    snprintf (posix_loc, sizeof posix_loc, "ber_%.27ls", iso3166);
-	  else
-	    return TRUE;
-	}
-      /* In all other cases, we check if the script from the Windows
-	 locale is the default locale in that language.  If not, we
-	 add it as modifier if possible, or skip it */
-      else if (iso15924[0])
-	{
-	  wchar_t scriptless_win_locale[32];
-	  wchar_t default_iso15924[32];
-
-	  wcpcpy (wcpcpy (wcpcpy (scriptless_win_locale, iso639), L"-"),
-		  iso3166);
-	  if ((GetLocaleInfoEx (scriptless_win_locale, LOCALE_SSCRIPTS,
-				default_iso15924, 32)
-	       || GetLocaleInfoEx (iso639, LOCALE_SSCRIPTS,
-				   default_iso15924, 32))
-	      && !wcsstr (default_iso15924, iso15924))
-	    {
-	      if (!wcscmp (iso15924, L"Latn;"))
-		stpcpy (c, "@latin");
-	      else if (!wcscmp (iso15924, L"Cyrl;"))
-		stpcpy (c, "@cyrillic");
-	      else if (!wcscmp (iso15924, L"Deva;"))
-		stpcpy (c, "@devanagar");
-	      else if (!wcscmp (iso15924, L"Adlm;"))
-		stpcpy (c, "@adlam");
-	      else
-		return TRUE;
-	    }
-	}
-
-      /* Print */
-      GetLocaleInfoEx (loc_name, LOCALE_SENGLISHLANGUAGENAME, language, 256);
-      GetLocaleInfoEx (loc_name, LOCALE_SENGLISHCOUNTRYNAME, country, 256);
-      size_t idx = add_locale (posix_loc, language, country);
-      /* Check for locales sporting an additional modifier for
-	 changing the codeset and other stuff. */
-      if (!wcscmp (iso639, L"be") && !wcscmp (iso3166, L"BY"))
-	stpcpy (c, "@latin");
-      if (!wcscmp (iso639, L"tt") && !wcscmp (iso3166, L"RU"))
-	stpcpy (c, "@iqtelif");
-       /* If the base locale is ISO-8859-1 and the locale defines currency
-          as EUR, add a @euro locale. For historical reasons there's also
-	  a greek @euro locale, albeit it doesn't change the codeset. */
-      else if ((!strcmp (locale[idx].codeset, "ISO-8859-1")
-		|| !strcmp (posix_loc, "el_GR"))
-	       && GetLocaleInfoEx (loc_name, LOCALE_SINTLSYMBOL, currency, 9)
-	       && !wcsncmp (currency, L"EUR", 3))
-	stpcpy (c, "@euro");
-      else if (!wcscmp (iso639, L"ja")
-	       || !wcscmp (iso639, L"ko")
-	       || !wcscmp (iso639, L"zh"))
-	stpcpy (c, "@cjknarrow");
-      else
-	return TRUE;
-      add_locale (posix_loc, language, country);
-    }
-  return TRUE;
 }
 
 void
 print_all_locales (int verbose)
 {
-  add_locale ("C", L"C", L"POSIX");
-  add_locale ("POSIX", L"C", L"POSIX", true);
-  EnumSystemLocalesEx (print_all_locales_proc,
-		       LOCALE_WINDOWS | LOCALE_SUPPLEMENTAL,
-		       0, NULL);
+  FILE *fp = fopen ("/proc/locales", "r");
+  char line[80];
+
+  if (!fp)
+    {
+      fprintf (stderr, "%s: can't open /proc/locales, old Cygwin DLL?\n",
+	       program_invocation_short_name);
+      return;
+    }
+  /* Skip header line */
+  fgets (line, 80, fp);
+  while (fgets (line, 80, fp))
+    {
+      char *posix_loc;
+      char *codeset;
+      char *win_loc;
+      char *nl;
+      wchar_t win_locale[32];
+      wchar_t language[64] = { 0 };
+      wchar_t country[64] = { 0 };
+
+      nl = strchr (line, '\n');
+      if (nl)
+	*nl = '\0';
+      posix_loc = line;
+      codeset = strchr (posix_loc, '\t');
+      if (!codeset)
+	continue;
+      *codeset = '\0';
+      while (*++codeset == '\t')
+	;
+      win_loc = strchr (codeset, '\t');
+      if (win_loc)
+	{
+	  *win_loc = '\0';
+	  while (*++win_loc == '\t')
+	    ;
+	  if (win_loc[0])
+	    {
+	      mbstowcs (win_locale, win_loc, 32);
+	      GetLocaleInfoEx (win_locale, LOCALE_SENGLISHLANGUAGENAME,
+			       language, 64);
+	      GetLocaleInfoEx (win_locale, LOCALE_SENGLISHCOUNTRYNAME,
+			       country, 64);
+	    }
+	}
+      add_locale (posix_loc, codeset, language, country);
+    }
+  fclose (fp);
   /* First sort allows add_locale_alias_locales to bsearch in locales. */
   qsort (locale, loc_num, sizeof (loc_t), compare_locales);
   add_locale_alias_locales ();
@@ -435,67 +351,18 @@ print_all_locales (int verbose)
 void
 print_charmaps ()
 {
-  /* FIXME: We need a method to fetch the available charsets from Cygwin, */
-  const char *charmaps[] =
-  {
-    "ASCII",
-    "BIG5",
-    "CP1125",
-    "CP1250",
-    "CP1251",
-    "CP1252",
-    "CP1253",
-    "CP1254",
-    "CP1255",
-    "CP1256",
-    "CP1257",
-    "CP1258",
-    "CP437",
-    "CP720",
-    "CP737",
-    "CP775",
-    "CP850",
-    "CP852",
-    "CP855",
-    "CP857",
-    "CP858",
-    "CP862",
-    "CP866",
-    "CP874",
-    "CP932",
-    "EUC-CN",
-    "EUC-JP",
-    "EUC-KR",
-    "GB2312",
-    "GBK",
-    "GEORGIAN-PS",
-    "ISO-8859-1",
-    "ISO-8859-10",
-    "ISO-8859-11",
-    "ISO-8859-13",
-    "ISO-8859-14",
-    "ISO-8859-15",
-    "ISO-8859-16",
-    "ISO-8859-2",
-    "ISO-8859-3",
-    "ISO-8859-4",
-    "ISO-8859-5",
-    "ISO-8859-6",
-    "ISO-8859-7",
-    "ISO-8859-8",
-    "ISO-8859-9",
-    "KOI8-R",
-    "KOI8-T",
-    "KOI8-U",
-    "PT154",
-    "SJIS",
-    "TIS-620",
-    "UTF-8",
-    NULL
-  };
-  const char **charmap = charmaps;
-  while (*charmap)
-    printf ("%s\n", *charmap++);
+  FILE *fp = fopen ("/proc/codesets", "r");
+  char line[80];
+
+  if (!fp)
+    {
+      fprintf (stderr, "%s: can't open /proc/codesets, old Cygwin DLL?\n",
+	       program_invocation_short_name);
+      return;
+    }
+  while (fgets (line, 80, fp))
+    fputs (line, stdout);
+  fclose (fp);
 }
 
 void

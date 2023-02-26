@@ -33,6 +33,13 @@ fnmatch(3) and glob(3) now support named character classes and equivalence
 class expressions in the search pattern, i.e., [:alnum:], [=a=], etc.
 </para></listitem>
 
+<listitem><para>
+Introduce /proc/codesets and /proc/locales with information on supported
+codesets and locales for all interested parties.  Locale(1) opens these
+files and uses the info for printing locale info like any other process
+could do.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
