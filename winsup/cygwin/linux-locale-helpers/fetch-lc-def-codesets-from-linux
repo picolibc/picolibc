@@ -10,17 +10,16 @@
 	} default_codeset[] =
 	{
 	EOF
-  locale -av | \
-  awk '/^locale:/{
-		   if ( index ($2, "_") == 0 ) next # No aliases
-		   if ( index ($2, ".") > 0 ) next # No explicit codesets
-		   locale = gensub (/devanagar.*/, "devanagari", 1, $2);
-		 }
-       /codeset/ {
-		   if ( length (locale) == 0 ) next
-		   codeset = gensub (/BIG5.*/, "BIG5", 1, $3);
-		   printf "  { \"%s\", \"%s\" },\n", locale, codeset;
-		   locale = "";
-		 }'
+  locale -a | \
+  awk '{
+	 if ( index ($1, "_") == 0 ) next # No aliases
+	 if ( index ($1, ".") > 0 ) next # No explicit codesets
+	 locale = $1
+	 cmd = "LC_CTYPE=" locale " locale -ck LC_CTYPE | grep charmap"
+	 cmd | getline codeset
+	 codeset = gensub (/charmap="(.*)"/, "\\1", 1, codeset)
+	 codeset = gensub (/BIG5.*/, "BIG5", 1, codeset);
+	 printf "  { \"%s\", \"%s\" },\n", locale, codeset;
+       }'
   echo "};"
 ) > lc_def_codesets.h
