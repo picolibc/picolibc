@@ -1212,8 +1212,8 @@ __wcollate_range_cmp (wint_t c1, wint_t c2)
 
 /* Not so much BSD.  Used from glob.cc, fnmatch.c and regcomp.c.
 
-   First arg is always from pattern space, second arg is the tested string.
-   len is the length of the pattern in the first arg. */
+   The args are pointers to wint_t strings.  This allows to compare
+   against collating symbols. */
 extern "C" int
 __wscollate_range_cmp (wint_t *c1, wint_t *c2,
 		       size_t c1len, size_t c2len)
