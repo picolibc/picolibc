@@ -73,22 +73,13 @@ __FBSDID("$FreeBSD: head/lib/libc/gen/fnmatch.c 288309 2015-09-27 12:52:18Z jill
 #define RANGE_ERROR     (-1)
 
 static int rangematch(const char *, wint_t, int, char **, mbstate_t *);
-static int fnmatch1(const char *, const char *, const char *, int, mbstate_t,
-		mbstate_t);
 
 int
 fnmatch(const char *pattern, const char *string, int flags)
 {
-	static const mbstate_t initial;
-
-	return (fnmatch1(pattern, string, string, flags, initial, initial));
-}
-
-static int
-fnmatch1(const char *pattern, const char *string, const char *stringstart,
-    int flags, mbstate_t patmbs, mbstate_t strmbs)
-{
+	const char *stringstart = string;
 	const char *bt_pattern, *bt_string;
+	mbstate_t patmbs, strmbs;
 	mbstate_t bt_patmbs, bt_strmbs;
 	char *newp;
 	char c;
