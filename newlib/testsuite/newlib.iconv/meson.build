@@ -33,7 +33,16 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-tests = ['iconvjp', 'iconvnm', 'iconvru' ]
+tests = [ 'iconvnm' ]
+
+tests_ccs = ['iconvjp', 'iconvru']
+
+# Add CCS tests if the data are internal or we're not using semihosting
+# or we're using arm semihosting
+
+if not newlib_iconv_external_ccs or has_arm_semihost or not has_semihost
+  tests += tests_ccs
+endif
 
 iconv_test_c_args = ['-DTEST_NLSPATH="' + newlib_iconv_ccs_dir + '"']
 
