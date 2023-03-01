@@ -481,12 +481,6 @@ globtilde(const Char *pattern, Char *patbuf, size_t patbuf_len, glob_t *pglob)
 	return patbuf;
 }
 
-static void
-wcitoascii(char *dst, wint_t *src)
-{
-	while ((*dst++ = *src++));
-}
-
 /*
  * The main glob() routine: compiles the pattern (optionally processing
  * quotes), calls glob1() to do the real pattern matching, and finally

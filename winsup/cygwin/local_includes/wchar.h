@@ -52,6 +52,14 @@ size_t wirtomb (char *, wint_t, mbstate_t *);
    a UTF-32 value. Defined in strfuncs.cc */
 extern size_t mbrtowi (wint_t *, const char *, size_t, mbstate_t *);
 
+/* convert wint_t string to char string, but *only* if the string consists
+   entirely of ASCII chars */
+static inline void
+wcitoascii(char *dst, wint_t *src)
+{
+        while ((*dst++ = *src++));
+}
+
 /* like wcslen, just for wint_t */
 static inline size_t
 wcilen (const wint_t *wcs)
