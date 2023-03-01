@@ -52,6 +52,14 @@ size_t wirtomb (char *, wint_t, mbstate_t *);
    a UTF-32 value. Defined in strfuncs.cc */
 extern size_t mbrtowi (wint_t *, const char *, size_t, mbstate_t *);
 
+/* replacement function for mbsnrtowcs, returning a wint_t representing
+   a UTF-32 value. Defined in strfuncs.cc.
+   Deviation from standard: If the input is broken, the output will be
+   broken.  I. e., we just copy the current byte over into the wint_t
+   destination and try to pick up on the next byte.  This is in line
+   with the way fnmatch works. */
+extern size_t mbsnrtowci(wint_t *, const char **, size_t, size_t, mbstate_t *);
+
 /* convert wint_t string to char string, but *only* if the string consists
    entirely of ASCII chars */
 static inline void

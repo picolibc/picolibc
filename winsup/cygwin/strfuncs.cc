@@ -180,6 +180,59 @@ mbrtowi (wint_t *pwi, const char *s, size_t n, mbstate_t *ps)
   return len;
 }
 
+extern "C" size_t
+mbsnrtowci(wint_t *dst, const char **src, size_t nms, size_t len, mbstate_t *ps)
+{
+  wint_t *ptr = dst;
+  const char *tmp_src;
+  size_t max;
+  size_t count = 0;
+  size_t bytes;
+
+  if (dst == NULL)
+    {
+      /* Ignore original len value and do not alter src pointer if the
+         dst pointer is NULL.  */
+      len = (size_t)-1;
+      tmp_src = *src;
+      src = &tmp_src;
+    }
+  max = len;
+  while (len > 0)
+    {
+      bytes = mbrtowi (ptr, *src, MB_CUR_MAX, ps);
+      if (bytes > 0)
+        {
+          *src += bytes;
+          nms -= bytes;
+          ++count;
+          ptr = (dst == NULL) ? NULL : ptr + 1;
+          --len;
+        }
+      else if (bytes == 0)
+        {
+          *src = NULL;
+          return count;
+        }
+      else
+        {
+	  /* Deviation from standard: If the input is broken, the output
+	     will be broken.  I. e., we just copy the current byte over
+	     into the wint_t destination and try to pick up on the next
+	     byte.  This is in line with the way fnmatch works. */
+          ps->__count = 0;
+          if (dst)
+	    {
+	      *ptr++ = (const wint_t) *(*src)++;
+	      ++count;
+	      --nms;
+	      --len;
+	    }
+        }
+    }
+  return (size_t) max;
+}
+
 /* The SJIS, JIS and eucJP conversion in newlib does not use UTF as
    wchar_t character representation.  That's unfortunate for us since
    we require UTF for the OS.  What we do here is to have our own
