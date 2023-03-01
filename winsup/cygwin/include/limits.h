@@ -375,9 +375,8 @@ details. */
 #undef BC_STRING_MAX
 #define BC_STRING_MAX 1000
 
-/* Maximum number of bytes in a character class name.  Not implemented. */
-#undef CHARCLASS_NAME_MAX
-/* #define CHARCLASS_NAME_MAX >= _POSIX2_CHARCLASS_NAME_MAX */
+/* Maximum number of bytes in a character class name. */
+#define CHARCLASS_NAME_MAX 14
 
 /* Maximum number of weights that can be assigned to an entry of the
    LC_COLLATE order keyword in the locale definition file. */
