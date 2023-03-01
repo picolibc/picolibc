@@ -35,12 +35,7 @@
 
 tests = ['iconvjp', 'iconvnm', 'iconvru' ]
 
-iconv_data_link = custom_target('iconv_data link',
-				install: false,
-				output: 'iconv_data',
-				command: ['ln', '-sf', meson.source_root() / 'newlib/libc/iconv/ccs/binary', '@OUTPUT@'])
-
-iconv_test_c_args = ['-DTEST_NLSPATH="' + meson.current_build_dir() + '"']
+iconv_test_c_args = ['-DTEST_NLSPATH="' + newlib_iconv_ccs_dir + '"']
 
 foreach target : targets
   value = get_variable('target_' + target)
@@ -74,7 +69,7 @@ foreach target : targets
 		    objects: _objs,
 		    link_with: _libs,
 		    include_directories: test_inc),
-	 depends: [iconv_data_link, bios_bin],
+	 depends: [bios_bin],
 	 env: test_env)
   endforeach
 endforeach

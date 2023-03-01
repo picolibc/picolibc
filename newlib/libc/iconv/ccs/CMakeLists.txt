@@ -33,7 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-add_subdirectory(binary)
+add_subdirectory(iconv_data)
 
 picolibc_sources(
   big5.c
