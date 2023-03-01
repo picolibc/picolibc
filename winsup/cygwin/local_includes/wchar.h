@@ -72,6 +72,19 @@ wcilen (const wint_t *wcs)
   return ret;
 }
 
+/* like wcschr, just for wint_t */
+static inline wint_t *
+wcichr (const wint_t *str, wint_t chr)
+{
+  do
+    {
+      if (*str == chr)
+	return (wint_t *) str;
+    }
+  while (*str++);
+  return NULL;
+}
+
 /* like wcscmp, just for wint_t */
 static inline int
 wcicmp (const wint_t *s1, const wint_t *s2)
