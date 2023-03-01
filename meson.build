@@ -198,6 +198,10 @@ if get_option('profile')
   c_args += ['-pg', '-no-pie']
 endif
 
+if get_option('freestanding')
+  c_args += ['-ffreestanding']
+endif
+
 # Disable ssp and fortify source while building picolibc (it's enabled
 # by default by the ubuntu native compiler)
 c_flags = cc.get_supported_arguments(['-fno-common', '-frounding-math', '-fsignaling-nans',

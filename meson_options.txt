@@ -86,6 +86,9 @@ option('use-stdlib', type: 'boolean', value: false,
 option('profile', type: 'boolean', value: false,
        description: 'Enable profiling by adding -pg -no-pie to compile flags')
 
+option('freestanding', type: 'boolean', value: false,
+       description: 'Build the library with -ffreestanding (useful for Zephyr testing)')
+
 #
 # Testing options
 #
