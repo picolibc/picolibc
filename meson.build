@@ -1135,7 +1135,12 @@ if meson.version().version_compare('>=0.57')
     endif
   endforeach
 else
-  available_encodings = run_command(['sed', '-e', '/^#/d', '-e', '/^$/d', '-e', 's/ .*$//', files('newlib/libc/iconv/encoding.aliases')[0]], check : true).stdout().split('\n')
+  _available_encodings = run_command(['sed', '-e', '/^#/d', '-e', '/^$/d', '-e', 's/ .*$//', files('newlib/libc/iconv/encoding.aliases')[0]], check : true).stdout().split('\n')
+  foreach _encoding : _available_encodings
+    if _encoding != ''
+      available_encodings += _encoding
+    endif
+  endforeach
 endif
 
 # Include all available encodings if none were specified on the command line
@@ -1158,6 +1163,7 @@ endif
 # Set config variables for each requested 'from' encoding
 
 foreach from : newlib_iconv_from_encodings
+  message('from ' + from)
   if not available_encodings.contains(from)
     error('Requested from encoding ' + from + ' is not available. Look in newlib/libc/iconv/encoding.aliases')
   endif
