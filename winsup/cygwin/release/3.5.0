@@ -13,9 +13,9 @@ What's new:
   cygwin distro, as well as getting extended info on available and
   installed packages.
 
-- fnmatch(3) and glob(3) now support named character classes and
-  equivalence class expressions in the search pattern, i.e., [:alnum:],
-  [=a=], etc.
+- fnmatch(3) and glob(3) now support named character classes, equivalence
+  class expressions, and collating symbols in the search pattern, i.e.,
+  [:alnum:], [=a=], [.aa.].
 
 - Introduce /proc/codesets and /proc/locales with information on
   supported codesets and locales for all interested parties.  Locale(1)

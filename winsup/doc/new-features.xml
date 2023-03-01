@@ -29,8 +29,9 @@ installed packages.
 </para></listitem>
 
 <listitem><para>
-fnmatch(3) and glob(3) now support named character classes and equivalence
-class expressions in the search pattern, i.e., [:alnum:], [=a=], etc.
+fnmatch(3) and glob(3) now support named character classes, equivalence
+class expressions, and collating symbols in the search pattern, i.e.,
+[:alnum:], [=a=], [.aa.].
 </para></listitem>
 
 <listitem><para>
