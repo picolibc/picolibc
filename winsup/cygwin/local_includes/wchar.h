@@ -101,6 +101,36 @@ wcincmp (const wint_t *s1, const wint_t *s2, size_t n)
   return (0);
 }
 
+/* like wcpcpy, just for wint_t */
+static inline wint_t *
+wcipcpy (wint_t *s1, const wint_t *s2)
+{
+  while ((*s1++ = *s2++))
+    ;
+  return --s1;
+}
+
+/* like wcpncpy, just for wint_t */
+static inline wint_t *
+wcipncpy (wint_t *dst, const wint_t *src, size_t count)
+{
+  wint_t *ret = NULL;
+
+  while (count > 0)
+    {
+      --count;
+      if ((*dst++ = *src++) == L'\0')
+        {
+          ret = dst - 1;
+          break;
+        }
+    }
+  while (count-- > 0)
+    *dst++ = L'\0';
+
+  return ret ? ret : dst;
+}
+
 #ifdef __cplusplus
 }
 #endif

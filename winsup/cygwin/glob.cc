@@ -203,13 +203,10 @@ check_classes_expr(const Char *&cptr, wint_t *classbuf = NULL,
 		if (classbuf) {
 			const Char *class_p = ctype + 1;
 			size_t clen = cptr - class_p;
-			size_t idx;
 
-			if (clen < classbufsize) {
-				for (idx = 0; idx < clen; ++idx)
-				    classbuf[idx] = CHAR(class_p[idx]);
-				classbuf[idx] = '\0';
-			} else
+			if (clen < classbufsize)
+				*wcipncpy (classbuf, class_p, clen) = '\0';
+			else
 				ctype = NULL;
 		}
 		cptr++; /* Advance cptr to closing RBRACKET of class expr */
