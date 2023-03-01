@@ -72,71 +72,77 @@ __FBSDID("$FreeBSD: head/lib/libc/gen/fnmatch.c 288309 2015-09-27 12:52:18Z jill
 #define RANGE_NOMATCH   0
 #define RANGE_ERROR     (-1)
 
-static int rangematch(const char *, wint_t, int, char **, mbstate_t *);
+static int rangematch(const wint_t *, wint_t *, int, wint_t **, mbstate_t *);
 
 int
-fnmatch(const char *pattern, const char *string, int flags)
+fnmatch(const char *in_pattern, const char *in_string, int flags)
 {
-	const char *stringstart = string;
-	const char *bt_pattern, *bt_string;
-	mbstate_t patmbs, strmbs;
+	size_t pclen = strlen (in_pattern);
+	size_t sclen = strlen (in_string);
+	wint_t *pattern = (wint_t *) alloca ((pclen + 1) * sizeof (wint_t));
+	wint_t *string = (wint_t *) alloca ((sclen + 1) * sizeof (wint_t));
+
+	const wint_t *stringstart = string;
+	const wint_t *bt_pattern, *bt_string;
+	mbstate_t patmbs = { 0 };
+	mbstate_t strmbs = { 0 };
 	mbstate_t bt_patmbs, bt_strmbs;
-	char *newp;
-	char c;
-	wint_t pc, sc;
-	size_t pclen, sclen;
+	wint_t *newp;
+	wint_t *c;
+	wint_t *pc, *sc;
+
+	pclen = mbsnrtowci (pattern, &in_pattern, (size_t) -1, pclen, &patmbs);
+	if (pclen == (size_t) -1)
+		return (FNM_NOMATCH);
+	pattern[pclen] = '\0';
+	sclen = mbsnrtowci (string, &in_string, (size_t) -1, sclen, &strmbs);
+	if (sclen == (size_t) -1)
+		return (FNM_NOMATCH);
+	string[sclen] = '\0';
 
 	bt_pattern = bt_string = NULL;
 	for (;;) {
-		pclen = mbrtowi(&pc, pattern, MB_LEN_MAX, &patmbs);
-		if (pclen == (size_t)-1 || pclen == (size_t)-2)
-			return (FNM_NOMATCH);
-		pattern += pclen;
-		sclen = mbrtowi(&sc, string, MB_LEN_MAX, &strmbs);
-		if (sclen == (size_t)-1 || sclen == (size_t)-2) {
-			sc = (unsigned char)*string;
-			sclen = 1;
-			memset(&strmbs, 0, sizeof(strmbs));
-		}
-		switch (pc) {
+		pc = pattern++;
+		sc = string;
+		switch (*pc) {
 		case EOS:
-			if ((flags & FNM_LEADING_DIR) && sc == '/')
+			if ((flags & FNM_LEADING_DIR) && *sc == '/')
 				return (0);
-			if (sc == EOS)
+			if (*sc == EOS)
 				return (0);
 			goto backtrack;
 		case '?':
-			if (sc == EOS)
+			if (*sc == EOS)
 				return (FNM_NOMATCH);
-			if (sc == '/' && (flags & FNM_PATHNAME))
+			if (*sc == '/' && (flags & FNM_PATHNAME))
 				goto backtrack;
-			if (sc == '.' && (flags & FNM_PERIOD) &&
+			if (*sc == '.' && (flags & FNM_PERIOD) &&
 			    (string == stringstart ||
 			    ((flags & FNM_PATHNAME) && *(string - 1) == '/')))
 				goto backtrack;
-			string += sclen;
+			++string;
 			break;
 		case '*':
-			c = *pattern;
+			c = pattern;
 			/* Collapse multiple stars. */
-			while (c == '*')
-				c = *++pattern;
+			while (*c == '*')
+				*c = *++pattern;
 
-			if (sc == '.' && (flags & FNM_PERIOD) &&
+			if (*sc == '.' && (flags & FNM_PERIOD) &&
 			    (string == stringstart ||
 			    ((flags & FNM_PATHNAME) && *(string - 1) == '/')))
 				goto backtrack;
 
 			/* Optimize for pattern with * at end or before /. */
-			if (c == EOS)
+			if (*c == EOS)
 				if (flags & FNM_PATHNAME)
 					return ((flags & FNM_LEADING_DIR) ||
-					    strchr(string, '/') == NULL ?
+					    wcichr(string, '/') == NULL ?
 					    0 : FNM_NOMATCH);
 				else
 					return (0);
-			else if (c == '/' && flags & FNM_PATHNAME) {
-				if ((string = strchr(string, '/')) == NULL)
+			else if (*c == '/' && flags & FNM_PATHNAME) {
+				if ((string = wcichr(string, '/')) == NULL)
 					return (FNM_NOMATCH);
 				break;
 			}
@@ -147,47 +153,46 @@ fnmatch(const char *pattern, const char *string, int flags)
 			 * there is no way having it match more characters
 			 * can help us, given that we are already here.
 			 */
-			bt_pattern = pattern, bt_patmbs = patmbs;
-			bt_string = string, bt_strmbs = strmbs;
+			bt_pattern = pattern;
+			bt_patmbs = patmbs;
+			bt_string = string;
+			bt_strmbs = strmbs;
 			break;
 		case '[':
-			if (sc == EOS)
+			if (*sc == EOS)
 				return (FNM_NOMATCH);
-			if (sc == '/' && (flags & FNM_PATHNAME))
+			if (*sc == '/' && (flags & FNM_PATHNAME))
 				goto backtrack;
-			if (sc == '.' && (flags & FNM_PERIOD) &&
+			if (*sc == '.' && (flags & FNM_PERIOD) &&
 			    (string == stringstart ||
 			    ((flags & FNM_PATHNAME) && *(string - 1) == '/')))
 				goto backtrack;
 
-			switch (rangematch(pattern, sc, flags, &newp,
-			    &patmbs)) {
+			int ret = rangematch(pattern, sc, flags, &newp,
+					     &patmbs);
+			switch (ret) {
 			case RANGE_ERROR:
 				goto norm;
-			case RANGE_MATCH:
-				pattern = newp;
-				break;
 			case RANGE_NOMATCH:
 				goto backtrack;
+			default: /* > 0 ... case RANGE_MATCH */
+				pattern = newp;
+				break;
 			}
-			string += sclen;
+			string += ret;
 			break;
 		case '\\':
 			if (!(flags & FNM_NOESCAPE)) {
-				pclen = mbrtowi(&pc, pattern, MB_LEN_MAX,
-				    &patmbs);
-				if (pclen == (size_t)-1 || pclen == (size_t)-2)
-					return (FNM_NOMATCH);
-				pattern += pclen;
+				pc = pattern++;
 			}
 			fallthrough;
 		default:
 		norm:
-			string += sclen;
-			if (pc == sc)
+			++string;
+			if (*pc == *sc)
 				;
 			else if ((flags & FNM_CASEFOLD) &&
-				 (towlower(pc) == towlower(sc)))
+				 (towlower(*pc) == towlower(*sc)))
 				;
 			else {
 		backtrack:
@@ -199,22 +204,16 @@ fnmatch(const char *pattern, const char *string, int flags)
 				 */
 				if (bt_pattern == NULL)
 					return (FNM_NOMATCH);
-				sclen = mbrtowi(&sc, bt_string, MB_LEN_MAX,
-				    &bt_strmbs);
-				if (sclen == (size_t)-1 ||
-				    sclen == (size_t)-2) {
-					sc = (unsigned char)*bt_string;
-					sclen = 1;
-					memset(&bt_strmbs, 0,
-					    sizeof(bt_strmbs));
-				}
-				if (sc == EOS)
+				sc = (wint_t *) bt_string;
+				if (*sc == EOS)
 					return (FNM_NOMATCH);
-				if (sc == '/' && flags & FNM_PATHNAME)
+				if (*sc == '/' && flags & FNM_PATHNAME)
 					return (FNM_NOMATCH);
-				bt_string += sclen;
-				pattern = bt_pattern, patmbs = bt_patmbs;
-				string = bt_string, strmbs = bt_strmbs;
+				++bt_string;
+				pattern = (wint_t *) bt_pattern;
+				patmbs = bt_patmbs;
+				string = (wint_t *) bt_string;
+				strmbs = bt_strmbs;
 			}
 			break;
 		}
@@ -222,18 +221,46 @@ fnmatch(const char *pattern, const char *string, int flags)
 	/* NOTREACHED */
 }
 
+/* Return value is either '\0', ':', '.', '=', or '[' if no class
+   expression found.  cptr_p is set to the next character which needs
+   checking. */
+static inline wint_t
+check_classes_expr(const wint_t **cptr_p, wint_t *classbuf, size_t classbufsize)
+{
+	const wint_t *ctype = NULL;
+	const wint_t *cptr = *cptr_p;
+
+	if (*cptr == '[' &&
+	    (cptr[1] == ':' || cptr[1] == '.' || cptr[1] == '=')) {
+		ctype = ++cptr;
+		while (*++cptr && (*cptr != *ctype || cptr[1] != ']'))
+			;
+		if (!*cptr)
+			return '\0';
+		if (classbuf) {
+			const wint_t *class_p = ctype + 1;
+			size_t clen = cptr - class_p;
+
+			if (clen < classbufsize)
+				*wcipncpy (classbuf, class_p, clen) = '\0';
+			else
+				ctype = NULL;
+		}
+		cptr += 2; /* Advance cptr to next char after class expr. */
+	}
+	*cptr_p = cptr;
+	return ctype ? *ctype : '[';
+}
+
 static int
-rangematch(const char *pattern, wint_t test, int flags, char **newp,
+rangematch(const wint_t *pattern, wint_t *test, int flags, wint_t **newp,
     mbstate_t *patmbs)
 {
 	int negate, ok;
-	wint_t c, c2;
-	size_t pclen;
-	const char *origpat;
-#ifndef __CYGWIN__
-	struct xlocale_collate *table =
-		(struct xlocale_collate*)__get_locale()->components[XLC_COLLATE];
-#endif
+	wint_t *c, *c2;
+	//size_t pclen;
+	const wint_t *origpat;
+	size_t tlen = next_unicode_char (test);
 
 	/*
 	 * A bracket expression starting with an unquoted circumflex
@@ -245,8 +272,10 @@ rangematch(const char *pattern, wint_t test, int flags, char **newp,
 	if ( (negate = (*pattern == '!' || *pattern == '^')) )
 		++pattern;
 
-	if (flags & FNM_CASEFOLD)
-		test = towlower(test);
+	if (flags & FNM_CASEFOLD) {
+		for (int idx = 0; idx < tlen; ++idx)
+			test[idx] = towlower(test[idx]);
+	}
 
 	/*
 	 * A right bracket shall lose its special meaning and represent
@@ -256,6 +285,11 @@ rangematch(const char *pattern, wint_t test, int flags, char **newp,
 	ok = 0;
 	origpat = pattern;
 	for (;;) {
+		wint_t wclass[64], wclass2[64];
+		char cclass[64];
+		wint_t ctype;
+		size_t clen = 1, c2len = 1;
+
 		if (*pattern == ']' && pattern > origpat) {
 			pattern++;
 			break;
@@ -265,75 +299,69 @@ rangematch(const char *pattern, wint_t test, int flags, char **newp,
 			return (RANGE_NOMATCH);
 		} else if (*pattern == '\\' && !(flags & FNM_NOESCAPE))
 			pattern++;
-		if (*pattern == '[' && (pattern[1] == ':' || pattern[1] == '.'
-					|| pattern[1] == '=')) {
-			const char ctype = *++pattern;
-			const char *class_p = ++pattern;
-
-			while (*pattern
-			       && (*pattern != ctype || pattern[1] != ']'))
-				++pattern;
-			if (!*pattern)
-				return (RANGE_ERROR);
-			if (ctype == ':') { /* named character class */
-				size_t clen = pattern - class_p;
-				char class[clen + 1];
-
-				*stpncpy (class, class_p, clen) = '\0';
-				if (iswctype (test, wctype (class)))
-					ok = 1;
-			} else if (ctype == '=') { /* equivalence class */
-				size_t elen = pattern - class_p;
-				char equiv[elen + 1];
-				wint_t eqv;
-
-				*stpncpy (equiv, class_p, elen) = '\0';
-				if (mbrtowi(&eqv, equiv, elen, patmbs) == elen
-				    && is_unicode_equiv (test, eqv))
-					ok = 1;
-			}
-			/* TODO: [. is just ignored for now */
-			pattern += 2;
+		switch (ctype = check_classes_expr (&pattern, wclass, 64)) {
+		case ':':
+			/* No worries, char classes are ASCII-only */
+			wcitoascii (cclass, wclass);
+			if (iswctype (*test, wctype (cclass)))
+				ok = 1;
 			continue;
-
+		case '=':
+			if (wcilen (wclass) == 1 &&
+			    is_unicode_equiv (*test, *wclass))
+				ok = 1;
+			continue;
+		case '.':
+			if (!is_unicode_coll_elem (wclass))
+				return (RANGE_NOMATCH);
+			c = wclass;
+			clen = wcilen (wclass);
+			break;
+		default:
+			c = (wint_t *) pattern++;
+			break;
 		}
-		pclen = mbrtowi(&c, pattern, MB_LEN_MAX, patmbs);
-		if (pclen == (size_t)-1 || pclen == (size_t)-2)
-			return (RANGE_NOMATCH);
-		pattern += pclen;
-
-		if (flags & FNM_CASEFOLD)
-			c = towlower(c);
+		if (flags & FNM_CASEFOLD) {
+			for (int idx = 0; idx < tlen; ++idx)
+				c[idx] = towlower(c[idx]);
+		}
 
 		if (*pattern == '-' && *(pattern + 1) != EOS &&
 		    *(pattern + 1) != ']') {
 			if (*++pattern == '\\' && !(flags & FNM_NOESCAPE))
 				if (*pattern != EOS)
 					pattern++;
-			pclen = mbrtowi(&c2, pattern, MB_LEN_MAX, patmbs);
-			if (pclen == (size_t)-1 || pclen == (size_t)-2)
-				return (RANGE_NOMATCH);
-			pattern += pclen;
-			if (c2 == EOS)
+			const wint_t *orig_pattern = pattern;
+			switch (ctype = check_classes_expr (&pattern, wclass2,
+							    64)) {
+			case '.':
+				if (!is_unicode_coll_elem (wclass2))
+					return (RANGE_NOMATCH);
+				c2 = wclass2;
+				c2len = wcilen (wclass2);
+				break;
+			default:
+				pattern = orig_pattern;
+				c2 = (wint_t *) pattern++;
+			}
+			if (*c2 == EOS)
 				return (RANGE_ERROR);
 
-			if (flags & FNM_CASEFOLD)
-				c2 = towlower(c2);
+			if (flags & FNM_CASEFOLD) {
+				for (int idx = 0; idx < tlen; ++idx)
+					c2[idx] = towlower(c2[idx]);
+			}
 
-#ifdef __CYGWIN__
 			if ((!__get_current_collate_locale ()->win_locale[0]) ?
-#else
-			if (table->__collate_load_error ?
-#endif
 			    c <= test && test <= c2 :
-			       __wcollate_range_cmp(c, test) <= 0
-			    && __wcollate_range_cmp(test, c2) <= 0
+			       __wscollate_range_cmp(c, test, clen, tlen) <= 0
+			    && __wscollate_range_cmp(test, c2, tlen, c2len) <= 0
 			   )
 				ok = 1;
-		} else if (c == test)
+		} else if (clen == tlen && wcincmp (c, test, clen) == 0)
 			ok = 1;
 	}
 
-	*newp = (char *)pattern;
-	return (ok == negate ? RANGE_NOMATCH : RANGE_MATCH);
+	*newp = (wint_t *) pattern;
+	return (ok == negate ? RANGE_NOMATCH : tlen);
 }
