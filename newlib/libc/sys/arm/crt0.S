@@ -122,10 +122,10 @@
 *   +-----+ <- SP_svc         of getting in and out of secure state are not as
 *   |     |                   simple as writing to the CPSR mode bits.
 *   | IRQ | -= 0x2000       - Mode switch via CPSR is not allowed once in
-*   |     |                   non-privileged mode, so we take care not to enter
-* ^ +-----+ <- SP_und         "User" to set up its SP, and also skip most
-* s |     |                   operations if already in that mode.
-* t | UND | -= 0x1000
+*   |     |                   non-privileged mode or in hypervisor mode, so we
+* ^ +-----+ <- SP_und         take care not to enter "User" or "Hypervisor" mode
+* s |     |                   to set up its SP, and also skip most operations if
+* t | UND | -= 0x1000         already in these modes.
 * a |     |                Input parameters:
 * c +-----+ <- SP_und       - sp - Initialized SP
 * k |     |                 - r2 - May contain SL value from semihosting
@@ -150,9 +150,9 @@
 	/* Following code is compatible for both ARM and Thumb ISA.  */
 	mrs	r4, CPSR
 	mov	r3, sp /* Save input SP value.  */
-	/* Test mode bits - in User of all are 0.  */
-	tst	r4, #(CPSR_M_MASK)
-	/* "eq" means r4 AND #0x0F is 0.  */
+	ands	r1, r4, #(CPSR_M_MASK)
+	beq	.Lskip_cpu_modes
+	cmp	r1, #(CPSR_M_HYP)
 	beq	.Lskip_cpu_modes
 
 	/* FIQ mode, interrupts disabled.  */
