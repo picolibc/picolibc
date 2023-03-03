@@ -149,12 +149,11 @@
 #if (__ARM_ARCH_PROFILE != 'M')
 	/* Following code is compatible for both ARM and Thumb ISA.  */
 	mrs	r4, CPSR
+	mov	r3, sp /* Save input SP value.  */
 	/* Test mode bits - in User of all are 0.  */
 	tst	r4, #(CPSR_M_MASK)
 	/* "eq" means r4 AND #0x0F is 0.  */
 	beq	.Lskip_cpu_modes
-
-	mov	r3, sp /* Save input SP value.  */
 
 	/* FIQ mode, interrupts disabled.  */
 	mov	r1, #(CPSR_M_FIQ|CPSR_M_32BIT|CPSR_I_MASK|CPSR_F_MASK)
