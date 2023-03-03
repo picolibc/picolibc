@@ -1268,7 +1268,7 @@ is_unicode_equiv (wint_t test, wint_t eqv)
 		testc[1] = ((test - 0x10000) & 0x3ff) + 0xdc00;
 	} else
 		testc[0] = test;
-	/* Convert to denormalized form */
+	/* Convert to decomposed form */
 	FoldStringW (MAP_COMPOSITE | MAP_FOLDCZONE | MAP_FOLDDIGITS,
 		     eqvc, -1, decomp_eqvc, 24);
 	FoldStringW (MAP_COMPOSITE | MAP_FOLDCZONE | MAP_FOLDDIGITS,
