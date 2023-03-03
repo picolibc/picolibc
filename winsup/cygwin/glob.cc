@@ -130,7 +130,7 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/glob.c,v 1.28 2010/05/12 17:44:00 gordon Ex
 #define	M_PROTECT	0x20000000U
 #define	M_MASK		0x70ffffffU
 #define	M_COLL_MASK	0x700000ffU
-#define	M_CHAR		0x0fffffffU
+#define	M_CHAR		0x00ffffffU
 
 typedef wint_t Char;
 
@@ -1030,7 +1030,7 @@ g_Ctoc(const Char *str, char *buf, size_t len)
 
 	memset(&mbs, 0, sizeof(mbs));
 	while (len >= (size_t) MB_CUR_MAX) {
-		clen = wirtomb(buf, *str, &mbs);
+		clen = wirtomb(buf, CHAR (*str), &mbs);
 		if (clen == (size_t)-1)
 			return (1);
 		if (*str == L'\0')
