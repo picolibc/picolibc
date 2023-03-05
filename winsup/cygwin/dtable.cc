@@ -764,13 +764,6 @@ dtable::dup3 (int oldfd, int newfd, int flags)
       return -1;
     }
 
-  /* This is a temporary kludge until all utilities can catch up with
-     a change in behavior that implements linux functionality:  opening
-     a tty should not automatically cause it to become the controlling
-     tty for the process.  */
-  if (newfd > 2)
-    flags |= O_NOCTTY;
-
   if ((newfh = dup_worker (fds[oldfd], flags)) == NULL)
     {
       res = -1;

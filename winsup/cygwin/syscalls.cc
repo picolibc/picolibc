@@ -1450,17 +1450,6 @@ open (const char *unix_path, int flags, ...)
       int opt = PC_OPEN | PC_SYM_NOFOLLOW_PROCFD;
       opt |= (flags & (O_NOFOLLOW | O_EXCL)) ? PC_SYM_NOFOLLOW
 					     : PC_SYM_FOLLOW;
-      /* This is a temporary kludge until all utilities can catch up
-	 with a change in behavior that implements linux functionality:
-	 opening a tty should not automatically cause it to become the
-	 controlling tty for the process.  */
-      if (!(flags & O_NOCTTY) && fd > 2 && myself->ctty != -2)
-	{
-	  flags |= O_NOCTTY;
-	  /* flag that, if opened, this fhandler could later be capable
-	     of being a controlling terminal if /dev/tty is opened. */
-	  opt |= PC_CTTY;
-	}
 
       /* If we're opening a FIFO, we will call device_access_denied
 	 below.  This leads to a call to fstat, which can use the
