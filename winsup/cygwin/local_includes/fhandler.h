@@ -1905,6 +1905,17 @@ class fhandler_serial: public fhandler_base
 #define release_output_mutex() \
   __release_output_mutex (__PRETTY_FUNCTION__, __LINE__)
 
+/*
+ -1: CTTY is not initialized yet. Can associate with the TTY
+     which is associated with the own session.
+ -2: CTTY has been released by setsid(). Can associate with
+     a new TTY as CTTY, but cannot associate with the TTYs
+     already associated with other sessions.
+*/
+#define CTTY_UNINITIALIZED -1
+#define CTTY_RELEASED -2
+#define CTTY_IS_VALID(c) ((c) > 0)
+
 extern DWORD mutex_timeout;
 DWORD acquire_attach_mutex (DWORD t);
 void release_attach_mutex (void);

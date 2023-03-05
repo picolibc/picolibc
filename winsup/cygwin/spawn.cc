@@ -623,7 +623,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       si.cb = sizeof (si);
 
       if (!iscygwin ())
-	init_console_handler (myself->ctty > 0);
+	init_console_handler (CTTY_IS_VALID (myself->ctty));
 
     loop:
       /* When ruid != euid we create the new process under the current original

@@ -111,7 +111,7 @@ fhandler_termios::tcsetpgrp (const pid_t pgid)
 int
 fhandler_termios::tcgetpgrp ()
 {
-  if (myself->ctty > 0 && myself->ctty == tc ()->ntty)
+  if (CTTY_IS_VALID (myself->ctty) && myself->ctty == tc ()->ntty)
     return tc ()->pgid;
   set_errno (ENOTTY);
   return -1;
@@ -685,7 +685,7 @@ fhandler_termios::sigflush ()
 pid_t
 fhandler_termios::tcgetsid ()
 {
-  if (myself->ctty > 0 && myself->ctty == tc ()->ntty)
+  if (CTTY_IS_VALID (myself->ctty) && myself->ctty == tc ()->ntty)
     return tc ()->getsid ();
   set_errno (ENOTTY);
   return -1;
@@ -730,7 +730,8 @@ fhandler_termios::ioctl (int cmd, void *varg)
 
   termios_printf ("myself->ctty %d, myself->sid %d, myself->pid %d, arg %d, tc()->getsid () %d\n",
 		  myself->ctty, myself->sid, myself->pid, arg, tc ()->getsid ());
-  if (myself->ctty > 0 || myself->sid != myself->pid || (!arg && tc ()->getsid () > 0))
+  if (CTTY_IS_VALID (myself->ctty) || myself->sid != myself->pid
+      || (!arg && tc ()->getsid () > 0))
     {
       set_errno (EPERM);
       return -1;

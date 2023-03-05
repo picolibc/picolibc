@@ -1049,7 +1049,7 @@ ctrl_c_handler (DWORD type)
       return FALSE;
     }
 
-  if (myself->ctty != -1)
+  if (myself->ctty != CTTY_UNINITIALIZED)
     {
       if (type == CTRL_CLOSE_EVENT)
 	{

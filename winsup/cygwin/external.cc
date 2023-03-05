@@ -73,12 +73,12 @@ fillout_pinfo (pid_t pid, int winpid)
 	  ep.pid = thispid + MAX_PID;
 	  ep.dwProcessId = thispid;
 	  ep.process_state = PID_IN_USE;
-	  ep.ctty = -1;
+	  ep.ctty = CTTY_UNINITIALIZED;
 	  break;
 	}
       else if (nextpid || p->pid == pid)
 	{
-	  ep.ctty = (p->ctty < 0 || iscons_dev (p->ctty))
+	  ep.ctty = (!CTTY_IS_VALID (p->ctty) || iscons_dev (p->ctty))
 		    ? p->ctty : device::minor (p->ctty);
 	  ep.pid = p->pid;
 	  ep.ppid = p->ppid;

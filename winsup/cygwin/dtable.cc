@@ -323,7 +323,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	   || GetNumberOfConsoleInputEvents (handle, (DWORD *) &buf))
     {
       /* Console I/O */
-      if (myself->ctty > 0)
+      if (CTTY_IS_VALID (myself->ctty))
 	dev.parse (myself->ctty);
       else
 	{
@@ -603,10 +603,10 @@ fh_alloc (path_conv& pc)
 	      fhraw = cnew_no_ctor (fhandler_console, -1);
 	      debug_printf ("not called from open for /dev/tty");
 	    }
-	  else if (myself->ctty <= 0 && last_tty_dev
+	  else if (!CTTY_IS_VALID (myself->ctty) && last_tty_dev
 		   && !myself->set_ctty (fh_last_tty_dev, 0))
 	    debug_printf ("no /dev/tty assigned");
-	  else if (myself->ctty > 0)
+	  else if (CTTY_IS_VALID (myself->ctty))
 	    {
 	      debug_printf ("determining /dev/tty assignment for ctty %p", myself->ctty);
 	      if (iscons_dev (myself->ctty))
@@ -682,7 +682,7 @@ build_fh_pc (path_conv& pc)
 
   /* Keep track of the last tty-like thing opened.  We could potentially want
      to open it if /dev/tty is referenced. */
-  if (myself->ctty > 0 || !fh->is_tty () || !pc.isctty_capable ())
+  if (CTTY_IS_VALID (myself->ctty) || !fh->is_tty () || !pc.isctty_capable ())
     last_tty_dev = FH_NADA;
   else
     last_tty_dev = fh->dev ();

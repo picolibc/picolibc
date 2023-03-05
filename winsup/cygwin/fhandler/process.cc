@@ -468,7 +468,7 @@ static off_t
 format_process_ctty (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
-  if (p->ctty < 0)
+  if (!CTTY_IS_VALID (p->ctty))
     {
       destbuf = (char *) crealloc_abort (destbuf, 2);
       return __small_sprintf (destbuf, "\n");
@@ -1098,7 +1098,7 @@ format_process_stat (void *data, char *&destbuf)
 /* ctty maj is 31:16, min is 15:0; tty_nr s/b maj 15:8, min 31:20, 7:0;
    maj is 31:16 >> 16 & fff << 8; min is 15:0 >> 8 & ff << 20 | & ff */
   int tty_nr = 0;
-  if (p->ctty > 0)
+  if (CTTY_IS_VALID (p->ctty))
     tty_nr =   (((p->ctty >>  8) & 0xff)  << 20)
 	     | (((p->ctty >> 16) & 0xfff) <<  8)
 	     |   (p->ctty        & 0xff);

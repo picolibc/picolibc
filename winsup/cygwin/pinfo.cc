@@ -97,7 +97,7 @@ pinfo_init (char **envp, int envc)
 
       myself.thisproc (NULL);
       myself->pgid = myself->sid = myself->pid;
-      myself->ctty = -1; /* -1 means not initialized yet. */
+      myself->ctty = CTTY_UNINITIALIZED;
       myself->uid = ILLEGAL_UID;
       myself->gid = ILLEGAL_GID;
       environ_init (NULL, 0);	/* call after myself has been set up */
@@ -212,7 +212,7 @@ pinfo::exit (DWORD n)
     maybe_set_exit_code_from_windows ();	/* may block */
   exit_state = ES_FINAL;
 
-  if (myself->ctty > 0 && !iscons_dev (myself->ctty))
+  if (CTTY_IS_VALID (myself->ctty) && !iscons_dev (myself->ctty))
     {
       lock_ttys here;
       tty *t = cygwin_shared->tty[device::minor(myself->ctty)];
@@ -514,7 +514,7 @@ pinfo::pinfo (HANDLE parent, pinfo_minimal& from, pid_t pid):
 const char *
 _pinfo::_ctty (char *buf)
 {
-  if (ctty <= 0)
+  if (!CTTY_IS_VALID (ctty))
     strcpy (buf, "no ctty");
   else
     {
@@ -530,12 +530,9 @@ _pinfo::set_ctty (fhandler_termios *fh, int flags)
 {
   tty_min& tc = *fh->tc ();
   debug_printf ("old %s, ctty device number %y, tc.ntty device number %y flags & O_NOCTTY %y", __ctty (), ctty, tc.ntty, flags & O_NOCTTY);
-  if (fh && (ctty <= 0 || ctty == tc.ntty) && !(flags & O_NOCTTY))
+  if (fh && (!CTTY_IS_VALID (ctty) || ctty == tc.ntty) && !(flags & O_NOCTTY))
     {
-      if (tc.getsid () && tc.getsid () != sid && ctty == -2)
-	/* ctty == -2 means CTTY has been released by setsid().
-	   Can be associated only with a new TTY which is not
-	   associated with any other session. */
+      if (tc.getsid () && tc.getsid () != sid && ctty == CTTY_RELEASED)
 	; /* Do nothing if another session is associated with the TTY. */
       else
 	{
@@ -581,14 +578,14 @@ _pinfo::set_ctty (fhandler_termios *fh, int flags)
 	 an obvious bug surfaces. */
       if (sid == pid && !tc.getsid ())
 	tc.setsid (sid);
-      if (ctty > 0)
+      if (CTTY_IS_VALID (ctty))
 	sid = tc.getsid ();
       /* See above */
       if ((!tc.getpgid () || being_debugged ()) && pgid == pid)
 	tc.setpgid (pgid);
     }
   debug_printf ("cygheap->ctty now %p, archetype %p", cygheap->ctty, fh ? fh->archetype : NULL);
-  return ctty > 0;
+  return CTTY_IS_VALID (ctty);
 }
 
 /* Test to determine if a process really exists and is processing signals.

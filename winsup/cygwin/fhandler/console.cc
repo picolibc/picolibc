@@ -665,12 +665,13 @@ fhandler_console::set_unit ()
     this_unit == FH_CONSOLE || this_unit == FH_CONIN || this_unit == FH_CONOUT;
   if (!generic_console && this_unit != FH_TTY)
     unit = get_minor ();
-  else if (myself->ctty != -1)
+  else if (myself->ctty != CTTY_UNINITIALIZED)
     unit = device::minor (myself->ctty);
 
   if (shared_console_info[unit])
     ; /* Do nothing */
-  else if (generic_console && myself->ctty != -1 && !iscons_dev (myself->ctty))
+  else if (generic_console
+	   && myself->ctty != CTTY_UNINITIALIZED && !iscons_dev (myself->ctty))
     devset = FH_ERROR;
   else
     {
@@ -1732,7 +1733,7 @@ int
 fhandler_console::dup (fhandler_base *child, int flags)
 {
   /* See comments in fhandler_pty_slave::dup */
-  if (myself->ctty != -2)
+  if (myself->ctty != CTTY_RELEASED)
     myself->set_ctty (this, flags);
   return 0;
 }
@@ -1933,7 +1934,8 @@ fhandler_console::close ()
   memset (&con_ra, 0, sizeof (con_ra));
 
   if (!have_execed && !invisible_console
-      && (myself->ctty <= 0 || get_device () == (dev_t) myself->ctty))
+      && (!CTTY_IS_VALID (myself->ctty)
+	  || get_device () == (dev_t) myself->ctty))
     free_console ();
 
   if (shared_console_info[unit])

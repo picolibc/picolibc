@@ -1176,9 +1176,7 @@ setsid (void)
     syscall_printf ("hmm.  pgid %d pid %d", myself->pgid, myself->pid);
   else
     {
-      myself->ctty = -2; /* -2 means CTTY has been released by setsid().
-			    Can be associated only with a new TTY which
-			    is not associated with any session. */
+      myself->ctty = CTTY_RELEASED;
       myself->sid = myself->pid;
       myself->pgid = myself->pid;
       if (cygheap->ctty)
@@ -2843,7 +2841,7 @@ ctermid (char *str)
 {
   if (str == NULL)
     str = _my_tls.locals.ttybuf;
-  if (myself->ctty < 0)
+  if (!CTTY_IS_VALID (myself->ctty))
     strcpy (str, "no tty");
   else
     {

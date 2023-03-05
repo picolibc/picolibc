@@ -58,7 +58,7 @@ revoke (char *ttyname)
 extern "C" int
 ttyslot (void)
 {
-  if (myself->ctty <= 0 || iscons_dev (myself->ctty))
+  if (!CTTY_IS_VALID (myself->ctty) || iscons_dev (myself->ctty))
     return -1;
   return device::minor (myself->ctty);
 }
