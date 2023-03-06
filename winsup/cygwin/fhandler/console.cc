@@ -645,7 +645,7 @@ scan_console (HWND hw, LPARAM lp)
        {
 	 *p->shared_console_info = cs;
 	 CloseHandle (h);
-	 return TRUE;
+	 return FALSE;
        }
       UnmapViewOfFile ((void *) cs);
       CloseHandle (h);
