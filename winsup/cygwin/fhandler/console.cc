@@ -723,6 +723,7 @@ fhandler_console::set_unit ()
     pc.file_attributes (FILE_ATTRIBUTE_NORMAL);
   else
     {
+      _tc = NULL;
       set_handle (NULL);
       set_output_handle (NULL);
       created = false;
@@ -4251,6 +4252,12 @@ fhandler_console::fixup_after_fork_exec (bool execing)
   set_unit ();
   setup_io_mutex ();
   wpbuf.init ();
+  if (cygheap->ctty == this && !get_handle () && !get_output_handle ())
+    {
+      close_with_arch ();
+      cygheap->ctty = NULL;
+      return;
+    }
 
   if (!execing)
     return;

@@ -913,6 +913,8 @@ dtable::fixup_after_exec ()
 	else if (i <= 2)
 	  SetStdHandle (std_consts[i], fh->get_output_handle ());
       }
+  if (cygheap->ctty)
+    cygheap->ctty->fixup_after_exec ();
 }
 
 void
@@ -939,6 +941,9 @@ dtable::fixup_after_fork (HANDLE parent)
 	else if (i <= 2)
 	  SetStdHandle (std_consts[i], fh->get_output_handle ());
       }
+
+  if (cygheap->ctty)
+    cygheap->ctty->fixup_after_fork (parent);
 }
 
 static void
