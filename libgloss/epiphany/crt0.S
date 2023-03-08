@@ -121,7 +121,7 @@ _external_start:
 #error "not implemented"
 #else  /* !__STRUCT_ALIGN_64__ */
 	str	r1, [r2, 0]	; __atexit = &__atexit0
-	movr	r0, 1
+	mov	r0, 1
 	str	r0, [r1, 4]	; __atexit0._ind = 1
 	mov	r0,%low(fini)
 	movt	r0,%high(fini)
