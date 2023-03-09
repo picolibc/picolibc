@@ -40,6 +40,7 @@ at this point only has code to build for the following targets:
  * ARC (32- and 64- bit)
  * ARM (32- and 64- bit)
  * i386 (Native and Linux hosted, for testing)
+ * Microblaze (32-bit, big and little endian)
  * Motorola 68000 (m68k)
  * MIPS
  * MSP430

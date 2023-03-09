@@ -93,6 +93,8 @@ cpu_family_aliases = {
 		       'fido' : 'm68k',
 		       # m88k
 		       'm88110' : 'm88k',
+		       # Microblaze
+		       'microblazeel' : 'microblaze',
 		       # or1k
 		       'or1knd': 'or1k',
 		       # powerpc

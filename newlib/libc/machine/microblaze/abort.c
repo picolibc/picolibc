@@ -88,3 +88,4 @@ abort (void)
       exit(1);
     }
 }
+#endif
