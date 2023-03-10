@@ -15,6 +15,6 @@ RUN apt-get update && \
      xargs -a packages.txt apt-get install -y || \
      xargs -a packages.txt apt-get install -y) && \
     mkdir -p /opt && \
-    (cd /opt && while read file; do wget $file && tar xf `basename $file`; done) < extra-files.txt
+    (cd /opt && while read file; do wget $file || exit 1; tar xf `basename $file`; done) < extra-files.txt
 
 RUN apt-get clean
