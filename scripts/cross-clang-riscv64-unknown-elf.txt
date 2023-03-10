@@ -20,7 +20,7 @@ endian = 'little'
 
 [properties]
 c_args = ['-Werror=double-promotion', '-fshort-enums']
-c_link_args = ['-L/usr/lib/gcc/riscv64-unknown-elf/12.1.0/rv64imac/lp64/']
+c_link_args = ['-L/usr/lib/gcc/riscv64-unknown-elf/12.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/12.1.0/rv64imac/lp64/']
 skip_sanity_check = true
 has_link_defsym = true
 default_flash_addr = '0x80000000'
