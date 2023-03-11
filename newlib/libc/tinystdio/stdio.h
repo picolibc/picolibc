@@ -58,11 +58,12 @@
  */
 
 #ifdef ATOMIC_UNGETC
-#ifdef __riscv
+#if defined(__riscv) || defined(__MICROBLAZE__)
 /*
- * Use 32-bit ungetc storage when doing atomic ungetc on RISC-V, which
- * has 4-byte swap intrinsics but not 2-byte swap intrinsics. This
- * increases the size of the __file struct by four bytes.
+ * Use 32-bit ungetc storage when doing atomic ungetc on RISC-V and
+ * MicroBlaze, which have 4-byte swap intrinsics but not 2-byte swap
+ * intrinsics. This increases the size of the __file struct by four
+ * bytes.
  */
 #define __PICOLIBC_UNGETC_SIZE	4
 #endif
