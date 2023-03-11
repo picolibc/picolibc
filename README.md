@@ -58,25 +58,32 @@ Supporting architectures that already have Newlib code requires:
     setjmp/longjmp support as these cannot be performed in
     architecture independent code and are needed by libstdc++.
 
- 2. newlib/libm/machine/_architecture_/meson.build to build any
+ 2. Checking for atomic support for tinystdio. Tinystdio requires
+    atomics for ungetc to work correctly in a reentrant
+    environment. By default, it stores them in 16-bit values, but
+    some architectures only have 32-bit atomics. To avoid ABI
+    issues, the size selected isn't detected automatically, instead
+    it must be configured in newlib/libc/tinystdio/stdio.h.
+
+ 3. newlib/libm/machine/_architecture_/meson.build to build any
     architecture-specific libm bits
 
- 3. picocrt/machine/_architecture_ source code and build bits if you
+ 4. picocrt/machine/_architecture_ source code and build bits if you
     need custom startup code for the architecture. Useful in all
     cases, but this is necessary to run tests under qemu if your
     platform can do that.
 
- 4. cross-_gcc-triple_.txt to configure the meson cross-compilation
+ 5. cross-_gcc-triple_.txt to configure the meson cross-compilation
     mechanism to use the right tools
 
- 5. do-_architecture_-configure to make testing the cross-compilation
+ 6. do-_architecture_-configure to make testing the cross-compilation
     setup easier.
 
- 6. newlib/libc/picolib support. This should include whatever startup
+ 7. newlib/libc/picolib support. This should include whatever startup
     helpers are required (like ARM interrupt vector) and TLS support
     (if your compiler includes this).
 
- 7. run-_architecture_ script to run tests under QEMU. Look at the ARM
+ 8. run-_architecture_ script to run tests under QEMU. Look at the ARM
     and RISC-V examples to get a sense of what this needs to do and
     how it gets invoked from the cross-_gcc-triple_.txt configuration
     file.
