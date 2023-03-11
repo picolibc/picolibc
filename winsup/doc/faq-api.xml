@@ -41,8 +41,8 @@ deprecated by regular, automated test releases.  See the next FAQ entry
 <answer>
 
 <para>Yes.  Starting December 2022, regular, automated test releases
-are created whenever a considerable patch is pushed to the Cygwin git
-repo at <ulink url="https://cygwin.com/git/newlib-cygwin.git"/>.
+are created whenever a significant patch is pushed to the Cygwin git
+repo at <ulink url="https://cygwin.com/cgit/newlib-cygwin/"/>.
 You can download the cygwin package test releases just like any other
 test release for any Cgywin package using the Cygwin Setup program.
 For more info, see
