@@ -18,3 +18,7 @@ endian = 'little'
 
 [properties]
 skip_sanity_check = true
+default_flash_addr = '0x00000000'
+default_flash_size = '0x08000000'
+default_ram_addr   = '0x08000000'
+default_ram_size   = '0x10000000'
