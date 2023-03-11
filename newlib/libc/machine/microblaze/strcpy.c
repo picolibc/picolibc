@@ -117,7 +117,7 @@ strcpy (char *__restrict dst0,
       src = (char*)aligned_src;
     }
 
-  while (*dst++ = *src++)
+  while ((*dst++ = *src++))
     ;
   return dst0;
 #endif /* not PREFER_SIZE_OVER_SPEED */
