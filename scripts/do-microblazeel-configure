@@ -36,5 +36,6 @@
 #
 exec "$(dirname "$0")"/do-configure microblazeel-zephyr-elf \
   -Dtests-enable-stack-protector=false \
+    -Datomic-ungetc=false \
   -Dtests=true \
   "$@"
