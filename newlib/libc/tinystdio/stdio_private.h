@@ -485,8 +485,9 @@ static inline bool
 __atomic_compare_exchange_ungetc(__ungetc_t *p, __ungetc_t d, __ungetc_t v)
 {
 	_Atomic __ungetc_t *pa = (_Atomic __ungetc_t *) p;
-	return atomic_compare_exchange_weak(pa, &d, v);
+        return atomic_compare_exchange_strong(pa, &d, v);
 }
+
 static inline __ungetc_t
 __atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v)
 {
