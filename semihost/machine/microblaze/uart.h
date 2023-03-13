@@ -45,7 +45,7 @@ struct uart {
         volatile uint32_t       status;
 };
 
-#define UART    ((struct uart *) 0x84000000)
+#define UART    ((struct uart *) 0xfe020000)
 #define STATUS_RXVALID    0x01
 #define STATUS_TXFULL     0x08
 

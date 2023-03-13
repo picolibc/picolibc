@@ -44,9 +44,12 @@ shift
 
 "$dir"/monitor-e9 $qemu \
 	-monitor none \
-        -machine petalogix-s3adsp1800 \
-	-serial stdio \
+	-machine microblaze-fdt \
+	-hw-dtb $dir/../semihost/machine/microblaze/board-qemu-microblaze-demo.dtb \
+	-chardev stdio,id=con,mux=on -serial chardev:con -mon chardev=con,mode=readline \
 	-nic none \
+	-net none \
 	-kernel "$elf" \
 	-nographic \
+	-s \
 	"$@" < /dev/null
