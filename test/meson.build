@@ -334,7 +334,7 @@ foreach target : targets
 		 'math-funcs', 'timegm', 'time-tests',
                  'test-strtod', 'test-strchr',
 		 'test-memset', 'test-put',
-		 'test-efcvt',
+		 'test-efcvt', 'test-atomic',
 		]
 
   if have_attr_ctor_dtor
@@ -424,6 +424,11 @@ if enable_native_tests
 		    c_args: native_c_args,
 		    dependencies: native_lib_m))
   endif
+
+  test('test-atomic-native',
+       executable('test-atomic-native', 'test-atomic.c',
+		  c_args: native_c_args))
+
 endif
 
 subdir('libc-testsuite')
