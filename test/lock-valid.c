@@ -141,6 +141,8 @@ static void lock_validate(int ret, void *arg)
         assert(__lock___libc_recursive_mutex == LIBC_LOCK_EXIT_COUNT);
 }
 
+#include <stdio.h>
+
 __attribute__((constructor))
 static void add_lock_validate(void)
 {

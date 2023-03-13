@@ -1,9 +1,7 @@
-#!/bin/sh
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2023 Advanced Micro Devices, Inc. (AMD)
-# Copyright © 2023 Alp Sayin
+# Copyright © 2023 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -34,7 +32,4 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-exec "$(dirname "$0")"/do-configure microblazeel-zephyr-elf \
-  -Dtests-enable-stack-protector=false \
-  -Dtests=true \
-  "$@"
+src_picocrt += files('crt0.S', 'crt1.c')

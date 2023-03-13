@@ -248,6 +248,7 @@ foreach target : targets
 		    link_args:  _link_args,
 		    objects: _objs_minimal,
 		    link_with: _libs,
+		    link_depends: test_link_depends,
 		    include_directories: inc),
          depends: bios_bin,
 	 env: test_env)
@@ -321,6 +322,26 @@ foreach target : targets
 		  c_args: double_printf_compile_args + _c_args,
 		  link_args: double_printf_link_args + _link_args,
 		  objects: _objs,
+		  link_with: _libs,
+		  link_depends:  test_link_depends,
+		  include_directories: inc),
+       depends: bios_bin,
+       env: test_env,
+      )
+
+  t1 = 'hello'
+  t1_src = t1 + '.c'
+  if target == ''
+    t1_name = t1
+  else
+    t1_name = t1 + '_' + target
+  endif
+
+  test(t1_name,
+       executable(t1_name, t1_src,
+		  c_args: _c_args,
+		  link_args: _link_args,
+		  objects: _objs_minimal,
 		  link_with: _libs,
 		  link_depends:  test_link_depends,
 		  include_directories: inc),

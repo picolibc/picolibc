@@ -143,6 +143,7 @@ main(void)
 	char	buf[256];
 	int	errors = 0;
 
+        printf("main\n");
 #if 0
 	double	a;
 
@@ -166,9 +167,11 @@ main(void)
 	printf ("%g\n", exp(11));
 #endif
 
+        wprintf(L"before swscanf test %ls\n", L"yup, before it");
         unsigned wt;
         for (wt = 0; wtest[wt].str; wt++) {
             void *extra;
+            wprintf(L"testing %ls fmt %ls\n", wtest[wt].str, wtest[wt].fmt);
             int wtr = swscanf(wtest[wt].str, wtest[wt].fmt, &extra);
             if (wtr != wtest[wt].expect) {
                 wprintf(L"%d str %ls fmt %ls expected %d got %d\n", wt,
@@ -176,6 +179,7 @@ main(void)
                 ++errors;
             }
         }
+        printf("after swscanf test\n");
         wprintf(L"hello world %g\n", 1.0);
 
 #if defined(TINY_STDIO) || !defined(NO_FLOATING_POINT)

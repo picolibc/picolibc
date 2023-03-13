@@ -150,7 +150,10 @@ SECTIONS
 		. = ALIGN(8);
 
 		PROVIDE( __global_pointer$ = . + 0x800 );
-		*(.sdata .sdata.* .sdata2.*)
+		PROVIDE( __sdata = . );
+		*(.sdata .sdata.*)
+		PROVIDE( __sdata2 = .);
+		*(.sdata2 .sdata2.*)
 		*(.gnu.linkonce.s.*)
 	} >ram AT>flash :ram_init
 	PROVIDE(__data_start = ADDR(.data));
