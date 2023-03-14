@@ -31,50 +31,104 @@ int __sched_getaffinity_sys (pid_t, size_t, cpu_set_t *);
 
 /* These macros alloc or free dynamically-sized cpu sets of size 'num' cpus.
    Allocations are padded such that full-word operations can be done easily. */
-#define CPU_ALLOC_SIZE(num) ((num+__NCPUBITS-1) / __NCPUBITS) * sizeof (__cpu_mask)
-#define CPU_ALLOC(num)      __builtin_malloc (CPU_ALLOC_SIZE(num))
-#define CPU_FREE(set)       __builtin_free (set)
+#define CPU_ALLOC_SIZE(num) __cpuset_alloc_size (num)
+static inline size_t
+__cpuset_alloc_size (int num)
+{
+  return (size_t) (((num + __NCPUBITS - 1) / __NCPUBITS) * sizeof (__cpu_mask));
+}
+
+#define CPU_ALLOC(num) __cpuset_alloc (num)
+static inline cpu_set_t *
+__cpuset_alloc (int num)
+{
+  return (cpu_set_t *) __builtin_malloc (CPU_ALLOC_SIZE(num));
+}
+
+#define CPU_FREE(set) __cpuset_free (set)
+static inline void
+__cpuset_free (cpu_set_t *set)
+{
+  __builtin_free (set);
+}
 
 /* These _S macros operate on dynamically-sized cpu sets of size 'siz' bytes */
-#define CPU_ZERO_S(siz, set)    __builtin_memset (set, 0, siz)
+#define CPU_ZERO_S(siz, set) __cpuset_zero_s (siz, set)
+static inline void
+__cpuset_zero_s (size_t siz, cpu_set_t *set)
+{
+  (void) __builtin_memset (set, 0, siz);
+}
 
-#define CPU_SET_S(cpu,siz,set) \
-	if (cpu < 8 * siz) \
-	  (set)->__bits[__CPUELT(cpu)] |= __CPUMASK(cpu);
+#define CPU_SET_S(cpu, siz, set) __cpuset_set_s (cpu, siz, set)
+static inline void
+__cpuset_set_s (int cpu, size_t siz, cpu_set_t *set)
+{
+  if (cpu >= 0 && cpu < 8 * siz)
+    (set)->__bits[__CPUELT(cpu)] |= __CPUMASK(cpu);
+}
 
-#define CPU_CLR_S(cpu,siz,set) \
-	if (cpu < 8 * siz) \
-	  (set)->__bits[__CPUELT(cpu)] &= ~(__CPUMASK(cpu));
+#define CPU_CLR_S(cpu, siz, set) __cpuset_clr_s (cpu, siz, set)
+static inline void
+__cpuset_clr_s (int cpu, size_t siz, cpu_set_t *set)
+{
+  if (cpu >= 0 && cpu < 8 * siz)
+    (set)->__bits[__CPUELT(cpu)] &= ~(__CPUMASK(cpu));
+}
 
-#define CPU_ISSET_S(cpu,siz,set) \
-      ({int res = 0; \
-	if (cpu < 8 * siz) \
-	  res = !!((set)->__bits[__CPUELT(cpu)] & __CPUMASK(cpu)); \
-	res;})
+#define CPU_ISSET_S(cpu, siz, set) __cpuset_isset_s (cpu, siz, set)
+static inline int
+__cpuset_isset_s (int cpu, size_t siz, cpu_set_t *set)
+{
+  int res = 0;
+  if (cpu >= 0 && cpu < 8 * siz)
+    res = !!((set)->__bits[__CPUELT(cpu)] & __CPUMASK(cpu));
+  return res;
+}
 
-#define CPU_COUNT_S(siz, set) \
-      ({int tot = 0;\
-	for (int i = 0; i < siz / sizeof (__cpu_mask); i++) \
-	  tot += __builtin_popcountl ((set)->__bits[i]); \
-	tot;})
+#define CPU_COUNT_S(siz, set) __cpuset_count_s (siz, set)
+static inline int
+__cpuset_count_s (size_t siz, cpu_set_t *set)
+{
+  int res = 0;
+  for (int i = 0; i < siz / sizeof (__cpu_mask); i++)
+    res += __builtin_popcountl ((set)->__bits[i]);
+  return res;
+}
 
-#define CPU_AND_S(siz, dst, src1, src2) \
-	for (int i = 0; i < siz / sizeof (__cpu_mask); i++) \
-	  (dst)->__bits[i] = (src1)->__bits[i] & (src2)->__bits[i];
+#define CPU_AND_S(siz, dst, src1, src2) __cpuset_and_s (siz, dst, src1, src2)
+static inline void
+__cpuset_and_s (size_t siz, cpu_set_t *dst, cpu_set_t *src1, cpu_set_t *src2)
+{
+  for (int i = 0; i < siz / sizeof (__cpu_mask); i++)
+    (dst)->__bits[i] = (src1)->__bits[i] & (src2)->__bits[i];
+}
 
-#define CPU_OR_S(siz, dst, src1, src2) \
-	for (int i = 0; i < siz / sizeof (__cpu_mask); i++) \
-	  (dst)->__bits[i] = (src1)->__bits[i] | (src2)->__bits[i];
+#define CPU_OR_S(siz, dst, src1, src2) __cpuset_or_s (siz, dst, src1, src2)
+static inline void
+__cpuset_or_s (size_t siz, cpu_set_t *dst, cpu_set_t *src1, cpu_set_t *src2)
+{
+  for (int i = 0; i < siz / sizeof (__cpu_mask); i++)
+    (dst)->__bits[i] = (src1)->__bits[i] | (src2)->__bits[i];
+}
 
-#define CPU_XOR_S(siz, dst, src1, src2) \
-	for (int i = 0; i < siz / sizeof (__cpu_mask); i++) \
-	  (dst)->__bits[i] = (src1)->__bits[i] ^ (src2)->__bits[i];
+#define CPU_XOR_S(siz, dst, src1, src2) __cpuset_xor_s (siz, dst, src1, src2)
+static inline void
+__cpuset_xor_s (size_t siz, cpu_set_t *dst, cpu_set_t *src1, cpu_set_t *src2)
+{
+  for (int i = 0; i < siz / sizeof (__cpu_mask); i++)
+    (dst)->__bits[i] = (src1)->__bits[i] ^ (src2)->__bits[i];
+}
 
-#define CPU_EQUAL_S(siz, src1, src2) \
-      ({int res = 1; \
-	for (int i = 0; res && i < siz / sizeof (__cpu_mask); i++) \
-	  res &= (src1)->__bits[i] == (src2)->__bits[i]; \
-	res;})
+#define CPU_EQUAL_S(siz, src1, src2) __cpuset_equal_s (siz, src1, src2)
+static inline int
+__cpuset_equal_s (size_t siz, cpu_set_t *src1, cpu_set_t *src2)
+{
+  int res = 1;
+  for (int i = 0; res && i < siz / sizeof (__cpu_mask); i++)
+    res &= (src1)->__bits[i] == (src2)->__bits[i];
+  return res;
+}
 
 /* These macros operate on fixed-size cpu sets of size __CPU_SETSIZE cpus */
 #define CPU_ZERO(set)             CPU_ZERO_S(sizeof (cpu_set_t), set)
