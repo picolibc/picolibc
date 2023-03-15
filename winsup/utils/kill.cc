@@ -71,11 +71,49 @@ print_version ()
 static const char *
 strsigno (int signo)
 {
-  if (signo > 0 && signo < NSIG)
+  static char sigbuf[8];
+
+  if (signo > 0 && signo < SIGRTMIN)
     return sys_sigabbrev[signo];
+  if (signo <= SIGRTMAX)
+    {
+      snprintf (sigbuf, sizeof sigbuf, "SIGRT%d", signo - SIGRTMIN);
+      return sigbuf;
+    }
   static char buf[sizeof ("Unknown signal") + 32];
   sprintf (buf, "Unknown signal %d", signo);
   return buf;
+}
+
+static int
+strtortsig (const char *sig)
+{
+  bool neg = false;
+  char *endp = NULL;
+  int signo;
+
+  sig += 5;
+  if (!strcmp (sig, "MIN"))
+    return SIGRTMIN;
+  if (!strcmp (sig, "MAX"))
+    return SIGRTMAX;
+  if (!strncmp (sig, "MIN+", 4))
+    sig += 4;
+  else if (!strncmp (sig, "MAX-", 4))
+    {
+      sig += 4;
+      neg = true;
+    }
+  signo = strtoul (sig, &endp, 10);
+  if (!endp || *endp)
+    return 0;
+  if (neg)
+    signo = SIGRTMAX - signo;
+  else
+    signo = SIGRTMIN + signo;
+  if (signo < SIGRTMIN || signo > SIGRTMAX)
+    return 0;
+  return signo;
 }
 
 static int
@@ -92,7 +130,10 @@ getsig (const char *in_sig)
       sprintf (buf, "SIG%-.20s", in_sig);
       sig = buf;
     }
-  intsig = strtosigno (sig) ?: atoi (in_sig);
+  if (!strncmp (sig, "SIGRT", 5))
+    intsig = strtortsig (sig);
+  else
+    intsig = strtosigno (sig) ?: atoi (in_sig);
   char *p;
   if (!intsig && (strcmp (sig, "SIG0") != 0 && (strtol (in_sig, &p, 10) != 0 || *p)))
     intsig = -1;
