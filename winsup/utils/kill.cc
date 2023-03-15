@@ -65,6 +65,7 @@ print_version ()
 	  CYGWIN_VERSION_DLL_MAJOR % 1000,
 	  CYGWIN_VERSION_DLL_MINOR,
 	  strrchr (__DATE__, ' ') + 1);
+  exit (0);
 }
 
 static const char *
@@ -126,6 +127,7 @@ listsig (const char *in_sig)
       else
 	printf ("%d\n", sig);
     }
+  exit (0);
 }
 
 static void
