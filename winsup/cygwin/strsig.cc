@@ -56,37 +56,37 @@ struct sigdesc
   _s(SIGUSR1, "User defined signal 1"),		/* 30 */ \
   _s(SIGUSR2, "User defined signal 2"),		/* 31 */ \
   _s(SIGRTMIN, "Real-time signal 0"),		/* 32 */ \
-  _s(SIGRTMIN + 1, "Real-time signal 1"),	/* 33 */ \
-  _s(SIGRTMIN + 2, "Real-time signal 2"),	/* 34 */ \
-  _s(SIGRTMIN + 3, "Real-time signal 3"),	/* 35 */ \
-  _s(SIGRTMIN + 4, "Real-time signal 4"),	/* 36 */ \
-  _s(SIGRTMIN + 5, "Real-time signal 5"),	/* 37 */ \
-  _s(SIGRTMIN + 6, "Real-time signal 6"),	/* 38 */ \
-  _s(SIGRTMIN + 7, "Real-time signal 7"),	/* 39 */ \
-  _s(SIGRTMIN + 8, "Real-time signal 8"),	/* 40 */ \
-  _s(SIGRTMIN + 9, "Real-time signal 9"),	/* 41 */ \
-  _s(SIGRTMIN + 10, "Real-time signal 10"),	/* 42 */ \
-  _s(SIGRTMIN + 11, "Real-time signal 11"),	/* 43 */ \
-  _s(SIGRTMIN + 12, "Real-time signal 12"),	/* 44 */ \
-  _s(SIGRTMIN + 13, "Real-time signal 13"),	/* 45 */ \
-  _s(SIGRTMIN + 14, "Real-time signal 14"),	/* 46 */ \
-  _s(SIGRTMIN + 15, "Real-time signal 15"),	/* 47 */ \
-  _s(SIGRTMIN + 16, "Real-time signal 16"),	/* 48 */ \
-  _s(SIGRTMIN + 17, "Real-time signal 17"),	/* 49 */ \
-  _s(SIGRTMIN + 18, "Real-time signal 18"),	/* 50 */ \
-  _s(SIGRTMIN + 19, "Real-time signal 19"),	/* 51 */ \
-  _s(SIGRTMIN + 20, "Real-time signal 20"),	/* 52 */ \
-  _s(SIGRTMIN + 21, "Real-time signal 21"),	/* 53 */ \
-  _s(SIGRTMIN + 22, "Real-time signal 22"),	/* 54 */ \
-  _s(SIGRTMIN + 23, "Real-time signal 23"),	/* 55 */ \
-  _s(SIGRTMIN + 24, "Real-time signal 24"),	/* 56 */ \
-  _s(SIGRTMIN + 25, "Real-time signal 25"),	/* 57 */ \
-  _s(SIGRTMIN + 26, "Real-time signal 26"),	/* 58 */ \
-  _s(SIGRTMIN + 27, "Real-time signal 27"),	/* 59 */ \
-  _s(SIGRTMIN + 28, "Real-time signal 28"),	/* 60 */ \
-  _s(SIGRTMIN + 29, "Real-time signal 29"),	/* 61 */ \
-  _s(SIGRTMIN + 30, "Real-time signal 30"),	/* 62 */ \
-  _s(SIGRTMIN + 31, "Real-time signal 31"),	/* 63 */ \
+  _s(SIGRTMIN+1, "Real-time signal 1"),	/* 33 */ \
+  _s(SIGRTMIN+2, "Real-time signal 2"),	/* 34 */ \
+  _s(SIGRTMIN+3, "Real-time signal 3"),	/* 35 */ \
+  _s(SIGRTMIN+4, "Real-time signal 4"),	/* 36 */ \
+  _s(SIGRTMIN+5, "Real-time signal 5"),	/* 37 */ \
+  _s(SIGRTMIN+6, "Real-time signal 6"),	/* 38 */ \
+  _s(SIGRTMIN+7, "Real-time signal 7"),	/* 39 */ \
+  _s(SIGRTMIN+8, "Real-time signal 8"),	/* 40 */ \
+  _s(SIGRTMIN+9, "Real-time signal 9"),	/* 41 */ \
+  _s(SIGRTMIN+10, "Real-time signal 10"),	/* 42 */ \
+  _s(SIGRTMIN+11, "Real-time signal 11"),	/* 43 */ \
+  _s(SIGRTMIN+12, "Real-time signal 12"),	/* 44 */ \
+  _s(SIGRTMIN+13, "Real-time signal 13"),	/* 45 */ \
+  _s(SIGRTMIN+14, "Real-time signal 14"),	/* 46 */ \
+  _s(SIGRTMIN+15, "Real-time signal 15"),	/* 47 */ \
+  _s(SIGRTMIN+16, "Real-time signal 16"),	/* 48 */ \
+  _s(SIGRTMIN+17, "Real-time signal 17"),	/* 49 */ \
+  _s(SIGRTMIN+18, "Real-time signal 18"),	/* 50 */ \
+  _s(SIGRTMIN+19, "Real-time signal 19"),	/* 51 */ \
+  _s(SIGRTMIN+20, "Real-time signal 20"),	/* 52 */ \
+  _s(SIGRTMIN+21, "Real-time signal 21"),	/* 53 */ \
+  _s(SIGRTMIN+22, "Real-time signal 22"),	/* 54 */ \
+  _s(SIGRTMIN+23, "Real-time signal 23"),	/* 55 */ \
+  _s(SIGRTMIN+24, "Real-time signal 24"),	/* 56 */ \
+  _s(SIGRTMIN+25, "Real-time signal 25"),	/* 57 */ \
+  _s(SIGRTMIN+26, "Real-time signal 26"),	/* 58 */ \
+  _s(SIGRTMIN+27, "Real-time signal 27"),	/* 59 */ \
+  _s(SIGRTMIN+28, "Real-time signal 28"),	/* 60 */ \
+  _s(SIGRTMIN+29, "Real-time signal 29"),	/* 61 */ \
+  _s(SIGRTMIN+30, "Real-time signal 30"),	/* 62 */ \
+  _s(SIGRTMIN+31, "Real-time signal 31"),	/* 63 */ \
   _s(SIGRTMAX, "Real-time signal 32")		/* 64 */
 
 #define _s(n, s) #n
