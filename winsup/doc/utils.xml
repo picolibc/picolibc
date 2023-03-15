@@ -969,8 +969,10 @@ file gmon.out.21900.zstd.exe, gmon version 0x51879, sample rate 100
       </cmdsynopsis>
       <cmdsynopsis>
 	<command>kill</command>
-	<arg choice="plain">-l</arg>
-	<arg choice="repeat"><replaceable>signal</replaceable></arg>
+	<group choice="plain">
+	  <arg choice="plain">-l <replaceable>signal</replaceable></arg>
+	  <arg choice="plain">-L</arg>
+	</group>
       </cmdsynopsis>
       <cmdsynopsis>
 	<command>kill</command>
@@ -987,6 +989,7 @@ file gmon.out.21900.zstd.exe, gmon version 0x51879, sample rate 100
       <screen>
  -f, --force     force, using win32 interface if necessary
  -l, --list      print a list of signal names
+ -L, --table     print a formatted table of signal names
  -s, --signal    send signal (use kill --list for a list)
  -W, --winpid    specified pids are windows PIDs, not Cygwin PIDs
                  (use with extreme caution!)
@@ -1029,6 +1032,9 @@ $ /bin/kill --version
 
     <para>The <command>kill -l</command> option prints the name of the given
       signal, or a list of all signal names if no signal is given.</para>
+
+    <para>The <command>kill -L</command> option is similar to <literal>-l</literal>,
+      but it will print signal names and their corresponding numbers.</para>
 
     <para>To send a specific signal, use the <literal>-signN</literal> option,
       either with a signal number or a signal name (minus the "SIG" part), as
