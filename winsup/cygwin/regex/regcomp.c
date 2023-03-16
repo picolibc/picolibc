@@ -1145,7 +1145,7 @@ p_b_term(struct parse *p, cset *cs)
 #else
 			if (MB_CUR_MAX > 1) {
 #endif
-				(void)REQUIRE(start <= finish, REG_ERANGE);
+				(void)REQUIRE(p_range_cmp(start, finish) <= 0, REG_ERANGE);
 				CHaddrange(p, cs, start, finish);
 			} else {
 				(void)REQUIRE(p_range_cmp(start, finish) <= 0, REG_ERANGE);
@@ -1665,8 +1665,6 @@ CHaddrange(struct parse *p, cset *cs, wint_t min, wint_t max)
 
 	for (; min < NC && min <= max; min++)
 		CHadd(p, cs, min);
-	if (min >= max)
-		return;
 	newranges = reallocarray(cs->ranges, cs->nranges + 1,
 	    sizeof(*cs->ranges));
 	if (newranges == NULL) {
