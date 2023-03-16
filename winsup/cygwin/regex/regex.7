@@ -13,6 +13,10 @@
 .\" 2. Redistributions in binary form must reproduce the above copyright
 .\"    notice, this list of conditions and the following disclaimer in the
 .\"    documentation and/or other materials provided with the distribution.
+.\" 3. All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\"	This product includes software developed by the University of
+.\"	California, Berkeley and its contributors.
 .\" 4. Neither the name of the University nor the names of its contributors
 .\"    may be used to endorse or promote products derived from this software
 .\"    without specific prior written permission.
@@ -30,9 +34,9 @@
 .\" SUCH DAMAGE.
 .\"
 .\"	@(#)re_format.7	8.3 (Berkeley) 3/20/94
-.\" $FreeBSD: src/lib/libc/regex/re_format.7,v 1.12 2008/09/05 17:41:20 keramida Exp $
+.\" $FreeBSD$
 .\"
-.Dd March 20, 1994
+.Dd June 30, 2014
 .Dt RE_FORMAT 7
 .Os
 .Sh NAME
@@ -271,7 +275,6 @@ and
 stands for the list of all characters belonging to that
 class.
 Standard character class names are:
-.Pp
 .Bl -column "alnum" "digit" "xdigit" -offset indent
 .It Em "alnum	digit	punct"
 .It Em "alpha	graph	space"
@@ -311,6 +314,13 @@ compatible with but not specified by
 .St -p1003.2 ,
 and should be used with
 caution in software intended to be portable to other systems.
+The additional word delimiters
+.Ql \e<
+and
+.Ql \e>
+are provided to ease compatibility with traditional
+SVR4
+systems but are not portable and should be avoided.
 .Pp
 In the event that an RE could match more than one substring of a given
 string,
@@ -382,10 +392,12 @@ and
 .Ql ?\&
 are ordinary characters, and their functionality
 can be expressed using bounds
-.No ( Ql {1,}
+.Po
+.Ql {1,}
 or
 .Ql {0,1}
-respectively).
+respectively
+.Pc .
 Also note that
 .Ql x+
 in modern REs is equivalent to

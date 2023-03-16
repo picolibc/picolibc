@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 1992, 1993, 1994 Henry Spencer.
  * Copyright (c) 1992, 1993, 1994
  *	The Regents of the University of California.  All rights reserved.
@@ -14,7 +16,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -31,21 +33,21 @@
  * SUCH DAMAGE.
  *
  *	@(#)regex2.h	8.4 (Berkeley) 3/20/94
- * $FreeBSD: src/lib/libc/regex/regex2.h,v 1.11 2007/01/09 00:28:04 imp Exp $
+ * $FreeBSD$
  */
 
 /*
  * First, the stuff that ends up in the outside-world include file
  = typedef off_t regoff_t;
  = typedef struct {
- =	int re_magic;
- =	size_t re_nsub;		// number of parenthesized subexpressions
- =	const char *re_endp;	// end pointer for REG_PEND
- =	struct re_guts *re_g;	// none of your business :-)
+ = 	int re_magic;
+ = 	size_t re_nsub;		// number of parenthesized subexpressions
+ = 	const char *re_endp;	// end pointer for REG_PEND
+ = 	struct re_guts *re_g;	// none of your business :-)
  = } regex_t;
  = typedef struct {
- =	regoff_t rm_so;		// start of match
- =	regoff_t rm_eo;		// end of match
+ = 	regoff_t rm_so;		// start of match
+ = 	regoff_t rm_eo;		// end of match
  = } regmatch_t;
  */
 /*
@@ -73,7 +75,7 @@
  * immediately *preceding* "execution" of that operator.
  */
 typedef unsigned long sop;	/* strip operator */
-typedef long sopno;
+typedef unsigned long sopno;
 #define	OPRMASK	0xf8000000L
 #define	OPDMASK	0x07ffffffL
 #define	OPSHIFT	((unsigned)27)
@@ -102,6 +104,10 @@ typedef long sopno;
 #define	O_CH	(18L<<OPSHIFT)	/* end choice	back to OOR1		*/
 #define	OBOW	(19L<<OPSHIFT)	/* begin word	-			*/
 #define	OEOW	(20L<<OPSHIFT)	/* end word	-			*/
+#define	OBOS	(21L<<OPSHIFT)	/* begin subj.  -			*/
+#define	OEOS	(22L<<OPSHIFT)	/* end subj.	-			*/
+#define	OWBND	(23L<<OPSHIFT)	/* word bound	-			*/
+#define	ONWBND	(24L<<OPSHIFT)	/* not bound	-			*/
 
 /*
  * Structures for [] character-set representation.
@@ -111,13 +117,13 @@ typedef struct {
 	wint_t		max;
 } crange;
 typedef struct {
-	unsigned char	bmp[NC / 8];
+	unsigned char	bmp[NC_MAX / 8];
 	wctype_t	*types;
-	int		ntypes;
+	unsigned int	ntypes;
 	wint_t		*wides;
-	int		nwides;
+	unsigned int	nwides;
 	crange		*ranges;
-	int		nranges;
+	unsigned int	nranges;
 	int		invert;
 	int		icase;
 } cset;
@@ -125,15 +131,20 @@ typedef struct {
 static int
 CHIN1(cset *cs, wint_t ch)
 {
-	int i;
+	unsigned int i;
 
 	assert(ch >= 0);
 	if (ch < NC)
 		return (((cs->bmp[ch >> 3] & (1 << (ch & 7))) != 0) ^
 		    cs->invert);
-	for (i = 0; i < cs->nwides; i++)
-		if (ch == cs->wides[i])
+	for (i = 0; i < cs->nwides; i++) {
+		if (cs->icase) {
+			if (ch == towlower(cs->wides[i]) ||
+			    ch == towupper(cs->wides[i]))
+				return (!cs->invert);
+		} else if (ch == cs->wides[i])
 			return (!cs->invert);
+	}
 	for (i = 0; i < cs->nranges; i++)
 		if (cs->ranges[i].min <= ch && ch <= cs->ranges[i].max)
 			return (!cs->invert);
@@ -151,14 +162,10 @@ CHIN(cset *cs, wint_t ch)
 	if (ch < NC)
 		return (((cs->bmp[ch >> 3] & (1 << (ch & 7))) != 0) ^
 		    cs->invert);
-	else if (cs->icase) {
-		if (cs->invert)
-			return (CHIN1(cs, ch) && CHIN1(cs, towlower(ch)) &&
-			    CHIN1(cs, towupper(ch)));
-		else
-			return (CHIN1(cs, ch) || CHIN1(cs, towlower(ch)) ||
-			    CHIN1(cs, towupper(ch)));
-	} else
+	else if (cs->icase)
+		return (CHIN1(cs, ch) || CHIN1(cs, towlower(ch)) ||
+		    CHIN1(cs, towupper(ch)));
+	else
 		return (CHIN1(cs, ch));
 }
 
@@ -169,7 +176,7 @@ struct re_guts {
 	int magic;
 #		define	MAGIC2	((('R'^0200)<<8)|'E')
 	sop *strip;		/* malloced area for strip */
-	int ncsets;		/* number of csets in use */
+	unsigned int ncsets;	/* number of csets in use */
 	cset *sets;		/* -> cset [ncsets] */
 	int cflags;		/* copy of regcomp() cflags argument */
 	sopno nstates;		/* = number of sops */
@@ -193,4 +200,5 @@ struct re_guts {
 
 /* misc utilities */
 #define	OUT	(CHAR_MIN - 1)	/* a non-character value */
-#define ISWORD(c)       (iswalnum((wint_t)(c)) || (c) == '_')
+#define	IGN	(CHAR_MIN - 2)
+#define ISWORD(c)       (iswalnum((uch)(c)) || (c) == '_')

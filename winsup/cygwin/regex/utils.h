@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 1992, 1993, 1994 Henry Spencer.
  * Copyright (c) 1992, 1993, 1994
  *	The Regents of the University of California.  All rights reserved.
@@ -14,7 +16,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -31,13 +33,15 @@
  * SUCH DAMAGE.
  *
  *	@(#)utils.h	8.3 (Berkeley) 3/20/94
- * $FreeBSD: src/lib/libc/regex/utils.h,v 1.3 2007/01/09 00:28:04 imp Exp $
+ * $FreeBSD$
  */
 
 /* utility definitions */
 #define	DUPMAX		_POSIX2_RE_DUP_MAX	/* xxx is this right? */
 #define	INFINITY	(DUPMAX + 1)
-#define	NC		(CHAR_MAX - CHAR_MIN + 1)
+
+#define	NC_MAX		(CHAR_MAX - CHAR_MIN + 1)
+#define	NC		((MB_CUR_MAX) == 1 ? (NC_MAX) : (128))
 typedef unsigned char uch;
 
 /* switch off assertions (if not already off) if no REDEBUG */

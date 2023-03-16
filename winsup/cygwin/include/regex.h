@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 1992 Henry Spencer.
  * Copyright (c) 1992, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -14,7 +16,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -38,32 +40,20 @@
 #define	_REGEX_H_
 
 #include <sys/cdefs.h>
-#include <_ansi.h>
 #include <sys/_types.h>
 
 /* types */
-#ifdef __CYGWIN__
-typedef	_off_t		regoff_t;
-
-#define __need_size_t
-#include <stddef.h>
-#else /* !__CYGWIN__ */
 typedef	__off_t		regoff_t;
 
 #ifndef _SIZE_T_DECLARED
 typedef	__size_t	size_t;
 #define	_SIZE_T_DECLARED
 #endif
-#endif /* !__CYGWIN__ */
 
 typedef struct {
 	int re_magic;
 	size_t re_nsub;		/* number of parenthesized subexpressions */
-#ifdef __CYGWIN__
 	const char *re_endp;	/* end pointer for REG_PEND */
-#else
-	__const char *re_endp;	/* end pointer for REG_PEND */
-#endif
 	struct re_guts *re_g;	/* none of your business :-) */
 } regex_t;
 
@@ -81,12 +71,10 @@ typedef struct {
 #define	REG_NOSPEC	0020
 #define	REG_PEND	0040
 #define	REG_DUMP	0200
+#define	REG_POSIX	0400	/* only POSIX-compliant regex (libregex) */
 
 /* regerror() flags */
 #define	REG_ENOSYS	(-1)
-#ifdef __CYGWIN__
-#define	REG_NOERROR	 0	/* GNU extension */
-#endif
 #define	REG_NOMATCH	 1
 #define	REG_BADPAT	 2
 #define	REG_ECOLLATE	 3

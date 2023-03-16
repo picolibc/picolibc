@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 1992, 1993, 1994 Henry Spencer.
  * Copyright (c) 1992, 1993, 1994
  *	The Regents of the University of California.  All rights reserved.
@@ -14,7 +16,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -37,7 +39,7 @@
 static char sccsid[] = "@(#)regexec.c	8.3 (Berkeley) 3/20/94";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/regex/regexec.c,v 1.8 2007/06/11 03:05:54 delphij Exp $");
+__FBSDID("$FreeBSD$");
 
 /*
  * the outer shell of regexec()
@@ -46,9 +48,6 @@ __FBSDID("$FreeBSD: src/lib/libc/regex/regexec.c,v 1.8 2007/06/11 03:05:54 delph
  * macros that code uses.  This lets the same code operate on two different
  * representations for state sets and characters.
  */
-#ifdef __CYGWIN__
-#include "winsup.h"
-#endif
 #include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -68,9 +67,9 @@ static __inline size_t
 xmbrtowc(wint_t *wi, const char *s, size_t n, mbstate_t *mbs, wint_t dummy)
 {
 	size_t nr;
-	wint_t wc;
+	wchar_t wc;
 
-	nr = mbrtowi(&wc, s, n, mbs);
+	nr = mbrtowc(&wc, s, n, mbs);
 	if (wi != NULL)
 		*wi = wc;
 	if (nr == 0)
@@ -98,8 +97,8 @@ xmbrtowc_dummy(wint_t *wi,
 }
 
 /* macros for manipulating states, small version */
-#define	states	long
-#define	states1	states		/* for later use in regexec() decision */
+#define	states1	long		/* for later use in regexec() decision */
+#define	states	states1
 #define	CLEAR(v)	((v) = 0)
 #define	SET0(v, n)	((v) &= ~((unsigned long)1 << (n)))
 #define	SET1(v, n)	((v) |= (unsigned long)1 << (n))
@@ -228,9 +227,9 @@ regexec(const regex_t * __restrict preg,
 	eflags = GOODFLAGS(eflags);
 
 	if (MB_CUR_MAX > 1)
-		return(mmatcher(g, (char *)string, nmatch, pmatch, eflags));
+		return(mmatcher(g, string, nmatch, pmatch, eflags));
 	else if (g->nstates <= CHAR_BIT*sizeof(states1) && !(eflags&REG_LARGE))
-		return(smatcher(g, (char *)string, nmatch, pmatch, eflags));
+		return(smatcher(g, string, nmatch, pmatch, eflags));
 	else
-		return(lmatcher(g, (char *)string, nmatch, pmatch, eflags));
+		return(lmatcher(g, string, nmatch, pmatch, eflags));
 }
