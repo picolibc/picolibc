@@ -119,7 +119,7 @@ static states step(struct re_guts *g, sopno start, sopno stop, states bef, wint_
 #define	EOW	(BOL-5)
 #define	BADCHAR	(BOL-6)
 #define	NWBND	(BOL-7)
-#define	NONCHAR(c)	((c) <= OUT)
+#define	NONCHAR(c)	((int)(c) <= OUT)
 /* sflags */
 #define	SBOS	0x0001
 #define	SEOS	0x0002
