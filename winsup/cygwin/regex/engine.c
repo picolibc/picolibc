@@ -170,7 +170,7 @@ stepback(const char *start, const char *cur, int nchar)
 			if ((ret - mbc) < start)
 				return (NULL);
 			memset(&mbs, 0, sizeof(mbs));
-			clen = mbrtowc(NULL, ret - mbc, mbc, &mbs);
+			clen = mbrtowi(NULL, ret - mbc, mbc, &mbs);
 			if (clen != (size_t)-1 && clen != (size_t)-2)
 				break;
 		}

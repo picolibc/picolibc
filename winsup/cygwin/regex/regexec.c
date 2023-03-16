@@ -67,9 +67,9 @@ static __inline size_t
 xmbrtowc(wint_t *wi, const char *s, size_t n, mbstate_t *mbs, wint_t dummy)
 {
 	size_t nr;
-	wchar_t wc;
+	wint_t wc;
 
-	nr = mbrtowc(&wc, s, n, mbs);
+	nr = mbrtowi(&wc, s, n, mbs);
 	if (wi != NULL)
 		*wi = wc;
 	if (nr == 0)

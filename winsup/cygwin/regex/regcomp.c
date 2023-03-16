@@ -57,7 +57,13 @@ __FBSDID("$FreeBSD$");
 #include <wchar.h>
 #include <wctype.h>
 
-#ifndef LIBREGEX
+/* We want the extensions implemented with LIBREGEX... */
+#ifdef __CYGWIN__
+#define LIBREGEX
+#endif
+
+/* ...but we also want to use the collation functions from nlsfuncs.cc. */
+#if 1//ndef LIBREGEX
 #include "collate.h"
 #endif
 
@@ -131,7 +137,7 @@ static void p_re(struct parse *p, int end1, int end2);
 static bool p_simp_re(struct parse *p, struct branchc *bc);
 static int p_count(struct parse *p);
 static void p_bracket(struct parse *p);
-static int p_range_cmp(wchar_t c1, wchar_t c2);
+static int p_range_cmp(wint_t c1, wint_t c2);
 static void p_b_term(struct parse *p, cset *cs);
 static int p_b_pseudoclass(struct parse *p, char c);
 static void p_b_cclass(struct parse *p, cset *cs);
@@ -1058,13 +1064,13 @@ p_bracket(struct parse *p)
 }
 
 static int
-p_range_cmp(wchar_t c1, wchar_t c2)
+p_range_cmp(wint_t c1, wint_t c2)
 {
-#ifndef LIBREGEX
+#if 1//ndef LIBREGEX
 	return __wcollate_range_cmp(c1, c2);
 #else
 	/* Copied from libc/collate __wcollate_range_cmp */
-	wchar_t s1[2], s2[2];
+	wint_t s1[2], s2[2];
 
 	s1[0] = c1;
 	s1[1] = L'\0';
@@ -1272,7 +1278,7 @@ p_b_coll_elem(struct parse *p,
 	const char *sp = p->next;
 	struct cname *cp;
 	mbstate_t mbs;
-	wchar_t wc;
+	wint_t wc;
 	size_t clen, len;
 
 	while (MORE() && !SEETWO(endc, ']'))
@@ -1286,7 +1292,7 @@ p_b_coll_elem(struct parse *p,
 		if (strncmp(cp->name, sp, len) == 0 && strlen(cp->name) == len)
 			return(cp->code);	/* known name */
 	memset(&mbs, 0, sizeof(mbs));
-	if ((clen = mbrtowc(&wc, sp, len, &mbs)) == len)
+	if ((clen = mbrtowi(&wc, sp, len, &mbs)) == len)
 		return (wc);			/* single character */
 	else if (clen == (size_t)-1 || clen == (size_t)-2)
 		SETERROR(REG_ILLSEQ);
@@ -1378,7 +1384,7 @@ bothcases(struct parse *p, wint_t ch)
 	assert(othercase(ch) != ch);	/* p_bracket() would recurse */
 	p->next = bracket;
 	memset(&mbs, 0, sizeof(mbs));
-	n = wcrtomb(bracket, ch, &mbs);
+	n = wirtomb(bracket, ch, &mbs);
 	assert(n != (size_t)-1);
 	bracket[n] = ']';
 	bracket[n + 1] = '\0';
@@ -1519,11 +1525,11 @@ static wint_t
 wgetnext(struct parse *p)
 {
 	mbstate_t mbs;
-	wchar_t wc;
+	wint_t wc;
 	size_t n;
 
 	memset(&mbs, 0, sizeof(mbs));
-	n = mbrtowc(&wc, p->next, p->end - p->next, &mbs);
+	n = mbrtowi(&wc, p->next, p->end - p->next, &mbs);
 	if (n == (size_t)-1 || n == (size_t)-2) {
 		SETERROR(REG_ILLSEQ);
 		return (0);
@@ -1871,7 +1877,7 @@ findmust(struct parse *p, struct re_guts *g)
 				memset(&mbs, 0, sizeof(mbs));
 				newstart = scan - 1;
 			}
-			clen = wcrtomb(buf, OPND(s), &mbs);
+			clen = wirtomb(buf, OPND(s), &mbs);
 			if (clen == (size_t)-1)
 				goto toohard;
 			newlen += clen;
@@ -1994,7 +2000,7 @@ findmust(struct parse *p, struct re_guts *g)
 	while (cp < g->must + g->mlen) {
 		while (OP(s = *scan++) != OCHAR)
 			continue;
-		clen = wcrtomb(cp, OPND(s), &mbs);
+		clen = wirtomb(cp, OPND(s), &mbs);
 		assert(clen != (size_t)-1);
 		cp += clen;
 	}
