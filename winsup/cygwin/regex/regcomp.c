@@ -61,6 +61,7 @@ __FBSDID("$FreeBSD$");
 #include "collate.h"
 #endif
 
+#include "winsup.h"
 #include "utils.h"
 #include "regex2.h"
 
@@ -932,7 +933,7 @@ p_simp_re(struct parse *p, struct branchc *bc)
 			 * appears otherwise.
 			 */
 			(void)REQUIRE(bc->nchain == 0, REG_BADRPT);
-			/* FALLTHROUGH */
+			fallthrough;
 		default:
 			if (p->error != 0)
 				return (false);	/* Definitely not $... */
@@ -1170,13 +1171,13 @@ p_b_pseudoclass(struct parse *p, char c) {
 	switch (c) {
 	case 'W':
 		cs->invert = 1;
-		/* PASSTHROUGH */
+		fallthrough;
 	case 'w':
 		p_b_cclass_named(p, cs, "alnum");
 		break;
 	case 'S':
 		cs->invert = 1;
-		/* PASSTHROUGH */
+		fallthrough;
 	case 's':
 		p_b_cclass_named(p, cs, "space");
 		break;
@@ -1854,7 +1855,7 @@ findmust(struct parse *p, struct re_guts *g)
 	 * UTF-8 (see RFC 3629).
 	 */
 	if (MB_CUR_MAX > 1 &&
-	    strcmp(_CurrentRuneLocale->__encoding, "UTF-8") != 0)
+	    strcmp(__current_locale_charset (), "UTF-8") != 0)
 		return;
 
 	/* find the longest OCHAR sequence in strip */
@@ -1893,7 +1894,7 @@ findmust(struct parse *p, struct re_guts *g)
 					return;
 				}
 			} while (OP(s) != (sop)O_QUEST && OP(s) != (sop)O_CH);
-			/* FALLTHROUGH */
+			fallthrough;
 		case OBOW:		/* things that break a sequence */
 		case OEOW:
 		case OBOL:
