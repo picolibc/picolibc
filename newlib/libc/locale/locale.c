@@ -65,8 +65,8 @@ build with multibyte support and support for all ISO and Windows Codepage.
 Otherwise all singlebyte charsets are simply mapped to ASCII.  Right now,
 only newlib for Cygwin is built with full charset support by default.
 Under Cygwin, this implementation additionally supports the charsets
-<<"GBK">>, <<"GB2312">>, <<"eucCN">>, <<"eucKR">>, and <<"Big5">>.  Cygwin
-does not support <<"JIS">>.
+<<"GB18030">>, <<"GBK">>, <<"GB2312">>, <<"eucCN">>, <<"eucKR">>, and
+<<"Big5">>.  Cygwin does not support <<"JIS">>.
 
 Cygwin additionally supports locales from the file
 /usr/share/locale/locale.alias.
@@ -657,7 +657,7 @@ restart:
 	}
 #ifdef __CYGWIN__
       /* Newlib does neither provide EUC-KR nor EUC-CN, and Cygwin's
-      	 implementation requires Windows support. */
+	 implementation requires Windows support. */
       else if (!strcasecmp (c, "KR"))
 	{
 	  strcpy (charset, "EUCKR");
@@ -817,11 +817,18 @@ restart:
 	 requires Windows support. */
       if (!strcasecmp (charset, "GBK")
 	  || !strcasecmp (charset, "GB2312"))
-      	{
+	{
 	  strcpy (charset, charset[2] == '2' ? "GB2312" : "GBK");
 	  mbc_max = 2;
 	  l_wctomb = __gbk_wctomb;
 	  l_mbtowc = __gbk_mbtowc;
+	}
+      else if (!strcasecmp (charset, "GB18030"))
+	{
+	  strcpy (charset, "GB18030");
+	  mbc_max = 4;
+	  l_wctomb = __gb18030_wctomb;
+	  l_mbtowc = __gb18030_mbtowc;
 	}
       else
 #endif /* __CYGWIN__ */

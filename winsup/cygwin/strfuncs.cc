@@ -245,7 +245,8 @@ mbsnrtowci(wint_t *dst, const char **src, size_t nms, size_t len, mbstate_t *ps)
    eucJP, the both most used Japanese charset encodings, this shouldn't
    be such a big problem. */
 
-/* GBK, eucKR, and Big5 conversions are not available so far in newlib. */
+/* GBK, GB18030, eucKR, and Big5 conversions are not available so far
+   in newlib. */
 
 static int
 __db_wctomb (struct _reent *r, char *s, wchar_t wchar, UINT cp)
@@ -323,6 +324,12 @@ extern "C" int
 __gbk_wctomb (struct _reent *r, char *s, wchar_t wchar, mbstate_t *state)
 {
   return __db_wctomb (r,s, wchar, 936);
+}
+
+extern "C" int
+__gb18030_wctomb (struct _reent *r, char *s, wchar_t wchar, mbstate_t *state)
+{
+  return __db_wctomb (r,s, wchar, 54936);
 }
 
 extern "C" int
@@ -480,6 +487,13 @@ __gbk_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
 	      mbstate_t *state)
 {
   return __db_mbtowc (r, pwc, s, n, 936, state);
+}
+
+extern "C" int
+__gb18030_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
+		  mbstate_t *state)
+{
+  return __db_mbtowc (r, pwc, s, n, 54936, state);
 }
 
 extern "C" int

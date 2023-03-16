@@ -2323,6 +2323,7 @@ format_proc_codesets (void *, char *&destbuf)
 			 "EUC-CN\n"
 			 "EUC-JP\n"
 			 "EUC-KR\n"
+			 "GB18030\n"
 			 "GB2312\n"
 			 "GBK\n"
 			 "GEORGIAN-PS\n"

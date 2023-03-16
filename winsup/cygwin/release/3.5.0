@@ -21,3 +21,5 @@ What's new:
   supported codesets and locales for all interested parties.  Locale(1)
   opens these files and uses the info for printing locale info like any
   other process could do.
+
+- Add support for GB18030 codeset.

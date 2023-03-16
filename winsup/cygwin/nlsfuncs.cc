@@ -1578,8 +1578,8 @@ __eval_codepage_from_internal_charset ()
 	  break;
 	}
       break;
-    case 'G': /* GBK/GB2312 */
-      codepage = 936;
+    case 'G': /* GBK/GB2312/GB18030 */
+      codepage = (charset[2] == '1') ? 54936 : 936;
       break;
     case 'I': /* ISO-8859-x */
       codepage = strtoul (charset + 9, NULL, 10) + 28590;

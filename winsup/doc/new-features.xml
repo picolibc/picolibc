@@ -41,6 +41,10 @@ files and uses the info for printing locale info like any other process
 could do.
 </para></listitem>
 
+<listitem><para>
+Add support for GB18030 codeset.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

@@ -24,6 +24,7 @@ wctomb_p __iso_wctomb (int val);
 wctomb_p __cp_wctomb (int val);
 #ifdef __CYGWIN__
 wctomb_f __gbk_wctomb;
+wctomb_f __gb18030_wctomb;
 wctomb_f __kr_wctomb;
 wctomb_f __big5_wctomb;
 #endif
@@ -45,6 +46,7 @@ mbtowc_p __iso_mbtowc (int val);
 mbtowc_p __cp_mbtowc (int val);
 #ifdef __CYGWIN__
 mbtowc_f __gbk_mbtowc;
+mbtowc_f __gb18030_mbtowc;
 mbtowc_f __kr_mbtowc;
 mbtowc_f __big5_mbtowc;
 #endif
