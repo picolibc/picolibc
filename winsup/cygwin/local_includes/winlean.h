@@ -74,6 +74,29 @@ details. */
 #undef CRITICAL
 #endif
 
+/* Filesystem flags not yet supported by Mingw-w64 headers. */
+#ifndef FILE_RETURNS_CLEANUP_RESULT_INFO
+#define FILE_RETURNS_CLEANUP_RESULT_INFO        0x00000200
+#endif
+#ifndef FILE_SUPPORTS_POSIX_UNLINK_RENAME
+#define FILE_SUPPORTS_POSIX_UNLINK_RENAME       0x00000400
+#endif
+#ifndef FILE_SUPPORTS_INTEGRITY_STREAMS
+#define FILE_SUPPORTS_INTEGRITY_STREAMS         0x04000000
+#endif
+#ifndef FILE_SUPPORTS_BLOCK_REFCOUNTING
+#define FILE_SUPPORTS_BLOCK_REFCOUNTING         0x08000000
+#endif
+#ifndef FILE_SUPPORTS_SPARSE_VDL
+#define FILE_SUPPORTS_SPARSE_VDL                0x10000000
+#endif
+#ifndef FILE_DAX_VOLUME
+#define FILE_DAX_VOLUME                         0x20000000
+#endif
+#ifndef FILE_SUPPORTS_GHOSTING
+#define FILE_SUPPORTS_GHOSTING                  0x40000000
+#endif
+
 /* So-called "Microsoft Account" SIDs (S-1-11-...) have a netbios domain name
    "MicrosoftAccounts".  The new "Application Container SIDs" (S-1-15-...)
    have a netbios domain name "APPLICATION PACKAGE AUTHORITY"

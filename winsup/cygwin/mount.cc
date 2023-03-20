@@ -319,12 +319,49 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
    to Windows 11.  The important point here is to test only flags indicating
    capabilities and to ignore flags indicating a specific state of this
    volume.  At present these flags to ignore are FILE_VOLUME_IS_COMPRESSED,
-   FILE_READ_ONLY_VOLUME, and FILE_SEQUENTIAL_WRITE_ONCE.  The additional
-   filesystem flags supported since Windows 7 are also ignored for now.
-   They add information only for filesystems also supporting these flags,
-   right now only NTFS. */
-#define GETVOLINFO_VALID_MASK (0x002701ffUL)
+   FILE_READ_ONLY_VOLUME, FILE_SEQUENTIAL_WRITE_ONCE and FILE_DAX_VOLUME. */
+#define GETVOLINFO_VALID_MASK (FILE_CASE_SENSITIVE_SEARCH		\
+			       | FILE_CASE_PRESERVED_NAMES		\
+			       | FILE_UNICODE_ON_DISK			\
+			       | FILE_PERSISTENT_ACLS			\
+			       | FILE_FILE_COMPRESSION			\
+			       | FILE_VOLUME_QUOTAS			\
+			       | FILE_SUPPORTS_SPARSE_FILES		\
+			       | FILE_SUPPORTS_REPARSE_POINTS		\
+			       | FILE_SUPPORTS_REMOTE_STORAGE		\
+			       | FILE_RETURNS_CLEANUP_RESULT_INFO	\
+			       | FILE_SUPPORTS_POSIX_UNLINK_RENAME	\
+			       | FILE_SUPPORTS_OBJECT_IDS		\
+			       | FILE_SUPPORTS_ENCRYPTION		\
+			       | FILE_NAMED_STREAMS			\
+			       | FILE_SUPPORTS_TRANSACTIONS		\
+			       | FILE_SUPPORTS_HARD_LINKS		\
+			       | FILE_SUPPORTS_EXTENDED_ATTRIBUTES	\
+			       | FILE_SUPPORTS_OPEN_BY_FILE_ID		\
+			       | FILE_SUPPORTS_USN_JOURNAL		\
+			       | FILE_SUPPORTS_INTEGRITY_STREAMS	\
+			       | FILE_SUPPORTS_BLOCK_REFCOUNTING	\
+			       | FILE_SUPPORTS_SPARSE_VDL		\
+			       | FILE_SUPPORTS_GHOSTING)
+/* This is the pre-Win7 mask used to recognize 3rd-party drivers.  We'll never
+   learn in time when those drivers start to support the new (har har) Win7 FS
+   flags.  */
+#define GETVOLINFO_NON_WIN_MASK (FILE_CASE_SENSITIVE_SEARCH		\
+			       | FILE_CASE_PRESERVED_NAMES		\
+			       | FILE_UNICODE_ON_DISK			\
+			       | FILE_PERSISTENT_ACLS			\
+			       | FILE_FILE_COMPRESSION			\
+			       | FILE_VOLUME_QUOTAS			\
+			       | FILE_SUPPORTS_SPARSE_FILES		\
+			       | FILE_SUPPORTS_REPARSE_POINTS		\
+			       | FILE_SUPPORTS_REMOTE_STORAGE		\
+			       | FILE_SUPPORTS_OBJECT_IDS		\
+			       | FILE_SUPPORTS_ENCRYPTION		\
+			       | FILE_NAMED_STREAMS			\
+			       | FILE_SUPPORTS_TRANSACTIONS)
+
 #define TEST_GVI(f,m) (((f) & GETVOLINFO_VALID_MASK) == (m))
+#define TEST_GVI_NON_WIN(f,m) (((f) & GETVOLINFO_NON_WIN_MASK) == (m))
 
 /* FIXME: This flag twist is getting awkward.  There should really be some
    other method.  Maybe we need mount flags to allow the user to fix file
@@ -335,7 +372,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 #define SAMBA_IGNORE (FILE_VOLUME_QUOTAS \
 		      | FILE_SUPPORTS_OBJECT_IDS \
 		      | FILE_UNICODE_ON_DISK)
-#define FS_IS_SAMBA TEST_GVI(flags () & ~SAMBA_IGNORE, \
+#define FS_IS_SAMBA TEST_GVI_NON_WIN(flags () & ~SAMBA_IGNORE, \
 			     FILE_CASE_SENSITIVE_SEARCH \
 			     | FILE_CASE_PRESERVED_NAMES \
 			     | FILE_PERSISTENT_ACLS)
@@ -343,12 +380,12 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 #define NETAPP_IGNORE (FILE_SUPPORTS_SPARSE_FILES \
 		       | FILE_SUPPORTS_REPARSE_POINTS \
 		       | FILE_PERSISTENT_ACLS)
-#define FS_IS_NETAPP_DATAONTAP TEST_GVI(flags () & ~NETAPP_IGNORE, \
+#define FS_IS_NETAPP_DATAONTAP TEST_GVI_NON_WIN(flags () & ~NETAPP_IGNORE, \
 			     FILE_CASE_SENSITIVE_SEARCH \
 			     | FILE_CASE_PRESERVED_NAMES \
 			     | FILE_UNICODE_ON_DISK \
 			     | FILE_NAMED_STREAMS)
-/* These are the minimal flags supported by NTFS since Windows 2000.  Every
+/* These are the minimal flags supported by NTFS since Windows 7.  Every
    filesystem not supporting these flags is not a native NTFS.  We subsume
    them under the filesystem type "cifs". */
 #define MINIMAL_WIN_NTFS_FLAGS (FILE_CASE_SENSITIVE_SEARCH \
@@ -361,7 +398,12 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 				| FILE_SUPPORTS_REPARSE_POINTS \
 				| FILE_SUPPORTS_OBJECT_IDS \
 				| FILE_SUPPORTS_ENCRYPTION \
-				| FILE_NAMED_STREAMS)
+				| FILE_NAMED_STREAMS \
+				| FILE_SUPPORTS_TRANSACTIONS \
+				| FILE_SUPPORTS_HARD_LINKS \
+				| FILE_SUPPORTS_EXTENDED_ATTRIBUTES \
+				| FILE_SUPPORTS_OPEN_BY_FILE_ID \
+				| FILE_SUPPORTS_USN_JOURNAL)
 #define FS_IS_WINDOWS_NTFS TEST_GVI(flags () & MINIMAL_WIN_NTFS_FLAGS, \
 				    MINIMAL_WIN_NTFS_FLAGS)
 /* These are the exact flags of a real Windows FAT/FAT32 filesystem.
