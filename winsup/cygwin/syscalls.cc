@@ -2419,6 +2419,7 @@ rename2 (const char *oldpath, const char *newpath, unsigned int at2flags)
 			    && oldpc.fs_is_ntfs ()
 			    && oldpc.has_attribute (FILE_SUPPORTS_OPEN_BY_FILE_ID);
 
+ignore_posix_semantics_retry:
       /* Opening the file must be part of the transaction.  It's not sufficient
 	 to call only NtSetInformationFile under the transaction.  Therefore we
 	 have to start the transaction here, if necessary.  Don't start
@@ -2663,6 +2664,15 @@ skip_pre_W10_checks:
 	    unlink_nt (*removepc, false);
 	  res = 0;
 	}
+      else if (use_posix_semantics && status == STATUS_INVALID_PARAMETER)
+        {
+          /* NtSetInformationFile returns STATUS_INVALID_PARAMETER
+             on a bind mounted file system in hyper-v container
+             with FILE_RENAME_POSIX_SEMANTICS.
+             Disable the use_posix semntics flag and retry. */
+          use_posix_semantics = 0;
+          goto ignore_posix_semantics_retry;
+        }
       else
 	__seterrno_from_nt_status (status);
     }
