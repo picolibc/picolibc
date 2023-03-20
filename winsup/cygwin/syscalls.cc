@@ -733,7 +733,10 @@ unlink_nt (path_conv &pc, bool shareable)
       /* Trying to delete in-use executables and DLLs using
          FILE_DISPOSITION_POSIX_SEMANTICS returns STATUS_CANNOT_DELETE.
 	 Fall back to the default method. */
-      if (status != STATUS_CANNOT_DELETE)
+      /* Additionaly that returns STATUS_INVALID_PARAMETER
+         on a bind mounted fs in hyper-v container. Falling back too. */
+      if (status != STATUS_CANNOT_DELETE
+          && status != STATUS_INVALID_PARAMETER)
 	goto out;
     }
 
