@@ -1836,7 +1836,7 @@ fhandler_disk_file::mkdir (mode_t mode)
 int
 fhandler_disk_file::rmdir ()
 {
-  extern NTSTATUS unlink_nt (path_conv &pc);
+  extern NTSTATUS unlink_nt (path_conv &pc, bool sharable);
 
   if (!pc.isdir ())
     {
@@ -1849,7 +1849,7 @@ fhandler_disk_file::rmdir ()
       return -1;
     }
 
-  NTSTATUS status = unlink_nt (pc);
+  NTSTATUS status = unlink_nt (pc, false);
 
   if (!NT_SUCCESS (status))
     {

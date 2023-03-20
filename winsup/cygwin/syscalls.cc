@@ -665,8 +665,8 @@ _unlink_nt_post_dir_check (NTSTATUS status, POBJECT_ATTRIBUTES attr, const path_
   return status;
 }
 
-static NTSTATUS
-_unlink_nt (path_conv &pc, bool shareable)
+NTSTATUS
+unlink_nt (path_conv &pc, bool shareable)
 {
   NTSTATUS status;
   HANDLE fh, fh_ro = NULL;
@@ -1062,18 +1062,6 @@ out:
   return status;
 }
 
-NTSTATUS
-unlink_nt (path_conv &pc)
-{
-  return _unlink_nt (pc, false);
-}
-
-NTSTATUS
-unlink_nt_shareable (path_conv &pc)
-{
-  return _unlink_nt (pc, true);
-}
-
 extern "C" int
 unlink (const char *ourname)
 {
@@ -1113,7 +1101,7 @@ unlink (const char *ourname)
       goto done;
     }
 
-  status = unlink_nt (win32_name);
+  status = unlink_nt (win32_name, false);
   if (NT_SUCCESS (status))
     res = 0;
   else
@@ -2504,7 +2492,7 @@ rename2 (const char *oldpath, const char *newpath, unsigned int at2flags)
 	 unlink_nt returns with STATUS_DIRECTORY_NOT_EMPTY. */
       if (dstpc->isdir ())
 	{
-	  status = unlink_nt (*dstpc);
+	  status = unlink_nt (*dstpc, false);
 	  if (!NT_SUCCESS (status))
 	    {
 	      __seterrno_from_nt_status (status);
@@ -2645,7 +2633,7 @@ skip_pre_W10_checks:
 					? FILE_OPEN_REPARSE_POINT : 0));
 	      if (NT_SUCCESS (status))
 		{
-		  status = unlink_nt (*dstpc);
+		  status = unlink_nt (*dstpc, false);
 		  if (NT_SUCCESS (status))
 		    break;
 		}
@@ -2665,7 +2653,7 @@ skip_pre_W10_checks:
       if (NT_SUCCESS (status))
 	{
 	  if (removepc)
-	    unlink_nt (*removepc);
+	    unlink_nt (*removepc, false);
 	  res = 0;
 	}
       else

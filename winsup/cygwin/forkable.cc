@@ -29,7 +29,7 @@ details. */
 
 /* Allow concurrent processes to use the same dll or exe
  * via their hardlink while we delete our hardlink. */
-extern NTSTATUS unlink_nt_shareable (path_conv &pc);
+extern NTSTATUS unlink_nt (path_conv &pc, bool sharable);
 
 #define MUTEXSEP L"@"
 #define PATHSEP L"\\"
@@ -132,7 +132,7 @@ rmdirs (WCHAR ntmaxpathbuf[NT_MAX_PATH])
 	      RtlInitUnicodeString (&fn, ntmaxpathbuf);
 
 	      path_conv pc (&fn);
-	      unlink_nt_shareable (pc); /* move to bin */
+	      unlink_nt (pc, true); /* move to bin */
 	    }
 
 	  if (!pfdi->NextEntryOffset)
