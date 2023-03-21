@@ -691,10 +691,12 @@ unlink_nt (path_conv &pc, bool shareable)
   pc.get_object_attr (attr, sec_none_nih);
 
   /* First check if we can use POSIX unlink semantics: W10 1709+, local NTFS.
-     With POSIX unlink semantics the entire job gets MUCH easier and faster.
-     Just try to do it and if it fails, it fails. */
+     For the OPEN_BY_FILE_ID flag, see MINIMAL_WIN_NTFS_FLAGS comment in
+     fs_info::update.  With POSIX unlink semantics the entire job gets MUCH
+     easier and faster.  Just try to do it and if it fails, it fails. */
   if (wincap.has_posix_unlink_semantics ()
-      && !pc.isremote () && pc.fs_is_ntfs ())
+      && !pc.isremote () && pc.fs_is_ntfs ()
+      && pc.has_attribute (FILE_SUPPORTS_OPEN_BY_FILE_ID))
     {
       FILE_DISPOSITION_INFORMATION_EX fdie;
 
@@ -2407,10 +2409,12 @@ rename2 (const char *oldpath, const char *newpath, unsigned int at2flags)
 	  __leave;
 	}
 
-      /* POSIX semantics only on local NTFS drives. */
+      /* POSIX semantics only on local NTFS drives. For the OPEN_BY_FILE_ID
+         flag, see MINIMAL_WIN_NTFS_FLAGS comment in fs_info::update. */
       use_posix_semantics = wincap.has_posix_rename_semantics ()
 			    && !oldpc.isremote ()
-			    && oldpc.fs_is_ntfs ();
+			    && oldpc.fs_is_ntfs ()
+			    && oldpc.has_attribute (FILE_SUPPORTS_OPEN_BY_FILE_ID);
 
       /* Opening the file must be part of the transaction.  It's not sufficient
 	 to call only NtSetInformationFile under the transaction.  Therefore we
