@@ -385,9 +385,10 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 			     | FILE_CASE_PRESERVED_NAMES \
 			     | FILE_UNICODE_ON_DISK \
 			     | FILE_NAMED_STREAMS)
-/* These are the minimal flags supported by NTFS since Windows 7.  Every
-   filesystem not supporting these flags is not a native NTFS.  We subsume
-   them under the filesystem type "cifs". */
+/* These are the minimal flags supported by NTFS since Windows 7, when
+   checking a remote NTFS filesystem.  Every filesystem not supporting these
+   flags is not a native NTFS.
+   We subsume them under the filesystem type "cifs". */
 #define MINIMAL_WIN_NTFS_FLAGS (FILE_CASE_SENSITIVE_SEARCH \
 				| FILE_CASE_PRESERVED_NAMES \
 				| FILE_UNICODE_ON_DISK \
@@ -399,11 +400,8 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 				| FILE_SUPPORTS_OBJECT_IDS \
 				| FILE_SUPPORTS_ENCRYPTION \
 				| FILE_NAMED_STREAMS \
-				| FILE_SUPPORTS_TRANSACTIONS \
 				| FILE_SUPPORTS_HARD_LINKS \
-				| FILE_SUPPORTS_EXTENDED_ATTRIBUTES \
-				| FILE_SUPPORTS_OPEN_BY_FILE_ID \
-				| FILE_SUPPORTS_USN_JOURNAL)
+				| FILE_SUPPORTS_EXTENDED_ATTRIBUTES)
 #define FS_IS_WINDOWS_NTFS TEST_GVI(flags () & MINIMAL_WIN_NTFS_FLAGS, \
 				    MINIMAL_WIN_NTFS_FLAGS)
 /* These are the exact flags of a real Windows FAT/FAT32 filesystem.
