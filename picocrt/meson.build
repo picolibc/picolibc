@@ -64,11 +64,19 @@ foreach target : targets
     crt_hosted_name = 'crt0-hosted.o'
     crt_minimal_name = 'crt0-minimal.o'
     crt_semihost_name = 'crt0-semihost.o'
+    libcrt_name = 'crt0'
+    libcrt_hosted_name = 'crt0-hosted'
+    libcrt_minimal_name = 'crt0-minimal'
+    libcrt_semihost_name = 'crt0-semihost'
   else
     crt_name = join_paths(target, 'crt0.o')
     crt_hosted_name = join_paths(target, 'crt0-hosted.o')
     crt_minimal_name = join_paths(target, 'crt0-minimal.o')
     crt_semihost_name = join_paths(target, 'crt0-semihost.o')
+    libcrt_name = join_paths(target, 'libcrt0')
+    libcrt_hosted_name = join_paths(target, 'libcrt0-hosted')
+    libcrt_minimal_name = join_paths(target, 'libcrt0-minimal')
+    libcrt_semihost_name = join_paths(target, 'libcrt0-semihost')
   endif
 
   crt0_name = 'crt0' + target
@@ -89,6 +97,13 @@ foreach target : targets
 	       _crt.extract_objects(src_picocrt)
 	      )
 
+  static_library(libcrt_name,
+                 [],
+                 install : true,
+                 install_dir : instdir,
+                 pic: false,
+                 objects : [_crt.extract_objects(src_picocrt)])
+
   # The 'hosted' variant calls 'exit' after return from main (c lingo: hosted execution environment)
   _crt = executable(crt_hosted_name,
 		    src_picocrt,
@@ -102,6 +117,13 @@ foreach target : targets
 	       _crt.extract_objects(src_picocrt)
 	      )
 
+  static_library(libcrt_hosted_name,
+                 [],
+                 install : true,
+                 install_dir : instdir,
+                 pic: false,
+                 objects : [_crt.extract_objects(src_picocrt)])
+
   # The 'minimal' variant doesn't call exit, nor does it invoke any constructors
   _crt = executable(crt_minimal_name,
 		    src_picocrt,
@@ -114,6 +136,13 @@ foreach target : targets
   set_variable(crt0_minimal_name,
 	       _crt.extract_objects(src_picocrt)
 	      )
+
+  static_library(libcrt_minimal_name,
+                 [],
+                 install : true,
+                 install_dir : instdir,
+                 pic: false,
+                 objects : [_crt.extract_objects(src_picocrt)])
 
   if has_arm_semihost
     # The 'semihost' variant calls sys_semihost_get_cmdline to build argv
@@ -129,5 +158,12 @@ foreach target : targets
     set_variable(crt0_semihost_name,
 		 _crt.extract_objects(src_picocrt)
 		)
+
+    static_library(libcrt_semihost_name,
+                   [],
+                   install : true,
+                   install_dir : instdir,
+                   pic: false,
+                   objects : [_crt.extract_objects(src_picocrt)])
   endif
 endforeach
