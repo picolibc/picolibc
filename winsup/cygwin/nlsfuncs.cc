@@ -74,7 +74,10 @@ __get_rfc5646_from_locale (const char *name, wchar_t *win_locale)
       if (!wcscmp (locale, L"ber"))
 	wcscpy (locale, L"tzm");
       if (ResolveLocaleName (locale, wlocale, ENCODING_LEN + 1) <= 0)
-	return -1;
+	{
+	  set_errno (ENOENT);
+	  return -1;
+	}
       wcpcpy (win_locale, wlocale);
       return 1;
     }
@@ -114,7 +117,10 @@ __get_rfc5646_from_locale (const char *name, wchar_t *win_locale)
     }
   if (!wlocale[0]
       && ResolveLocaleName (locale, wlocale, ENCODING_LEN + 1) <= 1)
-    return -1;
+    {
+      set_errno (ENOENT);
+      return -1;
+    }
 
   /* Check for modifiers changing the script */
   const wchar_t *iso15924_script[] = { L"Latn-", L"Cyrl-", L"Deva-", L"Adlm-" };
