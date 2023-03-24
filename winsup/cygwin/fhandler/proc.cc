@@ -2178,8 +2178,12 @@ format_proc_locale_proc (LPWSTR win_locale, DWORD info, LPARAM param)
     }
   /* Serbian: Windows default is Latin, Linux default is Cyrillic.
      We want the Linux default and attach @latin otherwise */
-  else if (!wcscmp (iso639, L"sr")  && !wcscmp (iso15924, L"Latn;"))
-    stpcpy (modifier, "@latin");
+  else if (!wcscmp (iso639, L"sr"))
+    {
+      snprintf (posix_loc, sizeof posix_loc, "sr_%.27ls", iso3166);
+      if (!wcscmp (iso15924, L"Latn;"))
+	stpcpy (modifier, "@latin");
+    }
   /* Tamazight: no modifier, iso639 is "ber" on Linux.
      "zgh-Tfng-MA" is equivalent to "ber_MA". */
   else if (!wcscmp (iso639, L"zgh"))
