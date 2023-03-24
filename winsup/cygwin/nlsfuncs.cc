@@ -69,17 +69,8 @@ __get_rfc5646_from_locale (const char *name, wchar_t *win_locale)
   c = wcschr (locale, '_');
   if (!c)
     {
-      /* try if the locale can be resolved from the language tag
-         fix up Linux-only locale first */
-      if (!wcscmp (locale, L"ber"))
-	wcscpy (locale, L"tzm");
-      if (ResolveLocaleName (locale, wlocale, ENCODING_LEN + 1) <= 0)
-	{
-	  set_errno (ENOENT);
-	  return -1;
-	}
-      wcpcpy (win_locale, wlocale);
-      return 1;
+      set_errno (ENOENT);
+      return -1;
     }
 
   /* Convert to RFC 5646 syntax. */
