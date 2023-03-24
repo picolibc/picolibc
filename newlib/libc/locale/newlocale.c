@@ -171,7 +171,10 @@ _newlocale_r (struct _reent *p, int category_mask, const char *locale,
 	    continue;
 	  /* Otherwise load locale data. */
 	  else if (!__loadlocale (&tmp_locale, i, new_categories[i]))
-	    goto error;
+	    {
+	      p->_errno = ENOENT;
+	      goto error;
+	    }
 	}
     }
   /* Allocate new locale_t. */
