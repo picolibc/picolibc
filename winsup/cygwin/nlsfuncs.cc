@@ -39,6 +39,64 @@ details. */
 
 #define has_modifier(x)	((x)[0] && !strcmp (modifier, (x)))
 
+/* ResolveLocaleName does not what we want.  It converts anything which
+   vaguely resembles a locale into some other locale it supports.  Bad
+   examples are: "en-XY" gets converted to "en-US", and worse, "ff-BF" gets
+   converted to "ff-Latn-SN", even though "ff-Adlm-BF" exists!  Useless.
+   To check if a locale is supported, we have to enumerate all valid
+   Windows locales, and return the match, even if the locale in Windows
+   requires a script. */
+struct res_loc_t {
+  const wchar_t *search_iso639;
+  const wchar_t *search_iso3166;
+  wchar_t *resolved_locale;
+  int res_len;
+};
+
+static BOOL
+resolve_locale_proc (LPWSTR win_locale, DWORD info, LPARAM param)
+{
+  res_loc_t *loc = (res_loc_t *) param;
+  wchar_t *iso639, *iso639_end;
+  wchar_t *iso3166;
+
+  iso639 = win_locale;
+  iso639_end = wcschr (iso639, L'-');
+  if (!iso639_end)
+    return TRUE;
+  if (wcsncmp (loc->search_iso639, iso639, iso639_end - iso639) != 0)
+    return TRUE;
+  iso3166 = ++iso639_end;
+  /* Territory is all upper case */
+  while (!iswupper (iso3166[0]) || !iswupper (iso3166[1]))
+    {
+      iso3166 = wcschr (iso3166, L'-');
+      if (!iso3166)
+	return TRUE;
+      ++iso3166;
+    }
+  if (wcsncmp (loc->search_iso3166, iso3166, wcslen (loc->search_iso3166)))
+    return TRUE;
+  wcsncat (loc->resolved_locale, win_locale, loc->res_len - 1);
+  return FALSE;
+}
+
+static int
+resolve_locale_name (const wchar_t *search, wchar_t *result, int rlen)
+{
+  res_loc_t loc;
+
+  loc.search_iso639 = search;
+  loc.search_iso3166 = wcschr (search, L'-') + 1;
+  loc.resolved_locale = result;
+  loc.res_len = rlen;
+  result[0] = L'\0';
+  EnumSystemLocalesEx (resolve_locale_proc,
+		       LOCALE_WINDOWS | LOCALE_SUPPLEMENTAL,
+		       (LPARAM) &loc, NULL);
+  return wcslen (result);
+}
+
 /* Fetch Windows RFC 5646 locale from POSIX locale specifier.
    Return values:
 
@@ -106,8 +164,10 @@ __get_rfc5646_from_locale (const char *name, wchar_t *win_locale)
 	  break;
 	}
     }
+  /* If resolve_locale_name returns with error, or if it returns a
+     locale other than the input locale, we don't support this locale. */
   if (!wlocale[0]
-      && ResolveLocaleName (locale, wlocale, ENCODING_LEN + 1) <= 1)
+      && !resolve_locale_name (locale, wlocale, ENCODING_LEN + 1))
     {
       set_errno (ENOENT);
       return -1;
