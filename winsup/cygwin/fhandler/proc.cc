@@ -2193,6 +2193,11 @@ format_proc_locale_proc (LPWSTR win_locale, DWORD info, LPARAM param)
       else
 	return TRUE;
     }
+  /* "sd-IN" is no valid Windows locale, only "sd-Deva-IN" is.  However,
+     asking for LOCALE_SSCRIPTS below returns "Arab;" because the first "sd"
+     locale Windows finds is "sd-Arab-PK", so we have to override this here. */
+  else if (!wcscmp (iso639, L"sd") && !wcscmp (iso3166, L"IN"))
+    strcpy (posix_loc, "sd_IN");
   /* In all other cases, we check if the script from the Windows
      locale is the default locale in that language.  If not, we
      add it as modifier if possible, or skip it */
@@ -2242,8 +2247,10 @@ format_proc_locale_proc (LPWSTR win_locale, DWORD info, LPARAM param)
      changing the codeset and other stuff. */
   if (!wcscmp (iso639, L"be") && !wcscmp (iso3166, L"BY"))
     stpcpy (modifier, "@latin");
-  if (!wcscmp (iso639, L"tt") && !wcscmp (iso3166, L"RU"))
+  else if (!wcscmp (iso639, L"tt") && !wcscmp (iso3166, L"RU"))
     stpcpy (modifier, "@iqtelif");
+  else if (!wcscmp (iso639, L"sd") && !wcscmp (iso3166, L"IN"))
+    stpcpy (modifier, "@devanagari");
    /* If the base locale is ISO-8859-1 and the locale defines currency
       as EUR, add a @euro locale. For historical reasons there's also
       a greek @euro locale, albeit it doesn't change the codeset. */
