@@ -131,7 +131,7 @@ __get_rfc5646_from_locale (const char *name, wchar_t *win_locale)
          fix up Linux-only locale first */
       if (!wcscmp (locale, L"ber"))
 	wcscpy (locale, L"tzm");
-      if (ResolveLocaleName (locale, wlocale, ENCODING_LEN + 1) <= 0)
+      if (ResolveLocaleName (locale, wlocale, ENCODING_LEN + 1) <= 1)
 	{
 	  set_errno (ENOENT);
 	  return -1;
