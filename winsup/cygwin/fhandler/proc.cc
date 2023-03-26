@@ -2121,8 +2121,8 @@ format_proc_locale_proc (LPWSTR win_locale, DWORD info, LPARAM param)
   wchar_t currency[9] = { 0 };
   char modifier[32] = { 0 };
   char posix_loc[32];
-  char *codeset;
-  locale_t loc;
+  char posix_loc_and_modifier[32];
+  char codeset[32];
   wchar_t *cp;
 
   /* Skip language-only locales, e. g. "en" */
@@ -2236,8 +2236,8 @@ format_proc_locale_proc (LPWSTR win_locale, DWORD info, LPARAM param)
       wcstombs (modifier + 1, iso15924_postfix, 31);
     }
 
-  loc = newlocale (LC_CTYPE_MASK, posix_loc, (locale_t) 0);
-  codeset = nl_langinfo_l (CODESET, loc);
+  stpcpy (stpcpy (posix_loc_and_modifier, posix_loc), modifier);
+  __set_charset_from_locale (posix_loc_and_modifier, codeset);
   *bufptr_p = add_locale (*bufptr_p, posix_loc, codeset, false, modifier,
 			  win_locale);
   *bufptr_p = add_locale (*bufptr_p, posix_loc, "UTF-8", true, modifier,
@@ -2270,12 +2270,13 @@ format_proc_locale_proc (LPWSTR win_locale, DWORD info, LPARAM param)
   else
     return TRUE;
 
+  stpcpy (stpcpy (posix_loc_and_modifier, posix_loc), modifier);
+  __set_charset_from_locale (posix_loc_and_modifier, codeset);
   *bufptr_p = add_locale (*bufptr_p, posix_loc, codeset, false, modifier,
 			  win_locale);
   *bufptr_p = add_locale (*bufptr_p, posix_loc, "UTF-8", true, modifier,
 			  win_locale);
 
-  freelocale (loc);
   return TRUE;
 }
 
