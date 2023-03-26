@@ -1528,7 +1528,7 @@ __set_charset_from_locale (const char *loc, char *charset)
 {
   wchar_t win_locale[ENCODING_LEN + 1];
   char locale[ENCODING_LEN + 1];
-  const char *modifier;
+  char *modifier;
   char *c;
   UINT cp;
 
@@ -1537,6 +1537,12 @@ __set_charset_from_locale (const char *loc, char *charset)
   modifier = strchr (loc, '@');
   if ((c = strchr (locale, '.')))
     stpcpy (c, modifier ?: "");
+  /* Cut out @cjknarrow/@cjkwide modifier, both are newlib specials and
+    don't affect the codeset. */
+  modifier = strchr (locale, '@');
+  if (modifier && (!strcmp (modifier + 1, "cjknarrow")
+		   || !strcmp (modifier + 1, "cjkwide")))
+    *modifier = '\0';
 
   default_codeset_t srch_dc = { locale, NULL };
   default_codeset_t *dc = (default_codeset_t *)
