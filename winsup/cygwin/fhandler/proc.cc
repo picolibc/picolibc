@@ -2114,15 +2114,15 @@ static BOOL
 format_proc_locale_proc (LPWSTR win_locale, DWORD info, LPARAM param)
 {
   char **bufptr_p = (char **) param;
-  wchar_t iso15924_postfix[32] = { 0 };
-  wchar_t iso15924[32] = { 0 };
-  wchar_t iso3166[32] = { 0 };
-  wchar_t iso639[32] = { 0 };
+  wchar_t iso15924_postfix[ENCODING_LEN + 1] = { 0 };
+  wchar_t iso15924[ENCODING_LEN + 1] = { 0 };
+  wchar_t iso3166[ENCODING_LEN + 1] = { 0 };
+  wchar_t iso639[ENCODING_LEN + 1] = { 0 };
   wchar_t currency[9] = { 0 };
-  char modifier[32] = { 0 };
-  char posix_loc[32];
-  char posix_loc_and_modifier[32];
-  char codeset[32];
+  char modifier[ENCODING_LEN + 1] = { 0 };
+  char posix_loc[ENCODING_LEN + 1];
+  char posix_loc_and_modifier[ENCODING_LEN + 1];
+  char codeset[ENCODING_LEN + 1];
   wchar_t *cp;
 
   /* Skip language-only locales, e. g. "en" */
@@ -2207,15 +2207,15 @@ format_proc_locale_proc (LPWSTR win_locale, DWORD info, LPARAM param)
      add it as modifier if possible, or skip it */
   else if (iso15924[0])
     {
-      wchar_t scriptless_win_locale[32];
-      wchar_t default_iso15924[32];
+      wchar_t scriptless_win_locale[ENCODING_LEN + 1];
+      wchar_t default_iso15924[ENCODING_LEN + 1];
 
       wcpcpy (wcpcpy (wcpcpy (scriptless_win_locale, iso639), L"-"),
 	      iso3166);
       if ((GetLocaleInfoEx (scriptless_win_locale, LOCALE_SSCRIPTS,
-			    default_iso15924, 32)
+			    default_iso15924, ENCODING_LEN + 1)
 	   || GetLocaleInfoEx (iso639, LOCALE_SSCRIPTS,
-			       default_iso15924, 32))
+			       default_iso15924, ENCODING_LEN + 1))
 	  && !wcsstr (default_iso15924, iso15924))
 	{
 	  if (!wcscmp (iso15924, L"Latn;"))
