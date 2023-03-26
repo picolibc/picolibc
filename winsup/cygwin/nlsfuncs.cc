@@ -1610,8 +1610,16 @@ __set_charset_from_locale (const char *loc, char *charset)
       cs = "ISO-8859-13";
       break;
     case 1258:
-    default:
       cs = "UTF-8";
+      break;
+    default:
+      /* Some (pretty new) EU locales don't exist in GLibc and haven't been
+	 catched above.  Check for @euro modifier again and make these locales
+	 always use ISO-8859-15. */
+      if (modifier && !strcmp (modifier + 1, "euro"))
+	cs = "ISO-8859-15";
+      else
+	cs = "UTF-8";
       break;
     }
   stpcpy (charset, cs);
