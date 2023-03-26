@@ -2240,8 +2240,9 @@ format_proc_locale_proc (LPWSTR win_locale, DWORD info, LPARAM param)
   __set_charset_from_locale (posix_loc_and_modifier, codeset);
   *bufptr_p = add_locale (*bufptr_p, posix_loc, codeset, false, modifier,
 			  win_locale);
-  *bufptr_p = add_locale (*bufptr_p, posix_loc, "UTF-8", true, modifier,
-			  win_locale);
+  if (strcmp (codeset, "UTF-8") != 0)
+    *bufptr_p = add_locale (*bufptr_p, posix_loc, "UTF-8", true, modifier,
+			    win_locale);
 
   /* Only one cross each */
   if (modifier[0])
@@ -2274,8 +2275,9 @@ format_proc_locale_proc (LPWSTR win_locale, DWORD info, LPARAM param)
   __set_charset_from_locale (posix_loc_and_modifier, codeset);
   *bufptr_p = add_locale (*bufptr_p, posix_loc, codeset, false, modifier,
 			  win_locale);
-  *bufptr_p = add_locale (*bufptr_p, posix_loc, "UTF-8", true, modifier,
-			  win_locale);
+  if (strcmp (codeset, "UTF-8") != 0 && strcmp (modifier, "@euro") != 0)
+    *bufptr_p = add_locale (*bufptr_p, posix_loc, "UTF-8", true, modifier,
+			    win_locale);
 
   return TRUE;
 }
