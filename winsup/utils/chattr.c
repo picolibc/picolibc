@@ -265,8 +265,9 @@ usage (FILE *stream)
       "                        content indexing service\n"
       "  'e', 'Encrypted':     file is encrypted\n"
       "  'C', 'Casesensitive': directory is handled case sensitive\n"
-      "                        (Windows 10 1803 or later, local NTFS only,\n"
-      "                         WSL must be installed)\n");
+      "                        - local NTFS only\n"
+      "                        - Windows 10 1803 or later: requires installed WSL\n"
+      "                        - Windows 11: enabling requires empty dir\n");
   exit (stream == stdout ? 0 : 1);
 }
 

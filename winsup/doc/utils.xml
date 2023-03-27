@@ -89,8 +89,9 @@
 			content indexing service
   'e', 'Encrypted':     file is encrypted
   'C', 'Casesensitive': directory is handled case sensitive
-			(Windows 10 1803 or later, local NTFS only,
-			 WSL must be installed)
+                        - local NTFS only
+                        - Windows 10 1803 or later: requires installed WSL
+                        - Windows 11: enabling requires empty dir
     </screen>
     </refsect1>
   </refentry>
