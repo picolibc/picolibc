@@ -97,12 +97,14 @@ foreach target : targets
 	       _crt.extract_objects(src_picocrt)
 	      )
 
-  static_library(libcrt_name,
-                 [],
-                 install : true,
-                 install_dir : instdir,
-                 pic: false,
-                 objects : [_crt.extract_objects(src_picocrt)])
+  if enable_picocrt_lib
+    static_library(libcrt_name,
+                   [],
+                   install : true,
+                   install_dir : instdir,
+                   pic: false,
+                   objects : [_crt.extract_objects(src_picocrt)])
+  endif
 
   # The 'hosted' variant calls 'exit' after return from main (c lingo: hosted execution environment)
   _crt = executable(crt_hosted_name,
@@ -117,12 +119,14 @@ foreach target : targets
 	       _crt.extract_objects(src_picocrt)
 	      )
 
-  static_library(libcrt_hosted_name,
-                 [],
-                 install : true,
-                 install_dir : instdir,
-                 pic: false,
-                 objects : [_crt.extract_objects(src_picocrt)])
+  if enable_picocrt_lib
+    static_library(libcrt_hosted_name,
+                   [],
+                   install : true,
+                   install_dir : instdir,
+                   pic: false,
+                   objects : [_crt.extract_objects(src_picocrt)])
+  endif
 
   # The 'minimal' variant doesn't call exit, nor does it invoke any constructors
   _crt = executable(crt_minimal_name,
@@ -137,12 +141,14 @@ foreach target : targets
 	       _crt.extract_objects(src_picocrt)
 	      )
 
-  static_library(libcrt_minimal_name,
-                 [],
-                 install : true,
-                 install_dir : instdir,
-                 pic: false,
-                 objects : [_crt.extract_objects(src_picocrt)])
+  if enable_picocrt_lib
+    static_library(libcrt_minimal_name,
+                   [],
+                   install : true,
+                   install_dir : instdir,
+                   pic: false,
+                   objects : [_crt.extract_objects(src_picocrt)])
+  endif
 
   if has_arm_semihost
     # The 'semihost' variant calls sys_semihost_get_cmdline to build argv
@@ -159,11 +165,13 @@ foreach target : targets
 		 _crt.extract_objects(src_picocrt)
 		)
 
-    static_library(libcrt_semihost_name,
-                   [],
-                   install : true,
-                   install_dir : instdir,
-                   pic: false,
-                   objects : [_crt.extract_objects(src_picocrt)])
+    if enable_picocrt_lib
+      static_library(libcrt_semihost_name,
+                     [],
+                     install : true,
+                     install_dir : instdir,
+                     pic: false,
+                     objects : [_crt.extract_objects(src_picocrt)])
+    endif
   endif
 endforeach

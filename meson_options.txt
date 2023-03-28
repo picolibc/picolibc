@@ -59,6 +59,9 @@ option('picolib', type: 'boolean', value: true,
 option('picocrt', type: 'boolean', value: true,
        description: 'Include pico crt bits')
 
+option('picocrt-lib', type: 'boolean', value: true,
+       description: 'Include pico crt bits in lib form')
+
 option('semihost', type: 'boolean', value: true,
        description: 'Include semihost bits')
 
