@@ -5120,7 +5120,7 @@ dirname (char *path)
     return strcpy (buf, ".");
   if (isalpha (path[0]) && path[1] == ':')
     bs += 2;
-  else if (strspn (path, "/\\") > 1)
+  else if (strspn (path, "/\\") == 2)
     ++bs;
   c = strrchr (bs, '/');
   if ((d = strrchr (c ?: bs, '\\')) > c)
