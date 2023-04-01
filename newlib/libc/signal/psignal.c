@@ -35,35 +35,12 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <string.h>
 #include <unistd.h>
 
-#define WRITE_STR(str) \
-{ \
-  const char *p = (str); \
-  size_t len = strlen (p); \
-  while (len) \
-    { \
-      ssize_t len1 = write (fileno (stderr), p, len); \
-      if (len1 < 0) \
-	break; \
-      len -= len1; \
-      p += len1; \
-    } \
-}
-
 void
 psignal (int sig,
        const char *s)
 {
   fflush (stderr);
   if (s != NULL && *s != '\0')
-    {
-      WRITE_STR (s);
-      WRITE_STR (": ");
-    }
-  WRITE_STR (strsignal (sig));
-
-#ifdef __SCLE
-  WRITE_STR ((stderr->_flags & __SCLE) ? "\r\n" : "\n");
-#else
-  WRITE_STR ("\n");
-#endif
+      fprintf(stderr, "%s: ", s);
+  fprintf(stderr, "%s\n", strsignal(sig));
 }
