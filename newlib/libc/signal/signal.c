@@ -81,93 +81,84 @@ without an operating system that can actually raise exceptions.
  * for the signal sig, or SIG_ERR if the request fails.
  */
 
-#ifdef SIGNAL_PROVIDED
-
-int _dummy_simulated_signal;
-
-#else
-
 #define _DEFAULT_SOURCE
 #include <errno.h>
 #include <signal.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <_syslist.h>
 #include <unistd.h>
+#include <_syslist.h>
 
-/* signal info */
-static NEWLIB_THREAD_LOCAL void (*(_sig_func[NSIG]))(int);
+#ifdef _PICOLIBC_ATOMIC_SIGNAL
+
+#if __SIZEOF_POINTER__ == 2 && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2)
+#define _USE_ATOMIC_SIGNAL
+#endif
+
+#if __SIZEOF_POINTER__ == 4 && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
+#define _USE_ATOMIC_SIGNAL
+#endif
+
+#if __SIZEOF_POINTER__ == 8 && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8)
+#define _USE_ATOMIC_SIGNAL
+#endif
+
+#endif
+
+#ifdef _USE_ATOMIC_SIGNAL
+#include <stdatomic.h>
+static _Atomic uintptr_t _sig_func[NSIG];
+#else
+static _sig_func_ptr _sig_func[NSIG];
+#endif
 
 _sig_func_ptr
 signal (int sig, _sig_func_ptr func)
 {
-  _sig_func_ptr old_func;
-
   if (sig < 0 || sig >= NSIG)
     {
       errno = EINVAL;
       return SIG_ERR;
     }
 
-  old_func = _sig_func[sig];
+#ifdef _USE_ATOMIC_SIGNAL
+  uintptr_t ifunc = (uintptr_t) func;
+  return (_sig_func_ptr) atomic_exchange(&_sig_func[sig], ifunc);
+#else
+  _sig_func_ptr old = _sig_func[sig];
   _sig_func[sig] = func;
-
-  return old_func;
+  return old;
+#endif
 }
 
 int
 raise (int sig)
 {
-  _sig_func_ptr func;
-
   if (sig < 0 || sig >= NSIG)
     {
       errno = EINVAL;
       return -1;
     }
 
-  func = _sig_func[sig];
-
-  if (func == SIG_DFL)
-    return kill (getpid (), sig);
-  else if (func == SIG_IGN)
+  for (;;) {
+    _sig_func_ptr func;
+#ifdef _USE_ATOMIC_SIGNAL
+    func = (_sig_func_ptr) atomic_load(&_sig_func[sig]);
+#else
+    func = _sig_func[sig];
+#endif
+    if (func == SIG_IGN)
+      return 0;
+    else if (func == SIG_DFL)
+      _exit(128 + sig);
+#ifdef _USE_ATOMIC_SIGNAL
+    /* make sure it hasn't changed in the meantime */
+    if (!atomic_compare_exchange_strong(&_sig_func[sig],
+                                       (uintptr_t *) &func,
+                                        (uintptr_t) SIG_DFL))
+      continue;
+#else
+    _sig_func[sig] = SIG_DFL;
+#endif
+    (*func)(sig);
     return 0;
-  else if (func == SIG_ERR)
-    {
-      errno = EINVAL;
-      return 1;
-    }
-  else
-    {
-      _sig_func[sig] = SIG_DFL;
-      func (sig);
-      return 0;
-    }
+  }
 }
-
-int
-__sigtramp (int sig)
-{
-  _sig_func_ptr func;
-
-  if (sig < 0 || sig >= NSIG)
-    {
-      return -1;
-    }
-
-  func = _sig_func[sig];
-  if (func == SIG_DFL)
-    return 1;
-  else if (func == SIG_ERR)
-    return 2;
-  else if (func == SIG_IGN)
-    return 3;
-  else
-    {
-      _sig_func[sig] = SIG_DFL;
-      func (sig);
-      return 0;
-    }
-}
-
-#endif /* !SIGNAL_PROVIDED */
