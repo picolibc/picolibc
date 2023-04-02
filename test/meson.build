@@ -335,6 +335,7 @@ foreach target : targets
                  'test-strtod', 'test-strchr',
 		 'test-memset', 'test-put',
 		 'test-efcvt', 'test-atomic',
+		 'test-raise',
 		]
 
   if have_attr_ctor_dtor
