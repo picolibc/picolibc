@@ -40,9 +40,7 @@
 #include <string.h>
 #include <errno.h>
 #include <stdbool.h>
-
-#define CASE_CONVERT    ('a' - 'A')
-#define TOLOW(c)        ((c) | CASE_CONVERT)
+#include "stdio_private.h"
 
 #if defined(_HAVE_BUILTIN_MUL_OVERFLOW) && defined(_HAVE_BUILTIN_ADD_OVERFLOW) && !defined(strtoi_signed)
 #define USE_OVERFLOW
@@ -57,8 +55,10 @@ ISSPACE(unsigned char c)
 strtoi_type
 strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
 {
+    unsigned int base = ibase;
+
     /* Check for invalid base value */
-    if ((unsigned int) ibase > 36 || ibase == 1) {
+    if (base > 36 || base == 1) {
         errno = EINVAL;
         if (endptr)
             *endptr = (char *) nptr;
@@ -71,8 +71,7 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
     const unsigned char *s = (const unsigned char *) nptr;
     strtoi_type val = 0;
     unsigned char flags = 0;
-    unsigned char base = (unsigned char) ibase;
-    unsigned char i;
+    unsigned int i;
 
     /* Skip leading spaces */
     do {
@@ -90,7 +89,7 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
 
     /* Leading '0' digit -- check for base indication */
     if (i == '0') {
-        if (TOLOW(*s) == 'x' && (base == 0 || base == 16)) {
+        if (TOLOW(*s) == 'x' && ((base | 16) == 16)) {
             base = 16;
             /* Parsed the '0' */
             nptr = (const char *) s;
@@ -109,19 +108,15 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
     /* works because strtoi_min = (strtoi_type) ((strtoi_utype) strtoi_max + 1) */
     strtoi_utype ucutoff = (strtoi_utype) strtoi_max + flags;
     strtoi_type cutoff = ucutoff / base;
-    unsigned cutlim = ucutoff % base;
+    unsigned int cutlim = ucutoff % base;
 #else
     strtoi_type cutoff = strtoi_max / base;
-    unsigned cutlim = strtoi_max % base;
+    unsigned int cutlim = strtoi_max % base;
 #endif
 #endif
 
     for(;;) {
-        /* Map digits to 0..35, non-digits above 35. */
-        if (i > '9')
-            i = TOLOW(i-1) + ('0' - 'a' + 11);
-        i -= '0';
-
+        i = digit_to_val(i);
         /* detect invalid char */
         if (i >= base)
             break;
@@ -142,12 +137,16 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
 #else
         if (val > cutoff || (val == cutoff && i > cutlim))
             flags |= FLAG_OFLOW;
-        val = val * (strtoi_type) base + i;
+        val = val * (strtoi_type) base + (strtoi_type) i;
 #endif
         /* Parsed another digit */
         nptr = (const char *) s;
         i = *s++;
     }
+
+    /* Mark the end of the parsed region */
+    if (endptr != NULL)
+        *endptr = (char *) nptr;
 
     if (flags & FLAG_NEG)
         val = -val;
@@ -160,10 +159,6 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
 #endif
         errno = ERANGE;
     }
-
-    /* Mark the end of the parsed region */
-    if (endptr != NULL)
-        *endptr = (char *) nptr;
 
     return val;
 }

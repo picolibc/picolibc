@@ -613,7 +613,7 @@ run_vector_1 (int vector,
      }
     p++;
   }
-  if (vector)
+  if (vector && f)
   {
     VECCLOSE(f, name, args);
   }

@@ -133,7 +133,7 @@ char illegal_pos[2][3] = {
   {0xff, 0xff}
 };
   
-int main()
+int main(void)
   {
     wchar_t wchar;
     int retval;
@@ -151,7 +151,7 @@ int main()
     /* 2.1  First possible sequence of a certain length */
     retval = mbtowc(&wchar, first[0], MAX_BYTES);
     if (retval == 0)
-      printf("2.1.1: U-%08d\n", wchar);
+      printf("2.1.1: U-%08ld\n", (long) wchar);
     else
       printf("2.1.1: Invalid\n");
 
@@ -159,7 +159,7 @@ int main()
     {
       retval = mbtowc (&wchar, first[i-1], MAX_BYTES);
       if (retval == i)
-        printf("2.1.%d: U-%08x\n", i, wchar);
+        printf("2.1.%d: U-%08lx\n", i, (long) wchar);
       else
         printf("2.1.%d: Invalid\n", i);
     }
@@ -169,7 +169,7 @@ int main()
     {
       retval = mbtowc (&wchar, last[i-1], MAX_BYTES);
       if (retval == i)
-        printf("2.2.%d: U-%08x\n", i, wchar);
+        printf("2.2.%d: U-%08lx\n", i, (long) wchar);
       else
         printf("2.2.%d: Invalid\n", i);
     }
@@ -179,7 +179,7 @@ int main()
       {
         retval = mbtowc (&wchar, boundary[i-1], MAX_BYTES);
         if ((i < 4 && retval == 3) || (i > 3 && retval == 4))
-          printf("2.3.%d: U-%08x\n", i, wchar);
+          printf("2.3.%d: U-%08lx\n", i, (long) wchar);
         else
           printf("2.3.%d: Invalid\n", i);
       }
@@ -188,13 +188,13 @@ int main()
     /* 3.1  Unexpected continuation bytes */
     retval = mbtowc (&wchar, continuation_bytes[0], MAX_BYTES);
     if (retval == 1)
-      printf("3.1.1: U-%08x\n", wchar);
+      printf("3.1.1: U-%08lx\n", (long) wchar);
     else
       printf("3.1.1: 1 Invalid\n");
 
     retval = mbtowc (&wchar, continuation_bytes[1], MAX_BYTES);
     if (retval == 1)
-      printf("3.1.2: U-%08x\n", wchar);
+      printf("3.1.2: U-%08lx\n", (long) wchar);
     else
       printf("3.1.2: 1 Invalid\n");
 

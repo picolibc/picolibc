@@ -71,6 +71,8 @@ function(picolibc_test test)
 
   target_compile_options(${test} PRIVATE "-fno-builtin" ${PICOLIBC_COMPILE_OPTIONS})
 
+  target_link_options(${test} PRIVATE ${TARGET_COMPILE_OPTIONS})
+
   add_test(
     NAME ${test}
     COMMAND "${PICOLIBC_SCRIPTS}/run-thumbv7m" $<TARGET_FILE:${test}>

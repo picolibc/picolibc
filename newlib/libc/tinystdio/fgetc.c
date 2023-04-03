@@ -43,7 +43,7 @@ fgetc(FILE *stream)
 		return EOF;
 
 	if ((unget = __atomic_exchange_ungetc(&stream->unget, 0)) != 0)
-		return (unsigned char) unget;
+                return (unsigned char) (unget - 1);
 
 	rv = stream->get(stream);
 	if (rv < 0) {

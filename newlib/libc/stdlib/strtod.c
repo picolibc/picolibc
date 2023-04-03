@@ -1320,6 +1320,20 @@ isdenormf(float f)
 }
 
 float
+strtof_l (const char *__restrict s00, char **__restrict se, locale_t loc)
+{
+  double val = strtod_l (s00, se, loc);
+  if (isnan (val))
+    return signbit (val) ? -nanf ("") : nanf ("");
+  float retval = (float) val;
+#ifndef NO_ERRNO
+  if ((isinf (retval) && !isinf (val)) || (isdenormf(retval) && !isdenorm(val)))
+    _REENT_ERRNO(_REENT) = ERANGE;
+#endif
+  return retval;
+}
+
+float
 strtof (const char *__restrict s00,
 	char **__restrict se)
 {

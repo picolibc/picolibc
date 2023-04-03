@@ -40,6 +40,7 @@ These options control some general build configuration values.
 | native-tests                | false   | Build tests against native libc (used to validate tests)                             |
 | picolib                     | true    | Include picolib bits for tls and sbrk support                                        |
 | picocrt                     | true    | Build crt0.o (C startup function)                                                    |
+| picocrt-lib                 | true    | Also wrap crt0.o into a library -lcrt0, which is easier to find via the library path |
 | semihost                    | true    | Build the semihost library (libsemihost.a)                                           |
 | fake-semihost               | false   | Create a fake semihost library to allow tests to link                                |
 | specsdir                    | auto    | Where to install the .specs file (default is in the GCC directory). <br> If set to `none`, then picolibc.specs will not be installed at all.|

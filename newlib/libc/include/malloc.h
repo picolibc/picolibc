@@ -41,6 +41,7 @@ SUCH DAMAGE.
 #define __need_size_t
 #include <stddef.h>
 
+#include <sys/cdefs.h>
 /* include any machine-specific extensions */
 #include <machine/malloc.h>
 
@@ -66,26 +67,29 @@ struct mallinfo {
 
 /* The routines.  */
 
-extern void *malloc (size_t);
-extern void free (void *);
-extern void *realloc (void *, size_t);
-extern void *calloc (size_t, size_t);
-extern void *memalign (size_t, size_t);
-extern struct mallinfo mallinfo (void);
-extern void malloc_stats (void);
-extern int mallopt (int, int);
-extern size_t malloc_usable_size (void *);
+void	free (void *) _NOTHROW;
+void	*malloc(size_t) __malloc_like __result_use_check __alloc_size(1) _NOTHROW;
+void	*calloc(size_t, size_t) __malloc_like __result_use_check
+    __alloc_size2(1, 2) _NOTHROW;
+void	*realloc(void *, size_t) __result_use_check __alloc_size(2) _NOTHROW;
+void    *memalign (size_t __alignment, size_t __size)  __malloc_like
+    __result_use_check __alloc_size(2) _NOTHROW;
+
+struct mallinfo mallinfo (void);
+void malloc_stats (void);
+int mallopt (int, int);
+size_t malloc_usable_size (void *);
 /* These aren't too useful on an embedded system, but we define them
    anyhow.  */
 
-extern void *pvalloc (size_t);
-extern int malloc_trim (size_t);
-extern void __malloc_lock(void);
-extern void __malloc_unlock(void);
+void *pvalloc (size_t);
+int malloc_trim (size_t);
+void __malloc_lock(void);
+void __malloc_unlock(void);
 
 /* A compatibility routine for an earlier version of the allocator.  */
 
-extern void mstats (char *);
+void mstats (char *);
 
 /* SVID2/XPG mallopt options */
 
@@ -103,7 +107,7 @@ extern void mstats (char *);
 
 #ifndef __CYGWIN__
 /* Some systems provide this, so do too for compatibility.  */
-extern void cfree (void *);
+void cfree (void *);
 #endif /* __CYGWIN__ */
 
 #ifdef __cplusplus

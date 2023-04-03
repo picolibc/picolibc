@@ -636,5 +636,19 @@
     result |= test(__LINE__, "0X1.23456789ABCDFP-1022", "%A", 0x1.23456789abcdfp-1022);
 #endif
 #endif
+    /* test %ls for wchar_t string */
+    result |= testw(__LINE__, L"foo", L"%.3ls", L"foobar");
+    /* test %s for mbchar string */
+    result |= testw(__LINE__, L"foo", L"%.3s", "foobar");
+
+    wchar_t wc = 0x1234;
+
+    /* test %lc for wchar_t */
+    wchar_t wb[2] = { 0x1234, 0 };
+    result |= testw(__LINE__, wb, L"%lc", wc);
+
+    /* make sure %c truncates to char */
+    wb[0] = 0x34;
+    result |= testw(__LINE__, wb, L"%c", wc);
 }
 #endif

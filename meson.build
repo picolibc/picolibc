@@ -42,7 +42,7 @@ project('picolibc', 'c',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.53',
-	version: '1.8'
+	version: '1.8.1'
        )
 
 targets = []
@@ -50,6 +50,21 @@ targets = []
 fs = import('fs')
 
 cc = meson.get_compiler('c')
+
+# Find the compiler installation directory by parsing the output of
+# cc -print-search-dirs
+
+cc_install_dir = ''
+foreach _line : run_command(cc.cmd_array() + ['-print-search-dirs'], check : false).stdout().split('\n')
+  if _line.startswith('install: ')
+    if meson.version().version_compare('>=0.56')
+      # trim off the leading 'install: '
+      cc_install_dir = _line.substring(9)
+    else
+      cc_install_dir = run_command(['expr', _line, ':', 'install: *\(.*\)'], check : false).stdout().split('\n')[0]
+    endif
+  endif
+endforeach
 
 # these options are required for all C compiler operations, including
 # detecting many C compiler features, as we cannot expect there
@@ -78,6 +93,8 @@ cpu_family_aliases = {
 		       'fido' : 'm68k',
 		       # m88k
 		       'm88110' : 'm88k',
+		       # Microblaze
+		       'microblazeel' : 'microblaze',
 		       # or1k
 		       'or1knd': 'or1k',
 		       # powerpc
@@ -155,6 +172,7 @@ enable_multilib = get_option('multilib')
 multilib_list = get_option('multilib-list')
 enable_picolib = get_option('picolib')
 enable_picocrt = get_option('picocrt')
+enable_picocrt_lib = get_option('picocrt-lib')
 enable_semihost = get_option('semihost')
 enable_tests = get_option('tests')
 enable_native_tests = get_option('native-tests')
@@ -181,6 +199,10 @@ native_c_args = ['-DNO_NEWLIB']
 
 if get_option('profile')
   c_args += ['-pg', '-no-pie']
+endif
+
+if get_option('freestanding')
+  c_args += ['-ffreestanding']
 endif
 
 # Disable ssp and fortify source while building picolibc (it's enabled
@@ -390,8 +412,7 @@ else
 endif
 
 if host_cpu_family == ''
-  host_cmds = cc.cmd_array() + ['-dumpmachine']
-  host_cc_machine=run_command(host_cmds, check : true).stdout().strip().split('-')
+  host_cc_machine=run_command(cc.cmd_array() + ['-dumpmachine'], check : true).stdout().strip().split('-')
   host_cpu_family=host_cc_machine[0]
   message('Computed host_cpu_family as ' + host_cpu_family)
 endif
@@ -435,13 +456,7 @@ if sysroot_install
   if sysroot != ''
     specs_prefix_format = '%R/@0@'
   else
-    paths = run_command(cc.cmd_array() + ['-print-search-dirs'], check : true).stdout().split('\n')
-    foreach path : paths
-      if path.startswith('install: ')
-	sysroot = path.substring(9) + '../../../..'
-      endif
-    endforeach
-    message('computed sysroot is ' + sysroot)
+    sysroot = cc_install_dir + '../../../..'
     specs_prefix_format = '%:getenv(GCC_EXEC_PREFIX ../../@0@)'
   endif
   if not get_option('sysroot-install-skip-checks')
@@ -474,17 +489,14 @@ endif
 
 specs_dir_option = get_option('specsdir')
 if build_type_subdir != ''
-  specs_install = false
   specs_dir = ''
+  specs_install = false
 elif specs_dir_option == ''
-  search_cmds = cc.cmd_array() + ['-print-search-dirs']
-  install_dir=run_command(search_cmds, check : true).stdout().split('\n')[0]
-  # Meson 0.56 adds a 'substring' method which can be used here
-  specs_dir=run_command(['expr', install_dir, ':', 'install: *\(.*\)'], check : false).stdout().split('\n')[0]
+  specs_dir = cc_install_dir
   specs_install = specs_dir != ''
 elif specs_dir_option == 'none'
-  specs_install = false
   specs_dir = ''
+  specs_install = false
 else
   specs_dir = join_paths(prefix, specs_dir_option)
   specs_install = true
@@ -516,10 +528,12 @@ if tinystdio and printf_aliases
 		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfscanf=__i_vfscanf}')
 endif
 
+crt0_expr = '%{-crt0=*:crt0-%*%O%s; :crt0%O%s}'
+
 if system_libc
   specs_isystem = ''
   specs_libpath = ''
-  specs_startfile = 'crt0%O%s'
+  specs_startfile = crt0_expr
 else
 
 #
@@ -587,7 +601,6 @@ specs_libpath = '-L' + specs_option_format.format(lib_prefix, lib_buildtype, lib
 #
 # Build the non-multilib *startfile options
 #
-crt0_expr = 'crt0%{-crt0=*:-%*%O;:%O}%s'
 
 prefix_crt0_path = '%*/@0@'.format(get_option('libdir')) / crt0_expr
 crt0_prefix = picolibc_prefix_format.format(prefix_crt0_path)
@@ -683,12 +696,6 @@ picolibcpp_specs = configure_file(input: 'picolibc.specs.in',
 				  install_dir: specs_dir,
 				  install: specs_install)
 
-
-test_specs = configure_file(input: 'test.specs.in',
-			    output: '@BASENAME@',
-			    configuration: specs_data,
-			    install: false)
-
 picolibc_linker_type_data = configuration_data()
 if cc.get_linker_id() == 'ld.lld'
     # ld.lld does not implement ALIGN_WITH_INPUT, but this flag is not needed
@@ -709,6 +716,26 @@ if cc.get_linker_id() == 'ld.lld'
 else
     picolibc_linker_type_data.set('LDSCRIPT_ALIGN_WITH_INPUT', 'ALIGN_WITH_INPUT')
 endif
+
+picolibc_linker_type_data.set('DEFAULT_FLASH_ADDR',
+			      meson.get_cross_property('default_flash_addr',
+						       '0x10000000'))
+
+picolibc_linker_type_data.set('DEFAULT_FLASH_SIZE',
+			      meson.get_cross_property('default_flash_size',
+						       '0x00010000'))
+
+picolibc_linker_type_data.set('DEFAULT_RAM_ADDR',
+			      meson.get_cross_property('default_ram_addr',
+						       '0x20000000'))
+
+picolibc_linker_type_data.set('DEFAULT_RAM_SIZE',
+			      meson.get_cross_property('default_ram_size',
+						       '0x00008000'))
+
+picolibc_linker_type_data.set('DEFAULT_STACK_SIZE',
+			      meson.get_cross_property('default_stack_size',
+						       '0x00001000'))
 
 picolibc_ld_data = configuration_data()
 picolibc_ld_data.merge_from(picolibc_linker_type_data)
@@ -816,7 +843,7 @@ if enable_multilib
   # Ask the compiler for the set of available multilib configurations,
   # set up the build system to compile for all desired ones
 
-  target_list = run_command(cc, '--print-multi-lib', check : true).stdout().strip().split('\n')
+  target_list = run_command(cc.cmd_array() +  ['--print-multi-lib'], check : true).stdout().strip().split('\n')
 
   has_mcmodel = false
   foreach target : target_list
@@ -1017,6 +1044,7 @@ conf_data.set('PICOLIBC_TLS', thread_local_storage, description: 'use thread loc
 conf_data.set('_HAVE_PICOLIBC_TLS_API', thread_local_storage and have_picolibc_tls_api, description: '_set_tls and _init_tls functions available')
 conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in tinystdio')
 conf_data.set('ATOMIC_UNGETC', atomic_ungetc, description: 'Use atomics for fgetc/ungetc for re-entrancy')
+conf_data.set('_PICOLIBC_ATOMIC_SIGNAL', get_option('atomic-signal'), description: 'Use atomics for signal/raise for re-entrancy')
 conf_data.set('_HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
 conf_data.set('_HAVE_BUILTIN_MUL_OVERFLOW', have_builtin_mul_overflow, description: 'Compiler has __builtin_mul_overflow')
 conf_data.set('_HAVE_BUILTIN_ADD_OVERFLOW', have_builtin_add_overflow, description: 'Compiler has __builtin_add_overflow')
@@ -1105,7 +1133,23 @@ endif
 # Dig out the list of available encodings from the encoding.aliases file. Only
 # accept the first entry from each line
 
-available_encodings = run_command(['sed', '-e', '/^#/d', '-e', '/^$/d', '-e', 's/ .*$//', files('newlib/libc/iconv/encoding.aliases')[0]], check : true).stdout().split('\n')
+available_encodings = []
+# fs.read was added in meson version 0.57.0. The sed invocation can be
+# removed once picolibc requires a version of meson newer than that.
+if meson.version().version_compare('>=0.57')
+  foreach line : fs.read('newlib/libc/iconv/encoding.aliases').split('\n')
+    if line != '' and not line.startswith('#')
+      available_encodings += [line.split()[0]]
+    endif
+  endforeach
+else
+  _available_encodings = run_command(['sed', '-e', '/^#/d', '-e', '/^$/d', '-e', 's/ .*$//', files('newlib/libc/iconv/encoding.aliases')[0]], check : true).stdout().split('\n')
+  foreach _encoding : _available_encodings
+    if _encoding != ''
+      available_encodings += _encoding
+    endif
+  endforeach
+endif
 
 # Include all available encodings if none were specified on the command line
 
@@ -1127,6 +1171,7 @@ endif
 # Set config variables for each requested 'from' encoding
 
 foreach from : newlib_iconv_from_encodings
+  message('from ' + from)
   if not available_encodings.contains(from)
     error('Requested from encoding ' + from + ' is not available. Look in newlib/libc/iconv/encoding.aliases')
   endif
@@ -1226,8 +1271,8 @@ conf_data.set('_HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs suppor
 
 # By default, tests don't require any special arguments
 
-# disable compiler built-ins so we reach the library equivalents
-test_c_args = c_args + arg_fnobuiltin
+test_c_args = c_args
+# disable compiler built-ins so we don't use native equivalents
 native_c_args += arg_fnobuiltin
 if tests_enable_stack_protector
   if cc.has_argument('-fstack-protector-all') and cc.has_argument('-fstack-protector-strong')
@@ -1249,7 +1294,7 @@ endif
 # of meson newer than that.
 
 test_env = environment({'PICOLIBC_TEST' : '1'})
-test_env.prepend('PATH', meson.source_root() / 'scripts')
+test_env.prepend('PATH', meson.current_source_dir() / 'scripts')
 
 # CompCert needs the '-WUl,' prefix to correctly pass the --spec parameters to the linker
 specs_prefix = ''
@@ -1258,28 +1303,17 @@ if cc.get_id() == 'ccomp'
 endif
 
 if has_semihost
-  # If we're using semihosting, we assume that there's a custom linker
-  # script that includes picolibc.specs.  Linker args must be strings
-  # (seems like a bug), so compute the path by hand.  Because at the
-  # linker's runtime, its working directory is the build dir, linker
-  # scripts under scripts/ can't be found. We use the absolute path
-  # for our convinience.
-  cpu_script = 'scripts' / 'test-' + host_machine.cpu() + '.ld'
-  cpu_family_script = 'scripts' / 'test-' + host_cpu_family + '.ld'
-  if fs.is_file(cpu_script)
-    custom_script = cpu_script
-  else
-    custom_script = cpu_family_script
-  endif
-  test_link_args = ['-nostartfiles',
-                    '-T', meson.current_source_dir() / custom_script,
-                    '-T', '@0@'.format(picolibc_ld), '-lgcc'] + additional_libs_list
-  test_linker_files = files(custom_script) + [picolibc_ld]
+  test_link_args = ['-nostartfiles', '-T', '@0@'.format(picolibc_ld),
+		    '-lgcc'] + additional_libs_list
+  test_linker_files = [picolibc_ld]
   specs = picolibc_specs
 else
+  specs = configure_file(input: 'test.specs.in',
+			 output: '@BASENAME@',
+			 configuration: specs_data,
+			 install: false)
   test_link_args = []
   test_linker_files = []
-  specs = test_specs
 endif
 
 # Clang does not support spec files

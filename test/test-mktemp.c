@@ -101,6 +101,7 @@ main(void)
     check(f != NULL, "fopen w");
     fputs(MESSAGE, f);
     fclose(f);
+    f = NULL;
     check_contents(template, 1);
     (void) remove(template);
 
@@ -114,6 +115,7 @@ main(void)
     check(f != NULL, "fopen w");
     fputs(MESSAGE, f);
     fclose(f);
+    f = NULL;
     check_contents(template, 1);
     (void) remove(template);
 

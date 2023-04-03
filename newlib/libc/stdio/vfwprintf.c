@@ -454,7 +454,7 @@ VFWPRINTF (
 	uio.uio_resid += (len) * sizeof (wchar_t); \
 	iovp++; \
 	if (++uio.uio_iovcnt >= NIOV) { \
-		if (__SPRINT(data, fp, &uio)) \
+		if (__SPRINT(fp, &uio)) \
 			goto error; \
 		iovp = iov; \
 	} \
@@ -477,7 +477,7 @@ VFWPRINTF (
 	PAD((len) - (n > 0 ? n : 0), (with)); \
 }
 #define	FLUSH() { \
-	if (uio.uio_resid && __SPRINT(data, fp, &uio)) \
+	if (uio.uio_resid && __SPRINT(fp, &uio)) \
 		goto error; \
 	uio.uio_iovcnt = 0; \
 	iovp = iov; \

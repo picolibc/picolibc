@@ -118,11 +118,11 @@ void *	bsearch (const void *__key,
 		       size_t __nmemb,
 		       size_t __size,
 		       __compar_fn_t _compar);
+void	free (void *) _NOTHROW;
 void	*calloc(size_t, size_t) __malloc_like __result_use_check
 	     __alloc_size2(1, 2) _NOTHROW;
 div_t	div (int __numer, int __denom);
 void	exit (int __status) _ATTRIBUTE ((__noreturn__));
-void	free (void *) _NOTHROW;
 char *  getenv (const char *__string);
 #if __GNU_VISIBLE
 char *  secure_getenv (const char *__string);
@@ -155,7 +155,7 @@ int	mkstemp (char *);
 int	mkstemps (char *, int);
 #endif
 #if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200112)
-char *	mktemp (char *) _ATTRIBUTE ((__deprecated__("the use of `mktemp' is dangerous; use `mkstemp' instead")));
+char *	mktemp (char *) __picolibc_deprecated("the use of `mktemp' is dangerous; use `mkstemp' instead");
 #endif
 void	qsort (void *__base, size_t __nmemb, size_t __size, __compar_fn_t _compar);
 int	rand (void);
@@ -366,7 +366,7 @@ extern long double strtold (const char *__restrict, char **__restrict);
  */
 #if __ISO_C_VISIBLE >= 2011
 void *	aligned_alloc(size_t, size_t) __malloc_like __alloc_align(1)
-	    __alloc_size(2) __result_use_check;
+	    __alloc_size(2) __result_use_check _NOTHROW;
 int	at_quick_exit(void (*)(void));
 _Noreturn void
 	quick_exit(int);

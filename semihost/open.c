@@ -44,6 +44,13 @@
 extern struct timeval __semihost_creat_time _ATTRIBUTE((__weak__));
 extern int gettimeofday(struct timeval *restrict tv, void *restrict tz) _ATTRIBUTE((__weak__));
 
+/*
+ * note: binary mode has been chosen below because otherwise
+ *       files are treated on host side as text files which
+ *       is most probably not intented.  This means that
+ *       data transfer is transparent between target and host.
+ */
+
 int
 open(const char *pathname, int flags, ...)
 {
@@ -51,19 +58,19 @@ open(const char *pathname, int flags, ...)
 
 	switch (flags & (O_RDONLY|O_WRONLY|O_RDWR)) {
 	case O_RDONLY:
-		semiflags = SH_OPEN_R;			/* 'r' */
+		semiflags = SH_OPEN_R_B;		/* 'rb' */
 		break;
 	case O_WRONLY:
 		if (flags & O_TRUNC)
-			semiflags = SH_OPEN_W;		/* 'w' */
+			semiflags = SH_OPEN_W_B;	/* 'wb' */
 		else
-			semiflags = SH_OPEN_A;		/* 'a' */
+			semiflags = SH_OPEN_A_B;	/* 'ab' */
 		break;
 	default:
 		if (flags & O_TRUNC)
-			semiflags = SH_OPEN_W_PLUS;	/* 'w+' */
+			semiflags = SH_OPEN_W_PLUS_B;	/* 'wb+' */
 		else
-			semiflags = SH_OPEN_A_PLUS;	/* 'a+' */
+			semiflags = SH_OPEN_A_PLUS_B;	/* 'ab+' */
 		break;
 	}
 

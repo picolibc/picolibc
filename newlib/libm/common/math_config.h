@@ -594,7 +594,7 @@ force_eval_long_double (long double x)
 #   define _MATH_ALIAS_l_llI_to_d(name) long double _LD_NAME(name)(long double x, long double y, int *z) { return (long double) _D_NAME(name)((double) x, (double) y, z); }
 #   define _MATH_ALIAS_l_il_to_d(name) long double _LD_NAME(name)(int n, long double x) { return (long double) _D_NAME(name)(n, (double) x); }
 #   define _MATH_ALIAS_l_li_to_d(name) long double _LD_NAME(name)(long double x, int n) { return (long double) _D_NAME(name)((double) x, n); }
-#   define _MATH_ALIAS_l_lj_to_d(name) long double _LD_NAME(name)(long double x, long j) { return (long double) _D_NAME(name)((double) x, n); }
+#   define _MATH_ALIAS_l_lj_to_d(name) long double _LD_NAME(name)(long double x, long j) { return (long double) _D_NAME(name)((double) x, j); }
 #   define _MATH_ALIAS_i_l_to_d(name) int _LD_NAME(name)(long double x) { return _D_NAME(name)((double) x); }
 #   define _MATH_ALIAS_j_l_to_d(name) long _LD_NAME(name)(long double x) { return _D_NAME(name)((double) x); }
 #   define _MATH_ALIAS_k_l_to_d(name) long long _LD_NAME(name)(long double x) { return _D_NAME(name)((double) x); }
@@ -1144,7 +1144,7 @@ __math_lgamma_r (__float64 y, int *signgamp, int *divzero);
 HIDDEN float
 __math_lgammaf_r (float y, int *signgamp, int *divzero);
 
-#if defined(_HAVE_ALIAS_ATTRIBUTE) && defined(_HAVE_WEAK_ATTRIBUTE)
+#ifdef __weak_reference
 extern int __signgam;
 #else
 #define __signgam signgam

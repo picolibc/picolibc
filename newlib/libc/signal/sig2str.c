@@ -68,7 +68,7 @@ Otherwise, it returns <<-1>>.
 #define NUM_OF_SIGS (sizeof(sig_array) / sizeof(sig_name_and_num))
 
 typedef struct sig_name_and_num {
-  const char *sig_name;
+  const char sig_name[8];
   const int  sig_num;
 } sig_name_and_num;
 

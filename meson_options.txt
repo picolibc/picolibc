@@ -59,6 +59,9 @@ option('picolib', type: 'boolean', value: true,
 option('picocrt', type: 'boolean', value: true,
        description: 'Include pico crt bits')
 
+option('picocrt-lib', type: 'boolean', value: true,
+       description: 'Include pico crt bits in lib form')
+
 option('semihost', type: 'boolean', value: true,
        description: 'Include semihost bits')
 
@@ -85,6 +88,9 @@ option('use-stdlib', type: 'boolean', value: false,
 
 option('profile', type: 'boolean', value: false,
        description: 'Enable profiling by adding -pg -no-pie to compile flags')
+
+option('freestanding', type: 'boolean', value: false,
+       description: 'Build the library with -ffreestanding (useful for Zephyr testing)')
 
 #
 # Testing options
@@ -212,6 +218,8 @@ option('fake-semihost', type: 'boolean', value: false,
        description: 'create fake semihost library to link tests')
 option('crt-runtime-size', type: 'boolean', value: false,
        description: 'compute crt memory space sizes at runtime')
+option('atomic-signal', type: 'boolean', value: true,
+       description: 'use atomics in signal/raise to make them re-entrant')
 
 #
 # Malloc option

@@ -42,8 +42,8 @@ ENTRY(_start)
 
 MEMORY
 {
-	flash (rx!w) : ORIGIN = DEFINED(__flash) ? __flash : 0x10000000, LENGTH = DEFINED(__flash_size) ? __flash_size : 0x10000
-	ram (w!rx)   : ORIGIN = DEFINED(__ram  ) ? __ram   : 0x20000000, LENGTH = DEFINED(__ram_size  ) ? __ram_size   : 0x08000
+	flash (rx!w) : ORIGIN = DEFINED(__flash) ? __flash : @DEFAULT_FLASH_ADDR@, LENGTH = DEFINED(__flash_size) ? __flash_size : @DEFAULT_FLASH_SIZE@
+	ram (w!rx)   : ORIGIN = DEFINED(__ram  ) ? __ram   : @DEFAULT_RAM_ADDR@, LENGTH = DEFINED(__ram_size  ) ? __ram_size   : @DEFAULT_RAM_SIZE@
 }
 
 PHDRS
@@ -231,12 +231,12 @@ SECTIONS
 
 	/* Make the rest of memory available for heap storage */
 	PROVIDE (__heap_start = __end);
-	PROVIDE (__heap_end = __stack - (DEFINED(__stack_size) ? __stack_size : 0x800));
+	PROVIDE (__heap_end = __stack - (DEFINED(__stack_size) ? __stack_size : @DEFAULT_STACK_SIZE@));
 	PROVIDE (__heap_size = __heap_end - __heap_start);
 
 	/* Define a stack region to make sure it fits in memory */
 	.stack (NOLOAD) : {
-		. += (DEFINED(__stack_size) ? __stack_size : 0x800);
+		. += (DEFINED(__stack_size) ? __stack_size : @DEFAULT_STACK_SIZE@);
 	} >ram :ram
 
 	/* Throw away C++ exception handling information */

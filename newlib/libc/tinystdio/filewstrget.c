@@ -32,8 +32,24 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-__flash = 0x80000000;
-__flash_size = 0x00200000;
-__ram = 0x80200000;
-__ram_size = 0x200000;
-__stack_size = 1k;
+
+#include "stdio_private.h"
+#include <string.h>
+
+int
+__file_wstr_get(FILE *stream)
+{
+	struct __file_str *sstream = (struct __file_str *) stream;
+	int rv;
+
+        if (((sstream->pos - sstream->end) & (sizeof(wchar_t) - 1)) == 0)
+        {
+                wchar_t c;
+                memcpy(&c, sstream->pos, sizeof(wchar_t));
+                if (c == L'\0')
+                        return _FDEV_EOF;
+        }
+	rv = (unsigned char) *sstream->pos;
+	sstream->pos++;
+	return rv;
+}

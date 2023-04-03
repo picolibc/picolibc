@@ -64,89 +64,114 @@ foreach target : targets
     crt_hosted_name = 'crt0-hosted.o'
     crt_minimal_name = 'crt0-minimal.o'
     crt_semihost_name = 'crt0-semihost.o'
-    libcrt_name = 'crt'
-    libcrt_hosted_name = 'crt-hosted'
-    libcrt_minimal_name = 'crt-minimal'
-    libcrt_semihost_name = 'crt-semihost'
+    libcrt_name = 'crt0'
+    libcrt_hosted_name = 'crt0-hosted'
+    libcrt_minimal_name = 'crt0-minimal'
+    libcrt_semihost_name = 'crt0-semihost'
   else
     crt_name = join_paths(target, 'crt0.o')
     crt_hosted_name = join_paths(target, 'crt0-hosted.o')
     crt_minimal_name = join_paths(target, 'crt0-minimal.o')
     crt_semihost_name = join_paths(target, 'crt0-semihost.o')
-    libcrt_name = join_paths(target, 'libcrt')
-    libcrt_hosted_name = join_paths(target, 'libcrt-hosted')
-    libcrt_minimal_name = join_paths(target, 'libcrt-minimal')
-    libcrt_semihost_name = join_paths(target, 'libcrt-semihost')
+    libcrt_name = join_paths(target, 'libcrt0')
+    libcrt_hosted_name = join_paths(target, 'libcrt0-hosted')
+    libcrt_minimal_name = join_paths(target, 'libcrt0-minimal')
+    libcrt_semihost_name = join_paths(target, 'libcrt0-semihost')
   endif
 
-  # The normal variant does not call 'exit' after return from main (c lingo: freestanding execution environment)
-  executable(crt_name,
-	     src_picocrt,
-	     include_directories : inc,
-	     install : true,
-	     install_dir : instdir,
-	     c_args : value[1] + arg_fnobuiltin + ['-ffreestanding'],
-	     link_args : value[1] + ['-r', '-ffreestanding'])
+  crt0_name = 'crt0' + target
+  crt0_hosted_name = 'crt0_hosted' + target
+  crt0_minimal_name = 'crt0_minimal' + target
+  crt0_semihost_name = 'crt0_semihost' + target
 
-  # Tests link against this because using the .o isn't supported under meson
-  set_variable('lib_crt' + target,
-	       static_library(libcrt_name,
-			      src_picocrt,
-			      install : false,
-			      include_directories : inc,
-			      c_args : value[1]))
+  # The normal variant does not call 'exit' after return from main (c lingo: freestanding execution environment)
+  _crt = executable(crt_name,
+		    src_picocrt,
+		    include_directories : inc,
+		    install : true,
+		    install_dir : instdir,
+		    c_args : value[1] + arg_fnobuiltin + ['-ffreestanding'],
+		    link_args : value[1] + ['-r', '-ffreestanding'])
+
+  set_variable(crt0_name,
+	       _crt.extract_objects(src_picocrt)
+	      )
+
+  if enable_picocrt_lib
+    static_library(libcrt_name,
+                   [],
+                   install : true,
+                   install_dir : instdir,
+                   pic: false,
+                   objects : [_crt.extract_objects(src_picocrt)])
+  endif
 
   # The 'hosted' variant calls 'exit' after return from main (c lingo: hosted execution environment)
-  executable(crt_hosted_name,
-             src_picocrt,
-             include_directories : inc,
-             install : true,
-             install_dir : instdir,
-             c_args : value[1] + arg_fnobuiltin + ['-ffreestanding', '-DCRT0_EXIT'],
-             link_args : value[1] + ['-r', '-ffreestanding'])
+  _crt = executable(crt_hosted_name,
+		    src_picocrt,
+		    include_directories : inc,
+		    install : true,
+		    install_dir : instdir,
+		    c_args : value[1] + arg_fnobuiltin + ['-ffreestanding', '-DCRT0_EXIT'],
+		    link_args : value[1] + ['-r', '-ffreestanding'])
 
-  # Tests link against this because using the .o isn't supported under meson
-  set_variable('lib_crt_hosted' + target,
-	       static_library(libcrt_hosted_name,
-			      src_picocrt,
-			      install : false,
-			      include_directories : inc,
-			      c_args : value[1] + ['-DCRT0_EXIT']))
+  set_variable(crt0_hosted_name,
+	       _crt.extract_objects(src_picocrt)
+	      )
+
+  if enable_picocrt_lib
+    static_library(libcrt_hosted_name,
+                   [],
+                   install : true,
+                   install_dir : instdir,
+                   pic: false,
+                   objects : [_crt.extract_objects(src_picocrt)])
+  endif
 
   # The 'minimal' variant doesn't call exit, nor does it invoke any constructors
-  executable(crt_minimal_name,
-             src_picocrt,
-             include_directories : inc,
-             install : true,
-             install_dir : instdir,
-             c_args : value[1] + arg_fnobuiltin + ['-ffreestanding', '-DCONSTRUCTORS=0'],
-             link_args : value[1] + ['-r', '-ffreestanding'])
+  _crt = executable(crt_minimal_name,
+		    src_picocrt,
+		    include_directories : inc,
+		    install : true,
+		    install_dir : instdir,
+		    c_args : value[1] + arg_fnobuiltin + ['-ffreestanding', '-DCONSTRUCTORS=0'],
+		    link_args : value[1] + ['-r', '-ffreestanding'])
 
-  # Tests link against this because using the .o isn't supported under meson
-  set_variable('lib_crt_minimal' + target,
-	       static_library(libcrt_minimal_name,
-			      src_picocrt,
-			      install : false,
-			      include_directories : inc,
-			      c_args : value[1] + ['-DCONSTRUCTORS=0']))
+  set_variable(crt0_minimal_name,
+	       _crt.extract_objects(src_picocrt)
+	      )
+
+  if enable_picocrt_lib
+    static_library(libcrt_minimal_name,
+                   [],
+                   install : true,
+                   install_dir : instdir,
+                   pic: false,
+                   objects : [_crt.extract_objects(src_picocrt)])
+  endif
 
   if has_arm_semihost
     # The 'semihost' variant calls sys_semihost_get_cmdline to build argv
     # and calls exit when main returns
-    executable(crt_semihost_name,
-               src_picocrt,
-               include_directories : inc,
-               install : true,
-               install_dir : instdir,
-               c_args : value[1] + arg_fnobuiltin + ['-ffreestanding', '-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
-               link_args : value[1] + ['-r', '-ffreestanding'])
+    _crt = executable(crt_semihost_name,
+		      src_picocrt,
+		      include_directories : inc,
+		      install : true,
+		      install_dir : instdir,
+		      c_args : value[1] + arg_fnobuiltin + ['-ffreestanding', '-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
+		      link_args : value[1] + ['-r', '-ffreestanding'])
 
-    # Tests link against this because using the .o isn't supported under meson
-    set_variable('lib_crt_semihost' + target,
-		 static_library(libcrt_semihost_name,
-				src_picocrt,
-				install : false,
-				include_directories : inc,
-				c_args : value[1] + ['-DCRT0_EXIT', '-DCRT0_SEMIHOST']))
+    set_variable(crt0_semihost_name,
+		 _crt.extract_objects(src_picocrt)
+		)
+
+    if enable_picocrt_lib
+      static_library(libcrt_semihost_name,
+                     [],
+                     install : true,
+                     install_dir : instdir,
+                     pic: false,
+                     objects : [_crt.extract_objects(src_picocrt)])
+    endif
   endif
 endforeach

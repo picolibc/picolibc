@@ -101,6 +101,10 @@ _start32:
 	call	main
 
 #ifdef CRT0_EXIT
+	/* keep stack aligned to 16-byte boundary so SSE works */
+	push	$0
+	push	$0
+	push	$0
 	push	%eax
 	call	exit
 #else

@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2020 Keith Packard
+ * Copyright © 2022 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,8 +32,14 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-__flash =      0x00100000;
-__flash_size = 0x00400000;
-__ram =        0x00500000;
-__ram_size   = 0x00200000;
-__stack_size = 4k;
+
+#define _DEFAULT_SOURCE
+#include <_ansi.h>
+#include <stdio.h>
+
+_ssize_t
+getline (char **restrict lineptr, size_t *restrict n, FILE *restrict stream)
+{
+    return getdelim (lineptr, n, '\n', stream);
+}
+

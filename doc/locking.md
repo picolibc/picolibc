@@ -98,7 +98,7 @@ mutex multiple times.
 
 ### `void __retarget_lock_release_recursive(_LOCK_T lock)`
 
-Acquire a recursive mutex. A thread thread must release the mutex as
+Release a recursive mutex. A thread thread must release the mutex as
 many times as it has acquired it before the mutex is unlocked.
 
 ### `void __retarget_lock_close_recursive(_LOCK_T lock)`

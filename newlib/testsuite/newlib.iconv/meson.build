@@ -33,14 +33,18 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-tests = ['iconvjp', 'iconvnm', 'iconvru' ]
+tests = [ 'iconvnm' ]
 
-iconv_data_link = custom_target('iconv_data link',
-				install: false,
-				output: 'iconv_data',
-				command: ['ln', '-sf', meson.source_root() / 'newlib/libc/iconv/ccs/binary', '@OUTPUT@'])
+tests_ccs = ['iconvjp', 'iconvru']
 
-iconv_test_c_args = ['-DTEST_NLSPATH="' + meson.current_build_dir() + '"']
+# Add CCS tests if the data are internal or we're not using semihosting
+# or we're using arm semihosting
+
+if not newlib_iconv_external_ccs or has_arm_semihost or not has_semihost
+  tests += tests_ccs
+endif
+
+iconv_test_c_args = ['-DTEST_NLSPATH="' + newlib_iconv_ccs_dir + '"']
 
 foreach target : targets
   value = get_variable('target_' + target)
@@ -49,8 +53,10 @@ foreach target : targets
   if is_variable('lib_semihost' + target)
     _libs += [get_variable('lib_semihost' + target)]
   endif
-  if is_variable('lib_crt_hosted' + target)
-    _libs += [get_variable('lib_crt_hosted'+ target)]
+  if is_variable('crt0_hosted' + target)
+    _objs = [get_variable('crt0_hosted'+ target)]
+  else
+    _objs = []
   endif
   
   _c_args = value[1] + test_c_args
@@ -69,9 +75,10 @@ foreach target : targets
 	 executable(test_name, src,
 		    c_args: ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE'] + _c_args + iconv_test_c_args,
 		    link_args: _link_args,
+		    objects: _objs,
 		    link_with: _libs,
 		    include_directories: test_inc),
-	 depends: [iconv_data_link, bios_bin],
+	 depends: [bios_bin],
 	 env: test_env)
   endforeach
 endforeach

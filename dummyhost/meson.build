@@ -35,6 +35,7 @@
 
 srcs_dummyhost = [
   'iob.c',
+  'exit.c',
 ]
 
 foreach target : targets

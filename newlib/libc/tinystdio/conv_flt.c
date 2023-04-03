@@ -521,3 +521,5 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
     }
     return 1;
 }
+
+#undef base

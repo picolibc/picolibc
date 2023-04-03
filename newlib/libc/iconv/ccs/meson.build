@@ -32,7 +32,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-subdir('binary')
+subdir('iconv_data')
 
 srcs_iconv_ccs = [
     'big5.c',
@@ -83,6 +83,8 @@ hdrs_iconv_ccs = [
     'ccs.h',
     'ccsnames.h',
 ]
+
+newlib_iconv_ccs_dir=meson.current_source_dir()
 
 srcs_iconv_ccs_use = []
 foreach file : srcs_iconv_ccs

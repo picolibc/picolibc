@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2020 Keith Packard
+ * Copyright © 2023 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,8 +32,23 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-__flash =      0x00100000;
-__flash_size = 0x00400000;
-__ram =        0x00500000;
-__ram_size   = 0x00200000;
-__stack_size = 4k;
+
+#include <limits.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <wchar.h>
+#include "stdio_private.h"
+
+int
+vswprintf(wchar_t *s, size_t len, const wchar_t *fmt, va_list ap)
+{
+	struct __file_str f = FDEV_SETUP_STRING_WRITE((char *) s, len * sizeof(wchar_t));
+	int i;
+
+        f.file.flags |= __SWIDE;
+	i = vfwprintf(&f.file, fmt, ap);
+	if (i >= 0)
+		s[i] = 0;
+
+	return i;
+}

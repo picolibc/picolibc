@@ -33,7 +33,9 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-dirs = ['newlib.locale',
+dirs = [
+	'newlib.iconv',
+	'newlib.locale',
 	'newlib.search',
 	'newlib.stdio',
 	'newlib.stdlib',
@@ -41,9 +43,9 @@ dirs = ['newlib.locale',
 	'newlib.time',
 	'newlib.wctype']
 
-if not newlib_iconv_external_ccs or tests_enable_posix_io
-  dirs += ['newlib.iconv']
-endif
+skip_dirs = [
+  'newlib.elix', # depends on mmap(2)
+]
 
 test_inc = [include_directories('include'), inc]
 

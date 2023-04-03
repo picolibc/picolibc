@@ -526,7 +526,7 @@ Files: CMakeLists.txt
  newlib/libc/errno/CMakeLists.txt
  newlib/libc/iconv/CMakeLists.txt
  newlib/libc/iconv/ccs/CMakeLists.txt
- newlib/libc/iconv/ccs/binary/CMakeLists.txt
+ newlib/libc/iconv/ccs/iconv_data/CMakeLists.txt
  newlib/libc/iconv/ces/CMakeLists.txt
  newlib/libc/iconv/lib/CMakeLists.txt
  newlib/libc/include/CMakeLists.txt
@@ -598,6 +598,7 @@ Files: CMakeLists.txt
  newlib/libc/tinystdio/fcvt_r.c
  newlib/libc/tinystdio/fcvtf_r.c
  newlib/libc/tinystdio/fmemopen.c
+ newlib/libc/tinystdio/getline.c
  newlib/libc/tinystdio/remove.c
  newlib/libc/tinystdio/stdio-bufio.h
  newlib/libc/tinystdio/strtol_l.c
@@ -742,7 +743,7 @@ License: BSD3-1
 Files: cmake/TC-arm-none-eabi.ld
  hello-world/hello-worldpp.cpp
  newlib/libc/errno/errno.c
- newlib/libc/iconv/ccs/binary/meson.build
+ newlib/libc/iconv/ccs/iconv_data/meson.build
  newlib/libc/include/machine/math.h
  newlib/libc/include/ssp/meson.build
  newlib/libc/include/sys/auxv.h
@@ -773,6 +774,7 @@ Files: cmake/TC-arm-none-eabi.ld
  newlib/libc/tinystdio/filestrget.c
  newlib/libc/tinystdio/filestrput.c
  newlib/libc/tinystdio/filestrputalloc.c
+ newlib/libc/tinystdio/filewstrget.c
  newlib/libc/tinystdio/gcvt.c
  newlib/libc/tinystdio/gcvtf.c
  newlib/libc/tinystdio/perror.c
@@ -794,16 +796,6 @@ Files: cmake/TC-arm-none-eabi.ld
  scripts/run-i386
  scripts/run-x86
  scripts/run-x86_64
- scripts/test-arm.ld
- scripts/test-cortex-a9.ld
- scripts/test-i386.ld
- scripts/test-m68k.ld
- scripts/test-powerpc.ld
- scripts/test-riscv.ld
- scripts/test-riscv32.ld
- scripts/test-riscv64.ld
- scripts/test-x86.ld
- scripts/test-x86_64.ld
  semihost/fstat.c
  semihost/isatty.c
  semihost/mapstdio.c
@@ -856,6 +848,14 @@ Files: cmake/TC-arm-none-eabi.ld
  test/try-ilp32.c
  test/try-ilp32.h
 Copyright: 2020 Keith Packard
+License: BSD3-1
+
+Files: dummyhost/exit.c
+ newlib/libc/tinystdio/getdelim.c
+ newlib/libc/tinystdio/swprintf.c
+ newlib/libc/tinystdio/vswprintf.c
+ test/test-raise.c
+Copyright: 2023 Keith Packard
 License: BSD3-1
 
 Files: dummyhost/iob.c
@@ -953,6 +953,7 @@ Files: dummyhost/iob.c
  newlib/libc/tinystdio/ftell.c
  newlib/libc/tinystdio/ftello.c
  newlib/libc/tinystdio/ftoa_data.c
+ newlib/libc/tinystdio/fwide.c
  newlib/libc/tinystdio/meson.build
  newlib/libc/tinystdio/posixiob.c
  newlib/libc/tinystdio/setbuf.c
@@ -1180,6 +1181,13 @@ License: BSD3-1
 Files: newlib/libc/machine/m68k/meson.build
  scripts/do-m68k-configure
 Copyright: 2020 Thomas Daede
+License: BSD3-1
+
+Files: newlib/libc/machine/microblaze/CMakeLists.txt
+ newlib/libc/machine/microblaze/meson.build
+ scripts/do-microblazeel-configure
+Copyright: 2023 Advanced Micro Devices, Inc. (AMD)
+ 2023 Alp Sayin
 License: BSD3-1
 
 Files: newlib/libc/machine/powerpc/meson.build
@@ -1796,6 +1804,8 @@ Files: newlib/libc/tinystdio/dtoa_data.c
  newlib/libc/tinystdio/vfiscanf.c
  newlib/libc/tinystdio/vfprintff.c
  newlib/libc/tinystdio/vfscanff.c
+ newlib/libc/tinystdio/vfwprintf.c
+ newlib/libc/tinystdio/vfwscanf.c
 Copyright: 2018, Keith Packard
 License: BSD3-13
 
@@ -1804,22 +1814,34 @@ Copyright: 2002,2005, 2007 Joerg Wunsch
 License: BSD3-13
 
 Files: newlib/libc/tinystdio/fgets.c
+ newlib/libc/tinystdio/fgetwc.c
+ newlib/libc/tinystdio/fgetws.c
  newlib/libc/tinystdio/fprintf.c
  newlib/libc/tinystdio/fputc.c
  newlib/libc/tinystdio/fputs.c
+ newlib/libc/tinystdio/fputwc.c
+ newlib/libc/tinystdio/fputws.c
  newlib/libc/tinystdio/fread.c
  newlib/libc/tinystdio/fscanf.c
+ newlib/libc/tinystdio/fwprintf.c
  newlib/libc/tinystdio/fwrite.c
+ newlib/libc/tinystdio/fwscanf.c
  newlib/libc/tinystdio/getchar.c
  newlib/libc/tinystdio/gets.c
+ newlib/libc/tinystdio/getwchar.c
  newlib/libc/tinystdio/printf.c
  newlib/libc/tinystdio/putchar.c
  newlib/libc/tinystdio/puts.c
+ newlib/libc/tinystdio/putwchar.c
  newlib/libc/tinystdio/scanf.c
  newlib/libc/tinystdio/snprintf.c
  newlib/libc/tinystdio/sprintf.c
  newlib/libc/tinystdio/sscanf.c
+ newlib/libc/tinystdio/swscanf.c
  newlib/libc/tinystdio/ungetc.c
+ newlib/libc/tinystdio/ungetwc.c
+ newlib/libc/tinystdio/wprintf.c
+ newlib/libc/tinystdio/wscanf.c
 Copyright: 2002, Joerg Wunsch
 License: BSD3-13
 
@@ -1859,6 +1881,9 @@ License: BSD3-13
 Files: newlib/libc/tinystdio/vprintf.c
  newlib/libc/tinystdio/vscanf.c
  newlib/libc/tinystdio/vsscanf.c
+ newlib/libc/tinystdio/vswscanf.c
+ newlib/libc/tinystdio/vwprintf.c
+ newlib/libc/tinystdio/vwscanf.c
 Copyright: 2005, Joerg Wunsch
 License: BSD3-13
 
@@ -2591,6 +2616,7 @@ Files: .clang-format
  .gitignore
  README.md
  cmake/TC-arm-none-eabi.cmake
+ cmake/TC-clang-arm-none-eabi.cmake
  cross.tmpl
  doc/build.md
  doc/embedsource.md
@@ -2646,8 +2672,6 @@ Files: .clang-format
  scripts/cross-arm-zephyr-eabi.txt
  scripts/cross-avr.txt
  scripts/cross-clang-msp430.txt
- scripts/cross-clang-old-riscv64-unknown-elf.txt
- scripts/cross-clang-old-rv32imafdc-unknown-elf.txt
  scripts/cross-clang-riscv64-unknown-elf.txt
  scripts/cross-clang-rv32imafdc-unknown-elf.txt
  scripts/cross-clang-thumbv6m-none-eabi.txt
@@ -2656,11 +2680,11 @@ Files: .clang-format
  scripts/cross-cortex-a9-none-eabi.txt
  scripts/cross-i686-linux-gnu.txt
  scripts/cross-m68k-linux-gnu.txt
+ scripts/cross-microblazeel-zephyr-elf.txt
  scripts/cross-mips-linux-gnu.txt
  scripts/cross-mipsel-linux-gnu.txt
  scripts/cross-msp430.txt
  scripts/cross-nios2-zephyr-elf.txt
- scripts/cross-old-clang-riscv64-unknown-elf.txt
  scripts/cross-power9-fp128.txt
  scripts/cross-power9.txt
  scripts/cross-powerpc64-linux-gnu.txt
@@ -2687,6 +2711,7 @@ Files: .clang-format
  test/complex-funcs.c
  test/long_double_gen.5c
  test/long_double_vec.h
+ test/test-atomic.c
  test/time-sprintf.c
 Copyright:
 License: Default-1
@@ -3691,7 +3716,6 @@ License: Other-15
 
 Files: newlib/libc/reent/reent.c
  newlib/libc/reent/reent.tex
- newlib/libc/signal/raise.c
  newlib/libc/signal/signal.c
  newlib/libc/signal/signal.tex
  newlib/libc/string/bcmp.c

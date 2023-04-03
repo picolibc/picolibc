@@ -29,6 +29,7 @@ HERE=`dirname "$0"`
 "$HERE"/do-test clang-rv32imafdc "$@"
 "$HERE"/do-zephyr-build arc "$@"
 "$HERE"/do-zephyr-build arc64 "$@"
+"$HERE"/do-zephyr-build microblazeel "$@"
 "$HERE"/do-zephyr-build nios2 "$@"
 "$HERE"/do-zephyr-build xtensa-espressif_esp32s2 "$@"
 "$HERE"/do-zephyr-build xtensa-espressif_esp32 "$@"

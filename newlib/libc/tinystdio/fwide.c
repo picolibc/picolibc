@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2020 Keith Packard
+ * Copyright © 2019 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,8 +32,13 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-__flash =      0x20010000;
-__flash_size = 0x00400000;
-__ram =        0x20410000;
-__ram_size   = 0x00200000;
-__stack_size = 4k;
+
+#include <stdio.h>
+
+int
+fwide(FILE *stream, int mode)
+{
+        if (mode != 0)
+                stream->flags = (stream->flags & ~__SWIDE) | ((mode > 0) ? __SWIDE : 0);
+        return (stream->flags & __SWIDE) ? 1 : -1;
+}

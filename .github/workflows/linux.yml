@@ -89,10 +89,11 @@ jobs:
 
           # Tinystdio configurations
           "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true",
-          "-Dformat-default=integer",
+          "-Dformat-default=integer -Dfreestanding=true",
 
           # Original stdio
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true",
+          "-Dtinystdio=false",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true -Dnewlib-fvwrite-in-streamio=true",
 
           # Locale, iconv, original malloc and original atexit/onexit configurations
           "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
@@ -139,10 +140,11 @@ jobs:
 
           # Tinystdio configurations
           "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true",
-          "-Dformat-default=integer",
+          "-Dformat-default=integer -Dfreestanding=true",
 
           # Original stdio
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true",
+          "-Dtinystdio=false",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true -Dnewlib-fvwrite-in-streamio=true",
 
           # Locale, iconv, original malloc and original atexit/onexit configurations
           "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
@@ -189,10 +191,11 @@ jobs:
 
           # Tinystdio configurations
           "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true",
-          "-Dformat-default=integer",
+          "-Dformat-default=integer -Dfreestanding=true",
 
           # Original stdio
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true",
+          "-Dtinystdio=false",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true -Dnewlib-fvwrite-in-streamio=true",
 
           # Locale, iconv, original malloc and original atexit/onexit configurations
           "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",

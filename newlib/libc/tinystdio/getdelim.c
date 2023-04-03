@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2020 Keith Packard
+ * Copyright © 2023 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,8 +32,46 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-__flash =      0x00100000;
-__flash_size = 0x00400000;
-__ram =        0x00500000;
-__ram_size   = 0x00200000;
-__stack_size = 4k;
+
+#define _DEFAULT_SOURCE
+#include <_ansi.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define INCR    16
+
+_ssize_t
+getdelim (char **restrict lineptr, size_t *restrict nptr,
+          int delim, FILE *restrict stream)
+{
+    char *line = *lineptr;
+    size_t n = *nptr;
+    _ssize_t count = 0;
+
+    for (;;) {
+        int c = getc(stream);
+        if (c == EOF)
+            break;
+
+        if (count >= (_ssize_t) n) {
+            size_t newsize = n + INCR;
+            char *newline = realloc(line, newsize);
+            if (newline == NULL) {
+                count = -1;
+                break;
+            }
+            line = newline;
+            n = newsize;
+        }
+
+        line[count++] = c;
+        if (c == delim) {
+            line[count] = '\0';
+            break;
+        }
+    }
+
+    *lineptr = line;
+    *nptr = n;
+    return count;
+}

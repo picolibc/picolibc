@@ -33,18 +33,46 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-cygwin_tests = ['UTF-8']
-
 tests = []
 
-foreach test : tests
-  src = test + '.c'
-  test(test,
-       executable(test, src,
-		  c_args: ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE'] + test_c_args,
-		  link_args: test_link_args,
-		  link_with: [lib_c, lib_semihost, lib_crt],
-		  include_directories: inc),
-       depends: bios_bin,
-       env: test_env)
+mb_tests = ['UTF-8']
+
+if newlib_mb
+  tests += mb_tests
+endif
+
+foreach target : targets
+  value = get_variable('target_' + target)
+
+  _libs = [get_variable('lib_c' + target)]
+  if is_variable('lib_semihost' + target)
+    _libs += [get_variable('lib_semihost' + target)]
+  endif
+  if is_variable('crt0_hosted' + target)
+    _objs = [get_variable('crt0_hosted'+ target)]
+  else
+    _objs = []
+  endif
+  
+  _c_args = value[1] + test_c_args
+  _link_args = value[1] + test_link_args
+
+  foreach test : tests
+    if target == ''
+      test_name = test
+    else
+      test_name = test + '_' + target
+    endif
+
+    src = test + '.c'
+    test(test_name,
+	 executable(test_name, src,
+		    c_args: ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE'] + _c_args,
+		    link_args: _link_args,
+		    objects: _objs,
+		    link_with: _libs,
+		    include_directories: inc),
+	 depends: bios_bin,
+	 env: test_env)
+  endforeach
 endforeach

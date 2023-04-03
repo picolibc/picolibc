@@ -113,6 +113,7 @@ char	*strcasestr (const char *, const char *);
 char 	*strchrnul (const char *, int);
 #endif
 #if __MISC_VISIBLE || __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE >= 4
+void	free (void *) _NOTHROW;
 char 	*strdup (const char *) __malloc_like __result_use_check;
 #endif
 #if __POSIX_VISIBLE >= 200809

@@ -44,11 +44,6 @@
 #define SCANF_STD 1
 #define SCANF_FLT 2
 
-/* This is OR'd into the char stored in unget to make it non-zero to
- * flag the unget buffer as being full
- */
-#define UNGETC_MARK	0x0100
-
 struct __file_str {
 	struct __file file;	/* main file struct */
         char	*pos;		/* current buffer position */
@@ -58,6 +53,9 @@ struct __file_str {
 
 int
 __file_str_get(FILE *stream);
+
+int
+__file_wstr_get(FILE *stream);
 
 int
 __file_str_put(char c, FILE *stream);
@@ -88,6 +86,15 @@ bool __matchcaseprefix(const char *input, const char *pattern);
 			.get = __file_str_get	\
 		},				\
 		.pos = (char *) (_s)		\
+	}
+
+#define FDEV_SETUP_WSTRING_READ(_s) {		\
+		.file = {			\
+			.flags = __SRD,		\
+			.get = __file_wstr_get	\
+		},				\
+                .pos = (char *) (_s),           \
+                .end = (char *) (_s)            \
 	}
 
 #define FDEV_SETUP_STRING_WRITE(_s, _size) {	\
@@ -478,8 +485,9 @@ static inline bool
 __atomic_compare_exchange_ungetc(__ungetc_t *p, __ungetc_t d, __ungetc_t v)
 {
 	_Atomic __ungetc_t *pa = (_Atomic __ungetc_t *) p;
-	return atomic_compare_exchange_weak(pa, &d, v);
+        return atomic_compare_exchange_strong(pa, &d, v);
 }
+
 static inline __ungetc_t
 __atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v)
 {
@@ -504,5 +512,86 @@ __atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v);
 #define __atomic_exchange_ungetc(p,v) __non_atomic_exchange_ungetc(p,v)
 
 #endif /* ATOMIC_UNGETC */
+
+#define CASE_CONVERT    ('a' - 'A')
+#define TOLOW(c)        ((c) | CASE_CONVERT)
+
+/*
+ * Convert a single character to the value of the digit for any
+ * character 0 .. 9, A .. Z or a .. z
+ *
+ * Characters out of these ranges will return a value above 36
+ *
+ * Work in unsigned int type to avoid extra instructions required for
+ * unsigned char folding. The only time this matters is when
+ * subtracting '0' from values below '0', which results in very large
+ * unsigned values.
+ */
+
+static inline unsigned int
+digit_to_val(unsigned int c)
+{
+    /*
+     * Convert letters with some tricky code.
+     *
+     * TOLOW(c-1) maps characters as follows (Skipping values not
+     * greater than '9' (0x39), as those are skipped by the 'if'):
+     *
+     * Minus 1, bitwise-OR ('a' - 'A') (0x20):
+     *
+     *             0x3a..0x40 -> 0x39..0x3f
+     * 0x41..0x60, 0x61..0x80 -> 0x60..0x7f
+     * 0x81..0xa0, 0xa1..0xc0 -> 0xa0..0xbf
+     * 0xc1..0xe0, 0xe1..0x00 -> 0xe0..0xff
+     *
+     * Plus '0' (0x30), minus 'a') (0x61), plus 11 (0xb), for
+     * a total of minus 0x26:
+     *
+     *             0x3a..0x40 -> 0x39..0x3f -> 0x13..0x19
+     * 0x41..0x60, 0x61..0x80 -> 0x60..0x7f -> 0x3a..0x59
+     * 0x81..0xa0, 0xa1..0xc0 -> 0xa0..0xbf -> 0x7a..0x99
+     * 0xc1..0xe0, 0xe1..0x00 -> 0xe0..0xff -> 0xba..0xd9
+     */
+
+    if (c > '9') {
+
+        /*
+         * For the letters, we want TOLOW(c) - 'a' + 10, but that
+         * would map both '@' and '`' to 9.
+         *
+         * To work around this, subtract 1 before the bitwise-or so
+         * that '@' (0x40) gets mapped down to 0x3f (0x3f | 0x20)
+         * while '`' (0x60) gets mapped up to 0x7f (0x5f | 0x20),
+         * moving them away from the letters (which end up in the
+         * range 0x60..0x79). Then add the 1 back in when subtracting
+         * 'a' and adding 10.
+         *
+         * Add in '0' so that it can get subtracted out in the common
+         * code (c -= '0') below, avoiding an else clause.
+         */
+
+        c = TOLOW(c-1) + ('0' - 'a' + 11);
+    }
+
+    /*
+     * Now, include the range from NUL (0x00) through '9' (0x39)
+     *
+     * Minus '0' (0x30):
+     *
+     * 0x00..0x2f                                         ->-0x30..-0x01
+     * 0x30..0x39                                         -> 0x00..0x09 *
+     *             0x3a..0x40 -> 0x39..0x3f -> 0x13..0x19 ->-0x1d..-0x17
+     * 0x41..0x60, 0x61..0x80 -> 0x60..0x7f -> 0x3a..0x59 -> 0x0a..0x29 *
+     * 0x81..0xa0, 0xa1..0xc0 -> 0xa0..0xbf -> 0x7a..0x99 -> 0x4a..0x69
+     * 0xc1..0xe0, 0xe1..0x00 -> 0xe0..0xff -> 0xba..0xd9 -> 0x8a..0xa9
+     *
+     * The first starred row has the digits '0'..'9', while the second
+     * starts with the letters 'A'..'Z' and 'a'..'z'. All of the other
+     * rows end up with values above any allowed conversion base
+     */
+
+    c -= '0';
+    return c;
+}
 
 #endif /* _STDIO_PRIVATE_H_ */

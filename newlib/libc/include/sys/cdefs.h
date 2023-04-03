@@ -262,6 +262,12 @@
 #define	__alignof(x)	__offsetof(struct { char __a; x __b; }, __b)
 #endif
 
+#if __GNUC_PREREQ__(4,5) || defined(__clang__)
+#define __picolibc_deprecated(m) __attribute__((__deprecated__(m)))
+#else
+#define __picolibc_deprecated(m) _ATTRIBUTE(__deprecated__)
+#endif
+
 /*
  * Keywords added in C11.
  */
@@ -352,12 +358,18 @@
 #endif
 
 #if __GNUC_PREREQ__(2, 96)
-#define	__malloc_like	__attribute__((__malloc__))
-#define	__pure		__attribute__((__pure__))
+# if __GNUC_PREREQ__(11, 0)
+#  define       __malloc_like_with_free(_f,_a) __attribute__((__malloc__, __malloc__(_f,_a)))
+# else
+#  define       __malloc_like_with_free(_f,_a) __attribute__((__malloc__))
+# endif
+# define	__pure		__attribute__((__pure__))
 #else
-#define	__malloc_like
+#define __malloc_like_with_free(free,free_arg)
 #define	__pure
 #endif
+
+#define	__malloc_like __malloc_like_with_free(free, 1)
 
 #ifndef __always_inline
 #if __GNUC_PREREQ__(3, 1)
@@ -530,11 +542,14 @@
 #define	__printf0like(fmtarg, firstvararg)
 #endif
 
-#if defined(__GNUC__)
 #if defined(_HAVE_ALIAS_ATTRIBUTE)
-#define __strong_reference_alias(n) #n
 #define	__strong_reference(sym,aliassym)	\
-    extern __typeof (sym) aliassym __attribute__ ((__alias__ (__strong_reference_alias(sym))))
+    extern __typeof (sym) aliassym __attribute__ ((__alias__ (__STRING(sym))))
+#endif
+
+#if defined(_HAVE_WEAK_ATTRIBUTE) && defined(_HAVE_ALIAS_ATTRIBUTE)
+#define	__weak_reference(sym,aliassym)	\
+    extern __typeof (sym) aliassym __attribute__ ((__weak__, __alias__ (__STRING(sym))))
 #endif
 
 /*
@@ -564,6 +579,8 @@
 #define __inhibit_new_builtin_calls
 #endif
 
+#if defined(__GNUC__)
+#ifndef __weak_reference
 #ifdef __ELF__
 #ifdef __STDC__
 #define	__weak_reference(sym,alias)	\
@@ -607,38 +624,8 @@
 	__asm__(".stabs \"_/**/sym\",1,0,0,0")
 #endif
 #endif
+#endif
 
-#if defined(__ELF__)
-#ifdef __STDC__
-#define	__warn_references(sym,msg)	\
-	__asm__(".section .gnu.warning." #sym);	\
-	__asm__(".asciz \"" msg "\"");	\
-	__asm__(".previous")
-#define	__sym_compat(sym,impl,verid)	\
-	__asm__(".symver " #impl ", " #sym "@" #verid)
-#define	__sym_default(sym,impl,verid)	\
-	__asm__(".symver " #impl ", " #sym "@@" #verid)
-#else
-#define	__warn_references(sym,msg)	\
-	__asm__(".section .gnu.warning.sym"); \
-	__asm__(".asciz \"msg\"");	\
-	__asm__(".previous")
-#define	__sym_compat(sym,impl,verid)	\
-	__asm__(".symver impl, sym@verid")
-#define	__sym_default(impl,sym,verid)	\
-	__asm__(".symver impl, sym@@verid")
-#endif	/* __STDC__ */
-#else	/* !__ELF__ */
-#ifdef __STDC__
-#define	__warn_references(sym,msg)	\
-	__asm__(".stabs \"" msg "\",30,0,0,0");		\
-	__asm__(".stabs \"_" #sym "\",1,0,0,0")
-#else
-#define	__warn_references(sym,msg)	\
-	__asm__(".stabs msg,30,0,0,0");			\
-	__asm__(".stabs \"_/**/sym\",1,0,0,0")
-#endif	/* __STDC__ */
-#endif	/* __ELF__ */
 #endif	/* __GNUC__ */
 
 #ifndef	__FBSDID

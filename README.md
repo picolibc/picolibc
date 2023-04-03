@@ -40,6 +40,7 @@ at this point only has code to build for the following targets:
  * ARC (32- and 64- bit)
  * ARM (32- and 64- bit)
  * i386 (Native and Linux hosted, for testing)
+ * Microblaze (32-bit, big and little endian)
  * Motorola 68000 (m68k)
  * MIPS
  * MSP430
@@ -57,25 +58,32 @@ Supporting architectures that already have Newlib code requires:
     setjmp/longjmp support as these cannot be performed in
     architecture independent code and are needed by libstdc++.
 
- 2. newlib/libm/machine/_architecture_/meson.build to build any
+ 2. Checking for atomic support for tinystdio. Tinystdio requires
+    atomics for ungetc to work correctly in a reentrant
+    environment. By default, it stores them in 16-bit values, but
+    some architectures only have 32-bit atomics. To avoid ABI
+    issues, the size selected isn't detected automatically, instead
+    it must be configured in newlib/libc/tinystdio/stdio.h.
+
+ 3. newlib/libm/machine/_architecture_/meson.build to build any
     architecture-specific libm bits
 
- 3. picocrt/machine/_architecture_ source code and build bits if you
+ 4. picocrt/machine/_architecture_ source code and build bits if you
     need custom startup code for the architecture. Useful in all
     cases, but this is necessary to run tests under qemu if your
     platform can do that.
 
- 4. cross-_gcc-triple_.txt to configure the meson cross-compilation
+ 5. cross-_gcc-triple_.txt to configure the meson cross-compilation
     mechanism to use the right tools
 
- 5. do-_architecture_-configure to make testing the cross-compilation
+ 6. do-_architecture_-configure to make testing the cross-compilation
     setup easier.
 
- 6. newlib/libc/picolib support. This should include whatever startup
+ 7. newlib/libc/picolib support. This should include whatever startup
     helpers are required (like ARM interrupt vector) and TLS support
     (if your compiler includes this).
 
- 7. run-_architecture_ script to run tests under QEMU. Look at the ARM
+ 8. run-_architecture_ script to run tests under QEMU. Look at the ARM
     and RISC-V examples to get a sense of what this needs to do and
     how it gets invoked from the cross-_gcc-triple_.txt configuration
     file.
@@ -128,6 +136,47 @@ use Picolibc:
  * [Copyright and license information](COPYING.picolibc)
 
 ## Releases
+
+### Picolibc version 1.8.1
+
+ * Fix cmake build system to auto-detect compiler characteristics
+   instead of assuming the compiler is a recent version of GCC. This
+   allows building using cmake with clang.
+
+ * Fix cmake build system to leave out TLS support when TLS is
+   disabled on the cmake command line.
+
+ * Replace inline asm with attributes for __weak_reference macro
+
+ * Add allocation attributes to malloc and stdio functions. This
+   allows the compiler to detect allocation related mistakes as well
+   as perform some additional optimizations. Bugs found by this change
+   were also addressed.
+
+ * Add wchar_t support to tinystdio, eliminating the last missing
+   feature compared with the legacy stdio bits from newlib. With this,
+   libstdc++ can be built with wide char I/O support, eliminating the
+   last missing feature there as well.
+
+ * Eliminate use of command line tools when building with a new enough
+   version of meson. Thanks to Michael Platings.
+
+ * Add Microblaze support. Thanks to Alp Sayin.
+
+ * Switch semihosting to use binary mode when opening files. Thanks to
+   Hardy Griech.
+
+ * Build and install static library versions of the crt0 startup
+   code. These allows developers to reference them as libraries on the
+   command line instead of needing special compiler support to locate
+   the different variants, which is useful when using clang. Thanks to
+   Simon Tatham.
+
+ * Simplify the signal/raise implementation to use a single global
+   array of signal handlers and to not use getpid and kill, instead
+   raise now directly invokes _exit. This makes using assert and abort
+   simpler and doesn't cause a large TLS block to be allocated. Thanks
+   to Joe Nelson for discovering the use of a TLS variable here.
 
 ### Picolibc version 1.8
 

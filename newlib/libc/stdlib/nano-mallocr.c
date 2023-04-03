@@ -38,6 +38,7 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <malloc.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <sys/config.h>
 #include <sys/lock.h>
@@ -152,8 +153,8 @@ bool __malloc_grow_chunk(chunk_t *c, size_t new_size);
  * call to free.
  */
 #ifdef _HAVE_ALIAS_ATTRIBUTE
-extern __typeof(free) __malloc_free;
-extern __typeof(malloc) __malloc_malloc;
+extern void __malloc_free(void *);
+extern void *__malloc_malloc(size_t);
 #else
 #define __malloc_free(x) free(x)
 #define __malloc_malloc(x) malloc(x)
