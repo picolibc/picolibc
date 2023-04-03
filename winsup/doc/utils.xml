@@ -89,10 +89,26 @@
 			content indexing service
   'e', 'Encrypted':     file is encrypted
   'C', 'Casesensitive': directory is handled case sensitive
-                        - local NTFS only
-                        - Windows 10 1803 or later: requires installed WSL
-                        - Windows 11: enabling requires empty dir
     </screen>
+    </refsect1>
+
+    <refsect1 id="chattr-Cprec">
+      <title>Case-sensitive directories</title>
+      <para>Case-sensitive directories are supported starting with
+        Windows 10 1803.  They are only supported on local NTFS filesystems.
+	</para>
+      <para>The system-wide availability of case-sensitive directories
+	depends on the setting of the registry value of type DWORD called
+	HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem\NtfsEnableDirCaseSensitivity.  The value 0 disables case-sensitive directories.
+	The value 1 enables case-sensitive directories.  The value 3
+	enables case-sensitive directories, too, with the additional
+	requirement that a directory can only be set to case-sensitive
+	if it's empty.  No other value is supported.</para>
+      <para>Removing case-sensitivity on a directory requires that the
+        directory does not contain files only differing by case.</para>
+      <para>Trying to access a case-sensitive directory on a remote NTFS leads
+	to all kinds of weird errors and is therefore
+	<emphasis>not</emphasis> recommended.</para>
     </refsect1>
   </refentry>
 
