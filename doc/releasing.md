@@ -25,6 +25,8 @@ picolibc:
 
     * Enable errno in the math functions using -Dwant-math-errno=true
 
+    * Enable long-double io for RISC-V compiles using -Dio-long-double=true
+
     * Build and install minsize and release builds, using
     --buildtype=release -Dbuild-type-subdir=release
 
