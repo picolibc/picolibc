@@ -206,9 +206,12 @@ w = floorl(y);
 /* Set iyflg to 1 if y is an integer.  */
 iyflg = (w == y);
 
-/* Test for odd integer y.  */
+/* flag = 1 if x is negative */
+nflg = signbit(x);
+
+/* Test for odd integer y and negative x (including negative zero)  */
 yoddint = 0;
-if( iyflg )
+if( iyflg && nflg )
 	{
         ya = ldexpl(y, -1);
         yoddint = (ya != floorl(ya));
@@ -216,7 +219,7 @@ if( iyflg )
 
 if( x == 0.0L) {
         if( y < 0 )
-                return __math_divzerol(__signbitl(x) && yoddint);
+                return __math_divzerol(yoddint);
 }
 
 if( isnanl(x) )
@@ -291,20 +294,19 @@ if( x <= -LDBL_MAX )
 	}
 
 
-nflg = 0;	/* flag = 1 if x<0 raised to integer power */
 if( x <= 0.0L )
 	{
 	if( x == 0.0L )
 		{
 		if( y < 0.0L )
 			{
-			if( signbit(x) && yoddint )
+                        if( yoddint )
 				return( -(long double)INFINITY );
 			return( (long double)INFINITY );
 			}
 		if( y > 0.0L )
 			{
-			if( signbit(x) && yoddint )
+			if( yoddint )
 				return( -0.0L );
 			return( 0.0L );
 			}
@@ -317,7 +319,6 @@ if( x <= 0.0L )
 		{
 		if( iyflg == 0 )
                         return __math_invalidl(x); /* (x<0)**(non-int) is NaN */
-		nflg = 1;
 		}
 	}
 
@@ -325,7 +326,6 @@ if( x <= 0.0L )
 
 if( iyflg )
 	{
-	i = w;
 	w = floorl(x);
 	if( (w == x) && (fabsl(y) < 32768.0L) )
 		{
@@ -416,10 +416,10 @@ w = ldexpl( Ga+Ha, LNXT );
 
 /* Test the power of 2 for overflow */
 if( w > MEXP )
-	return __math_oflowl(0);		/* overflow */
+	return __math_oflowl(yoddint);		/* overflow */
 
 if( w < MNEXP )
-	return __math_uflowl(0);	        /* underflow */
+	return __math_uflowl(yoddint);	        /* underflow */
 
 e = w;
 Hb = H - Ha;
