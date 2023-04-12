@@ -196,8 +196,8 @@ ivln2_l  =  1.92596299112661746887e-08; /* 0x3E54AE0B, 0xF85DDF44 =1/ln2 tail*/
         }
 
     /* |y| is huge */
-	if(iy>0x41e00000) { /* if |y| > 2**31 */
-	    if(iy>0x43f00000){	/* if |y| > 2**64, must o/uflow and y is an even integer */
+	if(iy>0x42000000) { /* if |y| > ~2**33 (does not regard mantissa) */
+	    if(iy>0x43f00000){	/* if |y| > ~2**64, must o/uflow and y is an even integer */
 		if(ix<=0x3fefffff) return (hy<0)? __math_oflow(0):__math_uflow(0);
 		if(ix>=0x3ff00000) return (hy>0)? __math_oflow(0):__math_uflow(0);
 	    }
