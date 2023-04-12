@@ -140,5 +140,9 @@
 /* If x is positive infinity, and y greater than 0, the result is positive infinity. */
 {64, 0,123,__LINE__, 0x7ff00000, 0x00000000, 0x7ff00000, 0x00000000, 0x40100000, 0x00000000 },   /* +inf=f(+inf, 4) */
 
+/* x is close to one and y is large */
+{64, 0,123,__LINE__, 0x792ffffe, 0x0bc9e399, 0x3ff00000, 0x2c5e2e99, 0x41ec9eee, 0x35374af6},
+{64, 0,123,__LINE__, 0x18bfffff, 0xec16bafd, 0x3fefffff, 0xd2e3e669, 0x41f344c9, 0x823eb66c},
+
 {0},};
 void test_pow_vec(int m)   {run_vector_1(m,pow_vec,(char *)(pow),"pow","ddd");   }
