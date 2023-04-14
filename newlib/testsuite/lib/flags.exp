@@ -4,6 +4,13 @@
 # is freely granted, provided that this notice is preserved.
 #
 
+if [info exists env(XGCC_FLAGS_FOR_TARGET)] {
+    verbose "GCC, newlib combined tree, build-tree testing; using standard search paths"
+    # ... instead of the search paths built here, based on 'objdir' as set in
+    # newlib's 'site.exp', which always points to the default multilib.
+    return
+}
+
 # flags.exp: overrides the dejagnu versions of libgloss_link_flags,
 # newlib_link_flags, and newlib_include_flags.
 
