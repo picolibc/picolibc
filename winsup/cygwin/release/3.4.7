@@ -9,3 +9,6 @@ Bug Fixes
 
 - Align behaviour of dirname in terms of leading slashes to POSIX:
   https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap04.html
+
+- Fix reading CONIN$ in non cygwin apps when stdin is not a pty.
+  Addresses https://cygwin.com/pipermail/cygwin/2023-April/253424.html

@@ -3222,6 +3222,11 @@ fhandler_pty_slave::setup_pseudoconsole ()
       return false;
     }
 
+  /* Set switch_to_nat_pipe regardless whether stdin is the pty or not
+     so that the non-cygwin app can work when it opens CONIN$. */
+  bool switch_to_nat_pipe_orig = get_ttyp ()->switch_to_nat_pipe;
+  get_ttyp ()->switch_to_nat_pipe = true;
+
   HANDLE hpConIn, hpConOut;
   if (get_ttyp ()->pcon_activated)
     { /* The pseudo console is already activated. */
@@ -3499,6 +3504,7 @@ cleanup_pseudo_console:
       CloseHandle (tmp);
     }
 fallback:
+  get_ttyp ()->switch_to_nat_pipe = switch_to_nat_pipe_orig;
   return false;
 }
 
