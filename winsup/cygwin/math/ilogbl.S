@@ -23,6 +23,8 @@ __MINGW_USYMBOL(ilogbl):
 	andb    %ah, %dh
 	cmpb    $0x05, %dh
 	je      1f		/* Is +-Inf, jump.  */
+	cmpb	$0x01, %dh
+	je      1f		/* Is +-Inf, jump.  */
 	cmpb	$0x40, %dh
 	je	2f		/* Is +-Inf, jump.  */
 
@@ -52,6 +54,8 @@ __MINGW_USYMBOL(ilogbl):
 	movb    $0x45, %dh
 	andb    %ah, %dh
 	cmpb    $0x05, %dh
+	je      1f		/* Is +-Inf, jump.  */
+	cmpb	$0x01, %dh
 	je      1f		/* Is +-Inf, jump.  */
 	cmpb	$0x40, %dh
 	je	2f		/* Is +-Inf, jump.  */
