@@ -123,7 +123,13 @@ struct __posix_spawn_file_actions {
 
 typedef struct __posix_spawn_file_actions_entry {
 	STAILQ_ENTRY(__posix_spawn_file_actions_entry) fae_list;
-	enum { FAE_OPEN, FAE_DUP2, FAE_CLOSE } fae_action;
+	enum {
+		FAE_OPEN,
+		FAE_DUP2,
+		FAE_CLOSE,
+		FAE_CHDIR,
+		FAE_FCHDIR
+	} fae_action;
 
 	int fae_fildes;
 	union {
@@ -139,6 +145,10 @@ typedef struct __posix_spawn_file_actions_entry {
 			int newfildes;
 #define fae_newfildes	fae_data.dup2.newfildes
 		} dup2;
+		char *dir;
+#define fae_dir		fae_data.dir
+		int dirfd;
+#define fae_dirfd		fae_data.dirfd
 	} fae_data;
 } posix_spawn_file_actions_entry_t;
 
@@ -235,7 +245,21 @@ process_file_actions_entry(posix_spawn_file_actions_entry_t *fae)
 		/* Perform a close(), do not fail if already closed */
 		(void)_close(fae->fae_fildes);
 		break;
+#ifdef HAVE_CHDIR
+	case FAE_CHDIR:
+		/* Perform a chdir. */
+		if (chdir (fae->fae_dir) == -1)
+			return (errno);
+		break;
+#endif
+#ifdef HAVE_FCHDIR
+	case FAE_FCHDIR:
+		/* Perform a chdir. */
+		if (fchdir (fae->fae_dirfd) == -1)
+			return (errno);
+		break;
 	}
+#endif
 	return (0);
 }
 
@@ -407,8 +431,18 @@ posix_spawn_file_actions_destroy (posix_spawn_file_actions_t *fa)
 		STAILQ_REMOVE_HEAD(&(*fa)->fa_list, fae_list);
 
 		/* Deallocate file action entry */
-		if (fae->fae_action == FAE_OPEN)
+		switch (fae->fae_action) {
+		case FAE_OPEN:
 			free(fae->fae_path);
+			break;
+#ifdef HAVE_CHDIR
+		case FAE_CHDIR:
+			free(fae->fae_dir);
+			break;
+#endif
+		default:
+			break;
+		}
 		free(fae);
 	}
 
@@ -495,6 +529,57 @@ posix_spawn_file_actions_addclose (posix_spawn_file_actions_t *fa,
 	STAILQ_INSERT_TAIL(&(*fa)->fa_list, fae, fae_list);
 	return (0);
 }
+
+#ifdef HAVE_CHDIR
+int
+posix_spawn_file_actions_addchdir_np (
+	posix_spawn_file_actions_t * __restrict fa,
+	const char * __restrict path)
+{
+	posix_spawn_file_actions_entry_t *fae;
+	int error;
+
+	/* Allocate object */
+	fae = malloc(sizeof(posix_spawn_file_actions_entry_t));
+	if (fae == NULL)
+		return (errno);
+
+	/* Set values and store in queue */
+	fae->fae_action = FAE_CHDIR;
+	fae->fae_dir = strdup(path);
+	if (fae->fae_dir == NULL) {
+		error = errno;
+		free(fae);
+		return (error);
+	}
+
+	STAILQ_INSERT_TAIL(&(*fa)->fa_list, fae, fae_list);
+	return (0);
+}
+#endif
+
+#ifdef HAVE_FCHDIR
+int
+posix_spawn_file_actions_addfchdir_np (
+	posix_spawn_file_actions_t * __restrict fa,
+	int fd)
+{
+	posix_spawn_file_actions_entry_t *fae;
+	int error;
+
+	/* Allocate object */
+	fae = malloc(sizeof(posix_spawn_file_actions_entry_t));
+	if (fae == NULL)
+		return (errno);
+
+	/* Set values and store in queue */
+	fae->fae_action = FAE_FCHDIR;
+	fae->fae_dirfd = fd;
+
+	STAILQ_INSERT_TAIL(&(*fa)->fa_list, fae, fae_list);
+	return (0);
+}
+#endif
 
 /*
  * Spawn attributes

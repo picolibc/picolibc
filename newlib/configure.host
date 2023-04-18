@@ -587,7 +587,7 @@ case "${host}" in
 	default_newlib_io_long_double="yes"
 	default_newlib_io_pos_args="yes"
 	CC="${CC} -I${cygwin_srcdir}/include"
-	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME -DGETREENT_PROVIDED -DSIGNAL_PROVIDED -DHAVE_BLKSIZE -DHAVE_FCNTL -DMALLOC_PROVIDED"
+	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME -DGETREENT_PROVIDED -DSIGNAL_PROVIDED -DHAVE_BLKSIZE -DHAVE_FCNTL -DMALLOC_PROVIDED -DHAVE_CHDIR -DHAVE_FCHDIR"
 	syscall_dir=syscalls
 	;;
 # RTEMS supplies its own versions of some routines:
