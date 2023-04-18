@@ -159,7 +159,8 @@ mbrtowi (wint_t *pwi, const char *s, size_t n, mbstate_t *ps)
   len = mbrtowc (&w1, s, n, ps);
   if (len == (size_t) -1 || len == (size_t) -2)
     return len;
-  *pwi = w1;
+  if (pwi)
+    *pwi = w1;
   /* Convert surrogate pair to wint_t value */
   if (len > 0 && w1 >= 0xd800 && w1 <= 0xdbff)
     {
@@ -169,7 +170,8 @@ mbrtowi (wint_t *pwi, const char *s, size_t n, mbstate_t *ps)
       if (len2 > 0 && w2 >= 0xdc00 && w2 <= 0xdfff)
 	{
 	  len += len2;
-	  *pwi = (((w1 & 0x3ff) << 10) | (w2 & 0x3ff)) + 0x10000;
+	  if (pwi)
+	    *pwi = (((w1 & 0x3ff) << 10) | (w2 & 0x3ff)) + 0x10000;
 	}
       else
 	{
