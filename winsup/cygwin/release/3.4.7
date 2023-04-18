@@ -12,3 +12,6 @@ Bug Fixes
 
 - Fix reading CONIN$ in non cygwin apps when stdin is not a pty.
   Addresses https://cygwin.com/pipermail/cygwin/2023-April/253424.html
+
+- Fix bug in cygheap allocation size computation after fork.  Addresses:
+  https://cygwin.com/pipermail/cygwin-developers/2023-April/012620.html
