@@ -21,3 +21,7 @@ Bug Fixes
 
 - Fix error handling in readlinkat.
   Addresses: https://cygwin.com/pipermail/cygwin/2023-April/253510.html
+
+- Fix return code and errno set by renameat2, if oldfile and newfile
+  refer to the same file, and the RENAME_NOREPLACE flag is set.
+  Addresses: https://cygwin.com/pipermail/cygwin/2023-April/253514.html
