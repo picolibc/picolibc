@@ -87,7 +87,8 @@ cygheap_fixup_in_child (bool execed)
   SIZE_T commit_size = CYGHEAP_STORAGE_INITIAL - CYGHEAP_STORAGE_LOW;
 
   if (child_proc_info->cygheap_max > (void *) CYGHEAP_STORAGE_INITIAL)
-    commit_size = allocsize (child_proc_info->cygheap_max);
+    commit_size = allocsize ((char *) child_proc_info->cygheap_max
+                   - CYGHEAP_STORAGE_LOW);
   cygheap = (init_cygheap *) VirtualAlloc ((LPVOID) CYGHEAP_STORAGE_LOW,
 					   CYGHEAP_STORAGE_HIGH
 					   - CYGHEAP_STORAGE_LOW,
