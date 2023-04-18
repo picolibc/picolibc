@@ -4415,19 +4415,6 @@ gen_full_path_at (char *path_ret, int dirfd, const char *pathname,
       set_errno (EFAULT);
       return -1;
     }
-  if (pathname)
-    {
-      if (!*pathname)
-	{
-	  set_errno (ENOENT);
-	  return -1;
-	}
-      if (strlen (pathname) >= PATH_MAX)
-	{
-	  set_errno (ENAMETOOLONG);
-	  return -1;
-	}
-    }
   if (pathname && isabspath_strict (pathname))
     stpcpy (path_ret, pathname);
   else
@@ -4459,6 +4446,16 @@ gen_full_path_at (char *path_ret, int dirfd, const char *pathname,
 	}
       if (pathname)
 	{
+	  if (!*pathname)
+	    {
+	      set_errno (ENOENT);
+	      return -1;
+	    }
+	  if (strlen (pathname) >= PATH_MAX)
+	    {
+	      set_errno (ENAMETOOLONG);
+	      return -1;
+	    }
 	  if (p[-1] != '/')
 	    *p++ = '/';
 	  stpcpy (p, pathname);
@@ -4803,21 +4800,26 @@ readlinkat (int dirfd, const char *__restrict pathname, char *__restrict buf,
   __try
     {
       char *path = tp.c_get ();
+      int save_errno = errno;
       int res = gen_full_path_at (path, dirfd, pathname);
       if (res)
 	{
-	  if (errno != ENOENT)
+	  if (errno != ENOENT && errno != ENOTDIR)
 	    __leave;
 	  /* pathname is an empty string.  This is OK if dirfd refers
 	     to a symlink that was opened with O_PATH | O_NOFOLLOW.
-	     In this case, readlinkat operates on the symlink. */
+	     In this case, readlinkat operates on the symlink.
+	     Don't propagate errors from gen_full_path_at after this point. */
+	  errno = save_errno;
 	  cygheap_fdget cfd (dirfd);
-	  if (cfd < 0)
-	    __leave;
-	  if (!(cfd->issymlink ()
+	  if (cfd < 0
+	      || (!(cfd->issymlink ()
 		&& cfd->get_flags () & O_PATH
-		&& cfd->get_flags () & O_NOFOLLOW))
-	    __leave;
+		&& cfd->get_flags () & O_NOFOLLOW)))
+	    {
+	      set_errno (ENOENT);
+	      __leave;
+	    }
 	  strcpy (path, cfd->get_name ());
 	}
       return readlink (path, buf, bufsize);
