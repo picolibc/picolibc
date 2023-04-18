@@ -23,3 +23,6 @@ What's new:
   other process could do.
 
 - Add support for GB18030 codeset.
+
+- New API calls: posix_spawn_file_actions_addchdir_np,
+  posix_spawn_file_actions_addfchdir_np.
