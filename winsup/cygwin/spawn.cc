@@ -1392,8 +1392,7 @@ __posix_spawn_execvpe (const char *path, char * const *argv, char *const *envp,
   ch_spawn.set_sem (sem);
   ch_spawn.worker (use_env_path ? (find_exec (path, buf, "PATH", FE_NNF) ?: "")
 				: path,
-		   argv, envp,
-		   _P_OVERLAY | (use_env_path ? _P_PATH_TYPE_EXEC : 0));
+		   argv, envp, _P_OVERLAY);
   __posix_spawn_sem_release (sem, errno);
   return -1;
 }
