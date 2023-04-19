@@ -565,7 +565,12 @@ posix_spawn_file_actions_addfchdir_np (
 	int fd)
 {
 	posix_spawn_file_actions_entry_t *fae;
-	int error;
+
+	/* POSIX proposal documents it as implemented in FreeBSD and Musl.
+	   Return EBADF if fd is negative.
+	   https://www.austingroupbugs.net/view.php?id=1208 */
+	if (fd < 0)
+		return EBADF;
 
 	/* Allocate object */
 	fae = malloc(sizeof(posix_spawn_file_actions_entry_t));
