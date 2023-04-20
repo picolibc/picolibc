@@ -36,10 +36,12 @@ picolibc_sources(
   asprintf.c
   bufio.c
   clearerr.c
+  compare_exchange.c
   ecvt_r.c
   ecvt.c
   ecvtf_r.c
   ecvtf.c
+  exchange.c
   fcvt.c
   fcvt_r.c
   fcvtf.c
