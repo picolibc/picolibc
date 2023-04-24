@@ -39,6 +39,18 @@ details. */
 
 #define has_modifier(x)	((x)[0] && !strcmp (modifier, (x)))
 
+/* Check for @cjk* modifier.  Try to be as fast as possible */
+#define __is_cjk_modifier(_in, _cmp, _L) ({ \
+	_in[1] == 'c' \
+	&& _in[2] == 'j' \
+	&& _in[3] == 'k'\
+	&& (_cmp (_in + 4, _L##"narrow") == 0 \
+	    || _cmp (_in + 4, _L##"wide") == 0 \
+	    || _cmp (_in + 4, _L##"single") == 0); \
+})
+#define is_cjk_modifier(_in)	__is_cjk_modifier(_in, strcmp, )
+#define w_is_cjk_modifier(_in)	__is_cjk_modifier(_in, wcscmp, L)
+
 /* ResolveLocaleName does not what we want.  It converts anything which
    vaguely resembles a locale into some other locale it supports.  Bad
    examples are: "en-XY" gets converted to "en-US", and worse, "ff-BF" gets
@@ -532,9 +544,8 @@ __set_lc_time_from_win (const char *name,
 	{
 	  *c = '\0';
 	  char *c2 = strchr (c + 1, '@');
-	  /* Ignore @cjknarrow modifier since it's a very personal thing between
-	     Cygwin and newlib... */
-	  if (c2 && strcmp (c2, "@cjknarrow"))
+	  /* Ignore @cjk* modifiers, they are newlib specials. */
+	  if (c2 && !is_cjk_modifier (c2))
 	    memmove (c, c2, strlen (c2) + 1);
 	}
       /* Now search in the alphabetically order lc_era array for the
@@ -1075,9 +1086,8 @@ __set_lc_messages_from_win (const char *name,
 	{
 	  *c = '\0';
 	  c2 = strchr (c + 1, '@');
-	  /* Ignore @cjknarrow modifier since it's a very personal thing between
-	     Cygwin and newlib... */
-	  if (c2 && strcmp (c2, "@cjknarrow"))
+	  /* Ignore @cjk* modifiers, they are newlib specials. */
+	  if (c2 && !is_cjk_modifier (c2))
 	    memmove (c, c2, strlen (c2) + 1);
 	}
       /* Now search in the alphabetically order lc_msg array for the
@@ -1537,11 +1547,9 @@ __set_charset_from_locale (const char *loc, char *charset)
   modifier = strchr (loc, '@');
   if ((c = strchr (locale, '.')))
     stpcpy (c, modifier ?: "");
-  /* Cut out @cjknarrow/@cjkwide modifier, both are newlib specials and
-    don't affect the codeset. */
+  /* Ignore @cjk* modifiers, they are newlib specials. */
   modifier = strchr (locale, '@');
-  if (modifier && (!strcmp (modifier + 1, "cjknarrow")
-		   || !strcmp (modifier + 1, "cjkwide")))
+  if (modifier && is_cjk_modifier (modifier))
     *modifier = '\0';
 
   default_codeset_t srch_dc = { locale, NULL };
@@ -1702,9 +1710,9 @@ __set_locale_from_locale_alias (const char *locale, char *new_locale)
   if (mbstowcs (wlocale, locale, ENCODING_LEN + 1) == (size_t) -1)
     sys_mbstowcs (wlocale, ENCODING_LEN + 1, locale);
   wlocale[ENCODING_LEN] = L'\0';
-  /* Ignore @cjknarrow modifier since it's a very personal thing between
-     Cygwin and newlib... */
-  if ((wc = wcschr (wlocale, L'@')) && !wcscmp (wc + 1, L"cjknarrow"))
+  /* Ignore @cjk* modifiers, they are newlib specials. */
+  wc = wcschr (wlocale, L'@');
+  if (wc && w_is_cjk_modifier (wc))
     *wc = L'\0';
   while (fgets (alias_buf, LOCALE_ALIAS_LINE_LEN + 1, fp))
     {
