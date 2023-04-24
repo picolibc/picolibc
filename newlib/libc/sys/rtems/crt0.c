@@ -230,3 +230,7 @@ int __EH_FRAME_BEGIN__;
  */
 const char* __stack ;
 #endif
+
+#if defined(__m68k__)
+RTEMS_STUB(void, __m68k_read_tp(void), { })
+#endif
