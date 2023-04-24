@@ -37,8 +37,6 @@ details. */
 #define charfromwchar(category,in) \
 	    __charfromwchar (_##category##_locale->in,_LC(category),f_wctomb)
 
-#define has_modifier(x)	((x)[0] && !strcmp (modifier, (x)))
-
 /* Check for @cjk* modifier.  Try to be as fast as possible */
 #define __is_cjk_modifier(_in, _cmp, _L) ({ \
 	_in[1] == 'c' \
