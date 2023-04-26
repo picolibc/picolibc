@@ -812,7 +812,7 @@ extern _Thread_local int _tls_cvtlen;
 #define _REENT_CVTLEN(_ptr) (_tls_cvtlen)
 extern _Thread_local void (*_tls_cleanup)(struct _reent *);
 #define _REENT_CLEANUP(_ptr) (_tls_cleanup)
-extern _Thread_local char _tls_emergency;
+extern _Thread_local char _tls_emergency[_REENT_EMERGENCY_SIZE];
 #define _REENT_EMERGENCY(_ptr) (_tls_emergency)
 extern _Thread_local int _tls_errno;
 #define _REENT_ERRNO(_ptr) (_tls_errno)

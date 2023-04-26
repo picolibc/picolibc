@@ -84,7 +84,7 @@ The global pointer <<environ>> is also required.
 
 #ifdef _REENT_THREAD_LOCAL
 _Thread_local int _tls_inc;
-_Thread_local char _tls_emergency;
+_Thread_local char _tls_emergency[_REENT_EMERGENCY_SIZE];
 #endif
 
 /* Try to open the file specified, if it can't be opened then try
