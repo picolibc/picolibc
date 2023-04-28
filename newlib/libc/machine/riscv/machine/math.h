@@ -102,20 +102,14 @@
 
 #if __riscv_flen >= 64
 
+#if __ISO_C_VISIBLE >= 1999
+
 /* Double-precision functions */
 __declare_riscv_macro(double)
 copysign(double x, double y)
 {
 	double result;
 	__asm__("fsgnj.d\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
-	return result;
-}
-
-__declare_riscv_macro(double)
-fabs(double x)
-{
-	double result;
-	__asm__("fabs.d\t%0, %1" : "=f"(result) : "f"(x));
 	return result;
 }
 
@@ -172,6 +166,24 @@ __fpclassifyd (double x)
 }
 
 __declare_riscv_macro(double)
+fma (double x, double y, double z)
+{
+	double result;
+	__asm__ volatile("fmadd.d %0, %1, %2, %3" : "=f" (result) : "f" (x), "f" (y), "f" (z));
+	return result;
+}
+
+#endif /* __ISO_C_VISIBLE >= 1999 */
+
+__declare_riscv_macro(double)
+fabs(double x)
+{
+	double result;
+	__asm__("fabs.d\t%0, %1" : "=f"(result) : "f"(x));
+	return result;
+}
+
+__declare_riscv_macro(double)
 sqrt (double x)
 {
 	double result;
@@ -183,17 +195,9 @@ sqrt (double x)
 	return result;
 }
 
-__declare_riscv_macro(double)
-fma (double x, double y, double z)
-{
-	double result;
-	__asm__ volatile("fmadd.d %0, %1, %2, %3" : "=f" (result) : "f" (x), "f" (y), "f" (z));
-	return result;
-}
-
 #endif /* __riscv_flen >= 64 */
 
-#if __riscv_flen >= 32
+#if __riscv_flen >= 32 && __ISO_C_VISIBLE >= 1999
 
 /* Single-precision functions */
 __declare_riscv_macro(float)
@@ -284,7 +288,7 @@ fmaf (float x, float y, float z)
 	return result;
 }
 
-#endif /* __riscv_flen >= 32 */
+#endif /* __riscv_flen >= 32 && __ISO_C_VISIBLE >= 1999 */
 
 #endif /* defined(__GNUC_GNU_INLINE__) || defined(__GNUC_STDC_INLINE__) */
 
