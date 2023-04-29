@@ -518,10 +518,12 @@ enum
   FILE_RENAME_IGNORE_READONLY_ATTRIBUTE			= 0x40
 };
 
+#if (__MINGW64_VERSION_MAJOR < 11)
 enum
 {
   FILE_CS_FLAG_CASE_SENSITIVE_DIR			= 0x01
 };
+#endif
 
 enum
 {
