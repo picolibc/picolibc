@@ -88,7 +88,7 @@ int	 strcoll_l (const char *, const char *, locale_t);
 char	*strerror_l (int, locale_t);
 size_t	 strxfrm_l (char *__restrict, const char *__restrict, size_t, locale_t);
 #endif
-#if __MISC_VISIBLE || __POSIX_VISIBLE
+#if __MISC_VISIBLE || __POSIX_VISIBLE || __ZEPHYR_VISIBLE
 char 	*strtok_r (char *__restrict, const char *__restrict, char **__restrict);
 #endif
 #if __BSD_VISIBLE
@@ -146,7 +146,7 @@ char *	_strerror_r (int, int, int *);
 size_t	strlcat (char *, const char *, size_t);
 size_t	strlcpy (char *, const char *, size_t);
 #endif
-#if __POSIX_VISIBLE >= 200809
+#if __POSIX_VISIBLE >= 200809 || __ZEPHYR_VISIBLE
 size_t	 strnlen (const char *, size_t);
 #endif
 #if __BSD_VISIBLE
