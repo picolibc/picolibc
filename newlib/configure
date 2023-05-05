@@ -633,6 +633,8 @@ HAS_NDS32_FPU_SP_FALSE
 HAS_NDS32_FPU_SP_TRUE
 MACH_ADD_SETJMP_FALSE
 MACH_ADD_SETJMP_TRUE
+HAVE_FPMATH_H_FALSE
+HAVE_FPMATH_H_TRUE
 HAVE_LIBC_MACHINE_Z8K_FALSE
 HAVE_LIBC_MACHINE_Z8K_TRUE
 HAVE_LIBC_MACHINE_XSTORMY16_FALSE
@@ -6123,6 +6125,16 @@ else
 fi
 
 
+ if test -r "${srcdir}/libc/machine/${machine_dir}/machine/_fpmath.h"; then
+  HAVE_FPMATH_H_TRUE=
+  HAVE_FPMATH_H_FALSE='#'
+else
+  HAVE_FPMATH_H_TRUE='#'
+  HAVE_FPMATH_H_FALSE=
+fi
+
+
+
  if test "x$mach_add_setjmp" = "xtrue"; then
   MACH_ADD_SETJMP_TRUE=
   MACH_ADD_SETJMP_FALSE='#'
@@ -7867,6 +7879,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_LIBC_MACHINE_Z8K_TRUE}" && test -z "${HAVE_LIBC_MACHINE_Z8K_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_Z8K\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_FPMATH_H_TRUE}" && test -z "${HAVE_FPMATH_H_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_FPMATH_H\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${MACH_ADD_SETJMP_TRUE}" && test -z "${MACH_ADD_SETJMP_FALSE}"; then
