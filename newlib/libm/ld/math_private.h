@@ -21,6 +21,23 @@
 #include <machine/endian.h>
 
 /*
+ * __double_t and __float_t are defined elsewhere in
+ * freebsd and used to define double_t and float_t.
+ * Newlib has already went through the process of
+ * defining double_t and float_t so we should be able
+ * to use them to define __double_t and __float_t for
+ * this file.
+ */
+typedef double_t          __double_t;
+typedef float_t           __float_t;
+
+/*
+ * Necessary to disable Protection Enabled specific
+ * Free-bsd source.
+ */
+#define NO_FPSETPREC
+
+/*
  * The original fdlibm code used statements like:
  *	n0 = ((*(int*)&one)>>29)^1;		* index of high word *
  *	ix0 = *(n0+(int*)&x);			* high word of x *
@@ -644,7 +661,7 @@ rnintl(long double x)
  * return type provided their arg is a floating point integer.  They can
  * sometimes be more efficient because no rounding is required.
  */
-#if defined(amd64) || defined(__i386__)
+#if defined(amd64) || (defined(__i386__) && (!defined _SOFT_FLOAT))
 #define	irint(x)						\
     (sizeof(x) == sizeof(float) &&				\
     sizeof(__float_t) == sizeof(long double) ? irintf(x) :	\
@@ -677,7 +694,7 @@ irintd(double x)
 }
 #endif
 
-#if defined(__amd64__) || defined(__i386__)
+#if defined(__amd64__) || (defined(__i386__) && (!defined _SOFT_FLOAT))
 static __inline int
 irintl(long double x)
 {

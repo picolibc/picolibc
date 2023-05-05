@@ -36,9 +36,9 @@ __FBSDID("$FreeBSD$");
 #include <ieeefp.h>
 #endif
 
-#include "fpmath.h"
+#include "../ld/fpmath.h"
 #include "math.h"
-#include "math_private.h"
+#include "../ld/math_private.h"
 
 #define	TBLBITS	7
 #define	TBLSIZE	(1 << TBLBITS)

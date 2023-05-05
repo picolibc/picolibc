@@ -20,9 +20,9 @@ __FBSDID("$FreeBSD$");
  */
 #include <float.h>
 
-#include "fpmath.h"
+#include "../ld/fpmath.h"
 #include "math.h"
-#include "math_private.h"
+#include "../ld/math_private.h"
 
 /* XXX Prevent compilers from erroneously constant folding these: */
 static const volatile long double tiny = 0x1p-10000L;

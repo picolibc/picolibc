@@ -16,6 +16,7 @@ __FBSDID("$FreeBSD$");
 #include <float.h>
 #include <limits.h>
 #include <math.h>
+#include <stdint.h>
 
 #include "fpmath.h"
 
@@ -23,7 +24,7 @@ long double
 logbl(long double x)
 {
 	union IEEEl2bits u;
-	unsigned long m;
+	uint64_t m;
 	int b;
 
 	u.e = x;
@@ -34,11 +35,11 @@ logbl(long double x)
 		}
 		/* denormalized */
 		if (u.bits.manh == 0) {
-			m = 1lu << (LDBL_MANL_SIZE - 1);
+			m = 1llu << (LDBL_MANL_SIZE - 1);
 			for (b = LDBL_MANH_SIZE; !(u.bits.manl & m); m >>= 1)
 				b++;
 		} else {
-			m = 1lu << (LDBL_MANH_SIZE - 1);
+			m = 1llu << (LDBL_MANH_SIZE - 1);
 			for (b = 0; !(u.bits.manh & m); m >>= 1)
 				b++;
 		}

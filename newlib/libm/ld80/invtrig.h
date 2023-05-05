@@ -30,7 +30,7 @@
 
 #include <float.h>
 
-#include "fpmath.h"
+#include "../ld/fpmath.h"
 
 #define	BIAS		(LDBL_MAX_EXP - 1)
 #define	MANH_SIZE	LDBL_MANH_SIZE

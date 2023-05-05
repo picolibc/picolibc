@@ -33,9 +33,9 @@
 #endif
 #include <stdint.h>
 
-#include "fpmath.h"
+#include "../ld/fpmath.h"
 #include "math.h"
-#include "math_private.h"
+#include "../ld/math_private.h"
 
 static const double
 pi_hi = 3.1415926814079285e+00,	/* 0x400921fb 0x58000000 */

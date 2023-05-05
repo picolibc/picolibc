@@ -19,9 +19,9 @@ __FBSDID("$FreeBSD$");
  * Converted to long double by Steven G. Kargl.
  */
 
-#include "fpmath.h"
+#include "../ld/fpmath.h"
 #include "math.h"
-#include "math_private.h"
+#include "../ld/math_private.h"
 
 static const volatile double vzero = 0;
 

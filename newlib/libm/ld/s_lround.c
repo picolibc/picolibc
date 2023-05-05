@@ -27,7 +27,7 @@
  */
 
 #include <sys/cdefs.h>
-#include <sys/limits.h>
+#include <limits.h>
 #include <fenv.h>
 #include <math.h>
 

@@ -19,7 +19,7 @@ __FBSDID("$FreeBSD$");
 
 #include <math.h>
 
-#include "math_private.h"
+#include "../ld/math_private.h"
 
 /*
  * Polynomial evaluator:
@@ -122,7 +122,7 @@ __FBSDID("$FreeBSD$");
 #include <float.h>
 #include <math.h>
 
-#include "math_private.h"
+#include "../ld/math_private.h"
 
 /* Table size */
 #define NXT 32

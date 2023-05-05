@@ -16,6 +16,8 @@ __FBSDID("$FreeBSD$");
 #include "math.h"
 #include "math_private.h"
 
+long double lgammal_r(long double x, int *signp);
+
 extern int signgam;
 
 long double

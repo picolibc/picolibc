@@ -32,7 +32,7 @@ __FBSDID("$FreeBSD$");
 #include <float.h>
 #include <stdint.h>
 
-#include "fpmath.h"
+#include "../ld/fpmath.h"
 #include "math.h"
 
 #define	TBLBITS	7

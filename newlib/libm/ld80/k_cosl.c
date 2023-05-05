@@ -17,8 +17,8 @@ __FBSDID("$FreeBSD$");
 /*
  * ld80 version of k_cos.c.  See ../src/k_cos.c for most comments.
  */
-
-#include "math_private.h"
+#include <math.h>
+#include "../ld/math_private.h"
 
 /*
  * Domain [-0.7854, 0.7854], range ~[-2.43e-23, 2.425e-23]:

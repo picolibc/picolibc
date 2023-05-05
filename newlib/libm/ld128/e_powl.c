@@ -65,7 +65,7 @@ __FBSDID("$FreeBSD$");
 #include <float.h>
 #include <math.h>
 
-#include "math_private.h"
+#include "../ld/math_private.h"
 
 static const long double bp[] = {
   1.0L,

@@ -35,8 +35,8 @@
  * bsdrc/b_exp.c converted to long double by Steven G. Kargl.
  */
 
-#include "fpmath.h"
-#include "math_private.h"
+#include "../ld/fpmath.h"
+#include "../ld/math_private.h"
 
 static const union IEEEl2bits
     p0u = LD80C(0xaaaaaaaaaaaaaaab,    -3,  1.66666666666666666671e-01L),

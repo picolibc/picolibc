@@ -34,6 +34,12 @@ __FBSDID("$FreeBSD$");
 #define	NMAX	65536
 #define	NMIN	-65536
 
+/*
+ * scalbln and scalblnf are defined elsewhere in
+ * newlib.  Ignore the freebsd versions and only compile
+ * scalblnl.
+ */
+#if 0
 double
 scalbln(double x, long n)
 {
@@ -47,6 +53,7 @@ scalblnf(float x, long n)
 
 	return (scalbnf(x, (n > NMAX) ? NMAX : (n < NMIN) ? NMIN : (int)n));
 }
+#endif
 
 long double
 scalblnl(long double x, long n)

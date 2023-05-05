@@ -17,8 +17,8 @@ __FBSDID("$FreeBSD$");
 /*
  * ld80 version of k_sin.c.  See ../src/k_sin.c for most comments.
  */
-
-#include "math_private.h"
+#include <math.h>
+#include "../ld/math_private.h"
 
 static const double
 half =  0.5;

@@ -85,13 +85,13 @@ __FBSDID("$FreeBSD$");
 #include <ieeefp.h>
 #endif
 
-#include "fpmath.h"
+#include "../ld/fpmath.h"
 #include "math.h"
 #define	i386_SSE_GOOD
 #ifndef NO_STRUCT_RETURN
 #define	STRUCT_RETURN
 #endif
-#include "math_private.h"
+#include "../ld/math_private.h"
 
 #if !defined(NO_UTAB) && !defined(NO_UTABL)
 #define	USE_UTAB

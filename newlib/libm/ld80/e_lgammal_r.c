@@ -23,9 +23,9 @@ __FBSDID("$FreeBSD$");
 #include <ieeefp.h>
 #endif
 
-#include "fpmath.h"
+#include "../ld/fpmath.h"
 #include "math.h"
-#include "math_private.h"
+#include "../ld/math_private.h"
 
 static const volatile double vzero = 0;
 

@@ -33,7 +33,7 @@
 #define _FPMATH_H_
 
 #include <sys/endian.h>
-#include "_fpmath.h"
+#include "machine/_fpmath.h"  /* changed to machine for newlib */
 
 #ifndef _IEEE_WORD_ORDER
 #define	_IEEE_WORD_ORDER	_BYTE_ORDER

@@ -25,7 +25,7 @@ __FBSDID("$FreeBSD$");
 #include <float.h>
 
 #include "math.h"
-#include "math_private.h"
+#include "../ld/math_private.h"
 #include "../ld/fpmath.h"
 
 #define	BIAS	(LDBL_MAX_EXP - 1)

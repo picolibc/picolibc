@@ -27,19 +27,25 @@
  * $FreeBSD$
  */
 
+/*
+ * Change unsigned int/long used by FreeBSD to fixed width types because
+ * ilp32 has a different size for unsigned long. --joel (20 Aug 2022)
+ */
+#include <stdint.h>
+
 union IEEEl2bits {
 	long double	e;
 	struct {
-		unsigned long	manl	:64;
-		unsigned long	manh	:48;
-		unsigned int	exp	:15;
-		unsigned int	sign	:1;
+		uint64_t	manl	:64;
+		uint64_t	manh	:48;
+		uint32_t	exp	:15;
+		uint32_t	sign	:1;
 	} bits;
 	/* TODO andrew: Check the packing here */
 	struct {
-		unsigned long	manl	:64;
-		unsigned long	manh	:48;
-		unsigned int	expsign	:16;
+		uint64_t	manl	:64;
+		uint64_t	manh	:48;
+		uint32_t	expsign	:16;
 	} xbits;
 };
 

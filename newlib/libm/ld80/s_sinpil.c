@@ -33,9 +33,9 @@
 #endif
 #include <stdint.h>
 
-#include "fpmath.h"
+#include "../ld/fpmath.h"
 #include "math.h"
-#include "math_private.h"
+#include "../ld/math_private.h"
 
 static const union IEEEl2bits
 pi_hi_u = LD80C(0xc90fdaa200000000,   1, 3.14159265346825122833e+00L),

@@ -62,4 +62,7 @@ m4_foreach_w([MACHINE], [
   z8k
 ], [AM_CONDITIONAL([HAVE_LIBC_MACHINE_]m4_toupper(MACHINE), test "${machine_dir}" = MACHINE)])
 
+AM_CONDITIONAL(HAVE_FPMATH_H, test -r "${srcdir}/libc/machine/${machine_dir}/machine/_fpmath.h")
+
+
 AM_CONDITIONAL(MACH_ADD_SETJMP, test "x$mach_add_setjmp" = "xtrue")

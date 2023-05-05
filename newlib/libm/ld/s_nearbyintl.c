@@ -56,6 +56,13 @@ fn(type x)			\
 	return (ret);		\
 }
 
+/*
+ * nearbyint and nearbyintf are defined elsewhere in
+ * newlib.  Ignore the freebsd versions and only compile
+ * nearbyintl.
+ */
+#if 0
 DECL(double, nearbyint, rint)
 DECL(float, nearbyintf, rintf)
+#endif
 DECL(long double, nearbyintl, rintl)

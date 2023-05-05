@@ -55,9 +55,12 @@
 #include <ieeefp.h>
 #endif
 
-#include "fpmath.h"
+#include "../ld/fpmath.h"
 #include "math.h"
-#include "math_private.h"
+#include "../ld/math_private.h"
+
+long double sinpil(long double x);
+long double cospil(long double x);
 
 /* Used in b_log.c and below. */
 struct Double {

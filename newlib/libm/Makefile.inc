@@ -44,12 +44,18 @@ else
 include %D%/math/Makefile.inc
 endif
 include %D%/common/Makefile.inc
+
+if HAVE_FPMATH_H
+include %D%/ld/Makefile.inc
+endif # HAVE_FPMATH_H
+
 include %D%/complex/Makefile.inc
 include %D%/fenv/Makefile.inc
 include %D%/test/Makefile.inc
 
 if HAVE_LIBM_MACHINE_AARCH64
 include %D%/machine/aarch64/Makefile.inc
+include %D%/ld128/Makefile.inc
 endif
 if HAVE_LIBM_MACHINE_AMDGCN
 include %D%/machine/amdgcn/Makefile.inc
@@ -59,6 +65,7 @@ include %D%/machine/arm/Makefile.inc
 endif
 if HAVE_LIBM_MACHINE_I386
 include %D%/machine/i386/Makefile.inc
+include %D%/ld80/Makefile.inc
 endif
 if HAVE_LIBM_MACHINE_MIPS
 include %D%/machine/mips/Makefile.inc
@@ -83,6 +90,7 @@ include %D%/machine/riscv/Makefile.inc
 endif
 if HAVE_LIBM_MACHINE_X86_64
 include %D%/machine/x86_64/Makefile.inc
+include %D%/ld80/Makefile.inc
 endif
 
 CLEANFILES += \

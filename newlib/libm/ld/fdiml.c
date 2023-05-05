@@ -43,6 +43,13 @@ fn(type x, type y)			\
 	return (x > y ? x - y : 0.0);	\
 }
 
+/*
+ * fdim and fdimf are defined elsewhere in
+ * newlib.  Ignore the freebsd versions and only compile
+ * fdiml.
+ */
+#if 0
 DECL(double, fdim)
 DECL(float, fdimf)
+#endif
 DECL(long double, fdiml)
