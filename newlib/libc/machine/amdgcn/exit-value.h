@@ -21,13 +21,19 @@ exit_with_int (int val)
 {
   /* Write the exit value to the conventional place.  */
   int *return_value;
-  __asm__("s_load_dwordx2	%0, s[8:9], 16 glc\n\t"
+#if defined(__has_builtin) && __has_builtin(__builtin_gcn_kernarg_ptr)
+  __asm__ ("s_load_dwordx2	%0, %1, 16 glc\n\t"
+       "s_waitcnt	0"
+       : "=Sg"(return_value) : "r"(__builtin_gcn_kernarg_ptr()));
+#else
+  __asm__ ("s_load_dwordx2	%0, s[8:9], 16 glc\n\t"
        "s_waitcnt	0" : "=Sg"(return_value));
+#endif
   *return_value = val;
 
   /* Terminate the current kernel.  */
-  __asm__("s_dcache_wb");
-  __asm__("s_endpgm");
+  __asm__ ("s_dcache_wb");
+  __asm__ ("s_endpgm");
   __builtin_unreachable ();
 }
 

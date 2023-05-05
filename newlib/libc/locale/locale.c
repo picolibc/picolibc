@@ -42,10 +42,10 @@ but uses the UTF-8 charset.
 
 The following charsets are recognized:
 <<"UTF-8">>, <<"JIS">>, <<"EUCJP">>, <<"SJIS">>, <<"KOI8-R">>, <<"KOI8-U">>,
-<<"GEORGIAN-PS">>, <<"PT154">>, <<"TIS-620">>, <<"ISO-8859-x">> with
-1 <= x <= 16, or <<"CPxxx">> with xxx in [437, 720, 737, 775, 850, 852, 855,
-857, 858, 862, 866, 874, 932, 1125, 1250, 1251, 1252, 1253, 1254, 1255, 1256,
-1257, 1258].
+<<"KOI8-T">>, <<"GEORGIAN-PS">>, <<"PT154">>, <<"TIS-620">>, <<"ISO-8859-x">>
+with 1 <= x <= 16, or <<"CPxxx">> with xxx in [437, 720, 737, 775, 850, 852,
+855, 857, 858, 862, 866, 874, 932, 1125, 1250, 1251, 1252, 1253, 1254, 1255,
+1256, 1257, 1258].
 
 Charsets are case insensitive.  For instance, <<"EUCJP">> and <<"eucJP">>
 are equivalent.  Charset names with dashes can also be written without
@@ -57,8 +57,8 @@ build with multibyte support and support for all ISO and Windows Codepage.
 Otherwise all singlebyte charsets are simply mapped to ASCII.  Right now,
 only newlib for Cygwin is built with full charset support by default.
 Under Cygwin, this implementation additionally supports the charsets
-<<"GBK">>, <<"GB2312">>, <<"eucCN">>, <<"eucKR">>, and <<"Big5">>.  Cygwin
-does not support <<"JIS">>.
+<<"GB18030">>, <<"GBK">>, <<"GB2312">>, <<"eucCN">>, <<"eucKR">>, and
+<<"Big5">>.  Cygwin does not support <<"JIS">>.
 
 Cygwin additionally supports locales from the file
 /usr/share/locale/locale.alias.
@@ -260,10 +260,11 @@ struct __locale_t __global_locale =
     { NULL, NULL },			/* LC_ALL */
 #ifdef __CYGWIN__
     { &_C_collate_locale, NULL },	/* LC_COLLATE */
+    { &_C_utf8_ctype_locale, NULL },	/* LC_CTYPE */
 #else
     { NULL, NULL },			/* LC_COLLATE */
-#endif
     { &_C_ctype_locale, NULL },		/* LC_CTYPE */
+#endif
     { &_C_monetary_locale, NULL },	/* LC_MONETARY */
     { &_C_numeric_locale, NULL },	/* LC_NUMERIC */
     { &_C_time_locale, NULL },		/* LC_TIME */
@@ -276,7 +277,8 @@ struct __locale_t __global_locale =
 /* Renamed from current_locale_string to make clear this is only the
    *global* string for setlocale (LC_ALL, NULL).  There's no equivalent
    functionality for uselocale. */
-static char global_locale_string[_LC_LAST * (ENCODING_LEN + 1/*"/"*/ + 1)];
+static char global_locale_string[_LC_LAST * (ENCODING_LEN + 1/*"/"*/ + 1)]
+	    = "C";
 static char *currentlocale (void);
 
 #endif /* _MB_CAPABLE */
@@ -300,6 +302,7 @@ setlocale (
   static char saved_categories[_LC_LAST][ENCODING_LEN + 1];
   int i, j, len, saverr;
   const char *env, *r;
+  char *ret;
 
   if (category < LC_ALL || category >= _LC_LAST)
     {
@@ -309,7 +312,7 @@ setlocale (
 
   if (locale == NULL)
     return category != LC_ALL ? __get_global_locale ()->categories[category]
-			      : currentlocale();
+			      : global_locale_string;
 
   /*
    * Default to the current locale for everything.
@@ -403,8 +406,12 @@ setlocale (
     }
 
   if (category != LC_ALL)
-    return __loadlocale (__get_global_locale (), category,
-			 new_categories[category]);
+    {
+      ret = __loadlocale (__get_global_locale (), category,
+			  new_categories[category]);
+      currentlocale ();
+      return ret;
+    }
 
   for (i = 1; i < _LC_LAST; ++i)
     {
@@ -640,7 +647,7 @@ restart:
 	}
 #ifdef __CYGWIN__
       /* Newlib does neither provide EUC-KR nor EUC-CN, and Cygwin's
-      	 implementation requires Windows support. */
+	 implementation requires Windows support. */
       else if (!strcasecmp (c, "KR"))
 	{
 	  strcpy (charset, "EUCKR");
@@ -752,7 +759,7 @@ restart:
     break;
     case 'K':
     case 'k':
-      /* KOI8-R, KOI8-U and the aliases without dash */
+      /* KOI8-R, KOI8-U, KOI8-T and the aliases without dash */
       if (strncasecmp (charset, "KOI8", 4))
 	FAIL;
       c = charset + 4;
@@ -767,6 +774,11 @@ restart:
 	{
 	  val = 21866;
 	  strcpy (charset, "CP21866");
+	}
+      else if (*c == 'T' || *c == 't')
+	{
+	  val = 103;
+	  strcpy (charset, "CP103");
 	}
       else
 	FAIL;
@@ -795,11 +807,18 @@ restart:
 	 requires Windows support. */
       if (!strcasecmp (charset, "GBK")
 	  || !strcasecmp (charset, "GB2312"))
-      	{
+	{
 	  strcpy (charset, charset[2] == '2' ? "GB2312" : "GBK");
 	  mbc_max = 2;
 	  l_wctomb = __gbk_wctomb;
 	  l_mbtowc = __gbk_mbtowc;
+	}
+      else if (!strcasecmp (charset, "GB18030"))
+	{
+	  strcpy (charset, "GB18030");
+	  mbc_max = 4;
+	  l_wctomb = __gb18030_wctomb;
+	  l_mbtowc = __gb18030_mbtowc;
 	}
       else
 #endif /* __CYGWIN__ */

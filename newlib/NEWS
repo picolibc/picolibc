@@ -3,7 +3,17 @@
 - remove i?86-pc-linux-gnu support
 - remove decstation & sunos support
 - remove phoenix OS support
+- remove unused members from struct _reent (see also --enable-newlib-reent-binary-compat)
 - build system internals heavily rewritten & updated
+- make arm jmp_buf size and alignment ABI-conformant
+- fixed bug in arm setjmp/longjmp to preserve floating-point register values
+- add --enable-newlib-reent-thread-local configuration option
+- add --enable-newlib-reent-binary-compat configuration option
+- add 64-bit powerpc setjmp/longjmp support
+- use global stdio streams for all configurations
+- use global atexit data for all configurations
+- vectorized math routines added for amdgcn platform
+- nvptx: remove newlib ELIX level 1 restriction
 
 *** Major changes in newlib version 4.2.0:
 

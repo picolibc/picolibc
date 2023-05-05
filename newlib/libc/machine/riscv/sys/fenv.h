@@ -14,7 +14,8 @@
 
 #include <stddef.h>
 
-#ifdef __riscv_flen
+#if __riscv_flen
+
 /* Per "The RISC-V Instruction Set Manual: Volume I: User-Level ISA:
  * Version 2.1", Section 8.2, "Floating-Point Control and Status
  * Register":

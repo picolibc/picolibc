@@ -13,6 +13,7 @@
  * they apply.
  */
 
+#include <unistd.h>
 #include <stdlib.h>
 
 /* Sadly, PTX doesn't support weak declarations, only weak
@@ -23,10 +24,18 @@
 int *__attribute((weak)) __exitval_ptr;
 
 void __attribute__((noreturn))
-exit (int status)
+_exit (int status)
 {
   if (__exitval_ptr)
-    *__exitval_ptr = status;
-  for (;;)
-    __asm__("exit;" ::: "memory");
+    {
+      *__exitval_ptr = status;
+      for (;;)
+	asm ("exit;" ::: "memory");
+    }
+  else /* offloading */
+    {
+      /* Map to 'abort'; see <https://gcc.gnu.org/PR85463>
+	 '[nvptx] "exit" in offloaded region doesn't terminate process'.  */
+      abort ();
+    }
 }

@@ -29,10 +29,14 @@
 /* Tiny version of strcmp in ARM state.  Used only when optimizing
    for size.  Also supports Thumb-2.  */
 
+#include "arm_asm.h"
+
 	.syntax unified
 def_fn strcmp
+	.fnstart
 	.cfi_sections .debug_frame
 	.cfi_startproc
+	prologue
 1:
 	ldrb	r2, [r0], #1
 	ldrb	r3, [r1], #1
@@ -42,6 +46,8 @@ def_fn strcmp
 	beq	1b
 2:
 	subs	r0, r2, r3
-	bx	lr
+	epilogue
 	.cfi_endproc
+	.cantunwind
+	.fnend
 	.size	strcmp, . - strcmp

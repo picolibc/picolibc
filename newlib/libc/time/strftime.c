@@ -161,6 +161,10 @@ the current locale. [tm_hour]
 o %P
 Same as '<<%p>>', but in lowercase.  This is a GNU extension. [tm_hour]
 
+o %q
+Quarter of the year (from `<<1>>' to `<<4>>'), with January starting
+the first quarter. This is a GNU extension. [tm_mon]
+
 o %r
 Replaced by the time in a.m. and p.m. notation.  In the "C" locale this
 is equivalent to "%I:%M:%S %p".  In locales which don't define a.m./p.m.
@@ -197,6 +201,10 @@ o %V
 The week number, where weeks start on Monday, week 1 contains January 4th,
 and earlier days are in the previous year.  Formatted with two digits
 (from `<<01>>' to `<<53>>').  See also <<%G>>. [tm_year, tm_wday, tm_yday]
+
+o %v
+A string representing the BSD/OSX/Ruby VMS/Oracle date format, in the form
+"%e-%b-%Y". Non-POSIX extension. [tm_mday, tm_mon, tm_year]
 
 o %w
 The weekday as a number, 0-based from Sunday (from `<<0>>' to `<<6>>').
@@ -235,9 +243,9 @@ savings offset for the current timezone. The offset is determined from
 the TZ environment variable, as if by calling tzset(). [tm_isdst]
 
 o %Z
-The time zone name.  If tm_isdst is negative, no output is generated.
-Otherwise, the time zone name is based on the TZ environment variable,
-as if by calling tzset(). [tm_isdst]
+The current time zone abbreviation. If tm_isdst is negative, no output
+is generated. Otherwise, the time zone abbreviation is based on the TZ
+environment variable, as if by calling tzset(). [tm_isdst]
 
 o %%
 A single character, `<<%>>'.
@@ -1088,6 +1096,11 @@ recurse:
 		return 0;
 	    }
 	  break;
+	case CQ('q'):	/* GNU quarter year */
+	  len = t_snprintf (&s[count], maxsize - count, CQ("%.1d"),
+			  tim_p->tm_mon / 3 + 1);
+	  CHECK_LENGTH ();
+	  break;
 	case CQ('R'):
           len = t_snprintf (&s[count], maxsize - count, CQ("%.2d:%.2d"),
 			  tim_p->tm_hour, tim_p->tm_min);
@@ -1243,6 +1256,37 @@ recurse:
             CHECK_LENGTH ();
 	  }
           break;
+	case CQ('v'):	/* BSD/OSX/Ruby extension VMS/Oracle date format
+			   from Arnold Robbins strftime version 3.0 */
+	  { /* %v is equivalent to "%e-%b-%Y", flags and width can change year
+	       format. Recurse to avoid need to replicate %b and %Y formation. */
+	    CHAR fmtbuf[32], *fmt = fmtbuf;
+	    STRCPY (fmt, CQ("%e-%b-%"));
+	    fmt += STRLEN (fmt);
+	    if (pad) /* '0' or '+' */
+	      *fmt++ = pad;
+	    else
+	      *fmt++ = '+';
+	    if (!pad)
+	      width = 10;
+	    if (width < 6)
+	      width = 6;
+	    width -= 6;
+	    if (width)
+	      {
+		len = t_snprintf (fmt, fmtbuf + 32 - fmt, CQ("%lu"), width);
+		if (len > 0)
+		  fmt += len;
+	      }
+	    STRCPY (fmt, CQ("Y"));
+	    len = __strftime (&s[count], maxsize - count, fmtbuf, tim_p,
+			      locale, era_info, alt_digits);
+	    if (len > 0)
+	      count += len;
+	    else
+	      return 0;
+	  }
+	  break;
 	case CQ('w'):
 #ifdef _WANT_C99_TIME_FORMATS
 	  if (alt == CQ('O') && *alt_digits)
@@ -1533,6 +1577,7 @@ const struct test  Vec0[] = {
 	{ CQ("%M"), 2+1, EXP(CQ("53")) },
 	{ CQ("%n"), 1+1, EXP(CQ("\n")) },
 	{ CQ("%p"), 2+1, EXP(CQ("AM")) },
+	{ CQ("%q"), 1+1, EXP(CQ("4")) },
 	{ CQ("%r"), 11+1, EXP(CQ("09:53:47 AM")) },
 	{ CQ("%R"), 5+1, EXP(CQ("09:53")) },
 	{ CQ("%s"), 2+1, EXP(CQ("1230648827")) },
@@ -1542,6 +1587,7 @@ const struct test  Vec0[] = {
 	{ CQ("%u"), 1+1, EXP(CQ("2")) },
 	{ CQ("%U"), 2+1, EXP(CQ("52")) },
 	{ CQ("%V"), 2+1, EXP(CQ("01")) },
+	{ CQ("%v"), 11+1, EXP(CQ("30-Dec-2008")) },
 	{ CQ("%w"), 1+1, EXP(CQ("2")) },
 	{ CQ("%W"), 2+1, EXP(CQ("52")) },
 	{ CQ("%x"), 8+1, EXP(CQ("12/30/08")) },
@@ -1594,6 +1640,7 @@ const struct test  Vec1[] = {
 	{ CQ("%M"), 2+1, EXP(CQ("01")) },
 	{ CQ("%n"), 1+1, EXP(CQ("\n")) },
 	{ CQ("%p"), 2+1, EXP(CQ("PM")) },
+	{ CQ("%q"), 1+1, EXP(CQ("3")) },
 	{ CQ("%r"), 11+1, EXP(CQ("11:01:13 PM")) },
 	{ CQ("%R"), 5+1, EXP(CQ("23:01")) },
 	{ CQ("%s"), 2+1, EXP(CQ("1215054073")) },
@@ -1603,6 +1650,7 @@ const struct test  Vec1[] = {
 	{ CQ("%u"), 1+1, EXP(CQ("3")) },
 	{ CQ("%U"), 2+1, EXP(CQ("26")) },
 	{ CQ("%V"), 2+1, EXP(CQ("27")) },
+	{ CQ("%v"), 11+1, EXP(CQ(" 2-Jul-2008")) },
 	{ CQ("%w"), 1+1, EXP(CQ("3")) },
 	{ CQ("%W"), 2+1, EXP(CQ("26")) },
 	{ CQ("%x"), 8+1, EXP(CQ("07/02/08")) },
@@ -1664,6 +1712,7 @@ const struct test  Vecyr0[] = {
 	{ CQ("%c"), OUTSIZE, EXP(CQ("Wed Jul  2 23:01:13 ")YEAR) },
 	{ CQ("%D"), OUTSIZE, EXP(CQ("07/02/")Year) },
 	{ CQ("%F"), OUTSIZE, EXP(YEAR CQ("-07-02")) },
+	{ CQ("%v"), OUTSIZE, EXP(CQ(" 2-Jul-")YEAR) },
 	{ CQ("%x"), OUTSIZE, EXP(CQ("07/02/")Year) },
 	{ CQ("%y"), OUTSIZE, EXP(Year) },
 	{ CQ("%Y"), OUTSIZE, EXP(YEAR) },
@@ -1710,6 +1759,7 @@ const struct test  Vecyr1[] = {
 	{ CQ("%c"), OUTSIZE, EXP(CQ("Wed Jul  2 23:01:13 ")YEAR) },
 	{ CQ("%D"), OUTSIZE, EXP(CQ("07/02/")Year) },
 	{ CQ("%F"), OUTSIZE, EXP(YEAR CQ("-07-02")) },
+	{ CQ("%v"), OUTSIZE, EXP(CQ(" 2-Jul-")YEAR) },
 	{ CQ("%x"), OUTSIZE, EXP(CQ("07/02/")Year) },
 	{ CQ("%y"), OUTSIZE, EXP(Year) },
 	{ CQ("%Y"), OUTSIZE, EXP(YEAR) },
@@ -1747,6 +1797,7 @@ const struct test  Vecyrzp[] = {
 	{ CQ("%c"), OUTSIZE, EXP(CQ("Wed Jul  2 23:01:60 ")YEAR) },
 	{ CQ("%D"), OUTSIZE, EXP(CQ("07/02/")Year) },
 	{ CQ("%F"), OUTSIZE, EXP(YEAR CQ("-07-02")) },
+	{ CQ("%v"), OUTSIZE, EXP(CQ(" 2-Jul-")YEAR) },
 	{ CQ("%x"), OUTSIZE, EXP(CQ("07/02/")Year) },
 	{ CQ("%y"), OUTSIZE, EXP(Year) },
 	{ CQ("%Y"), OUTSIZE, EXP(YEAR) },
@@ -1782,6 +1833,7 @@ const struct test  Vecyrzn[] = {
 	{ CQ("%c"), OUTSIZE, EXP(CQ("Wed Jul  2 23:01:00 ")YEAR) },
 	{ CQ("%D"), OUTSIZE, EXP(CQ("07/02/")Year) },
 	{ CQ("%F"), OUTSIZE, EXP(YEAR CQ("-07-02")) },
+	{ CQ("%v"), OUTSIZE, EXP(CQ(" 2-Jul-")YEAR) },
 	{ CQ("%x"), OUTSIZE, EXP(CQ("07/02/")Year) },
 	{ CQ("%y"), OUTSIZE, EXP(Year) },
 	{ CQ("%Y"), OUTSIZE, EXP(YEAR) },

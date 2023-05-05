@@ -27,7 +27,7 @@
 /* The structure of the following #if #else #endif conditional chain
    must match the chain in memcpy.S.  */
 
-#include "acle-compat.h"
+#include "machine/acle-compat.h"
 
 #if (defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED))
 #define MEMCPY_FALLBACK

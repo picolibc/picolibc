@@ -42,6 +42,20 @@ const struct lc_ctype_T _C_ctype_locale = {
 };
 
 #ifdef __CYGWIN__
+static char	numsix[] = { '\6', '\0'};
+
+const struct lc_ctype_T _C_utf8_ctype_locale = {
+	"UTF-8",			/* codeset */
+	numsix				/* mb_cur_max */
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+	,
+	{ "0", "1", "2", "3", "4",	/* outdigits */
+	  "5", "6", "7", "8", "9" },
+	{ L"0", L"1", L"2", L"3", L"4",	/* woutdigits */
+	  L"5", L"6", L"7", L"8", L"9" }
+#endif
+};
+
 /* NULL locale indicates global locale (called from setlocale) */
 int
 __ctype_load_locale (struct __locale_t *locale, const char *name,

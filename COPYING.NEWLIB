@@ -727,7 +727,9 @@ SUCH DAMAGE.
 
 (35) - Arm Ltd
 
- Copyright (c) 2009-2018 Arm Ltd
+ SPDX-License-Identifier: BSD-3-Clause
+
+ Copyright (c) 2009-2022 Arm Ltd
  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
