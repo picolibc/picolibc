@@ -15,6 +15,7 @@
 	%D%/w_scalb.c %D%/w_sinh.c %D%/w_sqrt.c \
 	%D%/w_sincos.c \
 	%D%/w_drem.c \
+	%D%/signgam.c \
 	%D%/s_asinh.c %D%/s_atan.c %D%/s_ceil.c \
 	%D%/s_cos.c %D%/s_erf.c %D%/s_fabs.c %D%/s_floor.c \
 	%D%/s_frexp.c %D%/s_ldexp.c \

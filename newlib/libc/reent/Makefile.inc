@@ -14,7 +14,6 @@ libc_a_SOURCES += \
 	%D%/readr.c \
 	%D%/renamer.c \
 	%D%/signalr.c \
-	%D%/signgam.c \
 	%D%/sbrkr.c \
 	%D%/statr.c \
 	%D%/timesr.c \
