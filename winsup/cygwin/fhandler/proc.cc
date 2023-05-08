@@ -1384,8 +1384,8 @@ format_proc_cpuinfo (void *, char *&destbuf)
 
 	  ftcprint (features2,  0, "perfmon_v2"); /* Performance Monitoring Version 2 */
 	}
-      /* cpuid 0x80000008 ebx */
-      if (maxe >= 0x80000008)
+      /* AMD cpuid 0x80000008 ebx */
+      if (is_amd && maxe >= 0x80000008)
         {
 /*	  cpuid (&unused, &features1, &unused, &unused, 0x80000008, 0); */
 /*	  from above ^ */
@@ -1395,16 +1395,19 @@ format_proc_cpuinfo (void *, char *&destbuf)
 /*	  ftcprint (features1,  4, "rdpru");	*//* user level rd proc reg */
 /*	  ftcprint (features1,  6, "mba");	*//* memory BW alloc */
 /*	  ftcprint (features1,  9, "wbnoinvd"); *//* wbnoinvd instruction */
-	  ftcprint (features1, 14, "ibrs");	/* ind br restricted spec */
 	  ftcprint (features1, 12, "ibpb");	/* ind br pred barrier */
+	  ftcprint (features1, 14, "ibrs");	/* ind br restricted spec */
 	  ftcprint (features1, 15, "stibp");	/* 1 thread ind br pred */
-	  ftcprint (features1, 16, "ibrs_enhanced"); /* IBRS_ALL enhanced IBRS always on */
+	  ftcprint (features1, 16, "ibrs_enhanced"); /* ibrs_enhanced IBRS always on */
 /*	  ftcprint (features1, 17, "stibp_always_on"); */ /* stibp always on */
-/*	  ftcprint (features1, 18, "ibrs_pref");*//* IBRS_PREF IBRS preferred */
+/*	  ftcprint (features1, 18, "ibrs_pref");*//* ibrs_pref IBRS preferred */
 /*	  ftcprint (features1, 23, "amd_ppin"); *//* protected proc id no */
 /*	  ftcprint (features1, 24, "ssbd");	*//* spec store byp dis */
 /*	  ftcprint (features1, 25, "virt_ssbd");*//* vir spec store byp dis */
 /*	  ftcprint (features1, 26, "ssb_no");	*//* ssb fixed in hardware */
+/*	  ftcprint (features1, 27, "cppc");	*//* collab proc perf ctl */
+/*	  ftcprint (features1, 28, "amd_psfd"); *//* predictive store fwd dis */
+/*	  ftcprint (features1, 31, "brs");	*//* branch sampling */
         }
 
       /* cpuid 0x00000021 ebx|edx|ecx == "IntelTDX    " */
@@ -1483,6 +1486,14 @@ format_proc_cpuinfo (void *, char *&destbuf)
 
 /*	  ftcprint (features1,  6, "split_lock_detect");*//* MSR_TEST_CTRL split lock */
 
+      /* cpuid 0x00000007 ecx & Windows [20]20H1/[20]2004+ */
+      if (maxf >= 0x00000007 && wincap.osname () >= "10.0"
+					 && wincap.build_number () >= 19041)
+        {
+	  cpuid (&unused, &unused, &features1, &unused, 0x00000007, 0);
+	  ftcprint (features1,  7, "user_shstk");	/* "user shadow stack" */
+	}
+
       /* cpuid 0x00000007:1 eax */
       if (maxf >= 0x00000007)
 	{
@@ -1491,6 +1502,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  ftcprint (features1,  4, "avx_vnni");	    /* vex enc NN vec */
 	  ftcprint (features1,  5, "avx512_bf16");  /* vec bfloat16 short */
 /*	  ftcprint (features1,  7, "cmpccxadd"); */ /* CMPccXADD instructions */
+/*	  ftcprint (features1, 18, "lkgs");	 */ /* load kernel (userspace) GS */
 /*	  ftcprint (features1, 21, "amx_fp16");	 */ /* AMX fp16 Support */
 /*	  ftcprint (features1, 23, "avx_ifma");	 */ /* Support for VPMADD52[H,L]UQ */
 	  ftcprint (features1, 26, "lam");	    /* Linear Address Masking */
@@ -1510,14 +1522,15 @@ format_proc_cpuinfo (void *, char *&destbuf)
 /*	  ftcprint (features1, 12, "ibpb" ); */	    /* ind br pred barrier */
 /*	  ftcprint (features1, 14, "ibrs" ); */	    /* ind br restricted spec */
 /*	  ftcprint (features1, 15, "stibp"); */	    /* 1 thread ind br pred */
-/*	  ftcprint (features1, 16, "ibrs_enhanced");*//* IBRS_ALL enhanced IBRS always on */
+/*	  ftcprint (features1, 16, "ibrs_enhanced"); */  /* ibrs_enhanced IBRS always on */
 /*	  ftcprint (features1, 17, "stibp_always_on"); */ /* stibp always on */
-/*	  ftcprint (features1, 18, "ibrs_pref");*//* IBRS_PREF IBRS preferred */
+/*	  ftcprint (features1, 18, "ibrs_pref"); */ /* ibrs_pref IBRS preferred */
 	  ftcprint (features1, 23, "amd_ppin");     /* protected proc id no */
 /*	  ftcprint (features1, 24, "ssbd"); */	    /* spec store byp dis */
 	  ftcprint (features1, 25, "virt_ssbd");    /* vir spec store byp dis */
 /*	  ftcprint (features1, 26, "ssb_no"); */    /* ssb fixed in hardware */
 	  ftcprint (features1, 27, "cppc");	    /* collab proc perf ctl */
+/*	  ftcprint (features1, 28, "amd_psfd"); */  /* predictive store fwd dis */
 	  ftcprint (features1, 31, "brs");	    /* branch sampling */
         }
 
@@ -1558,6 +1571,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  ftcprint (features1, 15, "v_vmsave_vmload");  /* virt vmsave vmload */
 	  ftcprint (features1, 16, "vgif");             /* virt glb int flag */
 	  ftcprint (features1, 20, "v_spec_ctrl");	/* virt spec ctrl support */
+	  ftcprint (features1, 25, "vnmi");             /* virt NMI */
 /*	  ftcprint (features1, 28, "svme_addr_chk");  *//* secure vmexit addr check */
         }
 
@@ -1572,6 +1586,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  ftcprint (features1,  4, "ospke");            /* OS prot keys en */
 	  ftcprint (features1,  5, "waitpkg");          /* umon/umwait/tpause */
 	  ftcprint (features1,  6, "avx512_vbmi2");     /* vec bit manip 2 */
+/*	  ftcprint (features1,  7, "shstk"); */		/* Shadow stack */
 	  ftcprint (features1,  8, "gfni");             /* Galois field instr */
 	  ftcprint (features1,  9, "vaes");             /* vector AES */
 	  ftcprint (features1, 10, "vpclmulqdq");       /* nc mul dbl quad */
