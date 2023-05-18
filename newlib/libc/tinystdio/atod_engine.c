@@ -35,27 +35,15 @@
 double
 __atod_engine(uint64_t u64, int exp)
 {
-    double flt;
-    const double *f;
-    flt = u64;
-    int exp_cur;
+    double flt = u64;
 
-    if (exp < 0) {
-	f = __dtoa_scale_down + DTOA_SCALE_DOWN_NUM - 1;
-	exp = -exp;
-	exp_cur = 1 << (DTOA_SCALE_DOWN_NUM - 1);
-    } else {
-	f = __dtoa_scale_up + DTOA_SCALE_UP_NUM - 1;
-	exp_cur = 1 << (DTOA_SCALE_UP_NUM - 1);
+    while (exp < 0) {
+        flt *= 1e-1;
+        exp++;
     }
-
-    while (exp) {
-	if (exp >= exp_cur) {
-	    flt *= *f;
-	    exp -= exp_cur;
-	}
-	f--;
-	exp_cur >>= 1;
+    while (exp > 0) {
+        flt *= 1e1;
+        exp--;
     }
     return flt;
 }
