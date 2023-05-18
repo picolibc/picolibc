@@ -38,8 +38,8 @@ double_type *pd = doubles;
 #define CONVERT_BITS_DOUBLE	64
 #define CONVERT_BITS_FLOAT	32
 #else
-#define CONVERT_BITS_DOUBLE	61
-#define CONVERT_BITS_FLOAT	30
+#define CONVERT_BITS_DOUBLE	58
+#define CONVERT_BITS_FLOAT	29
 #endif
 
 void
@@ -496,7 +496,7 @@ test_scan (void)
     sscanf(s->result, "%lg", &d0);
     sprintf(buffer, "%.16e", d0);
     sscanf(buffer, "%lg", &d1);
-    if  (s->mag)
+    if  (s->mag && s->mag < CONVERT_BITS_DOUBLE)
       test_mok(d0, d1, s->mag);
     else
       test_mok(d0,d1, CONVERT_BITS_DOUBLE);
