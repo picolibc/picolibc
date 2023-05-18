@@ -141,21 +141,35 @@ picolibc_sources(
   vswscanf.c
   wprintf.c
   wscanf.c
-  dtoa_ryu.c
-  ftoa_ryu.c
-  ryu_table.c
-  atod_ryu.c
-  atof_ryu.c
-  ryu_log2pow5.c
-  ryu_log10.c
-  ryu_pow5bits.c
-  ryu_umul128.c
-  ryu_divpow2.c
   fopen.c
   fdopen.c
   fclose.c
   sflags.c
   )
+
+if(_IO_FLOAT_EXACT)
+  picolibc_sources(
+    dtoa_ryu.c
+    ftoa_ryu.c
+    ryu_table.c
+    atod_ryu.c
+    atof_ryu.c
+    ryu_log2pow5.c
+    ryu_log10.c
+    ryu_pow5bits.c
+    ryu_umul128.c
+    ryu_divpow2.c
+    )
+else()
+  picolibc_sources(
+    dtoa_engine.c
+    ftoa_engine.c
+    atod_engine.c
+    atof_engine.c
+    dtoa_data.c
+    ftoa_data.c
+    )
+endif()
 
 if(POSIX_CONSOLE)
   picolibc_sources(
