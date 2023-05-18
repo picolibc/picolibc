@@ -28,17 +28,7 @@
 
 #include "dtoa_engine.h"
 #include <math.h>
-
-/* A bit of CPP trickery -- construct the floating-point value 10 ** DBL_DIG
- * by pasting the value of DBL_DIG onto '1e' to
- */
-
-#define paste(a) 1e##a
-#define substitute(a) paste(a)
-#define MIN_MANT (substitute(DTOA_DIG))
-#define MAX_MANT (10.0 * MIN_MANT)
-#define MIN_MANT_INT ((uint64_t) MIN_MANT)
-#define MIN_MANT_EXP	DTOA_DIG
+#include "../../libm/common/math_config.h"
 
 #define max(a, b) ({\
 		__typeof(a) _a = a;\
@@ -50,50 +40,110 @@
 		__typeof(b) _b = b;\
 		_a < _b ? _a : _b; })
 
+#define FRACTION_BITS   (__DBL_MANT_DIG__ - 1)
+#define FRACTION_MASK   (((uint64_t) 1 << FRACTION_BITS) - 1)
+#define EXPONENT_BITS   (sizeof(double) * 8 - FRACTION_BITS - 1)
+#define EXPONENT_MASK   (((uint64_t) 1 << EXPONENT_BITS) - 1)
+#define SIGN_BIT        ((uint64_t) 1 << (sizeof(double) * 8 - 1))
+#define BIT64(x)        ((uint64_t) 1 << (x))
+
+/*
+ * Check to see if the high bit is set by casting
+ * to signed and checking for negative
+ */
+static inline bool
+high_bit_set(uint64_t fract)
+{
+        return ((int64_t) fract < 0);
+}
+
 int
 __dtoa_engine(double x, struct dtoa *dtoa, int max_digits, bool fmode, int max_decimals)
 {
-	int	i;
+        uint64_t v = asuint64(x);
+        uint64_t fract = (v << (EXPONENT_BITS + 1)) >> 1;
+        int expo = (v << 1) >> (FRACTION_BITS + 1);
+        int decexp = 0;
+        int i;
 	uint8_t	flags = 0;
-	int32_t	exp = 0;
 
-	if (signbit(x)) {
+	if (high_bit_set(v))
 		flags |= DTOA_MINUS;
-		x = -x;
-	}
-	if (x == 0) {
-		flags |= DTOA_ZERO;
-		dtoa->digits[0] = '0';
-		max_digits = 1;
-	} else if (isnan(x)) {
-		flags |= DTOA_NAN;
-	} else if (isinf(x)) {
-		flags |= DTOA_INF;
-	} else {
-		double	y;
+	if (expo == EXPONENT_MASK) {
+                if (fract)
+                        flags |= DTOA_NAN;
+                else
+                        flags |= DTOA_INF;
+        } else {
+                if (expo == 0) {
+                        if (fract == 0) {
+                                flags |= DTOA_ZERO;
+                                dtoa->digits[0] = '0';
+                                max_digits = 1;
+                                goto done;
+                        }
+                        /* normalize */
+                        while ((int64_t) (fract <<= 1) >= 0)
+                                expo--;
+                }
 
-		exp = MIN_MANT_EXP;
+                /* add implicit bit */
+                fract |= SIGN_BIT;
+                /* adjust exponent */
+                expo -= (__DBL_MAX_EXP__ - 2);
+                decexp = -1;
 
-		/* Bring x within range MIN_MANT <= x < MAX_MANT while
-		 * computing exponent value
-		 */
-		if (x < MIN_MANT) {
-			for (i = DTOA_SCALE_UP_NUM - 1; i >= 0; i--) {
-				y = x * __dtoa_scale_up[i];
-				if (y < MAX_MANT) {
-					x = y;
-					exp -= (1 << i);
-				}
-			}
-		} else {
-			for (i = DTOA_SCALE_DOWN_NUM - 1; i >= 0; i--) {
-				y = x * __dtoa_scale_down[i];
-				if (y >= MIN_MANT) {
-					x = y;
-					exp += (1 << i);
-				}
-			}
-		}
+                /*
+                 * Let's consider:
+                 *
+                 *	value = fract * 2^expo * 10^decexp
+                 *
+                 * Initially decexp = 0. The goal is to bring exp between
+                 * 0 and -2 as the magnitude of a fractional decimal digit is 3 bits.
+                 */
+
+                while (expo < -2) {
+                        /*
+                         * Make room to allow a multiplication by 5 without overflow.
+                         * We test only the top part for faster code.
+                         */
+                        do {
+                                /* Round this division to avoid accumulating errors */
+                                fract = (fract >> 1) + (fract&1);
+                                expo++;
+                        } while ((uint32_t)(fract >> 32) >= (UINT32_MAX / 5U));
+
+                        /* Perform fract * 5 * 2 / 10 */
+                        fract *= 5U;
+                        expo++;
+                        decexp--;
+                }
+
+                while (expo > 0) {
+                        /*
+                         * Perform fract / 5 / 2 * 10.
+                         * The +2 is there to do round the result of the division
+                         * by 5 not to lose too much precision in extreme cases.
+                         */
+                        fract += 2;
+                        fract /= 5U;
+                        expo--;
+                        decexp++;
+
+                        /* Bring back our fractional number to full scale */
+                        do {
+                                fract <<= 1;
+                                expo--;
+                        } while (!high_bit_set(fract));
+                }
+
+
+                /*
+                 * The binary fractional point is located somewhere above bit 63.
+                 * Move it between bits 59 and 60 to give 4 bits of room to the
+                 * integer part.
+                 */
+                fract >>= (4 - expo);
 
 		/* If limiting decimals, then limit the max digits
 		 * to no more than the number of digits left of the decimal
@@ -135,39 +185,36 @@ __dtoa_engine(double x, struct dtoa *dtoa, int max_digits, bool fmode, int max_d
 			 * cases, which is kinda cool
 			 */
 			/* max_decimals comes in biased by 1 to flag the 'f' case */
-			max_digits = min(max_digits, max(1, max_decimals + exp + 1));
+			max_digits = min(max_digits, max(1, max_decimals + decexp + 1));
 		}
 
-		/* Round nearest by adding 1/2 of the last digit
-		 * before converting to int. Check for overflow
-		 * and adjust mantissa and exponent values
-		 */
+                int decimals = max_digits;
 
-		x = x + __dtoa_round[max_digits];
-
-		if (x >= MAX_MANT) {
-			x /= 10.0;
-			exp++;
-
-			/* Redo this computation with the new exp value */
-			if  (fmode)
-				max_digits = min(save_max_digits, max(1, max_decimals + exp + 1));
-		}
+                /* Round the value to the last digit being printed. */
+                uint64_t round = BIT64(59); /* 0.5 */
+                while (decimals--) {
+                        round /= 10U;
+                }
+                fract += round;
+                /* Make sure rounding didn't make fract >= 1.0 */
+                if (fract >= BIT64(60)) {
+                        fract /= 10U;
+                        decexp++;
+                        max_digits = min(save_max_digits, max(1, max_decimals + decexp + 1));
+                }
 
 		/* Now convert mantissa to decimal. */
 
-		uint64_t	mant = (uint64_t) x;
-		uint64_t	decimal = MIN_MANT_INT;
-
 		/* Compute digits */
 		for (i = 0; i < max_digits; i++) {
-			dtoa->digits[i] = mant / decimal + '0';
-			mant %= decimal;
-			decimal /= 10;
+                        fract *= 10U;
+			dtoa->digits[i] = (fract >> 60) + '0';
+                        fract &= BIT64(60) - 1;
 		}
 	}
+done:
 	dtoa->digits[max_digits] = '\0';
 	dtoa->flags = flags;
-	dtoa->exp = exp;
+	dtoa->exp = decexp;
 	return max_digits;
 }

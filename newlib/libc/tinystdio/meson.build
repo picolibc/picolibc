@@ -165,8 +165,6 @@ srcs_dtoa_ryu = [
 # smaller float/string conversion code
 srcs_dtoa_float = [
   'dtoa_engine.c',
-  'dtoa_data.c',
-  'ftoa_data.c',
   'ftoa_engine.c',
   'atod_engine.c',
   'atof_engine.c',
