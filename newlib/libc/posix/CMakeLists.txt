@@ -44,7 +44,7 @@ picolibc_sources(
 
 if(__HAVE_LOCALE_INFO)
   picolibc_sources(
-    'collate.c',
-    'collcmp.c',
+    collate.c
+    collcmp.c
     )
 endif()
