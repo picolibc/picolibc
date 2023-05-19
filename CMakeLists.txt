@@ -404,6 +404,10 @@ if(NOT DEFINED __HAVE_LOCALE_INFO_EXTENDED__)
   option(__HAVE_LOCALE_INFO_EXTENDED__ "Provide even more locale support" 0)
 endif()
 
+if(__HAVE_LOCALE_INFO_EXTENDED__ AND NOT __HAVE_LOCALE_INFO__)
+  message(FATAL_ERROR "Must have locale support to enable extended locale support")
+endif()
+
 # Use old math code for double funcs (0 no, 1 yes)
 set(__OBSOLETE_MATH_FLOAT 1)
 
