@@ -166,8 +166,6 @@ else()
     ftoa_engine.c
     atod_engine.c
     atof_engine.c
-    dtoa_data.c
-    ftoa_data.c
     )
 endif()
 
