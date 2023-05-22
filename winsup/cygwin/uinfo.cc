@@ -1485,9 +1485,9 @@ get_logon_sid ()
     }
 }
 
-/* Fetch special AzureAD group, which is part of the token group list but
-   *not* recognized by LookupAccountSid (ERROR_NONE_MAPPED). */
-static cygsid azure_grp_sid ("");
+/* Fetch special AzureAD and IIS APPPOOL groups, which are part of the token
+   group list but *not* recognized by LookupAccountSid (ERROR_NONE_MAPPED). */
+static cygsid azure_grp_sid (""), iis_apppool_grp_sid ("");
 
 static void
 get_azure_grp_sid ()
@@ -1511,6 +1511,36 @@ get_azure_grp_sid ()
 		azure_grp_sid = groups->Groups[pg].Sid;
 		break;
 	      }
+	}
+    }
+}
+
+static void
+get_iis_apppool_grp_sid ()
+{
+  if (PSID (iis_apppool_grp_sid) == NO_SID)
+    {
+      NTSTATUS status;
+      ULONG size;
+      tmp_pathbuf tp;
+      PTOKEN_GROUPS groups = (PTOKEN_GROUPS) tp.w_get ();
+
+      status = NtQueryInformationToken (hProcToken, TokenGroups, groups,
+					2 * NT_MAX_PATH, &size);
+      if (!NT_SUCCESS (status))
+	debug_printf ("NtQueryInformationToken (TokenGroups) %y", status);
+      else
+	{
+	  for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
+	    {
+	      PSID sid = groups->Groups[pg].Sid;
+	      if (sid_id_auth (sid) == 5 &&
+		  sid_sub_auth (sid, 0) == SECURITY_APPPOOL_ID_BASE_RID)
+		{
+		  iis_apppool_grp_sid = sid;
+		  break;
+		}
+	    }
 	}
     }
 }
@@ -1796,6 +1826,16 @@ pwdgrp::construct_sid_from_name (cygsid &sid, wchar_t *name, wchar_t *sep)
 	}
       return false;
     }
+  if (sep && wcscmp (name, L"IIS APPPOOL\\Group") == 0)
+    {
+      get_iis_apppool_grp_sid ();
+      if (PSID (logon_sid) != NO_SID)
+	{
+	  sid = iis_apppool_grp_sid;
+	  return true;
+	}
+      return false;
+    }
   if (!sep && wcscmp (name, L"CurrentSession") == 0)
     {
       get_logon_sid ();
@@ -2018,8 +2058,11 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
       /* Last but not least, some validity checks on the name style. */
       if (!fq_name)
 	{
-	  /* AzureAD user must be prepended by "domain" name. */
-	  if (sid_id_auth (sid) == 12)
+	  /* AzureAD and IIS APPPOOL users must be prepended by "domain"
+	     name. */
+	  if (sid_id_auth (sid) == 12 ||
+	      (sid_id_auth (sid) == 5 &&
+	       sid_sub_auth (sid, 0) == SECURITY_APPPOOL_ID_BASE_RID))
 	    return NULL;
 	  /* name_only account is either builtin or primary domain, or
 	     account domain on non-domain machines. */
@@ -2045,8 +2088,10 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	}
       else
 	{
-	  /* AzureAD accounts should be fully qualifed either. */
-	  if (sid_id_auth (sid) == 12)
+	  /* AzureAD and IIS APPPOOL accounts should be fully qualifed either. */
+	  if (sid_id_auth (sid) == 12 ||
+	      (sid_id_auth (sid) == 5 &&
+	       sid_sub_auth (sid, 0) == SECURITY_APPPOOL_ID_BASE_RID))
 	    break;
 	  /* Otherwise, no fully_qualified for builtin accounts, except for
 	     NT SERVICE, for which we require the prefix.  Note that there's
@@ -2123,6 +2168,19 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	  get_azure_grp_sid ();
 	  /* LookupAccountSidW will fail. */
 	  sid = csid = azure_grp_sid;
+	  break;
+	}
+      else if (arg.id == 0x1002)
+        {
+	  /* IIS APPPOOL S-1-5-82-* user */
+	  csid = cygheap->user.saved_sid ();
+	}
+      else if (arg.id == 0x1003)
+        {
+	  /* Special IIS APPPOOL group SID */
+	  get_iis_apppool_grp_sid ();
+	  /* LookupAccountSidW will fail. */
+	  sid = csid = iis_apppool_grp_sid;
 	  break;
 	}
       else if (arg.id == 0xfffe)
@@ -2253,7 +2311,9 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 
 		 Those we let pass, but no others. */
 	      bool its_ok = false;
-	      if (sid_id_auth (sid) == 12)
+	      if (sid_id_auth (sid) == 12 ||
+		  (sid_id_auth (sid) == 5 &&
+		   sid_sub_auth (sid, 0) == SECURITY_APPPOOL_ID_BASE_RID))
 		its_ok = true;
 	      else /* Microsoft Account */
 		{
@@ -2342,10 +2402,25 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		    posix_offset = fetch_posix_offset (td, &loc_ldap);
 		}
 	    }
-	  /* AzureAD S-1-12-1-W-X-Y-Z user */
+	  /* AzureAD S-1-12-1-W-X-Y-Z and IIS APPOOL S-1-5-82-* user */
 	  else if (sid_id_auth (sid) == 12)
 	    {
 	      uid = gid = 0x1000;
+	      fully_qualified_name = true;
+	      home = cygheap->pg.get_home ((PUSER_INFO_3) NULL, sid, dom, name,
+					   fully_qualified_name);
+	      shell = cygheap->pg.get_shell ((PUSER_INFO_3) NULL, sid, dom,
+					     name, fully_qualified_name);
+	      gecos = cygheap->pg.get_gecos ((PUSER_INFO_3) NULL, sid, dom,
+					     name, fully_qualified_name);
+	      break;
+	    }
+	  /* IIS APPOOL S-1-5-82-* user */
+	  else if (sid_id_auth (sid) == 5 &&
+		   sid_sub_auth (sid, 0) == SECURITY_APPPOOL_ID_BASE_RID)
+	    {
+	      uid = 0x1002;
+	      gid = 0x1003;
 	      fully_qualified_name = true;
 	      home = cygheap->pg.get_home ((PUSER_INFO_3) NULL, sid, dom, name,
 					   fully_qualified_name);
@@ -2610,6 +2685,20 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	return NULL;
       uid = gid = 0x1001;
       wcpcpy (dom, L"AzureAD");
+      wcpcpy (name = namebuf, L"Group");
+      fully_qualified_name = true;
+      acc_type = SidTypeUnknown;
+    }
+  else if (sid_id_auth (sid) == 5 &&
+	   sid_sub_auth (sid, 0) == SECURITY_APPPOOL_ID_BASE_RID)
+    {
+      /* Special IIS APPPOOL group SID which can't be resolved by
+         LookupAccountSid (ERROR_NONE_MAPPED).  This is only allowed
+	 as group entry, not as passwd entry. */
+      if (is_passwd ())
+	return NULL;
+      uid = gid = 0x1003;
+      wcpcpy (dom, L"IIS APPPOOL");
       wcpcpy (name = namebuf, L"Group");
       fully_qualified_name = true;
       acc_type = SidTypeUnknown;
