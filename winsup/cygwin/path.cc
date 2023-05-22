@@ -4511,13 +4511,27 @@ find_fast_cwd_pointer ()
       if (!lock)
 	{
 	  /* Windows 8.1 Preview calls `lea rel(rip),%r12' then some unrelated
-	     or, then `mov %r12,%rcx', then `callq RtlEnterCriticalSection'. */
+	     ops, then `mov %r12,%rcx', then `callq RtlEnterCriticalSection'. */
 	  lock = (const uint8_t *) memmem ((const char *) use_cwd, 80,
 					   "\x4c\x8d\x25", 3);
-	  if (!lock)
-	    return NULL;
 	  call_rtl_offset = 14;
 	}
+
+      if (!lock)
+	{
+	  /* A recent Windows 11 Preview calls `lea rel(rip),%r13' then
+	     some unrelated instructions, then `callq RtlEnterCriticalSection'.
+	     */
+	  lock = (const uint8_t *) memmem ((const char *) use_cwd, 80,
+					   "\x4c\x8d\x2d", 3);
+	  call_rtl_offset = 24;
+	}
+
+      if (!lock)
+	{
+	  return NULL;
+	}
+
       PRTL_CRITICAL_SECTION lockaddr =
         (PRTL_CRITICAL_SECTION) (lock + 7 + peek32 (lock + 3));
       /* Test if lock address is FastPebLock. */
