@@ -929,7 +929,13 @@ fetch_home_env (void)
   /* If `HOME` is set, prefer it */
   const char *home = getenv ("HOME");
   if (home)
-    return strdup (home);
+    {
+      /* In the very early code path of `user_info::initialize ()`, the value
+         of the environment variable `HOME` is still in its Windows form. */
+      if (isdrive (home) || home[0] == '\\')
+	return (char *) cygwin_create_path (CCP_WIN_A_TO_POSIX, home);
+      return strdup (home);
+    }
 
   /* If `HOME` is unset, fall back to `HOMEDRIVE``HOMEPATH`
      (without a directory separator, as `HOMEPATH` starts with one). */
