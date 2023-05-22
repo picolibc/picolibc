@@ -137,6 +137,28 @@ use Picolibc:
 
 ## Releases
 
+### Picolibc version 1.8.2
+
+ * Support _ZEPHYR_SOURCE macro which, like _POSIX_SOURCE et al,
+   controls whether the library expresses the Zephyr C library API.
+   This is also automatically selected when the __ZEPHYR__ macro is
+   defined and no other _*_SOURCE macro is defined.
+
+ * Add another cross compile property, 'libgcc', which specifies the
+   library containing soft float and other compiler support routines.
+
+ * Fix a couple of minor imprecisions in pow and 80-bit powl.
+
+ * Merge newlib changes that included an update to the ARM assembly
+   code.
+
+ * Replace inexact float/string conversion code with smaller code that
+   doesn't use floating point operations to save additional space on
+   soft float targets.
+
+ * More cmake fixes, including making the inexact printf and locale
+   options work.
+
 ### Picolibc version 1.8.1
 
  * Fix cmake build system to auto-detect compiler characteristics
