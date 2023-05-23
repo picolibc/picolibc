@@ -160,6 +160,10 @@ _scalbnl_no_errno(long double x, int n)
 #define _scalbnl_no_errno(a,b) scalbnl(a,b)
 #endif
 
+#ifdef __clang__
+#pragma STDC FP_CONTRACT OFF
+#endif
+
 /*
  * Fused multiply-add: Compute x * y + z with a single rounding error.
  *

@@ -8,6 +8,10 @@
 
 #if !_HAVE_FAST_FMAF
 
+#ifdef __clang__
+#pragma STDC FP_CONTRACT OFF
+#endif
+
 float fmaf(float x, float y, float z)
 {
   /*
