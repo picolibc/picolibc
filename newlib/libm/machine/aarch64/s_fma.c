@@ -24,6 +24,8 @@
    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
+#if __ARM_NEON_FP & 8
+
 #include <math.h>
 
 double
@@ -33,3 +35,7 @@ fma (double x, double y, double z)
   __asm__("fmadd\t%d0, %d1, %d2, %d3" : "=w" (result) : "w" (x), "w" (y), "w" (z));
   return result;
 }
+
+#else
+#include "../../common/s_fma.c"
+#endif

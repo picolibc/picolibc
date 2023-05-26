@@ -24,6 +24,8 @@
    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
+#if __ARM_NEON_FP & 4
+
 #include <math.h>
 
 float
@@ -33,3 +35,7 @@ truncf (float x)
   __asm__("frintz\t%s0, %s1" : "=w" (result) : "w" (x));
   return result;
 }
+
+#else
+#include "../../common/sf_trunc.c"
+#endif

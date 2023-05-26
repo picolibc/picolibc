@@ -24,6 +24,8 @@
    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
+#if __ARM_NEON_FP & 8
+
 #include <math.h>
 
 double
@@ -40,3 +42,7 @@ nearbyint (double x)
 #endif
     return x;
 }
+
+#else
+#include "../../common/s_nearbyint.c"
+#endif

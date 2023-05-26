@@ -36,8 +36,13 @@
 #ifndef _MACHINE_MATH_H_
 #define _MACHINE_MATH_H_
 
+#if __ARM_NEON_FP & 8
 #define _HAVE_FAST_FMA 1
+#endif
+
+#if __ARM_NEON_FP & 4
 #define _HAVE_FAST_FMAF 1
+#endif
 
 #if defined(_HAVE_ATTRIBUTE_ALWAYS_INLINE) && defined(_HAVE_ATTRIBUTE_GNU_INLINE)
 #define __declare_aarch64_macro(type) extern __inline type __attribute((gnu_inline, always_inline))
@@ -46,6 +51,7 @@
 #include <errno.h>
 #endif
 
+#if __ARM_NEON_FP & 8
 __declare_aarch64_macro(double)
 sqrt (double x)
 {
@@ -58,6 +64,17 @@ sqrt (double x)
     return result;
 }
 
+__declare_aarch64_macro(double)
+fma (double x, double y, double z)
+{
+    double result;
+    __asm__ __volatile__ ("fmadd\t%d0, %d1, %d2, %d3" : "=w" (result) : "w" (x), "w" (y), "w" (z));
+    return result;
+}
+
+#endif
+
+#if __ARM_NEON_FP & 4
 __declare_aarch64_macro(float)
 sqrtf (float x)
 {
@@ -70,14 +87,6 @@ sqrtf (float x)
     return result;
 }
 
-__declare_aarch64_macro(double)
-fma (double x, double y, double z)
-{
-    double result;
-    __asm__ __volatile__ ("fmadd\t%d0, %d1, %d2, %d3" : "=w" (result) : "w" (x), "w" (y), "w" (z));
-    return result;
-}
-
 __declare_aarch64_macro(float)
 fmaf (float x, float y, float z)
 {
@@ -85,6 +94,8 @@ fmaf (float x, float y, float z)
     __asm__ __volatile__ ("fmadd\t%s0, %s1, %s2, %s3" : "=w" (result) : "w" (x), "w" (y), "w" (z));
     return result;
 }
+
+#endif
 
 #endif
 

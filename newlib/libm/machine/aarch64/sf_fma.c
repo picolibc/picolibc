@@ -24,6 +24,8 @@
    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
+#if __ARM_NEON_FP & 4
+
 #include <math.h>
 
 float
@@ -33,3 +35,7 @@ fmaf (float x, float y, float z)
   __asm__("fmadd\t%s0, %s1, %s2, %s3" : "=w" (result) : "w" (x), "w" (y), "w" (z));
   return result;
 }
+
+#else
+#include "../../common/sf_fma.c"
+#endif

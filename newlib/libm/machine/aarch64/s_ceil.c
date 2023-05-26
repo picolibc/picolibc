@@ -24,6 +24,8 @@
    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
+#if __ARM_NEON_FP & 8
+
 #include <math.h>
 
 double
@@ -33,3 +35,7 @@ ceil (double x)
   __asm__( "frintp\t%d0, %d1" : "=w" (result) : "w" (x) );
   return result;
 }
+
+#else
+#include "../../math/s_ceil.c"
+#endif
