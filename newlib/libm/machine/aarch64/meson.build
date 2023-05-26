@@ -62,10 +62,7 @@ srcs_libm_machine_real = [
   'sf_rint.c',
   'sf_round.c',
   'sf_sqrt.c',
-  'sf_trunc.c'
-]
-
-srcs_libm_machine = srcs_libm_machine_real + [
+  'sf_trunc.c',
   'feclearexcept.c',
   'fedisableexcept.c',
   'feenableexcept.c',
@@ -81,5 +78,7 @@ srcs_libm_machine = srcs_libm_machine_real + [
   'fetestexcept.c',
   'feupdateenv.c',
 ]
+
+srcs_libm_machine = srcs_libm_machine_real
 
 src_libm_machine = files(srcs_libm_machine_real)

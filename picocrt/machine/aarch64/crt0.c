@@ -72,9 +72,11 @@ _start(void)
 	__asm__("adrp x1, __stack");
 	__asm__("add  x1, x1, :lo12:__stack");
 	__asm__("mov sp, x1");
+#if __ARM_NEON_FP
 	/* Enable FPU */
 	__asm__("mov x1, #(0x3 << 20)");
 	__asm__("msr cpacr_el1,x1");
+#endif
 	/* Jump into C code */
 	__asm__("bl _cstart");
 }

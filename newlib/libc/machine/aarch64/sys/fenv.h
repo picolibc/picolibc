@@ -34,6 +34,7 @@
 typedef	__uint64_t	fenv_t;
 typedef	__uint64_t	fexcept_t;
 
+#if __ARM_NEON_FP
 /* Exception flags */
 #define	FE_INVALID	0x00000001
 #define	FE_DIVBYZERO	0x00000002
@@ -70,6 +71,8 @@ typedef	__uint64_t	fexcept_t;
 #ifndef	__fenv_static
 #define	__fenv_static	static
 #include <machine/fenv-fp.h>
+#endif
+
 #endif
 
 #endif	/* !_FENV_H_ */

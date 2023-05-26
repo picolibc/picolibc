@@ -27,6 +27,8 @@
  * $FreeBSD$
  */
 
+#if __ARM_NEON_FP
+
 #define	__fenv_static
 #include <fenv.h>
 #include <machine/fenv-fp.h>
@@ -55,3 +57,5 @@ extern inline int feupdateenv(const fenv_t *__envp);
 extern inline int feenableexcept(int __mask);
 extern inline int fedisableexcept(int __mask);
 extern inline int fegetexcept(void);
+
+#endif
