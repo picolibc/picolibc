@@ -41,7 +41,7 @@ srcs_libm_machine_complex128 = [
   'complex128.c'
 ]
 
-if cc.has_function('__mulkc3_hw', args: core_c_args + ['-lgcc'])
+if cc.has_function('__mulkc3_hw', args: core_c_args + [lib_gcc])
   srcs_libm_machine_real += srcs_libm_machine_complex128
 endif
 
