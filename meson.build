@@ -42,7 +42,7 @@ project('picolibc', 'c',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.53',
-	version: '1.8.1'
+	version: '1.8.2'
        )
 
 targets = []
@@ -276,6 +276,7 @@ tinystdio = get_option('tinystdio')
 
 has_link_defsym = meson.get_cross_property('has_link_defsym', cc.has_link_argument('-Wl,--defsym=' + global_prefix + '_start=0'))
 has_link_alias = meson.get_cross_property('has_link_alias', cc.has_link_argument('-Wl,-alias,' + global_prefix + 'main,testalias'))
+lib_gcc = meson.get_cross_property('libgcc', '-lgcc')
 
 # tinystdio options
 posix_io = tinystdio and get_option('posix-io')
@@ -442,7 +443,7 @@ have_picolibc_tls_api = fs.is_file('newlib/libc/picolib/machine' / host_cpu_fami
 if thread_local_storage_option == 'auto' or thread_local_storage_option == 'picolibc'
   # We assume that _set_tls() is defined in the arch specific tls.c
   if thread_local_storage_option == 'auto' or have_picolibc_tls_api
-    thread_local_storage = not cc.has_function('__emutls_get_address', args: core_c_args + ['-lgcc'])
+    thread_local_storage = not cc.has_function('__emutls_get_address', args: core_c_args + [lib_gcc])
   endif
 else
   thread_local_storage = get_option('thread-local-storage') == 'true'
@@ -1304,7 +1305,7 @@ endif
 
 if has_semihost
   test_link_args = ['-nostartfiles', '-T', '@0@'.format(picolibc_ld),
-		    '-lgcc'] + additional_libs_list
+		    lib_gcc] + additional_libs_list
   test_linker_files = [picolibc_ld]
   specs = picolibc_specs
 else

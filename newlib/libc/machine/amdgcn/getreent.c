@@ -42,21 +42,41 @@ typedef struct hsa_kernel_dispatch_packet_s {
 struct _reent *
 __getreent (void)
 {
-  /* Place the reent data at the top of the stack allocation.
-     s[0:1] contains a 48-bit private segment base address.
+  /* Place the reent data at the top of the stack allocation.  */
+  struct data {
+    int marker;
+    struct _reent reent;
+  } *data;
+
+#if defined(__has_builtin) \
+    && __has_builtin(__builtin_gcn_get_stack_limit) \
+    && __has_builtin(__builtin_gcn_first_call_this_thread_p)
+  unsigned long addr = (((unsigned long) __builtin_gcn_get_stack_limit()
+			 - sizeof(struct data)) & ~7);
+  data = (struct data *)addr;
+
+  register long sp asm("s16");
+
+  if (sp >= addr)
+    goto stackoverflow;
+  if (__builtin_gcn_first_call_this_thread_p())
+    {
+      data->marker = 12345;
+      __builtin_memset (&data->reent, 0, sizeof(struct _reent));
+      _REENT_INIT_PTR_ZEROED (&data->reent);
+    }
+  else if (data->marker != 12345)
+    goto stackoverflow;
+#else
+  /* s[0:1] contains a 48-bit private segment base address.
      s11 contains the offset to the base of the stack.
      s[4:5] contains the dispatch pointer.
-     
+
      WARNING: this code will break if s[0:1] is ever used for anything!  */
   const register unsigned long buffer_descriptor __asm__("s0");
   unsigned long private_segment = buffer_descriptor & 0x0000ffffffffffff;
   const register unsigned int stack_offset __asm__("s11");
   const register hsa_kernel_dispatch_packet_t *dispatch_ptr __asm__("s4");
-
-  struct data {
-    int marker;
-    struct _reent reent;
-  } *data;
 
   unsigned long stack_base = private_segment + stack_offset;
   unsigned long stack_end = stack_base + dispatch_ptr->private_segment_size * 64;
@@ -82,7 +102,7 @@ __getreent (void)
     }
   else if (data->marker != 12345)
     goto stackoverflow;
-
+#endif
 
   return &data->reent;
 

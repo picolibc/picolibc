@@ -102,6 +102,9 @@ extern "C" {
  *
  * _FORTIFY_SOURCE = 1 or 2
  * 	Object Size Checking function wrappers
+ *
+ * _ZEPHYR_SOURCE
+ *      Zephyr. ISO C + a small selection of other APIs.
  */
 
 #ifdef _GNU_SOURCE
@@ -123,10 +126,25 @@ extern "C" {
 #define	_XOPEN_SOURCE_EXTENDED	1
 #endif /* _GNU_SOURCE */
 
+/* When building for Zephyr, set _ZEPHYR_SOURCE unless some other API
+ * indicator is set by the application. Don't check __STRICT_ANSI__ as that
+ * is set by the compiler for -std=cxx, or _POSIX_C_SOURCE as Zephyr defines
+ * that for picolibc currently.
+ */
+
+#if defined(__ZEPHYR__) && !defined(_ZEPHYR_SOURCE) &&                  \
+    !defined(_GNU_SOURCE)&&                                             \
+    !defined(_BSD_SOURCE) &&                                            \
+    !defined(_SVID_SOURCE) &&                                           \
+    !defined(_DEFAULT_SOURCE)
+#define _ZEPHYR_SOURCE      1
+#endif
+
 #if defined(_BSD_SOURCE) || defined(_SVID_SOURCE) || \
    (!defined(__STRICT_ANSI__) && !defined(_ANSI_SOURCE) && \
    !defined(_ISOC99_SOURCE) && !defined(_POSIX_SOURCE) && \
-   !defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE))
+   !defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE) && \
+   !defined(_ZEPHYR_SOURCE))
 #undef _DEFAULT_SOURCE
 #define	_DEFAULT_SOURCE		1
 #endif
@@ -156,6 +174,15 @@ extern "C" {
 #if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200809
 #undef _ATFILE_SOURCE
 #define	_ATFILE_SOURCE		1
+#endif
+
+#ifdef _ZEPHYR_SOURCE
+#undef _ISOC99_SOURCE
+#define	_ISOC99_SOURCE		1
+#undef _ISOC11_SOURCE
+#define	_ISOC11_SOURCE		1
+#undef _ANSI_SOURCE
+#define _ANSI_SOURCE            1
 #endif
 
 /*
@@ -238,6 +265,9 @@ extern "C" {
  * __SSP_FORTIFY_LEVEL
  * 	Object Size Checking; defined to 0 (off), 1, or 2.
  *
+ * __ZEPHYR_VISIBLE
+ *      Zephyr extensions; enabled with _ZEPHYR_SOURCE.
+ *
  * In all cases above, "enabled by default" means either by defining
  * _DEFAULT_SOURCE, or by not defining any of the public feature test macros.
  */
@@ -258,6 +288,12 @@ extern "C" {
 #define	__GNU_VISIBLE		1
 #else
 #define	__GNU_VISIBLE		0
+#endif
+
+#ifdef _ZEPHYR_SOURCE
+#define __ZEPHYR_VISIBLE        1
+#else
+#define __ZEPHYR_VISIBLE        0
 #endif
 
 #if defined(_ISOC11_SOURCE) || \

@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 HERE=`dirname "$0"`
-for target in cmake-thumbv7m cmake-clang-thumbv7m; do
+for target in cmake-thumbv6m cmake-clang-thumbv6m cmake-thumbv7m cmake-clang-thumbv7m; do
     "$HERE"/do-cmake-test "$target" "$@" "$@"
     for buildtype in Debug Release RelWithDebInfo MinSizeRel; do
 	"$HERE"/do-cmake-test "$target" "$@" -DCMAKE_BUILD_TYPE="$buildtype" "$@"

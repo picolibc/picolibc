@@ -44,6 +44,10 @@
 	.global strcpy
 	.type strcpy, %function
 strcpy:
+	.fnstart
+	.cfi_sections .debug_frame
+	.cfi_startproc
+	prologue push_ip=HAVE_PAC_LEAF
 	
 #if !(defined(__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED) || \
       (defined (__thumb__) && !defined (__thumb2__)))
@@ -143,16 +147,17 @@ strcpy:
         tstne	r2, #0xff00
 #endif
         bne	5b
-        bx	lr
+	.cfi_remember_state
+	epilogue push_ip=HAVE_PAC_LEAF
+	.cfi_restore_state
 
        /* src and dst do not have a common word-alignement.  Fall back to
 	  byte copying.  */
-        4:
+4:
         ldrb	r2, [r1], #1
         strb	r2, [ip], #1
         cmp	r2, #0
         bne	4b
-        bx	lr
 
 #elif !defined (__thumb__) || defined (__thumb2__)
         mov	r3, r0
@@ -161,7 +166,6 @@ strcpy:
         strb	r2, [r3], #1
         cmp	r2, #0
         bne	1b
-        bx	lr
 #else
         movs	r3, r0
 1:
@@ -171,9 +175,12 @@ strcpy:
         adds	r3, #1
         cmp	r2, #0
         bne	1b
-        bx	lr
-	.size	strcpy, . - strcpy
 #endif
+	epilogue push_ip=HAVE_PAC_LEAF
+	.cfi_endproc
+	.cantunwind
+	.fnend
+	.size strcpy, . - strcpy
 
 #if defined(__linux__) && defined(__ELF__)
 .section .note.GNU-stack,"",%progbits

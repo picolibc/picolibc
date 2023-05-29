@@ -482,7 +482,14 @@ __cp_102_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
   return ___cp_mbtowc (r, pwc, s, n, 25, state);
 }
 
-static mbtowc_p __cp_xxx_mbtowc[26] = {
+static int
+__cp_103_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
+		 mbstate_t *state)
+{
+  return ___cp_mbtowc (r, pwc, s, n, 26, state);
+}
+
+static mbtowc_p __cp_xxx_mbtowc[27] = {
   __cp_437_mbtowc,
   __cp_720_mbtowc,
   __cp_737_mbtowc,
@@ -508,7 +515,8 @@ static mbtowc_p __cp_xxx_mbtowc[26] = {
   __cp_20866_mbtowc,
   __cp_21866_mbtowc,
   __cp_101_mbtowc,
-  __cp_102_mbtowc
+  __cp_102_mbtowc,
+  __cp_103_mbtowc,
 };
 
 /* val *MUST* be valid!  All checks for validity are supposed to be

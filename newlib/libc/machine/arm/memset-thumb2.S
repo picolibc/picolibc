@@ -26,12 +26,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "arm_asm.h"
+
 	.thumb
 	.syntax unified
 	.global memset
 	.type	memset, %function
-memset:	
-	push	{r4, r5, r6}
+	.p2align 1
+memset:
+	.fnstart
+	.cfi_sections .debug_frame
+	.cfi_startproc
+	prologue 4 6 push_ip=HAVE_PAC_LEAF
 	lsls	r4, r0, #30
 	beq	10f
 	subs	r4, r2, #1
@@ -96,10 +102,18 @@ memset:
 	cmp	r3, r4
 	bne	8b
 9:
-	pop	{r4, r5, r6}
-	bx	lr
+	.cfi_remember_state
+	epilogue 4 6 push_ip=HAVE_PAC_LEAF
+	.cfi_restore_state
 10:
 	mov	r4, r2
 	mov	r3, r0
 	b	3b
+	.cfi_endproc
+	.cantunwind
+	.fnend
 	.size memset, . - memset
+
+#if defined(__linux__) && defined(__ELF__)
+.section .note.GNU-stack,"",%progbits
+#endif

@@ -68,7 +68,7 @@ PORTABILITY
  *	    R1(r**2) = 6/r *((exp(r)+1)/(exp(r)-1) - 2/r)
  *		     = 6/r * ( 1 + 2.0*(1/(exp(r)-1) - 1/r))
  *		     = 1 - r^2/60 + r^4/2520 - r^6/100800 + ...
- *      We use a special Reme algorithm on [0,0.347] to generate 
+ *      We use a special Remez algorithm on [0,0.347] to generate 
  * 	a polynomial of degree 5 in r*r to approximate R1. The 
  *	maximum error of this polynomial approximation is bounded 
  *	by 2**-61. In other words,

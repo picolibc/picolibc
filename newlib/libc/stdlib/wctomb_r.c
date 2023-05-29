@@ -609,7 +609,13 @@ __cp_102_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
   return ___cp_wctomb (s, _wchar, 25, state);
 }
 
-static wctomb_p __cp_xxx_wctomb[26] = {
+static int
+__cp_103_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+{
+  return ___cp_wctomb (r, s, _wchar, 26, state);
+}
+
+static wctomb_p __cp_xxx_wctomb[27] = {
   __cp_437_wctomb,
   __cp_720_wctomb,
   __cp_737_wctomb,
@@ -635,7 +641,8 @@ static wctomb_p __cp_xxx_wctomb[26] = {
   __cp_20866_wctomb,
   __cp_21866_wctomb,
   __cp_101_wctomb,
-  __cp_102_wctomb
+  __cp_102_wctomb,
+  __cp_103_wctomb,
 };
 
 /* val *MUST* be valid!  All checks for validity are supposed to be

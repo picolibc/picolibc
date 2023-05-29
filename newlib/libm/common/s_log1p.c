@@ -65,7 +65,7 @@ Interface Definition (Issue 2).
  *	Let s = f/(2+f) ; based on log(1+f) = log(1+s) - log(1-s)
  *		 = 2s + 2/3 s**3 + 2/5 s**5 + .....,
  *	     	 = 2s + s*R
- *      We use a special Reme algorithm on [0,0.1716] to generate 
+ *      We use a special Remez algorithm on [0,0.1716] to generate 
  * 	a polynomial of degree 14 to approximate R The maximum error 
  *	of this polynomial approximation is bounded by 2**-58.45. In
  *	other words,

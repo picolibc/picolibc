@@ -26,14 +26,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "acle-compat.h"
+#include "arm_asm.h"
 
 	.thumb
 	.syntax unified
 	.global memset
 	.type	memset, %function
+	.p2align 1
 memset:
-	push	{r4, r5, r6, lr}
+	.fnstart
+	.cfi_sections .debug_frame
+	.cfi_startproc
+	prologue 4 6 push_ip=HAVE_PAC_LEAF
+
 	lsls	r3, r0, #30
 	beq	10f
 	subs	r4, r2, #1
@@ -110,15 +115,14 @@ memset:
 	cmp	r4, r3
 	bne	8b
 9:
-#if __ARM_ARCH >= 5
-	pop	{r4, r5, r6, pc}
-#else
-	pop	{r4, r5, r6}
-	pop	{r2}
-	bx	r2
-#endif
+	.cfi_remember_state
+	epilogue 4 6 push_ip=HAVE_PAC_LEAF
+	.cfi_restore_state
 10:
 	movs	r3, r0
 	movs	r4, r2
 	b	3b
+	.cfi_endproc
+	.cantunwind
+	.fnend
 	.size memset, . - memset

@@ -23,18 +23,20 @@
 
 from __future__ import print_function
 
+import fcntl
 import sys
+import os
 import re
 from optparse import OptionParser
 import lxml.etree
 import ply.lex as lex
 import ply.yacc as yacc
 
-rootelement = None # root element of the XML tree
-refentry = None # the current refentry
+rootelement = None  # root element of the XML tree
+refentry = None     # the current refentry
 verbose = 0
 
-def dump(s, stage, threshold = 1):
+def dump(s, stage, threshold=1):
     if verbose > threshold:
         print('*' * 40, file=sys.stderr)
         print(stage, file=sys.stderr)
@@ -48,7 +50,7 @@ def dump(s, stage, threshold = 1):
 
 def skip_whitespace_and_stars(i, src):
 
-    while i < len(src) and (src[i].isspace() or (src[i] == '*' and src[i+1] != '/')):
+    while i < len(src) and (src[i].isspace() or (src[i] == '*' and src[i + 1] != '/')):
         i += 1
 
     return i
@@ -61,7 +63,7 @@ def comment_contents_generator(src):
     i = 0
 
     while i < len(src) - 2:
-        if src[i] == '\n' and src[i+1] == '/' and src[i+2] == '*':
+        if src[i] == '\n' and src[i + 1] == '/' and src[i + 2] == '*':
             i = i + 3
 
             i = skip_whitespace_and_stars(i, src)
@@ -81,7 +83,7 @@ def comment_contents_generator(src):
 
                     i = skip_whitespace_and_stars(i, src)
 
-                elif src[i] == '*' and src[i+1] == '/':
+                elif src[i] == '*' and src[i + 1] == '/':
                     i = i + 2
                     # If we have just output \n\n, this adds another blank line.
                     # This is the only way a double blank line can occur.
@@ -106,7 +108,7 @@ def remove_noncomments(src):
 
 # A command is a single word of at least 3 characters, all uppercase, and alone on a line
 def iscommand(l):
-    if re.match('^[A-Z_]{3,}\s*$', l):
+    if re.match(r'^[A-Z_]{3,}\s*$', l):
 
         return True
     return False
@@ -176,10 +178,10 @@ def function(c, l):
         spliton = ';'
         o = ''
         for i in l.splitlines():
-             if separator in i:
-                 o += i + ';'
-             else:
-                 o += i
+            if separator in i:
+                o += i + ';'
+            else:
+                o += i
         l = o[:-1]
     else:
         spliton = '\n'
@@ -197,7 +199,7 @@ def function(c, l):
     descr = line_markup_convert(', '.join(descrlist))
 
     # fpclassify includes an 'and' we need to discard
-    namelist = map(lambda v: re.sub('^and ', '', v.strip(), 1), namelist)
+    namelist = map(lambda v: re.sub(r'^and ', r'', v.strip(), 1), namelist)
     # strip off << >> surrounding name
     namelist = map(lambda v: v.strip().lstrip('<').rstrip('>'), namelist)
     # instantiate list to make it subscriptable
@@ -213,8 +215,7 @@ def function(c, l):
 
     # FUNCTION implies starting a new refentry
     if refentry is not None:
-        print("multiple FUNCTIONs without NEWPAGE", file=sys.stderr)
-        exit(1)
+        sys.exit("multiple FUNCTIONs without NEWPAGE")
 
     # create the refentry
     refentry = lxml.etree.SubElement(rootelement, 'refentry')
@@ -265,7 +266,7 @@ def index(c, l):
     primary.text = l
 
     # to validate, it seems we need to maintain refentry elements in a certain order
-    refentry[:] = sorted(refentry, key = lambda x: x.tag if isinstance(x.tag, str) else '')
+    refentry[:] = sorted(refentry, key=lambda x: x.tag if isinstance(x.tag, str) else '')
 
     # adds another alternate refname
     refnamediv = refentry.find('refnamediv')
@@ -281,7 +282,7 @@ def index(c, l):
             print('duplicate refname %s discarded' % l, file=sys.stderr)
 
     # to validate, it seems we need to maintain refnamediv elements in a certain order
-    refnamediv[:] = sorted(refnamediv, key = lambda x: x.tag)
+    refnamediv[:] = sorted(refnamediv, key=lambda x: x.tag)
 
 
 # SYNOPSIS aka ANSI_SYNOPSIS
@@ -296,28 +297,26 @@ def synopsis(c, t):
 
     s = ''
     for l in t.splitlines():
-        if re.match('\s*(#|\[|struct)', l):
+        if re.match(r'\s*(#|\[|struct)', l):
             # preprocessor # directives, structs, comments in square brackets
             funcsynopsisinfo = lxml.etree.SubElement(funcsynopsis, 'funcsynopsisinfo')
             funcsynopsisinfo.text = l.strip() + '\n'
-        elif re.match('[Ll]ink with', l):
+        elif re.match(r'[Ll]ink with', l):
             pass
         else:
             s = s + l
 
             # a prototype without a terminating ';' is an error
             if s.endswith(')'):
-                print("'%s' missing terminating semicolon" % l, file=sys.stderr)
+                sys.exit("'%s' missing terminating semicolon" % l)
                 s = s + ';'
-                exit(1)
 
             if ';' in s:
                 synopsis_for_prototype(funcsynopsis, s)
                 s = ''
 
     if s.strip():
-        print("surplus synopsis '%s'" % s, file=sys.stderr)
-        exit(1)
+        sys.exit("surplus synopsis '%s'" % s)
 
 def synopsis_for_prototype(funcsynopsis, s):
     s = s.strip()
@@ -347,7 +346,7 @@ def synopsis_for_prototype(funcsynopsis, s):
                 void = lxml.etree.SubElement(funcprototype, 'void')
             else:
                 # Split parameters on ',' except if it is inside ()
-                for p in re.split(',(?![^()]*\))', match.group(3)):
+                for p in re.split(r',(?![^()]*\))', match.group(3)):
                     p = p.strip()
 
                     if verbose:
@@ -360,7 +359,7 @@ def synopsis_for_prototype(funcsynopsis, s):
                         parameter = lxml.etree.SubElement(paramdef, 'parameter')
 
                         # <[ ]> enclose the parameter name
-                        match2 = re.match('(.*)<\[(.*)\]>(.*)', p)
+                        match2 = re.match(r'(.*)<\[(.*)\]>(.*)', p)
 
                         if verbose:
                             print(match2.groups(), file=sys.stderr)
@@ -380,14 +379,13 @@ def synopsis_for_prototype(funcsynopsis, s):
 # sscanf, have very complex layout using nested tables and itemized lists, which
 # it is best to parse in order to transform correctly.
 #
-
 def refsect(t, s):
     refsect = lxml.etree.SubElement(refentry, 'refsect1')
     title = lxml.etree.SubElement(refsect, 'title')
     title.text = t.title()
 
     if verbose:
-        print('%s has %d paragraphs' % (t, len(s.split('\n\n'))) , file=sys.stderr)
+        print('%s has %d paragraphs' % (t, len(s.split('\n\n'))), file=sys.stderr)
 
     if verbose > 1:
         dump(s, 'before lexing')
@@ -424,25 +422,25 @@ def discarded(c, t):
     return
 
 command_dispatch_dict = {
-    'FUNCTION'          : function,
-    'TYPEDEF'           : function,     # TYPEDEF is not currently used, but described in doc.str
-    'INDEX'             : index,
-    'TRAD_SYNOPSIS'     : discarded,    # K&R-style synopsis, obsolete and discarded
-    'ANSI_SYNOPSIS'     : synopsis,
-    'SYNOPSIS'          : synopsis,
-    'DESCRIPTION'       : refsect,
-    'RETURNS'           : refsect,
-    'ERRORS'            : refsect,
-    'PORTABILITY'       : refsect,
-    'BUGS'              : refsect,
-    'WARNINGS'          : refsect,
-    'SEEALSO'           : seealso,
-    'NOTES'             : refsect,      # NOTES is not described in doc.str, so is currently discarded by makedoc, but that doesn't seem right
-    'QUICKREF'          : discarded,    # The intent of QUICKREF and MATHREF is not obvious, but they don't generate any output currently
-    'MATHREF'           : discarded,
-    'START'             : discarded,    # a START command is inserted to contain the text before the first command
-    'END'               : discarded,    # an END command is inserted merely to terminate the text for the last command in a comment block
-    'NEWPAGE'           : newpage,
+    'FUNCTION':      function,
+    'TYPEDEF':       function,     # TYPEDEF is not currently used, but described in doc.str
+    'INDEX':         index,
+    'TRAD_SYNOPSIS': discarded,    # K&R-style synopsis, obsolete and discarded
+    'ANSI_SYNOPSIS': synopsis,
+    'SYNOPSIS':      synopsis,
+    'DESCRIPTION':   refsect,
+    'RETURNS':       refsect,
+    'ERRORS':        refsect,
+    'PORTABILITY':   refsect,
+    'BUGS':          refsect,
+    'WARNINGS':      refsect,
+    'SEEALSO':       seealso,
+    'NOTES':         refsect,      # NOTES is not described in doc.str, so is currently discarded by makedoc, but that doesn't seem right
+    'QUICKREF':      discarded,    # The intent of QUICKREF and MATHREF is not obvious, but they don't generate any output currently
+    'MATHREF':       discarded,
+    'START':         discarded,    # a START command is inserted to contain the text before the first command
+    'END':           discarded,    # an END command is inserted merely to terminate the text for the last command in a comment block
+    'NEWPAGE':       newpage,
 }
 
 #
@@ -451,39 +449,44 @@ command_dispatch_dict = {
 
 # apply transformations which are easy to do in-place
 def line_markup_convert(p):
-    s = p;
-
-    # process the texinfo escape for an @
-    s = s.replace('@@', '@')
+    s = p
 
     # escape characters not allowed in XML
-    s = s.replace('&','&amp;')
-    s = s.replace('<','&lt;')
-    s = s.replace('>','&gt;')
+    s = s.replace('&', '&amp;')
+    s = s.replace('<', '&lt;')
+    s = s.replace('>', '&gt;')
 
     # convert <<somecode>> to <code>somecode</code> and <[var]> to
     # <varname>var</varname>
     # also handle nested << <[ ]> >> correctly
-    s = s.replace('&lt;&lt;','<code>')
-    s = s.replace('&lt;[','<varname>')
-    s = s.replace(']&gt;','</varname>')
-    s = s.replace('&gt;&gt;','</code>')
+    s = s.replace('&lt;&lt;', '<code>')
+    s = s.replace('&lt;[', '<varname>')
+    s = s.replace(']&gt;', '</varname>')
+    s = s.replace('&gt;&gt;', '</code>')
 
     # also convert some simple texinfo markup
     # convert @emph{foo} to <emphasis>foo</emphasis>
-    s = re.sub('@emph{(.*?)}', '<emphasis>\\1</emphasis>', s)
+    s = re.sub(r'@emph{(.*?)}', r'<emphasis>\1</emphasis>', s)
     # convert @strong{foo} to <emphasis role=strong>foo</emphasis>
-    s = re.sub('@strong{(.*?)}', '<emphasis role="strong">\\1</emphasis>', s)
+    s = re.sub(r'@strong{(.*?)}', r'<emphasis role="strong">\1</emphasis>', s)
     # convert @minus{} to U+2212 MINUS SIGN
     s = s.replace('@minus{}', '&#x2212;')
     # convert @dots{} to U+2026 HORIZONTAL ELLIPSIS
     s = s.replace('@dots{}', '&#x2026;')
 
     # convert xref and pxref
-    s = re.sub('@xref{(.*?)}', "See <xref linkend='\\1'/>", s)
+    s = re.sub(r'@xref{(.*?)}', r"See <xref linkend='\1'/>", s)
 
     # very hacky way of dealing with @* to force a newline
     s = s.replace('@*', '</para><para>')
+
+    # fail if there are unhandled texinfo commands
+    match = re.search(r'(?<!@)@[^@\s]+', s)
+    if match:
+        sys.exit("texinfo command '%s' remains in output" % match.group(0))
+
+    # process the texinfo escape for an @
+    s = s.replace('@@', '@')
 
     if (verbose > 3) and (s != p):
         print('%s-> line_markup_convert ->\n%s' % (p, s), file=sys.stderr)
@@ -495,18 +498,18 @@ def line_markup_convert(p):
 #
 
 texinfo_commands = {
-    'ifnottex' : 'IFNOTTEX',
-    'end ifnottex' : 'ENDIFNOTTEX',
-    'tex' : 'IFTEX',
-    'end tex' : 'ENDIFTEX',
-    'comment' : 'COMMENT',
-    'c ' : 'COMMENT',
-    'multitable' : 'MULTICOLUMNTABLE',
-    'end multitable' : 'ENDMULTICOLUMNTABLE',
-    'headitem' : 'MCT_HEADITEM',
-    'tab' : 'MCT_COLUMN_SEPARATOR',
-    'item' : 'MCT_ITEM',
-    }
+    'ifnottex': 'IFNOTTEX',
+    'end ifnottex': 'ENDIFNOTTEX',
+    'tex': 'IFTEX',
+    'end tex': 'ENDIFTEX',
+    'comment': 'COMMENT',
+    'c ': 'COMMENT',
+    'multitable': 'MULTICOLUMNTABLE',
+    'end multitable': 'ENDMULTICOLUMNTABLE',
+    'headitem': 'MCT_HEADITEM',
+    'tab': 'MCT_COLUMN_SEPARATOR',
+    'item': 'MCT_ITEM',
+}
 
 # token names
 tokens = [
@@ -561,7 +564,7 @@ def t_TABLEEND(t):
 
 def t_ITEM(t):
     r'o\s.*\n'
-    t.value = re.sub('o\s', '', lexer.lexmatch.group(0), 1)
+    t.value = re.sub(r'o\s', r'', lexer.lexmatch.group(0), 1)
     t.value = line_markup_convert(t.value)
     return t
 
@@ -577,21 +580,20 @@ def t_BLANKLINE(t):
     return t
 
 def t_eof(t):
-    if hasattr(t.lexer,'at_eof'):
+    if hasattr(t.lexer, 'at_eof'):
         # remove eof flag ready for lexing next input
-        delattr(t.lexer,'at_eof')
+        delattr(t.lexer, 'at_eof')
         t.lexer.lineno = 0
         return None
 
     t.type = 'EOF'
-    t.lexer.at_eof = True;
+    t.lexer.at_eof = True
 
     return t
 
 # Error handling rule
 def t_error(t):
-    print("tokenization error, remaining text '%s'" % t.value, file=sys.stderr)
-    exit(1)
+    sys.exit("tokenization error, remaining text '%s'" % t.value)
 
 lexer = lex.lex()
 
@@ -790,14 +792,23 @@ def p_multitable(p):
     colspec = '\n'.join(['<colspec colwidth="%s*"/>' % (c) for c in colfrac])
     header = '<thead>' + p[2] + '</thead>\n'
     body = '<tbody>' + p[3] + '</tbody>\n'
-    p[0] = '<informaltable><tgroup cols="' + str(len(colfrac)) +'">' + colspec + header + body  + '</tgroup></informaltable>'
+    p[0] = '<informaltable><tgroup cols="' + str(len(colfrac)) + '">' + colspec + header + body + '</tgroup></informaltable>'
     parser_verbose(p)
 
-def p_error(t):
-    print('parse error at line %d, token %s, next token %s' % (t.lineno, t, parser.token()), file=sys.stderr)
-    exit(1)
 
-parser = yacc.yacc(start='input')
+def p_error(t):
+    sys.exit('parse error at line %d, token %s, next token %s' % (t.lineno, t, parser.token()))
+
+
+# protect creating the parser with a lockfile, so that when multiple processes
+# are running this script simultaneously, we don't get one of them generating a
+# parsetab.py file, while another one attempts to read it...
+#
+# see also https://github.com/dabeaz/ply/pull/184
+with open(os.path.join(os.path.dirname(__file__), 'parsetab.lock'), 'w+') as lockfile:
+    fcntl.flock(lockfile.fileno(), fcntl.LOCK_EX)
+    parser = yacc.yacc(start='input')
+    fcntl.flock(lockfile.fileno(), fcntl.LOCK_UN)
 
 #
 #
@@ -818,23 +829,14 @@ def main(file):
 
     print(s)
 
-    # warn about texinfo commands which didn't get processed
-    match = re.search('@[a-z*]+', s)
-    if match:
-        print('texinfo command %s remains in output' % match.group(), file=sys.stderr)
 
 #
 #
 #
-
-if __name__ == '__main__' :
+if __name__ == '__main__':
     options = OptionParser()
-    options.add_option('-v', '--verbose', action='count', dest = 'verbose', default = 0)
-    options.add_option('-c', '--cache', action='store_true', dest = 'cache', help="just ensure PLY cache is up to date")
+    options.add_option('-v', '--verbose', action='count', dest='verbose', default=0)
     (opts, args) = options.parse_args()
-
-    if opts.cache:
-        sys.exit()
 
     verbose = opts.verbose
 

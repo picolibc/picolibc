@@ -3,7 +3,7 @@
    Copyright (c) 1997 Nick Clifton, Cygnus Solutions
  */
 
-#include "acle-compat.h"
+#include "machine/acle-compat.h"
 
 /* ANSI concatenation macros.  */
 #define CONCAT(a, b)  CONCAT2(a, b)
@@ -23,42 +23,69 @@
 #define SIZE(x)
 #endif
 
+/* Jump buffer allocation sizes.  */
+#define JUMPBUF_CORE_REGS_SIZE (10 * 4)
+#define JUMPBUF_FP_REGS_SIZE (8 * 8)
+#define JUMPBUF_PAC (JUMPBUF_CORE_REGS_SIZE + JUMPBUF_FP_REGS_SIZE + 0)
+
 /* Arm/Thumb interworking support:
 
    The interworking scheme expects functions to use a BX instruction
    to return control to their parent.  Since we need this code to work
    in both interworked and non-interworked environments as well as with
-   older processors which do not have the BX instruction we do the 
+   older processors which do not have the BX instruction we do the
    following:
 	Test the return address.
 	If the bottom bit is clear perform an "old style" function exit.
 	(We know that we are in ARM mode and returning to an ARM mode caller).
 	Otherwise use the BX instruction to perform the function exit.
 
-   We know that we will never attempt to perform the BX instruction on 
-   an older processor, because that kind of processor will never be 
-   interworked, and a return address with the bottom bit set will never 
+   We know that we will never attempt to perform the BX instruction on
+   an older processor, because that kind of processor will never be
+   interworked, and a return address with the bottom bit set will never
    be generated.
 
    In addition, we do not actually assemble the BX instruction as this would
    require us to tell the assembler that the processor is an ARM7TDMI and
    it would store this information in the binary.  We want this binary to be
    able to be linked with binaries compiled for older processors however, so
-   we do not want such information stored there.  
+   we do not want such information stored there.
 
    If we are running using the APCS-26 convention however, then we never
-   test the bottom bit, because this is part of the processor status.  
-   Instead we just do a normal return, since we know that we cannot be 
+   test the bottom bit, because this is part of the processor status.
+   Instead we just do a normal return, since we know that we cannot be
    returning to a Thumb caller - the Thumb does not support APCS-26.
-	
-   Function entry is much simpler.  If we are compiling for the Thumb we 
+
+   Function entry is much simpler.  If we are compiling for the Thumb we
    just switch into ARM mode and then drop through into the rest of the
    function.  The function exit code will take care of the restore to
    Thumb mode.
-   
+
    For Thumb-2 do everything in Thumb mode.  */
 
 	.syntax unified
+
+/*  GCC 12.1 and later and clang will tell the assembler exactly which
+    floating point (or MVE) unit is required and we don't want to
+    override that.  Conversely, older versions of the compiler don't
+    pass this information so we need to enable the VFP version that is
+    most appropriate.  The choice here should support all suitable VFP
+    versions that the older toolchains can handle.  */
+#if __GNUC__ && __GNUC__ < 12 && !defined(__clang__)
+/*  Ensure that FPU instructions are correctly compiled and, likewise,
+    the appropriate build attributes are added to the resulting object
+    file.  Check whether the MVE extension is present and whether
+    we have support for hardware floating point-operations.  VFPxd
+    covers all the cases we need in this file for hardware
+    floating-point and should be compatible with all required FPUs
+    that we need to support.  */
+# if __ARM_FP
+	.fpu vfpxd
+# endif
+# if __ARM_FEATURE_MVE
+	.arch_extension mve
+# endif
+#endif
 
 #if __ARM_ARCH_ISA_THUMB == 1 && !__ARM_ARCH_ISA_ARM
 /* ARMv6-M-like has to be implemented in Thumb mode.  */
@@ -116,15 +143,15 @@ SYM (longjmp):
 #else
 #define RET	tst		lr, #1; \
 	        moveq		pc, lr ; \
-.word           0xe12fff1e	/* bx lr */
+.inst           0xe12fff1e	/* bx lr */
 #endif
 
 #ifdef __thumb2__
-.macro COND where when 
+.macro COND where when
 	i\where	\when
 .endm
 #else
-.macro COND where when 
+.macro COND where when
 .endm
 #endif
 
@@ -141,7 +168,7 @@ SYM (longjmp):
 .macro PROLOGUE name
 	.code 16
 	bx	pc
-	nop	
+	nop
 	.code 32
 SYM (.arm_start_of.\name):
 .endm
@@ -150,12 +177,13 @@ SYM (.arm_start_of.\name):
 .macro PROLOGUE name
 .endm
 #endif
-	
+
 .macro FUNC_START name
 	.text
 	.align 2
 	MODE
 	.globl SYM (\name)
+	.cfi_startproc
 	TYPE (\name)
 SYM (\name):
 	PROLOGUE \name
@@ -163,63 +191,90 @@ SYM (\name):
 
 .macro FUNC_END name
 	RET
+	.cfi_endproc
 	SIZE (\name)
 .endm
-	
+
 /* --------------------------------------------------------------------
-                 int setjmp (jmp_buf); 
+                 int setjmp (jmp_buf);
    -------------------------------------------------------------------- */
-	
+
 	FUNC_START setjmp
+
+#if __ARM_FEATURE_PAC_DEFAULT
+# if __ARM_FEATURE_BTI_DEFAULT
+	pacbti	ip, lr, sp
+# else
+	pac	ip, lr, sp
+# endif /* __ARM_FEATURE_BTI_DEFAULT */
+	mov r3, ip
+	str r3, [r0, #JUMPBUF_PAC]
+	.cfi_register 143, 12
+#else
+# if __ARM_FEATURE_BTI_DEFAULT
+	bti
+# endif /* __ARM_FEATURE_BTI_DEFAULT */
+#endif /* __ARM_FEATURE_PAC_DEFAULT */
 
 	/* Save all the callee-preserved registers into the jump buffer.  */
 #ifdef __thumb2__
 	mov		ip, sp
-	stmea		a1!, { v1-v7, fp, ip, lr }
+	stmia		r0!, { r4-r10, fp, ip, lr }
 #else
-	stmea		a1!, { v1-v7, fp, ip, sp, lr }
+	stmia		r0!, { r4-r10, fp, sp, lr }
 #endif
-	
-#if 0	/* Simulator does not cope with FP instructions yet.  */
-#ifndef __SOFTFP__
-	/* Save the floating point registers.  */
-	sfmea		f4, 4, [a1]
+#if defined __ARM_FP || defined __ARM_FEATURE_MVE
+	vstm		r0, { d8-d15 }
 #endif
-#endif		
+
 	/* When setting up the jump buffer return 0.  */
-	mov		a1, #0
+	mov		r0, #0
+#if __ARM_FEATURE_PAC_DEFAULT
+	mov ip, r3
+	aut ip, lr, sp
+#endif /* __ARM_FEATURE_PAC_DEFAULT */
 
 	FUNC_END setjmp
-	
+
 /* --------------------------------------------------------------------
 		volatile void longjmp (jmp_buf, int);
    -------------------------------------------------------------------- */
-	
+
 	FUNC_START longjmp
 
+#if __ARM_FEATURE_BTI_DEFAULT
+	bti
+#endif /* __ARM_FEATURE_BTI_DEFAULT */
+
+#if __ARM_FEATURE_PAC_DEFAULT
+	/* Keep original jmpbuf address for retrieving pac-code
+	   for authentication.  */
+	mov	r2, r0
+#endif /* __ARM_FEATURE_PAC_DEFAULT */
+
 	/* If we have stack extension code it ought to be handled here.  */
-	
+
 	/* Restore the registers, retrieving the state when setjmp() was called.  */
 #ifdef __thumb2__
-	ldmfd		a1!, { v1-v7, fp, ip, lr }
+	ldmia		r0!, { r4-r10, fp, ip, lr }
 	mov		sp, ip
 #else
-	ldmfd		a1!, { v1-v7, fp, ip, sp, lr }
+	ldmia		r0!, { r4-r10, fp, sp, lr }
 #endif
-	
-#if 0	/* Simulator does not cope with FP instructions yet.  */
-#ifndef __SOFTFP__
-	/* Restore floating point registers as well.  */
-	lfmfd		f4, 4, [a1]
+#if defined __ARM_FP || defined __ARM_FEATURE_MVE
+	vldm		r0, { d8-d15 }
 #endif
-#endif	
+
 	/* Put the return value into the integer result register.
-	   But if it is zero then return 1 instead.  */	
-	movs		a1, a2
-#ifdef __thumb2__
+	   But if it is zero then return 1 instead.  */
+	movs		r0, r1
 	it		eq
-#endif
-	moveq		a1, #1
+	moveq		r0, #1
+
+#if __ARM_FEATURE_PAC_DEFAULT
+	ldr ip, [r2, #JUMPBUF_PAC]
+	aut ip, lr, sp
+#endif /* __ARM_FEATURE_PAC_DEFAULT */
 
 	FUNC_END longjmp
 #endif

@@ -50,6 +50,8 @@ jobs:
       matrix:
         cmake_flags: [
           "",
+          # optional configurations
+          "-D__IO_FLOAT=y -D_IO_FLOAT_EXACT=n -D_WANT_IO_LONG_LONG=y -D_MB_CAPABLE=y -D_WANT_IO_POS_ARGS=y -D__HAVE_LOCALE_INFO__=y -D__HAVE_LOCALE_INFO_EXTENDED__=y ",
         ]
         test: [
 	  "./.github/do-cmake-linux",

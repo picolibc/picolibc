@@ -42,6 +42,8 @@ volatile FLOAT_T makemathname(two) = (FLOAT_T) 2.0;
 volatile FLOAT_T makemathname(three) = (FLOAT_T) 3.0;
 volatile FLOAT_T makemathname(half) = (FLOAT_T) 0.5;
 volatile FLOAT_T makemathname(big) = BIG;
+volatile FLOAT_T makemathname(bigodd) = BIGODD;
+volatile FLOAT_T makemathname(bigeven) = BIGEVEN;
 volatile FLOAT_T makemathname(small) = SMALL;
 volatile FLOAT_T makemathname(infval) = (FLOAT_T) INFINITY;
 volatile FLOAT_T makemathname(minfval) = (FLOAT_T) -INFINITY;
@@ -591,6 +593,10 @@ FLOAT_T makemathname(test_pow_0_neghalf)(void) { return makemathname(pow)(makema
 FLOAT_T makemathname(test_pow_neg0_neghalf)(void) { return makemathname(pow)(-makemathname(zero), -makemathname(half)); }
 FLOAT_T makemathname(test_pow_0_neg3)(void) { return makemathname(pow)(makemathname(zero), -makemathname(three)); }
 FLOAT_T makemathname(test_pow_neg0_neg3)(void) { return makemathname(pow)(-makemathname(zero), -makemathname(three)); }
+FLOAT_T makemathname(test_pow_negsmall_negbigodd)(void) { return makemathname(pow)(-makemathname(small), -makemathname(bigodd)); }
+FLOAT_T makemathname(test_pow_negbig_bigodd)(void) { return makemathname(pow)(-makemathname(big), makemathname(bigodd)); }
+FLOAT_T makemathname(test_pow_negsmall_negbigeven)(void) { return makemathname(pow)(-makemathname(small), -makemathname(bigeven)); }
+FLOAT_T makemathname(test_pow_negbig_bigeven)(void) { return makemathname(pow)(-makemathname(big), makemathname(bigeven)); }
 
 #ifndef __PICOLIBC__
 #define pow10(x) exp10(x)
@@ -1091,6 +1097,10 @@ struct {
 	TEST(pow_neg0_neg2, (FLOAT_T)INFINITY, FE_DIVBYZERO, ERANGE),
 	TEST(pow_0_neg3, (FLOAT_T)INFINITY, FE_DIVBYZERO, ERANGE),
 	TEST(pow_neg0_neg3, (FLOAT_T)-INFINITY, FE_DIVBYZERO, ERANGE),
+	TEST(pow_negsmall_negbigodd, (FLOAT_T)-INFINITY, FE_OVERFLOW, ERANGE),
+	TEST(pow_negbig_bigodd, (FLOAT_T)-INFINITY, FE_OVERFLOW, ERANGE),
+	TEST(pow_negsmall_negbigeven, (FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
+	TEST(pow_negbig_bigeven, (FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
 
 	TEST(pow10_qnan, (FLOAT_T)NAN, 0, 0),
 	TEST(pow10_snan, (FLOAT_T)NAN, FE_INVALID, 0),

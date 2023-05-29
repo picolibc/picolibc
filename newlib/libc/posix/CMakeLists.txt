@@ -42,9 +42,9 @@ picolibc_sources(
   regfree.c
   )
 
-if(__HAVE_LOCALE_INFO)
+if(__HAVE_LOCALE_INFO__)
   picolibc_sources(
-    'collate.c',
-    'collcmp.c',
+    collate.c
+    collcmp.c
     )
 endif()

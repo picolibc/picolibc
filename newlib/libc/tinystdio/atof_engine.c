@@ -37,26 +37,15 @@
 float
 __atof_engine(uint32_t u32, int exp)
 {
-    float flt;
-    const float *f;
-    flt = u32;
-    int exp_cur;
+    float flt = u32;
 
-    if (exp < 0) {
-	f = __ftoa_scale_down + DTOA_SCALE_DOWN_NUM - 1;
-	exp = -exp;
-	exp_cur = 1 << (DTOA_SCALE_DOWN_NUM - 1);
-    } else {
-	f = __ftoa_scale_up + DTOA_SCALE_UP_NUM - 1;
-	exp_cur = 1 << (DTOA_SCALE_UP_NUM - 1);
+    while (exp < 0) {
+        flt *= 1e-1f;
+        exp++;
     }
-    while (exp) {
-	if (exp >= exp_cur) {
-	    flt *= *f;
-	    exp -= exp_cur;
-	}
-	f--;
-	exp_cur >>= 1;
+    while (exp > 0) {
+        flt *= 1e1f;
+        exp--;
     }
     return flt;
 }

@@ -48,6 +48,10 @@ ANSI C, POSIX.
 
 #ifdef _NEED_FLOAT64
 
+#ifdef __clang__
+#pragma STDC FP_CONTRACT OFF
+#endif
+
 __float64
 fma64(__float64 x, __float64 y, __float64 z)
 {

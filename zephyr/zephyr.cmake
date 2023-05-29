@@ -85,9 +85,13 @@ if(CONFIG_PICOLIBC_USE_MODULE)
 
   zephyr_compile_options(-D_POSIX_C_SOURCE=200809)
 
-  # Link to C library and libgcc
+  # Link to C library and libgcc (on non-armclang toolchains)
 
-  zephyr_link_libraries(c -lgcc)
+  if(${ZEPHYR_TOOLCHAIN_VARIANT} STREQUAL "armclang")
+    zephyr_link_libraries(c)
+  else()
+    zephyr_link_libraries(c -lgcc)
+  endif()
 
   # Provide an alias target for zephyr to use
 

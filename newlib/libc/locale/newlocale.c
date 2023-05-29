@@ -203,7 +203,10 @@ newlocale (int category_mask, const char *locale,
 	    continue;
 	  /* Otherwise load locale data. */
 	  else if (!__loadlocale (&tmp_locale, i, new_categories[i]))
-	    goto error;
+	    {
+              __errno_r(p) = ENOENT;
+	      goto error;
+	    }
 	}
     }
   /* Allocate new locale_t. */

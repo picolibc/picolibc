@@ -207,11 +207,11 @@ pow64(__float64 x, __float64 y)
         return __math_invalid(x);
 
     /* |y| is huge */
-    if (iy > 0x41e00000) { /* if |y| > 2**31 */
-        if (iy > 0x43f00000) { /* if |y| > 2**64, must o/uflow */
+    if (iy > 0x42000000) { /* if |y| > ~2**33 */
+        if (iy > 0x43f00000) { /* if |y| > ~2**64, must o/uflow */
             if (ix <= 0x3fefffff)
                 return (hy < 0) ? __math_oflow(0) : __math_uflow(0);
-            if (ix >= 0x3ff00000)
+            else
                 return (hy > 0) ? __math_oflow(0) : __math_uflow(0);
         }
         /* over/underflow if x is not close to one */
