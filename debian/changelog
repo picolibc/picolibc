@@ -1,3 +1,14 @@
+picolibc (1.8.2-1) unstable; urgency=medium
+
+  * New upstream
+
+  * Fix a couple of minor imprecisions in pow and 80-bit powl.
+
+  * Merge newlib changes that included an update to the ARM assembly
+    code.
+
+ -- Keith Packard <keithp@keithp.com>  Sun, 28 May 2023 20:06:47 -0700
+
 picolibc (1.8.1-1) unstable; urgency=medium
 
   * New upstream

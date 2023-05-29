@@ -952,7 +952,6 @@ Files: dummyhost/iob.c
  newlib/libc/tinystdio/fseeko.c
  newlib/libc/tinystdio/ftell.c
  newlib/libc/tinystdio/ftello.c
- newlib/libc/tinystdio/ftoa_data.c
  newlib/libc/tinystdio/fwide.c
  newlib/libc/tinystdio/meson.build
  newlib/libc/tinystdio/posixiob.c
@@ -1575,8 +1574,7 @@ Files: newlib/libc/machine/aarch64/setjmp.S
 Copyright: 2011, 2012 ARM Ltd
 License: BSD3-8
 
-Files: newlib/libc/machine/arm/acle-compat.h
- newlib/libc/machine/arm/aeabi_memcpy-armv7a.S
+Files: newlib/libc/machine/arm/aeabi_memcpy-armv7a.S
  newlib/libc/machine/arm/machine/acle-compat.h
  newlib/libc/machine/arm/strcmp-armv6m.S
 Copyright: 2014 ARM Ltd
@@ -1793,11 +1791,9 @@ Files: newlib/libc/tinystdio/clearerr.c
 Copyright: 2002,2005 Joerg Wunsch
 License: BSD3-13
 
-Files: newlib/libc/tinystdio/dtoa_data.c
- newlib/libc/tinystdio/dtoa_engine.c
+Files: newlib/libc/tinystdio/dtoa_engine.c
  newlib/libc/tinystdio/dtoa_engine.h
  newlib/libc/tinystdio/ldtoa_engine.h
- newlib/libc/tinystdio/make-dtoa-data
  newlib/libc/tinystdio/sprintfd.c
  newlib/libc/tinystdio/sprintff.c
  newlib/libc/tinystdio/vfiprintf.c
@@ -2368,7 +2364,7 @@ Copyright: 1997 Peter Wemm <peter@freebsd.org>
 License: BSD3-31
 
 Files: newlib/libc/time/strptime.c
-Copyright: 1999 Kungliga Tekniska Hgskolan Royal Institute of Technology, Stockholm, Sweden).
+Copyright: 1999 Kungliga Tekniska Högskolan Royal Institute of Technology, Stockholm, Sweden).
 License: BSD3-32
 
 Files: newlib/libc/tinystdio/ftoa_engine.c
@@ -2615,8 +2611,10 @@ Files: .clang-format
  .github/workflows/variants
  .gitignore
  README.md
- cmake/TC-arm-none-eabi.cmake
- cmake/TC-clang-arm-none-eabi.cmake
+ cmake/TC-clang-thumbv6m.cmake
+ cmake/TC-clang-thumbv7m.cmake
+ cmake/TC-thumbv6m.cmake
+ cmake/TC-thumbv7m.cmake
  cross.tmpl
  doc/build.md
  doc/embedsource.md
@@ -2713,7 +2711,7 @@ Files: .clang-format
  test/long_double_vec.h
  test/test-atomic.c
  test/time-sprintf.c
-Copyright:
+Copyright: 2020 The Newlib Project
 License: Default-1
 
 Files: newlib/doc/chapter-texi2docbook.py
@@ -3583,10 +3581,10 @@ Files: newlib/libc/machine/moxie/setjmp.S
 Copyright: 2009, 2019  Anthony Green
 License: Other-8
 
-Files: newlib/libc/machine/nvptx/abort.c
+Files: newlib/libc/machine/nvptx/_exit.c
+ newlib/libc/machine/nvptx/abort.c
  newlib/libc/machine/nvptx/calloc.c
  newlib/libc/machine/nvptx/callocr.c
- newlib/libc/machine/nvptx/exit.c
  newlib/libc/machine/nvptx/mallocr.c
  newlib/libc/machine/nvptx/misc.c
  newlib/libc/machine/nvptx/reallocr.c
