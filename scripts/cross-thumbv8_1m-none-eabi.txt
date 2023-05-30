@@ -3,13 +3,13 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['arm-none-eabi-gcc', '-nostdlib']
+c = ['arm-none-eabi-gcc', '-nostdlib', '-mthumb', '-march=armv8.1-m.main+mve', '-mfloat-abi=hard']
 ar = 'arm-none-eabi-ar'
 as = 'arm-none-eabi-as'
 nm = 'arm-none-eabi-nm'
 strip = 'arm-none-eabi-strip'
 # only needed to run tests
-exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-arm "$@"', 'run-arm']
+exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-cortex-m55 "$@"', 'run-cortex-m55']
 
 [host_machine]
 system = 'none'
@@ -21,8 +21,8 @@ endian = 'little'
 skip_sanity_check = true
 separate_boot_flash = true
 default_boot_flash_addr = '0x00000000'
-default_boot_flash_size = '0x00000400'
-default_flash_addr = '0x00000400'
-default_flash_size = '0x003ffc00'
-default_ram_addr   = '0x20000000'
-default_ram_size   = '0x00200000'
+default_boot_flash_size = '0x00080000'
+default_flash_addr = '0x01000000'
+default_flash_size = '0x00200000'
+default_ram_addr   = '0x60000000'
+default_ram_size   = '0x01000000'

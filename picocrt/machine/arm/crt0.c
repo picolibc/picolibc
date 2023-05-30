@@ -55,7 +55,10 @@ _start(void)
 {
 	/* Generate a reference to __interrupt_vector so we get one loaded */
 	__asm__(".equ __my_interrupt_vector, __interrupt_vector");
-#ifndef __SOFTFP__
+    /* Access to the coprocessor has to be enabled in CPACR, if either FPU or
+     * MVE is used. This is described in "Arm v8-M Architecture Reference
+     * Manual". */
+#if defined __ARM_FP || defined __ARM_FEATURE_MVE
 	/* Enable FPU */
 	*CPACR |= 0xf << 20;
 	/*

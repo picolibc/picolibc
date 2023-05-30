@@ -1021,6 +1021,8 @@ Files: dummyhost/iob.c
  scripts/do-riscv-configure
  scripts/do-rv32imac-configure
  scripts/do-sparc64-configure
+ scripts/do-thumbv8_1m-configure
+ scripts/do-thumbv8m_main_fp-configure
  scripts/do-x86-configure
  scripts/do-x86_64-configure
  scripts/do-xtensa-espressif_esp32-configure
@@ -1035,6 +1037,8 @@ Files: dummyhost/iob.c
  scripts/do-zephyr-riscv-configure
  scripts/run-arm
  scripts/run-cortex-a9
+ scripts/run-cortex-m33
+ scripts/run-cortex-m55
  scripts/run-power9
  scripts/run-riscv
  scripts/run-thumbv6m
@@ -2692,6 +2696,8 @@ Files: .clang-format
  scripts/cross-rv32imac.txt
  scripts/cross-rv32imac_zicsr.txt
  scripts/cross-sparc64-linux-gnu.txt
+ scripts/cross-thumbv8_1m-none-eabi.txt
+ scripts/cross-thumbv8m_main_fp-none-eabi.txt
  scripts/cross-x86-linux-gnu.txt
  scripts/cross-x86_64-linux-gnu.txt
  scripts/cross-xtensa-esp32-elf.txt

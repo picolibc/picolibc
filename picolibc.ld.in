@@ -41,9 +41,13 @@ ENTRY(_start)
  */
 
 MEMORY
-{
-	flash (rx!w) : ORIGIN = DEFINED(__flash) ? __flash : @DEFAULT_FLASH_ADDR@, LENGTH = DEFINED(__flash_size) ? __flash_size : @DEFAULT_FLASH_SIZE@
-	ram (w!rx)   : ORIGIN = DEFINED(__ram  ) ? __ram   : @DEFAULT_RAM_ADDR@, LENGTH = DEFINED(__ram_size  ) ? __ram_size   : @DEFAULT_RAM_SIZE@
+{@MEMORY_BOOT_FLASH@
+	flash (rx!w) :
+		ORIGIN = DEFINED(__flash) ? __flash : @DEFAULT_FLASH_ADDR@,
+		LENGTH = DEFINED(__flash_size) ? __flash_size : @DEFAULT_FLASH_SIZE@
+	ram (w!rx) :
+		ORIGIN = DEFINED(__ram) ? __ram : @DEFAULT_RAM_ADDR@,
+		LENGTH = DEFINED(__ram_size) ? __ram_size : @DEFAULT_RAM_SIZE@
 }
 
 PHDRS
@@ -62,7 +66,7 @@ SECTIONS
 		KEEP (*(.text.init.enter))
 		KEEP (*(.data.init.enter))
 		KEEP (*(SORT_BY_NAME(.init) SORT_BY_NAME(.init.*)))
-	} >flash AT>flash :text
+	} >@INIT_MEMORY@ AT>@INIT_MEMORY@ :text
 
 	.text : {
 

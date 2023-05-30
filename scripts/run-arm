@@ -124,6 +124,10 @@ case "$elf" in
     *thumb_v8_m_main_dp_hard*)
 	;;
 
+    *thumb_v8_1_m_main_mve_hard*)
+    cpu=cortex-m55
+    ;;
+
     # v7 - Cortex-A7
     *thumb_v7_nofp*)
 	cpu=cortex-a7
@@ -153,6 +157,16 @@ case $cpu in
     cortex-m3)
 	machine=mps2-an385
 	;;
+
+    # mps2-an386 offers a cortex-m4 processor
+    cortex-m4)
+    machine=mps2-an386
+    ;;
+
+    # mps2-an500 offers a cortex-m7 processor
+    cortex-m7)
+    machine=mps2-an500
+    ;;
 
     # Maybe qemu upstream will take this machine
     # which supports all Cortex-M processors

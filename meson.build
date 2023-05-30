@@ -749,13 +749,34 @@ else
     picolibc_linker_type_data.set('LLD_END', '*/')
 endif
 
-picolibc_linker_type_data.set('DEFAULT_FLASH_ADDR',
-			      meson.get_cross_property('default_flash_addr',
-						       '0x10000000'))
-
-picolibc_linker_type_data.set('DEFAULT_FLASH_SIZE',
-			      meson.get_cross_property('default_flash_size',
-						       '0x00010000'))
+if meson.get_cross_property('separate_boot_flash', false)
+    default_boot_flash_addr = meson.get_cross_property(
+        'default_boot_flash_addr',
+        '0x10000000')
+    default_boot_flash_size = meson.get_cross_property(
+        'default_boot_flash_size',
+        '0x00000400')
+    picolibc_linker_type_data.set('MEMORY_BOOT_FLASH', '''
+	boot_flash (rx!w) :
+		ORIGIN = DEFINED(__boot_flash) ? __boot_flash : ''' + default_boot_flash_addr + ''',
+		LENGTH = DEFINED(__boot_flash_size) ? __boot_flash_size : ''' + default_boot_flash_size)
+    picolibc_linker_type_data.set('INIT_MEMORY', 'boot_flash')
+    picolibc_linker_type_data.set(
+        'DEFAULT_FLASH_ADDR',
+        meson.get_cross_property('default_flash_addr', '0x10000400'))
+    picolibc_linker_type_data.set(
+        'DEFAULT_FLASH_SIZE',
+        meson.get_cross_property('default_flash_size', '0x0000fc00'))
+else
+    picolibc_linker_type_data.set('MEMORY_BOOT_FLASH', '')
+    picolibc_linker_type_data.set('INIT_MEMORY', 'flash')
+    picolibc_linker_type_data.set(
+        'DEFAULT_FLASH_ADDR',
+        meson.get_cross_property('default_flash_addr', '0x10000000'))
+    picolibc_linker_type_data.set(
+        'DEFAULT_FLASH_SIZE',
+        meson.get_cross_property('default_flash_size', '0x00010000'))
+endif
 
 picolibc_linker_type_data.set('DEFAULT_RAM_ADDR',
 			      meson.get_cross_property('default_ram_addr',
