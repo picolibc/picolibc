@@ -56,4 +56,11 @@ details. */
 #define __PATH_MAX 4096
 #define __PIPE_BUF 4096
 
+/* XATTR_NAME_MAX is the maximum XATTR name length excluding the null
+ * terminator. Since only XATTRs in the `user' namespace are allowed and the
+ * `user.' prefix is not stored, the maximum is increased by 5. */
+#define XATTR_NAME_MAX 260
+#define XATTR_SIZE_MAX 65536
+#define XATTR_LIST_MAX 65536
+
 #endif /* _CYGWIN_LIMITS_H__ */
