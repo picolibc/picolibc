@@ -30,6 +30,8 @@ envz_merge (char **envz,
       if (!override)
         {
           name_str = strdup (entry);
+          if (!name_str)
+              return ENOMEM;
           name_iter = strchr(name_str, '=');
           if(name_iter)
             *name_iter = '\0';
@@ -43,6 +45,8 @@ envz_merge (char **envz,
       else
         {
           name_str = strdup (entry);
+          if (!name_str)
+              return ENOMEM;
           name_iter = strchr(name_str, '=');
           if(name_iter)
             {
