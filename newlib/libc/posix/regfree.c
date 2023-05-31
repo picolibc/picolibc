@@ -76,7 +76,7 @@ regfree(regex_t *preg)
 	if (g->must != NULL)
 		free(g->must);
 	if (g->charjump != NULL)
-		free(&g->charjump[CHAR_MIN]);
+                free(g->charjump);
 	if (g->matchjump != NULL)
 		free(g->matchjump);
 	free((char *)g);

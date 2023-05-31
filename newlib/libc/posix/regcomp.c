@@ -1869,16 +1869,14 @@ computejumps(struct parse *p, struct re_guts *g)
 	if (p->error != 0)
 		return;
 
-	g->charjump = (int*) malloc((NC + 1) * sizeof(int));
+	g->charjump = (int*) malloc(NC * sizeof(int));
 	if (g->charjump == NULL)	/* Not a fatal error */
 		return;
-	/* Adjust for signed chars, if necessary */
-	g->charjump = &g->charjump[-(CHAR_MIN)];
 
 	/* If the character does not exist in the pattern, the jump
 	 * is equal to the number of characters in the pattern.
 	 */
-	for (ch = CHAR_MIN; ch < (CHAR_MAX + 1); ch++)
+	for (ch = 0; ch < NC; ch++)
 		g->charjump[ch] = g->mlen;
 
 	/* If the character does exist, compute the jump that would
