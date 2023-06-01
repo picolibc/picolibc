@@ -117,5 +117,5 @@ fdevopen(int (*put)(char, FILE *), int (*get)(FILE *), int (*flush)(FILE *))
 		cf->file.flags |= __SWR;
 	}
 
-	return &(cf->file);
+	return (FILE *) cf;
 }

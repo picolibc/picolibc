@@ -147,5 +147,5 @@ fmemopen(void *buf, size_t size, const char *mode)
                 .mflags = mflags,
         };
 
-	return &(mf->xfile.cfile.file);
+	return (FILE *) mf;
 }
