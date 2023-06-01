@@ -403,6 +403,12 @@ __strong_reference(malloc, __malloc_malloc);
 
 #ifdef DEFINE_FREE
 
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wanalyzer-null-dereference"
+#endif
+
 /** Function free
   * Implementation of libc free.
   * Algorithm:
