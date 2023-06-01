@@ -1750,7 +1750,7 @@ findmust(struct parse *p, struct re_guts *g)
 		}
 	} while (OP(s) != OEND);
 
-	if (g->mlen == 0) {		/* there isn't one */
+	if (g->mlen == 0 || !start) {		/* there isn't one */
 		g->moffset = -1;
 		return;
 	}
