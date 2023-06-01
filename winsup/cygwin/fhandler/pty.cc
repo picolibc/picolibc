@@ -1297,17 +1297,7 @@ fhandler_pty_slave::mask_switch_to_nat_pipe (bool mask, bool xfer)
   else if (InterlockedDecrement (&num_reader) == 0)
     CloseHandle (slave_reading);
 
-  /* This is needed when cygwin-app is started from non-cygwin app if
-     pseudo console is disabled. */
-  bool need_xfer = get_ttyp ()->nat_fg (get_ttyp ()->getpgid ())
-    && get_ttyp ()->switch_to_nat_pipe && !get_ttyp ()->pcon_activated;
-
-  /* In GDB, transfer input based on setpgid() does not work because
-     GDB may not set terminal process group properly. Therefore,
-     transfer input here if isHybrid is set. */
-  bool need_gdb_xfer =
-    isHybrid && GetStdHandle (STD_INPUT_HANDLE) == get_handle ();
-  if (!!masked != mask && xfer && (need_gdb_xfer || need_xfer))
+  if (!!masked != mask && xfer && get_ttyp ()->switch_to_nat_pipe)
     {
       if (mask && get_ttyp ()->pty_input_state_eq (tty::to_nat))
 	{
@@ -2238,11 +2228,7 @@ fhandler_pty_master::write (const void *ptr, size_t len)
       if (!get_ttyp ()->pcon_start)
 	{ /* Pseudo console initialization has been done in above code. */
 	  pinfo pp (get_ttyp ()->pcon_start_pid);
-	  bool pcon_fg = (pp && get_ttyp ()->getpgid () == pp->pgid);
-	  /* GDB may set WINPID rather than cygwin PID to process group
-	     when the debugged process is a non-cygwin process.*/
-	  pcon_fg |= !pinfo (get_ttyp ()->getpgid ());
-	  if (get_ttyp ()->switch_to_nat_pipe && pcon_fg
+	  if (get_ttyp ()->switch_to_nat_pipe
 	      && get_ttyp ()->pty_input_state_eq (tty::to_cyg))
 	    {
 	      /* This accept_input() call is needed in order to transfer input
@@ -4089,7 +4075,7 @@ fhandler_pty_slave::cleanup_for_non_cygwin_app (handle_set_t *p, tty *ttyp,
 						DWORD force_switch_to)
 {
   ttyp->wait_fwd ();
-  if (ttyp->getpgid () == myself->pgid && stdin_is_ptys
+  if ((ttyp->pcon_activated || stdin_is_ptys)
       && ttyp->pty_input_state_eq (tty::to_nat))
     {
       WaitForSingleObject (p->input_mutex, mutex_timeout);
