@@ -80,12 +80,10 @@ QUICKREF
 double complex
 clog(double complex z)
 {
-	double complex w;
 	double p, rr;
 
 	rr = cabs(z);
 	p = log(rr);
 	rr = atan2(cimag(z), creal(z));
-	w = p + rr * (double complex) I;
-	return w;
+	return (double complex) p + rr * (double complex) I;
 }

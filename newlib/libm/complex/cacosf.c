@@ -42,6 +42,5 @@ cacosf(float complex z)
 	float complex w;
 
 	w = casinf(z);
-	w = ((float)M_PI_2 - crealf(w)) - cimagf(w) * I;
-	return w;
+	return (float complex) ((float)M_PI_2 - crealf(w)) - cimagf(w) * I;
 }

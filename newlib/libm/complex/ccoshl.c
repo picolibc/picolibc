@@ -37,13 +37,11 @@
 long double complex
 ccoshl(long double complex z)
 {
-	long double complex w;
 	long double x, y;
 
 	x = creall(z);
 	y = cimagl(z);
-	w = coshl(x) * cosl(y) + (sinhl(x) * sinl(y)) * (long double complex) I;
-	return w;
+	return (long double complex) (coshl(x) * cosl(y)) + (sinhl(x) * sinl(y)) * (long double complex) I;
 }
 
 #endif

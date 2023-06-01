@@ -39,7 +39,6 @@
 long double complex
 ctanl(long double complex z)
 {
-	long double complex w;
 	long double d;
 
 	d = cosl(2.0L * creall(z)) + coshl(2.0L * cimagl(z));
@@ -49,12 +48,10 @@ ctanl(long double complex z)
 
 	if (d == 0.0L) {
 		/* mtherr ("ctan", OVERFLOW); */
-		w = HUGE_VALL + HUGE_VALL * (long double complex) I;
-		return w;
+		return HUGE_VALL + HUGE_VALL * (long double complex) I;
 	}
 
-	w = sinl(2.0L * creall(z)) / d + (sinhl(2.0L * cimagl(z)) / d) * (long double complex) I;
-	return w;
+	return (long double complex) (sinl(2.0L * creall(z)) / d) + (sinhl(2.0L * cimagl(z)) / d) * (long double complex) I;
 }
 
 #endif
