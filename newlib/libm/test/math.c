@@ -47,6 +47,10 @@ double mretval = 64;
 int traperror = 1;
 char *mname;
 
+/*
+  #define INCLUDE_GENERATE
+*/
+
 void
 translate_to (FILE *file,
 	    double r)
@@ -338,10 +342,16 @@ finish (FILE *f,
   int mag;
 
   mag = ffcheck(result, p,name,  merror, errno);
+  (void) f;
+  (void) vector;
+  (void) args;
+  (void) mag;
+#ifdef INCLUDE_GENERATE
   if (vector)
   {
     frontline(f, mag, p, result, merror, errno, args , name);
   }
+#endif
 }
 
 void
@@ -359,6 +369,11 @@ finish2 (FILE *f,
   mag2 = ffcheck_id(result2, p,name,  merror, errno, 2);
   if (mag2 < mag)
     mag = mag2;
+  (void) f;
+  (void) vector;
+  (void) mag;
+  (void) args;
+#ifdef INCLUDE_GENERATE
   if (vector)
   {
     __ieee_double_shape_type result2_double;
@@ -367,6 +382,7 @@ finish2 (FILE *f,
     p->qs[2].lsw = result2_double.parts.lsw;
     frontline(f, mag, p, result, merror, errno, args , name);
   }
+#endif
 }
 
 void
@@ -380,10 +396,16 @@ ffinish (FILE *f,
   int mag;
 
   mag = fffcheck(fresult, p,name,  merror, errno);
+  (void) f;
+  (void) vector;
+  (void) args;
+  (void) mag;
+#ifdef INCLUDE_GENERATE
   if (vector)
   {
     frontline(f, mag, p, (double) fresult, merror, errno, args , name);
   }
+#endif
 }
 
 void
@@ -401,6 +423,11 @@ ffinish2 (FILE *f,
   mag2 = fffcheck_id(fresult2, p, name, merror, errno, 2);
   if (mag2 < mag)
     mag = mag2;
+  (void) f;
+  (void) vector;
+  (void) args;
+  (void) mag;
+#ifdef INCLUDE_GENERATE
   if (vector)
   {
     __ieee_double_shape_type result2_double;
@@ -409,6 +436,7 @@ ffinish2 (FILE *f,
     p->qs[2].lsw = result2_double.parts.lsw;
     frontline(f, mag, p, (double) fresult, merror, errno, args , name);
   }
+#endif
 }
 
 extern int redo;
