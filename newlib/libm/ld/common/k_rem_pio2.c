@@ -119,6 +119,12 @@
  *
  */
 
+#ifdef __GNUC__
+/* GCC analyzer gets confused about the use of 'iq' here */
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wanalyzer-use-of-uninitialized-value"
+#endif
 
 /*
  * Constants:

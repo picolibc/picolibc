@@ -59,6 +59,12 @@
 
 #include "xdr_private.h"
 
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wanalyzer-malloc-leak"
+#endif
+
 #ifndef ntohl
 # define ntohl(x) xdr_ntohl(x)
 #endif
@@ -670,7 +676,11 @@ __xdrrec_getrec (XDR * xdrs,
         }
       rstrm->in_reclen += fraglen;
       if (rstrm->in_reclen > (int)rstrm->recvsize) /* guaranteed recvsize < INT_MAX */
-        realloc_stream (rstrm, rstrm->in_reclen);
+        if (!realloc_stream (rstrm, rstrm->in_reclen))
+          {
+            *statp = XPRT_DIED;
+            return FALSE;
+          }
       if (rstrm->in_header & LAST_FRAG)
         {
           rstrm->in_header &= ~LAST_FRAG;
@@ -888,13 +898,11 @@ realloc_stream (RECSTREAM * rstrm,
       buf = realloc (rstrm->in_buffer, (size_t) (size + BYTES_PER_XDR_UNIT));
       if (buf == NULL)
         return FALSE;
-      for (buf_algn = buf;
-           (intptr_t) buf_algn % BYTES_PER_XDR_UNIT != 0; buf_algn++)
-        ;
-      diff = buf_algn - rstrm->in_base;
+      rstrm->in_buffer = buf;
+      buf_algn = (char *) RNDUP((uintptr_t) buf);
+      diff = buf_algn - buf;
       rstrm->in_finger += diff;
       rstrm->in_base = buf_algn;
-      rstrm->in_buffer = buf;
       rstrm->in_boundry = buf_algn + size;
       rstrm->recvsize = size;
       rstrm->in_size = size;
