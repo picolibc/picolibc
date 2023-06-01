@@ -245,6 +245,13 @@ int _dummy_mallocr = 1;
 
 /* Preliminaries */
 
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wanalyzer-malloc-leak"
+#pragma GCC diagnostic ignored "-Wanalyzer-use-of-uninitialized-value"
+#endif
+
 #define _DEFAULT_SOURCE
 #ifndef __STD_C
 #ifdef __STDC__
