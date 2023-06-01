@@ -8,13 +8,33 @@ for p in /opt/*/bin; do
     PATH="$p":$PATH
 done
 
+ANALYZER="-Danalyzer=true"
+
+# Disable analyzer on m68k because the compiler gets very confused
+# about complex values
+
+case "$TARGET" in
+    *m68k*)
+	ANALYZER=""
+	;;
+esac
+
+# Disable the analyser when not using tinystdio as the stdio code is
+# full of problems
+
+case "$*" in
+    *-Dtinystdio=false*)
+	ANALYZER=""
+	;;
+esac
+
 mkdir "$DIR"
 trap 'rm -rf "$DIR"' 0 1 15
 (cd "$DIR" || exit 1
  echo '##################################################'
- echo '##########' ../scripts/"$CONFIGURE" -Dwerror=true "$@"
+ echo '##########' ../scripts/"$CONFIGURE" -Dwerror=true $ANALYZER "$@"
  echo '##################################################'
- ../scripts/"$CONFIGURE" -Dwerror=true "$@"
+ ../scripts/"$CONFIGURE" -Dwerror=true $ANALYZER "$@"
  case $? in
      0)
 	 echo 'Configuration succeeded'
