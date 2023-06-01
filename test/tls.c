@@ -266,23 +266,28 @@ main(void)
         size_t tls_size = _tls_size();
 	void *tls = aligned_alloc(tls_align, tls_size);
 
-        /*
-         * Fill the region with data to make sure even bss
-         * gets correctly initialized
-         */
-        memset(tls, 0x55, tls_size);
+        if (tls) {
+            /*
+             * Fill the region with data to make sure even bss
+             * gets correctly initialized
+             */
+            memset(tls, 0x55, tls_size);
 
-	_init_tls(tls);
-	_set_tls(tls);
+            _init_tls(tls);
+            _set_tls(tls);
 
-	if (memcmp(tls, &__tdata_source, tdata_size) != 0) {
+            if (memcmp(tls, &__tdata_source, tdata_size) != 0) {
 		printf("New TLS data in RAM does not match ROM\n");
 		hexdump(&__tdata_source, tdata_source_size, "ROM:");
 		hexdump(tls, tdata_size, "RAM:");
 		result++;
-	}
+            }
 
-	result += check_tls("allocated", true, tls);
+            result += check_tls("allocated", true, tls);
+        } else {
+            printf("TLS allocation failed\n");
+            result = 1;
+        }
 #endif
 
 	printf("tls test result %d\n", result);
