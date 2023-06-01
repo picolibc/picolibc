@@ -770,6 +770,11 @@ c_warnings = [
   '-Wold-style-definition',
   '-Werror=double-promotion',
 ]
+if get_option('analyzer')
+  c_warnings += [
+    '-fanalyzer',
+    ]
+endif
 disabled_warnings = [
   '-Wno-missing-braces',
   '-Wno-implicit-int',

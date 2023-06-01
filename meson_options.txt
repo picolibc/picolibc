@@ -92,6 +92,9 @@ option('profile', type: 'boolean', value: false,
 option('freestanding', type: 'boolean', value: false,
        description: 'Build the library with -ffreestanding (useful for Zephyr testing)')
 
+option('analyzer', type: 'boolean', value: false,
+       description: 'Enable the analyzer while compiling with -fanalyzer')
+
 #
 # Testing options
 #
