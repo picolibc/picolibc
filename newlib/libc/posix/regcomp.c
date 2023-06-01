@@ -695,6 +695,9 @@ p_bracket(struct parse *p)
 		return;
 	}
 
+	if (p->error != 0)	/* don't mess things up further */
+		return;
+
 	if (EAT('^'))
 		invert++;	/* make note to invert set at end */
 	if (EAT(']'))
@@ -706,9 +709,6 @@ p_bracket(struct parse *p)
 	if (EAT('-'))
 		CHadd(cs, '-');
 	(void)MUSTEAT(']', REG_EBRACK);
-
-	if (p->error != 0)	/* don't mess things up further */
-		return;
 
 	if (p->g->cflags&REG_ICASE) {
 		int i;
@@ -1147,6 +1147,10 @@ seterr(struct parse *p, int e)
 {
 	if (p->error == 0)	/* keep earliest error condition */
 		p->error = e;
+        free(p->g->sets);
+        free(p->g->setbits);
+        p->g->sets = NULL;
+        p->g->setbits = NULL;
 	p->next = nuls;		/* try to bring things to a halt */
 	p->end = nuls;
 	return(0);		/* make the return value well-defined */
@@ -1165,37 +1169,34 @@ allocset(struct parse *p)
 	cset *cs;
 	size_t css = (size_t)p->g->csetsize;
 	int i;
+        uch *setbits;
 
 	if (no >= p->ncsalloc) {	/* need another column of space */
 		p->ncsalloc += CHAR_BIT;
 		nc = p->ncsalloc;
 		assert(nc % CHAR_BIT == 0);
 		nbytes = nc / CHAR_BIT * css;
-		if (p->g->sets == NULL)
-			p->g->sets = (cset *)malloc(nc * sizeof(cset));
-		else
-			p->g->sets = (cset *)reallocf((char *)p->g->sets,
-							nc * sizeof(cset));
-		if (p->g->setbits == NULL)
-			p->g->setbits = (uch *)malloc(nbytes);
-		else {
-			p->g->setbits = (uch *)reallocf((char *)p->g->setbits,
-								nbytes);
-			/* xxx this isn't right if setbits is now NULL */
-			for (i = 0; i < no; i++)
-				p->g->sets[i].ptr = p->g->setbits + css*(i/CHAR_BIT);
-		}
-		if (p->g->sets != NULL && p->g->setbits != NULL)
-			(void) memset((char *)p->g->setbits + (nbytes - css),
-								0, css);
-		else {
-			no = 0;
+
+                cs = realloc(p->g->sets, nc * sizeof(cset));
+                if (!cs) {
 			SETERROR(REG_ESPACE);
-			/* caller's responsibility not to do set ops */
-		}
+                        return NULL;
+                }
+                p->g->sets = cs;
+
+                setbits = realloc(p->g->setbits, nbytes);
+                if (!setbits) {
+                        SETERROR(REG_ESPACE);
+                        return NULL;
+                }
+                p->g->setbits = setbits;
+
+                for (i = 0; i < no; i++)
+                        cs[i].ptr = setbits + css*(i/CHAR_BIT);
+
+                (void) memset(setbits + (nbytes - css), 0, css);
 	}
 
-	assert(p->g->sets != NULL);	/* xxx */
 	cs = &p->g->sets[no];
 	cs->ptr = p->g->setbits + css*((no)/CHAR_BIT);
 	cs->mask = 1 << ((no) % CHAR_BIT);
