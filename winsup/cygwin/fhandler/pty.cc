@@ -4075,7 +4075,14 @@ fhandler_pty_slave::cleanup_for_non_cygwin_app (handle_set_t *p, tty *ttyp,
 						DWORD force_switch_to)
 {
   ttyp->wait_fwd ();
-  if ((ttyp->pcon_activated || stdin_is_ptys)
+  DWORD current_pid = myself->exec_dwProcessId ?: myself->dwProcessId;
+  DWORD switch_to = force_switch_to;
+  WaitForSingleObject (p->pipe_sw_mutex, INFINITE);
+  if (!switch_to)
+    switch_to = get_console_process_id (current_pid, false, true, true);
+  if (!switch_to)
+    switch_to = get_console_process_id (current_pid, false, true, false);
+  if ((!switch_to && (ttyp->pcon_activated || stdin_is_ptys))
       && ttyp->pty_input_state_eq (tty::to_nat))
     {
       WaitForSingleObject (p->input_mutex, mutex_timeout);
@@ -4085,7 +4092,6 @@ fhandler_pty_slave::cleanup_for_non_cygwin_app (handle_set_t *p, tty *ttyp,
       release_attach_mutex ();
       ReleaseMutex (p->input_mutex);
     }
-  WaitForSingleObject (p->pipe_sw_mutex, INFINITE);
   if (ttyp->pcon_activated)
     close_pseudoconsole (ttyp, force_switch_to);
   else
