@@ -121,6 +121,9 @@
 /* Compiler supports _Complex */
 #cmakedefine _HAVE_COMPLEX
 
+/* Compiler supports __builtin_complex */
+#cmakedefine _HAVE_BUILTIN_COMPLEX
+
 #cmakedefine _HAVE_FCNTL
 
 #cmakedefine _HAVE_FORMAT_ATTRIBUTE

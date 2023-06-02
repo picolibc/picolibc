@@ -194,6 +194,9 @@ picolibc_flag(_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL)
 # Compiler supports _Complex
 picolibc_flag(_HAVE_COMPLEX)
 
+# Compiler supports __builtin_complex
+picolibc_flag(_HAVE_BUILTIN_COMPLEX)
+
 # Compiler supports format function attribute
 picolibc_flag(_HAVE_FORMAT_ATTRIBUTE 1)
 
