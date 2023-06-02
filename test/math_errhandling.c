@@ -147,7 +147,6 @@ e_to_str(int e)
 #else
 #define EXCEPTION_TEST	MATH_ERREXCEPT
 #endif
-#define LONG_DOUBLE_EXCEPTION_TEST EXCEPTION_TEST
 #ifdef _M_PI_L
 #define PI_VAL _M_PI_L
 #else
@@ -207,7 +206,6 @@ e_to_str(int e)
 #else
 #define EXCEPTION_TEST	MATH_ERREXCEPT
 #endif
-#define DOUBLE_EXCEPTION_TEST EXCEPTION_TEST
 
 #define BIG 1.7e308
 #define BIGODD  0x1.123456789abcdp+52
@@ -264,14 +262,12 @@ int main(void)
 {
 	int result = 0;
 
-#if DOUBLE_EXCEPTION_TEST
 	printf("Double tests:\n");
 	result += run_tests();
-#endif
-#ifdef LONG_DOUBLE_EXCEPTION_TEST
+
 	printf("Long double tests:\n");
 	result += run_testsl();
-#endif
+
 	printf("Float tests:\n");
 	result += run_testsf();
 	return result;

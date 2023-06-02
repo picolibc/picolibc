@@ -154,7 +154,7 @@ if set_double_equals_float
   float_double_code = '''
 char size_test[sizeof(float) == sizeof(double) ? 1 : -1];
 '''
-  set_double_equals_float = 
+  set_double_equals_float =
   double_equals_float = cc.compiles(float_double_code, name : 'double same as float', args : core_c_args)
 endif
 
@@ -167,6 +167,14 @@ char size_test[sizeof(double) == sizeof(long double) ? 1 : -1];
 '''
   long_double_equals_double = cc.compiles(long_double_size_code, name : 'long double same as double', args: core_c_args)
 endif
+
+fenv_access_code = '''
+#pragma STDC FENV_ACCESS ON
+'''
+fenv_access_supported = cc.compiles(
+  fenv_access_code,
+  name : 'FENV_ACCESS supported',
+  args : cc.get_supported_arguments(['-Werror=ignored-pragmas']))
 
 enable_multilib = get_option('multilib')
 multilib_list = get_option('multilib-list')
@@ -503,7 +511,7 @@ else
   specs_install = true
 endif
 
-# Let targets add more support libraries 
+# Let targets add more support libraries
 additional_libs_list = meson.get_cross_property('additional_libs', [])
 
 if cc.get_id() == 'ccomp'
@@ -648,7 +656,7 @@ if enable_multilib
   gen_multilib_crt0_path = specs_prefix_format.format(get_option('libdir') / '%M' / crt0_expr)
   crt0_gen = gen_format.format(gen_multilib_crt0_path)
 endif
-  
+
 #
 # Construct the *startfile value from the options computed
 # above. As there's only one value, it's either the

@@ -1420,6 +1420,7 @@ makemathname(run_tests)(void) {
                         printf("\n");
 			++result;
 		}
+#if ENABLE_FE_EXCEPTION_CHECKS
 		if (math_errhandling & EXCEPTION_TEST) {
                     int expect_except = makemathname(tests)[t].except;
                     int mask = MY_EXCEPT;
@@ -1443,6 +1444,7 @@ makemathname(run_tests)(void) {
 				++result;
 			}
 		}
+#endif
 		if (math_errhandling & MATH_ERRNO) {
 			if (err != makemathname(tests)[t].errno_expect) {
                                 PRINT;
@@ -1474,6 +1476,7 @@ makemathname(run_tests)(void) {
 			printf("\tbad value got %ld expect %ld\n", iv, makemathname(itests)[t].value);
 			++result;
 		}
+#if ENABLE_FE_EXCEPTION_CHECKS
 		if (math_errhandling & EXCEPTION_TEST) {
                         int expect_except = makemathname(itests)[t].except;
                         int mask = MY_EXCEPT;
@@ -1497,6 +1500,7 @@ makemathname(run_tests)(void) {
 				++result;
 			}
 		}
+#endif
 		if (math_errhandling & MATH_ERRNO) {
 			if (err != makemathname(itests)[t].errno_expect) {
                                 IPRINT;

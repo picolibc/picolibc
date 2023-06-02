@@ -258,9 +258,14 @@ foreach target : targets
     t1_name = t1 + '_' + target
   endif
 
+  math_errhandling_c_args = []
+  if fenv_access_supported
+    math_errhandling_c_args += ['-DENABLE_FE_EXCEPTION_CHECKS']
+  endif
+
   test(t1_name,
        executable(t1_name, ['math_errhandling.c'],
-		  c_args: arg_fnobuiltin + _c_args,
+		  c_args: arg_fnobuiltin + math_errhandling_c_args + _c_args,
 		  link_args: _link_args,
 		  objects: _objs,
 		  link_with: _libs,
