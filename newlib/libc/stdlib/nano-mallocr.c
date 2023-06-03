@@ -649,7 +649,7 @@ struct mallinfo mallinfo(void)
     size_t free_size = 0;
     size_t total_size;
     size_t ordblks = 0;
-    struct mallinfo current_mallinfo;
+    struct mallinfo current_mallinfo = {};
 
     MALLOC_LOCK;
 
