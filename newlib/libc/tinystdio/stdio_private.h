@@ -126,6 +126,18 @@ bool __matchcaseprefix(const char *input, const char *pattern);
 int
 __posix_sflags (const char *mode, int *optr);
 
+static inline int
+__stdio_sflags (const char *mode)
+{
+    int omode;
+    return __posix_sflags (mode, &omode);
+}
+
+#else
+
+int
+__stdio_sflags (const char *mode);
+
 #endif
 
 int	__d_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);

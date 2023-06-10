@@ -116,10 +116,10 @@ fmemopen(void *buf, size_t size, const char *mode)
 {
 	int stdio_flags;
         uint8_t mflags = 0;
-	int open_flags;
 	struct __file_mem *mf;
 
-	stdio_flags = __posix_sflags(mode, &open_flags);
+	stdio_flags = __stdio_sflags(mode);
+
 	if (stdio_flags == 0)
 		return NULL;
 

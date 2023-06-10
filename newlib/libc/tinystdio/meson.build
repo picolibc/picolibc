@@ -67,7 +67,6 @@ srcs_tinystdio = [
     'fputwc.c',
     'fputws.c',
     'fread.c',
-    'freopen.c',
     'fscanf.c',
     'fseek.c',
     'fseeko.c',
@@ -96,6 +95,7 @@ srcs_tinystdio = [
     'setbuffer.c',
     'setlinebuf.c',
     'setvbuf.c',
+    'sflags.c',
     'snprintf.c',
     'sprintf.c',
     'snprintfd.c',
@@ -186,7 +186,7 @@ srcs_tinystdio_posix = [
     'fopen.c',
     'fdopen.c',
     'fclose.c',
-    'sflags.c'
+    'freopen.c',
 ]
 
 srcs_tinystdio_posix_console = [
