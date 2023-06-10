@@ -11,7 +11,7 @@
 
           # Tinystdio configurations
           "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true",
-          "-Dformat-default=integer -Dfreestanding=true",
+          "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false",
 
           # Original stdio
           "-Dtinystdio=false",
