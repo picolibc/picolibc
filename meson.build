@@ -279,8 +279,8 @@ has_link_alias = meson.get_cross_property('has_link_alias', cc.has_link_argument
 lib_gcc = meson.get_cross_property('libgcc', '-lgcc')
 
 # tinystdio options
-posix_io = tinystdio and get_option('posix-io')
-posix_console = posix_io and get_option('posix-console')
+posix_console = tinystdio and get_option('posix-console')
+posix_io = tinystdio and (get_option('posix-io') or posix_console)
 io_float_exact = not tinystdio or get_option('io-float-exact')
 atomic_ungetc = tinystdio and get_option('atomic-ungetc')
 format_default = get_option('format-default')
