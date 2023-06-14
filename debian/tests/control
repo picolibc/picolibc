@@ -1,4 +1,4 @@
-Test-Command: riscv64-unknown-elf-gcc -fno-stack-protector --specs=picolibc.specs -o /tmp/touch-risc-v debian/tests/touch.c
+Test-Command: riscv64-unknown-elf-gcc -mcmodel=medany -fno-stack-protector --specs=picolibc.specs -o /tmp/touch-risc-v debian/tests/touch.c
 Depends: @, gcc-riscv64-unknown-elf
 Architecture: amd64, i386, pcc64el
 
