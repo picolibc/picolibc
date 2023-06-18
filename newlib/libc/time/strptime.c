@@ -434,7 +434,7 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		break;
 	    case '\0' :
 		--format;
-		FALLTHROUGH;
+		__PICOLIBC_FALLTHROUGH;
 	    case '%' :
 		if (*buf == '%')
 		    ++buf;

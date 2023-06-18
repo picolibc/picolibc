@@ -761,7 +761,7 @@ _SVFSCANF (
 
 	case 'D':		/* compat */
 	  flags |= LONG;
-	  FALLTHROUGH;
+	  __PICOLIBC_FALLTHROUGH;
 	case 'd':
 	  c = CT_INT;
 	  ccfn = (u_long (*)CCFN_PARAMS)strtol;
@@ -776,7 +776,7 @@ _SVFSCANF (
 
 	case 'O':		/* compat */
 	  flags |= LONG;
-	  FALLTHROUGH;
+	  __PICOLIBC_FALLTHROUGH;
 	case 'o':
 	  c = CT_INT;
 	  ccfn = strtoul;
@@ -815,7 +815,7 @@ _SVFSCANF (
 #ifdef _WANT_IO_C99_FORMATS
 	case 'S':
 	  flags |= LONG;
-          FALLTHROUGH;
+          __PICOLIBC_FALLTHROUGH;
 #endif
 
 	case 's':
@@ -831,7 +831,7 @@ _SVFSCANF (
 #ifdef _WANT_IO_C99_FORMATS
 	case 'C':
 	  flags |= LONG;
-          FALLTHROUGH;
+          __PICOLIBC_FALLTHROUGH;
 #endif
 
 	case 'c':

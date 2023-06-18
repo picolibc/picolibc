@@ -153,7 +153,7 @@ _printf_i (struct _prt_data_t *pdata, FILE *fp,
       pdata->flags |= HEXPREFIX;
       if (sizeof (void*) > sizeof (int))
 	pdata->flags |= LONGINT;
-      FALLTHROUGH;
+      __PICOLIBC_FALLTHROUGH;
       /* NOSTRICT.  */
     case 'x':
       pdata->l_buf[2] = 'x';
@@ -208,7 +208,7 @@ number:
 	*GET_ARG (N, *ap, short_ptr_t) = pdata->ret;
       else
 	*GET_ARG (N, *ap, int_ptr_t) = pdata->ret;
-      FALLTHROUGH;
+      __PICOLIBC_FALLTHROUGH;
     case '\0':
       pdata->size = 0;
       break;

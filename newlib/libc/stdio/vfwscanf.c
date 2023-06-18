@@ -708,7 +708,7 @@ _SVFWSCANF (
 #ifdef _WANT_IO_C99_FORMATS
 	case L'S':
 	  flags |= LONG;
-          FALLTHROUGH;
+          __PICOLIBC_FALLTHROUGH;
 #endif
 
 	case L's':
@@ -737,7 +737,7 @@ _SVFWSCANF (
 #ifdef _WANT_IO_C99_FORMATS
 	case 'C':
 	  flags |= LONG;
-          FALLTHROUGH;
+          __PICOLIBC_FALLTHROUGH;
 #endif
 
 	case 'c':

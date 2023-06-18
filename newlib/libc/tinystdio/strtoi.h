@@ -82,7 +82,7 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
     switch (i) {
     case '-':
         flags = FLAG_NEG;
-	FALLTHROUGH;
+	__PICOLIBC_FALLTHROUGH;
     case '+':
         i = *s++;
     }
