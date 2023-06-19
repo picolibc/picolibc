@@ -31,6 +31,7 @@ static const wincaps wincap_8_1 = {
     has_linux_tcp_keepalive_sockopts:false,
     has_tcp_maxrtms:false,
     has_con_broken_tabs:false,
+    has_user_shstk:false,
   },
 };
 
@@ -52,6 +53,7 @@ static const wincaps  wincap_10_1507 = {
     has_linux_tcp_keepalive_sockopts:false,
     has_tcp_maxrtms:false,
     has_con_broken_tabs:false,
+    has_user_shstk:false,
   },
 };
 
@@ -73,6 +75,7 @@ static const wincaps  wincap_10_1607 = {
     has_linux_tcp_keepalive_sockopts:false,
     has_tcp_maxrtms:true,
     has_con_broken_tabs:false,
+    has_user_shstk:false,
   },
 };
 
@@ -94,6 +97,7 @@ static const wincaps wincap_10_1703 = {
     has_linux_tcp_keepalive_sockopts:false,
     has_tcp_maxrtms:true,
     has_con_broken_tabs:true,
+    has_user_shstk:false,
   },
 };
 
@@ -115,6 +119,7 @@ static const wincaps wincap_10_1709 = {
     has_linux_tcp_keepalive_sockopts:true,
     has_tcp_maxrtms:true,
     has_con_broken_tabs:true,
+    has_user_shstk:false,
   },
 };
 
@@ -136,6 +141,7 @@ static const wincaps wincap_10_1803 = {
     has_linux_tcp_keepalive_sockopts:true,
     has_tcp_maxrtms:true,
     has_con_broken_tabs:true,
+    has_user_shstk:false,
   },
 };
 
@@ -157,6 +163,7 @@ static const wincaps wincap_10_1809 = {
     has_linux_tcp_keepalive_sockopts:true,
     has_tcp_maxrtms:true,
     has_con_broken_tabs:true,
+    has_user_shstk:false,
   },
 };
 
@@ -178,6 +185,7 @@ static const wincaps wincap_10_1903 = {
     has_linux_tcp_keepalive_sockopts:true,
     has_tcp_maxrtms:true,
     has_con_broken_tabs:true,
+    has_user_shstk:false,
   },
 };
 
@@ -199,6 +207,7 @@ static const wincaps wincap_10_2004 = {
     has_linux_tcp_keepalive_sockopts:true,
     has_tcp_maxrtms:true,
     has_con_broken_tabs:true,
+    has_user_shstk:true,
   },
 };
 
@@ -220,6 +229,7 @@ static const wincaps wincap_11 = {
     has_linux_tcp_keepalive_sockopts:true,
     has_tcp_maxrtms:true,
     has_con_broken_tabs:false,
+    has_user_shstk:true,
   },
 };
 
