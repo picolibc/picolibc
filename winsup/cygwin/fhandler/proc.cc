@@ -1486,12 +1486,12 @@ format_proc_cpuinfo (void *, char *&destbuf)
 
 /*	  ftcprint (features1,  6, "split_lock_detect");*//* MSR_TEST_CTRL split lock */
 
-      /* cpuid 0x00000007 ecx & Windows [20]20H1/[20]2004+ */
-      if (maxf >= 0x00000007 && wincap.osname () >= "10.0"
-					 && wincap.build_number () >= 19041)
+      /* Windows [20]20H1/[20]2004/19041 user shadow stack */
+      if (maxf >= 0x00000007 && wincap.has_user_shstk ())
         {
+	  /* cpuid 0x00000007 ecx CET shadow stack */
 	  cpuid (&unused, &unused, &features1, &unused, 0x00000007, 0);
-	  ftcprint (features1,  7, "user_shstk");	/* "user shadow stack" */
+	  ftcprint (features1,  7, "user_shstk");	/* user shadow stack */
 	}
 
       /* cpuid 0x00000007:1 eax */
