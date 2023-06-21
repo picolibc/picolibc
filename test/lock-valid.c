@@ -63,6 +63,7 @@ void __retarget_lock_init(_LOCK_T *lock)
 /* Create a new dynamic recursive lock */
 void __retarget_lock_init_recursive(_LOCK_T *lock)
 {
+        assert(lock_id < MAX_LOCKS);
         *lock = &locks[lock_id++];
         **lock = 0;
 }
