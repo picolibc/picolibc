@@ -31,6 +31,7 @@
  */
 
 #define _DEFAULT_SOURCE
+#define __LINUX_ERRNO_EXTENSIONS__
 #include <sys/param.h>
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)hash_page.c	8.7 (Berkeley) 8/16/94";
