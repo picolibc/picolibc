@@ -10,10 +10,10 @@ RUN apt-get update && \
     echo "deb http://maps.altusmetrum.org/archive unstable/" > /etc/apt/sources.list.d/keithp.list && \
     (apt-get update || apt-get update || apt-get update) && \
     (apt-get upgrade -y || apt-get upgrade -y || apt-get upgrade -y) && \
-    (xargs -a packages.txt apt-get install -y || \
-     xargs -a packages.txt apt-get install -y || \
-     xargs -a packages.txt apt-get install -y || \
-     xargs -a packages.txt apt-get install -y) && \
+    (xargs -a packages.txt apt-get install -y --no-install-recommends || \
+     xargs -a packages.txt apt-get install -y --no-install-recommends || \
+     xargs -a packages.txt apt-get install -y --no-install-recommends || \
+     xargs -a packages.txt apt-get install -y --no-install-recommends) && \
     mkdir -p /opt && \
     (cd /opt && while read file; do wget $file || exit 1; tar xf `basename $file`; done) < extra-files.txt
 
