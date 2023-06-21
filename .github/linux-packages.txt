@@ -12,6 +12,7 @@ gcc-riscv64-unknown-elf
 gcc-aarch64-linux-gnu
 gcc-xtensa-lx106
 gcc-m68k-linux-gnu
+libc6-dev-m68k-cross
 gcc-mips-linux-gnu
 gcc-mipsel-linux-gnu
 gcc-powerpc64-linux-gnu
