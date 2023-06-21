@@ -48,13 +48,6 @@ foreach target : targets
     _objs = []
   endif
 
-  have_crt_minimal = is_variable('crt0_minimal' + target)
-  if have_crt_minimal
-    _objs_minimal = [get_variable('crt0_minimal'+ target)]
-  else
-    _objs_minimal = _objs
-  endif
-
   _c_args = value[1] + test_c_args
   _link_args = value[1] + test_link_args
 
@@ -234,7 +227,12 @@ foreach target : targets
        should_fail: true
       )
 
-  if have_crt_minimal
+  # POSIX console code requires a constructor to run, so
+  # it is incompatible with the minimal crt0 when using stdout
+  # (which lock-valid.c uses).
+
+  if is_variable('crt0_minimal' + target) and not posix_console
+    _objs_minimal = [get_variable('crt0_minimal'+ target)]
     t1 = 'constructor-skip'
     if target == ''
       t1_name = t1
