@@ -1,4 +1,4 @@
-name: Linux
+name: Zephyr
 
 on:
   push:
@@ -9,10 +9,10 @@ on:
       - main
 
 env:
-  IMAGE_FILE: dockerimg.tar.xz
+  IMAGE_FILE: dockerimg-zephyr.tar.xz
   IMAGE: picolibc
-  PACKAGES_FILE: picolibc/.github/linux-packages.txt
-  EXTRA_FILE: picolibc/.github/linux-files.txt
+  PACKAGES_FILE: picolibc/.github/packages.txt
+  EXTRA_FILE: picolibc/.github/zephyr-files.txt
 
 jobs:
   cache-maker:
@@ -39,7 +39,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           platforms: linux/amd64
-          file: .github/Dockerfile
+          file: .github/Dockerfile-zephyr
           tags: ${{ env.IMAGE }}:latest
           outputs: type=docker,dest=${{ env.IMAGE_FILE }}
 
