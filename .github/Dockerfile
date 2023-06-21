@@ -1,8 +1,8 @@
 FROM debian:testing
 
-COPY .github/packages.txt /
+COPY .github/linux-packages.txt /
 
-COPY .github/extra-files.txt /
+COPY .github/linux-files.txt /
 
 RUN apt-get update && \
     apt-get install -y wget gnupg && \
@@ -10,11 +10,11 @@ RUN apt-get update && \
     echo "deb http://maps.altusmetrum.org/archive unstable/" > /etc/apt/sources.list.d/keithp.list && \
     (apt-get update || apt-get update || apt-get update) && \
     (apt-get upgrade -y || apt-get upgrade -y || apt-get upgrade -y) && \
-    (xargs -a packages.txt apt-get install -y || \
-     xargs -a packages.txt apt-get install -y || \
-     xargs -a packages.txt apt-get install -y || \
-     xargs -a packages.txt apt-get install -y) && \
+    (xargs -a linux-packages.txt apt-get install -y --no-install-recommends || \
+     xargs -a linux-packages.txt apt-get install -y --no-install-recommends || \
+     xargs -a linux-packages.txt apt-get install -y --no-install-recommends || \
+     xargs -a linux-packages.txt apt-get install -y --no-install-recommends) && \
     mkdir -p /opt && \
-    (cd /opt && while read file; do wget $file || exit 1; tar xf `basename $file`; done) < extra-files.txt
+    (cd /opt && while read file; do wget $file || exit 1; tar xf `basename $file`; done) < linux-files.txt
 
 RUN apt-get clean

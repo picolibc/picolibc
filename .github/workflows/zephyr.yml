@@ -1,4 +1,4 @@
-name: Linux
+name: Zephyr
 
 on:
   push:
@@ -9,10 +9,10 @@ on:
       - main
 
 env:
-  IMAGE_FILE: dockerimg.tar.xz
+  IMAGE_FILE: dockerimg-zephyr.tar.xz
   IMAGE: picolibc
-  PACKAGES_FILE: picolibc/.github/linux-packages.txt
-  EXTRA_FILE: picolibc/.github/linux-files.txt
+  PACKAGES_FILE: picolibc/.github/packages.txt
+  EXTRA_FILE: picolibc/.github/zephyr-files.txt
 
 jobs:
   cache-maker:
@@ -39,45 +39,11 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           platforms: linux/amd64
-          file: .github/Dockerfile
+          file: .github/Dockerfile-zephyr
           tags: ${{ env.IMAGE }}:latest
           outputs: type=docker,dest=${{ env.IMAGE_FILE }}
 
-  cmake-linux:
-    needs: cache-maker
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        cmake_flags: [
-          "",
-          # optional configurations
-          "-D__IO_FLOAT=y -D_IO_FLOAT_EXACT=n -D_WANT_IO_LONG_LONG=y -D_MB_CAPABLE=y -D_WANT_IO_POS_ARGS=y -D__HAVE_LOCALE_INFO__=y -D__HAVE_LOCALE_INFO_EXTENDED__=y ",
-        ]
-        test: [
-	  "./.github/do-cmake-linux",
-	]
-    steps:
-      - name: Clone picolibc
-        uses: actions/checkout@v2
-        with:
-          path: picolibc
-
-      - name: Restore the Docker Image
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
-
-      - name: Load and Check the Docker Image
-        run: |
-          docker load -i $IMAGE_FILE
-          docker images -a $IMAGE
-
-      - name: CMake test
-        run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.cmake_flags }}
-
-  fortify-source-linux:
+  fortify-source-zephyr:
     needs: cache-maker
     runs-on: ubuntu-latest
     strategy:
@@ -105,7 +71,7 @@ jobs:
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
         ]
         test: [
-	  "./.github/do-linux",
+	  "./.github/do-zephyr",
 	]
     steps:
       - name: Clone picolibc
@@ -128,7 +94,7 @@ jobs:
         run: |
           docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} -Dfortify-source=2
 
-  minsize-linux:
+  minsize-zephyr:
     needs: cache-maker
     runs-on: ubuntu-latest
     strategy:
@@ -156,7 +122,7 @@ jobs:
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
         ]
         test: [
-	  "./.github/do-linux",
+	  "./.github/do-zephyr",
 	]
     steps:
       - name: Clone picolibc
@@ -179,7 +145,7 @@ jobs:
         run: |
           docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
 
-  release-linux:
+  release-zephyr:
     needs: cache-maker
     runs-on: ubuntu-latest
     strategy:
@@ -207,7 +173,7 @@ jobs:
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
         ]
         test: [
-	  "./.github/do-linux",
+	  "./.github/do-zephyr",
 	]
     steps:
       - name: Clone picolibc
