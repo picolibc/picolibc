@@ -130,19 +130,12 @@ void __retarget_lock_release_recursive(_LOCK_T lock)
 #define LIBC_LOCK_EXIT_COUNT 1
 #endif
 
-static void lock_validate(int ret, void *arg)
+__attribute__((destructor))
+static void lock_validate(void)
 {
         int i;
-        (void) ret;
-        (void) arg;
         for (i = 0; i < MAX_LOCKS; i++)
                 assert(locks[i] == 0);
 
         assert(__lock___libc_recursive_mutex == LIBC_LOCK_EXIT_COUNT);
-}
-
-__attribute__((constructor))
-static void add_lock_validate(void)
-{
-    on_exit(lock_validate, NULL);
 }
