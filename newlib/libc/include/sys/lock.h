@@ -20,8 +20,6 @@ typedef int _LOCK_RECURSIVE_T;
 #define __lock_close_recursive(lock) ((void) 0)
 #define __lock_acquire(lock) ((void) 0)
 #define __lock_acquire_recursive(lock) ((void) 0)
-#define __lock_try_acquire(lock) ((void) 0)
-#define __lock_try_acquire_recursive(lock) ((void) 0)
 #define __lock_release(lock) ((void) 0)
 #define __lock_release_recursive(lock) ((void) 0)
 
@@ -50,11 +48,6 @@ extern void __retarget_lock_acquire(_LOCK_T lock);
 #define __lock_acquire(lock) __retarget_lock_acquire(lock)
 extern void __retarget_lock_acquire_recursive(_LOCK_T lock);
 #define __lock_acquire_recursive(lock) __retarget_lock_acquire_recursive(lock)
-extern int __retarget_lock_try_acquire(_LOCK_T lock);
-#define __lock_try_acquire(lock) __retarget_lock_try_acquire(lock)
-extern int __retarget_lock_try_acquire_recursive(_LOCK_T lock);
-#define __lock_try_acquire_recursive(lock) \
-  __retarget_lock_try_acquire_recursive(lock)
 extern void __retarget_lock_release(_LOCK_T lock);
 #define __lock_release(lock) __retarget_lock_release(lock)
 extern void __retarget_lock_release_recursive(_LOCK_T lock);

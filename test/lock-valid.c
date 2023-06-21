@@ -94,20 +94,6 @@ void __retarget_lock_acquire_recursive(_LOCK_T lock)
         ++(*lock);
 }
 
-/* Try acquiring non-recursive lock */
-int __retarget_lock_try_acquire(_LOCK_T lock)
-{
-        assert(*lock == 0);
-        *lock = 1;
-}
-
-/* Try acquiring recursive lock */
-int __retarget_lock_try_acquire_recursive(_LOCK_T lock)
-{
-        assert(*lock >= 0);
-        ++(*lock);
-}
-
 /* Release non-recursive lock */
 void __retarget_lock_release(_LOCK_T lock)
 {
