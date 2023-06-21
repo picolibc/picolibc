@@ -129,25 +129,29 @@ foreach target : targets
   endif
 
   # The 'minimal' variant doesn't call exit, nor does it invoke any constructors
-  _crt = executable(crt_minimal_name,
-		    src_picocrt,
-		    include_directories : inc,
-		    install : true,
-		    install_dir : instdir,
-		    c_args : value[1] + arg_fnobuiltin + ['-ffreestanding', '-DCONSTRUCTORS=0'],
-		    link_args : value[1] + ['-r', '-ffreestanding'])
+  # This is incompatible with posix buffered IO, because the posix_exit destructor assumes
+  # that a lock constructor has run.
+  if not posix_console
+    _crt = executable(crt_minimal_name,
+                      src_picocrt,
+                      include_directories : inc,
+                      install : true,
+                      install_dir : instdir,
+                      c_args : value[1] + arg_fnobuiltin + ['-ffreestanding', '-DCONSTRUCTORS=0'],
+                      link_args : value[1] + ['-r', '-ffreestanding'])
 
-  set_variable(crt0_minimal_name,
-	       _crt.extract_objects(src_picocrt)
-	      )
+    set_variable(crt0_minimal_name,
+                 _crt.extract_objects(src_picocrt)
+                )
 
-  if enable_picocrt_lib
-    static_library(libcrt_minimal_name,
-                   [],
-                   install : true,
-                   install_dir : instdir,
-                   pic: false,
-                   objects : [_crt.extract_objects(src_picocrt)])
+    if enable_picocrt_lib
+      static_library(libcrt_minimal_name,
+                     [],
+                     install : true,
+                     install_dir : instdir,
+                     pic: false,
+                     objects : [_crt.extract_objects(src_picocrt)])
+    endif
   endif
 
   if has_arm_semihost
