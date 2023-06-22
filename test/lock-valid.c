@@ -108,15 +108,6 @@ void __retarget_lock_release_recursive(_LOCK_T lock)
         --(*lock);
 }
 
-#ifdef _PICO_EXIT
-#define LIBC_LOCK_EXIT_COUNT 0
-#else
-/*
- * Legacy onexit handler holds libc lock while calling hooks
- */
-#define LIBC_LOCK_EXIT_COUNT 1
-#endif
-
 __attribute__((destructor))
 static void lock_validate(void)
 {
@@ -124,5 +115,5 @@ static void lock_validate(void)
         for (i = 0; i < MAX_LOCKS; i++)
                 assert(locks[i] == 0);
 
-        assert(__lock___libc_recursive_mutex == LIBC_LOCK_EXIT_COUNT);
+        assert(__lock___libc_recursive_mutex == 0);
 }
