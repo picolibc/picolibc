@@ -25,9 +25,9 @@ gcc-powerpc64le-linux-gnu
 libc6-dev-ppc64el-cross
 gcc-sparc64-linux-gnu
 libc6-dev-sparc64-cross
+lld
+clang
 qemu-system-x86
 qemu-system-arm
 qemu-system-misc
 qemu-system-ppc64
-lld
-clang
