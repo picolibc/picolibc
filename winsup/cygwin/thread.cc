@@ -364,7 +364,7 @@ void
 pthread::init_mainthread ()
 {
   pthread *thread = _my_tls.tid;
-  if (!thread)
+  if (!thread || thread == pthread_null::get_null_pthread ())
     {
       thread = new pthread ();
       if (!thread)
