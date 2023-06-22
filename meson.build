@@ -698,12 +698,15 @@ picolibcpp_specs = configure_file(input: 'picolibc.specs.in',
 				  install: specs_install)
 
 picolibc_linker_type_data = configuration_data()
+# We need to use different alignment flags for .tdata/.tbss for ld.bfd
+# (ALIGN_WITH_INPUT, which is not supported by ld.lld) and ld.lld
+# (ALIGN(__tls_align), which is rejected as non-constant by ld.bfd), so we use
+# the {BFD,LLD}_{START,END} templates to comment out the incompatible flag.
 if cc.get_linker_id() == 'ld.lld'
-    # ld.lld does not implement ALIGN_WITH_INPUT, but this flag is not needed
-    # with ld.lld's output section LMA/VMA algorithm.
-    # An added ASSERT() statement in the linker script ensures that we don't
-    # get silent failures in case this changes in the future.
-    picolibc_linker_type_data.set('LDSCRIPT_ALIGN_WITH_INPUT', '')
+    picolibc_linker_type_data.set('BFD_START', '/* For ld.bfd: ')
+    picolibc_linker_type_data.set('BFD_END', '*/')
+    picolibc_linker_type_data.set('LLD_START', '')
+    picolibc_linker_type_data.set('LLD_END', '')
     if host_cpu_family == 'riscv'
         # ld.lld before version 15 did not support linker relaxations, disable
         # them if we are using an older version.
@@ -715,7 +718,10 @@ if cc.get_linker_id() == 'ld.lld'
         endif
     endif
 else
-    picolibc_linker_type_data.set('LDSCRIPT_ALIGN_WITH_INPUT', 'ALIGN_WITH_INPUT')
+    picolibc_linker_type_data.set('BFD_START', '')
+    picolibc_linker_type_data.set('BFD_END', '')
+    picolibc_linker_type_data.set('LLD_START', '/* For ld.lld: ')
+    picolibc_linker_type_data.set('LLD_END', '*/')
 endif
 
 picolibc_linker_type_data.set('DEFAULT_FLASH_ADDR',
