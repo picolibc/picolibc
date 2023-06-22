@@ -484,9 +484,11 @@ collect_data(HTAB *hashp,
 		}
 	} else {
 		xbp = __get_buf(hashp, bp[bp[0] - 1], bufp, 0);
-		if (!xbp || ((totlen =
-		    collect_data(hashp, xbp, len + mylen, set)) < 1))
-			return (-1);
+                if (!xbp)
+                        return (-1);
+                totlen = collect_data(hashp, xbp, len + mylen, set);
+		if (totlen < 1 || totlen == (size_t) -1)
+                        return (-1);
 	}
 	if (bufp->addr != save_addr) {
 		errno = EINVAL;			/* Out of buffers. */
