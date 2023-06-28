@@ -120,6 +120,7 @@
     result |= test(__LINE__, "Hot Pocket", "%1$s %2$s", "Hot", "Pocket");
     result |= test(__LINE__, "Pocket Hot", "%2$s %1$s", "Hot", "Pocket");
     result |= test(__LINE__, "0002   1 hi", "%2$04d %1$*3$d %4$s", 1, 2, 3, "hi");
+    result |= test(__LINE__, "   ab", "%1$*2$.*3$s", "abc", 5, 2);
 #ifndef NO_FLOAT
     result |= test(__LINE__, "12.0 Hot Pockets", "%1$.1f %2$s %3$ss", printf_float(12.0), "Hot", "Pocket");
     result |= test(__LINE__, "12.0 Hot Pockets", "%1$.*4$f %2$s %3$ss", printf_float(12.0), "Hot", "Pocket", 1);
