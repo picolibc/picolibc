@@ -303,9 +303,13 @@ union arg_val
   wint_t val_wint_t;
 };
 
+typedef struct {
+    va_list ap;
+} my_va_list;
+
 static union arg_val *
 get_arg (int n, wchar_t *fmt,
-                 va_list *ap, int *numargs, union arg_val *args,
+                 my_va_list *my_ap, int *numargs, union arg_val *args,
                  int *arg_type, wchar_t **last_fmt);
 #endif /* !_NO_POS_ARGS */
 
@@ -360,6 +364,8 @@ VFWPRINTF (
 	int arg_index;          /* index into args processed directly */
 	int numargs;            /* number of varargs read */
 	wchar_t *saved_fmt;     /* saved fmt pointer */
+        my_va_list my_ap;
+        va_copy(my_ap.ap, ap);
 	union arg_val args[MAX_POS_ARGS];
 	int arg_type[MAX_POS_ARGS];
 	int is_pos_arg;         /* is current format positional? */
@@ -513,13 +519,13 @@ VFWPRINTF (
 	(is_pos_arg							\
 	 ? (n < numargs							\
 	    ? args[n].val_##type					\
-	    : get_arg (data, n, fmt_anchor, &ap, &numargs, args,	\
+	    : get_arg (n, fmt_anchor, &my_ap, &numargs, args,           \
 		       arg_type, &saved_fmt)->val_##type)		\
 	 : (arg_index++ < numargs					\
 	    ? args[n].val_##type					\
 	    : (numargs < MAX_POS_ARGS					\
-	       ? args[numargs++].val_##type = va_arg (ap, type)		\
-	       : va_arg (ap, type))))
+	       ? args[numargs++].val_##type = va_arg (my_ap.ap, type)  \
+	       : va_arg (my_ap.ap, type))))
 #else
 # define GET_ARG(n, ap, type) (va_arg (ap, type))
 #endif
@@ -1704,7 +1710,7 @@ static union arg_val *
 get_arg (
        int n,
        wchar_t *fmt,
-       va_list *ap,
+       my_va_list *ap,
        int *numargs_p,
        union arg_val *args,
        int *arg_type,
@@ -1882,25 +1888,25 @@ get_arg (
 		    switch (spec_type)
 		      {
 		      case LONG_INT:
-			args[numargs++].val_long = va_arg (*ap, long);
+			args[numargs++].val_long = va_arg (ap->ap, long);
 			break;
 		      case QUAD_INT:
-			args[numargs++].val_quad_t = va_arg (*ap, quad_t);
+			args[numargs++].val_quad_t = va_arg (ap->ap, quad_t);
 			break;
 		      case WIDE_CHAR:
-			args[numargs++].val_wint_t = va_arg (*ap, wint_t);
+			args[numargs++].val_wint_t = va_arg (ap->ap, wint_t);
 			break;
 		      case INT:
-			args[numargs++].val_int = va_arg (*ap, int);
+			args[numargs++].val_int = va_arg (ap->ap, int);
 			break;
 		      case CHAR_PTR:
-			args[numargs++].val_wchar_ptr_t = va_arg (*ap, wchar_t *);
+			args[numargs++].val_wchar_ptr_t = va_arg (ap->ap, wchar_t *);
 			break;
 		      case DOUBLE:
-			args[numargs++].val_double = va_arg (*ap, double);
+			args[numargs++].val_double = va_arg (ap->ap, double);
 			break;
 		      case LONG_DOUBLE:
-			args[numargs++].val__LONG_DOUBLE = va_arg (*ap, _LONG_DOUBLE);
+			args[numargs++].val__LONG_DOUBLE = va_arg (ap->ap, _LONG_DOUBLE);
 			break;
 		      }
 		  }
@@ -1923,7 +1929,7 @@ get_arg (
 	      --fmt;
 	      __PICOLIBC_FALLTHROUGH;
 	    case GETPW:  /* we have a variable precision or width to acquire */
-	      args[numargs++].val_int = va_arg (*ap, int);
+	      args[numargs++].val_int = va_arg (ap->ap, int);
 	      break;
 	    case NUMBER: /* we have a number to process */
 	      number = (ch - '0');
@@ -1956,26 +1962,26 @@ get_arg (
       switch (arg_type[numargs])
 	{
 	case LONG_INT:
-	  args[numargs++].val_long = va_arg (*ap, long);
+	  args[numargs++].val_long = va_arg (ap->ap, long);
 	  break;
 	case QUAD_INT:
-	  args[numargs++].val_quad_t = va_arg (*ap, quad_t);
+	  args[numargs++].val_quad_t = va_arg (ap->ap, quad_t);
 	  break;
 	case CHAR_PTR:
-	  args[numargs++].val_wchar_ptr_t = va_arg (*ap, wchar_t *);
+	  args[numargs++].val_wchar_ptr_t = va_arg (ap->ap, wchar_t *);
 	  break;
 	case DOUBLE:
-	  args[numargs++].val_double = va_arg (*ap, double);
+	  args[numargs++].val_double = va_arg (ap->ap, double);
 	  break;
 	case LONG_DOUBLE:
-	  args[numargs++].val__LONG_DOUBLE = va_arg (*ap, _LONG_DOUBLE);
+	  args[numargs++].val__LONG_DOUBLE = va_arg (ap->ap, _LONG_DOUBLE);
 	  break;
 	case WIDE_CHAR:
-	  args[numargs++].val_wint_t = va_arg (*ap, wint_t);
+	  args[numargs++].val_wint_t = va_arg (ap->ap, wint_t);
 	  break;
 	case INT:
 	default:
-	  args[numargs++].val_int = va_arg (*ap, int);
+	  args[numargs++].val_wchar_ptr_t = va_arg (ap->ap, wchar_t *);
 	  break;
 	}
     }
