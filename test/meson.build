@@ -326,6 +326,34 @@ foreach target : targets
        env: test_env,
       )
 
+  if have_ubsan
+    t1 = 'test-ubsan'
+    t1_src = t1 + '.c'
+    if target == ''
+      t1_name = t1
+    else
+      t1_name = t1 + '_' + target
+    endif
+
+    test_ubsan_flags = []
+    if sanitize_trap_on_error
+      test_ubsan_flags = ['-DSANITIZE_TRAP_ON_ERROR']
+    endif
+
+    test(t1_name,
+	 executable(t1_name, t1_src,
+		    c_args: c_sanitize_bounds_flags + _c_args + test_ubsan_flags,
+		    link_args: _link_args,
+		    objects: _objs,
+		    link_with: _libs,
+		    link_depends:  test_link_depends,
+		    include_directories: inc),
+	 depends: bios_bin,
+	 env: test_env,
+	 should_fail: sanitize_trap_on_error
+	)
+  endif
+
   plain_tests = ['rand', 'regex', 'ungetc', 'fenv',
 		 'malloc', 'tls',
 		 'ffs', 'setjmp', 'atexit', 'on_exit',
@@ -392,41 +420,49 @@ if enable_native_tests
     test('long_double_native',
 	 executable('long_double_native', 'long_double.c',
 		    c_args: native_c_args,
+		    link_args: native_c_args,
 		    dependencies: native_lib_m))
     test('math_errhandling_native',
 	 executable('math_errhandling_native', 'math_errhandling.c',
 		    c_args: native_c_args,
+		    link_args: native_c_args,
 		    dependencies: native_lib_m))
     test('rounding-mode_native',
 	 executable('rounding-mode_native',
 		    ['rounding-mode.c', 'rounding-mode-sub.c'],
 		    c_args: native_c_args,
+		    link_args: native_c_args,
 		    dependencies: native_lib_m))
     test('printf-tests_native',
 	 executable('printf-tests_native',
 		    'printf-tests.c',
 		    c_args: native_c_args,
+		    link_args: native_c_args,
 		    dependencies: native_lib_m))
     test('printf_scanf_native',
 	 executable('printf_scanf_native',
 		    'printf_scanf.c',
 		    c_args: native_c_args,
+		    link_args: native_c_args,
 		    dependencies: native_lib_m))
     test('test-efcvt_native',
 	 executable('test-efcvt_native',
 		    'test-efcvt.c',
 		    c_args: native_c_args,
+		    link_args: native_c_args,
 		    dependencies: native_lib_m))
     test('test-strtod_native',
 	 executable('test-strtod_native',
 		    'test-strtod.c',
 		    c_args: native_c_args,
+		    link_args: native_c_args,
 		    dependencies: native_lib_m))
   endif
 
   test('test-atomic-native',
        executable('test-atomic-native', 'test-atomic.c',
-		  c_args: native_c_args))
+		  c_args: native_c_args,
+		  link_args: native_c_args))
 
 endif
 
