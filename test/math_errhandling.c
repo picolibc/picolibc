@@ -41,6 +41,46 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <limits.h>
+#include <stdbool.h>
+
+#ifdef _HAVE_ATTRIBUTE_ALWAYS_INLINE
+#define ALWAYS_INLINE __inline__ __attribute__((__always_inline__))
+#else
+#define ALWAYS_INLINE __inline__
+#endif
+
+static ALWAYS_INLINE float
+opt_barrier_float (float x)
+{
+  volatile float y = x;
+  return y;
+}
+
+static ALWAYS_INLINE double
+opt_barrier_double (double x)
+{
+  volatile double y = x;
+  return y;
+}
+
+#ifdef _HAVE_LONG_DOUBLE
+static ALWAYS_INLINE long double
+opt_barrier_long_double (long double x)
+{
+  volatile long double y = x;
+  return y;
+}
+#endif
+
+#ifdef __clang__
+#define clang_barrier_long_double(x) opt_barrier_long_double(x)
+#define clang_barrier_double(x) opt_barrier_double(x)
+#define clang_barrier_float(x) opt_barrier_float(x)
+#else
+#define clang_barrier_long_double(x) (x)
+#define clang_barrier_double(x) (x)
+#define clang_barrier_float(x) (x)
+#endif
 
 static const char *
 e_to_str(int e)
@@ -175,6 +215,7 @@ e_to_str(int e)
 #define MAX_VAL __LDBL_MAX__
 #define EPSILON_VAL __LDBL_EPSILON__
 #define sNAN __builtin_nansl("")
+#define force_eval(x) clang_barrier_long_double(x)
 
 #define TEST_LONG_DOUBLE
 
@@ -190,6 +231,7 @@ e_to_str(int e)
 #undef MIN_VAL
 #undef MAX_VAL
 #undef EPSILON_VAL
+#undef force_eval
 #undef sNAN
 #undef makemathname
 #undef makemathname_r
@@ -218,6 +260,7 @@ e_to_str(int e)
 #define MAX_VAL __DBL_MAX__
 #define EPSILON_VAL __DBL_EPSILON__
 #define sNAN __builtin_nans("")
+#define force_eval(x) clang_barrier_double(x)
 #define PI_VAL M_PI
 
 #define TEST_DOUBLE
@@ -234,6 +277,7 @@ e_to_str(int e)
 #undef MIN_VAL
 #undef MAX_VAL
 #undef EPSILON_VAL
+#undef force_eval
 #undef sNAN
 #undef makemathname
 #undef makemathname_r
@@ -252,6 +296,7 @@ e_to_str(int e)
 #define MAX_VAL 0xf.fffffp+124f
 #define EPSILON_VAL 0x1p-23f
 #define sNAN __builtin_nansf("")
+#define force_eval(x) clang_barrier_float(x)
 #define FLOAT_T float
 #define TEST_FLOAT
 #define makemathname(s) scat(s,f)
@@ -264,11 +309,9 @@ int main(void)
 {
 	int result = 0;
 
-#if DOUBLE_EXCEPTION_TEST
 	printf("Double tests:\n");
 	result += run_tests();
-#endif
-#ifdef LONG_DOUBLE_EXCEPTION_TEST
+#ifdef __SIZEOF_LONG_DOUBLE__
 	printf("Long double tests:\n");
 	result += run_testsl();
 #endif

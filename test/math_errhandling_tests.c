@@ -1394,6 +1394,110 @@ makemathname(print_float)(FLOAT_T a)
 #endif
 }
 
+static volatile const FLOAT_T makemathname(except_zero) = (FLOAT_T) 0.0;
+static volatile const FLOAT_T makemathname(except_one) = (FLOAT_T) 1.0;
+static volatile const FLOAT_T makemathname(except_small) = SMALL;
+static volatile const FLOAT_T makemathname(except_big) = BIG;
+static volatile FLOAT_T makemathname(except_result);
+
+static bool makemathname(has_invalid)(void)
+{
+        int except;
+        feclearexcept(FE_ALL_EXCEPT);
+        makemathname(except_result) = force_eval(makemathname(except_zero) / makemathname(except_zero));
+        except = fetestexcept(FE_INVALID);
+        return except != 0;
+}
+
+static bool makemathname(has_inf)(void)
+{
+        int except;
+        feclearexcept(FE_ALL_EXCEPT);
+        makemathname(except_result) = force_eval(makemathname(except_one) / makemathname(except_zero));
+        except = fetestexcept(FE_DIVBYZERO);
+        return except != 0;
+}
+
+static bool makemathname(has_uflow)(void)
+{
+        int except;
+        feclearexcept(FE_ALL_EXCEPT);
+        makemathname(except_result) = force_eval(makemathname(except_small) * makemathname(except_small));
+        except = fetestexcept(FE_UNDERFLOW);
+        return except != 0;
+}
+
+static bool makemathname(has_oflow)(void)
+{
+        int except;
+        feclearexcept(FE_ALL_EXCEPT);
+        makemathname(except_result) = force_eval(makemathname(except_big) * makemathname(except_big));
+        except = fetestexcept(FE_OVERFLOW);
+        return except != 0;
+}
+
+static bool makemathname(check_except)(void)
+{
+        bool result = true;
+        if (FE_INVALID != 0) {
+                if (EXCEPTION_TEST) {
+                        if (!makemathname(has_invalid)()) {
+                                printf("Exceptions claim to be supported, but 0/0 doesn't raise FE_INVALID\n");
+                                result = false;
+                        }
+                } else {
+                        if (makemathname(has_invalid)()) {
+                                printf("Exceptions are not supposed to be supported, but 0/0 raises FE_INVALID\n");
+                                result = false;
+                        }
+                }
+        }
+        if (FE_DIVBYZERO != 0) {
+                if (EXCEPTION_TEST) {
+                        if (!makemathname(has_inf)()) {
+                                printf("Exceptions claim to be supported, but 1/0 doesn't raise FE_DIVBYZERO\n");
+                                result = false;
+                        }
+                } else {
+                        if (makemathname(has_inf)()) {
+                                printf("Exceptions are not supposed to be supported, but 1/0 raises FE_DIVBYZERO\n");
+                                result = false;
+                        }
+                }
+        }
+        if (FE_UNDERFLOW != 0) {
+                if (EXCEPTION_TEST) {
+                        if (!makemathname(has_uflow)()) {
+                                printf("Exceptions claim to be supported, but %g*%g doesn't raise FE_UNDERFLOW\n",
+                                       (double) makemathname(except_small), (double) makemathname(except_small));
+                                result = false;
+                        }
+                } else {
+                        if (makemathname(has_uflow)()) {
+                                printf("Exceptions are not supposed to be supported, but %g*%g raises FE_UNDERFLOW\n",
+                                       (double) makemathname(except_small), (double)makemathname(except_small));
+                                result = false;
+                        }
+                }
+        }
+        if (FE_OVERFLOW != 0) {
+                if (EXCEPTION_TEST) {
+                        if (!makemathname(has_oflow)()) {
+                                printf("Exceptions claim to be supported, but %g*%g doesn't raise FE_OVERFLOW\n",
+                                       (double) makemathname(except_big), (double) makemathname(except_big));
+                                result = false;
+                        }
+                } else {
+                        if (makemathname(has_oflow)()) {
+                                printf("Exceptions are not supposed to be supported, but %g*%g raises FE_OVERFLOW\n",
+                                       (double) makemathname(except_big), (double) makemathname(except_big));
+                                result = false;
+                        }
+                }
+        }
+        return result;
+}
+
 int
 makemathname(run_tests)(void) {
 	int result = 0;
@@ -1402,6 +1506,9 @@ makemathname(run_tests)(void) {
 	int err, except;
 	int t;
         int printed;
+
+        if (!makemathname(check_except)())
+                result++;
 
 	for (t = 0; makemathname(tests)[t].func; t++) {
                 printed = 0;
