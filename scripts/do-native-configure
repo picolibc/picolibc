@@ -51,6 +51,7 @@ meson setup \
 	-Dspecsdir=none \
 	-Duse-stdlib=true \
 	-Dtests=true \
-	-Dc_args="-fsanitize=bounds -fsanitize-undefined-trap-on-error -Werror" \
+	-Dsanitize-bounds=true \
+	-Dwerror=true \
 	"$@" \
 	"$DIR"/..

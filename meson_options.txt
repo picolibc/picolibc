@@ -83,6 +83,12 @@ option('picoexit', type: 'boolean', value: true,
 option('fortify-source', type: 'combo', choices: ['none', '1', '2'], value: 'none',
        description: 'Set _FORTIFY_SOURCE=<value>')
 
+option('sanitize-bounds', type: 'boolean', value: false,
+       description: 'Build the library with -fsanitize=bounds')
+
+option('sanitize-trap-on-error', type: 'boolean', value: false,
+       description: 'Build the library with -fsanitize-undefined-trap-on-error')
+
 option('use-stdlib', type: 'boolean', value: false,
        description: 'Do not bypass the standard system library with -nostdlib (useful for native testing)')
 

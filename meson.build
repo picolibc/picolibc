@@ -210,6 +210,11 @@ endif
 c_flags = cc.get_supported_arguments(['-fno-common', '-frounding-math', '-fsignaling-nans',
 				      '-Wno-unsupported-floating-point-opt', '-fno-stack-protector',
 				      '-fno-builtin-copysignl'])
+
+c_sanitize_bounds_flags = cc.get_supported_arguments(['-fsanitize=bounds'])
+c_sanitize_trap_flags = cc.get_supported_arguments(['-fsanitize-undefined-trap-on-error'])
+c_sanitize_no_trap_flags = cc.get_supported_arguments(['-fno-sanitize-undefined-trap-on-error', '-static-libubsan'])
+have_ubsan = c_sanitize_bounds_flags != []
 c_args += c_flags
 native_c_args += c_flags
 
@@ -221,6 +226,22 @@ if fortify_source == 'none'
   c_args += '-U_FORTIFY_SOURCE'
 else
   c_args += '-D_FORTIFY_SOURCE=' + fortify_source
+endif
+
+sanitize_bounds = get_option('sanitize-bounds')
+sanitize_trap_on_error = get_option('sanitize-trap-on-error')
+
+if sanitize_bounds
+  if not have_ubsan
+    error('sanitize-bounds option selected but -fsanitize=bounds is not supported')
+  endif
+  c_args += c_sanitize_bounds_flags
+  native_c_args += c_sanitize_bounds_flags
+  if sanitize_trap_on_error
+    c_args += c_sanitize_trap_flags
+  else
+    c_args += c_sanitize_no_trap_flags
+  endif
 endif
 
 if cc.symbols_have_underscore_prefix()
