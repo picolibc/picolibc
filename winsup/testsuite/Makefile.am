@@ -339,13 +339,36 @@ testdll_tmpdir = $(shell cygpath -ma $(tmpdir) | sed -e 's#^\([A-Z]\):#/cygdrive
 
 site-extra.exp: ../config.status Makefile
 	@rm -f ./tmp0
-	@echo "set runtime_root \"`pwd`/runtime\"" >> ./tmp0
+	@echo "set runtime_root \"`pwd`/testinst/bin\"" >> ./tmp0
 	@echo "set tmpdir $(tmpdir)" >> ./tmp0
 	@echo "set testdll_tmpdir $(testdll_tmpdir)" >> ./tmp0
 	@echo "set cygrun \"`pwd`/mingw/cygrun\"" >> ./tmp0
 	@mv ./tmp0 site-extra.exp
 
 EXTRA_DEJAGNU_SITE_CONFIG = site-extra.exp
+
+# Set up things in the Cygwin 'installation' at testsuite/testinst/ to provide
+# things which tests need to work
+#
+# * Create /tmp
+# * Ensure there is a /usr/bin/sh for tests which use system()
+# * Ensure there is a /usr/bin/sleep for tests which use system("sleep 10")
+# * Ensure there is a /usr/bin/ls for tests which  use system("ls")
+#
+# copy to avoid all the complexities: hardlink will fail if builddir is on a
+# separate filesystem, symlink would need to be constructed with regard to the
+# mounts of the test installation, and making it into /bin/ will cause
+# CreateProcess() to load cygwin1.dll from there.
+#
+# use busybox executables as they don't have any other shared library
+# dependencies other than cygwin1.dll.
+#
+
+check-local:
+	$(MKDIR_P) ${builddir}/testinst/tmp
+	cd ${builddir}/testinst/bin && cp /usr/libexec/busybox/bin/busybox.exe sh.exe
+	cd ${builddir}/testinst/bin && cp /usr/libexec/busybox/bin/busybox.exe sleep.exe
+	cd ${builddir}/testinst/bin && cp /usr/libexec/busybox/bin/busybox.exe ls.exe
 
 # target to build all the programs needed by check, without running check
 check_programs: $(check_PROGRAMS)
