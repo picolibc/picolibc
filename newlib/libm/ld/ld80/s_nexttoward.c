@@ -37,7 +37,7 @@ nexttoward(__float64 x, long double y)
 	if((long double) x==y) return y;	/* x=y, return y */
 	if((ix|lx)==0) {			/* x == 0 */
 	    INSERT_WORDS(x,(esy&0x8000)<<16,1); /* return +-minsub */
-            force_eval_double(x*x);
+            force_eval_float64(opt_barrier_float64(x)*x);
 	    return x;
 	}
 	if(hx>=0) {				/* x > 0 */

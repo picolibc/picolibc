@@ -30,7 +30,7 @@ float nextafterf(float x, float y)
 	if(x==y) return y;		/* x=y, return y */
 	if(FLT_UWORD_IS_ZERO(ix)) {		/* x == 0 */
 	    SET_FLOAT_WORD(x,(hy&0x80000000)|FLT_UWORD_MIN);
-            force_eval_float(x*x);
+            force_eval_float(opt_barrier_float(x)*x);
             return x;
 	}
 	if(hx>=0) {				/* x > 0 */

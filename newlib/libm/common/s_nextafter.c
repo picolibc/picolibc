@@ -69,7 +69,7 @@ nextafter64(__float64 x, __float64 y)
 	if(x==y) return y;		/* x=y, return y (follow y sign for 0) */
 	if((ix|lx)==0) {			/* x == 0 */
 	    INSERT_WORDS(x,hy&0x80000000,1);	/* return +-minsubnormal */
-            force_eval_float64(x*x);
+            force_eval_float64(opt_barrier_float64(x)*x);
             return x;
 	} 
 	if(hx>=0) {				/* x > 0 */

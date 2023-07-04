@@ -33,7 +33,7 @@ nexttoward64(__float64 x, long double y)
 	iy = hy&0x7fffffffffffffffLL;	/* |y| */
 
 	if((ix>=0x7ff00000)&&((ix-0x7ff00000)|lx)!=0) {   /* x is nan */
-            force_eval_long_double(y+y);
+            force_eval_long_double(opt_barrier_long_double(y)+y);
             return x + x;
         }
 	if((iy>=0x7fff000000000000LL)&&((iy-0x7fff000000000000LL)|ly)!=0) { /* y is nan */
@@ -42,7 +42,7 @@ nexttoward64(__float64 x, long double y)
 	if((long double) x==y) return y;	/* x=y, return y */
 	if((ix|lx)==0) {			/* x == 0 */
 	    INSERT_WORDS(x,(u_int32_t)((hy>>32)&0x80000000),1);/* return +-minsub */
-            force_eval_float64(x*x);
+            force_eval_float64(opt_barrier_float64(x)*x);
 	    return x;
 	}
 	if(hx>=0) {				/* x > 0 */

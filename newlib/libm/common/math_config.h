@@ -326,6 +326,13 @@ force_eval_double (double x)
 }
 
 #ifdef _HAVE_LONG_DOUBLE
+static ALWAYS_INLINE long double
+opt_barrier_long_double (long double x)
+{
+  FORCE_LONG_DOUBLE y = x;
+  return y;
+}
+
 static ALWAYS_INLINE void
 force_eval_long_double (long double x)
 {
@@ -339,11 +346,13 @@ force_eval_long_double (long double x)
  * to force evaluation order where needed
  */
 #ifdef __clang__
+#define clang_barrier_long_double(x) opt_barrier_long_double(x)
 #define clang_barrier_double(x) opt_barrier_double(x)
 #define clang_barrier_float(x) opt_barrier_float(x)
 #define clang_force_double(x) force_eval_double(x)
 #define clang_force_float(x) force_eval_float(x)
 #else
+#define clang_barrier_long_double(x) (x)
 #define clang_barrier_double(x) (x)
 #define clang_barrier_float(x) (x)
 #define clang_force_double(x) (x)
@@ -615,6 +624,7 @@ force_eval_long_double (long double x)
 #  define _FLOAT64_MIN  LDBL_MIN
 #  define _FLOAT64_MAX  LDBL_MAX
 #  define force_eval_float64 force_eval_long_double
+#  define opt_barrier_float64 opt_barrier_long_double
 # endif
 # define _MATH_ALIAS_l_to_f(name)
 # define _MATH_ALIAS_l_l_to_f(name)
@@ -662,6 +672,7 @@ typedef double __float64;
 # define FORCE_FLOAT64 FORCE_DOUBLE
 # define pick_float64_except(a,b) pick_double_except(a,b)
 # define force_eval_float64 force_eval_double
+# define opt_barrier_float64 opt_barrier_double
 #endif
 
 #if __SIZEOF_LONG_DOUBLE__ > 8

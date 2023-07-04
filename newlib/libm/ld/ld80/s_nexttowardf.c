@@ -30,7 +30,7 @@ nexttowardf(float x, long double y)
 	if((long double) x==y) return y;	/* x=y, return y */
 	if(ix==0) {				/* x == 0 */
 	    SET_FLOAT_WORD(x,((esy&0x8000)<<16)|1);/* return +-minsub*/
-            force_eval_float(x*x);
+            force_eval_float(opt_barrier_float(x)*x);
 	    return x;
 	}
 	if(hx>=0) {				/* x > 0 */
