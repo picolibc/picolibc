@@ -25,3 +25,6 @@ Bug Fixes
 - Fix return code and errno set by renameat2, if oldfile and newfile
   refer to the same file, and the RENAME_NOREPLACE flag is set.
   Addresses: https://cygwin.com/pipermail/cygwin/2023-April/253514.html
+
+- Make <sys/cpuset.h> safe for c89 compilations.
+  Addresses: https://cygwin.com/pipermail/cygwin-patches/2023q3/012308.html
