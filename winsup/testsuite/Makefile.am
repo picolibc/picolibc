@@ -334,17 +334,9 @@ DEJATOOL = winsup
 RUNTESTFLAGS_1 = -v
 RUNTESTFLAGS = $(RUNTESTFLAGS_$(V))
 
-# a temporary directory, to be used for files created by tests
-tmpdir = $(abspath $(builddir)/tmp/)
-# the same temporary directory, as an absolute, /cygdrive path (so it can be
-# understood by the test DLL, which will have a different mount table)
-testdll_tmpdir = $(shell cygpath -ma $(tmpdir) | sed -e 's#^\([A-Z]\):#/cygdrive/\L\1#')
-
 site-extra.exp: ../config.status Makefile
 	@rm -f ./tmp0
 	@echo "set runtime_root \"`pwd`/testinst/bin\"" >> ./tmp0
-	@echo "set tmpdir $(tmpdir)" >> ./tmp0
-	@echo "set testdll_tmpdir $(testdll_tmpdir)" >> ./tmp0
 	@echo "set cygrun \"`pwd`/mingw/cygrun\"" >> ./tmp0
 	@mv ./tmp0 site-extra.exp
 
