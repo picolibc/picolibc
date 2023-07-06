@@ -36,6 +36,7 @@
 DIR="$(dirname "$0")"
 meson setup \
         --buildtype debug \
+	--fatal-meson-warnings \
         -Dtls-model=global-dynamic \
 	-Derrno-function=auto \
         -Dmultilib=false \
