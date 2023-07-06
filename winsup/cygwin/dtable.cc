@@ -600,7 +600,13 @@ fh_alloc (path_conv& pc)
 	case FH_TTY:
 	  if (!pc.isopen ())
 	    {
-	      fhraw = cnew_no_ctor (fhandler_console, -1);
+	      if (CTTY_IS_VALID (myself->ctty))
+		{
+		  if (iscons_dev (myself->ctty))
+		    fhraw = cnew_no_ctor (fhandler_console, -1);
+		  else
+		    fhraw = cnew_no_ctor (fhandler_pty_slave, -1);
+		}
 	      debug_printf ("not called from open for /dev/tty");
 	    }
 	  else if (!CTTY_IS_VALID (myself->ctty) && last_tty_dev

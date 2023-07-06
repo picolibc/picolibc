@@ -4554,6 +4554,12 @@ fhandler_console::set_disable_master_thread (bool x, fhandler_console *cons)
 int
 fhandler_console::fstat (struct stat *st)
 {
+  /* When stat() is called, fh_alloc() in dtable.cc omits to initialize
+     the console instance. Due to this, get_ttyp() returns NULL here.
+     So, calling set_unit() is necessary to access getsid(). */
+  if (!get_ttyp ())
+    set_unit ();
+
   fhandler_base::fstat (st);
   st->st_mode = S_IFCHR | S_IRUSR | S_IWUSR;
   pinfo p (get_ttyp ()->getsid ());
