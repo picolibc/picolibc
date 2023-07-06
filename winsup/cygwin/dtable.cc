@@ -509,7 +509,7 @@ fh_alloc (path_conv& pc)
 	  break;
 	case FH_PTMX:
 	  if (pc.isopen ())
-	    fh = cnew (fhandler_pty_master, -1);
+	    fh = cnew (fhandler_pty_master, -1, (dev_t) pc.dev);
 	  else
 	    fhraw = cnew_no_ctor (fhandler_pty_master, -1);
 	  break;
@@ -618,7 +618,8 @@ fh_alloc (path_conv& pc)
 	      if (iscons_dev (myself->ctty))
 		fh = cnew (fhandler_console, pc.dev);
 	      else
-		fh = cnew (fhandler_pty_slave, myself->ctty);
+		fh = cnew (fhandler_pty_slave,
+			   minor (myself->ctty), (dev_t) pc.dev);
 	      if (fh->dev () != FH_NADA)
 		fh->set_name ("/dev/tty");
 	    }

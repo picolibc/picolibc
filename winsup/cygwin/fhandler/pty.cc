@@ -765,10 +765,11 @@ out:
 
 /* pty slave stuff */
 
-fhandler_pty_slave::fhandler_pty_slave (int unit)
+fhandler_pty_slave::fhandler_pty_slave (int unit, dev_t via)
   : fhandler_pty_common (), inuse (NULL), output_handle_nat (NULL),
   io_handle_nat (NULL), slave_reading (NULL), num_reader (0)
 {
+  dev_referred_via = via;
   if (unit >= 0)
     dev ().parse (DEV_PTYS_MAJOR, unit);
 }
@@ -1769,7 +1770,7 @@ out:
 int
 fhandler_pty_slave::fstat (struct stat *st)
 {
-  fhandler_base::fstat (st);
+  fhandler_termios::fstat (st);
 
   bool to_close = false;
   if (!input_available_event)
@@ -1974,13 +1975,14 @@ errout:
 /*******************************************************
  fhandler_pty_master
 */
-fhandler_pty_master::fhandler_pty_master (int unit)
+fhandler_pty_master::fhandler_pty_master (int unit, dev_t via)
   : fhandler_pty_common (), pktmode (0), master_ctl (NULL),
     master_thread (NULL), from_master_nat (NULL), to_master_nat (NULL),
     from_slave_nat (NULL), to_slave_nat (NULL), echo_r (NULL), echo_w (NULL),
     dwProcessId (0), to_master (NULL), from_master (NULL),
     master_fwd_thread (NULL)
 {
+  dev_referred_via = via;
   if (unit >= 0)
     dev ().parse (DEV_PTYM_MAJOR, unit);
   set_name ("/dev/ptmx");

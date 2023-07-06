@@ -1936,6 +1936,7 @@ class fhandler_termios: public fhandler_base
   virtual void acquire_input_mutex_if_necessary (DWORD ms) {};
   virtual void release_input_mutex_if_necessary (void) {};
   virtual void discard_input () {};
+  dev_t dev_referred_via;
 
   /* Result status of processing keys in process_sigs(). */
   enum process_sig_state {
@@ -1975,6 +1976,7 @@ class fhandler_termios: public fhandler_base
   void echo_erase (int force = 0);
   virtual off_t lseek (off_t, int);
   pid_t tcgetsid ();
+  virtual int fstat (struct stat *buf);
 
   fhandler_termios (void *) {}
 
@@ -2297,7 +2299,9 @@ private:
   void copy_from (fhandler_base *x)
   {
     pc.free_strings ();
+    dev_t via = this->dev_referred_via; /* Do not copy dev_referred_via */
     *this = *reinterpret_cast<fhandler_console *> (x);
+    this->dev_referred_via = via;
     _copy_from_reset_helper ();
   }
 
@@ -2424,7 +2428,7 @@ class fhandler_pty_slave: public fhandler_pty_common
   typedef ptys_handle_set_t handle_set_t;
 
   /* Constructor */
-  fhandler_pty_slave (int);
+  fhandler_pty_slave (int, dev_t via = 0);
 
   void set_output_handle_nat (HANDLE h) { output_handle_nat = h; }
   HANDLE& get_output_handle_nat () { return output_handle_nat; }
@@ -2462,7 +2466,9 @@ class fhandler_pty_slave: public fhandler_pty_common
   void copy_from (fhandler_base *x)
   {
     pc.free_strings ();
+    dev_t via = this->dev_referred_via; /* Do not copy dev_referred_via */
     *this = *reinterpret_cast<fhandler_pty_slave *> (x);
+    this->dev_referred_via = via;
     _copy_from_reset_helper ();
   }
 
@@ -2537,7 +2543,7 @@ private:
 public:
   HANDLE get_echo_handle () const { return echo_r; }
   /* Constructor */
-  fhandler_pty_master (int);
+  fhandler_pty_master (int, dev_t via = 0);
 
   static DWORD pty_master_thread (const master_thread_param_t *p);
   static DWORD pty_master_fwd_thread (const master_fwd_thread_param_t *p);
@@ -2572,7 +2578,9 @@ public:
   void copy_from (fhandler_base *x)
   {
     pc.free_strings ();
+    dev_t via = this->dev_referred_via; /* Do not copy dev_referred_via */
     *this = *reinterpret_cast<fhandler_pty_master *> (x);
+    this->dev_referred_via = via;
     _copy_from_reset_helper ();
   }
 

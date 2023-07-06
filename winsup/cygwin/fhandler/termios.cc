@@ -691,6 +691,15 @@ fhandler_termios::tcgetsid ()
   return -1;
 }
 
+int
+fhandler_termios::fstat (struct stat *buf)
+{
+  fhandler_base::fstat (buf);
+  if (dev_referred_via > 0)
+    buf->st_rdev = dev_referred_via;
+  return 0;
+}
+
 static bool
 is_console_app (const WCHAR *filename)
 {

@@ -2110,6 +2110,7 @@ fhandler_console::fhandler_console (fh_devices devunit) :
   fhandler_termios (), input_ready (false), thread_sync_event (NULL),
   input_mutex (NULL), output_mutex (NULL), unit (MAX_CONS_DEV)
 {
+  dev_referred_via = (dev_t) devunit;
   if (devunit > 0)
     dev ().parse (devunit);
   setup ();
@@ -4558,9 +4559,12 @@ fhandler_console::fstat (struct stat *st)
      the console instance. Due to this, get_ttyp() returns NULL here.
      So, calling set_unit() is necessary to access getsid(). */
   if (!get_ttyp ())
-    set_unit ();
+    {
+      dev_referred_via = get_device ();
+      set_unit ();
+    }
 
-  fhandler_base::fstat (st);
+  fhandler_termios::fstat (st);
   st->st_mode = S_IFCHR | S_IRUSR | S_IWUSR;
   pinfo p (get_ttyp ()->getsid ());
   if (p)
