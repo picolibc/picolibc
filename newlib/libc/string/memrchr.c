@@ -71,7 +71,8 @@ memrchr (const void *src_void,
   const unsigned char *src = (const unsigned char *) src_void + length - 1;
   unsigned char d = c;
 
-#if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
+#if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && \
+    !defined(PICOLIBC_NO_OUT_OF_BOUNDS_READS)
   unsigned long *asrc;
   unsigned long  mask;
   unsigned int i;
