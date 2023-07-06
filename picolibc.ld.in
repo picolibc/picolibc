@@ -142,7 +142,7 @@ SECTIONS
 		PROVIDE(__preserve_end__ = .);
 	} >ram AT>ram :ram
 
-	.data : @LDSCRIPT_ALIGN_WITH_INPUT@ {
+	.data : @BFD_START@ ALIGN_WITH_INPUT @BFD_END@ {
 		*(.data .data.*)
 		*(.gnu.linkonce.d.*)
 
