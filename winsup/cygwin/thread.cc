@@ -457,6 +457,7 @@ pthread::precreate (pthread_attr *newattr)
       attr.joinable = newattr->joinable;
       attr.contentionscope = newattr->contentionscope;
       attr.inheritsched = newattr->inheritsched;
+      attr.schedparam = newattr->schedparam;
       attr.stackaddr = newattr->stackaddr;
       attr.stacksize = newattr->stacksize;
       attr.guardsize = newattr->guardsize;
