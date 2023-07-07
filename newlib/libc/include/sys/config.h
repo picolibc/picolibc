@@ -353,6 +353,8 @@ SUCH DAMAGE.
 #if __has_feature(address_sanitizer)
 #define PICOLIBC_NO_OUT_OF_BOUNDS_READS
 #endif
+#elif defined(__SANITIZE_ADDRESS__)
+#define PICOLIBC_NO_OUT_OF_BOUNDS_READS
 #endif
 
 #endif /* __SYS_CONFIG_H__ */
