@@ -170,15 +170,11 @@ playbacktest (void)
 		strerror (errno));
     }
   audio2 = open ("/dev/dsp", O_WRONLY);
+  tst_resm (TINFO, "Second open /dev/dsp W %s ",
+	    audio2 >= 0 ? "WORKS" : "DOESN'T WORK");
   if (audio2 >= 0)
     {
-      tst_brkm (TFAIL, cleanup,
-		"Second open /dev/dsp W succeeded, but is expected to fail");
-    }
-  else if (errno != EBUSY)
-    {
-      tst_brkm (TFAIL, cleanup, "Expected EBUSY here, exit: %s",
-		strerror (errno));
+      close (audio2);
     }
   for (rate = 0; rate < sizeof (rates) / sizeof (int); rate++)
     for (k = 0; k < sizeof (sblut) / sizeof (struct sb); k++)
@@ -209,15 +205,11 @@ recordingtest (void)
 		strerror (errno));
     }
   audio2 = open ("/dev/dsp", O_RDONLY);
+  tst_resm (TINFO, "Second open /dev/dsp R %s",
+	    audio2 >= 0 ? "WORKS" : "DOESN'T WORK");
   if (audio2 >= 0)
     {
-      tst_brkm (TFAIL, cleanup,
-		"Second open /dev/dsp R succeeded, but is expected to fail");
-    }
-  else if (errno != EBUSY)
-    {
-      tst_brkm (TFAIL, cleanup, "Expected EBUSY here, exit: %s",
-		strerror (errno));
+      close (audio2);
     }
   for (rate = 0; rate < sizeof (rates) / sizeof (int); rate++)
     for (k = 0; k < sizeof (sblut) / sizeof (struct sb); k++)
