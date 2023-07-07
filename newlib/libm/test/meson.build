@@ -169,6 +169,7 @@ if enable_native_tests
     test('math-native',
 	 executable('math_test_native', math_test_src,
 		    c_args: native_c_args,
+		    link_args: native_c_args,
 		    dependencies: native_lib_m))
   endif
 endif
