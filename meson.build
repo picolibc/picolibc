@@ -51,6 +51,9 @@ fs = import('fs')
 
 cc = meson.get_compiler('c')
 
+# check for 'install-name' support
+install_name = meson.version().version_compare('> 1.2.0')
+
 # Find the compiler installation directory by parsing the output of
 # cc -print-search-dirs
 

@@ -65,30 +65,64 @@ foreach target : targets
     libc_name = join_paths(target, 'libc')
     libg_name = join_paths(target, 'libg')
     libm_name = join_paths(target, 'libm')
+    if install_name
+      libc_name = target + '_c'
+      libg_name = target + '_g'
+      libm_name = target + '_m'
+    endif
   endif
 
-  local_lib_c_target = static_library(libc_name,
-				      libsrcs_target,
-				      install : true,
-				      install_dir : instdir,
-				      pic: false,
-				      objects : libobjs,
-				      include_directories: inc,
-				      c_args: value[1])
+  if install_name
+    local_lib_c_target = static_library(libc_name,
+					libsrcs_target,
+					install : true,
+					install_dir : instdir,
+					install_name : 'c',
+					pic: false,
+					objects : libobjs,
+					include_directories: inc,
+					c_args: value[1])
+  else
+    local_lib_c_target = static_library(libc_name,
+					libsrcs_target,
+					install : true,
+					install_dir : instdir,
+					pic: false,
+					objects : libobjs,
+					include_directories: inc,
+					c_args: value[1])
+  endif
 
   set_variable('lib_c' + target, local_lib_c_target)
-  static_library(libm_name,
-		 ['empty.c'],
-		 install : true,
-		 install_dir : instdir,
-		 pic: false,
-		 objects : [])
-  static_library(libg_name,
-		 ['empty.c'],
-		 install : true,
-		 install_dir : instdir,
-		 pic: false,
-		 objects : [])
+  if install_name
+    static_library(libm_name,
+		   ['empty.c'],
+		   install : true,
+		   install_dir : instdir,
+		   install_name : 'm',
+		   pic: false,
+		   objects : [])
+    static_library(libg_name,
+		   ['empty.c'],
+		   install : true,
+		   install_dir : instdir,
+		   install_name : 'g',
+		   pic: false,
+		   objects : [])
+  else
+    static_library(libm_name,
+		   ['empty.c'],
+		   install : true,
+		   install_dir : instdir,
+		   pic: false,
+		   objects : [])
+    static_library(libg_name,
+		   ['empty.c'],
+		   install : true,
+		   install_dir : instdir,
+		   pic: false,
+		   objects : [])
+  endif
 
   if check_duplicate_names
     custom_target('libc_duplicates' + target,

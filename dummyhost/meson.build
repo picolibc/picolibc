@@ -47,14 +47,28 @@ foreach target : targets
     libdummyhost_name = 'dummyhost'
   else
     libdummyhost_name = join_paths(target, 'libdummyhost')
+    if install_name
+      libdummyhost_name = target + '_' + 'dummyhost'
+    endif
   endif
 
-  set_variable('lib_dummyhost' + target,
-	       static_library(libdummyhost_name,
-			      srcs_dummyhost,
-			      install : true,
-			      install_dir : instdir,
-			      include_directories : inc,
-			      c_args : value[1]))
+  if install_name
+    set_variable('lib_dummyhost' + target,
+		 static_library(libdummyhost_name,
+				srcs_dummyhost,
+				install : true,
+				install_dir : instdir,
+				install_name : 'dummyhost',
+				include_directories : inc,
+				c_args : value[1]))
+  else
+    set_variable('lib_dummyhost' + target,
+		 static_library(libdummyhost_name,
+				srcs_dummyhost,
+				install : true,
+				install_dir : instdir,
+				include_directories : inc,
+				c_args : value[1]))
+  endif
 
 endforeach
