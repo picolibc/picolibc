@@ -325,6 +325,9 @@ AM_CPPFLAGS = -I$(srcdir)/libltp/include
 AM_LDFLAGS = $(LDFLAGS_FOR_TESTDLL)
 LDADD = $(builddir)/libltp.a $(builddir)/../cygwin/binmode.o $(LDADD_FOR_TESTDLL)
 
+# additional flags for specific test executables
+winsup_api_devdsp_LDADD = -lwinmm $(LDADD)
+
 DEJATOOL = winsup
 
 # Add '-v' to RUNTESTFLAGS if V=1

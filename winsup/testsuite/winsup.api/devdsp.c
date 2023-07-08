@@ -27,6 +27,8 @@ details. */
 #include <errno.h>
 #include "test.h" /* use libltp framework */
 
+#include <windows.h>
+
 /* Controls if a child can open the device after the parent */
 #define CHILD_EXPECT 0 /* 0 or 1 */
 
@@ -59,6 +61,7 @@ void playwavtest (void);
 void syncwithchild (pid_t pid, int expected_exit_status);
 void cleanup (void);
 void dup_test (void);
+void devcheck (void);
 
 static int expect_child_failure = 0;
 
@@ -77,6 +80,7 @@ int
 main (int argc, char *argv[])
 {
   /*  tst_brkm(TBROK, cleanup, "see if it breaks all right"); */
+  devcheck ();
   ioctltest ();
   playbacktest ();
   recordingtest ();
@@ -89,6 +93,17 @@ main (int argc, char *argv[])
   tst_exit ();
   /* NOTREACHED */
   return 0;
+}
+
+/* skip test if we don't have any audio devices*/
+void
+devcheck (void)
+{
+  if ((waveInGetNumDevs() == 0) || (waveOutGetNumDevs() == 0))
+    {
+      tst_resm (TINFO, "Skipping, no audio devices present");
+      exit(0);
+    }
 }
 
 /* test some extra ioctls */
