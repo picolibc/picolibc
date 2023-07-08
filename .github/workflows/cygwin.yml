@@ -121,3 +121,13 @@ jobs:
         (export PATH=${{ matrix.target }}/winsup/testsuite/testinst/bin:${PATH} && cmd /c $(cygpath -wa ${{ matrix.target }}/winsup/cygserver/cygserver) &) &&
         (cd ${{ matrix.target }}/winsup; make check AM_COLOR_TESTS=always || true)
       shell: C:\cygwin\bin\bash.exe --noprofile --norc -eo pipefail '{0}'
+
+    # upload test logs to facilitate investigation of problems
+    - name: Upload test logs
+      uses: actions/upload-artifact@v3
+      with:
+        name: testlogs
+        path: |
+          build/${{ matrix.target }}/winsup/testsuite/**/*.log
+          build/${{ matrix.target }}/winsup/testsuite/**/*.trs
+      if: ${{ !cancelled() }}
