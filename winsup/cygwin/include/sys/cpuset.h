@@ -9,7 +9,8 @@ details. */
 #ifndef _SYS_CPUSET_H_
 #define _SYS_CPUSET_H_
 
-#include <sys/cdefs.h>
+#include <stdlib.h>
+#include <string.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,14 +45,14 @@ __cpuset_alloc_size (int num)
 static __inline cpu_set_t *
 __cpuset_alloc (int num)
 {
-  return (cpu_set_t *) __builtin_malloc (CPU_ALLOC_SIZE(num));
+  return (cpu_set_t *) malloc (CPU_ALLOC_SIZE(num));
 }
 
 #define CPU_FREE(set) __cpuset_free (set)
 static __inline void
 __cpuset_free (cpu_set_t *set)
 {
-  __builtin_free (set);
+  free (set);
 }
 
 /* These _S macros operate on dynamically-sized cpu sets of size 'siz' bytes */
@@ -59,7 +60,7 @@ __cpuset_free (cpu_set_t *set)
 static __inline void
 __cpuset_zero_s (size_t siz, cpu_set_t *set)
 {
-  (void) __builtin_memset (set, 0, siz);
+  (void) memset (set, 0, siz);
 }
 
 #define CPU_SET_S(cpu, siz, set) __cpuset_set_s (cpu, siz, set)
