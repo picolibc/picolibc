@@ -26,6 +26,14 @@ main (int argc, char **argv)
       fprintf (stderr, "couldn't redirect stdout to /dev/null, fd %d - %s\n", fd, strerror (errno));
       exit (1);
     }
+
+  n = system ("ls");
+  if (n != 0)
+    {
+      fprintf (stderr, "system() (in parent) call returned %x\n", n);
+      exit (1);
+    }
+
   if (pipe (fds))
     {
       fprintf (stderr, "pipe call failed - %s\n", strerror (errno));
@@ -61,7 +69,7 @@ main (int argc, char **argv)
     }
   if (n != 0)
     {
-      fprintf (stderr, "system() call returned %x\n", n);
+      fprintf (stderr, "system() (in child) call returned %x\n", n);
       exit (1);
     }
   exit (0);
