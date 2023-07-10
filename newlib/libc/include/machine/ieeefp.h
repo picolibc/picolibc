@@ -97,18 +97,6 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # define _LONG_DOUBLE_IS_32BITS
 #endif
 
-#if defined(__SIZEOF_LONG_DOUBLE__)
-#define _HAVE_LONG_DOUBLE
-#endif
-
-#if defined(__SIZEOF_DOUBLE__) && defined(__SIZEOF_LONG_DOUBLE__)
-# if __SIZEOF_DOUBLE__ == __SIZEOF_LONG_DOUBLE__
-#  define _LDBL_EQ_DBL
-# else
-#  undef _LDBL_EQ_DBL
-# endif
-#endif
-
 #if defined(__SIZEOF_FLOAT__) && defined(__SIZEOF_DOUBLE__)
 # if __SIZEOF_FLOAT__ == __SIZEOF_DOUBLE__
 #  define _DBL_EQ_FLT
@@ -259,7 +247,9 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 #ifdef __i386__
 #define __IEEE_LITTLE_ENDIAN
+#ifndef _SOFT_FLOAT
 # define _SUPPORTS_ERREXCEPT
+#endif
 #endif
 
 #ifdef __riscv
@@ -488,7 +478,9 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 #ifdef __x86_64__
 #define __IEEE_LITTLE_ENDIAN
+#ifndef _SOFT_FLOAT
 # define _SUPPORTS_ERREXCEPT
+#endif
 #endif
 
 #ifdef __mep__
