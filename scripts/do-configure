@@ -82,6 +82,12 @@ case "$*" in
 		exit 77
 		;;
 	esac
+	case "$*" in
+	    *-Dtest-long-double=false*)
+		echo "skipping io-long-double when test-long-double=false"
+		exit 77
+		;;
+	esac
 	;;
 esac
 
