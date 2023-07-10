@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone picolibc
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: picolibc
 
@@ -75,7 +75,7 @@ jobs:
 	]
     steps:
       - name: Clone picolibc
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: picolibc
 
@@ -126,7 +126,7 @@ jobs:
 	]
     steps:
       - name: Clone picolibc
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: picolibc
 
@@ -177,7 +177,7 @@ jobs:
 	]
     steps:
       - name: Clone picolibc
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: picolibc
 
