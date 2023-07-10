@@ -136,12 +136,13 @@ long_double_code = '''
 #ifndef __LDBL_MANT_DIG__
 #error No long double support in float.h
 #endif
-long double test()
+long double test(void)
 {
 	long double ld = 0.0L;
-	 return ld;
+	return ld;
 }
 '''
+
 have_long_double = cc.compiles(long_double_code, name : 'long double check', args: core_c_args)
 
 have_sizeof_float = cc.get_define('__SIZEOF_FLOAT__') != ''
@@ -1321,6 +1322,10 @@ if tests_enable_stack_protector
   else
     tests_enable_stack_protector = false
   endif
+endif
+
+if have_long_double and get_option('test-long-double')
+  test_c_args += ['-D_TEST_LONG_DOUBLE']
 endif
 
 # Meson version 0.53.2 doesn't check for the skip_sanity_check value

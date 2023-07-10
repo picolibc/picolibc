@@ -405,7 +405,7 @@ FLOAT_T makemathname(test_nextafter_negmin_0)(void) { return makemathname(nextaf
 FLOAT_T makemathname(test_nextafter_1_2)(void) {return makemathname(nextafter)(makemathname(one), makemathname(two)); }
 FLOAT_T makemathname(test_nextafter_neg1_neg2)(void) {return makemathname(nextafter)(-makemathname(one), -makemathname(two)); }
 
-#if defined(__SIZEOF_LONG_DOUBLE__) && !defined(NO_NEXTTOWARD)
+#if defined(_TEST_LONG_DOUBLE) && !defined(NO_NEXTTOWARD)
 
 FLOAT_T makemathname(test_nexttoward_0_neg0)(void) { return makemathname(nexttoward)(makemathname(zero), -makelname(zero)); }
 FLOAT_T makemathname(test_nexttoward_neg0_0)(void) { return makemathname(nexttoward)(-makemathname(zero), makelname(zero)); }
@@ -711,7 +711,7 @@ FLOAT_T makemathname(test_scalbn_tiny)(void) { return makemathname(scalbn)(makem
 
 #undef sNAN_RET
 #undef sNAN_EXCEPTION
-#if defined(__i386__) && !defined(TEST_LONG_DOUBLE)
+#if defined(__i386__) && !defined(TEST_LONG_DOUBLE) && !defined(_SOFT_FLOAT)
 /*
  * i386 ABI returns floats in the 8087 registers, which convert sNAN
  * to NAN on load, so you can't ever return a sNAN value successfully.
@@ -1167,7 +1167,7 @@ struct {
         TEST(nextafter_1_2, (FLOAT_T)1.0 + EPSILON_VAL, 0, 0),
         TEST(nextafter_neg1_neg2, -(FLOAT_T)1.0 - EPSILON_VAL, 0, 0),
 
-#if defined(__SIZEOF_LONG_DOUBLE__) && !defined(NO_NEXTTOWARD)
+#if defined(_TEST_LONG_DOUBLE) && !defined(NO_NEXTTOWARD)
         TEST(nexttoward_0_neg0, -(FLOAT_T)0, 0, 0),
         TEST(nexttoward_neg0_0, (FLOAT_T)0, 0, 0),
         TEST(nexttoward_0_1, (FLOAT_T) MIN_VAL, FE_UNDERFLOW, 0),

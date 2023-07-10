@@ -76,6 +76,7 @@ struct {
     { "0x1.fffffffffffffp1022@",  0x1.fffffffffffffp1022, (float) INFINITY, 0x1.fffffffffffffp1022l },
     { "0x1.fffffffffffff8p1022@", 0x1.0000000000000p1023, (float) INFINITY, 0x1.fffffffffffff8p1022l }, /* rounds up for double */
     { "0x1.fffffffffffffp1023@",  0x1.fffffffffffffp1023, (float) INFINITY, 0x1.fffffffffffffp1023l },
+#ifdef _TEST_LONG_DOUBLE
 #if __LDBL_MANT_DIG__ > __DBL_MANT_DIG__
     { "0x1.fffffffffffff8p1023@",      (double) INFINITY, (float) INFINITY, 0x1.fffffffffffff8p1023l }, /* rounds up to INFINITY for double */
 #else
@@ -94,6 +95,7 @@ struct {
     { "0x1.ffffffffffffffffp16383@", (double) INFINITY, (float) INFINITY, (long double) INFINITY },             /* rounds up to INFINITY for long double */
 #endif
 #endif
+#endif
 };
 
 #define NTESTS (sizeof(tests)/sizeof(tests[0]))
@@ -103,8 +105,10 @@ int main(void)
     int i;
     double d;
     float f;
+#ifdef _TEST_LONG_DOUBLE
 #ifdef FULL_TESTS
     long double ld;
+#endif
 #endif
     char *end;
     int ret = 0;
@@ -131,6 +135,7 @@ int main(void)
             printf("strtof(\"%s\") end is \"%s\"\n", tests[i].string, end);
             ret = 1;
         }
+#ifdef _TEST_LONG_DOUBLE
 #ifdef FULL_TESTS
         if (sizeof(long double) > sizeof(double)) {
             ld = strtold(tests[i].string, &end);
@@ -144,6 +149,7 @@ int main(void)
                 ret = 1;
             }
         }
+#endif
 #endif
     }
     return ret;

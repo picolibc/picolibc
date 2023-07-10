@@ -175,7 +175,7 @@ e_to_str(int e)
 #define scat(a,b) a ## b
 
 /* Tests with long doubles */
-#ifdef __SIZEOF_LONG_DOUBLE__
+#ifdef _TEST_LONG_DOUBLE
 
 #if defined(__PICOLIBC__) && !defined(_HAVE_LONG_DOUBLE_MATH)
 #define SIMPLE_MATH_ONLY
@@ -311,7 +311,7 @@ int main(void)
 
 	printf("Double tests:\n");
 	result += run_tests();
-#ifdef __SIZEOF_LONG_DOUBLE__
+#ifdef _TEST_LONG_DOUBLE
 	printf("Long double tests:\n");
 	result += run_testsl();
 #endif

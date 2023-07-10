@@ -39,7 +39,7 @@
 #include <stdio.h>
 #include <float.h>
 
-#ifdef LDBL_MANT_DIG
+#ifdef _TEST_LONG_DOUBLE
 
 static long double max_error;
 

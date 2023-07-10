@@ -6,7 +6,7 @@
 
 double complex c1, c2;
 float complex f1, f2;
-#ifdef _HAVE_LONG_DOUBLE
+#ifdef _TEST_LONG_DOUBLE
 long double complex l1, l2;
 #endif
 
@@ -93,7 +93,9 @@ main(void)
        float cabsf(f1) __RENAME(__c99_cabsf);
        #endif
     */
+#ifdef _TEST_LONG_DOUBLE
     (void) cabsl(l1) ;
+#endif
     (void) cabs(c1) ;
     (void) cabsf(f1) ;
 
@@ -104,7 +106,9 @@ main(void)
     /* 7.3.8.3 The csqrt functions */
     (void) csqrt(c1);
     (void) csqrtf(f1);
+#ifdef _TEST_LONG_DOUBLE
     (void) csqrtl(l1);
+#endif
 
     /* 7.3.9 Manipulation functions */
     /* 7.3.9.1 The carg functions */ 
@@ -117,7 +121,9 @@ main(void)
     /* 7.3.9.2 The cimag functions */
     (void) cimag(c1);
     (void) cimagf(f1);
+#ifdef _TEST_LONG_DOUBLE
     (void) cimagl(l1);
+#endif
 
     /* 7.3.9.3 The conj functions */
     (void) conj(c1);
@@ -130,7 +136,9 @@ main(void)
     /* 7.3.9.5 The creal functions */
     (void) creal(c1);
     (void) crealf(f1);
+#ifdef _TEST_LONG_DOUBLE
     (void) creall(l1);
+#endif
 
     (void) clog10(c1);
     (void) clog10f(f1);
@@ -149,8 +157,10 @@ main(void)
     (void) cexpl(l1);
     (void) cpowl(l1, l2);
 #endif
+#ifdef _TEST_LONG_DOUBLE
     (void) conjl(l1);
     (void) cprojl(l1);
+#endif
 
     return 0;
 }

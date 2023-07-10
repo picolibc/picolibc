@@ -114,6 +114,8 @@ option('tests-enable-full-malloc-stress', type: 'boolean', value: false,
        description: 'tests enable stress test for full malloc')
 option('tests-enable-posix-io', type: 'boolean', value: true,
        description: 'tests enable posix-io when available')
+option('test-long-double', type: 'boolean', value: true,
+       description: 'Enable long double tests on targets with long double type')
 
 option('tinystdio', type: 'boolean', value: true,
        description: 'Use tiny stdio from avr libc')
