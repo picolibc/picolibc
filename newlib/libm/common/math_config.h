@@ -612,9 +612,9 @@ force_eval_long_double (long double x)
 #  endif
 # endif
 #else
-# if __SIZEOF_LONG_DOUBLE__ == 8
+# if __SIZEOF_LONG_DOUBLE__ == 8 && !defined(_LDBL_EQ_DBL)
 #  define _NAME_64(x) _LD_NAME_REG(x)
-# define _NAME_64_SPECIAL(d,l) l
+#  define _NAME_64_SPECIAL(d,l) l
    typedef long double __float64;
 #  define FORCE_FLOAT64 FORCE_LONG_DOUBLE
 #  define pick_float64_except(a,b) pick_long_double_except(a,b)
