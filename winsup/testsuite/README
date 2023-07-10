@@ -1,35 +1,69 @@
-Here are some notes about adding and using this testsuite.
+Here are some notes about adding to and using this testsuite.
 
-The testsuite adds a directory containing the just built cygwin1.dll to the PATH
-(during the run step) so that it can be found by the Windows loader during
-testing.
+The testsuite adds a directory containing the just-built cygwin1.dll to the PATH
+so that it can be found by the Windows loader during testing.
 
-Because we'll probably run into complaints about using two DLLs, we
-run cygrun.exe for each test.  All this does is run the test with
-CreateProcess() so that we don't attempt to do the special code for
-when a cygwin program calls another cygwin program, as this might be a
-"multiple cygwins" problem.
+Because we'll probably run into complaints about using two DLLs, we use
+cygrun.exe to run each test.  All this does is run the test with CreateProcess()
+so that we don't attempt to do the special code for when a cygwin program calls
+another cygwin program, as this might be a "multiple cygwins" problem.
 
-Any test that needs to test command line args or redirection needs to
-run such a child program itself, as the testsuite will not do any
-arguments or redirection for it.  Same for fork, signals, etc.
+The testsuite/winsup.api subdirectory is for testing the API to cygwin1.dll
+ONLY.  Create other subdirs under testsuite/ for other classes of testing.
 
-The testsuite/winsup.api subdirectory is for testing the API to
-cygwin1.dll ONLY.  Create other subdirs under testsuite/ for other
-classes of testing.
+Tests in testsuite/winsup.api/pthread/ are derived from the pthread-win32
+testsuite.
 
-Tests under winsup.api/ either run successfully and exit(0), exit(77) to
-indicate a skipped test, or any other exit status to indicate a failure.
+Tests in testsuite/winsup.api/ltp/ are derived from (a very old version of) the
+ltp testsuite.
 
 Don't print anything to the screen if you can avoid it (except for failure
-reasons, of course).  One .c file per test, no compile options are allowed
-(we're testing the api, not the compiler).
+reasons, of course).
 
-Tests whose filename is mentioned in XFAIL_TESTS are expected to fail,
-effectively reversing the result of those.
+"make check" will only work if you run it *on* an NT machine.  Cross-checking is
+not supported.
 
-"make check" will only work if you run it *on* an NT machine.
-Cross-checking is not supported.
+Tests whose name is mentioned in XFAIL_TESTS are expected to fail, effectively
+reversing the result of those.
 
-To run selected tests, use e.g:
+Adding a test
+=============
+
+Add the source for the test under testsuite/winsup.api/.
+
+Add the additional tests program to check_PROGRAMS in testsuite/Makefile.am.
+
+(Note that if the test 'foo' has a single source file, foo.c, there's no need to
+write a foo_SOURCES as that's the default Automake assumes.)
+
+Tests can use libltp, but's that not required.
+
+The Cygwin 'installation' that the tests are run in is minimal, so don't assume
+anything is present.
+
+Any test that needs to test command line args or redirection needs to run such a
+child program itself, as the testsuite will not do any arguments or redirection
+for it.  Same for fork, signals, etc.
+
+Tests should either run successfully and exit(0), exit(77) to indicate a skipped
+test, or any other exit status to indicate a failure.
+
+Tips
+====
+
+* To run selected tests, use e.g:
+
 $ make check TESTS="winsup.api/ltp/umask03 winsup.api/ltp/stat06"
+
+* To build the tests without running them, use the check_programs target, e.g:
+
+$ make -C winsup/testsuite/ check_programs
+
+* To run an individual test program directly (against the installed, rather than
+  just built DLL), e.g.:
+
+$ winsup/testsuite/winsup.api/pthread/cancel1
+
+* To run an individual test program against the test DLL under gdb, e.g.:
+
+$ PATH="<build_tooldir>/winsup/testsuite/testinst/bin/:$PATH" cygrun -notimeout "gdb winsup.api/systemcall"
