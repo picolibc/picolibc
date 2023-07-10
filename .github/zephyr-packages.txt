@@ -1,0 +1,6 @@
+build-essential
+meson
+cmake
+file
+ninja-build
+qemu-system-x86

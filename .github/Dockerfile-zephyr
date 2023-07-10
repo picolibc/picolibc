@@ -1,6 +1,6 @@
 FROM debian:testing
 
-COPY .github/packages.txt /
+COPY .github/zephyr-packages.txt /
 
 COPY .github/zephyr-files.txt /
 
@@ -8,11 +8,11 @@ RUN apt-get update && \
     apt-get install -y wget gnupg && \
     (apt-get update || apt-get update || apt-get update) && \
     (apt-get upgrade -y || apt-get upgrade -y || apt-get upgrade -y) && \
-    (xargs -a packages.txt apt-get install -y || \
-     xargs -a packages.txt apt-get install -y || \
-     xargs -a packages.txt apt-get install -y || \
-     xargs -a packages.txt apt-get install -y) && \
+    (xargs -a zephyr-packages.txt apt-get install -y || \
+     xargs -a zephyr-packages.txt apt-get install -y || \
+     xargs -a zephyr-packages.txt apt-get install -y || \
+     xargs -a zephyr-packages.txt apt-get install -y) && \
     mkdir -p /opt && \
-    (cd /opt && while read file; do wget $file || exit 1; tar xf `basename $file`; done) < zephyr-files.txt
+    (cd /opt && while read file; do wget $file || exit 1; tar xf `basename $file`; rm `basename $file`; done) < zephyr-files.txt
 
 RUN apt-get clean

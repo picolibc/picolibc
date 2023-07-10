@@ -11,7 +11,7 @@ on:
 env:
   IMAGE_FILE: dockerimg-zephyr.tar.xz
   IMAGE: picolibc
-  PACKAGES_FILE: picolibc/.github/packages.txt
+  PACKAGES_FILE: picolibc/.github/zephyr-packages.txt
   EXTRA_FILE: picolibc/.github/zephyr-files.txt
 
 jobs:
