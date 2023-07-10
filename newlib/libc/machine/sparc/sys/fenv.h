@@ -31,6 +31,11 @@
 #ifndef	_SYS_FENV_H_
 #define	_SYS_FENV_H_
 
+#ifdef _SOFT_FLOAT
+typedef int fenv_t;
+typedef int fexcept_t;
+#else
+
 #include <stdint.h>
 
 #ifdef __arch64__
@@ -78,4 +83,5 @@ typedef	uint32_t	fexcept_t;
 
 
 
+#endif  /* !_SOFT_FLOAT */
 #endif	/* !_SYS_FENV_H_ */

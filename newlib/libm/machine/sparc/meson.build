@@ -33,11 +33,8 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-srcs_libm_machine_real = [
+srcs_libm_machine = [
   'fenv.c',
-]
-
-srcs_libm_machine = srcs_libm_machine_real + [
   'feclearexcept.c',
   'fedisableexcept.c',
   'feenableexcept.c',
@@ -54,4 +51,4 @@ srcs_libm_machine = srcs_libm_machine_real + [
   'feupdateenv.c',
 ]
 
-src_libm_machine = files(srcs_libm_machine_real)
+src_libm_machine = files(srcs_libm_machine)
