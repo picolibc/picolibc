@@ -4,6 +4,8 @@
  * Copyright (c) 2010-2019 Red Hat, Inc.
  */
 
+#ifndef _SOFT_FLOAT
+
 #define _GNU_SOURCE        // for FE_NOMASK_ENV
 
 #include <fenv.h>
@@ -473,3 +475,5 @@ _feinitialise (void)
   /* Finally cache state as default environment. */
   fegetenv (&_fe_dfl_env);
 }
+
+#endif /* _SOFT_FLOAT */
