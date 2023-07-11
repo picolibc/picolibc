@@ -488,7 +488,7 @@ time_t a_time_value = 100;
 const char  *TCID = NULL;
 char  *Selectedtests = NULL;		/* Name (tcid) of selected test cases */
 char test_msg[BUFMAX];
-char full_path[PATH_MAX+1];
+char full_path[PATH_MAX+1+1]; /* Add one for '\0' and another to exceed the PATH_MAX limit, see creat_path_max() */
 extern int Tst_count;
 extern char *TESTDIR;
 extern char *strrchr();
