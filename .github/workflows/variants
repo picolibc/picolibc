@@ -15,7 +15,7 @@
 
           # Original stdio
           "-Dtinystdio=false",
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true -Dnewlib-fvwrite-in-streamio=true -Dio-pos-args=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true -Dnewlib-fvwrite-in-streamio=true",
 
           # Locale, iconv, original malloc and original atexit/onexit configurations
           "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
