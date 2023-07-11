@@ -20,6 +20,7 @@ main (int argc, char **argv)
 {
   STARTUPINFO sa;
   PROCESS_INFORMATION pi;
+  DWORD res;
   DWORD ec = 1;
   char *p;
 
@@ -42,9 +43,21 @@ main (int argc, char **argv)
       exit (1);
     }
 
-  WaitForSingleObject (pi.hProcess, INFINITE);
+  res = WaitForSingleObject (pi.hProcess, 60 * 1000);
 
-  GetExitCodeProcess (pi.hProcess, &ec);
+  if (res == WAIT_TIMEOUT)
+    {
+      char cmd[1024];
+      // there is no simple API to kill a Windows process tree
+      sprintf(cmd, "taskkill /f /t /pid %lu", GetProcessId(pi.hProcess));
+      system(cmd);
+      fprintf (stderr, "Timeout\n");
+      ec = 124;
+    }
+  else
+    {
+      GetExitCodeProcess (pi.hProcess, &ec);
+    }
 
   CloseHandle (pi.hProcess);
   CloseHandle (pi.hThread);
