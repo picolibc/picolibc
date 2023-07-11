@@ -432,6 +432,9 @@ else
   if posix_console
     error('newlib stdio does not support the posix-console option (posix-console)')
   endif
+  if io_pos_args
+    error('newlib stdio has bugs with positional arguments (io-pos-args)')
+  endif	
 endif
 
 if host_cpu_family == ''
