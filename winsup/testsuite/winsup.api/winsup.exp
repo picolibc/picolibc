@@ -64,7 +64,7 @@ foreach src [lsort [glob -nocomplain $srcdir/$subdir/*.c $srcdir/$subdir/*/*.{cc
 	    }
 	    file mkdir $tmpdir/$tmpfile
 	    set env(PATH) "$runtime_root:$env(PATH)"
-	    ws_spawn "$cygrun $exec $testdll_tmpdir/$tmpfile > $redirect_output"
+	    ws_spawn "cygdrop $cygrun $exec $testdll_tmpdir/$tmpfile > $redirect_output"
 	    file delete -force $tmpdir/$tmpfile
 	    set env(PATH) "$orig_path"
 	    if { $rv } {

@@ -73,6 +73,7 @@ jobs:
           automake,
           busybox,
           cocom,
+          cygutils-extra,
           dblatex,
           dejagnu,
           docbook-xml45,
