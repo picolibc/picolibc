@@ -4449,11 +4449,6 @@ gen_full_path_at (char *path_ret, int dirfd, const char *pathname,
 	    }
 	  p = stpcpy (path_ret, cfd->get_name ());
 	}
-      if (!p)
-	{
-	  set_errno (ENOTDIR);
-	  return -1;
-	}
       if (pathname)
 	{
 	  if (!*pathname)
