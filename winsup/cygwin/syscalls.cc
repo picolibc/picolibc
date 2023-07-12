@@ -4416,11 +4416,10 @@ pclose (FILE *fp)
 
 static int
 gen_full_path_at (char *path_ret, int dirfd, const char *pathname,
-		  bool null_pathname_allowed = false)
+		  int flags = 0)
 {
-  /* Set null_pathname_allowed to true to allow GLIBC compatible behaviour
-     for NULL pathname.  Only used by futimesat. */
-  if (!pathname && !null_pathname_allowed)
+  /* futimesat allows a NULL pathname. */
+  if (!pathname && !(flags & _AT_NULL_PATHNAME_ALLOWED))
     {
       set_errno (EFAULT);
       return -1;
@@ -4678,7 +4677,7 @@ futimesat (int dirfd, const char *pathname, const struct timeval times[2])
   __try
     {
       char *path = tp.c_get ();
-      if (gen_full_path_at (path, dirfd, pathname, true))
+      if (gen_full_path_at (path, dirfd, pathname, _AT_NULL_PATHNAME_ALLOWED))
 	__leave;
       return utimes (path, times);
     }
