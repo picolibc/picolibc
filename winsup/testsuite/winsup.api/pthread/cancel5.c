@@ -76,9 +76,9 @@ mythread(void * arg)
   assert(pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL) == 0);
 
   /*
-   * We wait up to 10 seconds for a cancelation to be applied to us.
+   * We wait up to 30 seconds for a cancelation to be applied to us.
    */
-  for (bag->count = 0; bag->count < 10; bag->count++)
+  for (bag->count = 0; bag->count < 30; bag->count++)
     {
       /* Busy wait to avoid Sleep(), since we can't asynchronous cancel inside a
 	 kernel function. (This is still somewhat fragile as if the async cancel
@@ -93,6 +93,9 @@ mythread(void * arg)
 	}
     }
 
+  /* Notice if asynchronous cancel got deferred */
+  pthread_testcancel();
+
   return result;
 }
 
@@ -102,6 +105,7 @@ main()
   int failed = 0;
   int i;
   pthread_t t[NUMTHREADS + 1];
+  int ran_to_completion = 0;
 
   for (i = 1; i <= NUMTHREADS; i++)
     {
@@ -165,7 +169,17 @@ main()
 		  threadbag[i].count,
 		  result);
 	}
+
+      if (threadbag[i].count >= 30)
+       ran_to_completion++;
+
       failed = (failed || fail);
+    }
+
+  if (ran_to_completion >= 10)
+    {
+      fprintf(stderr, "All threads ran to completion, async cancellation never happened\n");
+      failed = TRUE;
     }
 
   assert(!failed);
