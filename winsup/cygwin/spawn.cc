@@ -228,6 +228,8 @@ struct system_call_handle
   _sig_func_ptr oldint;
   _sig_func_ptr oldquit;
   sigset_t oldmask;
+  __pthread_cleanup_handler cleanup_handler;
+
   bool is_system_call ()
   {
     return oldint != ILLEGAL_SIG_FUNC_PTR;
@@ -253,18 +255,27 @@ struct system_call_handle
 	sigaddset (&child_block, SIGCHLD);
 	sigprocmask (SIG_BLOCK, &child_block, &oldmask);
 	sig_send (NULL, __SIGNOHOLD);
+
+	cleanup_handler = { system_call_handle::cleanup, this, NULL };
+	_pthread_cleanup_push (&cleanup_handler);
       }
   }
   ~system_call_handle ()
   {
     if (is_system_call ())
+      _pthread_cleanup_pop (1);
+  }
+  static void cleanup (void *arg)
+  {
+# define this_ ((system_call_handle *) arg)
+    if (this_->is_system_call ())
       {
-	signal (SIGINT, oldint);
-	signal (SIGQUIT, oldquit);
-	sigprocmask (SIG_SETMASK, &oldmask, NULL);
+	signal (SIGINT, this_->oldint);
+	signal (SIGQUIT, this_->oldquit);
+	sigprocmask (SIG_SETMASK, &(this_->oldmask), NULL);
       }
   }
-# undef cleanup
+# undef this_
 };
 
 child_info_spawn NO_COPY ch_spawn;
