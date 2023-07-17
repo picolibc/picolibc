@@ -962,12 +962,9 @@ pthread::testcancel ()
      pthread_testcancel function a lot without adding the overhead of
      an OS call.  Only if the thread is marked as canceled, we wait for
      cancel_event being really set, on the off-chance that pthread_cancel
-     gets interrupted before calling SetEvent. */
-  if (canceled)
-    {
-      WaitForSingleObject (cancel_event, INFINITE);
-      cancel_self ();
-    }
+     gets interrupted or terminated before calling SetEvent. */
+  if (canceled && IsEventSignalled (cancel_event))
+    cancel_self ();
 }
 
 /* Return cancel event handle if it exists *and* cancel is not disabled.
