@@ -17,8 +17,6 @@ getlogin ()
   char *tty;
 
   if (((tty = ttyname (0)) == 0)
-      || ((tty = ttyname (1)) == 0)
-      || ((tty = ttyname (2)) == 0))
     return 0;
 
   if ((utmp_fd = open (UTMP_FILE, O_RDONLY)) == -1)
