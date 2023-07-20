@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2020 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,5 +33,65 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-multilib_list="arcem,archs,em"
-exec "$(dirname "$0")"/do-configure arc-zephyr-elf -Dposix-console=true -Dtests=true -Dthread-local-storage=false -Dmultilib-list="$multilib_list" "$@"
+
+qemu="qemu-system-arc"
+
+# select the program
+elf="$1"
+shift
+
+archstring=""
+readelf="arc-zephyr-elf-readelf"
+# If readelf is installed, we can use the attributes
+# in the file to determine the target cpu
+if command -v "$readelf" >/dev/null 2>/dev/null; then
+    # LLVM-based toolchains readelf produces different output from GNU, so
+    # check --version output first.
+    if readelf --version | grep LLVM >/dev/null; then
+        archstring=$("$readelf" --arch-specific "$elf" | grep "Value: rv" | cut -d: -f2)
+    else
+        archstring=$("$readelf" --arch-specific "$elf" | grep Tag_ARC_CPU_name | cut -d: -f2 | tr -d '"')
+    fi
+fi
+if [ -z "$archstring" ]; then
+    echo "Could not determine architecture for $elf, is readelf installed?" >&2
+    exit 77
+fi
+cpu=$archstring
+
+# Map stdio to a multiplexed character device so we can use it
+# for the monitor and semihosting output
+
+chardev=stdio,mux=on,id=stdio0
+
+# Point the semihosting driver at our new chardev
+
+semi=enable=on,chardev=stdio0
+
+input=""
+
+case "$1" in
+    --)
+	semi="$semi",arg="$2"
+	shift
+	shift
+	;;
+    -*|"")
+	semi="$semi",arg=""
+	;;
+    *)
+	semi="$semi",arg="$1"
+	input="$1"
+	shift
+	;;
+esac
+
+# Disable monitor
+
+mon=none
+
+# Point serial port at new chardev
+
+serial=none
+
+echo "$input" | $qemu -chardev $chardev -semihosting-config "$semi" -monitor "$mon" -serial "$serial" -cpu $cpu -nographic -kernel "$elf" "$@" -nic none
