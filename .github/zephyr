@@ -7,4 +7,9 @@ for dir in "$ZEPHYR_SDK_INSTALL_DIR"/*; do
        PATH="$dir"/bin:$PATH
     fi
 done
+
+if [ -d $ZEPHYR_SDK_INSTALL_DIR/sysroots/x86_64-pokysdk-linux/usr/bin ]; then
+    PATH=$ZEPHYR_SDK_INSTALL_DIR/sysroots/x86_64-pokysdk-linux/usr/bin:$PATH
+fi
+
 exec "$@"

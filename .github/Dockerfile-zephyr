@@ -4,6 +4,8 @@ COPY .github/zephyr-packages.txt /
 
 COPY .github/zephyr-files.txt /
 
+COPY .github/zephyr-setup /
+
 RUN apt-get update && \
     apt-get install -y wget gnupg && \
     (apt-get update || apt-get update || apt-get update) && \

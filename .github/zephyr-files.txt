@@ -1,4 +1,5 @@
 https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/toolchain_linux-x86_64_arc-zephyr-elf.tar.xz
+https://maps.altusmetrum.org/qemu-arc.tar.xz
 https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/toolchain_linux-x86_64_arc64-zephyr-elf.tar.xz
 https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/toolchain_linux-x86_64_microblazeel-zephyr-elf.tar.xz
 https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/toolchain_linux-x86_64_nios2-zephyr-elf.tar.xz
