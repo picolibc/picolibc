@@ -143,7 +143,7 @@ euc_from_ucs_init (
   goto error1;
 
 ok:
-  for (i = 0; data->desc[i].csname != NULL; i++)
+  for (i = 0; i < MAX_CS_NUM && data->desc[i].csname != NULL; i++)
     {
       data->data[i] = _iconv_from_ucs_ces_handlers_table.init (
                                                         data->desc[i].csname);
@@ -298,7 +298,7 @@ euc_to_ucs_init (
   goto error1;
 
 ok:
-  for (i = 0; data->desc[i].csname != NULL; i++)
+  for (i = 0; i < MAX_CS_NUM && data->desc[i].csname != NULL; i++)
     {
       data->data[i] = _iconv_to_ucs_ces_handlers_table.init (
                                                         data->desc[i].csname);
