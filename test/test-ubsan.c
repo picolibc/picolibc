@@ -70,6 +70,13 @@ abrt_handler(int sig)
 
 static volatile int ten = 10;
 
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+/* 'bsize' is used directly with malloc/realloc which confuses -fanalyzer */
+#pragma GCC diagnostic ignored "-Wanalyzer-out-of-bounds"
+#endif
+
 int main(void)
 {
     int array[10];
