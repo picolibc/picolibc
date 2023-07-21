@@ -1967,12 +1967,13 @@ stat_worker (path_conv &pc, struct stat *buf)
 	{
 	  fhandler_base *fh;
 
-	  debug_printf ("(%S, %p, %p), file_attributes %d",
-			pc.get_nt_native_path (), buf, fh, (DWORD) *fh);
 	  memset (buf, 0, sizeof (*buf));
 
 	  if (!(fh = build_fh_pc (pc)))
 	    __leave;
+
+	  debug_printf ("(%S, %p, %p), file_attributes %d",
+			pc.get_nt_native_path (), buf, fh, (DWORD) *fh);
 
 	  res = fh->fstat (buf);
 	  if (!res)
