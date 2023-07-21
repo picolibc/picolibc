@@ -1916,7 +1916,7 @@ computematchjumps(struct parse *p, struct re_guts *g)
 	if (p->error != 0)
 		return;
 
-	pmatches = (int*) calloc(g->mlen, sizeof(unsigned int));
+	pmatches = (int*) calloc(g->mlen + 1, sizeof(unsigned int));
 	if (pmatches == NULL) {
 		g->matchjump = NULL;
 		return;
