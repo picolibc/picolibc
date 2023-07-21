@@ -15,6 +15,10 @@ libc6-dev-arm64-cross
 gcc-xtensa-lx106
 gcc-m68k-linux-gnu
 libc6-dev-m68k-cross
+gcc-mips-linux-gnu
+libc6-dev-mips-cross
+gcc-mipsel-linux-gnu
+libc6-dev-mipsel-cross
 gcc-powerpc64-linux-gnu
 libc6-dev-ppc64-cross
 gcc-powerpc64le-linux-gnu
