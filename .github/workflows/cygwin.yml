@@ -15,7 +15,7 @@ jobs:
     name: Fedora cross ${{ matrix.target }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     # install build tools
     - run: dnf install -y autoconf automake make patch perl
@@ -61,7 +61,7 @@ jobs:
     # endings, but this could still be dangerous e.g if we need symlinks in the
     # repo)
     - run: git config --global core.autocrlf input
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     # install cygwin and build tools
     - name: Install Cygwin
@@ -131,3 +131,7 @@ jobs:
           build/${{ matrix.target }}/winsup/testsuite/**/*.log
           build/${{ matrix.target }}/winsup/testsuite/**/*.trs
       if: ${{ !cancelled() }}
+
+    # workaround problems with actions/checkout post-run step using cygwin git
+    - name: Avoid actions/checkout post-run step using Cygwin git
+      run: bash -c 'rm /usr/bin/git.exe'
