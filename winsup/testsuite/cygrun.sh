@@ -11,7 +11,7 @@ export PATH="$runtime_root:${PATH}"
 if [ "$1" = "./mingw/cygload" ]
 then
     windows_runtime_root=$(cygpath -m $runtime_root)
-    $exe -v -cygwin $windows_runtime_root/cygwin1.dll
+    $cygrun "$exe -v -cygwin $windows_runtime_root/cygwin1.dll"
 else
     cygdrop $cygrun $exe
 fi
