@@ -722,13 +722,13 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 	    if (!(flags & FL_STAR)) nconvs += 1;
 	} /* else */
     } /* while */
-#ifdef PRINTF_POSITIONAL
+#ifdef SCANF_POSITIONAL
     va_end(ap);
 #endif
     return nconvs;
 
   eof:
-#ifdef PRINTF_POSITIONAL
+#ifdef SCANF_POSITIONAL
     va_end(ap);
 #endif
 #undef ap
