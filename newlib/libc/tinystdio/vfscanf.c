@@ -99,7 +99,7 @@ scanf_ungetc(INT c, FILE *stream, int *lenp)
 static void
 putval (void *addr, int_scanf_t val, uint16_t flags)
 {
-    if (!(flags & FL_STAR)) {
+    if (addr) {
 	if (flags & FL_CHAR)
 	    *(char *)addr = val;
 #ifdef SCANF_LONGLONG
