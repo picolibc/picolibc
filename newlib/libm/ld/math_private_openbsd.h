@@ -493,6 +493,18 @@ __signbitl(long double x)
     return exp < 0;
 }
 
+#ifdef __PPC__
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+/* the bitfields confuse the ppc compiler into thinking accessing
+ * manl will be 'out of bounds'
+ */
+#pragma GCC diagnostic ignored "-Wanalyzer-out-of-bounds"
+#define yup_all_good
+#endif
+#endif
+
 union IEEEl2bits {
 	long double	e;
 	struct {
