@@ -117,7 +117,7 @@ input=""
 
 case "$1" in
     --)
-	semi="$semi",arg="$2"
+	semi="$semi",arg="$elf $2"
 	shift
 	shift
 	;;

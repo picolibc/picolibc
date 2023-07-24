@@ -37,9 +37,9 @@
 #include <stdio.h>
 #include <string.h>
 
-static const char *expect_argv[] = { "program-name", "hello", "world" };
+static const char *expect_argv[] = { "hello", "world" };
 
-#define EXPECT_NARG (sizeof(expect_argv) / sizeof(expect_argv[0]))
+#define EXPECT_NARG (sizeof(expect_argv) / sizeof(expect_argv[0]) + 1)
 
 int
 main(int argc, char **argv)
@@ -56,11 +56,11 @@ main(int argc, char **argv)
                 printf("argc is %d expect %d\n", argc, (int) EXPECT_NARG);
                 errors = 1;
         }
-        for (c = 0; (int) c < argc; c++) {
+        for (c = 1; (int) c < argc; c++) {
                 if (c < EXPECT_NARG) {
-                        if (strcmp(argv[c], expect_argv[c]) != 0) {
+                        if (strcmp(argv[c], expect_argv[c - 1]) != 0) {
                                 printf("argv[%d] is '%s' expect '%s'\n",
-                                       c, argv[c], expect_argv[c]);
+                                       c, argv[c], expect_argv[c - 1]);
                                 errors = 1;
                         }
                 }
