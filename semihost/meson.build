@@ -106,6 +106,8 @@ if src_semihost != []
 
   has_arm_semihost = true
 
+  has_semihost_args = true
+
   foreach target : targets
     value = get_variable('target_' + target)
 

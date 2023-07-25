@@ -70,6 +70,10 @@ semihost_fail_tests = [
   'semihost-system-failure',
 ]
 
+semihost_no_args_tests = [
+  'semihost-no-argv',
+]
+
 command_line = 'program-name hello world'
 
 foreach target : targets
@@ -131,4 +135,26 @@ foreach target : targets
 	 should_fail: true)
   endforeach
   
+  if has_semihost_args
+    foreach semihost_test : semihost_no_args_tests
+      semihost_test_src = semihost_test + '.c'
+      if target == ''
+	semihost_test_name = semihost_test
+      else
+	semihost_test_name = semihost_test + '_' + target
+      endif
+
+      test(semihost_test_name,
+	   executable(semihost_test_name, [semihost_test_src],
+		      c_args: _c_args,
+		      link_args: double_printf_link_args + _link_args,
+		      objects: _objs,
+		      link_with: _libs,
+		      link_depends:  test_link_depends,
+		      include_directories: inc),
+           depends: bios_bin,
+	   env: test_env)
+    endforeach
+  endif
+
 endforeach
