@@ -70,7 +70,7 @@ semihost_fail_tests = [
   'semihost-system-failure',
 ]
 
-command_line = 'hello world'
+command_line = 'program-name hello world'
 
 foreach target : targets
   value = get_variable('target_' + target)

@@ -42,16 +42,13 @@ int
 main(void)
 {
 	char	buf[PATH_MAX];
-	char	*ptr;
 	int	ret;
 	ret = sys_semihost_get_cmdline(buf, PATH_MAX);
 	if (ret != 0) {
 		printf("get_cmdline failed %d %d\n", ret, sys_semihost_errno());
 		exit(1);
 	}
-	// Ignore the first argument, which is the program name.
-	ptr = strchr(buf, ' ');
-	if (ptr && strcmp(ptr + 1, COMMAND_LINE) != 0) {
+	if (strcmp(buf, COMMAND_LINE) != 0) {
 		printf("cmdline %s (expected %s)\n", buf, COMMAND_LINE);
 		exit(2);
 	}

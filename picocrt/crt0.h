@@ -121,7 +121,8 @@ __start(void)
                 while (*++c == ' ')
                     ;
             }
-        }
+        } else
+            argv[argc++] = "program-name";
         argv[argc] = NULL;
 #else
 #define argv NULL
