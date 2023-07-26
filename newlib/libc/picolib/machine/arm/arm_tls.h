@@ -33,6 +33,6 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if (__ARM_FEATURE_COPROC & 1) && __ARM_ARCH_PROFILE != 'M' && __ARM_ARCH >= 6
+#if ((__ARM_FEATURE_COPROC & 1) || __ARM_ARCH >= 8) && __ARM_ARCH_PROFILE != 'M' && __ARM_ARCH >= 6
 #define ARM_TLS_CP15
 #endif
