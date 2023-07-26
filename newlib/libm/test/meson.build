@@ -150,12 +150,20 @@ foreach target : targets
     test_name = 'math_test_' + target
   endif
 
+  _c_args = value[1] + get_variable('test_c_args_' + target, test_c_args)
+  _link_args = value[1] + get_variable('test_link_args_' + target, test_link_args)
+  _link_depends = get_variable('test_link_depends_' + target, test_link_depends)
+
+  _c_args = double_printf_compile_args + _c_args
+  _link_args = double_printf_link_args + _link_args
+
   test(test_name,
        executable(test_name, math_test_src,
-		  c_args: value[1] + double_printf_compile_args + test_c_args,
+		  c_args: _c_args,
 		  objects: objs,
 		  link_with: libs,
-		  link_args: value[1] + double_printf_link_args + test_link_args,
+		  link_args: _link_args,
+		  link_depends: _link_depends,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)

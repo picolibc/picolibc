@@ -48,8 +48,9 @@ foreach target : targets
     _objs = []
   endif
 
-  _c_args = value[1] + test_c_args
-  _link_args = value[1] + test_link_args
+  _c_args = value[1] + get_variable('test_c_args_' + target, test_c_args)
+  _link_args = value[1] + get_variable('test_link_args_' + target, test_link_args)
+  _link_depends = get_variable('test_link_depends_' + target, test_link_depends)
 
   t1 = 'printf_scanf'
   if target == ''
@@ -64,7 +65,7 @@ foreach target : targets
 		  link_args: double_printf_link_args + _link_args,
 		  objects: _objs,
 		  link_with: _libs,
-		  link_depends:  test_link_depends,
+		  link_depends:  _link_depends,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -82,7 +83,7 @@ foreach target : targets
 		  link_args: float_printf_link_args + _link_args,
 		  objects: _objs,
 		  link_with: _libs,
-		  link_depends:  test_link_depends,
+		  link_depends:  _link_depends,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -299,7 +300,7 @@ foreach target : targets
 		  link_args: double_printf_link_args + _link_args,
 		  objects: _objs,
 		  link_with: _libs,
-		  link_depends:  test_link_depends,
+		  link_depends:  _link_depends,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env,
@@ -320,7 +321,7 @@ foreach target : targets
 		  link_args: double_printf_link_args + _link_args,
 		  objects: _objs,
 		  link_with: _libs,
-		  link_depends:  test_link_depends,
+		  link_depends:  _link_depends,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env,
@@ -346,7 +347,7 @@ foreach target : targets
 		    link_args: _link_args,
 		    objects: _objs,
 		    link_with: _libs,
-		    link_depends:  test_link_depends,
+		    link_depends:  _link_depends,
 		    include_directories: inc),
 	 depends: bios_bin,
 	 env: test_env,
@@ -403,7 +404,7 @@ foreach target : targets
 		    link_args: double_printf_link_args + _link_args,
 		    objects: _objs,
 		    link_with: _libs,
-		    link_depends:  test_link_depends,
+		    link_depends:  _link_depends,
 		    include_directories: inc),
          depends: bios_bin,
 	 timeout: 60,

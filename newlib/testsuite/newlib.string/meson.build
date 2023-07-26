@@ -48,8 +48,11 @@ foreach target : targets
     _objs = []
   endif
   
-  _c_args = value[1] + test_c_args
-  _link_args = value[1] + test_link_args
+  _c_args = value[1] + get_variable('test_c_args_' + target, test_c_args)
+  _link_args = value[1] + get_variable('test_link_args_' + target, test_link_args)
+  _link_depends = get_variable('test_link_depends_' + target, test_link_depends)
+
+  _c_args += ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE']
 
   foreach test : tests
     if target == ''
@@ -62,10 +65,11 @@ foreach target : targets
 
     test(test_name,
 	 executable(test_name, [src],
-		    c_args: ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE'] + _c_args,
+		    c_args: _c_args,
 		    link_args: _link_args,
 		    objects: _objs,
 		    link_with: _libs,
+		    link_depends: _link_depends,
 		    include_directories: test_inc),
          depends: bios_bin,
 	 env: test_env)
