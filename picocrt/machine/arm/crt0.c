@@ -101,20 +101,18 @@ _start(void)
 	/* Initialize stack pointer */
 	__asm__("mov sp, %0" : : "r" (__stack));
 
-#if __ARM_ARCH == 7
-#ifdef __thumb__
+#ifdef __thumb2__
 	/* Make exceptions run in Thumb mode */
 	uint32_t sctlr;
 	__asm__("mrc p15, 0, %0, c1, c0, 0" : "=r" (sctlr));
 	sctlr |= (1 << 30);
 	__asm__("mcr p15, 0, %0, c1, c0, 0" : : "r" (sctlr));
 #endif
-#ifndef __SOFTFP__
+#if defined __ARM_FP || defined __ARM_FEATURE_MVE
 	/* Set CPACR for access to CP10 and 11 */
 	__asm__("mcr p15, 0, %0, c1, c0, 2" : : "r" (0xf << 20));
 	/* Enable FPU */
 	__asm__("vmsr fpexc, %0" : : "r" (0x40000000));
-#endif
 #endif
 
 	/* Branch to C code */
