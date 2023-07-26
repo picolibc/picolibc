@@ -10,3 +10,7 @@ Bug Fixes
 - Fix AT_EMPTY_PATH handling in fchmodat and fstatat if dirfd referres to
   a file other than a directory
   Addresses: https://cygwin.com/pipermail/cygwin-patches/2023q2/012306.html
+
+- Rename internal macros _NL_CTYPE_OUTDIGITSx_MB/WC to GLibc compatible
+  _NL_CTYPE_OUTDIGITx_MB/WC.
+  Addresses: https://cygwin.com/pipermail/cygwin-developers/2023-July/012637.html
