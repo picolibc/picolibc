@@ -72,7 +72,8 @@
 
 /* Compiler can inline fma as a single instruction.  */
 #ifndef HAVE_FAST_FMA
-# if __aarch64__ || (__ARM_FEATURE_FMA && (__ARM_FP & 8)) || __riscv_flen >= 64
+# if __aarch64__ || (__ARM_FEATURE_FMA && (__ARM_FP & 8)) \
+     || __riscv_flen >= 64 || defined (__riscv_zdinx)
 #   define HAVE_FAST_FMA 1
 # else
 #   define HAVE_FAST_FMA 0
@@ -80,7 +81,8 @@
 #endif
 
 #ifndef HAVE_FAST_FMAF
-# if HAVE_FAST_FMA || (__ARM_FEATURE_FMA && (__ARM_FP & 4)) || __riscv_flen >= 32
+# if HAVE_FAST_FMA || (__ARM_FEATURE_FMA && (__ARM_FP & 4)) \
+     || __riscv_flen >= 32 || defined (__riscv_zfinx)
 #  define HAVE_FAST_FMAF 1
 # else
 #  define HAVE_FAST_FMAF 0

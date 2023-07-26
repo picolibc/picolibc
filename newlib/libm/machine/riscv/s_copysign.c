@@ -34,8 +34,9 @@
  */
 
 #include <math.h>
+#include "riscv_math.h"
 
-#if defined(__riscv_flen) && __riscv_flen >= 64
+#if defined(__RISCV_HARD_FLOAT) && __RISCV_HARD_FLOAT >= 64
 
 double
 copysign (double x, double y)

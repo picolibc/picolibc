@@ -218,10 +218,10 @@
 #else
 #define __IEEE_LITTLE_ENDIAN
 #endif
-#ifdef __riscv_flen
+#if defined(__riscv_flen) || defined (__riscv_zfinx)
 # define _SUPPORTS_ERREXCEPT
 #endif
-#if __riscv_flen == 64
+#if (__riscv_flen == 64) || defined (__riscv_zdinx)
 # define __OBSOLETE_MATH_DEFAULT 0
 #else
 # define __OBSOLETE_MATH_DEFAULT 1

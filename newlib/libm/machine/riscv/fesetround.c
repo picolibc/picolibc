@@ -32,6 +32,7 @@
 */
 
 #include <fenv.h>
+#include "riscv_math.h"
 
 /* This implementation is intended to comply with the following
  * specification:
@@ -48,7 +49,7 @@
 int fesetround(int round)
 {
 
-#if __riscv_flen
+#ifdef __RISCV_HARD_FLOAT
 
   /* Mask round to be sure only valid rounding bits are set */
 

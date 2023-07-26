@@ -38,7 +38,13 @@
 
 
 
-#ifdef __riscv_flen
+#if defined(__riscv_flen) || defined(__riscv_zfinx)
+
+#if (__riscv_flen >= 64) || defined(__riscv_zdinx)
+#define __RISCV_HARD_FLOAT 64
+#else
+#define __RISCV_HARD_FLOAT 32
+#endif
 
 #define FCLASS_NEG_INF       (1 << 0)
 #define FCLASS_NEG_NORMAL    (1 << 1)
@@ -58,7 +64,7 @@
 #define FCLASS_SUBNORMAL     (FCLASS_NEG_SUBNORMAL | FCLASS_POS_SUBNORMAL)
 #define FCLASS_NAN           (FCLASS_SNAN | FCLASS_QNAN)
 
-#if __riscv_flen >= 64
+#if (__riscv_flen >= 64) || defined(__riscv_zdinx)
 static inline long _fclass_d(double x){
   long fclass;
   __asm __volatile ("fclass.d\t%0, %1" : "=r" (fclass) : "f" (x));
@@ -66,7 +72,7 @@ static inline long _fclass_d(double x){
 }
 #endif
 
-#if __riscv_flen >= 32
+#if (__riscv_flen >= 32) || defined(__riscv_zfinx)
 static inline long _fclass_f(float x){
   long fclass;
   __asm __volatile ("fclass.s\t%0, %1" : "=r" (fclass) : "f" (x));

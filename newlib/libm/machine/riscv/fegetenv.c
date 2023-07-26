@@ -32,6 +32,7 @@
 */
 
 #include <fenv.h>
+#include "riscv_math.h"
 
 /* This implementation is intended to comply with the following
  * specification:
@@ -47,7 +48,7 @@
 int fegetenv(fenv_t *envp)
 {
 
-#if __riscv_flen
+#if __RISCV_HARD_FLOAT
 
   /* Get the current environment (FCSR) */
 
