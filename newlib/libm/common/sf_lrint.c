@@ -60,9 +60,7 @@ TWO23[2]={
   
   if (j0 < (int)(sizeof (long int) * 8) - 1)
     {
-      if (j0 < -1)
-        return 0;
-      else if (j0 >= 23)
+      if (j0 >= 23)
         result = (long int) ((i0 & 0x7fffff) | 0x800000) << (j0 - 23);
       else
         {
@@ -76,7 +74,7 @@ TWO23[2]={
           j0 = ((i0 >> 23) & 0xff) - 0x7f;
           i0 &= 0x7fffff;
           i0 |= 0x800000;
-          result = i0 >> (23 - j0);
+          result = (j0 < 0 ? 0 : i0 >> (23 - j0));
         }
     }
   else
