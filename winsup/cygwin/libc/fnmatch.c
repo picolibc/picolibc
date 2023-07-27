@@ -353,7 +353,7 @@ rangematch(const wint_t *pattern, wint_t *test, int flags, wint_t **newp,
 			}
 
 			if ((!__get_current_collate_locale ()->win_locale[0]) ?
-			    c <= test && test <= c2 :
+			    *c <= *test && *test <= *c2 :
 			       __wscollate_range_cmp(c, test, clen, tlen) <= 0
 			    && __wscollate_range_cmp(test, c2, tlen, c2len) <= 0
 			   )
