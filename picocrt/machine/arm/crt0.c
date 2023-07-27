@@ -109,8 +109,10 @@ _start(void)
 	__asm__("mcr p15, 0, %0, c1, c0, 0" : : "r" (sctlr));
 #endif
 #if defined __ARM_FP || defined __ARM_FEATURE_MVE
+#if __ARM_ARCH > 6
 	/* Set CPACR for access to CP10 and 11 */
 	__asm__("mcr p15, 0, %0, c1, c0, 2" : : "r" (0xf << 20));
+#endif
 	/* Enable FPU */
 	__asm__("vmsr fpexc, %0" : : "r" (0x40000000));
 #endif
