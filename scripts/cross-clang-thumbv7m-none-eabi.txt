@@ -10,7 +10,7 @@ as = 'arm-none-eab-as'
 nm = 'arm-none-eab-nm'
 strip = 'arm-none-eabi-strip'
 # only needed to run tests
-exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-thumbv7m "$@"', 'run-thumbv7m']
+exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-arm "$@"', 'run-arm']
 
 [host_machine]
 system = 'none'

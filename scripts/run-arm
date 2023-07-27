@@ -45,113 +45,134 @@ machine=unknown
 memory=
 
 #
-# Map from GCC configuration to QEMU CPU type
+# Map ELF information to required core type
 #
 
-case "$elf" in
-    *arm_v5te_hard*|*arm_v5te_softfp*)
-	# The only v5 supported by qemu is the arm946,
-	# which doesn't have an FPU, and all of the GCC
-	#cpu=arm946
-	;;
+cpu_arch=`arm-none-eabi-readelf -A "$elf" | awk '/Tag_CPU_arch:/ { print $2 }'`
+cpu_profile=`arm-none-eabi-readelf -A "$elf" | awk '/Tag_CPU_arch_profile:/ { print $2 }'`
+fp_arch=`arm-none-eabi-readelf -A "$elf" | awk '/Tag_FP_arch/ { print $2 }'`
+fp_use=`arm-none-eabi-readelf -A "$elf" | awk '/Tag_ABI_HardFP_use/ { print $2 }'`
 
-    # v6-m - Cortex-M0
-    *thumb_v6_m_nofp*)
-	cpu=cortex-m0
-	;;
-
-    # v7-a/v7ve - Cortex-A7
-    *thumb_v7_a*|*thumb_v7ve_*)
-	cpu=cortex-a7
-	;;
-
-    # v7-m - Cortex-M3
-    *thumb_v7_m_nofp*)
-	cpu=cortex-m3
-	;;
-
-    # v7-r - Cortex-R5
-    *thumb_v7_r*)
-	cpu=cortex-r5f
-	;;
-
-    # v7e-m - Cortex-M4
-    *thumb_v7e_m_nofp*)
-	cpu=cortex-m4
-	;;
-    *thumb_v7e_m_fp_hard*)
-	cpu=cortex-m4
-	;;
-    *thumb_v7e_m_fp_softfp*)
-	cpu=cortex-m4
-	;;
-
-    # v7e-m dp - Cortex-M7
-    *thumb_v7e_m_dp_hard*)
-	cpu=cortex-m7
-	;;
-    *thumb_v7e_m_dp_softfp*)
-	cpu=cortex-m7
-	;;
-
-    # v8-a - unknown
-    *thumb_v8_a*)
-	cpu=unknown
-	;;
-
-    # v8.1 - unknown
-    *thumb_v8_1*)
-	cpu=unknown
-	;;
-
-    # v8-m with single-precision FPU - Cortex-M33
-    *thumb_v8_m_base_nofp*)
-	cpu=cortex-m33
-	;;
-    *thumb_v8_m_main_fp_softfp*)
-	cpu=cortex-m33
-	;;
-    *thumb_v8_m_main_dp_softfp*)
-	;;
-    *thumb_v8_m_main_fp_hard*)
-	cpu=cortex-m33
-	;;
-    *thumb_v8_m_main_nofp*)
-	cpu=cortex-m33
-	;;
-
-    # v8-m with double-preicision FPU - none
-    *thumb_v8_m_main_dp_hard*)
-	;;
-
-    *thumb_v8_1_m_main_mve_hard*)
-    cpu=cortex-m55
-    ;;
-
-    # v7 - Cortex-A7
-    *thumb_v7_nofp*)
-	cpu=cortex-a7
-	;;
-
-    # v7 with FPU - Cortex-A9
-    *thumb_v7_fp_hard*)
-	cpu=cortex-a8
-	;;
-    *thumb_v7_fp_softfp*)
-	cpu=cortex-a8
-	;;
-
-    # v4t - ti925t
-    *)
-	# ARMv4t is the default
-	cpu=ti925t
-	;;
+case "$cpu_arch"/"$cpu_profile" in
+    v4T/)
+        cpu=ti925t
+        ;;
+    v5TE/)
+        cpu=arm926
+        ;;
+    v6S-M/Microcontroller)
+        cpu=cortex-m0
+        ;;
+    v7/Application|v7/)
+        case "$fp_arch" in
+            VFPv3-D16)
+                cpu=cortex-a8
+                ;;
+            *)
+                cpu=cortex-a7
+                ;;
+        esac
+        ;;        
+    v7/Microcontroller)
+        cpu=cortex-m3
+        ;;
+    v7/Realtime)
+        cpu=cortex-r5f
+        ;;
+    v7E-M/Microcontroller)
+        cpu=cortex-m7
+        case "$fp_arch" in
+            FPv5/FP-D16)
+                case "$fp_use" in
+                    SP)
+                        cpu=cortex-m4
+                        ;;
+                esac
+                ;;
+            *)
+                cpu=cortex-m4
+                ;;
+        esac
+        ;;
+    
+    v8-M.*/Microcontroller)
+        case "$fp_arch" in
+            FPv5/FP-D16)
+                case "$fp_use" in
+                    SP)
+                        cpu=cortex-m33
+                        ;;
+                    *)
+                        cpu=cortex-m55
+                        ;;
+                esac
+                ;;
+            *)
+                cpu=cortex-m33
+                ;;
+        esac
+        ;;
+    v8.1-M.mainline/Microcontroller)
+        case "$fp_arch" in
+            FPv5/FP-D16)
+                case "$fp_use" in
+                    SP)
+                        cpu=cortex-m55
+                        ;;
+                esac
+                ;;
+            *)
+                cpu=cortex-m55
+                ;;
+        esac
+        ;;
+    v8/Application)
+        cpu=cortex-a57
+        ;;
 esac
 
 #
 # Select a QEMU machine based on the CPU
 #
 case $cpu in
+
+    cortex-m0)
+        machine=microbit
+        # Microbit only allows for 256kB of flash and 16kB of ram
+        # check the size of the binary and bail if it's too large
+
+        # check which awk version we've got and adapt
+        if awk --version | grep -q GNU; then
+            STRTONUM="strtonum"
+        else
+            STRTONUM=""
+        fi
+        sizes=`arm-none-eabi-objdump -h "$elf" |
+        awk '/^ *[0-9]/ {
+		size = '$STRTONUM'("0x" $3) + 0;
+		name = $2;
+	}
+	/ALLOC/ {
+		if (name == ".stack")
+			size = 0;
+		if ($0 ~ ".*LOAD.*") {
+			rom += size;
+		}
+		if ($0 !~ ".*READONLY.*" && name != ".init" && $0 !~ ".*THREAD_LOCAL.*") {
+			ram += size
+		}
+	}
+	END {
+		printf("%d %d\n", rom, ram);
+	}'`
+        rom_size=`echo "$sizes" | awk '{print $1}'`
+        ram_size=`echo "$sizes" | awk '{print $2}'`
+        echo "rom_size $rom_size ram_size $ram_size"
+        if [ "$rom_size" -gt 262144 -o "$ram_size" -gt 16384 ]; then
+            echo "$elf: too big"
+            exit 77
+        fi
+        ;;
 
     # mps2-an385 offers a cortex-m3 processor
     cortex-m3)
@@ -160,26 +181,33 @@ case $cpu in
 
     # mps2-an386 offers a cortex-m4 processor
     cortex-m4)
-    machine=mps2-an386
-    ;;
+        machine=mps2-an386
+        ;;
 
     # mps2-an500 offers a cortex-m7 processor
     cortex-m7)
-    machine=mps2-an500
-    ;;
+        machine=mps2-an500
+        ;;
 
-    # Maybe qemu upstream will take this machine
-    # which supports all Cortex-M processors
-    cortex-m*)
-	machine=virtm
-	;;
+    # mps2-an505 offers a cortex-m33 processor
+    cortex-m33)
+        machine=mps2-an505
+        ;;
 
-    cortex-a53)
-	;;
+    # mps3-an547 offers a cortex-m55 processor
+    cortex-m55)
+        machine=mps3-an547
+        ;;
 
-    # The 'none' machine supports all non-M
+    cortex-a57)
+        machine=none
+        cpu=max
+	memory="-m 1G"
+        ;;
+
+    # The 'none' machine supports many non-M
     # processors
-    ti925t|arm946|cortex-a*|cortex-r*)
+    ti925t|arm*|cortex-a*|cortex-r*)
 	machine=none
 	memory="-m 1G"
 	;;
@@ -187,12 +215,17 @@ case $cpu in
 esac
 
 #
-# Make sure the target machine is supported by qemu
+# Make sure the target machine and cpu is supported by qemu
 # 
 if $qemu -machine help | grep -q "^$machine "; then
-    :
+    if $qemu -machine $machine -cpu help | grep -q "^ *$cpu"; then
+        :
+    else
+        echo "Skipping $elf: unsupported cpu on $machine"
+        exit 77
+    fi
 else
-    echo "Skipping $elf" unsupported machine
+    echo "Skipping $elf: unsupported machine"
     exit 77
 fi
 
