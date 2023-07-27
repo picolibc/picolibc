@@ -176,7 +176,7 @@ typedef struct
 } question_struct_type;
 
 
-typedef struct 
+typedef const struct 
 {
   char error_bit;
   char errno_val;
@@ -224,7 +224,7 @@ int fmag_of_error (float, float);
 
 
 
-typedef struct 
+typedef const struct 
 {
   int line;
   
@@ -237,13 +237,13 @@ typedef struct
 #define ENDSCAN_IS_ZERO	0x80
 #define ENDSCAN_IS_INF	0x80
 
-typedef struct {
+typedef const struct {
   long int value;
   char end;
   char errno_val;
 } int_scan_type;
 
-typedef struct 
+typedef const struct 
 {
   int line;
   int_scan_type octal;
@@ -255,7 +255,7 @@ typedef struct
 } int_type;
 
 
-typedef struct 
+typedef const struct 
 {
   int line;
   double value;
@@ -272,7 +272,7 @@ typedef struct
   char *gfstring;
 } ddouble_type;
 
-typedef struct
+typedef const struct
 {
   int line;
   double value;
@@ -282,7 +282,7 @@ typedef struct
 } sprint_double_type;
 
 
-typedef struct
+typedef const struct
 {
   int line;
   int value;

@@ -93,32 +93,32 @@ check_long_long(const char *name, int i, long long expect, long long result)
     return 0;
 }
 
-typedef struct {
+typedef const struct {
     const char *name;
     int (*test)(void);
 } long_double_test_t;
 
-typedef struct {
+typedef const struct {
     int line;
     long double x;
     long double y;
 } long_double_test_f_f_t;
 
-typedef struct {
+typedef const struct {
     int line;
     long double x0;
     long double x1;
     long double y;
 } long_double_test_f_ff_t;
 
-typedef struct {
+typedef const struct {
     int line;
     long double x0;
     int x1;
     long double y;
 } long_double_test_f_fi_t;
 
-typedef struct {
+typedef const struct {
     int line;
     long double x;
     long long y;

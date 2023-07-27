@@ -35,23 +35,23 @@
 
 #define makelname(s) scat(s,l)
 
-volatile FLOAT_T makemathname(zero) = (FLOAT_T) 0.0;
-volatile FLOAT_T makemathname(negzero) = (FLOAT_T) -0.0;
-volatile FLOAT_T makemathname(one) = (FLOAT_T) 1.0;
-volatile FLOAT_T makemathname(two) = (FLOAT_T) 2.0;
-volatile FLOAT_T makemathname(three) = (FLOAT_T) 3.0;
-volatile FLOAT_T makemathname(half) = (FLOAT_T) 0.5;
-volatile FLOAT_T makemathname(big) = BIG;
-volatile FLOAT_T makemathname(bigodd) = BIGODD;
-volatile FLOAT_T makemathname(bigeven) = BIGEVEN;
-volatile FLOAT_T makemathname(small) = SMALL;
-volatile FLOAT_T makemathname(infval) = (FLOAT_T) INFINITY;
-volatile FLOAT_T makemathname(minfval) = (FLOAT_T) -INFINITY;
-volatile FLOAT_T makemathname(qnanval) = (FLOAT_T) NAN;
-volatile FLOAT_T makemathname(snanval) = (FLOAT_T) sNAN;
-volatile FLOAT_T makemathname(pio2) = (FLOAT_T) (PI_VAL/(FLOAT_T)2.0);
-volatile FLOAT_T makemathname(min_val) = (FLOAT_T) MIN_VAL;
-volatile FLOAT_T makemathname(max_val) = (FLOAT_T) MAX_VAL;
+volatile const FLOAT_T makemathname(zero) = (FLOAT_T) 0.0;
+volatile const FLOAT_T makemathname(negzero) = (FLOAT_T) -0.0;
+volatile const FLOAT_T makemathname(one) = (FLOAT_T) 1.0;
+volatile const FLOAT_T makemathname(two) = (FLOAT_T) 2.0;
+volatile const FLOAT_T makemathname(three) = (FLOAT_T) 3.0;
+volatile const FLOAT_T makemathname(half) = (FLOAT_T) 0.5;
+volatile const FLOAT_T makemathname(big) = BIG;
+volatile const FLOAT_T makemathname(bigodd) = BIGODD;
+volatile const FLOAT_T makemathname(bigeven) = BIGEVEN;
+volatile const FLOAT_T makemathname(small) = SMALL;
+volatile const FLOAT_T makemathname(infval) = (FLOAT_T) INFINITY;
+volatile const FLOAT_T makemathname(minfval) = (FLOAT_T) -INFINITY;
+volatile const FLOAT_T makemathname(qnanval) = (FLOAT_T) NAN;
+volatile const FLOAT_T makemathname(snanval) = (FLOAT_T) sNAN;
+volatile const FLOAT_T makemathname(pio2) = (FLOAT_T) (PI_VAL/(FLOAT_T)2.0);
+volatile const FLOAT_T makemathname(min_val) = (FLOAT_T) MIN_VAL;
+volatile const FLOAT_T makemathname(max_val) = (FLOAT_T) MAX_VAL;
 
 FLOAT_T makemathname(scalb)(FLOAT_T, FLOAT_T);
 
@@ -723,7 +723,7 @@ FLOAT_T makemathname(test_scalbn_tiny)(void) { return makemathname(scalbn)(makem
 #define sNAN_EXCEPTION  0
 #endif
 
-struct {
+const struct {
 	FLOAT_T	(*func)(void);
 	char	*name;
 	FLOAT_T	value;
