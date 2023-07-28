@@ -48,15 +48,3 @@ default_flash_addr_mps2_an505 = '0x10000400'
 default_flash_size_mps2_an505 = '0x103ffc00'
 default_ram_addr_mps2_an505 = '0x80000000'
 default_ram_size_mps2_an505 = '0x01000000'
-
-custom_mem_config_thumb_v6_m_nofp = 'microbit'
-
-# The microbit has only 256k of flash, but
-# we pretend it has lots more so that tests
-# will successfully link and then report
-# "SKIP" when run
-default_flash_addr_microbit = '0x00000000'
-default_flash_size_microbit = '0x00400000'
-default_ram_addr_microbit   = '0x20000000'
-default_ram_size_microbit   = '0x00004000'
-default_stack_size_microbit = '0x00000800'

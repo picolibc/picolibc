@@ -127,40 +127,7 @@ case $cpu in
 
     cortex-m0)
         machine=microbit
-        # Microbit only allows for 256kB of flash and 16kB of ram
-        # check the size of the binary and bail if it's too large
-
-        # check which awk version we've got and adapt
-        if awk --version | grep -q GNU; then
-            STRTONUM="strtonum"
-        else
-            STRTONUM=""
-        fi
-        sizes=`arm-none-eabi-objdump -h "$elf" |
-        awk '/^ *[0-9]/ {
-		size = '$STRTONUM'("0x" $3) + 0;
-		name = $2;
-	}
-	/ALLOC/ {
-		if (name == ".stack")
-			size = 0;
-		if ($0 ~ ".*LOAD.*") {
-			rom += size;
-		}
-		if ($0 !~ ".*READONLY.*" && name != ".init" && $0 !~ ".*THREAD_LOCAL.*") {
-			ram += size
-		}
-	}
-	END {
-		printf("%d %d\n", rom, ram);
-	}'`
-        rom_size=`echo "$sizes" | awk '{print $1}'`
-        ram_size=`echo "$sizes" | awk '{print $2}'`
-        echo "rom_size $rom_size ram_size $ram_size"
-        if [ "$rom_size" -gt 262144 -o "$ram_size" -gt 16384 ]; then
-            echo "$elf: too big"
-            exit 77
-        fi
+        memory="-global nrf51-soc.sram-size=2097152 -global nrf51-soc.flash-size=4194304"
         ;;
 
     # mps2-an385 offers a cortex-m3 processor
