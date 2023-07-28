@@ -331,7 +331,55 @@ __gbk_wctomb (struct _reent *r, char *s, wchar_t wchar, mbstate_t *state)
 extern "C" int
 __gb18030_wctomb (struct _reent *r, char *s, wchar_t wchar, mbstate_t *state)
 {
-  return __db_wctomb (r,s, wchar, 54936);
+  int ret;
+  wchar_t wres[2];
+
+  if (s == NULL)
+    return 0;
+
+  if (state->__count == 0)
+    {
+      if (wchar <= 0x7f)
+	{
+	  *s = (char) wchar;
+	  return 1;
+	}
+
+      if (wchar >= 0xd800 && wchar <= 0xdbff)
+	{
+	  /* First half of a surrogate pair */
+	  state->__count = 18030;
+	  state->__value.__wch = wchar;
+	  return 0;
+	}
+      ret = WideCharToMultiByte (54936, WC_ERR_INVALID_CHARS, &wchar, 1, s,
+				 4, NULL, NULL);
+      if (ret > 0)
+	return ret;
+      goto ilseq;
+    }
+  else if (state->__count == 18030 && state->__value.__wch >= 0xd800
+	   && state->__value.__wch <= 0xdbff)
+    {
+      if (wchar >= 0xdc00 && wchar <= 0xdfff)
+	{
+	  /* Create multibyte sequence from full surrogate pair. */
+	  wres[0] = state->__value.__wch;
+	  wres[1] = wchar;
+	  ret = WideCharToMultiByte (54936, WC_ERR_INVALID_CHARS, wres, 2, s, 4,
+				     NULL, NULL);
+	  if (ret > 0)
+	    {
+	      state->__count = 0;
+	      return ret;
+	    }
+	}
+ilseq:
+      _REENT_ERRNO(r) = EILSEQ;
+      return -1;
+    }
+  _REENT_ERRNO(r) = EINVAL;
+  return -1;
 }
 
 extern "C" int
@@ -495,7 +543,105 @@ extern "C" int
 __gb18030_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
 		  mbstate_t *state)
 {
-  return __db_mbtowc (r, pwc, s, n, 54936, state);
+  wchar_t wres[2], dummy;
+  unsigned char ch;
+  int ret, len, ocount;
+  size_t ncopy;
+
+  if (state->__count < 0 || (state->__count > (int) sizeof state->__value.__wchb
+			     && state->__count != 18030))
+    {
+      errno = EINVAL;
+      return -1;
+    }
+
+  if (s == NULL)
+    {
+      s = "";
+      n = 1;
+      pwc = NULL;
+    }
+
+  if (state->__count == 18030)
+    {
+      /* Return second half of the surrogate pair */
+      *pwc = state->__value.__wch;
+      state->__count = 0;
+      return 1;
+    }
+
+  ncopy = MIN (MIN (n, MB_CUR_MAX),
+	       sizeof state->__value.__wchb - state->__count);
+  memcpy (state->__value.__wchb + state->__count, s, ncopy);
+  ocount = state->__count;
+  state->__count += ncopy;
+  s = (char *) state->__value.__wchb;
+  n = state->__count;
+
+  if (n == 0) /* Incomplete multibyte sequence */
+    return -2;
+
+  if (!pwc)
+    pwc = &dummy;
+
+  /* Check if input is a valid GB18030 char (per FreeBSD):
+   * Single byte:         [00-7f]
+   * Two byte:            [81-fe][40-7e,80-fe]
+   * Four byte:           [81-fe][30-39][81-fe][30-39]
+   */
+  ch = *(unsigned char *) s;
+  if (ch <= 0x7f)
+    {
+      *pwc = ch;
+      state->__count = 0;
+      return ch ? 1 : 0;
+    }
+  if (ch >= 0x81 && ch <= 0xfe)
+    {
+      if (n < 2)
+	return -2;
+      ch = (unsigned char) s[1];
+      if ((ch >= 0x40 && ch <= 0x7e) || (ch >= 0x80 && ch <= 0xfe))
+	len = 2;
+      else if (ch >= 0x30 && ch <= 0x39)
+	{
+	  if (n < 3)
+	    return -2;
+	  ch = (unsigned char) s[2];
+	  if (ch < 0x81 || ch > 0xfe)
+	    goto ilseq;
+	  if (n < 4)
+	    return -2;
+	  ch = (unsigned char) s[3];
+	  if (ch < 0x30 || ch > 0x39)
+	    goto ilseq;
+	  len = 4;
+	}
+      else
+	goto ilseq;
+    }
+  else
+    goto ilseq;
+  ret = MultiByteToWideChar (54936, MB_ERR_INVALID_CHARS, s, len, wres, 2);
+  if (ret)
+    {
+      *pwc = wres[0];
+      if (ret == 2)
+	{
+	  /* Surrogate pair. Store second half for later and return
+	     first half. Return real count - 1, return 1 when the second
+	     half of the pair is returned in the next run. */
+	  state->__count = 18030;
+	  state->__value.__wch = wres[1];
+	  --len;
+	}
+      else
+	state->__count = 0;
+      return len - ocount;
+    }
+ilseq:
+  _REENT_ERRNO(r) = EILSEQ;
+  return -1;
 }
 
 extern "C" int
