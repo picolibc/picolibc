@@ -47,10 +47,6 @@ double mretval = 64;
 int traperror = 1;
 char *mname;
 
-/*
-  #define INCLUDE_GENERATE
-*/
-
 void
 translate_to (FILE *file,
 	    double r)
@@ -460,7 +456,7 @@ run_vector_1 (int vector,
   double result;
   float fresult;
 
-#if 0
+#ifdef INCLUDE_GENERATE
   if (vector)
   {
 

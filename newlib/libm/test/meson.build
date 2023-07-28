@@ -176,7 +176,7 @@ if enable_native_tests
   if native_lib_m.found()
     test('math-native',
 	 executable('math_test_native', math_test_src,
-		    c_args: native_c_args,
+		    c_args: native_c_args + ['-DINCLUDE_GENERATE'],
 		    link_args: native_c_args,
 		    dependencies: native_lib_m))
   endif
