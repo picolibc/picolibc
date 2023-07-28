@@ -113,18 +113,7 @@ case "$cpu_arch"/"$cpu_profile" in
         esac
         ;;
     v8.1-M.mainline/Microcontroller)
-        case "$fp_arch" in
-            FPv5/FP-D16)
-                case "$fp_use" in
-                    SP)
-                        cpu=cortex-m55
-                        ;;
-                esac
-                ;;
-            *)
-                cpu=cortex-m55
-                ;;
-        esac
+        cpu=cortex-m55
         ;;
     v8/Application)
         cpu=cortex-a57
