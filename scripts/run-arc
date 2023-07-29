@@ -34,8 +34,6 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-qemu="qemu-system-arc"
-
 # select the program
 elf="$1"
 shift
@@ -47,17 +45,31 @@ readelf="arc-zephyr-elf-readelf"
 if command -v "$readelf" >/dev/null 2>/dev/null; then
     # LLVM-based toolchains readelf produces different output from GNU, so
     # check --version output first.
-    if readelf --version | grep LLVM >/dev/null; then
+    if "$readelf" --version | grep LLVM >/dev/null; then
         archstring=$("$readelf" --arch-specific "$elf" | grep "Value: rv" | cut -d: -f2)
     else
-        archstring=$("$readelf" --arch-specific "$elf" | grep Tag_ARC_CPU_name | cut -d: -f2 | tr -d '"')
+        archstring=$("$readelf" --arch-specific "$elf" | grep Tag_ARC_CPU_name | cut -d: -f2 | tr -d '" ')
     fi
 fi
 if [ -z "$archstring" ]; then
     echo "Could not determine architecture for $elf, is readelf installed?" >&2
     exit 77
 fi
+
 cpu=$archstring
+
+case "$cpu" in
+    hs5*)
+        qemu=qemu-system-arc
+        cpu=hs5x
+        ;;
+    hs6x|fpud)
+        qemu=qemu-system-arc64
+        ;;
+    *)
+        qemu=qemu-system-arc
+        ;;
+esac
 
 # Map stdio to a multiplexed character device so we can use it
 # for the monitor and semihosting output
