@@ -539,7 +539,9 @@
 #endif
 #endif
 #ifndef _NANO_FORMATTED_IO
-    result |= test(__LINE__, "1, 1", "%-*.llu, %-*.llu",1,(int64_t)1,1,(int64_t)1);
+#ifndef NO_LONGLONG
+    result |= test(__LINE__, "1, 1", "%-*.llu, %-*.llu",1,1ULL,1,1ULL);
+#endif
 #endif
 #ifndef NO_FLOAT
     result |= test(__LINE__, "1e-09", "%g", 0.000000001);
