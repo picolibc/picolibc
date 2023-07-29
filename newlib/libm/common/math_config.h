@@ -252,25 +252,22 @@ _asdouble(int64_t i)
     return asdouble((uint64_t) i);
 }
 
-#ifndef IEEE_754_2008_SNAN
-# define IEEE_754_2008_SNAN 1
-#endif
 static ALWAYS_INLINE int
 issignalingf_inline (float x)
 {
   uint32_t ix = asuint (x);
-  if (!IEEE_754_2008_SNAN)
-    return (ix & 0x7fc00000) == 0x7fc00000;
-  return 2 * (ix ^ 0x00400000) > 0xFF800000u;
+  if (!_IEEE_754_2008_SNAN)
+    return (ix & 0x7fc00000u) == 0x7fc00000u;
+  return 2 * (ix ^ 0x00400000u) > 0xFF800000u;
 }
 
 static ALWAYS_INLINE int
 issignaling_inline (double x)
 {
   uint64_t ix = asuint64 (x);
-  if (!IEEE_754_2008_SNAN)
-    return (ix & 0x7ff8000000000000) == 0x7ff8000000000000;
-  return 2 * (ix ^ 0x0008000000000000) > 2 * 0x7ff8000000000000ULL;
+  if (!_IEEE_754_2008_SNAN)
+    return (ix & 0x7ff8000000000000ULL) == 0x7ff8000000000000ULL;
+  return 2 * (ix ^ 0x0008000000000000ULL) > 2 * 0x7ff8000000000000ULL;
 }
 
 #ifdef PICOLIBC_FLOAT_NOEXCEPT

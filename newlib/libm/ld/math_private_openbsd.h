@@ -112,7 +112,7 @@ issignalingl(long double x)
     if (!isnanl(x))
         return 0;
     GET_LDOUBLE_MSW64(high, x);
-    if (!IEEE_754_2008_SNAN)
+    if (!_IEEE_754_2008_SNAN)
         return (high & 0x0000800000000000ULL) != 0;
     else
         return (high & 0x0000800000000000ULL) == 0;
@@ -479,7 +479,7 @@ issignalingl(long double x)
     if (!isnanl(x))
         return 0;
     GET_LDOUBLE_MSW64(high, x);
-    if (!IEEE_754_2008_SNAN)
+    if (!_IEEE_754_2008_SNAN)
         return (high & 0x0008000000000000ULL) != 0;
     else
         return (high & 0x0008000000000000ULL) == 0;

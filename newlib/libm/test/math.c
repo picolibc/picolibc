@@ -40,6 +40,10 @@
 #include <string.h>
 #include <stdbool.h>
 
+#ifndef _IEEE_754_2008_SNAN
+# define _IEEE_754_2008_SNAN 1
+#endif
+
 extern int inacc;
 
 int merror;
@@ -55,6 +59,10 @@ translate_to (FILE *file,
   bits.value = r;
   fprintf(file, "0x%08lx, 0x%08lx", (unsigned long) bits.parts.msw, (unsigned long) bits.parts.lsw);
 }
+
+double
+thedouble (uint32_t msw,
+           uint32_t lsw, double *r);
 
 /* Convert double to float, preserving issignaling status and NaN sign */
 
@@ -103,8 +111,8 @@ ffcheck_id(double is,
 
   (void) serrno;
   (void) merror;
-  correct.parts.msw = p->qs[id].msw;
-  correct.parts.lsw = p->qs[id].lsw;
+
+  thedouble(p->qs[id].msw, p->qs[id].lsw, &correct.value);
 
   int error_bit = p->error_bit;
 
@@ -187,8 +195,8 @@ fffcheck_id (float is,
   isbits.value = is;
   to_double(is_double.value, is);
 
-  correct_double.parts.msw = p->qs[id].msw;
-  correct_double.parts.lsw = p->qs[id].lsw;
+  thedouble(p->qs[id].msw,p->qs[id].lsw, &correct_double.value);
+
   to_float(correct.value, correct_double.value);
 //  printf("%s got 0x%08x want 0x%08x\n", name, isbits.p1, correct.p1);
 
@@ -214,7 +222,7 @@ fffcheck_id (float is,
   {
     inacc ++;
 
-    printf("%s:%d, inaccurate answer: bit %d (%08lx %08lx) (%g %g) (is double 0x%08lx, 0x%08lx)\n",
+    printf("%s:%d, inaccurate answer: bit %d (%08lx is %08lx) (%g is %g) (is double 0x%08lx, 0x%08lx)\n",
 	   name,  p->line, mag,
 	   (unsigned long) (uint32_t) correct.p1,
 	   (unsigned long) (uint32_t) isbits.p1,
@@ -260,6 +268,10 @@ thedouble (uint32_t msw,
 
   x.parts.msw = msw;
   x.parts.lsw = lsw;
+#if !_IEEE_754_2008_SNAN
+  if (isnan(x.value))
+      x.parts.msw ^= 0x000c0000;
+#endif
   if (r)
     memcpy(r, &x.value, sizeof(double));
   return x.value;

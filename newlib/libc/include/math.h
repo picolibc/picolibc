@@ -243,6 +243,16 @@ extern int isnan (double);
 # define math_errhandling (_MATH_ERRHANDLING_ERRNO | _MATH_ERRHANDLING_ERREXCEPT)
 #endif
 
+/*
+ * Specifies whether the target uses the snan/nan discriminator
+ * definition from IEEE 754 2008 (top bit of significand is 1 for qNaN
+ * and 0 for sNaN). This is set to zero in machine/math.h for targets
+ * that don't do this (such as MIPS).
+ */
+#ifndef _IEEE_754_2008_SNAN
+# define _IEEE_754_2008_SNAN 1
+#endif
+
 extern int __isinff (float);
 extern int __isinfd (double);
 extern int __isnanf (float);
