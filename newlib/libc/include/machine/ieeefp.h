@@ -310,6 +310,13 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #define __IEEE_LITTLE_ENDIAN
 #endif
 
+#ifdef __mips__
+#define _IEEE_754_2008_SNAN 0
+#ifndef __mips_soft_float
+#define _SUPPORTS_ERREXCEPT
+#endif
+#endif
+
 #ifdef __MIPSEL__
 #define __IEEE_LITTLE_ENDIAN
 #endif
