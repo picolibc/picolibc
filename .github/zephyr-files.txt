@@ -1,5 +1,4 @@
 https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/toolchain_linux-x86_64_arc-zephyr-elf.tar.xz
-https://maps.altusmetrum.org/qemu-arc.tar.xz
 https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/toolchain_linux-x86_64_arc64-zephyr-elf.tar.xz
 https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/toolchain_linux-x86_64_microblazeel-zephyr-elf.tar.xz
 https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/toolchain_linux-x86_64_nios2-zephyr-elf.tar.xz
@@ -11,3 +10,5 @@ https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/toolchain
 https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/toolchain_linux-x86_64_xtensa-nxp_imx8m_adsp_zephyr-elf.tar.xz
 https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/toolchain_linux-x86_64_xtensa-nxp_imx_adsp_zephyr-elf.tar.xz
 https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/toolchain_linux-x86_64_xtensa-sample_controller_zephyr-elf.tar.xz
+https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/hosttools_linux-x86_64.tar.xz
+https://maps.altusmetrum.org/qemu-arc.tar.xz
