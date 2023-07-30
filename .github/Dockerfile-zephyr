@@ -15,6 +15,22 @@ RUN apt-get update && \
      xargs -a zephyr-packages.txt apt-get install -y || \
      xargs -a zephyr-packages.txt apt-get install -y) && \
     mkdir -p /opt && \
-    (cd /opt && while read file; do wget $file || exit 1; tar xf `basename $file`; rm `basename $file`; done) < zephyr-files.txt
+    (cd /opt && \
+     for file in `cat /zephyr-files.txt`; do \
+	echo "Fetching $file"; \
+	wget "$file" || exit 1; \
+	echo "Unpacking $file"; \
+	tar xf `basename "$file"`; \
+	echo "Removing $file"; \
+	rm `basename "$file"`; \
+     done)
+
+RUN if [ -f /opt/zephyr-sdk-*-hosttools*.sh ]; then \
+	echo "Unpacking host tools"; \
+	/opt/zephyr-sdk-*-hosttools*.sh -y -d /opt/zephyr-sdk-hosttools; \
+	rm /opt/zephyr-sdk-*-hosttools*.sh; \
+    else \
+	echo "No host tools found"; \
+    fi
 
 RUN apt-get clean

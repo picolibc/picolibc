@@ -2,14 +2,14 @@
 here=`dirname "$0"`
 export ZEPHYR_SDK_INSTALL_DIR=/opt
 
+if [ -d $ZEPHYR_SDK_INSTALL_DIR/zephyr-sdk-hosttools ]; then
+    . $ZEPHYR_SDK_INSTALL_DIR/zephyr-sdk-hosttools/environment-setup-*
+fi
+
 for dir in "$ZEPHYR_SDK_INSTALL_DIR"/*; do
     if [ -d "$dir" -a -d "$dir"/bin ]; then
-       PATH="$dir"/bin:$PATH
+	PATH="$dir"/bin:$PATH
     fi
 done
-
-if [ -d $ZEPHYR_SDK_INSTALL_DIR/sysroots/x86_64-pokysdk-linux/usr/bin ]; then
-    PATH=$ZEPHYR_SDK_INSTALL_DIR/sysroots/x86_64-pokysdk-linux/usr/bin:$PATH
-fi
 
 exec "$@"
