@@ -50,6 +50,10 @@ Add support for GB18030 codeset.
   posix_spawn_file_actions_addfchdir_np.
 </para></listitem>
 
+<listitem><para>
+- New API calls: c16rtomb, c32rtomb, mbrtoc16, mbrtoc32.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

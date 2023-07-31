@@ -481,6 +481,7 @@ details. */
   345: Reinstantiate _alloca.
   346: (Belatedly) add posix_spawn_file_actions_addchdir_np,
        posix_spawn_file_actions_addfchdir_np.
+  347: Add c16rtomb, c32rtomb, mbrtoc16, mbrtoc32.
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */

@@ -10,6 +10,7 @@ details. */
 #include <stdlib.h>
 #include <sys/param.h>
 #include <wchar.h>
+#include <uchar.h>
 #include <ntdll.h>
 #include "path.h"
 #include "fhandler.h"
@@ -132,26 +133,30 @@ wcintowcs (wchar_t *dest, wint_t *src, size_t len)
 /* replacement function for wcrtomb, converting a UTF-32 char to a
    multibyte string. */
 extern "C" size_t
-wirtomb (char *s, wint_t wi, mbstate_t *ps)
+c32rtomb (char *s, char32_t wc, mbstate_t *ps)
 {
-    wchar_t wc[3] = { (wchar_t) wi, '\0', '\0' };
-    const wchar_t *wcp = wc;
-    size_t nwc = 1;
+    /* If s is NULL, behave as if s pointed to an internal buffer and wc
+       was a null wide character (L'').  wcrtomb will do that for us*/
+    if (wc <= 0xffff || !s)
+      return wcrtomb (s, (wchar_t) wc, ps);
 
-    if (wi >= 0x10000)
-      {
-	wi -= 0x10000;
-	wc[0] = (wi >> 10) + 0xd800;
-	wc[1] = (wi & 0x3ff) + 0xdc00;
-	nwc = 2;
-      }
-    return wcsnrtombs (s, &wcp, nwc, SIZE_MAX, ps);
+    wchar_t wc_arr[2];
+    const wchar_t *wcp = wc_arr;
+
+    wc -= 0x10000;
+    wc_arr[0] = (wc >> 10) + 0xd800;
+    wc_arr[1] = (wc & 0x3ff) + 0xdc00;
+    return wcsnrtombs (s, &wcp, 2, SIZE_MAX, ps);
 }
 
-/* replacement function for mbrtowc, returning a wint_t representing
-   a UTF-32 value. */
 extern "C" size_t
-mbrtowi (wint_t *pwi, const char *s, size_t n, mbstate_t *ps)
+c16rtomb (char *s, char16_t wc, mbstate_t *ps)
+{
+  return wcrtomb (s, (wchar_t) wc, ps);
+}
+
+extern "C" size_t
+mbrtoc32 (char32_t *pwc, const char *s, size_t n, mbstate_t *ps)
 {
   size_t len, len2;
   wchar_t w1, w2;
@@ -159,8 +164,8 @@ mbrtowi (wint_t *pwi, const char *s, size_t n, mbstate_t *ps)
   len = mbrtowc (&w1, s, n, ps);
   if (len == (size_t) -1 || len == (size_t) -2)
     return len;
-  if (pwi)
-    *pwi = w1;
+  if (pwc && s)
+    *pwc = w1;
   /* Convert surrogate pair to wint_t value */
   if (len > 0 && w1 >= 0xd800 && w1 <= 0xdbff)
     {
@@ -170,8 +175,8 @@ mbrtowi (wint_t *pwi, const char *s, size_t n, mbstate_t *ps)
       if (len2 > 0 && w2 >= 0xdc00 && w2 <= 0xdfff)
 	{
 	  len += len2;
-	  if (pwi)
-	    *pwi = (((w1 & 0x3ff) << 10) | (w2 & 0x3ff)) + 0x10000;
+	  if (pwc && s)
+	    *pwc = (((w1 & 0x3ff) << 10) | (w2 & 0x3ff)) + 0x10000;
 	}
       else
 	{
@@ -180,6 +185,64 @@ mbrtowi (wint_t *pwi, const char *s, size_t n, mbstate_t *ps)
 	}
     }
   return len;
+}
+
+/* Like mbrtowc, but we already defined how to return a surrogate, and
+   the definition of mbrtoc16 differes from that.
+   Return the high surrogate with a return value representing the length
+   of the entire multibyte sequence, and in the next call return the low
+   surrogate with a return value of -3. */
+extern "C" size_t
+mbrtoc16 (char16_t *pwc, const char *s, size_t n, mbstate_t *ps)
+{
+  int retval = 0;
+  struct _reent *reent = _REENT;
+  wchar_t wc;
+
+  if (ps == NULL)
+    {
+      _REENT_CHECK_MISC(reent);
+      ps = &(_REENT_MBRTOWC_STATE(reent));
+    }
+
+  if (s == NULL)
+    retval = __MBTOWC (reent, NULL, "", 1, ps);
+  else if (ps->__count == 0xdc00)
+    {
+      /* Return stored second half of the surrogate. */
+      if (pwc)
+	*pwc = ps->__value.__wch;
+      ps->__count = 0;
+      return -3;
+    }
+  else
+    retval = __MBTOWC (reent, &wc, s, n, ps);
+
+  if (retval == -1)
+    goto ilseq;
+
+  if (pwc)
+    *pwc = wc;
+  /* Did we catch the first half of a surrogate? */
+  if (wc >= 0xd800 && wc <= 0xdbff)
+    {
+      if (n <= (size_t) retval)
+	goto ilseq;
+      int r2 = __MBTOWC (reent, &wc, s + retval, n, ps);
+      if (r2 == -1)
+	goto ilseq;
+      /* Store second half of the surrogate in state, and return the
+	 length of the entire multibyte sequence. */
+      ps->__count = 0xdc00;
+      ps->__value.__wch = wc;
+      retval += r2;
+    }
+  return (size_t)retval;
+
+ilseq:
+  ps->__count = 0;
+  _REENT_ERRNO(reent) = EILSEQ;
+  return (size_t)(-1);
 }
 
 extern "C" size_t

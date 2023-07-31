@@ -268,6 +268,8 @@ bindresvport_sa = cygwin_bindresvport_sa SIGFE
 bsearch NOSIGFE
 btowc NOSIGFE
 bzero NOSIGFE
+c16rtomb NOSIGFE
+c32rtomb NOSIGFE
 cabs NOSIGFE
 cabsf NOSIGFE
 cabsl NOSIGFE
@@ -936,6 +938,8 @@ malloc_trim SIGFE
 malloc_usable_size SIGFE
 mallopt SIGFE
 mblen NOSIGFE
+mbrtoc16 NOSIGFE
+mbrtoc32 NOSIGFE
 mbrlen NOSIGFE
 mbrtowc NOSIGFE
 mbsinit NOSIGFE

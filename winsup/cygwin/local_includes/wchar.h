@@ -13,6 +13,7 @@ details. */
 
 /* Internal headers from newlib */
 #include "../locale/setlocale.h"
+#include <uchar.h>
 
 #define ENCODING_LEN 31
 
@@ -46,11 +47,19 @@ void wcintowcs (wchar_t *, wint_t *, size_t);
 
 /* replacement function for wcrtomb, converting a UTF-32 char to a
    multibyte string. */
-size_t wirtomb (char *, wint_t, mbstate_t *);
+static inline size_t
+wirtomb (char *s, wint_t wc, mbstate_t *ps)
+{
+  return c32rtomb (s,(char32_t) wc, ps);
+}
 
 /* replacement function for mbrtowc, returning a wint_t representing
-   a UTF-32 value. Defined in strfuncs.cc */
-extern size_t mbrtowi (wint_t *, const char *, size_t, mbstate_t *);
+   a UTF-32 value. */
+static inline size_t
+mbrtowi (wint_t *pwc, const char *s, size_t n, mbstate_t *ps)
+{
+  return mbrtoc32 ((char32_t *) pwc, s, n, ps);
+}
 
 /* replacement function for mbsnrtowcs, returning a wint_t representing
    a UTF-32 value. Defined in strfuncs.cc.

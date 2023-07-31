@@ -27,6 +27,8 @@ What's new:
 - New API calls: posix_spawn_file_actions_addchdir_np,
   posix_spawn_file_actions_addfchdir_np.
 
+- New API calls: c16rtomb, c32rtomb, mbrtoc16, mbrtoc32.
+
 What changed:
 -------------
 
