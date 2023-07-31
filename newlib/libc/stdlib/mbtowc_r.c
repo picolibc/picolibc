@@ -36,14 +36,6 @@ __ascii_mbtowc (struct _reent *r,
   if (n == 0)
     return -2;
 
-#ifdef __CYGWIN__
-  if ((wchar_t)*t >= 0x80)
-    {
-      _REENT_ERRNO(r) = EILSEQ;
-      return -1;
-    }
-#endif
-
   *pwc = (wchar_t)*t;
   
   if (*t == '\0')

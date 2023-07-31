@@ -29,11 +29,7 @@ __ascii_wctomb (struct _reent *r,
   if (s == NULL)
     return 0;
  
-#ifdef __CYGWIN__
-  if ((size_t)wchar >= 0x80)
-#else
   if ((size_t)wchar >= 0x100)
-#endif
     {
       _REENT_ERRNO(r) = EILSEQ;
       return -1;
