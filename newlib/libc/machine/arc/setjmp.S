@@ -32,13 +32,7 @@
    these are the stack mappings for the registers
    as stored in the ABI for ARC */
 
-#ifdef __ARC64__
-#define ARC_REGSIZE	8
-#else
-#define ARC_REGSIZE	4
-#endif
-
-       .file "setjmp.S"
+#define ARC_REGSIZE	__SIZEOF_LONG__
 
 ABIr13	= 0
 ABIr14	= ABIr13 + ARC_REGSIZE
@@ -91,8 +85,9 @@ setjmp:
 	st	r29, [r0, ABIr29]
 	st	r30, [r0, ABIr30]
 	st	blink, [r0, ABIr31]
+#ifndef __ARCV3__
 	st	lp_count, [r0, ABIlpc]
-
+#endif
 	lr	r2, [lp_start]
 	lr	r3, [lp_end]
 	st	r2, [r0, ABIlps]
@@ -143,8 +138,10 @@ longjmp:
 
 	ld	blink, [r0, ABIr31]
 
+#ifndef __ARCV3__
 	ld	r3,  [r0, ABIlpc]
 	mov	lp_count, r3
+#endif
 
 	ld	r2, [r0, ABIlps]
 	ld	r3, [r0, ABIlpe]
