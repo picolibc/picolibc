@@ -2,7 +2,7 @@
 set -e
 HERE=`dirname "$0"`
 "$HERE"/do-zephyr-test arc "$@"
-"$HERE"/do-zephyr-build arc64 "$@"
+"$HERE"/do-zephyr-test arc64 "$@"
 "$HERE"/do-zephyr-build microblazeel "$@"
 "$HERE"/do-zephyr-test mips-zephyr "$@"
 "$HERE"/do-zephyr-build nios2 "$@"
