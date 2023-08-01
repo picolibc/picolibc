@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2020 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,5 +33,52 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-multilib_list='.,nomul,mulx'
-exec "$(dirname "$0")"/do-configure nios2-zephyr-elf -Dposix-console=true -Dtests=true -Dmultilib-list="$multilib_list" "$@"
+
+dir="$(dirname "$0")"
+
+# select the program
+elf="$1"
+shift
+
+qemu="qemu-system-nios2"
+
+# Point the semihosting driver at our new chardev
+
+semi=enable=on,chardev=stdio0
+
+input=""
+
+case "$1" in
+    --)
+	semi="$semi",arg="$2"
+	shift
+	shift
+	;;
+    -*|"")
+	;;
+    *)
+	semi="$semi",arg="$1"
+	input="$1"
+	shift
+	;;
+esac
+
+# Disable monitor
+
+mon=none
+
+# Point serial port at new chardev
+
+serial=stdio
+
+machine=10m50-ghrd
+
+echo "$input" | $qemu \
+  -chardev stdio,id=stdio0,mux=on \
+  -machine $machine \
+  -serial none \
+  -semihosting-config "$semi" \
+  -mon chardev=stdio0,mode=readline \
+  -net none \
+  -nographic \
+  -kernel "$elf" "$@"
