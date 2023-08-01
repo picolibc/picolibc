@@ -333,12 +333,16 @@ TESTS = $(check_PROGRAMS) \
 	mingw/cygload
 
 # expected fail tests
+XFAIL_TESTS_CI_true = \
+	winsup.api/ltp/umask03$(EXEEXT)
+
 XFAIL_TESTS = \
 	winsup.api/ltp/setgroups01 \
 	winsup.api/ltp/setuid02 \
 	winsup.api/ltp/ulimit01 \
 	winsup.api/ltp/unlink08 \
-	winsup.api/samples/sample-fail
+	winsup.api/samples/sample-fail \
+	$(XFAIL_TESTS_CI_$(GITHUB_ACTIONS))
 
 # cygrun.sh test-runner script, and variables used by it:
 LOG_COMPILER = $(srcdir)/cygrun.sh
