@@ -17,7 +17,9 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #include "m68kasm.h"
 
 .global SYM (setjmp)
+.type	SYM (setjmp), @function
 .global SYM (longjmp)
+.type	SYM (longjmp), @function
 
 SYM (setjmp):
 	moveal sp@(4),a0
@@ -26,6 +28,7 @@ SYM (setjmp):
 	moveml d2-d7/a2-a6,a0@(20)
 	clrl d0
 	rts
+	.size	SYM(setjmp), . - SYM(setjmp)
 
 SYM (longjmp):
 	moveal sp@(4),a0
@@ -37,10 +40,13 @@ SYM (longjmp):
 	moveal a0@(8),sp
 	movel a0@(12),sp@
 	rts
+	.size	SYM(longjmp), . - SYM(longjmp)
 
 #ifdef M68881
 .global SYM (setjmp_68881)
+.type	SYM (setjmp_68881), @function
 .global SYM (longjmp_68881)
+.type	SYM (longjmp_68881), @function
 
 SYM (setjmp_68881):
 	moveal sp@(4),a0
@@ -50,7 +56,8 @@ SYM (setjmp_68881):
 	fmovemx fp2-fp7,a0@(64)
 	clrl d0
 	rts
-
+	.size	SYM(setjmp_68881), . - SYM(setjmp_68881)
+	
 SYM (longjmp_68881):
 	moveal sp@(4),a0
 	fmovemx a0@(64),fp2-fp7
@@ -62,4 +69,10 @@ SYM (longjmp_68881):
 	moveal a0@(8),sp
 	movel a0@(12),sp@
 	rts
+	.size	SYM(longjmp_68881), . - SYM(longjmp_68881)
 #endif
+
+#if defined(__linux__) && defined(__ELF__)
+	.section .note.GNU-stack,"",%progbits
+#endif
+

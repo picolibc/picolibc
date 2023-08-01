@@ -110,3 +110,8 @@ SYM(memcpy):
 #endif
 	move.l	4(sp),d0	| return value
 	rts
+	.size	SYM(memcpy), . - SYM(memcpy)
+	
+#if defined(__linux__) && defined(__ELF__)
+	.section .note.GNU-stack,"",%progbits
+#endif
