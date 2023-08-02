@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2020 Thomas Daede
+# Copyright © 2020 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,4 +33,43 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-exec "$(dirname "$0")"/do-configure m68k-linux-gnu -Dtests=true -Dposix-console=true -Dmultilib=false "$@"
+
+dir="$(dirname "$0")"
+
+# select the program
+elf="$1"
+shift
+
+qemu="qemu-system-m68k"
+
+# Point the semihosting driver at our new chardev
+
+semi=enable=on,chardev=stdio0
+
+input=""
+
+case "$1" in
+    --)
+	semi="$semi",arg="$2"
+	shift
+	shift
+	;;
+    -*|"")
+	;;
+    *)
+	semi="$semi",arg="$1"
+	input="$1"
+	shift
+	;;
+esac
+
+echo "$input" | $qemu \
+  -chardev stdio,id=stdio0,mux=on \
+  -machine virt \
+  -cpu m68020 \
+  -semihosting-config "$semi" \
+  -monitor none \
+  -serial none \
+  -net none \
+  -nographic \
+  -kernel "$elf" "$@"
