@@ -15,6 +15,15 @@
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 #include "test.h"
+
+#ifdef __HAVE_68881__
+#define LOW_PREC_1        62
+#define LOW_PREC_2        62
+#else
+#define LOW_PREC_1        64
+#define LOW_PREC_2        63
+#endif
+
  one_line_type y0_vec[] = {
 {64, 0, 33,__LINE__, 0x7ff80000, 0x00000000, 0xbff33333, 0x33333333},	/* nan=f(-1.2)*/
 {64, 0, 33,__LINE__, 0x7ff80000, 0x00000000, 0xbff30a3d, 0x70a3d70a},	/* nan=f(-1.19)*/
@@ -184,7 +193,7 @@
 {63, 0,123,__LINE__, 0xbfe0af8a, 0xa64cf89f, 0x3fdccccc, 0xcccccce3},	/* -0.521428=f(0.45)*/
 {63, 0,123,__LINE__, 0xbfe02ceb, 0xe907006a, 0x3fdd70a3, 0xd70a3d87},	/* -0.505484=f(0.46)*/
 {64, 0,123,__LINE__, 0xbfdf5966, 0xeffea91b, 0x3fde147a, 0xe147ae2b},	/* -0.489832=f(0.47)*/
-{64, 0,123,__LINE__, 0xbfde5d90, 0xf2270065, 0x3fdeb851, 0xeb851ecf},	/* -0.474461=f(0.48)*/
+{LOW_PREC_1, 0,123,__LINE__, 0xbfde5d90, 0xf2270065, 0x3fdeb851, 0xeb851ecf},	/* -0.474461=f(0.48)*/
 {63, 0,123,__LINE__, 0xbfdd6627, 0x5ee2acd3, 0x3fdf5c28, 0xf5c28f73},	/* -0.45936=f(0.49)*/
 {63, 0,123,__LINE__, 0xbfdc72fe, 0xb3b7b882, 0x3fe00000, 0x0000000b},	/* -0.444519=f(0.5)*/
 {63, 0,123,__LINE__, 0xbfdb83ee, 0x28938e2c, 0x3fe051eb, 0x851eb85d},	/* -0.429927=f(0.51)*/
@@ -223,7 +232,7 @@
 {62, 0,123,__LINE__, 0xbfa8dd86, 0x0d3a74e3, 0x3feae147, 0xae147aef},	/* -0.0485651=f(0.84)*/
 {61, 0,123,__LINE__, 0xbfa41bfc, 0xc78b8379, 0x3feb3333, 0x33333341},	/* -0.039276=f(0.85)*/
 {61, 0,123,__LINE__, 0xbf9ed05c, 0x1f5d00d6, 0x3feb851e, 0xb851eb93},	/* -0.0300917=f(0.86)*/
-{63, 0,123,__LINE__, 0xbf9583cb, 0x7f59a6c5, 0x3febd70a, 0x3d70a3e5},	/* -0.0210106=f(0.87)*/
+{LOW_PREC_2, 0,123,__LINE__, 0xbf9583cb, 0x7f59a6c5, 0x3febd70a, 0x3d70a3e5},	/* -0.0210106=f(0.87)*/
 {60, 0,123,__LINE__, 0xbf88a3c7, 0x5dfcb6ba, 0x3fec28f5, 0xc28f5c37},	/* -0.0120311=f(0.88)*/
 {58, 0,123,__LINE__, 0xbf69d226, 0x276b52f6, 0x3fec7ae1, 0x47ae1489},	/* -0.00315196=f(0.89)*/
 {60, 0,123,__LINE__, 0x3f770db5, 0x0ee194be, 0x3feccccc, 0xccccccdb},	/* 0.00562831=f(0.9)*/

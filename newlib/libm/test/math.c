@@ -126,7 +126,7 @@ ffcheck_id(double is,
    * nans, let that pass
    */
   if (isnan(correct.value) && isnan(is)
-#ifndef __i386__
+#if !defined(__i386__) && !defined(__HAVE_68881__)
       && (issignaling(correct.value) == issignaling(is))
 #endif
     )
@@ -209,7 +209,7 @@ fffcheck_id (float is,
 
   /* All signaling nans are the "same", as are all quiet nans */
   if (isnan(correct.value) && isnan(is)
-#ifndef __i386__
+#if !defined(__i386__) && !defined(__HAVE_68881__)
       /* i386 calling convention ends up always converting snan into qnan */
       && (__issignalingf(correct.value) == __issignalingf(is))
 #endif
