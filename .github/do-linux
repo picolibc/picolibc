@@ -12,7 +12,7 @@ HERE=`dirname "$0"`
 "$HERE"/do-test aarch64 "$@"
 "$HERE"/do-build lx106 "$@"
 "$HERE"/do-test i386 "$@"
-"$HERE"/do-build m68k "$@"
+"$HERE"/do-test m68k "$@"
 "$HERE"/do-build msp430 "$@"
 "$HERE"/do-build clang-msp430 "$@"
 "$HERE"/do-build sparc64 "$@"
