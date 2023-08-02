@@ -711,7 +711,7 @@ FLOAT_T makemathname(test_scalbn_tiny)(void) { return makemathname(scalbn)(makem
 
 #undef sNAN_RET
 #undef sNAN_EXCEPTION
-#if defined(__i386__) && !defined(TEST_LONG_DOUBLE) && !defined(_SOFT_FLOAT)
+#if (defined(__i386__) || defined(__HAVE_68881__)) && !defined(TEST_LONG_DOUBLE) && !defined(_SOFT_FLOAT)
 /*
  * i386 ABI returns floats in the 8087 registers, which convert sNAN
  * to NAN on load, so you can't ever return a sNAN value successfully.
@@ -933,8 +933,14 @@ const struct {
         TEST(hypot_neginf_qnan, (FLOAT_T)INFINITY, 0, 0),
         TEST(hypot_qnan_inf, (FLOAT_T)INFINITY, 0, 0),
         TEST(hypot_qnan_neginf, (FLOAT_T)INFINITY, 0, 0),
+#ifndef __HAVE_68881__
+        /*
+         * On 68881, the snan gets converted to qnan before the hypot code
+         * sees it, so skip these tests
+         */
         TEST(hypot_snan_inf, (FLOAT_T)NAN, FE_INVALID, 0),
         TEST(hypot_snan_neginf, (FLOAT_T)NAN, FE_INVALID, 0),
+#endif
         TEST(hypot_1_inf, (FLOAT_T)INFINITY, 0, 0),
         TEST(hypot_1_neginf, (FLOAT_T)INFINITY, 0, 0),
         TEST(hypot_inf_1, (FLOAT_T)INFINITY, 0, 0),
