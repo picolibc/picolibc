@@ -156,6 +156,103 @@ c16rtomb (char *s, char16_t wc, mbstate_t *ps)
 }
 
 extern "C" size_t
+c8rtomb (char *s, char8_t c8, mbstate_t *ps)
+{
+  struct _reent *reent = _REENT;
+  char32_t wc;
+
+  if (ps == NULL)
+    {
+      _REENT_CHECK_MISC(reent);
+      ps = &(_REENT_MBRTOWC_STATE(reent));
+    }
+
+  if (s == NULL)
+    {
+      ps->__count = 0;
+      return 1;
+    }
+  if ((ps->__count & 0xff00) != 0xc800)
+    {
+      switch (c8)
+	{
+	case 0 ... 0x7f:	/* single octet */
+	  ps->__count = 0;
+	  wc = c8;
+	  break;
+	case 0xc2 ... 0xf4:	/* valid lead byte */
+	  ps->__count = 0xc801;
+	  ps->__value.__wchb[0] = c8;
+	  return 0;
+	default:
+	  goto ilseq;
+	}
+    }
+  else
+    {
+      /* We already collected something... */
+      int idx = ps->__count & 0x3;
+      char8_t &c1 = ps->__value.__wchb[0];
+      char8_t &c2 = ps->__value.__wchb[1];
+      char8_t &c3 = ps->__value.__wchb[2];
+
+      switch (idx)
+	{
+	  case 1:
+	    /* Annoyingly complex check for validity for 2nd octet. */
+	    if (c8 <= 0x7f || c8 >= 0xc0)
+	      goto ilseq;
+	    if (c1 == 0xe0 && c8 <= 0x9f)
+	      goto ilseq;
+	    if (c1 == 0xed && c8 >= 0xa0)
+	      goto ilseq;
+	    if (c1 == 0xf0 && c8 <= 0x8f)
+	      goto ilseq;
+	    if (c1 == 0xf4 && c8 >= 0x90)
+	      goto ilseq;
+	    if (c1 >= 0xe0)
+	      {
+		ps->__count = 0xc802;
+		c2 = c8;
+		return 0;
+	      }
+	    wc =   ((c1 & 0x1f) << 6)
+		 |  (c8 & 0x3f);
+	    break;
+	  case 2:
+	    if (c8 <= 0x7f || c8 >= 0xc0)
+	      goto ilseq;
+	    if (c1 >= 0xf0)
+	      {
+		ps->__count = 0xc803;
+		c3 = c8;
+		return 0;
+	      }
+	    wc =   ((c1 & 0x0f) << 12)
+		 | ((c2 & 0x3f) <<  6)
+		 |  (c8 & 0x3f);
+	    break;
+	  case 3:
+	    if (c8 <= 0x7f || c8 >= 0xc0)
+	      goto ilseq;
+	    wc =   ((c1 & 0x07) << 18)
+		 | ((c2 & 0x3f) << 12)
+		 | ((c3 & 0x3f) <<  6)
+		 |  (c8 & 0x3f);
+	    break;
+	  default: /* Shouldn't happen */
+	    goto ilseq;
+	}
+    }
+  ps->__count = 0;
+  return c32rtomb (s, wc, ps);
+ilseq:
+  ps->__count = 0;
+  _REENT_ERRNO(reent) = EILSEQ;
+  return (size_t)(-1);
+}
+
+extern "C" size_t
 mbrtoc32 (char32_t *pwc, const char *s, size_t n, mbstate_t *ps)
 {
   size_t len, len2;
@@ -243,6 +340,75 @@ ilseq:
   ps->__count = 0;
   _REENT_ERRNO(reent) = EILSEQ;
   return (size_t)(-1);
+}
+
+extern "C" size_t
+mbrtoc8 (char8_t *pc8, const char *s, size_t n, mbstate_t *ps)
+{
+  struct _reent *reent = _REENT;
+  size_t len;
+  char32_t wc;
+
+  if (ps == NULL)
+    {
+      _REENT_CHECK_MISC(reent);
+      ps = &(_REENT_MBRTOWC_STATE(reent));
+    }
+
+  if (s == NULL)
+    {
+      if (ps)
+	ps->__count = 0;
+      return 1;
+    }
+  else if ((ps->__count & 0xff00) == 0xc800)
+    {
+      /* Return next utf-8 octet in line. */
+      int idx = ps->__count & 0x3;
+
+      if (pc8)
+	*pc8 = ps->__value.__wchb[--idx];
+      if (idx == 0)
+	ps->__count = 0;
+      return -3;
+    }
+  len = mbrtoc32 (&wc, s, n, ps);
+  if (len > 0)
+    {
+      /* octets stored back to front for easier indexing */
+      switch (wc)
+	{
+	case 0 ... 0x7f:
+	  ps->__value.__wchb[0] = wc;
+	  ps->__count = 0;
+	  break;
+	case 0x80 ... 0x7ff:
+	  ps->__value.__wchb[1] = 0xc0 | ((wc & 0x7c0) >> 6);
+	  ps->__value.__wchb[0] = 0x80 |  (wc &  0x3f);
+	  ps->__count = 0xc800 | 1;
+	  break;
+	case 0x800 ... 0xffff:
+	  ps->__value.__wchb[2] = 0xe0 | ((wc & 0xf000) >> 12);
+	  ps->__value.__wchb[1] = 0x80 | ((wc &  0xfc0) >> 6);
+	  ps->__value.__wchb[0] = 0x80 |  (wc &   0x3f);
+	  ps->__count = 0xc800 | 2;
+	  break;
+	case 0x10000 ... 0x10ffff:
+	  ps->__value.__wchb[3] = 0xf0 | ((wc & 0x1c0000) >> 18);
+	  ps->__value.__wchb[2] = 0x80 | ((wc &  0x3f000) >> 12);
+	  ps->__value.__wchb[1] = 0x80 | ((wc &    0xfc0) >> 6);
+	  ps->__value.__wchb[0] = 0x80 |  (wc &     0x3f);
+	  ps->__count = 0xc800 | 3;
+	  break;
+	default:
+	  ps->__count = 0;
+	  _REENT_ERRNO(reent) = EILSEQ;
+	  return (size_t)(-1);
+	}
+      if (pc8)
+	*pc8 = ps->__value.__wchb[ps->__count & 0x3];
+    }
+  return len;
 }
 
 extern "C" size_t
