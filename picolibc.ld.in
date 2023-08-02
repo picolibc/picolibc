@@ -93,7 +93,6 @@ SECTIONS
 		*(.srodata.cst2)
 		*(.srodata .srodata.*)
 		*(.data.rel.ro .data.rel.ro.*)
-		*(.got .got.*)
 
 		/* Need to pre-align so that the symbols come after padding */
 		. = ALIGN(8);
@@ -113,6 +112,16 @@ SECTIONS
 		KEEP (*(.fini_array .dtors))
 		PROVIDE_HIDDEN ( __fini_array_end = . );
 
+	} >flash AT>flash :text
+
+	/*
+	 * Needs to be in its own segment with the PLT entries first
+	 * so that the linker will compute the offsets to those
+	 * entries correctly.
+	 */
+	.got : {
+		*(.got.plt)
+		*(.got)
 	} >flash AT>flash :text
 
 	.toc : {
