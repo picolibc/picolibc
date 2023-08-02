@@ -215,7 +215,7 @@ exp2l(long double x)
 	ix = hx & EXPMASK;
 	if (ix >= BIAS + 14) {		/* |x| >= 16384 or x is NaN */
 		if (ix == BIAS + LDBL_MAX_EXP) {
-			if (u.xbits.man != 1ULL << 63 || (hx & 0x8000) == 0)
+                        if (u.xbits.man != (unsigned long long) LDBL_NBIT_INF << 32 || (hx & 0x8000) == 0)
 				return (x + x);	/* x is +Inf or NaN */
 			else
 				return (0.0l);	/* x is -Inf */

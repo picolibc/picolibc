@@ -160,6 +160,7 @@ union IEEEl2bits {
 };
 
 #define	LDBL_NBIT	0
+#define LDBL_NBIT_INF   0
 #define	LDBL_IMPLICIT_NBIT
 #define	mask_nbit_l(u)	((void)0)
 #define LDBL_INF_NAN_EXP    32767
@@ -303,9 +304,9 @@ union IEEEl2bits {
 #if __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__
 		uint64_t	sign	:1;
 		uint64_t	exp	:15;
+		uint64_t	junk	:16;
 		uint64_t	manh	:32;
 		uint64_t	manl	:32;
-		uint64_t	junk	:16;
 #endif
 #if __FLOAT_WORD_ORDER__ == __ORDER_LITTLE_ENDIAN__
 		uint64_t	manl	:32;
@@ -318,8 +319,8 @@ union IEEEl2bits {
 	struct {
 #if __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__
 		uint64_t 	expsign	:16;
-		uint64_t        man	:64;
 		uint64_t	junk	:16;
+		uint64_t        man	:64;
 #endif
 #if __FLOAT_WORD_ORDER__ == __ORDER_LITTLE_ENDIAN__
 		uint64_t        man	:64;
@@ -330,6 +331,11 @@ union IEEEl2bits {
 };
 
 #define	LDBL_NBIT	0x80000000
+#ifdef __m68k__
+#define LDBL_NBIT_INF   0
+#else
+#define LDBL_NBIT_INF   LDBL_NBIT
+#endif
 #define	mask_nbit_l(u)	((u).bits.manh &= ~LDBL_NBIT)
 #define LDBL_INF_NAN_EXP    32767
 #define LDBL_EXP_MASK           0x7fff
@@ -546,6 +552,7 @@ union IEEEl2bits {
 };
 
 #define	LDBL_NBIT	        0
+#define LDBL_NBIT_INF           0
 #define	LDBL_IMPLICIT_NBIT
 #define	mask_nbit_l(u)	        ((void)0)
 #define LDBL_INF_NAN_EXP        2047
