@@ -14,3 +14,6 @@ Bug Fixes
 - Rename internal macros _NL_CTYPE_OUTDIGITSx_MB/WC to GLibc compatible
   _NL_CTYPE_OUTDIGITx_MB/WC.
   Addresses: https://cygwin.com/pipermail/cygwin-developers/2023-July/012637.html
+
+- Fix memory leak in printf() regarding gdtoa-based _ldtoa_r().
+  Addresses: https://cygwin.com/pipermail/cygwin/2023-July/254054.html
