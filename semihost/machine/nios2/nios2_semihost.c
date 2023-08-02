@@ -35,7 +35,7 @@
 
 #include "nios2_semihost.h"
 
-int
+intptr_t
 nios2_semihost(int func, struct nios2_semihost *args)
 {
     register int r_op __asm__("r4") = func;
