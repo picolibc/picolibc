@@ -108,7 +108,7 @@ SYM(memcpy):
 	subq.l	#1,d1
 	bpl	1b
 #endif
-	move.l	4(sp),d0	| return value
+	move.l	4(sp),a0	| return value
 	rts
 	.size	SYM(memcpy), . - SYM(memcpy)
 	
