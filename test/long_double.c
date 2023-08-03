@@ -38,6 +38,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <float.h>
+#include <stdlib.h>
+#include <string.h>
 
 #ifdef _TEST_LONG_DOUBLE
 
@@ -177,9 +179,92 @@ static long double vals[] = {
     0x1.8p0L,
     3.141592653589793238462643383279502884197169L,
     0.0L,
+    1.0L/0.0L,
+    0.0L/0.0L,
 };
 
 #define NVALS   (sizeof(vals)/sizeof(vals[0]))
+
+static long double
+naive_strtold(const char *buf)
+{
+    long double v = 0.0L;
+    long exp = 0;
+    long double frac_mul = 1.0L / 16.0L;
+    long exp_sign = 1;
+    char c;
+    enum {
+        LDOUBLE_INT,
+        LDOUBLE_FRAC,
+        LDOUBLE_EXP,
+    } state = LDOUBLE_INT;
+
+    if (strncmp(buf, "0x", 2) != 0)
+        return -(long double)INFINITY;
+    buf += 2;
+    while ((c = *buf++)) {
+        int digit;
+        switch (c) {
+        case '.':
+            if (state == LDOUBLE_INT) {
+                state = LDOUBLE_FRAC;
+                continue;
+            }
+            return -(long double)INFINITY;
+        case 'p':
+            if (state == LDOUBLE_INT || state == LDOUBLE_FRAC) {
+                state = LDOUBLE_EXP;
+                continue;
+            }
+            return -(long double)INFINITY;
+        case '-':
+            if (state == LDOUBLE_EXP) {
+                exp_sign = -1;
+                continue;
+            }
+            return -(long double)INFINITY;
+        case '+':
+            if (state == LDOUBLE_EXP) {
+                exp_sign = 1;
+                continue;
+            }
+            return -(long double)INFINITY;
+        case '0': case '1': case '2': case '3': case '4':
+        case '5': case '6': case '7': case '8': case '9':
+            digit = c - '0';
+            break;
+        case 'A': case 'B': case 'C':
+        case 'D': case 'E': case 'F':
+            if (state == LDOUBLE_INT || state == LDOUBLE_FRAC) {
+                digit = c - 'A' + 10;
+                break;
+            }
+            return -(long double)INFINITY;
+        case 'a': case 'b': case 'c':
+        case 'd': case 'e': case 'f':
+            if (state == LDOUBLE_INT || state == LDOUBLE_FRAC) {
+                digit = c - 'a' + 10;
+                break;
+            }
+            return -(long double)INFINITY;
+        default:
+            return -(long double)INFINITY;
+        }
+        switch (state) {
+        case LDOUBLE_INT:
+            v = v * 16.0L + digit;
+            break;
+        case LDOUBLE_FRAC:
+            v = v + digit * frac_mul;
+            frac_mul *= 1.0L / 16.0L;
+            break;
+        case LDOUBLE_EXP:
+            exp = exp * 10 + digit;
+            break;
+        }
+    }
+    return ldexpl(v, exp * exp_sign);
+}
 
 static int
 test_io(void)
@@ -188,6 +273,7 @@ test_io(void)
     int result = 0;
     char buf[80];
     unsigned i;
+    char *end;
 
     for (e = __LDBL_MIN_EXP__ - __LDBL_MANT_DIG__; e <= __LDBL_MAX_EXP__; e++)
     {
@@ -195,9 +281,31 @@ test_io(void)
         for (i = 0; i < NVALS; i++) {
             v = ldexpl(vals[i], e);
             sprintf(buf, "%La", v);
+            if (isinf(v)) {
+                if (strcmp(buf, "inf") != 0) {
+                    printf("test_io is %s should be inf\n", buf);
+                    result++;
+                }
+            } else if (isnan(v)) {
+                if (strcmp(buf, "nan") != 0) {
+                    printf("test_io is %s should be nan\n", buf);
+                    result++;
+                }
+            } else {
+                r = naive_strtold(buf);
+                if (v != r) {
+                    printf("test_io naive i %d val %La exp %d: \"%s\", is %La should be %La\n", i, vals[i], e, buf, r, v);
+                    result++;
+                }
+            }
             sscanf(buf, "%Lf", &r);
-            if (v != r) {
-                printf("%d: \"%s\", is %La should be %La\n", e, buf, r, v);
+            if (v != r && !(isnan(v) && isnan(r))) {
+                printf("test_io scanf i %d val %La exp %d: \"%s\", is %La should be %La\n", i, vals[i], e, buf, r, v);
+                result++;
+            }
+            r = strtold(buf, &end);
+            if ((v != r && !(isnan(v) && isnan(r)))|| end != buf + strlen(buf)) {
+                printf("test_io strtold i %d val %La exp %d: \"%s\", is %La should be %La\n", i, vals[i], e, buf, r, v);
                 result++;
             }
         }
