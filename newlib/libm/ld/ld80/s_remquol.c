@@ -21,11 +21,9 @@
  * default already.
  */
 #ifdef LDBL_IMPLICIT_NBIT
-#define	LDBL_NBIT	0
 #define	SET_NBIT(hx)	((hx) | (1ULL << LDBL_MANH_SIZE))
 #define	HFRAC_BITS	EXT_FRACHBITS
 #else
-#define	LDBL_NBIT	0x80000000
 #define	SET_NBIT(hx)	(hx)
 #define	HFRAC_BITS	(EXT_FRACHBITS - 1)
 #endif
