@@ -56,7 +56,7 @@ __flt_rounds(void)
 }
 #define FLT_ROUNDS __flt_rounds()
 #else
-#define FLT_ROUNDS 0
+#define FLT_ROUNDS 1
 #endif
 
 long double

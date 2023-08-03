@@ -43,10 +43,10 @@ THIS SOFTWARE.
 
 #ifdef IEEE_MC68k
 #define _0 0
-#define _1 1
-#define _2 2
-#define _3 3
-#define _4 4
+#define _1 2
+#define _2 3
+#define _3 4
+#define _4 5
 #endif
 #ifdef IEEE_8087
 #define _0 4
@@ -66,7 +66,7 @@ ULtox(__UShort *L, __ULong *bits, Long exp, int k)
 	switch(k & STRTOG_Retmask) {
 	  case STRTOG_NoNumber:
 	  case STRTOG_Zero:
-		L[0] = L[1] = L[2] = L[3] = L[4] = 0;
+		L[_0] = L[_1] = L[_2] = L[_3] = L[_4] = 0;
 		break;
 
 	  case STRTOG_Denormal:
