@@ -72,7 +72,7 @@ _iconv_nls_construct_filename (
 
   len1 = strlen (path);
   len2 = strlen (file);
-  len3 = strlen (ext);
+  len3 = ext ? strlen (ext) : 0;
 
   if ((p = malloc (len1 + dirlen + len2 + len3 + 3)) == NULL)
     return (const char *)NULL;
