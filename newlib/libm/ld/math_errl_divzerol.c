@@ -1,4 +1,4 @@
-/* Long double precision math error handling.
+/* Double-precision math error handling.
    Copyright (c) 2018 Arm Ltd.  All rights reserved.
 
    SPDX-License-Identifier: BSD-3-Clause
@@ -26,16 +26,15 @@
    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
-#include "math_config.h"
+#include "math_ld.h"
 
-#if WANT_ERRNO
-#include <errno.h>
-/* NOINLINE reduces code size and avoids making math functions non-leaf
-   when the error handling is inlined.  */
-NOINLINE HIDDEN long double
-__math_with_errnol (long double y, int e)
+static const FORCE_LONG_DOUBLE VAL = pick_long_double_except(0.0L, (long double) INFINITY);
+
+HIDDEN long double
+__math_divzerol (uint32_t sign)
 {
-  errno = e;
-  return y;
+    long double y = pick_long_double_except(1.0L / VAL, VAL);
+    if (sign)
+        y = -y;
+    return __math_with_errnol (y, ERANGE);
 }
-#endif

@@ -1,4 +1,4 @@
-/* Double-precision math error handling.
+/* Long double-precision math error handling.
    Copyright (c) 2018 Arm Ltd.  All rights reserved.
 
    SPDX-License-Identifier: BSD-3-Clause
@@ -26,16 +26,27 @@
    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
-#include "math_config.h"
+#include "math_ld.h"
 
 #ifdef _NEED_FLOAT_HUGE
 
-/* Check result and set errno if necessary.  */
+static const FORCE_LONG_DOUBLE VAL = pick_long_double_except((long double) 0.0, (long double) NAN);
 
 HIDDEN long double
-__math_check_oflowl (long double y)
+__math_invalidl (long double x)
 {
-    return isinf (y) ? __math_with_errnol (y, ERANGE) : y;
+    if (isnanl_inline(x))
+        return pick_long_double_except(x + x, VAL);
+    x = pick_long_double_except(VAL / VAL, VAL);
+    return __math_with_errnol (x, EDOM);
 }
 
-#endif /* _NEED_FLOAT_HUGE */
+#ifndef __math_set_invalidl
+HIDDEN void
+__math_set_invalidl(void)
+{
+    force_eval_long_double(pick_long_double_except(VAL / VAL, VAL));
+}
+#endif
+
+#endif

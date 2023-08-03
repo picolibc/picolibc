@@ -99,5 +99,12 @@ if(_HAVE_LONG_DOUBLE)
     s_sincosl.c
     s_sinl.c
     s_tanl.c
+    math_errl_check_oflowl.c
+    math_errl_check_uflowl.c
+    math_errl_divzerol.c
+    math_errl_invalidl.c
+    math_errl_oflowl.c
+    math_errl_uflowl.c
+    math_errl_with_errnol.c
   )
 endif()
