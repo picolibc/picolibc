@@ -190,17 +190,22 @@ long double F, Fa, Fb, G, Ga, Gb, H, Ha, Hb;
 int i, nflg, iyflg, yoddint;
 long e;
 
-if( y == 0.0L ) {
-        if (issignalingl(x))
+if( !isnanl_inline(y) && y == 0.0L ) {
+        if (issignalingl_inline(x))
                 return x + y;
 	return( 1.0L );
 }
 
-if( x == 1.0L ) {
-        if (issignalingl(y))
+if( !isnanl_inline(x) && x == 1.0L ) {
+        if (issignalingl_inline(y))
                 return x + y;
 	return( 1.0L );
 }
+
+if( isnanl_inline(x) )
+	return( x + y );
+if( isnanl_inline(y) )
+	return( x + y );
 
 w = floorl(y);
 /* Set iyflg to 1 if y is an integer.  */
@@ -221,11 +226,6 @@ if( x == 0.0L) {
         if( y < 0 )
                 return __math_divzerol(yoddint);
 }
-
-if( isnanl(x) )
-	return( x );
-if( isnanl(y) )
-	return( y );
 
 if( y == 1.0L )
 	return( x );

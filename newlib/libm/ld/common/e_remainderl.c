@@ -32,7 +32,7 @@ remainderl(long double x, long double y)
 {
 	int quo;
 
-        if (isnanl(x) || isnanl(y))
+        if (isnanl_inline(x) || isnanl_inline(y))
             return x + y;
 
         if (isinfl(x) || y == 0.0L)

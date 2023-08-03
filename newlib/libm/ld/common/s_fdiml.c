@@ -30,7 +30,7 @@
 long double
 fdiml(long double x, long double y)
 {
-        if (isnanl(x) || isnanl(y))
+        if (isnanl_inline(x) || isnanl_inline(y))
 		return (x + y);
         long double z = x > y ? x - y : 0.0L;
         if (!isinfl(x) && !isinfl(y))
