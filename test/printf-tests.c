@@ -43,6 +43,7 @@ static void failmsg(int serial, char *fmt, ...) {
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 /* 'bsize' is used directly with malloc/realloc which confuses -fanalyzer */
 #pragma GCC diagnostic ignored "-Wanalyzer-va-arg-type-mismatch"
+#pragma GCC diagnostic ignored "-Wanalyzer-va-list-exhausted"
 #endif
 
 static int test(int serial, char *expect, char *fmt, ...) {
