@@ -204,6 +204,9 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 #if defined(__m68k__) || defined(__mc68000__)
 #define __IEEE_BIG_ENDIAN
+#ifdef __HAVE_68881__
+# define _SUPPORTS_ERREXCEPT
+#endif
 #endif
 
 #if defined(__mc68hc11__) || defined(__mc68hc12__) || defined(__mc68hc1x__)
