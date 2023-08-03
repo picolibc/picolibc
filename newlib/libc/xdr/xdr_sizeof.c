@@ -80,6 +80,13 @@ x_setpostn (XDR * xdrs,
   return FALSE;
 }
 
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+/* 'len' is used directly with calloc which confuses -fanalyzer */
+#pragma GCC diagnostic ignored "-Wanalyzer-allocation-size"
+#endif
+
 static int32_t *
 x_inline (XDR * xdrs,
 	u_int len)
