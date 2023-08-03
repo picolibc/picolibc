@@ -1420,6 +1420,7 @@ endif
 
 if have_long_double and get_option('test-long-double')
   test_c_args += ['-D_TEST_LONG_DOUBLE']
+  native_c_args += ['-D_TEST_LONG_DOUBLE']
 endif
 
 # Meson version 0.53.2 doesn't check for the skip_sanity_check value

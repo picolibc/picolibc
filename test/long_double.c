@@ -167,7 +167,7 @@ typedef const struct {
 
 #include "long_double_vec.h"
 
-#if defined(_WANT_IO_LONG_DOUBLE) && (defined(TINY_STDIO) || defined(FLOATING_POINT))
+#if !defined(__PICOLIBC__) || (defined(_WANT_IO_LONG_DOUBLE) && (defined(TINY_STDIO) || defined(FLOATING_POINT)))
 #define TEST_IO_LONG_DOUBLE
 #endif
 
