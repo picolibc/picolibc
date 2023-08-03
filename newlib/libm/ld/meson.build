@@ -105,6 +105,7 @@ srcs_ld_common = [
   's_frexpl.c',
   's_isinfl.c',
   's_isnanl.c',
+  's_issignalingl.c',
   's_llrintl.c',
   's_llroundl.c',
   's_logbl.c',

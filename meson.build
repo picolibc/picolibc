@@ -1086,6 +1086,7 @@ builtins = [
   ['builtin_isnan', '__builtin_isnan((long double)42)', 'int'],
   ['builtin_finitel', '__builtin_finitel((long double)42)', 'int'],
   ['builtin_isfinite', '__builtin_isfinite((long double)42)', 'int'],
+  ['builtin_issignalingl', '__builtin_issignalingl((long double)42)', 'int'],
 ]
 foreach builtin : builtins
   builtin_template='''

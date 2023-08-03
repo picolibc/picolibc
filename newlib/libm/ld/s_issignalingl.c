@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright © 2022 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,12 +33,10 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "math_config.h"
+#include "math_ld.h"
 
-#if defined(_NEED_FLOAT_HUGE) && defined(_HAVE_BUILTIN_ISSIGNALINGL)
-int
-__issignalingl (long double x)
-{
-    return __builtin_issignalingl(x);
-}
+#if defined(_NEED_FLOAT_HUGE) && !defined(_HAVE_BUILTIN_ISSIGNALINGL)
+
+#include "common/s_issignalingl.c"
+
 #endif
