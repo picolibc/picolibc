@@ -474,7 +474,7 @@ __loadlocale (struct __locale_t *loc, int category, char *new_locale)
      is extracted and stored in ctype_codeset or message_charset
      dependent on the cateogry. */
   char *locale = NULL;
-  char charset[ENCODING_LEN + 1];
+  char charset[ENCODING_LEN + 1] = {};
   long val = 0;
   char *end, *c = NULL;
   int mbc_max;
