@@ -62,7 +62,7 @@ translate_to (FILE *file,
 
 double
 thedouble (uint32_t msw,
-           uint32_t lsw, double *r);
+           uint32_t lsw, volatile double *r);
 
 /* Convert double to float, preserving issignaling status and NaN sign */
 
@@ -260,9 +260,18 @@ fffcheck (float is,
   return fffcheck_id(is, p, name, serrno, merror, 0);
 }
 
+static
+volatile_memcpy(volatile void *dest, void *src, size_t len)
+{
+    volatile uint8_t *d = dest;
+    uint8_t *s = src;
+    while (len--)
+        *d++ = *s++;
+}
+
 double
 thedouble (uint32_t msw,
-  uint32_t lsw, double *r)
+  uint32_t lsw, volatile double *r)
 {
   __ieee_double_shape_type x;
 
@@ -273,7 +282,7 @@ thedouble (uint32_t msw,
       x.parts.msw ^= 0x000c0000;
 #endif
   if (r)
-    memcpy(r, &x.value, sizeof(double));
+    volatile_memcpy(r, &x.value, sizeof(double));
   return x.value;
 }
 
@@ -525,9 +534,9 @@ run_vector_1 (int vector,
   newfunc(name);
   while (p->line)
   {
-    double arg1;
+    volatile double arg1;
     thedouble(p->qs[1].msw, p->qs[1].lsw, &arg1);
-    double arg2;
+    volatile double arg2;
     thedouble(p->qs[2].msw, p->qs[2].lsw, &arg2);
 
     errno = 0;
@@ -574,8 +583,8 @@ run_vector_1 (int vector,
      }
      else  if (strcmp(args,"fff")==0)
      {
-       float arga;
-       float argb;
+       volatile float arga;
+       volatile float argb;
 
        typedef float (*pdblfunc) (float,float);
 
