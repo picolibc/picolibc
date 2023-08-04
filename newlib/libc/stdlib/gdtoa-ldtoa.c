@@ -72,7 +72,7 @@ _ldtoa_r(struct _reent *ptr,
 
 	/* reentrancy addition to use mprec storage pool */
 	if (_REENT_MP_RESULT (ptr)) {
-		freedtoa (ptr, _REENT_MP_RESULT (ptr));
+		freedtoa (ptr, (char *) _REENT_MP_RESULT (ptr));
 		_REENT_MP_RESULT (ptr) = 0;
 	}
 
