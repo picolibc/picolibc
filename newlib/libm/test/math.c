@@ -105,7 +105,7 @@ ffcheck_id(double is,
 	   int id)
 {
   /* Make sure the answer isn't to far wrong from the correct value */
-  __ieee_double_shape_type correct, isbits;
+  __ieee_double_shape_type correct = {}, isbits;
   int mag;
   isbits.value = is;
 
