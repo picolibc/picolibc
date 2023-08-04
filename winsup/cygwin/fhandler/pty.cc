@@ -436,8 +436,10 @@ static int osi;
 void
 fhandler_pty_master::flush_to_slave ()
 {
+  WaitForSingleObject (input_mutex, mutex_timeout);
   if (get_readahead_valid () && !(get_ttyp ()->ti.c_lflag & ICANON))
     accept_input ();
+  ReleaseMutex (input_mutex);
 }
 
 void
@@ -522,8 +524,6 @@ fhandler_pty_master::accept_input ()
 {
   DWORD bytes_left;
   int ret = 1;
-
-  WaitForSingleObject (input_mutex, mutex_timeout);
 
   char *p = rabuf () + raixget ();
   bytes_left = eat_readahead (-1);
@@ -625,7 +625,6 @@ fhandler_pty_master::accept_input ()
   if (write_to == get_output_handle ())
     SetEvent (input_available_event); /* Set input_available_event only when
 					 the data is written to cyg pipe. */
-  ReleaseMutex (input_mutex);
   return ret;
 }
 
@@ -2235,9 +2234,9 @@ fhandler_pty_master::write (const void *ptr, size_t len)
 	    {
 	      /* This accept_input() call is needed in order to transfer input
 		 which is not accepted yet to non-cygwin pipe. */
+	      WaitForSingleObject (input_mutex, mutex_timeout);
 	      if (get_readahead_valid ())
 		accept_input ();
-	      WaitForSingleObject (input_mutex, mutex_timeout);
 	      acquire_attach_mutex (mutex_timeout);
 	      fhandler_pty_slave::transfer_input (tty::to_nat, from_master,
 						  get_ttyp (),
@@ -2305,9 +2304,10 @@ fhandler_pty_master::write (const void *ptr, size_t len)
 					  get_ttyp (), input_available_event);
       release_attach_mutex ();
     }
-  ReleaseMutex (input_mutex);
 
   line_edit_status status = line_edit (p, len, ti, &ret);
+  ReleaseMutex (input_mutex);
+
   if (status > line_edit_signalled && status != line_edit_pipe_full)
     ret = -1;
   return ret;

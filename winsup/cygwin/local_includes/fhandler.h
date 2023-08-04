@@ -2572,6 +2572,14 @@ public:
   int tcgetpgrp ();
   void flush_to_slave ();
   void discard_input ();
+  void acquire_input_mutex_if_necessary (DWORD ms)
+  {
+    WaitForSingleObject (input_mutex, ms);
+  }
+  void release_input_mutex_if_necessary (void)
+  {
+    ReleaseMutex (input_mutex);
+  }
 
   fhandler_pty_master (void *) {}
 
