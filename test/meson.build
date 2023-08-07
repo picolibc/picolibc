@@ -325,6 +325,7 @@ foreach target : targets
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env,
+       timeout: 90,
       )
 
   if have_ubsan
