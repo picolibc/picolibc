@@ -34,21 +34,26 @@ scripts.
 
 ## Supported Architectures
 
-Picolibc inherited code for a *lot* of architectures from Newlib, but
-at this point only has code to build for the following targets:
+Picolibc has integrated testing support for many architectures which
+is used to validate the code for all patch integration:
 
  * ARC (32- and 64- bit)
  * ARM (32- and 64- bit)
  * i386 (Native and Linux hosted, for testing)
- * Microblaze (32-bit, big and little endian)
  * Motorola 68000 (m68k)
  * MIPS
- * MSP430
  * Nios II
- * PowerPC (big and little endian)
+ * Power9
  * RISC-V (both 32- and 64- bit)
- * Sparc64
  * x86_64 (Native and Linux hosted, for testing)
+
+There is also build infrastructure and continuous build validation,
+but no integrated testing available for additional architectures:
+
+ * Microblaze (32-bit, big and little endian)
+ * MSP430
+ * PowerPC (big and little endian)
+ * Sparc64
  * Xtensa (ESP8266, ESP32)
 
 Supporting architectures that already have Newlib code requires:
@@ -68,8 +73,8 @@ Supporting architectures that already have Newlib code requires:
  3. newlib/libm/machine/_architecture_/meson.build to build any
     architecture-specific libm bits
 
- 4. picocrt/machine/_architecture_ source code and build bits if you
-    need custom startup code for the architecture. Useful in all
+ 4. picocrt/machine/_architecture_ source code and build bits
+    for startup code needed for the architecture. Useful in all
     cases, but this is necessary to run tests under qemu if your
     platform can do that.
 
