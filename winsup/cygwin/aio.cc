@@ -905,7 +905,7 @@ aio_write (struct aiocb *aio)
 }
 
 int
-lio_listio (int mode, struct aiocb *__restrict const aiolist[__restrict],
+lio_listio (int mode, struct aiocb *__restrict const aiolist[__restrict_arr],
             int nent, struct sigevent *__restrict sig)
 {
   struct aiocb *aio;

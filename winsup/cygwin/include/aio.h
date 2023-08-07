@@ -73,7 +73,7 @@ ssize_t aio_return  (struct aiocb *);
 int     aio_suspend (const struct aiocb *const [], int,
                         const struct timespec *);
 int     aio_write   (struct aiocb *);
-int     lio_listio  (int, struct aiocb *__restrict const [__restrict], int,
+int     lio_listio  (int, struct aiocb *__restrict const [__restrict_arr], int,
                         struct sigevent *__restrict);
 
 #ifdef __cplusplus
