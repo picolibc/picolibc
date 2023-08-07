@@ -424,6 +424,19 @@
 #endif
 
 /*
+ * Additionally, we allow to use `__restrict_arr' for declaring arrays as
+ * non-overlapping per C99.  That's supported since gcc 3.1, but it's not
+ * allowed in C++.
+ */
+#if defined(__cplusplus) || !__GNUC_PREREQ__(3, 1)
+#define __restrict_arr
+#elif defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
+#define __restrict_arr       restrict
+#else
+#define __restrict_arr
+#endif
+
+/*
  * GNU C version 2.96 adds explicit branch prediction so that
  * the CPU back-end can hint the processor and also so that
  * code blocks can be reordered such that the predicted path
