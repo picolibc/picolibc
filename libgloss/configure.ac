@@ -195,6 +195,9 @@ case "${target}" in
 	AC_CONFIG_FILES([xstormy16/Makefile])
 	subdirs="$subdirs xstormy16"
 	;;
+  xtensa-*-*)
+	config_xtensa=true
+	;;
   m32c-*-*)
 	AC_CONFIG_FILES([m32c/Makefile])
 	subdirs="$subdirs m32c"
@@ -248,7 +251,7 @@ AC_SUBST(subdirs)
 dnl These subdirs have converted to non-recursive make.  Hopefully someday all
 dnl the ports above will too!
 m4_foreach_w([SUBDIR], [
-  aarch64 arc arm bfin csky d30v iq2000 libnosys lm32 nios2 riscv wince
+  aarch64 arc arm bfin csky d30v iq2000 libnosys lm32 nios2 riscv wince xtensa
 ], [dnl
   AM_CONDITIONAL([CONFIG_]m4_toupper(SUBDIR), [test x$config_]SUBDIR = xtrue)
 ])
@@ -352,6 +355,7 @@ m4_include([mcore/acinclude.m4])
 m4_include([mips/acinclude.m4])
 m4_include([mn10300/acinclude.m4])
 m4_include([moxie/acinclude.m4])
+m4_include([xtensa/acinclude.m4])
 
 AC_CACHE_CHECK([for compiler search settings], libc_cv_compiler_isystem, [dnl
   for subdir in include include-fixed; do

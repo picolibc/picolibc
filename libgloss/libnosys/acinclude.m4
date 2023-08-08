@@ -22,6 +22,7 @@ case "${target}" in
   v850*-*-*) ;;
   w65-*-*) ;;
   xstormy16-*-*) ;;
+  xtensa-*-*) ;;
   z8k-*-*) ;;
   *) AC_DEFINE(MISSING_SYSCALL_NAMES, 1, [Missing syscall names]) ;;
 esac

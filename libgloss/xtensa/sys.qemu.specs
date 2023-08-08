@@ -1,0 +1,8 @@
+%rename link_gcc_c_sequence    qemu_link_gcc_c_sequence
+
+*libqemu:
+--whole-archive -lsys_qemu --no-whole-archive
+
+*link_gcc_c_sequence:
+%(qemu_link_gcc_c_sequence) --start-group %G %(libqemu) --end-group
+
