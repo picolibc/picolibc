@@ -463,7 +463,7 @@ in_float_range(double arg)
 {
 	if (isinf(arg) || isnan(arg))
 		return true;
-	return -(double) FLT_MAX <= arg && arg < (double) FLT_MAX;
+	return -(double) FLT_MAX <= arg && arg <= (double) FLT_MAX;
 }
 
 void
