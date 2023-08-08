@@ -24,4 +24,5 @@ multilibtool_LIBRARIES += %D%/libnosys.a
 	%D%/unlink.c \
 	%D%/wait.c \
 	%D%/write.c \
+	%D%/getentropy.c \
 	%D%/_exit.c

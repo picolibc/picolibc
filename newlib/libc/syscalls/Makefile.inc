@@ -4,6 +4,7 @@ libc_a_SOURCES += \
 	%D%/sysclose.c \
 	%D%/sysfcntl.c \
 	%D%/sysfstat.c \
+	%D%/sysgetentropy.c \
 	%D%/sysgetpid.c \
 	%D%/sysgettod.c \
 	%D%/sysisatty.c \

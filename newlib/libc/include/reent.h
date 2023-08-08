@@ -125,6 +125,7 @@ struct timezone;
 #define _unlink_r(__reent, __path)                unlink(__path)
 #define _wait_r(__reent, __status)                wait(__status)
 #define _write_r(__reent, __fd, __buff, __cnt)    write(__fd, __buff, __cnt)
+#define _getentropy_r(__reent, __buff, __cnt)     getentropy(__buff, __cnt)
 #define _gettimeofday_r(__reent, __tp, __tzp)     gettimeofday(__tp, __tzp)
 
 #ifdef __LARGE64_FILES
@@ -156,6 +157,7 @@ extern _CLOCK_T_ _times_r (struct _reent *, struct tms *);
 extern int _unlink_r (struct _reent *, const char *);
 extern int _wait_r (struct _reent *, int *);
 extern _ssize_t _write_r (struct _reent *, int, const void *, size_t);
+extern int _getentropy_r (struct _reent *, void *, size_t);
 
 /* This one is not guaranteed to be available on all targets.  */
 extern int _gettimeofday_r (struct _reent *, struct timeval *__tp, void *__tzp);
