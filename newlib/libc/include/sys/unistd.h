@@ -315,6 +315,10 @@ int	unlinkat (int, const char *, int);
 # define	SEEK_SET	0
 # define	SEEK_CUR	1
 # define	SEEK_END	2
+#if __GNU_VISIBLE
+# define	SEEK_DATA	3
+# define	SEEK_HOLE	4
+#endif
 
 #include <sys/features.h>
 
