@@ -1559,7 +1559,7 @@ lseek (int fd, off_t pos, int dir)
 {
   off_t res;
 
-  if (dir != SEEK_SET && dir != SEEK_CUR && dir != SEEK_END)
+  if (dir < SEEK_SET || dir > SEEK_HOLE)
     {
       set_errno (EINVAL);
       res = -1;
