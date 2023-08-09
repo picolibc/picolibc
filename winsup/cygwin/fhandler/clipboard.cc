@@ -322,6 +322,13 @@ fhandler_dev_clipboard::lseek (off_t offset, int whence)
    * On writes we use this to decide how to write - empty and write, or open, copy, empty
    * and write
    */
+  if (whence == SEEK_CUR)
+    return 0;
+  if (whence != SEEK_SET)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
   pos = offset;
   /* treat seek like rewind */
   if (membuffer)
