@@ -1195,7 +1195,7 @@ fhandler_base::lseek (off_t offset, int whence)
 	       SEEK_HOLE: seek to offset */
 	    fpi.CurrentByteOffset.QuadPart = (whence == SEEK_DATA)
 					     ? out.FileOffset.QuadPart
-						 : offset;
+					     : offset;
 	  }
       }
       break;
