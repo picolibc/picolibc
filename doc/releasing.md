@@ -27,10 +27,31 @@ picolibc:
 
     * Enable long-double io for RISC-V compiles using -Dio-long-double=true
 
-    * Build and install minsize and release builds, using
-    --buildtype=release -Dbuild-type-subdir=release
+    * Build and install minsize and release builds:
+
+	$ do-arm-configure -Dwant-math-errno=true -Dio-long-double=true && \
+	  ninja test install
+
+	$ do-arm-configure -Dwant-math-errno=true -Dio-long-double=true \
+	  --buildtype=release -Dbuild-type-subdir=release && \
+	  ninja test install
+
+	$ do-riscv-configure -Dwant-math-errno=true -Dio-long-double=true && \
+	  ninja test install
+
+	$ do-riscv-configure -Dwant-math-errno=true -Dio-long-double=true \
+	  --buildtype=release -Dbuild-type-subdir=release && \
+	  ninja test install
 
     * Build and run glibc test suite against all four builds
+
+	$ do-arm-configure --buildtype=minsize && ninja test
+
+	$ do-arm-configure --buildtype=release -Dpicolibc-buildtype=release && ninja test
+
+	$ do-riscv-configure --buildtype=minsize && ninja test
+
+	$ do-riscv-configure --buildtype=release -Dpicolibc-buildtype=release && ninja test
 
  4. Test c++ builds using hello-world example on ARM
 
