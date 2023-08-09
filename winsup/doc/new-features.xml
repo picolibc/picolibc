@@ -46,6 +46,10 @@ Add support for GB18030 codeset.
 </para></listitem>
 
 <listitem><para>
+Add support for lseek flags SEEK_DATA and SEEK_HOLE, a GNU extension.
+</para></listitem>
+
+<listitem><para>
 New API calls: posix_spawn_file_actions_addchdir_np,
 posix_spawn_file_actions_addfchdir_np.
 </para></listitem>
