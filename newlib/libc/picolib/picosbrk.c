@@ -44,12 +44,12 @@ static char *brk = __heap_start;
 void *sbrk(ptrdiff_t incr)
 {
 	if (incr < 0) {
-            if (brk - __heap_start < -incr) {
+                if ((size_t) (brk - __heap_start) < (size_t) (-incr)) {
                     errno = ENOMEM;
                     return (void *) -1;
             }
 	} else {
-		if (__heap_end - brk < incr) {
+                if ((size_t) (__heap_end - brk) < (size_t) incr) {
                         errno = ENOMEM;
 			return (void *) -1;
                 }
