@@ -1109,7 +1109,7 @@ fhandler_base::lseek (off_t offset, int whence)
 	}
       fpi.CurrentByteOffset.QuadPart += offset;
       break;
-    default: /* SEEK_END */
+    case SEEK_END:
       status = NtQueryInformationFile (get_handle (), &io, &fsi, sizeof fsi,
 				       FileStandardInformation);
       if (!NT_SUCCESS (status))
@@ -1119,6 +1119,89 @@ fhandler_base::lseek (off_t offset, int whence)
 	}
       fpi.CurrentByteOffset.QuadPart = fsi.EndOfFile.QuadPart + offset;
       break;
+    case SEEK_DATA:
+    case SEEK_HOLE:
+      {
+	FILE_ALLOCATED_RANGE_BUFFER inp, out;
+
+	status = NtQueryInformationFile (get_handle (), &io, &fsi, sizeof fsi,
+					 FileStandardInformation);
+	if (!NT_SUCCESS (status))
+	  {
+	    __seterrno_from_nt_status (status);
+	    return -1;
+	  }
+	/* Per Linux man page, ENXIO if offset is beyond EOF */
+	if (offset > fsi.EndOfFile.QuadPart)
+	  {
+	    set_errno (ENXIO);
+	    return -1;
+	  }
+	if (!pc.support_sparse ())
+	  {
+	    /* Default behaviour if sparse files are not supported:
+	       SEEK_DATA: seek to offset
+	       SEEK_HOLE: seek to EOF */
+	    fpi.CurrentByteOffset.QuadPart = (whence == SEEK_DATA)
+					     ? offset
+					     : fsi.EndOfFile.QuadPart;
+	    break;
+	  }
+	inp.FileOffset.QuadPart = offset;
+	inp.Length.QuadPart = fsi.EndOfFile.QuadPart - offset;
+	/* Note that we only fetch a single region, so we expect the
+	   function to fail with STATUS_BUFFER_OVERFLOW.  It still
+	   returns the data region containing offset, or the next
+	   region after offset, if offset is within a hole. */
+	status = NtFsControlFile (get_output_handle (), NULL, NULL, NULL,
+				  &io, FSCTL_QUERY_ALLOCATED_RANGES,
+				  &inp, sizeof inp,
+				  &out, sizeof out);
+	if (!NT_SUCCESS (status) && status != STATUS_BUFFER_OVERFLOW)
+	  {
+	    /* On error, fall back to default behaviour, see above. */
+	    fpi.CurrentByteOffset.QuadPart = (whence == SEEK_DATA)
+					     ? offset
+					     : fsi.EndOfFile.QuadPart;
+	    break;
+	  }
+	if (io.Information == 0)
+	  {
+	    /* No valid region, so offset is within a hole at EOF.
+	       SEEK_DATA: ENXIO
+	       SEEK_HOLE: seek to offset */
+	    if (whence == SEEK_DATA)
+	      {
+		set_errno (ENXIO);
+		return -1;
+	      }
+	    fpi.CurrentByteOffset.QuadPart = offset;
+	  }
+	else if (out.FileOffset.QuadPart == offset)
+	  {
+	    /* offset within valid data range?  In that case, that region
+	       supposedly starts at offset, and the region length is corrected
+	       accordingly.  That's quite helpful.
+	       SEEK_DATA: seek to offset
+	       SEEK_HOLE: seek to end of range */
+	    fpi.CurrentByteOffset.QuadPart = offset;
+	    if (whence == SEEK_HOLE)
+	      fpi.CurrentByteOffset.QuadPart += out.Length.QuadPart;
+	  }
+	else
+	  {
+	    /* Is range beyond offset?
+	       SEEK_DATA: seek to start of range
+	       SEEK_HOLE: seek to offset */
+	    fpi.CurrentByteOffset.QuadPart = (whence == SEEK_DATA)
+					     ? out.FileOffset.QuadPart
+						 : offset;
+	  }
+      }
+      break;
+    default: /* Should never be reached */
+      set_errno (EINVAL);
+      return -1;
     }
 
   debug_printf ("setting file pointer to %U", fpi.CurrentByteOffset.QuadPart);
