@@ -187,6 +187,8 @@ fmal(long double x, long double y, long double z)
 	 * return values here are crucial in handling special cases involving
 	 * infinities, NaNs, overflows, and signed zeroes correctly.
 	 */
+        if (!isfinite(z) && isfinite(x) && isfinite(y))
+                return z + z;
 	if (!isfinite(x) || !isfinite(y) || !isfinite(z))
 		return (x * y + z);
 	if (x == 0.0L || y == 0.0L)
