@@ -48,7 +48,7 @@ frexpl(long double x, int *ex)
 		}
 		break;
 	case 0x7fff:	/* infinity or NaN; value of *ex is unspecified */
-		break;
+                return x + x;
 	default:	/* normal */
 		*ex = u.bits.exp - 0x3ffe;
 		u.bits.exp = 0x3ffe;
