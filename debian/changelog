@@ -1,3 +1,11 @@
+picolibc (1.8.3-1) unstable; urgency=medium
+
+  * New upstream
+
+  * Bugs fixed using -fanalyzer and more CI targets
+
+ -- Keith Packard <keithp@keithp.com>  Thu, 10 Aug 2023 13:58:00 -0700
+
 picolibc (1.8.2-2) unstable; urgency=medium
 
   * Adjust compile flags for riscv autopkgtest. Closes: #1037961.
