@@ -18,6 +18,9 @@ jobs:
           pkgarch: 64
     name: Fedora cross ${{ matrix.target }}
 
+    env:
+      HAS_SSH_KEY: ${{ secrets.SSH_KEY != '' }}
+
     steps:
     - uses: actions/checkout@v3
 
@@ -40,7 +43,7 @@ jobs:
     # install doc tools
     - name: Install doc tools
       run: |
-        dnf install -y dblatex docbook2X docbook-xsl xmlto python3 python3-lxml python3-ply
+        dnf install -y dblatex docbook2X docbook-xsl xmlto python3 python3-lxml python3-ply openssh-clients
         fmtutil-sys --byfmt pdflatex && texhash
 
     # build
@@ -53,6 +56,23 @@ jobs:
         make -C build/*/newlib info man
         make -C build install
         make -C build/*/newlib install-info install-man
+
+    # deploy documentation preview
+    - name: Deploy documentation preview
+      env:
+        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+      run: |
+        # unfuck github fuckery of HOME in a container
+        unset HOME
+        # add the hosts public key to known_hosts
+        mkdir -p ~/.ssh/
+        echo "cygwin.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKoejTnTCbXaIIMYfbX7t4tYUOQ2bTxZC3e/td3BageF" >> ~/.ssh/known_hosts
+        # load the key (restricted to scp only) into ssh-agent
+        ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+        ssh-add - <<< "${{ secrets.SSH_KEY }}"
+        # 'make install' doesn't install faq, so instead just deploy from build directory
+        scp -pr build/*/winsup/doc/{cygwin-api,cygwin-ug-net,faq} cygwin-admin@cygwin.com:/sourceware/www/sourceware/htdocs/cygwin/doc/preview/
+      if: env.HAS_SSH_KEY == 'true' && github.ref == 'refs/heads/main'
 
   windows-build:
     runs-on: windows-latest
