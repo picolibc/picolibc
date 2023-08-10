@@ -110,6 +110,9 @@ AWK_UNIQUE_OBJS = $(AWK) '{ \
     print objs[i]; \
 }'
 
+# Recursive Wildcard function
+rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2)$(filter $(subst *,%,$2),$d))
+
 # The functions ldexp, frexp and modf are traditionally supplied in
 # both libc.a and libm.a.  We build them in libm.a and copy them over,
 # along with some required supporting routines.
@@ -236,13 +239,11 @@ stmp-targ-include: config.status
 	$(AM_V_at)s=machine/$(machine_dir)/sys d=sys $(TARG_INCLUDE_CP_DIR)
 	$(AM_V_at)s=machine/$(machine_dir)/include d= $(TARG_INCLUDE_CP_DIR)
 	$(AM_V_at)s=sys/$(sys_dir)/include d= $(TARG_INCLUDE_CP_DIR)
-	$(AM_V_at)for i in $(srcdir)/libc/sys/$(sys_dir)/include/*/; do \
-	    if [ -d $$i ]; then \
-		d=`basename $$i`; \
-		$(MKDIR_P) targ-include/$$d; \
-		s=sys/${sys_dir}/include/$$d $(TARG_INCLUDE_CP_DIR) || exit $$?; \
-	    fi \
-	  done
+	$(AM_V_at)for i in $(call rwildcard,$(srcdir)/libc/sys/$(sys_dir)/include/,*.h); do \
+	  f=`echo $$i | sed s:$(srcdir)/libc/sys/$(sys_dir)/include/::`; \
+	  $(MKDIR_P) targ-include/`dirname $$f`; \
+	  cp $$i targ-include/$$f; \
+	done
 	$(AM_V_at)s=sys/$(sys_dir)/sys d=sys $(TARG_INCLUDE_CP_DIR)
 	$(AM_V_at)s=sys/$(sys_dir)/bits d=bits $(TARG_INCLUDE_CP_DIR)
 	$(AM_V_at)s=sys/$(sys_dir)/machine d=machine $(TARG_INCLUDE_CP_DIR)
@@ -332,18 +333,10 @@ install-data-local: install-toollibLIBRARIES install-multi $(INSTALL_DATA_LOCAL)
 	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/machine/`basename $$i`; \
 	    else true; fi ; \
 	  done ; \
-	  for i in $(srcdir)/libc/sys/$(sys_dir)/include/*.h; do \
-	    if [ -f $$i ]; then \
-	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/`basename $$i`; \
-	    else true; fi ; \
-	  done ; \
-	  for i in $(srcdir)/libc/sys/$(sys_dir)/include/*; do \
-	    if [ -d $$i ]; then \
-	    $(MKDIR_P) $(DESTDIR)$(tooldir)/include/`basename $$i`; \
-		for j in $$i/*.h; do \
-	            $(INSTALL_DATA) $$j $(DESTDIR)$(tooldir)/include/`basename $$i`/`basename $$j`; \
-		done ; \
-	    else true; fi ; \
+	  for i in $(call rwildcard,$(srcdir)/libc/sys/$(sys_dir)/include/,*.h); do \
+	    f=`echo $$i | sed s:$(srcdir)/libc/sys/$(sys_dir)/include/::`; \
+	    $(MKDIR_P) $(DESTDIR)$(tooldir)/`dirname $$f`; \
+	    $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/`dirname $$f`; \
 	  done ; \
 	  for i in $(srcdir)/libc/sys/$(sys_dir)/machine/$(machine_dir)/include/*.h; do \
 	    if [ -f $$i ]; then \
