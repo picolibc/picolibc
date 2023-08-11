@@ -3,11 +3,13 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['nios2-zephyr-elf-gcc', '-nostdlib']
+c = ['nios2-zephyr-elf-gcc', '-nostdlib', '-fno-pic', '-fno-pie', '--param=min-pagesize=0', '-mgpopt=global']
 ar = 'nios2-zephyr-elf-ar'
 as = 'nios2-zephyr-elf-as'
 nm = 'nios2-zephyr-elf-nm'
 strip = 'nios2-zephyr-elf-strip'
+# only needed to run tests
+exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-nios2 "$@"', 'run-nios2']
 
 [host_machine]
 system = 'zephyr'
@@ -17,3 +19,7 @@ endian = 'little'
 
 [properties]
 skip_sanity_check = true
+default_flash_addr = '0xc8000000'
+default_flash_size = '0x04000000'
+default_ram_addr   = '0xcc000000'
+default_ram_size   = '0x04000000'

@@ -45,6 +45,7 @@
 
 #define OVERALIGN_DATA  128
 #define OVERALIGN_BSS   256
+#define OVERALIGN_NON_TLS_BSS   512
 
 #define TLS_ALIGN      (OVERALIGN_DATA > OVERALIGN_BSS ? OVERALIGN_DATA : OVERALIGN_BSS)
 
@@ -52,6 +53,7 @@ NEWLIB_THREAD_LOCAL volatile int data_var = DATA_VAL;
 NEWLIB_THREAD_LOCAL volatile int bss_var;
 _Alignas(OVERALIGN_DATA) NEWLIB_THREAD_LOCAL volatile int overaligned_data_var = DATA_VAL2;
 _Alignas(OVERALIGN_BSS) NEWLIB_THREAD_LOCAL volatile int overaligned_bss_var;
+_Alignas(OVERALIGN_NON_TLS_BSS) volatile int overaligned_non_tls_bss_var;
 
 volatile int *volatile data_addr;
 volatile int *volatile overaligned_data_addr;
@@ -115,6 +117,11 @@ check_tls(char *where, bool check_addr, void *tls_region)
                        &overaligned_bss_var, (unsigned long) OVERALIGN_BSS);
                 result++;
         }
+	if (!__is_aligned((uintptr_t)&overaligned_non_tls_bss_var, OVERALIGN_NON_TLS_BSS)) {
+                printf("overaligned_non_tls_bss_var (%p) is not %ld aligned\n",
+                       &overaligned_non_tls_bss_var, (unsigned long) OVERALIGN_NON_TLS_BSS);
+                result++;
+        }
 	if (data_var != DATA_VAL) {
 		printf("%s: initialized thread var has wrong value (0x%x instead of 0x%x)\n",
 		       where, data_var, DATA_VAL);
@@ -134,6 +141,11 @@ check_tls(char *where, bool check_addr, void *tls_region)
         if (overaligned_bss_var != 0) {
 		printf("%s: overaligned uninitialized thread var has wrong value (0x%x instead of 0x%x)\n",
 		       where, overaligned_bss_var, 0);
+		result++;
+        }
+	if (overaligned_non_tls_bss_var != 0) {
+		printf("%s: overaligned uninitialized var has wrong value (0x%x instead of 0x%x)\n",
+		       where, overaligned_non_tls_bss_var, 0);
 		result++;
         }
 
@@ -196,9 +208,21 @@ check_tls(char *where, bool check_addr, void *tls_region)
 	check_inside_tls_region(&bss_var, tls_region);
 	check_inside_tls_region(&overaligned_bss_var, tls_region);
 
-        if (__non_tls_bss_start < __tdata_start + _tls_size() || __tdata_start + _tls_size() + 64 < __non_tls_bss_start) {
-                printf("non-TLS bss data doesn't start after TLS data (is %p should be %p)\n",
-                       __non_tls_bss_start, __tdata_start + _tls_size());
+        char *tdata_end = __tdata_start + _tls_size();
+        /*
+         * We allow for up to OVERALIGN_NON_TLS_BSS -1 bytes of padding after
+         * the end of .tbss and the start of aligned .bss since in theory the
+         * linker could fill this space with smaller .bss variables before the
+         * overaligned value that we define in this file.
+         */
+        char *non_tls_bss_start_latest = __align_up(
+            tdata_end + OVERALIGN_NON_TLS_BSS, OVERALIGN_NON_TLS_BSS);
+        if (__non_tls_bss_start < tdata_end ||
+            __non_tls_bss_start > non_tls_bss_start_latest) {
+                printf("non-TLS bss data doesn't start shortly after TLS data "
+                       "(is %p should be between %p and %p)\n",
+                       __non_tls_bss_start, tdata_end,
+                       non_tls_bss_start_latest);
                 result++;
         }
 #endif
@@ -266,23 +290,28 @@ main(void)
         size_t tls_size = _tls_size();
 	void *tls = aligned_alloc(tls_align, tls_size);
 
-        /*
-         * Fill the region with data to make sure even bss
-         * gets correctly initialized
-         */
-        memset(tls, 0x55, tls_size);
+        if (tls) {
+            /*
+             * Fill the region with data to make sure even bss
+             * gets correctly initialized
+             */
+            memset(tls, 0x55, tls_size);
 
-	_init_tls(tls);
-	_set_tls(tls);
+            _init_tls(tls);
+            _set_tls(tls);
 
-	if (memcmp(tls, &__tdata_source, tdata_size) != 0) {
+            if (memcmp(tls, &__tdata_source, tdata_size) != 0) {
 		printf("New TLS data in RAM does not match ROM\n");
 		hexdump(&__tdata_source, tdata_source_size, "ROM:");
 		hexdump(tls, tdata_size, "RAM:");
 		result++;
-	}
+            }
 
-	result += check_tls("allocated", true, tls);
+            result += check_tls("allocated", true, tls);
+        } else {
+            printf("TLS allocation failed\n");
+            result = 1;
+        }
 #endif
 
 	printf("tls test result %d\n", result);

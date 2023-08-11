@@ -24,4 +24,4 @@ set(FORMAT_DEFAULT_DOUBLE 1)
 set(FORMAT_DEFAULT_FLOAT 0)
 set(FORMAT_DEFAULT_INTEGER 0)
 
-set(PICOLIBC_LINK_FLAGS -nostartfiles -T ${CMAKE_CURRENT_SOURCE_DIR}/cmake/TC-arm-none-eabi.ld -lgcc)
+set(PICOLIBC_LINK_FLAGS -nostartfiles -T ${CMAKE_CURRENT_SOURCE_DIR}/cmake/TC-microbit.ld -lgcc)

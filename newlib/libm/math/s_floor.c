@@ -104,7 +104,7 @@ floor64(__float64 x)
                 i0 += 1;
             else {
                 j = i1 + (1 << (52 - j0));
-                if (j < i1)
+                if ((__uint32_t) j < (__uint32_t) i1)
                     i0 += 1; /* got a carry */
                 i1 = j;
             }

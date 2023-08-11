@@ -71,11 +71,9 @@ QUICKREF
 double complex
 ccosh(double complex z)
 {
-	double complex w;
 	double x, y;
 
 	x = creal(z);
 	y = cimag(z);
-	w = cosh(x) * cos(y) + (sinh(x) * sin(y)) * (double complex) I;
-	return w;
+	return cosh(x) * cos(y) * (double complex) 1.0 + (sinh(x) * sin(y)) * (double complex) I;
 }

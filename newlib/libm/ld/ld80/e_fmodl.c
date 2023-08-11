@@ -60,7 +60,7 @@ fmodl(long double x, long double y)
 	uy.e = y;
 	sx = ux.bits.ext_sign;
 
-        if (isnanl(x) || isnanl(y))
+        if (isnanl_inline(x) || isnanl_inline(y))
             return x + y;
 
         if (isinfl(x))

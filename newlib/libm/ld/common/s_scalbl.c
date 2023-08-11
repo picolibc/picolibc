@@ -31,7 +31,7 @@
 long double
 scalbl (long double x, long double fn)
 {
-    if (isnanl(fn) || isnanl(x))
+    if (isnanl_inline(fn) || isnanl_inline(x))
         return x + fn;
 
     if (isinf(fn)) {

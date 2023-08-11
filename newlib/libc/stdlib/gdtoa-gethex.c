@@ -212,7 +212,7 @@ gethex (const char **sp, const FPI *fpi,
 		switch(*++s) {
 		  case '-':
 			esign = 1;
-			FALLTHROUGH;
+			__PICOLIBC_FALLTHROUGH;
 		  case '+':
 			s++;
 		  }

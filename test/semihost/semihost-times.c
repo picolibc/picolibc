@@ -50,7 +50,7 @@ main(void)
         double          seconds;
         long            ticks_per_second;
 
-        begin = times(&begin_tms);
+        begin = end = times(&begin_tms);
         y = 0.0;
         for (x = -100; x < 100; x += 0.001) {
                 y += sin(x)*sin(x) + cos(x)*cos(x);

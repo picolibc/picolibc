@@ -204,7 +204,7 @@ int
 __bufio_setvbuf(FILE *f, char *buf, int mode, size_t size)
 {
 	struct __file_bufio *bf = (struct __file_bufio *) f;
-        int ret = 0;
+        int ret = -1;
 
 	__bufio_lock(f);
         bf->bflags &= ~__BLBF;
@@ -219,36 +219,31 @@ __bufio_setvbuf(FILE *f, char *buf, int mode, size_t size)
         case _IOFBF:
                 break;
         default:
-                ret = -1;
                 goto bail;
         }
         if (bf->bflags & __BALL) {
-                /*
-                 * Handling allocation failures here is a bit tricky;
-                 * we don't want to lose the existing buffer. Instead,
-                 * we try to reallocate it
-                 */
-                if (!buf) {
+                if (buf) {
+                        free(bf->buf);
+                        bf->bflags &= ~__BALL;
+                } else {
+                        /*
+                         * Handling allocation failures here is a bit tricky;
+                         * we don't want to lose the existing buffer. Instead,
+                         * we try to reallocate it
+                         */
                         buf = realloc(bf->buf, size);
                         if (!buf)
-                                ret = -1;
-                        else
-                                bf->size = size;
-                        goto bail;
+                                goto bail;
                 }
-                free(bf->buf);
-                bf->bflags &= ~__BALL;
-        }
-        if (!buf) {
+        } else if (!buf) {
                 buf = malloc(size);
-                if (!buf) {
-                        ret = -1;
+                if (!buf)
                         goto bail;
-                }
                 bf->bflags |= __BALL;
         }
         bf->buf = buf;
         bf->size = size;
+        ret = 0;
 bail:
         __bufio_unlock(f);
         return ret;

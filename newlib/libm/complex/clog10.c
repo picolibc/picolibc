@@ -37,12 +37,10 @@ PORTABILITY
 double complex
 clog10(double complex z)
 {
-	double complex w;
 	double p, rr;
 
 	rr = cabs(z);
 	p = log10(rr);
 	rr = atan2(cimag(z), creal(z)) * M_IVLN10;
-	w = p + rr * (double complex) I;
-	return w;
+	return (double complex) p + rr * (double complex) I;
 }

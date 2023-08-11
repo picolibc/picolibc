@@ -39,6 +39,7 @@ srcs_misc = [
     'init.c',
     'lock.c',
     'unctrl.c',
+    'ubsan.c',
 ]
 
 srcs_misc_use = []

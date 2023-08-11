@@ -40,7 +40,7 @@
 
 #define NUM_TEST	1024
 
-struct _test {
+const struct _test {
 	struct tm	tm;
 	time_t		time;
 } tests[NUM_TEST] = {
@@ -117,8 +117,10 @@ int main(void)
 			ret++;
 		}
 
+                struct tm tmp = tests[i].tm;
+
 		/* timegm */
-		time = timegm(&tests[i].tm);
+		time = timegm(&tmp);
 		if (time != tests[i].time) {
 			printf("time: got %ld want %ld\n", (long) time, (long) tests[i].time);
 			ret++;

@@ -31,7 +31,16 @@
 #ifndef	_SYS_FENV_H_
 #define	_SYS_FENV_H_
 
-#include <sys/_types.h>
+#include <sys/cdefs.h>
+
+#ifdef __mips_soft_float
+typedef int fenv_t;
+typedef int fexcept_t;
+#else
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifndef	__fenv_static
 #define	__fenv_static	static
@@ -84,5 +93,11 @@ extern fenv_t		_fe_dfl_env;
 #define	__cfc1(__fcsr)	__asm __volatile("cfc1 %0, $31" : "=r" (__fcsr))
 #define	__ctc1(__fcsr)	__asm __volatile("ctc1 %0, $31" :: "r" (__fcsr))
 #endif
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* !_SOFT_FLOAT */
 
 #endif	/* !_FENV_H_ */

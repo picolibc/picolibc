@@ -36,7 +36,7 @@ nextafterl(long double x, long double y)
 	if(x==y) return y;		/* x=y, return y */
 	if((ix|lx)==0) {			/* x == 0 */
 	    SET_LDOUBLE_WORDS64(x,hy&0x8000000000000000ULL,1);/* return +-minsubnormal */
-            force_eval_long_double(x*x);
+            force_eval_long_double(opt_barrier_long_double(x)*x);
             return x;
 	}
 	if(hx>=0) {			/* x > 0 */

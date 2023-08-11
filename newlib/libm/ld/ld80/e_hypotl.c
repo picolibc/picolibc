@@ -65,10 +65,10 @@ hypotl(long double x, long double y)
 	       w = a+b;			/* for sNaN */
 	       GET_LDOUBLE_WORDS(es,high,low,a);
                (void) es;
-	       if(((high&0x7fffffff)|low)==0 && !issignalingl(b))
+	       if(((high&0x7fffffff)|low)==0 && !issignalingl_inline(b))
                    w = a;
 	       GET_LDOUBLE_WORDS(es,high,low,b);
-	       if(((eb^0x7fff)|(high&0x7fffffff)|low)==0 && !issignalingl(a))
+	       if(((eb^0x7fff)|(high&0x7fffffff)|low)==0 && !issignalingl_inline(a))
                    w = b;
 	       return w;
 	   }

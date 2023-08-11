@@ -35,9 +35,6 @@
 
 picolibc_sources(
   fenv.c
-  )
-
-picolibc_sources_fake(
   feclearexcept.c
   fedisableexcept.c
   feenableexcept.c

@@ -34,21 +34,26 @@ scripts.
 
 ## Supported Architectures
 
-Picolibc inherited code for a *lot* of architectures from Newlib, but
-at this point only has code to build for the following targets:
+Picolibc has integrated testing support for many architectures which
+is used to validate the code for all patch integration:
 
  * ARC (32- and 64- bit)
  * ARM (32- and 64- bit)
  * i386 (Native and Linux hosted, for testing)
- * Microblaze (32-bit, big and little endian)
  * Motorola 68000 (m68k)
  * MIPS
- * MSP430
  * Nios II
- * PowerPC (big and little endian)
+ * Power9
  * RISC-V (both 32- and 64- bit)
- * Sparc64
  * x86_64 (Native and Linux hosted, for testing)
+
+There is also build infrastructure and continuous build validation,
+but no integrated testing available for additional architectures:
+
+ * Microblaze (32-bit, big and little endian)
+ * MSP430
+ * PowerPC (big and little endian)
+ * Sparc64
  * Xtensa (ESP8266, ESP32)
 
 Supporting architectures that already have Newlib code requires:
@@ -68,8 +73,8 @@ Supporting architectures that already have Newlib code requires:
  3. newlib/libm/machine/_architecture_/meson.build to build any
     architecture-specific libm bits
 
- 4. picocrt/machine/_architecture_ source code and build bits if you
-    need custom startup code for the architecture. Useful in all
+ 4. picocrt/machine/_architecture_ source code and build bits
+    for startup code needed for the architecture. Useful in all
     cases, but this is necessary to run tests under qemu if your
     platform can do that.
 
@@ -136,6 +141,49 @@ use Picolibc:
  * [Copyright and license information](COPYING.picolibc)
 
 ## Releases
+
+### Picolibc version 1.8.3
+
+ * Fix bugs in floor and ceil implementations.
+
+ * Use -fanalyzer to find and fix a range of issues.
+
+ * Add __ubsan_handle_out_of_bounds implementation. This enables
+   building applications with -fsanitize=bounds and
+   -fno-sanitize-undefined-trap-on-error.
+
+ * Validate exception configuration on targets with mixed exception
+   support where some types have exceptions and others don't. Right
+   now, that's only arm platforms where any soft float implementations
+   don't build with exception support.
+
+ * Fix bugs in nexttowards/nextafter on clang caused by the compiler
+   re-ordering code and causing incorrect exception generation.
+
+ * Use the small/slow string code when -fsanitize=address is used
+   while building the library. This avoids reading beyond the end of
+   strings and triggering faults.
+
+ * Handle soft float on x86 and sparc targets. That mostly required
+   disabling the hardware exception API, along with a few other minor
+   bug fixes.
+
+ * Add runtime support for arc, mips, nios2 and m68k. This enables CI
+   testing on these architectures using qemu.
+
+ * Fix 80-bit floating math library support for m68k targets.
+
+ * Fix arm testing infra to use various qemu models that expand
+   testing to all standard multi-lib configurations.
+
+ * Adjust floating exception stubs to return success when appropriate,
+   instead of always returning ENOSYS.
+
+ * Make sure sNaN raises FE_INVALID and is converted to qNaN in
+   truncl, frexpl and roundl
+
+ * Avoid NaN result from fmal caused by multiply overflow when
+   addend is infinity (-inf + inf results in NaN in that case).
 
 ### Picolibc version 1.8.2
 

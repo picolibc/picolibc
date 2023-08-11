@@ -27,9 +27,12 @@ truncf(float x)
     if (exp < 0)
         /* less than one, save sign bit */
         mask = 0x80000000;
-    else
+    else {
         /* otherwise, save sign, exponent and any useful bits */
+        if (exp >= 32)
+            exp = 31;
         mask = ~(0x007fffff >> exp);
+    }
 
     return _asfloat(ix & mask);
 }

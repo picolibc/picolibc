@@ -97,18 +97,6 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # define _LONG_DOUBLE_IS_32BITS
 #endif
 
-#if defined(__SIZEOF_LONG_DOUBLE__)
-#define _HAVE_LONG_DOUBLE
-#endif
-
-#if defined(__SIZEOF_DOUBLE__) && defined(__SIZEOF_LONG_DOUBLE__)
-# if __SIZEOF_DOUBLE__ == __SIZEOF_LONG_DOUBLE__
-#  define _LDBL_EQ_DBL
-# else
-#  undef _LDBL_EQ_DBL
-# endif
-#endif
-
 #if defined(__SIZEOF_FLOAT__) && defined(__SIZEOF_DOUBLE__)
 # if __SIZEOF_FLOAT__ == __SIZEOF_DOUBLE__
 #  define _DBL_EQ_FLT
@@ -216,6 +204,9 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 #if defined(__m68k__) || defined(__mc68000__)
 #define __IEEE_BIG_ENDIAN
+#ifdef __HAVE_68881__
+# define _SUPPORTS_ERREXCEPT
+#endif
 #endif
 
 #if defined(__mc68hc11__) || defined(__mc68hc12__) || defined(__mc68hc1x__)
@@ -259,7 +250,9 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 #ifdef __i386__
 #define __IEEE_LITTLE_ENDIAN
+#ifndef _SOFT_FLOAT
 # define _SUPPORTS_ERREXCEPT
+#endif
 #endif
 
 #ifdef __riscv
@@ -318,6 +311,13 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 #ifdef __TIC80__
 #define __IEEE_LITTLE_ENDIAN
+#endif
+
+#ifdef __mips__
+#define _IEEE_754_2008_SNAN 0
+#ifndef __mips_soft_float
+#define _SUPPORTS_ERREXCEPT
+#endif
 #endif
 
 #ifdef __MIPSEL__
@@ -488,7 +488,9 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 #ifdef __x86_64__
 #define __IEEE_LITTLE_ENDIAN
+#ifndef _SOFT_FLOAT
 # define _SUPPORTS_ERREXCEPT
+#endif
 #endif
 
 #ifdef __mep__

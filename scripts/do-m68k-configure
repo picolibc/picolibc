@@ -33,4 +33,4 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-exec "$(dirname "$0")"/do-configure m68k-linux-gnu -Dtests=true -Dfake-semihost=true "$@"
+exec "$(dirname "$0")"/do-configure m68k-linux-gnu -Dtests=true -Dposix-console=true -Dmultilib=false "$@"

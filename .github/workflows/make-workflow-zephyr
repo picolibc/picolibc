@@ -1,0 +1,13 @@
+#!/bin/bash
+
+cat head-zephyr
+
+for build in fortify-source minsize release; do
+    for arch in zephyr; do
+	echo "  $build-$arch:"
+	cat variants
+	cat targets-$arch
+	cat steps-head
+	cat steps-$build
+    done
+done

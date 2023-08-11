@@ -31,6 +31,11 @@
 
 #include <sys/cdefs.h>
 
+#ifdef _SOFT_FLOAT
+typedef int fenv_t;
+typedef int fexcept_t;
+#else
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -160,5 +165,7 @@ int fesetprec (int __prec);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* !_SOFT_FLOAT */
 
 #endif /* _FENV_H */

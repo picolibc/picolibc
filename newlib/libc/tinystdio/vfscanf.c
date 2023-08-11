@@ -99,7 +99,7 @@ scanf_ungetc(INT c, FILE *stream, int *lenp)
 static void
 putval (void *addr, int_scanf_t val, uint16_t flags)
 {
-    if (!(flags & FL_STAR)) {
+    if (addr) {
 	if (flags & FL_CHAR)
 	    *(char *)addr = val;
 #ifdef SCANF_LONGLONG
@@ -126,7 +126,7 @@ conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags, un
     switch (i) {
       case '-':
         flags |= FL_MINUS;
-	FALLTHROUGH;
+	__PICOLIBC_FALLTHROUGH;
       case '+':
         if (!--width || IS_EOF(i = scanf_getc(stream, lenp)))
 	    goto err;
@@ -657,7 +657,7 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 	          case 'p':
                       if (sizeof(void *) > sizeof(int))
                           flags |= FL_LONG;
-                      FALLTHROUGH;
+                      __PICOLIBC_FALLTHROUGH;
 		  case 'x':
 	          case 'X':
                     base = 16;
@@ -676,7 +676,7 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 
 	          case 'o':
                     base = 8;
-		    FALLTHROUGH;
+		    __PICOLIBC_FALLTHROUGH;
 		  case 'i':
 		  conv_int:
                     c = conv_int (stream, lenp, width, addr, flags, base);
@@ -698,14 +698,14 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 
 	          case 'o':
                     base = 8;
-		    FALLTHROUGH;
+		    __PICOLIBC_FALLTHROUGH;
 		  case 'i':
 		    goto conv_int;
 
                   case 'p':
                       if (sizeof(void *) > sizeof(int))
                           flags |= FL_LONG;
-                      FALLTHROUGH;
+                      __PICOLIBC_FALLTHROUGH;
 		  default:			/* p,x,X	*/
                     base = 16;
 		  conv_int:
@@ -722,13 +722,13 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 	    if (!(flags & FL_STAR)) nconvs += 1;
 	} /* else */
     } /* while */
-#ifdef PRINTF_POSITIONAL
+#ifdef SCANF_POSITIONAL
     va_end(ap);
 #endif
     return nconvs;
 
   eof:
-#ifdef PRINTF_POSITIONAL
+#ifdef SCANF_POSITIONAL
     va_end(ap);
 #endif
 #undef ap

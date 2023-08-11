@@ -36,6 +36,7 @@
 DIR="$(dirname "$0")"
 meson setup \
         --buildtype debug \
+	--fatal-meson-warnings \
         -Dtls-model=global-dynamic \
 	-Derrno-function=auto \
         -Dmultilib=false \
@@ -51,6 +52,7 @@ meson setup \
 	-Dspecsdir=none \
 	-Duse-stdlib=true \
 	-Dtests=true \
-	-Dc_args="-fsanitize=bounds -fsanitize-undefined-trap-on-error -Werror" \
+	-Dsanitize-bounds=true \
+	-Dwerror=true \
 	"$@" \
 	"$DIR"/..

@@ -105,14 +105,40 @@ do {								\
   (v) = sh_u.parts64.lsw;					\
 } while (0)
 
+#define	LDBL_NBIT	0
+#define LDBL_NBIT_INF   0
+#define	LDBL_IMPLICIT_NBIT
+#define	mask_nbit_l(u)	((void)0)
+#define LDBL_INF_NAN_EXP    32767
+#define LDBL_EXP_MASK           0x7fff
+#define LDBL_EXP_SIGN           0x8000
+
+#define	LDBL_MANH_SIZE	48
+#define	LDBL_MANL_SIZE	64
+
 static ALWAYS_INLINE int
-issignalingl(long double x)
+isnanl_inline(long double x)
 {
-    u_int64_t high;
-    if (!isnanl(x))
-        return 0;
+    u_int64_t high, low;
     GET_LDOUBLE_MSW64(high, x);
-    if (!IEEE_754_2008_SNAN)
+    /* Check exponent for all ones */
+    if (((high >> LDBL_MANH_SIZE) & LDBL_EXP_MASK) != LDBL_EXP_MASK)
+        return 0;
+    GET_LDOUBLE_LSW64(low, x);
+    /* Check for non-zero significand */
+    if (high << (64 - LDBL_MANH_SIZE) == 0 && low == 0)
+        return 0;
+    return 1;
+}
+
+static ALWAYS_INLINE int
+issignalingl_inline(long double x)
+{
+    if (!isnanl_inline(x))
+        return 0;
+    u_int64_t high;
+    GET_LDOUBLE_MSW64(high, x);
+    if (!_IEEE_754_2008_SNAN)
         return (high & 0x0000800000000000ULL) != 0;
     else
         return (high & 0x0000800000000000ULL) == 0;
@@ -158,16 +184,6 @@ union IEEEl2bits {
 #endif
 	} xbits;
 };
-
-#define	LDBL_NBIT	0
-#define	LDBL_IMPLICIT_NBIT
-#define	mask_nbit_l(u)	((void)0)
-#define LDBL_INF_NAN_EXP    32767
-#define LDBL_EXP_MASK           0x7fff
-#define LDBL_EXP_SIGN           0x8000
-
-#define	LDBL_MANH_SIZE	48
-#define	LDBL_MANL_SIZE	64
 
 #define	LDBL_TO_ARRAY32(u, a) do {			\
 	(a)[0] = (uint32_t)(u).bits.manl;		\
@@ -279,14 +295,50 @@ do {								\
   (d) = se_u.value;						\
 } while (0)
 
+#define	LDBL_NBIT	0x80000000
+#ifdef __m68k__
+#define LDBL_NBIT_INF   0
+#else
+#define LDBL_NBIT_INF   LDBL_NBIT
+#endif
+#define	mask_nbit_l(u)	((u).bits.manh &= ~LDBL_NBIT)
+#define LDBL_INF_NAN_EXP    32767
+#define LDBL_EXP_MASK           0x7fff
+#define LDBL_EXP_SIGN           0x8000
+
+#define	LDBL_MANH_SIZE	32
+#define	LDBL_MANL_SIZE	32
+
+#define	LDBL_TO_ARRAY32(u, a) do {			\
+	(a)[0] = (uint32_t)(u).bits.manl;		\
+	(a)[1] = (uint32_t)(u).bits.manh;		\
+} while (0)
+
 static ALWAYS_INLINE int
-issignalingl(long double x)
+isnanl_inline(long double x)
 {
-    u_int32_t high;
-    if (!isnanl(x))
+    u_int32_t exp, msw, lsw;
+    GET_LDOUBLE_WORDS(exp, msw, lsw, x);
+    /* Check exponent for all ones */
+    if ((exp & 0x7fff) != 0x7fff)
         return 0;
-    GET_LDOUBLE_MSW(high, x);
-    return (high & 0x40000000U) == 0;
+    /* Check for non-zero significand */
+    if (msw == LDBL_NBIT_INF && lsw == 0)
+        return 0;
+    return 1;
+}
+
+static ALWAYS_INLINE int
+issignalingl_inline(long double x)
+{
+    u_int32_t msw;
+    if (!isnanl_inline(x))
+        return 0;
+    GET_LDOUBLE_MSW(msw, x);
+    if (!_IEEE_754_2008_SNAN)
+        return (msw & 0x40000000U) != 0;
+    else
+        return (msw & 0x40000000U) == 0;
 }
 
 static ALWAYS_INLINE int
@@ -303,9 +355,9 @@ union IEEEl2bits {
 #if __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__
 		uint64_t	sign	:1;
 		uint64_t	exp	:15;
+		uint64_t	junk	:16;
 		uint64_t	manh	:32;
 		uint64_t	manl	:32;
-		uint64_t	junk	:16;
 #endif
 #if __FLOAT_WORD_ORDER__ == __ORDER_LITTLE_ENDIAN__
 		uint64_t	manl	:32;
@@ -318,8 +370,8 @@ union IEEEl2bits {
 	struct {
 #if __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__
 		uint64_t 	expsign	:16;
-		uint64_t        man	:64;
 		uint64_t	junk	:16;
+		uint64_t        man	:64;
 #endif
 #if __FLOAT_WORD_ORDER__ == __ORDER_LITTLE_ENDIAN__
 		uint64_t        man	:64;
@@ -328,20 +380,6 @@ union IEEEl2bits {
 #endif
 	} xbits;
 };
-
-#define	LDBL_NBIT	0x80000000
-#define	mask_nbit_l(u)	((u).bits.manh &= ~LDBL_NBIT)
-#define LDBL_INF_NAN_EXP    32767
-#define LDBL_EXP_MASK           0x7fff
-#define LDBL_EXP_SIGN           0x8000
-
-#define	LDBL_MANH_SIZE	32
-#define	LDBL_MANL_SIZE	32
-
-#define	LDBL_TO_ARRAY32(u, a) do {			\
-	(a)[0] = (uint32_t)(u).bits.manl;		\
-	(a)[1] = (uint32_t)(u).bits.manh;		\
-} while (0)
 
 #endif /* _INTEL80_FLOAT */
 
@@ -473,13 +511,27 @@ do {								\
 } while (0)
 
 static ALWAYS_INLINE int
-issignalingl(long double x)
+isnanl_inline(long double x)
 {
-    u_int64_t high;
-    if (!isnanl(x))
+    uint64_t high;
+    GET_LDOUBLE_MSW64(high, x);
+    /* Check exponent for all ones */
+    if (((high >> 52) & 0x7ff) != 0x7ff)
+        return 0;
+    /* Check for non-zero significand */
+    if (high << 12 == 0)
+        return 0;
+    return 1;
+}
+
+static ALWAYS_INLINE int
+issignalingl_inline(long double x)
+{
+    uint64_t high;
+    if (!isnanl_inline(x))
         return 0;
     GET_LDOUBLE_MSW64(high, x);
-    if (!IEEE_754_2008_SNAN)
+    if (!_IEEE_754_2008_SNAN)
         return (high & 0x0008000000000000ULL) != 0;
     else
         return (high & 0x0008000000000000ULL) == 0;
@@ -492,6 +544,18 @@ __signbitl(long double x)
     GET_LDOUBLE_EXP(exp, x);
     return exp < 0;
 }
+
+#ifdef __PPC__
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+/* the bitfields confuse the ppc compiler into thinking accessing
+ * manl will be 'out of bounds'
+ */
+#pragma GCC diagnostic ignored "-Wanalyzer-out-of-bounds"
+#define yup_all_good
+#endif
+#endif
 
 union IEEEl2bits {
 	long double	e;
@@ -534,6 +598,7 @@ union IEEEl2bits {
 };
 
 #define	LDBL_NBIT	        0
+#define LDBL_NBIT_INF           0
 #define	LDBL_IMPLICIT_NBIT
 #define	mask_nbit_l(u)	        ((void)0)
 #define LDBL_INF_NAN_EXP        2047

@@ -31,6 +31,7 @@
  */
 
 #define _DEFAULT_SOURCE
+#define __LINUX_ERRNO_EXTENSIONS__
 #include <sys/param.h>
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)hash.c	8.9 (Berkeley) 6/16/94";
@@ -862,9 +863,10 @@ __expand_table(HTAB *hashp)
 				return (-1);
 			hashp->DSIZE = dirsize << 1;
 		}
-		if ((hashp->dir[new_segnum] =
-		    (SEGMENT)calloc(hashp->SGSIZE, sizeof(SEGMENT))) == NULL)
+                SEGMENT seg = calloc(hashp->SGSIZE, sizeof(SEGMENT));
+		if (seg == NULL)
 			return (-1);
+                hashp->dir[new_segnum] = seg;
 		hashp->exsegs++;
 		hashp->nsegs++;
 	}
@@ -948,7 +950,8 @@ alloc_segs(HTAB *hashp, int nsegs)
 		errno = save_errno;
 		return (-1);
 	}
-	for (i = 0; i < nsegs; i++, hashp->nsegs++)
+        hashp->dir[0] = store;
+	for (i = 1; i < nsegs; i++, hashp->nsegs++)
 		hashp->dir[i] = &store[i << hashp->SSHIFT];
 	return (0);
 }

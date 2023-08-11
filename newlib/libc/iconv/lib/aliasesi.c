@@ -97,13 +97,14 @@ find_alias (
 {
   const char *end;
   const char *p;
-  int l = strlen (alias);
+  int l;
   const char *ptable = table;
   const char *table_end = table + len;
 
   if (table == NULL || alias == NULL || *table == '\0' || *alias == '\0')
     return NULL;
 
+  l = strlen (alias);
 search_again:
   if (len < l || (p = strnstr (ptable, alias, len)) == NULL)
     return NULL;

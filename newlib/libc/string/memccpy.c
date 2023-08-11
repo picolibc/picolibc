@@ -64,7 +64,8 @@ memccpy (void *__restrict dst0,
 	size_t len0)
 {
 
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__) || \
+    defined(PICOLIBC_NO_OUT_OF_BOUNDS_READS)
   void *ptr = NULL;
   char *dst = (char *) dst0;
   char *src = (char *) src0;

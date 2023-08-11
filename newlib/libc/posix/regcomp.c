@@ -205,8 +205,7 @@ regcomp(regex_t *__restrict preg, const char *__restrict pattern, int cflags)
 		len = strlen((char *)pattern);
 
 	/* do the mallocs early so failure handling is easy */
-	g = (struct re_guts *)malloc(sizeof(struct re_guts) +
-							(NC-1)*sizeof(cat_t));
+	g = (struct re_guts *)malloc(sizeof(struct re_guts));
 	if (g == NULL)
 		return(REG_ESPACE);
 	p->ssize = len/(size_t)2*(size_t)3 + (size_t)1;	/* ugh */
@@ -417,7 +416,7 @@ p_ere_exp(struct parse *p)
 		break;
 	case '{':		/* okay as ordinary except if digit follows */
 		(void)REQUIRE(!MORE() || !isdigit((uch)PEEK()), REG_BADRPT);
-		FALLTHROUGH;
+		__PICOLIBC_FALLTHROUGH;
 	default:
 		ordinary(p, c);
 		break;
@@ -617,7 +616,7 @@ p_simp_re(struct parse *p,
 		break;
 	case '*':
 		(void)REQUIRE(starordinary, REG_BADRPT);
-		FALLTHROUGH;
+		__PICOLIBC_FALLTHROUGH;
 	default:
 		ordinary(p, (char)c);
 		break;
@@ -696,6 +695,9 @@ p_bracket(struct parse *p)
 		return;
 	}
 
+	if (p->error != 0)	/* don't mess things up further */
+		return;
+
 	if (EAT('^'))
 		invert++;	/* make note to invert set at end */
 	if (EAT(']'))
@@ -707,9 +709,6 @@ p_bracket(struct parse *p)
 	if (EAT('-'))
 		CHadd(cs, '-');
 	(void)MUSTEAT(']', REG_EBRACK);
-
-	if (p->error != 0)	/* don't mess things up further */
-		return;
 
 	if (p->g->cflags&REG_ICASE) {
 		int i;
@@ -1148,6 +1147,10 @@ seterr(struct parse *p, int e)
 {
 	if (p->error == 0)	/* keep earliest error condition */
 		p->error = e;
+        free(p->g->sets);
+        free(p->g->setbits);
+        p->g->sets = NULL;
+        p->g->setbits = NULL;
 	p->next = nuls;		/* try to bring things to a halt */
 	p->end = nuls;
 	return(0);		/* make the return value well-defined */
@@ -1166,37 +1169,34 @@ allocset(struct parse *p)
 	cset *cs;
 	size_t css = (size_t)p->g->csetsize;
 	int i;
+        uch *setbits;
 
 	if (no >= p->ncsalloc) {	/* need another column of space */
 		p->ncsalloc += CHAR_BIT;
 		nc = p->ncsalloc;
 		assert(nc % CHAR_BIT == 0);
 		nbytes = nc / CHAR_BIT * css;
-		if (p->g->sets == NULL)
-			p->g->sets = (cset *)malloc(nc * sizeof(cset));
-		else
-			p->g->sets = (cset *)reallocf((char *)p->g->sets,
-							nc * sizeof(cset));
-		if (p->g->setbits == NULL)
-			p->g->setbits = (uch *)malloc(nbytes);
-		else {
-			p->g->setbits = (uch *)reallocf((char *)p->g->setbits,
-								nbytes);
-			/* xxx this isn't right if setbits is now NULL */
-			for (i = 0; i < no; i++)
-				p->g->sets[i].ptr = p->g->setbits + css*(i/CHAR_BIT);
-		}
-		if (p->g->sets != NULL && p->g->setbits != NULL)
-			(void) memset((char *)p->g->setbits + (nbytes - css),
-								0, css);
-		else {
-			no = 0;
+
+                cs = realloc(p->g->sets, nc * sizeof(cset));
+                if (!cs) {
 			SETERROR(REG_ESPACE);
-			/* caller's responsibility not to do set ops */
-		}
+                        return NULL;
+                }
+                p->g->sets = cs;
+
+                setbits = realloc(p->g->setbits, nbytes);
+                if (!setbits) {
+                        SETERROR(REG_ESPACE);
+                        return NULL;
+                }
+                p->g->setbits = setbits;
+
+                for (i = 0; i < no; i++)
+                        cs[i].ptr = setbits + css*(i/CHAR_BIT);
+
+                (void) memset(setbits + (nbytes - css), 0, css);
 	}
 
-	assert(p->g->sets != NULL);	/* xxx */
 	cs = &p->g->sets[no];
 	cs->ptr = p->g->setbits + css*((no)/CHAR_BIT);
 	cs->mask = 1 << ((no) % CHAR_BIT);
@@ -1668,7 +1668,7 @@ findmust(struct parse *p, struct re_guts *g)
 					return;
 				}
 			} while (OP(s) != O_QUEST && OP(s) != O_CH);
-			FALLTHROUGH;
+			__PICOLIBC_FALLTHROUGH;
 		case OBOW:		/* things that break a sequence */
 		case OEOW:
 		case OBOL:
@@ -1750,7 +1750,7 @@ findmust(struct parse *p, struct re_guts *g)
 		}
 	} while (OP(s) != OEND);
 
-	if (g->mlen == 0) {		/* there isn't one */
+	if (g->mlen == 0 || !start) {		/* there isn't one */
 		g->moffset = -1;
 		return;
 	}
@@ -1823,7 +1823,7 @@ altoffset(sop *scan, int offset, int mccs)
 		case OANYOF:
 			if (mccs)
 				return -1;
-                        FALLTHROUGH;
+                        __PICOLIBC_FALLTHROUGH;
 		case OCHAR:
 		case OANY:
 			try++;
@@ -1869,16 +1869,14 @@ computejumps(struct parse *p, struct re_guts *g)
 	if (p->error != 0)
 		return;
 
-	g->charjump = (int*) malloc((NC + 1) * sizeof(int));
+	g->charjump = (int*) malloc(NC * sizeof(int));
 	if (g->charjump == NULL)	/* Not a fatal error */
 		return;
-	/* Adjust for signed chars, if necessary */
-	g->charjump = &g->charjump[-(CHAR_MIN)];
 
 	/* If the character does not exist in the pattern, the jump
 	 * is equal to the number of characters in the pattern.
 	 */
-	for (ch = CHAR_MIN; ch < (CHAR_MAX + 1); ch++)
+	for (ch = 0; ch < NC; ch++)
 		g->charjump[ch] = g->mlen;
 
 	/* If the character does exist, compute the jump that would
@@ -1918,15 +1916,17 @@ computematchjumps(struct parse *p, struct re_guts *g)
 	if (p->error != 0)
 		return;
 
-	pmatches = (int*) malloc(g->mlen * sizeof(unsigned int));
+	pmatches = (int*) calloc(g->mlen + 1, sizeof(unsigned int));
 	if (pmatches == NULL) {
 		g->matchjump = NULL;
 		return;
 	}
 
-	g->matchjump = (int*) malloc(g->mlen * sizeof(unsigned int));
-	if (g->matchjump == NULL)	/* Not a fatal error */
+	g->matchjump = (int*) calloc(g->mlen, sizeof(unsigned int));
+	if (g->matchjump == NULL) {	/* Not a fatal error */
+                free(pmatches);
 		return;
+        }
 
 	/* Set maximum possible jump for each character in the pattern */
 	for (mindex = 0; mindex < g->mlen; mindex++)

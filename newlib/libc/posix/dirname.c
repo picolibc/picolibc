@@ -8,6 +8,15 @@
 #include <libgen.h>
 #include <string.h>
 
+#if __GNUC__ == 12 && __GNUC_MINOR__ >= 2 && __OPTIMIZE_SIZE__
+/*
+ * GCC 12.x has a bug in -Os mode on (at least) arm v8.1-m which
+ * mis-compiles this function. Work around that by switching
+ * optimization mode
+ */
+#pragma GCC optimize("O2")
+#endif
+
 char *
 dirname (char *path)
 {

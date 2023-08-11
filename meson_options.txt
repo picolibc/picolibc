@@ -83,6 +83,12 @@ option('picoexit', type: 'boolean', value: true,
 option('fortify-source', type: 'combo', choices: ['none', '1', '2'], value: 'none',
        description: 'Set _FORTIFY_SOURCE=<value>')
 
+option('sanitize-bounds', type: 'boolean', value: false,
+       description: 'Build the library with -fsanitize=bounds')
+
+option('sanitize-trap-on-error', type: 'boolean', value: false,
+       description: 'Build the library with -fsanitize-undefined-trap-on-error')
+
 option('use-stdlib', type: 'boolean', value: false,
        description: 'Do not bypass the standard system library with -nostdlib (useful for native testing)')
 
@@ -91,6 +97,9 @@ option('profile', type: 'boolean', value: false,
 
 option('freestanding', type: 'boolean', value: false,
        description: 'Build the library with -ffreestanding (useful for Zephyr testing)')
+
+option('analyzer', type: 'boolean', value: false,
+       description: 'Enable the analyzer while compiling with -fanalyzer')
 
 #
 # Testing options
@@ -105,6 +114,8 @@ option('tests-enable-full-malloc-stress', type: 'boolean', value: false,
        description: 'tests enable stress test for full malloc')
 option('tests-enable-posix-io', type: 'boolean', value: true,
        description: 'tests enable posix-io when available')
+option('test-long-double', type: 'boolean', value: true,
+       description: 'Enable long double tests on targets with long double type')
 
 option('tinystdio', type: 'boolean', value: true,
        description: 'Use tiny stdio from avr libc')

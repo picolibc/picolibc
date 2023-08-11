@@ -344,4 +344,17 @@ SUCH DAMAGE.
 #define _HAVE_LONG_DOUBLE_MATH
 #endif
 
+/*
+ * When the address sanitizer is enabled, we must prevent the library
+ * from even reading beyond the end of input data. This happens in
+ * many optimized string functions.
+ */
+#ifdef __has_feature
+#if __has_feature(address_sanitizer)
+#define PICOLIBC_NO_OUT_OF_BOUNDS_READS
+#endif
+#elif defined(__SANITIZE_ADDRESS__)
+#define PICOLIBC_NO_OUT_OF_BOUNDS_READS
+#endif
+
 #endif /* __SYS_CONFIG_H__ */

@@ -77,6 +77,13 @@ struct _bufhead {
 
 typedef BUFHEAD **SEGMENT;
 
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+/* 'bsize' is used directly with malloc/realloc which confuses -fanalyzer */
+#pragma GCC diagnostic ignored "-Wanalyzer-allocation-size"
+#endif
+
 /* Hash Table Information */
 typedef struct hashhdr {		/* Disk resident portion */
 	int32_t		magic;		/* Magic NO for hash tables */

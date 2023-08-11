@@ -33,4 +33,5 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-exec "$(dirname "$0")"/do-configure nios2-zephyr-elf "$@"
+multilib_list='.,nomul,mulx'
+exec "$(dirname "$0")"/do-configure nios2-zephyr-elf -Dposix-console=true -Dtests=true -Dmultilib-list="$multilib_list" "$@"

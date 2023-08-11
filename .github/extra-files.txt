@@ -1,3 +1,0 @@
-https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.0-rc1/zephyr-sdk-0.16.0-rc1_linux-x86_64.tar.xz
-https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-LlCjWuAbzH/9.3.1.2/msp430-gcc-9.3.1.11_linux64.tar.bz2
-https://github.com/ZakKemble/avr-gcc-build/releases/download/v12.1.0-1/avr-gcc-12.1.0-x64-linux.tar.bz2

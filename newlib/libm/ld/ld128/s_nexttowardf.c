@@ -25,7 +25,7 @@ nexttowardf(float x, long double y)
 	iy = hy&0x7fffffffffffffffLL;	/* |y| */
 
 	if(ix>0x7f800000) {       /* x is nan */
-            force_eval_long_double(y+y);
+            force_eval_long_double(opt_barrier_long_double(y)+y);
             return x + x;
         }
         if((iy>=0x7fff000000000000LL)&&((iy-0x7fff000000000000LL)|ly)!=0) { /* y is nan */
@@ -34,7 +34,7 @@ nexttowardf(float x, long double y)
 	if((long double) x==y) return y;	/* x=y, return y */
 	if(ix==0) {				/* x == 0 */
 	    SET_FLOAT_WORD(x,(u_int32_t)((hy>>32)&0x80000000)|1);/* return +-minsub*/
-            force_eval_float(x*x);
+            force_eval_float(opt_barrier_float(x)*x);
 	    return x;
 	}
 	if(hx>=0) {				/* x > 0 */

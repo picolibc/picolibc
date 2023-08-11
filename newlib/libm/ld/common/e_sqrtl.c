@@ -82,11 +82,11 @@ sqrtl(long double x)
 
 	u.e = x;
 
-	/* If x = NaN, then sqrt(x) = NaN. */
+	/* If x = NaN, then sqrt(x) = qNaN. */
 	/* If x = Inf, then sqrt(x) = Inf. */
-	/* If x = -Inf, then sqrt(x) = NaN. */
+	/* If x = -Inf, then sqrt(x) = sNaN. */
 	if (u.bits.exp == LDBL_INF_NAN_EXP) {
-                if (x == -(long double)INFINITY)
+                if (u.bits.sign && u.bits.manh == LDBL_NBIT_INF && u.bits.manl == 0)
                         return __math_invalidl(x);
                 return x + x;
         }

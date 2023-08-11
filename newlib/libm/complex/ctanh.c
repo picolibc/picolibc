@@ -71,13 +71,10 @@ QUICKREF
 double complex
 ctanh(double complex z)
 {
-	double complex w;
 	double x, y, d;
 
 	x = creal(z);
 	y = cimag(z);
 	d = cosh(2.0 * x) + cos(2.0 * y);
-	w = sinh(2.0 * x) / d  +  (sin(2.0 * y) / d) * (double complex) I;
-
-	return w;
+	return (double complex) (sinh(2.0 * x) / d)  +  (sin(2.0 * y) / d) * (double complex) I;
 }

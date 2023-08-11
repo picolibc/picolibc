@@ -64,10 +64,10 @@ hypotl(long double x, long double y)
 	       u_int64_t low;
 	       w = a+b;			/* for sNaN */
 	       GET_LDOUBLE_LSW64(low,a);
-	       if(((ha&0xffffffffffffLL)|low)==0 && !issignalingl(b))
+	       if(((ha&0xffffffffffffLL)|low)==0 && !issignalingl_inline(b))
                    w = a;
 	       GET_LDOUBLE_LSW64(low,b);
-	       if(((hb^0x7fff000000000000LL)|low)==0 && !issignalingl(a))
+	       if(((hb^0x7fff000000000000LL)|low)==0 && !issignalingl_inline(a))
                    w = b;
 	       return w;
 	   }

@@ -310,7 +310,7 @@ _SVFSCANF (
 
 	case 'p':
 	  scan_data.flags |= POINTER;
-          FALLTHROUGH;
+          __PICOLIBC_FALLTHROUGH;
 	case 'x':
 	case 'X':
 	  scan_data.flags |= PFXOK;

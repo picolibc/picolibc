@@ -47,10 +47,10 @@ argz_create_sep (const char *string,
       num_strings++;
     }
 
+  free(old_running);
+
   if(!(*argz = (char *)malloc(*argz_len)))
     return ENOMEM;
-
-  free(old_running);
 
   running = strdup(string);
   old_running = running;

@@ -62,6 +62,9 @@ _BEGIN_STD_C
 #define	EXT_EXPBITS	15
 #define EXT_FRACHBITS	32
 #define	EXT_FRACLBITS	32
+#ifdef __IEEE_BIG_ENDIAN
+#define EXT_FRACGAP     16
+#endif
 #define __ieee_ext_field_type unsigned int
 
 #elif (LDBL_MANT_DIG == 113 || LDBL_MANT_DIG == 112) && LDBL_MAX_EXP == 16384
@@ -89,6 +92,7 @@ _BEGIN_STD_C
 
 typedef struct ieee_ext
 {
+#ifdef __IEEE_LITTLE_ENDIAN
   __ieee_ext_field_type	 ext_fracl : EXT_FRACLBITS;
 #ifdef EXT_FRACGAP
   __ieee_ext_field_type  ext_gap   : EXT_FRACGAP;
@@ -96,6 +100,16 @@ typedef struct ieee_ext
   __ieee_ext_field_type	 ext_frach : EXT_FRACHBITS;
   __ieee_ext_field_type	 ext_exp   : EXT_EXPBITS;
   __ieee_ext_field_type	 ext_sign  : 1;
+#endif
+#ifdef __IEEE_BIG_ENDIAN
+  __ieee_ext_field_type	 ext_sign  : 1;
+  __ieee_ext_field_type	 ext_exp   : EXT_EXPBITS;
+#ifdef EXT_FRACGAP
+  __ieee_ext_field_type  ext_gap   : EXT_FRACGAP;
+#endif
+  __ieee_ext_field_type	 ext_frach : EXT_FRACHBITS;
+  __ieee_ext_field_type	 ext_fracl : EXT_FRACLBITS;
+#endif
 } ieee_ext;
 
 typedef union ieee_ext_u

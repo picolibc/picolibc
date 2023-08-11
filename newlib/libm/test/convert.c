@@ -89,7 +89,7 @@ test_strtof (void)
   test_iok(tail - pd->string, pd->endscan & ENDSCAN_MASK);
 }
 
-#if defined(_HAVE_LONG_DOUBLE) && (__LDBL_MANT_DIG__ == 64 || defined(TINY_STDIO))
+#if defined(_TEST_LONG_DOUBLE) && (__LDBL_MANT_DIG__ == 64 || defined(TINY_STDIO))
 #define HAVE_STRTOLD
 #endif
 

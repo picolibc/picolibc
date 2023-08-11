@@ -69,13 +69,13 @@ function(picolibc_test test)
 
   target_link_libraries(${test} LINK_PUBLIC ${PICOLIBC_TEST_LINK_LIBRARIES})
 
-  target_compile_options(${test} PRIVATE "-fno-builtin" ${PICOLIBC_COMPILE_OPTIONS})
+  target_compile_options(${test} PRIVATE -fno-builtin ${PICOLIBC_COMPILE_OPTIONS} -D_TEST_LONG_DOUBLE)
 
   target_link_options(${test} PRIVATE ${TARGET_COMPILE_OPTIONS})
 
   add_test(
     NAME ${test}
-    COMMAND "${PICOLIBC_SCRIPTS}/run-thumbv7m" $<TARGET_FILE:${test}>
+    COMMAND "${PICOLIBC_SCRIPTS}/run-arm" $<TARGET_FILE:${test}>
     )
   set_tests_properties(${test} PROPERTIES SKIP_RETURN_CODE 77)
 endfunction()

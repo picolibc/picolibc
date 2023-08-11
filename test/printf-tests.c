@@ -38,6 +38,14 @@ static void failmsg(int serial, char *fmt, ...) {
     va_end(ap);
 }
 
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+/* 'bsize' is used directly with malloc/realloc which confuses -fanalyzer */
+#pragma GCC diagnostic ignored "-Wanalyzer-va-arg-type-mismatch"
+#pragma GCC diagnostic ignored "-Wanalyzer-va-list-exhausted"
+#endif
+
 static int test(int serial, char *expect, char *fmt, ...) {
     va_list ap;
     char *abuf = NULL;

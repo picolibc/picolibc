@@ -23,34 +23,54 @@
 #include "stdio_private.h"
 
 /*
- * Return the (stdio) flags for a given mode.  Store the flags
- * to be passed to an open() syscall through *optr.
+ * In POSIX_IO mode, this is called __posix_sflags and __stdio_sflags
+ * is a static inline on top of this. Otherwise, this is called
+ * __stdio_sflags.
+ *
+ * Return the (stdio) flags for a given mode. When POSIX_IO is
+ * available, also store the flags to be passed to an open() syscall
+ * through *optr.
+ *
  * Return 0 on error.
  */
 
+#ifdef POSIX_IO
 int
 __posix_sflags (const char *mode, int *optr)
+#else
+int
+__stdio_sflags (const char *mode) 
+#endif
 {
-  int ret, m, o;
+  int ret;
+#ifdef POSIX_IO
+  int m, o;
+#endif
 
   switch (mode[0])
     {
     case 'r':			/* open for reading */
       ret = __SRD;
+#ifdef POSIX_IO
       m = O_RDONLY;
       o = 0;
+#endif
       break;
 
     case 'w':			/* open for writing */
       ret = __SWR;
+#ifdef POSIX_IO
       m = O_WRONLY;
       o = O_CREAT | O_TRUNC;
+#endif
       break;
 
     case 'a':			/* open for appending */
       ret = __SWR;
+#ifdef POSIX_IO
       m = O_WRONLY;
       o = O_CREAT | O_APPEND;
+#endif
       break;
     default:			/* illegal mode */
       errno = EINVAL;
@@ -62,12 +82,16 @@ __posix_sflags (const char *mode, int *optr)
 	{
 	case '+':
 	  ret |= (__SRD | __SWR);
+#ifdef POSIX_IO
 	  m = (m & ~O_ACCMODE) | O_RDWR;
+#endif
 	  break;
 	default:
 	  break;
 	}
     }
+#ifdef POSIX_IO
   *optr = m | o;
+#endif
   return ret;
 }

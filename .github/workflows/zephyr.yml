@@ -1,0 +1,198 @@
+name: Zephyr
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  IMAGE_FILE: dockerimg-zephyr.tar.xz
+  IMAGE: picolibc
+  PACKAGES_FILE: picolibc/.github/zephyr-packages.txt
+  EXTRA_FILE: picolibc/.github/zephyr-files.txt
+
+jobs:
+  cache-maker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone picolibc
+        uses: actions/checkout@v3
+        with:
+          path: picolibc
+
+      - name: Cache the Docker Image
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.IMAGE_FILE }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+
+      - name: Set up Docker Buildx
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build picolibc container
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: docker/build-push-action@v4
+        with:
+          platforms: linux/amd64
+          file: .github/Dockerfile-zephyr
+          tags: ${{ env.IMAGE }}:latest
+          outputs: type=docker,dest=${{ env.IMAGE_FILE }}
+
+  fortify-source-zephyr:
+    needs: cache-maker
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        meson_flags: [
+          "",
+
+          # Math configurations
+          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
+          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
+
+          # Tinystdio configurations
+          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true",
+          "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false",
+
+          # Original stdio
+          "-Dtinystdio=false",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true -Dnewlib-fvwrite-in-streamio=true",
+
+          # Locale, iconv, original malloc and original atexit/onexit configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
+
+          # Multithread disabled
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
+        ]
+        test: [
+	  "./.github/do-zephyr",
+	]
+    steps:
+      - name: Clone picolibc
+        uses: actions/checkout@v3
+        with:
+          path: picolibc
+
+      - name: Restore the Docker Image
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.IMAGE_FILE }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+
+      - name: Load and Check the Docker Image
+        run: |
+          docker load -i $IMAGE_FILE
+          docker images -a $IMAGE
+
+      - name: Fortity source test
+        run: |
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} -Dfortify-source=2
+
+  minsize-zephyr:
+    needs: cache-maker
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        meson_flags: [
+          "",
+
+          # Math configurations
+          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
+          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
+
+          # Tinystdio configurations
+          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true",
+          "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false",
+
+          # Original stdio
+          "-Dtinystdio=false",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true -Dnewlib-fvwrite-in-streamio=true",
+
+          # Locale, iconv, original malloc and original atexit/onexit configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
+
+          # Multithread disabled
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
+        ]
+        test: [
+	  "./.github/do-zephyr",
+	]
+    steps:
+      - name: Clone picolibc
+        uses: actions/checkout@v3
+        with:
+          path: picolibc
+
+      - name: Restore the Docker Image
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.IMAGE_FILE }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+
+      - name: Load and Check the Docker Image
+        run: |
+          docker load -i $IMAGE_FILE
+          docker images -a $IMAGE
+
+      - name: Minsize test
+        run: |
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
+
+  release-zephyr:
+    needs: cache-maker
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        meson_flags: [
+          "",
+
+          # Math configurations
+          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
+          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
+
+          # Tinystdio configurations
+          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true",
+          "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false",
+
+          # Original stdio
+          "-Dtinystdio=false",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true -Dnewlib-fvwrite-in-streamio=true",
+
+          # Locale, iconv, original malloc and original atexit/onexit configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
+
+          # Multithread disabled
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
+        ]
+        test: [
+	  "./.github/do-zephyr",
+	]
+    steps:
+      - name: Clone picolibc
+        uses: actions/checkout@v3
+        with:
+          path: picolibc
+
+      - name: Restore the Docker Image
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.IMAGE_FILE }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+
+      - name: Load and Check the Docker Image
+        run: |
+          docker load -i $IMAGE_FILE
+          docker images -a $IMAGE
+
+      - name: Release test
+        run: |
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
+

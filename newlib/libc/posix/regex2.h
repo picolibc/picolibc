@@ -165,7 +165,7 @@ struct re_guts {
 	int backrefs;		/* does it use back references? */
 	sopno nplus;		/* how deep does it nest +s? */
 	/* catspace must be last */
-	cat_t catspace[1];	/* actually [NC] */
+	cat_t catspace[NC];	/* categories */
 };
 
 /* misc utilities */

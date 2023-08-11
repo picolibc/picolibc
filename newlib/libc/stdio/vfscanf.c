@@ -160,7 +160,11 @@ Supporting OS subroutines required:
 #  define MAX_POS_ARGS 32
 # endif
 
-static void * get_arg (int, va_list *, int *, void **);
+typedef struct {
+    va_list ap;
+} my_va_list;
+
+static void * get_arg (int, my_va_list *, int *, void **);
 #endif /* _WANT_IO_POS_ARGS */
 
 /*
@@ -388,6 +392,8 @@ _SVFSCANF (
   int N;			/* arg number */
   int arg_index = 0;		/* index into args processed directly */
   int numargs = 0;		/* number of varargs read */
+  my_va_list my_ap;
+  va_copy(my_ap.ap, ap);
   void *args[MAX_POS_ARGS];	/* positional args read */
   int is_pos_arg;		/* is current format positional? */
 #endif
@@ -550,12 +556,12 @@ _SVFSCANF (
   ((type) (is_pos_arg						\
 	   ? (n < numargs					\
 	      ? args[n]						\
-	      : get_arg (n, &ap, &numargs, args))		\
+	      : get_arg (n, &my_ap, &numargs, args))      \
 	   : (arg_index++ < numargs				\
 	      ? args[n]						\
 	      : (numargs < MAX_POS_ARGS				\
-		 ? args[numargs++] = va_arg (ap, void *)	\
-		 : va_arg (ap, void *)))))
+		 ? args[numargs++] = va_arg (my_ap.ap, void *)	\
+		 : va_arg (my_ap.ap, void *)))))
 #else
 # define GET_ARG(n, ap, type) (va_arg (ap, type))
 #endif
@@ -761,7 +767,7 @@ _SVFSCANF (
 
 	case 'D':		/* compat */
 	  flags |= LONG;
-	  FALLTHROUGH;
+	  __PICOLIBC_FALLTHROUGH;
 	case 'd':
 	  c = CT_INT;
 	  ccfn = (u_long (*)CCFN_PARAMS)strtol;
@@ -776,7 +782,7 @@ _SVFSCANF (
 
 	case 'O':		/* compat */
 	  flags |= LONG;
-	  FALLTHROUGH;
+	  __PICOLIBC_FALLTHROUGH;
 	case 'o':
 	  c = CT_INT;
 	  ccfn = strtoul;
@@ -815,7 +821,7 @@ _SVFSCANF (
 #ifdef _WANT_IO_C99_FORMATS
 	case 'S':
 	  flags |= LONG;
-          FALLTHROUGH;
+          __PICOLIBC_FALLTHROUGH;
 #endif
 
 	case 's':
@@ -831,7 +837,7 @@ _SVFSCANF (
 #ifdef _WANT_IO_C99_FORMATS
 	case 'C':
 	  flags |= LONG;
-          FALLTHROUGH;
+          __PICOLIBC_FALLTHROUGH;
 #endif
 
 	case 'c':
@@ -1953,11 +1959,11 @@ all_done:
    intermediate arguments are sizeof(void*), so we don't need to scan
    ahead in the format string.  */
 static void *
-get_arg (int n, va_list *ap, int *numargs_p, void **args)
+get_arg (int n, my_va_list *ap, int *numargs_p, void **args)
 {
   int numargs = *numargs_p;
   while (n >= numargs)
-    args[numargs++] = va_arg (*ap, void *);
+    args[numargs++] = va_arg (ap->ap, void *);
   *numargs_p = numargs;
   return args[n];
 }

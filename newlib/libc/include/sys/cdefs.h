@@ -773,12 +773,12 @@
  */
 #if __cplusplus >= 201703L || __STDC_VERSION__ > 201710L
 /* Standard C++17/C23 attribute */
-#define FALLTHROUGH [[fallthrough]]
+#define __PICOLIBC_FALLTHROUGH [[fallthrough]]
 #elif __has_attribute(fallthrough)
 /* Non-standard but supported by at least gcc and clang */
-#define FALLTHROUGH __attribute__((fallthrough))
+#define __PICOLIBC_FALLTHROUGH __attribute__((fallthrough))
 #else
-#define FALLTHROUGH do { } while(0)
+#define __PICOLIBC_FALLTHROUGH do { } while(0)
 #endif
 
 /* Guard variables and structure members by lock. */

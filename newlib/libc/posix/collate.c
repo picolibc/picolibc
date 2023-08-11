@@ -116,11 +116,12 @@ u_char *
 __collate_substitute(const u_char *s)
 {
 	int dest_len, len, nlen;
-	int delta = strlen((const char *) s);
+	int delta;
 	u_char *dest_str = NULL;
 
 	if(s == NULL || *s == '\0')
 		return __collate_strdup((u_char *) "");
+        delta = strlen((const char *) s);
 	delta += delta / 8;
 	dest_str = (u_char *) malloc(dest_len = delta);
 	if(dest_str == NULL)

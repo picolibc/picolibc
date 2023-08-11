@@ -24,6 +24,12 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#ifdef INCLUDE_GENERATE
+#define TEST_CONST
+#else
+#define TEST_CONST const
+#endif
+
 /* FIXME FIXME FIXME:
    Neither of __ieee_{float,double}_shape_type seem to be used anywhere
    except in libm/test.  If that is the case, please delete these from here.
@@ -176,7 +182,7 @@ typedef struct
 } question_struct_type;
 
 
-typedef struct 
+typedef TEST_CONST struct 
 {
   char error_bit;
   char errno_val;
@@ -224,7 +230,7 @@ int fmag_of_error (float, float);
 
 
 
-typedef struct 
+typedef TEST_CONST struct 
 {
   int line;
   
@@ -237,13 +243,13 @@ typedef struct
 #define ENDSCAN_IS_ZERO	0x80
 #define ENDSCAN_IS_INF	0x80
 
-typedef struct {
+typedef TEST_CONST struct {
   long int value;
   char end;
   char errno_val;
 } int_scan_type;
 
-typedef struct 
+typedef TEST_CONST struct 
 {
   int line;
   int_scan_type octal;
@@ -255,7 +261,7 @@ typedef struct
 } int_type;
 
 
-typedef struct 
+typedef TEST_CONST struct 
 {
   int line;
   double value;
@@ -272,7 +278,7 @@ typedef struct
   char *gfstring;
 } ddouble_type;
 
-typedef struct
+typedef TEST_CONST struct
 {
   int line;
   double value;
@@ -282,7 +288,7 @@ typedef struct
 } sprint_double_type;
 
 
-typedef struct
+typedef TEST_CONST struct
 {
   int line;
   int value;

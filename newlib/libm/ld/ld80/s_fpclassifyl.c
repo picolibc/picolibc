@@ -19,7 +19,7 @@ __fpclassifyl (long double x)
     return FP_SUBNORMAL;
   else if (esx < 0x7fff)
     return FP_NORMAL;
-  else if (hx == LDBL_NBIT && lx == 0)
+  else if (hx == LDBL_NBIT_INF && lx == 0)
     return FP_INFINITE;
   else
     return FP_NAN;

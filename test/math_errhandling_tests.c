@@ -35,23 +35,23 @@
 
 #define makelname(s) scat(s,l)
 
-volatile FLOAT_T makemathname(zero) = (FLOAT_T) 0.0;
-volatile FLOAT_T makemathname(negzero) = (FLOAT_T) -0.0;
-volatile FLOAT_T makemathname(one) = (FLOAT_T) 1.0;
-volatile FLOAT_T makemathname(two) = (FLOAT_T) 2.0;
-volatile FLOAT_T makemathname(three) = (FLOAT_T) 3.0;
-volatile FLOAT_T makemathname(half) = (FLOAT_T) 0.5;
-volatile FLOAT_T makemathname(big) = BIG;
-volatile FLOAT_T makemathname(bigodd) = BIGODD;
-volatile FLOAT_T makemathname(bigeven) = BIGEVEN;
-volatile FLOAT_T makemathname(small) = SMALL;
-volatile FLOAT_T makemathname(infval) = (FLOAT_T) INFINITY;
-volatile FLOAT_T makemathname(minfval) = (FLOAT_T) -INFINITY;
-volatile FLOAT_T makemathname(qnanval) = (FLOAT_T) NAN;
-volatile FLOAT_T makemathname(snanval) = (FLOAT_T) sNAN;
-volatile FLOAT_T makemathname(pio2) = (FLOAT_T) (PI_VAL/(FLOAT_T)2.0);
-volatile FLOAT_T makemathname(min_val) = (FLOAT_T) MIN_VAL;
-volatile FLOAT_T makemathname(max_val) = (FLOAT_T) MAX_VAL;
+volatile const FLOAT_T makemathname(zero) = (FLOAT_T) 0.0;
+volatile const FLOAT_T makemathname(negzero) = (FLOAT_T) -0.0;
+volatile const FLOAT_T makemathname(one) = (FLOAT_T) 1.0;
+volatile const FLOAT_T makemathname(two) = (FLOAT_T) 2.0;
+volatile const FLOAT_T makemathname(three) = (FLOAT_T) 3.0;
+volatile const FLOAT_T makemathname(half) = (FLOAT_T) 0.5;
+volatile const FLOAT_T makemathname(big) = BIG;
+volatile const FLOAT_T makemathname(bigodd) = BIGODD;
+volatile const FLOAT_T makemathname(bigeven) = BIGEVEN;
+volatile const FLOAT_T makemathname(small) = SMALL;
+volatile const FLOAT_T makemathname(infval) = (FLOAT_T) INFINITY;
+volatile const FLOAT_T makemathname(minfval) = (FLOAT_T) -INFINITY;
+volatile const FLOAT_T makemathname(qnanval) = (FLOAT_T) NAN;
+volatile const FLOAT_T makemathname(snanval) = (FLOAT_T) sNAN;
+volatile const FLOAT_T makemathname(pio2) = (FLOAT_T) (PI_VAL/(FLOAT_T)2.0);
+volatile const FLOAT_T makemathname(min_val) = (FLOAT_T) MIN_VAL;
+volatile const FLOAT_T makemathname(max_val) = (FLOAT_T) MAX_VAL;
 
 FLOAT_T makemathname(scalb)(FLOAT_T, FLOAT_T);
 
@@ -405,7 +405,7 @@ FLOAT_T makemathname(test_nextafter_negmin_0)(void) { return makemathname(nextaf
 FLOAT_T makemathname(test_nextafter_1_2)(void) {return makemathname(nextafter)(makemathname(one), makemathname(two)); }
 FLOAT_T makemathname(test_nextafter_neg1_neg2)(void) {return makemathname(nextafter)(-makemathname(one), -makemathname(two)); }
 
-#if defined(__SIZEOF_LONG_DOUBLE__) && !defined(NO_NEXTTOWARD)
+#if defined(_TEST_LONG_DOUBLE) && !defined(NO_NEXTTOWARD)
 
 FLOAT_T makemathname(test_nexttoward_0_neg0)(void) { return makemathname(nexttoward)(makemathname(zero), -makelname(zero)); }
 FLOAT_T makemathname(test_nexttoward_neg0_0)(void) { return makemathname(nexttoward)(-makemathname(zero), makelname(zero)); }
@@ -711,7 +711,7 @@ FLOAT_T makemathname(test_scalbn_tiny)(void) { return makemathname(scalbn)(makem
 
 #undef sNAN_RET
 #undef sNAN_EXCEPTION
-#if defined(__i386__) && !defined(TEST_LONG_DOUBLE)
+#if (defined(__i386__) || defined(__HAVE_68881__)) && !defined(TEST_LONG_DOUBLE) && !defined(_SOFT_FLOAT)
 /*
  * i386 ABI returns floats in the 8087 registers, which convert sNAN
  * to NAN on load, so you can't ever return a sNAN value successfully.
@@ -723,7 +723,7 @@ FLOAT_T makemathname(test_scalbn_tiny)(void) { return makemathname(scalbn)(makem
 #define sNAN_EXCEPTION  0
 #endif
 
-struct {
+const struct {
 	FLOAT_T	(*func)(void);
 	char	*name;
 	FLOAT_T	value;
@@ -933,8 +933,14 @@ struct {
         TEST(hypot_neginf_qnan, (FLOAT_T)INFINITY, 0, 0),
         TEST(hypot_qnan_inf, (FLOAT_T)INFINITY, 0, 0),
         TEST(hypot_qnan_neginf, (FLOAT_T)INFINITY, 0, 0),
+#ifndef __HAVE_68881__
+        /*
+         * On 68881, the snan gets converted to qnan before the hypot code
+         * sees it, so skip these tests
+         */
         TEST(hypot_snan_inf, (FLOAT_T)NAN, FE_INVALID, 0),
         TEST(hypot_snan_neginf, (FLOAT_T)NAN, FE_INVALID, 0),
+#endif
         TEST(hypot_1_inf, (FLOAT_T)INFINITY, 0, 0),
         TEST(hypot_1_neginf, (FLOAT_T)INFINITY, 0, 0),
         TEST(hypot_inf_1, (FLOAT_T)INFINITY, 0, 0),
@@ -1167,7 +1173,7 @@ struct {
         TEST(nextafter_1_2, (FLOAT_T)1.0 + EPSILON_VAL, 0, 0),
         TEST(nextafter_neg1_neg2, -(FLOAT_T)1.0 - EPSILON_VAL, 0, 0),
 
-#if defined(__SIZEOF_LONG_DOUBLE__) && !defined(NO_NEXTTOWARD)
+#if defined(_TEST_LONG_DOUBLE) && !defined(NO_NEXTTOWARD)
         TEST(nexttoward_0_neg0, -(FLOAT_T)0, 0, 0),
         TEST(nexttoward_neg0_0, (FLOAT_T)0, 0, 0),
         TEST(nexttoward_0_1, (FLOAT_T) MIN_VAL, FE_UNDERFLOW, 0),
@@ -1394,6 +1400,110 @@ makemathname(print_float)(FLOAT_T a)
 #endif
 }
 
+static volatile const FLOAT_T makemathname(except_zero) = (FLOAT_T) 0.0;
+static volatile const FLOAT_T makemathname(except_one) = (FLOAT_T) 1.0;
+static volatile const FLOAT_T makemathname(except_small) = SMALL;
+static volatile const FLOAT_T makemathname(except_big) = BIG;
+static volatile FLOAT_T makemathname(except_result);
+
+static bool makemathname(has_invalid)(void)
+{
+        int except;
+        feclearexcept(FE_ALL_EXCEPT);
+        makemathname(except_result) = force_eval(makemathname(except_zero) / makemathname(except_zero));
+        except = fetestexcept(FE_INVALID);
+        return except != 0;
+}
+
+static bool makemathname(has_inf)(void)
+{
+        int except;
+        feclearexcept(FE_ALL_EXCEPT);
+        makemathname(except_result) = force_eval(makemathname(except_one) / makemathname(except_zero));
+        except = fetestexcept(FE_DIVBYZERO);
+        return except != 0;
+}
+
+static bool makemathname(has_uflow)(void)
+{
+        int except;
+        feclearexcept(FE_ALL_EXCEPT);
+        makemathname(except_result) = force_eval(makemathname(except_small) * makemathname(except_small));
+        except = fetestexcept(FE_UNDERFLOW);
+        return except != 0;
+}
+
+static bool makemathname(has_oflow)(void)
+{
+        int except;
+        feclearexcept(FE_ALL_EXCEPT);
+        makemathname(except_result) = force_eval(makemathname(except_big) * makemathname(except_big));
+        except = fetestexcept(FE_OVERFLOW);
+        return except != 0;
+}
+
+static bool makemathname(check_except)(void)
+{
+        bool result = true;
+        if (FE_INVALID != 0) {
+                if (EXCEPTION_TEST) {
+                        if (!makemathname(has_invalid)()) {
+                                printf("Exceptions claim to be supported, but 0/0 doesn't raise FE_INVALID\n");
+                                result = false;
+                        }
+                } else {
+                        if (makemathname(has_invalid)()) {
+                                printf("Exceptions are not supposed to be supported, but 0/0 raises FE_INVALID\n");
+                                result = false;
+                        }
+                }
+        }
+        if (FE_DIVBYZERO != 0) {
+                if (EXCEPTION_TEST) {
+                        if (!makemathname(has_inf)()) {
+                                printf("Exceptions claim to be supported, but 1/0 doesn't raise FE_DIVBYZERO\n");
+                                result = false;
+                        }
+                } else {
+                        if (makemathname(has_inf)()) {
+                                printf("Exceptions are not supposed to be supported, but 1/0 raises FE_DIVBYZERO\n");
+                                result = false;
+                        }
+                }
+        }
+        if (FE_UNDERFLOW != 0) {
+                if (EXCEPTION_TEST) {
+                        if (!makemathname(has_uflow)()) {
+                                printf("Exceptions claim to be supported, but %g*%g doesn't raise FE_UNDERFLOW\n",
+                                       (double) makemathname(except_small), (double) makemathname(except_small));
+                                result = false;
+                        }
+                } else {
+                        if (makemathname(has_uflow)()) {
+                                printf("Exceptions are not supposed to be supported, but %g*%g raises FE_UNDERFLOW\n",
+                                       (double) makemathname(except_small), (double)makemathname(except_small));
+                                result = false;
+                        }
+                }
+        }
+        if (FE_OVERFLOW != 0) {
+                if (EXCEPTION_TEST) {
+                        if (!makemathname(has_oflow)()) {
+                                printf("Exceptions claim to be supported, but %g*%g doesn't raise FE_OVERFLOW\n",
+                                       (double) makemathname(except_big), (double) makemathname(except_big));
+                                result = false;
+                        }
+                } else {
+                        if (makemathname(has_oflow)()) {
+                                printf("Exceptions are not supposed to be supported, but %g*%g raises FE_OVERFLOW\n",
+                                       (double) makemathname(except_big), (double) makemathname(except_big));
+                                result = false;
+                        }
+                }
+        }
+        return result;
+}
+
 int
 makemathname(run_tests)(void) {
 	int result = 0;
@@ -1402,6 +1512,9 @@ makemathname(run_tests)(void) {
 	int err, except;
 	int t;
         int printed;
+
+        if (!makemathname(check_except)())
+                result++;
 
 	for (t = 0; makemathname(tests)[t].func; t++) {
                 printed = 0;

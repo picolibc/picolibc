@@ -60,7 +60,9 @@ truncl(long double x)
 			return (x);	/* x is integral */
 		if (huge + x > 0.0L)		/* raise inexact flag */
 			ix1 &= ~m;
-	}
+	} else if (e == 0x7fff - LDBL_MAX_EXP + 1) {
+                return x + x;
+        }
 	SET_LDOUBLE_WORDS(x,es,ix0,ix1);
 	return (x);
 }

@@ -23,3 +23,28 @@ default_flash_addr = '0x00000000'
 default_flash_size = '0x00400000'
 default_ram_addr   = '0x20000000'
 default_ram_size   = '0x00200000'
+
+custom_mem_config_thumb_v8_1_m_main_mve_hard = 'mps3_an547'
+custom_mem_config_thumb_v8_m_main_dp_hard = 'mps3_an547'
+custom_mem_config_thumb_v8_m_main_dp_softfp = 'mps3_an547'
+
+separate_boot_flash_mps3_an547 = true
+default_boot_flash_addr_mps3_an547 = '0x00000000'
+default_boot_flash_size_mps3_an547 = '0x00080000'
+default_flash_addr_mps3_an547 = '0x01000000'
+default_flash_size_mps3_an547 = '0x00200000'
+default_ram_addr_mps3_an547 = '0x60000000'
+default_ram_size_mps3_an547 = '0x01000000'
+
+custom_mem_config_thumb_v8_m_base_nofp = 'mps2_an505'
+custom_mem_config_thumb_v8_m_main_nofp = 'mps2_an505'
+custom_mem_config_thumb_v8_m_main_fp_hard = 'mps2_an505'
+custom_mem_config_thumb_v8_m_main_fp_softfp = 'mps2_an505'
+
+separate_boot_flash_mps2_an505 = true
+default_boot_flash_addr_mps2_an505 = '0x10000000'
+default_boot_flash_size_mps2_an505 = '0x10000400'
+default_flash_addr_mps2_an505 = '0x10000400'
+default_flash_size_mps2_an505 = '0x103ffc00'
+default_ram_addr_mps2_an505 = '0x80000000'
+default_ram_size_mps2_an505 = '0x01000000'

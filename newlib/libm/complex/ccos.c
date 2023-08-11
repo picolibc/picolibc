@@ -72,10 +72,8 @@ QUICKREF
 double complex
 ccos(double complex z)
 {
-	double complex w;
 	double ch, sh;
 
 	_cchsh(cimag(z), &ch, &sh);
-	w = cos(creal(z)) * ch - (sin(creal(z)) * sh) * (double complex) I;
-	return w;
+	return (double complex) (cos(creal(z)) * ch) - (sin(creal(z)) * sh) * (double complex) I;
 }

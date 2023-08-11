@@ -23,11 +23,10 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  */
+
+#ifndef _SOFT_FLOAT
+
 #include <sys/cdefs.h>
-__RCSID("$NetBSD: fenv.c,v 1.2 2017/03/22 23:11:09 chs Exp $");
-
-
-
 #include <assert.h>
 #include <fenv.h>
 
@@ -348,3 +347,5 @@ fegetexcept(void)
 	__stfsr(&r);
 	return (r & _ENABLE_MASK) >> _FPUSW_SHIFT;
 }
+
+#endif /* !_SOFT_FLOAT */

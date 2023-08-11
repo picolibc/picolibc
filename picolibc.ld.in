@@ -41,9 +41,13 @@ ENTRY(_start)
  */
 
 MEMORY
-{
-	flash (rx!w) : ORIGIN = DEFINED(__flash) ? __flash : @DEFAULT_FLASH_ADDR@, LENGTH = DEFINED(__flash_size) ? __flash_size : @DEFAULT_FLASH_SIZE@
-	ram (w!rx)   : ORIGIN = DEFINED(__ram  ) ? __ram   : @DEFAULT_RAM_ADDR@, LENGTH = DEFINED(__ram_size  ) ? __ram_size   : @DEFAULT_RAM_SIZE@
+{@MEMORY_BOOT_FLASH@
+	flash (rx!w) :
+		ORIGIN = DEFINED(__flash) ? __flash : @DEFAULT_FLASH_ADDR@,
+		LENGTH = DEFINED(__flash_size) ? __flash_size : @DEFAULT_FLASH_SIZE@
+	ram (w!rx) :
+		ORIGIN = DEFINED(__ram) ? __ram : @DEFAULT_RAM_ADDR@,
+		LENGTH = DEFINED(__ram_size) ? __ram_size : @DEFAULT_RAM_SIZE@
 }
 
 PHDRS
@@ -62,7 +66,7 @@ SECTIONS
 		KEEP (*(.text.init.enter))
 		KEEP (*(.data.init.enter))
 		KEEP (*(SORT_BY_NAME(.init) SORT_BY_NAME(.init.*)))
-	} >flash AT>flash :text
+	} >@INIT_MEMORY@ AT>@INIT_MEMORY@ :text
 
 	.text : {
 
@@ -89,7 +93,6 @@ SECTIONS
 		*(.srodata.cst2)
 		*(.srodata .srodata.*)
 		*(.data.rel.ro .data.rel.ro.*)
-		*(.got .got.*)
 
 		/* Need to pre-align so that the symbols come after padding */
 		. = ALIGN(8);
@@ -109,6 +112,16 @@ SECTIONS
 		KEEP (*(.fini_array .dtors))
 		PROVIDE_HIDDEN ( __fini_array_end = . );
 
+	} >flash AT>flash :text
+
+	/*
+	 * Needs to be in its own segment with the PLT entries first
+	 * so that the linker will compute the offsets to those
+	 * entries correctly.
+	 */
+	.got : {
+		*(.got.plt)
+		*(.got)
 	} >flash AT>flash :text
 
 	.toc : {
@@ -142,7 +155,7 @@ SECTIONS
 		PROVIDE(__preserve_end__ = .);
 	} >ram AT>ram :ram
 
-	.data : @LDSCRIPT_ALIGN_WITH_INPUT@ {
+	.data : @BFD_START@ ALIGN_WITH_INPUT @BFD_END@ {
 		*(.data .data.*)
 		*(.gnu.linkonce.d.*)
 
@@ -150,6 +163,7 @@ SECTIONS
 		. = ALIGN(8);
 
 		PROVIDE( __global_pointer$ = . + 0x800 );
+		PROVIDE( _gp = . + 0x8000);
 		*(.sdata .sdata.* .sdata2.*)
 		*(.gnu.linkonce.s.*)
 	} >ram AT>flash :ram_init
@@ -162,9 +176,13 @@ SECTIONS
 	 * allocated at runtime. We're slightly abusing that
 	 * by placing the data in flash where it will be copied
 	 * into the allocate ram addresses by the existing
-	 * data initialization code in crt0
+	 * data initialization code in crt0.
+	 * BFD includes .tbss alignment when computing .tdata
+	 * alignment, but for ld.lld we have to explicitly pad
+	 * as it only guarantees usage as a TLS template works
+	 * rather than supporting this use case.
 	 */
-	.tdata : @LDSCRIPT_ALIGN_WITH_INPUT@ {
+	.tdata : @LLD_START@ ALIGN(__tls_align) @LLD_END@ @BFD_START@ ALIGN_WITH_INPUT @BFD_END@ {
 		*(.tdata .tdata.* .gnu.linkonce.td.*)
 		PROVIDE(__data_end = .);
 		PROVIDE(__tdata_end = .);
@@ -199,19 +217,17 @@ SECTIONS
 	PROVIDE( __arm64_tls_tcb_offset = MAX(16, __tls_align) );
 
 	/*
-	 * The linker special cases .tbss segments which are
-	 * identified as segments which are not loaded and are
-	 * thread_local.
-	 *
-	 * For these segments, the linker does not advance 'dot'
-	 * across them.  We actually need memory allocated for tbss,
-	 * so we create a special segment here just to make room
+	 * Unlike ld.lld, ld.bfd does not advance the location counter for
+	 * .tbss, but we actually need memory allocated for .tbss as we use
+	 * it for the initial TLS storage.
+	 * Create special section here just to make room.
 	 */
-	.tbss_space (NOLOAD) : {
+        @BFD_START@
+        .tbss_space (NOLOAD) : {
 		. = ADDR(.tbss);
 		. = . + SIZEOF(.tbss);
 	} >ram AT>ram :ram
-
+	@BFD_END@
 	.bss (NOLOAD) : {
 		*(.sbss*)
 		*(.gnu.linkonce.sb.*)

@@ -40,6 +40,10 @@
 #include <string.h>
 #include <stdbool.h>
 
+#ifndef _IEEE_754_2008_SNAN
+# define _IEEE_754_2008_SNAN 1
+#endif
+
 extern int inacc;
 
 int merror;
@@ -55,6 +59,10 @@ translate_to (FILE *file,
   bits.value = r;
   fprintf(file, "0x%08lx, 0x%08lx", (unsigned long) bits.parts.msw, (unsigned long) bits.parts.lsw);
 }
+
+double
+thedouble (uint32_t msw,
+           uint32_t lsw, volatile double *r);
 
 /* Convert double to float, preserving issignaling status and NaN sign */
 
@@ -97,14 +105,14 @@ ffcheck_id(double is,
 	   int id)
 {
   /* Make sure the answer isn't to far wrong from the correct value */
-  __ieee_double_shape_type correct, isbits;
+  __ieee_double_shape_type correct = {}, isbits;
   int mag;
   isbits.value = is;
 
   (void) serrno;
   (void) merror;
-  correct.parts.msw = p->qs[id].msw;
-  correct.parts.lsw = p->qs[id].lsw;
+
+  thedouble(p->qs[id].msw, p->qs[id].lsw, &correct.value);
 
   int error_bit = p->error_bit;
 
@@ -118,7 +126,7 @@ ffcheck_id(double is,
    * nans, let that pass
    */
   if (isnan(correct.value) && isnan(is)
-#ifndef __i386__
+#if !defined(__i386__) && !defined(__HAVE_68881__)
       && (issignaling(correct.value) == issignaling(is))
 #endif
     )
@@ -187,8 +195,8 @@ fffcheck_id (float is,
   isbits.value = is;
   to_double(is_double.value, is);
 
-  correct_double.parts.msw = p->qs[id].msw;
-  correct_double.parts.lsw = p->qs[id].lsw;
+  thedouble(p->qs[id].msw,p->qs[id].lsw, &correct_double.value);
+
   to_float(correct.value, correct_double.value);
 //  printf("%s got 0x%08x want 0x%08x\n", name, isbits.p1, correct.p1);
 
@@ -201,7 +209,7 @@ fffcheck_id (float is,
 
   /* All signaling nans are the "same", as are all quiet nans */
   if (isnan(correct.value) && isnan(is)
-#ifndef __i386__
+#if !defined(__i386__) && !defined(__HAVE_68881__)
       /* i386 calling convention ends up always converting snan into qnan */
       && (__issignalingf(correct.value) == __issignalingf(is))
 #endif
@@ -214,7 +222,7 @@ fffcheck_id (float is,
   {
     inacc ++;
 
-    printf("%s:%d, inaccurate answer: bit %d (%08lx %08lx) (%g %g) (is double 0x%08lx, 0x%08lx)\n",
+    printf("%s:%d, inaccurate answer: bit %d (%08lx is %08lx) (%g is %g) (is double 0x%08lx, 0x%08lx)\n",
 	   name,  p->line, mag,
 	   (unsigned long) (uint32_t) correct.p1,
 	   (unsigned long) (uint32_t) isbits.p1,
@@ -252,16 +260,29 @@ fffcheck (float is,
   return fffcheck_id(is, p, name, serrno, merror, 0);
 }
 
+static
+volatile_memcpy(volatile void *dest, void *src, size_t len)
+{
+    volatile uint8_t *d = dest;
+    uint8_t *s = src;
+    while (len--)
+        *d++ = *s++;
+}
+
 double
 thedouble (uint32_t msw,
-  uint32_t lsw, double *r)
+  uint32_t lsw, volatile double *r)
 {
   __ieee_double_shape_type x;
 
   x.parts.msw = msw;
   x.parts.lsw = lsw;
+#if !_IEEE_754_2008_SNAN
+  if (isnan(x.value))
+      x.parts.msw ^= 0x000c0000;
+#endif
   if (r)
-    memcpy(r, &x.value, sizeof(double));
+    volatile_memcpy(r, &x.value, sizeof(double));
   return x.value;
 }
 
@@ -338,10 +359,16 @@ finish (FILE *f,
   int mag;
 
   mag = ffcheck(result, p,name,  merror, errno);
+  (void) f;
+  (void) vector;
+  (void) args;
+  (void) mag;
+#ifdef INCLUDE_GENERATE
   if (vector)
   {
     frontline(f, mag, p, result, merror, errno, args , name);
   }
+#endif
 }
 
 void
@@ -359,6 +386,11 @@ finish2 (FILE *f,
   mag2 = ffcheck_id(result2, p,name,  merror, errno, 2);
   if (mag2 < mag)
     mag = mag2;
+  (void) f;
+  (void) vector;
+  (void) mag;
+  (void) args;
+#ifdef INCLUDE_GENERATE
   if (vector)
   {
     __ieee_double_shape_type result2_double;
@@ -367,6 +399,7 @@ finish2 (FILE *f,
     p->qs[2].lsw = result2_double.parts.lsw;
     frontline(f, mag, p, result, merror, errno, args , name);
   }
+#endif
 }
 
 void
@@ -380,10 +413,16 @@ ffinish (FILE *f,
   int mag;
 
   mag = fffcheck(fresult, p,name,  merror, errno);
+  (void) f;
+  (void) vector;
+  (void) args;
+  (void) mag;
+#ifdef INCLUDE_GENERATE
   if (vector)
   {
     frontline(f, mag, p, (double) fresult, merror, errno, args , name);
   }
+#endif
 }
 
 void
@@ -401,6 +440,11 @@ ffinish2 (FILE *f,
   mag2 = fffcheck_id(fresult2, p, name, merror, errno, 2);
   if (mag2 < mag)
     mag = mag2;
+  (void) f;
+  (void) vector;
+  (void) args;
+  (void) mag;
+#ifdef INCLUDE_GENERATE
   if (vector)
   {
     __ieee_double_shape_type result2_double;
@@ -409,6 +453,7 @@ ffinish2 (FILE *f,
     p->qs[2].lsw = result2_double.parts.lsw;
     frontline(f, mag, p, (double) fresult, merror, errno, args , name);
   }
+#endif
 }
 
 extern int redo;
@@ -418,7 +463,7 @@ in_float_range(double arg)
 {
 	if (isinf(arg) || isnan(arg))
 		return true;
-	return -(double) FLT_MAX <= arg && arg < (double) FLT_MAX;
+	return -(double) FLT_MAX <= arg && arg <= (double) FLT_MAX;
 }
 
 void
@@ -432,7 +477,7 @@ run_vector_1 (int vector,
   double result;
   float fresult;
 
-#if 0
+#ifdef INCLUDE_GENERATE
   if (vector)
   {
 
@@ -489,9 +534,9 @@ run_vector_1 (int vector,
   newfunc(name);
   while (p->line)
   {
-    double arg1;
+    volatile double arg1;
     thedouble(p->qs[1].msw, p->qs[1].lsw, &arg1);
-    double arg2;
+    volatile double arg2;
     thedouble(p->qs[2].msw, p->qs[2].lsw, &arg2);
 
     errno = 0;
@@ -538,8 +583,8 @@ run_vector_1 (int vector,
      }
      else  if (strcmp(args,"fff")==0)
      {
-       float arga;
-       float argb;
+       volatile float arga;
+       volatile float argb;
 
        typedef float (*pdblfunc) (float,float);
 

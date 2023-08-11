@@ -35,7 +35,7 @@
 
 cmake_minimum_required(VERSION 3.20.0)
 
-project(Picolibc VERSION 1.8.2 LANGUAGES C ASM)
+project(Picolibc VERSION 1.8.3 LANGUAGES C ASM)
 
 if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "arm64")
   set(CMAKE_SYSTEM_PROCESSOR "aarch64")
@@ -193,6 +193,9 @@ picolibc_flag(_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL)
 
 # Compiler supports _Complex
 picolibc_flag(_HAVE_COMPLEX)
+
+# Compiler supports __builtin_complex
+picolibc_flag(_HAVE_BUILTIN_COMPLEX)
 
 # Compiler supports format function attribute
 picolibc_flag(_HAVE_FORMAT_ATTRIBUTE 1)

@@ -175,10 +175,14 @@ main(void)
 
 		for (i = 0; i < NUM_MALLOC; i++) {
 			result += check_block("grow", 0);
-			block_size[0] += randint(MAX_ALLOC);
-			in_use = block_size[0];
-			blocks[0] = realloc(blocks[0], block_size[0]);
-			fill_block(0);
+                        size_t new_size = block_size[0] + randint(MAX_ALLOC);
+                        uint8_t *new_block = realloc(blocks[0], new_size);
+                        if (new_block || new_size == 0) {
+                            blocks[0] = new_block;
+                            block_size[0] = new_size;
+                            in_use = block_size[0];
+                            fill_block(0);
+                        }
 		}
 
 		result += check_block("grow done", 0);
@@ -231,10 +235,13 @@ main(void)
 		/* Test allocating random chunks */
 		for (i = 0; i < NUM_MALLOC; i++) {
 			size_t size = randint(MAX_ALLOC);
-			block_size[i] = size;
-			blocks[i] = malloc(size);
-			in_use += size;
-			fill_block(i);
+                        uint8_t *new_block = malloc(size);
+                        if (new_block || size == 0) {
+                            block_size[i] = size;
+                            blocks[i] = new_block;
+                            in_use += size;
+                            fill_block(i);
+                        }
 		}
 
 		result += check_blocks("malloc");
@@ -246,11 +253,14 @@ main(void)
 		for (i = 0; i < NUM_MALLOC; i++) {
 			size_t size = randint(MAX_ALLOC);
 			int j = order[i];
-			in_use -= block_size[j];
-			blocks[j] = realloc(blocks[j], size);
-			block_size[j] = size;
-			in_use += size;
-			fill_block(j);
+                        uint8_t *new_block = realloc(blocks[j], size);
+                        if (new_block || size == 0) {
+                            blocks[j] = new_block;
+                            in_use -= block_size[j];
+                            block_size[j] = size;
+                            in_use += size;
+                            fill_block(j);
+                        }
 		}
 
 		result += check_blocks("realloc");
@@ -276,16 +286,19 @@ main(void)
 			size_t size = randint(MAX_ALLOC);
 			size_t align = 1 << (3 + randint(7));
 
-			block_size[i] = size;
-			blocks[i] = memalign(align, size);
+                        uint8_t *new_block = memalign(align, size);
+                        if (new_block || size == 0) {
+                            block_size[i] = size;
+                            blocks[i] = new_block;
 
-			if ((uintptr_t) blocks[i] & (align - 1)) {
-				printf("unaligned block returned %p align %zu size %zu\n",
-				       blocks[i], align, size);
-				result++;
-			}
-			fill_block(i);
-			in_use += size;
+                            if ((uintptr_t) blocks[i] & (align - 1)) {
+                                printf("unaligned block returned %p align %zu size %zu\n",
+                                       blocks[i], align, size);
+                                result++;
+                            }
+                            fill_block(i);
+                            in_use += size;
+                        }
 		}
 		result += check_blocks("memalign");
 		result += check_malloc(in_use);

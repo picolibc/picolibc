@@ -32,6 +32,15 @@
 
 #include "dtoa_engine.h"
 
+#if __GNUC__ == 12 && __GNUC_MINOR__ == 2 && __GNUC_PATCHLEVEL__ == 1 && __OPTIMIZE_SIZE__
+/*
+ * GCC 12.2.1 has a bug in -Os mode on (at least) arm v8.1-m which
+ * mis-compiles this function resulting in an infinite loop. Work
+ * around that by switching optimization mode
+ */
+#pragma GCC optimize("O2")
+#endif
+
 double
 __atod_engine(uint64_t u64, int exp)
 {

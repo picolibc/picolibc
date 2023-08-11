@@ -161,14 +161,14 @@ powl(long double x, long double y)
 
   /* y==zero: x**0 = 1 */
   if ((iy | q.parts32.mswlo | q.parts32.lswhi | q.parts32.lswlo) == 0) {
-    if (issignalingl(x))
+    if (issignalingl_inline(x))
       return x + y;
     return one;
   }
 
   /* 1.0**y = 1; -1.0**+-Inf = 1 */
   if (x == one) {
-    if (issignalingl(y))
+    if (issignalingl_inline(y))
       return x + y;
     return one;
   }

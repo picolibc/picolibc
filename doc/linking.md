@@ -49,7 +49,7 @@ this with gcc, the command line would look like this:
 Alternatively, you can specify those values using `--defsym` and use
 picolibc.ld as the linker script:
 
-	cc -Wl,--defsym=__flash=__0x08000000 -Wl,--defsym=__flash_size=128K ... -Tpicolibc.ld
+	cc -Wl,--defsym=__flash=0x08000000 -Wl,--defsym=__flash_size=128K ... -Tpicolibc.ld
 
 ### Defining Memory Regions
 

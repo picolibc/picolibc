@@ -126,6 +126,18 @@ bool __matchcaseprefix(const char *input, const char *pattern);
 int
 __posix_sflags (const char *mode, int *optr);
 
+static inline int
+__stdio_sflags (const char *mode)
+{
+    int omode;
+    return __posix_sflags (mode, &omode);
+}
+
+#else
+
+int
+__stdio_sflags (const char *mode);
+
 #endif
 
 int	__d_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
@@ -166,6 +178,7 @@ typedef __int128_t _i128;
 #define _u128_and_64(a,b)       ((uint64_t) (a) & (b))
 #define _u128_or(a,b)           ((a) | (b))
 #define _u128_and(a,b)          ((a) & (b))
+#define _u128_eq(a,b)           ((a) == (b))
 #define _u128_ge(a,b)           ((a) >= (b))
 #define _i128_ge(a,b)           ((_i128)(a) >= (_i128)(b))
 #define _u128_lt(a,b)           ((a) < (b))
@@ -208,6 +221,12 @@ static inline bool
 _i128_lt_zero(_u128 a)
 {
     return (int64_t) a.hi < 0;
+}
+
+static inline bool
+_u128_eq(_u128 a, _u128 b)
+{
+    return (a.hi == b.hi) && (a.lo == b.lo);
 }
 
 static inline bool
@@ -424,9 +443,14 @@ asuint128(long double f)
         long double     f;
         _u128           i;
     } v;
+    _u128       i;
 
     v.f = f;
-    return v.i;
+    i = v.i;
+#if defined(__IEEE_BIG_ENDIAN) && __SIZEOF_LONG_DOUBLE__ != 16
+    i = _u128_rshift(i, (16 - __SIZEOF_LONG_DOUBLE__) * 8);
+#endif
+    return i;
 }
 
 static inline long double
@@ -437,6 +461,9 @@ aslongdouble(_u128 i)
         _u128           i;
     } v;
 
+#if defined(__IEEE_BIG_ENDIAN) && __SIZEOF_LONG_DOUBLE__ != 16
+    i = _u128_lshift(i, (16 - __SIZEOF_LONG_DOUBLE__) * 8);
+#endif
     v.i = i;
     return v.f;
 }

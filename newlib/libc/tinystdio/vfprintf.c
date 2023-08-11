@@ -437,7 +437,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 		    continue;
 		  case '+':
 		    flags |= FL_PLUS;
-		    FALLTHROUGH;
+		    __PICOLIBC_FALLTHROUGH;
 		  case ' ':
 		    flags |= FL_SPACE;
 		    continue;
@@ -633,11 +633,21 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #if __LDBL_MANT_DIG__ == 64
 #define LDENORM_EXP_BIAS 1
 #define LEXP_BIAS       (__LDBL_MAX_EXP__ + 2)
+#define LEXP_INF        (__LDBL_MAX_EXP__ - 3)
 #define LSIG_BITS       (__LDBL_MANT_DIG__)
+#ifndef __m68k__
+#define LSIG_MSB_INF    _u128_lshift(to_u128(1), __LDBL_MANT_DIG__-1)
+#endif
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define LEXP_SHIFT       __LDBL_MANT_DIG__
+#endif
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define LEXP_SHIFT       (__LDBL_MANT_DIG__ + 16)
+#endif
 #else
 #define LDENORM_EXP_BIAS 1
 #define LEXP_BIAS       (__LDBL_MAX_EXP__ - 1)
+#define LEXP_INF        (__LDBL_MAX_EXP__)
 #define LSIG_MSB        _u128_lshift(to_u128(1), __LDBL_MANT_DIG__-1)
 #define LSIG_BITS       (__LDBL_MANT_DIG__ - 1)
 #define LEXP_SHIFT      (__LDBL_MANT_DIG__ - 1)
@@ -679,8 +689,12 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                         s = _u128_and(s, mask);
                     }
 
-                    if (exp == LEXP_BIAS + 1) {
+                    if (exp == LEXP_INF) {
+#ifdef LSIG_MSB_INF
+                        if (!_u128_eq(fi, LSIG_MSB_INF))
+#else
                         if (!_u128_is_zero(fi))
+#endif
                             _dtoa.flags |= DTOA_NAN;
                         else
                             _dtoa.flags |= DTOA_INF;

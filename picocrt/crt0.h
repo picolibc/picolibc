@@ -107,8 +107,8 @@ __start(void)
         static char *argv[ARGV_LEN];
         int argc = 0;
 
-        argv[argc++] = "program-name";
-        if (sys_semihost_get_cmdline(cmdline, sizeof(cmdline)) == 0)
+        if (sys_semihost_get_cmdline(cmdline, sizeof(cmdline)) == 0 &&
+            cmdline[0])
         {
             char *c = cmdline;
 
@@ -122,7 +122,8 @@ __start(void)
                 while (*++c == ' ')
                     ;
             }
-        }
+        } else
+            argv[argc++] = "program-name";
         argv[argc] = NULL;
 #else
 #define argv NULL

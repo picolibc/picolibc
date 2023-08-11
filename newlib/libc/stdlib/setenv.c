@@ -102,13 +102,14 @@ setenv (const char *name,
       offset = cnt;
     }
   for (C = (char *) name; *C && *C != '='; ++C);	/* no `=' in name */
-  if (!((*p_environ)[offset] =	/* name + `=' + value */
-	malloc ((size_t) ((int) (C - name) + l_value + 2))))
+  char *E = malloc ((size_t) ((int) (C - name) + l_value + 2));
+  if (!E)
     {
       ENV_UNLOCK;
       return -1;
     }
-  for (C = (*p_environ)[offset]; (*C = *name++) && *C != '='; ++C);
+  (*p_environ)[offset] = E;
+  for (C = E; (*C = *name++) && *C != '='; ++C);
   for (*C++ = '='; (*C++ = *value++) != 0;);
 
   ENV_UNLOCK;

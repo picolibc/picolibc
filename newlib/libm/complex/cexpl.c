@@ -37,14 +37,12 @@
 long double complex
 cexpl(long double complex z)
 {
-	long double complex w;
 	long double r, x, y;
 
 	x = creall(z);
 	y = cimagl(z);
 	r = expl(x);
-	w = r * cosl(y) + r * sinl(y) * (long double complex) I;
-	return w;
+	return (long double complex) (r * cosl(y)) + r * sinl(y) * (long double complex) I;
 }
 
 #endif

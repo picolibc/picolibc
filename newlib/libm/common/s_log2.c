@@ -71,7 +71,7 @@ C99, POSIX, System V Interface Definition (Issue 6).
 __float64
 log264(__float64 x)		/* wrapper log2 */
 {
-    return (log64(x) / (__float64) _M_LN2_LD);
+    return (log64(x) / _F_64(_M_LN2));
 }
 
 _MATH_ALIAS_d_d(log2)

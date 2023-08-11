@@ -34,7 +34,7 @@ roundl(long double x)
 	long double t;
 
 	if (!isfinite(x))
-		return (x);
+		return (x + x);
 
 	if (x >= 0.0L) {
 		t = floorl(x);

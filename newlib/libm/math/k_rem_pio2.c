@@ -148,9 +148,13 @@ static const __float64
     two24 = _F_64(1.67772160000000000000e+07), /* 0x41700000, 0x00000000 */
     twon24 = _F_64(5.96046447753906250000e-08); /* 0x3E700000, 0x00000000 */
 
+#ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+/* GCC analyzer gets confused about the use of 'iq' here */
+#pragma GCC diagnostic ignored "-Wanalyzer-use-of-uninitialized-value"
+#endif
 
 int
 __kernel_rem_pio2(__float64 *x, __float64 *y, int e0, int nx, int prec,
