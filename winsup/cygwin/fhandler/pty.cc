@@ -3835,7 +3835,9 @@ fhandler_pty_slave::transfer_input (tty::xfer_dir dir, HANDLE from, tty *ttyp,
     to = ttyp->to_slave ();
 
   pinfo p (ttyp->master_pid);
-  HANDLE pty_owner = OpenProcess (PROCESS_DUP_HANDLE, FALSE, p->dwProcessId);
+  HANDLE pty_owner = NULL;
+  if (p)
+    pty_owner = OpenProcess (PROCESS_DUP_HANDLE, FALSE, p->dwProcessId);
   if (pty_owner)
     {
       DuplicateHandle (pty_owner, to, GetCurrentProcess (), &to,
