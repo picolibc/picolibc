@@ -364,6 +364,7 @@ foreach target : targets
 		 'test-memset', 'test-put',
 		 'test-efcvt', 'test-atomic',
 		 'test-raise',
+                 'test-fma',
 		]
 
   if have_attr_ctor_dtor
@@ -421,6 +422,11 @@ if enable_native_tests
   if native_lib_m.found()
     test('long_double_native',
 	 executable('long_double_native', 'long_double.c',
+		    c_args: native_c_args,
+		    link_args: native_c_args,
+		    dependencies: native_lib_m))
+    test('test-fma_native',
+	 executable('test-fma_native', 'test-fma.c',
 		    c_args: native_c_args,
 		    link_args: native_c_args,
 		    dependencies: native_lib_m))
