@@ -620,6 +620,9 @@ force_eval_long_double (long double x)
 #  define _F_64(x)      __F_64(x)
 #  define _FLOAT64_MIN  LDBL_MIN
 #  define _FLOAT64_MAX  LDBL_MAX
+#  define _FLOAT64_MAX_EXP LDBL_MAX_EXP
+#  define _FLOAT64_DENORM_MIN __LDBL_DENORM_MIN__
+#  define _FLOAT64_MANT_DIG   __LDBL_MANT_DIG__
 #  define force_eval_float64 force_eval_long_double
 #  define opt_barrier_float64 opt_barrier_long_double
 # endif
@@ -665,6 +668,9 @@ force_eval_long_double (long double x)
 # define _F_64(x) x
 # define _FLOAT64_MIN DBL_MIN
 # define _FLOAT64_MAX DBL_MAX
+# define _FLOAT64_MAX_EXP DBL_MAX_EXP
+# define _FLOAT64_DENORM_MIN __DBL_DENORM_MIN__
+# define _FLOAT64_MANT_DIG  __DBL_MANT_DIG__
 typedef double __float64;
 # define FORCE_FLOAT64 FORCE_DOUBLE
 # define pick_float64_except(a,b) pick_double_except(a,b)
