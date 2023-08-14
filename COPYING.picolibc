@@ -221,6 +221,10 @@ Files: newlib/libc/string/wcscat.c
 Copyright: 1999 Citrus Project,
 License: BSD2-1
 
+Files: newlib/libm/common/fma_inc.h
+Copyright: 2005-2011 David Schultz <das@FreeBSD.ORG>
+License: BSD2-1
+
 Files: newlib/libm/complex/csqrtl.c
 Copyright: 2007-2008 David Schultz <das@FreeBSD.ORG>
 License: BSD2-1
@@ -245,10 +249,6 @@ Files: newlib/libm/ld/common/s_fdiml.c
  newlib/libm/machine/mips/fenv.c
  newlib/libm/machine/powerpc/fenv.c
 Copyright: 2004 David Schultz <das@FreeBSD.ORG>
-License: BSD2-1
-
-Files: newlib/libm/ld/common/s_fmal.c
-Copyright: 2005-2011 David Schultz <das@FreeBSD.ORG>
 License: BSD2-1
 
 Files: newlib/libm/ld/common/s_lrintl.c
@@ -917,6 +917,7 @@ Files: dummyhost/exit.c
  semihost/machine/nios2/nios2_stat.c
  semihost/machine/nios2/nios2_unlink.c
  semihost/machine/nios2/nios2_write.c
+ test/test-fma.c
  test/test-raise.c
  test/test-ubsan.c
 Copyright: 2023 Keith Packard
