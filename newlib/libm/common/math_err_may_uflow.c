@@ -37,9 +37,7 @@ static const FORCE_FLOAT64 VAL = pick_float64_except(_F_64(0x1.8p-538), _F_64(0.
 HIDDEN __float64
 __math_may_uflow (uint32_t sign)
 {
-    __float64 y = pick_float64_except(VAL * VAL, VAL);
-    if (sign)
-        y = -y;
+    __float64 y = pick_float64_except((sign ? -VAL : VAL) * VAL, sign ? -VAL : VAL);
     return __math_with_errno (y, ERANGE);
 }
 #endif

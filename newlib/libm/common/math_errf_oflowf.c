@@ -34,8 +34,6 @@ static const FORCE_FLOAT VAL = pick_float_except(FLT_MAX, (float) INFINITY);
 HIDDEN float
 __math_oflowf (uint32_t sign)
 {
-    float y = pick_float_except(VAL * VAL, VAL);
-    if (sign)
-        y = -y;
+    float y = pick_float_except((sign ? -VAL : VAL) * VAL, sign ? -VAL : VAL);
     return __math_with_errnof (y, ERANGE);
 }
