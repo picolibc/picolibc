@@ -313,5 +313,14 @@ test_fma(void)
 int
 main(void)
 {
+#ifdef __arc__
+    volatile float x = 0x1.000002p-2f;
+    volatile float y = 0x1.000002p-126f;
+    volatile float z = 0x0.400002p-126f;
+    if (x * y != z) {
+        printf("ARC soft float bug, skipping FMA tests\n");
+        return 77;
+    }
+#endif
     return test_fmaf() || test_fma();
 }
