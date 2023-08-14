@@ -8,18 +8,33 @@
 
 #if !_HAVE_FAST_FMAF
 
-#ifdef __clang__
-#pragma STDC FP_CONTRACT OFF
-#endif
+typedef float FLOAT_T;
 
-float fmaf(float x, float y, float z)
+#define FMA fmaf
+#define NEXTAFTER nextafterf
+#define LDEXP ldexpf
+#define FREXP frexpf
+#define SCALBN scalbnf
+#define SPLIT (0x1p12f + 1.0f)
+#define COPYSIGN copysignf
+#define FLOAT_MANT_DIG        __FLT_MANT_DIG__
+#define FLOAT_MAX_EXP         __FLT_MAX_EXP__
+#define FLOAT_MIN             __FLT_MIN__
+#define ILOGB    ilogbf
+
+static inline int
+odd_mant(FLOAT_T x)
 {
-  /*
-   * Better to just get a double-rounded answer than invoke double
-   * precision operations and get exceptions messed up
-   */
-  return x * y + z;
+    return asuint(x) & 1;
 }
+
+static unsigned int
+EXPONENT(FLOAT_T x)
+{
+    return _exponent32(asuint(x));
+}
+
+#include "fma_inc.h"
 
 _MATH_ALIAS_f_fff(fma)
 
