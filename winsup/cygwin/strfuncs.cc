@@ -135,6 +135,12 @@ wcintowcs (wchar_t *dest, wint_t *src, size_t len)
 extern "C" size_t
 c32rtomb (char *s, char32_t wc, mbstate_t *ps)
 {
+  if (ps == NULL)
+    {
+      _REENT_CHECK_MISC(_REENT);
+      ps = &(_REENT_C32RTOMB_STATE(_REENT));
+    }
+
     /* If s is NULL, behave as if s pointed to an internal buffer and wc
        was a null wide character (L'').  wcrtomb will do that for us*/
     if (wc <= 0xffff || !s)
@@ -152,6 +158,12 @@ c32rtomb (char *s, char32_t wc, mbstate_t *ps)
 extern "C" size_t
 c16rtomb (char *s, char16_t wc, mbstate_t *ps)
 {
+  if (ps == NULL)
+    {
+      _REENT_CHECK_MISC(_REENT);
+      ps = &(_REENT_C16RTOMB_STATE(_REENT));
+    }
+
   return wcrtomb (s, (wchar_t) wc, ps);
 }
 
@@ -164,7 +176,7 @@ c8rtomb (char *s, char8_t c8, mbstate_t *ps)
   if (ps == NULL)
     {
       _REENT_CHECK_MISC(reent);
-      ps = &(_REENT_MBRTOWC_STATE(reent));
+      ps = &(_REENT_C8RTOMB_STATE(reent));
     }
 
   if (s == NULL)
@@ -258,6 +270,12 @@ mbrtoc32 (char32_t *pwc, const char *s, size_t n, mbstate_t *ps)
   size_t len, len2;
   wchar_t w1, w2;
 
+  if (ps == NULL)
+    {
+      _REENT_CHECK_MISC(_REENT);
+      ps = &(_REENT_MBRTOC32_STATE(_REENT));
+    }
+
   len = mbrtowc (&w1, s, n, ps);
   if (len == (size_t) -1 || len == (size_t) -2)
     return len;
@@ -299,7 +317,7 @@ mbrtoc16 (char16_t *pwc, const char *s, size_t n, mbstate_t *ps)
   if (ps == NULL)
     {
       _REENT_CHECK_MISC(reent);
-      ps = &(_REENT_MBRTOWC_STATE(reent));
+      ps = &(_REENT_MBRTOC16_STATE(reent));
     }
 
   if (s == NULL)
@@ -352,7 +370,7 @@ mbrtoc8 (char8_t *pc8, const char *s, size_t n, mbstate_t *ps)
   if (ps == NULL)
     {
       _REENT_CHECK_MISC(reent);
-      ps = &(_REENT_MBRTOWC_STATE(reent));
+      ps = &(_REENT_MBRTOC8_STATE(reent));
     }
 
   if (s == NULL)
