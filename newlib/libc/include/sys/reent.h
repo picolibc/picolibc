@@ -622,6 +622,14 @@ struct _reent
           _mbstate_t _wcrtomb_state;
           _mbstate_t _wcsrtombs_state;
 	  int _h_errno;
+#ifdef __CYGWIN__
+          _mbstate_t _c8rtomb_state;
+          _mbstate_t _c16rtomb_state;
+          _mbstate_t _c32rtomb_state;
+          _mbstate_t _mbrtoc8_state;
+          _mbstate_t _mbrtoc16_state;
+          _mbstate_t _mbrtoc32_state;
+#endif
         } _reent;
 #ifdef _REENT_BACKWARD_BINARY_COMPAT
       struct
@@ -730,6 +738,14 @@ struct _reent
 #define _REENT_MBSRTOWCS_STATE(ptr)((ptr)->_new._reent._mbsrtowcs_state)
 #define _REENT_WCRTOMB_STATE(ptr)((ptr)->_new._reent._wcrtomb_state)
 #define _REENT_WCSRTOMBS_STATE(ptr)((ptr)->_new._reent._wcsrtombs_state)
+#ifdef __CYGWIN__
+#  define _REENT_C8RTOMB_STATE(ptr)((ptr)->_new._reent._c8rtomb_state)
+#  define _REENT_C16RTOMB_STATE(ptr)((ptr)->_new._reent._c16rtomb_state)
+#  define _REENT_C32RTOMB_STATE(ptr)((ptr)->_new._reent._c32rtomb_state)
+#  define _REENT_MBRTOC8_STATE(ptr)((ptr)->_new._reent._mbrtoc8_state)
+#  define _REENT_MBRTOC16_STATE(ptr)((ptr)->_new._reent._mbrtoc16_state)
+#  define _REENT_MBRTOC32_STATE(ptr)((ptr)->_new._reent._mbrtoc32_state)
+#endif
 #define _REENT_L64A_BUF(ptr)    ((ptr)->_new._reent._l64a_buf)
 #define _REENT_SIGNAL_BUF(ptr)  ((ptr)->_new._reent._signal_buf)
 #define _REENT_GETDATE_ERR_P(ptr) (&((ptr)->_new._reent._getdate_err))
