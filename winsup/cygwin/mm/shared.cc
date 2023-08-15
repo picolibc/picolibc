@@ -139,8 +139,7 @@ open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
       if (name)
 	mapname = shared_name (map_buf, name, n);
       if (m == SH_JUSTOPEN)
-	shared_h = OpenFileMappingW (FILE_MAP_READ | FILE_MAP_WRITE, FALSE,
-				     mapname);
+	shared_h = OpenFileMappingW (access, FALSE, mapname);
       else
 	{
 	  created = true;
@@ -165,8 +164,7 @@ open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
   do
     {
       addr = (void *) next_address;
-      shared = MapViewOfFileEx (shared_h, FILE_MAP_READ | FILE_MAP_WRITE,
-				0, 0, 0, addr);
+      shared = MapViewOfFileEx (shared_h, access, 0, 0, 0, addr);
       next_address += wincap.allocation_granularity ();
       if (next_address >= SHARED_REGIONS_ADDRESS_HIGH)
 	{
