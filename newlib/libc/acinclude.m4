@@ -23,6 +23,7 @@ m4_foreach_w([SYS_DIR], [
   sh sysmec sysnec810 sysnecv850 sysvi386 sysvnecv70
   tic80 tirtos
   w65
+  xtensa
   z8ksim
 ], [AM_CONDITIONAL([HAVE_LIBC_SYS_]m4_toupper(SYS_DIR)[_DIR], test "${sys_dir}" = SYS_DIR)])
 
@@ -38,6 +39,7 @@ m4_include([libc/machine/nds32/acinclude.m4])
 m4_include([libc/machine/powerpc/acinclude.m4])
 m4_include([libc/machine/sh/acinclude.m4])
 m4_include([libc/machine/spu/acinclude.m4])
+m4_include([libc/machine/xtensa/acinclude.m4])
 
 m4_foreach_w([MACHINE], [
   aarch64 amdgcn arc arm
@@ -58,7 +60,7 @@ m4_foreach_w([MACHINE], [
   tic4x tic6x tic80
   v850 visium
   w65
-  x86_64 xc16x xstormy16
+  x86_64 xc16x xstormy16 xtensa
   z8k
 ], [AM_CONDITIONAL([HAVE_LIBC_MACHINE_]m4_toupper(MACHINE), test "${machine_dir}" = MACHINE)])
 

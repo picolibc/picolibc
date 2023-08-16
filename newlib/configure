@@ -603,6 +603,8 @@ HAVE_MULTISUBDIR_FALSE
 HAVE_MULTISUBDIR_TRUE
 HAVE_DOC_FALSE
 HAVE_DOC_TRUE
+HAVE_LIBM_MACHINE_XTENSA_FALSE
+HAVE_LIBM_MACHINE_XTENSA_TRUE
 HAVE_LIBM_MACHINE_X86_64_FALSE
 HAVE_LIBM_MACHINE_X86_64_TRUE
 HAVE_LIBM_MACHINE_RISCV_FALSE
@@ -627,6 +629,8 @@ HAVE_LIBM_MACHINE_AMDGCN_FALSE
 HAVE_LIBM_MACHINE_AMDGCN_TRUE
 HAVE_LIBM_MACHINE_AARCH64_FALSE
 HAVE_LIBM_MACHINE_AARCH64_TRUE
+XTENSA_XCHAL_HAVE_FP_SQRT_FALSE
+XTENSA_XCHAL_HAVE_FP_SQRT_TRUE
 HAS_NDS32_FPU_DP_FALSE
 HAS_NDS32_FPU_DP_TRUE
 HAS_NDS32_FPU_SP_FALSE
@@ -637,6 +641,8 @@ HAVE_FPMATH_H_FALSE
 HAVE_FPMATH_H_TRUE
 HAVE_LIBC_MACHINE_Z8K_FALSE
 HAVE_LIBC_MACHINE_Z8K_TRUE
+HAVE_LIBC_MACHINE_XTENSA_FALSE
+HAVE_LIBC_MACHINE_XTENSA_TRUE
 HAVE_LIBC_MACHINE_XSTORMY16_FALSE
 HAVE_LIBC_MACHINE_XSTORMY16_TRUE
 HAVE_LIBC_MACHINE_XC16X_FALSE
@@ -751,6 +757,8 @@ HAVE_LIBC_MACHINE_AMDGCN_FALSE
 HAVE_LIBC_MACHINE_AMDGCN_TRUE
 HAVE_LIBC_MACHINE_AARCH64_FALSE
 HAVE_LIBC_MACHINE_AARCH64_TRUE
+XTENSA_ESP32_PSRAM_CACHE_FIX_FALSE
+XTENSA_ESP32_PSRAM_CACHE_FIX_TRUE
 HAVE_SPU_EA_FALSE
 HAVE_SPU_EA_TRUE
 SH64_FALSE
@@ -767,6 +775,8 @@ HAVE_LONG_DOUBLE_FALSE
 HAVE_LONG_DOUBLE_TRUE
 HAVE_LIBC_SYS_Z8KSIM_DIR_FALSE
 HAVE_LIBC_SYS_Z8KSIM_DIR_TRUE
+HAVE_LIBC_SYS_XTENSA_DIR_FALSE
+HAVE_LIBC_SYS_XTENSA_DIR_TRUE
 HAVE_LIBC_SYS_W65_DIR_FALSE
 HAVE_LIBC_SYS_W65_DIR_TRUE
 HAVE_LIBC_SYS_TIRTOS_DIR_FALSE
@@ -5502,6 +5512,13 @@ else
   HAVE_LIBC_SYS_W65_DIR_TRUE='#'
   HAVE_LIBC_SYS_W65_DIR_FALSE=
 fi
+ if test "${sys_dir}" = xtensa; then
+  HAVE_LIBC_SYS_XTENSA_DIR_TRUE=
+  HAVE_LIBC_SYS_XTENSA_DIR_FALSE='#'
+else
+  HAVE_LIBC_SYS_XTENSA_DIR_TRUE='#'
+  HAVE_LIBC_SYS_XTENSA_DIR_FALSE=
+fi
  if test "${sys_dir}" = z8ksim; then
   HAVE_LIBC_SYS_Z8KSIM_DIR_TRUE=
   HAVE_LIBC_SYS_Z8KSIM_DIR_FALSE='#'
@@ -5713,6 +5730,15 @@ fi
 else
   HAVE_SPU_EA_TRUE='#'
   HAVE_SPU_EA_FALSE=
+fi
+
+
+ if echo $CC | grep mfix-esp32-psram-cache-issue >/dev/null 2>&1; then
+  XTENSA_ESP32_PSRAM_CACHE_FIX_TRUE=
+  XTENSA_ESP32_PSRAM_CACHE_FIX_FALSE='#'
+else
+  XTENSA_ESP32_PSRAM_CACHE_FIX_TRUE='#'
+  XTENSA_ESP32_PSRAM_CACHE_FIX_FALSE=
 fi
 
 
@@ -6116,6 +6142,13 @@ else
   HAVE_LIBC_MACHINE_XSTORMY16_TRUE='#'
   HAVE_LIBC_MACHINE_XSTORMY16_FALSE=
 fi
+ if test "${machine_dir}" = xtensa; then
+  HAVE_LIBC_MACHINE_XTENSA_TRUE=
+  HAVE_LIBC_MACHINE_XTENSA_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_XTENSA_TRUE='#'
+  HAVE_LIBC_MACHINE_XTENSA_FALSE=
+fi
  if test "${machine_dir}" = z8k; then
   HAVE_LIBC_MACHINE_Z8K_TRUE=
   HAVE_LIBC_MACHINE_Z8K_FALSE='#'
@@ -6221,6 +6254,47 @@ else
 fi
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XCHAL_HAVE_FP_SQRT" >&5
+$as_echo_n "checking for XCHAL_HAVE_FP_SQRT... " >&6; }
+if ${newlib_cv_xchal_have_fp_sqrt+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#define _LIBM
+// targ-include does not exist yet, use relative path
+#include "../sys/xtensa/include/xtensa/config/core-isa.h"
+#if (!XCHAL_HAVE_FP_SQRT)
+# error "Have not XCHAL_HAVE_FP_SQRT"
+#endif
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_cpp "$LINENO"; then :
+  newlib_cv_xchal_have_fp_sqrt="yes"
+else
+  newlib_cv_xchal_have_fp_sqrt="no"
+fi
+rm -f conftest.err conftest.i conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $newlib_cv_xchal_have_fp_sqrt" >&5
+$as_echo "$newlib_cv_xchal_have_fp_sqrt" >&6; }
+
+ if test "$newlib_cv_xchal_have_fp_sqrt" = "yes"; then
+  XTENSA_XCHAL_HAVE_FP_SQRT_TRUE=
+  XTENSA_XCHAL_HAVE_FP_SQRT_FALSE='#'
+else
+  XTENSA_XCHAL_HAVE_FP_SQRT_TRUE='#'
+  XTENSA_XCHAL_HAVE_FP_SQRT_FALSE=
+fi
+
+
 
    if test "${libm_machine_dir}" = "aarch64"; then
   HAVE_LIBM_MACHINE_AARCH64_TRUE=
@@ -6316,6 +6390,14 @@ fi
 else
   HAVE_LIBM_MACHINE_X86_64_TRUE='#'
   HAVE_LIBM_MACHINE_X86_64_FALSE=
+fi
+
+   if test "${libm_machine_dir}" = "xtensa"; then
+  HAVE_LIBM_MACHINE_XTENSA_TRUE=
+  HAVE_LIBM_MACHINE_XTENSA_FALSE='#'
+else
+  HAVE_LIBM_MACHINE_XTENSA_TRUE='#'
+  HAVE_LIBM_MACHINE_XTENSA_FALSE=
 fi
 
 
@@ -7617,6 +7699,10 @@ if test -z "${HAVE_LIBC_SYS_W65_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_W65_DIR_F
   as_fn_error $? "conditional \"HAVE_LIBC_SYS_W65_DIR\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${HAVE_LIBC_SYS_XTENSA_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_XTENSA_DIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_SYS_XTENSA_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${HAVE_LIBC_SYS_Z8KSIM_DIR_TRUE}" && test -z "${HAVE_LIBC_SYS_Z8KSIM_DIR_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_LIBC_SYS_Z8KSIM_DIR\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -7647,6 +7733,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_SPU_EA_TRUE}" && test -z "${HAVE_SPU_EA_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_SPU_EA\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${XTENSA_ESP32_PSRAM_CACHE_FIX_TRUE}" && test -z "${XTENSA_ESP32_PSRAM_CACHE_FIX_FALSE}"; then
+  as_fn_error $? "conditional \"XTENSA_ESP32_PSRAM_CACHE_FIX\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_LIBC_MACHINE_AARCH64_TRUE}" && test -z "${HAVE_LIBC_MACHINE_AARCH64_FALSE}"; then
@@ -7877,6 +7967,10 @@ if test -z "${HAVE_LIBC_MACHINE_XSTORMY16_TRUE}" && test -z "${HAVE_LIBC_MACHINE
   as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_XSTORMY16\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${HAVE_LIBC_MACHINE_XTENSA_TRUE}" && test -z "${HAVE_LIBC_MACHINE_XTENSA_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_XTENSA\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${HAVE_LIBC_MACHINE_Z8K_TRUE}" && test -z "${HAVE_LIBC_MACHINE_Z8K_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_Z8K\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -7895,6 +7989,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAS_NDS32_FPU_DP_TRUE}" && test -z "${HAS_NDS32_FPU_DP_FALSE}"; then
   as_fn_error $? "conditional \"HAS_NDS32_FPU_DP\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${XTENSA_XCHAL_HAVE_FP_SQRT_TRUE}" && test -z "${XTENSA_XCHAL_HAVE_FP_SQRT_FALSE}"; then
+  as_fn_error $? "conditional \"XTENSA_XCHAL_HAVE_FP_SQRT\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_LIBM_MACHINE_AARCH64_TRUE}" && test -z "${HAVE_LIBM_MACHINE_AARCH64_FALSE}"; then
@@ -7943,6 +8041,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_LIBM_MACHINE_X86_64_TRUE}" && test -z "${HAVE_LIBM_MACHINE_X86_64_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_LIBM_MACHINE_X86_64\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBM_MACHINE_XTENSA_TRUE}" && test -z "${HAVE_LIBM_MACHINE_XTENSA_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBM_MACHINE_XTENSA\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_DOC_TRUE}" && test -z "${HAVE_DOC_FALSE}"; then

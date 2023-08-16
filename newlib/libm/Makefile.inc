@@ -92,6 +92,9 @@ if HAVE_LIBM_MACHINE_X86_64
 include %D%/machine/x86_64/Makefile.inc
 include %D%/ld80/Makefile.inc
 endif
+if HAVE_LIBM_MACHINE_XTENSA
+include %D%/machine/xtensa/Makefile.inc
+endif
 
 CLEANFILES += \
 	%D%/targetdep.tex \
