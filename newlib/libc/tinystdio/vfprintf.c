@@ -640,12 +640,15 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #endif
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define LEXP_SHIFT       __LDBL_MANT_DIG__
+#define LSIGN_SHIFT        79
 #endif
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #define LEXP_SHIFT       (__LDBL_MANT_DIG__ + 16)
+#define LSIGN_SHIFT        (79 + 16)
 #endif
 #else
 #define LDENORM_EXP_BIAS 1
+#define LSIGN_SHIFT        127
 #define LEXP_BIAS       (__LDBL_MAX_EXP__ - 1)
 #define LEXP_INF        (__LDBL_MAX_EXP__)
 #define LSIG_MSB        _u128_lshift(to_u128(1), __LDBL_MANT_DIG__-1)
@@ -657,6 +660,9 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #define LSIG_MASK        _u128_minus_64(_u128_lshift(to_u128(1), LSIG_BITS), 1)
 
                     exp = _u128_and_64(_u128_rshift(fi, LEXP_SHIFT), LEXP_MASK);
+                    _dtoa.flags = 0;
+                    if (_u128_and_64(_u128_rshift(fi, LSIGN_SHIFT), 1))
+                        _dtoa.flags = DTOA_MINUS;
                     s = fi = _u128_lshift(_u128_and(fi, LSIG_MASK), LSIG_SHIFT);
                     if (!_u128_is_zero(s) || exp != 0) {
                         if (exp == 0)
@@ -669,9 +675,6 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                         }
                         exp -= LEXP_BIAS;
                     }
-                    _dtoa.flags = 0;
-                    if (_i128_lt_zero(fi))
-                        _dtoa.flags = DTOA_MINUS;
 
                     if (!(flags & FL_PREC))
                         prec = 0;
