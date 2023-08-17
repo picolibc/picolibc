@@ -35,9 +35,7 @@ static const FORCE_LONG_DOUBLE VAL = pick_long_double_except(LDBL_MIN, 0.0l);
 HIDDEN long double
 __math_uflowl (uint32_t sign)
 {
-    long double y = pick_long_double_except(VAL * VAL, VAL);
-    if (sign)
-        y = -y;
+    long double y = pick_long_double_except((sign ? -VAL : VAL) * VAL, VAL);
     return __math_with_errnol (y, ERANGE);
 }
 
