@@ -1,0 +1,425 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2023 Keith Packard
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/* List of all IEEE rounding modes */
+typedef enum {
+	TONEAREST, UPWARD, DOWNWARD, TOWARDZERO
+} rounding_mode_t;
+
+/*
+ * IEEE-style numbers with explicit sign (for signed 0), along with
+ * NaN and infinity values
+ */
+
+typedef union {
+	real	num;
+	void	nan;
+	void	inf;
+} value_t;
+
+typedef struct {
+	bool	sign;
+	value_t	u;
+} float_t;
+
+/*
+ * Exponent range for the specified number of bits in the
+ * exponent. Note that the minimum is off-by one for the 80-bit m68k
+ * format, which uses a slightly different form for denorm.
+ */
+
+int
+min_exp(int exp_bits)
+{
+	return -(2**(exp_bits-1) - 3);
+}
+
+int
+max_exp(int exp_bits)
+{
+	return (2**(exp_bits-1));
+}
+
+/*
+ * Construct our fancy float_t from a number
+ */
+float_t
+make_float(real num)
+{
+	return (float_t) {
+		.sign = num < 0,
+		.u = { .num = num },
+	};
+}
+
+/*
+ * Round the given float to the specified sizes under the given
+ * rounding mode.
+ */
+
+float_t
+round(float_t f, int bits, int exp_bits, rounding_mode_t rm)
+{
+	union switch(f.u) {
+	case num x:
+		if (f.sign)
+			x = -x;
+		int exp;
+		if (x == 0)
+			exp = 0;
+		else
+			exp = ceil(log2(x));
+		int denorm = min_exp(exp_bits) - exp;
+
+		/* Denorm means our available precision is reduced */
+		if (denorm > 0) {
+#			printf("denorm %d\n", denorm);
+			bits -= denorm;
+		}
+
+		/*
+		 * Compute the significand. This could use the
+		 * mantissa built-in function if 'x' was a float, but
+		 * we usually want to use rationals instead to
+		 * preserve all of the bits until rounding happens
+		 */
+		real mant = abs(x / (2**(exp-bits)));;
+
+		/*
+		 * Split into integer and fractional portions. The
+		 * integer portion holds the number of bits in the
+		 * eventual result, the fractional portion is used in
+		 * rounding decisions.
+		 */
+		int ipart = floor(mant);
+		real fpart = mant - ipart;
+
+#		printf("%a: mant %f ipart %d fpart %f\n", x, mant, ipart, fpart);
+
+		union switch(rm) {
+		case TONEAREST:
+			if (fpart == 0.5) {
+				/* round even when the fraction is exactly 1/2 */
+				if ((ipart & 1) != 0)
+					ipart = ipart + 1;
+			} else if (fpart > 0.5) {
+				ipart = ipart + 1;
+			}
+			break;
+		case UPWARD:
+			if (!f.sign) {
+				if (fpart > 0)
+					ipart = ipart + 1;
+			} else {
+				/*
+				 * Large negative values round
+				 * up to the negative finite value
+				 * of greatest magnitude instead of
+				 * rounding down to -infinity
+				 */
+				if (exp > max_exp(exp_bits)) {
+					exp = max_exp(exp_bits);
+					ipart = (2**bits) - 1;
+				}
+			}
+			break;
+		case DOWNWARD:
+			if (f.sign) {
+				if (fpart > 0)
+					ipart = ipart + 1;
+			} else {
+				/*
+				 * Large positive values round
+				 * down to the positive finite value
+				 * of greatest magnitude instead of
+				 * rounding up to infinity
+				 */
+				if (exp > max_exp(exp_bits)) {
+					exp = max_exp(exp_bits);
+					ipart = (2**bits) - 1;
+				}
+			}
+			break;
+		case TOWARDZERO:
+			/*
+			 * Large magnitude values round to the value
+			 * of largest magnitude of the appropriate
+			 * sign instead of away from zero to
+			 * +/-infinity.
+			 */
+			if (exp > max_exp(exp_bits)) {
+				exp = max_exp(exp_bits);
+				ipart = (2**bits) - 1;
+			}
+			break;
+		}
+
+		/*
+		 * Handle underflow in a way that preserves rounding
+		 * to a value of smallest magnitude.
+		 */
+		if (bits < 0) {
+			exp -= bits;
+			bits = 0;
+		}
+
+		/*
+		 * Compute the final significand, which
+		 * is always >= 0.5 and < 1
+		 */
+		mant = ipart / (2 ** bits);
+		if (mant >= 1) {
+			exp++;
+			mant /= 2;
+		}
+
+		/* Overflow to infinity */
+		if (exp > max_exp(exp_bits)) {
+			f.u.inf = <>;
+		} else {
+			f.u.num = mant * 2 ** exp;
+			if (f.sign)
+				f.u.num = -f.u.num;
+		}
+		break;
+	case nan:
+	case inf:
+		break;
+	}
+	return f;
+}
+
+string
+strfromfloat(float_t f, string suffix)
+{
+	union switch (f.u) {
+	case num x:
+		if (x == 0)
+			/*
+			 * Make sure zero is printed as 0.0 so that
+			 * the suffix works
+			 */
+			return sprintf("%.1f%s", x, suffix);
+		else
+			/*
+			 * %a format involves conversion to float; the
+			 * default has 256 bits of significand, which
+			 * is expected to be sufficient for any ieee
+			 * target
+			 */
+			return sprintf("%a%s", x, suffix);
+	case nan:
+		return sprintf("%s%s", f.sign ? "          -nan" : "           nan", suffix);
+	case inf:
+		return sprintf("%s%s", f.sign ? "          -inf" : "           inf", suffix);
+	}
+}
+
+bool
+isfinite(float_t f)
+{
+	union switch (f.u) {
+	case num:
+		return true;
+	default:
+		return false;
+	}
+}
+
+bool
+isnan(float_t f)
+{
+	union switch (f.u) {
+	case nan:
+		return true;
+	default:
+		return false;
+	}
+}
+
+bool
+isinf(float_t f)
+{
+	union switch (f.u) {
+	case inf:
+		return true;
+	default:
+		return false;
+	}
+}
+
+float_t
+times(float_t a, float_t b)
+{
+	if (isnan(a))
+		return a;
+	if (isnan(b))
+		return b;
+
+	bool sign = !(a.sign == b.sign);
+
+	/* Special case inf values -- inf * 0 is nan, but inf * other is inf */
+	if (isinf(a)) {
+		if (b.u == (value_t.num) 0)
+			return (float_t) { .sign = sign, .u = { .nan = <> } };
+		return (float_t) { .sign = sign, .u = a.u };
+	}
+	if (isinf(b)) {
+		if (a.u == (value_t.num) 0)
+			return (float_t) { .sign = sign, .u = { .nan = <> } };
+		return (float_t) { .sign = sign, .u = b.u };
+	}
+	return (float_t) { .sign = sign, .u = { .num = a.u.num * b.u.num } };
+}
+
+float_t
+plus(float_t a, float_t b)
+{
+	if (isnan(a))
+		return a;
+	if (isnan(b))
+		return b;
+
+	if (isinf(a)) {
+		/* inf + -inf is NaN */
+		if (isinf(b) && a.sign != b.sign)
+			return (float_t) { .sign = true, .u = { .nan = <> } };
+		return a;
+	}
+	if (isinf(b)) {
+		return b;
+	}
+	real v = a.u.num + b.u.num;
+	bool sign = v < 0;
+	if (v == 0)
+		sign = a.sign;
+	return (float_t) { .sign = sign, .u = { .num = v } };
+}
+
+/*
+ * Now that we have all of our support functions, the actual fma
+ * implementation is pretty simple
+ */
+float_t
+fma(float_t x, float_t y, float_t z)
+{
+	return plus(times(x, y), z);
+}
+
+/*
+ * A kludge -- place the current floating point format values in these
+ * globals to make next_exp work without needing to pass a bunch of
+ * state in.
+ */
+
+int MIN_EXP;
+int MAX_EXP;
+int MANT_DIG;
+int FIRST_EXP;
+int LAST_EXP;
+
+int next_exp(int e)
+{
+	switch (e) {
+	case FIRST_EXP + 1:
+		return MIN_EXP - 2;
+	case MIN_EXP:
+		return -1;
+	case 1:
+		return LAST_EXP - 2;
+	default:
+		return e + 1;
+	}
+}
+
+/*
+ * Generate a set of test vectors for the specified floating point
+ * format
+ */
+void generate(string suf, int bits, int exp_bits)
+{
+	MIN_EXP = -(2**(exp_bits-1) -3);
+	MAX_EXP = 2**(exp_bits-1);
+	MANT_DIG = bits;
+	FIRST_EXP = (MIN_EXP - MANT_DIG - 2);
+	LAST_EXP = (MAX_EXP);
+
+	real val = 1 + 2**-(bits-1);
+
+	/* Check +/- z */
+	for (int zs = -1; zs <= 1; zs += 2) {
+		for (int ze = FIRST_EXP; ze <= LAST_EXP; ze = next_exp(ze)) {
+			float_t z = round(make_float(zs * val * (2 ** ze)), bits, exp_bits, rounding_mode_t.TONEAREST);
+			for (int ye = FIRST_EXP; ye <= LAST_EXP; ye = next_exp(ye)) {
+				float_t y = round(make_float(val * (2 ** ye)), bits, exp_bits, rounding_mode_t.TONEAREST);
+				for (int xs = -1; xs <= 1; xs += 2) {
+					for (int xe = FIRST_EXP; xe <= LAST_EXP; xe = next_exp(xe)) {
+						float_t x = round(make_float(xs * val * (2 ** xe)), bits, exp_bits, rounding_mode_t.TONEAREST);
+						printf("    { %-17s, %-17s, %-17s, {", strfromfloat(x, suf), strfromfloat(y, suf), strfromfloat(z, suf));
+						float_t r = plus(times(x, y), z);
+						printf(" %s,", strfromfloat(round(r, bits, exp_bits, rounding_mode_t.TONEAREST), suf));
+						printf(" %s,", strfromfloat(round(r, bits, exp_bits, rounding_mode_t.UPWARD), suf));
+						printf(" %s,", strfromfloat(round(r, bits, exp_bits, rounding_mode_t.DOWNWARD), suf));
+						printf(" %s" , strfromfloat(round(r, bits, exp_bits, rounding_mode_t.TOWARDZERO), suf));
+						printf(" } },\n");
+					}
+				}
+			}
+		}
+	}
+}
+
+void main()
+{
+	printf("/* This file is automatically generated with fma_gen.5c */\n");
+	printf("static const struct fmaf_vec fmaf_vec[] = {\n");
+	generate("f", 24, 8);
+	printf("};\n");
+	printf("static const struct fma_vec fma_vec[] = {\n");
+	generate("", 53, 11);
+	printf("};\n");
+	printf("#if LDBL_MANT_DIG == 64\n");
+	printf("static const struct fmal_vec fmal_vec[] = {\n");
+	generate("l", 64, 15);
+	printf("};\n");
+	printf("#endif\n");
+	printf("#if LDBL_MANT_DIG == 113\n");
+	printf("static const struct fmal_vec fmal_vec[] = {\n");
+	generate("l", 113, 15);
+	printf("};\n");
+	printf("#endif\n");
+}
+
+main();
