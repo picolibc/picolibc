@@ -2399,7 +2399,8 @@ class fhandler_pty_common: public fhandler_termios
   void resize_pseudo_console (struct winsize *);
   static DWORD get_console_process_id (DWORD pid, bool match,
 				       bool cygwin = false,
-				       bool stub_only = false);
+				       bool stub_only = false,
+				       bool nat = false);
   bool to_be_read_from_nat_pipe (void);
   static DWORD attach_console_temporarily (DWORD target_pid);
   static void resume_from_temporarily_attach (DWORD resume_pid);

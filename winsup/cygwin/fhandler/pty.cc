@@ -85,7 +85,8 @@ inline static bool process_alive (DWORD pid);
      stub_only: return only stub process's pid of non-cygwin process. */
 DWORD
 fhandler_pty_common::get_console_process_id (DWORD pid, bool match,
-					     bool cygwin, bool stub_only)
+					     bool cygwin, bool stub_only,
+					     bool nat)
 {
   tmp_pathbuf tp;
   DWORD *list = (DWORD *) tp.c_get ();
@@ -109,6 +110,8 @@ fhandler_pty_common::get_console_process_id (DWORD pid, bool match,
 	else
 	  {
 	    pinfo p (cygwin_pid (list[i]));
+	    if (nat && !!p && !ISSTATE(p, PID_NOTCYGWIN))
+	      continue;
 	    if (!!p && p->exec_dwProcessId)
 	      {
 		res_pri = stub_only ? p->exec_dwProcessId : list[i];
@@ -3511,9 +3514,11 @@ fhandler_pty_slave::get_winpid_to_hand_over (tty *ttyp,
     {
       /* Search another native process which attaches to the same console */
       DWORD current_pid = myself->exec_dwProcessId ?: myself->dwProcessId;
-      switch_to = get_console_process_id (current_pid, false, true, true);
+      switch_to = get_console_process_id (current_pid,
+					  false, true, true, true);
       if (!switch_to)
-	switch_to = get_console_process_id (current_pid, false, true, false);
+	switch_to = get_console_process_id (current_pid,
+					    false, true, false, true);
     }
   return switch_to;
 }
