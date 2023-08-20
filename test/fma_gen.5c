@@ -55,24 +55,6 @@ typedef struct {
 } float_t;
 
 /*
- * Exponent range for the specified number of bits in the
- * exponent. Note that the minimum is off-by one for the 80-bit m68k
- * format, which uses a slightly different form for denorm.
- */
-
-int
-min_exp(int exp_bits)
-{
-	return -(2**(exp_bits-1) - 3);
-}
-
-int
-max_exp(int exp_bits)
-{
-	return (2**(exp_bits-1));
-}
-
-/*
  * Construct our fancy float_t from a number
  */
 float_t
@@ -84,14 +66,41 @@ make_float(real num)
 	};
 }
 
+typedef struct {
+	int	bits;
+	int	exp_bits;
+	int	min_exp;
+	int	max_exp;
+
+	int	first_exp;
+	int	last_exp;
+} format_t;
+
+typedef union {
+	format_t	format;
+	void		none;
+} format_or_none_t;
+
+format_or_none_t none_format = { .none = <> };
+
 /*
  * Round the given float to the specified sizes under the given
  * rounding mode.
  */
 
 float_t
-round(float_t f, int bits, int exp_bits, rounding_mode_t rm)
+round(float_t f, format_t format, format_or_none_t i_format, rounding_mode_t rm)
 {
+	union switch (i_format) {
+	case format format:
+		f = round(f, format, none_format, rm);
+		break;
+	case none:
+		break;
+	}
+
+	int bits = format.bits;
+
 	union switch(f.u) {
 	case num x:
 		if (f.sign)
@@ -101,7 +110,7 @@ round(float_t f, int bits, int exp_bits, rounding_mode_t rm)
 			exp = 0;
 		else
 			exp = ceil(log2(x));
-		int denorm = min_exp(exp_bits) - exp;
+		int denorm = format.min_exp - exp;
 
 		/* Denorm means our available precision is reduced */
 		if (denorm > 0) {
@@ -115,7 +124,7 @@ round(float_t f, int bits, int exp_bits, rounding_mode_t rm)
 		 * we usually want to use rationals instead to
 		 * preserve all of the bits until rounding happens
 		 */
-		real mant = abs(x / (2**(exp-bits)));;
+		real mant = abs(x / (2**(exp-bits)));
 
 		/*
 		 * Split into integer and fractional portions. The
@@ -126,7 +135,7 @@ round(float_t f, int bits, int exp_bits, rounding_mode_t rm)
 		int ipart = floor(mant);
 		real fpart = mant - ipart;
 
-#		printf("%a: mant %f ipart %d fpart %f\n", x, mant, ipart, fpart);
+#		printf("%a: mant %e ipart %d fpart %f\n", x, mant, ipart, fpart);
 
 		union switch(rm) {
 		case TONEAREST:
@@ -149,8 +158,8 @@ round(float_t f, int bits, int exp_bits, rounding_mode_t rm)
 				 * of greatest magnitude instead of
 				 * rounding down to -infinity
 				 */
-				if (exp > max_exp(exp_bits)) {
-					exp = max_exp(exp_bits);
+				if (exp > format.max_exp) {
+					exp = format.max_exp;
 					ipart = (2**bits) - 1;
 				}
 			}
@@ -166,8 +175,8 @@ round(float_t f, int bits, int exp_bits, rounding_mode_t rm)
 				 * of greatest magnitude instead of
 				 * rounding up to infinity
 				 */
-				if (exp > max_exp(exp_bits)) {
-					exp = max_exp(exp_bits);
+				if (exp > format.max_exp) {
+					exp = format.max_exp;
 					ipart = (2**bits) - 1;
 				}
 			}
@@ -179,8 +188,8 @@ round(float_t f, int bits, int exp_bits, rounding_mode_t rm)
 			 * sign instead of away from zero to
 			 * +/-infinity.
 			 */
-			if (exp > max_exp(exp_bits)) {
-				exp = max_exp(exp_bits);
+			if (exp > format.max_exp) {
+				exp = format.max_exp;
 				ipart = (2**bits) - 1;
 			}
 			break;
@@ -195,6 +204,8 @@ round(float_t f, int bits, int exp_bits, rounding_mode_t rm)
 			bits = 0;
 		}
 
+#		printf("rounded ipart %d exp %d bits %d\n", ipart, exp, bits);
+
 		/*
 		 * Compute the final significand, which
 		 * is always >= 0.5 and < 1
@@ -206,7 +217,7 @@ round(float_t f, int bits, int exp_bits, rounding_mode_t rm)
 		}
 
 		/* Overflow to infinity */
-		if (exp > max_exp(exp_bits)) {
+		if (exp > format.max_exp) {
 			f.u.inf = <>;
 		} else {
 			f.u.num = mant * 2 ** exp;
@@ -338,62 +349,70 @@ fma(float_t x, float_t y, float_t z)
 	return plus(times(x, y), z);
 }
 
-/*
- * A kludge -- place the current floating point format values in these
- * globals to make next_exp work without needing to pass a bunch of
- * state in.
- */
-
-int MIN_EXP;
-int MAX_EXP;
-int MANT_DIG;
-int FIRST_EXP;
-int LAST_EXP;
-
-int next_exp(int e)
+int next_exp(int e, format_t format)
 {
 	switch (e) {
-	case FIRST_EXP + 1:
-		return MIN_EXP - 2;
-	case MIN_EXP:
+	case format.first_exp + 1:
+		return format.min_exp - 2;
+	case format.min_exp:
 		return -1;
 	case 1:
-		return LAST_EXP - 2;
+		return format.last_exp - 2;
 	default:
 		return e + 1;
 	}
 }
 
 /*
+ * Usual Exponent range for the specified number of bits in the
+ * exponent. Note that the minimum is off-by one for the 80-bit m68k
+ * format, which uses a slightly different form for denorm.
+ */
+
+int
+min_exp(int exp_bits)
+{
+	return -(2**(exp_bits-1) - 3);
+}
+
+int
+max_exp(int exp_bits)
+{
+	return (2**(exp_bits-1));
+}
+
+/*
  * Generate a set of test vectors for the specified floating point
  * format
  */
-void generate(string suf, int bits, int exp_bits)
+void generate(string suf, format_t format, format_or_none_t i_format)
 {
-	MIN_EXP = -(2**(exp_bits-1) -3);
-	MAX_EXP = 2**(exp_bits-1);
-	MANT_DIG = bits;
-	FIRST_EXP = (MIN_EXP - MANT_DIG - 2);
-	LAST_EXP = (MAX_EXP);
+	int bits = format.bits;
+
+	format.first_exp = (format.min_exp - bits - 2);
+	format.last_exp = (format.max_exp);
 
 	real val = 1 + 2**-(bits-1);
 
+	int i = 0;
+
 	/* Check +/- z */
 	for (int zs = -1; zs <= 1; zs += 2) {
-		for (int ze = FIRST_EXP; ze <= LAST_EXP; ze = next_exp(ze)) {
-			float_t z = round(make_float(zs * val * (2 ** ze)), bits, exp_bits, rounding_mode_t.TONEAREST);
-			for (int ye = FIRST_EXP; ye <= LAST_EXP; ye = next_exp(ye)) {
-				float_t y = round(make_float(val * (2 ** ye)), bits, exp_bits, rounding_mode_t.TONEAREST);
+		for (int ze = format.first_exp; ze <= format.last_exp; ze = next_exp(ze, format)) {
+			float_t z = round(make_float(zs * val * (2 ** ze)), format, none_format, rounding_mode_t.TONEAREST);
+			for (int ye = format.first_exp; ye <= format.last_exp; ye = next_exp(ye, format)) {
+				float_t y = round(make_float(val * (2 ** ye)), format, none_format, rounding_mode_t.TONEAREST);
 				for (int xs = -1; xs <= 1; xs += 2) {
-					for (int xe = FIRST_EXP; xe <= LAST_EXP; xe = next_exp(xe)) {
-						float_t x = round(make_float(xs * val * (2 ** xe)), bits, exp_bits, rounding_mode_t.TONEAREST);
-						printf("    { %-17s, %-17s, %-17s, {", strfromfloat(x, suf), strfromfloat(y, suf), strfromfloat(z, suf));
+					for (int xe = format.first_exp; xe <= format.last_exp; xe = next_exp(xe, format)) {
+						float_t x = round(make_float(xs * val * (2 ** xe)), format, none_format, rounding_mode_t.TONEAREST);
+						printf(" /* %4d */ { %-17s, %-17s, %-17s, {", i, strfromfloat(x, suf), strfromfloat(y, suf), strfromfloat(z, suf));
 						float_t r = plus(times(x, y), z);
-						printf(" %s,", strfromfloat(round(r, bits, exp_bits, rounding_mode_t.TONEAREST), suf));
-						printf(" %s,", strfromfloat(round(r, bits, exp_bits, rounding_mode_t.UPWARD), suf));
-						printf(" %s,", strfromfloat(round(r, bits, exp_bits, rounding_mode_t.DOWNWARD), suf));
-						printf(" %s" , strfromfloat(round(r, bits, exp_bits, rounding_mode_t.TOWARDZERO), suf));
+						printf(" %s,", strfromfloat(round(r, format, i_format, rounding_mode_t.TONEAREST), suf));
+						printf(" %s,", strfromfloat(round(r, format, i_format, rounding_mode_t.UPWARD), suf));
+						printf(" %s,", strfromfloat(round(r, format, i_format, rounding_mode_t.DOWNWARD), suf));
+						printf(" %s" , strfromfloat(round(r, format, i_format, rounding_mode_t.TOWARDZERO), suf));
 						printf(" } },\n");
+						i++;
 					}
 				}
 			}
@@ -401,23 +420,117 @@ void generate(string suf, int bits, int exp_bits)
 	}
 }
 
+format_t ieee_32 = {
+	.bits = 24,
+	.exp_bits = 8,
+	.min_exp = min_exp(8),
+	.max_exp = max_exp(8),
+};
+
+format_t ieee_64 = {
+	.bits = 53,
+	.exp_bits = 11,
+	.min_exp = min_exp(11),
+	.max_exp = max_exp(11),
+};
+
+format_t ieee_128 = {
+	.bits = 113,
+	.exp_bits = 15,
+	.min_exp = min_exp(15),
+	.max_exp = max_exp(15),
+};
+
+format_t intel_80 = {
+	.bits = 64,
+	.exp_bits = 15,
+	.min_exp = min_exp(15),
+	.max_exp = max_exp(15),
+};
+
+format_t moto_80 = {
+	.bits = 64,
+	.exp_bits = 15,
+	.min_exp = -16382,
+	.max_exp = max_exp(15),
+};
+
+format_or_none_t intel_80_optional = { .format = intel_80 };
+format_or_none_t moto_80_optional = { .format = moto_80 };
+
 void main()
 {
 	printf("/* This file is automatically generated with fma_gen.5c */\n");
+	printf("\n");
+
+	printf("#if __FLT_EVAL_METHOD__ == 0 && FLT_MANT_DIG == 24\n");
+	printf("#define HAVE_FLOAT_FMA_VEC\n");
 	printf("static const struct fmaf_vec fmaf_vec[] = {\n");
-	generate("f", 24, 8);
-	printf("};\n");
-	printf("static const struct fma_vec fma_vec[] = {\n");
-	generate("", 53, 11);
-	printf("};\n");
-	printf("#if LDBL_MANT_DIG == 64\n");
-	printf("static const struct fmal_vec fmal_vec[] = {\n");
-	generate("l", 64, 15);
+	generate("f", ieee_32, none_format);
 	printf("};\n");
 	printf("#endif\n");
-	printf("#if LDBL_MANT_DIG == 113\n");
+	printf("\n");
+
+	printf("#if __FLT_EVAL_METHOD__ == 2 && FLT_MANT_DIG == 24 && LDBL_MANT_DIG == 64 && LDBL_MIN_EXP == -16381\n");
+	printf("#define HAVE_FLOAT_FMA_VEC\n");
+	printf("static const struct fmaf_vec fmaf_vec[] = {\n");
+	generate("f", ieee_32, intel_80_optional);
+	printf("};\n");
+	printf("#endif\n");
+	printf("\n");
+
+	printf("#if __FLT_EVAL_METHOD__ == 2 && FLT_MANT_DIG == 24 && LDBL_MANT_DIG == 64 && LDBL_MIN_EXP == -16382\n");
+	printf("#define HAVE_FLOAT_FMA_VEC\n");
+	printf("static const struct fmaf_vec fmaf_vec[] = {\n");
+	generate("f", ieee_32, moto_80_optional);
+	printf("};\n");
+	printf("#endif\n");
+	printf("\n");
+
+	printf("#if __FLT_EVAL_METHOD__ <= 1 && DBL_MANT_DIG == 53\n");
+	printf("#define HAVE_DOUBLE_FMA_VEC\n");
+	printf("static const struct fma_vec fma_vec[] = {\n");
+	generate("", ieee_64, none_format);
+	printf("};\n");
+	printf("#endif\n");
+	printf("\n");
+
+	printf("#if __FLT_EVAL_METHOD__ == 2 && DBL_MANT_DIG == 53 && LDBL_MANT_DIG == 64 && LDBL_MIN_EXP == -16381\n");
+	printf("#define HAVE_DOUBLE_FMA_VEC\n");
+	printf("static const struct fma_vec fma_vec[] = {\n");
+	generate("", ieee_64, intel_80_optional);
+	printf("};\n");
+	printf("#endif\n");
+	printf("\n");
+
+	printf("#if __FLT_EVAL_METHOD__ == 2 && DBL_MANT_DIG == 53 && LDBL_MANT_DIG == 64 && LDBL_MIN_EXP == -16382\n");
+	printf("#define HAVE_DOUBLE_FMA_VEC\n");
+	printf("static const struct fma_vec fma_vec[] = {\n");
+	generate("", ieee_64, moto_80_optional);
+	printf("};\n");
+	printf("#endif\n");
+	printf("\n");
+
+	printf("#if LDBL_MANT_DIG == 64 && LDBL_MIN_EXP == -16381\n");
+	printf("#define HAVE_LONG_DOUBLE_FMA_VEC\n");
 	printf("static const struct fmal_vec fmal_vec[] = {\n");
-	generate("l", 113, 15);
+	generate("l", intel_80, none_format);
+	printf("};\n");
+	printf("#endif\n");
+	printf("\n");
+
+	printf("#if LDBL_MANT_DIG == 64 && LDBL_MIN_EXP == -16382\n");
+	printf("#define HAVE_LONG_DOUBLE_FMA_VEC\n");
+	printf("static const struct fmal_vec fmal_vec[] = {\n");
+	generate("l", moto_80, none_format);
+	printf("};\n");
+	printf("#endif\n");
+	printf("\n");
+
+	printf("#if LDBL_MANT_DIG == 113\n");
+	printf("#define HAVE_LONG_DOUBLE_FMA_VEC\n");
+	printf("static const struct fmal_vec fmal_vec[] = {\n");
+	generate("l", ieee_128, none_format);
 	printf("};\n");
 	printf("#endif\n");
 }

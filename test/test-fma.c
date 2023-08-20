@@ -125,7 +125,7 @@ struct fmal_vec {
 
 #endif
 
-#if __FLT_EVAL_METHOD__ == 0 && FLT_MANT_DIG == 24
+#ifdef HAVE_FLOAT_FMA_VEC
 
 static bool
 equalf(float x, float y)
@@ -153,12 +153,12 @@ test_fmaf(void)
     unsigned int t;
 
     printf("float\n");
-    for (t = 0; t < NUM_FMAF_VEC; t++) {
-        for (ro = 0; ro < NROUND_FLOAT; ro++) {
-            if (roundings[ro] == -1)
-                fesetround(defround);
-            else
-                fesetround(roundings[ro]);
+    for (ro = 0; ro < NROUND_FLOAT; ro++) {
+        if (roundings[ro] == -1)
+            fesetround(defround);
+        else
+            fesetround(roundings[ro]);
+        for (t = 0; t < NUM_FMAF_VEC; t++) {
             float x = fmaf_vec[t].x;
             float y = fmaf_vec[t].y;
             float z = fmaf_vec[t].z;
@@ -184,7 +184,7 @@ test_fmaf(void)
 #define test_fmaf() 0
 #endif
 
-#if DBL_MANT_DIG == 53 && __FLT_EVAL_METHOD__ == 0
+#ifdef HAVE_DOUBLE_FMA_VEC
 
 #ifdef PICOLIBC_DOUBLE_NOEXCEPT
 /*
@@ -217,12 +217,12 @@ test_fma(void)
     unsigned int t;
 
     printf("double\n");
-    for (t = 0; t < NUM_FMA_VEC; t++) {
-        for (ro = 0; ro < NROUND_DOUBLE; ro++) {
-            if (roundings[ro] == -1)
-                fesetround(defround);
-            else
-                fesetround(roundings[ro]);
+    for (ro = 0; ro < NROUND_DOUBLE; ro++) {
+        if (roundings[ro] == -1)
+            fesetround(defround);
+        else
+            fesetround(roundings[ro]);
+        for (t = 0; t < NUM_FMA_VEC; t++) {
             double x = fma_vec[t].x;
             double y = fma_vec[t].y;
             double z = fma_vec[t].z;
@@ -243,7 +243,7 @@ test_fma(void)
 #define test_fma() 0
 #endif
 
-#if defined (_TEST_LONG_DOUBLE) && (LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113) && LDBL_MIN_EXP == -16381
+#if defined (_TEST_LONG_DOUBLE) && defined(HAVE_LONG_DOUBLE_FMA_VEC)
 
 #ifdef PICOLIBC_LONG_DOUBLE_NOEXCEPT
 /*
@@ -276,12 +276,14 @@ test_fmal(void)
     unsigned int t;
 
     printf("long double\n");
-    for (t = 0; t < NUM_FMAL_VEC; t++) {
-        for (ro = 0; ro < NROUND_LONG_DOUBLE; ro++) {
-            if (roundings[ro] == -1)
-                fesetround(defround);
-            else
-                fesetround(roundings[ro]);
+    for (ro = 0; ro < NROUND_LONG_DOUBLE; ro++) {
+        if (roundings[ro] == -1)
+            fesetround(defround);
+        else
+            fesetround(roundings[ro]);
+        for (t = 0; t < NUM_FMAL_VEC; t++) {
+            if (t < 30)
+                continue;
             long double x = fmal_vec[t].x;
             long double y = fmal_vec[t].y;
             long double z = fmal_vec[t].z;
@@ -316,5 +318,17 @@ main(void)
 #endif
     (void) rounding_names;
     (void) roundings;
-    return test_fmaf() || test_fma() || test_fmal();
+    int ret = 0;
+    ret |= test_fmaf();
+    ret |= test_fma();
+#ifdef __m68k__
+    volatile long double big = 0x1p+16383l;
+    volatile long double small = 0x1p-16446l;
+    if (big * small != 0x1p-63) {
+        printf("m68k qemu long double denorm bug, skipping long double tests\n");
+        return ret;
+    }
+#endif
+    ret |= test_fmal();
+    return ret;
 }
