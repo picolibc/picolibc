@@ -631,11 +631,13 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 
 
 #if __LDBL_MANT_DIG__ == 64
-#define LDENORM_EXP_BIAS 1
 #define LEXP_BIAS       (__LDBL_MAX_EXP__ + 2)
 #define LEXP_INF        (__LDBL_MAX_EXP__ - 3)
 #define LSIG_BITS       (__LDBL_MANT_DIG__)
-#ifndef __m68k__
+#ifdef __m68k__
+#define LDENORM_EXP_BIAS 0
+#else
+#define LDENORM_EXP_BIAS 1
 #define LSIG_MSB_INF    _u128_lshift(to_u128(1), __LDBL_MANT_DIG__-1)
 #endif
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
