@@ -8,6 +8,16 @@
 
 #if !_HAVE_FAST_FMAF
 
+#if __FLT_EVAL_METHOD__ == 2 && defined(_HAVE_LONG_DOUBLE)
+
+float
+fmaf(float x, float y, float z)
+{
+    return (float) fmal((long double) x, (long double) y, (long double) z);
+}
+
+#else
+
 typedef float FLOAT_T;
 
 #define FMA fmaf
@@ -35,6 +45,8 @@ EXPONENT(FLOAT_T x)
 }
 
 #include "fma_inc.h"
+
+#endif
 
 _MATH_ALIAS_f_fff(fma)
 

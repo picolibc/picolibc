@@ -48,6 +48,16 @@ ANSI C, POSIX.
 
 #ifdef _NEED_FLOAT64
 
+#if __FLT_EVAL_METHOD__ == 2 && defined(_HAVE_LONG_DOUBLE)
+
+__float64
+fma64(__float64 x, __float64 y, __float64 z)
+{
+    return (__float64) fmal((long double) x, (long double) y, (long double) z);
+}
+
+#else
+
 typedef __float64 FLOAT_T;
 
 #define FMA fma64
@@ -80,6 +90,8 @@ EXPONENT(FLOAT_T x)
 #endif
 
 #include "fma_inc.h"
+
+#endif
 
 _MATH_ALIAS_d_ddd(fma)
 
