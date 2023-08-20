@@ -53,5 +53,5 @@ int fesetexceptflag(const fexcept_t *flagp, int excepts)
     return 0;
 }
 #else
-#include "../../fenv/feraiseexcept.c"
+#include "../../fenv/fesetexceptflag.c"
 #endif

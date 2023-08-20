@@ -63,5 +63,5 @@ int feholdexcept(fenv_t *envp)
     return 0;
 }
 #else
-#include "../../fenv/feraiseexcept.c"
+#include "../../fenv/feholdexcept.c"
 #endif
