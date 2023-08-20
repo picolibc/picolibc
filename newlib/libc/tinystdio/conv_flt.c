@@ -448,7 +448,7 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
             if (exp >= FLOAT_MAX_EXP) {
                 flt = (FLOAT) INFINITY;
             } else {
-#if !defined(UINTFLOAT_128) || __LDBL_IS_IEC_60559__ != 0
+#if !defined(UINTFLOAT_128) || __LDBL_IS_IEC_60559__ != 0 || defined(__m68k__)
                 if (UF_LT(uint, UF_LSHIFT_64(1, (FLOAT_MANT_DIG-1)))) {
                     exp = 0;
                 } else {
@@ -461,6 +461,8 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
                      * the integer bit
                      */
 #define EXP_SHIFT       FLOAT_MANT_DIG
+#elif defined(UINTFLOAT_128) && defined(__m68k__)
+#define EXP_SHIFT   FLOAT_MANT_DIG + 16
 #else
                     uint = UF_AND(uint, UF_NOT(UF_LSHIFT_64(1, (FLOAT_MANT_DIG-1))));
 #define EXP_SHIFT       (FLOAT_MANT_DIG-1)
