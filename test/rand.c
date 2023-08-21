@@ -51,7 +51,7 @@ near(double got, double target, double close)
 int
 main(void)
 {
-	int i;
+	int32_t i;
 	int ret = 0;
 	double s1 = 0;
 	double s2 = 0;
