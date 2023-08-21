@@ -22,7 +22,7 @@
 int
 randi (void)
 {
-  static int next;
+  static int32_t next;
   next = (next * 1103515245) + 12345;
   return ((next >> 16) & 0xffff);
 }
