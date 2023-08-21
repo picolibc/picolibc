@@ -9,8 +9,8 @@ on:
       - main
 
 env:
-  IMAGE_FILE: dockerimg.tar.xz
-  IMAGE: picolibc
+  IMAGE_FILE: dockerimg-linux.tar.xz
+  IMAGE: picolibc-linux
   PACKAGES_FILE: picolibc/.github/linux-packages.txt
   EXTRA_FILE: picolibc/.github/linux-files.txt
 
@@ -29,6 +29,7 @@ jobs:
         with:
           path: ${{ env.IMAGE_FILE }}
           key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          lookup-only: true
 
       - name: Set up Docker Buildx
         if: steps.cache.outputs.cache-hit != 'true'
@@ -54,8 +55,8 @@ jobs:
           "-D__IO_FLOAT=y -D_IO_FLOAT_EXACT=n -D_WANT_IO_LONG_LONG=y -D_MB_CAPABLE=y -D_WANT_IO_POS_ARGS=y -D__HAVE_LOCALE_INFO__=y -D__HAVE_LOCALE_INFO_EXTENDED__=y ",
         ]
         test: [
-	  "./.github/do-cmake-linux",
-	]
+          "./.github/do-cmake-linux",
+        ]
     steps:
       - name: Clone picolibc
         uses: actions/checkout@v3
@@ -67,6 +68,7 @@ jobs:
         with:
           path: ${{ env.IMAGE_FILE }}
           key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          fail-on-cache-miss: true
 
       - name: Load and Check the Docker Image
         run: |
@@ -105,8 +107,8 @@ jobs:
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
         ]
         test: [
-	  "./.github/do-linux",
-	]
+          "./.github/do-linux",
+        ]
     steps:
       - name: Clone picolibc
         uses: actions/checkout@v3
@@ -118,6 +120,7 @@ jobs:
         with:
           path: ${{ env.IMAGE_FILE }}
           key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          fail-on-cache-miss: true
 
       - name: Load and Check the Docker Image
         run: |
@@ -156,8 +159,8 @@ jobs:
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
         ]
         test: [
-	  "./.github/do-linux",
-	]
+          "./.github/do-linux",
+        ]
     steps:
       - name: Clone picolibc
         uses: actions/checkout@v3
@@ -169,6 +172,7 @@ jobs:
         with:
           path: ${{ env.IMAGE_FILE }}
           key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          fail-on-cache-miss: true
 
       - name: Load and Check the Docker Image
         run: |
@@ -207,8 +211,8 @@ jobs:
           "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
         ]
         test: [
-	  "./.github/do-linux",
-	]
+          "./.github/do-linux",
+        ]
     steps:
       - name: Clone picolibc
         uses: actions/checkout@v3
@@ -220,6 +224,7 @@ jobs:
         with:
           path: ${{ env.IMAGE_FILE }}
           key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          fail-on-cache-miss: true
 
       - name: Load and Check the Docker Image
         run: |
