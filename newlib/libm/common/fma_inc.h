@@ -26,6 +26,17 @@
 
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_fmal.c,v 1.7 2011/10/21 06:30:43 das Exp $");
 
+/*
+ * Denorms usually have an exponent biased by 1 so that they flow
+ * smoothly into the smallest normal value with an exponent of
+ * 1. However, m68k 80-bit long doubles includes exponent of zero for
+ * normal values, so denorms use the same value, eliminating the
+ * bias. That is set in s_fmal.c.
+ */
+
+#ifndef FLOAT_DENORM_BIAS
+#define FLOAT_DENORM_BIAS   1
+#endif
 
 /*
  * A struct dd represents a floating-point number with twice the precision
@@ -102,7 +113,7 @@ add_and_denormalize(FLOAT_T a, FLOAT_T b, int scale)
 	 * break the ties manually.
 	 */
 	if (sum.lo != 0) {
-		bits_lost = -EXPONENT(sum.hi) - scale + 1;
+		bits_lost = -EXPONENT(sum.hi) - scale + FLOAT_DENORM_BIAS;
 		if ((bits_lost != 1) ^ (int)odd_mant(sum.hi))
                         sum.hi = NEXTAFTER(sum.hi, (FLOAT_T)INFINITY * sum.lo);
 	}
@@ -287,7 +298,7 @@ FMA(FLOAT_T x, FLOAT_T y, FLOAT_T z)
 #endif
 
 	adj = add_adjusted(r.lo, xy.lo);
-	if (spread + ILOGB(r.hi) > -(FLOAT_MAX_EXP - 1))
+	if (spread + ILOGB(r.hi) > -(FLOAT_MAX_EXP - FLOAT_DENORM_BIAS))
 		return (_scalbn_no_errno(r.hi + adj, spread));
 	else
 		return (add_and_denormalize(r.hi, adj, spread));

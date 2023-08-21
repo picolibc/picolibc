@@ -49,6 +49,9 @@ typedef long double FLOAT_T;
 
 #if LDBL_MANT_DIG == 64
 #define SPLIT (0x1p32L + 1.0L)
+#if __LDBL_MIN_EXP__ == -16382
+#define FLOAT_DENORM_BIAS       0
+#endif
 #endif
 #if LDBL_MANT_DIG == 113
 #define SPLIT (0x1p57L + 1.0L)
