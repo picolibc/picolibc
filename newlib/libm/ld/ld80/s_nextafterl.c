@@ -22,7 +22,7 @@
 long double
 nextafterl(long double x, long double y)
 {
-	int32_t hx,hy,ix,iy;
+	u_int32_t hx,hy,ix,iy;
 	u_int32_t lx,ly;
         int32_t esx,esy;
 
