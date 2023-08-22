@@ -18,6 +18,7 @@
 
 sprint_int_type sprint_ints[] = 
 {
+#if TEST_PART == 1
 {__LINE__, 0x000838d2,	"838d2", "%.4x", },
 {__LINE__, 0x0063be46,	"63BE46", "%-6X", },
 {__LINE__, -0x1b236c0,	"-28456640", "%#0.d", },
@@ -529,6 +530,7 @@ sprint_int_type sprint_ints[] =
 {__LINE__, 0x002bf4c7,	"2BF4C7", "%X", },
 {__LINE__, 0x6954abf4,	"+1767156724", "%+d", },
 {__LINE__, -0x0000005,	"fffffffb", "%x", },
+#elif TEST_PART == 2
 {__LINE__, -0x29e0050e,	"-702547214", "%-0ld", },
 {__LINE__, -0x0014989,	"-84361", "%-#0.3ld", },
 {__LINE__, 0x001a557c,	"+1725820", "%+6.5d", },
@@ -605,9 +607,6 @@ sprint_int_type sprint_ints[] =
 {__LINE__, 0x00003eb6,	"3EB6", "% X", },
 {__LINE__, 0x000009ef,	"9ef", "% x", },
 {__LINE__, -0x62622f9,	"F9D9DD07", "%0X", },
-
-#ifndef __PCCNECV70__
-
 {__LINE__, 0x000154d7,	"087255", "%.6ld", },
 {__LINE__, -0x000036e,	"-878", "%-ld", },
 {__LINE__, -0x0007dcc,	"-32204", "% d", },
@@ -1043,6 +1042,7 @@ sprint_int_type sprint_ints[] =
 {__LINE__, 0x00000da5,	"DA5", "%0.X", },
 {__LINE__, 0x055ad3ac,	"0x55ad3ac", "%#1x", },
 {__LINE__, 0x00000e5a,	" 3674", "% .4ld", },
+#elif TEST_PART == 3
 {__LINE__, -0x0000087,	"FFFFFF79", "%+X", },
 {__LINE__, -0x0001e99,	"ffffe167", "%+5x", },
 {__LINE__, 0x0000fa50,	"0064080", "%.7ld", },
@@ -1554,6 +1554,7 @@ sprint_int_type sprint_ints[] =
 {__LINE__, -0x0001d99,	"FFFFE267", "%.5X", },
 {__LINE__, -0x0000039,	"0xffffffc7", "%#x", },
 {__LINE__, -0x1727c38,	"-24280120", "%d", },
+#elif TEST_PART == 4
 {__LINE__, 0x01308072,	"1308072", "%x", },
 {__LINE__, -0x5883c7c,	"-92814460", "%+ld", },
 {__LINE__, 0x000030ad,	"30ad", "%x", },
@@ -2065,6 +2066,7 @@ sprint_int_type sprint_ints[] =
 {__LINE__, -0x0063fef,	"FFF9C011", "%2X", },
 {__LINE__, -0x0000002,	"fffffffe", "%7x", },
 {__LINE__, -0x0000007,	"FFFFFFF9", "%X", },
+#elif TEST_PART == 5
 {__LINE__, -0x016a095,	"-1482901", "%4.0ld", },
 {__LINE__, -0x000001c,	"-28", "% ld", },
 {__LINE__, -0x0029ecd,	"0xfffd6133", "%#x", },
@@ -2576,6 +2578,7 @@ sprint_int_type sprint_ints[] =
 {__LINE__, 0x03931d84,	"59972996", "%0.d", },
 {__LINE__, 0x07d261ce,	"131228110", "%#ld", },
 {__LINE__, 0000000000,	"0", "%x", },
+#elif TEST_PART == 6
 {__LINE__, 0x00000002,	"2", "%+X", },
 {__LINE__, -0x0000604,	"-1540", "%+d", },
 {__LINE__, 0000000000,	"       ", "%7.x", },
@@ -3087,6 +3090,7 @@ sprint_int_type sprint_ints[] =
 {__LINE__, -0x0000001,	"ffffffff", "%.7x", },
 {__LINE__, -0x0008ee8,	"-36584", "%ld", },
 {__LINE__, 0x0000001c,	"28", "%-d", },
+#elif TEST_PART == 7
 {__LINE__, 0x000abeda,	"704218", "%d", },
 {__LINE__, 0x001347f7,	"1347f7", "%3.0x", },
 {__LINE__, 0x0000023e,	"574", "%3.3ld", },
@@ -3598,6 +3602,7 @@ sprint_int_type sprint_ints[] =
 {__LINE__, -0x0222c15,	"-2239509", "%#0.4ld", },
 {__LINE__, 0x00000004,	"4", "%0ld", },
 {__LINE__, -0x02c6b0d,	"-2910989", "% 0ld", },
+#elif TEST_PART == 8
 {__LINE__, -0x0000002,	"FFFFFFFE", "%-4X", },
 {__LINE__, -0x00000c3,	"FFFFFF3D", "%-.0X", },
 {__LINE__, -0x0000015,	"-21", "%0d", },
@@ -4109,6 +4114,7 @@ sprint_int_type sprint_ints[] =
 {__LINE__, 0x0052138b,	"5378955", "%#7.7ld", },
 {__LINE__, 0x000000c0,	"    192", "% 7ld", },
 {__LINE__, 0x005b26cd,	"5B26CD", "%X", },
+#elif TEST_PART == 9
 {__LINE__, -0x008df17,	"-581399", "%.4ld", },
 {__LINE__, -0x0000528,	"fffffad8", "%-x", },
 {__LINE__, 0x000006a9,	"6a9", "%.0x", },
@@ -4620,6 +4626,7 @@ sprint_int_type sprint_ints[] =
 {__LINE__, 0x0000a765,	"a765", "%x", },
 {__LINE__, 0x0026e2c8,	"26E2C8", "%-0X", },
 {__LINE__, -0x00003eb,	"-1003", "%3.1ld", },
+#elif TEST_PART == 10
 {__LINE__, 0x015d53ca,	"22893514", "%0ld", },
 {__LINE__, -0x0000020,	"-32", "%ld", },
 {__LINE__, -0x03558dd,	"-3496157", "%1.0ld", },
@@ -5021,14 +5028,13 @@ sprint_int_type sprint_ints[] =
 {__LINE__, -0x00003e7,	"-999", "%+0.3d", },
 {__LINE__, 0x0a68ba6e,	"a68ba6e", "%3.1x", },
 {__LINE__, -0x1d637f0,	"FE29C810", "%+X", },
-#endif
-
 {__LINE__, 0000000000,	"0", "%o", },
 {__LINE__, 0x00000053,	"123", "%o", },
 {__LINE__, 0x0000a72e,	"0123456", "%#o", },
 {__LINE__, 0x0000a72e,	"00123456", "%#.8o", },
 {__LINE__, 0x0000a72e,	"  00123456", "%#10.8o", },
 {__LINE__, 0x00000123,	"0x00123", "%#07x", },
-
+#else
+#endif
 {0},
 };

@@ -667,6 +667,7 @@ run_vector_1 (int vector,
 void
 test_math (int vector)
 {
+#if TEST_PART == 0
   test_acos(vector);
   test_acosf(vector);
   test_acosh(vector);
@@ -676,8 +677,12 @@ test_math (int vector)
   test_asinh(vector);
   test_asinhf(vector);
   test_atan(vector);
+#endif
+#if TEST_PART > 0
   test_atan2(vector);
   test_atan2f(vector);
+#endif
+#if TEST_PART == 0
   test_atanf(vector);
   test_atanh(vector);
   test_atanhf(vector);
@@ -746,6 +751,7 @@ test_math (int vector)
   test_y1f(vector);
   test_y1f(vector);
   test_ynf(vector);
+#endif
 }
 
 /* These have to be played with to get to compile on machines which
