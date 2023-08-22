@@ -351,8 +351,8 @@ FLOAT_T makemathname(test_ldexp_qnan_0)(void) { return makemathname(ldexp)(makem
 FLOAT_T makemathname(test_ldexp_snan_0)(void) { return makemathname(ldexp)(makemathname(snanval), 0); }
 FLOAT_T makemathname(test_ldexp_inf_0)(void) { return makemathname(ldexp)(makemathname(infval), 0); }
 FLOAT_T makemathname(test_ldexp_neginf_0)(void) { return makemathname(ldexp)(-makemathname(infval), 0); }
-FLOAT_T makemathname(test_ldexp_1_negbig)(void) { return makemathname(ldexp)(makemathname(one), -(__DBL_MAX_EXP__ * 100)); }
-FLOAT_T makemathname(test_ldexp_1_big)(void) { return makemathname(ldexp)(makemathname(one),(__DBL_MAX_EXP__ * 100)); }
+FLOAT_T makemathname(test_ldexp_1_negbig)(void) { return makemathname(ldexp)(makemathname(one), -(__DBL_MAX_EXP__ * 20)); }
+FLOAT_T makemathname(test_ldexp_1_big)(void) { return makemathname(ldexp)(makemathname(one),(__DBL_MAX_EXP__ * 20)); }
 
 FLOAT_T makemathname(test_rint_qnan)(void) { return makemathname(rint)(makemathname(qnanval)); }
 FLOAT_T makemathname(test_rint_snan)(void) { return makemathname(rint)(makemathname(snanval)); }
