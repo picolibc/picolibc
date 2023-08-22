@@ -50,12 +50,21 @@ const char haystack[] = "hello world";
     }                                                                   \
     } while(0)
 
+#if INT_MAX == INT16_MAX
+#define many_check(func, needle, expect) do { \
+        check(func, needle, expect);                    \
+        check(func, needle | 0xff00, expect);           \
+        check(func, needle | 0x0100, expect);           \
+        check(func, needle | 0x8000, expect);           \
+    } while(0)
+#else
 #define many_check(func, needle, expect) do { \
         check(func, needle, expect);                    \
         check(func, needle | 0xffffff00, expect);       \
         check(func, needle | 0x00000100, expect);       \
         check(func, needle | 0x80000000, expect);       \
     } while(0)
+#endif
 
 int
 main(void)
