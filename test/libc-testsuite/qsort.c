@@ -22,6 +22,7 @@
  */
 #define _GNU_SOURCE
 #include <stdlib.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -40,7 +41,7 @@ struct three {
 };
 
 #define i3(x)                                                    \
-        { (unsigned char) ((x) >> 16), (unsigned char) ((x) >> 8),      \
+        { (unsigned char) (((int32_t)(x)) >> 16), (unsigned char) ((x) >> 8), \
                         (unsigned char) ((x) >> 0) }
 
 static int tcmp(const void *av, const void *bv)
