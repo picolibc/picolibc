@@ -144,6 +144,7 @@ typedef const struct {
  * to some answers getting rounded to an even value instead of the
  * (more accurate) odd value
  */
+#define FMA_PREC 0
 #if LDBL_MANT_DIG == 64
 #define DEFAULT_PREC 0x1p-55L
 #define SQRTL_PREC 0x1.0p-63L

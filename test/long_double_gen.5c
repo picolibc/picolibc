@@ -296,6 +296,26 @@ real rintl(real x) {
 	return nearbyint(x);
 }
 
+real round_even(real x, int bits)
+{
+	int exp = exponent(x);
+	real mant = abs(mantissa(x)) * 2**bits;
+
+	int ipart = floor(mant);
+	real fpart = mant - ipart;
+
+	if (fpart == 0.5) {
+		if ((ipart & 1) != 0)
+			ipart++;
+	} else if (fpart > 0.5)
+		ipart++;
+
+	real ret = ipart * (2 ** (exp - bits));
+	if (x < 0)
+		ret = -ret;
+	return ret;
+}
+
 real j0(real x) = jn(x,0);
 real j1(real x) = jn(x,1);
 
@@ -361,7 +381,7 @@ gen_real_f_ff(func_f_ff_t f)
 				string sy;
 				try {
 					try {
-						y = imprecise(f.f(imprecise(x0, prec), imprecise(x1, prec)), out_prec);
+						y = round_even(f.f(imprecise(x0, prec), imprecise(x1, prec)), out_prec);
 						sy = sprintf("%.-eL", y);
 					} catch divide_by_zero(real x, real y) {
 						if (x == 0)
@@ -551,7 +571,7 @@ func_f_ff_t[] funcs_f_ff = {
 
 real fma(real x, real y, real z)
 {
-	real t = imprecise(x, precision(x) * 2) * imprecise(y, precision(y) * 2) + imprecise(z, precision(z) * 2);
+	real t = x * y + z;
 
 	return imprecise(t, precision(x));
 }
