@@ -688,8 +688,8 @@ FLOAT_T makemathname(test_scalb_neg1_big)(void) { return makemathname(scalb)(-ma
 FLOAT_T makemathname(test_scalb_1_negbig)(void) { return makemathname(scalb)(makemathname(one), -makemathname(big)); }
 FLOAT_T makemathname(test_scalb_neg1_negbig)(void) { return makemathname(scalb)(-makemathname(one), -makemathname(big)); }
 
-FLOAT_T makemathname(test_scalbn_big)(void) { return makemathname(scalbn)(makemathname(one), 0x7fffffff); }
-FLOAT_T makemathname(test_scalbn_tiny)(void) { return makemathname(scalbn)(makemathname(one), -0x7fffffff); }
+FLOAT_T makemathname(test_scalbn_big)(void) { return makemathname(scalbn)(makemathname(one), INT_MAX); }
+FLOAT_T makemathname(test_scalbn_tiny)(void) { return makemathname(scalbn)(makemathname(one), -INT_MAX); }
 
 #ifndef FE_DIVBYZERO
 #define FE_DIVBYZERO 0
