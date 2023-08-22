@@ -33,6 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <picotls.h>
 #include <stdlib.h>
@@ -49,16 +50,16 @@
 
 #define TLS_ALIGN      (OVERALIGN_DATA > OVERALIGN_BSS ? OVERALIGN_DATA : OVERALIGN_BSS)
 
-NEWLIB_THREAD_LOCAL volatile int data_var = DATA_VAL;
-NEWLIB_THREAD_LOCAL volatile int bss_var;
-_Alignas(OVERALIGN_DATA) NEWLIB_THREAD_LOCAL volatile int overaligned_data_var = DATA_VAL2;
-_Alignas(OVERALIGN_BSS) NEWLIB_THREAD_LOCAL volatile int overaligned_bss_var;
-_Alignas(OVERALIGN_NON_TLS_BSS) volatile int overaligned_non_tls_bss_var;
+NEWLIB_THREAD_LOCAL volatile int32_t data_var = DATA_VAL;
+NEWLIB_THREAD_LOCAL volatile int32_t bss_var;
+_Alignas(OVERALIGN_DATA) NEWLIB_THREAD_LOCAL volatile int32_t overaligned_data_var = DATA_VAL2;
+_Alignas(OVERALIGN_BSS) NEWLIB_THREAD_LOCAL volatile int32_t overaligned_bss_var;
+_Alignas(OVERALIGN_NON_TLS_BSS) volatile int32_t overaligned_non_tls_bss_var;
 
-volatile int *volatile data_addr;
-volatile int *volatile overaligned_data_addr;
-volatile int *volatile bss_addr;
-volatile int *volatile overaligned_bss_addr;
+volatile int32_t *volatile data_addr;
+volatile int32_t *volatile overaligned_data_addr;
+volatile int32_t *volatile bss_addr;
+volatile int32_t *volatile overaligned_bss_addr;
 
 #ifdef PICOLIBC_TLS
 extern char __tdata_start[], __tdata_end[];
@@ -123,61 +124,61 @@ check_tls(char *where, bool check_addr, void *tls_region)
                 result++;
         }
 	if (data_var != DATA_VAL) {
-		printf("%s: initialized thread var has wrong value (0x%x instead of 0x%x)\n",
-		       where, data_var, DATA_VAL);
+		printf("%s: initialized thread var has wrong value (0x%" PRIx32 " instead of 0x%" PRIx32 ")\n",
+		       where, data_var, (int32_t) DATA_VAL);
 		result++;
 	}
 	if (overaligned_data_var != DATA_VAL2) {
-		printf("%s: initialized overaligned thread var has wrong value (0x%x instead of 0x%x)\n",
-		       where, overaligned_data_var, DATA_VAL2);
+		printf("%s: initialized overaligned thread var has wrong value (0x%" PRIx32 " instead of 0x%" PRIx32 ")\n",
+		       where, overaligned_data_var, (int32_t) DATA_VAL2);
 		result++;
 	}
 
 	if (bss_var != 0) {
-		printf("%s: uninitialized thread var has wrong value (0x%x instead of 0x%x)\n",
-		       where, bss_var, 0);
+		printf("%s: uninitialized thread var has wrong value (0x%" PRIx32 " instead of 0x%" PRIx32 ")\n",
+		       where, bss_var, (int32_t) 0);
 		result++;
 	}
         if (overaligned_bss_var != 0) {
-		printf("%s: overaligned uninitialized thread var has wrong value (0x%x instead of 0x%x)\n",
-		       where, overaligned_bss_var, 0);
+		printf("%s: overaligned uninitialized thread var has wrong value (0x%" PRIx32 " instead of 0x%" PRIx32 ")\n",
+		       where, overaligned_bss_var, (int32_t) 0);
 		result++;
         }
 	if (overaligned_non_tls_bss_var != 0) {
-		printf("%s: overaligned uninitialized var has wrong value (0x%x instead of 0x%x)\n",
-		       where, overaligned_non_tls_bss_var, 0);
+		printf("%s: overaligned uninitialized var has wrong value (0x%" PRIx32 " instead of 0x%" PRIx32 ")\n",
+		       where, overaligned_non_tls_bss_var, (int32_t) 0);
 		result++;
         }
 
 	data_var = ~data_var;
 
 	if (data_var != ~DATA_VAL) {
-		printf("%s: initialized thread var set to wrong value (0x%x instead of 0x%x)\n",
-		       where, data_var, ~DATA_VAL);
+		printf("%s: initialized thread var set to wrong value (0x%" PRIx32 " instead of 0x%" PRIx32 ")\n",
+		       where, data_var, ~((int32_t) DATA_VAL));
 		result++;
 	}
 
 	overaligned_data_var = ~overaligned_data_var;
 
 	if (overaligned_data_var != ~DATA_VAL2) {
-		printf("%s: overaligned initialized thread var set to wrong value (0x%x instead of 0x%x)\n",
-		       where, overaligned_data_var, ~DATA_VAL2);
+		printf("%s: overaligned initialized thread var set to wrong value (0x%" PRIx32 " instead of 0x%" PRIx32 ")\n",
+		       where, overaligned_data_var, ~((int32_t) DATA_VAL2));
 		result++;
 	}
 
 	bss_var = ~bss_var;
 
 	if (bss_var != ~0) {
-		printf("%s: uninitialized thread var has wrong value (0x%x instead of 0x%x)\n",
-		       where, bss_var, ~0);
+		printf("%s: uninitialized thread var has wrong value (0x%" PRIx32 " instead of 0x%" PRIx32 ")\n",
+		       where, bss_var, ~((int32_t) 0));
 		result++;
 	}
 
 	overaligned_bss_var = ~overaligned_bss_var;
 
 	if (overaligned_bss_var != ~0) {
-		printf("%s: overaligned uninitialized thread var has wrong value (0x%x instead of 0x%x)\n",
-		       where, overaligned_bss_var, ~0);
+		printf("%s: overaligned uninitialized thread var has wrong value (0x%" PRIx32 " instead of 0x%" PRIx32 ")\n",
+		       where, overaligned_bss_var, ~((int32_t) 0));
 		result++;
 	}
 
