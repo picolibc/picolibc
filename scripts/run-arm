@@ -240,7 +240,7 @@ if [ $result != 0 ]; then
 	cortex-a8)
 	    test="$(uname -m)-$elf"
 	    case "$test" in
-		i?86-*math_test)
+		i?86-*math_test|i?86-*math_test_?|i?86-*math_test_??)
 		    echo "fp imprecise for $cpu on" "$(uname -m)"
 		    result=77
 		    ;;

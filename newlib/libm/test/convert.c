@@ -569,8 +569,6 @@ extern int _malloc_test_fail;
 void
 test_cvt (void)
 {
-  deltest();
-
 #ifdef GENERATE_VECTORS
   diterate(gen_dvec, "gen");
 #else
@@ -595,8 +593,11 @@ test_cvt (void)
   iterate(test_strtold, "strtold");
 #endif
 
+#if TEST_PART ==1 || TEST_PART == -1
+  deltest();
   test_scan();
   test_sprint();
+#endif
   iterate(test_atof, "atof");
 #ifndef NO_NEWLIB
   iterate(test_atoff, "atoff");

@@ -56,17 +56,22 @@ main (int ac,
      verbose ++;
     if (strcmp(av[i],"-nomath2") == 0)
      math2 = 0;
+    (void) math2;
     if (strcmp(av[i],"-nostrin") == 0)
      string= 0;
+    (void) string;
     if (strcmp(av[i],"-nois") == 0)
      is = 0;
+    (void) is;
     if (strcmp(av[i],"-nomath") == 0)
      math= 0;
+    (void) math;
     if (strcmp(av[i],"-nocvt") == 0)
      cvt = 0;
 #ifdef _HAVE_IEEEFP_FUNCS
     if (strcmp(av[i],"-noiee") == 0)
      ieee= 0;
+  (void) ieee;
 #endif
     if (strcmp(av[i],"-generate") == 0) {
      vector = 1;
@@ -75,18 +80,22 @@ main (int ac,
   }
   if (cvt)
    test_cvt();
-  
+
+#if TEST_PART == 0 || TEST_PART == -1
   if (math2)
    test_math2();
   if (string)
    test_string();
+#endif
   if (math)
    test_math(vector);
+#if TEST_PART == 0 || TEST_PART == -1
   if (is)
    test_is();
 #ifdef _HAVE_IEEEFP_FUNCS
   if (ieee)
    test_ieee();
+#endif
 #endif
   printf("Tested %d functions, %d errors detected\n", count, inacc);
   exit(inacc != 0);

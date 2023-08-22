@@ -32,6 +32,21 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+
+# Some arrays have more members than what can be supported on some targets.
+# Split the arrays into chunks of ~4k, and compile a separate test for each
+# chunk. Meson 0.58 has range(), but 0.53 is supported, so make an array
+# of numbers to iterate over.
+
+if get_option('split-large-tests')
+  test_parts = [
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+    '10', '11', '12', '13', '14', '15', '16',
+  ]
+else
+  test_parts = ['-1']
+endif
+
 math_test_src = [
   'acosf_vec.c',
   'acoshf_vec.c',
@@ -144,12 +159,6 @@ foreach target : targets
     objs = []
   endif
 
-  if target == ''
-    test_name = 'math_test'
-  else
-    test_name = 'math_test_' + target
-  endif
-
   _c_args = value[1] + get_variable('test_c_args_' + target, test_c_args)
   _link_args = value[1] + get_variable('test_link_args_' + target, test_link_args)
   _link_depends = get_variable('test_link_depends_' + target, test_link_depends)
@@ -157,16 +166,28 @@ foreach target : targets
   _c_args = double_printf_compile_args + _c_args
   _link_args = double_printf_link_args + _link_args
 
-  test(test_name,
-       executable(test_name, math_test_src,
-		  c_args: _c_args,
-		  objects: objs,
-		  link_with: libs,
-		  link_args: _link_args,
-		  link_depends: _link_depends,
-		  include_directories: inc),
-       depends: bios_bin,
-       env: test_env)
+  foreach test_part : test_parts
+    if test_part == '-1'
+      test_part_name = ''
+    else
+      test_part_name = '_' + test_part
+    endif
+    if target == ''
+      test_name = 'math_test' + test_part_name
+    else
+      test_name = 'math_test' + test_part_name + '_' + target
+    endif
+    test(test_name,
+         executable(test_name, math_test_src,
+		    c_args: _c_args +  ['-DTEST_PART=' + test_part],
+		    objects: objs,
+		    link_with: libs,
+		    link_args: _link_args,
+		    link_depends: _link_depends,
+		    include_directories: inc),
+         depends: bios_bin,
+         env: test_env)
+  endforeach
 endforeach
 
 if enable_native_tests
@@ -174,9 +195,10 @@ if enable_native_tests
   native_lib_m = cc.find_library('m', required: false)
 
   if native_lib_m.found()
-    test('math-native',
+    defines = ['-DINCLUDE_GENERATE', '-DTEST_PART=-1']
+    test('math_test_native',
 	 executable('math_test_native', math_test_src,
-		    c_args: native_c_args + ['-DINCLUDE_GENERATE'],
+		    c_args: native_c_args + defines,
 		    link_args: native_c_args,
 		    dependencies: native_lib_m))
   endif
