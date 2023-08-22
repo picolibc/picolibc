@@ -966,7 +966,7 @@ int main(void)
 }
 
 #else /* #if defined(_ICONV_FROM_ENCODING_UTF_8) || ... */
-int main(int argc, char **argv)
+int main(void)
 {
     puts("None of UTF-8, EUC-JP, SHIFT-JIS and UCS-2_INTERNAL converters "
          "linked, SKIP test");

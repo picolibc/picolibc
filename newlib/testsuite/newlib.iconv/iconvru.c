@@ -477,7 +477,7 @@ int main(void)
 }
 
 #else /* #if defined(_ICONV_FROM_ENCODING_UTF_8) || ... */
-int main(int argc, char **argv)
+int main(void)
 {
     puts("None of ISO-8859-5, KOI8-R and UTF-8 converters linked, SKIP test");
     exit(0);
