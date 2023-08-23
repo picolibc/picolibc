@@ -50,7 +50,7 @@ m68k_semihost:
 #ifdef __mcoldfire__
 	.short 0x4ac8
 #else
-	bkpt #0
+	.short 0x4848
 #endif
 	.long 0x4e7bf000
 	rts
