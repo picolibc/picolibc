@@ -7,7 +7,7 @@ COPY .github/zephyr-files.txt /
 COPY .github/zephyr-setup /
 
 RUN apt-get update && \
-    apt-get install -y wget gnupg && \
+    apt-get install -y --no-install-recommends ca-certificates wget gnupg && \
     (apt-get update || apt-get update || apt-get update) && \
     (apt-get upgrade -y || apt-get upgrade -y || apt-get upgrade -y) && \
     (xargs -a zephyr-packages.txt apt-get install -y || \
