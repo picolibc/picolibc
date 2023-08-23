@@ -10,10 +10,10 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates wget gnupg && \
     (apt-get update || apt-get update || apt-get update) && \
     (apt-get upgrade -y || apt-get upgrade -y || apt-get upgrade -y) && \
-    (xargs -a zephyr-packages.txt apt-get install -y || \
-     xargs -a zephyr-packages.txt apt-get install -y || \
-     xargs -a zephyr-packages.txt apt-get install -y || \
-     xargs -a zephyr-packages.txt apt-get install -y) && \
+    (xargs -a zephyr-packages.txt apt-get install -y --no-install-recommends || \
+     xargs -a zephyr-packages.txt apt-get install -y --no-install-recommends || \
+     xargs -a zephyr-packages.txt apt-get install -y --no-install-recommends || \
+     xargs -a zephyr-packages.txt apt-get install -y --no-install-recommends) && \
     mkdir -p /opt && \
     (cd /opt && \
      for file in `cat /zephyr-files.txt`; do \
