@@ -23,14 +23,13 @@ RUN apt-get update && \
 	tar xf `basename "$file"`; \
 	echo "Removing $file"; \
 	rm `basename "$file"`; \
-     done)
-
-RUN if [ -f /opt/zephyr-sdk-*-hosttools*.sh ]; then \
+     done) && \
+    if [ -f /opt/zephyr-sdk-*-hosttools*.sh ]; then \
 	echo "Unpacking host tools"; \
 	/opt/zephyr-sdk-*-hosttools*.sh -y -d /opt/zephyr-sdk-hosttools; \
 	rm /opt/zephyr-sdk-*-hosttools*.sh; \
     else \
 	echo "No host tools found"; \
-    fi
-
-RUN apt-get clean
+    fi && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*

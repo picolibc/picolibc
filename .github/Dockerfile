@@ -15,6 +15,7 @@ RUN apt-get update && \
      xargs -a linux-packages.txt apt-get install -y --no-install-recommends || \
      xargs -a linux-packages.txt apt-get install -y --no-install-recommends) && \
     mkdir -p /opt && \
-    (cd /opt && while read file; do wget $file || exit 1; tar xf `basename $file`; rm `basename $file`; done) < linux-files.txt
+    (cd /opt && while read file; do wget $file || exit 1; tar xf `basename $file`; rm `basename $file`; done) < linux-files.txt && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN apt-get clean
