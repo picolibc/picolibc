@@ -162,7 +162,7 @@ test_fmaf(void)
             float x = fmaf_vec[t].x;
             float y = fmaf_vec[t].y;
             float z = fmaf_vec[t].z;
-            float r = fmaf(x, y, z);
+            volatile float r = fmaf(x, y, z);
             float s = fmaf_vec[t].r[ro];
             if (!equalf(r, s)) {
                 strfromf(xs, sizeof(xs), "%a", x);
@@ -226,7 +226,7 @@ test_fma(void)
             double x = fma_vec[t].x;
             double y = fma_vec[t].y;
             double z = fma_vec[t].z;
-            double r = fma(x, y, z);
+            volatile double r = fma(x, y, z);
             double s = fma_vec[t].r[ro];
             if (!equal(r, s)) {
                 printf("%u: round %s %a * %a + %a -> got %a want %a\n",
@@ -321,7 +321,7 @@ main(void)
     int ret = 0;
     ret |= test_fmaf();
     ret |= test_fma();
-#ifdef __m68k__
+#if defined(__m68k__) && __LDBL_MIN_EXP__ == -16382
     volatile long double big = 0x1p+16383l;
     volatile long double small = 0x1p-16446l;
     if (big * small != 0x1p-63) {
