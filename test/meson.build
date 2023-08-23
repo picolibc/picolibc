@@ -183,8 +183,10 @@ foreach target : targets
   t1 = 'hosted-exit'
   if target == ''
     t1_name = t1
+    t1_fail_name = t1 + '-fail'
   else
     t1_name = t1 + '_' + target
+    t1_fail_name = t1 + '-fail_' + target
   endif
 
   test(t1_name,
@@ -197,8 +199,8 @@ foreach target : targets
        depends: bios_bin,
        env: test_env)
 
-  test(t1 + '-fail' + target,
-       executable(t1_name + '-fail', ['hosted-exit.c', 'lock-valid.c'],
+  test(t1_fail_name,
+       executable(t1_fail_name, ['hosted-exit.c', 'lock-valid.c'],
 		  c_args: _c_args + ['-DRETVAL=1'],
 		  link_args:  _link_args,
 		  objects: _objs,
