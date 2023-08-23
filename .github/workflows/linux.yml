@@ -9,6 +9,7 @@ on:
       - main
 
 env:
+  DOCKERFILE: picolibc/.github/Dockerfile
   IMAGE_FILE: dockerimg-linux.tar.xz
   IMAGE: picolibc-linux
   PACKAGES_FILE: picolibc/.github/linux-packages.txt
@@ -28,7 +29,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
           lookup-only: true
 
       - name: Set up Docker Buildx
@@ -67,7 +68,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
           fail-on-cache-miss: true
 
       - name: Load and Check the Docker Image
@@ -119,7 +120,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
           fail-on-cache-miss: true
 
       - name: Load and Check the Docker Image
@@ -171,7 +172,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
           fail-on-cache-miss: true
 
       - name: Load and Check the Docker Image
@@ -223,7 +224,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
           fail-on-cache-miss: true
 
       - name: Load and Check the Docker Image
