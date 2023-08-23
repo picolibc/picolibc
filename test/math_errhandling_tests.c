@@ -844,7 +844,9 @@ const struct {
 
 #endif
         TEST(fabs_qnan, (FLOAT_T)NAN, 0, 0),
+#ifndef SKIP_SNAN_CHECKS
         TEST(fabs_snan, (FLOAT_T)sNAN_RET, sNAN_EXCEPTION, 0),
+#endif
         TEST(fabs_0, (FLOAT_T)0.0, 0, 0),
         TEST(fabs_neg0, (FLOAT_T)0.0, 0, 0),
         TEST(fabs_inf, (FLOAT_T)INFINITY, 0, 0),
@@ -933,11 +935,7 @@ const struct {
         TEST(hypot_neginf_qnan, (FLOAT_T)INFINITY, 0, 0),
         TEST(hypot_qnan_inf, (FLOAT_T)INFINITY, 0, 0),
         TEST(hypot_qnan_neginf, (FLOAT_T)INFINITY, 0, 0),
-#ifndef __HAVE_68881__
-        /*
-         * On 68881, the snan gets converted to qnan before the hypot code
-         * sees it, so skip these tests
-         */
+#ifndef SKIP_SNAN_CHECKS
         TEST(hypot_snan_inf, (FLOAT_T)NAN, FE_INVALID, 0),
         TEST(hypot_snan_neginf, (FLOAT_T)NAN, FE_INVALID, 0),
 #endif
@@ -1068,9 +1066,11 @@ const struct {
         TEST(pow_1_qnan, (FLOAT_T)1.0, 0, 0),
         TEST(pow_qnan_0, (FLOAT_T)1.0, 0, 0),
         TEST(pow_qnan_neg0, (FLOAT_T)1.0, 0, 0),
+#ifndef SKIP_SNAN_CHECKS
         TEST(pow_1_snan, (FLOAT_T)NAN, FE_INVALID, 0),
         TEST(pow_snan_0, (FLOAT_T)NAN, FE_INVALID, 0),
         TEST(pow_snan_neg0, (FLOAT_T)NAN, FE_INVALID, 0),
+#endif
         TEST(pow_1_0, (FLOAT_T)1.0, 0, 0),
         TEST(pow_1_neg0, (FLOAT_T)1.0, 0, 0),
         TEST(pow_0_0, (FLOAT_T)1.0, 0, 0),

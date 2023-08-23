@@ -174,6 +174,19 @@ e_to_str(int e)
 
 #define scat(a,b) a ## b
 
+#ifdef __mcffpu__
+#define SKIP_SNAN_CHECKS
+#endif
+
+#ifdef __HAVE_68881__
+#define SKIP_SNAN_CHECKS
+#endif
+
+#if defined(__m68k__) && !defined(__mcoldfire__) && !defined(__HAVE_M68881__)
+#undef _TEST_LONG_DOUBLE
+#define NO_NEXTTOWARD
+#endif
+
 /* Tests with long doubles */
 #ifdef _TEST_LONG_DOUBLE
 
@@ -313,6 +326,14 @@ int main(void)
 	result += run_tests();
 #ifdef _TEST_LONG_DOUBLE
 	printf("Long double tests:\n");
+#ifdef __m68k__
+        volatile long double zero = 0.0L;
+        volatile long double one = 1.0L;
+        volatile long double check = nextafterl(zero, one);
+        if (check + check == zero) {
+            printf("m68k emulating long double with double, skipping\n");
+        } else
+#endif
 	result += run_testsl();
 #endif
 	printf("Float tests:\n");
