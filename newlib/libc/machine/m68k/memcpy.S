@@ -109,6 +109,7 @@ SYM(memcpy):
 	bpl	1b
 #endif
 	move.l	4(sp),a0	| return value
+	move.l	a0,d0		| in both a0 and d0
 	rts
 	.size	SYM(memcpy), . - SYM(memcpy)
 	
