@@ -336,6 +336,15 @@ int main(void)
     unsigned int i;
 
     printf("LDBL_MANT_DIG %d\n", LDBL_MANT_DIG);
+#ifdef __m68k__
+    volatile long double zero = 0.0L;
+    volatile long double one = 1.0L;
+    volatile long double check = nextafterl(zero, one);
+    if (check + check == zero) {
+        printf("m68k emulating long double with double, skipping\n");
+        return 77;
+    }
+#endif
 #ifdef TEST_IO_LONG_DOUBLE
     result += test_io();
 #endif
