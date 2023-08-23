@@ -1,5 +1,5 @@
 [binaries]
-c = 'xtensa-esp32-elf-gcc'
+c = ['ccache', 'xtensa-esp32-elf-gcc']
 ar = 'xtensa-esp32-elf-ar'
 as = 'xtensa-esp32-elf-as'
 nm = 'xtensa-esp32-elf-nm'

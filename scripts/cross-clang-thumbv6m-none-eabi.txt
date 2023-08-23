@@ -3,7 +3,7 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['clang', '-m32', '--target=thumbv6m-none-eabi', '-nostdlib']
+c = ['ccache', 'clang', '-m32', '--target=thumbv6m-none-eabi', '-nostdlib']
 c_ld = '/usr/bin/arm-none-eabi-ld'
 ar = 'arm-none-eabi-ar'
 as = 'arm-none-eab-as'

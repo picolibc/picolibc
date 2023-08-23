@@ -1,5 +1,5 @@
 [binaries]
-c = 'xtensa-lx106-elf-gcc'
+c = ['ccache', 'xtensa-lx106-elf-gcc']
 ar = 'xtensa-lx106-elf-ar'
 as = 'xtensa-lx106-elf-as'
 nm = 'xtensa-lx106-elf-nm'

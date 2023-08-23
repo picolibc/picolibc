@@ -3,7 +3,7 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['x86_64-linux-gnu-gcc', '-march=core2', '-mfpmath=sse', '-msse2', '-fno-pic', '-fno-PIE', '-static', '-nostdlib']
+c = ['ccache', 'x86_64-linux-gnu-gcc', '-march=core2', '-mfpmath=sse', '-msse2', '-fno-pic', '-fno-PIE', '-static', '-nostdlib']
 ar = 'x86_64-linux-gnu-ar'
 as = 'x86_64-linux-gnu-as'
 nm = 'x86_64-linux-gnu-nm'

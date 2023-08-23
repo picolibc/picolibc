@@ -3,7 +3,7 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['mips-linux-gnu-gcc', '-nostdlib']
+c = ['ccache', 'mips-linux-gnu-gcc', '-nostdlib']
 ar = 'mips-linux-gnu-ar'
 as = 'mips-linux-gnu-as'
 ld = 'mips-linux-gnu-ld'

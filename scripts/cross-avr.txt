@@ -3,7 +3,7 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['avr-gcc', '-nostdlib', '-D__COMPILING_AVR_LIBC__']
+c = ['ccache', 'avr-gcc', '-nostdlib', '-D__COMPILING_AVR_LIBC__']
 ar = 'avr-ar'
 as = 'avr-as'
 nm = 'avr-nm'

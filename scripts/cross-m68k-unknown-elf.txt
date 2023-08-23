@@ -1,5 +1,5 @@
 [binaries]
-c = ['m68k-unknown-elf-gcc', '-static', '-nostdlib', '-fno-builtin-isinfl']
+c = ['ccache', 'm68k-unknown-elf-gcc', '-static', '-nostdlib', '-fno-builtin-isinfl']
 ar = 'm68k-unknown-elf-ar'
 as = 'm68k-unknown-elf-as'
 ld = 'm68k-unknown-elf-ld'

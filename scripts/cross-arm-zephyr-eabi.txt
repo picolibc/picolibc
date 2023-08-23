@@ -3,7 +3,7 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['arm-zephyr-eabi-gcc', '-nostdlib']
+c = ['ccache', 'arm-zephyr-eabi-gcc', '-nostdlib']
 ar = 'arm-zephyr-eabi-ar'
 as = 'arm-zephyr-eabi-as'
 nm = 'arm-zephyr-eabi-nm'
