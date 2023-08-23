@@ -93,6 +93,12 @@ test_strtof (void)
 #define HAVE_STRTOLD
 #endif
 
+#ifdef __m68k__
+#define STRTOLD_TEST_BITS       (CONVERT_BITS_DOUBLE > 63 ? 63 : CONVERT_BITS_DOUBLE)
+#else
+#define STRTOLD_TEST_BITS       CONVERT_BITS_DOUBLE
+#endif
+
 #ifdef HAVE_STRTOLD
 void
 test_strtold (void)
@@ -114,7 +120,7 @@ test_strtold (void)
     else
       test_eok(e, 0);
   }
-  test_mok(v, pd->value, CONVERT_BITS_DOUBLE);
+  test_mok(v, pd->value, STRTOLD_TEST_BITS);
   test_iok(tail - pd->string, pd->endscan & ENDSCAN_MASK);
 }
 #endif
