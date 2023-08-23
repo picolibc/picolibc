@@ -37,6 +37,12 @@ cmake_minimum_required(VERSION 3.20.0)
 
 project(Picolibc VERSION 1.8.3 LANGUAGES C ASM)
 
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+  message(STATUS "Using ccache: ${CCACHE_PROGRAM}")
+  set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+endif()
+
 if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "arm64")
   set(CMAKE_SYSTEM_PROCESSOR "aarch64")
 endif()
