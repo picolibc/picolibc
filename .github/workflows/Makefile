@@ -2,6 +2,7 @@ LINUX_DEPS=\
 	make-workflow \
 	head \
 	variants-cmake \
+	variants \
 	targets-cmake-linux \
 	steps-head \
 	steps-cmake \
