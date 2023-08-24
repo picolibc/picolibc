@@ -45,47 +45,6 @@ jobs:
           tags: ${{ env.IMAGE }}:latest
           outputs: type=docker,dest=${{ env.IMAGE_FILE }}
 
-  fortify-source-zephyr:
-    needs: cache-maker
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        meson_flags: [
-          "",
-
-          # Tinystdio and math configurations, one with multithread disabled and with locale, original malloc and atexit/onexit code
-          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
-          "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false -Dnewlib-obsolete-math=true -Dwant-math-errno=true",
-
-          # Original stdio, one with multithread disabled
-          "-Dtinystdio=false",
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true -Dnewlib-fvwrite-in-streamio=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
-        ]
-        test: [
-          "./.github/do-zephyr",
-        ]
-    steps:
-      - name: Clone picolibc
-        uses: actions/checkout@v3
-        with:
-          path: picolibc
-
-      - name: Restore the Docker Image
-        uses: actions/cache@v3
-        with:
-          path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
-          fail-on-cache-miss: true
-
-      - name: Load and Check the Docker Image
-        run: |
-          docker load -i $IMAGE_FILE
-          docker images -a $IMAGE
-
-      - name: Fortity source test
-        run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} -Dfortify-source=2
-
   minsize-zephyr:
     needs: cache-maker
     runs-on: ubuntu-latest
@@ -127,7 +86,7 @@ jobs:
         run: |
           docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
 
-  release-zephyr:
+  fortify-source-zephyr:
     needs: cache-maker
     runs-on: ubuntu-latest
     strategy:
@@ -164,7 +123,7 @@ jobs:
           docker load -i $IMAGE_FILE
           docker images -a $IMAGE
 
-      - name: Release test
+      - name: Fortity source test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} -Dfortify-source=2 --buildtype release
 
