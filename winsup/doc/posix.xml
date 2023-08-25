@@ -1355,6 +1355,8 @@ also IEEE Std 1003.1-2017 (POSIX.1-2017).</para>
     mkostemp
     mkostemps
     pipe2
+    posix_spawn_file_actions_addchdir_np
+    posix_spawn_file_actions_addfchdir_np
     pow10
     pow10f
     pow10l
@@ -1514,6 +1516,9 @@ also IEEE Std 1003.1-2017 (POSIX.1-2017).</para>
 <screen>
     aligned_alloc		(ISO C11)
     at_quick_exit		(ISO C11)
+    c16rtomb			(ISO C11)
+    c32rtomb			(ISO C11)
+    c8rtomb			(ISO C23)
     call_once			(ISO C11)
     cnd_broadcast		(ISO C11)
     cnd_destroy			(ISO C11)
@@ -1521,6 +1526,9 @@ also IEEE Std 1003.1-2017 (POSIX.1-2017).</para>
     cnd_signal			(ISO C11)
     cnd_timedwait		(ISO C11)
     cnd_wait			(ISO C11)
+    mbrtoc16			(ISO C11)
+    mbrtoc32			(ISO C11)
+    mbrtoc8			(ISO C23)
     mtx_destroy			(ISO C11)
     mtx_init			(ISO C11)
     mtx_lock			(ISO C11)
