@@ -158,7 +158,7 @@ jobs:
           docker load -i $IMAGE_FILE
           docker images -a $IMAGE
 
-      - name: Fortity source test
+      - name: Fortify source test
         run: |
           docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} -Dfortify-source=2 --buildtype release
 
