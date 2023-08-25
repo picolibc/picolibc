@@ -16,27 +16,9 @@ jobs:
         meson_flags: [
           "",
 
-          # Math configurations
-          "-Dnewlib-obsolete-math=false",
-          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
-          "-Dnewlib-obsolete-math-float=true -Dnewlib-obsolete-math-double=false",
-          "-Dnewlib-obsolete-math=true",
-          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
-
-          # Tinystdio configurations
-          "-Dio-float-exact=false",
-          "-Dio-long-long=true",
-          "-Dformat-default=integer",
-          "-Dformat-default=float",
-
-          # Malloc configurations
-          "-Dnewlib-nano-malloc=false",
-
-          # Locale configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true",
-
-          # Iconv configurations
-          "-Dnewlib-iconv-external-ccs=true"
+          # Tinystdio and math configurations, one with multithread disabled and with locale, original malloc and atexit/onexit code
+          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
+          "-Dformat-default=integer -Dposix-io=false -Dnewlib-obsolete-math=true -Dwant-math-errno=true",
         ]
         test: [
           "./.github/do-test native -Dnative-tests=false -Dtests-enable-posix-io=false",
