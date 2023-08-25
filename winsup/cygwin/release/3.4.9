@@ -4,3 +4,7 @@ Bug Fixes
 - Fix a bug introduced in cygwin 3.4.0 that switch_to_nat_pipe flag is
   not cleared properly when non-cygwin app is terminated in the case
   where pseudo console is not activated.
+
+- For the time being, disable creating special files using mknod/mkfifo
+  on NFS.
+  Addresses: https://cygwin.com/pipermail/cygwin/2023-August/254266.html
