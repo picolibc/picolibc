@@ -10,7 +10,7 @@ on:
 
 env:
   DOCKERFILE: picolibc/.github/Dockerfile-zephyr
-  IMAGE_FILE: dockerimg-zephyr.tar.xz
+  IMAGE_FILE: dockerimg-zephyr.tar.zst
   IMAGE: picolibc
   PACKAGES_FILE: picolibc/.github/zephyr-packages.txt
   EXTRA_FILE: picolibc/.github/zephyr-files.txt
@@ -43,7 +43,7 @@ jobs:
           platforms: linux/amd64
           file: .github/Dockerfile-zephyr
           tags: ${{ env.IMAGE }}:latest
-          outputs: type=docker,dest=${{ env.IMAGE_FILE }}
+          outputs: type=docker,force-compression=true,compression=zstd,compression-level=20,dest=${{ env.IMAGE_FILE }}
 
   minsize-zephyr:
     needs: cache-maker

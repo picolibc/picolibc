@@ -10,7 +10,7 @@ on:
 
 env:
   DOCKERFILE: picolibc/.github/Dockerfile
-  IMAGE_FILE: dockerimg-linux.tar.xz
+  IMAGE_FILE: dockerimg-linux.tar.zst
   IMAGE: picolibc-linux
   PACKAGES_FILE: picolibc/.github/linux-packages.txt
   EXTRA_FILE: picolibc/.github/linux-files.txt
@@ -43,5 +43,5 @@ jobs:
           platforms: linux/amd64
           file: .github/Dockerfile
           tags: ${{ env.IMAGE }}:latest
-          outputs: type=docker,dest=${{ env.IMAGE_FILE }}
+          outputs: type=docker,force-compression=true,compression=zstd,compression-level=20,dest=${{ env.IMAGE_FILE }}
 
