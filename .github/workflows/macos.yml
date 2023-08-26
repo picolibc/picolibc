@@ -11,30 +11,17 @@ on:
 jobs:
   macos:
     runs-on: macos-latest
-    strategy:
-      matrix:
-        meson_flags: [
-          "",
-
-          # Tinystdio and math configurations, one with multithread disabled and with locale, original malloc and atexit/onexit code
-          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
-          "-Dformat-default=integer -Dposix-io=false -Dnewlib-obsolete-math=true -Dwant-math-errno=true",
-        ]
-        test: [
-          "./.github/do-test native -Dnative-tests=false -Dtests-enable-posix-io=false",
-        ]
-
     steps:
-      - name: 'Clone picolibc'
+      - name: Clone picolibc
         uses: actions/checkout@v3
 
-      - name: 'Setup python'
+      - name: Setup python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
-      - name: 'Install meson and ninja'
+      - name: Install meson and ninja
         run: pip install meson ninja
 
-      - name: 'MacOS test'
-        run: ${{ matrix.test }} ${{ matrix.meson_flags }}
+      - name: MacOS tests
+        run: ./.github/do-arm
