@@ -1757,15 +1757,6 @@ fhandler_base::select_except (select_stuff *ss)
   return s;
 }
 
-struct wfd_set
-{
-  u_int   fd_count;
-  SOCKET  fd_array[1];
-};
-
-/* autoload exposes the Winsock select function only with a _win32_ prefix. */
-extern "C" int _win32_select(int, wfd_set *, wfd_set *, wfd_set *, TIMEVAL *);
-
 static int
 peek_socket (select_record *me, bool)
 {
@@ -1781,24 +1772,9 @@ peek_socket (select_record *me, bool)
   if (me->read_selected)
     me->read_ready |= ret || !!(events & (FD_READ | FD_ACCEPT | FD_CLOSE));
   if (me->write_selected)
-    {
-      /* The FD_WRITE event is a false friend. It indicates ready to write
-         even if the next send fails with WSAEWOULDBLOCK.  *After* the fact,
-	 FD_WRITE will be cleared until sending is again possible.
-	 For the time being, workaround that here by using the WinSock
-	 select function.  It indicates writability correctly. */
-      if (events & FD_WRITE)
-	{
-	  wfd_set w = { 1, { fh->get_socket () } };
-	  TIMEVAL t = { 0 };
-
-	  if (_win32_select (0, NULL, &w, NULL, &t) == 0)
-	    events &= ~FD_WRITE;
-	}
-      /* Don't check for FD_CLOSE here.  Only an error case (ret == -1)
-	 will set ready for writing. */
-      me->write_ready |= ret || !!(events & (FD_WRITE | FD_CONNECT));
-    }
+    /* Don't check for FD_CLOSE here.  Only an error case (ret == -1)
+       will set ready for writing. */
+    me->write_ready |= ret || !!(events & (FD_WRITE | FD_CONNECT));
   if (me->except_selected)
     me->except_ready |= !!(events & FD_OOB);
 
