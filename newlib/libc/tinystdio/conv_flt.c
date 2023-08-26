@@ -39,16 +39,9 @@ static const char pstr_an[] = "an";
 #if defined(STRTOD) || defined(STRTOF) || defined(STRTOLD)
 # define CHECK_WIDTH()   1
 # define CHECK_RANGE(flt) do {                                          \
-        if (CHECK_LONG()) {                                             \
-            if ((double) flt == 0.0 || (double) flt == (double) INFINITY) \
-                errno = ERANGE;                                         \
-        } else if (CHECK_LONG_LONG()) {                                 \
-            if (flt == (FLOAT) 0.0 || flt == (FLOAT) INFINITY)          \
-                errno = ERANGE;                                         \
-        } else {                                                        \
-            if ((float) flt == 0.0f || (float) flt == (float) INFINITY) \
-                errno = ERANGE;                                         \
-        }                                                               \
+        int __class = fpclassify(flt);                                  \
+        if (__class == FP_INFINITE || __class == FP_SUBNORMAL || __class == FP_ZERO) \
+            errno = ERANGE;                                             \
     } while (0);
 # ifdef STRTOD
 #  define CHECK_LONG()          1
@@ -473,6 +466,7 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 #else /* !defined(UINTFLOAT_128) || __LDBL_IS_IEC_60559__ != 0 */
                 flt = scalbnl(TOFLOAT(uint), exp - (FLOAT_MANT_DIG-1));
 #endif
+                CHECK_RANGE(flt);
             }
         }
         else
