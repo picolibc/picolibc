@@ -210,13 +210,14 @@ fhandler_base::fstat_by_nfs_ea (struct stat *buf)
   cyg_ldap cldap;
   bool ldap_open = false;
 
-  if (get_handle ())
+  /* NFS stumbles over its own caching.  If you write to the file,
+     a subsequent fstat does not return the actual size of the file,
+     but the size at the time the handle has been opened.  Unless
+     access through another handle invalidates the caching within the
+     NFS client.  Skip this for Cygwin-created Symlinks playing FIFOs
+     (this sets the filler1 member to NF3FIFO). */
+  if (get_handle () && nfs_attr->filler1 != NF3FIFO)
     {
-      /* NFS stumbles over its own caching.  If you write to the file,
-	 a subsequent fstat does not return the actual size of the file,
-	 but the size at the time the handle has been opened.  Unless
-	 access through another handle invalidates the caching within the
-	 NFS client. */
       if (get_access () & GENERIC_WRITE)
 	FlushFileBuffers (get_handle ());
       pc.get_finfo (get_handle ());
@@ -357,8 +358,13 @@ fhandler_base::fstat_fs (struct stat *buf)
 
   if (get_stat_handle ())
     {
-      if (!nohandle () && (!is_fs_special () || get_flags () & O_PATH))
-	res = pc.fs_is_nfs () ? fstat_by_nfs_ea (buf) : fstat_by_handle (buf);
+      if (!nohandle ())
+	{
+	  if (pc.fs_is_nfs ())
+	    res = fstat_by_nfs_ea (buf);
+	  else if (!is_fs_special () || get_flags () & O_PATH)
+	    res = fstat_by_handle (buf);
+	}
       if (res)
 	res = fstat_by_name (buf);
       return res;

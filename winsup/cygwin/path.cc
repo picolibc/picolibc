@@ -3513,11 +3513,41 @@ restart:
 	}
 
       /* If the file is on an NFS share and could be opened with extended
-	 attributes, check if it's a symlink.  Only files can be symlinks
-	 (which can be symlinks to directories). */
-      else if (fs.is_nfs () && (conv_hdl.nfsattr ()->type & 7) == NF3LNK)
+	 attributes, check if it's a symlink or FIFO. */
+      else if (fs.is_nfs ())
 	{
-	  res = check_nfs_symlink (h);
+	  /* Make sure filler1 is 0, so we can use it safely as a marker. */
+	  conv_hdl.nfsattr ()->filler1 = 0;
+	  switch (conv_hdl.nfsattr ()->type & 7)
+	    {
+	    case NF3LNK:
+	      res = check_nfs_symlink (h);
+	      /* Enable Cygwin-created FIFOs to be recognized as FIFOs.
+		 We have to overwrite the NFS fattr3 data, otherwise the
+		 info returned by Cygwin's stat will still claim the file
+		 is a symlink. */
+	      if (res && contents[0] == ':' && contents[1] == '\\'
+		  && parse_device (contents) && major == _major (FH_FIFO))
+		{
+		  conv_hdl.nfsattr ()->type = NF3FIFO;
+		  conv_hdl.nfsattr ()->mode = mode;
+		  conv_hdl.nfsattr ()->size = 0;
+		  /* Marker for fhandler_base::fstat_by_nfs_ea not to override
+		     the cached fattr3 data with fresh data from the filesystem,
+		     even if the handle is used for other purposes than stat. */
+		  conv_hdl.nfsattr ()->filler1 = NF3FIFO;
+		}
+	      break;
+	    case NF3FIFO:
+	      /* Enable real FIFOs recognized as such. */
+	      major = _major (FH_FIFO);
+	      minor = _minor (FH_FIFO);
+	      mode = S_IFIFO | (conv_hdl.nfsattr ()->mode & ~S_IFMT);
+	      isdevice = true;
+	      break;
+	    default:
+	      break;
+	    }
 	  if (res)
 	    break;
 	}
