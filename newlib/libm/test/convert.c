@@ -59,7 +59,7 @@ test_strtod (void)
       else
 #endif
         test_eok(errno, ERANGE);
-    } else if (fabs(v) == (double) INFINITY && !(pd->endscan & ENDSCAN_IS_INF))
+    } else if (isinf(v) && !(pd->endscan & ENDSCAN_IS_INF))
       test_eok(errno, ERANGE);
     else
       test_eok(errno, 0);
@@ -80,7 +80,7 @@ test_strtof (void)
     int e = errno;
     if (fabsf(v) < FLT_MIN && !(pd->endscan & ENDSCAN_IS_ZERO))
       test_eok(e, ERANGE);
-    else if (fabsf(v) == INFINITY && !(pd->endscan & ENDSCAN_IS_INF))
+    else if (isinf(v) && !(pd->endscan & ENDSCAN_IS_INF))
       test_eok(errno, ERANGE);
     else
       test_eok(errno, 0);
@@ -115,7 +115,7 @@ test_strtold (void)
       av = -av;
     if (av < LDBL_MIN && !(pd->endscan & ENDSCAN_IS_ZERO))
       test_eok(e, ERANGE);
-    else if (fabsl(v) == (long double) INFINITY && !(pd->endscan & ENDSCAN_IS_INF))
+    else if (isinf(av) && !(pd->endscan & ENDSCAN_IS_INF))
       test_eok(e, ERANGE);
     else
       test_eok(e, 0);
