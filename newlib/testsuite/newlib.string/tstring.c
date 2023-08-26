@@ -93,7 +93,6 @@ int main(void)
   tmp3 = buffer3;
   tmp4 = buffer4;
   tmp5 = buffer5;
-  tmp6 = buffer6;
   tmp7 = buffer7;
 
   tmp2[0] = 'Z';
