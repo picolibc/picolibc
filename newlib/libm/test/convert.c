@@ -39,7 +39,7 @@ double_type *pd = doubles;
 #define CONVERT_BITS_FLOAT	32
 #else
 #define CONVERT_BITS_DOUBLE	58
-#define CONVERT_BITS_FLOAT	29
+#define CONVERT_BITS_FLOAT	28
 #endif
 
 void
