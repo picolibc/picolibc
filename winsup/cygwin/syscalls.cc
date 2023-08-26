@@ -3294,12 +3294,6 @@ mknod (const char *path, mode_t mode, dev_t dev)
 	  __leave;
 	}
 
-      if (w32path.fs_is_nfs ())
-	{
-	  set_errno (EPERM);
-	  __leave;
-	}
-
       return mknod_worker (w32path, mode, major, minor);
     }
   __except (EFAULT)
