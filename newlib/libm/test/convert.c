@@ -579,6 +579,14 @@ test_cvt (void)
 
   iterate(test_strtod, "strtod");
 #ifdef HAVE_STRTOLD
+#ifdef __m68k__
+    volatile long double zero = 0.0L;
+    volatile long double one = 1.0L;
+    volatile long double check = nextafterl(zero, one);
+    if (check + check == zero) {
+        printf("m68k emulating long double with double, skipping\n");
+    } else
+#endif
   iterate(test_strtold, "strtold");
 #endif
 
