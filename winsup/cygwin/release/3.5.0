@@ -39,3 +39,5 @@ What changed:
 - posix_spawnp no longer falls back to starting the shell for unrecognized
   files as execvp.  For the reasoning, see
   https://www.austingroupbugs.net/view.php?id=1674
+
+- FIFOs now also work over NFS.

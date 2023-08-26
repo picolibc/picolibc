@@ -58,6 +58,10 @@ posix_spawn_file_actions_addfchdir_np.
 New API calls: c8rtomb, c16rtomb, c32rtomb, mbrtoc8, mbrtoc16, mbrtoc32.
 </para></listitem>
 
+<listitem><para>
+FIFOs now also work over NFS.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
