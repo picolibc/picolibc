@@ -122,7 +122,6 @@ fcvt_r (double invalue,
 
     /* Value */
     memcpy(buf, digits, ndigit);
-    len -= ndigit;
     buf += ndigit;
 
     /* Trailing zeros */
