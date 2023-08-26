@@ -312,7 +312,6 @@ __math_lgamma_r(__float64 x, int *signgamp, int *divzero)
         }
     } else if (ix < 0x40200000) { /* x < 8.0 */
         i = (__int32_t)x;
-        t = zero;
         y = x - (__float64)i;
         p = y * (s0 +
                  y * (s1 + y * (s2 + y * (s3 + y * (s4 + y * (s5 + y * s6))))));
