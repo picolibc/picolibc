@@ -123,33 +123,6 @@ _win32_" #name ":					\n\
   .asciz	\"" #name "\"				\n\
   .text							\n\
 ");
-
-/* Do not export function "foo" as "foo". Only export it as "_win32_foo".
-   That allows to autoload and use a Windows function having the same name
-   as a Cygwin function. Namely select. */
-#define LoadDLLfunc_pfx_only(name, dllname) \
-  LoadDLLprime (dllname, dll_func_load, 0) \
-  __asm__ ("						\n\
-  .section	." #dllname "_autoload_text,\"wx\"	\n\
-  .global	_win32_" #name "			\n\
-  .align	16					\n\
-_win32_" #name ":					\n\
-  movq		3f(%rip),%rax				\n\
-  jmp		*%rax					\n\
-1:movq		2f(%rip),%rax				\n\
-  push		%rbp		# Keep 16 byte aligned	\n\
-  push		%r9					\n\
-  push		%r8					\n\
-  push		%rdx					\n\
-  push		%rcx					\n\
-  call		*(%rax)					\n\
-2:.quad		." #dllname "_info			\n\
-  .hword	0					\n\
-  .hword	0					\n\
-3:.quad		1b					\n\
-  .asciz	\"" #name "\"				\n\
-  .text							\n\
-");
 #else
 #error unimplemented for this target
 #endif
