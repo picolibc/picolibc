@@ -37,7 +37,13 @@ int
 __fpclassifyl (long double x)
 {
     union IEEEl2bits u;
+    int ret;
 
     u.e = x;
-    return __fpclassifyd(u.dbits.dh);
+    ret = __fpclassifyd(u.dbits.dh);
+    if (ret == FP_NORMAL) {
+        if (u.bits.exp < 54)
+            ret = FP_SUBNORMAL;
+    }
+    return ret;
 }
