@@ -3,7 +3,7 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['ccache', 'msp430-elf-gcc', '-nostdlib']
+c = ['ccache', 'msp430-elf-gcc', '-nolibc']
 ar = 'msp430-elf-ar'
 as = 'msp430-elf-as'
 nm = 'msp430-elf-nm'
@@ -17,4 +17,4 @@ endian = 'little'
 
 [properties]
 skip_sanity_check = true
-additional_libs = ['-lmul_none']
+specs_extra = ['*libgcc:', '-lmul_none -lgcc']
