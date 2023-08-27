@@ -2,3 +2,4 @@
 
 *link:
 @SPECS_PRINTF@ --gc-sections %(test_link)
+@SPECS_EXTRA@
