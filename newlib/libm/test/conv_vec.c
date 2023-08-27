@@ -3691,6 +3691,9 @@ double_type doubles[] =
 {__LINE__, "0x1.fffffffffffffp-1022", 0x1.fffffffffffffp-1022, 23, },
 {__LINE__, "0x1.fffffffffffffp+1023", 0x1.fffffffffffffp+1023, 23, },
 {__LINE__, "0x1.8p-1050", 0x1.8p-1050, 11, },
+{__LINE__, "0x1.0p-968", 0x1.0p-968, 10 },
+{__LINE__, "0x1.0p-969", 0x1.0p-969, 10 },
+{__LINE__, "0x1.0p-970", 0x1.0p-970, 10 },
 #endif
 {0 },
 };
