@@ -15,6 +15,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  # CCache is disabled for the Linux jobs for now.
+  CCACHE_SIZE: "0M"
+  CCACHE_CMD: true
   DOCKERFILE: picolibc/.github/Dockerfile
   IMAGE_FILE: dockerimg-linux.tar.zst
   IMAGE: picolibc-linux
@@ -82,9 +85,28 @@ jobs:
           docker load -i $IMAGE_FILE
           docker images -a $IMAGE
 
+      # The docker image contains ccache, but the ccache action uses the ccache
+      # outside docker for statistics, so install the same ccache version.
+      # Install in /usr/bin so the ccache action gets the expected environment.
+      - name: install ccache
+        if: matrix.test == './.github/do-zephyr'
+        run: |
+          wget -nv https://github.com/ccache/ccache/releases/download/v4.8.2/ccache-4.8.2-linux-x86_64.tar.xz
+          sudo tar xf ccache-4.8.2-linux-x86_64.tar.xz -C /usr/bin --strip-components=1 --no-same-owner ccache-4.8.2-linux-x86_64/ccache
+          rm -f ccache-*-linux-x86_64.tar.xz
+
+      # Key on job name and cache size to get separate caches for linux
+      # and zephyr.
+      - name: ccache
+        if: matrix.test == './.github/do-zephyr'
+        uses: hendrikmuhs/ccache-action@v1.2.10
+        with:
+          key: compilation-${{ runner.os }}-${{ github.job }}-${{ matrix.meson_flags }}-${{ env.CCACHE_SIZE }}
+          max-size: ${{ env.CCACHE_SIZE }}
+
       - name: CMake test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.cmake_flags }}
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc -v $GITHUB_WORKSPACE/.ccache:/root/.ccache $IMAGE bash --login -c "${{ env.CCACHE_CMD }} --set-config=max_size=${{ env.CCACHE_SIZE }} && ${{ matrix.test }} ${{ matrix.cmake_flags }}"
 
   minsize-linux:
     needs: cache-maker
@@ -123,9 +145,28 @@ jobs:
           docker load -i $IMAGE_FILE
           docker images -a $IMAGE
 
+      # The docker image contains ccache, but the ccache action uses the ccache
+      # outside docker for statistics, so install the same ccache version.
+      # Install in /usr/bin so the ccache action gets the expected environment.
+      - name: install ccache
+        if: matrix.test == './.github/do-zephyr'
+        run: |
+          wget -nv https://github.com/ccache/ccache/releases/download/v4.8.2/ccache-4.8.2-linux-x86_64.tar.xz
+          sudo tar xf ccache-4.8.2-linux-x86_64.tar.xz -C /usr/bin --strip-components=1 --no-same-owner ccache-4.8.2-linux-x86_64/ccache
+          rm -f ccache-*-linux-x86_64.tar.xz
+
+      # Key on job name and cache size to get separate caches for linux
+      # and zephyr.
+      - name: ccache
+        if: matrix.test == './.github/do-zephyr'
+        uses: hendrikmuhs/ccache-action@v1.2.10
+        with:
+          key: compilation-${{ runner.os }}-${{ github.job }}-${{ matrix.meson_flags }}-${{ env.CCACHE_SIZE }}
+          max-size: ${{ env.CCACHE_SIZE }}
+
       - name: Minsize test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc -v $GITHUB_WORKSPACE/.ccache:/root/.ccache $IMAGE bash --login -c "${{ env.CCACHE_CMD }} --set-config=max_size=${{ env.CCACHE_SIZE }} && ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize"
 
   fortify-source-linux:
     needs: cache-maker
@@ -164,7 +205,26 @@ jobs:
           docker load -i $IMAGE_FILE
           docker images -a $IMAGE
 
+      # The docker image contains ccache, but the ccache action uses the ccache
+      # outside docker for statistics, so install the same ccache version.
+      # Install in /usr/bin so the ccache action gets the expected environment.
+      - name: install ccache
+        if: matrix.test == './.github/do-zephyr'
+        run: |
+          wget -nv https://github.com/ccache/ccache/releases/download/v4.8.2/ccache-4.8.2-linux-x86_64.tar.xz
+          sudo tar xf ccache-4.8.2-linux-x86_64.tar.xz -C /usr/bin --strip-components=1 --no-same-owner ccache-4.8.2-linux-x86_64/ccache
+          rm -f ccache-*-linux-x86_64.tar.xz
+
+      # Key on job name and cache size to get separate caches for linux
+      # and zephyr.
+      - name: ccache
+        if: matrix.test == './.github/do-zephyr'
+        uses: hendrikmuhs/ccache-action@v1.2.10
+        with:
+          key: compilation-${{ runner.os }}-${{ github.job }}-${{ matrix.meson_flags }}-${{ env.CCACHE_SIZE }}
+          max-size: ${{ env.CCACHE_SIZE }}
+
       - name: Fortify source test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} -Dfortify-source=2 --buildtype release
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc -v $GITHUB_WORKSPACE/.ccache:/root/.ccache $IMAGE bash --login -c "${{ env.CCACHE_CMD }} --set-config=max_size=${{ env.CCACHE_SIZE }} && ${{ matrix.test }} ${{ matrix.meson_flags }} -Dfortify-source=2 --buildtype release"
 
