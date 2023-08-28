@@ -704,22 +704,20 @@ static bool
 is_console_app (const WCHAR *filename)
 {
   HANDLE h;
-  const int id_offset = 92;
   h = CreateFileW (filename, GENERIC_READ, FILE_SHARE_READ,
 		   NULL, OPEN_EXISTING, 0, NULL);
   char buf[1024];
   DWORD n;
   ReadFile (h, buf, sizeof (buf), &n, 0);
   CloseHandle (h);
-  char *p = (char *) memmem (buf, n, "PE\0\0", 4);
-  if (p && p + id_offset < buf + n)
-    return p[id_offset] == '\003'; /* 02: GUI, 03: console */
-  else
-    {
-      wchar_t *e = wcsrchr (filename, L'.');
-      if (e && (wcscasecmp (e, L".bat") == 0 || wcscasecmp (e, L".cmd") == 0))
-	return true;
-    }
+  /* The offset of Subsystem is the same for both IMAGE_NT_HEADERS32 and
+     IMAGE_NT_HEADERS64, so only IMAGE_NT_HEADERS32 is used here. */
+  IMAGE_NT_HEADERS32 *p = (IMAGE_NT_HEADERS32 *) memmem (buf, n, "PE\0\0", 4);
+  if (p && (char *) &p->OptionalHeader.DllCharacteristics <= buf + n)
+    return p->OptionalHeader.Subsystem == IMAGE_SUBSYSTEM_WINDOWS_CUI;
+  wchar_t *e = wcsrchr (filename, L'.');
+  if (e && (wcscasecmp (e, L".bat") == 0 || wcscasecmp (e, L".cmd") == 0))
+    return true;
   return false;
 }
 
