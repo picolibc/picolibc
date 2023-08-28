@@ -73,6 +73,10 @@ uint32_t cygwin_inet_addr (const char *cp);
    application provided path strings we handle. */
 #define NT_MAX_PATH 32768
 
+/* CYG_ARG_MAX is the maximum total length of command line args.
+   The value 2097152 is the default ARG_MAX value in Linux. */
+#define CYG_ARG_MAX 2097152
+
 /* This definition allows to define wide char strings using macros as
    parameters.  See the definition of __CONCAT in newlib's sys/cdefs.h
    and accompanying comment. */

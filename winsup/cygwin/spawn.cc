@@ -351,8 +351,9 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	 We need to quote any argument that has whitespace or embedded "'s.  */
 
       int ac;
+      size_t arg_len = 0;
       for (ac = 0; argv[ac]; ac++)
-	/* nothing */;
+	arg_len += strlen (argv[ac]) + 1;
 
       int err;
       const char *ext;
@@ -521,6 +522,12 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  __leave;
 	}
       set (chtype, real_path.iscygexec ());
+      if (iscygwin () && arg_len > (size_t) sysconf (_SC_ARG_MAX))
+	{
+	  set_errno (E2BIG);
+	  res = -1;
+	  __leave;
+	}
       __stdin = in__stdin;
       __stdout = in__stdout;
       record_children ();

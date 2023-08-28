@@ -978,11 +978,8 @@ dll_crt0_1 (void *)
 	 a change to an element of argv[] it does not affect Cygwin's argv.
 	 Changing the the contents of what argv[n] points to will still
 	 affect Cygwin.  This is similar (but not exactly like) Linux. */
-      char *newargv[__argc + 1];
-      char **nav = newargv;
-      char **oav = __argv;
-      while ((*nav++ = *oav++) != NULL)
-	continue;
+      char **newargv = (char **) malloc ((__argc + 1) * sizeof (char *));
+      memcpy (newargv, __argv, (__argc + 1) * sizeof (char *));
       /* Handle any signals which may have arrived */
       sig_dispatch_pending (false);
       _my_tls.call_signal_handler ();
