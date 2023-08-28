@@ -240,7 +240,7 @@ stmp-targ-include: config.status
 	$(AM_V_at)s=machine/$(machine_dir)/include d= $(TARG_INCLUDE_CP_DIR)
 	$(AM_V_at)s=sys/$(sys_dir)/include d= $(TARG_INCLUDE_CP_DIR)
 	$(AM_V_at)for i in $(call rwildcard,$(srcdir)/libc/sys/$(sys_dir)/include/,*.h); do \
-	  f=`echo $$i | sed s:$(srcdir)/libc/sys/$(sys_dir)/include/::`; \
+	  f=`echo $$i | sed s:^$(srcdir)/libc/sys/$(sys_dir)/include/::`; \
 	  $(MKDIR_P) targ-include/`dirname $$f`; \
 	  cp $$i targ-include/$$f; \
 	done
@@ -334,7 +334,7 @@ install-data-local: install-toollibLIBRARIES install-multi $(INSTALL_DATA_LOCAL)
 	    else true; fi ; \
 	  done ; \
 	  for i in $(call rwildcard,$(srcdir)/libc/sys/$(sys_dir)/include/,*.h); do \
-	    f=`echo $$i | sed s:$(srcdir)/libc/sys/$(sys_dir)/include/::`; \
+	    f=`echo $$i | sed s:^$(srcdir)/libc/sys/$(sys_dir)/include/::`; \
 	    $(MKDIR_P) $(DESTDIR)$(tooldir)/`dirname $$f`; \
 	    $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/`dirname $$f`; \
 	  done ; \
