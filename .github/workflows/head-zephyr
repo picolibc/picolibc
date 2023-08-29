@@ -8,6 +8,12 @@ on:
     branches:
       - main
 
+# When a PR is updated, cancel the jobs from the previous version. Merges
+# do not define head_ref, so use run_id to never cancel those jobs.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 env:
   DOCKERFILE: picolibc/.github/Dockerfile-zephyr
   IMAGE_FILE: dockerimg-zephyr.tar.zst
