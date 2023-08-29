@@ -52,7 +52,7 @@ jobs:
           platforms: linux/amd64
           file: .github/Dockerfile
           tags: ${{ env.IMAGE }}:latest
-          outputs: type=docker,force-compression=true,compression=zstd,compression-level=20,dest=${{ env.IMAGE_FILE }}
+          outputs: type=docker,force-compression=true,compression=zstd,compression-level=22,dest=${{ env.IMAGE_FILE }}
 
   cmake-linux:
     needs: cache-maker
