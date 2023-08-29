@@ -23,11 +23,16 @@ class av
  public:
   int argc;
   bool win16_exe;
-  av (): argv (NULL) {}
-  av (int ac_in, const char * const *av_in) : calloced (0), argc (ac_in), win16_exe (false)
+  av () : argv (NULL), argc (0) {}
+  av (int ac_in, const char * const *av_in)
+  : calloced (0), win16_exe (false)
   {
-    argv = (char **) cmalloc_abort (HEAP_1_ARGV, (argc + 5) * sizeof (char *));
-    memcpy (argv, av_in, (argc + 1) * sizeof (char *));
+    argv = (char **) cmalloc (HEAP_1_ARGV, (ac_in + 5) * sizeof (char *));
+    if (argv)
+      {
+	argc = ac_in;
+	memcpy (argv, av_in, (argc + 1) * sizeof (char *));
+      }
   }
   void *operator new (size_t, void *p) __attribute__ ((nothrow)) {return p;}
   ~av ()

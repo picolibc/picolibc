@@ -485,7 +485,7 @@ static struct
     };
 } sca[] =
 {
-  {cons, {c:CYG_ARG_MAX}},		/*   0, _SC_ARG_MAX */
+  {cons, {c:-1L}},			/*   0, _SC_ARG_MAX */
   {cons, {c:CHILD_MAX}},		/*   1, _SC_CHILD_MAX */
   {cons, {c:CLOCKS_PER_SEC}},		/*   2, _SC_CLK_TCK */
   {cons, {c:NGROUPS_MAX}},		/*   3, _SC_NGROUPS_MAX */

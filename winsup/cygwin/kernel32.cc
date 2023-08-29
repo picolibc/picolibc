@@ -424,8 +424,11 @@ ucmd ()
       linebuf cmd;
       path_conv real_path (__argv[0]);
       av newargv (__argc, __argv);
-      cmd.fromargv (newargv, real_path.get_win32 (), true);
-      RtlInitUnicodeString (&wcmd, cmd);
+      if (newargv.argc)
+	{
+	  cmd.fromargv (newargv, real_path.get_win32 (), true);
+	  RtlInitUnicodeString (&wcmd, cmd);
+	}
     }
   return &wcmd;
 }

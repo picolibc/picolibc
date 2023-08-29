@@ -976,10 +976,22 @@ dll_crt0_1 (void *)
     {
       /* Create a copy of Cygwin's version of __argv so that, if the user makes
 	 a change to an element of argv[] it does not affect Cygwin's argv.
-	 Changing the the contents of what argv[n] points to will still
-	 affect Cygwin.  This is similar (but not exactly like) Linux. */
+	 Changing the contents of what argv[n] points to will still affect
+	 Cygwin.  This is similar (but not exactly like) Linux.
+
+	 We used to allocate newargv on the stack, but all the rest of the
+	 argument and environment handling does not depend on the stack,
+	 as it does on Linux.  In fact, everything is stored by the parent
+	 in the cygheap, so the only reason this may fail is if we're out
+	 of resources in a big way.  If this malloc fails, we could either
+	 fail the entire process execution, or we could proceed with the
+	 original argv and potentially affect output of /proc/self/cmdline.
+	 We opt for the latter here because it's the lesser evil. */
       char **newargv = (char **) malloc ((__argc + 1) * sizeof (char *));
-      memcpy (newargv, __argv, (__argc + 1) * sizeof (char *));
+      if (newargv)
+	memcpy (newargv, __argv, (__argc + 1) * sizeof (char *));
+      else
+	newargv = __argv;
       /* Handle any signals which may have arrived */
       sig_dispatch_pending (false);
       _my_tls.call_signal_handler ();
