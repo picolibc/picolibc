@@ -346,7 +346,7 @@ extern void __malloc_unlock();
 #define RDECL struct _reent *reent_ptr;
 #endif
 
-#define RERRNO reent_ptr->_errno
+#define RERRNO _REENT_ERRNO(reent_ptr)
 #define RCALL reent_ptr,
 #define RONECALL reent_ptr
 

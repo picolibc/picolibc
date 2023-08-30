@@ -64,7 +64,7 @@
 #define MALLOC_LOCK __malloc_lock(reent_ptr)
 #define MALLOC_UNLOCK __malloc_unlock(reent_ptr)
 
-#define RERRNO reent_ptr->_errno
+#define RERRNO _REENT_ERRNO(reent_ptr)
 
 #define nano_malloc		_malloc_r
 #define nano_free		_free_r
