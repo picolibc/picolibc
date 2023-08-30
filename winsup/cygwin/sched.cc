@@ -684,4 +684,16 @@ done:
   return 0;
 }
 
+cpu_set_t *
+__cpuset_alloc (int num)
+{
+  return (cpu_set_t *) malloc (CPU_ALLOC_SIZE(num));
+}
+
+void
+__cpuset_free (cpu_set_t *set)
+{
+  free (set);
+}
+
 } /* extern C */

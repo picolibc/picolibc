@@ -49,6 +49,8 @@ __b64_ntop NOSIGFE
 __b64_pton NOSIGFE
 __bsd_qsort_r NOSIGFE
 __chk_fail SIGFE
+__cpuset_alloc SIGFE
+__cpuset_free SIGFE
 __cxa_atexit = cygwin__cxa_atexit SIGFE
 __cxa_finalize SIGFE
 __dn_comp SIGFE
