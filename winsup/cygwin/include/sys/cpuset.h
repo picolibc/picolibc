@@ -29,15 +29,15 @@ typedef struct
 } cpu_set_t;
 
 #if __GNU_VISIBLE
-int __sched_getaffinity_sys (pid_t, size_t, cpu_set_t *);
+int __sched_getaffinity_sys (__pid_t, __size_t, cpu_set_t *);
 
 /* These macros alloc or free dynamically-sized cpu sets of size 'num' cpus.
    Allocations are padded such that full-word operations can be done easily. */
 #define CPU_ALLOC_SIZE(num) __cpuset_alloc_size (num)
-static __inline size_t
+static __inline __size_t
 __cpuset_alloc_size (int num)
 {
-  return (size_t) (((num + __NCPUBITS - 1) / __NCPUBITS) * sizeof (__cpu_mask));
+  return (__size_t) (((num + __NCPUBITS - 1) / __NCPUBITS) * sizeof (__cpu_mask));
 }
 
 #define CPU_ALLOC(num) __cpuset_alloc (num)
@@ -49,7 +49,7 @@ void __cpuset_free (cpu_set_t *);
 /* These _S macros operate on dynamically-sized cpu sets of size 'siz' bytes */
 #define CPU_ZERO_S(siz, set) __cpuset_zero_s (siz, set)
 static __inline
-__cpuset_zero_s (size_t siz, cpu_set_t *set)
+__cpuset_zero_s (__size_t siz, cpu_set_t *set)
 {
 #if __GNUC_PREREQ (2, 91)
   __builtin_memset (set, 0, siz);
@@ -62,7 +62,7 @@ __cpuset_zero_s (size_t siz, cpu_set_t *set)
 
 #define CPU_SET_S(cpu, siz, set) __cpuset_set_s (cpu, siz, set)
 static __inline void
-__cpuset_set_s (int cpu, size_t siz, cpu_set_t *set)
+__cpuset_set_s (int cpu, __size_t siz, cpu_set_t *set)
 {
   if (cpu >= 0 && cpu < 8 * siz)
     (set)->__bits[__CPUELT(cpu)] |= __CPUMASK(cpu);
@@ -70,7 +70,7 @@ __cpuset_set_s (int cpu, size_t siz, cpu_set_t *set)
 
 #define CPU_CLR_S(cpu, siz, set) __cpuset_clr_s (cpu, siz, set)
 static __inline void
-__cpuset_clr_s (int cpu, size_t siz, cpu_set_t *set)
+__cpuset_clr_s (int cpu, __size_t siz, cpu_set_t *set)
 {
   if (cpu >= 0 && cpu < 8 * siz)
     (set)->__bits[__CPUELT(cpu)] &= ~(__CPUMASK(cpu));
@@ -78,7 +78,7 @@ __cpuset_clr_s (int cpu, size_t siz, cpu_set_t *set)
 
 #define CPU_ISSET_S(cpu, siz, set) __cpuset_isset_s (cpu, siz, set)
 static __inline int
-__cpuset_isset_s (int cpu, size_t siz, cpu_set_t *set)
+__cpuset_isset_s (int cpu, __size_t siz, cpu_set_t *set)
 {
   int res = 0;
   if (cpu >= 0 && cpu < 8 * siz)
@@ -88,7 +88,7 @@ __cpuset_isset_s (int cpu, size_t siz, cpu_set_t *set)
 
 #define CPU_COUNT_S(siz, set) __cpuset_count_s (siz, set)
 static __inline int
-__cpuset_count_s (size_t siz, cpu_set_t *set)
+__cpuset_count_s (__size_t siz, cpu_set_t *set)
 {
   int i, res = 0;
   for (i = 0; i < siz / sizeof (__cpu_mask); i++)
@@ -98,7 +98,7 @@ __cpuset_count_s (size_t siz, cpu_set_t *set)
 
 #define CPU_AND_S(siz, dst, src1, src2) __cpuset_and_s (siz, dst, src1, src2)
 static __inline void
-__cpuset_and_s (size_t siz, cpu_set_t *dst, cpu_set_t *src1, cpu_set_t *src2)
+__cpuset_and_s (__size_t siz, cpu_set_t *dst, cpu_set_t *src1, cpu_set_t *src2)
 {
   int i;
   for (i = 0; i < siz / sizeof (__cpu_mask); i++)
@@ -107,7 +107,7 @@ __cpuset_and_s (size_t siz, cpu_set_t *dst, cpu_set_t *src1, cpu_set_t *src2)
 
 #define CPU_OR_S(siz, dst, src1, src2) __cpuset_or_s (siz, dst, src1, src2)
 static __inline void
-__cpuset_or_s (size_t siz, cpu_set_t *dst, cpu_set_t *src1, cpu_set_t *src2)
+__cpuset_or_s (__size_t siz, cpu_set_t *dst, cpu_set_t *src1, cpu_set_t *src2)
 {
   int i;
   for (i = 0; i < siz / sizeof (__cpu_mask); i++)
@@ -116,7 +116,7 @@ __cpuset_or_s (size_t siz, cpu_set_t *dst, cpu_set_t *src1, cpu_set_t *src2)
 
 #define CPU_XOR_S(siz, dst, src1, src2) __cpuset_xor_s (siz, dst, src1, src2)
 static __inline void
-__cpuset_xor_s (size_t siz, cpu_set_t *dst, cpu_set_t *src1, cpu_set_t *src2)
+__cpuset_xor_s (__size_t siz, cpu_set_t *dst, cpu_set_t *src1, cpu_set_t *src2)
 {
   int i;
   for (i = 0; i < siz / sizeof (__cpu_mask); i++)
@@ -125,7 +125,7 @@ __cpuset_xor_s (size_t siz, cpu_set_t *dst, cpu_set_t *src1, cpu_set_t *src2)
 
 #define CPU_EQUAL_S(siz, src1, src2) __cpuset_equal_s (siz, src1, src2)
 static __inline int
-__cpuset_equal_s (size_t siz, cpu_set_t *src1, cpu_set_t *src2)
+__cpuset_equal_s (__size_t siz, cpu_set_t *src1, cpu_set_t *src2)
 {
   int i, res = 1;
   for (i = 0; res && i < siz / sizeof (__cpu_mask); i++)
