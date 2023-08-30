@@ -9,6 +9,8 @@ int _dummy_getreent;
 #include <_ansi.h>
 #include <reent.h>
 
+#ifndef _REENT_THREAD_LOCAL
+
 #ifdef __getreent
 #undef __getreent
 #endif
@@ -18,5 +20,7 @@ __getreent (void)
 {
   return _impure_ptr;
 }
+
+#endif /* !_REENT_THREAD_LOCAL */
 
 #endif
