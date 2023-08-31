@@ -5,6 +5,8 @@ on:
    # since master is a symbolic reference to main, don't run for both
    branches-ignore:
      - 'master'
+   tags:
+     - '*'
 
 jobs:
   fedora-build:
@@ -57,11 +59,25 @@ jobs:
         make -C build install
         make -C build/*/newlib install-info install-man
 
-    # deploy documentation preview
-    - name: Deploy documentation preview
+    # deploy documentation
+    - name: Deploy documentation
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
+        # pushes to main are deployed as preview
+        # pushes to cygwin-n.n.n (but not 'cygwin-n.n.n.dev') tags are deployed as stable
+        # other references are ignored by this step
+        case "${{ github.ref }}" in
+          refs/heads/main)
+            DEST='preview'
+            ;;
+          refs/tags/cygwin-[0-9.]*)
+            DEST='stable'
+            ;;
+          *)
+            exit 0
+            ;;
+        esac
         # unfuck github fuckery of HOME in a container
         unset HOME
         # add the hosts public key to known_hosts
@@ -71,8 +87,8 @@ jobs:
         ssh-agent -a $SSH_AUTH_SOCK > /dev/null
         ssh-add - <<< "${{ secrets.SSH_KEY }}"
         # 'make install' doesn't install faq, so instead just deploy from build directory
-        scp -pr build/*/winsup/doc/{cygwin-api,cygwin-ug-net,faq} cygwin-admin@cygwin.com:/sourceware/www/sourceware/htdocs/cygwin/doc/preview/
-      if: env.HAS_SSH_KEY == 'true' && github.ref == 'refs/heads/main'
+        scp -pr build/*/winsup/doc/{cygwin-api,cygwin-ug-net,faq} cygwin-admin@cygwin.com:/sourceware/www/sourceware/htdocs/cygwin/doc/${DEST}/
+      if: env.HAS_SSH_KEY == 'true'
 
   windows-build:
     runs-on: windows-latest
