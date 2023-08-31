@@ -8,7 +8,7 @@
 /*
  * The following array contains the list of built-in CCS tables.
  */
-const iconv_ccs_t *
+const iconv_ccs_t * const
 _iconv_ccs[] =
 {
 #if defined (ICONV_TO_UCS_CCS_BIG5) \

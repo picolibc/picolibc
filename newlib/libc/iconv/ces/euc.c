@@ -59,7 +59,7 @@ typedef struct
 { 
   int type;
   int mb_cur_max;
-  euc_cs_desc_t *desc;
+  const euc_cs_desc_t *desc;
   
   void *data[MAX_CS_NUM];
 } euc_data_t;
@@ -67,7 +67,7 @@ typedef struct
 #if defined (_ICONV_TO_ENCODING_EUC_JP) \
  || defined (_ICONV_FROM_ENCODING_EUC_JP) \
  || defined (_ICONV_ENABLE_EXTERNAL_CCS)
-static euc_cs_desc_t euc_jp_cs_desc[] =
+static const euc_cs_desc_t euc_jp_cs_desc[] =
 {
   {ICONV_CCS_JIS_X0208_1990, "",     2, 0, 1},
   {ICONV_CCS_JIS_X0201_1976, "\x8e", 1, 1, 0},
@@ -79,7 +79,7 @@ static euc_cs_desc_t euc_jp_cs_desc[] =
 #if defined (_ICONV_TO_ENCODING_EUC_TW) \
  || defined (_ICONV_FROM_ENCODING_EUC_TW) \
  || defined (_ICONV_ENABLE_EXTERNAL_CCS)
-static euc_cs_desc_t euc_tw_cs_desc [] =
+static const euc_cs_desc_t euc_tw_cs_desc [] =
 {
   {ICONV_CCS_CNS11643_PLANE1,  "",         2, 0, 1},
   {ICONV_CCS_CNS11643_PLANE2,  "\x8e\xa2", 2, 2, 1},
@@ -91,7 +91,7 @@ static euc_cs_desc_t euc_tw_cs_desc [] =
 #if defined (_ICONV_TO_ENCODING_EUC_KR) \
  || defined (_ICONV_FROM_ENCODING_EUC_KR) \
  || defined (_ICONV_ENABLE_EXTERNAL_CCS)
-static euc_cs_desc_t euc_kr_cs_desc [] =
+static const euc_cs_desc_t euc_kr_cs_desc [] =
 {
   {ICONV_CCS_KSX1001,  "", 2, 0, 1},
   {0}

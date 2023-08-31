@@ -151,7 +151,7 @@ typedef struct
 } iconv_ccs_desc_t;
 
 /* Array containing all built-in CCS tables */
-extern const iconv_ccs_t *
+extern const iconv_ccs_t * const
 _iconv_ccs[];
 
 #endif /* __CCS_H__ */
