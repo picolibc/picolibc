@@ -7,6 +7,7 @@ All rights reserved.
 #include <string.h>
 #include <wchar.h>
 #include <locale.h>
+#include <stdint.h>
 #include "mbctype.h"
 #include "local.h"
 
