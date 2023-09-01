@@ -1282,7 +1282,7 @@ const struct {
 	{ 0 },
 };
 
-struct {
+static const struct {
         long    (*func)(void);
 	char	*name;
 	long	value;
