@@ -36,7 +36,7 @@
 
 #define FLAG(f)	{ f, #f }
 
-struct xlat {
+const struct xlat {
   int val;
   char *str;
 } fnmatch_flags[] = {
@@ -68,7 +68,7 @@ static void printflags(const struct xlat *map, int flags) {
 /*
  * tests harness adapted from glibc testfnm.c
  */
-struct {
+const struct {
     const char *pattern;
     const char *string;
     int flags;

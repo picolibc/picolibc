@@ -41,7 +41,7 @@
 #define FULL_TESTS
 #endif
 
-struct {
+static const struct {
     char        *string;
     double      dvalue;
     float       fvalue;
