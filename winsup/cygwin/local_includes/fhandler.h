@@ -2777,6 +2777,35 @@ class fhandler_windows: public fhandler_base
   }
 };
 
+class fhandler_dev_mixer: public fhandler_base
+{
+ private:
+  int rec_source;
+ public:
+  fhandler_dev_mixer () {}
+  int open (int, mode_t mode = 0);
+  ssize_t write (const void *, size_t);
+  void read (void *, size_t&);
+  int ioctl (unsigned int, void *);
+
+  fhandler_dev_mixer (void *) {}
+
+  void copy_from (fhandler_base *x)
+  {
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_dev_mixer *> (x);
+    _copy_from_reset_helper ();
+  }
+
+  fhandler_dev_mixer *clone (cygheap_types malloc_type = HEAP_FHANDLER)
+  {
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_dev_mixer));
+    fhandler_dev_mixer *fh = new (ptr) fhandler_dev_mixer (ptr);
+    fh->copy_from (this);
+    return fh;
+  }
+};
+
 class fhandler_dev_dsp: public fhandler_base
 {
  public:

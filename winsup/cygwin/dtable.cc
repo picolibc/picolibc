@@ -552,6 +552,9 @@ fh_alloc (path_conv& pc)
 	case FH_CLIPBOARD:
 	  fh = cnew (fhandler_dev_clipboard);
 	  break;
+	case FH_OSS_MIXER:
+	  fh = cnew (fhandler_dev_mixer);
+	  break;
 	case FH_OSS_DSP:
 	  fh = cnew (fhandler_dev_dsp);
 	  break;

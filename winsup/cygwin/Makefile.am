@@ -89,6 +89,7 @@ FHANDLER_FILES= \
 	fhandler/dsp.cc \
 	fhandler/fifo.cc \
 	fhandler/floppy.cc \
+	fhandler/mixer.cc \
 	fhandler/mqueue.cc \
 	fhandler/netdrive.cc \
 	fhandler/nodevice.cc \
