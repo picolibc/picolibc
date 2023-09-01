@@ -194,7 +194,7 @@ static char *categories[_LC_LAST] = {
  * This variable can be changed by any outside mechanism.  This allows,
  * for instance, to load the default locale from a file.
  */
-char __default_locale[ENCODING_LEN + 1] = DEFAULT_LOCALE;
+static const char __default_locale[ENCODING_LEN + 1] = DEFAULT_LOCALE;
 
 const struct __locale_t __C_locale =
 {

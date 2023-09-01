@@ -32,10 +32,10 @@
 
 #define LCMONETARY_SIZE (sizeof(struct lc_monetary_T) / sizeof(char *))
 
-static char	empty[] = "";
-static char	numempty[] = { CHAR_MAX, '\0'};
+static const char	empty[] = "";
+static const char	numempty[] = { CHAR_MAX, '\0'};
 #ifdef __HAVE_LOCALE_INFO_EXTENDED__
-static wchar_t	wempty[] = L"";
+static const wchar_t	wempty[] = L"";
 #endif
 
 const struct lc_monetary_T _C_monetary_locale = {
