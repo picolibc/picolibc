@@ -16,14 +16,14 @@ struct tz_test {
     int32_t dst_offset_seconds;
 };
 
-extern struct tm winter_tm;
-extern struct tm summer_tm;
+extern const struct tm winter_tm;
+extern const struct tm summer_tm;
 extern const time_t winter_time;
 extern const time_t summer_time;
 extern struct tz_test test_timezones[];
 
 // winter time is March, 21st 2022 at 8:15pm and 20 seconds
-struct tm winter_tm = {
+const struct tm winter_tm = {
     .tm_sec     = 20,
     .tm_min     = 15,
     .tm_hour    = 20,
@@ -34,7 +34,7 @@ struct tm winter_tm = {
 };
 
 // summer time is July, 15th 2022 at 10:50am and 40 seconds
-struct tm summer_tm = {
+const struct tm summer_tm = {
     .tm_sec     = 40,
     .tm_min     = 50,
     .tm_hour    = 10,
