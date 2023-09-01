@@ -40,9 +40,11 @@ ANSI C requires <<exit>>, and specifies that <<EXIT_SUCCESS>> and
 Supporting OS subroutines required: <<_exit>>.
 */
 
+#define _DEFAULT_SOURCE
 #include <stdlib.h>
 #include <unistd.h>	/* for _exit() declaration */
 #ifndef TINY_STDIO
+#include "../stdio/local.h"
 #include <stdio.h>
 #endif
 #include "atexit.h"
@@ -63,7 +65,7 @@ exit (int code)
 
 #ifndef TINY_STDIO
   if (_REENT_CLEANUP(_GLOBAL_REENT))
-      (*_REENT_CLEANUP(_GLOBAL_REENT)) (_GLOBAL_REENT);
+    (*_REENT_CLEANUP(_GLOBAL_REENT)) ();
   if (__stdio_exit_handler != NULL)
     (*__stdio_exit_handler) ();
 #endif
