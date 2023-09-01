@@ -39,7 +39,7 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
  */
 enum {TO1, TOLO, TOUP, TOBOTH};
 enum {EVENCAP, ODDCAP};
-static struct caseconv_entry {
+static const struct caseconv_entry {
   uint_least32_t first: 21;
   uint_least32_t diff: 8;
   uint_least32_t mode: 2;
