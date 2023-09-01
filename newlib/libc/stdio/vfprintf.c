@@ -1483,7 +1483,7 @@ string:
 
 				/* Convert widechar string to multibyte string. */
 				memset ((void *)&ps, '\0', sizeof (mbstate_t));
-				if (wcsrtombs (cp, &wcp, size, &ps)
+				if ((int)wcsrtombs (cp, &wcp, size, &ps)
 				    != size) {
 					fp->_flags |= __SERR;
 					goto error;
