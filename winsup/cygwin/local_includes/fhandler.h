@@ -2817,6 +2817,8 @@ class fhandler_dev_dsp: public fhandler_base
 
   void close_audio_in ();
   void close_audio_out (bool = false);
+
+ public:
   bool use_archetype () const {return true;}
 
   fhandler_dev_dsp (void *) {}

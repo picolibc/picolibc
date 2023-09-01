@@ -1060,7 +1060,7 @@ fhandler_dev_dsp::fixup_after_exec ()
 int
 fhandler_dev_dsp::open (int flags, mode_t)
 {
-  int ret = 0, err = 0;
+  int ret = -1, err = 0;
   UINT num_in = 0, num_out = 0;
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   // Work out initial sample format & frequency, /dev/dsp defaults
@@ -1095,7 +1095,7 @@ fhandler_dev_dsp::open (int flags, mode_t)
 
   debug_printf ("ACCMODE=%y audio_in=%d audio_out=%d, err=%d, ret=%d",
 		flags & O_ACCMODE, num_in, num_out, err, ret);
-  if (ret)
+  if (ret >= 0)
     being_closed = false;
   return ret;
 }
