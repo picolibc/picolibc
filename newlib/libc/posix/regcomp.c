@@ -836,7 +836,7 @@ p_b_cclass(struct parse *p, cset *cs)
 {
 	int c;
 	char *sp = p->next;
-	struct cclass *cp;
+	const struct cclass *cp;
 	size_t len;
 
 	while (MORE() && isalpha((uch)PEEK()))
@@ -962,7 +962,7 @@ p_b_coll_elem(struct parse *p,
               int endc)		/* name ended by endc,']' */
 {
 	char *sp = p->next;
-	struct cname *cp;
+	const struct cname *cp;
 	int len;
 
 	while (MORE() && !SEETWO(endc, ']'))
