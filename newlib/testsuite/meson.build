@@ -33,8 +33,13 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-dirs = [
-	'newlib.iconv',
+if newlib_iconv_encodings == []
+  dirs = []
+else
+  dirs = ['newlib.iconv']
+endif
+
+dirs += [
 	'newlib.locale',
 	'newlib.search',
 	'newlib.stdio',
