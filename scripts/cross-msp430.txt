@@ -18,3 +18,4 @@ endian = 'little'
 [properties]
 skip_sanity_check = true
 additional_libs = ['-lmul_none']
+default_alignment = 2
