@@ -1004,6 +1004,12 @@ foreach target : ['default-target'] + targets
                                meson.get_cross_property('default_stack_size',
                                                         '0x00001000')))
 
+    picolibc_linker_type_data.set(
+      'DEFAULT_ALIGNMENT',
+      meson.get_cross_property('default_alignment_' + custom_mem_config,
+                               meson.get_cross_property('default_alignment',
+                                                        '8')))
+
     picolibc_ld_data = configuration_data()
     picolibc_ld_data.merge_from(picolibc_linker_type_data)
     picolibc_ld_data.set('CPP_START', '/*')
