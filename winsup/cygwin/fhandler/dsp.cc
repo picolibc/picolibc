@@ -931,8 +931,8 @@ fhandler_dev_dsp::Audio_in::waitfordata ()
 	  set_errno (EAGAIN);
 	  return false;
 	}
-      debug_printf ("100ms");
-      switch (cygwait (100))
+      debug_printf ("1ms");
+      switch (cygwait (1))
 	{
 	case WAIT_SIGNALED:
 	  if (!_my_tls.call_signal_handler ())
