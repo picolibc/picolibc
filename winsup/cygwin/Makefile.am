@@ -572,6 +572,10 @@ toollib_DATA = \
 libgmon_a_SOURCES = $(GMON_FILES)
 libgmon_a_LIBADD =
 
+# Enable deterministic archives for reproducible builds.
+ARFLAGS = cr$${SOURCE_DATE_EPOCH:+D}
+override RANLIB := $(RANLIB)$${SOURCE_DATE_EPOCH:+ -D}
+
 # cygserver library
 cygserver_blddir = ${target_builddir}/winsup/cygserver
 LIBSERVER = $(cygserver_blddir)/libcygserver.a
@@ -589,12 +593,14 @@ $(LDSCRIPT): $(LDSCRIPT).in
 	$(AM_V_GEN)$(CC) -E - -P < $^ -o $@
 
 # cygwin dll
+# Set PE and export table header timestamps to zero for reproducible builds.
 $(NEW_DLL_NAME): $(LDSCRIPT) libdll.a $(VERSION_OFILES) $(LIBSERVER)\
 		  $(newlib_build)/libm.a $(newlib_build)/libc.a
 	$(AM_V_CXXLD)$(CXX) $(CXXFLAGS) \
 	-mno-use-libstdc-wrappers \
 	-Wl,--gc-sections -nostdlib -Wl,-T$(LDSCRIPT) \
 	-Wl,--dynamicbase -static \
+	$${SOURCE_DATE_EPOCH:+-Wl,--no-insert-timestamp} \
 	-Wl,--heap=0 -Wl,--out-implib,cygdll.a -shared -o $@ \
 	-e @DLL_ENTRY@ $(DEF_FILE) \
 	-Wl,-whole-archive libdll.a -Wl,-no-whole-archive \

@@ -56,9 +56,9 @@ parse_preproc_flags $CC
 
 
 #
-# Load the current date so we can work on individual fields
+# Load the current date (or SOURCE_DATE_EPOCH) so we can work on individual fields
 #
-set -$- $(date -u +"%m %d %Y %H:%M")
+set -$- $(date ${SOURCE_DATE_EPOCH:+-d @}${SOURCE_DATE_EPOCH} -u +"%m %d %Y %H:%M")
 m=$1 d=$2 y=$3 hhmm=$4
 #
 # Set date into YYYY-MM-DD HH:MM:SS format

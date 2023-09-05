@@ -74,7 +74,11 @@ EOF
 close $as_fd or exit 1;
 system $objcopy, '-j', '.idata$7', $iname_o;
 
-$res = system $ar, 'crus', $lib, sort keys %extract;
+# Enable deterministic archives for reproducible builds.
+my $opts = 'crs';
+$opts .= 'D' if ($ENV{'SOURCE_DATE_EPOCH'} != '');
+
+$res = system $ar, $opts, $lib, sort keys %extract;
 unlink keys %extract;
 die "$0: ar creation of $lib exited with non-zero status\n" if $res;
 exit 0;

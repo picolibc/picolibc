@@ -92,8 +92,12 @@ for my $f (keys %text) {
     }
 }
 
+# Enable deterministic archives for reproducible builds.
+my $opts = 'crs';
+$opts .= 'D' if ($ENV{'SOURCE_DATE_EPOCH'} != '');
+
 unlink $libdll;
-system $ar, 'crus', $libdll, glob('*.o'), @ARGV;
+system $ar, $opts, $libdll, glob('*.o'), @ARGV;
 unlink glob('*.o');
 exit 1 if $?;
 
