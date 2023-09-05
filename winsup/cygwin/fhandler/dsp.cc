@@ -1029,7 +1029,7 @@ fhandler_dev_dsp::write (const void *ptr, size_t len)
 void
 fhandler_dev_dsp::read (void *ptr, size_t& len)
 {
-  return base ()->_read (ptr, len);
+  base ()->_read (ptr, len);
 }
 
 int
