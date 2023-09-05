@@ -1192,7 +1192,9 @@ fhandler_dev_dsp::_read (void *ptr, size_t& len)
       return;
     }
 
-  audio_in_->read ((char *)ptr, (int&)len);
+  int res = len;
+  audio_in_->read ((char *)ptr, res);
+  len = (size_t)res;
 }
 
 void
