@@ -2255,3 +2255,133 @@ fhandler_timerfd::select_except (select_stuff *stuff)
   s->except_ready = false;
   return s;
 }
+
+static int
+peek_dsp (select_record *s, bool from_select)
+{
+  int gotone = 0;
+  fhandler_dev_dsp *fh = (fhandler_dev_dsp *)(fhandler_base *) s->fh;
+
+  if (s->read_selected)
+      if (s->read_ready || fh->read_ready ())
+	gotone += s->read_ready = true;
+  if (s->write_selected)
+      if (s->write_ready || fh->write_ready ())
+	gotone += s->write_ready = true;
+  return gotone;
+}
+
+static int start_thread_dsp (select_record *me, select_stuff *stuff);
+
+static DWORD
+thread_dsp (void *arg)
+{
+  select_dsp_info *di = (select_dsp_info *) arg;
+  DWORD sleep_time = 0;
+  bool looping = true;
+
+  while (looping)
+    {
+      for (select_record *s = di->start; (s = s->next); )
+	if (s->startup == start_thread_dsp)
+	  {
+	    if (peek_dsp (s, true))
+	      looping = false;
+	    if (di->stop_thread)
+	      {
+		select_printf ("stopping");
+		looping = false;
+		break;
+	      }
+	  }
+      if (!looping)
+	break;
+      cygwait (sleep_time >> 3);
+      if (sleep_time < 80)
+	++sleep_time;
+      if (di->stop_thread)
+	break;
+    }
+  return 0;
+}
+
+static int
+start_thread_dsp (select_record *me, select_stuff *stuff)
+{
+  select_dsp_info *di = stuff->device_specific_dsp;
+  if (di->start)
+    me->h = *((select_dsp_info *) stuff->device_specific_dsp)->thread;
+  else
+    {
+      di->start = &stuff->start;
+      di->stop_thread = false;
+      di->thread = new cygthread (thread_dsp, di, "dspsel");
+      me->h = *di->thread;
+      if (!me->h)
+	return 0;
+    }
+  return 1;
+}
+
+static void
+dsp_cleanup (select_record *aaa, select_stuff *stuff)
+{
+  select_dsp_info *di = (select_dsp_info *) stuff->device_specific_dsp;
+  if (!di)
+    return;
+  if (di->thread)
+    {
+      di->stop_thread = true;
+      di->thread->detach ();
+    }
+  delete di;
+  stuff->device_specific_dsp = NULL;
+}
+
+select_record *
+fhandler_dev_dsp::select_read (select_stuff *stuff)
+{
+  if (!stuff->device_specific_dsp
+      && (stuff->device_specific_dsp = new select_dsp_info) == NULL)
+    return NULL;
+  select_record *s = stuff->start.next;
+  s->startup = start_thread_dsp;
+  s->peek = peek_dsp;
+  s->verify = verify_ok;
+  s->cleanup = dsp_cleanup;
+  s->read_selected = true;
+  s->read_ready = false;
+  return s;
+}
+
+select_record *
+fhandler_dev_dsp::select_write (select_stuff *stuff)
+{
+  if (!stuff->device_specific_dsp
+      && (stuff->device_specific_dsp = new select_dsp_info) == NULL)
+    return NULL;
+  select_record *s = stuff->start.next;
+  s->startup = start_thread_dsp;
+  s->peek = peek_dsp;
+  s->verify = verify_ok;
+  s->cleanup = dsp_cleanup;
+  s->write_selected = true;
+  s->write_ready = false;
+  return s;
+}
+
+select_record *
+fhandler_dev_dsp::select_except (select_stuff *stuff)
+{
+  if (!stuff->device_specific_dsp
+      && (stuff->device_specific_dsp = new select_dsp_info) == NULL)
+    return NULL;
+  select_record *s = stuff->start.next;
+  s->startup = start_thread_dsp;
+  s->peek = peek_dsp;
+  s->verify = verify_ok;
+  s->cleanup = dsp_cleanup;
+  s->except_selected = true;
+  s->except_ready = false;
+  return s;
+}

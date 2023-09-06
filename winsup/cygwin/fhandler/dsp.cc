@@ -1483,3 +1483,41 @@ fhandler_dev_dsp::_fixup_after_exec ()
       audio_out_ = NULL;
     }
 }
+
+bool
+fhandler_dev_dsp::_write_ready ()
+{
+  audio_buf_info info;
+  if (audio_out_)
+    {
+      audio_out_->buf_info (&info, audiofreq_, audiobits_, audiochannels_);
+      return info.bytes > 0;
+    }
+  else
+    return true;
+}
+
+bool
+fhandler_dev_dsp::_read_ready ()
+{
+  audio_buf_info info;
+  if (audio_in_)
+    {
+      audio_in_->buf_info (&info, audiofreq_, audiobits_, audiochannels_);
+      return info.bytes > 0;
+    }
+  else
+    return true;
+}
+
+bool
+fhandler_dev_dsp::write_ready ()
+{
+  return base ()->_write_ready ();
+}
+
+bool
+fhandler_dev_dsp::read_ready ()
+{
+  return base ()->_read_ready ();
+}

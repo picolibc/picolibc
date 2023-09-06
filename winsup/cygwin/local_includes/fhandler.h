@@ -2847,6 +2847,9 @@ class fhandler_dev_dsp: public fhandler_base
   void close_audio_in ();
   void close_audio_out (bool = false);
 
+  bool _read_ready();
+  bool _write_ready();
+
  public:
   bool use_archetype () const {return true;}
 
@@ -2866,6 +2869,14 @@ class fhandler_dev_dsp: public fhandler_base
     fh->copy_from (this);
     return fh;
   }
+
+  /* select.cc */
+  select_record *select_read (select_stuff *);
+  select_record *select_write (select_stuff *);
+  select_record *select_except (select_stuff *);
+
+  bool read_ready();
+  bool write_ready();
 };
 
 class fhandler_virtual : public fhandler_base

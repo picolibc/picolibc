@@ -87,6 +87,11 @@ struct select_socket_info: public select_info
   select_socket_info (): select_info (), num_w4 (0), ser_num (0), w4 (NULL) {}
 };
 
+struct select_dsp_info: public select_info
+{
+  select_dsp_info (): select_info () {}
+};
+
 class select_stuff
 {
 public:
@@ -112,6 +117,7 @@ public:
   select_pipe_info *device_specific_ptys;
   select_fifo_info *device_specific_fifo;
   select_socket_info *device_specific_socket;
+  select_dsp_info *device_specific_dsp;
 
   bool test_and_set (int, fd_set *, fd_set *, fd_set *);
   int poll (fd_set *, fd_set *, fd_set *);
@@ -125,7 +131,8 @@ public:
 		   device_specific_pipe (NULL),
 		   device_specific_ptys (NULL),
 		   device_specific_fifo (NULL),
-		   device_specific_socket (NULL)
+		   device_specific_socket (NULL),
+		   device_specific_dsp (NULL)
 		   {}
 };
 
