@@ -20,7 +20,7 @@ extern const struct tm winter_tm;
 extern const struct tm summer_tm;
 extern const time_t winter_time;
 extern const time_t summer_time;
-extern struct tz_test test_timezones[];
+extern const struct tz_test test_timezones[];
 
 // winter time is March, 21st 2022 at 8:15pm and 20 seconds
 const struct tm winter_tm = {
@@ -48,7 +48,7 @@ const struct tm summer_tm = {
 const time_t winter_time = 1647893720;
 const time_t summer_time = 1657882240;
 
-struct tz_test test_timezones[] = {
+const struct tz_test test_timezones[] = {
     /*
      * creating test vectors based on the POSIX spec (https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html#tag_08_03)
      */
