@@ -30,7 +30,7 @@
 
 #if WANT_ERRNO_UFLOW && defined(_NEED_FLOAT64)
 
-static const FORCE_FLOAT64 VAL = pick_float64_except(_F_64(0x1.8p-538), _F_64(0.0));
+static CONST_FORCE_FLOAT64 VAL = pick_float64_except(_F_64(0x1.8p-538), _F_64(0.0));
 
 /* Underflows to zero in some non-nearest rounding mode, setting errno
    is valid even if the result is non-zero, but in the subnormal range.  */

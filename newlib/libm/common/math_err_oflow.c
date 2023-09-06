@@ -28,7 +28,7 @@
 
 #include "math_config.h"
 
-static const FORCE_FLOAT64 VAL = pick_float64_except(_FLOAT64_MAX, (__float64) INFINITY);
+static CONST_FORCE_FLOAT64 VAL = pick_float64_except(_FLOAT64_MAX, (__float64) INFINITY);
 
 HIDDEN __float64
 __math_oflow (uint32_t sign)

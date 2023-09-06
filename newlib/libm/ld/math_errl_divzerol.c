@@ -28,7 +28,7 @@
 
 #include "math_ld.h"
 
-static const FORCE_LONG_DOUBLE VAL = pick_long_double_except(0.0L, (long double) INFINITY);
+static CONST_FORCE_LONG_DOUBLE VAL = pick_long_double_except(0.0L, (long double) INFINITY);
 
 HIDDEN long double
 __math_divzerol (uint32_t sign)

@@ -30,7 +30,7 @@
 
 #ifdef _NEED_FLOAT_HUGE
 
-static const FORCE_LONG_DOUBLE VAL = pick_long_double_except((long double) 0.0, (long double) NAN);
+static CONST_FORCE_LONG_DOUBLE VAL = pick_long_double_except((long double) 0.0, (long double) NAN);
 
 HIDDEN long double
 __math_invalidl (long double x)

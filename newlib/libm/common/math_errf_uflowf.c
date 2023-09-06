@@ -29,7 +29,7 @@
 #include "fdlibm.h"
 #include "math_config.h"
 
-static const FORCE_FLOAT VAL = pick_float_except(FLT_MIN, 0.0f);
+static CONST_FORCE_FLOAT VAL = pick_float_except(FLT_MIN, 0.0f);
 
 HIDDEN float
 __math_uflowf (uint32_t sign)

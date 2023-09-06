@@ -30,7 +30,7 @@
 
 #ifdef _NEED_FLOAT_HUGE
 
-static const FORCE_LONG_DOUBLE VAL = pick_long_double_except(LDBL_MAX, (long double) INFINITY);
+static CONST_FORCE_LONG_DOUBLE VAL = pick_long_double_except(LDBL_MAX, (long double) INFINITY);
 
 HIDDEN long double
 __math_oflowl (uint32_t sign)

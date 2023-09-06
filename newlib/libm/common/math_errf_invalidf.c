@@ -29,7 +29,7 @@
 #include "fdlibm.h"
 #include "math_config.h"
 
-static const FORCE_FLOAT VAL = pick_float_except(0.0f, (float) NAN);
+static CONST_FORCE_FLOAT VAL = pick_float_except(0.0f, (float) NAN);
 
 HIDDEN float
 __math_invalidf (float x)

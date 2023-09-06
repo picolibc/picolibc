@@ -31,7 +31,7 @@
 #ifndef __math_denormf
 
 #ifndef PICOLIBC_FLOAT_NOEXCEPT
-static const FORCE_FLOAT VAL = __FLT_MIN__;
+static CONST_FORCE_FLOAT VAL = __FLT_MIN__;
 #endif
 
 HIDDEN float
