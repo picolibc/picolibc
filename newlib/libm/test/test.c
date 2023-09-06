@@ -177,7 +177,7 @@ mag_of_error (double is,
   __ieee_double_shape_type a,b;
   int i;
   int a_big;
-  unsigned  int mask;
+  uint32_t mask;
   unsigned long int __x;
   unsigned long int msw, lsw;						  
   a.value = is;
@@ -240,7 +240,7 @@ fmag_of_error (float is,
   __ieee_float_shape_type a,b;
   int i;
   int a_big;
-  unsigned  int mask;
+  uint32_t mask;
   uint32_t sw;
   a.value = is;
   
