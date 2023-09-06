@@ -55,7 +55,7 @@ extern "C" {
 #endif
 
 /* === regerror.c === */
-static char *regatoi(const regex_t *preg, char *localbuf);
+static const char *regatoi(const regex_t *preg, char *localbuf);
 
 #ifdef __cplusplus
 }
@@ -81,10 +81,10 @@ static char *regatoi(const regex_t *preg, char *localbuf);
  = #define	REG_ATOI	255	// convert name to number (!)
  = #define	REG_ITOA	0400	// convert number to name (!)
  */
-static struct rerr {
+static const struct rerr {
 	int code;
-	char *name;
-	char *explain;
+	const char *name;
+	const char *explain;
 } rerrs[] = {
 	{REG_NOMATCH,	"REG_NOMATCH",	"regexec() failed to match"},
 	{REG_BADPAT,	"REG_BADPAT",	"invalid regular expression"},
@@ -117,10 +117,10 @@ regerror(int errcode,
          char *__restrict errbuf,
          size_t errbuf_size)
 {
-	struct rerr *r;
+	const struct rerr *r;
 	size_t len;
 	int target = errcode &~ REG_ITOA;
-	char *s;
+	const char *s;
 	char convbuf[50];
 
 	if (errcode == REG_ATOI)
@@ -158,16 +158,14 @@ regerror(int errcode,
  - regatoi - internal routine to implement REG_ATOI
  == static char *regatoi(const regex_t *preg, char *localbuf);
  */
-static char *
+static const char *
 regatoi(const regex_t *preg, char *localbuf)
 {
-	struct rerr *r;
+	const struct rerr *r;
 
 	for (r = rerrs; r->code != 0; r++)
 		if (strcmp(r->name, preg->re_endp) == 0)
 			break;
-	if (r->code == 0)
-		return("0");
 
 	sprintf(localbuf, "%d", r->code);
 	return(localbuf);
