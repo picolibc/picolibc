@@ -536,6 +536,8 @@ inline void
 fhandler_dev_dsp::Audio_out::callback_sampledone (WAVEHDR *pHdr)
 {
   Qisr2app_->send (pHdr);
+  ReleaseSemaphore (fh->get_select_sem (),
+		    get_obj_handle_count (fh->get_select_sem ()) - 1, NULL);
 }
 
 bool
@@ -994,6 +996,8 @@ inline void
 fhandler_dev_dsp::Audio_in::callback_blockfull (WAVEHDR *pHdr)
 {
   Qisr2app_->send (pHdr);
+  ReleaseSemaphore (fh->get_select_sem (),
+		    get_obj_handle_count (fh->get_select_sem ()) - 1, NULL);
 }
 
 static void CALLBACK
@@ -1058,7 +1062,7 @@ fhandler_dev_dsp::fixup_after_exec ()
 
 
 int
-fhandler_dev_dsp::open (int flags, mode_t)
+fhandler_dev_dsp::open (int flags, mode_t mode)
 {
   int ret = -1, err = 0;
   UINT num_in = 0, num_out = 0;
@@ -1092,6 +1096,8 @@ fhandler_dev_dsp::open (int flags, mode_t)
     set_errno (err);
   else
     ret = open_null (flags);
+
+  select_sem = CreateSemaphore (sec_none_cloexec (mode), 0, INT32_MAX, NULL);
 
   debug_printf ("ACCMODE=%y audio_in=%d audio_out=%d, err=%d, ret=%d",
 		flags & O_ACCMODE, num_in, num_out, err, ret);
@@ -1226,6 +1232,9 @@ fhandler_dev_dsp::close ()
   being_closed = true;
   close_audio_in ();
   close_audio_out ();
+  ReleaseSemaphore (select_sem, get_obj_handle_count (select_sem) - 1, NULL);
+  CloseHandle (select_sem);
+  select_sem = NULL;
   return fhandler_base::close ();
 }
 

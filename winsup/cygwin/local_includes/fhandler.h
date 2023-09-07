@@ -2875,8 +2875,9 @@ class fhandler_dev_dsp: public fhandler_base
   select_record *select_write (select_stuff *);
   select_record *select_except (select_stuff *);
 
-  bool read_ready();
-  bool write_ready();
+  bool read_ready ();
+  bool write_ready ();
+  bool is_closed () { return being_closed; };
 };
 
 class fhandler_virtual : public fhandler_base

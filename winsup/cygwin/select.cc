@@ -2268,6 +2268,9 @@ peek_dsp (select_record *s, bool from_select)
   if (s->write_selected)
       if (s->write_ready || fh->write_ready ())
 	gotone += s->write_ready = true;
+  if (s->except_selected)
+      if (s->except_ready || fh->is_closed ())
+	gotone += s->except_ready = true;
   return gotone;
 }
 
@@ -2296,7 +2299,7 @@ thread_dsp (void *arg)
 	  }
       if (!looping)
 	break;
-      cygwait (sleep_time >> 3);
+      cygwait (di->bye, sleep_time >> 3);
       if (sleep_time < 80)
 	++sleep_time;
       if (di->stop_thread)
@@ -2313,6 +2316,13 @@ start_thread_dsp (select_record *me, select_stuff *stuff)
     me->h = *((select_dsp_info *) stuff->device_specific_dsp)->thread;
   else
     {
+      di->bye = me->fh->get_select_sem ();
+      if (di->bye)
+	DuplicateHandle (GetCurrentProcess (), di->bye,
+			 GetCurrentProcess (), &di->bye,
+			 0, 0, DUPLICATE_SAME_ACCESS);
+      else
+	di->bye = CreateSemaphore (&sec_none_nih, 0, INT32_MAX, NULL);
       di->start = &stuff->start;
       di->stop_thread = false;
       di->thread = new cygthread (thread_dsp, di, "dspsel");
@@ -2324,7 +2334,7 @@ start_thread_dsp (select_record *me, select_stuff *stuff)
 }
 
 static void
-dsp_cleanup (select_record *aaa, select_stuff *stuff)
+dsp_cleanup (select_record *, select_stuff *stuff)
 {
   select_dsp_info *di = (select_dsp_info *) stuff->device_specific_dsp;
   if (!di)
@@ -2332,7 +2342,9 @@ dsp_cleanup (select_record *aaa, select_stuff *stuff)
   if (di->thread)
     {
       di->stop_thread = true;
+      ReleaseSemaphore (di->bye, get_obj_handle_count (di->bye), NULL);
       di->thread->detach ();
+      CloseHandle (di->bye);
     }
   delete di;
   stuff->device_specific_dsp = NULL;
