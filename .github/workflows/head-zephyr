@@ -15,9 +15,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # .github/do-zephyr -Dtinystdio=false -Dfortify-source=2 --buildtype release
-  # is the largest cache, 376.5M (August 2023).
-  CCACHE_SIZE: "400M"
+  # .github/do-zephyr -Dfortify-source=2 --buildtype release
+  # is the largest cache, 429.5M (September 2023).
+  CCACHE_SIZE: "450M"
   CCACHE_CMD: ccache
   DOCKERFILE: picolibc/.github/Dockerfile-zephyr
   IMAGE_FILE: dockerimg-zephyr.tar.zst
