@@ -715,7 +715,10 @@ fhandler_disk_file::fchmod (mode_t mode)
   NTSTATUS status;
   IO_STATUS_BLOCK io;
 
-  if (pc.is_fs_special ())
+  if (pc.is_fs_special ()
+      /* For NFS, only handle Cygwin FIFOs specially.  Changing mode of
+	 native FIFOs will work with the default code below. */
+      && (!pc.fs_is_nfs () || pc.nfsattr ()->filler1 == NF3FIFO))
     return chmod_device (pc, mode);
 
   if (!get_handle ())

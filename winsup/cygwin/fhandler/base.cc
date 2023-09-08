@@ -613,7 +613,10 @@ fhandler_base::open (int flags, mode_t mode)
 	options |= FILE_OPEN_REPARSE_POINT;
     }
 
-  if (get_device () == FH_FS)
+  /* If the file is a FIFO, open has been called for an operation on the file
+     constituting the FIFO, e. g., chmod or statvfs.  Handle it like a normal
+     file.  Eespecially the access flags have to be set correctly. */
+  if (get_device () == FH_FS || get_device () == FH_FIFO)
     {
       /* O_TMPFILE files are created with delete-on-close semantics, as well
 	 as with FILE_ATTRIBUTE_TEMPORARY.  The latter speeds up file access,
@@ -1710,7 +1713,10 @@ int
 fhandler_base::fchmod (mode_t mode)
 {
   if (pc.is_fs_special ())
-    return chmod_device (pc, mode);
+    {
+      fhandler_disk_file fh (pc);
+      return fh.fchmod (mode);
+    }
   /* By default, just succeeds. */
   return 0;
 }
