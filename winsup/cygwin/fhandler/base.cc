@@ -1725,7 +1725,10 @@ int
 fhandler_base::fchown (uid_t uid, gid_t gid)
 {
   if (pc.is_fs_special ())
-    return ((fhandler_disk_file *) this)->fhandler_disk_file::fchown (uid, gid);
+    {
+      fhandler_disk_file fh (pc);
+      return fh.fchown (uid, gid);
+    }
   /* By default, just succeeds. */
   return 0;
 }
