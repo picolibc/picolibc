@@ -225,6 +225,8 @@ class path_conv;
 
 int stat_worker (path_conv &pc, struct stat *buf);
 
+NTSTATUS unlink_nt (path_conv &pc, bool sharable);
+
 ino_t readdir_get_ino (const char *path, bool dot_dot);
 
 /* mmap functions. */

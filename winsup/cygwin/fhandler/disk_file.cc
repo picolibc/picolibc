@@ -1842,8 +1842,6 @@ fhandler_disk_file::mkdir (mode_t mode)
 int
 fhandler_disk_file::rmdir ()
 {
-  extern NTSTATUS unlink_nt (path_conv &pc, bool sharable);
-
   if (!pc.isdir ())
     {
       set_errno (ENOTDIR);
