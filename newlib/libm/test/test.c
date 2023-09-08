@@ -187,8 +187,8 @@ mag_of_error (double is,
   int i;
   int a_big;
   uint32_t mask;
-  unsigned long int __x;
-  unsigned long int msw, lsw;						  
+  uint32_t __x;
+  uint32_t msw, lsw;
   a.value = is;
   
   b.value = shouldbe;
@@ -202,7 +202,7 @@ mag_of_error (double is,
   a_big = bigger(&a, &b);
 
   if (!a_big) {
-    int t;
+    uint32_t t;
     t = a.parts.msw;
     a.parts.msw = b.parts.msw;
     b.parts.msw = t;
@@ -222,14 +222,14 @@ mag_of_error (double is,
 
 
   /* Find out which bit the difference is in */
-  mask = 0x80000000;
+  mask = 0x80000000UL;
   for (i = 0; i < 32; i++)
   {
     if (((msw) & mask)!=0) return i;
     mask >>=1;
   }
   
-  mask = 0x80000000;
+  mask = 0x80000000UL;
   for (i = 0; i < 32; i++)
   {
     
@@ -270,7 +270,7 @@ fmag_of_error (float is,
 
   sw = (a.p1) - (b.p1);
 
-  mask = 0x80000000;
+  mask = 0x80000000UL;
   for (i = 0; i < 32; i++)
   {
 	  if (((sw) & mask)!=0) return i;

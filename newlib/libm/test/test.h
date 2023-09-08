@@ -77,31 +77,31 @@ typedef union
   struct 
   {
 #ifdef __SMALL_BITFIELDS
-    unsigned int fraction3:16;
-    unsigned int fraction2:16;
-    unsigned int fraction1:16;
-    unsigned int fraction0: 4;
+    uint32_t fraction3:16;
+    uint32_t fraction2:16;
+    uint32_t fraction1:16;
+    uint32_t fraction0: 4;
 #else
-    unsigned int fraction1:32;
-    unsigned int fraction0:20;
+    uint32_t fraction1:32;
+    uint32_t fraction0:20;
 #endif
-    unsigned int exponent :11;
-    unsigned int sign     : 1;
+    uint32_t exponent :11;
+    uint32_t sign     : 1;
   } number;
   struct 
   {
 #ifdef __SMALL_BITFIELDS
-    unsigned int function3:16;
-    unsigned int function2:16;
-    unsigned int function1:16;
-    unsigned int function0:3;
+    uint32_t function3:16;
+    uint32_t function2:16;
+    uint32_t function1:16;
+    uint32_t function0:3;
 #else
-    unsigned int function1:32;
-    unsigned int function0:19;
+    uint32_t function1:32;
+    uint32_t function0:19;
 #endif
-    unsigned int quiet:1;
-    unsigned int exponent: 11;
-    unsigned int sign : 1;
+    uint32_t quiet:1;
+    uint32_t exponent: 11;
+    uint32_t sign : 1;
   } nan;
   struct 
   {
@@ -122,18 +122,18 @@ typedef union
   float value;
   struct 
   {
-    unsigned int sign : 1;
-    unsigned int exponent: 8;
-    unsigned int fraction0: 7;
-    unsigned int fraction1: 16;
+    uint32_t sign : 1;
+    uint32_t exponent: 8;
+    uint32_t fraction0: 7;
+    uint32_t fraction1: 16;
   } number;
   struct 
   {
-    unsigned int sign:1;
-    unsigned int exponent:8;
-    unsigned int quiet:1;
-    unsigned int function0:6;
-    unsigned int function1:16;
+    uint32_t sign:1;
+    uint32_t exponent:8;
+    uint32_t quiet:1;
+    uint32_t function0:6;
+    uint32_t function1:16;
   } nan;
   uint32_t p1;
   
@@ -146,18 +146,18 @@ typedef union
   float value;
   struct 
   {
-    unsigned int fraction0: 7;
-    unsigned int fraction1: 16;
-    unsigned int exponent: 8;
-    unsigned int sign : 1;
+    uint32_t fraction0: 7;
+    uint32_t fraction1: 16;
+    uint32_t exponent: 8;
+    uint32_t sign : 1;
   } number;
   struct 
   {
-    unsigned int function1:16;
-    unsigned int function0:6;
-    unsigned int quiet:1;
-    unsigned int exponent:8;
-    unsigned int sign:1;
+    uint32_t function1:16;
+    uint32_t function0:6;
+    uint32_t quiet:1;
+    uint32_t exponent:8;
+    uint32_t sign:1;
   } nan;
   int32_t p1;
   
