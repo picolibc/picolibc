@@ -16,6 +16,13 @@
  */
 #include "test.h"
 
+#if __SIZEOF_INT__ < 4
+#pragma GCC diagnostic ignored "-Woverflow"
+#ifdef __clang__
+#pragma GCC diagnostic ignored "-Wliteral-range"
+#endif
+#endif
+
 sprint_int_type sprint_ints[] = 
 {
 #if TEST_PART == 1 || TEST_PART == -1
