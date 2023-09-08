@@ -51,6 +51,13 @@
 #endif
 
 
+#if __SIZEOF_INT__ < 4
+#define I(a,b) (b)
+#else
+#define I(a,b) (a)
+#endif
+
+//{
 /* XXX This code generated automatically by gen-testcases.hs
    from ../../printf-tests.txt . You probably do not want to
    manually edit this file. */
@@ -164,7 +171,7 @@
     result |= test(__LINE__, "10", "%d", 10);
 
 #ifndef _NANO_FORMATTED_IO
-    result |= test(__LINE__, "1000000", "%'d", 1000000);
+    result |= test(__LINE__, I("1000000","16960"), "%'d", 1000000);
 #endif
     /* 72: anti-test */
     /* 73: anti-test */
@@ -269,7 +276,7 @@
     result |= test(__LINE__, "(null)", "%s", NULL);
 #endif
     result |= test(__LINE__, "%%%%", "%s", "%%%%");
-    result |= test(__LINE__, "4294967295", "%u", -1);
+    result |= test(__LINE__, I("4294967295", "65535"), "%u", -1);
 #ifdef TINY_STDIO
     result |= test(__LINE__, "%w", "%w", -1);
 #endif
@@ -292,18 +299,18 @@
     result |= test(__LINE__, "1024", "%i", 1024);
     result |= test(__LINE__, "-1024", "%i", -1024);
     result |= test(__LINE__, "1024", "%u", 1024);
-    result |= test(__LINE__, "4294966272", "%u", 4294966272U);
+    result |= test(__LINE__, I("4294966272", "64512"), "%u", 4294966272U);
     result |= test(__LINE__, "777", "%o", 511);
-    result |= test(__LINE__, "37777777001", "%o", 4294966785U);
-    result |= test(__LINE__, "1234abcd", "%x", 305441741);
-    result |= test(__LINE__, "edcb5433", "%x", 3989525555U);
-    result |= test(__LINE__, "1234ABCD", "%X", 305441741);
-    result |= test(__LINE__, "EDCB5433", "%X", 3989525555U);
+    result |= test(__LINE__, I("37777777001", "177001"), "%o", 4294966785U);
+    result |= test(__LINE__, I("1234abcd", "abcd"), "%x", 305441741);
+    result |= test(__LINE__, I("edcb5433", "5433"), "%x", 3989525555U);
+    result |= test(__LINE__, I("1234ABCD", "ABCD"), "%X", 305441741);
+    result |= test(__LINE__, I("EDCB5433", "5433"), "%X", 3989525555U);
 #ifdef BINARY_FORMAT
-    result |= test(__LINE__, "10010001101001010101111001101", "%b", 305441741);
-    result |= test(__LINE__, "11101101110010110101010000110011", "%b", 3989525555U);
-    result |= test(__LINE__, "10010001101001010101111001101", "%B", 305441741);
-    result |= test(__LINE__, "11101101110010110101010000110011", "%B", 3989525555U);
+    result |= test(__LINE__, I("10010001101001010101111001101", "1010101111001101"), "%b", 305441741);
+    result |= test(__LINE__, I("11101101110010110101010000110011", "101010000110011"), "%b", 3989525555U);
+    result |= test(__LINE__, I("10010001101001010101111001101", "1010101111001101"), "%B", 305441741);
+    result |= test(__LINE__, I("11101101110010110101010000110011", "101010000110011"), "%B", 3989525555U);
 #endif
     result |= test(__LINE__, "x", "%c", 'x');
     result |= test(__LINE__, "%", "%%");
@@ -313,13 +320,13 @@
     result |= test(__LINE__, "+1024", "%+i", 1024);
     result |= test(__LINE__, "-1024", "%+i", -1024);
     result |= test(__LINE__, "1024", "%+u", 1024);
-    result |= test(__LINE__, "4294966272", "%+u", 4294966272U);
+    result |= test(__LINE__, I("4294966272", "64512"), "%+u", 4294966272U);
     result |= test(__LINE__, "777", "%+o", 511);
-    result |= test(__LINE__, "37777777001", "%+o", 4294966785U);
-    result |= test(__LINE__, "1234abcd", "%+x", 305441741);
-    result |= test(__LINE__, "edcb5433", "%+x", 3989525555U);
-    result |= test(__LINE__, "1234ABCD", "%+X", 305441741);
-    result |= test(__LINE__, "EDCB5433", "%+X", 3989525555U);
+    result |= test(__LINE__, I("37777777001", "177001"), "%+o", 4294966785U);
+    result |= test(__LINE__, I("1234abcd", "abcd"), "%+x", 305441741);
+    result |= test(__LINE__, I("edcb5433", "5433"), "%+x", 3989525555U);
+    result |= test(__LINE__, I("1234ABCD", "ABCD"), "%+X", 305441741);
+    result |= test(__LINE__, I("EDCB5433", "5433"), "%+X", 3989525555U);
     result |= test(__LINE__, "x", "%+c", 'x');
     result |= test(__LINE__, "Hallo heimur", "% s", "Hallo heimur");
     result |= test(__LINE__, " 1024", "% d", 1024);
@@ -327,13 +334,13 @@
     result |= test(__LINE__, " 1024", "% i", 1024);
     result |= test(__LINE__, "-1024", "% i", -1024);
     result |= test(__LINE__, "1024", "% u", 1024);
-    result |= test(__LINE__, "4294966272", "% u", 4294966272U);
+    result |= test(__LINE__, I("4294966272", "64512"), "% u", 4294966272U);
     result |= test(__LINE__, "777", "% o", 511);
-    result |= test(__LINE__, "37777777001", "% o", 4294966785U);
-    result |= test(__LINE__, "1234abcd", "% x", 305441741);
-    result |= test(__LINE__, "edcb5433", "% x", 3989525555U);
-    result |= test(__LINE__, "1234ABCD", "% X", 305441741);
-    result |= test(__LINE__, "EDCB5433", "% X", 3989525555U);
+    result |= test(__LINE__, I("37777777001", "177001"), "% o", 4294966785U);
+    result |= test(__LINE__, I("1234abcd", "abcd"), "% x", 305441741);
+    result |= test(__LINE__, I("edcb5433", "5433"), "% x", 3989525555U);
+    result |= test(__LINE__, I("1234ABCD", "ABCD"), "% X", 305441741);
+    result |= test(__LINE__, I("EDCB5433", "5433"), "% X", 3989525555U);
     result |= test(__LINE__, "x", "% c", 'x');
     result |= test(__LINE__, "Hallo heimur", "%+ s", "Hallo heimur");
     result |= test(__LINE__, "+1024", "%+ d", 1024);
@@ -341,25 +348,25 @@
     result |= test(__LINE__, "+1024", "%+ i", 1024);
     result |= test(__LINE__, "-1024", "%+ i", -1024);
     result |= test(__LINE__, "1024", "%+ u", 1024);
-    result |= test(__LINE__, "4294966272", "%+ u", 4294966272U);
+    result |= test(__LINE__, I("4294966272", "64512"), "%+ u", 4294966272U);
     result |= test(__LINE__, "777", "%+ o", 511);
-    result |= test(__LINE__, "37777777001", "%+ o", 4294966785U);
-    result |= test(__LINE__, "1234abcd", "%+ x", 305441741);
-    result |= test(__LINE__, "edcb5433", "%+ x", 3989525555U);
-    result |= test(__LINE__, "1234ABCD", "%+ X", 305441741);
-    result |= test(__LINE__, "EDCB5433", "%+ X", 3989525555U);
+    result |= test(__LINE__, I("37777777001", "177001"), "%+ o", 4294966785U);
+    result |= test(__LINE__, I("1234abcd", "abcd"), "%+ x", 305441741);
+    result |= test(__LINE__, I("edcb5433", "5433"), "%+ x", 3989525555U);
+    result |= test(__LINE__, I("1234ABCD", "ABCD"), "%+ X", 305441741);
+    result |= test(__LINE__, I("EDCB5433", "5433"), "%+ X", 3989525555U);
     result |= test(__LINE__, "x", "%+ c", 'x');
     result |= test(__LINE__, "0777", "%#o", 511);
-    result |= test(__LINE__, "037777777001", "%#o", 4294966785U);
-    result |= test(__LINE__, "0x1234abcd", "%#x", 305441741);
-    result |= test(__LINE__, "0xedcb5433", "%#x", 3989525555U);
-    result |= test(__LINE__, "0X1234ABCD", "%#X", 305441741);
-    result |= test(__LINE__, "0XEDCB5433", "%#X", 3989525555U);
+    result |= test(__LINE__, I("037777777001", "0177001"), "%#o", 4294966785U);
+    result |= test(__LINE__, I("0x1234abcd", "0xabcd"), "%#x", 305441741);
+    result |= test(__LINE__, I("0xedcb5433", "0x5433"), "%#x", 3989525555U);
+    result |= test(__LINE__, I("0X1234ABCD", "0XABCD"), "%#X", 305441741);
+    result |= test(__LINE__, I("0XEDCB5433", "0X5433"), "%#X", 3989525555U);
 #ifdef BINARY_FORMAT
-    result |= test(__LINE__, "0b10010001101001010101111001101", "%#b", 305441741);
-    result |= test(__LINE__, "0b11101101110010110101010000110011", "%#b", 3989525555U);
-    result |= test(__LINE__, "0B10010001101001010101111001101", "%#B", 305441741);
-    result |= test(__LINE__, "0B11101101110010110101010000110011", "%#B", 3989525555U);
+    result |= test(__LINE__, I("0b10010001101001010101111001101", "0b1010101111001101"), "%#b", 305441741);
+    result |= test(__LINE__, I("0b11101101110010110101010000110011", "0b101010000110011"), "%#b", 3989525555U);
+    result |= test(__LINE__, I("0B10010001101001010101111001101", "0B1010101111001101"), "%#B", 305441741);
+    result |= test(__LINE__, I("0B11101101110010110101010000110011", "0B101010000110011"), "%#B", 3989525555U);
 #endif
     result |= test(__LINE__, "0", "%#o", 0U);
     result |= test(__LINE__, "0", "%#x", 0U);
@@ -370,13 +377,13 @@
     result |= test(__LINE__, "1024", "%1i", 1024);
     result |= test(__LINE__, "-1024", "%1i", -1024);
     result |= test(__LINE__, "1024", "%1u", 1024);
-    result |= test(__LINE__, "4294966272", "%1u", 4294966272U);
+    result |= test(__LINE__, I("4294966272", "64512"), "%1u", 4294966272U);
     result |= test(__LINE__, "777", "%1o", 511);
-    result |= test(__LINE__, "37777777001", "%1o", 4294966785U);
-    result |= test(__LINE__, "1234abcd", "%1x", 305441741);
-    result |= test(__LINE__, "edcb5433", "%1x", 3989525555U);
-    result |= test(__LINE__, "1234ABCD", "%1X", 305441741);
-    result |= test(__LINE__, "EDCB5433", "%1X", 3989525555U);
+    result |= test(__LINE__, I("37777777001", "177001"), "%1o", 4294966785U);
+    result |= test(__LINE__, I("1234abcd", "abcd"), "%1x", 305441741);
+    result |= test(__LINE__, I("edcb5433", "5433"), "%1x", 3989525555U);
+    result |= test(__LINE__, I("1234ABCD", "ABCD"), "%1X", 305441741);
+    result |= test(__LINE__, I("EDCB5433", "5433"), "%1X", 3989525555U);
     result |= test(__LINE__, "x", "%1c", 'x');
     result |= test(__LINE__, "               Hallo", "%20s", "Hallo");
     result |= test(__LINE__, "                1024", "%20d", 1024);
@@ -384,13 +391,13 @@
     result |= test(__LINE__, "                1024", "%20i", 1024);
     result |= test(__LINE__, "               -1024", "%20i", -1024);
     result |= test(__LINE__, "                1024", "%20u", 1024);
-    result |= test(__LINE__, "          4294966272", "%20u", 4294966272U);
+    result |= test(__LINE__, I("          4294966272", "               64512"), "%20u", 4294966272U);
     result |= test(__LINE__, "                 777", "%20o", 511);
-    result |= test(__LINE__, "         37777777001", "%20o", 4294966785U);
-    result |= test(__LINE__, "            1234abcd", "%20x", 305441741);
-    result |= test(__LINE__, "            edcb5433", "%20x", 3989525555U);
-    result |= test(__LINE__, "            1234ABCD", "%20X", 305441741);
-    result |= test(__LINE__, "            EDCB5433", "%20X", 3989525555U);
+    result |= test(__LINE__, I("         37777777001", "              177001"), "%20o", 4294966785U);
+    result |= test(__LINE__, I("            1234abcd", "                abcd"), "%20x", 305441741);
+    result |= test(__LINE__, I("            edcb5433", "                5433"), "%20x", 3989525555U);
+    result |= test(__LINE__, I("            1234ABCD", "                ABCD"), "%20X", 305441741);
+    result |= test(__LINE__, I("            EDCB5433", "                5433"), "%20X", 3989525555U);
     result |= test(__LINE__, "                   x", "%20c", 'x');
     result |= test(__LINE__, "Hallo               ", "%-20s", "Hallo");
     result |= test(__LINE__, "1024                ", "%-20d", 1024);
@@ -398,51 +405,51 @@
     result |= test(__LINE__, "1024                ", "%-20i", 1024);
     result |= test(__LINE__, "-1024               ", "%-20i", -1024);
     result |= test(__LINE__, "1024                ", "%-20u", 1024);
-    result |= test(__LINE__, "4294966272          ", "%-20u", 4294966272U);
+    result |= test(__LINE__, I("4294966272          ", "64512               "), "%-20u", 4294966272U);
     result |= test(__LINE__, "777                 ", "%-20o", 511);
-    result |= test(__LINE__, "37777777001         ", "%-20o", 4294966785U);
-    result |= test(__LINE__, "1234abcd            ", "%-20x", 305441741);
-    result |= test(__LINE__, "edcb5433            ", "%-20x", 3989525555U);
-    result |= test(__LINE__, "1234ABCD            ", "%-20X", 305441741);
-    result |= test(__LINE__, "EDCB5433            ", "%-20X", 3989525555U);
+    result |= test(__LINE__, I("37777777001         ", "177001              "), "%-20o", 4294966785U);
+    result |= test(__LINE__, I("1234abcd            ", "abcd                "), "%-20x", 305441741);
+    result |= test(__LINE__, I("edcb5433            ", "5433                "), "%-20x", 3989525555U);
+    result |= test(__LINE__, I("1234ABCD            ", "ABCD                "), "%-20X", 305441741);
+    result |= test(__LINE__, I("EDCB5433            ", "5433                "), "%-20X", 3989525555U);
     result |= test(__LINE__, "x                   ", "%-20c", 'x');
     result |= test(__LINE__, "00000000000000001024", "%020d", 1024);
     result |= test(__LINE__, "-0000000000000001024", "%020d", -1024);
     result |= test(__LINE__, "00000000000000001024", "%020i", 1024);
     result |= test(__LINE__, "-0000000000000001024", "%020i", -1024);
     result |= test(__LINE__, "00000000000000001024", "%020u", 1024);
-    result |= test(__LINE__, "00000000004294966272", "%020u", 4294966272U);
+    result |= test(__LINE__, I("00000000004294966272", "00000000000000064512"), "%020u", 4294966272U);
     result |= test(__LINE__, "00000000000000000777", "%020o", 511);
-    result |= test(__LINE__, "00000000037777777001", "%020o", 4294966785U);
-    result |= test(__LINE__, "0000000000001234abcd", "%020x", 305441741);
-    result |= test(__LINE__, "000000000000edcb5433", "%020x", 3989525555U);
-    result |= test(__LINE__, "0000000000001234ABCD", "%020X", 305441741);
-    result |= test(__LINE__, "000000000000EDCB5433", "%020X", 3989525555U);
+    result |= test(__LINE__, I("00000000037777777001", "00000000000000177001"), "%020o", 4294966785U);
+    result |= test(__LINE__, I("0000000000001234abcd", "0000000000000000abcd"), "%020x", 305441741);
+    result |= test(__LINE__, I("000000000000edcb5433", "00000000000000005433"), "%020x", 3989525555U);
+    result |= test(__LINE__, I("0000000000001234ABCD", "0000000000000000ABCD"), "%020X", 305441741);
+    result |= test(__LINE__, I("000000000000EDCB5433", "00000000000000005433"), "%020X", 3989525555U);
     result |= test(__LINE__, "                0777", "%#20o", 511);
-    result |= test(__LINE__, "        037777777001", "%#20o", 4294966785U);
-    result |= test(__LINE__, "          0x1234abcd", "%#20x", 305441741);
-    result |= test(__LINE__, "          0xedcb5433", "%#20x", 3989525555U);
-    result |= test(__LINE__, "          0X1234ABCD", "%#20X", 305441741);
-    result |= test(__LINE__, "          0XEDCB5433", "%#20X", 3989525555U);
+    result |= test(__LINE__, I("        037777777001", "             0177001"), "%#20o", 4294966785U);
+    result |= test(__LINE__, I("          0x1234abcd", "              0xabcd"), "%#20x", 305441741);
+    result |= test(__LINE__, I("          0xedcb5433", "              0x5433"), "%#20x", 3989525555U);
+    result |= test(__LINE__, I("          0X1234ABCD", "              0XABCD"), "%#20X", 305441741);
+    result |= test(__LINE__, I("          0XEDCB5433", "              0X5433"), "%#20X", 3989525555U);
     result |= test(__LINE__, "00000000000000000777", "%#020o", 511);
-    result |= test(__LINE__, "00000000037777777001", "%#020o", 4294966785U);
-    result |= test(__LINE__, "0x00000000001234abcd", "%#020x", 305441741);
-    result |= test(__LINE__, "0x0000000000edcb5433", "%#020x", 3989525555U);
-    result |= test(__LINE__, "0X00000000001234ABCD", "%#020X", 305441741);
-    result |= test(__LINE__, "0X0000000000EDCB5433", "%#020X", 3989525555U);
+    result |= test(__LINE__, I("00000000037777777001", "00000000000000177001"), "%#020o", 4294966785U);
+    result |= test(__LINE__, I("0x00000000001234abcd", "0x00000000000000abcd"), "%#020x", 305441741);
+    result |= test(__LINE__, I("0x0000000000edcb5433", "0x000000000000005433"), "%#020x", 3989525555U);
+    result |= test(__LINE__, I("0X00000000001234ABCD", "0X00000000000000ABCD"), "%#020X", 305441741);
+    result |= test(__LINE__, I("0X0000000000EDCB5433", "0X000000000000005433"), "%#020X", 3989525555U);
     result |= test(__LINE__, "Hallo               ", "%0-20s", "Hallo");
     result |= test(__LINE__, "1024                ", "%0-20d", 1024);
     result |= test(__LINE__, "-1024               ", "%0-20d", -1024);
     result |= test(__LINE__, "1024                ", "%0-20i", 1024);
     result |= test(__LINE__, "-1024               ", "%0-20i", -1024);
     result |= test(__LINE__, "1024                ", "%0-20u", 1024);
-    result |= test(__LINE__, "4294966272          ", "%0-20u", 4294966272U);
+    result |= test(__LINE__, I("4294966272          ", "64512               "), "%0-20u", 4294966272U);
     result |= test(__LINE__, "777                 ", "%-020o", 511);
-    result |= test(__LINE__, "37777777001         ", "%-020o", 4294966785U);
-    result |= test(__LINE__, "1234abcd            ", "%-020x", 305441741);
-    result |= test(__LINE__, "edcb5433            ", "%-020x", 3989525555U);
-    result |= test(__LINE__, "1234ABCD            ", "%-020X", 305441741);
-    result |= test(__LINE__, "EDCB5433            ", "%-020X", 3989525555U);
+    result |= test(__LINE__, I("37777777001         ", "177001              "), "%-020o", 4294966785U);
+    result |= test(__LINE__, I("1234abcd            ", "abcd                "), "%-020x", 305441741);
+    result |= test(__LINE__, I("edcb5433            ", "5433                "), "%-020x", 3989525555U);
+    result |= test(__LINE__, I("1234ABCD            ", "ABCD                "), "%-020X", 305441741);
+    result |= test(__LINE__, I("EDCB5433            ", "5433                "), "%-020X", 3989525555U);
     result |= test(__LINE__, "x                   ", "%-020c", 'x');
     result |= test(__LINE__, "               Hallo", "%*s", 20, "Hallo");
     result |= test(__LINE__, "                1024", "%*d", 20, 1024);
@@ -450,13 +457,13 @@
     result |= test(__LINE__, "                1024", "%*i", 20, 1024);
     result |= test(__LINE__, "               -1024", "%*i", 20, -1024);
     result |= test(__LINE__, "                1024", "%*u", 20, 1024);
-    result |= test(__LINE__, "          4294966272", "%*u", 20, 4294966272U);
+    result |= test(__LINE__, I("          4294966272", "               64512"), "%*u", 20, 4294966272U);
     result |= test(__LINE__, "                 777", "%*o", 20, 511);
-    result |= test(__LINE__, "         37777777001", "%*o", 20, 4294966785U);
-    result |= test(__LINE__, "            1234abcd", "%*x", 20, 305441741);
-    result |= test(__LINE__, "            edcb5433", "%*x", 20, 3989525555U);
-    result |= test(__LINE__, "            1234ABCD", "%*X", 20, 305441741);
-    result |= test(__LINE__, "            EDCB5433", "%*X", 20, 3989525555U);
+    result |= test(__LINE__, I("         37777777001", "              177001"), "%*o", 20, 4294966785U);
+    result |= test(__LINE__, I("            1234abcd", "                abcd"), "%*x", 20, 305441741);
+    result |= test(__LINE__, I("            edcb5433", "                5433"), "%*x", 20, 3989525555U);
+    result |= test(__LINE__, I("            1234ABCD", "                ABCD"), "%*X", 20, 305441741);
+    result |= test(__LINE__, I("            EDCB5433", "                5433"), "%*X", 20, 3989525555U);
     result |= test(__LINE__, "                   x", "%*c", 20, 'x');
     result |= test(__LINE__, "Hallo heimur", "%.20s", "Hallo heimur");
     result |= test(__LINE__, "00000000000000001024", "%.20d", 1024);
@@ -464,38 +471,38 @@
     result |= test(__LINE__, "00000000000000001024", "%.20i", 1024);
     result |= test(__LINE__, "-00000000000000001024", "%.20i", -1024);
     result |= test(__LINE__, "00000000000000001024", "%.20u", 1024);
-    result |= test(__LINE__, "00000000004294966272", "%.20u", 4294966272U);
+    result |= test(__LINE__, I("00000000004294966272", "00000000000000064512"), "%.20u", 4294966272U);
     result |= test(__LINE__, "00000000000000000777", "%.20o", 511);
-    result |= test(__LINE__, "00000000037777777001", "%.20o", 4294966785U);
-    result |= test(__LINE__, "0000000000001234abcd", "%.20x", 305441741);
-    result |= test(__LINE__, "000000000000edcb5433", "%.20x", 3989525555U);
-    result |= test(__LINE__, "0000000000001234ABCD", "%.20X", 305441741);
-    result |= test(__LINE__, "000000000000EDCB5433", "%.20X", 3989525555U);
+    result |= test(__LINE__, I("00000000037777777001", "00000000000000177001"), "%.20o", 4294966785U);
+    result |= test(__LINE__, I("0000000000001234abcd", "0000000000000000abcd"), "%.20x", 305441741);
+    result |= test(__LINE__, I("000000000000edcb5433", "00000000000000005433"), "%.20x", 3989525555U);
+    result |= test(__LINE__, I("0000000000001234ABCD", "0000000000000000ABCD"), "%.20X", 305441741);
+    result |= test(__LINE__, I("000000000000EDCB5433", "00000000000000005433"), "%.20X", 3989525555U);
     result |= test(__LINE__, "               Hallo", "%20.5s", "Hallo heimur");
     result |= test(__LINE__, "               01024", "%20.5d", 1024);
     result |= test(__LINE__, "              -01024", "%20.5d", -1024);
     result |= test(__LINE__, "               01024", "%20.5i", 1024);
     result |= test(__LINE__, "              -01024", "%20.5i", -1024);
     result |= test(__LINE__, "               01024", "%20.5u", 1024);
-    result |= test(__LINE__, "          4294966272", "%20.5u", 4294966272U);
+    result |= test(__LINE__, I("          4294966272", "               64512"), "%20.5u", 4294966272U);
     result |= test(__LINE__, "               00777", "%20.5o", 511);
-    result |= test(__LINE__, "         37777777001", "%20.5o", 4294966785U);
-    result |= test(__LINE__, "            1234abcd", "%20.5x", 305441741);
-    result |= test(__LINE__, "          00edcb5433", "%20.10x", 3989525555U);
-    result |= test(__LINE__, "            1234ABCD", "%20.5X", 305441741);
-    result |= test(__LINE__, "          00EDCB5433", "%20.10X", 3989525555U);
+    result |= test(__LINE__, I("         37777777001", "              177001"), "%20.5o", 4294966785U);
+    result |= test(__LINE__, I("            1234abcd", "               0abcd"), "%20.5x", 305441741);
+    result |= test(__LINE__, I("          00edcb5433", "          0000005433"), "%20.10x", 3989525555U);
+    result |= test(__LINE__, I("            1234ABCD", "               0ABCD"), "%20.5X", 305441741);
+    result |= test(__LINE__, I("          00EDCB5433", "          0000005433"), "%20.10X", 3989525555U);
     result |= test(__LINE__, "               01024", "%020.5d", 1024);
     result |= test(__LINE__, "              -01024", "%020.5d", -1024);
     result |= test(__LINE__, "               01024", "%020.5i", 1024);
     result |= test(__LINE__, "              -01024", "%020.5i", -1024);
     result |= test(__LINE__, "               01024", "%020.5u", 1024);
-    result |= test(__LINE__, "          4294966272", "%020.5u", 4294966272U);
+    result |= test(__LINE__, I("          4294966272", "               64512"), "%020.5u", 4294966272U);
     result |= test(__LINE__, "               00777", "%020.5o", 511);
-    result |= test(__LINE__, "         37777777001", "%020.5o", 4294966785U);
-    result |= test(__LINE__, "            1234abcd", "%020.5x", 305441741);
-    result |= test(__LINE__, "          00edcb5433", "%020.10x", 3989525555U);
-    result |= test(__LINE__, "            1234ABCD", "%020.5X", 305441741);
-    result |= test(__LINE__, "          00EDCB5433", "%020.10X", 3989525555U);
+    result |= test(__LINE__, I("         37777777001", "              177001"), "%020.5o", 4294966785U);
+    result |= test(__LINE__, I("            1234abcd", "               0abcd"), "%020.5x", 305441741);
+    result |= test(__LINE__, I("          00edcb5433", "          0000005433"), "%020.10x", 3989525555U);
+    result |= test(__LINE__, I("            1234ABCD", "               0ABCD"), "%020.5X", 305441741);
+    result |= test(__LINE__, I("          00EDCB5433", "          0000005433"), "%020.10X", 3989525555U);
     result |= test(__LINE__, "", "%.0s", "Hallo heimur");
     result |= test(__LINE__, "                    ", "%20.0s", "Hallo heimur");
     result |= test(__LINE__, "", "%.s", "Hallo heimur");
@@ -507,16 +514,16 @@
     result |= test(__LINE__, "               -1024", "%20.i", -1024);
     result |= test(__LINE__, "                    ", "%20.i", 0);
     result |= test(__LINE__, "                1024", "%20.u", 1024);
-    result |= test(__LINE__, "          4294966272", "%20.0u", 4294966272U);
+    result |= test(__LINE__, I("          4294966272", "               64512") , "%20.0u", 4294966272U);
     result |= test(__LINE__, "                    ", "%20.u", 0U);
     result |= test(__LINE__, "                 777", "%20.o", 511);
-    result |= test(__LINE__, "         37777777001", "%20.0o", 4294966785U);
+    result |= test(__LINE__, I("         37777777001", "              177001"), "%20.0o", 4294966785U);
     result |= test(__LINE__, "                    ", "%20.o", 0U);
-    result |= test(__LINE__, "            1234abcd", "%20.x", 305441741);
-    result |= test(__LINE__, "            edcb5433", "%20.0x", 3989525555U);
+    result |= test(__LINE__, I("            1234abcd", "                abcd"), "%20.x", 305441741);
+    result |= test(__LINE__, I("            edcb5433", "                5433"), "%20.0x", 3989525555U);
     result |= test(__LINE__, "                    ", "%20.x", 0U);
-    result |= test(__LINE__, "            1234ABCD", "%20.X", 305441741);
-    result |= test(__LINE__, "            EDCB5433", "%20.0X", 3989525555U);
+    result |= test(__LINE__, I("            1234ABCD", "                ABCD"), "%20.X", 305441741);
+    result |= test(__LINE__, I("            EDCB5433", "                5433"), "%20.0X", 3989525555U);
     result |= test(__LINE__, "                    ", "%20.X", 0U);
     result |= test(__LINE__, "Hallo               ", "% -0+*.*s", 20, 5, "Hallo heimur");
     result |= test(__LINE__, "+01024              ", "% -0+*.*d", 20, 5, 1024);
@@ -524,13 +531,13 @@
     result |= test(__LINE__, "+01024              ", "% -0+*.*i", 20, 5, 1024);
     result |= test(__LINE__, "-01024              ", "% 0-+*.*i", 20, 5, -1024);
     result |= test(__LINE__, "01024               ", "% 0-+*.*u", 20, 5, 1024);
-    result |= test(__LINE__, "4294966272          ", "% 0-+*.*u", 20, 5, 4294966272U);
+    result |= test(__LINE__, I("4294966272          ", "64512               "), "% 0-+*.*u", 20, 5, 4294966272U);
     result |= test(__LINE__, "00777               ", "%+ -0*.*o", 20, 5, 511);
-    result |= test(__LINE__, "37777777001         ", "%+ -0*.*o", 20, 5, 4294966785U);
-    result |= test(__LINE__, "1234abcd            ", "%+ -0*.*x", 20, 5, 305441741);
-    result |= test(__LINE__, "00edcb5433          ", "%+ -0*.*x", 20, 10, 3989525555U);
-    result |= test(__LINE__, "1234ABCD            ", "% -+0*.*X", 20, 5, 305441741);
-    result |= test(__LINE__, "00EDCB5433          ", "% -+0*.*X", 20, 10, 3989525555U);
+    result |= test(__LINE__, I("37777777001         ", "177001              "), "%+ -0*.*o", 20, 5, 4294966785U);
+    result |= test(__LINE__, I("1234abcd            ", "0abcd               "), "%+ -0*.*x", 20, 5, 305441741);
+    result |= test(__LINE__, I("00edcb5433          ", "0000005433          "), "%+ -0*.*x", 20, 10, 3989525555U);
+    result |= test(__LINE__, I("1234ABCD            ", "0ABCD               "), "% -+0*.*X", 20, 5, 305441741);
+    result |= test(__LINE__, I("00EDCB5433          ", "0000005433          "), "% -+0*.*X", 20, 10, 3989525555U);
     result |= test(__LINE__, "hi x", "%*sx", -3, "hi");
 #ifndef NO_FLOAT
     result |= test(__LINE__, "1.000e-38", "%.3e", 1e-38);
