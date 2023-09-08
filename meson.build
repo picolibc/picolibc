@@ -937,40 +937,87 @@ foreach target : ['default-target'] + targets
       picolibc_linker_type_data.set('LLD_END', '*/')
     endif
 
+    init_memory_template = '''
+        @0@ (rx!w) : ORIGIN = @1@, LENGTH = @2@
+'''
+    init_section_template = '''
+        .@0@ : {
+@1@
+        } >@2@ AT>@2@ :text
+'''
+    default_init_section_template = init_section_template.format('@0@', '''      		KEEP (*(.text.init.enter))
+		KEEP (*(.data.init.enter))
+		KEEP (*(SORT_BY_NAME(.init) SORT_BY_NAME(.init.*)))''',
+                                                                 '@1@')
+
+    additional_sections = []
+
+    fallback_flash_addr = '0x10000000'
+    fallback_flash_size = '0x00010000'
+
     if meson.get_cross_property('separate_boot_flash_' + custom_mem_config,
                                 meson.get_cross_property('separate_boot_flash', false))
-
-      default_boot_flash_addr = meson.get_cross_property(
+      boot_flash_addr = meson.get_cross_property(
         'default_boot_flash_addr_' + custom_mem_config,
         meson.get_cross_property(
           'default_boot_flash_addr',
           '0x10000000'))
-
-      default_boot_flash_size = meson.get_cross_property(
+      boot_flash_size = meson.get_cross_property(
         'default_boot_flash_size_' + custom_mem_config,
         meson.get_cross_property(
           'default_boot_flash_size',
           '0x00000400'))
-
+      additional_sections = [
+        {
+          'name' : 'boot_flash',
+          'addr' : boot_flash_addr,
+          'size' : boot_flash_size,
+          'contents' : default_init_section_template.format('boot_flash', 'boot_flash')
+        }]
       fallback_flash_addr = '0x10000400'
       fallback_flash_size = '0x0000fc00'
-
-      picolibc_linker_type_data.set('MEMORY_BOOT_FLASH', '''
-        boot_flash (rx!w) :
-                ORIGIN = DEFINED(__boot_flash) ? __boot_flash : ''' + default_boot_flash_addr + ''',
-                LENGTH = DEFINED(__boot_flash_size) ? __boot_flash_size : ''' + default_boot_flash_size)
-
-      picolibc_linker_type_data.set('INIT_MEMORY', 'boot_flash')
-
     else
-
-      fallback_flash_addr = '0x10000000'
-      fallback_flash_size = '0x00010000'
-
-      picolibc_linker_type_data.set('MEMORY_BOOT_FLASH', '')
-      picolibc_linker_type_data.set('INIT_MEMORY', 'flash')
-
+      additional_section_names = meson.get_cross_property('additional_sections_' + custom_mem_config,
+                                                     meson.get_cross_property('additional_sections', []))
+      if additional_section_names != []
+        foreach section_name : additional_section_names
+          default_content_list =  ['*.(.' + section_name + ')', '*.(.' + section_name + '.*)']
+          content_list = meson.get_cross_property('default_' + section_name + '_contents', default_content_list)
+          contents = ''
+          foreach content : content_list
+            if contents != ''
+              contents += '''
+'''
+            endif
+            contents += '                @0@'.format(content)
+          endforeach
+          additional_sections += [
+            {
+              'name' : section_name,
+              'addr' : meson.get_cross_property('default_' + section_name + '_addr'),
+              'size' : meson.get_cross_property('default_' + section_name + '_size'),
+              'contents' : init_section_template.format(section_name, contents, section_name)
+            }]
+        endforeach
+      endif
     endif
+                          
+    init_memory = ''
+    init_sections = ''
+
+    if additional_sections != []
+      foreach section : additional_sections
+        section_name = section['name']
+        init_memory += init_memory_template.format(section_name, section['addr'], section['size'])
+        init_sections += section['contents']
+      endforeach
+    else
+      init_memory = ''
+      init_sections = default_init_section_template.format('init', 'flash')
+    endif
+
+    picolibc_linker_type_data.set('INIT_MEMORY', init_memory)
+    picolibc_linker_type_data.set('INIT_SECTIONS', init_sections)
 
     picolibc_linker_type_data.set(
       'DEFAULT_FLASH_ADDR', meson.get_cross_property(

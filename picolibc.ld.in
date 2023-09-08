@@ -41,7 +41,7 @@ ENTRY(_start)
  */
 
 MEMORY
-{@MEMORY_BOOT_FLASH@
+{@INIT_MEMORY@
 	flash (rx!w) :
 		ORIGIN = DEFINED(__flash) ? __flash : @DEFAULT_FLASH_ADDR@,
 		LENGTH = DEFINED(__flash_size) ? __flash_size : @DEFAULT_FLASH_SIZE@
@@ -61,13 +61,7 @@ PHDRS
 SECTIONS
 {
 	PROVIDE(__stack = ORIGIN(ram) + LENGTH(ram));
-
-	.init : {
-		KEEP (*(.text.init.enter))
-		KEEP (*(.data.init.enter))
-		KEEP (*(SORT_BY_NAME(.init) SORT_BY_NAME(.init.*)))
-	} >@INIT_MEMORY@ AT>@INIT_MEMORY@ :text
-
+	@INIT_SECTIONS@
 	.text : {
 
 		/* code */
