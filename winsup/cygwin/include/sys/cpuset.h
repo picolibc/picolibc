@@ -48,7 +48,7 @@ void __cpuset_free (cpu_set_t *);
 
 /* These _S macros operate on dynamically-sized cpu sets of size 'siz' bytes */
 #define CPU_ZERO_S(siz, set) __cpuset_zero_s (siz, set)
-static __inline
+static __inline void
 __cpuset_zero_s (__size_t siz, cpu_set_t *set)
 {
 #if __GNUC_PREREQ (2, 91)
