@@ -55,14 +55,14 @@ ceil64(__float64 x)
         else
             return x; /* x is integral */
     } else {
-        i = ((__uint32_t)(0xffffffff)) >> (j0 - 20);
+        i = ((__uint32_t)(0xffffffffUL)) >> (j0 - 20);
         if ((i1 & i) == 0)
             return x; /* x is integral */
         if (i0 > 0) {
             if (j0 == 20)
                 i0 += 1;
             else {
-                j = i1 + (1 << (52 - j0));
+                j = i1 + ((__uint32_t) 1 << (52 - j0));
                 if ((__uint32_t) j < (__uint32_t) i1)
                     i0 += 1; /* got a carry */
                 i1 = j;
