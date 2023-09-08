@@ -291,7 +291,7 @@ typedef TEST_CONST struct
 typedef TEST_CONST struct
 {
   int line;
-  int value;
+  int32_t value;
   char *result;
   char *format_string;
 } sprint_int_type;

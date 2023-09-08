@@ -151,9 +151,11 @@ void
 iterate (void (*func) (void),
        char *name)
 {
+  pd = doubles;
+  if (!pd->string)
+      return;
 
   newfunc(name);
-  pd = doubles;
   while (pd->string) {
     line(pd->line);
     func();
@@ -171,9 +173,12 @@ static void
 int_iterate (void (*func)(),
        char *name)
 {
+  p = ints;
+  if (!p->string)
+      return;
+
   newfunc(name);
 
-  p = ints;
   while (p->string) {
     line(p->line);
     errno = 0;
@@ -380,9 +385,12 @@ static void
 diterate (void (*func)(),
        char *name)
 {
+  pdd = ddoubles;
+  if (!pdd->estring)
+      return;
+
   newfunc(name);
 
-  pdd = ddoubles;
   while (pdd->estring) {
     line(pdd->line);
     errno = 0;
@@ -460,6 +468,10 @@ test_sprint (void)
   }
 #endif
 
+#ifdef GENERATE_VECTORS
+  int c = 0;
+  int q = 1;
+#endif
   while (si->line)
   {
     line( si->line);
@@ -468,12 +480,50 @@ test_sprint (void)
     else
       sprintf(buffer, si->format_string, si->value);
 #ifdef GENERATE_VECTORS
+    static char sbuffer[500];
+    static char sformat[1024];
+    char *df = si->format_string;
+    char *sf = sformat;
+    int size = 0;
+    while (*df) {
+        switch (*df) {
+        case 'd':
+        case 'x':
+        case 'X':
+        case 'o':
+            if (!size) {
+                *sf++ = 'h';
+                size = 2;
+            }
+            break;
+        case 'l':
+            size = 1;
+            break;
+        }
+        *sf++ = *df++;
+    }
+    *sf = '\0';
+    sprintf(sbuffer, sformat, (short) si->value);
+    if (strcmp(sbuffer, buffer) && size != 1) {
+        snprintf(sformat, sizeof(sformat), "I(\"%s\", \"%s\")", buffer, sbuffer);
+    } else {
+        snprintf(sformat, sizeof(sformat), "\"%s\"", buffer);
+    }
+    if (c == 0) {
+      printf("#if TEST_PART == %d || TEST_PART == -1\n", q);
+      q++;
+    }
     if (si->value < 0)
-      printf("__LINE__, -%#09x,\t\"%s\", \"%s\",\n",
-	     -si->value, buffer, si->format_string);
+      printf("{__LINE__, -%#09xl, %s, \"%s\", },\n",
+	     -si->value, sformat, si->format_string);
     else
-      printf("__LINE__, %#010x,\t\"%s\", \"%s\",\n",
-	     si->value, buffer, si->format_string);
+      printf("{__LINE__, %#010xl, %s, \"%s\", },\n",
+	     si->value, sformat, si->format_string);
+    c++;
+    if (c == 511 || !si[1].line) {
+        printf("#endif\n");
+        c = 0;
+    }
 #else
     test_sok(buffer, si->result);
 #endif
