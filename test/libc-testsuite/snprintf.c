@@ -169,12 +169,12 @@ int test_snprintf(void)
 	int err=0;
 	char b[2000];
 
-	TEST(i, snprintf(0, 0, "%d", 123456), 6, "length returned %d != %d");
+	TEST(i, snprintf(0, 0, "%ld", 123456l), 6, "length returned %d != %d");
 	TEST(i, snprintf(0, 0, "%.4s", "hello"), 4, "length returned %d != %d");
 	TEST(i, snprintf(b, 0, "%.0s", "goodbye"), 0, "length returned %d != %d");
 
 	strcpy(b, "xxxxxxxx");
-	TEST(i, snprintf(b, 4, "%d", 123456), 6, "length returned %d != %d");
+	TEST(i, snprintf(b, 4, "%ld", 123456l), 6, "length returned %d != %d");
 	TEST_S(b, "123", "incorrect output");
 	TEST(i, b[5], 'x', "buffer overrun");
 
