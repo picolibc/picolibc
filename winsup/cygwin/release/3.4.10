@@ -1,0 +1,5 @@
+Bug Fixes
+---------
+
+- Fix missing term in __cpuset_zero_s() prototoype in sys/cpuset.h.
+  Addresses: https://cygwin.com/pipermail/cygwin/2023-September/254423.html
