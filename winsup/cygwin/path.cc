@@ -3259,7 +3259,7 @@ restart:
 	{
 	  status = conv_hdl.get_finfo (h, fs.is_nfs ());
 	  if (NT_SUCCESS (status))
-	    fileattr = conv_hdl.get_dosattr (fs.is_nfs ());
+	    fileattr = conv_hdl.get_dosattr (h, fs.is_nfs ());
 	}
       if (!NT_SUCCESS (status))
 	{

@@ -125,10 +125,16 @@ public:
     return nfs ? nfsattr ()->fileid
 	       : fai ()->InternalInformation.IndexNumber.QuadPart;
   }
-  inline DWORD get_dosattr (bool nfs) const
+  inline DWORD get_dosattr (HANDLE h, bool nfs) const
   {
     if (nfs)
-      return (nfsattr ()->type & 7) == NF3DIR ? FILE_ATTRIBUTE_DIRECTORY : 0;
+      {
+	IO_STATUS_BLOCK io;
+	FILE_BASIC_INFORMATION fbi;
+
+	NtQueryInformationFile (h, &io, &fbi, sizeof fbi, FileBasicInformation);
+	return fbi.FileAttributes;
+      }
     return fai ()->BasicInformation.FileAttributes;
   }
 };
