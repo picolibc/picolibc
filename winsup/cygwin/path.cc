@@ -3532,21 +3532,6 @@ restart:
 	    {
 	    case NF3LNK:
 	      res = check_nfs_symlink (h);
-	      /* Enable Cygwin-created FIFOs to be recognized as FIFOs.
-		 We have to overwrite the NFS fattr3 data, otherwise the
-		 info returned by Cygwin's stat will still claim the file
-		 is a symlink. */
-	      if (res && contents[0] == ':' && contents[1] == '\\'
-		  && parse_device (contents) && major == _major (FH_FIFO))
-		{
-		  conv_hdl.nfsattr ()->type = NF3FIFO;
-		  conv_hdl.nfsattr ()->mode = mode;
-		  conv_hdl.nfsattr ()->size = 0;
-		  /* Marker for fhandler_base::fstat_by_nfs_ea not to override
-		     the cached fattr3 data with fresh data from the filesystem,
-		     even if the handle is used for other purposes than stat. */
-		  conv_hdl.nfsattr ()->filler1 = NF3FIFO;
-		}
 	      break;
 	    case NF3FIFO:
 	      /* Enable real FIFOs recognized as such. */
