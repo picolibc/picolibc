@@ -1,4 +1,4 @@
-https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-LlCjWuAbzH/9.3.1.2/msp430-gcc-9.3.1.11_linux64.tar.bz2
 https://github.com/ZakKemble/avr-gcc-build/releases/download/v12.1.0-1/avr-gcc-12.1.0-x64-linux.tar.bz2
 https://maps.altusmetrum.org/qemu-m68k.tar.xz
 https://maps.altusmetrum.org/m68k-unknown-elf.tar.xz
+https://maps.altusmetrum.org/msp430-unknown-elf.tar.xz
