@@ -2005,7 +2005,7 @@ symlink_worker (const char *oldpath, path_conv &win32_newpath, bool isdevice)
 	 variable.  Device files are always shortcuts. */
       wsym_type = isdevice ? WSYM_lnk : allow_winsymlinks;
       /* NFS has its own, dedicated way to create symlinks. */
-      if (win32_newpath.fs_is_nfs ())
+      if (win32_newpath.fs_is_nfs () && !isdevice)
 	wsym_type = WSYM_nfs;
       /* MVFS doesn't handle the SYSTEM DOS attribute, but it handles the R/O
 	 attribute. Therefore we create symlinks on MVFS always as shortcuts. */
@@ -3477,6 +3477,16 @@ restart:
 	  else if (contents[0] != ':' || contents[1] != '\\'
 		   || !parse_device (contents))
 	    break;
+	  if (fs.is_nfs () && major == _major (FH_FIFO))
+	    {
+	      conv_hdl.nfsattr ()->type = NF3FIFO;
+	      conv_hdl.nfsattr ()->mode = mode;
+	      conv_hdl.nfsattr ()->size = 0;
+	      /* Marker for fhandler_base::fstat_by_nfs_ea not to override
+		 the cached fattr3 data with fresh data from the filesystem,
+		 even if the handle is used for other purposes than stat. */
+	      conv_hdl.nfsattr ()->filler1 = NF3FIFO;
+	    }
 	}
 
       /* If searching for `foo' and then finding a `foo.lnk' which is

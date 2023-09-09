@@ -2348,9 +2348,11 @@ go_ahead:
 		 And, since some filesystems choke on the EAs, we don't
 		 use them unconditionally. */
 	      f_status = (dir->__flags & dirent_nfs_d_ino)
-			 ? NtCreateFile (&hdl, READ_CONTROL, &attr, &io,
-					 NULL, 0, FILE_SHARE_VALID_FLAGS,
-					 FILE_OPEN, FILE_OPEN_FOR_BACKUP_INTENT,
+			 ? NtCreateFile (&hdl,
+					 READ_CONTROL | FILE_READ_ATTRIBUTES,
+					 &attr, &io, NULL, 0,
+					 FILE_SHARE_VALID_FLAGS, FILE_OPEN,
+					 FILE_OPEN_FOR_BACKUP_INTENT,
 					 &nfs_aol_ffei, sizeof nfs_aol_ffei)
 			 : NtOpenFile (&hdl, READ_CONTROL, &attr, &io,
 				       FILE_SHARE_VALID_FLAGS,
@@ -2364,6 +2366,16 @@ go_ahead:
 		  FILE_INTERNAL_INFORMATION fii;
 		  f_status = NtQueryInformationFile (hdl, &io, &fii, sizeof fii,
 						     FileInternalInformation);
+		  /* On NFS fetch the (faked, but useful) DOS attribute.
+		     We need it to recognize shortcut FIFOs. */
+		  if ((dir->__flags & dirent_nfs_d_ino))
+		    {
+		      FILE_BASIC_INFORMATION fbi;
+
+		      if (NT_SUCCESS (NtQueryInformationFile (hdl, &io, &fbi,
+				      sizeof fbi, FileBasicInformation)))
+			FileAttributes = fbi.FileAttributes;
+		    }
 		  NtClose (hdl);
 		  if (NT_SUCCESS (f_status))
 		    {
