@@ -2262,6 +2262,8 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 	      goto go_ahead;
 	    }
 	}
+      /* NFS must use FileNamesInformation!  Any other information class
+	 skips all symlinks. */
       if (!(dir->__flags & dirent_get_d_ino))
 	status = NtQueryDirectoryFile (get_handle (), NULL, NULL, NULL, &io,
 				       d_cache (dir), DIR_BUF_SIZE,
