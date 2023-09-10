@@ -34,6 +34,7 @@
  */
 
 #include <string.h>
+#include <stdint.h>
 #include <stdio.h>
 
 const char haystack[] = "hello world";
