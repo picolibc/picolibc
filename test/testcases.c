@@ -289,8 +289,12 @@
     result |= test(__LINE__, "%0", "%%0");
     result |= test(__LINE__, "2345", "%hx", 74565);
 #ifndef _NANO_FORMATTED_IO
-    result |= test(__LINE__, "61", "%hhx", 'a');
-    result |= test(__LINE__, "61", "%hhx", 'a' + 256);
+    result |= test(__LINE__, "61", "%hhx", 0x61);
+    result |= test(__LINE__, "61", "%hhx", 0x161);
+    result |= test(__LINE__, "97", "%hhd", 0x61);
+    result |= test(__LINE__, "97", "%hhd", 0x161);
+    result |= test(__LINE__, "-97", "%hhd", -0x61);
+    result |= test(__LINE__, "-97", "%hhd", -0x161);
 #endif
     result |= test(__LINE__, "Hallo heimur", "Hallo heimur");
     result |= test(__LINE__, "Hallo heimur", "%s", "Hallo heimur");
