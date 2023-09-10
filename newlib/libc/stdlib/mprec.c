@@ -147,7 +147,7 @@ Balloc (int k)
   /* Allocate an mprec Bigint */
   rv = (_Bigint *) calloc(1,
 			  sizeof (_Bigint) +
-			  (x-1) * sizeof(rv->_x));
+			  (x) * sizeof(rv->_x[0]));
   if (rv == NULL) return NULL;
   rv->_k = k;
   rv->_maxwds = x;

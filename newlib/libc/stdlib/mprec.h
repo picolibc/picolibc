@@ -358,7 +358,7 @@ int __mprec_register_exit(void);
 struct _Bigint
 {
   int _k, _maxwds, _sign, _wds;
-  uint32_t _x[1];
+  uint32_t _x[];
 };
 
 struct FPI;
