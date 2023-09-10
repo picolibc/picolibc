@@ -807,23 +807,40 @@ VFPRINTF (
 	    flags&SHORTINT ? (long)(short)GET_ARG (N, ap, int) : \
 	    flags&CHARINT ? (long)(signed char)GET_ARG (N, ap, int) : \
 	    (long)GET_ARG (N, ap, int))
+#ifdef __MSP430__
+#define	UARG() \
+	(flags&QUADINT ? GET_ARG (N, ap, u_quad_t) : \
+	    flags&LONGINT ? GET_ARG (N, ap, u_long) : \
+	    flags&SHORTINT ? (u_long)(u_short)GET_ARG (N, ap, int) : \
+	    flags&CHARINT ? (u_long)(GET_ARG (N, ap, int) & 0xff) : \
+	    (u_long)GET_ARG (N, ap, u_int))
+#else
 #define	UARG() \
 	(flags&QUADINT ? GET_ARG (N, ap, u_quad_t) : \
 	    flags&LONGINT ? GET_ARG (N, ap, u_long) : \
 	    flags&SHORTINT ? (u_long)(u_short)GET_ARG (N, ap, int) : \
 	    flags&CHARINT ? (u_long)(unsigned char)GET_ARG (N, ap, int) : \
 	    (u_long)GET_ARG (N, ap, u_int))
+#endif
 #else
 #define	SARG() \
 	(flags&LONGINT ? GET_ARG (N, ap, long) : \
 	    flags&SHORTINT ? (long)(short)GET_ARG (N, ap, int) : \
 	    flags&CHARINT ? (long)(signed char)GET_ARG (N, ap, int) : \
 	    (long)GET_ARG (N, ap, int))
+#ifdef __MSP430__
+#define	UARG() \
+	(flags&LONGINT ? GET_ARG (N, ap, u_long) : \
+	    flags&SHORTINT ? (u_long)(u_short)GET_ARG (N, ap, int) : \
+	    flags&CHARINT ? (u_long)(GET_ARG (N, ap, int) & 0xff) :     \
+	    (u_long)GET_ARG (N, ap, u_int))
+#else
 #define	UARG() \
 	(flags&LONGINT ? GET_ARG (N, ap, u_long) : \
 	    flags&SHORTINT ? (u_long)(u_short)GET_ARG (N, ap, int) : \
 	    flags&CHARINT ? (u_long)(unsigned char)GET_ARG (N, ap, int) : \
 	    (u_long)GET_ARG (N, ap, u_int))
+#endif
 #endif
 
 #ifndef STRING_ONLY
