@@ -159,6 +159,8 @@ option('format-default', type: 'combo', choices: ['double', 'float', 'integer'],
        description: 'which printf/scanf versions should be the default')
 option('printf-aliases', type: 'boolean', value: true,
        description: 'Allow link-time printf aliases')
+option('printf-small-ultoa', type: 'boolean', value: false,
+       description: 'Avoid softare division in decimal conversions')
 
 #
 # Options applying to only legacy stdio
