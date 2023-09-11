@@ -582,6 +582,7 @@ Files: CMakeLists.txt
  newlib/libc/picolib/machine/arc/tls.c
  newlib/libc/picolib/machine/arm/CMakeLists.txt
  newlib/libc/picolib/machine/mips/tls.c
+ newlib/libc/picolib/machine/msp430/CMakeLists.txt
  newlib/libc/picolib/machine/riscv/CMakeLists.txt
  newlib/libc/picolib/machine/xtensa/CMakeLists.txt
  newlib/libc/picolib/machine/xtensa/tls.c
@@ -806,6 +807,7 @@ Files: cmake/TC-arm-none-eabi.ld
  scripts/run-i386
  scripts/run-m68k
  scripts/run-mips
+ scripts/run-msp430
  scripts/run-nios2
  scripts/run-x86
  scripts/run-x86_64
@@ -882,6 +884,7 @@ Files: dummyhost/exit.c
  newlib/libm/machine/m68k/feupdateenv.c
  picocrt/machine/m68k/crt0.c
  picocrt/machine/mips/crt0.c
+ picocrt/machine/msp430/crt0.c
  picocrt/machine/nios2/crt0.c
  semihost/machine/arc/arc_close.c
  semihost/machine/arc/arc_exit.c
@@ -906,6 +909,8 @@ Files: dummyhost/exit.c
  semihost/machine/m68k/m68k_write.c
  semihost/machine/mips/mips-semihost.h
  semihost/machine/mips/mips_iob.c
+ semihost/machine/msp430/msp430-iob.c
+ semihost/machine/msp430/msp430-semihost.h
  semihost/machine/nios2/nios2_close.c
  semihost/machine/nios2/nios2_exit.c
  semihost/machine/nios2/nios2_fstat.c
@@ -1084,6 +1089,7 @@ Files: dummyhost/iob.c
  scripts/do-mips-zephyr-configure
  scripts/do-mipsel-configure
  scripts/do-msp430-configure
+ scripts/do-msp430-unknown-elf-configure
  scripts/do-native-configure
  scripts/do-nios2-configure
  scripts/do-riscv-configure
@@ -1171,6 +1177,7 @@ Files: newlib/empty.c
  newlib/libc/picolib/machine/arc/meson.build
  newlib/libc/picolib/machine/arm/meson.build
  newlib/libc/picolib/machine/mips/meson.build
+ newlib/libc/picolib/machine/msp430/meson.build
  newlib/libc/picolib/machine/riscv/meson.build
  newlib/libc/picolib/machine/xtensa/meson.build
  newlib/libc/stdlib/pico-atexit.c
@@ -1200,6 +1207,7 @@ Files: newlib/empty.c
  picocrt/machine/arm/meson.build
  picocrt/machine/m68k/meson.build
  picocrt/machine/mips/meson.build
+ picocrt/machine/msp430/meson.build
  picocrt/machine/nios2/meson.build
  picocrt/machine/powerpc/meson.build
  picocrt/machine/riscv/meson.build
@@ -1218,6 +1226,9 @@ Files: newlib/empty.c
  semihost/machine/mips/meson.build
  semihost/machine/mips/mips_exit.c
  semihost/machine/mips/mips_stub.c
+ semihost/machine/msp430/meson.build
+ semihost/machine/msp430/msp430-exit.c
+ semihost/machine/msp430/msp430-stub.c
  semihost/machine/nios2/meson.build
  semihost/machine/nios2/nios2_stub.c
  semihost/machine/powerpc/meson.build
@@ -1263,6 +1274,7 @@ License: BSD3-1
 
 Files: newlib/libc/machine/m68k/meson.build
  scripts/do-m68k-configure
+ scripts/do-m68k-unknown-elf-configure
 Copyright: 2020 Thomas Daede
 License: BSD3-1
 
@@ -1880,10 +1892,12 @@ Files: newlib/libc/tinystdio/dtoa_engine.c
  newlib/libc/tinystdio/ldtoa_engine.h
  newlib/libc/tinystdio/sprintfd.c
  newlib/libc/tinystdio/sprintff.c
+ newlib/libc/tinystdio/vffprintf.c
+ newlib/libc/tinystdio/vffscanf.c
  newlib/libc/tinystdio/vfiprintf.c
  newlib/libc/tinystdio/vfiscanf.c
- newlib/libc/tinystdio/vfprintff.c
- newlib/libc/tinystdio/vfscanff.c
+ newlib/libc/tinystdio/vfmprintf.c
+ newlib/libc/tinystdio/vfmscanf.c
  newlib/libc/tinystdio/vfwprintf.c
  newlib/libc/tinystdio/vfwscanf.c
 Copyright: 2018, Keith Packard
@@ -1926,7 +1940,6 @@ Copyright: 2002, Joerg Wunsch
 License: BSD3-13
 
 Files: newlib/libc/tinystdio/ftoa_engine.h
- newlib/libc/tinystdio/xtoa_fast.h
 Copyright: 2005, Dmitry Xmelkov
 License: BSD3-13
 
@@ -2701,6 +2714,7 @@ Files: .clang-format
  .github/workflows/zephyr.yml
  .github/zephyr
  .github/zephyr-files.txt
+ .github/zephyr-packages.txt
  .gitignore
  README.md
  cmake/TC-clang-thumbv6m.cmake
@@ -2770,10 +2784,12 @@ Files: .clang-format
  scripts/cross-cortex-a9-none-eabi.txt
  scripts/cross-i686-linux-gnu.txt
  scripts/cross-m68k-linux-gnu.txt
+ scripts/cross-m68k-unknown-elf.txt
  scripts/cross-microblazeel-zephyr-elf.txt
  scripts/cross-mips-linux-gnu.txt
  scripts/cross-mips-zephyr-elf.txt
  scripts/cross-mipsel-linux-gnu.txt
+ scripts/cross-msp430-unknown-elf.txt
  scripts/cross-msp430.txt
  scripts/cross-nios2-zephyr-elf.txt
  scripts/cross-power9-fp128.txt
@@ -3131,6 +3147,8 @@ License: Default-1
 Files: newlib/libc/stdlib/abort.c
  newlib/libc/stdlib/abs.c
  newlib/libc/stdlib/assert.c
+ newlib/libc/stdlib/assert_func.c
+ newlib/libc/stdlib/assert_no_arg.c
  newlib/libc/stdlib/atexit.c
  newlib/libc/stdlib/atexit.h
  newlib/libc/stdlib/atof.c
