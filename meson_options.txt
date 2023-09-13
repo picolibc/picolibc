@@ -101,6 +101,9 @@ option('freestanding', type: 'boolean', value: false,
 option('analyzer', type: 'boolean', value: false,
        description: 'Enable the analyzer while compiling with -fanalyzer')
 
+option('assert-verbose', type: 'boolean', value: true,
+       description: 'Assert provides verbose information')
+
 #
 # Testing options
 #

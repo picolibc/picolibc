@@ -347,6 +347,10 @@ set(_LITE_EXIT 1)
 
 set(_PICO_EXIT 1)
 
+if(NOT DEFINED _ASSERT_VERBOSE)
+  option(_ASSERT_VERBOSE "Assert provides verbose information" 1)
+endif()
+
 if(NOT DEFINED _MB_CAPABLE)
   option(_MB_CAPABLE "Enable multi-byte support" 0)
 endif()

@@ -418,6 +418,9 @@
 
 #cmakedefine _WIDE_ORIENT
 
+/* chatty assert */
+#cmakedefine _ASSERT_VERBOSE
+
 /* extended locale support */
 #cmakedefine __HAVE_LOCALE_INFO_EXTENDED__
 

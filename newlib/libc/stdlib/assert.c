@@ -76,3 +76,10 @@ __assert (const char *failedexpr,
    __assert_func (file, line, NULL, failedexpr);
   /* NOTREACHED */
 }
+
+void
+__assert_no_args  (void)
+{
+    fprintf(stderr, "assertion failed\n");
+    abort();
+}
