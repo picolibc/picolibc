@@ -105,14 +105,18 @@ typedef int64_t printf_float_int_t;
 #  endif
 #endif
 
-#if PRINTF_LEVEL == PRINTF_STD || PRINTF_LEVEL == PRINTF_FLT
+#if PRINTF_LEVEL == PRINTF_STD || PRINTF_LEVEL == PRINTF_FLT || PRINTF_LEVEL == PRINTF_MIN
 
 #if ((PRINTF_LEVEL >= PRINTF_FLT) || defined(_WANT_IO_LONG_LONG))
 #define PRINTF_LONGLONG
 #endif
 
-#if ((PRINTF_LEVEL >= PRINTF_FLT) || defined(_WANT_IO_POS_ARGS))
+#if (PRINTF_LEVEL >= PRINTF_FLT) || (defined(_WANT_IO_POS_ARGS) && PRINTF_LEVEL >= PRINTF_FLT)
 #define PRINTF_POSITIONAL
+#endif
+
+#if (PRINTF_LEVEL <= PRINTF_MIN)
+#define PRINTF_SHRINK
 #endif
 
 #ifdef PRINTF_LONGLONG
@@ -178,10 +182,17 @@ typedef long ultoa_signed_t;
 
 /* Order is relevant here and matches order in format string */
 
+#ifdef PRINTF_SHRINK
+#define FL_ZFILL	0x0000
+#define FL_PLUS		0x0000
+#define FL_SPACE	0x0000
+#define FL_LPAD		0x0000
+#else
 #define FL_ZFILL	0x0001
 #define FL_PLUS		0x0002
 #define FL_SPACE	0x0004
 #define FL_LPAD		0x0008
+#endif /* else PRINTF_SHRINK */
 #define FL_ALT		0x0010
 
 #define FL_WIDTH	0x0020
@@ -391,7 +402,9 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #endif
     } u;
     const char * pnt;
+#ifndef PRINTF_SHRINK
     size_t size;
+#endif
 
 #define buf	(u.__buf)
 #define _dtoa	(u.__dtoa)
@@ -458,6 +471,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 
 	    if (flags < FL_LONG) {
 		if (c >= '0' && c <= '9') {
+#ifndef PRINTF_SHRINK
 		    c -= '0';
 		    if (flags & FL_PREC) {
 			prec = 10*prec + c;
@@ -465,6 +479,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 		    }
 		    width = 10*width + c;
 		    flags |= FL_WIDTH;
+#endif
 		    continue;
 		}
 		if (c == '*') {
@@ -479,13 +494,20 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #endif
 		    if (flags & FL_PREC) {
 			prec = va_arg(ap, int);
+#ifdef PRINTF_SHRINK
+                        (void) prec;
+#endif
 		    } else {
 			width = va_arg(ap, int);
 			flags |= FL_WIDTH;
+#ifdef PRINTF_SHRINK
+                        (void) width;
+#else
 			if (width < 0) {
 			    width = -width;
 			    flags |= FL_LPAD;
 			}
+#endif
 		    }
 		    continue;
 		}
@@ -574,6 +596,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
         }
 #endif
 
+#ifndef PRINTF_SHRINK
 	/* This can happen only when prec is set via a '*'
 	 * specifier, in which case it works as if no precision
 	 * was specified. Set the precision to zero and clear the
@@ -583,6 +606,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 	    prec = 0;
 	    flags &= ~FL_PREC;
 	}
+#endif
 
 	/* Only a format character is valid.	*/
 
@@ -592,6 +616,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 
 #define TOCASE(c)       ((c) - case_convert)
 
+#ifndef PRINTF_SHRINK
 	if ((TOLOW(c) >= 'e' && TOLOW(c) <= 'g')
 #ifdef _WANT_IO_C99_FORMATS
             || TOLOW(c) == 'a'
@@ -1114,8 +1139,10 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 	    size = sizeof ("*float*") - 1;
 	    goto str_lpad;
 #endif
-        } else {
-            int len, buf_len;
+        } else
+#endif /* ifndef PRINT_SHRINK */
+        {
+            int buf_len;
 #ifdef WIDE_CHARS
             CHAR *wstr = NULL;
             CHAR c_arg;
@@ -1129,12 +1156,18 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                 if (!(flags & FL_LONG))
                     c_arg = (char) c_arg;
                 wstr = &c_arg;
+                size = 1;
+                goto str_lpad;
+#else
+#ifdef PRINTF_SHRINK
+                my_putc(va_arg(ap, int), stream);
 #else
                 buf[0] = va_arg (ap, int);
                 pnt = buf;
-#endif
                 size = 1;
                 goto str_lpad;
+#endif
+#endif
             } else if (c == 's') {
 #ifdef WIDE_CHARS
                 if (flags & FL_LONG) {
@@ -1148,6 +1181,11 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                     pnt = va_arg (ap, char *);
                 if (!pnt)
                     pnt = "(null)";
+#ifdef PRINTF_SHRINK
+                char c;
+                while ( (c = *pnt++) )
+                    my_putc(c, stream);
+#else
                 size = strnlen (pnt, (flags & FL_PREC) ? (size_t) prec : SIZE_MAX);
 
             str_lpad:
@@ -1166,6 +1204,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #endif
                         my_putc (*pnt++, stream);
                 }
+#endif
 
             } else {
                 if (c == 'd' || c == 'i') {
@@ -1180,9 +1219,11 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 
                     flags &= ~FL_ALT;
 
+#ifndef PRINTF_SHRINK
                     if (x_s == 0 && (flags & FL_PREC) && prec == 0)
                         buf_len = 0;
                     else
+#endif
                         buf_len = __ultoa_invert (x_s, buf, 10) - buf;
                 } else {
                     int base;
@@ -1222,13 +1263,16 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                     if (x == 0)
                         flags &= ~FL_ALT;
 
+#ifndef PRINTF_SHRINK
                     if (x == 0 && (flags & FL_PREC) && prec == 0)
                         buf_len = 0;
                     else
+#endif
                         buf_len = __ultoa_invert (x, buf, base) - buf;
                 }
 
-                len = buf_len;
+#ifndef PRINTF_SHRINK
+                int len = buf_len;
 
                 /* Specified precision */
                 if (flags & FL_PREC) {
@@ -1296,6 +1340,14 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                     my_putc ('0', stream);
                     prec--;
                 }
+#else
+                if (flags & FL_ALT) {
+                    my_putc ('0', stream);
+                    if (c != '\0')
+                        my_putc (c, stream);
+                } else if (flags & FL_NEGATIVE)
+                    my_putc('-', stream);
+#endif
 
                 /* Output value */
                 while (buf_len)
@@ -1303,10 +1355,12 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
             }
         }
 
+#ifndef PRINTF_SHRINK
 	/* Tail is possible.	*/
 	while (width-- > 0) {
 	    my_putc (' ', stream);
 	}
+#endif
     } /* for (;;) */
 
   ret:

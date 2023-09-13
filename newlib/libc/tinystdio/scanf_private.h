@@ -40,7 +40,10 @@
 # endif
 #endif
 
-#if	SCANF_LEVEL == SCANF_STD
+#if	SCANF_LEVEL == SCANF_MIN
+# define SCANF_BRACKET	0
+# define SCANF_FLOAT	0
+#elif	SCANF_LEVEL == SCANF_STD
 # define SCANF_BRACKET	1
 # define SCANF_FLOAT	0
 int vfscanf (FILE * stream, const char *fmt, va_list ap) __attribute__((weak));

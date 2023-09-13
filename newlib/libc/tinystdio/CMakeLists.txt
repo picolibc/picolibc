@@ -125,6 +125,7 @@ picolibc_sources(
   ungetwc.c
   vasprintf.c
   vfiprintf.c
+  vfmprintf.c
   vfprintf.c
   vfprintff.c
   vfscanf.c
