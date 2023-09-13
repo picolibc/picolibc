@@ -37,6 +37,15 @@
 #   define NO_POS_ARGS
 #  endif
 # endif
+# ifdef PICOLIBC_MINIMAL_PRINTF_SCANF
+#  define NO_FLOAT
+#  ifndef _WANT_IO_LONG_LONG
+#   define NO_LONGLONG
+#  endif
+#  define NO_POS_ARGS
+#  define NO_WIDTH_PREC
+#  define NO_CASE_HEX
+# endif
 #else
 # ifdef NO_FLOATING_POINT
 #  define NO_FLOAT
@@ -65,10 +74,13 @@
     result |= test(__LINE__, "0", "%.7g", 0.0);
     result |= test(__LINE__, "0.33", "%.*f", 2, 0.33333333);
 #endif
+#ifndef NO_WIDTH_PREC
     result |= test(__LINE__, "foo", "%.3s", "foobar");
     result |= test(__LINE__, "     00004", "%10.5d", 4);
     result |= test(__LINE__, " 42", "% d", 42);
+#endif
     result |= test(__LINE__, "-42", "% d", -42);
+#ifndef NO_WIDTH_PREC
     result |= test(__LINE__, "   42", "% 5d", 42);
     result |= test(__LINE__, "  -42", "% 5d", -42);
     result |= test(__LINE__, "             42", "% 15d", 42);
@@ -79,30 +91,39 @@
     result |= test(__LINE__, "  -42", "%+5d", -42);
     result |= test(__LINE__, "            +42", "%+15d", 42);
     result |= test(__LINE__, "            -42", "%+15d", -42);
+#endif
     result |= test(__LINE__, "42", "%0d", 42);
     result |= test(__LINE__, "-42", "%0d", -42);
+#ifndef NO_WIDTH_PREC
     result |= test(__LINE__, "00042", "%05d", 42);
     result |= test(__LINE__, "-0042", "%05d", -42);
     result |= test(__LINE__, "000000000000042", "%015d", 42);
     result |= test(__LINE__, "-00000000000042", "%015d", -42);
+#endif
     result |= test(__LINE__, "42", "%-d", 42);
     result |= test(__LINE__, "-42", "%-d", -42);
+#ifndef NO_WIDTH_PREC
     result |= test(__LINE__, "42   ", "%-5d", 42);
     result |= test(__LINE__, "-42  ", "%-5d", -42);
     result |= test(__LINE__, "42             ", "%-15d", 42);
     result |= test(__LINE__, "-42            ", "%-15d", -42);
+#endif
     result |= test(__LINE__, "42", "%-0d", 42);
     result |= test(__LINE__, "-42", "%-0d", -42);
+#ifndef NO_WIDTH_PREC
     result |= test(__LINE__, "42   ", "%-05d", 42);
     result |= test(__LINE__, "-42  ", "%-05d", -42);
     result |= test(__LINE__, "42             ", "%-015d", 42);
     result |= test(__LINE__, "-42            ", "%-015d", -42);
+#endif
     result |= test(__LINE__, "42", "%0-d", 42);
     result |= test(__LINE__, "-42", "%0-d", -42);
+#ifndef NO_WIDTH_PREC
     result |= test(__LINE__, "42   ", "%0-5d", 42);
     result |= test(__LINE__, "-42  ", "%0-5d", -42);
     result |= test(__LINE__, "42             ", "%0-15d", 42);
     result |= test(__LINE__, "-42            ", "%0-15d", -42);
+#endif
 #ifndef NO_FLOAT
     result |= test(__LINE__, "42.90", "%.2f", 42.8952);
     result |= test(__LINE__, "42.90", "%.2F", 42.8952);
@@ -146,7 +167,9 @@
 #ifdef TINY_STDIO
     result |= test(__LINE__, "%(foo", "%(foo");
 #endif
+#ifndef NO_WIDTH_PREC
     result |= test(__LINE__, " foo", "%*s", 4, "foo");
+#endif
 #ifndef NO_FLOAT
     result |= test(__LINE__, "      3.14", "%*.*f", 10, 2, 3.14159265);
     result |= test(__LINE__, "3.14      ", "%-*.*f", 10, 2, 3.14159265);
@@ -190,15 +213,18 @@
     result |= test(__LINE__, "8.e+08", "%#1.1g", 7.89456123e8);
 #endif
 #ifndef NO_LONGLONG
+#ifndef NO_WIDTH_PREC
     result |= test(__LINE__, "    +100", "%+8lld", 100LL);
 #if defined(TINY_STDIO) || !defined(__PICOLIBC__)
     result |= test(__LINE__, "    +100", "%+8Ld", 100LL);
 #endif
     result |= test(__LINE__, "+00000100", "%+.8lld", 100LL);
     result |= test(__LINE__, " +00000100", "%+10.8lld", 100LL);
+#endif
 #ifdef TINY_STDIO
     result |= test(__LINE__, "%_1lld", "%_1lld", 100LL);
 #endif
+#ifndef NO_WIDTH_PREC
     result |= test(__LINE__, "-00100", "%-1.5lld", -100LL);
     result |= test(__LINE__, "  100", "%5lld", 100LL);
     result |= test(__LINE__, " -100", "%5lld", -100LL);
@@ -234,25 +260,34 @@
     result |= test(__LINE__, "0000000000000000000000000000000000000001", "%.40lld", 1LL);
     result |= test(__LINE__, " 0000000000000000000000000000000000000001", "% .40lld", 1LL);
 #endif
+#endif
+#ifndef NO_WIDTH_PREC
     result |= test(__LINE__, " 0000000000000000000000000000000000000001", "% .40d", 1);
+#endif
     /* 121: excluded for C */
     /* 124: excluded for C */
+#ifndef NO_WIDTH_PREC
     result |= test(__LINE__, " 1", "% d", 1);
     result |= test(__LINE__, "+1", "%+ d", 1);
     result |= test(__LINE__, "0x0000000001", "%#012x", 1);
     result |= test(__LINE__, "0x00000001", "%#04.8x", 1);
     result |= test(__LINE__, "0x01    ", "%#-08.2x", 1);
     result |= test(__LINE__, "00000001", "%#08o", 1);
+#endif
     result |= test(__LINE__, "0x39", "%p", (void *)57ULL);
     result |= test(__LINE__, "0x39", "%p", (void *)57U);
+#ifndef NO_WIDTH_PREC
     result |= test(__LINE__, "f", "%.1s", "foo");
     result |= test(__LINE__, "f", "%.*s", 1, "foo");
     result |= test(__LINE__, "foo  ", "%*s", -5, "foo");
+#endif
     result |= test(__LINE__, "hello", "hello");
 #if defined(TINY_STDIO) && !defined(_WANT_IO_PERCENT_B)
     result |= test(__LINE__, "%b", "%b");
 #endif
+#ifndef NO_WIDTH_PREC
     result |= test(__LINE__, "  a", "%3c", 'a');
+#endif
     result |= test(__LINE__, "1234", "%3d", 1234);
     /* 150: excluded for C */
     result |= test(__LINE__, "2", "%-1d", 2);
@@ -268,7 +303,9 @@
 #endif
     result |= test(__LINE__, "-1", "%-i", -1);
     result |= test(__LINE__, "1", "%-i", 1);
+#ifndef NO_WIDTH_PREC
     result |= test(__LINE__, "+1", "%+i", 1);
+#endif
     result |= test(__LINE__, "12", "%o", 10);
     /* 166: excluded for C */
     /* 167: excluded for C */
@@ -319,9 +356,13 @@
     result |= test(__LINE__, "x", "%c", 'x');
     result |= test(__LINE__, "%", "%%");
     result |= test(__LINE__, "Hallo heimur", "%+s", "Hallo heimur");
+#ifndef NO_WIDTH_PREC
     result |= test(__LINE__, "+1024", "%+d", 1024);
+#endif
     result |= test(__LINE__, "-1024", "%+d", -1024);
+#ifndef NO_WIDTH_PREC
     result |= test(__LINE__, "+1024", "%+i", 1024);
+#endif
     result |= test(__LINE__, "-1024", "%+i", -1024);
     result |= test(__LINE__, "1024", "%+u", 1024);
     result |= test(__LINE__, I("4294966272", "64512"), "%+u", 4294966272U);
@@ -333,9 +374,13 @@
     result |= test(__LINE__, I("EDCB5433", "5433"), "%+X", 3989525555U);
     result |= test(__LINE__, "x", "%+c", 'x');
     result |= test(__LINE__, "Hallo heimur", "% s", "Hallo heimur");
+#ifndef NO_WIDTH_PREC
     result |= test(__LINE__, " 1024", "% d", 1024);
+#endif
     result |= test(__LINE__, "-1024", "% d", -1024);
+#ifndef NO_WIDTH_PREC
     result |= test(__LINE__, " 1024", "% i", 1024);
+#endif
     result |= test(__LINE__, "-1024", "% i", -1024);
     result |= test(__LINE__, "1024", "% u", 1024);
     result |= test(__LINE__, I("4294966272", "64512"), "% u", 4294966272U);
@@ -347,9 +392,13 @@
     result |= test(__LINE__, I("EDCB5433", "5433"), "% X", 3989525555U);
     result |= test(__LINE__, "x", "% c", 'x');
     result |= test(__LINE__, "Hallo heimur", "%+ s", "Hallo heimur");
+#ifndef NO_WIDTH_PREC
     result |= test(__LINE__, "+1024", "%+ d", 1024);
+#endif
     result |= test(__LINE__, "-1024", "%+ d", -1024);
+#ifndef NO_WIDTH_PREC
     result |= test(__LINE__, "+1024", "%+ i", 1024);
+#endif
     result |= test(__LINE__, "-1024", "%+ i", -1024);
     result |= test(__LINE__, "1024", "%+ u", 1024);
     result |= test(__LINE__, I("4294966272", "64512"), "%+ u", 4294966272U);
@@ -364,8 +413,10 @@
     result |= test(__LINE__, I("037777777001", "0177001"), "%#o", 4294966785U);
     result |= test(__LINE__, I("0x1234abcd", "0xabcd"), "%#x", 305441741);
     result |= test(__LINE__, I("0xedcb5433", "0x5433"), "%#x", 3989525555U);
+#ifndef NO_CASE_HEX
     result |= test(__LINE__, I("0X1234ABCD", "0XABCD"), "%#X", 305441741);
     result |= test(__LINE__, I("0XEDCB5433", "0X5433"), "%#X", 3989525555U);
+#endif
 #ifdef BINARY_FORMAT
     result |= test(__LINE__, I("0b10010001101001010101111001101", "0b1010101111001101"), "%#b", 305441741);
     result |= test(__LINE__, I("0b11101101110010110101010000110011", "0b101010000110011"), "%#b", 3989525555U);
@@ -389,6 +440,7 @@
     result |= test(__LINE__, I("1234ABCD", "ABCD"), "%1X", 305441741);
     result |= test(__LINE__, I("EDCB5433", "5433"), "%1X", 3989525555U);
     result |= test(__LINE__, "x", "%1c", 'x');
+#ifndef NO_WIDTH_PREC
     result |= test(__LINE__, "               Hallo", "%20s", "Hallo");
     result |= test(__LINE__, "                1024", "%20d", 1024);
     result |= test(__LINE__, "               -1024", "%20d", -1024);
@@ -543,6 +595,7 @@
     result |= test(__LINE__, I("1234ABCD            ", "0ABCD               "), "% -+0*.*X", 20, 5, 305441741);
     result |= test(__LINE__, I("00EDCB5433          ", "0000005433          "), "% -+0*.*X", 20, 10, 3989525555U);
     result |= test(__LINE__, "hi x", "%*sx", -3, "hi");
+#endif
 #ifndef NO_FLOAT
     result |= test(__LINE__, "1.000e-38", "%.3e", 1e-38);
 #ifndef LOW_FLOAT
@@ -580,12 +633,14 @@
     // Regression test for wrong behavior with negative precision in tinystdio
     // this might fail for configurations not using tinystdio, so for a first
     // PR, only run these test for tinystdio.
+#ifndef NO_WIDTH_PREC
     result |= test(__LINE__,         "", "%.*s",  0, "123456");
     result |= test(__LINE__,     "1234", "%.*s",  4, "123456");
     result |= test(__LINE__,   "123456", "%.*s", -4, "123456");
     result |= test(__LINE__,       "42", "%.*d",  0, 42);
     result |= test(__LINE__,   "000042", "%.*d",  6, 42);
     result |= test(__LINE__,       "42", "%.*d", -6, 42);
+#endif
 #ifndef NO_FLOAT
     result |= test(__LINE__,        "0", "%.*f",  0, 0.123);
     result |= test(__LINE__,      "0.1", "%.*f",  1, 0.123);
@@ -598,7 +653,9 @@
     if (sizeof (intmax_t) <= sizeof(long))
 #endif
 #ifndef _NANO_FORMATTED_IO
+#ifndef NO_WIDTH_PREC
     result |= test(__LINE__, "  42", "%4jd", (intmax_t)42L);
+#endif
     result |= test(__LINE__, "64", "%zu", sizeof c);
     result |= test(__LINE__, "12", "%td", (c+12) - c);
 #else

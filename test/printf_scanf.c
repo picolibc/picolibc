@@ -52,7 +52,11 @@
 # define _WANT_IO_POS_ARGS
 # define printf_float(x) ((double) (x))
 #elif defined(TINY_STDIO)
-# ifdef PICOLIBC_INTEGER_PRINTF_SCANF
+# if defined(PICOLIBC_MINIMAL_PRINTF_SCANF)
+#  define NO_FLOATING_POINT
+#  define NO_POS_ARGS
+#  undef _WANT_IO_PERCENT_B
+# elif defined(PICOLIBC_INTEGER_PRINTF_SCANF)
 #  define NO_FLOATING_POINT
 #  ifndef _WANT_IO_POS_ARGS
 #   define NO_POS_ARGS
