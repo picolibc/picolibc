@@ -300,7 +300,7 @@ test_io(void)
             sprintf(buf, "%La", v);
             if (isinf(v)) {
                 if (strcmp(buf, "inf") != 0) {
-                    printf("test_io is %s should be inf\n", buf);
+                    printf("test_io i %d val %La exp %d: is %s should be inf\n", i, vals[i], e, buf);
                     result++;
                 }
             } else if (isnan(v)) {

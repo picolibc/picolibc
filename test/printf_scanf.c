@@ -199,7 +199,7 @@ main(void)
         x = y = 0;
         int r = sscanf("3 4", "%2$d %1$d", &x, &y);
         if (x != 4 || y != 3 || r != 2) {
-            printf("pos: wanted %d %d (ret %d) got %d %d (ret %d)", 4, 3, 2, x, y, r);
+            printf("pos: wanted %d %d (ret %d) got %d %d (ret %d)\n", 4, 3, 2, x, y, r);
             errors++;
             fflush(stdout);
         }
