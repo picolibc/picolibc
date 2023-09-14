@@ -26,8 +26,6 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE. */
 
-#include "xtoa_fast.h"
-
 #if PRINTF_LEVEL < PRINTF_FLT && defined(_PRINTF_SMALL_ULTOA)
 
 #ifdef __arm__
@@ -146,12 +144,10 @@ udivmod(ultoa_unsigned_t val, int base, char *dig)
 static __noinline char *
 __ultoa_invert(ultoa_unsigned_t val, char *str, int base)
 {
-	char hex = 'a' - '0' - 10;
+	char hex = ('a' - '0' - 10 + 16) - base;
 
-	if (base & XTOA_UPPER) {
-		hex = 'A' - '0' - 10;
-		base &= ~XTOA_UPPER;
-	}
+        base &= 31;
+
 	do {
 		char	v;
 

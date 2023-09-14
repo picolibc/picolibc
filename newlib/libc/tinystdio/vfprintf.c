@@ -1242,9 +1242,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                         if (sizeof(void *) > sizeof(int))
                             flags |= FL_LONG;
                     } else if (TOLOW(c) == 'x') {
-                        base = 16;
-                        if (c == 'X')
-                            base = 16 | XTOA_UPPER;
+                        base = ('x' - c) | 16;
 #ifdef _WANT_IO_PERCENT_B
                     } else if (TOLOW(c) == 'b') {
                         base = 2;
