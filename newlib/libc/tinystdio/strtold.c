@@ -39,9 +39,12 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <stdbool.h>
+
+#define STRTOLD
+
 #include "stdio_private.h"
 
-#if defined(_HAVE_LONG_DOUBLE) && !defined(_LDBL_EQ_DBL)
+#if defined(_HAVE_LONG_DOUBLE) && __SIZEOF_LONG_DOUBLE__ > __SIZEOF_DOUBLE__
 
 /**  The strtold() function converts the initial portion of the string pointed
      to by \a nptr to long double representation.
@@ -69,7 +72,6 @@
      returned and \c ERANGE is stored in \c errno.
  */
 
-#define STRTOLD
 #include "conv_flt.c"
 
 long double

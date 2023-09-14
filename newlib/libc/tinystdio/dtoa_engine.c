@@ -26,6 +26,10 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE. */
 
+#define _WANT_IO_DOUBLE
+
+typedef double FLOAT;
+
 #include "dtoa_engine.h"
 #include <math.h>
 #include "../../libm/common/math_config.h"

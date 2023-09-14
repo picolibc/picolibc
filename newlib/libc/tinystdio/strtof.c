@@ -64,9 +64,9 @@
      returned and \c ERANGE is stored in \c errno.
  */
 
-#include "stdio_private.h"
-
 #define STRTOF
+
+#include "stdio_private.h"
 
 #include "conv_flt.c"
 

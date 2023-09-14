@@ -30,7 +30,6 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "scanf_private.h"
 #include "../../libm/common/math_config.h"
 
 static const char pstr_nfinity[] = "nfinity";
@@ -43,7 +42,11 @@ static const char pstr_an[] = "an";
         if (__class == FP_INFINITE || __class == FP_SUBNORMAL || __class == FP_ZERO) \
             errno = ERANGE;                                             \
     } while (0);
-# ifdef STRTOD
+# ifdef _WANT_IO_C99_FORMATS
+#  define _NEED_IO_C99_FORMATS
+# endif
+# if defined(STRTOD)
+#  define SCANF_LEVEL           SCANF_DBL
 #  define CHECK_LONG()          1
 #  define CHECK_LONG_LONG()     0
 #  define FLOAT_MIN             __DBL_MIN__
@@ -52,7 +55,10 @@ static const char pstr_an[] = "an";
 #  define FLOAT_MIN_EXP         __DBL_MIN_EXP__
 #  define ASFLOAT(x)            _asdouble(x)
 #  define TOFLOAT(x)            ((double) (x))
+typedef double FLOAT;
+typedef uint64_t UINTFLOAT;
 # elif defined(STRTOLD)
+#  define SCANF_LEVEL           SCANF_DBL
 #  define CHECK_LONG()          0
 #  define CHECK_LONG_LONG()     1
 #  define FLOAT_MIN             __LDBL_MIN__
@@ -64,16 +70,18 @@ static const char pstr_an[] = "an";
 typedef long double FLOAT;
 typedef _u128 UINTFLOAT;
 #define UINTFLOAT_128
-# else
+# elif defined(STRTOF)
+#  define SCANF_LEVEL           SCANF_FLT
 #  define CHECK_LONG()          0
 #  define CHECK_LONG_LONG()     0
-#  define PICOLIBC_FLOAT_PRINTF_SCANF
 #  define FLOAT_MIN             __FLT_MIN__
 #  define FLOAT_MANT_DIG        __FLT_MANT_DIG__
 #  define FLOAT_MAX_EXP         __FLT_MAX_EXP__
 #  define FLOAT_MIN_EXP         __FLT_MIN_EXP__
 #  define ASFLOAT(x)            _asfloat(x)
 #  define TOFLOAT(x)            ((float) (x))
+typedef float FLOAT;
+typedef uint32_t UINTFLOAT;
 # endif
 
 #define FLT_STREAM const char
@@ -99,45 +107,52 @@ static inline void scanf_ungetc(int c, const char *s, int *lenp)
 #else
 # define CHECK_WIDTH()   (--width != 0)
 # define CHECK_RANGE(flt)
-# ifdef PICOLIBC_FLOAT_PRINTF_SCANF
-#  define CHECK_LONG()    0
+# ifdef _NEED_IO_FLOAT
+#  define CHECK_LONG()          0
 #  define CHECK_LONG_LONG()     0
 #  define FLOAT_MANT_DIG        __FLT_MANT_DIG__
 #  define FLOAT_MAX_EXP         __FLT_MAX_EXP__
 #  define FLOAT_MIN_EXP         __FLT_MIN_EXP__
 #  define ASFLOAT(x) _asfloat(x)
 #  define TOFLOAT(x) ((float) (x))
-# else
-#  if __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
-#   define CHECK_LONG()         (flags & (FL_LONG|FL_LONGLONG))
-#   define CHECK_LONG_LONG()    0
-#  else
-#   define CHECK_LONG()    (flags & FL_LONG)
-#   if defined(_WANT_IO_LONG_DOUBLE)
-#    define CHECK_LONG_LONG()     (flags & FL_LONGLONG)
-#    define FLOAT_MANT_DIG        __LDBL_MANT_DIG__
-#    define FLOAT_MAX_EXP         __LDBL_MAX_EXP__
-#    define FLOAT_MIN_EXP         __LDBL_MIN_EXP__
-#    define UINTFLOAT_128
+
+typedef float FLOAT;
+typedef uint32_t UINTFLOAT;
+
+# elif defined(_NEED_IO_DOUBLE)
+#  ifdef _NEED_IO_LONG_DOUBLE
+#   define CHECK_LONG()         (flags & FL_LONG)
+#   define CHECK_LONG_LONG()    (flags & FL_LONGLONG)
+#   define FLOAT_MANT_DIG       __LDBL_MANT_DIG__
+#   define FLOAT_MAX_EXP        __LDBL_MAX_EXP__
+#   define FLOAT_MIN_EXP        __LDBL_MIN_EXP__
+#   define UINTFLOAT_128
 
 typedef long double FLOAT;
 typedef _u128 UINTFLOAT;
 
-#    define ASFLOAT(x) aslongdouble(x)
-#    define TOFLOAT(x) _u128_to_ld(x)
-#   else
-#    define CHECK_LONG_LONG()     0
-#   endif
-#  endif
-#  if __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__ || !defined(_WANT_IO_LONG_DOUBLE)
-#   define FLOAT_MANT_DIG        __DBL_MANT_DIG__
-#   define FLOAT_MAX_EXP         __DBL_MAX_EXP__
-#   define FLOAT_MIN_EXP         __DBL_MIN_EXP__
+#   define ASFLOAT(x) aslongdouble(x)
+#   define TOFLOAT(x) _u128_to_ld(x)
+#  else
+#   define CHECK_LONG()         (flags & (FL_LONG|FL_LONGLONG))
+#   define CHECK_LONG_LONG()    0
+#   define FLOAT_MANT_DIG       __DBL_MANT_DIG__
+#   define FLOAT_MAX_EXP        __DBL_MAX_EXP__
+#   define FLOAT_MIN_EXP        __DBL_MIN_EXP__
 #   define ASFLOAT(x) _asdouble(x)
 #   define TOFLOAT(x) ((double) (x))
+
+typedef double FLOAT;
+typedef uint64_t UINTFLOAT;
+
 #  endif
+# else
+#  define CHECK_LONG()          0
+#  define CHECK_LONG_LONG()     0
 # endif
 #endif
+
+#include "scanf_private.h"
 
 #ifdef UINTFLOAT_128
 #define U32_TO_UF(x)    to_u128(x)
@@ -245,7 +260,7 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 #define uintdigitsmax_16_double 15
 #define uintdigitsmax_16_long_double    30
 
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef _NEED_IO_C99_FORMATS
         int base = 10;
 #else
 #define base 10
@@ -253,20 +268,20 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 
 #define uintdigitsmax                                                   \
         ((base) == 10 ?                                                 \
-            (CHECK_LONG() ?                                             \
-             uintdigitsmax_10_double :                                  \
-             (CHECK_LONG_LONG() ? uintdigitsmax_10_long_double :        \
+            (CHECK_LONG_LONG() ? uintdigitsmax_10_long_double :         \
+             (CHECK_LONG() ?                                            \
+              uintdigitsmax_10_double :                                 \
               uintdigitsmax_10_float)) :                                \
-            (CHECK_LONG() ?                                             \
-             uintdigitsmax_16_double :                                  \
-             (CHECK_LONG_LONG() ? uintdigitsmax_16_long_double :        \
+            (CHECK_LONG_LONG() ? uintdigitsmax_16_long_double :         \
+             (CHECK_LONG() ?                                            \
+              uintdigitsmax_16_double :                                 \
               uintdigitsmax_16_float)))
 
 	do {
 
 	    unsigned char c;
 
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef _NEED_IO_C99_FORMATS
             if ((flags & FL_FHEX) && (c = TOLOWER(i) - 'a') <= 5)
                 c += 10;
             else
@@ -292,7 +307,7 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 
 	    } else if (c == (('.'-'0') & 0xff) && !(flags & FL_DOT)) {
 		flags |= FL_DOT;
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef _NEED_IO_C99_FORMATS
             } else if (TOLOWER(i) == 'x' && (flags & FL_ANY) && UF_IS_ZERO(uint)) {
                 flags |= FL_FHEX;
                 base = 16;
@@ -305,7 +320,7 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 	if (!(flags & FL_ANY))
 	    return 0;
 
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef _NEED_IO_C99_FORMATS
         int exp_match = (flags & FL_FHEX) ? 'p' : 'e';
 #else
 #define exp_match 'e'
@@ -354,7 +369,7 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 	    } while (CHECK_WIDTH() && ISDIGIT (i = scanf_getc(stream, lenp)));
 	    if (flags & FL_MEXP)
 		expacc = -expacc;
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef _NEED_IO_C99_FORMATS
             if (flags & FL_FHEX)
                 exp *= 4;
 #endif
@@ -370,18 +385,18 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 	    break;
 	}
 
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef _NEED_IO_C99_FORMATS
         if (flags & FL_FHEX)
         {
             int sig_bits;
             int min_exp;
 
-            if (CHECK_LONG()) {
-                sig_bits = __DBL_MANT_DIG__;
-                min_exp = __DBL_MIN_EXP__ - 1;
-            } else if (CHECK_LONG_LONG()) {
+            if (CHECK_LONG_LONG()) {
                 sig_bits = __LDBL_MANT_DIG__;
                 min_exp = __LDBL_MIN_EXP__ - 1;
+            } else if (CHECK_LONG()) {
+                sig_bits = __DBL_MANT_DIG__;
+                min_exp = __DBL_MIN_EXP__ - 1;
             } else {
                 sig_bits = __FLT_MANT_DIG__;
                 min_exp = __FLT_MIN_EXP__ - 1;
@@ -472,7 +487,11 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
         else
 #endif
         {
-            if (CHECK_LONG())
+            if (CHECK_LONG_LONG())
+            {
+                flt = (FLOAT) __atold_engine(UF_TO_U128(uint), exp);
+            }
+            else if (CHECK_LONG())
             {
 		if (uintdigits + exp <= -324) {
                     // Number is less than 1e-324, which should be rounded down to 0; return +/-0.0.
@@ -483,10 +502,6 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 		} else {
                     flt = (FLOAT) __atod_engine(UF_TO_U64(uint), exp);
                 }
-            }
-            else if (CHECK_LONG_LONG())
-            {
-                flt = (FLOAT) __atold_engine(UF_TO_U128(uint), exp);
             }
             else
             {
@@ -508,10 +523,10 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
     if (flags & FL_MINUS)
 	flt = -flt;
     if (addr) {
-	if (CHECK_LONG())
-	    *((double *) addr) = (double) flt;
-	else if (CHECK_LONG_LONG())
+	if (CHECK_LONG_LONG())
             *((long double *) addr) = (long double) flt;
+	else if (CHECK_LONG())
+	    *((double *) addr) = (double) flt;
         else
 	    *((float *) addr) = (float) flt;
     }

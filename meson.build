@@ -312,6 +312,7 @@ printf_aliases = get_option('printf-aliases')
 io_percent_b = tinystdio and get_option('io-percent-b')
 io_long_double = get_option('io-long-double') or get_option('newlib-io-long-double')
 printf_small_ultoa = tinystdio and get_option('printf-small-ultoa')
+minimal_io_long_long = tinystdio and get_option('minimal-io-long-long')
 
 if printf_aliases
   double_printf_compile_args=['-DPICOLIBC_DOUBLE_PRINTF_SCANF']
@@ -584,7 +585,9 @@ if tinystdio and printf_aliases
 		' %{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfprintf=__d_vfprintf}' +
 		' %{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfscanf=__d_vfscanf}' +
 		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfprintf=__i_vfprintf}' +
-		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfscanf=__i_vfscanf}')
+		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfscanf=__i_vfscanf}' +
+		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=vfprintf=__m_vfprintf}' +
+		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=vfscanf=__m_vfscanf}')
 endif
 
 crt0_expr = '%{-crt0=*:crt0-%*%O%s; :crt0%O%s}'
@@ -1216,6 +1219,7 @@ conf_data.set('_HAVE_FORMAT_ATTRIBUTE', have_format_attribute)
 conf_data.set('_HAVE_WEAK_ATTRIBUTE', have_weak_attribute)
 conf_data.set('_WANT_REGISTER_FINI', get_option('newlib-register-fini'))
 conf_data.set('_WANT_IO_LONG_LONG', io_long_long)
+conf_data.set('_WANT_MINIMAL_IO_LONG_LONG', minimal_io_long_long)
 conf_data.set('_WANT_IO_POS_ARGS', io_pos_args)
 conf_data.set('_WANT_IO_C99_FORMATS', io_c99_formats)
 conf_data.set('_IO_FLOAT_EXACT', io_float_exact)
@@ -1283,6 +1287,20 @@ conf_data.set('_HAVE_ATTRIBUTE_GNU_INLINE',
 conf_data.set('__PICOLIBC_CRT_RUNTIME_SIZE',
 	      get_option('crt-runtime-size'),
 	      description: 'Compute static memory area sizes at runtime instead of link time')
+if tinystdio
+  conf_data.set('_FORMAT_DEFAULT_DOUBLE',
+                format_default == 'double',
+                description: 'The default printf functions is the double variant')
+  conf_data.set('_FORMAT_DEFAULT_FLOAT',
+                format_default == 'float',
+                description: 'The default printf functions is the float variant')
+  conf_data.set('_FORMAT_DEFAULT_INTEGER',
+                format_default == 'integer',
+                description: 'The default printf functions is the integer variant')
+  conf_data.set('_FORMAT_DEFAULT_MINIMAL',
+                format_default == 'minimal',
+                description: 'The default printf functions is the minimal variant')
+endif
 errno_function=get_option('errno-function')
 if errno_function == 'auto'
   errno_function = 'false'

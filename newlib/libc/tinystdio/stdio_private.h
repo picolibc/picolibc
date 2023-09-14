@@ -40,11 +40,13 @@
 #define PRINTF_MIN 1
 #define PRINTF_STD 2
 #define PRINTF_FLT 3
+#define PRINTF_DBL 4
 
 /* values for SCANF_LEVEL */
 #define SCANF_MIN 1
 #define SCANF_STD 2
 #define SCANF_FLT 3
+#define SCANF_DBL 4
 
 struct __file_str {
 	struct __file file;	/* main file struct */
