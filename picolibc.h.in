@@ -396,6 +396,8 @@
 
 #cmakedefine _WANT_IO_LONG_LONG
 
+#cmakedefine _WANT_MINIMAL_IO_LONG_LONG
+
 #cmakedefine _WANT_IO_POS_ARGS
 
 #cmakedefine FORMAT_DEFAULT_DOUBLE
