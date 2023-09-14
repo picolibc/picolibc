@@ -22,27 +22,22 @@
 # define _WANT_IO_LONG_LONG
 # define _WANT_IO_POS_ARGS
 #elif defined(TINY_STDIO)
-# ifdef _WANT_IO_PERCENT_B
+# ifdef _HAS_IO_PERCENT_B
 #  define BINARY_FORMAT
 # endif
-# ifdef PICOLIBC_FLOAT_PRINTF_SCANF
+# ifdef _HAS_IO_DOUBLE
+# elif defined(_HAS_IO_FLOAT)
 #  define LOW_FLOAT
-# endif
-# ifdef PICOLIBC_INTEGER_PRINTF_SCANF
+# else
 #  define NO_FLOAT
-#  ifndef _WANT_IO_LONG_LONG
-#   define NO_LONGLONG
-#  endif
-#  ifndef _WANT_IO_POS_ARGS
-#   define NO_POS_ARGS
-#  endif
+# endif
+# ifndef _HAS_IO_LONG_LONG
+#  define NO_LONGLONG
+# endif
+# ifndef _HAS_IO_POS_ARGS
+#  define NO_POS_ARGS
 # endif
 # ifdef PICOLIBC_MINIMAL_PRINTF_SCANF
-#  define NO_FLOAT
-#  ifndef _WANT_IO_LONG_LONG
-#   define NO_LONGLONG
-#  endif
-#  define NO_POS_ARGS
 #  define NO_WIDTH_PREC
 #  define NO_CASE_HEX
 # endif
@@ -282,7 +277,7 @@
     result |= test(__LINE__, "foo  ", "%*s", -5, "foo");
 #endif
     result |= test(__LINE__, "hello", "hello");
-#if defined(TINY_STDIO) && !defined(_WANT_IO_PERCENT_B)
+#if defined(TINY_STDIO) && !defined(_HAS_IO_PERCENT_B)
     result |= test(__LINE__, "%b", "%b");
 #endif
 #ifndef NO_WIDTH_PREC
