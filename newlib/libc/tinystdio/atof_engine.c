@@ -30,7 +30,9 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#define PICOLIBC_FLOAT_PRINTF_SCANF
+#define _WANT_IO_FLOAT
+
+typedef float FLOAT;
 
 #include "dtoa_engine.h"
 

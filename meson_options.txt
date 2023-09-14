@@ -164,6 +164,8 @@ option('printf-aliases', type: 'boolean', value: true,
        description: 'Allow link-time printf aliases')
 option('printf-small-ultoa', type: 'boolean', value: false,
        description: 'Avoid softare division in decimal conversions')
+option('minimal-io-long-long', type: 'boolean', value: false,
+       description: 'enable long long type support in minimal printf/scanf')
 
 #
 # Options applying to only legacy stdio

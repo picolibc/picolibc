@@ -347,6 +347,8 @@ static inline bool d2d_small_int(const uint64_t ieeeMantissa, const uint32_t iee
 	return true;
 }
 
+typedef double FLOAT;
+
 #include "dtoa_engine.h"
 
 int

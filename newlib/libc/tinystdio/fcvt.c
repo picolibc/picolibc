@@ -37,6 +37,9 @@
 #include <_ansi.h>
 #include <stdlib.h>
 #include <string.h>
+
+typedef double FLOAT;
+
 #include "dtoa_engine.h"
 
 #define FCVT_MAXDIG (__DBL_MAX_10_EXP__ + DTOA_MAX_DIG + 1)

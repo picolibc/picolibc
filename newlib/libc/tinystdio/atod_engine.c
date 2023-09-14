@@ -30,6 +30,10 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
+#define _WANT_IO_DOUBLE
+
+typedef double FLOAT;
+
 #include "dtoa_engine.h"
 
 #if __GNUC__ == 12 && __GNUC_MINOR__ == 2 && __GNUC_PATCHLEVEL__ == 1 && __OPTIMIZE_SIZE__

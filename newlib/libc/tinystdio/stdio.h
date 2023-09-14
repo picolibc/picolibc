@@ -339,10 +339,68 @@ __printf_float(float f)
 	return u.u;
 }
 
-#ifdef PICOLIBC_FLOAT_PRINTF_SCANF
-#define printf_float(x) __printf_float(x)
+#if !defined(PICOLIBC_DOUBLE_PRINTF_SCANF) && \
+    !defined(PICOLIBC_FLOAT_PRINTF_SCANF) && \
+    !defined(PICOLIBC_INTEGER_PRINTF_SCANF) && \
+    !defined(PICOLIBC_MIMINAL_PRINTF_SCANF)
+#if defined(_FORMAT_DEFAULT_FLOAT)
+#define PICOLIBC_FLOAT_PRINTF_SCANF
+#elif defined(_FORMAT_DEFAULT_INTEGER)
+#define PICOLIBC_INTEGER_PRINTF_SCANF
+#elif defined(_FORMAT_DEFAULT_MINIMAL)
+#define PICOLIBC_MINIMAL_PRINTF_SCANF
 #else
-#define printf_float(x) ((double) (x))
+#define PICOLIBC_DOUBLE_PRINTF_SCANF
+#endif
+#endif
+
+#ifdef PICOLIBC_FLOAT_PRINTF_SCANF
+#else
+#endif
+
+#if defined(PICOLIBC_MINIMAL_PRINTF_SCANF)
+# define printf_float(x) ((double) (x))
+# ifdef _WANT_MINIMAL_IO_LONG_LONG
+#  define _HAS_IO_LONG_LONG
+# endif
+# ifdef _WANT_IO_C99_FORMATS
+#  define _HAS_IO_C99_FORMATS
+# endif
+#elif defined(PICOLIBC_INTEGER_PRINTF_SCANF)
+# define printf_float(x) ((double) (x))
+# ifdef _WANT_IO_LONG_LONG
+#  define _HAS_IO_LONG_LONG
+# endif
+# ifdef _WANT_IO_POS_ARGS
+#  define _HAS_IO_POS_ARGS
+# endif
+# ifdef _WANT_IO_C99_FORMATS
+#  define _HAS_IO_C99_FORMATS
+# endif
+# ifdef _WANT_IO_PERCENT_B
+#  define _HAS_IO_PERCENT_B
+# endif
+#elif defined(PICOLIBC_FLOAT_PRINTF_SCANF)
+# define printf_float(x) __printf_float(x)
+# define _HAS_IO_LONG_LONG
+# define _HAS_IO_POS_ARGS
+# define _HAS_IO_C99_FORMATS
+# ifdef _WANT_IO_PERCENT_B
+#  define _HAS_IO_PERCENT_B
+# endif
+# define _HAS_IO_FLOAT
+#else
+# define printf_float(x) ((double) (x))
+# define _HAS_IO_LONG_LONG
+# define _HAS_IO_POS_ARGS
+# define _HAS_IO_C99_FORMATS
+# define _HAS_IO_DOUBLE
+# ifdef _WANT_IO_PERCENT_B
+#  define _HAS_IO_PERCENT_B
+# endif
+# ifdef _WANT_IO_LONG_DOUBLE
+#  define _HAS_IO_LONG_DOUBLE
+# endif
 #endif
 
 #endif /* _STDIO_H_ */

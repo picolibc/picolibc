@@ -65,9 +65,9 @@
      returned and \c ERANGE is stored in \c errno.
  */
 
-#include "stdio_private.h"
-
 #define STRTOD
+
+#include "stdio_private.h"
 
 #include "conv_flt.c"
 
@@ -91,7 +91,7 @@ strtod (const char * nptr, char ** endptr)
     return flt;
 }
 
-#if defined(_HAVE_LONG_DOUBLE) && defined(_LDBL_EQ_DBL)
+#if defined(_HAVE_LONG_DOUBLE) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
 #ifdef _HAVE_ALIAS_ATTRIBUTE
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"

@@ -30,6 +30,7 @@
 
 */
 
+#define PICOLIBC_INTEGER_PRINTF_SCANF
 #define PRINTF_LEVEL PRINTF_STD
 #ifndef FORMAT_DEFAULT_INTEGER
 #define vfprintf __i_vfprintf

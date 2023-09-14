@@ -37,6 +37,9 @@
 #include <_ansi.h>
 #include <stdlib.h>
 #include <string.h>
+
+typedef double FLOAT;
+
 #include "dtoa_engine.h"
 
 static NEWLIB_THREAD_LOCAL char ecvt_buf[DTOA_MAX_DIG + 1];
