@@ -52,10 +52,8 @@ Supporting OS subroutines required (only if enabled): <<close>>, <<fstat>>,
 #include <stdio.h>
 
 void
-__assert (const char *failedexpr,
-	const char *file,
-	int line)
+__assert_no_args  (void)
 {
-   __assert_func (file, line, NULL, failedexpr);
-  /* NOTREACHED */
+    fprintf(stderr, "assertion failed\n");
+    abort();
 }
