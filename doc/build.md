@@ -58,6 +58,7 @@ types and formats.
 | io-c99-formats              | true    | Enable C99 support in IO functions like printf/scanf                                 |
 | io-long-long                | false   | Enable long long type support in IO functions like printf/scanf. For tiny-stdio, this only affects the integer-only versions, the full version always includes long long support. |
 | io-pos-args                 | false   | Enable printf-family positional arg support. For tiny-stdio, this only affects the integer-only versions, the full version always includes positional argument support. |
+| io-long-double              | false   | Enable long double support in printf/scanf.                                          |
 
 
 `long long` support is always enabled for the tinystdio full
@@ -85,6 +86,11 @@ definitions which use the same POSIX I/O functions.
 | posix-io                    | true    | Provide fopen/fdopen using POSIX I/O (requires open, close, read, write, lseek)      |
 | posix-console               | false   | Use POSIX I/O for stdin/stdout/stderr                                                |
 | format-default              | double  | Sets the default printf/scanf style ('double', 'float' or 'integer')                 |
+| printf-aliases              | true    | Support link-time printf aliases to set the default printf/scanf variant             |
+| io-percent-b                | false   | Support the %b as proposed in the upcoming C standard                                |
+| printf-small-ultoa          | false   | Avoid soft division routine during integer binary to decimal conversion in printf    |
+| minimal-io-long-long        | false   | Support long long integers in the minimal printf and scanf variants                  |
+
 
 ### Options when using legacy stdio bits
 

@@ -140,8 +140,6 @@ option('io-pos-args', type: 'boolean', value: false,
        description: 'enable printf-family positional arg support (always enabled for tinystdio float)')
 option('newlib-io-pos-args', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
        description: 'enable printf-family positional arg support (always enabled for tinystdio float)')
-option('io-percent-b', type: 'boolean', value: false,
-       description: 'enable proposed %b/%B format in printf and scanf in tinystdio (default: false)')
 option('io-long-double', type: 'boolean', value: false,
        description: 'enable long double type support in IO functions printf/scanf')
 option('newlib-io-long-double', type: 'boolean', value: false,
@@ -162,6 +160,8 @@ option('format-default', type: 'combo', choices: ['double', 'float', 'integer', 
        description: 'which printf/scanf versions should be the default')
 option('printf-aliases', type: 'boolean', value: true,
        description: 'Allow link-time printf aliases')
+option('io-percent-b', type: 'boolean', value: false,
+       description: 'enable proposed %b/%B format in printf and scanf in tinystdio (default: false)')
 option('printf-small-ultoa', type: 'boolean', value: false,
        description: 'Avoid softare division in decimal conversions')
 option('minimal-io-long-long', type: 'boolean', value: false,
