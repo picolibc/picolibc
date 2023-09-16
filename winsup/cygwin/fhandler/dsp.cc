@@ -1430,6 +1430,8 @@ fhandler_dev_dsp::_ioctl (unsigned int cmd, void *buf)
 	int *p = (int *) buf;
 	fragstotal_ = min (*p >> 16, MAX_BLOCKS);
 	fragsize_ = 1 << (*p & 0xffff);
+	while (fragsize_ * fragstotal_ < 16384)
+	  fragsize_ *= 2;
 	fragment_has_been_set = true;
 	return 0;
       }
