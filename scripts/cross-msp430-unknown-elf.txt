@@ -26,10 +26,10 @@ default_ram_addr    = '0x00001c00'
 default_ram_size    = '0x00004000'
 default_stack_size  = '0x00000400'
 additional_sections = ['init', 'vector']
-default_init_addr = '0x00005c00'
-default_init_size = '0x0000a3c0'
+default_init_addr = 'DEFINED(__init) ? __init : 0x00005c00'
+default_init_size = 'DEFINED(__init_size) ? __init_size : 0x0000a3c0'
 default_init_contents = ['KEEP (*(.text.init.enter))', 'KEEP (*(.data.init.enter))', 'KEEP (*(SORT_BY_NAME(.init) SORT_BY_NAME(.init.*)))']
 
-default_vector_addr = '0x0000ffc0'
-default_vector_size = '0x00000040'
+default_vector_addr = 'DEFINED(__vector) ? __vector : 0x0000ffc0'
+default_vector_size = 'DEFINED(__vector_size) ? __vector_size : 0x00000040'
 default_vector_contents = ['KEEP (*(.rodata.vector*))']
