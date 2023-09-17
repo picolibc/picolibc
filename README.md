@@ -1,5 +1,5 @@
 # Picolibc
-Copyright © 2018-2022 Keith Packard
+Copyright © 2018-2023 Keith Packard
 
 Picolibc is library offering standard C library APIs that targets
 small embedded systems with limited RAM. Picolibc was formed by blending
@@ -42,6 +42,7 @@ is used to validate the code for all patch integration:
  * i386 (Native and Linux hosted, for testing)
  * Motorola 68000 (m68k)
  * MIPS
+ * MSP430
  * Nios II
  * Power9
  * RISC-V (both 32- and 64- bit)
@@ -51,7 +52,6 @@ There is also build infrastructure and continuous build validation,
 but no integrated testing available for additional architectures:
 
  * Microblaze (32-bit, big and little endian)
- * MSP430
  * PowerPC (big and little endian)
  * Sparc64
  * Xtensa (ESP8266, ESP32)
