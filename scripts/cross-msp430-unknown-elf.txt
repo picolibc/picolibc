@@ -18,7 +18,7 @@ endian = 'little'
 
 [properties]
 skip_sanity_check = true
-additional_libs = ['-lmul_none']
+libgcc = ['-lmul_none', '-lgcc']
 default_alignment = 2
 default_flash_addr  = '0x00010000'
 default_flash_size  = '0x000e0000'

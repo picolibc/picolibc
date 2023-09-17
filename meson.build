@@ -565,12 +565,21 @@ endif
 # Let targets add more support libraries 
 additional_libs_list = meson.get_cross_property('additional_libs', [])
 
-if cc.get_id() == 'ccomp'
+compiler_id = cc.get_id()
+if compiler_id == 'ccomp'
   # When passing the specs file to CompCert, the libcompcert needs to be included there as well
   additional_libs_list += '-lcompcert'
 endif
 
 additional_libs = ' '.join(additional_libs_list)
+
+if compiler_id == 'gcc' and target_machine.cpu_family() == 'msp430'
+  # Extract -mhwmult-selection-snippet from GCC.
+  dumped_specs = run_command(cc.cmd_array() + '-dumpspecs').stdout()
+  hwmult_start = dumped_specs.split('%{mhwmult=auto')[1]
+  hwmult_snippet = '%{mhwmult=auto' + hwmult_start.split('-lc')[0]
+  additional_libs += hwmult_snippet
+endif
 
 specs_extra = ''
 specs_extra_list = meson.get_cross_property('specs_extra', [])
