@@ -60,7 +60,7 @@ void
 _set_tls(void *tls)
 {
 #ifdef ARM_TLS_CP15
-	__asm__("mcr 15, 0, %0, cr13, cr0, 3" : : "r" (tls - TP_OFFSET));
+	__asm__("mcr p15, 0, %0, cr13, cr0, 3" : : "r" (tls - TP_OFFSET));
 #else
 	__tls = (uint8_t *) tls - TP_OFFSET;
 #endif
