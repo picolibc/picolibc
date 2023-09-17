@@ -2681,7 +2681,6 @@ Files: .clang-format
  .editorconfig
  .gitattributes
  .github/Dockerfile
- .github/debian-packages.txt
  .github/do-build
  .github/do-cmake-test
  .github/do-linux
