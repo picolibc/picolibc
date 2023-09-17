@@ -2682,7 +2682,6 @@ Files: .clang-format
  .gitattributes
  .github/Dockerfile
  .github/Dockerfile-zephyr
- .github/debian-packages.txt
  .github/do-build
  .github/do-cmake-test
  .github/do-linux
