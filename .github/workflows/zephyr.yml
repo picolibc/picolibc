@@ -19,11 +19,11 @@ env:
   # is the largest cache, 429.5M (September 2023).
   CCACHE_SIZE: "450M"
   CCACHE_CMD: ccache
-  DOCKERFILE: picolibc/.github/Dockerfile-zephyr
-  IMAGE_FILE: dockerimg-zephyr.tar.zst
+  DOCKERFILE: picolibc/.github/Dockerfile
+  IMAGE_FILE: dockerimg.tar.zst
   IMAGE: picolibc
-  PACKAGES_FILE: picolibc/.github/zephyr-packages.txt
-  EXTRA_FILE: picolibc/.github/zephyr-files.txt
+  PACKAGES_FILE: picolibc/.github/linux-packages.txt
+  EXTRA_FILE: picolibc/.github/linux-files.txt
 
 jobs:
   cache-maker:
@@ -51,7 +51,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           platforms: linux/amd64
-          file: .github/Dockerfile-zephyr
+          file: .github/Dockerfile
           tags: ${{ env.IMAGE }}:latest
           outputs: type=docker,force-compression=true,compression=zstd,compression-level=22,dest=${{ env.IMAGE_FILE }}
 
@@ -65,7 +65,7 @@ jobs:
 
           # Tinystdio and math configurations, one with multithread disabled and with locale, original malloc and atexit/onexit code
           "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false -Dprintf-small-ultoa=true",
-          "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false -Dnewlib-obsolete-math=true -Dwant-math-errno=true",
+          "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false -Dnewlib-obsolete-math=true -Dwant-math-errno=true -Dassert-verbose=false",
 
           # Original stdio, one with multithread disabled
           "-Dtinystdio=false",
@@ -125,7 +125,7 @@ jobs:
 
           # Tinystdio and math configurations, one with multithread disabled and with locale, original malloc and atexit/onexit code
           "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false -Dprintf-small-ultoa=true",
-          "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false -Dnewlib-obsolete-math=true -Dwant-math-errno=true",
+          "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false -Dnewlib-obsolete-math=true -Dwant-math-errno=true -Dassert-verbose=false",
 
           # Original stdio, one with multithread disabled
           "-Dtinystdio=false",
