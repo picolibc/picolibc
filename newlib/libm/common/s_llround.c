@@ -11,6 +11,7 @@
  */
 
 #include "fdlibm.h"
+#include <limits.h>
 
 #ifdef _NEED_FLOAT64
 
@@ -59,7 +60,7 @@ llround64(__float64 x)
 	/* 64bit longlong: shift amt in [32,42] */
         result = ((long long int) msw << (exponent_less_1023 - 20))
 		    /* 64bit longlong: shift amt in [0,10] */
-                    | (lsw << (exponent_less_1023 - 52));
+                    | ((long long int) lsw << (exponent_less_1023 - 52));
       else
         {
 	  /* 64bit longlong: exponent_less_1023 in [20,51] */
@@ -75,8 +76,17 @@ llround64(__float64 x)
         }
     }
   else
-    /* Result is too large to be represented by a long long int. */
-    return (long long int)x;
+    {
+      /* Result is too large to be represented by a long long int. */
+      if (sign == 1 ||
+          !((sizeof(long long) == 4 && x > LLONG_MIN - 0.5) ||
+            (sizeof(long long) > 4 && x >= LLONG_MIN)))
+        {
+          __math_set_invalid();
+          return sign == 1 ? LLONG_MAX : LLONG_MIN;
+        }
+      return (long long)x;
+    }
 
   return sign * result;
 }
