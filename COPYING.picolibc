@@ -2681,8 +2681,6 @@ Files: .clang-format
  .editorconfig
  .gitattributes
  .github/Dockerfile
- .github/Dockerfile-zephyr
- .github/debian-packages.txt
  .github/do-build
  .github/do-cmake-test
  .github/do-linux
@@ -2701,7 +2699,6 @@ Files: .clang-format
  .github/workflows/variants
  .github/workflows/zephyr.yml
  .github/zephyr
- .github/zephyr-files.txt
  .gitignore
  README.md
  cmake/TC-clang-thumbv6m.cmake
