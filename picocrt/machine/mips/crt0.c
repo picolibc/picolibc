@@ -43,11 +43,12 @@ _cstart(void)
 
 extern char __stack[];
 
-#if __mips == 32
+#if _MIPS_SZLONG == 32
 #define LA  "la"
-#endif
-#if __mips ==64
+#elif _MIPS_SZLONG == 64
 #define LA  "dla"
+#else
+#error unknown mips target
 #endif
 
 void __section(".init") __attribute__((used))
