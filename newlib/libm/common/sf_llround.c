@@ -11,6 +11,7 @@
  */
 
 #include "fdlibm.h"
+#include <limits.h>
 
 long long int
 llroundf(float x)
@@ -39,7 +40,14 @@ llroundf(float x)
         }
     }
   else
-      return (long long int) x;
+    {
+      /* Result other than LONG_MIN is too large to be represented by
+       * a long int.
+       */
+      if (x != (float) LLONG_MIN)
+          __math_set_invalidf();
+      return sign == 1 ? LLONG_MAX : LLONG_MIN;
+    }
 
   return sign * result;
 }
