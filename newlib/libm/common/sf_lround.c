@@ -10,6 +10,7 @@
  */
 
 #include "fdlibm.h"
+#include <limits.h>
 
 long int lroundf(float x)
 {
@@ -24,7 +25,7 @@ long int lroundf(float x)
   w &= 0x7fffff;
   w |= 0x800000;
 
-  if (exponent_less_127 < (int)((8 * sizeof (long int)) - 1))
+  if (exponent_less_127 < (__int32_t)((8 * sizeof (long int)) - 1))
     {
       if (exponent_less_127 < 0)
         return exponent_less_127 < -1 ? 0 : sign;
@@ -37,7 +38,14 @@ long int lroundf(float x)
         }
     }
   else
-      return (long int) x;
+    {
+      /* Result other than LONG_MIN is too large to be represented by
+       * a long int.
+       */
+      if (x != (float) LONG_MIN)
+          __math_set_invalidf();
+      return sign == 1 ? LONG_MAX : LONG_MIN;
+    }
 
   return sign * result;
 }
