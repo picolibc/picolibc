@@ -406,6 +406,17 @@ long long makemathname(test_lrint_long_min_mask)(void) { return makemathname(lri
 long long makemathname(test_lrint_long_max_one)(void) { return makemathname(lrint)(makemathname(long_max_one)); }
 long long makemathname(test_lrint_long_min_one)(void) { return makemathname(lrint)(makemathname(long_min_one)); }
 
+long long makemathname(test_llrint_qnan)(void) { makemathname(llrint)(makemathname(qnanval)); return 0; }
+long long makemathname(test_llrint_snan)(void) { makemathname(llrint)(makemathname(snanval)); return 0; }
+long long makemathname(test_llrint_inf)(void) { makemathname(llrint)(makemathname(infval)); return 0; }
+long long makemathname(test_llrint_neginf)(void) { makemathname(llrint)(-makemathname(infval)); return 0; }
+long long makemathname(test_llrint_big)(void) { makemathname(llrint)(makemathname(big)); return 0; }
+long long makemathname(test_llrint_negbig)(void) { makemathname(llrint)(-makemathname(big)); return 0; }
+long long makemathname(test_llrint_long_long_max_mask)(void) { return makemathname(llrint)(makemathname(long_long_max_mask)); }
+long long makemathname(test_llrint_long_long_min_mask)(void) { return makemathname(llrint)(makemathname(long_long_min_mask)); }
+long long makemathname(test_llrint_long_long_max_one)(void) { return makemathname(llrint)(makemathname(long_long_max_one)); }
+long long makemathname(test_llrint_long_long_min_one)(void) { return makemathname(llrint)(makemathname(long_long_min_one)); }
+
 long long makemathname(test_lround_qnan)(void) { makemathname(lround)(makemathname(qnanval)); return 0; }
 long long makemathname(test_lround_snan)(void) { makemathname(lround)(makemathname(snanval)); return 0; }
 long long makemathname(test_lround_inf)(void) { makemathname(lround)(makemathname(infval)); return 0; }
@@ -1400,6 +1411,16 @@ static const struct {
         TEST(lrint_long_min_mask, FLOAT_LONG_MIN, 0, 0),
         TEST(lrint_long_max_one, LROUND_LONG_MAX, FE_INVALID, 0),
         TEST(lrint_long_min_one, LONG_MIN, FE_INVALID, 0),
+
+        TEST(llrint_qnan, 0, FE_INVALID, 0),
+        TEST(llrint_inf, 0, FE_INVALID, 0),
+        TEST(llrint_neginf, 0, FE_INVALID, 0),
+        TEST(llrint_big, 0, FE_INVALID, 0),
+        TEST(llrint_negbig, 0, FE_INVALID, 0),
+        TEST(llrint_long_long_max_mask, FLOAT_LONG_LONG_MAX, 0, 0),
+        TEST(llrint_long_long_min_mask, FLOAT_LONG_LONG_MIN, 0, 0),
+        TEST(llrint_long_long_max_one, LROUND_LLONG_MAX, FE_INVALID, 0),
+        TEST(llrint_long_long_min_one, LLONG_MIN, FE_INVALID, 0),
 
         TEST(lround_qnan, 0, FE_INVALID, 0),
         TEST(lround_inf, 0, FE_INVALID, 0),
