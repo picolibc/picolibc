@@ -186,7 +186,7 @@ check_PROGRAMS = $(am__EXEEXT_2) $(am__EXEEXT_3)
 @CONFIG_RISCV_TRUE@	riscv/semihost.specs \
 @CONFIG_RISCV_TRUE@	riscv/crt0.o
 
-@CONFIG_RISCV_TRUE@am__append_35 = riscv/libgloss.a \
+@CONFIG_RISCV_TRUE@am__append_35 = riscv/libgloss.a riscv/libsim.a \
 @CONFIG_RISCV_TRUE@	riscv/libsemihost.a
 @CONFIG_WINCE_TRUE@am__append_36 = $(gdbdir)
 @CONFIG_WINCE_TRUE@am__append_37 = wince/stub.exe
@@ -542,15 +542,52 @@ riscv_libsemihost_a_LIBADD =
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsemihost_a-semihost-sys_unlink.$(OBJEXT) \
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsemihost_a-semihost-sys_write.$(OBJEXT)
 riscv_libsemihost_a_OBJECTS = $(am_riscv_libsemihost_a_OBJECTS)
+riscv_libsim_a_AR = $(AR) $(ARFLAGS)
+riscv_libsim_a_LIBADD =
+@CONFIG_RISCV_TRUE@am__objects_7 =  \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_access.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_chdir.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_chmod.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_chown.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_close.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_conv_stat.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_execve.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_exit.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_faccessat.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_fork.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_fstat.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_fstatat.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_ftime.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_getcwd.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_getpid.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_gettimeofday.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_isatty.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_kill.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_link.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_lseek.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_lstat.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_open.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_openat.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_read.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_sbrk.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_stat.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_sysconf.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_times.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_unlink.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_utime.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_wait.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_write.$(OBJEXT)
+@CONFIG_RISCV_TRUE@am_riscv_libsim_a_OBJECTS = $(am__objects_7)
+riscv_libsim_a_OBJECTS = $(am_riscv_libsim_a_OBJECTS)
 xtensa_libgloss_a_AR = $(AR) $(ARFLAGS)
 xtensa_libgloss_a_LIBADD =
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__objects_7 = xtensa/boards/esp32/xtensa_libgloss_a-board.$(OBJEXT)
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__objects_8 = xtensa/boards/esp32s3/xtensa_libgloss_a-board.$(OBJEXT)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__objects_8 = xtensa/boards/esp32/xtensa_libgloss_a-board.$(OBJEXT)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__objects_9 = xtensa/boards/esp32s3/xtensa_libgloss_a-board.$(OBJEXT)
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am_xtensa_libgloss_a_OBJECTS = xtensa/xtensa_libgloss_a-sleep.$(OBJEXT) \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/xtensa_libgloss_a-syscalls.$(OBJEXT) \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/xtensa_libgloss_a-window-vectors.$(OBJEXT) \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__objects_7) \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__objects_8)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__objects_8) \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__objects_9)
 xtensa_libgloss_a_OBJECTS = $(am_xtensa_libgloss_a_OBJECTS)
 xtensa_libsys_openocd_a_AR = $(AR) $(ARFLAGS)
 xtensa_libsys_openocd_a_LIBADD =
@@ -623,7 +660,8 @@ SOURCES = $(aarch64_librdimon_a_SOURCES) $(arc_libnsim_a_SOURCES) \
 	$(iq2000_libeval_a_SOURCES) $(libnosys_libnosys_a_SOURCES) \
 	$(libobjs_a_SOURCES) $(lm32_libgloss_a_SOURCES) \
 	$(nios2_libnios2_a_SOURCES) $(riscv_libgloss_a_SOURCES) \
-	$(riscv_libsemihost_a_SOURCES) $(xtensa_libgloss_a_SOURCES) \
+	$(riscv_libsemihost_a_SOURCES) $(riscv_libsim_a_SOURCES) \
+	$(xtensa_libgloss_a_SOURCES) \
 	$(xtensa_libsys_openocd_a_SOURCES) \
 	$(xtensa_libsys_qemu_a_SOURCES) bfin/sim-test.c iq2000/test.c \
 	$(wince_stub_exe_SOURCES)
@@ -1113,6 +1151,8 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 @CONFIG_RISCV_TRUE@	riscv/sys_wait.c \
 @CONFIG_RISCV_TRUE@	riscv/sys_write.c
 
+@CONFIG_RISCV_TRUE@riscv_libsim_a_CPPFLAGS = $(riscv_libgloss_a_CPPFLAGS) -DUSING_SIM_SPECS
+@CONFIG_RISCV_TRUE@riscv_libsim_a_SOURCES = $(riscv_libgloss_a_SOURCES)
 @CONFIG_RISCV_TRUE@riscv_libsemihost_a_CPPFLAGS = -I$(srcdir)/riscv
 @CONFIG_RISCV_TRUE@riscv_libsemihost_a_SOURCES = \
 @CONFIG_RISCV_TRUE@	riscv/nanosleep.c \
@@ -1856,6 +1896,75 @@ riscv/libsemihost.a: $(riscv_libsemihost_a_OBJECTS) $(riscv_libsemihost_a_DEPEND
 	$(AM_V_at)-rm -f riscv/libsemihost.a
 	$(AM_V_AR)$(riscv_libsemihost_a_AR) riscv/libsemihost.a $(riscv_libsemihost_a_OBJECTS) $(riscv_libsemihost_a_LIBADD)
 	$(AM_V_at)$(RANLIB) riscv/libsemihost.a
+riscv/riscv_libsim_a-sys_access.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_chdir.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_chmod.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_chown.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_close.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_conv_stat.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_execve.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_exit.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_faccessat.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_fork.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_fstat.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_fstatat.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_ftime.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_getcwd.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_getpid.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_gettimeofday.$(OBJEXT):  \
+	riscv/$(am__dirstamp) riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_isatty.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_kill.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_link.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_lseek.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_lstat.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_open.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_openat.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_read.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_sbrk.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_stat.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_sysconf.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_times.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_unlink.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_utime.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_wait.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsim_a-sys_write.$(OBJEXT): riscv/$(am__dirstamp) \
+	riscv/$(DEPDIR)/$(am__dirstamp)
+
+riscv/libsim.a: $(riscv_libsim_a_OBJECTS) $(riscv_libsim_a_DEPENDENCIES) $(EXTRA_riscv_libsim_a_DEPENDENCIES) riscv/$(am__dirstamp)
+	$(AM_V_at)-rm -f riscv/libsim.a
+	$(AM_V_AR)$(riscv_libsim_a_AR) riscv/libsim.a $(riscv_libsim_a_OBJECTS) $(riscv_libsim_a_LIBADD)
+	$(AM_V_at)$(RANLIB) riscv/libsim.a
 xtensa/$(am__dirstamp):
 	@$(MKDIR_P) xtensa
 	@: > xtensa/$(am__dirstamp)
@@ -2190,6 +2299,38 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsemihost_a-sys_kill.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsemihost_a-sys_utime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsemihost_a-sys_wait.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_access.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_chdir.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_chmod.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_chown.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_close.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_conv_stat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_execve.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_exit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_faccessat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_fork.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_fstat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_fstatat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_ftime.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_getcwd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_getpid.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_gettimeofday.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_isatty.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_kill.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_link.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_lseek.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_lstat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_open.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_openat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_read.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_sbrk.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_stat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_sysconf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_times.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_unlink.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_utime.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_wait.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsim_a-sys_write.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@xtensa/$(DEPDIR)/xtensa_libgloss_a-sleep.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@xtensa/$(DEPDIR)/xtensa_libgloss_a-syscalls.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@xtensa/$(DEPDIR)/xtensa_libgloss_a-window-vectors.Po@am__quote@
@@ -3981,6 +4122,454 @@ riscv/riscv_libsemihost_a-semihost-sys_write.obj: riscv/semihost-sys_write.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/semihost-sys_write.c' object='riscv/riscv_libsemihost_a-semihost-sys_write.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsemihost_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsemihost_a-semihost-sys_write.obj `if test -f 'riscv/semihost-sys_write.c'; then $(CYGPATH_W) 'riscv/semihost-sys_write.c'; else $(CYGPATH_W) '$(srcdir)/riscv/semihost-sys_write.c'; fi`
+
+riscv/riscv_libsim_a-sys_access.o: riscv/sys_access.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_access.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_access.Tpo -c -o riscv/riscv_libsim_a-sys_access.o `test -f 'riscv/sys_access.c' || echo '$(srcdir)/'`riscv/sys_access.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_access.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_access.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_access.c' object='riscv/riscv_libsim_a-sys_access.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_access.o `test -f 'riscv/sys_access.c' || echo '$(srcdir)/'`riscv/sys_access.c
+
+riscv/riscv_libsim_a-sys_access.obj: riscv/sys_access.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_access.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_access.Tpo -c -o riscv/riscv_libsim_a-sys_access.obj `if test -f 'riscv/sys_access.c'; then $(CYGPATH_W) 'riscv/sys_access.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_access.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_access.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_access.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_access.c' object='riscv/riscv_libsim_a-sys_access.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_access.obj `if test -f 'riscv/sys_access.c'; then $(CYGPATH_W) 'riscv/sys_access.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_access.c'; fi`
+
+riscv/riscv_libsim_a-sys_chdir.o: riscv/sys_chdir.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_chdir.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_chdir.Tpo -c -o riscv/riscv_libsim_a-sys_chdir.o `test -f 'riscv/sys_chdir.c' || echo '$(srcdir)/'`riscv/sys_chdir.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_chdir.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_chdir.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_chdir.c' object='riscv/riscv_libsim_a-sys_chdir.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_chdir.o `test -f 'riscv/sys_chdir.c' || echo '$(srcdir)/'`riscv/sys_chdir.c
+
+riscv/riscv_libsim_a-sys_chdir.obj: riscv/sys_chdir.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_chdir.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_chdir.Tpo -c -o riscv/riscv_libsim_a-sys_chdir.obj `if test -f 'riscv/sys_chdir.c'; then $(CYGPATH_W) 'riscv/sys_chdir.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_chdir.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_chdir.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_chdir.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_chdir.c' object='riscv/riscv_libsim_a-sys_chdir.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_chdir.obj `if test -f 'riscv/sys_chdir.c'; then $(CYGPATH_W) 'riscv/sys_chdir.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_chdir.c'; fi`
+
+riscv/riscv_libsim_a-sys_chmod.o: riscv/sys_chmod.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_chmod.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_chmod.Tpo -c -o riscv/riscv_libsim_a-sys_chmod.o `test -f 'riscv/sys_chmod.c' || echo '$(srcdir)/'`riscv/sys_chmod.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_chmod.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_chmod.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_chmod.c' object='riscv/riscv_libsim_a-sys_chmod.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_chmod.o `test -f 'riscv/sys_chmod.c' || echo '$(srcdir)/'`riscv/sys_chmod.c
+
+riscv/riscv_libsim_a-sys_chmod.obj: riscv/sys_chmod.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_chmod.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_chmod.Tpo -c -o riscv/riscv_libsim_a-sys_chmod.obj `if test -f 'riscv/sys_chmod.c'; then $(CYGPATH_W) 'riscv/sys_chmod.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_chmod.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_chmod.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_chmod.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_chmod.c' object='riscv/riscv_libsim_a-sys_chmod.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_chmod.obj `if test -f 'riscv/sys_chmod.c'; then $(CYGPATH_W) 'riscv/sys_chmod.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_chmod.c'; fi`
+
+riscv/riscv_libsim_a-sys_chown.o: riscv/sys_chown.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_chown.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_chown.Tpo -c -o riscv/riscv_libsim_a-sys_chown.o `test -f 'riscv/sys_chown.c' || echo '$(srcdir)/'`riscv/sys_chown.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_chown.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_chown.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_chown.c' object='riscv/riscv_libsim_a-sys_chown.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_chown.o `test -f 'riscv/sys_chown.c' || echo '$(srcdir)/'`riscv/sys_chown.c
+
+riscv/riscv_libsim_a-sys_chown.obj: riscv/sys_chown.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_chown.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_chown.Tpo -c -o riscv/riscv_libsim_a-sys_chown.obj `if test -f 'riscv/sys_chown.c'; then $(CYGPATH_W) 'riscv/sys_chown.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_chown.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_chown.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_chown.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_chown.c' object='riscv/riscv_libsim_a-sys_chown.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_chown.obj `if test -f 'riscv/sys_chown.c'; then $(CYGPATH_W) 'riscv/sys_chown.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_chown.c'; fi`
+
+riscv/riscv_libsim_a-sys_close.o: riscv/sys_close.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_close.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_close.Tpo -c -o riscv/riscv_libsim_a-sys_close.o `test -f 'riscv/sys_close.c' || echo '$(srcdir)/'`riscv/sys_close.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_close.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_close.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_close.c' object='riscv/riscv_libsim_a-sys_close.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_close.o `test -f 'riscv/sys_close.c' || echo '$(srcdir)/'`riscv/sys_close.c
+
+riscv/riscv_libsim_a-sys_close.obj: riscv/sys_close.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_close.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_close.Tpo -c -o riscv/riscv_libsim_a-sys_close.obj `if test -f 'riscv/sys_close.c'; then $(CYGPATH_W) 'riscv/sys_close.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_close.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_close.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_close.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_close.c' object='riscv/riscv_libsim_a-sys_close.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_close.obj `if test -f 'riscv/sys_close.c'; then $(CYGPATH_W) 'riscv/sys_close.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_close.c'; fi`
+
+riscv/riscv_libsim_a-sys_conv_stat.o: riscv/sys_conv_stat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_conv_stat.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_conv_stat.Tpo -c -o riscv/riscv_libsim_a-sys_conv_stat.o `test -f 'riscv/sys_conv_stat.c' || echo '$(srcdir)/'`riscv/sys_conv_stat.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_conv_stat.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_conv_stat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_conv_stat.c' object='riscv/riscv_libsim_a-sys_conv_stat.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_conv_stat.o `test -f 'riscv/sys_conv_stat.c' || echo '$(srcdir)/'`riscv/sys_conv_stat.c
+
+riscv/riscv_libsim_a-sys_conv_stat.obj: riscv/sys_conv_stat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_conv_stat.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_conv_stat.Tpo -c -o riscv/riscv_libsim_a-sys_conv_stat.obj `if test -f 'riscv/sys_conv_stat.c'; then $(CYGPATH_W) 'riscv/sys_conv_stat.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_conv_stat.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_conv_stat.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_conv_stat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_conv_stat.c' object='riscv/riscv_libsim_a-sys_conv_stat.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_conv_stat.obj `if test -f 'riscv/sys_conv_stat.c'; then $(CYGPATH_W) 'riscv/sys_conv_stat.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_conv_stat.c'; fi`
+
+riscv/riscv_libsim_a-sys_execve.o: riscv/sys_execve.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_execve.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_execve.Tpo -c -o riscv/riscv_libsim_a-sys_execve.o `test -f 'riscv/sys_execve.c' || echo '$(srcdir)/'`riscv/sys_execve.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_execve.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_execve.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_execve.c' object='riscv/riscv_libsim_a-sys_execve.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_execve.o `test -f 'riscv/sys_execve.c' || echo '$(srcdir)/'`riscv/sys_execve.c
+
+riscv/riscv_libsim_a-sys_execve.obj: riscv/sys_execve.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_execve.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_execve.Tpo -c -o riscv/riscv_libsim_a-sys_execve.obj `if test -f 'riscv/sys_execve.c'; then $(CYGPATH_W) 'riscv/sys_execve.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_execve.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_execve.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_execve.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_execve.c' object='riscv/riscv_libsim_a-sys_execve.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_execve.obj `if test -f 'riscv/sys_execve.c'; then $(CYGPATH_W) 'riscv/sys_execve.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_execve.c'; fi`
+
+riscv/riscv_libsim_a-sys_exit.o: riscv/sys_exit.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_exit.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_exit.Tpo -c -o riscv/riscv_libsim_a-sys_exit.o `test -f 'riscv/sys_exit.c' || echo '$(srcdir)/'`riscv/sys_exit.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_exit.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_exit.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_exit.c' object='riscv/riscv_libsim_a-sys_exit.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_exit.o `test -f 'riscv/sys_exit.c' || echo '$(srcdir)/'`riscv/sys_exit.c
+
+riscv/riscv_libsim_a-sys_exit.obj: riscv/sys_exit.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_exit.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_exit.Tpo -c -o riscv/riscv_libsim_a-sys_exit.obj `if test -f 'riscv/sys_exit.c'; then $(CYGPATH_W) 'riscv/sys_exit.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_exit.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_exit.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_exit.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_exit.c' object='riscv/riscv_libsim_a-sys_exit.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_exit.obj `if test -f 'riscv/sys_exit.c'; then $(CYGPATH_W) 'riscv/sys_exit.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_exit.c'; fi`
+
+riscv/riscv_libsim_a-sys_faccessat.o: riscv/sys_faccessat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_faccessat.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_faccessat.Tpo -c -o riscv/riscv_libsim_a-sys_faccessat.o `test -f 'riscv/sys_faccessat.c' || echo '$(srcdir)/'`riscv/sys_faccessat.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_faccessat.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_faccessat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_faccessat.c' object='riscv/riscv_libsim_a-sys_faccessat.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_faccessat.o `test -f 'riscv/sys_faccessat.c' || echo '$(srcdir)/'`riscv/sys_faccessat.c
+
+riscv/riscv_libsim_a-sys_faccessat.obj: riscv/sys_faccessat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_faccessat.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_faccessat.Tpo -c -o riscv/riscv_libsim_a-sys_faccessat.obj `if test -f 'riscv/sys_faccessat.c'; then $(CYGPATH_W) 'riscv/sys_faccessat.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_faccessat.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_faccessat.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_faccessat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_faccessat.c' object='riscv/riscv_libsim_a-sys_faccessat.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_faccessat.obj `if test -f 'riscv/sys_faccessat.c'; then $(CYGPATH_W) 'riscv/sys_faccessat.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_faccessat.c'; fi`
+
+riscv/riscv_libsim_a-sys_fork.o: riscv/sys_fork.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_fork.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_fork.Tpo -c -o riscv/riscv_libsim_a-sys_fork.o `test -f 'riscv/sys_fork.c' || echo '$(srcdir)/'`riscv/sys_fork.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_fork.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_fork.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_fork.c' object='riscv/riscv_libsim_a-sys_fork.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_fork.o `test -f 'riscv/sys_fork.c' || echo '$(srcdir)/'`riscv/sys_fork.c
+
+riscv/riscv_libsim_a-sys_fork.obj: riscv/sys_fork.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_fork.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_fork.Tpo -c -o riscv/riscv_libsim_a-sys_fork.obj `if test -f 'riscv/sys_fork.c'; then $(CYGPATH_W) 'riscv/sys_fork.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_fork.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_fork.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_fork.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_fork.c' object='riscv/riscv_libsim_a-sys_fork.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_fork.obj `if test -f 'riscv/sys_fork.c'; then $(CYGPATH_W) 'riscv/sys_fork.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_fork.c'; fi`
+
+riscv/riscv_libsim_a-sys_fstat.o: riscv/sys_fstat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_fstat.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_fstat.Tpo -c -o riscv/riscv_libsim_a-sys_fstat.o `test -f 'riscv/sys_fstat.c' || echo '$(srcdir)/'`riscv/sys_fstat.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_fstat.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_fstat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_fstat.c' object='riscv/riscv_libsim_a-sys_fstat.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_fstat.o `test -f 'riscv/sys_fstat.c' || echo '$(srcdir)/'`riscv/sys_fstat.c
+
+riscv/riscv_libsim_a-sys_fstat.obj: riscv/sys_fstat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_fstat.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_fstat.Tpo -c -o riscv/riscv_libsim_a-sys_fstat.obj `if test -f 'riscv/sys_fstat.c'; then $(CYGPATH_W) 'riscv/sys_fstat.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_fstat.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_fstat.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_fstat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_fstat.c' object='riscv/riscv_libsim_a-sys_fstat.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_fstat.obj `if test -f 'riscv/sys_fstat.c'; then $(CYGPATH_W) 'riscv/sys_fstat.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_fstat.c'; fi`
+
+riscv/riscv_libsim_a-sys_fstatat.o: riscv/sys_fstatat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_fstatat.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_fstatat.Tpo -c -o riscv/riscv_libsim_a-sys_fstatat.o `test -f 'riscv/sys_fstatat.c' || echo '$(srcdir)/'`riscv/sys_fstatat.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_fstatat.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_fstatat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_fstatat.c' object='riscv/riscv_libsim_a-sys_fstatat.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_fstatat.o `test -f 'riscv/sys_fstatat.c' || echo '$(srcdir)/'`riscv/sys_fstatat.c
+
+riscv/riscv_libsim_a-sys_fstatat.obj: riscv/sys_fstatat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_fstatat.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_fstatat.Tpo -c -o riscv/riscv_libsim_a-sys_fstatat.obj `if test -f 'riscv/sys_fstatat.c'; then $(CYGPATH_W) 'riscv/sys_fstatat.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_fstatat.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_fstatat.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_fstatat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_fstatat.c' object='riscv/riscv_libsim_a-sys_fstatat.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_fstatat.obj `if test -f 'riscv/sys_fstatat.c'; then $(CYGPATH_W) 'riscv/sys_fstatat.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_fstatat.c'; fi`
+
+riscv/riscv_libsim_a-sys_ftime.o: riscv/sys_ftime.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_ftime.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_ftime.Tpo -c -o riscv/riscv_libsim_a-sys_ftime.o `test -f 'riscv/sys_ftime.c' || echo '$(srcdir)/'`riscv/sys_ftime.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_ftime.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_ftime.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_ftime.c' object='riscv/riscv_libsim_a-sys_ftime.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_ftime.o `test -f 'riscv/sys_ftime.c' || echo '$(srcdir)/'`riscv/sys_ftime.c
+
+riscv/riscv_libsim_a-sys_ftime.obj: riscv/sys_ftime.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_ftime.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_ftime.Tpo -c -o riscv/riscv_libsim_a-sys_ftime.obj `if test -f 'riscv/sys_ftime.c'; then $(CYGPATH_W) 'riscv/sys_ftime.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_ftime.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_ftime.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_ftime.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_ftime.c' object='riscv/riscv_libsim_a-sys_ftime.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_ftime.obj `if test -f 'riscv/sys_ftime.c'; then $(CYGPATH_W) 'riscv/sys_ftime.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_ftime.c'; fi`
+
+riscv/riscv_libsim_a-sys_getcwd.o: riscv/sys_getcwd.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_getcwd.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_getcwd.Tpo -c -o riscv/riscv_libsim_a-sys_getcwd.o `test -f 'riscv/sys_getcwd.c' || echo '$(srcdir)/'`riscv/sys_getcwd.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_getcwd.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_getcwd.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_getcwd.c' object='riscv/riscv_libsim_a-sys_getcwd.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_getcwd.o `test -f 'riscv/sys_getcwd.c' || echo '$(srcdir)/'`riscv/sys_getcwd.c
+
+riscv/riscv_libsim_a-sys_getcwd.obj: riscv/sys_getcwd.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_getcwd.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_getcwd.Tpo -c -o riscv/riscv_libsim_a-sys_getcwd.obj `if test -f 'riscv/sys_getcwd.c'; then $(CYGPATH_W) 'riscv/sys_getcwd.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_getcwd.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_getcwd.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_getcwd.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_getcwd.c' object='riscv/riscv_libsim_a-sys_getcwd.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_getcwd.obj `if test -f 'riscv/sys_getcwd.c'; then $(CYGPATH_W) 'riscv/sys_getcwd.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_getcwd.c'; fi`
+
+riscv/riscv_libsim_a-sys_getpid.o: riscv/sys_getpid.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_getpid.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_getpid.Tpo -c -o riscv/riscv_libsim_a-sys_getpid.o `test -f 'riscv/sys_getpid.c' || echo '$(srcdir)/'`riscv/sys_getpid.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_getpid.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_getpid.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_getpid.c' object='riscv/riscv_libsim_a-sys_getpid.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_getpid.o `test -f 'riscv/sys_getpid.c' || echo '$(srcdir)/'`riscv/sys_getpid.c
+
+riscv/riscv_libsim_a-sys_getpid.obj: riscv/sys_getpid.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_getpid.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_getpid.Tpo -c -o riscv/riscv_libsim_a-sys_getpid.obj `if test -f 'riscv/sys_getpid.c'; then $(CYGPATH_W) 'riscv/sys_getpid.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_getpid.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_getpid.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_getpid.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_getpid.c' object='riscv/riscv_libsim_a-sys_getpid.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_getpid.obj `if test -f 'riscv/sys_getpid.c'; then $(CYGPATH_W) 'riscv/sys_getpid.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_getpid.c'; fi`
+
+riscv/riscv_libsim_a-sys_gettimeofday.o: riscv/sys_gettimeofday.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_gettimeofday.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_gettimeofday.Tpo -c -o riscv/riscv_libsim_a-sys_gettimeofday.o `test -f 'riscv/sys_gettimeofday.c' || echo '$(srcdir)/'`riscv/sys_gettimeofday.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_gettimeofday.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_gettimeofday.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_gettimeofday.c' object='riscv/riscv_libsim_a-sys_gettimeofday.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_gettimeofday.o `test -f 'riscv/sys_gettimeofday.c' || echo '$(srcdir)/'`riscv/sys_gettimeofday.c
+
+riscv/riscv_libsim_a-sys_gettimeofday.obj: riscv/sys_gettimeofday.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_gettimeofday.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_gettimeofday.Tpo -c -o riscv/riscv_libsim_a-sys_gettimeofday.obj `if test -f 'riscv/sys_gettimeofday.c'; then $(CYGPATH_W) 'riscv/sys_gettimeofday.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_gettimeofday.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_gettimeofday.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_gettimeofday.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_gettimeofday.c' object='riscv/riscv_libsim_a-sys_gettimeofday.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_gettimeofday.obj `if test -f 'riscv/sys_gettimeofday.c'; then $(CYGPATH_W) 'riscv/sys_gettimeofday.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_gettimeofday.c'; fi`
+
+riscv/riscv_libsim_a-sys_isatty.o: riscv/sys_isatty.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_isatty.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_isatty.Tpo -c -o riscv/riscv_libsim_a-sys_isatty.o `test -f 'riscv/sys_isatty.c' || echo '$(srcdir)/'`riscv/sys_isatty.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_isatty.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_isatty.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_isatty.c' object='riscv/riscv_libsim_a-sys_isatty.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_isatty.o `test -f 'riscv/sys_isatty.c' || echo '$(srcdir)/'`riscv/sys_isatty.c
+
+riscv/riscv_libsim_a-sys_isatty.obj: riscv/sys_isatty.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_isatty.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_isatty.Tpo -c -o riscv/riscv_libsim_a-sys_isatty.obj `if test -f 'riscv/sys_isatty.c'; then $(CYGPATH_W) 'riscv/sys_isatty.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_isatty.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_isatty.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_isatty.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_isatty.c' object='riscv/riscv_libsim_a-sys_isatty.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_isatty.obj `if test -f 'riscv/sys_isatty.c'; then $(CYGPATH_W) 'riscv/sys_isatty.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_isatty.c'; fi`
+
+riscv/riscv_libsim_a-sys_kill.o: riscv/sys_kill.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_kill.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_kill.Tpo -c -o riscv/riscv_libsim_a-sys_kill.o `test -f 'riscv/sys_kill.c' || echo '$(srcdir)/'`riscv/sys_kill.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_kill.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_kill.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_kill.c' object='riscv/riscv_libsim_a-sys_kill.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_kill.o `test -f 'riscv/sys_kill.c' || echo '$(srcdir)/'`riscv/sys_kill.c
+
+riscv/riscv_libsim_a-sys_kill.obj: riscv/sys_kill.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_kill.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_kill.Tpo -c -o riscv/riscv_libsim_a-sys_kill.obj `if test -f 'riscv/sys_kill.c'; then $(CYGPATH_W) 'riscv/sys_kill.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_kill.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_kill.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_kill.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_kill.c' object='riscv/riscv_libsim_a-sys_kill.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_kill.obj `if test -f 'riscv/sys_kill.c'; then $(CYGPATH_W) 'riscv/sys_kill.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_kill.c'; fi`
+
+riscv/riscv_libsim_a-sys_link.o: riscv/sys_link.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_link.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_link.Tpo -c -o riscv/riscv_libsim_a-sys_link.o `test -f 'riscv/sys_link.c' || echo '$(srcdir)/'`riscv/sys_link.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_link.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_link.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_link.c' object='riscv/riscv_libsim_a-sys_link.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_link.o `test -f 'riscv/sys_link.c' || echo '$(srcdir)/'`riscv/sys_link.c
+
+riscv/riscv_libsim_a-sys_link.obj: riscv/sys_link.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_link.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_link.Tpo -c -o riscv/riscv_libsim_a-sys_link.obj `if test -f 'riscv/sys_link.c'; then $(CYGPATH_W) 'riscv/sys_link.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_link.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_link.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_link.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_link.c' object='riscv/riscv_libsim_a-sys_link.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_link.obj `if test -f 'riscv/sys_link.c'; then $(CYGPATH_W) 'riscv/sys_link.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_link.c'; fi`
+
+riscv/riscv_libsim_a-sys_lseek.o: riscv/sys_lseek.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_lseek.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_lseek.Tpo -c -o riscv/riscv_libsim_a-sys_lseek.o `test -f 'riscv/sys_lseek.c' || echo '$(srcdir)/'`riscv/sys_lseek.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_lseek.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_lseek.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_lseek.c' object='riscv/riscv_libsim_a-sys_lseek.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_lseek.o `test -f 'riscv/sys_lseek.c' || echo '$(srcdir)/'`riscv/sys_lseek.c
+
+riscv/riscv_libsim_a-sys_lseek.obj: riscv/sys_lseek.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_lseek.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_lseek.Tpo -c -o riscv/riscv_libsim_a-sys_lseek.obj `if test -f 'riscv/sys_lseek.c'; then $(CYGPATH_W) 'riscv/sys_lseek.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_lseek.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_lseek.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_lseek.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_lseek.c' object='riscv/riscv_libsim_a-sys_lseek.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_lseek.obj `if test -f 'riscv/sys_lseek.c'; then $(CYGPATH_W) 'riscv/sys_lseek.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_lseek.c'; fi`
+
+riscv/riscv_libsim_a-sys_lstat.o: riscv/sys_lstat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_lstat.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_lstat.Tpo -c -o riscv/riscv_libsim_a-sys_lstat.o `test -f 'riscv/sys_lstat.c' || echo '$(srcdir)/'`riscv/sys_lstat.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_lstat.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_lstat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_lstat.c' object='riscv/riscv_libsim_a-sys_lstat.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_lstat.o `test -f 'riscv/sys_lstat.c' || echo '$(srcdir)/'`riscv/sys_lstat.c
+
+riscv/riscv_libsim_a-sys_lstat.obj: riscv/sys_lstat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_lstat.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_lstat.Tpo -c -o riscv/riscv_libsim_a-sys_lstat.obj `if test -f 'riscv/sys_lstat.c'; then $(CYGPATH_W) 'riscv/sys_lstat.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_lstat.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_lstat.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_lstat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_lstat.c' object='riscv/riscv_libsim_a-sys_lstat.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_lstat.obj `if test -f 'riscv/sys_lstat.c'; then $(CYGPATH_W) 'riscv/sys_lstat.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_lstat.c'; fi`
+
+riscv/riscv_libsim_a-sys_open.o: riscv/sys_open.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_open.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_open.Tpo -c -o riscv/riscv_libsim_a-sys_open.o `test -f 'riscv/sys_open.c' || echo '$(srcdir)/'`riscv/sys_open.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_open.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_open.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_open.c' object='riscv/riscv_libsim_a-sys_open.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_open.o `test -f 'riscv/sys_open.c' || echo '$(srcdir)/'`riscv/sys_open.c
+
+riscv/riscv_libsim_a-sys_open.obj: riscv/sys_open.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_open.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_open.Tpo -c -o riscv/riscv_libsim_a-sys_open.obj `if test -f 'riscv/sys_open.c'; then $(CYGPATH_W) 'riscv/sys_open.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_open.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_open.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_open.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_open.c' object='riscv/riscv_libsim_a-sys_open.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_open.obj `if test -f 'riscv/sys_open.c'; then $(CYGPATH_W) 'riscv/sys_open.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_open.c'; fi`
+
+riscv/riscv_libsim_a-sys_openat.o: riscv/sys_openat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_openat.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_openat.Tpo -c -o riscv/riscv_libsim_a-sys_openat.o `test -f 'riscv/sys_openat.c' || echo '$(srcdir)/'`riscv/sys_openat.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_openat.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_openat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_openat.c' object='riscv/riscv_libsim_a-sys_openat.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_openat.o `test -f 'riscv/sys_openat.c' || echo '$(srcdir)/'`riscv/sys_openat.c
+
+riscv/riscv_libsim_a-sys_openat.obj: riscv/sys_openat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_openat.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_openat.Tpo -c -o riscv/riscv_libsim_a-sys_openat.obj `if test -f 'riscv/sys_openat.c'; then $(CYGPATH_W) 'riscv/sys_openat.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_openat.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_openat.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_openat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_openat.c' object='riscv/riscv_libsim_a-sys_openat.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_openat.obj `if test -f 'riscv/sys_openat.c'; then $(CYGPATH_W) 'riscv/sys_openat.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_openat.c'; fi`
+
+riscv/riscv_libsim_a-sys_read.o: riscv/sys_read.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_read.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_read.Tpo -c -o riscv/riscv_libsim_a-sys_read.o `test -f 'riscv/sys_read.c' || echo '$(srcdir)/'`riscv/sys_read.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_read.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_read.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_read.c' object='riscv/riscv_libsim_a-sys_read.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_read.o `test -f 'riscv/sys_read.c' || echo '$(srcdir)/'`riscv/sys_read.c
+
+riscv/riscv_libsim_a-sys_read.obj: riscv/sys_read.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_read.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_read.Tpo -c -o riscv/riscv_libsim_a-sys_read.obj `if test -f 'riscv/sys_read.c'; then $(CYGPATH_W) 'riscv/sys_read.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_read.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_read.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_read.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_read.c' object='riscv/riscv_libsim_a-sys_read.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_read.obj `if test -f 'riscv/sys_read.c'; then $(CYGPATH_W) 'riscv/sys_read.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_read.c'; fi`
+
+riscv/riscv_libsim_a-sys_sbrk.o: riscv/sys_sbrk.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_sbrk.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_sbrk.Tpo -c -o riscv/riscv_libsim_a-sys_sbrk.o `test -f 'riscv/sys_sbrk.c' || echo '$(srcdir)/'`riscv/sys_sbrk.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_sbrk.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_sbrk.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_sbrk.c' object='riscv/riscv_libsim_a-sys_sbrk.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_sbrk.o `test -f 'riscv/sys_sbrk.c' || echo '$(srcdir)/'`riscv/sys_sbrk.c
+
+riscv/riscv_libsim_a-sys_sbrk.obj: riscv/sys_sbrk.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_sbrk.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_sbrk.Tpo -c -o riscv/riscv_libsim_a-sys_sbrk.obj `if test -f 'riscv/sys_sbrk.c'; then $(CYGPATH_W) 'riscv/sys_sbrk.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_sbrk.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_sbrk.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_sbrk.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_sbrk.c' object='riscv/riscv_libsim_a-sys_sbrk.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_sbrk.obj `if test -f 'riscv/sys_sbrk.c'; then $(CYGPATH_W) 'riscv/sys_sbrk.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_sbrk.c'; fi`
+
+riscv/riscv_libsim_a-sys_stat.o: riscv/sys_stat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_stat.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_stat.Tpo -c -o riscv/riscv_libsim_a-sys_stat.o `test -f 'riscv/sys_stat.c' || echo '$(srcdir)/'`riscv/sys_stat.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_stat.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_stat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_stat.c' object='riscv/riscv_libsim_a-sys_stat.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_stat.o `test -f 'riscv/sys_stat.c' || echo '$(srcdir)/'`riscv/sys_stat.c
+
+riscv/riscv_libsim_a-sys_stat.obj: riscv/sys_stat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_stat.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_stat.Tpo -c -o riscv/riscv_libsim_a-sys_stat.obj `if test -f 'riscv/sys_stat.c'; then $(CYGPATH_W) 'riscv/sys_stat.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_stat.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_stat.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_stat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_stat.c' object='riscv/riscv_libsim_a-sys_stat.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_stat.obj `if test -f 'riscv/sys_stat.c'; then $(CYGPATH_W) 'riscv/sys_stat.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_stat.c'; fi`
+
+riscv/riscv_libsim_a-sys_sysconf.o: riscv/sys_sysconf.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_sysconf.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_sysconf.Tpo -c -o riscv/riscv_libsim_a-sys_sysconf.o `test -f 'riscv/sys_sysconf.c' || echo '$(srcdir)/'`riscv/sys_sysconf.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_sysconf.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_sysconf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_sysconf.c' object='riscv/riscv_libsim_a-sys_sysconf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_sysconf.o `test -f 'riscv/sys_sysconf.c' || echo '$(srcdir)/'`riscv/sys_sysconf.c
+
+riscv/riscv_libsim_a-sys_sysconf.obj: riscv/sys_sysconf.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_sysconf.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_sysconf.Tpo -c -o riscv/riscv_libsim_a-sys_sysconf.obj `if test -f 'riscv/sys_sysconf.c'; then $(CYGPATH_W) 'riscv/sys_sysconf.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_sysconf.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_sysconf.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_sysconf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_sysconf.c' object='riscv/riscv_libsim_a-sys_sysconf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_sysconf.obj `if test -f 'riscv/sys_sysconf.c'; then $(CYGPATH_W) 'riscv/sys_sysconf.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_sysconf.c'; fi`
+
+riscv/riscv_libsim_a-sys_times.o: riscv/sys_times.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_times.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_times.Tpo -c -o riscv/riscv_libsim_a-sys_times.o `test -f 'riscv/sys_times.c' || echo '$(srcdir)/'`riscv/sys_times.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_times.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_times.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_times.c' object='riscv/riscv_libsim_a-sys_times.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_times.o `test -f 'riscv/sys_times.c' || echo '$(srcdir)/'`riscv/sys_times.c
+
+riscv/riscv_libsim_a-sys_times.obj: riscv/sys_times.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_times.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_times.Tpo -c -o riscv/riscv_libsim_a-sys_times.obj `if test -f 'riscv/sys_times.c'; then $(CYGPATH_W) 'riscv/sys_times.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_times.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_times.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_times.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_times.c' object='riscv/riscv_libsim_a-sys_times.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_times.obj `if test -f 'riscv/sys_times.c'; then $(CYGPATH_W) 'riscv/sys_times.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_times.c'; fi`
+
+riscv/riscv_libsim_a-sys_unlink.o: riscv/sys_unlink.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_unlink.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_unlink.Tpo -c -o riscv/riscv_libsim_a-sys_unlink.o `test -f 'riscv/sys_unlink.c' || echo '$(srcdir)/'`riscv/sys_unlink.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_unlink.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_unlink.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_unlink.c' object='riscv/riscv_libsim_a-sys_unlink.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_unlink.o `test -f 'riscv/sys_unlink.c' || echo '$(srcdir)/'`riscv/sys_unlink.c
+
+riscv/riscv_libsim_a-sys_unlink.obj: riscv/sys_unlink.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_unlink.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_unlink.Tpo -c -o riscv/riscv_libsim_a-sys_unlink.obj `if test -f 'riscv/sys_unlink.c'; then $(CYGPATH_W) 'riscv/sys_unlink.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_unlink.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_unlink.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_unlink.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_unlink.c' object='riscv/riscv_libsim_a-sys_unlink.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_unlink.obj `if test -f 'riscv/sys_unlink.c'; then $(CYGPATH_W) 'riscv/sys_unlink.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_unlink.c'; fi`
+
+riscv/riscv_libsim_a-sys_utime.o: riscv/sys_utime.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_utime.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_utime.Tpo -c -o riscv/riscv_libsim_a-sys_utime.o `test -f 'riscv/sys_utime.c' || echo '$(srcdir)/'`riscv/sys_utime.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_utime.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_utime.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_utime.c' object='riscv/riscv_libsim_a-sys_utime.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_utime.o `test -f 'riscv/sys_utime.c' || echo '$(srcdir)/'`riscv/sys_utime.c
+
+riscv/riscv_libsim_a-sys_utime.obj: riscv/sys_utime.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_utime.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_utime.Tpo -c -o riscv/riscv_libsim_a-sys_utime.obj `if test -f 'riscv/sys_utime.c'; then $(CYGPATH_W) 'riscv/sys_utime.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_utime.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_utime.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_utime.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_utime.c' object='riscv/riscv_libsim_a-sys_utime.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_utime.obj `if test -f 'riscv/sys_utime.c'; then $(CYGPATH_W) 'riscv/sys_utime.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_utime.c'; fi`
+
+riscv/riscv_libsim_a-sys_wait.o: riscv/sys_wait.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_wait.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_wait.Tpo -c -o riscv/riscv_libsim_a-sys_wait.o `test -f 'riscv/sys_wait.c' || echo '$(srcdir)/'`riscv/sys_wait.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_wait.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_wait.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_wait.c' object='riscv/riscv_libsim_a-sys_wait.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_wait.o `test -f 'riscv/sys_wait.c' || echo '$(srcdir)/'`riscv/sys_wait.c
+
+riscv/riscv_libsim_a-sys_wait.obj: riscv/sys_wait.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_wait.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_wait.Tpo -c -o riscv/riscv_libsim_a-sys_wait.obj `if test -f 'riscv/sys_wait.c'; then $(CYGPATH_W) 'riscv/sys_wait.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_wait.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_wait.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_wait.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_wait.c' object='riscv/riscv_libsim_a-sys_wait.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_wait.obj `if test -f 'riscv/sys_wait.c'; then $(CYGPATH_W) 'riscv/sys_wait.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_wait.c'; fi`
+
+riscv/riscv_libsim_a-sys_write.o: riscv/sys_write.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_write.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_write.Tpo -c -o riscv/riscv_libsim_a-sys_write.o `test -f 'riscv/sys_write.c' || echo '$(srcdir)/'`riscv/sys_write.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_write.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_write.c' object='riscv/riscv_libsim_a-sys_write.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_write.o `test -f 'riscv/sys_write.c' || echo '$(srcdir)/'`riscv/sys_write.c
+
+riscv/riscv_libsim_a-sys_write.obj: riscv/sys_write.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsim_a-sys_write.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsim_a-sys_write.Tpo -c -o riscv/riscv_libsim_a-sys_write.obj `if test -f 'riscv/sys_write.c'; then $(CYGPATH_W) 'riscv/sys_write.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_write.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsim_a-sys_write.Tpo riscv/$(DEPDIR)/riscv_libsim_a-sys_write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/sys_write.c' object='riscv/riscv_libsim_a-sys_write.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_write.obj `if test -f 'riscv/sys_write.c'; then $(CYGPATH_W) 'riscv/sys_write.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_write.c'; fi`
 
 xtensa/xtensa_libgloss_a-syscalls.o: xtensa/syscalls.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(xtensa_libgloss_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT xtensa/xtensa_libgloss_a-syscalls.o -MD -MP -MF xtensa/$(DEPDIR)/xtensa_libgloss_a-syscalls.Tpo -c -o xtensa/xtensa_libgloss_a-syscalls.o `test -f 'xtensa/syscalls.c' || echo '$(srcdir)/'`xtensa/syscalls.c

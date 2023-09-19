@@ -40,6 +40,10 @@ multilibtool_LIBRARIES += %D%/libgloss.a
 	%D%/sys_wait.c \
 	%D%/sys_write.c
 
+multilibtool_LIBRARIES += %D%/libsim.a
+%C%_libsim_a_CPPFLAGS = $(%C%_libgloss_a_CPPFLAGS) -DUSING_SIM_SPECS
+%C%_libsim_a_SOURCES = $(%C%_libgloss_a_SOURCES)
+
 multilibtool_LIBRARIES += %D%/libsemihost.a
 %C%_libsemihost_a_CPPFLAGS = -I$(srcdir)/%D%
 %C%_libsemihost_a_SOURCES = \
