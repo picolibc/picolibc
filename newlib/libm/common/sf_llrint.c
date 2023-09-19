@@ -22,6 +22,7 @@
  */
 
 #include "fdlibm.h"
+#include <limits.h>
 
 static const float
 /* Adding a float, x, to 2^23 will cause the result to be rounded based on
@@ -72,7 +73,12 @@ long long int llrintf(float x)
     }
   else
     {
-      return (long long int) x;
+      if (x != LLONG_MIN)
+      {
+        __math_set_invalidf();
+        return sx ? LLONG_MIN : LLONG_MAX;
+      }
+      return (long long) x;
     }
   return sx ? -result : result;
 }
