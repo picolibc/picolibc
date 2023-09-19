@@ -401,6 +401,10 @@ long long makemathname(test_lrint_inf)(void) { makemathname(lrint)(makemathname(
 long long makemathname(test_lrint_neginf)(void) { makemathname(lrint)(-makemathname(infval)); return 0; }
 long long makemathname(test_lrint_big)(void) { makemathname(lrint)(makemathname(big)); return 0; }
 long long makemathname(test_lrint_negbig)(void) { makemathname(lrint)(-makemathname(big)); return 0; }
+long long makemathname(test_lrint_long_max_mask)(void) { return makemathname(lrint)(makemathname(long_max_mask)); }
+long long makemathname(test_lrint_long_min_mask)(void) { return makemathname(lrint)(makemathname(long_min_mask)); }
+long long makemathname(test_lrint_long_max_one)(void) { return makemathname(lrint)(makemathname(long_max_one)); }
+long long makemathname(test_lrint_long_min_one)(void) { return makemathname(lrint)(makemathname(long_min_one)); }
 
 long long makemathname(test_lround_qnan)(void) { makemathname(lround)(makemathname(qnanval)); return 0; }
 long long makemathname(test_lround_snan)(void) { makemathname(lround)(makemathname(snanval)); return 0; }
@@ -1392,6 +1396,10 @@ static const struct {
         TEST(lrint_neginf, 0, FE_INVALID, 0),
         TEST(lrint_big, 0, FE_INVALID, 0),
         TEST(lrint_negbig, 0, FE_INVALID, 0),
+        TEST(lrint_long_max_mask, FLOAT_LONG_MAX, 0, 0),
+        TEST(lrint_long_min_mask, FLOAT_LONG_MIN, 0, 0),
+        TEST(lrint_long_max_one, LROUND_LONG_MAX, FE_INVALID, 0),
+        TEST(lrint_long_min_one, LONG_MIN, FE_INVALID, 0),
 
         TEST(lround_qnan, 0, FE_INVALID, 0),
         TEST(lround_inf, 0, FE_INVALID, 0),
