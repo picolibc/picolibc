@@ -25,9 +25,12 @@
  */
 
 
+#include <limits.h>
 #ifndef dtype
 #define dtype long
 #define fn lrintl
+#define DTYPE_MIN LONG_MIN
+#define DTYPE_MAX LONG_MAX
 #endif
 
 /*
@@ -55,7 +58,9 @@ fn(long double x)
 		feclearexcept(FE_INVALID);
 	feupdateenv(&env);
 #endif
-        if ((long double) d != x)
+        if ((long double) d != x) {
             __math_set_invalidl();
+            return x > 0 ? DTYPE_MAX : DTYPE_MIN;
+        }
 	return (d);
 }
