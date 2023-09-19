@@ -22,6 +22,7 @@
  */
 
 #include "fdlibm.h"
+#include <limits.h>
 
 #ifdef _NEED_FLOAT64
 
@@ -105,8 +106,21 @@ llrint64(__float64 x)
     }
   else
     {
-      return (long long int) x;
+      if (sizeof (long long) == 4 && (__float64) LLONG_MIN - _F_64(1.0) < x && x < (__float64) LLONG_MIN) {
+        if (nearbyint(x) == LLONG_MIN)
+          __math_set_inexact();
+        else
+          __math_set_invalid();
+        return LLONG_MIN;
+      }
+      else if (x != LLONG_MIN)
+      {
+        __math_set_invalid();
+        return sx ? LLONG_MIN : LLONG_MAX;
+      }
+      return (long long) x;
     }
+
   
   return sx ? -result : result;
 }
