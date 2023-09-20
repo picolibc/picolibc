@@ -73,22 +73,14 @@ picolibc:
         $ ../../scripts/do-native-configure
 	$ ninja dist
 
- 10. Use arm configuration to build bits for the Arm embedded toolkit:
-
-        $ mkdir -p builds/build-arm-tk builds/build-arm-tk-release
-        $ cd builds/build-arm-tk
-        $ PATH=$ARM_TK/bin:$PATH ../../scripts/do-arm-configure -Dsysroot-install=true
-        $ PATH=$ARM_TK/bin:$PATH DESTDIR=$PWD/../dist ninja test install
-	$ cd ../build-arm-tk-release
-	$ PATH=$ARM_TK/bin:$PATH ../../scripts/do-arm-configure -Dsysroot-install=true -Dbuild-type-subdir=release --buildtype=release
-        $ PATH=$ARM_TK/bin:$PATH DESTDIR=$PWD/../dist ninja test install
-        $ cd ../dist/$ARM_TK
-        $ zip -r ../../../picolibc-<version>-<arm-et-version>.zip .
-        $ scp picolibc-<version>-<arm-et-version>.zip keithp.com:/var/www/picolibc/dist/gnu-arm-embedded
-
- 11. Tag release
+ 10. Tag release
 
 	$ git tag -m'Version <version>' <version> main
+
+ 11. Use arm configuration to build bits for the Arm embedded toolkit:
+
+        $ ./scripts/do-arm-tk
+        $ scp builds/dist/picolibc-<version>-<arm-et-version>.zip keithp.com:/var/www/picolibc/dist/gnu-arm-embedded
 
  12. Push tag and branch to repositories
 
