@@ -44,7 +44,7 @@ jobs:
 
       - name: Set up Docker Buildx
         if: steps.cache.outputs.cache-hit != 'true'
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Build picolibc container
         if: steps.cache.outputs.cache-hit != 'true'
