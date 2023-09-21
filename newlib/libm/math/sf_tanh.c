@@ -15,7 +15,7 @@
 
 #include "fdlibm.h"
 
-static const volatile float one = 1.0, two = 2.0, tiny = 1.0e-30;
+static const float one = 1.0, two = 2.0;
 
 float
 tanhf(float x)
@@ -47,7 +47,7 @@ tanhf(float x)
         }
         /* |x| > 22, return +-1 */
     } else {
-        z = one - tiny; /* raised inexact flag */
+        z = __math_inexactf(one);
     }
     return (jx >= 0) ? z : -z;
 }

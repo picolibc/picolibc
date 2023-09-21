@@ -48,7 +48,7 @@ struct test {
 	regmatch_t matches[MAX_MATCH];
 };
 
-struct test tests[] = {
+const struct test tests[] = {
 	{ .pattern = ".", .string = "xxx",
 	  .ret = 0, .nmatch = 1, .matches = { { .rm_so = 0, .rm_eo = 1 } }
 	},

@@ -244,7 +244,6 @@ __math_lgammaf_r(float x, int *signgamp, int *divzero)
         }
     } else if (ix < 0x41000000) { /* x < 8.0 */
         i = (__int32_t)x;
-        t = zero;
         y = x - (float)i;
         p = y * (s0 +
                  y * (s1 + y * (s2 + y * (s3 + y * (s4 + y * (s5 + y * s6))))));

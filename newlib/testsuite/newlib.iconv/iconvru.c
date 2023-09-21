@@ -35,7 +35,7 @@
     defined(_ICONV_FROM_ENCODING_KOI8_R)
 
 #ifdef _ICONV_FROM_ENCODING_ISO_8859_5
-char iso_8859_5[] =
+static const char iso_8859_5[] =
 {
     0xbe,0xdf,0xd5,0xe0,0xd0,0xe2,0xde,0xe0,0xeb,0x20,
     0xd2,0x20,0xde,0xd4,0xdd,0xde,0xd9,0x20,0xe1,0xe2,
@@ -138,7 +138,7 @@ char iso_8859_5[] =
 #endif /* #ifdef _ICONV_FROM_ENCODING_ISO_8859_5 */
 
 #ifdef _ICONV_FROM_ENCODING_KOI8_R
-char koi8_r[] = 
+static const char koi8_r[] = 
 {
     0xef,0xd0,0xc5,0xd2,0xc1,0xd4,0xcf,0xd2,0xd9,0x20,
     0xd7,0x20,0xcf,0xc4,0xce,0xcf,0xca,0x20,0xd3,0xd4,
@@ -241,7 +241,7 @@ char koi8_r[] =
 #endif /* #ifdef _ICONV_FROM_ENCODING_KOI8_R */
 
 #ifdef _ICONV_FROM_ENCODING_UTF_8
-char utf8[] =
+static const char utf8[] =
 {
     0xd0,0x9e,0xd0,0xbf,0xd0,0xb5,0xd1,0x80,0xd0,0xb0,
     0xd1,0x82,0xd0,0xbe,0xd1,0x80,0xd1,0x8b,0x20,0xd0,
@@ -361,7 +361,7 @@ struct iconv_data
 
 #define CONVERSIONS 3
 
-struct iconv_data data[] = 
+static const struct iconv_data data[] = 
 {
 #ifdef _ICONV_FROM_ENCODING_ISO_8859_5
     {sizeof(iso_8859_5), "ISO-8859-5", (char *)iso_8859_5},
@@ -477,7 +477,7 @@ int main(void)
 }
 
 #else /* #if defined(_ICONV_FROM_ENCODING_UTF_8) || ... */
-int main(int argc, char **argv)
+int main(void)
 {
     puts("None of ISO-8859-5, KOI8-R and UTF-8 converters linked, SKIP test");
     exit(0);

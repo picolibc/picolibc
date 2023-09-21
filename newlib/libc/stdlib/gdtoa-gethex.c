@@ -251,7 +251,7 @@ gethex (const char **sp, const FPI *fpi,
 			L = 0;
 			n = 0;
 			}
-		L |= (__get_hexdig(*s1) & 0x0f) << n;
+		L |= (__ULong) (__get_hexdig(*s1) & 0x0f) << n;
 		n += 4;
 		}
 	*x++ = L;
@@ -265,7 +265,7 @@ gethex (const char **sp, const FPI *fpi,
 		if (any_on(b,n)) {
 			lostbits = 1;
 			k = n - 1;
-			if (x[k>>kshift] & 1 << (k & kmask)) {
+			if (x[k>>kshift] & (__ULong) 1 << (k & kmask)) {
 				lostbits = 2;
 				if (k > 1 && any_on(b,k-1))
 					lostbits = 3;
@@ -319,7 +319,7 @@ gethex (const char **sp, const FPI *fpi,
 			lostbits = 1;
 		else if (k > 0)
 			lostbits = any_on(b,k);
-		if (x[k>>kshift] & 1 << (k & kmask))
+		if (x[k>>kshift] & (__ULong) 1 << (k & kmask))
 			lostbits |= 2;
 		nbits -= n;
 		rshift(b,n);
@@ -349,7 +349,7 @@ gethex (const char **sp, const FPI *fpi,
 			x = b->_x;
 			if (irv == STRTOG_Denormal) {
 				if (nbits == fpi->nbits - 1
-				 && x[nbits >> kshift] & 1 << (nbits & kmask))
+                                    && x[nbits >> kshift] & (__ULong) 1 << (nbits & kmask))
 					irv =  STRTOG_Normal;
 				}
 			else if ((b->_wds > k)

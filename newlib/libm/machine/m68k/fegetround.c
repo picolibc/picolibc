@@ -46,5 +46,5 @@ int fegetround(void)
     return (fpcr >> 4) & 3;
 }
 #else
-#include "../../fenv/fegetenv.c"
+#include "../../fenv/fegetround.c"
 #endif

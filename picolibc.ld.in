@@ -41,7 +41,7 @@ ENTRY(_start)
  */
 
 MEMORY
-{@MEMORY_BOOT_FLASH@
+{@INIT_MEMORY@
 	flash (rx!w) :
 		ORIGIN = DEFINED(__flash) ? __flash : @DEFAULT_FLASH_ADDR@,
 		LENGTH = DEFINED(__flash_size) ? __flash_size : @DEFAULT_FLASH_SIZE@
@@ -61,13 +61,7 @@ PHDRS
 SECTIONS
 {
 	PROVIDE(__stack = ORIGIN(ram) + LENGTH(ram));
-
-	.init : {
-		KEEP (*(.text.init.enter))
-		KEEP (*(.data.init.enter))
-		KEEP (*(SORT_BY_NAME(.init) SORT_BY_NAME(.init.*)))
-	} >@INIT_MEMORY@ AT>@INIT_MEMORY@ :text
-
+	@INIT_SECTIONS@
 	.text : {
 
 		/* code */
@@ -95,7 +89,7 @@ SECTIONS
 		*(.data.rel.ro .data.rel.ro.*)
 
 		/* Need to pre-align so that the symbols come after padding */
-		. = ALIGN(8);
+		. = ALIGN(@DEFAULT_ALIGNMENT@);
 
 		/* lists of constructors and destructors */
 		PROVIDE_HIDDEN ( __preinit_array_start = . );
@@ -137,7 +131,7 @@ SECTIONS
 	} >flash AT>flash :text
 
 	.except_unordered : {
-		. = ALIGN(8);
+		. = ALIGN(@DEFAULT_ALIGNMENT@);
 
 		PROVIDE(__exidx_start = .);
 		*(.ARM.exidx*)
@@ -160,7 +154,7 @@ SECTIONS
 		*(.gnu.linkonce.d.*)
 
 		/* Need to pre-align so that the symbols come after padding */
-		. = ALIGN(8);
+		. = ALIGN(@DEFAULT_ALIGNMENT@);
 
 		PROVIDE( __global_pointer$ = . + 0x800 );
 		PROVIDE( _gp = . + 0x8000);
@@ -236,12 +230,12 @@ SECTIONS
 		*(COMMON)
 
 		/* Align the heap */
-		. = ALIGN(8);
+		. = ALIGN(@DEFAULT_ALIGNMENT@);
 		__bss_end = .;
 	} >ram AT>ram :ram
 	PROVIDE( __non_tls_bss_start = ADDR(.bss) );
 	PROVIDE( __end = __bss_end );
-	PROVIDE( _end = __bss_end );
+	_end = __bss_end;
 	PROVIDE( end = __bss_end );
 	PROVIDE( __bss_size = __bss_end - __bss_start );
 
@@ -249,6 +243,11 @@ SECTIONS
 	PROVIDE (__heap_start = __end);
 	PROVIDE (__heap_end = __stack - (DEFINED(__stack_size) ? __stack_size : @DEFAULT_STACK_SIZE@));
 	PROVIDE (__heap_size = __heap_end - __heap_start);
+
+        /* Allow a minimum heap size to be specified */
+        .heap (NOLOAD) : {
+                . += (DEFINED(__heap_size_min) ? __heap_size_min : 0);
+        } >ram :ram
 
 	/* Define a stack region to make sure it fits in memory */
 	.stack (NOLOAD) : {

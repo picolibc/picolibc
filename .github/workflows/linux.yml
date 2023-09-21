@@ -8,9 +8,19 @@ on:
     branches:
       - main
 
+# When a PR is updated, cancel the jobs from the previous version. Merges
+# do not define head_ref, so use run_id to never cancel those jobs.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 env:
-  IMAGE_FILE: dockerimg.tar.xz
-  IMAGE: picolibc
+  # CCache is disabled for the Linux jobs for now.
+  CCACHE_SIZE: "0M"
+  CCACHE_CMD: true
+  DOCKERFILE: picolibc/.github/Dockerfile
+  IMAGE_FILE: dockerimg-linux.tar.zst
+  IMAGE: picolibc-linux
   PACKAGES_FILE: picolibc/.github/linux-packages.txt
   EXTRA_FILE: picolibc/.github/linux-files.txt
 
@@ -28,7 +38,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          lookup-only: true
 
       - name: Set up Docker Buildx
         if: steps.cache.outputs.cache-hit != 'true'
@@ -41,7 +52,7 @@ jobs:
           platforms: linux/amd64
           file: .github/Dockerfile
           tags: ${{ env.IMAGE }}:latest
-          outputs: type=docker,dest=${{ env.IMAGE_FILE }}
+          outputs: type=docker,force-compression=true,compression=zstd,compression-level=22,dest=${{ env.IMAGE_FILE }}
 
   cmake-linux:
     needs: cache-maker
@@ -51,11 +62,11 @@ jobs:
         cmake_flags: [
           "",
           # optional configurations
-          "-D__IO_FLOAT=y -D_IO_FLOAT_EXACT=n -D_WANT_IO_LONG_LONG=y -D_MB_CAPABLE=y -D_WANT_IO_POS_ARGS=y -D__HAVE_LOCALE_INFO__=y -D__HAVE_LOCALE_INFO_EXTENDED__=y ",
+          "-D__IO_FLOAT=y -D_IO_FLOAT_EXACT=n -D_WANT_IO_LONG_LONG=y -D_MB_CAPABLE=y -D_WANT_IO_POS_ARGS=y -D__HAVE_LOCALE_INFO__=y -D__HAVE_LOCALE_INFO_EXTENDED__=y -D_WANT_MINIMAL_IO_LONG_LONG=y",
         ]
         test: [
-	  "./.github/do-cmake-linux",
-	]
+          "./.github/do-cmake-linux",
+        ]
     steps:
       - name: Clone picolibc
         uses: actions/checkout@v3
@@ -66,67 +77,36 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          fail-on-cache-miss: true
 
       - name: Load and Check the Docker Image
         run: |
           docker load -i $IMAGE_FILE
           docker images -a $IMAGE
+
+      # The docker image contains ccache, but the ccache action uses the ccache
+      # outside docker for statistics, so install the same ccache version.
+      # Install in /usr/bin so the ccache action gets the expected environment.
+      - name: install ccache
+        if: matrix.test == './.github/do-zephyr'
+        run: |
+          wget -nv https://github.com/ccache/ccache/releases/download/v4.8.2/ccache-4.8.2-linux-x86_64.tar.xz
+          sudo tar xf ccache-4.8.2-linux-x86_64.tar.xz -C /usr/bin --strip-components=1 --no-same-owner ccache-4.8.2-linux-x86_64/ccache
+          rm -f ccache-*-linux-x86_64.tar.xz
+
+      # Key on job name and cache size to get separate caches for linux
+      # and zephyr.
+      - name: ccache
+        if: matrix.test == './.github/do-zephyr'
+        uses: hendrikmuhs/ccache-action@v1.2.10
+        with:
+          key: compilation-${{ runner.os }}-${{ github.job }}-${{ matrix.meson_flags }}-${{ env.CCACHE_SIZE }}
+          max-size: ${{ env.CCACHE_SIZE }}
 
       - name: CMake test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.cmake_flags }}
-
-  fortify-source-linux:
-    needs: cache-maker
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        meson_flags: [
-          "",
-
-          # Math configurations
-          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
-          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
-
-          # Tinystdio configurations
-          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true",
-          "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false",
-
-          # Original stdio
-          "-Dtinystdio=false",
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true -Dnewlib-fvwrite-in-streamio=true",
-
-          # Locale, iconv, original malloc and original atexit/onexit configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
-
-          # Multithread disabled
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
-        ]
-        test: [
-	  "./.github/do-linux",
-	]
-    steps:
-      - name: Clone picolibc
-        uses: actions/checkout@v3
-        with:
-          path: picolibc
-
-      - name: Restore the Docker Image
-        uses: actions/cache@v3
-        with:
-          path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
-
-      - name: Load and Check the Docker Image
-        run: |
-          docker load -i $IMAGE_FILE
-          docker images -a $IMAGE
-
-      - name: Fortity source test
-        run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} -Dfortify-source=2
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc -v $GITHUB_WORKSPACE/.ccache:/root/.ccache $IMAGE bash --login -c "${{ env.CCACHE_CMD }} --set-config=max_size=${{ env.CCACHE_SIZE }} && ${{ matrix.test }} ${{ matrix.cmake_flags }}"
 
   minsize-linux:
     needs: cache-maker
@@ -136,28 +116,17 @@ jobs:
         meson_flags: [
           "",
 
-          # Math configurations
-          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
-          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
+          # Tinystdio and math configurations, one with multithread disabled and with locale, original malloc and atexit/onexit code
+          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false -Dprintf-small-ultoa=true",
+          "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false -Dnewlib-obsolete-math=true -Dwant-math-errno=true -Dassert-verbose=false",
 
-          # Tinystdio configurations
-          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true",
-          "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false",
-
-          # Original stdio
+          # Original stdio, one with multithread disabled
           "-Dtinystdio=false",
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true -Dnewlib-fvwrite-in-streamio=true",
-
-          # Locale, iconv, original malloc and original atexit/onexit configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
-
-          # Multithread disabled
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true -Dnewlib-fvwrite-in-streamio=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
         ]
         test: [
-	  "./.github/do-linux",
-	]
+          "./.github/do-linux",
+        ]
     steps:
       - name: Clone picolibc
         uses: actions/checkout@v3
@@ -168,18 +137,38 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          fail-on-cache-miss: true
 
       - name: Load and Check the Docker Image
         run: |
           docker load -i $IMAGE_FILE
           docker images -a $IMAGE
 
+      # The docker image contains ccache, but the ccache action uses the ccache
+      # outside docker for statistics, so install the same ccache version.
+      # Install in /usr/bin so the ccache action gets the expected environment.
+      - name: install ccache
+        if: matrix.test == './.github/do-zephyr'
+        run: |
+          wget -nv https://github.com/ccache/ccache/releases/download/v4.8.2/ccache-4.8.2-linux-x86_64.tar.xz
+          sudo tar xf ccache-4.8.2-linux-x86_64.tar.xz -C /usr/bin --strip-components=1 --no-same-owner ccache-4.8.2-linux-x86_64/ccache
+          rm -f ccache-*-linux-x86_64.tar.xz
+
+      # Key on job name and cache size to get separate caches for linux
+      # and zephyr.
+      - name: ccache
+        if: matrix.test == './.github/do-zephyr'
+        uses: hendrikmuhs/ccache-action@v1.2.10
+        with:
+          key: compilation-${{ runner.os }}-${{ github.job }}-${{ matrix.meson_flags }}-${{ env.CCACHE_SIZE }}
+          max-size: ${{ env.CCACHE_SIZE }}
+
       - name: Minsize test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc -v $GITHUB_WORKSPACE/.ccache:/root/.ccache $IMAGE bash --login -c "${{ env.CCACHE_CMD }} --set-config=max_size=${{ env.CCACHE_SIZE }} && ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize"
 
-  release-linux:
+  fortify-source-linux:
     needs: cache-maker
     runs-on: ubuntu-latest
     strategy:
@@ -187,28 +176,17 @@ jobs:
         meson_flags: [
           "",
 
-          # Math configurations
-          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
-          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
+          # Tinystdio and math configurations, one with multithread disabled and with locale, original malloc and atexit/onexit code
+          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false -Dprintf-small-ultoa=true",
+          "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false -Dnewlib-obsolete-math=true -Dwant-math-errno=true -Dassert-verbose=false",
 
-          # Tinystdio configurations
-          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true",
-          "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false",
-
-          # Original stdio
+          # Original stdio, one with multithread disabled
           "-Dtinystdio=false",
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true -Dnewlib-fvwrite-in-streamio=true",
-
-          # Locale, iconv, original malloc and original atexit/onexit configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false",
-
-          # Multithread disabled
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
-          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dtinystdio=false",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true -Dnewlib-fvwrite-in-streamio=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
         ]
         test: [
-	  "./.github/do-linux",
-	]
+          "./.github/do-linux",
+        ]
     steps:
       - name: Clone picolibc
         uses: actions/checkout@v3
@@ -219,14 +197,34 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          fail-on-cache-miss: true
 
       - name: Load and Check the Docker Image
         run: |
           docker load -i $IMAGE_FILE
           docker images -a $IMAGE
 
-      - name: Release test
+      # The docker image contains ccache, but the ccache action uses the ccache
+      # outside docker for statistics, so install the same ccache version.
+      # Install in /usr/bin so the ccache action gets the expected environment.
+      - name: install ccache
+        if: matrix.test == './.github/do-zephyr'
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
+          wget -nv https://github.com/ccache/ccache/releases/download/v4.8.2/ccache-4.8.2-linux-x86_64.tar.xz
+          sudo tar xf ccache-4.8.2-linux-x86_64.tar.xz -C /usr/bin --strip-components=1 --no-same-owner ccache-4.8.2-linux-x86_64/ccache
+          rm -f ccache-*-linux-x86_64.tar.xz
+
+      # Key on job name and cache size to get separate caches for linux
+      # and zephyr.
+      - name: ccache
+        if: matrix.test == './.github/do-zephyr'
+        uses: hendrikmuhs/ccache-action@v1.2.10
+        with:
+          key: compilation-${{ runner.os }}-${{ github.job }}-${{ matrix.meson_flags }}-${{ env.CCACHE_SIZE }}
+          max-size: ${{ env.CCACHE_SIZE }}
+
+      - name: Fortify source test
+        run: |
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc -v $GITHUB_WORKSPACE/.ccache:/root/.ccache $IMAGE bash --login -c "${{ env.CCACHE_CMD }} --set-config=max_size=${{ env.CCACHE_SIZE }} && ${{ matrix.test }} ${{ matrix.meson_flags }} -Dfortify-source=2 --buildtype release"
 

@@ -8,51 +8,36 @@ on:
     branches:
       - main
 
+# When a PR is updated, cancel the jobs from the previous version. Merges
+# do not define head_ref, so use run_id to never cancel those jobs.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  # 20M measured cache size (August 2023).
+  CCACHE_SIZE: "25M"
+
 jobs:
   macos:
     runs-on: macos-latest
-    strategy:
-      matrix:
-        meson_flags: [
-          "",
-
-          # Math configurations
-          "-Dnewlib-obsolete-math=false",
-          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
-          "-Dnewlib-obsolete-math-float=true -Dnewlib-obsolete-math-double=false",
-          "-Dnewlib-obsolete-math=true",
-          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
-
-          # Tinystdio configurations
-          "-Dio-float-exact=false",
-          "-Dio-long-long=true",
-          "-Dformat-default=integer",
-          "-Dformat-default=float",
-
-          # Malloc configurations
-          "-Dnewlib-nano-malloc=false",
-
-          # Locale configurations
-          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true",
-
-          # Iconv configurations
-          "-Dnewlib-iconv-external-ccs=true"
-        ]
-        test: [
-          "./.github/do-test native -Dnative-tests=false -Dtests-enable-posix-io=false",
-        ]
-
     steps:
-      - name: 'Clone picolibc'
+      - name: Clone picolibc
         uses: actions/checkout@v3
 
-      - name: 'Setup python'
+      - name: Setup python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
-      - name: 'Install meson and ninja'
+      - name: Install meson and ninja
         run: pip install meson ninja
 
-      - name: 'MacOS test'
-        run: ${{ matrix.test }} ${{ matrix.meson_flags }}
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.10
+        with:
+          key: compilation-${{ runner.os }}-${{ github.job }}
+          max-size: ${{ env.CCACHE_SIZE }}
+
+      - name: MacOS tests
+        run: ./.github/do-arm

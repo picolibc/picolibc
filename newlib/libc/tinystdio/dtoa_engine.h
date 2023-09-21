@@ -46,7 +46,7 @@
 #error DBL_DIG
 #endif
 
-#ifdef PICOLIBC_FLOAT_PRINTF_SCANF
+#ifdef _NEED_IO_FLOAT
 
 #define DTOA_MAX_10_EXP FLT_MAX_10_EXP
 #define DTOA_MIN_10_EXP FLT_MIN_10_EXP
@@ -57,8 +57,6 @@
 #define __dtoa_scale_down __ftoa_scale_down
 #define __dtoa_round __ftoa_round
 #define __atod_engine __atof_engine
-#define FLOAT float
-#define UINTFLOAT uint32_t
 
 #else
 
@@ -66,8 +64,6 @@
 #define DTOA_MIN_10_EXP DBL_MIN_10_EXP
 #define DTOA_DIG 	17
 #define DTOA_MAX_DIG	17
-#define FLOAT double
-#define UINTFLOAT uint64_t
 
 #endif
 

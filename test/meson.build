@@ -40,6 +40,11 @@ foreach target : targets
     _libs += [get_variable('lib_semihost' + target)]
   endif
 
+  _lib_files=[]
+  foreach _lib : _libs
+    _lib_files += _lib.full_path()
+  endforeach
+
   if is_variable('crt0_semihost' + target)
     _objs = [get_variable('crt0_semihost'+ target)]
   elif is_variable('crt0_hosted' + target)
@@ -62,10 +67,9 @@ foreach target : targets
   test(t1_name,
        executable(t1_name, ['printf_scanf.c', 'lock-valid.c'],
 		  c_args: double_printf_compile_args + _c_args,
-		  link_args: double_printf_link_args + _link_args,
+		  link_args: double_printf_link_args + _lib_files + _link_args,
 		  objects: _objs,
-		  link_with: _libs,
-		  link_depends:  _link_depends,
+		  link_depends:  _link_depends + _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -80,10 +84,43 @@ foreach target : targets
   test(t1_name,
        executable(t1_name, ['printf_scanf.c', 'lock-valid.c'],
 		  c_args: float_printf_compile_args + _c_args,
-		  link_args: float_printf_link_args + _link_args,
+		  link_args: float_printf_link_args + _lib_files + _link_args,
 		  objects: _objs,
-		  link_with: _libs,
-		  link_depends:  _link_depends,
+		  link_depends:  _link_depends + _libs,
+		  include_directories: inc),
+       depends: bios_bin,
+       env: test_env)
+
+  t1 = 'printfi_scanfi'
+  if target == ''
+    t1_name = t1
+  else
+    t1_name = t1 + '_' + target
+  endif
+
+  test(t1_name,
+       executable(t1_name, ['printf_scanf.c', 'lock-valid.c'],
+		  c_args: int_printf_compile_args + _c_args,
+		  link_args: int_printf_link_args + _lib_files + _link_args,
+		  objects: _objs,
+		  link_depends:  _link_depends + _libs,
+		  include_directories: inc),
+       depends: bios_bin,
+       env: test_env)
+
+  t1 = 'printfm_scanfm'
+  if target == ''
+    t1_name = t1
+  else
+    t1_name = t1 + '_' + target
+  endif
+
+  test(t1_name,
+       executable(t1_name, ['printf_scanf.c', 'lock-valid.c'],
+		  c_args: min_printf_compile_args + _c_args,
+		  link_args: min_printf_link_args + _lib_files + _link_args,
+		  objects: _objs,
+		  link_depends:  _link_depends + _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -98,9 +135,9 @@ foreach target : targets
   test(t1_name,
        executable(t1_name, ['printf-tests.c', 'lock-valid.c'],
 		  c_args: double_printf_compile_args + _c_args,
-		  link_args: double_printf_link_args + _link_args,
+		  link_args: double_printf_link_args + _lib_files + _link_args,
 		  objects: _objs,
-		  link_with: _libs,
+		  link_depends: _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -115,9 +152,9 @@ foreach target : targets
   test(t1_name,
        executable(t1_name, ['printf-tests.c', 'lock-valid.c'],
 		  c_args: float_printf_compile_args + _c_args,
-		  link_args: float_printf_link_args + _link_args,
+		  link_args: float_printf_link_args + _lib_files + _link_args,
 		  objects: _objs,
-		  link_with: _libs,
+		  link_depends: _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -132,9 +169,26 @@ foreach target : targets
   test(t1_name,
        executable(t1_name, ['printf-tests.c', 'lock-valid.c'],
 		  c_args: int_printf_compile_args + _c_args,
-		  link_args: int_printf_link_args + _link_args,
+		  link_args: int_printf_link_args + _lib_files + _link_args,
 		  objects: _objs,
-		  link_with: _libs,
+		  link_depends: _libs,
+		  include_directories: inc),
+       depends: bios_bin,
+       env: test_env)
+
+  t1 = 'printfm-tests'
+  if target == ''
+    t1_name = t1
+  else
+    t1_name = t1 + '_' + target
+  endif
+
+  test(t1_name,
+       executable(t1_name, ['printf-tests.c', 'lock-valid.c'],
+		  c_args: min_printf_compile_args + _c_args,
+		  link_args: min_printf_link_args + _lib_files + _link_args,
+		  objects: _objs,
+		  link_depends: _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -156,9 +210,9 @@ foreach target : targets
   test(t1_name,
        executable(t1_name, ['time-sprintf.c', 'lock-valid.c'],
 		  c_args: int_printf_compile_args + _c_args + ['-fno-builtin'],
-		  link_args: int_printf_link_args + _link_args,
+		  link_args: int_printf_link_args + _lib_files + _link_args,
 		  objects: _objs,
-		  link_with: _libs,
+		  link_depends: _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -183,8 +237,10 @@ foreach target : targets
   t1 = 'hosted-exit'
   if target == ''
     t1_name = t1
+    t1_fail_name = t1 + '-fail'
   else
     t1_name = t1 + '_' + target
+    t1_fail_name = t1 + '-fail_' + target
   endif
 
   test(t1_name,
@@ -197,8 +253,8 @@ foreach target : targets
        depends: bios_bin,
        env: test_env)
 
-  test(t1 + '-fail' + target,
-       executable(t1_name + '-fail', ['hosted-exit.c', 'lock-valid.c'],
+  test(t1_fail_name,
+       executable(t1_fail_name, ['hosted-exit.c', 'lock-valid.c'],
 		  c_args: _c_args + ['-DRETVAL=1'],
 		  link_args:  _link_args,
 		  objects: _objs,
@@ -364,6 +420,7 @@ foreach target : targets
 		 'test-memset', 'test-put',
 		 'test-efcvt', 'test-atomic',
 		 'test-raise',
+                 'test-fma',
 		]
 
   if have_attr_ctor_dtor
@@ -421,6 +478,11 @@ if enable_native_tests
   if native_lib_m.found()
     test('long_double_native',
 	 executable('long_double_native', 'long_double.c',
+		    c_args: native_c_args,
+		    link_args: native_c_args,
+		    dependencies: native_lib_m))
+    test('test-fma_native',
+	 executable('test-fma_native', 'test-fma.c',
 		    c_args: native_c_args,
 		    link_args: native_c_args,
 		    dependencies: native_lib_m))

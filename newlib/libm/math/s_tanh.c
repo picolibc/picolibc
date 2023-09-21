@@ -72,7 +72,7 @@ PORTABILITY
 
 #ifdef _NEED_FLOAT64
 
-static const volatile __float64 one = _F_64(1.0), two = _F_64(2.0), tiny = _F_64(1.0e-300);
+static const __float64 one = _F_64(1.0), two = _F_64(2.0);
 
 __float64
 tanh64(__float64 x)
@@ -105,7 +105,7 @@ tanh64(__float64 x)
         }
         /* |x| > 22, return +-1 */
     } else {
-        z = one - tiny; /* raised inexact flag */
+        z = __math_inexact(one);
     }
     return (jx >= 0) ? z : -z;
 }

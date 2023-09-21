@@ -29,13 +29,11 @@
 #include "fdlibm.h"
 #include "math_config.h"
 
-static const FORCE_FLOAT VAL = pick_float_except(FLT_MIN, 0.0f);
+static CONST_FORCE_FLOAT VAL = pick_float_except(FLT_MIN, 0.0f);
 
 HIDDEN float
 __math_uflowf (uint32_t sign)
 {
-    float y = pick_float_except(VAL * VAL, VAL);
-    if (sign)
-        y = -y;
+    float y = pick_float_except((sign ? -VAL : VAL) * VAL, sign ? -VAL : VAL);
     return __math_with_errnof (y, ERANGE);
 }

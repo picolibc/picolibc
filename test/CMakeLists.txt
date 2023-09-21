@@ -56,6 +56,7 @@ set(tests
   test-memset
   test-put
   test-efcvt
+  test-fma
   malloc_stress
   posix-io
   )

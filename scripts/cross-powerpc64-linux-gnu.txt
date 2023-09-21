@@ -1,5 +1,5 @@
 [binaries]
-c = ['powerpc64-linux-gnu-gcc', '-fno-pic', '-static']
+c = ['ccache', 'powerpc64-linux-gnu-gcc', '-fno-pic', '-static']
 ar = 'powerpc64-linux-gnu-ar'
 nm = 'powerpc64-linux-gnu-nm'
 strip = 'powerpc64-linux-gnu-strip'

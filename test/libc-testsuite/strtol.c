@@ -140,7 +140,7 @@ int test_strtol(void)
                 ('A' <= j && j <= 'F') ||
                 ('a' <= j && j <= 'f'))
             {
-                int k;
+                long k;
                 if ('0' <= j && j <= '9')
                     k = j - '0';
                 else if ('A' <= j && j <= 'Z')

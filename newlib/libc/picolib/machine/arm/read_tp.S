@@ -51,7 +51,7 @@ __aeabi_read_tp:
 	.cfi_sections .debug_frame
 	.cfi_startproc
 #ifdef ARM_TLS_CP15
-	mrc 15, 0, r0, c13, c0, 3
+	mrc p15, 0, r0, c13, c0, 3
 #else
 	/* Load the address of __tls */
 	ldr r0,1f

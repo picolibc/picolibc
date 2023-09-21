@@ -35,7 +35,7 @@
     defined(_ICONV_FROM_ENCODING_UCS_2_INTERNAL)
 
 #ifdef _ICONV_FROM_ENCODING_UTF_8
-char utf8[] =
+static const char utf8[] =
 {
     0xe8,0x89,0xb2,0xe3,0x80,0x85,0xe3,0x83,0x86,0xe3,
     0x82,0xad,0xe3,0x82,0xb9,0xe3,0x83,0x88,0xe3,0x83,
@@ -228,7 +228,7 @@ char utf8[] =
 #endif /* ifdef _ICONV_FROM_ENCODING_UTF_8 */
 
 #ifdef _ICONV_FROM_ENCODING_EUC_JP
- char euc_jp[] =
+ static const char euc_jp[] =
  {
     0xbf,0xa7,0xa1,0xb9,0xa5,0xc6,0xa5,0xad,0xa5,0xb9,
     0xa5,0xc8,0xa5,0xd5,0xa5,0xa1,0xa5,0xa4,0xa5,0xeb,
@@ -395,7 +395,7 @@ char utf8[] =
 #endif /* #ifdef _ICONV_FROM_ENCODING_EUC_JP */
 
 #ifdef _ICONV_FROM_ENCODING_SHIFT_JIS
-char shift_jis[] =
+static const char shift_jis[] =
 {
     0x90,0x46,0x81,0x58,0x83,0x65,0x83,0x4c,0x83,0x58,
     0x83,0x67,0x83,0x74,0x83,0x40,0x83,0x43,0x83,0x8b,
@@ -562,7 +562,7 @@ char shift_jis[] =
 #endif /* _ICONV_FROM_ENCODING_SHIFT_JIS */
 
 #ifdef _ICONV_FROM_ENCODING_UCS_2_INTERNAL
-short ucs2[] =
+static const short ucs2[] =
 {
     0x8272,0x3005,0x30c6,0x30ad,0x30b9,
     0x30c8,0x30d5,0x30a1,0x30a4,0x30eb,
@@ -847,7 +847,7 @@ struct iconv_data
 
 #define CONVERSIONS 4
 
-struct iconv_data data[] =
+static const struct iconv_data data[] =
 {
 #if defined(_ICONV_FROM_ENCODING_EUC_JP) && defined(_ICONV_TO_ENCODING_EUC_JP)
     {sizeof(euc_jp), "EUC-JP", (char *)euc_jp},
@@ -966,7 +966,7 @@ int main(void)
 }
 
 #else /* #if defined(_ICONV_FROM_ENCODING_UTF_8) || ... */
-int main(int argc, char **argv)
+int main(void)
 {
     puts("None of UTF-8, EUC-JP, SHIFT-JIS and UCS-2_INTERNAL converters "
          "linked, SKIP test");

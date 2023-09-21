@@ -26,23 +26,137 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE. */
 
-#include "xtoa_fast.h"
+#if PRINTF_LEVEL < PRINTF_FLT && defined(_PRINTF_SMALL_ULTOA)
+
+#ifdef __arm__
+
+# define FANCY_DIVMOD_8
+# ifndef __ARM_FEATURE_IDIV__
+#  define FANCY_DIVMOD_4
+# endif
+
+#elif defined(__riscv)
+
+# if __riscv_xlen <= 32
+#  define FANCY_DIVMOD_8
+#  ifndef __riscv_m
+#   define FANCY_DIVMOD_4
+#  endif
+# elif __riscv_xlen >= 64
+#  ifndef __riscv_m
+#   define FANCY_DIVMOD_8
+#   define FANCY_DIVMOD_4
+#  endif
+# endif
+
+#elif defined(__arc__)
+
+#if __SIZEOF_LONG__ <= 4
+# define FANCY_DIVMOD_8
+# ifndef __ARC_DIVREM__
+#  define FANCY_DIVMOD_4
+# endif
+#else
+# ifndef __ARC_DIVREM__
+#  define FANCY_DIVMOD_8
+#  define FANCY_DIVMOD_4
+# endif
+#endif
+
+#else
+# if __SIZEOF_LONG__ < 8
+#  define FANCY_DIVMOD_8
+# endif
+#endif
+
+#if SIZEOF_ULTOA == 8 && defined(FANCY_DIVMOD_8)
+
+#define FANCY_DIVMOD
+
+static inline uint64_t udivmod10(uint64_t n, char *rp) {
+        uint64_t q;
+        char r;
+
+	q = (n >> 1) + (n >> 2);
+	q = q + (q >> 4);
+	q = q + (q >> 8);
+	q = q + (q >> 16);
+        q = q + (q >> 32);
+	q = q >> 3;
+	r = (char) (n - (((q << 2) + q) << 1));
+        if (r > 9) {
+            q++;
+            r -= 10;
+        }
+        *rp = r;
+	return q;
+}
+
+#elif SIZEOF_ULTOA == 4 && defined(FANCY_DIVMOD_4)
+
+#define FANCY_DIVMOD
+
+static inline uint32_t udivmod10(uint32_t n, char *rp) {
+	uint32_t q;
+        char r;
+
+	q = (n >> 1) + (n >> 2);
+	q = q + (q >> 4);
+	q = q + (q >> 8);
+	q = q + (q >> 16);
+	q = q >> 3;
+	r = (char) (n - (((q << 2) + q) << 1));
+        if (r > 9) {
+            q++;
+            r -= 10;
+        }
+        *rp = r;
+	return q;
+}
+
+#endif
+
+#endif
+
+#ifdef FANCY_DIVMOD
+
+static inline ultoa_unsigned_t
+udivmod(ultoa_unsigned_t val, int base, char *dig)
+{
+    switch(base) {
+#ifdef _WANT_IO_PERCENT_B
+    case 2:
+        *dig = val & 1;
+        return val >> 1;
+#endif
+    case 8:
+        *dig = val & 7;
+        return val >> 3;
+    case 16:
+        *dig = val & 15;
+        return val >> 4;
+    }
+    return udivmod10(val, dig);
+}
+
+#endif
 
 static __noinline char *
 __ultoa_invert(ultoa_unsigned_t val, char *str, int base)
 {
-	char hex = 'a' - '0' - 10;
+	char hex = ('a' - '0' - 10 + 16) - base;
 
-	if (base & XTOA_UPPER) {
-		hex = 'A' - '0' - 10;
-		base &= ~XTOA_UPPER;
-	}
+        base &= 31;
+
 	do {
 		char	v;
 
+#ifdef FANCY_DIVMOD
+                val = udivmod(val, base, &v);
+#else
                 v = val % base;
                 val /= base;
-
+#endif
 		if (v > 9)
                         v += hex;
                 v += '0';

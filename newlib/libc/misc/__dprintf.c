@@ -34,6 +34,7 @@
 
 #include <_ansi.h>
 #include <unistd.h>
+#include <endian.h>
 #include "ctype.h"
 #include "string.h"
 #include "unctrl.h"
@@ -52,9 +53,6 @@ static long get_number (char *, long, int);
 static void print_number (int, int, long);
 static void write_char (char c);
 static void write_string (const char *s);
-
-/* Non-zero for big-endian systems.  */
-static int big_endian_p;
 
 /* For now hardcode 2 (stderr) as the console file descriptor.
    May wish to let the caller pass in a file descriptor or some such but
@@ -91,12 +89,6 @@ __dprintf (fmt, va_alist)
 #endif
 {
   va_list args;
-
-  /* Which endian are we?  */
-  {
-    short tmp = 1;
-    big_endian_p = *(char *) &tmp == 0;
-  }
 
 #ifdef __STDC__
   va_start (args, fmt);
@@ -220,7 +212,7 @@ get_number (char *s,
 	x = (x ^ 0x80) - 0x80;
       return x;
     case 2 :
-      if (big_endian_p)
+      if (_BYTE_ORDER == _BIG_ENDIAN)
 	x = (p[0] << 8) | p[1];
       else
 	x = (p[1] << 8) | p[0];
@@ -228,7 +220,7 @@ get_number (char *s,
 	x = (x ^ 0x8000) - 0x8000;
       return x;
     case 4 :
-      if (big_endian_p)
+      if (_BYTE_ORDER == _BIG_ENDIAN)
 	x = ((long)p[0] << 24) | ((long)p[1] << 16) | (p[2] << 8) | p[3];
       else
 	x = ((long)p[3] << 24) | ((long)p[2] << 16) | (p[1] << 8) | p[0];

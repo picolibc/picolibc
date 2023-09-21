@@ -55,5 +55,5 @@ int fegetexceptflag(fexcept_t *flagp, int excepts)
     return 0;
 }
 #else
-#include "../../fenv/fetestexcept.c"
+#include "../../fenv/fegetexceptflag.c"
 #endif

@@ -22,7 +22,7 @@
 long double
 nextafterl(long double x, long double y)
 {
-	int32_t hx,hy,ix,iy;
+	u_int32_t hx,hy,ix,iy;
 	u_int32_t lx,ly;
         int32_t esx,esy;
 
@@ -40,8 +40,8 @@ nextafterl(long double x, long double y)
             force_eval_long_double(opt_barrier_long_double(x)*x);
             return x;
 	}
-	if(esx<0x8000) {			/* x > 0 */
-	    if(ix>iy||((ix==iy) && (hx>hy||((hx==hy)&&(lx>ly))))) {
+	if(esx>=0) {			/* x > 0 */
+	    if(esy<0||(ix>iy||((ix==iy) && (hx>hy||((hx==hy)&&(lx>ly)))))) {
 	      /* x > y, x -= ulp */
 		if(lx==0) {
 		    if ((hx&0x7fffffff)==0) esx -= 1;

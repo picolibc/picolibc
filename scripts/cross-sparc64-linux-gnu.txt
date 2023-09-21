@@ -3,7 +3,7 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['sparc64-linux-gnu-gcc', '-nostdlib']
+c = ['ccache', 'sparc64-linux-gnu-gcc', '-nostdlib']
 ar = 'sparc64-linux-gnu-ar'
 as = 'sparc64-linux-gnu-as'
 ld = 'sparc64-linux-gnu-ld'

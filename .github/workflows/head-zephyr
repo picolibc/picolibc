@@ -8,8 +8,19 @@ on:
     branches:
       - main
 
+# When a PR is updated, cancel the jobs from the previous version. Merges
+# do not define head_ref, so use run_id to never cancel those jobs.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 env:
-  IMAGE_FILE: dockerimg-zephyr.tar.xz
+  # .github/do-zephyr -Dfortify-source=2 --buildtype release
+  # is the largest cache, 429.5M (September 2023).
+  CCACHE_SIZE: "450M"
+  CCACHE_CMD: ccache
+  DOCKERFILE: picolibc/.github/Dockerfile-zephyr
+  IMAGE_FILE: dockerimg-zephyr.tar.zst
   IMAGE: picolibc
   PACKAGES_FILE: picolibc/.github/zephyr-packages.txt
   EXTRA_FILE: picolibc/.github/zephyr-files.txt
@@ -28,7 +39,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          lookup-only: true
 
       - name: Set up Docker Buildx
         if: steps.cache.outputs.cache-hit != 'true'
@@ -41,5 +53,5 @@ jobs:
           platforms: linux/amd64
           file: .github/Dockerfile-zephyr
           tags: ${{ env.IMAGE }}:latest
-          outputs: type=docker,dest=${{ env.IMAGE_FILE }}
+          outputs: type=docker,force-compression=true,compression=zstd,compression-level=22,dest=${{ env.IMAGE_FILE }}
 

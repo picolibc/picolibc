@@ -30,7 +30,7 @@
 #include <newlib.h>
 #include "check.h"
 
-char *good_names[] = {
+static const char * const good_names[] = {
 #ifdef _ICONV_FROM_ENCODING_ISO_8859_5
 "iso_8859_5", "iso-8859-5", "iso-8859_5", "IsO-8859_5"
 #elif defined _ICONV_FROM_ENCODING_US_ASCII
@@ -43,7 +43,7 @@ char *good_names[] = {
 #endif
 };
 
-char *bad_names[] =
+static const char * const bad_names[] =
 {" ", "iso", "8", "iso_8859_5 ", " iso_8859_5", "csisolatincyrillic ",
  " csisolatincyrillic", "euc-", "p", "euc_jp ", "euc-jp-",
  "us_as", "us_", "us_ascii ", " us_ascii",

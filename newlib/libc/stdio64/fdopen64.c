@@ -34,8 +34,6 @@ File pointer or <<NULL>>, as for <<fopen>>.
 #include <sys/lock.h>
 #include "../stdio/local.h"
 
-extern int __sflags ();
-
 FILE *
 fdopen64 (
 	int fd,

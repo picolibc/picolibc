@@ -28,7 +28,7 @@
 
 #include "math_config.h"
 
-static const FORCE_FLOAT64 VAL = pick_float64_except(_F_64(0.0), (__float64) NAN);
+static CONST_FORCE_FLOAT64 VAL = pick_float64_except(_F_64(0.0), (__float64) NAN);
 
 HIDDEN __float64
 __math_invalid (__float64 x)

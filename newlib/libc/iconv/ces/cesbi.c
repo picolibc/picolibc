@@ -12,7 +12,7 @@
  */
 #if defined (ICONV_TO_UCS_CES_EUC) \
  || defined (ICONV_FROM_UCS_CES_EUC)
-static const char *
+static const char * const
 iconv_ces_names_euc[] =
 {
 # if defined (_ICONV_FROM_ENCODING_EUC_JP) \
@@ -33,7 +33,7 @@ iconv_ces_names_euc[] =
 
 #if defined (ICONV_TO_UCS_CES_TABLE) \
  || defined (ICONV_FROM_UCS_CES_TABLE)
-static const char *
+static const char * const
 iconv_ces_names_table[] =
 {
 # if defined (_ICONV_FROM_ENCODING_CP775) \
@@ -174,7 +174,7 @@ iconv_ces_names_table[] =
 
 #if defined (ICONV_TO_UCS_CES_TABLE_PCS) \
  || defined (ICONV_FROM_UCS_CES_TABLE_PCS)
-static const char *
+static const char * const
 iconv_ces_names_table_pcs[] =
 {
 # if defined (_ICONV_FROM_ENCODING_BIG5) \
@@ -187,7 +187,7 @@ iconv_ces_names_table_pcs[] =
 
 #if defined (ICONV_TO_UCS_CES_UCS_2) \
  || defined (ICONV_FROM_UCS_CES_UCS_2)
-static const char *
+static const char * const
 iconv_ces_names_ucs_2[] =
 {
 # if defined (_ICONV_FROM_ENCODING_UCS_2) \
@@ -208,7 +208,7 @@ iconv_ces_names_ucs_2[] =
 
 #if defined (ICONV_TO_UCS_CES_UCS_2_INTERNAL) \
  || defined (ICONV_FROM_UCS_CES_UCS_2_INTERNAL)
-static const char *
+static const char * const
 iconv_ces_names_ucs_2_internal[] =
 {
 # if defined (_ICONV_FROM_ENCODING_UCS_2_INTERNAL) \
@@ -221,7 +221,7 @@ iconv_ces_names_ucs_2_internal[] =
 
 #if defined (ICONV_TO_UCS_CES_UCS_4) \
  || defined (ICONV_FROM_UCS_CES_UCS_4)
-static const char *
+static const char * const
 iconv_ces_names_ucs_4[] =
 {
 # if defined (_ICONV_FROM_ENCODING_UCS_4) \
@@ -242,7 +242,7 @@ iconv_ces_names_ucs_4[] =
 
 #if defined (ICONV_TO_UCS_CES_UCS_4_INTERNAL) \
  || defined (ICONV_FROM_UCS_CES_UCS_4_INTERNAL)
-static const char *
+static const char * const
 iconv_ces_names_ucs_4_internal[] =
 {
 # if defined (_ICONV_FROM_ENCODING_UCS_4_INTERNAL) \
@@ -255,7 +255,7 @@ iconv_ces_names_ucs_4_internal[] =
 
 #if defined (ICONV_TO_UCS_CES_US_ASCII) \
  || defined (ICONV_FROM_UCS_CES_US_ASCII)
-static const char *
+static const char * const
 iconv_ces_names_us_ascii[] =
 {
 # if defined (_ICONV_FROM_ENCODING_US_ASCII) \
@@ -268,7 +268,7 @@ iconv_ces_names_us_ascii[] =
 
 #if defined (ICONV_TO_UCS_CES_UTF_16) \
  || defined (ICONV_FROM_UCS_CES_UTF_16)
-static const char *
+static const char * const
 iconv_ces_names_utf_16[] =
 {
 # if defined (_ICONV_FROM_ENCODING_UTF_16) \
@@ -289,7 +289,7 @@ iconv_ces_names_utf_16[] =
 
 #if defined (ICONV_TO_UCS_CES_UTF_8) \
  || defined (ICONV_FROM_UCS_CES_UTF_8)
-static const char *
+static const char * const
 iconv_ces_names_utf_8[] =
 {
 # if defined (_ICONV_FROM_ENCODING_UTF_8) \

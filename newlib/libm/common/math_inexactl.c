@@ -38,11 +38,11 @@
 #if defined(FE_INEXACT) && !defined(PICOLIBC_LONG_DOUBLE_NOEXECPT) && defined(_NEED_FLOAT_HUGE)
 
 #ifdef _DOUBLE_DOUBLE_FLOAT
-static const FORCE_LONG_DOUBLE VAL = pick_long_double_except(LDBL_MIN, 0.0L);
-static const FORCE_LONG_DOUBLE VAL1 = pick_long_double_except(LDBL_MAX, 0.0L);
+static CONST_FORCE_LONG_DOUBLE VAL = pick_long_double_except(LDBL_MIN, 0.0L);
+static CONST_FORCE_LONG_DOUBLE VAL1 = pick_long_double_except(LDBL_MAX, 0.0L);
 #define eqn (1.0L + VAL + VAL1)
 #else
-static const FORCE_LONG_DOUBLE VAL = pick_long_double_except(LDBL_MIN, 0.0L);
+static CONST_FORCE_LONG_DOUBLE VAL = pick_long_double_except(LDBL_MIN, 0.0L);
 #define eqn (1.0L + VAL)
 #endif
 

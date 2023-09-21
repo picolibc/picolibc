@@ -36,6 +36,7 @@
 #define _DEFAULT_SOURCE
 #include <strings.h>
 #include <string.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -98,7 +99,6 @@ check(long long int x, int got, int expect, char *which)
 int
 main(void)
 {
-	size_t i;
 	int ret = 0;
 
 	/* Test zero */
@@ -107,7 +107,7 @@ main(void)
 	ret += check(0, ffsll(0), slow_ffsll(0), "ffsll");
 
 	/* Test every bit position in a long long */
-	for (i = 0; i < sizeof(long long) * 8; i++) {
+	for (size_t i = 0; i < sizeof(long long) * 8; i++) {
 		long long int xll = 1LL << i;
 		long xl = (long) xll;
 		int x = (int) xll;
@@ -119,7 +119,7 @@ main(void)
 
 	/* Test another few random values */
 #define N 100000
-	for (i = 0; i < N; i++) {
+	for (int32_t i = 0; i < N; i++) {
 		long long int xll = rand_long_long();
 		long xl = (long) xll;
 		int x = (int) xll;

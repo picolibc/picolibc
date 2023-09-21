@@ -139,9 +139,9 @@ checkint (uint32_t iy)
     return 0;
   if (e > 0x7f + 23)
     return 2;
-  if (iy & ((1 << (0x7f + 23 - e)) - 1))
+  if (iy & (((uint32_t) 1 << (0x7f + 23 - e)) - 1))
     return 0;
-  if (iy & (1 << (0x7f + 23 - e)))
+  if (iy & ((uint32_t) 1 << (0x7f + 23 - e)))
     return 1;
   return 2;
 }

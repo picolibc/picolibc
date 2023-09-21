@@ -1,5 +1,5 @@
 # Picolibc
-Copyright © 2018-2022 Keith Packard
+Copyright © 2018-2023 Keith Packard
 
 Picolibc is library offering standard C library APIs that targets
 small embedded systems with limited RAM. Picolibc was formed by blending
@@ -9,6 +9,7 @@ code from [Newlib](http://sourceware.org/newlib/) and
 Build status:
 
  * ![Linux](https://github.com/picolibc/picolibc/workflows/Linux/badge.svg?branch=main)
+ * ![Zephyr](https://github.com/picolibc/picolibc/workflows/Zephyr/badge.svg?branch=main)
  * ![Mac OS X](https://github.com/picolibc/picolibc/workflows/Mac%20OS%20X/badge.svg)
 
 ## License
@@ -42,6 +43,7 @@ is used to validate the code for all patch integration:
  * i386 (Native and Linux hosted, for testing)
  * Motorola 68000 (m68k)
  * MIPS
+ * MSP430
  * Nios II
  * Power9
  * RISC-V (both 32- and 64- bit)
@@ -51,7 +53,6 @@ There is also build infrastructure and continuous build validation,
 but no integrated testing available for additional architectures:
 
  * Microblaze (32-bit, big and little endian)
- * MSP430
  * PowerPC (big and little endian)
  * Sparc64
  * Xtensa (ESP8266, ESP32)
@@ -141,6 +142,67 @@ use Picolibc:
  * [Copyright and license information](COPYING.picolibc)
 
 ## Releases
+
+### Picolibc version 1.8.4
+
+ * Make math overflow and underflow handlers respect rounding modes.
+
+ * Add full precision fma/fmaf fallbacks by adapting the long-double
+   code which uses two floats/doubles and some careful exponent
+   management to ensure that only a single rounding operation occurs.
+
+ * Fix more m68k 80-bit float bugs
+
+ * Fix m68k asm ABI by returning pointers in %a0 and %d0
+
+ * Use an m68k-unknown-elf toolchain for m68k testing, including
+   multi-lib to check various FPU configurations on older and more
+   modern 68k targets.
+
+ * Improve CI speed by using ccache on zephyr and mac tests,
+   compressing the docker images and automatically canceling jobs when
+   the related PR is updated. Thanks to Peter Jonsson.
+
+ * Move a bunch of read-only data out of RAM and into flash by adding
+   'const' attributes in various places.
+
+ * Add a new linker symbol, `__heap_size_min`, which specifies a
+   minimum heap size. The linker will emit an error if this much space
+   is not available between the end of static data and the stack.
+
+ * Fix a bunch of bugs on targets with 16-bit int type. Thanks to
+   Peter Jonsson for many of these.
+
+ * Work around a handful of platform bugs on MSP430. I think these are
+   compiler bugs as they occur using both the binutils simulator and
+   mspsim.
+
+ * Run tests on MSP430 using the simulator that comes with gdb. Thanks to
+   Peter Jonsson for spliting tests apart to make them small enough to
+   link in under 1MB. This requires a patch adding primitive
+   semihosting to the simulator.
+
+ * Provide a division-free binary to decimal conversion option for
+   printf at friends. This is useful on targets without hardware
+   divide as it avoids pulling in a (usually large) software
+   implementation. This is controlled with the 'printf-small-ultoa'
+   meson option and is 'false' by default.
+
+ * Add 'minimal' printf and scanf variants. These reduce functionality
+   by removing code that acts on most data modifers including width
+   and precision fields and alternate presentation modes. A new config
+   variable, minimal-io-long-long, controls whether that code supports
+   long long types.
+
+ * Add a 'assert-verbose' option which controls whether the assert
+   macro is chatty by default. It is 'true' by default, which
+   preserves the existing code, but when set to 'false', then a
+   failing assert calls __assert_no_msg with no arguments, saving the
+   memory usually occupied by the filename, function name and
+   expression.
+
+ * Fix arm asm syntax for mrc/mcr instructions to make clang happy.
+   Thanks to Radovan Blažek for this patch.
 
 ### Picolibc version 1.8.3
 

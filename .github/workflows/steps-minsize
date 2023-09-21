@@ -1,4 +1,4 @@
       - name: Minsize test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc -v $GITHUB_WORKSPACE/.ccache:/root/.ccache $IMAGE bash --login -c "${{ env.CCACHE_CMD }} --set-config=max_size=${{ env.CCACHE_SIZE }} && ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize"
 

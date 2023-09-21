@@ -26,8 +26,10 @@ int (*_reference_scanf_float)() = _scanf_float;
 #endif
 #endif
 
-static char buf[1024];
-static wchar_t wbuf[1024];
+#define PRINTF_BUF_SIZE 512
+
+static char buf[PRINTF_BUF_SIZE];
+static wchar_t wbuf[PRINTF_BUF_SIZE];
 
 static void failmsg(int serial, char *fmt, ...) {
     va_list ap;
@@ -78,21 +80,21 @@ static int test(int serial, char *expect, char *fmt, ...) {
 			    int iv1 = va_arg(ap, int);
 			    int iv2 = va_arg(ap, int);
 			    dv = va_arg(ap, double);
-			    n = snprintf(buf, 1024, fmt, iv1, iv2, printf_float(dv));
+			    n = snprintf(buf, PRINTF_BUF_SIZE, fmt, iv1, iv2, printf_float(dv));
 #ifdef TEST_ASPRINTF
 			    an = asprintf(&abuf, fmt, iv1, iv2, printf_float(dv));
 #endif
 		    } else  {
 			    int iv = va_arg(ap, int);
 			    dv = va_arg(ap, double);
-			    n = snprintf(buf, 1024, fmt, iv, printf_float(dv));
+			    n = snprintf(buf, PRINTF_BUF_SIZE, fmt, iv, printf_float(dv));
 #ifdef TEST_ASPRINTF
 			    an = asprintf(&abuf, fmt, iv, printf_float(dv));
 #endif
 		    }
 	    } else {
 		    dv = va_arg(ap, double);
-		    n = snprintf(buf, 1024, fmt, printf_float(dv));
+		    n = snprintf(buf, PRINTF_BUF_SIZE, fmt, printf_float(dv));
 #ifdef TEST_ASPRINTF
 		    an = asprintf(&abuf, fmt, printf_float(dv));
 #endif
@@ -100,7 +102,7 @@ static int test(int serial, char *expect, char *fmt, ...) {
 	    break;
 #endif
     default:
-	    n = vsnprintf(buf, 1024, fmt, ap);
+	    n = vsnprintf(buf, PRINTF_BUF_SIZE, fmt, ap);
 #ifdef TEST_ASPRINTF
 	    an = vasprintf(&abuf, fmt, aap);
 #endif
@@ -111,14 +113,14 @@ static int test(int serial, char *expect, char *fmt, ...) {
     va_end(aap);
 #endif
 //    printf("serial %d expect \"%s\" got \"%s\"\n", serial, expect, buf);
-    if (n >= 1024) {
+    if (n >= PRINTF_BUF_SIZE) {
         failmsg(serial, "buffer overflow");
 	free(abuf);
         return 1;
     }
     if (n != (int) strlen(expect)) {
         failmsg(serial, "expected \"%s\" (%d), got \"%s\" (%d)",
-		expect, strlen(expect), buf, n);
+		expect, (int) strlen(expect), buf, n);
 	free(abuf);
         return 1;
     }
@@ -147,10 +149,10 @@ static void failmsgw(int serial, wchar_t *fmt, ...) {
     va_list ap;
     va_start(ap, fmt);
     printf("test %d failed: ", serial);
-    static wchar_t f_wbuf[1024];
-    static char f_buf[1024];
-    vswprintf(f_wbuf, 1024, fmt, ap);
-    wcstombs(f_buf, f_wbuf, 1024);
+    static wchar_t f_wbuf[PRINTF_BUF_SIZE];
+    static char f_buf[PRINTF_BUF_SIZE];
+    vswprintf(f_wbuf, PRINTF_BUF_SIZE, fmt, ap);
+    wcstombs(f_buf, f_wbuf, PRINTF_BUF_SIZE);
     printf("%s\n", f_buf);
     va_end(ap);
 }
@@ -187,25 +189,25 @@ static int testw(int serial, wchar_t *expect, wchar_t *fmt, ...) {
 			    int iv1 = va_arg(ap, int);
 			    int iv2 = va_arg(ap, int);
 			    dv = va_arg(ap, double);
-			    n = swprintf(wbuf, 1024, fmt, iv1, iv2, printf_float(dv));
+			    n = swprintf(wbuf, PRINTF_BUF_SIZE, fmt, iv1, iv2, printf_float(dv));
 		    } else  {
 			    int iv = va_arg(ap, int);
 			    dv = va_arg(ap, double);
-			    n = swprintf(wbuf, 1024, fmt, iv, printf_float(dv));
+			    n = swprintf(wbuf, PRINTF_BUF_SIZE, fmt, iv, printf_float(dv));
 		    }
 	    } else {
 		    dv = va_arg(ap, double);
-		    n = swprintf(wbuf, 1024, fmt, printf_float(dv));
+		    n = swprintf(wbuf, PRINTF_BUF_SIZE, fmt, printf_float(dv));
 	    }
 	    break;
 #endif
     default:
-	    n = vswprintf(wbuf, 1024, fmt, ap);
+	    n = vswprintf(wbuf, PRINTF_BUF_SIZE, fmt, ap);
 	    break;
     }
     va_end(ap);
 //    printf("serial %d expect \"%s\" got \"%s\"\n", serial, expect, wbuf);
-    if (n >= 1024) {
+    if (n >= PRINTF_BUF_SIZE) {
         failmsgw(serial, L"buffer overflow");
 	free(abuf);
         return 1;

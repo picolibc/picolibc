@@ -3,7 +3,7 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['xtensa-nxp_imx_adsp_zephyr-elf-gcc', '-nostdlib']
+c = ['ccache', 'xtensa-nxp_imx_adsp_zephyr-elf-gcc', '-nostdlib']
 ar = 'xtensa-nxp_imx_adsp_zephyr-elf-ar'
 as = 'xtensa-nxp_imx_adsp_zephyr-elf-as'
 nm = 'xtensa-nxp_imx_adsp_zephyr-elf-nm'

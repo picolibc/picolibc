@@ -42,7 +42,7 @@ project('picolibc', 'c',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.53',
-	version: '1.8.3'
+	version: '1.8.4'
        )
 
 targets = []
@@ -311,19 +311,24 @@ format_default = get_option('format-default')
 printf_aliases = get_option('printf-aliases')
 io_percent_b = tinystdio and get_option('io-percent-b')
 io_long_double = get_option('io-long-double') or get_option('newlib-io-long-double')
+printf_small_ultoa = tinystdio and get_option('printf-small-ultoa')
+minimal_io_long_long = tinystdio and get_option('minimal-io-long-long')
 
 if printf_aliases
   double_printf_compile_args=['-DPICOLIBC_DOUBLE_PRINTF_SCANF']
   float_printf_compile_args=['-DPICOLIBC_FLOAT_PRINTF_SCANF']
   int_printf_compile_args=['-DPICOLIBC_INTEGER_PRINTF_SCANF']
+  min_printf_compile_args=['-DPICOLIBC_MINIMAL_PRINTF_SCANF']
 else
   double_printf_compile_args=[]
   float_printf_compile_args=[]
   int_printf_compile_args=[]
+  min_printf_compile_args=[]
 endif
 double_printf_link_args=double_printf_compile_args
 float_printf_link_args=float_printf_compile_args
 int_printf_link_args=int_printf_compile_args
+min_printf_link_args=min_printf_compile_args
 
 if tinystdio
   if format_default == 'double'
@@ -332,6 +337,8 @@ if tinystdio
     c_args += '-DFORMAT_DEFAULT_FLOAT'
   elif format_default == 'integer'
     c_args += '-DFORMAT_DEFAULT_INTEGER'
+  elif format_default == 'minimal'
+    c_args += '-DFORMAT_DEFAULT_MINIMAL'
   endif
 endif
 
@@ -340,10 +347,12 @@ if tinystdio and printf_aliases
   __d_vfprintf_symbol = global_prefix + '__d_vfprintf'
   __f_vfprintf_symbol = global_prefix + '__f_vfprintf'
   __i_vfprintf_symbol = global_prefix + '__i_vfprintf'
+  __m_vfprintf_symbol = global_prefix + '__m_vfprintf'
   vfscanf_symbol = global_prefix + 'vfscanf'
   __d_vfscanf_symbol = global_prefix + '__d_vfscanf'
   __f_vfscanf_symbol = global_prefix + '__f_vfscanf'
   __i_vfscanf_symbol = global_prefix + '__i_vfscanf'
+  __m_vfscanf_symbol = global_prefix + '__m_vfscanf'
 
   if has_link_defsym
     if format_default != 'double'
@@ -358,24 +367,43 @@ if tinystdio and printf_aliases
       int_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __i_vfprintf_symbol
       int_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __i_vfscanf_symbol
     endif
+    if format_default != 'minimal'
+      min_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __m_vfprintf_symbol
+      min_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __m_vfscanf_symbol
+      message('added m symbols')
+    endif
   elif has_link_alias
     if format_default == 'double'
       float_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __d_vfprintf_symbol
       float_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __d_vfscanf_symbol
       int_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __d_vfprintf_symbol
       int_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __d_vfscanf_symbol
+      min_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __d_vfprintf_symbol
+      min_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __d_vfscanf_symbol
     endif
     if format_default == 'float'
       double_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __f_vfprintf_symbol
       double_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __f_vfscanf_symbol
       int_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __f_vfprintf_symbol
       int_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __f_vfscanf_symbol
+      min_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __f_vfprintf_symbol
+      min_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __f_vfscanf_symbol
     endif
-    if format_default == 'int'
+    if format_default == 'integer'
       double_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __i_vfprintf_symbol
       double_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __i_vfscanf_symbol
       float_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __i_vfprintf_symbol
       float_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __i_vfscanf_symbol
+      min_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __i_vfprintf_symbol
+      min_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __i_vfscanf_symbol
+    endif
+    if format_default == 'minimal'
+      double_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __m_vfprintf_symbol
+      double_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __m_vfscanf_symbol
+      float_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __m_vfprintf_symbol
+      float_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __m_vfscanf_symbol
+      int_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __m_vfprintf_symbol
+      int_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __m_vfscanf_symbol
     endif
     if format_default != 'double'
       double_printf_link_args += '-Wl,-alias,' + __d_vfprintf_symbol +  ',' + vfprintf_symbol
@@ -388,6 +416,10 @@ if tinystdio and printf_aliases
     if format_default != 'integer'
       int_printf_link_args += '-Wl,-alias,' + __i_vfprintf_symbol +  ',' + vfprintf_symbol
       int_printf_link_args += '-Wl,-alias,' + __i_vfscanf_symbol + ',' + vfscanf_symbol
+    endif
+    if format_default != 'minimal'
+      min_printf_link_args += '-Wl,-alias,' + __m_vfprintf_symbol +  ',' + vfprintf_symbol
+      min_printf_link_args += '-Wl,-alias,' + __m_vfscanf_symbol + ',' + vfscanf_symbol
     endif
   else
     if enable_tests
@@ -533,12 +565,21 @@ endif
 # Let targets add more support libraries 
 additional_libs_list = meson.get_cross_property('additional_libs', [])
 
-if cc.get_id() == 'ccomp'
+compiler_id = cc.get_id()
+if compiler_id == 'ccomp'
   # When passing the specs file to CompCert, the libcompcert needs to be included there as well
   additional_libs_list += '-lcompcert'
 endif
 
 additional_libs = ' '.join(additional_libs_list)
+
+if compiler_id == 'gcc' and target_machine.cpu_family() == 'msp430'
+  # Extract -mhwmult-selection-snippet from GCC.
+  dumped_specs = run_command(cc.cmd_array() + '-dumpspecs').stdout()
+  hwmult_start = dumped_specs.split('%{mhwmult=auto')[1]
+  hwmult_snippet = '%{mhwmult=auto' + hwmult_start.split('-lc')[0]
+  additional_libs += hwmult_snippet
+endif
 
 specs_extra = ''
 specs_extra_list = meson.get_cross_property('specs_extra', [])
@@ -553,7 +594,9 @@ if tinystdio and printf_aliases
 		' %{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfprintf=__d_vfprintf}' +
 		' %{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfscanf=__d_vfscanf}' +
 		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfprintf=__i_vfprintf}' +
-		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfscanf=__i_vfscanf}')
+		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfscanf=__i_vfscanf}' +
+		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=vfprintf=__m_vfprintf}' +
+		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=vfscanf=__m_vfscanf}')
 endif
 
 crt0_expr = '%{-crt0=*:crt0-%*%O%s; :crt0%O%s}'
@@ -937,40 +980,87 @@ foreach target : ['default-target'] + targets
       picolibc_linker_type_data.set('LLD_END', '*/')
     endif
 
+    init_memory_template = '''
+        @0@ (rx!w) : ORIGIN = @1@, LENGTH = @2@
+'''
+    init_section_template = '''
+        .@0@ : {
+@1@
+        } >@2@ AT>@2@ :text
+'''
+    default_init_section_template = init_section_template.format('@0@', '''      		KEEP (*(.text.init.enter))
+		KEEP (*(.data.init.enter))
+		KEEP (*(SORT_BY_NAME(.init) SORT_BY_NAME(.init.*)))''',
+                                                                 '@1@')
+
+    additional_sections = []
+
+    fallback_flash_addr = '0x10000000'
+    fallback_flash_size = '0x00010000'
+
     if meson.get_cross_property('separate_boot_flash_' + custom_mem_config,
                                 meson.get_cross_property('separate_boot_flash', false))
-
-      default_boot_flash_addr = meson.get_cross_property(
+      boot_flash_addr = meson.get_cross_property(
         'default_boot_flash_addr_' + custom_mem_config,
         meson.get_cross_property(
           'default_boot_flash_addr',
           '0x10000000'))
-
-      default_boot_flash_size = meson.get_cross_property(
+      boot_flash_size = meson.get_cross_property(
         'default_boot_flash_size_' + custom_mem_config,
         meson.get_cross_property(
           'default_boot_flash_size',
           '0x00000400'))
-
+      additional_sections = [
+        {
+          'name' : 'boot_flash',
+          'addr' : boot_flash_addr,
+          'size' : boot_flash_size,
+          'contents' : default_init_section_template.format('boot_flash', 'boot_flash')
+        }]
       fallback_flash_addr = '0x10000400'
       fallback_flash_size = '0x0000fc00'
-
-      picolibc_linker_type_data.set('MEMORY_BOOT_FLASH', '''
-        boot_flash (rx!w) :
-                ORIGIN = DEFINED(__boot_flash) ? __boot_flash : ''' + default_boot_flash_addr + ''',
-                LENGTH = DEFINED(__boot_flash_size) ? __boot_flash_size : ''' + default_boot_flash_size)
-
-      picolibc_linker_type_data.set('INIT_MEMORY', 'boot_flash')
-
     else
-
-      fallback_flash_addr = '0x10000000'
-      fallback_flash_size = '0x00010000'
-
-      picolibc_linker_type_data.set('MEMORY_BOOT_FLASH', '')
-      picolibc_linker_type_data.set('INIT_MEMORY', 'flash')
-
+      additional_section_names = meson.get_cross_property('additional_sections_' + custom_mem_config,
+                                                     meson.get_cross_property('additional_sections', []))
+      if additional_section_names != []
+        foreach section_name : additional_section_names
+          default_content_list =  ['*.(.' + section_name + ')', '*.(.' + section_name + '.*)']
+          content_list = meson.get_cross_property('default_' + section_name + '_contents', default_content_list)
+          contents = ''
+          foreach content : content_list
+            if contents != ''
+              contents += '''
+'''
+            endif
+            contents += '                @0@'.format(content)
+          endforeach
+          additional_sections += [
+            {
+              'name' : section_name,
+              'addr' : meson.get_cross_property('default_' + section_name + '_addr'),
+              'size' : meson.get_cross_property('default_' + section_name + '_size'),
+              'contents' : init_section_template.format(section_name, contents, section_name)
+            }]
+        endforeach
+      endif
     endif
+                          
+    init_memory = ''
+    init_sections = ''
+
+    if additional_sections != []
+      foreach section : additional_sections
+        section_name = section['name']
+        init_memory += init_memory_template.format(section_name, section['addr'], section['size'])
+        init_sections += section['contents']
+      endforeach
+    else
+      init_memory = ''
+      init_sections = default_init_section_template.format('init', 'flash')
+    endif
+
+    picolibc_linker_type_data.set('INIT_MEMORY', init_memory)
+    picolibc_linker_type_data.set('INIT_SECTIONS', init_sections)
 
     picolibc_linker_type_data.set(
       'DEFAULT_FLASH_ADDR', meson.get_cross_property(
@@ -1003,6 +1093,12 @@ foreach target : ['default-target'] + targets
       meson.get_cross_property('default_stack_size_' + custom_mem_config,
                                meson.get_cross_property('default_stack_size',
                                                         '0x00001000')))
+
+    picolibc_linker_type_data.set(
+      'DEFAULT_ALIGNMENT',
+      meson.get_cross_property('default_alignment_' + custom_mem_config,
+                               meson.get_cross_property('default_alignment',
+                                                        '8')))
 
     picolibc_ld_data = configuration_data()
     picolibc_ld_data.merge_from(picolibc_linker_type_data)
@@ -1132,11 +1228,14 @@ conf_data.set('_HAVE_FORMAT_ATTRIBUTE', have_format_attribute)
 conf_data.set('_HAVE_WEAK_ATTRIBUTE', have_weak_attribute)
 conf_data.set('_WANT_REGISTER_FINI', get_option('newlib-register-fini'))
 conf_data.set('_WANT_IO_LONG_LONG', io_long_long)
+conf_data.set('_WANT_MINIMAL_IO_LONG_LONG', minimal_io_long_long)
 conf_data.set('_WANT_IO_POS_ARGS', io_pos_args)
 conf_data.set('_WANT_IO_C99_FORMATS', io_c99_formats)
 conf_data.set('_IO_FLOAT_EXACT', io_float_exact)
 conf_data.set('_WANT_IO_PERCENT_B', io_percent_b)
 conf_data.set('_WANT_IO_LONG_DOUBLE', io_long_double)
+conf_data.set('_ASSERT_VERBOSE', get_option('assert-verbose'))
+
 if not tinystdio
   conf_data.set('NO_FLOATING_POINT', not newlib_io_float)
   conf_data.set('FLOATING_POINT', newlib_io_float)
@@ -1178,6 +1277,7 @@ conf_data.set('NEWLIB_TLS', thread_local_storage, description: 'use thread local
 conf_data.set('PICOLIBC_TLS', thread_local_storage, description: 'use thread local storage')
 conf_data.set('_HAVE_PICOLIBC_TLS_API', thread_local_storage and have_picolibc_tls_api, description: '_set_tls and _init_tls functions available')
 conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in tinystdio')
+conf_data.set('_PRINTF_SMALL_ULTOA', printf_small_ultoa, description: 'avoid software division in decimal conversion')
 conf_data.set('ATOMIC_UNGETC', atomic_ungetc, description: 'Use atomics for fgetc/ungetc for re-entrancy')
 conf_data.set('_PICOLIBC_ATOMIC_SIGNAL', get_option('atomic-signal'), description: 'Use atomics for signal/raise for re-entrancy')
 conf_data.set('_HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
@@ -1196,6 +1296,20 @@ conf_data.set('_HAVE_ATTRIBUTE_GNU_INLINE',
 conf_data.set('__PICOLIBC_CRT_RUNTIME_SIZE',
 	      get_option('crt-runtime-size'),
 	      description: 'Compute static memory area sizes at runtime instead of link time')
+if tinystdio
+  conf_data.set('_FORMAT_DEFAULT_DOUBLE',
+                format_default == 'double',
+                description: 'The default printf functions is the double variant')
+  conf_data.set('_FORMAT_DEFAULT_FLOAT',
+                format_default == 'float',
+                description: 'The default printf functions is the float variant')
+  conf_data.set('_FORMAT_DEFAULT_INTEGER',
+                format_default == 'integer',
+                description: 'The default printf functions is the integer variant')
+  conf_data.set('_FORMAT_DEFAULT_MINIMAL',
+                format_default == 'minimal',
+                description: 'The default printf functions is the minimal variant')
+endif
 errno_function=get_option('errno-function')
 if errno_function == 'auto'
   errno_function = 'false'

@@ -35,11 +35,16 @@ extern double_type doubles[];
 double_type *pd = doubles;
 
 #ifdef _IO_FLOAT_EXACT
+#if !defined(TINYSTDIO) && defined(__m68k__) && !defined(__mcf_fpu__) && !defined(__HAVE_M68881__)
+/* soft floats on m68k have rounding bugs for 64-bit values */
+#define CONVERT_BITS_DOUBLE	63
+#else
 #define CONVERT_BITS_DOUBLE	64
+#endif
 #define CONVERT_BITS_FLOAT	32
 #else
 #define CONVERT_BITS_DOUBLE	58
-#define CONVERT_BITS_FLOAT	29
+#define CONVERT_BITS_FLOAT	28
 #endif
 
 void
@@ -59,7 +64,7 @@ test_strtod (void)
       else
 #endif
         test_eok(errno, ERANGE);
-    } else if (v == (double) INFINITY && !(pd->endscan & ENDSCAN_IS_INF))
+    } else if (isinf(v) && !(pd->endscan & ENDSCAN_IS_INF))
       test_eok(errno, ERANGE);
     else
       test_eok(errno, 0);
@@ -80,7 +85,7 @@ test_strtof (void)
     int e = errno;
     if (fabsf(v) < FLT_MIN && !(pd->endscan & ENDSCAN_IS_ZERO))
       test_eok(e, ERANGE);
-    else if (v == INFINITY && !(pd->endscan & ENDSCAN_IS_INF))
+    else if (isinf(v) && !(pd->endscan & ENDSCAN_IS_INF))
       test_eok(errno, ERANGE);
     else
       test_eok(errno, 0);
@@ -91,6 +96,12 @@ test_strtof (void)
 
 #if defined(_TEST_LONG_DOUBLE) && (__LDBL_MANT_DIG__ == 64 || defined(TINY_STDIO))
 #define HAVE_STRTOLD
+#endif
+
+#ifdef __m68k__
+#define STRTOLD_TEST_BITS       (CONVERT_BITS_DOUBLE > 63 ? 63 : CONVERT_BITS_DOUBLE)
+#else
+#define STRTOLD_TEST_BITS       CONVERT_BITS_DOUBLE
 #endif
 
 #ifdef HAVE_STRTOLD
@@ -109,12 +120,12 @@ test_strtold (void)
       av = -av;
     if (av < LDBL_MIN && !(pd->endscan & ENDSCAN_IS_ZERO))
       test_eok(e, ERANGE);
-    else if (v == (long double) INFINITY && !(pd->endscan & ENDSCAN_IS_INF))
+    else if (isinf(av) && !(pd->endscan & ENDSCAN_IS_INF))
       test_eok(e, ERANGE);
     else
       test_eok(e, 0);
   }
-  test_mok(v, pd->value, CONVERT_BITS_DOUBLE);
+  test_mok(v, pd->value, STRTOLD_TEST_BITS);
   test_iok(tail - pd->string, pd->endscan & ENDSCAN_MASK);
 }
 #endif
@@ -140,9 +151,11 @@ void
 iterate (void (*func) (void),
        char *name)
 {
+  pd = doubles;
+  if (!pd->string)
+      return;
 
   newfunc(name);
-  pd = doubles;
   while (pd->string) {
     line(pd->line);
     func();
@@ -160,9 +173,12 @@ static void
 int_iterate (void (*func)(),
        char *name)
 {
+  p = ints;
+  if (!p->string)
+      return;
+
   newfunc(name);
 
-  p = ints;
   while (p->string) {
     line(p->line);
     errno = 0;
@@ -369,9 +385,12 @@ static void
 diterate (void (*func)(),
        char *name)
 {
+  pdd = ddoubles;
+  if (!pdd->estring)
+      return;
+
   newfunc(name);
 
-  pdd = ddoubles;
   while (pdd->estring) {
     line(pdd->line);
     errno = 0;
@@ -449,6 +468,10 @@ test_sprint (void)
   }
 #endif
 
+#ifdef GENERATE_VECTORS
+  int c = 0;
+  int q = 1;
+#endif
   while (si->line)
   {
     line( si->line);
@@ -457,12 +480,50 @@ test_sprint (void)
     else
       sprintf(buffer, si->format_string, si->value);
 #ifdef GENERATE_VECTORS
+    static char sbuffer[500];
+    static char sformat[1024];
+    char *df = si->format_string;
+    char *sf = sformat;
+    int size = 0;
+    while (*df) {
+        switch (*df) {
+        case 'd':
+        case 'x':
+        case 'X':
+        case 'o':
+            if (!size) {
+                *sf++ = 'h';
+                size = 2;
+            }
+            break;
+        case 'l':
+            size = 1;
+            break;
+        }
+        *sf++ = *df++;
+    }
+    *sf = '\0';
+    sprintf(sbuffer, sformat, (short) si->value);
+    if (strcmp(sbuffer, buffer) && size != 1) {
+        snprintf(sformat, sizeof(sformat), "I(\"%s\", \"%s\")", buffer, sbuffer);
+    } else {
+        snprintf(sformat, sizeof(sformat), "\"%s\"", buffer);
+    }
+    if (c == 0) {
+      printf("#if TEST_PART == %d || TEST_PART == -1\n", q);
+      q++;
+    }
     if (si->value < 0)
-      printf("__LINE__, -%#09x,\t\"%s\", \"%s\",\n",
-	     -si->value, buffer, si->format_string);
+      printf("{__LINE__, -%#09xl, %s, \"%s\", },\n",
+	     -si->value, sformat, si->format_string);
     else
-      printf("__LINE__, %#010x,\t\"%s\", \"%s\",\n",
-	     si->value, buffer, si->format_string);
+      printf("{__LINE__, %#010xl, %s, \"%s\", },\n",
+	     si->value, sformat, si->format_string);
+    c++;
+    if (c == 511 || !si[1].line) {
+        printf("#endif\n");
+        c = 0;
+    }
 #else
     test_sok(buffer, si->result);
 #endif
@@ -558,8 +619,6 @@ extern int _malloc_test_fail;
 void
 test_cvt (void)
 {
-  deltest();
-
 #ifdef GENERATE_VECTORS
   diterate(gen_dvec, "gen");
 #else
@@ -573,11 +632,22 @@ test_cvt (void)
 
   iterate(test_strtod, "strtod");
 #ifdef HAVE_STRTOLD
+#ifdef __m68k__
+    volatile long double zero = 0.0L;
+    volatile long double one = 1.0L;
+    volatile long double check = nextafterl(zero, one);
+    if (check + check == zero) {
+        printf("m68k emulating long double with double, skipping\n");
+    } else
+#endif
   iterate(test_strtold, "strtold");
 #endif
 
+#if TEST_PART ==1 || TEST_PART == -1
+  deltest();
   test_scan();
   test_sprint();
+#endif
   iterate(test_atof, "atof");
 #ifndef NO_NEWLIB
   iterate(test_atoff, "atoff");

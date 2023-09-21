@@ -39,11 +39,19 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
  */
 enum {TO1, TOLO, TOUP, TOBOTH};
 enum {EVENCAP, ODDCAP};
-static struct caseconv_entry {
+static const struct caseconv_entry {
   uint_least32_t first: 21;
   uint_least32_t diff: 8;
   uint_least32_t mode: 2;
+#ifdef __MSP430__
+  /*
+   * MSP430 has 20-bit integers which the compiler attempts to use and
+   * fails. Waste some memory to fix that.
+   */
+  int_least32_t delta;
+#else
   int_least32_t delta: 17;
+#endif
 }
 #ifdef _HAVE_BITFIELDS_IN_PACKED_STRUCTS
 __attribute__((packed))
@@ -56,10 +64,10 @@ caseconv_table [] = {
 
 /* auxiliary function for binary search in interval properties table */
 static const struct caseconv_entry *
-bisearch (wint_t ucs, const struct caseconv_entry *table, int max)
+bisearch (wint_t ucs, const struct caseconv_entry *table, size_t max)
 {
-  int min = 0;
-  int mid;
+  size_t min = 0;
+  size_t mid;
 
   if (ucs < first(table[0]) || ucs > last(table[max]))
     return 0;

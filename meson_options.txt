@@ -101,6 +101,9 @@ option('freestanding', type: 'boolean', value: false,
 option('analyzer', type: 'boolean', value: false,
        description: 'Enable the analyzer while compiling with -fanalyzer')
 
+option('assert-verbose', type: 'boolean', value: true,
+       description: 'Assert provides verbose information')
+
 #
 # Testing options
 #
@@ -116,6 +119,8 @@ option('tests-enable-posix-io', type: 'boolean', value: true,
        description: 'tests enable posix-io when available')
 option('test-long-double', type: 'boolean', value: true,
        description: 'Enable long double tests on targets with long double type')
+option('split-large-tests', type: 'boolean', value: false,
+       description: 'Split large tests into pieces for smaller targets')
 
 option('tinystdio', type: 'boolean', value: true,
        description: 'Use tiny stdio from avr libc')
@@ -135,8 +140,6 @@ option('io-pos-args', type: 'boolean', value: false,
        description: 'enable printf-family positional arg support (always enabled for tinystdio float)')
 option('newlib-io-pos-args', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
        description: 'enable printf-family positional arg support (always enabled for tinystdio float)')
-option('io-percent-b', type: 'boolean', value: false,
-       description: 'enable proposed %b/%B format in printf and scanf in tinystdio (default: false)')
 option('io-long-double', type: 'boolean', value: false,
        description: 'enable long double type support in IO functions printf/scanf')
 option('newlib-io-long-double', type: 'boolean', value: false,
@@ -153,10 +156,16 @@ option('posix-io', type: 'boolean', value: true,
        description: 'Provide fopen/fdopen using POSIX I/O (open, close, read, write, lseek)')
 option('posix-console', type: 'boolean', value: false,
        description: 'Use POSIX I/O for stdin/stdout/stderr')
-option('format-default', type: 'combo', choices: ['double', 'float', 'integer'], value: 'double',
+option('format-default', type: 'combo', choices: ['double', 'float', 'integer', 'minimal'], value: 'double',
        description: 'which printf/scanf versions should be the default')
 option('printf-aliases', type: 'boolean', value: true,
        description: 'Allow link-time printf aliases')
+option('io-percent-b', type: 'boolean', value: false,
+       description: 'enable proposed %b/%B format in printf and scanf in tinystdio (default: false)')
+option('printf-small-ultoa', type: 'boolean', value: false,
+       description: 'Avoid softare division in decimal conversions')
+option('minimal-io-long-long', type: 'boolean', value: false,
+       description: 'enable long long type support in minimal printf/scanf')
 
 #
 # Options applying to only legacy stdio

@@ -46,7 +46,7 @@ struct test {
     char        *expect;
 };
 
-struct test ecvt_tests[] = {
+const struct test ecvt_tests[] = {
     { 1.0e0,    4,   1, 0, "1000", },
     { -1.0e0,   4,   1, 1, "1000", },
     { 1.0e7,    7,   8, 0, "1000000" },
@@ -63,7 +63,7 @@ struct test ecvt_tests[] = {
 
 #define N_ECVT_TESTS    (sizeof(ecvt_tests) / sizeof(ecvt_tests[0]))
 
-struct test fcvt_tests[] = {
+const struct test fcvt_tests[] = {
     { 0.0058882729652625027, 7, -2, 0, "58883", },
     { 1.0e0,    4,   1, 0, "10000", },
     { -1.0e0,   4,   1, 1, "10000", },
@@ -103,7 +103,7 @@ struct test fcvt_tests[] = {
 
 #define N_FCVT_TESTS    (sizeof(fcvt_tests) / sizeof(fcvt_tests[0]))
 
-struct test fcvt_extra_tests[] = {
+const struct test fcvt_extra_tests[] = {
 #ifdef TINY_STDIO
     { 0x1.fffffffffffffp1023, 17, 309, 0, "17976931348623157"
       "0000000000000000000000000000000000000000"
@@ -133,7 +133,7 @@ struct test fcvt_extra_tests[] = {
 
 #define N_FCVT_EXTRA_TESTS      (sizeof(fcvt_extra_tests) / sizeof(fcvt_extra_tests[0]))
 
-struct test fcvtf_tests[] = {
+const struct test fcvtf_tests[] = {
 #ifdef TINY_STDIO
     { 0x1.fffffep127, 9, 39, 0, "340282350000000000000000000000000000000000000000" },
 #else

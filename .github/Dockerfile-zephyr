@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 FROM debian:testing
 
 COPY .github/zephyr-packages.txt /
@@ -7,13 +8,13 @@ COPY .github/zephyr-files.txt /
 COPY .github/zephyr-setup /
 
 RUN apt-get update && \
-    apt-get install -y wget gnupg && \
+    apt-get install -y --no-install-recommends ca-certificates wget gnupg && \
     (apt-get update || apt-get update || apt-get update) && \
     (apt-get upgrade -y || apt-get upgrade -y || apt-get upgrade -y) && \
-    (xargs -a zephyr-packages.txt apt-get install -y || \
-     xargs -a zephyr-packages.txt apt-get install -y || \
-     xargs -a zephyr-packages.txt apt-get install -y || \
-     xargs -a zephyr-packages.txt apt-get install -y) && \
+    (xargs -a zephyr-packages.txt apt-get install -y --no-install-recommends || \
+     xargs -a zephyr-packages.txt apt-get install -y --no-install-recommends || \
+     xargs -a zephyr-packages.txt apt-get install -y --no-install-recommends || \
+     xargs -a zephyr-packages.txt apt-get install -y --no-install-recommends) && \
     mkdir -p /opt && \
     (cd /opt && \
      for file in `cat /zephyr-files.txt`; do \
@@ -23,14 +24,17 @@ RUN apt-get update && \
 	tar xf `basename "$file"`; \
 	echo "Removing $file"; \
 	rm `basename "$file"`; \
-     done)
-
-RUN if [ -f /opt/zephyr-sdk-*-hosttools*.sh ]; then \
+     done) && \
+    if [ -f /opt/zephyr-sdk-*-hosttools*.sh ]; then \
 	echo "Unpacking host tools"; \
 	/opt/zephyr-sdk-*-hosttools*.sh -y -d /opt/zephyr-sdk-hosttools; \
 	rm /opt/zephyr-sdk-*-hosttools*.sh; \
     else \
 	echo "No host tools found"; \
-    fi
+    fi && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN apt-get clean
+ADD --checksum=sha256:0b33f39766fe9db67f40418aed6a5b3d7b2f4f7fab025a8213264b77a2d0e1b1 https://github.com/ccache/ccache/releases/download/v4.8.2/ccache-4.8.2-linux-x86_64.tar.xz /
+RUN tar xf ccache-4.8.2-linux-x86_64.tar.xz -C /usr/bin --strip-components=1 --no-same-owner ccache-4.8.2-linux-x86_64/ccache && \
+    rm -f ccache-*-linux-x86_64.tar.xz

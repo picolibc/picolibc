@@ -56,17 +56,22 @@ main (int ac,
      verbose ++;
     if (strcmp(av[i],"-nomath2") == 0)
      math2 = 0;
+    (void) math2;
     if (strcmp(av[i],"-nostrin") == 0)
      string= 0;
+    (void) string;
     if (strcmp(av[i],"-nois") == 0)
      is = 0;
+    (void) is;
     if (strcmp(av[i],"-nomath") == 0)
      math= 0;
+    (void) math;
     if (strcmp(av[i],"-nocvt") == 0)
      cvt = 0;
 #ifdef _HAVE_IEEEFP_FUNCS
     if (strcmp(av[i],"-noiee") == 0)
      ieee= 0;
+  (void) ieee;
 #endif
     if (strcmp(av[i],"-generate") == 0) {
      vector = 1;
@@ -75,18 +80,22 @@ main (int ac,
   }
   if (cvt)
    test_cvt();
-  
+
+#if TEST_PART == 0 || TEST_PART == -1
   if (math2)
    test_math2();
   if (string)
    test_string();
+#endif
   if (math)
    test_math(vector);
+#if TEST_PART == 0 || TEST_PART == -1
   if (is)
    test_is();
 #ifdef _HAVE_IEEEFP_FUNCS
   if (ieee)
    test_ieee();
+#endif
 #endif
   printf("Tested %d functions, %d errors detected\n", count, inacc);
   exit(inacc != 0);
@@ -177,9 +186,9 @@ mag_of_error (double is,
   __ieee_double_shape_type a,b;
   int i;
   int a_big;
-  unsigned  int mask;
-  unsigned long int __x;
-  unsigned long int msw, lsw;						  
+  uint32_t mask;
+  uint32_t __x;
+  uint32_t msw, lsw;
   a.value = is;
   
   b.value = shouldbe;
@@ -193,7 +202,7 @@ mag_of_error (double is,
   a_big = bigger(&a, &b);
 
   if (!a_big) {
-    int t;
+    uint32_t t;
     t = a.parts.msw;
     a.parts.msw = b.parts.msw;
     b.parts.msw = t;
@@ -213,14 +222,14 @@ mag_of_error (double is,
 
 
   /* Find out which bit the difference is in */
-  mask = 0x80000000;
+  mask = 0x80000000UL;
   for (i = 0; i < 32; i++)
   {
     if (((msw) & mask)!=0) return i;
     mask >>=1;
   }
   
-  mask = 0x80000000;
+  mask = 0x80000000UL;
   for (i = 0; i < 32; i++)
   {
     
@@ -240,7 +249,7 @@ fmag_of_error (float is,
   __ieee_float_shape_type a,b;
   int i;
   int a_big;
-  unsigned  int mask;
+  uint32_t mask;
   uint32_t sw;
   a.value = is;
   
@@ -261,7 +270,7 @@ fmag_of_error (float is,
 
   sw = (a.p1) - (b.p1);
 
-  mask = 0x80000000;
+  mask = 0x80000000UL;
   for (i = 0; i < 32; i++)
   {
 	  if (((sw) & mask)!=0) return i;

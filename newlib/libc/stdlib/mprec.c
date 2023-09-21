@@ -147,7 +147,7 @@ Balloc (int k)
   /* Allocate an mprec Bigint */
   rv = (_Bigint *) calloc(1,
 			  sizeof (_Bigint) +
-			  (x-1) * sizeof(rv->_x));
+			  (x) * sizeof(rv->_x[0]));
   if (rv == NULL) return NULL;
   rv->_k = k;
   rv->_maxwds = x;
@@ -708,7 +708,7 @@ ulp (double _x)
 	  word0 (a) = 0;
 	  L -= Exp_shift;
 #ifndef _DOUBLE_IS_32BITS
-         word1 (a) = L >= 31 ? 1 : 1 << (31 - L);
+          word1 (a) = L >= 31 ? 1 : (__uint32_t) 1 << (31 - L);
 #endif
 	}
     }

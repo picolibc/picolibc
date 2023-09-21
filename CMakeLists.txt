@@ -37,6 +37,12 @@ cmake_minimum_required(VERSION 3.20.0)
 
 project(Picolibc VERSION 1.8.3 LANGUAGES C ASM)
 
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+  message(STATUS "Using ccache: ${CCACHE_PROGRAM}")
+  set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+endif()
+
 if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "arm64")
   set(CMAKE_SYSTEM_PROCESSOR "aarch64")
 endif()
@@ -341,6 +347,10 @@ set(_LITE_EXIT 1)
 
 set(_PICO_EXIT 1)
 
+if(NOT DEFINED _ASSERT_VERBOSE)
+  option(_ASSERT_VERBOSE "Assert provides verbose information" 1)
+endif()
+
 if(NOT DEFINED _MB_CAPABLE)
   option(_MB_CAPABLE "Enable multi-byte support" 0)
 endif()
@@ -363,14 +373,30 @@ if(NOT DEFINED _WANT_IO_LONG_LONG)
   option(_WANT_IO_LONG_LONG "Support long long in integer printf/scanf" OFF)
 endif()
 
+if(NOT DEFINED _WANT_MINIMAL_IO_LONG_LONG)
+  option(_WANT_MINIMAL_IO_LONG_LONG "Support long long in minimal printf/scanf" OFF)
+endif()
+
 if(NOT DEFINED _WANT_IO_POS_ARGS)
   option(_WANT_IO_POS_ARGS "Support positional args in integer printf/scanf" OFF)
 endif()
 
 option(__IO_FLOAT "Support floating point in printf/scanf by default" OFF)
 
+option(__IO_MINIMAL "Use minimal printf variant" OFF)
+
 if(NOT DEFINED _WANT_IO_PERCENT_B)
   option(_WANT_IO_PERCENT_B "Support %b/%B formats in printf/scanf" OFF)
+endif()
+
+if(NOT DEFINED FORMAT_DEFAULT_MINIMAL)
+  set(FORMAT_DEFAULT_MINIMAL ${IO_MINIMAL})
+endif()
+
+if(FORMAT_DEFAULT_MINIMAL)
+  set(FORMAT_DEFAULT_DOUBLE 0)
+  set(FORMAT_DEFAULT_FLOAT 0)
+  set(FORMAT_DEFAULT_INTEGER 0)
 endif()
 
 if(NOT DEFINED FORMAT_DEFAULT_DOUBLE)
@@ -462,13 +488,17 @@ string(APPEND SPECS_PRINTF "%{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfprintf=__f
   " %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfscanf=__f_vfscanf}"
   " %{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfprintf=__d_vfprintf}"
   " %{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfscanf=__d_vfscanf}"
-  " %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfprintf=__i_vfprintf}")
+  " %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfprintf=__i_vfprintf}"
+  " %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfscanf=__i_vfscanff}"
+  " %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=vfprintf=__m_vfprintf}"
+  " %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=vfscanf=__i_vfscanff}"
+  )
 set(PREFIX "${PROJECT_BINARY_DIR}")
 
 configure_file(picolibc.specs.in "${PROJECT_BINARY_DIR}/picolibc.specs" @ONLY)
 
 set(PICOLIBC_COMPILE_OPTIONS
-  "--include" "${PICOLIBC_INCLUDE}/picolibc.h"
+  "-include" "${PICOLIBC_INCLUDE}/picolibc.h"
   "-nostdlib"
   "-D_LIBC"
   ${TLSMODEL}

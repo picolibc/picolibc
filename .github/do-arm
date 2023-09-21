@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+HERE=`dirname "$0"`
+"$HERE"/do-test native -Dnative-tests=false -Dtests-enable-posix-io=false
+"$HERE"/do-test native -Dnative-tests=false -Dtests-enable-posix-io=false -Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false
+"$HERE"/do-test native -Dnative-tests=false -Dtests-enable-posix-io=false -Dformat-default=integer -Dposix-io=false -Dnewlib-obsolete-math=true -Dwant-math-errno=true

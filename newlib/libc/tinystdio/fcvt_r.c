@@ -34,11 +34,14 @@
  */
 
 #define _GNU_SOURCE
-#include "dtoa_engine.h"
 #include <_ansi.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+
+typedef double FLOAT;
+
+#include "dtoa_engine.h"
 
 int
 fcvt_r (double invalue,
@@ -122,7 +125,6 @@ fcvt_r (double invalue,
 
     /* Value */
     memcpy(buf, digits, ndigit);
-    len -= ndigit;
     buf += ndigit;
 
     /* Trailing zeros */

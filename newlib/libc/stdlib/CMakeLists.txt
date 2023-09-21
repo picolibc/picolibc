@@ -40,6 +40,8 @@ picolibc_sources(
   arc4random.c
   arc4random_uniform.c
   assert.c
+  assert_func.c
+  assert_no_arg.c
   atof.c
   atoff.c
   atoi.c

@@ -1,4 +1,4 @@
-#ifdef _HAVE_BUILTIN_MUL_OVERFLOW
+#if defined(_HAVE_BUILTIN_MUL_OVERFLOW) && !defined(__MSP430__)
 // gcc should use the correct one here
 #define mul_overflow __builtin_mul_overflow
 #else
@@ -16,11 +16,22 @@ static int mul_overflow_size_t(size_t a, size_t b, size_t *res)
 
     // multiply with 0 can not overflow (and avoid div-by-zero):
     if (a == 0 || b == 0)
-        return 1;
+        return 0;
+
+#ifdef __MSP430__
+    volatile uint32_t ia = (uint32_t) a;
+    volatile uint32_t ib = (uint32_t) b;
 
     // check if overflow would happen:
-    if ( (a > SIZE_MAX / b) || (b > SIZE_MAX / a))
+    if ( (ia > SIZE_MAX / ib) || (ib > SIZE_MAX / ia)) {
         return 1;
+    }
+#else
+    // check if overflow would happen:
+    if ( (a > SIZE_MAX / b) || (b > SIZE_MAX / a)) {
+        return 1;
+    }
+#endif
 
     return 0;
 }

@@ -78,6 +78,11 @@ in your linker script:
  * `__stack_size` reserves this much space at the top of ram for the
    initial stack.
    
+ * `__heap_size_min` is an optional value that you can set to ensure
+   there is at least this much memory available for the heap used by
+   malloc. Malloc will still be able to use all memory between the end
+   of pre-allocate data and the bottom of the stack area.
+
 ### Arranging Code and Data in Memory
 
 Where bits of code and data land in memory can be controlled to some
@@ -203,3 +208,16 @@ After the TLS bss section comes the regular BSS variables:
  3) `.bss`, `.bss.*`
  4) `.gnu.linkonce.b.*`
  5) `COMMON`
+
+#### Stack area
+
+The stack is placed at the end of RAM; the `__stack_size` value in the linker
+script specifies how much space to reserve for it. If there isn't
+enough available RAM, linking will fail.
+
+#### Heap area
+
+Memory between the end of the cleared ram contents and the stack is
+available for malloc. If you need to ensure that there is at least a
+certain amount of heap space available, you can set the
+`__heap_size_min` value in the linker script.

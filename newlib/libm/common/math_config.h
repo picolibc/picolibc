@@ -270,27 +270,48 @@ issignaling_inline (double x)
   return 2 * (ix ^ 0x0008000000000000ULL) > 2 * 0x7ff8000000000000ULL;
 }
 
+/*
+ * gcc older than version 13 places 'const volatile' variables in
+ * .data while clang places them in .rodata. gcc never optimizes away
+ * math operations which might generate exceptions while clang will
+ * happily do so. Therefore, we don't need volatile with gcc, but we
+ * do need it for clang. And, we don't want volatile with gcc to avoid
+ * placing these constants in the .data section with older gcc versions
+ */
+
+#ifdef __clang__
+#define CONST_FORCE_FLOAT_MODIFIER    volatile
+#else
+#define CONST_FORCE_FLOAT_MODIFIER
+#endif
+
 #ifdef PICOLIBC_FLOAT_NOEXCEPT
 #define FORCE_FLOAT     float
+#define CONST_FORCE_FLOAT const float
 #define pick_float_except(expr,val)    (val)
 #else
 #define FORCE_FLOAT     volatile float
+#define CONST_FORCE_FLOAT       const CONST_FORCE_FLOAT_MODIFIER float
 #define pick_float_except(expr,val)    (expr)
 #endif
 
 #ifdef PICOLIBC_DOUBLE_NOEXCEPT
 #define FORCE_DOUBLE    double
+#define CONST_FORCE_DOUBLE      const double
 #define pick_double_except(expr,val)    (val)
 #else
 #define FORCE_DOUBLE    volatile double
+#define CONST_FORCE_DOUBLE      const CONST_FORCE_FLOAT_MODIFIER double
 #define pick_double_except(expr,val)    (expr)
 #endif
 
 #ifdef PICOLIBC_LONG_DOUBLE_NOEXCEPT
 #define FORCE_LONG_DOUBLE       long double
+#define CONST_FORCE_LONG_DOUBLE const long double
 #define pick_long_double_except(expr,val)       (val)
 #else
 #define FORCE_LONG_DOUBLE       volatile long double
+#define CONST_FORCE_LONG_DOUBLE const CONST_FORCE_FLOAT_MODIFIER long double
 #define pick_long_double_except(expr,val)       (expr)
 #endif
 
@@ -614,12 +635,16 @@ force_eval_long_double (long double x)
 #  define _NAME_64_SPECIAL(d,l) l
    typedef long double __float64;
 #  define FORCE_FLOAT64 FORCE_LONG_DOUBLE
+#  define CONST_FORCE_FLOAT64 CONST_FORCE_LONG_DOUBLE
 #  define pick_float64_except(a,b) pick_long_double_except(a,b)
 #  define _NEED_FLOAT64
 #  define __F_64(x)     x ## L
 #  define _F_64(x)      __F_64(x)
 #  define _FLOAT64_MIN  LDBL_MIN
 #  define _FLOAT64_MAX  LDBL_MAX
+#  define _FLOAT64_MAX_EXP LDBL_MAX_EXP
+#  define _FLOAT64_DENORM_MIN __LDBL_DENORM_MIN__
+#  define _FLOAT64_MANT_DIG   __LDBL_MANT_DIG__
 #  define force_eval_float64 force_eval_long_double
 #  define opt_barrier_float64 opt_barrier_long_double
 # endif
@@ -665,8 +690,12 @@ force_eval_long_double (long double x)
 # define _F_64(x) x
 # define _FLOAT64_MIN DBL_MIN
 # define _FLOAT64_MAX DBL_MAX
+# define _FLOAT64_MAX_EXP DBL_MAX_EXP
+# define _FLOAT64_DENORM_MIN __DBL_DENORM_MIN__
+# define _FLOAT64_MANT_DIG  __DBL_MANT_DIG__
 typedef double __float64;
 # define FORCE_FLOAT64 FORCE_DOUBLE
+# define CONST_FORCE_FLOAT64 CONST_FORCE_DOUBLE
 # define pick_float64_except(a,b) pick_double_except(a,b)
 # define force_eval_float64 force_eval_double
 # define opt_barrier_float64 opt_barrier_double

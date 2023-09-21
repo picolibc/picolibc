@@ -209,7 +209,7 @@ fffcheck_id (float is,
 
   /* All signaling nans are the "same", as are all quiet nans */
   if (isnan(correct.value) && isnan(is)
-#if !defined(__i386__) && !defined(__HAVE_68881__)
+#if !defined(__i386__) && !defined(__m68k__)
       /* i386 calling convention ends up always converting snan into qnan */
       && (__issignalingf(correct.value) == __issignalingf(is))
 #endif
@@ -667,6 +667,8 @@ run_vector_1 (int vector,
 void
 test_math (int vector)
 {
+  (void) vector;
+#if TEST_PART == 0 || TEST_PART == -1
   test_acos(vector);
   test_acosf(vector);
   test_acosh(vector);
@@ -676,8 +678,12 @@ test_math (int vector)
   test_asinh(vector);
   test_asinhf(vector);
   test_atan(vector);
+#endif
+#if TEST_PART > 0 || TEST_PART == -1
   test_atan2(vector);
   test_atan2f(vector);
+#endif
+#if TEST_PART == 0 || TEST_PART == -1
   test_atanf(vector);
   test_atanh(vector);
   test_atanhf(vector);
@@ -695,6 +701,8 @@ test_math (int vector)
   test_erff(vector);
   test_exp(vector);
   test_expf(vector);
+#endif
+#if TEST_PART == 1 || TEST_PART == -1
   test_fabs(vector);
   test_fabsf(vector);
   test_floor(vector);
@@ -720,6 +728,8 @@ test_math (int vector)
   test_log2(vector);
   test_log2f(vector);
   test_logf(vector);
+#endif
+#if TEST_PART == 2 || TEST_PART == -1
   test_modf(vector);
   test_modff(vector);
   test_pow_vec(vector);
@@ -746,6 +756,7 @@ test_math (int vector)
   test_y1f(vector);
   test_y1f(vector);
   test_ynf(vector);
+#endif
 }
 
 /* These have to be played with to get to compile on machines which

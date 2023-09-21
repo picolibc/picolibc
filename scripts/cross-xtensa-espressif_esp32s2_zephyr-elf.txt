@@ -3,7 +3,7 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['xtensa-espressif_esp32s2_zephyr-elf-gcc', '-nostdlib']
+c = ['ccache', 'xtensa-espressif_esp32s2_zephyr-elf-gcc', '-nostdlib']
 ar = 'xtensa-espressif_esp32s2_zephyr-elf-ar'
 as = 'xtensa-espressif_esp32s2_zephyr-elf-as'
 nm = 'xtensa-espressif_esp32s2_zephyr-elf-nm'

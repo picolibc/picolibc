@@ -52,9 +52,17 @@
 # define _WANT_IO_POS_ARGS
 # define printf_float(x) ((double) (x))
 #elif defined(TINY_STDIO)
-# ifdef PICOLIBC_INTEGER_PRINTF_SCANF
+# if defined(PICOLIBC_MINIMAL_PRINTF_SCANF)
+#  define NO_FLOATING_POINT
+#  define NO_POS_ARGS
+#  undef _WANT_IO_PERCENT_B
+# elif defined(PICOLIBC_INTEGER_PRINTF_SCANF)
+#  define NO_FLOATING_POINT
 #  ifndef _WANT_IO_POS_ARGS
 #   define NO_POS_ARGS
+#  endif
+#  ifndef _WANT_IO_LONG_LONG
+#   define NO_LONG_LONG
 #  endif
 # endif
 # ifdef _WANT_IO_PERCENT_B
@@ -79,7 +87,7 @@ int (*_reference_scanf_float)() = _scanf_float;
 #endif
 #endif
 
-#if defined(TINY_STDIO) || !defined(NO_FLOATING_POINT)
+#if !defined(NO_FLOATING_POINT)
 static const double test_vals[] = { 1.234567, 1.1, M_PI };
 #endif
 
@@ -178,7 +186,7 @@ main(void)
         }
         wprintf(L"hello world %g\n", 1.0);
 
-#if defined(TINY_STDIO) || !defined(NO_FLOATING_POINT)
+#if !defined(NO_FLOATING_POINT)
 	sprintf(buf, "%g", printf_float(0.0f));
 	if (strcmp(buf, "0") != 0) {
 		printf("0: wanted \"0\" got \"%s\"\n", buf);
@@ -191,7 +199,7 @@ main(void)
         x = y = 0;
         int r = sscanf("3 4", "%2$d %1$d", &x, &y);
         if (x != 4 || y != 3 || r != 2) {
-            printf("pos: wanted %d %d (ret %d) got %d %d (ret %d)", 4, 3, 2, x, y, r);
+            printf("pos: wanted %d %d (ret %d) got %d %d (ret %d)\n", 4, 3, 2, x, y, r);
             errors++;
             fflush(stdout);
         }
@@ -280,11 +288,11 @@ main(void)
 	CHECK_RT(unsigned short, "h");
         CHECK_RT(unsigned int, "");
         CHECK_RT(unsigned long, "l");
-#if defined(_WANT_IO_LONG_LONG) || defined(TINY_STDIO)
+#if defined(_WANT_IO_LONG_LONG)
         CHECK_RT(unsigned long long, "ll");
 #endif
 #ifndef _NANO_FORMATTED_IO
-#if !defined(_WANT_IO_LONG_LONG) && !defined(TINY_STDIO)
+#if !defined(_WANT_IO_LONG_LONG)
 	if (sizeof(intmax_t) <= sizeof(long))
 #endif
 	{
@@ -300,7 +308,7 @@ main(void)
             void *r = (void *) -1;
             VERIFY("", "p");
         }
-#if defined(TINY_STDIO) || !defined(NO_FLOATING_POINT)
+#if !defined(NO_FLOATING_POINT)
 #ifdef PICOLIBC_FLOAT_PRINTF_SCANF
 #define float_type float
 #define pow(a,b) powf((float) a, (float) b)

@@ -48,16 +48,50 @@ ANSI C, POSIX.
 
 #ifdef _NEED_FLOAT64
 
-#ifdef __clang__
-#pragma STDC FP_CONTRACT OFF
-#endif
+#if __FLT_EVAL_METHOD__ == 2 && defined(_HAVE_LONG_DOUBLE)
 
 __float64
 fma64(__float64 x, __float64 y, __float64 z)
 {
-  /* Implementation defined. */
-  return (x * y) + z;
+    return (__float64) fmal((long double) x, (long double) y, (long double) z);
 }
+
+#else
+
+typedef __float64 FLOAT_T;
+
+#define FMA fma64
+#define NEXTAFTER nextafter64
+#define LDEXP ldexp64
+#define FREXP frexp64
+#define SCALBN scalbn64
+#define ILOGB    ilogb64
+#define COPYSIGN copysign64
+
+#define SPLIT ((FLOAT_T) 0x1p26 + (FLOAT_T) 1.0)
+#define FLOAT_MANT_DIG        _FLOAT64_MANT_DIG
+#define FLOAT_MAX_EXP         _FLOAT64_MAX_EXP
+#define FLOAT_MIN             _FLOAT64_MIN
+
+static inline int
+odd_mant(FLOAT_T x)
+{
+    return asuint64(x) & 1;
+}
+
+static unsigned int
+EXPONENT(FLOAT_T x)
+{
+    return _exponent64(asuint64(x));
+}
+
+#ifdef PICOLIBC_DOUBLE_NOEXCEPT
+#define feraiseexcept(x) ((void) (x))
+#endif
+
+#include "fma_inc.h"
+
+#endif
 
 _MATH_ALIAS_d_ddd(fma)
 

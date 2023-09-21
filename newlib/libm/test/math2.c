@@ -22,7 +22,7 @@
 int
 randi (void)
 {
-  static int next;
+  static int32_t next;
   next = (next * 1103515245) + 12345;
   return ((next >> 16) & 0xffff);
 }
@@ -173,7 +173,7 @@ test_mod (void)
     n  = randx();
     if (finite(n) && n != 0.0 )
     {
-      double r = modf(n, &intpart);
+      volatile double r = modf(n, &intpart);
       line(i);
       test_mok(intpart + r, n, 63);
     }
@@ -187,10 +187,10 @@ test_mod (void)
     double nd;
     line(i);
     nd  = randx() ;
-    if (nd < (double) FLT_MAX && finitef(nd) && nd != 0.0)
+    if (fabs(nd) < (double) FLT_MAX && finitef(nd) && nd != 0.0)
     {
-      float n = nd;
-      double r = (double) modff(n, &intpart);
+      volatile float n = nd;
+      volatile double r = (double) modff(n, &intpart);
       line(i);
       test_mok((double) intpart + r, (double) n, 32);
     }

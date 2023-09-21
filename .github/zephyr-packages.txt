@@ -1,6 +1,13 @@
 build-essential
-meson
 cmake
 file
+libgtk-3-0
+libjack0
+libpulse0
+libsndio7.0
+librados2
+librbd1
+libvte-2.91-0
+meson
 ninja-build
 qemu-system-x86

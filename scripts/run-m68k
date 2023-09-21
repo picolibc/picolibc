@@ -63,10 +63,38 @@ case "$1" in
 	;;
 esac
 
+case "$elf" in
+    *_softfp)
+        elfbase=`echo "$elf" | sed 's/_softfp//'`
+        ;;
+    *)
+        elfbase="$elf"
+        ;;
+esac
+
+case "$elfbase" in
+    *m5307|*m51qe|*m5329|*m5407|*m54455|*m5475)
+        CPU=any
+        ;;
+    *m5206|*m5206e)
+        CPU=m5206
+        ;;
+    *m5208)
+        CPU=m5208
+        ;;
+    *m680?0)
+        CPU=`echo "$elfbase" | sed 's/.*\(m680.0\)$/\1/'`
+        echo CPU set to $CPU
+        ;;
+    *)
+        CPU=m68020
+        ;;
+esac
+
 echo "$input" | $qemu \
   -chardev stdio,id=stdio0,mux=on \
   -machine virt \
-  -cpu m68020 \
+  -cpu "$CPU" \
   -semihosting-config "$semi" \
   -monitor none \
   -serial none \

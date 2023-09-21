@@ -1,5 +1,5 @@
 [binaries]
-c = ['powerpc64le-linux-gnu-gcc', '-fno-pic', '-static']
+c = ['ccache', 'powerpc64le-linux-gnu-gcc', '-fno-pic', '-static']
 ar = 'powerpc64le-linux-gnu-ar'
 as = 'powerpc64le-linux-gnu-as'
 nm = 'powerpc64le-linux-gnu-nm'

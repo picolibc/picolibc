@@ -47,10 +47,10 @@ m68k_semihost:
 	 */
 	.balignw 4,0x4e71
 	nop
-#ifdef __mcoldfire__
+#if defined(__mcoldfire__) || defined(__mc68000__)
 	.short 0x4ac8
 #else
-	bkpt #0
+	.short 0x4848
 #endif
 	.long 0x4e7bf000
 	rts

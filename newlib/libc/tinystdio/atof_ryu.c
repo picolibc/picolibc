@@ -36,14 +36,20 @@
 #include <intrin.h>
 
 static inline uint32_t floor_log2(const uint32_t value) {
-  unsigned long index;
+  uint32_t index;
   return _BitScanReverse(&index, value) ? index : 32;
 }
 
 #else
 
 static inline uint32_t floor_log2(const uint32_t value) {
+#if __SIZEOF_INT__ >= 4
   return 31 - __builtin_clz(value);
+#elif __SIZEOF_INT__ < 4 && __SIZEOF_LONG__ >= 4
+  return 31 - __builtin_clzl(value);
+#else
+#error no usable clz
+#endif
 }
 
 #endif

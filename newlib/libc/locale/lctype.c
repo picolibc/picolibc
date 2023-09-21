@@ -27,7 +27,7 @@
 
 #define LCCTYPE_SIZE (sizeof(struct lc_ctype_T) / sizeof(char *))
 
-static char	numone[] = { '\1', '\0'};
+static const char	numone[] = { '\1', '\0'};
 
 const struct lc_ctype_T _C_ctype_locale = {
 	"ASCII",			/* codeset */
@@ -42,7 +42,7 @@ const struct lc_ctype_T _C_ctype_locale = {
 };
 
 #ifdef __CYGWIN__
-static char	numsix[] = { '\6', '\0'};
+static const char	numsix[] = { '\6', '\0'};
 
 const struct lc_ctype_T _C_utf8_ctype_locale = {
 	"UTF-8",			/* codeset */

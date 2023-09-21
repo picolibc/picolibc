@@ -1948,7 +1948,7 @@ int def__tolower (int i) { return _tolower(i); }
 int def__toupper (int i) { return _toupper(i); }
 
 void
-test_is_set (int (*func)(),
+test_is_set (int (*func)(int),
        char *name,
        int *p)
 {
@@ -1966,7 +1966,7 @@ test_is_set (int (*func)(),
   }
 }
 void
-test_to_set (int (*func)(),
+test_to_set (int (*func)(int),
        char *name,
        int *p,
        int low,

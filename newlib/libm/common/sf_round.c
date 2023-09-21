@@ -34,7 +34,7 @@ roundf(float x)
         }
       else
         {
-          unsigned int exponent_mask = 0x007fffff >> exponent_less_127;
+          __uint32_t exponent_mask = 0x007fffff >> exponent_less_127;
           if ((w & exponent_mask) == 0)
             /* x has an integral value. */
             return x;

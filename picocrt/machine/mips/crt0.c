@@ -43,11 +43,19 @@ _cstart(void)
 
 extern char __stack[];
 
+#if _MIPS_SZLONG == 32
+#define LA  "la"
+#elif _MIPS_SZLONG == 64
+#define LA  "dla"
+#else
+#error unknown mips target
+#endif
+
 void __section(".init") __attribute__((used))
 _start(void)
 {
 	/* Initialize stack pointer */
-	__asm__("la $sp,%0" : : "i" (__stack));
+	__asm__(LA " $sp,%0" : : "i" (__stack));
 
 #ifndef __mips_soft_float
         /* Enable FPU */

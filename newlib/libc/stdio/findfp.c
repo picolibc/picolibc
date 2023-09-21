@@ -128,24 +128,30 @@ stderr_init(FILE *ptr)
   std (ptr, __SRW | __SNBF, 2);
 }
 
-struct glue_with_file {
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wanalyzer-malloc-leak"
+#endif
+
+struct glue_with_files {
   struct _glue glue;
-  FILE file;
+  FILE file[];
 };
 
 static struct _glue *
 sfmoreglue (int n)
 {
-  struct glue_with_file *g;
+  struct glue_with_files *g;
 
-  g = (struct glue_with_file *)
-    malloc (sizeof (*g) + (n - 1) * sizeof (FILE));
+  g = (struct glue_with_files *)
+    malloc (sizeof (*g) + n * sizeof (FILE));
   if (g == NULL)
     return NULL;
   g->glue._next = NULL;
   g->glue._niobs = n;
-  g->glue._iobs = &g->file;
-  memset (&g->file, 0, n * sizeof (FILE));
+  g->glue._iobs = g->file;
+  memset (g->file, 0, n * sizeof (FILE));
   return &g->glue;
 }
 

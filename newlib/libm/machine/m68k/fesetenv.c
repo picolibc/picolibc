@@ -70,5 +70,5 @@ int fesetenv(const fenv_t *envp)
 
 }
 #else
-#include "../../fenv/feupdateenv.c"
+#include "../../fenv/fesetenv.c"
 #endif
