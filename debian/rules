@@ -23,7 +23,9 @@ AARCH64_ARCH=aarch64-linux-gnu
 MESON_SHARED_C_ARGS = -Wdate-time -ffile-prefix-map=$(BUILDPATH)=. -fdebug-prefix-map=$(BUILDPATH)=.
 
 MESON_SHARED_FLAGS = \
-	--prefix=/usr
+	--prefix=/usr \
+	-Dio-long-long=true \
+	-Dprintf-small-ultoa=true
 
 MESON_RELEASE_FLAGS=-Dbuild-type-subdir=release --buildtype=release
 

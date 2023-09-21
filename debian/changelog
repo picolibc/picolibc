@@ -1,3 +1,12 @@
+picolibc (1.8.4-1) unstable; urgency=medium
+
+  * New upstream
+
+  * New printf variant, 'minimal'. 'integer' variant now supports
+    long long.
+
+ -- Keith Packard <keithp@keithp.com>  Wed, 20 Sep 2023 17:25:27 -0700
+
 picolibc (1.8.3-1) unstable; urgency=medium
 
   * New upstream
