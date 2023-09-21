@@ -362,6 +362,8 @@
 
 #cmakedefine _IO_FLOAT_EXACT
 
+#cmakedefine _PRINTF_SMALL_ULTOA
+
 #cmakedefine _LITE_EXIT
 
 #cmakedefine _MB_CAPABLE

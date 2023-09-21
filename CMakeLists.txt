@@ -385,6 +385,10 @@ option(__IO_FLOAT "Support floating point in printf/scanf by default" OFF)
 
 option(__IO_MINIMAL "Use minimal printf variant" OFF)
 
+if(NOT DEFINED _PRINTF_SMALL_ULTOA)
+  option(_PRINTF_SMALL_ULTOA "Avoid soft divide in printf" OFF)
+endif()
+
 if(NOT DEFINED _WANT_IO_PERCENT_B)
   option(_WANT_IO_PERCENT_B "Support %b/%B formats in printf/scanf" OFF)
 endif()
