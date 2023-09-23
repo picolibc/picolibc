@@ -861,7 +861,7 @@ if enable_multilib
   # Ask the compiler for the set of available multilib configurations,
   # set up the build system to compile for all desired ones
 
-  target_list = run_command(cc.cmd_array() +  ['--print-multi-lib'], check : true).stdout().strip().split('\n')
+  target_list = run_command(cc.cmd_array() + get_option('c_args') + ['--print-multi-lib'], check : true).stdout().strip().split('\n')
 
   has_mcmodel = false
   foreach target : target_list
