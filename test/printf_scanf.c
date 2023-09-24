@@ -47,32 +47,55 @@
 #include <wchar.h>
 
 #ifndef __PICOLIBC__
-# define _WANT_IO_C99_FORMATS
-# define _WANT_IO_LONG_LONG
-# define _WANT_IO_POS_ARGS
 # define printf_float(x) ((double) (x))
 #elif defined(TINY_STDIO)
 # if defined(PICOLIBC_MINIMAL_PRINTF_SCANF)
 #  define NO_FLOATING_POINT
 #  define NO_POS_ARGS
-#  undef _WANT_IO_PERCENT_B
+#  if !defined(_WANT_MINIMAL_IO_LONG_LONG) && __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
+#   define NO_LONG_LONG
+#  endif
+#  ifndef _WANT_IO_C99_FORMATS
+#   define NO_C99_FORMATS
+#  endif
 # elif defined(PICOLIBC_INTEGER_PRINTF_SCANF)
 #  define NO_FLOATING_POINT
 #  ifndef _WANT_IO_POS_ARGS
 #   define NO_POS_ARGS
 #  endif
-#  ifndef _WANT_IO_LONG_LONG
+#  if !defined(_WANT_IO_LONG_LONG) && __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
 #   define NO_LONG_LONG
 #  endif
-# endif
-# ifdef _WANT_IO_PERCENT_B
-#  define BINARY_FORMAT
+#  ifndef _WANT_IO_C99_FORMATS
+#   define NO_C99_FORMATS
+#  endif
+#  ifdef _WANT_IO_PERCENT_B
+#   define BINARY_FORMAT
+#  endif
+# elif defined(PICOLIBC_LONG_LONG_PRINTF_SCANF)
+#  define NO_FLOATING_POINT
+#  ifndef _WANT_IO_POS_ARGS
+#   define NO_POS_ARGS
+#  endif
+#  ifndef _WANT_IO_C99_FORMATS
+#   define NO_C99_FORMATS
+#  endif
+#  ifdef _WANT_IO_PERCENT_B
+#   define BINARY_FORMAT
+#  endif
+# elif defined(PICOLIBC_FLOAT_PRINTF_SCANF) || defined(PICOLIBC_DOUBLE_PRINTF_SCANF)
+#  ifdef _WANT_IO_PERCENT_B
+#   define BINARY_FORMAT
+#  endif
 # endif
 #else
 #define printf_float(x) ((double) (x))
 
 #ifndef _WANT_IO_POS_ARGS
 #define NO_POS_ARGS
+#endif
+#if !defined(_WANT_IO_C99_FORMATS) || defined(_NANO_FORMATTED_IO)
+# define NO_C99_FORMATS
 #endif
 
 #ifdef _NANO_FORMATTED_IO
@@ -187,6 +210,7 @@ main(void)
         wprintf(L"hello world %g\n", 1.0);
 
 #if !defined(NO_FLOATING_POINT)
+        printf("checking floating point\n");
 	sprintf(buf, "%g", printf_float(0.0f));
 	if (strcmp(buf, "0") != 0) {
 		printf("0: wanted \"0\" got \"%s\"\n", buf);
@@ -196,6 +220,7 @@ main(void)
 #endif
 
 #ifndef NO_POS_ARGS
+        printf("checking pos args\n");
         x = y = 0;
         int r = sscanf("3 4", "%2$d %1$d", &x, &y);
         if (x != 4 || y != 3 || r != 2) {
@@ -259,6 +284,7 @@ main(void)
 #define VERIFY(prefix, conv) VERIFY_BOTH(prefix, conv, conv)
 
 #ifdef BINARY_FORMAT
+        printf("checking binary format\n");
 #define VERIFY_BINARY(prefix) VERIFY(prefix, "b")
 #pragma GCC diagnostic ignored "-Wformat"
 #pragma GCC diagnostic ignored "-Wformat-extra-args"
@@ -288,11 +314,13 @@ main(void)
 	CHECK_RT(unsigned short, "h");
         CHECK_RT(unsigned int, "");
         CHECK_RT(unsigned long, "l");
-#if defined(_WANT_IO_LONG_LONG)
+#ifndef NO_LONG_LONG
+        printf("checking long long\n");
         CHECK_RT(unsigned long long, "ll");
 #endif
-#ifndef _NANO_FORMATTED_IO
-#if !defined(_WANT_IO_LONG_LONG)
+#ifndef NO_C99_FORMATS
+        printf("checking c99 formats\n");
+#ifdef NO_LONG_LONG
 	if (sizeof(intmax_t) <= sizeof(long))
 #endif
 	{
@@ -376,7 +404,7 @@ main(void)
 				fflush(stdout);
 			}
 
-#ifdef _WANT_IO_C99_FORMATS
+#ifndef NO_C99_FORMATS
 			sprintf(buf, "%.20a", printf_float(v));
 			sscanf(buf, scanf_format, &r);
 			e = fabs(v-r) / v;
@@ -390,7 +418,7 @@ main(void)
 #endif
 
 		}
-#ifdef _WANT_IO_C99_FORMATS
+#ifndef NO_C99_FORMATS
                 sprintf(buf, "0x0.0p%+d", x);
                 sscanf(buf, scanf_format, &r);
                 if (r != (float_type) 0.0)
