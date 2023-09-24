@@ -4,17 +4,17 @@
         with:
           path: picolibc
 
-      - name: Restore the Docker Image
-        uses: actions/cache@v3
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
-          fail-on-cache-miss: true
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Load and Check the Docker Image
         run: |
-          docker load -i $IMAGE_FILE
-          docker images -a $IMAGE
+          echo IMAGE_TAG=${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }} >> $GITHUB_ENV
+          docker pull ${{ env.IMAGE }}:${{ env.IMAGE_TAG }}
 
       # The docker image contains ccache, but the ccache action uses the ccache
       # outside docker for statistics, so install the same ccache version.
