@@ -19,7 +19,7 @@ env:
   CCACHE_SIZE: "0M"
   CCACHE_CMD: true
   DOCKERFILE: picolibc/.github/Dockerfile
-  IMAGE: ghcr.io/picolibc/picolibc-linux
+  IMAGE: ghcr.io/${{ github.repository }}-linux
   PACKAGES_FILE: picolibc/.github/linux-packages.txt
   EXTRA_FILE: picolibc/.github/linux-files.txt
 
@@ -45,12 +45,8 @@ jobs:
           echo $TAGS | jq -e '.tags|any(. == "${{ env.IMAGE_TAG }}")'  > /dev/null || echo DOCKER_NEED_BUILD=1 >> $GITHUB_ENV
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
         if: env.DOCKER_NEED_BUILD == '1'
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
 
       - name: Set up Docker Buildx
         if: env.DOCKER_NEED_BUILD == '1'
@@ -68,13 +64,12 @@ jobs:
         if: env.DOCKER_NEED_BUILD == '1'
         uses: docker/build-push-action@v5
         with:
+          context: picolibc
           platforms: linux/amd64
           file: .github/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=registry,force-compression=true,compression=zstd,compression-level=22
-
   cmake-linux:
     needs: cache-maker
     runs-on: ubuntu-latest

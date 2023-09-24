@@ -19,22 +19,18 @@ env:
   # is the largest cache, 429.5M (September 2023).
   CCACHE_SIZE: "450M"
   CCACHE_CMD: ccache
-  DOCKERFILE: picolibc/.github/Dockerfile-zephyr
-  IMAGE: ghcr.io/picolibc/picolibc
-  PACKAGES_FILE: picolibc/.github/zephyr-packages.txt
-  EXTRA_FILE: picolibc/.github/zephyr-files.txt
+  DOCKERFILE: .github/Dockerfile-zephyr
+  IMAGE: ghcr.io/${{ github.repository }}
+  PACKAGES_FILE: .github/zephyr-packages.txt
+  EXTRA_FILE: .github/zephyr-files.txt
 
 jobs:
   cache-maker:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+    permissions: write-all
     steps:
       - name: Clone picolibc
         uses: actions/checkout@v4
-        with:
-          path: picolibc
 
       - name: Check if image needs to be rebuilt
         run: |
@@ -45,34 +41,15 @@ jobs:
           TAGS=$(curl -s -H "Authorization: Bearer ${GHCR_TOKEN}" https://ghcr.io/v2/picolibc/picolibc/tags/list)
           echo $TAGS | jq -e '.tags|any(. == "${{ env.IMAGE_TAG }}")'  > /dev/null || echo DOCKER_NEED_BUILD=1 >> $GITHUB_ENV
 
-      - name: Login to GitHub Container Registry
-        if: env.DOCKER_NEED_BUILD == '1'
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Set up Docker Buildx
         if: env.DOCKER_NEED_BUILD == '1'
         uses: docker/setup-buildx-action@v3
 
-      # Required for connecting repo<->package name for permissions.
-      - name: Extract metadata (tags, labels) for Docker
+      - name: Build image
         if: env.DOCKER_NEED_BUILD == '1'
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.IMAGE }}
-
-      - name: Build picolibc container
-        if: env.DOCKER_NEED_BUILD == '1'
-        uses: docker/build-push-action@v5
-        with:
-          platforms: linux/amd64
-          file: .github/Dockerfile-zephyr
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=registry,force-compression=true,compression=zstd,compression-level=22
-
+        run: |
+          pwd
+          ls
+          docker build . --file .github/Dockerfile-zephyr --tag $IMAGE:${{ env.IMAGE_TAG }} --label "runnumber=${GITHUB_RUN_ID}"
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+          docker push $IMAGE:${{ env.IMAGE_TAG }}
