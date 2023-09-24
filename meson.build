@@ -317,16 +317,19 @@ minimal_io_long_long = tinystdio and get_option('minimal-io-long-long')
 if printf_aliases
   double_printf_compile_args=['-DPICOLIBC_DOUBLE_PRINTF_SCANF']
   float_printf_compile_args=['-DPICOLIBC_FLOAT_PRINTF_SCANF']
+  llong_printf_compile_args=['-DPICOLIBC_LONG_LONG_PRINTF_SCANF']
   int_printf_compile_args=['-DPICOLIBC_INTEGER_PRINTF_SCANF']
   min_printf_compile_args=['-DPICOLIBC_MINIMAL_PRINTF_SCANF']
 else
   double_printf_compile_args=[]
   float_printf_compile_args=[]
+  llong_printf_compile_args=[]
   int_printf_compile_args=[]
   min_printf_compile_args=[]
 endif
 double_printf_link_args=double_printf_compile_args
 float_printf_link_args=float_printf_compile_args
+llong_printf_link_args=llong_printf_compile_args
 int_printf_link_args=int_printf_compile_args
 min_printf_link_args=min_printf_compile_args
 
@@ -335,6 +338,8 @@ if tinystdio
     c_args += '-DFORMAT_DEFAULT_DOUBLE'
   elif format_default == 'float'
     c_args += '-DFORMAT_DEFAULT_FLOAT'
+  elif format_default == 'long-long'
+    c_args += '-DFORMAT_DEFAULT_LONG_LONG'
   elif format_default == 'integer'
     c_args += '-DFORMAT_DEFAULT_INTEGER'
   elif format_default == 'minimal'
@@ -346,11 +351,13 @@ if tinystdio and printf_aliases
   vfprintf_symbol = global_prefix + 'vfprintf'
   __d_vfprintf_symbol = global_prefix + '__d_vfprintf'
   __f_vfprintf_symbol = global_prefix + '__f_vfprintf'
+  __l_vfprintf_symbol = global_prefix + '__l_vfprintf'
   __i_vfprintf_symbol = global_prefix + '__i_vfprintf'
   __m_vfprintf_symbol = global_prefix + '__m_vfprintf'
   vfscanf_symbol = global_prefix + 'vfscanf'
   __d_vfscanf_symbol = global_prefix + '__d_vfscanf'
   __f_vfscanf_symbol = global_prefix + '__f_vfscanf'
+  __l_vfscanf_symbol = global_prefix + '__l_vfscanf'
   __i_vfscanf_symbol = global_prefix + '__i_vfscanf'
   __m_vfscanf_symbol = global_prefix + '__m_vfscanf'
 
@@ -363,6 +370,10 @@ if tinystdio and printf_aliases
       float_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __f_vfprintf_symbol
       float_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __f_vfscanf_symbol
     endif
+    if format_default != 'long-long'
+      llong_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __l_vfprintf_symbol
+      llong_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __l_vfscanf_symbol
+    endif
     if format_default != 'integer'
       int_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __i_vfprintf_symbol
       int_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __i_vfscanf_symbol
@@ -370,12 +381,13 @@ if tinystdio and printf_aliases
     if format_default != 'minimal'
       min_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __m_vfprintf_symbol
       min_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __m_vfscanf_symbol
-      message('added m symbols')
     endif
   elif has_link_alias
     if format_default == 'double'
       float_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __d_vfprintf_symbol
       float_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __d_vfscanf_symbol
+      llong_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __d_vfprintf_symbol
+      llong_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __d_vfscanf_symbol
       int_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __d_vfprintf_symbol
       int_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __d_vfscanf_symbol
       min_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __d_vfprintf_symbol
@@ -384,16 +396,30 @@ if tinystdio and printf_aliases
     if format_default == 'float'
       double_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __f_vfprintf_symbol
       double_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __f_vfscanf_symbol
+      llong_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __f_vfprintf_symbol
+      llong_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __f_vfscanf_symbol
       int_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __f_vfprintf_symbol
       int_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __f_vfscanf_symbol
       min_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __f_vfprintf_symbol
       min_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __f_vfscanf_symbol
+    endif
+    if format_default == 'long-long'
+      double_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __l_vfprintf_symbol
+      double_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __l_vfscanf_symbol
+      float_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __l_vfprintf_symbol
+      float_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __l_vfscanf_symbol
+      int_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __l_vfprintf_symbol
+      int_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __l_vfscanf_symbol
+      min_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __l_vfprintf_symbol
+      min_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __l_vfscanf_symbol
     endif
     if format_default == 'integer'
       double_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __i_vfprintf_symbol
       double_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __i_vfscanf_symbol
       float_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __i_vfprintf_symbol
       float_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __i_vfscanf_symbol
+      llong_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __i_vfprintf_symbol
+      llong_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __i_vfscanf_symbol
       min_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __i_vfprintf_symbol
       min_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __i_vfscanf_symbol
     endif
@@ -402,6 +428,8 @@ if tinystdio and printf_aliases
       double_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __m_vfscanf_symbol
       float_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __m_vfprintf_symbol
       float_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __m_vfscanf_symbol
+      llong_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __m_vfprintf_symbol
+      llong_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __m_vfscanf_symbol
       int_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __m_vfprintf_symbol
       int_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __m_vfscanf_symbol
     endif
@@ -412,6 +440,10 @@ if tinystdio and printf_aliases
     if format_default != 'float'
       float_printf_link_args += '-Wl,-alias,' + __f_vfprintf_symbol +  ',' + vfprintf_symbol
       float_printf_link_args += '-Wl,-alias,' + __f_vfscanf_symbol + ',' + vfscanf_symbol
+    endif
+    if format_default != 'long-long'
+      llong_printf_link_args += '-Wl,-alias,' + __l_vfprintf_symbol +  ',' + vfprintf_symbol
+      llong_printf_link_args += '-Wl,-alias,' + __l_vfscanf_symbol + ',' + vfscanf_symbol
     endif
     if format_default != 'integer'
       int_printf_link_args += '-Wl,-alias,' + __i_vfprintf_symbol +  ',' + vfprintf_symbol

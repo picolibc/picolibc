@@ -28,46 +28,22 @@
 
 #if PRINTF_LEVEL < PRINTF_FLT && defined(_PRINTF_SMALL_ULTOA)
 
-#ifdef __arm__
+/*
+ * Enable fancy divmod for targets where we don't expect either
+ * hardware division support or that software will commonly be using
+ * the soft division code. That means platforms where 'long' is not at
+ * least 64-bits get the fancy code for 64-bit values and platforms
+ * where 'int' is not at least 32-bits also get the fancy code for
+ * 32-bit values
+ */
 
-# define FANCY_DIVMOD_8
-# ifndef __ARM_FEATURE_IDIV__
-#  define FANCY_DIVMOD_4
-# endif
-
-#elif defined(__riscv)
-
-# if __riscv_xlen <= 32
-#  define FANCY_DIVMOD_8
-#  ifndef __riscv_m
-#   define FANCY_DIVMOD_4
-#  endif
-# elif __riscv_xlen >= 64
-#  ifndef __riscv_m
-#   define FANCY_DIVMOD_8
-#   define FANCY_DIVMOD_4
-#  endif
-# endif
-
-#elif defined(__arc__)
-
-#if __SIZEOF_LONG__ <= 4
-# define FANCY_DIVMOD_8
-# ifndef __ARC_DIVREM__
-#  define FANCY_DIVMOD_4
-# endif
-#else
-# ifndef __ARC_DIVREM__
-#  define FANCY_DIVMOD_8
-#  define FANCY_DIVMOD_4
-# endif
-#endif
-
-#else
 # if __SIZEOF_LONG__ < 8
 #  define FANCY_DIVMOD_8
 # endif
-#endif
+
+# if __SIZEOF_INT__ < 4
+#  define FANCY_DIVMOD_4
+# endif
 
 #if SIZEOF_ULTOA == 8 && defined(FANCY_DIVMOD_8)
 

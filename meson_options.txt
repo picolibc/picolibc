@@ -156,13 +156,13 @@ option('posix-io', type: 'boolean', value: true,
        description: 'Provide fopen/fdopen using POSIX I/O (open, close, read, write, lseek)')
 option('posix-console', type: 'boolean', value: false,
        description: 'Use POSIX I/O for stdin/stdout/stderr')
-option('format-default', type: 'combo', choices: ['double', 'float', 'integer', 'minimal'], value: 'double',
+option('format-default', type: 'combo', choices: ['double', 'float', 'long-long', 'integer', 'minimal'], value: 'double',
        description: 'which printf/scanf versions should be the default')
 option('printf-aliases', type: 'boolean', value: true,
        description: 'Allow link-time printf aliases')
 option('io-percent-b', type: 'boolean', value: false,
        description: 'enable proposed %b/%B format in printf and scanf in tinystdio (default: false)')
-option('printf-small-ultoa', type: 'boolean', value: false,
+option('printf-small-ultoa', type: 'boolean', value: true,
        description: 'Avoid softare division in decimal conversions')
 option('minimal-io-long-long', type: 'boolean', value: false,
        description: 'enable long long type support in minimal printf/scanf')

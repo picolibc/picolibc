@@ -61,6 +61,9 @@
  *  PRINTF_STD: full integer support with options for positional
  *              params and long long
  *
+ *  PRINTF_LLONG: full integer support including long long with
+ *                options for positional params
+ *
  *  PRINTF_FLT: full support
  */
 
@@ -86,6 +89,19 @@
 # endif
 #elif PRINTF_LEVEL == PRINTF_STD
 # if defined(_WANT_IO_LONG_LONG) && __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
+#  define _NEED_IO_LONG_LONG
+# endif
+# ifdef _WANT_IO_POS_ARGS
+#  define _NEED_IO_POS_ARGS
+# endif
+# ifdef _WANT_IO_C99_FORMATS
+#  define _NEED_IO_C99_FORMATS
+# endif
+# ifdef _WANT_IO_PERCENT_B
+#  define _NEED_IO_PERCENT_B
+# endif
+#elif PRINTF_LEVEL == PRINTF_LLONG
+# if __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
 #  define _NEED_IO_LONG_LONG
 # endif
 # ifdef _WANT_IO_POS_ARGS

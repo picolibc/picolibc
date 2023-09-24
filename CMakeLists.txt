@@ -383,10 +383,8 @@ endif()
 
 option(__IO_FLOAT "Support floating point in printf/scanf by default" OFF)
 
-option(__IO_MINIMAL "Use minimal printf variant" OFF)
-
 if(NOT DEFINED _PRINTF_SMALL_ULTOA)
-  option(_PRINTF_SMALL_ULTOA "Avoid soft divide in printf" OFF)
+  option(_PRINTF_SMALL_ULTOA "Avoid soft divide in printf" ON)
 endif()
 
 if(NOT DEFINED _WANT_IO_PERCENT_B)
@@ -401,6 +399,7 @@ if(FORMAT_DEFAULT_MINIMAL)
   set(FORMAT_DEFAULT_DOUBLE 0)
   set(FORMAT_DEFAULT_FLOAT 0)
   set(FORMAT_DEFAULT_INTEGER 0)
+  set(FORMAT_DEFAULT_LONG_LONG 0)
 endif()
 
 if(NOT DEFINED FORMAT_DEFAULT_DOUBLE)
@@ -409,6 +408,10 @@ endif()
 
 if(NOT DEFINED FORMAT_DEFAULT_FLOAT)
   set(FORMAT_DEFAULT_FLOAT 0)
+endif()
+
+if(NOT DEFINED FORMAT_DEFAULT_LONG_LONG)
+  set(FORMAT_DEFAULT_LONG_LONG 0)
 endif()
 
 if(NOT DEFINED FORMAT_DEFAULT_INTEGER)

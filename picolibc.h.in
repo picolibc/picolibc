@@ -406,6 +406,8 @@
 
 #cmakedefine FORMAT_DEFAULT_FLOAT
 
+#cmakedefine FORMAT_DEFAULT_LONG_LONG
+
 #cmakedefine FORMAT_DEFAULT_INTEGER
 
 #cmakedefine FORMAT_DEFAULT_MINIMAL

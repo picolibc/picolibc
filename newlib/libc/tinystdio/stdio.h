@@ -341,10 +341,13 @@ __printf_float(float f)
 
 #if !defined(PICOLIBC_DOUBLE_PRINTF_SCANF) && \
     !defined(PICOLIBC_FLOAT_PRINTF_SCANF) && \
+    !defined(PICOLIBC_LONG_LONG_PRINTF_SCANF) && \
     !defined(PICOLIBC_INTEGER_PRINTF_SCANF) && \
     !defined(PICOLIBC_MIMINAL_PRINTF_SCANF)
 #if defined(_FORMAT_DEFAULT_FLOAT)
 #define PICOLIBC_FLOAT_PRINTF_SCANF
+#elif defined(_FORMAT_DEFAULT_LONG_LONG)
+#define PICOLIBC_LONG_LONG_PRINTF_SCANF
 #elif defined(_FORMAT_DEFAULT_INTEGER)
 #define PICOLIBC_INTEGER_PRINTF_SCANF
 #elif defined(_FORMAT_DEFAULT_MINIMAL)
@@ -360,7 +363,7 @@ __printf_float(float f)
 
 #if defined(PICOLIBC_MINIMAL_PRINTF_SCANF)
 # define printf_float(x) ((double) (x))
-# ifdef _WANT_MINIMAL_IO_LONG_LONG
+# if defined(_WANT_MINIMAL_IO_LONG_LONG) || __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
 #  define _HAS_IO_LONG_LONG
 # endif
 # ifdef _WANT_IO_C99_FORMATS
@@ -368,9 +371,21 @@ __printf_float(float f)
 # endif
 #elif defined(PICOLIBC_INTEGER_PRINTF_SCANF)
 # define printf_float(x) ((double) (x))
-# ifdef _WANT_IO_LONG_LONG
+# if defined(_WANT_IO_LONG_LONG) || __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
 #  define _HAS_IO_LONG_LONG
 # endif
+# ifdef _WANT_IO_POS_ARGS
+#  define _HAS_IO_POS_ARGS
+# endif
+# ifdef _WANT_IO_C99_FORMATS
+#  define _HAS_IO_C99_FORMATS
+# endif
+# ifdef _WANT_IO_PERCENT_B
+#  define _HAS_IO_PERCENT_B
+# endif
+#elif defined(PICOLIBC_LONG_LONG_PRINTF_SCANF)
+# define printf_float(x) ((double) (x))
+# define _HAS_IO_LONG_LONG
 # ifdef _WANT_IO_POS_ARGS
 #  define _HAS_IO_POS_ARGS
 # endif
