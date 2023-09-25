@@ -343,7 +343,7 @@ __printf_float(float f)
     !defined(PICOLIBC_FLOAT_PRINTF_SCANF) && \
     !defined(PICOLIBC_LONG_LONG_PRINTF_SCANF) && \
     !defined(PICOLIBC_INTEGER_PRINTF_SCANF) && \
-    !defined(PICOLIBC_MIMINAL_PRINTF_SCANF)
+    !defined(PICOLIBC_MINIMAL_PRINTF_SCANF)
 #if defined(_FORMAT_DEFAULT_FLOAT)
 #define PICOLIBC_FLOAT_PRINTF_SCANF
 #elif defined(_FORMAT_DEFAULT_LONG_LONG)
@@ -355,10 +355,6 @@ __printf_float(float f)
 #else
 #define PICOLIBC_DOUBLE_PRINTF_SCANF
 #endif
-#endif
-
-#ifdef PICOLIBC_FLOAT_PRINTF_SCANF
-#else
 #endif
 
 #if defined(PICOLIBC_MINIMAL_PRINTF_SCANF)

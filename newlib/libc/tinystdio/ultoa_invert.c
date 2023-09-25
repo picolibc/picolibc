@@ -26,7 +26,7 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE. */
 
-#if PRINTF_LEVEL < PRINTF_FLT && defined(_PRINTF_SMALL_ULTOA)
+#if PRINTF_LEVEL < PRINTF_DBL && defined(_PRINTF_SMALL_ULTOA)
 
 /*
  * Enable fancy divmod for targets where we don't expect either
