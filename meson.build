@@ -1015,7 +1015,9 @@ foreach target : ['default-target'] + targets
     endif
 
     init_memory_template = '''
-        @0@ (rx!w) : ORIGIN = @1@, LENGTH = @2@
+	@0@ (rx!w) :
+		ORIGIN = DEFINED(__@0@) ? __@0@ : @1@,
+		LENGTH = DEFINED(__@0@_size) ? __@0@_size : @2@
 '''
     init_section_template = '''
         .@0@ : {
