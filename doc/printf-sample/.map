@@ -1,0 +1,1268 @@
+Archive member included to satisfy reference by file (symbol)
+
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memcpy.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/crt0-hosted.o (memcpy)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memset.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/crt0-hosted.o (memset)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_init.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/crt0-hosted.o (__libc_init_array)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_stdlib_pico-exit.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/crt0-hosted.o (exit)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_interrupt.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/crt0-hosted.o (__interrupt_vector)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_tls.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/crt0-hosted.o (_set_tls)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_printf.c.o)
+                              /tmp/ccwawuPr.o (printf)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfprintf.c.o)
+                              (__d_vfprintf)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o)
+                              (__d_vfscanf)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_dtoa_ryu.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfprintf.c.o) (__dtoa_engine)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_table.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_dtoa_ryu.c.o) (__pow5Factor)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atod_ryu.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o) (__atod_engine)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atof_ryu.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o) (__atof_engine)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log2pow5.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atod_ryu.c.o) (__log2pow5)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log10.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_dtoa_ryu.c.o) (__log10Pow2)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_pow5bits.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_dtoa_ryu.c.o) (__pow5bits)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_umul128.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_dtoa_ryu.c.o) (__umul128)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_divpow2.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atof_ryu.c.o) (__mulPow5InvDivPow2)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_fini.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_stdlib_pico-exit.c.o) (__libc_fini_array)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strchr.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o) (strchr)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strnlen.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfprintf.c.o) (strnlen)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_fgetc.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o) (fgetc)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ungetc.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o) (ungetc)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(exit.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_stdlib_pico-exit.c.o) (_exit)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(exit.c.o) (sys_semihost_exit)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit_extended.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(exit.c.o) (sys_semihost_exit_extended)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_feature.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(exit.c.o) (sys_semihost_feature)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_flen.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_feature.c.o) (sys_semihost_flen)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_open.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_feature.c.o) (sys_semihost_open)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_read.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_feature.c.o) (sys_semihost_read)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(iob.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_printf.c.o) (stdout)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(machine_arm_semihost-arm.S.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit.c.o) (sys_semihost)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_close.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_feature.c.o) (sys_semihost_close)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_getc.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(iob.c.o) (sys_semihost_getc)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_putc.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(iob.c.o) (sys_semihost_putc)
+/usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubdf3.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o) (__aeabi_f2d)
+/usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_arm_truncdfsf2.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o) (__aeabi_d2f)
+/usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_aeabi_uldivmod.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfprintf.c.o) (__aeabi_uldivmod)
+/usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_udivmoddi4.o)
+                              /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_aeabi_uldivmod.o) (__udivmoddi4)
+/usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_dvmd_tls.o)
+                              /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_aeabi_uldivmod.o) (__aeabi_ldiv0)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(strlen.S.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_open.c.o) (strlen)
+/usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_memcmp.c.o)
+                              /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_feature.c.o) (memcmp)
+
+Discarded input sections
+
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/crt0-hosted.o
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/crt0-hosted.o
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/crt0-hosted.o
+ .text          0x00000000        0x0 /tmp/ccwawuPr.o
+ .data          0x00000000        0x0 /tmp/ccwawuPr.o
+ .bss           0x00000000        0x0 /tmp/ccwawuPr.o
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memcpy.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memcpy.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memcpy.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memset.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memset.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memset.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_init.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_init.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_init.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_stdlib_pico-exit.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_stdlib_pico-exit.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_stdlib_pico-exit.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_interrupt.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_interrupt.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_interrupt.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_tls.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_tls.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_printf.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_printf.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_printf.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfprintf.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfprintf.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfprintf.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o)
+ .text.scanf_getc
+                0x00000000       0x14 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o)
+ .text.putval   0x00000000       0x2c /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o)
+ .text.scanf_ungetc.isra.0
+                0x00000000       0x16 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o)
+ .text.skip_spaces
+                0x00000000       0x2a /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o)
+ .rodata.str1.1
+                0x00000000       0x12 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o)
+ .text.vfscanf  0x00000000      0x834 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o)
+ .rodata        0x00000000        0xb /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o)
+ .debug_info    0x00000000     0x1241 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o)
+ .debug_abbrev  0x00000000      0x48b /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o)
+ .debug_loclists
+                0x00000000     0x10f3 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o)
+ .debug_aranges
+                0x00000000       0x40 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o)
+ .debug_rnglists
+                0x00000000      0x13d /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o)
+ .debug_line    0x00000000      0xe0e /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o)
+ .debug_str     0x00000000      0x487 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o)
+ .comment       0x00000000       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o)
+ .debug_frame   0x00000000       0x9c /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o)
+ .ARM.attributes
+                0x00000000       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfscanf.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_dtoa_ryu.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_dtoa_ryu.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_dtoa_ryu.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_table.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_table.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_table.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atod_ryu.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atod_ryu.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atod_ryu.c.o)
+ .text.mulShift64
+                0x00000000       0x62 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atod_ryu.c.o)
+ .text.__atod_engine
+                0x00000000      0x1bc /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atod_ryu.c.o)
+ .debug_info    0x00000000      0x668 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atod_ryu.c.o)
+ .debug_abbrev  0x00000000      0x266 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atod_ryu.c.o)
+ .debug_loclists
+                0x00000000      0x3fc /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atod_ryu.c.o)
+ .debug_aranges
+                0x00000000       0x28 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atod_ryu.c.o)
+ .debug_rnglists
+                0x00000000       0x57 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atod_ryu.c.o)
+ .debug_line    0x00000000      0x35f /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atod_ryu.c.o)
+ .debug_str     0x00000000      0x329 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atod_ryu.c.o)
+ .comment       0x00000000       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atod_ryu.c.o)
+ .debug_frame   0x00000000       0x64 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atod_ryu.c.o)
+ .ARM.attributes
+                0x00000000       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atod_ryu.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atof_ryu.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atof_ryu.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atof_ryu.c.o)
+ .text.__atof_engine
+                0x00000000      0x11c /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atof_ryu.c.o)
+ .debug_info    0x00000000      0x558 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atof_ryu.c.o)
+ .debug_abbrev  0x00000000      0x1e8 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atof_ryu.c.o)
+ .debug_loclists
+                0x00000000      0x2fe /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atof_ryu.c.o)
+ .debug_aranges
+                0x00000000       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atof_ryu.c.o)
+ .debug_rnglists
+                0x00000000       0x6a /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atof_ryu.c.o)
+ .debug_line    0x00000000      0x36e /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atof_ryu.c.o)
+ .debug_str     0x00000000      0x2d8 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atof_ryu.c.o)
+ .comment       0x00000000       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atof_ryu.c.o)
+ .debug_frame   0x00000000       0x34 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atof_ryu.c.o)
+ .ARM.attributes
+                0x00000000       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_atof_ryu.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log2pow5.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log2pow5.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log2pow5.c.o)
+ .text.__log2pow5
+                0x00000000        0xc /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log2pow5.c.o)
+ .text.__ceil_log2pow5
+                0x00000000       0x10 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log2pow5.c.o)
+ .debug_info    0x00000000      0x132 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log2pow5.c.o)
+ .debug_abbrev  0x00000000       0xc8 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log2pow5.c.o)
+ .debug_loclists
+                0x00000000       0x45 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log2pow5.c.o)
+ .debug_aranges
+                0x00000000       0x28 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log2pow5.c.o)
+ .debug_rnglists
+                0x00000000       0x19 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log2pow5.c.o)
+ .debug_line    0x00000000       0xf9 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log2pow5.c.o)
+ .debug_str     0x00000000      0x1f1 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log2pow5.c.o)
+ .comment       0x00000000       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log2pow5.c.o)
+ .debug_frame   0x00000000       0x30 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log2pow5.c.o)
+ .ARM.attributes
+                0x00000000       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log2pow5.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log10.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log10.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log10.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_pow5bits.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_pow5bits.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_pow5bits.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_umul128.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_umul128.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_umul128.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_divpow2.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_divpow2.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_divpow2.c.o)
+ .text.mulShift32
+                0x00000000       0x2e /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_divpow2.c.o)
+ .text.__mulPow5InvDivPow2
+                0x00000000       0x26 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_divpow2.c.o)
+ .text.__mulPow5divPow2
+                0x00000000       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_divpow2.c.o)
+ .debug_info    0x00000000      0x2fc /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_divpow2.c.o)
+ .debug_abbrev  0x00000000      0x15c /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_divpow2.c.o)
+ .debug_loclists
+                0x00000000      0x129 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_divpow2.c.o)
+ .debug_aranges
+                0x00000000       0x30 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_divpow2.c.o)
+ .debug_rnglists
+                0x00000000       0x2e /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_divpow2.c.o)
+ .debug_line    0x00000000      0x195 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_divpow2.c.o)
+ .debug_str     0x00000000      0x28e /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_divpow2.c.o)
+ .comment       0x00000000       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_divpow2.c.o)
+ .debug_frame   0x00000000       0x68 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_divpow2.c.o)
+ .ARM.attributes
+                0x00000000       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_divpow2.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_fini.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_fini.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_fini.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strchr.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strchr.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strchr.c.o)
+ .text.strchr   0x00000000       0x1a /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strchr.c.o)
+ .debug_info    0x00000000       0xf4 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strchr.c.o)
+ .debug_abbrev  0x00000000       0x82 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strchr.c.o)
+ .debug_loclists
+                0x00000000       0x62 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strchr.c.o)
+ .debug_aranges
+                0x00000000       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strchr.c.o)
+ .debug_rnglists
+                0x00000000       0x13 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strchr.c.o)
+ .debug_line    0x00000000       0x7f /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strchr.c.o)
+ .debug_str     0x00000000      0x1b3 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strchr.c.o)
+ .comment       0x00000000       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strchr.c.o)
+ .debug_frame   0x00000000       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strchr.c.o)
+ .ARM.attributes
+                0x00000000       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strchr.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strnlen.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strnlen.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strnlen.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_fgetc.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_fgetc.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_fgetc.c.o)
+ .text.fgetc    0x00000000       0x40 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_fgetc.c.o)
+ .debug_info    0x00000000      0x306 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_fgetc.c.o)
+ .debug_abbrev  0x00000000      0x19c /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_fgetc.c.o)
+ .debug_loclists
+                0x00000000       0xd3 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_fgetc.c.o)
+ .debug_aranges
+                0x00000000       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_fgetc.c.o)
+ .debug_rnglists
+                0x00000000       0x13 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_fgetc.c.o)
+ .debug_line    0x00000000      0x183 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_fgetc.c.o)
+ .debug_str     0x00000000      0x2f6 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_fgetc.c.o)
+ .comment       0x00000000       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_fgetc.c.o)
+ .debug_frame   0x00000000       0x28 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_fgetc.c.o)
+ .ARM.attributes
+                0x00000000       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_fgetc.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ungetc.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ungetc.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ungetc.c.o)
+ .text.ungetc   0x00000000       0x3a /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ungetc.c.o)
+ .debug_info    0x00000000      0x2b5 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ungetc.c.o)
+ .debug_abbrev  0x00000000      0x16c /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ungetc.c.o)
+ .debug_loclists
+                0x00000000       0x89 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ungetc.c.o)
+ .debug_aranges
+                0x00000000       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ungetc.c.o)
+ .debug_rnglists
+                0x00000000       0x1f /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ungetc.c.o)
+ .debug_line    0x00000000      0x163 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ungetc.c.o)
+ .debug_str     0x00000000      0x27c /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ungetc.c.o)
+ .comment       0x00000000       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ungetc.c.o)
+ .debug_frame   0x00000000       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ungetc.c.o)
+ .ARM.attributes
+                0x00000000       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ungetc.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(exit.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(exit.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(exit.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit_extended.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit_extended.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit_extended.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_feature.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_feature.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_flen.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_flen.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_flen.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_open.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_open.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_open.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_read.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_read.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_read.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(iob.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(iob.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(machine_arm_semihost-arm.S.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(machine_arm_semihost-arm.S.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_close.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_close.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_close.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_getc.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_getc.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_getc.c.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_putc.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_putc.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_putc.c.o)
+ .text          0x00000000      0x378 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubdf3.o)
+ .data          0x00000000        0x0 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubdf3.o)
+ .bss           0x00000000        0x0 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubdf3.o)
+ .debug_line    0x00000000      0x16f /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubdf3.o)
+ .debug_line_str
+                0x00000000       0x91 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubdf3.o)
+ .debug_info    0x00000000       0xd3 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubdf3.o)
+ .debug_abbrev  0x00000000       0x28 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubdf3.o)
+ .debug_aranges
+                0x00000000       0x20 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubdf3.o)
+ .debug_str     0x00000000      0x149 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubdf3.o)
+ .debug_frame   0x00000000       0xac /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubdf3.o)
+ .ARM.attributes
+                0x00000000       0x1d /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubdf3.o)
+ .text          0x00000000       0xa0 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_arm_truncdfsf2.o)
+ .data          0x00000000        0x0 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_arm_truncdfsf2.o)
+ .bss           0x00000000        0x0 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_arm_truncdfsf2.o)
+ .debug_line    0x00000000       0x76 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_arm_truncdfsf2.o)
+ .debug_line_str
+                0x00000000       0x91 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_arm_truncdfsf2.o)
+ .debug_info    0x00000000       0x3f /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_arm_truncdfsf2.o)
+ .debug_abbrev  0x00000000       0x28 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_arm_truncdfsf2.o)
+ .debug_aranges
+                0x00000000       0x20 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_arm_truncdfsf2.o)
+ .debug_str     0x00000000       0xb6 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_arm_truncdfsf2.o)
+ .debug_frame   0x00000000       0x24 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_arm_truncdfsf2.o)
+ .ARM.attributes
+                0x00000000       0x1d /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_arm_truncdfsf2.o)
+ .data          0x00000000        0x0 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_aeabi_uldivmod.o)
+ .bss           0x00000000        0x0 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_aeabi_uldivmod.o)
+ .data          0x00000000        0x0 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_udivmoddi4.o)
+ .bss           0x00000000        0x0 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_udivmoddi4.o)
+ .ARM.extab     0x00000000        0x0 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_udivmoddi4.o)
+ .ARM.exidx     0x00000000        0x8 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_udivmoddi4.o)
+ .data          0x00000000        0x0 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_dvmd_tls.o)
+ .bss           0x00000000        0x0 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_dvmd_tls.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(strlen.S.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(strlen.S.o)
+ .ARM.extab     0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(strlen.S.o)
+ .ARM.exidx     0x00000000        0x8 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(strlen.S.o)
+ .eh_frame      0x00000000       0x28 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(strlen.S.o)
+ .text          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_memcmp.c.o)
+ .data          0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_memcmp.c.o)
+ .bss           0x00000000        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_memcmp.c.o)
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+flash            0x00000000         0x00200000         xr!w
+ram              0x20000000         0x00200000         w!xr
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+                0x00000308                        vfprintf = __d_vfprintf
+                0x00000000                        vfscanf = __d_vfscanf
+                0x20200000                        PROVIDE (__stack = (ORIGIN (ram) + LENGTH (ram)))
+
+.init           0x00000000       0x40
+ *(.text.init.enter)
+ *(.data.init.enter)
+ .data.init.enter
+                0x00000000       0x40 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_interrupt.c.o)
+                0x00000000                __interrupt_vector
+                0x00000000                __weak_interrupt_vector
+ *(SORT_BY_NAME(.init) SORT_BY_NAME(.init.*))
+
+.text           0x00000040     0x1f98
+ *(.text.unlikely .text.unlikely.*)
+ *(.text.startup .text.startup.*)
+ .text.startup  0x00000040       0x2c /tmp/ccwawuPr.o
+                0x00000040                main
+ *(.text .text.* .opd .opd.*)
+ .text._start   0x0000006c       0x44 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/crt0-hosted.o
+                0x0000006c                _start
+ .text.memcpy   0x000000b0       0x1c /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memcpy.c.o)
+                0x000000b0                memcpy
+                0x000000b0                __aeabi_memcpy
+                0x000000b0                __aeabi_memcpy4
+                0x000000b0                __aeabi_memcpy8
+ .text.memset   0x000000cc       0x10 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memset.c.o)
+                0x000000cc                memset
+ .text.__libc_init_array
+                0x000000dc       0x50 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_init.c.o)
+                0x000000dc                __libc_init_array
+ .text.exit     0x0000012c       0x1c /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_stdlib_pico-exit.c.o)
+                0x0000012c                exit
+ .text.arm_halt_isr
+                0x00000148        0x2 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_interrupt.c.o)
+                0x00000148                arm_busfault_isr
+                0x00000148                arm_memmanage_isr
+                0x00000148                arm_hardfault_isr
+                0x00000148                arm_halt_isr
+                0x00000148                arm_usagefault_isr
+ .text.arm_ignore_isr
+                0x0000014a        0x2 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_interrupt.c.o)
+                0x0000014a                arm_debugmon_isr
+                0x0000014a                arm_svc_isr
+                0x0000014a                arm_ignore_isr
+                0x0000014a                arm_pendsv_isr
+                0x0000014a                arm_systick_isr
+                0x0000014a                arm_nmi_isr
+ .text._set_tls
+                0x0000014c       0x14 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_tls.c.o)
+                0x0000014c                _set_tls
+ .text.printf   0x00000160       0x24 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_printf.c.o)
+                0x00000160                printf
+ .text.__ultoa_invert
+                0x00000184       0x4e /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfprintf.c.o)
+ *fill*         0x000001d2        0x2 
+ .text.skip_to_arg
+                0x000001d4      0x134 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfprintf.c.o)
+ .text.vfprintf
+                0x00000308      0xba8 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfprintf.c.o)
+                0x00000308                __d_vfprintf
+ .text.mulShiftAll64
+                0x00000eb0      0x17a /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_dtoa_ryu.c.o)
+ *fill*         0x0000102a        0x2 
+ .text.div10    0x0000102c       0x28 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_dtoa_ryu.c.o)
+ .text.__dtoa_engine
+                0x00001054      0x4a4 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_dtoa_ryu.c.o)
+                0x00001054                __dtoa_engine
+ .text.__pow5Factor
+                0x000014f8       0x30 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_table.c.o)
+                0x000014f8                __pow5Factor
+ .text.__double_computePow5
+                0x00001528       0xe4 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_table.c.o)
+                0x00001528                __double_computePow5
+ .text.__double_computeInvPow5
+                0x0000160c       0xf8 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_table.c.o)
+                0x0000160c                __double_computeInvPow5
+ .text.__log10Pow2
+                0x00001704        0xc /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log10.c.o)
+                0x00001704                __log10Pow2
+ .text.__log10Pow5
+                0x00001710        0xc /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log10.c.o)
+                0x00001710                __log10Pow5
+ .text.__pow5bits
+                0x0000171c       0x10 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_pow5bits.c.o)
+                0x0000171c                __pow5bits
+ .text.__umul128
+                0x0000172c       0x36 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_umul128.c.o)
+                0x0000172c                __umul128
+ .text.__shiftright128
+                0x00001762       0x3e /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_umul128.c.o)
+                0x00001762                __shiftright128
+ .text.__libc_fini_array
+                0x000017a0       0x2c /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_fini.c.o)
+                0x000017a0                __libc_fini_array
+ .text.strnlen  0x000017cc       0x18 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strnlen.c.o)
+                0x000017cc                strnlen
+ .text._exit    0x000017e4       0x2c /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(exit.c.o)
+                0x000017e4                _exit
+ .text.sys_semihost_exit
+                0x00001810        0xa /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit.c.o)
+                0x00001810                sys_semihost_exit
+ *fill*         0x0000181a        0x2 
+ .text.sys_semihost_exit_extended
+                0x0000181c       0x14 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit_extended.c.o)
+                0x0000181c                sys_semihost_exit_extended
+ .text.sys_semihost_feature
+                0x00001830       0x78 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_feature.c.o)
+                0x00001830                sys_semihost_feature
+ .text.sys_semihost_flen
+                0x000018a8       0x12 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_flen.c.o)
+                0x000018a8                sys_semihost_flen
+ .text.sys_semihost_open
+                0x000018ba       0x1a /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_open.c.o)
+                0x000018ba                sys_semihost_open
+ .text.sys_semihost_read
+                0x000018d4       0x16 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_read.c.o)
+                0x000018d4                sys_semihost_read
+ *fill*         0x000018ea        0x6 
+ .text          0x000018f0        0x4 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(machine_arm_semihost-arm.S.o)
+                0x000018f0                sys_semihost
+ .text.sys_semihost_close
+                0x000018f4       0x12 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_close.c.o)
+                0x000018f4                sys_semihost_close
+ .text.sys_semihost_getc
+                0x00001906        0xe /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_getc.c.o)
+                0x00001906                sys_semihost_getc
+ .text.sys_semihost_putc
+                0x00001914       0x1a /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_putc.c.o)
+                0x00001914                sys_semihost_putc
+ *fill*         0x0000192e        0x2 
+ .text          0x00001930       0x30 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_aeabi_uldivmod.o)
+                0x00001930                __aeabi_uldivmod
+ .text          0x00001960      0x2b8 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_udivmoddi4.o)
+                0x00001960                __udivmoddi4
+ .text          0x00001c18        0x4 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_dvmd_tls.o)
+                0x00001c18                __aeabi_ldiv0
+                0x00001c18                __aeabi_idiv0
+ .text          0x00001c1c       0x10 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(strlen.S.o)
+                0x00001c1c                strlen
+ .text.memcmp   0x00001c2c       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_memcmp.c.o)
+                0x00001c2c                memcmp
+ *(.gnu.linkonce.t.*)
+ *(.fini .fini.*)
+                0x00001c4c                        __text_end = .
+                [!provide]                        PROVIDE (__etext = __text_end)
+                [!provide]                        PROVIDE (_etext = __text_end)
+                [!provide]                        PROVIDE (etext = __text_end)
+ *(.rdata)
+ *(.rodata .rodata.*)
+ .rodata.str1.1
+                0x00001c4c       0x42 /tmp/ccwawuPr.o
+                                 0x1d (size before relaxing)
+ .rodata.str1.1
+                0x00001c8e        0xf /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfprintf.c.o)
+ *fill*         0x00001c8e        0x2 
+ .rodata        0x00001c90      0x33c /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_table.c.o)
+ .rodata.str1.1
+                0x00001fcc       0x16 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_feature.c.o)
+ .rodata        0x00001fcc        0x4 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_feature.c.o)
+ .rodata        0x00001fd0        0x4 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(iob.c.o)
+                0x00001fd0                stdout
+                0x00001fd0                stdin
+                0x00001fd0                stderr
+ *(.gnu.linkonce.r.*)
+ *(.srodata.cst16)
+ *(.srodata.cst8)
+ *(.srodata.cst4)
+ *(.srodata.cst2)
+ *(.srodata .srodata.*)
+ *(.data.rel.ro .data.rel.ro.*)
+                0x00001fe8                        . = ALIGN (0x8)
+ *fill*         0x00001fd4        0x4 
+                0x00001fd8                        PROVIDE (__preinit_array_start = .)
+ *(.preinit_array)
+                0x00001fd8                        PROVIDE (__preinit_array_end = .)
+                0x00001fd8                        PROVIDE (__init_array_start = .)
+ *(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*))
+ *(.init_array .ctors)
+                0x00001fd8                        PROVIDE (__init_array_end = .)
+                0x00001fd8                        PROVIDE (__fini_array_start = .)
+ *(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*))
+ *(.fini_array .dtors)
+                0x00001fd8                        PROVIDE (__fini_array_end = .)
+
+.glue_7         0x00001fd8        0x0
+ .glue_7        0x00001fd8        0x0 linker stubs
+
+.glue_7t        0x00001fd8        0x0
+ .glue_7t       0x00001fd8        0x0 linker stubs
+
+.vfp11_veneer   0x00001fd8        0x0
+ .vfp11_veneer  0x00001fd8        0x0 linker stubs
+
+.v4_bx          0x00001fd8        0x0
+ .v4_bx         0x00001fd8        0x0 linker stubs
+
+.iplt           0x00001fd8        0x0
+ .iplt          0x00001fd8        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/crt0-hosted.o
+
+.rel.dyn        0x00001fd8        0x0
+ .rel.iplt      0x00001fd8        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/crt0-hosted.o
+
+.got
+ *(.got.plt)
+ *(.got)
+
+.toc
+ *(.toc .toc.*)
+
+.preserve       0x20000000        0x0
+                [!provide]                        PROVIDE (__preserve_start__ = .)
+ *(SORT_BY_NAME(.preserve.*))
+ *(.preserve)
+                [!provide]                        PROVIDE (__preserve_end__ = .)
+
+.data           0x20000000       0x10 load address 0x00001fd8
+ *(.data .data.*)
+ .data          0x20000000       0x10 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(iob.c.o)
+ *(.gnu.linkonce.d.*)
+                0x20000010                        . = ALIGN (0x8)
+                [!provide]                        PROVIDE (__global_pointer$ = (. + 0x800))
+                [!provide]                        PROVIDE (_gp = (. + 0x8000))
+ *(.sdata .sdata.* .sdata2.*)
+ *(.gnu.linkonce.s.*)
+                0x20000000                        PROVIDE (__data_start = ADDR (.data))
+                0x00001fd8                        PROVIDE (__data_source = LOADADDR (.data))
+
+.igot.plt       0x20000010        0x0 load address 0x00001fe8
+ .igot.plt      0x20000010        0x0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/crt0-hosted.o
+
+.tdata          0x20000010        0x0 load address 0x00001fe8
+ *(.tdata .tdata.* .gnu.linkonce.td.*)
+                0x20000010                        PROVIDE (__data_end = .)
+                [!provide]                        PROVIDE (__tdata_end = .)
+                0x20000010                        PROVIDE (__tls_base = ADDR (.tdata))
+                [!provide]                        PROVIDE (__tdata_start = ADDR (.tdata))
+                [!provide]                        PROVIDE (__tdata_source = LOADADDR (.tdata))
+                0x00001fe8                        PROVIDE (__tdata_source_end = (LOADADDR (.tdata) + SIZEOF (.tdata)))
+                0x00001fe8                        PROVIDE (__data_source_end = __tdata_source_end)
+                [!provide]                        PROVIDE (__tdata_size = SIZEOF (.tdata))
+                0x00000001                        PROVIDE (__tls_align = MAX (ALIGNOF (.tdata), ALIGNOF (.tbss)))
+                [!provide]                        PROVIDE (__edata = __data_end)
+                [!provide]                        PROVIDE (_edata = __data_end)
+                [!provide]                        PROVIDE (edata = __data_end)
+                0x00000010                        PROVIDE (__data_size = (__data_end - __data_start))
+                0x00000010                        PROVIDE (__data_source_size = (__data_source_end - __data_source))
+
+.tbss           0x20000010        0x0
+ *(.tbss .tbss.* .gnu.linkonce.tb.*)
+ *(.tcommon)
+                [!provide]                        PROVIDE (__tls_end = .)
+                [!provide]                        PROVIDE (__tbss_end = .)
+                0x20000010                        PROVIDE (__bss_start = ADDR (.tbss))
+                [!provide]                        PROVIDE (__tbss_start = ADDR (.tbss))
+                [!provide]                        PROVIDE (__tbss_offset = (ADDR (.tbss) - ADDR (.tdata)))
+                [!provide]                        PROVIDE (__tbss_size = SIZEOF (.tbss))
+                [!provide]                        PROVIDE (__tls_size = (__tls_end - __tls_base))
+                [!provide]                        PROVIDE (__tls_align = MAX (ALIGNOF (.tdata), ALIGNOF (.tbss)))
+                0x00000008                        PROVIDE (__arm32_tls_tcb_offset = MAX (0x8, __tls_align))
+                [!provide]                        PROVIDE (__arm64_tls_tcb_offset = MAX (0x10, __tls_align))
+
+.tbss_space     0x20000010        0x0
+                0x20000010                        . = ADDR (.tbss)
+                0x20000010                        . = (. + SIZEOF (.tbss))
+
+.bss            0x20000010        0x8
+ *(.sbss*)
+ *(.gnu.linkonce.sb.*)
+ *(.bss .bss.*)
+ .bss           0x20000010        0x4 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_tls.c.o)
+                0x20000010                __tls
+ .bss           0x20000014        0x2 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_feature.c.o)
+ *(.gnu.linkonce.b.*)
+ *(COMMON)
+                0x20000018                        . = ALIGN (0x8)
+ *fill*         0x20000016        0x2 
+                0x20000018                        __bss_end = .
+                [!provide]                        PROVIDE (__non_tls_bss_start = ADDR (.bss))
+                [!provide]                        PROVIDE (__end = __bss_end)
+                0x20000018                        _end = __bss_end
+                [!provide]                        PROVIDE (end = __bss_end)
+                0x00000008                        PROVIDE (__bss_size = (__bss_end - __bss_start))
+                [!provide]                        PROVIDE (__heap_start = __end)
+                [!provide]                        PROVIDE (__heap_end = (__stack - DEFINED (__stack_size)?__stack_size:0x1000))
+                [!provide]                        PROVIDE (__heap_size = (__heap_end - __heap_start))
+
+.heap           0x20000018        0x0
+                0x20000018                        . = (. + DEFINED (__heap_size_min)?__heap_size_min:0x0)
+
+.stack          0x20000018     0x1000
+                0x20001018                        . = (. + DEFINED (__stack_size)?__stack_size:0x1000)
+ *fill*         0x20000018     0x1000 
+
+/DISCARD/
+ *(.note .note.*)
+ *(.eh_frame .eh_frame.*)
+ *(.ARM.extab* .gnu.linkonce.armextab.*)
+ *(.ARM.exidx*)
+
+.stab
+ *(.stab)
+
+.stabstr
+ *(.stabstr)
+
+.stab.excl
+ *(.stab.excl)
+
+.stab.exclstr
+ *(.stab.exclstr)
+
+.stab.index
+ *(.stab.index)
+
+.stab.indexstr
+ *(.stab.indexstr)
+
+.comment        0x00000000       0x26
+ *(.comment)
+ .comment       0x00000000       0x26 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/crt0-hosted.o
+                                 0x27 (size before relaxing)
+ .comment       0x00000026       0x27 /tmp/ccwawuPr.o
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memcpy.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memset.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_init.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_stdlib_pico-exit.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_interrupt.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_tls.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_printf.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfprintf.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_dtoa_ryu.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_table.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log10.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_pow5bits.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_umul128.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_fini.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strnlen.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(exit.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit_extended.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_feature.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_flen.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_open.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_read.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(iob.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_close.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_getc.c.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_putc.c.o)
+ .comment       0x00000026       0x27 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_udivmoddi4.o)
+ .comment       0x00000026       0x27 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_memcmp.c.o)
+
+.ARM.attributes
+                0x00000000       0x2f
+ .ARM.attributes
+                0x00000000       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/crt0-hosted.o
+ .ARM.attributes
+                0x00000031       0x2d /tmp/ccwawuPr.o
+ .ARM.attributes
+                0x0000005e       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memcpy.c.o)
+ .ARM.attributes
+                0x0000008f       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memset.c.o)
+ .ARM.attributes
+                0x000000c0       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_init.c.o)
+ .ARM.attributes
+                0x000000f1       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_stdlib_pico-exit.c.o)
+ .ARM.attributes
+                0x00000122       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_interrupt.c.o)
+ .ARM.attributes
+                0x00000153       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_tls.c.o)
+ .ARM.attributes
+                0x00000184       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_printf.c.o)
+ .ARM.attributes
+                0x000001b5       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfprintf.c.o)
+ .ARM.attributes
+                0x000001e6       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_dtoa_ryu.c.o)
+ .ARM.attributes
+                0x00000217       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_table.c.o)
+ .ARM.attributes
+                0x00000248       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log10.c.o)
+ .ARM.attributes
+                0x00000279       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_pow5bits.c.o)
+ .ARM.attributes
+                0x000002aa       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_umul128.c.o)
+ .ARM.attributes
+                0x000002db       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_fini.c.o)
+ .ARM.attributes
+                0x0000030c       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strnlen.c.o)
+ .ARM.attributes
+                0x0000033d       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(exit.c.o)
+ .ARM.attributes
+                0x0000036e       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit.c.o)
+ .ARM.attributes
+                0x0000039f       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit_extended.c.o)
+ .ARM.attributes
+                0x000003d0       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_feature.c.o)
+ .ARM.attributes
+                0x00000401       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_flen.c.o)
+ .ARM.attributes
+                0x00000432       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_open.c.o)
+ .ARM.attributes
+                0x00000463       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_read.c.o)
+ .ARM.attributes
+                0x00000494       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(iob.c.o)
+ .ARM.attributes
+                0x000004c5       0x1b /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(machine_arm_semihost-arm.S.o)
+ .ARM.attributes
+                0x000004e0       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_close.c.o)
+ .ARM.attributes
+                0x00000511       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_getc.c.o)
+ .ARM.attributes
+                0x00000542       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_putc.c.o)
+ .ARM.attributes
+                0x00000573       0x1d /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_aeabi_uldivmod.o)
+ .ARM.attributes
+                0x00000590       0x2d /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_udivmoddi4.o)
+ .ARM.attributes
+                0x000005bd       0x1d /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_dvmd_tls.o)
+ .ARM.attributes
+                0x000005da       0x17 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(strlen.S.o)
+ .ARM.attributes
+                0x000005f1       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_memcmp.c.o)
+
+.gnu.build.attributes
+ *(.gnu.build.attributes .gnu.build.attributes.*)
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges  0x00000000      0x460
+ *(.debug_aranges)
+ .debug_aranges
+                0x00000000       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/crt0-hosted.o
+ .debug_aranges
+                0x00000020       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memcpy.c.o)
+ .debug_aranges
+                0x00000040       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memset.c.o)
+ .debug_aranges
+                0x00000060       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_init.c.o)
+ .debug_aranges
+                0x00000080       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_stdlib_pico-exit.c.o)
+ .debug_aranges
+                0x000000a0       0x28 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_interrupt.c.o)
+ .debug_aranges
+                0x000000c8       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_tls.c.o)
+ .debug_aranges
+                0x000000e8       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_printf.c.o)
+ .debug_aranges
+                0x00000108       0x30 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfprintf.c.o)
+ .debug_aranges
+                0x00000138       0x30 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_dtoa_ryu.c.o)
+ .debug_aranges
+                0x00000168       0x30 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_table.c.o)
+ .debug_aranges
+                0x00000198       0x28 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log10.c.o)
+ .debug_aranges
+                0x000001c0       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_pow5bits.c.o)
+ .debug_aranges
+                0x000001e0       0x28 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_umul128.c.o)
+ .debug_aranges
+                0x00000208       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_fini.c.o)
+ .debug_aranges
+                0x00000228       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strnlen.c.o)
+ .debug_aranges
+                0x00000248       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(exit.c.o)
+ .debug_aranges
+                0x00000268       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit.c.o)
+ .debug_aranges
+                0x00000288       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit_extended.c.o)
+ .debug_aranges
+                0x000002a8       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_feature.c.o)
+ .debug_aranges
+                0x000002c8       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_flen.c.o)
+ .debug_aranges
+                0x000002e8       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_open.c.o)
+ .debug_aranges
+                0x00000308       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_read.c.o)
+ .debug_aranges
+                0x00000328       0x18 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(iob.c.o)
+ .debug_aranges
+                0x00000340       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(machine_arm_semihost-arm.S.o)
+ .debug_aranges
+                0x00000360       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_close.c.o)
+ .debug_aranges
+                0x00000380       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_getc.c.o)
+ .debug_aranges
+                0x000003a0       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_putc.c.o)
+ .debug_aranges
+                0x000003c0       0x20 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_aeabi_uldivmod.o)
+ .debug_aranges
+                0x000003e0       0x20 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_udivmoddi4.o)
+ .debug_aranges
+                0x00000400       0x20 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_dvmd_tls.o)
+ .debug_aranges
+                0x00000420       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(strlen.S.o)
+ .debug_aranges
+                0x00000440       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_memcmp.c.o)
+
+.debug_pubnames
+ *(.debug_pubnames)
+
+.debug_info     0x00000000     0x4e3d
+ *(.debug_info .gnu.linkonce.wi.*)
+ .debug_info    0x00000000      0x228 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/crt0-hosted.o
+ .debug_info    0x00000228      0x121 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memcpy.c.o)
+ .debug_info    0x00000349       0xe0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memset.c.o)
+ .debug_info    0x00000429      0x10b /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_init.c.o)
+ .debug_info    0x00000534      0x11a /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_stdlib_pico-exit.c.o)
+ .debug_info    0x0000064e      0x10b /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_interrupt.c.o)
+ .debug_info    0x00000759       0xe6 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_tls.c.o)
+ .debug_info    0x0000083f      0x218 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_printf.c.o)
+ .debug_info    0x00000a57      0xcc9 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfprintf.c.o)
+ .debug_info    0x00001720     0x113b /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_dtoa_ryu.c.o)
+ .debug_info    0x0000285b      0x566 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_table.c.o)
+ .debug_info    0x00002dc1       0xfb /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log10.c.o)
+ .debug_info    0x00002ebc       0xd2 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_pow5bits.c.o)
+ .debug_info    0x00002f8e      0x269 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_umul128.c.o)
+ .debug_info    0x000031f7       0xf7 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_fini.c.o)
+ .debug_info    0x000032ee       0xe5 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strnlen.c.o)
+ .debug_info    0x000033d3      0x180 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(exit.c.o)
+ .debug_info    0x00003553      0x139 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit.c.o)
+ .debug_info    0x0000368c      0x126 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit_extended.c.o)
+ .debug_info    0x000037b2      0x34c /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_feature.c.o)
+ .debug_info    0x00003afe      0x11f /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_flen.c.o)
+ .debug_info    0x00003c1d      0x186 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_open.c.o)
+ .debug_info    0x00003da3      0x165 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_read.c.o)
+ .debug_info    0x00003f08      0x1c2 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(iob.c.o)
+ .debug_info    0x000040ca       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(machine_arm_semihost-arm.S.o)
+ .debug_info    0x000040fb      0x11f /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_close.c.o)
+ .debug_info    0x0000421a      0x1d3 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_getc.c.o)
+ .debug_info    0x000043ed      0x1d3 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_putc.c.o)
+ .debug_info    0x000045c0       0x24 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_aeabi_uldivmod.o)
+ .debug_info    0x000045e4      0x6ef /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_udivmoddi4.o)
+ .debug_info    0x00004cd3       0x3c /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_dvmd_tls.o)
+ .debug_info    0x00004d0f       0x31 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(strlen.S.o)
+ .debug_info    0x00004d40       0xfd /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_memcmp.c.o)
+
+.debug_abbrev   0x00000000     0x1f68
+ *(.debug_abbrev)
+ .debug_abbrev  0x00000000      0x151 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/crt0-hosted.o
+ .debug_abbrev  0x00000151       0xc1 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memcpy.c.o)
+ .debug_abbrev  0x00000212       0x9e /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memset.c.o)
+ .debug_abbrev  0x000002b0       0xc9 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_init.c.o)
+ .debug_abbrev  0x00000379       0xd4 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_stdlib_pico-exit.c.o)
+ .debug_abbrev  0x0000044d       0xcf /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_interrupt.c.o)
+ .debug_abbrev  0x0000051c       0x93 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_tls.c.o)
+ .debug_abbrev  0x000005af      0x147 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_printf.c.o)
+ .debug_abbrev  0x000006f6      0x3a0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfprintf.c.o)
+ .debug_abbrev  0x00000a96      0x37d /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_dtoa_ryu.c.o)
+ .debug_abbrev  0x00000e13      0x157 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_table.c.o)
+ .debug_abbrev  0x00000f6a       0x8e /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log10.c.o)
+ .debug_abbrev  0x00000ff8       0x6f /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_pow5bits.c.o)
+ .debug_abbrev  0x00001067       0xcc /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_umul128.c.o)
+ .debug_abbrev  0x00001133       0xc9 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_fini.c.o)
+ .debug_abbrev  0x000011fc       0x8f /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strnlen.c.o)
+ .debug_abbrev  0x0000128b       0xdd /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(exit.c.o)
+ .debug_abbrev  0x00001368       0xd3 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit.c.o)
+ .debug_abbrev  0x0000143b       0xcc /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit_extended.c.o)
+ .debug_abbrev  0x00001507      0x18f /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_feature.c.o)
+ .debug_abbrev  0x00001696       0xc9 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_flen.c.o)
+ .debug_abbrev  0x0000175f       0xe8 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_open.c.o)
+ .debug_abbrev  0x00001847       0xe8 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_read.c.o)
+ .debug_abbrev  0x0000192f       0xfe /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(iob.c.o)
+ .debug_abbrev  0x00001a2d       0x28 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(machine_arm_semihost-arm.S.o)
+ .debug_abbrev  0x00001a55       0xc9 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_close.c.o)
+ .debug_abbrev  0x00001b1e       0xf7 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_getc.c.o)
+ .debug_abbrev  0x00001c15       0xf7 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_putc.c.o)
+ .debug_abbrev  0x00001d0c       0x14 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_aeabi_uldivmod.o)
+ .debug_abbrev  0x00001d20      0x16a /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_udivmoddi4.o)
+ .debug_abbrev  0x00001e8a       0x26 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_dvmd_tls.o)
+ .debug_abbrev  0x00001eb0       0x28 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(strlen.S.o)
+ .debug_abbrev  0x00001ed8       0x90 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_memcmp.c.o)
+
+.debug_line     0x00000000     0x3de1
+ *(.debug_line .debug_line.* .debug_line_end)
+ .debug_line    0x00000000      0x17a /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/crt0-hosted.o
+ .debug_line    0x0000017a       0xf8 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memcpy.c.o)
+ .debug_line    0x00000272       0xe9 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memset.c.o)
+ .debug_line    0x0000035b      0x112 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_init.c.o)
+ .debug_line    0x0000046d       0x9a /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_stdlib_pico-exit.c.o)
+ .debug_line    0x00000507       0xe2 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_interrupt.c.o)
+ .debug_line    0x000005e9      0x101 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_tls.c.o)
+ .debug_line    0x000006ea      0x12a /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_printf.c.o)
+ .debug_line    0x00000814     0x1313 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfprintf.c.o)
+ .debug_line    0x00001b27      0x8d0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_dtoa_ryu.c.o)
+ .debug_line    0x000023f7      0x2de /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_table.c.o)
+ .debug_line    0x000026d5       0xeb /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log10.c.o)
+ .debug_line    0x000027c0       0xd0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_pow5bits.c.o)
+ .debug_line    0x00002890      0x14e /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_umul128.c.o)
+ .debug_line    0x000029de       0xd2 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_fini.c.o)
+ .debug_line    0x00002ab0       0xad /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strnlen.c.o)
+ .debug_line    0x00002b5d       0xce /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(exit.c.o)
+ .debug_line    0x00002c2b       0xd9 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit.c.o)
+ .debug_line    0x00002d04       0xe8 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit_extended.c.o)
+ .debug_line    0x00002dec      0x1ae /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_feature.c.o)
+ .debug_line    0x00002f9a       0xd8 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_flen.c.o)
+ .debug_line    0x00003072      0x13e /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_open.c.o)
+ .debug_line    0x000031b0      0x116 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_read.c.o)
+ .debug_line    0x000032c6       0xcb /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(iob.c.o)
+ .debug_line    0x00003391       0x4a /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(machine_arm_semihost-arm.S.o)
+ .debug_line    0x000033db       0xd9 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_close.c.o)
+ .debug_line    0x000034b4      0x101 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_getc.c.o)
+ .debug_line    0x000035b5       0xfd /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_putc.c.o)
+ .debug_line    0x000036b2       0x4e /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_aeabi_uldivmod.o)
+ .debug_line    0x00003700      0x57d /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_udivmoddi4.o)
+ .debug_line    0x00003c7d       0x4a /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_dvmd_tls.o)
+ .debug_line    0x00003cc7       0x4f /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(strlen.S.o)
+ .debug_line    0x00003d16       0xcb /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_memcmp.c.o)
+
+.debug_frame    0x00000000      0x600
+ *(.debug_frame)
+ .debug_frame   0x00000000       0x28 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/crt0-hosted.o
+ .debug_frame   0x00000028       0x28 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memcpy.c.o)
+ .debug_frame   0x00000050       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memset.c.o)
+ .debug_frame   0x00000070       0x2c /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_init.c.o)
+ .debug_frame   0x0000009c       0x28 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_stdlib_pico-exit.c.o)
+ .debug_frame   0x000000c4       0x30 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_interrupt.c.o)
+ .debug_frame   0x000000f4       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_tls.c.o)
+ .debug_frame   0x00000114       0x40 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_printf.c.o)
+ .debug_frame   0x00000154       0x84 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfprintf.c.o)
+ .debug_frame   0x000001d8       0x88 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_dtoa_ryu.c.o)
+ .debug_frame   0x00000260       0x8c /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_table.c.o)
+ .debug_frame   0x000002ec       0x30 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log10.c.o)
+ .debug_frame   0x0000031c       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_pow5bits.c.o)
+ .debug_frame   0x0000033c       0x50 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_umul128.c.o)
+ .debug_frame   0x0000038c       0x2c /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_fini.c.o)
+ .debug_frame   0x000003b8       0x28 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strnlen.c.o)
+ .debug_frame   0x000003e0       0x28 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(exit.c.o)
+ .debug_frame   0x00000408       0x28 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit.c.o)
+ .debug_frame   0x00000430       0x28 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit_extended.c.o)
+ .debug_frame   0x00000458       0x30 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_feature.c.o)
+ .debug_frame   0x00000488       0x28 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_flen.c.o)
+ .debug_frame   0x000004b0       0x28 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_open.c.o)
+ .debug_frame   0x000004d8       0x28 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_read.c.o)
+ .debug_frame   0x00000500       0x28 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_close.c.o)
+ .debug_frame   0x00000528       0x28 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_getc.c.o)
+ .debug_frame   0x00000550       0x28 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_putc.c.o)
+ .debug_frame   0x00000578       0x2c /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_aeabi_uldivmod.o)
+ .debug_frame   0x000005a4       0x34 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_udivmoddi4.o)
+ .debug_frame   0x000005d8       0x28 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_memcmp.c.o)
+
+.debug_str      0x00000000     0x1588
+ *(.debug_str)
+ .debug_str     0x00000000     0x1588 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/crt0-hosted.o
+                                0x26f (size before relaxing)
+ .debug_str     0x00001588      0x1e0 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memcpy.c.o)
+ .debug_str     0x00001588      0x1cc /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memset.c.o)
+ .debug_str     0x00001588      0x21b /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_init.c.o)
+ .debug_str     0x00001588      0x1e2 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_stdlib_pico-exit.c.o)
+ .debug_str     0x00001588      0x21f /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_interrupt.c.o)
+ .debug_str     0x00001588      0x1f5 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_tls.c.o)
+ .debug_str     0x00001588      0x242 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_printf.c.o)
+ .debug_str     0x00001588      0x3ef /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfprintf.c.o)
+ .debug_str     0x00001588      0x4a2 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_dtoa_ryu.c.o)
+ .debug_str     0x00001588      0x2f1 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_table.c.o)
+ .debug_str     0x00001588      0x1eb /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log10.c.o)
+ .debug_str     0x00001588      0x1e1 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_pow5bits.c.o)
+ .debug_str     0x00001588      0x232 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_umul128.c.o)
+ .debug_str     0x00001588      0x1f1 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_fini.c.o)
+ .debug_str     0x00001588      0x1c2 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strnlen.c.o)
+ .debug_str     0x00001588      0x221 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(exit.c.o)
+ .debug_str     0x00001588      0x204 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit.c.o)
+ .debug_str     0x00001588      0x209 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit_extended.c.o)
+ .debug_str     0x00001588      0x29b /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_feature.c.o)
+ .debug_str     0x00001588      0x1eb /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_flen.c.o)
+ .debug_str     0x00001588      0x21a /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_open.c.o)
+ .debug_str     0x00001588      0x206 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_read.c.o)
+ .debug_str     0x00001588      0x235 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(iob.c.o)
+ .debug_str     0x00001588       0x64 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(machine_arm_semihost-arm.S.o)
+ .debug_str     0x00001588      0x1ed /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_close.c.o)
+ .debug_str     0x00001588      0x234 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_getc.c.o)
+ .debug_str     0x00001588      0x234 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_putc.c.o)
+ .debug_str     0x00001588       0x98 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_aeabi_uldivmod.o)
+ .debug_str     0x00001588      0x667 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_udivmoddi4.o)
+ .debug_str     0x00001588       0xb8 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_dvmd_tls.o)
+ .debug_str     0x00001588       0x65 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(strlen.S.o)
+ .debug_str     0x00001588      0x1b5 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_memcmp.c.o)
+
+.debug_loc
+ *(.debug_loc)
+
+.debug_macinfo
+ *(.debug_macinfo)
+
+.debug_weaknames
+ *(.debug_weaknames)
+
+.debug_funcnames
+ *(.debug_funcnames)
+
+.debug_typenames
+ *(.debug_typenames)
+
+.debug_varnames
+ *(.debug_varnames)
+
+.debug_pubtypes
+ *(.debug_pubtypes)
+
+.debug_ranges
+ *(.debug_ranges)
+
+.debug_addr
+ *(.debug_addr)
+
+.debug_line_str
+                0x00000000      0x114
+ *(.debug_line_str)
+ .debug_line_str
+                0x00000000      0x114 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(machine_arm_semihost-arm.S.o)
+                                 0x4b (size before relaxing)
+ .debug_line_str
+                0x00000114       0x8c /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_aeabi_uldivmod.o)
+ .debug_line_str
+                0x00000114       0x90 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_dvmd_tls.o)
+ .debug_line_str
+                0x00000114       0x52 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(strlen.S.o)
+
+.debug_loclists
+                0x00000000     0x34a0
+ *(.debug_loclists)
+ .debug_loclists
+                0x00000000       0x17 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/crt0-hosted.o
+ .debug_loclists
+                0x00000017       0x8f /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memcpy.c.o)
+ .debug_loclists
+                0x000000a6       0x3b /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memset.c.o)
+ .debug_loclists
+                0x000000e1       0x34 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_init.c.o)
+ .debug_loclists
+                0x00000115       0x20 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_stdlib_pico-exit.c.o)
+ .debug_loclists
+                0x00000135       0x17 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_tls.c.o)
+ .debug_loclists
+                0x0000014c       0x17 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_printf.c.o)
+ .debug_loclists
+                0x00000163     0x1256 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfprintf.c.o)
+ .debug_loclists
+                0x000013b9      0xc6a /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_dtoa_ryu.c.o)
+ .debug_loclists
+                0x00002023      0x5c6 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_table.c.o)
+ .debug_loclists
+                0x000025e9       0x3a /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log10.c.o)
+ .debug_loclists
+                0x00002623       0x23 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_pow5bits.c.o)
+ .debug_loclists
+                0x00002646      0x134 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_umul128.c.o)
+ .debug_loclists
+                0x0000277a       0x34 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_fini.c.o)
+ .debug_loclists
+                0x000027ae       0x49 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strnlen.c.o)
+ .debug_loclists
+                0x000027f7       0x61 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(exit.c.o)
+ .debug_loclists
+                0x00002858       0x41 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit.c.o)
+ .debug_loclists
+                0x00002899       0x2b /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit_extended.c.o)
+ .debug_loclists
+                0x000028c4       0x93 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_feature.c.o)
+ .debug_loclists
+                0x00002957       0x2b /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_flen.c.o)
+ .debug_loclists
+                0x00002982       0x3a /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_open.c.o)
+ .debug_loclists
+                0x000029bc       0x61 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_read.c.o)
+ .debug_loclists
+                0x00002a1d       0x2b /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_close.c.o)
+ .debug_loclists
+                0x00002a48       0x2e /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_getc.c.o)
+ .debug_loclists
+                0x00002a76       0x38 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_putc.c.o)
+ .debug_loclists
+                0x00002aae      0x951 /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_udivmoddi4.o)
+ .debug_loclists
+                0x000033ff       0xa1 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_memcmp.c.o)
+
+.debug_macro
+ *(.debug_macro)
+
+.debug_names
+ *(.debug_names)
+
+.debug_rnglists
+                0x00000000      0x57c
+ *(.debug_rnglists)
+ .debug_rnglists
+                0x00000000       0x13 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/crt0-hosted.o
+ .debug_rnglists
+                0x00000013       0x13 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memcpy.c.o)
+ .debug_rnglists
+                0x00000026       0x13 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(memset.c.o)
+ .debug_rnglists
+                0x00000039       0x13 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_init.c.o)
+ .debug_rnglists
+                0x0000004c       0x13 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_stdlib_pico-exit.c.o)
+ .debug_rnglists
+                0x0000005f       0x19 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_interrupt.c.o)
+ .debug_rnglists
+                0x00000078       0x13 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_picolib_machine_arm_tls.c.o)
+ .debug_rnglists
+                0x0000008b       0x13 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_printf.c.o)
+ .debug_rnglists
+                0x0000009e      0x192 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_vfprintf.c.o)
+ .debug_rnglists
+                0x00000230      0x143 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_dtoa_ryu.c.o)
+ .debug_rnglists
+                0x00000373       0x21 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_table.c.o)
+ .debug_rnglists
+                0x00000394       0x19 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_log10.c.o)
+ .debug_rnglists
+                0x000003ad       0x13 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_pow5bits.c.o)
+ .debug_rnglists
+                0x000003c0       0x19 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_tinystdio_ryu_umul128.c.o)
+ .debug_rnglists
+                0x000003d9       0x13 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_misc_fini.c.o)
+ .debug_rnglists
+                0x000003ec       0x13 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_strnlen.c.o)
+ .debug_rnglists
+                0x000003ff       0x13 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(exit.c.o)
+ .debug_rnglists
+                0x00000412       0x13 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit.c.o)
+ .debug_rnglists
+                0x00000425       0x13 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_exit_extended.c.o)
+ .debug_rnglists
+                0x00000438       0x22 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_feature.c.o)
+ .debug_rnglists
+                0x0000045a       0x13 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_flen.c.o)
+ .debug_rnglists
+                0x0000046d       0x13 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_open.c.o)
+ .debug_rnglists
+                0x00000480       0x13 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_read.c.o)
+ .debug_rnglists
+                0x00000493       0x13 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_close.c.o)
+ .debug_rnglists
+                0x000004a6       0x13 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_getc.c.o)
+ .debug_rnglists
+                0x000004b9       0x13 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a(sys_putc.c.o)
+ .debug_rnglists
+                0x000004cc       0x9d /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a(_udivmoddi4.o)
+ .debug_rnglists
+                0x00000569       0x13 /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_string_memcmp.c.o)
+
+.debug_str_offsets
+ *(.debug_str_offsets)
+
+.debug_sup
+ *(.debug_sup)
+
+.gnu.attributes
+ *(.gnu.attributes)
+                0x00000001                        ASSERT ((__data_size == __data_source_size), ERROR: .data/.tdata flash size does not match RAM size)
+LOAD /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/crt0-hosted.o
+                0x00000000                        __flash = 0x0
+                0x00200000                        __flash_size = 0x200000
+                0x20000000                        __ram = 0x20000000
+                0x00200000                        __ram_size = 0x200000
+LOAD /tmp/ccwawuPr.o
+START GROUP
+LOAD /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a
+START GROUP
+LOAD /usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/libgcc.a
+LOAD /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libc.a
+LOAD /usr/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp/libsemihost.a
+END GROUP
+END GROUP
+OUTPUT(printf.elf elf32-littlearm)
+LOAD linker stubs
