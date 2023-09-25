@@ -262,6 +262,7 @@ void *  _sbrk (ptrdiff_t __incr);
 int     _unlink (const char *__path);
 _READ_WRITE_RETURN_TYPE _write (int __fd, const void *__buf, size_t __nbyte);
 int     _execve (const char *__path, char * const __argv[], char * const __envp[]);
+int     _getentropy (void *, size_t);
 #endif
 
 #if !defined(__INSIDE_CYGWIN__)
