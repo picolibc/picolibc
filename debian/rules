@@ -31,6 +31,7 @@ MESON_RELEASE_FLAGS=-Dbuild-type-subdir=release --buildtype=release
 
 MESON_RISCV_MINSIZE_FLAGS = \
 	$(MESON_SHARED_FLAGS) \
+	-Dtests=true \
 	-Dc_args='$(MESON_SHARED_C_ARGS) -msave-restore' \
 	--cross-file scripts/cross-$(RISCV_ARCH).txt \
 	-Dspecsdir=/usr/lib/picolibc/$(RISCV_ARCH) \
@@ -40,6 +41,7 @@ MESON_RISCV_MINSIZE_FLAGS = \
 MESON_RISCV_RELEASE_FLAGS = \
 	$(MESON_RELEASE_FLAGS) \
 	$(MESON_SHARED_FLAGS) \
+	-Dtests=true \
 	-Dc_args='$(MESON_SHARED_C_ARGS)' \
 	--cross-file scripts/cross-$(RISCV_ARCH).txt \
 	-Dspecsdir=/usr/lib/picolibc/$(RISCV_ARCH) \
@@ -133,8 +135,10 @@ override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
 	cd debian/$(BUILDDIR)/$(ARM_ARCH) && meson test --timeout-multiplier=10
 	cd debian/$(BUILDDIR)/$(AARCH64_ARCH) && meson test --timeout-multiplier=10
+	cd debian/$(BUILDDIR)/$(RISCV_ARCH) && meson test --timeout-multiplier=10
 	cd debian/$(BUILDDIR)/$(ARM_ARCH)-release && meson test --timeout-multiplier=10
 	cd debian/$(BUILDDIR)/$(AARCH64_ARCH)-release && meson test --timeout-multiplier=10
+	cd debian/$(BUILDDIR)/$(RISCV_ARCH)-release && meson test --timeout-multiplier=10
 endif
 
 override_dh_auto_install:

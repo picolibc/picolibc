@@ -2,7 +2,7 @@ Source: picolibc
 Priority: optional
 Maintainer: Keith Packard <keithp@keithp.com>
 Build-Depends: debhelper-compat (= 13), gcc-arm-none-eabi, gcc-riscv64-unknown-elf, gcc-xtensa-lx106,
- gcc-aarch64-linux-gnu, meson, ninja-build, qemu-system-arm
+ gcc-aarch64-linux-gnu, meson, ninja-build, qemu-system-arm, qemu-system-misc
 Standards-Version: 4.6.2
 Rules-Requires-Root: no
 Section: devel
