@@ -1114,8 +1114,6 @@ Files: dummyhost/iob.c
  scripts/do-zephyr-riscv-configure
  scripts/run-arm
  scripts/run-cortex-a9
- scripts/run-cortex-m33
- scripts/run-cortex-m55
  scripts/run-power9
  scripts/run-riscv
  semihost/close.c
