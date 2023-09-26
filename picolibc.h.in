@@ -362,6 +362,8 @@
 
 #cmakedefine _IO_FLOAT_EXACT
 
+#cmakedefine _PRINTF_SMALL_ULTOA
+
 #cmakedefine _LITE_EXIT
 
 #cmakedefine _MB_CAPABLE
@@ -403,6 +405,8 @@
 #cmakedefine FORMAT_DEFAULT_DOUBLE
 
 #cmakedefine FORMAT_DEFAULT_FLOAT
+
+#cmakedefine FORMAT_DEFAULT_LONG_LONG
 
 #cmakedefine FORMAT_DEFAULT_INTEGER
 

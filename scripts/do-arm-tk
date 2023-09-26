@@ -1,0 +1,67 @@
+#!/bin/bash
+PICOLIBC=$(realpath $(dirname "$0")/..)
+case "$ARM_TK" in
+    "")
+	echo "Need to set ARM_TK before running $0"
+	exit 1
+	;;
+esac
+README="$ARM_TK/share/doc/arm-none-eabi/readme.txt"
+if [ ! -f  "$README" ]; then
+    echo "ARM_TK '$ARM_TK' doesn't appear valid?"
+    exit 1
+fi
+TK_VERSION=$(head -n 1 "$README" | awk '{ print $NF; }')
+PICOLIBC_VERSION=$(cd "$PICOLIBC" && git describe)
+echo Toolkit "$ARM_TK"
+echo Toolkit version "$TK_VERSION"
+echo Picolibc "$PICOLIBC"
+echo Picolibc version "$PICOLIBC_VERSION"
+
+case "$TK_VERSION" in
+    [12]*)
+	;;
+    *)
+	echo "Toolkit version '$TK_VERSION' doesn't appear valid?"
+	exit 1
+	;;
+esac
+
+export PATH=$ARM_TK/bin:$PATH
+
+MINSIZE_DIR="$PICOLIBC"/builds/build-arm-tk-minsize
+RELEASE_DIR="$PICOLIBC"/builds/build-arm-tk-release
+export DESTDIR="$PICOLIBC"/builds/dist
+
+rm -r "$MINSIZE_DIR"
+rm -r "$RELEASE_DIR"
+rm -r "$DESTDIR"/"$ARM_TK"
+
+mkdir -p "$MINSIZE_DIR" "$RELEASE_DIR" "$DESTDIR"
+
+set -e
+
+
+echo '###################################'
+echo '####' ../../scripts/do-arm-configure -Dsysroot-install=true --buildtype=minsize
+echo '###################################'
+
+cd "$MINSIZE_DIR"
+../../scripts/do-arm-configure -Dsysroot-install=true --buildtype=minsize
+ninja test install
+
+echo '###################################'
+echo '####' ../../scripts/do-arm-configure -Dsysroot-install=true -Dbuild-type-subdir=release --buildtype=release
+echo '###################################'
+
+cd "$RELEASE_DIR"
+../../scripts/do-arm-configure -Dsysroot-install=true -Dbuild-type-subdir=release --buildtype=release
+ninja test install
+
+cd "$DESTDIR"/"$ARM_TK"
+
+ZIP="$DESTDIR"/picolibc-"$PICOLIBC_VERSION"-"$TK_VERSION".zip
+
+rm "$ZIP"
+
+zip -r "$ZIP" .

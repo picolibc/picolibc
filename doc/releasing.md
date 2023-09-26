@@ -21,37 +21,17 @@ picolibc:
     * ARM 32-bit, almost all targets (qemu)
     * ARM 64-bit
 
- 3. Use glibc test suite for RISC-V and ARM 32-bit
+ 3. Use glibc test suite for RISC-V and ARM 32-bit:
 
-    * Enable errno in the math functions using -Dwant-math-errno=true
+	$ ./scripts/test-picolibc
 
-    * Enable long-double io for RISC-V compiles using -Dio-long-double=true
+    * Enables errno in the math functions using -Dwant-math-errno=true
 
-    * Build and install minsize and release builds:
+    * Enables long-double io for RISC-V compiles using -Dio-long-double=true
 
-	$ do-arm-configure -Dwant-math-errno=true -Dio-long-double=true && \
-	  ninja test install
+    * Builds and installs minsize and release builds
 
-	$ do-arm-configure -Dwant-math-errno=true -Dio-long-double=true \
-	  --buildtype=release -Dbuild-type-subdir=release && \
-	  ninja test install
-
-	$ do-riscv-configure -Dwant-math-errno=true -Dio-long-double=true && \
-	  ninja test install
-
-	$ do-riscv-configure -Dwant-math-errno=true -Dio-long-double=true \
-	  --buildtype=release -Dbuild-type-subdir=release && \
-	  ninja test install
-
-    * Build and run glibc test suite against all four builds
-
-	$ do-arm-configure --buildtype=minsize && ninja test
-
-	$ do-arm-configure --buildtype=release -Dpicolibc-buildtype=release && ninja test
-
-	$ do-riscv-configure --buildtype=minsize && ninja test
-
-	$ do-riscv-configure --buildtype=release -Dpicolibc-buildtype=release && ninja test
+    * Builds and runs glibc test suite against all four builds
 
  4. Test c++ builds using hello-world example on ARM
 
@@ -73,22 +53,14 @@ picolibc:
         $ ../../scripts/do-native-configure
 	$ ninja dist
 
- 10. Use arm configuration to build bits for the Arm embedded toolkit:
-
-        $ mkdir -p builds/build-arm-tk builds/build-arm-tk-release
-        $ cd builds/build-arm-tk
-        $ PATH=$ARM_TK/bin:$PATH ../../scripts/do-arm-configure -Dsysroot-install=true
-        $ PATH=$ARM_TK/bin:$PATH DESTDIR=$PWD/../dist ninja test install
-	$ cd ../build-arm-tk-release
-	$ PATH=$ARM_TK/bin:$PATH ../../scripts/do-arm-configure -Dsysroot-install=true -Dbuild-type-subdir=release --buildtype=release
-        $ PATH=$ARM_TK/bin:$PATH DESTDIR=$PWD/../dist ninja test install
-        $ cd ../dist/$ARM_TK
-        $ zip -r ../../../picolibc-<version>-<arm-et-version>.zip .
-        $ scp picolibc-<version>-<arm-et-version>.zip keithp.com:/var/www/picolibc/dist/gnu-arm-embedded
-
- 11. Tag release
+ 10. Tag release
 
 	$ git tag -m'Version <version>' <version> main
+
+ 11. Use arm configuration to build bits for the Arm embedded toolkit:
+
+        $ ./scripts/do-arm-tk
+        $ scp builds/dist/picolibc-<version>-<arm-et-version>.zip keithp.com:/var/www/picolibc/dist/gnu-arm-embedded
 
  12. Push tag and branch to repositories
 

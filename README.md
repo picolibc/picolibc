@@ -143,6 +143,20 @@ use Picolibc:
 
 ## Releases
 
+### Picolibc version 1.8.5
+
+ * Detect clang multi-lib support correctly by passing compiler flags.
+   Thanks to xbjfk for identifying the problem.
+
+ * Create a new 'long-long' printf variant. This provides enough
+   variety to satisfy the Zephyr cbprintf options without needing to
+   build the library from scratch.
+
+ * Adjust use of custom binary to decimal conversion code so that it
+   is only enabled for types beyond the register size of the
+   target. This avoids the cost of this code when the application is
+   already likely to be using the soft division routines.
+
 ### Picolibc version 1.8.4
 
  * Make math overflow and underflow handlers respect rounding modes.

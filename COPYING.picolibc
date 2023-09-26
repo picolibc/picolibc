@@ -866,7 +866,9 @@ Files: cmake/TC-arm-none-eabi.ld
 Copyright: 2020 Keith Packard
 License: BSD3-1
 
-Files: dummyhost/exit.c
+Files: doc/printf-sample/Makefile
+ doc/printf-sample/printf.c
+ dummyhost/exit.c
  newlib/libc/machine/m68k/sys/fenv.h
  newlib/libc/tinystdio/getdelim.c
  newlib/libc/tinystdio/swprintf.c
@@ -1896,6 +1898,8 @@ Files: newlib/libc/tinystdio/dtoa_engine.c
  newlib/libc/tinystdio/vffscanf.c
  newlib/libc/tinystdio/vfiprintf.c
  newlib/libc/tinystdio/vfiscanf.c
+ newlib/libc/tinystdio/vflprintf.c
+ newlib/libc/tinystdio/vflscanf.c
  newlib/libc/tinystdio/vfmprintf.c
  newlib/libc/tinystdio/vfmscanf.c
  newlib/libc/tinystdio/vfwprintf.c
@@ -2815,8 +2819,10 @@ Files: .clang-format
  scripts/cross-xtensa-nxp_imx8m_adsp_zephyr-elf.txt
  scripts/cross-xtensa-nxp_imx_adsp_zephyr-elf.txt
  scripts/cross-xtensa-sample_controller_zephyr-elf.txt
+ scripts/do-arm-tk
  scripts/duplicate-names
  scripts/monitor-e9
+ scripts/test-picolibc
  semihost/machine/x86/bios.ld
  test/complex-funcs.c
  test/long_double_gen.5c

@@ -35,7 +35,7 @@
 
 cmake_minimum_required(VERSION 3.20.0)
 
-project(Picolibc VERSION 1.8.3 LANGUAGES C ASM)
+project(Picolibc VERSION 1.8.5 LANGUAGES C ASM)
 
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
@@ -383,7 +383,9 @@ endif()
 
 option(__IO_FLOAT "Support floating point in printf/scanf by default" OFF)
 
-option(__IO_MINIMAL "Use minimal printf variant" OFF)
+if(NOT DEFINED _PRINTF_SMALL_ULTOA)
+  option(_PRINTF_SMALL_ULTOA "Avoid soft divide in printf" ON)
+endif()
 
 if(NOT DEFINED _WANT_IO_PERCENT_B)
   option(_WANT_IO_PERCENT_B "Support %b/%B formats in printf/scanf" OFF)
@@ -397,6 +399,7 @@ if(FORMAT_DEFAULT_MINIMAL)
   set(FORMAT_DEFAULT_DOUBLE 0)
   set(FORMAT_DEFAULT_FLOAT 0)
   set(FORMAT_DEFAULT_INTEGER 0)
+  set(FORMAT_DEFAULT_LONG_LONG 0)
 endif()
 
 if(NOT DEFINED FORMAT_DEFAULT_DOUBLE)
@@ -405,6 +408,10 @@ endif()
 
 if(NOT DEFINED FORMAT_DEFAULT_FLOAT)
   set(FORMAT_DEFAULT_FLOAT 0)
+endif()
+
+if(NOT DEFINED FORMAT_DEFAULT_LONG_LONG)
+  set(FORMAT_DEFAULT_LONG_LONG 0)
 endif()
 
 if(NOT DEFINED FORMAT_DEFAULT_INTEGER)

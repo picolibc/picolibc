@@ -92,6 +92,10 @@ if $qemu --version | grep -q 'version [89]'; then
     all_options="Zawrs $all_options"
 fi
 
+if $qemu --version | grep -q 'version \(8.1\|9\)'; then
+    all_options="Zfa $all_options"
+fi
+
 for o in $all_options; do
     if echo "$options" | grep -q "$o"; then
 	value=true

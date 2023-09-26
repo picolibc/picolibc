@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone picolibc
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: picolibc
 
@@ -44,11 +44,11 @@ jobs:
 
       - name: Set up Docker Buildx
         if: steps.cache.outputs.cache-hit != 'true'
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Build picolibc container
         if: steps.cache.outputs.cache-hit != 'true'
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           platforms: linux/amd64
           file: .github/Dockerfile-zephyr
@@ -76,7 +76,7 @@ jobs:
         ]
     steps:
       - name: Clone picolibc
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: picolibc
 
@@ -136,7 +136,7 @@ jobs:
         ]
     steps:
       - name: Clone picolibc
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: picolibc
 

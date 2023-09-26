@@ -91,6 +91,23 @@ foreach target : targets
        depends: bios_bin,
        env: test_env)
 
+  t1 = 'printfl_scanfl'
+  if target == ''
+    t1_name = t1
+  else
+    t1_name = t1 + '_' + target
+  endif
+
+  test(t1_name,
+       executable(t1_name, ['printf_scanf.c', 'lock-valid.c'],
+		  c_args: llong_printf_compile_args + _c_args,
+		  link_args: llong_printf_link_args + _lib_files + _link_args,
+		  objects: _objs,
+		  link_depends:  _link_depends + _libs,
+		  include_directories: inc),
+       depends: bios_bin,
+       env: test_env)
+
   t1 = 'printfi_scanfi'
   if target == ''
     t1_name = t1

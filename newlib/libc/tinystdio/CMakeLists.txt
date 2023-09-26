@@ -126,10 +126,12 @@ picolibc_sources(
   vasprintf.c
   vffprintf.c
   vfiprintf.c
+  vflprintf.c
   vfmprintf.c
   vfprintf.c
   vffscanf.c
   vfiscanf.c
+  vflscanf.c
   vfmscanf.c
   vfscanf.c
   vfwprintf.c
