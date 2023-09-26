@@ -1,0 +1,68 @@
+#!/bin/sh
+
+PICOLIBC_DIR=/build/picolibc
+GLIBC_DIR=/build/glibc
+
+set -e
+
+#test=echo
+
+for arch in arm riscv; do
+
+    DIR=$PICOLIBC_DIR/builds/build-$arch-minsize
+
+    $test rm -r $DIR
+    $test mkdir -p $DIR
+    $test cd $DIR
+
+    echo '###################################'
+    echo '####' ../../scripts/do-$arch-configure -Dwant-math-errno=true -Dio-long-double=true
+    echo '###################################'
+
+    $test ../../scripts/do-$arch-configure -Dwant-math-errno=true -Dio-long-double=true
+    $test ninja test install
+
+    DIR=$PICOLIBC_DIR/builds/build-$arch-release
+
+    $test rm -r $DIR
+    $test mkdir -p $DIR
+    $test cd $DIR
+
+    echo '###################################'
+    echo '####' ../../scripts/do-$arch-configure -Dwant-math-errno=true -Dio-long-double=true --buildtype=release -Dbuild-type-subdir=release
+    echo '###################################'
+
+    $test ../../scripts/do-$arch-configure -Dwant-math-errno=true -Dio-long-double=true --buildtype=release -Dbuild-type-subdir=release
+    $test ninja test install
+
+done
+
+for arch in arm riscv; do
+
+    DIR=$GLIBC_DIR/builds/build-$arch-minsize
+
+    $test rm -r $DIR
+    $test mkdir -p $DIR
+    $test cd $DIR
+
+    echo '###################################'
+    echo '####' ../../picolibc/do-$arch-configure --buildtype=minsize
+    echo '###################################'
+
+    $test ../../picolibc/do-$arch-configure --buildtype=minsize
+    $test ninja test
+
+    DIR=$GLIBC_DIR/builds/build-$arch-release
+
+    $test rm -r $DIR
+    $test mkdir -p $DIR
+    $test cd $DIR
+
+    echo '###################################'
+    echo '####' ../../picolibc/do-$arch-configure --buildtype=release -Dpicolibc-buildtype=release
+    echo '###################################'
+
+    $test ../../picolibc/do-$arch-configure --buildtype=release -Dpicolibc-buildtype=release
+    $test ninja test
+
+done
