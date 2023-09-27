@@ -1,3 +1,9 @@
+picolibc (1.8.5-2) unstable; urgency=medium
+
+  * Silence aarch64 linker warning during autopkgtst 
+
+ -- Keith Packard <keithp@keithp.com>  Wed, 27 Sep 2023 09:36:11 -0700
+
 picolibc (1.8.5-1) unstable; urgency=medium
 
   * New upstream
