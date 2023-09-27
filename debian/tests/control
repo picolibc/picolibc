@@ -6,6 +6,6 @@ Test-Command: arm-none-eabi-gcc -fno-stack-protector --specs=picolibc.specs -o /
 Depends: @, gcc-arm-none-eabi
 Architecture: amd64, i386, pcc64el
 
-Test-Command: aarch64-linux-gnu-gcc -fno-stack-protector --specs=picolibc.specs -o /tmp/touch-aarch64 debian/tests/touch.c
+Test-Command: aarch64-linux-gnu-gcc -fno-stack-protector --specs=picolibc.specs -o /tmp/touch-aarch64 debian/tests/touch.c -Wl,--no-warn-rwx-segments
 Depends: @, gcc-arm-none-eabi
 Architecture: amd64, i386, pcc64el
