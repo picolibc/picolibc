@@ -19,38 +19,54 @@ env:
   CCACHE_SIZE: "0M"
   CCACHE_CMD: true
   DOCKERFILE: picolibc/.github/Dockerfile
-  IMAGE_FILE: dockerimg-linux.tar.zst
-  IMAGE: picolibc-linux
+  IMAGE: ghcr.io/${{ github.repository }}-linux
   PACKAGES_FILE: picolibc/.github/linux-packages.txt
   EXTRA_FILE: picolibc/.github/linux-files.txt
 
 jobs:
   cache-maker:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Clone picolibc
         uses: actions/checkout@v4
         with:
           path: picolibc
 
-      - name: Cache the Docker Image
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
-          lookup-only: true
+      - name: Check if image needs to be rebuilt
+        run: |
+          set -x
+          echo IMAGE_TAG=${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }} >> $GITHUB_ENV
+          # https://github.com/orgs/community/discussions/26279
+          GHCR_TOKEN=$(echo ${{ secrets.GITHUB_TOKEN }} | base64)
+          TAGS=$(curl -s -H "Authorization: Bearer ${GHCR_TOKEN}" https://ghcr.io/v2/picolibc/picolibc-linux/tags/list)
+          echo $TAGS | jq -e '.tags|any(. == "${{ env.IMAGE_TAG }}")'  > /dev/null || echo DOCKER_NEED_BUILD=1 >> $GITHUB_ENV
+
+      - name: Login to GitHub Container Registry
+        if: env.DOCKER_NEED_BUILD == '1'
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
 
       - name: Set up Docker Buildx
-        if: steps.cache.outputs.cache-hit != 'true'
+        if: env.DOCKER_NEED_BUILD == '1'
         uses: docker/setup-buildx-action@v3
 
-      - name: Build picolibc container
-        if: steps.cache.outputs.cache-hit != 'true'
-        uses: docker/build-push-action@v4
+      # Required for connecting repo<->package name for permissions.
+      - name: Extract metadata (tags, labels) for Docker
+        if: env.DOCKER_NEED_BUILD == '1'
+        id: meta
+        uses: docker/metadata-action@v5
         with:
+          images: ${{ env.IMAGE }}
+
+      - name: Build picolibc container
+        if: env.DOCKER_NEED_BUILD == '1'
+        uses: docker/build-push-action@v5
+        with:
+          context: picolibc
           platforms: linux/amd64
           file: .github/Dockerfile
-          tags: ${{ env.IMAGE }}:latest
-          outputs: type=docker,force-compression=true,compression=zstd,compression-level=22,dest=${{ env.IMAGE_FILE }}
-
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

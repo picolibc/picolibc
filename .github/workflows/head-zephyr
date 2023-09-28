@@ -19,39 +19,37 @@ env:
   # is the largest cache, 429.5M (September 2023).
   CCACHE_SIZE: "450M"
   CCACHE_CMD: ccache
-  DOCKERFILE: picolibc/.github/Dockerfile-zephyr
-  IMAGE_FILE: dockerimg-zephyr.tar.zst
-  IMAGE: picolibc
-  PACKAGES_FILE: picolibc/.github/zephyr-packages.txt
-  EXTRA_FILE: picolibc/.github/zephyr-files.txt
+  DOCKERFILE: .github/Dockerfile-zephyr
+  IMAGE: ghcr.io/${{ github.repository }}
+  PACKAGES_FILE: .github/zephyr-packages.txt
+  EXTRA_FILE: .github/zephyr-files.txt
 
 jobs:
   cache-maker:
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
       - name: Clone picolibc
         uses: actions/checkout@v4
-        with:
-          path: picolibc
 
-      - name: Cache the Docker Image
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
-          lookup-only: true
+      - name: Check if image needs to be rebuilt
+        run: |
+          set -x
+          echo IMAGE_TAG=${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }} >> $GITHUB_ENV
+          # https://github.com/orgs/community/discussions/26279
+          GHCR_TOKEN=$(echo ${{ secrets.GITHUB_TOKEN }} | base64)
+          TAGS=$(curl -s -H "Authorization: Bearer ${GHCR_TOKEN}" https://ghcr.io/v2/picolibc/picolibc/tags/list)
+          echo $TAGS | jq -e '.tags|any(. == "${{ env.IMAGE_TAG }}")'  > /dev/null || echo DOCKER_NEED_BUILD=1 >> $GITHUB_ENV
 
       - name: Set up Docker Buildx
-        if: steps.cache.outputs.cache-hit != 'true'
+        if: env.DOCKER_NEED_BUILD == '1'
         uses: docker/setup-buildx-action@v3
 
-      - name: Build picolibc container
-        if: steps.cache.outputs.cache-hit != 'true'
-        uses: docker/build-push-action@v4
-        with:
-          platforms: linux/amd64
-          file: .github/Dockerfile-zephyr
-          tags: ${{ env.IMAGE }}:latest
-          outputs: type=docker,force-compression=true,compression=zstd,compression-level=22,dest=${{ env.IMAGE_FILE }}
-
+      - name: Build image
+        if: env.DOCKER_NEED_BUILD == '1'
+        run: |
+          pwd
+          ls
+          docker build . --file .github/Dockerfile-zephyr --tag $IMAGE:${{ env.IMAGE_TAG }} --label "runnumber=${GITHUB_RUN_ID}"
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+          docker push $IMAGE:${{ env.IMAGE_TAG }}
