@@ -1168,7 +1168,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                     my_putc (_dtoa.digits[0], stream);
                     if (prec > 0) {
                         my_putc ('.', stream);
-                        uint8_t pos = 1;
+                        int pos = 1;
                         for (pos = 1; pos < 1 + prec; pos++)
                             my_putc (pos < ndigs ? _dtoa.digits[pos] : '0', stream);
                     } else if (flags & FL_ALT)
