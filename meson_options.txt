@@ -121,6 +121,8 @@ option('test-long-double', type: 'boolean', value: true,
        description: 'Enable long double tests on targets with long double type')
 option('split-large-tests', type: 'boolean', value: false,
        description: 'Split large tests into pieces for smaller targets')
+option('test-stdin', type: 'boolean', value: false,
+       description: 'Enable tests that use stdin. This only works on a few targets')
 
 option('tinystdio', type: 'boolean', value: true,
        description: 'Use tiny stdio from avr libc')
