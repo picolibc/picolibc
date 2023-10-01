@@ -52,8 +52,7 @@ __stack_chk_fail_weak (void)
   static const char msg[] = STACK_CHK_MSG "\n";
   write (2, msg, sizeof(msg)-1);
 #endif
-  raise (SIGABRT);
-  _exit (127);
+  abort();
 }
 __weak_reference(__stack_chk_fail_weak, __stack_chk_fail);
 
