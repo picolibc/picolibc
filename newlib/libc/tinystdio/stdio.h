@@ -414,4 +414,8 @@ __printf_float(float f)
 # endif
 #endif
 
+#if __SSP_FORTIFY_LEVEL > 0
+#include <ssp/stdio.h>
+#endif
+
 #endif /* _STDIO_H_ */
