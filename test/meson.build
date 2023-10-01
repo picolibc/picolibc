@@ -401,6 +401,42 @@ foreach target : targets
        timeout: 90,
       )
 
+  if get_option('test-stdin')
+    t1 = 'test-gets'
+    t1_src = 'test-gets.c'
+    if target == ''
+      t1_name = t1
+    else
+      t1_name = t1 + '_' + target
+    endif
+
+    test_gets = executable(t1_name, t1_src,
+		           c_args: _c_args + ['-D_FORTIFY_SOURCE=2'],
+		           link_args: _link_args,
+		           objects: _objs,
+		           link_with: _libs,
+		           link_depends:  _link_depends,
+		           include_directories: inc)
+
+    test(t1_name + '-success',
+         test_gets,
+         depends: bios_bin,
+         args: ['hi'],
+         env: test_env,
+         timeout: 90
+        )
+
+
+    test(t1_name + '-failure',
+         test_gets,
+         depends: bios_bin,
+         args: ['this is a long string that should overflow the buffer'],
+         env: test_env,
+         timeout: 90,
+         should_fail: true
+        )
+  endif
+
   if have_ubsan
     t1 = 'test-ubsan'
     t1_src = t1 + '.c'
