@@ -268,6 +268,6 @@ foreach target : targets
 			      srcs_stdlib_malloc_use,
 			      pic: false,
 			      include_directories: inc,
-			      c_args: value[1] + ['-DINTERNAL_NEWLIB'] + c_args_malloc))
+			      c_args: value[1] + c_args + c_args_malloc))
 
 endforeach

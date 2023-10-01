@@ -90,7 +90,7 @@ foreach target : targets
 		    include_directories : inc,
 		    install : true,
 		    install_dir : instdir,
-		    c_args : value[1] + arg_fnobuiltin + ['-ffreestanding'],
+		    c_args : value[1] + c_args + arg_fnobuiltin + ['-ffreestanding'],
 		    link_args : value[1] + ['-r', '-ffreestanding'])
 
   set_variable(crt0_name,
@@ -103,6 +103,7 @@ foreach target : targets
                    install : true,
                    install_dir : instdir,
                    pic: false,
+                   c_args: value[1] + c_args,
                    objects : [_crt.extract_objects(src_picocrt)])
   endif
 
@@ -112,7 +113,7 @@ foreach target : targets
 		    include_directories : inc,
 		    install : true,
 		    install_dir : instdir,
-		    c_args : value[1] + arg_fnobuiltin + ['-ffreestanding', '-DCRT0_EXIT'],
+		    c_args : value[1] + c_args + arg_fnobuiltin + ['-ffreestanding', '-DCRT0_EXIT'],
 		    link_args : value[1] + ['-r', '-ffreestanding'])
 
   set_variable(crt0_hosted_name,
@@ -125,6 +126,7 @@ foreach target : targets
                    install : true,
                    install_dir : instdir,
                    pic: false,
+                   c_args: value[1] + c_args,
                    objects : [_crt.extract_objects(src_picocrt)])
   endif
 
@@ -134,7 +136,7 @@ foreach target : targets
 		    include_directories : inc,
 		    install : true,
 		    install_dir : instdir,
-		    c_args : value[1] + arg_fnobuiltin + ['-ffreestanding', '-DCONSTRUCTORS=0'],
+		    c_args : value[1] + c_args + arg_fnobuiltin + ['-ffreestanding', '-DCONSTRUCTORS=0'],
 		    link_args : value[1] + ['-r', '-ffreestanding'])
 
   set_variable(crt0_minimal_name,
@@ -147,6 +149,7 @@ foreach target : targets
                    install : true,
                    install_dir : instdir,
                    pic: false,
+                   c_args: value[1] + c_args,
                    objects : [_crt.extract_objects(src_picocrt)])
   endif
 
@@ -158,7 +161,7 @@ foreach target : targets
 		      include_directories : inc,
 		      install : true,
 		      install_dir : instdir,
-		      c_args : value[1] + arg_fnobuiltin + ['-ffreestanding', '-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
+		      c_args : value[1] + c_args + arg_fnobuiltin + ['-ffreestanding', '-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
 		      link_args : value[1] + ['-r', '-ffreestanding'])
 
     set_variable(crt0_semihost_name,
@@ -171,6 +174,7 @@ foreach target : targets
                      install : true,
                      install_dir : instdir,
                      pic: false,
+                     c_args: value[1] + c_args,
                      objects : [_crt.extract_objects(src_picocrt)])
     endif
   endif

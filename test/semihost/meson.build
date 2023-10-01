@@ -74,7 +74,7 @@ semihost_no_args_tests = [
   'semihost-no-argv',
 ]
 
-command_line = 'program-name hello world'
+test_args = ['hello', 'world']
 
 foreach target : targets
   value = get_variable('target_' + target)
@@ -93,8 +93,6 @@ foreach target : targets
   _link_args = value[1] + get_variable('test_link_args_' + target, test_link_args)
   _link_depends = get_variable('test_link_depends_' + target, test_link_depends)
 
-  _c_args += ['-DCOMMAND_LINE="' + command_line + '"']
-
   foreach semihost_test : semihost_tests
     semihost_test_src = semihost_test + '.c'
     if target == ''
@@ -103,16 +101,19 @@ foreach target : targets
       semihost_test_name = semihost_test + '_' + target
     endif
 
+    _cmd_arg = ['-DCOMMAND_LINE="' + 'program-name' + ' ' + ' '.join(test_args) + '"']
+
     test(semihost_test_name,
 	 executable(semihost_test_name, [semihost_test_src],
-		    c_args: _c_args,
+		    c_args: _c_args + _cmd_arg,
 		    link_args: double_printf_link_args + _link_args,
 		    objects: _objs,
 		    link_with: _libs,
 		    link_depends:  _link_depends,
 		    include_directories: inc),
-	 args: ['--', command_line],
+	 args: test_args,
          depends: bios_bin,
+         suite: 'semihost',
 	 env: test_env)
   endforeach
 
@@ -126,13 +127,15 @@ foreach target : targets
 
     test(semihost_fail_test_name,
 	 executable(semihost_fail_test_name, [semihost_fail_test_src],
-		    c_args: _c_args,
+		    c_args: _c_args + _cmd_arg,
 		    link_args: _link_args,
 		    objects: _objs,
 		    link_with: _libs,
 		    link_depends:  _link_depends,
 		    include_directories: inc),
-	 args: ['--', command_line],
+	 args: test_args,
+         depends: bios_bin,
+         suite: 'semihost',
 	 env: test_env,
 	 should_fail: true)
   endforeach
@@ -148,13 +151,14 @@ foreach target : targets
 
       test(semihost_test_name,
 	   executable(semihost_test_name, [semihost_test_src],
-		      c_args: _c_args,
+		      c_args: _c_args + _cmd_arg,
 		      link_args: double_printf_link_args + _link_args,
 		      objects: _objs,
 		      link_with: _libs,
 		      link_depends:  test_link_depends,
 		      include_directories: inc),
            depends: bios_bin,
+           suite: 'semihost',
 	   env: test_env)
     endforeach
   endif

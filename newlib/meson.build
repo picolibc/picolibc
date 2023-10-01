@@ -74,7 +74,7 @@ foreach target : targets
 				      pic: false,
 				      objects : libobjs,
 				      include_directories: inc,
-				      c_args: value[1])
+				      c_args: value[1] + c_args)
 
   set_variable('lib_c' + target, local_lib_c_target)
   static_library(libm_name,
@@ -82,12 +82,14 @@ foreach target : targets
 		 install : true,
 		 install_dir : instdir,
 		 pic: false,
+                 c_args: value[1] + c_args,
 		 objects : [])
   static_library(libg_name,
 		 ['empty.c'],
 		 install : true,
 		 install_dir : instdir,
 		 pic: false,
+                 c_args: value[1] + c_args,
 		 objects : [])
 
   if check_duplicate_names

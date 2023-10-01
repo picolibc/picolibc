@@ -44,5 +44,5 @@ foreach target : targets
 			      srcs_machine,
 			      pic: false,
 			      include_directories: inc,
-			      c_args: value[1] + arg_fnobuiltin))
+			      c_args: value[1] + c_args + arg_fnobuiltin))
 endforeach

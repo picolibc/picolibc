@@ -55,6 +55,6 @@ foreach target : targets
 			      install : true,
 			      install_dir : instdir,
 			      include_directories : inc,
-			      c_args : value[1]))
+			      c_args : value[1] + c_args))
 
 endforeach

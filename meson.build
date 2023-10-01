@@ -219,8 +219,6 @@ have_ubsan = c_sanitize_bounds_flags != []
 c_args += c_flags
 native_c_args += c_flags
 
-c_args += '-D_LIBC'
-
 # Select a fortify source option
 fortify_source = get_option('fortify-source')
 if fortify_source == 'none'
@@ -824,6 +822,10 @@ c_flags = cc.get_supported_arguments(c_warnings, disabled_warnings)
 c_args += c_flags
 native_c_args += c_flags
 
+# Make sure _LIBC is not defined when building tests
+test_c_args = c_args
+c_args += '-D_LIBC'
+
 # CompCert does not support bitfields in packed structs, so avoid using this optimization
 bitfields_in_packed_structs_code = '''
 struct test { int part: 24; } __attribute__((packed));
@@ -907,7 +909,7 @@ if enable_multilib
   foreach target : target_list
     message('target ' + target)
     tmp = target.split(';')
-    flags = c_args
+    flags = []
 
     # Let the user specify a subset of the possible multilib
     # configurations to build for
@@ -976,7 +978,7 @@ if enable_multilib
   endif
 else
   targets = ['']
-  target_ = ['.', c_args]
+  target_ = ['.', []]
 endif
 
 foreach target : ['default-target'] + targets
@@ -1557,7 +1559,6 @@ conf_data.set('_HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs suppor
 
 # By default, tests don't require any special arguments
 
-test_c_args = c_args
 # disable compiler built-ins so we don't use native equivalents
 native_c_args += arg_fnobuiltin
 if tests_enable_stack_protector

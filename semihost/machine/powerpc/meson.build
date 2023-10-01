@@ -79,7 +79,7 @@ if cc.get_define('_CALL_ELF') == '1'
 						 install : true,
 						 install_dir : instdir,
 						 include_directories : inc,
-						 c_args : value[1],
+						 c_args : value[1] + c_args,
 						 pic: false)
 
       set_variable('lib_semihost' + target, local_lib_semihost_target)
