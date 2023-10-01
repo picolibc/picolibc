@@ -33,4 +33,4 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-exec "$(dirname "$0")"/do-configure riscv64-unknown-elf -Dtests=true "$@"
+exec "$(dirname "$0")"/do-configure riscv64-unknown-elf -Dtests=true -Dtest-stdin=true "$@"
