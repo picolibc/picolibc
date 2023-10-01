@@ -35,18 +35,21 @@
 char *
 gets(char *str)
 {
-	char *cp;
-	int c;
+	char *cp = str;
 
-	if ((stdin->flags & __SRD) == 0)
-		return NULL;
-
-	for (c = 0, cp = str; c != '\n'; cp++) {
-		if ((c = getchar()) == EOF)
-			return NULL;
-		*cp = (char)c;
-	}
-	*--cp = '\0';
-
-	return str;
+        for (;;) {
+                int c = getchar();
+                switch (c) {
+                case EOF:
+                        if (ferror(stdin) || cp == str)
+                                return NULL;
+                        __PICOLIBC_FALLTHROUGH;
+                case '\n':
+                        *cp = '\0';
+                        return str;
+                default:
+                        *cp++ = (char)c;
+                        break;
+                }
+        }
 }
