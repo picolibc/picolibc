@@ -47,25 +47,35 @@ chardev=stdio,mux=on,id=stdio0
 
 # Point the semihosting driver at our new chardev
 
-semi=enable=on,chardev=stdio0
-
+cmdline="program-name"
 input=""
+done=0
 
-case "$1" in
-    --)
-	semi="$semi",arg="$2"
-	shift
-	shift
-	;;
-    -*|"")
-	semi="$semi",arg=""
-	;;
-    *)
-	semi="$semi",arg="$1"
-	input="$1"
-	shift
-	;;
-esac
+while [ "$done" != "1" ]; do
+    case "$1" in
+        --)
+            shift
+            done=1
+            ;;
+        -s|"")
+            done=1
+            ;;
+        *)
+            cmdline="$cmdline $1"
+            case "$input" in
+                "")
+                    input="$1"
+                    ;;
+                *)
+                    input="$input $1"
+                    ;;
+            esac
+            shift
+            ;;
+    esac
+done
+
+semi=enable=on,chardev=stdio0,arg="$cmdline"
 
 # Disable monitor
 
