@@ -40,39 +40,28 @@ __RCSID("$NetBSD: gets_chk.c,v 1.7 2013/10/04 20:49:16 christos Exp $");
 #include <stdlib.h>
 #include <ssp/stdio.h>
 
-extern char *__gets(char *);
-#undef gets
-#ifdef __NEWLIB__
-#define __gets gets
-#endif
-
 char *
-__gets_chk(char * __restrict buf, size_t slen)
+__gets_chk(char * __restrict str, size_t slen)
 {
-	char *abuf;
-	size_t len;
+	char *cp = str;
 
-	if (slen >= (size_t)INT_MAX)
-		return __gets(buf);
-
-	if ((abuf = malloc(slen + 1)) == NULL)
-		return __gets(buf);
-
-	if (fgets(abuf, (int)(slen + 1), stdin) == NULL) {
-		free(abuf);
-		return NULL;
+        for (;;) {
+                int c = getchar();
+                switch (c) {
+                case EOF:
+                        if (ferror(stdin) || cp == str)
+                                return NULL;
+                        __PICOLIBC_FALLTHROUGH;
+                case '\n':
+                        if (slen == 0)
+                                __chk_fail();
+                        *cp = '\0';
+                        return str;
+                default:
+                        if (slen == 0)
+                                __chk_fail();
+                        slen--;
+                        *cp++ = (char)c;
+                }
 	}
-
-	len = strlen(abuf);
-	if (len > 0 && abuf[len - 1] == '\n')
-		--len;
-
-	if (len >= slen)
-		__chk_fail();
-
-	(void)memcpy(buf, abuf, len);
-
-	buf[len] = '\0';
-	free(abuf);
-	return buf;
 }
