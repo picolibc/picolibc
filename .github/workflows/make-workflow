@@ -12,7 +12,7 @@ for build in cmake; do
     done
 done
 
-for build in minsize fortify-source; do
+for build in minsize release; do
     for arch in linux; do
 	echo "  $build-$arch:"
 	cat variants

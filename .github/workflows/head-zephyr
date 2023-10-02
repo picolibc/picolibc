@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # .github/do-zephyr -Dfortify-source=2 --buildtype release
+  # .github/do-zephyr --buildtype release
   # is the largest cache, 429.5M (September 2023).
   CCACHE_SIZE: "450M"
   CCACHE_CMD: ccache
