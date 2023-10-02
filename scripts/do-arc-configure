@@ -34,4 +34,4 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 multilib_list="arcem,archs,em"
-exec "$(dirname "$0")"/do-configure arc-zephyr-elf -Dposix-console=true -Dtests=true -Dthread-local-storage=false -Dmultilib-list="$multilib_list" "$@"
+exec "$(dirname "$0")"/do-configure arc-zephyr-elf -Dtest-stdin=true -Dposix-console=true -Dtests=true -Dthread-local-storage=false -Dmultilib-list="$multilib_list" "$@"
