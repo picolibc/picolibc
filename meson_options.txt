@@ -80,9 +80,6 @@ option('system-libc', type: 'boolean', value: false,
 option('picoexit', type: 'boolean', value: true,
        description: 'Smaller exit/atexit/onexit code')
 
-option('fortify-source', type: 'combo', choices: ['none', '1', '2'], value: 'none',
-       description: 'Set _FORTIFY_SOURCE=<value>')
-
 option('sanitize-bounds', type: 'boolean', value: false,
        description: 'Build the library with -fsanitize=bounds')
 
@@ -123,6 +120,8 @@ option('split-large-tests', type: 'boolean', value: false,
        description: 'Split large tests into pieces for smaller targets')
 option('test-stdin', type: 'boolean', value: false,
        description: 'Enable tests that use stdin. This only works on a few targets')
+option('fortify-source', type: 'combo', choices: ['none', '1', '2'], value: '2',
+       description: 'Set _FORTIFY_SOURCE=<value> when building tests')
 
 option('tinystdio', type: 'boolean', value: true,
        description: 'Use tiny stdio from avr libc')

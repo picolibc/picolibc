@@ -219,14 +219,6 @@ have_ubsan = c_sanitize_bounds_flags != []
 c_args += c_flags
 native_c_args += c_flags
 
-# Select a fortify source option
-fortify_source = get_option('fortify-source')
-if fortify_source == 'none'
-  c_args += '-U_FORTIFY_SOURCE'
-else
-  c_args += '-D_FORTIFY_SOURCE=' + fortify_source
-endif
-
 sanitize_bounds = get_option('sanitize-bounds')
 sanitize_trap_on_error = get_option('sanitize-trap-on-error')
 
@@ -824,7 +816,15 @@ native_c_args += c_flags
 
 # Make sure _LIBC is not defined when building tests
 test_c_args = c_args
-c_args += '-D_LIBC'
+c_args += ['-D_LIBC', '-U_FORTIFY_SOURCE']
+
+# Select a fortify source option
+fortify_source = get_option('fortify-source')
+if fortify_source == 'none'
+  test_c_args += '-U_FORTIFY_SOURCE'
+else
+  test_c_args += '-D_FORTIFY_SOURCE=' + fortify_source
+endif
 
 # CompCert does not support bitfields in packed structs, so avoid using this optimization
 bitfields_in_packed_structs_code = '''
