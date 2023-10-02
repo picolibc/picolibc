@@ -601,3 +601,13 @@ int __nonnull((1, 2)) _NOTHROW
 siprintf ( char *, const char *, ...)
        _ATTRIBUTE ((__alias__("sprintf")));
 #endif
+
+
+#ifdef __LONG_DOUBLE_IEEE128__
+#if defined(_HAVE_ALIAS_ATTRIBUTE)
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(sprintf, __sprintfieee128);
+#endif
+#endif

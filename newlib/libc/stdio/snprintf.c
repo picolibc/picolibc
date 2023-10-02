@@ -60,3 +60,11 @@ int __nonnull((1, 3)) _NOTHROW
 sniprintf (char *, size_t, const char *, ...)
        _ATTRIBUTE ((__alias__("snprintf")));
 #endif
+#ifdef __LONG_DOUBLE_IEEE128__
+#if defined(_HAVE_ALIAS_ATTRIBUTE)
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(snprintf, __snprintfieee128);
+#endif
+#endif

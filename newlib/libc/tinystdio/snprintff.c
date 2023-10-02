@@ -32,5 +32,6 @@
 
 #define vfprintf __f_vfprintf
 #define snprintf __f_snprintf
+#define __snprintfieee128 __f_snprintfieee128
 
 #include "snprintf.c"

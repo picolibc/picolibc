@@ -58,3 +58,12 @@ __snprintf_chk(char * __restrict buf, size_t len, int flags, size_t slen,
 
 	return rv;
 }
+
+#ifdef __LONG_DOUBLE_IEEE128__
+#if defined(_HAVE_ALIAS_ATTRIBUTE)
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(__snprintf_chk, __snprintf_chkieee128);
+#endif
+#endif
