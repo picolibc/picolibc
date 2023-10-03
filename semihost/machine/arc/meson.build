@@ -34,6 +34,7 @@
 #
 lib_semihost_srcs = [
   'arc_close.c',
+  'arc_errno.c',
   'arc_exit.c',
   'arc_fstat.c',
   'arc_lseek.c',

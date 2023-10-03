@@ -44,5 +44,9 @@
 ssize_t
 write(int fd, const void *buf, size_t count)
 {
-    return arc_semihost3(SYS_SEMIHOST_write, fd, (uintptr_t) buf, count);
+    ssize_t ret;
+    ret = arc_semihost3(SYS_SEMIHOST_write, fd, (uintptr_t) buf, count);
+    if (ret < 0)
+        arc_semihost_errno(EINVAL);
+    return ret;
 }

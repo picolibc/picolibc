@@ -44,5 +44,17 @@
 ssize_t
 read(int fd, void *buf, size_t count)
 {
-    return arc_semihost3(SYS_SEMIHOST_read, fd, (uintptr_t) buf, count);
+    ssize_t ret;
+
+    /*
+     * Console input is non-blocking, returning -1 (without setting
+     * errno) when nothing is available. Spin waiting for input to
+     * appear.
+     */
+    do {
+        ret = arc_semihost3(SYS_SEMIHOST_read, fd, (uintptr_t) buf, count);
+        if (ret < 0)
+            arc_semihost_errno(EINVAL);
+    } while (ret < 0 && fd == 0);
+    return ret;
 }
