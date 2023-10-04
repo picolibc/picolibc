@@ -249,8 +249,11 @@ serial=none
 
 export QEMU_AUDIO_DRV=none
 
-# shellcheck disable=SC2086
-echo "$input" | "$qemu" $memory \
+input_file=`mktemp`
+trap 'rm "$input_file"' 0
+echo "$input" > "$input_file"
+
+"$qemu" $memory \
       -chardev "$chardev" \
       -semihosting-config "$semi" \
       -monitor "$mon" \
@@ -259,7 +262,7 @@ echo "$input" | "$qemu" $memory \
       -cpu "$cpu" \
       -device loader,file="$elf",cpu-num=0 \
       -nographic \
-      "$@"
+      "$@" < $input_file 
 
 result=$?
 
