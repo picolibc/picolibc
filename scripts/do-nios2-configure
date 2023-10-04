@@ -34,4 +34,4 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 multilib_list='.,nomul,mulx'
-exec "$(dirname "$0")"/do-configure nios2-zephyr-elf -Dposix-console=true -Dtests=true -Dmultilib-list="$multilib_list" "$@"
+exec "$(dirname "$0")"/do-configure nios2-zephyr-elf -Dposix-console=true -Dtests=true -Dmultilib-list="$multilib_list" -Dtest-stdin=true "$@"
