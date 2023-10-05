@@ -34,7 +34,8 @@ _fputwc_unlocked_r (struct _reent *ptr,
 	wchar_t wc,
 	FILE *fp)
 {
-  ORIENT(fp, 1);
+  if (ORIENT(fp, 1) != 1)
+    return WEOF;
   return __fputwc(ptr, wc, fp);
 }
 

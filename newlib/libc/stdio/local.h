@@ -231,21 +231,24 @@ extern _READ_WRITE_RETURN_TYPE __swrite64 (struct _reent *, void *,
  * Set the orientation for a stream. If o > 0, the stream has wide-
  * orientation. If o < 0, the stream has byte-orientation.
  */
-#define ORIENT(fp,ori)					\
-  do								\
-    {								\
-      if (!((fp)->_flags & __SORD))	\
-	{							\
-	  (fp)->_flags |= __SORD;				\
-	  if (ori > 0)						\
-	    (fp)->_flags2 |= __SWID;				\
-	  else							\
-	    (fp)->_flags2 &= ~__SWID;				\
-	}							\
-    }								\
-  while (0)
+#define ORIENT(fp,ori)			\
+  (					\
+    (					\
+      ((fp)->_flags & __SORD) ?		\
+	0				\
+      :					\
+	(				\
+	  ((fp)->_flags |= __SORD),	\
+	  (ori > 0) ?			\
+	    ((fp)->_flags2 |= __SWID)	\
+	  :				\
+	    ((fp)->_flags2 &= ~__SWID)	\
+	)				\
+    ),					\
+    ((fp)->_flags2 & __SWID) ? 1 : -1	\
+  )
 #else
-#define ORIENT(fp,ori)
+#define ORIENT(fp,ori) (-1)
 #endif
 
 /* WARNING: _dcvt is defined in the stdlib directory, not here!  */
