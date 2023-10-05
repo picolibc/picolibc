@@ -51,7 +51,7 @@ MEMORY
 }
 
 PHDRS
-{
+{@INIT_PHDRS@
 	text PT_LOAD;
 	ram PT_LOAD;
 	ram_init PT_LOAD;
@@ -61,7 +61,7 @@ PHDRS
 SECTIONS
 {
 	PROVIDE(__stack = ORIGIN(ram) + LENGTH(ram));
-	@INIT_SECTIONS@
+@INIT_SECTIONS@
 	.text : {
 
 		/* code */

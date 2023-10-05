@@ -1019,17 +1019,19 @@ foreach target : ['default-target'] + targets
     init_memory_template = '''
 	@0@ (rx!w) :
 		ORIGIN = DEFINED(__@0@) ? __@0@ : @1@,
-		LENGTH = DEFINED(__@0@_size) ? __@0@_size : @2@
-'''
+		LENGTH = DEFINED(__@0@_size) ? __@0@_size : @2@'''
+    init_phdr_template = '''
+	text_@0@ PT_LOAD;'''
     init_section_template = '''
-        .@0@ : {
-@1@
-        } >@2@ AT>@2@ :text
+	.@0@ : {@1@
+	} >@2@ AT>@2@ :@3@
 '''
-    default_init_section_template = init_section_template.format('@0@', '''      		KEEP (*(.text.init.enter))
+    default_init_section_template = init_section_template.format('@0@', '''
+		KEEP (*(.text.init.enter))
 		KEEP (*(.data.init.enter))
 		KEEP (*(SORT_BY_NAME(.init) SORT_BY_NAME(.init.*)))''',
-                                                                 '@1@')
+                                                                 '@1@',
+                                                                 '@2@')
 
     additional_sections = []
 
@@ -1053,7 +1055,7 @@ foreach target : ['default-target'] + targets
           'name' : 'boot_flash',
           'addr' : boot_flash_addr,
           'size' : boot_flash_size,
-          'contents' : default_init_section_template.format('boot_flash', 'boot_flash')
+          'contents' : default_init_section_template.format('boot_flash', 'boot_flash', 'text_boot_flash')
         }]
       fallback_flash_addr = '0x10000400'
       fallback_flash_size = '0x0000fc00'
@@ -1066,38 +1068,38 @@ foreach target : ['default-target'] + targets
           content_list = meson.get_cross_property('default_' + section_name + '_contents', default_content_list)
           contents = ''
           foreach content : content_list
-            if contents != ''
-              contents += '''
-'''
-            endif
-            contents += '                @0@'.format(content)
+            contents += '''
+		@0@'''.format(content)
           endforeach
           additional_sections += [
             {
               'name' : section_name,
               'addr' : meson.get_cross_property('default_' + section_name + '_addr'),
               'size' : meson.get_cross_property('default_' + section_name + '_size'),
-              'contents' : init_section_template.format(section_name, contents, section_name)
+              'contents' : init_section_template.format(section_name, contents, section_name, 'text_' + section_name)
             }]
         endforeach
       endif
     endif
-                          
+
     init_memory = ''
+    init_phdrs = ''
     init_sections = ''
 
     if additional_sections != []
       foreach section : additional_sections
         section_name = section['name']
         init_memory += init_memory_template.format(section_name, section['addr'], section['size'])
+        init_phdrs += init_phdr_template.format(section_name)
         init_sections += section['contents']
       endforeach
     else
       init_memory = ''
-      init_sections = default_init_section_template.format('init', 'flash')
+      init_sections = default_init_section_template.format('init', 'flash', 'text')
     endif
 
     picolibc_linker_type_data.set('INIT_MEMORY', init_memory)
+    picolibc_linker_type_data.set('INIT_PHDRS', init_phdrs)
     picolibc_linker_type_data.set('INIT_SECTIONS', init_sections)
 
     picolibc_linker_type_data.set(
