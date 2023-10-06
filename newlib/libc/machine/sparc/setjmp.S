@@ -110,6 +110,8 @@
 
 ENTRY(setjmp)
 ENTRY(_setjmp)
+        ta      0x03            /* Flush registers, just in case another stack
+                                   is used after the setjmp().  */
         st      %sp, [%o0]      /* caller's stack pointer */
         st      %i7, [%o0+4]    /* caller's return pc */
         st      %fp, [%o0+8]    /* store caller's frame pointer */
