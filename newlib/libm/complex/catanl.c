@@ -51,8 +51,6 @@ catanl(long double complex z)
 
 	x2 = x * x;
 	a = 1.0L - x2 - (y * y);
-	if (a == 0.0)
-		goto ovrf;
 
 	t = 0.5L * atan2l(2.0L * x, a);
 	w = _redupil(t);

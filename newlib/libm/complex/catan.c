@@ -105,8 +105,6 @@ catan(double complex z)
 
 	x2 = x * x;
 	a = 1.0 - x2 - (y * y);
-	if (a == 0.0)
-		goto ovrf;
 
 	t = 0.5 * atan2(2.0 * x, a);
 	w = _redupi(t);
