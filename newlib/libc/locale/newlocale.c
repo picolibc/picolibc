@@ -135,7 +135,7 @@ newlocale (int category_mask, const char *locale,
   /* Check for invalid mask values and valid locale ptr. */
   if ((category_mask & ~LC_VALID_MASK) || !locale)
     {
-      __errno_r(p) = EINVAL;
+      _REENT_ERRNO(p) = EINVAL;
       return NULL;
     }
   /* If the new locale is supposed to be all default locale, just return
@@ -157,7 +157,7 @@ newlocale (int category_mask, const char *locale,
 						: locale;
 	  if (strlen (cat) > ENCODING_LEN)
 	    {
-	      __errno_r(p) = EINVAL;
+	      _REENT_ERRNO(p) = EINVAL;
 	      return NULL;
 	    }
 	  strcpy (new_categories[i], cat);
@@ -204,7 +204,7 @@ newlocale (int category_mask, const char *locale,
 	  /* Otherwise load locale data. */
 	  else if (!__loadlocale (&tmp_locale, i, new_categories[i]))
 	    {
-              __errno_r(p) = ENOENT;
+	      _REENT_ERRNO(p) = ENOENT;
 	      goto error;
 	    }
 	}

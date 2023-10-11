@@ -31,6 +31,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <math.h>
 #include <fenv.h>
 
 /* This implementation is intended to comply with the following
@@ -51,7 +52,7 @@
  * status flags represented through its argument."
  */
 
-#if __riscv_flen
+#if __RISCV_HARD_FLOAT
 
 int fesetenv(const fenv_t *envp)
 {

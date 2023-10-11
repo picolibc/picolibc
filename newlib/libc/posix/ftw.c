@@ -1,3 +1,5 @@
+#ifndef HAVE_OPENDIR
+
 /*
 * Copyright © 2005-2020 Rich Felker, et al.
 *
@@ -31,3 +33,4 @@ int ftw(const char *path, int (*fn)(const char *, const struct stat *, int), int
 	return nftw(path, (int (*)())fn, fd_limit, FTW_PHYS);
 }
 
+#endif /* ! HAVE_OPENDIR */

@@ -35,7 +35,7 @@
 
 #include <math.h>
 
-#if defined(__riscv_flen) && __riscv_flen >= 32
+#if defined(__RISCV_HARD_FLOAT) && __RISCV_HARD_FLOAT >= 32
 long int
 lroundf(float x)
 {

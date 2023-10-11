@@ -52,9 +52,7 @@ long long int llrintf(float x)
   
   if (j0 < (int)(sizeof (long long int) * 8) - 1)
     {
-      if (j0 < -1)
-        return 0;
-      else if (j0 >= 23)
+      if (j0 >= 23)
         result = (long long int) ((i0 & 0x7fffff) | 0x800000) << (j0 - 23);
       else
         {
@@ -68,7 +66,7 @@ long long int llrintf(float x)
           j0 = ((i0 >> 23) & 0xff) - 0x7f;
           i0 &= 0x7fffff;
           i0 |= 0x800000;
-          result = i0 >> (23 - j0);
+          result = (j0 < 0 ? 0 : i0 >> (23 - j0));
         }
     }
   else

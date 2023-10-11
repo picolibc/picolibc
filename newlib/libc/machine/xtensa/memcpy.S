@@ -30,9 +30,8 @@
    warning messages.  Set this flag to disable the use of unaligned
    accesses and keep the ISS happy.  */
 
-#if XCHAL_UNALIGNED_LOAD_EXCEPTION || 1
+/* #define UNALIGNED_ADDRESSES_CHECKED XCHAL_UNALIGNED_LOAD_EXCEPTION */
 #define UNALIGNED_ADDRESSES_CHECKED 1
-#endif
 
 
 /* void *memcpy (void *dst, const void *src, size_t len)
@@ -72,14 +71,14 @@ __memcpy_aux:
 #endif
 1:	l8ui	a6, a3, 0
 	addi	a3, a3, 1
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	nop
 	nop
 	nop
 #endif
 	s8i	a6, a5, 0
 	addi	a5, a5, 1
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	memw
 #endif
 #if !XCHAL_HAVE_LOOPS
@@ -101,7 +100,7 @@ __memcpy_aux:
 	addi	a3, a3, 1
 	addi	a4, a4, -1
 	s8i	a6, a5, 0
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	memw
 #endif
 	addi	a5, a5, 1
@@ -121,7 +120,7 @@ __memcpy_aux:
 	addi	a4, a4, -2
 	s8i	a6, a5, 0
 	s8i	a7, a5, 1
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	memw
 #endif
 	addi	a5, a5, 2
@@ -158,20 +157,8 @@ memcpy:
 	add	a8, a8, a3	// a8 = end of last 16B source chunk
 #endif
 
-#ifndef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 
-1:	l32i	a6, a3, 0 //HYP: memw after this is fix-ish?
-	l32i	a7, a3, 4
-	s32i	a6, a5, 0
-	l32i	a6, a3, 8
-	s32i	a7, a5, 4
-	l32i	a7, a3, 12
-	s32i	a6, a5, 8
-	addi	a3, a3, 16
-	s32i	a7, a5, 12
-	addi	a5, a5, 16
-
-#else
 1:	l32i	a6, a3, 0
 	l32i	a7, a3, 4
 	s32i	a6, a5, 0
@@ -184,6 +171,19 @@ memcpy:
 	memw
 
 	addi	a3, a3, 16
+	addi	a5, a5, 16
+
+#else
+
+1:	l32i	a6, a3, 0
+	l32i	a7, a3, 4
+	s32i	a6, a5, 0
+	l32i	a6, a3, 8
+	s32i	a7, a5, 4
+	l32i	a7, a3, 12
+	s32i	a6, a5, 8
+	addi	a3, a3, 16
+	s32i	a7, a5, 12
 	addi	a5, a5, 16
 
 #endif
@@ -207,7 +207,7 @@ memcpy:
 3:	bbsi.l	a4, 2, 4f
 	bbsi.l	a4, 1, 5f
 	bbsi.l	a4, 0, 6f
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	memw
 #endif
 	leaf_return
@@ -220,7 +220,7 @@ memcpy:
 	addi	a5, a5, 4
 	bbsi.l	a4, 1, 5f
 	bbsi.l	a4, 0, 6f
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	memw
 #endif
 	leaf_return
@@ -231,7 +231,7 @@ memcpy:
 	s16i	a6, a5, 0
 	addi	a5, a5, 2
 	bbsi.l	a4, 0, 6f
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	memw
 #endif
 	leaf_return
@@ -241,7 +241,7 @@ memcpy:
 	s8i	a6, a5, 0
 
 .Ldone:
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	memw
 #endif
 	leaf_return
@@ -325,7 +325,7 @@ memcpy:
 	s8i	a7, a5, 1
 	addi	a5, a5, 2
 	bbsi.l	a4, 0, 6f
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	memw
 #endif
 	leaf_return
@@ -333,7 +333,7 @@ memcpy:
 	/* Copy 1 byte.  */
 6:	l8ui	a6, a3, 0
 	s8i	a6, a5, 0
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	memw
 #endif
 	leaf_return
@@ -341,5 +341,3 @@ memcpy:
 	.end schedule
 
 	.size	memcpy, . - memcpy
-
-

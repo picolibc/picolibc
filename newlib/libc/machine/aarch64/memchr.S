@@ -1,31 +1,8 @@
 /*
  * memchr - find a character in a memory zone
  *
- * Copyright (c) 2014, ARM Limited
- * All rights Reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the company nor the names of its contributors
- *       may be used to endorse or promote products derived from this
- *       software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2014-2022, Arm Limited.
+ * SPDX-License-Identifier: MIT 
  */
 
 #if (defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED)) || !defined(__LP64__)
@@ -36,6 +13,8 @@
  * ARMv8-a, AArch64
  * Neon Available.
  */
+
+#include "asmdefs.h"
 
 /* Arguments and results.  */
 #define srcin		x0
@@ -70,17 +49,11 @@
  * identify exactly which byte has matched.
  */
 
-	.macro def_fn f p2align=0
-	.text
-	.p2align \p2align
-	.global \f
-	.type \f, %function
-\f:
-	.endm
-
-def_fn memchr
+ENTRY (memchr)
+	PTR_ARG (0)
+	SIZE_ARG (2)
 	/* Do not dereference srcin if no bytes to compare.  */
-	cbz	cntin, .Lzero_length
+	cbz	cntin, L(zero_length)
 	/*
 	 * Magic constant 0x40100401 allows us to identify which lane matches
 	 * the requested byte.
@@ -93,7 +66,7 @@ def_fn memchr
 	dup	vrepmask.4s, wtmp2
 	ands	soff, srcin, #31
 	and	cntrem, cntin, #31
-	b.eq	.Lloop
+	b.eq	L(loop)
 
 	/*
 	 * Input string is not 32-byte aligned. We calculate the syndrome
@@ -116,25 +89,25 @@ def_fn memchr
 	lsr	synd, synd, tmp
 	lsl	synd, synd, tmp
 	/* The first block can also be the last */
-	b.ls	.Lmasklast
+	b.ls	L(masklast)
 	/* Have we found something already? */
-	cbnz	synd, .Ltail
+	cbnz	synd, L(tail)
 
-.Lloop:
+L(loop):
 	ld1	{vdata1.16b, vdata2.16b}, [src], #32
 	subs	cntin, cntin, #32
 	cmeq	vhas_chr1.16b, vdata1.16b, vrepchr.16b
 	cmeq	vhas_chr2.16b, vdata2.16b, vrepchr.16b
 	/* If we're out of data we finish regardless of the result */
-	b.ls	.Lend
+	b.ls	L(end)
 	/* Use a fast check for the termination condition */
 	orr	vend.16b, vhas_chr1.16b, vhas_chr2.16b
 	addp	vend.2d, vend.2d, vend.2d
 	mov	synd, vend.d[0]
 	/* We're not out of data, loop if we haven't found the character */
-	cbz	synd, .Lloop
+	cbz	synd, L(loop)
 
-.Lend:
+L(end):
 	/* Termination condition found, let's calculate the syndrome value */
 	and	vhas_chr1.16b, vhas_chr1.16b, vrepmask.16b
 	and	vhas_chr2.16b, vhas_chr2.16b, vrepmask.16b
@@ -142,9 +115,9 @@ def_fn memchr
 	addp	vend.16b, vend.16b, vend.16b			/* 128->64 */
 	mov	synd, vend.d[0]
 	/* Only do the clear for the last possible block */
-	b.hi	.Ltail
+	b.hs	L(tail)
 
-.Lmasklast:
+L(masklast):
 	/* Clear the (32 - ((cntrem + soff) % 32)) * 2 upper bits */
 	add	tmp, cntrem, soff
 	and	tmp, tmp, #31
@@ -153,7 +126,7 @@ def_fn memchr
 	lsl	synd, synd, tmp
 	lsr	synd, synd, tmp
 
-.Ltail:
+L(tail):
 	/* Count the trailing zeros using bit reversing */
 	rbit	synd, synd
 	/* Compensate the last post-increment */
@@ -168,9 +141,9 @@ def_fn memchr
 	csel	result, xzr, result, eq
 	ret
 
-.Lzero_length:
+L(zero_length):
 	mov	result, #0
 	ret
 
-	.size	memchr, . - memchr
+END (memchr)
 #endif

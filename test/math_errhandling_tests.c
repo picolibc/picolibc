@@ -395,6 +395,8 @@ FLOAT_T makemathname(test_nearbyint_negbig)(void) { return makemathname(nearbyin
 FLOAT_T makemathname(test_nearbyint_half)(void) { return makemathname(nearbyint)(makemathname(half)); }
 FLOAT_T makemathname(test_nearbyint_neghalf)(void) { return makemathname(nearbyint)(makemathname(half)); }
 
+long long makemathname(test_lrint_zero)(void) { return makemathname(lrint)(makemathname(zero)); }
+long long makemathname(test_lrint_negzero)(void) { return makemathname(lrint)(makemathname(negzero)); }
 long long makemathname(test_lrint_qnan)(void) { makemathname(lrint)(makemathname(qnanval)); return 0; }
 long long makemathname(test_lrint_snan)(void) { makemathname(lrint)(makemathname(snanval)); return 0; }
 long long makemathname(test_lrint_inf)(void) { makemathname(lrint)(makemathname(infval)); return 0; }
@@ -1402,6 +1404,8 @@ static const struct {
         TEST(ilogb_inf, INT_MAX, FE_INVALID, EDOM),
         TEST(ilogb_neginf, INT_MAX, FE_INVALID, EDOM),
 
+        TEST(lrint_zero, 0, 0, 0),
+        TEST(lrint_negzero, 0, 0, 0),
         TEST(lrint_qnan, 0, FE_INVALID, 0),
         TEST(lrint_inf, 0, FE_INVALID, 0),
         TEST(lrint_neginf, 0, FE_INVALID, 0),

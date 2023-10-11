@@ -19,12 +19,12 @@
    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
 
-#include <machine/core-isa.h>
+/* Define macros for leaf function entry and return, supporting either the
+ * standard register windowed ABI or the non-windowed call0 ABI.  These
+ * macros do not allocate any extra stack space, so they only work for
+ * leaf functions that do not need to spill anything to the stack.  */
 
-# Define macros for leaf function entry and return, supporting either the
-# standard register windowed ABI or the non-windowed call0 ABI.  These
-# macros do not allocate any extra stack space, so they only work for
-# leaf functions that do not need to spill anything to the stack.
+#include <machine/core-isa.h>
 
 	.macro leaf_entry reg, size
 #if XCHAL_HAVE_WINDOWED && !__XTENSA_CALL0_ABI__

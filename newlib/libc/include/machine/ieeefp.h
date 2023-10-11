@@ -261,7 +261,7 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #else
 #define __IEEE_LITTLE_ENDIAN
 #endif
-#ifdef __riscv_flen
+#if defined(__riscv_flen) || defined (__riscv_zfinx)
 # define _SUPPORTS_ERREXCEPT
 #endif
 #endif
@@ -580,6 +580,10 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #undef __OBSOLETE_MATH_DOUBLE
 #undef __OBSOLETE_MATH_FLOAT
 #define __OBSOLETE_MATH 1
+#endif
+
+#ifdef __XTENSA_EB__
+#define __IEEE_BIG_ENDIAN
 #endif
 
 #ifdef __CYGWIN__

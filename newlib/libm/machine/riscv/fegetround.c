@@ -31,6 +31,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <math.h>
 #include <fenv.h>
 
 /* This implementation is intended to comply with the following
@@ -42,8 +43,7 @@
  * "The fegetround() function shall get the current rounding direction."
  */
 
-#if __riscv_flen
-
+#if __RISCV_HARD_FLOAT
 int fegetround(void)
 {
 

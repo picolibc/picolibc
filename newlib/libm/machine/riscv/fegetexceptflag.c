@@ -31,6 +31,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <math.h>
 #include <fenv.h>
 
 /* This implementation is intended to comply with the following
@@ -45,7 +46,7 @@
  * the object pointed to by the argument flagp."
  */
 
-#if __riscv_flen
+#if __RISCV_HARD_FLOAT
 
 int fegetexceptflag(fexcept_t *flagp, int excepts)
 {

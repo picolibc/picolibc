@@ -260,9 +260,9 @@ int sigqueue (pid_t, int, const union sigval);
 /* POSIX Issue 8 adds sig2str() and str2sig() */
 
 #if __SIZEOF_INT__ >= 4
-#define SIG2STR_MAX (sizeof("RTMAX+") + sizeof("4294967295") - 1)
+#define SIG2STR_MAX 17	/* (sizeof("RTMAX+") + sizeof("4294967295") - 1) */
 #else
-#define SIG2STR_MAX (sizeof("RTMAX+") + sizeof("65535") - 1)
+#define SIG2STR_MAX 12	/* (sizeof("RTMAX+") + sizeof("65535") - 1) */
 #endif
 
 int sig2str(int, char *);

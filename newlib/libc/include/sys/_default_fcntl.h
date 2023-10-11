@@ -163,12 +163,13 @@ extern "C" {
 #define AT_FDCWD -2
 
 /* Flag values for faccessat2) et al. */
-#define AT_EACCESS              1
-#define AT_SYMLINK_NOFOLLOW     2
-#define AT_SYMLINK_FOLLOW       4
-#define AT_REMOVEDIR            8
+#define AT_EACCESS                 0x0001
+#define AT_SYMLINK_NOFOLLOW        0x0002
+#define AT_SYMLINK_FOLLOW          0x0004
+#define AT_REMOVEDIR               0x0008
 #if __GNU_VISIBLE
-#define AT_EMPTY_PATH          16
+#define AT_EMPTY_PATH              0x0010
+#define _AT_NULL_PATHNAME_ALLOWED  0x4000 /* Internal flag used by futimesat */
 #endif
 #endif
 

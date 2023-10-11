@@ -46,26 +46,28 @@ rv_alloc(ptr, i) struct _reent *ptr, int i;
 rv_alloc(struct _reent *ptr, int i)
 #endif
 {
-	int j, k, *r;
+	int j;
+	char *r;
 
+	/* Allocate buffer in a compatible way with legacy _ldtoa_r(). */
 	j = sizeof(ULong);
-	for(k = 0;
-		sizeof(Bigint) - sizeof(ULong) - sizeof(int) + j <= i;
-		j <<= 1)
-			k++;
-	r = (int*)Balloc(ptr, k);
+	for (_REENT_MP_RESULT_K (ptr) = 0;
+	     sizeof (Bigint) - sizeof (ULong) + j <= i; j <<= 1)
+		_REENT_MP_RESULT_K (ptr)++;
+	_REENT_MP_RESULT (ptr) = eBalloc (ptr, _REENT_MP_RESULT_K (ptr));
+	r = (char *) _REENT_MP_RESULT (ptr);
+
 	if (r == NULL)
 		return (
 #ifndef MULTIPLE_THREADS
 		dtoa_result =
 #endif
 			NULL);
-	*r = k;
 	return
 #ifndef MULTIPLE_THREADS
 	dtoa_result =
 #endif
-		(char *)(r+1);
+		r;
 	}
 
  char *
@@ -100,8 +102,9 @@ freedtoa(ptr, s) struct _reent *ptr, char *s;
 freedtoa(struct _reent *ptr, char *s)
 #endif
 {
-	Bigint *b = (Bigint *)((int *)s - 1);
-	b->_maxwds = 1 << (b->_k = *(int*)b);
+	/* Free buffer allocated in a compatible way with legacy _ldtoa_r(). */
+	Bigint *b = (Bigint *)s;
+	b->_maxwds = 1 << (b->_k = _REENT_MP_RESULT_K (ptr));
 	Bfree(ptr, b);
 #ifndef MULTIPLE_THREADS
 	if (s == dtoa_result)
