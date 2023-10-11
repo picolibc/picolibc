@@ -42,5 +42,7 @@
 int
 close(int fd)
 {
+        if (fd <= 2)
+                return 0;
 	return (int) sys_semihost_close(fd);
 }
