@@ -228,7 +228,6 @@ hdrs_stdlib = [
     'local.h',
     'mbctype.h',
     'mprec.h',
-    'on_exit_args.h',
     'rand48.h',
     'std.h',
 ]
