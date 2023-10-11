@@ -54,6 +54,8 @@ _map_stdio(int fd)
 		fd_stderr = sys_semihost_open(":tt", 8);
 	}
 	switch (fd) {
+        case 0:
+                return -1;
 	case 1:
 		return fd_stdout;
 	case 2:

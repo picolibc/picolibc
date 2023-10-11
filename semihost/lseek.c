@@ -53,7 +53,9 @@ off_t lseek(int fd, off_t offset, int whence)
 		}
 	}
 
-	if (whence != SEEK_SET) {
+        fd = _map_stdio(fd);
+
+	if (whence != SEEK_SET || fd < 0) {
 		errno = EINVAL;
 		return (off_t) -1;
 	}
