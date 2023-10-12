@@ -41,6 +41,8 @@ picolibc_sources_flags("-fno-builtin"
   memcpy.S
   memmove-stub.c
   memmove.S
+  memrchr-stub.c
+  memrchr.S
   memset-stub.c
   memset.S
   rawmemchr-stub.c
@@ -62,8 +64,8 @@ picolibc_sources_flags("-fno-builtin"
   strncmp.S
   strnlen-stub.c
   strnlen.S
-  strchr-stub.c
-  strchr.S
+  strrchr-stub.c
+  strrchr.S
   )
 
 add_subdirectory(sys)
