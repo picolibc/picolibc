@@ -14,7 +14,7 @@
 
 #include <stddef.h>
 
-#if defined(__riscv_f) || defined(__riscv_zfinx)
+#if defined(__riscv_flen) || defined(__riscv_zfinx)
 
 /* Per "The RISC-V Instruction Set Manual: Volume I: User-Level ISA:
  * Version 2.1", Section 8.2, "Floating-Point Control and Status
