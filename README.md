@@ -47,6 +47,7 @@ is used to validate the code for all patch integration:
  * Nios II
  * Power9
  * RISC-V (both 32- and 64- bit)
+ * SparcV8 (32 bit)
  * x86_64 (Native and Linux hosted, for testing)
 
 There is also build infrastructure and continuous build validation,
