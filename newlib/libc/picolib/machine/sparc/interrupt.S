@@ -198,40 +198,40 @@ _sparc_window_flush_isr:
 	sub	%fp, 0x10, %fp
 	std	%l0, [%fp + 0x40 + 0x00]
 	st	%l2, [%fp + 0x40 + 0x08]
-	st	%g2, [%fp + 0x40 + 0x0c]
+	st	%g1, [%fp + 0x40 + 0x0c]
 
 	restore
 	/* In window where we trapped from. This window will not be flushed. */
 
 	/* Set highest processor interrupt level and enable traps. */
-	rd	%psr, %g2
-	or	%g2, PSR_PIL, %g2
-	wr	%g2, PSR_ET, %psr
+	rd	%psr, %g1
+	or	%g1, PSR_PIL, %g1
+	wr	%g1, PSR_ET, %psr
 	nop
 	nop
 
 	/* Execute "save" NWINDOWS-1 times. */
-	set     SPARC_NWIN-2, %g2
+	set     SPARC_NWIN-2, %g1
 1:
 	save
-	cmp	%g2, %g0
+	cmp	%g1, %g0
 	bne	1b
-	 sub	%g2, 1, %g2
+	sub	%g1, 1, %g1
 
 	/* Execute "restore" NWINDOWS-1 times. */
-	set     SPARC_NWIN-2, %g2
+	set     SPARC_NWIN-2, %g1
 2:
 	restore
-	cmp	%g2, %g0
+	cmp	%g1, %g0
 	bne	2b
-	 sub	%g2, 1, %g2
+	sub	%g1, 1, %g1
 
 	save
 
 	/* pop registers from stack which are used for the trap return */
 	ldd	[%fp + 0x40 + 0x00], %l0
 	ld	[%fp + 0x40 + 0x08], %l2
-	ld	[%fp + 0x40 + 0x0c], %g2
+	ld	[%fp + 0x40 + 0x0c], %g1
 	add	%fp, 0x10, %fp
 
 	/* Restore %psr as it was on trap entry. */
@@ -241,5 +241,5 @@ _sparc_window_flush_isr:
 	nop
 
 	jmp	%l2
-	 rett	%l2 + 4
+	rett	%l2 + 4
 	.size	_sparc_window_flush_isr, .-_sparc_window_flush_isr
