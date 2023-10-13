@@ -37,6 +37,5 @@ multilib_list="fpus,hs58,hs5x,m128"
 exec "$(dirname "$0")"/do-configure arc64-zephyr-elf \
     -Dposix-console=true \
     -Dtests=true \
-    -Dtest-stdin=true \
     -Dthread-local-storage=false \
     -Dmultilib-list="$multilib_list" "$@"
