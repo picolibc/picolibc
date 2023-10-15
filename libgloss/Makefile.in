@@ -937,6 +937,7 @@ MULTISUBDIR =
 MULTIDO = true
 MULTICLEAN = true
 TEXINFO_TEX = ../texinfo/texinfo.tex
+@HAVE_DOC_TRUE@AM_MAKEINFOFLAGS = --no-split
 @CONFIG_AARCH64_TRUE@aarch64_librdimon_a_SOURCES = \
 @CONFIG_AARCH64_TRUE@	aarch64/_exit.c \
 @CONFIG_AARCH64_TRUE@	aarch64/_kill.c \
@@ -5097,6 +5098,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+@HAVE_DOC_FALSE@html-local:
 clean: clean-recursive
 
 clean-am: clean-aminfo clean-binPROGRAMS clean-checkPROGRAMS \
@@ -5116,7 +5118,7 @@ dvi-am: $(DVIS)
 
 html: html-recursive
 
-html-am: $(HTMLS)
+html-am: $(HTMLS) html-local
 
 info: info-recursive
 
@@ -5283,7 +5285,7 @@ uninstall-am: uninstall-aarch64_cpu_initcpuinitDATA \
 	clean-noinstLIBRARIES cscope cscopelist-am ctags ctags-am \
 	dist-info distclean distclean-compile distclean-generic \
 	distclean-hdr distclean-local distclean-tags dvi dvi-am html \
-	html-am info info-am install \
+	html-am html-local info info-am install \
 	install-aarch64_cpu_initcpuinitDATA install-am \
 	install-arm_cpu_initcpuinitDATA install-binPROGRAMS \
 	install-data install-data-am install-dvi install-dvi-am \
@@ -5335,6 +5337,11 @@ mostlyclean-local: mostlyclean-multi
 clean-local: clean-multi
 distclean-local: distclean-multi
 maintainer-clean-local: maintainer-clean-multi
+
+@HAVE_DOC_TRUE@html-local: doc/porting/index.html
+@HAVE_DOC_TRUE@doc/porting/index.html: doc/porting.texi doc/$(am__dirstamp)
+@HAVE_DOC_TRUE@	$(AM_V_GEN)$(MAKEINFOHTML) $(AM_MAKEINFOHTMLFLAGS) $(MAKEINFOFLAGS) \
+@HAVE_DOC_TRUE@		--split=node $< -o $(@D)
 
 @CONFIG_AARCH64_TRUE@aarch64/crt0.$(OBJEXT): aarch64/crt0.S
 @CONFIG_AARCH64_TRUE@	$(AM_V_CPPAS)$(CPPASCOMPILE) -DSEMIHOST_V2 -o $@ -c $<
