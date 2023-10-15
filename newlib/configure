@@ -9269,7 +9269,7 @@ $as_echo "$as_me: executing $ac_file commands" >&6;}
 
 
   case $ac_file$ac_mode in
-    "newlib.h":H) sed -i.tmp -e '/^#define [^_]/d' -e '/^\/\* #undef [^_]/d' newlib.h && rm -f newlib.h.tmp ;;
+    "newlib.h":H) sed -i.tmp -E -e '/^#define [^_]/d' -e '/^\/\* #undef [^_]/d' -e '/_NEWLIB_VERSION|__NEWLIB_(MINOR|PATCHLEVEL)__|__NEWLIB__/d' newlib.h && rm -f newlib.h.tmp ;;
     "default-1":C)
 # Only add multilib support code if we just rebuilt the top-level
 # Makefile.

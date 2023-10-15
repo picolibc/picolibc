@@ -8,8 +8,11 @@ dnl Since we can't control what defines autoheader picks up (various autoconf
 dnl macros will add their own), filter out all the ones w/out a _ prefix.  All
 dnl the ones we want to export use a _ prefix, and all the rest we don't want
 dnl to export as it'll pollute the namespace of newlib users.
+dnl We also filter out version defines that we want in _newlib_version.h.
 dnl NB: newlib.h must be the first AC_CONFIG_HEADERS call for autoheader.
-AC_CONFIG_HEADERS([newlib.h:newlib.hin], [sed -i.tmp -e '/^#define [^_]/d' -e '/^\/\* #undef [^_]/d' newlib.h && rm -f newlib.h.tmp])
+AC_CONFIG_HEADERS(
+  [newlib.h:newlib.hin],
+  [sed -i.tmp -E -e '/^#define [^_]/d' -e '/^\/\* #undef [^_]/d' -e '/_NEWLIB_VERSION|__NEWLIB_(MINOR|PATCHLEVEL)__|__NEWLIB__/d' newlib.h && rm -f newlib.h.tmp])
 AH_TOP([/* NB: The contents are filtered before being installed. */
 
 #ifndef __NEWLIB_H__
