@@ -410,10 +410,10 @@ EOF
 fi
 AC_SUBST(EXEEXT_FOR_BUILD)
 
-AC_DEFINE(_NEWLIB_VERSION,"NEWLIB_VERSION","The newlib version in string format.")
-AC_DEFINE(__NEWLIB__,NEWLIB_MAJOR_VERSION,"The newlib major version number.")
-AC_DEFINE(__NEWLIB_MINOR__,NEWLIB_MINOR_VERSION,"The newlib minor version number.")
-AC_DEFINE(__NEWLIB_PATCHLEVEL__,NEWLIB_PATCHLEVEL_VERSION,"The newlib patch level.")
+AC_DEFINE(_NEWLIB_VERSION, "NEWLIB_VERSION", [The newlib version in string format.])
+AC_DEFINE(__NEWLIB__, NEWLIB_MAJOR_VERSION, [The newlib major version number.])
+AC_DEFINE(__NEWLIB_MINOR__, NEWLIB_MINOR_VERSION, [The newlib minor version number.])
+AC_DEFINE(__NEWLIB_PATCHLEVEL__, NEWLIB_PATCHLEVEL_VERSION, [The newlib patch level.])
 
 if test "${newlib_elix_level}" -gt "0"; then
   AC_DEFINE_UNQUOTED(_ELIX_LEVEL, ${newlib_elix_level}, [EL/IX level])
