@@ -32,7 +32,6 @@ exit_with_int (int val)
   *return_value = val;
 
   /* Terminate the current kernel.  */
-  asm ("s_dcache_wb");
   asm ("s_endpgm");
   __builtin_unreachable ();
 }
