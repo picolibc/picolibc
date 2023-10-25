@@ -147,6 +147,12 @@ extern FILE *const stdin;
 extern FILE *const stdout;
 extern FILE *const stderr;
 
+/* The stdin, stdout, and stderr symbols are described as macros in the C
+ * standard. */
+#define stdin stdin
+#define stdout stdout
+#define stderr stderr
+
 #define EOF	(-1)
 
 #define	_IOFBF	0		/* setvbuf should set fully buffered */
@@ -280,6 +286,17 @@ int	ferror(FILE *__stream);
 /* only mentioned for libstdc++ support, not implemented in library */
 #ifndef BUFSIZ
 #define BUFSIZ 512
+#endif
+
+/*
+ * We don't have any way of knowing any underlying POSIX limits,
+ * so just use a reasonably small values here
+ */
+#ifndef FOPEN_MAX
+#define FOPEN_MAX 32
+#endif
+#ifndef FILENAME_MAX
+#define FILENAME_MAX 1024
 #endif
 
 __extension__ typedef _fpos_t fpos_t;
