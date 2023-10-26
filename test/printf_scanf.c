@@ -98,6 +98,10 @@
 # define NO_C99_FORMATS
 #endif
 
+#ifndef _WANT_IO_LONG_LONG
+#define NO_LONG_LONG
+#endif
+
 #ifdef _NANO_FORMATTED_IO
 
 #ifndef NO_FLOATING_POINT
