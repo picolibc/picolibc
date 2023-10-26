@@ -2,4 +2,5 @@ https://github.com/ZakKemble/avr-gcc-build/releases/download/v12.1.0-1/avr-gcc-1
 https://maps.altusmetrum.org/qemu-m68k.tar.xz
 https://maps.altusmetrum.org/m68k-unknown-elf.tar.xz
 https://maps.altusmetrum.org/msp430-unknown-elf.tar.xz
+https://maps.altusmetrum.org/sh-unknown-elf-1.tar.xz
 https://maps.altusmetrum.org/qemu-arm.tar.xz

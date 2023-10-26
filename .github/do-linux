@@ -14,6 +14,7 @@ HERE=`dirname "$0"`
 "$HERE"/do-test i386 "$@"
 "$HERE"/do-test m68k-unknown-elf "$@"
 "$HERE"/do-test msp430-unknown-elf "$@"
+"$HERE"/do-test sh-unknown-elf "$@"
 "$HERE"/do-build sparc64 "$@"
 "$HERE"/do-test x86_64 "$@"
 "$HERE"/do-test x86 "$@"
