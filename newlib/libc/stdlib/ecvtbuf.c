@@ -276,6 +276,12 @@ fcvtbuf (double invalue,
   if (!p)
     return NULL;
 
+  if (*decpt == 9999)
+    {
+      strcpy(fcvt_buf, p);
+      return fcvt_buf;
+    }
+
   /* Now copy */
 
   done = -*decpt;
@@ -326,6 +332,12 @@ ecvtbuf (double invalue,
   p = __dtoa (invalue, 2, ndigit, decpt, sign, &end);
   if (!p)
     return NULL;
+
+  if (*decpt == 9999)
+    {
+      strcpy(fcvt_buf, p);
+      return fcvt_buf;
+    }
 
   /* Now copy */
 
