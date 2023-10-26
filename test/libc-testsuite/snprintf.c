@@ -33,6 +33,7 @@
 #pragma GCC diagnostic ignored "-Wformat-extra-args"
 #pragma GCC diagnostic ignored "-Wformat"
 #pragma GCC diagnostic ignored "-Wformat-truncation"
+#pragma GCC diagnostic ignored "-Woverflow"
 
 #define DISABLE_SLOW_TESTS
 

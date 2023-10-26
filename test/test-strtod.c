@@ -41,6 +41,12 @@
 #define FULL_TESTS
 #endif
 
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wunused-value"
+#pragma GCC diagnostic ignored "-Woverflow"
+#pragma GCC diagnostic ignored "-Wliteral-range"
+
 static const struct {
     char        *string;
     double      dvalue;
