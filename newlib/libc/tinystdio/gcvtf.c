@@ -35,9 +35,7 @@
 
 #define _XOPEN_SOURCE
 #define _XOPEN_SOURCE_EXTENDED
-#include <_ansi.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include "stdio_private.h"
 
 char *

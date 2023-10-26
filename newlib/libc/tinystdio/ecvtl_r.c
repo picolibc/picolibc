@@ -33,16 +33,19 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _NEED_IO_FLOAT
+#define _GNU_SOURCE
+#include <stdlib.h>
+
+#if __SIZEOF_LONG_DOUBLE__ > __SIZEOF_DOUBLE__
+
+#define _NEED_IO_LONG_DOUBLE
+
+#include <string.h>
 
 #include "dtoa.h"
 
-#include <_ansi.h>
-#include <stdlib.h>
-#include <string.h>
-
 int
-ecvtf_r (float invalue,
+ecvtl_r (long double invalue,
          int ndigit,
          int *decpt,
          int *sign,
@@ -50,6 +53,7 @@ ecvtf_r (float invalue,
          size_t len)
 {
     struct dtoa dtoa;
+    char *digits = dtoa.digits;
     int ngot;
 
     if (ndigit < 0)
@@ -58,11 +62,58 @@ ecvtf_r (float invalue,
     if ((size_t) ndigit > len - 1)
         return -1;
 
-    ngot = __ftoa_engine(invalue, &dtoa, ndigit, false, 0);
-    *sign = !!(dtoa.flags & DTOA_MINUS);
-    *decpt = dtoa.exp + 1;
+    if (!isfinite(invalue)) {
+        *sign = invalue < 0;
+        *decpt = 0;
+        if (isnan(invalue))
+            digits = "nan";
+        else
+            digits = "inf";
+        ngot = 3;
+        if (ndigit < ngot)
+            ngot = ndigit;
+        ndigit = ngot;
+    } else {
+#ifdef _NEED_IO_FLOAT_LARGE
+        ngot = __ldtoa_engine(invalue, &dtoa, ndigit, false, 0);
+#elif __SIZEOF_LONG_DOUBLE__ == 8
+        ngot = __dtoa_engine((FLOAT64) invalue, &dtoa, ndigit, false, 0);
+#elif __SIZEOF_LONG_DOUBLE__ == 4
+        ngot = __ftoa_engine((float) invalue, &dtoa, ndigit, false, 0);
+#endif
+        *sign = !!(dtoa.flags & DTOA_MINUS);
+        *decpt = dtoa.exp + 1;
+    }
     memset(buf, '0', ndigit);
-    memcpy(buf, dtoa.digits, ngot);
+    memcpy(buf, digits, ngot);
     buf[ndigit] = '\0';
     return 0;
 }
+
+#elif __SIZEOF_LONG_DOUBLE__ == 4
+
+int
+ecvtl_r (long double invalue,
+         int ndigit,
+         int *decpt,
+         int *sign,
+         char *buf,
+         size_t len)
+{
+    return ecvtf_r((float) invalue, ndigit, decpt, sign, buf, len);
+}
+
+#elif __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+
+int
+ecvtl_r (long double invalue,
+         int ndigit,
+         int *decpt,
+         int *sign,
+         char *buf,
+         size_t len)
+{
+    return ecvt_r((double) invalue, ndigit, decpt, sign, buf, len);
+}
+
+#endif

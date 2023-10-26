@@ -22,6 +22,14 @@
 //     depending on your compiler.
 //
 
+#include "stdio_private.h"
+
+#ifdef FLOAT64
+
+#define _NEED_IO_FLOAT64
+
+#include "dtoa.h"
+
 #include "ryu/ryu.h"
 
 #include <stdbool.h>
@@ -347,15 +355,11 @@ static inline bool d2d_small_int(const uint64_t ieeeMantissa, const uint32_t iee
 	return true;
 }
 
-typedef double FLOAT;
-
-#include "dtoa_engine.h"
-
 int
-__dtoa_engine(double x, struct dtoa *dtoa, int max_digits, bool fmode, int max_decimals)
+__dtoa_engine(FLOAT64 x, struct dtoa *dtoa, int max_digits, bool fmode, int max_decimals)
 {
 	// Step 1: Decode the floating-point number, and unify normalized and subnormal cases.
-	const uint64_t bits = double_to_bits(x);
+	const uint64_t bits = ryu64_to_bits(x);
 
 #ifdef RYU_DEBUG
 	printf("IN=");
@@ -377,7 +381,6 @@ __dtoa_engine(double x, struct dtoa *dtoa, int max_digits, bool fmode, int max_d
 	if (ieeeExponent == 0 && ieeeMantissa == 0) {
 		flags |= DTOA_ZERO;
 		dtoa->digits[0] = '0';
-		dtoa->digits[1] = '\0';
 		dtoa->flags = flags;
 		dtoa->exp = 0;
 		return 1;
@@ -422,9 +425,10 @@ __dtoa_engine(double x, struct dtoa *dtoa, int max_digits, bool fmode, int max_d
 		dtoa->digits[olength - i - 1] = (mant % 10) + '0';
 		mant /= 10;
 	}
-	dtoa->digits[olength] = '\0';
 
 	dtoa->exp = exp;
 	dtoa->flags = flags;
 	return olength;
 }
+
+#endif /* FLOAT64 */

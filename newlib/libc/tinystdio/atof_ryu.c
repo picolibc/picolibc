@@ -20,6 +20,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "stdio_private.h"
+
 #ifdef RYU_DEBUG
 #include <inttypes.h>
 #include <stdio.h>
@@ -69,9 +71,9 @@ float
 __atof_engine(uint32_t m10, int e10)
 {
 #ifdef RYU_DEBUG
-	printf("m10digits = %d\n", m10);
+	printf("m10digits = %ld\n", m10);
 	printf("e10digits = %d\n", e10);
-	printf("m10 * 10^e10 = %u * 10^%d\n", m10, e10);
+	printf("m10 * 10^e10 = %lu * 10^%d\n", m10, e10);
 #endif
 
 	// Convert to binary float m2 * 2^e2, while retaining information about whether the conversion
@@ -124,7 +126,7 @@ __atof_engine(uint32_t m10, int e10)
 	}
 
 #ifdef RYU_DEBUG
-	printf("m2 * 2^e2 = %u * 2^%d\n", m2, e2);
+	printf("m2 * 2^e2 = %lu * 2^%ld\n", m2, e2);
 #endif
 
 	// Compute the final IEEE exponent.
@@ -142,8 +144,8 @@ __atof_engine(uint32_t m10, int e10)
 	int32_t shift = (ieee_e2 == 0 ? 1 : ieee_e2) - e2 - FLOAT_EXPONENT_BIAS - FLOAT_MANTISSA_BITS;
 	assert(shift >= 0);
 #ifdef RYU_DEBUG
-	printf("ieee_e2 = %d\n", ieee_e2);
-	printf("shift = %d\n", shift);
+	printf("ieee_e2 = %ld\n", ieee_e2);
+	printf("shift = %ld\n", shift);
 #endif
 
 	// We need to round up if the exact value is more than 0.5 above the value we computed. That's
@@ -157,7 +159,7 @@ __atof_engine(uint32_t m10, int e10)
 
 #ifdef RYU_DEBUG
 	printf("roundUp = %d\n", roundUp);
-	printf("ieee_m2 = %u\n", (m2 >> shift) + roundUp);
+	printf("ieee_m2 = %lu\n", (m2 >> shift) + roundUp);
 #endif
 	uint32_t ieee_m2 = (m2 >> shift) + roundUp;
         assert(ieee_m2 <= (1u << (FLOAT_MANTISSA_BITS + 1)));

@@ -153,8 +153,26 @@ int	__f_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 
 int	__d_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
 int	__f_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
 
-double
+#if __SIZEOF_DOUBLE__ == 8
+#define FLOAT64 double
+#define _asdouble(x) _asfloat64(x)
+#elif __SIZEOF_LONG_DOUBLE__ == 8
+#define FLOAT64 long double
+#endif
+
+#if __SIZEOF_DOUBLE__ == 4
+#define FLOAT32 double
+#define _asdouble(x) ((double) _asfloat(x))
+#elif __SIZEOF_FLOAT__ == 4
+#define FLOAT32 float
+#elif __SIZEOF_LONG_DOUBLE__ == 4
+#define FLOAT32 long double
+#endif
+
+#ifdef FLOAT64
+FLOAT64
 __atod_engine(uint64_t m10, int e10);
+#endif
 
 float
 __atof_engine(uint32_t m10, int e10);
@@ -442,8 +460,9 @@ _u128_oflow(_u128 a)
 }
 #endif
 
+#if __SIZEOF_LONG_DOUBLE__ > 8
 static inline _u128
-asuint128(long double f)
+asuintld(long double f)
 {
     union {
         long double     f;
@@ -473,6 +492,55 @@ aslongdouble(_u128 i)
     v.i = i;
     return v.f;
 }
+#elif __SIZEOF_LONG_DOUBLE__ == 8
+static inline uint64_t
+asuintld(long double f)
+{
+    union {
+        long double     f;
+        uint64_t        i;
+    } v;
+
+    v.f = f;
+    return v.i;
+}
+
+static inline long double
+aslongdouble(uint64_t i)
+{
+    union {
+        long double     f;
+        uint64_t        i;
+    } v;
+
+    v.i = i;
+    return v.f;
+}
+#elif __SIZEOF_LONG_DOUBLE__ == 4
+static inline uint32_t
+asuintld(long double f)
+{
+    union {
+        long double     f;
+        uint32_t        i;
+    } v;
+
+    v.f = f;
+    return v.i;
+}
+
+static inline long double
+aslongdouble(uint32_t i)
+{
+    union {
+        long double     f;
+        uint32_t        i;
+    } v;
+
+    v.i = i;
+    return v.f;
+}
+#endif
 
 static inline bool
 _u128_gt(_u128 a, _u128 b)

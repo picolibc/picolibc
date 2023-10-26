@@ -30,11 +30,9 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#define _WANT_IO_FLOAT
+#define _NEED_IO_FLOAT
 
-typedef float FLOAT;
-
-#include "dtoa_engine.h"
+#include "dtoa.h"
 
 #if __GNUC__ == 12 && __GNUC_MINOR__ == 2 && __GNUC_PATCHLEVEL__ == 1 && __OPTIMIZE_SIZE__
 /*
@@ -51,11 +49,11 @@ __atof_engine(uint32_t u32, int exp)
     float flt = u32;
 
     while (exp < 0) {
-        flt *= 1e-1f;
+        flt *= (float) 1e-1f;
         exp++;
     }
     while (exp > 0) {
-        flt *= 1e1f;
+        flt *= (float) 1e1f;
         exp--;
     }
     return flt;

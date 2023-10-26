@@ -26,13 +26,13 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE. */
 
-#define _WANT_IO_DOUBLE
+#include "stdio_private.h"
 
-typedef double FLOAT;
+#ifdef FLOAT64
 
-#include "dtoa_engine.h"
-#include <math.h>
-#include "../../libm/common/math_config.h"
+#define _NEED_IO_FLOAT64
+
+#include "dtoa.h"
 
 #define max(a, b) ({\
 		__typeof(a) _a = a;\
@@ -44,11 +44,11 @@ typedef double FLOAT;
 		__typeof(b) _b = b;\
 		_a < _b ? _a : _b; })
 
-#define FRACTION_BITS   (__DBL_MANT_DIG__ - 1)
+#define FRACTION_BITS   (53 - 1)
 #define FRACTION_MASK   (((uint64_t) 1 << FRACTION_BITS) - 1)
-#define EXPONENT_BITS   (sizeof(double) * 8 - FRACTION_BITS - 1)
+#define EXPONENT_BITS   (64 - FRACTION_BITS - 1)
 #define EXPONENT_MASK   (((uint64_t) 1 << EXPONENT_BITS) - 1)
-#define SIGN_BIT        ((uint64_t) 1 << (sizeof(double) * 8 - 1))
+#define SIGN_BIT        ((uint64_t) 1 << (64 - 1))
 #define BIT64(x)        ((uint64_t) 1 << (x))
 
 /*
@@ -62,7 +62,7 @@ high_bit_set(uint64_t fract)
 }
 
 int
-__dtoa_engine(double x, struct dtoa *dtoa, int max_digits, bool fmode, int max_decimals)
+__dtoa_engine(FLOAT64 x, struct dtoa *dtoa, int max_digits, bool fmode, int max_decimals)
 {
         uint64_t v = asuint64(x);
         uint64_t fract = (v << (EXPONENT_BITS + 1)) >> 1;
@@ -94,7 +94,7 @@ __dtoa_engine(double x, struct dtoa *dtoa, int max_digits, bool fmode, int max_d
                 /* add implicit bit */
                 fract |= SIGN_BIT;
                 /* adjust exponent */
-                expo -= (__DBL_MAX_EXP__ - 2);
+                expo -= (DTOA_MAX_EXP - 2);
                 decexp = -1;
 
                 /*
@@ -217,8 +217,9 @@ __dtoa_engine(double x, struct dtoa *dtoa, int max_digits, bool fmode, int max_d
 		}
 	}
 done:
-	dtoa->digits[max_digits] = '\0';
 	dtoa->flags = flags;
 	dtoa->exp = decexp;
 	return max_digits;
 }
+
+#endif

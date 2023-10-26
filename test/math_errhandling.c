@@ -63,7 +63,7 @@ opt_barrier_double (double x)
   return y;
 }
 
-#ifdef _HAVE_LONG_DOUBLE
+#if __SIZEOF_LONG_DOUBLE__ > 0
 static ALWAYS_INLINE long double
 opt_barrier_long_double (long double x)
 {

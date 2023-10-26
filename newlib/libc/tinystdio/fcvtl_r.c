@@ -36,17 +36,16 @@
 #define _GNU_SOURCE
 #include <stdlib.h>
 
-#if __SIZEOF_DOUBLE__ == 8
+#if __SIZEOF_LONG_DOUBLE__ > __SIZEOF_DOUBLE__
 
-#define _NEED_IO_FLOAT64
+#define _NEED_IO_LONG_DOUBLE
 
 #include <string.h>
-#include <math.h>
 
 #include "dtoa.h"
 
 int
-fcvt_r (double invalue,
+fcvtl_r (long double invalue,
         int ndecimal,
         int *decpt,
         int *sign,
@@ -75,7 +74,13 @@ fcvt_r (double invalue,
          */
         if (ndecimal < 0)
             dtoa_decimal = 0;
-        ndigit = __dtoa_engine(invalue, &dtoa, DTOA_MAX_DIG, true, ndecimal);
+#ifdef _NEED_IO_FLOAT_LARGE
+        ndigit = __ldtoa_engine(invalue, &dtoa, LDTOA_MAX_DIG, true, ndecimal);
+#elif __SIZEOF_LONG_DOUBLE__ == 8
+        ndigit = __dtoa_engine((FLOAT64) invalue, &dtoa, DTOA_MAX_DIG, true, ndecimal);
+#elif __SIZEOF_LONG_DOUBLE__ == 4
+        ndigit = __ftoa_engine ((float) invalue, &dtoa, FTOA_MAX_DIG, true, ndecimal);
+#endif
         *sign = !!(dtoa.flags & DTOA_MINUS);
 
         /*
@@ -138,17 +143,30 @@ fcvt_r (double invalue,
     return 0;
 }
 
-#elif __SIZEOF_DOUBLE__ == 4
+#elif __SIZEOF_LONG_DOUBLE__ == 4
 
 int
-fcvt_r (double invalue,
-        int ndecimal,
-        int *decpt,
-        int *sign,
-        char *buf,
-        size_t len)
+fcvtl_r (long double invalue,
+         int ndecimal,
+         int *decpt,
+         int *sign,
+         char *buf,
+         size_t len)
 {
     return fcvtf_r((float) invalue, ndecimal, decpt, sign, buf, len);
+}
+
+#elif __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+
+int
+fcvtl_r (long double invalue,
+         int ndecimal,
+         int *decpt,
+         int *sign,
+         char *buf,
+         size_t len)
+{
+    return fcvt_r((double) invalue, ndecimal, decpt, sign, buf, len);
 }
 
 #endif

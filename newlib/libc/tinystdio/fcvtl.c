@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2022 Keith Packard
+ * Copyright © 2020 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,36 +33,50 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _NEED_IO_FLOAT
+#define _GNU_SOURCE
+#include <stdlib.h>
+
+#if __SIZEOF_LONG_DOUBLE__ > __SIZEOF_DOUBLE__
+
+#define _NEED_IO_LONG_DOUBLE
 
 #include "dtoa.h"
 
-#include <_ansi.h>
-#include <stdlib.h>
-#include <string.h>
+#define FCVTL_MAXDIG (__LDBL_MAX_10_EXP__ + LONG_FLOAT_MAX_DIG + 1)
 
-int
-ecvtf_r (float invalue,
-         int ndigit,
-         int *decpt,
-         int *sign,
-         char *buf,
-         size_t len)
+static NEWLIB_THREAD_LOCAL char fcvt_buf[FCVTL_MAXDIG];
+
+char *
+fcvtl (long double invalue,
+       int ndigit,
+       int *decpt,
+       int *sign)
 {
-    struct dtoa dtoa;
-    int ngot;
-
-    if (ndigit < 0)
-        ndigit = 0;
-
-    if ((size_t) ndigit > len - 1)
-        return -1;
-
-    ngot = __ftoa_engine(invalue, &dtoa, ndigit, false, 0);
-    *sign = !!(dtoa.flags & DTOA_MINUS);
-    *decpt = dtoa.exp + 1;
-    memset(buf, '0', ndigit);
-    memcpy(buf, dtoa.digits, ngot);
-    buf[ndigit] = '\0';
-    return 0;
+    if (fcvtl_r(invalue, ndigit, decpt, sign, fcvt_buf, sizeof(fcvt_buf)) < 0)
+        return NULL;
+    return fcvt_buf;
 }
+
+#elif __SIZEOF_LONG_DOUBLE__ == 4
+
+char *
+fcvtl (long double invalue,
+       int ndecimal,
+       int *decpt,
+       int *sign)
+{
+    return fcvtf((float) invalue, ndecimal, decpt, sign);
+}
+
+#elif __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+
+char *
+fcvtl (long double invalue,
+       int ndecimal,
+       int *decpt,
+       int *sign)
+{
+    return fcvt((double) invalue, ndecimal, decpt, sign);
+}
+
+#endif

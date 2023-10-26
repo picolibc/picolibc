@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2022 Keith Packard
+ * Copyright © 2020 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,36 +33,50 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _NEED_IO_FLOAT
+#define _GNU_SOURCE
+#include <stdlib.h>
+
+#if __SIZEOF_LONG_DOUBLE__ >8
+
+#define _NEED_IO_LONG_DOUBLE
 
 #include "dtoa.h"
 
-#include <_ansi.h>
-#include <stdlib.h>
-#include <string.h>
+static NEWLIB_THREAD_LOCAL char ecvt_buf[LDTOA_MAX_DIG + 1];
 
-int
-ecvtf_r (float invalue,
-         int ndigit,
-         int *decpt,
-         int *sign,
-         char *buf,
-         size_t len)
+char *
+ecvtl (long double invalue,
+       int ndigit,
+       int *decpt,
+       int *sign)
 {
-    struct dtoa dtoa;
-    int ngot;
-
-    if (ndigit < 0)
-        ndigit = 0;
-
-    if ((size_t) ndigit > len - 1)
-        return -1;
-
-    ngot = __ftoa_engine(invalue, &dtoa, ndigit, false, 0);
-    *sign = !!(dtoa.flags & DTOA_MINUS);
-    *decpt = dtoa.exp + 1;
-    memset(buf, '0', ndigit);
-    memcpy(buf, dtoa.digits, ngot);
-    buf[ndigit] = '\0';
-    return 0;
+    if (ecvtl_r(invalue, ndigit, decpt, sign, ecvt_buf, sizeof(ecvt_buf)) < 0)
+        return NULL;
+    return ecvt_buf;
 }
+
+
+#elif __SIZEOF_LONG_DOUBLE__ == 4
+
+char *
+ecvtl (long double invalue,
+       int ndigit,
+       int *decpt,
+       int *sign)
+{
+    return ecvtf((float) invalue, ndigit, decpt, sign);
+}
+
+#elif __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+
+char *
+ecvtl (long double invalue,
+       int ndigit,
+       int *decpt,
+       int *sign)
+{
+    return ecvt((double) invalue, ndigit, decpt, sign);
+}
+
+#endif
+

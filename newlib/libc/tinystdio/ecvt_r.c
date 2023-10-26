@@ -34,14 +34,16 @@
  */
 
 #define _GNU_SOURCE
-#include <_ansi.h>
 #include <stdlib.h>
+
+#if __SIZEOF_DOUBLE__ == 8
+
+#define _NEED_IO_FLOAT64
+
 #include <string.h>
 #include <math.h>
 
-typedef double FLOAT;
-
-#include "dtoa_engine.h"
+#include "dtoa.h"
 
 int
 ecvt_r (double invalue,
@@ -82,3 +84,16 @@ ecvt_r (double invalue,
     buf[ndigit] = '\0';
     return 0;
 }
+
+#elif __SIZEOF_DOUBLE__ == 4
+int
+ecvt_r (double invalue,
+        int ndigit,
+        int *decpt,
+        int *sign,
+        char *buf,
+        size_t len)
+{
+    return ecvtf_r(invalue, ndigit, decpt, sign, buf, len);
+}
+#endif

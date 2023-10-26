@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2022 Keith Packard
+ * Copyright © 2020 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,36 +33,16 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _NEED_IO_FLOAT
-
-#include "dtoa.h"
-
-#include <_ansi.h>
+#define _XOPEN_SOURCE
+#define _XOPEN_SOURCE_EXTENDED
 #include <stdlib.h>
-#include <string.h>
+#include "stdio_private.h"
 
-int
-ecvtf_r (float invalue,
-         int ndigit,
-         int *decpt,
-         int *sign,
-         char *buf,
-         size_t len)
+char *
+gcvtl (long double invalue,
+       int ndigit,
+       char *buf)
 {
-    struct dtoa dtoa;
-    int ngot;
-
-    if (ndigit < 0)
-        ndigit = 0;
-
-    if ((size_t) ndigit > len - 1)
-        return -1;
-
-    ngot = __ftoa_engine(invalue, &dtoa, ndigit, false, 0);
-    *sign = !!(dtoa.flags & DTOA_MINUS);
-    *decpt = dtoa.exp + 1;
-    memset(buf, '0', ndigit);
-    memcpy(buf, dtoa.digits, ngot);
-    buf[ndigit] = '\0';
-    return 0;
+	__d_sprintf(buf, "%.*Lg", ndigit, invalue);
+	return buf;
 }

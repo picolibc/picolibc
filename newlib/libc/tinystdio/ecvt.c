@@ -34,13 +34,13 @@
  */
 
 #define _GNU_SOURCE
-#include <_ansi.h>
 #include <stdlib.h>
-#include <string.h>
 
-typedef double FLOAT;
+#if __SIZEOF_DOUBLE__ == 8
 
-#include "dtoa_engine.h"
+#define _NEED_IO_DOUBLE
+
+#include "dtoa.h"
 
 static NEWLIB_THREAD_LOCAL char ecvt_buf[DTOA_MAX_DIG + 1];
 
@@ -54,3 +54,16 @@ ecvt (double invalue,
         return NULL;
     return ecvt_buf;
 }
+
+
+#elif __SIZEOF_DOUBLE__ == 4
+char *
+ecvt (double invalue,
+      int ndigit,
+      int *decpt,
+      int *sign)
+{
+    return ecvtf((float) invalue, ndigit, decpt, sign);
+}
+
+#endif

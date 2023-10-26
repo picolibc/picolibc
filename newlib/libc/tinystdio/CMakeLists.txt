@@ -37,17 +37,20 @@ picolibc_sources(
   bufio.c
   clearerr.c
   compare_exchange.c
+  dtox_engine.c
   ecvt_r.c
   ecvt.c
   ecvtf_r.c
   ecvtf.c
+  ecvtl_r.c
+  ecvtl.c
   exchange.c
   fcvt.c
   fcvt_r.c
   fcvtf.c
   fcvtf_r.c
-  gcvt.c
-  gcvtf.c
+  fcvtl.c
+  fcvtl_r.c
   fclose.c
   fdevopen.c
   feof.c
@@ -75,15 +78,21 @@ picolibc_sources(
   fseeko.c
   ftell.c
   ftello.c
+  ftox_engine.c
   fwide.c
   fwrite.c
   fwprintf.c
   fwscanf.c
+  gcvt.c
+  gcvtf.c
+  gcvtl.c
   getchar.c
   getdelim.c
   getline.c
   gets.c
   getwchar.c
+  ldtoa_engine.c
+  ldtox_engine.c
   matchcaseprefix.c
   mktemp.c
   perror.c
