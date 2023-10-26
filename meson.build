@@ -287,8 +287,10 @@ endif
 tinystdio = get_option('tinystdio')
 
 has_link_defsym = meson.get_cross_property('has_link_defsym',
-                                           cc.has_link_argument('-Wl,--defsym=' + global_prefix + '_start=0') or
-                                           cc.has_link_argument('-Wl,--defsym=' + global_prefix + '__start=0') )
+                                           cc.has_link_argument('-Wl,--defsym=' + 'start=0') or
+                                           cc.has_link_argument('-Wl,--defsym=' + '_start=0') or
+                                           cc.has_link_argument('-Wl,--defsym=' + '__start=0') or
+                                           cc.has_link_argument('-Wl,--defsym=' + '___start=0') )
 has_link_alias = meson.get_cross_property('has_link_alias', cc.has_link_argument('-Wl,-alias,' + global_prefix + 'main,testalias'))
 lib_gcc = meson.get_cross_property('libgcc', '-lgcc')
 
@@ -611,16 +613,16 @@ endif
 
 specs_printf = ''
 if tinystdio and printf_aliases
-  specs_printf=('%{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfprintf=__d_vfprintf}' +
-		' %{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfscanf=__d_vfscanf}' +
-                ' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfprintf=__f_vfprintf}' +
-		' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfscanf=__f_vfscanf}' +
-		' %{DPICOLIBC_LONG_LONG_PRINTF_SCANF:--defsym=vfprintf=__l_vfprintf}' +
-		' %{DPICOLIBC_LONG_LONG_PRINTF_SCANF:--defsym=vfscanf=__l_vfscanf}' +
-		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfprintf=__i_vfprintf}' +
-		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfscanf=__i_vfscanf}' +
-		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=vfprintf=__m_vfprintf}' +
-		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=vfscanf=__m_vfscanf}')
+  specs_printf=('%{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfprintf=' + __d_vfprintf_symbol + '}' +
+		' %{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfscanf=' + __d_vfscanf_symbol + '}' +
+                ' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfprintf=' + __f_vfprintf_symbol + '}' +
+		' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfscanf=' + __f_vfscanf_symbol + '}' +
+		' %{DPICOLIBC_LONG_LONG_PRINTF_SCANF:--defsym=vfprintf=' + __l_vfprintf_symbol + '}' +
+		' %{DPICOLIBC_LONG_LONG_PRINTF_SCANF:--defsym=vfscanf=' + __l_vfscanf_symbol + '}' +
+		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfprintf=' + __i_vfprintf_symbol + '}' +
+		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfscanf=' + __i_vfscanf_symbol + '}' +
+		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=vfprintf=' + __m_vfprintf_symbol + '}' +
+		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=vfscanf=' + __m_vfscanf_symbol + '}')
 endif
 
 crt0_expr = '%{-crt0=*:crt0-%*%O%s; :crt0%O%s}'
@@ -1146,6 +1148,7 @@ foreach target : ['default-target'] + targets
     picolibc_ld_data.set('CPP_END', '*/')
     picolibc_ld_data.set('C_START', '')
     picolibc_ld_data.set('C_END', '')
+    picolibc_ld_data.set('PREFIX', global_prefix)
 
     if target == 'default-target'
       picolibc_ld_file = 'picolibc.ld'
@@ -1182,6 +1185,7 @@ foreach target : ['default-target'] + targets
     picolibcpp_ld_data.set('CPP_END', '')
     picolibcpp_ld_data.set('C_START', '/*')
     picolibcpp_ld_data.set('C_END', '*/')
+    picolibcpp_ld_data.set('PREFIX', global_prefix)
 
     if not is_variable(picolibcpp_ld_config_variable)
       set_variable(picolibcpp_ld_config_variable,

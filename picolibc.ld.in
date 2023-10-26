@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-ENTRY(_start)
+ENTRY(@PREFIX@_start)
 
 /*
  * These values should be provided by the application. We'll include
@@ -43,11 +43,11 @@ ENTRY(_start)
 MEMORY
 {@INIT_MEMORY@
 	flash (rx!w) :
-		ORIGIN = DEFINED(__flash) ? __flash : @DEFAULT_FLASH_ADDR@,
-		LENGTH = DEFINED(__flash_size) ? __flash_size : @DEFAULT_FLASH_SIZE@
+		ORIGIN = DEFINED(@PREFIX@__flash) ? @PREFIX@__flash : @DEFAULT_FLASH_ADDR@,
+		LENGTH = DEFINED(@PREFIX@__flash_size) ? @PREFIX@__flash_size : @DEFAULT_FLASH_SIZE@
 	ram (w!rx) :
-		ORIGIN = DEFINED(__ram) ? __ram : @DEFAULT_RAM_ADDR@,
-		LENGTH = DEFINED(__ram_size) ? __ram_size : @DEFAULT_RAM_SIZE@
+		ORIGIN = DEFINED(@PREFIX@__ram) ? @PREFIX@__ram : @DEFAULT_RAM_ADDR@,
+		LENGTH = DEFINED(@PREFIX@__ram_size) ? @PREFIX@__ram_size : @DEFAULT_RAM_SIZE@
 }
 
 PHDRS
@@ -60,7 +60,7 @@ PHDRS
 
 SECTIONS
 {
-	PROVIDE(__stack = ORIGIN(ram) + LENGTH(ram));
+	PROVIDE(@PREFIX@__stack = ORIGIN(ram) + LENGTH(ram));
 @INIT_SECTIONS@
 	.text : {
 
@@ -70,11 +70,11 @@ SECTIONS
 		*(.text .text.* .opd .opd.*)
 		*(.gnu.linkonce.t.*)
 		KEEP (*(.fini .fini.*))
-		__text_end = .;
+		@PREFIX@__text_end = .;
 
-		PROVIDE (__etext = __text_end);
-		PROVIDE (_etext = __text_end);
-		PROVIDE (etext = __text_end);
+		PROVIDE (@PREFIX@__etext = @PREFIX@__text_end);
+		PROVIDE (@PREFIX@_etext = @PREFIX@__text_end);
+		PROVIDE (@PREFIX@etext = @PREFIX@__text_end);
 	} >flash AT>flash :text
 
 	.rodata : {
@@ -97,19 +97,19 @@ SECTIONS
 		. = ALIGN(@DEFAULT_ALIGNMENT@);
 
 		/* lists of constructors and destructors */
-		PROVIDE_HIDDEN ( __preinit_array_start = . );
+		PROVIDE_HIDDEN ( @PREFIX@__preinit_array_start = . );
 		KEEP (*(.preinit_array))
-		PROVIDE_HIDDEN ( __preinit_array_end = . );
+		PROVIDE_HIDDEN ( @PREFIX@__preinit_array_end = . );
 
-		PROVIDE_HIDDEN ( __init_array_start = . );
+		PROVIDE_HIDDEN ( @PREFIX@__init_array_start = . );
 		KEEP (*(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*)))
 		KEEP (*(.init_array .ctors))
-		PROVIDE_HIDDEN ( __init_array_end = . );
+		PROVIDE_HIDDEN ( @PREFIX@__init_array_end = . );
 
-		PROVIDE_HIDDEN ( __fini_array_start = . );
+		PROVIDE_HIDDEN ( @PREFIX@__fini_array_start = . );
 		KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
 		KEEP (*(.fini_array .dtors))
-		PROVIDE_HIDDEN ( __fini_array_end = . );
+		PROVIDE_HIDDEN ( @PREFIX@__fini_array_end = . );
 
 	} >flash AT>flash :text
 
@@ -134,22 +134,22 @@ SECTIONS
 		*(.ARM.extab* .gnu.linkonce.armextab.*)
 	} >flash AT>flash :text
 	.eh_frame_hdr : {
-		PROVIDE_HIDDEN ( __eh_frame_hdr_start = . );
+		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_hdr_start = . );
 		*(.eh_frame_hdr) *(.eh_frame_entry .eh_frame_entry.*)
-		PROVIDE_HIDDEN ( __eh_frame_hdr_end = . );
+		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_hdr_end = . );
 	} >flash AT>flash :text
 	.eh_frame : {
-		PROVIDE_HIDDEN ( __eh_frame_start = . );
+		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_start = . );
 		KEEP (*(.eh_frame .eh_frame.*))
-		PROVIDE_HIDDEN ( __eh_frame_end = . );
+		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_end = . );
 	} >flash AT>flash :text
 
 	.except_unordered : {
 		. = ALIGN(@DEFAULT_ALIGNMENT@);
 
-		PROVIDE(__exidx_start = .);
+		PROVIDE(@PREFIX@__exidx_start = .);
 		*(.ARM.exidx*)
-		PROVIDE(__exidx_end = .);
+		PROVIDE(@PREFIX@__exidx_end = .);
 	} >flash AT>flash :text
 	@CPP_END@
 
@@ -157,10 +157,10 @@ SECTIONS
 	 * Data values which are preserved across reset
 	 */
 	.preserve (NOLOAD) : {
-		PROVIDE(__preserve_start__ = .);
+		PROVIDE(@PREFIX@__preserve_start__ = .);
 		KEEP(*(SORT_BY_NAME(.preserve.*)))
 		KEEP(*(.preserve))
-		PROVIDE(__preserve_end__ = .);
+		PROVIDE(@PREFIX@__preserve_end__ = .);
 	} >ram AT>ram :ram
 
 	.data : @BFD_START@ ALIGN_WITH_INPUT @BFD_END@ {
@@ -170,13 +170,13 @@ SECTIONS
 		/* Need to pre-align so that the symbols come after padding */
 		. = ALIGN(@DEFAULT_ALIGNMENT@);
 
-		PROVIDE( __global_pointer$ = . + 0x800 );
-		PROVIDE( _gp = . + 0x8000);
+		PROVIDE( @PREFIX@__global_pointer$ = . + 0x800 );
+		PROVIDE( @PREFIX@_gp = . + 0x8000);
 		*(.sdata .sdata.* .sdata2.*)
 		*(.gnu.linkonce.s.*)
 	} >ram AT>flash :ram_init
-	PROVIDE(__data_start = ADDR(.data));
-	PROVIDE(__data_source = LOADADDR(.data));
+	PROVIDE(@PREFIX@__data_start = ADDR(.data));
+	PROVIDE(@PREFIX@__data_source = LOADADDR(.data));
 
 	/* Thread local initialized data. This gets
 	 * space allocated as it is expected to be placed
@@ -190,39 +190,39 @@ SECTIONS
 	 * as it only guarantees usage as a TLS template works
 	 * rather than supporting this use case.
 	 */
-	.tdata : @LLD_START@ ALIGN(__tls_align) @LLD_END@ @BFD_START@ ALIGN_WITH_INPUT @BFD_END@ {
+	.tdata : @LLD_START@ ALIGN(@PREFIX@__tls_align) @LLD_END@ @BFD_START@ ALIGN_WITH_INPUT @BFD_END@ {
 		*(.tdata .tdata.* .gnu.linkonce.td.*)
-		PROVIDE(__data_end = .);
-		PROVIDE(__tdata_end = .);
+		PROVIDE(@PREFIX@__data_end = .);
+		PROVIDE(@PREFIX@__tdata_end = .);
 	} >ram AT>flash :tls :ram_init
-	PROVIDE( __tls_base = ADDR(.tdata));
-	PROVIDE( __tdata_start = ADDR(.tdata));
-	PROVIDE( __tdata_source = LOADADDR(.tdata) );
-	PROVIDE( __tdata_source_end = LOADADDR(.tdata) + SIZEOF(.tdata) );
-	PROVIDE( __data_source_end = __tdata_source_end );
-	PROVIDE( __tdata_size = SIZEOF(.tdata) );
+	PROVIDE( @PREFIX@__tls_base = ADDR(.tdata));
+	PROVIDE( @PREFIX@__tdata_start = ADDR(.tdata));
+	PROVIDE( @PREFIX@__tdata_source = LOADADDR(.tdata) );
+	PROVIDE( @PREFIX@__tdata_source_end = LOADADDR(.tdata) + SIZEOF(.tdata) );
+	PROVIDE( @PREFIX@__data_source_end = @PREFIX@__tdata_source_end );
+	PROVIDE( @PREFIX@__tdata_size = SIZEOF(.tdata) );
 
-	PROVIDE( __edata = __data_end );
-	PROVIDE( _edata = __data_end );
-	PROVIDE( edata = __data_end );
-	PROVIDE( __data_size = __data_end - __data_start );
-	PROVIDE( __data_source_size = __data_source_end - __data_source );
+	PROVIDE( @PREFIX@__edata = @PREFIX@__data_end );
+	PROVIDE( @PREFIX@_edata = @PREFIX@__data_end );
+	PROVIDE( @PREFIX@edata = @PREFIX@__data_end );
+	PROVIDE( @PREFIX@__data_size = @PREFIX@__data_end - @PREFIX@__data_start );
+	PROVIDE( @PREFIX@__data_source_size = @PREFIX@__data_source_end - @PREFIX@__data_source );
 
 	.tbss (NOLOAD) : {
 		*(.tbss .tbss.* .gnu.linkonce.tb.*)
 		*(.tcommon)
-		PROVIDE( __tls_end = . );
-		PROVIDE( __tbss_end = . );
+		PROVIDE( @PREFIX@__tls_end = . );
+		PROVIDE( @PREFIX@__tbss_end = . );
 	} >ram AT>ram :tls :ram
-	PROVIDE( __bss_start = ADDR(.tbss));
-	PROVIDE( __tbss_start = ADDR(.tbss));
-	PROVIDE( __tbss_offset = ADDR(.tbss) - ADDR(.tdata) );
-	PROVIDE( __tbss_size = SIZEOF(.tbss) );
-	PROVIDE( __tls_size = __tls_end - __tls_base );
-	PROVIDE( __tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
-	PROVIDE( __tls_size_align = (__tls_size + __tls_align - 1) & ~(__tls_align - 1));
-	PROVIDE( __arm32_tls_tcb_offset = MAX(8, __tls_align) );
-	PROVIDE( __arm64_tls_tcb_offset = MAX(16, __tls_align) );
+	PROVIDE( @PREFIX@__bss_start = ADDR(.tbss));
+	PROVIDE( @PREFIX@__tbss_start = ADDR(.tbss));
+	PROVIDE( @PREFIX@__tbss_offset = ADDR(.tbss) - ADDR(.tdata) );
+	PROVIDE( @PREFIX@__tbss_size = SIZEOF(.tbss) );
+	PROVIDE( @PREFIX@__tls_size = @PREFIX@__tls_end - @PREFIX@__tls_base );
+	PROVIDE( @PREFIX@__tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
+	PROVIDE( @PREFIX@__tls_size_align = (@PREFIX@__tls_size + @PREFIX@__tls_align - 1) & ~(@PREFIX@__tls_align - 1));
+	PROVIDE( @PREFIX@__arm32_tls_tcb_offset = MAX(8, @PREFIX@__tls_align) );
+	PROVIDE( @PREFIX@__arm64_tls_tcb_offset = MAX(16, @PREFIX@__tls_align) );
 
 	/*
 	 * Unlike ld.lld, ld.bfd does not advance the location counter for
@@ -245,27 +245,27 @@ SECTIONS
 
 		/* Align the heap */
 		. = ALIGN(@DEFAULT_ALIGNMENT@);
-		__bss_end = .;
+		@PREFIX@__bss_end = .;
 	} >ram AT>ram :ram
-	PROVIDE( __non_tls_bss_start = ADDR(.bss) );
-	PROVIDE( __end = __bss_end );
-	_end = __bss_end;
-	PROVIDE( end = __bss_end );
-	PROVIDE( __bss_size = __bss_end - __bss_start );
+	PROVIDE( @PREFIX@__non_tls_bss_start = ADDR(.bss) );
+	PROVIDE( @PREFIX@__end = @PREFIX@__bss_end );
+	@PREFIX@_end = @PREFIX@__bss_end;
+	PROVIDE( @PREFIX@end = @PREFIX@__bss_end );
+	PROVIDE( @PREFIX@__bss_size = @PREFIX@__bss_end - @PREFIX@__bss_start );
 
 	/* Make the rest of memory available for heap storage */
-	PROVIDE (__heap_start = __end);
-	PROVIDE (__heap_end = __stack - (DEFINED(__stack_size) ? __stack_size : @DEFAULT_STACK_SIZE@));
-	PROVIDE (__heap_size = __heap_end - __heap_start);
+	PROVIDE (@PREFIX@__heap_start = @PREFIX@__end);
+	PROVIDE (@PREFIX@__heap_end = @PREFIX@__stack - (DEFINED(@PREFIX@__stack_size) ? @PREFIX@__stack_size : @DEFAULT_STACK_SIZE@));
+	PROVIDE (@PREFIX@__heap_size = @PREFIX@__heap_end - @PREFIX@__heap_start);
 
         /* Allow a minimum heap size to be specified */
         .heap (NOLOAD) : {
-                . += (DEFINED(__heap_size_min) ? __heap_size_min : 0);
+                . += (DEFINED(@PREFIX@__heap_size_min) ? @PREFIX@__heap_size_min : 0);
         } >ram :ram
 
 	/* Define a stack region to make sure it fits in memory */
 	.stack (NOLOAD) : {
-		. += (DEFINED(__stack_size) ? __stack_size : @DEFAULT_STACK_SIZE@);
+		. += (DEFINED(@PREFIX@__stack_size) ? @PREFIX@__stack_size : @DEFAULT_STACK_SIZE@);
 	} >ram :ram
 
 	/* Throw away C++ exception handling information */
@@ -333,5 +333,5 @@ SECTIONS
  * Check that sections that are copied from flash to RAM have matching
  * padding, so that a single memcpy() of __data_size copies the correct bytes.
  */
-ASSERT( __data_size == __data_source_size,
+ASSERT( @PREFIX@__data_size == @PREFIX@__data_source_size,
 	"ERROR: .data/.tdata flash size does not match RAM size");
