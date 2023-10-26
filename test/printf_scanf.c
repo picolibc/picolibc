@@ -351,7 +351,11 @@ main(void)
 #define float_type double
 #define scanf_format "%lf"
 #if defined(TINY_STDIO) && !defined(_IO_FLOAT_EXACT)
-#define ERROR_MAX 1e-14
+# if __SIZEOF_DOUBLE__ == 4
+#  define ERROR_MAX 1e-6
+# else
+#  define ERROR_MAX 1e-14
+# endif
 #else
 #if (!defined(TINY_STDIO) && defined(_WANT_IO_LONG_DOUBLE))
 /* __ldtoa is really broken */

@@ -59,8 +59,12 @@ int test_strtod(void)
 		TEST(d2, strtod(buf, 0), d, "round trip fail %a != %a (%a)");
 	}
 
+#if defined(__PICOLIBC__) && !defined(TINY_STDIO) && __SIZEOF_DOUBLE__ != 8
+        /* skip strtod tests for legacy stdio on systems with atypical doubles */
+#else
 	TEST(d, strtod("0x1p4", 0), 16.0, "hex float %a != %a");
 	TEST(d, strtod("0x1.1p4", 0), 17.0, "hex float %a != %a");
+#endif
 
 	return err;
 }

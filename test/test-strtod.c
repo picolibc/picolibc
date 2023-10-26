@@ -58,7 +58,8 @@ static const struct {
     { "0x1.000002p0@", 0x1.000002p0, 0x1.000002p0f, 0x1.000002p0l },
     { "0x1.000003p0@", 0x1.000003p0, 0x1.000004p0f, 0x1.000003p0l },
     { "0x1.000001p0@", 0x1.000001p0, 0x1.000000p0f, 0x1.000001p0l },
-    { "0x1.000001000000001p0@", 0x1.000001p0, 0x1.000002p0f, 0x1.000001000000001p0l },
+    { "0x1.000001000000001p0@", 0x1.000001000000001p0, 0x1.000002p0f, 0x1.000001000000001p0l },
+#if __SIZEOF_DOUBLE__ == 8
     /* Check round-to-even for doubles */
     { "0x100000000000008p0@", 0x1p56, 0x1p56f, 0x1.00000000000008p56l },
     { "0x100000000000008.p0@", 0x1p56, 0x1p56f, 0x1.00000000000008p56l },
@@ -67,16 +68,19 @@ static const struct {
     { "0x10000000000000801p0@", 0x1.0000000000001p64, 0x1p64f, 0x1.0000000000000801p64l },
     { "0x10000000000000800.0000000000001p0@", 0x1.0000000000001p64, 0x1p64f, 0x1.00000000000008p64l },
     { "0x10000000000001800p0@", 0x1.0000000000002p64, 0x1p64f, 0x1.00000000000018p64l },
+#endif
     /* Check max values for floats */
     { "0x1.fffffep126@", 0x1.fffffep126,  0x1.fffffep126f, 0x1.fffffep126l },
     { "0x1.ffffffp126@", 0x1.ffffffp126,  0x1.000000p127f, 0x1.ffffffp126l },
     { "0x1.fffffep127@", 0x1.fffffep127,  0x1.fffffep127f, 0x1.fffffep127l },
     { "0x1.ffffffp127@", 0x1.ffffffp127, (float) INFINITY, 0x1.ffffffp127l },   /* rounds up to INFINITY for float */
+#if __SIZEOF_DOUBLE__ == 8
     /* Check max values for doubles */
     { "0x1.fffffffffffffp1022@",  0x1.fffffffffffffp1022, (float) INFINITY, 0x1.fffffffffffffp1022l },
     { "0x1.fffffffffffff8p1022@", 0x1.0000000000000p1023, (float) INFINITY, 0x1.fffffffffffff8p1022l }, /* rounds up for double */
     { "0x1.fffffffffffffp1023@",  0x1.fffffffffffffp1023, (float) INFINITY, 0x1.fffffffffffffp1023l },
-#ifdef _TEST_LONG_DOUBLE
+#endif
+#if defined(_TEST_LONG_DOUBLE) && __SIZEOF_LONG_DOUBLE__ > 8
 #if __LDBL_MANT_DIG__ > __DBL_MANT_DIG__
     { "0x1.fffffffffffff8p1023@",      (double) INFINITY, (float) INFINITY, 0x1.fffffffffffff8p1023l }, /* rounds up to INFINITY for double */
 #else

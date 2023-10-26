@@ -190,6 +190,10 @@ typedef const struct {
 #undef TEST_IO_LONG_DOUBLE
 #endif
 
+#if defined(__PICOLIBC__) && !defined(TINY_STDIO) && __LDBL_MANT_DIG__ != 64
+#undef TEST_IO_LONG_DOUBLE
+#endif
+
 #ifdef TEST_IO_LONG_DOUBLE
 static long double vals[] = {
     1.0L,

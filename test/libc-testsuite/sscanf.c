@@ -44,6 +44,10 @@ TEST(t, d, (double)x, "%g != %g") )
 #pragma GCC diagnostic ignored "-Wliteral-range"
 #pragma GCC diagnostic ignored "-Wformat-extra-args"
 
+#if defined(__PICOLIBC__) && !defined(TINY_STDIO) && __SIZEOF_DOUBLE__ != 8
+#define NO_FLOATING_POINT
+#endif
+
 int test_sscanf(void)
 {
 	int i;

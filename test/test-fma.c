@@ -60,6 +60,21 @@ static int roundings[] = {
 #endif
 };
 
+static int rounding_map[] = {
+#ifdef FE_TONEAREST
+    0,
+#endif
+#ifdef FE_UPWARD
+    1,
+#endif
+#ifdef FE_DOWNWARD
+    2,
+#endif
+#ifdef FE_TOWARDZERO
+    3,
+#endif
+};
+
 static const char *rounding_names[] = {
 #ifdef FE_TONEAREST
     "FE_TONEAREST",
@@ -163,7 +178,7 @@ test_fmaf(void)
             float y = fmaf_vec[t].y;
             float z = fmaf_vec[t].z;
             volatile float r = fmaf(x, y, z);
-            float s = fmaf_vec[t].r[ro];
+            float s = fmaf_vec[t].r[rounding_map[ro]];
             if (!equalf(r, s)) {
                 strfromf(xs, sizeof(xs), "%a", x);
                 strfromf(ys, sizeof(xs), "%a", y);
@@ -227,7 +242,7 @@ test_fma(void)
             double y = fma_vec[t].y;
             double z = fma_vec[t].z;
             volatile double r = fma(x, y, z);
-            double s = fma_vec[t].r[ro];
+            double s = fma_vec[t].r[rounding_map[ro]];
             if (!equal(r, s)) {
                 printf("%u: round %s %a * %a + %a -> got %a want %a\n",
                        t, rounding_names[ro],
@@ -288,7 +303,7 @@ test_fmal(void)
             long double y = fmal_vec[t].y;
             long double z = fmal_vec[t].z;
             long double r = fmal(x, y, z);
-            long double s = fmal_vec[t].r[ro];
+            long double s = fmal_vec[t].r[rounding_map[ro]];
             if (!equall(r, s)) {
                 printf("%u: round %s %La * %La + %La -> got %La want %La\n",
                        t, rounding_names[ro],
