@@ -15,6 +15,8 @@ is preserved.
  * chooses to use it instead of the C99 macro.
  */
 
+#define _ADD_D_TO_DOUBLE_FUNCS
+
 #include "fdlibm.h"
 #include <ieeefp.h>
 
@@ -32,3 +34,7 @@ isinff (float x)
 #undef isinf
 
 _MATH_ALIAS_i_f(isinf)
+#ifdef _DOUBLE_IS_32BITS
+#define isinfd __isinfd
+_MATH_ALIAS_i_d_to_f(isinf)
+#endif

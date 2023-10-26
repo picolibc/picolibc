@@ -77,7 +77,7 @@ double
       lo = r * InvLn2lo + fma (r, InvLn2hi, -hi);
 #else
       double_t rhi, rlo;
-      rhi = asdouble (asuint64 (r) & -1ULL << 32);
+      rhi = asfloat64 (asuint64 (r) & -1ULL << 32);
       rlo = r - rhi;
       hi = rhi * InvLn2hi;
       lo = rlo * InvLn2hi + r * InvLn2lo;
@@ -118,7 +118,7 @@ double
   iz = ix - (tmp & 0xfffULL << 52);
   invc = T[i].invc;
   logc = T[i].logc;
-  z = asdouble (iz);
+  z = asfloat64 (iz);
   kd = (double_t) k;
 
   /* log2(x) = log2(z/c) + log2(c) + k.  */
@@ -132,7 +132,7 @@ double
   double_t rhi, rlo;
   /* rounding error: 0x1p-55/N + 0x1p-65.  */
   r = (z - T2[i].chi - T2[i].clo) * invc;
-  rhi = asdouble (asuint64 (r) & -1ULL << 32);
+  rhi = asfloat64 (asuint64 (r) & -1ULL << 32);
   rlo = r - rhi;
   t1 = rhi * InvLn2hi;
   t2 = rlo * InvLn2hi + r * InvLn2lo;

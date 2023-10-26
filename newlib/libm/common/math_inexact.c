@@ -35,20 +35,20 @@
 
 #include "math_config.h"
 
-#if FE_INEXACT && !defined(PICOLIBC_DOUBLE_NOEXECPT)
+#if FE_INEXACT && !defined(PICOLIBC_FLOAT64_NOEXECPT)
 
-static CONST_FORCE_DOUBLE VAL = pick_double_except(DBL_MIN, 0.0);
+static CONST_FORCE_FLOAT64 VAL = pick_float64_except(_FLOAT64_MIN, _F_64(0.0));
 
 HIDDEN void
-__math_set_inexact(void)
+__math_set_inexact64(void)
 {
-    force_eval_double(1.0 + VAL);
+    force_eval_float64(_F_64(1.0) + VAL);
 }
 
-HIDDEN double
-__math_inexact(double val)
+HIDDEN __float64
+__math_inexact64(__float64 val)
 {
-    force_eval_double(1.0 + VAL);
+    force_eval_float64(_F_64(1.0) + VAL);
     return val;
 }
 

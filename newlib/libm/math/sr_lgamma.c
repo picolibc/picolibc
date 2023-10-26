@@ -172,11 +172,11 @@ sin_pi(__float64 x)
      * argument reduction, make sure inexact flag not raised if input
      * is an integer
      */
-    z = floor(y);
+    z = floor64(y);
     if (z != y) { /* inexact anyway */
-        y *= 0.5;
-        y = 2.0 * (y - floor(y)); /* y = |x| mod 2.0 */
-        n = (__int32_t)(y * 4.0);
+        y *= _F_64(0.5);
+        y = _F_64(2.0) * (y - floor64(y)); /* y = |x| mod 2.0 */
+        n = (__int32_t)(y * _F_64(4.0));
     } else {
         if (ix >= 0x43400000) {
             y = zero;
@@ -196,7 +196,7 @@ sin_pi(__float64 x)
         break;
     case 1:
     case 2:
-        y = __kernel_cos(pi * (0.5 - y), zero);
+        y = __kernel_cos(pi * (_F_64(0.5) - y), zero);
         break;
     case 3:
     case 4:
@@ -204,10 +204,10 @@ sin_pi(__float64 x)
         break;
     case 5:
     case 6:
-        y = -__kernel_cos(pi * (y - 1.5), zero);
+        y = -__kernel_cos(pi * (y - _F_64(1.5)), zero);
         break;
     default:
-        y = __kernel_sin(pi * (y - 2.0), zero, 0);
+        y = __kernel_sin(pi * (y - _F_64(2.0)), zero, 0);
         break;
     }
     return -y;
@@ -235,9 +235,9 @@ __math_lgamma_r(__float64 x, int *signgamp, int *divzero)
     if (ix < 0x3b900000) { /* |x|<2**-70, return -log(|x|) */
         if (hx < 0) {
             *signgamp = -1;
-            return -log(-x);
+            return -log64(-x);
         } else
-            return -log(x);
+            return -log64(x);
     }
     if (hx < 0) {
         if (ix >= 0x43300000) { /* |x|>=2**52, must be -integer */
@@ -249,7 +249,7 @@ __math_lgamma_r(__float64 x, int *signgamp, int *divzero)
             *divzero = 1;
             return __math_divzero(0);
         }
-        nadj = log(pi / fabs64(t * x));
+        nadj = log64(pi / fabs64(t * x));
         if (t < zero)
             *signgamp = -1;
         x = -x;
@@ -261,7 +261,7 @@ __math_lgamma_r(__float64 x, int *signgamp, int *divzero)
     /* for x < 2.0 */
     else if (ix < 0x40000000) {
         if (ix <= 0x3feccccc) { /* lgamma(x) = lgamma(x+1)-log(x) */
-            r = -log(x);
+            r = -log64(x);
             if (ix >= 0x3FE76944) {
                 y = one - x;
                 i = 0;
@@ -329,7 +329,7 @@ __math_lgamma_r(__float64 x, int *signgamp, int *divzero)
             z *= (y + 3.0); /* FALLTHRU */
         case 3:
             z *= (y + 2.0); /* FALLTHRU */
-            r += log(z);
+            r += log64(z);
             break;
         }
         /* 8.0 <= x < 2**58 */
@@ -341,7 +341,7 @@ __math_lgamma_r(__float64 x, int *signgamp, int *divzero)
         r = (x - half) * (t - one) + w;
     } else
         /* 2**58 <= x <= inf */
-        r = x * (log(x) - one);
+        r = x * (log64(x) - one);
     if (hx < 0)
         r = nadj - r;
     return check_oflow(r);

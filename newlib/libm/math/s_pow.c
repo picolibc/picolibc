@@ -110,7 +110,7 @@ pow64(__float64 x, __float64 y)
 
     /* y==zero: x**0 = 1 unless x is snan */
     if ((iy | ly) == 0) {
-        if (issignaling_inline(x))
+        if (issignaling64_inline(x))
             return x + y;
         return one;
     }
@@ -118,7 +118,7 @@ pow64(__float64 x, __float64 y)
     /* x|y==NaN return NaN unless x==1 then return 1 */
     if (ix > 0x7ff00000 || ((ix == 0x7ff00000) && (lx != 0)) ||
         iy > 0x7ff00000 || ((iy == 0x7ff00000) && (ly != 0))) {
-        if (((hx - 0x3ff00000) | lx) == 0 && !issignaling_inline(y))
+        if (((hx - 0x3ff00000) | lx) == 0 && !issignaling64_inline(y))
             return one;
         else
             return x + y;

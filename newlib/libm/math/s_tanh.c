@@ -105,7 +105,7 @@ tanh64(__float64 x)
         }
         /* |x| > 22, return +-1 */
     } else {
-        z = __math_inexact(one);
+        z = __math_inexact64(one);
     }
     return (jx >= 0) ? z : -z;
 }

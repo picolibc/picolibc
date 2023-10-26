@@ -124,6 +124,14 @@ converttoint (double_t x)
 # define TOINT_INTRINSICS 0
 #endif
 
+#if __SIZEOF_DOUBLE__ == 8
+typedef double __float64;
+# define _NEED_FLOAT64
+#elif __SIZEOF_LONG_DOUBLE__ == 8
+typedef long double __float64;
+# define _NEED_FLOAT64
+#endif
+
 static ALWAYS_INLINE uint32_t
 asuint (float f)
 {
@@ -188,46 +196,16 @@ _asfloat(int32_t i)
     return asfloat((uint32_t) i);
 }
 
-static ALWAYS_INLINE uint64_t
-asuint64 (double f)
+static ALWAYS_INLINE int
+issignalingf_inline (float x)
 {
-#if defined(__riscv_flen) && __riscv_flen >= 64 && __riscv_xlen >= 64
-  uint64_t result;
-  __asm__("fmv.x.d\t%0, %1" : "=r" (result) : "f" (f));
-  return result;
-#else
-  union
-  {
-    double f;
-    uint64_t i;
-  } u = {f};
-  return u.i;
-#endif
+  uint32_t ix = asuint (x);
+  if (!_IEEE_754_2008_SNAN)
+    return (ix & 0x7fc00000u) == 0x7fc00000u;
+  return 2 * (ix ^ 0x00400000u) > 0xFF800000u;
 }
 
-static ALWAYS_INLINE double
-asdouble (uint64_t i)
-{
-#if defined(__riscv_flen) && __riscv_flen >= 64 && __riscv_xlen >= 64
-  double result;
-  __asm__("fmv.d.x\t%0, %1" : "=f" (result) : "r" (i));
-  return result;
-#else
-  union
-  {
-    uint64_t i;
-    double f;
-  } u = {i};
-  return u.f;
-#endif
-}
-
-static ALWAYS_INLINE int64_t
-_asint64(double f)
-{
-    return (int64_t) asuint64(f);
-}
-
+#ifdef _NEED_FLOAT64
 static ALWAYS_INLINE int
 _sign64(int64_t ix)
 {
@@ -246,23 +224,54 @@ _significand64(int64_t ix)
     return ix & 0xfffffffffffffLL;
 }
 
-static ALWAYS_INLINE double
-_asdouble(int64_t i)
+static ALWAYS_INLINE uint64_t
+asuint64 (__float64 f)
 {
-    return asdouble((uint64_t) i);
+#if defined(__riscv_flen) && __riscv_flen >= 64 && __riscv_xlen >= 64
+  uint64_t result;
+  __asm__("fmv.x.d\t%0, %1" : "=r" (result) : "f" (f));
+  return result;
+#else
+  union
+  {
+    __float64 f;
+    uint64_t i;
+  } u = {f};
+  return u.i;
+#endif
+}
+
+static ALWAYS_INLINE __float64
+asfloat64 (uint64_t i)
+{
+#if defined(__riscv_flen) && __riscv_flen >= 64 && __riscv_xlen >= 64
+  __float64 result;
+  __asm__("fmv.d.x\t%0, %1" : "=f" (result) : "r" (i));
+  return result;
+#else
+  union
+  {
+    uint64_t i;
+    __float64 f;
+  } u = {i};
+  return u.f;
+#endif
+}
+
+static ALWAYS_INLINE int64_t
+_asint64(__float64 f)
+{
+    return (int64_t) asuint64(f);
+}
+
+static ALWAYS_INLINE __float64
+_asfloat64(int64_t i)
+{
+    return asfloat64((uint64_t) i);
 }
 
 static ALWAYS_INLINE int
-issignalingf_inline (float x)
-{
-  uint32_t ix = asuint (x);
-  if (!_IEEE_754_2008_SNAN)
-    return (ix & 0x7fc00000u) == 0x7fc00000u;
-  return 2 * (ix ^ 0x00400000u) > 0xFF800000u;
-}
-
-static ALWAYS_INLINE int
-issignaling_inline (double x)
+issignaling64_inline (__float64 x)
 {
   uint64_t ix = asuint64 (x);
   if (!_IEEE_754_2008_SNAN)
@@ -270,6 +279,7 @@ issignaling_inline (double x)
   return 2 * (ix ^ 0x0008000000000000ULL) > 2 * 0x7ff8000000000000ULL;
 }
 
+#endif /* _NEED_FLOAT64 */
 /*
  * gcc older than version 13 places 'const volatile' variables in
  * .data while clang places them in .rodata. gcc never optimizes away
@@ -471,11 +481,11 @@ force_eval_long_double (long double x)
 #  define _MATH_ALIAS_d_id_to_f(name) extern double _D_NAME(name)(int n, double x) __attribute__((__alias__(_FLOAT_ALIAS(name))));
 #  define _MATH_ALIAS_d_di_to_f(name) extern double _D_NAME(name)(double x, int n) __attribute__((__alias__(_FLOAT_ALIAS(name))));
 #  define _MATH_ALIAS_d_dj_to_f(name) extern double _D_NAME(name)(double x, long n) __attribute__((__alias__(_FLOAT_ALIAS(name))));
-#  define _MATH_ALIAS_i_d_to_f(name) extern int name(double x) __attribute__((__alias__(_FLOAT_ALIAS(name))));
-#  define _MATH_ALIAS_j_d_to_f(name) extern long name(double x) __attribute__((__alias__(_FLOAT_ALIAS(name))));
-#  define _MATH_ALIAS_k_d_to_f(name) extern long long name(double x) __attribute__((__alias__(_FLOAT_ALIAS(name))));
-#  define _MATH_ALIAS_i_dd_to_f(name) extern int name(double x, double y) __attribute__((__alias__(_FLOAT_ALIAS(name))));
-#  define _MATH_ALIAS_v_dDD_to_f(name) extern void name(double x, double *y, double *z) __attribute__((__alias__(_FLOAT_ALIAS(name))));
+#  define _MATH_ALIAS_i_d_to_f(name) extern int _D_NAME(name)(double x) __attribute__((__alias__(_FLOAT_ALIAS(name))));
+#  define _MATH_ALIAS_j_d_to_f(name) extern long _D_NAME(name)(double x) __attribute__((__alias__(_FLOAT_ALIAS(name))));
+#  define _MATH_ALIAS_k_d_to_f(name) extern long long _D_NAME(name)(double x) __attribute__((__alias__(_FLOAT_ALIAS(name))));
+#  define _MATH_ALIAS_i_dd_to_f(name) extern int _D_NAME(name)(double x, double y) __attribute__((__alias__(_FLOAT_ALIAS(name))));
+#  define _MATH_ALIAS_v_dDD_to_f(name) extern void _D_NAME(name)(double x, double *y, double *z) __attribute__((__alias__(_FLOAT_ALIAS(name))));
 # else
 #  define _MATH_ALIAS_d_to_f(name) double _D_NAME(name)(void) { return (double) __FLOAT_NAME(name)(); }
 #  define _MATH_ALIAS_d_d_to_f(name) double _D_NAME(name)(double x) { return (double) __FLOAT_NAME(name)((float) x); }
@@ -515,7 +525,12 @@ force_eval_long_double (long double x)
 # define _MATH_ALIAS_k_d_to_f(name)
 # define _MATH_ALIAS_i_dd_to_f(name)
 # define _MATH_ALIAS_v_dDD_to_f(name)
-# define _NEED_FLOAT64
+# ifdef PICOLIBC_DOUBLE_NOEXCEPT
+#  define PICOLIBC_FLOAT64_NOEXCEPT
+# endif
+# ifdef PICOLIBC_DOUBLE_NOROUND
+#  define PICOLIBC_FLOAT64_NOROUND
+# endif
 #endif
 
 #ifdef _LDBL_EQ_DBL
@@ -633,11 +648,16 @@ force_eval_long_double (long double x)
 # if __SIZEOF_LONG_DOUBLE__ == 8 && !defined(_LDBL_EQ_DBL)
 #  define _NAME_64(x) _LD_NAME_REG(x)
 #  define _NAME_64_SPECIAL(d,l) l
-   typedef long double __float64;
 #  define FORCE_FLOAT64 FORCE_LONG_DOUBLE
 #  define CONST_FORCE_FLOAT64 CONST_FORCE_LONG_DOUBLE
 #  define pick_float64_except(a,b) pick_long_double_except(a,b)
 #  define _NEED_FLOAT64
+#  ifdef PICOLIBC_LONG_DOUBLE_NOEXCEPT
+#   define PICOLIBC_FLOAT64_NOEXCEPT
+#  endif
+#  ifdef PICOLIBC_LONG_DOUBLE_NOROUND
+#   define PICOLIBC_FLOAT64_NOROUND
+#  endif
 #  define __F_64(x)     x ## L
 #  define _F_64(x)      __F_64(x)
 #  define _FLOAT64_MIN  LDBL_MIN
@@ -693,7 +713,6 @@ force_eval_long_double (long double x)
 # define _FLOAT64_MAX_EXP DBL_MAX_EXP
 # define _FLOAT64_DENORM_MIN __DBL_DENORM_MIN__
 # define _FLOAT64_MANT_DIG  __DBL_MANT_DIG__
-typedef double __float64;
 # define FORCE_FLOAT64 FORCE_DOUBLE
 # define CONST_FORCE_FLOAT64 CONST_FORCE_DOUBLE
 # define pick_float64_except(a,b) pick_double_except(a,b)
@@ -885,6 +904,57 @@ HIDDEN float __math_uflowf (uint32_t);
 HIDDEN float __math_may_uflowf (uint32_t);
 /* Division by zero.  */
 HIDDEN float __math_divzerof (uint32_t);
+
+/* Invalid input unless it is a quiet NaN.  */
+HIDDEN float __math_invalidf (float);
+/* set invalid exception */
+#if defined(FE_INVALID) && !defined(PICOLIBC_FLOAT_NOEXECPT)
+HIDDEN void __math_set_invalidf(void);
+#else
+#define __math_set_invalidf()   ((void) 0)
+#endif
+
+/* Check if the result overflowed to infinity.  */
+HIDDEN float __math_check_oflowf (float);
+
+static inline float
+check_oflowf (float x)
+{
+  return WANT_ERRNO ? __math_check_oflowf (x) : x;
+}
+
+/* Check if the result underflowed to 0.  */
+HIDDEN float __math_check_uflowf (float);
+
+static inline float
+check_uflowf (float x)
+{
+  return WANT_ERRNO ? __math_check_uflowf (x) : x;
+}
+
+#if defined(FE_INEXACT) && !defined(PICOLIBC_FLOAT_NOEXECPT)
+float __math_inexactf(float val);
+void __math_set_inexactf(void);
+#else
+#define __math_inexactf(val) (val)
+#define __math_set_inexactf()   ((void) 0)
+#endif
+
+#if WANT_ERRNO
+HIDDEN float
+__math_with_errnof (float y, int e);
+#else
+#define __math_with_errnof(x, e) (x)
+#endif
+
+/* Check if the result is a denorm. */
+#if (defined(FE_UNDERFLOW) && !defined(PICOLIBC_FLOAT_NOEXCEPT)) || WANT_ERRNO
+float __math_denormf (float x);
+#else
+#define __math_denormf(x) (x)
+#endif
+
+#ifdef _NEED_FLOAT64
 /* The result overflows.  */
 HIDDEN __float64 __math_oflow (uint32_t);
 /* The result underflows to 0 in nearest rounding mode.  */
@@ -897,14 +967,6 @@ HIDDEN __float64 __math_divzero (uint32_t);
 /* Error handling using input checking.  */
 
 /* Invalid input unless it is a quiet NaN.  */
-HIDDEN float __math_invalidf (float);
-/* set invalid exception */
-#if defined(FE_INVALID) && !defined(PICOLIBC_FLOAT_NOEXECPT)
-HIDDEN void __math_set_invalidf(void);
-#else
-#define __math_set_invalidf()   ((void) 0)
-#endif
-/* Invalid input unless it is a quiet NaN.  */
 HIDDEN __float64 __math_invalid (__float64);
 /* set invalid exception */
 #if defined(FE_INVALID) && !defined(PICOLIBC_DOUBLE_NOEXECPT)
@@ -912,6 +974,48 @@ HIDDEN void __math_set_invalid(void);
 #else
 #define __math_set_invalid()    ((void) 0)
 #endif
+
+/* Check if the result overflowed to infinity.  */
+HIDDEN __float64 __math_check_oflow (__float64);
+
+static inline __float64
+check_oflow (__float64 x)
+{
+  return WANT_ERRNO ? __math_check_oflow (x) : x;
+}
+
+/* Check if the result underflowed to 0.  */
+HIDDEN __float64 __math_check_uflow (__float64);
+
+static inline __float64
+check_uflow (__float64 x)
+{
+  return WANT_ERRNO ? __math_check_uflow (x) : x;
+}
+
+/* Set inexact exception */
+#if defined(FE_INEXACT) && !defined(PICOLIBC_FLOAT64_NOEXECPT)
+__float64 __math_inexact64(__float64 x);
+void __math_set_inexact64(void);
+#else
+#define __math_inexact64(val) (val)
+#define __math_set_inexact64()    ((void) 0)
+#endif
+
+#if WANT_ERRNO
+HIDDEN __float64
+__math_with_errno (__float64 y, int e);
+#else
+#define __math_with_errno(x, e) (x)
+#endif
+
+#if (defined(FE_UNDERFLOW) && !defined(PICOLIBC_FLOAT64_NOEXCEPT)) || WANT_ERRNO
+__float64 __math_denorm (__float64 x);
+#else
+#define __math_denorm(x) (x)
+#endif
+
+#endif /* _NEED_FLOAT64 */
 
 #ifdef _HAVE_LONG_DOUBLE
 HIDDEN long double __math_oflowl (uint32_t);
@@ -929,93 +1033,47 @@ HIDDEN void __math_set_invalidl(void);
 #else
 #define __math_set_invalidl()    ((void) 0)
 #endif
-#endif
-
-/* Error handling using output checking, only for errno setting.  */
 
 /* Check if the result overflowed to infinity.  */
-HIDDEN float __math_check_oflowf (float);
-/* Check if the result overflowed to infinity.  */
-HIDDEN __float64 __math_check_oflow (__float64);
-#ifdef _NEED_FLOAT_HUGE
 HIDDEN long double __math_check_oflowl(long double);
-#endif
 
-/* Check if the result underflowed to 0.  */
-HIDDEN float __math_check_uflowf (float);
-HIDDEN __float64 __math_check_uflow (__float64);
-#ifdef _NEED_FLOAT_HUGE
-HIDDEN long double __math_check_uflowl(long double);
-#endif
-
-/* Check if the result overflowed to infinity.  */
-static inline __float64
-check_oflow (__float64 x)
-{
-  return WANT_ERRNO ? __math_check_oflow (x) : x;
-}
-
-/* Check if the result overflowed to infinity.  */
-static inline float
-check_oflowf (float x)
-{
-  return WANT_ERRNO ? __math_check_oflowf (x) : x;
-}
-
-#ifdef _NEED_FLOAT_HUGE
 static inline long double
 check_oflowl (long double x)
 {
   return WANT_ERRNO ? __math_check_oflowl (x) : x;
 }
-#endif
 
 /* Check if the result underflowed to 0.  */
-static inline __float64
-check_uflow (__float64 x)
-{
-  return WANT_ERRNO ? __math_check_uflow (x) : x;
-}
+HIDDEN long double __math_check_uflowl(long double);
 
-/* Check if the result underflowed to 0.  */
-static inline float
-check_uflowf (float x)
-{
-  return WANT_ERRNO ? __math_check_uflowf (x) : x;
-}
-
-#ifdef _NEED_FLOAT_HUGE
 static inline long double
 check_uflowl (long double x)
 {
   return WANT_ERRNO ? __math_check_uflowl (x) : x;
 }
-#endif
 
-/* Set inexact exception */
-#if defined(FE_INEXACT) && !defined(PICOLIBC_DOUBLE_NOEXECPT)
-__float64 __math_inexact(__float64);
-void __math_set_inexact(void);
-#else
-#define __math_inexact(val) (val)
-#define __math_set_inexact()    ((void) 0)
-#endif
-
-#if defined(FE_INEXACT) && !defined(PICOLIBC_FLOAT_NOEXECPT)
-float __math_inexactf(float val);
-void __math_set_inexactf(void);
-#else
-#define __math_inexactf(val) (val)
-#define __math_set_inexactf()   ((void) 0)
-#endif
-
-#if defined(FE_INEXACT) && !defined(PICOLIBC_LONG_DOUBLE_NOEXECPT) && defined(_NEED_FLOAT_HUGE)
+#if defined(FE_INEXACT) && !defined(PICOLIBC_LONG_DOUBLE_NOEXECPT)
 long double __math_inexactl(long double val);
 void __math_set_inexactl(void);
 #else
 #define __math_inexactl(val) (val)
 #define __math_set_inexactl()   ((void) 0)
 #endif
+
+#if WANT_ERRNO
+HIDDEN long double
+__math_with_errnol (long double y, int e);
+#else
+#define __math_with_errnol(x, e) (x)
+#endif
+
+#if (defined(FE_UNDERFLOW) && !defined(PICOLIBC_LONG_DOUBLE_NOEXCEPT)) || WANT_ERRNO
+long double __math_denorml(long double x);
+#else
+#define __math_denorml(x) (x)
+#endif
+
+#endif /* _HAVE_LONG_DOUBLE */
 
 /* Shared between expf, exp2f and powf.  */
 #define EXP2F_TABLE_BITS 5
@@ -1133,53 +1191,14 @@ extern const struct pow_log_data
   struct {double invc, pad, logc, logctail;} tab[1 << POW_LOG_TABLE_BITS];
 } __pow_log_data HIDDEN;
 
-#if WANT_ERRNO
-HIDDEN double
-__math_with_errno (double y, int e);
-
-HIDDEN float
-__math_with_errnof (float y, int e);
-
-#ifdef _HAVE_LONG_DOUBLE
-HIDDEN long double
-__math_with_errnol (long double y, int e);
-#endif
-#else
-#define __math_with_errno(x, e) (x)
-#define __math_with_errnof(x, e) (x)
-#define __math_with_errnol(x, e) (x)
-#endif
-
-/* Check if the result is a denorm. */
-#if (defined(FE_UNDERFLOW) && !defined(PICOLIBC_FLOAT_NOEXCEPT)) || WANT_ERRNO
-float __math_denormf (float x);
-#else
-#define __math_denormf(x) (x)
-#endif
-
-#if (defined(FE_UNDERFLOW) && !defined(PICOLIBC_DOUBLE_NOEXCEPT)) || WANT_ERRNO
-__float64 __math_denorm (__float64 x);
-#else
-#define __math_denorm(x) (x)
-#endif
-
-#if defined(_NEED_FLOAT_HUGE) && ((defined(FE_UNDERFLOW) && !defined(PICOLIBC_LONG_DOUBLE_NOEXCEPT)) || WANT_ERRNO)
-long double __math_denorml(long double x);
-#else
-#define __math_denorml(x) (x)
-#endif
-
-HIDDEN double
-__math_xflow (uint32_t sign, double y);
-
-HIDDEN float
-__math_xflowf (uint32_t sign, float y);
-
-HIDDEN __float64
-__math_lgamma_r (__float64 y, int *signgamp, int *divzero);
 
 HIDDEN float
 __math_lgammaf_r (float y, int *signgamp, int *divzero);
+
+#ifdef _NEED_FLOAT64
+HIDDEN __float64
+__math_lgamma_r (__float64 y, int *signgamp, int *divzero);
+#endif
 
 #ifdef __weak_reference
 extern int __signgam;
@@ -1230,6 +1249,7 @@ extern int __signgam;
 #define __isinf64 _NAME_64_SPECIAL(__isinfd, __isinfl)
 #define isnan64 _NAME_64(isnan)
 #define __isnan64 _NAME_64_SPECIAL(__isnand, __isnanl)
+#define __issignaling64 _NAME_64(__issignaling)
 #define ldexp64 _NAME_64(ldexp)
 #define j064 _NAME_64(j0)
 #define y064 _NAME_64(y0)
@@ -1263,6 +1283,7 @@ extern int __signgam;
 #define scalb64 _NAME_64(scalb)
 #define scalbn64 _NAME_64(scalbn)
 #define scalbln64 _NAME_64(scalbln)
+#define __signbit64 _NAME_64_SPECIAL(__signbitd, __signbitl)
 #define significand64 _NAME_64(significand)
 #define sin64 _NAME_64(sin)
 #define _sin64 _NAME_64(_sin)
@@ -1279,9 +1300,11 @@ float _powf(float, float);
 float _sinf(float);
 float _cosf(float);
 
+#ifdef _NEED_FLOAT64
 __float64 _pow64(__float64, __float64);
 __float64 _sin64(__float64);
 __float64 _cos64(__float64);
+#endif
 
 #ifdef _HAVE_LONG_DOUBLE_MATH
 long double _powl(long double, long double);

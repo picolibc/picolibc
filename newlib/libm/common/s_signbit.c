@@ -33,10 +33,9 @@ C99, POSIX.
 
 */
 
-#include "fdlibm.h"
+#define _ADD_D_TO_DOUBLE_FUNCS
 
-int __signbitf (float x);
-int __signbitd (double x);
+#include "fdlibm.h"
 
 int
 __signbitf (float x)
@@ -48,8 +47,11 @@ __signbitf (float x)
   return (w & 0x80000000) != 0;
 }
 
+_MATH_ALIAS_i_f(__signbit)
+
+#ifdef _NEED_FLOAT64
 int
-__signbitd (double x)
+__signbit64(__float64 x)
 {
   __uint32_t msw;
 
@@ -57,3 +59,6 @@ __signbitd (double x)
 
   return (msw & 0x80000000) != 0;
 }
+
+_MATH_ALIAS_i_d(__signbit)
+#endif

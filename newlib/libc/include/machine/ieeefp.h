@@ -89,20 +89,20 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # endif
 #endif
 
+#if __SIZEOF_DOUBLE__ == __SIZEOF_FLOAT__
+# define _DBL_EQ_FLT
+#endif
+
+#if __SIZEOF_LONG_DOUBLE == __SIZEOF_DOUBLE__
+# define LDBL_EQ_DBL
+#endif
+
 #if __SIZEOF_DOUBLE__ == 4
 # define _DOUBLE_IS_32BITS
 #endif
 
 #if _SIZEOF_LONG_DOUBLE__ == 4
 # define _LONG_DOUBLE_IS_32BITS
-#endif
-
-#if defined(__SIZEOF_FLOAT__) && defined(__SIZEOF_DOUBLE__)
-# if __SIZEOF_FLOAT__ == __SIZEOF_DOUBLE__
-#  define _DBL_EQ_FLT
-# else
-#  undef _DBL_EQ_FLT
-#endif
 #endif
 
 #if (defined(__arm__) || defined(__thumb__)) && !defined(__MAVERICK__)
@@ -230,13 +230,14 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 
 #ifdef __sh__
-#ifdef __LITTLE_ENDIAN__
+#define _IEEE_754_2008_SNAN 0
+#if __FLOAT_WORD_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define __IEEE_LITTLE_ENDIAN
-#else
+#elif __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__
 #define __IEEE_BIG_ENDIAN
 #endif
-#if defined(__SH2E__) || defined(__SH3E__) || defined(__SH4_SINGLE_ONLY__) || defined(__SH2A_SINGLE_ONLY__)
-#define _DOUBLE_IS_32BITS
+#ifdef __SH_FPU_ANY__
+#define _SUPPORTS_ERREXCEPT
 #endif
 #endif
 

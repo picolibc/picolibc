@@ -71,7 +71,7 @@ log_inline (uint64_t ix, double_t *tail)
   i = (tmp >> (52 - POW_LOG_TABLE_BITS)) % N;
   k = (int64_t) tmp >> 52; /* arithmetic shift */
   iz = ix - (tmp & 0xfffULL << 52);
-  z = asdouble (iz);
+  z = asfloat64 (iz);
   kd = (double_t) k;
 
   /* log(x) = k*Ln2 + log(c) + log1p(z/c-1).  */
@@ -85,7 +85,7 @@ log_inline (uint64_t ix, double_t *tail)
   r = fma (z, invc, -1.0);
 #else
   /* Split z such that rhi, rlo and rhi*rhi are exact and |rlo| <= |r|.  */
-  double_t zhi = asdouble ((iz + (1ULL << 31)) & (-1ULL << 32));
+  double_t zhi = asfloat64 ((iz + (1ULL << 31)) & (-1ULL << 32));
   double_t zlo = z - zhi;
   double_t rhi = zhi * invc - 1.0;
   double_t rlo = zlo * invc;
@@ -156,14 +156,14 @@ specialcase (double_t tmp, uint64_t sbits, uint64_t ki)
     {
       /* k > 0, the exponent of scale might have overflowed by <= 460.  */
       sbits -= 1009ull << 52;
-      scale = asdouble (sbits);
+      scale = asfloat64 (sbits);
       y = 0x1p1009 * (scale + scale * tmp);
       return check_oflow (y);
     }
   /* k < 0, need special care in the subnormal range.  */
   sbits += 1022ull << 52;
   /* Note: sbits is signed scale.  */
-  scale = asdouble (sbits);
+  scale = asfloat64 (sbits);
   y = scale + scale * tmp;
 #if FLT_EVAL_METHOD == 2
 #define fabs(x) fabsl(x)
@@ -184,7 +184,7 @@ specialcase (double_t tmp, uint64_t sbits, uint64_t ki)
       y = eval_as_double (hi + lo) - one;
       /* Fix the sign of 0.  */
       if (y == 0.0)
-	y = asdouble (sbits & 0x8000000000000000);
+	y = asfloat64 (sbits & 0x8000000000000000);
       /* The underflow exception needs to be signaled explicitly.  */
       force_eval_double (opt_barrier_double (0x1p-1022) * 0x1p-1022);
     }
@@ -249,7 +249,7 @@ exp_inline (double x, double xtail, uint32_t sign_bias)
   /* 2^(k/N) ~= scale * (1 + tail).  */
   idx = 2 * (ki % N);
   top = (ki + sign_bias) << (52 - EXP_TABLE_BITS);
-  tail = asdouble (T[idx]);
+  tail = asfloat64 (T[idx]);
   /* This is only a valid scale when -1023*N < k < 1024*N.  */
   sbits = T[idx + 1] + top;
   /* exp(x) = 2^(k/N) * exp(r) ~= scale + scale * (tail + exp(r) - 1).  */
@@ -266,7 +266,7 @@ exp_inline (double x, double xtail, uint32_t sign_bias)
 #endif
   if (unlikely (abstop == 0))
     return specialcase (tmp, sbits, ki);
-  scale = asdouble (sbits);
+  scale = asfloat64 (sbits);
   /* Note: tmp == 0 or |tmp| > 2^-200 and scale > 2^-739, so there
      is no spurious underflow here even without fma.  */
   return scale + scale * tmp;
@@ -317,9 +317,9 @@ pow (double x, double y)
       if (unlikely (zeroinfnan (iy)))
 	{
 	  if (2 * iy == 0)
-	    return issignaling_inline (x) ? x + y : 1.0;
+	    return issignaling64_inline (x) ? x + y : 1.0;
 	  if (ix == asuint64 (1.0))
-	    return issignaling_inline (y) ? x + y : 1.0;
+	    return issignaling64_inline (y) ? x + y : 1.0;
 	  if (2 * ix > 2 * asuint64 ((double) INFINITY)
 	      || 2 * iy > 2 * asuint64 ((double) INFINITY))
 	    return x + y;
@@ -387,9 +387,9 @@ pow (double x, double y)
   ehi = y * hi;
   elo = y * lo + fma (y, hi, -ehi);
 #else
-  double_t yhi = asdouble (iy & -1ULL << 27);
+  double_t yhi = asfloat64 (iy & -1ULL << 27);
   double_t ylo = y - yhi;
-  double_t lhi = asdouble (asuint64 (hi) & -1ULL << 27);
+  double_t lhi = asfloat64 (asuint64 (hi) & -1ULL << 27);
   double_t llo = hi - lhi + lo;
   ehi = yhi * lhi;
   elo = ylo * lhi + y * llo; /* |elo| < |ehi| * 2^-25.  */

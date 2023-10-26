@@ -32,11 +32,12 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#include "math_config.h"
+#include "fdlibm.h"
 
 int
 __issignalingf(float x)
 {
 	return issignalingf_inline(x);
 }
+
+_MATH_ALIAS_i_f(__issignaling)

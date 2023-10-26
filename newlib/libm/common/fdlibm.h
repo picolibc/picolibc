@@ -168,6 +168,7 @@
 
 #define X_TLOSS		1.41484755040568800000e+16 
 
+#ifdef _NEED_FLOAT64
 extern __int32_t __rem_pio2 (__float64,__float64*);
 
 /* fdlibm kernel function */
@@ -175,6 +176,7 @@ extern __float64 __kernel_sin (__float64,__float64,int);
 extern __float64 __kernel_cos (__float64,__float64);
 extern __float64 __kernel_tan (__float64,__float64,int);
 extern int    __kernel_rem_pio2 (__float64*,__float64*,int,int,int,const __int32_t*);
+#endif
 
 extern __int32_t __rem_pio2f (float,float*);
 
@@ -267,7 +269,7 @@ do {								\
   ieee_double_shape_type iw_u;					\
   iw_u.parts.msw = (ix0);					\
   iw_u.parts.lsw = (ix1);					\
-  (d) = asdouble(iw_u.bits);					\
+  (d) = asfloat64(iw_u.bits);                                   \
 } while (0)
 
 /* Set the more significant 32 bits of a double from an int.  */
@@ -277,7 +279,7 @@ do {								\
   ieee_double_shape_type sh_u;					\
   sh_u.bits = asuint64(d);					\
   sh_u.parts.msw = (v);						\
-  (d) = asdouble(sh_u.bits);					\
+  (d) = asfloat64(sh_u.bits);                                   \
 } while (0)
 
 /* Set the less significant 32 bits of a double from an int.  */
@@ -287,7 +289,7 @@ do {								\
   ieee_double_shape_type sl_u;					\
   sl_u.bits = asuint64(d);					\
   sl_u.parts.lsw = (v);						\
-  (d) = asdouble(sl_u.bits);					\
+  (d) = asfloat64(sl_u.bits);                                   \
 } while (0)
 
 /* A union which permits us to convert between a float and a 32 bit

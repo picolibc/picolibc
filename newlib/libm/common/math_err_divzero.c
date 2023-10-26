@@ -28,13 +28,15 @@
 
 #include "math_config.h"
 
+#ifdef _NEED_FLOAT64
+
 static CONST_FORCE_FLOAT64 VAL = pick_float64_except(_F_64(0.0), (__float64) INFINITY);
 
 HIDDEN __float64
 __math_divzero (uint32_t sign)
 {
-    __float64 y = pick_float64_except(_F_64(1.0) / VAL, VAL);
-    if (sign)
-        y = -y;
+    __float64 y = pick_float64_except((sign ? _F_64(-1.0) : _F_64(1.0)) / VAL, sign ? (-VAL) : VAL);
     return __math_with_errno (y, ERANGE);
 }
+
+#endif
