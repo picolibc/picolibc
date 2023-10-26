@@ -145,30 +145,6 @@ long double test(void)
 
 have_long_double = cc.compiles(long_double_code, name : 'long double check', args: core_c_args)
 
-have_sizeof_float = cc.get_define('__SIZEOF_FLOAT__') != ''
-have_sizeof_double = cc.get_define('__SIZEOF_DOUBLE__') != ''
-have_sizeof_long_double = have_long_double and cc.get_define('__SIZEOF_LONG_DOUBLE__') != ''
-
-set_double_equals_float = not have_sizeof_float or not have_sizeof_double
-
-if set_double_equals_float
-  float_double_code = '''
-char size_test[sizeof(float) == sizeof(double) ? 1 : -1];
-'''
-  set_double_equals_float = 
-  double_equals_float = cc.compiles(float_double_code, name : 'double same as float', args : core_c_args)
-endif
-
-set_long_double_equals_double = not have_sizeof_double or not have_sizeof_long_double
-
-if set_long_double_equals_double
-  long_double_size_code = '''
-#include <float.h>
-char size_test[sizeof(double) == sizeof(long double) ? 1 : -1];
-'''
-  long_double_equals_double = cc.compiles(long_double_size_code, name : 'long double same as double', args: core_c_args)
-endif
-
 enable_multilib = get_option('multilib')
 multilib_list = get_option('multilib-list')
 enable_picolib = get_option('picolib')
@@ -1259,14 +1235,6 @@ conf_data.set('_HAVE_NO_BUILTIN_ATTRIBUTE',
 
 conf_data.set('_HAVE_LONG_DOUBLE', have_long_double,
 	      description: 'Compiler has long double type')
-if set_double_equals_float
-  conf_data.set('_DBL_EQ_FLT', double_equals_float,
-		description: 'double is the same as float')
-endif
-if set_long_double_equals_double
-  conf_data.set('_LDBL_EQ_DBL', long_double_equals_double,
-		description: 'long double is the same as double')
-endif
 conf_data.set('_HAVE_ALIAS_ATTRIBUTE', have_alias_attribute)
 conf_data.set('_HAVE_FORMAT_ATTRIBUTE', have_format_attribute)
 conf_data.set('_HAVE_WEAK_ATTRIBUTE', have_weak_attribute)
