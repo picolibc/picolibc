@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2023 Adrian Siekierka
+# Copyright © 2020 Keith Packard, 
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,18 +32,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
-srcs_machine = [
-  'memcpy.S',
-  'memset.S',
-  'setjmp.S',
-  'strcmp.S',
-  'strcpy.S',
-  'strlen.S',
-  'strncpy.S',
-  'strncpy.c',
+inc_sys_headers_machine = [
+  'fenv.h'
 ]
 
-subdir('sys')
-
-src_machine = files(srcs_machine)
+install_headers(inc_sys_headers_machine,
+		install_dir: include_dir / 'sys')
