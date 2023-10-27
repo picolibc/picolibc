@@ -38,114 +38,119 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#define __MALL          0x01
+#define __MALL 0x01
 
 struct __file_mem {
-        struct __file_ext xfile;
-        char    *buf;
-        size_t  size;
-        size_t  pos;
-        uint8_t mflags;
+    struct __file_ext xfile;
+    char *buf;
+    size_t size;
+    size_t pos;
+    uint8_t mflags;
 };
 
-static int __fmem_put(char c, FILE *f)
+static int
+__fmem_put(char c, FILE *f)
 {
-        struct __file_mem *mf = (struct __file_mem *) f;
-        if ((f->flags & __SWR) && mf->pos < mf->size) {
-                mf->buf[mf->pos++] = c;
-                return (unsigned char) c;
-        }
-        return _FDEV_ERR;
+    struct __file_mem *mf = (struct __file_mem *)f;
+    if ((f->flags & __SWR) && mf->pos < mf->size) {
+        mf->buf[mf->pos++] = c;
+        return (unsigned char)c;
+    }
+    return _FDEV_ERR;
 }
 
-static int __fmem_get(FILE *f)
+static int
+__fmem_get(FILE *f)
 {
-        struct __file_mem *mf = (struct __file_mem *) f;
-        int c;
-        if ((f->flags & __SRD) && mf->pos < mf->size) {
-                c = (unsigned char) mf->buf[mf->pos++];
-                if (c == '\0')
-                        c = _FDEV_EOF;
-        } else
-                c = _FDEV_ERR;
-        return c;
+    struct __file_mem *mf = (struct __file_mem *)f;
+    int c;
+    if ((f->flags & __SRD) && mf->pos < mf->size) {
+        c = (unsigned char)mf->buf[mf->pos++];
+        if (c == '\0')
+            c = _FDEV_EOF;
+    } else
+        c = _FDEV_ERR;
+    return c;
 }
 
-static int __fmem_flush(FILE *f)
+static int
+__fmem_flush(FILE *f)
 {
-        struct __file_mem *mf = (struct __file_mem *) f;
-        if ((f->flags & __SWR) && mf->pos < mf->size)
-                mf->buf[mf->pos] = '\0';
-        return 0;
+    struct __file_mem *mf = (struct __file_mem *)f;
+    if ((f->flags & __SWR) && mf->pos < mf->size)
+        mf->buf[mf->pos] = '\0';
+    return 0;
 }
 
-static off_t __fmem_seek(FILE *f, off_t pos, int whence)
+static off_t
+__fmem_seek(FILE *f, off_t pos, int whence)
 {
-        struct __file_mem *mf = (struct __file_mem *) f;
+    struct __file_mem *mf = (struct __file_mem *)f;
 
-        switch (whence) {
-        case SEEK_SET:
-                break;
-        case SEEK_CUR:
-                pos += mf->pos;
-                break;
-        case SEEK_END:
-                pos += mf->size;
-                break;
-        }
-        if (pos < 0 || mf->size < (size_t) pos)
-                return EOF;
-        mf->pos = pos;
-        return pos;
+    switch (whence) {
+    case SEEK_SET:
+        break;
+    case SEEK_CUR:
+        pos += mf->pos;
+        break;
+    case SEEK_END:
+        pos += mf->size;
+        break;
+    }
+    if (pos < 0 || mf->size < (size_t)pos)
+        return EOF;
+    mf->pos = pos;
+    return pos;
 }
 
-static int __fmem_close(FILE *f)
+static int
+__fmem_close(FILE *f)
 {
-        struct __file_mem *mf = (struct __file_mem *) f;
+    struct __file_mem *mf = (struct __file_mem *)f;
 
-        if (mf->mflags & __MALL)
-                free (mf->buf);
-        else
-                __fmem_flush(f);
-        free(f);
-        return 0;
+    if (mf->mflags & __MALL)
+        free(mf->buf);
+    else
+        __fmem_flush(f);
+    free(f);
+    return 0;
 }
 
 FILE *
 fmemopen(void *buf, size_t size, const char *mode)
 {
-	int stdio_flags;
-        uint8_t mflags = 0;
-	struct __file_mem *mf;
+    int stdio_flags;
+    uint8_t mflags = 0;
+    struct __file_mem *mf;
 
-	stdio_flags = __stdio_sflags(mode);
+    stdio_flags = __stdio_sflags(mode);
 
-	if (stdio_flags == 0)
-		return NULL;
+    if (stdio_flags == 0)
+        return NULL;
 
-	/* Allocate file structure and necessary buffers */
-	mf = calloc(1, sizeof(struct __file_mem));
+    /* Allocate file structure and necessary buffers */
+    mf = calloc(1, sizeof(struct __file_mem));
 
-	if (mf == NULL)
-		return NULL;
+    if (mf == NULL)
+        return NULL;
 
-        if (buf == NULL) {
-                buf = malloc(size);
-                if (!buf) {
-                        free(mf);
-                        return NULL;
-                }
-                mflags |= __MALL;
+    if (buf == NULL) {
+        buf = malloc(size);
+        if (!buf) {
+            free(mf);
+            return NULL;
         }
+        mflags |= __MALL;
+    }
 
-        *mf = (struct __file_mem) {
-                .xfile = FDEV_SETUP_EXT(__fmem_put, __fmem_get, __fmem_flush, __fmem_close,
-                                        __fmem_seek, NULL, stdio_flags),
-                .buf = buf,
-                .size = size,
-                .pos = 0,
-                .mflags = mflags,
-        };
+    *mf = (struct __file_mem){
+        .xfile = FDEV_SETUP_EXT(__fmem_put, __fmem_get, __fmem_flush,
+                                __fmem_close, __fmem_seek, NULL, stdio_flags),
+        .buf = buf,
+        .size = size,
+        .pos = 0,
+        .mflags = mflags,
+    };
 
-	return (FILE *) mf;
+    return (FILE *)mf;
 }
