@@ -30,26 +30,35 @@
 #if defined(__NetBSD__)
 #include <atf-c.h>
 #else
-#if defined(__linux__)
+#if defined(__PICOLIBC__)
+#define _GNU_SOURCE  /* strnlen */
+#elif defined(__linux__)
 #define _GNU_SOURCE
 #include <features.h>
 #endif
 #include <assert.h>
 #include <stdio.h>
 #define ATF_TC(arg0)		static void arg0##_head(void)
-#define ATF_TC_HEAD(arg0, arg1)	static void arg0##_head()
+#define ATF_TC_HEAD(arg0, arg1)	static void arg0##_head(void)
 #define atf_tc_set_md_var(arg0, arg1, ...) do {	\
 	printf(__VA_ARGS__);			\
 	puts("");				\
 } while (/*CONSTCOND*/0)
-#define ATF_TC_BODY(arg0, arg1)	static void arg0##_body()
+#define ATF_TC_BODY(arg0, arg1)	static void arg0##_body(void)
 #define ATF_CHECK(arg0)		assert(arg0)
+#define ATF_CHECK_MSG(arg0, fmt, ...) do { \
+	if (!(arg0)) { \
+		fprintf(stderr, fmt, __VA_ARGS__); \
+		exit(1); \
+	} \
+} while (/*CONSTCOND*/0)
 #define ATF_TP_ADD_TCS(arg0)	int main(void)
 #define ATF_TP_ADD_TC(arg0, arg1) arg1##_head(); arg1##_body()
 #define atf_no_error()		0
 #endif
 
 #include <errno.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <limits.h>
@@ -212,6 +221,23 @@ ATF_TC_BODY(test02, tc)
 	}
 }
 
+static bool
+fmemopen_truncates_buffer(const char *mode)
+{
+    if (mode[0] != 'w')
+		return false;
+#if defined(__NetBSD__)
+	/* The NetBSD implementation truncates for all 'w' open flags */
+	return true;
+#elif defined(__GLIBC__)
+	/* glibc only truncates the file if "+" is the second char. */
+	return (mode[1] == '+');
+#else
+	/* POSIX mandates truncation for w+ and wb+ */
+	return strchr(mode, '+') != 0;
+#endif
+}
+
 ATF_TC(test03);
 ATF_TC_HEAD(test03, tc)
 {
@@ -233,7 +259,11 @@ ATF_TC_BODY(test03, tc)
  * This position is initially set to either the beginning of the buffer
  * (for r and w modes)
  */
-		ATF_CHECK(buf[0] == '\0');
+		if (fmemopen_truncates_buffer(*p)) {
+			ATF_CHECK(buf[0] == '\0');
+		} else {
+			ATF_CHECK(buf[0] == 1);
+		}
 		ATF_CHECK(ftello(fp) == (off_t)0);
 
 /*
@@ -296,6 +326,7 @@ ATF_TC_HEAD(test05, tc)
 }
 ATF_TC_BODY(test05, tc)
 {
+#if !defined(__GLIBC__)
 	const char **p;
 	FILE *fp;
 	char buf[BUFSIZ];
@@ -315,6 +346,7 @@ ATF_TC_BODY(test05, tc)
 		ATF_CHECK(fp == NULL);
 		ATF_CHECK(errno == EINVAL);
 	}
+#endif
 }
 
 ATF_TC(test06);
@@ -437,6 +469,13 @@ ATF_TC_BODY(test09, tc)
 				ATF_CHECK(ftello(fp) == i);
 			}
 			/* positive + OOB */
+			ATF_CHECK(ftello(fp) == t->n);
+#if defined(__GLIBC__)
+			/* seeking beyond the end of a buffered w/a file on
+			 * glibc appears to rewind the buffer. */
+			if (**p != 'r')
+				setbuf(fp, NULL);
+#endif
 			ATF_CHECK(fseeko(fp, t->n + 1, SEEK_SET) == -1);
 			ATF_CHECK(ftello(fp) == t->n);
 
@@ -578,7 +617,13 @@ ATF_TC_BODY(test12, tc)
 
 	/* test fmemopen_seek(SEEK_END) */
 	for (t = &testcases[0]; t->s != NULL; ++t) {
+#if !defined(__NetBSD__)
+		/* Modes starting with 'r' treat the buffer size as length not the
+		 * first NUL byte offset. */
+		len = t->n;
+#else
 		len = (off_t)strnlen(t->s, t->n);
+#endif
 		rest = t->n - len;
 		for (p = &mode_r[0]; *p != NULL; ++p) {
 
@@ -589,7 +634,6 @@ ATF_TC_BODY(test12, tc)
 /*
  * test fmemopen_seek(SEEK_END)
  */
-#if !defined(__GLIBC__)
 			ATF_CHECK(ftello(fp) == (off_t)0);
 
 			/* zero */
@@ -615,7 +659,6 @@ ATF_TC_BODY(test12, tc)
 				ATF_CHECK(fseeko(fp, -i, SEEK_END) == 0);
 				ATF_CHECK(ftello(fp) == len - i);
 			}
-#endif
 			ATF_CHECK(fclose(fp) == 0);
 		}
 	}
@@ -644,9 +687,9 @@ ATF_TC_BODY(test13, tc)
 /*
  * test fmemopen_seek(SEEK_END)
  */
-#if !defined(__GLIBC__)
 			ATF_CHECK(ftello(fp) == (off_t)0);
-			ATF_CHECK(buf[0] == '\0');
+			if (fmemopen_truncates_buffer(*p))
+				ATF_CHECK(buf[0] == '\0');
 
 			/* zero */
 			ATF_CHECK(fseeko(fp, (off_t)0, SEEK_END) == 0);
@@ -665,7 +708,6 @@ ATF_TC_BODY(test13, tc)
 				ATF_CHECK(fseeko(fp, i, SEEK_END) == 0);
 				ATF_CHECK(ftello(fp) == i);
 			}
-#endif
 			ATF_CHECK(fclose(fp) == 0);
 		}
 	}
@@ -696,7 +738,6 @@ ATF_TC_BODY(test14, tc)
 /*
  * test fmemopen_seek(SEEK_END)
  */
-#if !defined(__GLIBC__)
 			ATF_CHECK(ftello(fp) == len);
 
 			/* zero */
@@ -722,7 +763,6 @@ ATF_TC_BODY(test14, tc)
 				ATF_CHECK(fseeko(fp, -i, SEEK_END) == 0);
 				ATF_CHECK(ftello(fp) == len - i);
 			}
-#endif
 			ATF_CHECK(fclose(fp) == 0);
 		}
 	}
@@ -751,10 +791,17 @@ ATF_TC_BODY(test15, tc)
 	const char **p;
 	char buf0[BUFSIZ];
 	FILE *fp;
-	int i;
+	off_t i, read_end;
 
 	for (t = &testcases[0]; t->s != NULL; ++t) {
 		for (p = &mode_rw1[0]; *p != NULL; ++p) {
+			read_end = (off_t)t->n;
+#ifndef __NetBSD__
+			/* NetBSD allows reading beyond EOF for 'w' mode. */
+			if (**p == 'w') {
+				read_end = 0;
+			}
+#endif
 
 			memcpy(&buf0[0], t->s, t->n);
 			fp = fmemopen(&buf0[0], t->n, *p);
@@ -762,15 +809,15 @@ ATF_TC_BODY(test15, tc)
 /*
  * test fmemopen_read + fgetc(3)
  */
-			for (i = 0; i < t->n; ++i) {
-				ATF_CHECK(ftello(fp) == (off_t)i);
+			for (i = 0; i < read_end; ++i) {
+				ATF_CHECK(ftello(fp) == i);
 				ATF_CHECK(fgetc(fp) == buf0[i]);
 				ATF_CHECK(feof(fp) == 0);
-				ATF_CHECK(ftello(fp) == (off_t)i + 1);
+				ATF_CHECK(ftello(fp) == i + 1);
 			}
 			ATF_CHECK(fgetc(fp) == EOF);
 			ATF_CHECK(feof(fp) != 0);
-			ATF_CHECK(ftello(fp) == (off_t)t->n);
+			ATF_CHECK(ftello(fp) == read_end);
 			ATF_CHECK(fclose(fp) == 0);
 		}
 	}
@@ -787,9 +834,17 @@ ATF_TC_BODY(test16, tc)
 	const char **p;
 	char buf0[BUFSIZ], buf1[BUFSIZ];
 	FILE *fp;
+	size_t read_end;
 
 	for (t = &testcases[0]; t->s != NULL; ++t) {
 		for (p = &mode_rw1[0]; *p != NULL; ++p) {
+			read_end = t->n;
+#ifndef __NetBSD__
+			/* NetBSD allows reading beyond EOF for 'w' mode. */
+			if (**p == 'w') {
+				read_end = 0;
+			}
+#endif
 
 			memcpy(&buf0[0], t->s, t->n);
 			buf1[t->n] = 0x1;
@@ -799,9 +854,9 @@ ATF_TC_BODY(test16, tc)
  * test fmemopen_read + fread(4)
  */
 			ATF_CHECK(ftello(fp) == (off_t)0);
-			ATF_CHECK(fread(&buf1[0], 1, sizeof(buf1), fp) == (size_t)t->n);
+			ATF_CHECK(fread(&buf1[0], 1, sizeof(buf1), fp) == read_end);
 			ATF_CHECK(feof(fp) != 0);
-			ATF_CHECK(memcmp(&buf0[0], &buf1[0], t->n) == 0);
+			ATF_CHECK(memcmp(&buf0[0], &buf1[0], read_end) == 0);
 			ATF_CHECK((unsigned char)buf1[t->n] == 0x1);
 
 			ATF_CHECK(fclose(fp) == 0);
@@ -820,10 +875,11 @@ ATF_TC_BODY(test17, tc)
 {
 	struct testcase *t;
 	size_t len;
-	int i;
+	size_t i;
 	const char **p;
 	char buf[BUFSIZ];
 	FILE *fp;
+	size_t read_end;
 
 	for (t = &testcases[0]; t->s != NULL; ++t) {
 		len = strnlen(t->s, t->n);
@@ -835,10 +891,13 @@ ATF_TC_BODY(test17, tc)
 /*
  * test fmemopen_read + fgetc(3)
  */
-#if defined(__GLIBC__)
-			if (i < t->n) {
+#ifdef __NetBSD__
+			/* NetBSD allows reading beyond EOF for 'a' mode. */
+			read_end = t->n;
+#else
+			read_end = len;
 #endif
-			for (i = len; i < t->n; ++i) {
+			for (i = len; i < read_end; ++i) {
 				ATF_CHECK(ftello(fp) == (off_t)i);
 				ATF_CHECK(fgetc(fp) == buf[i]);
 				ATF_CHECK(feof(fp) == 0);
@@ -846,9 +905,13 @@ ATF_TC_BODY(test17, tc)
 			}
 			ATF_CHECK(fgetc(fp) == EOF);
 			ATF_CHECK(feof(fp) != 0);
+#ifdef __NetBSD__
 			ATF_CHECK(ftello(fp) == (off_t)t->n);
+#else
+			ATF_CHECK(ftello(fp) == (off_t)len);
+#endif
 			rewind(fp);
-			for (i = 0; i < t->n; ++i) {
+			for (i = 0; i < read_end; ++i) {
 				ATF_CHECK(ftello(fp) == (off_t)i);
 				ATF_CHECK(fgetc(fp) == buf[i]);
 				ATF_CHECK(feof(fp) == 0);
@@ -856,10 +919,7 @@ ATF_TC_BODY(test17, tc)
 			}
 			ATF_CHECK(fgetc(fp) == EOF);
 			ATF_CHECK(feof(fp) != 0);
-			ATF_CHECK(ftello(fp) == (off_t)t->n);
-#if defined(__GLIBC__)
-			}
-#endif
+			ATF_CHECK(ftello(fp) == (off_t)read_end);
 			ATF_CHECK(fclose(fp) == 0);
 		}
 	}
@@ -873,7 +933,7 @@ ATF_TC_HEAD(test18, tc)
 ATF_TC_BODY(test18, tc)
 {
 	struct testcase *t;
-	size_t len;
+	size_t len, readlen1, readlen2;
 	const char **p;
 	char buf0[BUFSIZ], buf1[BUFSIZ];
 	FILE *fp;
@@ -881,7 +941,14 @@ ATF_TC_BODY(test18, tc)
 	for (t = &testcases[0]; t->s != NULL; ++t) {
 		len = strnlen(t->s, t->n);
 		for (p = &mode_a1[0]; *p != NULL; ++p) {
-
+			/* POSIX says reads end at current buffer length. */
+#if defined(__NetBSD__)
+			readlen1 = t->n - len;
+			readlen2 = (size_t)t->n;
+#else
+			readlen1 = 0;
+			readlen2 = len;
+#endif
 			memcpy(&buf0[0], t->s, t->n);
 			buf1[t->n - len] = 0x1;
 			fp = fmemopen(&buf0[0], t->n, *p);
@@ -889,26 +956,20 @@ ATF_TC_BODY(test18, tc)
 /*
  * test fmemopen_read + fread(3)
  */
-#if defined(__GLIBC__)
-			if (i < t->n) {
-#endif
 			ATF_CHECK(ftello(fp) == (off_t)len);
 			ATF_CHECK(fread(&buf1[0], 1, sizeof(buf1), fp)
-			    == t->n - len);
+			    == readlen1);
 			ATF_CHECK(feof(fp) != 0);
-			ATF_CHECK(!memcmp(&buf0[len], &buf1[0], t->n - len));
+			ATF_CHECK(!memcmp(&buf0[len], &buf1[0], readlen1));
 			ATF_CHECK((unsigned char)buf1[t->n - len] == 0x1);
 			rewind(fp);
 			buf1[t->n] = 0x1;
 			ATF_CHECK(ftello(fp) == (off_t)0);
 			ATF_CHECK(fread(&buf1[0], 1, sizeof(buf1), fp)
-			    == (size_t)t->n);
+			    == readlen2);
 			ATF_CHECK(feof(fp) != 0);
-			ATF_CHECK(!memcmp(&buf0[0], &buf1[0], t->n));
+			ATF_CHECK(!memcmp(&buf0[0], &buf1[0], readlen2));
 			ATF_CHECK((unsigned char)buf1[t->n] == 0x1);
-#if defined(__GLIBC__)
-			}
-#endif
 			ATF_CHECK(fclose(fp) == 0);
 		}
 	}
@@ -957,17 +1018,21 @@ ATF_TC_BODY(test19, tc)
 				ATF_CHECK(buf[i] == t->s[i]);
 				ATF_CHECK(ftello(fp) == (off_t)i + 1);
 				ATF_CHECK(buf[i] == t->s[i]);
-#if !defined(__GLIBC__)
-				ATF_CHECK(buf[i + 1] == '\0');
+#if !defined(__NetBSD__)
+				if (**p == 'w' && t->s[i] != '\0')
 #endif
+				ATF_CHECK(buf[i + 1] == '\0');
 			}
 
-/* don't accept non nul character at end of buffer */
+/* don't accept non nul character at end of buffer (not mandated by POSIX, so
+ * fails with glibc, etc.) */
+#if defined(__NetBSD__)
 			ATF_CHECK(fputc(0x1, fp) == EOF);
 			ATF_CHECK_MSG(ftello(fp) == (off_t)t->n,
 				"%jd != %jd", (intmax_t)ftello(fp),
 				(intmax_t)t->n);
 			ATF_CHECK(feof(fp) == 0);
+#endif
 
 /* accept nul character at end of buffer */
 			ATF_CHECK(fputc('\0', fp) == '\0');
@@ -1011,10 +1076,11 @@ ATF_TC_BODY(test20, tc)
 /*
  * test fmemopen_write + fwrite(3)
  */
-#if !defined(__GLIBC__)
+#if defined(__NetBSD__)
+/* NUL termination is not mandated by POSIX, so fails with glibc, etc. */
 			ATF_CHECK(buf[t->n] == '\0');
-
-/* don't accept non nul character at end of buffer */
+/* don't accept non nul character at end of buffer (not mandated by POSIX, so
+ * fails with glibc, etc.) */
 			ATF_CHECK(fwrite("\x1", 1, 1, fp) == 0);
 			ATF_CHECK(ftello(fp) == (off_t)t->n);
 			ATF_CHECK(feof(fp) == 0);
@@ -1068,15 +1134,18 @@ ATF_TC_BODY(test21, tc)
 					    == t->s[i - len]);
 					ATF_CHECK(buf[i] == t->s[i - len]);
 					ATF_CHECK(ftello(fp) == (off_t)i + 1);
-#if !defined(__GLIBC__)
+#if defined(__NetBSD__)
 					ATF_CHECK(buf[i + 1] == '\0');
 #endif
 				}
 
-/* don't accept non nul character at end of buffer */
+/* don't accept non nul character at end of buffer (not mandated by POSIX, so
+ * fails with glibc, etc.) */
+#if defined(__NetBSD__)
 				ATF_CHECK(ftello(fp) == (off_t)t->n - 1);
 				ATF_CHECK(fputc(0x1, fp) == EOF);
 				ATF_CHECK(ftello(fp) == (off_t)t->n - 1);
+#endif
 
 /* accept nul character at end of buffer */
 				ATF_CHECK(ftello(fp) == (off_t)t->n - 1);
@@ -1102,7 +1171,7 @@ ATF_TC_HEAD(test22, tc)
 ATF_TC_BODY(test22, tc)
 {
 	struct testcase *t0, *t1;
-	size_t len0, len1, nleft;
+	size_t len0, len1, nleft, written, writelen;
 	const char **p;
 	char buf[BUFSIZ];
 	FILE *fp;
@@ -1110,28 +1179,37 @@ ATF_TC_BODY(test22, tc)
 	for (t0 = &testcases[0]; t0->s != NULL; ++t0) {
 		len0 = strnlen(t0->s, t0->n);
 		for (t1 = &testcases[0]; t1->s != NULL; ++t1) {
-			len1 = strnlen(t1->s, t1->n);
 			for (p = &mode_a[0]; *p != NULL; ++p) {
-
+				len1 = strnlen(t1->s, t1->n);
 				memcpy(&buf[0], t0->s, t0->n);
 				fp = fmemopen(&buf[0], t0->n, *p);
 				ATF_CHECK(fp != NULL);
 				setbuf(fp, NULL);
+				ATF_CHECK(ftello(fp) == (off_t)len0);
 /*
  * test fmemopen_write + fwrite(3)
  */
 				nleft = t0->n - len0;
-#if !defined(__GLIBC__)
+				written = fwrite(t1->s, 1, t1->n, fp);
 				if (nleft == 0 || len1 == nleft - 1) {
-					ATF_CHECK(fwrite(t1->s, 1, t1->n, fp)
-					    == nleft);
-					ATF_CHECK(ftell(fp) == t1->n);
+					writelen = nleft;
 				} else {
-					ATF_CHECK(fwrite(t1->s, 1, t1->n, fp)
-					    == nleft - 1);
-					ATF_CHECK(ftell(fp) == t1->n - 1);
-				}
+#if defined(__NetBSD__)
+					/* NetBSD ensures NUL-termination */
+					writelen = nleft - 1;
+#else
+					/* POSIX says it's not required. */
+					writelen = nleft;
 #endif
+				}
+#if defined(__GLIBC__)
+				/* glibc incorrectly checks buf[writelen-1] for
+				 * NUL termination instead of clamped index. */
+				if (t1->s[t1->n - 1] != '\0' && nleft <= 1)
+					writelen = 0;
+#endif
+				ATF_CHECK(written == writelen);
+				ATF_CHECK(ftello(fp) == (off_t)(len0 + writelen));
 				ATF_CHECK(fclose(fp) == 0);
 			}
 		}

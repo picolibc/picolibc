@@ -488,6 +488,10 @@ foreach target : targets
     plain_tests += 'malloc_stress'
   endif
 
+  if tinystdio
+    plain_tests += 't_fmemopen'
+  endif
+
   if (posix_io or not tinystdio) and tests_enable_posix_io
     plain_tests += ['posix-io']
 
