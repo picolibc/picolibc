@@ -35,6 +35,7 @@
 
 #include "stdio_private.h"
 #include <stdlib.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -125,8 +126,10 @@ fmemopen(void *buf, size_t size, const char *mode)
 
     stdio_flags = __stdio_sflags(mode);
 
-    if (stdio_flags == 0)
+    if (stdio_flags == 0 || size == 0) {
+        errno = EINVAL;
         return NULL;
+    }
 
     /* Allocate file structure and necessary buffers */
     mf = calloc(1, sizeof(struct __file_mem));
@@ -135,9 +138,17 @@ fmemopen(void *buf, size_t size, const char *mode)
         return NULL;
 
     if (buf == NULL) {
+        /* POSIX says return EINVAL if: The buf argument is a null pointer and
+         * the mode argument does not include a '+' character. */
+        if ((stdio_flags & (__SRD | __SWR)) != (__SRD | __SWR)) {
+            free(mf);
+            errno = EINVAL;
+            return NULL;
+        }
         buf = malloc(size);
         if (!buf) {
             free(mf);
+            errno = ENOMEM;
             return NULL;
         }
         mflags |= __MALL;
