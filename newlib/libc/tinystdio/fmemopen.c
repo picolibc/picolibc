@@ -151,6 +151,7 @@ fmemopen(void *buf, size_t size, const char *mode)
             errno = ENOMEM;
             return NULL;
         }
+        *((char *)buf) = '\0';
         mflags |= __MALL;
     }
 
