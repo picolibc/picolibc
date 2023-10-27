@@ -5,8 +5,7 @@ libc_a_SOURCES += \
 	%D%/memcmp.S \
 	%D%/memcpy-stub.c \
 	%D%/memcpy.S \
-	%D%/memmove-stub.c \
-	%D%/memmove.S \
+	%D%/memmove.c \
 	%D%/memrchr-stub.c \
 	%D%/memrchr.S \
 	%D%/memset-stub.c \
