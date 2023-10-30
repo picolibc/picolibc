@@ -73,14 +73,13 @@ static int
 __fmem_get(FILE *f)
 {
     struct __file_mem *mf = (struct __file_mem *)f;
-    int c;
-    if ((f->flags & __SRD) && mf->pos < mf->size) {
-        c = (unsigned char)mf->buf[mf->pos++];
-        if (c == '\0')
-            c = _FDEV_EOF;
-    } else
-        c = _FDEV_ERR;
-    return c;
+    if ((f->flags & __SRD) == 0) {
+        return _FDEV_ERR;
+    } else if (mf->pos < mf->size) {
+        return (unsigned char)mf->buf[mf->pos++];
+    } else {
+        return _FDEV_EOF;
+    }
 }
 
 static int
