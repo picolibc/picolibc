@@ -60,11 +60,15 @@ typedef int fexcept_t;
 /* Exception flags */
 #define	FE_INVALID	0x0040
 #define	FE_DIVBYZERO	0x0020
+#if defined(__SH2E__)
+#define	FE_ALL_EXCEPT	(FE_DIVBYZERO | FE_INVALID)
+#else
 #define	FE_OVERFLOW	0x0010
 #define	FE_UNDERFLOW	0x0008
 #define	FE_INEXACT	0x0004
 #define	FE_ALL_EXCEPT	(FE_DIVBYZERO | FE_INEXACT | \
     FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW)
+#endif
 
 /* Rounding modes */
 #define	FE_TONEAREST		0x0000
