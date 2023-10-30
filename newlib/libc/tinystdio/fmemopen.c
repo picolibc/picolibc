@@ -33,10 +33,12 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _DEFAULT_SOURCE /* for strnlen */
 #include "stdio_private.h"
 #include <stdlib.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <string.h>
 #include <unistd.h>
 
 #define __MALL 0x01
@@ -44,7 +46,8 @@
 struct __file_mem {
     struct __file_ext xfile;
     char *buf;
-    size_t size;
+    size_t size; /* Current size. */
+    size_t bufsize; /* Upper limit on size. */
     size_t pos;
     uint8_t mflags;
 };
@@ -53,11 +56,17 @@ static int
 __fmem_put(char c, FILE *f)
 {
     struct __file_mem *mf = (struct __file_mem *)f;
-    if ((f->flags & __SWR) && mf->pos < mf->size) {
+    if ((f->flags & __SWR) == 0) {
+        return _FDEV_ERR;
+    } else if (mf->pos < mf->bufsize) {
         mf->buf[mf->pos++] = c;
+        if (mf->pos > mf->size) {
+            mf->size = mf->pos;
+        }
         return (unsigned char)c;
+    } else {
+        return _FDEV_EOF;
     }
-    return _FDEV_ERR;
 }
 
 static int
@@ -78,8 +87,12 @@ static int
 __fmem_flush(FILE *f)
 {
     struct __file_mem *mf = (struct __file_mem *)f;
-    if ((f->flags & __SWR) && mf->pos < mf->size)
+    if ((f->flags & __SWR) && mf->pos < mf->bufsize) {
         mf->buf[mf->pos] = '\0';
+        if (mf->pos > mf->size) {
+            mf->size = mf->pos;
+        }
+    }
     return 0;
 }
 
@@ -122,6 +135,8 @@ fmemopen(void *buf, size_t size, const char *mode)
 {
     int stdio_flags;
     uint8_t mflags = 0;
+    size_t initial_pos = 0;
+    size_t initial_size;
     struct __file_mem *mf;
 
     stdio_flags = __stdio_sflags(mode);
@@ -155,12 +170,28 @@ fmemopen(void *buf, size_t size, const char *mode)
         mflags |= __MALL;
     }
 
+    /* Check mode directly to avoid _POSIX_IO dependency. */
+    if (mode[0] == 'a') {
+        /* For append the position is set to the first NUL byte or the end. */
+        initial_pos = (mflags & __MALL) ? 0 : strnlen(buf, size);
+        initial_size = initial_pos;
+    } else if (mode[0] == 'w') {
+        initial_size = 0;
+        /* w+ mode truncates the buffer, writing NUL */
+        if ((stdio_flags & (__SRD | __SWR)) == (__SRD | __SWR)) {
+            *((char *)buf) = '\0';
+        }
+    } else {
+        initial_size = size;
+    }
+
     *mf = (struct __file_mem){
         .xfile = FDEV_SETUP_EXT(__fmem_put, __fmem_get, __fmem_flush,
                                 __fmem_close, __fmem_seek, NULL, stdio_flags),
         .buf = buf,
-        .size = size,
-        .pos = 0,
+        .size = initial_size,
+        .bufsize = size,
+        .pos = initial_pos,
         .mflags = mflags,
     };
 
