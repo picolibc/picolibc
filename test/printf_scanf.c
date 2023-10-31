@@ -98,6 +98,10 @@
 # define NO_C99_FORMATS
 #endif
 
+#if __SIZEOF_DOUBLE__ != 8
+#define NO_FLOATING_POINT
+#endif
+
 #ifndef _WANT_IO_LONG_LONG
 #define NO_LONG_LONG
 #endif
