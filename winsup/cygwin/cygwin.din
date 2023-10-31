@@ -534,7 +534,7 @@ fegetround NOSIGFE
 feholdexcept SIGFE
 feof SIGFE
 feof_unlocked SIGFE
-feraiseexcept SIGFE
+feraiseexcept NOSIGFE
 ferror SIGFE
 ferror_unlocked SIGFE
 fesetenv SIGFE
