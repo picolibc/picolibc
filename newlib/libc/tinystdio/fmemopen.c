@@ -62,6 +62,13 @@ __fmem_put(char c, FILE *f)
         mf->buf[mf->pos++] = c;
         if (mf->pos > mf->size) {
             mf->size = mf->pos;
+            /* When a stream open for update (the mode argument includes '+') or
+             * for writing only is successfully written and the write advances
+             * the current buffer end position, a null byte shall be written at
+             * the new buffer end position if it fits. */
+            if (mf->size < mf->bufsize) {
+                mf->buf[mf->size] = '\0';
+            }
         }
         return (unsigned char)c;
     } else {
