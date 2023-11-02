@@ -42,6 +42,7 @@
 #include <unistd.h>
 
 #define __MALL 0x01
+#define __MAPP 0x02
 
 struct __file_mem {
     struct __file_ext xfile;
@@ -56,12 +57,13 @@ static int
 __fmem_put(char c, FILE *f)
 {
     struct __file_mem *mf = (struct __file_mem *)f;
+    size_t pos = mf->mflags & __MAPP ? mf->size : mf->pos;
     if ((f->flags & __SWR) == 0) {
         return _FDEV_ERR;
-    } else if (mf->pos < mf->bufsize) {
-        mf->buf[mf->pos++] = c;
-        if (mf->pos > mf->size) {
-            mf->size = mf->pos;
+    } else if (pos < mf->bufsize) {
+        mf->buf[pos++] = c;
+        if (pos > mf->size) {
+            mf->size = pos;
             /* When a stream open for update (the mode argument includes '+') or
              * for writing only is successfully written and the write advances
              * the current buffer end position, a null byte shall be written at
@@ -70,6 +72,7 @@ __fmem_put(char c, FILE *f)
                 mf->buf[mf->size] = '\0';
             }
         }
+        mf->pos = pos;
         return (unsigned char)c;
     } else {
         return _FDEV_EOF;
@@ -182,6 +185,7 @@ fmemopen(void *buf, size_t size, const char *mode)
         /* For append the position is set to the first NUL byte or the end. */
         initial_pos = (mflags & __MALL) ? 0 : strnlen(buf, size);
         initial_size = initial_pos;
+        mflags |= __MAPP;
     } else if (mode[0] == 'w') {
         initial_size = 0;
         /* w+ mode truncates the buffer, writing NUL */
