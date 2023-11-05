@@ -35,6 +35,9 @@ details. */
    (path[mount_table->cygdrive_len + 1] == '/' || \
     !path[mount_table->cygdrive_len + 1]))
 
+#define isdev_disk(path) \
+  (path_prefix_p (dev_disk, (path), dev_disk_len, false))
+
 #define isproc(path) \
   (path_prefix_p (proc, (path), proc_len, false))
 
@@ -683,6 +686,13 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
 	}
       backslashify (src_path, dst, 0);
       /* Go through chroot check */
+      goto out;
+    }
+  if (isdev_disk (src_path))
+    {
+      dev = *dev_disk_dev;
+      *flags = 0;
+      strcpy (dst, src_path);
       goto out;
     }
   if (isproc (src_path))

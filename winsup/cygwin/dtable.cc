@@ -585,6 +585,9 @@ fh_alloc (path_conv& pc)
 	case FH_DEV:
 	  fh = cnew (fhandler_dev);
 	  break;
+	case FH_DEV_DISK:
+	  fh = cnew (fhandler_dev_disk);
+	  break;
 	case FH_DEV_FD:
 	  fh = cnew (fhandler_dev_fd);
 	  break;

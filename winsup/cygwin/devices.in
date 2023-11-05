@@ -115,6 +115,9 @@ const _device dev_cygdrive_storage =
 const _device dev_fs_storage =
   {"", {FH_FS}, "", exists};
 
+const _device dev_dev_disk_storage =
+  {"", {FH_DEV_DISK}, "", exists};
+
 const _device dev_proc_storage =
   {"", {FH_PROC}, "", exists};
 
@@ -173,6 +176,7 @@ const _device dev_error_storage =
    the POSIX namespace.  */
 %%
 "/dev", BRACK(FH_DEV), "", exists, S_IFDIR
+"/dev/disk", BRACK(FH_DEV_DISK), "", exists, S_IFDIR
 "/dev/tty", BRACK(FH_TTY), "/dev/tty", exists, S_IFCHR
 "/dev/pty%(0-127)d", BRACK(FHDEV(DEV_PTYS_MAJOR, {$1})), "/dev/pty{$1}", exists_pty, S_IFCHR, =ptys_dev
 ":ptym%(0-127)d", BRACK(FHDEV(DEV_PTYM_MAJOR, {$1})), "/dev/ptym{$1}", exists_internal, S_IFCHR, =ptym_dev

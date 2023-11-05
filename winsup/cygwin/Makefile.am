@@ -84,6 +84,7 @@ FHANDLER_FILES= \
 	fhandler/console.cc \
 	fhandler/cygdrive.cc \
 	fhandler/dev.cc \
+	fhandler/dev_disk.cc \
 	fhandler/dev_fd.cc \
 	fhandler/disk_file.cc \
 	fhandler/dsp.cc \

@@ -40,6 +40,8 @@ details. */
 extern const char *windows_device_names[];
 extern struct __cygwin_perfile *perfile_table;
 #define __fmode (*(user_data->fmode_ptr))
+extern const char dev_disk[];
+extern const size_t dev_disk_len;
 extern const char proc[];
 extern const size_t proc_len;
 extern const char procsys[];
@@ -3190,6 +3192,50 @@ class fhandler_procnet: public fhandler_proc
   }
 };
 
+class fhandler_dev_disk: public fhandler_virtual
+{
+  enum dev_disk_location {
+    unknown_loc, invalid_loc, disk_dir, by_id_dir, by_id_link
+  };
+  dev_disk_location loc;
+
+  void init_dev_disk ();
+  void ensure_inited ()
+  {
+    if (loc == unknown_loc)
+      init_dev_disk ();
+  }
+
+  int drive_from_id;
+  int part_from_id;
+
+ public:
+  fhandler_dev_disk ();
+  fhandler_dev_disk (void *) {}
+  virtual_ftype_t exists();
+  DIR *opendir (int fd);
+  int closedir (DIR *);
+  int readdir (DIR *, dirent *);
+  int open (int flags, mode_t mode = 0);
+  int fstat (struct stat *buf);
+  bool fill_filebuf ();
+
+  void copy_from (fhandler_base *x)
+  {
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_dev_disk *> (x);
+    _copy_from_reset_helper ();
+  }
+
+  fhandler_dev_disk *clone (cygheap_types malloc_type = HEAP_FHANDLER)
+  {
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_dev_disk));
+    fhandler_dev_disk *fh = new (ptr) fhandler_dev_disk (ptr);
+    fh->copy_from (this);
+    return fh;
+  }
+};
+
 class fhandler_dev_fd: public fhandler_virtual
 {
  public:
@@ -3416,6 +3462,7 @@ typedef union
   char __dev_raw[sizeof (fhandler_dev_raw)];
   char __dev_tape[sizeof (fhandler_dev_tape)];
   char __dev_zero[sizeof (fhandler_dev_zero)];
+  char __dev_disk[sizeof (fhandler_dev_disk)];
   char __dev_fd[sizeof (fhandler_dev_fd)];
   char __disk_file[sizeof (fhandler_disk_file)];
   char __fifo[sizeof (fhandler_fifo)];
