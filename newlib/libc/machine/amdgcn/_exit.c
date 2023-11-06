@@ -13,11 +13,11 @@
  * they apply.
  */
 
-#include <stdlib.h>
+#include <unistd.h>
 #include "exit-value.h"
 
 void __attribute__((noreturn))
-exit (int val)
+_exit (int val)
 {
   exit_with_status_and_signal (val, 0);
 }

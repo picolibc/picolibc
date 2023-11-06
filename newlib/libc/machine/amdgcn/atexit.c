@@ -18,8 +18,7 @@
 int
 atexit (void (*function)(void))
 {
-  /* Our current implementation of exit does not run functions registered with
-     atexit, so fail here.  */
+  /* Fail here.  */
   abort ();
   return 1;
 }

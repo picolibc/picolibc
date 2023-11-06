@@ -1,6 +1,6 @@
 libc_a_SOURCES += \
+	%D%/_exit.c \
 	%D%/abort.c \
-	%D%/exit.c \
 	%D%/atexit.c \
 	%D%/mlock.c \
 	%D%/getreent.c \
