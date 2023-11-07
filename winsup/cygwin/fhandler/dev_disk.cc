@@ -176,9 +176,38 @@ by_id_realloc (by_id_entry *p, size_t n)
   return reinterpret_cast<by_id_entry *>(p2);
 }
 
+static bool
+format_partuuid (char *name, const PARTITION_INFORMATION_EX *pix)
+{
+  const GUID *guid;
+  switch (pix->PartitionStyle)
+    {
+      case PARTITION_STYLE_MBR: guid = &pix->Mbr.PartitionId; break;
+      case PARTITION_STYLE_GPT: guid = &pix->Gpt.PartitionId; break;
+      default: return false;
+    }
+
+  if (pix->PartitionStyle == PARTITION_STYLE_MBR && !guid->Data2
+      && !guid->Data3 && !guid->Data4[6] && !guid->Data4[7])
+      /* MBR "GUID": SERIAL-0000-0000-00NN-NNNNNNN00000
+	 Byte offset in LE order -----^^^^-^^^^^^^
+	 Print as: SERIAL-OFFSET */
+    __small_sprintf(name,
+		    "%08_x-%02_x%02_x%02_x%02_x%02_x%02_x",
+		    guid->Data1, guid->Data4[5], guid->Data4[4], guid->Data4[3],
+		    guid->Data4[2], guid->Data4[1], guid->Data4[0]);
+  else
+    __small_sprintf(name,
+		    "%08_x-%04_x-%04_x-%02_x%02_x-%02_x%02_x%02_x%02_x%02_x%02_x",
+		    guid->Data1, guid->Data2, guid->Data3,
+		    guid->Data4[0], guid->Data4[1], guid->Data4[2], guid->Data4[3],
+		    guid->Data4[4], guid->Data4[5], guid->Data4[6], guid->Data4[7]);
+   return true;
+}
+
 /* Create sorted name -> drive mapping table. Must be freed by caller. */
 static int
-get_by_id_table (by_id_entry * &table)
+get_by_id_table (by_id_entry * &table, fhandler_dev_disk::dev_disk_location loc)
 {
   table = nullptr;
 
@@ -282,25 +311,31 @@ get_by_id_table (by_id_entry * &table)
 		}
 	    }
 
-	  /* Fetch storage properties and create the ID string. */
-	  int rc = storprop_to_id_name (devhdl, &upath, ioctl_buf,
-					table[table_size].name);
-	  if (rc <= 0)
+	  const char *drive_name = "";
+	  if (loc == fhandler_dev_disk::disk_by_id)
 	    {
-	      if (rc < 0)
-		errno_set = true;
-	      continue;
+	      /* Fetch storage properties and create the ID string. */
+	      int rc = storprop_to_id_name (devhdl, &upath, ioctl_buf,
+					    table[table_size].name);
+	      if (rc <= 0)
+		{
+		  if (rc < 0)
+		    errno_set = true;
+		  continue;
+		}
+	      drive_name = table[table_size].name;
+	      table[table_size].drive = drive_num;
+	      table[table_size].part = 0;
+	      table_size++;
 	    }
-	  int drive_index = table_size++;
-	  size_t drive_len = strlen(table[drive_index].name);
-	  table[drive_index].drive = drive_num;
-	  table[drive_index].part = 0;
 
-	  /* Fetch drive layout info to get size of all partitions on disk. */
+	  /* Fetch drive layout info to information of all partitions on disk. */
 	  DWORD bytes_read;
 	  if (!DeviceIoControl (devhdl, IOCTL_DISK_GET_DRIVE_LAYOUT_EX, nullptr, 0,
 			       ioctl_buf, NT_MAX_PATH, &bytes_read, nullptr))
 	    {
+	      __seterrno_from_win_error (GetLastError ());
+	      errno_set = true;
 	      debug_printf ("DeviceIoControl(%S, "
 			    "IOCTL_DISK_GET_DRIVE_LAYOUT_EX): %E", &upath);
 	      continue;
@@ -311,7 +346,8 @@ get_by_id_table (by_id_entry * &table)
 	    reinterpret_cast<const DRIVE_LAYOUT_INFORMATION_EX *>(ioctl_buf);
 	  for (DWORD i = 0; i < dlix->PartitionCount; i++)
 	    {
-	      DWORD part_num = dlix->PartitionEntry[i].PartitionNumber;
+	      const PARTITION_INFORMATION_EX *pix = &dlix->PartitionEntry[i];
+	      DWORD part_num = pix->PartitionNumber;
 	      /* A partition number of 0 denotes an extended partition or a
 		 filler entry as described in
 		 fhandler_dev_floppy::lock_partition.  Just skip. */
@@ -319,9 +355,22 @@ get_by_id_table (by_id_entry * &table)
 		continue;
 	      if (part_num > max_part_num)
 		break;
-	      table[table_size] = table[drive_index];
-	      __small_sprintf(table[table_size].name + drive_len, "-part%u",
-			      part_num);
+
+	      char *name = table[table_size].name;
+	      switch (loc)
+		{
+		  case fhandler_dev_disk::disk_by_id:
+		    __small_sprintf (name, "%s-part%u", drive_name, part_num);
+		    break;
+
+		  case fhandler_dev_disk::disk_by_partuuid:
+		    if (!format_partuuid (name, pix))
+		      continue;
+		    break;
+
+		  default: continue; /* Should not happen. */
+		}
+	      table[table_size].drive = drive_num;
 	      table[table_size].part = part_num;
 	      table_size++;
 	    }
@@ -362,10 +411,15 @@ get_by_id_table (by_id_entry * &table)
 
 const char dev_disk[] = "/dev/disk";
 const size_t dev_disk_len = sizeof (dev_disk) - 1;
+static const char by_id[] = "/by-id";
+const size_t by_id_len = sizeof(by_id) - 1;
+static const char by_partuuid[] = "/by-partuuid";
+const size_t by_partuuid_len = sizeof(by_partuuid) - 1;
 
 fhandler_dev_disk::fhandler_dev_disk ():
   fhandler_virtual (),
   loc (unknown_loc),
+  loc_is_link (false),
   drive_from_id (-1),
   part_from_id (0)
 {
@@ -377,32 +431,46 @@ fhandler_dev_disk::init_dev_disk ()
   if (loc != unknown_loc)
     return;
 
-  static const char by_id[] = "/by-id";
-  const size_t by_id_len = sizeof(by_id) - 1;
-
   /* Determine location. */
   const char *path = get_name ();
+  size_t dirlen = 0;
   if (!path_prefix_p (dev_disk, path, dev_disk_len, false))
     loc = invalid_loc; // should not happen
   else if (!path[dev_disk_len])
     loc = disk_dir; // "/dev/disk"
-  else if (!path_prefix_p (by_id, path + dev_disk_len, by_id_len, false))
-    loc = invalid_loc; // "/dev/disk/invalid"
-  else if (!path[dev_disk_len + by_id_len])
-    loc = by_id_dir; // "/dev/disk/by-id"
-  else if (strchr (path + dev_disk_len + by_id_len + 1, '/'))
-    loc = invalid_loc; // "/dev/disk/by-id/dir/invalid"
+  else if (path_prefix_p (by_id, path + dev_disk_len, by_id_len, false))
+    {
+      loc = disk_by_id; // "/dev/disk/by-id.."
+      dirlen = dev_disk_len + by_id_len;
+    }
+  else if (path_prefix_p (by_partuuid, path + dev_disk_len, by_partuuid_len, false))
+    {
+      loc = disk_by_partuuid; // "/dev/disk/by-partuuid..."
+      dirlen = dev_disk_len + by_partuuid_len;
+    }
   else
-    loc = by_id_link; // possible "/dev/disk/by-id/LINK"
-  debug_printf ("'%s': loc %d", path, (int)loc);
+      loc = invalid_loc; // "/dev/disk/invalid"
 
-  /* Done if "/dev/disk", "/dev/disk/by_id" or invalid. */
-  if (loc != by_id_link)
+  loc_is_link = false;
+  if (dirlen)
+    {
+      if (!path[dirlen])
+	; // "/dev/disk/by-..."
+      else if (!strchr (path + dirlen + 1, '/'))
+	loc_is_link = true; // "/dev/disk/by-.../LINK"
+      else
+	loc = invalid_loc; // "/dev/disk/by-.../dir/invalid"
+    }
+
+  debug_printf ("%s: loc %d, loc_is_link %d", path, (int) loc, (int) loc_is_link);
+
+  /* Done if directory or invalid. */
+  if (!loc_is_link)
     return;
 
-  /* Check whether "/dev/disk/by_id/LINK" exists. */
+  /* Check whether "/dev/disk/by-.../LINK" exists. */
   by_id_entry *table;
-  int table_size = get_by_id_table (table);
+  int table_size = get_by_id_table (table, loc);
   if (!table)
     {
       loc = invalid_loc;
@@ -410,7 +478,7 @@ fhandler_dev_disk::init_dev_disk ()
     }
 
   by_id_entry key;
-  strcpy (key.name, path + dev_disk_len + by_id_len + 1);
+  strcpy (key.name, path + dirlen + 1);
   const void *found = bsearch (&key, table, table_size, sizeof (*table),
 			       by_id_compare_name);
   if (found)
@@ -430,16 +498,12 @@ fhandler_dev_disk::exists ()
 {
   debug_printf ("exists (%s)", get_name ());
   ensure_inited ();
-  switch (loc)
-    {
-      case disk_dir:
-      case by_id_dir:
-	return virt_directory;
-      case by_id_link:
-	return virt_symlink;
-      default:
-	return virt_none;
-    }
+  if (loc == invalid_loc)
+    return virt_none;
+  else if (loc_is_link)
+    return virt_symlink;
+  else
+    return virt_directory;
 }
 
 int
@@ -454,7 +518,7 @@ fhandler_dev_disk::fstat (struct stat *buf)
     }
 
   fhandler_base::fstat (buf);
-  buf->st_mode = (loc == by_id_link ? S_IFLNK | S_IWUSR | S_IWGRP | S_IWOTH
+  buf->st_mode = (loc_is_link ? S_IFLNK | S_IWUSR | S_IWGRP | S_IWOTH
 		  : S_IFDIR) | STD_RBITS | STD_XBITS;
   buf->st_ino = get_ino ();
   return 0;
@@ -470,16 +534,16 @@ DIR *
 fhandler_dev_disk::opendir (int fd)
 {
   ensure_inited ();
-  if (!(loc == disk_dir || loc == by_id_dir))
+  if (loc_is_link)
     {
       set_errno (ENOTDIR);
       return nullptr;
     }
 
   by_id_entry *table = nullptr;
-  if (loc == by_id_dir)
+  if (loc != disk_dir)
     {
-      int table_size = get_by_id_table (table);
+      int table_size = get_by_id_table (table, loc);
       if (table_size < 0)
 	return nullptr; /* errno is set. */
       if (table)
@@ -524,14 +588,15 @@ fhandler_dev_disk::readdir (DIR *dir, dirent *de)
       dir->__d_position++;
       res = 0;
     }
-  else if (loc == disk_dir && dir->__d_position == 2)
+  else if (loc == disk_dir && dir->__d_position < 2 + 2)
     {
-      strcpy (de->d_name, "by-id");
+      static const char * const names[2] {by_id, by_partuuid};
+      strcpy (de->d_name, names[dir->__d_position - 2] + 1);
       de->d_type = DT_DIR;
       dir->__d_position++;
       res = 0;
     }
-  else if (loc == by_id_dir && *dir_id_table (dir))
+  else if (*dir_id_table (dir))
     {
       const char *name = (*dir_id_table (dir))[dir->__d_position - 2].name;
       if (name[0])
@@ -559,7 +624,8 @@ fhandler_dev_disk::open (int flags, mode_t mode)
   int err = 0;
   if (!fhandler_virtual::open (flags, mode))
     err = -1;
-  else if (loc == disk_dir || loc == by_id_dir)
+  /* else if (loc_is_link) {} */ /* should not happen. */
+  else if (loc != invalid_loc)
     {
       if ((flags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
 	err = EEXIST;
@@ -568,8 +634,7 @@ fhandler_dev_disk::open (int flags, mode_t mode)
       else
 	diropen = true;
     }
-  /* else if (loc == by_id_link) { } */ /* should not happen */
-  else /* (loc == invalid_loc) */
+  else
     {
       if (flags & O_CREAT)
 	err = EROFS;
@@ -600,7 +665,7 @@ fhandler_dev_disk::fill_filebuf ()
 {
   debug_printf ("fill_filebuf (%s)", get_name ());
   ensure_inited ();
-  if (!(loc == by_id_link && drive_from_id >= 0))
+  if (!(loc_is_link && drive_from_id >= 0))
     return false;
 
   char buf[32];

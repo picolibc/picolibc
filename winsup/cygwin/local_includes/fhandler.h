@@ -3194,10 +3194,15 @@ class fhandler_procnet: public fhandler_proc
 
 class fhandler_dev_disk: public fhandler_virtual
 {
+public:
   enum dev_disk_location {
-    unknown_loc, invalid_loc, disk_dir, by_id_dir, by_id_link
+    unknown_loc, invalid_loc, disk_dir,
+    disk_by_id, disk_by_partuuid
   };
+
+private:
   dev_disk_location loc;
+  bool loc_is_link;
 
   void init_dev_disk ();
   void ensure_inited ()
