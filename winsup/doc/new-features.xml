@@ -35,6 +35,20 @@ class expressions, and collating symbols in the search pattern, i.e.,
 </para></listitem>
 
 <listitem><para>
+Introduce /dev/disk directory with subdirectories by-id and by-partuuid.
+The by-id directory provides symlinks for each disk and its partitions:
+  <screen>
+  BUSTYPE-[VENDOR_]PRODUCT_[SERIAL|0xHASH][-partN] -> ../../sdX[N]
+  </screen>
+The by-partuuid directory provides symlinks for each MBR and GPT disk
+partition:
+  <screen>
+  MBR_SERIAL-OFFSET -> ../../sdXN
+  GPT_GUID -> ../../sdXN
+  </screen>
+</para></listitem>
+
+<listitem><para>
 Introduce /proc/codesets and /proc/locales with information on supported
 codesets and locales for all interested parties.  Locale(1) opens these
 files and uses the info for printing locale info like any other process

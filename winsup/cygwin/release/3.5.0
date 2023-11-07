@@ -17,6 +17,12 @@ What's new:
   class expressions, and collating symbols in the search pattern, i.e.,
   [:alnum:], [=a=], [.aa.].
 
+- Introduce /dev/disk directory with subdirectories by-id and by-partuuid.
+  The by-id directory provides symlinks for each disk and its partitions:
+  BUSTYPE-[VENDOR_]PRODUCT_[SERIAL|HASH][-partN] -> ../../sdX[N].
+  The by-partuuid directory provides symlinks for each MBR and GPT disk
+  partition: MBR_SERIAL-OFFSET -> ../../sdXN, GPT_GUID -> ../../sdXN.
+
 - Introduce /proc/codesets and /proc/locales with information on
   supported codesets and locales for all interested parties.  Locale(1)
   opens these files and uses the info for printing locale info like any
