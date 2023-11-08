@@ -14,27 +14,33 @@ details. */
 #include <wctype.h>
 #include <winioctl.h>
 
-/* Replace non-printing and unexpected characters, remove trailing spaces,
-   return remaining string length. */
+/* Replace spaces, non-printing and unexpected characters.  Remove
+   leading and trailing spaces.  Return remaining string length. */
 static int
 sanitize_id_string (char *s)
 {
-  int lastspace = -1, i;
-  for (i = 0; s[i]; i++)
+  int first = 0;
+  while (s[first] == ' ')
+    first++;
+  int last = -1, i;
+  for (i = 0; s[first + i]; i++)
     {
-      char c = s[i];
+      char c = s[first + i];
       if (c != ' ')
-	lastspace = -1;
-      else if (lastspace < 0)
-	lastspace = i;
-      if (('0' <= c && c <= '9') || c == '.' || c == '-'
-	  || ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z'))
+	last = -1;
+      else if (last < 0)
+	last = i;
+      if (!(('0' <= c && c <= '9') || c == '.' || c == '-'
+	  || ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z')))
+	c = '_';
+      else if (!first)
 	continue;
-      s[i] = '_';
+      s[i] = c;
     }
-  if (lastspace >= 0)
-    s[(i = lastspace)] = '\0';
-  return i;
+  if (last < 0)
+    last = i;
+  s[last] = '\0';
+  return last;
 }
 
 /* Fetch storage properties and create the ID string.
