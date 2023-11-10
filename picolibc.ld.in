@@ -75,7 +75,9 @@ SECTIONS
 		PROVIDE (__etext = __text_end);
 		PROVIDE (_etext = __text_end);
 		PROVIDE (etext = __text_end);
+	} >flash AT>flash :text
 
+	.rodata : {
 		/* read-only data */
 		*(.rdata)
 		*(.rodata .rodata.*)
@@ -86,6 +88,9 @@ SECTIONS
 		*(.srodata.cst4)
 		*(.srodata.cst2)
 		*(.srodata .srodata.*)
+	} >flash AT>flash :text
+
+	.data.rel.ro : {
 		*(.data.rel.ro .data.rel.ro.*)
 
 		/* Need to pre-align so that the symbols come after padding */
