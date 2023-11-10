@@ -373,6 +373,10 @@ if(NOT DEFINED _WANT_IO_LONG_LONG)
   option(_WANT_IO_LONG_LONG "Support long long in integer printf/scanf" OFF)
 endif()
 
+if(NOT DEFINED _WANT_IO_LONG_DOUBLE)
+  option(_WANT_IO_LONG_DOUBLE "Support long double in printf/scanf" OFF)
+endif()
+
 if(NOT DEFINED _WANT_MINIMAL_IO_LONG_LONG)
   option(_WANT_MINIMAL_IO_LONG_LONG "Support long long in minimal printf/scanf" OFF)
 endif()
