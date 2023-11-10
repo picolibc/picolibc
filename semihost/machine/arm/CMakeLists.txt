@@ -34,3 +34,5 @@
 #
 
 target_sources(semihost PRIVATE semihost-arm.S)
+
+set(_SEMIHOST_ARM 1 PARENT_SCOPE)
