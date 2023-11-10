@@ -75,23 +75,6 @@ SECTIONS
 		PROVIDE (@PREFIX@__etext = @PREFIX@__text_end);
 		PROVIDE (@PREFIX@_etext = @PREFIX@__text_end);
 		PROVIDE (@PREFIX@etext = @PREFIX@__text_end);
-	} >flash AT>flash :text
-
-	.rodata : {
-		/* read-only data */
-		*(.rdata)
-		*(.rodata .rodata.*)
-		*(.gnu.linkonce.r.*)
-
-		*(.srodata.cst16)
-		*(.srodata.cst8)
-		*(.srodata.cst4)
-		*(.srodata.cst2)
-		*(.srodata .srodata.*)
-	} >flash AT>flash :text
-
-	.data.rel.ro : {
-		*(.data.rel.ro .data.rel.ro.*)
 
 		/* Need to pre-align so that the symbols come after padding */
 		. = ALIGN(@DEFAULT_ALIGNMENT@);
@@ -110,6 +93,28 @@ SECTIONS
 		KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
 		KEEP (*(.fini_array .dtors))
 		PROVIDE_HIDDEN ( @PREFIX@__fini_array_end = . );
+
+	} >flash AT>flash :text
+
+	.rodata : {
+
+		/* read-only data */
+		*(.rdata)
+		*(.rodata .rodata.*)
+		*(.gnu.linkonce.r.*)
+
+		*(.srodata.cst16)
+		*(.srodata.cst8)
+		*(.srodata.cst4)
+		*(.srodata.cst2)
+		*(.srodata .srodata.*)
+
+	} >flash AT>flash :text
+
+	.data.rel.ro : {
+
+		/* data that needs relocating */
+		*(.data.rel.ro .data.rel.ro.*)
 
 	} >flash AT>flash :text
 
