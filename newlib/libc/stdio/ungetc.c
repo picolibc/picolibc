@@ -125,12 +125,6 @@ _ungetc_r (struct _reent *rptr,
 
   _newlib_flockfile_start (fp);
 
-  if (ORIENT (fp, -1) != -1)
-    {
-      _newlib_flockfile_exit (fp);
-      return EOF;
-    }
-
   /* After ungetc, we won't be at eof anymore */
   fp->_flags &= ~__SEOF;
 

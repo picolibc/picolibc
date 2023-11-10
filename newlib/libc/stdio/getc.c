@@ -81,6 +81,9 @@ _getc_r (struct _reent *ptr,
 {
   int result;
   CHECK_INIT (ptr, fp);
+  if (ORIENT (fp, -1) != -1)
+    return EOF;
+
   _newlib_flockfile_start (fp);
   result = __sgetc_r (ptr, fp);
   _newlib_flockfile_end (fp);
@@ -96,6 +99,9 @@ getc (register FILE *fp)
   struct _reent *reent = _REENT;
 
   CHECK_INIT (reent, fp);
+  if (ORIENT (fp, -1) != -1)
+    return EOF;
+
   _newlib_flockfile_start (fp);
   result = __sgetc_r (reent, fp);
   _newlib_flockfile_end (fp);

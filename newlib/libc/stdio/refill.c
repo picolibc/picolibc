@@ -43,9 +43,6 @@ __srefill_r (struct _reent * ptr,
 
   CHECK_INIT (ptr, fp);
 
-  if (ORIENT (fp, -1) != -1)
-    return EOF;
-
   fp->_r = 0;			/* largely a convenience for callers */
 
   /* SysV does not make this test; take it out for compatibility */

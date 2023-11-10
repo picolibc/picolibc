@@ -82,9 +82,8 @@ _ungetwc_r (struct _reent *ptr,
   size_t len;
 
   _newlib_flockfile_start (fp);
-  if (ORIENT (fp, 1) != 1)
-    wc = WEOF;
-  else if (wc == WEOF)
+  ORIENT (fp, 1);
+  if (wc == WEOF)
     wc = WEOF;
   else if ((len = _wcrtomb_r(ptr, buf, wc, &fp->_mbstate)) == (size_t)-1)
     {
