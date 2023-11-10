@@ -27,6 +27,7 @@ set(FORMAT_DEFAULT_INTEGER 0)
 set(PICOLIBC_LINK_FLAGS
   --ld-path=/usr/bin/arm-none-eabi-ld
   -L/usr/lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/
+  -L/usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/
   -Wl,-z,noexecstack
   -Wl,-no-enum-size-warning
   -T ${CMAKE_CURRENT_SOURCE_DIR}/cmake/TC-arm-none-eabi.ld
