@@ -67,12 +67,18 @@
 # if __SIZEOF_LONG_DOUBLE__ == 4
 #  define _NEED_IO_FLOAT32
 #  define LONG_FLOAT_MAX_DIG    FTOA_MAX_DIG
+#  define __lfloat_d_engine     __ftoa_engine
+#  define __lfloat_x_engine     __ftox_engine
 # elif __SIZEOF_LONG_DOUBLE__ == 8
 #  define _NEED_IO_FLOAT64
 #  define LONG_FLOAT_MAX_DIG    DTOA_MAX_DIG
+#  define __lfloat_d_engine     __dtoa_engine
+#  define __lfloat_x_engine     __dtox_engine
 # elif __SIZEOF_LONG_DOUBLE__ > 8
 #  define _NEED_IO_FLOAT_LARGE
 #  define LONG_FLOAT_MAX_DIG    LDTOA_MAX_DIG
+#  define __lfloat_d_engine     __ldtoa_engine
+#  define __lfloat_x_engine     __ldtox_engine
 # endif
 #endif
 
@@ -80,11 +86,13 @@
 # if __SIZEOF_DOUBLE__ == 4
 #  define _NEED_IO_FLOAT32
 #  define FLOAT_MAX_DIG         FTOA_MAX_DIG
-#  define __float_engine        __ftoa_engine
+#  define __float_d_engine      __ftoa_engine
+#  define __float_x_engine      __ftox_engine
 # elif __SIZEOF_DOUBLE__ == 8
 #  define _NEED_IO_FLOAT64
 #  define FLOAT_MAX_DIG         DTOA_MAX_DIG
-#  define __float_engine        __dtoa_engine
+#  define __float_d_engine      __dtoa_engine
+#  define __float_x_engine      __dtox_engine
 # endif
 # define PRINTF_FLOAT_ARG(ap)   (va_arg(ap, double))
 #endif
@@ -93,7 +101,8 @@
 # define _NEED_IO_FLOAT32
 # define PRINTF_FLOAT_ARG(ap) (asfloat(va_arg(ap, uint32_t)))
 # define FLOAT_MAX_DIG   FTOA_MAX_DIG
-# define __float_engine __ftoa_engine
+# define __float_d_engine __ftoa_engine
+# define __float_x_engine __ftox_engine
 #endif
 
 #ifdef _NEED_IO_FLOAT_LARGE

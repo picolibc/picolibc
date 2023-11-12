@@ -251,6 +251,54 @@ typedef long ultoa_signed_t;
 #define FL_FLTEXP	0x1000
 #define	FL_FLTFIX	0x2000
 
+#ifdef _NEED_IO_C99_FORMATS
+
+#define CHECK_INT_SIZE(c, flags, letter, type)          \
+    if (c == letter) {                                  \
+        if (sizeof(type) == sizeof(int))                \
+            ;                                           \
+        else if (sizeof(type) == sizeof(long))          \
+            flags |= FL_LONG;                           \
+        else if (sizeof(type) == sizeof(long long))     \
+            flags |= FL_LONG|FL_REPD_TYPE;              \
+        else if (sizeof(type) == sizeof(short))         \
+            flags |= FL_SHORT;                          \
+        continue;                                       \
+    }
+
+#define CHECK_C99_INT_SIZES(c, flags)           \
+    CHECK_INT_SIZE(c, flags, 'j', intmax_t);    \
+    CHECK_INT_SIZE(c, flags, 'z', size_t);      \
+    CHECK_INT_SIZE(c, flags, 't', ptrdiff_t);
+
+#else
+#define CHECK_C99_INT_SIZES(c, flags)
+#endif
+
+#define CHECK_INT_SIZES(c, flags) {             \
+        if (c == 'l') {                         \
+            if (flags & FL_LONG)                \
+                flags |= FL_REPD_TYPE;          \
+            flags |= FL_LONG;                   \
+            continue;                           \
+        }                                       \
+                                                \
+        if (c == 'h') {                         \
+            if (flags & FL_SHORT)               \
+                flags |= FL_REPD_TYPE;          \
+            flags |= FL_SHORT;                  \
+            continue;                           \
+        }                                       \
+                                                \
+        /* alias for 'll' */                    \
+        if (c == 'L') {                         \
+            flags |= FL_REPD_TYPE;              \
+            flags |= FL_LONG;                   \
+            continue;                           \
+        }                                       \
+        CHECK_C99_INT_SIZES(c, flags);          \
+    }
+
 #ifdef _NEED_IO_POS_ARGS
 
 typedef struct {
@@ -344,47 +392,8 @@ skip_to_arg(const CHAR *fmt_orig, my_va_list *ap, int target_argno)
                 }
 	    }
 
-	    if (c == 'l') {
-		if (flags & FL_LONG)
-		    flags |= FL_REPD_TYPE;
-		flags |= FL_LONG;
-		continue;
-	    }
+            CHECK_INT_SIZES(c, flags);
 
-	    if (c == 'h') {
-		if (flags & FL_SHORT)
-		    flags |= FL_REPD_TYPE;
-		flags |= FL_SHORT;
-		continue;
-	    }
-
-            /* alias for 'll' */
-            if (c == 'L') {
-                flags |= FL_REPD_TYPE;
-		flags |= FL_LONG;
-		continue;
-            }
-
-#ifdef _NEED_IO_C99_FORMATS
-
-#define CHECK_LONGLONG(type) else if (sizeof(type) == sizeof(long long)) flags |= FL_LONG|FL_REPD_TYPE;
-
-#define CHECK_INT_SIZE(letter, type)			\
-	    if (c == letter) {				\
-		if (sizeof(type) == sizeof(int))	\
-		    ;                                   \
-		else if (sizeof(type) == sizeof(long))	\
-		    flags |= FL_LONG;                   \
-                CHECK_LONGLONG(type)                    \
-		else if (sizeof(type) == sizeof(short))	\
-		    flags |= FL_SHORT;			\
-                continue;                               \
-	    }
-
-	    CHECK_INT_SIZE('j', intmax_t);
-	    CHECK_INT_SIZE('z', size_t);
-	    CHECK_INT_SIZE('t', ptrdiff_t);
-#endif
 	    break;
 	} while ( (c = *fmt++) != 0);
         if (argno == 0)
@@ -575,47 +584,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #endif
 	    }
 
-	    if (c == 'l') {
-		if (flags & FL_LONG)
-		    flags |= FL_REPD_TYPE;
-		flags |= FL_LONG;
-		continue;
-	    }
-
-	    if (c == 'h') {
-		if (flags & FL_SHORT)
-		    flags |= FL_REPD_TYPE;
-		flags |= FL_SHORT;
-		continue;
-	    }
-
-            /* alias for 'll' */
-            if (c == 'L') {
-                flags |= FL_REPD_TYPE;
-		flags |= FL_LONG;
-		continue;
-            }
-
-#define CHECK_LONGLONG(type) else if (sizeof(type) == sizeof(long long)) flags |= FL_LONG|FL_REPD_TYPE;
-
-#ifdef _NEED_IO_C99_FORMATS
-
-#define CHECK_INT_SIZE(letter, type)			\
-	    if (c == letter) {				\
-		if (sizeof(type) == sizeof(int))	\
-		    ;                                   \
-		else if (sizeof(type) == sizeof(long))	\
-		    flags |= FL_LONG;                   \
-                CHECK_LONGLONG(type)                    \
-		else if (sizeof(type) == sizeof(short))	\
-		    flags |= FL_SHORT;			\
-                continue;                               \
-	    }
-
-	    CHECK_INT_SIZE('j', intmax_t);
-	    CHECK_INT_SIZE('z', size_t);
-	    CHECK_INT_SIZE('t', ptrdiff_t);
-#endif
+            CHECK_INT_SIZES(c, flags);
 
 	    break;
 	} while ( (c = *fmt++) != 0);
@@ -642,10 +611,6 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #endif
 
 	/* Only a format character is valid.	*/
-
-#if	'F' != 'E'+1  ||  'G' != 'F'+1  ||  'f' != 'e'+1  ||  'g' != 'f'+1
-# error
-#endif
 
 #define TOCASE(c)       ((c) - case_convert)
 
@@ -684,13 +649,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 
                     if (!(flags & FL_PREC))
                         prec = -1;
-#ifdef _NEED_IO_FLOAT_LARGE
-                    prec = __ldtox_engine(fval, &dtoa, prec, case_convert);
-#elif __SIZEOF_LONG_DOUBLE__ == 8
-                    prec = __dtox_engine(fval, &dtoa, prec, case_convert);
-#elif __SIZEOF_LONG_DOUBLE__ == 4
-                    prec = __ftox_engine(fval, &dtoa, prec, case_convert);
-#endif
+                    prec = __lfloat_x_engine(fval, &dtoa, prec, case_convert);
                     ndigs = prec + 1;
                     exp = dtoa.exp;
                     ndigs_exp = 1;
@@ -719,13 +678,8 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                     if (ndigs > LONG_FLOAT_MAX_DIG)
                         ndigs = LONG_FLOAT_MAX_DIG;
 
-#ifdef _NEED_IO_FLOAT_LARGE
-                    ndigs = __ldtoa_engine(fval, &dtoa, ndigs, fmode, ndecimal);
-#elif __SIZEOF_LONG_DOUBLE__ == 8
-                    ndigs = __dtoa_engine((FLOAT64) fval, &dtoa, ndigs, fmode, ndecimal);
-#elif __SIZEOF_LONG_DOUBLE__ == 4
-                    ndigs = __ftoa_engine ((float) fval, &dtoa, ndigs, fmode, ndecimal);
-#endif
+                    ndigs = __lfloat_d_engine(fval, &dtoa, ndigs, fmode, ndecimal);
+
                     exp = dtoa.exp;
                     ndigs_exp = 2;
                 }
@@ -747,11 +701,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                     if (!(flags & FL_PREC))
                         prec = -1;
 
-#if defined(_NEED_IO_DOUBLE) && __SIZEOF_DOUBLE__ == 8
-                    prec = __dtox_engine(fval, &dtoa, prec, case_convert);
-#else
-                    prec = __ftox_engine(fval, &dtoa, prec, case_convert);
-#endif
+                    prec = __float_x_engine(fval, &dtoa, prec, case_convert);
                     ndigs = prec + 1;
                     exp = dtoa.exp;
                     ndigs_exp = 1;
@@ -780,7 +730,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                     if (ndigs > FLOAT_MAX_DIG)
                         ndigs = FLOAT_MAX_DIG;
 
-                    ndigs = __float_engine (fval, &dtoa, ndigs, fmode, ndecimal);
+                    ndigs = __float_d_engine (fval, &dtoa, ndigs, fmode, ndecimal);
                     exp = dtoa.exp;
                     ndigs_exp = 2;
                 }
@@ -789,10 +739,10 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 		    ndigs_exp = 2;
 	    if (exp < -99 || 99 < exp)
 		    ndigs_exp = 3;
-#ifdef _NEED_IO_DOUBLE
+#ifdef _NEED_IO_FLOAT64
 	    if (exp < -999 || 999 < exp)
 		    ndigs_exp = 4;
-#ifdef _NEED_IO_LONG_DOUBLE
+#ifdef _NEED_IO_FLOAT_LARGE
 	    if (exp < -9999 || 9999 < exp)
 		    ndigs_exp = 5;
 #endif
@@ -1001,13 +951,13 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                         sign = '-';
                     }
                     my_putc (sign, stream);
-#ifdef _NEED_IO_LONG_DOUBLE
+#ifdef _NEED_IO_FLOAT_LARGE
                     if (ndigs_exp > 4) {
 			my_putc(exp / 10000 + '0', stream);
 			exp %= 10000;
                     }
 #endif
-#ifdef _NEED_IO_DOUBLE
+#ifdef _NEED_IO_FLOAT64
                     if (ndigs_exp > 3) {
 			my_putc(exp / 1000 + '0', stream);
 			exp %= 1000;
