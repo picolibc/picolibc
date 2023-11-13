@@ -9,3 +9,6 @@ Bug Fixes
 
 - Let feraiseexcept actually raise an exception.
   Addresses: https://cygwin.com/pipermail/cygwin/2023-October/254667.html
+
+- Make random(3) family of functions thread-safe.
+  Addresses: https://cygwin.com/pipermail/cygwin/2023-November/254734.html
