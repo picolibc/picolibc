@@ -29,6 +29,14 @@
 
 #define __INSIDE_CYGWIN__
 
+#include "winsup.h"
+
+SRWLOCK NO_COPY rndlock = SRWLOCK_INIT;
+# define __random_lock()	{ if (__isthreaded) \
+					AcquireSRWLockExclusive (&rndlock); }
+# define __random_unlock()	{ if (__isthreaded) \
+					ReleaseSRWLockExclusive (&rndlock); }
+
 extern "C" {
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)random.c	8.2 (Berkeley) 5/19/95";
@@ -248,6 +256,8 @@ static inline uint32_t good_rand (int32_t x)
 #endif  /* !USE_WEAK_SEEDING */
 }
 
+static long __random_unlocked();
+
 /*
  * srandom:
  *
@@ -260,8 +270,8 @@ static inline uint32_t good_rand (int32_t x)
  * introduced by the L.C.R.N.G.  Note that the initialization of randtbl[]
  * for default usage relies on values produced by this routine.
  */
-void
-srandom(unsigned x)
+static void
+__srandom_unlocked(unsigned x)
 {
 	int i, lim;
 
@@ -276,7 +286,15 @@ srandom(unsigned x)
 		lim = 10 * rand_deg;
 	}
 	for (i = 0; i < lim; i++)
-		(void)random();
+		(void)__random_unlocked();
+}
+
+void
+srandom(unsigned x)
+{
+	__random_lock();
+	__srandom_unlocked(x);
+	__random_unlock();
 }
 
 /*
@@ -351,6 +369,7 @@ initstate(unsigned seed,		/* seed for R.N.G. */
 	char *ostate = (char *)(&state[-1]);
 	uint32_t *int_arg_state = (uint32_t *)arg_state;
 
+	__random_lock();
 	if (rand_type == TYPE_0)
 		state[-1] = rand_type;
 	else
@@ -359,6 +378,7 @@ initstate(unsigned seed,		/* seed for R.N.G. */
 		(void)fprintf(stderr,
 		    "random: not enough state (%lu bytes); ignored.\n",
 		    (unsigned long) n);
+		__random_unlock();
 		return(0);
 	}
 	if (n < BREAK_1) {
@@ -384,11 +404,12 @@ initstate(unsigned seed,		/* seed for R.N.G. */
 	}
 	state = int_arg_state + 1; /* first location */
 	end_ptr = &state[rand_deg];	/* must set end_ptr before srandom */
-	srandom(seed);
+	__srandom_unlocked(seed);
 	if (rand_type == TYPE_0)
 		int_arg_state[0] = rand_type;
 	else
 		int_arg_state[0] = MAX_TYPES * (rptr - state) + rand_type;
+	__random_unlock();
 	return(ostate);
 }
 
@@ -419,6 +440,7 @@ setstate(char *arg_state /* pointer to state array */)
 	uint32_t rear = new_state[0] / MAX_TYPES;
 	char *ostate = (char *)(&state[-1]);
 
+	__random_lock();
 	if (rand_type == TYPE_0)
 		state[-1] = rand_type;
 	else
@@ -443,6 +465,7 @@ setstate(char *arg_state /* pointer to state array */)
 		fptr = &state[(rear + rand_sep) % rand_deg];
 	}
 	end_ptr = &state[rand_deg];		/* set end_ptr too */
+	__random_unlock();
 	return(ostate);
 }
 
@@ -463,8 +486,8 @@ setstate(char *arg_state /* pointer to state array */)
  *
  * Returns a 31-bit random number.
  */
-long
-random()
+static long
+__random_unlocked()
 {
 	uint32_t i;
 	uint32_t *f, *r;
@@ -491,4 +514,16 @@ random()
 	}
 	return((long)i);
 }
+
+long
+random()
+{
+	long r;
+
+	__random_lock();
+	r = __random_unlocked();
+	__random_unlock();
+	return (r);
+}
+
 }
