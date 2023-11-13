@@ -44,11 +44,7 @@ static char sccsid[] = "@(#)random.c	8.2 (Berkeley) 5/19/95";
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD: src/lib/libc/stdlib/random.c,v 1.25 2007/01/09 00:28:10 imp Exp $");
 
-#include <sys/time.h>          /* for srandomdev() */
-#include <fcntl.h>             /* for srandomdev() */
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>            /* for srandomdev() */
 
 /*
  * random.c:
@@ -295,47 +291,6 @@ srandom(unsigned x)
 	__random_lock();
 	__srandom_unlocked(x);
 	__random_unlock();
-}
-
-/*
- * srandomdev:
- *
- * Many programs choose the seed value in a totally predictable manner.
- * This often causes problems.  We seed the generator using the much more
- * secure random(4) interface.  Note that this particular seeding
- * procedure can generate states which are impossible to reproduce by
- * calling srandom() with any value, since the succeeding terms in the
- * state buffer are no longer derived from the LC algorithm applied to
- * a fixed seed.
- */
-void
-srandomdev()
-{
-	size_t len;
-
-	if (rand_type == TYPE_0)
-		len = sizeof state[0];
-	else
-		len = rand_deg * sizeof state[0];
-
-	if (getentropy ((void *) state, len)) {
-		struct timeval tv;
-		unsigned long junk;
-
-		gettimeofday(&tv, NULL);
-		/* Avoid a compiler warning when we really want to get at the
-		   junk in an uninitialized variable. */
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-		srandom((getpid() << 16) ^ tv.tv_sec ^ tv.tv_usec ^ junk);
-#pragma GCC diagnostic pop
-		return;
-	}
-
-	if (rand_type != TYPE_0) {
-		fptr = &state[rand_sep];
-		rptr = &state[0];
-	}
 }
 
 /*
