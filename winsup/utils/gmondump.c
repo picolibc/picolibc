@@ -58,7 +58,7 @@ void
 note (const char *fmt, ...)
 {
   va_list args;
-  char    buf[4096];
+  char    buf[BUFSIZ];
 
   va_start (args, fmt);
   vsprintf (buf, fmt, args);
@@ -72,7 +72,7 @@ void
 warn (int geterrno, const char *fmt, ...)
 {
   va_list args;
-  char    buf[4096];
+  char    buf[BUFSIZ];
 
   va_start (args, fmt);
   sprintf (buf, "%s: ", pgm);
@@ -92,10 +92,12 @@ void __attribute__ ((noreturn))
 error (int geterrno, const char *fmt, ...)
 {
   va_list args;
+  char    buf[BUFSIZ];
 
   va_start (args, fmt);
-  warn (geterrno, fmt, args);
+  vsprintf (buf, fmt, args);
   va_end (args);
+  warn (geterrno, "%s", buf);
 
   exit (1);
 }

@@ -12,3 +12,6 @@ Bug Fixes
 
 - Make random(3) family of functions thread-safe.
   Addresses: https://cygwin.com/pipermail/cygwin/2023-November/254734.html
+
+- Updates to profiler and gmondump: error display mechanics, buffer sizing,
+  and output formatting.
