@@ -375,6 +375,9 @@
 /* nano version of malloc is used. */
 #undef _NANO_MALLOC
 
+/* The newlib version in string format. */
+#undef _NEWLIB_VERSION
+
 /* Verify _REENT_CHECK macros allocate memory successfully. */
 #undef _REENT_CHECK_VERIFY
 
@@ -421,5 +424,14 @@
 
 /* Define if wide char orientation is supported. */
 #undef _WIDE_ORIENT
+
+/* The newlib minor version number. */
+#undef __NEWLIB_MINOR__
+
+/* The newlib patch level. */
+#undef __NEWLIB_PATCHLEVEL__
+
+/* The newlib major version number. */
+#undef __NEWLIB__
 
 #endif /* !__NEWLIB_H__ */
