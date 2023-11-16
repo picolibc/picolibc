@@ -158,6 +158,92 @@ storprop_to_id_name (HANDLE devhdl, const UNICODE_STRING *upath,
   return 1;
 }
 
+/* ("HarddiskN", PART_NUM) -> "\\\\?\\Volume{GUID}\\" */
+static bool
+partition_to_volpath (const UNICODE_STRING *drive_uname, DWORD part_num,
+		      WCHAR (& volpath)[MAX_PATH])
+{
+  WCHAR gpath[MAX_PATH];
+  __small_swprintf (gpath, L"\\\\?\\GLOBALROOT\\Device\\%S\\Partition%u\\",
+		    drive_uname, part_num);
+  if (!GetVolumeNameForVolumeMountPointW (gpath, volpath, sizeof(volpath)))
+    {
+      debug_printf ("GetVolumeNameForVolumeMountPointW(%W): %E", gpath);
+      return false;
+    }
+  debug_printf ("%W -> %W", gpath, volpath);
+  return true;
+}
+
+/* ("HarddiskN", PART_NUM) -> "x" */
+static bool
+partition_to_drive(const UNICODE_STRING *drive_uname, DWORD part_num,
+		   WCHAR *w_buf, char *name)
+{
+  WCHAR volpath[MAX_PATH];
+  if (!partition_to_volpath (drive_uname, part_num, volpath))
+    return false;
+
+  DWORD len;
+  if (!GetVolumePathNamesForVolumeNameW (volpath, w_buf, NT_MAX_PATH, &len))
+    {
+      debug_printf ("GetVolumePathNamesForVolumeNameW(%W): %E", volpath);
+      return false;
+    }
+  debug_printf ("%W -> '%W'%s", volpath, w_buf,
+		(w_buf[0] && wcschr (w_buf, L'\0')[1] ? ", ..." : ""));
+
+  /* Find first "X:\\", skip if not found.
+     FIXME: Support multiple drive letters. */
+  WCHAR *p;
+  for (p = w_buf; ; p = wcschr (p, L'\0') + 1)
+    {
+	if (!*p)
+	  return false;
+	if (L'A' <= p[0] && p[0] <= L'Z' && p[1] == L':' && p[2] == L'\\' && !p[3])
+	  break;
+    }
+  name[0] = (p[0] - L'A') + 'a';
+  name[1] = '\0';
+  return true;
+}
+
+/* ("HarddiskN", PART_NUM) -> "VOLUME_GUID" */
+static bool
+partition_to_voluuid(const UNICODE_STRING *drive_uname, DWORD part_num,
+		     char *name)
+{
+  WCHAR volpath[MAX_PATH];
+  if (!partition_to_volpath (drive_uname, part_num, volpath))
+    return false;
+
+  /* Skip if not "\\\\?\\Volume{GUID}...". */
+  static const WCHAR prefix[] = L"\\\\?\\Volume{";
+  const size_t prefix_len = sizeof (prefix) / sizeof(WCHAR) - 1, uuid_len = 36;
+  if (!(!wcsncmp (volpath, prefix, prefix_len)
+      && volpath[prefix_len + uuid_len] == L'}'))
+    return false;
+
+  /* Extract GUID. */
+  volpath[prefix_len + uuid_len] = 0;
+  __small_sprintf (name, "%W", volpath + prefix_len);
+
+  if (!strncmp (name + 9, "0000-0000-00", 12) && !strcmp (name + 32, "0000"))
+    {
+      /* MBR "GUID": Use same SERIAL-OFFSET format as in by-partuuid directory.
+         SERIAL-0000-0000-009a-785634120000 -> SERIAL-123456789a00 */
+      for (int i = 9, j = 30; i < 19; i += 2, j -= 2)
+	{
+	  if (j == 22) // name[j + 1] == '-'
+	    j--;
+	  name[i] = name[j];
+	  name[i + 1] = name[j + 1];
+	}
+      name[21] = '\0';
+    }
+  return true;
+}
+
 struct by_id_entry
 {
   char name[NAME_MAX + 1];
@@ -208,6 +294,7 @@ format_partuuid (char *name, const PARTITION_INFORMATION_EX *pix)
 		    guid->Data1, guid->Data2, guid->Data3,
 		    guid->Data4[0], guid->Data4[1], guid->Data4[2], guid->Data4[3],
 		    guid->Data4[4], guid->Data4[5], guid->Data4[6], guid->Data4[7]);
+
    return true;
 }
 
@@ -237,6 +324,7 @@ get_by_id_table (by_id_entry * &table, fhandler_dev_disk::dev_disk_location loc)
   unsigned alloc_size = 0, table_size = 0;
   tmp_pathbuf tp;
   char *ioctl_buf = tp.c_get ();
+  WCHAR *w_buf = tp.w_get ();
   DIRECTORY_BASIC_INFORMATION *dbi_buf =
     reinterpret_cast<DIRECTORY_BASIC_INFORMATION *>(tp.w_get ());
 
@@ -365,12 +453,22 @@ get_by_id_table (by_id_entry * &table, fhandler_dev_disk::dev_disk_location loc)
 	      char *name = table[table_size].name;
 	      switch (loc)
 		{
+		  case fhandler_dev_disk::disk_by_drive:
+		    if (!partition_to_drive (&dbi->ObjectName, part_num, w_buf, name))
+		      continue;
+		    break;
+
 		  case fhandler_dev_disk::disk_by_id:
 		    __small_sprintf (name, "%s-part%u", drive_name, part_num);
 		    break;
 
 		  case fhandler_dev_disk::disk_by_partuuid:
 		    if (!format_partuuid (name, pix))
+		      continue;
+		    break;
+
+		  case fhandler_dev_disk::disk_by_voluuid:
+		    if (!partition_to_voluuid (&dbi->ObjectName, part_num, name))
 		      continue;
 		    break;
 
@@ -417,10 +515,17 @@ get_by_id_table (by_id_entry * &table, fhandler_dev_disk::dev_disk_location loc)
 
 const char dev_disk[] = "/dev/disk";
 const size_t dev_disk_len = sizeof (dev_disk) - 1;
-static const char by_id[] = "/by-id";
-const size_t by_id_len = sizeof(by_id) - 1;
-static const char by_partuuid[] = "/by-partuuid";
-const size_t by_partuuid_len = sizeof(by_partuuid) - 1;
+static const char by_drive[] = "/by-drive";
+const size_t by_drive_len = sizeof(by_drive) - 1;
+
+/* Keep this in sync with enum fhandler_dev_disk::dev_disk_location starting
+   at disk_by_drive. */
+static const char * const by_dir_names[] {
+  "/by-drive", "/by-id", "/by-partuuid", "/by-voluuid"
+};
+const size_t by_dir_names_size = sizeof(by_dir_names) / sizeof(by_dir_names[0]);
+static_assert((size_t) fhandler_dev_disk::disk_by_drive + by_dir_names_size - 1
+	      == (size_t) fhandler_dev_disk::disk_by_voluuid);
 
 fhandler_dev_disk::fhandler_dev_disk ():
   fhandler_virtual (),
@@ -440,22 +545,23 @@ fhandler_dev_disk::init_dev_disk ()
   /* Determine location. */
   const char *path = get_name ();
   size_t dirlen = 0;
+  loc = invalid_loc; // "/dev/disk/invalid"
   if (!path_prefix_p (dev_disk, path, dev_disk_len, false))
-    loc = invalid_loc; // should not happen
+    ; // should not happen
   else if (!path[dev_disk_len])
     loc = disk_dir; // "/dev/disk"
-  else if (path_prefix_p (by_id, path + dev_disk_len, by_id_len, false))
-    {
-      loc = disk_by_id; // "/dev/disk/by-id.."
-      dirlen = dev_disk_len + by_id_len;
-    }
-  else if (path_prefix_p (by_partuuid, path + dev_disk_len, by_partuuid_len, false))
-    {
-      loc = disk_by_partuuid; // "/dev/disk/by-partuuid..."
-      dirlen = dev_disk_len + by_partuuid_len;
-    }
   else
-      loc = invalid_loc; // "/dev/disk/invalid"
+    for (size_t i = 0; i < by_dir_names_size; i++)
+      {
+	const char *dir = by_dir_names[i];
+	size_t len = strlen(dir);
+	if (path_prefix_p (dir, path + dev_disk_len, len, false))
+	  {
+	    loc = (dev_disk_location) (disk_by_drive + i); // "/dev/disk/by-..."
+	    dirlen = dev_disk_len + len;
+	    break;
+	  }
+      }
 
   loc_is_link = false;
   if (dirlen)
@@ -594,10 +700,9 @@ fhandler_dev_disk::readdir (DIR *dir, dirent *de)
       dir->__d_position++;
       res = 0;
     }
-  else if (loc == disk_dir && dir->__d_position < 2 + 2)
+  else if (loc == disk_dir && dir->__d_position < 2 + (int) by_dir_names_size)
     {
-      static const char * const names[2] {by_id, by_partuuid};
-      strcpy (de->d_name, names[dir->__d_position - 2] + 1);
+      strcpy (de->d_name, by_dir_names[dir->__d_position - 2] + 1);
       de->d_type = DT_DIR;
       dir->__d_position++;
       res = 0;

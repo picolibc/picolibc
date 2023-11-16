@@ -3197,7 +3197,8 @@ class fhandler_dev_disk: public fhandler_virtual
 public:
   enum dev_disk_location {
     unknown_loc, invalid_loc, disk_dir,
-    disk_by_id, disk_by_partuuid
+    /* Keep these in sync with dev_disk.cc:by_dir_names array: */
+    disk_by_drive, disk_by_id, disk_by_partuuid, disk_by_voluuid
   };
 
 private:
