@@ -153,18 +153,18 @@ int _VFWPRINTF_R (struct _reent *, FILE *, const wchar_t *, va_list);
 /* Defined in vfprintf.c. */
 #ifdef _FVWRITE_IN_STREAMIO
 # ifdef STRING_ONLY
-#  define __SPRINT __ssprint_r
+#  define __SPRINT __sswprint_r
 # else
-#  define __SPRINT __sprint_r
+#  define __SPRINT __swprint_r
 # endif
 int __SPRINT (struct _reent *, FILE *, register struct __suio *);
 #else
 # ifdef STRING_ONLY
-#  define __SPRINT __ssputs_r
+#  define __SPRINT __ssputws_r
 # else
-#  define __SPRINT __sfputs_r
+#  define __SPRINT __sfputws_r
 # endif
-int __SPRINT (struct _reent *, FILE *, const char *, size_t);
+int __SPRINT (struct _reent *, FILE *, const wchar_t *, size_t);
 #endif
 #ifndef STRING_ONLY
 #ifdef _UNBUF_STREAM_OPT
@@ -479,8 +479,8 @@ _VFWPRINTF_R (struct _reent *data,
 #ifdef _FVWRITE_IN_STREAMIO
 #define	PRINT(ptr, len) { \
 	iovp->iov_base = (char *) (ptr); \
-	iovp->iov_len = (len) * sizeof (wchar_t); \
-	uio.uio_resid += (len) * sizeof (wchar_t); \
+	iovp->iov_len = (len); \
+	uio.uio_resid += iovp->iov_len; \
 	iovp++; \
 	if (++uio.uio_iovcnt >= NIOV) { \
 		if (__SPRINT(data, fp, &uio)) \
@@ -513,7 +513,7 @@ _VFWPRINTF_R (struct _reent *data,
 }
 #else
 #define PRINT(ptr, len) {		\
-	if (__SPRINT (data, fp, (const char *)(ptr), (len) * sizeof (wchar_t)) == EOF) \
+	if (__SPRINT (data, fp, (ptr), (len)) == EOF) \
 		goto error;		\
 }
 #define	PAD(howmany, with) {		\
