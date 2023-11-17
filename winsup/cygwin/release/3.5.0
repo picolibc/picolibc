@@ -17,11 +17,17 @@ What's new:
   class expressions, and collating symbols in the search pattern, i.e.,
   [:alnum:], [=a=], [.aa.].
 
-- Introduce /dev/disk directory with subdirectories by-id and by-partuuid.
-  The by-id directory provides symlinks for each disk and its partitions:
-  BUSTYPE-[VENDOR_]PRODUCT_[SERIAL|HASH][-partN] -> ../../sdX[N].
-  The by-partuuid directory provides symlinks for each MBR and GPT disk
-  partition: MBR_SERIAL-OFFSET -> ../../sdXN, GPT_GUID -> ../../sdXN.
+- Introduce /dev/disk directory with various by-* subdirectories which
+  provide symlinks to disk and partition raw devices:
+  by-drive/DRIVE_LETTER ->  ../../sdXN
+  by-label/VOLUME_LABEL ->  ../../sdXN
+  by-id/BUSTYPE-[VENDOR_]PRODUCT_[SERIAL|0xHASH][-partN] -> ../../sdX[N]
+  by-partuuid/MBR_SERIAL-OFFSET -> ../../sdXN
+  by-partuuid/GPT_GUID -> ../../sdXN
+  by-uuid/VOLUME_SERIAL -> ../../sdXN
+  by-voluuid/MBR_SERIAL-OFFSET -> ../../sdXN
+  by-voluuid/VOLUME_GUID -> ../../sdXN
+  The subdirectories by-drive and by-voluuid are Cygwin specific.
 
 - Introduce /proc/codesets and /proc/locales with information on
   supported codesets and locales for all interested parties.  Locale(1)

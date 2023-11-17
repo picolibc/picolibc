@@ -35,17 +35,19 @@ class expressions, and collating symbols in the search pattern, i.e.,
 </para></listitem>
 
 <listitem><para>
-Introduce /dev/disk directory with subdirectories by-id and by-partuuid.
-The by-id directory provides symlinks for each disk and its partitions:
+Introduce /dev/disk directory with various by-* subdirectories which
+provide symlinks to disk and partition raw devices:
   <screen>
-  BUSTYPE-[VENDOR_]PRODUCT_[SERIAL|0xHASH][-partN] -> ../../sdX[N]
+  by-drive/DRIVE_LETTER ->  ../../sdXN
+  by-label/VOLUME_LABEL ->  ../../sdXN
+  by-id/BUSTYPE-[VENDOR_]PRODUCT_[SERIAL|0xHASH][-partN] -> ../../sdX[N]
+  by-partuuid/MBR_SERIAL-OFFSET -> ../../sdXN
+  by-partuuid/GPT_GUID -> ../../sdXN
+  by-uuid/VOLUME_SERIAL -> ../../sdXN
+  by-voluuid/MBR_SERIAL-OFFSET -> ../../sdXN
+  by-voluuid/VOLUME_GUID -> ../../sdXN
   </screen>
-The by-partuuid directory provides symlinks for each MBR and GPT disk
-partition:
-  <screen>
-  MBR_SERIAL-OFFSET -> ../../sdXN
-  GPT_GUID -> ../../sdXN
-  </screen>
+The subdirectories by-drive and by-voluuid are Cygwin specific.
 </para></listitem>
 
 <listitem><para>
