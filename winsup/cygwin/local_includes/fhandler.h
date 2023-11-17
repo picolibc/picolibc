@@ -3198,7 +3198,8 @@ public:
   enum dev_disk_location {
     unknown_loc, invalid_loc, disk_dir,
     /* Keep these in sync with dev_disk.cc:by_dir_names array: */
-    disk_by_drive, disk_by_id, disk_by_partuuid, disk_by_voluuid
+    disk_by_drive, disk_by_id, disk_by_label,
+    disk_by_partuuid, disk_by_uuid, disk_by_voluuid
   };
 
 private:

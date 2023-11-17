@@ -14,33 +14,62 @@ details. */
 #include <wctype.h>
 #include <winioctl.h>
 
-/* Replace spaces, non-printing and unexpected characters.  Remove
-   leading and trailing spaces.  Return remaining string length. */
+/* Replace invalid characters.  Optionally remove leading and trailing
+   characters.  Return remaining string length. */
+template <typename char_type, typename func_type>
 static int
-sanitize_id_string (char *s)
+sanitize_string (char_type *s, char_type leading, char_type trailing,
+		 char_type replace, func_type valid)
 {
   int first = 0;
-  while (s[first] == ' ')
-    first++;
-  int last = -1, i;
+  if (leading)
+    while (s[first] == leading)
+      first++;
+  int len = -1, i;
   for (i = 0; s[first + i]; i++)
     {
-      char c = s[first + i];
-      if (c != ' ')
-	last = -1;
-      else if (last < 0)
-	last = i;
-      if (!(('0' <= c && c <= '9') || c == '.' || c == '-'
-	  || ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z')))
-	c = '_';
+      char_type c = s[first + i];
+      if (c != trailing)
+	len = -1;
+      else if (len < 0)
+	len = i;
+      if (!valid (c))
+	c = replace;
       else if (!first)
 	continue;
       s[i] = c;
     }
-  if (last < 0)
-    last = i;
-  s[last] = '\0';
-  return last;
+  if (len < 0)
+    len = i;
+  s[len] = (char_type) 0;
+  return len;
+}
+
+/* Variant for device identify strings. */
+static int
+sanitize_id_string (char *s)
+{
+  return sanitize_string (s, ' ', ' ', '_', [] (char c) -> bool
+    {
+      return (('0' <= c && c <= '9') || c == '.' || c == '-'
+	      || ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z'));
+    }
+  );
+}
+
+/* Variant for volume labels. */
+static int
+sanitize_label_string (WCHAR *s)
+{
+  /* Linux does not skip leading spaces. */
+  return sanitize_string (s, L'\0', L' ', L'_', [] (WCHAR c) -> bool
+    {
+      /* Labels may contain characters not allowed in filenames.
+	 Linux replaces spaces with \x20 which is not an option here. */
+      return !((0 <= c && c <= L' ') || c == L':' || c == L'/' || c == L'\\'
+	      || c == L'"');
+    }
+  );
 }
 
 /* Fetch storage properties and create the ID string.
@@ -244,6 +273,79 @@ partition_to_voluuid(const UNICODE_STRING *drive_uname, DWORD part_num,
   return true;
 }
 
+/* ("HarddiskN", PART_NUM) -> "VOLUME_LABEL" or "VOLUME_SERIAL" */
+static bool
+partition_to_label_or_uuid(bool uuid, const UNICODE_STRING *drive_uname,
+			   DWORD part_num, char *ioctl_buf, char *name)
+{
+  WCHAR wpath[MAX_PATH];
+  /* Trailing backslash is required. */
+  size_t len = __small_swprintf (wpath, L"\\Device\\%S\\Partition%u\\",
+				 drive_uname, part_num);
+  len *= sizeof (WCHAR);
+  UNICODE_STRING upath = {(USHORT) len, (USHORT) (len + 1), wpath};
+  OBJECT_ATTRIBUTES attr;
+  InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE, nullptr,
+			      nullptr);
+  IO_STATUS_BLOCK io;
+  HANDLE volhdl;
+  NTSTATUS status = NtOpenFile (&volhdl, READ_CONTROL, &attr, &io,
+				FILE_SHARE_VALID_FLAGS, 0);
+  if (!NT_SUCCESS (status))
+    {
+      /* Fails with STATUS_UNRECOGNIZED_VOLUME (0xC000014F) if the
+         partition/filesystem type is unsupported. */
+      debug_printf ("NtOpenFile(%S), status %y", upath, status);
+      return false;
+    }
+
+  /* Check for possible 64-bit NTFS serial number first. */
+  DWORD bytes_read;
+  const NTFS_VOLUME_DATA_BUFFER *nvdb =
+    reinterpret_cast<const NTFS_VOLUME_DATA_BUFFER *>(ioctl_buf);
+  if (uuid && DeviceIoControl (volhdl, FSCTL_GET_NTFS_VOLUME_DATA, nullptr, 0,
+			       ioctl_buf, NT_MAX_PATH, &bytes_read, nullptr)
+      && nvdb->VolumeSerialNumber.QuadPart)
+    {
+      /* Print without any separator as on Linux. */
+      __small_sprintf (name, "%16X", nvdb->VolumeSerialNumber.QuadPart);
+      NtClose(volhdl);
+      return true;
+    }
+
+  /* Get label and 32-bit serial number. */
+  status = NtQueryVolumeInformationFile (volhdl, &io, ioctl_buf,
+					 NT_MAX_PATH, FileFsVolumeInformation);
+  NtClose(volhdl);
+  if (!NT_SUCCESS (status))
+    {
+      debug_printf ("NtQueryVolumeInformationFile(%S), status %y", upath,
+		    status);
+      return false;
+    }
+
+  FILE_FS_VOLUME_INFORMATION *ffvi =
+    reinterpret_cast<FILE_FS_VOLUME_INFORMATION *>(ioctl_buf);
+  if (uuid)
+    {
+      if (!ffvi->VolumeSerialNumber)
+	return false;
+      /* Print with separator as on Linux. */
+      __small_sprintf (name, "%04x-%04x", ffvi->VolumeSerialNumber >> 16,
+		       ffvi->VolumeSerialNumber & 0xffff);
+    }
+  else
+    {
+      /* Label is not null terminated. */
+      ffvi->VolumeLabel[ffvi->VolumeLabelLength / sizeof(WCHAR)] = L'\0';
+      int len = sanitize_label_string (ffvi->VolumeLabel);
+      if (!len)
+	return false;
+      __small_sprintf (name, "%W", ffvi->VolumeLabel);
+    }
+  return true;
+}
+
 struct by_id_entry
 {
   char name[NAME_MAX + 1];
@@ -324,7 +426,11 @@ get_by_id_table (by_id_entry * &table, fhandler_dev_disk::dev_disk_location loc)
   unsigned alloc_size = 0, table_size = 0;
   tmp_pathbuf tp;
   char *ioctl_buf = tp.c_get ();
-  WCHAR *w_buf = tp.w_get ();
+  char *ioctl_buf2 = (loc == fhandler_dev_disk::disk_by_label
+		      || loc == fhandler_dev_disk::disk_by_uuid ?
+		      tp.c_get () : nullptr);
+  WCHAR *w_buf = (loc == fhandler_dev_disk::disk_by_drive ?
+		  tp.w_get () : nullptr);
   DIRECTORY_BASIC_INFORMATION *dbi_buf =
     reinterpret_cast<DIRECTORY_BASIC_INFORMATION *>(tp.w_get ());
 
@@ -462,8 +568,20 @@ get_by_id_table (by_id_entry * &table, fhandler_dev_disk::dev_disk_location loc)
 		    __small_sprintf (name, "%s-part%u", drive_name, part_num);
 		    break;
 
+		  case fhandler_dev_disk::disk_by_label:
+		    if (!partition_to_label_or_uuid (false, &dbi->ObjectName,
+						     part_num, ioctl_buf2, name))
+		      continue;
+		    break;
+
 		  case fhandler_dev_disk::disk_by_partuuid:
 		    if (!format_partuuid (name, pix))
+		      continue;
+		    break;
+
+		  case fhandler_dev_disk::disk_by_uuid:
+		    if (!partition_to_label_or_uuid (true, &dbi->ObjectName,
+						     part_num, ioctl_buf2, name))
 		      continue;
 		    break;
 
@@ -521,7 +639,8 @@ const size_t by_drive_len = sizeof(by_drive) - 1;
 /* Keep this in sync with enum fhandler_dev_disk::dev_disk_location starting
    at disk_by_drive. */
 static const char * const by_dir_names[] {
-  "/by-drive", "/by-id", "/by-partuuid", "/by-voluuid"
+  "/by-drive", "/by-id", "/by-label",
+  "/by-partuuid", "/by-uuid", "/by-voluuid"
 };
 const size_t by_dir_names_size = sizeof(by_dir_names) / sizeof(by_dir_names[0]);
 static_assert((size_t) fhandler_dev_disk::disk_by_drive + by_dir_names_size - 1
