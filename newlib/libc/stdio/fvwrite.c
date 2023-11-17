@@ -40,6 +40,9 @@
 /*
  * Write some memory regions.  Return zero on success, EOF on error.
  *
+ * On systems supporting threads, this function *must* be called under
+ * _newlib_flockfile_start locking.
+ *
  * This routine is large and unsightly, but most of the ugliness due
  * to the three different kinds of output buffering is handled here.
  */
@@ -74,7 +77,7 @@ __sfvwrite_r (struct _reent *ptr,
           GETIOV (;);
           while (len > 0)
             {
-              if (putc (*p, fp) == EOF)
+              if (__sputc_r (ptr, *p, fp) == EOF)
                 return EOF;
               p++;
               len--;
