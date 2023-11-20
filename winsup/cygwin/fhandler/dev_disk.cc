@@ -308,7 +308,7 @@ partition_to_label_or_uuid(bool uuid, const UNICODE_STRING *drive_uname,
       && nvdb->VolumeSerialNumber.QuadPart)
     {
       /* Print without any separator as on Linux. */
-      __small_sprintf (name, "%16X", nvdb->VolumeSerialNumber.QuadPart);
+      __small_sprintf (name, "%016X", nvdb->VolumeSerialNumber.QuadPart);
       NtClose(volhdl);
       return true;
     }
