@@ -102,8 +102,6 @@ _puts_r (struct _reent *ptr,
   fp = _stdout_r (ptr);
   CHECK_INIT (ptr, fp);
   _newlib_flockfile_start (fp);
-  if (ORIENT (fp, -1) != -1)
-    goto err;
   /* Make sure we can write.  */
   if (cantwrite (ptr, fp))
     goto err;

@@ -152,8 +152,6 @@ _fwrite_r (struct _reent * ptr,
   CHECK_INIT (ptr, fp);
 
   _newlib_flockfile_start (fp);
-  if (ORIENT (fp, -1) != -1)
-    goto ret;
   /* Make sure we can write.  */
   if (cantwrite (ptr, fp))
     goto ret;

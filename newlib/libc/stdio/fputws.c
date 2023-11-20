@@ -130,8 +130,6 @@ error:
   return (-1);
 #else
   _newlib_flockfile_start (fp);
-  if (ORIENT (fp, 1) != 1)
-    goto error;
   if (cantwrite (ptr, fp) != 0)
     goto error;
 
