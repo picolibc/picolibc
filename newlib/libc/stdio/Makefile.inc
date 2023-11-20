@@ -117,6 +117,7 @@ libc_a_SOURCES += \
 	%D%/vsprintf.c \
 	%D%/vsscanf.c \
 	%D%/wbuf.c \
+	%D%/wbufw.c \
 	%D%/wsetup.c
 
 ## The following are EL/IX level 2 interfaces

@@ -251,6 +251,39 @@ extern _READ_WRITE_RETURN_TYPE __swrite64 (struct _reent *, void *,
 #define ORIENT(fp,ori) (-1)
 #endif
 
+/* Same thing as the functions in stdio.h, but these are to be called
+   from inside the wide-char functions. */
+int	__swbufw_r (struct _reent *, int, FILE *);
+#ifdef __GNUC__
+_ELIDABLE_INLINE int __swputc_r(struct _reent *_ptr, int _c, FILE *_p) {
+#ifdef __SCLE
+	if ((_p->_flags & __SCLE) && _c == '\n')
+	  __swputc_r (_ptr, '\r', _p);
+#endif
+	if (--_p->_w >= 0 || (_p->_w >= _p->_lbfsize && (char)_c != '\n'))
+		return (*_p->_p++ = _c);
+	else
+		return (__swbufw_r(_ptr, _c, _p));
+}
+#else
+#define       __swputc_raw_r(__ptr, __c, __p) \
+	(--(__p)->_w < 0 ? \
+		(__p)->_w >= (__p)->_lbfsize ? \
+			(*(__p)->_p = (__c)), *(__p)->_p != '\n' ? \
+				(int)*(__p)->_p++ : \
+				__swbufw_r(__ptr, '\n', __p) : \
+			__swbufw_r(__ptr, (int)(__c), __p) : \
+		(*(__p)->_p = (__c), (int)*(__p)->_p++))
+#ifdef __SCLE
+#define __swputc_r(__ptr, __c, __p) \
+        ((((__p)->_flags & __SCLE) && ((__c) == '\n')) \
+          ? __swputc_raw_r(__ptr, '\r', (__p)) : 0 , \
+        __swputc_raw_r((__ptr), (__c), (__p)))
+#else
+#define __swputc_r(__ptr, __c, __p) __swputc_raw_r(__ptr, __c, __p)
+#endif
+#endif
+
 /* WARNING: _dcvt is defined in the stdlib directory, not here!  */
 
 char *_dcvt (struct _reent *, char *, double, int, int, char, int);

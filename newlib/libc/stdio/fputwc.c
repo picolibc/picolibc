@@ -155,7 +155,7 @@ __fputwc (struct _reent *ptr,
     }
 
   for (i = 0; i < len; i++)
-    if (__sputc_r (ptr, (unsigned char) buf[i], fp) == EOF)
+    if (__swputc_r (ptr, (unsigned char) buf[i], fp) == EOF)
       return WEOF;
 
   return (wint_t) wc;
@@ -169,10 +169,7 @@ _fputwc_r (struct _reent *ptr,
   wint_t r;
 
   _newlib_flockfile_start (fp);
-  if (ORIENT(fp, 1) != 1)
-    r = WEOF;
-  else
-    r = __fputwc(ptr, wc, fp);
+  __fputwc(ptr, wc, fp);
   _newlib_flockfile_end (fp);
   return r;
 }

@@ -70,21 +70,43 @@ __sfvwrite_r (struct _reent *ptr,
   len = 0;
 
 #ifdef __SCLE
+  /* This only affects Cygwin, so calling __sputc_r *and* __swputc_r
+   * from here doesn't matter.
+   */
   if (fp->_flags & __SCLE) /* text mode */
     {
-      do
-        {
-          GETIOV (;);
-          while (len > 0)
-            {
-              if (__sputc_r (ptr, *p, fp) == EOF)
-                return EOF;
-              p++;
-              len--;
-              uio->uio_resid--;
-            }
-        }
-      while (uio->uio_resid > 0);
+      if (fp->_flags2 & __SWID)
+	{
+	  do
+	    {
+	      GETIOV (;);
+	      while (len > 0)
+		{
+		  if (__swputc_r (ptr, *p, fp) == EOF)
+		    return EOF;
+		  p++;
+		  len--;
+		  uio->uio_resid--;
+		}
+	    }
+	  while (uio->uio_resid > 0);
+	}
+      else
+	{
+	  do
+	    {
+	      GETIOV (;);
+	      while (len > 0)
+		{
+		  if (__sputc_r (ptr, *p, fp) == EOF)
+		    return EOF;
+		  p++;
+		  len--;
+		  uio->uio_resid--;
+		}
+	    }
+	  while (uio->uio_resid > 0);
+	}
       return 0;
     }
 #endif

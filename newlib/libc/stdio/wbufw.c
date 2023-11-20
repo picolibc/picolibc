@@ -27,47 +27,28 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include "fvwrite.h"
 
 /*
- * Write the given character into the (probably full) buffer for
- * the given file.  Flush the buffer out if it is or becomes full,
- * or if c=='\n' and the file is line buffered.
+ * Note that this is the same function as __swbuf_r, just to be called
+ * from wide-char functions!
+ *
+ * The only difference is that we set and test the orientation differently.
  */
 
 int
-__swbuf_r (struct _reent *ptr,
+__swbufw_r (struct _reent *ptr,
        register int c,
        register FILE *fp)
 {
   register int n;
 
-  /* Ensure stdio has been initialized.  */
-
   CHECK_INIT (ptr, fp);
-
-  /*
-   * In case we cannot write, or longjmp takes us out early,
-   * make sure _w is 0 (if fully- or un-buffered) or -_bf._size
-   * (if line buffered) so that we will get called again.
-   * If we did not do this, a sufficient number of putc()
-   * calls might wrap _w from negative to positive.
-   */
 
   fp->_w = fp->_lbfsize;
   if (cantwrite (ptr, fp))
     return EOF;
   c = (unsigned char) c;
 
-  if (ORIENT (fp, -1) != -1)
+  if (ORIENT (fp, 1) != 1)
     return EOF;
-
-  /*
-   * If it is completely full, flush it out.  Then, in any case,
-   * stuff c into the buffer.  If this causes the buffer to fill
-   * completely, or if c is '\n' and the file is line buffered,
-   * flush it (perhaps a second time).  The second flush will always
-   * happen on unbuffered streams, where _bf._size==1; fflush()
-   * guarantees that putc() will always call wbuf() by setting _w
-   * to 0, so we need not do anything else.
-   */
 
   n = fp->_p - fp->_bf._base;
   if (n >= fp->_bf._size)
@@ -82,14 +63,4 @@ __swbuf_r (struct _reent *ptr,
     if (_fflush_r (ptr, fp))
       return EOF;
   return c;
-}
-
-/* This function isn't any longer declared in stdio.h, but it's
-   required for backward compatibility with applications built against
-   earlier dynamically built newlib libraries. */
-int
-__swbuf (register int c,
-       register FILE *fp)
-{
-  return __swbuf_r (_REENT, c, fp);
 }
