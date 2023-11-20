@@ -59,6 +59,17 @@ _reclaim_reent (struct _reent *ptr)
 	}
       if (_REENT_MP_RESULT(ptr))
 	_free_r (ptr, _REENT_MP_RESULT(ptr));
+      if (_REENT_MP_P5S(ptr))
+        {
+          struct _Bigint *thisone, *nextone;
+          nextone = _REENT_MP_P5S(ptr);
+          while (nextone)
+           {
+             thisone = nextone;
+             nextone = nextone->_next;
+             _free_r (ptr, thisone);
+           }
+        }
 #ifdef _REENT_SMALL
       }
 #endif
