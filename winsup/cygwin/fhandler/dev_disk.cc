@@ -64,10 +64,11 @@ sanitize_label_string (WCHAR *s)
   /* Linux does not skip leading spaces. */
   return sanitize_string (s, L'\0', L' ', L'_', [] (WCHAR c) -> bool
     {
-      /* Labels may contain characters not allowed in filenames.
-	 Linux replaces spaces with \x20 which is not an option here. */
-      return !((0 <= c && c <= L' ') || c == L':' || c == L'/' || c == L'\\'
-	      || c == L'"');
+      /* Labels may contain characters not allowed in filenames.  Also
+         replace '#' to avoid that duplicate markers introduce new
+	 duplicates.  Linux replaces spaces with \x20 which is not an
+	 option here. */
+      return !(c == L'/' || c == L'\\' || c == L'#');
     }
   );
 }
@@ -304,8 +305,7 @@ partition_to_label_or_uuid(bool uuid, const UNICODE_STRING *drive_uname,
   const NTFS_VOLUME_DATA_BUFFER *nvdb =
     reinterpret_cast<const NTFS_VOLUME_DATA_BUFFER *>(ioctl_buf);
   if (uuid && DeviceIoControl (volhdl, FSCTL_GET_NTFS_VOLUME_DATA, nullptr, 0,
-			       ioctl_buf, NT_MAX_PATH, &bytes_read, nullptr)
-      && nvdb->VolumeSerialNumber.QuadPart)
+			       ioctl_buf, NT_MAX_PATH, &bytes_read, nullptr))
     {
       /* Print without any separator as on Linux. */
       __small_sprintf (name, "%016X", nvdb->VolumeSerialNumber.QuadPart);
@@ -327,13 +327,9 @@ partition_to_label_or_uuid(bool uuid, const UNICODE_STRING *drive_uname,
   FILE_FS_VOLUME_INFORMATION *ffvi =
     reinterpret_cast<FILE_FS_VOLUME_INFORMATION *>(ioctl_buf);
   if (uuid)
-    {
-      if (!ffvi->VolumeSerialNumber)
-	return false;
-      /* Print with separator as on Linux. */
-      __small_sprintf (name, "%04x-%04x", ffvi->VolumeSerialNumber >> 16,
-		       ffvi->VolumeSerialNumber & 0xffff);
-    }
+    /* Print with separator as on Linux. */
+    __small_sprintf (name, "%04x-%04x", ffvi->VolumeSerialNumber >> 16,
+		     ffvi->VolumeSerialNumber & 0xffff);
   else
     {
       /* Label is not null terminated. */
@@ -359,6 +355,20 @@ by_id_compare_name (const void *a, const void *b)
   const by_id_entry *ap = reinterpret_cast<const by_id_entry *>(a);
   const by_id_entry *bp = reinterpret_cast<const by_id_entry *>(b);
   return strcmp (ap->name, bp->name);
+}
+
+static int
+by_id_compare_name_drive_part (const void *a, const void *b)
+{
+  const by_id_entry *ap = reinterpret_cast<const by_id_entry *>(a);
+  const by_id_entry *bp = reinterpret_cast<const by_id_entry *>(b);
+  int cmp = strcmp (ap->name, bp->name);
+  if (cmp)
+    return cmp;
+  cmp = ap->drive - bp->drive;
+  if (cmp)
+    return cmp;
+  return ap->part - bp->part;
 }
 
 static by_id_entry *
@@ -610,8 +620,9 @@ get_by_id_table (by_id_entry * &table, fhandler_dev_disk::dev_disk_location loc)
   if (!table)
     return (errno_set ? -1 : 0);
 
-  /* Sort by name and remove duplicates. */
-  qsort (table, table_size, sizeof (*table), by_id_compare_name);
+  /* Sort by {name, drive, part} to ensure stable sort order. */
+  qsort (table, table_size, sizeof (*table), by_id_compare_name_drive_part);
+  /* Mark duplicate names. */
   for (unsigned i = 0; i < table_size; i++)
     {
       unsigned j = i + 1;
@@ -619,12 +630,13 @@ get_by_id_table (by_id_entry * &table, fhandler_dev_disk::dev_disk_location loc)
 	j++;
       if (j == i + 1)
 	continue;
-      /* Duplicate(s) found, remove all entries with this name. */
-      debug_printf ("removing duplicates %d-%d: '%s'", i, j - 1, table[i].name);
-      if (j < table_size)
-	memmove (table + i, table + j, (table_size - j) * sizeof (*table));
-      table_size -= j - i;
-      i--;
+      /* Duplicate(s) found, append "#N" to all entries.  This never
+	 introduces new duplicates because '#' never occurs in the
+	 original names. */
+      debug_printf ("mark duplicates %u-%u of '%s'", i, j - 1, table[i].name);
+      size_t len = strlen (table[i].name);
+      for (unsigned k = i; k < j; k++)
+	__small_sprintf (table[k].name + len, "#%u", k - i);
     }
 
   debug_printf ("table_size: %d", table_size);
