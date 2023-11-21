@@ -59,16 +59,6 @@
 #define MAX(a,b) ((a) >= (b) ? (a) : (b))
 #endif
 
-#if __SIZEOF_POINTER__ == __SIZEOF_LONG__
-#define ALIGN_TO(size, align) \
-    (((size) + (align) -1L) & ~((align) -1L))
-#else
-#define ALIGN_TO(size, align) \
-    (((size) + (align) -1) & ~((align) -1))
-#endif
-
-#define ALIGN_PTR(ptr, align)	(void *) (uintptr_t) ALIGN_TO((uintptr_t) ptr, align)
-
 typedef struct {
     char c;
     union {
@@ -116,13 +106,13 @@ typedef struct malloc_chunk
 #define MALLOC_HEAD_ALIGN	(offsetof(align_head_t, s))
 
 /* Size of malloc header. Keep it aligned. */
-#define MALLOC_HEAD 		ALIGN_TO(sizeof(size_t), MALLOC_HEAD_ALIGN)
+#define MALLOC_HEAD 		__align_up(sizeof(size_t), MALLOC_HEAD_ALIGN)
 
 /* nominal "page size" */
 #define MALLOC_PAGE_ALIGN 	(0x1000)
 
 /* Minimum allocation size */
-#define MALLOC_MINSIZE		ALIGN_TO(sizeof(chunk_t), MALLOC_HEAD_ALIGN)
+#define MALLOC_MINSIZE		__align_up(sizeof(chunk_t), MALLOC_HEAD_ALIGN)
 
 /* Maximum allocation size */
 #define MALLOC_MAXSIZE 		(SIZE_MAX - (MALLOC_HEAD + 2*MALLOC_CHUNK_ALIGN))
@@ -186,7 +176,7 @@ static inline size_t
 chunk_size(size_t malloc_size)
 {
     /* Keep all blocks aligned */
-    malloc_size = ALIGN_TO(malloc_size, MALLOC_CHUNK_ALIGN);
+    malloc_size = __align_up(malloc_size, MALLOC_CHUNK_ALIGN);
 
     /* Add space for header */
     malloc_size += MALLOC_HEAD;
@@ -259,7 +249,7 @@ void* __malloc_sbrk_aligned(size_t s)
      * is MALLOC_CHUNK_ALIGN aligned and the head is
      * MALLOC_HEAD_ALIGN aligned.
      */
-    align_p = (char*)ALIGN_PTR(p + MALLOC_HEAD, MALLOC_CHUNK_ALIGN) - MALLOC_HEAD;
+    align_p = __align_up(p + MALLOC_HEAD, MALLOC_CHUNK_ALIGN) - MALLOC_HEAD;
 
     if (align_p != p)
     {
@@ -630,11 +620,11 @@ void
 __malloc_validate_block(chunk_t *r)
 {
     __malloc_block = r;
-    assert (ALIGN_PTR(chunk_to_ptr(r), MALLOC_CHUNK_ALIGN) == chunk_to_ptr(r));
-    assert (ALIGN_PTR(r, MALLOC_HEAD_ALIGN) == r);
+    assert (__align_up(chunk_to_ptr(r), MALLOC_CHUNK_ALIGN) == chunk_to_ptr(r));
+    assert (__align_up(r, MALLOC_HEAD_ALIGN) == r);
     assert (r->size >= MALLOC_MINSIZE);
     assert (r->size < 0x80000000UL);
-    assert (ALIGN_TO(r->size, MALLOC_HEAD_ALIGN) == r->size);
+    assert (__align_up(r->size, MALLOC_HEAD_ALIGN) == r->size);
 }
 
 void
@@ -745,7 +735,7 @@ void * memalign(size_t align, size_t s)
         return NULL;
     }
 
-    s = ALIGN_TO(MAX(s,1), MALLOC_CHUNK_ALIGN);
+    s = __align_up(MAX(s,1), MALLOC_CHUNK_ALIGN);
 
     /* Make sure there's space to align the allocation and split
      * off chunk_t from the front
@@ -757,7 +747,7 @@ void * memalign(size_t align, size_t s)
 
     chunk_p = ptr_to_chunk(allocated);
 
-    aligned_p = ALIGN_PTR(allocated, align);
+    aligned_p = __align_up(allocated, align);
 
     offset = (size_t) (aligned_p - allocated);
 
@@ -818,7 +808,7 @@ void * pvalloc(size_t s)
         return NULL;
     }
 
-    return valloc(ALIGN_TO(s, MALLOC_PAGE_ALIGN));
+    return valloc(__align_up(s, MALLOC_PAGE_ALIGN));
 }
 #endif /* DEFINE_PVALLOC */
 
