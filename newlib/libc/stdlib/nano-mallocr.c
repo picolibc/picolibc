@@ -56,18 +56,14 @@
 #define assert(x) ((void)0)
 #endif
 
-typedef struct {
-    char c;
-    union {
-	void *p;
-	double d;
-	long long ll;
-	size_t s;
-    } u;
+typedef union {
+    void *p;
+    double d;
+    long long ll;
+    size_t s;
 } align_chunk_t;
 
 typedef struct {
-    char c;
     size_t s;
 } align_head_t;
 
@@ -97,10 +93,10 @@ typedef struct malloc_chunk
 
 /* Alignment of allocated chunk. Compute the alignment required from a
  * range of types */
-#define MALLOC_CHUNK_ALIGN	(offsetof(align_chunk_t, u))
+#define MALLOC_CHUNK_ALIGN	_Alignof(align_chunk_t)
 
 /* Alignment of the header. Never larger than MALLOC_CHUNK_ALIGN */
-#define MALLOC_HEAD_ALIGN	(offsetof(align_head_t, s))
+#define MALLOC_HEAD_ALIGN	_Alignof(align_head_t)
 
 /* Size of malloc header. Keep it aligned. */
 #define MALLOC_HEAD 		__align_up(sizeof(size_t), MALLOC_HEAD_ALIGN)
