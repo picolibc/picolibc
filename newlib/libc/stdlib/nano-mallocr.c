@@ -42,6 +42,7 @@
 #include <unistd.h>
 #include <sys/config.h>
 #include <sys/lock.h>
+#include <sys/param.h>
 #include <stdint.h>
 
 #if MALLOC_DEBUG
@@ -53,10 +54,6 @@
 #define MALLOC_UNLOCK __LIBC_UNLOCK()
 #undef assert
 #define assert(x) ((void)0)
-#endif
-
-#ifndef MAX
-#define MAX(a,b) ((a) >= (b) ? (a) : (b))
 #endif
 
 typedef struct {
