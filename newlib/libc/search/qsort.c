@@ -79,8 +79,8 @@ typedef int		 cmp_t(const void *, const void *, void *);
 #else
 typedef int		 cmp_t(const void *, const void *);
 #endif
-static __inline char	*med3 (char *, char *, char *, cmp_t *, void *);
-static __inline void	 swapfunc (char *, char *, size_t, int);
+static inline char	*med3 (char *, char *, char *, cmp_t *, void *);
+static inline void	 swapfunc(char *, char *, size_t, int, int);
 
 #define min(a, b)	(a) < (b) ? a : b
 
@@ -98,30 +98,35 @@ static __inline void	 swapfunc (char *, char *, size_t, int);
         } while (--i > 0);				\
 }
 
-#define SWAPINIT(a, es) swaptype = ((uintptr_t)(a) % sizeof(long)) ||   \
-	((es) % sizeof(long)) ? 2 : ((es) == sizeof(long)) ? 0 : 1
+#define	SWAPINIT(TYPE, a, es) swaptype_ ## TYPE =	\
+	((uintptr_t)(a) % sizeof(TYPE)) ||	\
+	((es) % sizeof(TYPE)) ? 2 : ((es) == sizeof(TYPE)) ? 0 : 1;
 
-static __inline void
-swapfunc (char *a,
-	char *b,
-	size_t n,
-	int swaptype)
+static inline void
+swapfunc(char *a, char *b, size_t n, int swaptype_intptr_t, int swaptype_int)
 {
-	if(swaptype <= 1)
-		swapcode(long, a, b, n)
+	if (swaptype_intptr_t <= 1)
+		swapcode(intptr_t, a, b, n)
+	else if (swaptype_int <= 1)
+		swapcode(int, a, b, n)
 	else
 		swapcode(char, a, b, n)
 }
 
-#define swap(a, b)					\
-	if (swaptype == 0) {				\
-		long t = *(long *)(a);			\
-		*(long *)(a) = *(long *)(b);		\
-		*(long *)(b) = t;			\
+#define	swap(a, b)					\
+	if (swaptype_intptr_t == 0) {			\
+		intptr_t t = *(intptr_t *)(a);		\
+		*(intptr_t *)(a) = *(intptr_t *)(b);	\
+		*(intptr_t *)(b) = t;			\
+	} else if (swaptype_int == 0) {			\
+		int t = *(int *)(a);			\
+		*(int *)(a) = *(int *)(b);		\
+		*(int *)(b) = t;			\
 	} else						\
-		swapfunc(a, b, es, swaptype)
+		swapfunc(a, b, es, swaptype_intptr_t, swaptype_int)
 
-#define vecswap(a, b, n) 	if ((n) > 0) swapfunc(a, b, n, swaptype)
+#define	vecswap(a, b, n)				\
+	if ((n) > 0) swapfunc(a, b, n, swaptype_intptr_t, swaptype_int)
 
 #if defined(I_AM_QSORT_R)
 #define	CMP(t, x, y) (cmp((t), (x), (y)))
@@ -196,11 +201,12 @@ qsort (void *a,
 	char *pa, *pb, *pc, *pd, *pl, *pm, *pn;
 	size_t d, r;
 	int cmp_result;
-	int swaptype, swap_cnt;
+	int swaptype_intptr_t, swaptype_int, swap_cnt;
 	size_t recursion_level = 0;
 	struct { void *a; size_t n; } parameter_stack[PARAMETER_STACK_LEVELS];
 
-	SWAPINIT(a, es);
+	SWAPINIT(intptr_t, a, es);
+	SWAPINIT(int, a, es);
 loop:	swap_cnt = 0;
 	if (n < 7) {
 		/* Short arrays are insertion sorted. */
