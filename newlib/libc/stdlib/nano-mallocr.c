@@ -64,7 +64,7 @@ typedef union {
 } align_chunk_t;
 
 typedef struct {
-    size_t s;
+    uintptr_t s;
 } align_head_t;
 
 typedef struct malloc_chunk
@@ -85,7 +85,7 @@ typedef struct malloc_chunk
      */
 
     /* size of the allocated payload area */
-    size_t size;
+    uintptr_t size;
 
     /* pointer to next chunk */
     struct malloc_chunk * next;
@@ -99,7 +99,7 @@ typedef struct malloc_chunk
 #define MALLOC_HEAD_ALIGN	_Alignof(align_head_t)
 
 /* Size of malloc header. Keep it aligned. */
-#define MALLOC_HEAD 		__align_up(sizeof(size_t), MALLOC_HEAD_ALIGN)
+#define MALLOC_HEAD 		__align_up(sizeof(uintptr_t), MALLOC_HEAD_ALIGN)
 
 /* nominal "page size" */
 #define MALLOC_PAGE_ALIGN 	(0x1000)
