@@ -135,6 +135,7 @@
 	  <command>cygcheck</command>
 	  <arg choice="plain">-c</arg>
 	  <arg>-d</arg>
+	  <arg>-n</arg>
 	  <arg><replaceable>PACKAGE</replaceable></arg>
 	</cmdsynopsis>
 	<cmdsynopsis>
@@ -201,7 +202,8 @@ At least one command option or a PROGRAM is required, as shown above.
   PROGRAM              list library (DLL) dependencies of PROGRAM
   -c, --check-setup    show installed version of PACKAGE and verify integrity
                        (or for all installed packages if none specified)
-  -d, --dump-only      just list packages, do not verify (with -c)
+  -d, --dump-only      do not verify packages (with -c)
+  -n, --names-only     just list package names (implies -c -d)
   -s, --sysinfo        produce diagnostic system information (implies -c -d)
   -r, --registry       also scan registry for Cygwin settings (with -s)
   -k, --keycheck       perform a keyboard check session (must be run from a
@@ -251,7 +253,7 @@ Notes:
       dealing with Cygwin programs. If you are familiar with
       <command>dpkg</command> or <command>rpm</command>,
       <command>cygcheck</command> is similar in many ways. (The major
-      difference is that <command>setup.exe</command> handles installing and
+      difference is that <command>setup</command> handles installing and
       uninstalling packages; see <xref linkend="internet-setup"/> for more
       information.) </para>
     <para> The <literal>-c</literal> option checks the version and status of
@@ -260,11 +262,12 @@ Notes:
       with no arguments it lists all packages. A package will be marked
       <literal>Incomplete</literal> if files originally installed are no longer
       present. The best thing to do in that situation is reinstall the package
-      with <command>setup.exe</command>. To see which files are missing, use
+      with <command>setup</command>. To see which files are missing, use
       the <literal>-v</literal> option. If you do not need to know the status
       of each package and want <command>cygcheck</command> to run faster, add
       the <literal>-d</literal> option and <command>cygcheck</command> will
-      only output the name and version for each package. </para>
+      only output the name and version for each package. Add the
+      <literal>-n</literal> option to output only the names of packages. </para>
     <para> If you list one or more programs on the command line,
       <command>cygcheck</command> will diagnose the runtime environment of that
       program or programs, providing the names of DLL files on which the

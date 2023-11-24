@@ -55,6 +55,7 @@ int givehelp = 0;
 int keycheck = 0;
 int check_setup = 0;
 int dump_only = 0;
+int names_only = 0;
 int find_package = 0;
 int list_package = 0;
 int grep_packages = 0;
@@ -84,7 +85,7 @@ typedef __int64 longlong;
 #endif
 
 /* In dump_setup.cc  */
-void dump_setup (int, char **, bool);
+void dump_setup (int, char **, bool, bool);
 void package_find (int, char **);
 void package_list (int, char **);
 /* In bloda.cc  */
@@ -2913,7 +2914,8 @@ At least one command option or a PROGRAM is required, as shown above.\n\
   PROGRAM              list library (DLL) dependencies of PROGRAM\n\
   -c, --check-setup    show installed version of PACKAGE and verify integrity\n\
                        (or for all installed packages if none specified)\n\
-  -d, --dump-only      just list packages, do not verify (with -c)\n\
+  -d, --dump-only      do not verify packages (with -c)\n\
+  -n, --names-only     just list package names (implies -c -d)\n\
   -s, --sysinfo        produce diagnostic system information (implies -c)\n\
   -r, --registry       also scan registry for Cygwin settings (with -s)\n\
   -k, --keycheck       perform a keyboard check session (must be run from a\n\
@@ -2962,6 +2964,7 @@ Notes:\n\
 struct option longopts[] = {
   {"check-setup", no_argument, NULL, 'c'},
   {"dump-only", no_argument, NULL, 'd'},
+  {"names-only", no_argument, NULL, 'n'},
   {"sysinfo", no_argument, NULL, 's'},
   {"registry", no_argument, NULL, 'r'},
   {"verbose", no_argument, NULL, 'v'},
@@ -2985,7 +2988,7 @@ struct option longopts[] = {
   {0, no_argument, NULL, 0}
 };
 
-static char opts[] = "cdsrvkfliephV";
+static char opts[] = "cdnsrvkfliephV";
 
 static void
 print_version ()
@@ -3092,6 +3095,11 @@ main (int argc, char **argv)
 	break;
       case 'd':
 	dump_only = 1;
+	break;
+      case 'n':
+	check_setup = 1;
+	dump_only = 1;
+	names_only = 1;
 	break;
       case 'r':
 	registry = 1;
@@ -3205,7 +3213,7 @@ main (int argc, char **argv)
     }
 
   if (check_setup)
-    dump_setup (verbose, argv, !dump_only);
+    dump_setup (verbose, argv, !dump_only, names_only);
   else if (find_package)
     package_find (verbose, argv);
   else if (list_package)
@@ -3224,7 +3232,7 @@ main (int argc, char **argv)
       if (!check_setup)
 	{
 	  puts ("");
-	  dump_setup (verbose, NULL, !dump_only);
+	  dump_setup (verbose, NULL, !dump_only, FALSE);
 	}
 
       if (!givehelp)

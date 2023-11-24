@@ -466,11 +466,13 @@ get_installed_packages (char **argv, size_t *count)
 }
 
 void
-dump_setup (int verbose, char **argv, bool check_files)
+dump_setup (int verbose, char **argv, bool check_files, bool names_only)
 {
   pkgver *packages = get_installed_packages (argv);
 
-  puts ("Cygwin Package Information");
+  if (!names_only)
+    puts ("Cygwin Package Information");
+
   if (packages == NULL)
     {
       puts ("No setup information found");
@@ -484,12 +486,15 @@ dump_setup (int verbose, char **argv, bool check_files)
 	puts ("");
     }
 
-  printf ("%-*s %-*s%s\n", package_len, "Package",
-			   check_files ? version_len : 7, "Version",
-			   check_files ? "     Status" : "");
+  if (!names_only)
+    printf ("%-*s %-*s%s\n", package_len, "Package",
+	    check_files ? version_len : 7, "Version",
+	    check_files ? "	Status" : "");
   for (int i = 0; packages[i].name; i++)
     {
-      if (check_files)
+      if (names_only)
+	printf ("%s\n", packages[i].name);
+      else if (check_files)
 	printf ("%-*s %-*s%s\n", package_len, packages[i].name,
 		version_len, packages[i].ver,
 		check_package_files (verbose, packages[i].name)
