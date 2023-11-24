@@ -67,12 +67,3 @@ build_script: >-
 
 test: off
 deploy: off
-
-# irc notification via notifico
-notifications:
-- provider: Webhook
-  url: http://n.tkte.ch/h/4848/0nqixIBiOFzf-S_N2PY83dGB
-  method: GET
-  on_build_success: false
-  on_build_failure: false
-  on_build_status_changed: true
