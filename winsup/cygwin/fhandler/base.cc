@@ -1140,7 +1140,7 @@ fhandler_base::lseek (off_t offset, int whence)
 	    set_errno (ENXIO);
 	    return -1;
 	  }
-	if (!pc.support_sparse ())
+	if (!has_attribute (FILE_ATTRIBUTE_SPARSE_FILE))
 	  {
 	    /* Default behaviour if sparse files are not supported:
 	       SEEK_DATA: seek to offset
