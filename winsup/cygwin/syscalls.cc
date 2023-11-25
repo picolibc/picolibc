@@ -3000,6 +3000,8 @@ posix_fallocate (int fd, off_t offset, off_t len)
 	res = cfd->ftruncate (offset + len, false);
       else
 	res = EBADF;
+      if (res == EISDIR)
+	res = ENODEV;
     }
   syscall_printf ("%R = posix_fallocate(%d, %D, %D)", res, fd, offset, len);
   return res;
@@ -3015,6 +3017,8 @@ ftruncate (int fd, off_t length)
       res = cfd->ftruncate (length, true);
       if (res)
 	{
+	  if (res == ENODEV)
+	    res = EINVAL;
 	  set_errno (res);
 	  res = -1;
 	}
