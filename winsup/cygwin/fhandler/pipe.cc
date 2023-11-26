@@ -247,9 +247,9 @@ fhandler_pipe::fadvise (off_t offset, off_t length, int advice)
 }
 
 int
-fhandler_pipe::ftruncate (off_t length, bool allow_truncate)
+fhandler_pipe::fallocate (int mode, off_t offset, off_t length)
 {
-  return allow_truncate ? EINVAL : ESPIPE;
+  return (mode & __FALLOC_FL_TRUNCATE) ? EINVAL : ESPIPE;
 }
 
 char *

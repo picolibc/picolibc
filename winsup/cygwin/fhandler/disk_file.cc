@@ -25,6 +25,7 @@ details. */
 #include "devices.h"
 #include "ldap.h"
 #include <aio.h>
+#include <fcntl.h>
 #include <cygwin/fs.h>
 
 #define _LIBC
@@ -1130,7 +1131,7 @@ fhandler_disk_file::fadvise (off_t offset, off_t length, int advice)
 }
 
 int
-fhandler_disk_file::ftruncate (off_t length, bool allow_truncate)
+fhandler_disk_file::fallocate (int mode, off_t offset, off_t length)
 {
   int res = 0;
 
@@ -1152,17 +1153,18 @@ fhandler_disk_file::ftruncate (off_t length, bool allow_truncate)
       if (!NT_SUCCESS (status))
 	return geterrno_from_nt_status (status);
 
-      /* If called through posix_fallocate, silently succeed if length
-	 is less than the file's actual length. */
-      if (!allow_truncate && length < fsi.EndOfFile.QuadPart)
+      /* If called through posix_fallocate, silently succeed if
+	 offset + length is less than the file's actual length. */
+      if (mode == 0 && offset + length < fsi.EndOfFile.QuadPart)
 	return 0;
 
-      feofi.EndOfFile.QuadPart = length;
+      feofi.EndOfFile.QuadPart = offset + length;
       /* Create sparse files only when called through ftruncate, not when
 	 called through posix_fallocate. */
-      if (allow_truncate && pc.support_sparse ()
+      if ((mode & __FALLOC_FL_TRUNCATE)
 	  && !has_attribute (FILE_ATTRIBUTE_SPARSE_FILE)
-	  && length >= fsi.EndOfFile.QuadPart + (128 * 1024))
+	  && pc.support_sparse ()
+	  && offset + length >= fsi.EndOfFile.QuadPart + (128 * 1024))
 	{
 	  status = NtFsControlFile (get_handle (), NULL, NULL, NULL, &io,
 				    FSCTL_SET_SPARSE, NULL, 0, NULL, 0);

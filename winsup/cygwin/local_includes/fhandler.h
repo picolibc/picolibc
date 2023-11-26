@@ -389,7 +389,7 @@ public:
   virtual ssize_t fgetxattr (const char *, void *, size_t);
   virtual int fsetxattr (const char *, const void *, size_t, int);
   virtual int fadvise (off_t, off_t, int);
-  virtual int ftruncate (off_t, bool);
+  virtual int fallocate (int, off_t, off_t);
   virtual int link (const char *);
   virtual int utimens (const struct timespec *);
   virtual int fsync ();
@@ -1222,7 +1222,7 @@ public:
   int fstat (struct stat *buf);
   int fstatvfs (struct statvfs *buf);
   int fadvise (off_t, off_t, int);
-  int ftruncate (off_t, bool);
+  int fallocate (int, off_t, off_t);
   int init (HANDLE, DWORD, mode_t, int64_t);
   static int create (fhandler_pipe *[2], unsigned, int);
   static DWORD create (LPSECURITY_ATTRIBUTES, HANDLE *, HANDLE *, DWORD,
@@ -1727,7 +1727,7 @@ class fhandler_disk_file: public fhandler_base
   ssize_t fgetxattr (const char *, void *, size_t);
   int fsetxattr (const char *, const void *, size_t, int);
   int fadvise (off_t, off_t, int);
-  int ftruncate (off_t, bool);
+  int fallocate (int, off_t, off_t);
   int link (const char *);
   int utimens (const struct timespec *);
   int fstatvfs (struct statvfs *buf);
@@ -3413,7 +3413,7 @@ public:
   ssize_t fgetxattr (const char *, void *, size_t) NO_IMPL;
   int fsetxattr (const char *, const void *, size_t, int) NO_IMPL;
   int fadvise (off_t, off_t, int) NO_IMPL;
-  int ftruncate (off_t, bool) NO_IMPL;
+  int fallocate (int, off_t, off_t) NO_IMPL;
   int link (const char *) NO_IMPL;
   int mkdir (mode_t) NO_IMPL;
   ssize_t pread (void *, size_t, off_t, void *aio = NULL) NO_IMPL;

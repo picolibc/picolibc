@@ -2997,7 +2997,7 @@ posix_fallocate (int fd, off_t offset, off_t len)
     {
       cygheap_fdget cfd (fd);
       if (cfd >= 0)
-	res = cfd->ftruncate (offset + len, false);
+	res = cfd->fallocate (0, offset, len);
       else
 	res = EBADF;
       if (res == EISDIR)
@@ -3014,7 +3014,7 @@ ftruncate (int fd, off_t length)
   cygheap_fdget cfd (fd);
   if (cfd >= 0)
     {
-      res = cfd->ftruncate (length, true);
+      res = cfd->fallocate (__FALLOC_FL_TRUNCATE, 0, length);
       if (res)
 	{
 	  if (res == ENODEV)

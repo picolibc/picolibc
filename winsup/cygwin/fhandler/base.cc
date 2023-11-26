@@ -1795,7 +1795,7 @@ fhandler_base::fadvise (off_t offset, off_t length, int advice)
 }
 
 int
-fhandler_base::ftruncate (off_t length, bool allow_truncate)
+fhandler_base::fallocate (int mode, off_t offset, off_t length)
 {
   return ENODEV;
 }

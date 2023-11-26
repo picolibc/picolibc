@@ -40,9 +40,12 @@ details. */
 #define POSIX_FADV_DONTNEED	4
 #define POSIX_FADV_NOREUSE	5
 
+#define __FALLOC_FL_TRUNCATE		0x0001	/* internal */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 extern int posix_fadvise (int, off_t, off_t, int);
 extern int posix_fallocate (int, off_t, off_t);
 #ifdef __cplusplus
