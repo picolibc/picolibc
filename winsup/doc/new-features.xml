@@ -75,6 +75,10 @@ New API calls: c8rtomb, c16rtomb, c32rtomb, mbrtoc8, mbrtoc16, mbrtoc32.
 </para></listitem>
 
 <listitem><para>
+New API call: fallocate (Linux-specific).
+</para></listitem>
+
+<listitem><para>
 FIFOs now also work over NFS.
 </para></listitem>
 

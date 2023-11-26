@@ -42,12 +42,24 @@ details. */
 #define POSIX_FADV_DONTNEED	4
 #define POSIX_FADV_NOREUSE	5
 
-#define __FALLOC_FL_TRUNCATE		0x0001	/* internal */
+#if __GNU_VISIBLE
+#define FALLOC_FL_PUNCH_HOLE		0x0001
+#define FALLOC_FL_ZERO_RANGE		0x0002
+#define FALLOC_FL_UNSHARE_RANGE		0x0004
+#define FALLOC_FL_COLLAPSE_RANGE	0x0008
+#define FALLOC_FL_INSERT_RANGE		0x0010
+#define FALLOC_FL_KEEP_SIZE		0x1000
+/* Internal flags */
+#define __FALLOC_FL_TRUNCATE		0x2000
+#endif
 
 __BEGIN_DECLS
 
 extern int posix_fadvise (int, off_t, off_t, int);
 extern int posix_fallocate (int, off_t, off_t);
+#if __GNU_VISIBLE
+extern int fallocate (int, int, off_t, off_t);
+#endif
 
 __END_DECLS
 

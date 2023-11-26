@@ -43,6 +43,8 @@ What's new:
 
 - New API calls: c8rtomb, c16rtomb, c32rtomb, mbrtoc8, mbrtoc16, mbrtoc32.
 
+- New API call: fallocate (Linux-specific).
+
 - Implement OSS-based sound mixer device (/dev/mixer).
 
 What changed:

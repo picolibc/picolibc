@@ -2988,6 +2988,40 @@ posix_fadvise (int fd, off_t offset, off_t len, int advice)
 }
 
 extern "C" int
+fallocate (int fd, int mode, off_t offset, off_t len)
+{
+  int res = 0;
+
+  /* First check mask of allowed flags */
+  if (mode & ~(FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE
+	       | FALLOC_FL_UNSHARE_RANGE | FALLOC_FL_COLLAPSE_RANGE
+	       | FALLOC_FL_INSERT_RANGE | FALLOC_FL_KEEP_SIZE))
+    res = EOPNOTSUPP;
+  /* Either FALLOC_FL_PUNCH_HOLE or FALLOC_FL_ZERO_RANGE, never both */
+  else if ((mode & (FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE))
+	   == (FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE))
+    res = EOPNOTSUPP;
+  /* FALLOC_FL_PUNCH_HOLE must be ORed with FALLOC_FL_KEEP_SIZE */
+  else if ((mode & (FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE))
+	   == FALLOC_FL_PUNCH_HOLE)
+    res = EOPNOTSUPP;
+  else if (offset < 0 || len == 0)
+    res = EINVAL;
+  else
+    {
+      cygheap_fdget cfd (fd);
+      if (cfd >= 0)
+	res = cfd->fallocate (mode, offset, len);
+      else
+	res = EBADF;
+      if (res == EISDIR)
+	res = ENODEV;
+    }
+  syscall_printf ("%R = posix_fallocate(%d, %D, %D)", res, fd, offset, len);
+  return 0;
+}
+
+extern "C" int
 posix_fallocate (int fd, off_t offset, off_t len)
 {
   int res = 0;

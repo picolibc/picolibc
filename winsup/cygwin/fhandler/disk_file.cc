@@ -1153,15 +1153,46 @@ fhandler_disk_file::fallocate (int mode, off_t offset, off_t length)
       if (!NT_SUCCESS (status))
 	return geterrno_from_nt_status (status);
 
-      /* If called through posix_fallocate, silently succeed if
-	 offset + length is less than the file's actual length. */
-      if (mode == 0 && offset + length < fsi.EndOfFile.QuadPart)
-	return 0;
+      /* Never change file size if FALLOC_FL_KEEP_SIZE is specified. */
+      if ((mode & FALLOC_FL_KEEP_SIZE)
+	  && offset + length > fsi.EndOfFile.QuadPart)
+	{
+	  if (offset > fsi.EndOfFile.QuadPart) /* no-op */
+	    return 0;
+	  length = fsi.EndOfFile.QuadPart - offset;
+	}
+      mode &= ~FALLOC_FL_KEEP_SIZE;
+
+      switch (mode)
+	{
+	case 0:
+	case __FALLOC_FL_TRUNCATE:
+	  break;
+	case FALLOC_FL_PUNCH_HOLE: /* TODO */
+	  return EOPNOTSUPP;
+	  break;
+	case FALLOC_FL_ZERO_RANGE: /* TODO */
+	  return EOPNOTSUPP;
+	  break;
+	default:
+	  return EINVAL;
+	}
+
+      if (mode == 0)
+	{
+	  /* If called through posix_fallocate, silently succeed if
+	     offset + length is less than the file's actual length. */
+
+	  /* TODO: If the file is sparse, POSIX requires to allocate
+		   the holes within offset and offset + length. */
+	  if (offset + length < fsi.EndOfFile.QuadPart)
+	    return 0;
+	}
 
       feofi.EndOfFile.QuadPart = offset + length;
       /* Create sparse files only when called through ftruncate, not when
 	 called through posix_fallocate. */
-      if ((mode & __FALLOC_FL_TRUNCATE)
+      if (mode == __FALLOC_FL_TRUNCATE
 	  && !has_attribute (FILE_ATTRIBUTE_SPARSE_FILE)
 	  && pc.support_sparse ()
 	  && offset + length >= fsi.EndOfFile.QuadPart + (128 * 1024))

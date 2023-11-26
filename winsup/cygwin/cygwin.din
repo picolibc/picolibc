@@ -506,6 +506,7 @@ fabsf NOSIGFE
 fabsl NOSIGFE
 faccessat SIGFE
 facl SIGFE
+fallocate SIGFE
 fchdir SIGFE
 fchmod SIGFE
 fchmodat SIGFE
