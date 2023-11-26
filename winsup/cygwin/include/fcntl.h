@@ -9,7 +9,9 @@ details. */
 #ifndef _FCNTL_H
 #define _FCNTL_H
 
+#include <sys/cdefs.h>
 #include <sys/fcntl.h>
+
 #define O_NDELAY	_FNDELAY
 
 /* F_LCK_MANDATORY: Request mandatory locks for this file descriptor.
@@ -42,14 +44,11 @@ details. */
 
 #define __FALLOC_FL_TRUNCATE		0x0001	/* internal */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+__BEGIN_DECLS
 
 extern int posix_fadvise (int, off_t, off_t, int);
 extern int posix_fallocate (int, off_t, off_t);
-#ifdef __cplusplus
-}
-#endif
+
+__END_DECLS
 
 #endif /* _FCNTL_H */
