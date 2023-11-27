@@ -21,3 +21,6 @@ Bug Fixes
 
 - Fix posix_fallocate(3) return value in case of being called on
   other than regular files.
+
+- Reset sparseness in case open(2) has been called with O_CREAT|O_TRUNC on
+  sparse files.

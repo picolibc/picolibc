@@ -776,6 +776,15 @@ fhandler_base::open (int flags, mode_t mode)
 	  NtClose (fh);
 	  goto done;
 	}
+      /* Drop sparseness */
+      if (pc.file_attributes () & FILE_ATTRIBUTE_SPARSE_FILE)
+	{
+	  FILE_SET_SPARSE_BUFFER fssb = { SetSparse: FALSE };
+	  status = NtFsControlFile (fh, NULL, NULL, NULL, &io,
+				    FSCTL_SET_SPARSE, &fssb, sizeof fssb, NULL, 0);
+	  if (NT_SUCCESS (status))
+	    pc.file_attributes (pc.file_attributes () & ~FILE_ATTRIBUTE_SPARSE_FILE);
+	}
     }
 
   set_handle (fh);
