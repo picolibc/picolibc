@@ -1724,6 +1724,7 @@ fhandler_disk_file::pwrite (void *buf, size_t count, off_t offset, void *aio)
     {
       NTSTATUS status;
       IO_STATUS_BLOCK io;
+      FILE_STANDARD_INFORMATION fsi;
       LARGE_INTEGER off = { QuadPart:offset };
       HANDLE evt = aio ? (HANDLE) aiocb->aio_wincb.event : NULL;
       PIO_STATUS_BLOCK pio = aio ? (PIO_STATUS_BLOCK) &aiocb->aio_wincb : &io;
@@ -1732,6 +1733,25 @@ fhandler_disk_file::pwrite (void *buf, size_t count, off_t offset, void *aio)
       if (prw_handle && (prw_handle_isasync != !!aio))
         NtClose (prw_handle), prw_handle = NULL;
 
+      /* If the file system supports sparse files and the application is
+         writing beyond EOF spanning more than one sparsifiable chunk,
+	 convert the file to a sparse file. */
+      if (pc.support_sparse ()
+	  && !has_attribute (FILE_ATTRIBUTE_SPARSE_FILE)
+	  && NT_SUCCESS (NtQueryInformationFile (get_handle (),
+						 &io, &fsi, sizeof fsi,
+						 FileStandardInformation))
+	  && offset >= fsi.EndOfFile.QuadPart + (128 * 1024))
+	{
+	  NTSTATUS status;
+	  status = NtFsControlFile (get_handle (), NULL, NULL, NULL,
+				    &io, FSCTL_SET_SPARSE, NULL, 0, NULL, 0);
+	  if (NT_SUCCESS (status))
+	    pc.file_attributes (pc.file_attributes ()
+				| FILE_ATTRIBUTE_SPARSE_FILE);
+	  debug_printf ("%y = NtFsControlFile(%S, FSCTL_SET_SPARSE)",
+			status, pc.get_nt_native_path ());
+	}
       if (!prw_handle && prw_open (true, aio))
 	goto non_atomic;
       status = NtWriteFile (prw_handle, evt, NULL, NULL, pio, buf, count,
