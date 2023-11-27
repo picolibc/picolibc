@@ -3017,8 +3017,13 @@ fallocate (int fd, int mode, off_t offset, off_t len)
       if (res == EISDIR)
 	res = ENODEV;
     }
+  if (res)
+    {
+      set_errno (res);
+      res = -1;
+    }
   syscall_printf ("%R = posix_fallocate(%d, %D, %D)", res, fd, offset, len);
-  return 0;
+  return res;
 }
 
 extern "C" int
