@@ -45,6 +45,9 @@ extern GUID __cygwin_socket_guid;
 #define FILE_WRITE_TO_END_OF_FILE      (-1LL)
 #define FILE_USE_FILE_POINTER_POSITION (-2LL)
 
+/* Sparsification granularity on NTFS. */
+#define FILE_SPARSE_GRANULARITY	       (64 * 1024)
+
 /* Device Characteristics. */
 #define FILE_REMOVABLE_MEDIA           0x00000001
 #define FILE_READ_ONLY_DEVICE          0x00000002
@@ -389,6 +392,11 @@ typedef struct _FILE_ALL_INFORMATION {		// 18
   FILE_ALIGNMENT_INFORMATION AlignmentInformation;
   FILE_NAME_INFORMATION      NameInformation;
 } FILE_ALL_INFORMATION, *PFILE_ALL_INFORMATION;
+
+typedef struct _FILE_ALLOCATION_INFORMATION	// 19
+{
+  LARGE_INTEGER AllocationSize;
+} FILE_ALLOCATION_INFORMATION, *PFILE_ALLOCATION_INFORMATION;
 
 typedef struct _FILE_END_OF_FILE_INFORMATION	// 20
 {

@@ -51,6 +51,7 @@ details. */
 #define FALLOC_FL_KEEP_SIZE		0x1000
 /* Internal flags */
 #define __FALLOC_FL_TRUNCATE		0x2000
+#define __FALLOC_FL_ZERO_HOLES		0x4000
 #endif
 
 __BEGIN_DECLS

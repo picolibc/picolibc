@@ -14,6 +14,7 @@ details. */
 #include <cygwin/_socketflags.h>
 #include <cygwin/_ucred.h>
 #include <sys/un.h>
+#include <sys/param.h>
 
 /* It appears that 64K is the block size used for buffered I/O on NT.
    Using this blocksize in read/write calls in the application results
@@ -36,6 +37,15 @@ details. */
 /* (65536 / sizeof (INPUT_RECORD)) is 3276, however,
    ERROR_NOT_ENOUGH_MEMORY occurs in win7 if this value is used. */
 #define INREC_SIZE 2048
+
+/* Helper function to allow checking if some offset in a file is so far
+   beyond EOF, that at least one sparse chunk fits into the span. */
+inline bool
+span_sparse_chunk (off_t new_pos, off_t old_eof)
+{
+  return roundup2 (old_eof, FILE_SPARSE_GRANULARITY) + FILE_SPARSE_GRANULARITY
+	 <= rounddown (new_pos, FILE_SPARSE_GRANULARITY);
+}
 
 extern const char *windows_device_names[];
 extern struct __cygwin_perfile *perfile_table;
@@ -1707,6 +1717,10 @@ class fhandler_disk_file: public fhandler_base
   int prw_open (bool, void *);
   uint64_t fs_ioc_getflags ();
   int fs_ioc_setflags (uint64_t);
+
+  falloc_allocate (int, off_t, off_t);
+  falloc_punch_hole (off_t, off_t);
+  falloc_zero_range (int, off_t, off_t);
 
  public:
   fhandler_disk_file ();

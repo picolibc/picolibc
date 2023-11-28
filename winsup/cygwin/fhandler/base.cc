@@ -896,6 +896,9 @@ fhandler_base::write (const void *ptr, size_t len)
 
       did_lseek (false); /* don't do it again */
 
+      /* If the file system supports sparse files and the application is
+         writing after a long seek beyond EOF spanning more than one
+	 sparsifiable chunk, convert the file to a sparse file. */
       if (!(get_flags () & O_APPEND)
 	  && !has_attribute (FILE_ATTRIBUTE_SPARSE_FILE)
 	  && NT_SUCCESS (NtQueryInformationFile (get_output_handle (),
@@ -904,12 +907,9 @@ fhandler_base::write (const void *ptr, size_t len)
 	  && NT_SUCCESS (NtQueryInformationFile (get_output_handle (),
 						 &io, &fpi, sizeof fpi,
 						 FilePositionInformation))
-	  && fpi.CurrentByteOffset.QuadPart
-	     >= fsi.EndOfFile.QuadPart + (128 * 1024))
+	  && span_sparse_chunk (fpi.CurrentByteOffset.QuadPart,
+				fsi.EndOfFile.QuadPart))
 	{
-	  /* If the file system supports sparse files and the application
-	     is writing after a long seek beyond EOF, convert the file to
-	     a sparse file. */
 	  NTSTATUS status;
 	  status = NtFsControlFile (get_output_handle (), NULL, NULL, NULL,
 				    &io, FSCTL_SET_SPARSE, NULL, 0, NULL, 0);

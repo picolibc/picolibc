@@ -1131,87 +1131,298 @@ fhandler_disk_file::fadvise (off_t offset, off_t length, int advice)
 }
 
 int
-fhandler_disk_file::fallocate (int mode, off_t offset, off_t length)
+fhandler_disk_file::falloc_allocate (int mode, off_t offset, off_t length)
 {
-  int res = 0;
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+  FILE_STANDARD_INFORMATION fsi;
+  FILE_END_OF_FILE_INFORMATION feofi;
+  FILE_ALLOCATION_INFORMATION fai = { 0 };
 
-  if (length < 0 || !get_handle ())
-    res = EINVAL;
-  else if (pc.isdir ())
-    res = EISDIR;
-  else if (!(get_access () & GENERIC_WRITE))
-    res = EBADF;
-  else
+  /* Fetch EOF */
+  status = NtQueryInformationFile (get_handle (), &io, &fsi, sizeof fsi,
+				   FileStandardInformation);
+  if (!NT_SUCCESS (status))
+    return geterrno_from_nt_status (status);
+
+  switch (mode)
     {
-      NTSTATUS status;
-      IO_STATUS_BLOCK io;
-      FILE_STANDARD_INFORMATION fsi;
-      FILE_END_OF_FILE_INFORMATION feofi;
-
-      status = NtQueryInformationFile (get_handle (), &io, &fsi, sizeof fsi,
-				       FileStandardInformation);
-      if (!NT_SUCCESS (status))
-	return geterrno_from_nt_status (status);
-
-      /* Never change file size if FALLOC_FL_KEEP_SIZE is specified. */
-      if ((mode & FALLOC_FL_KEEP_SIZE)
-	  && offset + length > fsi.EndOfFile.QuadPart)
+    case 0:
+      /* For posix_fallocate(3), truncating the file is a no-op.  However,
+         for sparse files we still have to allocate the blocks within
+	 offset and offset + length which are currently in holes, due to
+	 the following POSIX requirement:
+	 "If posix_fallocate() returns successfully, subsequent writes to
+	  the specified file data shall not fail due to the lack of free
+	  space on the file system  storage  media." */
+      if (offset + length <= fsi.EndOfFile.QuadPart)
 	{
-	  if (offset > fsi.EndOfFile.QuadPart) /* no-op */
+	  if (!has_attribute (FILE_ATTRIBUTE_SPARSE_FILE))
 	    return 0;
-	  length = fsi.EndOfFile.QuadPart - offset;
+	  feofi.EndOfFile.QuadPart = fsi.EndOfFile.QuadPart;
 	}
-      mode &= ~FALLOC_FL_KEEP_SIZE;
+      else
+	feofi.EndOfFile.QuadPart = offset + length;
+      break;
+    case __FALLOC_FL_TRUNCATE:
+      /* For ftruncate(2), offset is 0. Just use length as is. */
+      feofi.EndOfFile.QuadPart = length;
 
-      switch (mode)
-	{
-	case 0:
-	case __FALLOC_FL_TRUNCATE:
-	  break;
-	case FALLOC_FL_PUNCH_HOLE: /* TODO */
-	  return EOPNOTSUPP;
-	  break;
-	case FALLOC_FL_ZERO_RANGE: /* TODO */
-	  return EOPNOTSUPP;
-	  break;
-	default:
-	  return EINVAL;
-	}
-
-      if (mode == 0)
-	{
-	  /* If called through posix_fallocate, silently succeed if
-	     offset + length is less than the file's actual length. */
-
-	  /* TODO: If the file is sparse, POSIX requires to allocate
-		   the holes within offset and offset + length. */
-	  if (offset + length < fsi.EndOfFile.QuadPart)
-	    return 0;
-	}
-
-      feofi.EndOfFile.QuadPart = offset + length;
-      /* Create sparse files only when called through ftruncate, not when
-	 called through posix_fallocate. */
-      if (mode == __FALLOC_FL_TRUNCATE
+      /* Make file sparse only when called through ftruncate and the mount
+	 mode supports sparse files.  Also, make sure that the new region
+	 actually spans over at least one sparsifiable chunk. */
+      if (pc.support_sparse ()
 	  && !has_attribute (FILE_ATTRIBUTE_SPARSE_FILE)
-	  && pc.support_sparse ()
-	  && offset + length >= fsi.EndOfFile.QuadPart + (128 * 1024))
+	  && span_sparse_chunk (feofi.EndOfFile.QuadPart,
+				fsi.EndOfFile.QuadPart))
 	{
 	  status = NtFsControlFile (get_handle (), NULL, NULL, NULL, &io,
 				    FSCTL_SET_SPARSE, NULL, 0, NULL, 0);
 	  if (NT_SUCCESS (status))
 	    pc.file_attributes (pc.file_attributes ()
-			        | FILE_ATTRIBUTE_SPARSE_FILE);
-	  syscall_printf ("%y = NtFsControlFile(%S, FSCTL_SET_SPARSE)",
-			  status, pc.get_nt_native_path ());
+				| FILE_ATTRIBUTE_SPARSE_FILE);
+	  debug_printf ("%y = NtFsControlFile(%S, FSCTL_SET_SPARSE)",
+			status, pc.get_nt_native_path ());
 	}
+      break;
+    case FALLOC_FL_KEEP_SIZE:
+      /* Keep track of the allocation size for overallocation below.
+	 Note that overallocation in Windows is only temporary!
+	 As soon as the last open handle to the file is closed, the
+	 overallocation gets removed by the system.  Also, overallocation
+	 for sparse files fails silently, so just don't bother. */
+      if (offset + length > fsi.EndOfFile.QuadPart
+	  && !has_attribute (FILE_ATTRIBUTE_SPARSE_FILE))
+	fai.AllocationSize.QuadPart = offset + length;
+
+      feofi.EndOfFile.QuadPart = fsi.EndOfFile.QuadPart;
+      break;
+    }
+
+  /* Now set the new EOF */
+  if (feofi.EndOfFile.QuadPart != fsi.EndOfFile.QuadPart)
+    {
       status = NtSetInformationFile (get_handle (), &io,
 				     &feofi, sizeof feofi,
 				     FileEndOfFileInformation);
       if (!NT_SUCCESS (status))
-	res = geterrno_from_nt_status (status);
+	return geterrno_from_nt_status (status);
     }
+
+  /* If called via fallocate(2) or posix_fallocate(3), allocate blocks in
+     sparse file holes. */
+  if (mode != __FALLOC_FL_TRUNCATE
+      && length
+      && has_attribute (FILE_ATTRIBUTE_SPARSE_FILE))
+    {
+      int res = falloc_zero_range (mode | __FALLOC_FL_ZERO_HOLES,
+				   offset, length);
+      if (res)
+	return res;
+    }
+
+  /* Last but not least, set the new allocation size, if any */
+  if (fai.AllocationSize.QuadPart)
+    {
+      /* This is not fatal. Just note a failure in the debug output. */
+      status = NtSetInformationFile (get_handle (), &io,
+				     &fai, sizeof fai,
+				     FileAllocationInformation);
+      if (!NT_SUCCESS (status))
+	debug_printf ("%y = NtSetInformationFile(%S, "
+		      "FileAllocationInformation)",
+		      status, pc.get_nt_native_path ());
+    }
+
+  return 0;
+}
+
+int
+fhandler_disk_file::falloc_punch_hole (off_t offset, off_t length)
+{
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+  FILE_STANDARD_INFORMATION fsi;
+  FILE_ZERO_DATA_INFORMATION fzi;
+
+  /* Fetch EOF */
+  status = NtQueryInformationFile (get_handle (), &io, &fsi, sizeof fsi,
+				   FileStandardInformation);
+  if (!NT_SUCCESS (status))
+    return geterrno_from_nt_status (status);
+
+  if (offset > fsi.EndOfFile.QuadPart) /* no-op */
+    return 0;
+
+  if (offset + length > fsi.EndOfFile.QuadPart)
+    length = fsi.EndOfFile.QuadPart - offset;
+
+  /* If the file isn't sparse yet, make it so. */
+  if (!has_attribute (FILE_ATTRIBUTE_SPARSE_FILE))
+    {
+      status = NtFsControlFile (get_handle (), NULL, NULL, NULL, &io,
+				FSCTL_SET_SPARSE, NULL, 0, NULL, 0);
+	debug_printf ("%y = NtFsControlFile(%S, FSCTL_SET_SPARSE)",
+		      status, pc.get_nt_native_path ());
+      if (!NT_SUCCESS (status))
+	return geterrno_from_nt_status (status);
+      pc.file_attributes (pc.file_attributes () | FILE_ATTRIBUTE_SPARSE_FILE);
+    }
+
+  /* Now punch a hole. For once, FSCTL_SET_ZERO_DATA does it exactly as per
+     fallocate(FALLOC_FL_PUNCH_HOLE) specs. */
+  fzi.FileOffset.QuadPart = offset;
+  fzi.BeyondFinalZero.QuadPart = offset + length;
+  status = NtFsControlFile (get_handle (), NULL, NULL, NULL, &io,
+			    FSCTL_SET_ZERO_DATA, &fzi, sizeof fzi, NULL, 0);
+  if (!NT_SUCCESS (status))
+    return geterrno_from_nt_status (status);
+
+  return 0;
+}
+
+int
+fhandler_disk_file::falloc_zero_range (int mode, off_t offset, off_t length)
+{
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+  FILE_STANDARD_INFORMATION fsi;
+  FILE_ALLOCATED_RANGE_BUFFER inp, *out = NULL;
+  OBJECT_ATTRIBUTES attr;
+  HANDLE zo_handle;
+  tmp_pathbuf tp;
+  size_t data_chunk_count = 0;
+
+  /* Fetch EOF */
+  status = NtQueryInformationFile (get_handle (), &io, &fsi, sizeof fsi,
+				   FileStandardInformation);
+  if (!NT_SUCCESS (status))
+    return geterrno_from_nt_status (status);
+
+  /* offset and length must not exceed EOF with FALLOC_FL_KEEP_SIZE */
+  if (mode & FALLOC_FL_KEEP_SIZE)
+    {
+      if (offset > fsi.EndOfFile.QuadPart) /* no-op */
+	return 0;
+
+      if (offset + length > fsi.EndOfFile.QuadPart)
+	length = fsi.EndOfFile.QuadPart - offset;
+    }
+
+  /* If the file is sparse, fetch the data ranges within the file
+       to be able to recognize holes. */
+  if (has_attribute (FILE_ATTRIBUTE_SPARSE_FILE))
+    {
+      inp.FileOffset.QuadPart = offset;
+      inp.Length.QuadPart = length;
+      out = (FILE_ALLOCATED_RANGE_BUFFER *) tp.t_get ();
+      status = NtFsControlFile (get_handle (), NULL, NULL, NULL,
+				&io, FSCTL_QUERY_ALLOCATED_RANGES,
+				&inp, sizeof inp, out, 2 * NT_MAX_PATH);
+      if (NT_ERROR (status))
+	out = NULL;
+      else
+	data_chunk_count = io.Information / sizeof *out;
+    }
+
+  /* Re-open the file and use this handle ever after, so as not to
+     move the file pointer of the original file object.  */
+  status = NtOpenFile (&zo_handle, SYNCHRONIZE | GENERIC_WRITE,
+		       pc.init_reopen_attr (attr, get_handle ()), &io,
+		       FILE_SHARE_VALID_FLAGS, get_options ());
+  if (!NT_SUCCESS (status))
+    return geterrno_from_nt_status (status);
+
+  /* FILE_SPARSE_GRANULARITY == 2 * NT_MAX_PATH ==> fits exactly */
+  char *nullbuf = tp.t_get ();
+  memset (nullbuf, 0, FILE_SPARSE_GRANULARITY);
+  int res = 0;
+
+  /* Split range into chunks of size FILE_SPARSE_GRANULARITY and handle
+     them according to being data or hole */
+  LARGE_INTEGER off = { QuadPart:offset };
+  size_t start_idx = 0;
+  while (length > 0)
+    {
+      off_t chunk_len;
+      bool in_data = true;
+
+      if (off.QuadPart % FILE_SPARSE_GRANULARITY)	/* First block */
+	chunk_len = roundup2 (off.QuadPart, FILE_SPARSE_GRANULARITY) - off.QuadPart;
+      else
+	chunk_len = FILE_SPARSE_GRANULARITY;
+      if (chunk_len > length)			/* First or last block */
+	chunk_len = length;
+
+      /* Check if the current chunk is within data or hole */
+      if (has_attribute (FILE_ATTRIBUTE_SPARSE_FILE)
+	  && off.QuadPart < fsi.EndOfFile.QuadPart)
+	{
+	  in_data = false;
+	  for (size_t idx = start_idx; idx < data_chunk_count; ++idx)
+	    if (off.QuadPart >= out[idx].FileOffset.QuadPart)
+	      {
+		/* Skip entries with lower start address next time. */
+		start_idx = idx;
+		if (off.QuadPart < out[idx].FileOffset.QuadPart
+				   + out[idx].Length.QuadPart)
+		  {
+		    in_data = true;
+		    break;
+		  }
+	      }
+	}
+
+      /* Eventually, write zeros into the block.  Completely zero out data
+	 blocks, just write a single zero to former holes in sparse files.
+	 If __FALLOC_FL_ZERO_HOLES has been specified, only write to holes. */
+      if (!(mode & __FALLOC_FL_ZERO_HOLES) || !in_data)
+	{
+	  status = NtWriteFile (zo_handle, NULL, NULL, NULL, &io, nullbuf,
+				in_data ? chunk_len : 1, &off, NULL);
+	  if (!NT_SUCCESS (status))
+	    {
+	      res = geterrno_from_nt_status (status);
+	      break;
+	    }
+	}
+
+      off.QuadPart += chunk_len;
+      length -= chunk_len;
+    }
+
+  NtClose (zo_handle);
   return res;
+}
+
+int
+fhandler_disk_file::fallocate (int mode, off_t offset, off_t length)
+{
+  if (length < 0 || !get_handle ())
+    return EINVAL;
+  if (pc.isdir ())
+    return EISDIR;
+  if (!(get_access () & GENERIC_WRITE))
+    return EBADF;
+
+  switch (mode)
+    {
+    case 0:
+    case __FALLOC_FL_TRUNCATE:
+    case FALLOC_FL_KEEP_SIZE:
+      return falloc_allocate (mode, offset, length);
+    case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE:
+      /* Only if the filesystem supports it... */
+      if (!(pc.fs_flags () & FILE_SUPPORTS_SPARSE_FILES))
+	return EOPNOTSUPP;
+      return falloc_punch_hole (offset, length);
+    case FALLOC_FL_ZERO_RANGE:
+    case FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE:
+      return falloc_zero_range (mode, offset, length);
+    default:
+      break;
+    }
+  return EINVAL;
 }
 
 int
@@ -1741,7 +1952,7 @@ fhandler_disk_file::pwrite (void *buf, size_t count, off_t offset, void *aio)
 	  && NT_SUCCESS (NtQueryInformationFile (get_handle (),
 						 &io, &fsi, sizeof fsi,
 						 FileStandardInformation))
-	  && offset >= fsi.EndOfFile.QuadPart + (128 * 1024))
+	  && span_sparse_chunk (offset, fsi.EndOfFile.QuadPart))
 	{
 	  NTSTATUS status;
 	  status = NtFsControlFile (get_handle (), NULL, NULL, NULL,
