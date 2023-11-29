@@ -23,7 +23,7 @@ _gettimeofday(struct timeval *tp, void *tzp)
   int rv;
   rv = syscall_errno (SYS_clock_gettime64, 2, 0, (long)&ts64, 0, 0, 0, 0);
   tp->tv_sec = ts64.tv_sec;
-  tp->tv_usec = ts64.tv_nsec * 1000;
+  tp->tv_usec = ts64.tv_nsec / 1000;
   return rv;
 #else
   return syscall_errno (SYS_gettimeofday, 1, tp, 0, 0, 0, 0, 0);
