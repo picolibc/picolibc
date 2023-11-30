@@ -79,6 +79,12 @@ New API call: fallocate (Linux-specific).
 </para></listitem>
 
 <listitem><para>
+posix_spawnp no longer falls back to starting the shell for unrecognized
+files as execvp.  For the reasoning, see
+https://www.austingroupbugs.net/view.php?id=1674
+</para></listitem>
+
+<listitem><para>
 FIFOs now also work over NFS.
 </para></listitem>
 
