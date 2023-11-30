@@ -108,7 +108,9 @@ _trap(void)
                 ".option	pop");
 
         /* Make space for saved registers */
-        __asm__("addi   sp,sp,%0" :: "i" (-sizeof(struct fault)));
+        __asm__("addi   sp, sp, %0\n"
+                ".cfi_def_cfa sp, 0\n"
+                :: "i"(-sizeof(struct fault)));
 
         /* Save registers on stack */
 #define SAVE_REG(num)   \
@@ -130,11 +132,18 @@ _trap(void)
         __asm__("csrr   t0, "PASTE(name));\
         __asm__(SD"  t0, %0(sp)" :: "i" (offsetof(struct fault, name)))
 
-        /* Save the trapping frame's stack pointer stashed in mscratch. */
-        __asm__("csrrw t0, mscratch, zero\n"
+        /*
+         * Save the trapping frame's stack pointer that was stashed in mscratch
+         * and tell the unwinder where we can find the return address (mepc).
+         */
+        __asm__("csrr   ra, mepc\n"
+                SD "    ra, %0(sp)\n"
+                ".cfi_offset ra, %0\n"
+                "csrrw t0, mscratch, zero\n"
                 SD "    t0, %1(sp)\n"
-                :: "i"(offsetof(struct fault, r[2])));
-        SAVE_CSR(mepc);
+                ".cfi_offset sp, %1\n"
+                :: "i"(offsetof(struct fault, mepc)),
+                   "i"(offsetof(struct fault, r[2])));
         SAVE_CSR(mcause);
         SAVE_CSR(mtval);
 
