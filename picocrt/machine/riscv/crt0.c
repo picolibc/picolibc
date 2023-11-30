@@ -104,7 +104,7 @@ _trap(void)
 	__asm__(".option	push\n"
                 ".option	norelax\n"
                 "csrrw  sp, mscratch, sp\n"
-                "la	sp, __stack\n"
+                "la	sp, __heap_end\n"
                 ".option	pop");
 
         /* Make space for saved registers */
