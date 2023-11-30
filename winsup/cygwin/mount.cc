@@ -523,8 +523,22 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
   caseinsensitive ((!(flags () & FILE_CASE_SENSITIVE_SEARCH) || is_samba ())
 		   && !is_nfs ());
 
+  /* Check for being an SSD */
+  if (!is_remote_drive () && !is_cdrom ())
+    {
+      /* Theoretically FileFsVolumeFlagsInformation would be sufficient,
+	 but apparently it's not exposed into userspace. */
+      FILE_FS_SECTOR_SIZE_INFORMATION ffssi;
+
+      status = NtQueryVolumeInformationFile (vol, &io, &ffssi, sizeof ffssi,
+					     FileFsSectorSizeInformation);
+      if (NT_SUCCESS (status))
+	is_ssd (!!(ffssi.Flags & SSINFO_FLAGS_NO_SEEK_PENALTY));
+    }
+
   if (!in_vol)
     NtClose (vol);
+
   fsi_cache.add (hash, this);
   return true;
 }
