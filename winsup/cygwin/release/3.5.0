@@ -55,3 +55,6 @@ What changed:
   https://www.austingroupbugs.net/view.php?id=1674
 
 - FIFOs now also work over NFS.
+
+- Enable automatic sparsifying of files on SSDs, independent of the
+  "sparse" mount mode.

@@ -82,6 +82,11 @@ New API call: fallocate (Linux-specific).
 FIFOs now also work over NFS.
 </para></listitem>
 
+<listitem><para>
+Enable automatic sparsifying of files on SSDs, independent of the
+"sparse" mount mode.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

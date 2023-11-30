@@ -174,8 +174,8 @@ class path_conv
   bool isgood_inode (ino_t ino) const;
   bool support_sparse () const
   {
-    return (mount_flags & MOUNT_SPARSE)
-	   && (fs_flags () & FILE_SUPPORTS_SPARSE_FILES);
+    return (fs_flags () & FILE_SUPPORTS_SPARSE_FILES)
+	   && (fs.is_ssd () || (mount_flags & MOUNT_SPARSE));
   }
   int has_dos_filenames_only () const {return mount_flags & MOUNT_DOS;}
   int has_buggy_reopen () const {return fs.has_buggy_reopen ();}
