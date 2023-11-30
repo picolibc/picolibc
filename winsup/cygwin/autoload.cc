@@ -465,6 +465,7 @@ LoadDLLfunc (GetUdpTable, iphlpapi)
 LoadDLLfunc (if_indextoname, iphlpapi)
 LoadDLLfunc (if_nametoindex, iphlpapi)
 
+LoadDLLfuncEx2 (DiscardVirtualMemory, kernel32, 1, 127)
 LoadDLLfuncEx (ClosePseudoConsole, kernel32, 1)
 LoadDLLfuncEx (CreatePseudoConsole, kernel32, 1)
 LoadDLLfuncEx (IsWow64Process2, kernel32, 1)
