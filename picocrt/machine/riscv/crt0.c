@@ -103,8 +103,8 @@ _trap(void)
         /* Build a known-working C environment */
 	__asm__(".option	push\n"
                 ".option	norelax\n"
+                "csrrw  sp, mscratch, sp\n"
                 "la	sp, __stack\n"
-                "la	gp, __global_pointer$\n"
                 ".option	pop");
 
         /* Make space for saved registers */
@@ -130,6 +130,10 @@ _trap(void)
         __asm__("csrr   t0, "PASTE(name));\
         __asm__(SD"  t0, %0(sp)" :: "i" (offsetof(struct fault, name)))
 
+        /* Save the trapping frame's stack pointer stashed in mscratch. */
+        __asm__("csrrw t0, mscratch, zero\n"
+                SD "    t0, %1(sp)\n"
+                :: "i"(offsetof(struct fault, r[2])));
         SAVE_CSR(mepc);
         SAVE_CSR(mcause);
         SAVE_CSR(mtval);
@@ -137,6 +141,7 @@ _trap(void)
         /*
          * Pass pointer to saved registers in first parameter register
          */
+        __asm__("la	gp, __global_pointer$");
         __asm__("mv     a0, sp");
 
         /* Enable FPU (just in case) */
