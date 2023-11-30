@@ -161,7 +161,7 @@ _trap(void)
                 "csrw	mstatus, t0\n"
                 "csrwi	fcsr, 0");
 #endif
-        __asm__("j      _ctrap");
+        __asm__("jal    _ctrap");
 }
 #endif
 
