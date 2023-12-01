@@ -81,8 +81,6 @@ class fs_info
   ULONG sernum;			/* Volume Serial Number */
   char fsn[80];			/* Windows filesystem name */
 
-  void check_ssd (HANDLE);
-
  public:
   void clear ()
   {
