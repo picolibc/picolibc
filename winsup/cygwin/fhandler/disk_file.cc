@@ -1319,9 +1319,7 @@ fhandler_disk_file::falloc_zero_range (int mode, off_t offset, off_t length)
       status = NtFsControlFile (get_handle (), NULL, NULL, NULL,
 				&io, FSCTL_QUERY_ALLOCATED_RANGES,
 				&inp, sizeof inp, out, 2 * NT_MAX_PATH);
-      if (NT_ERROR (status))
-	out = NULL;
-      else
+      if (!NT_ERROR (status))
 	data_chunk_count = io.Information / sizeof *out;
     }
 
