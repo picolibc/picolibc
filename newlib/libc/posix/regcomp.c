@@ -2001,10 +2001,10 @@ struct re_guts *g;
 	}
 
 	g->matchjump = (int*) malloc(g->mlen * sizeof(unsigned int));
-	if (g->matchjump == NULL) { /* Not a fatal error */
-        free(pmatches);
-        return;
-    }
+	if (g->matchjump == NULL) {	/* Not a fatal error */
+		free(pmatches);
+		return;
+	}
 
 	/* Set maximum possible jump for each character in the pattern */
 	for (mindex = 0; mindex < g->mlen; mindex++)
@@ -2037,16 +2037,16 @@ struct re_guts *g;
 		g->matchjump[mindex] = MIN(g->matchjump[mindex],
 		    g->mlen + suffix - mindex);
 
-        ssuffix = pmatches[suffix];
-        while (suffix < g->mlen) {
-                while (suffix <= ssuffix && suffix < g->mlen) {
-                        g->matchjump[suffix] = MIN(g->matchjump[suffix],
+	ssuffix = pmatches[suffix];
+	while (suffix < g->mlen) {
+		while (suffix <= ssuffix && suffix < g->mlen) {
+			g->matchjump[suffix] = MIN(g->matchjump[suffix],
 			    g->mlen + ssuffix - suffix);
-                        suffix++;
-                }
+			suffix++;
+		}
 		if (suffix < g->mlen)
-                	ssuffix = pmatches[ssuffix];
-        }
+			ssuffix = pmatches[ssuffix];
+	}
 
 	free(pmatches);
 }
