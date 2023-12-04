@@ -446,7 +446,8 @@ extern float hypotf (float, float);
    are implemented independently from newlib to be able to use optimized
    assembler functions despite using the Microsoft x86_64 ABI. */
 #if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__) || \
-	defined(__aarch64__) || defined(__i386__) || defined(__x86_64__)
+	defined(__aarch64__) || defined(__i386__) || defined(__x86_64__) || \
+	defined(__riscv)
 /* Reentrant ANSI C functions.  */
 #ifndef __math_68881
 extern long double atanl (long double);

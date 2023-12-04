@@ -87,6 +87,7 @@ include %D%/machine/spu/Makefile.inc
 endif
 if HAVE_LIBM_MACHINE_RISCV
 include %D%/machine/riscv/Makefile.inc
+include %D%/ld128/Makefile.inc
 endif
 if HAVE_LIBM_MACHINE_X86_64
 include %D%/machine/x86_64/Makefile.inc
