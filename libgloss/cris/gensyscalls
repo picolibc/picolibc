@@ -1,5 +1,5 @@
 #! /bin/sh
-#  Copyright (C) 2005, 2018 Axis Communications.
+#  Copyright (C) 2005, 2018, 2023 Axis Communications.
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
@@ -40,13 +40,14 @@ lu='/* -*- buffer-read-only: t -*-
 #define R(x) return (x); }
 '
 lui="$lu int"
+lul="$lu long int"
 r=") { R (_Sys_"
 
 cat > close.c <<EOF
 $lui _close (int fd${r}close (fd))
 EOF
 cat > execve.c <<EOF
-$lui _execve (char *path, char **argv, char **env${r}execve (path, argv, env))
+$lui _execve (const char *path, char * const *argv, char *const *env${r}execve (path, argv, env))
 EOF
 cat > exit.c <<EOF
 $lu void _exit (int val) { _Sys_exit (val); /* Appease GCC: */ while (1) ; }
@@ -141,13 +142,13 @@ cat > link.c <<EOF
 $lui _link (const char *old, const char *new${r}link (old, new))
 EOF
 cat > lseek.c <<EOF
-$lui _lseek (int fd, int offset, int whence${r}lseek (fd, offset, whence))
+$lul _lseek (int fd, long int offset, int whence${r}lseek (fd, offset, whence))
 EOF
 cat > open.c <<EOF
 $lui _open (const char *fnam, int flags, int mode${r}open (fnam, flags, mode))
 EOF
 cat > read.c <<EOF
-$lui _read (int fd, char *buf, int nbytes${r}read (fd, buf, nbytes))
+$lui _read (int fd, void *buf, unsigned long int nbytes${r}read (fd, buf, nbytes))
 EOF
 cat > rename.c <<EOF
 $lui _rename (const char *old, const char *new${r}rename (old, new))
@@ -158,8 +159,8 @@ $lu
 #define PROT_READ	0x1		/* page can be read */
 #define PROT_WRITE	0x2		/* page can be written */
 #define MAP_ANONYMOUS	0x20		/* don't use a file */
-char *
-_sbrk (int d)
+void *
+_sbrk (long int d)
 {
   static long last_alloc = 0;
 
@@ -260,6 +261,6 @@ cat > wait.c <<EOF
 $lui _wait (int *status${r}wait4 (_getpid(), status, 0, 0))
 EOF
 cat > write.c <<EOF
-$lui _write (int fd, char *buf, int nbytes${r}write (fd, buf, nbytes))
+$lui _write (int fd, const void *buf, unsigned long int nbytes${r}write (fd, buf, nbytes))
 EOF
 exit 0

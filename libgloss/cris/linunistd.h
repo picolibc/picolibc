@@ -1,5 +1,5 @@
 /* Support for syscalls for cris*-axis-linux-gnu and simulators
-   Copyright (C) 1998-2005, 2018 Axis Communications.
+   Copyright (C) 1998-2005, 2018, 2023 Axis Communications.
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -32,10 +32,13 @@
 #ifndef _ASM_ELINUX_UNISTD_H_
 #define _ASM_ELINUX_UNISTD_H_
 
+#define _LIBC
+
 /* Our callers might want to use link_warning, so provide it from here.  */
 #include "../config.h"
 #include "libnosys/warning.h"
 
+#include <unistd.h>
 #include <errno.h>
 
 /*
@@ -357,7 +360,7 @@ static inline _syscall0(int,setup)
 static inline _syscall0(int,sync)
 static inline _syscall3(int,write,int,fd,const char *,buf,unsigned,count)
 static inline _syscall1(int,dup,int,fd)
-static inline _syscall3(int,execve,const char *,file,char **,argv,char **,envp)
+static inline _syscall3(int,execve,const char *,file,char *const *,argv,char *const *,envp)
 static inline _syscall3(int,open,const char *,file,int,flag,int,mode)
 static inline _syscall1(int,close,int,fd)
 static inline _syscall1(int,_exit,int,exitcode)
