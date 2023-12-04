@@ -24,11 +24,7 @@ includetool_DATA =
 includesystooldir = $(tooldir)/include/sys
 includesystool_DATA =
 
-if NEED_TOP_INCLUDE_DIR
 AM_CPPFLAGS = -idirafter $(srcroot)/include
-else
-AM_CPPFLAGS =
-endif
 
 # A fake library so automake will generate rules for plain objects that we want
 # to install (e.g. our crt0.o objects).
