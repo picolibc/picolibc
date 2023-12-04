@@ -89,7 +89,7 @@ LDFLAGS_FOR_TARGET = ${MULTILIB}
 .C.o:
 	$(CC) $(CFLAGS_FOR_TARGET) -Os $(INCLUDES) -c $(CFLAGS) $<
 .s.o:
-	$(AS) $(ASFLAGS_FOR_TARGET) $(INCLUDES) $(ASFLAGS) -o $*.o $<
+	$(AS) $(ASFLAGS_FOR_TARGET) $(ASFLAGS) -o $*.o $<
 
 #
 # GCC knows to run the preprocessor on .S files before it assembles them.
