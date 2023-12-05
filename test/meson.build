@@ -465,6 +465,40 @@ foreach target : targets
 	)
   endif
 
+  t1 = 'test-long-longl'
+  if target == ''
+    t1_name = t1
+  else
+    t1_name = t1 + '_' + target
+  endif
+
+  test(t1_name,
+       executable(t1_name, ['test-long-long.c', 'lock-valid.c'],
+		  c_args: llong_printf_compile_args + _c_args,
+		  link_args: llong_printf_link_args + _lib_files + _link_args,
+		  objects: _objs,
+		  link_depends:  _link_depends + _libs,
+		  include_directories: inc),
+       depends: bios_bin,
+       env: test_env)
+
+  t1 = 'test-long-long'
+  if target == ''
+    t1_name = t1
+  else
+    t1_name = t1 + '_' + target
+  endif
+
+  test(t1_name,
+       executable(t1_name, ['test-long-long.c', 'lock-valid.c'],
+		  c_args: double_printf_compile_args + _c_args,
+		  link_args: double_printf_link_args + _lib_files + _link_args,
+		  objects: _objs,
+		  link_depends:  _link_depends + _libs,
+		  include_directories: inc),
+       depends: bios_bin,
+       env: test_env)
+
   plain_tests = ['rand', 'regex', 'ungetc', 'fenv',
 		 'malloc', 'tls',
 		 'ffs', 'setjmp', 'atexit', 'on_exit',
