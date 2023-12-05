@@ -3024,7 +3024,7 @@ fallocate (int fd, int mode, off_t offset, off_t len)
       set_errno (res);
       res = -1;
     }
-  syscall_printf ("%R = posix_fallocate(%d, %D, %D)", res, fd, offset, len);
+  syscall_printf ("%R = fallocate(%d, %y, %D, %D)", res, fd, mode, offset, len);
   return res;
 }
 
