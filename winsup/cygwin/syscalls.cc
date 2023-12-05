@@ -3005,8 +3005,10 @@ fallocate (int fd, int mode, off_t offset, off_t len)
   else if ((mode & (FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE))
 	   == FALLOC_FL_PUNCH_HOLE)
     res = EOPNOTSUPP;
-  else if (offset < 0 || len == 0)
+  else if (offset < 0 || len <= 0)
     res = EINVAL;
+  else if (INT64_MAX - len < offset)
+    res = EFBIG;
   else
     {
       cygheap_fdget cfd (fd);
