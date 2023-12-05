@@ -3030,8 +3030,10 @@ extern "C" int
 posix_fallocate (int fd, off_t offset, off_t len)
 {
   int res = 0;
-  if (offset < 0 || len == 0)
+  if (offset < 0 || len <= 0)
     res = EINVAL;
+  else if (INT64_MAX - len < offset)
+    res = EFBIG;
   else
     {
       cygheap_fdget cfd (fd);
