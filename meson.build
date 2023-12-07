@@ -729,6 +729,10 @@ endif
 specs_startfile = specs_option_format.format(crt0_prefix, crt0_buildtype, crt0_gen)
 endif
 
+if not enable_picocrt
+  specs_startfile = ''
+endif
+
 specs_data = configuration_data()
 specs_data.set('SPECS_ISYSTEM', specs_isystem)
 specs_data.set('SPECS_LIBPATH', specs_libpath)
