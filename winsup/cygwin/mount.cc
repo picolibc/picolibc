@@ -524,7 +524,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 		   && !is_nfs ());
 
   /* Check for being an SSD */
-  if (!is_remote_drive () && !is_cdrom ())
+  if (!is_cdrom ())
     {
       /* Theoretically FileFsVolumeFlagsInformation would be sufficient,
 	 but apparently it's not exposed into userspace. */
