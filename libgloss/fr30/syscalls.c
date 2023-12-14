@@ -5,6 +5,8 @@
 #include <sys/stat.h>
 #include "../syscall.h"
 
+#pragma GCC diagnostic ignored "-Wreturn-mismatch"
+
 int
 _read (file, ptr, len)
      int    file;
