@@ -71,10 +71,10 @@ into another language, under the above conditions for modified versions.
 @sp 1
 @subtitle @code{libc} 4.3.0
 @subtitle January 2023
-@author {Steve Chamberlain}
-@author {Roland Pesch}
-@author {Red Hat Support}
-@author {Jeff Johnston}
+@author Steve Chamberlain
+@author Roland Pesch
+@author Red Hat Support
+@author Jeff Johnston
 @page
 
 @tex
