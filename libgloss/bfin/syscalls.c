@@ -27,6 +27,8 @@
 #include <reent.h>
 #include <unistd.h>
 
+extern int main (int, char **, char **);
+
 register char *stack_ptr asm ("SP");
 
 static inline int
@@ -254,7 +256,7 @@ __setup_argv_for_main (int argc)
     do_syscall (SYS_argn, (void *)block);
   }
 
-  return main (argc, argv);
+  return main (argc, argv, NULL);
 }
 
 int
@@ -263,7 +265,7 @@ __setup_argv_and_call_main ()
   int argc = do_syscall (SYS_argc, 0);
 
   if (argc <= 0)
-    return main (argc, NULL);
+    return main (argc, NULL, NULL);
   else
     return __setup_argv_for_main (argc);
 }
