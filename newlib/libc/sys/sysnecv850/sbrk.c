@@ -2,7 +2,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "sys/syscall.h"
+#include <stdlib.h>
 
+extern int _write (int, char *, int);
 caddr_t
 _sbrk (int incr)
 {
