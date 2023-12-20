@@ -899,8 +899,7 @@ includetooldir = $(tooldir)/include
 includetool_DATA = $(am__append_16)
 includesystooldir = $(tooldir)/include/sys
 includesystool_DATA = $(am__append_17)
-@NEED_TOP_INCLUDE_DIR_FALSE@AM_CPPFLAGS = 
-@NEED_TOP_INCLUDE_DIR_TRUE@AM_CPPFLAGS = -idirafter $(srcroot)/include
+AM_CPPFLAGS = -idirafter $(srcroot)/include
 
 # A fake library so automake will generate rules for plain objects that we want
 # to install (e.g. our crt0.o objects).
