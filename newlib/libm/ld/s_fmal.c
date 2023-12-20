@@ -199,27 +199,37 @@ fmal(long double x, long double y, long double z)
 	 * modes other than FE_TONEAREST are painful.
 	 */
 	if (spread < -LDBL_MANT_DIG) {
+#ifdef FE_INEXACT
 		feraiseexcept(FE_INEXACT);
+#endif
+#ifdef FE_UNDERFLOW
 		if (!isnormal(z))
 			feraiseexcept(FE_UNDERFLOW);
+#endif
 		switch (oround) {
-		case FE_TONEAREST:
+		default: /* FE_TONEAREST */
 			return (z);
+#ifdef FE_TOWARDZERO
 		case FE_TOWARDZERO:
 			if (x > 0.0 ^ y < 0.0 ^ z < 0.0)
 				return (z);
 			else
 				return (nextafterl(z, 0));
+#endif
+#ifdef FE_DOWNWARD
 		case FE_DOWNWARD:
 			if (x > 0.0 ^ y < 0.0)
 				return (z);
 			else
 				return (nextafterl(z, -INFINITY));
-		default:	/* FE_UPWARD */
+#endif
+#ifdef FE_UPWARD
+		case FE_UPWARD:
 			if (x > 0.0 ^ y < 0.0)
 				return (nextafterl(z, INFINITY));
 			else
 				return (z);
+#endif
 		}
 	}
 	if (spread <= LDBL_MANT_DIG * 2)
