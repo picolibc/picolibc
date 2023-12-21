@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include "trap.h"
 
+int _write (int, char *, size_t);
 
 caddr_t
 _sbrk (size_t incr)

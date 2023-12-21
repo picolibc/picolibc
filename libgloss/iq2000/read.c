@@ -4,6 +4,7 @@
 #include "trap.h"
 
 
+int
 _read (int file,
        char *ptr,
        size_t len)
