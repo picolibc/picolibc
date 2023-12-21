@@ -1,7 +1,10 @@
 #include <_ansi.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <stdlib.h>
 #include "trap.h"
+
+extern int _write (int, char *, size_t);
 
 
 caddr_t
