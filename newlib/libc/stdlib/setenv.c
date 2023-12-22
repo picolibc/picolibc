@@ -47,9 +47,10 @@ setenv (const char *name,
   size_t l_value;
   int offset;
 
-  if (strchr(name, '='))
+  /* Name cannot be NULL, empty, or contain an equal sign.  */ 
+  if (name == NULL || name[0] == '\0' || strchr(name, '='))
     {
-	    __errno_r(ptr) = EINVAL;
+      errno = EINVAL;
       return -1;
     }
 
