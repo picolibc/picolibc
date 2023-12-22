@@ -84,7 +84,7 @@ fwide (
 
   _newlib_flockfile_start (fp);
   if (mode != 0) {
-    ORIENT (fp, mode);
+    (void) ORIENT (fp, mode);
   }
   if (!(fp->_flags & __SORD))
     ret = 0;

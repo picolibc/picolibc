@@ -14,8 +14,9 @@
 #include "local.h"
 
 char *
-asnprintf (char *__restrict buf,
-       size_t *__restrict lenp,
+asnprintf (
+       char *buf,
+       size_t *lenp,
        const char *__restrict fmt, ...)
 {
   int ret;
@@ -35,9 +36,9 @@ asnprintf (char *__restrict buf,
       len = 0;
       buf = NULL;
     }
+  f._flags2 = 0;
   f._bf._base = f._p = (unsigned char *) buf;
   /* For now, inherit the 32-bit signed limit of FILE._bf._size.
-     FIXME - it would be nice to rewrite sys/reent.h to support size_t
      for _size.  */
   if (len > INT_MAX)
     {
@@ -47,7 +48,7 @@ asnprintf (char *__restrict buf,
   f._bf._size = f._w = len;
   f._file = -1;  /* No file. */
   va_start (ap, fmt);
-  ret = svfprintf ( &f, fmt, ap);
+  ret = svfprintf (&f, fmt, ap);
   va_end (ap);
   if (ret < 0)
     return NULL;

@@ -141,7 +141,7 @@
 
 extern wint_t __fgetwc (FILE *);
 extern wint_t __fputwc (wchar_t, FILE *);
-extern u_char *__sccl (char *, u_char *fmt);
+extern unsigned char *__sccl (char *, unsigned char *fmt);
 extern int    _svfscanf (FILE *, const char *,va_list);
 extern int    _ssvfscanf (FILE *, const char *,va_list);
 extern int    _svfiscanf (FILE *, const char *,va_list);
@@ -241,21 +241,60 @@ void _reclaim_reent (void *);
  * Set the orientation for a stream. If o > 0, the stream has wide-
  * orientation. If o < 0, the stream has byte-orientation.
  */
-#define ORIENT(fp,ori)					\
-  do								\
-    {								\
-      if (!((fp)->_flags & __SORD))	\
-	{							\
-	  (fp)->_flags |= __SORD;				\
-	  if (ori > 0)						\
-	    (fp)->_flags2 |= __SWID;				\
-	  else							\
-	    (fp)->_flags2 &= ~__SWID;				\
-	}							\
-    }								\
-  while (0)
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wunused-value"
+#endif
+#define ORIENT(fp,ori)			\
+  (					\
+    (					\
+      ((fp)->_flags & __SORD) ?		\
+	0				\
+      :					\
+	(				\
+	  ((fp)->_flags |= __SORD),	\
+	  (ori > 0) ?			\
+	    ((fp)->_flags2 |= __SWID)	\
+	  :				\
+	    ((fp)->_flags2 &= ~__SWID)	\
+	)				\
+    ),					\
+    ((fp)->_flags2 & __SWID) ? 1 : -1	\
+  )
 #else
-#define ORIENT(fp,ori)
+#define ORIENT(fp,ori) (-1)
+#endif
+
+/* Same thing as the functions in stdio.h, but these are to be called
+   from inside the wide-char functions. */
+int	__swbufw (int, FILE *);
+#ifdef __GNUC__
+_ELIDABLE_INLINE int __swputc(int _c, FILE *_p) {
+#ifdef __SCLE
+	if ((_p->_flags & __SCLE) && _c == '\n')
+	  __swputc ('\r', _p);
+#endif
+	if (--_p->_w >= 0 || (_p->_w >= _p->_lbfsize && (char)_c != '\n'))
+		return (*_p->_p++ = _c);
+	else
+		return (__swbufw(_c, _p));
+}
+#else
+#define       __swputc_raw(__c, __p) \
+	(--(__p)->_w < 0 ? \
+		(__p)->_w >= (__p)->_lbfsize ? \
+			(*(__p)->_p = (__c)), *(__p)->_p != '\n' ? \
+				(int)*(__p)->_p++ : \
+				__swbufw('\n', __p) : \
+			__swbufw((int)(__c), __p) : \
+		(*(__p)->_p = (__c), (int)*(__p)->_p++))
+#ifdef __SCLE
+#define __swputc(__c, __p) \
+        ((((__p)->_flags & __SCLE) && ((__c) == '\n')) \
+          ? __swputc_raw('\r', (__p)) : 0 , \
+        __swputc_raw((__c), (__p)))
+#else
+#define __swputc(__c, __p) __swputc_raw(__c, __p)
+#endif
 #endif
 
 /* WARNING: _dcvt is defined in the stdlib directory, not here!  */

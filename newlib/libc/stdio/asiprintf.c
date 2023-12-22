@@ -35,6 +35,7 @@ asiprintf (
 
   /* mark a zero-length reallocatable buffer */
   f._flags = __SWR | __SSTR | __SMBF;
+  f._flags2 = 0;
   f._bf._base = f._p = NULL;
   f._bf._size = f._w = 0;
   f._file = -1;  /* No file. */

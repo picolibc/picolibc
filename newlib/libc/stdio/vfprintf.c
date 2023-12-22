@@ -173,271 +173,24 @@ static char *rcsid = "$Id$";
 #endif
 
 #ifdef STRING_ONLY
+
 # ifdef _FVWRITE_IN_STREAMIO
-#  define __SPRINT _ssprint
+#  define __SPRINT __ssprint
+   int __ssprint (FILE *, register struct __suio *);
 # else
-#  define __SPRINT _ssputs
+#  define __SPRINT __ssputs
+   int __ssputs (FILE *, const char *, size_t);
 # endif
-#else
-# ifdef _FVWRITE_IN_STREAMIO
-#  define __SPRINT _sprint
-# else
-#  define __SPRINT _sfputs
-# endif
-#endif
-
-/* The __sprint_r/__ssprint_r functions are shared between all versions of
-   vfprintf and vfwprintf.  They must only be defined once, which we do in
-   the INTEGER_ONLY versions here. */
-#ifdef STRING_ONLY
-#ifdef INTEGER_ONLY
-#ifndef _FVWRITE_IN_STREAMIO
-int
-_ssputs (
-       FILE *fp,
-       const char *buf,
-       size_t len)
-{
-	register int w;
-
-	w = fp->_w;
-	if (len >= (size_t) w && fp->_flags & (__SMBF | __SOPT)) {
-		/* must be asprintf family */
-		unsigned char *str;
-		int curpos = (fp->_p - fp->_bf._base);
-		/* Choose a geometric growth factor to avoid
-	 	 * quadratic realloc behavior, but use a rate less
-		 * than (1+sqrt(5))/2 to accomodate malloc
-	 	 * overhead. asprintf EXPECTS us to overallocate, so
-	 	 * that it can add a trailing \0 without
-	 	 * reallocating.  The new allocation should thus be
-	 	 * max(prev_size*1.5, curpos+len+1). */
-		int newsize = fp->_bf._size * 3 / 2;
-		if ((size_t) newsize < curpos + len + 1)
-			newsize = curpos + len + 1;
-		if (fp->_flags & __SOPT)
-		{
-			/* asnprintf leaves original buffer alone.  */
-			str = (unsigned char *)malloc (newsize);
-			if (!str)
-			{
-				_REENT_ERRNO(ptr) = ENOMEM;
-				goto err;
-			}
-			memcpy (str, fp->_bf._base, curpos);
-			fp->_flags = (fp->_flags & ~__SOPT) | __SMBF;
-		}
-		else
-		{
-			str = (unsigned char *)realloc (fp->_bf._base,
-					newsize);
-			if (!str) {
-				/* Free unneeded buffer.  */
-				free (fp->_bf._base);
-				/* Ensure correct errno, even if free
-				 * changed it.  */
-				_REENT_ERRNO(ptr) = ENOMEM;
-				goto err;
-			}
-		}
-		fp->_bf._base = str;
-		fp->_p = str + curpos;
-		fp->_bf._size = newsize;
-		w = len;
-		fp->_w = newsize - curpos;
-	}
-	if (len < (size_t) w)
-		w = len;
-	(void)memmove ((void *) fp->_p, (void *) buf, (size_t) (w));
-	fp->_w -= w;
-	fp->_p += w;
-
-	return 0;
-
-err:
-	fp->_flags |= __SERR;
-	return EOF;
-}
-#endif
-
-int
-_ssprint (
-       FILE *fp,
-       register struct __suio *uio)
-{
-	register size_t len;
-	register int w;
-	register struct __siov *iov;
-	register const char *p = NULL;
-
-	iov = uio->uio_iov;
-	len = 0;
-
-	if (uio->uio_resid == 0) {
-		uio->uio_iovcnt = 0;
-		return (0);
-	}
-
-        do {
-		while (len == 0) {
-			p = iov->iov_base;
-			len = iov->iov_len;
-			iov++;
-		}
-		w = fp->_w;
-		if (len >= (size_t) w && fp->_flags & (__SMBF | __SOPT)) {
-			/* must be asprintf family */
-			unsigned char *str;
-			int curpos = (fp->_p - fp->_bf._base);
-			/* Choose a geometric growth factor to avoid
-		 	 * quadratic realloc behavior, but use a rate less
-			 * than (1+sqrt(5))/2 to accomodate malloc
-		 	 * overhead. asprintf EXPECTS us to overallocate, so
-		 	 * that it can add a trailing \0 without
-		 	 * reallocating.  The new allocation should thus be
-		 	 * max(prev_size*1.5, curpos+len+1). */
-			int newsize = fp->_bf._size * 3 / 2;
-			if ((size_t) newsize < curpos + len + 1)
-				newsize = curpos + len + 1;
-			if (fp->_flags & __SOPT)
-			{
-				/* asnprintf leaves original buffer alone.  */
-				str = (unsigned char *)malloc (newsize);
-				if (!str)
-				{
-					_REENT_ERRNO(ptr) = ENOMEM;
-					goto err;
-				}
-				memcpy (str, fp->_bf._base, curpos);
-				fp->_flags = (fp->_flags & ~__SOPT) | __SMBF;
-			}
-			else
-			{
-				str = (unsigned char *)realloc (fp->_bf._base,
-						newsize);
-				if (!str) {
-					/* Free unneeded buffer.  */
-					free (fp->_bf._base);
-					/* Ensure correct errno, even if free
-					 * changed it.  */
-					_REENT_ERRNO(ptr) = ENOMEM;
-					goto err;
-				}
-			}
-			fp->_bf._base = str;
-			fp->_p = str + curpos;
-			fp->_bf._size = newsize;
-			w = len;
-			fp->_w = newsize - curpos;
-		}
-		if (len < (size_t) w)
-			w = len;
-		(void)memmove ((void *) fp->_p, (void *) p, (size_t) (w));
-		fp->_w -= w;
-		fp->_p += w;
-		w = len;          /* pretend we copied all */
-		p += w;
-		len -= w;
-        } while ((uio->uio_resid -= w) != 0);
-
-	uio->uio_resid = 0;
-	uio->uio_iovcnt = 0;
-	return 0;
-
-err:
-  fp->_flags |= __SERR;
-  uio->uio_resid = 0;
-  uio->uio_iovcnt = 0;
-  return EOF;
-}
-#else /* !INTEGER_ONLY */
-#ifndef _FVWRITE_IN_STREAMIO
-int _ssputs ( FILE *, const char *, size_t);
-#endif
-int _ssprint ( FILE *, register struct __suio *);
-#endif /* !INTEGER_ONLY */
 
 #else /* !STRING_ONLY */
-#ifdef INTEGER_ONLY
 
-#ifndef _FVWRITE_IN_STREAMIO
-int
-_sfputs (
-       FILE *fp,
-       const char *buf,
-       size_t len)
-{
-	register int i;
-
-#if defined _WIDE_ORIENT && (!defined _ELIX_LEVEL || _ELIX_LEVEL >= 4)
-	if (fp->_flags2 & __SWID) {
-		wchar_t *p;
-
-		p = (wchar_t *) buf;
-		for (i = 0; i < (len / sizeof (wchar_t)); i++) {
-			if (fputwc ( p[i], fp) == WEOF)
-				return -1;
-		}
-	} else {
-#else
-	{
-#endif
-                for (i = 0; (size_t) i < len; i++) {
-			if (fputc ( buf[i], fp) == EOF)
-				return -1;
-		}
-	}
-	return (0);
-}
-#endif
-/*
- * Flush out all the vectors defined by the given uio,
- * then reset it so that it can be reused.
- */
-int
-_sprint (
-       FILE *fp,
-       register struct __suio *uio)
-{
-	register int err = 0;
-
-	if (uio->uio_resid == 0) {
-		uio->uio_iovcnt = 0;
-		return (0);
-	}
-#if defined _WIDE_ORIENT && (!defined _ELIX_LEVEL || _ELIX_LEVEL >= 4)
-	if (fp->_flags2 & __SWID) {
-		struct __siov *iov;
-		wchar_t *p;
-		int i, len;
-
-		iov = uio->uio_iov;
-		for (; uio->uio_resid != 0;
-		     uio->uio_resid -= len * sizeof (wchar_t), iov++) {
-			p = (wchar_t *) iov->iov_base;
-			len = iov->iov_len / sizeof (wchar_t);
-			for (i = 0; i < len; i++) {
-				if (fputwc ( p[i], fp) == WEOF) {
-					err = -1;
-					goto out;
-				}
-			}
-		}
-out:
-		;
-	} else
-#endif
-		err = _sfvwrite( fp, uio);
-	uio->uio_resid = 0;
-	uio->uio_iovcnt = 0;
-	return (err);
-}
-#else /* !INTEGER_ONLY */
-#ifndef _FVWRITE_IN_STREAMIO
-int _sfputs ( FILE *, const char *buf, size_t);
-#endif
-int _sprint ( FILE *, register struct __suio *);
-#endif /* !INTEGER_ONLY */
+# ifdef _FVWRITE_IN_STREAMIO
+#  define __SPRINT __sprint
+   int __sprint (FILE *, register struct __suio *);
+# else
+#  define __SPRINT __sfputs
+   int __sfputs (FILE *, const char *buf, size_t);
+# endif
 
 #ifdef _UNBUF_STREAM_OPT
 /*
@@ -448,7 +201,7 @@ int _sprint ( FILE *, register struct __suio *);
  * Make sure to avoid inlining.
  */
 _NOINLINE_STATIC int
-__sbprintf (struct _reent *rptr,
+__sbprintf (
        register FILE *fp,
        const char *fmt,
        va_list ap)
@@ -848,7 +601,10 @@ VFPRINTF (
 	CHECK_INIT (data, fp);
 	_newlib_flockfile_start (fp);
 
-	ORIENT(fp, -1);
+	if (ORIENT(fp, -1) != -1) {
+		_newlib_flockfile_exit (fp);
+		return (EOF);
+	}
 
 	/* sorry, fprintf(read_only_file, "") returns EOF, not 0 */
 	if (cantwrite (data, fp)) {
@@ -861,7 +617,7 @@ VFPRINTF (
 	if ((fp->_flags & (__SNBF|__SWR|__SRW)) == (__SNBF|__SWR) &&
 	    fp->_file >= 0) {
 		_newlib_flockfile_exit (fp);
-		return (__sbprintf (data, fp, fmt0, ap));
+		return (__sbprintf (fp, fmt0, ap));
 	}
 #endif
 #else /* STRING_ONLY */

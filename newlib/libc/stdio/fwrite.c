@@ -135,8 +135,12 @@ fwrite (
   CHECK_INIT(ptr, fp);
 
   _newlib_flockfile_start (fp);
-  ORIENT (fp, -1);
-  if (_sfvwrite ( fp, &uio) == 0)
+  if (ORIENT (fp, -1) != -1)
+    {
+      _newlib_flockfile_exit (fp);
+      return 0;
+    }
+  if (_sfvwrite (fp, &uio) == 0)
     {
       _newlib_flockfile_exit (fp);
       return count;
@@ -151,7 +155,6 @@ fwrite (
   CHECK_INIT (ptr, fp);
 
   _newlib_flockfile_start (fp);
-  ORIENT (fp, -1);
   /* Make sure we can write.  */
   if (cantwrite (ptr, fp))
     goto ret;

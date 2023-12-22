@@ -763,6 +763,8 @@ picolibc_specs = configure_file(input: 'picolibc.specs.in',
 				install_dir: specs_dir,
 				install: specs_install)
 
+picolibc_specs_name = 'picolibc.specs'
+
 picolibcpp_specs = configure_file(input: 'picolibc.specs.in',
 				  output: 'picolibcpp.specs',
 				  configuration: specs_cpp_data,
@@ -1570,17 +1572,19 @@ endif
 
 if has_semihost
   specs = picolibc_specs
+  specs_name = picolibc_specs_name
 else
   specs = configure_file(input: 'test.specs.in',
 			 output: '@BASENAME@',
 			 configuration: specs_data,
 			 install: false)
+  specs_name = 'test.specs'
 endif
 
 # Clang does not support spec files
 specs_line = []
 if cc.get_id() != 'clang'
-  specs_line += [specs_prefix + '--specs', specs_prefix + meson.current_build_dir() / '@0@'.format(specs)]
+  specs_line += [specs_prefix + '--specs', specs_prefix + meson.current_build_dir() / '@0@'.format(specs_name)]
 endif
 test_c_args += specs_line
 

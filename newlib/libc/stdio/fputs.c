@@ -104,8 +104,10 @@ fputs (
   CHECK_INIT(ptr, fp);
 
   _newlib_flockfile_start (fp);
-  ORIENT (fp, -1);
-  result = _sfvwrite ( fp, &uio);
+  if (ORIENT (fp, -1) != -1)
+    result = EOF;
+  else
+    result = _sfvwrite (fp, &uio);
   _newlib_flockfile_end (fp);
   return result;
 #else
@@ -114,7 +116,6 @@ fputs (
   CHECK_INIT(ptr, fp);
 
   _newlib_flockfile_start (fp);
-  ORIENT (fp, -1);
   /* Make sure we can write.  */
   if (cantwrite (ptr, fp))
     goto error;

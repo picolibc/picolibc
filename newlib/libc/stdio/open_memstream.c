@@ -368,7 +368,7 @@ internalopen_memstream (
   fp->_flags |= __SL64;
 #endif
   fp->_close = memcloser;
-  ORIENT (fp, wide);
+  (void) ORIENT (fp, wide);
   _newlib_flockfile_end (fp);
   return fp;
 }

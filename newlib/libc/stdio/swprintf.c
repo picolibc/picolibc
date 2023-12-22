@@ -563,6 +563,7 @@ swprintf (wchar_t *__restrict str,
       return EOF;
     }
   f._flags = __SWR | __SSTR;
+  f._flags2 = 0;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = (size > 0 ? (size - 1) * sizeof (wchar_t) : 0);
   f._file = -1;  /* No file. */

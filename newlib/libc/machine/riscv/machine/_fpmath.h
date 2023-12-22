@@ -1,5 +1,6 @@
-/*
- * Copyright (c) 2014 Red Hat, Inc.
+/*-
+ * Copyright (c) 2002, 2003 David Schultz <das@FreeBSD.ORG>
+ * Copyright (2) 2014 The FreeBSD Foundation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,18 +23,42 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
+ *
+ * $FreeBSD$
  */
 
-#define _DEFAULT_SOURCE
-#include <_ansi.h>
-#include <stdio.h>
-#include <wchar.h>
-#include "local.h"
+/*
+ * Change unsigned int/long used by FreeBSD to fixed width types because
+ * ilp32 has a different size for unsigned long. --joel (20 Aug 2022)
+ */
+#include <stdint.h>
 
-wint_t
-fputwc_unlocked (
-	wchar_t wc,
-	FILE *fp)
-{
-  return __fputwc(wc, fp);
-}
+union IEEEl2bits {
+	long double	e;
+	struct {
+		uint64_t	manl	:64;
+		uint64_t	manh	:48;
+		uint32_t	exp	:15;
+		uint32_t	sign	:1;
+	} bits;
+	/* TODO andrew: Check the packing here */
+	struct {
+		uint64_t	manl	:64;
+		uint64_t	manh	:48;
+		uint32_t	expsign	:16;
+	} xbits;
+};
+
+#define	LDBL_NBIT	0
+#define	LDBL_IMPLICIT_NBIT
+#define	mask_nbit_l(u)	((void)0)
+
+#define	LDBL_MANH_SIZE	48
+#define	LDBL_MANL_SIZE	64
+
+#define	LDBL_TO_ARRAY32(u, a) do {			\
+	(a)[0] = (uint32_t)(u).bits.manl;		\
+	(a)[1] = (uint32_t)((u).bits.manl >> 32);	\
+	(a)[2] = (uint32_t)(u).bits.manh;		\
+	(a)[3] = (uint32_t)((u).bits.manh >> 32);	\
+} while(0)

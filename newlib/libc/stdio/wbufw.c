@@ -14,43 +14,51 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-/* doc in vfprintf.c */
+/* No user fns here.  Pesch 15apr92. */
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
-#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
-#include <limits.h>
-#include <stdarg.h>
-
+#include <errno.h>
 #include "local.h"
+#include "fvwrite.h"
 
-#undef vsprintf
+/*
+ * Note that this is the same function as __swbuf, just to be called
+ * from wide-char functions!
+ *
+ * The only difference is that we set and test the orientation differently.
+ */
 
 int
-vsprintf (
-       char *__restrict str,
-       const char *__restrict fmt,
-       va_list ap)
+__swbufw (
+       register int c,
+       register FILE *fp)
 {
-  int ret;
-  FILE f;
+  register int n;
 
-  f._flags = __SWR | __SSTR;
-  f._flags2 = 0;
-  f._bf._base = f._p = (unsigned char *) str;
-  f._bf._size = f._w = INT_MAX;
-  f._file = -1;  /* No file. */
-  ret = svfprintf ( &f, fmt, ap);
-  *f._p = 0;
-  return ret;
+  fp->_w = fp->_lbfsize;
+  if (cantwrite (ptr, fp))
+    return EOF;
+  c = (unsigned char) c;
+
+  if (ORIENT (fp, 1) != 1)
+    return EOF;
+
+  n = fp->_p - fp->_bf._base;
+  if (n >= fp->_bf._size)
+    {
+      if (fflush (fp))
+	return EOF;
+      n = 0;
+    }
+  fp->_w--;
+  *fp->_p++ = c;
+  if (++n == fp->_bf._size || (fp->_flags & __SLBF && c == '\n'))
+    if (fflush (fp))
+      return EOF;
+  return c;
 }
-
-#ifdef _NANO_FORMATTED_IO
-int __nonnull((1)) _NOTHROW
-vsiprintf (char *, const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("vsprintf")));
-#endif

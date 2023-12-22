@@ -105,7 +105,8 @@ fputws (
   struct __siov iov;
 
   _newlib_flockfile_start (fp);
-  ORIENT (fp, 1);
+  if (ORIENT (fp, 1) != 1)
+    goto error;
   if (cantwrite (ptr, fp) != 0)
     goto error;
   uio.uio_iov = &iov;
@@ -129,7 +130,6 @@ error:
   return (-1);
 #else
   _newlib_flockfile_start (fp);
-  ORIENT (fp, 1);
   if (cantwrite (ptr, fp) != 0)
     goto error;
 
@@ -141,7 +141,7 @@ error:
 	goto error;
       while (i < nbytes)
         {
-	  if (_sputc ( buf[i], fp) == EOF)
+	  if (__swputc(buf[i], fp) == EOF)
 	    goto error;
 	  i++;
         }

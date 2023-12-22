@@ -177,8 +177,10 @@ fgetwc (
   wint_t r;
 
   _newlib_flockfile_start (fp);
-  ORIENT(fp, 1);
-  r = __fgetwc (fp);
+  if (ORIENT(fp, 1) != 1)
+    r = WEOF;
+  else
+    r = __fgetwc (fp);
   _newlib_flockfile_end (fp);
   return r;
 }

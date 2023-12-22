@@ -35,9 +35,9 @@ asniprintf (char *buf,
       len = 0;
       buf = NULL;
     }
+  f._flags2 = 0;
   f._bf._base = f._p = (unsigned char *) buf;
   /* For now, inherit the 32-bit signed limit of FILE._bf._size.
-     FIXME - it would be nice to rewrite sys/reent.h to support size_t
      for _size.  */
   if (len > INT_MAX)
     {

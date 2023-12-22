@@ -1959,16 +1959,16 @@ computematchjumps(struct parse *p, struct re_guts *g)
 		g->matchjump[mindex] = MIN(g->matchjump[mindex],
 		    g->mlen + suffix - mindex);
 
-        ssuffix = pmatches[suffix];
-        while (suffix < g->mlen) {
-                while (suffix <= ssuffix && suffix < g->mlen) {
-                        g->matchjump[suffix] = MIN(g->matchjump[suffix],
+	ssuffix = pmatches[suffix];
+	while (suffix < g->mlen) {
+		while (suffix <= ssuffix && suffix < g->mlen) {
+			g->matchjump[suffix] = MIN(g->matchjump[suffix],
 			    g->mlen + ssuffix - suffix);
-                        suffix++;
-                }
+			suffix++;
+		}
 		if (suffix < g->mlen)
-                	ssuffix = pmatches[ssuffix];
-        }
+			ssuffix = pmatches[ssuffix];
+	}
 
 	free(pmatches);
 }
