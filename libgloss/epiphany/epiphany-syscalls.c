@@ -253,7 +253,7 @@ int __attribute__ ((section ("libgloss_epiphany")))  e_raise(int signum) {
 		__asm__ __volatile__ ("wand");
 		//ilatst = 1 << WAND_IVT_N;
 		//break;
-		return;
+		return 0;
 
 	case SIG_USR1:
 		ilatst = 1 << USR_SOFT_IVT_N;

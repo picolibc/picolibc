@@ -30,6 +30,7 @@
 
 #include <syscall.h>
 #include <sys/types.h>
+#include "epiphany-syscalls.h"
 
 /* ------------------------------------------------------------------------- */
 /*!Set a position in a file
@@ -43,5 +44,5 @@
 off_t __attribute__ ((section ("libgloss_epiphany")))
 _lseek (int  fildes, off_t offset, int  whence)
 {
-  return asm_syscall (fildes, offset, whence, SYS_lseek);
+  return asm_syscall ((void *)fildes, (void *)offset, (void *)whence, SYS_lseek);
 }	/* _lseek () */

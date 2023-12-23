@@ -31,6 +31,7 @@
 
 #include <sys/stat.h>
 #include <syscall.h>
+#include "epiphany-syscalls.h"
 
 
 /* ------------------------------------------------------------------------- */
@@ -44,6 +45,6 @@
 int __attribute__ ((section ("libgloss_epiphany")))
 _fstat (int fildes, struct stat *st)
 {
-  return asm_syscall (fildes, st, NULL, SYS_fstat);
+  return asm_syscall ((void *)fildes, st, NULL, SYS_fstat);
 
 }	/* _fstat () */

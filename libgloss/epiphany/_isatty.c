@@ -18,6 +18,7 @@
 
 #include <sys/stat.h>
 #include <errno.h>
+#include "epiphany-syscalls.h"
 
 int
 _isatty (int fd)
