@@ -14,6 +14,8 @@
  * they apply.
  */
 
+#include <unistd.h>
+
 int
 inbyte ()
 {
