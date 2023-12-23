@@ -4,7 +4,7 @@
 #include "eit.h"
 
 void
-_exit (n)
+_exit (int n)
 {
   TRAP0 (SYS_exit, n, 0, 0);
 }
