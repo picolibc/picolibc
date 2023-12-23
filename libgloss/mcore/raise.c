@@ -14,6 +14,9 @@
  */
 #include "glue.h"
 
+extern int _kill (int, int);
+extern int _getpid (void);
+
 int
 _raise (int sig)
 {

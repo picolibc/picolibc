@@ -16,6 +16,8 @@
 #include <sys/stat.h>
 #include "glue.h"
 
+extern int _write (int, char *, int);
+
 caddr_t
 _sbrk (size_t incr)
 {

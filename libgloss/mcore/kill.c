@@ -14,6 +14,8 @@
  */
 #include "glue.h"
 
+#include <unistd.h>
+
 /*
  * kill -- go out via exit...
  */
