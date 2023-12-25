@@ -125,7 +125,7 @@ After a while it became apparent that this approach of isolating the
 hardware and systems files together made sense. Around this same time
 the stub dirs were made to run standalone, mostly so it could also be
 used to support GDB's remote debugging needs. At this time it was
-decided to move the stub dirs out of newlib and into it's own separate
+decided to move the stub dirs out of newlib and into its own separate
 library so it could be used standalone, and be included in various other
 GNU tools without having to bring in all of newlib, which is large. The
 new library is called Libgloss, for Gnu Low-level OS support. 
@@ -269,7 +269,7 @@ source tree, use:
 @end smallexample
 
 The configure script is in the source tree. When configure is invoked
-it will determine it's own source tree, so the --srcdir is would be
+it will determine its own source tree, so the --srcdir is would be
 redundant here.
 
 Once libgloss is configured, @code{make} is sufficient to build it. The
@@ -445,7 +445,7 @@ compiler passes. It will format command line options for the other passes.
 The usual command line GCC uses for the final link phase will have LD
 link in the startup code and additional libraries by default.
 
-GNU AS started it's life to only function as a compiler pass, but
+GNU AS started its life to only function as a compiler pass, but
 these days it can also be used as a source level assembler. When used as
 a source level assembler, it has a companion assembler preprocessor
 called @code{gasp}. This has a syntax similar to most other assembler
@@ -524,7 +524,7 @@ Pass the next option directly to the linker.
 To make a program that has been compiled with GCC to run, you
 need to write some startup code. The initial piece of startup code is
 called a crt0. (C RunTime 0) This is usually written in assembler, and
-it's object gets linked in first, and bootstraps the rest of the
+its object gets linked in first, and bootstraps the rest of the
 application when executed. This file needs to do the following things.
 
 @enumerate
@@ -550,7 +550,7 @@ This is what basically starts things running. If your ROM monitor
 supports it, then first setup argc and argv for command line arguments
 and an environment pointer. Then branch to main(). For G++ the the main
 routine gets a branch to __main inserted by the code generator at the
-very top.  __main() is used by G++ to initialize it's internal tables.
+very top.  __main() is used by G++ to initialize its internal tables.
 __main() then returns back to your original main() and your code gets
 executed.
 
@@ -760,7 +760,7 @@ the m68k-coff configuration defaults to not linking in the crt0.o by
 default. It assumes that the developer probably has their own crt0.o.
 This behavior is controlled in the config file for each architecture.
 It's a macro called @code{STARTFILE_SPEC}, and if it's set to
-@code{null}, then when @code{gcc} formats it's command line, it doesn't
+@code{null}, then when @code{gcc} formats its command line, it doesn't
 add @code{crto.o}. Any file name can be specified here, but the default
 is always @code{crt0.o}.
 
@@ -879,7 +879,7 @@ are setup here for use by the @code{crt0.o} when it zero's the
 
 A few ROM monitors load binary images, typically @code{a.out}, but most all
 will load an @code{srecord}. An srecord is an ASCII representation of a binary 
-image. At it's simplest, an srecord is an address, followed by a byte
+image. At its simplest, an srecord is an address, followed by a byte
 count, followed by the bytes, and a 2's compliment checksum. A whole
 srecord file has an optional @emph{start} record, and a required @emph{end} 
 record. To make an srecord from a binary image, the GNU @code{objcopy} program
@@ -901,7 +901,7 @@ typically they are stubbed out. Kill is also a stub, since you can't do
 process control on an embedded system. 
 
 Sbrk() is only needed by applications that do dynamic memory
-allocation. It's uses the symbol @code{_end} that is setup in the linker
+allocation. It uses the symbol @code{_end} that is setup in the linker
 script. It also requires a compile time option to set the upper size
 limit on the heap space. This leaves us with read and write, which are
 required for serial I/O. Usually these two routines are written in C,

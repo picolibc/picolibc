@@ -14,7 +14,7 @@ int cnt;
 		THIS SOFTWARE IS NOT COPYRIGHTED  
    
    HP offers the following for use in the public domain.  HP makes no
-   warranty with regard to the software or it's performance and the 
+   warranty with regard to the software or its performance and the
    user accepts the software "AS IS" with all faults.
 
    HP DISCLAIMS ANY WARRANTIES, EXPRESS OR IMPLIED, WITH REGARD
@@ -50,7 +50,7 @@ int cnt;
  *  Some explanation is probably necessary to explain how exceptions are
  *  handled.  When an exception is encountered the 68000 pushes the current
  *  program counter and status register onto the supervisor stack and then
- *  transfers execution to a location specified in it's vector table.
+ *  transfers execution to a location specified in its vector table.
  *  The handlers for the exception vectors are hardwired to jmp to an address
  *  given by the relation:  (exception - 256) * 6.  These are decending 
  *  addresses starting from -6, -12, -18, ...  By allowing 6 bytes for
@@ -69,7 +69,7 @@ int cnt;
  * 
  *  Because gdb will sometimes write to the stack area to execute function
  *  calls, this program cannot rely on using the supervisor stack so it
- *  uses it's own stack area reserved in the int array remcomStack.  
+ *  uses its own stack area reserved in the int array remcomStack.
  * 
  *************
  *

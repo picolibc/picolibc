@@ -10,7 +10,7 @@ SHELL = /bin/sh
 SUPPORT=support.o
 
 #
-# to add a new test, put it's name here, and list the objects
+# to add a new test, put its name here, and list the objects
 # required too.
 TESTS= misc.x float.x io.x memory.x double.x math.x func.x div.x \
       printf.x varargs.x varargs2.x array.x struct.x misc.x

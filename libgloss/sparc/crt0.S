@@ -103,7 +103,7 @@ copyloop:
 
 
 /*
- * Move the data segment from it's ROM address to RAM where it
+ * Move the data segment from its ROM address to RAM where it
  * belongs. 
  */
 

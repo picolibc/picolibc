@@ -692,7 +692,7 @@ gdb_read_reg(int reg)
 
 /*
  * P - write one register.
- *	params are the register number, and it's new value.
+ *	params are the register number, and its new value.
  *	returns the register value or ENN.
  */
 char *
