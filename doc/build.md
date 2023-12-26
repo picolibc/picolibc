@@ -90,6 +90,7 @@ definitions which use the same POSIX I/O functions.
 | io-percent-b                | false   | Support the %b as proposed in the upcoming C standard                                |
 | printf-small-ultoa          | false   | Avoid soft division routine during integer binary to decimal conversion in printf    |
 | minimal-io-long-long        | false   | Support long long integers in the minimal printf and scanf variants                  |
+| fast-bufio                  | false   | Improve performance of some I/O operations when using bufio                          |
 
 
 ### Options when using legacy stdio bits

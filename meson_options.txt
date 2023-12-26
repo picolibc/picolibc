@@ -145,6 +145,8 @@ option('io-long-double', type: 'boolean', value: false,
        description: 'enable long double type support in IO functions printf/scanf')
 option('newlib-io-long-double', type: 'boolean', value: false,
        description: 'enable long double type support in IO functions printf/scanf')
+option('fast-bufio', type: 'boolean', value: false,
+       description: 'enable some faster buffered i/o operations')
 
 #
 # Options applying only to tinystdio

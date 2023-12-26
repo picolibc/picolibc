@@ -40,7 +40,7 @@
 
 /* Buffered I/O routines for tiny stdio */
 
-static int
+int
 __bufio_flush_locked(FILE *f)
 {
 	struct __file_bufio *bf = (struct __file_bufio *) f;
@@ -56,7 +56,7 @@ __bufio_flush_locked(FILE *f)
                         ssize_t this = (bf->write) (bf->fd, buf, bf->len);
 			if (this <= 0) {
                                 bf->len = 0;
-                                ret = -1;
+                                ret = _FDEV_ERR;
                                 break;
 			}
 			bf->pos += this;
@@ -80,6 +80,30 @@ __bufio_flush_locked(FILE *f)
 	return ret;
 }
 
+
+int __bufio_fill_locked(FILE *f)
+{
+	struct __file_bufio *bf = (struct __file_bufio *) f;
+        ssize_t len;
+
+        /* Reset read pointer, read some data */
+        bf->off = 0;
+        len = (bf->read)(bf->fd, bf->buf, bf->size);
+
+        if (len <= 0) {
+                bf->len = 0;
+                if (len < 0)
+                        return _FDEV_ERR;
+                else
+                        return _FDEV_EOF;
+        }
+
+        /* Update FD pos */
+        bf->len = len;
+        bf->pos += len;
+        return 0;
+}
+
 int
 __bufio_flush(FILE *f)
 {
@@ -92,7 +116,7 @@ __bufio_flush(FILE *f)
 }
 
 /* Set I/O direction, flushing when it changes */
-static int
+int
 __bufio_setdir_locked(FILE *f, uint8_t dir)
 {
 	struct __file_bufio *bf = (struct __file_bufio *) f;
@@ -129,6 +153,7 @@ bail:
 	return ret;
 }
 
+
 int
 __bufio_get(FILE *f)
 {
@@ -153,18 +178,9 @@ again:
                         goto again;
 		}
 
-		/* Reset read pointer, read some data */
-		bf->off = 0;
-		bf->len = (bf->read)(bf->fd, bf->buf, bf->size);
-
-		if (bf->len <= 0) {
-			bf->len = 0;
-                        ret = _FDEV_EOF;
-                        goto bail;
-		}
-
-                /* Update FD pos */
-                bf->pos += bf->len;
+                ret = __bufio_fill_locked(f);
+                if (ret)
+                    goto bail;
 	}
 
 	/*

@@ -281,6 +281,7 @@ io_percent_b = tinystdio and get_option('io-percent-b')
 io_long_double = get_option('io-long-double') or get_option('newlib-io-long-double')
 printf_small_ultoa = tinystdio and get_option('printf-small-ultoa')
 minimal_io_long_long = tinystdio and get_option('minimal-io-long-long')
+fast_bufio = tinystdio and get_option('fast-bufio')
 
 if printf_aliases
   double_printf_compile_args=['-DPICOLIBC_DOUBLE_PRINTF_SCANF']
@@ -1243,6 +1244,7 @@ conf_data.set('_HAVE_WEAK_ATTRIBUTE', have_weak_attribute)
 conf_data.set('_WANT_REGISTER_FINI', get_option('newlib-register-fini'))
 conf_data.set('_WANT_IO_LONG_LONG', io_long_long)
 conf_data.set('_WANT_MINIMAL_IO_LONG_LONG', minimal_io_long_long)
+conf_data.set('_WANT_FAST_BUFIO', fast_bufio)
 conf_data.set('_WANT_IO_POS_ARGS', io_pos_args)
 conf_data.set('_WANT_IO_C99_FORMATS', io_c99_formats)
 conf_data.set('_IO_FLOAT_EXACT', io_float_exact)
