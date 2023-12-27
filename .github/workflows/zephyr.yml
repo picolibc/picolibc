@@ -65,7 +65,7 @@ jobs:
 
           # Tinystdio and math configurations, one with multithread disabled and with locale, original malloc and atexit/onexit code
           "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false -Dprintf-small-ultoa=true",
-          "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false -Dnewlib-obsolete-math=true -Dwant-math-errno=true -Dassert-verbose=false",
+          "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false -Dnewlib-obsolete-math=true -Dwant-math-errno=true -Dassert-verbose=false -Dfast-bufio=true",
 
           # Original stdio, one with multithread disabled
           "-Dtinystdio=false",
@@ -125,7 +125,7 @@ jobs:
 
           # Tinystdio and math configurations, one with multithread disabled and with locale, original malloc and atexit/onexit code
           "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false -Dprintf-small-ultoa=true",
-          "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false -Dnewlib-obsolete-math=true -Dwant-math-errno=true -Dassert-verbose=false",
+          "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false -Dnewlib-obsolete-math=true -Dwant-math-errno=true -Dassert-verbose=false -Dfast-bufio=true",
 
           # Original stdio, one with multithread disabled
           "-Dtinystdio=false",
