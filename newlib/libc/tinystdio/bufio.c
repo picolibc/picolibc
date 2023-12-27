@@ -45,7 +45,6 @@ __bufio_flush_locked(FILE *f)
 {
 	struct __file_bufio *bf = (struct __file_bufio *) f;
         char *buf;
-        int ret = 0;
         off_t backup;
 
         switch (bf->dir) {
@@ -56,7 +55,7 @@ __bufio_flush_locked(FILE *f)
                         ssize_t this = (bf->write) (bf->fd, buf, bf->len);
 			if (this <= 0) {
                                 bf->len = 0;
-                                ret = _FDEV_ERR;
+                                return _FDEV_ERR;
                                 break;
 			}
 			bf->pos += this;
@@ -77,7 +76,7 @@ __bufio_flush_locked(FILE *f)
         default:
                 break;
 	}
-	return ret;
+	return 0;
 }
 
 
@@ -199,19 +198,40 @@ __bufio_seek(FILE *f, off_t offset, int whence)
 	struct __file_bufio *bf = (struct __file_bufio *) f;
 	off_t ret;
 
+        if (!bf->lseek)
+            return _FDEV_ERR;
+
 	__bufio_lock(f);
-        if (__bufio_setdir_locked(f, 0) < 0)
-                return _FDEV_ERR;
-        if (bf->lseek) {
-                if (whence == SEEK_CUR) {
-                        whence = SEEK_SET;
-                        offset += bf->pos;
-                }
-                ret = (bf->lseek)(bf->fd, offset, whence);
-        } else
+        if (__bufio_setdir_locked(f, __SRD) < 0) {
                 ret = _FDEV_ERR;
-        if (ret >= 0)
-                bf->pos = ret;
+        } else {
+                /* compute offset of the first char in the buffer */
+                __off_t buf_pos = bf->pos - bf->len;
+
+                switch (whence) {
+                case SEEK_CUR:
+                        /* Map CUR -> SET, accounting for position within buffer */
+                        whence = SEEK_SET;
+                        offset += buf_pos + bf->off;
+                        __PICOLIBC_FALLTHROUGH;
+                case SEEK_SET:
+                        /* Optimize for seeks within buffer or just past buffer */
+                        if (buf_pos <= offset && offset <= buf_pos + bf->len) {
+                                bf->off = offset - buf_pos;
+                                ret = offset;
+                                break;
+                        }
+                        __PICOLIBC_FALLTHROUGH;
+                default:
+                        ret = (bf->lseek)(bf->fd, offset, whence);
+                        if (ret >= 0)
+                                bf->pos = ret;
+                        /* Flush any buffered data after a real seek */
+                        bf->len = 0;
+                        bf->off = 0;
+                        break;
+                }
+        }
         __bufio_unlock(f);
         return ret;
 }
