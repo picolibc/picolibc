@@ -657,6 +657,8 @@ CONFIG_LIBNOSYS_FALSE
 CONFIG_LIBNOSYS_TRUE
 CONFIG_IQ2000_FALSE
 CONFIG_IQ2000_TRUE
+CONFIG_I960_FALSE
+CONFIG_I960_TRUE
 CONFIG_D30V_FALSE
 CONFIG_D30V_TRUE
 CONFIG_CSKY_FALSE
@@ -2811,9 +2813,7 @@ case "${target}" in
 	subdirs="$subdirs pa"
 	;;
   i960-*-coff)
-	ac_config_files="$ac_config_files i960/Makefile"
-
-	subdirs="$subdirs i960"
+	config_i960=true
 	;;
   sparc-*leon*-elf* | sparc-*leon*-none*)
 	ac_config_files="$ac_config_files sparc_leon/Makefile"
@@ -3043,6 +3043,14 @@ fi
 else
   CONFIG_D30V_TRUE='#'
   CONFIG_D30V_FALSE=
+fi
+
+   if test x$config_i960 = xtrue; then
+  CONFIG_I960_TRUE=
+  CONFIG_I960_FALSE='#'
+else
+  CONFIG_I960_TRUE='#'
+  CONFIG_I960_FALSE=
 fi
 
    if test x$config_iq2000 = xtrue; then
@@ -5408,6 +5416,10 @@ if test -z "${CONFIG_D30V_TRUE}" && test -z "${CONFIG_D30V_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_D30V\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${CONFIG_I960_TRUE}" && test -z "${CONFIG_I960_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_I960\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${CONFIG_IQ2000_TRUE}" && test -z "${CONFIG_IQ2000_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_IQ2000\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -6087,7 +6099,6 @@ do
     "nds32/Makefile") CONFIG_FILES="$CONFIG_FILES nds32/Makefile" ;;
     "m68k/Makefile") CONFIG_FILES="$CONFIG_FILES m68k/Makefile" ;;
     "pa/Makefile") CONFIG_FILES="$CONFIG_FILES pa/Makefile" ;;
-    "i960/Makefile") CONFIG_FILES="$CONFIG_FILES i960/Makefile" ;;
     "sparc_leon/Makefile") CONFIG_FILES="$CONFIG_FILES sparc_leon/Makefile" ;;
     "sparc/Makefile") CONFIG_FILES="$CONFIG_FILES sparc/Makefile" ;;
     "mips/Makefile") CONFIG_FILES="$CONFIG_FILES mips/Makefile" ;;

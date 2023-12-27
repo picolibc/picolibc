@@ -87,8 +87,7 @@ case "${target}" in
 	subdirs="$subdirs pa"
 	;;
   i960-*-coff)
-	AC_CONFIG_FILES([i960/Makefile])
-	subdirs="$subdirs i960"
+	config_i960=true
 	;;
   sparc-*leon*-elf* | sparc-*leon*-none*)
 	AC_CONFIG_FILES([sparc_leon/Makefile])
@@ -248,8 +247,8 @@ AC_SUBST(subdirs)
 dnl These subdirs have converted to non-recursive make.  Hopefully someday all
 dnl the ports above will too!
 m4_foreach_w([SUBDIR], [
-  aarch64 arc arm bfin csky d30v iq2000 libnosys lm32 moxie nios2 riscv v850
-  wince xtensa
+  aarch64 arc arm bfin csky d30v i960 iq2000 libnosys lm32 moxie nios2 riscv
+  v850 wince xtensa
 ], [dnl
   AM_CONDITIONAL([CONFIG_]m4_toupper(SUBDIR), [test x$config_]SUBDIR = xtrue)
 ])
