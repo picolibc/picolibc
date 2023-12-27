@@ -35,17 +35,23 @@
 int
 puts(const char *str)
 {
+        int (*put)(char, struct __file *);
 	char c;
-	int rv = 0;
+        FILE *out = stdout;
 
-	if ((stdout->flags & __SWR) == 0)
+	if ((out->flags & __SWR) == 0)
 		return EOF;
 
+        put = out->put;
 	while ((c = *str++) != '\0')
-		if (stdout->put(c, stdout) < 0)
-			rv = EOF;
-	if (stdout->put('\n', stdout) < 0)
-		rv = EOF;
+		if (put(c, out) < 0)
+			goto fail;
 
-	return rv;
+	if (put('\n', out) < 0)
+		goto fail;
+
+	return 0;
+fail:
+        out->flags |= __SERR;
+        return EOF;
 }

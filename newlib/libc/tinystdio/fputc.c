@@ -39,8 +39,10 @@ fputc(int c, FILE *stream)
 	if ((stream->flags & __SWR) == 0)
 		return EOF;
 
-	if (stream->put(c, stream) < 0)
+	if (stream->put(c, stream) < 0) {
+                stream->flags |= __SERR;
 		return EOF;
+        }
 
 	return (unsigned char) c;
 }
