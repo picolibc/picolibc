@@ -318,8 +318,7 @@ multilibtool_PROGRAMS = $(am__EXEEXT_6)
 @CONFIG_XSTORMY16_TRUE@	xstormy16/libeva_app.a
 @CONFIG_XSTORMY16_TRUE@am__append_92 = xstormy16/eva_stub.elf
 @CONFIG_XSTORMY16_TRUE@am__append_93 = xstormy16/eva_stub.hex
-@CONFIG_XTENSA_TRUE@am__append_94 = -D_LIBGLOSS -I$(srcdir)/xtensa/include
-@CONFIG_XTENSA_TRUE@am__append_95 = \
+@CONFIG_XTENSA_TRUE@am__append_94 = \
 @CONFIG_XTENSA_TRUE@	xtensa/default.specs \
 @CONFIG_XTENSA_TRUE@	xtensa/nano.specs \
 @CONFIG_XTENSA_TRUE@	xtensa/sim.elf.specs \
@@ -328,27 +327,29 @@ multilibtool_PROGRAMS = $(am__EXEEXT_6)
 @CONFIG_XTENSA_TRUE@	xtensa/sys.openocd.specs \
 @CONFIG_XTENSA_TRUE@	xtensa/crt0.o
 
-@CONFIG_XTENSA_TRUE@am__append_96 = \
+@CONFIG_XTENSA_TRUE@am__append_95 = \
 @CONFIG_XTENSA_TRUE@	xtensa/crt0.S \
 @CONFIG_XTENSA_TRUE@	xtensa/crt1-sim.S \
 @CONFIG_XTENSA_TRUE@	xtensa/crt1-boards.S
 
-@CONFIG_XTENSA_TRUE@am__append_97 = xtensa/libgloss.a
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_98 = \
+@CONFIG_XTENSA_TRUE@am__append_96 = xtensa/libgloss.a
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_97 = \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/app.elf.ld \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/crt1-sim.o \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/crt1-boards.o
 
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_99 = xtensa/libsys_qemu.a \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_98 = xtensa/libsys_qemu.a \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/libsys_openocd.a
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_100 = xtensa/boards/esp32/memory.elf.ld
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_101 = xtensa/boards/esp32/board.c
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_99 = xtensa/boards/esp32/memory.elf.ld
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_100 = xtensa/boards/esp32/board.c
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_101 = -I$(srcdir)/xtensa/boards/esp32/include
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_102 = -I$(srcdir)/xtensa/boards/esp32/include
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_103 = -I$(srcdir)/xtensa/boards/esp32/include
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_104 = xtensa/boards/esp32s3/memory.elf.ld
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_105 = xtensa/boards/esp32s3/board.c
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_106 = -I$(srcdir)/xtensa/boards/esp32s3/include
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_107 = -I$(srcdir)/xtensa/boards/esp32s3/include
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_108 = -I$(srcdir)/xtensa/boards/esp32s3/include
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../config/depstand.m4 \
@@ -1284,7 +1285,7 @@ CCASFLAGS = @CCASFLAGS@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
-CPPFLAGS = @CPPFLAGS@ $(am__append_94)
+CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
@@ -1409,8 +1410,8 @@ multilibtool_DATA = $(am__append_3) $(am__append_6) $(am__append_7) \
 	$(am__append_62) $(am__append_65) $(am__append_68) \
 	$(am__append_71) $(am__append_73) $(am__append_75) \
 	$(am__append_78) $(am__append_81) $(am__append_84) \
-	$(am__append_89) $(am__append_95) $(am__append_98) \
-	$(am__append_100) $(am__append_104)
+	$(am__append_89) $(am__append_94) $(am__append_97) \
+	$(am__append_99) $(am__append_104)
 multilibtool_LIBRARIES = $(am__append_2) $(am__append_5) \
 	$(am__append_9) $(am__append_11) $(am__append_20) \
 	$(am__append_21) $(am__append_25) $(am__append_28) \
@@ -1420,7 +1421,7 @@ multilibtool_LIBRARIES = $(am__append_2) $(am__append_5) \
 	$(am__append_64) $(am__append_67) $(am__append_70) \
 	$(am__append_72) $(am__append_74) $(am__append_77) \
 	$(am__append_80) $(am__append_83) $(am__append_86) \
-	$(am__append_91) $(am__append_97) $(am__append_99)
+	$(am__append_91) $(am__append_96) $(am__append_98)
 includetooldir = $(tooldir)/include
 includetool_DATA = $(am__append_16)
 includesystooldir = $(tooldir)/include/sys
@@ -1442,7 +1443,7 @@ libobjs_a_SOURCES = $(am__append_14) $(am__append_19) $(am__append_24) \
 	$(am__append_51) $(am__append_57) $(am__append_63) \
 	$(am__append_66) $(am__append_69) $(am__append_76) \
 	$(am__append_79) $(am__append_82) $(am__append_85) \
-	$(am__append_90) $(am__append_96)
+	$(am__append_90) $(am__append_95)
 FLAGS_TO_PASS = \
 	"CC=$(CC)" \
 	"CFLAGS=$(CFLAGS)" \
@@ -2098,27 +2099,31 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 @CONFIG_XSTORMY16_TRUE@	$(AM_LDFLAGS) \
 @CONFIG_XSTORMY16_TRUE@	-nostartfiles -T$(srcdir)/xstormy16/eva_stub.ld
 
+@CONFIG_XTENSA_TRUE@AM_CPPFLAGS_xtensa = -D_LIBGLOSS -I$(srcdir)/xtensa/include
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libgloss_a_SOURCES = xtensa/sleep.S \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/syscalls.c \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/window-vectors.S \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_101) \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_100) \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_105)
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libsys_qemu_a_CPPFLAGS = -DQEMU_SEMIHOSTING \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_102) \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libgloss_a_CPPFLAGS = $(AM_CPPFLAGS) \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_101) \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_106)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libsys_qemu_a_CPPFLAGS = $(AM_CPPFLAGS) \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	-DQEMU_SEMIHOSTING \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_102) \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_107)
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libsys_qemu_a_SOURCES = \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/sim-vectors.S \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/sim-call.S \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/syscalls.c
 
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libsys_openocd_a_CPPFLAGS = -DOPENOCD_SEMIHOSTING \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libsys_openocd_a_CPPFLAGS = $(AM_CPPFLAGS) \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	-DOPENOCD_SEMIHOSTING \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_103) \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_107)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_108)
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libsys_openocd_a_SOURCES = \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/syscalls.c
 
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libgloss_a_CPPFLAGS = -I$(srcdir)/xtensa/boards/esp32s3/include
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libgloss_a_CPPFLAGS = -I$(srcdir)/xtensa/boards/esp32/include
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
