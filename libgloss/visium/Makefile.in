@@ -97,6 +97,9 @@ sim-syscalls.o: syscalls.c syscall.h io.h
 debug-syscalls.o: syscalls.c syscall.h io.h
 	${CC} ${CFLAGS_FOR_TARGET} ${CFLAGS} -c -o $@ $<
 
+sbrk.o: $(srcdir)/sbrk.c
+	${CC} ${CFLAGS_FOR_TARGET} ${CFLAGS} -c -o $@ $<
+
 $(OBJS): %.o: ../%.c
 	${CC} ${CFLAGS_FOR_TARGET} ${CFLAGS} -c -o $@ $<
 
