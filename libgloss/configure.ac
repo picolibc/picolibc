@@ -177,8 +177,7 @@ case "${target}" in
 	subdirs="$subdirs mt"
 	;;
   v850*-*-*)
-	AC_CONFIG_FILES([v850/Makefile])
-	subdirs="$subdirs v850"
+	config_v850=true
 	;;
   visium-*-*)
 	AC_CONFIG_FILES([visium/Makefile])
@@ -249,7 +248,8 @@ AC_SUBST(subdirs)
 dnl These subdirs have converted to non-recursive make.  Hopefully someday all
 dnl the ports above will too!
 m4_foreach_w([SUBDIR], [
-  aarch64 arc arm bfin csky d30v iq2000 libnosys lm32 moxie nios2 riscv wince xtensa
+  aarch64 arc arm bfin csky d30v iq2000 libnosys lm32 moxie nios2 riscv v850
+  wince xtensa
 ], [dnl
   AM_CONDITIONAL([CONFIG_]m4_toupper(SUBDIR), [test x$config_]SUBDIR = xtrue)
 ])
