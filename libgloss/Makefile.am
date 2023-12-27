@@ -115,6 +115,9 @@ endif
 if CONFIG_LM32
 include lm32/Makefile.inc
 endif
+if CONFIG_MN10300
+include mn10300/Makefile.inc
+endif
 if CONFIG_MOXIE
 include moxie/Makefile.inc
 endif

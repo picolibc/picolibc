@@ -600,8 +600,8 @@ SPARC_CYGMONLDSCRIPTTEMPL
 SPARC_CPU
 MOXIE_BUILD_CRT0_FALSE
 MOXIE_BUILD_CRT0_TRUE
-MN10300_BSP_LIST
-MN10300_SCRIPT_LIST
+MN10300_BUILD_LIBCYGMON_FALSE
+MN10300_BUILD_LIBCYGMON_TRUE
 MIPS_CRT0
 MIPS_BSP_LIST
 MIPS_SCRIPT_LIST
@@ -655,6 +655,8 @@ CONFIG_MSP430_FALSE
 CONFIG_MSP430_TRUE
 CONFIG_MOXIE_FALSE
 CONFIG_MOXIE_TRUE
+CONFIG_MN10300_FALSE
+CONFIG_MN10300_TRUE
 CONFIG_LM32_FALSE
 CONFIG_LM32_TRUE
 CONFIG_LIBNOSYS_FALSE
@@ -2856,10 +2858,7 @@ case "${target}" in
 	target_makefile_frag=${srcdir}/config/mn10200.mt
 	;;
   mn10300-*-*)
-	ac_config_files="$ac_config_files mn10300/Makefile"
-
-	subdirs="$subdirs mn10300"
-	target_makefile_frag=${srcdir}/config/mn10300.mt
+	config_mn10300=true
 	;;
   bfin-*-*)
 	config_bfin=true
@@ -3093,6 +3092,14 @@ fi
 else
   CONFIG_LM32_TRUE='#'
   CONFIG_LM32_FALSE=
+fi
+
+   if test x$config_mn10300 = xtrue; then
+  CONFIG_MN10300_TRUE=
+  CONFIG_MN10300_FALSE='#'
+else
+  CONFIG_MN10300_TRUE='#'
+  CONFIG_MN10300_FALSE=
 fi
 
    if test x$config_moxie = xtrue; then
@@ -5316,19 +5323,19 @@ esac
 
 
 
-MN10300_SCRIPT_LIST=
-MN10300_BSP_LIST=
-case "${target}" in
-  mn10300-*elf)
-    MN10300_SCRIPT_LIST="eval sim asb2303 asb2305"
-    MN10300_BSP_LIST="libeval.a libcygmon.a"
-    ;;
-  *)
-    MN10300_SCRIPT_LIST="eval sim"
-    MN10300_BSP_LIST="libeval.a"
-    ;;
+case ${target} in #(
+  mn10300-*elf) :
+    MN10300_BUILD_LIBCYGMON=true ;; #(
+  *) :
+    MN10300_BUILD_LIBCYGMON=false ;;
 esac
-
+ if $MN10300_BUILD_LIBCYGMON; then
+  MN10300_BUILD_LIBCYGMON_TRUE=
+  MN10300_BUILD_LIBCYGMON_FALSE='#'
+else
+  MN10300_BUILD_LIBCYGMON_TRUE='#'
+  MN10300_BUILD_LIBCYGMON_FALSE=
+fi
 
 
 case ${target} in #(
@@ -5650,6 +5657,10 @@ if test -z "${CONFIG_LM32_TRUE}" && test -z "${CONFIG_LM32_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_LM32\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${CONFIG_MN10300_TRUE}" && test -z "${CONFIG_MN10300_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_MN10300\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${CONFIG_MOXIE_TRUE}" && test -z "${CONFIG_MOXIE_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_MOXIE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -5688,6 +5699,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCCAS_TRUE}" && test -z "${am__fastdepCCAS_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCCAS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${MN10300_BUILD_LIBCYGMON_TRUE}" && test -z "${MN10300_BUILD_LIBCYGMON_FALSE}"; then
+  as_fn_error $? "conditional \"MN10300_BUILD_LIBCYGMON\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${MOXIE_BUILD_CRT0_TRUE}" && test -z "${MOXIE_BUILD_CRT0_FALSE}"; then
@@ -6325,7 +6340,6 @@ do
     "mips/Makefile") CONFIG_FILES="$CONFIG_FILES mips/Makefile" ;;
     "rs6000/Makefile") CONFIG_FILES="$CONFIG_FILES rs6000/Makefile" ;;
     "mn10200/Makefile") CONFIG_FILES="$CONFIG_FILES mn10200/Makefile" ;;
-    "mn10300/Makefile") CONFIG_FILES="$CONFIG_FILES mn10300/Makefile" ;;
     "cr16/Makefile") CONFIG_FILES="$CONFIG_FILES cr16/Makefile" ;;
     "cris/Makefile") CONFIG_FILES="$CONFIG_FILES cris/Makefile" ;;
     "crx/Makefile") CONFIG_FILES="$CONFIG_FILES crx/Makefile" ;;
