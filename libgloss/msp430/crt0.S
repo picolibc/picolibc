@@ -195,20 +195,6 @@ START_CRT_FUNC 0600 run_init_array
 END_CRT_FUNC	run_init_array
 #endif /* Lrun_init_array */
 
-;; FIXME: There are currently no program termination routines executed for
-;; msp430.
-#if 0
-#if Lrun_fini_array
-;; Ensure global C++ destructors in .fini_array are called on exit
-;; by registering __crt0_run_fini_array with atexit.
-START_CRT_FUNC 0700 register_fini_array
-
-	mov_	#__crt0_run_fini_array, R12
-	call_	#atexit
-
-END_CRT_FUNC	register_fini_array
-#endif /* Lrun_fini_array */
-#endif /* 0 */
 
 #if Lmain
 ;; This function is always included and calls main().
