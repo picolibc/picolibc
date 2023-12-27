@@ -113,9 +113,7 @@ case "${target}" in
 	host_makefile_frag=${srcdir}/config/ppc.mh
 	;;
   mn10200-*-*)
-	AC_CONFIG_FILES([mn10200/Makefile])
-	subdirs="$subdirs mn10200"
-	target_makefile_frag=${srcdir}/config/mn10200.mt
+	config_mn10200=true
 	;;
   mn10300-*-*)
 	config_mn10300=true
@@ -243,7 +241,7 @@ dnl These subdirs have converted to non-recursive make.  Hopefully someday all
 dnl the ports above will too!
 m4_foreach_w([SUBDIR], [
   aarch64 arc arm bfin csky d30v frv i386 i960 iq2000 libnosys lm32
-  mn10300 moxie msp430
+  mn10200 mn10300 moxie msp430
   nios2 riscv v850 wince xtensa
 ], [dnl
   AM_CONDITIONAL([CONFIG_]m4_toupper(SUBDIR), [test x$config_]SUBDIR = xtrue)
