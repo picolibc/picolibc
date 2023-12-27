@@ -654,6 +654,8 @@ CONFIG_V850_FALSE
 CONFIG_V850_TRUE
 CONFIG_RX_FALSE
 CONFIG_RX_TRUE
+CONFIG_RL78_FALSE
+CONFIG_RL78_TRUE
 CONFIG_RISCV_FALSE
 CONFIG_RISCV_TRUE
 CONFIG_NIOS2_FALSE
@@ -2957,9 +2959,7 @@ case "${target}" in
 	config_libnosys=false
 	;;
   rl78*-*-elf)
-	ac_config_files="$ac_config_files rl78/Makefile"
-
-	subdirs="$subdirs rl78"
+	config_rl78=true
 	;;
   rx*-*-elf)
 	config_rx=true
@@ -3158,6 +3158,14 @@ fi
 else
   CONFIG_RISCV_TRUE='#'
   CONFIG_RISCV_FALSE=
+fi
+
+   if test x$config_rl78 = xtrue; then
+  CONFIG_RL78_TRUE=
+  CONFIG_RL78_FALSE='#'
+else
+  CONFIG_RL78_TRUE='#'
+  CONFIG_RL78_FALSE=
 fi
 
    if test x$config_rx = xtrue; then
@@ -5747,6 +5755,10 @@ if test -z "${CONFIG_RISCV_TRUE}" && test -z "${CONFIG_RISCV_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_RISCV\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${CONFIG_RL78_TRUE}" && test -z "${CONFIG_RL78_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_RL78\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${CONFIG_RX_TRUE}" && test -z "${CONFIG_RX_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_RX\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -6435,7 +6447,6 @@ do
     "visium/Makefile") CONFIG_FILES="$CONFIG_FILES visium/Makefile" ;;
     "xc16x/Makefile") CONFIG_FILES="$CONFIG_FILES xc16x/Makefile" ;;
     "m32c/Makefile") CONFIG_FILES="$CONFIG_FILES m32c/Makefile" ;;
-    "rl78/Makefile") CONFIG_FILES="$CONFIG_FILES rl78/Makefile" ;;
     "spu/Makefile") CONFIG_FILES="$CONFIG_FILES spu/Makefile" ;;
     "tic6x/Makefile") CONFIG_FILES="$CONFIG_FILES tic6x/Makefile" ;;
     "or1k/Makefile") CONFIG_FILES="$CONFIG_FILES or1k/Makefile" ;;

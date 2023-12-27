@@ -140,6 +140,9 @@ endif
 if CONFIG_RISCV
 include riscv/Makefile.inc
 endif
+if CONFIG_RL78
+include rl78/Makefile.inc
+endif
 if CONFIG_RX
 include rx/Makefile.inc
 endif
