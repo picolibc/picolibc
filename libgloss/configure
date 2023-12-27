@@ -651,6 +651,8 @@ CONFIG_RISCV_FALSE
 CONFIG_RISCV_TRUE
 CONFIG_NIOS2_FALSE
 CONFIG_NIOS2_TRUE
+CONFIG_MSP430_FALSE
+CONFIG_MSP430_TRUE
 CONFIG_MOXIE_FALSE
 CONFIG_MOXIE_TRUE
 CONFIG_LM32_FALSE
@@ -2948,9 +2950,7 @@ case "${target}" in
 	subdirs="$subdirs m32c"
 	;;
   msp430-*-elf*)
-	ac_config_files="$ac_config_files msp430/Makefile"
-
-	subdirs="$subdirs msp430"
+	config_msp430=true
 	config_libnosys=false
 	;;
   rl78*-*-elf)
@@ -3085,6 +3085,14 @@ fi
 else
   CONFIG_MOXIE_TRUE='#'
   CONFIG_MOXIE_FALSE=
+fi
+
+   if test x$config_msp430 = xtrue; then
+  CONFIG_MSP430_TRUE=
+  CONFIG_MSP430_FALSE='#'
+else
+  CONFIG_MSP430_TRUE='#'
+  CONFIG_MSP430_FALSE=
 fi
 
    if test x$config_nios2 = xtrue; then
@@ -5622,6 +5630,10 @@ if test -z "${CONFIG_MOXIE_TRUE}" && test -z "${CONFIG_MOXIE_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_MOXIE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${CONFIG_MSP430_TRUE}" && test -z "${CONFIG_MSP430_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_MSP430\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${CONFIG_NIOS2_TRUE}" && test -z "${CONFIG_NIOS2_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_NIOS2\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -6305,7 +6317,6 @@ do
     "xc16x/Makefile") CONFIG_FILES="$CONFIG_FILES xc16x/Makefile" ;;
     "xstormy16/Makefile") CONFIG_FILES="$CONFIG_FILES xstormy16/Makefile" ;;
     "m32c/Makefile") CONFIG_FILES="$CONFIG_FILES m32c/Makefile" ;;
-    "msp430/Makefile") CONFIG_FILES="$CONFIG_FILES msp430/Makefile" ;;
     "rl78/Makefile") CONFIG_FILES="$CONFIG_FILES rl78/Makefile" ;;
     "rx/Makefile") CONFIG_FILES="$CONFIG_FILES rx/Makefile" ;;
     "spu/Makefile") CONFIG_FILES="$CONFIG_FILES spu/Makefile" ;;
