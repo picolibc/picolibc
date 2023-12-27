@@ -531,7 +531,7 @@ foreach target : targets
 
     # legacy stdio doesn't work on semihosting, so just skip it
     if tinystdio
-      plain_tests += ['test-fopen', 'test-mktemp']
+      plain_tests += ['test-fopen', 'test-mktemp', 'test-fread-fwrite']
     endif
   endif
 
@@ -546,10 +546,11 @@ foreach target : targets
     else
       t1_name = t1 + '_' + target
     endif
+    test_file_name_arg=['-DTEST_FILE_NAME="' + t1_name + '.txt"']
 
     test(t1_name,
 	 executable(t1_name, [t1_src, 'lock-valid.c'],
-		    c_args: double_printf_compile_args + _c_args,
+		    c_args: double_printf_compile_args + test_file_name_arg + _c_args,
 		    link_args: double_printf_link_args + _link_args,
 		    objects: _objs,
 		    link_with: _libs,
@@ -619,6 +620,11 @@ if enable_native_tests
 		  c_args: native_c_args,
 		  link_args: native_c_args))
 
+  test('test-fread-fwrite-native',
+       executable('test-fread-fwrite-native', 'test-fread-fwrite.c',
+		  c_args: native_c_args + ['-DTEST_FILE_NAME="test-fread-fwrite-native.txt"'],
+		  link_args: native_c_args))
+       
 endif
 
 subdir('libc-testsuite')

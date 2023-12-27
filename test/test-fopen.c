@@ -36,7 +36,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifndef TEST_FILE_NAME
 #define TEST_FILE_NAME "FOPEN.TXT"
+#endif
 
 #define check(condition, message) do {                  \
         if (!(condition)) {                             \
