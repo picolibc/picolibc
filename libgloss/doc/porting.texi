@@ -18,16 +18,8 @@
 @set automake @ref{Top,,GNU Automake,automake}
 @set libtool @ref{Top,,GNU Libtool,libtool}
 
-@titlepage
-@title Embed With GNU
-@subtitle Porting The GNU Tools To Embedded Systems
-@sp 4
-@subtitle Spring 1995
-@subtitle Very *Rough* Draft
-@author Rob Savoye - Cygnus Support
-@page
-
-@vskip 0pt plus 1filll
+@copying
+@c man begin COPYRIGHT
 Copyright @copyright{} 1993, 1994, 1995 Cygnus Support
 
 Permission is granted to make and distribute verbatim copies of
@@ -41,6 +33,20 @@ permission notice identical to this one.
 
 Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions.
+@c man end
+@end copying
+
+@titlepage
+@title Embed With GNU
+@subtitle Porting The GNU Tools To Embedded Systems
+@sp 4
+@subtitle Spring 1995
+@subtitle Very *Rough* Draft
+@author Rob Savoye - Cygnus Support
+@c Then the copyright page.  This must be a page by itself after the titlepage.
+@page
+@vskip 0pt plus 1filll
+@insertcopying
 @end titlepage
 
 @direntry
@@ -50,19 +56,7 @@ END-INFO-DIR-ENTRY
 @end direntry
 
 @ifnottex
-Copyright (c) 1993, 1994, 1995 Cygnus Support
-
-Permission is granted to make and distribute verbatim copies of
-this manual provided the copyright notice and this permission notice
-are preserved on all copies.
-
-Permission is granted to copy and distribute modified versions of this
-manual under the conditions for verbatim copying, provided also that
-the entire resulting derived work is distributed under the terms of a
-permission notice identical to this one.
-
-Permission is granted to copy and distribute translations of this manual
-into another language, under the above conditions for modified versions.
+@insertcopying
 
 @node Top
 @top Embed with GNU
