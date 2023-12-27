@@ -672,6 +672,8 @@ CONFIG_MN10200_FALSE
 CONFIG_MN10200_TRUE
 CONFIG_MCORE_FALSE
 CONFIG_MCORE_TRUE
+CONFIG_M32R_FALSE
+CONFIG_M32R_TRUE
 CONFIG_LM32_FALSE
 CONFIG_LM32_TRUE
 CONFIG_LIBNOSYS_FALSE
@@ -2811,9 +2813,7 @@ case "${target}" in
 	config_i386=true
 	;;
   m32r-*-*)
-	ac_config_files="$ac_config_files m32r/Makefile"
-
-	subdirs="$subdirs m32r"
+	config_m32r=true
 	;;
   m68hc11-*-* | m6811-*-* | m68hc12-*-* | m6812-*-*)
 	ac_config_files="$ac_config_files m68hc11/Makefile"
@@ -3094,6 +3094,14 @@ fi
 else
   CONFIG_LM32_TRUE='#'
   CONFIG_LM32_FALSE=
+fi
+
+   if test x$config_m32r = xtrue; then
+  CONFIG_M32R_TRUE=
+  CONFIG_M32R_FALSE='#'
+else
+  CONFIG_M32R_TRUE='#'
+  CONFIG_M32R_FALSE=
 fi
 
    if test x$config_mcore = xtrue; then
@@ -5723,6 +5731,10 @@ if test -z "${CONFIG_LM32_TRUE}" && test -z "${CONFIG_LM32_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_LM32\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${CONFIG_M32R_TRUE}" && test -z "${CONFIG_M32R_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_M32R\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${CONFIG_MCORE_TRUE}" && test -z "${CONFIG_MCORE_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_MCORE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -6428,7 +6440,6 @@ do
   case $ac_config_target in
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
     "epiphany/Makefile") CONFIG_FILES="$CONFIG_FILES epiphany/Makefile" ;;
-    "m32r/Makefile") CONFIG_FILES="$CONFIG_FILES m32r/Makefile" ;;
     "m68hc11/Makefile") CONFIG_FILES="$CONFIG_FILES m68hc11/Makefile" ;;
     "m68k/Makefile") CONFIG_FILES="$CONFIG_FILES m68k/Makefile" ;;
     "pa/Makefile") CONFIG_FILES="$CONFIG_FILES pa/Makefile" ;;
