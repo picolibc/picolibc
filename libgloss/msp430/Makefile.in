@@ -90,8 +90,7 @@ CRT_OBJS = \
 	crt_run_init_array.o \
 	crt_run_preinit_array.o \
 	crt_run_fini_array.o \
-	crt_run_array.o \
-	crt_init.o
+	crt_run_array.o
 
 #### Host specific Makefile fragment comes in here.
 @host_makefile_frag@
