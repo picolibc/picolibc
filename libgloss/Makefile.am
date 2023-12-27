@@ -152,6 +152,9 @@ endif
 if CONFIG_V850
 include v850/Makefile.inc
 endif
+if CONFIG_VISIUM
+include visium/Makefile.inc
+endif
 if CONFIG_WINCE
 include wince/Makefile.inc
 endif

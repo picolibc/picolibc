@@ -170,8 +170,7 @@ case "${target}" in
 	config_v850=true
 	;;
   visium-*-*)
-	AC_CONFIG_FILES([visium/Makefile])
-	subdirs="$subdirs visium"
+	config_visium=true
 	config_testsuite=false
 	;;
   xc16x-*-*)
@@ -236,7 +235,7 @@ dnl the ports above will too!
 m4_foreach_w([SUBDIR], [
   aarch64 arc arm bfin csky d30v frv i386 i960 iq2000 libnosys lm32
   m32r mcore mn10200 mn10300 moxie msp430
-  nds32 nios2 riscv rl78 rx v850 wince xstormy16 xtensa
+  nds32 nios2 riscv rl78 rx v850 visium wince xstormy16 xtensa
 ], [dnl
   AM_CONDITIONAL([CONFIG_]m4_toupper(SUBDIR), [test x$config_]SUBDIR = xtrue)
 ])
