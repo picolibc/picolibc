@@ -63,8 +63,7 @@ case "${target}" in
 	config_testsuite=true
 	;;
   i[[3456]]86-*-elf* | i[[3456]]86-*-coff*)
-	AC_CONFIG_FILES([i386/Makefile])
-	subdirs="$subdirs i386"
+	config_i386=true
 	;;
   m32r-*-*)
 	AC_CONFIG_FILES([m32r/Makefile])
@@ -245,7 +244,7 @@ AC_SUBST(subdirs)
 dnl These subdirs have converted to non-recursive make.  Hopefully someday all
 dnl the ports above will too!
 m4_foreach_w([SUBDIR], [
-  aarch64 arc arm bfin csky d30v frv i960 iq2000 libnosys lm32 moxie msp430
+  aarch64 arc arm bfin csky d30v frv i386 i960 iq2000 libnosys lm32 moxie msp430
   nios2 riscv v850 wince xtensa
 ], [dnl
   AM_CONDITIONAL([CONFIG_]m4_toupper(SUBDIR), [test x$config_]SUBDIR = xtrue)

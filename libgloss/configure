@@ -663,6 +663,8 @@ CONFIG_IQ2000_FALSE
 CONFIG_IQ2000_TRUE
 CONFIG_I960_FALSE
 CONFIG_I960_TRUE
+CONFIG_I386_FALSE
+CONFIG_I386_TRUE
 CONFIG_FRV_FALSE
 CONFIG_FRV_TRUE
 CONFIG_D30V_FALSE
@@ -2789,9 +2791,7 @@ case "${target}" in
 	config_testsuite=true
 	;;
   i[3456]86-*-elf* | i[3456]86-*-coff*)
-	ac_config_files="$ac_config_files i386/Makefile"
-
-	subdirs="$subdirs i386"
+	config_i386=true
 	;;
   m32r-*-*)
 	ac_config_files="$ac_config_files m32r/Makefile"
@@ -3053,6 +3053,14 @@ fi
 else
   CONFIG_FRV_TRUE='#'
   CONFIG_FRV_FALSE=
+fi
+
+   if test x$config_i386 = xtrue; then
+  CONFIG_I386_TRUE=
+  CONFIG_I386_FALSE='#'
+else
+  CONFIG_I386_TRUE='#'
+  CONFIG_I386_FALSE=
 fi
 
    if test x$config_i960 = xtrue; then
@@ -5622,6 +5630,10 @@ if test -z "${CONFIG_FRV_TRUE}" && test -z "${CONFIG_FRV_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_FRV\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${CONFIG_I386_TRUE}" && test -z "${CONFIG_I386_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_I386\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${CONFIG_I960_TRUE}" && test -z "${CONFIG_I960_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_I960\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -6303,7 +6315,6 @@ do
   case $ac_config_target in
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
     "epiphany/Makefile") CONFIG_FILES="$CONFIG_FILES epiphany/Makefile" ;;
-    "i386/Makefile") CONFIG_FILES="$CONFIG_FILES i386/Makefile" ;;
     "m32r/Makefile") CONFIG_FILES="$CONFIG_FILES m32r/Makefile" ;;
     "m68hc11/Makefile") CONFIG_FILES="$CONFIG_FILES m68hc11/Makefile" ;;
     "nds32/Makefile") CONFIG_FILES="$CONFIG_FILES nds32/Makefile" ;;

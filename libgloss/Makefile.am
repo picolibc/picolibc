@@ -100,6 +100,9 @@ endif
 if CONFIG_FRV
 include frv/Makefile.inc
 endif
+if CONFIG_I386
+include i386/Makefile.inc
+endif
 if CONFIG_I960
 include i960/Makefile.inc
 endif
