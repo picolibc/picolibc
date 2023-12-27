@@ -8,6 +8,10 @@ multilibtool_DATA += \
 	%D%/sys.qemu.specs \
 	%D%/sys.openocd.specs \
 	%D%/crt0.o
+libobjs_a_SOURCES += \
+	%D%/crt0.S \
+	%D%/crt1-sim.S \
+	%D%/crt1-boards.S
 
 multilibtool_LIBRARIES += %D%/libgloss.a
 
@@ -50,6 +54,3 @@ multilibtool_DATA += %D%/boards/esp32s3/memory.elf.ld
 %C%_libsys_openocd_a_CPPFLAGS += -I$(srcdir)/%D%/boards/esp32s3/include
 endif
 endif
-
-%D%/crt0.$(OBJEXT): %D%/crt0.S
-	$(AM_V_CPPAS)$(CPPASCOMPILE) $(CPPFLAGS) -o $@ -c $<
