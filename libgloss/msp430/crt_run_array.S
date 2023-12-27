@@ -30,17 +30,19 @@
 
 #include "memmodel.h"
 
-;; This function is responsible for initializing the contents of the
-;; .bss section.
+;; Note - this section is only included in the startup code of the application
+;; if it is needed by one of the above run_*_array functions.
 
-START_CRT_FUNC 0100 init_bss
+START_CRT_FUNC 1100 run_array
 
-	mov_	#__bssstart, R12
-	clr.w	R13
-	mov_	#__bsssize, R14
-#ifdef __MSP430X_LARGE__
-	clr.w	R15		; We assume that __bsssize is never > 64K
-#endif
-	call_	#memset
+	cmp_	R4, R5
+	jeq	_msp430_run_done
+	mov_	@R4, R7
+	add_	R6, R4
+	call_	R7
+	br_	#__crt0_run_array
 
-END_CRT_FUNC	init_bss
+END_CRT_FUNC	run_array
+
+_msp430_run_done:
+	ret_

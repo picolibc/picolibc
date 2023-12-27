@@ -28,19 +28,44 @@
    negligence or otherwise) arising in any way out of the use of this
    software, even if advised of the possibility of such damage.  */
 
+#ifdef __MSP430X_LARGE__
+
 #include "memmodel.h"
 
-;; This function is responsible for initializing the contents of the
-;; .bss section.
+;; This function is responsible for making sure that the
+;; contents of the .upper.data section have their correct startup values.
+;; If a copy of the .upper.data section is stored in ROM then this means
+;; copying the contents into HIFRAM.  If a copy of .upper.data is stored in a
+;; shadow section in HIFRAM then this means copying from the shadow section
+;; into the real section.
 
-START_CRT_FUNC 0100 init_bss
+START_CRT_FUNC 0400 move_highdata
+	;;  __rom_highdatacopysize may be zero.  Test this first because
+	;; its value may come from the weak definitions above and we do
+	;; not want to access the memory at address 0 pointed to by the
+	;; weak definition of __upper_data_init.
+	mov.w	#__rom_highdatacopysize, R14
+	cmp.w	#0, R14
+	jeq	3f
 
-	mov_	#__bssstart, R12
-	clr.w	R13
-	mov_	#__bsssize, R14
-#ifdef __MSP430X_LARGE__
-	clr.w	R15		; We assume that __bsssize is never > 64K
-#endif
-	call_	#memset
+	/* Test our status word.  */
+	cmpx.w  #0, &__upper_data_init
+	jeq	1f
+	/* Status word is non-zero - copy from shadow into upper.  */
+	mov_	#__high_datastart, R12
+	mov_	#__rom_highdatastart, R13
+	jmp	2f
 
-END_CRT_FUNC	init_bss
+1:	/* Status word is zero.  Copy from upper to shadow and change status word.  */
+	movx.w  #1, &__upper_data_init
+	mov_	#__rom_highdatastart, R12
+	mov_	#__high_datastart, R13
+
+2:	;; __rom_highdatacopysize may be zero.  memmove should cope.
+	mov.w	#__rom_highdatacopysize, R14
+
+	call_	#memmove
+3:
+END_CRT_FUNC	move_highdata
+
+#endif /* __MSP430X_LARGE__ */

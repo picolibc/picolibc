@@ -30,17 +30,10 @@
 
 #include "memmodel.h"
 
-;; This function is responsible for initializing the contents of the
-;; .bss section.
+;; This function is responsible for calling exit once main has finished.
 
-START_CRT_FUNC 0100 init_bss
+START_CRT_FUNC 0900 call_exit
 
-	mov_	#__bssstart, R12
-	clr.w	R13
-	mov_	#__bsssize, R14
-#ifdef __MSP430X_LARGE__
-	clr.w	R15		; We assume that __bsssize is never > 64K
-#endif
-	call_	#memset
+	call_	#_exit
 
-END_CRT_FUNC	init_bss
+END_CRT_FUNC	call_exit

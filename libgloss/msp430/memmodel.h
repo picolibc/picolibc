@@ -40,10 +40,16 @@
 #endif
 
 /* Start a function in its own named and numbered section, so that it
-   can be subject to linker garbage collection.  The numbers are used
-   to enforce link-time ordering of the sections.  Note - the construction
-   of the symbol names is critical - they need to match the unresolved
-   symbol references created by the compiler and assembler.  */
+   can be subject to linker garbage collection.
+
+   The linker links all .crt_* sections in asciibetical order at the same place.
+   So, the four digits in .crt_NNNN_xxx name are used to enforce link-time
+   ordering of the sections.  Make sure to keep them in sequential order.  The
+   first two digits are set in the files, the second two allow users to insert
+   code between our standard code fragments.
+
+   Note - the construction of the symbol names is critical - they need to match
+   the unresolved symbol references created by the compiler and assembler.  */
 .macro START_CRT_FUNC number name 
 	.section .crt_\number\name,"ax",@progbits
 	.global __crt0_\name

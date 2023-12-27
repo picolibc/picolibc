@@ -30,17 +30,21 @@
 
 #include "memmodel.h"
 
-;; This function is responsible for initializing the contents of the
-;; .bss section.
+;; This function is responsible for copying the
+;; contents of the .data section from its load address (in ROM) to
+;; its run-time address (in RAM).
 
-START_CRT_FUNC 0100 init_bss
+START_CRT_FUNC 0300 movedata
 
-	mov_	#__bssstart, R12
-	clr.w	R13
-	mov_	#__bsssize, R14
-#ifdef __MSP430X_LARGE__
-	clr.w	R15		; We assume that __bsssize is never > 64K
-#endif
-	call_	#memset
+	mov_	#__datastart, R12
+	mov_	#__romdatastart, R13
 
-END_CRT_FUNC	init_bss
+	;;  memmove and memcpy do not currently work when src == dst
+	cmp_	R12, R13
+	jeq	1f
+
+	mov_	#__romdatacopysize, R14
+
+	call_	#memmove
+1:
+END_CRT_FUNC	movedata

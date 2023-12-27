@@ -28,19 +28,24 @@
    negligence or otherwise) arising in any way out of the use of this
    software, even if advised of the possibility of such damage.  */
 
+#ifdef __MSP430X_LARGE__
+
 #include "memmodel.h"
 
 ;; This function is responsible for initializing the contents of the
-;; .bss section.
+;; .upper.bss section.
 
-START_CRT_FUNC 0100 init_bss
+START_CRT_FUNC 0200 init_highbss
 
-	mov_	#__bssstart, R12
-	clr.w	R13
-	mov_	#__bsssize, R14
-#ifdef __MSP430X_LARGE__
-	clr.w	R15		; We assume that __bsssize is never > 64K
-#endif
+	mov_	#__high_bssstart, R12
+	mov.w	#0, R13
+	mov_	#__high_bsssize, R14
+	;; If __high_bsssize is zero then skip the call to memset.
+	;; This can happen if all of the bss data was placed into .either.bss.
+	cmp.w	#0, R14
+	jeq	1f
 	call_	#memset
+1:
+END_CRT_FUNC	init_highbss
 
-END_CRT_FUNC	init_bss
+#endif /* __MSP430X_LARGE__ */

@@ -30,17 +30,11 @@
 
 #include "memmodel.h"
 
-;; This function is responsible for initializing the contents of the
-;; .bss section.
+;; This function is always included and calls main().
 
-START_CRT_FUNC 0100 init_bss
+START_CRT_FUNC 0800 call_main
 
-	mov_	#__bssstart, R12
-	clr.w	R13
-	mov_	#__bsssize, R14
-#ifdef __MSP430X_LARGE__
-	clr.w	R15		; We assume that __bsssize is never > 64K
-#endif
-	call_	#memset
+	clr.w	R12		; Set argc == 0
+	call_	#main
 
-END_CRT_FUNC	init_bss
+END_CRT_FUNC	call_main

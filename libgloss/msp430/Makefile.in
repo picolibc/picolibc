@@ -78,8 +78,6 @@ NOSYS_OBJS = ciosyscalls.o \
 	unlink.o \
 	sbrk.o
 
-# Each crt_*.o is built from crt0.S using -DL*.  crt0.o is built from
-# crt0.s with -DL0 via the default rule below.
 CRT_OBJS = \
 	crt_bss.o \
 	crt_high_bss.o \
@@ -98,12 +96,9 @@ CRT_OBJS = \
 
 all: $(CRT) $(SIM_BSP) $(LIB_NOSYS) $(LIB_CRT) copy_scripts_to_objdir
 
-crt_%.o : crt0.S
-	$(CC) -DL$* -Wa,-gdwarf2 -Wa,-I$(srcdir) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -c $< -o $@
-
 # Override .S.o rule to pass assembler debugging flags
 .S.o:
-	$(CC) -DL0 -Wa,-gdwarf2 -Wa,-I$(srcdir) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -c $<
+	$(CC) -Wa,-gdwarf2 -Wa,-I$(srcdir) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -c $<
 
 $(SIM_BSP): $(SIM_OBJS)
 	$(AR) $(ARFLAGS) $@ $?

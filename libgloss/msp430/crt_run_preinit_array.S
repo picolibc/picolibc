@@ -30,17 +30,14 @@
 
 #include "memmodel.h"
 
-;; This function is responsible for initializing the contents of the
-;; .bss section.
+;; This function is responsible for setting up the arguments
+;; required for __crt0_run_array, to run the functions in .preinit_array.
 
-START_CRT_FUNC 0100 init_bss
+START_CRT_FUNC 0500 run_preinit_array
 
-	mov_	#__bssstart, R12
-	clr.w	R13
-	mov_	#__bsssize, R14
-#ifdef __MSP430X_LARGE__
-	clr.w	R15		; We assume that __bsssize is never > 64K
-#endif
-	call_	#memset
+	mov_	#__preinit_array_start, R4
+	mov_	#__preinit_array_end, R5
+	mov_	#PTRsz, R6
+	call_	#__crt0_run_array
 
-END_CRT_FUNC	init_bss
+END_CRT_FUNC	run_preinit_array
