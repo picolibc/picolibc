@@ -1,13 +1,5 @@
 dnl Don't build crt0 for moxiebox, which provides crt0 for us.
-case "${target}" in
-  moxie-*-moxiebox*)
-    MOXIE_BUILD_CRT0_TRUE='#'
-    MOXIE_BUILD_CRT0_FALSE=
-    ;;
-  *)
-    MOXIE_BUILD_CRT0_TRUE=
-    MOXIE_BUILD_CRT0_FALSE='#'
-    ;;
-esac
-AC_SUBST(MOXIE_BUILD_CRT0_TRUE)
-AC_SUBST(MOXIE_BUILD_CRT0_FALSE)
+AS_CASE([${target}],
+  [moxie-*-moxiebox*], [MOXIE_BUILD_CRT0=false],
+  [MOXIE_BUILD_CRT0=true])
+AM_CONDITIONAL([MOXIE_BUILD_CRT0], [$MOXIE_BUILD_CRT0])

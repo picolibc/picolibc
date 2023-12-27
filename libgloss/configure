@@ -647,6 +647,8 @@ CONFIG_RISCV_FALSE
 CONFIG_RISCV_TRUE
 CONFIG_NIOS2_FALSE
 CONFIG_NIOS2_TRUE
+CONFIG_MOXIE_FALSE
+CONFIG_MOXIE_TRUE
 CONFIG_LM32_FALSE
 CONFIG_LM32_TRUE
 CONFIG_LIBNOSYS_FALSE
@@ -2901,9 +2903,7 @@ case "${target}" in
 	subdirs="$subdirs mep"
 	;;
   moxie-*-*)
-	ac_config_files="$ac_config_files moxie/Makefile"
-
-	subdirs="$subdirs moxie"
+	config_moxie=true
 	;;
   microblaze*-*-*)
 	ac_config_files="$ac_config_files microblaze/Makefile"
@@ -3067,6 +3067,14 @@ fi
 else
   CONFIG_LM32_TRUE='#'
   CONFIG_LM32_FALSE=
+fi
+
+   if test x$config_moxie = xtrue; then
+  CONFIG_MOXIE_TRUE=
+  CONFIG_MOXIE_FALSE='#'
+else
+  CONFIG_MOXIE_TRUE='#'
+  CONFIG_MOXIE_FALSE=
 fi
 
    if test x$config_nios2 = xtrue; then
@@ -5097,17 +5105,19 @@ esac
 
 
 
-case "${target}" in
-  moxie-*-moxiebox*)
-    MOXIE_BUILD_CRT0_TRUE='#'
-    MOXIE_BUILD_CRT0_FALSE=
-    ;;
-  *)
-    MOXIE_BUILD_CRT0_TRUE=
-    MOXIE_BUILD_CRT0_FALSE='#'
-    ;;
+case ${target} in #(
+  moxie-*-moxiebox*) :
+    MOXIE_BUILD_CRT0=false ;; #(
+  *) :
+    MOXIE_BUILD_CRT0=true ;;
 esac
-
+ if $MOXIE_BUILD_CRT0; then
+  MOXIE_BUILD_CRT0_TRUE=
+  MOXIE_BUILD_CRT0_FALSE='#'
+else
+  MOXIE_BUILD_CRT0_TRUE='#'
+  MOXIE_BUILD_CRT0_FALSE=
+fi
 
 
 SPARC_CPU=SPARC
@@ -5402,6 +5412,10 @@ if test -z "${CONFIG_LM32_TRUE}" && test -z "${CONFIG_LM32_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_LM32\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${CONFIG_MOXIE_TRUE}" && test -z "${CONFIG_MOXIE_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_MOXIE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${CONFIG_NIOS2_TRUE}" && test -z "${CONFIG_NIOS2_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_NIOS2\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -5428,6 +5442,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCCAS_TRUE}" && test -z "${am__fastdepCCAS_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCCAS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${MOXIE_BUILD_CRT0_TRUE}" && test -z "${MOXIE_BUILD_CRT0_FALSE}"; then
+  as_fn_error $? "conditional \"MOXIE_BUILD_CRT0\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_XTENSA_BOARD_ESP32_TRUE}" && test -z "${HAVE_XTENSA_BOARD_ESP32_FALSE}"; then
@@ -6072,7 +6090,6 @@ do
     "ft32/Makefile") CONFIG_FILES="$CONFIG_FILES ft32/Makefile" ;;
     "mcore/Makefile") CONFIG_FILES="$CONFIG_FILES mcore/Makefile" ;;
     "mep/Makefile") CONFIG_FILES="$CONFIG_FILES mep/Makefile" ;;
-    "moxie/Makefile") CONFIG_FILES="$CONFIG_FILES moxie/Makefile" ;;
     "microblaze/Makefile") CONFIG_FILES="$CONFIG_FILES microblaze/Makefile" ;;
     "mt/Makefile") CONFIG_FILES="$CONFIG_FILES mt/Makefile" ;;
     "v850/Makefile") CONFIG_FILES="$CONFIG_FILES v850/Makefile" ;;
