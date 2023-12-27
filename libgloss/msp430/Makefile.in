@@ -96,10 +96,6 @@ CRT_OBJS = \
 
 all: $(CRT) $(SIM_BSP) $(LIB_NOSYS) $(LIB_CRT) copy_scripts_to_objdir
 
-# Override .S.o rule to pass assembler debugging flags
-.S.o:
-	$(CC) -Wa,-gdwarf2 -Wa,-I$(srcdir) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -c $<
-
 $(SIM_BSP): $(SIM_OBJS)
 	$(AR) $(ARFLAGS) $@ $?
 	$(RANLIB) $@
