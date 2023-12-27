@@ -1210,6 +1210,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #undef my_putc
 #undef ap
   fail:
+    stream->flags |= __SERR;
     stream_len = -1;
     goto ret;
 }
