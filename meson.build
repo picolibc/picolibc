@@ -1584,7 +1584,7 @@ endif
 # Clang does not support spec files
 specs_line = []
 if cc.get_id() != 'clang'
-  specs_line += [specs_prefix + '--specs', specs_prefix + meson.current_build_dir() / '@0@'.format(specs_name)]
+  specs_line += [specs_prefix + '--specs', specs_prefix + meson.current_build_dir() / specs_name]
 endif
 test_c_args += specs_line
 
@@ -1602,8 +1602,14 @@ if has_semihost
       picolibc_ld_value = get_variable('picolibc_' + target + '_ld', picolibc_ld)
     endif
 
+    if meson.version().version_compare('>=1.4.0')
+      picolibc_ld_string = picolibc_ld_value.full_path()
+    else
+      picolibc_ld_string = '@0@'.format(picolibc_ld_value)
+    endif
+
     set_variable(test_link_args_variable,
-		 ['-nostartfiles', '-T', '@0@'.format(picolibc_ld_value),
+		 ['-nostartfiles', '-T', picolibc_ld_string,
 		  lib_gcc] + additional_libs_list + specs_line)
 
     set_variable(test_linker_files_variable, [picolibc_ld_value])
