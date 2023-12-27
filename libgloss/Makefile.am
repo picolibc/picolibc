@@ -130,6 +130,9 @@ endif
 if CONFIG_MSP430
 include msp430/Makefile.inc
 endif
+if CONFIG_NDS32
+include nds32/Makefile.inc
+endif
 if CONFIG_NIOS2
 include nios2/Makefile.inc
 endif
