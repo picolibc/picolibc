@@ -181,8 +181,7 @@ case "${target}" in
 	target_makefile_frag=${srcdir}/config/xc16x.mt
 	;;
   xstormy16-*-*)
-	AC_CONFIG_FILES([xstormy16/Makefile])
-	subdirs="$subdirs xstormy16"
+	config_xstormy16=true
 	;;
   xtensa-*-*)
 	config_xtensa=true
@@ -240,7 +239,7 @@ dnl the ports above will too!
 m4_foreach_w([SUBDIR], [
   aarch64 arc arm bfin csky d30v frv i386 i960 iq2000 libnosys lm32
   mcore mn10200 mn10300 moxie msp430
-  nds32 nios2 riscv v850 wince xtensa
+  nds32 nios2 riscv v850 wince xstormy16 xtensa
 ], [dnl
   AM_CONDITIONAL([CONFIG_]m4_toupper(SUBDIR), [test x$config_]SUBDIR = xtrue)
 ])

@@ -17,6 +17,7 @@ tooldir = $(exec_prefix)/$(target_alias)
 multilibtooldir = $(tooldir)/lib$(MULTISUBDIR)
 multilibtool_DATA =
 multilibtool_LIBRARIES =
+multilibtool_PROGRAMS =
 
 includetooldir = $(tooldir)/include
 includetool_DATA =
@@ -144,6 +145,9 @@ include v850/Makefile.inc
 endif
 if CONFIG_WINCE
 include wince/Makefile.inc
+endif
+if CONFIG_XSTORMY16
+include xstormy16/Makefile.inc
 endif
 if CONFIG_XTENSA
 include xtensa/Makefile.inc

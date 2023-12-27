@@ -646,6 +646,8 @@ CFLAGS
 CC
 CONFIG_XTENSA_FALSE
 CONFIG_XTENSA_TRUE
+CONFIG_XSTORMY16_FALSE
+CONFIG_XSTORMY16_TRUE
 CONFIG_WINCE_FALSE
 CONFIG_WINCE_TRUE
 CONFIG_V850_FALSE
@@ -2938,9 +2940,7 @@ case "${target}" in
 	target_makefile_frag=${srcdir}/config/xc16x.mt
 	;;
   xstormy16-*-*)
-	ac_config_files="$ac_config_files xstormy16/Makefile"
-
-	subdirs="$subdirs xstormy16"
+	config_xstormy16=true
 	;;
   xtensa-*-*)
 	config_xtensa=true
@@ -3174,6 +3174,14 @@ fi
 else
   CONFIG_WINCE_TRUE='#'
   CONFIG_WINCE_FALSE=
+fi
+
+   if test x$config_xstormy16 = xtrue; then
+  CONFIG_XSTORMY16_TRUE=
+  CONFIG_XSTORMY16_FALSE='#'
+else
+  CONFIG_XSTORMY16_TRUE='#'
+  CONFIG_XSTORMY16_FALSE=
 fi
 
    if test x$config_xtensa = xtrue; then
@@ -5739,6 +5747,10 @@ if test -z "${CONFIG_WINCE_TRUE}" && test -z "${CONFIG_WINCE_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_WINCE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${CONFIG_XSTORMY16_TRUE}" && test -z "${CONFIG_XSTORMY16_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_XSTORMY16\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${CONFIG_XTENSA_TRUE}" && test -z "${CONFIG_XTENSA_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_XTENSA\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -6410,7 +6422,6 @@ do
     "mt/Makefile") CONFIG_FILES="$CONFIG_FILES mt/Makefile" ;;
     "visium/Makefile") CONFIG_FILES="$CONFIG_FILES visium/Makefile" ;;
     "xc16x/Makefile") CONFIG_FILES="$CONFIG_FILES xc16x/Makefile" ;;
-    "xstormy16/Makefile") CONFIG_FILES="$CONFIG_FILES xstormy16/Makefile" ;;
     "m32c/Makefile") CONFIG_FILES="$CONFIG_FILES m32c/Makefile" ;;
     "rl78/Makefile") CONFIG_FILES="$CONFIG_FILES rl78/Makefile" ;;
     "rx/Makefile") CONFIG_FILES="$CONFIG_FILES rx/Makefile" ;;
