@@ -607,7 +607,10 @@ MIPS_BSP_LIST
 MIPS_SCRIPT_LIST
 MIPS_PART_SPECIFIC_DEFINES
 MIPS_PART_SPECIFIC_OBJ
-MCORE_BSP_PREFIX
+MCORE_BUILD_PE_FALSE
+MCORE_BUILD_PE_TRUE
+MCORE_BUILD_ELF_FALSE
+MCORE_BUILD_ELF_TRUE
 M68K_TARGET
 I386_CPPFLAGS
 ARM_OBJTYPE
@@ -659,6 +662,8 @@ CONFIG_MN10300_FALSE
 CONFIG_MN10300_TRUE
 CONFIG_MN10200_FALSE
 CONFIG_MN10200_TRUE
+CONFIG_MCORE_FALSE
+CONFIG_MCORE_TRUE
 CONFIG_LM32_FALSE
 CONFIG_LM32_TRUE
 CONFIG_LIBNOSYS_FALSE
@@ -2897,9 +2902,7 @@ case "${target}" in
 	config_lm32=true
 	;;
   mcore-*-*)
-	ac_config_files="$ac_config_files mcore/Makefile"
-
-	subdirs="$subdirs mcore"
+	config_mcore=true
 	;;
   mep-*-*)
 	ac_config_files="$ac_config_files mep/Makefile"
@@ -3091,6 +3094,14 @@ fi
 else
   CONFIG_LM32_TRUE='#'
   CONFIG_LM32_FALSE=
+fi
+
+   if test x$config_mcore = xtrue; then
+  CONFIG_MCORE_TRUE=
+  CONFIG_MCORE_FALSE='#'
+else
+  CONFIG_MCORE_TRUE='#'
+  CONFIG_MCORE_FALSE=
 fi
 
    if test x$config_mn10200 = xtrue; then
@@ -5271,15 +5282,31 @@ $as_echo "$M68K_TARGET" >&6; }
 esac
 
 
-MCORE_BSP_PREFIX=
-case "${target}" in
-  mcore-*-elf)
-	MCORE_BSP_PREFIX=elf-
-	;;
-  mcore-*-pe)
-	MCORE_BSP_PREFIX=pe-
-	;;
+MCORE_BUILD_ELF=false
+MCORE_BUILD_PE=false
+case ${target} in #(
+  mcore-*-elf) :
+    MCORE_BUILD_ELF=true ;; #(
+  mcore-*-pe) :
+    MCORE_BUILD_PE=true ;; #(
+  *) :
+     ;;
 esac
+ if $MCORE_BUILD_ELF; then
+  MCORE_BUILD_ELF_TRUE=
+  MCORE_BUILD_ELF_FALSE='#'
+else
+  MCORE_BUILD_ELF_TRUE='#'
+  MCORE_BUILD_ELF_FALSE=
+fi
+
+ if $MCORE_BUILD_PE; then
+  MCORE_BUILD_PE_TRUE=
+  MCORE_BUILD_PE_FALSE='#'
+else
+  MCORE_BUILD_PE_TRUE='#'
+  MCORE_BUILD_PE_FALSE=
+fi
 
 
 MIPS_PART_SPECIFIC_OBJ=
@@ -5664,6 +5691,10 @@ if test -z "${CONFIG_LM32_TRUE}" && test -z "${CONFIG_LM32_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_LM32\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${CONFIG_MCORE_TRUE}" && test -z "${CONFIG_MCORE_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_MCORE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${CONFIG_MN10200_TRUE}" && test -z "${CONFIG_MN10200_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_MN10200\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -5710,6 +5741,14 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCCAS_TRUE}" && test -z "${am__fastdepCCAS_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCCAS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${MCORE_BUILD_ELF_TRUE}" && test -z "${MCORE_BUILD_ELF_FALSE}"; then
+  as_fn_error $? "conditional \"MCORE_BUILD_ELF\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${MCORE_BUILD_PE_TRUE}" && test -z "${MCORE_BUILD_PE_FALSE}"; then
+  as_fn_error $? "conditional \"MCORE_BUILD_PE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${MN10300_BUILD_LIBCYGMON_TRUE}" && test -z "${MN10300_BUILD_LIBCYGMON_FALSE}"; then
@@ -6355,7 +6394,6 @@ do
     "crx/Makefile") CONFIG_FILES="$CONFIG_FILES crx/Makefile" ;;
     "fr30/Makefile") CONFIG_FILES="$CONFIG_FILES fr30/Makefile" ;;
     "ft32/Makefile") CONFIG_FILES="$CONFIG_FILES ft32/Makefile" ;;
-    "mcore/Makefile") CONFIG_FILES="$CONFIG_FILES mcore/Makefile" ;;
     "mep/Makefile") CONFIG_FILES="$CONFIG_FILES mep/Makefile" ;;
     "microblaze/Makefile") CONFIG_FILES="$CONFIG_FILES microblaze/Makefile" ;;
     "mt/Makefile") CONFIG_FILES="$CONFIG_FILES mt/Makefile" ;;

@@ -115,6 +115,9 @@ endif
 if CONFIG_LM32
 include lm32/Makefile.inc
 endif
+if CONFIG_MCORE
+include mcore/Makefile.inc
+endif
 if CONFIG_MN10200
 include mn10200/Makefile.inc
 endif
