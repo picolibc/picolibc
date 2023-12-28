@@ -34,9 +34,9 @@
 #
 picolibc_sources(
   asprintf.c
+  atold_engine.c
   bufio.c
   clearerr.c
-  compare_exchange.c
   dtox_engine.c
   ecvt.c
   ecvtf.c
@@ -44,8 +44,6 @@ picolibc_sources(
   ecvtl.c
   ecvtl_r.c
   ecvt_r.c
-  exchange.c
-  fclose.c
   fclose.c
   fcvt.c
   fcvtf.c
@@ -54,7 +52,6 @@ picolibc_sources(
   fcvtl_r.c
   fcvt_r.c
   fdevopen.c
-  fdopen.c
   feof.c
   ferror.c
   fflush.c
@@ -68,14 +65,12 @@ picolibc_sources(
   filestrput.c
   filewstrget.c
   fmemopen.c
-  fopen.c
   fprintf.c
   fputc.c
   fputs.c
   fputwc.c
   fputws.c
   fread.c
-  freopen.c
   fscanf.c
   fseek.c
   fseeko.c
@@ -120,15 +115,22 @@ picolibc_sources(
   sscanf.c
   strfromd.c
   strfromf.c
+  strfroml.c
   strtod.c
   strtod_l.c
   strtof.c
   strtof_l.c
   strtoimax.c
   strtol.c
+  strtold.c
+  strtold_l.c
+  strtol_l.c
   strtoll.c
+  strtoll_l.c
   strtoul.c
+  strtoul_l.c
   strtoull.c
+  strtoull_l.c
   strtoumax.c
   swprintf.c
   swscanf.c
@@ -156,8 +158,21 @@ picolibc_sources(
   vsscanf.c
   vswprintf.c
   vswscanf.c
+  vwprintf.c
+  vwscanf.c
   wprintf.c
   wscanf.c
+  )
+
+picolibc_sources(
+  compare_exchange.c
+  exchange.c
+  )  
+
+picolibc_sources(
+  fdopen.c
+  fopen.c
+  freopen.c
   )
 
 if(_IO_FLOAT_EXACT)
