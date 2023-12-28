@@ -38,21 +38,23 @@ picolibc_sources(
   clearerr.c
   compare_exchange.c
   dtox_engine.c
-  ecvt_r.c
   ecvt.c
-  ecvtf_r.c
   ecvtf.c
-  ecvtl_r.c
+  ecvtf_r.c
   ecvtl.c
+  ecvtl_r.c
+  ecvt_r.c
   exchange.c
+  fclose.c
+  fclose.c
   fcvt.c
-  fcvt_r.c
   fcvtf.c
   fcvtf_r.c
   fcvtl.c
   fcvtl_r.c
-  fclose.c
+  fcvt_r.c
   fdevopen.c
+  fdopen.c
   feof.c
   ferror.c
   fflush.c
@@ -62,10 +64,11 @@ picolibc_sources(
   fgetws.c
   fileno.c
   filestrget.c
-  filestrput.c
   filestrputalloc.c
+  filestrput.c
   filewstrget.c
   fmemopen.c
+  fopen.c
   fprintf.c
   fputc.c
   fputs.c
@@ -80,8 +83,8 @@ picolibc_sources(
   ftello.c
   ftox_engine.c
   fwide.c
-  fwrite.c
   fwprintf.c
+  fwrite.c
   fwscanf.c
   gcvt.c
   gcvtf.c
@@ -107,19 +110,20 @@ picolibc_sources(
   setbuffer.c
   setlinebuf.c
   setvbuf.c
+  sflags.c
   snprintf.c
-  sprintf.c
   snprintfd.c
   snprintff.c
-  sprintff.c
+  sprintf.c
   sprintfd.c
+  sprintff.c
   sscanf.c
-  strfromf.c
   strfromd.c
-  strtof.c
-  strtof_l.c
+  strfromf.c
   strtod.c
   strtod_l.c
+  strtof.c
+  strtof_l.c
   strtoimax.c
   strtol.c
   strtoll.c
@@ -128,57 +132,53 @@ picolibc_sources(
   strtoumax.c
   swprintf.c
   swscanf.c
-  tmpnam.c
   tmpfile.c
+  tmpnam.c
   ungetc.c
   ungetwc.c
   vasprintf.c
   vffprintf.c
-  vfiprintf.c
-  vflprintf.c
-  vfmprintf.c
-  vfprintf.c
   vffscanf.c
+  vfiprintf.c
   vfiscanf.c
+  vflprintf.c
   vflscanf.c
+  vfmprintf.c
   vfmscanf.c
+  vfprintf.c
   vfscanf.c
   vfwprintf.c
   vfwscanf.c
   vprintf.c
   vscanf.c
-  vsscanf.c
   vsnprintf.c
   vsprintf.c
+  vsscanf.c
   vswprintf.c
   vswscanf.c
   wprintf.c
   wscanf.c
-  fopen.c
-  fdopen.c
-  fclose.c
-  sflags.c
   )
 
 if(_IO_FLOAT_EXACT)
   picolibc_sources(
-    dtoa_ryu.c
-    ftoa_ryu.c
-    ryu_table.c
     atod_ryu.c
     atof_ryu.c
-    ryu_log2pow5.c
-    ryu_log10.c
-    ryu_pow5bits.c
-    ryu_umul128.c
+    dtoa_ryu.c
+    ftoa_ryu.c
     ryu_divpow2.c
+    ryu_log10.c
+    ryu_log2pow5.c
+    ryu_pow5bits.c
+    ryu_table.c
+    ryu_umul128.c
     )
 else()
   picolibc_sources(
-    dtoa_engine.c
-    ftoa_engine.c
     atod_engine.c
     atof_engine.c
+    dtoa_engine.c
+    ftoa_engine.c
     )
 endif()
 
