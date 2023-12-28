@@ -1,6 +1,6 @@
 /* link stub for MMIXware.
 
-   Copyright (C) 2002 Hans-Peter Nilsson
+   Copyright (C) 2002, 2023 Hans-Peter Nilsson
 
    Permission to use, copy, modify, and distribute this software is
    freely granted, provided that the above copyright notice, this notice
@@ -18,7 +18,7 @@
 #include <errno.h>
 
 int
-_link ()
+_link (const char *p1 __unused, const char *p2 __unused)
 {
   errno = EMLINK;
   return -1;

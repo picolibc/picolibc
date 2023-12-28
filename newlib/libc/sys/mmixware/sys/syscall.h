@@ -1,6 +1,6 @@
 /* syscall defines for MMIXware.
 
-   Copyright (C) 2001, 2002, 2007 Hans-Peter Nilsson
+   Copyright (C) 2001, 2002, 2007, 2023 Hans-Peter Nilsson
 
    Permission to use, copy, modify, and distribute this software is
    freely granted, provided that the above copyright notice, this notice
@@ -10,6 +10,12 @@
    IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
    PURPOSE.  */
+
+/* The standard-library calls in UNIMPLEMENTED, defined below, need to
+   be declared.  Don't push the #include requirements to the caller.  */
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 
 /* These are the mmixware simulator calls that are of use in newlib.  */
 

@@ -1,6 +1,6 @@
 /* read for MMIXware.
 
-   Copyright (C) 2001 Hans-Peter Nilsson
+   Copyright (C) 2001, 2023 Hans-Peter Nilsson
 
    Permission to use, copy, modify, and distribute this software is
    freely granted, provided that the above copyright notice, this notice
@@ -19,7 +19,7 @@
 
 int
 _read (int file,
-       char *ptr,
+       void *ptr,
        size_t len)
 {
   long ret;

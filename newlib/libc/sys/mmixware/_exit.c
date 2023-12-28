@@ -1,6 +1,6 @@
 /* _exit for MMIXware.
 
-   Copyright (C) 2001 Hans-Peter Nilsson
+   Copyright (C) 2001, 2023 Hans-Peter Nilsson
 
    Permission to use, copy, modify, and distribute this software is
    freely granted, provided that the above copyright notice, this notice
@@ -27,4 +27,5 @@ void _exit (int n)
 	   : /* No outputs.  */
 	   : "r" (n)
 	   : "memory");
+  __unreachable ();
 }

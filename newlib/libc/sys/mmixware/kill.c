@@ -1,6 +1,6 @@
 /* kill for MMIXware.
 
-   Copyright (C) 2001 Hans-Peter Nilsson
+   Copyright (C) 2001, 2023 Hans-Peter Nilsson
 
    Permission to use, copy, modify, and distribute this software is
    freely granted, provided that the above copyright notice, this notice
@@ -17,7 +17,8 @@
 #include "sys/syscall.h"
 #include <errno.h>
 
-_kill (n, m)
+int
+_kill (pid_t n, int m __unused)
 {
   if (n == 1)
     return TRAP1i (SYS_halt, 0);

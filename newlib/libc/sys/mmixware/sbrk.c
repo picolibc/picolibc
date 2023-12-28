@@ -1,6 +1,6 @@
 /* sbrk for MMIXware.
 
-   Copyright (C) 2001, 2012 Hans-Peter Nilsson
+   Copyright (C) 2001, 2012, 2023 Hans-Peter Nilsson
 
    Permission to use, copy, modify, and distribute this software is
    freely granted, provided that the above copyright notice, this notice
@@ -31,10 +31,10 @@ __asm__ (" .global _Sbrk_high\n"
 	 "_Sbrk_high	IS	Pool_Segment\n"
 	 "Pool_Segment	IS	0x40<<56");
 
-caddr_t
-_sbrk (size_t incr)
+void *
+_sbrk (ptrdiff_t incr)
 {
-  char *prev_heap_end;
+  void *prev_heap_end;
 
   prev_heap_end = _Sbrk_high;
 
@@ -55,5 +55,5 @@ _sbrk (size_t incr)
     }
 
   _Sbrk_high += incr;
-  return (caddr_t) prev_heap_end;
+  return prev_heap_end;
 }
