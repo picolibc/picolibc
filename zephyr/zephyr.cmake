@@ -93,8 +93,6 @@ if(CONFIG_PICOLIBC_USE_MODULE)
 
   # Enable POSIX APIs
 
-  zephyr_compile_options(-D_POSIX_C_SOURCE=200809)
-
   # Link to C library and libgcc (on non-armclang toolchains)
 
   if(${ZEPHYR_TOOLCHAIN_VARIANT} STREQUAL "armclang")
