@@ -596,6 +596,8 @@ HAVE_XTENSA_BOARD_ESP32S3_TRUE
 HAVE_XTENSA_BOARD_ESP32_FALSE
 HAVE_XTENSA_BOARD_ESP32_TRUE
 XTENSA_BOARD_ESP
+SPARC_CYGMONLDSCRIPTTEMPL
+SPARC_CPU
 MOXIE_BUILD_CRT0_FALSE
 MOXIE_BUILD_CRT0_TRUE
 MN10300_BSP_LIST
@@ -5108,6 +5110,23 @@ esac
 
 
 
+SPARC_CPU=SPARC
+case ${target_cpu} in
+sparclite*) SPARC_CPU=SLITE ;;
+sparclet*) SPARC_CPU=SPLET ;;
+sparc64*) SPARC_CPU=SPARC64 ;;
+sparc86x*) SPARC_CPU=SLITE ;;
+esac
+
+
+SPARC_CYGMONLDSCRIPTTEMPL=cygmon.ld.src
+case ${target_cpu} in
+sparc64*) SPARC_CYGMONLDSCRIPTTEMPL=cygmon-sparc64-ld.src ;;
+sparclet-*-aout*) SPARC_CYGMONLDSCRIPTTEMPL=cygmon.ld.src; ac_config_files="$ac_config_files sparc/libsys/Makefile"
+ ;;
+esac
+
+
 XTENSA_BOARD_ESP=`echo $CC | sed 's/.*-mdynconfig=xtensa_\(.*\)\.so.*/\1/;s/.*-mcpu=\(^ *\).*/\1/;s/.* .*/unknown/'`
 
  if test x$XTENSA_BOARD_ESP = xesp32; then
@@ -6069,6 +6088,7 @@ do
     "or1k/Makefile") CONFIG_FILES="$CONFIG_FILES or1k/Makefile" ;;
     "pru/Makefile") CONFIG_FILES="$CONFIG_FILES pru/Makefile" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
+    "sparc/libsys/Makefile") CONFIG_FILES="$CONFIG_FILES sparc/libsys/Makefile" ;;
     "default-1") CONFIG_COMMANDS="$CONFIG_COMMANDS default-1" ;;
     "default-2") CONFIG_COMMANDS="$CONFIG_COMMANDS default-2" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;

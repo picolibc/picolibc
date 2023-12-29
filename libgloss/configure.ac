@@ -351,6 +351,7 @@ m4_include([mcore/acinclude.m4])
 m4_include([mips/acinclude.m4])
 m4_include([mn10300/acinclude.m4])
 m4_include([moxie/acinclude.m4])
+m4_include([sparc/acinclude.m4])
 m4_include([xtensa/acinclude.m4])
 
 AC_CACHE_CHECK([for compiler search settings], libc_cv_compiler_isystem, [dnl

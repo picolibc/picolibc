@@ -170,7 +170,7 @@ sparcl-stub.o: $(srcdir)/sparcl-stub.c $(srcdir)/../debug.h $(srcdir)/../debug.c
 erc32-stub.o: $(srcdir)/erc32-stub.c $(srcdir)/../debug.h $(srcdir)/../debug.c
 fixctors.o : $(srcdir)/fixctors.c
 
-$(objdir)/cygmon.ld: @SPARC_CYGMONLDSCRIPTTEMPL@
+$(objdir)/cygmon.ld: $(srcdir)/@SPARC_CYGMONLDSCRIPTTEMPL@
 	sed 's/TARGET_OBJ_FORMAT/$($(CPU)_OBJ_FORMAT)/g;s/TARGET_RAM_START/$($(CPU)_RAM_START)/g;' < $(<) > $(objdir)/cygmon.ld
 
 install: $($(CPU)_INSTALL)

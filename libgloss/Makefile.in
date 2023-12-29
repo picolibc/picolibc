@@ -235,6 +235,7 @@ am__aclocal_m4_deps = $(top_srcdir)/../config/depstand.m4 \
 	$(top_srcdir)/mips/acinclude.m4 \
 	$(top_srcdir)/mn10300/acinclude.m4 \
 	$(top_srcdir)/moxie/acinclude.m4 \
+	$(top_srcdir)/sparc/acinclude.m4 \
 	$(top_srcdir)/xtensa/acinclude.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
@@ -253,7 +254,8 @@ CONFIG_CLEAN_FILES = epiphany/Makefile i386/Makefile m32r/Makefile \
 	moxie/Makefile microblaze/Makefile mt/Makefile v850/Makefile \
 	visium/Makefile xc16x/Makefile xstormy16/Makefile \
 	m32c/Makefile msp430/Makefile rl78/Makefile rx/Makefile \
-	spu/Makefile tic6x/Makefile or1k/Makefile pru/Makefile
+	spu/Makefile tic6x/Makefile or1k/Makefile pru/Makefile \
+	sparc/libsys/Makefile
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -822,6 +824,8 @@ PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
+SPARC_CPU = @SPARC_CPU@
+SPARC_CYGMONLDSCRIPTTEMPL = @SPARC_CYGMONLDSCRIPTTEMPL@
 STRIP = @STRIP@
 VERSION = @VERSION@
 XTENSA_BOARD_ESP = @XTENSA_BOARD_ESP@
@@ -1344,6 +1348,8 @@ tic6x/Makefile: $(top_builddir)/config.status $(top_srcdir)/tic6x/Makefile.in
 or1k/Makefile: $(top_builddir)/config.status $(top_srcdir)/or1k/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 pru/Makefile: $(top_builddir)/config.status $(top_srcdir)/pru/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+sparc/libsys/Makefile: $(top_builddir)/config.status $(top_srcdir)/sparc/libsys/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-multilibtoolLIBRARIES: $(multilibtool_LIBRARIES)
 	@$(NORMAL_INSTALL)
