@@ -133,8 +133,7 @@ case "${target}" in
 	config_d30v=true
 	;;
   fr30-*-*)
-	AC_CONFIG_FILES([fr30/Makefile])
-	subdirs="$subdirs fr30"
+	config_fr30=true
 	;;
   frv*-*-*)
 	config_frv=true
@@ -230,7 +229,8 @@ AC_SUBST(subdirs)
 dnl These subdirs have converted to non-recursive make.  Hopefully someday all
 dnl the ports above will too!
 m4_foreach_w([SUBDIR], [
-  aarch64 arc arm bfin csky d30v epiphany frv i386 i960 iq2000 libnosys lm32
+  aarch64 arc arm bfin csky d30v epiphany fr30 frv i386 i960 iq2000
+  libnosys lm32
   m32r mcore mn10200 mn10300 moxie msp430
   nds32 nios2 or1k riscv rl78 rx v850 visium wince xstormy16 xtensa
 ], [dnl

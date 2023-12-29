@@ -101,6 +101,9 @@ endif
 if CONFIG_EPIPHANY
 include epiphany/Makefile.inc
 endif
+if CONFIG_FR30
+include fr30/Makefile.inc
+endif
 if CONFIG_FRV
 include frv/Makefile.inc
 endif

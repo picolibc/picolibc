@@ -690,6 +690,8 @@ CONFIG_I386_FALSE
 CONFIG_I386_TRUE
 CONFIG_FRV_FALSE
 CONFIG_FRV_TRUE
+CONFIG_FR30_FALSE
+CONFIG_FR30_TRUE
 CONFIG_EPIPHANY_FALSE
 CONFIG_EPIPHANY_TRUE
 CONFIG_D30V_FALSE
@@ -2895,9 +2897,7 @@ case "${target}" in
 	config_d30v=true
 	;;
   fr30-*-*)
-	ac_config_files="$ac_config_files fr30/Makefile"
-
-	subdirs="$subdirs fr30"
+	config_fr30=true
 	;;
   frv*-*-*)
 	config_frv=true
@@ -3053,6 +3053,14 @@ fi
 else
   CONFIG_EPIPHANY_TRUE='#'
   CONFIG_EPIPHANY_FALSE=
+fi
+
+   if test x$config_fr30 = xtrue; then
+  CONFIG_FR30_TRUE=
+  CONFIG_FR30_FALSE='#'
+else
+  CONFIG_FR30_TRUE='#'
+  CONFIG_FR30_FALSE=
 fi
 
    if test x$config_frv = xtrue; then
@@ -5734,6 +5742,10 @@ if test -z "${CONFIG_EPIPHANY_TRUE}" && test -z "${CONFIG_EPIPHANY_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_EPIPHANY\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${CONFIG_FR30_TRUE}" && test -z "${CONFIG_FR30_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_FR30\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${CONFIG_FRV_TRUE}" && test -z "${CONFIG_FRV_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_FRV\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -6484,7 +6496,6 @@ do
     "cr16/Makefile") CONFIG_FILES="$CONFIG_FILES cr16/Makefile" ;;
     "cris/Makefile") CONFIG_FILES="$CONFIG_FILES cris/Makefile" ;;
     "crx/Makefile") CONFIG_FILES="$CONFIG_FILES crx/Makefile" ;;
-    "fr30/Makefile") CONFIG_FILES="$CONFIG_FILES fr30/Makefile" ;;
     "ft32/Makefile") CONFIG_FILES="$CONFIG_FILES ft32/Makefile" ;;
     "mep/Makefile") CONFIG_FILES="$CONFIG_FILES mep/Makefile" ;;
     "microblaze/Makefile") CONFIG_FILES="$CONFIG_FILES microblaze/Makefile" ;;
