@@ -89,8 +89,7 @@ case "${target}" in
 	subdirs="$subdirs sparc_leon"
 	;;
   sparclet-*-aout* | sparc-*-elf* | sparc64-*-elf* | sparc86x-*-* | sparclite-*-*)
-	AC_CONFIG_FILES([sparc/Makefile])
-	subdirs="$subdirs sparc"
+	config_sparc=true
 	;;
   sh*-*-pe | mips*-*-pe | *arm*-wince-pe)
 	config_wince=true
@@ -231,7 +230,7 @@ m4_foreach_w([SUBDIR], [
   aarch64 arc arm bfin csky d30v epiphany fr30 frv ft32 i386 i960 iq2000
   libnosys lm32
   m32r mcore mn10200 mn10300 moxie msp430
-  nds32 nios2 or1k riscv rl78 rx v850 visium wince xstormy16 xtensa
+  nds32 nios2 or1k riscv rl78 rx sparc v850 visium wince xstormy16 xtensa
 ], [dnl
   AM_CONDITIONAL([CONFIG_]m4_toupper(SUBDIR), [test x$config_]SUBDIR = xtrue)
 ])
