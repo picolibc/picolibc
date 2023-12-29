@@ -31,6 +31,16 @@ AM_CPPFLAGS = -idirafter $(srcroot)/include
 noinst_LIBRARIES = libobjs.a
 libobjs_a_SOURCES =
 
+## Some convenience rules for debugging programs.
+%.dis: %
+	$(AM_V_GEN)$(OBJDUMP) -d $< > $@
+%.bin: %
+	$(AM_V_GEN)$(OBJCOPY) -O binary $< $@
+%.hex: %
+	$(AM_V_GEN)$(OBJCOPY) -O ihex $< $@
+%.srec: %
+	$(AM_V_GEN)$(OBJCOPY) -O srec $< $@
+
 ## These are roughly topologically sorted in order to make porting more
 ## streamlined.
 FLAGS_TO_PASS = \

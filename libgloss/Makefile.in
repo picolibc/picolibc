@@ -5693,6 +5693,15 @@ uninstall-am: uninstall-aarch64_cpu_initcpuinitDATA \
 .PRECIOUS: Makefile
 
 
+%.dis: %
+	$(AM_V_GEN)$(OBJDUMP) -d $< > $@
+%.bin: %
+	$(AM_V_GEN)$(OBJCOPY) -O binary $< $@
+%.hex: %
+	$(AM_V_GEN)$(OBJCOPY) -O ihex $< $@
+%.srec: %
+	$(AM_V_GEN)$(OBJCOPY) -O srec $< $@
+
 # GNU Make needs to see an explicit $(MAKE) variable in the command it
 # runs to enable its job server during parallel builds.  Hence the
 # comments below.
