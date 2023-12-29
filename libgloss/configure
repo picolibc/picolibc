@@ -688,6 +688,8 @@ CONFIG_I960_FALSE
 CONFIG_I960_TRUE
 CONFIG_I386_FALSE
 CONFIG_I386_TRUE
+CONFIG_FT32_FALSE
+CONFIG_FT32_TRUE
 CONFIG_FRV_FALSE
 CONFIG_FRV_TRUE
 CONFIG_FR30_FALSE
@@ -2903,9 +2905,7 @@ case "${target}" in
 	config_frv=true
 	;;
   ft32*-*-*)
-	ac_config_files="$ac_config_files ft32/Makefile"
-
-	subdirs="$subdirs ft32"
+	config_ft32=true
 	;;
   lm32*-*-*)
 	config_lm32=true
@@ -3069,6 +3069,14 @@ fi
 else
   CONFIG_FRV_TRUE='#'
   CONFIG_FRV_FALSE=
+fi
+
+   if test x$config_ft32 = xtrue; then
+  CONFIG_FT32_TRUE=
+  CONFIG_FT32_FALSE='#'
+else
+  CONFIG_FT32_TRUE='#'
+  CONFIG_FT32_FALSE=
 fi
 
    if test x$config_i386 = xtrue; then
@@ -5750,6 +5758,10 @@ if test -z "${CONFIG_FRV_TRUE}" && test -z "${CONFIG_FRV_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_FRV\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${CONFIG_FT32_TRUE}" && test -z "${CONFIG_FT32_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_FT32\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${CONFIG_I386_TRUE}" && test -z "${CONFIG_I386_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_I386\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -6496,7 +6508,6 @@ do
     "cr16/Makefile") CONFIG_FILES="$CONFIG_FILES cr16/Makefile" ;;
     "cris/Makefile") CONFIG_FILES="$CONFIG_FILES cris/Makefile" ;;
     "crx/Makefile") CONFIG_FILES="$CONFIG_FILES crx/Makefile" ;;
-    "ft32/Makefile") CONFIG_FILES="$CONFIG_FILES ft32/Makefile" ;;
     "mep/Makefile") CONFIG_FILES="$CONFIG_FILES mep/Makefile" ;;
     "microblaze/Makefile") CONFIG_FILES="$CONFIG_FILES microblaze/Makefile" ;;
     "mt/Makefile") CONFIG_FILES="$CONFIG_FILES mt/Makefile" ;;

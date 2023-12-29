@@ -178,113 +178,119 @@ multilibtool_PROGRAMS = $(am__EXEEXT_6)
 @CONFIG_FRV_TRUE@am__append_29 = frv/crt0.o
 @CONFIG_FRV_TRUE@am__append_30 = frv/crt0.S
 @CONFIG_FRV_TRUE@am__append_31 = frv/libsim.a
-@CONFIG_I386_TRUE@am__append_32 = i386/cygmon.ld i386/cygmon-crt0.o
-@CONFIG_I386_TRUE@am__append_33 = i386/cygmon-crt0.S
-@CONFIG_I386_TRUE@am__append_34 = i386/libcygmon.a
-@CONFIG_I960_TRUE@am__append_35 = i960/crt0.o i960/mon960.ld
-@CONFIG_I960_TRUE@am__append_36 = \
+@CONFIG_FT32_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_32 = \
+@CONFIG_FT32_TRUE@@HAVE_MULTISUBDIR_FALSE@	ft32/sim.ld
+
+@CONFIG_FT32_TRUE@am__append_33 = ft32/crt0.o
+@CONFIG_FT32_TRUE@am__append_34 = ft32/crt0.S
+@CONFIG_FT32_TRUE@am__append_35 = ft32/libsim.a
+@CONFIG_I386_TRUE@am__append_36 = i386/cygmon.ld i386/cygmon-crt0.o
+@CONFIG_I386_TRUE@am__append_37 = i386/cygmon-crt0.S
+@CONFIG_I386_TRUE@am__append_38 = i386/libcygmon.a
+@CONFIG_I960_TRUE@am__append_39 = i960/crt0.o i960/mon960.ld
+@CONFIG_I960_TRUE@am__append_40 = \
 @CONFIG_I960_TRUE@	i960/crt0.c
 
-@CONFIG_I960_TRUE@am__append_37 = i960/libmon960.a
-@CONFIG_IQ2000_TRUE@am__append_38 = iq2000/crt0.o iq2000/sim.ld
-@CONFIG_IQ2000_TRUE@am__append_39 = iq2000/libeval.a
-@CONFIG_IQ2000_TRUE@am__append_40 = iq2000/crt0.S iq2000/test.o
-@CONFIG_IQ2000_TRUE@am__append_41 = iq2000/test
-@CONFIG_LIBNOSYS_TRUE@am__append_42 = libnosys/nosys.specs
-@CONFIG_LIBNOSYS_TRUE@am__append_43 = libnosys/libnosys.a
-@CONFIG_LM32_TRUE@am__append_44 = lm32/crt0.o lm32/sim.ld
-@CONFIG_LM32_TRUE@am__append_45 = lm32/libgloss.a
-@CONFIG_LM32_TRUE@am__append_46 = lm32/crt0.S
-@CONFIG_M32R_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_47 = \
+@CONFIG_I960_TRUE@am__append_41 = i960/libmon960.a
+@CONFIG_IQ2000_TRUE@am__append_42 = iq2000/crt0.o iq2000/sim.ld
+@CONFIG_IQ2000_TRUE@am__append_43 = iq2000/libeval.a
+@CONFIG_IQ2000_TRUE@am__append_44 = iq2000/crt0.S iq2000/test.o
+@CONFIG_IQ2000_TRUE@am__append_45 = iq2000/test
+@CONFIG_LIBNOSYS_TRUE@am__append_46 = libnosys/nosys.specs
+@CONFIG_LIBNOSYS_TRUE@am__append_47 = libnosys/libnosys.a
+@CONFIG_LM32_TRUE@am__append_48 = lm32/crt0.o lm32/sim.ld
+@CONFIG_LM32_TRUE@am__append_49 = lm32/libgloss.a
+@CONFIG_LM32_TRUE@am__append_50 = lm32/crt0.S
+@CONFIG_M32R_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_51 = \
 @CONFIG_M32R_TRUE@@HAVE_MULTISUBDIR_FALSE@	m32r/eva.ld \
 @CONFIG_M32R_TRUE@@HAVE_MULTISUBDIR_FALSE@	m32r/eva-stub.ld \
 @CONFIG_M32R_TRUE@@HAVE_MULTISUBDIR_FALSE@	m32r/mon.specs
 
-@CONFIG_M32R_TRUE@am__append_48 = m32r/crt0.o m32r/m32r-lib.o \
+@CONFIG_M32R_TRUE@am__append_52 = m32r/crt0.o m32r/m32r-lib.o \
 @CONFIG_M32R_TRUE@	m32r/m32r-stub.o
-@CONFIG_M32R_TRUE@am__append_49 = m32r/crt0.S m32r/m32r-lib.c \
+@CONFIG_M32R_TRUE@am__append_53 = m32r/crt0.S m32r/m32r-lib.c \
 @CONFIG_M32R_TRUE@	m32r/m32r-stub.c
-@CONFIG_M32R_TRUE@am__append_50 = m32r/libgloss.a m32r/libmon.a
-@CONFIG_MCORE_TRUE@@MCORE_BUILD_ELF_TRUE@am__append_51 = \
+@CONFIG_M32R_TRUE@am__append_54 = m32r/libgloss.a m32r/libmon.a
+@CONFIG_MCORE_TRUE@@MCORE_BUILD_ELF_TRUE@am__append_55 = \
 @CONFIG_MCORE_TRUE@@MCORE_BUILD_ELF_TRUE@	mcore/cmb.ld \
 @CONFIG_MCORE_TRUE@@MCORE_BUILD_ELF_TRUE@	mcore/cmb.specs
 
-@CONFIG_MCORE_TRUE@@MCORE_BUILD_PE_TRUE@am__append_52 = \
+@CONFIG_MCORE_TRUE@@MCORE_BUILD_PE_TRUE@am__append_56 = \
 @CONFIG_MCORE_TRUE@@MCORE_BUILD_PE_TRUE@	mcore/cmb.ld \
 @CONFIG_MCORE_TRUE@@MCORE_BUILD_PE_TRUE@	mcore/cmb.specs
 
-@CONFIG_MCORE_TRUE@am__append_53 = mcore/crt0.o
-@CONFIG_MCORE_TRUE@am__append_54 = mcore/crt0.S
-@CONFIG_MCORE_TRUE@am__append_55 = mcore/libsim.a mcore/libcmb.a
-@CONFIG_MN10200_TRUE@am__append_56 = mn10200/eval.ld mn10200/sim.ld \
+@CONFIG_MCORE_TRUE@am__append_57 = mcore/crt0.o
+@CONFIG_MCORE_TRUE@am__append_58 = mcore/crt0.S
+@CONFIG_MCORE_TRUE@am__append_59 = mcore/libsim.a mcore/libcmb.a
+@CONFIG_MN10200_TRUE@am__append_60 = mn10200/eval.ld mn10200/sim.ld \
 @CONFIG_MN10200_TRUE@	mn10200/crt0.o
-@CONFIG_MN10200_TRUE@am__append_57 = mn10200/crt0.S
-@CONFIG_MN10200_TRUE@am__append_58 = mn10200/libeval.a
-@CONFIG_MN10200_TRUE@am__append_59 = mn10200/test
-@CONFIG_MN10300_TRUE@am__append_60 = \
+@CONFIG_MN10200_TRUE@am__append_61 = mn10200/crt0.S
+@CONFIG_MN10200_TRUE@am__append_62 = mn10200/libeval.a
+@CONFIG_MN10200_TRUE@am__append_63 = mn10200/test
+@CONFIG_MN10300_TRUE@am__append_64 = \
 @CONFIG_MN10300_TRUE@	mn10300/eval.ld \
 @CONFIG_MN10300_TRUE@	mn10300/sim.ld
 
-@CONFIG_MN10300_TRUE@@MN10300_BUILD_LIBCYGMON_TRUE@am__append_61 = \
+@CONFIG_MN10300_TRUE@@MN10300_BUILD_LIBCYGMON_TRUE@am__append_65 = \
 @CONFIG_MN10300_TRUE@@MN10300_BUILD_LIBCYGMON_TRUE@	mn10300/asb2303.ld \
 @CONFIG_MN10300_TRUE@@MN10300_BUILD_LIBCYGMON_TRUE@	mn10300/asb2305.ld
 
-@CONFIG_MN10300_TRUE@am__append_62 = \
+@CONFIG_MN10300_TRUE@am__append_66 = \
 @CONFIG_MN10300_TRUE@	mn10300/crt0.o \
 @CONFIG_MN10300_TRUE@	mn10300/crt0_cygmon.o \
 @CONFIG_MN10300_TRUE@	mn10300/crt0_redboot.o
 
-@CONFIG_MN10300_TRUE@am__append_63 = \
+@CONFIG_MN10300_TRUE@am__append_67 = \
 @CONFIG_MN10300_TRUE@	mn10300/crt0.S \
 @CONFIG_MN10300_TRUE@	mn10300/crt0_cygmon.S \
 @CONFIG_MN10300_TRUE@	mn10300/crt0_redboot.S
 
-@CONFIG_MN10300_TRUE@am__append_64 = mn10300/libeval.a
-@CONFIG_MN10300_TRUE@@MN10300_BUILD_LIBCYGMON_TRUE@am__append_65 = mn10300/libcygmon.a
-@CONFIG_MN10300_TRUE@am__append_66 = mn10300/test
-@CONFIG_MOXIE_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_67 = \
+@CONFIG_MN10300_TRUE@am__append_68 = mn10300/libeval.a
+@CONFIG_MN10300_TRUE@@MN10300_BUILD_LIBCYGMON_TRUE@am__append_69 = mn10300/libcygmon.a
+@CONFIG_MN10300_TRUE@am__append_70 = mn10300/test
+@CONFIG_MOXIE_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_71 = \
 @CONFIG_MOXIE_TRUE@@HAVE_MULTISUBDIR_FALSE@	moxie/moxie-elf-common.ld \
 @CONFIG_MOXIE_TRUE@@HAVE_MULTISUBDIR_FALSE@	moxie/qemu.ld \
 @CONFIG_MOXIE_TRUE@@HAVE_MULTISUBDIR_FALSE@	moxie/sim.ld \
 @CONFIG_MOXIE_TRUE@@HAVE_MULTISUBDIR_FALSE@	moxie/moxiebox.ld
 
-@CONFIG_MOXIE_TRUE@@MOXIE_BUILD_CRT0_TRUE@am__append_68 = moxie/crt0.o
-@CONFIG_MOXIE_TRUE@am__append_69 = \
+@CONFIG_MOXIE_TRUE@@MOXIE_BUILD_CRT0_TRUE@am__append_72 = moxie/crt0.o
+@CONFIG_MOXIE_TRUE@am__append_73 = \
 @CONFIG_MOXIE_TRUE@	moxie/crt0.S
 
-@CONFIG_MOXIE_TRUE@am__append_70 = moxie/libsim.a moxie/libqemu.a
-@CONFIG_MSP430_TRUE@am__append_71 = msp430/msp430-sim.ld \
+@CONFIG_MOXIE_TRUE@am__append_74 = moxie/libsim.a moxie/libqemu.a
+@CONFIG_MSP430_TRUE@am__append_75 = msp430/msp430-sim.ld \
 @CONFIG_MSP430_TRUE@	msp430/msp430xl-sim.ld \
 @CONFIG_MSP430_TRUE@	msp430/intr_vectors.ld msp430/gcrt0.o \
 @CONFIG_MSP430_TRUE@	msp430/crt0.o
-@CONFIG_MSP430_TRUE@am__append_72 = \
+@CONFIG_MSP430_TRUE@am__append_76 = \
 @CONFIG_MSP430_TRUE@	msp430/gcrt0.S \
 @CONFIG_MSP430_TRUE@	msp430/crt0.S
 
-@CONFIG_MSP430_TRUE@am__append_73 = msp430/libsim.a msp430/libnosys.a \
+@CONFIG_MSP430_TRUE@am__append_77 = msp430/libsim.a msp430/libnosys.a \
 @CONFIG_MSP430_TRUE@	msp430/libcrt.a
-@CONFIG_NDS32_TRUE@am__append_74 = \
+@CONFIG_NDS32_TRUE@am__append_78 = \
 @CONFIG_NDS32_TRUE@	nds32/crt0.o \
 @CONFIG_NDS32_TRUE@	nds32/crt1.o
 
-@CONFIG_NDS32_TRUE@am__append_75 = \
+@CONFIG_NDS32_TRUE@am__append_79 = \
 @CONFIG_NDS32_TRUE@	nds32/crt0.S \
 @CONFIG_NDS32_TRUE@	nds32/crt1.S
 
-@CONFIG_NDS32_TRUE@am__append_76 = nds32/libgloss.a
-@CONFIG_NIOS2_TRUE@am__append_77 = \
+@CONFIG_NDS32_TRUE@am__append_80 = nds32/libgloss.a
+@CONFIG_NIOS2_TRUE@am__append_81 = \
 @CONFIG_NIOS2_TRUE@	nios2/qemu-hosted.ld
 
-@CONFIG_NIOS2_TRUE@am__append_78 = nios2/libnios2.a
-@CONFIG_OR1K_TRUE@am__append_79 = or1k/crt0.o
-@CONFIG_OR1K_TRUE@am__append_80 = or1k/crt0.S
-@CONFIG_OR1K_TRUE@am__append_81 = \
+@CONFIG_NIOS2_TRUE@am__append_82 = nios2/libnios2.a
+@CONFIG_OR1K_TRUE@am__append_83 = or1k/crt0.o
+@CONFIG_OR1K_TRUE@am__append_84 = or1k/crt0.S
+@CONFIG_OR1K_TRUE@am__append_85 = \
 @CONFIG_OR1K_TRUE@	or1k/include/or1k-asm.h \
 @CONFIG_OR1K_TRUE@	or1k/include/or1k-nop.h \
 @CONFIG_OR1K_TRUE@	or1k/include/or1k-sprs.h \
 @CONFIG_OR1K_TRUE@	or1k/include/or1k-support.h
 
-@CONFIG_OR1K_TRUE@am__append_82 = or1k/libor1k.a or1k/libboard-atlys.a \
+@CONFIG_OR1K_TRUE@am__append_86 = or1k/libor1k.a or1k/libboard-atlys.a \
 @CONFIG_OR1K_TRUE@	or1k/libboard-de0_nano.a \
 @CONFIG_OR1K_TRUE@	or1k/libboard-ml501.a \
 @CONFIG_OR1K_TRUE@	or1k/libboard-optimsoc.a \
@@ -293,55 +299,55 @@ multilibtool_PROGRAMS = $(am__EXEEXT_6)
 @CONFIG_OR1K_TRUE@	or1k/libboard-ordb1a3pe1500.a \
 @CONFIG_OR1K_TRUE@	or1k/libboard-ordb2a.a \
 @CONFIG_OR1K_TRUE@	or1k/libboard-orpsocrefdesign.a
-@CONFIG_RISCV_TRUE@am__append_83 = \
+@CONFIG_RISCV_TRUE@am__append_87 = \
 @CONFIG_RISCV_TRUE@	riscv/nano.specs \
 @CONFIG_RISCV_TRUE@	riscv/sim.specs \
 @CONFIG_RISCV_TRUE@	riscv/semihost.specs \
 @CONFIG_RISCV_TRUE@	riscv/crt0.o
 
-@CONFIG_RISCV_TRUE@am__append_84 = riscv/libgloss.a riscv/libsim.a \
+@CONFIG_RISCV_TRUE@am__append_88 = riscv/libgloss.a riscv/libsim.a \
 @CONFIG_RISCV_TRUE@	riscv/libsemihost.a
-@CONFIG_RL78_TRUE@am__append_85 = rl78/rl78.ld rl78/rl78-sim.ld \
+@CONFIG_RL78_TRUE@am__append_89 = rl78/rl78.ld rl78/rl78-sim.ld \
 @CONFIG_RL78_TRUE@	rl78/gcrt0.o rl78/crt0.o rl78/crtn.o
-@CONFIG_RL78_TRUE@am__append_86 = \
+@CONFIG_RL78_TRUE@am__append_90 = \
 @CONFIG_RL78_TRUE@	rl78/gcrt0.S \
 @CONFIG_RL78_TRUE@	rl78/crt0.S \
 @CONFIG_RL78_TRUE@	rl78/crtn.S
 
-@CONFIG_RL78_TRUE@am__append_87 = rl78/libsim.a
-@CONFIG_RX_TRUE@am__append_88 = rx/rx.ld rx/rx-sim.ld rx/gcrt0.o \
+@CONFIG_RL78_TRUE@am__append_91 = rl78/libsim.a
+@CONFIG_RX_TRUE@am__append_92 = rx/rx.ld rx/rx-sim.ld rx/gcrt0.o \
 @CONFIG_RX_TRUE@	rx/crt0.o rx/crtn.o
-@CONFIG_RX_TRUE@am__append_89 = \
+@CONFIG_RX_TRUE@am__append_93 = \
 @CONFIG_RX_TRUE@	rx/gcrt0.S \
 @CONFIG_RX_TRUE@	rx/crt0.S \
 @CONFIG_RX_TRUE@	rx/crtn.S
 
-@CONFIG_RX_TRUE@am__append_90 = rx/libsim.a
-@CONFIG_V850_TRUE@am__append_91 = v850/crt0.o
-@CONFIG_V850_TRUE@am__append_92 = v850/crt0.S
-@CONFIG_V850_TRUE@am__append_93 = v850/libsim.a
-@CONFIG_VISIUM_TRUE@am__append_94 = visium/crt0.o
-@CONFIG_VISIUM_TRUE@am__append_95 = visium/crt0.S
-@CONFIG_VISIUM_TRUE@am__append_96 = visium/libserial.a visium/libsim.a \
-@CONFIG_VISIUM_TRUE@	visium/libdebug.a
-@CONFIG_WINCE_TRUE@am__append_97 = $(gdbdir)
-@CONFIG_WINCE_TRUE@am__append_98 = wince/stub.exe
-@CONFIG_XSTORMY16_TRUE@am__append_99 = xstormy16/crt0.o \
+@CONFIG_RX_TRUE@am__append_94 = rx/libsim.a
+@CONFIG_V850_TRUE@am__append_95 = v850/crt0.o
+@CONFIG_V850_TRUE@am__append_96 = v850/crt0.S
+@CONFIG_V850_TRUE@am__append_97 = v850/libsim.a
+@CONFIG_VISIUM_TRUE@am__append_98 = visium/crt0.o
+@CONFIG_VISIUM_TRUE@am__append_99 = visium/crt0.S
+@CONFIG_VISIUM_TRUE@am__append_100 = visium/libserial.a \
+@CONFIG_VISIUM_TRUE@	visium/libsim.a visium/libdebug.a
+@CONFIG_WINCE_TRUE@am__append_101 = $(gdbdir)
+@CONFIG_WINCE_TRUE@am__append_102 = wince/stub.exe
+@CONFIG_XSTORMY16_TRUE@am__append_103 = xstormy16/crt0.o \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/crti.o xstormy16/crtn.o \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/sim_high.ld \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/sim_rom.ld \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/eva_app.ld \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/eva_stub.hex
-@CONFIG_XSTORMY16_TRUE@am__append_100 = \
+@CONFIG_XSTORMY16_TRUE@am__append_104 = \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/crt0.s \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/crti.s \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/crtn.s
 
-@CONFIG_XSTORMY16_TRUE@am__append_101 = xstormy16/libsim.a \
+@CONFIG_XSTORMY16_TRUE@am__append_105 = xstormy16/libsim.a \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/libeva_app.a
-@CONFIG_XSTORMY16_TRUE@am__append_102 = xstormy16/eva_stub.elf
-@CONFIG_XSTORMY16_TRUE@am__append_103 = xstormy16/eva_stub.hex
-@CONFIG_XTENSA_TRUE@am__append_104 = \
+@CONFIG_XSTORMY16_TRUE@am__append_106 = xstormy16/eva_stub.elf
+@CONFIG_XSTORMY16_TRUE@am__append_107 = xstormy16/eva_stub.hex
+@CONFIG_XTENSA_TRUE@am__append_108 = \
 @CONFIG_XTENSA_TRUE@	xtensa/default.specs \
 @CONFIG_XTENSA_TRUE@	xtensa/nano.specs \
 @CONFIG_XTENSA_TRUE@	xtensa/sim.elf.specs \
@@ -350,29 +356,29 @@ multilibtool_PROGRAMS = $(am__EXEEXT_6)
 @CONFIG_XTENSA_TRUE@	xtensa/sys.openocd.specs \
 @CONFIG_XTENSA_TRUE@	xtensa/crt0.o
 
-@CONFIG_XTENSA_TRUE@am__append_105 = \
+@CONFIG_XTENSA_TRUE@am__append_109 = \
 @CONFIG_XTENSA_TRUE@	xtensa/crt0.S \
 @CONFIG_XTENSA_TRUE@	xtensa/crt1-sim.S \
 @CONFIG_XTENSA_TRUE@	xtensa/crt1-boards.S
 
-@CONFIG_XTENSA_TRUE@am__append_106 = xtensa/libgloss.a
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_107 = \
+@CONFIG_XTENSA_TRUE@am__append_110 = xtensa/libgloss.a
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_111 = \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/app.elf.ld \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/crt1-sim.o \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/crt1-boards.o
 
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_108 = xtensa/libsys_qemu.a \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_112 = xtensa/libsys_qemu.a \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/libsys_openocd.a
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_109 = xtensa/boards/esp32/memory.elf.ld
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_110 = xtensa/boards/esp32/board.c
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_111 = -I$(srcdir)/xtensa/boards/esp32/include
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_112 = -I$(srcdir)/xtensa/boards/esp32/include
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_113 = -I$(srcdir)/xtensa/boards/esp32/include
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_114 = xtensa/boards/esp32s3/memory.elf.ld
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_115 = xtensa/boards/esp32s3/board.c
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_116 = -I$(srcdir)/xtensa/boards/esp32s3/include
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_117 = -I$(srcdir)/xtensa/boards/esp32s3/include
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_118 = -I$(srcdir)/xtensa/boards/esp32s3/include
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_113 = xtensa/boards/esp32/memory.elf.ld
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_114 = xtensa/boards/esp32/board.c
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_115 = -I$(srcdir)/xtensa/boards/esp32/include
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_116 = -I$(srcdir)/xtensa/boards/esp32/include
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_117 = -I$(srcdir)/xtensa/boards/esp32/include
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_118 = xtensa/boards/esp32s3/memory.elf.ld
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_119 = xtensa/boards/esp32s3/board.c
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_120 = -I$(srcdir)/xtensa/boards/esp32s3/include
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_121 = -I$(srcdir)/xtensa/boards/esp32s3/include
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_122 = -I$(srcdir)/xtensa/boards/esp32s3/include
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../config/depstand.m4 \
@@ -400,9 +406,9 @@ CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES = m68hc11/Makefile m68k/Makefile pa/Makefile \
 	sparc_leon/Makefile sparc/Makefile mips/Makefile \
 	rs6000/Makefile cr16/Makefile cris/Makefile crx/Makefile \
-	ft32/Makefile mep/Makefile microblaze/Makefile mt/Makefile \
-	xc16x/Makefile m32c/Makefile spu/Makefile tic6x/Makefile \
-	pru/Makefile sparc/libsys/Makefile
+	mep/Makefile microblaze/Makefile mt/Makefile xc16x/Makefile \
+	m32c/Makefile spu/Makefile tic6x/Makefile pru/Makefile \
+	sparc/libsys/Makefile
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -586,6 +592,21 @@ frv_libsim_a_LIBADD =
 @CONFIG_FRV_TRUE@	frv/sim-unlink.$(OBJEXT) \
 @CONFIG_FRV_TRUE@	frv/sim-write.$(OBJEXT) frv/stat.$(OBJEXT)
 frv_libsim_a_OBJECTS = $(am_frv_libsim_a_OBJECTS)
+ft32_libsim_a_AR = $(AR) $(ARFLAGS)
+ft32_libsim_a_LIBADD =
+@CONFIG_FT32_TRUE@am_ft32_libsim_a_OBJECTS = ft32/fstat.$(OBJEXT) \
+@CONFIG_FT32_TRUE@	ft32/getpid.$(OBJEXT) ft32/isatty.$(OBJEXT) \
+@CONFIG_FT32_TRUE@	ft32/kill.$(OBJEXT) ft32/sbrk.$(OBJEXT) \
+@CONFIG_FT32_TRUE@	ft32/sim-close.$(OBJEXT) \
+@CONFIG_FT32_TRUE@	ft32/sim-exit.$(OBJEXT) \
+@CONFIG_FT32_TRUE@	ft32/sim-inbyte.$(OBJEXT) \
+@CONFIG_FT32_TRUE@	ft32/sim-lseek.$(OBJEXT) \
+@CONFIG_FT32_TRUE@	ft32/sim-open.$(OBJEXT) \
+@CONFIG_FT32_TRUE@	ft32/sim-read.$(OBJEXT) \
+@CONFIG_FT32_TRUE@	ft32/sim-time.$(OBJEXT) \
+@CONFIG_FT32_TRUE@	ft32/sim-unlink.$(OBJEXT) \
+@CONFIG_FT32_TRUE@	ft32/sim-write.$(OBJEXT) ft32/stat.$(OBJEXT)
+ft32_libsim_a_OBJECTS = $(am_ft32_libsim_a_OBJECTS)
 i386_libcygmon_a_AR = $(AR) $(ARFLAGS)
 i386_libcygmon_a_LIBADD =
 @CONFIG_I386_TRUE@am_i386_libcygmon_a_OBJECTS = i386/i386_libcygmon_a-cygmon-salib.$(OBJEXT) \
@@ -660,34 +681,35 @@ libobjs_a_LIBADD =
 @CONFIG_EPIPHANY_TRUE@am__objects_5 = epiphany/crt0.$(OBJEXT)
 @CONFIG_FR30_TRUE@am__objects_6 = fr30/crt0.$(OBJEXT)
 @CONFIG_FRV_TRUE@am__objects_7 = frv/crt0.$(OBJEXT)
-@CONFIG_I386_TRUE@am__objects_8 = i386/cygmon-crt0.$(OBJEXT)
-@CONFIG_I960_TRUE@am__objects_9 = i960/crt0.$(OBJEXT)
-@CONFIG_IQ2000_TRUE@am__objects_10 = iq2000/crt0.$(OBJEXT)
-@CONFIG_LM32_TRUE@am__objects_11 = lm32/crt0.$(OBJEXT)
-@CONFIG_M32R_TRUE@am__objects_12 = m32r/crt0.$(OBJEXT) \
+@CONFIG_FT32_TRUE@am__objects_8 = ft32/crt0.$(OBJEXT)
+@CONFIG_I386_TRUE@am__objects_9 = i386/cygmon-crt0.$(OBJEXT)
+@CONFIG_I960_TRUE@am__objects_10 = i960/crt0.$(OBJEXT)
+@CONFIG_IQ2000_TRUE@am__objects_11 = iq2000/crt0.$(OBJEXT)
+@CONFIG_LM32_TRUE@am__objects_12 = lm32/crt0.$(OBJEXT)
+@CONFIG_M32R_TRUE@am__objects_13 = m32r/crt0.$(OBJEXT) \
 @CONFIG_M32R_TRUE@	m32r/m32r-lib.$(OBJEXT) \
 @CONFIG_M32R_TRUE@	m32r/m32r-stub.$(OBJEXT)
-@CONFIG_MCORE_TRUE@am__objects_13 = mcore/crt0.$(OBJEXT)
-@CONFIG_MN10200_TRUE@am__objects_14 = mn10200/crt0.$(OBJEXT)
-@CONFIG_MN10300_TRUE@am__objects_15 = mn10300/crt0.$(OBJEXT) \
+@CONFIG_MCORE_TRUE@am__objects_14 = mcore/crt0.$(OBJEXT)
+@CONFIG_MN10200_TRUE@am__objects_15 = mn10200/crt0.$(OBJEXT)
+@CONFIG_MN10300_TRUE@am__objects_16 = mn10300/crt0.$(OBJEXT) \
 @CONFIG_MN10300_TRUE@	mn10300/crt0_cygmon.$(OBJEXT) \
 @CONFIG_MN10300_TRUE@	mn10300/crt0_redboot.$(OBJEXT)
-@CONFIG_MOXIE_TRUE@am__objects_16 = moxie/crt0.$(OBJEXT)
-@CONFIG_MSP430_TRUE@am__objects_17 = msp430/gcrt0.$(OBJEXT) \
+@CONFIG_MOXIE_TRUE@am__objects_17 = moxie/crt0.$(OBJEXT)
+@CONFIG_MSP430_TRUE@am__objects_18 = msp430/gcrt0.$(OBJEXT) \
 @CONFIG_MSP430_TRUE@	msp430/crt0.$(OBJEXT)
-@CONFIG_NDS32_TRUE@am__objects_18 = nds32/crt0.$(OBJEXT) \
+@CONFIG_NDS32_TRUE@am__objects_19 = nds32/crt0.$(OBJEXT) \
 @CONFIG_NDS32_TRUE@	nds32/crt1.$(OBJEXT)
-@CONFIG_OR1K_TRUE@am__objects_19 = or1k/crt0.$(OBJEXT)
-@CONFIG_RL78_TRUE@am__objects_20 = rl78/gcrt0.$(OBJEXT) \
+@CONFIG_OR1K_TRUE@am__objects_20 = or1k/crt0.$(OBJEXT)
+@CONFIG_RL78_TRUE@am__objects_21 = rl78/gcrt0.$(OBJEXT) \
 @CONFIG_RL78_TRUE@	rl78/crt0.$(OBJEXT) rl78/crtn.$(OBJEXT)
-@CONFIG_RX_TRUE@am__objects_21 = rx/gcrt0.$(OBJEXT) rx/crt0.$(OBJEXT) \
+@CONFIG_RX_TRUE@am__objects_22 = rx/gcrt0.$(OBJEXT) rx/crt0.$(OBJEXT) \
 @CONFIG_RX_TRUE@	rx/crtn.$(OBJEXT)
-@CONFIG_V850_TRUE@am__objects_22 = v850/crt0.$(OBJEXT)
-@CONFIG_VISIUM_TRUE@am__objects_23 = visium/crt0.$(OBJEXT)
-@CONFIG_XSTORMY16_TRUE@am__objects_24 = xstormy16/crt0.$(OBJEXT) \
+@CONFIG_V850_TRUE@am__objects_23 = v850/crt0.$(OBJEXT)
+@CONFIG_VISIUM_TRUE@am__objects_24 = visium/crt0.$(OBJEXT)
+@CONFIG_XSTORMY16_TRUE@am__objects_25 = xstormy16/crt0.$(OBJEXT) \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/crti.$(OBJEXT) \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/crtn.$(OBJEXT)
-@CONFIG_XTENSA_TRUE@am__objects_25 = xtensa/crt0.$(OBJEXT) \
+@CONFIG_XTENSA_TRUE@am__objects_26 = xtensa/crt0.$(OBJEXT) \
 @CONFIG_XTENSA_TRUE@	xtensa/crt1-sim.$(OBJEXT) \
 @CONFIG_XTENSA_TRUE@	xtensa/crt1-boards.$(OBJEXT)
 am_libobjs_a_OBJECTS = $(am__objects_3) $(am__objects_4) \
@@ -697,7 +719,8 @@ am_libobjs_a_OBJECTS = $(am__objects_3) $(am__objects_4) \
 	$(am__objects_14) $(am__objects_15) $(am__objects_16) \
 	$(am__objects_17) $(am__objects_18) $(am__objects_19) \
 	$(am__objects_20) $(am__objects_21) $(am__objects_22) \
-	$(am__objects_23) $(am__objects_24) $(am__objects_25)
+	$(am__objects_23) $(am__objects_24) $(am__objects_25) \
+	$(am__objects_26)
 libobjs_a_OBJECTS = $(am_libobjs_a_OBJECTS)
 lm32_libgloss_a_AR = $(AR) $(ARFLAGS)
 lm32_libgloss_a_LIBADD =
@@ -706,7 +729,7 @@ lm32_libgloss_a_LIBADD =
 lm32_libgloss_a_OBJECTS = $(am_lm32_libgloss_a_OBJECTS)
 m32r_libgloss_a_AR = $(AR) $(ARFLAGS)
 m32r_libgloss_a_LIBADD =
-@CONFIG_M32R_TRUE@am__objects_26 = m32r/chmod.$(OBJEXT) \
+@CONFIG_M32R_TRUE@am__objects_27 = m32r/chmod.$(OBJEXT) \
 @CONFIG_M32R_TRUE@	m32r/close.$(OBJEXT) m32r/exit.$(OBJEXT) \
 @CONFIG_M32R_TRUE@	m32r/fstat.$(OBJEXT) m32r/getpid.$(OBJEXT) \
 @CONFIG_M32R_TRUE@	m32r/isatty.$(OBJEXT) m32r/kill.$(OBJEXT) \
@@ -716,16 +739,16 @@ m32r_libgloss_a_LIBADD =
 @CONFIG_M32R_TRUE@	m32r/unlink.$(OBJEXT) m32r/utime.$(OBJEXT) \
 @CONFIG_M32R_TRUE@	m32r/write.$(OBJEXT)
 @CONFIG_M32R_TRUE@am_m32r_libgloss_a_OBJECTS = m32r/trap0.$(OBJEXT) \
-@CONFIG_M32R_TRUE@	$(am__objects_26)
+@CONFIG_M32R_TRUE@	$(am__objects_27)
 m32r_libgloss_a_OBJECTS = $(am_m32r_libgloss_a_OBJECTS)
 m32r_libmon_a_AR = $(AR) $(ARFLAGS)
 m32r_libmon_a_LIBADD =
 @CONFIG_M32R_TRUE@am_m32r_libmon_a_OBJECTS = m32r/trapmon0.$(OBJEXT) \
-@CONFIG_M32R_TRUE@	$(am__objects_26)
+@CONFIG_M32R_TRUE@	$(am__objects_27)
 m32r_libmon_a_OBJECTS = $(am_m32r_libmon_a_OBJECTS)
 mcore_libcmb_a_AR = $(AR) $(ARFLAGS)
 mcore_libcmb_a_LIBADD =
-@CONFIG_MCORE_TRUE@am__objects_27 = mcore/fstat.$(OBJEXT) \
+@CONFIG_MCORE_TRUE@am__objects_28 = mcore/fstat.$(OBJEXT) \
 @CONFIG_MCORE_TRUE@	mcore/getpid.$(OBJEXT) isatty.$(OBJEXT) \
 @CONFIG_MCORE_TRUE@	mcore/kill.$(OBJEXT) mcore/raise.$(OBJEXT) \
 @CONFIG_MCORE_TRUE@	mcore/putnum.$(OBJEXT) mcore/stat.$(OBJEXT) \
@@ -737,12 +760,12 @@ mcore_libcmb_a_LIBADD =
 @CONFIG_MCORE_TRUE@	mcore/cmb-exit.$(OBJEXT) \
 @CONFIG_MCORE_TRUE@	mcore/cmb-inbyte.$(OBJEXT) \
 @CONFIG_MCORE_TRUE@	mcore/cmb-outbyte.$(OBJEXT) \
-@CONFIG_MCORE_TRUE@	$(am__objects_27)
+@CONFIG_MCORE_TRUE@	$(am__objects_28)
 mcore_libcmb_a_OBJECTS = $(am_mcore_libcmb_a_OBJECTS)
 mcore_libsim_a_AR = $(AR) $(ARFLAGS)
 mcore_libsim_a_LIBADD =
 @CONFIG_MCORE_TRUE@am_mcore_libsim_a_OBJECTS =  \
-@CONFIG_MCORE_TRUE@	mcore/syscalls.$(OBJEXT) $(am__objects_27)
+@CONFIG_MCORE_TRUE@	mcore/syscalls.$(OBJEXT) $(am__objects_28)
 mcore_libsim_a_OBJECTS = $(am_mcore_libsim_a_OBJECTS)
 mn10200_libeval_a_AR = $(AR) $(ARFLAGS)
 mn10200_libeval_a_LIBADD =
@@ -769,7 +792,7 @@ mn10200_libeval_a_LIBADD =
 mn10200_libeval_a_OBJECTS = $(am_mn10200_libeval_a_OBJECTS)
 mn10300_libcygmon_a_AR = $(AR) $(ARFLAGS)
 mn10300_libcygmon_a_LIBADD =
-@CONFIG_MN10300_TRUE@am__objects_28 = mn10300/_exit.$(OBJEXT) \
+@CONFIG_MN10300_TRUE@am__objects_29 = mn10300/_exit.$(OBJEXT) \
 @CONFIG_MN10300_TRUE@	mn10300/access.$(OBJEXT) \
 @CONFIG_MN10300_TRUE@	mn10300/chmod.$(OBJEXT) \
 @CONFIG_MN10300_TRUE@	mn10300/close.$(OBJEXT) \
@@ -788,12 +811,12 @@ mn10300_libcygmon_a_LIBADD =
 @CONFIG_MN10300_TRUE@	mn10300/unlink.$(OBJEXT) \
 @CONFIG_MN10300_TRUE@	mn10300/utime.$(OBJEXT) \
 @CONFIG_MN10300_TRUE@	mn10300/write.$(OBJEXT)
-@CONFIG_MN10300_TRUE@@MN10300_BUILD_LIBCYGMON_TRUE@am_mn10300_libcygmon_a_OBJECTS = $(am__objects_28) \
+@CONFIG_MN10300_TRUE@@MN10300_BUILD_LIBCYGMON_TRUE@am_mn10300_libcygmon_a_OBJECTS = $(am__objects_29) \
 @CONFIG_MN10300_TRUE@@MN10300_BUILD_LIBCYGMON_TRUE@	mn10300/cygmon.$(OBJEXT)
 mn10300_libcygmon_a_OBJECTS = $(am_mn10300_libcygmon_a_OBJECTS)
 mn10300_libeval_a_AR = $(AR) $(ARFLAGS)
 mn10300_libeval_a_LIBADD =
-@CONFIG_MN10300_TRUE@am_mn10300_libeval_a_OBJECTS = $(am__objects_28) \
+@CONFIG_MN10300_TRUE@am_mn10300_libeval_a_OBJECTS = $(am__objects_29) \
 @CONFIG_MN10300_TRUE@	mn10300/trap.$(OBJEXT)
 mn10300_libeval_a_OBJECTS = $(am_mn10300_libeval_a_OBJECTS)
 moxie_libqemu_a_AR = $(AR) $(ARFLAGS)
@@ -1043,7 +1066,7 @@ riscv_libsemihost_a_LIBADD =
 riscv_libsemihost_a_OBJECTS = $(am_riscv_libsemihost_a_OBJECTS)
 riscv_libsim_a_AR = $(AR) $(ARFLAGS)
 riscv_libsim_a_LIBADD =
-@CONFIG_RISCV_TRUE@am__objects_29 =  \
+@CONFIG_RISCV_TRUE@am__objects_30 =  \
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_access.$(OBJEXT) \
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_chdir.$(OBJEXT) \
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_chmod.$(OBJEXT) \
@@ -1076,7 +1099,7 @@ riscv_libsim_a_LIBADD =
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_utime.$(OBJEXT) \
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_wait.$(OBJEXT) \
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_write.$(OBJEXT)
-@CONFIG_RISCV_TRUE@am_riscv_libsim_a_OBJECTS = $(am__objects_29)
+@CONFIG_RISCV_TRUE@am_riscv_libsim_a_OBJECTS = $(am__objects_30)
 riscv_libsim_a_OBJECTS = $(am_riscv_libsim_a_OBJECTS)
 rl78_libsim_a_AR = $(AR) $(ARFLAGS)
 rl78_libsim_a_LIBADD =
@@ -1132,11 +1155,11 @@ v850_libsim_a_LIBADD =
 v850_libsim_a_OBJECTS = $(am_v850_libsim_a_OBJECTS)
 visium_libdebug_a_AR = $(AR) $(ARFLAGS)
 visium_libdebug_a_LIBADD =
-@CONFIG_VISIUM_TRUE@am__objects_30 = getpid.$(OBJEXT) kill.$(OBJEXT) \
+@CONFIG_VISIUM_TRUE@am__objects_31 = getpid.$(OBJEXT) kill.$(OBJEXT) \
 @CONFIG_VISIUM_TRUE@	visium/io-gdb.$(OBJEXT) \
 @CONFIG_VISIUM_TRUE@	visium/io-stubs.$(OBJEXT) \
 @CONFIG_VISIUM_TRUE@	visium/sbrk.$(OBJEXT)
-@CONFIG_VISIUM_TRUE@am_visium_libdebug_a_OBJECTS = $(am__objects_30) \
+@CONFIG_VISIUM_TRUE@am_visium_libdebug_a_OBJECTS = $(am__objects_31) \
 @CONFIG_VISIUM_TRUE@	visium/syscalls.$(OBJEXT)
 visium_libdebug_a_OBJECTS = $(am_visium_libdebug_a_OBJECTS)
 visium_libserial_a_AR = $(AR) $(ARFLAGS)
@@ -1156,7 +1179,7 @@ visium_libserial_a_LIBADD =
 visium_libserial_a_OBJECTS = $(am_visium_libserial_a_OBJECTS)
 visium_libsim_a_AR = $(AR) $(ARFLAGS)
 visium_libsim_a_LIBADD =
-@CONFIG_VISIUM_TRUE@am_visium_libsim_a_OBJECTS = $(am__objects_30) \
+@CONFIG_VISIUM_TRUE@am_visium_libsim_a_OBJECTS = $(am__objects_31) \
 @CONFIG_VISIUM_TRUE@	visium/sim-syscalls.$(OBJEXT)
 visium_libsim_a_OBJECTS = $(am_visium_libsim_a_OBJECTS)
 xstormy16_libeva_app_a_AR = $(AR) $(ARFLAGS)
@@ -1182,13 +1205,13 @@ xstormy16_libsim_a_LIBADD =
 xstormy16_libsim_a_OBJECTS = $(am_xstormy16_libsim_a_OBJECTS)
 xtensa_libgloss_a_AR = $(AR) $(ARFLAGS)
 xtensa_libgloss_a_LIBADD =
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__objects_31 = xtensa/boards/esp32/xtensa_libgloss_a-board.$(OBJEXT)
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__objects_32 = xtensa/boards/esp32s3/xtensa_libgloss_a-board.$(OBJEXT)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__objects_32 = xtensa/boards/esp32/xtensa_libgloss_a-board.$(OBJEXT)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__objects_33 = xtensa/boards/esp32s3/xtensa_libgloss_a-board.$(OBJEXT)
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am_xtensa_libgloss_a_OBJECTS = xtensa/xtensa_libgloss_a-sleep.$(OBJEXT) \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/xtensa_libgloss_a-syscalls.$(OBJEXT) \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/xtensa_libgloss_a-window-vectors.$(OBJEXT) \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__objects_31) \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__objects_32)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__objects_32) \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__objects_33)
 xtensa_libgloss_a_OBJECTS = $(am_xtensa_libgloss_a_OBJECTS)
 xtensa_libsys_openocd_a_AR = $(AR) $(ARFLAGS)
 xtensa_libsys_openocd_a_LIBADD =
@@ -1284,17 +1307,18 @@ SOURCES = $(aarch64_librdimon_a_SOURCES) $(arc_libnsim_a_SOURCES) \
 	$(bfin_libbfinbsp_a_SOURCES) $(bfin_libsim_a_SOURCES) \
 	$(csky_libsemi_a_SOURCES) $(d30v_libsim_a_SOURCES) \
 	$(epiphany_libepiphany_a_SOURCES) $(fr30_libsim_a_SOURCES) \
-	$(frv_libsim_a_SOURCES) $(i386_libcygmon_a_SOURCES) \
-	$(i960_libmon960_a_SOURCES) $(iq2000_libeval_a_SOURCES) \
-	$(libnosys_libnosys_a_SOURCES) $(libobjs_a_SOURCES) \
-	$(lm32_libgloss_a_SOURCES) $(m32r_libgloss_a_SOURCES) \
-	$(m32r_libmon_a_SOURCES) $(mcore_libcmb_a_SOURCES) \
-	$(mcore_libsim_a_SOURCES) $(mn10200_libeval_a_SOURCES) \
-	$(mn10300_libcygmon_a_SOURCES) $(mn10300_libeval_a_SOURCES) \
-	$(moxie_libqemu_a_SOURCES) $(moxie_libsim_a_SOURCES) \
-	$(msp430_libcrt_a_SOURCES) $(msp430_libnosys_a_SOURCES) \
-	$(msp430_libsim_a_SOURCES) $(nds32_libgloss_a_SOURCES) \
-	$(nios2_libnios2_a_SOURCES) $(or1k_libboard_atlys_a_SOURCES) \
+	$(frv_libsim_a_SOURCES) $(ft32_libsim_a_SOURCES) \
+	$(i386_libcygmon_a_SOURCES) $(i960_libmon960_a_SOURCES) \
+	$(iq2000_libeval_a_SOURCES) $(libnosys_libnosys_a_SOURCES) \
+	$(libobjs_a_SOURCES) $(lm32_libgloss_a_SOURCES) \
+	$(m32r_libgloss_a_SOURCES) $(m32r_libmon_a_SOURCES) \
+	$(mcore_libcmb_a_SOURCES) $(mcore_libsim_a_SOURCES) \
+	$(mn10200_libeval_a_SOURCES) $(mn10300_libcygmon_a_SOURCES) \
+	$(mn10300_libeval_a_SOURCES) $(moxie_libqemu_a_SOURCES) \
+	$(moxie_libsim_a_SOURCES) $(msp430_libcrt_a_SOURCES) \
+	$(msp430_libnosys_a_SOURCES) $(msp430_libsim_a_SOURCES) \
+	$(nds32_libgloss_a_SOURCES) $(nios2_libnios2_a_SOURCES) \
+	$(or1k_libboard_atlys_a_SOURCES) \
 	$(or1k_libboard_de0_nano_a_SOURCES) \
 	$(or1k_libboard_ml501_a_SOURCES) \
 	$(or1k_libboard_optimsoc_a_SOURCES) \
@@ -1400,7 +1424,7 @@ ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
 DIST_SUBDIRS = $(SUBDIRS)
-VPATH = @srcdir@ $(am__append_97)
+VPATH = @srcdir@ $(am__append_101)
 AARCH64_OBJTYPE = @AARCH64_OBJTYPE@
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
@@ -1526,7 +1550,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I . -I .. -I ../config
 info_TEXINFOS = $(am__append_1)
-CLEANFILES = $(am__append_4) $(am__append_10) $(am__append_103)
+CLEANFILES = $(am__append_4) $(am__append_10) $(am__append_107)
 PHONY = 
 SUBDIRS = @subdirs@ .
 srcroot = $(top_srcdir)/..
@@ -1536,29 +1560,31 @@ multilibtool_DATA = $(am__append_3) $(am__append_6) $(am__append_7) \
 	$(am__append_8) $(am__append_13) $(am__append_15) \
 	$(am__append_18) $(am__append_22) $(am__append_23) \
 	$(am__append_26) $(am__append_29) $(am__append_32) \
-	$(am__append_35) $(am__append_38) $(am__append_42) \
-	$(am__append_44) $(am__append_47) $(am__append_48) \
-	$(am__append_51) $(am__append_52) $(am__append_53) \
-	$(am__append_56) $(am__append_60) $(am__append_61) \
-	$(am__append_62) $(am__append_67) $(am__append_68) \
-	$(am__append_71) $(am__append_74) $(am__append_77) \
-	$(am__append_79) $(am__append_83) $(am__append_85) \
-	$(am__append_88) $(am__append_91) $(am__append_94) \
-	$(am__append_99) $(am__append_104) $(am__append_107) \
-	$(am__append_109) $(am__append_114)
+	$(am__append_33) $(am__append_36) $(am__append_39) \
+	$(am__append_42) $(am__append_46) $(am__append_48) \
+	$(am__append_51) $(am__append_52) $(am__append_55) \
+	$(am__append_56) $(am__append_57) $(am__append_60) \
+	$(am__append_64) $(am__append_65) $(am__append_66) \
+	$(am__append_71) $(am__append_72) $(am__append_75) \
+	$(am__append_78) $(am__append_81) $(am__append_83) \
+	$(am__append_87) $(am__append_89) $(am__append_92) \
+	$(am__append_95) $(am__append_98) $(am__append_103) \
+	$(am__append_108) $(am__append_111) $(am__append_113) \
+	$(am__append_118)
 multilibtool_LIBRARIES = $(am__append_2) $(am__append_5) \
 	$(am__append_9) $(am__append_11) $(am__append_20) \
 	$(am__append_21) $(am__append_25) $(am__append_28) \
-	$(am__append_31) $(am__append_34) $(am__append_37) \
-	$(am__append_39) $(am__append_43) $(am__append_45) \
-	$(am__append_50) $(am__append_55) $(am__append_58) \
-	$(am__append_64) $(am__append_65) $(am__append_70) \
-	$(am__append_73) $(am__append_76) $(am__append_78) \
-	$(am__append_82) $(am__append_84) $(am__append_87) \
-	$(am__append_90) $(am__append_93) $(am__append_96) \
-	$(am__append_101) $(am__append_106) $(am__append_108)
+	$(am__append_31) $(am__append_35) $(am__append_38) \
+	$(am__append_41) $(am__append_43) $(am__append_47) \
+	$(am__append_49) $(am__append_54) $(am__append_59) \
+	$(am__append_62) $(am__append_68) $(am__append_69) \
+	$(am__append_74) $(am__append_77) $(am__append_80) \
+	$(am__append_82) $(am__append_86) $(am__append_88) \
+	$(am__append_91) $(am__append_94) $(am__append_97) \
+	$(am__append_100) $(am__append_105) $(am__append_110) \
+	$(am__append_112)
 includetooldir = $(tooldir)/include
-includetool_DATA = $(am__append_16) $(am__append_81)
+includetool_DATA = $(am__append_16) $(am__append_85)
 includesystooldir = $(tooldir)/include/sys
 includesystool_DATA = $(am__append_17)
 
@@ -1573,13 +1599,13 @@ AM_LDFLAGS = $(AM_LDFLAGS_$(subst /,_,$(@D))) $(AM_LDFLAGS_$(subst -,_,$(subst /
 # to install (e.g. our crt0.o objects).
 noinst_LIBRARIES = libobjs.a
 libobjs_a_SOURCES = $(am__append_14) $(am__append_19) $(am__append_24) \
-	$(am__append_27) $(am__append_30) $(am__append_33) \
-	$(am__append_36) $(am__append_40) $(am__append_46) \
-	$(am__append_49) $(am__append_54) $(am__append_57) \
-	$(am__append_63) $(am__append_69) $(am__append_72) \
-	$(am__append_75) $(am__append_80) $(am__append_86) \
-	$(am__append_89) $(am__append_92) $(am__append_95) \
-	$(am__append_100) $(am__append_105)
+	$(am__append_27) $(am__append_30) $(am__append_34) \
+	$(am__append_37) $(am__append_40) $(am__append_44) \
+	$(am__append_50) $(am__append_53) $(am__append_58) \
+	$(am__append_61) $(am__append_67) $(am__append_73) \
+	$(am__append_76) $(am__append_79) $(am__append_84) \
+	$(am__append_90) $(am__append_93) $(am__append_96) \
+	$(am__append_99) $(am__append_104) $(am__append_109)
 FLAGS_TO_PASS = \
 	"CC=$(CC)" \
 	"CFLAGS=$(CFLAGS)" \
@@ -1774,6 +1800,23 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 @CONFIG_FRV_TRUE@	frv/sim-unlink.S \
 @CONFIG_FRV_TRUE@	frv/sim-write.S \
 @CONFIG_FRV_TRUE@	frv/stat.c
+
+@CONFIG_FT32_TRUE@ft32_libsim_a_SOURCES = \
+@CONFIG_FT32_TRUE@	ft32/fstat.c \
+@CONFIG_FT32_TRUE@	ft32/getpid.c \
+@CONFIG_FT32_TRUE@	ft32/isatty.c \
+@CONFIG_FT32_TRUE@	ft32/kill.c \
+@CONFIG_FT32_TRUE@	ft32/sbrk.c \
+@CONFIG_FT32_TRUE@	ft32/sim-close.S \
+@CONFIG_FT32_TRUE@	ft32/sim-exit.S \
+@CONFIG_FT32_TRUE@	ft32/sim-inbyte.c \
+@CONFIG_FT32_TRUE@	ft32/sim-lseek.c \
+@CONFIG_FT32_TRUE@	ft32/sim-open.S \
+@CONFIG_FT32_TRUE@	ft32/sim-read.S \
+@CONFIG_FT32_TRUE@	ft32/sim-time.c \
+@CONFIG_FT32_TRUE@	ft32/sim-unlink.S \
+@CONFIG_FT32_TRUE@	ft32/sim-write.S \
+@CONFIG_FT32_TRUE@	ft32/stat.c
 
 @CONFIG_I386_TRUE@i386_libcygmon_a_SOURCES = \
 @CONFIG_I386_TRUE@	i386/cygmon-salib.c \
@@ -2294,15 +2337,15 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libgloss_a_SOURCES = xtensa/sleep.S \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/syscalls.c \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/window-vectors.S \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_110) \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_115)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_114) \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_119)
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libgloss_a_CPPFLAGS = $(AM_CPPFLAGS) \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_111) \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_116)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_115) \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_120)
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libsys_qemu_a_CPPFLAGS = $(AM_CPPFLAGS) \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	-DQEMU_SEMIHOSTING \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_112) \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_117)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_116) \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_121)
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libsys_qemu_a_SOURCES = \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/sim-vectors.S \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/sim-call.S \
@@ -2310,8 +2353,8 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libsys_openocd_a_CPPFLAGS = $(AM_CPPFLAGS) \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	-DOPENOCD_SEMIHOSTING \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_113) \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_118)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_117) \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_122)
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libsys_openocd_a_SOURCES = \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/syscalls.c
 
@@ -2322,7 +2365,7 @@ all: config.h
 .SUFFIXES: .S .c .dvi .o .obj .ps .s
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arc/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/csky/Makefile.inc $(srcdir)/d30v/Makefile.inc $(srcdir)/epiphany/Makefile.inc $(srcdir)/fr30/Makefile.inc $(srcdir)/frv/Makefile.inc $(srcdir)/i386/Makefile.inc $(srcdir)/i960/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/m32r/Makefile.inc $(srcdir)/mcore/Makefile.inc $(srcdir)/mn10200/Makefile.inc $(srcdir)/mn10300/Makefile.inc $(srcdir)/moxie/Makefile.inc $(srcdir)/msp430/Makefile.inc $(srcdir)/nds32/Makefile.inc $(srcdir)/nios2/Makefile.inc $(srcdir)/or1k/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/rl78/Makefile.inc $(srcdir)/rx/Makefile.inc $(srcdir)/v850/Makefile.inc $(srcdir)/visium/Makefile.inc $(srcdir)/wince/Makefile.inc $(srcdir)/xstormy16/Makefile.inc $(srcdir)/xtensa/Makefile.inc $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arc/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/csky/Makefile.inc $(srcdir)/d30v/Makefile.inc $(srcdir)/epiphany/Makefile.inc $(srcdir)/fr30/Makefile.inc $(srcdir)/frv/Makefile.inc $(srcdir)/ft32/Makefile.inc $(srcdir)/i386/Makefile.inc $(srcdir)/i960/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/m32r/Makefile.inc $(srcdir)/mcore/Makefile.inc $(srcdir)/mn10200/Makefile.inc $(srcdir)/mn10300/Makefile.inc $(srcdir)/moxie/Makefile.inc $(srcdir)/msp430/Makefile.inc $(srcdir)/nds32/Makefile.inc $(srcdir)/nios2/Makefile.inc $(srcdir)/or1k/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/rl78/Makefile.inc $(srcdir)/rx/Makefile.inc $(srcdir)/v850/Makefile.inc $(srcdir)/visium/Makefile.inc $(srcdir)/wince/Makefile.inc $(srcdir)/xstormy16/Makefile.inc $(srcdir)/xtensa/Makefile.inc $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -2344,7 +2387,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe);; \
 	esac;
-$(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arc/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/csky/Makefile.inc $(srcdir)/d30v/Makefile.inc $(srcdir)/epiphany/Makefile.inc $(srcdir)/fr30/Makefile.inc $(srcdir)/frv/Makefile.inc $(srcdir)/i386/Makefile.inc $(srcdir)/i960/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/m32r/Makefile.inc $(srcdir)/mcore/Makefile.inc $(srcdir)/mn10200/Makefile.inc $(srcdir)/mn10300/Makefile.inc $(srcdir)/moxie/Makefile.inc $(srcdir)/msp430/Makefile.inc $(srcdir)/nds32/Makefile.inc $(srcdir)/nios2/Makefile.inc $(srcdir)/or1k/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/rl78/Makefile.inc $(srcdir)/rx/Makefile.inc $(srcdir)/v850/Makefile.inc $(srcdir)/visium/Makefile.inc $(srcdir)/wince/Makefile.inc $(srcdir)/xstormy16/Makefile.inc $(srcdir)/xtensa/Makefile.inc $(am__empty):
+$(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arc/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/csky/Makefile.inc $(srcdir)/d30v/Makefile.inc $(srcdir)/epiphany/Makefile.inc $(srcdir)/fr30/Makefile.inc $(srcdir)/frv/Makefile.inc $(srcdir)/ft32/Makefile.inc $(srcdir)/i386/Makefile.inc $(srcdir)/i960/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/m32r/Makefile.inc $(srcdir)/mcore/Makefile.inc $(srcdir)/mn10200/Makefile.inc $(srcdir)/mn10300/Makefile.inc $(srcdir)/moxie/Makefile.inc $(srcdir)/msp430/Makefile.inc $(srcdir)/nds32/Makefile.inc $(srcdir)/nios2/Makefile.inc $(srcdir)/or1k/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/rl78/Makefile.inc $(srcdir)/rx/Makefile.inc $(srcdir)/v850/Makefile.inc $(srcdir)/visium/Makefile.inc $(srcdir)/wince/Makefile.inc $(srcdir)/xstormy16/Makefile.inc $(srcdir)/xtensa/Makefile.inc $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
@@ -2388,8 +2431,6 @@ cr16/Makefile: $(top_builddir)/config.status $(top_srcdir)/cr16/Makefile.in
 cris/Makefile: $(top_builddir)/config.status $(top_srcdir)/cris/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 crx/Makefile: $(top_builddir)/config.status $(top_srcdir)/crx/Makefile.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-ft32/Makefile: $(top_builddir)/config.status $(top_srcdir)/ft32/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 mep/Makefile: $(top_builddir)/config.status $(top_srcdir)/mep/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
@@ -2752,6 +2793,47 @@ frv/libsim.a: $(frv_libsim_a_OBJECTS) $(frv_libsim_a_DEPENDENCIES) $(EXTRA_frv_l
 	$(AM_V_at)-rm -f frv/libsim.a
 	$(AM_V_AR)$(frv_libsim_a_AR) frv/libsim.a $(frv_libsim_a_OBJECTS) $(frv_libsim_a_LIBADD)
 	$(AM_V_at)$(RANLIB) frv/libsim.a
+ft32/$(am__dirstamp):
+	@$(MKDIR_P) ft32
+	@: > ft32/$(am__dirstamp)
+ft32/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) ft32/$(DEPDIR)
+	@: > ft32/$(DEPDIR)/$(am__dirstamp)
+ft32/fstat.$(OBJEXT): ft32/$(am__dirstamp) \
+	ft32/$(DEPDIR)/$(am__dirstamp)
+ft32/getpid.$(OBJEXT): ft32/$(am__dirstamp) \
+	ft32/$(DEPDIR)/$(am__dirstamp)
+ft32/isatty.$(OBJEXT): ft32/$(am__dirstamp) \
+	ft32/$(DEPDIR)/$(am__dirstamp)
+ft32/kill.$(OBJEXT): ft32/$(am__dirstamp) \
+	ft32/$(DEPDIR)/$(am__dirstamp)
+ft32/sbrk.$(OBJEXT): ft32/$(am__dirstamp) \
+	ft32/$(DEPDIR)/$(am__dirstamp)
+ft32/sim-close.$(OBJEXT): ft32/$(am__dirstamp) \
+	ft32/$(DEPDIR)/$(am__dirstamp)
+ft32/sim-exit.$(OBJEXT): ft32/$(am__dirstamp) \
+	ft32/$(DEPDIR)/$(am__dirstamp)
+ft32/sim-inbyte.$(OBJEXT): ft32/$(am__dirstamp) \
+	ft32/$(DEPDIR)/$(am__dirstamp)
+ft32/sim-lseek.$(OBJEXT): ft32/$(am__dirstamp) \
+	ft32/$(DEPDIR)/$(am__dirstamp)
+ft32/sim-open.$(OBJEXT): ft32/$(am__dirstamp) \
+	ft32/$(DEPDIR)/$(am__dirstamp)
+ft32/sim-read.$(OBJEXT): ft32/$(am__dirstamp) \
+	ft32/$(DEPDIR)/$(am__dirstamp)
+ft32/sim-time.$(OBJEXT): ft32/$(am__dirstamp) \
+	ft32/$(DEPDIR)/$(am__dirstamp)
+ft32/sim-unlink.$(OBJEXT): ft32/$(am__dirstamp) \
+	ft32/$(DEPDIR)/$(am__dirstamp)
+ft32/sim-write.$(OBJEXT): ft32/$(am__dirstamp) \
+	ft32/$(DEPDIR)/$(am__dirstamp)
+ft32/stat.$(OBJEXT): ft32/$(am__dirstamp) \
+	ft32/$(DEPDIR)/$(am__dirstamp)
+
+ft32/libsim.a: $(ft32_libsim_a_OBJECTS) $(ft32_libsim_a_DEPENDENCIES) $(EXTRA_ft32_libsim_a_DEPENDENCIES) ft32/$(am__dirstamp)
+	$(AM_V_at)-rm -f ft32/libsim.a
+	$(AM_V_AR)$(ft32_libsim_a_AR) ft32/libsim.a $(ft32_libsim_a_OBJECTS) $(ft32_libsim_a_LIBADD)
+	$(AM_V_at)$(RANLIB) ft32/libsim.a
 i386/$(am__dirstamp):
 	@$(MKDIR_P) i386
 	@: > i386/$(am__dirstamp)
@@ -2909,6 +2991,8 @@ epiphany/crt0.$(OBJEXT): epiphany/$(am__dirstamp) \
 fr30/crt0.$(OBJEXT): fr30/$(am__dirstamp) \
 	fr30/$(DEPDIR)/$(am__dirstamp)
 frv/crt0.$(OBJEXT): frv/$(am__dirstamp) frv/$(DEPDIR)/$(am__dirstamp)
+ft32/crt0.$(OBJEXT): ft32/$(am__dirstamp) \
+	ft32/$(DEPDIR)/$(am__dirstamp)
 i386/cygmon-crt0.$(OBJEXT): i386/$(am__dirstamp) \
 	i386/$(DEPDIR)/$(am__dirstamp)
 i960/crt0.$(OBJEXT): i960/$(am__dirstamp) \
@@ -4167,6 +4251,7 @@ mostlyclean-compile:
 	-rm -f epiphany/*.$(OBJEXT)
 	-rm -f fr30/*.$(OBJEXT)
 	-rm -f frv/*.$(OBJEXT)
+	-rm -f ft32/*.$(OBJEXT)
 	-rm -f i386/*.$(OBJEXT)
 	-rm -f i960/*.$(OBJEXT)
 	-rm -f iq2000/*.$(OBJEXT)
@@ -4315,6 +4400,22 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@frv/$(DEPDIR)/sim-unlink.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@frv/$(DEPDIR)/sim-write.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@frv/$(DEPDIR)/stat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@ft32/$(DEPDIR)/crt0.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@ft32/$(DEPDIR)/fstat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@ft32/$(DEPDIR)/getpid.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@ft32/$(DEPDIR)/isatty.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@ft32/$(DEPDIR)/kill.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@ft32/$(DEPDIR)/sbrk.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@ft32/$(DEPDIR)/sim-close.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@ft32/$(DEPDIR)/sim-exit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@ft32/$(DEPDIR)/sim-inbyte.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@ft32/$(DEPDIR)/sim-lseek.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@ft32/$(DEPDIR)/sim-open.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@ft32/$(DEPDIR)/sim-read.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@ft32/$(DEPDIR)/sim-time.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@ft32/$(DEPDIR)/sim-unlink.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@ft32/$(DEPDIR)/sim-write.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@ft32/$(DEPDIR)/stat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@i386/$(DEPDIR)/cygmon-crt0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@i386/$(DEPDIR)/i386_libcygmon_a-cygmon-gmon.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@i386/$(DEPDIR)/i386_libcygmon_a-cygmon-salib.Po@am__quote@
@@ -7555,6 +7656,8 @@ distclean-generic:
 	-rm -f fr30/$(am__dirstamp)
 	-rm -f frv/$(DEPDIR)/$(am__dirstamp)
 	-rm -f frv/$(am__dirstamp)
+	-rm -f ft32/$(DEPDIR)/$(am__dirstamp)
+	-rm -f ft32/$(am__dirstamp)
 	-rm -f i386/$(DEPDIR)/$(am__dirstamp)
 	-rm -f i386/$(am__dirstamp)
 	-rm -f i960/$(DEPDIR)/$(am__dirstamp)
@@ -7618,7 +7721,7 @@ clean-am: clean-aminfo clean-binPROGRAMS clean-checkPROGRAMS \
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) csky/$(DEPDIR) d30v/$(DEPDIR) epiphany/$(DEPDIR) fr30/$(DEPDIR) frv/$(DEPDIR) i386/$(DEPDIR) i960/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) m32r/$(DEPDIR) mcore/$(DEPDIR) mn10200/$(DEPDIR) mn10300/$(DEPDIR) moxie/$(DEPDIR) msp430/$(DEPDIR) nds32/$(DEPDIR) nios2/$(DEPDIR) or1k/$(DEPDIR) or1k/boards/$(DEPDIR) riscv/$(DEPDIR) rl78/$(DEPDIR) rx/$(DEPDIR) v850/$(DEPDIR) visium/$(DEPDIR) xstormy16/$(DEPDIR) xtensa/$(DEPDIR) xtensa/boards/esp32/$(DEPDIR) xtensa/boards/esp32s3/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) csky/$(DEPDIR) d30v/$(DEPDIR) epiphany/$(DEPDIR) fr30/$(DEPDIR) frv/$(DEPDIR) ft32/$(DEPDIR) i386/$(DEPDIR) i960/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) m32r/$(DEPDIR) mcore/$(DEPDIR) mn10200/$(DEPDIR) mn10300/$(DEPDIR) moxie/$(DEPDIR) msp430/$(DEPDIR) nds32/$(DEPDIR) nios2/$(DEPDIR) or1k/$(DEPDIR) or1k/boards/$(DEPDIR) riscv/$(DEPDIR) rl78/$(DEPDIR) rx/$(DEPDIR) v850/$(DEPDIR) visium/$(DEPDIR) xstormy16/$(DEPDIR) xtensa/$(DEPDIR) xtensa/boards/esp32/$(DEPDIR) xtensa/boards/esp32s3/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-local distclean-tags
@@ -7761,7 +7864,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) csky/$(DEPDIR) d30v/$(DEPDIR) epiphany/$(DEPDIR) fr30/$(DEPDIR) frv/$(DEPDIR) i386/$(DEPDIR) i960/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) m32r/$(DEPDIR) mcore/$(DEPDIR) mn10200/$(DEPDIR) mn10300/$(DEPDIR) moxie/$(DEPDIR) msp430/$(DEPDIR) nds32/$(DEPDIR) nios2/$(DEPDIR) or1k/$(DEPDIR) or1k/boards/$(DEPDIR) riscv/$(DEPDIR) rl78/$(DEPDIR) rx/$(DEPDIR) v850/$(DEPDIR) visium/$(DEPDIR) xstormy16/$(DEPDIR) xtensa/$(DEPDIR) xtensa/boards/esp32/$(DEPDIR) xtensa/boards/esp32s3/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) csky/$(DEPDIR) d30v/$(DEPDIR) epiphany/$(DEPDIR) fr30/$(DEPDIR) frv/$(DEPDIR) ft32/$(DEPDIR) i386/$(DEPDIR) i960/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) m32r/$(DEPDIR) mcore/$(DEPDIR) mn10200/$(DEPDIR) mn10300/$(DEPDIR) moxie/$(DEPDIR) msp430/$(DEPDIR) nds32/$(DEPDIR) nios2/$(DEPDIR) or1k/$(DEPDIR) or1k/boards/$(DEPDIR) riscv/$(DEPDIR) rl78/$(DEPDIR) rx/$(DEPDIR) v850/$(DEPDIR) visium/$(DEPDIR) xstormy16/$(DEPDIR) xtensa/$(DEPDIR) xtensa/boards/esp32/$(DEPDIR) xtensa/boards/esp32s3/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-aminfo \
 	maintainer-clean-generic maintainer-clean-local
