@@ -176,6 +176,9 @@ $(objdir)/cygmon.ld: $(srcdir)/@SPARC_CYGMONLDSCRIPTTEMPL@
 install: $($(CPU)_INSTALL)
 	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
 	$(INSTALL_DATA) $(CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(CRT0)
+	$(INSTALL_DATA) $(objdir)/traps.o $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(ERC32_CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(ERC32_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
 
 sparc-install:
 	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}
@@ -195,9 +198,6 @@ slite-install:
 	$(INSTALL_DATA) $(srcdir)/ex934.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
 	$(INSTALL_DATA) $(srcdir)/sparc86x.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
 	$(INSTALL_DATA) $(srcdir)/elfsim.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
-	$(INSTALL_DATA) $(ERC32_CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
-	$(INSTALL_DATA) $(ERC32_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
-	$(INSTALL_DATA) $(objdir)/traps.o $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
 	$(INSTALL_DATA) $(CYGMON_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
 	$(INSTALL_DATA) $(CYGMON_OBJS) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
 	$(INSTALL_DATA) $(objdir)/cygmon.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
