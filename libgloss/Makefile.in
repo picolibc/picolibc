@@ -353,31 +353,48 @@ multilibtool_PROGRAMS = $(am__EXEEXT_7)
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SPLET_TRUE@am__append_105 = sparc/libsplet701.a
 @CONFIG_SPARC_TRUE@am__append_106 = sparc/erc32-test sparc/ex930-test \
 @CONFIG_SPARC_TRUE@	sparc/ex931-test sparc/ex934-test
-@CONFIG_V850_TRUE@am__append_107 = v850/crt0.o
-@CONFIG_V850_TRUE@am__append_108 = v850/crt0.S
-@CONFIG_V850_TRUE@am__append_109 = v850/libsim.a
-@CONFIG_VISIUM_TRUE@am__append_110 = visium/crt0.o
-@CONFIG_VISIUM_TRUE@am__append_111 = visium/crt0.S
-@CONFIG_VISIUM_TRUE@am__append_112 = visium/libserial.a \
+@CONFIG_SPARC_LEON_TRUE@am__append_107 = sparc_leon/libleonbare.a \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/liblbthread.a \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/libsmall.a
+@CONFIG_SPARC_LEON_TRUE@am__append_108 = \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/crt0.o \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/pnpinit.o \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/pnpinit_simple.o \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_svt.o \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_mvt.o
+
+@CONFIG_SPARC_LEON_TRUE@am__append_109 = \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/crt0.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/pnpinit.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/pnpinit_simple.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_svt.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_mvt.S
+
+@CONFIG_V850_TRUE@am__append_110 = v850/crt0.o
+@CONFIG_V850_TRUE@am__append_111 = v850/crt0.S
+@CONFIG_V850_TRUE@am__append_112 = v850/libsim.a
+@CONFIG_VISIUM_TRUE@am__append_113 = visium/crt0.o
+@CONFIG_VISIUM_TRUE@am__append_114 = visium/crt0.S
+@CONFIG_VISIUM_TRUE@am__append_115 = visium/libserial.a \
 @CONFIG_VISIUM_TRUE@	visium/libsim.a visium/libdebug.a
-@CONFIG_WINCE_TRUE@am__append_113 = $(gdbdir)
-@CONFIG_WINCE_TRUE@am__append_114 = wince/stub.exe
-@CONFIG_XSTORMY16_TRUE@am__append_115 = xstormy16/crt0.o \
+@CONFIG_WINCE_TRUE@am__append_116 = $(gdbdir)
+@CONFIG_WINCE_TRUE@am__append_117 = wince/stub.exe
+@CONFIG_XSTORMY16_TRUE@am__append_118 = xstormy16/crt0.o \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/crti.o xstormy16/crtn.o \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/sim_high.ld \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/sim_rom.ld \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/eva_app.ld \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/eva_stub.hex
-@CONFIG_XSTORMY16_TRUE@am__append_116 = \
+@CONFIG_XSTORMY16_TRUE@am__append_119 = \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/crt0.s \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/crti.s \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/crtn.s
 
-@CONFIG_XSTORMY16_TRUE@am__append_117 = xstormy16/libsim.a \
+@CONFIG_XSTORMY16_TRUE@am__append_120 = xstormy16/libsim.a \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/libeva_app.a
-@CONFIG_XSTORMY16_TRUE@am__append_118 = xstormy16/eva_stub.elf
-@CONFIG_XSTORMY16_TRUE@am__append_119 = xstormy16/eva_stub.hex
-@CONFIG_XTENSA_TRUE@am__append_120 = \
+@CONFIG_XSTORMY16_TRUE@am__append_121 = xstormy16/eva_stub.elf
+@CONFIG_XSTORMY16_TRUE@am__append_122 = xstormy16/eva_stub.hex
+@CONFIG_XTENSA_TRUE@am__append_123 = \
 @CONFIG_XTENSA_TRUE@	xtensa/default.specs \
 @CONFIG_XTENSA_TRUE@	xtensa/nano.specs \
 @CONFIG_XTENSA_TRUE@	xtensa/sim.elf.specs \
@@ -386,29 +403,29 @@ multilibtool_PROGRAMS = $(am__EXEEXT_7)
 @CONFIG_XTENSA_TRUE@	xtensa/sys.openocd.specs \
 @CONFIG_XTENSA_TRUE@	xtensa/crt0.o
 
-@CONFIG_XTENSA_TRUE@am__append_121 = \
+@CONFIG_XTENSA_TRUE@am__append_124 = \
 @CONFIG_XTENSA_TRUE@	xtensa/crt0.S \
 @CONFIG_XTENSA_TRUE@	xtensa/crt1-sim.S \
 @CONFIG_XTENSA_TRUE@	xtensa/crt1-boards.S
 
-@CONFIG_XTENSA_TRUE@am__append_122 = xtensa/libgloss.a
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_123 = \
+@CONFIG_XTENSA_TRUE@am__append_125 = xtensa/libgloss.a
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_126 = \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/app.elf.ld \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/crt1-sim.o \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/crt1-boards.o
 
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_124 = xtensa/libsys_qemu.a \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_127 = xtensa/libsys_qemu.a \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/libsys_openocd.a
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_125 = xtensa/boards/esp32/memory.elf.ld
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_126 = xtensa/boards/esp32/board.c
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_127 = -I$(srcdir)/xtensa/boards/esp32/include
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_128 = -I$(srcdir)/xtensa/boards/esp32/include
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_129 = -I$(srcdir)/xtensa/boards/esp32/include
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_130 = xtensa/boards/esp32s3/memory.elf.ld
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_131 = xtensa/boards/esp32s3/board.c
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_132 = -I$(srcdir)/xtensa/boards/esp32s3/include
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_133 = -I$(srcdir)/xtensa/boards/esp32s3/include
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_134 = -I$(srcdir)/xtensa/boards/esp32s3/include
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_128 = xtensa/boards/esp32/memory.elf.ld
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_129 = xtensa/boards/esp32/board.c
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_130 = -I$(srcdir)/xtensa/boards/esp32/include
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_131 = -I$(srcdir)/xtensa/boards/esp32/include
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_132 = -I$(srcdir)/xtensa/boards/esp32/include
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_133 = xtensa/boards/esp32s3/memory.elf.ld
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_134 = xtensa/boards/esp32s3/board.c
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_135 = -I$(srcdir)/xtensa/boards/esp32s3/include
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_136 = -I$(srcdir)/xtensa/boards/esp32s3/include
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_137 = -I$(srcdir)/xtensa/boards/esp32s3/include
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../config/depstand.m4 \
@@ -434,10 +451,10 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
 mkinstalldirs = $(SHELL) $(top_srcdir)/../mkinstalldirs
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES = m68hc11/Makefile m68k/Makefile pa/Makefile \
-	sparc_leon/Makefile mips/Makefile rs6000/Makefile \
-	cr16/Makefile cris/Makefile crx/Makefile mep/Makefile \
-	microblaze/Makefile mt/Makefile xc16x/Makefile m32c/Makefile \
-	spu/Makefile tic6x/Makefile pru/Makefile sparc/libsys/Makefile
+	mips/Makefile rs6000/Makefile cr16/Makefile cris/Makefile \
+	crx/Makefile mep/Makefile microblaze/Makefile mt/Makefile \
+	xc16x/Makefile m32c/Makefile spu/Makefile tic6x/Makefile \
+	pru/Makefile sparc/libsys/Makefile
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -472,6 +489,7 @@ am__installdirs = "$(DESTDIR)$(multilibtooldir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(arm_cpu_initcpuinitdir)" \
 	"$(DESTDIR)$(includemachinetooldir)" \
 	"$(DESTDIR)$(includesystooldir)" "$(DESTDIR)$(includetooldir)" \
+	"$(DESTDIR)$(includetoolasmleondir)" \
 	"$(DESTDIR)$(multilibtooldir)"
 LIBRARIES = $(multilibtool_LIBRARIES) $(noinst_LIBRARIES)
 ARFLAGS = cru
@@ -737,12 +755,17 @@ libobjs_a_LIBADD =
 @CONFIG_SPARC_TRUE@	sparc/erc32-crt0.$(OBJEXT)
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_CYGMON_TRUE@am__objects_24 = sparc/cygmon-crt0.$(OBJEXT)
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SPLET_TRUE@am__objects_25 = sparc/crt0-701.$(OBJEXT)
-@CONFIG_V850_TRUE@am__objects_26 = v850/crt0.$(OBJEXT)
-@CONFIG_VISIUM_TRUE@am__objects_27 = visium/crt0.$(OBJEXT)
-@CONFIG_XSTORMY16_TRUE@am__objects_28 = xstormy16/crt0.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@am__objects_26 = sparc_leon/crt0.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/pnpinit.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/pnpinit_simple.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_svt.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_mvt.$(OBJEXT)
+@CONFIG_V850_TRUE@am__objects_27 = v850/crt0.$(OBJEXT)
+@CONFIG_VISIUM_TRUE@am__objects_28 = visium/crt0.$(OBJEXT)
+@CONFIG_XSTORMY16_TRUE@am__objects_29 = xstormy16/crt0.$(OBJEXT) \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/crti.$(OBJEXT) \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/crtn.$(OBJEXT)
-@CONFIG_XTENSA_TRUE@am__objects_29 = xtensa/crt0.$(OBJEXT) \
+@CONFIG_XTENSA_TRUE@am__objects_30 = xtensa/crt0.$(OBJEXT) \
 @CONFIG_XTENSA_TRUE@	xtensa/crt1-sim.$(OBJEXT) \
 @CONFIG_XTENSA_TRUE@	xtensa/crt1-boards.$(OBJEXT)
 am_libobjs_a_OBJECTS = $(am__objects_3) $(am__objects_4) \
@@ -754,7 +777,7 @@ am_libobjs_a_OBJECTS = $(am__objects_3) $(am__objects_4) \
 	$(am__objects_20) $(am__objects_21) $(am__objects_22) \
 	$(am__objects_23) $(am__objects_24) $(am__objects_25) \
 	$(am__objects_26) $(am__objects_27) $(am__objects_28) \
-	$(am__objects_29)
+	$(am__objects_29) $(am__objects_30)
 libobjs_a_OBJECTS = $(am_libobjs_a_OBJECTS)
 lm32_libgloss_a_AR = $(AR) $(ARFLAGS)
 lm32_libgloss_a_LIBADD =
@@ -763,7 +786,7 @@ lm32_libgloss_a_LIBADD =
 lm32_libgloss_a_OBJECTS = $(am_lm32_libgloss_a_OBJECTS)
 m32r_libgloss_a_AR = $(AR) $(ARFLAGS)
 m32r_libgloss_a_LIBADD =
-@CONFIG_M32R_TRUE@am__objects_30 = m32r/chmod.$(OBJEXT) \
+@CONFIG_M32R_TRUE@am__objects_31 = m32r/chmod.$(OBJEXT) \
 @CONFIG_M32R_TRUE@	m32r/close.$(OBJEXT) m32r/exit.$(OBJEXT) \
 @CONFIG_M32R_TRUE@	m32r/fstat.$(OBJEXT) m32r/getpid.$(OBJEXT) \
 @CONFIG_M32R_TRUE@	m32r/isatty.$(OBJEXT) m32r/kill.$(OBJEXT) \
@@ -773,16 +796,16 @@ m32r_libgloss_a_LIBADD =
 @CONFIG_M32R_TRUE@	m32r/unlink.$(OBJEXT) m32r/utime.$(OBJEXT) \
 @CONFIG_M32R_TRUE@	m32r/write.$(OBJEXT)
 @CONFIG_M32R_TRUE@am_m32r_libgloss_a_OBJECTS = m32r/trap0.$(OBJEXT) \
-@CONFIG_M32R_TRUE@	$(am__objects_30)
+@CONFIG_M32R_TRUE@	$(am__objects_31)
 m32r_libgloss_a_OBJECTS = $(am_m32r_libgloss_a_OBJECTS)
 m32r_libmon_a_AR = $(AR) $(ARFLAGS)
 m32r_libmon_a_LIBADD =
 @CONFIG_M32R_TRUE@am_m32r_libmon_a_OBJECTS = m32r/trapmon0.$(OBJEXT) \
-@CONFIG_M32R_TRUE@	$(am__objects_30)
+@CONFIG_M32R_TRUE@	$(am__objects_31)
 m32r_libmon_a_OBJECTS = $(am_m32r_libmon_a_OBJECTS)
 mcore_libcmb_a_AR = $(AR) $(ARFLAGS)
 mcore_libcmb_a_LIBADD =
-@CONFIG_MCORE_TRUE@am__objects_31 = mcore/fstat.$(OBJEXT) \
+@CONFIG_MCORE_TRUE@am__objects_32 = mcore/fstat.$(OBJEXT) \
 @CONFIG_MCORE_TRUE@	mcore/getpid.$(OBJEXT) isatty.$(OBJEXT) \
 @CONFIG_MCORE_TRUE@	mcore/kill.$(OBJEXT) mcore/raise.$(OBJEXT) \
 @CONFIG_MCORE_TRUE@	mcore/putnum.$(OBJEXT) mcore/stat.$(OBJEXT) \
@@ -794,12 +817,12 @@ mcore_libcmb_a_LIBADD =
 @CONFIG_MCORE_TRUE@	mcore/cmb-exit.$(OBJEXT) \
 @CONFIG_MCORE_TRUE@	mcore/cmb-inbyte.$(OBJEXT) \
 @CONFIG_MCORE_TRUE@	mcore/cmb-outbyte.$(OBJEXT) \
-@CONFIG_MCORE_TRUE@	$(am__objects_31)
+@CONFIG_MCORE_TRUE@	$(am__objects_32)
 mcore_libcmb_a_OBJECTS = $(am_mcore_libcmb_a_OBJECTS)
 mcore_libsim_a_AR = $(AR) $(ARFLAGS)
 mcore_libsim_a_LIBADD =
 @CONFIG_MCORE_TRUE@am_mcore_libsim_a_OBJECTS =  \
-@CONFIG_MCORE_TRUE@	mcore/syscalls.$(OBJEXT) $(am__objects_31)
+@CONFIG_MCORE_TRUE@	mcore/syscalls.$(OBJEXT) $(am__objects_32)
 mcore_libsim_a_OBJECTS = $(am_mcore_libsim_a_OBJECTS)
 mn10200_libeval_a_AR = $(AR) $(ARFLAGS)
 mn10200_libeval_a_LIBADD =
@@ -826,7 +849,7 @@ mn10200_libeval_a_LIBADD =
 mn10200_libeval_a_OBJECTS = $(am_mn10200_libeval_a_OBJECTS)
 mn10300_libcygmon_a_AR = $(AR) $(ARFLAGS)
 mn10300_libcygmon_a_LIBADD =
-@CONFIG_MN10300_TRUE@am__objects_32 = mn10300/_exit.$(OBJEXT) \
+@CONFIG_MN10300_TRUE@am__objects_33 = mn10300/_exit.$(OBJEXT) \
 @CONFIG_MN10300_TRUE@	mn10300/access.$(OBJEXT) \
 @CONFIG_MN10300_TRUE@	mn10300/chmod.$(OBJEXT) \
 @CONFIG_MN10300_TRUE@	mn10300/close.$(OBJEXT) \
@@ -845,12 +868,12 @@ mn10300_libcygmon_a_LIBADD =
 @CONFIG_MN10300_TRUE@	mn10300/unlink.$(OBJEXT) \
 @CONFIG_MN10300_TRUE@	mn10300/utime.$(OBJEXT) \
 @CONFIG_MN10300_TRUE@	mn10300/write.$(OBJEXT)
-@CONFIG_MN10300_TRUE@@MN10300_BUILD_LIBCYGMON_TRUE@am_mn10300_libcygmon_a_OBJECTS = $(am__objects_32) \
+@CONFIG_MN10300_TRUE@@MN10300_BUILD_LIBCYGMON_TRUE@am_mn10300_libcygmon_a_OBJECTS = $(am__objects_33) \
 @CONFIG_MN10300_TRUE@@MN10300_BUILD_LIBCYGMON_TRUE@	mn10300/cygmon.$(OBJEXT)
 mn10300_libcygmon_a_OBJECTS = $(am_mn10300_libcygmon_a_OBJECTS)
 mn10300_libeval_a_AR = $(AR) $(ARFLAGS)
 mn10300_libeval_a_LIBADD =
-@CONFIG_MN10300_TRUE@am_mn10300_libeval_a_OBJECTS = $(am__objects_32) \
+@CONFIG_MN10300_TRUE@am_mn10300_libeval_a_OBJECTS = $(am__objects_33) \
 @CONFIG_MN10300_TRUE@	mn10300/trap.$(OBJEXT)
 mn10300_libeval_a_OBJECTS = $(am_mn10300_libeval_a_OBJECTS)
 moxie_libqemu_a_AR = $(AR) $(ARFLAGS)
@@ -1100,7 +1123,7 @@ riscv_libsemihost_a_LIBADD =
 riscv_libsemihost_a_OBJECTS = $(am_riscv_libsemihost_a_OBJECTS)
 riscv_libsim_a_AR = $(AR) $(ARFLAGS)
 riscv_libsim_a_LIBADD =
-@CONFIG_RISCV_TRUE@am__objects_33 =  \
+@CONFIG_RISCV_TRUE@am__objects_34 =  \
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_access.$(OBJEXT) \
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_chdir.$(OBJEXT) \
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_chmod.$(OBJEXT) \
@@ -1133,7 +1156,7 @@ riscv_libsim_a_LIBADD =
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_utime.$(OBJEXT) \
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_wait.$(OBJEXT) \
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_write.$(OBJEXT)
-@CONFIG_RISCV_TRUE@am_riscv_libsim_a_OBJECTS = $(am__objects_33)
+@CONFIG_RISCV_TRUE@am_riscv_libsim_a_OBJECTS = $(am__objects_34)
 riscv_libsim_a_OBJECTS = $(am_riscv_libsim_a_OBJECTS)
 rl78_libsim_a_AR = $(AR) $(ARFLAGS)
 rl78_libsim_a_LIBADD =
@@ -1175,14 +1198,14 @@ sparc_libcygmon_a_LIBADD =
 sparc_libcygmon_a_OBJECTS = $(am_sparc_libcygmon_a_OBJECTS)
 sparc_liberc32_a_AR = $(AR) $(ARFLAGS)
 sparc_liberc32_a_LIBADD =
-@CONFIG_SPARC_TRUE@am__objects_34 = close.$(OBJEXT) fstat.$(OBJEXT) \
+@CONFIG_SPARC_TRUE@am__objects_35 = close.$(OBJEXT) fstat.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@	getpid.$(OBJEXT) isatty.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@	kill.$(OBJEXT) lseek.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@	open.$(OBJEXT) print.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@	putnum.$(OBJEXT) read.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@	sbrk.$(OBJEXT) stat.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@	unlink.$(OBJEXT) write.$(OBJEXT)
-@CONFIG_SPARC_TRUE@am_sparc_liberc32_a_OBJECTS = $(am__objects_34) \
+@CONFIG_SPARC_TRUE@am_sparc_liberc32_a_OBJECTS = $(am__objects_35) \
 @CONFIG_SPARC_TRUE@	sparc/erc32-io.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@	sparc/traps.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@	sparc/erc32-stub.$(OBJEXT) debug.$(OBJEXT) \
@@ -1190,18 +1213,18 @@ sparc_liberc32_a_LIBADD =
 sparc_liberc32_a_OBJECTS = $(am_sparc_liberc32_a_OBJECTS)
 sparc_libslite86x_a_AR = $(AR) $(ARFLAGS)
 sparc_libslite86x_a_LIBADD =
-@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@am__objects_35 =  \
-@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	$(am__objects_34) \
+@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@am__objects_36 =  \
+@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	$(am__objects_35) \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	sparc/salib.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	sparc/sparcl-stub.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	sparc/cache.$(OBJEXT)
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@am_sparc_libslite86x_a_OBJECTS =  \
-@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	$(am__objects_35)
+@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	$(am__objects_36)
 sparc_libslite86x_a_OBJECTS = $(am_sparc_libslite86x_a_OBJECTS)
 sparc_libslite930_a_AR = $(AR) $(ARFLAGS)
 sparc_libslite930_a_LIBADD =
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@am_sparc_libslite930_a_OBJECTS =  \
-@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	$(am__objects_34) \
+@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	$(am__objects_35) \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	sparc/salib.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	sparc/sparcl-stub.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	sparc/cache.$(OBJEXT)
@@ -1209,12 +1232,12 @@ sparc_libslite930_a_OBJECTS = $(am_sparc_libslite930_a_OBJECTS)
 sparc_libslite931_a_AR = $(AR) $(ARFLAGS)
 sparc_libslite931_a_LIBADD =
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@am_sparc_libslite931_a_OBJECTS =  \
-@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	$(am__objects_35)
+@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	$(am__objects_36)
 sparc_libslite931_a_OBJECTS = $(am_sparc_libslite931_a_OBJECTS)
 sparc_libslite934_a_AR = $(AR) $(ARFLAGS)
 sparc_libslite934_a_LIBADD =
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@am_sparc_libslite934_a_OBJECTS =  \
-@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	$(am__objects_35)
+@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	$(am__objects_36)
 sparc_libslite934_a_OBJECTS = $(am_sparc_libslite934_a_OBJECTS)
 sparc_libsplet701_a_AR = $(AR) $(ARFLAGS)
 sparc_libsplet701_a_LIBADD =
@@ -1222,6 +1245,88 @@ sparc_libsplet701_a_LIBADD =
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SPLET_TRUE@	sparc/salib-701.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SPLET_TRUE@	sparc/sparclet-stub.$(OBJEXT)
 sparc_libsplet701_a_OBJECTS = $(am_sparc_libsplet701_a_OBJECTS)
+sparc_leon_liblbthread_a_AR = $(AR) $(ARFLAGS)
+sparc_leon_liblbthread_a_LIBADD =
+@CONFIG_SPARC_LEON_TRUE@am_sparc_leon_liblbthread_a_OBJECTS =  \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel_debug.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel_debug_var.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel_context.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel_mutex.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel_thread.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel_sched.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel_queue.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel_mm.$(OBJEXT)
+sparc_leon_liblbthread_a_OBJECTS =  \
+	$(am_sparc_leon_liblbthread_a_OBJECTS)
+sparc_leon_libleonbare_a_AR = $(AR) $(ARFLAGS)
+sparc_leon_libleonbare_a_LIBADD =
+@CONFIG_SPARC_LEON_TRUE@am_sparc_leon_libleonbare_a_OBJECTS =  \
+@CONFIG_SPARC_LEON_TRUE@	close.$(OBJEXT) fstat.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	getpid.$(OBJEXT) isatty.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	kill.$(OBJEXT) lseek.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	open.$(OBJEXT) print.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	putnum.$(OBJEXT) read.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sbrk.$(OBJEXT) stat.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	unlink.$(OBJEXT) write.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/io.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel_debug.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel_debug_var.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel_context.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/etrap.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/rtrap.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/etrap_fast.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/rtrap_fast.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/irqinstall.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/regwin.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/regwinflush.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/fpu.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/bdinit.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/contextswitch.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/busscan.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/irqtrap_fast.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/catch_interrupt.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/catch_interrupt_svt.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/catch_interrupt_mvt.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/catch_interrupt_pending.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/gettimeofday.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/times.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/rtc.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/lcpuinit.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/console_init.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/console.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/console_dbg.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/contextswitch.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/contextswitch_asm.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/_exit.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/amba.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/amba_dbg.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/amba_scan.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/amba_driver.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/timer.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/mutex.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_clean.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_var.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_var_svt.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/jiffies.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/mmu_asm.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_svtdisp.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_mvt_reset.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_svt_reset.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/stop.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/initcalls.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/regwin_patch.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/cacheA.$(OBJEXT) \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/nocache.$(OBJEXT)
+sparc_leon_libleonbare_a_OBJECTS =  \
+	$(am_sparc_leon_libleonbare_a_OBJECTS)
+sparc_leon_libsmall_a_AR = $(AR) $(ARFLAGS)
+sparc_leon_libsmall_a_LIBADD =
+@CONFIG_SPARC_LEON_TRUE@am_sparc_leon_libsmall_a_OBJECTS =  \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_atexit.$(OBJEXT)
+sparc_leon_libsmall_a_OBJECTS = $(am_sparc_leon_libsmall_a_OBJECTS)
 v850_libsim_a_AR = $(AR) $(ARFLAGS)
 v850_libsim_a_LIBADD =
 @CONFIG_V850_TRUE@am_v850_libsim_a_OBJECTS = v850/_exit.$(OBJEXT) \
@@ -1242,11 +1347,11 @@ v850_libsim_a_LIBADD =
 v850_libsim_a_OBJECTS = $(am_v850_libsim_a_OBJECTS)
 visium_libdebug_a_AR = $(AR) $(ARFLAGS)
 visium_libdebug_a_LIBADD =
-@CONFIG_VISIUM_TRUE@am__objects_36 = getpid.$(OBJEXT) kill.$(OBJEXT) \
+@CONFIG_VISIUM_TRUE@am__objects_37 = getpid.$(OBJEXT) kill.$(OBJEXT) \
 @CONFIG_VISIUM_TRUE@	visium/io-gdb.$(OBJEXT) \
 @CONFIG_VISIUM_TRUE@	visium/io-stubs.$(OBJEXT) \
 @CONFIG_VISIUM_TRUE@	visium/sbrk.$(OBJEXT)
-@CONFIG_VISIUM_TRUE@am_visium_libdebug_a_OBJECTS = $(am__objects_36) \
+@CONFIG_VISIUM_TRUE@am_visium_libdebug_a_OBJECTS = $(am__objects_37) \
 @CONFIG_VISIUM_TRUE@	visium/syscalls.$(OBJEXT)
 visium_libdebug_a_OBJECTS = $(am_visium_libdebug_a_OBJECTS)
 visium_libserial_a_AR = $(AR) $(ARFLAGS)
@@ -1266,7 +1371,7 @@ visium_libserial_a_LIBADD =
 visium_libserial_a_OBJECTS = $(am_visium_libserial_a_OBJECTS)
 visium_libsim_a_AR = $(AR) $(ARFLAGS)
 visium_libsim_a_LIBADD =
-@CONFIG_VISIUM_TRUE@am_visium_libsim_a_OBJECTS = $(am__objects_36) \
+@CONFIG_VISIUM_TRUE@am_visium_libsim_a_OBJECTS = $(am__objects_37) \
 @CONFIG_VISIUM_TRUE@	visium/sim-syscalls.$(OBJEXT)
 visium_libsim_a_OBJECTS = $(am_visium_libsim_a_OBJECTS)
 xstormy16_libeva_app_a_AR = $(AR) $(ARFLAGS)
@@ -1292,13 +1397,13 @@ xstormy16_libsim_a_LIBADD =
 xstormy16_libsim_a_OBJECTS = $(am_xstormy16_libsim_a_OBJECTS)
 xtensa_libgloss_a_AR = $(AR) $(ARFLAGS)
 xtensa_libgloss_a_LIBADD =
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__objects_37 = xtensa/boards/esp32/xtensa_libgloss_a-board.$(OBJEXT)
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__objects_38 = xtensa/boards/esp32s3/xtensa_libgloss_a-board.$(OBJEXT)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__objects_38 = xtensa/boards/esp32/xtensa_libgloss_a-board.$(OBJEXT)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__objects_39 = xtensa/boards/esp32s3/xtensa_libgloss_a-board.$(OBJEXT)
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am_xtensa_libgloss_a_OBJECTS = xtensa/xtensa_libgloss_a-sleep.$(OBJEXT) \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/xtensa_libgloss_a-syscalls.$(OBJEXT) \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/xtensa_libgloss_a-window-vectors.$(OBJEXT) \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__objects_37) \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__objects_38)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__objects_38) \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__objects_39)
 xtensa_libgloss_a_OBJECTS = $(am_xtensa_libgloss_a_OBJECTS)
 xtensa_libsys_openocd_a_AR = $(AR) $(ARFLAGS)
 xtensa_libsys_openocd_a_LIBADD =
@@ -1436,7 +1541,10 @@ SOURCES = $(aarch64_librdimon_a_SOURCES) $(arc_libnsim_a_SOURCES) \
 	$(sparc_libcygmon_a_SOURCES) $(sparc_liberc32_a_SOURCES) \
 	$(sparc_libslite86x_a_SOURCES) $(sparc_libslite930_a_SOURCES) \
 	$(sparc_libslite931_a_SOURCES) $(sparc_libslite934_a_SOURCES) \
-	$(sparc_libsplet701_a_SOURCES) $(v850_libsim_a_SOURCES) \
+	$(sparc_libsplet701_a_SOURCES) \
+	$(sparc_leon_liblbthread_a_SOURCES) \
+	$(sparc_leon_libleonbare_a_SOURCES) \
+	$(sparc_leon_libsmall_a_SOURCES) $(v850_libsim_a_SOURCES) \
 	$(visium_libdebug_a_SOURCES) $(visium_libserial_a_SOURCES) \
 	$(visium_libsim_a_SOURCES) $(xstormy16_libeva_app_a_SOURCES) \
 	$(xstormy16_libsim_a_SOURCES) $(xtensa_libgloss_a_SOURCES) \
@@ -1501,7 +1609,8 @@ am__can_run_installinfo = \
   esac
 DATA = $(aarch64_cpu_initcpuinit_DATA) $(arm_cpu_initcpuinit_DATA) \
 	$(includemachinetool_DATA) $(includesystool_DATA) \
-	$(includetool_DATA) $(multilibtool_DATA)
+	$(includetool_DATA) $(includetoolasmleon_DATA) \
+	$(multilibtool_DATA)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 am__recursive_targets = \
@@ -1532,7 +1641,7 @@ ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
 DIST_SUBDIRS = $(SUBDIRS)
-VPATH = @srcdir@ $(am__append_113)
+VPATH = @srcdir@ $(am__append_116)
 AARCH64_OBJTYPE = @AARCH64_OBJTYPE@
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
@@ -1658,7 +1767,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I . -I .. -I ../config
 info_TEXINFOS = $(am__append_1)
-CLEANFILES = $(am__append_4) $(am__append_10) $(am__append_119)
+CLEANFILES = $(am__append_4) $(am__append_10) $(am__append_122)
 PHONY = 
 SUBDIRS = @subdirs@ .
 srcroot = $(top_srcdir)/..
@@ -1677,9 +1786,9 @@ multilibtool_DATA = $(am__append_3) $(am__append_6) $(am__append_7) \
 	$(am__append_78) $(am__append_81) $(am__append_83) \
 	$(am__append_87) $(am__append_89) $(am__append_92) \
 	$(am__append_95) $(am__append_98) $(am__append_101) \
-	$(am__append_103) $(am__append_107) $(am__append_110) \
-	$(am__append_115) $(am__append_120) $(am__append_123) \
-	$(am__append_125) $(am__append_130)
+	$(am__append_103) $(am__append_108) $(am__append_110) \
+	$(am__append_113) $(am__append_118) $(am__append_123) \
+	$(am__append_126) $(am__append_128) $(am__append_133)
 multilibtool_LIBRARIES = $(am__append_2) $(am__append_5) \
 	$(am__append_9) $(am__append_11) $(am__append_20) \
 	$(am__append_21) $(am__append_25) $(am__append_28) \
@@ -1691,8 +1800,8 @@ multilibtool_LIBRARIES = $(am__append_2) $(am__append_5) \
 	$(am__append_82) $(am__append_86) $(am__append_88) \
 	$(am__append_91) $(am__append_94) $(am__append_97) \
 	$(am__append_100) $(am__append_102) $(am__append_105) \
-	$(am__append_109) $(am__append_112) $(am__append_117) \
-	$(am__append_122) $(am__append_124)
+	$(am__append_107) $(am__append_112) $(am__append_115) \
+	$(am__append_120) $(am__append_125) $(am__append_127)
 includetooldir = $(tooldir)/include
 includetool_DATA = $(am__append_16) $(am__append_85)
 includesystooldir = $(tooldir)/include/sys
@@ -1715,8 +1824,9 @@ libobjs_a_SOURCES = $(am__append_14) $(am__append_19) $(am__append_24) \
 	$(am__append_61) $(am__append_67) $(am__append_73) \
 	$(am__append_76) $(am__append_79) $(am__append_84) \
 	$(am__append_90) $(am__append_93) $(am__append_96) \
-	$(am__append_99) $(am__append_104) $(am__append_108) \
-	$(am__append_111) $(am__append_116) $(am__append_121)
+	$(am__append_99) $(am__append_104) $(am__append_109) \
+	$(am__append_111) $(am__append_114) $(am__append_119) \
+	$(am__append_124)
 FLAGS_TO_PASS = \
 	"CC=$(CC)" \
 	"CFLAGS=$(CFLAGS)" \
@@ -2405,6 +2515,90 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 @CONFIG_SPARC_TRUE@AM_LDFLAGS_sparc_ex931_test = -N -Wl,-T$(srcdir)/sparc/ex931.ld -nostdlib
 @CONFIG_SPARC_TRUE@sparc_ex934_test_SOURCES = sparc/test.c
 @CONFIG_SPARC_TRUE@AM_LDFLAGS_sparc_ex934_test = -N -Wl,-T$(srcdir)/sparc/ex934.ld -nostdlib
+@CONFIG_SPARC_LEON_TRUE@AM_CPPFLAGS_sparc_leon = -I$(srcdir)/sparc_leon
+@CONFIG_SPARC_LEON_TRUE@sparc_leon_libleonbare_a_SOURCES = \
+@CONFIG_SPARC_LEON_TRUE@	close.c \
+@CONFIG_SPARC_LEON_TRUE@	fstat.c \
+@CONFIG_SPARC_LEON_TRUE@	getpid.c \
+@CONFIG_SPARC_LEON_TRUE@	isatty.c \
+@CONFIG_SPARC_LEON_TRUE@	kill.c \
+@CONFIG_SPARC_LEON_TRUE@	lseek.c \
+@CONFIG_SPARC_LEON_TRUE@	open.c \
+@CONFIG_SPARC_LEON_TRUE@	print.c \
+@CONFIG_SPARC_LEON_TRUE@	putnum.c \
+@CONFIG_SPARC_LEON_TRUE@	read.c \
+@CONFIG_SPARC_LEON_TRUE@	sbrk.c \
+@CONFIG_SPARC_LEON_TRUE@	stat.c \
+@CONFIG_SPARC_LEON_TRUE@	unlink.c \
+@CONFIG_SPARC_LEON_TRUE@	write.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/io.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel_debug.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel_debug_var.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel_context.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/etrap.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/rtrap.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/etrap_fast.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/rtrap_fast.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/irqinstall.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/regwin.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/regwinflush.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/fpu.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/bdinit.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/contextswitch.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/busscan.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/irqtrap_fast.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/catch_interrupt.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/catch_interrupt_svt.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/catch_interrupt_mvt.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/catch_interrupt_pending.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/gettimeofday.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/times.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/rtc.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/lcpuinit.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/console_init.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/console.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/console_dbg.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/contextswitch.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/contextswitch_asm.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/_exit.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/amba.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/amba_dbg.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/amba_scan.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/amba_driver.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/timer.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/mutex.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_clean.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_var.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_var_svt.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/jiffies.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/mmu_asm.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_svtdisp.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_mvt_reset.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_svt_reset.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/stop.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/initcalls.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/regwin_patch.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/cacheA.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/nocache.S
+
+@CONFIG_SPARC_LEON_TRUE@sparc_leon_liblbthread_a_SOURCES = \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel_debug.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel_debug_var.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel_context.S \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel_mutex.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel_thread.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel_sched.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel_queue.c \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/kernel_mm.c
+
+@CONFIG_SPARC_LEON_TRUE@sparc_leon_libsmall_a_SOURCES = \
+@CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_atexit.c
+
+@CONFIG_SPARC_LEON_TRUE@@HAVE_MULTISUBDIR_FALSE@includetoolasmleondir = $(includetooldir)/asm-leon
+@CONFIG_SPARC_LEON_TRUE@@HAVE_MULTISUBDIR_FALSE@includetoolasmleon_DATA = $(wildcard $(srcdir)/sparc_leon/asm-leon/*.h)
 @CONFIG_V850_TRUE@v850_libsim_a_SOURCES = \
 @CONFIG_V850_TRUE@	v850/_exit.c \
 @CONFIG_V850_TRUE@	v850/access.c \
@@ -2504,15 +2698,15 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libgloss_a_SOURCES = xtensa/sleep.S \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/syscalls.c \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/window-vectors.S \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_126) \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_131)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_129) \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_134)
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libgloss_a_CPPFLAGS = $(AM_CPPFLAGS) \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_127) \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_132)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_130) \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_135)
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libsys_qemu_a_CPPFLAGS = $(AM_CPPFLAGS) \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	-DQEMU_SEMIHOSTING \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_128) \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_133)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_131) \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_136)
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libsys_qemu_a_SOURCES = \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/sim-vectors.S \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/sim-call.S \
@@ -2520,8 +2714,8 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libsys_openocd_a_CPPFLAGS = $(AM_CPPFLAGS) \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	-DOPENOCD_SEMIHOSTING \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_129) \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_134)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_132) \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_137)
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libsys_openocd_a_SOURCES = \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/syscalls.c
 
@@ -2532,7 +2726,7 @@ all: config.h
 .SUFFIXES: .S .c .dvi .o .obj .ps .s
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arc/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/csky/Makefile.inc $(srcdir)/d30v/Makefile.inc $(srcdir)/epiphany/Makefile.inc $(srcdir)/fr30/Makefile.inc $(srcdir)/frv/Makefile.inc $(srcdir)/ft32/Makefile.inc $(srcdir)/i386/Makefile.inc $(srcdir)/i960/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/m32r/Makefile.inc $(srcdir)/mcore/Makefile.inc $(srcdir)/mn10200/Makefile.inc $(srcdir)/mn10300/Makefile.inc $(srcdir)/moxie/Makefile.inc $(srcdir)/msp430/Makefile.inc $(srcdir)/nds32/Makefile.inc $(srcdir)/nios2/Makefile.inc $(srcdir)/or1k/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/rl78/Makefile.inc $(srcdir)/rx/Makefile.inc $(srcdir)/sparc/Makefile.inc $(srcdir)/v850/Makefile.inc $(srcdir)/visium/Makefile.inc $(srcdir)/wince/Makefile.inc $(srcdir)/xstormy16/Makefile.inc $(srcdir)/xtensa/Makefile.inc $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arc/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/csky/Makefile.inc $(srcdir)/d30v/Makefile.inc $(srcdir)/epiphany/Makefile.inc $(srcdir)/fr30/Makefile.inc $(srcdir)/frv/Makefile.inc $(srcdir)/ft32/Makefile.inc $(srcdir)/i386/Makefile.inc $(srcdir)/i960/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/m32r/Makefile.inc $(srcdir)/mcore/Makefile.inc $(srcdir)/mn10200/Makefile.inc $(srcdir)/mn10300/Makefile.inc $(srcdir)/moxie/Makefile.inc $(srcdir)/msp430/Makefile.inc $(srcdir)/nds32/Makefile.inc $(srcdir)/nios2/Makefile.inc $(srcdir)/or1k/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/rl78/Makefile.inc $(srcdir)/rx/Makefile.inc $(srcdir)/sparc/Makefile.inc $(srcdir)/sparc_leon/Makefile.inc $(srcdir)/v850/Makefile.inc $(srcdir)/visium/Makefile.inc $(srcdir)/wince/Makefile.inc $(srcdir)/xstormy16/Makefile.inc $(srcdir)/xtensa/Makefile.inc $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -2554,7 +2748,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe);; \
 	esac;
-$(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arc/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/csky/Makefile.inc $(srcdir)/d30v/Makefile.inc $(srcdir)/epiphany/Makefile.inc $(srcdir)/fr30/Makefile.inc $(srcdir)/frv/Makefile.inc $(srcdir)/ft32/Makefile.inc $(srcdir)/i386/Makefile.inc $(srcdir)/i960/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/m32r/Makefile.inc $(srcdir)/mcore/Makefile.inc $(srcdir)/mn10200/Makefile.inc $(srcdir)/mn10300/Makefile.inc $(srcdir)/moxie/Makefile.inc $(srcdir)/msp430/Makefile.inc $(srcdir)/nds32/Makefile.inc $(srcdir)/nios2/Makefile.inc $(srcdir)/or1k/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/rl78/Makefile.inc $(srcdir)/rx/Makefile.inc $(srcdir)/sparc/Makefile.inc $(srcdir)/v850/Makefile.inc $(srcdir)/visium/Makefile.inc $(srcdir)/wince/Makefile.inc $(srcdir)/xstormy16/Makefile.inc $(srcdir)/xtensa/Makefile.inc $(am__empty):
+$(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arc/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/csky/Makefile.inc $(srcdir)/d30v/Makefile.inc $(srcdir)/epiphany/Makefile.inc $(srcdir)/fr30/Makefile.inc $(srcdir)/frv/Makefile.inc $(srcdir)/ft32/Makefile.inc $(srcdir)/i386/Makefile.inc $(srcdir)/i960/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/m32r/Makefile.inc $(srcdir)/mcore/Makefile.inc $(srcdir)/mn10200/Makefile.inc $(srcdir)/mn10300/Makefile.inc $(srcdir)/moxie/Makefile.inc $(srcdir)/msp430/Makefile.inc $(srcdir)/nds32/Makefile.inc $(srcdir)/nios2/Makefile.inc $(srcdir)/or1k/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/rl78/Makefile.inc $(srcdir)/rx/Makefile.inc $(srcdir)/sparc/Makefile.inc $(srcdir)/sparc_leon/Makefile.inc $(srcdir)/v850/Makefile.inc $(srcdir)/visium/Makefile.inc $(srcdir)/wince/Makefile.inc $(srcdir)/xstormy16/Makefile.inc $(srcdir)/xtensa/Makefile.inc $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
@@ -2584,8 +2778,6 @@ m68hc11/Makefile: $(top_builddir)/config.status $(top_srcdir)/m68hc11/Makefile.i
 m68k/Makefile: $(top_builddir)/config.status $(top_srcdir)/m68k/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 pa/Makefile: $(top_builddir)/config.status $(top_srcdir)/pa/Makefile.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-sparc_leon/Makefile: $(top_builddir)/config.status $(top_srcdir)/sparc_leon/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 mips/Makefile: $(top_builddir)/config.status $(top_srcdir)/mips/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
@@ -3283,6 +3475,22 @@ sparc/cygmon-crt0.$(OBJEXT): sparc/$(am__dirstamp) \
 	sparc/$(DEPDIR)/$(am__dirstamp)
 sparc/crt0-701.$(OBJEXT): sparc/$(am__dirstamp) \
 	sparc/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/$(am__dirstamp):
+	@$(MKDIR_P) sparc_leon
+	@: > sparc_leon/$(am__dirstamp)
+sparc_leon/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) sparc_leon/$(DEPDIR)
+	@: > sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/crt0.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/pnpinit.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/pnpinit_simple.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/locore_svt.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/locore_mvt.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
 v850/$(am__dirstamp):
 	@$(MKDIR_P) v850
 	@: > v850/$(am__dirstamp)
@@ -4172,6 +4380,134 @@ sparc/libsplet701.a: $(sparc_libsplet701_a_OBJECTS) $(sparc_libsplet701_a_DEPEND
 	$(AM_V_at)-rm -f sparc/libsplet701.a
 	$(AM_V_AR)$(sparc_libsplet701_a_AR) sparc/libsplet701.a $(sparc_libsplet701_a_OBJECTS) $(sparc_libsplet701_a_LIBADD)
 	$(AM_V_at)$(RANLIB) sparc/libsplet701.a
+sparc_leon/kernel.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/kernel_debug.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/kernel_debug_var.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/kernel_context.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/kernel_mutex.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/kernel_thread.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/kernel_sched.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/kernel_queue.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/kernel_mm.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+
+sparc_leon/liblbthread.a: $(sparc_leon_liblbthread_a_OBJECTS) $(sparc_leon_liblbthread_a_DEPENDENCIES) $(EXTRA_sparc_leon_liblbthread_a_DEPENDENCIES) sparc_leon/$(am__dirstamp)
+	$(AM_V_at)-rm -f sparc_leon/liblbthread.a
+	$(AM_V_AR)$(sparc_leon_liblbthread_a_AR) sparc_leon/liblbthread.a $(sparc_leon_liblbthread_a_OBJECTS) $(sparc_leon_liblbthread_a_LIBADD)
+	$(AM_V_at)$(RANLIB) sparc_leon/liblbthread.a
+sparc_leon/io.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/etrap.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/rtrap.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/etrap_fast.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/rtrap_fast.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/irqinstall.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/regwin.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/regwinflush.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/fpu.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/bdinit.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/contextswitch.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/busscan.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/irqtrap_fast.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/catch_interrupt.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/catch_interrupt_svt.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/catch_interrupt_mvt.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/catch_interrupt_pending.$(OBJEXT):  \
+	sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/gettimeofday.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/times.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/rtc.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/lcpuinit.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/console_init.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/console.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/console_dbg.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/contextswitch_asm.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/_exit.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/amba.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/amba_dbg.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/amba_scan.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/amba_driver.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/timer.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/mutex.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/locore.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/locore_clean.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/locore_var.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/locore_var_svt.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/jiffies.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/mmu_asm.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/locore_svtdisp.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/locore_mvt_reset.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/locore_svt_reset.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/stop.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/initcalls.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/regwin_patch.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/cacheA.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+sparc_leon/nocache.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+
+sparc_leon/libleonbare.a: $(sparc_leon_libleonbare_a_OBJECTS) $(sparc_leon_libleonbare_a_DEPENDENCIES) $(EXTRA_sparc_leon_libleonbare_a_DEPENDENCIES) sparc_leon/$(am__dirstamp)
+	$(AM_V_at)-rm -f sparc_leon/libleonbare.a
+	$(AM_V_AR)$(sparc_leon_libleonbare_a_AR) sparc_leon/libleonbare.a $(sparc_leon_libleonbare_a_OBJECTS) $(sparc_leon_libleonbare_a_LIBADD)
+	$(AM_V_at)$(RANLIB) sparc_leon/libleonbare.a
+sparc_leon/locore_atexit.$(OBJEXT): sparc_leon/$(am__dirstamp) \
+	sparc_leon/$(DEPDIR)/$(am__dirstamp)
+
+sparc_leon/libsmall.a: $(sparc_leon_libsmall_a_OBJECTS) $(sparc_leon_libsmall_a_DEPENDENCIES) $(EXTRA_sparc_leon_libsmall_a_DEPENDENCIES) sparc_leon/$(am__dirstamp)
+	$(AM_V_at)-rm -f sparc_leon/libsmall.a
+	$(AM_V_AR)$(sparc_leon_libsmall_a_AR) sparc_leon/libsmall.a $(sparc_leon_libsmall_a_OBJECTS) $(sparc_leon_libsmall_a_LIBADD)
+	$(AM_V_at)$(RANLIB) sparc_leon/libsmall.a
 v850/_exit.$(OBJEXT): v850/$(am__dirstamp) \
 	v850/$(DEPDIR)/$(am__dirstamp)
 v850/access.$(OBJEXT): v850/$(am__dirstamp) \
@@ -4525,6 +4861,7 @@ mostlyclean-compile:
 	-rm -f rl78/*.$(OBJEXT)
 	-rm -f rx/*.$(OBJEXT)
 	-rm -f sparc/*.$(OBJEXT)
+	-rm -f sparc_leon/*.$(OBJEXT)
 	-rm -f v850/*.$(OBJEXT)
 	-rm -f visium/*.$(OBJEXT)
 	-rm -f xstormy16/*.$(OBJEXT)
@@ -5088,6 +5425,67 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@sparc/$(DEPDIR)/sysc-701.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sparc/$(DEPDIR)/test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sparc/$(DEPDIR)/traps.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/_exit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/amba.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/amba_dbg.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/amba_driver.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/amba_scan.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/bdinit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/busscan.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/cacheA.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/catch_interrupt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/catch_interrupt_mvt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/catch_interrupt_pending.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/catch_interrupt_svt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/console.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/console_dbg.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/console_init.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/contextswitch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/contextswitch_asm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/crt0.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/etrap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/etrap_fast.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/fpu.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/gettimeofday.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/initcalls.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/io.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/irqinstall.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/irqtrap_fast.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/jiffies.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/kernel.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/kernel_context.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/kernel_debug.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/kernel_debug_var.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/kernel_mm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/kernel_mutex.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/kernel_queue.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/kernel_sched.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/kernel_thread.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/lcpuinit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/locore.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/locore_atexit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/locore_clean.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/locore_mvt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/locore_mvt_reset.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/locore_svt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/locore_svt_reset.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/locore_svtdisp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/locore_var.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/locore_var_svt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/mmu_asm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/mutex.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/nocache.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/pnpinit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/pnpinit_simple.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/regwin.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/regwin_patch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/regwinflush.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/rtc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/rtrap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/rtrap_fast.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/stop.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/timer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sparc_leon/$(DEPDIR)/times.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@v850/$(DEPDIR)/_exit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@v850/$(DEPDIR)/access.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@v850/$(DEPDIR)/chmod.Po@am__quote@
@@ -7745,6 +8143,27 @@ uninstall-includetoolDATA:
 	@list='$(includetool_DATA)'; test -n "$(includetooldir)" || list=; \
 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
 	dir='$(DESTDIR)$(includetooldir)'; $(am__uninstall_files_from_dir)
+install-includetoolasmleonDATA: $(includetoolasmleon_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(includetoolasmleon_DATA)'; test -n "$(includetoolasmleondir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(includetoolasmleondir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(includetoolasmleondir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(includetoolasmleondir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(includetoolasmleondir)" || exit $$?; \
+	done
+
+uninstall-includetoolasmleonDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(includetoolasmleon_DATA)'; test -n "$(includetoolasmleondir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(includetoolasmleondir)'; $(am__uninstall_files_from_dir)
 install-multilibtoolDATA: $(multilibtool_DATA)
 	@$(NORMAL_INSTALL)
 	@list='$(multilibtool_DATA)'; test -n "$(multilibtooldir)" || list=; \
@@ -7879,7 +8298,7 @@ all-am: Makefile $(INFO_DEPS) $(LIBRARIES) $(PROGRAMS) $(DATA) \
 		config.h all-local
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(multilibtooldir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(multilibtooldir)" "$(DESTDIR)$(infodir)" "$(DESTDIR)$(aarch64_cpu_initcpuinitdir)" "$(DESTDIR)$(arm_cpu_initcpuinitdir)" "$(DESTDIR)$(includemachinetooldir)" "$(DESTDIR)$(includesystooldir)" "$(DESTDIR)$(includetooldir)" "$(DESTDIR)$(multilibtooldir)"; do \
+	for dir in "$(DESTDIR)$(multilibtooldir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(multilibtooldir)" "$(DESTDIR)$(infodir)" "$(DESTDIR)$(aarch64_cpu_initcpuinitdir)" "$(DESTDIR)$(arm_cpu_initcpuinitdir)" "$(DESTDIR)$(includemachinetooldir)" "$(DESTDIR)$(includesystooldir)" "$(DESTDIR)$(includetooldir)" "$(DESTDIR)$(includetoolasmleondir)" "$(DESTDIR)$(multilibtooldir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -7968,6 +8387,8 @@ distclean-generic:
 	-rm -f rx/$(am__dirstamp)
 	-rm -f sparc/$(DEPDIR)/$(am__dirstamp)
 	-rm -f sparc/$(am__dirstamp)
+	-rm -f sparc_leon/$(DEPDIR)/$(am__dirstamp)
+	-rm -f sparc_leon/$(am__dirstamp)
 	-rm -f v850/$(DEPDIR)/$(am__dirstamp)
 	-rm -f v850/$(am__dirstamp)
 	-rm -f visium/$(DEPDIR)/$(am__dirstamp)
@@ -7995,7 +8416,7 @@ clean-am: clean-aminfo clean-binPROGRAMS clean-checkPROGRAMS \
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) csky/$(DEPDIR) d30v/$(DEPDIR) epiphany/$(DEPDIR) fr30/$(DEPDIR) frv/$(DEPDIR) ft32/$(DEPDIR) i386/$(DEPDIR) i960/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) m32r/$(DEPDIR) mcore/$(DEPDIR) mn10200/$(DEPDIR) mn10300/$(DEPDIR) moxie/$(DEPDIR) msp430/$(DEPDIR) nds32/$(DEPDIR) nios2/$(DEPDIR) or1k/$(DEPDIR) or1k/boards/$(DEPDIR) riscv/$(DEPDIR) rl78/$(DEPDIR) rx/$(DEPDIR) sparc/$(DEPDIR) v850/$(DEPDIR) visium/$(DEPDIR) xstormy16/$(DEPDIR) xtensa/$(DEPDIR) xtensa/boards/esp32/$(DEPDIR) xtensa/boards/esp32s3/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) csky/$(DEPDIR) d30v/$(DEPDIR) epiphany/$(DEPDIR) fr30/$(DEPDIR) frv/$(DEPDIR) ft32/$(DEPDIR) i386/$(DEPDIR) i960/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) m32r/$(DEPDIR) mcore/$(DEPDIR) mn10200/$(DEPDIR) mn10300/$(DEPDIR) moxie/$(DEPDIR) msp430/$(DEPDIR) nds32/$(DEPDIR) nios2/$(DEPDIR) or1k/$(DEPDIR) or1k/boards/$(DEPDIR) riscv/$(DEPDIR) rl78/$(DEPDIR) rx/$(DEPDIR) sparc/$(DEPDIR) sparc_leon/$(DEPDIR) v850/$(DEPDIR) visium/$(DEPDIR) xstormy16/$(DEPDIR) xtensa/$(DEPDIR) xtensa/boards/esp32/$(DEPDIR) xtensa/boards/esp32s3/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-local distclean-tags
@@ -8015,8 +8436,9 @@ info-am: $(INFO_DEPS)
 install-data-am: install-aarch64_cpu_initcpuinitDATA \
 	install-arm_cpu_initcpuinitDATA install-includemachinetoolDATA \
 	install-includesystoolDATA install-includetoolDATA \
-	install-info-am install-multilibtoolDATA \
-	install-multilibtoolLIBRARIES install-multilibtoolPROGRAMS
+	install-includetoolasmleonDATA install-info-am \
+	install-multilibtoolDATA install-multilibtoolLIBRARIES \
+	install-multilibtoolPROGRAMS
 
 install-dvi: install-dvi-recursive
 
@@ -8138,7 +8560,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) csky/$(DEPDIR) d30v/$(DEPDIR) epiphany/$(DEPDIR) fr30/$(DEPDIR) frv/$(DEPDIR) ft32/$(DEPDIR) i386/$(DEPDIR) i960/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) m32r/$(DEPDIR) mcore/$(DEPDIR) mn10200/$(DEPDIR) mn10300/$(DEPDIR) moxie/$(DEPDIR) msp430/$(DEPDIR) nds32/$(DEPDIR) nios2/$(DEPDIR) or1k/$(DEPDIR) or1k/boards/$(DEPDIR) riscv/$(DEPDIR) rl78/$(DEPDIR) rx/$(DEPDIR) sparc/$(DEPDIR) v850/$(DEPDIR) visium/$(DEPDIR) xstormy16/$(DEPDIR) xtensa/$(DEPDIR) xtensa/boards/esp32/$(DEPDIR) xtensa/boards/esp32s3/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) csky/$(DEPDIR) d30v/$(DEPDIR) epiphany/$(DEPDIR) fr30/$(DEPDIR) frv/$(DEPDIR) ft32/$(DEPDIR) i386/$(DEPDIR) i960/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) m32r/$(DEPDIR) mcore/$(DEPDIR) mn10200/$(DEPDIR) mn10300/$(DEPDIR) moxie/$(DEPDIR) msp430/$(DEPDIR) nds32/$(DEPDIR) nios2/$(DEPDIR) or1k/$(DEPDIR) or1k/boards/$(DEPDIR) riscv/$(DEPDIR) rl78/$(DEPDIR) rx/$(DEPDIR) sparc/$(DEPDIR) sparc_leon/$(DEPDIR) v850/$(DEPDIR) visium/$(DEPDIR) xstormy16/$(DEPDIR) xtensa/$(DEPDIR) xtensa/boards/esp32/$(DEPDIR) xtensa/boards/esp32s3/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-aminfo \
 	maintainer-clean-generic maintainer-clean-local
@@ -8160,10 +8582,10 @@ uninstall-am: uninstall-aarch64_cpu_initcpuinitDATA \
 	uninstall-arm_cpu_initcpuinitDATA uninstall-binPROGRAMS \
 	uninstall-dvi-am uninstall-html-am \
 	uninstall-includemachinetoolDATA uninstall-includesystoolDATA \
-	uninstall-includetoolDATA uninstall-info-am \
-	uninstall-multilibtoolDATA uninstall-multilibtoolLIBRARIES \
-	uninstall-multilibtoolPROGRAMS uninstall-pdf-am \
-	uninstall-ps-am
+	uninstall-includetoolDATA uninstall-includetoolasmleonDATA \
+	uninstall-info-am uninstall-multilibtoolDATA \
+	uninstall-multilibtoolLIBRARIES uninstall-multilibtoolPROGRAMS \
+	uninstall-pdf-am uninstall-ps-am
 
 .MAKE: $(am__recursive_targets) all check-am install-am install-strip
 
@@ -8182,23 +8604,23 @@ uninstall-am: uninstall-aarch64_cpu_initcpuinitDATA \
 	install-exec install-exec-am install-exec-local install-html \
 	install-html-am install-includemachinetoolDATA \
 	install-includesystoolDATA install-includetoolDATA \
-	install-info install-info-am install-man \
-	install-multilibtoolDATA install-multilibtoolLIBRARIES \
-	install-multilibtoolPROGRAMS install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs installdirs-am maintainer-clean \
-	maintainer-clean-aminfo maintainer-clean-generic \
-	maintainer-clean-local mostlyclean mostlyclean-aminfo \
-	mostlyclean-compile mostlyclean-generic mostlyclean-local pdf \
-	pdf-am ps ps-am tags tags-am uninstall \
+	install-includetoolasmleonDATA install-info install-info-am \
+	install-man install-multilibtoolDATA \
+	install-multilibtoolLIBRARIES install-multilibtoolPROGRAMS \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-aminfo \
+	maintainer-clean-generic maintainer-clean-local mostlyclean \
+	mostlyclean-aminfo mostlyclean-compile mostlyclean-generic \
+	mostlyclean-local pdf pdf-am ps ps-am tags tags-am uninstall \
 	uninstall-aarch64_cpu_initcpuinitDATA uninstall-am \
 	uninstall-arm_cpu_initcpuinitDATA uninstall-binPROGRAMS \
 	uninstall-dvi-am uninstall-html-am \
 	uninstall-includemachinetoolDATA uninstall-includesystoolDATA \
-	uninstall-includetoolDATA uninstall-info-am \
-	uninstall-multilibtoolDATA uninstall-multilibtoolLIBRARIES \
-	uninstall-multilibtoolPROGRAMS uninstall-pdf-am \
-	uninstall-ps-am
+	uninstall-includetoolDATA uninstall-includetoolasmleonDATA \
+	uninstall-info-am uninstall-multilibtoolDATA \
+	uninstall-multilibtoolLIBRARIES uninstall-multilibtoolPROGRAMS \
+	uninstall-pdf-am uninstall-ps-am
 
 .PRECIOUS: Makefile
 

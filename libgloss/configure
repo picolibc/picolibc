@@ -660,6 +660,8 @@ CONFIG_VISIUM_FALSE
 CONFIG_VISIUM_TRUE
 CONFIG_V850_FALSE
 CONFIG_V850_TRUE
+CONFIG_SPARC_LEON_FALSE
+CONFIG_SPARC_LEON_TRUE
 CONFIG_SPARC_FALSE
 CONFIG_SPARC_TRUE
 CONFIG_RX_FALSE
@@ -2852,9 +2854,7 @@ case "${target}" in
 	config_i960=true
 	;;
   sparc-*leon*-elf* | sparc-*leon*-none*)
-	ac_config_files="$ac_config_files sparc_leon/Makefile"
-
-	subdirs="$subdirs sparc_leon"
+	config_sparc_leon=true
 	;;
   sparclet-*-aout* | sparc-*-elf* | sparc64-*-elf* | sparc86x-*-* | sparclite-*-*)
 	config_sparc=true
@@ -3227,6 +3227,14 @@ fi
 else
   CONFIG_SPARC_TRUE='#'
   CONFIG_SPARC_FALSE=
+fi
+
+   if test x$config_sparc_leon = xtrue; then
+  CONFIG_SPARC_LEON_TRUE=
+  CONFIG_SPARC_LEON_FALSE='#'
+else
+  CONFIG_SPARC_LEON_TRUE='#'
+  CONFIG_SPARC_LEON_FALSE=
 fi
 
    if test x$config_v850 = xtrue; then
@@ -5873,6 +5881,10 @@ if test -z "${CONFIG_SPARC_TRUE}" && test -z "${CONFIG_SPARC_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_SPARC\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${CONFIG_SPARC_LEON_TRUE}" && test -z "${CONFIG_SPARC_LEON_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_SPARC_LEON\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${CONFIG_V850_TRUE}" && test -z "${CONFIG_V850_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_V850\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -6556,7 +6568,6 @@ do
     "m68hc11/Makefile") CONFIG_FILES="$CONFIG_FILES m68hc11/Makefile" ;;
     "m68k/Makefile") CONFIG_FILES="$CONFIG_FILES m68k/Makefile" ;;
     "pa/Makefile") CONFIG_FILES="$CONFIG_FILES pa/Makefile" ;;
-    "sparc_leon/Makefile") CONFIG_FILES="$CONFIG_FILES sparc_leon/Makefile" ;;
     "mips/Makefile") CONFIG_FILES="$CONFIG_FILES mips/Makefile" ;;
     "rs6000/Makefile") CONFIG_FILES="$CONFIG_FILES rs6000/Makefile" ;;
     "cr16/Makefile") CONFIG_FILES="$CONFIG_FILES cr16/Makefile" ;;

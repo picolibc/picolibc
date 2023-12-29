@@ -164,6 +164,9 @@ endif
 if CONFIG_SPARC
 include sparc/Makefile.inc
 endif
+if CONFIG_SPARC_LEON
+include sparc_leon/Makefile.inc
+endif
 if CONFIG_V850
 include v850/Makefile.inc
 endif
