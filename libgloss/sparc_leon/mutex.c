@@ -23,9 +23,13 @@
  */
 
 
+#define pthread_mutex_t pthread_mutex_t_
+#define pthread_mutexattr_t pthread_mutexattr_t_
 #include <sys/types.h>
 #include <sys/lock.h>
 #include <asm-leon/queue.h>
+#undef pthread_mutex_t
+#undef pthread_mutexattr_t
 /*#include <sys/fsu_pthread_mutex.h>*/
 
 typedef int pthread_protocol_t;
