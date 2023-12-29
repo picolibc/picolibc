@@ -660,6 +660,8 @@ CONFIG_RL78_FALSE
 CONFIG_RL78_TRUE
 CONFIG_RISCV_FALSE
 CONFIG_RISCV_TRUE
+CONFIG_OR1K_FALSE
+CONFIG_OR1K_TRUE
 CONFIG_NIOS2_FALSE
 CONFIG_NIOS2_TRUE
 CONFIG_NDS32_FALSE
@@ -2984,9 +2986,7 @@ case "${target}" in
 	config_iq2000=true
 	;;
   or1k-*-* | or1knd-*-* )
-	ac_config_files="$ac_config_files or1k/Makefile"
-
-	subdirs="$subdirs or1k"
+	config_or1k=true
 	;;
   pru-*-*)
 	ac_config_files="$ac_config_files pru/Makefile"
@@ -3165,6 +3165,14 @@ fi
 else
   CONFIG_NIOS2_TRUE='#'
   CONFIG_NIOS2_FALSE=
+fi
+
+   if test x$config_or1k = xtrue; then
+  CONFIG_OR1K_TRUE=
+  CONFIG_OR1K_FALSE='#'
+else
+  CONFIG_OR1K_TRUE='#'
+  CONFIG_OR1K_FALSE=
 fi
 
    if test x$config_riscv = xtrue; then
@@ -5782,6 +5790,10 @@ if test -z "${CONFIG_NIOS2_TRUE}" && test -z "${CONFIG_NIOS2_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_NIOS2\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${CONFIG_OR1K_TRUE}" && test -z "${CONFIG_OR1K_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_OR1K\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${CONFIG_RISCV_TRUE}" && test -z "${CONFIG_RISCV_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_RISCV\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -6481,7 +6493,6 @@ do
     "m32c/Makefile") CONFIG_FILES="$CONFIG_FILES m32c/Makefile" ;;
     "spu/Makefile") CONFIG_FILES="$CONFIG_FILES spu/Makefile" ;;
     "tic6x/Makefile") CONFIG_FILES="$CONFIG_FILES tic6x/Makefile" ;;
-    "or1k/Makefile") CONFIG_FILES="$CONFIG_FILES or1k/Makefile" ;;
     "pru/Makefile") CONFIG_FILES="$CONFIG_FILES pru/Makefile" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "sparc/libsys/Makefile") CONFIG_FILES="$CONFIG_FILES sparc/libsys/Makefile" ;;

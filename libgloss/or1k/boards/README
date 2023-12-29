@@ -60,6 +60,5 @@ steps:
        implementation. It is recommended to do so in assembler board files to
        keep the ability to overwrite the default implementation by the user.
 
-When you are done with your board, add it to libgloss/or1k/Makefile.in to the
-BOARDS variable and compile.
-
+When you are done with your board, add it to libgloss/or1k/Makefile.inc like the
+other libboard-*.a definitions and compile.

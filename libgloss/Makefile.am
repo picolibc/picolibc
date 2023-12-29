@@ -143,6 +143,9 @@ endif
 if CONFIG_NIOS2
 include nios2/Makefile.inc
 endif
+if CONFIG_OR1K
+include or1k/Makefile.inc
+endif
 if CONFIG_RISCV
 include riscv/Makefile.inc
 endif
