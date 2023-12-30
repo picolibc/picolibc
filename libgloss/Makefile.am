@@ -24,7 +24,13 @@ includetool_DATA =
 includesystooldir = $(tooldir)/include/sys
 includesystool_DATA =
 
-AM_CPPFLAGS = -idirafter $(srcroot)/include
+# These are useful for standalone object files like crt0.o.
+AM_CFLAGS = $(AM_CFLAGS_$(subst /,_,$(@D))) $(AM_CFLAGS_$(subst /,_,$(@D)_$(<F)))
+AM_CCASFLAGS = $(AM_CCASFLAGS_$(subst /,_,$(@D))) $(AM_CCASFLAGS_$(subst /,_,$(@D)_$(<F)))
+AM_CPPFLAGS = $(AM_CPPFLAGS_$(subst /,_,$(@D))) $(AM_CPPFLAGS_$(subst /,_,$(@D)_$(<F)))
+AM_LDFLAGS = $(AM_LDFLAGS_$(subst /,_,$(@D))) $(AM_LDFLAGS_$(subst -,_,$(subst /,_,$(@D)_$(@F))))
+
+AM_CPPFLAGS += -idirafter $(srcroot)/include
 
 # A fake library so automake will generate rules for plain objects that we want
 # to install (e.g. our crt0.o objects).
