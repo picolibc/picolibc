@@ -2946,12 +2946,6 @@ case "${target}" in
 	config_visium=true
 	config_testsuite=false
 	;;
-  xc16x-*-*)
-	ac_config_files="$ac_config_files xc16x/Makefile"
-
-	subdirs="$subdirs xc16x"
-	target_makefile_frag=${srcdir}/config/xc16x.mt
-	;;
   xstormy16-*-*)
 	config_xstormy16=true
 	;;
@@ -6599,7 +6593,6 @@ do
     "crx/Makefile") CONFIG_FILES="$CONFIG_FILES crx/Makefile" ;;
     "mep/Makefile") CONFIG_FILES="$CONFIG_FILES mep/Makefile" ;;
     "mt/Makefile") CONFIG_FILES="$CONFIG_FILES mt/Makefile" ;;
-    "xc16x/Makefile") CONFIG_FILES="$CONFIG_FILES xc16x/Makefile" ;;
     "m32c/Makefile") CONFIG_FILES="$CONFIG_FILES m32c/Makefile" ;;
     "spu/Makefile") CONFIG_FILES="$CONFIG_FILES spu/Makefile" ;;
     "pru/Makefile") CONFIG_FILES="$CONFIG_FILES pru/Makefile" ;;

@@ -166,11 +166,6 @@ case "${target}" in
 	config_visium=true
 	config_testsuite=false
 	;;
-  xc16x-*-*)
-	AC_CONFIG_FILES([xc16x/Makefile])
-	subdirs="$subdirs xc16x"
-	target_makefile_frag=${srcdir}/config/xc16x.mt
-	;;
   xstormy16-*-*)
 	config_xstormy16=true
 	;;

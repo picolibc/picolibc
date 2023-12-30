@@ -481,8 +481,8 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/../mkinstalldirs
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES = m68hc11/Makefile m68k/Makefile pa/Makefile \
 	mips/Makefile rs6000/Makefile cr16/Makefile cris/Makefile \
-	crx/Makefile mep/Makefile mt/Makefile xc16x/Makefile \
-	m32c/Makefile spu/Makefile pru/Makefile sparc/libsys/Makefile
+	crx/Makefile mep/Makefile mt/Makefile m32c/Makefile \
+	spu/Makefile pru/Makefile sparc/libsys/Makefile
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -2911,8 +2911,6 @@ crx/Makefile: $(top_builddir)/config.status $(top_srcdir)/crx/Makefile.in
 mep/Makefile: $(top_builddir)/config.status $(top_srcdir)/mep/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 mt/Makefile: $(top_builddir)/config.status $(top_srcdir)/mt/Makefile.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-xc16x/Makefile: $(top_builddir)/config.status $(top_srcdir)/xc16x/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 m32c/Makefile: $(top_builddir)/config.status $(top_srcdir)/m32c/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
