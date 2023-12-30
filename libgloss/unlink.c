@@ -20,7 +20,7 @@
  *           we just return an error.
  */
 int
-unlink (char * path)
+unlink (const char * path)
 {
   errno = EIO;
   return (-1);

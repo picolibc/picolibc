@@ -23,10 +23,11 @@ extern int  outbyte (char x);
  */
 int
 write (int fd,
-       char *buf,
-       int nbytes)
+       const void *buf_,
+       size_t nbytes)
 {
   int i;
+  const char *buf = buf_;
 
   for (i = 0; i < nbytes; i++) {
     if (*(buf + i) == '\n') {

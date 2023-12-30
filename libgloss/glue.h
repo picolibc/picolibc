@@ -13,6 +13,7 @@
  * they apply.
  */
 #include <_ansi.h>
+#include <unistd.h>
 
 #ifndef NULL
 #  define NULL 0
@@ -28,4 +29,5 @@ extern char _end[];                /* _end is set in the linker command file */
 /* only one prcess support, as this is OS dependant */
 #define __MYPID 1
 
+int outbyte (char);
 

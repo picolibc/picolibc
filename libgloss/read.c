@@ -22,10 +22,11 @@ extern char inbyte (void);
  */
 int
 read (int fd,
-       char *buf,
-       int nbytes)
+       void *buf_,
+       size_t nbytes)
 {
   int i = 0;
+  char *buf = buf_;
 
   for (i = 0; i < nbytes; i++) {
     *(buf + i) = inbyte();
