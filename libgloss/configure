@@ -660,6 +660,8 @@ CONFIG_VISIUM_FALSE
 CONFIG_VISIUM_TRUE
 CONFIG_V850_FALSE
 CONFIG_V850_TRUE
+CONFIG_TIC6X_FALSE
+CONFIG_TIC6X_TRUE
 CONFIG_SPARC_LEON_FALSE
 CONFIG_SPARC_LEON_TRUE
 CONFIG_SPARC_FALSE
@@ -2983,9 +2985,7 @@ case "${target}" in
 	config_libnosys=false
 	;;
   tic6x-*-*)
-	ac_config_files="$ac_config_files tic6x/Makefile"
-
-	subdirs="$subdirs tic6x"
+	config_tic6x=true
 	config_testsuite=false
 	;;
   iq2000-*-*)
@@ -3235,6 +3235,14 @@ fi
 else
   CONFIG_SPARC_LEON_TRUE='#'
   CONFIG_SPARC_LEON_FALSE=
+fi
+
+   if test x$config_tic6x = xtrue; then
+  CONFIG_TIC6X_TRUE=
+  CONFIG_TIC6X_FALSE='#'
+else
+  CONFIG_TIC6X_TRUE='#'
+  CONFIG_TIC6X_FALSE=
 fi
 
    if test x$config_v850 = xtrue; then
@@ -5885,6 +5893,10 @@ if test -z "${CONFIG_SPARC_LEON_TRUE}" && test -z "${CONFIG_SPARC_LEON_FALSE}"; 
   as_fn_error $? "conditional \"CONFIG_SPARC_LEON\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${CONFIG_TIC6X_TRUE}" && test -z "${CONFIG_TIC6X_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_TIC6X\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${CONFIG_V850_TRUE}" && test -z "${CONFIG_V850_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_V850\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -6579,7 +6591,6 @@ do
     "xc16x/Makefile") CONFIG_FILES="$CONFIG_FILES xc16x/Makefile" ;;
     "m32c/Makefile") CONFIG_FILES="$CONFIG_FILES m32c/Makefile" ;;
     "spu/Makefile") CONFIG_FILES="$CONFIG_FILES spu/Makefile" ;;
-    "tic6x/Makefile") CONFIG_FILES="$CONFIG_FILES tic6x/Makefile" ;;
     "pru/Makefile") CONFIG_FILES="$CONFIG_FILES pru/Makefile" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "sparc/libsys/Makefile") CONFIG_FILES="$CONFIG_FILES sparc/libsys/Makefile" ;;

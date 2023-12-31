@@ -203,8 +203,7 @@ case "${target}" in
 	config_libnosys=false
 	;;
   tic6x-*-*)
-	AC_CONFIG_FILES([tic6x/Makefile])
-	subdirs="$subdirs tic6x"
+	config_tic6x=true
 	config_testsuite=false
 	;;
   iq2000-*-*)
@@ -229,7 +228,7 @@ m4_foreach_w([SUBDIR], [
   aarch64 arc arm bfin csky d30v epiphany fr30 frv ft32 i386 i960 iq2000
   libnosys lm32
   m32r mcore mn10200 mn10300 moxie msp430
-  nds32 nios2 or1k riscv rl78 rx sparc sparc_leon v850 visium wince
+  nds32 nios2 or1k riscv rl78 rx sparc sparc_leon tic6x v850 visium wince
   xstormy16 xtensa
 ], [dnl
   AM_CONDITIONAL([CONFIG_]m4_toupper(SUBDIR), [test x$config_]SUBDIR = xtrue)
