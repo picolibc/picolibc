@@ -1,4 +1,16 @@
+*** Major changes in newlib version 4.4.0:
+
+- long double support for i386, aarch64, and x86_64 added from FreeBSD
+- RISC-V Zfinx/Zdinx extension support
+- wildcard support added to allow arbitrary include dirs to be specified for a platform
+- Xtensa port added
+- printf family helper functions split out into separate files to save space when linking
+- wide-oriented I/O fixes including proper split of byte and wide-oriented stdio functions
+- support added for RISC-V long double math
+- fixes for c99/gcc-14 warnings treated as errors in multiple platforms
+
 *** Major changes in newlib version 4.3.0:
+
 
 - remove i?86-pc-linux-gnu support
 - remove decstation & sunos support
