@@ -122,6 +122,7 @@ linux-crt0.o: linux-crt0.S
 crtinit.o: crtinit.S
 sim-crtinit.o: sim-crtinit.S
 sim-pgcrtinit.o: sim-pgcrtinit.S
+sbrk.o: sbrk.c
 
 # target specific makefile fragment comes in here.
 @target_makefile_frag@
