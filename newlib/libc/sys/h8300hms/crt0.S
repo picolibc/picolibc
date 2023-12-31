@@ -9,12 +9,10 @@
 _start:
 	mov.w	#_stack,sp
 	mov.w	#_edata,r0
-	mov.w	#_end,r1
-	sub.w   r2,r2
-.Loop:	mov.w	r2,@r0
-	adds	#2,r0
-	cmp	r1,r0
-	blo	.Loop
+	mov.w	#_end,r2
+	sub.w   r1,r1
+	sub.w	r0,r2
+	jsr	@_memset
 #ifdef __ELF__
 	mov.l   #__fini,r0
 	jsr     @_atexit
@@ -43,12 +41,10 @@ _stack:	.word 	1
 _start:
 	mov.l	#_stack,sp
 	mov.l	#_edata,er0
-	mov.l	#_end,er1
-	sub.w   r2,r2           ; not sure about alignment requirements
-.Loop:	mov.w	r2,@er0		; playing it safe for now
-	adds	#2,er0
-	cmp.l	er1,er0
-	blo	.Loop
+	mov.l	#_end,er2
+	sub.w   r1,r1
+	sub.l	er0,er2
+	jsr	@_memset
 #ifdef __ELF__
 	mov.l   #__fini,er0
 	jsr     @_atexit
@@ -77,12 +73,10 @@ _stack:	.long 	1
 _start:
 	mov.l	#_stack,sp
 	mov.l	#_edata,er0
-	mov.l	#_end,er1
-	sub.w   r2,r2           ; not sure about alignment requirements
-.Loop:	mov.w	r2,@er0		; playing it safe for now
-	adds	#2,er0
-	cmp.l	er1,er0
-	blo	.Loop
+	mov.l	#_end,er2
+	sub.w   r1,r1
+	sub.l	er0,er2
+	jsr	@_memset
 #ifdef __ELF__
 	mov.l   #__fini,er0
 	jsr     @_atexit
