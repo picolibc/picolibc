@@ -686,6 +686,8 @@ CONFIG_MN10300_FALSE
 CONFIG_MN10300_TRUE
 CONFIG_MN10200_FALSE
 CONFIG_MN10200_TRUE
+CONFIG_MICROBLAZE_FALSE
+CONFIG_MICROBLAZE_TRUE
 CONFIG_MCORE_FALSE
 CONFIG_MCORE_TRUE
 CONFIG_M32R_FALSE
@@ -2930,9 +2932,7 @@ case "${target}" in
 	config_moxie=true
 	;;
   microblaze*-*-*)
-	ac_config_files="$ac_config_files microblaze/Makefile"
-
-	subdirs="$subdirs microblaze"
+	config_microblaze=true
 	;;
   mt-*-*)
 	ac_config_files="$ac_config_files mt/Makefile"
@@ -3139,6 +3139,14 @@ fi
 else
   CONFIG_MCORE_TRUE='#'
   CONFIG_MCORE_FALSE=
+fi
+
+   if test x$config_microblaze = xtrue; then
+  CONFIG_MICROBLAZE_TRUE=
+  CONFIG_MICROBLAZE_FALSE='#'
+else
+  CONFIG_MICROBLAZE_TRUE='#'
+  CONFIG_MICROBLAZE_FALSE=
 fi
 
    if test x$config_mn10200 = xtrue; then
@@ -5845,6 +5853,10 @@ if test -z "${CONFIG_MCORE_TRUE}" && test -z "${CONFIG_MCORE_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_MCORE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${CONFIG_MICROBLAZE_TRUE}" && test -z "${CONFIG_MICROBLAZE_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_MICROBLAZE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${CONFIG_MN10200_TRUE}" && test -z "${CONFIG_MN10200_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_MN10200\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -6586,7 +6598,6 @@ do
     "cris/Makefile") CONFIG_FILES="$CONFIG_FILES cris/Makefile" ;;
     "crx/Makefile") CONFIG_FILES="$CONFIG_FILES crx/Makefile" ;;
     "mep/Makefile") CONFIG_FILES="$CONFIG_FILES mep/Makefile" ;;
-    "microblaze/Makefile") CONFIG_FILES="$CONFIG_FILES microblaze/Makefile" ;;
     "mt/Makefile") CONFIG_FILES="$CONFIG_FILES mt/Makefile" ;;
     "xc16x/Makefile") CONFIG_FILES="$CONFIG_FILES xc16x/Makefile" ;;
     "m32c/Makefile") CONFIG_FILES="$CONFIG_FILES m32c/Makefile" ;;

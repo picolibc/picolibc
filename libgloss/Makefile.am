@@ -131,6 +131,9 @@ endif
 if CONFIG_MCORE
 include mcore/Makefile.inc
 endif
+if CONFIG_MICROBLAZE
+include microblaze/Makefile.inc
+endif
 if CONFIG_MN10200
 include mn10200/Makefile.inc
 endif

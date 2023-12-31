@@ -153,8 +153,7 @@ case "${target}" in
 	config_moxie=true
 	;;
   microblaze*-*-*)
-	AC_CONFIG_FILES([microblaze/Makefile])
-	subdirs="$subdirs microblaze"
+	config_microblaze=true
 	;;
   mt-*-*)
 	AC_CONFIG_FILES([mt/Makefile])
@@ -227,7 +226,7 @@ dnl the ports above will too!
 m4_foreach_w([SUBDIR], [
   aarch64 arc arm bfin csky d30v epiphany fr30 frv ft32 i386 i960 iq2000
   libnosys lm32
-  m32r mcore mn10200 mn10300 moxie msp430
+  m32r mcore microblaze mn10200 mn10300 moxie msp430
   nds32 nios2 or1k riscv rl78 rx sparc sparc_leon tic6x v850 visium wince
   xstormy16 xtensa
 ], [dnl
