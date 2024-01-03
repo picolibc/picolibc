@@ -24,25 +24,26 @@ static struct fdentry fdtable[RISCV_MAX_OPEN_FILES];
 void __attribute__ ((constructor))
 init_semihosting ()
 {
-  int handle;
+  int i;
 
-  for (int i=0; i<RISCV_MAX_OPEN_FILES; i++)
+  for (i=0; i<RISCV_MAX_OPEN_FILES; i++)
     fdtable[i].handle = -1;
 
-  /* Set up std streams.  */
+  /* Set up std streams. Note that the semihost _open() call returns an index
+     into the fdtable.  */
   /* stdin.  */
-  handle = _open (":tt", O_RDONLY);
-  fdtable[STDIN_FILENO].handle = handle;
+  i = _open (":tt", O_RDONLY);
+  fdtable[STDIN_FILENO].handle = fdtable[i].handle;
   fdtable[STDIN_FILENO].pos = 0;
 
   /* stdout.  */
-  handle = _open (":tt", O_WRONLY|O_CREAT|O_TRUNC);
-  fdtable[STDOUT_FILENO].handle = handle;
+  i = _open (":tt", O_WRONLY|O_CREAT|O_TRUNC);
+  fdtable[STDOUT_FILENO].handle = fdtable[i].handle;
   fdtable[STDOUT_FILENO].pos = 0;
 
   /* stderr.  */
-  handle = _open (":tt", O_WRONLY|O_CREAT|O_APPEND);
-  fdtable[STDERR_FILENO].handle = handle;
+  i = _open (":tt", O_WRONLY|O_CREAT|O_APPEND);
+  fdtable[STDERR_FILENO].handle = fdtable[i].handle;
   fdtable[STDERR_FILENO].pos = 0;
 }
 
