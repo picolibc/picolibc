@@ -65,7 +65,8 @@ jobs:
           "-D__IO_FLOAT=y -D_IO_FLOAT_EXACT=n -D_WANT_IO_LONG_LONG=y -D_MB_CAPABLE=y -D_WANT_IO_POS_ARGS=y -D__HAVE_LOCALE_INFO__=y -D__HAVE_LOCALE_INFO_EXTENDED__=y -D_WANT_MINIMAL_IO_LONG_LONG=y",
         ]
         test: [
-          "./.github/do-cmake-linux",
+          "./.github/do-cmake-linux -DCMAKE_BUILD_TYPE=RelWithDebInfo",
+          "./.github/do-cmake-linux -DCMAKE_BUILD_TYPE=MinSizeRel",
         ]
     steps:
       - name: Clone picolibc
@@ -99,7 +100,7 @@ jobs:
       # and zephyr.
       - name: ccache
         if: matrix.test == './.github/do-zephyr'
-        uses: hendrikmuhs/ccache-action@v1.2.11
+        uses: hendrikmuhs/ccache-action@v1.2.10
         with:
           key: compilation-${{ runner.os }}-${{ github.job }}-${{ matrix.meson_flags }}-${{ env.CCACHE_SIZE }}
           max-size: ${{ env.CCACHE_SIZE }}
@@ -159,7 +160,7 @@ jobs:
       # and zephyr.
       - name: ccache
         if: matrix.test == './.github/do-zephyr'
-        uses: hendrikmuhs/ccache-action@v1.2.11
+        uses: hendrikmuhs/ccache-action@v1.2.10
         with:
           key: compilation-${{ runner.os }}-${{ github.job }}-${{ matrix.meson_flags }}-${{ env.CCACHE_SIZE }}
           max-size: ${{ env.CCACHE_SIZE }}
@@ -219,7 +220,7 @@ jobs:
       # and zephyr.
       - name: ccache
         if: matrix.test == './.github/do-zephyr'
-        uses: hendrikmuhs/ccache-action@v1.2.11
+        uses: hendrikmuhs/ccache-action@v1.2.10
         with:
           key: compilation-${{ runner.os }}-${{ github.job }}-${{ matrix.meson_flags }}-${{ env.CCACHE_SIZE }}
           max-size: ${{ env.CCACHE_SIZE }}
