@@ -419,7 +419,11 @@ if(NOT DEFINED FORMAT_DEFAULT_LONG_LONG)
 endif()
 
 if(NOT DEFINED FORMAT_DEFAULT_INTEGER)
-  set(FORMAT_DEFAULT_INTEGER NOT ${__IO_FLOAT})
+  if (__IO_FLOAT)
+    set(FORMAT_DEFAULT_INTEGER 0)
+  else()
+    set(FORMAT_DEFAULT_INTEGER 1)
+  endif()
 endif()
 
 # math library sets errno
