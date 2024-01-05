@@ -35,7 +35,7 @@
 
 #if	!defined (SCANF_LEVEL)
 # define SCANF_LEVEL SCANF_DBL
-# ifndef FORMAT_DEFAULT_DOUBLE
+# ifndef _FORMAT_DEFAULT_DOUBLE
 #  define vfscanf __d_vfscanf
 # endif
 #endif

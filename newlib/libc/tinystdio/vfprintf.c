@@ -69,7 +69,7 @@
 
 #ifndef PRINTF_LEVEL
 #  define PRINTF_LEVEL PRINTF_DBL
-#  ifndef FORMAT_DEFAULT_DOUBLE
+#  ifndef _FORMAT_DEFAULT_DOUBLE
 #    define vfprintf __d_vfprintf
 #  endif
 #endif
@@ -1215,7 +1215,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
     goto ret;
 }
 
-#if defined(FORMAT_DEFAULT_DOUBLE) && !defined(vfprintf)
+#if defined(_FORMAT_DEFAULT_DOUBLE) && !defined(vfprintf)
 #ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(vfprintf, __d_vfprintf);
 #else

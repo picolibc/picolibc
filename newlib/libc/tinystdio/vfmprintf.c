@@ -31,13 +31,13 @@
 */
 
 #define PRINTF_LEVEL PRINTF_MIN
-#ifndef FORMAT_DEFAULT_MINIMAL
+#ifndef _FORMAT_DEFAULT_MINIMAL
 #define vfprintf __m_vfprintf
 #endif
 
 #include "vfprintf.c"
 
-#ifdef FORMAT_DEFAULT_MINIMAL
+#ifdef _FORMAT_DEFAULT_MINIMAL
 #ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(vfprintf, __m_vfprintf);
 #else

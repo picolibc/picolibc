@@ -726,7 +726,7 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
     return nconvs ? nconvs : EOF;
 }
 
-#if defined(FORMAT_DEFAULT_DOUBLE) && !defined(vfscanf)
+#if defined(_FORMAT_DEFAULT_DOUBLE) && !defined(vfscanf)
 #ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(vfscanf, __d_vfscanf);
 #else
