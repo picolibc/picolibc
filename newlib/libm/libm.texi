@@ -98,6 +98,7 @@ into another language, under the above conditions for modified versions.
 * Reentrancy::     The functions in libm are not reentrant by default.
 * Long Double Functions:: The long double function support of libm.
 * Document Index::
+* Function Index::
 @end menu
 
 @include targetdep.tex
@@ -121,9 +122,14 @@ This makes it thread safe, and therefore reentrant.
 Currently, the full set of long double math functions is only provided
 on platforms where long double equals double.
 For such platforms, the long double math functions are implemented as calls to the double versions.
+
 @node Document Index
 @unnumbered Document Index
 @printindex cp
+
+@node Function Index
+@unnumbered Function Index
+@printindex fn
 
 @tex
 % I think something like @@colophon should be in texinfo.  In the

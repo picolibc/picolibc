@@ -155,6 +155,7 @@ into another language, under the above conditions for modified versions.
 * Overflow Protection::
 
 * Document Index::
+* Function Index::
 @end menu
 @end ifnottex
 
@@ -409,6 +410,10 @@ usage as the ANSI C version from @file{stdarg.h}.
 @node Document Index
 @unnumbered Document Index
 @printindex cp
+
+@node Function Index
+@unnumbered Function Index
+@printindex fn
 
 @tex
 % I think something like @@colophon should be in texinfo.  In the
