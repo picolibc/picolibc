@@ -75,7 +75,7 @@
 	;
 
 : FUNCTION
-	"@node "	- a
+	"@node Function "	- a
 	skip_past_newline
 	copy_past_newline
 	dup		- a x x 

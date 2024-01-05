@@ -208,13 +208,13 @@ also defines a special type to represent variable argument lists: this
 type is called @code{va_list}.  
 
 @menu
-* va_start::
-* va_arg::
-* va_end::
+* Function va_start::
+* Function va_arg::
+* Function va_end::
 @end menu
 
 @page
-@node va_start
+@node Function va_start
 @subsection Initialize variable argument list
 @findex va_start
 @strong{Synopsis}
@@ -239,7 +239,7 @@ variable arguments in an ANSI C function header).  You can only use
 ANSI C requires @code{va_start}.
 
 @page
-@node va_arg
+@node Function va_arg
 @subsection Extract a value from argument list
 @findex va_arg
 @strong{Synopsis}
@@ -273,7 +273,7 @@ in your function call.
 ANSI C requires @code{va_arg}.
 
 @page
-@node va_end
+@node Function va_end
 @subsection Abandon a variable argument list
 @findex va_end
 @strong{Synopsis}
@@ -307,14 +307,14 @@ As with @file{stdarg.h}, the type @code{va_list} is used to hold a data
 structure representing a variable argument list.
 
 @menu
-* va_alist::
-* va_start-trad::
-* va_arg-trad::
-* va_end-trad::
+* Function va_alist::
+* Function va_start-trad::
+* Function va_arg-trad::
+* Function va_end-trad::
 @end menu
 
 @page
-@node va_alist
+@node Function va_alist
 @subsection Declare variable arguments
 @findex va_alist
 @findex va_dcl
@@ -340,7 +340,7 @@ possible.
 declaring variable argument lists prior to ANSI C.
 
 @page
-@node va_start-trad
+@node Function va_start-trad
 @subsection Initialize variable argument list
 @findex va_start
 @strong{Synopsis}
@@ -364,7 +364,7 @@ definitions are incompatible; the ANSI version has another parameter
 besides @var{ap}.
 
 @page
-@node va_arg-trad
+@node Function va_arg-trad
 @subsection Extract a value from argument list
 @findex va_arg
 @strong{Synopsis}
@@ -387,7 +387,7 @@ The @code{va_arg} defined in @file{varargs.h} has the same syntax and
 usage as the ANSI C version from @file{stdarg.h}.
 
 @page
-@node va_end-trad
+@node Function va_end-trad
 @subsection Abandon a variable argument list
 @findex va_end
 @strong{Synopsis}
