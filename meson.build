@@ -302,20 +302,6 @@ llong_printf_link_args=llong_printf_compile_args
 int_printf_link_args=int_printf_compile_args
 min_printf_link_args=min_printf_compile_args
 
-if tinystdio
-  if format_default == 'double'
-    c_args += '-DFORMAT_DEFAULT_DOUBLE'
-  elif format_default == 'float'
-    c_args += '-DFORMAT_DEFAULT_FLOAT'
-  elif format_default == 'long-long'
-    c_args += '-DFORMAT_DEFAULT_LONG_LONG'
-  elif format_default == 'integer'
-    c_args += '-DFORMAT_DEFAULT_INTEGER'
-  elif format_default == 'minimal'
-    c_args += '-DFORMAT_DEFAULT_MINIMAL'
-  endif
-endif
-
 if tinystdio and printf_aliases
   vfprintf_symbol = global_prefix + 'vfprintf'
   __d_vfprintf_symbol = global_prefix + '__d_vfprintf'
