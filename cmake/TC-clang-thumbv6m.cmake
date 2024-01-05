@@ -20,10 +20,6 @@ set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
 set(_HAVE_PICOLIBC_TLS_API TRUE)
 
-set(FORMAT_DEFAULT_DOUBLE 1)
-set(FORMAT_DEFAULT_FLOAT 0)
-set(FORMAT_DEFAULT_INTEGER 0)
-
 set(PICOLIBC_LINK_FLAGS
   --ld-path=/usr/bin/arm-none-eabi-ld
   -L/usr/lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/
