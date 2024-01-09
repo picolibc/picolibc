@@ -294,7 +294,7 @@ cygheap_init ()
       cygheap->locale.mbtowc = __utf8_mbtowc;
       /* Set umask to a sane default. */
       cygheap->umask = 022;
-      cygheap->rlim_core = RLIM_INFINITY;
+      cygheap->rlim_core = 0;
     }
   if (!cygheap->fdtab)
     cygheap->fdtab.init ();

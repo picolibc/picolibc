@@ -64,3 +64,6 @@ What changed:
 - When RLIMIT_CORE is more than 1MB, a core dump file which can be loaded by gdb
   is now written on a fatal error. Otherwise, if it's greater than zero, a text
   format .stackdump file is written, as previously.
+
+- The default RLIMIT_CORE is now 0, disabling the generation of core dump or
+  stackdump files.

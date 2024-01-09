@@ -103,6 +103,12 @@ is now written on a fatal error. Otherwise, if it's greater than zero, a text
 format .stackdump file is written, as previously.
 </para></listitem>
 
+<listitem><para>
+The default RLIMIT_CORE is now 0, disabling the generation of core dump or
+stackdump files. Use e.g. <code>ulimit -c unlimited</code> or <code>ulimit -c
+1024</code> to enable them again.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
