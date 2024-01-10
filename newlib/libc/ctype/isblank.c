@@ -36,7 +36,6 @@ PORTABILITY
 No supporting OS subroutines are required.
 */
 
-#define _DEFINING_ISBLANK
 #include <_ansi.h>
 #include <ctype.h>
 

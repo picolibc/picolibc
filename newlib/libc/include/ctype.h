@@ -58,14 +58,8 @@ int isxdigit (int __c);
 int tolower (int __c);
 int toupper (int __c);
 
-#if  __ISO_C_VISIBLE >= 1999
-#ifdef _DEFINING_ISBLANK
+#if __ISO_C_VISIBLE >= 1999
 int isblank(int c);
-#else
-static __inline int isblank(int c) {
-	return c == ' ' || c == '\t';
-}
-#endif
 #endif
 
 #if __MISC_VISIBLE || __XSI_VISIBLE
