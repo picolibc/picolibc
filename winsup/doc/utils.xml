@@ -210,7 +210,7 @@ At least one command option or a PROGRAM is required, as shown above.
                        plain console only, not from a pty/rxvt/xterm)
   -e, --search-package list all available packages matching PATTERN
                        PATTERN is a glob pattern with * and ? as wildcard chars
-      search selection specifiers (multiple allowed):\n\
+      search selection specifiers (multiple allowed):
       --requires       list packages depending on packages matching PATTERN
       --build-reqs     list packages depending on packages matching PATTERN
                        when building these packages
