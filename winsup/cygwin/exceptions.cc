@@ -1334,7 +1334,7 @@ signal_exit (int sig, siginfo_t *si, void *)
 	if (cygheap->rlim_core == 0Ul)
 	  break;
 
-	sig |= 0x80; /* Set flag in exit status to show that we've "dumped core" */
+	sig |= __WCOREFLAG; /* Set flag in exit status to show that we've "dumped core" */
 
 	/* If core dump size is >1MB, try to invoke dumper to write a
 	   .core file */
