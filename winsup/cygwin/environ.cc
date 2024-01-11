@@ -832,6 +832,7 @@ environ_init (char **envp, int envc)
     out:
       findenv_func = (char * (*)(const char*, int*)) my_findenv;
       environ = envp;
+      dumper_init ();
       if (envp_passed_in)
 	{
 	  p = getenv ("CYGWIN");

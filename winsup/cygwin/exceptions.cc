@@ -52,6 +52,7 @@ details. */
 #define DUMPSTACK_FRAME_LIMIT    32
 
 PWCHAR debugger_command;
+PWCHAR dumper_command;
 extern uint8_t _sigbe;
 extern uint8_t _sigdelayed_end;
 
@@ -129,6 +130,42 @@ error_start_init (const char *buf)
   wcpcpy (cp, global_progname);
   for (PWCHAR p = wcschr (cp, L'\\'); p; p = wcschr (p, L'\\'))
     *p = L'/';
+  wcscat (cp, L"\"");
+}
+
+extern "C" void
+dumper_init (void)
+{
+  WCHAR dll_dir[PATH_MAX];
+  if (!GetModuleFileNameW (cygwin_hmodule, dll_dir, PATH_MAX))
+    return;
+
+  /* Strip off last path component ("\\cygwin1.dll") */
+  PWCHAR w = wcsrchr (dll_dir, L'\\');
+  if (!w)
+    return;
+
+  *w = L'\0';
+
+  /* Calculate the length of the command, allowing for an appended DWORD PID and
+     terminating null */
+  int cmd_len = 1 + wcslen(dll_dir) + 11 + 2 + 1 + wcslen(global_progname) + 1 + 10 + 1;
+  if (cmd_len > 32767)
+    {
+      /* If this comes to more than the 32,767 characters CreateProcess() can
+           accept, we can't work, so don't set dumper_command */
+      return;
+    }
+
+  dumper_command = (PWCHAR) malloc(cmd_len * sizeof (WCHAR));
+
+  PWCHAR cp = dumper_command;
+  cp = wcpcpy (cp, L"\"");
+  cp = wcpcpy (cp, dll_dir);
+  cp = wcpcpy (cp, L"\\dumper.exe");
+  cp = wcpcpy (cp, L"\" ");
+  cp = wcpcpy (cp, L"\"");
+  cp = wcpcpy (cp, global_progname);
   wcscat (cp, L"\"");
 }
 
@@ -454,20 +491,14 @@ cygwin_stackdump ()
   exc.dumpstack ();
 }
 
-extern "C" int
-try_to_debug ()
+static
+int exec_prepared_command (PWCHAR command)
 {
-  if (!debugger_command)
+  if (!command)
     return 0;
-  debug_printf ("debugger_command '%W'", debugger_command);
-  if (being_debugged ())
-    {
-      extern void break_here ();
-      break_here ();
-      return 0;
-    }
+  debug_printf ("executing prepared command '%W'", command);
 
-  PWCHAR dbg_end = wcschr (debugger_command, L'\0');
+  PWCHAR dbg_end = wcschr (command, L'\0');
   __small_swprintf (dbg_end, L" %u", GetCurrentProcessId ());
 
   LONG prio = GetThreadPriority (GetCurrentThread ());
@@ -509,11 +540,12 @@ try_to_debug ()
     }
   FreeEnvironmentStringsW (rawenv);
 
-  console_printf ("*** starting debugger for pid %u, tid %u\n",
+  console_printf ("*** starting '%W' for pid %u, tid %u\r\n",
+		  command,
 		  cygwin_pid (GetCurrentProcessId ()), GetCurrentThreadId ());
   BOOL dbg;
   dbg = CreateProcessW (NULL,
-			debugger_command,
+			command,
 			NULL,
 			NULL,
 			FALSE,
@@ -527,11 +559,15 @@ try_to_debug ()
      we can't wait here for the error_start process to exit, as if it's a
      debugger, it might want to continue this thread.  So we busy wait until a
      debugger attaches, which stops this process, after which it can decide if
-     we continue or not. */
+     we continue or not.
+
+     Note that this is still racy: if the error_start process does it's work too
+     fast, we don't notice that it attached and get stuck here.
+  */
 
   *dbg_end = L'\0';
   if (!dbg)
-    system_printf ("Failed to start debugger, %E");
+    system_printf ("Failed to start, %E");
   else
     {
       SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
@@ -540,11 +576,27 @@ try_to_debug ()
       Sleep (2000);
     }
 
-  console_printf ("*** continuing pid %u from debugger call (%d)\n",
-		  cygwin_pid (GetCurrentProcessId ()), dbg);
+  console_printf ("*** continuing pid %u\r\n",
+		  cygwin_pid (GetCurrentProcessId ()));
 
   SetThreadPriority (GetCurrentThread (), prio);
   return dbg;
+}
+
+extern "C" int
+try_to_debug ()
+{
+  /* If already being debugged, break into the debugger (Note that this function
+     can be called from places other than an exception) */
+  if (being_debugged ())
+    {
+      extern void break_here ();
+      break_here ();
+      return 1;
+    }
+
+  /* Otherwise, invoke the JIT debugger, if set */
+  return exec_prepared_command (debugger_command);
 }
 
 /* myfault exception handler. */
@@ -1264,7 +1316,6 @@ signal_exit (int sig, siginfo_t *si, void *)
   debug_printf ("exiting due to signal %d", sig);
   exit_state = ES_SIGNAL_EXIT;
 
-  if (cygheap->rlim_core > 0UL)
     switch (sig)
       {
       case SIGABRT:
@@ -1277,9 +1328,24 @@ signal_exit (int sig, siginfo_t *si, void *)
       case SIGTRAP:
       case SIGXCPU:
       case SIGXFSZ:
-	sig |= 0x80;		/* Flag that we've "dumped core" */
 	if (try_to_debug ())
 	  break;
+
+	if (cygheap->rlim_core == 0Ul)
+	  break;
+
+	sig |= 0x80; /* Set flag in exit status to show that we've "dumped core" */
+
+	/* If core dump size is >1MB, try to invoke dumper to write a
+	   .core file */
+	if (cygheap->rlim_core > 1024*1024)
+	  {
+	    if (exec_prepared_command (dumper_command))
+	      break;
+	    /* If that failed, fall-through to... */
+	  }
+
+	/* Otherwise write a .stackdump */
 	if (si->si_code != SI_USER && si->si_cyg)
 	  {
 	    cygwin_exception *exc = (cygwin_exception *) si->si_cyg;

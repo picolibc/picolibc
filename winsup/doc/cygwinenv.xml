@@ -23,17 +23,28 @@ Defaults to off.</para>
 
 <listitem>
 <para>
-<envar>error_start:Win32filepath</envar> - if set, runs 
-<filename>Win32filepath</filename> when cygwin encounters a fatal error,
-which is useful for debugging.  <filename>Win32filepath</filename> is
-usually set to the path to <command>gdb</command> or
-<command>dumper</command>, for example
-<filename>C:\cygwin\bin\gdb.exe</filename>.
-There is no default set.
+<envar>error_start:Win32filepath</envar> - if set, runs
+<filename>Win32filepath</filename> when cygwin encounters a fatal error, which
+can be useful for debugging. Defaults to not set.
+</para>
+<para>
+<filename>Win32filepath</filename> is typically set to <command>gdb</command> or
+<command>dumper</command>.  If giving a path in
+<filename>Win32filepath</filename>, note that it is a Windows-style path and not
+a Cygwin path.
 </para>
 <para>
 The filename of the executing program and it's Windows process id are appended
 to the command as arguments.
+</para>
+<para>
+  Note: This takes priority over writing core dump or .stackdump files, if
+  enabled by <function>setrlimit(RLIMIT_CORE)</function> (e.g. via
+  <command>ulimit -c</command>).
+</para>
+<para>
+  Note: This has no effect if a debugger is already attached when the fatal
+  error occurs.
 </para>
 </listitem>
 

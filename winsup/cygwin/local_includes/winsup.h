@@ -179,6 +179,7 @@ void close_all_files (bool = false);
 
 /* debug_on_trap support. see exceptions.cc:try_to_debug() */
 extern "C" void error_start_init (const char*);
+extern "C" void dumper_init (void);
 extern "C" int try_to_debug ();
 
 void ld_preload ();

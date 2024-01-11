@@ -721,17 +721,17 @@ explorer $XPATH &
     <refsect1 id="dumper-desc">
       <title>Description</title>
     <para>The <command>dumper</command> utility can be used to create a core
-      dump of running Windows process. This core dump can be later loaded to
-      <command>gdb</command> and analyzed. One common way to use
-      <command>dumper</command> is to plug it into cygwin's Just-In-Time
-      debugging facility by adding
-      <screen>
-error_start=x:\path\to\dumper.exe
-</screen> to the
-      <emphasis>CYGWIN</emphasis> environment variable. Please note that
-      <literal>x:\path\to\dumper.exe</literal> is Windows-style and not cygwin
-      path. If <literal>error_start</literal> is set this way, then dumper will
-      be started whenever some program encounters a fatal error. </para>
+      dump of running Windows process. This core dump can be later loaded into
+      <command>gdb</command> and analyzed.
+    </para>
+
+    <para>
+      If the core file size limit is set to unlimited (e.g. <command>ulimit -c
+      unlimited</command>) and an <literal>error_start</literal> executable
+      hasn't been configured in the <literal>CYGWIN</literal> environment
+      variable, Cygwin will automatically run <command>dumper</command> when a
+      fatal error occurs.
+    </para>
 
     <para> <command>dumper</command> can be also be started from the command
       line to create a core dump of any running process.</para>
@@ -742,14 +742,25 @@ error_start=x:\path\to\dumper.exe
     terminated.</para>
 
     <para> To save space in the core dump, <command>dumper</command> doesn't
-      write those portions of the target process's memory space that are loaded
+      write those portions of the target process's memory space that were loaded
       from executable and dll files and are unchanged (e.g. program code).
       Instead, <command>dumper</command> saves paths to the files which
       contain that data. When a core dump is loaded into gdb, it uses these
       paths to load the appropriate files. That means that if you create a core
       dump on one machine and try to debug it on another, you'll need to place
       identical copies of the executable and dlls in the same directories as on
-      the machine where the core dump was created. </para>
+      the machine where the core dump was created.
+    </para>
+  </refsect1>
+
+  <refsect1 id="dumper-notes">
+    <title>Notes</title>
+    <para>
+      A Cygwin "core dump file" is an ELF file containing the mutable parts of
+      the process memory and special note sections which capture the process,
+      thread and loaded module context needed to recreate the process image in a
+      debugger.
+    </para>
     </refsect1>
   </refentry>
 
@@ -1497,8 +1508,10 @@ bash$ locale noexpr
 
   <para>
     <command>minidumper</command> can be used with cygwin's Just-In-Time
-    debugging facility in exactly the same way as <command>dumper</command>
-    (See <xref linkend="dumper"></xref>).
+    debugging facility by adding <code>error_start=minidumper</code> to the
+    <literal>CYGWIN</literal> environment variable. If <literal>CYGWIN</literal>
+    is set this way, then <command>minidumper</command> will be started whenever
+    a program encounters a fatal exception.
   </para>
 
   <para>

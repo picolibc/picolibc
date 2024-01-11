@@ -97,6 +97,12 @@ Enable automatic sparsifying of files on SSDs, independent of the
 "sparse" mount mode.
 </para></listitem>
 
+<listitem><para>
+When RLIMIT_CORE is more than 1MB, a core dump file which can be loaded by gdb
+is now written on a fatal error. Otherwise, if it's greater than zero, a text
+format .stackdump file is written, as previously.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
