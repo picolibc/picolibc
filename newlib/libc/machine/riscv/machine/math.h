@@ -98,18 +98,12 @@
 #endif
 
 
-/**
- * Not available for all compilers.
- * In case of absence, fall back to normal function calls
- */
-#if defined(__GNUC_GNU_INLINE__) || defined(__GNUC_STDC_INLINE__)
-
-# define __declare_riscv_macro(type) extern __inline type __attribute((gnu_inline, always_inline))
+#ifdef __declare_extern_inline
 
 #if __RISCV_HARD_FLOAT >= 64
 
 /* Double-precision functions */
-__declare_riscv_macro(double)
+__declare_extern_inline(double)
 copysign(double x, double y)
 {
 	double result;
@@ -117,7 +111,7 @@ copysign(double x, double y)
 	return result;
 }
 
-__declare_riscv_macro(double)
+__declare_extern_inline(double)
 fabs(double x)
 {
 	double result;
@@ -125,7 +119,7 @@ fabs(double x)
 	return result;
 }
 
-__declare_riscv_macro(double)
+__declare_extern_inline(double)
 fmax (double x, double y)
 {
 	double result;
@@ -136,7 +130,7 @@ fmax (double x, double y)
 	return result;
 }
 
-__declare_riscv_macro(double)
+__declare_extern_inline(double)
 fmin (double x, double y)
 {
 	double result;
@@ -147,20 +141,20 @@ fmin (double x, double y)
 	return result;
 }
 
-__declare_riscv_macro(int)
+__declare_extern_inline(int)
 __finite(double x)
 {
 	long fclass = _fclass_d (x);
 	return (fclass & (FCLASS_INF|FCLASS_NAN)) == 0;
 }
 
-__declare_riscv_macro(int)
+__declare_extern_inline(int)
 finite(double x)
 {
         return __finite(x);
 }
 
-__declare_riscv_macro(int)
+__declare_extern_inline(int)
 __fpclassifyd (double x)
 {
   long fclass = _fclass_d (x);
@@ -177,7 +171,7 @@ __fpclassifyd (double x)
     return FP_NAN;
 }
 
-__declare_riscv_macro(double)
+__declare_extern_inline(double)
 sqrt (double x)
 {
 	double result;
@@ -189,7 +183,7 @@ sqrt (double x)
 	return result;
 }
 
-__declare_riscv_macro(double)
+__declare_extern_inline(double)
 fma (double x, double y, double z)
 {
 	double result;
@@ -202,7 +196,7 @@ fma (double x, double y, double z)
 #if __RISCV_HARD_FLOAT >= 32
 
 /* Single-precision functions */
-__declare_riscv_macro(float)
+__declare_extern_inline(float)
 copysignf(float x, float y)
 {
 	float result;
@@ -210,7 +204,7 @@ copysignf(float x, float y)
 	return result;
 }
 
-__declare_riscv_macro(float)
+__declare_extern_inline(float)
 fabsf (float x)
 {
 	float result;
@@ -218,7 +212,7 @@ fabsf (float x)
 	return result;
 }
 
-__declare_riscv_macro(float)
+__declare_extern_inline(float)
 fmaxf (float x, float y)
 {
 	float result;
@@ -229,7 +223,7 @@ fmaxf (float x, float y)
 	return result;
 }
 
-__declare_riscv_macro(float)
+__declare_extern_inline(float)
 fminf (float x, float y)
 {
 	float result;
@@ -240,20 +234,20 @@ fminf (float x, float y)
 	return result;
 }
 
-__declare_riscv_macro(int)
+__declare_extern_inline(int)
 __finitef(float x)
 {
 	long fclass = _fclass_f (x);
 	return (fclass & (FCLASS_INF|FCLASS_NAN)) == 0;
 }
 
-__declare_riscv_macro(int)
+__declare_extern_inline(int)
 finitef(float x)
 {
         return __finitef(x);
 }
 
-__declare_riscv_macro(int)
+__declare_extern_inline(int)
 __fpclassifyf (float x)
 {
   long fclass = _fclass_f (x);
@@ -270,7 +264,7 @@ __fpclassifyf (float x)
     return FP_NAN;
 }
 
-__declare_riscv_macro(float)
+__declare_extern_inline(float)
 sqrtf (float x)
 {
 	float result;
@@ -282,7 +276,7 @@ sqrtf (float x)
 	return result;
 }
 
-__declare_riscv_macro(float)
+__declare_extern_inline(float)
 fmaf (float x, float y, float z)
 {
 	float result;

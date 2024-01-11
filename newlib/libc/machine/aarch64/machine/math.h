@@ -39,14 +39,13 @@
 #define _HAVE_FAST_FMA 1
 #define _HAVE_FAST_FMAF 1
 
-#if defined(_HAVE_ATTRIBUTE_ALWAYS_INLINE) && defined(_HAVE_ATTRIBUTE_GNU_INLINE)
-#define __declare_aarch64_macro(type) extern __inline type __attribute((gnu_inline, always_inline))
+#ifdef __declare_extern_inline
 
 #ifdef _WANT_MATH_ERRNO
 #include <errno.h>
 #endif
 
-__declare_aarch64_macro(double)
+__declare_extern_inline(double)
 sqrt (double x)
 {
     double result;
@@ -58,7 +57,7 @@ sqrt (double x)
     return result;
 }
 
-__declare_aarch64_macro(float)
+__declare_extern_inline(float)
 sqrtf (float x)
 {
     float result;
@@ -70,7 +69,7 @@ sqrtf (float x)
     return result;
 }
 
-__declare_aarch64_macro(double)
+__declare_extern_inline(double)
 fma (double x, double y, double z)
 {
     double result;
@@ -78,7 +77,7 @@ fma (double x, double y, double z)
     return result;
 }
 
-__declare_aarch64_macro(float)
+__declare_extern_inline(float)
 fmaf (float x, float y, float z)
 {
     float result;

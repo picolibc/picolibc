@@ -41,8 +41,6 @@
 #endif
 #define __ssp_real(fun)		__ssp_real_(fun)
 
-#define __ssp_inline extern __inline__ __attribute__((__always_inline__, __gnu_inline__))
-
 #define __ssp_bos(ptr) __builtin_object_size(ptr, __SSP_FORTIFY_LEVEL > 1)
 #define __ssp_bos0(ptr) __builtin_object_size(ptr, 0)
 
@@ -51,7 +49,7 @@
 		__chk_fail()
 #define __ssp_decl(rtype, fun, args) \
 rtype __ssp_real_(fun) args __asm__(__ASMNAME(#fun)); \
-__ssp_inline rtype fun args
+__declare_extern_inline(rtype) fun args
 #define __ssp_redirect_raw(rtype, fun, args, call, cond, bos) \
 __ssp_decl(rtype, fun, args) \
 { \
