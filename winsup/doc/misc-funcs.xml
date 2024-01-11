@@ -107,6 +107,10 @@ enum.  The second is an optional pointer.</para>
     <title>Description</title>
 <para> Outputs a stackdump to stderr from the called location.
 </para>
+<para> Note: This function only has an effect the first time it is called by a process.
+</para>
+<para> Note: This function is deprecated.
+</para>
   </refsect1>
 </refentry>
 
