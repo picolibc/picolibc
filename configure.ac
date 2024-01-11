@@ -2599,7 +2599,15 @@ esac
 
 # Some systems (e.g., one of the i386-aix systems the gas testers are
 # using) don't handle "\$" correctly, so don't use it here.
-tooldir='${exec_prefix}'/${target_noncanonical}
+AC_ARG_WITH([tooldir],
+  [AS_HELP_STRING([--with-tooldir=PATH],
+		[use given path to install target tools after build])],
+  [AS_CASE([x"$withval"],
+	[x/*],,
+	[AC_MSG_ERROR([argument to --with-tooldir must be an absolute path])])
+  ],
+  [with_tooldir='${exec_prefix}'/${target_noncanonical}])
+tooldir=${with_tooldir}
 build_tooldir=${tooldir}
 
 # Create a .gdbinit file which runs the one in srcdir
