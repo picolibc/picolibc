@@ -101,4 +101,12 @@
 typedef int fenv_t;
 typedef int fexcept_t;
 
+#if !defined(__declare_fenv_inline) && defined(__declare_extern_inline)
+#define	__declare_fenv_inline(type) __declare_extern_inline(type)
+#endif
+
+#ifdef __declare_fenv_inline
+#include <machine/fenv-softfloat.h>
+#endif
+
 #endif /* _SYS_FENV_H_ */

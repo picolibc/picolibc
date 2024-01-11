@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2022 Keith Packard
+ * Copyright © 2024 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,14 +33,6 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define __STDC_WANT_IEC_60559_BFP_EXT__
+#define _DEFAULT_SOURCE
+#define	__declare_fenv_inline(type) type
 #include <fenv.h>
-
-/* By default, the only state we carry is the rounding mode */
-
-int fegetmode(femode_t *modep)
-{
-    modep->round = fegetround();
-    modep->except = fegetexcept();
-    return 0;
-}

@@ -4,7 +4,9 @@
  * Copyright (c) 2010-2019 Red Hat, Inc.
  */
 
-#ifndef _SOFT_FLOAT
+#ifdef _SOFT_FLOAT
+#include "../../fenv/fenv.c"
+#else
 
 #define _GNU_SOURCE        // for FE_NOMASK_ENV
 

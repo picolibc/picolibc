@@ -33,25 +33,8 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 srcs_fenv = [
-  'feclearexcept.c',
+  'fenv.c',
   'fe_dfl_env.c',
-  'fedisableexcept.c',
-  'feenableexcept.c',
-  'fegetenv.c',
-  'fegetexcept.c',
-  'fegetexceptflag.c',
-  'fegetmode.c',
-  'fegetround.c',
-  'feholdexcept.c',
-  'fenv_stub.c',
-  'feraiseexcept.c',
-  'fesetenv.c',
-  'fesetexcept.c',
-  'fesetexceptflag.c',
-  'fesetmode.c',
-  'fesetround.c',
-  'fetestexcept.c',
-  'feupdateenv.c',
 ]
 
 srcs_fenv_use = []

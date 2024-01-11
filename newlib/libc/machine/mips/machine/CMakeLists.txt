@@ -35,6 +35,5 @@
 picolibc_headers(machine
   asm.h
   fenv-fp.h
-  fenv-softfloat.h
   regdef.h
   )

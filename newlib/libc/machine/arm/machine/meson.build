@@ -35,6 +35,7 @@
 inc_machine_headers_machine = [
   'acle-compat.h',
   '_endian.h',
+  'fenv-fp.h',
   'math.h',
   'param.h',
 ]

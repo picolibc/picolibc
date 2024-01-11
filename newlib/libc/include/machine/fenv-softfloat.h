@@ -51,14 +51,14 @@
  */
 #include <errno.h>
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 feclearexcept(int excepts)
 {
         (void) excepts;
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 fegetexceptflag(fexcept_t *flagp, int excepts)
 {
         (void) excepts;
@@ -67,7 +67,7 @@ fegetexceptflag(fexcept_t *flagp, int excepts)
 
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 fesetexceptflag(const fexcept_t *flagp, int excepts)
 {
         (void) excepts;
@@ -75,7 +75,7 @@ fesetexceptflag(const fexcept_t *flagp, int excepts)
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 feraiseexcept(int excepts)
 {
 
@@ -83,14 +83,14 @@ feraiseexcept(int excepts)
 
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 fetestexcept(int excepts)
 {
         (void) excepts;
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 fegetround(void)
 {
 
@@ -102,7 +102,7 @@ fegetround(void)
 
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 fesetround(int rounding_mode)
 {
         (void) rounding_mode;
@@ -110,28 +110,28 @@ fesetround(int rounding_mode)
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 fegetenv(fenv_t *envp)
 {
         (void) envp;
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 feholdexcept(fenv_t *envp)
 {
         (void) envp;
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 fesetenv(const fenv_t *envp)
 {
         (void) envp;
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 feupdateenv(const fenv_t *envp)
 {
         (void) envp;
@@ -146,23 +146,21 @@ feupdateenv(const fenv_t *envp)
 
 #if __BSD_VISIBLE
 
-/* We currently provide no external definitions of the functions below. */
-
-__fenv_static inline int
+__declare_fenv_inline(int)
 feenableexcept(int __mask)
 {
         (void) __mask;
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 fedisableexcept(int __mask)
 {
         (void) __mask;
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 fegetexcept(void)
 {
 
