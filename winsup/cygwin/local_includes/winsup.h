@@ -181,6 +181,7 @@ void close_all_files (bool = false);
 extern "C" void error_start_init (const char*);
 extern "C" void dumper_init (void);
 extern "C" int try_to_debug ();
+extern "C" void api_fatal_debug ();
 
 void ld_preload ();
 void fixup_hooks_after_fork ();

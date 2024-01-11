@@ -1250,11 +1250,7 @@ vapi_fatal (const char *fmt, va_list ap)
   __small_vsprintf (buf + n, fmt, ap);
   va_end (ap);
   strace.prntf (_STRACE_SYSTEM, NULL, "%s", buf);
-
-#ifdef DEBUGGING
-  try_to_debug ();
-#endif
-  cygwin_stackdump ();
+  api_fatal_debug();
   myself.exit (__api_fatal_exit_val);
 }
 

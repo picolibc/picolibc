@@ -1396,6 +1396,24 @@ signal_exit (int sig, siginfo_t *si, void *)
 }
 } /* extern "C" */
 
+/* As above, but before exiting due to api_fatal */
+extern "C"
+void
+api_fatal_debug ()
+{
+  if (try_to_debug ())
+    return;
+
+  if (cygheap->rlim_core == 0Ul)
+    return;
+
+  if (cygheap->rlim_core > 1024*1024)
+    if (exec_prepared_command (dumper_command))
+      return;
+
+  cygwin_stackdump();
+}
+
 /* Attempt to carefully handle SIGCONT when we are stopped. */
 void
 _cygtls::handle_SIGCONT ()
