@@ -33,38 +33,26 @@
 
 #include <sys/cdefs.h>
 
-#ifdef __mips_soft_float
-typedef int fenv_t;
-typedef int fexcept_t;
-#else
+#if !defined(__mips_soft_float) && !defined(__mips_hard_float)
+#error compiler didnt set soft/hard float macros
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifndef	__fenv_static
-#define	__fenv_static	static
-#endif
+typedef int fenv_t;
+typedef int fexcept_t;
 
-typedef	int	fenv_t;
-typedef	int	fexcept_t;
+#ifndef __mips_soft_float
 
 /* Exception flags */
-#ifdef __mips_soft_float
-#define	_FPUSW_SHIFT	16
-#define	FE_INVALID	0x0001
-#define	FE_DIVBYZERO	0x0002
-#define	FE_OVERFLOW	0x0004
-#define	FE_UNDERFLOW	0x0008
-#define	FE_INEXACT	0x0010
-#else
 #define	_FCSR_CAUSE_SHIFT	10
 #define	FE_INVALID	0x0040
 #define	FE_DIVBYZERO	0x0020
 #define	FE_OVERFLOW	0x0010
 #define	FE_UNDERFLOW	0x0008
 #define	FE_INEXACT	0x0004
-#endif
 #define	FE_ALL_EXCEPT	(FE_DIVBYZERO | FE_INEXACT | \
 			 FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW)
 
@@ -76,28 +64,33 @@ typedef	int	fexcept_t;
 #define	_ROUND_MASK	(FE_TONEAREST | FE_DOWNWARD | \
 			 FE_UPWARD | FE_TOWARDZERO)
 
-
 /* Default floating-point environment */
 extern fenv_t		_fe_dfl_env;
 #define	FE_DFL_ENV	((const fenv_t *) &_fe_dfl_env)
 
 /* We need to be able to map status flag positions to mask flag positions */
-#define	_ENABLE_SHIFT	5
-#define	_ENABLE_MASK	(FE_ALL_EXCEPT << _ENABLE_SHIFT)
+#define	_FCSR_ENABLE_SHIFT	5
+#define	_FCSR_ENABLE_MASK	(FE_ALL_EXCEPT << _FCSR_ENABLE_SHIFT)
 
-#if !defined(__mips_soft_float) && !defined(__mips_hard_float)
-#error compiler didnt set soft/hard float macros
-#endif
-
-#ifndef	__mips_soft_float
 #define	__cfc1(__fcsr)	__asm __volatile("cfc1 %0, $31" : "=r" (__fcsr))
 #define	__ctc1(__fcsr)	__asm __volatile("ctc1 %0, $31" :: "r" (__fcsr))
+
+#endif /* !__mips_soft_float */
+
+#if !defined(__declare_fenv_inline) && defined(__declare_extern_inline)
+#define	__declare_fenv_inline(type) __declare_extern_inline(type)
+#endif
+
+#ifdef __declare_fenv_inline
+#ifdef	__mips_soft_float
+#include <machine/fenv-softfloat.h>
+#else
+#include <machine/fenv-fp.h>
+#endif
 #endif
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* !_SOFT_FLOAT */
 
 #endif	/* !_FENV_H_ */
