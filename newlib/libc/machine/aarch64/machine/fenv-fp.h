@@ -27,7 +27,7 @@
  */
 
 
-__fenv_static __inline int
+__declare_fenv_inline(int)
 feclearexcept(int __excepts)
 {
 	fexcept_t __r;
@@ -38,7 +38,7 @@ feclearexcept(int __excepts)
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 fegetexceptflag(fexcept_t *__flagp, int __excepts)
 {
 	fexcept_t __r;
@@ -48,7 +48,7 @@ fegetexceptflag(fexcept_t *__flagp, int __excepts)
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 fesetexceptflag(const fexcept_t *__flagp, int __excepts)
 {
 	fexcept_t __r;
@@ -60,7 +60,7 @@ fesetexceptflag(const fexcept_t *__flagp, int __excepts)
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 feraiseexcept(int __excepts)
 {
 	fexcept_t __r;
@@ -71,7 +71,7 @@ feraiseexcept(int __excepts)
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 fetestexcept(int __excepts)
 {
 	fexcept_t __r;
@@ -80,7 +80,7 @@ fetestexcept(int __excepts)
 	return (__r & __excepts);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 fegetround(void)
 {
 	fenv_t __r;
@@ -89,7 +89,7 @@ fegetround(void)
 	return ((__r >> _ROUND_SHIFT) & _ROUND_MASK);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 fesetround(int __round)
 {
 	fenv_t __r;
@@ -103,7 +103,7 @@ fesetround(int __round)
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 fegetenv(fenv_t *__envp)
 {
 	fenv_t __r;
@@ -117,7 +117,7 @@ fegetenv(fenv_t *__envp)
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 feholdexcept(fenv_t *__envp)
 {
 	fenv_t __r;
@@ -134,7 +134,7 @@ feholdexcept(fenv_t *__envp)
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 fesetenv(const fenv_t *__envp)
 {
 
@@ -143,7 +143,7 @@ fesetenv(const fenv_t *__envp)
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 feupdateenv(const fenv_t *__envp)
 {
 	fexcept_t __r;
@@ -154,7 +154,7 @@ feupdateenv(const fenv_t *__envp)
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 feenableexcept(int __mask)
 {
 	fenv_t __old_r, __new_r;
@@ -165,7 +165,7 @@ feenableexcept(int __mask)
 	return ((__old_r >> _FPUSW_SHIFT) & FE_ALL_EXCEPT);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 fedisableexcept(int __mask)
 {
 	fenv_t __old_r, __new_r;
@@ -176,7 +176,7 @@ fedisableexcept(int __mask)
 	return ((__old_r >> _FPUSW_SHIFT) & FE_ALL_EXCEPT);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 fegetexcept(void)
 {
 	fenv_t __r;
@@ -184,4 +184,3 @@ fegetexcept(void)
 	__mrs_fpcr(__r);
 	return ((__r & _ENABLE_MASK) >> _FPUSW_SHIFT);
 }
-

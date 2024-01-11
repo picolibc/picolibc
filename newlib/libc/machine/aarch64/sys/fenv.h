@@ -30,6 +30,11 @@
 #define	_FENV_H_
 
 #include <sys/_types.h>
+#include <sys/cdefs.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef	__uint64_t	fenv_t;
 typedef	__uint64_t	fexcept_t;
@@ -67,9 +72,16 @@ typedef	__uint64_t	fexcept_t;
 #define	__mrs_fpsr(__r)	__asm __volatile("mrs %0, fpsr" : "=r" (__r))
 #define	__msr_fpsr(__r)	__asm __volatile("msr fpsr, %0" : : "r" (__r))
 
-#ifndef	__fenv_static
-#define	__fenv_static	static
+#if !defined(__declare_fenv_inline) && defined(__declare_extern_inline)
+#define	__declare_fenv_inline(type) __declare_extern_inline(type)
+#endif
+
+#ifdef __declare_fenv_inline
 #include <machine/fenv-fp.h>
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif	/* !_FENV_H_ */
