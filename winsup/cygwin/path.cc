@@ -3131,7 +3131,7 @@ restart:
   major = 0;
   minor = 0;
   mode = 0;
-  // mount_flags is an incoming value set in path_conv */
+  /* mount_flags is an incoming value set in path_conv */
   path_flags = 0;
 
   PVOID eabuf = &nfs_aol_ffei;
