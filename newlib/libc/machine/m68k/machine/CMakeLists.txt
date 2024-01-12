@@ -32,19 +32,6 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-picolibc_sources(
-  feclearexcept.c
-  fedisableexcept.c
-  feenableexcept.c
-  fegetenv.c
-  fegetexcept.c
-  fegetexceptflag.c
-  fegetround.c
-  feholdexcept.c
-  feraiseexcept.c
-  fesetenv.c
-  fesetexceptflag.c
-  fesetround.c
-  fetestexcept.c
-  feupdateenv.c
+picolibc_headers(machine
+  fenv-fp.h
   )

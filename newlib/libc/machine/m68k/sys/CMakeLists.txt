@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2020 Thomas Daede
+# Copyright © 2022 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,23 +32,6 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-srcs_machine = [
-  'memcpy.S',
-  'memset.S',
-  'setjmp.S',
-  'strcpy.c',
-  'strlen.c',
-]
-
-subdir('sys')
-subdir('machine')
-
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_machine' + target,
-		static_library('machine' + target,
-			srcs_machine,
-			pic: false,
-			include_directories: inc,
-			c_args: value[1] + c_args + arg_fnobuiltin))
-endforeach
+picolibc_headers(sys
+  fenv.h
+  )
