@@ -89,10 +89,14 @@ if $qemu --version | grep -q 'version [789]'; then
 fi
 
 if $qemu --version | grep -q 'version [89]'; then
-    all_options="Zawrs $all_options"
+    if $qemu --version | grep -q 'version 8.1'; then
+        all_options="Zawrs $all_options"
+    else
+        all_options="zawrs $all_options"
+    fi
 fi
 
-if $qemu --version | grep -q 'version \(8.1\|9\)'; then
+if $qemu --version | grep -q 'version \(8.[1-9]\|9\)'; then
     all_options="Zfa $all_options"
 fi
 
