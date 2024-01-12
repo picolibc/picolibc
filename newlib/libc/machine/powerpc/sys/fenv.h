@@ -31,12 +31,7 @@
 #ifndef	_SYS_FENV_H_
 #define	_SYS_FENV_H_
 
-#include <sys/_types.h>
-#include <machine/endian.h>
-
-#ifndef	__fenv_static
-#define	__fenv_static	static
-#endif
+#include <sys/cdefs.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -113,7 +108,7 @@ extern fenv_t		_fe_dfl_env;
 union __fpscr {
 	double __d;
 	struct {
-#if _BYTE_ORDER == _LITTLE_ENDIAN
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 		fenv_t __reg;
 		__uint32_t __junk;
 #else
@@ -123,10 +118,16 @@ union __fpscr {
 	} __bits;
 };
 
+#if !defined(__declare_fenv_inline) && defined(__declare_extern_inline)
+#define	__declare_fenv_inline(type) __declare_extern_inline(type)
+#endif
+
+#ifdef __declare_fenv_inline
+#include <machine/fenv-fp.h>
+#endif
 
 #ifdef __cplusplus
 }
 #endif
-
 
 #endif	/* !_SYS_FENV_H_ */

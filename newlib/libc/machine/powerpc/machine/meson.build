@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2021 Keith Packard
+# Copyright © 2022 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,16 +32,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
-srcs_libm_machine = [
+inc_machine_headers_machine = [
+  'fenv-fp.h',
 ]
 
-srcs_libm_machine_complex128 = [
-  'complex128.c'
-]
-
-if cc.has_function('__mulkc3_hw', args: core_c_args + [lib_gcc])
-  srcs_libm_machine += srcs_libm_machine_complex128
-endif
-
-src_libm_machine = files(srcs_libm_machine)
+install_headers(inc_machine_headers_machine,
+		install_dir: include_dir / 'machine')
