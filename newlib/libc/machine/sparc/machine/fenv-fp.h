@@ -24,31 +24,6 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  */
 
-#ifndef _SOFT_FLOAT
-
-#include <sys/cdefs.h>
-#include <assert.h>
-#include <fenv.h>
-
-#define _DIAGASSERT(x) assert(x)
-
-#ifdef __weak_alias
-__weak_alias(feclearexcept,_feclearexcept)
-__weak_alias(fedisableexcept,_fedisableexcept)
-__weak_alias(feenableexcept,_feenableexcept)
-__weak_alias(fegetenv,_fegetenv)
-__weak_alias(fegetexcept,_fegetexcept)
-__weak_alias(fegetexceptflag,_fegetexceptflag)
-__weak_alias(fegetround,_fegetround)
-__weak_alias(feholdexcept,_feholdexcept)
-__weak_alias(feraiseexcept,_feraiseexcept)
-__weak_alias(fesetenv,_fesetenv)
-__weak_alias(fesetexceptflag,_fesetexceptflag)
-__weak_alias(fesetround,_fesetround)
-__weak_alias(fetestexcept,_fetestexcept)
-__weak_alias(feupdateenv,_feupdateenv)
-#endif
-
 /* Load floating-point state register (32bits) */
 #define	__ldfsr(__r)	__asm__	__volatile__		\
 	("ld %0, %%fsr" : : "m" (__r))
@@ -61,13 +36,11 @@ __weak_alias(feupdateenv,_feupdateenv)
  * The feclearexcept() function clears the supported floating-point exceptions
  * represented by `excepts'.
  */
-int
+__declare_fenv_inline(int)
 feclearexcept(int excepts)
 {
 	fexcept_t r;
 	int ex;
-
-	_DIAGASSERT((excepts & ~FE_ALL_EXCEPT) == 0);
 
 	ex = excepts & FE_ALL_EXCEPT;
 
@@ -84,14 +57,11 @@ feclearexcept(int excepts)
  * representation of the states of the floating-point status flags indicated
  * by the argument excepts in the object pointed to by the argument flagp.
  */
-int
+__declare_fenv_inline(int)
 fegetexceptflag(fexcept_t *flagp, int excepts)
 {
 	fexcept_t r;
 	int ex;
-
-	_DIAGASSERT(flagp != NULL);
-	_DIAGASSERT((excepts & ~FE_ALL_EXCEPT) == 0);
 
 	ex = excepts & FE_ALL_EXCEPT;
 
@@ -108,14 +78,11 @@ fegetexceptflag(fexcept_t *flagp, int excepts)
  * `excepts' to the states stored in the object pointed to by `flagp'. It does
  * NOT raise any floating-point exceptions, but only sets the state of the flags.
  */
-int
+__declare_fenv_inline(int)
 fesetexceptflag(const fexcept_t *flagp, int excepts)
 {
 	fexcept_t r;
 	int ex;
-
-	_DIAGASSERT(flagp != NULL);
-	_DIAGASSERT((excepts & ~FE_ALL_EXCEPT) == 0);
 
 	ex = excepts & FE_ALL_EXCEPT;
 
@@ -135,13 +102,11 @@ fesetexceptflag(const fexcept_t *flagp, int excepts)
  * The order in which these floating-point exceptions are raised is unspecified
  * (by the standard).
  */
-int
+__declare_fenv_inline(int)
 feraiseexcept(int excepts)
 {
 	volatile double d;
 	int ex;
-
-	_DIAGASSERT((excepts & ~FE_ALL_EXCEPT) == 0);
 
 	ex = excepts & FE_ALL_EXCEPT;
 
@@ -181,12 +146,10 @@ feraiseexcept(int excepts)
  * floating-point exception flags are currently set. The `excepts' argument
  * specifies the floating-point status flags to be queried.
  */
-int
+__declare_fenv_inline(int)
 fetestexcept(int excepts)
 {
 	fexcept_t r;
-
-	_DIAGASSERT((excepts & ~FE_ALL_EXCEPT) == 0);
 
 	__stfsr(&r);
 
@@ -196,7 +159,7 @@ fetestexcept(int excepts)
 /*
  * The fegetround() function gets the current rounding direction.
  */
-int
+__declare_fenv_inline(int)
 fegetround(void)
 {
 	fenv_t r;
@@ -211,12 +174,11 @@ fegetround(void)
  * its argument `round'. If the argument is not equal to the value of a rounding
  * direction macro, the rounding direction is not changed.
  */
-int
+__declare_fenv_inline(int)
 fesetround(int round)
 {
 	fenv_t r;
 
-	_DIAGASSERT((round & ~_ROUND_MASK) == 0);
 	if (round & ~_ROUND_MASK)
 		return -1;
 
@@ -233,11 +195,9 @@ fesetround(int round)
  * The fegetenv() function attempts to store the current floating-point
  * environment in the object pointed to by envp.
  */
-int
+__declare_fenv_inline(int)
 fegetenv(fenv_t *envp)
 {
-	_DIAGASSERT(envp != NULL);
-
 	__stfsr(envp);
 
 	/* Success */
@@ -251,12 +211,10 @@ fegetenv(fenv_t *envp)
  * then installs a non-stop (continue on floating-point exceptions) mode, if
  * available, for all floating-point exceptions.
  */
-int
+__declare_fenv_inline(int)
 feholdexcept(fenv_t *envp)
 {
 	fenv_t r;
-
-	_DIAGASSERT(envp != NULL);
 
 	__stfsr(&r);
 	*envp = r;
@@ -275,11 +233,9 @@ feholdexcept(fenv_t *envp)
  * floating-point exceptions, but only installs the state of the floating-point
  * status flags represented through its argument.
  */
-int
+__declare_fenv_inline(int)
 fesetenv(const fenv_t *envp)
 {
-	_DIAGASSERT(envp != NULL);
-
 	__ldfsr(*envp);
 
 	/* Success */
@@ -295,17 +251,14 @@ fesetenv(const fenv_t *envp)
  * by a call to feholdexcept() or fegetenv(), or equal a floating-point
  * environment macro.
  */
-int
+__declare_fenv_inline(int)
 feupdateenv(const fenv_t *envp)
 {
 	fexcept_t r;
 
-	_DIAGASSERT(envp != NULL);
-
 	__stfsr(&r);
 	__ldfsr(*envp);
 
-	_DIAGASSERT((r & ~FE_ALL_EXCEPT) == 0);
 	feraiseexcept(r & FE_ALL_EXCEPT);
 
 	/* Success */
@@ -315,7 +268,7 @@ feupdateenv(const fenv_t *envp)
 /*
  * The following functions are extentions to the standard
  */
-int
+__declare_fenv_inline(int)
 feenableexcept(int mask)
 {
 	fenv_t old_r, new_r;
@@ -327,7 +280,7 @@ feenableexcept(int mask)
 	return (old_r >> _FPUSW_SHIFT) & FE_ALL_EXCEPT;
 }
 
-int
+__declare_fenv_inline(int)
 fedisableexcept(int mask)
 {
 	fenv_t old_r, new_r;
@@ -339,7 +292,7 @@ fedisableexcept(int mask)
 	return (old_r >> _FPUSW_SHIFT) & FE_ALL_EXCEPT;
 }
 
-int
+__declare_fenv_inline(int)
 fegetexcept(void)
 {
 	fenv_t r;
@@ -347,5 +300,3 @@ fegetexcept(void)
 	__stfsr(&r);
 	return (r & _ENABLE_MASK) >> _FPUSW_SHIFT;
 }
-
-#endif /* !_SOFT_FLOAT */
