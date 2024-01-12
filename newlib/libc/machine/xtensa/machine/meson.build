@@ -33,7 +33,8 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 inc_machine_headers_machine = [
-  'core-isa.h'
+  'core-isa.h',
+  'fenv-fp.h'
 ]
 
 install_headers(inc_machine_headers_machine,

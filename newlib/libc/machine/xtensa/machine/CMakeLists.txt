@@ -34,4 +34,5 @@
 #
 picolibc_headers(machine
   core-isa.h
+  fenv-fp.h
   )
