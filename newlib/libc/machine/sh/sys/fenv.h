@@ -76,6 +76,18 @@ typedef int fexcept_t;
 
 #endif
 
+#if !defined(__declare_fenv_inline) && defined(__declare_extern_inline)
+#define	__declare_fenv_inline(type) __declare_extern_inline(type)
+#endif
+
+#ifdef __declare_fenv_inline
+#ifdef __SH_FPU_ANY__
+#include <machine/fenv-fp.h>
+#else
+#include <machine/fenv-softfloat.h>
+#endif
+#endif
+
 #ifdef __cplusplus
 }
 #endif

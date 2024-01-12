@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2023 Adrian Siekierka
+# Copyright © 2024 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,19 +32,6 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
-srcs_machine = [
-  'memcpy.S',
-  'memset.S',
-  'setjmp.S',
-  'strcmp.S',
-  'strcpy.S',
-  'strlen.S',
-  'strncpy.S',
-  'strncpy.c',
-]
-
-subdir('sys')
-subdir('machine')
-
-src_machine = files(srcs_machine)
+picolibc_headers(machine
+  fenv-fp.h
+  )

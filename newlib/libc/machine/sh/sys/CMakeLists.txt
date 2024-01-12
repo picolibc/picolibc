@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2024 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,21 +32,6 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-srcs_libm_machine = [
-  'feclearexcept.c',
-  'fedisableexcept.c',
-  'feenableexcept.c',
-  'fegetenv.c',
-  'fegetexcept.c',
-  'fegetexceptflag.c',
-  'fegetround.c',
-  'feholdexcept.c',
-  'feraiseexcept.c',
-  'fesetenv.c',
-  'fesetexceptflag.c',
-  'fesetround.c',
-  'fetestexcept.c',
-  'feupdateenv.c',
-]
-
-src_libm_machine = files(srcs_libm_machine)
+picolibc_headers(sys
+  fenv.h
+  )
