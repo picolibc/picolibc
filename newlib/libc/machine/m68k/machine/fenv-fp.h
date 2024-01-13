@@ -33,6 +33,8 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _M68K_EXCEPT_SHIFT      6
+
 __declare_fenv_inline(int) feclearexcept(int excepts)
 {
   /* Mask excepts to be sure only supported flag bits are set */
@@ -253,4 +255,41 @@ __declare_fenv_inline(int) feupdateenv(const fenv_t *envp)
 
     return 0;
 
+}
+
+__declare_fenv_inline(int) feenableexcept(int excepts)
+{
+    fenv_t fpcr;
+
+    __asm__ volatile("fmove.l %%fpcr, %0" : "=d"(fpcr));
+
+    /* Enable exceptions */
+
+    fpcr |= (excepts & FE_ALL_EXCEPT) << _M68K_EXCEPT_SHIFT;
+
+    __asm__ volatile("fmove.l %0, %%fpcr" : : "d"(fpcr));
+    return 0;
+}
+
+__declare_fenv_inline(int) fedisableexcept(int excepts)
+{
+    fenv_t fpcr;
+
+    __asm__ volatile("fmove.l %%fpcr, %0" : "=d"(fpcr));
+
+    /* Disable exceptions */
+
+    fpcr &= ~((excepts & FE_ALL_EXCEPT) << _M68K_EXCEPT_SHIFT);
+
+    __asm__ volatile("fmove.l %0, %%fpcr" : : "d"(fpcr));
+    return 0;
+}
+
+__declare_fenv_inline(int) fegetexcept(void)
+{
+    fenv_t fpcr;
+
+    __asm__ volatile("fmove.l %%fpcr, %0" : "=d"(fpcr));
+
+    return (fpcr >> _M68K_EXCEPT_SHIFT) & FE_ALL_EXCEPT;
 }
