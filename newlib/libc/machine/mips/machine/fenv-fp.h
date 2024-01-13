@@ -81,6 +81,19 @@ feraiseexcept(int excepts)
 }
 
 __declare_fenv_inline(int)
+fesetexcept(int excepts)
+{
+	fexcept_t fcsr;
+
+	excepts &= FE_ALL_EXCEPT;
+	__cfc1(fcsr);
+	fcsr |= excepts | (excepts << _FCSR_CAUSE_SHIFT);
+	__ctc1(fcsr);
+
+	return (0);
+}
+
+__declare_fenv_inline(int)
 fetestexcept(int excepts)
 {
 	fexcept_t fcsr;
