@@ -284,6 +284,29 @@ feraiseexcept (int excepts)
   return 0;
 }
 
+/*  This function sets the supported exceptions indicated by
+   excepts.  The function returns
+   zero in case the operation was successful, a non-zero value otherwise.  */
+int
+fesetexcept (int excepts)
+{
+  fenv_t fenv;
+
+  if (excepts & ~FE_ALL_EXCEPT)
+    return EINVAL;
+
+  /* Need to save/restore whole environment to modify status word.  */
+  __asm__ volatile ("fnstenv %0" : "=m" (fenv) : );
+
+  /* Set desired exception bits.  */
+  fenv._fpu._fpu_sw |= excepts;
+
+  /* Set back into FPU state.  */
+  __asm__ volatile ("fldenv %0" :: "m" (fenv));
+
+  return 0;
+}
+
 /*  Test whether the exception flags indicated by the parameter except
    are currently set. If any of them are, a nonzero value is returned
    which specifies which exceptions are set. Otherwise the result is zero.  */
