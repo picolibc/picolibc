@@ -80,6 +80,12 @@ feraiseexcept(int excepts)
 }
 
 __declare_fenv_inline(int)
+fesetexcept(int excepts)
+{
+        return feraiseexcept(excepts);
+}
+
+__declare_fenv_inline(int)
 fetestexcept(int excepts)
 {
 	union __fpscr __r;

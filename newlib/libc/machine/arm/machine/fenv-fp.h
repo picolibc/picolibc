@@ -116,7 +116,6 @@ __declare_fenv_inline(int) feholdexcept(fenv_t *envp)
 
 __declare_fenv_inline(int) fesetenv(const fenv_t *envp)
 {
-
 	_vmsr_fpscr(*envp);
 	return (0);
 }
@@ -136,8 +135,12 @@ __declare_fenv_inline(int) feraiseexcept(int excepts)
 {
 	fexcept_t __ex = excepts;
 
-	fesetexceptflag(&__ex, excepts);
-	return (0);
+	return fesetexceptflag(&__ex, excepts);
+}
+
+__declare_fenv_inline(int) fesetexcept(int excepts)
+{
+        return feraiseexcept(excepts);
 }
 
 __declare_fenv_inline(int) fesetround(int round)

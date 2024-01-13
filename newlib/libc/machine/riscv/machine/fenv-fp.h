@@ -259,6 +259,11 @@ __declare_fenv_inline(int) feraiseexcept(int excepts)
   return 0;
 }
 
+__declare_fenv_inline(int) fesetexcept(int excepts)
+{
+    return feraiseexcept(excepts);
+}
+
 /* This implementation is intended to comply with the following
  * specification:
  *

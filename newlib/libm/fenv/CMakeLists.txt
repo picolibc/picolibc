@@ -36,4 +36,6 @@
 picolibc_sources(
   fe_dfl_env.c
   fenv.c
+  fegetmode.c
+  fesetmode.c
   )

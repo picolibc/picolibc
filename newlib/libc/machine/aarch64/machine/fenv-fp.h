@@ -72,6 +72,12 @@ feraiseexcept(int __excepts)
 }
 
 __declare_fenv_inline(int)
+fesetexcept(int excepts)
+{
+        return feraiseexcept(excepts);
+}
+
+__declare_fenv_inline(int)
 fetestexcept(int __excepts)
 {
 	fexcept_t __r;

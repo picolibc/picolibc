@@ -95,6 +95,14 @@ fesetexceptflag(const fexcept_t *flagp, int excepts)
 	return 0;
 }
 
+__declare_fenv_inline(int)
+fesetexcept(int excepts)
+{
+	fexcept_t __ex = excepts;
+
+	return fesetexceptflag(&__ex, excepts);
+}
+
 /*
  * The feraiseexcept() function raises the supported floating-point exceptions
  * represented by the argument `excepts'.

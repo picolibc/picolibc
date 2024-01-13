@@ -119,6 +119,11 @@ __declare_fenv_inline(int) feraiseexcept(int excepts)
   return 0;
 }
 
+__declare_fenv_inline(int) fesetexcept(int excepts)
+{
+  return feraiseexcept(excepts);
+}
+
 __declare_fenv_inline(int) fesetenv(const fenv_t * env_ptr)
 {
   __asm__ volatile ("wur.fsr %0" : : "a"(*env_ptr));

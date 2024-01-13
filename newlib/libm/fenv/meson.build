@@ -34,6 +34,8 @@
 #
 srcs_fenv = [
   'fenv.c',
+  'fegetmode.c',
+  'fesetmode.c',
   'fe_dfl_env.c',
 ]
 

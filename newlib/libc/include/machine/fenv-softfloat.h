@@ -78,9 +78,13 @@ fesetexceptflag(const fexcept_t *flagp, int excepts)
 __declare_fenv_inline(int)
 feraiseexcept(int excepts)
 {
-
 	return( excepts != 0 );
+}
 
+__declare_fenv_inline(int)
+fesetexcept(int excepts)
+{
+        return( excepts != 0 );
 }
 
 __declare_fenv_inline(int)
