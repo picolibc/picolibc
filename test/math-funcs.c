@@ -33,9 +33,11 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define __STDC_WANT_IEC_60559_BFP_EXT__
 #define _GNU_SOURCE
 #include <stdio.h>
 #include <math.h>
+#include <fenv.h>
 #include <stdlib.h>
 #ifdef _HAVE_COMPLEX
 #include <complex.h>
@@ -60,6 +62,10 @@ long double complex cl1, cl2, cl3;
 #endif
 
 #endif
+
+fexcept_t fex;
+fenv_t fen;
+femode_t fem;
 
 /*
  * Touch test to make sure all of the expected math functions exist
@@ -462,6 +468,28 @@ main(void)
 #endif /* _TEST_LONG_DOUBLE */
 
 #endif /* _HAVE_COMPLEX */
-    
+
+    i1 = feclearexcept(FE_ALL_EXCEPT);
+    i1 = fegetexceptflag(&fex, FE_ALL_EXCEPT);
+    i1 = feraiseexcept(0);
+    i1 = fesetexceptflag(&fex, FE_ALL_EXCEPT);
+    i1 = fetestexcept(FE_ALL_EXCEPT);
+
+    i1 = fegetround();
+    i1 = fesetround(FE_TONEAREST);
+
+    i1 = fegetenv(&fen);
+    i1 = feholdexcept(&fen);
+    i1 = fesetenv(&fen);
+    i1 = feupdateenv(&fen);
+
+    i1 = feenableexcept(FE_ALL_EXCEPT);
+    i1 = fedisableexcept(FE_ALL_EXCEPT);
+    i1 = fegetexcept();
+
+    i1 = fegetmode(&fem);
+    i1 = fesetmode(&fem);
+    i1 = fesetexcept(FE_ALL_EXCEPT);
+
     return 0;
 }
