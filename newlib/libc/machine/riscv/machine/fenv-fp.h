@@ -444,3 +444,20 @@ __declare_fenv_inline(int) feupdateenv(const fenv_t *envp)
   return 0;
 
 }
+
+__declare_fenv_inline(int) feenableexcept(int excepts)
+{
+    (void) excepts;
+    return -1;
+}
+
+__declare_fenv_inline(int) fedisableexcept(int excepts)
+{
+    (void) excepts;
+    return -1;
+}
+
+__declare_fenv_inline(int) fegetexcept(void)
+{
+    return 0;
+}
