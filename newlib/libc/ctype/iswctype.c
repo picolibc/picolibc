@@ -63,7 +63,8 @@ PORTABILITY
 
 No supporting OS subroutines are required.
 */
-#include <_ansi.h>
+
+#define _DEFAULT_SOURCE
 #include <wctype.h>
 #include "local.h"
 

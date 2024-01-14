@@ -64,11 +64,15 @@ PORTABILITY
 No supporting OS subroutines are required.
 */
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
+#include <ctype.h>
 #include <wctype.h>
 
 int
 iswalnum (wint_t c)
 {
-  return iswalnum_l (c, 0);
+#ifdef _MB_CAPABLE
+    return iswalnum_l (c, 0);
+#else
+    return c < (wint_t)0x100 ? isalnum (c) : 0;
+#endif
 }

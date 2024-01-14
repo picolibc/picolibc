@@ -63,11 +63,15 @@ PORTABILITY
 No supporting OS subroutines are required.
 */
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
+#include <ctype.h>
 #include <wctype.h>
 
 int
 iswlower (wint_t c)
 {
+#ifdef _MB_CAPABLE
   return iswlower_l (c, 0);
+#else
+  return c < (wint_t)0x100 ? islower (c) : 0;
+#endif
 }
