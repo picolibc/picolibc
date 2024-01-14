@@ -66,13 +66,15 @@ PORTABILITY
 
 No supporting OS subroutines are required.
 */
-#include <_ansi.h>
 #include <ctype.h>
-
 
 #undef isspace
 int
 isspace (int c)
 {
-	return(__CTYPE_PTR[c+1] & _S);
+#if _PICOLIBC_CTYPE_SMALL
+    return c == ' ' || ('\t' <= c && c <= '\r');
+#else
+    return(__CTYPE_PTR[c+1] & _S);
+#endif
 }

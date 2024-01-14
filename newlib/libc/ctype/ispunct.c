@@ -67,13 +67,18 @@ PORTABILITY
 No supporting OS subroutines are required.
 */
 
-#include <_ansi.h>
 #include <ctype.h>
-
 
 #undef ispunct
 int
 ispunct (int c)
 {
-	return(__CTYPE_PTR[c+1] & _P);
+#if _PICOLIBC_CTYPE_SMALL
+    return (('!' <= c && c <= '/') ||
+            (':' <= c && c <= '@') ||
+            ('[' <= c && c <= '`') ||
+            ('{' <= c && c <= '~'));
+#else
+    return(__CTYPE_PTR[c+1] & _P);
+#endif
 }

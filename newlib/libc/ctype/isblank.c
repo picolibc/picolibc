@@ -36,11 +36,10 @@ PORTABILITY
 No supporting OS subroutines are required.
 */
 
-#include <_ansi.h>
 #include <ctype.h>
 
 int
 isblank (int c)
 {
-	return c == ' ' || c == '\t';
+    return c == ' ' || c == '\t';
 }

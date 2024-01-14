@@ -66,13 +66,15 @@ PORTABILITY
 No OS subroutines are required.
 */
 
-#include <_ansi.h>
 #include <ctype.h>
 
 #undef isalnum
-
 int
 isalnum (int c)
 {
-	return(__CTYPE_PTR[c+1] & (_U|_L|_N));
+#if _PICOLIBC_CTYPE_SMALL
+    return isalpha(c) || isdigit(c);
+#else
+    return __CTYPE_PTR[c+1] & (_U|_L|_N);
+#endif
 }

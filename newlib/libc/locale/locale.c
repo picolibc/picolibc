@@ -144,6 +144,7 @@ No supporting OS subroutines are required.
  */
 
 #define _DEFAULT_SOURCE
+#define _PICOLIBC_CTYPE_SMALL 0
 #include <newlib.h>
 #include <errno.h>
 #include <string.h>

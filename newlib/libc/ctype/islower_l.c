@@ -7,9 +7,13 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 #include <ctype.h>
 
 #undef islower_l
-
 int
 islower_l (int c, struct __locale_t *locale)
 {
-  return (__locale_ctype_ptr_l (locale)[c+1] & (_U|_L)) == _L;
+#if _PICOLIBC_CTYPE_SMALL
+    (void) locale;
+    return islower(c);
+#else
+    return (__locale_ctype_ptr_l (locale)[c+1] & (_U|_L)) == _L;
+#endif
 }

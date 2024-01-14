@@ -28,53 +28,53 @@ SUCH DAMAGE.
  */
 /*
 FUNCTION
-	<<islower>>, <<islower_l>>---lowercase character predicate
+	<<isgraph>>, <<isgraph_l>>---printable character predicates
 
 INDEX
-	islower
+	isgraph
 
 INDEX
-	islower_l
+	isgraph_l
 
 SYNOPSIS
 	#include <ctype.h>
-	int islower(int <[c]>);
+	int isgraph(int <[c]>);
 
 	#include <ctype.h>
-	int islower_l(int <[c]>, locale_t <[locale]>);
+	int isgraph_l(int <[c]>, locale_t <[locale]>);
 
 DESCRIPTION
-<<islower>> is a macro which classifies singlebyte charset values by table
-lookup.  It is a predicate returning non-zero for minuscules
-(lowercase alphabetic characters), and 0 for other characters.
-It is defined only if <[c]> is representable as an unsigned char or if
-<[c]> is EOF.
+<<isgraph>> behaves identically to <<isprint>>, except that space characters
+are excluded.
 
-<<islower_l>> is like <<islower>> but performs the check based on the
+<<isgraph_l>> is like <<isgraph>> but perform the check based on the
 locale specified by the locale object locale.  If <[locale]> is
-LC_GLOBAL_LOCALE or not a valid locale object, the behaviour is undefined.
+LC_GLOBAL_LOCALE or not a valid locale object, the behaviour is
+undefined.
 
 You can use a compiled subroutine instead of the macro definition by
-undefining the macro using `<<#undef islower>>' or `<<#undef islower_l>>'.
+undefining either macro using `<<#undef isgraph>>', or `<<#undef
+isgraph_l>>'.
 
 RETURNS
-<<islower>>, <<islower_l>> return non-zero if <[c]> is a lowercase letter.
+<<isgraph>>, <<isgraph_l>> return non-zero if <[c]> is a printing character
+except spaces.
 
 PORTABILITY
-<<islower>> is ANSI C.
-<<islower_l>> is POSIX-1.2008.
+<<isgraph>> is ANSI C.
 
 No supporting OS subroutines are required.
 */
+
 #include <ctype.h>
 
-#undef islower
+#undef isgraph
 int
-islower (int c)
+isgraph (int c)
 {
 #if _PICOLIBC_CTYPE_SMALL
-    return 'a' <= c && c <= 'z';
+    return '!' <= c && c <= '~';
 #else
-    return ((__CTYPE_PTR[c+1] & (_U|_L)) == _L);
+    return __CTYPE_PTR[c+1]&(_P|_U|_L|_N);
 #endif
 }
