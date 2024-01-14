@@ -34,7 +34,7 @@ SUCH DAMAGE.
 #ifndef _CTYPE_H_
 #define _CTYPE_H_
 
-#include "_ansi.h"
+#include <_ansi.h>
 #include <sys/cdefs.h>
 #include <limits.h>
 
@@ -75,25 +75,25 @@ int toascii (int __c);
 #endif
 
 #if __POSIX_VISIBLE >= 200809
-extern int isalnum_l (int __c, locale_t __l);
-extern int isalpha_l (int __c, locale_t __l);
-extern int isblank_l (int __c, locale_t __l);
-extern int iscntrl_l (int __c, locale_t __l);
-extern int isdigit_l (int __c, locale_t __l);
-extern int isgraph_l (int __c, locale_t __l);
-extern int islower_l (int __c, locale_t __l);
-extern int isprint_l (int __c, locale_t __l);
-extern int ispunct_l (int __c, locale_t __l);
-extern int isspace_l (int __c, locale_t __l);
-extern int isupper_l (int __c, locale_t __l);
-extern int isxdigit_l(int __c, locale_t __l);
-extern int tolower_l (int __c, locale_t __l);
-extern int toupper_l (int __c, locale_t __l);
+int isalnum_l (int __c, locale_t __l);
+int isalpha_l (int __c, locale_t __l);
+int isblank_l (int __c, locale_t __l);
+int iscntrl_l (int __c, locale_t __l);
+int isdigit_l (int __c, locale_t __l);
+int isgraph_l (int __c, locale_t __l);
+int islower_l (int __c, locale_t __l);
+int isprint_l (int __c, locale_t __l);
+int ispunct_l (int __c, locale_t __l);
+int isspace_l (int __c, locale_t __l);
+int isupper_l (int __c, locale_t __l);
+int isxdigit_l(int __c, locale_t __l);
+int tolower_l (int __c, locale_t __l);
+int toupper_l (int __c, locale_t __l);
 #endif
 
 #if __MISC_VISIBLE
-extern int isascii_l (int __c, locale_t __l);
-extern int toascii_l (int __c, locale_t __l);
+int isascii_l (int __c, locale_t __l);
+int toascii_l (int __c, locale_t __l);
 #endif
 
 #define	_U	01
