@@ -347,6 +347,7 @@ clog10l NOSIGFE
 clogf NOSIGFE
 clogl NOSIGFE
 close SIGFE
+close_range SIGFE
 closedir SIGFE
 closelog SIGFE
 cnd_broadcast SIGFE

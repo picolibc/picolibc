@@ -85,6 +85,48 @@ close_all_files (bool norelease)
   cygheap->fdtab.unlock ();
 }
 
+/* Close or set the close-on-exec flag for all open file descriptors
+   from firstfd to lastfd.  CLOSE_RANGE_UNSHARE is not supported.
+   Available on FreeBSD since 13 and Linux since 5.9 */
+extern "C" int
+close_range (unsigned int firstfd, unsigned int lastfd, int flags)
+{
+  pthread_testcancel ();
+
+  if (!(firstfd <= lastfd && !(flags & ~CLOSE_RANGE_CLOEXEC)))
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  cygheap->fdtab.lock ();
+
+  unsigned int size = (lastfd < cygheap->fdtab.size ? lastfd + 1 :
+		      cygheap->fdtab.size);
+
+  for (unsigned int i = firstfd; i < size; i++)
+    {
+      cygheap_fdget cfd ((int) i, false, false);
+      if (cfd < 0)
+	continue;
+
+      if (flags & CLOSE_RANGE_CLOEXEC)
+	{
+	  syscall_printf ("set FD_CLOEXEC on fd %u", i);
+	  cfd->fcntl (F_SETFD, FD_CLOEXEC);
+	}
+      else
+	{
+	  syscall_printf ("closing fd %u", i);
+	  cfd->close_with_arch ();
+	  cfd.release ();
+	}
+    }
+
+  cygheap->fdtab.unlock ();
+  return 0;
+}
+
 extern "C" int
 dup (int fd)
 {

@@ -484,12 +484,13 @@ details. */
   347: Add c16rtomb, c32rtomb, mbrtoc16, mbrtoc32.
   348: Add c8rtomb, mbrtoc.
   349: Add fallocate.
+  350: Add close_range.
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 349
+#define CYGWIN_VERSION_API_MINOR 350
 
 /* There is also a compatibity version number associated with the shared memory
    regions.  It is incremented when incompatible changes are made to the shared

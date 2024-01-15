@@ -26,6 +26,12 @@ int     chown (const char *__path, uid_t __owner, gid_t __group);
 int     chroot (const char *__path);
 #endif
 int     close (int __fildes);
+#if defined(__CYGWIN__) && (__BSD_VISIBLE || __GNU_VISIBLE)
+/* Available on FreeBSD (__BSD_VISIBLE) and Linux (__GNU_VISIBLE). */
+int     close_range (unsigned int __firstfd, unsigned int __lastfd, int __flags);
+/*      CLOSE_RANGE_UNSHARE (1 << 1) */ /* Linux-specific, not supported. */
+#define CLOSE_RANGE_CLOEXEC (1 << 2)
+#endif
 #if __POSIX_VISIBLE >= 199209
 size_t	confstr (int __name, char *__buf, size_t __len);
 #endif

@@ -1143,6 +1143,7 @@ also IEEE Std 1003.1-2017 (POSIX.1-2017).</para>
     cfmakeraw
     cfsetspeed
     clearerr_unlocked
+    close_range
     daemon
     dn_comp
     dn_expand
@@ -1297,6 +1298,7 @@ also IEEE Std 1003.1-2017 (POSIX.1-2017).</para>
     clog10
     clog10f
     clog10l
+    close_range			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     crypt_r			(available in external "crypt" library)
     dladdr			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     dremf
@@ -1655,6 +1657,9 @@ Windows however.</para>
 CLOCK_REALTIME and CLOCK_MONOTONIC.  <function>clock_setres</function>,
 <function>clock_settime</function>, and <function>timer_create</function>
 currently support only CLOCK_REALTIME.</para>
+
+<para><function>close_range</function> does not support the Linux-specific
+flag CLOSE_RANGE_UNSHARE.</para>
 
 <para>POSIX file locks via <function>fcntl</function> or
 <function>lockf</function>, as well as BSD <function>flock</function> locks
