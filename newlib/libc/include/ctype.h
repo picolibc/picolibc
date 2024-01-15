@@ -88,8 +88,8 @@ __declare_extern_inline(int) isblank(int c) {
 #if __MISC_VISIBLE || __XSI_VISIBLE
 int isascii (int c);
 int toascii (int c);
-#define _tolower(__c) ((unsigned char)(__c) - 'A' + 'a')
-#define _toupper(__c) ((unsigned char)(__c) - 'a' + 'A')
+#define _tolower(__c) ((__c) + ('a' - 'A'))
+#define _toupper(__c) ((__c) - ('a' - 'A'))
 #define isascii(__c)	((unsigned)(__c)<=0177)
 #define toascii(__c)	((__c)&0177)
 #endif
