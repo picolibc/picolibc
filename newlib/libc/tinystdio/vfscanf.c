@@ -128,7 +128,7 @@ conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags, un
 
         flags |= FL_ANY;
 
-        if (TOLOW(i) == 'x' && (base == 0 || base == 16)) {
+        if (TOLOWER(i) == 'x' && (base == 0 || base == 16)) {
             base = 16;
             if (!--width || IS_EOF(i = scanf_getc (stream, lenp)))
 		goto putval;

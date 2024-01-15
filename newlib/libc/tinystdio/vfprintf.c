@@ -392,9 +392,9 @@ skip_to_arg(const CHAR *fmt_orig, my_va_list *ap, int target_argno)
         if (argno == 0)
             break;
         if (argno == current_argno) {
-            if ((TOLOW(c) >= 'e' && TOLOW(c) <= 'g')
+            if ((TOLOWER(c) >= 'e' && TOLOWER(c) <= 'g')
 #ifdef _NEED_IO_C99_FORMATS
-                || TOLOW(c) == 'a'
+                || TOLOWER(c) == 'a'
 #endif
                 ) {
                 SKIP_FLOAT_ARG(flags, ap->ap);
@@ -608,9 +608,9 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #define TOCASE(c)       ((c) - case_convert)
 
 #ifndef _NEED_IO_SHRINK
-	if ((TOLOW(c) >= 'e' && TOLOW(c) <= 'g')
+	if ((TOLOWER(c) >= 'e' && TOLOWER(c) <= 'g')
 #ifdef _NEED_IO_C99_FORMATS
-            || TOLOW(c) == 'a'
+            || TOLOWER(c) == 'a'
 #endif
             )
         {
@@ -623,8 +623,8 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 	    uint8_t ndigs_exp;		/* number of digis in exponent */
 
             /* deal with upper vs lower case */
-            case_convert = TOLOW(c) - c;
-            c = TOLOW(c);
+            case_convert = TOLOWER(c) - c;
+            c = TOLOWER(c);
 
 #ifdef _NEED_IO_LONG_DOUBLE
             if ((flags & (FL_LONG | FL_REPD_TYPE)) == (FL_LONG | FL_REPD_TYPE))
@@ -1075,10 +1075,10 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                         c = 'x';
                         if (sizeof(void *) > sizeof(int))
                             flags |= FL_LONG;
-                    } else if (TOLOW(c) == 'x') {
+                    } else if (TOLOWER(c) == 'x') {
                         base = ('x' - c) | 16;
 #ifdef _NEED_IO_PERCENT_B
-                    } else if (TOLOW(c) == 'b') {
+                    } else if (TOLOWER(c) == 'b') {
                         base = 2;
 #endif
                     } else {

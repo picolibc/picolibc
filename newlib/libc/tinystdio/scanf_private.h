@@ -113,9 +113,6 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap) __attribute__((weak));
 # error	 "Not a known scanf level."
 #endif
 
-#define CASE_CONVERT    ('a' - 'A')
-#define TOLOWER(c)        ((c) | CASE_CONVERT)
-
 typedef unsigned int width_t;
 
 #define FL_STAR	    0x01	/* '*': skip assignment		*/

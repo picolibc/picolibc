@@ -230,7 +230,7 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 	    while ((c = *p++) != 0) {
 		if (CHECK_WIDTH()) {
                     if ((i = scanf_getc (stream, lenp)) >= 0) {
-                        if ((unsigned char)TOLOWER(i) == c)
+                        if (TOLOWER(i) == c)
                             continue;
                         scanf_ungetc (i, stream, lenp);
                     }

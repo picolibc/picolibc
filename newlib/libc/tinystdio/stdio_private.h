@@ -626,8 +626,11 @@ __atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v);
 
 #endif /* ATOMIC_UNGETC */
 
-#define CASE_CONVERT    ('a' - 'A')
-#define TOLOW(c)        ((c) | CASE_CONVERT)
+/*
+ * This operates like _tolower on upper case letters, but also works
+ * correctly on lower case letters.
+ */
+#define TOLOWER(c)      ((c) | ('a' - 'A'))
 
 /*
  * Convert a single character to the value of the digit for any
@@ -647,7 +650,7 @@ digit_to_val(unsigned int c)
     /*
      * Convert letters with some tricky code.
      *
-     * TOLOW(c-1) maps characters as follows (Skipping values not
+     * TOLOWER(c-1) maps characters as follows (Skipping values not
      * greater than '9' (0x39), as those are skipped by the 'if'):
      *
      * Minus 1, bitwise-OR ('a' - 'A') (0x20):
@@ -669,7 +672,7 @@ digit_to_val(unsigned int c)
     if (c > '9') {
 
         /*
-         * For the letters, we want TOLOW(c) - 'a' + 10, but that
+         * For the letters, we want TOLOWER(c) - 'a' + 10, but that
          * would map both '@' and '`' to 9.
          *
          * To work around this, subtract 1 before the bitwise-or so
@@ -683,7 +686,7 @@ digit_to_val(unsigned int c)
          * code (c -= '0') below, avoiding an else clause.
          */
 
-        c = TOLOW(c-1) + ('0' - 'a' + 11);
+        c = TOLOWER(c-1) + ('0' - 'a' + 11);
     }
 
     /*

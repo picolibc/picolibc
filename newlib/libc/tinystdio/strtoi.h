@@ -73,7 +73,7 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
 
     /* Leading '0' digit -- check for base indication */
     if (i == '0') {
-        if (TOLOW(*s) == 'x' && ((base | 16) == 16)) {
+        if (TOLOWER(*s) == 'x' && ((base | 16) == 16)) {
             base = 16;
             /* Parsed the '0' */
             nptr = (const char *) s;
