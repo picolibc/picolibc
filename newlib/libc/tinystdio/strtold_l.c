@@ -33,11 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _DEFAULT_SOURCE
-#include <_ansi.h>
-#include <errno.h>
-#include <stdlib.h>
-#include <string.h>
+#include "stdio_private.h"
 
 #if defined(_HAVE_LONG_DOUBLE) && !defined(_LDBL_EQ_DBL)
 

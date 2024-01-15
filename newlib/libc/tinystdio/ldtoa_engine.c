@@ -39,9 +39,6 @@
 
 #ifdef _NEED_IO_FLOAT_LARGE
 
-#include <float.h>
-#include <math.h>
-
 #define max(a, b) ({\
 		__typeof(a) _a = a;\
 		__typeof(b) _b = b;\

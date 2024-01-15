@@ -33,10 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio-bufio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdbool.h>
+#include "stdio_private.h"
 
 /* Buffered I/O routines for tiny stdio */
 

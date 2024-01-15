@@ -27,9 +27,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <stdio.h>
 #include "stdio_private.h"
-#include <wchar.h>
 
 wchar_t *
 fgetws(wchar_t *str, int size, FILE *stream)

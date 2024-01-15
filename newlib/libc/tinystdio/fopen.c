@@ -34,8 +34,6 @@
  */
 
 #include "stdio_private.h"
-#include <stdlib.h>
-#include <fcntl.h>
 
 FILE *
 fopen(const char *pathname, const char *mode)

@@ -33,8 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <unistd.h>
-#include <stdio.h>
+#include "stdio_private.h"
 
 int remove(const char *pathname)
 {

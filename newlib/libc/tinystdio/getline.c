@@ -33,9 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _DEFAULT_SOURCE
-#include <_ansi.h>
-#include <stdio.h>
+#include "stdio_private.h"
 
 _ssize_t
 getline (char **restrict lineptr, size_t *restrict n, FILE *restrict stream)

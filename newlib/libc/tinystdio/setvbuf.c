@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
+#include "stdio_private.h"
 
 int
 setvbuf(FILE *stream, char *buf, int mode, size_t size)

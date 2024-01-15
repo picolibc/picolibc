@@ -29,8 +29,6 @@
 
 /* $Id: vsnprintf.c 1944 2009-04-01 23:12:20Z arcanum $ */
 
-#include <limits.h>
-#include <stdarg.h>
 #include "stdio_private.h"
 
 int

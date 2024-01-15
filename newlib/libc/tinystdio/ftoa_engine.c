@@ -25,10 +25,7 @@
   POSSIBILITY OF SUCH DAMAGE. */
 
 #define _NEED_IO_FLOAT32
-
 #include "dtoa.h"
-
-#include <stdint.h>
 
 /*
  * 2^b ~= f * r * 10^e

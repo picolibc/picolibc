@@ -34,7 +34,6 @@
  */
 
 #include "stdio_private.h"
-#include <string.h>
 
 int
 __file_wstr_get(FILE *stream)

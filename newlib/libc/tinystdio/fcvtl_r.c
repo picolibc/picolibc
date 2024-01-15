@@ -33,14 +33,9 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
-#include <stdlib.h>
-
 #if __SIZEOF_LONG_DOUBLE__ > __SIZEOF_DOUBLE__
 
 #define _NEED_IO_LONG_DOUBLE
-
-#include <string.h>
 
 #include "dtoa.h"
 
@@ -145,6 +140,8 @@ fcvtl_r (long double invalue,
 
 #elif __SIZEOF_LONG_DOUBLE__ == 4
 
+#include "stdio_private.h"
+
 int
 fcvtl_r (long double invalue,
          int ndecimal,
@@ -157,6 +154,8 @@ fcvtl_r (long double invalue,
 }
 
 #elif __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+
+#include "stdio_private.h"
 
 int
 fcvtl_r (long double invalue,

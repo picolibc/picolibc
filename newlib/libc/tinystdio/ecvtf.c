@@ -33,8 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
-#include <stdlib.h>
+#include "stdio_private.h"
 
 #define _NEED_IO_FLOAT
 

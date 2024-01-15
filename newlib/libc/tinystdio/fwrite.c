@@ -29,11 +29,9 @@
 
 /* $Id: fwrite.c 1944 2009-04-01 23:12:20Z arcanum $ */
 
-#include <stdio.h>
 #include "stdio_private.h"
 
 #ifdef _WANT_FAST_BUFIO
-#include <string.h>
 #include "../stdlib/mul_overflow.h"
 #endif
 

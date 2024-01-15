@@ -33,10 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _DEFAULT_SOURCE
-#include <_ansi.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "stdio_private.h"
 
 #define INCR    16
 

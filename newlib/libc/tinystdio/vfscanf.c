@@ -32,13 +32,6 @@
 
 /* $Id: vfscanf.c 2191 2010-11-05 13:45:57Z arcanum $ */
 
-#include <limits.h>
-#include <math.h>
-#include <stdarg.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "stdio_private.h"
 #include "scanf_private.h"
 
@@ -55,7 +48,6 @@ typedef long int_scanf_t;
 #endif
 
 #ifdef WIDE_CHARS
-#include <wchar.h>
 #define INT wint_t
 #define CHAR wchar_t
 #define UCHAR wchar_t

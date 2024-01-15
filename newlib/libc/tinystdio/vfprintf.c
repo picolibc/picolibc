@@ -33,17 +33,10 @@
 /* From: Id: printf_p_new.c,v 1.1.1.9 2002/10/15 20:10:28 joerg_wunsch Exp */
 /* $Id: vfprintf.c 2191 2010-11-05 13:45:57Z arcanum $ */
 
-#define _DEFAULT_SOURCE
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
 #include "stdio_private.h"
 #include "../../libm/common/math_config.h"
 
 #ifdef WIDE_CHARS
-#include <wchar.h>
 #define CHAR wchar_t
 #define UCHAR wchar_t
 #define vfprintf vfwprintf

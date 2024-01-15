@@ -33,9 +33,6 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
-#include <stdlib.h>
-
 #if __SIZEOF_LONG_DOUBLE__ >8
 
 #define _NEED_IO_LONG_DOUBLE
@@ -58,6 +55,8 @@ ecvtl (long double invalue,
 
 #elif __SIZEOF_LONG_DOUBLE__ == 4
 
+#include "stdio_private.h"
+
 char *
 ecvtl (long double invalue,
        int ndigit,
@@ -68,6 +67,8 @@ ecvtl (long double invalue,
 }
 
 #elif __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+
+#include "stdio_private.h"
 
 char *
 ecvtl (long double invalue,

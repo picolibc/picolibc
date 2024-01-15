@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
+#include "stdio_private.h"
 
 int fflush(FILE *stream)
 {

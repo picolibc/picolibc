@@ -34,12 +34,9 @@
  */
 
 #define _NEED_IO_FLOAT
+#include "stdio_private.h"
 
 #include "dtoa.h"
-
-#include <_ansi.h>
-#include <stdlib.h>
-#include <string.h>
 
 int
 ecvtf_r (float invalue,

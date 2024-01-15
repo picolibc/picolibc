@@ -33,9 +33,6 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <limits.h>
-#include <stdarg.h>
-#include <stdlib.h>
 #include "stdio_private.h"
 
 int

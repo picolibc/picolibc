@@ -34,7 +34,6 @@
  */
 
 #include "stdio_private.h"
-#include <sys/cdefs.h>
 
 #if defined(ATOMIC_UNGETC) && !defined(PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP)
 

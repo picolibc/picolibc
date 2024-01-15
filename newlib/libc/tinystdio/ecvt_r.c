@@ -33,15 +33,9 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
-#include <stdlib.h>
-
 #if __SIZEOF_DOUBLE__ == 8
 
 #define _NEED_IO_FLOAT64
-
-#include <string.h>
-#include <math.h>
 
 #include "dtoa.h"
 
@@ -86,6 +80,9 @@ ecvt_r (double invalue,
 }
 
 #elif __SIZEOF_DOUBLE__ == 4
+
+#include "stdio_private.h"
+
 int
 ecvt_r (double invalue,
         int ndigit,

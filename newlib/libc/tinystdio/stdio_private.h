@@ -32,8 +32,20 @@
 #ifndef _STDIO_PRIVATE_H_
 #define _STDIO_PRIVATE_H_
 
-#include <stdio-bufio.h>
+#define _GNU_SOURCE
+#include <stdlib.h>
+#include <stdarg.h>
+#include <stddef.h>
 #include <stdbool.h>
+#include <string.h>
+#include <ctype.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <wchar.h>
+#include <float.h>
+#include <math.h>
+#include <stdio-bufio.h>
 #include <sys/lock.h>
 
 /* values for PRINTF_LEVEL */

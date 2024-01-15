@@ -33,15 +33,9 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
 #define _NEED_IO_FLOAT
 
 #include "dtoa.h"
-
-#include <_ansi.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
 
 int
 fcvtf_r (float invalue,

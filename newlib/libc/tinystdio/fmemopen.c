@@ -33,13 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _DEFAULT_SOURCE /* for strnlen */
 #include "stdio_private.h"
-#include <stdlib.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <string.h>
-#include <unistd.h>
 
 #define __MALL 0x01
 #define __MAPP 0x02

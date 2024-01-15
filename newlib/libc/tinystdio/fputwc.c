@@ -27,10 +27,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <stdio.h>
 #include "stdio_private.h"
-#include <sys/cdefs.h>
-#include <wchar.h>
 
 wint_t
 fputwc(wchar_t c, FILE *stream)

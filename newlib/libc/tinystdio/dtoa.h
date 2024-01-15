@@ -29,10 +29,6 @@
 #ifndef	_DTOA_H_
 #define	_DTOA_H_
 
-#include <stdlib.h>
-#include <stdint.h>
-#include <float.h>
-#include <stdbool.h>
 #include "stdio_private.h"
 #include "../../libm/common/math_config.h"
 

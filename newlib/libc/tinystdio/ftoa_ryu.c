@@ -21,18 +21,7 @@
 #define _NEED_IO_FLOAT32
 
 #include "dtoa.h"
-
 #include "ryu/ryu.h"
-
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
-#include <limits.h>
-
-#ifdef RYU_DEBUG
-#include <stdio.h>
-#endif
 
 #include "ryu/common.h"
 #include "ryu/f2s_intrinsics.h"

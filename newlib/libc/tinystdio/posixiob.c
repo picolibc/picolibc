@@ -34,8 +34,6 @@
  */
 
 #include "stdio_private.h"
-#include <stdlib.h>
-#include <unistd.h>
 
 static char write_buf[BUFSIZ];
 static char read_buf[BUFSIZ];

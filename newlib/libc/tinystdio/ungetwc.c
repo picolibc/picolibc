@@ -27,8 +27,6 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <stdio.h>
-#include <wchar.h>
 #include "stdio_private.h"
 
 wint_t

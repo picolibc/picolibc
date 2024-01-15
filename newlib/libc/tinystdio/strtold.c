@@ -30,15 +30,6 @@
 
 /* $Id: strtod.c 2191 2010-11-05 13:45:57Z arcanum $ */
 
-
-#include <errno.h>
-#include <limits.h>
-#include <math.h>		/* INFINITY, NAN		*/
-#include <string.h>
-#include <stdlib.h>
-#include <inttypes.h>
-#include <stdbool.h>
-
 #define STRTOLD
 
 #include "stdio_private.h"

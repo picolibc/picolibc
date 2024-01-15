@@ -33,9 +33,6 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
-#include <stdlib.h>
-
 #define _NEED_IO_FLOAT
 
 #include "dtoa.h"

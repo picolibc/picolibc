@@ -29,9 +29,7 @@
 
 /* $Id: fprintf.c 1944 2009-04-01 23:12:20Z arcanum $ */
 
-#include <stdarg.h>
-#include <stdio.h>
-#include <wchar.h>
+#include "stdio_private.h"
 
 int
 wprintf(const wchar_t *fmt, ...)

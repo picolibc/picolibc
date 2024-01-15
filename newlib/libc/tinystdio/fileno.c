@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio-bufio.h>
+#include "stdio_private.h"
 
 int
 fileno(FILE *file)

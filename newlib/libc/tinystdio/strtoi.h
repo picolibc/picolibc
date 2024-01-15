@@ -30,15 +30,6 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <limits.h>
-#include <math.h>
-#include <stdarg.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <stdbool.h>
 #include "stdio_private.h"
 
 #if defined(_HAVE_BUILTIN_MUL_OVERFLOW) && defined(_HAVE_BUILTIN_ADD_OVERFLOW) && !defined(strtoi_signed)

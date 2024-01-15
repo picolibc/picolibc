@@ -31,13 +31,6 @@
 /* $Id: strtod.c 2191 2010-11-05 13:45:57Z arcanum $ */
 
 
-#include <errno.h>
-#include <limits.h>
-#include <math.h>		/* INFINITY, NAN		*/
-#include <string.h>
-#include <stdlib.h>
-#include <inttypes.h>
-
 /**  The strtod() function converts the initial portion of the string pointed
      to by \a nptr to double representation.
 
