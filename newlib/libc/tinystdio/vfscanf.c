@@ -257,7 +257,7 @@ static INT skip_spaces (FILE *stream, int *lenp)
     do {
 	if (IS_EOF(i = scanf_getc (stream, lenp)))
 	    return i;
-    } while (ISSPACE (i));
+    } while (isspace (i));
     scanf_ungetc (i, stream, lenp);
     return i;
 }
@@ -443,7 +443,7 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
        to the begin.	*/
     while ((c = *fmt++) != 0) {
 
-	if (ISSPACE (c)) {
+	if (isspace (c)) {
 	    skip_spaces (stream, lenp);
 
 	} else if (c != '%'
@@ -608,7 +608,7 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 		    do {
 			if (IS_EOF(i = scanf_getc (stream, lenp)))
 			    break;
-			if (ISSPACE (i)) {
+			if (isspace (i)) {
 			    scanf_ungetc (i, stream, lenp);
 			    break;
 			}

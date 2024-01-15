@@ -36,12 +36,6 @@
 #define USE_OVERFLOW
 #endif
 
-static inline bool
-ISSPACE(unsigned char c)
-{
-    return ('\011' <= c && c <= '\015') || c == ' ';
-}
-
 strtoi_type
 strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
 {
@@ -66,7 +60,7 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
     /* Skip leading spaces */
     do {
         i = *s++;
-    } while (ISSPACE(i));
+    } while (isspace(i));
 
     /* Parse a leading sign */
     switch (i) {

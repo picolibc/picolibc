@@ -357,7 +357,7 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
                 break;
 	    }
 
-	    if (!ISDIGIT (edig))
+	    if (!isdigit (edig))
             {
                 scanf_ungetc(edig, stream, lenp);
                 if (esign != EOF)
@@ -371,7 +371,7 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 	    do {
                 if (expacc < MAX_POSSIBLE_EXP)
                     expacc = expacc * 10 + (i - '0');
-	    } while (CHECK_WIDTH() && ISDIGIT (i = scanf_getc(stream, lenp)));
+	    } while (CHECK_WIDTH() && isdigit (i = scanf_getc(stream, lenp)));
 	    if (flags & FL_MEXP)
 		expacc = -expacc;
 #ifdef _NEED_IO_C99_FORMATS

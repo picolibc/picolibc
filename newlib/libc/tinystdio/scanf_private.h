@@ -116,18 +116,6 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap) __attribute__((weak));
 #define CASE_CONVERT    ('a' - 'A')
 #define TOLOWER(c)        ((c) | CASE_CONVERT)
 
-static inline int
-ISSPACE(int c)
-{
-    return ('\011' <= c && c <= '\015') || c == ' ';
-}
-
-static inline int
-ISDIGIT(int c)
-{
-    return '0' <= c && c <= '9';
-}
-
 typedef unsigned int width_t;
 
 #define FL_STAR	    0x01	/* '*': skip assignment		*/

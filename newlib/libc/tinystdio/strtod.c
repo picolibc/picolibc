@@ -70,7 +70,7 @@ strtod (const char * nptr, char ** endptr)
     double flt;
     unsigned char ret;
 
-    while (ISSPACE(nptr[len]))
+    while (isspace(nptr[len]))
         len++;
 
     ret = conv_flt(nptr, &len, INT_MAX, &flt, FL_LONG);
