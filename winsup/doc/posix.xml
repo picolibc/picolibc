@@ -1314,6 +1314,7 @@ also IEEE Std 1003.1-2017 (POSIX.1-2017).</para>
     exp10
     exp10f
     exp10l
+    fallocate			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     fcloseall
     fcloseall_r
     fedisableexcept
@@ -1754,6 +1755,14 @@ otherwise returns the result from <function>setdtablesize</function>.
 RLIMIT_CORE and RLIMIT_STACK return the current values and set the requested
 values.
 All other resource arguments return -1 and set EINVAL.</para>
+
+<para><function>fallocate</function> has a few Windows quirks: The
+FALLOC_FL_ZERO_RANGE operation is NOT atomic.  With flags set to 0 and
+FALLOC_FL_KEEP_SIZE, sparse blocks in the given range are re-allocated
+as per the POSIX requirements.  This re-allocation operation isn't
+atomic either.  Over-allocation with FALLOC_FL_KEEP_SIZE is only
+temporary on Windows until the last handle to the file is closed.
+Over-allocation on sparse files is entirely ignored on Windows.</para>
 
 </sect1>
 
