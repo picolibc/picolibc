@@ -34,8 +34,7 @@ enum executable_states
 struct suffix_info
 {
   const char *name;
-  int addon;
-  suffix_info (const char *s, int addit = 0): name (s), addon (addit) {}
+  suffix_info (const char *s): name (s) {}
 };
 
 extern suffix_info stat_suffixes[];

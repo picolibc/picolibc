@@ -70,8 +70,8 @@
 
 suffix_info stat_suffixes[] =
 {
-  suffix_info ("", 1),
-  suffix_info (".exe", 1),
+  suffix_info (""),
+  suffix_info (".exe"),
   suffix_info (NULL)
 };
 
@@ -2836,7 +2836,6 @@ enum
   SCAN_JUSTCHECK,
   SCAN_JUSTCHECKTHIS, /* Never try to append a suffix. */
   SCAN_APPENDLNK,
-  SCAN_EXTRALNK,
   SCAN_DONE,
 };
 
@@ -2923,16 +2922,12 @@ suffix_scan::next ()
 		nextstate = SCAN_LNK;
 		return 1;
 	      }
-	    nextstate = SCAN_EXTRALNK;
-	    /* fall through to suffix checking below */
-	    break;
-	  case SCAN_HASLNK:
-	    nextstate = SCAN_APPENDLNK;	/* Skip SCAN_BEG */
-	    return 1;
-	  case SCAN_EXTRALNK:
 	    nextstate = SCAN_DONE;
 	    *eopath = '\0';
 	    return 0;
+	  case SCAN_HASLNK:
+	    nextstate = SCAN_APPENDLNK;	/* Skip SCAN_BEG */
+	    return 1;
 	  case SCAN_JUSTCHECK:
 	    nextstate = SCAN_LNK;
 	    return 1;
@@ -2954,19 +2949,18 @@ suffix_scan::next ()
 	    return 0;
 	  }
 
-      while (suffixes && suffixes->name)
-	if (nextstate == SCAN_EXTRALNK
-	    && (!suffixes->addon || namelen > NAME_MAX - 8))
+      if (suffixes && suffixes->name)
+	{
+	  strcpy (eopath, suffixes->name);
 	  suffixes++;
-	else
-	  {
-	    strcpy (eopath, suffixes->name);
-	    if (nextstate == SCAN_EXTRALNK)
-	      strcat (eopath, ".lnk");
-	    suffixes++;
-	    return 1;
-	  }
+	  return 1;
+	}
       suffixes = NULL;
+      if (nextstate == SCAN_BEG)
+	{
+	  nextstate = SCAN_LNK;
+	  *eopath = '\0';
+	}
     }
 }
 

@@ -30,13 +30,6 @@ details. */
 #include "ntdll.h"
 #include "shared_info.h"
 
-static const suffix_info exe_suffixes[] =
-{
-  suffix_info ("", 1),
-  suffix_info (".exe", 1),
-  suffix_info (NULL)
-};
-
 /* Add .exe to PROG if not already present and see if that exists.
    If not, return PROG (converted from posix to win32 rules if necessary).
    The result is always BUF.
@@ -50,8 +43,7 @@ perhaps_suffix (const char *prog, path_conv& buf, int& err, unsigned opt)
 
   err = 0;
   debug_printf ("prog '%s'", prog);
-  buf.check (prog, PC_SYM_FOLLOW | PC_NULLEMPTY | PC_POSIX,
-	     (opt & FE_DLL) ? stat_suffixes : exe_suffixes);
+  buf.check (prog, PC_SYM_FOLLOW | PC_NULLEMPTY | PC_POSIX, stat_suffixes);
 
   if (buf.isdir ())
     {
