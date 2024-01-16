@@ -46,6 +46,12 @@ to the command as arguments.
   Note: This has no effect if a debugger is already attached when the fatal
   error occurs.
 </para>
+<para>
+  Note: The command invoked must either (i) attach to the errored process with
+  <function>DebugActiveProcess()</function>, or (ii) forcibly terminate the
+  errored process (with <function>TerminateProcess()</function> or similar), as
+  otherwise the errored process will wait forever for a debugger to attach.
+</para>
 </listitem>
 
 <listitem>

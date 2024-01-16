@@ -149,7 +149,7 @@ dumper_init (void)
 
   /* Calculate the length of the command, allowing for an appended DWORD PID and
      terminating null */
-  int cmd_len = 1 + wcslen(dll_dir) + 11 + 2 + 1 + wcslen(global_progname) + 1 + 10 + 1;
+  int cmd_len = 1 + wcslen(dll_dir) + 11 + 5 + 1 + wcslen(global_progname) + 1 + 10 + 1;
   if (cmd_len > 32767)
     {
       /* If this comes to more than the 32,767 characters CreateProcess() can
@@ -163,7 +163,7 @@ dumper_init (void)
   cp = wcpcpy (cp, L"\"");
   cp = wcpcpy (cp, dll_dir);
   cp = wcpcpy (cp, L"\\dumper.exe");
-  cp = wcpcpy (cp, L"\" ");
+  cp = wcpcpy (cp, L"\" -n ");
   cp = wcpcpy (cp, L"\"");
   cp = wcpcpy (cp, global_progname);
   wcscat (cp, L"\"");
@@ -570,9 +570,8 @@ int exec_prepared_command (PWCHAR command)
     system_printf ("Failed to start, %E");
   else
     {
-      SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
       while (!being_debugged ())
-	Sleep (1);
+	Sleep (0);
       Sleep (2000);
     }
 
