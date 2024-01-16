@@ -1,3 +1,4 @@
+/* From: @(#)s_floor.c 5.1 93/09/24 */
 /*
  * ====================================================
  * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
@@ -7,8 +8,6 @@
  * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
- *
- * From: @(#)s_floor.c 5.1 93/09/24
  */
 
 /*
