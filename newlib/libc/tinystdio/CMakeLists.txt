@@ -199,7 +199,9 @@ endif()
 
 if(POSIX_CONSOLE)
   picolibc_sources(
-    posixiob.c
+    posixiob_stdin.c
+    posixiob_stdout.c
+    posixiob_stderr.c
     )
 endif()
 

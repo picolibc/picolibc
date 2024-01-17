@@ -36,28 +36,16 @@
 #include "stdio_private.h"
 
 static char write_buf[BUFSIZ];
-static char read_buf[BUFSIZ];
 
-static struct __file_bufio __stdin = FDEV_SETUP_POSIX(0, read_buf, BUFSIZ, __SRD, 0);
 static struct __file_bufio __stdout = FDEV_SETUP_POSIX(1, write_buf, BUFSIZ, __SWR, __BLBF);
 
-FILE *const __posix_stdin = &__stdin.xfile.cfile.file;
 FILE *const __posix_stdout = &__stdout.xfile.cfile.file;
 
-#ifdef __strong_reference
-__strong_reference(__posix_stdout, __posix_stderr);
-#else
-FILE *const __posix_stderr = &__stdout.xfile.cfile.file;
-#endif
-
-__weak_reference(__posix_stdin,stdin);
 __weak_reference(__posix_stdout,stdout);
-__weak_reference(__posix_stderr,stderr);
 
 __attribute__((constructor))
 static void posix_init(void)
 {
-    __bufio_lock_init(&__stdin.xfile.cfile.file);
     __bufio_lock_init(&__stdout.xfile.cfile.file);
 }
 
@@ -68,5 +56,5 @@ static void posix_init(void)
 __attribute__((destructor (101)))
 static void posix_exit(void)
 {
-	fflush(stdout);
+    fflush(stdout);
 }

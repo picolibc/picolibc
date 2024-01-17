@@ -213,9 +213,11 @@ if posix_io
   srcs_tinystdio += srcs_tinystdio_posix
 endif
 
-# stdin/stdout using POSIX APIs
+# stdin/stdout/stderr using POSIX APIs
 srcs_tinystdio_posix_console = [
-  'posixiob.c',
+  'posixiob_stdin.c',
+  'posixiob_stdout.c',
+  'posixiob_stderr.c',
 ]
 
 if posix_console
