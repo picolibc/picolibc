@@ -615,6 +615,13 @@ if enable_native_tests
 		    c_args: native_c_args,
 		    link_args: native_c_args,
 		    dependencies: native_lib_m))
+
+    test('fenv-native',
+         executable('fenv-native',
+                    'fenv.c',
+                    c_args: native_c_args,
+                    link_args: native_c_args,
+                    dependencies: native_lib_m))
   endif
 
   test('test-atomic-native',
