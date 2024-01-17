@@ -75,22 +75,28 @@ suffix_info stat_suffixes[] =
   suffix_info (NULL)
 };
 
-struct symlink_info
+class symlink_info
 {
   char contents[SYMLINK_MAX + 1];
   char *ext_here;
-  int extn;
-  unsigned path_flags;
-  unsigned mount_flags;
-  unsigned pc_flags;	/* Relevant pathconv_arg flags from path_conv caller */
-  DWORD fileattr;
-  int issymlink;
-  bool ext_tacked_on;
-  int error;
-  bool isdevice;
-  _major_t major;
-  _minor_t minor;
-  __mode_t mode;
+  bool _ext_tacked_on;
+  size_t _path_len;
+  unsigned _path_flags;
+  unsigned _mount_flags;
+  unsigned _pc_flags;	/* Relevant pathconv_arg flags from path_conv caller */
+  DWORD _fileattr;
+  bool _issymlink;
+  int _error;
+  dev_t _dev;
+  __mode_t _mode;
+public:
+  void reset () {
+    clear_content ();
+    path_flags (0);
+    issymlink (true);
+    dev (FH_NADA);
+    /* mount_flags is an incoming value set in path_conv */
+  }
   int check (char *path, const suffix_info *suffixes, fs_info &fs,
 	     path_conv_handle &conv_hdl);
   int set (char *path);
@@ -101,6 +107,32 @@ struct symlink_info
   int check_nfs_symlink (HANDLE h);
   int posixify (char *srcbuf);
   bool set_error (int);
+
+  bool has_ext () const { return ext_here && *ext_here; }
+  char *ext () const { return ext_here; }
+  bool ext_tacked_on () const { return _ext_tacked_on; }
+  void ext_tacked_on (bool _neto) { _ext_tacked_on = _neto; }
+  const char *content () const { return contents; }
+  void clear_content () { contents[0] = '\0'; }
+  size_t path_len () const { return _path_len; }
+  void path_len (size_t _pl) { _path_len = _pl; }
+  unsigned path_flags () const { return _path_flags; }
+  void path_flags (unsigned _pflags) { _path_flags = _pflags; }
+  unsigned mount_flags () const { return _mount_flags; }
+  void mount_flags (unsigned _mflags) { _mount_flags = _mflags; }
+  unsigned pc_flags () const { return _pc_flags; }
+  void pc_flags (unsigned _pflags) { _pc_flags = _pflags; }
+  unsigned fileattr () const { return _fileattr; }
+  void fileattr (unsigned _fflags) { _fileattr = _fflags; }
+  bool issymlink () const { return _issymlink; }
+  void issymlink (bool _is) { _issymlink = _is; }
+  int error () const { return _error; }
+  void error (int _err) { _error = _err; }
+  bool isdevice () const { return _dev != FH_NADA; }
+  dev_t dev () const { return _dev; }
+  void dev (dev_t _ndev) { _dev = _ndev; }
+  __mode_t mode () const { return _mode; }
+  void mode (__mode_t _nmode) { _mode = _nmode; }
 };
 
 SRWLOCK NO_COPY cwdstuff::cwd_lock;
@@ -373,11 +405,11 @@ win32_path:
 inline void
 path_conv::add_ext_from_sym (symlink_info &sym)
 {
-  if (sym.ext_here && *sym.ext_here)
+  if (sym.has_ext ())
     {
-      suffix = path + sym.extn;
-      if (sym.ext_tacked_on)
-	strcpy ((char *) suffix, sym.ext_here);
+      suffix = path + sym.path_len ();
+      if (sym.ext_tacked_on ())
+	strcpy ((char *) suffix, sym.ext ());
     }
 }
 
@@ -717,8 +749,8 @@ path_conv::check (const char *src, unsigned opt,
 	     symlink.check as the caller may need it. */
 	  /* FIXME: Do we have to worry about multiple \'s here? */
 	  component = 0;		// Number of translated components
-	  sym.contents[0] = '\0';
-	  sym.path_flags = 0;
+	  sym.clear_content ();
+	  sym.path_flags (0);
 
 	  int symlen = 0;
 
@@ -747,13 +779,16 @@ path_conv::check (const char *src, unsigned opt,
     retry_fs_via_processfd:
 
 	      /* Convert to native path spec sans symbolic link info. */
+	      unsigned mnt_flags;
 	      error = mount_table->conv_to_win32_path (path_copy, full_path,
-						       dev, &sym.mount_flags);
+						       dev,
+						       &mnt_flags);
 
 	      if (error)
 		return;
 
-	      sym.pc_flags = pc_flags;
+	      sym.pc_flags (pc_flags);
+	      sym.mount_flags (mnt_flags);
 
 	      if (!dev.exists ())
 		{
@@ -769,7 +804,7 @@ path_conv::check (const char *src, unsigned opt,
 		  else
 		    {
 		      fileattr = getfileattr (THIS_path,
-					      sym.mount_flags & MOUNT_NOPOSIX);
+					    sym.mount_flags () & MOUNT_NOPOSIX);
 		      dev = FH_FS;
 		    }
 		  goto out;
@@ -846,7 +881,8 @@ path_conv::check (const char *src, unsigned opt,
 			if (opt & PC_SYM_NOFOLLOW_PROCFD)
 			  {
 			    opt &= ~PC_SYM_FOLLOW;
-			    sym.path_flags |= PATH_RESOLVE_PROCFD;
+			    sym.path_flags (sym.path_flags ()
+					    | PATH_RESOLVE_PROCFD);
 			  }
 			fallthrough;
 		      case virt_symlink:
@@ -912,7 +948,7 @@ path_conv::check (const char *src, unsigned opt,
 	      else if (dev != FH_FS)
 		{
 		  fileattr = 0;
-		  mount_flags = sym.mount_flags;
+		  mount_flags = sym.mount_flags ();
 		  if (component)
 		    {
 		      error = ENOTDIR;
@@ -936,7 +972,8 @@ path_conv::check (const char *src, unsigned opt,
 		 calling sym.check, otherwise the path is potentially treated
 		 casesensitive. */
 	      if (is_msdos)
-		sym.mount_flags |= MOUNT_NOPOSIX | MOUNT_NOACL;
+		sym.mount_flags (sym.mount_flags ()
+				 | MOUNT_NOPOSIX | MOUNT_NOACL);
 
     is_fs_via_procsys:
 
@@ -944,36 +981,36 @@ path_conv::check (const char *src, unsigned opt,
 
     is_virtual_symlink:
 
-	      if (sym.isdevice)
+	      if (sym.isdevice ())
 		{
 		  if (component)
 		    {
 		      error = ENOTDIR;
 		      return;
 		    }
-		  dev.parse (sym.major, sym.minor);
+		  dev.parse (sym.dev ());
 		  dev.setfs (1);
-		  dev.mode (sym.mode);
-		  fileattr = sym.fileattr;
+		  dev.mode (sym.mode ());
+		  fileattr = sym.fileattr ();
 		  goto out;
 		}
 
-	      if (sym.path_flags & PATH_SOCKET)
+	      if (sym.path_flags () & PATH_SOCKET)
 		{
 		  if (component)
 		    {
 		      error = ENOTDIR;
 		      return;
 		    }
-		  fileattr = sym.fileattr;
+		  fileattr = sym.fileattr ();
 #ifdef __WITH_AF_UNIX
-		  dev.parse ((sym.path_flags & PATH_REP) ? FH_UNIX : FH_LOCAL);
+		  dev.parse ((sym.path_flags () & PATH_REP) ? FH_UNIX : FH_LOCAL);
 #else
 		  dev.parse (FH_LOCAL);
 #endif /* __WITH_AF_UNIX */
 		  dev.setfs (1);
-		  mount_flags = sym.mount_flags;
-		  path_flags = sym.path_flags;
+		  mount_flags = sym.mount_flags ();
+		  path_flags = sym.path_flags ();
 		  goto out;
 		}
 
@@ -981,9 +1018,9 @@ path_conv::check (const char *src, unsigned opt,
 		{
 		  /* Make sure that /dev always exists. */
 		  fileattr = isdev_dev (dev) ? FILE_ATTRIBUTE_DIRECTORY
-					     : sym.fileattr;
-		  mount_flags = sym.mount_flags;
-		  path_flags = sym.path_flags;
+					     : sym.fileattr ();
+		  mount_flags = sym.mount_flags ();
+		  path_flags = sym.path_flags ();
 		}
 	      else if (isdev_dev (dev))
 		{
@@ -996,8 +1033,8 @@ path_conv::check (const char *src, unsigned opt,
 		     for a call from an informational system call.  In that
 		     case we just stick to ENOENT, and the device type doesn't
 		     matter anyway. */
-		  if (sym.error == ENOENT && !(opt & PC_KEEP_HANDLE))
-		    sym.error = EROFS;
+		  if (sym.error () == ENOENT && !(opt & PC_KEEP_HANDLE))
+		    sym.error (EROFS);
 		  else
 		    dev = FH_FS;
 		}
@@ -1005,12 +1042,13 @@ path_conv::check (const char *src, unsigned opt,
 	      /* If symlink.check found an existing non-symlink file, then
 		 it sets the appropriate flag.  It also sets any suffix found
 		 into `ext_here'. */
-	      if (!sym.issymlink && sym.fileattr != INVALID_FILE_ATTRIBUTES)
+	      if (!sym.issymlink ()
+		  && sym.fileattr () != INVALID_FILE_ATTRIBUTES)
 		{
-		  error = sym.error;
+		  error = sym.error ();
 		  if (component == 0)
 		    add_ext = true;
-		  else if (!(sym.fileattr & FILE_ATTRIBUTE_DIRECTORY))
+		  else if (!(sym.fileattr () & FILE_ATTRIBUTE_DIRECTORY))
 		    {
 		      error = ENOTDIR;
 		      goto out;
@@ -1053,7 +1091,7 @@ path_conv::check (const char *src, unsigned opt,
 			  need_directory = 0;
 			  if (opt & PC_SYM_CONTENTS)
 			    {
-			      strcpy (THIS_path, sym.contents);
+			      strcpy (THIS_path, sym.content ());
 			      goto out;
 			    }
 			  add_ext = true;
@@ -1068,9 +1106,9 @@ path_conv::check (const char *src, unsigned opt,
 		  conv_handle.close ();
 		  break;
 		}
-	      else if (sym.error && sym.error != ENOENT)
+	      else if (sym.error () && sym.error () != ENOENT)
 		{
-		  error = sym.error;
+		  error = sym.error ();
 		  goto out;
 		}
 	      /* No existing file found. */
@@ -1103,7 +1141,7 @@ path_conv::check (const char *src, unsigned opt,
 	     in tmp_buf */
 
 	  char *headptr;
-	  if (isabspath (sym.contents))
+	  if (isabspath (sym.content ()))
 	    headptr = tmp_buf;	/* absolute path */
 	  else
 	    {
@@ -1127,7 +1165,7 @@ path_conv::check (const char *src, unsigned opt,
 
 	 /* Copy the symlink contents to the end of tmp_buf.
 	    Convert slashes. */
-	  for (char *p = sym.contents; *p; p++)
+	  for (const char *p = sym.content (); *p; p++)
 	    *headptr++ = *p == '\\' ? '/' : *p;
 	  *headptr = '\0';
 
@@ -2402,7 +2440,7 @@ symlink_info::check_shortcut (HANDLE h)
 	}
     }
   if (res) /* It's a symlink.  */
-    path_flags |= PATH_SYMLINK | PATH_LNK;
+    path_flags (path_flags () | PATH_SYMLINK | PATH_LNK);
   return res;
 }
 
@@ -2432,24 +2470,24 @@ symlink_info::check_sysfile (HANDLE h)
 	   && memcmp (cookie_buf, SYMLINK_COOKIE, sizeof (cookie_buf)) == 0)
     {
       /* It's a symlink.  */
-      path_flags |= PATH_SYMLINK;
+      path_flags (path_flags () | PATH_SYMLINK);
     }
   else if (io.Information == sizeof (cookie_buf)
 	   && memcmp (cookie_buf, SOCKET_COOKIE, sizeof (cookie_buf)) == 0)
-    path_flags |= PATH_SOCKET;
+    path_flags (path_flags () | PATH_SOCKET);
   else if (io.Information >= sizeof (INTERIX_SYMLINK_COOKIE)
 	   && memcmp (cookie_buf, INTERIX_SYMLINK_COOKIE,
 		      sizeof (INTERIX_SYMLINK_COOKIE) - 1) == 0)
     {
       /* It's an Interix symlink.  */
-      path_flags |= PATH_SYMLINK;
+      path_flags (path_flags () | PATH_SYMLINK);
       interix_symlink = true;
       /* Interix symlink cookies are shorter than Cygwin symlink cookies, so
 	 in case of an Interix symlink cooky we have read too far into the
 	 file.  Set file pointer back to the position right after the cookie. */
       off.QuadPart = sizeof (INTERIX_SYMLINK_COOKIE) - 1;
     }
-  if (path_flags & PATH_SYMLINK)
+  if (path_flags () & PATH_SYMLINK)
     {
       status = NtReadFile (h, NULL, NULL, NULL, &io, srcbuf,
 			   NT_MAX_PATH, &off, NULL);
@@ -2730,17 +2768,17 @@ symlink_info::check_reparse_point (HANDLE h, bool remote)
       /* Maybe it's a reparse point, but it's certainly not one we recognize.
 	 Drop REPARSE attribute so we don't try to use the flag accidentally.
 	 It's just some arbitrary file or directory for us. */
-      fileattr &= ~FILE_ATTRIBUTE_REPARSE_POINT;
+      fileattr (fileattr () & ~FILE_ATTRIBUTE_REPARSE_POINT);
       return ret;
     }
   /* ret is > 0, so it's a known reparse point, path in symbuf. */
-  path_flags |= ret;
+  path_flags (path_flags () | ret);
   if (ret & PATH_SYMLINK)
     {
       sys_wcstombs (srcbuf, SYMLINK_MAX + 7, symbuf.Buffer,
 		    symbuf.Length / sizeof (WCHAR));
       /* A symlink is never a directory. */
-      fileattr &= ~FILE_ATTRIBUTE_DIRECTORY;
+      fileattr (fileattr () & ~FILE_ATTRIBUTE_DIRECTORY);
       return posixify (srcbuf);
     }
   else
@@ -2774,7 +2812,7 @@ symlink_info::check_nfs_symlink (HANDLE h)
 		     (pffei->EaName + pffei->EaNameLength + 1);
       res = sys_wcstombs (contents, SYMLINK_MAX + 1,
 			  spath, pffei->EaValueLength);
-      path_flags |= PATH_SYMLINK;
+      path_flags (path_flags () | PATH_SYMLINK);
     }
   return res;
 }
@@ -2844,13 +2882,11 @@ class suffix_scan
   const suffix_info *suffixes, *suffixes_start;
   int nextstate;
   char *eopath;
-  size_t namelen;
 public:
   const char *path;
   char *has (const char *, const suffix_info *);
   int next ();
   int lnk_match () {return nextstate >= SCAN_APPENDLNK;}
-  size_t name_len () {return namelen;}
 };
 
 char *
@@ -2891,7 +2927,7 @@ suffix_scan::has (const char *in_path, const suffix_info *in_suffixes)
   ext_here = eopath;
 
  done:
-  namelen = eopath - fname;
+  size_t namelen = eopath - fname;
   /* Avoid attaching suffixes if the resulting filename would be invalid.
      For performance reasons we don't check the length of a suffix, since
      we know that all suffixes are 4 chars in length.
@@ -2901,6 +2937,8 @@ suffix_scan::has (const char *in_path, const suffix_info *in_suffixes)
 	    up symlink_info::check. */
   if (namelen > NAME_MAX - 4)
     {
+      if (namelen > NAME_MAX)
+	return NULL;
       nextstate = SCAN_JUSTCHECKTHIS;
       suffixes = NULL;
     }
@@ -2937,11 +2975,6 @@ suffix_scan::next ()
 	  case SCAN_LNK:
 	  case SCAN_APPENDLNK:
 	    nextstate = SCAN_DONE;
-	    if (namelen + (*eopath ? 8 : 4) > NAME_MAX)
-	      {
-		*eopath = '\0';
-		return 0;
-	      }
 	    strcat (eopath, ".lnk");
 	    return 1;
 	  default:
@@ -2968,17 +3001,17 @@ bool
 symlink_info::set_error (int in_errno)
 {
   bool res;
-  if (!(pc_flags & PC_NO_ACCESS_CHECK)
+  if (!(pc_flags () & PC_NO_ACCESS_CHECK)
 	|| in_errno == ENAMETOOLONG || in_errno == EIO)
     {
-      error = in_errno;
+      error (in_errno);
       res = true;
     }
   else if (in_errno == ENOENT)
     res = true;
   else
     {
-      fileattr = FILE_ATTRIBUTE_NORMAL;
+      fileattr (FILE_ATTRIBUTE_NORMAL);
       res = false;
     }
   return res;
@@ -2994,28 +3027,24 @@ symlink_info::parse_device (const char *contents)
 
   mymajor = strtol (contents += 2, &endptr, 16);
   if (endptr == contents)
-    return isdevice = false;
+    return false;
 
   contents = endptr;
   myminor = strtol (++contents, &endptr, 16);
   if (endptr == contents)
-    return isdevice = false;
+    return false;
 
   contents = endptr;
   mymode = strtol (++contents, &endptr, 16);
   if (endptr == contents)
-    return isdevice = false;
+    return false;
 
   if ((mymode & S_IFMT) == S_IFIFO)
-    {
-      mymajor = _major (FH_FIFO);
-      myminor = _minor (FH_FIFO);
-    }
-
-  major = mymajor;
-  minor = myminor;
-  mode = mymode;
-  return isdevice = true;
+    dev (FH_FIFO);
+  else
+    dev (FHDEV (mymajor, myminor));
+  mode (mymode);
+  return true;
 }
 
 /* Probably we have a virtual drive input path and the resulting full path
@@ -3102,9 +3131,10 @@ symlink_info::check (char *path, const suffix_info *suffixes, fs_info &fs,
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
   suffix_scan suffix;
+  bool had_ext;
 
   const ULONG ci_flag = cygwin_shared->obcaseinsensitive
-			|| (mount_flags & MOUNT_NOPOSIX)
+			|| (mount_flags () & MOUNT_NOPOSIX)
 			? OBJ_CASE_INSENSITIVE : 0;
   /* TODO: Temporarily do all char->UNICODE conversion here.  This should
      already be slightly faster than using Ascii functions. */
@@ -3117,36 +3147,29 @@ symlink_info::check (char *path, const suffix_info *suffixes, fs_info &fs,
   bool restarted = false;
 restart:
 
+  reset ();
   h = NULL;
   res = 0;
-  contents[0] = '\0';
-  issymlink = true;
-  isdevice = false;
-  major = 0;
-  minor = 0;
-  mode = 0;
-  /* mount_flags is an incoming value set in path_conv */
-  path_flags = 0;
 
   PVOID eabuf = &nfs_aol_ffei;
   ULONG easize = sizeof nfs_aol_ffei;
 
   ext_here = suffix.has (path, suffixes);
-  extn = ext_here - path;
-  bool had_ext = !!*ext_here;
-
   /* If the filename is too long, don't even try. */
-  if (suffix.name_len () > NAME_MAX)
+  if (!ext_here)
     {
       set_error (ENAMETOOLONG);
       goto file_not_symlink;
     }
 
+  had_ext = !!*ext_here;
+  path_len (ext_here - path);
+
   while (suffix.next ())
     {
       res = 0;
-      error = 0;
-      get_nt_native_path (suffix.path, upath, mount_flags & MOUNT_DOS);
+      error (0);
+      get_nt_native_path (suffix.path, upath, mount_flags () & MOUNT_DOS);
       if (h)
 	{
 	  NtClose (h);
@@ -3200,7 +3223,7 @@ restart:
 	     we encountered a STATUS_OBJECT_NAME_NOT_FOUND *and* we didn't
 	     already attach a suffix. */
 	  if (!restarted && !*ext_here && ext_here[-1] != '\\'
-	      && !(mount_flags & MOUNT_DOS))
+	      && !(mount_flags () & MOUNT_DOS))
 	    {
 	      /* Check for trailing dot or space or leading space in
 		 last component. */
@@ -3222,7 +3245,7 @@ restart:
 		      /* If so, try again.  Since we now know the FS, the
 			 filenames will be tweaked to follow DOS rules via the
 			 third parameter in the call to get_nt_native_path. */
-		      mount_flags |= MOUNT_DOS;
+		      mount_flags (mount_flags () | MOUNT_DOS);
 		      restarted = true;
 		      goto restart;
 		    }
@@ -3253,12 +3276,12 @@ restart:
 	{
 	  status = conv_hdl.get_finfo (h, fs.is_nfs ());
 	  if (NT_SUCCESS (status))
-	    fileattr = conv_hdl.get_dosattr (h, fs.is_nfs ());
+	    fileattr (conv_hdl.get_dosattr (h, fs.is_nfs ()));
 	}
       if (!NT_SUCCESS (status))
 	{
 	  debug_printf ("%y = NtQueryInformationFile (%S)", status, &upath);
-	  fileattr = INVALID_FILE_ATTRIBUTES;
+	  fileattr (INVALID_FILE_ATTRIBUTES);
 
 	  /* One of the inner path components is invalid, or the path contains
 	     invalid characters.  Bail out with ENOENT.
@@ -3283,12 +3306,12 @@ restart:
 	      || status == STATUS_NO_MEDIA_IN_DEVICE)
 	    {
 	      set_error (ENOENT);
-	      if (ext_tacked_on && !had_ext)
+	      if (ext_tacked_on () && !had_ext)
 		{
 		  *ext_here = '\0';
-		  ext_tacked_on = false;
+		  ext_tacked_on (false);
 		  ext_here = NULL;
-		  extn = 0;
+		  path_len (0);
 		}
 	      goto file_not_symlink;
 	    }
@@ -3324,10 +3347,10 @@ restart:
 		     basename part.  If it's 0, the incoming file is the
 		     root of a drive.  So we at least know it's a directory. */
 		  if (basename.Length)
-		    fileattr = FILE_ATTRIBUTE_DIRECTORY;
+		    fileattr (FILE_ATTRIBUTE_DIRECTORY);
 		  else
 		    {
-		      fileattr = 0;
+		      fileattr (0);
 		      set_error (geterrno_from_nt_status (status));
 		    }
 		}
@@ -3357,17 +3380,17 @@ restart:
 			  set_error (ENOENT);
 			  continue;
 			}
-		      fileattr = 0;
+		      fileattr (0);
 		    }
 		  else
 		    {
 		      PFILE_ALL_INFORMATION pfai = conv_hdl.fai ();
 
-		      fileattr = fdi_buf.fdi.FileAttributes;
+		      fileattr (fdi_buf.fdi.FileAttributes);
 		      memcpy (&pfai->BasicInformation.CreationTime,
 			      &fdi_buf.fdi.CreationTime,
 			      4 * sizeof (LARGE_INTEGER));
-		      pfai->BasicInformation.FileAttributes = fileattr;
+		      pfai->BasicInformation.FileAttributes = fileattr ();
 		      pfai->StandardInformation.AllocationSize.QuadPart
 			= fdi_buf.fdi.AllocationSize.QuadPart;
 		      pfai->StandardInformation.EndOfFile.QuadPart
@@ -3377,21 +3400,22 @@ restart:
 			= fdi_buf.fdi.FileId.QuadPart;
 		    }
 		}
-	      ext_tacked_on = !!*ext_here;
+	      ext_tacked_on (!!*ext_here);
 	      goto file_not_symlink;
 	    }
 	  set_error (ENOENT);
 	  continue;
 	}
 
-      ext_tacked_on = !!*ext_here;
+      ext_tacked_on (!!*ext_here);
       /* Don't allow to returns directories with appended suffix.  If we found
 	 a directory with a suffix which has been appended here, then this
 	 directory doesn't match the request.  So, just do as usual if file
 	 hasn't been found. */
-      if (ext_tacked_on && !had_ext && (fileattr & FILE_ATTRIBUTE_DIRECTORY))
+      if (ext_tacked_on () && !had_ext
+	  && (fileattr () & FILE_ATTRIBUTE_DIRECTORY))
 	{
-	  fileattr = INVALID_FILE_ATTRIBUTES;
+	  fileattr (INVALID_FILE_ATTRIBUTES);
 	  set_error (ENOENT);
 	  continue;
 	}
@@ -3407,7 +3431,7 @@ restart:
       /* Reparse points are potentially symlinks.  This check must be
 	 performed before checking the SYSTEM attribute for sysfile
 	 symlinks, since reparse points can have this flag set, too. */
-      if ((fileattr & FILE_ATTRIBUTE_REPARSE_POINT))
+      if ((fileattr () & FILE_ATTRIBUTE_REPARSE_POINT))
 	{
 	  res = check_reparse_point (h, fs.is_remote_drive ());
 	  if (res > 0)
@@ -3417,7 +3441,7 @@ restart:
 		&= ~FILE_ATTRIBUTE_DIRECTORY;
 	      break;
 	    }
-	  else if (res == 0 && (path_flags & PATH_REP))
+	  else if (res == 0 && (path_flags () & PATH_REP))
 	    /* Known reparse point but not a symlink. */
 	    goto file_not_symlink;
 	  else
@@ -3427,7 +3451,7 @@ restart:
 		 The handle has been opened with the FILE_OPEN_REPARSE_POINT
 		 flag, so it's a handle to the reparse point, not a handle
 		 to the volumes root dir. */
-	      pc_flags &= ~PC_KEEP_HANDLE;
+	      pc_flags (pc_flags () & ~PC_KEEP_HANDLE);
 	      /* Volume mount point:  The filesystem information for the top
 		 level directory should be for the volume top level directory,
 		 rather than for the reparse point itself.  So we fetch the
@@ -3441,8 +3465,10 @@ restart:
 
       /* Windows shortcuts are potentially treated as symlinks.  Valid Cygwin
 	 & U/WIN shortcuts are R/O, but definitely not directories. */
-      else if ((fileattr & (FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_DIRECTORY))
-	  == FILE_ATTRIBUTE_READONLY && suffix.lnk_match ())
+      else if ((fileattr () & (FILE_ATTRIBUTE_READONLY
+			       | FILE_ATTRIBUTE_DIRECTORY))
+	       == FILE_ATTRIBUTE_READONLY
+	       && suffix.lnk_match ())
 	{
 	  HANDLE sym_h;
 
@@ -3461,9 +3487,9 @@ restart:
 	    {
 	      /* If searching for `foo' and then finding a `foo.lnk' which
 		 is no shortcut, return the same as if file not found. */
-	      if (ext_tacked_on)
+	      if (ext_tacked_on ())
 		{
-		  fileattr = INVALID_FILE_ATTRIBUTES;
+		  fileattr (INVALID_FILE_ATTRIBUTES);
 		  set_error (ENOENT);
 		  continue;
 		}
@@ -3471,10 +3497,10 @@ restart:
 	  else if (contents[0] != ':' || contents[1] != '\\'
 		   || !parse_device (contents))
 	    break;
-	  if (fs.is_nfs () && major == _major (FH_FIFO))
+	  if (fs.is_nfs () && dev () == FH_FIFO)
 	    {
 	      conv_hdl.nfsattr ()->type = NF3FIFO;
-	      conv_hdl.nfsattr ()->mode = mode;
+	      conv_hdl.nfsattr ()->mode = mode ();
 	      conv_hdl.nfsattr ()->size = 0;
 	      /* Marker for fhandler_base::fstat_by_nfs_ea not to override
 		 the cached fattr3 data with fresh data from the filesystem,
@@ -3485,9 +3511,9 @@ restart:
 
       /* If searching for `foo' and then finding a `foo.lnk' which is
 	 no shortcut, return the same as if file not found. */
-      else if (suffix.lnk_match () && ext_tacked_on)
+      else if (suffix.lnk_match () && ext_tacked_on ())
 	{
-	  fileattr = INVALID_FILE_ATTRIBUTES;
+	  fileattr (INVALID_FILE_ATTRIBUTES);
 	  set_error (ENOENT);
 	  continue;
 	}
@@ -3495,7 +3521,8 @@ restart:
       /* This is the old Cygwin method creating symlinks.  A symlink will
 	 have the `system' file attribute.  Only files can be symlinks
 	 (which can be symlinks to directories). */
-      else if ((fileattr & (FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_DIRECTORY))
+      else if ((fileattr () & (FILE_ATTRIBUTE_SYSTEM
+			       | FILE_ATTRIBUTE_DIRECTORY))
 	       == FILE_ATTRIBUTE_SYSTEM)
 	{
 	  HANDLE sym_h;
@@ -3529,10 +3556,8 @@ restart:
 	      break;
 	    case NF3FIFO:
 	      /* Enable real FIFOs recognized as such. */
-	      major = _major (FH_FIFO);
-	      minor = _minor (FH_FIFO);
-	      mode = S_IFIFO | (conv_hdl.nfsattr ()->mode & ~S_IFMT);
-	      isdevice = true;
+	      dev (FH_FIFO);
+	      mode (S_IFIFO | (conv_hdl.nfsattr ()->mode & ~S_IFMT));
 	      break;
 	    default:
 	      break;
@@ -3547,7 +3572,8 @@ restart:
 	 differ, return the final path as symlink content and set symlen
 	 to a negative value.  This forces path_conv::check to restart
 	 symlink evaluation with the new path. */
-      if ((pc_flags & (PC_SYM_FOLLOW | PC_SYM_NOFOLLOW_REP)) == PC_SYM_FOLLOW)
+      if ((pc_flags () & (PC_SYM_FOLLOW | PC_SYM_NOFOLLOW_REP))
+	  == PC_SYM_FOLLOW)
 	{
 	  PWCHAR fpbuf = tp.w_get ();
 	  DWORD ret;
@@ -3599,7 +3625,6 @@ restart:
 			    goto file_not_symlink;
 			}
 		    }
-		  issymlink = true;
 		  /* upath.Buffer is big enough and unused from this point on.
 		     Reuse it here, avoiding yet another buffer allocation. */
 		  char *nfpath = (char *) upath.Buffer;
@@ -3615,22 +3640,22 @@ restart:
 
     /* Normal file. */
     file_not_symlink:
-      issymlink = false;
-      syscall_printf ("%s", isdevice ? "is a device" : "not a symlink");
+      issymlink (false);
+      syscall_printf ("%s", isdevice () ? "is a device" : "not a symlink");
       res = 0;
       break;
     }
 
   if (h)
     {
-      if (pc_flags & PC_KEEP_HANDLE)
+      if (pc_flags () & PC_KEEP_HANDLE)
 	conv_hdl.set (h);
       else
 	NtClose (h);
     }
 
   syscall_printf ("%d = symlink.check(%s, %p) (mount_flags %y, path_flags %y)",
-		  res, suffix.path, contents, mount_flags, path_flags);
+		  res, suffix.path, contents, mount_flags (), path_flags ());
   return res;
 }
 
@@ -3640,15 +3665,15 @@ int
 symlink_info::set (char *path)
 {
   strcpy (contents, path);
-  mount_flags = 0;
-  path_flags = PATH_SYMLINK;
-  fileattr = FILE_ATTRIBUTE_NORMAL;
-  error = 0;
-  issymlink = true;
-  isdevice = false;
-  ext_tacked_on = false;
+  mount_flags (0);
+  path_flags (PATH_SYMLINK);
+  fileattr (FILE_ATTRIBUTE_NORMAL);
+  error (0);
+  issymlink (true);
+  ext_tacked_on (false);
   ext_here = NULL;
-  extn = major = minor = mode = 0;
+  path_len (0);
+  dev (FH_NADA);
   return strlen (path);
 }
 
