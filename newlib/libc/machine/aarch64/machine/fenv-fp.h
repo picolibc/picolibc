@@ -163,11 +163,14 @@ feupdateenv(const fenv_t *__envp)
 __declare_fenv_inline(int)
 feenableexcept(int __mask)
 {
-	fenv_t __old_r, __new_r;
+        fenv_t __old_r, __new_r, __test_r;
 
 	__mrs_fpcr(__old_r);
 	__new_r = __old_r | ((__mask & FE_ALL_EXCEPT) << _FPUSW_SHIFT);
 	__msr_fpcr(__new_r);
+        __asm ("mrs %0, fpcr" : "=r" (__test_r));
+        if (__new_r != __test_r)
+            return -1;
 	return ((__old_r >> _FPUSW_SHIFT) & FE_ALL_EXCEPT);
 }
 
