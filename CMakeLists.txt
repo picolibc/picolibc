@@ -35,7 +35,7 @@
 
 cmake_minimum_required(VERSION 3.20.0)
 
-project(Picolibc VERSION 1.8.5 LANGUAGES C ASM)
+project(Picolibc VERSION 1.8.6 LANGUAGES C ASM)
 
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
