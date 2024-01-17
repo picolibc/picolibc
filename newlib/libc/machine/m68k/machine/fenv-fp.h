@@ -259,30 +259,30 @@ __declare_fenv_inline(int) feupdateenv(const fenv_t *envp)
 
 __declare_fenv_inline(int) feenableexcept(int excepts)
 {
-    fenv_t fpcr;
+    fenv_t old_fpcr, new_fpcr;
 
-    __asm__ volatile("fmove.l %%fpcr, %0" : "=d"(fpcr));
+    __asm__ volatile("fmove.l %%fpcr, %0" : "=d"(old_fpcr));
 
     /* Enable exceptions */
 
-    fpcr |= (excepts & FE_ALL_EXCEPT) << _M68K_EXCEPT_SHIFT;
+    new_fpcr = old_fpcr | ((excepts & FE_ALL_EXCEPT) << _M68K_EXCEPT_SHIFT);
 
-    __asm__ volatile("fmove.l %0, %%fpcr" : : "d"(fpcr));
-    return 0;
+    __asm__ volatile("fmove.l %0, %%fpcr" : : "d"(new_fpcr));
+    return (old_fpcr >> _M68K_EXCEPT_SHIFT) & FE_ALL_EXCEPT;
 }
 
 __declare_fenv_inline(int) fedisableexcept(int excepts)
 {
-    fenv_t fpcr;
+    fenv_t old_fpcr, new_fpcr;
 
-    __asm__ volatile("fmove.l %%fpcr, %0" : "=d"(fpcr));
+    __asm__ volatile("fmove.l %%fpcr, %0" : "=d"(old_fpcr));
 
     /* Disable exceptions */
 
-    fpcr &= ~((excepts & FE_ALL_EXCEPT) << _M68K_EXCEPT_SHIFT);
+    new_fpcr = old_fpcr & ~((excepts & FE_ALL_EXCEPT) << _M68K_EXCEPT_SHIFT);
 
-    __asm__ volatile("fmove.l %0, %%fpcr" : : "d"(fpcr));
-    return 0;
+    __asm__ volatile("fmove.l %0, %%fpcr" : : "d"(new_fpcr));
+    return (old_fpcr >> _M68K_EXCEPT_SHIFT) & FE_ALL_EXCEPT;
 }
 
 __declare_fenv_inline(int) fegetexcept(void)
