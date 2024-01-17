@@ -3,9 +3,9 @@ What's new:
 
 - Drop support for Windows 7, Windows 8, Server 2008 R2 and Server 2012.
 
-- The console device gets accessible from other terminals such as other
-  consoles and ptys. Thanks to this new feature, GNU screen and tmux
-  now work in the console.
+- Console devices (/dev/consN) are now accessible by processes attached
+  to other consoles or ptys. Thanks to this new feature, GNU screen and
+  tmux now work in the console.
 
 - newgrp(1) tool.
 
@@ -56,7 +56,7 @@ What changed:
   files as execvp.  For the reasoning, see
   https://www.austingroupbugs.net/view.php?id=1674
 
-- FIFOs now also work over NFS.
+- FIFOs now also work on NFS filesystems.
 
 - Enable automatic sparsifying of files on SSDs, independent of the
   "sparse" mount mode.
