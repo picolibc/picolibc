@@ -149,6 +149,8 @@ bail:
 	return ret;
 }
 
+extern FILE *const stdin _ATTRIBUTE((__weak__));
+extern FILE *const stdout _ATTRIBUTE((__weak__));
 
 int
 __bufio_get(FILE *f)
@@ -167,7 +169,7 @@ again:
 	if (bf->off >= bf->len) {
 
 		/* Flush stdout if reading from stdin */
-		if (f == stdin && !flushed) {
+		if (f == stdin && !flushed && stdout != NULL) {
                         flushed = true;
 			__bufio_unlock(f);
 			fflush(stdout);

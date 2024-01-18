@@ -35,6 +35,9 @@
 #include "../stdlib/mul_overflow.h"
 #endif
 
+extern FILE *const stdin _ATTRIBUTE((__weak__));
+extern FILE *const stdout _ATTRIBUTE((__weak__));
+
 size_t
 fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
 {
@@ -79,7 +82,7 @@ fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
                                 /* Flush stdout if reading from stdin */
                                 if (!flushed) {
                                         flushed = true;
-                                        if (stream == stdin) {
+                                        if (stream == stdin && stdout != NULL) {
                                                 __bufio_unlock(stream);
                                                 fflush(stdout);
                                                 goto again;
