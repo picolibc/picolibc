@@ -530,9 +530,9 @@ details. */
 
    The mkvers.sh script at the top level produces a .cc file which initializes
    a cygwin_version structure based on the above version information and
-   creates a string table for grepping via "fgrep '%%%' cygwinwhatever.dll"
+   creates a string table for grepping via "grep -F '%%%' cygwinwhatever.dll"
    if you are using GNU grep.  Otherwise you may want to do a
-   "strings cygwinwhatever.dll | fgrep '%%%'" instead.
+   "strings cygwinwhatever.dll | grep -F '%%%'" instead.
 
    This will produce output such as:
 

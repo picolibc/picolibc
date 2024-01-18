@@ -149,8 +149,8 @@ main ()
 {
   char name[32], *c;
   FILE *pp;
-  
-  pp = popen ("locale -a | grep -a '_' | fgrep -v .", "r");
+
+  pp = popen ("locale -a | grep -a '_' | grep -F -v .", "r");
   if (!pp)
     {
       perror ("popen failed");
@@ -160,7 +160,7 @@ main ()
     {
       c = strchr (name, '\n');
       if (c)
-      	*c = '\0';
+	*c = '\0';
       read_locale_messages (name);
     }
   pclose (pp);

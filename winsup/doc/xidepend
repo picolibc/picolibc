@@ -12,7 +12,7 @@ fi
 for f in "$@"
 do
 	f=`basename "$f"`
-	if fgrep -q 'xi:include' "$f"
+	if grep -F -q 'xi:include' "$f"
 	then
 		# This file uses XIncludes.  Let's chase its deps recursively.
 		base=`basename "$f" .xml`

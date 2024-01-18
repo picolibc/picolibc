@@ -380,7 +380,7 @@ cygexec, you can find them with a script like this:
 <screen>
 #!/bin/sh
 cd /bin; for f in `find . -type f -name '*.exe'`; do
-	cygcheck $f | (fgrep -qi cygwin1.dll || echo $f)
+	cygcheck $f | (grep -Fqi cygwin1.dll || echo $f)
 done
 </screen>
 
