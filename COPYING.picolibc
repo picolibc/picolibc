@@ -1009,7 +1009,9 @@ Files: dummyhost/iob.c
  newlib/libc/tinystdio/ftello.c
  newlib/libc/tinystdio/fwide.c
  newlib/libc/tinystdio/meson.build
- newlib/libc/tinystdio/posixiob.c
+ newlib/libc/tinystdio/posixiob_stderr.c
+ newlib/libc/tinystdio/posixiob_stdin.c
+ newlib/libc/tinystdio/posixiob_stdout.c
  newlib/libc/tinystdio/setbuf.c
  newlib/libc/tinystdio/setbuffer.c
  newlib/libc/tinystdio/setlinebuf.c
@@ -2704,6 +2706,7 @@ Files: .clang-format
  cmake/TC-thumbv7m.cmake
  cross.tmpl
  doc/build.md
+ doc/ctype.md
  doc/embedsource.md
  doc/init.md
  doc/linking.md
