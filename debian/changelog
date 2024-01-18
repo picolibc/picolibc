@@ -1,3 +1,17 @@
+picolibc (1.8.6-1) unstable; urgency=medium
+
+  * New upstream
+
+  * New ctype option avoiding _ctype_ array
+
+  * Inline fenv functions.
+
+  * Fixes for fmemopen
+
+  * Fix risc-v run script. Closes: #1060967.
+
+ -- Keith Packard <keithp@keithp.com>  Thu, 18 Jan 2024 10:59:44 -0800
+
 picolibc (1.8.5-2) unstable; urgency=medium
 
   * Silence aarch64 linker warning during autopkgtst 
