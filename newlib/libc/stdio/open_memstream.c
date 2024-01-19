@@ -367,7 +367,7 @@ internal_open_memstream_r (struct _reent *ptr,
   fp->_flags |= __SL64;
 #endif
   fp->_close = memcloser;
-  ORIENT (fp, wide);
+  (void) ORIENT (fp, wide);
   _newlib_flockfile_end (fp);
   return fp;
 }
