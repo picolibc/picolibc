@@ -44,8 +44,14 @@ SUCH DAMAGE.
 
 _BEGIN_STD_C
 
-/* The small ctype code does not support locales or extended character sets */
-#if defined(__HAVE_LOCALE_INFO__) || defined (_MB_EXTENDED_CHARSETS_ISO) || defined (_MB_EXTENDED_CHARSETS_WINDOWS)
+/*
+ * The small ctype code does not support locales or extended character sets. It also breaks
+ * libstdc++'s ctype implementation, so just skip it for c++
+ */
+#if defined(__HAVE_LOCALE_INFO__) || \
+    defined (_MB_EXTENDED_CHARSETS_ISO) || \
+    defined (_MB_EXTENDED_CHARSETS_WINDOWS) || \
+    defined (__cplusplus)
 #undef _PICOLIBC_CTYPE_SMALL
 #define _PICOLIBC_CTYPE_SMALL 0
 #endif
