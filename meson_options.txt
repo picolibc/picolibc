@@ -50,6 +50,9 @@ option('multilib', type: 'boolean', value: true,
 option('multilib-list', type: 'array', value: [],
        description: 'List of multilib configurations to build for')
 
+option('multilib-exclude', type: 'array', value: [],
+       description: 'Multilib configurations containing any of these strings will not be built')
+
 option('build-type-subdir', type: 'string',
        description: 'Build-type subdir. Also skips installing .specs file')
 

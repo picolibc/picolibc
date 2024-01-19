@@ -147,6 +147,7 @@ have_long_double = cc.compiles(long_double_code, name : 'long double check', arg
 
 enable_multilib = get_option('multilib')
 multilib_list = get_option('multilib-list')
+multilib_exclude = get_option('multilib-exclude')
 enable_picolib = get_option('picolib')
 enable_picocrt = get_option('picocrt')
 enable_picocrt_lib = get_option('picocrt-lib')
@@ -876,6 +877,17 @@ if enable_multilib
   foreach target : target_list
     message('target ' + target)
     tmp = target.split(';')
+    matches_exclude = false
+    foreach exclude : multilib_exclude
+      if tmp[0].contains(exclude)
+        matches_exclude = true
+        message('skipping target ' + tmp[0])
+        break
+      endif
+    endforeach
+    if matches_exclude
+      continue
+    endif
     flags = []
 
     # Let the user specify a subset of the possible multilib
