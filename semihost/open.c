@@ -74,15 +74,13 @@ open(const char *pathname, int flags, ...)
 		break;
 	}
 
+        /* Make sure any stdout/stderr fds are allocated first */
+        (void) _map_stdio(0);
 	int ret;
 	do {
 		ret = sys_semihost_open(pathname, semiflags);
 	}
-#ifdef TINY_STDIO
-	while(0);
-#else
 	while (0 <= ret && ret <= 2);
-#endif
 	if (ret == -1)
 		errno = sys_semihost_errno();
         else if (&__semihost_creat_time && gettimeofday)

@@ -28,7 +28,7 @@ tgamma64(__float64 x)
     int signgam_local;
     int divzero = 0;
 
-    if (isless(x, 0.0) && clang_barrier_double(rint(x)) == x)
+    if (isless(x, 0.0) && clang_barrier_double(rint64(x)) == x)
         return __math_invalid(x);
 
     __float64 y = exp64(__math_lgamma_r(x, &signgam_local, &divzero));

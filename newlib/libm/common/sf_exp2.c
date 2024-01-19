@@ -90,7 +90,7 @@ exp2f (float x)
   /* exp2(x) = 2^(k/N) * 2^r ~= s * (C0*r^3 + C1*r^2 + C2*r + 1) */
   t = T[ki % N];
   t += ki << (52 - EXP2F_TABLE_BITS);
-  s = asdouble (t);
+  s = asfloat64 (t);
   z = C[0] * r + C[1];
   r2 = r * r;
   y = C[2] * r + 1;

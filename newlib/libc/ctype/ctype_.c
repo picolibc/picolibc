@@ -27,10 +27,8 @@
  * SUCH DAMAGE.
  */
 
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)ctype_.c	5.6 (Berkeley) 6/1/90";
-#endif /* LIBC_SCCS and not lint */
-
+/* Make sure we're using fast ctype */
+#define _PICOLIBC_CTYPE_SMALL 0
 #include "ctype_.h"
 #include "../locale/setlocale.h"
 

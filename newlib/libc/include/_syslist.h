@@ -57,6 +57,7 @@ SUCH DAMAGE.
 #define _unlink unlink
 #define _wait wait
 #define _write write
+#define _getentropy getentropy
 #endif /* MISSING_SYSCALL_NAMES */
 
 #if defined MISSING_SYSCALL_NAMES || !defined HAVE_OPENDIR

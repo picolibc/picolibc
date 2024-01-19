@@ -64,12 +64,15 @@ PORTABILITY
 
 No supporting OS subroutines are required.
 */
-#include <_ansi.h>
 #include <ctype.h>
 
 #undef isupper
 int
 isupper (int c)
 {
-	return ((__CTYPE_PTR[c+1] & (_U|_L)) == _U);
+#if _PICOLIBC_CTYPE_SMALL
+    return 'A' <= c && c <= 'Z';
+#else
+    return ((__CTYPE_PTR[c+1] & (_U|_L)) == _U);
+#endif
 }

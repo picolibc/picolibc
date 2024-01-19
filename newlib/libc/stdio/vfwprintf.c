@@ -125,6 +125,8 @@ SEEALSO
 #include "../locale/setlocale.h"
 #endif
 
+int VFWPRINTF (FILE *, const wchar_t *, va_list);
+
 /* Currently a test is made to see if long double processing is warranted.
    This could be changed in the future should the __ldtoa code be
    preferred over __dtoa.  */
@@ -142,18 +144,18 @@ SEEALSO
 /* Defined in vfprintf.c. */
 #ifdef _FVWRITE_IN_STREAMIO
 # ifdef STRING_ONLY
-#  define __SPRINT _ssprint
+#  define __SPRINT __sswprint
 # else
-#  define __SPRINT _sprint
+#  define __SPRINT __swprint
 # endif
 int __SPRINT (FILE *, register struct __suio *);
 #else
 # ifdef STRING_ONLY
-#  define __SPRINT _ssputs
+#  define __SPRINT __ssputws
 # else
-#  define __SPRINT _sfputs
+#  define __SPRINT __sfputws
 # endif
-int __SPRINT (FILE *, const char *, size_t);
+int __SPRINT (FILE *, const wchar_t *, size_t);
 #endif
 #ifndef STRING_ONLY
 #ifdef _UNBUF_STREAM_OPT
@@ -188,7 +190,7 @@ __sbwprintf (
 #endif
 
 	/* do the work, then copy any error status */
-	ret = _VFWPRINTF_R (rptr, &fake, fmt, ap);
+	ret = VFWPRINTF (&fake, fmt, ap);
 	if (ret >= 0 && fflush ( &fake))
 		ret = EOF;
 	if (fake._flags & __SERR)
@@ -456,8 +458,8 @@ VFWPRINTF (
 #ifdef _FVWRITE_IN_STREAMIO
 #define	PRINT(ptr, len) { \
 	iovp->iov_base = (char *) (ptr); \
-	iovp->iov_len = (len) * sizeof (wchar_t); \
-	uio.uio_resid += (len) * sizeof (wchar_t); \
+	iovp->iov_len = (len); \
+	uio.uio_resid += iovp->iov_len; \
 	iovp++; \
 	if (++uio.uio_iovcnt >= NIOV) { \
 		if (__SPRINT(fp, &uio)) \
@@ -490,7 +492,7 @@ VFWPRINTF (
 }
 #else
 #define PRINT(ptr, len) {		\
-	if (__SPRINT (fp, (const char *)(ptr), (len) * sizeof (wchar_t)) == EOF) \
+	if (__SPRINT (fp, (ptr), (len)) == EOF) \
 		goto error;		\
 }
 #define	PAD(howmany, with) {		\
@@ -565,7 +567,10 @@ VFWPRINTF (
 	CHECK_INIT (data, fp);
 	_newlib_flockfile_start (fp);
 
-	ORIENT(fp, 1);
+	if (ORIENT(fp, 1) != 1) {
+		_newlib_flockfile_exit (fp);
+		return (EOF);
+	}
 
 	/* sorry, fwprintf(read_only_file, "") returns EOF, not 0 */
 	if (cantwrite (data, fp)) {
@@ -578,7 +583,7 @@ VFWPRINTF (
 	if ((fp->_flags & (__SNBF|__SWR|__SRW)) == (__SNBF|__SWR) &&
 	    fp->_file >= 0) {
 		_newlib_flockfile_exit (fp);
-		return (__sbwprintf (data, fp, fmt0, ap));
+		return (__sbwprintf (fp, fmt0, ap));
 	}
 #endif
 #else /* STRING_ONLY */

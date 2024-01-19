@@ -190,6 +190,10 @@ typedef const struct {
 #undef TEST_IO_LONG_DOUBLE
 #endif
 
+#if defined(__PICOLIBC__) && !defined(TINY_STDIO) && __LDBL_MANT_DIG__ != 64
+#undef TEST_IO_LONG_DOUBLE
+#endif
+
 #ifdef TEST_IO_LONG_DOUBLE
 static long double vals[] = {
     1.0L,
@@ -207,8 +211,9 @@ naive_strtold(const char *buf)
 {
     long double v = 0.0L;
     long exp = 0;
-    long double frac_mul = 1.0L / 16.0L;
+    long double frac_mul;
     long exp_sign = 1;
+    long double base = 10.0L;
     char c;
     enum {
         LDOUBLE_INT,
@@ -216,9 +221,11 @@ naive_strtold(const char *buf)
         LDOUBLE_EXP,
     } state = LDOUBLE_INT;
 
-    if (strncmp(buf, "0x", 2) != 0)
-        return -(long double)INFINITY;
-    buf += 2;
+    if (strncmp(buf, "0x", 2) == 0) {
+        base = 16.0L;
+        buf += 2;
+    }
+    frac_mul = 1.0L / base;
     while ((c = *buf++)) {
         int digit;
         switch (c) {
@@ -229,9 +236,11 @@ naive_strtold(const char *buf)
             }
             return -(long double)INFINITY;
         case 'p':
-            if (state == LDOUBLE_INT || state == LDOUBLE_FRAC) {
-                state = LDOUBLE_EXP;
-                continue;
+            if (base == 16.0L) {
+                if (state == LDOUBLE_INT || state == LDOUBLE_FRAC) {
+                    state = LDOUBLE_EXP;
+                    continue;
+                }
             }
             return -(long double)INFINITY;
         case '-':
@@ -250,15 +259,41 @@ naive_strtold(const char *buf)
         case '5': case '6': case '7': case '8': case '9':
             digit = c - '0';
             break;
+        case 'E':
+            if (base == 10.0L) {
+                if (state == LDOUBLE_INT || state == LDOUBLE_FRAC) {
+                    state = LDOUBLE_EXP;
+                    continue;
+                }
+                return -(long double)INFINITY;
+            }
+            /* FALLTHROUGH */
+            if (base == 10.0L) {
+                if (state == LDOUBLE_INT || state == LDOUBLE_FRAC) {
+                    state = LDOUBLE_EXP;
+                    continue;
+                }
+                return -(long double)INFINITY;
+            }
+            /* FALLTHROUGH */
         case 'A': case 'B': case 'C':
-        case 'D': case 'E': case 'F':
+        case 'D': case 'F':
             if (state == LDOUBLE_INT || state == LDOUBLE_FRAC) {
                 digit = c - 'A' + 10;
                 break;
             }
             return -(long double)INFINITY;
+        case 'e':
+            if (base == 10.0L) {
+                if (state == LDOUBLE_INT || state == LDOUBLE_FRAC) {
+                    state = LDOUBLE_EXP;
+                    continue;
+                }
+                return -(long double)INFINITY;
+            }
+            /* FALLTHROUGH */
         case 'a': case 'b': case 'c':
-        case 'd': case 'e': case 'f':
+        case 'd': case 'f':
             if (state == LDOUBLE_INT || state == LDOUBLE_FRAC) {
                 digit = c - 'a' + 10;
                 break;
@@ -269,61 +304,149 @@ naive_strtold(const char *buf)
         }
         switch (state) {
         case LDOUBLE_INT:
-            v = v * 16.0L + digit;
+            v = v * base + digit;
             break;
         case LDOUBLE_FRAC:
             v = v + digit * frac_mul;
-            frac_mul *= 1.0L / 16.0L;
+            frac_mul *= 1.0L / base;
             break;
         case LDOUBLE_EXP:
             exp = exp * 10 + digit;
             break;
         }
     }
-    return ldexpl(v, exp * exp_sign);
+    if (base == 10.0L) {
+        long etop = exp / 2;
+        long ebot = exp - etop;
+        long double epow_top = powl(10.0L, etop * exp_sign);
+        long double epow_bot = powl(10.0L, ebot * exp_sign);
+        long double vpow = v * epow_top;
+        long double r = vpow * epow_bot;
+        return r;
+    } else
+        return ldexpl(v, exp * exp_sign);
 }
+
+static const char *formats[] = { "%La", "%.30Le", };
+
+#define NFMTS (sizeof (formats)/sizeof(formats[0]))
+
+static bool
+close(long double have, long double want, long double max_error)
+{
+    if (have == want)
+        return true;
+
+    if (max_error == 0.0L)
+        return false;
+
+    if (want == 0.0L)
+        return fabsl(have) <= max_error;
+    return fabsl((have - want) / want) <= max_error;
+}
+
+static const int test_exp[] = {
+    __LDBL_MIN_EXP__ - __LDBL_MANT_DIG__ - 1,
+    __LDBL_MIN_EXP__ - __LDBL_MANT_DIG__,
+    __LDBL_MIN_EXP__ - __LDBL_MANT_DIG__ + 1,
+    __LDBL_MIN_EXP__ - __LDBL_MANT_DIG__ + 2,
+    __LDBL_MIN_EXP__ - __LDBL_MANT_DIG__ + 3,
+    __LDBL_MIN_EXP__ - 3,
+    __LDBL_MIN_EXP__ - 2,
+    __LDBL_MIN_EXP__ - 1,
+    __LDBL_MIN_EXP__,
+    __LDBL_MIN_EXP__ + 1,
+    __LDBL_MIN_EXP__ + 2,
+    __LDBL_MIN_EXP__ + 3,
+    -3,
+    -2,
+    -1,
+    0,
+    1,
+    2,
+    3,
+    __LDBL_MAX_EXP__ - 3,
+    __LDBL_MAX_EXP__ - 2,
+    __LDBL_MAX_EXP__ - 1,
+    __LDBL_MAX_EXP__,
+    __LDBL_MAX_EXP__ + 1,
+};
+
+#define NEXPS (sizeof (test_exp)/ sizeof(test_exp[0]))
+
+/*
+ * For 64-bit values, we may have exact conversions. Otherwise, allow
+ * some error
+ */
+#ifdef _IO_FLOAT_EXACT
+# if __SIZEOF_LONG_DOUBLE__ == 8
+#  define MAX_DECIMAL_ERROR       0
+# else
+#  define MAX_DECIMAL_ERROR     1e-10L
+# endif
+#else
+# if __SIZEOF_LONG_DOUBLE__ == 8
+#  define MAX_DECIMAL_ERROR       1e-5L
+# else
+#  define MAX_DECIMAL_ERROR       1e-10L
+# endif
+#endif
 
 static int
 test_io(void)
 {
-    int e;
+    unsigned e;
     int result = 0;
     char buf[80];
-    unsigned i;
+    unsigned i, j;
+    long double max_error, max_error_naive;
     char *end;
 
-    for (e = __LDBL_MIN_EXP__ - __LDBL_MANT_DIG__; e <= __LDBL_MAX_EXP__; e++)
+    for (e = 0; e < NEXPS; e++)
     {
-        long double v, r;
         for (i = 0; i < NVALS; i++) {
-            v = ldexpl(vals[i], e);
-            sprintf(buf, "%La", v);
-            if (isinf(v)) {
-                if (strcmp(buf, "inf") != 0) {
-                    printf("test_io i %d val %La exp %d: is %s should be inf\n", i, vals[i], e, buf);
+
+            long double v, r;
+            v = ldexpl(vals[i], test_exp[e]);
+
+            for (j = 0; j < NFMTS; j++) {
+
+                if (j == 0) {
+                    max_error = 0;
+                    max_error_naive = 0;
+                } else {
+                    max_error = MAX_DECIMAL_ERROR;
+                    max_error_naive = 1e-6L;
+                }
+
+                sprintf(buf, formats[j], v);
+                if (isinf(v)) {
+                    if (strcmp(buf, "inf") != 0) {
+                        printf("test_io i %d val %La exp %d: is %s should be inf\n", i, vals[i], test_exp[e], buf);
+                        result++;
+                    }
+                } else if (isnan(v)) {
+                    if (strcmp(buf, "nan") != 0) {
+                        printf("test_io is %s should be nan\n", buf);
+                        result++;
+                    }
+                } else {
+                    r = naive_strtold(buf);
+                    if (!close(r, v, max_error_naive)) {
+                        printf("test_io naive i %d val %La exp %d: \"%s\", is %La should be %La\n", i, vals[i], test_exp[e], buf, r, v);
+                        result++;
+                    }
+                }
+                sscanf(buf, "%Lf", &r);
+                if (!close(r, v, max_error) && !(isnan(v) && isnan(r))) {
+                    printf("test_io scanf i %d val %La exp %d: \"%s\", is %La should be %La\n", i, vals[i], test_exp[e], buf, r, v);
                     result++;
                 }
-            } else if (isnan(v)) {
-                if (strcmp(buf, "nan") != 0) {
-                    printf("test_io is %s should be nan\n", buf);
+                r = strtold(buf, &end);
+                if ((!close(r, v, max_error) && !(isnan(v) && isnan(r)))|| end != buf + strlen(buf)) {
+                    printf("test_io strtold i %d val %La exp %d: \"%s\", is %La should be %La\n", i, vals[i], test_exp[e], buf, r, v);
                     result++;
                 }
-            } else {
-                r = naive_strtold(buf);
-                if (v != r) {
-                    printf("test_io naive i %d val %La exp %d: \"%s\", is %La should be %La\n", i, vals[i], e, buf, r, v);
-                    result++;
-                }
-            }
-            sscanf(buf, "%Lf", &r);
-            if (v != r && !(isnan(v) && isnan(r))) {
-                printf("test_io scanf i %d val %La exp %d: \"%s\", is %La should be %La\n", i, vals[i], e, buf, r, v);
-                result++;
-            }
-            r = strtold(buf, &end);
-            if ((v != r && !(isnan(v) && isnan(r)))|| end != buf + strlen(buf)) {
-                printf("test_io strtold i %d val %La exp %d: \"%s\", is %La should be %La\n", i, vals[i], e, buf, r, v);
-                result++;
             }
         }
     }

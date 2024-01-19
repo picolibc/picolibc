@@ -60,7 +60,7 @@ __kernel_sin(__float64 x, __float64 y, int iy)
     GET_HIGH_WORD(ix, x);
     ix &= 0x7fffffff; /* high word of x */
     if (ix < 0x3e400000) /* |x| < 2**-27 */
-        return __math_inexact(x);       /* generate inexact */
+        return __math_inexact64(x);       /* generate inexact */
     z = x * x;
     v = z * x;
     r = S2 + z * (S3 + z * (S4 + z * (S5 + z * S6)));

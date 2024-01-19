@@ -188,7 +188,7 @@ if srcs_strcmp_use != []
 		 static_library('strcmp' + target,
 				srcs_strcmp_use,
 				pic: false,
-				c_args: value[1] + cargs_strcmp,
+				c_args: value[1] + c_args + cargs_strcmp,
 				include_directories: inc))
   endforeach
 endif

@@ -39,11 +39,11 @@ scalb64(__float64 x, __float64 fn)
     if (rint64(fn) != fn)
         return __math_invalid(fn);
 
-    if (fn > 4 * __DBL_MAX_EXP__)
-        fn = 4 * __DBL_MAX_EXP__;
+    if (fn > 4 * _FLOAT64_MAX_EXP)
+        fn = 4 * _FLOAT64_MAX_EXP;
 
-    if (fn < -4 * __DBL_MAX_EXP__)
-        fn = -4 * __DBL_MAX_EXP__;
+    if (fn < -4 * _FLOAT64_MAX_EXP)
+        fn = -4 * _FLOAT64_MAX_EXP;
 
     return scalbn64(x, (int)fn);
 }

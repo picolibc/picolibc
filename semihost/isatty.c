@@ -44,6 +44,11 @@
 int
 isatty (int fd)
 {
+        fd = _map_stdio(fd);
+
+        if (fd < 0)
+                return 1;
+
 	int size = sys_semihost_flen(fd);
 
 	return size <= 0;

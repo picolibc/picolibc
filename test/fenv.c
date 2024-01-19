@@ -33,6 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _GNU_SOURCE
 #include <fenv.h>
 #include <math.h>
 #include <stdio.h>
@@ -181,9 +182,32 @@ report(char *expr, test_t v, int e, int exception, int oexception)
 			TEST_CASE2(expr, exception, 0);			\
 	} while(0)
 
+static const struct {
+    const char *name;
+    int value;
+} excepts[] = {
+    { .name = "None", .value = 0 },
+#if FE_DIVBYZERO
+    { .name = "Divide by zero", .value = FE_DIVBYZERO },
+#endif
+#if FE_OVERFLOW
+    { .name = "Overflow", .value = FE_OVERFLOW },
+#endif
+#if FE_UNDERFLOW
+    { .name = "Underflow", .value = FE_UNDERFLOW },
+#endif
+#if FE_INVALID
+    { .name = "Invalid", .value = FE_INVALID },
+#endif
+};
+
+#define NUM_EXCEPTS (sizeof(excepts)/sizeof(excepts[0]))
+
 int main(void)
 {
 	int result = 0;
+        int ret;
+        unsigned i;
 
 	(void) report;
 	(void) e_to_str;
@@ -212,5 +236,21 @@ int main(void)
 		TEST_CASE(test_sqrt(-two), FE_INVALID);
 #endif
 	}
+
+        for (i = 0; i < NUM_EXCEPTS; i++) {
+            ret = feenableexcept(excepts[i].value);
+            if (ret == 0) {
+                ret = fedisableexcept(excepts[i].value);
+                if (ret != excepts[i].value) {
+                    printf("enable %s worked, disabled returned %d\n", excepts[i].name, ret);
+                    result = 1;
+                }
+            } else {
+                if (excepts[i].value == 0) {
+                    printf("enable %s returned %d", excepts[i].name, ret);
+                    result = 1;
+                }
+            }
+        }
 	return result;
 }

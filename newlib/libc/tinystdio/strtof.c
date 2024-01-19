@@ -30,14 +30,6 @@
 
 /* $Id: strtof.c 2191 2010-11-05 13:45:57Z arcanum $ */
 
-#include <ctype.h>
-#include <errno.h>
-#include <limits.h>
-#include <math.h>		/* INFINITY, NAN		*/
-#include <stdlib.h>
-#include <stdint.h>
-#include <string.h>
-
 /**  The strtof() function converts the initial portion of the string pointed
      to by \a nptr to float representation.
 
@@ -77,7 +69,7 @@ strtof (const char * nptr, char ** endptr)
     float flt;
     unsigned char ret;
 
-    while (ISSPACE(nptr[len]))
+    while (isspace(nptr[len]))
         len++;
 
     ret = conv_flt(nptr, &len, INT_MAX, &flt, 0);

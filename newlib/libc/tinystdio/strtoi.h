@@ -30,27 +30,11 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <ctype.h>
-#include <limits.h>
-#include <math.h>
-#include <stdarg.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <stdbool.h>
 #include "stdio_private.h"
 
 #if defined(_HAVE_BUILTIN_MUL_OVERFLOW) && defined(_HAVE_BUILTIN_ADD_OVERFLOW) && !defined(strtoi_signed)
 #define USE_OVERFLOW
 #endif
-
-static inline bool
-ISSPACE(unsigned char c)
-{
-    return ('\011' <= c && c <= '\015') || c == ' ';
-}
 
 strtoi_type
 strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
@@ -76,7 +60,7 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
     /* Skip leading spaces */
     do {
         i = *s++;
-    } while (ISSPACE(i));
+    } while (isspace(i));
 
     /* Parse a leading sign */
     switch (i) {
@@ -89,7 +73,7 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
 
     /* Leading '0' digit -- check for base indication */
     if (i == '0') {
-        if (TOLOW(*s) == 'x' && ((base | 16) == 16)) {
+        if (TOLOWER(*s) == 'x' && ((base | 16) == 16)) {
             base = 16;
             /* Parsed the '0' */
             nptr = (const char *) s;

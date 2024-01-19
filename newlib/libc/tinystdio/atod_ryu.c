@@ -15,19 +15,22 @@
 // is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied.
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
+#include "stdio_private.h"
 
 #ifdef RYU_DEBUG
 #include <inttypes.h>
-#include <stdio.h>
 #endif
 
 #include "ryu/common.h"
 #include "ryu/d2s_intrinsics.h"
+
+#if __SIZEOF_DOUBLE__ == 8
+#define FLOAT64 double
+#elif __SIZEOF_LONG_DOUBLE__ == 8
+#define FLOAT64 long double
+#endif
+
+#ifdef FLOAT64
 
 #define DOUBLE_MANTISSA_BITS 52
 #define DOUBLE_EXPONENT_BITS 11
@@ -54,13 +57,13 @@ static inline int32_t max32(int32_t a, int32_t b) {
   return a < b ? b : a;
 }
 
-static inline double int64Bits2Double(uint64_t bits) {
-  double f;
-  memcpy(&f, &bits, sizeof(double));
+static inline FLOAT64 int64Bits2Double(uint64_t bits) {
+  FLOAT64 f;
+  memcpy(&f, &bits, sizeof(FLOAT64));
   return f;
 }
 
-double
+FLOAT64
 __atod_engine(uint64_t m10, int e10)
 {
 #ifdef RYU_DEBUG
@@ -159,3 +162,4 @@ __atod_engine(uint64_t m10, int e10)
     return int64Bits2Double(ieee);
 }
 
+#endif /* FLOAT64 */

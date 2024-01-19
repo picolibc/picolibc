@@ -29,9 +29,7 @@
 
 /* $Id: fputc.c 1944 2009-04-01 23:12:20Z arcanum $ */
 
-#include <stdio.h>
 #include "stdio_private.h"
-#include <sys/cdefs.h>
 
 int
 fputc(int c, FILE *stream)
@@ -39,8 +37,10 @@ fputc(int c, FILE *stream)
 	if ((stream->flags & __SWR) == 0)
 		return EOF;
 
-	if (stream->put(c, stream) < 0)
+	if (stream->put(c, stream) < 0) {
+                stream->flags |= __SERR;
 		return EOF;
+        }
 
 	return (unsigned char) c;
 }

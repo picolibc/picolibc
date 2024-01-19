@@ -35,7 +35,7 @@ jobs:
 
       - name: Cache the Docker Image
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.IMAGE_FILE }}
           key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
@@ -47,7 +47,7 @@ jobs:
 
       - name: Build picolibc container
         if: steps.cache.outputs.cache-hit != 'true'
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           platforms: linux/amd64
           file: .github/Dockerfile

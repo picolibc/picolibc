@@ -18,17 +18,10 @@
 // Runtime compiler options:
 // -DRYU_DEBUG Generate verbose debugging output to stdout.
 
+#define _NEED_IO_FLOAT32
+
+#include "dtoa.h"
 #include "ryu/ryu.h"
-
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
-#include <limits.h>
-
-#ifdef RYU_DEBUG
-#include <stdio.h>
-#endif
 
 #include "ryu/common.h"
 #include "ryu/f2s_intrinsics.h"
@@ -297,10 +290,8 @@ f2d(const uint32_t ieeeMantissa, const uint32_t ieeeExponent, int max_digits, bo
 	return fd;
 }
 
-#include "ftoa_engine.h"
-
 int
-__ftoa_engine(float x, struct ftoa *ftoa, int max_digits, bool fmode, int max_decimals)
+__ftoa_engine(float x, struct dtoa *dtoa, int max_digits, bool fmode, int max_decimals)
 {
 	// Step 1: Decode the floating-point number, and unify normalized and subnormal cases.
 	const uint32_t bits = float_to_bits(x);
@@ -313,23 +304,22 @@ __ftoa_engine(float x, struct ftoa *ftoa, int max_digits, bool fmode, int max_de
 	uint8_t	flags = 0;
 
 	if (ieeeSign)
-		flags |= FTOA_MINUS;
+		flags |= DTOA_MINUS;
 
 	if (ieeeExponent == 0 && ieeeMantissa == 0) {
-		flags |= FTOA_ZERO;
-		ftoa->digits[0] = '0';
-		ftoa->digits[1] = '\0';
-		ftoa->flags = flags;
-		ftoa->exp = 0;
+		flags |= DTOA_ZERO;
+		dtoa->digits[0] = '0';
+		dtoa->flags = flags;
+		dtoa->exp = 0;
 		return 1;
 	}
 	if (ieeeExponent == ((1u << FLOAT_EXPONENT_BITS) - 1u)) {
 		if (ieeeMantissa) {
-			flags |= FTOA_NAN;
+			flags |= DTOA_NAN;
 		} else {
-			flags |= FTOA_INF;
+			flags |= DTOA_INF;
 		}
-		ftoa->flags = flags;
+		dtoa->flags = flags;
 		return 0;
 	}
 
@@ -344,12 +334,11 @@ __ftoa_engine(float x, struct ftoa *ftoa, int max_digits, bool fmode, int max_de
 	int i;
 
 	for (i = 0; i < olength; i++) {
-		ftoa->digits[olength - i - 1] = (mant % 10) + '0';
+		dtoa->digits[olength - i - 1] = (mant % 10) + '0';
 		mant /= 10;
 	}
-	ftoa->digits[olength] = '\0';
 
-	ftoa->exp = exp;
-	ftoa->flags = flags;
+	dtoa->exp = exp;
+	dtoa->flags = flags;
 	return olength;
 }

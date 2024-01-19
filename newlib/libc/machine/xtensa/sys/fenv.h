@@ -29,6 +29,8 @@
 #ifndef _SYS_FENV_H
 #define _SYS_FENV_H
 
+#include <sys/cdefs.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -66,6 +68,18 @@ typedef unsigned long fexcept_t;
 #define _FE_ROUND_MODE_MASK (0x3 << _FE_ROUND_MODE_OFFSET)
 #define _FE_FLOATING_ENV_MASK (_FE_EXCEPTION_FLAG_MASK | _FE_EXCEPTION_ENABLE_MASK | _FE_ROUND_MODE_MASK)
 
+#endif
+
+#if !defined(__declare_fenv_inline) && defined(__declare_extern_inline)
+#define	__declare_fenv_inline(type) __declare_extern_inline(type)
+#endif
+
+#ifdef __declare_fenv_inline
+#if XCHAL_HAVE_FP || XCHAL_HAVE_DFP
+#include <machine/fenv-fp.h>
+#else
+#include <machine/fenv-softfloat.h>
+#endif
 #endif
 
 #ifdef __cplusplus

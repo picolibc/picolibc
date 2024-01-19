@@ -36,7 +36,6 @@
 #ifndef _SYS_FENV_H_
 #define _SYS_FENV_H_
 
-#include <sys/_types.h>
 #include <sys/cdefs.h>
 
 #ifdef __cplusplus
@@ -62,7 +61,19 @@ typedef int fexcept_t;
 #define FE_DOWNWARD     0x0002
 #define FE_UPWARD       0x0003
 
-#endif /* __SOFTFP__ */
+#endif
+
+#if !defined(__declare_fenv_inline) && defined(__declare_extern_inline)
+#define	__declare_fenv_inline(type) __declare_extern_inline(type)
+#endif
+
+#ifdef __declare_fenv_inline
+#if defined(__HAVE_68881__)
+#include <machine/fenv-fp.h>
+#else
+#include <machine/fenv-softfloat.h>
+#endif
+#endif
 
 #ifdef __cplusplus
 }

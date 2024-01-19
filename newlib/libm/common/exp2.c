@@ -59,13 +59,13 @@ specialcase (double_t tmp, uint64_t sbits, uint64_t ki)
     {
       /* k > 0, the exponent of scale might have overflowed by 1.  */
       sbits -= 1ull << 52;
-      scale = asdouble (sbits);
+      scale = asfloat64 (sbits);
       y = 2 * (scale + scale * tmp);
       return check_oflow (y);
     }
   /* k < 0, need special care in the subnormal range.  */
   sbits += 1022ull << 52;
-  scale = asdouble (sbits);
+  scale = asfloat64 (sbits);
   y = scale + scale * tmp;
   if (y < 1.0)
     {
@@ -135,7 +135,7 @@ exp2 (double x)
   /* 2^(k/N) ~= scale * (1 + tail).  */
   idx = 2 * (ki % N);
   top = ki << (52 - EXP_TABLE_BITS);
-  tail = asdouble (T[idx]);
+  tail = asfloat64 (T[idx]);
   /* This is only a valid scale when -1023*N < k < 1024*N.  */
   sbits = T[idx + 1] + top;
   /* exp2(x) = 2^(k/N) * 2^r ~= scale + scale * (tail + 2^r - 1).  */
@@ -152,7 +152,7 @@ exp2 (double x)
 #endif
   if (unlikely (abstop == 0))
     return specialcase (tmp, sbits, ki);
-  scale = asdouble (sbits);
+  scale = asfloat64 (sbits);
   /* Note: tmp == 0 or |tmp| > 2^-65 and scale > 2^-928, so there
      is no spurious underflow here even without fma.  */
   return scale + scale * tmp;

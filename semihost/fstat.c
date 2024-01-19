@@ -47,7 +47,14 @@ struct timeval __semihost_write_time, __semihost_creat_time;
 int
 fstat (int fd, struct stat *sbuf )
 {
-	int size = sys_semihost_flen(fd);
+        fd = _map_stdio(fd);
+
+	int size;
+
+        if (fd > 0)
+                size = sys_semihost_flen(fd);
+        else
+                size = -1;
 
 	if (size > 0) {
 		sbuf->st_size = size;

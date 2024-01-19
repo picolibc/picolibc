@@ -30,16 +30,6 @@
 
 /* $Id: strtod.c 2191 2010-11-05 13:45:57Z arcanum $ */
 
-
-#include <ctype.h>
-#include <errno.h>
-#include <limits.h>
-#include <math.h>		/* INFINITY, NAN		*/
-#include <string.h>
-#include <stdlib.h>
-#include <inttypes.h>
-#include <stdbool.h>
-
 #define STRTOLD
 
 #include "stdio_private.h"
@@ -81,7 +71,7 @@ strtold (const char * nptr, char ** endptr)
     long double flt;
     unsigned char ret;
 
-    while (ISSPACE(nptr[len]))
+    while (isspace(nptr[len]))
         len++;
 
     ret = conv_flt(nptr, &len, INT_MAX, &flt, FL_LONG);

@@ -47,6 +47,7 @@ is used to validate the code for all patch integration:
  * Nios II
  * Power9
  * RISC-V (both 32- and 64- bit)
+ * SparcV8 (32 bit)
  * x86_64 (Native and Linux hosted, for testing)
 
 There is also build infrastructure and continuous build validation,
@@ -137,11 +138,67 @@ use Picolibc:
  * [Printf and Scanf in Picolibc](doc/printf.md)
  * [Thread Local Storage](doc/tls.md)
  * [Re-entrancy and Locking](doc/locking.md)
+ * [Selecting ctype implementation](doc/ctype.md)
  * [Picolibc as embedded source](doc/embedsource.md)
  * [Releasing Picolibc](doc/releasing.md)
  * [Copyright and license information](COPYING.picolibc)
 
 ## Releases
+
+### Picolibc version 1.8.6
+
+ * Fix some FORTITY_SOURCE issues with tinystdio
+
+ * Add __eh_* symbols to picolibc.ld for LLVM libunwind. Thanks Alex
+   Richardson.
+
+ * Merge in newlib annual release (4.4.0). Some minor updates to
+   aarch64 assembly code formatting (thanks to Sebastian Huber) and a
+   few other fixes.
+
+ * Enable 32-bit SPARC for testing.
+
+ * Fix a bunch of fmemopen bugs and add some tests. Thanks to Alex
+   Richardson.
+
+ * Finish support for targets with unusual float types, mapping
+   target types to 32-, 64-, 80- and 128- bit picolibc code.
+
+ * Add SuperH support, including testing infrastructure. Thanks to
+   Adrian Siekierka for help with this.
+
+ * Improve debugger stack trace in risc-v exception code. Thanks to
+   Alex Richardson.
+
+ * Add an option (-Dfast-bufio=true) for more efficient fread/fwrite
+   implementations when layered atop bufio. Thanks for the suggestion
+   from Zachary Yedidia.
+
+ * Fix cmake usage of FORMAT_ variables (note the lack of a leading
+   underscore).
+
+ * Remove explicit _POSIX_C_SOURCE definition in zephyr/zephr.cmake.
+
+ * Clean up public inline functions to share a common mechanism for
+   using gnu_inline semantics. Fix isblank. This ensures that no
+   static inline declarations exist in public API headers which are
+   required to be external linkage ("real") symbols.
+
+ * Create an alternate ctype implementation that avoids using the
+   _ctype_ array and just does direct value comparisons. This only
+   works when picolibc is limited to ASCII. Applications can select
+   whether they want this behavior at application compilation time
+   without needing to rebuild the C library. Thanks to P. Frost for
+   the suggestion.
+
+ * Unify most fenv implementations to use gnu_inline instead of
+   regular functions to improve performance. x86 was left out because
+   those fenv functions are complicated by the mix of 8087 and modern
+   FPU support.
+
+ * Add a separate FILE for stderr when using POSIX I/O. Split
+   stdin/stdout/stderr into three files to avoid pulling in
+   those which aren't used. Thanks to Zachary Yedidia.
 
 ### Picolibc version 1.8.5
 

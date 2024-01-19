@@ -63,11 +63,15 @@ PORTABILITY
 No supporting OS subroutines are required.
 */
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
+#include <ctype.h>
 #include <wctype.h>
 
 int
 iswpunct (wint_t c)
 {
+#ifdef _MB_CAPABLE
   return iswpunct_l (c, 0);
+#else
+  return c < (wint_t)0x100 ? ispunct (c) : 0;
+#endif
 }

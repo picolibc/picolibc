@@ -130,7 +130,7 @@ Supporting OS subroutines required:
    This could be changed in the future should the __ldtoa code be
    preferred over __dtoa.  */
 #define _NO_LONGDBL
-#if defined _WANT_IO_LONG_DOUBLE && (LDBL_MANT_DIG > DBL_MANT_DIG)
+#if defined _WANT_IO_LONG_DOUBLE && (LDBL_MANT_DIG == 64)
 #undef _NO_LONGDBL
 #endif
 
@@ -568,7 +568,11 @@ _SVFSCANF (
 
   _newlib_flockfile_start (fp);
 
-  ORIENT (fp, -1);
+  if (ORIENT (fp, -1) != -1)
+    {
+      nassigned = EOF;
+      goto all_done;
+    }
 
   nassigned = 0;
   nread = 0;

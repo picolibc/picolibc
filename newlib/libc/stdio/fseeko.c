@@ -248,7 +248,7 @@ fseeko (
 	curoff = fp->_offset;
       else
 	{
-	  curoff = seekfn (ptr, fp->_cookie, 0L, SEEK_CUR);
+	  curoff = seekfn (fp->_cookie, 0L, SEEK_CUR);
 	  if (curoff == POS_ERR)
 	    goto dumb;
 	}
@@ -284,7 +284,7 @@ fseeko (
    * and return.
    */
 
-  if (target >= curoff && target < curoff + n)
+  if (target >= curoff && (size_t) target < (size_t) curoff + n)
     {
       register int o = target - curoff;
 
@@ -308,7 +308,7 @@ fseeko (
    */
 
   curoff = target & ~(fp->_blksize - 1);
-  if (seekfn (ptr, fp->_cookie, curoff, SEEK_SET) == POS_ERR)
+  if (seekfn (fp->_cookie, curoff, SEEK_SET) == POS_ERR)
     goto dumb;
   fp->_r = 0;
   fp->_p = fp->_bf._base;
@@ -318,7 +318,7 @@ fseeko (
   n = target - curoff;
   if (n)
     {
-      if (_srefill ( fp) || fp->_r < n)
+      if (_srefill ( fp) || fp->_r < (int) n)
 	goto dumb;
       fp->_p += n;
       fp->_r -= n;

@@ -33,8 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-srcs_libm_machine_real = [
-  'fenv.c',
+srcs_libm_machine = [
 ]
 
 srcs_libm_machine_complex128 = [
@@ -42,24 +41,7 @@ srcs_libm_machine_complex128 = [
 ]
 
 if cc.has_function('__mulkc3_hw', args: core_c_args + [lib_gcc])
-  srcs_libm_machine_real += srcs_libm_machine_complex128
+  srcs_libm_machine += srcs_libm_machine_complex128
 endif
 
-srcs_libm_machine = srcs_libm_machine_real + [
-  'feclearexcept.c',
-  'fedisableexcept.c',
-  'feenableexcept.c',
-  'fegetenv.c',
-  'fegetexcept.c',
-  'fegetexceptflag.c',
-  'fegetround.c',
-  'feholdexcept.c',
-  'feraiseexcept.c',
-  'fesetenv.c',
-  'fesetexceptflag.c',
-  'fesetround.c',
-  'fetestexcept.c',
-  'feupdateenv.c',
-]
-
-src_libm_machine = files(srcs_libm_machine_real)
+src_libm_machine = files(srcs_libm_machine)

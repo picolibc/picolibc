@@ -31,14 +31,6 @@
 /* $Id: strtod.c 2191 2010-11-05 13:45:57Z arcanum $ */
 
 
-#include <ctype.h>
-#include <errno.h>
-#include <limits.h>
-#include <math.h>		/* INFINITY, NAN		*/
-#include <string.h>
-#include <stdlib.h>
-#include <inttypes.h>
-
 /**  The strtod() function converts the initial portion of the string pointed
      to by \a nptr to double representation.
 
@@ -78,7 +70,7 @@ strtod (const char * nptr, char ** endptr)
     double flt;
     unsigned char ret;
 
-    while (ISSPACE(nptr[len]))
+    while (isspace(nptr[len]))
         len++;
 
     ret = conv_flt(nptr, &len, INT_MAX, &flt, FL_LONG);

@@ -39,10 +39,7 @@
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
-#define _DEFAULT_SOURCE
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "stdio_private.h"
 
 /* No requirement for re-entrancy for this variable */
 static char _tmpnam[L_tmpnam];

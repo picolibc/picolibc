@@ -33,8 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
-#include <errno.h>
+#include "stdio_private.h"
 
 #ifndef FSEEK_TYPE
 #define FSEEK_TYPE long

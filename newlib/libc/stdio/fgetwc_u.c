@@ -34,6 +34,7 @@ wint_t
 fgetwc_unlocked (
 	register FILE *fp)
 {
-  ORIENT(fp, 1);
+  if (ORIENT(fp, 1) != 1)
+    return WEOF;
   return __fgetwc (fp);
 }

@@ -35,7 +35,7 @@
 
 #if	!defined (SCANF_LEVEL)
 # define SCANF_LEVEL SCANF_DBL
-# ifndef FORMAT_DEFAULT_DOUBLE
+# ifndef _FORMAT_DEFAULT_DOUBLE
 #  define vfscanf __d_vfscanf
 # endif
 #endif
@@ -112,21 +112,6 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap) __attribute__((weak));
 #else
 # error	 "Not a known scanf level."
 #endif
-
-#define CASE_CONVERT    ('a' - 'A')
-#define TOLOWER(c)        ((c) | CASE_CONVERT)
-
-static inline int
-ISSPACE(int c)
-{
-    return ('\011' <= c && c <= '\015') || c == ' ';
-}
-
-static inline int
-ISDIGIT(int c)
-{
-    return '0' <= c && c <= '9';
-}
 
 typedef unsigned int width_t;
 

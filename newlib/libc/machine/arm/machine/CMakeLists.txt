@@ -35,6 +35,7 @@
 picolibc_headers(machine
   acle-compat.h
   _endian.h
+  fenv-fp.h
   math.h
   param.h
   )

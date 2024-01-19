@@ -85,7 +85,7 @@ EXPONENT(FLOAT_T x)
     return _exponent64(asuint64(x));
 }
 
-#ifdef PICOLIBC_DOUBLE_NOEXCEPT
+#ifdef PICOLIBC_FLOAT64_NOEXCEPT
 #define feraiseexcept(x) ((void) (x))
 #endif
 

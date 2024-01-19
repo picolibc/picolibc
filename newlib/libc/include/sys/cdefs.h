@@ -330,6 +330,9 @@
  * __generic().  Unlike _Generic(), this macro can only distinguish
  * between a single type, so it requires nested invocations to
  * distinguish multiple cases.
+ *
+ * Note that the comma operator is used to force expr to decay in
+ * order to match _Generic().
  */
 
 #if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L) || \
@@ -339,7 +342,7 @@
 #elif __GNUC_PREREQ__(3, 1) && !defined(__cplusplus)
 #define	__generic(expr, t, yes, no)					\
 	__builtin_choose_expr(						\
-	    __builtin_types_compatible_p(__typeof(expr), t), yes, no)
+	    __builtin_types_compatible_p(__typeof((0, (expr))), t), yes, no)
 #endif
 
 /*
@@ -387,6 +390,13 @@
 #endif
 #endif
 
+#if defined(_HAVE_ATTRIBUTE_ALWAYS_INLINE) && defined(_HAVE_ATTRIBUTE_GNU_INLINE)
+/*
+ * When this macro is defined, use it to declare inline versions of extern functions.
+ */
+#define __declare_extern_inline(type) extern __inline type __attribute((gnu_inline, always_inline))
+#endif
+
 #if defined(__clang__) && defined(__nonnull)
 /* Clang has a builtin macro __nonnull for the _Nonnull qualifier */
 #undef __nonnull
@@ -425,17 +435,28 @@
 #endif
 
 /*
- * GCC 2.95 provides `__restrict' as an extension to C90 to support the
- * C99-specific `restrict' type qualifier.  We happen to use `__restrict' as
- * a way to define the `restrict' type qualifier without disturbing older
- * software that is unaware of C99 keywords.
+ * We use `__restrict' as a way to define the `restrict' type qualifier
+ * without disturbing older software that is unaware of C99 keywords.
+ * GCC also provides `__restrict' as an extension to support C99-style
+ * restricted pointers in other language modes.
  */
-#if !(__GNUC__ == 2 && __GNUC_MINOR__ == 95)
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901
-#define	__restrict
-#else
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901
 #define	__restrict	restrict
+#elif !__GNUC_PREREQ__(2, 95)
+#define	__restrict
 #endif
+
+/*
+ * Additionally, we allow to use `__restrict_arr' for declaring arrays as
+ * non-overlapping per C99.  That's supported since gcc 3.1, but it's not
+ * allowed in C++.
+ */
+#if defined(__cplusplus) || !__GNUC_PREREQ__(3, 1)
+#define __restrict_arr
+#elif defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
+#define __restrict_arr       restrict
+#else
+#define __restrict_arr
 #endif
 
 /*

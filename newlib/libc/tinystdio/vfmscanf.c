@@ -31,13 +31,13 @@
 */
 
 #define SCANF_LEVEL SCANF_MIN
-#ifndef FORMAT_DEFAULT_MINIMAL
+#ifndef _FORMAT_DEFAULT_MINIMAL
 #define vfscanf __m_vfscanf
 #endif
 
 #include "vfscanf.c"
 
-#ifdef FORMAT_DEFAULT_MINIMAL
+#ifdef _FORMAT_DEFAULT_MINIMAL
 #ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(vfscanf, __m_vfscanf);
 #else

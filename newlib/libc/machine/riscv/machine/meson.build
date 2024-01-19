@@ -33,6 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 inc_machine_headers_machine = [
+  'fenv-fp.h',
   'math.h'
 ]
 

@@ -4,7 +4,9 @@
  * Copyright (c) 2010-2019 Red Hat, Inc.
  */
 
-#ifndef _SOFT_FLOAT
+#ifdef _SOFT_FLOAT
+#include "../../fenv/fenv.c"
+#else
 
 #define _GNU_SOURCE        // for FE_NOMASK_ENV
 
@@ -278,6 +280,29 @@ feraiseexcept (int excepts)
 
   /* And trigger them - whichever are unmasked.  */
   __asm__ volatile ("fwait");
+
+  return 0;
+}
+
+/*  This function sets the supported exceptions indicated by
+   excepts.  The function returns
+   zero in case the operation was successful, a non-zero value otherwise.  */
+int
+fesetexcept (int excepts)
+{
+  fenv_t fenv;
+
+  if (excepts & ~FE_ALL_EXCEPT)
+    return EINVAL;
+
+  /* Need to save/restore whole environment to modify status word.  */
+  __asm__ volatile ("fnstenv %0" : "=m" (fenv) : );
+
+  /* Set desired exception bits.  */
+  fenv._fpu._fpu_sw |= excepts;
+
+  /* Set back into FPU state.  */
+  __asm__ volatile ("fldenv %0" :: "m" (fenv));
 
   return 0;
 }

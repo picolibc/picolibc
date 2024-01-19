@@ -144,6 +144,7 @@ No supporting OS subroutines are required.
  */
 
 #define _DEFAULT_SOURCE
+#define _PICOLIBC_CTYPE_SMALL 0
 #include <newlib.h>
 #include <errno.h>
 #include <string.h>
@@ -306,7 +307,7 @@ setlocale (
 
   if (category < LC_ALL || category >= _LC_LAST)
     {
-      __errno_r(p) = EINVAL;
+      _REENT_ERRNO(p) = EINVAL;
       return NULL;
     }
 
@@ -332,7 +333,7 @@ setlocale (
 	      env = __get_locale_env (i);
 	      if (strlen (env) > ENCODING_LEN)
 		{
-		  __errno_r(p) = EINVAL;
+		  _REENT_ERRNO(p) = EINVAL;
 		  return NULL;
 		}
 	      strcpy (new_categories[i], env);
@@ -343,7 +344,7 @@ setlocale (
 	  env = __get_locale_env (category);
 	  if (strlen (env) > ENCODING_LEN)
 	    {
-	      __errno_r(p) = EINVAL;
+	      _REENT_ERRNO(p) = EINVAL;
 	      return NULL;
 	    }
 	  strcpy (new_categories[category], env);
@@ -353,7 +354,7 @@ setlocale (
     {
       if (strlen (locale) > ENCODING_LEN)
 	{
-	  __errno_r(p) = EINVAL;
+	  _REENT_ERRNO(p) = EINVAL;
 	  return NULL;
 	}
       strcpy (new_categories[category], locale);
@@ -364,7 +365,7 @@ setlocale (
 	{
 	  if (strlen (locale) > ENCODING_LEN)
 	    {
-	      __errno_r(p) = EINVAL;
+	      _REENT_ERRNO(p) = EINVAL;
 	      return NULL;
 	    }
 	  for (i = 1; i < _LC_LAST; ++i)
@@ -376,7 +377,7 @@ setlocale (
 	    ;
 	  if (!r[1])
 	    {
-	      __errno_r(p) = EINVAL;
+	      _REENT_ERRNO(p) = EINVAL;
 	      return NULL;  /* Hmm, just slashes... */
 	    }
 	  do
@@ -385,7 +386,7 @@ setlocale (
 		break;  /* Too many slashes... */
 	      if ((len = r - locale) > ENCODING_LEN)
 		{
-		  __errno_r(p) = EINVAL;
+		  _REENT_ERRNO(p) = EINVAL;
 		  return NULL;
 		}
 	      strlcpy (new_categories[i], locale, len + 1);
@@ -418,7 +419,7 @@ setlocale (
       strcpy (saved_categories[i], __get_global_locale ()->categories[i]);
       if (__loadlocale (__get_global_locale (), i, new_categories[i]) == NULL)
 	{
-	  saverr = __errno_r(p);
+	  saverr = _REENT_ERRNO(p);
 	  for (j = 1; j < i; j++)
 	    {
 	      strcpy (new_categories[j], saved_categories[j]);
@@ -429,7 +430,7 @@ setlocale (
 		  __loadlocale (__get_global_locale (), j, new_categories[j]);
 		}
 	    }
-	  __errno_r(p) = saverr;
+	  _REENT_ERRNO(p) = saverr;
 	  return NULL;
 	}
     }

@@ -34,6 +34,7 @@
 #
 lib_semihost_srcs = [
   'arc_close.c',
+  'arc_errno.c',
   'arc_exit.c',
   'arc_fstat.c',
   'arc_lseek.c',
@@ -63,7 +64,7 @@ foreach target : targets
 				       install : true,
 				       install_dir : instdir,
 				       include_directories : inc,
-				       c_args : value[1],
+				       c_args : value[1] + c_args,
 				       pic: false)
 
   set_variable('lib_semihost' + target, local_lib_semihost_target)

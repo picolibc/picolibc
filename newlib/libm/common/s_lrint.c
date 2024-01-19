@@ -75,6 +75,7 @@ TWO52[2]={
  _F_64(-4.50359962737049600000e+15), /* 0xC3300000, 0x00000000 */
 };
 
+#include <stdio.h>
 long int
 lrint64(__float64 x)
 {
@@ -125,7 +126,7 @@ lrint64(__float64 x)
           if (sizeof (long) == 4 && x > LONG_MAX) {
             t = nearbyint(x);
             if (t == LONG_MAX)
-              __math_set_inexact();
+              __math_set_inexact64();
             else
               __math_set_invalid();
           } else {
@@ -153,7 +154,7 @@ lrint64(__float64 x)
     {
       if (sizeof (long) == 4 && (__float64) LONG_MIN - _F_64(1.0) < x && x < (__float64) LONG_MIN) {
         if (nearbyint(x) == LONG_MIN)
-          __math_set_inexact();
+          __math_set_inexact64();
         else
           __math_set_invalid();
         return LONG_MIN;

@@ -77,7 +77,5 @@ typedef uintptr_t sh_param_t;
 uintptr_t
 sys_semihost(uintptr_t op, uintptr_t param);
 
-#ifndef TINY_STDIO
 int
 _map_stdio(int fd);
-#endif

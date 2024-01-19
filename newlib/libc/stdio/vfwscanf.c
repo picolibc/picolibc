@@ -494,7 +494,11 @@ _SVFWSCANF (
 
   _newlib_flockfile_start (fp);
 
-  ORIENT (fp, 1);
+  if (ORIENT (fp, 1) != 1)
+    {
+      nassigned = EOF;
+      goto all_done;
+    }
 
   nassigned = 0;
   nread = 0;

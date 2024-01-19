@@ -24,8 +24,8 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE. */
 
-#include "ftoa_engine.h"
-#include <stdint.h>
+#define _NEED_IO_FLOAT32
+#include "dtoa.h"
 
 /*
  * 2^b ~= f * r * 10^e
@@ -87,7 +87,7 @@ static const uint32_t factorTable[32] = {
 		__typeof(b) _b = b;\
 		_a < _b ? _a : _b; })
 
-int __ftoa_engine(float val, struct ftoa *ftoa, int maxDigits, bool fmode, int maxDecimals) 
+int __ftoa_engine(float val, struct dtoa *ftoa, int maxDigits, bool fmode, int maxDecimals) 
 {
     uint8_t flags = 0;
 
@@ -106,7 +106,7 @@ int __ftoa_engine(float val, struct ftoa *ftoa, int maxDigits, bool fmode, int m
     /* Read the sign, shift the exponent in place and delete it from frac.
      */
     if (x.u & ((uint32_t)1 << 31))
-        flags = FTOA_MINUS;
+        flags = DTOA_MINUS;
 
     uint8_t exp = x.u >> 23;
 
@@ -117,14 +117,14 @@ int __ftoa_engine(float val, struct ftoa *ftoa, int maxDigits, bool fmode, int m
      */
     if(exp==0 && frac==0)
     {
-        flags |= FTOA_ZERO;
+        flags |= DTOA_ZERO;
 	ftoa->digits[0] = '0';
 	maxDigits = 1;
     } else if(exp == 0xff) {
         if(frac == 0)
-            flags |= FTOA_INF;
+            flags |= DTOA_INF;
         else
-            flags |= FTOA_NAN;
+            flags |= DTOA_NAN;
     } else {
 
         /* The implicit leading 1 is made explicit, except if value
@@ -243,12 +243,11 @@ int __ftoa_engine(float val, struct ftoa *ftoa, int maxDigits, bool fmode, int m
 		exp10++;
 		if (fmode)
 		    maxDigits = min(saveMaxDigits, max(1, maxDecimals + exp10 + 1));
-		flags |= FTOA_CARRY;
+		flags |= DTOA_CARRY;
 	    }
         }
         ftoa->exp = exp10;
     }
     ftoa->flags = flags;
-    ftoa->digits[maxDigits] = '\0';
     return maxDigits;
 }

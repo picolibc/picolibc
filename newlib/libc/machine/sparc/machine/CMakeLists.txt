@@ -33,5 +33,6 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 picolibc_headers(machine
+  fenv-fp.h
   sparclet.h
   )

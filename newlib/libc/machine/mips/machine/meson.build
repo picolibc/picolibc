@@ -35,7 +35,6 @@
 inc_machine_headers_machine = [
   'asm.h',
   'fenv-fp.h',
-  'fenv-softfloat.h',
   'regdef.h',
 ]
 

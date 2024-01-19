@@ -104,6 +104,15 @@ static inline void __bufio_unlock(FILE *f) {
 }
 
 int
+__bufio_flush_locked(FILE *f);
+
+int
+__bufio_fill_locked(FILE *f);
+
+int
+__bufio_setdir_locked(FILE *f, uint8_t dir);
+
+int
 __bufio_flush(FILE *f);
 
 int

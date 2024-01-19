@@ -350,11 +350,7 @@ int __issignalingf(float f);
 int __issignaling(double d);
 
 #if defined(_HAVE_LONG_DOUBLE)
-#if __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__ && __SIZEOF_DOUBLE__ > 0
-static inline int __issignalingl(long double d) { return __issignaling((double) d); }
-#else
 int __issignalingl(long double d);
-#endif
 #define issignaling(__x)						\
 	((sizeof(__x) == sizeof(float))  ? __issignalingf(__x) :	\
 	 (sizeof(__x) == sizeof(double)) ? __issignaling ((double) (__x)) :	\

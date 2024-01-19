@@ -26,9 +26,9 @@
 #include "local.h"
 
 #undef snprintf
-
 int
-snprintf (char *__restrict str,
+snprintf (
+       char *__restrict str,
        size_t size,
        const char *__restrict fmt, ...)
 {
@@ -42,11 +42,12 @@ snprintf (char *__restrict str,
       return EOF;
     }
   f._flags = __SWR | __SSTR;
+  f._flags2 = 0;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = (size > 0 ? size - 1 : 0);
   f._file = -1;  /* No file. */
   va_start (ap, fmt);
-  ret = svfprintf ( &f, fmt, ap);
+  ret = svfprintf (&f, fmt, ap);
   va_end (ap);
   if (ret < EOF)
     _REENT_ERRNO(ptr) = EOVERFLOW;
@@ -56,7 +57,16 @@ snprintf (char *__restrict str,
 }
 
 #ifdef _NANO_FORMATTED_IO
-int __nonnull((1, 3)) _NOTHROW
+int
 sniprintf (char *, size_t, const char *, ...)
        _ATTRIBUTE ((__alias__("snprintf")));
+#endif
+
+#ifdef __LONG_DOUBLE_IEEE128__
+#if defined(_HAVE_ALIAS_ATTRIBUTE)
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(snprintf, __snprintfieee128);
+#endif
 #endif

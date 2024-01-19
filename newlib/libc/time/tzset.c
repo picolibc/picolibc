@@ -112,7 +112,6 @@ Supporting OS subroutine required: None
 
 static char __tzname_std[TZNAME_MAX + 2];
 static char __tzname_dst[TZNAME_MAX + 2];
-static char *prev_tzenv = NULL;
 
 void
 _tzset_unlocked (void)
@@ -133,18 +132,8 @@ _tzset_unlocked (void)
 	_tzname[1] = "GMT";
 	tz->__tzrule[0] = default_tzrule;
 	tz->__tzrule[1] = default_tzrule;
-	free(prev_tzenv);
-	prev_tzenv = NULL;
 	return;
       }
-
-  if (prev_tzenv != NULL && strcmp(tzenv, prev_tzenv) == 0)
-    return;
-
-  free(prev_tzenv);
-  prev_tzenv = malloc (strlen(tzenv) + 1);
-  if (prev_tzenv != NULL)
-    strcpy (prev_tzenv, tzenv);
 
   /* default to unnamed UTC in case of error */
   _timezone = 0;

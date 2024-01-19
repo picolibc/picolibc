@@ -67,7 +67,7 @@ trunc64(__float64 x)
         mask = ~(0x000fffffffffffffLL >> exp);
     }
 
-    return _asdouble(ix & mask);
+    return _asfloat64(ix & mask);
 }
 
 _MATH_ALIAS_d_d(trunc)

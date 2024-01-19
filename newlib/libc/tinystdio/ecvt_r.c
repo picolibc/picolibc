@@ -33,15 +33,11 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
-#include <_ansi.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
+#if __SIZEOF_DOUBLE__ == 8
 
-typedef double FLOAT;
+#define _NEED_IO_FLOAT64
 
-#include "dtoa_engine.h"
+#include "dtoa.h"
 
 int
 ecvt_r (double invalue,
@@ -82,3 +78,19 @@ ecvt_r (double invalue,
     buf[ndigit] = '\0';
     return 0;
 }
+
+#elif __SIZEOF_DOUBLE__ == 4
+
+#include "stdio_private.h"
+
+int
+ecvt_r (double invalue,
+        int ndigit,
+        int *decpt,
+        int *sign,
+        char *buf,
+        size_t len)
+{
+    return ecvtf_r(invalue, ndigit, decpt, sign, buf, len);
+}
+#endif

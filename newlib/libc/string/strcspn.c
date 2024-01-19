@@ -53,12 +53,10 @@ strcspn (const char *s1,
       for (c = s2; *c; c++)
 	{
 	  if (*s1 == *c)
-	    break;
+	    goto end;
 	}
-      if (*c)
-	break;
       s1++;
     }
-
+end:
   return s1 - s;
 }

@@ -67,13 +67,15 @@ PORTABILITY
 No supporting OS subroutines are required.
 */
 
-#include <_ansi.h>
 #include <ctype.h>
-
 
 #undef isdigit
 int
 isdigit (int c)
 {
-	return(__CTYPE_PTR[c+1] & _N);
+#if _PICOLIBC_CTYPE_SMALL
+    return '0' <= c && c <= '9';
+#else
+    return __CTYPE_PTR[c+1] & _N;
+#endif
 }

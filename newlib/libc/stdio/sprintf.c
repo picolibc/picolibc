@@ -586,6 +586,7 @@ sprintf (
   FILE f;
 
   f._flags = __SWR | __SSTR;
+  f._flags2 = 0;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = INT_MAX;
   f._file = -1;  /* No file. */
@@ -597,7 +598,16 @@ sprintf (
 }
 
 #ifdef _NANO_FORMATTED_IO
-int __nonnull((1, 2)) _NOTHROW
-siprintf ( char *, const char *, ...)
+int
+siprintf (char *, const char *, ...)
        _ATTRIBUTE ((__alias__("sprintf")));
+#endif
+
+#ifdef __LONG_DOUBLE_IEEE128__
+#if defined(_HAVE_ALIAS_ATTRIBUTE)
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(sprintf, __sprintfieee128);
+#endif
 #endif

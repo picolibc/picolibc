@@ -32,13 +32,13 @@
 
 #define PICOLIBC_FLOAT_PRINTF_SCANF
 #define SCANF_LEVEL SCANF_FLT
-#ifndef FORMAT_DEFAULT_FLOAT
+#ifndef _FORMAT_DEFAULT_FLOAT
 #define vfscanf __f_vfscanf
 #endif
 
 #include "vfscanf.c"
 
-#ifdef FORMAT_DEFAULT_FLOAT
+#ifdef _FORMAT_DEFAULT_FLOAT
 #ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(vfscanf, __f_vfscanf);
 #else

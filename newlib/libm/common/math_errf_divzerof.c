@@ -34,8 +34,6 @@ static CONST_FORCE_FLOAT VAL = pick_float_except(0.0f, (float) INFINITY);
 HIDDEN float
 __math_divzerof (uint32_t sign)
 {
-    float y = pick_float_except(1.0f / VAL, VAL);
-    if (sign)
-        y = -y;
+    float y = pick_float_except((sign ? -1.0f : 1.0f) / VAL, (sign ? -(VAL) : VAL));
     return __math_with_errnof (y, ERANGE);
 }

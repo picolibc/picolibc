@@ -32,13 +32,13 @@
 
 #define PICOLIBC_INTEGER_PRINTF_SCANF
 #define PRINTF_LEVEL PRINTF_STD
-#ifndef FORMAT_DEFAULT_INTEGER
+#ifndef _FORMAT_DEFAULT_INTEGER
 #define vfprintf __i_vfprintf
 #endif
 
 #include "vfprintf.c"
 
-#ifdef FORMAT_DEFAULT_INTEGER
+#ifdef _FORMAT_DEFAULT_INTEGER
 #ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(vfprintf, __i_vfprintf);
 #else

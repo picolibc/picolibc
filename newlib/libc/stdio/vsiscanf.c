@@ -36,6 +36,7 @@ vsiscanf (
   FILE f;
 
   f._flags = __SRD | __SSTR;
+  f._flags2 = 0;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._r = strlen (str);
   f._read = __seofread;

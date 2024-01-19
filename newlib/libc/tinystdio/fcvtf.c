@@ -33,11 +33,9 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
-#include <_ansi.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ftoa_engine.h"
+#define _NEED_IO_FLOAT
+
+#include "dtoa.h"
 
 #define FCVTF_MAXDIG (__FLT_MAX_10_EXP__ + FTOA_MAX_DIG + 1)
 

@@ -11,7 +11,7 @@ for arch in arm riscv; do
 
     DIR=$PICOLIBC_DIR/builds/build-$arch-minsize
 
-    $test rm -r $DIR
+    $test rm -rf $DIR
     $test mkdir -p $DIR
     $test cd $DIR
 
@@ -24,7 +24,7 @@ for arch in arm riscv; do
 
     DIR=$PICOLIBC_DIR/builds/build-$arch-release
 
-    $test rm -r $DIR
+    $test rm -rf $DIR
     $test mkdir -p $DIR
     $test cd $DIR
 
@@ -41,7 +41,7 @@ for arch in arm riscv; do
 
     DIR=$GLIBC_DIR/builds/build-$arch-minsize
 
-    $test rm -r $DIR
+    $test rm -rf $DIR
     $test mkdir -p $DIR
     $test cd $DIR
 
@@ -54,7 +54,7 @@ for arch in arm riscv; do
 
     DIR=$GLIBC_DIR/builds/build-$arch-release
 
-    $test rm -r $DIR
+    $test rm -rf $DIR
     $test mkdir -p $DIR
     $test cd $DIR
 

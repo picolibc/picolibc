@@ -22,4 +22,4 @@ __isinff (float x)
 	return FLT_UWORD_IS_INFINITE(ix);
 }
 
-_MATH_ALIAS_f_f(__isinf)
+_MATH_ALIAS_i_f(__isinf)

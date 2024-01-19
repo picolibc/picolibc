@@ -44,9 +44,12 @@
 ssize_t
 read(int fd, void *buf, size_t count)
 {
-#ifndef TINY_STDIO
+        if (fd == 0) {
+                int ch = sys_semihost_getc((FILE *) 0);
+                *(char *) buf = ch;
+                return 1;
+        }
 	fd = _map_stdio(fd);
-#endif
 	uintptr_t ret = sys_semihost_read(fd, buf, count);
 
 	ssize_t got = count - (ssize_t) ret;

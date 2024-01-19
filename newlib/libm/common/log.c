@@ -142,7 +142,7 @@ log (double x)
   iz = ix - (tmp & 0xfffULL << 52);
   invc = T[i].invc;
   logc = T[i].logc;
-  z = asdouble (iz);
+  z = asfloat64 (iz);
 
   /* log(x) = log1p(z/c-1) + log(c) + k*Ln2.  */
   /* r ~= z/c - 1, |r| < 1/(2*N).  */

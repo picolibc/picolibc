@@ -1,5 +1,3 @@
-#ifndef _NO_DIRNAME
-
 /* Copyright 2005 Shaun Jackman
  * Permission to use, copy, modify, and distribute this software
  * is freely granted, provided that this notice is preserved.
@@ -8,12 +6,13 @@
 #include <libgen.h>
 #include <string.h>
 
-#if __GNUC__ == 12 && __GNUC_MINOR__ >= 2 && __OPTIMIZE_SIZE__
+#if defined(__GNUC__) && !defined(clang) && __OPTIMIZE_SIZE__
 /*
  * GCC 12.x has a bug in -Os mode on (at least) arm v8.1-m which
  * mis-compiles this function. Work around that by switching
  * optimization mode
  */
+#pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC optimize("O2")
 #endif
 
@@ -38,5 +37,3 @@ dirname (char *path)
 		p == path ? "/" :
 		(*p = '\0', path);
 }
-
-#endif /* !_NO_DIRNAME  */

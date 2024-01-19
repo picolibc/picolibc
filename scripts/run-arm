@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -52,6 +52,7 @@ cpu_arch=`arm-none-eabi-readelf -A "$elf" | awk '/Tag_CPU_arch:/ { print $2 }'`
 cpu_profile=`arm-none-eabi-readelf -A "$elf" | awk '/Tag_CPU_arch_profile:/ { print $2 }'`
 fp_arch=`arm-none-eabi-readelf -A "$elf" | awk '/Tag_FP_arch/ { print $2 }'`
 fp_use=`arm-none-eabi-readelf -A "$elf" | awk '/Tag_ABI_HardFP_use/ { print $2 }'`
+ram_addr=`arm-none-eabi-readelf -l "$elf" | awk '/LOAD.*RW/ { if (min_va == 0 || $3 < min_va) min_va = $3; } END { print(min_va); }'`
 
 case "$cpu_arch"/"$cpu_profile" in
     v4T/)
@@ -65,6 +66,9 @@ case "$cpu_arch"/"$cpu_profile" in
         ;;
     v7/Application|v7/)
         case "$fp_arch" in
+            VFPv3)
+                cpu=cortex-a9
+                ;;
             VFPv3-D16)
                 cpu=cortex-a8
                 ;;
@@ -161,6 +165,19 @@ case $cpu in
 	memory="-m 1G"
         ;;
 
+    cortex-a?)
+        case "$ram_addr" in
+            0x48*)
+                machine=vexpress-a9
+                cpu=cortex-a9
+                ;;
+            *)
+	        machine=none
+                ;;
+        esac
+	memory="-m 1G"
+        ;;
+        
     # The 'none' machine supports many non-M
     # processors
     ti925t|arm*|cortex-a*|cortex-r*)
@@ -192,24 +209,35 @@ chardev=stdio,mux=on,id=stdio0
 
 # Point the semihosting driver at our new chardev
 
-semi=enable=on,chardev=stdio0
-
+cmdline="program-name"
 input=""
+done=0
 
-case "$1" in
-    --)
-	semi="$semi",arg="$2"
-	shift
-	shift
-	;;
-    -*|"")
-	;;
-    *)
-	semi="$semi",arg="$1"
-	input="$1"
-	shift
-	;;
-esac
+while [ "$done" != "1" ]; do
+    case "$1" in
+        --)
+            shift
+            done=1
+            ;;
+        -s|"")
+            done=1
+            ;;
+        *)
+            cmdline="$cmdline $1"
+            case "$input" in
+                "")
+                    input="$1"
+                    ;;
+                *)
+                    input="$input $1"
+                    ;;
+            esac
+            shift
+            ;;
+    esac
+done
+
+semi=enable=on,chardev=stdio0,arg="$cmdline"
 
 # Disable monitor
 
@@ -219,8 +247,13 @@ mon=none
 
 serial=none
 
-# shellcheck disable=SC2086
-echo "$input" | "$qemu" $memory \
+export QEMU_AUDIO_DRV=none
+
+input_file=`mktemp`
+trap 'rm "$input_file"' 0
+echo "$input" > "$input_file"
+
+"$qemu" $memory \
       -chardev "$chardev" \
       -semihosting-config "$semi" \
       -monitor "$mon" \
@@ -229,7 +262,7 @@ echo "$input" | "$qemu" $memory \
       -cpu "$cpu" \
       -device loader,file="$elf",cpu-num=0 \
       -nographic \
-      "$@"
+      "$@" < $input_file 
 
 result=$?
 

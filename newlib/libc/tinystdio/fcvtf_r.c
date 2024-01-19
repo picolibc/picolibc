@@ -33,12 +33,9 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
-#include "ftoa_engine.h"
-#include <_ansi.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
+#define _NEED_IO_FLOAT
+
+#include "dtoa.h"
 
 int
 fcvtf_r (float invalue,
@@ -48,13 +45,13 @@ fcvtf_r (float invalue,
          char *buf,
          size_t len)
 {
-    struct ftoa ftoa;
+    struct dtoa dtoa;
     int ntrailing;      /* number of zeros to add after the value */
     int ndigit;         /* numer of generated digits */
-    int ftoa_decimal = ndecimal;
-    char *digits = ftoa.digits;
+    int dtoa_decimal = ndecimal;
+    char *digits = dtoa.digits;
 
-    if (!__finitef(invalue)) {
+    if (!finitef(invalue)) {
         ndigit = 3;
         ntrailing = 0;
         *sign = invalue < 0;
@@ -66,35 +63,35 @@ fcvtf_r (float invalue,
     } else {
         /* ndecimal = digits after decimal point desired
          * ndigit = digits actually generated
-         * ftoa.exp = exponent (position of decimal relative to first digit generated)
+         * dtoa.exp = exponent (position of decimal relative to first digit generated)
          */
         if (ndecimal < 0)
-            ftoa_decimal = 0;
-        ndigit = __ftoa_engine(invalue, &ftoa, FTOA_MAX_DIG, true, ndecimal);
-        *sign = !!(ftoa.flags & FTOA_MINUS);
+            dtoa_decimal = 0;
+        ndigit = __ftoa_engine(invalue, &dtoa, FTOA_MAX_DIG, true, ndecimal);
+        *sign = !!(dtoa.flags & DTOA_MINUS);
 
         /*
          * To compute the number of zeros added after the value, there are
          * three cases:
          *
          * 1. all of the generated digits are left of the decimal
-         *    point (ftoa.exp >= ndigit). We need (ftoa.exp - ndigit)
+         *    point (dtoa.exp >= ndigit). We need (dtoa.exp - ndigit)
          *    digits left of the decimal and ndecimal right of the
-         *    decimal: (ftoa.exp - ndigit) + ndecimal
+         *    decimal: (dtoa.exp - ndigit) + ndecimal
          *
          * 2. some of the generated digits are right
-         *    of the decimal point (ftoa.exp < ndigit). We need
-         *    ndecimal digits total, but we have (ndigit - ftoa.exp)
-         *    already, so: ndecimal - (ndigit - ftoa.exp).
+         *    of the decimal point (dtoa.exp < ndigit). We need
+         *    ndecimal digits total, but we have (ndigit - dtoa.exp)
+         *    already, so: ndecimal - (ndigit - dtoa.exp).
          *
          * 3. all of the generated digits are right of the decimal point
          *    We need fewer than ndecimal digits by the magnitude of
          *    the exponent (which is negative in this case, so:
-         *    ndecimal - (-ftoa.exp - 1) - ndigit
+         *    ndecimal - (-dtoa.exp - 1) - ndigit
          *
          * These all turn out to be the same computation. Kinda cool.
          */
-        ntrailing = (ftoa.exp + 1 - ndigit) + ftoa_decimal;
+        ntrailing = (dtoa.exp + 1 - ndigit) + dtoa_decimal;
         /*
          * If this value is negative, then we actually have *no* digits to
          * generate. In this case, we return the empty string and set the
@@ -109,9 +106,9 @@ fcvtf_r (float invalue,
              * Adjust exponent to reflect the desired output of ndecimal
              * zeros
              */
-            ftoa.exp = -(ftoa_decimal + 1);
+            dtoa.exp = -(dtoa_decimal + 1);
         }
-        *decpt = ftoa.exp + 1;
+        *decpt = dtoa.exp + 1;
     }
 
     /* If we can't fit the whole value in the provided space,

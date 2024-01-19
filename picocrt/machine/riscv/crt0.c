@@ -103,12 +103,14 @@ _trap(void)
         /* Build a known-working C environment */
 	__asm__(".option	push\n"
                 ".option	norelax\n"
-                "la	sp, __stack\n"
-                "la	gp, __global_pointer$\n"
+                "csrrw  sp, mscratch, sp\n"
+                "la	sp, __heap_end\n"
                 ".option	pop");
 
         /* Make space for saved registers */
-        __asm__("addi   sp,sp,%0" :: "i" (-sizeof(struct fault)));
+        __asm__("addi   sp, sp, %0\n"
+                ".cfi_def_cfa sp, 0\n"
+                :: "i"(-sizeof(struct fault)));
 
         /* Save registers on stack */
 #define SAVE_REG(num)   \
@@ -130,13 +132,25 @@ _trap(void)
         __asm__("csrr   t0, "PASTE(name));\
         __asm__(SD"  t0, %0(sp)" :: "i" (offsetof(struct fault, name)))
 
-        SAVE_CSR(mepc);
+        /*
+         * Save the trapping frame's stack pointer that was stashed in mscratch
+         * and tell the unwinder where we can find the return address (mepc).
+         */
+        __asm__("csrr   ra, mepc\n"
+                SD "    ra, %0(sp)\n"
+                ".cfi_offset ra, %0\n"
+                "csrrw t0, mscratch, zero\n"
+                SD "    t0, %1(sp)\n"
+                ".cfi_offset sp, %1\n"
+                :: "i"(offsetof(struct fault, mepc)),
+                   "i"(offsetof(struct fault, r[2])));
         SAVE_CSR(mcause);
         SAVE_CSR(mtval);
 
         /*
          * Pass pointer to saved registers in first parameter register
          */
+        __asm__("la	gp, __global_pointer$");
         __asm__("mv     a0, sp");
 
         /* Enable FPU (just in case) */
@@ -147,7 +161,7 @@ _trap(void)
                 "csrw	mstatus, t0\n"
                 "csrwi	fcsr, 0");
 #endif
-        __asm__("j      _ctrap");
+        __asm__("jal    _ctrap");
 }
 #endif
 

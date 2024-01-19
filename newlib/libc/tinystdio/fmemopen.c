@@ -34,118 +34,171 @@
  */
 
 #include "stdio_private.h"
-#include <stdlib.h>
-#include <fcntl.h>
-#include <unistd.h>
 
-#define __MALL          0x01
+#define __MALL 0x01
+#define __MAPP 0x02
 
 struct __file_mem {
-        struct __file_ext xfile;
-        char    *buf;
-        size_t  size;
-        size_t  pos;
-        uint8_t mflags;
+    struct __file_ext xfile;
+    char *buf;
+    size_t size; /* Current size. */
+    size_t bufsize; /* Upper limit on size. */
+    size_t pos;
+    uint8_t mflags;
 };
 
-static int __fmem_put(char c, FILE *f)
+static int
+__fmem_put(char c, FILE *f)
 {
-        struct __file_mem *mf = (struct __file_mem *) f;
-        if ((f->flags & __SWR) && mf->pos < mf->size) {
-                mf->buf[mf->pos++] = c;
-                return (unsigned char) c;
-        }
+    struct __file_mem *mf = (struct __file_mem *)f;
+    size_t pos = mf->mflags & __MAPP ? mf->size : mf->pos;
+    if ((f->flags & __SWR) == 0) {
         return _FDEV_ERR;
-}
-
-static int __fmem_get(FILE *f)
-{
-        struct __file_mem *mf = (struct __file_mem *) f;
-        int c;
-        if ((f->flags & __SRD) && mf->pos < mf->size) {
-                c = (unsigned char) mf->buf[mf->pos++];
-                if (c == '\0')
-                        c = _FDEV_EOF;
-        } else
-                c = _FDEV_ERR;
-        return c;
-}
-
-static int __fmem_flush(FILE *f)
-{
-        struct __file_mem *mf = (struct __file_mem *) f;
-        if ((f->flags & __SWR) && mf->pos < mf->size)
-                mf->buf[mf->pos] = '\0';
-        return 0;
-}
-
-static off_t __fmem_seek(FILE *f, off_t pos, int whence)
-{
-        struct __file_mem *mf = (struct __file_mem *) f;
-
-        switch (whence) {
-        case SEEK_SET:
-                break;
-        case SEEK_CUR:
-                pos += mf->pos;
-                break;
-        case SEEK_END:
-                pos += mf->size;
-                break;
+    } else if (pos < mf->bufsize) {
+        mf->buf[pos++] = c;
+        if (pos > mf->size) {
+            mf->size = pos;
+            /* When a stream open for update (the mode argument includes '+') or
+             * for writing only is successfully written and the write advances
+             * the current buffer end position, a null byte shall be written at
+             * the new buffer end position if it fits. */
+            if (mf->size < mf->bufsize) {
+                mf->buf[mf->size] = '\0';
+            }
         }
-        if (pos < 0 || mf->size < (size_t) pos)
-                return EOF;
         mf->pos = pos;
-        return pos;
+        return (unsigned char)c;
+    } else {
+        return _FDEV_EOF;
+    }
 }
 
-static int __fmem_close(FILE *f)
+static int
+__fmem_get(FILE *f)
 {
-        struct __file_mem *mf = (struct __file_mem *) f;
+    struct __file_mem *mf = (struct __file_mem *)f;
+    if ((f->flags & __SRD) == 0) {
+        return _FDEV_ERR;
+    } else if (mf->pos < mf->size) {
+        return (unsigned char)mf->buf[mf->pos++];
+    } else {
+        return _FDEV_EOF;
+    }
+}
 
-        if (mf->mflags & __MALL)
-                free (mf->buf);
-        else
-                __fmem_flush(f);
-        free(f);
-        return 0;
+static int
+__fmem_flush(FILE *f)
+{
+    struct __file_mem *mf = (struct __file_mem *)f;
+    if ((f->flags & __SWR) && mf->pos < mf->bufsize) {
+        mf->buf[mf->pos] = '\0';
+        if (mf->pos > mf->size) {
+            mf->size = mf->pos;
+        }
+    }
+    return 0;
+}
+
+static off_t
+__fmem_seek(FILE *f, off_t pos, int whence)
+{
+    struct __file_mem *mf = (struct __file_mem *)f;
+
+    switch (whence) {
+    case SEEK_SET:
+        break;
+    case SEEK_CUR:
+        pos += mf->pos;
+        break;
+    case SEEK_END:
+        pos += mf->size;
+        break;
+    }
+    _Static_assert(sizeof(off_t) >= sizeof(size_t), "must avoid truncation");
+    if (pos < 0 || (off_t)mf->bufsize < pos)
+        return EOF;
+    mf->pos = pos;
+    return pos;
+}
+
+static int
+__fmem_close(FILE *f)
+{
+    struct __file_mem *mf = (struct __file_mem *)f;
+
+    if (mf->mflags & __MALL)
+        free(mf->buf);
+    else
+        __fmem_flush(f);
+    free(f);
+    return 0;
 }
 
 FILE *
 fmemopen(void *buf, size_t size, const char *mode)
 {
-	int stdio_flags;
-        uint8_t mflags = 0;
-	struct __file_mem *mf;
+    int stdio_flags;
+    uint8_t mflags = 0;
+    size_t initial_pos = 0;
+    size_t initial_size;
+    struct __file_mem *mf;
 
-	stdio_flags = __stdio_sflags(mode);
+    stdio_flags = __stdio_sflags(mode);
 
-	if (stdio_flags == 0)
-		return NULL;
+    if (stdio_flags == 0 || size == 0) {
+        errno = EINVAL;
+        return NULL;
+    }
 
-	/* Allocate file structure and necessary buffers */
-	mf = calloc(1, sizeof(struct __file_mem));
+    /* Allocate file structure and necessary buffers */
+    mf = calloc(1, sizeof(struct __file_mem));
 
-	if (mf == NULL)
-		return NULL;
+    if (mf == NULL)
+        return NULL;
 
-        if (buf == NULL) {
-                buf = malloc(size);
-                if (!buf) {
-                        free(mf);
-                        return NULL;
-                }
-                mflags |= __MALL;
+    if (buf == NULL) {
+        /* POSIX says return EINVAL if: The buf argument is a null pointer and
+         * the mode argument does not include a '+' character. */
+        if ((stdio_flags & (__SRD | __SWR)) != (__SRD | __SWR)) {
+            free(mf);
+            errno = EINVAL;
+            return NULL;
         }
+        buf = malloc(size);
+        if (!buf) {
+            free(mf);
+            errno = ENOMEM;
+            return NULL;
+        }
+        *((char *)buf) = '\0';
+        mflags |= __MALL;
+    }
 
-        *mf = (struct __file_mem) {
-                .xfile = FDEV_SETUP_EXT(__fmem_put, __fmem_get, __fmem_flush, __fmem_close,
-                                        __fmem_seek, NULL, stdio_flags),
-                .buf = buf,
-                .size = size,
-                .pos = 0,
-                .mflags = mflags,
-        };
+    /* Check mode directly to avoid _POSIX_IO dependency. */
+    if (mode[0] == 'a') {
+        /* For append the position is set to the first NUL byte or the end. */
+        initial_pos = (mflags & __MALL) ? 0 : strnlen(buf, size);
+        initial_size = initial_pos;
+        mflags |= __MAPP;
+    } else if (mode[0] == 'w') {
+        initial_size = 0;
+        /* w+ mode truncates the buffer, writing NUL */
+        if ((stdio_flags & (__SRD | __SWR)) == (__SRD | __SWR)) {
+            *((char *)buf) = '\0';
+        }
+    } else {
+        initial_size = size;
+    }
 
-	return (FILE *) mf;
+    *mf = (struct __file_mem){
+        .xfile = FDEV_SETUP_EXT(__fmem_put, __fmem_get, __fmem_flush,
+                                __fmem_close, __fmem_seek, NULL, stdio_flags),
+        .buf = buf,
+        .size = initial_size,
+        .bufsize = size,
+        .pos = initial_pos,
+        .mflags = mflags,
+    };
+
+    return (FILE *)mf;
 }

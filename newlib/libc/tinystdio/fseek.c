@@ -34,7 +34,6 @@
  */
 
 #include "stdio_private.h"
-#include <errno.h>
 
 #ifndef FSEEK_TYPE
 #define FSEEK_TYPE long

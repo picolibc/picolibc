@@ -27,9 +27,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <stdarg.h>
-#include <stdio.h>
-#include <wchar.h>
+#include "stdio_private.h"
 
 int
 vwscanf(const wchar_t *fmt, va_list ap)

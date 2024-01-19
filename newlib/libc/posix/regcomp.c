@@ -460,7 +460,7 @@ p_ere_exp(struct parse *p)
 				count2 = p_count(p);
 				(void)REQUIRE(count <= count2, REG_BADBR);
 			} else		/* single number with comma */
-				count2 = INFINITY;
+				count2 = REGEX_INFINITY;
 		} else		/* just a single number */
 			count2 = count;
 		repeat(p, pos, count, count2);
@@ -635,7 +635,7 @@ p_simp_re(struct parse *p,
 				count2 = p_count(p);
 				(void)REQUIRE(count <= count2, REG_BADBR);
 			} else		/* single number with comma */
-				count2 = INFINITY;
+				count2 = REGEX_INFINITY;
 		} else		/* just a single number */
 			count2 = count;
 		repeat(p, pos, count, count2);
@@ -1075,13 +1075,13 @@ static void
 repeat(struct parse *p,
        sopno start,		/* operand from here to end of strip */
        int from,		/* repeated from this number */
-       int to)		        /* to this number of times (maybe INFINITY) */
+       int to)		        /* to this number of times (maybe REGEX_INFINITY) */
 {
 	sopno finish = HERE();
 #	define	N	2
 #	define	INF	3
 #	define	REP(f, t)	((f)*8 + (t))
-#	define	MAP(n)	(((n) <= 1) ? (n) : ((n) == INFINITY) ? INF : N)
+#	define	MAP(n)	(((n) <= 1) ? (n) : ((n) == REGEX_INFINITY) ? INF : N)
 	sopno copy;
 
 	if (p->error != 0)	/* head off possible runaway recursion */
@@ -1959,16 +1959,16 @@ computematchjumps(struct parse *p, struct re_guts *g)
 		g->matchjump[mindex] = MIN(g->matchjump[mindex],
 		    g->mlen + suffix - mindex);
 
-        ssuffix = pmatches[suffix];
-        while (suffix < g->mlen) {
-                while (suffix <= ssuffix && suffix < g->mlen) {
-                        g->matchjump[suffix] = MIN(g->matchjump[suffix],
+	ssuffix = pmatches[suffix];
+	while (suffix < g->mlen) {
+		while (suffix <= ssuffix && suffix < g->mlen) {
+			g->matchjump[suffix] = MIN(g->matchjump[suffix],
 			    g->mlen + ssuffix - suffix);
-                        suffix++;
-                }
+			suffix++;
+		}
 		if (suffix < g->mlen)
-                	ssuffix = pmatches[ssuffix];
-        }
+			ssuffix = pmatches[ssuffix];
+	}
 
 	free(pmatches);
 }

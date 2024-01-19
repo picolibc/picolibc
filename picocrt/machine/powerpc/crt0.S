@@ -38,19 +38,26 @@
 	.global _start
 	.type	_start, @function
 _start:
+	/* Get stack pointer */
+	lis	%r1,__stack@h
+	ori	%r1,%r1,__stack@l
 
+#ifdef __PPC64__
+#define TARGET_THREAD_SSP_OFFSET	0x7010
+#else
+#define TARGET_THREAD_SSP_OFFSET	0x7008
+#endif	
+	/* Compute stack protector location */
+	lis	%r13,(__stack_chk_guard+TARGET_THREAD_SSP_OFFSET)@h
+	ori	%r13,%r13,(__stack_chk_guard+TARGET_THREAD_SSP_OFFSET)@l
+
+#ifdef __PPC64__
 	/* Where are we? */
 	bl	here
 here:	mflr	%r2
 
-	/* Get stack pointer */
-	addi	%r1,%r2,stackaddr - here
-	ld	%r1,0(%r1)
-
-#ifdef __PPC64__
 	/* Figure out the initial TOC value */
-	addi	%r2,%r2,toc-here
-	ld	%r2,0(%r2)
+	ld	%r2,(toc-here)(%r2)
 #endif
 	
 	mfmsr	%r0
@@ -69,16 +76,9 @@ here:	mflr	%r2
 	mr	%r3, %r8
 	mr	%r4, %r9
 	bl	_cstart
-	.align	3
 #ifdef __PPC64__
+	.align	3
 toc:	
 	.quad 	.TOC.@tocbase
-
-stackaddr:
-	.quad	__stack
-
-#else
-stackaddr:
-	.long	__stack
 #endif
 	

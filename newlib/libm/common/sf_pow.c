@@ -120,7 +120,7 @@ exp2_inline (double_t xd, uint32_t sign_bias)
   t = T[ki % N];
   ski = ki + sign_bias;
   t += ski << (52 - EXP2F_TABLE_BITS);
-  s = asdouble (t);
+  s = asfloat64 (t);
   z = C[0] * r + C[1];
   r2 = r * r;
   y = C[2] * r + 1;

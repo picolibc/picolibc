@@ -91,11 +91,23 @@
 #else
 #define printf_float(x) ((double) (x))
 
+#ifndef _WIDE_ORIENT
+#define NO_WIDE_IO
+#endif
+
 #ifndef _WANT_IO_POS_ARGS
 #define NO_POS_ARGS
 #endif
 #if !defined(_WANT_IO_C99_FORMATS) || defined(_NANO_FORMATTED_IO)
 # define NO_C99_FORMATS
+#endif
+
+#if __SIZEOF_DOUBLE__ != 8
+#define NO_FLOATING_POINT
+#endif
+
+#ifndef _WANT_IO_LONG_LONG
+#define NO_LONG_LONG
 #endif
 
 #ifdef _NANO_FORMATTED_IO
@@ -130,6 +142,7 @@ check_vsnprintf(char *str, size_t size, const char *format, ...)
 #define LEGACY_NEWLIB
 #endif
 
+#ifndef NO_WIDE_IO
 static struct {
     const wchar_t *str;
     const wchar_t *fmt;
@@ -165,6 +178,7 @@ static struct {
     { .str = L"foo%bar1", .fmt = L"foo%%bar%d", 1 },
     { }
 };
+#endif
 
 int
 main(void)
@@ -197,6 +211,7 @@ main(void)
 	printf ("%g\n", exp(11));
 #endif
 
+#ifndef NO_WIDE_IO
         unsigned wt;
         for (wt = 0; wtest[wt].str; wt++) {
             void *extra;
@@ -208,6 +223,7 @@ main(void)
             }
         }
         wprintf(L"hello world %g\n", 1.0);
+#endif
 
 #if !defined(NO_FLOATING_POINT)
         printf("checking floating point\n");
@@ -351,7 +367,11 @@ main(void)
 #define float_type double
 #define scanf_format "%lf"
 #if defined(TINY_STDIO) && !defined(_IO_FLOAT_EXACT)
-#define ERROR_MAX 1e-14
+# if __SIZEOF_DOUBLE__ == 4
+#  define ERROR_MAX 1e-6
+# else
+#  define ERROR_MAX 1e-14
+# endif
 #else
 #if (!defined(TINY_STDIO) && defined(_WANT_IO_LONG_DOUBLE))
 /* __ldtoa is really broken */

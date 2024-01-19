@@ -27,9 +27,6 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <stdarg.h>
-#include <stdio.h>
-#include <wchar.h>
 #include "stdio_private.h"
 
 int

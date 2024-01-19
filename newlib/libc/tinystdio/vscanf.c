@@ -29,8 +29,7 @@
 
 /* $Id: vscanf.c 1944 2009-04-01 23:12:20Z arcanum $ */
 
-#include <stdarg.h>
-#include <stdio.h>
+#include "stdio_private.h"
 
 int
 vscanf(const char *fmt, va_list ap)

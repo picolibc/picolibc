@@ -39,6 +39,7 @@ inc_machine_headers_all = [
   '_endian.h',
   'endian.h',
   'fastmath.h',
+  'fenv-softfloat.h',
   'ieeefp.h',
   'malloc.h',
   'math.h',

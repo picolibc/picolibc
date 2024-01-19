@@ -1,0 +1,27 @@
+[binaries]
+# Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
+# so we have to add -nostdlib to the compiler configuration itself or
+# early compiler tests will fail. This can be removed when picolibc
+# requires at least version 0.54.2 of meson.
+c = ['ccache', 'sparc-zephyr-elf-gcc', '-msoft-float', '-fno-pic', '-fno-PIE', '-static', '-nostdlib']
+ar = 'sparc-zephyr-elf-ar'
+as = 'sparc-zephyr-elf-as'
+nm = 'sparc-zephyr-elf-nm'
+strip = 'sparc-zephyr-elf-strip'
+objcopy = 'sparc-zephyr-elf-objcopy'
+exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-sparc "$@"', 'run-sparc']
+
+[host_machine]
+system='linux'
+cpu_family='sparc'
+cpu='sparc'
+endian='little'
+
+[properties]
+skip_sanity_check = true
+needs_exe_wrapper = true
+has_link_defsym = true
+default_flash_addr = '0x40000000'
+default_flash_size = '0x00400000'
+default_ram_addr   = '0x40400000'
+default_ram_size   = '0x00200000'

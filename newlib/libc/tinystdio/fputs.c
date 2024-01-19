@@ -29,21 +29,24 @@
 
 /* $Id: fputs.c 1944 2009-04-01 23:12:20Z arcanum $ */
 
-#include <stdio.h>
 #include "stdio_private.h"
 
 int
 fputs(const char *str, FILE *stream)
 {
+        int (*put)(char, struct __file *);
 	char c;
-	int rv = 0;
 
 	if ((stream->flags & __SWR) == 0)
 		return EOF;
 
-	while ((c = *str++) != '\0')
-		if (stream->put(c, stream) < 0)
-			rv = EOF;
+        put = stream->put;
 
-	return rv;
+	while ((c = *str++) != '\0')
+                if (put(c, stream) < 0) {
+                        stream->flags |= __SERR;
+			return EOF;
+                }
+
+	return 0;
 }

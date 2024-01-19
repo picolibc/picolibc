@@ -80,20 +80,15 @@ PORTABILITY
 No supporting OS subroutines are required.
 */
 
-#include <_ansi.h>
 #include <ctype.h>
-
-#undef isgraph
-int
-isgraph (int c)
-{
-	return(__CTYPE_PTR[c+1] & (_P|_U|_L|_N));
-}
-
 
 #undef isprint
 int
 isprint (int c)
 {
-	return(__CTYPE_PTR[c+1] & (_P|_U|_L|_N|_B));
+#if _PICOLIBC_CTYPE_SMALL
+    return ' ' <= c && c <= '~';
+#else
+    return __CTYPE_PTR[c+1] & (_P|_U|_L|_N|_B);
+#endif
 }

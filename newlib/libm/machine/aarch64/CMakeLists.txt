@@ -34,7 +34,6 @@
 #
 
 picolibc_sources(
-  fenv.c
   s_ceil.c
   s_fabs.c
   s_floor.c
@@ -62,21 +61,4 @@ picolibc_sources(
   sf_round.c
   sf_sqrt.c
   sf_trunc.c
-  )
-
-picolibc_sources_fake(
-  feclearexcept.c
-  fedisableexcept.c
-  feenableexcept.c
-  fegetenv.c
-  fegetexcept.c
-  fegetexceptflag.c
-  fegetround.c
-  feholdexcept.c
-  feraiseexcept.c
-  fesetenv.c
-  fesetexceptflag.c
-  fesetround.c
-  fetestexcept.c
-  feupdateenv.c
   )

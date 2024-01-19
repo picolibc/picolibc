@@ -16,10 +16,6 @@
  */
 /* No user fns here. Pesch 15apr92 */
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <errno.h>
 #include "stdio_private.h"
 
 /*

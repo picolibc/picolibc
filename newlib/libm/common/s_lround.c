@@ -120,7 +120,7 @@ lround64(__float64 x)
   {
     /* Result is too large to be represented by a long int. */
     if (sign == 1 ||
-        !((sizeof(long) == 4 && x > LONG_MIN - 0.5) ||
+        !((sizeof(long) == 4 && x > LONG_MIN - _F_64(0.5)) ||
           (sizeof(long) > 4 && x >= LONG_MIN)))
     {
       __math_set_invalid();

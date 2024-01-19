@@ -28,6 +28,8 @@
 
 #include "math_config.h"
 
+#ifdef _NEED_FLOAT64
+
 static CONST_FORCE_FLOAT64 VAL = pick_float64_except(_F_64(0.0), (__float64) NAN);
 
 HIDDEN __float64
@@ -45,4 +47,6 @@ __math_set_invalid(void)
 {
     force_eval_float64(pick_float64_except(VAL / VAL, VAL));
 }
+#endif
+
 #endif

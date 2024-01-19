@@ -7,7 +7,7 @@ LINUX_DEPS=\
 	steps-head \
 	steps-cmake \
 	steps-minsize \
-	steps-fortify-source
+	steps-release
 
 all: linux.yml zephyr.yml
 
@@ -21,7 +21,7 @@ ZEPHYR_DEPS=\
 	targets-zephyr \
 	steps-head \
 	steps-minsize \
-	steps-fortify-source
+	steps-release
 
 zephyr.yml: $(ZEPHYR_DEPS)
 	./make-workflow-zephyr > $@

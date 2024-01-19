@@ -52,7 +52,7 @@ strcpy:
 	l8ui	a8, a3, 0	// get byte 0
 	addi	a3, a3, 1	// advance src pointer
 	s8i	a8, a10, 0	// store byte 0
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	memw
 #endif
 	beqz	a8, 1f		// if byte 0 is zero
@@ -63,7 +63,7 @@ strcpy:
 	l8ui	a8, a3, 0	// get byte 0
 	/* 1-cycle interlock */
 	s8i	a8, a10, 0	// store byte 0
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	memw
 #endif
 	beqz	a8, 1f		// if byte 0 is zero
@@ -71,7 +71,7 @@ strcpy:
 	addi	a3, a3, 2	// advance src pointer
 	s8i	a8, a10, 1	// store byte 0
 	addi	a10, a10, 2	// advance dst pointer
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	memw
 #endif
 	bnez	a8, .Lsrcaligned
@@ -102,7 +102,7 @@ strcpy:
 	bnone	a8, a5, .Lz1	// if byte 1 is zero
 	bnone	a8, a6, .Lz2	// if byte 2 is zero
 	s32i	a8, a10, 0	// store word to dst
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	l32i	a8, a10, 0
 	s32i	a8, a10, 0
 #endif
@@ -119,7 +119,7 @@ strcpy:
 	bnone	a8, a5, .Lz1	// if byte 1 is zero
 	bnone	a8, a6, .Lz2	// if byte 2 is zero
 	s32i	a8, a10, 0	// store word to dst
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	l32i	a8, a10, 0
 	s32i	a8, a10, 0
 #endif
@@ -135,7 +135,7 @@ strcpy:
 	movi	a8, 0
 #endif
 	s8i	a8, a10, 0
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	memw
 #endif
 	leaf_return
@@ -145,7 +145,7 @@ strcpy:
         extui   a8, a8, 16, 16
 #endif
 	s16i	a8, a10, 0
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	memw
 #endif
 	leaf_return
@@ -157,7 +157,7 @@ strcpy:
 	s16i	a8, a10, 0
 	movi	a8, 0
 	s8i	a8, a10, 2
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	memw
 #endif
 	leaf_return
@@ -189,7 +189,7 @@ strcpy:
 	addi	a3, a3, 1
 	s8i	a8, a10, 0
 	addi	a10, a10, 1
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	memw
 #endif
 #if XCHAL_HAVE_LOOPS
@@ -244,7 +244,7 @@ strcpy:
 	movi	a8, 0
 #endif
 	s8i	a8, a10, 0
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	memw
 #endif
 	leaf_return
@@ -254,7 +254,7 @@ strcpy:
         extui   a8, a8, 16, 16
 #endif
 	s16i	a8, a10, 0
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	memw
 #endif
 	leaf_return
@@ -263,7 +263,7 @@ strcpy:
 	s16i	a8, a10, 0
 	movi	a8, 0
 	s8i	a8, a10, 2
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	memw
 #endif
 	leaf_return

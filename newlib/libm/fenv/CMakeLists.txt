@@ -34,23 +34,8 @@
 #
 
 picolibc_sources(
-  feclearexcept.c
   fe_dfl_env.c
-  fedisableexcept.c
-  feenableexcept.c
-  fegetenv.c
-  fegetexcept.c
-  fegetexceptflag.c
+  fenv.c
   fegetmode.c
-  fegetround.c
-  feholdexcept.c
-  fenv_stub.c
-  feraiseexcept.c
-  fesetenv.c
-  fesetexcept.c
-  fesetexceptflag.c
   fesetmode.c
-  fesetround.c
-  fetestexcept.c
-  feupdateenv.c
   )

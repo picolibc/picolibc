@@ -2,7 +2,7 @@
 
 cat head-zephyr
 
-for build in minsize fortify-source; do
+for build in minsize release; do
     for arch in zephyr; do
 	echo "  $build-$arch:"
 	cat variants

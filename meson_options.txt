@@ -50,6 +50,9 @@ option('multilib', type: 'boolean', value: true,
 option('multilib-list', type: 'array', value: [],
        description: 'List of multilib configurations to build for')
 
+option('multilib-exclude', type: 'array', value: [],
+       description: 'Multilib configurations containing any of these strings will not be built')
+
 option('build-type-subdir', type: 'string',
        description: 'Build-type subdir. Also skips installing .specs file')
 
@@ -79,9 +82,6 @@ option('system-libc', type: 'boolean', value: false,
 					      
 option('picoexit', type: 'boolean', value: true,
        description: 'Smaller exit/atexit/onexit code')
-
-option('fortify-source', type: 'combo', choices: ['none', '1', '2'], value: 'none',
-       description: 'Set _FORTIFY_SOURCE=<value>')
 
 option('sanitize-bounds', type: 'boolean', value: false,
        description: 'Build the library with -fsanitize=bounds')
@@ -121,6 +121,10 @@ option('test-long-double', type: 'boolean', value: true,
        description: 'Enable long double tests on targets with long double type')
 option('split-large-tests', type: 'boolean', value: false,
        description: 'Split large tests into pieces for smaller targets')
+option('test-stdin', type: 'boolean', value: false,
+       description: 'Enable tests that use stdin. This only works on a few targets')
+option('fortify-source', type: 'combo', choices: ['none', '1', '2'], value: '2',
+       description: 'Set _FORTIFY_SOURCE=<value> when building tests')
 
 option('tinystdio', type: 'boolean', value: true,
        description: 'Use tiny stdio from avr libc')
@@ -144,6 +148,8 @@ option('io-long-double', type: 'boolean', value: false,
        description: 'enable long double type support in IO functions printf/scanf')
 option('newlib-io-long-double', type: 'boolean', value: false,
        description: 'enable long double type support in IO functions printf/scanf')
+option('fast-bufio', type: 'boolean', value: false,
+       description: 'enable some faster buffered i/o operations')
 
 #
 # Options applying only to tinystdio

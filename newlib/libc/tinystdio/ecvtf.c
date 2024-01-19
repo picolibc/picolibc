@@ -33,11 +33,11 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
-#include <_ansi.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ftoa_engine.h"
+#include "stdio_private.h"
+
+#define _NEED_IO_FLOAT
+
+#include "dtoa.h"
 
 static NEWLIB_THREAD_LOCAL char ecvtf_buf[FTOA_MAX_DIG + 1];
 

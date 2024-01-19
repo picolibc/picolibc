@@ -35,7 +35,7 @@ jobs:
 
       - name: Cache the Docker Image
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.IMAGE_FILE }}
           key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
@@ -65,7 +65,8 @@ jobs:
           "-D__IO_FLOAT=y -D_IO_FLOAT_EXACT=n -D_WANT_IO_LONG_LONG=y -D_MB_CAPABLE=y -D_WANT_IO_POS_ARGS=y -D__HAVE_LOCALE_INFO__=y -D__HAVE_LOCALE_INFO_EXTENDED__=y -D_WANT_MINIMAL_IO_LONG_LONG=y",
         ]
         test: [
-          "./.github/do-cmake-linux",
+          "./.github/do-cmake-linux -DCMAKE_BUILD_TYPE=RelWithDebInfo",
+          "./.github/do-cmake-linux -DCMAKE_BUILD_TYPE=MinSizeRel",
         ]
     steps:
       - name: Clone picolibc
@@ -74,7 +75,7 @@ jobs:
           path: picolibc
 
       - name: Restore the Docker Image
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.IMAGE_FILE }}
           key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
@@ -99,7 +100,7 @@ jobs:
       # and zephyr.
       - name: ccache
         if: matrix.test == './.github/do-zephyr'
-        uses: hendrikmuhs/ccache-action@v1.2.10
+        uses: hendrikmuhs/ccache-action@v1.2.11
         with:
           key: compilation-${{ runner.os }}-${{ github.job }}-${{ matrix.meson_flags }}-${{ env.CCACHE_SIZE }}
           max-size: ${{ env.CCACHE_SIZE }}
@@ -118,7 +119,7 @@ jobs:
 
           # Tinystdio and math configurations, one with multithread disabled and with locale, original malloc and atexit/onexit code
           "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false -Dprintf-small-ultoa=true",
-          "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false -Dnewlib-obsolete-math=true -Dwant-math-errno=true -Dassert-verbose=false",
+          "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false -Dnewlib-obsolete-math=true -Dwant-math-errno=true -Dassert-verbose=false -Dfast-bufio=true",
 
           # Original stdio, one with multithread disabled
           "-Dtinystdio=false",
@@ -134,7 +135,7 @@ jobs:
           path: picolibc
 
       - name: Restore the Docker Image
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.IMAGE_FILE }}
           key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
@@ -159,7 +160,7 @@ jobs:
       # and zephyr.
       - name: ccache
         if: matrix.test == './.github/do-zephyr'
-        uses: hendrikmuhs/ccache-action@v1.2.10
+        uses: hendrikmuhs/ccache-action@v1.2.11
         with:
           key: compilation-${{ runner.os }}-${{ github.job }}-${{ matrix.meson_flags }}-${{ env.CCACHE_SIZE }}
           max-size: ${{ env.CCACHE_SIZE }}
@@ -168,7 +169,7 @@ jobs:
         run: |
           docker run -v $(readlink -f picolibc):/picolibc -w /picolibc -v $GITHUB_WORKSPACE/.ccache:/root/.ccache $IMAGE bash --login -c "${{ env.CCACHE_CMD }} --set-config=max_size=${{ env.CCACHE_SIZE }} && ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize"
 
-  fortify-source-linux:
+  release-linux:
     needs: cache-maker
     runs-on: ubuntu-latest
     strategy:
@@ -178,7 +179,7 @@ jobs:
 
           # Tinystdio and math configurations, one with multithread disabled and with locale, original malloc and atexit/onexit code
           "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false -Dprintf-small-ultoa=true",
-          "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false -Dnewlib-obsolete-math=true -Dwant-math-errno=true -Dassert-verbose=false",
+          "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false -Dnewlib-obsolete-math=true -Dwant-math-errno=true -Dassert-verbose=false -Dfast-bufio=true",
 
           # Original stdio, one with multithread disabled
           "-Dtinystdio=false",
@@ -194,7 +195,7 @@ jobs:
           path: picolibc
 
       - name: Restore the Docker Image
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.IMAGE_FILE }}
           key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
@@ -219,12 +220,12 @@ jobs:
       # and zephyr.
       - name: ccache
         if: matrix.test == './.github/do-zephyr'
-        uses: hendrikmuhs/ccache-action@v1.2.10
+        uses: hendrikmuhs/ccache-action@v1.2.11
         with:
           key: compilation-${{ runner.os }}-${{ github.job }}-${{ matrix.meson_flags }}-${{ env.CCACHE_SIZE }}
           max-size: ${{ env.CCACHE_SIZE }}
 
-      - name: Fortify source test
+      - name: Release test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc -v $GITHUB_WORKSPACE/.ccache:/root/.ccache $IMAGE bash --login -c "${{ env.CCACHE_CMD }} --set-config=max_size=${{ env.CCACHE_SIZE }} && ${{ matrix.test }} ${{ matrix.meson_flags }} -Dfortify-source=2 --buildtype release"
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc -v $GITHUB_WORKSPACE/.ccache:/root/.ccache $IMAGE bash --login -c "${{ env.CCACHE_CMD }} --set-config=max_size=${{ env.CCACHE_SIZE }} && ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release"
 

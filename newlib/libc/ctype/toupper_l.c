@@ -3,7 +3,6 @@ Copyright (c) 2016 Corinna Vinschen <corinna@vinschen.de>
 Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
  */
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
 #include <ctype.h>
 #if defined (_MB_EXTENDED_CHARSETS_ISO) \
     || defined (_MB_EXTENDED_CHARSETS_WINDOWS)

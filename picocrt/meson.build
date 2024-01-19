@@ -84,14 +84,17 @@ foreach target : targets
   crt0_minimal_name = 'crt0_minimal' + target
   crt0_semihost_name = 'crt0_semihost' + target
 
+  _c_args = value[1] + arg_fnobuiltin + ['-ffreestanding']
+  _link_args = value[1] + ['-r', '-ffreestanding']
+
   # The normal variant does not call 'exit' after return from main (c lingo: freestanding execution environment)
   _crt = executable(crt_name,
 		    src_picocrt,
 		    include_directories : inc,
 		    install : true,
 		    install_dir : instdir,
-		    c_args : value[1] + arg_fnobuiltin + ['-ffreestanding'],
-		    link_args : value[1] + ['-r', '-ffreestanding'])
+		    c_args : _c_args,
+		    link_args : _link_args)
 
   set_variable(crt0_name,
 	       _crt.extract_objects(src_picocrt)
@@ -100,10 +103,12 @@ foreach target : targets
   if enable_picocrt_lib
     static_library(libcrt_name,
                    [],
+		   include_directories : inc,
                    install : true,
                    install_dir : instdir,
-                   pic: false,
-                   objects : [_crt.extract_objects(src_picocrt)])
+		   c_args : _c_args,
+                   objects: get_variable(crt0_name),
+                   pic: false)
   endif
 
   # The 'hosted' variant calls 'exit' after return from main (c lingo: hosted execution environment)
@@ -112,8 +117,8 @@ foreach target : targets
 		    include_directories : inc,
 		    install : true,
 		    install_dir : instdir,
-		    c_args : value[1] + arg_fnobuiltin + ['-ffreestanding', '-DCRT0_EXIT'],
-		    link_args : value[1] + ['-r', '-ffreestanding'])
+		    c_args : _c_args + ['-DCRT0_EXIT'],
+		    link_args : _link_args)
 
   set_variable(crt0_hosted_name,
 	       _crt.extract_objects(src_picocrt)
@@ -122,10 +127,12 @@ foreach target : targets
   if enable_picocrt_lib
     static_library(libcrt_hosted_name,
                    [],
+		   include_directories : inc,
                    install : true,
                    install_dir : instdir,
                    pic: false,
-                   objects : [_crt.extract_objects(src_picocrt)])
+                   objects: get_variable(crt0_hosted_name),
+		   c_args : value[1] + ['-DCRT0_EXIT'])
   endif
 
   # The 'minimal' variant doesn't call exit, nor does it invoke any constructors
@@ -134,8 +141,8 @@ foreach target : targets
 		    include_directories : inc,
 		    install : true,
 		    install_dir : instdir,
-		    c_args : value[1] + arg_fnobuiltin + ['-ffreestanding', '-DCONSTRUCTORS=0'],
-		    link_args : value[1] + ['-r', '-ffreestanding'])
+		    c_args : _c_args + ['-DCONSTRUCTORS=0'],
+		    link_args : _link_args)
 
   set_variable(crt0_minimal_name,
 	       _crt.extract_objects(src_picocrt)
@@ -144,10 +151,12 @@ foreach target : targets
   if enable_picocrt_lib
     static_library(libcrt_minimal_name,
                    [],
+		   include_directories : inc,
                    install : true,
                    install_dir : instdir,
                    pic: false,
-                   objects : [_crt.extract_objects(src_picocrt)])
+                   objects: get_variable(crt0_minimal_name),
+		   c_args : _c_args + ['-DCONSTRUCTORS=0'])
   endif
 
   if has_arm_semihost
@@ -158,8 +167,8 @@ foreach target : targets
 		      include_directories : inc,
 		      install : true,
 		      install_dir : instdir,
-		      c_args : value[1] + arg_fnobuiltin + ['-ffreestanding', '-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
-		      link_args : value[1] + ['-r', '-ffreestanding'])
+		      c_args : _c_args + ['-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
+		      link_args : _link_args)
 
     set_variable(crt0_semihost_name,
 		 _crt.extract_objects(src_picocrt)
@@ -168,10 +177,12 @@ foreach target : targets
     if enable_picocrt_lib
       static_library(libcrt_semihost_name,
                      [],
+		     include_directories : inc,
                      install : true,
                      install_dir : instdir,
                      pic: false,
-                     objects : [_crt.extract_objects(src_picocrt)])
+                     objects: get_variable(crt0_semihost_name),
+		     c_args : value[1] + ['-DCRT0_EXIT', '-DCRT0_SEMIHOST'])
     endif
   endif
 endforeach

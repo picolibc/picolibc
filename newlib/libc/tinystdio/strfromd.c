@@ -33,7 +33,6 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdlib.h>
 #include "stdio_private.h"
 
 int strfromd(char *restrict str, size_t n,

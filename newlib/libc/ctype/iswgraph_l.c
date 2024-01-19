@@ -4,7 +4,7 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
  */
 /* Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling */
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
+#include <ctype.h>
 #include <wctype.h>
 #include "local.h"
 #include "categories.h"
@@ -23,6 +23,7 @@ iswgraph_l (wint_t c, struct __locale_t *locale)
       && cat != CAT_Zl && cat != CAT_Zp // Line/Paragraph Separator
       ;
 #else
-  return iswprint_l (c, locale) && !iswspace_l (c, locale);
+  (void) locale;
+  return c < (wint_t)0x100 ? isgraph (c) : 0;
 #endif /* _MB_CAPABLE */
 }

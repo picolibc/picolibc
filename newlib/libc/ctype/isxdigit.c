@@ -66,13 +66,17 @@ PORTABILITY
 
 No supporting OS subroutines are required.
 */
-#include <_ansi.h>
 #include <ctype.h>
-
 
 #undef isxdigit
 int
 isxdigit (int c)
 {
-	return(__CTYPE_PTR[c+1] & ((_X)|(_N)));
+#ifdef __HAVE_LOCALE_INFO__
+    return __CTYPE_PTR[c+1] & ((_X)|(_N));
+#else
+    return (isdigit(c) ||
+            ('A' <= c && c <= 'F') ||
+            ('a' <= c && c <= 'f'));
+#endif
 }

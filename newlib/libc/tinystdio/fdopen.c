@@ -34,9 +34,6 @@
  */
 
 #include "stdio_private.h"
-#include <stdlib.h>
-#include <fcntl.h>
-#include <unistd.h>
 
 FILE *
 fdopen(int fd, const char *mode)

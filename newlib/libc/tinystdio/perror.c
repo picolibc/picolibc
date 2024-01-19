@@ -33,9 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
+#include "stdio_private.h"
 
 void
 perror (const char *msg)

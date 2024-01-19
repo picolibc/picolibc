@@ -66,12 +66,15 @@ PORTABILITY
 No supporting OS subroutines are required.
 */
 
-#include <_ansi.h>
 #include <ctype.h>
 
 #undef isalpha
 int
 isalpha (int c)
 {
-	return(__CTYPE_PTR[c+1] & (_U|_L));
+#if _PICOLIBC_CTYPE_SMALL
+    return isupper(c) || islower(c);
+#else
+    return __CTYPE_PTR[c+1] & (_U|_L);
+#endif
 }

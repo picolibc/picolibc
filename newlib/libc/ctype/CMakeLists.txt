@@ -47,6 +47,8 @@ picolibc_sources(
   iscntrl_l.c
   isdigit.c
   isdigit_l.c
+  isgraph.c
+  isgraph_l.c
   islower.c
   islower_l.c
   isprint.c

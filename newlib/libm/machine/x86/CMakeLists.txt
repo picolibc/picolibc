@@ -34,20 +34,6 @@
 #
 picolibc_sources(
   fenv.c
-  feclearexcept.c
-  fedisableexcept.c
-  feenableexcept.c
-  fegetenv.c
-  fegetexcept.c
-  fegetexceptflag.c
-  fegetround.c
-  feholdexcept.c
-  feraiseexcept.c
-  fesetenv.c
-  fesetexceptflag.c
-  fesetround.c
-  fetestexcept.c
-  feupdateenv.c
   )
 
 if(${CMAKE_SYSTEM_SUB_PROCESSOR} STREQUAL "i686")

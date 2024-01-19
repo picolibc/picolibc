@@ -47,9 +47,7 @@ int gettimeofday(struct timeval *restrict tv, void *restrict tz) _ATTRIBUTE((__w
 ssize_t
 write(int fd, const void *buf, size_t count)
 {
-#ifndef TINY_STDIO
 	fd = _map_stdio(fd);
-#endif
 	uintptr_t ret = sys_semihost_write(fd, buf, count);
 
         if (&__semihost_write_time && gettimeofday)

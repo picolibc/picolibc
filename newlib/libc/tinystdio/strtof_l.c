@@ -33,11 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _DEFAULT_SOURCE
-#include <_ansi.h>
-#include <errno.h>
-#include <stdlib.h>
-#include <string.h>
+#include "stdio_private.h"
 
 float
 strtof_l (const char *__restrict s00,

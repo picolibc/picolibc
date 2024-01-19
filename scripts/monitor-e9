@@ -19,6 +19,8 @@ with subprocess.Popen(sys.argv[1:], stdout=subprocess.PIPE, stderr=subprocess.DE
                 if words[0] == 'exit':
                     proc.send_signal(1)
                     status = int(words[1])
+                    if status >= 128:
+                        status = status | 1
                     break
         sys.stdout.write(c.decode('utf-8'))
 

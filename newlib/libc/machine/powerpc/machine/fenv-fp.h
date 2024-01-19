@@ -28,7 +28,7 @@
  * $FreeBSD$
  */
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 feclearexcept(int excepts)
 {
 	union __fpscr __r;
@@ -42,7 +42,7 @@ feclearexcept(int excepts)
 }
 
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 fegetexceptflag(fexcept_t *flagp, int excepts)
 {
 	union __fpscr __r;
@@ -52,7 +52,7 @@ fegetexceptflag(fexcept_t *flagp, int excepts)
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 fesetexceptflag(const fexcept_t *flagp, int excepts)
 {
 	union __fpscr __r;
@@ -66,7 +66,7 @@ fesetexceptflag(const fexcept_t *flagp, int excepts)
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 feraiseexcept(int excepts)
 {
 	union __fpscr __r;
@@ -79,7 +79,13 @@ feraiseexcept(int excepts)
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
+fesetexcept(int excepts)
+{
+        return feraiseexcept(excepts);
+}
+
+__declare_fenv_inline(int)
 fetestexcept(int excepts)
 {
 	union __fpscr __r;
@@ -88,7 +94,7 @@ fetestexcept(int excepts)
 	return (__r.__bits.__reg & excepts);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 fegetround(void)
 {
 	union __fpscr __r;
@@ -97,7 +103,7 @@ fegetround(void)
 	return (__r.__bits.__reg & _ROUND_MASK);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 fesetround(int rounding_mode)
 {
 	union __fpscr __r;
@@ -111,7 +117,7 @@ fesetround(int rounding_mode)
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 fegetenv(fenv_t *envp)
 {
 	union __fpscr __r;
@@ -121,7 +127,7 @@ fegetenv(fenv_t *envp)
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 feholdexcept(fenv_t *envp)
 {
 	union __fpscr __r;
@@ -133,7 +139,7 @@ feholdexcept(fenv_t *envp)
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 fesetenv(const fenv_t *envp)
 {
 	union __fpscr __r;
@@ -143,7 +149,7 @@ fesetenv(const fenv_t *envp)
 	return (0);
 }
 
-__fenv_static inline int
+__declare_fenv_inline(int)
 feupdateenv(const fenv_t *envp)
 {
 	union __fpscr __r;
@@ -157,9 +163,7 @@ feupdateenv(const fenv_t *envp)
 
 #if __BSD_VISIBLE
 
-/* We currently provide no external definitions of the functions below. */
-
-static inline int
+__declare_fenv_inline(int)
 feenableexcept(int __mask)
 {
 	union __fpscr __r;
@@ -172,7 +176,7 @@ feenableexcept(int __mask)
 	return ((__oldmask & _ENABLE_MASK) << _FPUSW_SHIFT);
 }
 
-static inline int
+__declare_fenv_inline(int)
 fedisableexcept(int __mask)
 {
 	union __fpscr __r;
@@ -185,7 +189,7 @@ fedisableexcept(int __mask)
 	return ((__oldmask & _ENABLE_MASK) << _FPUSW_SHIFT);
 }
 
-static inline int
+__declare_fenv_inline(int)
 fegetexcept(void)
 {
 	union __fpscr __r;
@@ -195,4 +199,3 @@ fegetexcept(void)
 }
 
 #endif /* __BSD_VISIBLE */
-

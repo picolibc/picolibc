@@ -43,6 +43,8 @@ srcs_machine = [
     'memcpy.S',
     'memmove-stub.c',
     'memmove.S',
+    'memrchr-stub.c',
+    'memrchr.S',
     'memset-stub.c',
     'memset.S',
     'rawmemchr-stub.c',
@@ -64,8 +66,8 @@ srcs_machine = [
     'strncmp.S',
     'strnlen-stub.c',
     'strnlen.S',
-    'strchr-stub.c',
-    'strchr.S'
+    'strrchr-stub.c',
+    'strrchr.S',
 ]
 
 subdir('sys')
@@ -78,5 +80,5 @@ foreach target : targets
             srcs_machine,
             pic: false,
             include_directories: inc,
-            c_args: value[1] + arg_fnobuiltin))
+            c_args: value[1] + c_args + arg_fnobuiltin))
 endforeach

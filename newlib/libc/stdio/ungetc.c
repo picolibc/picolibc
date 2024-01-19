@@ -125,8 +125,6 @@ ungetc (
 
   _newlib_flockfile_start (fp);
 
-  ORIENT (fp, -1);
-
   /* After ungetc, we won't be at eof anymore */
   fp->_flags &= ~__SEOF;
 

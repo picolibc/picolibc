@@ -31,19 +31,21 @@
 #ifndef	_SYS_FENV_H_
 #define	_SYS_FENV_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef _SOFT_FLOAT
 typedef int fenv_t;
 typedef int fexcept_t;
 #else
 
-#include <stdint.h>
-
 #ifdef __arch64__
-typedef	uint64_t	fenv_t;
-typedef	uint64_t	fexcept_t;
+typedef	__UINT64_TYPE__	fenv_t;
+typedef	__UINT64_TYPE__	fexcept_t;
 #else
-typedef	uint32_t	fenv_t;
-typedef	uint32_t	fexcept_t;
+typedef	__UINT32_TYPE__	fenv_t;
+typedef	__UINT32_TYPE__	fexcept_t;
 #endif
 
 /*
@@ -75,13 +77,26 @@ typedef	uint32_t	fexcept_t;
     FE_UPWARD | FE_TOWARDZERO)
 #define	_ROUND_SHIFT	30
 
-
-
 /* We need to be able to map status flag positions to mask flag positions */
 #define	_FPUSW_SHIFT	18
 #define	_ENABLE_MASK	(FE_ALL_EXCEPT << _FPUSW_SHIFT)
 
-
-
 #endif  /* !_SOFT_FLOAT */
+
+#if !defined(__declare_fenv_inline) && defined(__declare_extern_inline)
+#define	__declare_fenv_inline(type) __declare_extern_inline(type)
+#endif
+
+#ifdef __declare_fenv_inline
+#ifdef _SOFT_FLOAT
+#include <machine/fenv-softfloat.h>
+#else
+#include <machine/fenv-fp.h>
+#endif
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif	/* !_SYS_FENV_H_ */

@@ -34,21 +34,23 @@
 #
 picolibc_sources(
   asprintf.c
+  atold_engine.c
   bufio.c
   clearerr.c
-  compare_exchange.c
-  ecvt_r.c
+  dtox_engine.c
   ecvt.c
-  ecvtf_r.c
   ecvtf.c
-  exchange.c
+  ecvtf_r.c
+  ecvtl.c
+  ecvtl_r.c
+  ecvt_r.c
+  fclose.c
   fcvt.c
-  fcvt_r.c
   fcvtf.c
   fcvtf_r.c
-  gcvt.c
-  gcvtf.c
-  fclose.c
+  fcvtl.c
+  fcvtl_r.c
+  fcvt_r.c
   fdevopen.c
   feof.c
   ferror.c
@@ -59,8 +61,8 @@ picolibc_sources(
   fgetws.c
   fileno.c
   filestrget.c
-  filestrput.c
   filestrputalloc.c
+  filestrput.c
   filewstrget.c
   fmemopen.c
   fprintf.c
@@ -69,21 +71,26 @@ picolibc_sources(
   fputwc.c
   fputws.c
   fread.c
-  freopen.c
   fscanf.c
   fseek.c
   fseeko.c
   ftell.c
   ftello.c
+  ftox_engine.c
   fwide.c
-  fwrite.c
   fwprintf.c
+  fwrite.c
   fwscanf.c
+  gcvt.c
+  gcvtf.c
+  gcvtl.c
   getchar.c
   getdelim.c
   getline.c
   gets.c
   getwchar.c
+  ldtoa_engine.c
+  ldtox_engine.c
   matchcaseprefix.c
   mktemp.c
   perror.c
@@ -98,84 +105,103 @@ picolibc_sources(
   setbuffer.c
   setlinebuf.c
   setvbuf.c
+  sflags.c
   snprintf.c
-  sprintf.c
   snprintfd.c
   snprintff.c
-  sprintff.c
+  sprintf.c
   sprintfd.c
+  sprintff.c
   sscanf.c
-  strfromf.c
   strfromd.c
-  strtof.c
-  strtof_l.c
+  strfromf.c
+  strfroml.c
   strtod.c
   strtod_l.c
+  strtof.c
+  strtof_l.c
   strtoimax.c
   strtol.c
+  strtold.c
+  strtold_l.c
+  strtol_l.c
   strtoll.c
+  strtoll_l.c
   strtoul.c
+  strtoul_l.c
   strtoull.c
+  strtoull_l.c
   strtoumax.c
   swprintf.c
   swscanf.c
-  tmpnam.c
   tmpfile.c
+  tmpnam.c
   ungetc.c
   ungetwc.c
   vasprintf.c
   vffprintf.c
-  vfiprintf.c
-  vflprintf.c
-  vfmprintf.c
-  vfprintf.c
   vffscanf.c
+  vfiprintf.c
   vfiscanf.c
+  vflprintf.c
   vflscanf.c
+  vfmprintf.c
   vfmscanf.c
+  vfprintf.c
   vfscanf.c
   vfwprintf.c
   vfwscanf.c
   vprintf.c
   vscanf.c
-  vsscanf.c
   vsnprintf.c
   vsprintf.c
+  vsscanf.c
   vswprintf.c
   vswscanf.c
+  vwprintf.c
+  vwscanf.c
   wprintf.c
   wscanf.c
-  fopen.c
+  )
+
+picolibc_sources(
+  compare_exchange.c
+  exchange.c
+  )  
+
+picolibc_sources(
   fdopen.c
-  fclose.c
-  sflags.c
+  fopen.c
+  freopen.c
   )
 
 if(_IO_FLOAT_EXACT)
   picolibc_sources(
-    dtoa_ryu.c
-    ftoa_ryu.c
-    ryu_table.c
     atod_ryu.c
     atof_ryu.c
-    ryu_log2pow5.c
-    ryu_log10.c
-    ryu_pow5bits.c
-    ryu_umul128.c
+    dtoa_ryu.c
+    ftoa_ryu.c
     ryu_divpow2.c
+    ryu_log10.c
+    ryu_log2pow5.c
+    ryu_pow5bits.c
+    ryu_table.c
+    ryu_umul128.c
     )
 else()
   picolibc_sources(
-    dtoa_engine.c
-    ftoa_engine.c
     atod_engine.c
     atof_engine.c
+    dtoa_engine.c
+    ftoa_engine.c
     )
 endif()
 
 if(POSIX_CONSOLE)
   picolibc_sources(
-    posixiob.c
+    posixiob_stdin.c
+    posixiob_stdout.c
+    posixiob_stderr.c
     )
 endif()
 

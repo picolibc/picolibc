@@ -5,7 +5,7 @@
           path: picolibc
 
       - name: Restore the Docker Image
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.IMAGE_FILE }}
           key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
@@ -30,7 +30,7 @@
       # and zephyr.
       - name: ccache
         if: matrix.test == './.github/do-zephyr'
-        uses: hendrikmuhs/ccache-action@v1.2.10
+        uses: hendrikmuhs/ccache-action@v1.2.11
         with:
           key: compilation-${{ runner.os }}-${{ github.job }}-${{ matrix.meson_flags }}-${{ env.CCACHE_SIZE }}
           max-size: ${{ env.CCACHE_SIZE }}

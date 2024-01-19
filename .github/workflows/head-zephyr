@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # .github/do-zephyr -Dfortify-source=2 --buildtype release
+  # .github/do-zephyr --buildtype release
   # is the largest cache, 429.5M (September 2023).
   CCACHE_SIZE: "450M"
   CCACHE_CMD: ccache
@@ -36,7 +36,7 @@ jobs:
 
       - name: Cache the Docker Image
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.IMAGE_FILE }}
           key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
@@ -48,7 +48,7 @@ jobs:
 
       - name: Build picolibc container
         if: steps.cache.outputs.cache-hit != 'true'
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           platforms: linux/amd64
           file: .github/Dockerfile-zephyr

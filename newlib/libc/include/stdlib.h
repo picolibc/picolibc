@@ -267,6 +267,15 @@ int	fcvtf_r (float, int, int*, int*, char *, size_t);
 #else
 char *	fcvtfbuf (float, int, int*, int*, char *);
 #endif
+
+#if defined(_HAVE_LONG_DOUBLE) && defined(TINY_STDIO)
+char *  ecvtl(long double, int, int*, int*);
+int     ecvtl_r(long double, int, int*, int*, char *, size_t);
+char *  fcvtl(long double, int, int*, int*);
+int     fcvtl_r(long double, int, int*, int*, char *, size_t);
+char *	gcvtl(long double, int, char *);
+#endif
+
 #endif
 char *	__itoa (int, char *, int);
 char *	__utoa (unsigned, char *, int);

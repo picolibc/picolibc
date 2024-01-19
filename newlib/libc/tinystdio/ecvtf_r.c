@@ -33,11 +33,10 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
-#include "ftoa_engine.h"
-#include <_ansi.h>
-#include <stdlib.h>
-#include <string.h>
+#define _NEED_IO_FLOAT
+#include "stdio_private.h"
+
+#include "dtoa.h"
 
 int
 ecvtf_r (float invalue,
@@ -47,7 +46,7 @@ ecvtf_r (float invalue,
          char *buf,
          size_t len)
 {
-    struct ftoa ftoa;
+    struct dtoa dtoa;
     int ngot;
 
     if (ndigit < 0)
@@ -56,11 +55,11 @@ ecvtf_r (float invalue,
     if ((size_t) ndigit > len - 1)
         return -1;
 
-    ngot = __ftoa_engine(invalue, &ftoa, ndigit, false, 0);
-    *sign = !!(ftoa.flags & FTOA_MINUS);
-    *decpt = ftoa.exp + 1;
+    ngot = __ftoa_engine(invalue, &dtoa, ndigit, false, 0);
+    *sign = !!(dtoa.flags & DTOA_MINUS);
+    *decpt = dtoa.exp + 1;
     memset(buf, '0', ndigit);
-    memcpy(buf, ftoa.digits, ngot);
+    memcpy(buf, dtoa.digits, ngot);
     buf[ndigit] = '\0';
     return 0;
 }

@@ -146,7 +146,14 @@ endif
 
 #  'dcvt.c',
 
+skip_math_test = meson.get_cross_property('skip_math_test', [])
+
 foreach target : targets
+
+  if target in skip_math_test
+    continue
+  endif
+
   value = get_variable('target_' + target)
 
   libs = [get_variable('lib_c' + target)]

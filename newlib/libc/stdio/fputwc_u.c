@@ -35,6 +35,5 @@ fputwc_unlocked (
 	wchar_t wc,
 	FILE *fp)
 {
-  ORIENT(fp, 1);
   return __fputwc(wc, fp);
 }

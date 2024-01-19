@@ -110,6 +110,10 @@
 
 ENTRY(setjmp)
 ENTRY(_setjmp)
+#ifndef _FLAT
+        ta      0x03            /* Flush registers, just in case another stack
+                                   is used after the setjmp().  */
+#endif
         st      %sp, [%o0]      /* caller's stack pointer */
         st      %i7, [%o0+4]    /* caller's return pc */
         st      %fp, [%o0+8]    /* store caller's frame pointer */
@@ -119,7 +123,9 @@ ENTRY(_setjmp)
 
 ENTRY(longjmp)
 ENTRY(_longjmp)
+#ifndef _FLAT
         ta      0x03            /* flush registers */
+#endif
         addcc   %o1, %g0, %g1   ! compute v ? v : 1 in a global register
         be,a    0f
         mov     1, %g1

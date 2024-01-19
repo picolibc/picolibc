@@ -63,7 +63,7 @@ foreach target : targets
 				       install : true,
 				       install_dir : instdir,
 				       include_directories : inc,
-				       c_args : value[1],
+				       c_args : value[1] + c_args,
 				       pic: false)
 
   set_variable('lib_semihost' + target, local_lib_semihost_target)
@@ -77,7 +77,7 @@ if objcopy.found()
 
   bios_ld = '@0@/@1@'.format(meson.current_source_dir(), 'bios.ld')
   bios = executable('bios', 'bios.S',
-		    c_args: ['-m32'],
+		    c_args: ['-m32'] + c_args,
 		    link_args: ['-nostdlib', '-m32', '-Wl,--build-id=none', '-T', bios_ld])
 
   bios_bin = custom_target('bios.bin',

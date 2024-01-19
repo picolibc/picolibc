@@ -46,8 +46,7 @@
 #define _HAVE_FAST_FMAF 1
 #endif
 
-#if defined(_HAVE_ATTRIBUTE_ALWAYS_INLINE) && defined(_HAVE_ATTRIBUTE_GNU_INLINE)
-#define __declare_arm_macro(type) extern __inline type __attribute((gnu_inline, always_inline))
+#ifdef __declare_extern_inline
 
 #ifdef _WANT_MATH_ERRNO
 #include <errno.h>
@@ -59,7 +58,7 @@
  * Double precision routines
  */
 
-__declare_arm_macro(double)
+__declare_extern_inline(double)
 sqrt(double x)
 {
 	double result;
@@ -76,7 +75,7 @@ sqrt(double x)
 	return result;
 }
 
-__declare_arm_macro(double)
+__declare_extern_inline(double)
 fabs(double x)
 {
     double result;
@@ -85,7 +84,7 @@ fabs(double x)
 }
 
 #if __ARM_ARCH >= 8
-__declare_arm_macro(double)
+__declare_extern_inline(double)
 ceil (double x)
 {
   double result;
@@ -93,7 +92,7 @@ ceil (double x)
   return result;
 }
 
-__declare_arm_macro(double)
+__declare_extern_inline(double)
 floor (double x)
 {
   double result;
@@ -101,7 +100,7 @@ floor (double x)
   return result;
 }
 
-__declare_arm_macro(double)
+__declare_extern_inline(double)
 nearbyint (double x)
 {
     if (isnan(x)) return x + x;
@@ -116,7 +115,7 @@ nearbyint (double x)
     return x;
 }
 
-__declare_arm_macro(double)
+__declare_extern_inline(double)
 rint (double x)
 {
   double result;
@@ -124,7 +123,7 @@ rint (double x)
   return result;
 }
 
-__declare_arm_macro(double)
+__declare_extern_inline(double)
 round (double x)
 {
   double result;
@@ -132,7 +131,7 @@ round (double x)
   return result;
 }
 
-__declare_arm_macro(double)
+__declare_extern_inline(double)
 trunc (double x)
 {
   double result;
@@ -143,7 +142,7 @@ trunc (double x)
 
 #if _HAVE_FAST_FMA
 
-__declare_arm_macro(double)
+__declare_extern_inline(double)
 fma (double x, double y, double z)
 {
   __asm__ volatile ("vfma.f64 %P0, %P1, %P2" : "+w" (z) : "w" (x), "w" (y));
@@ -160,7 +159,7 @@ fma (double x, double y, double z)
  * Single precision functions
  */
 
-__declare_arm_macro(float)
+__declare_extern_inline(float)
 sqrtf(float x)
 {
 	float result;
@@ -177,7 +176,7 @@ sqrtf(float x)
 	return result;
 }
 
-__declare_arm_macro(float)
+__declare_extern_inline(float)
 fabsf(float x)
 {
     float result;
@@ -186,7 +185,7 @@ fabsf(float x)
 }
 
 #if __ARM_ARCH >= 8
-__declare_arm_macro(float)
+__declare_extern_inline(float)
 ceilf (float x)
 {
   float result;
@@ -194,7 +193,7 @@ ceilf (float x)
   return result;
 }
 
-__declare_arm_macro(float)
+__declare_extern_inline(float)
 floorf (float x)
 {
   float result;
@@ -202,7 +201,7 @@ floorf (float x)
   return result;
 }
 
-__declare_arm_macro(float)
+__declare_extern_inline(float)
 nearbyintf (float x)
 {
     if (isnan(x)) return x + x;
@@ -217,7 +216,7 @@ nearbyintf (float x)
     return x;
 }
 
-__declare_arm_macro(float)
+__declare_extern_inline(float)
 rintf (float x)
 {
   float result;
@@ -225,7 +224,7 @@ rintf (float x)
   return result;
 }
 
-__declare_arm_macro(float)
+__declare_extern_inline(float)
 roundf (float x)
 {
   float result;
@@ -233,7 +232,7 @@ roundf (float x)
   return result;
 }
 
-__declare_arm_macro(float)
+__declare_extern_inline(float)
 truncf (float x)
 {
   float result;
@@ -244,7 +243,7 @@ truncf (float x)
 
 #if _HAVE_FAST_FMAF
 
-__declare_arm_macro(float)
+__declare_extern_inline(float)
 fmaf (float x, float y, float z)
 {
   __asm__ volatile ("vfma.f32 %0, %1, %2" : "+t" (z) : "t" (x), "t" (y));
@@ -254,8 +253,6 @@ fmaf (float x, float y, float z)
 #endif
 
 #endif /* (__ARM_FP & 0x4) && !defined(__SOFTFP__) */
-
-#undef __declare_arm_macro
 
 #endif /* have attributes */
 

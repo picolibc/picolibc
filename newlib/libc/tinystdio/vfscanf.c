@@ -32,14 +32,6 @@
 
 /* $Id: vfscanf.c 2191 2010-11-05 13:45:57Z arcanum $ */
 
-#include <ctype.h>
-#include <limits.h>
-#include <math.h>
-#include <stdarg.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "stdio_private.h"
 #include "scanf_private.h"
 
@@ -56,7 +48,6 @@ typedef long int_scanf_t;
 #endif
 
 #ifdef WIDE_CHARS
-#include <wchar.h>
 #define INT wint_t
 #define CHAR wchar_t
 #define UCHAR wchar_t
@@ -137,7 +128,7 @@ conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags, un
 
         flags |= FL_ANY;
 
-        if (TOLOW(i) == 'x' && (base == 0 || base == 16)) {
+        if (TOLOWER(i) == 'x' && (base == 0 || base == 16)) {
             base = 16;
             if (!--width || IS_EOF(i = scanf_getc (stream, lenp)))
 		goto putval;
@@ -266,7 +257,7 @@ static INT skip_spaces (FILE *stream, int *lenp)
     do {
 	if (IS_EOF(i = scanf_getc (stream, lenp)))
 	    return i;
-    } while (ISSPACE (i));
+    } while (isspace (i));
     scanf_ungetc (i, stream, lenp);
     return i;
 }
@@ -452,7 +443,7 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
        to the begin.	*/
     while ((c = *fmt++) != 0) {
 
-	if (ISSPACE (c)) {
+	if (isspace (c)) {
 	    skip_spaces (stream, lenp);
 
 	} else if (c != '%'
@@ -617,7 +608,7 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 		    do {
 			if (IS_EOF(i = scanf_getc (stream, lenp)))
 			    break;
-			if (ISSPACE (i)) {
+			if (isspace (i)) {
 			    scanf_ungetc (i, stream, lenp);
 			    break;
 			}
@@ -727,7 +718,7 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
     return nconvs ? nconvs : EOF;
 }
 
-#if defined(FORMAT_DEFAULT_DOUBLE) && !defined(vfscanf)
+#if defined(_FORMAT_DEFAULT_DOUBLE) && !defined(vfscanf)
 #ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(vfscanf, __d_vfscanf);
 #else

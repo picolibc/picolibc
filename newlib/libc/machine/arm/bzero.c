@@ -32,10 +32,10 @@
    assume memory alignment.  */
 
 void __aeabi_memclr4 (void *dest, size_t n)
-	_ATTRIBUTE ((alias ("bzero")));
+	_ATTRIBUTE ((alias ("bzero"), weak));
 
 void __aeabi_memclr8 (void *dest, size_t n)
-	_ATTRIBUTE ((alias ("bzero")));
+	_ATTRIBUTE ((alias ("bzero"), weak));
 
 void __aeabi_memclr (void *dest, size_t n)
-	_ATTRIBUTE ((alias ("bzero")));
+	_ATTRIBUTE ((alias ("bzero"), weak));

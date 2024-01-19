@@ -29,8 +29,6 @@
 
 /* $Id: snprintf.c 1944 2009-04-01 23:12:20Z arcanum $ */
 
-#include <limits.h>
-#include <stdarg.h>
 #include "stdio_private.h"
 
 int
@@ -59,3 +57,12 @@ snprintf(char *s, size_t n, const char *fmt, ...)
 
 	return i;
 }
+
+#ifdef __LONG_DOUBLE_IEEE128__
+#if defined(_HAVE_ALIAS_ATTRIBUTE)
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(snprintf, __snprintfieee128);
+#endif
+#endif

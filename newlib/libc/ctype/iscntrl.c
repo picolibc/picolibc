@@ -67,14 +67,11 @@ PORTABILITY
 No supporting OS subroutines are required.
 */
 
-#include <_ansi.h>
 #include <ctype.h>
-
-
 
 #undef iscntrl
 int
 iscntrl (int c)
 {
-	return(__CTYPE_PTR[c+1] & _C);
+    return (0x00 <= c && c <= 0x1f) || c == 0x7f;
 }

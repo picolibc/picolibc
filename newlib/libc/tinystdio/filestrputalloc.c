@@ -34,7 +34,6 @@
  */
 
 #include "stdio_private.h"
-#include <stdlib.h>
 
 int
 __file_str_put_alloc(char c, FILE *stream)

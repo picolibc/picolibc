@@ -66,12 +66,15 @@ PORTABILITY
 
 No supporting OS subroutines are required.
 */
-#include <_ansi.h>
 #include <ctype.h>
 
 #undef islower
 int
 islower (int c)
 {
-	return ((__CTYPE_PTR[c+1] & (_U|_L)) == _L);
+#if _PICOLIBC_CTYPE_SMALL
+    return 'a' <= c && c <= 'z';
+#else
+    return ((__CTYPE_PTR[c+1] & (_U|_L)) == _L);
+#endif
 }

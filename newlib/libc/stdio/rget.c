@@ -40,19 +40,15 @@ _srget (
      we call __srefill_r so we may access the true read buffer. */
   CHECK_INIT(ptr, fp);
 
-  if (_srefill ( fp) == 0)
+  /* Have to set and check orientation here, otherwise the macros in
+     stdio.h never set it. */
+  if (ORIENT (fp, -1) != -1)
+    return EOF;
+
+  if (_srefill (fp) == 0)
     {
       fp->_r--;
       return *fp->_p++;
     }
   return EOF;
-}
-
-/* This function isn't any longer declared in stdio.h, but it's
-   required for backward compatibility with applications built against
-   earlier dynamically built newlib libraries. */
-int
-__srget (register FILE *fp)
-{
-  return _srget ( fp);
 }

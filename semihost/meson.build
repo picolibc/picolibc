@@ -57,6 +57,7 @@ if src_semihost != []
     'kill.c',
     'lseek.c',
     'lseek64.c',
+    'mapstdio.c',
     'open.c',
     'read.c',
     'sysconf.c',
@@ -92,8 +93,6 @@ if src_semihost != []
 
   if tinystdio
     src_semihost += 'iob.c'
-  else
-    src_semihost += 'mapstdio.c'
   endif
 
   install_headers('semihost.h',
@@ -125,7 +124,7 @@ if src_semihost != []
 				install : true,
 				install_dir : instdir,
 				include_directories : inc,
-				c_args : value[1]))
+				c_args : value[1] + c_args))
     
   endforeach
 endif

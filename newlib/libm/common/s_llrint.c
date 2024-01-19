@@ -57,26 +57,17 @@ llrint64(__float64 x)
   if(j0 < 20)
     {
       /* j0 in [-1023,19] */
-      if(j0 < -1)
-        return 0;
-      else
-        {
-          /* j0 in [0,19] */
-	  /* shift amt in [0,19] */
-          w = TWO52[sx] + x;
-          t = w - TWO52[sx];
-          GET_HIGH_WORD(i0, t);
-          /* Detect the all-zeros representation of plus and
-             minus zero, which fails the calculation below. */
-          if ((i0 & ~((__int32_t)1 << 31)) == 0)
-              return 0;
-          /* After round:  j0 in [0,20] */
-          j0 = ((i0 & 0x7ff00000) >> 20) - 1023;
-          i0 &= 0x000fffff;
-          i0 |= 0x00100000;
-	  /* shift amt in [20,0] */
-          result = i0 >> (20 - j0);
-        }
+      w = TWO52[sx] + x;
+      t = w - TWO52[sx];
+      GET_HIGH_WORD(i0, t);
+      /* Detect the all-zeros representation of plus and
+         minus zero, which fails the calculation below. */
+      if ((i0 & ~((__int32_t)1 << 31)) == 0)
+          return 0;
+      j0 = ((i0 & 0x7ff00000) >> 20) - 1023;
+      i0 &= 0x000fffff;
+      i0 |= 0x00100000;
+      result = (j0 < 0 ? 0 : i0 >> (20 - j0));
     }
   else if (j0 < (int)(8 * sizeof (long long int)) - 1)
     {
@@ -108,7 +99,7 @@ llrint64(__float64 x)
     {
       if (sizeof (long long) == 4 && (__float64) LLONG_MIN - _F_64(1.0) < x && x < (__float64) LLONG_MIN) {
         if (nearbyint(x) == LLONG_MIN)
-          __math_set_inexact();
+          __math_set_inexact64();
         else
           __math_set_invalid();
         return LLONG_MIN;

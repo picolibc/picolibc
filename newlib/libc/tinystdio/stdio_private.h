@@ -32,8 +32,20 @@
 #ifndef _STDIO_PRIVATE_H_
 #define _STDIO_PRIVATE_H_
 
-#include <stdio-bufio.h>
+#define _GNU_SOURCE
+#include <stdlib.h>
+#include <stdarg.h>
+#include <stddef.h>
 #include <stdbool.h>
+#include <string.h>
+#include <ctype.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <wchar.h>
+#include <float.h>
+#include <math.h>
+#include <stdio-bufio.h>
 #include <sys/lock.h>
 
 /* values for PRINTF_LEVEL */
@@ -153,8 +165,26 @@ int	__f_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 
 int	__d_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
 int	__f_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
 
-double
+#if __SIZEOF_DOUBLE__ == 8
+#define FLOAT64 double
+#define _asdouble(x) _asfloat64(x)
+#elif __SIZEOF_LONG_DOUBLE__ == 8
+#define FLOAT64 long double
+#endif
+
+#if __SIZEOF_DOUBLE__ == 4
+#define FLOAT32 double
+#define _asdouble(x) ((double) _asfloat(x))
+#elif __SIZEOF_FLOAT__ == 4
+#define FLOAT32 float
+#elif __SIZEOF_LONG_DOUBLE__ == 4
+#define FLOAT32 long double
+#endif
+
+#ifdef FLOAT64
+FLOAT64
 __atod_engine(uint64_t m10, int e10);
+#endif
 
 float
 __atof_engine(uint32_t m10, int e10);
@@ -442,8 +472,9 @@ _u128_oflow(_u128 a)
 }
 #endif
 
+#if __SIZEOF_LONG_DOUBLE__ > 8
 static inline _u128
-asuint128(long double f)
+asuintld(long double f)
 {
     union {
         long double     f;
@@ -473,6 +504,55 @@ aslongdouble(_u128 i)
     v.i = i;
     return v.f;
 }
+#elif __SIZEOF_LONG_DOUBLE__ == 8
+static inline uint64_t
+asuintld(long double f)
+{
+    union {
+        long double     f;
+        uint64_t        i;
+    } v;
+
+    v.f = f;
+    return v.i;
+}
+
+static inline long double
+aslongdouble(uint64_t i)
+{
+    union {
+        long double     f;
+        uint64_t        i;
+    } v;
+
+    v.i = i;
+    return v.f;
+}
+#elif __SIZEOF_LONG_DOUBLE__ == 4
+static inline uint32_t
+asuintld(long double f)
+{
+    union {
+        long double     f;
+        uint32_t        i;
+    } v;
+
+    v.f = f;
+    return v.i;
+}
+
+static inline long double
+aslongdouble(uint32_t i)
+{
+    union {
+        long double     f;
+        uint32_t        i;
+    } v;
+
+    v.i = i;
+    return v.f;
+}
+#endif
 
 static inline bool
 _u128_gt(_u128 a, _u128 b)
@@ -546,8 +626,11 @@ __atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v);
 
 #endif /* ATOMIC_UNGETC */
 
-#define CASE_CONVERT    ('a' - 'A')
-#define TOLOW(c)        ((c) | CASE_CONVERT)
+/*
+ * This operates like _tolower on upper case letters, but also works
+ * correctly on lower case letters.
+ */
+#define TOLOWER(c)      ((c) | ('a' - 'A'))
 
 /*
  * Convert a single character to the value of the digit for any
@@ -567,7 +650,7 @@ digit_to_val(unsigned int c)
     /*
      * Convert letters with some tricky code.
      *
-     * TOLOW(c-1) maps characters as follows (Skipping values not
+     * TOLOWER(c-1) maps characters as follows (Skipping values not
      * greater than '9' (0x39), as those are skipped by the 'if'):
      *
      * Minus 1, bitwise-OR ('a' - 'A') (0x20):
@@ -589,7 +672,7 @@ digit_to_val(unsigned int c)
     if (c > '9') {
 
         /*
-         * For the letters, we want TOLOW(c) - 'a' + 10, but that
+         * For the letters, we want TOLOWER(c) - 'a' + 10, but that
          * would map both '@' and '`' to 9.
          *
          * To work around this, subtract 1 before the bitwise-or so
@@ -603,7 +686,7 @@ digit_to_val(unsigned int c)
          * code (c -= '0') below, avoiding an else clause.
          */
 
-        c = TOLOW(c-1) + ('0' - 'a' + 11);
+        c = TOLOWER(c-1) + ('0' - 'a' + 11);
     }
 
     /*

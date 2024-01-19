@@ -395,45 +395,49 @@ FLOAT_T makemathname(test_nearbyint_negbig)(void) { return makemathname(nearbyin
 FLOAT_T makemathname(test_nearbyint_half)(void) { return makemathname(nearbyint)(makemathname(half)); }
 FLOAT_T makemathname(test_nearbyint_neghalf)(void) { return makemathname(nearbyint)(makemathname(half)); }
 
-long long makemathname(test_lrint_qnan)(void) { makemathname(lrint)(makemathname(qnanval)); return 0; }
-long long makemathname(test_lrint_snan)(void) { makemathname(lrint)(makemathname(snanval)); return 0; }
-long long makemathname(test_lrint_inf)(void) { makemathname(lrint)(makemathname(infval)); return 0; }
-long long makemathname(test_lrint_neginf)(void) { makemathname(lrint)(-makemathname(infval)); return 0; }
-long long makemathname(test_lrint_big)(void) { makemathname(lrint)(makemathname(big)); return 0; }
-long long makemathname(test_lrint_negbig)(void) { makemathname(lrint)(-makemathname(big)); return 0; }
+static volatile long long makemathname(llignore);
+
+long long makemathname(test_lrint_zero)(void) { return makemathname(lrint)(makemathname(zero)); }
+long long makemathname(test_lrint_negzero)(void) { return makemathname(lrint)(makemathname(negzero)); }
+long long makemathname(test_lrint_qnan)(void) { makemathname(llignore) = makemathname(lrint)(makemathname(qnanval)); return 0; }
+long long makemathname(test_lrint_snan)(void) { makemathname(llignore) = makemathname(lrint)(makemathname(snanval)); return 0; }
+long long makemathname(test_lrint_inf)(void) { makemathname(llignore) = makemathname(lrint)(makemathname(infval)); return 0; }
+long long makemathname(test_lrint_neginf)(void) { makemathname(llignore) = makemathname(lrint)(-makemathname(infval)); return 0; }
+long long makemathname(test_lrint_big)(void) { makemathname(llignore) = makemathname(lrint)(makemathname(big)); return 0; }
+long long makemathname(test_lrint_negbig)(void) { makemathname(llignore) = makemathname(lrint)(-makemathname(big)); return 0; }
 long long makemathname(test_lrint_long_max_mask)(void) { return makemathname(lrint)(makemathname(long_max_mask)); }
 long long makemathname(test_lrint_long_min_mask)(void) { return makemathname(lrint)(makemathname(long_min_mask)); }
 long long makemathname(test_lrint_long_max_one)(void) { return makemathname(lrint)(makemathname(long_max_one)); }
 long long makemathname(test_lrint_long_min_one)(void) { return makemathname(lrint)(makemathname(long_min_one)); }
 
-long long makemathname(test_llrint_qnan)(void) { makemathname(llrint)(makemathname(qnanval)); return 0; }
-long long makemathname(test_llrint_snan)(void) { makemathname(llrint)(makemathname(snanval)); return 0; }
-long long makemathname(test_llrint_inf)(void) { makemathname(llrint)(makemathname(infval)); return 0; }
-long long makemathname(test_llrint_neginf)(void) { makemathname(llrint)(-makemathname(infval)); return 0; }
-long long makemathname(test_llrint_big)(void) { makemathname(llrint)(makemathname(big)); return 0; }
-long long makemathname(test_llrint_negbig)(void) { makemathname(llrint)(-makemathname(big)); return 0; }
+long long makemathname(test_llrint_qnan)(void) { makemathname(llignore) = makemathname(llrint)(makemathname(qnanval)); return 0; }
+long long makemathname(test_llrint_snan)(void) { makemathname(llignore) = makemathname(llrint)(makemathname(snanval)); return 0; }
+long long makemathname(test_llrint_inf)(void) { makemathname(llignore) = makemathname(llrint)(makemathname(infval)); return 0; }
+long long makemathname(test_llrint_neginf)(void) { makemathname(llignore) = makemathname(llrint)(-makemathname(infval)); return 0; }
+long long makemathname(test_llrint_big)(void) { makemathname(llignore) = makemathname(llrint)(makemathname(big)); return 0; }
+long long makemathname(test_llrint_negbig)(void) { makemathname(llignore) = makemathname(llrint)(-makemathname(big)); return 0; }
 long long makemathname(test_llrint_long_long_max_mask)(void) { return makemathname(llrint)(makemathname(long_long_max_mask)); }
 long long makemathname(test_llrint_long_long_min_mask)(void) { return makemathname(llrint)(makemathname(long_long_min_mask)); }
 long long makemathname(test_llrint_long_long_max_one)(void) { return makemathname(llrint)(makemathname(long_long_max_one)); }
 long long makemathname(test_llrint_long_long_min_one)(void) { return makemathname(llrint)(makemathname(long_long_min_one)); }
 
-long long makemathname(test_lround_qnan)(void) { makemathname(lround)(makemathname(qnanval)); return 0; }
-long long makemathname(test_lround_snan)(void) { makemathname(lround)(makemathname(snanval)); return 0; }
-long long makemathname(test_lround_inf)(void) { makemathname(lround)(makemathname(infval)); return 0; }
-long long makemathname(test_lround_neginf)(void) { makemathname(lround)(-makemathname(infval)); return 0; }
-long long makemathname(test_lround_big)(void) { makemathname(lround)(makemathname(big)); return 0; }
-long long makemathname(test_lround_negbig)(void) { makemathname(lround)(-makemathname(big)); return 0; }
+long long makemathname(test_lround_qnan)(void) { makemathname(llignore) = makemathname(lround)(makemathname(qnanval)); return 0; }
+long long makemathname(test_lround_snan)(void) { makemathname(llignore) = makemathname(lround)(makemathname(snanval)); return 0; }
+long long makemathname(test_lround_inf)(void) { makemathname(llignore) = makemathname(lround)(makemathname(infval)); return 0; }
+long long makemathname(test_lround_neginf)(void) { makemathname(llignore) = makemathname(lround)(-makemathname(infval)); return 0; }
+long long makemathname(test_lround_big)(void) { makemathname(llignore) = makemathname(lround)(makemathname(big)); return 0; }
+long long makemathname(test_lround_negbig)(void) { makemathname(llignore) = makemathname(lround)(-makemathname(big)); return 0; }
 long long makemathname(test_lround_long_max_mask)(void) { return makemathname(lround)(makemathname(long_max_mask)); }
 long long makemathname(test_lround_long_min_mask)(void) { return makemathname(lround)(makemathname(long_min_mask)); }
 long long makemathname(test_lround_long_max_one)(void) { return makemathname(lround)(makemathname(long_max_one)); }
 long long makemathname(test_lround_long_min_one)(void) { return makemathname(lround)(makemathname(long_min_one)); }
 
-long long makemathname(test_llround_qnan)(void) { makemathname(llround)(makemathname(qnanval)); return 0; }
-long long makemathname(test_llround_snan)(void) { makemathname(llround)(makemathname(snanval)); return 0; }
-long long makemathname(test_llround_inf)(void) { makemathname(llround)(makemathname(infval)); return 0; }
-long long makemathname(test_llround_neginf)(void) { makemathname(llround)(-makemathname(infval)); return 0; }
-long long makemathname(test_llround_big)(void) { makemathname(llround)(makemathname(big)); return 0; }
-long long makemathname(test_llround_negbig)(void) { makemathname(llround)(-makemathname(big)); return 0; }
+long long makemathname(test_llround_qnan)(void) { makemathname(llignore) = makemathname(llround)(makemathname(qnanval)); return 0; }
+long long makemathname(test_llround_snan)(void) { makemathname(llignore) = makemathname(llround)(makemathname(snanval)); return 0; }
+long long makemathname(test_llround_inf)(void) { makemathname(llignore) = makemathname(llround)(makemathname(infval)); return 0; }
+long long makemathname(test_llround_neginf)(void) { makemathname(llignore) = makemathname(llround)(-makemathname(infval)); return 0; }
+long long makemathname(test_llround_big)(void) { makemathname(llignore) = makemathname(llround)(makemathname(big)); return 0; }
+long long makemathname(test_llround_negbig)(void) { makemathname(llignore) = makemathname(llround)(-makemathname(big)); return 0; }
 long long makemathname(test_llround_long_long_max_mask)(void) { return makemathname(llround)(makemathname(long_long_max_mask)); }
 long long makemathname(test_llround_long_long_min_mask)(void) { return makemathname(llround)(makemathname(long_long_min_mask)); }
 long long makemathname(test_llround_long_long_max_one)(void) { return makemathname(llround)(makemathname(long_long_max_one)); }
@@ -1402,6 +1406,8 @@ static const struct {
         TEST(ilogb_inf, INT_MAX, FE_INVALID, EDOM),
         TEST(ilogb_neginf, INT_MAX, FE_INVALID, EDOM),
 
+        TEST(lrint_zero, 0, 0, 0),
+        TEST(lrint_negzero, 0, 0, 0),
         TEST(lrint_qnan, 0, FE_INVALID, 0),
         TEST(lrint_inf, 0, FE_INVALID, 0),
         TEST(lrint_neginf, 0, FE_INVALID, 0),

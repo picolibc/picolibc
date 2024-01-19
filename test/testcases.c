@@ -26,6 +26,9 @@
 #  define BINARY_FORMAT
 # endif
 # ifdef _HAS_IO_DOUBLE
+#  if __SIZEOF_DOUBLE__ == 4
+#   define LOW_FLOAT
+#  endif
 # elif defined(_HAS_IO_FLOAT)
 #  define LOW_FLOAT
 # else
@@ -42,6 +45,9 @@
 #  define NO_CASE_HEX
 # endif
 #else
+# if __SIZEOF_DOUBLE__ == 4
+#  define LOW_FLOAT
+# endif
 # ifdef NO_FLOATING_POINT
 #  define NO_FLOAT
 # endif
@@ -685,7 +691,11 @@
     result |= test(__LINE__, "INF", "%A", (double) INFINITY);
     result |= test(__LINE__, "-INF", "%A", (double) -INFINITY);
 #ifdef LOW_FLOAT
+#ifdef NORMALIZED_A
+    result |= test(__LINE__, "0x1p-149", "%a", 0x1p-149);
+#else
     result |= test(__LINE__, "0x0.000002p-126", "%a", 0x1p-149);
+#endif
 #else
 #ifdef NORMALIZED_A
     /* newlib legacy stdio normalizes %a format */

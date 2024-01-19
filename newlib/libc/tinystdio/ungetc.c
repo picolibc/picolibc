@@ -29,7 +29,6 @@
 
 /* $Id: ungetc.c 1944 2009-04-01 23:12:20Z arcanum $ */
 
-#include <stdio.h>
 #include "stdio_private.h"
 
 int
@@ -44,7 +43,7 @@ ungetc(int c, FILE *stream)
 	if ((stream->flags & __SRD) == 0 || c == EOF)
 		return EOF;
 
-	if (!__atomic_compare_exchange_ungetc(&stream->unget, 0, (__ungetc_t) c + 1 ))
+	if (!__atomic_compare_exchange_ungetc(&stream->unget, 0, (__ungetc_t) (unsigned char) c + 1 ))
 		return EOF;
 
         stream->flags &= ~__SEOF;

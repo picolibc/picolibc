@@ -45,6 +45,7 @@ vsnprintf (
       return EOF;
     }
   f._flags = __SWR | __SSTR;
+  f._flags2 = 0;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = (size > 0 ? size - 1 : 0);
   f._file = -1;  /* No file. */
@@ -60,4 +61,13 @@ vsnprintf (
 int __nonnull((1)) _NOTHROW
 vsniprintf (char *, size_t, const char *, __VALIST)
        _ATTRIBUTE ((__alias__("vsnprintf")));
+#endif
+
+#ifdef __LONG_DOUBLE_IEEE128__
+#if defined(_HAVE_ALIAS_ATTRIBUTE)
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(vsnprintf, __vsnprintfieee128);
+#endif
 #endif

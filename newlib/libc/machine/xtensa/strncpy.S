@@ -56,7 +56,7 @@ __strncpy_aux:
 	j	.Lfill
 
 .Lret:
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	memw
 #endif
 	leaf_return
@@ -126,7 +126,7 @@ strncpy:
 	bnez    a4, .Lfillcleanup
 
 2:
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	memw
 #endif
 	leaf_return
@@ -248,7 +248,7 @@ strncpy:
 #endif
 1:	l8ui	a8, a3, 0
 	addi	a3, a3, 1
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	nop
 	nop
 	nop
@@ -265,7 +265,7 @@ strncpy:
 2:	j	.Lfill
 
 3:
-#ifdef PSRAM_FIX
+#if XTENSA_ESP32_PSRAM_CACHE_FIX
 	memw
 #endif
 	leaf_return

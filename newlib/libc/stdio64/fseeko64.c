@@ -93,7 +93,7 @@ fseeko64 (
 {
   _fpos64_t (*seekfn) (void *, _fpos64_t, int);
   _fpos64_t curoff;
-#if _FSEEK_OPTIMIZATION
+#ifdef _FSEEK_OPTIMIZATION
   _fpos64_t target;
   size_t n;
 #endif
@@ -200,7 +200,7 @@ fseeko64 (
   if (fp->_bf._base == NULL)
     _smakebuf (fp);
 
-#if _FSEEK_OPTIMIZATION
+#ifdef _FSEEK_OPTIMIZATION
   if (fp->_flags & (__SWR | __SRW | __SNBF | __SNPT))
     goto dumb;
   if ((fp->_flags & __SOPT) == 0)
@@ -208,7 +208,7 @@ fseeko64 (
       struct stat64 st;
       if (seekfn != __sseek64
 	  || fp->_file < 0
-	  || _fstat64_r (ptr, fp->_file, &st)
+	  || _fstat64 (fp->_file, &st)
 	  || (st.st_mode & S_IFMT) != S_IFREG)
 	{
 	  fp->_flags |= __SNPT;
@@ -231,7 +231,8 @@ fseeko64 (
     target = offset;
   else
     {
-      if (_fstat64_r (ptr, fp->_file, &st))
+      struct stat64 st;
+      if (_fstat64 (fp->_file, &st))
 	goto dumb;
       target = st.st_size + offset;
     }
@@ -242,7 +243,7 @@ fseeko64 (
 	curoff = fp->_offset;
       else
 	{
-	  curoff = seekfn (ptr, fp->_cookie, (_fpos64_t)0, SEEK_CUR);
+	  curoff = seekfn (fp->_cookie, (_fpos64_t)0, SEEK_CUR);
 	  if (curoff == POS_ERR)
 	    goto dumb;
 	}
@@ -278,7 +279,7 @@ fseeko64 (
    * and return.
    */
 
-  if (target >= curoff && target < curoff + n)
+  if (target >= curoff && (size_t) target < (size_t) curoff + n)
     {
       register int o = target - curoff;
 
@@ -301,7 +302,7 @@ fseeko64 (
    */
 
   curoff = target & ~((_fpos64_t)(fp->_blksize - 1));
-  if (seekfn (ptr, fp->_cookie, curoff, SEEK_SET) == POS_ERR)
+  if (seekfn (fp->_cookie, curoff, SEEK_SET) == POS_ERR)
     goto dumb;
   fp->_r = 0;
   fp->_p = fp->_bf._base;
@@ -311,7 +312,7 @@ fseeko64 (
   n = target - curoff;
   if (n)
     {
-      if (__srefill_r (ptr, fp) || fp->_r < n)
+      if (_srefill (fp) || fp->_r < (int) n)
 	goto dumb;
       fp->_p += n;
       fp->_r -= n;

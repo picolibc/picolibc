@@ -34,8 +34,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-srcs_libm_machine_real = [
-  'fenv.c',
+srcs_libm_machine = [
   's_ceil.c',
   's_fabs.c',
   's_floor.c',
@@ -65,21 +64,4 @@ srcs_libm_machine_real = [
   'sf_trunc.c'
 ]
 
-srcs_libm_machine = srcs_libm_machine_real + [
-  'feclearexcept.c',
-  'fedisableexcept.c',
-  'feenableexcept.c',
-  'fegetenv.c',
-  'fegetexcept.c',
-  'fegetexceptflag.c',
-  'fegetround.c',
-  'feholdexcept.c',
-  'feraiseexcept.c',
-  'fesetenv.c',
-  'fesetexceptflag.c',
-  'fesetround.c',
-  'fetestexcept.c',
-  'feupdateenv.c',
-]
-
-src_libm_machine = files(srcs_libm_machine_real)
+src_libm_machine = files(srcs_libm_machine)
