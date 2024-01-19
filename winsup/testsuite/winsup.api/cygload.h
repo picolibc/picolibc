@@ -102,7 +102,7 @@ namespace cygwin
   public:
     // The constructor will automatically hook you up for receiving
     // cygwin signals.  Just specify a signal and pass in a signal_handler.
-    typedef std::pointer_to_unary_function<int,void> signal_handler;
+    typedef void signal_handler (int);
     signal_handler *set_handler (int signal, signal_handler *);
 
   private:

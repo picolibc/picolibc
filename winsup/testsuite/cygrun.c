@@ -22,7 +22,6 @@ main (int argc, char **argv)
   PROCESS_INFORMATION pi;
   DWORD res;
   DWORD ec = 1;
-  char *p;
   DWORD timeout = 60 * 1000;
 
   if (argc < 2)

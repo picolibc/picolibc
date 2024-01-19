@@ -597,12 +597,9 @@ main (int argc, char *argv[])
     }
 
     // And signal handling:
-    std::pointer_to_unary_function < int , void > h1 (&hangup);
-    std::pointer_to_unary_function < int , void > h2 (&interrupt);
-    std::pointer_to_unary_function < int , void > h3 (&catch_signal);
-    cygwin.set_handler (SIGHUP, &h1);
-    cygwin.set_handler (SIGINT, &h2);
-    cygwin.set_handler (SIGUSR1, &h3);
+    cygwin.set_handler (SIGHUP, hangup);
+    cygwin.set_handler (SIGINT, interrupt);
+    cygwin.set_handler (SIGUSR1, catch_signal);
 
     // Make sure the signal handler thread has had time to start...
     Sleep (100);
