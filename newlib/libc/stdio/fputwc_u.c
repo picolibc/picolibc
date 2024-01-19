@@ -44,5 +44,5 @@ fputwc_unlocked (wchar_t wc,
   struct _reent *reent = _REENT;
 
   CHECK_INIT(reent, fp);
-  return _fputwc_unlocked_r (reent, wc, fp);
+  return __fputwc(reent, wc, fp);
 }
