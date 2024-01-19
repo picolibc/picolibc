@@ -118,8 +118,8 @@ memccpy (void *__restrict dst0,
         }
 
        /* Pick up any residual with a byte copier.  */
-      dst = (char*)aligned_dst;
-      src = (char*)aligned_src;
+      dst = (unsigned char*)aligned_dst;
+      src = (unsigned char*)aligned_src;
     }
 
   while (len0--)
