@@ -8,6 +8,7 @@ if !ELIX_LEVEL_1
 libc_a_SOURCES += \
 	%D%/duplocale.c \
 	%D%/freelocale.c \
+	%D%/getlocalename_l.c \
 	%D%/lctype.c \
 	%D%/lmessages.c \
 	%D%/lnumeric.c \

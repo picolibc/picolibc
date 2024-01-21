@@ -369,6 +369,9 @@ struct _misc_reent
   _mbstate_t _mbsrtowcs_state;
   _mbstate_t _wcrtomb_state;
   _mbstate_t _wcsrtombs_state;
+#ifdef _MB_CAPABLE
+  char _getlocalename_l_buf[32 /*ENCODING + 1*/];
+#endif
 };
 
 /* This version of _reent is laid out with "int"s in pairs, to help
@@ -530,6 +533,7 @@ struct _reent
   _r->_misc->_wcrtomb_state.__value.__wch = 0; \
   _r->_misc->_wcsrtombs_state.__count = 0; \
   _r->_misc->_wcsrtombs_state.__value.__wch = 0; \
+  _r->_misc->_getlocale_l_buf[0] = '\0'; \
   _r->_misc->_l64a_buf[0] = '\0'; \
   _r->_misc->_getdate_err = 0; \
 } while (0)
@@ -561,6 +565,7 @@ struct _reent
 #define _REENT_WCSRTOMBS_STATE(ptr) ((ptr)->_misc->_wcsrtombs_state)
 #define _REENT_L64A_BUF(ptr)    ((ptr)->_misc->_l64a_buf)
 #define _REENT_GETDATE_ERR_P(ptr) (&((ptr)->_misc->_getdate_err))
+#define _REENT_GETLOCALENAME_L_BUF(ptr) ((ptr)->_misc->_getlocalename_l_buf)
 #define _REENT_SIGNAL_BUF(ptr)  ((ptr)->_signal_buf)
 
 #else /* !_REENT_SMALL */
@@ -631,6 +636,10 @@ struct _reent
           _mbstate_t _mbrtoc16_state;
           _mbstate_t _mbrtoc32_state;
 #endif
+	  /* No errors are defined for getlocalename_l.  So we can't use
+	     buffer allocation which might lead to an ENOMEM error.  We
+	     have to use a "static" buffer here instead. */
+	  char _getlocalename_l_buf[32 /* ENCODING_LEN + 1 */];
         } _reent;
 #ifdef _REENT_BACKWARD_BINARY_COMPAT
       struct
@@ -750,6 +759,7 @@ struct _reent
 #define _REENT_L64A_BUF(ptr)    ((ptr)->_new._reent._l64a_buf)
 #define _REENT_SIGNAL_BUF(ptr)  ((ptr)->_new._reent._signal_buf)
 #define _REENT_GETDATE_ERR_P(ptr) (&((ptr)->_new._reent._getdate_err))
+#define _REENT_GETLOCALENAME_L_BUF(ptr)((ptr)->_new._reent._getlocalename_l_buf)
 
 #endif /* !_REENT_SMALL */
 
@@ -842,6 +852,8 @@ extern _Thread_local char _tls_l64a_buf[8];
 extern _Thread_local struct __locale_t *_tls_locale;
 #define _REENT_LOCALE(_ptr) (_tls_locale)
 extern _Thread_local _mbstate_t _tls_mblen_state;
+#define _REENT_GETLOCALENAME_L_BUF(ptr) (_tls_getlocalename_l_buf)
+extern _Thread_local char _tls_getlocalename_l_buf[32 /*ENCODING + 1*/];
 #define _REENT_MBLEN_STATE(_ptr) (_tls_mblen_state)
 extern _Thread_local _mbstate_t _tls_mbrlen_state;
 #define _REENT_MBRLEN_STATE(_ptr) (_tls_mbrlen_state)

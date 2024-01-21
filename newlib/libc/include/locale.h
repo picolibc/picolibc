@@ -76,6 +76,7 @@ struct __locale_t *_newlocale_r (struct _reent *, int, const char *,
 void _freelocale_r (struct _reent *, struct __locale_t *);
 struct __locale_t *_duplocale_r (struct _reent *, struct __locale_t *);
 struct __locale_t *_uselocale_r (struct _reent *, struct __locale_t *);
+const char *_getlocalename_l_r (struct _reent *, int, struct __locale_t *);
 
 #ifndef _REENT_ONLY
 
@@ -88,6 +89,10 @@ void freelocale (locale_t);
 locale_t duplocale (locale_t);
 locale_t uselocale (locale_t);
 #endif /* __POSIX_VISIBLE >= 200809 */
+
+#if __POSIX_VISIBLE >= 200809 /* FIXME? Starting with issue 8 */
+const char *getlocalename_l (int, struct __locale_t *);
+#endif
 
 #endif /* _REENT_ONLY */
 
