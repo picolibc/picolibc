@@ -486,12 +486,13 @@ details. */
   349: Add fallocate.
   350: Add close_range.
   351: Add getlocalename_l.
+  352: Implement dirent.d_reclen.
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 351
+#define CYGWIN_VERSION_API_MINOR 352
 
 /* There is also a compatibity version number associated with the shared memory
    regions.  It is incremented when incompatible changes are made to the shared

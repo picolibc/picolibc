@@ -103,6 +103,7 @@ readdir_worker (DIR *dir, dirent *de)
 
       de->d_ino = 0;
       de->d_type = DT_UNKNOWN;
+      de->d_reclen = sizeof *de;
       memset (&de->__d_unused1, 0, sizeof (de->__d_unused1));
 
       res = ((fhandler_base *) dir->__fh)->readdir (dir, de);

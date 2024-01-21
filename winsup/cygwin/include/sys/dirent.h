@@ -13,17 +13,30 @@
 #include <sys/types.h>
 #include <limits.h>
 
-#define __DIRENT_VERSION	2
+#define __DIRENT_VERSION	3
 
+/* Testing macros as per GLibC:
+    _DIRENT_HAVE_D_NAMLEN == dirent has a d_namlen member
+    _DIRENT_HAVE_D_OFF    == dirent has a d_off member
+    _DIRENT_HAVE_D_RECLEN == dirent has a d_reclen member
+    _DIRENT_HAVE_D_TYPE   == dirent has a d_type member
+*/
+#undef  _DIRENT_HAVE_D_NAMLEN
+#undef  _DIRENT_HAVE_D_OFF
+#define _DIRENT_HAVE_D_RECLEN
 #define _DIRENT_HAVE_D_TYPE
+
 struct dirent
 {
-  uint32_t __d_version;			/* Used internally */
-  ino_t d_ino;
-  unsigned char d_type;
-  unsigned char __d_unused1[3];
-  __uint32_t __d_internal1;
-  char d_name[NAME_MAX + 1];
+  __uint32_t	__d_version;			/* Used internally */
+  ino_t		d_ino;
+  unsigned char	d_type;
+  unsigned char	__d_unused1[1];
+  __uint16_t	d_reclen;
+  __uint32_t	__d_internal1;
+  char		d_name[NAME_MAX + 1];
+};
+
 };
 
 #define d_fileno d_ino			/* BSD compatible definition */
