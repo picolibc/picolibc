@@ -116,8 +116,7 @@ case "${target}" in
 	config_bfin=true
 	;;
   cr16-*-*)
-	AC_CONFIG_FILES([cr16/Makefile])
-	subdirs="$subdirs cr16"
+	config_cr16=true
 	;;
   cris-*-* | crisv32-*-*)
 	AC_CONFIG_FILES([cris/Makefile])
@@ -218,7 +217,7 @@ AC_SUBST(subdirs)
 dnl These subdirs have converted to non-recursive make.  Hopefully someday all
 dnl the ports above will too!
 m4_foreach_w([SUBDIR], [
-  aarch64 arc arm bfin csky d30v epiphany fr30 frv ft32 i386 i960 iq2000
+  aarch64 arc arm bfin cr16 csky d30v epiphany fr30 frv ft32 i386 i960 iq2000
   libnosys lm32
   m32r mcore microblaze mn10200 mn10300 moxie msp430
   nds32 nios2 or1k pru riscv rl78 rx sparc sparc_leon tic6x v850 visium

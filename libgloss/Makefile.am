@@ -92,6 +92,9 @@ endif
 if CONFIG_BFIN
 include bfin/Makefile.inc
 endif
+if CONFIG_CR16
+include cr16/Makefile.inc
+endif
 if CONFIG_CSKY
 include csky/Makefile.inc
 endif
