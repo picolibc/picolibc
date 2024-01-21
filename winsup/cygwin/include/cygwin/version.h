@@ -485,12 +485,13 @@ details. */
   348: Add c8rtomb, mbrtoc.
   349: Add fallocate.
   350: Add close_range.
+  351: Add getlocalename_l.
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 350
+#define CYGWIN_VERSION_API_MINOR 351
 
 /* There is also a compatibity version number associated with the shared memory
    regions.  It is incremented when incompatible changes are made to the shared

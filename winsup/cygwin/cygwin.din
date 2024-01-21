@@ -696,6 +696,7 @@ getifaddrs SIGFE
 getitimer SIGFE
 getline = __getline SIGFE
 getloadavg SIGFE
+getlocalename_l SIGFE
 getlogin NOSIGFE
 getlogin_r NOSIGFE
 getmntent SIGFE
