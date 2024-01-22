@@ -221,11 +221,13 @@ char *	ecvtbuf (double, int, int*, int*, char *);
 char *	fcvtbuf (double, int, int*, int*, char *);
 char *	ecvtf (float,int,int *,int *);
 #endif
+#ifndef __CYGWIN__
 char *	__itoa (int, char *, int);
 char *	__utoa (unsigned, char *, int);
-#if __MISC_VISIBLE
+# if __MISC_VISIBLE
 char *	itoa (int, char *, int);
 char *	utoa (unsigned, char *, int);
+# endif
 #endif
 #if __POSIX_VISIBLE
 int	rand_r (unsigned *__seed);
