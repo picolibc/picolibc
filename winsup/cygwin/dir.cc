@@ -235,7 +235,6 @@ seekdir (DIR *dir, long loc)
 	  dir->__flags &= dirent_info_mask;
 	  ((fhandler_base *) dir->__fh)->seekdir (dir, loc);
 	}
-      set_errno (EINVAL);	/* Diagnosis */
     }
   __except (EFAULT) {}
   __endtry
