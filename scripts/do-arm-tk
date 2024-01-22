@@ -62,6 +62,6 @@ cd "$DESTDIR"/"$ARM_TK"
 
 ZIP="$DESTDIR"/picolibc-"$PICOLIBC_VERSION"-"$TK_VERSION".zip
 
-rm "$ZIP"
+rm -f "$ZIP"
 
 zip -r "$ZIP" .
