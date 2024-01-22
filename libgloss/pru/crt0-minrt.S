@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: BSD-2-Clause-FreeBSD
  *
- * crt0.S -- PRU startup code
+ * crt0-minrt.S -- Minimal PRU startup code
  *
- * Copyright (c) 2018-2019 Dimitar Dimitrov <dimitar@dinux.eu>
+ * Copyright (c) 2024 Dimitar Dimitrov <dimitar@dinux.eu>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,6 @@
 #include "newlib.h"
 
 	.extern	main
-	.extern	exit
 
 	.text
 	.section .init0, "x"
@@ -39,42 +38,11 @@ _start:
 
 	/* DATA and BSS are handled by the loader, so nothing to do here. */
 
-	.extern _do_global_dtors
-	/* Ensure destructors get called.  Call is per GNU ABI (i.e. 32-bit
-	   function pointers).  But it is also compatible with the TI ABI
-	   since GCC supports only little endian PRU.
-
-	   WARNING:  Keep this compatible with both ABIs!  */
-	ldi	r14, %pmem(_do_global_dtors)
-	call	atexit
-
-	/* Call constructors. Use non-call-clobbered registers. */
-	ldi	r5, __init_array_start
-	ldi	r6, __init_array_end
-ctors_loop:
-	qbeq	ctors_done, r5, r6
-	/* ABI dictates 16-bit IMEM pointers. */
-	lbbo	r7, r5, 0, 2
-	call	r7.w0
-	add	r5, r5, 2
-	jmp	ctors_loop
-ctors_done:
-
 	/* Just in case main() tries to access argc, argv[] and envp. */
 	zero	r14, 3 * 4
 
-	.weak __c_args__
-	ldi32	r5, __c_args__
-	qbeq	__skip_c_args, r5, 0
-	lbbo	r14, r5, 0, 4	/* argc */
-	add	r15, r5, 4	/* argv */
-__skip_c_args:
-
-	/* Call main */
+	/* Call main. */
 	call	main
-
-	/* Call exit */
-	call	exit
 
 	/* We should never reach here. */
 _crt_exit:
