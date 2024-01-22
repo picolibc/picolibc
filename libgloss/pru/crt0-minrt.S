@@ -38,22 +38,9 @@ _start:
 
 	/* DATA and BSS are handled by the loader, so nothing to do here. */
 
-	/* Just in case main() tries to access argc, argv[] and envp. */
-	zero	r14, 3 * 4
-
-	/* Call main. */
+	/* Call main. Assume argc and argv are not used with -minrt! */
 	call	main
 
 	/* We should never reach here. */
 _crt_exit:
-	halt
 	jmp	_crt_exit
-
-	/* PRU obviously has no shared libraries, but dso_handle
-	   helps to achieve better GCC test coverage. Besides,
-	   it should be free with minrt. */
-	.section .data
-	.global __dso_handle
-	.weak __dso_handle
-__dso_handle:
-	.long	0
