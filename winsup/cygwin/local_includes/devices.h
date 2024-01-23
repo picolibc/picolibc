@@ -15,7 +15,6 @@ typedef unsigned short _minor_t;
 #define _minor(dev) ((dev) & ((1 << (sizeof (_minor_t) * 8)) - 1))
 #define _major(dev) ((dev) >> (sizeof (_major_t) * 8))
 
-#include <sys/stat.h>
 #include <dirent.h>
 #include "cygheap_malloc.h"
 
@@ -383,9 +382,7 @@ public:
   inline int exists () const {return exists_func (*this);}
   unsigned char type () const
   {
-    if (S_ISBLK (_mode))
-      return DT_BLK;
-    return _mode >> 12;
+    return IFTODT (_mode);
   }
 };
 
