@@ -1,4 +1,4 @@
-/* Posix dirent.h for WIN32.
+/* Posix dirent.h
 
    This software is a copyrighted work licensed under the terms of the
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -41,21 +41,7 @@ struct dirent
 
 #define d_fileno d_ino			/* BSD compatible definition */
 
-#define __DIRENT_COOKIE 0xcdcd8484
-
-typedef struct __DIR
-{
-  /* This is first to set alignment in non _LIBC case.  */
-  unsigned long __d_cookie;
-  struct dirent *__d_dirent;
-  char *__d_dirname;			/* directory name with trailing '*' */
-  __int32_t __d_position;			/* used by telldir/seekdir */
-  int __d_fd;
-  uintptr_t __d_internal;
-  void *__handle;
-  void *__fh;
-  unsigned __flags;
-} DIR;
+typedef struct __DIR DIR;
 
 #if __BSD_VISIBLE
 #ifdef _DIRENT_HAVE_D_TYPE
