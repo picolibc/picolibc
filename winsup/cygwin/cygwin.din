@@ -520,6 +520,7 @@ fcvt SIGFE
 fcvtbuf SIGFE
 fcvtf SIGFE
 fdatasync SIGFE
+fdclosedir SIGFE
 fdim NOSIGFE
 fdimf NOSIGFE
 fdiml NOSIGFE

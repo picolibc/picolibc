@@ -267,9 +267,8 @@ rewinddir (DIR *dir)
   __endtry
 }
 
-/* closedir: POSIX 5.1.2.1 */
-extern "C" int
-closedir (DIR *dir)
+static int
+closedir_worker (DIR *dir, int *fdret)
 {
   __try
     {
@@ -280,19 +279,42 @@ closedir (DIR *dir)
 
 	  int res = ((fhandler_base *) dir->__fh)->closedir (dir);
 
-	  close (dir->__d_fd);
+	  if (fdret)
+	    *fdret = dir->__d_fd;
+	  else
+	    close (dir->__d_fd);
+
 	  free (dir->__d_dirname);
 	  free (dir->__d_dirent);
 	  free (dir);
-	  syscall_printf ("%R = closedir(%p)", res, dir);
 	  return res;
 	}
       set_errno (EBADF);
     }
   __except (EFAULT) {}
   __endtry
-  syscall_printf ("%R = closedir(%p)", -1, dir);
   return -1;
+}
+
+/* closedir: POSIX 5.1.2.1 */
+extern "C" int
+closedir (DIR *dir)
+{
+  int res;
+
+  res = closedir_worker (dir, NULL);
+  syscall_printf ("%R = closedir(%p)", res, dir);
+  return res;
+}
+
+extern "C" int
+fdclosedir (DIR *dir)
+{
+  int fd = -1;
+
+  closedir_worker (dir, &fd);
+  syscall_printf ("%d = fdclosedir(%p)", fd, dir);
+  return fd;
 }
 
 /* mkdir: POSIX 5.4.1.1 */
