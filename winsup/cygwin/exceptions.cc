@@ -540,6 +540,9 @@ int exec_prepared_command (PWCHAR command)
     }
   FreeEnvironmentStringsW (rawenv);
 
+  /* timeout from waiting for debugger to attach after 10 seconds */
+  ULONGLONG timeout = GetTickCount64() + 10*1000;
+
   console_printf ("*** starting '%W' for pid %u, tid %u\r\n",
 		  command,
 		  cygwin_pid (GetCurrentProcessId ()), GetCurrentThreadId ());
@@ -562,7 +565,8 @@ int exec_prepared_command (PWCHAR command)
      we continue or not.
 
      Note that this is still racy: if the error_start process does it's work too
-     fast, we don't notice that it attached and get stuck here.
+     fast, we don't notice that it attached and get stuck here.  So we also
+     apply a timeout to ensure we exit eventually.
   */
 
   *dbg_end = L'\0';
@@ -570,7 +574,7 @@ int exec_prepared_command (PWCHAR command)
     system_printf ("Failed to start, %E");
   else
     {
-      while (!being_debugged ())
+      while (!being_debugged () && GetTickCount64() < timeout)
 	Sleep (0);
       Sleep (2000);
     }
