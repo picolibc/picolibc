@@ -9,6 +9,7 @@ details. */
 #include "winsup.h"
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #define _LIBC
 #include <dirent.h>
@@ -199,6 +200,63 @@ readdir_r (DIR *__restrict dir, dirent *__restrict de, dirent **__restrict ode)
 	res = 0;
     }
   return res;
+}
+
+/* Not exposed through sys/stat.h when building Cygwin */
+extern "C" int fstatat (int, const char *__restrict ,
+			struct stat *__restrict, int);
+
+extern "C"
+ssize_t posix_getdents(int fd, void *buf, size_t nbytes, int flags)
+{
+  struct posix_dent *dent_buf, *src;
+  ssize_t cnt = 0;
+
+  cygheap_fdget cfd (fd);
+  /* Valid descriptor? */
+  if (cfd < 0)
+    return -1;
+  /* Valid flags?  Right now only DT_FORCE_TYPE is defined */
+  if ((flags & ~DT_FORCE_TYPE) != 0)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  /* Create type-safe buffer pointer */
+  dent_buf = (struct posix_dent *) buf;
+  /* Check if nbytes is big enough to fit at least one struct posix_dent */
+  if (nbytes < sizeof (struct posix_dent))
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  /* Create internal DIR * on first invocation */
+  if (!cfd->getdents_dir ())
+    {
+      cfd->getdents_dir (cfd->opendir (fd));
+      if (!cfd->getdents_dir ())
+	return -1;
+    }
+  /* Now loop until EOF or buf is full */
+  while (nbytes >= sizeof (struct posix_dent))
+    {
+      /* Our struct posix_dent is identical to struct dirent */
+      src = (struct posix_dent *) readdir (cfd->getdents_dir ());
+      if (!src)
+	break;
+      /* Handle the suggested DT_FORCE_TYPE flag */
+      if (src->d_type == DT_UNKNOWN && (flags & DT_FORCE_TYPE))
+	{
+	  struct stat st;
+
+	  if (!fstatat (fd, src->d_name, &st, AT_SYMLINK_NOFOLLOW))
+	    src->d_type = IFTODT (st.st_mode);
+	}
+      *dent_buf++ = *src;
+      ++cnt;
+      nbytes -= sizeof (struct posix_dent);
+    }
+  return cnt * sizeof (struct posix_dent);
 }
 
 /* telldir */

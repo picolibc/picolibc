@@ -1316,6 +1316,7 @@ fhandler_base::close ()
       paranoid_printf ("CloseHandle failed, %E");
       __seterrno ();
     }
+  clear_getdents ();
   return res;
 }
 
@@ -1432,7 +1433,10 @@ fhandler_base::dup (fhandler_base *child, int flags)
 
       VerifyHandle (nh);
       child->set_handle (nh);
+      /* Just set to NULL, the struct is potentially still valid
+	 in the parent fhandler. */
     }
+  child->getdents_dir (NULL);
   return 0;
 }
 
@@ -1632,6 +1636,7 @@ fhandler_base::fixup_after_fork (HANDLE parent)
   /* POSIX locks are not inherited across fork. */
   if (unique_id)
     del_my_locks (after_fork);
+  clear_getdents ();
 }
 
 void
@@ -1640,6 +1645,7 @@ fhandler_base::fixup_after_exec ()
   debug_printf ("here for '%s'", get_name ());
   if (unique_id && close_on_exec ())
     del_my_locks (after_exec);
+  getdents_dir (NULL);
   mandatory_locking (false);
 }
 

@@ -1046,6 +1046,7 @@ poll SIGFE
 popen SIGFE
 posix_fadvise SIGFE
 posix_fallocate SIGFE
+posix_getdents SIGFE
 posix_madvise SIGFE
 posix_memalign SIGFE
 posix_openpt SIGFE

@@ -214,6 +214,9 @@ class fhandler_base
 
   struct rabuf_t ra;
 
+  /* Used for posix_getdents () */
+  DIR *_getdents_dir;
+
   /* Used for advisory file locking.  See flock.cc.  */
   int64_t unique_id;
   void del_my_locks (del_lock_called_from);
@@ -526,6 +529,17 @@ public:
   }
 
   HANDLE get_select_sem () { return select_sem; }
+
+  DIR *getdents_dir () const { return _getdents_dir; }
+  DIR *getdents_dir (DIR *_nd) { return _getdents_dir = _nd; }
+  void clear_getdents ()
+  {
+    if (getdents_dir ())
+      {
+	fdclosedir (getdents_dir ());
+	getdents_dir (NULL);
+      }
+  }
 };
 
 struct wsa_event

@@ -3,7 +3,7 @@ What's new:
 
 - New API call: getlocalename_l.
 
-- New API call: fdclosedir.
+- New API calls: fdclosedir, posix_getdents.
 
 
 What changed:

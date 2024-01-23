@@ -37,14 +37,30 @@ struct dirent
   char		d_name[NAME_MAX + 1];
 };
 
+#if __POSIX_VISIBLE >= 200809
+#define DT_FORCE_TYPE	0x01	/* Suggested by SUS Base Specs Issue 8 */
+
+typedef __uint16_t reclen_t;
+
+/* This is a drop-in replacement for DIR, but used from posix_getdent()
+   per SUS Base Specs Issue 8 */
+struct posix_dent
+{
+  __uint32_t	__d_version;
+  ino_t		d_ino;
+  unsigned char	d_type;
+  unsigned char	__d_unused1[1];
+  reclen_t	d_reclen;
+  __uint32_t	__d_internal1;
+  char		d_name[NAME_MAX + 1];
 };
+#endif /* __POSIX_VISIBLE >= 200809 */
 
 #define d_fileno d_ino			/* BSD compatible definition */
 
 typedef struct __DIR DIR;
 
-#if __BSD_VISIBLE
-#ifdef _DIRENT_HAVE_D_TYPE
+#if __BSD_VISIBLE || __POSIX_VISIBLE >= 200809
 /* File types for `d_type'.  */
 enum
 {
@@ -67,10 +83,11 @@ enum
   DT_WHT = 14
 # define DT_WHT         DT_WHT
 };
+#endif /* __BSD_VISIBLE || __POSIX_VISIBLE >= 200809 */
 
+#if __BSD_VISIBLE
 /* Convert between stat structure types and directory types.  */
 # define IFTODT(mode)		(((mode) & 0170000) >> 12)
 # define DTTOIF(dirtype)        ((dirtype) << 12)
-#endif /* _DIRENT_HAVE_D_TYPE */
 #endif /* __BSD_VISIBLE */
 #endif /*_SYS_DIRENT_H*/

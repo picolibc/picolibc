@@ -1609,10 +1609,33 @@ lseek (int fd, off_t pos, int dir)
   else
     {
       cygheap_fdget cfd (fd);
-      if (cfd >= 0)
-	res = cfd->lseek (pos, dir);
-      else
+      if (cfd < 0)
 	res = -1;
+      else if (cfd->getdents_dir ())
+	{
+	  if (dir != SEEK_SET && dir != SEEK_CUR) /* No SEEK_END */
+	    {
+	      set_errno (EINVAL);
+	      res = -1;
+	    }
+	  else
+	    {
+	      long cur;
+
+	      cur = cfd->telldir (cfd->getdents_dir ());
+	      if (dir == SEEK_CUR && cur == 0)
+		res = cur;
+	      else
+		{
+		  if (dir == SEEK_CUR)
+		    pos = cur + pos;
+		  cfd->seekdir (cfd->getdents_dir (), pos);
+		  res = pos;
+		}
+	    }
+	}
+      else
+	res = cfd->lseek (pos, dir);
     }
   /* Can't use %R/%lR here since res is always 8 bytes */
   syscall_printf (res == -1 ? "%D = lseek(%d, %D, %d), errno %d"
