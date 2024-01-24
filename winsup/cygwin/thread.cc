@@ -2060,6 +2060,9 @@ pthread::once (pthread_once_t *once_control, void (*init_routine) (void))
     {
       init_routine ();
       once_control->state = 1;
+      pthread_mutex_unlock (&once_control->mutex);
+      while (pthread_mutex_destroy (&once_control->mutex) == EBUSY);
+      return 0;
     }
   /* Here we must remove our cancellation handler */
   pthread_mutex_unlock (&once_control->mutex);
