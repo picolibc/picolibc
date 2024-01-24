@@ -202,10 +202,6 @@ readdir_r (DIR *__restrict dir, dirent *__restrict de, dirent **__restrict ode)
   return res;
 }
 
-/* Not exposed through sys/stat.h when building Cygwin */
-extern "C" int fstatat (int, const char *__restrict ,
-			struct stat *__restrict, int);
-
 extern "C"
 ssize_t posix_getdents(int fd, void *buf, size_t nbytes, int flags)
 {
