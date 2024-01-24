@@ -1,0 +1,13 @@
+			 libgloss Maintainers
+
+libgloss is part of Newlib project, so see the file newlib/MAINTAINERS
+for more people.  This file is intended to find libgloss-specific people
+where it makes sense.
+
+
+		      Blanket Write Privileges
+
+The official maintainers of libgloss:
+
+Jeff Johnston			jjohnstn@redhat.com
+Mike Frysinger			vapier@gentoo.org
