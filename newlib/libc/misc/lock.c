@@ -81,51 +81,51 @@ struct __lock {
   char unused;
 };
 
-struct __lock __lock___libc_recursive_mutex;
+struct __lock __attribute__((weak)) __lock___libc_recursive_mutex;
 
-void
+void __attribute__((weak))
 __retarget_lock_init (_LOCK_T *lock)
 {
   (void) lock;
 }
 
-void
+void __attribute__((weak))
 __retarget_lock_init_recursive(_LOCK_T *lock)
 {
   (void) lock;
 }
 
-void
+void __attribute__((weak))
 __retarget_lock_close(_LOCK_T lock)
 {
   (void) lock;
 }
 
-void
+void __attribute__((weak))
 __retarget_lock_close_recursive(_LOCK_T lock)
 {
   (void) lock;
 }
 
-void
+void __attribute__((weak))
 __retarget_lock_acquire (_LOCK_T lock)
 {
   (void) lock;
 }
 
-void
+void __attribute__((weak))
 __retarget_lock_acquire_recursive (_LOCK_T lock)
 {
   (void) lock;
 }
 
-void
+void __attribute__((weak))
 __retarget_lock_release (_LOCK_T lock)
 {
   (void) lock;
 }
 
-void
+void __attribute__((weak))
 __retarget_lock_release_recursive (_LOCK_T lock)
 {
   (void) lock;
