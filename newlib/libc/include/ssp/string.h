@@ -49,12 +49,12 @@ __END_DECLS
 #if __SSP_FORTIFY_LEVEL > 0
 
 #define __ssp_bos_check3(fun, dst, src, len) \
-    ((__ssp_bos0(dst) != (size_t)-1) ? \
+    (__ssp_bos_known(dst) ? \
     __builtin___ ## fun ## _chk(dst, src, len, __ssp_bos0(dst)) : \
     __ ## fun ## _ichk(dst, src, len))
 
 #define __ssp_bos_check2(fun, dst, src) \
-    ((__ssp_bos0(dst) != (size_t)-1) ? \
+    (__ssp_bos_known(dst) ? \
     __builtin___ ## fun ## _chk(dst, src, __ssp_bos0(dst)) : \
     __ ## fun ## _ichk(dst, src))
 

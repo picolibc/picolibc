@@ -104,7 +104,7 @@ extern "C" {
  * _DEFAULT_SOURCE (or none of the above)
  * 	POSIX-1.2008 with BSD and SVr4 extensions
  *
- * _FORTIFY_SOURCE = 1 or 2
+ * _FORTIFY_SOURCE = 1, 2 or 3
  * 	Object Size Checking function wrappers
  */
 
@@ -247,7 +247,7 @@ extern "C" {
  * 	GNU extensions; enabled with _GNU_SOURCE.
  *
  * __SSP_FORTIFY_LEVEL
- * 	Object Size Checking; defined to 0 (off), 1, or 2.
+ * 	Object Size Checking; defined to 0 (off), 1, 2 or 3.
  *
  * In all cases above, "enabled by default" means either by defining
  * _DEFAULT_SOURCE, or by not defining any of the public feature test macros.
@@ -335,7 +335,13 @@ extern "C" {
 #if _FORTIFY_SOURCE > 0 && !defined(__cplusplus) && !defined(__lint__) && \
    (__OPTIMIZE__ > 0 || defined(__clang__)) && __GNUC_PREREQ__(4, 1) && \
    !defined(_LIBC)
-#  if _FORTIFY_SOURCE > 1
+#  if _FORTIFY_SOURCE > 2 && defined(__has_builtin)
+#    if __has_builtin(__builtin_dynamic_object_size)
+#      define __SSP_FORTIFY_LEVEL 3
+#    else
+#      define __SSP_FORTIFY_LEVEL 2
+#    endif
+#  elif _FORTIFY_SOURCE > 1
 #    define __SSP_FORTIFY_LEVEL 2
 #  else
 #    define __SSP_FORTIFY_LEVEL 1
