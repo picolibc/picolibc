@@ -67,3 +67,9 @@ What changed:
 
 - The default RLIMIT_CORE is now 0, disabling the generation of core dump or
   stackdump files.
+
+Fixes:
+------
+
+- Fix arc4random reseeding after fork(2).
+  Addresses: https://cygwin.com/pipermail/cygwin/2024-January/255245.html

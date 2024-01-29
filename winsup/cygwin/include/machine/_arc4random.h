@@ -25,4 +25,15 @@ extern int __isthreaded;
 	    __lock_release (_arc4random_mutex);	\
         } while (0)
 
+static inline void
+_arc4random_forkdetect(void)
+{
+  extern int __in_forkee;
+
+  if (__in_forkee)
+    rs = NULL;
+}
+#define _ARC4RANDOM_FORKDETECT() _arc4random_forkdetect ()
+
+__END_DECLS
 #endif /* _MACHINE_ARC4RANDOM_H */
