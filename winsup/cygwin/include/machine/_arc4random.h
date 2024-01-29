@@ -35,5 +35,4 @@ _arc4random_forkdetect(void)
 }
 #define _ARC4RANDOM_FORKDETECT() _arc4random_forkdetect ()
 
-__END_DECLS
 #endif /* _MACHINE_ARC4RANDOM_H */
