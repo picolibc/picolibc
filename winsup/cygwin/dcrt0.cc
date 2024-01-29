@@ -64,7 +64,7 @@ do_global_dtors ()
 static void
 do_global_ctors (void (**in_pfunc)(), int force)
 {
-  if (!force && in_forkee)
+  if (!force && __in_forkee == FORKING)
     return;		// inherit constructed stuff from parent pid
 
   /* Run ctors backwards, so skip the first entry and find how many
@@ -532,7 +532,7 @@ get_cygwin_startup_info ()
       switch (res->type)
 	{
 	  case _CH_FORK:
-	    in_forkee = true;
+	    __in_forkee = FORKING;
 	    should_be_cb = sizeof (child_info_fork);
 	    fallthrough;
 	  case _CH_SPAWN:
@@ -803,7 +803,7 @@ dll_crt0_1 (void *)
 
   _my_tls.incyg++;
   /* Inherit "parent" exec'ed process sigmask */
-  if (spawn_info && !in_forkee)
+  if (spawn_info && __in_forkee != FORKING)
     _my_tls.sigmask = spawn_info->sigmask;
 
   if (dynamically_loaded)
@@ -840,7 +840,7 @@ dll_crt0_1 (void *)
 
   /* Initialize pthread mainthread when not forked and it is safe to call new,
      otherwise it is reinitalized in fixup_after_fork */
-  if (!in_forkee)
+  if (__in_forkee != FORKING)
     {
       pthread::init_mainthread ();
       _pei386_runtime_relocator (user_data);
@@ -851,7 +851,7 @@ dll_crt0_1 (void *)
 #endif
 
   cygbench ("pre-forkee");
-  if (in_forkee)
+  if (__in_forkee == FORKING)
     {
       /* Make sure to restore the TEB's stack info.  If guardsize is -1 the
 	 stack has been provided by the application and must not be deallocated
@@ -1018,7 +1018,7 @@ _dll_crt0 ()
      under our own control and avoids collision with the OS. */
   if (!dynamically_loaded)
     {
-      if (!in_forkee)
+      if (__in_forkee != FORKING)
 	{
 	  /* Must be static since it's referenced after the stack and frame
 	     pointer registers have been changed. */
@@ -1056,7 +1056,7 @@ void
 dll_crt0 (per_process *uptr)
 {
   /* Set the local copy of the pointer into the user space. */
-  if (!in_forkee && uptr && uptr != user_data)
+  if (__in_forkee != FORKING && uptr && uptr != user_data)
     {
       memcpy (user_data, uptr, per_process_overwrite);
       *(user_data->impure_ptr_ptr) = _GLOBAL_REENT;
@@ -1246,7 +1246,9 @@ extern "C" void
 vapi_fatal (const char *fmt, va_list ap)
 {
   char buf[4096];
-  int n = __small_sprintf (buf, "%P: *** fatal error %s- ", in_forkee ? "in forked process " : "");
+  int n = __small_sprintf (buf, "%P: *** fatal error %s- ",
+				(__in_forkee == FORKING)
+				? "in forked process " : "");
   __small_vsprintf (buf + n, fmt, ap);
   va_end (ap);
   strace.prntf (_STRACE_SYSTEM, NULL, "%s", buf);

@@ -639,7 +639,7 @@ dofork (void **proc, bool *with_forkables)
     else
       {
 	res = grouped.child (stackp);
-	in_forkee = false;
+	__in_forkee = FORKED;
 	ischild = true;	/* might have been reset by fork mem copy */
       }
   }

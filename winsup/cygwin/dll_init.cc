@@ -39,7 +39,7 @@ static bool dll_global_dtors_recorded;
 
 /* We need the in_load_after_fork flag so dll_dllcrt0_1 can decide at fork
    time if this is a linked DLL or a dynamically loaded DLL.  In either case,
-   both, cygwin_finished_initializing and in_forkee are true, so they are not
+   both, cygwin_finished_initializing and __in_forkee are true, so they are not
    sufficient to discern the situation. */
 static bool NO_COPY in_load_after_fork;
 
@@ -161,7 +161,7 @@ dll_global_dtors ()
   /* Don't attempt to call destructors if we're still in fork processing
      since that likely means fork is failing and everything will not have been
      set up.  */
-  if (in_forkee)
+  if (__in_forkee == FORKING)
     return;
   int recorded = dll_global_dtors_recorded;
   dll_global_dtors_recorded = false;
@@ -205,7 +205,7 @@ dll::init ()
   int ret = 1;
 
   /* Don't run constructors or the "main" if we've forked. */
-  if (!in_forkee)
+  if (__in_forkee != FORKING)
     {
       /* global contructors */
       p.run_ctors ();
@@ -564,7 +564,7 @@ dll_list::detach (void *retaddr)
   /* Don't attempt to call destructors if we're still in fork processing
      since that likely means fork is failing and everything will not have been
      set up.  */
-  if (!myself || in_forkee)
+  if (!myself || __in_forkee == FORKING)
     return;
   guard (true);
   if ((d = find (retaddr)))

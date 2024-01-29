@@ -73,8 +73,6 @@ bool wincmdln;
 winsym_t allow_winsymlinks = WSYM_default;
 bool disable_pcon;
 
-bool NO_COPY in_forkee;
-
 /* Taken from BSD libc:
    This variable is zero until a process has created a pthread.  It is used
    to avoid calling locking functions in libc when they are not required.
@@ -183,6 +181,17 @@ extern "C" {
    /* impure_ptr */ _GLOBAL_REENT,
   };
   int _check_for_executable = true;
+
+  /* This was a bool initially, just indicating if we're in the forked
+     child during fork(2).  However, we need an indicator accessible from
+     plain C we can ask if we're in a forked child even after fork(2)
+     finished.  Therefore redefined how we use this variable. */
+  enum {
+    NOT_FORKED	= 0,
+    FORKING	= 1,
+    FORKED	= 2
+  };
+  int NO_COPY __in_forkee;
 };
 
 int NO_COPY __api_fatal_exit_val = 1;

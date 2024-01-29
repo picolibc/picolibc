@@ -154,7 +154,7 @@ user_heap_info::init ()
 	  if ((reserve_size -= page_const) < allocsize)
 	    break;
 	}
-      if (!p && in_forkee && !fork_info->abort (NULL))
+      if (!p && __in_forkee == FORKING && !fork_info->abort (NULL))
 	api_fatal ("couldn't allocate heap, %E, base %p, top %p, "
 		   "reserve_size %ld, allocsize %ld, page_const %d",
 		   base, top,
