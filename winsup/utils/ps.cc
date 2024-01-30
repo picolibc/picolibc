@@ -357,6 +357,7 @@ main (int argc, char *argv[])
 
       char uname[128];
       char ttyname[9];
+      char *cmdline = NULL;
 
       if (fflag)
 	{
@@ -369,13 +370,25 @@ main (int argc, char *argv[])
 	    sprintf (uname, "%u", (unsigned)
 		     (p->version >= EXTERNAL_PINFO_VERSION_32_BIT ?
 		      p->uid32 : p->uid));
+
+	  cmdline = (char *) cygwin_internal (CW_CMDLINE_ALLOC, p->pid);
+	  if (cmdline) /* Replace \0 with spaces */
+	    {
+	      char *p = cmdline;
+	      while (p && *p)
+		if ((p = strchr (p, '\0')))
+		  *p++ = ' ';
+	    }
 	}
 
       if (sflag)
 	printf (dfmt, p->pid, ttynam (p->ctty, ttyname), start_time (p), pname);
       else if (fflag)
-	printf (ffmt, uname, p->pid, p->ppid, ttynam (p->ctty, ttyname),
-		start_time (p), pname);
+	{
+	  printf (ffmt, uname, p->pid, p->ppid, ttynam (p->ctty, ttyname),
+		  start_time (p), cmdline ?: pname);
+	  free (cmdline);
+	}
       else if (lflag)
 	printf (lfmt, status, p->pid, p->ppid, p->pgid,
 		p->dwProcessId, ttynam (p->ctty, ttyname),

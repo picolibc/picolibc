@@ -8,3 +8,6 @@ What's new:
 
 What changed:
 -------------
+
+- ps -f now prints the commandline rather than the full path to the
+  executable.
