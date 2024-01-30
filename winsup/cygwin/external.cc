@@ -344,20 +344,37 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  res = 0;
 	}
 	break;
-      case CW_CMDLINE:
+
+      case CW_CMDLINE_ALLOC:
 	{
 	  size_t n;
+	  char *cmdline_cheap;
+	  char *cmdline;
+
 	  pid_t pid = va_arg (arg, pid_t);
 	  pinfo p (pid);
-	  res = (uintptr_t) (p ? p->cmdline (n) : NULL);
+	  cmdline_cheap = (p ? p->cmdline (n) : NULL);
+	  if (cmdline_cheap)
+	    {
+	      cmdline = (char *) malloc (n + 1);
+	      if (cmdline)
+		{
+		  memcpy (cmdline, cmdline_cheap, n);
+		  cmdline[n] = '\0';
+		}
+	      cfree (cmdline_cheap);
+	    }
+	  res = (uintptr_t) cmdline;
 	}
 	break;
+
       case CW_CHECK_NTSEC:
 	{
 	  char *filename = va_arg (arg, char *);
 	  res = check_ntsec (filename);
 	}
 	break;
+
       case CW_GET_ERRNO_FROM_WINERROR:
 	{
 	  int error = va_arg (arg, int);
@@ -365,6 +382,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  res = geterrno_from_win_error (error, deferrno);
 	}
 	break;
+
       case CW_GET_POSIX_SECURITY_ATTRIBUTE:
 	{
 	  path_conv dummy;
@@ -383,23 +401,27 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	    }
 	}
 	break;
+
       case CW_GET_SHMLBA:
 	{
 	  res = wincap.allocation_granularity ();
 	}
 	break;
+
       case CW_GET_UID_FROM_SID:
 	{
 	  cygpsid psid = va_arg (arg, PSID);
 	  res = psid.get_uid (NULL);
 	}
 	break;
+
       case CW_GET_GID_FROM_SID:
 	{
 	  cygpsid psid = va_arg (arg, PSID);
 	  res = psid.get_gid (NULL);
 	}
 	break;
+
       case CW_GET_BINMODE:
 	{
 	  const char *path = va_arg (arg, const char *);
@@ -413,6 +435,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	    res = p.binmode ();
 	}
 	break;
+
       case CW_HOOK:
 	{
 	  const char *name = va_arg (arg, const char *);
@@ -421,32 +444,39 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  res = (uintptr_t) hook_or_detect_cygwin (name, hookfn, subsys);
 	}
 	break;
+
       case CW_ARGV:
 	{
 	  child_info_spawn *ci = (child_info_spawn *) get_cygwin_startup_info ();
 	  res = (uintptr_t) (ci ? ci->moreinfo->argv : NULL);
 	}
 	break;
+
       case CW_ENVP:
 	{
 	  child_info_spawn *ci = (child_info_spawn *) get_cygwin_startup_info ();
 	  res = (uintptr_t) (ci ? ci->moreinfo->envp : NULL);
 	}
 	break;
+
       case CW_DEBUG_SELF:
 	error_start_init (va_arg (arg, const char *));
 	res = try_to_debug ();
 	break;
+
       case CW_SYNC_WINENV:
 	create_winenv (NULL);
 	res = 0;
 	break;
+
       case CW_CYGTLS_PADSIZE:
 	res = __CYGTLS_PADSIZE__;
 	break;
+
       case CW_SET_DOS_FILE_WARNING:
 	res = 0;
 	break;
+
       case CW_SET_PRIV_KEY:
 	{
 	  const char *passwd = va_arg (arg, const char *);
@@ -454,6 +484,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  res = setlsapwd (passwd, username);
 	}
 	break;
+
       case CW_SETERRNO:
 	{
 	  const char *file = va_arg (arg, const char *);
@@ -462,6 +493,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  res = 0;
 	}
 	break;
+
       case CW_EXIT_PROCESS:
 	{
 	  UINT status = va_arg (arg, UINT);
@@ -476,6 +508,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  res = 0;
 	}
 	break;
+
       case CW_GET_INSTKEY:
 	{
 	  PWCHAR dest = va_arg (arg, PWCHAR);
@@ -483,6 +516,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  res = 0;
 	}
 	break;
+
       case CW_INT_SETLOCALE:
 	{
 	  extern void internal_setlocale ();
@@ -490,6 +524,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  res = 0;
 	}
 	break;
+
       case CW_CVT_MNT_OPTS:
 	{
 	  extern bool fstab_read_flags (char **, unsigned &, bool);
@@ -509,6 +544,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	    }
 	}
 	break;
+
       case CW_LST_MNT_OPTS:
 	{
 	  extern char *fstab_list_flags ();
@@ -523,6 +559,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	    }
 	}
 	break;
+
       case CW_STRERROR:
 	{
 	  int err = va_arg (arg, int);
