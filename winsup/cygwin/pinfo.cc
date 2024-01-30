@@ -515,7 +515,7 @@ const char *
 _pinfo::_ctty (char *buf)
 {
   if (!CTTY_IS_VALID (ctty))
-    strcpy (buf, "no ctty");
+    stpcpy (buf, "no ctty");
   else
     {
       device d;
@@ -1170,10 +1170,7 @@ _pinfo::cmdline (size_t& n)
       char *p;
       p = s = (char *) cmalloc_abort (HEAP_COMMUNE, n);
       for (char **a = __argv; *a; a++)
-	{
-	  strcpy (p, *a);
-	  p = strchr (p, '\0') + 1;
-	}
+	p = stpcpy (p, *a) + 1;
     }
   return s;
 }
@@ -1231,10 +1228,7 @@ _pinfo::environ (size_t& n)
   char *p, *s;
   p = s = (char *) cmalloc_abort (HEAP_COMMUNE, n);
   for (char **e = env; *e; e++)
-    {
-      strcpy (p, *e);
-      p = strchr (p, '\0') + 1;
-    }
+    p = stpcpy (p, *e) + 1;
   return s;
 }
 
