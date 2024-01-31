@@ -646,10 +646,7 @@ commune_process (void *arg)
 
 	for (int i = 0; i < __argc_safe; i++)
 	  {
-	    if (IsBadStringPtr (__argv[i], INT32_MAX))
-	      argv[i] = "";
-	    else
-	      argv[i] = __argv[i];
+	    argv[i] = __argv[i] ?: "";
 	    n += strlen (argv[i]) + 1;
 	  }
 	argv[__argc_safe] = NULL;
