@@ -419,14 +419,17 @@ static UNICODE_STRING *
 ucmd ()
 {
   static UNICODE_STRING wcmd;
+  tmp_pathbuf tp;
+
   if (!wcmd.Buffer)
     {
       linebuf cmd;
-      path_conv real_path (__argv[0]);
+      char *win_progname = tp.c_get ();
+      sys_wcstombs (win_progname, NT_MAX_PATH, global_progname);
       av newargv (__argc, __argv);
       if (newargv.argc)
 	{
-	  cmd.fromargv (newargv, real_path.get_win32 (), true);
+	  cmd.fromargv (newargv, win_progname, true);
 	  RtlInitUnicodeString (&wcmd, cmd);
 	}
     }
