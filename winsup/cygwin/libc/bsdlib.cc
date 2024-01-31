@@ -258,6 +258,40 @@ setprogname (const char *newprogname)
 }
 
 extern "C" void
+setproctitle (const char *fmt, ...)
+{
+  char buf[MAX_PATH];	/* Max len of a new proc title */
+  va_list ap;
+  int len;
+  char *tmp;
+
+  if (__argv0_orig)
+    {
+      tmp = __argv[0];
+      __argv[0] = __argv0_orig;
+      __argv0_orig = NULL;
+      cfree (tmp);
+    }
+  if (fmt)
+    {
+      if (fmt[0] == '-') /* Skip program name prefix. */
+        {
+	  fmt++;
+	  len = 0;
+	}
+      else /* Print program name heading for grep. */
+	len = snprintf (buf, sizeof buf, "%s: ", getprogname ());
+      va_start (ap, fmt);
+      vsnprintf (buf + len, sizeof buf - len, fmt, ap);
+      va_end (ap);
+
+      tmp = (char *) cstrdup1 (buf);
+      __argv0_orig = __argv[0];
+      __argv[0] = tmp;
+    }
+}
+
+extern "C" void
 logwtmp (const char *line, const char *user, const char *host)
 {
   struct utmp ut;

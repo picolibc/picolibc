@@ -83,6 +83,8 @@ int NO_COPY __isthreaded = 0;
 int __argc_safe;
 int __argc;
 char **__argv;
+/* Set via setproctitle */
+char *__argv0_orig;
 
 _cygtls NO_COPY *_main_tls /* !globals.h */;
 

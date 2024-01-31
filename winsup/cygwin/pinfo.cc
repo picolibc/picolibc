@@ -642,27 +642,24 @@ commune_process (void *arg)
       {
 	sigproc_printf ("processing PICOM_CMDLINE");
 	unsigned n = 0;
-	const char *argv[__argc_safe + 1];
+	int argc = __argv0_orig ? 1 : __argc_safe;
+	const char *argv[argc + 1];
 
-	for (int i = 0; i < __argc_safe; i++)
+	for (int i = 0; i < argc; i++)
 	  {
 	    argv[i] = __argv[i] ?: "";
 	    n += strlen (argv[i]) + 1;
 	  }
-	argv[__argc_safe] = NULL;
+	argv[argc] = NULL;
 	if (!WritePipeOverlapped (tothem, &n, sizeof n, &nr, 1000L))
-	  {
-	    /*__seterrno ();*/	// this is run from the signal thread, so don't set errno
-	    sigproc_printf ("WritePipeOverlapped sizeof argv failed, %E");
-	  }
-	else
-	  for (const char **a = argv; *a; a++)
-	    if (!WritePipeOverlapped (tothem, *a, strlen (*a) + 1, &nr, 1000L))
-	      {
-		sigproc_printf ("WritePipeOverlapped arg %d failed, %E",
-				a - argv);
-		break;
-	      }
+	  sigproc_printf ("WritePipeOverlapped sizeof argv failed, %E");
+	else for (int i = 0; i < argc; i++)
+	  if (!WritePipeOverlapped (tothem, __argv[i],
+				    strlen (__argv[i]) + 1, &nr, 1000L))
+	    {
+	      sigproc_printf ("WritePipeOverlapped arg %d failed, %E", i);
+	      break;
+	    }
 	break;
       }
     case PICOM_CWD:
@@ -1162,12 +1159,14 @@ _pinfo::cmdline (size_t& n)
   else
     {
       n = 0;
-      for (char **a = __argv; *a; a++)
-	n += strlen (*a) + 1;
+      int argc = __argv0_orig ? 1 : __argc_safe;
+
+      for (int i = 0; i < argc; ++i)
+	n += strlen (__argv[i]) + 1;
       char *p;
       p = s = (char *) cmalloc_abort (HEAP_COMMUNE, n);
-      for (char **a = __argv; *a; a++)
-	p = stpcpy (p, *a) + 1;
+      for (int i = 0; i < argc; ++i)
+	p = stpcpy (p, __argv[i]) + 1;
     }
   return s;
 }

@@ -5,6 +5,8 @@ What's new:
 
 - New API calls: fdclosedir, posix_getdents.
 
+- New API call: setproctitle.
+
 
 What changed:
 -------------

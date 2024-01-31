@@ -209,6 +209,14 @@ int     setpgid (pid_t __pid, pid_t __pgid);
 #if __SVID_VISIBLE || __XSI_VISIBLE >= 500
 int     setpgrp (void);
 #endif
+#if defined(__CYGWIN__) && __BSD_VISIBLE
+/* Stub for Linux libbsd compatibility. */
+#define initsetproctitle(c, a, e) setproctitle_init((c), (a), (e))
+static inline void setproctitle_init (int, char *[], char *[]) {}
+
+void setproctitle (const char *, ...)
+		   _ATTRIBUTE ((__format__ (__printf__, 1, 2)));
+#endif
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4
 int	setregid (gid_t __rgid, gid_t __egid);
 int	setreuid (uid_t __ruid, uid_t __euid);

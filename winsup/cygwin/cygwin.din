@@ -1353,6 +1353,7 @@ setpassent NOSIGFE
 setpgid SIGFE
 setpgrp SIGFE
 setpriority SIGFE
+setproctitle SIGFE
 setprogname NOSIGFE
 setprotoent = cygwin_setprotoent SIGFE
 setpwent NOSIGFE
