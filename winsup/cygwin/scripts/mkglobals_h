@@ -4,6 +4,7 @@ $_ = join('', <>);
 s/\s+\n/\n/sog;
 s/\n[^\n]*!globals.h[^\n]*\n/\n/sog;
 s%/\*.*?\*/%%sog;
+s/EXPORT_ALIAS.*\n//so;
 s/(enum\s.*?{.*?})/munge($1)/soge;
 s/^(\s*)([a-zA-Z_])/$1extern $2/mog;
 s/extern (extern|enum)/$1/sog;

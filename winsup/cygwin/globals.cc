@@ -149,10 +149,10 @@ extern "C" {
   #undef _ROU
 
   char **environ;
-  /* __progname used in getopt error message */
-  char *__progname;
-  char *program_invocation_name;
+  /* __progname used in getopt error message is an alias of
+     program_invocation_short_name. */
   char *program_invocation_short_name;
+  char *program_invocation_name;
   static MTinterface _mtinterf;
   struct per_process __cygwin_user_data =
   {/* initial_sp */ 0, /* magic_biscuit */ 0,
@@ -195,3 +195,5 @@ extern "C" {
 };
 
 int NO_COPY __api_fatal_exit_val = 1;
+
+EXPORT_ALIAS (program_invocation_short_name, __progname)

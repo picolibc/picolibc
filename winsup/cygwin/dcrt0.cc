@@ -924,17 +924,17 @@ dll_crt0_1 (void *)
   /* Set up standard fds in file descriptor table. */
   cygheap->fdtab.stdio_init ();
 
-  /* Set up __progname for getopt error call. */
-  if (__argv[0] && (__progname = strrchr (__argv[0], '/')))
-    ++__progname;
-  else
-    __progname = __argv[0];
+  /* Set up program_invocation_name and program_invocation_short_name.
+     __progname is an export alias for program_invocation_short_name. */
   program_invocation_name = __argv[0];
-  program_invocation_short_name = __progname;
-  if (__progname)
+  if (__argv[0] && (program_invocation_short_name = strrchr (__argv[0], '/')))
+    ++program_invocation_short_name;
+  else
+    program_invocation_short_name = __argv[0];
+  if (program_invocation_short_name)
     {
-      char *cp = strchr (__progname, '\0') - 4;
-      if (cp > __progname && ascii_strcasematch (cp, ".exe"))
+      char *cp = strchr (program_invocation_short_name, '\0') - 4;
+      if (cp > program_invocation_short_name && ascii_strcasematch (cp, ".exe"))
 	*cp = '\0';
     }
   SetThreadName (GetCurrentThreadId (), program_invocation_short_name);

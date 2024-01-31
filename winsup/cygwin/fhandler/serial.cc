@@ -268,11 +268,11 @@ fhandler_serial::open (int flags, mode_t mode)
 
      FIXME:  This should only be done when explicitly opening the com
      port.  It should not be reset if an fd is inherited.
-     Using __progname in this way, to determine how far along in the
-     initialization we are, is really a terrible kludge and should
-     be fixed ASAP.
+     Using program_invocation_short_name in this way, to determine how far
+     along in the initialization we are, is really a terrible kludge and
+     should be fixed ASAP.
   */
-  if (reset_com && __progname)
+  if (reset_com && program_invocation_short_name)
     {
       DCB state;
       GetCommState (get_handle (), &state);

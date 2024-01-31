@@ -157,13 +157,13 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
     {
       PWCHAR pn = NULL;
       WCHAR progname[NAME_MAX];
-      if (cygwin_finished_initializing && __progname)
+      if (cygwin_finished_initializing && program_invocation_short_name)
 	{
-	  char *p = strrchr (__progname, '/');
+	  char *p = strrchr (program_invocation_short_name, '/');
 	  if (p)
 	    ++p;
 	  else
-	    p = __progname;
+	    p = program_invocation_short_name;
 	  char *pe = strrchr (p, '.');
 	  if (!pe || !ascii_strcasematch (pe, ".exe"))
 	    pe = strrchr (p, '\0');
