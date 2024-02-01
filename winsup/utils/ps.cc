@@ -182,11 +182,15 @@ main (int argc, char *argv[])
 	break;
       case 'f':
 	fflag = 1;
+	lflag = 0;
+	sflag = 0;
 	break;
       case 'h':
 	usage (stdout, 0);
       case 'l':
+	fflag = 0;
 	lflag = 1;
+	sflag = 0;
 	break;
       case 'p':
 	proc_id = atoi (optarg);
@@ -194,6 +198,8 @@ main (int argc, char *argv[])
 	found_proc_id = false;
 	break;
       case 's':
+	fflag = 0;
+	lflag = 0;
 	sflag = 1;
 	break;
       case 'u':
