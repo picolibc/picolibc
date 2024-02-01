@@ -349,7 +349,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	{
 	  size_t n;
 	  char *cmdline_cheap;
-	  char *cmdline;
+	  char *cmdline = NULL;
 
 	  pid_t pid = va_arg (arg, pid_t);
 	  pinfo p (pid);
