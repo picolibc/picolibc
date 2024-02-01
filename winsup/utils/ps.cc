@@ -18,6 +18,7 @@ details. */
 #include <pwd.h>
 #include <limits.h>
 #include <sys/cygwin.h>
+#include <sys/ioctl.h>
 #include <cygwin/version.h>
 #include <ntdef.h>
 #include <ntdll.h>
@@ -25,6 +26,8 @@ details. */
 /* Maximum possible path length under NT.  There's no official define
    for that value.  Note that PATH_MAX is only 4K. */
 #define NT_MAX_PATH 32767
+
+#define OUTPUT_BUFSIZ 65536
 
 static char *prog_name;
 
@@ -146,23 +149,34 @@ struct
 
 char pname[NT_MAX_PATH + sizeof (" <defunct>")  + 1];
 
+char output_buffer[OUTPUT_BUFSIZ];
+
+void
+ps_print (const char *string, int width)
+{
+  printf ("%.*s\n", width, string);
+}
+
 int
 main (int argc, char *argv[])
 {
   external_pinfo *p;
-  int aflag, lflag, fflag, sflag, proc_id;
+  int aflag, lflag, fflag, sflag, proc_id, width, col;
   uid_t uid;
   bool found_proc_id = true;
   cygwin_getinfo_types query = CW_GETPINFO;
-  const char *dtitle = "    PID  TTY        STIME COMMAND\n";
-  const char *dfmt   = "%7d%4s%10s %s\n";
-  const char *ftitle = "     UID     PID    PPID  TTY        STIME COMMAND\n";
-  const char *ffmt   = "%8.8s%8d%8d%4s%10s %s\n";
-  const char *ltitle = "      PID    PPID    PGID     WINPID   TTY         UID    STIME COMMAND\n";
-  const char *lfmt   = "%c %7d %7d %7d %10u %4s %8u %8s %s\n";
+  const char *stitle = "    PID  TTY        STIME COMMAND";
+  const char *sfmt   = "%7d%4s%10s %s";
+  const char *ftitle = "     UID     PID    PPID  TTY        STIME COMMAND";
+  const char *ffmt   = "%8.8s%8d%8d%4s%10s %s";
+  const char *ltitle = "      PID    PPID    PGID     WINPID   TTY         UID    STIME COMMAND";
+  const char *lfmt   = "%c %7d %7d %7d %10u %4s %8u %8s %s";
   char ch;
   void *drive_map = NULL;
   time_t boot_time = -1;
+  char *columns, *end;
+  struct winsize ws;
+
 
   aflag = lflag = fflag = sflag = 0;
   uid = getuid ();
@@ -231,13 +245,6 @@ main (int argc, char *argv[])
 	exit (1);
       }
 
-  if (sflag)
-    fputs (dtitle, stdout);
-  else if (fflag)
-    fputs (ftitle, stdout);
-  else if (lflag)
-    fputs (ltitle, stdout);
-
   (void) cygwin_internal (CW_LOCK_PINFO, 1000);
 
   if (query == CW_GETPINFO_FULL)
@@ -274,6 +281,26 @@ main (int argc, char *argv[])
 		 "status %#010x\n", (unsigned int) status);
       boot_time = to_time_t ((FILETIME*)&stodi.BootTime);
     }
+
+  width = OUTPUT_BUFSIZ;
+  if ((columns = getenv ("COLUMNS")) && *columns
+      && (col = strtoul (columns, &end, 0)) > 0 && !*end)
+    width = col;
+  else if (isatty (STDOUT_FILENO))
+    {
+      width = 80;
+      if (ioctl (STDOUT_FILENO, TIOCGWINSZ, &ws) != -1)
+	width = ws.ws_col;
+    }
+  if (width > OUTPUT_BUFSIZ)
+    width = OUTPUT_BUFSIZ;
+
+  if (sflag)
+    ps_print (stitle, width);
+  else if (fflag)
+    ps_print (ftitle, width);
+  else if (lflag)
+    ps_print (ltitle, width);
 
   for (int pid = 0;
        (p = (external_pinfo *) cygwin_internal (query, pid | CW_NEXTPID));
@@ -388,19 +415,25 @@ main (int argc, char *argv[])
 	}
 
       if (sflag)
-	printf (dfmt, p->pid, ttynam (p->ctty, ttyname), start_time (p), pname);
+	{
+	  snprintf (output_buffer, sizeof output_buffer, sfmt,
+		    p->pid, ttynam (p->ctty, ttyname), start_time (p), pname);
+	}
       else if (fflag)
 	{
-	  printf (ffmt, uname, p->pid, p->ppid, ttynam (p->ctty, ttyname),
-		  start_time (p), cmdline ?: pname);
+	  snprintf (output_buffer, sizeof output_buffer, ffmt,
+		    uname, p->pid, p->ppid, ttynam (p->ctty, ttyname),
+		    start_time (p), cmdline ?: pname);
 	  free (cmdline);
 	}
       else if (lflag)
-	printf (lfmt, status, p->pid, p->ppid, p->pgid,
-		p->dwProcessId, ttynam (p->ctty, ttyname),
-		p->version >= EXTERNAL_PINFO_VERSION_32_BIT ? p->uid32 : p->uid,
-		start_time (p), pname);
-
+	snprintf (output_buffer, sizeof output_buffer, lfmt,
+		  status, p->pid, p->ppid, p->pgid,
+		  p->dwProcessId, ttynam (p->ctty, ttyname),
+		  p->version >= EXTERNAL_PINFO_VERSION_32_BIT
+		  ? p->uid32 : p->uid,
+		  start_time (p), pname);
+      ps_print (output_buffer, width);
     }
   if (drive_map)
     cygwin_internal (CW_FREE_DRIVE_MAP, drive_map);
