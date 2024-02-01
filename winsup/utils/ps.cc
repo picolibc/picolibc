@@ -110,7 +110,7 @@ Report process status\n\
 \n\
  -a, --all       show processes of all users\n\
  -e, --everyone  show processes of all users\n\
- -f, --full      show process uids, ppids\n\
+ -f, --full      show process uids, ppids and command line\n\
  -h, --help      output usage information and exit\n\
  -l, --long      show process uids, ppids, pgids, winpids\n\
  -p, --process   show information for specified PID\n\

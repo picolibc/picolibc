@@ -2496,7 +2496,7 @@ $ profiler du -khs .
       <screen>
  -a, --all       show processes of all users
  -e, --everyone  show processes of all users
- -f, --full      show process uids, ppids
+ -f, --full      show process uids, ppids and command line
  -h, --help      output usage information and exit
  -l, --long      show process uids, ppids, pgids, winpids
  -p, --process   show information for specified PID
@@ -2532,7 +2532,8 @@ With no options, ps outputs the long format by default
       <literal>-e</literal> option, all user's processes (and system processes)
       are listed. There are historical UNIX reasons for the synonomous options,
       which are functionally identical. The <literal>-f</literal> option
-      outputs a "full" listing with usernames for UIDs. The
+      outputs a "full" listing with usernames for UIDs and the command line
+      of the process, rather than just the full path to the executable. The
       <literal>-l</literal> option is the default display mode, showing a
       "long" listing with all the above columns. The other display option is
       <literal>-s</literal>, which outputs a shorter listing of just PID, TTY,
