@@ -420,6 +420,12 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 	}
 
       WaitForSingleObject (p->input_mutex, mutex_timeout);
+      /* Ensure accessing input recored is not disabled. */
+      if (con.disable_master_thread)
+	{
+	  ReleaseMutex (p->input_mutex);
+	  continue;
+	}
       total_read = 0;
       switch (cygwait (p->input_handle, (DWORD) 0))
 	{
@@ -4545,8 +4551,6 @@ fhandler_console::set_disable_master_thread (bool x, fhandler_console *cons)
 	return;
     }
   const _minor_t unit = cons->get_minor ();
-  if (con.disable_master_thread == x)
-    return;
   cons->acquire_input_mutex (mutex_timeout);
   con.disable_master_thread = x;
   cons->release_input_mutex ();
