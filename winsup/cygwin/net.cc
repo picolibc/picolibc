@@ -2001,13 +2001,40 @@ get_ifconf (struct ifconf *ifc, int what)
 extern "C" unsigned
 cygwin_if_nametoindex (const char *name)
 {
-  return (unsigned) ::if_nametoindex (name);
+  PIP_ADAPTER_ADDRESSES pa0 = NULL, pap;
+  if (get_adapters_addresses (&pa0, AF_UNSPEC))
+    for (pap = pa0; pap; pap = pap->Next)
+      if (strcmp (name, pap->AdapterName) == 0)
+	{
+	  free (pa0);
+	  return pap->IfIndex;
+	}
+  if (pa0)
+    free (pa0);
+  return 0;
 }
 
 extern "C" char *
 cygwin_if_indextoname (unsigned ifindex, char *ifname)
 {
-  return ::if_indextoname (ifindex, ifname);
+  if (ifindex == 0 || ifname == NULL)
+    {
+      set_errno (ENXIO);
+      return NULL;
+    }
+  PIP_ADAPTER_ADDRESSES pa0 = NULL, pap;
+  if (get_adapters_addresses (&pa0, AF_UNSPEC))
+    for (pap = pa0; pap; pap = pap->Next)
+      if (ifindex == pap->IfIndex)
+	{
+	  strcpy (ifname, pap->AdapterName);
+	  free (pa0);
+	  return ifname;
+	}
+  if (pa0)
+    free (pa0);
+  set_errno (ENXIO);
+  return NULL;
 }
 
 extern "C" struct if_nameindex *

@@ -462,8 +462,6 @@ LoadDLLfunc (GetNetworkParams, iphlpapi)
 LoadDLLfunc (GetTcpTable, iphlpapi)
 LoadDLLfunc (GetTcp6Table, iphlpapi)
 LoadDLLfunc (GetUdpTable, iphlpapi)
-LoadDLLfunc (if_indextoname, iphlpapi)
-LoadDLLfunc (if_nametoindex, iphlpapi)
 
 LoadDLLfuncEx2 (DiscardVirtualMemory, kernel32, 1, 127)
 LoadDLLfuncEx (ClosePseudoConsole, kernel32, 1)
