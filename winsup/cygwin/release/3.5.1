@@ -1,8 +1,14 @@
-Bug Fixes
----------
+Fixes:
+------
 
 - Fix exit code for non-cygwin process running in console. The bug
   was introduced in 3.5.0.
 
 - Make the interface names handled by if_nametoindex() and if_indextoname()
   consistent with that of if_nameindex().
+
+- Revert error handling for non-Cygwin child processes to use Cygwin's
+  error mode by default.  Resetting the error mode to the OS default
+  error mode is now possible by using the new CYGWIN environment variable
+  option "winjitdebug".
+  Addresses: https://cygwin.com/pipermail/cygwin/2024-February/255305.html

@@ -94,6 +94,16 @@ in addition to the normal UNIX argv list.  Defaults to not set.</para>
 </listitem>
 
 <listitem>
+<para><envar>(no)winjitdebug</envar> - if set, non-Cygwin executables
+started from a Cygwin process will have their error mode reset to the
+system default.  That means, if they don't call SetErrorMode() explicitl,
+the OS will display error dialog boxes in the GUI if some fatal error
+occurs.  Defaults to not set, so fatal errors in a non-Cygwin child
+process will just result in an error code be propagated back to the
+parent process.</para>
+</listitem>
+
+<listitem>
 <para><envar>winsymlinks:{lnk,native,nativestrict,sys}</envar></para>
 
 <itemizedlist mark="square">
