@@ -514,6 +514,11 @@ struct _reent
 #define _REENT_CHECK_EMERGENCY(var) \
   _REENT_CHECK(var, _emergency, char *, _REENT_EMERGENCY_SIZE, /* nothing */)
 
+#ifdef _MB_CAPABLE
+#define __REENT_INIT_MISC_GETLOCALENAME_L _r->_misc->_getlocalename_l_buf[0] = '\0'
+#else
+#define __REENT_INIT_MISC_GETLOCALENAME_L
+#endif
 #define _REENT_INIT_MISC(var) do { \
   struct _reent *_r = (var); \
   _r->_misc->_strtok_last = _NULL; \
@@ -533,7 +538,7 @@ struct _reent
   _r->_misc->_wcrtomb_state.__value.__wch = 0; \
   _r->_misc->_wcsrtombs_state.__count = 0; \
   _r->_misc->_wcsrtombs_state.__value.__wch = 0; \
-  _r->_misc->_getlocale_l_buf[0] = '\0'; \
+  __REENT_INIT_MISC_GETLOCALENAME_L; \
   _r->_misc->_l64a_buf[0] = '\0'; \
   _r->_misc->_getdate_err = 0; \
 } while (0)
