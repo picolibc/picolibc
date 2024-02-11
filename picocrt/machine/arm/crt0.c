@@ -77,6 +77,18 @@ _start(void)
 #endif
 	__asm__("vmsr fpscr, %0" : : "r" (INIT_FPSCR));
 #endif
+
+#if defined(__ARM_FEATURE_PAUTH) || defined(__ARM_FEATURE_BTI)
+        uint32_t        control;
+        __asm__("mrs %0, CONTROL" : "=r" (control));
+#ifdef __ARM_FEATURE_PAUTH
+        control |= (3 << 6);
+#endif
+#ifdef __ARM_FEATURE_BTI
+        control |= (3 << 4);
+#endif
+        __asm__("msr CONTROL, %0" : : "r" (control));
+#endif
 	__start();
 }
 
