@@ -120,6 +120,17 @@ The sample linker script provided with picolibc defines these two
 symbols to enclose all RAM which is not otherwise used by the
 application.
 
+## abort
+
+Posix says that `abort` sends `SIGABRT` to the calling process as if
+the process called `raise(SIGABRT)`. It also says `abort` shall not
+return. The picolibc implementation of `abort` calls `raise`; if that
+returns, it then calls `_exit`. The picolibc version of `raise` also
+calls `_exit` for uncaught and un-ignored signals.
+
+This means that an application needs to provide an implementation of
+`_exit` to support `abort`.
+
 ## Linking with System Library
 
 To get Picolibc to use a system library, that library needs to be
