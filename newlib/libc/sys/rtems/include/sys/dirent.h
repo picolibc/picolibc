@@ -49,6 +49,11 @@ typedef	__off_t		off_t;
 #define	_OFF_T_DECLARED
 #endif
 
+#ifndef _SSIZE_T_DECLARED
+typedef _ssize_t ssize_t;
+#define	_SSIZE_T_DECLARED
+#endif
+
 typedef struct _dirdesc {
 	int	dd_fd;
 	long	dd_loc;
