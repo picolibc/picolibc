@@ -142,7 +142,7 @@ dumper::sane ()
 }
 
 void
-print_section_name (bfd* abfd, asection* sect, PTR obj)
+print_section_name (bfd* abfd, asection* sect, void* obj)
 {
   deb_printf (" %s", get_section_name (abfd, sect));
 }
