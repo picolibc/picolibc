@@ -12,3 +12,7 @@ Fixes:
   error mode is now possible by using the new CYGWIN environment variable
   option "winjitdebug".
   Addresses: https://cygwin.com/pipermail/cygwin/2024-February/255305.html
+
+- Fix handle leak in pty master which occurs when non-cygwin process
+  is started in pty.
+  Addresses: https://github.com/msys2/msys2-runtime/issues/198
