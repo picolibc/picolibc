@@ -4608,29 +4608,27 @@ find_fast_cwd_pointer ()
 static fcwd_access_t **
 find_fast_cwd ()
 {
+  USHORT emulated, hosted;
+  fcwd_access_t **f_cwd_ptr;
+
+  /* First check if we're running in WOW64 on ARM64 emulating AMD64.  Skip
+     fetching FAST_CWD pointer as long as there's no solution for finding
+     it on that system. */
+  if (IsWow64Process2 (GetCurrentProcess (), &emulated, &hosted)
+      && hosted == IMAGE_FILE_MACHINE_ARM64)
+    return NULL;
+
   /* Fetch the pointer but don't set the global fast_cwd_ptr yet.  First
      we have to make sure we know the version of the FAST_CWD structure
      used on the system. */
-  fcwd_access_t **f_cwd_ptr = find_fast_cwd_pointer ();
+  f_cwd_ptr = find_fast_cwd_pointer ();
   if (!f_cwd_ptr)
-    {
-      bool warn = 1;
-      USHORT emulated, hosted;
-
-      /* Check if we're running in WOW64 on ARM64 emulating AMD64.  Skip
-	 warning as long as there's no solution for finding the FAST_CWD
-	 pointer on that system. */
-      if (IsWow64Process2 (GetCurrentProcess (), &emulated, &hosted)
-	  && hosted == IMAGE_FILE_MACHINE_ARM64)
-	warn = 0;
-
-      if (warn)
-	small_printf ("Cygwin WARNING:\n"
+    small_printf ("Cygwin WARNING:\n"
 "  Couldn't compute FAST_CWD pointer.  This typically occurs if you're using\n"
 "  an older Cygwin version on a newer Windows.  Please update to the latest\n"
 "  available Cygwin version from https://cygwin.com/.  If the problem persists,\n"
 "  please see https://cygwin.com/problems.html\n\n");
-    }
+
   /* Eventually, after we set the version as well, set fast_cwd_ptr. */
   return f_cwd_ptr;
 }
