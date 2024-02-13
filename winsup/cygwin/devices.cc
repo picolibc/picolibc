@@ -81,6 +81,13 @@ enum_cons_dev (HWND hw, LPARAM lp)
       UnmapViewOfFile ((void *) cs);
       CloseHandle (h);
     }
+  else
+    { /* Only for ConEmu */
+      char class_hw[32];
+      if (19 == GetClassName (hw, class_hw, sizeof (class_hw))
+	  && 0 == strcmp (class_hw, "VirtualConsoleClass"))
+	EnumChildWindows (hw, enum_cons_dev, lp);
+    }
   return TRUE;
 }
 
