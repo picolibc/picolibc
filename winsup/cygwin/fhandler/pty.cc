@@ -936,6 +936,8 @@ fhandler_pty_slave::open (int flags, mode_t)
 	  errmsg = "can't call master, %E";
 	  goto err;
 	}
+      CloseHandle (repl.to_slave_nat); /* not used. */
+      CloseHandle (repl.to_slave); /* not used. */
       from_master_nat_local = repl.from_master_nat;
       from_master_local = repl.from_master;
       to_master_nat_local = repl.to_master_nat;
@@ -1210,6 +1212,10 @@ fhandler_pty_slave::reset_switch_to_nat_pipe (void)
 		      if (!CallNamedPipe (pipe, &req, sizeof req,
 					  &repl, sizeof repl, &len, 500))
 			return; /* What can we do? */
+		      CloseHandle (repl.from_master); /* not used. */
+		      CloseHandle (repl.to_master); /* not used. */
+		      CloseHandle (repl.to_slave_nat); /* not used. */
+		      CloseHandle (repl.to_slave); /* not used. */
 		      CloseHandle (get_handle_nat ());
 		      set_handle_nat (repl.from_master_nat);
 		      CloseHandle (get_output_handle_nat ());
@@ -3861,10 +3867,20 @@ fhandler_pty_slave::transfer_input (tty::xfer_dir dir, HANDLE from, tty *ttyp,
       if (!CallNamedPipe (pipe, &req, sizeof req,
 			  &repl, sizeof repl, &len, 500))
 	return; /* What can we do? */
+      CloseHandle (repl.from_master_nat); /* not used. */
+      CloseHandle (repl.from_master); /* not used. */
+      CloseHandle (repl.to_master_nat); /* not used. */
+      CloseHandle (repl.to_master); /* not used. */
       if (dir == tty::to_nat)
-	to = repl.to_slave_nat;
+	{
+	  CloseHandle (repl.to_slave); /* not used. */
+	  to = repl.to_slave_nat;
+	}
       else
-	to = repl.to_slave;
+	{
+	  CloseHandle (repl.to_slave_nat); /* not used. */
+	  to = repl.to_slave;
+	}
     }
 
   UINT cp_from = 0, cp_to = 0;
