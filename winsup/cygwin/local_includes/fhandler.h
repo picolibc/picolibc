@@ -2259,6 +2259,8 @@ private:
   static void set_output_mode (tty::cons_mode m, const termios *t,
 			       const handle_set_t *p);
 
+  static BOOL CALLBACK enum_windows (HWND hw, LPARAM lp);
+
  public:
   pid_t tc_getpgid ()
   {
@@ -2379,6 +2381,19 @@ private:
   void wpbuf_put (char c);
   void wpbuf_send ();
   int fstat (struct stat *buf);
+
+  class console_unit
+  {
+    int n;
+    unsigned long bitmask;
+    console_state *shared_console_info;
+  public:
+    operator _minor_t () const {return n;}
+    operator console_state * () const {return shared_console_info;}
+    operator unsigned long () const {return bitmask;}
+    console_unit (int);
+    friend BOOL CALLBACK fhandler_console::enum_windows (HWND, LPARAM);
+  };
 
   friend tty_min * tty_list::get_cttyp ();
 };

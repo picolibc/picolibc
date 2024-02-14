@@ -224,49 +224,46 @@ fhandler_console::open_shared_console (HWND hw, HANDLE& h, bool& created)
   return res;
 }
 
-class console_unit
-{
-  int n;
-  unsigned long bitmask;
-  HWND me;
-
-public:
-  operator int () const {return n;}
-  console_unit (HWND);
-  friend BOOL CALLBACK enum_windows (HWND, LPARAM);
-};
-
 BOOL CALLBACK
-enum_windows (HWND hw, LPARAM lp)
+fhandler_console::enum_windows (HWND hw, LPARAM lp)
 {
   console_unit *this1 = (console_unit *) lp;
-  if (hw == this1->me)
-    return TRUE;
   HANDLE h = NULL;
   fhandler_console::console_state *cs;
   if ((cs = fhandler_console::open_shared_console (hw, h)))
     {
-      this1->bitmask ^= 1UL << cs->tty_min_state.getntty ();
-      UnmapViewOfFile ((void *) cs);
       CloseHandle (h);
+      if (major (cs->tty_min_state.getntty ()) == DEV_CONS_MAJOR)
+	this1->bitmask |= 1UL << minor (cs->tty_min_state.getntty ());
+      if (this1->n == minor (cs->tty_min_state.getntty ()))
+	{
+	  this1->shared_console_info = cs;
+	  return FALSE;
+	}
+      UnmapViewOfFile ((void *) cs);
     }
   else
     { /* Only for ConEmu */
       char class_hw[32];
       if (19 == GetClassName (hw, class_hw, sizeof (class_hw))
 	  && 0 == strcmp (class_hw, "VirtualConsoleClass"))
-	EnumChildWindows (hw, enum_windows, lp);
+	EnumChildWindows (hw, fhandler_console::enum_windows, lp);
     }
   return TRUE;
 }
 
-console_unit::console_unit (HWND me0):
-  bitmask (~0UL), me (me0)
+fhandler_console::console_unit::console_unit (int n0):
+  n (n0), bitmask (0)
 {
-  EnumWindows (enum_windows, (LPARAM) this);
-  n = (_minor_t) ffs (bitmask) - 1;
+  EnumWindows (fhandler_console::enum_windows, (LPARAM) this);
   if (n < 0)
-    api_fatal ("console device allocation failure - too many consoles in use, max consoles is 64");
+    n = (_minor_t) ffsl (~bitmask) - 1;
+  if (n < 0)
+    api_fatal (sizeof (bitmask) == 8 ?
+	       "console device allocation failure - "
+	       "too many consoles in use, max consoles is 64" :
+	       "console device allocation failure - "
+	       "too many consoles in use, max consoles is 32");
 }
 
 static DWORD
@@ -640,39 +637,6 @@ skip_writeback:
   free (input_tmp);
 }
 
-struct scan_console_args_t
-{
-  _minor_t unit;
-  fhandler_console::console_state **shared_console_info;
-};
-
-BOOL CALLBACK
-scan_console (HWND hw, LPARAM lp)
-{
-  scan_console_args_t *p = (scan_console_args_t *) lp;
-  HANDLE h = NULL;
-  fhandler_console::console_state *cs;
-  if ((cs = fhandler_console::open_shared_console (hw, h)))
-    {
-     if (p->unit == minor (cs->tty_min_state.getntty ()))
-       {
-	 *p->shared_console_info = cs;
-	 CloseHandle (h);
-	 return FALSE;
-       }
-      UnmapViewOfFile ((void *) cs);
-      CloseHandle (h);
-    }
-  else
-    { /* Only for ConEmu */
-      char class_hw[32];
-      if (19 == GetClassName (hw, class_hw, sizeof (class_hw))
-	  && 0 == strcmp (class_hw, "VirtualConsoleClass"))
-	EnumChildWindows (hw, scan_console, lp);
-    }
-  return TRUE;
-}
-
 bool
 fhandler_console::set_unit ()
 {
@@ -696,11 +660,7 @@ fhandler_console::set_unit ()
   else
     {
       if (!generic_console && (dev_t) myself->ctty != get_device ())
-	{
-	  /* Scan for existing shared console info */
-	  scan_console_args_t arg = { unit,  &shared_console_info[unit] };
-	  EnumWindows (scan_console, (LPARAM) &arg);
-	}
+	shared_console_info[unit] = console_unit (unit);
       if (generic_console || !shared_console_info[unit])
 	{
 	  me = GetConsoleWindow ();
@@ -714,7 +674,7 @@ fhandler_console::set_unit ()
 	      ProtectHandleINH (cygheap->console_h);
 	      if (created)
 		{
-		  unit = console_unit (me);
+		  unit = console_unit (-1);
 		  cs->tty_min_state.setntty (DEV_CONS_MAJOR, unit);
 		}
 	      else
