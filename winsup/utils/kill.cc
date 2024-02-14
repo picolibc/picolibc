@@ -73,7 +73,7 @@ print_version ()
 static const char *
 strsigno (int signo)
 {
-  static char sigbuf[8];
+  static char sigbuf[32];
 
   if (signo > 0 && signo < SIGRTMIN)
     return sys_sigabbrev[signo];

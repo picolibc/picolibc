@@ -323,7 +323,7 @@ tty::wait_fwd ()
      thread when the last data is transfered. */
   const ULONGLONG sleep_in_nat_pipe = 16;
   const ULONGLONG time_to_wait = sleep_in_nat_pipe * 2 + 1/* margine */;
-  ULONGLONG elapsed;
+  ULONGLONG elapsed = 0;
   while (fwd_not_empty
 	 || (elapsed = GetTickCount64 () - fwd_last_time) < time_to_wait)
     {

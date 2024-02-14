@@ -669,7 +669,7 @@ fhandler_fifo::create_shmem (bool only_open)
 {
   HANDLE sect;
   OBJECT_ATTRIBUTES attr;
-  NTSTATUS status;
+  NTSTATUS status = STATUS_SUCCESS;
   LARGE_INTEGER size = { .QuadPart = sizeof (fifo_shmem_t) };
   SIZE_T viewsize = sizeof (fifo_shmem_t);
   PVOID addr = NULL;
