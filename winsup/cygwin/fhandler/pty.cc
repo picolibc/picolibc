@@ -970,7 +970,7 @@ fhandler_pty_slave::open (int flags, mode_t)
   set_output_handle (to_master_local);
 
   if (_major (myself->ctty) == DEV_CONS_MAJOR
-      && !(!pinfo (myself->ppid) && getenv ("ConEmuPID")))
+      && !(!pinfo (myself->ppid) && GetModuleHandle ("ConEmuHk64.dll")))
     /* This process is supposed to be a master process which is
        running on console. Invisible console will be created in
        primary slave process to prevent overriding code page
@@ -1049,6 +1049,8 @@ fhandler_pty_slave::close ()
   fhandler_pty_common::close ();
   if (!ForceCloseHandle (output_mutex))
     termios_printf ("CloseHandle (output_mutex<%p>), %E", output_mutex);
+  if (!get_ttyp ()->invisible_console_pid && myself->ctty == CTTY_RELEASED)
+    FreeConsole();
   if (get_ttyp ()->invisible_console_pid
       && !pinfo (get_ttyp ()->invisible_console_pid))
     get_ttyp ()->invisible_console_pid = 0;
