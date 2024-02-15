@@ -253,12 +253,10 @@ fhandler_console::enum_windows (HWND hw, LPARAM lp)
 }
 
 fhandler_console::console_unit::console_unit (int n0):
-  n (n0), bitmask (0)
+  n (n0), bitmask (0), shared_console_info (NULL)
 {
   EnumWindows (fhandler_console::enum_windows, (LPARAM) this);
-  if (n < 0)
-    n = (_minor_t) ffsl (~bitmask) - 1;
-  if (n < 0)
+  if (n0 == CONS_SCAN_UNUSED && (n = ffsl (~bitmask) - 1) < 0)
     api_fatal (sizeof (bitmask) == 8 ?
 	       "console device allocation failure - "
 	       "too many consoles in use, max consoles is 64" :
@@ -674,7 +672,7 @@ fhandler_console::set_unit ()
 	      ProtectHandleINH (cygheap->console_h);
 	      if (created)
 		{
-		  unit = console_unit (-1);
+		  unit = console_unit (CONS_SCAN_UNUSED);
 		  cs->tty_min_state.setntty (DEV_CONS_MAJOR, unit);
 		}
 	      else

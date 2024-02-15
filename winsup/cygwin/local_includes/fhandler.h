@@ -2192,6 +2192,8 @@ class dev_console
 };
 
 #define MAX_CONS_DEV (sizeof (unsigned long) * 8)
+#define CONS_SCAN_UNUSED (-1)
+#define CONS_LIST_USED (-2)
 
 /* This is a input and output console handle */
 class fhandler_console: public fhandler_termios
@@ -2388,9 +2390,8 @@ private:
     unsigned long bitmask;
     console_state *shared_console_info;
   public:
-    operator _minor_t () const {return n;}
     operator console_state * () const {return shared_console_info;}
-    operator unsigned long () const {return bitmask;}
+    operator unsigned long () const {return n == CONS_LIST_USED ? bitmask : n;}
     console_unit (int);
     friend BOOL CALLBACK fhandler_console::enum_windows (HWND, LPARAM);
   };
