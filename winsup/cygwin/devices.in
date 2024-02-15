@@ -80,7 +80,7 @@ exists_console (const device& dev)
       if (dev.get_minor () < MAX_CONS_DEV)
 	{
 	  unsigned long bitmask = fhandler_console::console_unit (-1);
-	  return bitmask & (1UL << dev.get_minor ());
+	  return !!(bitmask & (1UL << dev.get_minor ()));
 	}
       return false;
     }
