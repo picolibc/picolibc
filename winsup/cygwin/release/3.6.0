@@ -7,6 +7,8 @@ What's new:
 
 - New API call: setproctitle.
 
+- New API call: timespec_get.
+
 
 What changed:
 -------------

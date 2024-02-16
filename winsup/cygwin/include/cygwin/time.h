@@ -35,6 +35,12 @@ extern long timezone __asm__ (_SYMSTR (_timezone));
 
 #endif /* __SVID_VISIBLE || __XSI_VISIBLE */
 
+#if __ISO_C_VISIBLE >= 2011
+#define TIME_UTC 1
+
+extern int timespec_get (struct timespec *, int);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

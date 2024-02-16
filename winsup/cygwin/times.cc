@@ -559,3 +559,12 @@ clock_getcpuclockid (pid_t pid, clockid_t *clk_id)
   *clk_id = (clockid_t) PID_TO_CLOCKID (pid);
   return 0;
 }
+
+extern "C" int
+timespec_get (struct timespec *ts, int base)
+{
+  if (base != TIME_UTC)
+    return 0;
+  clock_gettime (CLOCK_REALTIME, ts);
+  return base;
+}

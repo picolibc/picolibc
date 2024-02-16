@@ -1559,6 +1559,7 @@ timerfd_create SIGFE
 timerfd_gettime SIGFE
 timerfd_settime SIGFE
 times SIGFE
+timespec_get SIGFE
 timezone SIGFE
 timingsafe_bcmp NOSIGFE
 timingsafe_memcmp NOSIGFE
