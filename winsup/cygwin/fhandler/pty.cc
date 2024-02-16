@@ -4108,8 +4108,6 @@ fhandler_pty_slave::cleanup_for_non_cygwin_app (handle_set_t *p, tty *ttyp,
   WaitForSingleObject (p->pipe_sw_mutex, INFINITE);
   if (!switch_to)
     switch_to = get_console_process_id (current_pid, false, true, true);
-  if (!switch_to)
-    switch_to = get_console_process_id (current_pid, false, true, false);
   if ((!switch_to && (ttyp->pcon_activated || stdin_is_ptys))
       && ttyp->pty_input_state_eq (tty::to_nat))
     {
