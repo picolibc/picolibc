@@ -1,0 +1,30 @@
+From: Keith Packard <keithp@keithp.com>
+Date: Sun, 11 Feb 2024 11:52:02 -0800
+Subject: scripts: Fix memory map for pacbti armv8.1-m variants
+
+pacbti adds a bunch of new multilib variants for v8.1-m; the cross
+compilation script needs to use the same memory layout for those as
+for other v8.1m variants.
+
+Signed-off-by: Keith Packard <keithp@keithp.com>
+---
+ scripts/cross-arm-none-eabi.txt | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/scripts/cross-arm-none-eabi.txt b/scripts/cross-arm-none-eabi.txt
+index 5a31289..8d891a3 100644
+--- a/scripts/cross-arm-none-eabi.txt
++++ b/scripts/cross-arm-none-eabi.txt
+@@ -27,6 +27,12 @@ default_ram_size   = '0x00200000'
+ custom_mem_config_thumb_v8_1_m_main_mve_hard = 'mps3_an547'
+ custom_mem_config_thumb_v8_m_main_dp_hard = 'mps3_an547'
+ custom_mem_config_thumb_v8_m_main_dp_softfp = 'mps3_an547'
++custom_mem_config_thumb_v8_1_m_main_pacbti_bp_nofp = 'mps3_an547'
++custom_mem_config_thumb_v8_1_m_main_pacbti_dp_bp_hard = 'mps3_an547'
++custom_mem_config_thumb_v8_1_m_main_pacbti_dp_bp_softfp = 'mps3_an547'
++custom_mem_config_thumb_v8_1_m_main_pacbti_fp_bp_hard = 'mps3_an547'
++custom_mem_config_thumb_v8_1_m_main_pacbti_fp_bp_softfp = 'mps3_an547'
++custom_mem_config_thumb_v8_1_m_main_pacbti_mve_bp_hard = 'mps3_an547'
+ 
+ separate_boot_flash_mps3_an547 = true
+ default_boot_flash_addr_mps3_an547 = '0x00000000'

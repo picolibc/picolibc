@@ -1,0 +1,23 @@
+From: Keith Packard <keithp@keithp.com>
+Date: Sun, 11 Feb 2024 11:53:31 -0800
+Subject: scripts: Include pacbti arm variants in build
+
+This removes the multilib-exclude argument which disables pacbti
+library variants. As GCC currently has bugs with this mode, we'll
+leave this on a branch for now.
+
+Signed-off-by: Keith Packard <keithp@keithp.com>
+---
+ scripts/do-arm-configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/do-arm-configure b/scripts/do-arm-configure
+index aaeab64..11e8155 100755
+--- a/scripts/do-arm-configure
++++ b/scripts/do-arm-configure
+@@ -33,4 +33,4 @@
+ # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ # OF THE POSSIBILITY OF SUCH DAMAGE.
+ #
+-exec "$(dirname "$0")"/do-configure arm-none-eabi -Dtests=true -Dmultilib-exclude=pacbti "$@"
++exec "$(dirname "$0")"/do-configure arm-none-eabi -Dtests=true "$@"

@@ -1,0 +1,35 @@
+From: Keith Packard <keithp@keithp.com>
+Date: Sun, 11 Feb 2024 11:50:59 -0800
+Subject: picocrt/arm: Support BTI and PAC in crt0.
+
+Check to see if the compiler is using these options and enable the
+hardware which controls them.
+
+Signed-off-by: Keith Packard <keithp@keithp.com>
+---
+ picocrt/machine/arm/crt0.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/picocrt/machine/arm/crt0.c b/picocrt/machine/arm/crt0.c
+index 4fabbdb..c842bda 100644
+--- a/picocrt/machine/arm/crt0.c
++++ b/picocrt/machine/arm/crt0.c
+@@ -77,6 +77,18 @@ _start(void)
+ #endif
+ 	__asm__("vmsr fpscr, %0" : : "r" (INIT_FPSCR));
+ #endif
++
++#if defined(__ARM_FEATURE_PAUTH) || defined(__ARM_FEATURE_BTI)
++        uint32_t        control;
++        __asm__("mrs %0, CONTROL" : "=r" (control));
++#ifdef __ARM_FEATURE_PAUTH
++        control |= (3 << 6);
++#endif
++#ifdef __ARM_FEATURE_BTI
++        control |= (3 << 4);
++#endif
++        __asm__("msr CONTROL, %0" : : "r" (control));
++#endif
+ 	__start();
+ }
+ 
