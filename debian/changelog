@@ -1,3 +1,9 @@
+picolibc (1.8.6-2) unstable; urgency=medium
+
+  * Add pacbti variants for arm v8.1-m
+
+ -- Keith Packard <keithp@keithp.com>  Mon, 19 Feb 2024 15:46:44 -0800
+
 picolibc (1.8.6-1) unstable; urgency=medium
 
   * New upstream
