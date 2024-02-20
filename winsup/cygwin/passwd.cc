@@ -385,6 +385,11 @@ pg_ent::getent (void)
     case from_local:
       if (from_db
 	  && nss_db_enum_local ()
+	  /* Domain controller?  If so, sam and ad are one and the same
+	     and "local ad" would list all domain accounts twice without
+	     this test. */
+	  && (cygheap->dom.account_flat_name ()[0] != L'@'
+	      || !nss_db_enum_primary ())
 	  && (entry = enumerate_local ()))
 	return entry;
       state = from_sam;
