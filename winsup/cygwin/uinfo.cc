@@ -2624,9 +2624,15 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		  + (sid_sub_auth_rid (sid) & 0xff);
 #else
 	  if (sid_id_auth (sid) == 15 /* SECURITY_APP_PACKAGE_AUTHORITY */)
-	    uid = 0x10000 + 0x100 * sid_id_auth (sid)
-		  + 0x10 * sid_sub_auth (sid, 0)
-		  + (sid_sub_auth_rid (sid) & 0xf);
+	    {
+	      /* Filter out all SIDs not referring to an App Package, for
+	         instance, Capability SIDs (S-1-15-3-...) */
+	      if (sid_sub_auth (sid, 0) != SECURITY_APP_PACKAGE_BASE_RID)
+		return NULL;
+	      uid = 0x10000 + 0x100 * sid_id_auth (sid)
+		    + 0x10 * SECURITY_APP_PACKAGE_BASE_RID
+		    + (sid_sub_auth_rid (sid) & 0xf);
+	    }
 	  else if (sid_id_auth (sid) != 5 /* SECURITY_NT_AUTHORITY */)
 	    uid = 0x10000 + 0x100 * sid_id_auth (sid)
 		  + (sid_sub_auth_rid (sid) & 0xff);
@@ -2682,21 +2688,8 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
       fully_qualified_name = true;
       acc_type = SidTypeUnknown;
     }
-  else if (sid_id_auth (sid) == 12 && sid_sub_auth (sid, 0) == 1)
-    {
-      /* Special AzureAD group SID which can't be resolved by
-         LookupAccountSid (ERROR_NONE_MAPPED).  This is only allowed
-	 as group entry, not as passwd entry. */
-      if (is_passwd ())
-	return NULL;
-      uid = gid = 0x1001;
-      wcpcpy (dom, L"AzureAD");
-      wcpcpy (name = namebuf, L"Group");
-      fully_qualified_name = true;
-      acc_type = SidTypeUnknown;
-    }
-  else if (sid_id_auth (sid) == 5 &&
-	   sid_sub_auth (sid, 0) == SECURITY_APPPOOL_ID_BASE_RID)
+  else if (sid_id_auth (sid) == 5 /* SECURITY_NT_AUTHORITY */
+	   && sid_sub_auth (sid, 0) == SECURITY_APPPOOL_ID_BASE_RID)
     {
       /* Special IIS APPPOOL group SID which can't be resolved by
          LookupAccountSid (ERROR_NONE_MAPPED).  This is only allowed
@@ -2728,6 +2721,24 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	}
       acc_type = SidTypeUnknown;
     }
+  else if (sid_id_auth (sid) == 12 /* AzureAD ID */
+	   && sid_sub_auth (sid, 0) == 1 /* Azure ID base RID */)
+    {
+      /* Special AzureAD group SID which can't be resolved by
+         LookupAccountSid (ERROR_NONE_MAPPED).  This is only allowed
+	 as group entry, not as passwd entry. */
+      if (is_passwd ())
+	return NULL;
+      uid = gid = 0x1001;
+      wcpcpy (dom, L"AzureAD");
+      wcpcpy (name = namebuf, L"Group");
+      fully_qualified_name = true;
+      acc_type = SidTypeUnknown;
+    }
+  else if (sid_id_auth (sid) == 15 /* SECURITY_APP_PACKAGE_AUTHORITY */
+	   && sid_sub_auth (sid, 0) == SECURITY_CAPABILITY_BASE_RID)
+    /* Filter out Capability SIDs */
+    return NULL;
   else if (sid_id_auth (sid) == 22)
     {
       /* Samba UNIX Users/Groups
