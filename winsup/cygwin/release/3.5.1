@@ -20,3 +20,6 @@ Fixes:
 - Fix the problem that VMIN and VTIME does not work at all in console.
 
 - Fix a bug that cannot handle consoles more than 32, rather than 64.
+
+- Fix gettimeofday not checking for a NULL pointer
+  Addresses: https://cygwin.com/pipermail/cygwin/2024-February/255473.html

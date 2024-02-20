@@ -172,10 +172,13 @@ gettimeofday (struct timeval *__restrict tv, void *__restrict tzvp)
   static bool tzflag;
   LONGLONG now = get_clock (CLOCK_REALTIME)->usecs ();
 
-  tv->tv_sec = now / USPERSEC;
-  tv->tv_usec = now % USPERSEC;
+  if (tv)
+    {
+      tv->tv_sec = now / USPERSEC;
+      tv->tv_usec = now % USPERSEC;
+    }
 
-  if (tz != NULL)
+  if (tz)
     {
       if (!tzflag)
 	{
