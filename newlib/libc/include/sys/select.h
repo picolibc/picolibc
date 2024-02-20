@@ -30,6 +30,8 @@ typedef	__sigset_t	sigset_t;
 #ifndef FD_SETSIZE
 # ifdef __CYGWIN__
 #  define FD_SETSIZE	1024
+# elifdef __rtems__
+#  define FD_SETSIZE	256
 # else
 #  define FD_SETSIZE	64
 # endif
