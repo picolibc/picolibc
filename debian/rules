@@ -49,7 +49,6 @@ MESON_RISCV_RELEASE_FLAGS = \
 MESON_ARM_MINSIZE_FLAGS = \
 	$(MESON_SHARED_FLAGS) \
 	-Dc_args='$(MESON_SHARED_C_ARGS)' \
-	-Dmultilib-exclude=pacbti \
 	-Dtests=true \
 	--cross-file scripts/cross-$(ARM_ARCH).txt \
 	-Dspecsdir=/usr/lib/picolibc/$(ARM_ARCH) \
@@ -60,7 +59,6 @@ MESON_ARM_RELEASE_FLAGS = \
 	$(MESON_RELEASE_FLAGS) \
 	$(MESON_SHARED_FLAGS) \
 	-Dc_args='$(MESON_SHARED_C_ARGS)' \
-	-Dmultilib-exclude=pacbti \
 	-Dtests=true \
 	--cross-file scripts/cross-$(ARM_ARCH).txt \
 	-Dspecsdir=/usr/lib/picolibc/$(ARM_ARCH) \
@@ -89,7 +87,6 @@ MESON_LX106_RELEASE_FLAGS = \
 MESON_AARCH64_MINSIZE_FLAGS = \
 	$(MESON_SHARED_FLAGS) \
 	-Dc_args='$(MESON_SHARED_C_ARGS)' \
-	-Dmultilib-exclude=pacbti \
 	-Dtests=true \
 	--cross-file scripts/cross-$(AARCH64_ARCH).txt \
 	-Dspecsdir=/usr/lib/picolibc/$(AARCH64_ARCH) \
@@ -100,7 +97,6 @@ MESON_AARCH64_RELEASE_FLAGS = \
 	$(MESON_RELEASE_FLAGS) \
 	$(MESON_SHARED_FLAGS) \
 	-Dc_args='$(MESON_SHARED_C_ARGS)' \
-	-Dmultilib-exclude=pacbti \
 	-Dtests=true \
 	--cross-file scripts/cross-$(AARCH64_ARCH).txt \
 	-Dspecsdir=/usr/lib/picolibc/$(AARCH64_ARCH) \
