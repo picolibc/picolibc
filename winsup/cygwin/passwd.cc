@@ -385,8 +385,6 @@ pg_ent::getent (void)
     case from_local:
       if (from_db
 	  && nss_db_enum_local ()
-	  && (!cygheap->dom.member_machine ()
-	      || !nss_db_enum_primary ())
 	  && (entry = enumerate_local ()))
 	return entry;
       state = from_sam;

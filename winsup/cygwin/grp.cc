@@ -424,9 +424,15 @@ gr_ent::enumerate_local ()
 	  DWORD dlen = DNLEN + 1;
 	  SID_NAME_USE acc_type;
 
-	  LookupAccountNameW (NULL,
-			      ((PLOCALGROUP_INFO_0) buf)[cnt++].lgrpi0_name,
-			      sid, &slen, dom, &dlen, &acc_type);
+	  if (!LookupAccountNameW (NULL,
+				 ((PLOCALGROUP_INFO_0) buf)[cnt++].lgrpi0_name,
+				 sid, &slen, dom, &dlen, &acc_type))
+	    continue;
+	  if (sid_id_auth (sid) == 5 /* SECURITY_NT_AUTHORITY */
+	      && sid_sub_auth (sid, 0) == SECURITY_BUILTIN_DOMAIN_RID
+	      && cygheap->dom.member_machine ()
+	      && nss_db_enum_primary ())
+	    continue;
 	  fetch_user_arg_t arg;
 	  arg.type = SID_arg;
 	  arg.sid = &sid;
