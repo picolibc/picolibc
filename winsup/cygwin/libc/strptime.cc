@@ -335,6 +335,8 @@ __strptime(const char *buf, const char *fmt, struct tm *tm,
 	const char *new_fmt;
 	uint ulim;
 	int ymd = 0;
+	bool got_I = false;
+	bool got_pm = false;
 
 	bp = (const unsigned char *)buf;
 	const struct lc_time_T *_CurrentTimeLocale = __get_time_locale (locale);
@@ -537,6 +539,7 @@ literal:
 		case 'H':
 			LEGAL_ALT(ALT_O);
 			bp = conv_num(bp, &tm->tm_hour, 0, 23, ALT_DIGITS);
+			got_I = false;
 			continue;
 
 		case 'l':	/* The hour (12-hour clock representation). */
@@ -547,6 +550,7 @@ literal:
 			bp = conv_num(bp, &tm->tm_hour, 1, 12, ALT_DIGITS);
 			if (tm->tm_hour == 12)
 				tm->tm_hour = 0;
+			got_I = true;
 			continue;
 
 		case 'j':	/* The day of year. */
@@ -573,9 +577,7 @@ literal:
 		case 'p':	/* The locale's equivalent of AM/PM. */
 			bp = find_string(bp, &i, _ctloc(am_pm), NULL, 2,
 					 locale);
-			if (tm->tm_hour > 11)
-				return NULL;
-			tm->tm_hour += i * 12;
+			got_pm = (i == 1);
 			LEGAL_ALT(0);
 			continue;
 
@@ -751,7 +753,11 @@ literal:
 		default:	/* Unknown/unsupported conversion. */
 			return NULL;
 		}
+
 	}
+
+	if (got_I && got_pm)
+	  tm->tm_hour += 12;
 
 	if (bp && (era || got_eoff))
 	  {
