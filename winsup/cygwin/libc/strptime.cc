@@ -301,10 +301,19 @@ first_day (int year)
   return ret;
 }
 
-/* This simplifies the calls to conv_num enormously. */
+/* This simplifies the calls to __conv_num enormously. */
 #define ALT_DIGITS	((alt_format & ALT_O) ? *alt_digits : NULL)
 
-static const unsigned char *conv_num(const unsigned char *, int *, uint, uint,
+#define conv_num(_b,_d,_l,_u,_a)	\
+		({							\
+		  const unsigned char *_ret;				\
+		  _ret = __conv_num((_b),(_d),(_l),(_u),(_a));		\
+		  if (!_ret)						\
+		    return NULL;					\
+		  _ret;							\
+		})
+
+static const unsigned char *__conv_num(const unsigned char *, int *, uint, uint,
 				     alt_digits_t *);
 static const unsigned char *find_string(const unsigned char *, int *,
 					const char * const *,
@@ -842,7 +851,7 @@ strptime (const char *__restrict buf, const char *__restrict fmt,
 }
 
 static const unsigned char *
-conv_num(const unsigned char *buf, int *dest, uint llim, uint ulim,
+__conv_num(const unsigned char *buf, int *dest, uint llim, uint ulim,
 	 alt_digits_t *alt_digits)
 {
 	uint result = 0;
