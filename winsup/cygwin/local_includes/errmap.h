@@ -438,7 +438,7 @@ static const int errmap[] =
   0,			/* 430 */
   0,			/* 431 */
   0,			/* 432 */
-  0,			/* 433 */
+  ENODEV,		/* ERROR_NO_SUCH_DEVICE */
   0,			/* 434 */
   0,			/* 435 */
   0,			/* 436 */
@@ -1115,7 +1115,7 @@ static const int errmap[] =
   0,			/* ERROR_DEVICE_NOT_PARTITIONED */
   0,			/* ERROR_UNABLE_TO_LOCK_MEDIA */
   0,			/* ERROR_UNABLE_TO_UNLOAD_MEDIA */
-  0,			/* ERROR_MEDIA_CHANGED */
+  ENODEV,		/* ERROR_MEDIA_CHANGED */
   EIO,			/* ERROR_BUS_RESET */
   ENOMEDIUM,		/* ERROR_NO_MEDIA_IN_DRIVE */
   0,			/* ERROR_NO_UNICODE_TRANSLATION */
