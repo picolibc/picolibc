@@ -160,6 +160,7 @@ main (int argc, const char **argv)
   if (argv[1] == NULL)
     {
       gid = pw->pw_gid;
+      gr = getgrgid (gid);
     }
   else
     {
@@ -179,7 +180,7 @@ main (int argc, const char **argv)
   if (setgid (gid) != 0)
     {
       fprintf (stderr, "%s: can't switch primary group to '%s'\n",
-	       program_invocation_short_name, argv[1]);
+	       program_invocation_short_name, gr->gr_name);
       return 2;
     }
 
