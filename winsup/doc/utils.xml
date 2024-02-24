@@ -2116,11 +2116,9 @@ D: on /d type fat (binary,user,noumount)
 	has been given as argument, a command and its arguments can be
 	specified on the command line.</para>
 
-      <para>Please note that setting the primary group to any arbitrary group
-        is no privileged operation on Windows.  However, even if this group is
-	not in your current user token, or if the group is in your user token
-	but marked as <literal>deny-only</literal>, no additional permissions
-	can be obtained by setting this group as primary group.</para>
+      <para>The new primary group must be either the old primary group, or
+        it must be part of the supplementary group list.  Setting the primary
+	group to an arbitrary group is not allowed in Windows.</para>
     </refsect1>
 
     <refsect1 id="newgrp-seealso">
