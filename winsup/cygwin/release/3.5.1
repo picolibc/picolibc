@@ -26,3 +26,6 @@ Fixes:
 
 - Fix two bugs in strptime, error checking of invalid numerical input and
   %p handling.
+
+- Fix newgrp(1) group handling.  Only allow groups already in the user
+  token, as Windows doesn't allow otherwise.
