@@ -3,7 +3,7 @@
    to this new array manually on demand. */
 
 /* FIXME: Some of these choices are arbitrary! */
-static const int errmap[] =
+constexpr int errmap[] =
 {
   0,			/* ERROR_SUCCESS */
   EBADRQC,		/* ERROR_INVALID_FUNCTION */
@@ -9006,3 +9006,12 @@ static const int errmap[] =
   0,			/* 8998 */
   0,			/* 8999 */
 };
+
+constexpr unsigned errmap_size = sizeof (errmap) / sizeof (errmap[0]);
+
+/* Some consistency checks. */
+static_assert (errmap_size == 8999 + 1);
+static_assert (EINTR == errmap[/* 104 */ ERROR_INVALID_AT_INTERRUPT_TIME]);
+static_assert (ENXIO == errmap[/* 1006 */ ERROR_FILE_INVALID]);
+static_assert (EAGAIN == errmap[/* 2404 */ ERROR_DEVICE_IN_USE]);
+static_assert (EIO == errmap[/* 8341 */ ERROR_DS_GENERIC_ERROR]);

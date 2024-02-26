@@ -185,7 +185,7 @@ geterrno_from_win_error (DWORD code, int deferrno)
 {
   /* A 0-value in errmap means, we don't handle this windows error
      explicitely.  Fall back to deferrno in these cases. */
-  if (code < sizeof errmap / sizeof errmap[0] && errmap[code])
+  if (code < errmap_size && errmap[code])
     {
       syscall_printf ("windows error %u == errno %d", code, errmap[code]);
       return errmap[code];
