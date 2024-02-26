@@ -3,7 +3,7 @@
    to this new array manually on demand. */
 
 /* FIXME: Some of these choices are arbitrary! */
-constexpr int errmap[] =
+constexpr uint8_t errmap[] =
 {
   0,			/* ERROR_SUCCESS */
   EBADRQC,		/* ERROR_INVALID_FUNCTION */
