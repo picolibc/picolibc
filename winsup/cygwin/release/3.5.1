@@ -29,3 +29,5 @@ Fixes:
 
 - Fix newgrp(1) group handling.  Only allow groups already in the user
   token, as Windows doesn't allow otherwise.
+
+- Fix getgrent enumeration of local SAM accounts on domain member machines.
