@@ -176,9 +176,9 @@ extern __IMPORT char *program_invocation_short_name;
 #ifdef __LINUX_ERRNO_EXTENSIONS__
 #define ENOMEDIUM 135   /* No medium (in tape drive) */
 #endif
-#ifdef __CYGWIN__
-#define ENOSHARE 136    /* No such host or network path */
-#define ECASECLASH 137  /* Filename exists with different case */
+#if defined(__CYGWIN__) && !defined(__INSIDE_CYGWIN__)
+#define ENOSHARE (_Pragma("GCC warning \"'ENOSHARE' is no longer used by Cygwin\"") 136)
+#define ECASECLASH (_Pragma("GCC warning \"'ECASECLASH' is no longer used by Cygwin\"") 137)
 #endif
 #define EILSEQ 138		/* Illegal byte sequence */
 #define EOVERFLOW 139	/* Value too large for defined data type */
