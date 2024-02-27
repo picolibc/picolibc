@@ -53,8 +53,9 @@ MEMORY
 PHDRS
 {@INIT_PHDRS@
 	text PT_LOAD;
-	ram PT_LOAD;
 	ram_init PT_LOAD;
+	ram PT_LOAD;
+	tls_init PT_TLS;
 	tls PT_TLS;
 }
 
@@ -199,7 +200,7 @@ SECTIONS
 		*(.tdata .tdata.* .gnu.linkonce.td.*)
 		PROVIDE(@PREFIX@__data_end = .);
 		PROVIDE(@PREFIX@__tdata_end = .);
-	} >ram AT>flash :tls :ram_init
+	} >ram AT>flash :tls_init :ram_init
 	PROVIDE( @PREFIX@__tls_base = ADDR(.tdata));
 	PROVIDE( @PREFIX@__tdata_start = ADDR(.tdata));
 	PROVIDE( @PREFIX@__tdata_source = LOADADDR(.tdata) );
