@@ -167,8 +167,8 @@ const char *_sys_errlist[] =
 /* ESTALE 133 */	  "Stale NFS file handle",
 /* ENOTSUP 134 */	  "Not supported",
 /* ENOMEDIUM 135 */	  "No medium found",
-/* ENOSHARE 136 */	  "No such host or network path",
-/* ECASECLASH 137 */	  "Filename exists with different case",
+			  "", /* Was ENOSHARE 136, no longer used. */
+			  "", /* Was ECASECLASH 137, no longer used. */
 /* EILSEQ 138 */	  "Invalid or incomplete multibyte or wide character",
 /* EOVERFLOW 139 */	  "Value too large for defined data type",
 /* ECANCELED 140 */	  "Operation canceled",
@@ -176,6 +176,8 @@ const char *_sys_errlist[] =
 /* EOWNERDEAD 142 */	  "Previous owner died",
 /* ESTRPIPE 143 */	  "Streams pipe error"
 };
+
+static_assert(143 + 1 == sizeof (_sys_errlist) / sizeof (_sys_errlist[0]));
 
 int NO_COPY_INIT _sys_nerr = sizeof (_sys_errlist) / sizeof (_sys_errlist[0]);
 };
@@ -228,7 +230,11 @@ strerror_worker (int errnum)
 {
   char *res;
   if (errnum >= 0 && errnum < _sys_nerr)
-    res = (char *) _sys_errlist [errnum];
+    {
+      res = (char *) _sys_errlist [errnum];
+      if (res && !*res)
+	res = NULL;
+    }
   else
     res = NULL;
   return res;
