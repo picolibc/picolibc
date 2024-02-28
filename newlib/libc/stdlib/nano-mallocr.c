@@ -63,70 +63,75 @@ typedef union {
     size_t s;
 } align_chunk_t;
 
-typedef struct {
-    size_t s;
-} align_head_t;
+/*          --------------------------------------
+ *          | size                               |
+ *   chunk->| When allocated: data               |
+ *          | When freed: pointer to next free   |
+ *          | chunk                              |
+ *          --------------------------------------
+ *
+ * mem_ptr is aligned to MALLOC_CHUNK_ALIGN. That means that the
+ * address of 'size' may not be aligned to MALLOC_CHUNK_ALIGN. But it
+ * will be aligned to MALLOC_HEAD_ALIGN.
+ *
+ * size is set so that a chunk starting at chunk+size will be
+ * aligned correctly
+ *
+ * We can't use a single struct containing both size and next as that
+ * may insert padding between the size and pointer fields when
+ * pointers are larger than size_t.
+ */
 
-typedef struct malloc_chunk
-{
-    /*          --------------------------------------
-     *   chunk->| size                               |
-     * mem_ptr->| When allocated: data               |
-     *          | When freed: pointer to next free   |
-     *          | chunk                              |
-     *          --------------------------------------
-     *
-     * mem_ptr is aligned to MALLOC_CHUNK_ALIGN. That means that
-     * the chunk may not be aligned to MALLOC_CHUNK_ALIGN. But
-     * it will be aligned to MALLOC_HEAD_ALIGN.
-     *
-     * size is set so that a chunk starting at chunk+size will be
-     * aligned correctly
-     */
+typedef struct malloc_head {
+    size_t      size;
+} head_t;
 
-    /* size of the allocated payload area */
-    size_t size;
-
-    /* pointer to next chunk */
-    struct malloc_chunk * next;
+typedef struct malloc_chunk {
+    struct malloc_chunk *next;
 } chunk_t;
 
 /* Alignment of allocated chunk. Compute the alignment required from a
  * range of types */
 #define MALLOC_CHUNK_ALIGN	_Alignof(align_chunk_t)
 
-/* Alignment of the header. Never larger than MALLOC_CHUNK_ALIGN */
-#define MALLOC_HEAD_ALIGN	_Alignof(align_head_t)
+/* Alignment of the header. Never larger than MALLOC_CHUNK_ALIGN, but
+ * may be smaller on some targets when size_t is smaller than
+ * align_chunk_t.
+ */
+#define MALLOC_HEAD_ALIGN	_Alignof(head_t)
 
-/* Size of malloc header. Keep it aligned. */
-#define MALLOC_HEAD 		__align_up(sizeof(size_t), MALLOC_HEAD_ALIGN)
+#define MALLOC_HEAD 		sizeof(head_t)
 
 /* nominal "page size" */
 #define MALLOC_PAGE_ALIGN 	(0x1000)
 
 /* Minimum allocation size */
-#define MALLOC_MINSIZE		__align_up(sizeof(chunk_t), MALLOC_HEAD_ALIGN)
+#define MALLOC_MINSIZE		__align_up(MALLOC_HEAD + sizeof(chunk_t), MALLOC_HEAD_ALIGN)
 
 /* Maximum allocation size */
 #define MALLOC_MAXSIZE 		(SIZE_MAX - (MALLOC_HEAD + 2*MALLOC_CHUNK_ALIGN))
 
+static inline size_t *_size_ref(chunk_t *chunk)
+{
+    return (size_t *) ((char *) chunk - MALLOC_HEAD);
+}
+
+static inline size_t _size(chunk_t *chunk)
+{
+    return *_size_ref(chunk);
+}
+
+static inline void _set_size(chunk_t *chunk, size_t size)
+{
+    *_size_ref(chunk) = size;
+}
+
 /* Forward data declarations */
-extern chunk_t * __malloc_free_list;
+extern chunk_t *__malloc_free_list;
 extern char * __malloc_sbrk_start;
 extern char * __malloc_sbrk_top;
 
 /* Forward function declarations */
-void * malloc(size_t);
-void free (void * free_p);
-void cfree(void * ptr);
-void * calloc(size_t n, size_t elem);
-void malloc_stats(void);
-size_t malloc_usable_size(void * ptr);
-void * realloc(void * ptr, size_t size);
-void * memalign(size_t align, size_t s);
-int mallopt(int parameter_number, int parameter_value);
-void * valloc(size_t s);
-void * pvalloc(size_t s);
 void __malloc_validate(void);
 void __malloc_validate_block(chunk_t *r);
 void * __malloc_sbrk_aligned(size_t s);
@@ -147,21 +152,43 @@ extern void *__malloc_malloc(size_t);
 static inline chunk_t *
 ptr_to_chunk(void * ptr)
 {
-    return (chunk_t *) ((char *) ptr - MALLOC_HEAD);
+    return (chunk_t *) ptr;
 }
 
 /* convert chunk to storage pointer */
 static inline void *
 chunk_to_ptr(chunk_t *c)
 {
-    return (char *) c + MALLOC_HEAD;
+    return c;
+}
+
+/* Convert address of chunk region to chunk pointer */
+static inline chunk_t *
+blob_to_chunk(void *blob)
+{
+    return (chunk_t *) ((char *) blob + MALLOC_HEAD);
+}
+
+/* Convert chunk pointer to address of chunk region */
+static inline void *
+chunk_to_blob(chunk_t *c)
+{
+    return (void *) ((char *) c - MALLOC_HEAD);
 }
 
 /* end of chunk -- address of first byte past chunk storage */
 static inline void *
 chunk_end(chunk_t *c)
 {
-    return (char *) c + c->size;
+    size_t *s = _size_ref(c);
+    return (char *) s + *s;
+}
+
+/* next chunk in memory -- address of chunk header past this chunk */
+static inline chunk_t *
+chunk_after(chunk_t *c)
+{
+    return (chunk_t *) ((char *) c + _size(c));
 }
 
 /* chunk size needed to hold 'malloc_size' bytes */
@@ -186,7 +213,7 @@ chunk_size(size_t malloc_size)
 static inline size_t
 chunk_usable(chunk_t *c)
 {
-    return c->size - MALLOC_HEAD;
+    return _size(c) - MALLOC_HEAD;
 }
 
 /* assign 'size' to the specified chunk and return it to the free
@@ -194,13 +221,13 @@ chunk_usable(chunk_t *c)
 static inline void
 make_free_chunk(chunk_t *c, size_t size)
 {
-    c->size = size;
+    _set_size(c, size);
     __malloc_free(chunk_to_ptr(c));
 }
 
 #ifdef DEFINE_MALLOC
 /* List list header of free blocks */
-chunk_t * __malloc_free_list;
+chunk_t *__malloc_free_list;
 
 /* Starting point of memory allocated from system */
 char * __malloc_sbrk_start;
@@ -271,7 +298,7 @@ __malloc_grow_chunk(chunk_t *c, size_t new_size)
 
     if (chunk_e != __malloc_sbrk_top)
 	return false;
-    size_t add_size = MAX(MALLOC_MINSIZE, new_size - c->size);
+    size_t add_size = MAX(MALLOC_MINSIZE, new_size - _size(c));
 
     /* Ask for the extra memory needed */
     char *heap = __malloc_sbrk_aligned(add_size);
@@ -280,14 +307,14 @@ __malloc_grow_chunk(chunk_t *c, size_t new_size)
     if (heap == chunk_e)
     {
 	/* Set size and return */
-	c->size += add_size;
+	*_size_ref(c) += add_size;
 	return true;
     }
 
     if (heap != (char *) -1)
     {
 	/* sbrk returned unexpected memory, free it */
-	make_free_chunk((chunk_t *) heap, add_size);
+	make_free_chunk((chunk_t *) (heap + MALLOC_HEAD), add_size);
     }
     return false;
 }
@@ -297,7 +324,7 @@ __malloc_grow_chunk(chunk_t *c, size_t new_size)
   *   Walk through the free list to find the first match. If fails to find
   *   one, call sbrk to allocate a new chunk_t.
   */
-void * malloc(size_t s)
+void *malloc(size_t s)
 {
     chunk_t **p, *r;
     char * ptr;
@@ -315,9 +342,9 @@ void * malloc(size_t s)
 
     for (p = &__malloc_free_list; (r = *p) != NULL; p = &r->next)
     {
-        if (r->size >= alloc_size)
+        if (_size(r) >= alloc_size)
         {
-	    size_t rem = r->size - alloc_size;
+	    size_t rem = _size(r) - alloc_size;
 
             if (rem >= MALLOC_MINSIZE)
             {
@@ -326,11 +353,11 @@ void * malloc(size_t s)
 		 */
 
 		chunk_t *s = (chunk_t *)((char *)r + alloc_size);
-                s->size = rem;
+                _set_size(s, rem);
 		s->next = r->next;
 		*p = s;
 
-                r->size = alloc_size;
+                _set_size(r, alloc_size);
             }
 	    else
 	    {
@@ -354,21 +381,22 @@ void * malloc(size_t s)
     /* Failed to find a appropriate chunk_t. Ask for more memory */
     if (r == NULL)
     {
-        r = __malloc_sbrk_aligned(alloc_size);
+        void *blob = __malloc_sbrk_aligned(alloc_size);
 
         /* sbrk returns -1 if fail to allocate */
-        if (r == (void *)-1)
+        if (blob == (void *)-1)
         {
             errno = ENOMEM;
             MALLOC_UNLOCK;
             return NULL;
         }
-        r->size = alloc_size;
+        r = blob_to_chunk(blob);
+        _set_size(r, alloc_size);
     }
 
     MALLOC_UNLOCK;
 
-    ptr = (char *)r + MALLOC_HEAD;
+    ptr = chunk_to_ptr(r);
 
     memset(ptr, '\0', alloc_size - MALLOC_HEAD);
 
@@ -403,8 +431,8 @@ __strong_reference(malloc, __malloc_malloc);
   */
 void free (void * free_p)
 {
-    chunk_t * p_to_free;
-    chunk_t ** p, * r;
+    chunk_t     *p_to_free;
+    chunk_t     **p, *r;
 
     if (free_p == NULL) return;
 
@@ -423,9 +451,9 @@ void free (void * free_p)
 	    break;
 
 	/* Merge blocks together */
-	if (chunk_end(r) == p_to_free)
+	if (chunk_after(r) == p_to_free)
 	{
-	    r->size += p_to_free->size;
+	    *_size_ref(r) += _size(p_to_free);
 	    p_to_free = r;
 	    r = r->next;
 	    goto no_insert;
@@ -446,9 +474,9 @@ void free (void * free_p)
 no_insert:
 
     /* Merge blocks together */
-    if (chunk_end(p_to_free) == r)
+    if (chunk_after(p_to_free) == r)
     {
-	p_to_free->size += r->size;
+	*_size_ref(p_to_free) += _size(r);
 	p_to_free->next = r->next;
     }
 
@@ -528,7 +556,7 @@ void * realloc(void * ptr, size_t size)
     __malloc_validate_block(p_to_realloc);
 #endif
 
-    size_t old_size = p_to_realloc->size;
+    size_t old_size = _size(p_to_realloc);
 
     /* See if we can avoid allocating new memory
      * when increasing the size
@@ -557,7 +585,7 @@ void * realloc(void * ptr, size_t size)
 	    {
 		if (r == chunk_e)
 		{
-		    size_t r_size = r->size;
+		    size_t r_size = _size(r);
 
 		    /* remove R from the free list */
 		    *p = r->next;
@@ -567,7 +595,7 @@ void * realloc(void * ptr, size_t size)
 
 		    /* add it's size to our block */
 		    old_size += r_size;
-		    p_to_realloc->size = old_size;
+		    _set_size(p_to_realloc, old_size);
 		    break;
 		}
 		if (p_to_realloc < r)
@@ -586,8 +614,8 @@ void * realloc(void * ptr, size_t size)
 	 * and free it
 	 */
 	if (extra >= MALLOC_MINSIZE) {
-	    p_to_realloc->size = new_size;
-	    make_free_chunk(chunk_end(p_to_realloc), extra);
+	    _set_size(p_to_realloc, new_size);
+	    make_free_chunk(chunk_after(p_to_realloc), extra);
 	}
 	return ptr;
     }
@@ -615,9 +643,9 @@ __malloc_validate_block(chunk_t *r)
     __malloc_block = r;
     assert (__align_up(chunk_to_ptr(r), MALLOC_CHUNK_ALIGN) == chunk_to_ptr(r));
     assert (__align_up(r, MALLOC_HEAD_ALIGN) == r);
-    assert (r->size >= MALLOC_MINSIZE);
-    assert (r->size < 0x80000000UL);
-    assert (__align_up(r->size, MALLOC_HEAD_ALIGN) == r->size);
+    assert (_size(r) >= MALLOC_MINSIZE);
+    assert (_size(r) < 0x80000000UL);
+    assert (__align_up(_size(r), MALLOC_HEAD_ALIGN) == _size(r));
 }
 
 void
@@ -627,14 +655,14 @@ __malloc_validate(void)
 
     for (r = __malloc_free_list; r; r = r->next) {
 	__malloc_validate_block(r);
-	assert (r->next == NULL || (char *) r + r->size < (char *) r->next);
+	assert (r->next == NULL || (char *) r + _size(r) <= (char *) r->next);
     }
 }
 
 struct mallinfo mallinfo(void)
 {
     char * sbrk_now;
-    chunk_t * pf;
+    chunk_t *pf;
     size_t free_size = 0;
     size_t total_size;
     size_t ordblks = 0;
@@ -656,7 +684,7 @@ struct mallinfo mallinfo(void)
 
     for (pf = __malloc_free_list; pf; pf = pf->next) {
 	ordblks++;
-        free_size += pf->size;
+        free_size += _size(pf);
     }
 
     current_mallinfo.ordblks = ordblks;
@@ -709,7 +737,7 @@ size_t malloc_usable_size(void * ptr)
  */
 void * memalign(size_t align, size_t s)
 {
-    chunk_t * chunk_p;
+    chunk_t *chunk_p;
     size_t offset, size_with_padding;
     char * allocated, * aligned_p;
 
@@ -753,21 +781,21 @@ void * memalign(size_t align, size_t s)
 	}
 
 	chunk_t *new_chunk_p = ptr_to_chunk(aligned_p);
-	new_chunk_p->size = chunk_p->size - offset;
+	_set_size(new_chunk_p, _size(chunk_p) - offset);
 
 	make_free_chunk(chunk_p, offset);
 
 	chunk_p = new_chunk_p;
     }
 
-    offset = chunk_p->size - chunk_size(s);
+    offset = _size(chunk_p) - chunk_size(s);
 
     /* Split off the back piece if large enough */
     if (offset >= MALLOC_MINSIZE)
     {
-	chunk_p->size -= offset;
+	*_size_ref(chunk_p) -= offset;
 
-	make_free_chunk((chunk_t *) chunk_end(chunk_p), offset);
+	make_free_chunk(chunk_after(chunk_p), offset);
     }
     return aligned_p;
 }
