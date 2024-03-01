@@ -35,7 +35,7 @@ static mini_cygheap NO_COPY cygheap_dummy =
 init_cygheap NO_COPY *cygheap = (init_cygheap *) &cygheap_dummy;
 void NO_COPY *cygheap_max;
 
-static NO_COPY muto cygheap_protect;
+static NO_COPY SRWLOCK cygheap_protect = SRWLOCK_INIT;
 
 struct cygheap_entry
 {
@@ -278,7 +278,6 @@ static const uint32_t bucket_val[NBUCKETS] = {
 void
 cygheap_init ()
 {
-  cygheap_protect.init ("cygheap_protect");
   if (cygheap == &cygheap_dummy)
     {
       cygheap = (init_cygheap *) VirtualAlloc ((LPVOID) CYGHEAP_STORAGE_LOW,
@@ -364,7 +363,7 @@ _cmalloc (unsigned size)
   if (b >= NBUCKETS)
     return NULL;
 
-  cygheap_protect.acquire ();
+  AcquireSRWLockExclusive (&cygheap_protect);
   if (cygheap->buckets[b])
     {
       rvc = (_cmalloc_entry *) cygheap->buckets[b];
@@ -376,7 +375,7 @@ _cmalloc (unsigned size)
       rvc = (_cmalloc_entry *) _csbrk (bucket_val[b] + sizeof (_cmalloc_entry));
       if (!rvc)
 	{
-	  cygheap_protect.release ();
+	  ReleaseSRWLockExclusive (&cygheap_protect);
 	  return NULL;
 	}
 
@@ -384,19 +383,19 @@ _cmalloc (unsigned size)
       rvc->prev = cygheap->chain;
       cygheap->chain = rvc;
     }
-  cygheap_protect.release ();
+  ReleaseSRWLockExclusive (&cygheap_protect);
   return rvc->data;
 }
 
 static void
 _cfree (void *ptr)
 {
-  cygheap_protect.acquire ();
+  AcquireSRWLockExclusive (&cygheap_protect);
   _cmalloc_entry *rvc = to_cmalloc (ptr);
   unsigned b = rvc->b;
   rvc->ptr = cygheap->buckets[b];
   cygheap->buckets[b] = (char *) rvc;
-  cygheap_protect.release ();
+  ReleaseSRWLockExclusive (&cygheap_protect);
 }
 
 static void *
