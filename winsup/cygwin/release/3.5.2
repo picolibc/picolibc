@@ -1,0 +1,7 @@
+Fixes:
+------
+
+- Fix the problem that console setup accesses shared memory which
+  is already unmapped due to race condition. To avoid this issue,
+  shared console memory will be kept mapped if it belongs to CTTY.
+  Addresses:  https://cygwin.com/pipermail/cygwin/2024-February/255561.html

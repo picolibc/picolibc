@@ -1926,9 +1926,11 @@ fhandler_console::close ()
 	  || get_device () == (dev_t) myself->ctty))
     free_console ();
 
-  if (shared_console_info[unit])
-    UnmapViewOfFile ((void *) shared_console_info[unit]);
-  shared_console_info[unit] = NULL;
+  if (shared_console_info[unit] && myself->ctty != tc ()->ntty)
+    {
+      UnmapViewOfFile ((void *) shared_console_info[unit]);
+      shared_console_info[unit] = NULL;
+    }
 
   return 0;
 }
