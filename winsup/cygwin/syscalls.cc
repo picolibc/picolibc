@@ -1596,6 +1596,66 @@ open (const char *unix_path, int flags, ...)
 
 EXPORT_ALIAS (open, _open )
 
+static int
+posix_getdents_lseek (cygheap_fdget &cfd, off_t pos, int dir)
+{
+  long cur = cfd->telldir (cfd->getdents_dir ());
+  long abs_pos;
+
+  switch (dir)
+    {
+    case SEEK_CUR:
+      abs_pos = cur + pos;
+      break;
+    case SEEK_SET:
+    case SEEK_DATA:
+      abs_pos = pos;
+      break;
+    case SEEK_END:
+    case SEEK_HOLE:
+      /* First read full dir to learn end-of-dir position. */
+      while (::readdir (cfd->getdents_dir ()))
+	;
+      long eod = cfd->telldir (cfd->getdents_dir ());
+      /* Seek back so it looks like nothing happend in error case */
+      cfd->seekdir (cfd->getdents_dir (), cur);
+      if (dir == SEEK_HOLE)
+	{
+	  if (pos > eod)
+	    {
+	      set_errno (ENXIO);
+	      return -1;
+	    }
+	  abs_pos = eod;
+	}
+      else
+	abs_pos = eod + pos;
+      break;
+    }
+  if (abs_pos < 0)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  if (abs_pos != cur)
+    {
+      cfd->seekdir (cfd->getdents_dir (), abs_pos);
+      /* In SEEK_DATA case, check that we didn't seek beyond EOF */
+      if (dir == SEEK_DATA || dir == SEEK_HOLE)
+	{
+	  pos = cfd->telldir (cfd->getdents_dir ());
+	  if (pos < abs_pos)
+	    {
+	      /* Seek back so it looks like nothing happend */
+	      cfd->seekdir (cfd->getdents_dir (), cur);
+	      set_errno (ENXIO);
+	      return -1;
+	    }
+	}
+    }
+  return abs_pos;
+}
+
 extern "C" off_t
 lseek (int fd, off_t pos, int dir)
 {
@@ -1612,28 +1672,7 @@ lseek (int fd, off_t pos, int dir)
       if (cfd < 0)
 	res = -1;
       else if (cfd->getdents_dir ())
-	{
-	  if (dir != SEEK_SET && dir != SEEK_CUR) /* No SEEK_END */
-	    {
-	      set_errno (EINVAL);
-	      res = -1;
-	    }
-	  else
-	    {
-	      long cur;
-
-	      cur = cfd->telldir (cfd->getdents_dir ());
-	      if (dir == SEEK_CUR && cur == 0)
-		res = cur;
-	      else
-		{
-		  if (dir == SEEK_CUR)
-		    pos = cur + pos;
-		  cfd->seekdir (cfd->getdents_dir (), pos);
-		  res = pos;
-		}
-	    }
-	}
+	res = posix_getdents_lseek (cfd, pos, dir);
       else
 	res = cfd->lseek (pos, dir);
     }
