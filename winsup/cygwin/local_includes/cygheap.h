@@ -487,7 +487,7 @@ struct mini_cygheap
   cygheap_locale locale;
 };
 
-#define NBUCKETS 40
+#define NBUCKETS 32
 
 struct threadlist_t
 {

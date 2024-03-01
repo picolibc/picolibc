@@ -264,15 +264,15 @@ init_cygheap::init_installation_root ()
 
 /* Initialize bucket_val.  The value is the max size of a block
    fitting into the bucket.  The values are powers of two and their
-   medians: 24, 32, 48, 64, ...
+   medians: 32, 48, 64, 96, ...
    The idea is to have better matching bucket sizes (not wasting
    space) without trading in performance compared to the old powers
    of 2 method. */
 static const uint32_t bucket_val[NBUCKETS] = {
-  0, 24, 32, 48, 64, 96, 128, 192, 256, 384, 512, 768, 1024, 1536, 2048,
-  3072, 4096, 6144, 8192, 12288, 16384, 24576, 32768, 49152, 65536, 98304,
-  131072, 196608, 262144, 393216, 524288, 786432, 1048576, 1572864, 2097152,
-  3145728, 4194304, 6291456, 8388608, 12582912
+  32, 48, 64, 96, 128, 192, 256, 384,
+  512, 768, 1024, 1536, 2048, 3072, 4096, 6144,
+  8192, 12288, 16384, 24576, 32768, 49152, 65536, 98304,
+  131072, 196608, 262144, 393216, 524288, 786432, 1048576, 1572864
 };
 
 void
@@ -355,11 +355,15 @@ static void *
 _cmalloc (unsigned size)
 {
   _cmalloc_entry *rvc;
-  unsigned b;
+  unsigned b = 0;
 
   /* Calculate "bit bucket". */
-  for (b = 1; b < NBUCKETS && bucket_val[b] < size; b++)
-    continue;
+  if (size > bucket_val[0])
+    {
+      const unsigned clz = __builtin_clzl (size - 1);
+      b = (59 - clz) << 1;
+      b -= !((size - 1) & (1 << (62 - clz)));
+    }
   if (b >= NBUCKETS)
     return NULL;
 
