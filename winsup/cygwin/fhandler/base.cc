@@ -1636,7 +1636,6 @@ fhandler_base::fixup_after_fork (HANDLE parent)
   /* POSIX locks are not inherited across fork. */
   if (unique_id)
     del_my_locks (after_fork);
-  clear_getdents ();
 }
 
 void
