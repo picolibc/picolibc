@@ -9,3 +9,7 @@ Fixes:
 - Fix a race issue between console open() and close() which is caused
   by state mismatch between con.owner and console attaching state.
   Addresses: https://cygwin.com/pipermail/cygwin/2024-March/255575.html
+
+- Fix a problem that select() call for write-side of a pipe possibly
+  hangs with non-cygwin reader.
+  Addresses: https://github.com/msys2/msys2-runtime/issues/202

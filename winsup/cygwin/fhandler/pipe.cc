@@ -1197,53 +1197,24 @@ HANDLE
 fhandler_pipe::get_query_hdl_per_process (WCHAR *name,
 					  OBJECT_NAME_INFORMATION *ntfn)
 {
-  NTSTATUS status;
-  ULONG len;
-  DWORD n_process = 256;
-  PSYSTEM_PROCESS_INFORMATION spi;
-  do
-    { /* Enumerate processes */
-      DWORD nbytes = n_process * sizeof (SYSTEM_PROCESS_INFORMATION);
-      spi = (PSYSTEM_PROCESS_INFORMATION) HeapAlloc (GetProcessHeap (),
-						     0, nbytes);
-      if (!spi)
-	return NULL;
-      status = NtQuerySystemInformation (SystemProcessInformation,
-					 spi, nbytes, &len);
-      if (NT_SUCCESS (status))
-	break;
-      HeapFree (GetProcessHeap (), 0, spi);
-      n_process *= 2;
-    }
-  while (n_process < (1L<<20) && status == STATUS_INFO_LENGTH_MISMATCH);
-  if (!NT_SUCCESS (status))
-    return NULL;
+  winpids pids ((DWORD) 0);
 
-  /* In most cases, it is faster to check the processes in reverse order.
-     To do this, store PIDs into an array. */
-  DWORD *proc_pids = (DWORD *) HeapAlloc (GetProcessHeap (), 0,
-					  n_process * sizeof (DWORD));
-  if (!proc_pids)
+  /* In most cases, it is faster to check the processes in reverse order. */
+  for (LONG i = (LONG) pids.npids - 1; i >= 0; i--)
     {
-      HeapFree (GetProcessHeap (), 0, spi);
-      return NULL;
-    }
-  PSYSTEM_PROCESS_INFORMATION p = spi;
-  n_process = 0;
-  while (true)
-    {
-      proc_pids[n_process++] = (DWORD)(intptr_t) p->UniqueProcessId;
-      if (!p->NextEntryOffset)
-	break;
-      p = (PSYSTEM_PROCESS_INFORMATION) ((char *) p + p->NextEntryOffset);
-    }
-  HeapFree (GetProcessHeap (), 0, spi);
+      NTSTATUS status;
+      ULONG len;
 
-  for (LONG i = (LONG) n_process - 1; i >= 0; i--)
-    {
+      /* Non-cygwin app may call ReadFile() for empty pipe, which makes
+	NtQueryObject() for ObjectNameInformation block. Therefore, do
+	not try to get query_hdl for non-cygwin apps. */
+      _pinfo *p = pids[i];
+      if (!p || ISSTATE (p, PID_NOTCYGWIN))
+	continue;
+
       HANDLE proc = OpenProcess (PROCESS_DUP_HANDLE
 				 | PROCESS_QUERY_INFORMATION,
-				 0, proc_pids[i]);
+				 0, p->dwProcessId);
       if (!proc)
 	continue;
 
@@ -1307,7 +1278,6 @@ fhandler_pipe::get_query_hdl_per_process (WCHAR *name,
 	      query_hdl_proc = proc;
 	      query_hdl_value = (HANDLE)(intptr_t) phi->Handles[j].HandleValue;
 	      HeapFree (GetProcessHeap (), 0, phi);
-	      HeapFree (GetProcessHeap (), 0, proc_pids);
 	      return h;
 	    }
 close_handle:
@@ -1317,6 +1287,5 @@ close_handle:
 close_proc:
       CloseHandle (proc);
     }
-  HeapFree (GetProcessHeap (), 0, proc_pids);
   return NULL;
 }
