@@ -687,14 +687,6 @@ fhandler_console::set_unit ()
     {
       devset = (fh_devices) shared_console_info[unit]->tty_min_state.getntty ();
       _tc = &(shared_console_info[unit]->tty_min_state);
-      if (!created)
-	{
-	  while (con.owner > MAX_PID)
-	    Sleep (1);
-	  pinfo p (con.owner);
-	  if (!p)
-	    con.owner = myself->pid;
-	}
     }
 
   dev ().parse (devset);
@@ -1744,11 +1736,23 @@ fhandler_console::open (int flags, mode_t)
   set_handle (NULL);
   set_output_handle (NULL);
 
+  setup_io_mutex ();
+  acquire_output_mutex (mutex_timeout);
+
+  do
+    {
+      pinfo p (con.owner);
+      if (!p)
+	con.owner = myself->pid;
+    }
+  while (false);
+
   /* Open the input handle as handle_ */
   bool err = false;
   DWORD resume_pid = attach_console (con.owner, &err);
   if (err)
     {
+      release_output_mutex ();
       set_errno (EACCES);
       return 0;
     }
@@ -1759,6 +1763,7 @@ fhandler_console::open (int flags, mode_t)
 
   if (h == INVALID_HANDLE_VALUE)
     {
+      release_output_mutex ();
       __seterrno ();
       return 0;
     }
@@ -1768,6 +1773,7 @@ fhandler_console::open (int flags, mode_t)
   resume_pid = attach_console (con.owner, &err);
   if (err)
     {
+      release_output_mutex ();
       set_errno (EACCES);
       return 0;
     }
@@ -1778,14 +1784,16 @@ fhandler_console::open (int flags, mode_t)
 
   if (h == INVALID_HANDLE_VALUE)
     {
+      release_output_mutex ();
       __seterrno ();
       return 0;
     }
   set_output_handle (h);
   handle_set.output_handle = h;
+  release_output_mutex ();
+
   wpbuf.init ();
 
-  setup_io_mutex ();
   handle_set.input_mutex = input_mutex;
   handle_set.output_mutex = output_mutex;
 
@@ -1895,24 +1903,19 @@ fhandler_console::close ()
 	}
     }
 
-  release_output_mutex ();
-
-  if (shared_console_info[unit] && con.owner == myself->pid
-      && master_thread_started)
+  if (shared_console_info[unit] && con.owner == myself->pid)
     {
-      char name[MAX_PATH];
-      shared_name (name, CONS_THREAD_SYNC, get_minor ());
-      thread_sync_event = OpenEvent (MAXIMUM_ALLOWED, FALSE, name);
-      con.owner = MAX_PID + 1;
-      WaitForSingleObject (thread_sync_event, INFINITE);
-      CloseHandle (thread_sync_event);
+      if (master_thread_started)
+	{
+	  char name[MAX_PATH];
+	  shared_name (name, CONS_THREAD_SYNC, get_minor ());
+	  thread_sync_event = OpenEvent (MAXIMUM_ALLOWED, FALSE, name);
+	  con.owner = MAX_PID + 1;
+	  WaitForSingleObject (thread_sync_event, INFINITE);
+	  CloseHandle (thread_sync_event);
+	}
       con.owner = 0;
     }
-
-  CloseHandle (input_mutex);
-  input_mutex = NULL;
-  CloseHandle (output_mutex);
-  output_mutex = NULL;
 
   CloseHandle (get_handle ());
   CloseHandle (get_output_handle ());
@@ -1925,6 +1928,13 @@ fhandler_console::close ()
       && (!CTTY_IS_VALID (myself->ctty)
 	  || get_device () == (dev_t) myself->ctty))
     free_console ();
+
+  release_output_mutex ();
+
+  CloseHandle (input_mutex);
+  input_mutex = NULL;
+  CloseHandle (output_mutex);
+  output_mutex = NULL;
 
   if (shared_console_info[unit] && myself->ctty != tc ()->ntty)
     {

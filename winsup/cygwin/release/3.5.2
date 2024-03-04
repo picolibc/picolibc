@@ -5,3 +5,7 @@ Fixes:
   is already unmapped due to race condition. To avoid this issue,
   shared console memory will be kept mapped if it belongs to CTTY.
   Addresses:  https://cygwin.com/pipermail/cygwin/2024-February/255561.html
+
+- Fix a race issue between console open() and close() which is caused
+  by state mismatch between con.owner and console attaching state.
+  Addresses: https://cygwin.com/pipermail/cygwin/2024-March/255575.html
