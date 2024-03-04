@@ -40,7 +40,7 @@
 #define _REG(n) # n
 #define REG(n) _REG(n)
 
-void
+__attribute__((weak)) void
 _set_tls(void *tls)
 {
     __asm__("wur %0," REG(THREADPTR) : : "r" (tls));

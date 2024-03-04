@@ -38,7 +38,7 @@
 
 extern char __tls_size_align[];
 
-void
+__attribute__((weak)) void
 _set_tls(void *tls)
 {
         char *ctls = tls;

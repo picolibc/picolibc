@@ -56,7 +56,7 @@ void *__tls;
 extern char __arm32_tls_tcb_offset;
 #define TP_OFFSET ((size_t)&__arm32_tls_tcb_offset)
 
-void
+__attribute__((weak)) void
 _set_tls(void *tls)
 {
 #ifdef ARM_TLS_CP15

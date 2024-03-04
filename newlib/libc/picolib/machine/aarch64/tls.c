@@ -54,7 +54,7 @@ extern char __arm64_tls_tcb_offset;
 #endif
 
 
-void
+__attribute__((weak)) void
 _set_tls(void *tls)
 {
 	__asm__ volatile("msr tpidr_el0, %0" : : "r" (tls - TP_OFFSET));

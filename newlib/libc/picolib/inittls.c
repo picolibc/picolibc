@@ -61,7 +61,7 @@ extern char __tbss_size[];	/* Size of TLS zero-filled data */
 extern char __tbss_offset[];    /* Offset from tdata to tbss */
 #endif
 
-void
+__attribute__((weak)) void
 _init_tls(void *__tls)
 {
 	char *tls = __tls;

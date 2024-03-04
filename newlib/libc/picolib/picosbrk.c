@@ -41,7 +41,7 @@ extern char __heap_end[];
 
 static char *brk = __heap_start;
 
-void *sbrk(ptrdiff_t incr)
+__attribute((weak)) void *sbrk(ptrdiff_t incr)
 {
 	if (incr < 0) {
                 if ((size_t) (brk - __heap_start) < (size_t) (-incr)) {

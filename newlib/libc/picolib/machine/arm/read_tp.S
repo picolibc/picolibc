@@ -41,7 +41,7 @@
 	.text
 	.align 4
 	.p2align 4,,15
-	.global __aeabi_read_tp
+	.weak __aeabi_read_tp
 	.type __aeabi_read_tp,%function
 #ifdef __thumb__
 	.thumb

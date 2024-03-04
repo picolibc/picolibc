@@ -37,7 +37,7 @@
 #include <string.h>
 #include <stdint.h>
 
-void
+__attribute__((weak)) void
 _set_tls(void *tls)
 {
     __asm__(".set push\n"

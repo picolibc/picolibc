@@ -48,7 +48,7 @@
 #define _REG(n) "r" # n
 #define REG(n) _REG(n)
 
-void
+__attribute__((weak)) void
 _set_tls(void *tls)
 {
     __asm__("mov " REG(TLS_REGNO) ", %0" : : "r" (tls));
