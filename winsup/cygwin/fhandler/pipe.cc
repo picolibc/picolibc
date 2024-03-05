@@ -93,6 +93,21 @@ fhandler_pipe::init (HANDLE f, DWORD a, mode_t mode, int64_t uniq_id)
        even with FILE_SYNCHRONOUS_IO_NONALERT. */
     set_pipe_non_blocking (get_device () == FH_PIPER ?
 			   true : is_nonblocking ());
+
+  /* Store pipe name to path_conv pc for query_hdl check */
+  if (get_dev () == FH_PIPEW)
+    {
+      UNICODE_STRING name;
+      WCHAR pipename_buf[MAX_PATH];
+      __small_swprintf (pipename_buf, L"%S%S-%u-pipe-nt-%p",
+			&ro_u_npfs, &cygheap->installation_key,
+			GetCurrentProcessId (), unique_id >> 32);
+      name.Length = wcslen (pipename_buf) * sizeof (WCHAR);
+      name.MaximumLength = sizeof (pipename_buf);
+      name.Buffer = pipename_buf;
+      pc.set_nt_native_path (&name);
+    }
+
   return 1;
 }
 
@@ -1149,6 +1164,8 @@ fhandler_pipe::temporary_query_hdl ()
   tmp_pathbuf tp;
   OBJECT_NAME_INFORMATION *ntfn = (OBJECT_NAME_INFORMATION *) tp.w_get ();
 
+  UNICODE_STRING *name = pc.get_nt_native_path (NULL);
+
   /* Try process handle opened and pipe handle value cached first
      in order to reduce overhead. */
   if (query_hdl_proc && query_hdl_value)
@@ -1161,14 +1178,7 @@ fhandler_pipe::temporary_query_hdl ()
       status = NtQueryObject (h, ObjectNameInformation, ntfn, 65536, &len);
       if (!NT_SUCCESS (status) || !ntfn->Name.Buffer)
 	goto hdl_err;
-      ntfn->Name.Buffer[ntfn->Name.Length / sizeof (WCHAR)] = L'\0';
-      uint64_t key;
-      DWORD pid;
-      LONG id;
-      if (swscanf (ntfn->Name.Buffer,
-		   L"\\Device\\NamedPipe\\%llx-%u-pipe-nt-0x%x",
-		   &key, &pid, &id) == 3 &&
-	  key == pipename_key && pid == pipename_pid && id == pipename_id)
+      if (RtlEqualUnicodeString (name, &ntfn->Name, FALSE))
 	return h;
 hdl_err:
       CloseHandle (h);
@@ -1178,24 +1188,13 @@ cache_err:
       query_hdl_value = NULL;
     }
 
-  status = NtQueryObject (get_handle (), ObjectNameInformation, ntfn,
-			  65536, &len);
-  if (!NT_SUCCESS (status) || !ntfn->Name.Buffer)
+  if (name->Length == 0 || name->Buffer == NULL)
     return NULL; /* Non cygwin pipe? */
-  WCHAR name[MAX_PATH];
-  int namelen = min (ntfn->Name.Length / sizeof (WCHAR), MAX_PATH-1);
-  memcpy (name, ntfn->Name.Buffer, namelen * sizeof (WCHAR));
-  name[namelen] = L'\0';
-  if (swscanf (name, L"\\Device\\NamedPipe\\%llx-%u-pipe-nt-0x%x",
-	       &pipename_key, &pipename_pid, &pipename_id) != 3)
-    return NULL; /* Non cygwin pipe? */
-
-  return get_query_hdl_per_process (name, ntfn); /* Since Win8 */
+  return get_query_hdl_per_process (ntfn); /* Since Win8 */
 }
 
 HANDLE
-fhandler_pipe::get_query_hdl_per_process (WCHAR *name,
-					  OBJECT_NAME_INFORMATION *ntfn)
+fhandler_pipe::get_query_hdl_per_process (OBJECT_NAME_INFORMATION *ntfn)
 {
   winpids pids ((DWORD) 0);
 
@@ -1272,8 +1271,8 @@ fhandler_pipe::get_query_hdl_per_process (WCHAR *name,
 				  ntfn, 65536, &len);
 	  if (!NT_SUCCESS (status) || !ntfn->Name.Buffer)
 	    goto close_handle;
-	  ntfn->Name.Buffer[ntfn->Name.Length / sizeof (WCHAR)] = L'\0';
-	  if (wcscmp (name, ntfn->Name.Buffer) == 0)
+	  if (RtlEqualUnicodeString (pc.get_nt_native_path (),
+				     &ntfn->Name, FALSE))
 	    {
 	      query_hdl_proc = proc;
 	      query_hdl_value = (HANDLE)(intptr_t) phi->Handles[j].HandleValue;

@@ -1216,11 +1216,8 @@ private:
   HANDLE query_hdl_proc;
   HANDLE query_hdl_value;
   HANDLE query_hdl_close_req_evt;
-  uint64_t pipename_key;
-  DWORD pipename_pid;
-  LONG pipename_id;
   void release_select_sem (const char *);
-  HANDLE get_query_hdl_per_process (WCHAR *, OBJECT_NAME_INFORMATION *);
+  HANDLE get_query_hdl_per_process (OBJECT_NAME_INFORMATION *);
 public:
   fhandler_pipe ();
 
