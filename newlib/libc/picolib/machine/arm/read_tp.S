@@ -66,4 +66,13 @@ __aeabi_read_tp:
 	.align 2
 #ifndef ARM_TLS_CP15
 1: .word __tls
+
+	.global __tls
+	.bss
+	.align 4
+	.type __tls, %object
+	.size __tls, 4
+__tls:
+	.space 4
+
 #endif

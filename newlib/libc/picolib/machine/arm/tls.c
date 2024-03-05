@@ -42,7 +42,7 @@
  * refer to it in an asm statement
  */
 #ifndef ARM_TLS_CP15
-void *__tls;
+extern void *__tls;
 #endif
 
 /* The size of the thread control block.
