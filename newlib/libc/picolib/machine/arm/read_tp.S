@@ -38,7 +38,7 @@
  * does not modify anything other than r0 and lr.
  */
 	.syntax unified
-	.text
+	.section .text.__aeabi_read_tp
 	.align 4
 	.p2align 4,,15
 	.global __aeabi_read_tp
