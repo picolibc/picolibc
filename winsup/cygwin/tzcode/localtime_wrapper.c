@@ -124,7 +124,6 @@ tzgetwintzi (char *wildabbr, char *outbuf)
 #include "localtime.patched.c"
 
 // Don't forget these Cygwin-specific additions from this point to EOF
-EXPORT_ALIAS (tzset_unlocked, _tzset_unlocked)
 
 long
 __cygwin_gettzoffset (const struct tm *tmp)
@@ -150,3 +149,5 @@ __cygwin_gettzname (const struct tm *tmp)
 #endif
     return _tzname[tmp->tm_isdst > 0];
 }
+
+EXPORT_ALIAS (tzset_unlocked, _tzset_unlocked)

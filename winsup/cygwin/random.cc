@@ -293,8 +293,6 @@ srandom(unsigned x)
 	__random_unlock();
 }
 
-EXPORT_ALIAS (srandom, srand)
-
 /*
  * initstate:
  *
@@ -490,3 +488,5 @@ rand()
 }
 
 }
+
+EXPORT_ALIAS (srandom, srand)

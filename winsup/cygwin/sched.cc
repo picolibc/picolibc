@@ -411,7 +411,6 @@ sched_yield ()
   SwitchToThread ();
   return 0;
 }
-EXPORT_ALIAS (sched_yield, pthread_yield)
 
 int
 sched_getcpu ()
@@ -696,4 +695,5 @@ __cpuset_free (cpu_set_t *set)
   free (set);
 }
 
+EXPORT_ALIAS (sched_yield, pthread_yield)
 } /* extern C */

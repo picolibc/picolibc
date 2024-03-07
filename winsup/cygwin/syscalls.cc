@@ -1282,8 +1282,6 @@ read (int fd, void *ptr, size_t len)
   return (ssize_t) res;
 }
 
-EXPORT_ALIAS (read, _read)
-
 extern "C" ssize_t
 readv (int fd, const struct iovec *const iov, const int iovcnt)
 {
@@ -1379,8 +1377,6 @@ write (int fd, const void *ptr, size_t len)
   syscall_printf ("%lR = write(%d, %p, %d)", res, fd, ptr, len);
   return res;
 }
-
-EXPORT_ALIAS (write, _write)
 
 extern "C" ssize_t
 writev (const int fd, const struct iovec *const iov, const int iovcnt)
@@ -1594,8 +1590,6 @@ open (const char *unix_path, int flags, ...)
   return res;
 }
 
-EXPORT_ALIAS (open, _open )
-
 static int
 posix_getdents_lseek (cygheap_fdget &cfd, off_t pos, int dir)
 {
@@ -1684,8 +1678,6 @@ lseek (int fd, off_t pos, int dir)
   return res;
 }
 
-EXPORT_ALIAS (lseek, _lseek)
-
 extern "C" int
 close (int fd)
 {
@@ -1709,8 +1701,6 @@ close (int fd)
   return res;
 }
 
-EXPORT_ALIAS (close, _close)
-
 extern "C" int
 isatty (int fd)
 {
@@ -1724,7 +1714,6 @@ isatty (int fd)
   syscall_printf ("%R = isatty(%d)", res, fd);
   return res;
 }
-EXPORT_ALIAS (isatty, _isatty)
 
 extern "C" int
 link (const char *oldpath, const char *newpath)
@@ -1976,8 +1965,6 @@ fsync (int fd)
     }
   return cfd->fsync ();
 }
-
-EXPORT_ALIAS (fsync, fdatasync)
 
 static void
 sync_worker (HANDLE dir, USHORT len, LPCWSTR vol)
@@ -4071,8 +4058,6 @@ utmpname (const char *file)
   return -1;
 }
 
-EXPORT_ALIAS (utmpname, utmpxname)
-
 /* Note: do not make NO_COPY */
 static struct utmp utmp_data_buf[16];
 static unsigned utix = 0;
@@ -5128,3 +5113,12 @@ tmpfile (void)
   set_errno (e);
   return fp;
 }
+
+EXPORT_ALIAS (close, _close)
+EXPORT_ALIAS (fsync, fdatasync)
+EXPORT_ALIAS (isatty, _isatty)
+EXPORT_ALIAS (lseek, _lseek)
+EXPORT_ALIAS (open, _open)
+EXPORT_ALIAS (read, _read)
+EXPORT_ALIAS (utmpname, utmpxname)
+EXPORT_ALIAS (write, _write)

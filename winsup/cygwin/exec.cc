@@ -85,7 +85,6 @@ execve (const char *path, char *const argv[], char *const envp[])
 {
   return spawnve (_P_OVERLAY, path, argv, envp);
 }
-EXPORT_ALIAS (execve, _execve)	/* For newlib */
 
 extern "C" int
 execvp (const char *file, char * const *argv)
@@ -126,3 +125,5 @@ sexecve_is_bad ()
   set_errno (ENOSYS);
   return 0;
 }
+
+EXPORT_ALIAS (execve, _execve)	/* For newlib */

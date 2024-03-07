@@ -91,8 +91,6 @@ times (struct tms *buf)
   return tc;
 }
 
-EXPORT_ALIAS (times, _times)
-
 /* settimeofday: BSD */
 extern "C" int
 settimeofday (const struct timeval *tv, const struct timezone *tz)
@@ -191,8 +189,6 @@ gettimeofday (struct timeval *__restrict tv, void *__restrict tzvp)
 
   return 0;
 }
-
-EXPORT_ALIAS (gettimeofday, _gettimeofday)
 
 /* Cygwin internal */
 void
@@ -571,3 +567,6 @@ timespec_get (struct timespec *ts, int base)
   clock_gettime (CLOCK_REALTIME, ts);
   return base;
 }
+
+EXPORT_ALIAS (gettimeofday, _gettimeofday)
+EXPORT_ALIAS (times, _times)
