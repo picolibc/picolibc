@@ -97,6 +97,13 @@ details. */
 #define FILE_SUPPORTS_GHOSTING                  0x40000000
 #endif
 
+#ifndef FILE_ATTRIBUTE_RECALL_ON_OPEN
+#define FILE_ATTRIBUTE_RECALL_ON_OPEN		0x00040000
+#endif
+#ifndef FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS
+#define FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS	0x00400000
+#endif
+
 /* So-called "Microsoft Account" SIDs (S-1-11-...) have a netbios domain name
    "MicrosoftAccounts".  The new "Application Container SIDs" (S-1-15-...)
    have a netbios domain name "APPLICATION PACKAGE AUTHORITY"

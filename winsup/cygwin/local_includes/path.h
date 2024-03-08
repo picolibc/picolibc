@@ -23,6 +23,14 @@ has_attribute (DWORD attributes, DWORD attribs_to_test)
 	 && (attributes & attribs_to_test);
 }
 
+extern inline bool
+isoffline (DWORD attributes)
+{
+  return has_attribute (attributes, FILE_ATTRIBUTE_OFFLINE
+				    | FILE_ATTRIBUTE_RECALL_ON_OPEN
+				    | FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS);
+}
+
 enum executable_states
 {
   is_executable,
@@ -235,6 +243,12 @@ class path_conv
   bool exists () const {return fileattr != INVALID_FILE_ATTRIBUTES;}
   bool has_attribute (DWORD x) const {return exists () && (fileattr & x);}
   int isdir () const {return has_attribute (FILE_ATTRIBUTE_DIRECTORY);}
+  bool isoffline () const
+  {
+    return has_attribute (FILE_ATTRIBUTE_OFFLINE
+			  | FILE_ATTRIBUTE_RECALL_ON_OPEN
+			  | FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS);
+  }
   executable_states exec_state ()
   {
     extern int _check_for_executable;
@@ -242,7 +256,7 @@ class path_conv
       return is_executable;
     if (mount_flags & MOUNT_NOTEXEC)
       return not_executable;
-    if (!_check_for_executable)
+    if (isoffline () || !_check_for_executable)
       return dont_care_if_executable;
     return dont_know_if_executable;
   }

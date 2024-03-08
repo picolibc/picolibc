@@ -169,6 +169,13 @@ extern GUID __cygwin_socket_guid;
 #define FILE_VC_QUOTAS_REBUILDING       0x00000200
 #define FILE_VC_VALID_MASK              0x000003ff
 
+#define PHCM_APPLICATION_DEFAULT	 0
+#define PHCM_DISGUISE_PLACEHOLDER	 1
+#define PHCM_EXPOSE_PLACEHOLDERS	 2
+#define PHCM_MAX			 2
+#define PHCM_ERROR_INVALID_PARAMETER	-1
+#define PHCM_ERROR_NO_TEB		-2
+
 /* IOCTL code to impersonate client of named pipe. */
 
 #define FSCTL_PIPE_DISCONNECT	CTL_CODE(FILE_DEVICE_NAMED_PIPE, 1, \
@@ -1639,6 +1646,7 @@ extern "C"
 					 BOOLEAN);
   NTSTATUS RtlSetGroupSecurityDescriptor (PSECURITY_DESCRIPTOR, PSID, BOOLEAN);
   NTSTATUS RtlSetOwnerSecurityDescriptor (PSECURITY_DESCRIPTOR, PSID, BOOLEAN);
+  CHAR RtlSetProcessPlaceholderCompatibilityMode (CHAR);
   PUCHAR RtlSubAuthorityCountSid (PSID);
   PULONG RtlSubAuthoritySid (PSID, ULONG);
   ULONG RtlUnicodeStringToAnsiSize (PUNICODE_STRING);

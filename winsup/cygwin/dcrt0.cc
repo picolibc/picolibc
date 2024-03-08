@@ -809,6 +809,9 @@ dll_crt0_1 (void *)
   if (dynamically_loaded)
     sigproc_init ();
 
+  /* Call this before accessing any files. */
+  RtlSetProcessPlaceholderCompatibilityMode (PHCM_EXPOSE_PLACEHOLDERS);
+
   check_sanity_and_sync (user_data);
 
   /* Initialize malloc and then call user_shared_initialize since it relies
