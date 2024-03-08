@@ -2763,7 +2763,9 @@ fhandler_disk_file::fs_ioc_getflags ()
 				 | FS_SYSTEM_FL \
 				 | FS_ARCHIVE_FL \
 				 | FS_TEMP_FL \
-				 | FS_NOTINDEXED_FL)
+				 | FS_NOTINDEXED_FL\
+				 | FS_PINNED_FL \
+				 | FS_UNPINNED_FL)
 
 int
 fhandler_disk_file::fs_ioc_setflags (uint64_t flags)

@@ -53,6 +53,8 @@ struct
   { FS_OFFLINE_FL,	'o',	"Offline" },
   { FS_NOTINDEXED_FL,	'n',	"Notindexed" },
   { FS_ENCRYPT_FL,	'e',	"Encrypted" },
+  { FS_PINNED_FL,	'p',	"Pinned" },
+  { FS_UNPINNED_FL,	'u',	"Unpinned" },
   { FS_CASESENS_FL,	'C',	"Casesensitive" },
   { 0,			'\0',	NULL },
 };
@@ -218,6 +220,8 @@ usage (FILE *stream)
       "  'n', 'Notindexed':    file or directory is not to be indexed by the\n"
       "                        content indexing service\n"
       "  'e', 'Encrypted':     file is encrypted\n"
+      "  'p', 'Pinned':        file is pinned\n"
+      "  'u', 'Unpinned':      file is unpinned\n"
       "  'C', 'Casesensitive': directory is handled case sensitive\n"
       "                        (Windows 10 1803 or later, local NTFS only,\n"
       "                         WSL must be installed)\n");
@@ -284,7 +288,7 @@ main (int argc, char **argv)
 	    ret = 1;
 	}
       else if (lsattr (argv[optind]))
-      	ret = 1;
+	ret = 1;
     }
   return ret;
 }

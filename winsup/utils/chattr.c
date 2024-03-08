@@ -53,10 +53,12 @@ struct
   { FS_OFFLINE_FL,	'o',	NULL },
   { FS_NOTINDEXED_FL,	'n',	"Notindexed" },
   { FS_ENCRYPT_FL,	'e',	"Encrypted" },
+  { FS_PINNED_FL,	'p',	"Pinned" },
+  { FS_UNPINNED_FL,	'u',	"Unpinned" },
   { FS_CASESENS_FL,	'C',	"Casesensitive" },
   { 0,			'\0',	NULL },
 };
-const char *supp_list = "rhsatSrconeC";
+const char *supp_list = "rhsatSrconepuC";
 
 void
 print_flags (uint64_t flags)
@@ -245,7 +247,7 @@ usage (FILE *stream)
       "  -H, --help          this help text\n"
       "  -v, --version       display the program version\n"
       "\n"
-      "The format of 'mode' is {+-=}[acCehnrsSt]\n"
+      "The format of 'mode' is {+-=}[acCehnprsStu]\n"
       "\n"
       "The operator '+' causes the selected attributes to be added to the\n"
       "existing attributes of the files; '-' causes them to be removed; and\n"
@@ -264,6 +266,8 @@ usage (FILE *stream)
       "  'n', 'Notindexed':    file or directory is not to be indexed by the\n"
       "                        content indexing service\n"
       "  'e', 'Encrypted':     file is encrypted\n"
+      "  'p', 'Pinned':        file is pinned\n"
+      "  'u', 'Unpinned':      file is unpinned\n"
       "  'C', 'Casesensitive': directory is handled case sensitive\n");
   exit (stream == stdout ? 0 : 1);
 }

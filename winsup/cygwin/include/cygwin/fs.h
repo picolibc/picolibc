@@ -41,10 +41,12 @@ details. */
 #define FS_OFFLINE_FL		0x000001000ULL /* DOS Offline */
 #define FS_NOTINDEXED_FL	0x000002000ULL /* DOS Not context indexed */
 #define FS_ENCRYPT_FL		0x000004000ULL /* Encrypted file */
+#define FS_PINNED_FL		0x000080000ULL /* Pinned file */
+#define FS_UNPINNED_FL		0x000100000ULL /* Unpinned file */
 #define FS_CASESENS_FL		0x100000000ULL /* Case sensitive dir */
 
-#define FS_FL_USER_VISIBLE	0x100007f27ULL /* User visible flags */
-#define FS_FL_USER_MODIFIABLE	0x100006b27ULL /* User modifiable flags */
+#define FS_FL_USER_VISIBLE	0x100187f27ULL /* User visible flags */
+#define FS_FL_USER_MODIFIABLE	0x100186b27ULL /* User modifiable flags */
 
 /* Flags for renameat2, from /usr/include/linux/fs.h.  For now we
    support only RENAME_NOREPLACE. */

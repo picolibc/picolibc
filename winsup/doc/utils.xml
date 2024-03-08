@@ -68,7 +68,7 @@
       case sensitivity.
     </para>
 
-    <para>The format of 'mode' is {+-=}[acCehnrsSt]</para>
+    <para>The format of 'mode' is {+-=}[acCehnprsStu]</para>
 
     <para>The operator '+' causes the selected attributes to be added to the
       existing attributes of the files; '-' causes them to be removed; and
@@ -88,6 +88,8 @@
   'n', 'Notindexed':    file or directory is not to be indexed by the
 			content indexing service
   'e', 'Encrypted':     file is encrypted
+  'p', 'Pinned':        file is pinned
+  'u', 'Unpinned':      file is unpinned
   'C', 'Casesensitive': directory is handled case sensitive
     </screen>
     </refsect1>
@@ -1448,6 +1450,8 @@ bash$ locale noexpr
   'n', 'Notindexed':    file or directory is not to be indexed by the
                         content indexing service
   'e', 'Encrypted':     file is encrypted
+  'p', 'Pinned':        file is pinned
+  'u', 'Unpinned':      file is unpinned
   'C', 'Casesensitive': directory is handled case sensitive
                         (Windows 10 1803 or later, local NTFS only,
                          WSL must be installed)
