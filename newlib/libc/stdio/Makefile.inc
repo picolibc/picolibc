@@ -41,7 +41,14 @@ libc_a_SOURCES += \
 	%D%/ssputs_r.c \
 	%D%/ssputws_r.c \
 	%D%/ssprint_r.c \
-	%D%/sswprint_r.c
+	%D%/sswprint_r.c \
+	%D%/svfiwprintf.c \
+	%D%/svfiwscanf.c \
+	%D%/svfwprintf.c \
+	%D%/svfwscanf.c \
+	%D%/vfiwprintf.c \
+	%D%/vfiwscanf.c \
+	%D%/vfwscanf.c
 endif
 
 libc_a_SOURCES += \
@@ -100,17 +107,10 @@ libc_a_SOURCES += \
 	%D%/sprintf.c \
 	%D%/sscanf.c \
 	%D%/stdio.c \
-	%D%/svfiwprintf.c \
-	%D%/svfiwscanf.c \
-	%D%/svfwprintf.c \
-	%D%/svfwscanf.c \
 	%D%/tmpfile.c \
 	%D%/tmpnam.c \
 	%D%/ungetc.c \
 	%D%/vdprintf.c \
-	%D%/vfiwprintf.c \
-	%D%/vfiwscanf.c \
-	%D%/vfwscanf.c \
 	%D%/vprintf.c \
 	%D%/vscanf.c \
 	%D%/vsnprintf.c \
@@ -127,13 +127,13 @@ if !ELIX_LEVEL_1
 	%D%/fcloseall.c \
 	%D%/fseeko.c \
 	%D%/ftello.c \
-	%D%/getw.c \
 	%D%/mktemp.c \
-	%D%/putw.c \
 	%D%/vasprintf.c
 if !NEWLIB_NANO_FORMATTED_IO
 %C%_ELIX_2_SOURCES += \
 	%D%/asiprintf.c \
+	%D%/getw.c \
+	%D%/putw.c \
 	%D%/vasiprintf.c
 endif !NEWLIB_NANO_FORMATTED_IO
 endif !ELIX_LEVEL_1
@@ -157,52 +157,52 @@ else
 	%D%/fflush_u.c \
 	%D%/fgetc_u.c \
 	%D%/fgets_u.c \
-	%D%/fgetwc.c \
-	%D%/fgetwc_u.c \
-	%D%/fgetws.c \
-	%D%/fgetws_u.c \
 	%D%/fileno_u.c \
 	%D%/fmemopen.c \
 	%D%/fopencookie.c \
 	%D%/fpurge.c \
 	%D%/fputc_u.c \
 	%D%/fputs_u.c \
+	%D%/fread_u.c \
+	%D%/fsetlocking.c \
+	%D%/funopen.c \
+	%D%/fwrite_u.c \
+	%D%/open_memstream.c \
+	%D%/stdio_ext.c \
+	%D%/vasnprintf.c
+if !NEWLIB_NANO_FORMATTED_IO
+%C%_ELIX_4_SOURCES += \
+	%D%/asniprintf.c \
+	%D%/diprintf.c \
+	%D%/fgetwc.c \
+	%D%/fgetwc_u.c \
+	%D%/fgetws.c \
+	%D%/fgetws_u.c \
 	%D%/fputwc.c \
 	%D%/fputwc_u.c \
 	%D%/fputws.c \
 	%D%/fputws_u.c \
-	%D%/fread_u.c \
-	%D%/fsetlocking.c \
-	%D%/funopen.c \
 	%D%/fwide.c \
 	%D%/fwprintf.c \
-	%D%/fwrite_u.c \
 	%D%/fwscanf.c \
 	%D%/getwc.c \
 	%D%/getwc_u.c \
 	%D%/getwchar.c \
 	%D%/getwchar_u.c \
-	%D%/open_memstream.c \
 	%D%/putwc.c \
 	%D%/putwc_u.c \
 	%D%/putwchar.c \
 	%D%/putwchar_u.c \
-	%D%/stdio_ext.c \
 	%D%/swprintf.c \
 	%D%/swscanf.c \
 	%D%/ungetwc.c \
-	%D%/vasnprintf.c \
+	%D%/vasniprintf.c \
 	%D%/vswprintf.c \
 	%D%/vswscanf.c \
 	%D%/vwprintf.c \
 	%D%/vwscanf.c \
 	%D%/wprintf.c \
 	%D%/wscanf.c
-if !NEWLIB_NANO_FORMATTED_IO
-%C%_ELIX_4_SOURCES += \
-	%D%/asniprintf.c \
-	%D%/diprintf.c \
-	%D%/vasniprintf.c
 endif !NEWLIB_NANO_FORMATTED_IO
 endif !ELIX_LEVEL_3
 endif !ELIX_LEVEL_2
