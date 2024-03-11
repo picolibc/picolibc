@@ -9,6 +9,10 @@ What's new:
 
 - New API call: timespec_get.
 
+- Add FS_IOC_[GS]ETFLAGS FS_PINNED_FL and FS_UNPINNED_FL flags to handle
+  Windows attributes FILE_ATTRIBUTE_PINNED and FILE_ATTRIBUTE_UNPINNED.
+  Add matching 'p' and 'u' mode bits in chattr(1) and lsattr(1).
+
 
 What changed:
 -------------
