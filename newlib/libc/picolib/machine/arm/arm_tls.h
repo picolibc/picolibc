@@ -36,3 +36,14 @@
 #if ((__ARM_FEATURE_COPROC & 1) || __ARM_ARCH >= 8) && __ARM_ARCH_PROFILE != 'M' && __ARM_ARCH >= 6
 #define ARM_TLS_CP15
 #endif
+
+/* Switch cortex-m0 to use RP2040 CPUID register if requested */
+#if __ARM_ARCH == 6 && __ARM_ARCH_PROFILE == 'M' && defined(_HAVE_PICOLIBC_TLS_RP2040)
+#define ARM_RP2040
+#endif
+
+#ifdef ARM_RP2040
+#define RP2040_SIO_BASE        0xd0000000
+#define RP2040_CPUID           (RP2040_SIO_BASE + 0)
+#define RP2040_NCORE            2
+#endif

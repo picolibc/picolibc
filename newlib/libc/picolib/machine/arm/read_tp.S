@@ -2,6 +2,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Copyright © 2020 Keith Packard
+ * Copyright © 2024 Stephen Street
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -50,29 +51,51 @@
 __aeabi_read_tp:
 	.cfi_sections .debug_frame
 	.cfi_startproc
+
 #ifdef ARM_TLS_CP15
 	mrc p15, 0, r0, c13, c0, 3
-#else
-	/* Load the address of __tls */
-	ldr r0,1f
-	/* Dereference to get the value of __tls */
-	ldr r0,[r0]
-#endif
-	/* All done, return to caller */
 	bx lr
-	.cfi_endproc
-	
-	/* Holds the address of __tls */
-	.align 2
-#ifndef ARM_TLS_CP15
-1: .word __tls
+#else
 
+#ifdef ARM_RP2040
+
+	/*
+	 * Code for RP2040 processor. This is a dual-core cortex-m0
+	 * design. We use the CPUID register, stored at offset zero of
+	 * the Single-cycle IO block at 0xd0000000
+	 */
+
+#define TLS_SIZE	(4 * RP2040_NCORE)
+
+	push {r1,lr}		/* Save R1 (and LR) */
+	ldr r1,=0xd0000000	/* Address of SIO->CPUID */
+	ldr r1,[r1]	   	/* Fetch active core */
+	lsls r1,r1,#2	   	/* Multiply by 4 */
+	ldr r0,=__tls		/* Address of __tls array */
+	ldr r0,[r0,r1]		/* Fetch __tls[CPUID] */
+	pop {r1,pc}		/* Restore R1 and return  */
+
+#else
+
+#define TLS_SIZE	4
+
+	ldr r0,=__tls		/* Load the address of __tls */
+	ldr r0,[r0]		/* Dereference to get the value of __tls */
+	bx lr			/* All done, return to caller */
+
+#endif
+
+#endif
+
+	.cfi_endproc
+
+#ifndef ARM_TLS_CP15
 	.global __tls
 	.bss
 	.align 4
 	.type __tls, %object
-	.size __tls, 4
+	.size __tls, TLS_SIZE
 __tls:
-	.space 4
+	.space TLS_SIZE
 
 #endif

@@ -273,6 +273,8 @@ option('newlib-global-errno', type: 'boolean', value: false,
 option('errno-function', type: 'string',
        value: 'false',
        description: 'Use this function to compute errno address (default false, auto means autodetect, zephyr means use z_errno_wrap if !tls)')
+option('tls-rp2040', type: 'boolean', value: false,
+       description: 'Use Raspberry Pi RP2040 CPUID register to index thread local storage value')
 
 #
 # Math options
