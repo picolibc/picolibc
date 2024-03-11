@@ -104,6 +104,10 @@ details. */
 #define FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS	0x00400000
 #endif
 
+#ifndef DOMAIN_ALIAS_RID_DEVICE_OWNERS
+#define DOMAIN_ALIAS_RID_DEVICE_OWNERS		(__MSABI_LONG(0x00000247))
+#endif
+
 /* So-called "Microsoft Account" SIDs (S-1-11-...) have a netbios domain name
    "MicrosoftAccounts".  The new "Application Container SIDs" (S-1-15-...)
    have a netbios domain name "APPLICATION PACKAGE AUTHORITY"

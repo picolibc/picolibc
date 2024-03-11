@@ -428,10 +428,15 @@ gr_ent::enumerate_local ()
 				 ((PLOCALGROUP_INFO_0) buf)[cnt++].lgrpi0_name,
 				 sid, &slen, dom, &dlen, &acc_type))
 	    continue;
-	  if (sid_id_auth (sid) == 5 /* SECURITY_NT_AUTHORITY */
+	  /* Skip builtin groups if we're enumerating AD as well to avoid
+	     duplication. Don't skip "Power Users" and "Device Owners"
+	     accounts, they don't show up in AD enumeration. */
+	  if (cygheap->dom.member_machine ()
+	      && nss_db_enum_primary ()
+	      && sid_id_auth (sid) == 5 /* SECURITY_NT_AUTHORITY */
 	      && sid_sub_auth (sid, 0) == SECURITY_BUILTIN_DOMAIN_RID
-	      && cygheap->dom.member_machine ()
-	      && nss_db_enum_primary ())
+	      && sid_sub_auth (sid, 1) != DOMAIN_ALIAS_RID_POWER_USERS
+	      && sid_sub_auth (sid, 1) != DOMAIN_ALIAS_RID_DEVICE_OWNERS)
 	    continue;
 	  fetch_user_arg_t arg;
 	  arg.type = SID_arg;
