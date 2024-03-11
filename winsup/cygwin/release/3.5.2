@@ -13,3 +13,10 @@ Fixes:
 - Fix a problem that select() call for write-side of a pipe possibly
   hangs with non-cygwin reader.
   Addresses: https://github.com/msys2/msys2-runtime/issues/202
+
+- Avoid recalling offline files if the file is not explicitely opened
+  for reading or writing data.
+  Addresses: https://cygwin.com/pipermail/cygwin/2024-March/255613.html
+
+- Don't skip inadvertently some local SAM accounts on domain member
+  machines.
