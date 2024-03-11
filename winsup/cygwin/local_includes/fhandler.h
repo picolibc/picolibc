@@ -1234,6 +1234,7 @@ public:
   int open (int flags, mode_t mode = 0);
   bool open_setup (int flags);
   void fixup_after_fork (HANDLE);
+  void fixup_after_exec ();
   int dup (fhandler_base *child, int);
   void set_close_on_exec (bool val);
   int close ();
@@ -1295,6 +1296,8 @@ public:
 	}
       return false;
     }
+  static void spawn_worker (int fileno_stdin, int fileno_stdout,
+			    int fileno_stderr);
 };
 
 #define CYGWIN_FIFO_PIPE_NAME_LEN     47

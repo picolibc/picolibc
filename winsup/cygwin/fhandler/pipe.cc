@@ -18,6 +18,7 @@ details. */
 #include "pinfo.h"
 #include "shared_info.h"
 #include "tls_pbuf.h"
+#include "sigproc.h"
 #include <assert.h>
 
 /* This is only to be used for writing.  When reading,
@@ -600,6 +601,17 @@ fhandler_pipe::fixup_after_fork (HANDLE parent)
 
   fhandler_base::fixup_after_fork (parent);
   ReleaseMutex (hdl_cnt_mtx);
+}
+
+void
+fhandler_pipe::fixup_after_exec ()
+{
+  /* Set read pipe itself always non-blocking for cygwin process.
+     Blocking/non-blocking is simulated in raw_read(). For write
+     pipe, follow is_nonblocking(). */
+  bool mode = get_device () == FH_PIPEW ? is_nonblocking () : true;
+  set_pipe_non_blocking (mode);
+  fhandler_base::fixup_after_exec ();
 }
 
 int
@@ -1287,4 +1299,55 @@ close_proc:
       CloseHandle (proc);
     }
   return NULL;
+}
+
+void
+fhandler_pipe::spawn_worker (int fileno_stdin, int fileno_stdout,
+			     int fileno_stderr)
+{
+  bool need_send_noncygchld_sig = false;
+
+  /* spawn_worker() is called from spawn.cc only when non-cygwin app
+     is started. Set pipe mode blocking for the non-cygwin process. */
+  int fd;
+  cygheap_fdenum cfd (false);
+  while ((fd = cfd.next ()) >= 0)
+    if (cfd->get_dev () == FH_PIPEW
+	&& (fd == fileno_stdout || fd == fileno_stderr))
+      {
+	fhandler_pipe *pipe = (fhandler_pipe *)(fhandler_base *) cfd;
+	pipe->set_pipe_non_blocking (false);
+
+	/* Setup for query_ndl stuff. Read the comment below. */
+	if (pipe->request_close_query_hdl ())
+	  need_send_noncygchld_sig = true;
+      }
+    else if (cfd->get_dev () == FH_PIPER && fd == fileno_stdin)
+      {
+	fhandler_pipe *pipe = (fhandler_pipe *)(fhandler_base *) cfd;
+	pipe->set_pipe_non_blocking (false);
+      }
+
+  /* If multiple writers including non-cygwin app exist, the non-cygwin
+     app cannot detect pipe closure on the read side when the pipe is
+     created by system account or the pipe creator is running as service.
+     This is because query_hdl which is held in write side also is a read
+     end of the pipe, so the pipe is still alive for the non-cygwin app
+     even after the reader is closed.
+
+     To avoid this problem, let all processes in the same process
+     group close query_hdl using internal signal __SIGNONCYGCHLD when
+     non-cygwin app is started.  */
+  if (need_send_noncygchld_sig)
+    {
+      tty_min dummy_tty;
+      dummy_tty.ntty = (fh_devices) myself->ctty;
+      dummy_tty.pgid = myself->pgid;
+      tty_min *t = cygwin_shared->tty.get_cttyp ();
+      if (!t) /* If tty is not allocated, use dummy_tty instead. */
+	t = &dummy_tty;
+      /* Emit __SIGNONCYGCHLD to let all processes in the
+	 process group close query_hdl. */
+      t->kill_pgrp (__SIGNONCYGCHLD);
+    }
 }
