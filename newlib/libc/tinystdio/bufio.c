@@ -168,8 +168,15 @@ again:
 
 	if (bf->off >= bf->len) {
 
-		/* Flush stdout if reading from stdin */
-		if (f == stdin && !flushed && stdout != NULL) {
+		/*
+                 * Flush stdout if reading from stdin.
+                 *
+                 * The odd-looking NULL address checks along with the
+                 * weak attributes for stdin and stdout above avoids
+                 * pulling in stdin/stdout definitions just for this
+                 * check.
+                 */
+		if (&stdin != NULL && &stdout != NULL && f == stdin && !flushed) {
                         flushed = true;
 			__bufio_unlock(f);
 			fflush(stdout);
