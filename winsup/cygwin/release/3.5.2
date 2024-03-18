@@ -20,3 +20,7 @@ Fixes:
 
 - Don't skip inadvertently some local SAM accounts on domain member
   machines.
+
+- Revert ill-advised optimization of glob(3) in case of caseinsensitive
+  globbing.
+  Addresses: https://cygwin.com/pipermail/cygwin/2024-March/255675.html

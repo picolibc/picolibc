@@ -96,8 +96,6 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/glob.c,v 1.28 2010/05/12 17:44:00 gordon Ex
 
 #ifdef __CYGWIN__
 #define Cchar(c)	(ignore_case_with_glob ? towlower (c) : (c))
-#else
-#define Cchar(c)	(c)
 #endif
 
 #undef MAXPATHLEN
@@ -123,7 +121,6 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/glob.c,v 1.28 2010/05/12 17:44:00 gordon Ex
 #define	SLASH		'/'
 #define	COMMA		','
 
-#undef DEBUG /* never define */
 #ifndef DEBUG
 
 #define	M_QUOTE		0x40000000U
@@ -251,7 +248,7 @@ glob(const char *__restrict pattern, int flags, int (*errfunc)(const char *, int
 				return (GLOB_NOMATCH);
 			else if (clen == 0)
 				break;
-			*bufnext++ = Cchar(wc);
+			*bufnext++ = wc;
 			patnext += clen;
 		}
 	} else {
@@ -271,7 +268,7 @@ glob(const char *__restrict pattern, int flags, int (*errfunc)(const char *, int
 				return (GLOB_NOMATCH);
 			else if (clen == 0)
 				break;
-			*bufnext++ = Cchar(wc) | prot;
+			*bufnext++ = wc | prot;
 			patnext += clen;
 		}
 	}
@@ -772,19 +769,6 @@ glob3(Char *pathbuf, Char *pathend, Char *pathend_last,
 				break;
 			sc += clen;
 		}
-#ifdef __CYGWIN__
-		if (ignore_case_with_glob) {
-			wint_t lower_path[MAXPATHLEN];
-			wint_t *lp = lower_path, *sp = pathend;
-
-			while ((*lp++ = towlower(*sp++)))
-				;
-			if (!match(lower_path, pattern, restpattern)) {
-				*pathend = EOS;
-				continue;
-			}
-		} else
-#endif
 		if (!match(pathend, pattern, restpattern)) {
 			*pathend = EOS;
 			continue;
@@ -938,7 +922,7 @@ match(Char *name, Char *pat, Char *patend)
 				return(0);
 			break;
 		default:
-			if (*name++ != *c)
+			if (Cchar(*name++) != Cchar(*c))
 				return(0);
 			break;
 		}
