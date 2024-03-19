@@ -18,7 +18,7 @@ struct __DIR
   /* This is first to set alignment in non _LIBC case.  */
   unsigned long	__d_cookie;
   struct dirent	*__d_dirent;
-  char		*__d_dirname;		/* directory name with trailing '*' */
+  char		*__d_dirname;		/* use for internal caching */
   __int32_t	 __d_position;		/* used by telldir/seekdir */
   int		 __d_fd;
   uintptr_t	 __d_internal;
