@@ -243,6 +243,8 @@ fhandler_proc::opendir (int fd)
   DIR *dir = fhandler_virtual::opendir (fd);
   if (dir && !(dir->__handle = (void *) new winpids ((DWORD) 0)))
     {
+      free (dir->__d_dirname);
+      free (dir->__d_dirent);
       free (dir);
       dir = NULL;
       set_errno (ENOMEM);
