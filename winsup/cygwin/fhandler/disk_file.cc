@@ -2156,9 +2156,7 @@ fhandler_disk_file::opendir (int fd)
   DIR *dir;
   DIR *res = NULL;
 
-  if (!pc.isdir ())
-    set_errno (ENOTDIR);
-  else if ((dir = (DIR *) malloc (sizeof (DIR))) == NULL)
+  if ((dir = (DIR *) malloc (sizeof (DIR))) == NULL)
     set_errno (ENOMEM);
   else if ((dir->__d_dirname = (char *) malloc ( sizeof (struct __DIR_cache)))
 	   == NULL)

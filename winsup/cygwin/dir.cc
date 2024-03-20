@@ -61,13 +61,18 @@ opendir (const char *name)
       set_errno (fh->error ());
       res = NULL;
     }
-  else if (fh->exists ())
-    res = fh->opendir (-1);
-  else
+  else if (!fh->exists ())
     {
       set_errno (ENOENT);
       res = NULL;
     }
+  else if (!fh->pc.isdir ())
+    {
+      set_errno (ENOTDIR);
+      res = NULL;
+    }
+  else
+    res = fh->opendir (-1);
 
   if (!res && fh)
     delete fh;
