@@ -3079,6 +3079,7 @@ class fhandler_netdrive: public fhandler_virtual
  public:
   fhandler_netdrive ();
   virtual_ftype_t exists();
+  DIR *opendir (int);
   int readdir (DIR *, dirent *);
   void seekdir (DIR *, long);
   void rewinddir (DIR *);

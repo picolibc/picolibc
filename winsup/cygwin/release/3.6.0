@@ -21,3 +21,7 @@ What changed:
   executable.
 
 - Drop support for NT4 and Samba < 3.0.
+
+- Now that SMBv1 is ultimately deprecated and not installed by default
+  on latest Windows versions, enumerating network servers in // and shares
+  via //machine is now using Network Discovery just like Windows Explorer.

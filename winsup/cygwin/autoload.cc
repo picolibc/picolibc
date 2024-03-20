@@ -502,13 +502,6 @@ LoadDLLfunc (ldap_value_free_len, wldap32)
 LoadDLLfunc (LdapGetLastError, wldap32)
 LoadDLLfunc (LdapMapErrorToWin32, wldap32)
 
-LoadDLLfunc (WNetCloseEnum, mpr)
-LoadDLLfunc (WNetEnumResourceW, mpr)
-LoadDLLfunc (WNetGetLastErrorW, mpr)
-LoadDLLfunc (WNetGetProviderNameW, mpr)
-LoadDLLfunc (WNetGetResourceInformationW, mpr)
-LoadDLLfunc (WNetOpenEnumW, mpr)
-
 LoadDLLfunc (DsEnumerateDomainTrustsW, netapi32)
 LoadDLLfunc (DsGetDcNameW, netapi32)
 LoadDLLfunc (NetApiBufferFree, netapi32)
@@ -521,6 +514,8 @@ LoadDLLfunc (NetUserGetGroups, netapi32)
 LoadDLLfunc (NetUserGetInfo, netapi32)
 LoadDLLfunc (NetUserGetLocalGroups, netapi32)
 
+LoadDLLfunc (CoInitialize, ole32)
+LoadDLLfunc (CoUninitialize, ole32)
 LoadDLLfunc (CoTaskMemFree, ole32)
 
 LoadDLLfunc (LsaConnectUntrusted, secur32)
@@ -531,7 +526,9 @@ LoadDLLfunc (LsaLookupAuthenticationPackage, secur32)
 LoadDLLfunc (LsaRegisterLogonProcess, secur32)
 LoadDLLfunc (TranslateNameW, secur32)
 
+LoadDLLfunc (SHCreateItemFromParsingName, shell32)
 LoadDLLfunc (SHGetDesktopFolder, shell32)
+LoadDLLfunc (SHGetKnownFolderItem, shell32)
 
 LoadDLLfunc (CreateFontW, gdi32)
 LoadDLLfunc (DeleteObject, gdi32)
