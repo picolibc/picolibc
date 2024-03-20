@@ -40,13 +40,6 @@ echo "    Kaliningrad Standard Time/BY"
 echo "    SA Pacific Standard Time/HT "
 echo "    South Africa Standard Time/LY"
 echo ""
-echo "  It also doesn't contain deprecated country codes used in older"
-echo "  OSes, namely:"
-echo ""
-echo "    CS (Serbian and Montenegro, dissolved, now RS and ME) used in Vista"
-echo " "
-echo "  While these are apparently old, they are required here to get a complete"
-echo "  mapping on all supported OSes. */"
 echo "struct"
 echo "{"
 echo "  PCWSTR win_tzkey;"
@@ -59,7 +52,6 @@ wget -O - "${ZONES_FILE}" | \
   sed -n -e 's#territory="001"#territory=""#
 	     s#Asia/Calcutta#Asia/Kolkata#
 	     s#.*mapZone other=\("[^"]*"\) territory=\("[^"]*"\) type=\("[^"]*"\).*#  { L\1, L\2, L\3 },#p'
-  echo '  { L"Central Europe Standard Time", L"CS", L"Europe/Belgrade" },'
   echo '  { L"E. Europe Standard Time", L"", L"Asia/Nicosia" },'
   echo '  { L"E. Europe Standard Time", L"CY", L"Asia/Nicosia" },'
   echo '  { L"Eastern Standard Time", L"TC", L"America/Grand_Turk" },'
