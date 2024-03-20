@@ -19,3 +19,5 @@ What changed:
 
 - ps -f now prints the commandline rather than the full path to the
   executable.
+
+- Drop support for NT4 and Samba < 3.0.

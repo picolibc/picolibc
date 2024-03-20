@@ -310,7 +310,8 @@ get_file_attribute (HANDLE handle, path_conv &pc,
 	 share returns STATUS_INVALID_NETWORK_RESPONSE, which in turn is
 	 converted to ERROR_BAD_NET_RESP.  This potentially occurs when trying
 	 to fetch DACLs from a NT4 machine which is not part of the domain of
-	 the requesting machine. */
+	 the requesting machine.
+	 FIXME: We dropped NT4 support, but are there other scenarios? */
       else if (get_errno () != ENOSYS)
 	{
 	  if (uidret)

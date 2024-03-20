@@ -148,14 +148,9 @@ path_conv::isgood_inode (ino_t ino) const
      are to be trusted. */
   if (ino > UINT32_MAX || !isremote ())
     return true;
-  /* The inode numbers returned from a remote NT4 NTFS are ephemeral
-     32 bit numbers. */
-  if (fs_is_ntfs ())
-    return false;
   /* Starting with version 3.5.4, Samba returns the real inode numbers, if
      the file is on the same device as the root of the share (Samba function
-     get_FileIndex).  32 bit inode numbers returned by older versions (likely
-     < 3.0) are ephemeral. */
+     get_FileIndex). */
   if (fs_is_samba () && fs.samba_version () < 0x03050400)
     return false;
   /* Otherwise, trust the inode numbers unless proved otherwise. */

@@ -293,10 +293,6 @@ fhandler_netdrive::readdir (DIR *dir, dirent *de)
 	  char *rpath = tp.c_get ();
 	  sys_wcstombs (rpath, NT_MAX_PATH, nro->lpRemoteName);
 	  de->d_ino = readdir_get_ino (rpath, false);
-	  /* We can't trust remote inode numbers of only 32 bit.  That means,
-	     remote NT4 NTFS, as well as shares of Samba version < 3.0. */
-	  if (de->d_ino <= UINT32_MAX)
-	    de->d_ino = hash_path_name (0, rpath);
 	}
       de->d_type = DT_DIR;
 
