@@ -15,10 +15,6 @@ details. */
 #include <cygwin/version.h>
 #include <windows.h>
 
-#ifndef GEOID_NOT_AVAILABLE
-#define GEOID_NOT_AVAILABLE -1
-#endif
-
 /* The auto-generated tzmap.h contains the mapping table from Windows timezone
    and country per ISO 3166-1 to POSIX timezone.  For more info, see the file
    itself. */
@@ -34,49 +30,6 @@ static struct option longopts[] =
 };
 
 static char opts[] = "hV";
-
-#define REG_TZINFO L"SYSTEM\\CurrentControlSet\\Control\\TimeZoneInformation"
-#define REG_TZDB L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Time Zones"
-
-static inline HKEY
-reg_open (HKEY pkey, PCWSTR path, const char *msg)
-{
-  LONG ret;
-  HKEY hkey;
-
-  ret = RegOpenKeyExW (pkey, path, 0, KEY_READ, &hkey);
-  if (ret == ERROR_SUCCESS)
-    return hkey;
-  if (msg)
-    fprintf (stderr, "%s: cannot open registry %s, error code %" PRIu32 "\n",
-	     program_invocation_short_name, msg, (unsigned int) ret);
-  return NULL;
-}
-
-/* For symmetry */
-#define reg_close(hkey)	RegCloseKey(hkey)
-
-static inline BOOL
-reg_query (HKEY hkey, PCWSTR value, PWCHAR buf, DWORD size, const char *msg)
-{
-  LONG ret;
-  DWORD type;
-
-  ret = RegQueryValueExW (hkey, value, 0, &type, (LPBYTE) buf, &size);
-  if (ret == ERROR_SUCCESS)
-    return TRUE;
-  if (msg)
-    fprintf (stderr, "%s: cannot query registry %s, error code %" PRIu32 "\n",
-	     program_invocation_short_name, msg, (unsigned int) ret);
-  return FALSE;
-}
-
-static inline BOOL
-reg_enum (HKEY hkey, int idx, PWCHAR name, DWORD size)
-{
-  return RegEnumKeyExW (hkey, idx, name, &size, NULL, NULL, NULL, NULL)
-	 == ERROR_SUCCESS;
-}
 
 static void __attribute__ ((__noreturn__))
 usage (FILE *stream)
@@ -119,8 +72,8 @@ print_version ()
 int
 main (int argc, char **argv)
 {
-  HKEY hkey;
-  WCHAR keyname[256], country[10], *spc;
+  DYNAMIC_TIME_ZONE_INFORMATION tz;
+  WCHAR country[10], *spc;
   GEOID geo;
   int opt, idx, gotit = -1;
 
@@ -141,18 +94,8 @@ main (int argc, char **argv)
   if (optind < argc)
     usage (stderr);
 
-  /* First fetch current timezone information from registry. */
-  hkey = reg_open (HKEY_LOCAL_MACHINE, REG_TZINFO, "timezone information");
-  if (!hkey)
+  if (GetDynamicTimeZoneInformation (&tz) == TIME_ZONE_ID_INVALID)
     return 1;
-  /* Vista introduced the TimeZoneKeyName value, which simplifies the
-     job a lot. */
-  if (!reg_query (hkey, L"TimeZoneKeyName", keyname, sizeof keyname, NULL))
-    {
-      reg_close (hkey);
-      return 1;
-    }
-  reg_close (hkey);
 
   /* We fetch the current Geo-location of the user and convert it to an
      ISO 3166-1 compatible nation code. */
@@ -169,7 +112,7 @@ main (int argc, char **argv)
   /* Now iterate over the mapping table and find the right entry. */
   for (idx = 0; idx < TZMAP_SIZE; ++idx)
     {
-      if (!wcscasecmp (keyname, tzmap[idx].win_tzkey))
+      if (!wcscasecmp (tz.TimeZoneKeyName, tzmap[idx].win_tzkey))
 	{
 	  if (gotit < 0)
 	    gotit = idx;
@@ -189,7 +132,7 @@ main (int argc, char **argv)
 	  fprintf (stderr,
 		   "%s: can't find matching POSIX timezone for "
 		   "Windows timezone \"%ls\"\n",
-		   program_invocation_short_name, keyname);
+		   program_invocation_short_name, tz.TimeZoneKeyName);
 	  return 1;
 	}
       idx = gotit;
