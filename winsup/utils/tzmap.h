@@ -12,14 +12,15 @@
    POSIX-compatible timezone IDs.
 
    The mapping from unicode.org is just a bit incomplete.  It doesn't contain
-   a few timezones available on Windows 8.1:
+   some (deprecated) timezones available since Windows 8.1:
 
-    E. Europe Standard Time
     Mid-Atlantic Standard Time
     Kamchatka Standard Time
 
   as well as a few combinations which got a new Windows timezone name
+  but may still be in use somewhere...
 
+    E. Europe Standard Time/CY
     Eastern Standard Time/TC
     Egypt Standard Time/PS
     Greenwich Standard Time/EH
@@ -27,6 +28,7 @@
     Kaliningrad Standard Time/BY
     SA Pacific Standard Time/HT 
     South Africa Standard Time/LY
+*/
 
 struct
 {
@@ -161,7 +163,6 @@ struct
   { L"E. Africa Standard Time", L"ZZ", L"Etc/GMT-3" },
   { L"E. Australia Standard Time", L"", L"Australia/Brisbane" },
   { L"E. Australia Standard Time", L"AU", L"Australia/Brisbane Australia/Lindeman" },
-  { L"E. Europe Standard Time", L"", L"Asia/Nicosia" },
   { L"E. Europe Standard Time", L"", L"Europe/Chisinau" },
   { L"E. Europe Standard Time", L"CY", L"Asia/Nicosia" },
   { L"E. Europe Standard Time", L"MD", L"Europe/Chisinau" },
