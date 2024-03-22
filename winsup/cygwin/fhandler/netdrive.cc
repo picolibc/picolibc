@@ -15,9 +15,11 @@ details. */
 #include "cygheap.h"
 #include "cygthread.h"
 
+#define USE_SYS_TYPES_FD_SET
 #include <shobjidl.h>
 #include <shlobj.h>
 #include <lm.h>
+#include <ws2tcpip.h>
 
 #include <stdlib.h>
 #include <dirent.h>
@@ -94,22 +96,13 @@ struct netdriveinf
 {
   DIR *dir;
   int err;
-  bool test_only;
   HANDLE sem;
 };
 
 static inline int
-hresult_to_errno (HRESULT wres, bool test_only = false)
+hresult_to_errno (HRESULT wres)
 {
   if (SUCCEEDED (wres))
-    return 0;
-  /* IEnumShellItems::Reset returns E_NOTIMPL when called for share
-     enumeration.  However, if the machine doesn't exist, the Win32
-     error ERROR_BAD_NETPATH (converted into a HRESULT) is returned.  In
-     test_only mode, we exploit this.  Also, E_ACCESSDENIED is a funny
-     one.  It means, the machine exists, you just have no right to
-     access the share list, or SMB doesn't run. */
-  if (test_only && (wres == E_NOTIMPL || wres == E_ACCESSDENIED))
     return 0;
   if (((ULONG) wres & 0xffff0000)
       == (ULONG) MAKE_HRESULT(SEVERITY_ERROR, FACILITY_WIN32, 0))
@@ -174,18 +167,9 @@ thread_netdrive (void *arg)
       goto out;
     }
 
-  if (len == 2 || ndi->test_only)
+  if (len == 2)
     {
-      wres = netitem_enum->Reset ();
-
-      if (FAILED (wres) || ndi->test_only)
-	{
-	  ndi->err = hresult_to_errno (wres, ndi->test_only);
-	  netitem_enum->Release ();
-	  netparent->Release ();
-	  goto out;
-	}
-
+      netitem_enum->Reset ();
       /* Don't look at me!
 
 	 Network discovery is very unreliable and the list of machines
@@ -244,9 +228,9 @@ out:
 }
 
 static DWORD
-create_thread_and_wait (DIR *dir, bool test_only)
+create_thread_and_wait (DIR *dir)
 {
-  netdriveinf ndi = { dir, 0, test_only,
+  netdriveinf ndi = { dir, 0,
 		      CreateSemaphore (&sec_none_nih, 0, 2, NULL) };
 
   cygthread *thr = new cygthread (thread_netdrive, &ndi, "netdrive");
@@ -262,9 +246,22 @@ fhandler_netdrive::exists ()
   if (strlen (get_name ()) == 2)
     return virt_rootdir;
 
-  DIR dir = { 0 };
-  dir.__d_dirname = (char *) get_name ();
-  int ret = create_thread_and_wait (&dir, true);
+  wchar_t name[MAX_PATH];
+  struct addrinfoW *ai;
+  INT ret;
+
+  /* Hopefully we are allowed to assume an IP network with existing name
+     resolution these days.  Therefore, just try to resolve the name
+     into IP addresses.  This may take up to about 3 secs if the name
+     doesn't exist, or about 8 secs if DNS is unavailable.
+
+     Don't ask for "tsclient", it doesn't resolve.  Just assume it exists. */
+  if (!strcmp (get_name () + 2, "tsclient"))
+    return virt_directory;
+  sys_mbstowcs (name, CYG_MAX_PATH, get_name ());
+  ret = GetAddrInfoW (name + 2, NULL, NULL, &ai);
+  if (!ret)
+    FreeAddrInfoW (ai);
 
   return ret ? virt_none : virt_directory;
 }
@@ -295,7 +292,7 @@ fhandler_netdrive::opendir (int fd)
   int ret;
 
   dir = fhandler_virtual::opendir (fd);
-  if (dir && (ret = create_thread_and_wait (dir, false)))
+  if (dir && (ret = create_thread_and_wait (dir)))
     {
       free (dir->__d_dirname);
       free (dir->__d_dirent);
