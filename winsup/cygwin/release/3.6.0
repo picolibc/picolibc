@@ -23,5 +23,10 @@ What changed:
 - Drop support for NT4 and Samba < 3.0.22.
 
 - Now that SMBv1 is ultimately deprecated and not installed by default
-  on latest Windows versions, enumerating network servers in // and shares
-  via //machine is now using Network Discovery just like Windows Explorer.
+  on latest Windows versions, use Network Discovery (i. e. WSD, "Web
+  Service Discovery") for enumerating network servers in //, just like
+  Windows Explorer.
+
+- If "server" is given as FQDN, and if "server" is an NFS server,
+  ls //server now also enumerates NFS shares.  If "server" is given
+  as a flat name, only SMB shares are enumerated.
