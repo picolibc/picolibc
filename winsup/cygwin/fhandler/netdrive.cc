@@ -394,8 +394,12 @@ create_thread_and_wait (DIR *dir)
 
     }
 
+
   /* Eventually, try SMB via WNet for share enumeration. */
-  ndi.provider = WNNC_NET_LANMAN;
+  if (!strcmp (dir->__d_dirname + 2, "tsclient"))
+    ndi.provider = WNNC_NET_TERMSRV;
+  else
+    ndi.provider = WNNC_NET_LANMAN;
   ndi.sem = CreateSemaphore (&sec_none_nih, 0, 2, NULL);
   thr = new cygthread (thread_netdrive_wnet, &ndi, "netdrive_smb");
   if (thr->detach (ndi.sem))
