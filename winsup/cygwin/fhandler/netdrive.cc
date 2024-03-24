@@ -42,6 +42,12 @@ details. */
    instead of the SMB shares.  Un-be-lie-va-ble!
    FWIW, we reverted the SMB share enumeration using WNet. */
 
+#ifndef WNNC_NET_9P
+#define WNNC_NET_9P 0x00480000
+#endif
+#define TERMSRV_DIR "tsclient"
+#define PLAN9_DIR   "wsl$"
+
 /* Define the required GUIDs here to avoid linking with libuuid.a */
 const GUID FOLDERID_NetworkFolder = {
   0xd20beec4, 0x5ca8, 0x4905,
@@ -319,9 +325,14 @@ thread_netdrive_wnet (void *arg)
   while ((wres = WNetEnumResourceW (dom, (cnt = 1, &cnt), nro,
 				    (size = NT_MAX_PATH, &size))) == NO_ERROR)
     {
-      /* Skip server name and trailing backslash */
-      wchar_t *name = nro->lpRemoteName + wcslen (srv_name) + 1;
       size_t cache_idx;
+
+      /* Skip server name and trailing backslash */
+      wchar_t *name = nro->lpRemoteName + 2;
+      name = wcschr (name, L'\\');
+      if (!name)
+	continue;
+      ++name;
 
       if (ndi->provider == WNNC_NET_MS_NFS)
 	{
@@ -367,12 +378,19 @@ create_thread_and_wait (DIR *dir)
   /* For the Network root, fetch WSD info. */
   if (strlen (dir->__d_dirname) == 2)
     {
+      WCHAR provider[256];
+      DWORD size;
+
       ndi.provider = WNNC_NET_SMB;
       ndi.sem = CreateSemaphore (&sec_none_nih, 0, 2, NULL);
       thr = new cygthread (thread_netdrive_wsd, &ndi, "netdrive_wsd");
       if (thr->detach (ndi.sem))
 	ndi.err = EINTR;
       CloseHandle (ndi.sem);
+      /* Add wsl$ if Plan 9 is installed */
+      if (WNetGetProviderNameW (WNNC_NET_9P, provider, (size = 256, &size))
+	  == NO_ERROR)
+	DIR_cache.add (__CONCAT(L,PLAN9_DIR));
       goto out;
     }
 
@@ -394,10 +412,12 @@ create_thread_and_wait (DIR *dir)
 
     }
 
-
-  /* Eventually, try SMB via WNet for share enumeration. */
-  if (!strcmp (dir->__d_dirname + 2, "tsclient"))
+  /* Eventually, try TERMSRV/P9/SMB via WNet for share enumeration,
+     depending on "server" name. */
+  if (!strcmp (dir->__d_dirname + 2, TERMSRV_DIR))
     ndi.provider = WNNC_NET_TERMSRV;
+  else if (!strcmp (dir->__d_dirname + 2, PLAN9_DIR))
+    ndi.provider = WNNC_NET_9P;
   else
     ndi.provider = WNNC_NET_SMB;
   ndi.sem = CreateSemaphore (&sec_none_nih, 0, 2, NULL);
@@ -419,15 +439,28 @@ fhandler_netdrive::exists ()
   wchar_t name[MAX_PATH];
   struct addrinfoW *ai;
   INT ret;
+  DWORD protocol = 0;
 
+  /* Handle "tsclient" (Microsoft Terminal Services) and
+     "wsl$" (Plan 9 Network Provider) explicitely.
+     Both obviously don't resolve with GetAddrInfoW. */
+  if (!strcmp (get_name () + 2, TERMSRV_DIR))
+    protocol = WNNC_NET_TERMSRV;
+  else if (!strcmp (get_name () + 2, PLAN9_DIR))
+    protocol = WNNC_NET_9P;
+  if (protocol)
+    {
+      WCHAR provider[256];
+      DWORD size = 256;
+
+      if (WNetGetProviderNameW (protocol, provider, &size) == NO_ERROR)
+	return virt_directory;
+      return virt_none;
+    }
   /* Hopefully we are allowed to assume an IP network with existing name
      resolution these days.  Therefore, just try to resolve the name
      into IP addresses.  This may take up to about 3 secs if the name
-     doesn't exist, or about 8 secs if DNS is unavailable.
-
-     Don't ask for "tsclient", it doesn't resolve.  Just assume it exists. */
-  if (!strcmp (get_name () + 2, "tsclient"))
-    return virt_directory;
+     doesn't exist, or about 8 secs if DNS is unavailable. */
   sys_mbstowcs (name, CYG_MAX_PATH, get_name ());
   ret = GetAddrInfoW (name + 2, NULL, NULL, &ai);
   if (!ret)
