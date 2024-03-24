@@ -367,7 +367,7 @@ create_thread_and_wait (DIR *dir)
   /* For the Network root, fetch WSD info. */
   if (strlen (dir->__d_dirname) == 2)
     {
-      ndi.provider = WNNC_NET_LANMAN;
+      ndi.provider = WNNC_NET_SMB;
       ndi.sem = CreateSemaphore (&sec_none_nih, 0, 2, NULL);
       thr = new cygthread (thread_netdrive_wsd, &ndi, "netdrive_wsd");
       if (thr->detach (ndi.sem))
@@ -399,7 +399,7 @@ create_thread_and_wait (DIR *dir)
   if (!strcmp (dir->__d_dirname + 2, "tsclient"))
     ndi.provider = WNNC_NET_TERMSRV;
   else
-    ndi.provider = WNNC_NET_LANMAN;
+    ndi.provider = WNNC_NET_SMB;
   ndi.sem = CreateSemaphore (&sec_none_nih, 0, 2, NULL);
   thr = new cygthread (thread_netdrive_wnet, &ndi, "netdrive_smb");
   if (thr->detach (ndi.sem))
