@@ -72,7 +72,7 @@ public:
     free (entry);
   }
   size_t count () const { return num_entries; }
-  void add (wchar_t *str, bool downcase = false)
+  void add (const wchar_t *str, bool downcase = false)
   {
     if (num_entries >= max_entries)
       {
