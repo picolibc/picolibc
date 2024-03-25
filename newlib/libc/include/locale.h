@@ -112,6 +112,10 @@ locale_t duplocale (locale_t);
 locale_t uselocale (locale_t);
 #endif /* __POSIX_VISIBLE >= 200809 */
 
+#if __POSIX_VISIBLE >= 200809 /* FIXME? Starting with issue 8 */
+const char *getlocalename_l (int, struct __locale_t *);
+#endif
+
 #endif /* _REENT_ONLY */
 
 _END_STD_C

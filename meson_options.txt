@@ -123,7 +123,7 @@ option('split-large-tests', type: 'boolean', value: false,
        description: 'Split large tests into pieces for smaller targets')
 option('test-stdin', type: 'boolean', value: false,
        description: 'Enable tests that use stdin. This only works on a few targets')
-option('fortify-source', type: 'combo', choices: ['none', '1', '2'], value: '2',
+option('fortify-source', type: 'combo', choices: ['none', '1', '2', '3'], value: '3',
        description: 'Set _FORTIFY_SOURCE=<value> when building tests')
 
 option('tinystdio', type: 'boolean', value: true,

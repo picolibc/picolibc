@@ -43,6 +43,7 @@ risc-v			Kito Cheng		kito.cheng@gmail.com
 aarch64			Richard Earnshaw	richard.earnshaw@arm.com
 			Marcus Shawcroft	marcus.shawcroft@arm.com
 msp430			Nick Clifton		nickc@redhat.com
+pru			Dimitar Dimitrov	dimitar@dinux.eu
 
 			OS Port Maintainers	(OS alphabetical order)
 

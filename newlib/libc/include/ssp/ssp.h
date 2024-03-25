@@ -41,11 +41,20 @@
 #endif
 #define __ssp_real(fun)		__ssp_real_(fun)
 
+#if __SSP_FORTIFY_LEVEL > 2
+#define __ssp_bos(ptr) __builtin_dynamic_object_size(ptr, 1)
+#define __ssp_bos0(ptr) __builtin_dynamic_object_size(ptr, 0)
+#define __ssp_bos_known(ptr) \
+       (__builtin_object_size(ptr, 0) != (size_t)-1 \
+       || !__builtin_constant_p(__ssp_bos(ptr)))
+#else
 #define __ssp_bos(ptr) __builtin_object_size(ptr, __SSP_FORTIFY_LEVEL > 1)
 #define __ssp_bos0(ptr) __builtin_object_size(ptr, 0)
+#define __ssp_bos_known(ptr) (__ssp_bos0(ptr) != (size_t)-1)
+#endif
 
 #define __ssp_check(buf, len, bos) \
-	if (bos(buf) != (size_t)-1 && len > bos(buf)) \
+	if (__ssp_bos_known(buf) && len > bos(buf)) \
 		__chk_fail()
 #define __ssp_decl(rtype, fun, args) \
 rtype __ssp_real_(fun) args __asm__(__ASMNAME(#fun)); \

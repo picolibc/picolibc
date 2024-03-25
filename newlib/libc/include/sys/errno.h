@@ -212,10 +212,6 @@ extern NEWLIB_THREAD_LOCAL_ERRNO int errno;
 #ifdef __LINUX_ERRNO_EXTENSIONS__
 #define ENOMEDIUM 135   	/* No medium found */
 #endif
-#ifdef __CYGWIN__
-#define ENOSHARE 136    	/* No such host or network path */
-#define ECASECLASH 137  	/* Filename exists with different case */
-#endif
 #define EILSEQ 138		/* Illegal byte sequence */
 #define EOVERFLOW 139		/* Value too large for defined data type */
 #define ECANCELED 140		/* Operation canceled */

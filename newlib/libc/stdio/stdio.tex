@@ -40,81 +40,81 @@ instead of the globals @code{stdin}, @code{stdout}, and
 structure.
 
 @menu
-* clearerr::    Clear file or stream error indicator
-* diprintf::    Print to a file descriptor (integer only)
-* dprintf::     Print to a file descriptor
-* fclose::      Close a file
-* fcloseall::   Close all files
-* fdopen::      Turn an open file into a stream
-* feof::        Test for end of file
-* ferror::      Test whether read/write error has occurred
-* fflush::      Flush buffered file output
-* fgetc::       Get a character from a file or stream
-* fgetpos::     Record position in a stream or file
-* fgets::       Get character string from a file or stream
-* fgetwc::      Get a wide character from a file or stream
-* fgetws::      Get a wide character string from a file or stream
-* fileno::      Get file descriptor associated with stream
-* fmemopen::    Open a stream around a fixed-length buffer
-* fopen::       Open a file
-* fopencookie:: Open a stream with custom callbacks
-* fpurge::      Discard all pending I/O on a stream
-* fputc::       Write a character on a stream or file
-* fputs::       Write a character string in a file or stream
-* fputwc::      Write a wide character to a file or stream
-* fputws::      Write a wide character string to a file or stream
-* fread::       Read array elements from a file
-* freopen::     Open a file using an existing file descriptor
-* fseek::       Set file position
-* __fsetlocking::	Set or query locking mode on FILE stream
-* fsetpos::     Restore position of a stream or file
-* ftell::       Return position in a stream or file
-* funopen::     Open a stream with custom callbacks
-* fwide::	Set and determine the orientation of a FILE stream
-* fwrite::      Write array elements from memory to a file or stream
-* getc::        Get a character from a file or stream (macro)
-* getc_unlocked::	Get a character from a file or stream (macro)
-* getchar::     Get a character from standard input (macro)
-* getchar_unlocked::	Get a character from standard input (macro)
-* getdelim::    Get character string from a file or stream
-* getline::     Get character string from a file or stream
-* gets::        Get character string from standard input (obsolete)
-* getw::        Get a word (int) from a file or stream
-* getwchar::    Get a wide character from standard input
-* mktemp::      Generate unused file name
-* open_memstream::	Open a write stream around an arbitrary-length buffer
-* perror::      Print an error message on standard error
-* putc::        Write a character on a stream or file (macro)
-* putc_unlocked::	Write a character on a stream or file (macro)
-* putchar::     Write a character on standard output (macro)
-* putchar_unlocked::	Write a character on standard output (macro)
-* puts::        Write a character string on standard output
-* putw::        Write a word (int) to a file or stream
-* putwchar::    Write a wide character to standard output
-* remove::      Delete a file's name
-* rename::      Rename a file
-* rewind::      Reinitialize a file or stream
-* setbuf::      Specify full buffering for a file or stream
-* setbuffer::   Specify full buffering for a file or stream with size
-* setlinebuf::  Specify line buffering for a file or stream
-* setvbuf::     Specify buffering for a file or stream
-* siprintf::    Write formatted output (integer only)
-* siscanf::     Scan and format input (integer only)
-* sprintf::     Write formatted output
-* sscanf::      Scan and format input
-* stdio_ext::	Access internals of FILE structure
-* swprintf::    Write formatted wide character output
-* swscanf::     Scan and format wide character input
-* tmpfile::     Create a temporary file
-* tmpnam::      Generate name for a temporary file
-* ungetc::      Push data back into a stream
-* ungetwc::     Push wide character data back into a stream
-* vfprintf::    Format variable argument list
-* vfscanf::     Scan variable argument list
-* vfwprintf::   Format variable wide character argument list
-* vfwscanf::    Scan and format argument list from wide character input
-* viprintf::    Format variable argument list (integer only)
-* viscanf::     Scan variable format list (integer only)
+* Function clearerr::    Clear file or stream error indicator
+* Function diprintf::    Print to a file descriptor (integer only)
+* Function dprintf::     Print to a file descriptor
+* Function fclose::      Close a file
+* Function fcloseall::   Close all files
+* Function fdopen::      Turn an open file into a stream
+* Function feof::        Test for end of file
+* Function ferror::      Test whether read/write error has occurred
+* Function fflush::      Flush buffered file output
+* Function fgetc::       Get a character from a file or stream
+* Function fgetpos::     Record position in a stream or file
+* Function fgets::       Get character string from a file or stream
+* Function fgetwc::      Get a wide character from a file or stream
+* Function fgetws::      Get a wide character string from a file or stream
+* Function fileno::      Get file descriptor associated with stream
+* Function fmemopen::    Open a stream around a fixed-length buffer
+* Function fopen::       Open a file
+* Function fopencookie:: Open a stream with custom callbacks
+* Function fpurge::      Discard all pending I/O on a stream
+* Function fputc::       Write a character on a stream or file
+* Function fputs::       Write a character string in a file or stream
+* Function fputwc::      Write a wide character to a file or stream
+* Function fputws::      Write a wide character string to a file or stream
+* Function fread::       Read array elements from a file
+* Function freopen::     Open a file using an existing file descriptor
+* Function fseek::       Set file position
+* Function __fsetlocking::	Set or query locking mode on FILE stream
+* Function fsetpos::     Restore position of a stream or file
+* Function ftell::       Return position in a stream or file
+* Function funopen::     Open a stream with custom callbacks
+* Function fwide::       Set and determine the orientation of a FILE stream
+* Function fwrite::      Write array elements from memory to a file or stream
+* Function getc::        Get a character from a file or stream (macro)
+* Function getc_unlocked::	Get a character from a file or stream (macro)
+* Function getchar::     Get a character from standard input (macro)
+* Function getchar_unlocked::	Get a character from standard input (macro)
+* Function getdelim::    Get character string from a file or stream
+* Function getline::     Get character string from a file or stream
+* Function gets::        Get character string from standard input (obsolete)
+* Function getw::        Get a word (int) from a file or stream
+* Function getwchar::    Get a wide character from standard input
+* Function mktemp::      Generate unused file name
+* Function open_memstream::	Open a write stream around an arbitrary-length buffer
+* Function perror::      Print an error message on standard error
+* Function putc::        Write a character on a stream or file (macro)
+* Function putc_unlocked::	Write a character on a stream or file (macro)
+* Function putchar::     Write a character on standard output (macro)
+* Function putchar_unlocked::	Write a character on standard output (macro)
+* Function puts::        Write a character string on standard output
+* Function putw::        Write a word (int) to a file or stream
+* Function putwchar::    Write a wide character to standard output
+* Function remove::      Delete a file's name
+* Function rename::      Rename a file
+* Function rewind::      Reinitialize a file or stream
+* Function setbuf::      Specify full buffering for a file or stream
+* Function setbuffer::   Specify full buffering for a file or stream with size
+* Function setlinebuf::  Specify line buffering for a file or stream
+* Function setvbuf::     Specify buffering for a file or stream
+* Function siprintf::    Write formatted output (integer only)
+* Function siscanf::     Scan and format input (integer only)
+* Function sprintf::     Write formatted output
+* Function sscanf::      Scan and format input
+* Function stdio_ext::   Access internals of FILE structure
+* Function swprintf::    Write formatted wide character output
+* Function swscanf::     Scan and format wide character input
+* Function tmpfile::     Create a temporary file
+* Function tmpnam::      Generate name for a temporary file
+* Function ungetc::      Push data back into a stream
+* Function ungetwc::     Push wide character data back into a stream
+* Function vfprintf::    Format variable argument list
+* Function vfscanf::     Scan variable argument list
+* Function vfwprintf::   Format variable wide character argument list
+* Function vfwscanf::    Scan and format argument list from wide character input
+* Function viprintf::    Format variable argument list (integer only)
+* Function viscanf::     Scan variable format list (integer only)
 @end menu
 
 @page

@@ -37,11 +37,11 @@
 
 #if __BSD_VISIBLE || __POSIX_VISIBLE <= 200112
 #define bcopy(src, dst, len) \
-    ((__ssp_bos0(dst) != (size_t)-1) ? \
+    (__ssp_bos_known(dst) ? \
     __builtin___memmove_chk(dst, src, len, __ssp_bos0(dst)) : \
     __memmove_ichk(dst, src, len))
 #define bzero(dst, len) \
-    ((__ssp_bos0(dst) != (size_t)-1) ? \
+    (__ssp_bos_known(dst) ? \
     __builtin___memset_chk(dst, 0, len, __ssp_bos0(dst)) : \
     __memset_ichk(dst, 0, len))
 #endif
