@@ -42,6 +42,7 @@
 
 #define __BALL  0x0001          /* bufio buf is allocated by stdio */
 #define __BLBF  0x0002          /* bufio is line buffered */
+#define __BFALL 0x0004          /* FILE is allocated by stdio */
 
 struct __file_bufio {
         struct __file_ext xfile;
