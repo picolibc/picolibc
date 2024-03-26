@@ -4,6 +4,7 @@ HERE=`dirname "$0"`
 "$HERE"/do-test arm "$@"
 "$HERE"/do-test cortex-a9 "$@"
 "$HERE"/do-test clang-thumbv7e+fp "$@"
+"$HERE"/do-test clang-thumbv7e+dp "$@"
 "$HERE"/do-test clang-thumbv7m "$@"
 "$HERE"/do-test clang-thumbv6m "$@"
 "$HERE"/do-build mips "$@"
