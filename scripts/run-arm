@@ -93,6 +93,9 @@ case "$cpu_arch"/"$cpu_profile" in
                         ;;
                 esac
                 ;;
+            VFPv4-D16)
+                cpu=cortex-m7
+                ;;
             *)
                 cpu=cortex-m4
                 ;;
