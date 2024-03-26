@@ -978,6 +978,8 @@ foreach target : ['default-target'] + targets
       picolibc_linker_type_data.set('BFD_END', '*/')
       picolibc_linker_type_data.set('LLD_START', '')
       picolibc_linker_type_data.set('LLD_END', '')
+      picolibc_linker_type_data.set('TLS_PHDRS', 'tls PT_TLS;')
+      picolibc_linker_type_data.set('TLS_INIT_SEG', 'tls')
       if host_cpu_family == 'riscv'
         # ld.lld before version 15 did not support linker relaxations, disable
         # them if we are using an older version.
@@ -993,6 +995,9 @@ foreach target : ['default-target'] + targets
       picolibc_linker_type_data.set('BFD_END', '')
       picolibc_linker_type_data.set('LLD_START', '/* For ld.lld: ')
       picolibc_linker_type_data.set('LLD_END', '*/')
+      picolibc_linker_type_data.set('TLS_PHDRS', '''tls_init PT_TLS;
+        tls PT_TLS;''')
+      picolibc_linker_type_data.set('TLS_INIT_SEG', 'tls_init')
     endif
 
     init_memory_template = '''
