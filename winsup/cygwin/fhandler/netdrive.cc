@@ -234,24 +234,20 @@ thread_netdrive_wsd (void *arg)
 
   do
     {
-      IShellItem *netitem[10] = { 0 };
+      IShellItem *netitem = NULL;
       LPWSTR item_name = NULL;
-      ULONG count;
 
-      wres = netitem_enum->Next (10, netitem, &count);
-      if (SUCCEEDED (wres) && count > 0)
+      wres = netitem_enum->Next (1, &netitem, NULL);
+      if (wres == S_OK)
 	{
-	  for (ULONG idx = 0; idx < count; ++idx)
+	  if (netitem->GetDisplayName (SIGDN_PARENTRELATIVEPARSING,
+					    &item_name) == S_OK)
 	    {
-	      if (netitem[idx]->GetDisplayName (SIGDN_PARENTRELATIVEPARSING,
-						&item_name) == S_OK)
-		{
-		  /* Skip "\\" on server names and downcase */
-		  DIR_cache.add (item_name + 2, true);
-		  CoTaskMemFree (item_name);
-		}
-	      netitem[idx]->Release ();
+	      /* Skip "\\" on server names and downcase */
+	      DIR_cache.add (item_name + 2, true);
+	      CoTaskMemFree (item_name);
 	    }
+	  netitem->Release ();
 	}
     }
   while (wres == S_OK);
