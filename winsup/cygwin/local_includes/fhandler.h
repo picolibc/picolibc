@@ -2932,8 +2932,8 @@ class fhandler_virtual : public fhandler_base
   char *filebuf;
   off_t filesize;
   off_t position;
-  int fileid; // unique within each class
   bool diropen;
+
  public:
 
   fhandler_virtual ();
@@ -2960,6 +2960,8 @@ class fhandler_virtual : public fhandler_base
   void fixup_after_exec ();
 
   fhandler_virtual (void *) {}
+
+  int &fileid () { return pc.virt_fileid (); }
 
   virtual void copy_from (fhandler_base *x)
   {

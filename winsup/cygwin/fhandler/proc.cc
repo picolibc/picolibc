@@ -185,7 +185,7 @@ fhandler_proc::exists ()
 				       PROC_LINK_COUNT);
   if (entry)
     {
-      fileid = entry - proc_tab;
+      fileid () = entry - proc_tab;
       return entry->type;
     }
   return virt_none;
@@ -377,7 +377,7 @@ fhandler_proc::open (int flags, mode_t mode)
       goto out;
     }
 
-  fileid = proc_file_no;
+  fileid () = proc_file_no;
   if (!fill_filebuf ())
     {
       res = 0;
@@ -401,9 +401,9 @@ out:
 bool
 fhandler_proc::fill_filebuf ()
 {
-  if (fileid < PROC_LINK_COUNT && proc_tab[fileid].format_func)
+  if (fileid () < PROC_LINK_COUNT && proc_tab[fileid ()].format_func)
     {
-      filesize = proc_tab[fileid].format_func (NULL, filebuf);
+      filesize = proc_tab[fileid ()].format_func (NULL, filebuf);
       if (filesize > 0)
 	return true;
     }

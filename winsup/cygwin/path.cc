@@ -673,6 +673,7 @@ path_conv::check (const char *src, unsigned opt,
   bool add_ext = false;
   bool is_relpath;
   char *tail, *path_end;
+  virt_fileid () = -1;
 
 #if 0
   static path_conv last_path_conv;
@@ -826,6 +827,7 @@ path_conv::check (const char *src, unsigned opt,
 		  else
 		    {
 		      file_type = fh->exists ();
+		      virt_fileid () = fh->fileid ();
 		      if (file_type == virt_symlink
 			  || file_type == virt_fdsymlink)
 			{

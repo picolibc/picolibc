@@ -56,7 +56,7 @@ fhandler_procnet::exists ()
     {
       if (entry->type == virt_file && !get_adapters_addresses (NULL, AF_INET6))
 	return virt_none;
-      fileid = entry - procnet_tab;
+      fileid () = entry - procnet_tab;
       return entry->type;
     }
   return virt_none;
@@ -159,7 +159,7 @@ fhandler_procnet::open (int flags, mode_t mode)
       goto out;
     }
 
-  fileid = entry - procnet_tab;
+  fileid () = entry - procnet_tab;
   if (!fill_filebuf ())
 	{
 	  res = 0;
@@ -183,9 +183,9 @@ out:
 bool
 fhandler_procnet::fill_filebuf ()
 {
-  if (procnet_tab[fileid].format_func)
+  if (procnet_tab[fileid ()].format_func)
     {
-      filesize = procnet_tab[fileid].format_func (NULL, filebuf);
+      filesize = procnet_tab[fileid ()].format_func (NULL, filebuf);
       return true;
     }
   return false;

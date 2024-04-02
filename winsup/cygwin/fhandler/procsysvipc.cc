@@ -75,7 +75,7 @@ fhandler_procsysvipc::exists ()
 	  if (cygserver_running != CYGSERVER_OK)
 	    return virt_none;
 	}
-	  fileid = entry - procsysvipc_tab;
+	  fileid () = entry - procsysvipc_tab;
 	  return entry->type;
 	}
   return virt_none;
@@ -181,7 +181,7 @@ fhandler_procsysvipc::open (int flags, mode_t mode)
       goto out;
     }
 
-  fileid = entry - procsysvipc_tab;
+  fileid () = entry - procsysvipc_tab;
   if (!fill_filebuf ())
 	{
 	  res = 0;
@@ -205,9 +205,9 @@ out:
 bool
 fhandler_procsysvipc::fill_filebuf ()
 {
-  if (procsysvipc_tab[fileid].format_func)
+  if (procsysvipc_tab[fileid ()].format_func)
     {
-      filesize = procsysvipc_tab[fileid].format_func (NULL, filebuf);
+      filesize = procsysvipc_tab[fileid ()].format_func (NULL, filebuf);
       return true;
     }
   return false;

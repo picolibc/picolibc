@@ -20,7 +20,7 @@ details. */
 #include <dirent.h>
 
 fhandler_virtual::fhandler_virtual ():
-  fhandler_base (), filebuf (NULL), fileid (-1)
+  fhandler_base (), filebuf (NULL)
 {
 }
 

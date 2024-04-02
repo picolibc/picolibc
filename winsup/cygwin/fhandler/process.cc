@@ -103,12 +103,12 @@ fhandler_process::exists ()
     {
       if (!path[entry->name_len + 1])
 	{
-	  fileid = entry - process_tab;
+	  fileid () = entry - process_tab;
 	  return entry->type;
 	}
       if (entry->type == virt_directory)	/* fd subdir only */
 	{
-	  fileid = entry - process_tab;
+	  fileid () = entry - process_tab;
 	  if (fill_filebuf ())
 	    return fd_type;
 	  /* Check for nameless device entries. */
@@ -200,7 +200,7 @@ DIR *
 fhandler_process::opendir (int fd)
 {
   DIR *dir = fhandler_virtual::opendir (fd);
-  if (dir && process_tab[fileid].fhandler == FH_PROCESSFD)
+  if (dir && process_tab[fileid ()].fhandler == FH_PROCESSFD)
     fill_filebuf ();
   return dir;
 }
@@ -215,14 +215,14 @@ int
 fhandler_process::readdir (DIR *dir, dirent *de)
 {
   int res = ENMFILE;
-  if (process_tab[fileid].fhandler == FH_PROCESSFD)
+  if (process_tab[fileid ()].fhandler == FH_PROCESSFD)
     {
       if ((size_t) dir->__d_position >= 2 + filesize / sizeof (int))
 	goto out;
     }
   else if (dir->__d_position >= PROCESS_LINK_COUNT)
     goto out;
-  if (process_tab[fileid].fhandler == FH_PROCESSFD && dir->__d_position > 1)
+  if (process_tab[fileid ()].fhandler == FH_PROCESSFD && dir->__d_position > 1)
     {
       int *p = (int *) filebuf;
       __small_sprintf (de->d_name, "%d", p[dir->__d_position++ - 2]);
@@ -297,7 +297,7 @@ fhandler_process::open (int flags, mode_t mode)
       goto out;
     }
 
-  fileid = entry - process_tab;
+  fileid () = entry - process_tab;
   if (!fill_filebuf ())
 	{
 	  res = 0;
@@ -343,15 +343,15 @@ fhandler_process::fill_filebuf ()
       return false;
     }
 
-  if (process_tab[fileid].format_func)
+  if (process_tab[fileid ()].format_func)
     {
-      if (process_tab[fileid].fhandler == FH_PROCESSFD)
+      if (process_tab[fileid ()].fhandler == FH_PROCESSFD)
 	{
 	  process_fd_t fd = { path, p , &fd_type };
-	  filesize = process_tab[fileid].format_func (&fd, filebuf);
+	  filesize = process_tab[fileid ()].format_func (&fd, filebuf);
 	}
       else
-	filesize = process_tab[fileid].format_func (p, filebuf);
+	filesize = process_tab[fileid ()].format_func (p, filebuf);
       return filesize < 0 ? false : true;
     }
   return false;

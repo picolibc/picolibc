@@ -161,6 +161,12 @@ class path_conv
   const char *suffix;
   const char *posix_path;
   path_conv_handle conv_handle;
+  /* virt_fileid is used by and unique within each fhandler_virtual class.
+     We need it here to avoid calling the exists() method too often, in
+     case the derived class has a costly exists() operation.
+     virt_fileid is evaluated by the fhandler_virtual::exists() call in
+     path_conv::check and propageted to the caller's path_conv. */
+  int _virt_fileid;
 
   void add_ext_from_sym (symlink_info&);
   char *modifiable_path () {return (char *) path;}
@@ -168,6 +174,8 @@ class path_conv
  public:
   int error;
   device dev;
+
+  int &virt_fileid() { return _virt_fileid; }
 
   void *serialize (HANDLE, unsigned int &) const;
   HANDLE deserialize (void *);
