@@ -328,8 +328,7 @@ fhandler_base::fstat_by_name (struct stat *buf)
 			   | FILE_OPEN_FOR_BACKUP_INTENT
 			   | FILE_DIRECTORY_FILE);
       if (!NT_SUCCESS (status))
-	debug_printf ("%y = NtOpenFile(%S)", status,
-		      pc.get_nt_native_path ());
+	debug_printf ("%y = NtOpenFile(%S)", status, &dirname);
       else
 	{
 	  status = NtQueryDirectoryFile (dir, NULL, NULL, NULL, &io,
@@ -338,8 +337,7 @@ fhandler_base::fstat_by_name (struct stat *buf)
 					 TRUE, &basename, TRUE);
 	  NtClose (dir);
 	  if (!NT_SUCCESS (status))
-	    debug_printf ("%y = NtQueryDirectoryFile(%S)", status,
-			  pc.get_nt_native_path ());
+	    debug_printf ("%y = NtQueryDirectoryFile(%S)", status, &dirname);
 	  else
 	    ino = fdi_buf.fdi.FileId.QuadPart;
 	}
