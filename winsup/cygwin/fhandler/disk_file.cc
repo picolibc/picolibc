@@ -325,7 +325,6 @@ fhandler_base::fstat_by_name (struct stat *buf)
       status = NtOpenFile (&dir, SYNCHRONIZE | FILE_LIST_DIRECTORY,
 			   &attr, &io, FILE_SHARE_VALID_FLAGS,
 			   FILE_SYNCHRONOUS_IO_NONALERT
-			   | FILE_OPEN_NO_RECALL
 			   | FILE_OPEN_FOR_BACKUP_INTENT
 			   | FILE_DIRECTORY_FILE);
       if (!NT_SUCCESS (status))
