@@ -180,7 +180,10 @@ fhandler_proc::exists ()
   debug_printf ("exists (%s)", path);
   path += proc_len;
   if (*path == 0)
-    return virt_rootdir;
+    {
+      fileid () = 0;
+      return virt_rootdir;
+    }
   virt_tab_t *entry = virt_tab_search (path + 1, false, proc_tab,
 				       PROC_LINK_COUNT);
   if (entry)
@@ -188,6 +191,7 @@ fhandler_proc::exists ()
       fileid () = entry - proc_tab;
       return entry->type;
     }
+  fileid () = -1;
   return virt_none;
 }
 

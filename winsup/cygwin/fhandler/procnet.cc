@@ -48,7 +48,10 @@ fhandler_procnet::exists ()
   while (*path != 0 && !isdirsep (*path))
     path++;
   if (*path == 0)
-    return virt_rootdir;
+    {
+      fileid () = 0;
+      return virt_rootdir;
+    }
 
   virt_tab_t *entry = virt_tab_search (path + 1, false, procnet_tab,
 				       PROCNET_LINK_COUNT);
@@ -59,6 +62,7 @@ fhandler_procnet::exists ()
       fileid () = entry - procnet_tab;
       return entry->type;
     }
+  fileid () = -1;
   return virt_none;
 }
 

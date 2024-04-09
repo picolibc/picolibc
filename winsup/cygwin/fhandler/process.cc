@@ -95,7 +95,10 @@ fhandler_process::exists ()
   while (*path != 0 && !isdirsep (*path))
     path++;
   if (*path == 0)
-    return virt_rootdir;
+    {
+      fileid () = 0;
+      return virt_rootdir;
+    }
 
   virt_tab_t *entry = virt_tab_search (path + 1, true, process_tab,
 				       PROCESS_LINK_COUNT);
@@ -122,6 +125,7 @@ fhandler_process::exists ()
 	    }
 	}
     }
+  fileid () = -1;
   return virt_none;
 }
 

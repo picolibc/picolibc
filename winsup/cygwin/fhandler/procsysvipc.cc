@@ -61,7 +61,10 @@ fhandler_procsysvipc::exists ()
   while (*path != 0 && !isdirsep (*path))
     path++;
   if (*path == 0)
-    return virt_rootdir;
+    {
+      fileid () = 0;
+      return virt_rootdir;
+    }
 
   virt_tab_t *entry = virt_tab_search (path + 1, true, procsysvipc_tab,
 				       PROCSYSVIPC_LINK_COUNT);
@@ -78,6 +81,7 @@ fhandler_procsysvipc::exists ()
 	  fileid () = entry - procsysvipc_tab;
 	  return entry->type;
 	}
+  fileid () = -1;
   return virt_none;
 }
 
