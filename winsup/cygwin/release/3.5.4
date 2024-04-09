@@ -4,3 +4,7 @@ Fixes:
 - Fix regression in 3.5.3 which fails to open files for stat(2) if the
   file is opened exclusively by another process.
   Addresses: https://cygwin.com/pipermail/cygwin/2024-April/255811.html
+
+- Fix regression introduced in 3.5.0 when reading surrogate pairs (i.e.,
+  unicode chars >= 0x10000) from the DOS command line.  Addresses:
+  https://cygwin.com/pipermail/cygwin/2024-April/255807.html
