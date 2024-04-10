@@ -151,6 +151,19 @@ _start(void)
 #define _REASON(r) #r
 #define REASON(r) _REASON(r)
 
+static void arm_fault_write_reg(const char *prefix, unsigned reg)
+{
+    fputs(prefix, stdout);
+
+    for (unsigned i = 0; i < 8; i++) {
+        unsigned digitval = 0xF & (reg >> (28 - 4*i));
+        char digitchr = '0' + digitval + (digitval >= 10 ? 'a'-'0'-10 : 0);
+        putchar(digitchr);
+    }
+
+    putchar('\n');
+}
+
 #if __ARM_ARCH_PROFILE == 'M'
 
 #define GET_SP  struct fault *sp; __asm__ ("mov %0, sp" : "=r" (sp))
@@ -167,10 +180,10 @@ struct fault {
 };
 
 static const char *const reasons[] = {
-    "hardfault",
-    "memmanage",
-    "busfault",
-    "usagefault"
+    "hardfault\n",
+    "memmanage\n",
+    "busfault\n",
+    "usagefault\n"
 };
 
 #define REASON_HARDFAULT        0
@@ -181,15 +194,16 @@ static const char *const reasons[] = {
 static void __attribute__((used))
 arm_fault(struct fault *f, int reason)
 {
-    printf("ARM fault: %s\n", reasons[reason]);
-    printf("\tR0:   0x%08x\n", f->r0);
-    printf("\tR1:   0x%08x\n", f->r1);
-    printf("\tR2:   0x%08x\n", f->r2);
-    printf("\tR3:   0x%08x\n", f->r3);
-    printf("\tR12:  0x%08x\n", f->r12);
-    printf("\tLR:   0x%08x\n", f->lr);
-    printf("\tPC:   0x%08x\n", f->pc);
-    printf("\tXPSR: 0x%08x\n", f->xpsr);
+    fputs("ARM fault: ", stdout);
+    fputs(reasons[reason], stdout);
+    arm_fault_write_reg("\tR0:   0x", f->r0);
+    arm_fault_write_reg("\tR1:   0x", f->r1);
+    arm_fault_write_reg("\tR2:   0x", f->r2);
+    arm_fault_write_reg("\tR3:   0x", f->r3);
+    arm_fault_write_reg("\tR12:  0x", f->r12);
+    arm_fault_write_reg("\tLR:   0x", f->lr);
+    arm_fault_write_reg("\tPC:   0x", f->pc);
+    arm_fault_write_reg("\tXPSR: 0x", f->xpsr);
     _exit(1);
 }
 
@@ -233,10 +247,10 @@ struct fault {
 };
 
 static const char *const reasons[] = {
-    "undef",
-    "svc",
-    "prefetch_abort",
-    "data_abort"
+    "undef\n",
+    "svc\n",
+    "prefetch_abort\n",
+    "data_abort\n"
 };
 
 #define REASON_UNDEF            0
@@ -248,10 +262,14 @@ static void __attribute__((used))
 arm_fault(struct fault *f, int reason)
 {
     int r;
-    printf("ARM fault: %s\n", reasons[reason]);
-    for (r = 0; r <= 6; r++)
-        printf("\tR%d:   0x%08x\n", r, f->r[r]);
-    printf("\tPC:   0x%08x\n", f->pc);
+    fputs("ARM fault: ", stdout);
+    fputs(reasons[reason], stdout);
+    char prefix[] = "\tR#:   0x";
+    for (r = 0; r <= 6; r++) {
+        prefix[2] = '0' + r;    /* overwrite # with register number */
+        arm_fault_write_reg(prefix, f->r[r]);
+    }
+    arm_fault_write_reg("\tPC:   0x", f->pc);
     _exit(1);
 }
 
