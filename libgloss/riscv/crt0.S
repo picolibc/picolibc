@@ -61,7 +61,9 @@ _start:
 
   lw      a0, 0(sp)                  # a0 = argc
   addi    a1, sp, __SIZEOF_POINTER__ # a1 = argv
-  li      a2, 0                      # a2 = envp = NULL
+  slli    a2, a0, 1 + __SIZEOF_POINTER__ >> 2
+  addi    a2, a2, __SIZEOF_POINTER__
+  add     a2, a2, a1                 # a2 = envp
   call    main
   tail    exit
   .size  _start, .-_start
