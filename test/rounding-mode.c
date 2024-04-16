@@ -150,6 +150,17 @@ check(int mode, char *name, double value)
 		printf("ERROR fesetround %s failed\n", name);
 		ret++;
 	}
+        /* Make sure setting an invalid rounding mode fails and doesn't
+         * change the test results
+         */
+        if (fesetround(FE_ALL_EXCEPT+1) == 0) {
+                printf("ERROR fesetround %d succeeded\n", FE_ALL_EXCEPT+1);
+                ret++;
+        }
+        if (fegetround() != mode) {
+                printf("ERROR fegetround() != %s\n", name);
+                ret++;
+        }
 	got = nearbyint(value);
 	if (want != got) {
 		printf("ERROR double %s: value %g want %g got %g\n", name, value, want, got);
@@ -176,6 +187,17 @@ check(int mode, char *name, double value)
 		printf("ERROR fesetround %s failed\n", name);
 		ret++;
 	}
+        /* Make sure setting an invalid rounding mode fails and doesn't
+         * change the test results
+         */
+        if (fesetround(FE_ALL_EXCEPT+1) == 0) {
+                printf("ERROR fesetround %d succeeded\n", FE_ALL_EXCEPT+1);
+                ret++;
+        }
+        if (fegetround() != mode) {
+                printf("ERROR fegetround() != %s\n", name);
+                ret++;
+        }
 	gotf = nearbyintf(valuef);
 	if (wantf != gotf) {
 		printf("ERROR float %s: value %g want %g got %g\n", name, (double) valuef, (double) wantf, (double) gotf);
