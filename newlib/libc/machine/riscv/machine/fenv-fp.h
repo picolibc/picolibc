@@ -356,14 +356,33 @@ __declare_fenv_inline(int) fesetexceptflag(const fexcept_t *flagp, int excepts)
 
 __declare_fenv_inline(int) fesetround(int round)
 {
+int status = 1;
 
-  /* Mask round to be sure only valid rounding bits are set */
+  switch (round)
+  {
+    case FE_TONEAREST_MM:
+      /* Intentional fall-through */
 
-  round &= FE_RMODE_MASK;
+    case FE_UPWARD:
+      /* Intentional fall-through */
 
-  /* Set the rounding mode */
+    case FE_DOWNWARD:
+      /* Intentional fall-through */
 
-  __asm__ volatile("fsrm %0" : : "r"(round));
+    case FE_TOWARDZERO:
+      /* Intentional fall-through */
+
+    case FE_TONEAREST:
+      /* Set the rounding mode */
+      __asm__ volatile("fsrm %0" : : "r"(round));
+
+      /* status 0 to indicate successful processing of rounding mode */
+      status = 0;
+      break;
+
+    default:
+      break;
+  }
 
   /* Per 'fesetround.html:
    *
@@ -371,7 +390,7 @@ __declare_fenv_inline(int) fesetround(int round)
    * if the requested rounding direction was established."
    */
 
-  return 0;
+  return status;
 }
 
 /* This implementation is intended to comply with the following
