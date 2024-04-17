@@ -144,6 +144,8 @@ __declare_fenv_inline(int) fesetexceptflag(const fexcept_t *flagp, int excepts)
 
 __declare_fenv_inline(int) fesetround(int round)
 {
+  if (round & ~_FE_ROUND_MODE_MASK)
+    return 1;
   __asm__ volatile ("wur.fcr %0" : : "a"(round));
   return 0;
 }
