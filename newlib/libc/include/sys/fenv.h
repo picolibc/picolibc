@@ -83,11 +83,11 @@
  * Other implementation-specific rounding modes may be defined, and must start
  * with FE_ followed by a capital letter.
  */
+#define FE_TONEAREST  	0
 /*
 #define FE_DOWNWARD   	1
-#define FE_TONEAREST  	2
-#define FE_TOWARDZERO 	3
-#define FE_UPWARD     	4
+#define FE_TOWARDZERO 	2
+#define FE_UPWARD     	3
 */
 
 /*

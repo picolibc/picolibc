@@ -68,6 +68,8 @@ typedef unsigned long fexcept_t;
 #define _FE_ROUND_MODE_MASK (0x3 << _FE_ROUND_MODE_OFFSET)
 #define _FE_FLOATING_ENV_MASK (_FE_EXCEPTION_FLAG_MASK | _FE_EXCEPTION_ENABLE_MASK | _FE_ROUND_MODE_MASK)
 
+#else
+#define FE_TONEAREST  0x0
 #endif
 
 #if !defined(__declare_fenv_inline) && defined(__declare_extern_inline)

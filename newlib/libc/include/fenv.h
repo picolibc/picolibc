@@ -18,10 +18,6 @@ extern "C" {
 
 #include <sys/fenv.h>
 
-#ifndef FE_TONEAREST
-#define FE_TONEAREST	0
-#endif
-
 #ifndef FE_ALL_EXCEPT
 #define FE_ALL_EXCEPT	0
 #endif

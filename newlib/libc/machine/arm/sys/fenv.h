@@ -69,6 +69,8 @@ typedef int fexcept_t;
 #define	FE_DOWNWARD		0x00800000
 #define	FE_TOWARDZERO		0x00c00000
 
+#else
+#define	FE_TONEAREST		0x00000000
 #endif
 
 #if !defined(__declare_fenv_inline) && defined(__declare_extern_inline)

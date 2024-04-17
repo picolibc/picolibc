@@ -61,6 +61,8 @@
 #define FE_TONEAREST  	0x00000000
 
 #define FE_RMODE_MASK   0x7
+#else
+#define FE_TONEAREST	0
 #endif
 
 /* Per "The RISC-V Instruction Set Manual: Volume I: User-Level ISA:

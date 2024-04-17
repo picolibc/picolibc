@@ -38,6 +38,7 @@ extern "C" {
 #ifdef _SOFT_FLOAT
 typedef int fenv_t;
 typedef int fexcept_t;
+#define	FE_TONEAREST	0	/* round to nearest representable number */
 #else
 
 #ifdef __arch64__

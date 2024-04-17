@@ -75,6 +75,8 @@ extern fenv_t		_fe_dfl_env;
 #define	__cfc1(__fcsr)	__asm __volatile("cfc1 %0, $31" : "=r" (__fcsr))
 #define	__ctc1(__fcsr)	__asm __volatile("ctc1 %0, $31" :: "r" (__fcsr))
 
+#else
+#define	FE_TONEAREST	0x0000
 #endif /* !__mips_soft_float */
 
 #if !defined(__declare_fenv_inline) && defined(__declare_extern_inline)
