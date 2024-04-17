@@ -373,9 +373,6 @@ int status = 1;
       /* Intentional fall-through */
 
     case FE_TONEAREST:
-      /* Mask round to be sure only valid rounding bits are set */
-      round &= FE_RMODE_MASK;
-
       /* Set the rounding mode */
       __asm__ volatile("fsrm %0" : : "r"(round));
 
