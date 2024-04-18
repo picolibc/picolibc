@@ -36,15 +36,21 @@ fgets(char *str, int size, FILE *stream)
 {
 	char *cp;
 	int c;
+	int empty_stream_flag = 0; //flag checks if stream is empty or not
 
 	if ((stream->flags & __SRD) == 0 || size <= 0)
 		return NULL;
 
 	size--;
 	for (c = 0, cp = str; c != '\n' && size > 0; size--, cp++) {
-		if ((c = getc(stream)) == EOF)
-			return NULL;
+		if ((c = getc(stream)) == EOF) {
+			if(empty_stream_flag == 0)
+				return NULL;
+			else
+				break;
+		}
 		*cp = (char)c;
+		empty_stream_flag = 1;
 	}
 	*cp = '\0';
 
