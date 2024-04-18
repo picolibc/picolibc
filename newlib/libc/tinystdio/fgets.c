@@ -42,8 +42,12 @@ fgets(char *str, int size, FILE *stream)
 
 	size--;
 	for (c = 0, cp = str; c != '\n' && size > 0; size--, cp++) {
-		if ((c = getc(stream)) == EOF)
-			return NULL;
+		if ((c = getc(stream)) == EOF) {
+			if(cp == str)
+				return NULL;
+			else
+				break;
+		}
 		*cp = (char)c;
 	}
 	*cp = '\0';
