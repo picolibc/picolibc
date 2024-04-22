@@ -112,9 +112,9 @@ float crealf(float complex);
 
 #if __ISO_C_VISIBLE >= 2011
 #ifdef _HAVE_BUILTIN_COMPLEX
-#define CMPLX(r,i) __builtin_complex(r,i)
-#define CMPLXF(r,i) __builtin_complex(r,i)
-#define CMPLXL(r,i) __builtin_complex(r,i)
+#define CMPLX(r,i) __builtin_complex((double)(r), (double)(i))
+#define CMPLXF(r,i) __builtin_complex((float)(r), (float)(i))
+#define CMPLXL(r,i) __builtin_complex((long double)(r), (long double)(i))
 #else
 #define CMPLX(r,i) ((double complex) ((double) (r) + (double complex) I * (double) (i)))
 #define CMPLXF(r,i) ((float complex) ((float) (r) + (float complex) I * (float) (i)))
