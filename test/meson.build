@@ -533,7 +533,14 @@ foreach target : targets
 
     # legacy stdio doesn't work on semihosting, so just skip it
     if tinystdio
-      plain_tests += ['test-fopen', 'test-mktemp', 'test-tmpnam', 'test-fread-fwrite', 'test-ungetc-ftell', 'test-fgetc']
+      plain_tests += ['test-fopen',
+                      'test-mktemp',
+                      'test-tmpnam',
+                      'test-fread-fwrite',
+                      'test-ungetc-ftell',
+                      'test-fgetc',
+                      'test-fgets-eof',
+                     ]
     endif
   endif
 
