@@ -98,8 +98,10 @@ _gettemp (char *path,
           int *doopen,
           int flags)
 {
-  char *start, *trv;
+  char *trv;
   char *end;
+  static char inc = 0;
+  static char pos = 1;
 
   end = path + strlen(path) - suffixlen;
   trv = end;
@@ -115,10 +117,28 @@ _gettemp (char *path,
       return 0;
     }
 
-  start = trv + 1;
+  trv += pos;
 
   for (;;)
     {
+      /* Increment the string of letters to generate another name */
+      for(;;)
+      {
+        if (trv == end)
+          return 0;
+        
+        if ((*trv + inc - 1) == 'z') {
+          *trv++ = 'a';
+          pos++;
+          inc = 1;
+        }
+        else {
+          *trv += inc;
+          inc++;
+          break;
+        }
+      }
+
       /*
        * Use open to check if the file exists to avoid depending on
        * stat or access. Don't rely on O_EXCL working, although if it
@@ -145,22 +165,7 @@ _gettemp (char *path,
         }
       } else
         close(fd);
-
-      /* Increment the string of letters to generate another name */
-      trv = start;
-      for(;;)
-	{
-	  if (trv == end)
-	    return 0;
-	  if (*trv == 'z')
-	    *trv++ = 'a';
-	  else {
-            ++ * trv;
-            break;
-          }
-	}
     }
-  /*NOTREACHED*/
 }
 
 int
