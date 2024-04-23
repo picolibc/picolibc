@@ -191,6 +191,10 @@ mktime_utc (struct tm *tim_p, long *days_p)
   /* validate structure */
   validate_structure (tim_p);
 
+  /* check if year has valid value */  
+  if (tim_p->tm_year > 10000 || tim_p->tm_year < 0)
+      return (time_t) -1;
+    
   /* compute hours, minutes, seconds */
   tim += tim_p->tm_sec + (tim_p->tm_min * SECSPERMIN) +
     (tim_p->tm_hour * SECSPERHOUR);
@@ -203,9 +207,6 @@ mktime_utc (struct tm *tim_p, long *days_p)
 
   /* compute day of the year */
   tim_p->tm_yday = days;
-
-  if (tim_p->tm_year > 10000 || tim_p->tm_year < -10000)
-      return (time_t) -1;
 
   /* compute days in other years */
   if ((year = tim_p->tm_year) > 70)
