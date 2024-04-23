@@ -43,8 +43,14 @@ FSEEK_TYPE
 ftell(FILE *stream)
 {
         struct __file_ext *xf = (struct __file_ext *) stream;
-        if ((stream->flags & __SEXT) && xf->seek)
-                return (FSEEK_TYPE) (xf->seek) (stream, 0, SEEK_CUR);
+        FSEEK_TYPE ret;
+        if ((stream->flags & __SEXT) && xf->seek) {
+                ret = (FSEEK_TYPE) (xf->seek) (stream, 0, SEEK_CUR);
+                if(stream->unget != 0)
+                        return --ret;
+                else
+                        return ret;
+        }
         errno = ESPIPE;
 	return -1;
 }
