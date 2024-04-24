@@ -580,6 +580,12 @@ __non_atomic_compare_exchange_ungetc(__ungetc_t *p, __ungetc_t d, __ungetc_t v)
 	return true;
 }
 
+static inline uint16_t
+__non_atomic_load_ungetc(const volatile __ungetc_t *p)
+{
+        return *p;
+}
+
 #ifdef ATOMIC_UNGETC
 
 #if __PICOLIBC_UNGETC_SIZE == 4 && defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
@@ -608,6 +614,12 @@ __atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v)
 	return atomic_exchange_explicit(pa, v, memory_order_relaxed);
 }
 
+static inline __ungetc_t
+__atomic_load_ungetc(const volatile __ungetc_t *p)
+{
+	_Atomic __ungetc_t *pa = (_Atomic __ungetc_t *) p;
+        return atomic_load(pa);
+}
 #else
 
 bool
@@ -616,6 +628,9 @@ __atomic_compare_exchange_ungetc(__ungetc_t *p, __ungetc_t d, __ungetc_t v);
 __ungetc_t
 __atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v);
 
+__ungetc_t
+__atomic_load_ungetc(const volatile __ungetc_t *p);
+
 #endif /* PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP */
 
 #else
@@ -623,6 +638,8 @@ __atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v);
 #define __atomic_compare_exchange_ungetc(p,d,v) __non_atomic_compare_exchange_ungetc(p,d,v)
 
 #define __atomic_exchange_ungetc(p,v) __non_atomic_exchange_ungetc(p,v)
+
+#define __atomic_load_ungetc(p) (*(p))
 
 #endif /* ATOMIC_UNGETC */
 
