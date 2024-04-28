@@ -34,6 +34,7 @@
 #
 srcs_tinystdio = [
   'asprintf.c',
+  'atomic_load.c',
   'atold_engine.c',
   'bufio.c',
   'clearerr.c',

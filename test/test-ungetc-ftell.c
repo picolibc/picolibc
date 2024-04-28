@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright © 2024, Synopsys Inc.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,22 +33,43 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stdio_private.h"
+#include <stdio.h>
+#include <string.h>
 
-#ifndef FSEEK_TYPE
-#define FSEEK_TYPE long
-#endif
+const char *str = "This is a string";
 
-FSEEK_TYPE
-ftell(FILE *stream)
-{
-        struct __file_ext *xf = (struct __file_ext *) stream;
-        if ((stream->flags & __SEXT) && xf->seek) {
-                FSEEK_TYPE ret = (FSEEK_TYPE) (xf->seek) (stream, 0, SEEK_CUR);
-                if (__atomic_load_ungetc(&stream->unget) != 0)
-                    ret--;
-                return ret;
-        }
-        errno = ESPIPE;
-	return -1;
+int main(void) {
+
+    FILE *file;
+    char first;
+    long position, start;
+
+    file = fopen( "testfile.dat", "wb" );
+    if( file == NULL ) return 1;
+    fputs(str, file);
+    fclose(file);
+
+    file = fopen( "testfile.dat", "rb" );
+    if(file == NULL) return 1;
+
+    first = fgetc(file);
+    printf("First character read: %c\n", first);
+
+    start = ftell(file);
+    printf("Position before ungetc: %ld\n", start);
+
+    ungetc(first, file);  // Use ungetc to put the character back
+
+    position = ftell(file);  // Check ftell position (should be 0 after ungetc if first character was read)
+    printf("Position after ungetc: %ld\n", position);
+
+    fclose(file);
+
+    if (position == 0) {
+        printf("Test passed: ungetc and ftell working as expected.\n");
+        return 0;
+    } else {
+        printf("Test failed: Incorrect position after ungetc.\n");
+        return 1;
+    }
 }

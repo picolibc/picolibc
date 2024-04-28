@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright © 2024 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -35,20 +35,14 @@
 
 #include "stdio_private.h"
 
-#ifndef FSEEK_TYPE
-#define FSEEK_TYPE long
-#endif
+#if defined(ATOMIC_UNGETC) && !defined(PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP)
 
-FSEEK_TYPE
-ftell(FILE *stream)
+__ungetc_t
+__picolibc_non_atomic_load_ungetc(const volatile __ungetc_t *p)
 {
-        struct __file_ext *xf = (struct __file_ext *) stream;
-        if ((stream->flags & __SEXT) && xf->seek) {
-                FSEEK_TYPE ret = (FSEEK_TYPE) (xf->seek) (stream, 0, SEEK_CUR);
-                if (__atomic_load_ungetc(&stream->unget) != 0)
-                    ret--;
-                return ret;
-        }
-        errno = ESPIPE;
-	return -1;
+	return __non_atomic_load_ungetc(p);
 }
+
+__weak_reference(__picolibc_non_atomic_load_ungetc, __atomic_load_ungetc);
+
+#endif
