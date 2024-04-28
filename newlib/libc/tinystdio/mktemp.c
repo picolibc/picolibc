@@ -103,6 +103,8 @@ _gettemp (char *path,
   static char inc = 0;
   static char pos = 1;
 
+  __LIBC_LOCK();
+
   end = path + strlen(path) - suffixlen;
   trv = end;
 
@@ -114,6 +116,7 @@ _gettemp (char *path,
   if (end - trv < 6)
     {
       errno = EINVAL;
+      __LIBC_UNLOCK();
       return 0;
     }
 
@@ -125,7 +128,10 @@ _gettemp (char *path,
       for(;;)
       {
         if (trv == end)
+        {
+          __LIBC_UNLOCK();
           return 0;
+        }
         
         if ((*trv + inc - 1) == 'z') {
           *trv++ = 'a';
@@ -148,24 +154,34 @@ _gettemp (char *path,
       if (fd < 0) {
         if (errno != EACCES) {
           if (errno != ENOENT)
+          {
+            __LIBC_UNLOCK();
             return 0;
+          }
           if (doopen)
           {
             fd = open (path, flags | O_CREAT | O_EXCL | O_RDWR,
                        0600);
             if (fd >= 0) {
               *doopen = fd;
+              __LIBC_UNLOCK();
               return 1;
             }
             if (errno != EEXIST)
+            {
+              __LIBC_UNLOCK();
               return 0;
+            }
           } else {
+            __LIBC_UNLOCK();
             return 1;
           }
         }
       } else
         close(fd);
     }
+
+    __LIBC_UNLOCK();
 }
 
 int
