@@ -37,8 +37,10 @@ fgetc(FILE *stream)
 	int rv;
 	__ungetc_t unget;
 
-	if ((stream->flags & __SRD) == 0)
+	if ((stream->flags & __SRD) == 0) {
+		stream->flags |= __SERR;
 		return EOF;
+	}
 
 	if ((unget = __atomic_exchange_ungetc(&stream->unget, 0)) != 0)
                 return (unsigned char) (unget - 1);
