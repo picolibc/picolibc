@@ -841,6 +841,15 @@ int main (void) {
 '''
 have_builtin_expect = cc.links(builtin_expect_code, name : 'has __builtin_expect', args: core_c_args)
 
+# Check for __builtin_constant_p
+builtin_constant_p_code = '''
+volatile int a = 42;
+int main (void) {
+  return __builtin_constant_p(a);
+}
+'''
+have_builtin_constant_p = cc.links(builtin_constant_p_code, name : 'has __builtin_constant_p', args: core_c_args)
+
 werror_c_args = core_c_args + cc.get_supported_arguments('-Werror')
 
 # CompCert uses the GCC preprocessor, which causes to
@@ -1307,6 +1316,7 @@ conf_data.set('_HAVE_BUILTIN_ADD_OVERFLOW', have_builtin_add_overflow, descripti
 conf_data.set('_HAVE_COMPLEX', have_complex, description: 'Compiler supports _Complex')
 conf_data.set('_HAVE_BUILTIN_COMPLEX', have_builtin_complex, description: 'Compiler has __builtin_complex')
 conf_data.set('_HAVE_BUILTIN_EXPECT', have_builtin_expect, description: 'Compiler has __builtin_expect')
+conf_data.set('_HAVE_BUILTIN_CONSTANT_P', have_builtin_constant_p, description: 'Compiler has __builtin_constant_p')
 conf_data.set('_HAVE_ALLOC_SIZE', have_alloc_size, description: 'The compiler REALLY has the attribute __alloc_size__')
 conf_data.set('_HAVE_ATTRIBUTE_ALWAYS_INLINE',
 	      cc.has_function_attribute('always_inline'),
