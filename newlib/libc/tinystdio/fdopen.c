@@ -59,6 +59,12 @@ fdopen(int fd, const char *mode)
         *bf = (struct __file_bufio)
                 FDEV_SETUP_POSIX(fd, buf, BUFSIZ, stdio_flags, __BFALL);
 
+        if (_fflush_register(&(bf->xfile.cfile.file)) != 0) {
+                close(fd);
+                free(bf);
+                return NULL;
+        }
+
         __bufio_lock_init(&(bf->xfile.cfile.file));
 
 	if (open_flags & O_APPEND)
