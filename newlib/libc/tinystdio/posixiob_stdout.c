@@ -56,5 +56,5 @@ static void posix_init(void)
 __attribute__((destructor (101)))
 static void posix_exit(void)
 {
-    fflush(stdout);
+    _fflush_nonnull(stdout);
 }

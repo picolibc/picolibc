@@ -180,7 +180,7 @@ again:
                         flushed = true;
                         if (&stdin != NULL && &stdout != NULL && f == stdin) {
                                 __bufio_unlock(f);
-                                fflush(stdout);
+                                _fflush_nonnull(stdout);
                                 goto again;
                         }
 		}

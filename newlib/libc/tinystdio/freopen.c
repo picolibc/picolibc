@@ -55,7 +55,7 @@ freopen(const char *pathname, const char *mode, FILE *stream)
 	if (fd < 0)
 		return NULL;
 
-        fflush(stream);
+        _fflush_nonnull(stream);
 
         __bufio_lock(stream);
         close(pf->fd);
