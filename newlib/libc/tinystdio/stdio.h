@@ -200,8 +200,27 @@ extern "C" {
 FILE *fdevopen(int (*__put)(char, FILE*), int (*__get)(FILE*), int(*__flush)(FILE *));
 int	fclose(FILE *__stream);
 int	fflush(FILE *stream);
+int     _fflush_null(void);
+int     _fflush_nonnull(FILE *f);
+int     _fflush_register(FILE *stream);
+void    _fflush_unregister(FILE *stream);
+#define fflush(stream) (((__builtin_constant_p(stream) && (stream == NULL))) ? _fflush_null() : _fflush_nonnull(stream))
+#ifdef __declare_extern_inline
 
-# define fdev_close(f) (fflush(f))
+int     _fflush_register_real(FILE *stream) _ATTRIBUTE((__weak__));
+__declare_extern_inline(int) _fflush_register(FILE *stream) {
+    if (&_fflush_register_real)
+        return _fflush_register_real(stream);
+    return 0;
+}
+void     _fflush_unregister_real(FILE *stream) _ATTRIBUTE((__weak__));
+__declare_extern_inline(void) _fflush_unregister(FILE *stream) {
+    if (&_fflush_unregister_real)
+        _fflush_unregister_real(stream);
+}
+#endif
+
+# define fdev_close(f) (_fflush_nonnull(f))
 
 #ifdef _HAVE_FORMAT_ATTRIBUTE
 #ifdef PICOLIBC_FLOAT_PRINTF_SCANF

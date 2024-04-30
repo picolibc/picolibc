@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2020 Keith Packard
+ * Copyright © 2024 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -35,8 +35,8 @@
 
 #include "stdio_private.h"
 
-#undef fflush
-int fflush(FILE *stream)
+void _fflush_unregister(FILE *stream)
 {
-    return stream ? _fflush_nonnull(stream) : _fflush_null();
+    if (&_fflush_unregister_real)
+        _fflush_unregister_real(stream);
 }

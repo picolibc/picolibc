@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2020 Keith Packard
+ * Copyright © 2024 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -35,8 +35,55 @@
 
 #include "stdio_private.h"
 
-#undef fflush
-int fflush(FILE *stream)
+extern FILE *const stdout _ATTRIBUTE((__weak__));
+
+static size_t   num_files;
+static FILE     **files;
+
+int _fflush_register_real(FILE *stream)
 {
-    return stream ? _fflush_nonnull(stream) : _fflush_null();
+    int ret = -1;
+
+    if (!stream->flush)
+        return 0;
+
+    __LIBC_LOCK();
+    FILE ** new_files = reallocarray(files, num_files+1, sizeof(FILE *));
+    if (new_files) {
+        new_files[num_files++] = stream;
+        files = new_files;
+        ret = 0;
+    }
+    __LIBC_UNLOCK();
+    return ret;
+}
+
+void _fflush_unregister_real(FILE *stream)
+{
+    size_t i;
+
+    if (!stream->flush)
+        return;
+
+    __LIBC_LOCK();
+    for (i = 0; i < num_files; i++)
+        if (files[i] == stream) {
+            memmove(&files[i], &files[i+1], (num_files - i - 1) * sizeof(FILE *));
+            num_files--;
+            break;
+        }
+    __LIBC_UNLOCK();
+}
+
+int _fflush_null(void)
+{
+    int ret = 0;
+    size_t i;
+    __LIBC_LOCK();
+    if (&stdout)
+        ret = _fflush_nonnull(stdout);
+    for (i = 0; i < num_files; i++)
+        ret = _fflush_nonnull(files[i]) || ret;
+    __LIBC_UNLOCK();
+    return ret;
 }
