@@ -35,9 +35,8 @@
 
 #include "stdio_private.h"
 
+#undef fflush
 int fflush(FILE *stream)
 {
-	if (stream->flush)
-		return (stream->flush)(stream);
-	return 0;
+    return stream ? _fflush_nonnull(stream) : _fflush_null();
 }

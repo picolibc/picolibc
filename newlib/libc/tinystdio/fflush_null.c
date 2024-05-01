@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright © 2024 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -35,26 +35,55 @@
 
 #include "stdio_private.h"
 
-static char write_buf[BUFSIZ];
+extern FILE *const stdout _ATTRIBUTE((__weak__));
 
-static struct __file_bufio __stdout = FDEV_SETUP_POSIX(1, write_buf, BUFSIZ, __SWR, __BLBF);
+static size_t   num_files;
+static FILE     **files;
 
-FILE *const __posix_stdout = &__stdout.xfile.cfile.file;
-
-__weak_reference(__posix_stdout,stdout);
-
-__attribute__((constructor))
-static void posix_init(void)
+int _fflush_register_real(FILE *stream)
 {
-    __bufio_lock_init(&__stdout.xfile.cfile.file);
+    int ret = -1;
+
+    if (!stream->flush)
+        return 0;
+
+    __LIBC_LOCK();
+    FILE ** new_files = reallocarray(files, num_files+1, sizeof(FILE *));
+    if (new_files) {
+        new_files[num_files++] = stream;
+        files = new_files;
+        ret = 0;
+    }
+    __LIBC_UNLOCK();
+    return ret;
 }
 
-/*
- * Add a destructor function to get stdout flushed on
- * exit
- */
-__attribute__((destructor (101)))
-static void posix_exit(void)
+void _fflush_unregister_real(FILE *stream)
 {
-    _fflush_nonnull(stdout);
+    size_t i;
+
+    if (!stream->flush)
+        return;
+
+    __LIBC_LOCK();
+    for (i = 0; i < num_files; i++)
+        if (files[i] == stream) {
+            memmove(&files[i], &files[i+1], (num_files - i - 1) * sizeof(FILE *));
+            num_files--;
+            break;
+        }
+    __LIBC_UNLOCK();
+}
+
+int _fflush_null(void)
+{
+    int ret = 0;
+    size_t i;
+    __LIBC_LOCK();
+    if (&stdout)
+        ret = _fflush_nonnull(stdout);
+    for (i = 0; i < num_files; i++)
+        ret = _fflush_nonnull(files[i]) || ret;
+    __LIBC_UNLOCK();
+    return ret;
 }

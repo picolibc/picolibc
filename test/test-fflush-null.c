@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright © 2022 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,29 +32,63 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#define _DEFAULT_SOURCE
+#include <stdio.h>
+#include <stdlib.h>
 
-#include "stdio_private.h"
+#ifndef TEST_FILE_NAME
+#define TEST_FILE_NAME "FFLUSH.TXT"
+#endif
 
-static char write_buf[BUFSIZ];
+#define check(condition, message) do {                  \
+        if (!(condition)) {                             \
+            printf("%s: %s\n", message, #condition);    \
+            if (f)                                      \
+                fclose(f);                              \
+            (void) remove(TEST_FILE_NAME);              \
+            exit(1);                                    \
+        }                                               \
+    } while(0)
 
-static struct __file_bufio __stdout = FDEV_SETUP_POSIX(1, write_buf, BUFSIZ, __SWR, __BLBF);
+#define MESSAGE "hello, world\n"
 
-FILE *const __posix_stdout = &__stdout.xfile.cfile.file;
-
-__weak_reference(__posix_stdout,stdout);
-
-__attribute__((constructor))
-static void posix_init(void)
+void
+check_contents(int repeats)
 {
-    __bufio_lock_init(&__stdout.xfile.cfile.file);
+    FILE *f;
+    char *s;
+    int r;
+    int c;
+
+    f = fopen(TEST_FILE_NAME, "r");
+    check(f != NULL, "fflush-null r");
+    for (r = 0; r < repeats; r++) {
+        for (s = MESSAGE; *s; s++) {
+            c = getc(f);
+            check((char) c == *s, "contents");
+        }
+    }
+    c = getc(f);
+    check(c == EOF, "EOF");
+    r = fclose(f);
+    f = NULL;
+    check(r == 0, "fclose r");
 }
 
-/*
- * Add a destructor function to get stdout flushed on
- * exit
- */
-__attribute__((destructor (101)))
-static void posix_exit(void)
+int
+main(void)
 {
-    _fflush_nonnull(stdout);
+    FILE *f;
+
+    /* Make sure we can create a file, write contents and read them back */
+    f = fopen(TEST_FILE_NAME, "w");
+    check(f != NULL, "fflush-null w");
+    fputs(MESSAGE, f);
+    fflush(NULL);
+    check_contents(1);
+    fclose(f);
+
+    (void) remove(TEST_FILE_NAME);
+
+    exit(0);
 }

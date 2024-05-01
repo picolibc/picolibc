@@ -143,6 +143,9 @@ picolibc_flag(_HAVE_BITFIELDS_IN_PACKED_STRUCTS)
 # The compiler supports __builtin_alloca
 picolibc_flag(_HAVE_BUILTIN_ALLOCA)
 
+# The compiler supports __builtin_constant_p
+picolibc_flag(_HAVE_BUILTIN_CONSTANT_P)
+
 # The compiler supports __builtin_copysign
 picolibc_flag(_HAVE_BUILTIN_COPYSIGN)
 

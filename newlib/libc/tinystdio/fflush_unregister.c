@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright © 2024 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -35,26 +35,8 @@
 
 #include "stdio_private.h"
 
-static char write_buf[BUFSIZ];
-
-static struct __file_bufio __stdout = FDEV_SETUP_POSIX(1, write_buf, BUFSIZ, __SWR, __BLBF);
-
-FILE *const __posix_stdout = &__stdout.xfile.cfile.file;
-
-__weak_reference(__posix_stdout,stdout);
-
-__attribute__((constructor))
-static void posix_init(void)
+void _fflush_unregister(FILE *stream)
 {
-    __bufio_lock_init(&__stdout.xfile.cfile.file);
-}
-
-/*
- * Add a destructor function to get stdout flushed on
- * exit
- */
-__attribute__((destructor (101)))
-static void posix_exit(void)
-{
-    _fflush_nonnull(stdout);
+    if (&_fflush_unregister_real)
+        _fflush_unregister_real(stream);
 }

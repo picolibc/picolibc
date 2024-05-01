@@ -600,6 +600,12 @@
 #define __inhibit_new_builtin_calls
 #endif
 
+#if defined(_HAVE_BUILTIN_CONSTANT_P)
+# define __constant_p(v,d) __builtin_constant_p(v)
+#else
+# define __constant_p(v,d) (d)
+#endif
+
 #if defined(__GNUC__)
 #ifndef __weak_reference
 #ifdef __ELF__

@@ -200,5 +200,13 @@ fmemopen(void *buf, size_t size, const char *mode)
         .mflags = mflags,
     };
 
+    if (_fflush_register(&mf->xfile.cfile.file) != 0) {
+        if (mflags & __MALL)
+            free(buf);
+        free(mf);
+        errno = ENOMEM;
+        return NULL;
+    }
+
     return (FILE *)mf;
 }

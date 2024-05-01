@@ -112,6 +112,10 @@ fdevopen(int (*put)(char, FILE *), int (*get)(FILE *), int (*flush)(FILE *))
 		cf->file.put = put;
 		cf->file.flush = flush;
 		cf->file.flags |= __SWR;
+                if (_fflush_register(&(cf->file)) != 0) {
+                        free(cf);
+                        return NULL;
+                }
 	}
 
 	return (FILE *) cf;

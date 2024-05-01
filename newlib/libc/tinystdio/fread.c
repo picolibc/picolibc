@@ -82,9 +82,9 @@ fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
                                 /* Flush stdout if reading from stdin */
                                 if (!flushed) {
                                         flushed = true;
-                                        if (stream == stdin && stdout != NULL) {
+                                        if (&stdin != NULL && &stdout != NULL && stream == stdin) {
                                                 __bufio_unlock(stream);
-                                                fflush(stdout);
+                                                _fflush_nonnull(stdout);
                                                 goto again;
                                         }
                                 }

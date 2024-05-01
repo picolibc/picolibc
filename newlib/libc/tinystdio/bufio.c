@@ -176,11 +176,13 @@ again:
                  * pulling in stdin/stdout definitions just for this
                  * check.
                  */
-		if (&stdin != NULL && &stdout != NULL && f == stdin && !flushed) {
+                if (!flushed) {
                         flushed = true;
-			__bufio_unlock(f);
-			fflush(stdout);
-                        goto again;
+                        if (&stdin != NULL && &stdout != NULL && f == stdin) {
+                                __bufio_unlock(f);
+                                _fflush_nonnull(stdout);
+                                goto again;
+                        }
 		}
 
                 ret = __bufio_fill_locked(f);
