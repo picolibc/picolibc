@@ -735,6 +735,14 @@ size_t malloc_usable_size(void * ptr)
  *            Record the offset of align pointer and original pointer
  *            in the padding area.
  */
+
+#define MEMALIGN_MINALIGN        (MALLOC_MINSIZE <= 4 ? 4 : \
+                                  MALLOC_MINSIZE <= 8 ? 8 : \
+                                  MALLOC_MINSIZE <= 16 ? 16 : \
+                                  MALLOC_MINSIZE <= 32 ? 32 : -1)
+
+_Static_assert(MEMALIGN_MINALIGN > 0);
+
 void * memalign(size_t align, size_t s)
 {
     chunk_t *chunk_p;
@@ -748,7 +756,7 @@ void * memalign(size_t align, size_t s)
         return NULL;
     }
 
-    align = MAX(align, MALLOC_MINSIZE);
+    align = MAX(align, MEMALIGN_MINALIGN);
 
     if (s > MALLOC_MAXSIZE - align)
     {
