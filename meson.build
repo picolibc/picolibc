@@ -95,6 +95,8 @@ cpu_family_aliases = {
 		       'm88110' : 'm88k',
 		       # Microblaze
 		       'microblazeel' : 'microblaze',
+		       # mips
+		       'mips64' : 'mips',
 		       # or1k
 		       'or1knd': 'or1k',
 		       # powerpc
