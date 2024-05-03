@@ -51,6 +51,7 @@ set(tests
   math-funcs
   timegm
   time-tests
+  test-funopen
   test-strtod
   test-strchr
   test-memset
