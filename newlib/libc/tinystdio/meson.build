@@ -78,6 +78,7 @@ srcs_tinystdio = [
   'ftell.c',
   'ftello.c',
   'ftox_engine.c',
+  'funopen.c',
   'fwide.c',
   'fwprintf.c',
   'fwrite.c',
