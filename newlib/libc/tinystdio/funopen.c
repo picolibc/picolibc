@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright © 2024 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,14 +33,38 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stdio_private.h"
+#define _DEFAULT_SOURCE
+#include <stdlib.h>
+#include <stdio-bufio.h>
 
-int
-fileno(FILE *file)
+FILE *
+funopen (const void *cookie,
+         ssize_t (*readfn)(void *cookie, void *buf, size_t n),
+         ssize_t (*writefn)(void *cookie, const void *buf, size_t n),
+         __off_t (*seekfn)(void *cookie, __off_t off, int whence),
+         int (*closefn)(void *cookie))
 {
-        if (file->flags & __SBUF) {
-                struct __file_bufio *pf = (struct __file_bufio *) file;
-                return (int)(intptr_t)(pf->ptr);
-        }
-	return -1;
+	struct __file_bufio *bf;
+        char *buf;
+        int open_flags = 0;
+
+        if (readfn)
+            open_flags |= __SRD;
+        if (writefn)
+            open_flags |= __SWR;
+
+	/* Allocate file structure and necessary buffers */
+	bf = calloc(1, sizeof(struct __file_bufio) + BUFSIZ);
+
+	if (bf == NULL)
+            return NULL;
+
+        buf = (char *) (bf + 1);
+
+        *bf = (struct __file_bufio)
+            FDEV_SETUP_BUFIO_PTR(cookie, buf, BUFSIZ, readfn, writefn, seekfn, closefn, open_flags, __BFALL);
+
+        __bufio_lock_init(&(bf->xfile.cfile.file));
+
+	return (FILE *) bf;
 }

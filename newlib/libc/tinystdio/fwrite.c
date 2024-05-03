@@ -78,7 +78,7 @@ fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
                         /* Large writes go direct. */
                         if (__bufio_flush_locked(stream) >= 0) {
                                 while (bytes) {
-                                        ssize_t len = (bf->write)(bf->fd, cp, bytes);
+                                        ssize_t len = bufio_write(bf, cp, bytes);
                                         if (len <= 0) {
                                                 stream->flags |= _FDEV_ERR;
                                                 break;

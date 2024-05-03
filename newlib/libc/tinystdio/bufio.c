@@ -35,8 +35,6 @@
 
 #include "stdio_private.h"
 
-/* Buffered I/O routines for tiny stdio */
-
 int
 __bufio_flush_locked(FILE *f)
 {
@@ -49,7 +47,7 @@ __bufio_flush_locked(FILE *f)
 		/* Flush everything, drop contents if that doesn't work */
                 buf = bf->buf;
 		while (bf->len) {
-                        ssize_t this = (bf->write) (bf->fd, buf, bf->len);
+                        ssize_t this = bufio_write(bf, buf, bf->len);
 			if (this <= 0) {
                                 bf->len = 0;
                                 return _FDEV_ERR;
@@ -64,8 +62,7 @@ __bufio_flush_locked(FILE *f)
                 backup = bf->len - bf->off;
                 if (backup) {
                         bf->pos -= backup;
-                        if (bf->lseek)
-                                (void) (bf->lseek)(bf->fd, bf->pos, SEEK_SET);
+                        (void) bufio_lseek(bf, bf->pos, SEEK_SET);
                 }
                 bf->len = 0;
                 bf->off = 0;
@@ -84,7 +81,7 @@ int __bufio_fill_locked(FILE *f)
 
         /* Reset read pointer, read some data */
         bf->off = 0;
-        len = (bf->read)(bf->fd, bf->buf, bf->size);
+        len = bufio_read (bf, bf->buf, bf->size);
 
         if (len <= 0) {
                 bf->len = 0;
@@ -206,9 +203,6 @@ __bufio_seek(FILE *f, off_t offset, int whence)
 	struct __file_bufio *bf = (struct __file_bufio *) f;
 	off_t ret;
 
-        if (!bf->lseek)
-            return _FDEV_ERR;
-
 	__bufio_lock(f);
         if (__bufio_setdir_locked(f, __SRD) < 0) {
                 ret = _FDEV_ERR;
@@ -231,7 +225,7 @@ __bufio_seek(FILE *f, off_t offset, int whence)
                         }
                         __PICOLIBC_FALLTHROUGH;
                 default:
-                        ret = (bf->lseek)(bf->fd, offset, whence);
+                        ret = bufio_lseek(bf, offset, whence);
                         if (ret >= 0)
                                 bf->pos = ret;
                         /* Flush any buffered data after a real seek */
@@ -313,7 +307,7 @@ __bufio_close(FILE *f)
          * FILE structs defined for stdin/stdout/stderr.
          */
         if (bf->bflags & __BFALL) {
-                (bf->close)(bf->fd);
+                bufio_close(bf);
                 free(f);
         }
 	return ret;

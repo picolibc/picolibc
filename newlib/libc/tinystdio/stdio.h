@@ -324,6 +324,17 @@ char *tmpnam (char *s);
 ssize_t getline(char **__restrict lineptr, size_t *__restrict n, FILE *__restrict stream);
 ssize_t getdelim(char **__restrict lineptr, size_t *__restrict  n, int delim, FILE *__restrict stream);
 
+#if __BSD_VISIBLE
+FILE	*funopen (const void *cookie,
+		ssize_t (*readfn)(void *cookie, void *buf,
+				size_t n),
+		ssize_t (*writefn)(void *cookie, const void *buf,
+				 size_t n),
+		__off_t (*seekfn)(void *cookie, __off_t off, int whence),
+		int (*closefn)(void *cookie));
+# define	fropen(__cookie, __fn) funopen(__cookie, __fn, NULL, NULL, NULL)
+# define	fwopen(__cookie, __fn) funopen(__cookie, NULL, __fn, NULL, NULL)
+#endif /*__BSD_VISIBLE */
 /*
  * The format of tmpnam names is TXXXXXX, which works with mktemp
  */

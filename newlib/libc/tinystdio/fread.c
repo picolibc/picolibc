@@ -101,7 +101,7 @@ fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
                                         bf->off = 0;
 
                                         /* Large reads go directly to the destination */
-                                        ssize_t len = (bf->read)(bf->fd, cp, bytes);
+                                        ssize_t len = bufio_read(bf, cp, bytes);
                                         if (len <= 0) {
                                                 stream->flags |= (len < 0) ? __SERR : __SEOF;
                                                 break;

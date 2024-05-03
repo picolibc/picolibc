@@ -58,16 +58,16 @@ freopen(const char *pathname, const char *mode, FILE *stream)
         fflush(stream);
 
         __bufio_lock(stream);
-        close(pf->fd);
+        close((int)(intptr_t) (pf->ptr));
         stream->flags = (stream->flags & ~(__SRD|__SWR|__SERR|__SEOF)) | stdio_flags;
         pf->pos = 0;
-        pf->fd = fd;
+        pf->ptr = (void *) (intptr_t) (fd);
 
         /* Switch to POSIX backend */
-        pf->read = read;
-        pf->write = write;
-        pf->lseek = lseek;
-        pf->close = close;
+        pf->read_int = read;
+        pf->write_int = write;
+        pf->lseek_int = lseek;
+        pf->close_int = close;
 
         __bufio_unlock(stream);
 

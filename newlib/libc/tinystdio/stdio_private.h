@@ -134,6 +134,70 @@ bool __matchcaseprefix(const char *input, const char *pattern);
                 .size = 0,                      \
 	}
 
+#define _FDEV_BUFIO_FD(bf) ((int)((intptr_t) (bf)->ptr))
+
+
+/*
+ * While there are notionally two different ways to invoke the
+ * callbacks (one with an int and the other with a pointer), they are
+ * functionally identical on many architectures. Check for that and
+ * skip the extra code.
+ */
+#if __SIZEOF_POINTER__ == __SIZEOF_INT__ || defined(__x86_64) || defined(__arm__) || defined(__riscv)
+#define BUFIO_ABI_MATCHES
+#endif
+
+/* Buffered I/O routines for tiny stdio */
+
+static inline ssize_t bufio_read(struct __file_bufio *bf, void *buf, size_t count)
+{
+#ifndef BUFIO_ABI_MATCHES
+    if (!(bf->bflags & __BFPTR))
+        return (bf->read_int)(_FDEV_BUFIO_FD(bf), buf, count);
+#endif
+    return (bf->read_ptr)((void *) bf->ptr, buf, count);
+}
+
+static inline ssize_t bufio_write(struct __file_bufio *bf, const void *buf, size_t count)
+{
+#ifndef BUFIO_ABI_MATCHES
+    if (!(bf->bflags & __BFPTR))
+        return (bf->write_int)(_FDEV_BUFIO_FD(bf), buf, count);
+#endif
+    return (bf->write_ptr)((void *) bf->ptr, buf, count);
+}
+
+static inline __off_t bufio_lseek(struct __file_bufio *bf, __off_t offset, int whence)
+{
+#ifndef BUFIO_ABI_MATCHES
+    if (!(bf->bflags & __BFPTR)) {
+        if (bf->lseek_int)
+            return (bf->lseek_int)(_FDEV_BUFIO_FD(bf), offset, whence);
+    } else
+#endif
+    {
+        if (bf->lseek_ptr)
+            return (bf->lseek_ptr)((void *) bf->ptr, offset, whence);
+    }
+    return _FDEV_ERR;
+}
+
+static inline int bufio_close(struct __file_bufio *bf)
+{
+    int ret = 0;
+#ifndef BUFIO_ABI_MATCHES
+    if (!(bf->bflags & __BFPTR)) {
+        if (bf->close_int)
+            ret = (bf->close_int)(_FDEV_BUFIO_FD(bf));
+    } else
+#endif
+    {
+        if (bf->close_ptr)
+            ret = (bf->close_ptr)((void *) bf->ptr);
+    }
+    return ret;
+}
+
 #ifdef POSIX_IO
 
 #define FDEV_SETUP_POSIX(fd, buf, size, rwflags, bflags)        \
