@@ -510,6 +510,7 @@ foreach target : targets
 		 'test-efcvt', 'test-atomic',
 		 'test-raise',
                  'test-fma',
+                 'test-funopen',
 		]
 
   if have_attr_ctor_dtor
