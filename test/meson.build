@@ -544,6 +544,7 @@ foreach target : targets
                       'test-ungetc-ftell',
                       'test-fgetc',
                       'test-fgets-eof',
+                      'test-wchar',
                      ]
     endif
   endif
@@ -643,6 +644,12 @@ if enable_native_tests
 		    c_args: native_c_args,
 		    link_args: native_c_args,
 		    dependencies: native_lib_m))
+    test('test-wchar_native',
+    executable('test-wchar_native',
+        'test-wchar.c',
+        c_args: native_c_args,
+        link_args: native_c_args,
+        dependencies: native_lib_m))
 
     test('fenv-native',
          executable('fenv-native',
