@@ -37,19 +37,16 @@ fputwc(wchar_t c, FILE *stream)
                 char c[sizeof(wchar_t)];
         } u;
         unsigned i;
+        
+        stream->flags |= __SWIDE;
 
 	if ((stream->flags & __SWR) == 0)
 		return WEOF;
 
-        if (stream->flags & __SWIDE) {
-                u.wc = c;
-                for (i = 0; i < sizeof(wchar_t); i++)
-                        if (stream->put(u.c[i], stream) < 0)
-                                return WEOF;
-        } else {
-                if (stream->put((int)(char)c, stream) < 0)
+        u.wc = c;
+        for (i = 0; i < sizeof(wchar_t); i++)
+                if (stream->put(u.c[i], stream) < 0)
                         return WEOF;
-        }
 
 	return (wint_t) c;
 }
