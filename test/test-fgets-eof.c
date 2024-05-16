@@ -36,6 +36,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifndef TEST_FILE_NAME
+#define TEST_FILE_NAME "FGETSEOF.TXT"
+#endif
+
 const char *string = "123456789";
 
 int main(void)
@@ -46,12 +50,12 @@ int main(void)
     FILE *file;
     int ret = 0;
 
-    file = fopen("testfile.dat", "w");
+    file = fopen( TEST_FILE_NAME, "w" );
     if(file == NULL) return 1;
     fputs(string, file);
     fclose(file);
 
-    file = fopen( "testfile.dat", "r" );
+    file = fopen( TEST_FILE_NAME, "r" );
     if(file == NULL) return 1;
 
     /*Calling fgets to reach EOF and check on the returned value*/

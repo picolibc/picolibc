@@ -36,6 +36,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifndef TEST_FILE_NAME
+#define TEST_FILE_NAME "UNGETCFTELL.DAT"
+#endif
+
 const char *str = "This is a string";
 
 int main(void) {
@@ -44,12 +48,12 @@ int main(void) {
     char first;
     long position, start;
 
-    file = fopen( "testfile.dat", "wb" );
+    file = fopen( TEST_FILE_NAME, "wb" );
     if( file == NULL ) return 1;
     fputs(str, file);
     fclose(file);
 
-    file = fopen( "testfile.dat", "rb" );
+    file = fopen( TEST_FILE_NAME, "rb" );
     if(file == NULL) return 1;
 
     first = fgetc(file);
