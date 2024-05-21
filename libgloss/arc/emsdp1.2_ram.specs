@@ -1,0 +1,18 @@
+%rename link emsdp_link
+%rename link_gcc_c_sequence emsdp_link_gcc_c_sequence
+%rename startfile emsdp_startfile
+
+*link:
+%(emsdp_link) -T emsdp1.2_ram.ld%s
+
+*emsdp_libgloss:
+-luart_8250 -lemsdp_uart
+
+*emsdp_libc:
+%{!specs=nano.specs:-lc} %{specs=nano.specs:-lc_nano}
+
+*link_gcc_c_sequence:
+%(emsdp_link_gcc_c_sequence) --start-group %G %(emsdp_libc) %(emsdp_libgloss) --end-group
+
+*startfile:
+%(emsdp_startfile) arc-main-helper%O%s
