@@ -1,5 +1,5 @@
 /*
-   Copyright (c) 2015, Synopsys, Inc. All rights reserved.
+   Copyright (c) 2015-2024, Synopsys, Inc. All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are met:
@@ -29,7 +29,8 @@
 */
 
 
-#if defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED)
+#if defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED)	\
+  || defined (__ARC_RF16__)
 # include "../../string/memcmp.c"
 #else
 /* See memcmp-*.S.  */
