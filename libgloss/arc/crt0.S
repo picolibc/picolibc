@@ -206,16 +206,9 @@ __start:
 	jl	@_monstartup
 #endif /* PROFILE_SUPPORT */
 
-	mov_s	r0, r13
-	mov_s	r1, r14
 ; branch to main
-#if defined (__ARCEM__) || defined (__ARCHS__)
 	mov	fp,0			; initialize frame pointer
-	jl	@main
-#else
-	bl.d	@main
-	mov	fp, 0			; initialize frame pointer
-#endif /* __ARCEM__ || __ARCHS__ */
+	jl	@__setup_argv_and_call_main
 
 #ifdef PROFILE_SUPPORT
 	mov	r13, r0		; Save return code
@@ -225,6 +218,23 @@ __start:
 
 	; r0 contains exit code
 	j	@exit
+	.size	__start, .-__start
+
+;;; arc-main-helper.o object can be used to replace this function and
+;;; properly set up arguments and/or other low-level stuff.
+	.section .text.__setup_argv_and_call_main,"ax",@progbits
+	.weak	__setup_argv_and_call_main
+	.type	__setup_argv_and_call_main, @function
+	.align 4
+
+__setup_argv_and_call_main:
+	push_s	blink
+; Call main with argc = 0 and *argv[] = 0
+	mov	r0, 0
+	mov	r1, 0
+	jl	@main
+	pop_s	blink
+	j_s	[blink]
 
 .section .text._exit_halt,"ax",@progbits
 .global	 _exit_halt

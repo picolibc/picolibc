@@ -1,0 +1,14 @@
+%rename link_gcc_c_sequence hl_link_gcc_c_sequence
+%rename startfile hl_startfile
+
+*hl_libgloss:
+-lhl
+
+*hl_libc:
+%{!specs=nano.specs:-lc} %{specs=nano.specs:-lc_nano}
+
+*link_gcc_c_sequence:
+%(hl_link_gcc_c_sequence) --start-group %G %(hl_libc) %(hl_libgloss) --end-group
+
+*startfile:
+%(hl_startfile) arc-main-helper%O%s
