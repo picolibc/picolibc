@@ -1,5 +1,5 @@
 /*
-   Copyright (c) 2015-2016, Synopsys, Inc. All rights reserved.
+   Copyright (c) 2015-2024, Synopsys, Inc. All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are met:
@@ -55,7 +55,6 @@
 #define __ARCHS__ 1
 #endif
 
-	.file	"crt0.S"
 	.extern main
 
 #if defined (__ARCEM__) || defined (__ARCHS__)
