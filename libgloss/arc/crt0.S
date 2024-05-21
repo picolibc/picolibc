@@ -178,27 +178,12 @@ __start:
 
 #endif /* !__ARC601__ */
 
-; Some  targets use the .init and .fini sections to create constructors and
-; destructors, and for these targets we need to call the _init function and
-; arrange for _fini to be called at program exit.
-	mov_s	r13, r0
-	mov_s	r14, r1
-	; calling atexit drags in malloc, so instead poke the function
-	; address directly into the reent structure
-	ld	r1, [gp, @_impure_ptr@sda]
-	mov_s	r1, @__atexit0
-	mov_s	r2, @__atexit
-	st_s	r1, [r2, 0]		; __atexit = &__atexit0
-	mov_s	r0, 1
-	st_s	r0, [r1, 4]		; __atexit0._ind = 1
-	mov_s	r0, @_fini
-	st_s	r0, [r1, 8]		; __atexit0._fns[0] = _fini
-; branch to _init
-#if defined (__ARCEM__) || defined (__ARCHS__)
+	;; Call constructors
 	jl	@_init
-#else
-	bl	@_init
-#endif /* __ARCEM__ || __ARCHS__ */
+
+;;; Setup fini routines to be called from exit
+	mov_s	r0, @_fini
+	jl	@atexit
 
 #ifdef PROFILE_SUPPORT /* Defined in gcrt0.S.  */
 	mov	r0,@__start
