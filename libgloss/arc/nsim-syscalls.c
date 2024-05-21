@@ -1,5 +1,5 @@
 /*
-   Copyright (c) 2015, Synopsys, Inc. All rights reserved.
+   Copyright (c) 2015-2024, Synopsys, Inc. All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are met:
@@ -100,7 +100,7 @@ _open (const char * pathname, int flags, int mode)
 }
 
 /* Should be provided by crt0.S.  */
-extern void __attribute__((noreturn)) _exit_halt ();
+extern void __attribute__((noreturn, long_call)) _exit_halt ();
 
 void
 __attribute__((noreturn))
