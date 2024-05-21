@@ -1,0 +1,18 @@
+%rename link hsdk_link
+%rename link_gcc_c_sequence hsdk_link_gcc_c_sequence
+%rename startfile hsdk_startfile
+
+*link:
+%(hsdk_link) -T hsdk.ld%s
+
+*hsdk_libgloss:
+-luart_8250 -lhsdk_uart
+
+*hsdk_libc:
+%{!specs=nano.specs:-lc} %{specs=nano.specs:-lc_nano}
+
+*link_gcc_c_sequence:
+%(hsdk_link_gcc_c_sequence) --start-group %G %(hsdk_libc) %(hsdk_libgloss) --end-group
+
+*startfile:
+%(hsdk_startfile) arc-main-helper%O%s
