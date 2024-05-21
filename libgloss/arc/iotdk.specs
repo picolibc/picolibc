@@ -1,0 +1,18 @@
+%rename link iotdk_link
+%rename link_gcc_c_sequence iotdk_link_gcc_c_sequence
+%rename startfile iotdk_startfile
+
+*link:
+%(iotdk_link) -T iotdk.ld%s
+
+*iotdk_libgloss:
+-luart_8250 -liotdk_uart
+
+*iotdk_libc:
+%{!specs=nano.specs:-lc} %{specs=nano.specs:-lc_nano}
+
+*link_gcc_c_sequence:
+%(iotdk_link_gcc_c_sequence) --start-group %G %(iotdk_libc) %(iotdk_libgloss) --end-group
+
+*startfile:
+%(iotdk_startfile) arc-main-helper%O%s

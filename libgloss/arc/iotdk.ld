@@ -1,0 +1,14 @@
+/* Memory map for ARC IoT DK - EM9D */
+
+MEMORY
+{
+    ICCM : ORIGIN = 0x20000000, LENGTH = 256K
+    DCCM : ORIGIN = 0x80000000, LENGTH = 128K
+}
+
+REGION_ALIAS("startup", ICCM)
+REGION_ALIAS("text", ICCM)
+REGION_ALIAS("data", DCCM)
+REGION_ALIAS("sdata", DCCM)
+
+INCLUDE arcv2elf-common.ld
