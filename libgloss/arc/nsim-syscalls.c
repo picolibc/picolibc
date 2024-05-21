@@ -206,7 +206,7 @@ _fstat (int fd, struct stat *buf)
 {
   struct nsim_stat nsim_stat;
   long __res;
-  _naked_syscall2 (__res, stat, fd, &nsim_stat)
+  _naked_syscall2 (__res, fstat, fd, &nsim_stat)
   translate_stat (&nsim_stat, buf);
   return __res;
 }
