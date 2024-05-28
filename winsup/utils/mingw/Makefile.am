@@ -38,6 +38,7 @@ cygcheck_LDADD = -lz -lwininet -lshlwapi -lpsapi -lntdll
 cygwin_console_helper_SOURCES = cygwin-console-helper.cc
 
 ldh_SOURCES = ldh.cc
+ldh_LDFLAGS = ${AM_LDFLAGS} -Wl,--disable-high-entropy-va
 
 strace_SOURCES = \
 	path.cc \

@@ -12,3 +12,6 @@ Fixes:
 - Fix regression of pthread::once() introduced in 3.5.0 (i.e., the race
   issue regarding destroying mutex).
   Addresses: https://cygwin.com/pipermail/cygwin/2024-May/255987.html
+
+- Fix a problem that ldd command against cygwin DLLs sometimes hangs.
+  Addresses: https://cygwin.com/pipermail/cygwin/2024-May/255991.html
