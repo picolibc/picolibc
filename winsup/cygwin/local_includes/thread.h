@@ -674,7 +674,7 @@ class pthread_once
 {
 public:
   pthread_mutex_t mutex;
-  int state;
+  volatile int state;
 };
 
 /* shouldn't be here */

@@ -2045,27 +2045,31 @@ pthread::create (pthread_t *thread, const pthread_attr_t *attr,
 int
 pthread::once (pthread_once_t *once_control, void (*init_routine) (void))
 {
-  // already done ?
-  if (once_control->state)
+  /* Sign bit of once_control->state is used as done flag.
+     Similarly, the next significant bit is used as destroyed flag. */
+  const int32_t DONE = 0x80000000;
+  const int32_t  DESTROYED = 0x40000000;
+  static_assert (sizeof (once_control->state) >= sizeof (int32_t));
+  static_assert (sizeof (once_control->state) == sizeof (LONG));
+  if (once_control->state & DONE)
     return 0;
 
-  pthread_mutex_lock (&once_control->mutex);
-  /* Here we must set a cancellation handler to unlock the mutex if needed */
-  /* but a cancellation handler is not the right thing. We need this in the thread
-   *cleanup routine. Assumption: a thread can only be in one pthread_once routine
-   *at a time. Stote a mutex_t *in the pthread_structure. if that's non null unlock
-   *on pthread_exit ();
-   */
-  if (!once_control->state)
+  /* The type of &once_control->state is int *, which is compatible with
+     LONG * (that is the type of the pointer argument of InterlockedXxx()). */
+  if ((InterlockedIncrement (&once_control->state) & DONE) == 0)
     {
-      init_routine ();
-      once_control->state = 1;
+      pthread_mutex_lock (&once_control->mutex);
+      if (!(once_control->state & DONE))
+	{
+	  init_routine ();
+	  InterlockedOr (&once_control->state, DONE);
+	}
       pthread_mutex_unlock (&once_control->mutex);
-      while (pthread_mutex_destroy (&once_control->mutex) == EBUSY);
-      return 0;
     }
-  /* Here we must remove our cancellation handler */
-  pthread_mutex_unlock (&once_control->mutex);
+  InterlockedDecrement (&once_control->state);
+  if (InterlockedCompareExchange (&once_control->state,
+				  DONE | DESTROYED, DONE) == DONE)
+    pthread_mutex_destroy (&once_control->mutex);
   return 0;
 }
 
