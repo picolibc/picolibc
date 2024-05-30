@@ -1635,6 +1635,9 @@ endif
 # make sure to include semihost BEFORE picocrt!
 if enable_picocrt
   subdir('picocrt')
+  picocrt_enable_caches = get_option('picocrt-enable-caches')
+  conf_data.set('PICOCRT_ENABLE_CACHES', picocrt_enable_caches,
+                description: 'Turn on caches in picocrt startup code')
 endif
 subdir('newlib')
 

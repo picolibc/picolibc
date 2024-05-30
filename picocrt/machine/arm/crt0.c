@@ -33,6 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <picolibc.h>
 #include "../../crt0.h"
 
 #if __ARM_ARCH_PROFILE == 'M'
@@ -107,6 +108,28 @@ _cstart(void)
 
 extern char __stack[];
 
+#ifdef PICOCRT_ENABLE_CACHES
+/* We need 4096 1MB mappings to cover the full 32-bit address space. */
+#define MMU_MAPPING_COUNT 4096
+extern uint32_t identity_page_table[MMU_MAPPING_COUNT];
+#define MMU_TYPE_1MB (0x2 << 0)
+#define MMU_RW (0x3 << 10)
+#define MMU_NORMAL_CACHEABLE ((0x0 << 12) | (0x3 << 2))
+#define MMU_MAPPING_FLAGS (MMU_TYPE_1MB | MMU_RW | MMU_NORMAL_CACHEABLE)
+__asm__(
+    ".rodata\n"
+    ".global identity_page_table\n"
+    ".balign 16384\n"
+    "identity_page_table:\n"
+    ".set _i, 0\n"
+    ".rept " __XSTRING(MMU_MAPPING_COUNT) "\n"
+    "  .4byte (_i << 20) |" __XSTRING(MMU_MAPPING_FLAGS) "\n"
+    "  .set _i, _i + 1\n"
+    ".endr\n"
+    ".size identity_page_table, " __XSTRING(MMU_MAPPING_COUNT * 4) "\n"
+);
+#endif
+
 void __attribute__((naked)) __section(".init") __attribute__((used))
 _start(void)
 {
@@ -131,6 +154,40 @@ _start(void)
 	/* Enable FPU */
 	__asm__("vmsr fpexc, %0" : : "r" (0x40000000));
 #endif
+
+#ifdef PICOCRT_ENABLE_CACHES
+#define SCTLR_MMU (1 << 0)
+#define SCTLR_DATA_L2 (1 << 2)
+#define SCTLR_BRANCH_PRED (1 << 11)
+#define SCTLR_ICACHE (1 << 12)
+    /* We have to set up an identity map and enable the MMU for caches.
+     * Additionally, all page table entries are set to Domain 0, so set up DACR
+     * so that Domain zero has permission checks enabled rather than "deny all".
+     */
+    __asm__(
+        "mov r0, #1\n"
+        "mcr p15, 0, r0, c3, c0, 0\n" /* Set DACR Domain 0 permissions checked */
+        "mcr p15, 0, %0, c2, c0, 0\n" /* Write TTBR */
+        /*
+         * No DSB since tables are statically initialized and dcache is off.
+         * We or identity_page_table with 0x3 to set the cacheable flag bits.
+         */
+        :: "r" ((uintptr_t)identity_page_table | 0x3) : "r0");
+    /* Note: we assume Data+L2 cache has been invalidated by reset. */
+    __asm__(
+        "mov r0, #0\n"
+        "mcr p15, 0, r0, c7, c5, 0\n" /* ICIALLU: invalidate instruction cache */
+        "mcr p15, 0, r0, c8, c7, 0\n" /* TLBIALL: invalidate TLB */
+        "mcr p15, 0, r0, c7, c5, 6\n" /* BPIALL: invalidate branch predictor */
+        "isb\n"
+        "mrc p15, 0, r0, c1, c0, 0\n" /* Read SCTLR */
+        /* Need to split this into two instructions due to immediate range. */
+        "orr r0, r0, #" __XSTRING(SCTLR_ICACHE | SCTLR_BRANCH_PRED) " \n"
+        "orr r0, r0, #" __XSTRING(SCTLR_DATA_L2 | SCTLR_MMU) " \n"
+        "mcr p15, 0, r0, c1, c0, 0\n" /* Write back SCTLR */
+        "isb\n"
+    );
+#endif  /* PICOCRT_ENABLE_CACHES */
 
 	/* Branch to C code */
 	__asm__("b _cstart");

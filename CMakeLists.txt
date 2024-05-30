@@ -220,6 +220,9 @@ set(_HAVE_INITFINI_ARRAY 1)
 # Support _init() and _fini() functions
 set(_HAVE_INIT_FINI 1)
 
+# Enable CPU caches in pico crt startup
+set(PICOCRT_ENABLE_CACHES 0)
+
 # Compiler has long double type
 picolibc_flag(_HAVE_LONG_DOUBLE)
 

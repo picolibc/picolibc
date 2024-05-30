@@ -23,6 +23,9 @@
 /* use thread local storage */
 #cmakedefine NEWLIB_TLS
 
+/* Turn on caches in picocrt startup code */
+#cmakedefine PICOCRT_ENABLE_CACHES
+
 /* use thread local storage */
 #cmakedefine PICOLIBC_TLS
 
