@@ -58,6 +58,7 @@ set(tests
   test-put
   test-efcvt
   test-fma
+  test-sprintf-percent-n
   malloc_stress
   posix-io
   )

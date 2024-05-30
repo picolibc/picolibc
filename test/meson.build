@@ -40,6 +40,7 @@ plain_tests_common = ['regex', 'ungetc',
                       'test-strchr',
 	              'test-memset', 'test-put',
 	              'test-raise',
+                      'test-sprintf-percent-n',
 	      ]
 
 math_tests_common = [
@@ -63,7 +64,10 @@ if newlib_nano_malloc or tests_enable_full_malloc_stress
 endif
 
 if tinystdio
-  plain_tests_common += 't_fmemopen'
+  plain_tests_common += [
+    't_fmemopen',
+    'test-vfscanf-percent-a',
+  ]
 endif
 
 if atomic_ungetc or atomic_signal
@@ -83,7 +87,6 @@ if (posix_io or not tinystdio) and tests_enable_posix_io
                     'test-fgetc',
                     'test-fgets-eof',
                     'test-wchar',
-                    'test-vfscanf-percent-a',
                    ]
   endif
 endif
