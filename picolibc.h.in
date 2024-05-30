@@ -364,6 +364,8 @@
 
 #cmakedefine _PRINTF_SMALL_ULTOA
 
+#cmakedefine _PRINTF_PERCENT_N
+
 #cmakedefine _LITE_EXIT
 
 #cmakedefine _MB_CAPABLE

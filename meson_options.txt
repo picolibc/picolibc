@@ -172,6 +172,8 @@ option('io-percent-b', type: 'boolean', value: false,
        description: 'enable proposed %b/%B format in printf and scanf in tinystdio (default: false)')
 option('printf-small-ultoa', type: 'boolean', value: true,
        description: 'Avoid softare division in decimal conversions')
+option('printf-percent-n', type: 'boolean', value: false,
+       description: 'Support %n in printf format strings (default: false)')
 option('minimal-io-long-long', type: 'boolean', value: false,
        description: 'enable long long type support in minimal printf/scanf')
 

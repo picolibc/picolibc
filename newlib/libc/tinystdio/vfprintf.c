@@ -1031,7 +1031,11 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                         my_putc (*pnt++, stream);
                 }
 #endif
-
+#ifdef _PRINTF_PERCENT_N
+            } else if (c == 'n') {
+                int *n_ptr = va_arg(ap, int *);
+                *n_ptr = stream_len;
+#endif
             } else {
                 if (c == 'd' || c == 'i') {
                     ultoa_signed_t x_s;
