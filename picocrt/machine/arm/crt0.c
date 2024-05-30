@@ -33,6 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <picolibc.h>
 #include "../../crt0.h"
 
 #if __ARM_ARCH_PROFILE == 'M'
@@ -92,31 +93,92 @@ _start(void)
 	__start();
 }
 
-#else
+#else /*  __ARM_ARCH_PROFILE == 'M' */
+
+#ifdef _PICOCRT_ENABLE_MMU
+
+#if __ARM_ARCH >= 7 && __ARM_ARCH_PROFILE != 'R'
+
+/*
+ * We need 4096 1MB mappings to cover the usual Normal memory space,
+ * which runs from 0x00000000 to 0x7fffffff along with the usual
+ * Device space which runs from 0x80000000 to 0xffffffff.
+ */
+#define MMU_NORMAL_COUNT 2048
+#define MMU_DEVICE_COUNT 2048
+extern uint32_t __identity_page_table[MMU_NORMAL_COUNT + MMU_DEVICE_COUNT];
+
+/* Bits within a short-form section PTE (1MB mapping) */
+#define MMU_NS_BIT      19
+#define MMU_NG_BIT      17
+#define MMU_S_BIT       16
+#define MMU_AP2_BIT     15
+#define MMU_TEX_BIT     12
+#define MMU_AP0_BIT     10
+#define MMU_XN_BIT      4
+#define MMU_BC_BIT      2
+#define MMU_PXN_BIT     0
+
+#define MMU_TYPE_1MB    (0x2 << 0)
+#define MMU_RW          (0x3 << MMU_AP0_BIT)
+
+/* Memory attributes when TEX[2] == 0 */
+#define MMU_STRONGLY_ORDERED    ((0 << MMU_TEX_BIT) | (0 << MMU_BC_BIT))
+#define MMU_SHAREABLE_DEVICE    ((0 << MMU_TEX_BIT) | (1 << MMU_BC_BIT))
+#define MMU_WT_NOWA             ((0 << MMU_TEX_BIT) | (2 << MMU_BC_BIT))
+#define MMU_WB_NOWA             ((0 << MMU_TEX_BIT) | (3 << MMU_BC_BIT))
+#define MMU_NON_CACHEABLE       ((1 << MMU_TEX_BIT) | (0 << MMU_BC_BIT))
+#define MMU_WB_WA               ((1 << MMU_TEX_BIT) | (3 << MMU_BC_BIT))
+#define MMU_NONSHAREABLE_DEVICE ((2 << MMU_TEX_BIT) | (0 << MMU_BC_BIT))
+
+/*
+ * Memory attributes when TEX[2] == 1. In this mode
+ * TEX[1:0] define the outer cache attributes and
+ * C, B define the inner cache attributes
+ */
+#define MMU_MEM_ATTR(_O, _I)    (((4 | (_O)) << MMU_TEX_BIT) | ((_I) << MMU_BC_BIT))
+#define MMU_MEM_ATTR_NC         0
+#define MMU_MEM_ATTR_WB_WA      1
+#define MMU_MEM_ATTR_WT_NOWA    2
+#define MMU_MEM_ATTR_WB_NOWA    3
+
+#define MMU_SHAREABLE           (1 << MMU_S_BIT)
+#define MMU_NORMAL_MEMORY       (MMU_MEM_ATTR(MMU_MEM_ATTR_WB_WA, MMU_MEM_ATTR_WB_WA) | MMU_SHAREABLE)
+#define MMU_DEVICE_MEMORY       (MMU_SHAREABLE_DEVICE)
+#define MMU_NORMAL_FLAGS        (MMU_TYPE_1MB | MMU_RW | MMU_NORMAL_MEMORY)
+#define MMU_DEVICE_FLAGS        (MMU_TYPE_1MB | MMU_RW | MMU_DEVICE_MEMORY)
+
+__asm__(
+    ".section .rodata\n"
+    ".global __identity_page_table\n"
+    ".balign 16384\n"
+    "__identity_page_table:\n"
+    ".set _i, 0\n"
+    ".rept " __XSTRING(MMU_NORMAL_COUNT) "\n"
+    "  .4byte (_i << 20) |" __XSTRING(MMU_NORMAL_FLAGS) "\n"
+    "  .set _i, _i + 1\n"
+    ".endr\n"
+    ".set _i, 0\n"
+    ".rept " __XSTRING(MMU_DEVICE_COUNT) "\n"
+    "  .4byte (1 << 31) | (_i << 20) |" __XSTRING(MMU_DEVICE_FLAGS) "\n"
+    "  .set _i, _i + 1\n"
+    ".endr\n"
+    ".size __identity_page_table, " __XSTRING((MMU_NORMAL_COUNT + MMU_DEVICE_COUNT) * 4) "\n"
+);
+#endif
+
+#endif /* _PICOCRT_ENABLE_MMU */
 
 /*
  * Regular ARM has an 8-entry exception vector and starts without SP
- * initialized, so start is a naked function
+ * initialized, so start is a naked function which sets up the stack
+ * and then branches here.
  */
 
 static void __attribute__((used)) __section(".init")
 _cstart(void)
 {
-	__start();
-}
-
-extern char __stack[];
-
-void __attribute__((naked)) __section(".init") __attribute__((used))
-_start(void)
-{
-	/* Generate a reference to __vector_table so we get one loaded */
-	__asm__(".equ __my_vector_table, __vector_table");
-
-	/* Initialize stack pointer */
-	__asm__("mov sp, %0" : : "r" (__stack));
-
-#ifdef __thumb2__
+#if __thumb2__ && __ARM_ARCH_PROFILE != 'A'
 	/* Make exceptions run in Thumb mode */
 	uint32_t sctlr;
 	__asm__("mrc p15, 0, %0, c1, c0, 0" : "=r" (sctlr));
@@ -131,6 +193,71 @@ _start(void)
 	/* Enable FPU */
 	__asm__("vmsr fpexc, %0" : : "r" (0x40000000));
 #endif
+
+#ifdef _PICOCRT_ENABLE_MMU
+
+#if __ARM_ARCH >= 7 && __ARM_ARCH_PROFILE != 'R'
+
+#define SCTLR_MMU (1 << 0)
+#define SCTLR_DATA_L2 (1 << 2)
+#define SCTLR_BRANCH_PRED (1 << 11)
+#define SCTLR_ICACHE (1 << 12)
+#define SCTLR_TRE       (1 << 28)
+
+        uint32_t        mmfr0;
+        __asm__("mrc p15, 0, %0, c0, c1, 4" : "=r" (mmfr0));
+
+        /* Check to see if the processor supports VMSAv7 or better */
+        if ((mmfr0 & 0xf) >= 3)
+        {
+                /* We have to set up an identity map and enable the MMU for caches.
+                 * Additionally, all page table entries are set to Domain 0, so set up DACR
+                 * so that Domain zero has permission checks enabled rather than "deny all".
+                 */
+
+                /* Set DACR Domain 0 permissions checked */
+                __asm__("mcr p15, 0, %0, c3, c0, 0\n" :: "r" (1));
+
+                /*
+                 * Write TTBR
+                 *
+                 * No DSB since tables are statically initialized and dcache is off.
+                 * We or __identity_page_table with 0x3 to set the cacheable flag bits.
+                 */
+                __asm__("mcr p15, 0, %0, c2, c0, 0\n"
+                        :: "r" ((uintptr_t)__identity_page_table | 0x3));
+
+                /* Note: we assume Data+L2 cache has been invalidated by reset. */
+                __asm__("mcr p15, 0, %0, c7, c5, 0\n" :: "r" (0)); /* ICIALLU: invalidate instruction cache */
+                __asm__("mcr p15, 0, %0, c8, c7, 0\n" :: "r" (0)); /* TLBIALL: invalidate TLB */
+                __asm__("mcr p15, 0, %0, c7, c5, 6\n" :: "r" (0)); /* BPIALL: invalidate branch predictor */
+                __asm__("isb\n");
+
+                /* Enable caches, branch prediction and the MMU. Disable TRE */
+                uint32_t sctlr;
+                __asm__("mrc p15, 0, %0, c1, c0, 0" : "=r" (sctlr));
+                sctlr |= SCTLR_ICACHE | SCTLR_BRANCH_PRED | SCTLR_DATA_L2 | SCTLR_MMU;
+                sctlr &= ~SCTLR_TRE;
+                __asm__("mcr p15, 0, %0, c1, c0, 0\n" :: "r" (sctlr));
+                __asm__("isb\n");
+        }
+#endif
+
+#endif /* _PICOCRT_ENABLE_MMU */
+
+	__start();
+}
+
+extern char __stack[];
+
+void __attribute__((naked)) __section(".init") __attribute__((used))
+_start(void)
+{
+	/* Generate a reference to __vector_table so we get one loaded */
+	__asm__(".equ __my_vector_table, __vector_table");
+
+	/* Initialize stack pointer */
+	__asm__("mov sp, %0" : : "r" (__stack));
 
 	/* Branch to C code */
 	__asm__("b _cstart");
@@ -239,7 +366,7 @@ arm_usagefault_isr(void)
     __asm__("bl  arm_fault");
 }
 
-#else
+#else /* __ARM_ARCH_PROFILE == 'M' */
 
 struct fault {
     unsigned int        r[7];
@@ -304,7 +431,6 @@ arm_data_abort_vector(void)
     __asm__("bl  arm_fault");
 }
 
-#endif
+#endif /* else __ARM_ARCH_PROFILE == 'M' */
 
-#endif
-
+#endif /* CRT0_SEMIHOST */

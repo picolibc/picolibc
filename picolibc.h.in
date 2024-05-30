@@ -23,6 +23,9 @@
 /* use thread local storage */
 #cmakedefine NEWLIB_TLS
 
+/* Turn on mmu in picocrt startup code */
+#cmakedefine _PICOCRT_ENABLE_MMU
+
 /* use thread local storage */
 #cmakedefine PICOLIBC_TLS
 

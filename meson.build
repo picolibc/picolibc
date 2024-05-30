@@ -1693,6 +1693,9 @@ endif
 # make sure to include semihost BEFORE picocrt!
 if enable_picocrt
   subdir('picocrt')
+  picocrt_enable_mmu = get_option('picocrt-enable-mmu')
+  conf_data.set('_PICOCRT_ENABLE_MMU', picocrt_enable_mmu,
+                description: 'Turn on mmu in picocrt startup code')
 endif
 subdir('newlib')
 
