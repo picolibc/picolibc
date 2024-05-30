@@ -229,6 +229,9 @@ set(_HAVE_INITFINI_ARRAY 1)
 # Support _init() and _fini() functions
 set(_HAVE_INIT_FINI 1)
 
+# Enable MMU in pico crt startup
+set(_PICOCRT_ENABLE_MMU 1)
+
 # Compiler has long double type
 picolibc_flag(_HAVE_LONG_DOUBLE)
 

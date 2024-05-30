@@ -62,6 +62,9 @@ option('picolib', type: 'boolean', value: true,
 option('picocrt', type: 'boolean', value: true,
        description: 'Include pico crt bits')
 
+option('picocrt-enable-mmu', type: 'boolean', value: true,
+       description: 'Enable memory management unit in picocrt startup')
+
 option('picocrt-lib', type: 'boolean', value: true,
        description: 'Include pico crt bits in lib form')
 
