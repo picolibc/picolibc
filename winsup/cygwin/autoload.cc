@@ -603,6 +603,8 @@ LoadDLLfuncEx3 (waveOutReset, winmm, 1, 0, 1)
 LoadDLLfuncEx3 (waveOutSetVolume, winmm, 1, 0, 1)
 LoadDLLfuncEx3 (waveOutUnprepareHeader, winmm, 1, 0, 1)
 LoadDLLfuncEx3 (waveOutWrite, winmm, 1, 0, 1)
+LoadDLLfuncEx3 (waveOutMessage, winmm, 1, 0, 1)
+LoadDLLfuncEx3 (waveOutGetDevCapsA, winmm, 1, 0, 1)
 
 LoadDLLfunc (accept, ws2_32)
 LoadDLLfunc (bind, ws2_32)

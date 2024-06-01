@@ -15,6 +15,7 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include <mmddk.h>
 
 ssize_t
 fhandler_dev_mixer::write (const void *ptr, size_t len)
@@ -88,7 +89,9 @@ int
 fhandler_dev_mixer::ioctl (unsigned int cmd, void *buf)
 {
   int ret = 0;
+  DWORD id, flag;
   DWORD vol;
+  WAVEOUTCAPS woc;
   switch (cmd)
     {
     case SOUND_MIXER_READ_DEVMASK:
@@ -115,7 +118,12 @@ fhandler_dev_mixer::ioctl (unsigned int cmd, void *buf)
       *(int *) buf = 1 << rec_source;
       break;
     case MIXER_WRITE (SOUND_MIXER_VOLUME):
+      waveOutMessage ((HWAVEOUT)WAVE_MAPPER, DRVM_MAPPER_PREFERRED_GET,
+		      (DWORD_PTR)&id, (DWORD_PTR)&flag);
+      waveOutGetDevCaps ((UINT)id, &woc, sizeof (woc));
       vol = volume_oss_to_winmm (*(int *) buf);
+      if (!(woc.dwSupport & WAVECAPS_LRVOLUME))
+	vol = max(vol & 0xffff, (vol >> 16) & 0xffff);
       if (waveOutSetVolume ((HWAVEOUT)WAVE_MAPPER, vol) != MMSYSERR_NOERROR)
 	{
 	  set_errno (EINVAL);
@@ -123,13 +131,17 @@ fhandler_dev_mixer::ioctl (unsigned int cmd, void *buf)
 	}
       break;
     case MIXER_READ (SOUND_MIXER_VOLUME):
-      DWORD vol;
+      waveOutMessage ((HWAVEOUT)WAVE_MAPPER, DRVM_MAPPER_PREFERRED_GET,
+		      (DWORD_PTR)&id, (DWORD_PTR)&flag);
+      waveOutGetDevCaps ((UINT)id, &woc, sizeof (woc));
       if (waveOutGetVolume ((HWAVEOUT)WAVE_MAPPER, &vol) != MMSYSERR_NOERROR)
 	{
 	  set_errno (EINVAL);
 	  ret = -1;
 	  break;
 	}
+      if (!(woc.dwSupport & WAVECAPS_LRVOLUME))
+	vol |= (vol & 0xffff) << 16;
       *(int *) buf = volume_winmm_to_oss (vol);
       break;
     default:
