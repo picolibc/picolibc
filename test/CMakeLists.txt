@@ -60,6 +60,18 @@ set(tests
   test-fma
   malloc_stress
   posix-io
+  test-memcpy_s
+  test-memset_s
+  test-memmove_s
+  test-strcat_s
+  test-strcpy_s
+  test-strerror_s
+  test-strerrorlen_s
+  test-strncat_s
+  test-strncpy_s
+  test-strnlen_s
+  test-rsize_max_s
+  test-sprintf_s
   )
 
 set(tests_fail

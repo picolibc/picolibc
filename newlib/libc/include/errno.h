@@ -36,6 +36,16 @@ SUCH DAMAGE.
 
 #ifndef __error_t_defined
 typedef int error_t;
+
+#ifdef __STDC_WANT_LIB_EXT1__
+#if (__STDC_WANT_LIB_EXT1__ != 0) && (__STDC_WANT_LIB_EXT1__ != 1)
+#error Please define __STDC_WANT_LIB_EXT__ as 0 or 1
+#endif
+#if __STDC_WANT_LIB_EXT1__ == 1
+typedef int errno_t;
+#endif
+#endif
+
 #define __error_t_defined 1
 #endif
 

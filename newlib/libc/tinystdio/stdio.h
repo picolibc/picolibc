@@ -335,6 +335,25 @@ FILE	*funopen (const void *cookie,
 # define	fropen(__cookie, __fn) funopen(__cookie, __fn, NULL, NULL, NULL)
 # define	fwopen(__cookie, __fn) funopen(__cookie, NULL, __fn, NULL, NULL)
 #endif /*__BSD_VISIBLE */
+
+
+#ifdef __STDC_WANT_LIB_EXT1__
+#if (__STDC_WANT_LIB_EXT1__ != 0) && (__STDC_WANT_LIB_EXT1__ != 1)
+#error Please define __STDC_WANT_LIB_EXT__ as 0 or 1
+#endif
+
+#if __STDC_WANT_LIB_EXT1__ == 1
+#include <errno.h>
+
+#ifndef __RSIZE_T
+#define __RSIZE_T
+typedef size_t rsize_t;
+#endif
+extern int sprintf_s(char *__restrict __s, rsize_t __bufsize,
+        const char *__restrict __format, ...);
+#endif
+#endif
+
 /*
  * The format of tmpnam names is TXXXXXX, which works with mktemp
  */

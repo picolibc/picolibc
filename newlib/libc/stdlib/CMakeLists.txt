@@ -115,6 +115,8 @@ picolibc_sources(
   pico-exit.c
   pico-onexit.c
   pico-cxa-atexit.c
+  set_constraint_handler_s.c
+  rsizet.c
   )
 
 picolibc_sources_flags("-fno-builtin-malloc;-fno-builtin-free"

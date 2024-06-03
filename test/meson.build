@@ -552,6 +552,24 @@ foreach target : targets
     plain_tests += 'stack-smash'
   endif
 
+  plain_tests += ['test-memcpy_s',
+                  'test-memset_s',
+                  'test-memmove_s',
+                  'test-strcat_s',
+                  'test-strcpy_s',
+                  'test-strerror_s',
+                  'test-strerrorlen_s',
+                  'test-strncat_s',
+                  'test-strncpy_s',
+                  'test-strnlen_s',
+                  'test-rsize_max_s',
+                  ]
+
+  if tinystdio
+    plain_tests += 'test-sprintf_s'
+  endif
+
+
   foreach t1 : plain_tests
     t1_src = t1 + '.c'
     if target == ''

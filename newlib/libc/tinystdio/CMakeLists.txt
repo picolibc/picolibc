@@ -163,6 +163,7 @@ picolibc_sources(
   vwscanf.c
   wprintf.c
   wscanf.c
+  sprintf_s.c
   )
 
 picolibc_sources(
