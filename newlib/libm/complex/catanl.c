@@ -33,6 +33,8 @@
 #include <math.h>
 #include "cephes_subrl.h"
 
+/* On platforms where long double is as wide as double.  */
+#ifdef _LDBL_EQ_DBL
 #ifdef __weak_alias
 __weak_alias(catanl, _catanl)
 #endif
@@ -72,4 +74,4 @@ ovrf:
 	w = HUGE_VALL + HUGE_VALL * I;
 	return w;
 }
-
+#endif

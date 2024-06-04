@@ -33,6 +33,8 @@
 #include <math.h>
 #include "cephes_subrl.h"
 
+/* On platforms where long double is as wide as double.  */
+#ifdef _LDBL_EQ_DBL
 long double complex
 csinl(long double complex z)
 {
@@ -43,3 +45,4 @@ csinl(long double complex z)
 	w = sinl(creall(z)) * ch + (cosl(creall(z)) * sh) * I;
 	return w;
 }
+#endif

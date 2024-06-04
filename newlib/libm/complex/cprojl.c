@@ -45,6 +45,9 @@ __RCSID("$NetBSD: cprojl.c,v 1.7 2014/10/10 00:48:18 christos Exp $");
  *
  * INFINITY + I * copysign(0.0, cimag(z))
  */
+
+/* On platforms where long double is as wide as double.  */
+#ifdef _LDBL_EQ_DBL
 long double complex
 cprojl(long double complex z)
 {
@@ -62,3 +65,4 @@ cprojl(long double complex z)
 
 	return (w.z);
 }
+#endif

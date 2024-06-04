@@ -7,12 +7,11 @@
 #include <complex.h>
 #include <math.h>
 
+/* On platforms where long double is as wide as double.  */
+#ifdef _LDBL_EQ_DBL
 long double
 cargl(long double complex z)
-{     
-       #ifdef _LDBL_EQ_DBL
+{
          return carg (z);
-       #else
-         return atan2l (cimagl (z), creall (z));
-       #endif
 }
+#endif
