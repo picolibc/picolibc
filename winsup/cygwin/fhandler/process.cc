@@ -1337,9 +1337,39 @@ extern "C" {
   struct mntent *getmntent (FILE *);
 };
 
+static size_t
+escape_string_length (const char *str, const char *escapees)
+{
+  size_t i, len = 0;
+
+  for (i = strcspn (str, escapees);
+       str[i];
+       i += strcspn (str + i + 1, escapees) + 1)
+    len += 3;
+  return len + i;
+}
+
+static size_t
+escape_string (char *destbuf, const char *str, const char *escapees)
+{
+  size_t s, i;
+  char *p = destbuf;
+
+  for (s = 0, i = strcspn (str, escapees);
+       str[i];
+       s = i + 1, i += strcspn (str + s, escapees) + 1)
+    {
+      p = stpncpy (p, str + s, i - s);
+      p += __small_sprintf (p, "\\%03o", (int)(unsigned char) str[i]);
+    }
+  p = stpcpy (p, str + s);
+  return (p - destbuf);
+}
+
 static off_t
 format_process_mountstuff (void *data, char *&destbuf, bool mountinfo)
 {
+  static const char MOUNTSTUFF_ESCAPEES[] = " \t\n\\#";
   _pinfo *p = (_pinfo *) data;
   user_info *u_shared = NULL;
   HANDLE u_hdl = NULL;
@@ -1389,9 +1419,9 @@ format_process_mountstuff (void *data, char *&destbuf, bool mountinfo)
 	    continue;
 	}
       destbuf = (char *) crealloc_abort (destbuf, len
-						  + strlen (mnt->mnt_fsname)
-						  + strlen (mnt->mnt_dir)
-						  + strlen (mnt->mnt_type)
+						  + escape_string_length (mnt->mnt_fsname, MOUNTSTUFF_ESCAPEES)
+						  + escape_string_length (mnt->mnt_dir, MOUNTSTUFF_ESCAPEES)
+						  + escape_string_length (mnt->mnt_type, MOUNTSTUFF_ESCAPEES)
 						  + strlen (mnt->mnt_opts)
 						  + 30);
       if (mountinfo)
@@ -1400,18 +1430,44 @@ format_process_mountstuff (void *data, char *&destbuf, bool mountinfo)
 	  dev_t dev = pc.exists () ? pc.fs_serial_number () : -1;
 
 	  len += __small_sprintf (destbuf + len,
-				  "%d %d %d:%d / %s %s - %s %s %s\n",
+				  "%d %d %d:%d / ",
 				  iteration, iteration,
-				  major (dev), minor (dev),
-				  mnt->mnt_dir, mnt->mnt_opts,
-				  mnt->mnt_type, mnt->mnt_fsname,
+				  major (dev), minor (dev));
+	  len += escape_string (destbuf + len,
+				mnt->mnt_dir,
+				MOUNTSTUFF_ESCAPEES);
+	  len += __small_sprintf (destbuf + len,
+				  " %s - ",
+				  mnt->mnt_opts);
+	  len += escape_string (destbuf + len,
+				mnt->mnt_type,
+				MOUNTSTUFF_ESCAPEES);
+	  destbuf[len++] = ' ';
+	  len += escape_string (destbuf + len,
+				mnt->mnt_fsname,
+				MOUNTSTUFF_ESCAPEES);
+	  len += __small_sprintf (destbuf + len,
+				  " %s\n",
 				  (pc.fs_flags () & FILE_READ_ONLY_VOLUME)
 				  ? "ro" : "rw");
 	}
       else
-	len += __small_sprintf (destbuf + len, "%s %s %s %s %d %d\n",
-				mnt->mnt_fsname, mnt->mnt_dir, mnt->mnt_type,
-				mnt->mnt_opts, mnt->mnt_freq, mnt->mnt_passno);
+        {
+	  len += escape_string (destbuf + len,
+				mnt->mnt_fsname,
+				MOUNTSTUFF_ESCAPEES);
+	  destbuf[len++] = ' ';
+	  len += escape_string (destbuf + len,
+				mnt->mnt_dir,
+				MOUNTSTUFF_ESCAPEES);
+	  destbuf[len++] = ' ';
+	  len += escape_string (destbuf + len,
+				mnt->mnt_type,
+				MOUNTSTUFF_ESCAPEES);
+	  len += __small_sprintf (destbuf + len, " %s %d %d\n",
+				  mnt->mnt_opts, mnt->mnt_freq,
+				  mnt->mnt_passno);
+	}
     }
 
   /* Restore available_drives */
