@@ -1717,7 +1717,10 @@ _cygtls::call_signal_handler ()
 		 context, unwind to the caller and in case we're called
 		 from sigdelayed, fix the instruction pointer accordingly. */
 	      context.uc_mcontext.ctxflags = CONTEXT_FULL;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 	      RtlCaptureContext ((PCONTEXT) &context.uc_mcontext);
+#pragma GCC diagnostic pop
 	      __unwind_single_frame ((PCONTEXT) &context.uc_mcontext);
 	      if (stackptr > stack)
 		{
