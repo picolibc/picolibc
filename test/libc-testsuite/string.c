@@ -54,26 +54,27 @@
 
 int test_string(void)
 {
-	char b[32];
-	char *s;
+        char b[32] = {0};
+        char c[32] = {0};
+	char *s = NULL;
 	int i;
 	int err=0;
 
-	b[16]='a'; b[17]='b'; b[18]='c'; b[19]=0;
-	TEST(s, strcpy(b, b+16), b, "wrong return %p != %p");
+	c[0]='a'; c[1]='b'; c[2]='c'; c[3]=0;
+	TEST(s, strcpy(b, c), b, "wrong return %p != %p");
 	TEST_S(s, "abc", "strcpy gave incorrect string");
-	TEST(s, strcpy(b+1, b+16), b+1, "wrong return %p != %p");
+	TEST(s, strcpy(b+1, c), b+1, "wrong return %p != %p");
 	TEST_S(s, "abc", "strcpy gave incorrect string");
-	TEST(s, strcpy(b+2, b+16), b+2, "wrong return %p != %p");
+	TEST(s, strcpy(b+2, c), b+2, "wrong return %p != %p");
 	TEST_S(s, "abc", "strcpy gave incorrect string");
-	TEST(s, strcpy(b+3, b+16), b+3, "wrong return %p != %p");
+	TEST(s, strcpy(b+3, c), b+3, "wrong return %p != %p");
 	TEST_S(s, "abc", "strcpy gave incorrect string");
 
-	TEST(s, strcpy(b+1, b+17), b+1, "wrong return %p != %p");
+	TEST(s, strcpy(b+1, c+1), b+1, "wrong return %p != %p");
 	TEST_S(s, "bc", "strcpy gave incorrect string");
-	TEST(s, strcpy(b+2, b+18), b+2, "wrong return %p != %p");
+	TEST(s, strcpy(b+2, c+2), b+2, "wrong return %p != %p");
 	TEST_S(s, "c", "strcpy gave incorrect string");
-	TEST(s, strcpy(b+3, b+19), b+3, "wrong return %p != %p");
+	TEST(s, strcpy(b+3, c+3), b+3, "wrong return %p != %p");
 	TEST_S(s, "", "strcpy gave incorrect string");
 
 	TEST(s, memset(b, 'x', sizeof b), b, "wrong return %p != %p");
