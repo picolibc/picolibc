@@ -23,6 +23,7 @@
 //#include <ieeefp.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #ifdef INCLUDE_GENERATE
 #define TEST_CONST
@@ -215,6 +216,7 @@ int fmag_of_error (float, float);
   char buffer[100];\
    sprintf(buffer,"%s_vec.c",x);\
     f = fopen(buffer,"w");\
+    if (!f) { perror(buffer); exit(1); } \
      fprintf(f,"#include \"test.h\"\n");\
       fprintf(f," one_line_type %s_vec[] = {\n", x);\
 }
