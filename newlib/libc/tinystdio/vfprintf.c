@@ -983,8 +983,11 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 
             pnt = NULL;
 #endif
-
-            if (c == 'c') {
+            if (c == 'n') {
+                int *n_ptr = va_arg(ap, int *);
+                *n_ptr = stream_len;
+            }
+            else if (c == 'c') {
 #ifdef WIDE_CHARS
                 c_arg = va_arg (ap, int);
                 if (!(flags & FL_LONG))

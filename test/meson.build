@@ -540,6 +540,7 @@ foreach target : targets
                       'test-ungetc-ftell',
                       'test-fgetc',
                       'test-fgets-eof',
+                      'test-fprintf',
                      ]
     endif
   endif
