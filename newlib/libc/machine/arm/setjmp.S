@@ -183,6 +183,7 @@ SYM (.arm_start_of.\name):
 	MODE
 	.globl SYM (\name)
 	.fnstart
+	.cfi_sections .debug_frame
 	.cfi_startproc
 	TYPE (\name)
 SYM (\name):

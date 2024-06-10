@@ -33,6 +33,7 @@
 	.global __aeabi_memset
 	.type	__aeabi_memset, %function
 	.fnstart
+	.cfi_sections .debug_frame
 	.cfi_startproc
 	ASM_ALIAS __aeabi_memset4 __aeabi_memset
 	ASM_ALIAS __aeabi_memset8 __aeabi_memset

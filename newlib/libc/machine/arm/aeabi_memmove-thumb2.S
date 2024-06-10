@@ -36,6 +36,7 @@
 	ASM_ALIAS __aeabi_memmove8 __aeabi_memmove
 __aeabi_memmove:
 	.fnstart
+	.cfi_sections .debug_frame
 	.cfi_startproc
 	prologue 4
 	cmp	r0, r1

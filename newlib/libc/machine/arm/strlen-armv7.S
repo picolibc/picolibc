@@ -106,6 +106,7 @@
 
 def_fn	strlen p2align=6
 	.fnstart
+	.cfi_sections .debug_frame
 	.cfi_startproc
 	prologue 4 5 push_ip=HAVE_PAC_LEAF
 	pld	[srcin, #0]

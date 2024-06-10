@@ -88,6 +88,7 @@
 	.thumb
 	.thumb_func
 	.fnstart
+	.cfi_sections .debug_frame
 	.cfi_startproc
 	.type	memcpy, %function
 memcpy:
