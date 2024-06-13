@@ -337,6 +337,8 @@
 
 #if __GNUC_PREREQ__(4,5) || defined(__clang__)
 #define __picolibc_deprecated(m) __attribute__((__deprecated__(m)))
+#elif __GNUC_PREREQ__(3,1)
+#define __picolibc_deprecated(m) __attribute__((__deprecated__))
 #else
 #define __picolibc_deprecated(m) _ATTRIBUTE(__deprecated__)
 #endif
