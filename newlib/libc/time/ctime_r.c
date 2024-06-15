@@ -22,7 +22,7 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 char *
 ctime_r (const time_t * tim_p,
-        char * result)
+        char result[__restrict static __ASCTIME_SIZE])
 
 {
   struct tm tm;

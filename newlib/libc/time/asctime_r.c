@@ -20,10 +20,11 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 #include <stdio.h>
 #include <time.h>
+#include <errno.h>
 
 char *
 asctime_r (const struct tm *__restrict tim_p,
-	char *__restrict result)
+           char result[__restrict static __ASCTIME_SIZE])
 {
   static const char day_name[7][3] = {
 	"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
@@ -33,10 +34,23 @@ asctime_r (const struct tm *__restrict tim_p,
 	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   };
 
-  sprintf (result, "%.3s %.3s%3d %.2d:%.2d:%.2d %d\n",
-	    day_name[tim_p->tm_wday], 
-	    mon_name[tim_p->tm_mon],
-	    tim_p->tm_mday, tim_p->tm_hour, tim_p->tm_min,
-	    tim_p->tm_sec, 1900 + tim_p->tm_year);
+  int n;
+
+  n = snprintf (result, __ASCTIME_SIZE, "%.3s %.3s%3d %.2d:%.2d:%.2d %d\n",
+                day_name[tim_p->tm_wday], 
+                mon_name[tim_p->tm_mon],
+                tim_p->tm_mday, tim_p->tm_hour, tim_p->tm_min,
+                tim_p->tm_sec, 1900 + tim_p->tm_year);
+
+  if (n < 0)
+      return NULL;
+
+  if (n >= __ASCTIME_SIZE)
+      goto eoverflow;
+
   return result;
+
+eoverflow:
+  errno = EOVERFLOW;
+  return NULL;
 }
