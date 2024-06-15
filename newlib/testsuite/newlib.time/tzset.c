@@ -113,6 +113,8 @@ const struct tz_test test_timezones[] = {
 
     /// test parsing errors
     // 1. names are too long
+#ifdef __PICOLIBC__
+    /* glibc is more lenient about name lengths, don't check on that */
     {"JUSTEXCEEDI1:11:11",                                      0,   NO_TIME},
     {"AVERYLONGNAMEWHICHEXCEEDSTZNAMEMAX2:22:22",               0,   NO_TIME},
     {"FIRSTVERYLONGNAME3:33:33SECONDVERYLONGNAME4:44:44",       0,   0},
@@ -125,7 +127,8 @@ const struct tz_test test_timezones[] = {
     {"HE6:34:47LO3:34:47",      0,   0},
     {"<AB>2:34:47",             0,   NO_TIME},
     {"<AB>2:34:47<CD>3:34:47",  0,   0},
-    
+#endif
+
     // 3. names contain invalid chars
     {"N?ME2:10:56",     0,   NO_TIME},
     {"N!ME2:10:56",     0,   NO_TIME},
