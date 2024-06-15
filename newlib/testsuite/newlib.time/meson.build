@@ -33,7 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-tests = ['tzset']
+tests = ['tzset', 'asctime']
 
 foreach target : targets
   value = get_variable('target_' + target)
