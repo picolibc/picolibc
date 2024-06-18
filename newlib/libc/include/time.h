@@ -123,8 +123,19 @@ extern size_t strftime_l (char *__restrict _s, size_t _maxsize,
 #define __ASCTIME_SIZE 26
 
 char	  *asctime_r 	(const struct tm *__restrict,
-				 char [__restrict static __ASCTIME_SIZE]);
-char	  *ctime_r 	(const time_t *, char [__restrict static __ASCTIME_SIZE]);
+#ifndef __cplusplus
+                         char [__restrict static __ASCTIME_SIZE]
+#else
+                         char *__restrict
+#endif
+                        );
+char	  *ctime_r 	(const time_t *,
+#ifndef __cplusplus
+                         char [__restrict static __ASCTIME_SIZE]
+#else
+                         char *__restrict
+#endif
+                        );
 struct tm *gmtime_r 	(const time_t *__restrict,
 				 struct tm *__restrict);
 struct tm *localtime_r 	(const time_t *__restrict,
