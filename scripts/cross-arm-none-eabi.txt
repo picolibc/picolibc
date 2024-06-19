@@ -4,6 +4,7 @@
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
 c = ['ccache', 'arm-none-eabi-gcc', '-nostdlib']
+cpp = ['ccache', 'arm-none-eabi-g++', '-nostdlib']
 ar = 'arm-none-eabi-ar'
 as = 'arm-none-eabi-as'
 nm = 'arm-none-eabi-nm'
