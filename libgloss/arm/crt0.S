@@ -48,6 +48,7 @@
 	.thumb
 .macro FUNC_START name
 	.global \name
+	.type \name, %function
 	.thumb_func
 \name:
 .endm
@@ -55,6 +56,7 @@
 	.code 32
 .macro FUNC_START name
 	.global \name
+	.type \name, %function
 \name:
 .endm
 #endif
