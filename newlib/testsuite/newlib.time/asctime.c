@@ -83,6 +83,7 @@ static struct {
             .tm_mday    = 21,
             .tm_mon     = 3 - 1,
             .tm_year    = 2022 - 1900,
+            .tm_wday = 0,
             .tm_isdst   = 0
         },
         .result = "Sun Mar 21 20:15:20 2022\n",
@@ -97,11 +98,44 @@ static struct {
             .tm_mday    = 15,
             .tm_mon     = 7 - 1,
             .tm_year    = 2022 - 1900,
+            .tm_wday = 0,
             .tm_isdst   = 1
         },
         .result = "Sun Jul 15 10:50:40 2022\n",
         ._errno = 0,
     },
+#if defined(__GLIBC__) || defined(__PICOLIBC__)
+    {
+        /* Invalid wday */
+        .tm = {
+            .tm_sec     = 40,
+            .tm_min     = 50,
+            .tm_hour    = 10,
+            .tm_mday    = 15,
+            .tm_mon     = 7 - 1,
+            .tm_year    = 2022 - 1900,
+            .tm_wday    = -1,
+            .tm_isdst   = 1
+        },
+        .result = "??? Jul 15 10:50:40 2022\n",
+        ._errno = 0,
+    },
+    {
+        /* Invalid mon */
+        .tm = {
+            .tm_sec     = 40,
+            .tm_min     = 50,
+            .tm_hour    = 10,
+            .tm_mday    = 15,
+            .tm_mon     = 12,
+            .tm_year    = 2022 - 1900,
+            .tm_wday    = 1,
+            .tm_isdst   = 1
+        },
+        .result = "Mon ??? 15 10:50:40 2022\n",
+        ._errno = 0,
+    },
+#endif
 };
 
 static int mylen(const char *s)

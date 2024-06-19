@@ -22,6 +22,9 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #include <time.h>
 #include <errno.h>
 
+#define oob(x,a) ((unsigned)(x) >= sizeof(a)/sizeof(a[0]))
+#define valid(x,a)   (oob(x,a) ? "???" : a[x])
+
 char *
 asctime_r (const struct tm *__restrict tim_p,
            char result[__restrict static __ASCTIME_SIZE])
@@ -30,15 +33,15 @@ asctime_r (const struct tm *__restrict tim_p,
 	"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
   };
   static const char mon_name[12][3] = {
-	"Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+	"Jan", "Feb", "Mar", "Apr", "May", "Jun",
 	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   };
 
   int n;
 
   n = snprintf (result, __ASCTIME_SIZE, "%.3s %.3s%3d %.2d:%.2d:%.2d %d\n",
-                day_name[tim_p->tm_wday], 
-                mon_name[tim_p->tm_mon],
+                valid(tim_p->tm_wday, day_name),
+                valid(tim_p->tm_mon, mon_name),
                 tim_p->tm_mday, tim_p->tm_hour, tim_p->tm_min,
                 tim_p->tm_sec, 1900 + tim_p->tm_year);
 
