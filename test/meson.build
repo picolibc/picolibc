@@ -56,6 +56,9 @@ foreach target : targets
   _c_args = value[1] + get_variable('test_c_args_' + target, test_c_args)
   _link_args = value[1] + get_variable('test_link_args_' + target, test_link_args)
   _link_depends = get_variable('test_link_depends_' + target, test_link_depends)
+  if have_cplusplus
+    _cpp_args = value[1] + get_variable('test_cpp_args_' + target, test_cpp_args)
+  endif
 
   t1 = 'printf_scanf'
   if target == ''
@@ -571,6 +574,23 @@ foreach target : targets
 	 env: test_env)
   endforeach
 
+  if have_cplusplus
+    t1 = 'test-cplusplus'
+    t1_src = t1 + '.cpp'
+    if target == ''
+      t1_name = t1
+    else
+      t1_name = t1 + '_' + target
+    endif
+    test(t1_name,
+         executable(t1_name, t1_src,
+                    cpp_args: _cpp_args,
+		    link_args: _cpp_args + _link_args,
+		    objects: _objs,
+		    link_with: _libs,
+		    link_depends:  _link_depends,
+                    include_directories: inc))
+  endif
 endforeach
 
 if enable_native_tests
@@ -641,7 +661,14 @@ if enable_native_tests
        executable('test-fread-fwrite-native', 'test-fread-fwrite.c',
 		  c_args: native_c_args + ['-DTEST_FILE_NAME="test-fread-fwrite-native.txt"'],
 		  link_args: native_c_args))
-       
+
+  if have_cplusplus
+    test('test-cplusplus-native',
+         executable('test-cplusplus-native', 'test-cplusplus.cpp',
+                    cpp_args: native_cpp_args,
+		    link_args: native_cpp_args))
+  endif
+
 endif
 
 subdir('libc-testsuite')
