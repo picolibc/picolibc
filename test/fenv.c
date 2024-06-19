@@ -67,7 +67,7 @@ volatile test_t zero = 0.0;
 volatile test_t two = 2.0;
 volatile test_t huge = huge_val;
 volatile test_t tiny = tiny_val;
-volatile test_t inf = INFINITY;
+volatile test_t inf = (test_t) INFINITY;
 
 #define lowbit(x) 	((x) & -(x))
 #define ispoweroftwo(x)	(((x) & ((x) - 1)) == 0)
