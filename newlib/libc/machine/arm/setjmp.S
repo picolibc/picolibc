@@ -3,6 +3,8 @@
    Copyright (c) 1997 Nick Clifton, Cygnus Solutions
  */
 
+#include <picolibc.h>
+
 #include "machine/acle-compat.h"
 
 /* ANSI concatenation macros.  */

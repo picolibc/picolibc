@@ -31,6 +31,8 @@
 /* This implementation is optimized for performance.  For code size a generic
    implementation of this function from newlib/libc/string/strlen.c will be
    used.  */
+#include <picolibc.h>
+
 #if !defined (__OPTIMIZE_SIZE__) && !defined (PREFER_SIZE_OVER_SPEED)
 
 #include "asm.h"

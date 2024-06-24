@@ -9,6 +9,8 @@
    http://www.opensource.org/licenses.
 */
 
+#include <picolibc.h>
+
 	.section	.text
 	.align	3
 	.globl	setjmp

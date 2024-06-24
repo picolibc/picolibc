@@ -11,6 +11,8 @@
  * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#include <picolibc.h>
+
 .section .text
 .global setjmp
 _setjmp:

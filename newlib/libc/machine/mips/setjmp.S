@@ -18,6 +18,8 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
    Ian Lance Taylor, Cygnus Support, 13 May 1993.  */
 
+#include <picolibc.h>
+
 #ifdef __mips16
 /* This file contains 32 bit assembly code.  */
 	.set nomips16

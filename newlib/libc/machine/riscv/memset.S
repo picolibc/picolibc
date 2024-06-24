@@ -9,6 +9,8 @@
    http://www.opensource.org/licenses.
 */
 
+#include <picolibc.h>
+
 .section .text.memset
 .global memset
 .type	memset, @function

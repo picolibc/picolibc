@@ -33,6 +33,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#include <picolibc.h>
+
 #include "arm_tls.h"
 /*
  * This cannot be a C ABI function as the compiler assumes that it

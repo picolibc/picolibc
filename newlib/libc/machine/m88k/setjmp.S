@@ -25,6 +25,8 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
    bytes long in the one case, 84 bytes in the other.  */
 
 /* int setjmp (jmp_buf);  */
+#include <picolibc.h>
+
 	globl	_setjmp
 _setjmp:
 	st	r1,r2,0

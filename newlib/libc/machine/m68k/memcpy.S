@@ -13,6 +13,8 @@
  * they apply.
  */
 
+#include <picolibc.h>
+
 #include "m68kasm.h"
 
 #if defined (__mcoldfire__) || defined (__mc68020__) || defined (__mc68030__) || defined (__mc68040__) || defined (__mc68060__)

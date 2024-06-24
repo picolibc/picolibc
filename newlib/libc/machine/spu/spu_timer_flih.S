@@ -39,6 +39,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
    Note:       first must be less than or equal to last.  */
 
+#include <picolibc.h>
+
 .macro  saveregs        first, last
 	stqd            $\first, -(STACK_SKIP+\first)*16($SP)
 .if     \last-\first

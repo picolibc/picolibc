@@ -33,6 +33,8 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <picolibc.h>
+
 #define SPARC_NWIN	8
 
 #define PSR_VER_BIT                     24

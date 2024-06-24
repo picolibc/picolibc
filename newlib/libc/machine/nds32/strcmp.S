@@ -41,6 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       zero if s1 (or the first n bytes thereof) is found, respectively,
       to be less than, to match, or be greater than s2.
 */
+#include <picolibc.h>
+
 	.text
 	.align	2
 	.globl	strcmp

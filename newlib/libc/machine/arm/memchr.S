@@ -73,6 +73,8 @@
 
 @ This code requires armv6t2 or later.  Uses Thumb2.
 
+#include <picolibc.h>
+
 	.syntax unified
 
 #include "arm_asm.h"

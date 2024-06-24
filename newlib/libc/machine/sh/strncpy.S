@@ -1,5 +1,7 @@
 /* Copyright 2003 SuperH Ltd.  */
 
+#include <picolibc.h>
+
 #include "asm.h"
 
 #ifdef __SH5__

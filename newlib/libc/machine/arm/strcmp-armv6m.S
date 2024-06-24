@@ -30,6 +30,8 @@
    ARMv6-M when we want an efficient implementation.  Otherwize if the
    code size is preferred, strcmp-armv4t.S will be used.  */
 
+#include <picolibc.h>
+
 	.thumb_func
 	.syntax unified
 	.arch	armv6-m

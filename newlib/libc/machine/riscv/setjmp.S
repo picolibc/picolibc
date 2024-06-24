@@ -9,6 +9,8 @@
    http://www.opensource.org/licenses.
 */
 
+#include <picolibc.h>
+
 #include <sys/asm.h>
 
 /* int setjmp (jmp_buf);  */

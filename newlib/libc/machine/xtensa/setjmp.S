@@ -54,6 +54,8 @@
    Much like other ABIs, this version just saves the necessary registers
    to the stack and restores them later.  Much less needs to be done.  */
 
+#include <picolibc.h>
+
 #include "xtensa-asm.h"
 
 #define SYS_nop	0

@@ -13,6 +13,8 @@
  * they apply.
  */
 
+#include <picolibc.h>
+
 #include "m68kasm.h"
 
 	.text

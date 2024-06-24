@@ -16,6 +16,8 @@
 /*HPUX_ID:	@(#) $Revision$	*/
 /* strncat(s1,s2,n) : concatonate at most n characters from s2 onto s1 */
 
+#include <picolibc.h>
+
 #include "DEFS.h"
 
 #define	d_addr  r26

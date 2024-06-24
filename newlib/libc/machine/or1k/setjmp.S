@@ -24,6 +24,8 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <picolibc.h>
+
 .align  4
 .global setjmp
 .type   setjmp,@function

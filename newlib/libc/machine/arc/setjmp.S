@@ -32,6 +32,8 @@
    these are the stack mappings for the registers
    as stored in the ABI for ARC */
 
+#include <picolibc.h>
+
 #define ARC_REGSIZE	__SIZEOF_LONG__
 
 ABIr13	= 0

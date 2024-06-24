@@ -26,6 +26,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <picolibc.h>
+
 #include "arm_asm.h"
 
 /* NOTE: This ifdef MUST match the one in aeabi_memcpy.c.  */

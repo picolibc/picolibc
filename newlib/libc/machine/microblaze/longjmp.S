@@ -48,6 +48,8 @@
  *      |      .      |        
  */        
 
+#include <picolibc.h>
+
     
 .globl longjmp
 .section .text

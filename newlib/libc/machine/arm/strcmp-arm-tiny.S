@@ -29,6 +29,8 @@
 /* Tiny version of strcmp in ARM state.  Used only when optimizing
    for size.  Also supports Thumb-2.  */
 
+#include <picolibc.h>
+
 #include "arm_asm.h"
 
 	.syntax unified

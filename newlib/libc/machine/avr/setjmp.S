@@ -53,6 +53,8 @@
    void longjmp(jmp_buf __jmpb, int __val) __attribute__((noreturn));
  */
 
+#include <picolibc.h>
+
 #ifndef	__DOXYGEN__
 
 #include <avr/io.h>

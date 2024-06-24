@@ -11,6 +11,8 @@
    the new terms are clearly indicated on the first page of each file where
    they apply.  */
 
+#include <picolibc.h>
+
 # setjmp/longjmp for FT32.
 # Total jumpbuf size is 108 bytes, or 27 words.
 #        

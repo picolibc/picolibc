@@ -16,6 +16,8 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 /* These are predefined by new versions of GNU cpp.  */
 
+#include <picolibc.h>
+
 #ifndef __USER_LABEL_PREFIX__
 #define __USER_LABEL_PREFIX__ _
 #endif

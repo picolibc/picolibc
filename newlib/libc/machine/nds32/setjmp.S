@@ -46,6 +46,8 @@ The $r16 ~ $r19 are used to store D0/D1, keep them for backward-compatible.
 */
 
 /* int setjmp(jmp_buf env);  */
+#include <picolibc.h>
+
 	.text
 	.align	2
 	.global	setjmp

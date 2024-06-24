@@ -1,3 +1,5 @@
+#include <picolibc.h>
+
 ! Entry: arg0: destination
 !        arg1: source
 ! Exit:  result: destination

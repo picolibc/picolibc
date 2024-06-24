@@ -16,6 +16,8 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 /* We want to pretend we're in SHmedia mode, even when assembling for
    SHcompact.  */
+#include <picolibc.h>
+
 #if __SH5__ == 32 && ! __SHMEDIA__
 # undef __SHMEDIA__
 # define __SHMEDIA__ 1

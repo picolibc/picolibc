@@ -1,6 +1,8 @@
 /*
 Copyright (c) 2009 Nick Clifton <nickc@redhat.com>
  */
+#include <picolibc.h>
+
 	.file	"memmove.S"
 
 	.section .text

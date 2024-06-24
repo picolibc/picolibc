@@ -26,6 +26,8 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <picolibc.h>
+
 #define GPR_LAYOUT			\
 	REG_PAIR (x19, x20,  0);	\
 	REG_PAIR (x21, x22, 16);	\

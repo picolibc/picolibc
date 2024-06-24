@@ -30,6 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <picolibc.h>
+
 #if defined(__r8c_cpu__) || defined(__m16c_cpu__)
 #define A16 1
 #endif

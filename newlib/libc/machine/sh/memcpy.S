@@ -1,3 +1,5 @@
+#include <picolibc.h>
+
 !
 ! Fast SH memcpy
 !

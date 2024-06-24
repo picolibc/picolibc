@@ -43,6 +43,8 @@
    if defined (__ARM_ARCH_7A__) && defined (__ARM_FEATURE_UNALIGNED)
 
  */
+#include <picolibc.h>
+
 	.syntax unified
 	/* This implementation requires ARM state.  */
 	.arm

@@ -33,6 +33,8 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 /*
 	int setjmp( jmp_buf env );
 */
+#include <picolibc.h>
+
 	.text
 	.align	2
 	.global	setjmp

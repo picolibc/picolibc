@@ -23,6 +23,8 @@
  * SUCH DAMAGE.
  */
 /* setjmp/longjmp for LatticeMico32. */
+#include <picolibc.h>
+
  
 	.section	.text
 	.align	4

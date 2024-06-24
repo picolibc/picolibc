@@ -29,6 +29,8 @@
 /* Very similar to the generic code, but uses Thumb2 as implemented
    in ARMv7-M.  */
 
+#include <picolibc.h>
+
 #include "arm_asm.h"
 
 /* Parameters and result.  */

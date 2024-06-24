@@ -1,6 +1,8 @@
 /*
 Copyright (c) 2009 Nick Clifton <nickc@redhat.com>
  */
+#include <picolibc.h>
+
 # setjmp/longjmp for Renesas RX.
 # 
 # The jmpbuf looks like this:

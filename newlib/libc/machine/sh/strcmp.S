@@ -1,5 +1,7 @@
 /* SH5 code Copyright 2002 SuperH Ltd. */
 
+#include <picolibc.h>
+
 #include "asm.h"
 
 ENTRY(strcmp)

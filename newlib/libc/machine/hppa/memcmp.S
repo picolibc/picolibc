@@ -19,6 +19,8 @@
 /* 		    = 0 iff s1 lexicographically equal to s2 */
 /*  		    = 0 iff s1 lexicographically equal to s2 */
 /*		    quit after n charachters */
+#include <picolibc.h>
+
 #ifndef _NAMESPACE_CLEAN
 #define NOSECDEF   /* prevents _memcmp from becoming primary entry */
 #endif

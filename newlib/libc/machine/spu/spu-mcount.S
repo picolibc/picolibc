@@ -48,6 +48,8 @@ Author: Ken Werner <ken.werner@de.ibm.com>
    restoreregs  first, last    Restores registers from last down to first.
 
    Note:       first must be less than or equal to last.  */
+#include <picolibc.h>
+
 .macro  saveregs        first, last
         stqd            $\first, \first*16($SP)
 .if     \last-\first
