@@ -30,14 +30,8 @@
 #if defined(__NetBSD__)
 #include <atf-c.h>
 #else
-#if defined(__PICOLIBC__)
-#define _GNU_SOURCE  /* strnlen */
-#elif defined(__linux__)
-#define _GNU_SOURCE
-#include <features.h>
-#endif
+#define _POSIX_C_SOURCE 200809L /* for strnlen */
 #include <assert.h>
-#include <stdio.h>
 #define ATF_TC(arg0)		static void arg0##_head(void)
 #define ATF_TC_HEAD(arg0, arg1)	static void arg0##_head(void)
 #define atf_tc_set_md_var(arg0, arg1, ...) do {	\
