@@ -38,33 +38,31 @@
 #include <string.h>
 #include <stdlib.h>
 
-errno_t strcat_s(char *restrict s1, rsize_t s1max, const char *restrict s2) {
-    bool constraint_failure = false;
+errno_t strcat_s(char *restrict s1, rsize_t s1max, const char *restrict s2) 
+{
     const char *msg = "";
     size_t s1_len = 0;
-
     bool write_null = true;
-    if (!constraint_failure) {
-	if (s1 == NULL) {
-	    constraint_failure = true;
+	constraint_handler_t handler = NULL;
+
+	if (s1 == NULL)
+	{
 	    msg = "strcat_s: dest is NULL";
 	    write_null = false;
-	    }
+		goto handle_error;
 	}
 
-    if (!constraint_failure) {
-	if (s1max == 0 || s1max > RSIZE_MAX) {
-	    constraint_failure = true;
+	if (s1max == 0 || s1max > RSIZE_MAX)
+	{
 	    msg = "strcat_s: dest buffer size is 0 or exceeds RSIZE_MAX";
 	    write_null = false;
-	    }
+		goto handle_error;
 	}
 
-    if (!constraint_failure) {
-	if (s2 == NULL) {
-	    constraint_failure = true;
+	if (s2 == NULL) 
+	{
 	    msg = "strcat_s: source is NULL";
-	    }
+		goto handle_error;
 	}
 
     /* It is a constraint violation if s1max is not large enough to contain
@@ -76,83 +74,90 @@ errno_t strcat_s(char *restrict s1, rsize_t s1max, const char *restrict s2) {
      * of performing the copy operation.  This is to avoid calling strlen on
      * s2 to detect these violations prior to attempting the copy.
      */
-    if (!constraint_failure) {
 	// compute chars available in s1
 	s1_len = strnlen_s(s1, s1max);
-	if (s1_len == s1max) {
-	    constraint_failure = true;
+	if (s1_len == s1max) 
+	{
 	    msg = "strcat_s: string 1 length exceeds buffer size";
-	    }
+		goto handle_error;
 	}
 
-    if (!constraint_failure) {
 	const char *overlap_point;
 	bool check_s1_for_overlap;
 	unsigned m = s1max - s1_len;
 	char *s1cp = s1 + s1_len;
 	const char *s2cp = s2;
-	// Question; at this point should we just return
-	// strcpy_s(s1cp, m, s2)  ?
-	if (s1 <= s2) {
+
+	if (s1 <= s2) 
+	{
 	    // if we ever reach s2 when storing to s1 we have overlap
 	    overlap_point = s2;
 	    check_s1_for_overlap = true;
 	    // make sure source does not lie within initial dest string.
-	    if (s2 <= s1cp) {
-	        constraint_failure = true;
-		msg = "strcat_s: overlapping copy";
+	    if (s2 <= s1cp) 
+		{
+			msg = "strcat_s: overlapping copy";
+			goto handle_error;
 		}
-	    }
-	else {
+	}
+	else 
+	{
 	    // if we ever reach s1 when reading from s2 we have overlap
 	    overlap_point = s1;
 	    check_s1_for_overlap = false;
 	    // issue with checking initial dest string does not apply in this
 	    // case, overlap will be detected only by hitting overlap_point.
-	    }
-	if (!constraint_failure) {
-	    unsigned written = 0;
-	    char c = '.';
-	    while (written < m) {
-		if (check_s1_for_overlap) {
-		    if (s1cp == overlap_point) {
-			constraint_failure = true;
+	}
+
+	unsigned written = 0;
+	char c = '.';
+	while (written < m) 
+	{
+		if (check_s1_for_overlap) 
+		{
+			if (s1cp == overlap_point) 
+			{
+				msg = "strcat_s: overlapping copy";
+				goto handle_error;
 			}
-		    }
-		else if (s2cp == overlap_point) {
-		    constraint_failure = true;
-		    }
-		if (constraint_failure) {
-		    break;
-		    }
+		}
+		else if (s2cp == overlap_point) 
+		{
+			msg = "strcat_s: overlapping copy";
+			goto handle_error;
+		}
+	
 		c = *s2cp++;
 		*s1cp++ = c;
 		written++;
-		if (c == '\0') {
-		    break;
-		    }
-
+		if (c == '\0') 
+		{
+			break;
 		}
-	    if (constraint_failure) {
-		msg = "strcat_s: overlapping copy";
-		}
-	    else if (c != '\0') {
-		constraint_failure = true;
+	}
+	
+	if (c != '\0') 
+	{
 		msg = "strcat_s: dest buffer size insufficent to append string";
-		}
-	    }
-
+		goto handle_error;
 	}
 
+	// Normal return path
+	return 0;
 
-    if (constraint_failure) {
-	constraint_handler_t handler = set_constraint_handler_s(NULL);
+handle_error:
+	handler = set_constraint_handler_s(NULL);
 	set_constraint_handler_s(handler);
-	if (write_null)
+
+	if (write_null && s1 != NULL)
+	{
 	    *s1 = '\0';
-	(*handler)(msg, NULL, -1);
-	return -1;
 	}
-    else
-        return 0;
+
+	if (handler != NULL)
+    {
+        handler(msg, NULL, -1);
     }
+
+    return -1;
+}

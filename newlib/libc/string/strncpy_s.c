@@ -41,33 +41,32 @@
 errno_t strncpy_s(char *restrict s1, rsize_t s1max, const char *restrict s2,
         rsize_t n)
 {
-    bool constraint_failure = false;
     const char *msg = "";
     bool write_null = true;
-    errno_t rtn = 0;
+    constraint_handler_t handler = NULL;
 
     if (s1 == NULL)
     {
-        constraint_failure = true;
         msg = "strncpy_s: dest is NULL";
         write_null = false;
+        goto handle_error;
     }
     else if ((s1max == 0u) || (s1max >  RSIZE_MAX))
     {
-        constraint_failure = true;
         msg = "strncpy_s: dest buffer size is 0 or exceeds RSIZE_MAX";
         write_null = false;
+        goto handle_error;
     }
 
     else if (s2 == NULL)
     {
-        constraint_failure = true;
         msg = "strncpy_s: source is NULL";
+        goto handle_error;
     }
     else if (n >  RSIZE_MAX)
     {
-        constraint_failure = true;
         msg = "strncpy_s: copy count exceeds RSIZE_MAX";
+        goto handle_error;
     }
 
     /* It is a constraint violation if s1max is not large enough to contain
@@ -109,28 +108,27 @@ errno_t strncpy_s(char *restrict s1, rsize_t s1max, const char *restrict s2,
             {
                 if (s1cp == overlap_point)
                 {
-                    constraint_failure = true;
+                    msg = "strncpy_s: overlapping copy";
+                    goto handle_error;
                 }
             }
             else if (s2cp == overlap_point)
             {
-                constraint_failure = true;
+                msg = "strncpy_s: overlapping copy";
+                goto handle_error;
             }
             else
             {
                 /* Normal case*/
             }
 
-            if (constraint_failure == false)
-            {
-                c = *s2cp;
-                s2cp++;
-                *s1cp = c;
-                s1cp++;
-                written++;
-            }
+            c = *s2cp;
+            s2cp++;
+            *s1cp = c;
+            s1cp++;
+            written++;
 
-            if ((constraint_failure == true) || (c == '\0'))
+            if (c == '\0')
             {
                 break;
             }
@@ -141,7 +139,8 @@ errno_t strncpy_s(char *restrict s1, rsize_t s1max, const char *restrict s2,
             // we copied n chars from s2 and there is room for null char in s1
             if ((check_s1_for_overlap == true) && (s1cp == overlap_point))
             {
-                constraint_failure = true;
+                msg = "strncpy_s: overlapping copy";
+                goto handle_error;
             }
             else
             {
@@ -150,38 +149,30 @@ errno_t strncpy_s(char *restrict s1, rsize_t s1max, const char *restrict s2,
             }
         }
 
-        if (constraint_failure == true)
+        if (c != '\0')
         {
-            msg = "strncpy_s: overlapping copy";
-        }
-        else if (c != '\0')
-        {
-            constraint_failure = true;
             msg = "strncpy_s: dest buffer size insufficent to copy string";
+            goto handle_error;
         }
-        else
-        {
-            /*No Error*/
-        }
+        
     }
 
-    if (constraint_failure == true)
+    // Normal return path
+	return 0;
+
+handle_error:
+    handler = set_constraint_handler_s(NULL);
+    (void)set_constraint_handler_s(handler);
+
+    if (write_null && s1 != NULL)
     {
-        constraint_handler_t handler = set_constraint_handler_s(NULL);
-        (void)set_constraint_handler_s(handler);
-
-        if (write_null == true)
-        {
-            *s1 = '\0';
-        }
-
-        (*handler)(msg, NULL, -1);
-        rtn = -1;
+        *s1 = '\0';
     }
-    else
+
+    if (handler != NULL)
     {
-        rtn = 0;
+        handler(msg, NULL, -1);
     }
 
-    return rtn;
+    return -1;
 }

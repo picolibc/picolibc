@@ -40,55 +40,50 @@
 
 errno_t memset_s(void* s, rsize_t smax, int c, rsize_t n)
 {
-    bool constraint_failure = false;
-    bool fill_dest = true;
     const char* msg = "";
-    errno_t rtn = 0;
+    constraint_handler_t handler = NULL;
 
     if (s == NULL)
     {
-        constraint_failure = true;
         msg = "memset_s: dest is NULL";
-        fill_dest = false;
+        goto handle_error;
     }
 
-    if ((constraint_failure == false) && (smax > RSIZE_MAX))
+    if (smax > RSIZE_MAX)
     {
-        constraint_failure = true;
         msg = "memset_s: buffer size exceeds RSIZE_MAX";
-        fill_dest = false;
+        goto handle_error;
     }
 
-    if ((constraint_failure == false) && (n > RSIZE_MAX))
+    if (n > RSIZE_MAX)
     {
-        constraint_failure = true;
         msg = "memset_s: count exceeds RSIZE_MAX";
+        goto handle_error;
     }
 
-    if ((constraint_failure == false) && (n > smax))
+    if (n > smax)
     {
-        constraint_failure = true;
         msg = "memset_s: count exceeds buffer size";
+        goto handle_error;
     }
 
-    if (constraint_failure == true)
+    // Normal return path
+    (void) memset(s, c, n);
+    return 0;
+
+handle_error:
+    handler = set_constraint_handler_s(NULL);
+    (void) set_constraint_handler_s(handler);
+
+    if (s != NULL)
     {
-        constraint_handler_t handler = set_constraint_handler_s(NULL);
-        (void) set_constraint_handler_s(handler);
-
-        if (fill_dest == true)
-        {
-            (void) memset(s, c, smax);
-        }
-
-        (*handler)(msg, NULL, -1);
-        rtn = -1;
+        (void) memset(s, c, smax);
     }
-    else
+
+    if (handler != NULL)
     {
-        (void) memset(s, c, n);
-        rtn = 0;
+        handler(msg, NULL, -1);
     }
 
-    return rtn;
+    return -1;
 }

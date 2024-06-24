@@ -35,24 +35,27 @@
 #define __STDC_WANT_LIB_EXT1__ 1
 #include <stdlib.h>
 
-void ignore_handler_s(const char *restrict msg, void *restrict ptr, errno_t error)
+constraint_handler_t __cur_handler = abort_handler_s;
+
+void abort_handler_s(const char *restrict msg, void *restrict ptr, errno_t error)
 {
     (void) msg;
     (void) ptr;
     (void) error;
+    abort();
 }
 
 constraint_handler_t set_constraint_handler_s(constraint_handler_t handler)
 {
-    constraint_handler_t h = cur_handler;
+    constraint_handler_t h = __cur_handler;
 
     if (handler == (constraint_handler_t)NULL)
     {
-        cur_handler = ignore_handler_s; // null restores to default handler
+        __cur_handler = abort_handler_s; // null restores to default handler
     }
     else
     {
-        cur_handler = handler;
+        __cur_handler = handler;
     }
 
     return h;

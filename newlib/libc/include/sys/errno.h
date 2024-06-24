@@ -227,8 +227,6 @@ extern NEWLIB_THREAD_LOCAL_ERRNO int errno;
 #endif
 #define EWOULDBLOCK EAGAIN	/* Operation would block */
 
-#define ELAST 149
-
 #define __ELASTERROR 2000       /* Users can add values starting here */
 
 #ifdef __cplusplus

@@ -40,63 +40,59 @@
 
 errno_t memmove_s(void* s1, rsize_t s1max, const void* s2, rsize_t n)
 {
-    bool constraint_failure = false;
-    bool zero_dest = true;
     const char* msg = "";
-    errno_t rtn = 0;
+    constraint_handler_t handler = NULL;
 
     if (s1 == NULL)
     {
-        constraint_failure = true;
         msg = "memmove_s: dest is NULL";
-        zero_dest = false;
+        goto handle_error;
     }
 
-    if ((constraint_failure == false) && (s1max > RSIZE_MAX))
+    if (s1max > RSIZE_MAX)
     {
-        constraint_failure = true;
         msg = "memmove_s: buffer size exceeds RSIZE_MAX";
-        zero_dest = false;
+        goto handle_error;
     }
 
-    if ((constraint_failure == false) && (s2 == NULL))
+    if (s2 == NULL)
     {
-        constraint_failure = true;
         msg = "memmove_s: source is NULL";
+        goto handle_error;
     }
 
-    if ((constraint_failure == false) && (n > RSIZE_MAX))
+    if (n > RSIZE_MAX)
     {
-        constraint_failure = true;
         msg = "memmove_s: copy count exceeds RSIZE_MAX";
+        goto handle_error;
     }
 
-    if ((constraint_failure == false) && (n > s1max))
+    if (n > s1max)
     {
-        constraint_failure = true;
         msg = "memmove_s: copy count exceeds buffer size";
+        goto handle_error;
     }
 
     /* overlapping memory is allowed for memmove_s so no checks for that */
 
-    if (constraint_failure == true)
-    {
-        constraint_handler_t handler = set_constraint_handler_s(NULL);
-        (void) set_constraint_handler_s(handler);
 
-        if (zero_dest == true)
-        {
-            (void) memset(s1, (int32_t)'\0', s1max);
-        }
+    // Normal return path
+    (void) memmove(s1, s2, n);
+    return 0;
 
-        (*handler)(msg, NULL, -1);
-        rtn = -1;
-    }
-    else
+handle_error:
+    handler = set_constraint_handler_s(NULL);
+    (void) set_constraint_handler_s(handler);
+
+    if (s1 != NULL)
     {
-        (void) memmove(s1, s2, n);
-        rtn = 0;
+        (void) memset(s1, (int32_t)'\0', s1max);
     }
 
-    return rtn;
+    if (handler != NULL)
+    {
+        handler(msg, NULL, -1);
+    }
+
+    return -1;
 }

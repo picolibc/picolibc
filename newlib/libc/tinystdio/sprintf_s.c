@@ -34,7 +34,6 @@
  */
 #define __STDC_WANT_LIB_EXT1__  1
 #include "stdio_private.h"
-#include <errno.h>
 #include <stdio.h>
 #include <stddef.h>
 #include <stdbool.h>
@@ -43,33 +42,33 @@
 
 int sprintf_s(char *restrict s, rsize_t bufsize,
         const char * restrict fmt, ...) {
-	bool constraint_failure = false;
 	bool write_null = true;
 	const char *msg = "";
 	va_list args;
 	int rc;
+	constraint_handler_t handler = NULL;
 
     if (s == NULL)
 	{
-		constraint_failure = true;
 		write_null = false;
 		msg = "sprintf_s: dest buffer is null";
+		goto handle_error;
 	}
 	else if (bufsize == 0 || bufsize > RSIZE_MAX)
 	{
-		constraint_failure = true;
 		write_null = false;
 		msg = "sprintf_s: invalid buffer size";
+		goto handle_error;
 	}
 	else if (fmt == NULL)
 	{
-		constraint_failure = true;
 		msg = "sprintf_s: null format string";
+		goto handle_error;
 	}
 	else if (strstr(fmt, " %n") != NULL)
 	{
-		constraint_failure = true;
 		msg = "sprintf_s: format string contains percent-n";
+		goto handle_error;
 	}
 	else
 	{
@@ -91,11 +90,11 @@ int sprintf_s(char *restrict s, rsize_t bufsize,
 						char *str_arg = va_arg(args_copy, char *);
 						if (str_arg == NULL)
 						{
-							constraint_failure = true;
 							msg = "sprintf_s: null string argument";
 							va_end(args_copy);
 							va_end(args);
 							null_str = 1;
+							goto handle_error;
 						}
 						break;
 					}
@@ -117,37 +116,39 @@ int sprintf_s(char *restrict s, rsize_t bufsize,
 			check_ptr++;
 		}
 
-		if (constraint_failure == false)
-		{
-			rc = vsnprintf(s, bufsize, fmt, args);
-			va_end(args_copy);
-			va_end(args);
-		}
-		
+		rc = vsnprintf(s, bufsize, fmt, args);
+		va_end(args_copy);
+		va_end(args);
 	}
 
-	if (constraint_failure == false)
+	if (rc < 0 || rc >= (int)bufsize)
 	{
-		if (rc < 0 || rc >= (int)bufsize)
-		{
-			constraint_failure = true;
-			msg = "sprintf_s: dest buffer overflow";
-		}
-		else
-		{
-			s[rc] = 0;
-		}
+		msg = "sprintf_s: dest buffer overflow";
+		goto handle_error;
 	}
-
-	if (constraint_failure == true)
+	else
 	{
-		constraint_handler_t handler = set_constraint_handler_s(NULL);
-		(void) set_constraint_handler_s(handler);
-		(*handler)(msg, NULL, -1);
-		rc = 0; /* standard stipulates this */
-		if (write_null)
-	    	s[0] = '\0';  /* again, standard requires this */
+		s[rc] = 0;
 	}
 
-	return(rc);
+	// Normal return path
+	return rc;
+
+handle_error:
+	handler = set_constraint_handler_s(NULL);
+	(void) set_constraint_handler_s(handler);
+
+	if (handler != NULL)
+    {
+        handler(msg, NULL, -1);
+    }
+
+	rc = 0; /* standard stipulates this */
+
+	if (write_null && s != NULL)
+    {
+        s[0] = '\0';  /* again, standard requires this */
+    }
+
+	return rc;
 }

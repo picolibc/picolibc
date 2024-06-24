@@ -38,32 +38,30 @@
 #include <string.h>
 #include <stdlib.h>
 
-errno_t strcpy_s(char *restrict s1, rsize_t s1max, const char *restrict s2) {
-    bool constraint_failure = false;
+errno_t strcpy_s(char *restrict s1, rsize_t s1max, const char *restrict s2) 
+{
     const char *msg = "";
-
     bool write_null = true;
-    if (!constraint_failure) {
-	if (s1 == NULL) {
-	    constraint_failure = true;
+	constraint_handler_t handler = NULL;
+
+	if (s1 == NULL) 
+	{
 	    msg = "strcpy_s: dest is NULL";
 	    write_null = false;
-	    }
+		goto handle_error;
 	}
 
-    if (!constraint_failure) {
-	if (s1max == 0 || s1max > RSIZE_MAX) {
-	    constraint_failure = true;
+	if (s1max == 0 || s1max > RSIZE_MAX) 
+	{
 	    msg = "strcpy_s: dest buffer size is 0 or exceeds RSIZE_MAX";
 	    write_null = false;
-	    }
+		goto handle_error;
 	}
 
-    if (!constraint_failure) {
-	if (s2 == NULL) {
-	    constraint_failure = true;
+	if (s2 == NULL) 
+	{
 	    msg = "strcpy_s: source is NULL";
-	    }
+		goto handle_error;
 	}
 
     /* It is a constraint violation if s1max is not large enough to contain
@@ -75,61 +73,73 @@ errno_t strcpy_s(char *restrict s1, rsize_t s1max, const char *restrict s2) {
      * of performing the copy operation.  This is to avoid calling strlen on
      * s2 to detect these violations prior to attempting the copy.
      */
-    if (!constraint_failure) {
 	const char *overlap_point;
 	bool check_s1_for_overlap;
 	char *s1cp = s1;
 	const char *s2cp = s2;
-	if (s1 < s2) {
+	if (s1 < s2) 
+	{
 	    // if we ever reach s2 when storing to s1 we have overlap
 	    overlap_point = s2;
 	    check_s1_for_overlap = true;
-	    }
-	else {
+	}
+	else 
+	{
 	    // if we ever reach s1 when reading from s2 we have overlap
 	    overlap_point = s1;
 	    check_s1_for_overlap = false;
-	    }
+	}
+
 	unsigned written = 0;
 	char c = '.';
-	while (written < s1max) {
-	    if (check_s1_for_overlap) {
-	        if (s1cp == overlap_point) {
-		    constraint_failure = true;
+	while (written < s1max) 
+	{
+	    if (check_s1_for_overlap) 
+		{
+	        if (s1cp == overlap_point) 
+			{
+		    	msg = "strcpy_s: overlapping copy";
+				goto handle_error;
 		    }
 		}
-	    else if (s2cp == overlap_point) {
-		constraint_failure = true;
+	    else if (s2cp == overlap_point) 
+		{
+			msg = "strcpy_s: overlapping copy";
+			goto handle_error;
 		}
-	    if (constraint_failure) {
-		break;
-	        }
+
 	    c = *s2cp++;
 	    *s1cp++ = c;
 	    written++;
-	    if (c == '\0') {
+	    if (c == '\0') 
+		{
 	        break;
 		}
 
-	    }
+	}
 
-	if (constraint_failure) {
-	    msg = "strcpy_s: overlapping copy";
-	    }
-	else if (c != '\0') {
-	    constraint_failure = true;
+	if (c != '\0') 
+	{
 	    msg = "strcpy_s: dest buffer size insufficent to copy string";
-	    }
+		goto handle_error;
 	}
 
-    if (constraint_failure) {
-	constraint_handler_t handler = set_constraint_handler_s(NULL);
+	// Normal return path
+	return 0;
+
+handle_error:
+	handler = set_constraint_handler_s(NULL);
 	set_constraint_handler_s(handler);
-	if (write_null)
+
+	if (write_null && s1 != NULL)
+	{
 	    *s1 = '\0';
-	(*handler)(msg, NULL, -1);
-	return -1;
 	}
-    else
-        return 0;
+	
+	if (handler != NULL)
+    {
+        handler(msg, NULL, -1);
     }
+
+    return -1;
+}

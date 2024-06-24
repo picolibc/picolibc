@@ -80,19 +80,11 @@ size_t	 strspn (const char *, const char *);
 char 	*strstr (const char *, const char *);
 
 
-#ifdef __STDC_WANT_LIB_EXT1__
-#if (__STDC_WANT_LIB_EXT1__ != 0) && (__STDC_WANT_LIB_EXT1__ != 1)
-#error Please define __STDC_WANT_LIB_EXT__ as 0 or 1
-#endif
-
 #if __STDC_WANT_LIB_EXT1__ == 1
-#include <stddef.h>
-#include <errno.h>
+#include <sys/_types.h>
 
-#ifndef __RSIZE_T
-#define __RSIZE_T
-typedef size_t rsize_t;
-#endif
+typedef __rsize_t rsize_t;
+typedef __errno_t errno_t;
 
 extern errno_t memcpy_s(void *__restrict, rsize_t, const void *__restrict, rsize_t);
 extern errno_t memset_s(void *, rsize_t, int, rsize_t);
@@ -104,7 +96,6 @@ extern errno_t strncat_s(char *__restrict, rsize_t, const char *__restrict, rsiz
 extern size_t strnlen_s(const char *, size_t);
 extern errno_t strerror_s(char *, rsize_t, errno_t); /* C11 */
 extern size_t strerrorlen_s(errno_t);
-#endif
 #endif
 
 #ifndef _REENT_ONLY

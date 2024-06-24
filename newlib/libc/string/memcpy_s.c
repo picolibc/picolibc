@@ -40,79 +40,67 @@
 
 errno_t memcpy_s(void* restrict s1, rsize_t s1max, const void* restrict s2, rsize_t n)
 {
-    bool constraint_failure = false;
-    bool zero_dest = true;
     const char* msg = "";
-    errno_t rtn = 0;
+    constraint_handler_t handler = NULL;
 
     if (s1 == NULL)
     {
-        constraint_failure = true;
         msg = "memcpy_s: dest is NULL";
-        zero_dest = false;
+        goto handle_error;
     }
 
-    if ((constraint_failure == false) && (s1max > RSIZE_MAX))
+    if (s1max > RSIZE_MAX)
     {
-        constraint_failure = true;
         msg = "memcpy_s: buffer size exceeds RSIZE_MAX";
-        zero_dest = false;
+        goto handle_error;
     }
 
-    if ((constraint_failure == false) && (s2 == NULL))
+    if (s2 == NULL)
     {
-        constraint_failure = true;
         msg = "memcpy_s: source is NULL";
+        goto handle_error;
     }
 
-    if ((constraint_failure == false) && (n > RSIZE_MAX))
+    if (n > RSIZE_MAX)
     {
-        constraint_failure = true;
         msg = "memcpy_s: copy count exceeds RSIZE_MAX";
+        goto handle_error;
     }
 
-    if ((constraint_failure == false) && (n > s1max))
+    if (n > s1max)
     {
-        constraint_failure = true;
         msg = "memcpy_s: copy count exceeds buffer size";
+        goto handle_error;
     }
 
-    if (constraint_failure == false)
+    const char* s1cp = (const char*) s1;
+    const char* s2cp = (const char*) s2;
+    const char* s1cp_limit = &s1cp[n];
+    const char* s2cp_limit = &s2cp[n];
+
+    if (((s1cp_limit <= s2cp) || (s2cp_limit <= s1cp)) == false)
     {
-        const char* s1cp = (const char*) s1;
-        const char* s2cp = (const char*) s2;
-        const char* s1cp_limit = &s1cp[n];
-        const char* s2cp_limit = &s2cp[n];
-
-        if (((s1cp_limit <= s2cp) || (s2cp_limit <= s1cp)) == false)
-        {
-            constraint_failure = true;
-            msg = "memcpy_s: overlapping copy";
-        }
+        msg = "memcpy_s: overlapping copy";
+        goto handle_error;
     }
 
-    if (constraint_failure == true)
+    // Normal return path
+    (void) memcpy(s1, s2, n);
+    return 0;
+
+handle_error:
+    handler = set_constraint_handler_s(NULL);
+    (void) set_constraint_handler_s(handler);
+
+    if (s1 != NULL)
     {
-        constraint_handler_t handler = set_constraint_handler_s(NULL);
-        (void) set_constraint_handler_s(handler);
-
-        if (zero_dest == true)
-        {
-            (void) memset(s1, (int32_t)'\0', s1max);
-        }
-        else
-        {
-            /* No action required */
-        }
-
-        (*handler)(msg, NULL, -1);
-        rtn = -1;
+        (void) memset(s1, (int32_t)'\0', s1max);
     }
-    else
+
+    if (handler != NULL)
     {
-        (void) memcpy(s1, s2, n);
-        rtn = 0;
+        handler(msg, NULL, -1);
     }
 
-    return rtn;
+    return -1;
 }

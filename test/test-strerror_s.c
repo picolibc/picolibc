@@ -39,13 +39,6 @@
 #include <string.h>
 #include <errno.h>
 
-#undef cur_handler
-static constraint_handler_t cur_handler;
-
-constraint_handler_t *___pcur_handler(void) {
-	return &cur_handler;
-	}
-
 int main(void)
 {
     errno_t err = EINVAL;

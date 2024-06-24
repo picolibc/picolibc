@@ -458,22 +458,15 @@ typedef __uint_least64_t uint_least64_t;
 #endif
 #endif
 
-#ifdef __STDC_WANT_LIB_EXT1__
-#if (__STDC_WANT_LIB_EXT1__ != 0) && (__STDC_WANT_LIB_EXT1__ != 1)
-#error Please define __STDC_WANT_LIB_EXT__ as 0 or 1
-#endif
-
 #if __STDC_WANT_LIB_EXT1__ == 1
-    #include <stddef.h>
-    #ifndef __RSIZE_T
-    #define __RSIZE_T
-    typedef size_t rsize_t;
+    #include <sys/_types.h>
+
+    // could be defined by the user
+    #ifndef RSIZE_MAX
+    #define RSIZE_MAX SIZE_MAX
     #endif
 
-    extern rsize_t _set_rsize_max_s(rsize_t);
-    extern rsize_t _get_rsize_max_s(void);
-    #define RSIZE_MAX (_get_rsize_max_s())
-#endif
+    typedef __rsize_t rsize_t;
 #endif
 
 

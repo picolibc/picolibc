@@ -343,15 +343,12 @@ FILE	*funopen (const void *cookie,
 #endif
 
 #if __STDC_WANT_LIB_EXT1__ == 1
-#include <errno.h>
+#include <sys/_types.h>
 
-#ifndef __RSIZE_T
-#define __RSIZE_T
-typedef size_t rsize_t;
-#endif
+typedef __rsize_t rsize_t;
+
 extern int sprintf_s(char *__restrict __s, rsize_t __bufsize,
         const char *__restrict __format, ...);
-#endif
 #endif
 
 /*
