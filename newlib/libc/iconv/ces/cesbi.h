@@ -5,7 +5,6 @@
 #ifndef __CESBI_H__
 #define __CESBI_H__
 
-#include <newlib.h>
 #include <_ansi.h>
 #include "../lib/encnames.h"
 #include "../lib/ucsconv.h"

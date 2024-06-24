@@ -43,7 +43,6 @@
 #define	_SYS_CDEFS_H_
 
 #include <machine/_default_types.h>
-#include <sys/features.h>
 #include <stddef.h>
 
 #define __PMT(args)	args

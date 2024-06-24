@@ -2755,7 +2755,6 @@ Files: .clang-format
  newlib/libm/ld/files
  newlib/libm/libm.in.xml
  newlib/man.xsl
- newlib/newlib.hin
  newlib/refcontainers.xslt
  newlib/testsuite/newlib.time/tzset.c
  picolibc.h.in

@@ -1,4 +1,3 @@
-#include <newlib.h>
 
 #include <stdio.h>
 #include <stdlib.h>

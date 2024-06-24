@@ -1,14 +1,12 @@
 /*
 Copyright (c) 2002 Thomas Fitzsimmons <fitzsim@redhat.com>
  */
-#include <newlib.h>
 #include <wchar.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
 #include "local.h"
 
-#ifndef _REENT_ONLY
 size_t
 wcrtomb (char *__restrict s,
 	wchar_t wc,
@@ -39,4 +37,3 @@ wcrtomb (char *__restrict s,
   else
     return (size_t)retval;
 }
-#endif /* !_REENT_ONLY */

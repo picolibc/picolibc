@@ -47,7 +47,7 @@ PORTABILITY
 <<getlocalename_l>> is POSIX-1.2008 since Base Specification Issue 8
 */
 
-#include <newlib.h>
+#define _GNU_SOURCE
 #include "setlocale.h"
 
 const char *

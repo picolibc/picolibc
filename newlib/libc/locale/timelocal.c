@@ -25,9 +25,7 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
-
-#include <stddef.h>
+#define _GNU_SOURCE
 #include "setlocale.h"
 
 #define LCTIME_SIZE (sizeof(struct lc_time_T) / sizeof(char *))

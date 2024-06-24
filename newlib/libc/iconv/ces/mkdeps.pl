@@ -472,7 +472,6 @@ sub generate_cesbi_h($$)
   print CESBI_H "$comment_automatic\n\n";
   print CESBI_H "#ifndef __CESBI_H__\n";
   print CESBI_H "#define __CESBI_H__\n\n";
-  print CESBI_H "#include <newlib.h>\n";
   print CESBI_H "#include <_ansi.h>\n";
   print CESBI_H "#include \"../lib/encnames.h\"\n";
   print CESBI_H "#include \"../lib/ucsconv.h\"\n\n";
@@ -707,7 +706,6 @@ sub generate_ccsbi_h($)
   print CCSBI_H "$comment_automatic\n\n";
   print CCSBI_H "#ifndef __CCSBI_H__\n";
   print CCSBI_H "#define __CCSBI_H__\n\n";
-  print CCSBI_H "#include <newlib.h>\n";
   print CCSBI_H "#include <_ansi.h>\n";
   print CCSBI_H "#include \"ccs.h\"\n\n";
   print CCSBI_H "/*\n";
@@ -781,7 +779,6 @@ sub generate_cesbi_c($)
 
   print CESBI_C "$comment_automatic\n\n";
   print CESBI_C "#include <_ansi.h>\n";
-  print CESBI_C "#include <newlib.h>\n";
   print CESBI_C "#include \"../lib/ucsconv.h\"\n";
   print CESBI_C "#include \"cesbi.h\"\n\n";
   print CESBI_C "/*\n";

@@ -25,15 +25,6 @@
  */
 
 #define _GNU_SOURCE
-
-#include <sys/cdefs.h>
-
-#include <locale.h>
-#include <langinfo.h>
-#include <limits.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "setlocale.h"
 
 #undef offsetoff

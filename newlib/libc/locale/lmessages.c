@@ -24,9 +24,7 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
-
-#include <stddef.h>
+#define _GNU_SOURCE
 #include "setlocale.h"
 
 #define LCMESSAGES_SIZE_FULL (sizeof(struct lc_messages_T) / sizeof(char *))

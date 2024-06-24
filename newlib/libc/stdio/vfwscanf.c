@@ -76,7 +76,6 @@ C99, POSIX-1.2008
 
 #define _DEFAULT_SOURCE
 #include <_ansi.h>
-#include <newlib.h>
 #include <ctype.h>
 #include <wctype.h>
 #include <stdio.h>

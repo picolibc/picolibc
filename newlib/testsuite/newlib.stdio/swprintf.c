@@ -6,7 +6,6 @@
  */
 
 #include <stdio.h>
-#include <newlib.h>
 #include <stdlib.h>
 #include <wchar.h>
 #include "check.h"

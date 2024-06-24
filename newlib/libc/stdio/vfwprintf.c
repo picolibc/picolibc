@@ -84,7 +84,6 @@ SEEALSO
  * This code is large and complicated...
  */
 #define _DEFAULT_SOURCE
-#include <newlib.h>
 
 #ifdef INTEGER_ONLY
 # ifdef STRING_ONLY

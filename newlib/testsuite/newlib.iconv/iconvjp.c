@@ -26,7 +26,6 @@
 #include <stdio.h>
 #include <iconv.h>
 #include <errno.h>
-#include <newlib.h>
 #include "check.h"
 
 #if defined(_ICONV_FROM_ENCODING_UTF_8) || \

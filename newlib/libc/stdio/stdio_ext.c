@@ -55,6 +55,8 @@ These functions originate from Solaris and are also provided by GNU libc.
 No supporting OS subroutines are required.
 */
 
+#include <picolibc.h>
+
 #ifndef __rtems__
 
 #define _DEFAULT_SOURCE

@@ -3,11 +3,9 @@
   */
 
 #define _DEFAULT_SOURCE
-#include <newlib.h>
-#include <sys/config.h>
+#include <_ansi.h>
 
 #ifndef _USE_GDTOA
-#include <_ansi.h>
 #include <string.h>
 #include <stdlib.h>
 #include "mprec.h"

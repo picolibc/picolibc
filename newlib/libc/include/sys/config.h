@@ -32,7 +32,6 @@ SUCH DAMAGE.
 #include <machine/ieeefp.h>  /* floating point macros */
 #include <sys/features.h>	/* POSIX defs */
 #include <float.h>
-#include <newlib.h>
 
 #ifdef __aarch64__
 #define MALLOC_ALIGNMENT 16

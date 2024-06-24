@@ -279,7 +279,6 @@ locale, hard-coding the "C" locale settings.
 */
 
 #define _DEFAULT_SOURCE
-#include <newlib.h>
 #include <sys/config.h>
 #include <stddef.h>
 #include <stdio.h>

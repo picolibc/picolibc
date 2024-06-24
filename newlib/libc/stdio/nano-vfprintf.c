@@ -143,7 +143,6 @@ static char *rcsid = "$Id$";
 
 /* Actual printf innards.
    This code is large and complicated...  */
-#include <newlib.h>
 
 #ifdef STRING_ONLY
 # define VFPRINTF svfprintf

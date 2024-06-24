@@ -31,11 +31,13 @@
 
 #include <_ansi.h>
 #include <sys/cdefs.h>
+#include <errno.h>
 #include <limits.h>
 #include <string.h>
 #include <stdlib.h>
 #include <wchar.h>
 #include <locale.h>
+#include <langinfo.h>
 
 __BEGIN_DECLS
 

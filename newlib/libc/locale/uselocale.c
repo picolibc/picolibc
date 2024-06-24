@@ -79,9 +79,7 @@ PORTABILITY
 <<uselocale>> is POSIX-1.2008.
 */
 
-#define _DEFAULT_SOURCE
-#include <newlib.h>
-#include <stdlib.h>
+#define _GNU_SOURCE
 #include "setlocale.h"
 
 #ifndef _REENT_ONLY

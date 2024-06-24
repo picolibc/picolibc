@@ -64,7 +64,6 @@ PORTABILITY
 <<wcsnrtombs>> is defined by the POSIX.1-2008 standard.
 */
 
-#include <newlib.h>
 #include <wchar.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -137,7 +136,6 @@ _wcsnrtombs_l (char *dst, const wchar_t **src, size_t nwc,
   return n;
 } 
 
-#ifndef _REENT_ONLY
 size_t
 wcsnrtombs (char *__restrict dst,
 	const wchar_t **__restrict src,
@@ -148,4 +146,3 @@ wcsnrtombs (char *__restrict dst,
   return _wcsnrtombs_l (dst, src, nwc, len, ps,
 			__get_current_locale ());
 }
-#endif /* !_REENT_ONLY */

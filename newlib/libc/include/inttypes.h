@@ -13,7 +13,6 @@
 #ifndef _INTTYPES_H
 #define _INTTYPES_H
 
-#include <newlib.h>
 #include <sys/config.h>
 #include <sys/_intsup.h>
 #include "_ansi.h"
@@ -33,9 +32,9 @@
 #define __PRI8FAST(x) __FAST8 __STRINGIFY(x)
 
 /* NOTICE: scanning 8-bit types requires use of the hh specifier
- * which is only supported on newlib platforms that
+ * which is only supported on picolibc platforms that
  * are built with C99 I/O format support enabled.  If the flag in
- * newlib.h hasn't been set during configuration to indicate this, the 8-bit
+ * picolibc.h hasn't been set during configuration to indicate this, the 8-bit
  * scanning format macros are disabled here as they result in undefined
  * behaviour which can include memory overwrite.  Overriding the flag after the
  * library has been built is not recommended as it will expose the underlying

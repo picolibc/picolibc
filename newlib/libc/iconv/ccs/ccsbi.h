@@ -5,7 +5,6 @@
 #ifndef __CCSBI_H__
 #define __CCSBI_H__
 
-#include <newlib.h>
 #include <_ansi.h>
 #include "ccs.h"
 

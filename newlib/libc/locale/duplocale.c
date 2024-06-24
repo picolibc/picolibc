@@ -67,8 +67,7 @@ PORTABILITY
 <<duplocale>> is POSIX-1.2008.
 */
 
-#define _DEFAULT_SOURCE
-#include <newlib.h>
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include "setlocale.h"
 

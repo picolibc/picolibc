@@ -102,10 +102,7 @@ PORTABILITY
 <<newlocale>> is POSIX-1.2008.
 */
 
-#define _DEFAULT_SOURCE
-#include <newlib.h>
-#include <errno.h>
-#include <stdlib.h>
+#define _GNU_SOURCE
 #include "setlocale.h"
 
 #define LC_VALID_MASK	(LC_COLLATE_MASK | LC_CTYPE_MASK | LC_MONETARY_MASK \

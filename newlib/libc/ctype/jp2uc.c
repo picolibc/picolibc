@@ -30,7 +30,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <newlib.h>
+#include <picolibc.h>
 
 #ifdef _MB_CAPABLE
 /* Under Cygwin, the incoming wide character is already given in UTF due

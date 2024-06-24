@@ -24,6 +24,7 @@
  * SUCH DAMAGE.
  */
 
+#define _GNU_SOURCE
 #include "setlocale.h"
 
 #define LCNUMERIC_SIZE (sizeof(struct lc_numeric_T) / sizeof(char *))

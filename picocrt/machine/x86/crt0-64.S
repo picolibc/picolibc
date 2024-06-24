@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <picolibc.h>	
+#include <sys/features.h>	
 
 #ifndef CONSTRUCTORS
 #define CONSTRUCTORS 1

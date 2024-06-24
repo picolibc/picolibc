@@ -24,10 +24,7 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
-
-#include <limits.h>
-#include <stdlib.h>
+#define _GNU_SOURCE
 #include "setlocale.h"
 
 #define LCMONETARY_SIZE (sizeof(struct lc_monetary_T) / sizeof(char *))
