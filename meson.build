@@ -184,7 +184,7 @@ newlib_nano_malloc = get_option('newlib-nano-malloc')
 lite_exit = get_option('lite-exit')
 
 newlib_elix_level = get_option('newlib-elix-level')
-c_args = ['-include', '@0@/@1@'.format(meson.current_build_dir(), 'picolibc.h')] + core_c_args
+c_args = core_c_args
 native_common_args = ['-DNO_NEWLIB']
 
 if get_option('profile')

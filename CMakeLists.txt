@@ -513,7 +513,6 @@ set(PREFIX "${PROJECT_BINARY_DIR}")
 configure_file(picolibc.specs.in "${PROJECT_BINARY_DIR}/picolibc.specs" @ONLY)
 
 set(PICOLIBC_COMPILE_OPTIONS
-  "-include" "${PICOLIBC_INCLUDE}/picolibc.h"
   "-nostdlib"
   "-D_LIBC"
   ${TLSMODEL}
