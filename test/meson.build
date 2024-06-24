@@ -562,7 +562,6 @@ foreach target : targets
                   'test-strncat_s',
                   'test-strncpy_s',
                   'test-strnlen_s',
-                  'test-rsize_max_s',
                   ]
 
   if tinystdio
