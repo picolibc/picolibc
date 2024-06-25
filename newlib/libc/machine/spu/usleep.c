@@ -2,6 +2,8 @@
 
 /* Copyright (c) 2002 by Jeff Johnston */
 
+#include <picolibc.h>
+
 #include <errno.h>
 #include <time.h>
 #include <unistd.h>

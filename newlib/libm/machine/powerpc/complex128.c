@@ -33,6 +33,8 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <sys/features.h>
+
 #ifdef __LONG_DOUBLE_IEEE128__
 
 #define TCtype long double __complex

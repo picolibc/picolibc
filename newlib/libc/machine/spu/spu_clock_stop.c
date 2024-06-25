@@ -29,6 +29,8 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 /* SPU clock stop library service.  */
+#include <picolibc.h>
+
 #include <spu_timer.h>
 #include "spu_timer_internal.h"
 

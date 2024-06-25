@@ -13,6 +13,8 @@
  * they apply.
  */
 
+#include <picolibc.h>
+
 #include <stdlib.h>
 
 /* The CUDA-provided malloc.  */

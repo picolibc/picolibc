@@ -13,6 +13,8 @@
  * they apply.
  */
 
+#include <picolibc.h>
+
 #include <unistd.h>
 #include <stdlib.h>
 

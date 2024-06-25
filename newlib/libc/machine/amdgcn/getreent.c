@@ -13,6 +13,8 @@ they apply.
  */
 /* get thread-specific reentrant pointer */
 
+#include <picolibc.h>
+
 #include <reent.h>
 #include <stdint.h>
 #include <stdlib.h>

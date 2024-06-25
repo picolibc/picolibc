@@ -39,6 +39,8 @@
    <= 24+24*(n/48-1) so n >= 45.7; n >= 0.9; we win on the first full
    48-byte block to set.  */
 
+#include <picolibc.h>
+
 #define MEMSET_BY_BLOCK_THRESHOLD (1 * 48)
 
 /* No name ambiguities in this file.  */

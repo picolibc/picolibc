@@ -27,6 +27,8 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *  eric@skatter.usask.ca
  */
 
+#include <picolibc.h>
+
 #include <string.h>
 
 /*

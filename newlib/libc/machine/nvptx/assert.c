@@ -13,6 +13,8 @@
  * they apply.
  */
 
+#include <picolibc.h>
+
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>

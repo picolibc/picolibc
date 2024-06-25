@@ -9,6 +9,8 @@
    http://www.opensource.org/licenses.
 */
 
+#include <picolibc.h>
+
 #include <ieeefp.h>
 
 #if defined(__riscv_flen) || defined (__riscv_zfinx)

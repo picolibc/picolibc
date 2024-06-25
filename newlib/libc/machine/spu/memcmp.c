@@ -28,6 +28,8 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <picolibc.h>
+
 #include <stddef.h>
 #include "strncmp.h"
 

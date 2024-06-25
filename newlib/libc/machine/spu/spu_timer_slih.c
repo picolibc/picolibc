@@ -29,6 +29,8 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 /* Second Level Interrupt handler and related services for SPU timers.  */
+#include <picolibc.h>
+
 #include "spu_timer_internal.h"
 /* Resets decrementer to the specified value. Also updates software timebase
    to account for the time between the last decrementer reset and now. There

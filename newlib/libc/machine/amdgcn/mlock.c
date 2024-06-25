@@ -13,6 +13,8 @@
  * they apply.
  */
 
+#include <picolibc.h>
+
 #include <stdlib.h>
 #include <stdint.h>
 #include <reent.h>

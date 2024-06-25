@@ -11,6 +11,8 @@ and need not follow the licensing terms described here, provided that
 the new terms are clearly indicated on the first page of each file where
 they apply.
  */
+#include <picolibc.h>
+
 #include <signal.h>
 #include <errno.h>
 

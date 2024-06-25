@@ -3,6 +3,8 @@
 
 /* Written 2000 by Werner Almesberger */
 
+#include <picolibc.h>
+
 #include <errno.h>
 #include <time.h>
 #include <unistd.h>

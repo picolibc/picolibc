@@ -15,6 +15,8 @@
 
 /* getenv() is implemented as a low-level function, 
    thus we only invoke here the system call.  */
+#include <picolibc.h>
+
 char * getenv (const char *name)
 {
   char *_getenv(const char *);

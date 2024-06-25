@@ -15,6 +15,8 @@
  * the new terms are clearly indicated on the first page of each file where
  * they apply.  */
 
+#include <picolibc.h>
+
 #include <string.h>
 #include <stddef.h>
 #include <stdlib.h>
