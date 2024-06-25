@@ -64,6 +64,7 @@ PORTABILITY
 
 No supporting OS subroutines are required.
 */
+#define _DEFAULT_SOURCE
 #include <ctype.h>
 
 #undef isascii

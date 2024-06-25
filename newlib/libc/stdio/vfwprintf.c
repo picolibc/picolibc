@@ -154,7 +154,6 @@ int __SPRINT (FILE *, register struct __suio *);
 # else
 #  define __SPRINT __sfputws
 # endif
-int __SPRINT (FILE *, const wchar_t *, size_t);
 #endif
 #ifndef STRING_ONLY
 #ifdef _UNBUF_STREAM_OPT

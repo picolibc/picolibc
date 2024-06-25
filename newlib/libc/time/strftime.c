@@ -278,7 +278,7 @@ BUGS
 locale, hard-coding the "C" locale settings.
 */
 
-#define _DEFAULT_SOURCE
+#define _GNU_SOURCE
 #include <sys/config.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -288,6 +288,7 @@ locale, hard-coding the "C" locale settings.
 #include <limits.h>
 #include <ctype.h>
 #include <wctype.h>
+#include <wchar.h>
 #include "local.h"
 #include "../locale/setlocale.h"
 
@@ -327,7 +328,7 @@ locale, hard-coding the "C" locale settings.
 #   define _ctloc(x)    (ctloclen = wcslen (ctloc = _CurrentTimeLocale->w##x))
 #  else
 #   define CTLOCBUFLEN   256		/* Arbitrary big buffer size */
-    const wchar_t *
+    static const wchar_t *
     __ctloc (wchar_t *buf, const char *elem, size_t *len_ret)
     {
       buf[CTLOCBUFLEN - 1] = L'\0';

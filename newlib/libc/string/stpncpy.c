@@ -36,6 +36,7 @@ QUICKREF
 	stpncpy gnu
 */
 
+#define _DEFAULT_SOURCE
 #include <string.h>
 #include <limits.h>
 #include <stdint.h>

@@ -27,11 +27,8 @@
  * SUCH DAMAGE.
  */
 
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)getsubopt.c	8.1 (Berkeley) 6/4/93";
-#endif /* LIBC_SCCS and not lint */
+#define _DEFAULT_SOURCE
 #include <sys/cdefs.h>
-
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>

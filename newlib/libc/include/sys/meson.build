@@ -46,6 +46,7 @@ inc_sys_headers_all = [
   'fenv.h',
   'file.h',
   'iconvnls.h',
+  '_initfini.h',
   '_intsup.h',
   '_locale.h',
   'lock.h',

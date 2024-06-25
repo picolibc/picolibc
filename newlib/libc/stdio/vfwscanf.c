@@ -90,6 +90,7 @@ C99, POSIX-1.2008
 
 #ifdef INTEGER_ONLY
 #define VFWSCANF vfiwscanf
+__typeof(vfwscanf) vfiwscanf;
 #ifdef STRING_ONLY
 #  define _SVFWSCANF _ssvfiwscanf
 #else

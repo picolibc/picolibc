@@ -414,7 +414,7 @@ foreach target : targets
     endif
 
     test_gets = executable(t1_name, t1_src,
-		           c_args: _c_args + ['-D_FORTIFY_SOURCE=2'],
+		           c_args: _c_args,
 		           link_args: _link_args,
 		           objects: _objs,
 		           link_with: _libs,

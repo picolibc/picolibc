@@ -37,14 +37,14 @@
 #include <unistd.h>
 #include <stdio.h>
 
-void
+static void
 fail(void)
 {
 	printf("atexit failure\n");
 	_exit(2);
 }
 
-void
+static void
 success(void)
 {
 	_exit(0);

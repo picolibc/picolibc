@@ -52,6 +52,7 @@ PORTABILITY
 Supporting OS subroutines required: None.
 */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdlib.h>
 #include <limits.h>

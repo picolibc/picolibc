@@ -15,6 +15,9 @@
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#ifndef _FVWRITE_H_
+#define _FVWRITE_H_
+
 /* %W% (Berkeley) %G% */
 #include <_ansi.h>
 
@@ -34,3 +37,9 @@ struct __suio {
 
 extern int _sfvwrite ( FILE *, struct __suio *);
 extern int _swsetup ( FILE *);
+extern int __sswprint (	FILE *fp, register struct __suio *uio);
+extern int __sprint ( FILE *fp, register struct __suio *uio);
+extern int __ssprint ( FILE *fp, register struct __suio *uio);
+extern int __swprint ( FILE *fp, register struct __suio *uio);
+
+#endif /* _FVWRITE_H_ */

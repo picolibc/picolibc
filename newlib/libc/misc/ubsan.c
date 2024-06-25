@@ -50,6 +50,9 @@ struct out_of_bounds_data {
 };
 
 void
+__ubsan_handle_out_of_bounds(struct out_of_bounds_data *data, void *id);
+
+void
 __ubsan_handle_out_of_bounds(struct out_of_bounds_data *data, void *id)
 {
     (void) id;

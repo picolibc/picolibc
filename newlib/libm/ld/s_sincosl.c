@@ -33,6 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _GNU_SOURCE
 #include "math_ld.h"
 
 #if LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113

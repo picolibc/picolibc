@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <ssp/ssp.h>
 #undef puts
 
 static void (*fortify_handler)(int sig);

@@ -93,7 +93,7 @@ __weak_reference(__weak_interrupt_vector, __interrupt_vector);
 
 #else
 
-void arm_halt_isr(void);
+void arm_halt_vector(void);
 
 void __attribute__((naked)) __section(".init")
 arm_halt_vector(void)
@@ -102,7 +102,7 @@ arm_halt_vector(void)
 	__asm__("1: b 1b");
 }
 
-void arm_ignore_isr(void);
+void arm_ignore_vector(void);
 
 void __attribute__((naked)) __section(".init")
 arm_ignore_vector(void)
@@ -124,6 +124,9 @@ vector_halt(data_abort);
 vector(not_used);
 vector(irq);
 vector(fiq);
+
+void
+__weak_vector_table(void);
 
 void __attribute__((naked)) __section(".text.init.enter")
 __weak_vector_table(void)

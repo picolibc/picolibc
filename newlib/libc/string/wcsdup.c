@@ -32,10 +32,9 @@ QUICKREF
 	wcsdup 
 */
 
+#define _DEFAULT_SOURCE
 #include <stdlib.h>
 #include <wchar.h>
-
-#ifndef _REENT_ONLY
 
 wchar_t *
 wcsdup (const wchar_t *str)
@@ -46,5 +45,3 @@ wcsdup (const wchar_t *str)
     wmemcpy (copy, str, len);
   return copy;
 }
-
-#endif /* !_REENT_ONLY */

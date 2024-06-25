@@ -14,6 +14,7 @@
 #ifndef _RAND48_H_
 #define _RAND48_H_
 
+#define _DEFAULT_SOURCE
 #include <math.h>
 #include <stdlib.h>
 

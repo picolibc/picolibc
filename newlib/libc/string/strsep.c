@@ -2,12 +2,10 @@
 
 /* Copyright 2002, Red Hat Inc. */
 
-/* undef STRICT_ANSI so that strsep prototype will be defined */
-#undef  __STRICT_ANSI__
+#define _DEFAULT_SOURCE
 #include <string.h>
 #include <_ansi.h>
-
-extern char *__strtok_r (char *, const char *, char **, int);
+#include "strtok_r.h"
 
 char *
 strsep (register char **source_ptr,

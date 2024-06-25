@@ -27,9 +27,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <wchar.h>
 #ifdef __SCLE
 # include <io.h>
 #endif
+#include "fvwrite.h"
 
 /* The following define determines if the per-reent stdin, stdout and stderr
    streams are closed during _reclaim_reent().  The stdin, stdout and stderr
@@ -182,6 +184,16 @@ extern void   __sinit (void);
 extern void   _smakebuf ( FILE *);
 extern int    _swhatbuf ( FILE *, size_t *, int *);
 extern int __submore (FILE *);
+
+extern int __sprint (FILE *, register struct __suio *);
+extern int __ssprint (FILE *, register struct __suio *);
+extern int __ssputs (FILE *fp, const char *buf, size_t len);
+extern int __ssputws (FILE *fp,	const wchar_t *buf, size_t len);
+extern int __sfputs (FILE *, const char *buf, size_t len);
+extern int __sfputws (FILE *, const wchar_t *buf, size_t len);
+extern int sungetc (int c, register FILE *fp);
+extern int _ssrefill (register FILE * fp);
+extern size_t _sfread (void *buf, size_t size, size_t count, FILE * fp);
 
 #ifdef __LARGE64_FILES
 extern _fpos64_t __sseek64 (void *, _fpos64_t, int);

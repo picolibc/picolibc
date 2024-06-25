@@ -21,6 +21,7 @@
  * 0 results in an empty string.
  */
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stdlib.h>
 

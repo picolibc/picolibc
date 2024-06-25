@@ -32,6 +32,7 @@ PORTABILITY
 <<wcswidth>> has been marked as an extension in the Single UNIX Specification Volume 3.
 */
 
+#define _XOPEN_SOURCE
 #include <_ansi.h>
 #include <wchar.h>
 #include <stdint.h>

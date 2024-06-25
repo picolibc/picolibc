@@ -788,6 +788,8 @@ common_warnings = [
   '-Wno-missing-braces',
   '-Wno-return-type',
   '-Wno-unused-command-line-argument',
+  '-Wmissing-prototypes',
+  '-Wmissing-declarations',
 ]
 if get_option('analyzer')
   common_warnings += [

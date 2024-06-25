@@ -79,7 +79,7 @@ PORTABILITY
 <<fputws_unlocked>> is a GNU extension.
 */
 
-#define _DEFAULT_SOURCE
+#define _GNU_SOURCE
 #include <_ansi.h>
 #include <errno.h>
 #include <limits.h>

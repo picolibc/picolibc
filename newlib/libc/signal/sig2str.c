@@ -59,6 +59,7 @@ Otherwise, it returns <<-1>>.
 <[pnum]>. Otherwise it returns <<-1>>.
 */
 
+#define _DEFAULT_SOURCE
 #include <signal.h>
 #include <string.h>
 #include <stdio.h>

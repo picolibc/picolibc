@@ -46,4 +46,5 @@ extern NEWLIB_THREAD_LOCAL_ATEXIT struct _atexit *_atexit;
 
 void __call_exitprocs (int, void *);
 int __register_exitproc (int, void (*fn) (void), void *, void *);
-
+void __cxa_finalize (void * d);
+int __cxa_atexit (void (*fn) (void *), void *arg, void *d);

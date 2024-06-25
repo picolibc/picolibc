@@ -319,7 +319,7 @@ _ssrefill (
 }
 
 size_t
-sfread (
+_sfread (
        void *buf,
        size_t size,
        size_t count,

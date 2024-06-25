@@ -12,6 +12,7 @@
 #if !defined(_SOFT_FLOAT)
 
 #include <math.h>
+#include "f_math.h"
 
 /*
 FUNCTION

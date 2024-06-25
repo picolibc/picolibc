@@ -37,6 +37,7 @@
  * finite(x) returns 1 is x is finite, else 0;
  */
 
+#define _DEFAULT_SOURCE
 #include <math.h>
 
 #if defined(__RISCV_HARD_FLOAT) && __RISCV_HARD_FLOAT >= 64

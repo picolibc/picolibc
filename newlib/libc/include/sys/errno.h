@@ -42,6 +42,12 @@ extern "C" {
    Use strerror instead. */
 extern __IMPORT const char * const _sys_errlist[];
 extern __IMPORT int _sys_nerr;
+#if __GNU_VISIBLE
+char *
+_user_strerror (int errnum,
+                int internal,
+                int *errptr);
+#endif
 #ifdef __CYGWIN__
 extern __IMPORT const char * const sys_errlist[];
 extern __IMPORT int sys_nerr;

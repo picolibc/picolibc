@@ -16,12 +16,14 @@
  */
 
 #include "test.h"
+
+#ifdef _HAVE_IEEEFP_FUNCS
 #include <ieeefp.h>
 
 
 /* Test fp getround and fp setround */
 
-void
+static void
 test_getround (void)
 {
 
@@ -41,7 +43,7 @@ test_getround (void)
 }
 
 /* And fpset/fpgetmask */
-void
+static void
 test_getmask (void)
 {
   newfunc("fpsetmask/fpgetmask");
@@ -62,7 +64,7 @@ test_getmask (void)
     test_iok(fpgetmask(),FP_X_IMP);
 }
 
-void
+static void
 test_getsticky (void)
 {
   newfunc("fpsetsticky/fpgetsticky");
@@ -83,7 +85,7 @@ test_getsticky (void)
     test_iok(fpgetsticky(),FP_X_IMP);
 }
 
-void
+static void
 test_getroundtoi (void)
 {
   newfunc("fpsetroundtoi/fpgetroundtoi");
@@ -97,9 +99,9 @@ test_getroundtoi (void)
 
 }
 
-double
- dnumber (int msw,
-	int lsw)
+static double
+dnumber (int msw,
+         int lsw)
 {
   
   __ieee_double_shape_type v;
@@ -118,8 +120,9 @@ double add_rounded_up;
 double add_rounded_down;
 double sub_rounded_down ;
 double sub_rounded_up ;
-  double r1,r2,r3,r4;
-void
+double r1,r2,r3,r4;
+
+static void
 test_round (void)
 {
   n =                dnumber(0x40000000, 0x00000008); /* near 2 */
@@ -184,10 +187,12 @@ test_round (void)
   }
 }
 
+#endif
 
 void
 test_ieee (void)
 {
+#ifdef _HAVE_IEEEFP_FUNCS
   fp_rnd old = fpgetround();
   test_getround();
   test_getmask();
@@ -196,8 +201,7 @@ test_ieee (void)
 
   test_round();
   fpsetround(old);
-
-  
+#endif
 }
 
 

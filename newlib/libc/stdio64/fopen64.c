@@ -49,11 +49,7 @@ Supporting OS subroutines required: <<close>>, <<fstat64>>, <<isatty>>,
 
 /* Copied from fopen.c */
 
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "%W% (Berkeley) %G%";
-#endif /* LIBC_SCCS and not lint */
-
-#define _DEFAULT_SOURCE
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <errno.h>
 #include <fcntl.h>

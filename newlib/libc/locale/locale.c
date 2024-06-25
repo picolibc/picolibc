@@ -460,8 +460,6 @@ currentlocale (void)
   return global_locale_string;
 }
 
-extern void __set_ctype (struct __locale_t *, const char *charset);
-
 char *
 __loadlocale (struct __locale_t *loc, int category, char *new_locale)
 {

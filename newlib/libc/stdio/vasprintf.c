@@ -17,11 +17,7 @@
 /* This code was based on vsprintf.c */
 /* doc in vfprintf.c */
 
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "%W% (Berkeley) %G%";
-#endif /* LIBC_SCCS and not lint */
-
-#define _DEFAULT_SOURCE
+#define _GNU_SOURCE
 #include <_ansi.h>
 #include <stdio.h>
 #include <limits.h>

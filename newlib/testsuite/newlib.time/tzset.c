@@ -156,7 +156,7 @@ const struct tz_test test_timezones[] = {
 static int failed = 0;
 
 #define TEST_ASSERT_EQUAL_INT_MESSAGE(...) assert_equal(__VA_ARGS__)
-void assert_equal(int lhs, int rhs, const char* msg)
+static void assert_equal(int lhs, int rhs, const char* msg)
 {
     if (lhs != rhs)
     {
@@ -165,7 +165,7 @@ void assert_equal(int lhs, int rhs, const char* msg)
     }
 }
 
-void test_TimezoneStrings(void)
+static void test_TimezoneStrings(void)
 {
     char buffer[128];
 

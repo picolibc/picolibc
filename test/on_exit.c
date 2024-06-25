@@ -38,7 +38,7 @@
 #include <unistd.h>
 #include <stdio.h>
 
-void
+static void
 fail(int code, void *param)
 {
         (void) code;
@@ -47,7 +47,7 @@ fail(int code, void *param)
 	_exit(2);
 }
 
-void
+static void
 success(int code, void *param)
 {
         (void) code;

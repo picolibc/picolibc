@@ -56,6 +56,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<getpid>>,
 <<tmpfile64>> also requires the global pointer <<environ>>.
 */
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <errno.h>
 #include <fcntl.h>

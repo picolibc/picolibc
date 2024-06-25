@@ -1,5 +1,5 @@
-/*-
- * Copyright (c) 2017 embedded brains GmbH
+/*
+ * Copyright (c) 1988 Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -10,11 +10,14 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -24,30 +27,13 @@
  * SUCH DAMAGE.
  */
 
-#define _DEFAULT_SOURCE
-#include <strings.h>
+#ifndef _STRTOK_R_H_
+#define _STRTOK_R_H_
 
-int
-ffsl(long i)
-{
-#ifdef _HAVE_BUILTIN_FFSL
-	return (__builtin_ffsl(i));
-#elif defined(_HAVE_BUILTIN_CTZL)
-	if (i == 0)
-		return 0;
-	return __builtin_ctzl((unsigned long)i) + 1;
-#else
-  int r;
+char *
+__strtok_r (register char *s,
+            register const char *delim,
+            char **lasts,
+            int skip_leading_delim);
 
-  if (!i)
-    return 0;
-
-  r = 0;
-  for (;;)
-    {
-      if (((1L << r++) & i) != 0)
-       return r;
-    }
-  return 0;
-#endif
-}
+#endif /* _STRTOK_R_H_ */

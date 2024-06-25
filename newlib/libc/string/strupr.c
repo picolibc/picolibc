@@ -41,6 +41,7 @@ QUICKREF
 	strupr
 */
 
+#define _DEFAULT_SOURCE
 #include <string.h>
 #include <ctype.h>
 

@@ -15,6 +15,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#define _DEFAULT_SOURCE
 #include <sys/cdefs.h>
 #include <sys/types.h>
 #include <errno.h>

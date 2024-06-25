@@ -38,7 +38,7 @@
 #include <math.h>
 #include <stdbool.h>
 
-bool
+static bool
 near(double got, double target, double close)
 {
 	if (got < target - close)

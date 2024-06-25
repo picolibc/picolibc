@@ -55,6 +55,7 @@ PORTABILITY
 <<mbsnrtowcs>> is defined by the POSIX.1-2008 standard.
 */
 
+#define _DEFAULT_SOURCE
 #include <wchar.h>
 #include <stdlib.h>
 #include <stdio.h>

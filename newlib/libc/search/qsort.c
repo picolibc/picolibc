@@ -62,14 +62,15 @@ PORTABILITY
  * SUCH DAMAGE.
  */
 
+#if defined(I_AM_QSORT_R)
+#define _BSD_SOURCE
+#else
+#define _DEFAULT_SOURCE
+#endif
 #include <_ansi.h>
 #include <sys/cdefs.h>
 #include <stdlib.h>
 #include <stdint.h>
-
-#ifndef __GNUC__
-#define inline
-#endif
 
 #if defined(I_AM_QSORT_R)
 typedef int		 cmp_t(void *, const void *, const void *);
@@ -78,8 +79,8 @@ typedef int		 cmp_t(const void *, const void *, void *);
 #else
 typedef int		 cmp_t(const void *, const void *);
 #endif
-static inline char	*med3 (char *, char *, char *, cmp_t *, void *);
-static inline void	 swapfunc (char *, char *, size_t, int);
+static __inline char	*med3 (char *, char *, char *, cmp_t *, void *);
+static __inline void	 swapfunc (char *, char *, size_t, int);
 
 #define min(a, b)	(a) < (b) ? a : b
 
@@ -100,7 +101,7 @@ static inline void	 swapfunc (char *, char *, size_t, int);
 #define SWAPINIT(a, es) swaptype = ((uintptr_t)(a) % sizeof(long)) ||   \
 	((es) % sizeof(long)) ? 2 : ((es) == sizeof(long)) ? 0 : 1
 
-static inline void
+static __inline void
 swapfunc (char *a,
 	char *b,
 	size_t n,
@@ -130,7 +131,7 @@ swapfunc (char *a,
 #define	CMP(t, x, y) (cmp((x), (y)))
 #endif
 
-static inline char *
+static __inline char *
 med3 (char *a,
 	char *b,
 	char *c,
@@ -163,6 +164,9 @@ __unused
 #define PARAMETER_STACK_LEVELS 8u
 
 #if defined(I_AM_QSORT_R)
+# ifdef __GNUC__
+__typeof(qsort_r) __bsd_qsort_r;
+#endif
 void
 __bsd_qsort_r (void *a,
 	size_t n,

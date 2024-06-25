@@ -48,6 +48,7 @@ PORTABILITY
  * wrapper pow10(x)
  */
 
+#define _GNU_SOURCE
 #undef pow10
 #include "fdlibm.h"
 #include <errno.h>

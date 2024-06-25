@@ -52,10 +52,12 @@ typedef _sig_func_ptr sighandler_t;	/* glibc naming */
 #define SIG_IGN ((_sig_func_ptr)1)	/* Ignore action */
 #define SIG_ERR ((_sig_func_ptr)-1)	/* Error return */
 
-#ifndef _REENT_ONLY
 _sig_func_ptr signal (int, _sig_func_ptr);
 int	raise (int);
 void	psignal (int, const char *);
+
+#if __POSIX_VISIBLE
+int kill(__pid_t pid, int sig);
 #endif
 
 _END_STD_C

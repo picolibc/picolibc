@@ -568,7 +568,7 @@ int	fputs_unlocked (const char *__restrict, FILE *__restrict);
 #endif
 
 #ifdef __LARGE64_FILES
-#if !defined(__CYGWIN__) || defined(_LIBC)
+#if __LARGEFILE64_VISIBLE
 FILE *	fdopen64 (int, const char *);
 FILE *  fopen64 (const char *, const char *);
 FILE *  freopen64 (const char *, const char *, FILE *);
@@ -578,7 +578,7 @@ int     fgetpos64 (FILE *, _fpos64_t *);
 int     fsetpos64 (FILE *, const _fpos64_t *);
 FILE *  tmpfile64 (void);
 
-#endif /* !__CYGWIN__ */
+#endif /* __LARGEFILE64_VISIBLE */
 #endif /* __LARGE64_FILES */
 
 /*

@@ -20,6 +20,7 @@ distribute this software is freely granted.
 #if !defined(_SOFT_FLOAT)
 
 #include <math.h>
+#include "f_math.h"
 
 /*
  * Fast math version of lrintl(x)

@@ -28,6 +28,7 @@ PORTABILITY
 No supporting OS subroutine calls are required.
 */
 
+#define _DEFAULT_SOURCE
 #include <stdlib.h>
 
 char *

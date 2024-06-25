@@ -265,7 +265,10 @@ extern int __finite (double);
 extern int __finitef (float);
 #if defined(_HAVE_LONG_DOUBLE)
 extern int __fpclassifyl (long double);
+extern int __isinfl (long double);
+extern int __isnanl (long double);
 extern int __finitel (long double);
+extern int __signbitl (long double);
 #endif
 
 /* Note: isinf and isnan were once functions in newlib that took double
@@ -545,6 +548,7 @@ extern float hypotf (float, float);
 /* These functions are always available for long double */
 
 extern long double hypotl (long double, long double);
+extern long double infinityl (void);
 extern long double sqrtl (long double);
 extern long double frexpl (long double, int *);
 extern long double scalbnl (long double, int);

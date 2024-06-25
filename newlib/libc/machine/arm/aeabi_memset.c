@@ -49,6 +49,8 @@ void __aeabi_memset8 (void *dest, size_t n, int c)
 
 #undef memset
 
+void __attribute__((used, weak)) __aeabi_memset (void *dest, size_t n, int c);
+
 void __attribute__((used, weak)) __aeabi_memset (void *dest, size_t n, int c)
 {
   /*Note that relative to ANSI memset, __aeabi_memset hase the order

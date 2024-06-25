@@ -2,6 +2,7 @@
 /* sincos -- currently no more efficient than two separate calls to
    sin and cos. */
 
+#define _GNU_SOURCE
 #include "fdlibm.h"
 #include <errno.h>
 #include <math.h>

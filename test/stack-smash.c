@@ -40,11 +40,12 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <ssp/ssp.h>
 
 #ifdef TESTS_ENABLE_STACK_PROTECTOR
 static volatile bool expect_smash;
 
-void __attribute__((noinline))
+static void __attribute__((noinline))
 #ifdef _HAVE_CC_INHIBIT_LOOP_TO_LIBCALL
 __attribute((__optimize__("-fno-tree-loop-distribute-patterns")))
 #endif
@@ -53,7 +54,7 @@ __attribute((__optimize__("-fno-tree-loop-distribute-patterns")))
     while ((*d++ = *s++));
 }
 
-void __attribute__((noinline)) smash_array(char *source, char *dest)
+static void __attribute__((noinline)) smash_array(char *source, char *dest)
 {
 	char	local[16];
 

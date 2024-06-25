@@ -34,7 +34,7 @@ int mylower;
 int mygraph;
 int mypunct;
 
-void
+static void
 test_is_single (int i)
 {
   setascii = 0;
@@ -1929,25 +1929,25 @@ test_is_single (int i)
 }
 
 
-int def_isascii (int i) { return isascii(i); }
-int def_iscntrl (int i) { return iscntrl(i); }
-int def_isspace (int i) { return isspace(i); }
-int def_isprint (int i) { return isprint(i); }
-int def_isalnum (int i) { return isalnum(i); }
-int def_isdigit (int i) { return isdigit(i); }
-int def_isxdigit (int i) { return isxdigit(i); }
-int def_isalpha (int i) { return isalpha(i); }
-int def_isupper (int i) { return isupper(i); }
-int def_islower (int i) { return islower(i); }
-int def_isgraph (int i) { return isgraph(i); }
-int def_ispunct (int i) { return ispunct(i); }
-int def_tolower (int i) { return tolower(i); }
-int def_toupper (int i) { return toupper(i); }
-int def_toascii (int i) { return toascii(i); }
-int def__tolower (int i) { return _tolower(i); }
-int def__toupper (int i) { return _toupper(i); }
+static int def_isascii (int i) { return isascii(i); }
+static int def_iscntrl (int i) { return iscntrl(i); }
+static int def_isspace (int i) { return isspace(i); }
+static int def_isprint (int i) { return isprint(i); }
+static int def_isalnum (int i) { return isalnum(i); }
+static int def_isdigit (int i) { return isdigit(i); }
+static int def_isxdigit (int i) { return isxdigit(i); }
+static int def_isalpha (int i) { return isalpha(i); }
+static int def_isupper (int i) { return isupper(i); }
+static int def_islower (int i) { return islower(i); }
+static int def_isgraph (int i) { return isgraph(i); }
+static int def_ispunct (int i) { return ispunct(i); }
+static int def_tolower (int i) { return tolower(i); }
+static int def_toupper (int i) { return toupper(i); }
+static int def_toascii (int i) { return toascii(i); }
+static int def__tolower (int i) { return _tolower(i); }
+static int def__toupper (int i) { return _toupper(i); }
 
-void
+static void
 test_is_set (int (*func)(int),
        char *name,
        int *p)
@@ -1965,7 +1965,8 @@ test_is_set (int (*func)(int),
       }
   }
 }
-void
+
+static void
 test_to_set (int (*func)(int),
        char *name,
        int *p,

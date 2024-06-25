@@ -12,18 +12,9 @@
 
 /* Handle ELF .{pre_init,init,fini}_array sections.  */
 #include <sys/types.h>
+#include <sys/_initfini.h>
 
 #ifdef _HAVE_INITFINI_ARRAY
-
-/* These magic symbols are provided by the linker.  */
-extern void (*__preinit_array_start []) (void) __attribute__((weak));
-extern void (*__preinit_array_end []) (void) __attribute__((weak));
-extern void (*__init_array_start []) (void) __attribute__((weak));
-extern void (*__init_array_end []) (void) __attribute__((weak));
-
-#ifdef _HAVE_INIT_FINI
-extern void _init (void) __attribute__((weak));
-#endif
 
 /* Iterate over all the init routines.  */
 void

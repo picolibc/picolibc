@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <wchar.h>
+#include "local.h"
 
 int
 __sfputws (

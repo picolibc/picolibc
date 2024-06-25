@@ -26,7 +26,7 @@
 
 #define MAX_2 (2 * MAX_1 + MAX_1 / 10)
 
-void eprintf (int line, char *result, char *expected, int size)
+static void eprintf (int line, char *result, char *expected, int size)
 {
   if (size != 0)
     printf ("Failure at line %d, result is <%.*s>, should be <%s> of size %d\n",
@@ -36,7 +36,7 @@ void eprintf (int line, char *result, char *expected, int size)
              line, result, expected);
 }
 
-void mycopy (char *target, char *source, int size)
+static void mycopy (char *target, char *source, int size)
 {
   int i;
 
@@ -46,7 +46,7 @@ void mycopy (char *target, char *source, int size)
     }
 }
 
-void myset (char *target, char ch, int size)
+static void myset (char *target, char ch, int size)
 {
   int i;
   
@@ -56,7 +56,7 @@ void myset (char *target, char ch, int size)
     }
 }
 
-char *getbuf(size_t size, const char *template)
+static char *getbuf(size_t size, const char *template)
 {
     char *buf = calloc(size, 1);
     if (!buf) {

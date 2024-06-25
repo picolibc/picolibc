@@ -166,7 +166,7 @@ trailz (_Bigint *b)
 	return n;
 	}
 
-_Bigint *
+static _Bigint *
 increment (_Bigint *b)
 {
 	__ULong *x, *xe;
@@ -211,7 +211,7 @@ increment (_Bigint *b)
 	return b;
 	}
 
-int
+static int
 decrement (_Bigint *b)
 {
 	__ULong *x, *xe;
@@ -255,7 +255,7 @@ all_on (_Bigint *b, int n)
 	return 1;
 	}
 
-_Bigint *
+static _Bigint *
 set_ones (_Bigint *b, int n)
 {
 	int k;

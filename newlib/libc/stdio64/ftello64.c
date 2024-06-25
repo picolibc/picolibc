@@ -68,7 +68,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
  * ftello64: return current offset.
  */
 
-#define _DEFAULT_SOURCE
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <errno.h>
 #include "../stdio/local.h"

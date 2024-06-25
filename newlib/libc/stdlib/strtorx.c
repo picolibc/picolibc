@@ -56,12 +56,8 @@ THIS SOFTWARE.
 #define _4 0
 #endif
 
- void
-#ifdef KR_headers
-ULtox(L, bits, exp, k) __UShort *L; __ULong *bits; Long exp; int k;
-#else
+static void
 ULtox(__UShort *L, __ULong *bits, Long exp, int k)
-#endif
 {
 	switch(k & STRTOG_Retmask) {
 	  case STRTOG_NoNumber:

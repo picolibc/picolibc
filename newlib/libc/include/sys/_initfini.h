@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright © 2024 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,13 +33,24 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _DEFAULT_SOURCE
-#include "semihost-private.h"
-#include <sys/types.h>
-#include <signal.h>
-#include <unistd.h>
-#include <errno.h>
+#ifndef __INITFINI_H_
+#define __INITFINI_H_
 
-pid_t getpid(void) { return 1; }
+/* These magic symbols are provided by the linker.  */
+extern void (*__preinit_array_start []) (void) __attribute__((weak));
+extern void (*__preinit_array_end []) (void) __attribute__((weak));
+extern void (*__init_array_start []) (void) __attribute__((weak));
+extern void (*__init_array_end []) (void) __attribute__((weak));
+extern void (*__fini_array_start []) (void) __attribute__((weak));
+extern void (*__fini_array_end []) (void) __attribute__((weak));
 
-int kill(pid_t pid, int sig) { if (pid == 1) _exit(128 + sig); errno = ESRCH; return -1; }
+extern void _init (void) __attribute__((weak));
+extern void _fini (void) __attribute__((weak));
+
+void
+__libc_init_array (void);
+
+void
+__libc_fini_array (void);
+
+#endif /* __INITFINI_H_ */

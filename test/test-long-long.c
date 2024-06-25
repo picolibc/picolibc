@@ -42,7 +42,8 @@
 
 #if !defined(__PICOLIBC__) || defined(TINY_STDIO) || defined(_WANT_IO_LONG_LONG)
 
-unsigned long long
+#if 0
+static unsigned long long
 naive_atou(const char *buf)
 {
     unsigned long long v = 0;
@@ -59,7 +60,7 @@ naive_atou(const char *buf)
     return v * sign;
 }
 
-long long
+static long long
 naive_atol(const char *buf)
 {
     long long v = 0;
@@ -85,8 +86,9 @@ naive_atol(const char *buf)
     } while(c);
     return v * sign;
 }
+#endif
 
-char *
+static char *
 naive_utoa(char *buf, unsigned long long v)
 {
     buf += 21;
@@ -98,7 +100,7 @@ naive_utoa(char *buf, unsigned long long v)
     return buf;
 }
 
-char *
+static char *
 naive_ltoa(char *buf, long long v)
 {
     int sign = 0;

@@ -148,7 +148,7 @@ const struct {
     { "a[.]b", "a.b", FNM_PATHNAME|FNM_PERIOD, 0 },
 };
 
-int test_fnmatch(void) {
+static int test_fnmatch(void) {
     int i;
     unsigned int failed = 0;
 

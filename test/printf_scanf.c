@@ -126,7 +126,7 @@ int (*_reference_scanf_float)() = _scanf_float;
 static const double test_vals[] = { 1.234567, 1.1, M_PI };
 #endif
 
-int
+static int
 check_vsnprintf(char *str, size_t size, const char *format, ...)
 {
 	int i;

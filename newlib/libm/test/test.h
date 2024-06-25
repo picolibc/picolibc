@@ -555,7 +555,7 @@ void
 test_y1f(int vector);
 
 void
-test_y1f(int vector);
+test_yn(int vector);
 
 void
 test_ynf(int vector);

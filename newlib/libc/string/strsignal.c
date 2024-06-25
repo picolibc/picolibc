@@ -46,6 +46,7 @@ QUICKREF
  *  SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
  */
 
+#define _DEFAULT_SOURCE
 #include <string.h>
 #include <signal.h>
 #include <stdio.h>

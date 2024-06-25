@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright © 2021 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,13 +33,20 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _DEFAULT_SOURCE
-#include "semihost-private.h"
-#include <sys/types.h>
-#include <signal.h>
-#include <unistd.h>
-#include <errno.h>
+double
+div(double a, double b);
 
-pid_t getpid(void) { return 1; }
+double
+mul(double a, double b);
 
-int kill(pid_t pid, int sig) { if (pid == 1) _exit(128 + sig); errno = ESRCH; return -1; }
+double
+sub(double a, double b);
+
+float
+div_f(float a, float b);
+
+float
+mul_f(float a, float b);
+
+float
+sub_f(float a, float b);

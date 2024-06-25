@@ -54,79 +54,13 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
 */
 
-#define _DEFAULT_SOURCE
+#define _GNU_SOURCE
 #include <_ansi.h>
 #include <stdlib.h>
 #include <string.h>
 #include "mprec.h"
 #include "local.h"
 #include "atexit.h"
-
-static void
-print_f (
-	char *buf,
-	double invalue,
-	int ndigit,
-	char type,
-	int dot,
-	int mode)
-{
-  int decpt;
-  int sign;
-  char *p, *start, *end;
-
-  (void) type; /* XXX should be used */
-  start = p = __dtoa (invalue, mode, ndigit, &decpt, &sign, &end);
-  if (!p) {
-    buf[0] = '\0';
-    return;
-  }
-
-  if (decpt == 9999)
-    {
-      strcpy (buf, p);
-      return;
-    }
-  while (*p && decpt > 0)
-    {
-      *buf++ = *p++;
-      decpt--;
-    }
-  /* Even if not in buffer */
-  while (decpt > 0)
-    {
-      *buf++ = '0';
-      decpt--;
-    }
-
-  if (dot || *p)
-    {
-      if (p == start)
-	*buf++ = '0';
-      if (decpt < 0 && ndigit > 0)
-	*buf++ = '.';
-      while (decpt < 0 && ndigit > 0)
-	{
-	  *buf++ = '0';
-	  decpt++;
-	  ndigit--;
-	}
-
-      /* Print rest of stuff */
-      while (*p && ndigit > 0)
-	{
-	  *buf++ = *p++;
-	  ndigit--;
-	}
-      /* And trailing zeros */
-      while (ndigit > 0)
-	{
-	  *buf++ = '0';
-	  ndigit--;
-	}
-    }
-  *buf++ = 0;
-}
 
 /* Print number in e format with width chars after.
 
@@ -461,33 +395,4 @@ _gcvt (
     }
 
   return save;
-}
-
-char *
-_dcvt (
-	char *buffer,
-	double invalue,
-	int precision,
-	int width,
-	char type,
-	int dot)
-{
-  (void) width; /* XXX should be used */
-  switch (type)
-    {
-    case 'f':
-    case 'F':
-      print_f (buffer, invalue, precision, type, precision == 0 ? dot : 1, 3);
-      break;
-    case 'g':
-    case 'G':
-      if (precision == 0)
-	precision = 1;
-      _gcvt (invalue, precision, buffer, type, dot);
-      break;
-    case 'e':
-    case 'E':
-      print_e (buffer, invalue, precision, type, dot);
-    }
-  return buffer;
 }

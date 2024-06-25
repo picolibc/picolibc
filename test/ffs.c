@@ -40,7 +40,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-long long int
+static long long int
 rand_long_long(void)
 {
 	unsigned long long int r = 0;
@@ -51,7 +51,7 @@ rand_long_long(void)
 	return r;
 }
 
-int
+static int
 slow_ffs(int i)
 {
 	int p;
@@ -62,7 +62,7 @@ slow_ffs(int i)
 	return p;
 }
 
-int
+static int
 slow_ffsl(long int i)
 {
 	int p;
@@ -73,7 +73,7 @@ slow_ffsl(long int i)
 	return p;
 }
 
-int
+static int
 slow_ffsll(long long int i)
 {
 	int p;

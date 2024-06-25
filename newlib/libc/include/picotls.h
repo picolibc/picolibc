@@ -36,6 +36,8 @@
 #ifndef _PICOTLS_H_
 #define _PICOTLS_H_
 
+#include <picolibc.h>
+
 #ifdef PICOLIBC_TLS
 
 #include <sys/types.h>

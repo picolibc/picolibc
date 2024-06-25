@@ -48,7 +48,7 @@ TEST(t, d, (double)x, "%g != %g") )
 #define NO_FLOATING_POINT
 #endif
 
-int test_sscanf(void)
+static int test_sscanf(void)
 {
 	int i;
 	int err=0;

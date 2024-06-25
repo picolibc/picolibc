@@ -9,6 +9,7 @@
 #else
 
 #define _GNU_SOURCE        // for FE_NOMASK_ENV
+#define __STDC_WANT_IEC_60559_BFP_EXT__
 
 #include <fenv.h>
 #include <errno.h>

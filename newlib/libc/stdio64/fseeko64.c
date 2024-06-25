@@ -66,7 +66,7 @@ Supporting OS subroutines required: <<close>>, <<fstat64>>, <<isatty>>,
 <<lseek64>>, <<read>>, <<sbrk>>, <<write>>.
 */
 
-#define _DEFAULT_SOURCE
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <time.h>
 #include <fcntl.h>

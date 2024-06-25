@@ -82,7 +82,7 @@ expect(size_t pos)
     return (char) c;
 }
 
-size_t
+static size_t
 check(char *label, void *buf, size_t size, size_t start, size_t end, int c)
 {
     size_t      p;
@@ -103,7 +103,7 @@ check(char *label, void *buf, size_t size, size_t start, size_t end, int c)
     return error;
 }
 
-size_t
+static size_t
 randrange(size_t max)
 {
     size_t      pot;

@@ -55,7 +55,7 @@ static const char NAME_TEMPLATE_EXT[] = "foo-XXXXXX.txt";
 
 #define MESSAGE "hello, world\n"
 
-void
+static void
 check_contents(char *template,int repeats)
 {
     FILE *f;

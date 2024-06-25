@@ -52,7 +52,7 @@
     } while(0)
 
 
-int test_string(void)
+static int test_string(void)
 {
         char b[32] = {0};
         char c[32] = {0};

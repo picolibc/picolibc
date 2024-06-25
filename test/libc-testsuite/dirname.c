@@ -38,7 +38,7 @@
         free(tmp);                                                      \
     } while (0)
 
-int test_dirname(void)
+static int test_dirname(void)
 {
 	char *tmp, *s;
 	int err=0;

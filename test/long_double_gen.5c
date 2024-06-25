@@ -102,7 +102,7 @@ gen_real_f_f(func_f_f_t f)
 	if (is_full_func(f.name))
 		printf("#ifdef FULL_LONG_DOUBLE\n");
 	string prec_name = make_prec(f.name);
-	printf("long_double_test_f_f_t %s[] = {\n", vec);
+	printf("static long_double_test_f_f_t %s[] = {\n", vec);
 	for (x = -10; x <= 10; x += .1) {
 		try {
 			string sy;
@@ -127,7 +127,7 @@ gen_real_f_f(func_f_f_t f)
 		}
 	}
 	printf("};\n\n");
-	printf("int test_%s(void) {\n", f.name);
+	printf("static int test_%s(void) {\n", f.name);
 	printf("    unsigned int i;\n");
 	printf("    int result = 0;\n");
 	printf("    for (i = 0; i < sizeof(%s)/sizeof(%s[0]); i++) {\n", vec, vec);
@@ -374,7 +374,7 @@ gen_real_f_ff(func_f_ff_t f)
 	if (is_full_func(f.name))
 		printf("#ifdef FULL_LONG_DOUBLE\n");
 	string prec_name = make_prec(f.name);
-	printf("long_double_test_f_ff_t %s[] = {\n", vec);
+	printf("static long_double_test_f_ff_t %s[] = {\n", vec);
 	for (x0 = -4; x0 <= 4; x0 += .25) {
 		for (x1 = -4; x1 <= 4; x1 += 0.25) {
 			try {
@@ -401,7 +401,7 @@ gen_real_f_ff(func_f_ff_t f)
 		}
 	}
 	printf("};\n\n");
-	printf("int test_%s(void) {\n", f.name);
+	printf("static int test_%s(void) {\n", f.name);
 	printf("    unsigned int i;\n");
 	printf("    int result = 0;\n");
 	printf("    for (i = 0; i < sizeof(%s)/sizeof(%s[0]); i++) {\n", vec, vec);
@@ -424,7 +424,7 @@ gen_real_f_fff(func_f_fff_t f)
 	if (is_full_func(f.name))
 		printf("#ifdef FULL_LONG_DOUBLE\n");
 	string prec_name = make_prec(f.name);
-	printf("long_double_test_f_fff_t %s[] = {\n", vec);
+	printf("static long_double_test_f_fff_t %s[] = {\n", vec);
 	for (x0 = -4; x0 <= 4; x0 += 0.6) {
 		for (x1 = -4; x1 <= 4; x1 += 0.6) {
 			for (x2 = -4; x2 <= 4; x2 += 0.6) {
@@ -453,7 +453,7 @@ gen_real_f_fff(func_f_fff_t f)
 		}
 	}
 	printf("};\n\n");
-	printf("int test_%s(void) {\n", f.name);
+	printf("static int test_%s(void) {\n", f.name);
 	printf("    unsigned int i;\n");
 	printf("    int result = 0;\n");
 	printf("    for (i = 0; i < sizeof(%s)/sizeof(%s[0]); i++) {\n", vec, vec);
@@ -592,7 +592,7 @@ gen_real_f_fi(func_f_fi_t f)
 	if (is_full_func(f.name))
 		printf("#ifdef FULL_LONG_DOUBLE\n");
 	string prec_name = make_prec(f.name);
-	printf("long_double_test_f_fi_t %s[] = {\n", vec);
+	printf("static long_double_test_f_fi_t %s[] = {\n", vec);
 	for (x0 = -4; x0 <= 4; x0 += .25) {
 		for (x1 = -16; x1 <= 16; x1 += 1) {
 			try {
@@ -619,7 +619,7 @@ gen_real_f_fi(func_f_fi_t f)
 		}
 	}
 	printf("};\n\n");
-	printf("int test_%s(void) {\n", f.name);
+	printf("static int test_%s(void) {\n", f.name);
 	printf("    unsigned int i;\n");
 	printf("    int result = 0;\n");
 	printf("    for (i = 0; i < sizeof(%s)/sizeof(%s[0]); i++) {\n", vec, vec);
@@ -650,7 +650,7 @@ gen_real_i_f(func_i_f_t f)
 	printf("\n");
 	if (is_full_func(f.name))
 		printf("#ifdef FULL_LONG_DOUBLE\n");
-	printf("long_double_test_i_f_t %s[] = {\n", vec);
+	printf("static long_double_test_i_f_t %s[] = {\n", vec);
 	for (x = -10; x <= 10; x += .1) {
 		try {
 			string sy;
@@ -665,7 +665,7 @@ gen_real_i_f(func_i_f_t f)
 		}
 	}
 	printf("};\n\n");
-	printf("int test_%s(void) {\n", f.name);
+	printf("static int test_%s(void) {\n", f.name);
 	printf("    unsigned int i;\n");
 	printf("    int result = 0;\n");
 	printf("    for (i = 0; i < sizeof(%s)/sizeof(%s[0]); i++) {\n", vec, vec);
@@ -751,7 +751,7 @@ main()
 	for (int i = 0; i < dim(funcs_f_fff); i++)
 		gen_real_f_fff(funcs_f_fff[i]);
 
-	printf("long_double_test_t long_double_tests[] = {\n");
+	printf("static long_double_test_t long_double_tests[] = {\n");
 	for (int i = 0; i < dim(funcs_f_f); i++) {
 		if (is_full_func(funcs_f_f[i].name))
 			printf("#ifdef FULL_LONG_DOUBLE\n");

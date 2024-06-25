@@ -52,8 +52,7 @@ algorithm as <<rand>>.
 <<random>> requires no supporting OS subroutines.
 */
 
-#ifndef _REENT_ONLY
-
+#define _DEFAULT_SOURCE
 #include <stdlib.h>
 
 extern NEWLIB_THREAD_LOCAL long long _rand_next;
@@ -63,5 +62,3 @@ srandom (unsigned int seed)
 {
 	_rand_next = seed;
 }
-
-#endif /* _REENT_ONLY */

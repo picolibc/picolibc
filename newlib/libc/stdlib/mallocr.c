@@ -3406,6 +3406,13 @@ size_t malloc_usable_size(mem) RDECL Void_t* mem;
 
 #endif /* DEFINE_MALLOC_USABLE_SIZE */
 
+
+#if __STD_C
+extern void malloc_update_mallinfo(void);
+#else
+extern void malloc_update_mallinfo();
+#endif
+
 #ifdef DEFINE_MALLINFO
 
 /* Utility to update current_mallinfo for malloc_stats and mallinfo() */
@@ -3450,15 +3457,8 @@ STATIC void malloc_update_mallinfo(void)
 
 }
 
-#else /* ! DEFINE_MALLINFO */
-
-#if __STD_C
-extern void malloc_update_mallinfo(void);
-#else
-extern void malloc_update_mallinfo();
-#endif
-
 #endif /* ! DEFINE_MALLINFO */
+
 
 #ifdef DEFINE_MALLOC_STATS
 

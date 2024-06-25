@@ -89,6 +89,7 @@ PORTABILITY
  * Latest version: http://www.cl.cam.ac.uk/~mgk25/ucs/wcwidth.c
  */
 
+#define _XOPEN_SOURCE
 #include <_ansi.h>
 #include <wchar.h>
 #include <stdint.h>

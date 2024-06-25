@@ -52,8 +52,7 @@ algorithm as <<rand>>.
 <<random>> requires no supporting OS subroutines.
 */
 
-#ifndef _REENT_ONLY
-
+#define _DEFAULT_SOURCE
 #include <stdlib.h>
 
 NEWLIB_THREAD_LOCAL long long _rand_next = 1;
@@ -67,5 +66,3 @@ random (void)
   _rand_next = _rand_next * __extension__ 6364136223846793005LL + 1;
   return (long int)((_rand_next >> 32) & RAND_MAX);
 }
-
-#endif /* _REENT_ONLY */

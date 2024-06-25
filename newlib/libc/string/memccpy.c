@@ -28,6 +28,7 @@ PORTABILITY
 
 	*/
 
+#define _DEFAULT_SOURCE
 #include <_ansi.h>
 #include <stddef.h>
 #include <string.h>

@@ -144,7 +144,7 @@ int reduce = 0;
 
 int strtod_vector = 0;
 
-int 
+static int 
 bigger (__ieee_double_shape_type *a,
 	   __ieee_double_shape_type *b)
 {
@@ -164,7 +164,7 @@ bigger (__ieee_double_shape_type *a,
   return 0;
 }
 
-int 
+static int 
 fbigger (__ieee_float_shape_type *a,
 	   __ieee_float_shape_type *b)
 {
@@ -427,7 +427,8 @@ kill() {}
 getpid() {}
 #endif
 
-void bt(void){
+#if 0
+static void bt(void){
 
   double f1,f2;
   f1 = 0.0;
@@ -435,3 +436,4 @@ void bt(void){
   printf("(%g)\n", f2);
 
 }
+#endif
