@@ -38,7 +38,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-errno_t memset_s(void* s, rsize_t smax, int c, rsize_t n)
+__errno_t memset_s(void* s, rsize_t smax, int c, rsize_t n)
 {
     const char* msg = "";
     constraint_handler_t handler = NULL;

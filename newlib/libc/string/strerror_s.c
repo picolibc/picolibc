@@ -41,7 +41,7 @@
 #include "string_private.h"
 
 /* C11 version; required by LLVM's C++11 library */
-errno_t strerror_s(char *buf, rsize_t buflen, errno_t errnum)
+__errno_t strerror_s(char *buf, rsize_t buflen, __errno_t errnum)
 {
     int32_t result = 0;
     const char *msg = "";

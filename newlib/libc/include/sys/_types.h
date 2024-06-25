@@ -278,10 +278,7 @@ typedef	unsigned long	__useconds_t;	/* microseconds (unsigned) */
 typedef size_t __rsize_t;
 #endif
 
-#ifndef __ERRNO_T
-#define __ERRNO_T
 typedef int __errno_t;
-#endif
 
 #endif
 #endif

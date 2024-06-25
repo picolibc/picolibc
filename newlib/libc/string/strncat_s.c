@@ -38,7 +38,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-errno_t strncat_s(char *restrict s1, rsize_t s1max, const char *restrict s2,
+__errno_t strncat_s(char *restrict s1, rsize_t s1max, const char *restrict s2,
         rsize_t n)
 {
     const char *msg = "";

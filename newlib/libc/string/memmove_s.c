@@ -38,7 +38,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-errno_t memmove_s(void* s1, rsize_t s1max, const void* s2, rsize_t n)
+__errno_t memmove_s(void* s1, rsize_t s1max, const void* s2, rsize_t n)
 {
     const char* msg = "";
     constraint_handler_t handler = NULL;

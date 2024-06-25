@@ -387,17 +387,15 @@ _Noreturn void
 #if __STDC_WANT_LIB_EXT1__ == 1
 #include <sys/_types.h>
 
-typedef __errno_t errno_t;
-
 typedef void (*constraint_handler_t)(
-        const char *restrict msg, void *restrict ptr, errno_t error);
+        const char *restrict msg, void *restrict ptr, __errno_t error);
 
 extern constraint_handler_t __cur_handler;
 
 extern constraint_handler_t set_constraint_handler_s(
         constraint_handler_t handler);
 extern void abort_handler_s(
-        const char *restrict msg, void *restrict ptr, errno_t error);
+        const char *restrict msg, void *restrict ptr, __errno_t error);
 #endif
 
 

@@ -84,18 +84,17 @@ char 	*strstr (const char *, const char *);
 #include <sys/_types.h>
 
 typedef __rsize_t rsize_t;
-typedef __errno_t errno_t;
 
-extern errno_t memcpy_s(void *__restrict, rsize_t, const void *__restrict, rsize_t);
-extern errno_t memset_s(void *, rsize_t, int, rsize_t);
-extern errno_t memmove_s(void *, rsize_t, const void *, rsize_t);
-extern errno_t strcpy_s(char *__restrict, rsize_t, const char *__restrict);
-extern errno_t strcat_s(char *__restrict, rsize_t, const char *__restrict);
-extern errno_t strncpy_s(char *__restrict, rsize_t, const char *__restrict, rsize_t);
-extern errno_t strncat_s(char *__restrict, rsize_t, const char *__restrict, rsize_t);
+extern __errno_t memcpy_s(void *__restrict, rsize_t, const void *__restrict, rsize_t);
+extern __errno_t memset_s(void *, rsize_t, int, rsize_t);
+extern __errno_t memmove_s(void *, rsize_t, const void *, rsize_t);
+extern __errno_t strcpy_s(char *__restrict, rsize_t, const char *__restrict);
+extern __errno_t strcat_s(char *__restrict, rsize_t, const char *__restrict);
+extern __errno_t strncpy_s(char *__restrict, rsize_t, const char *__restrict, rsize_t);
+extern __errno_t strncat_s(char *__restrict, rsize_t, const char *__restrict, rsize_t);
 extern size_t strnlen_s(const char *, size_t);
-extern errno_t strerror_s(char *, rsize_t, errno_t); /* C11 */
-extern size_t strerrorlen_s(errno_t);
+extern __errno_t strerror_s(char *, rsize_t, __errno_t); /* C11 */
+extern size_t strerrorlen_s(__errno_t);
 #endif
 
 #ifndef _REENT_ONLY

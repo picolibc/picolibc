@@ -38,7 +38,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-errno_t strcpy_s(char *restrict s1, rsize_t s1max, const char *restrict s2) 
+__errno_t strcpy_s(char *restrict s1, rsize_t s1max, const char *restrict s2) 
 {
     const char *msg = "";
     bool write_null = true;

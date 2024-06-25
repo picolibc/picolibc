@@ -37,7 +37,7 @@
 
 constraint_handler_t __cur_handler = abort_handler_s;
 
-void abort_handler_s(const char *restrict msg, void *restrict ptr, errno_t error)
+void abort_handler_s(const char *restrict msg, void *restrict ptr, __errno_t error)
 {
     (void) msg;
     (void) ptr;

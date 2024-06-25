@@ -36,7 +36,7 @@
 #include <string.h>
 #include "string_private.h"
 
-size_t strerrorlen_s(errno_t errnum)
+size_t strerrorlen_s(__errno_t errnum)
 {
     return strnlen_s(_strerror_r(errnum, 0, NULL), MAX_ERROR_MSG);
 }
