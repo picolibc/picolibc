@@ -296,11 +296,12 @@ pid_t   getpid (void);
 int	isatty (int __fildes);
 int     link (const char *__path1, const char *__path2);
 _off_t  lseek (int __fildes, _off_t __offset, int __whence);
-#ifdef __LARGE64_FILES
-_off64_t lseek64 (int __filedes, _off64_t __offset, int __whence);
-#endif
 void *  sbrk (ptrdiff_t __incr);
 int     unlink (const char *__path);
+#endif
+
+#if __LARGEFILE64_VISIBLE
+_off64_t lseek64 (int __filedes, _off64_t __offset, int __whence);
 #endif
 
 #if !defined(__INSIDE_CYGWIN__)

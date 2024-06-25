@@ -107,6 +107,7 @@ struct	stat
 #endif
 };
 
+#if __LARGEFILE64_VISIBLE
 struct stat64
 {
   __dev_t st_dev;		/* Device.  */
@@ -157,6 +158,7 @@ struct stat64
   __ino64_t st_ino;			/* File serial number.		*/
 #  endif
 };
+#endif
 
 #if !(defined(__svr4__) && !defined(__PPC__) && !defined(__sun__))
 #define st_atime st_atim.tv_sec
