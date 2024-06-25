@@ -30,6 +30,8 @@
 
 */
 
+#include "stdio_private.h"
+
 #define PRINTF_LEVEL PRINTF_MIN
 #ifndef _FORMAT_DEFAULT_MINIMAL
 #define vfprintf __m_vfprintf

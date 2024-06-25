@@ -45,6 +45,8 @@
  * This code only works with long double type.
  */
 
+#include "stdio_private.h"
+
 #if __SIZEOF_LONG_DOUBLE__ > 8
 
 #define _NEED_IO_FLOAT_LARGE
