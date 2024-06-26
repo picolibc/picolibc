@@ -335,6 +335,21 @@ FILE	*funopen (const void *cookie,
 # define	fropen(__cookie, __fn) funopen(__cookie, __fn, NULL, NULL, NULL)
 # define	fwopen(__cookie, __fn) funopen(__cookie, NULL, __fn, NULL, NULL)
 #endif /*__BSD_VISIBLE */
+
+#if __POSIX_VISIBLE >= 199309L
+int	getc_unlocked (FILE *);
+int	getchar_unlocked (void);
+void	flockfile (FILE *);
+int	ftrylockfile (FILE *);
+void	funlockfile (FILE *);
+int	putc_unlocked (int, FILE *);
+int	putchar_unlocked (int);
+#define getc_unlocked(f) fgetc(f)
+#define getchar_unlocked(f) fgetc(stdin)
+#define putc_unlocked(c, f) fputc(c, f)
+#define putchar_unlocked(c, f) fgetc(c, stdin)
+#endif
+
 /*
  * The format of tmpnam names is TXXXXXX, which works with mktemp
  */

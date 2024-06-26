@@ -39,3 +39,10 @@ getchar(void)
 
 	return getc(stdin);
 }
+
+#undef getchar_unlocked
+#ifdef _HAVE_ALIAS_ATTRIBUTE
+__strong_reference(getchar, getchar_unlocked);
+#else
+int getchar_unlocked(void) { return getchar(); }
+#endif
