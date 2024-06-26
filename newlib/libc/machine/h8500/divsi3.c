@@ -128,6 +128,8 @@ __udivsi3 (unsigned long numerator, unsigned long denominator)
 
 
 
+#include <picolibc.h>
+
 #ifdef TEST
 
 

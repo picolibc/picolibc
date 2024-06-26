@@ -51,6 +51,8 @@
      always, as no parameter can be changed.
 */
 
+#include <picolibc.h>
+
 #ifdef __xstormy16__
 #define MALLOC_DIRECTION -1
 #endif

@@ -29,6 +29,8 @@
 */
 
 
+#include <picolibc.h>
+
 #if defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED)
 # include "../../string/strncpy.c"
 #else

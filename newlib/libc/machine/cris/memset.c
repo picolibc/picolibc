@@ -131,6 +131,8 @@ void *memset(void *pdst, int c, unsigned int plen)
 	   subq	   12*4,r12						\n\
 0:									\n\
 "
+#include <picolibc.h>
+
 #ifdef __arch_common_v10_v32
 	   /* Cater to branch offset difference between v32 and v10.  We
 	      assume the branch below has an 8-bit offset.  */

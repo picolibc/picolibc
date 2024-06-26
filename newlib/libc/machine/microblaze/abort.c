@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    own version of abort in clib.nlm.  If we can not use clib.nlm, then
    we must write abort in sys/netware.  */
 
+#include <picolibc.h>
+
 #ifdef ABORT_PROVIDED
 
 int _dummy_abort = 1;
