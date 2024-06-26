@@ -224,7 +224,7 @@ if(x == (long double) INFINITY)
 if(x == -(long double) INFINITY)
 	return __math_invalidl(x);
 if( x == 0.0L )
-	return __math_divzerol(__signbitl(x));
+	return __math_divzerol(signbitl_inline(x));
 q = fabsl(x);
 
 if( q > 13.0L )

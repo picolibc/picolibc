@@ -378,9 +378,16 @@ int __issignalingl(long double d);
 	     __builtin_signbit ((double) (__x)))
   #endif
 #else
-  #define signbit(__x) \
-	  ((sizeof(__x) == sizeof(float))  ?  __signbitf(__x) : \
-	                              __signbitd((double) (__x)))
+  #if defined(_HAVE_LONG_DOUBLE)
+    #define signbit(__x)							\
+	    ((sizeof(__x) == sizeof(float))  ? __signbitf(__x) :	\
+	     ((sizeof(__x) == sizeof(double)) ? __signbit ((double)(__x)) : \
+	      __signbitl((long double)(__x))))
+  #else
+    #define signbit(__x) \
+            ((sizeof(__x) == sizeof(float))  ?  __signbitf(__x) : \
+                                        __signbitd((double) (__x)))
+  #endif
 #endif
 
 #if __GNUC_PREREQ (2, 97) && !(defined(__riscv) && defined(__clang__))
@@ -558,6 +565,8 @@ extern long long int llroundl (long double);
 extern long double truncl (long double);
 extern long double nanl (const char *);
 extern long double floorl (long double);
+extern long double scalbl (long double, long double);
+extern long double significandl(long double);
 /* Compiler provides these */
 extern long double fabsl (long double);
 extern long double copysignl (long double, long double);
@@ -589,7 +598,6 @@ extern double nexttoward (double, long double);
 extern long double nexttowardl (long double, long double);
 extern long double log2l (long double);
 extern long double exp2l (long double);
-extern long double scalbl (long double, long double);
 extern long double tgammal (long double);
 extern long double remquol (long double, long double, int *);
 extern long double fdiml (long double, long double);
@@ -609,7 +617,6 @@ extern long double jnl(int, long double);
 extern long double ynl(int, long double);
 
 extern long double getpayloadl(const long double *x);
-extern long double significandl(long double);
 
 #endif /* _HAVE_LONG_DOUBLE_MATH */
 

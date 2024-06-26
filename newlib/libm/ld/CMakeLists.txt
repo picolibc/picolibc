@@ -96,6 +96,7 @@ if(_HAVE_LONG_DOUBLE)
     s_roundl.c
     s_scalbln.c
     s_scalbnl.c
+    s_signbitl.c
     s_sincosl.c
     s_sinl.c
     s_tanl.c

@@ -145,7 +145,7 @@ issignalingl_inline(long double x)
 }
 
 static ALWAYS_INLINE int
-__signbitl(long double x)
+signbitl_inline(long double x)
 {
     int64_t high;
     GET_LDOUBLE_MSW64(high, x);
@@ -342,7 +342,7 @@ issignalingl_inline(long double x)
 }
 
 static ALWAYS_INLINE int
-__signbitl(long double x)
+signbitl_inline(long double x)
 {
     int exp;
     GET_LDOUBLE_EXP(exp, x);
@@ -538,7 +538,7 @@ issignalingl_inline(long double x)
 }
 
 static ALWAYS_INLINE int
-__signbitl(long double x)
+signbitl_inline(long double x)
 {
     int exp;
     GET_LDOUBLE_EXP(exp, x);
