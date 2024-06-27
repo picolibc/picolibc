@@ -41,4 +41,9 @@ typedef int error_t;
 
 #include <sys/errno.h>
 
+#include <sys/_types.h>
+#ifdef __STDC_WANT_LIB_EXT1__
+typedef __errno_t errno_t;
+#endif
+
 #endif /* !__ERRNO_H__ */

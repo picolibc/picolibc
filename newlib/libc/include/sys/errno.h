@@ -37,6 +37,7 @@ extern "C" {
 #define _SYS_ERRNO_H_
 
 #include <sys/config.h>
+#include <sys/_types.h>
 
 /* Please don't use these variables directly.
    Use strerror instead. */
@@ -62,7 +63,7 @@ extern __IMPORT char *program_invocation_short_name;
 #endif
 
 #ifdef __PICOLIBC_ERRNO_FUNCTION
-int *__PICOLIBC_ERRNO_FUNCTION(void);
+__errno_t *__PICOLIBC_ERRNO_FUNCTION(void);
 #define errno (*__PICOLIBC_ERRNO_FUNCTION())
 #else
 extern NEWLIB_THREAD_LOCAL_ERRNO int errno;

@@ -400,6 +400,7 @@ QUICKREF
 #define _DEFAULT_SOURCE
 #include <errno.h>
 #include <string.h>
+#include "string_private.h"
 
 char *
 _strerror_r (

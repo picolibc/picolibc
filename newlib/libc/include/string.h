@@ -78,6 +78,25 @@ char 	*strpbrk (const char *, const char *);
 char 	*strrchr (const char *, int);
 size_t	 strspn (const char *, const char *);
 char 	*strstr (const char *, const char *);
+
+
+#if __STDC_WANT_LIB_EXT1__ == 1
+#include <sys/_types.h>
+
+typedef __rsize_t rsize_t;
+
+extern __errno_t memcpy_s(void *__restrict, rsize_t, const void *__restrict, rsize_t);
+extern __errno_t memset_s(void *, rsize_t, int, rsize_t);
+extern __errno_t memmove_s(void *, rsize_t, const void *, rsize_t);
+extern __errno_t strcpy_s(char *__restrict, rsize_t, const char *__restrict);
+extern __errno_t strcat_s(char *__restrict, rsize_t, const char *__restrict);
+extern __errno_t strncpy_s(char *__restrict, rsize_t, const char *__restrict, rsize_t);
+extern __errno_t strncat_s(char *__restrict, rsize_t, const char *__restrict, rsize_t);
+extern size_t strnlen_s(const char *, size_t);
+extern __errno_t strerror_s(char *, rsize_t, __errno_t); /* C11 */
+extern size_t strerrorlen_s(__errno_t);
+#endif
+
 #ifndef _REENT_ONLY
 char 	*strtok (char *__restrict, const char *__restrict);
 #endif

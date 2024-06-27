@@ -383,6 +383,22 @@ _Noreturn void
 	quick_exit(int);
 #endif /* __ISO_C_VISIBLE >= 2011 */
 
+
+#if __STDC_WANT_LIB_EXT1__ == 1
+#include <sys/_types.h>
+
+typedef void (*constraint_handler_t)(
+        const char *restrict msg, void *restrict ptr, __errno_t error);
+
+extern constraint_handler_t __cur_handler;
+
+extern constraint_handler_t set_constraint_handler_s(
+        constraint_handler_t handler);
+extern void abort_handler_s(
+        const char *restrict msg, void *restrict ptr, __errno_t error);
+#endif
+
+
 _END_STD_C
 
 #if __SSP_FORTIFY_LEVEL > 0
