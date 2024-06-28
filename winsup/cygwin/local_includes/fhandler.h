@@ -2881,11 +2881,12 @@ class fhandler_dev_dsp: public fhandler_base
   int close ();
   void fixup_after_fork (HANDLE);
   void fixup_after_exec ();
+  bool open_setup (int);
 
  private:
-  ssize_t _write (const void *, size_t);
-  void _read (void *, size_t&);
-  int _ioctl (unsigned int, void *);
+  ssize_t _write (const void *, size_t, fhandler_dev_dsp *);
+  void _read (void *, size_t&, fhandler_dev_dsp *);
+  int _ioctl (unsigned int, void *, fhandler_dev_dsp *);
   int _fcntl (int cmd, intptr_t);
   void _fixup_after_fork (HANDLE);
   void _fixup_after_exec ();

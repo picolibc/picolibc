@@ -1026,19 +1026,19 @@ fhandler_dev_dsp::fhandler_dev_dsp ():
 ssize_t
 fhandler_dev_dsp::write (const void *ptr, size_t len)
 {
-  return base ()->_write (ptr, len);
+  return base ()->_write (ptr, len, this);
 }
 
 void
 fhandler_dev_dsp::read (void *ptr, size_t& len)
 {
-  base ()->_read (ptr, len);
+  base ()->_read (ptr, len, this);
 }
 
 int
 fhandler_dev_dsp::ioctl (unsigned int cmd, void *buf)
 {
-  return base ()->_ioctl (cmd, buf);
+  return base ()->_ioctl (cmd, buf, this);
 }
 
 int
@@ -1065,7 +1065,6 @@ fhandler_dev_dsp::open (int flags, mode_t mode)
 {
   int ret = -1, err = 0;
   UINT num_in = 0, num_out = 0;
-  set_flags ((flags & ~O_TEXT) | O_BINARY);
   // Work out initial sample format & frequency, /dev/dsp defaults
   audioformat_ = AFMT_U8;
   audiofreq_ = 8000;
@@ -1105,11 +1104,11 @@ fhandler_dev_dsp::open (int flags, mode_t mode)
   return ret;
 }
 
-#define IS_WRITE() ((get_flags() & O_ACCMODE) != O_RDONLY)
-#define IS_READ() ((get_flags() & O_ACCMODE) != O_WRONLY)
+#define IS_WRITE() ((fh->get_flags() & O_ACCMODE) != O_RDONLY)
+#define IS_READ() ((fh->get_flags() & O_ACCMODE) != O_WRONLY)
 
 ssize_t
-fhandler_dev_dsp::_write (const void *ptr, size_t len)
+fhandler_dev_dsp::_write (const void *ptr, size_t len, fhandler_dev_dsp *fh)
 {
   debug_printf ("ptr=%p len=%ld", ptr, len);
   int len_s = len;
@@ -1168,7 +1167,7 @@ fhandler_dev_dsp::_write (const void *ptr, size_t len)
 }
 
 void
-fhandler_dev_dsp::_read (void *ptr, size_t& len)
+fhandler_dev_dsp::_read (void *ptr, size_t& len, fhandler_dev_dsp *fh)
 {
   debug_printf ("ptr=%p len=%ld", ptr, len);
 
@@ -1244,7 +1243,7 @@ fhandler_dev_dsp::close ()
 }
 
 int
-fhandler_dev_dsp::_ioctl (unsigned int cmd, void *buf)
+fhandler_dev_dsp::_ioctl (unsigned int cmd, void *buf, fhandler_dev_dsp *fh)
 {
   debug_printf ("audio_in=%p audio_out=%p", audio_in_, audio_out_);
   int *intbuf = (int *) buf;
@@ -1349,7 +1348,7 @@ fhandler_dev_dsp::_ioctl (unsigned int cmd, void *buf)
       CASE (SNDCTL_DSP_STEREO)
       {
 	int nChannels = *intbuf + 1;
-	int res = _ioctl (SNDCTL_DSP_CHANNELS, &nChannels);
+	int res = _ioctl (SNDCTL_DSP_CHANNELS, &nChannels, fh);
 	*intbuf = nChannels - 1;
 	return res;
       }
@@ -1546,4 +1545,11 @@ bool
 fhandler_dev_dsp::read_ready ()
 {
   return base ()->_read_ready ();
+}
+
+bool
+fhandler_dev_dsp::open_setup (int flags)
+{
+  set_flags ((flags & ~O_TEXT) | O_BINARY);
+  return fhandler_base::open_setup (flags);
 }
