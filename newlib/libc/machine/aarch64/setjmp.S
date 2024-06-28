@@ -54,7 +54,9 @@ setjmp:
 #define REG_PAIR(REG1, REG2, OFFS)	stp REG1, REG2, [x0, OFFS]
 #define REG_ONE(REG1, OFFS)		str REG1, [x0, OFFS]
 	GPR_LAYOUT
+#if __ARM_FP
 	FPR_LAYOUT
+#endif
 #undef REG_PAIR
 #undef REG_ONE
 	mov	w0, #0
@@ -72,7 +74,9 @@ longjmp:
 #define REG_PAIR(REG1, REG2, OFFS)	ldp REG1, REG2, [x0, OFFS]
 #define REG_ONE(REG1, OFFS)		ldr REG1, [x0, OFFS]
 	GPR_LAYOUT
+#if __ARM_FP
 	FPR_LAYOUT
+#endif
 #undef REG_PAIR
 #undef REG_ONE
 	mov	sp, x16

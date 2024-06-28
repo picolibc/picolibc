@@ -24,6 +24,7 @@
    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
+#if __ARM_FP & 0x4
 #include <math.h>
 
 long long int
@@ -33,3 +34,7 @@ llroundf (float x)
   __asm__("fcvtas\t%x0, %s1" : "=r" (result) : "w" (x));
   return result;
 }
+
+#else
+#include "../../common/sf_llround.c"
+#endif

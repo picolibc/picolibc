@@ -1649,7 +1649,7 @@ if has_semihost
     endif
 
     set_variable(test_link_args_variable,
-		 ['-nostartfiles', '-T', picolibc_ld_string,
+		 ['-nostdlib', '-T', picolibc_ld_string,
 		  lib_gcc] + additional_libs_list + specs_line)
 
     set_variable(test_linker_files_variable, [picolibc_ld_value])

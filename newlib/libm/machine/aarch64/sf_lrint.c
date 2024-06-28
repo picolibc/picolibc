@@ -24,6 +24,7 @@
    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
+#if __ARM_FP & 0x4
 #include <math.h>
 
 long int
@@ -36,3 +37,6 @@ lrintf (float x)
        : "=r" (result), "=w" (temp) : "w" (x));
   return result;
 }
+#else
+#include "../../common/sf_lrint.c"
+#endif

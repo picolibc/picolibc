@@ -39,6 +39,19 @@ extern "C" {
 typedef	__uint64_t	fenv_t;
 typedef	__uint64_t	fexcept_t;
 
+#if defined(__SOFTFP__) || (__ARM_FP & 0x8) == 0
+#define PICOLIBC_DOUBLE_NOROUND
+#define PICOLIBC_DOUBLE_NOEXCEPT
+#define PICOLIBC_LONG_DOUBLE_NOEXCEPT
+#endif
+
+#if defined(__SOFTFP__) || (__ARM_FP & 0x4) == 0
+#define PICOLIBC_FLOAT_NOROUND
+#define PICOLIBC_FLOAT_NOEXCEPT
+#endif
+
+#if __ARM_FP
+
 /* Exception flags */
 #define	FE_INVALID	0x00000001
 #define	FE_DIVBYZERO	0x00000002
@@ -72,12 +85,21 @@ typedef	__uint64_t	fexcept_t;
 #define	__mrs_fpsr(__r)	__asm __volatile("mrs %0, fpsr" : "=r" (__r))
 #define	__msr_fpsr(__r)	__asm __volatile("msr fpsr, %0" : : "r" (__r))
 
+#else
+#define	FE_TONEAREST		0x00000000
+#endif
+
 #if !defined(__declare_fenv_inline) && defined(__declare_extern_inline)
 #define	__declare_fenv_inline(type) __declare_extern_inline(type)
 #endif
 
 #ifdef __declare_fenv_inline
+#if __ARM_FP
 #include <machine/fenv-fp.h>
+#else
+#include <machine/fenv-softfloat.h>
+#endif
+
 #endif
 
 #ifdef __cplusplus

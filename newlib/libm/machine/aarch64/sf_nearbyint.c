@@ -24,6 +24,7 @@
    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
+#if __ARM_FP & 0x4
 #include <math.h>
 
 float
@@ -40,3 +41,7 @@ nearbyintf (float x)
 #endif
     return x;
 }
+
+#else
+#include "../../common/sf_nearbyint.c"
+#endif

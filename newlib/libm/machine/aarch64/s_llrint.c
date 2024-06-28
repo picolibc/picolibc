@@ -24,6 +24,7 @@
    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
+#if __ARM_FP & 0x8
 #include <math.h>
 
 long long int
@@ -36,3 +37,7 @@ llrint (double x)
        : "=r" (result), "=w" (temp) : "w" (x));
   return result;
 }
+
+#else
+#include "../../common/s_llrint.c"
+#endif
