@@ -146,6 +146,13 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #endif
 #ifdef __ARM_FP
 # define _SUPPORTS_ERREXCEPT
+#else
+#ifdef __clang__
+#include <float.h>
+/* Clang accesses FPSR for FLT_ROUNDS with soft float target */
+#undef FLT_ROUNDS
+#define FLT_ROUNDS 1
+#endif
 #endif
 /* As per ISO/IEC TS 18661 '__FLT_EVAL_METHOD__' will be defined to 16
    (if compiling with +fp16 support) so it can't be used by math.h to
