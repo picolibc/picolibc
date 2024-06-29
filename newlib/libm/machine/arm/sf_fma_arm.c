@@ -41,7 +41,7 @@
 float
 fmaf (float x, float y, float z)
 {
-  asm ("vfma.f32 %0, %1, %2" : "=t" (z) : "t" (x), "t" (y));
+  asm ("vfma.f32 %0, %1, %2" : "+t" (z) : "t" (x), "t" (y));
   return z;
 }
 
