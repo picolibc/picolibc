@@ -510,7 +510,7 @@ foreach target : targets
 		 'math-funcs', 'timegm', 'time-tests',
                  'test-strtod', 'test-strchr',
 		 'test-memset', 'test-put',
-		 'test-efcvt', 'test-atomic',
+		 'test-efcvt',
 		 'test-raise',
                  'test-fma',
                  'test-funopen',
@@ -530,6 +530,10 @@ foreach target : targets
 
   if tinystdio
     plain_tests += 't_fmemopen'
+  endif
+
+  if atomic_ungetc or atomic_signal
+    plain_tests += 'test-atomic'
   endif
 
   if (posix_io or not tinystdio) and tests_enable_posix_io
