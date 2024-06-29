@@ -71,11 +71,12 @@ extern "C" {
 #define	O_DIRECT	_FDIRECT
 #endif
 
+#define O_DSYNC         _FSYNC
+#define O_RSYNC         _FSYNC
+
 #if defined (__CYGWIN__)
 #define O_BINARY	_FBINARY
 #define O_TEXT		_FTEXT
-#define O_DSYNC         _FSYNC
-#define O_RSYNC         _FSYNC
 
 /* Linux-specific flags */
 #if __GNU_VISIBLE
