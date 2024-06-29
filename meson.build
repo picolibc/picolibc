@@ -198,7 +198,7 @@ endif
 if have_cplusplus
   cpp_args = c_args
   cpp_flags = cpp.get_supported_arguments(['-fno-common', '-frounding-math', '-fsignaling-nans',
-				           '-Wno-unsupported-floating-point-opt', '-fno-stack-protector',
+				           '-Wno-unsupported-floating-point-opt',
 				           '-fno-builtin-copysignl'])
   cpp_args += cpp_flags
   native_cpp_args = native_common_args + cpp_flags
@@ -207,7 +207,7 @@ endif
 # Disable ssp and fortify source while building picolibc (it's enabled
 # by default by the ubuntu native compiler)
 c_flags = cc.get_supported_arguments(['-fno-common', '-frounding-math', '-fsignaling-nans',
-				      '-Wno-unsupported-floating-point-opt', '-fno-stack-protector',
+				      '-Wno-unsupported-floating-point-opt',
 				      '-fno-builtin-copysignl'])
 
 c_sanitize_bounds_flags = cc.get_supported_arguments(['-fsanitize=bounds'])
@@ -819,11 +819,13 @@ else
 endif
 test_c_args += [test_fortify_arg]
 
+c_args += cc.get_supported_arguments(['-fno-stack-protector'])
+
 if have_cplusplus
   cpp_warnings = common_warnings
   cpp_flags = cpp.get_supported_arguments(cpp_warnings)
   cpp_args += cpp_flags
-  cpp_flags = cpp.get_supported_arguments(['-fno-exceptions', '-fno-unwind-tables'])
+  cpp_flags = cpp.get_supported_arguments(['-fno-exceptions', '-fno-unwind-tables', '-fno-stack-protector'])
   cpp_args += cpp_flags
   test_cpp_args = cpp_args + [test_fortify_arg]
 endif
@@ -1584,6 +1586,10 @@ if tests_enable_stack_protector
   else
     tests_enable_stack_protector = false
   endif
+endif
+
+if not tests_enable_stack_protector
+  test_c_args += cc.get_supported_arguments(['-fno-stack-protector'])
 endif
 
 if have_long_double and get_option('test-long-double')
