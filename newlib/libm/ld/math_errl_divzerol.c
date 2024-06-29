@@ -33,8 +33,6 @@ static CONST_FORCE_LONG_DOUBLE VAL = pick_long_double_except(0.0L, (long double)
 HIDDEN long double
 __math_divzerol (uint32_t sign)
 {
-    long double y = pick_long_double_except(1.0L / VAL, VAL);
-    if (sign)
-        y = -y;
+    long double y = pick_long_double_except((sign ? -1.0L : 1.0L) / VAL, sign ? -VAL : VAL);
     return __math_with_errnol (y, ERANGE);
 }
