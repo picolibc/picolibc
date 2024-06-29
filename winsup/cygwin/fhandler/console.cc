@@ -1861,6 +1861,9 @@ fhandler_console::open (int flags, mode_t)
 	  WaitForSingleObject (thread_sync_event, INFINITE);
 	  CloseHandle (thread_sync_event);
 	}
+      else
+	debug_printf ("Failed to create thread_sync_event %08x",
+		      GetLastError ());
     }
   return 1;
 }
