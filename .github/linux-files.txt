@@ -4,3 +4,4 @@ https://maps.altusmetrum.org/m68k-unknown-elf.tar.xz
 https://maps.altusmetrum.org/msp430-unknown-elf.tar.xz
 https://maps.altusmetrum.org/sh-unknown-elf-1.tar.xz
 https://maps.altusmetrum.org/qemu-arm.tar.xz
+https://maps.altusmetrum.org/aarch64-none-elf-llvm.tar.xz
