@@ -56,7 +56,7 @@ __attribute((__optimize__("-fno-tree-loop-distribute-patterns")))
 
 static void __attribute__((noinline)) smash_array(char *source, char *dest)
 {
-	char	local[16];
+	char	local[48];
 
 	my_strcpy(local, source);
 	local[0]++;
