@@ -272,17 +272,23 @@ cons_master_thread (VOID *arg)
   fhandler_console::handle_set_t handle_set;
   fh->get_duplicated_handle_set (&handle_set);
   HANDLE thread_sync_event;
-  DuplicateHandle (GetCurrentProcess (), fh->thread_sync_event,
-		   GetCurrentProcess (), &thread_sync_event,
-		   0, FALSE, DUPLICATE_SAME_ACCESS);
-  SetEvent (thread_sync_event);
-  master_thread_started = true;
-  /* Do not touch class members after here because the class instance
-     may have been destroyed. */
-  fhandler_console::cons_master_thread (&handle_set, ttyp);
-  fhandler_console::close_handle_set (&handle_set);
-  SetEvent (thread_sync_event);
-  CloseHandle (thread_sync_event);
+  if (DuplicateHandle (GetCurrentProcess (), fh->thread_sync_event,
+		       GetCurrentProcess (), &thread_sync_event,
+		       0, FALSE, DUPLICATE_SAME_ACCESS))
+    {
+      SetEvent (thread_sync_event);
+      master_thread_started = true;
+      /* Do not touch class members after here because the class instance
+	 may have been destroyed. */
+      fhandler_console::cons_master_thread (&handle_set, ttyp);
+      fhandler_console::close_handle_set (&handle_set);
+      SetEvent (thread_sync_event);
+      CloseHandle (thread_sync_event);
+      master_thread_started = false;
+    }
+  else
+    debug_printf ("cons_master_thread not started because thread_sync_event "
+		  "could not be duplicated %08x", GetLastError ());
   return 0;
 }
 
@@ -451,6 +457,8 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 	case WAIT_CANCELED:
 	  break;
 	default: /* Error */
+	  free (input_rec);
+	  free (input_tmp);
 	  ReleaseMutex (p->input_mutex);
 	  return;
 	}
@@ -1847,9 +1855,12 @@ fhandler_console::open (int flags, mode_t)
       char name[MAX_PATH];
       shared_name (name, CONS_THREAD_SYNC, get_minor ());
       thread_sync_event = CreateEvent(NULL, FALSE, FALSE, name);
-      new cygthread (::cons_master_thread, this, "consm");
-      WaitForSingleObject (thread_sync_event, INFINITE);
-      CloseHandle (thread_sync_event);
+      if (thread_sync_event)
+	{
+	  new cygthread (::cons_master_thread, this, "consm");
+	  WaitForSingleObject (thread_sync_event, INFINITE);
+	  CloseHandle (thread_sync_event);
+	}
     }
   return 1;
 }
@@ -1910,9 +1921,15 @@ fhandler_console::close ()
 	  char name[MAX_PATH];
 	  shared_name (name, CONS_THREAD_SYNC, get_minor ());
 	  thread_sync_event = OpenEvent (MAXIMUM_ALLOWED, FALSE, name);
-	  con.owner = MAX_PID + 1;
-	  WaitForSingleObject (thread_sync_event, INFINITE);
-	  CloseHandle (thread_sync_event);
+	  if (thread_sync_event)
+	    {
+	      con.owner = MAX_PID + 1;
+	      WaitForSingleObject (thread_sync_event, INFINITE);
+	      CloseHandle (thread_sync_event);
+	    }
+	  else
+	    debug_printf ("Failed to open thread_sync_event %08x",
+			  GetLastError ());
 	}
       con.owner = 0;
     }
