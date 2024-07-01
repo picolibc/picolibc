@@ -3118,8 +3118,22 @@ fhandler_pty_common::process_opost_output (HANDLE h, const void *ptr,
     return res; /* Discard write data */
   while (towrite)
     {
+      ssize_t space = towrite;
       if (!is_echo)
 	{
+	  IO_STATUS_BLOCK iosb = {{0}, 0};
+	  FILE_PIPE_LOCAL_INFORMATION fpli = {0};
+	  NTSTATUS status;
+
+	  status = NtQueryInformationFile (h, &iosb, &fpli, sizeof (fpli),
+					   FilePipeLocalInformation);
+	  if (!NT_SUCCESS (status))
+	    {
+	      if (towrite < len)
+		break;
+	      len = -1;
+	      return FALSE;
+	    }
 	  if (ttyp->output_stopped && is_nonblocking)
 	    {
 	      if (towrite < len)
@@ -3131,13 +3145,18 @@ fhandler_pty_common::process_opost_output (HANDLE h, const void *ptr,
 		  return TRUE;
 		}
 	    }
-	  while (ttyp->output_stopped)
-	    cygwait (10);
+	  if (ttyp->output_stopped || fpli.WriteQuotaAvailable == 0)
+	    {
+	      cygwait (1);
+	      continue;
+	    }
+	  space = fpli.WriteQuotaAvailable;
 	}
 
       if (!(ttyp->ti.c_oflag & OPOST))	// raw output mode
 	{
 	  DWORD n = MIN (OUT_BUFFER_SIZE, towrite);
+	  n = MIN (n, space);
 	  res = WriteFile (h, ptr, n, &n, NULL);
 	  if (!res)
 	    break;
@@ -3150,7 +3169,7 @@ fhandler_pty_common::process_opost_output (HANDLE h, const void *ptr,
 	  char *buf = (char *)ptr;
 	  DWORD n = 0;
 	  ssize_t rc = 0;
-	  while (n < OUT_BUFFER_SIZE && rc < towrite)
+	  while (n < OUT_BUFFER_SIZE && n < space && rc < towrite)
 	    {
 	      switch (buf[rc])
 		{
