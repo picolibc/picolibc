@@ -16,6 +16,19 @@
 
 __BEGIN_DECLS
 
+/* Implementation from FreeBSD */
+#if __ISO_C_VISIBLE >= 2011
+#ifdef __clang__
+#define	CMPLX(x, y)	((double complex){ x, y })
+#define	CMPLXF(x, y)	((float complex){ x, y })
+#define	CMPLXL(x, y)	((long double complex){ x, y })
+#elif __GNUC_PREREQ__(4, 7)
+#define	CMPLX(x, y)	__builtin_complex((double)(x), (double)(y))
+#define	CMPLXF(x, y)	__builtin_complex((float)(x), (float)(y))
+#define	CMPLXL(x, y)	__builtin_complex((long double)(x), (long double)(y))
+#endif
+#endif /* __ISO_C_VISIBLE >= 2011 */
+
 /* 7.3.5 Trigonometric functions */
 /* 7.3.5.1 The cacos functions */
 double complex cacos(double complex);
