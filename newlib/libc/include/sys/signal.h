@@ -77,7 +77,11 @@ struct sigevent {
   int              sigev_notify;               /* Notification type */
   int              sigev_signo;                /* Signal number */
   union sigval     sigev_value;                /* Signal value */
-
+#if defined(_POSIX_THREADS)
+  void           (*sigev_notify_function)( union sigval );
+                                               /* Notification function */
+  pthread_attr_t  *sigev_notify_attributes;    /* Notification Attributes */
+#endif
 };
 
 /* Signal Actions, P1003.1b-1993, p. 64 */
