@@ -49,7 +49,7 @@
 int
 main(void)
 {
-	void *r;
+        void *r, *q;
 	int result = 0;
 	int pow;
 
@@ -72,11 +72,16 @@ main(void)
 
 	errno = 0;
 	r = malloc(PTRDIFF_MAX);
-        printf("malloc(PTRDIFF_MAX): %p\n", r);
-	if (r || errno != ENOMEM) {
-                printf("malloc(PTRDIFF_MAX) should have failed. got %p error %s\n", r, strerror(errno));
+        q = NULL;
+        if (r)
+                q = malloc(PTRDIFF_MAX);
+        printf("malloc(PTRDIFF_MAX: %p %p\n", r, q);
+	if ((r && q) || errno != ENOMEM) {
+                printf("2*malloc(PTRDIFF_MAX) should have failed. got %p,%p error %s\n", r, q, strerror(errno));
 		result++;
 	}
+        free(r);
+        free(q);
 
 	errno = 0;
 	r = malloc(SIZE_MAX);
