@@ -150,7 +150,7 @@ report(char *expr, test_t v, int e, int exception, int oexception)
         e &= (my_inexact | my_divbyzero | my_underflow | my_overflow | my_invalid);
 	printf("%-20.20s: ", expr);
 	printf("%8g ", (double) v);
-	printf("(e expect %s", e_to_str(exception));
+	printf("expect %s", e_to_str(exception));
 	if (oexception)
 		printf(" or %s", e_to_str(oexception));
 	printf(" got %s\n", e_to_str(e));
@@ -159,10 +159,7 @@ report(char *expr, test_t v, int e, int exception, int oexception)
 	{
 		return 0;
 	}
-	printf("\tgot %s expecting %s", e_to_str(e), e_to_str(exception));
-	if (oexception)
-		printf(" or %s", e_to_str(oexception));
-	printf("\n");
+	printf("\tFAILURE\n");
 	return 1;
 }
 
@@ -237,6 +234,7 @@ int main(void)
 #endif
 	}
 
+	feclearexcept(FE_ALL_EXCEPT);
         for (i = 0; i < NUM_EXCEPTS; i++) {
             ret = feenableexcept(excepts[i].value);
             if (ret == 0) {
