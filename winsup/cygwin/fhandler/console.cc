@@ -66,6 +66,13 @@ static struct fhandler_base::rabuf_t con_ra;
    in xterm compatible mode */
 static wchar_t last_char;
 
+static char *
+cons_shared_name (char *ret_buf, const char *str, HWND hw)
+{
+  __small_sprintf (ret_buf, "%s.%p", str, hw);
+  return ret_buf;
+}
+
 DWORD
 fhandler_console::attach_console (pid_t owner, bool *err)
 {
@@ -922,7 +929,7 @@ fhandler_console::setup_io_mutex (void)
   res = WAIT_FAILED;
   if (!input_mutex || WAIT_FAILED == (res = acquire_input_mutex (0)))
     {
-      shared_name (buf, "cygcons.input.mutex", get_minor ());
+      cons_shared_name (buf, "cygcons.input.mutex", GetConsoleWindow ());
       input_mutex = OpenMutex (MAXIMUM_ALLOWED, TRUE, buf);
       if (!input_mutex)
 	input_mutex = CreateMutex (&sec_none, FALSE, buf);
@@ -938,7 +945,7 @@ fhandler_console::setup_io_mutex (void)
   res = WAIT_FAILED;
   if (!output_mutex || WAIT_FAILED == (res = acquire_output_mutex (0)))
     {
-      shared_name (buf, "cygcons.output.mutex", get_minor ());
+      cons_shared_name (buf, "cygcons.output.mutex", GetConsoleWindow ());
       output_mutex = OpenMutex (MAXIMUM_ALLOWED, TRUE, buf);
       if (!output_mutex)
 	output_mutex = CreateMutex (&sec_none, FALSE, buf);
@@ -1853,7 +1860,7 @@ fhandler_console::open (int flags, mode_t)
       if (GetModuleHandle ("ConEmuHk64.dll"))
 	hook_conemu_cygwin_connector ();
       char name[MAX_PATH];
-      shared_name (name, CONS_THREAD_SYNC, get_minor ());
+      cons_shared_name (name, CONS_THREAD_SYNC, GetConsoleWindow ());
       thread_sync_event = CreateEvent(NULL, FALSE, FALSE, name);
       if (thread_sync_event)
 	{
@@ -1922,7 +1929,7 @@ fhandler_console::close ()
       if (master_thread_started)
 	{
 	  char name[MAX_PATH];
-	  shared_name (name, CONS_THREAD_SYNC, get_minor ());
+	  cons_shared_name (name, CONS_THREAD_SYNC, GetConsoleWindow ());
 	  thread_sync_event = OpenEvent (MAXIMUM_ALLOWED, FALSE, name);
 	  if (thread_sync_event)
 	    {
