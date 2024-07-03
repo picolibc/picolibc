@@ -108,7 +108,9 @@ option('assert-verbose', type: 'boolean', value: true,
 # Testing options
 #
 option('native-tests', type: 'boolean', value: false,
-       description: 'Run math tests against native libc too')
+       description: 'Run some tests against native libc too')
+option('native-math-tests', type: 'boolean', value: true,
+       description: 'Run math tests against native libm when native-tests is enable')
 option('tests', type: 'boolean', value: false,
        description: 'Enable tests')
 option('tests-enable-stack-protector', type: 'boolean', value: true,

@@ -32,6 +32,80 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+
+plain_tests_common = ['regex', 'ungetc',
+	              'malloc',
+	              'ffs', 'setjmp', 'atexit', 'on_exit',
+	              'timegm',
+                      'test-strchr',
+	              'test-memset', 'test-put',
+	              'test-raise',
+	      ]
+
+math_tests_common = [
+  'fenv',
+  'rand',
+  'test-efcvt',
+  'test-fma',
+  'test-strtod',
+]
+
+if have_attr_ctor_dtor
+  plain_tests_common += 'constructor'
+endif
+
+if have_complex
+  math_tests_common += 'complex-funcs'
+endif
+
+if newlib_nano_malloc or tests_enable_full_malloc_stress
+  math_tests_common += 'malloc_stress'
+endif
+
+if tinystdio
+  plain_tests_common += 't_fmemopen'
+endif
+
+if atomic_ungetc or atomic_signal
+  plain_tests_common += 'test-atomic'
+endif
+
+if (posix_io or not tinystdio) and tests_enable_posix_io
+  plain_tests_common += ['posix-io']
+
+  # legacy stdio doesn't work on semihosting, so just skip it
+  if tinystdio
+    plain_tests_common += ['test-fopen',
+                    'test-mktemp',
+                    'test-tmpnam',
+                    'test-fread-fwrite',
+                    'test-ungetc-ftell',
+                    'test-fgetc',
+                    'test-fgets-eof',
+                    'test-wchar',
+                   ]
+  endif
+endif
+
+math_tests = math_tests_common + [
+  'math-funcs',
+]
+
+plain_tests = plain_tests_common
+
+plain_tests += math_tests + [
+  'test-funopen',
+  'time-tests',
+  'tls',  
+]
+
+if tests_enable_stack_protector
+  plain_tests += 'stack-smash'
+endif
+
+plain_tests_native = plain_tests_common
+
+math_tests_native = math_tests_common
 foreach target : targets
   value = get_variable('target_' + target)
 
@@ -504,59 +578,6 @@ foreach target : targets
        timeout: 60,
        env: test_env)
 
-  plain_tests = ['rand', 'regex', 'ungetc', 'fenv',
-		 'malloc', 'tls',
-		 'ffs', 'setjmp', 'atexit', 'on_exit',
-		 'math-funcs', 'timegm', 'time-tests',
-                 'test-strtod', 'test-strchr',
-		 'test-memset', 'test-put',
-		 'test-efcvt',
-		 'test-raise',
-                 'test-fma',
-                 'test-funopen',
-		]
-
-  if have_attr_ctor_dtor
-    plain_tests += 'constructor'
-  endif
-
-  if have_complex
-    plain_tests += 'complex-funcs'
-  endif
-
-  if newlib_nano_malloc or tests_enable_full_malloc_stress
-    plain_tests += 'malloc_stress'
-  endif
-
-  if tinystdio
-    plain_tests += 't_fmemopen'
-  endif
-
-  if atomic_ungetc or atomic_signal
-    plain_tests += 'test-atomic'
-  endif
-
-  if (posix_io or not tinystdio) and tests_enable_posix_io
-    plain_tests += ['posix-io']
-
-    # legacy stdio doesn't work on semihosting, so just skip it
-    if tinystdio
-      plain_tests += ['test-fopen',
-                      'test-mktemp',
-                      'test-tmpnam',
-                      'test-fread-fwrite',
-                      'test-ungetc-ftell',
-                      'test-fgetc',
-                      'test-fgets-eof',
-                      'test-wchar',
-                     ]
-    endif
-  endif
-
-  if tests_enable_stack_protector
-    plain_tests += 'stack-smash'
-  endif
-
   foreach t1 : plain_tests
     t1_src = t1 + '.c'
     if target == ''
@@ -598,80 +619,57 @@ foreach target : targets
   endif
 endforeach
 
-if enable_native_tests
+if enable_native_math_tests
 
   native_lib_m = cc.find_library('m', required: false)
 
   if native_lib_m.found()
-    test('long_double_native',
-	 executable('long_double_native', 'long_double.c',
+    test('long_double-native',
+	 executable('long_double-native', 'long_double.c',
 		    c_args: native_c_args,
 		    link_args: native_c_args,
 		    dependencies: native_lib_m))
-    test('test-fma_native',
-	 executable('test-fma_native', 'test-fma.c',
+    test('math_errhandling-native',
+	 executable('math_errhandling-native', 'math_errhandling.c',
 		    c_args: native_c_args,
 		    link_args: native_c_args,
 		    dependencies: native_lib_m))
-    test('math_errhandling_native',
-	 executable('math_errhandling_native', 'math_errhandling.c',
-		    c_args: native_c_args,
-		    link_args: native_c_args,
-		    dependencies: native_lib_m))
-    test('rounding-mode_native',
-	 executable('rounding-mode_native',
+    test('rounding-mode-native',
+	 executable('rounding-mode-native',
 		    ['rounding-mode.c', 'rounding-mode-sub.c'],
 		    c_args: native_c_args,
 		    link_args: native_c_args,
 		    dependencies: native_lib_m))
-    test('printf-tests_native',
-	 executable('printf-tests_native',
+    test('printf-tests-native',
+	 executable('printf-tests-native',
 		    'printf-tests.c',
 		    c_args: native_c_args,
 		    link_args: native_c_args,
 		    dependencies: native_lib_m))
-    test('printf_scanf_native',
-	 executable('printf_scanf_native',
+    test('printf_scanf-native',
+	 executable('printf_scanf-native',
 		    'printf_scanf.c',
 		    c_args: native_c_args,
 		    link_args: native_c_args,
 		    dependencies: native_lib_m))
-    test('test-efcvt_native',
-	 executable('test-efcvt_native',
-		    'test-efcvt.c',
-		    c_args: native_c_args,
-		    link_args: native_c_args,
-		    dependencies: native_lib_m))
-    test('test-strtod_native',
-	 executable('test-strtod_native',
-		    'test-strtod.c',
-		    c_args: native_c_args,
-		    link_args: native_c_args,
-		    dependencies: native_lib_m))
-    test('test-wchar_native',
-    executable('test-wchar_native',
-        'test-wchar.c',
-        c_args: native_c_args,
-        link_args: native_c_args,
-        dependencies: native_lib_m))
 
-    test('fenv-native',
-         executable('fenv-native',
-                    'fenv.c',
-                    c_args: native_c_args,
-                    link_args: native_c_args,
-                    dependencies: native_lib_m))
+    foreach t1 : math_tests_native
+      t1_src = t1 + '.c'
+      t1_name = t1 + '-native'
+
+      test(t1_name,
+	   executable(t1_name, t1_src,
+		      c_args: native_c_args,
+		      link_args: native_c_args,
+                      dependencies: native_lib_m))
+    endforeach
+
   endif
 
-  test('test-atomic-native',
-       executable('test-atomic-native', 'test-atomic.c',
-		  c_args: native_c_args,
-		  link_args: native_c_args))
 
-  test('test-fread-fwrite-native',
-       executable('test-fread-fwrite-native', 'test-fread-fwrite.c',
-		  c_args: native_c_args + ['-DTEST_FILE_NAME="test-fread-fwrite-native.txt"'],
-		  link_args: native_c_args))
+endif
+
+if enable_native_tests
 
   if have_cplusplus
     test('test-cplusplus-native',
@@ -679,6 +677,18 @@ if enable_native_tests
                     cpp_args: native_cpp_args,
 		    link_args: native_cpp_args))
   endif
+
+  
+  foreach t1 : plain_tests_native
+    t1_src = t1 + '.c'
+    t1_name = t1 + '-native'
+    test_file_name_arg=['-DTEST_FILE_NAME="' + t1_name + '.txt"']
+
+    test(t1_name,
+	 executable(t1_name, t1_src,
+		    c_args: native_c_args,
+		    link_args: native_c_args))
+  endforeach
 
 endif
 

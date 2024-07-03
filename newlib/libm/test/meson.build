@@ -197,7 +197,7 @@ foreach target : targets
   endforeach
 endforeach
 
-if enable_native_tests
+if enable_native_math_tests
 
   native_lib_m = cc.find_library('m', required: false)
 
