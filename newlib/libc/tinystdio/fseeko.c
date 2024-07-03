@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define FSEEK fseeko
 #define FSEEK_TYPE __off_t
-#define fseek fseeko
 
 #include "fseek.c"

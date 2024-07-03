@@ -35,16 +35,17 @@
 
 #include "stdio_private.h"
 
-#ifndef FSEEK_TYPE
-#define FSEEK_TYPE long
+#ifndef FTELL
+#define FTELL ftell
+#define FTELL_TYPE long
 #endif
 
-FSEEK_TYPE
-ftell(FILE *stream)
+FTELL_TYPE
+FTELL(FILE *stream)
 {
         struct __file_ext *xf = (struct __file_ext *) stream;
         if ((stream->flags & __SEXT) && xf->seek) {
-                FSEEK_TYPE ret = (FSEEK_TYPE) (xf->seek) (stream, 0, SEEK_CUR);
+                FTELL_TYPE ret = (FTELL_TYPE) (xf->seek) (stream, 0, SEEK_CUR);
                 if (__atomic_load_ungetc(&stream->unget) != 0)
                     ret--;
                 return ret;
