@@ -561,9 +561,6 @@ ATF_TC_BODY(test11, tc)
 /*
  * test fmemopen_seek(SEEK_CUR)
  */
-#if defined(__GLIBC__)
-			if (i < (off_t)t->n) {
-#endif
 			/* zero */
 			ATF_CHECK(fseeko(fp, (off_t)0, SEEK_CUR) == 0);
 			ATF_CHECK(ftello(fp) == len);
@@ -588,9 +585,6 @@ ATF_TC_BODY(test11, tc)
 			ATF_CHECK(fseeko(fp, (off_t)-1, SEEK_CUR) == -1);
 			ATF_CHECK(ftello(fp) == (off_t)0);
 
-#if defined(__GLIBC__)
-			}
-#endif
 			ATF_CHECK(fclose(fp) == 0);
 		}
 	}
