@@ -44,6 +44,7 @@
 
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Walloc-size-larger-than="
+#pragma GCC diagnostic ignored "-Wanalyzer-use-of-uninitialized-value"
 #endif
 
 int
@@ -115,24 +116,26 @@ main(void)
 			printf("calloc(SIZE_MAX >> %d, SIZE_MAX >> %d) should have failed. got %p error %s\n", pow, pow, r, strerror(errno));
 			result++;
 		}
+                free(r);
 		r = reallocarray(NULL, SIZE_MAX >> pow, SIZE_MAX >> pow);
                 printf("reallocarray(SIZE_MAX >> %d, SIZE_MAX >> %d): %p\n", pow, pow, r);
 		if (r || errno != ENOMEM) {
 			printf("reallocarray(NULL, SIZE_MAX >> %d, SIZE_MAX >> %d) should have failed. got %p error %s\n", pow, pow, r, strerror(errno));
 			result++;
 		}
+                free(r);
 	}
 
 	/* make sure realloc doesn't read past the source */
 
 	void *big = malloc(1024);
-	memset(big, '1', 1024);
         printf("big %p\n", big);
 	if (big) {
+                memset(big, '1', 1024);
 		void *small = malloc(128);
-		memset(small, '2', 128);
                 printf("small %p\n", small);
 		if (small) {
+                        memset(small, '2', 128);
                         (void) atoi(small);
 			free(big);
 			char *med = realloc(small, 1024);
