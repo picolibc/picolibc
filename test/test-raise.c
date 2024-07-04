@@ -42,9 +42,9 @@
 #define HANDLER_SUCCESS         1
 #define HANDLER_FAILED          2
 
-static sig_atomic_t     handler_result;
-static sig_atomic_t     handler_sig_expect;
-static sig_atomic_t     handler_sig_received;
+static volatile sig_atomic_t     handler_result;
+static volatile sig_atomic_t     handler_sig_expect;
+static volatile sig_atomic_t     handler_sig_received;
 
 static void
 signal_handler(int sig)
