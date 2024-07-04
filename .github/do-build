@@ -45,6 +45,7 @@ trap 'rm -rf "$DIR"' 0 1 15
 	 ;;
      *)
 	 echo 'Configuration failed with' "$?"
+	 cat meson-logs/*
 	 exit 1
 	 ;;
  esac
