@@ -164,9 +164,13 @@ __unused
 #define PARAMETER_STACK_LEVELS 8u
 
 #if defined(I_AM_QSORT_R)
-# ifdef __GNUC__
-__typeof(qsort_r) __bsd_qsort_r;
-#endif
+void
+__bsd_qsort_r (void *a,
+	size_t n,
+	size_t es,
+	void *thunk,
+        cmp_t *cmp);
+
 void
 __bsd_qsort_r (void *a,
 	size_t n,

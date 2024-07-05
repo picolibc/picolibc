@@ -4,7 +4,10 @@
 #include <errno.h>
 #include <string.h>
 
-__typeof(strerror_r) __xpg_strerror_r;
+int
+__xpg_strerror_r (int errnum,
+	char *buffer,
+        size_t n);
 
 int
 __xpg_strerror_r (int errnum,
