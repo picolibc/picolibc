@@ -48,6 +48,9 @@ details. */
 		  con.b.srWindow.Top + con.scroll_region.Bottom)
 #define con_is_legacy (shared_console_info[unit] && con.is_legacy)
 
+static HANDLE NO_COPY shared_info_mutex;
+static int NO_COPY shared_info_state;
+
 #define CONS_THREAD_SYNC "cygcons.thread_sync"
 static bool NO_COPY master_thread_started = false;
 
@@ -665,6 +668,12 @@ fhandler_console::set_unit ()
   else if (myself->ctty != CTTY_UNINITIALIZED)
     unit = device::minor (myself->ctty);
 
+  if (!shared_info_mutex)
+    shared_info_mutex = CreateMutex (&sec_none_nih, FALSE, NULL);
+
+  WaitForSingleObject (shared_info_mutex, INFINITE);
+  shared_info_state++;
+
   if (shared_console_info[unit])
     ; /* Do nothing */
   else if (generic_console
@@ -698,6 +707,8 @@ fhandler_console::set_unit ()
 	    }
 	}
     }
+  ReleaseMutex (shared_info_mutex);
+
   if (shared_console_info[unit])
     {
       devset = (fh_devices) shared_console_info[unit]->tty_min_state.getntty ();
@@ -1963,11 +1974,13 @@ fhandler_console::close ()
   CloseHandle (output_mutex);
   output_mutex = NULL;
 
-  if (shared_console_info[unit] && myself->ctty != tc ()->ntty)
+  WaitForSingleObject (shared_info_mutex, INFINITE);
+  if (--shared_info_state == 0 && shared_console_info[unit])
     {
       UnmapViewOfFile ((void *) shared_console_info[unit]);
       shared_console_info[unit] = NULL;
     }
+  ReleaseMutex (shared_info_mutex);
 
   return 0;
 }
