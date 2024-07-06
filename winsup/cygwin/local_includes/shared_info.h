@@ -33,7 +33,7 @@ public:
 /* Data accessible to all tasks */
 
 
-#define CURR_SHARED_MAGIC 0x9f33cc5dU
+#define CURR_SHARED_MAGIC 0x205f4579U
 
 #define USER_VERSION   1
 
@@ -46,6 +46,7 @@ class shared_info
   DWORD cb;
  public:
   tty_list tty;
+  HWND cons_hwnd[MAX_CONS_DEV];
   LONG last_used_bindresvport;
   DWORD obcaseinsensitive;
   mtinfo mt;

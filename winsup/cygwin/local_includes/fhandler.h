@@ -2191,10 +2191,6 @@ class dev_console
   friend class fhandler_console;
 };
 
-#define MAX_CONS_DEV (sizeof (unsigned long) * 8)
-#define CONS_SCAN_UNUSED (-1)
-#define CONS_LIST_USED (-2)
-
 /* This is a input and output console handle */
 class fhandler_console: public fhandler_termios
 {
@@ -2387,13 +2383,10 @@ private:
   class console_unit
   {
     int n;
-    unsigned long bitmask;
-    console_state *shared_console_info;
   public:
-    operator console_state * () const {return shared_console_info;}
-    operator unsigned long () const {return n == CONS_LIST_USED ? bitmask : n;}
-    console_unit (int);
-    friend BOOL CALLBACK fhandler_console::enum_windows (HWND, LPARAM);
+    operator console_state * () const;
+    operator int () const { return n; }
+    console_unit (int, HANDLE *input_mutex = NULL);
   };
 
   friend tty_min * tty_list::get_cttyp ();

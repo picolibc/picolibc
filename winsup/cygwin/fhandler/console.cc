@@ -69,13 +69,6 @@ static struct fhandler_base::rabuf_t con_ra;
    in xterm compatible mode */
 static wchar_t last_char;
 
-static char *
-cons_shared_name (char *ret_buf, const char *str, HWND hw)
-{
-  __small_sprintf (ret_buf, "%s.%p", str, hw);
-  return ret_buf;
-}
-
 DWORD
 fhandler_console::attach_console (pid_t owner, bool *err)
 {
@@ -234,44 +227,52 @@ fhandler_console::open_shared_console (HWND hw, HANDLE& h, bool& created)
   return res;
 }
 
-BOOL CALLBACK
-fhandler_console::enum_windows (HWND hw, LPARAM lp)
+fhandler_console::console_unit::console_unit (int n0, HANDLE *input_mutex) :
+  n (-1)
 {
-  console_unit *this1 = (console_unit *) lp;
-  HANDLE h = NULL;
-  fhandler_console::console_state *cs;
-  if ((cs = fhandler_console::open_shared_console (hw, h)))
+  char buf[MAX_PATH];
+  for (int i = max(0, n0); i < MAX_CONS_DEV; i++)
     {
-      CloseHandle (h);
-      if (major (cs->tty_min_state.getntty ()) == DEV_CONS_MAJOR)
-	this1->bitmask |= 1UL << minor (cs->tty_min_state.getntty ());
-      if (this1->n == minor (cs->tty_min_state.getntty ()))
+      shared_name (buf, "cygcons.input.mutex", i);
+      SetLastError (ERROR_SUCCESS);
+      HANDLE input_mutex0 = CreateMutex (&sec_none, FALSE, buf);
+      DWORD err = GetLastError ();
+      if (err == ERROR_ALREADY_EXISTS || err == ERROR_ACCESS_DENIED)
 	{
-	  this1->shared_console_info = cs;
-	  return FALSE;
+	  if (n0 >= 0)
+	    n = i;
 	}
-      UnmapViewOfFile ((void *) cs);
+      else if (n0 == CONS_SCAN_UNUSED)
+	{
+	  n = i;
+	  if (input_mutex)
+	    *input_mutex = input_mutex0;
+	  break;
+	}
+      if (input_mutex0)
+	CloseHandle (input_mutex0);
+      if (n0 >= 0)
+	break;
     }
-  else
-    { /* Only for ConEmu */
-      char class_hw[32];
-      if (19 == GetClassName (hw, class_hw, sizeof (class_hw))
-	  && 0 == strcmp (class_hw, "VirtualConsoleClass"))
-	EnumChildWindows (hw, fhandler_console::enum_windows, lp);
+  if (n0 == CONS_SCAN_UNUSED && n < 0)
+    {
+      __small_sprintf (buf, "console device allocation failure - "
+		       "too many consoles in use, max consoles is %d",
+		       MAX_CONS_DEV);
+      api_fatal (buf);
     }
-  return TRUE;
 }
 
-fhandler_console::console_unit::console_unit (int n0):
-  n (n0), bitmask (0), shared_console_info (NULL)
+fhandler_console::console_unit::operator console_state * () const
 {
-  EnumWindows (fhandler_console::enum_windows, (LPARAM) this);
-  if (n0 == CONS_SCAN_UNUSED && (n = ffsl (~bitmask) - 1) < 0)
-    api_fatal (sizeof (bitmask) == 8 ?
-	       "console device allocation failure - "
-	       "too many consoles in use, max consoles is 64" :
-	       "console device allocation failure - "
-	       "too many consoles in use, max consoles is 32");
+  if (n < 0 || n >= MAX_CONS_DEV)
+    return NULL;
+  HANDLE h = NULL;
+  fhandler_console::console_state *cs;
+  HWND hw = cygwin_shared->cons_hwnd[n];
+  if ((cs = fhandler_console::open_shared_console (hw, h)))
+    CloseHandle (h);
+  return cs;
 }
 
 static DWORD
@@ -699,7 +700,8 @@ fhandler_console::set_unit ()
 	      ProtectHandleINH (cygheap->console_h);
 	      if (created)
 		{
-		  unit = console_unit (CONS_SCAN_UNUSED);
+		  unit = console_unit (CONS_SCAN_UNUSED, &input_mutex);
+		  cygwin_shared->cons_hwnd[unit] = me;
 		  cs->tty_min_state.setntty (DEV_CONS_MAJOR, unit);
 		}
 	      else
@@ -943,7 +945,7 @@ fhandler_console::setup_io_mutex (void)
   res = WAIT_FAILED;
   if (!input_mutex || WAIT_FAILED == (res = acquire_input_mutex (0)))
     {
-      cons_shared_name (buf, "cygcons.input.mutex", GetConsoleWindow ());
+      shared_name (buf, "cygcons.input.mutex", get_minor ());
       input_mutex = OpenMutex (MAXIMUM_ALLOWED, TRUE, buf);
       if (!input_mutex)
 	input_mutex = CreateMutex (&sec_none, FALSE, buf);
@@ -959,7 +961,7 @@ fhandler_console::setup_io_mutex (void)
   res = WAIT_FAILED;
   if (!output_mutex || WAIT_FAILED == (res = acquire_output_mutex (0)))
     {
-      cons_shared_name (buf, "cygcons.output.mutex", GetConsoleWindow ());
+      shared_name (buf, "cygcons.output.mutex", get_minor ());
       output_mutex = OpenMutex (MAXIMUM_ALLOWED, TRUE, buf);
       if (!output_mutex)
 	output_mutex = CreateMutex (&sec_none, FALSE, buf);
@@ -1874,7 +1876,7 @@ fhandler_console::open (int flags, mode_t)
       if (GetModuleHandle ("ConEmuHk64.dll"))
 	hook_conemu_cygwin_connector ();
       char name[MAX_PATH];
-      cons_shared_name (name, CONS_THREAD_SYNC, GetConsoleWindow ());
+      shared_name (name, CONS_THREAD_SYNC, get_minor ());
       thread_sync_event = CreateEvent(NULL, FALSE, FALSE, name);
       if (thread_sync_event)
 	{
@@ -1943,7 +1945,7 @@ fhandler_console::close ()
       if (master_thread_started)
 	{
 	  char name[MAX_PATH];
-	  cons_shared_name (name, CONS_THREAD_SYNC, GetConsoleWindow ());
+	  shared_name (name, CONS_THREAD_SYNC, get_minor ());
 	  thread_sync_event = OpenEvent (MAXIMUM_ALLOWED, FALSE, name);
 	  if (thread_sync_event)
 	    {
