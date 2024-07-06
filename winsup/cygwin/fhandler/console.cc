@@ -49,7 +49,7 @@ details. */
 #define con_is_legacy (shared_console_info[unit] && con.is_legacy)
 
 static HANDLE NO_COPY shared_info_mutex;
-static int NO_COPY shared_info_state;
+static int NO_COPY shared_info_state[MAX_CONS_DEV];
 
 #define CONS_THREAD_SYNC "cygcons.thread_sync"
 static bool NO_COPY master_thread_started = false;
@@ -672,7 +672,6 @@ fhandler_console::set_unit ()
     shared_info_mutex = CreateMutex (&sec_none_nih, FALSE, NULL);
 
   WaitForSingleObject (shared_info_mutex, INFINITE);
-  shared_info_state++;
 
   if (shared_console_info[unit])
     ; /* Do nothing */
@@ -682,7 +681,10 @@ fhandler_console::set_unit ()
   else
     {
       if (!generic_console && (dev_t) myself->ctty != get_device ())
-	shared_console_info[unit] = console_unit (unit);
+	{
+	  shared_console_info[unit] = console_unit (unit);
+	  shared_info_state[unit]++;
+	}
       if (generic_console || !shared_console_info[unit])
 	{
 	  me = GetConsoleWindow ();
@@ -693,6 +695,7 @@ fhandler_console::set_unit ()
 	      created = true;
 	      fhandler_console::console_state *cs =
 		open_shared_console (me, cygheap->console_h, created);
+	      shared_info_state[unit]++;
 	      ProtectHandleINH (cygheap->console_h);
 	      if (created)
 		{
@@ -1975,7 +1978,7 @@ fhandler_console::close ()
   output_mutex = NULL;
 
   WaitForSingleObject (shared_info_mutex, INFINITE);
-  if (--shared_info_state == 0 && shared_console_info[unit])
+  if (--shared_info_state[unit] == 0 && shared_console_info[unit])
     {
       UnmapViewOfFile ((void *) shared_console_info[unit]);
       shared_console_info[unit] = NULL;
