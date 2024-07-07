@@ -380,7 +380,10 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 #endif
             exp += expacc;
 	}
-
+#ifdef _NEED_IO_C99_FORMATS
+    else if (flags & FL_FHEX)
+        exp *= 4;
+#endif
     no_exp:
 	if (width)
             scanf_ungetc (i, stream, lenp);
