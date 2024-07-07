@@ -36,6 +36,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 
 #if defined (TINY_STDIO) || !defined(__PICOLIBC__)
 #define FULL_TESTS
@@ -52,57 +53,68 @@ static const struct {
     double      dvalue;
     float       fvalue;
     long double ldvalue;
+    char        *end_test;
 } tests[] = {
-    { "1e2@", 100.0, 100.0f, 100.0l },
+    { "1e2@", 100.0, 100.0f, 100.0l, "@" },
 #ifdef FULL_TESTS
-    { "0x1p-1@", 0.5, 0.5f, 0.5l },
-    { "0x1p-10000000000000000000000000@", 0.0, 0.0f, 0.0l },
-    { "0x1p0@", 1.0, 1.0f, 1.0l },
-    { "0x10p0@", 16.0, 16.0f, 16.0l },
-    { "0x1p-1023@", 0x1p-1023, 0.0f, 0x1p-1023l },
+    { "0x10.000@", 16.0, 16.0f, 16.0l, "@" },
+    { "0x10.000p@", 16.0, 16.0f, 16.0l, "p@" },
+    { "0x10.000p+@", 16.0, 16.0f, 16.0l, "p+@" },
+    { "0x10.000p+1@", 32.0, 32.0f, 32.0l, "@" },
+    { "0x10.000p-@", 16.0, 16.0f, 16.0l, "p-@" },
+    { "0x10.000p-1@", 8.0, 8.0f, 8.0l, "@" },
+    { "0x11.000@", 17.0, 17.0f, 17.0l, "@" },
+    { "0x0.01@", 1/256.0, 1/256.0f, 1/256.0l, "@" },
+    { "0x0.01p", 1/256.0, 1/256.0f, 1/256.0l, "p" },
+    { "0x0.01p+", 1/256.0, 1/256.0f, 1/256.0l, "p+" },
+    { "0x1p-1@", 0.5, 0.5f, 0.5l, "@" },
+    { "0x1p-10000000000000000000000000@", 0.0, 0.0f, 0.0l, "@" },
+    { "0x1p0@", 1.0, 1.0f, 1.0l, "@" },
+    { "0x10p0@", 16.0, 16.0f, 16.0l, "@" },
+    { "0x1p-1023@", 0x1p-1023, 0.0f, 0x1p-1023l, "@" },
     /* Check round-to-even for floats */
-    { "0x1.000002p0@", 0x1.000002p0, 0x1.000002p0f, 0x1.000002p0l },
-    { "0x1.000003p0@", 0x1.000003p0, 0x1.000004p0f, 0x1.000003p0l },
-    { "0x1.000001p0@", 0x1.000001p0, 0x1.000000p0f, 0x1.000001p0l },
-    { "0x1.000001000000001p0@", 0x1.000001000000001p0, 0x1.000002p0f, 0x1.000001000000001p0l },
+    { "0x1.000002p0@", 0x1.000002p0, 0x1.000002p0f, 0x1.000002p0l, "@" },
+    { "0x1.000003p0@", 0x1.000003p0, 0x1.000004p0f, 0x1.000003p0l, "@" },
+    { "0x1.000001p0@", 0x1.000001p0, 0x1.000000p0f, 0x1.000001p0l, "@" },
+    { "0x1.000001000000001p0@", 0x1.000001000000001p0, 0x1.000002p0f, 0x1.000001000000001p0l, "@" },
 #if __SIZEOF_DOUBLE__ == 8
     /* Check round-to-even for doubles */
-    { "0x100000000000008p0@", 0x1p56, 0x1p56f, 0x1.00000000000008p56l },
-    { "0x100000000000008.p0@", 0x1p56, 0x1p56f, 0x1.00000000000008p56l },
-    { "0x100000000000008.00p0@", 0x1p56,0x1p56f, 0x1.00000000000008p56l },
-    { "0x10000000000000800p0@", 0x1p64, 0x1p64f, 0x1.00000000000008p64l },
-    { "0x10000000000000801p0@", 0x1.0000000000001p64, 0x1p64f, 0x1.0000000000000801p64l },
-    { "0x10000000000000800.0000000000001p0@", 0x1.0000000000001p64, 0x1p64f, 0x1.00000000000008p64l },
-    { "0x10000000000001800p0@", 0x1.0000000000002p64, 0x1p64f, 0x1.00000000000018p64l },
+    { "0x100000000000008p0@", 0x1p56, 0x1p56f, 0x1.00000000000008p56l, "@" },
+    { "0x100000000000008.p0@", 0x1p56, 0x1p56f, 0x1.00000000000008p56l, "@" },
+    { "0x100000000000008.00p0@", 0x1p56,0x1p56f, 0x1.00000000000008p56l, "@" },
+    { "0x10000000000000800p0@", 0x1p64, 0x1p64f, 0x1.00000000000008p64l, "@" },
+    { "0x10000000000000801p0@", 0x1.0000000000001p64, 0x1p64f, 0x1.0000000000000801p64l, "@" },
+    { "0x10000000000000800.0000000000001p0@", 0x1.0000000000001p64, 0x1p64f, 0x1.00000000000008p64l, "@" },
+    { "0x10000000000001800p0@", 0x1.0000000000002p64, 0x1p64f, 0x1.00000000000018p64l, "@" },
 #endif
     /* Check max values for floats */
-    { "0x1.fffffep126@", 0x1.fffffep126,  0x1.fffffep126f, 0x1.fffffep126l },
-    { "0x1.ffffffp126@", 0x1.ffffffp126,  0x1.000000p127f, 0x1.ffffffp126l },
-    { "0x1.fffffep127@", 0x1.fffffep127,  0x1.fffffep127f, 0x1.fffffep127l },
-    { "0x1.ffffffp127@", 0x1.ffffffp127, (float) INFINITY, 0x1.ffffffp127l },   /* rounds up to INFINITY for float */
+    { "0x1.fffffep126@", 0x1.fffffep126,  0x1.fffffep126f, 0x1.fffffep126l, "@" },
+    { "0x1.ffffffp126@", 0x1.ffffffp126,  0x1.000000p127f, 0x1.ffffffp126l, "@" },
+    { "0x1.fffffep127@", 0x1.fffffep127,  0x1.fffffep127f, 0x1.fffffep127l, "@" },
+    { "0x1.ffffffp127@", 0x1.ffffffp127, (float) INFINITY, 0x1.ffffffp127l, "@" },   /* rounds up to INFINITY for float */
 #if __SIZEOF_DOUBLE__ == 8
     /* Check max values for doubles */
-    { "0x1.fffffffffffffp1022@",  0x1.fffffffffffffp1022, (float) INFINITY, 0x1.fffffffffffffp1022l },
-    { "0x1.fffffffffffff8p1022@", 0x1.0000000000000p1023, (float) INFINITY, 0x1.fffffffffffff8p1022l }, /* rounds up for double */
-    { "0x1.fffffffffffffp1023@",  0x1.fffffffffffffp1023, (float) INFINITY, 0x1.fffffffffffffp1023l },
+    { "0x1.fffffffffffffp1022@",  0x1.fffffffffffffp1022, (float) INFINITY, 0x1.fffffffffffffp1022l, "@" },
+    { "0x1.fffffffffffff8p1022@", 0x1.0000000000000p1023, (float) INFINITY, 0x1.fffffffffffff8p1022l, "@" }, /* rounds up for double */
+    { "0x1.fffffffffffffp1023@",  0x1.fffffffffffffp1023, (float) INFINITY, 0x1.fffffffffffffp1023l, "@" },
 #endif
 #if defined(_TEST_LONG_DOUBLE) && __SIZEOF_LONG_DOUBLE__ > 8
 #if __LDBL_MANT_DIG__ > __DBL_MANT_DIG__
-    { "0x1.fffffffffffff8p1023@",      (double) INFINITY, (float) INFINITY, 0x1.fffffffffffff8p1023l }, /* rounds up to INFINITY for double */
+    { "0x1.fffffffffffff8p1023@",      (double) INFINITY, (float) INFINITY, 0x1.fffffffffffff8p1023l, "@" }, /* rounds up to INFINITY for double */
 #else
-    { "0x1.fffffffffffff8p1023@",      (double) INFINITY, (float) INFINITY, (long double) INFINITY }, /* rounds up to INFINITY for double */
+    { "0x1.fffffffffffff8p1023@",      (double) INFINITY, (float) INFINITY, (long double) INFINITY, "@" }, /* rounds up to INFINITY for double */
 #endif
     /* Check max values for long doubles */
 #if __LDBL_MANT_DIG__ == 113
-    { "0x1.ffffffffffffffffffffffffffffp16382@",  (double) INFINITY, (float) INFINITY, 0x1.ffffffffffffffffffffffffffffp16382l },
-    { "0x1.ffffffffffffffffffffffffffff8p16382@", (double) INFINITY, (float) INFINITY, 0x1.0000000000000000000000000000p16383l }, /* rounds up for long double */
-    { "0x1.ffffffffffffffffffffffffffffp16383@",  (double) INFINITY, (float) INFINITY, 0x1.ffffffffffffffffffffffffffffp16383l },
-    { "0x1.ffffffffffffffffffffffffffff8p16383@", (double) INFINITY, (float) INFINITY, (long double) INFINITY },                  /* rounds up to INFINITY for long oduble */
+    { "0x1.ffffffffffffffffffffffffffffp16382@",  (double) INFINITY, (float) INFINITY, 0x1.ffffffffffffffffffffffffffffp16382l, "@" },
+    { "0x1.ffffffffffffffffffffffffffff8p16382@", (double) INFINITY, (float) INFINITY, 0x1.0000000000000000000000000000p16383l, "@" }, /* rounds up for long double */
+    { "0x1.ffffffffffffffffffffffffffffp16383@",  (double) INFINITY, (float) INFINITY, 0x1.ffffffffffffffffffffffffffffp16383l, "@" },
+    { "0x1.ffffffffffffffffffffffffffff8p16383@", (double) INFINITY, (float) INFINITY, (long double) INFINITY, "@" },                  /* rounds up to INFINITY for long oduble */
 #elif __LDBL_MANT_DIG__ == 64
-    { "0x1.fffffffffffffffep16382@", (double) INFINITY, (float) INFINITY, 0x1.fffffffffffffffep16382l },
-    { "0x1.ffffffffffffffffp16382@", (double) INFINITY, (float) INFINITY, 0x1.0000000000000000p16383l },        /* rounds up for long double */
-    { "0x1.fffffffffffffffep16383@", (double) INFINITY, (float) INFINITY, 0x1.fffffffffffffffep16383l },
-    { "0x1.ffffffffffffffffp16383@", (double) INFINITY, (float) INFINITY, (long double) INFINITY },             /* rounds up to INFINITY for long double */
+    { "0x1.fffffffffffffffep16382@", (double) INFINITY, (float) INFINITY, 0x1.fffffffffffffffep16382l, "@" },
+    { "0x1.ffffffffffffffffp16382@", (double) INFINITY, (float) INFINITY, 0x1.0000000000000000p16383l, "@" },        /* rounds up for long double */
+    { "0x1.fffffffffffffffep16383@", (double) INFINITY, (float) INFINITY, 0x1.fffffffffffffffep16383l, "@" },
+    { "0x1.ffffffffffffffffp16383@", (double) INFINITY, (float) INFINITY, (long double) INFINITY, "@" },             /* rounds up to INFINITY for long double */
 #endif
 #endif
 #endif
@@ -130,9 +142,9 @@ int main(void)
                    d, d, tests[i].dvalue, tests[i].dvalue);
             ret = 1;
         }
-        if (*end != '@') {
-            printf("strtod(\"%s\") end is \"%s\"\n",
-                   tests[i].string, end);
+        if (strcmp(end, tests[i].end_test) != 0) {
+            printf("strtod(\"%s\") end is \"%s\" expected \"%s\"\n",
+                   tests[i].string, end, tests[i].end_test);
             ret = 1;
         }
         f = strtof(tests[i].string, &end);
@@ -141,8 +153,9 @@ int main(void)
                    (double) f, (double) f, (double) tests[i].fvalue, (double) tests[i].fvalue);
             ret = 1;
         }
-        if (*end != '@') {
-            printf("strtof(\"%s\") end is \"%s\"\n", tests[i].string, end);
+        if (strcmp(end, tests[i].end_test) != 0) {
+            printf("strtof(\"%s\") end is \"%s\" expected \"%s\"\n",
+                   tests[i].string, end, tests[i].end_test);
             ret = 1;
         }
 #ifdef _TEST_LONG_DOUBLE
@@ -154,8 +167,9 @@ int main(void)
                        ld, ld, tests[i].ldvalue, tests[i].ldvalue);
                 ret = 1;
             }
-            if (*end != '@') {
-                printf("strtold(\"%s\") end is \"%s\"\n", tests[i].string, end);
+            if (strcmp(end, tests[i].end_test) != 0) {
+                printf("strtold(\"%s\") end is \"%s\" expected \"%s\"\n",
+                       tests[i].string, end, tests[i].end_test);
                 ret = 1;
             }
         }

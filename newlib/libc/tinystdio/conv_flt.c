@@ -326,7 +326,11 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 	    return 0;
 
 #ifdef _NEED_IO_C99_FORMATS
-        int exp_match = (flags & FL_FHEX) ? 'p' : 'e';
+        int exp_match = 'e';
+        if (flags & FL_FHEX) {
+            exp_match = 'p';
+            exp *= 4;
+        }
 #else
 #define exp_match 'e'
 #endif
@@ -374,10 +378,6 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 	    } while (CHECK_WIDTH() && isdigit (i = scanf_getc(stream, lenp)));
 	    if (flags & FL_MEXP)
 		expacc = -expacc;
-#ifdef _NEED_IO_C99_FORMATS
-            if (flags & FL_FHEX)
-                exp *= 4;
-#endif
             exp += expacc;
 	}
 
