@@ -33,6 +33,7 @@ details. */
 #include "child_info.h"
 #include "cygwait.h"
 #include "winf.h"
+#include "psapi.h"
 
 /* Don't make this bigger than NT_MAX_PATH as long as the temporary buffer
    is allocated using tmp_pathbuf!!! */
@@ -1970,7 +1971,23 @@ fhandler_console::close ()
   if (!have_execed && !invisible_console
       && (!CTTY_IS_VALID (myself->ctty)
 	  || get_device () == (dev_t) myself->ctty))
-    free_console ();
+    {
+      /* ConEmu hack. Detach from ConEmu to unhook console APIs. */
+      HMODULE h = GetModuleHandle ("ConEmuHk64.dll");
+      if (h)
+	{
+	  MODULEINFO mi;
+	  if (GetModuleInformation (GetCurrentProcess (), h, &mi, sizeof (mi)))
+	    {
+	      BOOL (*DllMain)(HINSTANCE, DWORD, LPVOID) =
+		(BOOL (*)(HINSTANCE, DWORD, LPVOID)) mi.EntryPoint;
+	      DllMain (h, DLL_PROCESS_DETACH, NULL);
+	    }
+	}
+
+      /* Freeing console to detach the process from the console. */
+      free_console ();
+    }
 
   release_output_mutex ();
 
