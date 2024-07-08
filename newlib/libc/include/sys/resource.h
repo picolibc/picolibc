@@ -9,6 +9,9 @@ extern "C" {
 
 #define	RUSAGE_SELF	0		/* calling process */
 #define	RUSAGE_CHILDREN	-1		/* terminated child processes */
+#if __GNU_VISIBLE
+#define	RUSAGE_THREAD	1
+#endif
 
 struct rusage {
   	struct timeval ru_utime;	/* user time used */
