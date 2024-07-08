@@ -59,6 +59,7 @@ std_malloc_srcs_stdlib = [
   'malloc-malloc_usable_size.c',
   'malloc-mallopt.c',
   'malloc-memalign.c',
+  'malloc-posix_memalign.c',
   'malloc-pvalloc.c',
   'malloc-realloc.c',
   'malloc-valloc.c',

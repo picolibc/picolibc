@@ -963,6 +963,7 @@ extern Void_t*     sbrk();
 #define pvALLOc		__libc_pvalloc
 #define mALLINFo	__libc_mallinfo
 #define mALLOPt		__libc_mallopt
+#define pOSIx_mEMALIGn	__libc_posix_memalign
 
 #pragma weak calloc = __libc_calloc
 #pragma weak free = __libc_free
@@ -974,6 +975,7 @@ extern Void_t*     sbrk();
 #pragma weak pvalloc = __libc_pvalloc
 #pragma weak mallinfo = __libc_mallinfo
 #pragma weak mallopt = __libc_mallopt
+#pragma weak posix_memalign = __libc_posix_memalign
 
 #else
 
@@ -986,6 +988,7 @@ extern Void_t*     sbrk();
 #define pvALLOc		pvalloc
 #define mALLINFo	mallinfo
 #define mALLOPt		mallopt
+#define pOSIx_mEMALIGn	posix_memalign
 
 #ifdef _LIBC
 
@@ -1023,6 +1026,7 @@ size_t  malloc_usable_size(Void_t*);
 void    malloc_stats(void);
 int     mALLOPt(int, int);
 struct mallinfo mALLINFo(void);
+int     pOSIx_mEMALIGn(Void_t **, size_t, size_t);
 #else
 Void_t* mALLOc();
 void    fREe();
@@ -1037,6 +1041,7 @@ size_t  malloc_usable_size();
 void    malloc_stats();
 int     mALLOPt();
 struct mallinfo mALLINFo();
+int     pOSIx_mEMALIGn()
 #endif
 
 /* Work around compiler optimizing away stores to 'size' field before
@@ -3596,6 +3601,27 @@ int mALLOPt(param_number, value) RDECL int param_number; int value;
 }
 
 #endif /* DEFINE_MALLOPT */
+
+#ifdef DEFINE_POSIX_MEMALIGN
+#if __STD_C
+int pOSIx_mEMALIGn(Void_t **memptr, size_t align, size_t size)
+#else
+int pOSIx_mEMALIGn(memptr, align, size) RDECL Void_t **memptr; size_t align, size;
+#endif
+{
+    /* Return EINVAL if align isn't power of 2 or not a multiple of a pointer size */
+    if ((align & (align-1)) != 0 || align % sizeof(Void_t *) != 0 || align == 0)
+        return EINVAL;
+
+    Void_t *mem = mEMALIGn(align, size);
+
+    if (!mem)
+        return ENOMEM;
+
+    *memptr = mem;
+    return 0;
+}
+#endif
 
 /*
 
