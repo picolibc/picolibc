@@ -544,6 +544,7 @@ foreach target : targets
                       'test-ungetc-ftell',
                       'test-fgetc',
                       'test-fgets-eof',
+                      'test-dtox-rounding',
                      ]
     endif
   endif
