@@ -684,6 +684,8 @@
     result |= test(__LINE__, "0x1.6789a0p+1", "%.6a", (double) 0x1.6789ap+1f);
     result |= test(__LINE__, "0x1.ffp+1", "%.2a", (double) 0x1.ffp+1f);
     result |= test(__LINE__, "0x2.0p+1", "%.1a", (double) 0x1.ffp+1f);
+    result |= test(__LINE__, "0x2p+4", "%.a", 24.0);
+    result |= test(__LINE__, "0X2P+4", "%.A", 24.0);
     result |= test(__LINE__, "nan", "%a", (double) NAN);
     result |= test(__LINE__, "inf", "%a", (double) INFINITY);
     result |= test(__LINE__, "-inf", "%a", (double) -INFINITY);
@@ -693,16 +695,20 @@
 #ifdef LOW_FLOAT
 #ifdef NORMALIZED_A
     result |= test(__LINE__, "0x1p-149", "%a", 0x1p-149);
+    result |= test(__LINE__, "0x1p-127", "%.a", 0x1p-127);
 #else
     result |= test(__LINE__, "0x0.000002p-126", "%a", 0x1p-149);
+    result |= test(__LINE__, "0x0p-126", "%.a", 0x1p-127);
 #endif
 #else
 #ifdef NORMALIZED_A
     /* newlib legacy stdio normalizes %a format */
     result |= test(__LINE__, "0x1p-1074", "%a", 0x1p-1074);
+    result |= test(__LINE__, "0x1p-1023", "%.a", 0x1p-1023);
 #else
     /* glibc and picolibc show denorms like this */
     result |= test(__LINE__, "0x0.0000000000001p-1022", "%a", 0x1p-1074);
+    result |= test(__LINE__, "0x0p-1022", "%.a", 0x1p-1023);
 #endif
     result |= test(__LINE__, "0x1.fffffffffffffp+1022", "%a", 0x1.fffffffffffffp+1022);
     result |= test(__LINE__, "0x1.23456789abcdep-1022", "%a", 0x1.23456789abcdep-1022);
