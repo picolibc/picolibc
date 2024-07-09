@@ -83,6 +83,7 @@ if (posix_io or not tinystdio) and tests_enable_posix_io
                     'test-fgetc',
                     'test-fgets-eof',
                     'test-wchar',
+                    'test-vfscanf-percent-a',
                    ]
   endif
 endif
