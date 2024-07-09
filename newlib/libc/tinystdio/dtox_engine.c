@@ -134,7 +134,7 @@ __dtox_engine (DTOX_FLOAT x, struct dtoa *dtoa, int prec, unsigned char case_con
         DTOX_INT            mask = ~((half << 1) - 1);
 
         /* round even */
-        if ((s & ~mask) > half || ((s >> bits) & 1) != 0)
+        if ((s & ~mask) >= half || ((s >> bits) & 1) != 0)
             s += half;
         /* special case rounding first digit */
         if (s > (SIG_MASK << SIG_SHIFT))
