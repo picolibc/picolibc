@@ -553,7 +553,7 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 # define CNV_BRACKET	""
 #endif
 #if defined(_NEED_IO_FLOAT) || defined(_NEED_IO_DOUBLE)
-# define CNV_FLOAT	"efgEFG"
+# define CNV_FLOAT	"aefgAEFG"
 #else
 # define CNV_FLOAT	""
 #endif
@@ -665,7 +665,7 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                     c = conv_int (stream, lenp, width, addr, flags, base);
 		    break;
 
-	          default:		/* e,E,f,F,g,G	*/
+	          default:		/* a,A,e,E,f,F,g,G */
 		      c = conv_flt (stream, lenp, width, addr, flags);
 #else
 	          case 'd':
