@@ -58,6 +58,7 @@
 #define EXP_MASK        0x7ff
 #define SIG_SHIFT       0
 #define SIG_MASK        0xfffffffffffffLL
+#define SIG_MSB         0x10000000000000LL
 #define EXP_BIAS        1023
 #define ASUINT(x)       asuint64(x)
 #define DTOX_NDIGS 14
@@ -78,6 +79,7 @@
 #define EXP_MASK        0xff
 #define SIG_SHIFT       1
 #define SIG_MASK        0x7fffff
+#define SIG_MSB         0x800000
 #define EXP_BIAS        127
 #define ASUINT(x)       asuint(x)
 #define DTOX_NDIGS 7
@@ -104,25 +106,33 @@
 int
 __dtox_engine (DTOX_FLOAT x, struct dtoa *dtoa, int prec, unsigned char case_convert)
 {
-    DTOX_INT   fi, s;
-    int exp;
+    DTOX_INT fi, s;
+    int exp, d;
 
     fi = ASUINT(x);
 
-    dtoa->digits[0] = '0';
-
-    exp = ((fi >> EXP_SHIFT) & EXP_MASK);
-    s = (fi & SIG_MASK) << SIG_SHIFT;
-    if (s | exp) {
-        if (!exp)
-            exp = 1;
-        else
-            dtoa->digits[0] = '1';
-        exp -= EXP_BIAS;
-    }
     dtoa->flags = 0;
     if (fi < 0)
         dtoa->flags = DTOA_MINUS;
+
+    exp = ((fi >> EXP_SHIFT) & EXP_MASK);
+    s = (fi & SIG_MASK) << SIG_SHIFT;
+    if (s || exp) {
+        if (exp == EXP_BIAS * 2 + 1) {
+            if (s)
+                dtoa->flags |= DTOA_NAN;
+            else
+                dtoa->flags |= DTOA_INF;
+            return 0;
+        }
+
+        if (!exp)
+            exp = 1;
+        else
+            s |= (SIG_MSB << SIG_SHIFT);
+        exp -= EXP_BIAS;
+    }
+    dtoa->exp = exp;
 
     if (prec < 0)
         prec = 0;
@@ -136,34 +146,21 @@ __dtox_engine (DTOX_FLOAT x, struct dtoa *dtoa, int prec, unsigned char case_con
         /* round even */
         if ((s & ~mask) > half || ((s >> bits) & 1) != 0)
             s += half;
-        /* special case rounding first digit */
-        if (s > (SIG_MASK << SIG_SHIFT))
-            dtoa->digits[0]++;
         s &= mask;
     }
 
-    if (exp == EXP_BIAS + 1) {
-        if (s)
-            dtoa->flags |= DTOA_NAN;
-        else
-            dtoa->flags |= DTOA_INF;
-    } else {
-        int d;
-        for (d = DTOX_NDIGS - 1; d; d--) {
-            int dig = s & 0xf;
-            s >>= 4;
-            if (dig == 0 && d > prec)
-                continue;
-            if (dig <= 9)
-                dig += '0';
-            else
-                dig += TOCASE('a' - 10);
-            dtoa->digits[d] = dig;
-            if (prec < d)
-                prec = d;
-        }
+    for (d = DTOX_NDIGS - 1; d >= 0; d--) {
+        int dig = s & 0xf;
+        s >>= 4;
+        if (dig == 0 && d > prec)
+            continue;
+        if (dig > 9)
+            dig += TOCASE('a') - 10 - '0';
+        dig += '0';
+        dtoa->digits[d] = dig;
+        if (prec < d)
+            prec = d;
     }
-    dtoa->exp = exp;
     return prec;
 }
 
