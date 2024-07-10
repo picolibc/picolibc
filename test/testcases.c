@@ -296,6 +296,7 @@
     result |= test(__LINE__, "8.6000", "%2.4f", 8.6);
     result |= test(__LINE__, "0.600000", "%0f", 0.6);
     result |= test(__LINE__, "1", "%.0f", 0.6);
+    result |= test(__LINE__, "0", "%.0f", 0.45);
     result |= test(__LINE__, "8.6000e+00", "%2.4e", 8.6);
     result |= test(__LINE__, " 8.6000e+00", "% 2.4e", 8.6);
     result |= test(__LINE__, "-8.6000e+00", "% 2.4e", -8.6);
