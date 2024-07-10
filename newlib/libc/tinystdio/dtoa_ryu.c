@@ -283,7 +283,7 @@ d2d(const uint64_t ieeeMantissa, const uint32_t ieeeExponent, int max_digits, bo
 
 	// We need to take vr + 1 if vr is outside bounds or we need to round up.
 	// I don't know if the 'truncate_max' case is entirely correct; need some tests
-	uint8_t carry = ((!truncate_max && vr == vm && (!acceptBounds || !vmIsTrailingZeros)) || lastRemovedDigit >= 5);
+	uint8_t carry = (((!truncate_max && vr == vm && (!acceptBounds || !vmIsTrailingZeros)) || lastRemovedDigit >= 5) && !(fmode && max_decimals == 0));
 	output += carry;
 
 	int len = decimalLength17(output);
