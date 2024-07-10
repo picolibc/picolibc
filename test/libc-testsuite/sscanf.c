@@ -24,6 +24,7 @@
 #include <string.h>
 #include <errno.h>
 #include <limits.h>
+#include <stddef.h>
 
 #define TEST(r, f, x, m) ( \
 ((r) = (f)) == (x) || \
@@ -52,7 +53,7 @@ static int test_sscanf(void)
 {
 	int i;
 	int err=0;
-	char a[100], b[100];
+	char a[100], b[100], c[100];
 	int x, y, z, u, v;
 #ifdef _WANT_IO_PERCENT_B
         int w;
@@ -71,6 +72,11 @@ static int test_sscanf(void)
 	TEST(i, sscanf("hello, world\n", "%[hel] %s", a, b), 2, "only %d fields, expected %d");
 	TEST_S(a, "hell", "");
 	TEST_S(b, "o,", "");
+
+	TEST(i, sscanf("hello world 2024\n", "%5lc %ls %l[024]", (wchar_t *)a, (wchar_t *)b, (wchar_t *)c), 3, "only %d fields, expected %d");
+	TEST_S(a, (const char *)L"hello", "");
+	TEST_S(b, (const char *)L"world,", "");
+	TEST_S(c, (const char *)L"2024,", "");
 
 #ifdef TINY_STDIO
 	a[8] = 'X';

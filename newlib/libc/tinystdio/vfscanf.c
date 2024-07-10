@@ -168,7 +168,7 @@ conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags, un
 
 #ifdef _NEED_IO_BRACKET
 static const CHAR *
-conv_brk (FILE *stream, int *lenp, width_t width, CHAR *addr, const CHAR *fmt)
+conv_brk (FILE *stream, int *lenp, width_t width, void *addr, const CHAR *fmt, uint16_t flags)
 {
     unsigned char msk[32];
     unsigned char fnegate;
@@ -233,14 +233,31 @@ conv_brk (FILE *stream, int *lenp, width_t width, CHAR *addr, const CHAR *fmt)
 	    scanf_ungetc (i, stream, lenp);
 	    break;
 	}
-	if (addr) *addr++ = i;
+	if (addr) 
+    {
+        if (flags & FL_LONG) 
+        {
+            *(wchar_t *)addr = i;
+            addr = (wchar_t *)addr + 1;
+        } else
+    
+        {
+            *(char *)addr = i;
+            addr = (char*)addr + 1;
+        }
+    }
 	fnegate = 0;
     } while (--width);
 
     if (fnegate) {
 	return 0;
     } else {
-	if (addr) *addr = 0;
+	    if (addr){
+            if (flags & FL_LONG)
+                *(wchar_t *)addr = 0;
+            else
+                *(char *)addr = 0;
+        }
         return fmt;
     }
 }
@@ -574,12 +591,10 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 		    if (IS_EOF(i = scanf_getc (stream, lenp)))
 			goto eof;
 		    if (addr) {
-#ifdef WIDE_CHARS
                             if (flags & FL_LONG) {
                                 *(wchar_t *)addr = i;
                                 addr = (wchar_t *)addr + 1;
                             } else
-#endif
                             {
                                 *(char *)addr = i;
                                 addr = (char*)addr + 1;
@@ -590,7 +605,7 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 
 #ifdef _NEED_IO_BRACKET
 	    } else if (c == '[') {
-		fmt = conv_brk (stream, lenp, width, addr, fmt);
+		fmt = conv_brk (stream, lenp, width, addr, fmt, flags);
 		c = (fmt != 0);
 #endif
 
@@ -613,12 +628,10 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 			    break;
 			}
 			if (addr) {
-#ifdef WIDE_CHARS
                             if (flags & FL_LONG) {
                                 *(wchar_t *)addr = i;
                                 addr = (wchar_t *)addr + 1;
                             } else
-#endif
                             {
                                 *(char *)addr = i;
                                 addr = (char*)addr + 1;
@@ -626,11 +639,9 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 			}
 		    } while (--width);
                     if (addr){
-#ifdef WIDE_CHARS
                         if (flags & FL_LONG)
                             *(wchar_t *)addr = 0;
                         else
-#endif
                             *(char *)addr = 0;
                     }
 		    c = 1;		/* no matter with smart GCC	*/
