@@ -145,6 +145,77 @@ use Picolibc:
 
 ## Releases
 
+### Picolibc release 1.8.next
+
+ * Support ARM v8.1-m BTI and PAC features
+
+ * Fix stdio buffered backend automatic flushing of stdout when
+   reading stdin.
+
+ * Support _FORTIFY_SOURCE=3
+
+ * Fix several fesetround implementations to return an error when
+   passed an invalid argument. Thanks to Abdallah Abdelhafeez.
+
+ * Document headers which the compiler must provide. Thanks to Alexey
+   Brodkin.
+
+ * Generate mktemp/tmpnam filenames using random() so they don't
+   repeat even if they aren't used before another name is generated.
+
+ * Set error flag when fgetc is called on an file without read
+   mode. Thanks to Mohamed Moawad.
+
+ * Add type casting to CMPLX, CMPLXF and CMPLXL macros (as glibc
+   does). Thanks to Mostafa Salman.
+
+ * Add mips64 support and build the library during CI.
+
+ * Make fgets return any accumulated string on EOF instead of
+   always returning NULL. Thanks to Hana Ashour.
+
+ * Use C99 minimum array size in asctime_r and ctime_r API
+   declarations ('[static 26]'). Bounds check the generated value and
+   return NULL/EOVERFLOW on overflow.
+
+ * Make Zephyr's -Oz cmake option enable
+   PREFER_SIZE_OVER_SPEED. Thanks to Jonathon Penix.
+
+ * Add funopen to tinystdio.
+
+ * Validate all public headers with a C++ compiler to make sure they
+   at least compile successfully. Fix time.h.
+
+ * Stop using -include picolibc.h during library build.
+
+ * Add -Wmissing-declarations and -Wmissing-prototypes to library
+   build flags. Fix a rather large pile of missing prototypes caused
+   by source files failing to add _GNU_SOURCE or _DEFAULT_SOURCE
+   definitions.
+
+ * Add POSIX "unlocked" I/O functions to tinystdio. These don't
+   actually do anything because tinystdio doesn't do any
+   locking. However, flockfile/funlockfile grab the global C library
+   lock so applications synchronizing with that API will "work".
+
+ * Fix wide orientation handling in tinystdio. Thanks to Ahmed Shehab.
+
+ * Add aarch64 soft float support for armv8. Clang allows this with
+   -march=armv8-a+nofp -mabi=aapcs-soft. This required building a
+   custom toolchain that included a compiler-rt library built with the
+   right options.
+
+ * Add fgetpos and fsetpos to tinystdio. Thanks to Hana Ashour.
+
+ * Restore missing members of 'struct sigevent'. Over eager removal of
+   _POSIX_THREADS support caused these to be accidentally deleted some
+   time ago.
+
+ * Test on i386 native target.
+
+ * Fix hex float scanning and printing. Thanks to Hana Ashour and
+   Ahmed Shehab.
+
 ### Picolibc version 1.8.6
 
  * Fix some FORTITY_SOURCE issues with tinystdio
