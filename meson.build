@@ -315,7 +315,7 @@ printf_percent_n = tinystdio and get_option('printf-percent-n')
 minimal_io_long_long = tinystdio and get_option('minimal-io-long-long')
 fast_bufio = tinystdio and get_option('fast-bufio')
 io_wchar = tinystdio and get_option('io-wchar')
-
+flockfile = posix_io and get_option('flockfile')
 
 if printf_aliases
   double_printf_compile_args=['-DPICOLIBC_DOUBLE_PRINTF_SCANF']
@@ -1322,6 +1322,10 @@ conf_data.set('_WANT_IO_PERCENT_B', io_percent_b)
 conf_data.set('_WANT_IO_LONG_DOUBLE', io_long_double)
 conf_data.set('_WANT_IO_WCHAR', io_wchar)
 conf_data.set('_ASSERT_VERBOSE', get_option('assert-verbose'))
+
+if tinystdio
+    conf_data.set('_WANT_FLOCKFILE', flockfile)
+endif
 
 if not tinystdio
   conf_data.set('NO_FLOATING_POINT', not newlib_io_float)

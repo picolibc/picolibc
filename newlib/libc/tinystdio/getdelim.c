@@ -37,8 +37,9 @@
 
 #define INCR    16
 
+FILE_FN_UNLOCKED_SPECIFIER
 _ssize_t
-getdelim (char **restrict lineptr, size_t *restrict nptr,
+FILE_FN_UNLOCKED(getdelim) (char **restrict lineptr, size_t *restrict nptr,
           int delim, FILE *restrict stream)
 {
     char *line = *lineptr;
@@ -46,7 +47,7 @@ getdelim (char **restrict lineptr, size_t *restrict nptr,
     _ssize_t count = 0;
 
     for (;;) {
-        int c = getc(stream);
+        int c = FILE_FN_UNLOCKED(fgetc)(stream);
         if (c == EOF)
             break;
 
@@ -72,3 +73,16 @@ getdelim (char **restrict lineptr, size_t *restrict nptr,
     *nptr = n;
     return count;
 }
+
+#ifdef _WANT_FLOCKFILE
+int
+getdelim (char **restrict lineptr, size_t *restrict nptr,
+          int delim, FILE *restrict stream)
+{
+    int ret;
+    __flockfile(stream);
+    ret = FILE_FN_UNLOCKED(getdelim)(lineptr, nptr, delim, stream);
+    __funlockfile(stream);
+    return ret;
+}
+#endif

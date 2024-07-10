@@ -32,7 +32,7 @@
 #include "stdio_private.h"
 
 int
-fputws(const wchar_t *str, FILE *stream)
+FILE_FN_UNLOCKED(fputws)(const wchar_t *str, FILE *stream)
 {
 	wchar_t c;
 	int rv = 0;
@@ -41,8 +41,20 @@ fputws(const wchar_t *str, FILE *stream)
 		return EOF;
 
 	while ((c = *str++) != L'\0')
-		if (fputwc(c, stream) == WEOF)
+		if (FILE_FN_UNLOCKED(fputwc)(c, stream) == WEOF)
                         rv = EOF;
 
 	return rv;
 }
+
+#ifdef _WANT_FLOCKFILE
+int
+fputws(const wchar_t *str, FILE *stream)
+{
+    int ret;
+    __flockfile(stream);
+    ret = FILE_FN_UNLOCKED(fputws)(str, stream);
+    __funlockfile(stream);
+    return ret;
+}
+#endif

@@ -32,7 +32,7 @@
 #include "stdio_private.h"
 
 int
-ungetc(int c, FILE *stream)
+FILE_FN_UNLOCKED(ungetc)(int c, FILE *stream)
 {
 	/*
 	 * Streams that are not readable, or streams that already had
@@ -50,3 +50,15 @@ ungetc(int c, FILE *stream)
 
 	return (unsigned char) c;
 }
+
+#if defined(_WANT_FLOCKFILE) && !defined(_FILE_INCLUDED)
+int
+ungetc(int c, FILE *stream)
+{
+    int ret;
+    __flockfile(stream);
+    ret = FILE_FN_UNLOCKED(ungetc)(c, stream);
+    __funlockfile(stream);
+    return ret;
+}
+#endif

@@ -38,8 +38,9 @@
 extern FILE *const stdin _ATTRIBUTE((__weak__));
 extern FILE *const stdout _ATTRIBUTE((__weak__));
 
+FILE_FN_UNLOCKED_SPECIFIER
 size_t
-fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
+FILE_FN_UNLOCKED(fread)(void *ptr, size_t size, size_t nmemb, FILE *stream)
 {
 	size_t i, j;
 	uint8_t *cp = (uint8_t *) ptr;
@@ -118,7 +119,7 @@ fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
 #endif
 	for (i = 0; i < nmemb; i++)
 		for (j = 0; j < size; j++) {
-			c = getc(stream);
+			c = FILE_FN_UNLOCKED(fgetc)(stream);
 			if (c == EOF)
 				return i;
 			*cp++ = (uint8_t)c;
@@ -126,3 +127,15 @@ fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
 
 	return i;
 }
+
+#ifdef _WANT_FLOCKFILE
+size_t
+fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
+{
+    size_t ret;
+    __flockfile(stream);
+    ret = FILE_FN_UNLOCKED(fread)(ptr, size, nmemb, stream);
+    __funlockfile(stream);
+    return ret;
+}
+#endif

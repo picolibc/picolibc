@@ -46,6 +46,7 @@ __weak_reference(__posix_stdout,stdout);
 __attribute__((constructor))
 static void posix_init(void)
 {
+    __flockfile_init(&__stdout.xfile.cfile.file);
     __bufio_lock_init(&__stdout.xfile.cfile.file);
 }
 

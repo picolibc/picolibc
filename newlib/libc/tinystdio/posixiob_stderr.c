@@ -50,6 +50,7 @@ __weak_reference(__posix_stderr,stderr);
 __attribute__((constructor))
 static void posix_init(void)
 {
+    __flockfile_init(&__stderr.xfile.cfile.file);
     __bufio_lock_init(&__stderr.xfile.cfile.file);
 }
 

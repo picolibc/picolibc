@@ -33,9 +33,21 @@
 
 #undef feof
 
+FILE_FN_UNLOCKED_SPECIFIER
+int
+FILE_FN_UNLOCKED(feof)(FILE *stream)
+{
+	return stream->flags & __SEOF;
+}
+
+#ifdef _WANT_FLOCKFILE
 int
 feof(FILE *stream)
 {
-
-	return stream->flags & __SEOF;
+    int ret;
+    __flockfile(stream);
+    ret = FILE_FN_UNLOCKED(feof)(stream);
+    __funlockfile(stream);
+    return ret;
 }
+#endif

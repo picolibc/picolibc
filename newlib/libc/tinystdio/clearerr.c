@@ -33,9 +33,19 @@
 
 #undef clearerr
 
-void 
-clearerr(FILE *stream)
+FILE_FN_UNLOCKED_SPECIFIER
+void
+FILE_FN_UNLOCKED(clearerr)(FILE *stream)
 {
-
 	stream->flags &= ~(__SERR | __SEOF);
 }
+
+#if defined(_WANT_FLOCKFILE) && !defined(_FILE_INCLUDED)
+void
+clearerr(FILE *stream)
+{
+    __flockfile(stream);
+    FILE_FN_UNLOCKED(clearerr)(stream);
+    __funlockfile(stream);
+}
+#endif

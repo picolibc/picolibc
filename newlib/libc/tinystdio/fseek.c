@@ -40,7 +40,9 @@
 #define FSEEK_TYPE long
 #endif
 
-int FSEEK(FILE *stream, FSEEK_TYPE offset, int whence)
+FILE_FN_UNLOCKED_SPECIFIER
+int
+FILE_FN_UNLOCKED(FSEEK)(FILE *stream, FSEEK_TYPE offset, int whence)
 {
         struct __file_ext *xf = (struct __file_ext *) stream;
         if ((stream->flags & __SEXT) && xf->seek) {
@@ -54,3 +56,15 @@ int FSEEK(FILE *stream, FSEEK_TYPE offset, int whence)
 	errno = ESPIPE;
 	return -1;
 }
+
+#if defined(_WANT_FLOCKFILE) && !defined(_FILE_INCLUDED)
+int
+FSEEK(FILE *stream, FSEEK_TYPE offset, int whence)
+{
+    int ret;
+    __flockfile(stream);
+    ret = FILE_FN_UNLOCKED(FSEEK)(stream, offset, whence);
+    __funlockfile(stream);
+    return ret;
+}
+#endif

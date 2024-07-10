@@ -45,6 +45,7 @@
 #include <stddef.h>
 #define __need___va_list
 #include <stdarg.h>
+#include <sys/lock.h>
 #include <sys/_types.h>
 
 _BEGIN_STD_C
@@ -93,6 +94,9 @@ struct __file {
 	int	(*put)(char, struct __file *);	/* function to write one char to device */
 	int	(*get)(struct __file *);	/* function to read one char from device */
 	int	(*flush)(struct __file *);	/* function to flush output to device */
+#ifdef _WANT_FLOCKFILE
+	_LOCK_RECURSIVE_T lock;
+#endif
 };
 
 /*
@@ -161,13 +165,25 @@ extern FILE *const stderr;
 #define	_IOLBF	1		/* setvbuf should set line buffered */
 #define	_IONBF	2		/* setvbuf should set unbuffered */
 
-#define fdev_setup_stream(stream, p, g, fl, f)	\
+#ifdef _WANT_FLOCKFILE
+# define fdev_setup_stream(stream, p, g, fl, f)	\
+	do { \
+		(stream)->flags = f; \
+		(stream)->put = p; \
+		(stream)->get = g; \
+		(stream)->flush = fl; \
+		__flockfile_init((stream)); \
+	} while(0)
+
+#else
+# define fdev_setup_stream(stream, p, g, fl, f)	\
 	do { \
 		(stream)->flags = f; \
 		(stream)->put = p; \
 		(stream)->get = g; \
 		(stream)->flush = fl; \
 	} while(0)
+#endif
 
 #define _FDEV_SETUP_READ  __SRD	/**< fdev_setup_stream() with read intent */
 #define _FDEV_SETUP_WRITE __SWR	/**< fdev_setup_stream() with write intent */

@@ -32,7 +32,7 @@
 #include "stdio_private.h"
 
 int
-fgetc(FILE *stream)
+FILE_FN_UNLOCKED(fgetc)(FILE *stream)
 {
 	int rv;
 	__ungetc_t unget;
@@ -55,8 +55,21 @@ fgetc(FILE *stream)
 	return (unsigned char)rv;
 }
 
+#ifdef _WANT_FLOCKFILE
+int
+fgetc(FILE *stream)
+{
+    int ret;
+    __flockfile(stream);
+    ret = FILE_FN_UNLOCKED(fgetc)(stream);
+    __funlockfile(stream);
+    return ret;
+}
+#else
 #undef getc
 #undef getc_unlocked
+#endif
+
 #ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(fgetc, getc);
 __strong_reference(fgetc, getc_unlocked);

@@ -30,7 +30,7 @@
 #include "stdio_private.h"
 
 wint_t
-fputwc(wchar_t c, FILE *stream)
+FILE_FN_UNLOCKED(fputwc)(wchar_t c, FILE *stream)
 {
         union {
                 wchar_t wc;
@@ -51,8 +51,24 @@ fputwc(wchar_t c, FILE *stream)
 	return (wint_t) c;
 }
 
+#ifndef _FILE_INCLUDED
+
+#ifdef _WANT_FLOCKFILE
+wint_t
+fputwc(wchar_t c, FILE *stream)
+{
+    wint_t ret;
+    __flockfile(stream);
+    ret = FILE_FN_UNLOCKED(fputwc)(c, stream);
+    __funlockfile(stream);
+    return ret;
+}
+#endif
+
 #ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(fputwc, putwc);
 #elif !defined(getwc)
 wint_t putwc(wchar_t c, FILE *stream) { return fputwc(c, stream); }
 #endif
+
+#endif // _FILE_INCLUDED

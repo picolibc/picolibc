@@ -34,12 +34,27 @@
 int
 fclose(FILE *f)
 {
-        struct __file_close *cf = (struct __file_close *) f;
-        if ((f->flags & __SCLOSE) && cf->close) {
+	int ret = 0;
+#ifdef _WANT_FLOCKFILE
+	FILE f_copy;
+	f_copy.lock = f->lock;
+#endif
+
+	__flockfile(f);
+
+	if (f->flags & __SCLOSE) {
 		/*
 		 * File has 'close' function, call it
 		 */
-		return (*cf->close)(f);
+		struct __file_close *cf = (struct __file_close *) f;
+		if (cf)
+			ret = (*cf->close)(f);
 	}
-	return 0;
+
+#ifdef _WANT_FLOCKFILE
+    /* "f" could be already freed, so close copied lock */
+	__flockfile_close(&f_copy);
+#endif
+
+	return ret;
 }

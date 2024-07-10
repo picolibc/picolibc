@@ -77,7 +77,9 @@ struct __file_bufio {
                 int     (*close_ptr)(void *ptr);
         };
 #ifndef __SINGLE_THREAD__
+#ifndef _WANT_FLOCKFILE
 	_LOCK_T lock;
+#endif
 #endif
 };
 
@@ -123,23 +125,31 @@ struct __file_bufio {
 
 static inline void __bufio_lock_init(FILE *f) {
 	(void) f;
+#ifndef _WANT_FLOCKFILE
 	__lock_init(((struct __file_bufio *) f)->lock);
+#endif
 }
 
 static inline void __bufio_lock_close(FILE *f) {
 	(void) f;
+#ifndef _WANT_FLOCKFILE
         __lock_release(((struct __file_bufio *) f)->lock);
 	__lock_close(((struct __file_bufio *) f)->lock);
+#endif
 }
 
 static inline void __bufio_lock(FILE *f) {
 	(void) f;
+#ifndef _WANT_FLOCKFILE
 	__lock_acquire(((struct __file_bufio *) f)->lock);
+#endif
 }
 
 static inline void __bufio_unlock(FILE *f) {
 	(void) f;
+#ifndef _WANT_FLOCKFILE
 	__lock_release(((struct __file_bufio *) f)->lock);
+#endif
 }
 
 int

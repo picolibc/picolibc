@@ -33,9 +33,21 @@
 
 #undef ferror
 
+FILE_FN_UNLOCKED_SPECIFIER
+int
+FILE_FN_UNLOCKED(ferror)(FILE *stream)
+{
+	return stream->flags & __SERR;
+}
+
+#ifdef _WANT_FLOCKFILE
 int
 ferror(FILE *stream)
 {
-
-	return stream->flags & __SERR;
+    int ret;
+    __flockfile(stream);
+    ret = FILE_FN_UNLOCKED(ferror)(stream);
+    __funlockfile(stream);
+    return ret;
 }
+#endif

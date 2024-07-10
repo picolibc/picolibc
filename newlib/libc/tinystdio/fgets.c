@@ -31,8 +31,9 @@
 
 #include "stdio_private.h"
 
+FILE_FN_UNLOCKED_SPECIFIER
 char *
-fgets(char *str, int size, FILE *stream)
+FILE_FN_UNLOCKED(fgets)(char *str, int size, FILE *stream)
 {
 	char *cp;
 	int c;
@@ -42,7 +43,7 @@ fgets(char *str, int size, FILE *stream)
 
 	size--;
 	for (c = 0, cp = str; c != '\n' && size > 0; size--, cp++) {
-		if ((c = getc(stream)) == EOF) {
+		if ((c = FILE_FN_UNLOCKED(fgetc)(stream)) == EOF) {
 			if(cp == str)
 				return NULL;
 			else
@@ -54,3 +55,15 @@ fgets(char *str, int size, FILE *stream)
 
 	return str;
 }
+
+#ifdef _WANT_FLOCKFILE
+char *
+fgets(char *str, int size, FILE *stream)
+{
+    char * ret;
+    __flockfile(stream);
+    ret = FILE_FN_UNLOCKED(fgets)(str, size, stream);
+    __funlockfile(stream);
+    return ret;
+}
+#endif
