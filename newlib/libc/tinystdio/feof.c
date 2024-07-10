@@ -32,10 +32,28 @@
 #include "stdio_private.h"
 
 #undef feof
+#undef feof_unlocked
 
+int
+__STDIO_UNLOCKED(feof)(FILE *stream)
+{
+	return stream->flags & __SEOF;
+}
+
+#ifdef __STDIO_LOCKING
 int
 feof(FILE *stream)
 {
-
-	return stream->flags & __SEOF;
+    int ret;
+    __flockfile(stream);
+    ret = __STDIO_UNLOCKED(feof)(stream);
+    __funlockfile(stream);
+    return ret;
 }
+#else
+#ifdef __strong_reference
+__strong_reference(feof, feof_unlocked);
+#else
+int feof_unlocked(FILE *stream) { return feof(stream); }
+#endif
+#endif

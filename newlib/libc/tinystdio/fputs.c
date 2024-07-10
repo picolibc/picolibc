@@ -36,17 +36,21 @@ fputs(const char *str, FILE *stream)
 {
         int (*put)(char, struct __file *);
 	char c;
+	int ret = EOF;
 
+	__flockfile(stream);
 	if ((stream->flags & __SWR) == 0)
-		return EOF;
+		goto fail;
 
         put = stream->put;
 
 	while ((c = *str++) != '\0')
                 if (put(c, stream) < 0) {
                         stream->flags |= __SERR;
-			return EOF;
+			goto fail;
                 }
 
-	return 0;
+	ret = 0;
+fail:
+	__funlock_return(stream, ret);
 }

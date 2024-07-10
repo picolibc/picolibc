@@ -35,18 +35,20 @@
 char *
 gets(char *str)
 {
+        FILE *stream = stdin;
 	char *cp = str;
 
+        __flockfile(stream);
         for (;;) {
-                int c = getchar();
+                int c = getc_unlocked(stream);
                 switch (c) {
                 case EOF:
-                        if (ferror(stdin) || cp == str)
-                                return NULL;
+                        if (ferror(stream) || cp == str)
+                                __funlock_return(stream, NULL);
                         __fallthrough;
                 case '\n':
                         *cp = '\0';
-                        return str;
+                        __funlock_return(stream, str);
                 default:
                         *cp++ = (char)c;
                         break;

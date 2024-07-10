@@ -36,13 +36,21 @@
 int
 getchar(void)
 {
-
 	return getc(stdin);
 }
 
 #undef getchar_unlocked
+
+#ifdef __STDIO_LOCKING
+int
+getchar_unlocked(void)
+{
+	return getc_unlocked(stdin);
+}
+#else
 #ifdef __strong_reference
 __strong_reference(getchar, getchar_unlocked);
 #else
 int getchar_unlocked(void) { return getchar(); }
+#endif
 #endif

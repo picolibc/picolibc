@@ -556,8 +556,10 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #endif
 #endif
 
+    __flockfile(stream);
+
     if ((stream->flags & __SWR) == 0)
-	return EOF;
+	__funlock_return(stream, EOF);
 
 #ifdef _NEED_IO_POS_ARGS
     va_copy(ap, ap_orig);
@@ -1359,7 +1361,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #ifdef _NEED_IO_POS_ARGS
     va_end(ap);
 #endif
-    return stream_len;
+    __funlock_return(stream, stream_len);
 #undef my_putc
 #undef ap
   fail:

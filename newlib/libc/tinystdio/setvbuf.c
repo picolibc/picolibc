@@ -39,7 +39,9 @@ int
 setvbuf(FILE *stream, char *buf, int mode, size_t size)
 {
         struct __file_ext *xf = (struct __file_ext *) stream;
+        int ret = 0;
+        __flockfile(stream);
         if ((stream->flags & __SEXT) && xf->setvbuf)
-                return (xf->setvbuf)(stream, buf, mode, size);
-        return 0;
+                ret = (xf->setvbuf)(stream, buf, mode, size);
+        __funlock_return(stream, ret);
 }

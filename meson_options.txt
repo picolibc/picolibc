@@ -151,6 +151,8 @@ option('fast-bufio', type: 'boolean', value: false,
        description: 'enable some faster buffered i/o operations')
 option('io-wchar', type: 'boolean', value: false,
        description: 'enable wide character support in printf/scanf (requires multi-byte support)')
+option('stdio-locking', type: 'boolean', value: false,
+       description: 'perform POSIX-conforming file locking for all stdio operations')
 
 #
 # Legacy stdio options

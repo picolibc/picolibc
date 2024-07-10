@@ -35,9 +35,12 @@
 
 #include "stdio_private.h"
 
-int fflush(FILE *stream)
+int
+fflush(FILE *stream)
 {
+        int ret = 0;
+        __flockfile(stream);
 	if (stream->flush)
-		return (stream->flush)(stream);
-	return 0;
+		ret = (stream->flush)(stream);
+	__funlock_return(stream, ret);
 }

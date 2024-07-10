@@ -64,7 +64,5 @@ funopen (const void *cookie,
         *bf = (struct __file_bufio)
             FDEV_SETUP_BUFIO_PTR(cookie, buf, BUFSIZ, readfn, writefn, seekfn, closefn, open_flags, __BFALL);
 
-        __bufio_lock_init(&(bf->xfile.cfile.file));
-
 	return (FILE *) bf;
 }

@@ -42,9 +42,3 @@ static struct __file_bufio __stdin = FDEV_SETUP_POSIX(0, read_buf, BUFSIZ, __SRD
 FILE *const __posix_stdin = &__stdin.xfile.cfile.file;
 
 __weak_reference(__posix_stdin,stdin);
-
-__attribute__((constructor))
-static void posix_init(void)
-{
-    __bufio_lock_init(&__stdin.xfile.cfile.file);
-}

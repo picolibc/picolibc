@@ -36,21 +36,28 @@ puts(const char *str)
 {
         int (*put)(char, struct __file *);
 	char c;
+	int ret = EOF;
         FILE *out = stdout;
 
+	__flockfile(out);
+
 	if ((out->flags & __SWR) == 0)
-		return EOF;
+		goto exit;
 
         put = out->put;
 	while ((c = *str++) != '\0')
 		if (put(c, out) < 0)
-			goto fail;
+			goto flag_exit;
 
 	if (put('\n', out) < 0)
-		goto fail;
+		goto flag_exit;
 
-	return 0;
-fail:
-        out->flags |= __SERR;
-        return EOF;
+	ret = 0;
+	goto exit;
+
+flag_exit:
+	out->flags |= __SERR;
+exit:
+	__funlockfile(out);
+	return ret;
 }

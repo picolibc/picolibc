@@ -37,14 +37,15 @@ fgets(char *str, int size, FILE *stream)
 	char *cp;
 	int c;
 
+        __flockfile(stream);
 	if ((stream->flags & __SRD) == 0 || size <= 0)
-		return NULL;
+		__funlock_return(stream, NULL);
 
 	size--;
 	for (c = 0, cp = str; c != '\n' && size > 0; size--, cp++) {
-		if ((c = getc(stream)) == EOF) {
+		if ((c = getc_unlocked(stream)) == EOF) {
 			if(cp == str)
-				return NULL;
+				__funlock_return(stream, NULL);
 			else
 				break;
 		}
@@ -52,5 +53,5 @@ fgets(char *str, int size, FILE *stream)
 	}
 	*cp = '\0';
 
-	return str;
+	__funlock_return(stream, str);
 }

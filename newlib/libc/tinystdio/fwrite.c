@@ -41,8 +41,9 @@ fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
 	size_t i, j;
 	const uint8_t *cp = (const uint8_t *) ptr;
 
+        __flockfile(stream);
 	if ((stream->flags & __SWR) == 0 || size == 0)
-		return 0;
+		__funlock_return(stream, 0);
 
 #ifdef __FAST_BUFIO
         size_t bytes;
@@ -90,13 +91,13 @@ fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
                         }
                 }
                 __bufio_unlock(stream);
-                return (cp - (uint8_t *) ptr) / size;
+                __funlock_return(stream, (cp - (uint8_t *) ptr) / size);
         }
 #endif
 	for (i = 0; i < nmemb; i++)
 		for (j = 0; j < size; j++)
 			if (stream->put(*cp++, stream) < 0)
-				return i;
+				__funlock_return(stream, i);
 
-	return i;
+	__funlock_return(stream, i);
 }

@@ -43,12 +43,6 @@ FILE *const __posix_stdout = &__stdout.xfile.cfile.file;
 
 __weak_reference(__posix_stdout,stdout);
 
-__attribute__((constructor))
-static void posix_init(void)
-{
-    __bufio_lock_init(&__stdout.xfile.cfile.file);
-}
-
 /*
  * Add a destructor function to get stdout flushed on
  * exit

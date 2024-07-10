@@ -45,8 +45,9 @@ fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
 	uint8_t *cp = (uint8_t *) ptr;
 	int c;
 
+        __flockfile(stream);
 	if ((stream->flags & __SRD) == 0 || size == 0)
-		return 0;
+		__funlock_return(stream, 0);
 
 #ifdef __FAST_BUFIO
         size_t bytes;
@@ -113,16 +114,16 @@ fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
                         }
                 }
                 __bufio_unlock(stream);
-                return (cp - (uint8_t *) ptr) / size;
+                __funlock_return(stream, (cp - (uint8_t *) ptr) / size);
         }
 #endif
 	for (i = 0; i < nmemb; i++)
 		for (j = 0; j < size; j++) {
-			c = getc(stream);
+			c = getc_unlocked(stream);
 			if (c == EOF)
-				return i;
+				__funlock_return(stream, i);
 			*cp++ = (uint8_t)c;
 		}
 
-	return i;
+	__funlock_return(stream, i);
 }

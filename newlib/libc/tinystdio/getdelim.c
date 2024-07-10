@@ -45,8 +45,9 @@ getdelim (char **restrict lineptr, size_t *restrict nptr,
     size_t n = *nptr;
     _ssize_t count = 0;
 
+    __flockfile(stream);
     for (;;) {
-        int c = getc(stream);
+        int c = getc_unlocked(stream);
         if (c == EOF)
             break;
 
@@ -70,5 +71,5 @@ getdelim (char **restrict lineptr, size_t *restrict nptr,
 
     *lineptr = line;
     *nptr = n;
-    return count;
+    __funlock_return(stream, count);
 }

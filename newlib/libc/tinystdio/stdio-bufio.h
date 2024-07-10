@@ -50,6 +50,10 @@ union __file_bufio_cookie {
         void    *ptr;
 };
 
+#if !defined(__SINGLE_THREAD) && !defined(__STDIO_LOCKING)
+#define __STDIO_BUFIO_LOCKING
+#endif
+
 struct __file_bufio {
         struct __file_ext xfile;
         const void *ptr;
@@ -76,14 +80,14 @@ struct __file_bufio {
                 int     (*close_int)(int fd);
                 int     (*close_ptr)(void *ptr);
         };
-#ifndef __SINGLE_THREAD
+#ifdef __STDIO_BUFIO_LOCKING
 	_LOCK_T lock;
 #endif
 };
 
 #define FDEV_SETUP_BUFIO(_fd, _buf, _size, _read, _write, _lseek, _close, _rwflag, _bflags) \
         {                                                               \
-                .xfile = FDEV_SETUP_EXT(__bufio_put, __bufio_get,       \
+                .xfile = FDEV_SETUP_EXT(__bufio_put, __bufio_get,     \
                                         __bufio_flush, __bufio_close,   \
                                         __bufio_seek, __bufio_setvbuf,  \
                                         (_rwflag) | __SBUF),            \
@@ -103,7 +107,7 @@ struct __file_bufio {
 
 #define FDEV_SETUP_BUFIO_PTR(_ptr, _buf, _size, _read, _write, _lseek, _close, _rwflag, _bflags) \
         {                                                               \
-                .xfile = FDEV_SETUP_EXT(__bufio_put, __bufio_get,       \
+                .xfile = FDEV_SETUP_EXT(__bufio_put, __bufio_get,     \
                                         __bufio_flush, __bufio_close,   \
                                         __bufio_seek, __bufio_setvbuf,  \
                                         (_rwflag) | __SBUF),            \
@@ -121,25 +125,38 @@ struct __file_bufio {
                 { .close_ptr = _close }                                 \
         }
 
-static inline void __bufio_lock_init(FILE *f) {
-	(void) f;
-	__lock_init(((struct __file_bufio *) f)->lock);
-}
+#ifdef __STDIO_BUFIO_LOCKING
+void
+__bufio_lock_init(FILE *f);
+#endif
 
 static inline void __bufio_lock_close(FILE *f) {
+#ifdef __STDIO_BUFIO_LOCKING
+        struct __file_bufio *bf = (struct __file_bufio *) f;
+        if (bf->lock) {
+            __lock_release(bf->lock);
+            __lock_close(bf->lock);
+        }
+#endif
 	(void) f;
-        __lock_release(((struct __file_bufio *) f)->lock);
-	__lock_close(((struct __file_bufio *) f)->lock);
 }
 
 static inline void __bufio_lock(FILE *f) {
+#ifdef __STDIO_BUFIO_LOCKING
+        struct __file_bufio *bf = (struct __file_bufio *) f;
+        if (!bf->lock)
+            __lock_init(bf->lock);
+	__lock_acquire(bf->lock);
+#endif
 	(void) f;
-	__lock_acquire(((struct __file_bufio *) f)->lock);
 }
 
 static inline void __bufio_unlock(FILE *f) {
 	(void) f;
-	__lock_release(((struct __file_bufio *) f)->lock);
+#ifdef __STDIO_BUFIO_LOCKING
+        struct __file_bufio *bf = (struct __file_bufio *) f;
+	__lock_release(bf->lock);
+#endif
 }
 
 int

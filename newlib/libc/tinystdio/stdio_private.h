@@ -89,7 +89,8 @@ bool __matchcaseprefix(const char *input, const char *pattern);
 #define FDEV_SETUP_STRING_READ(_s) {		\
 		.file = {			\
 			.flags = __SRD,		\
-			.get = __file_str_get	\
+                        .get = __file_str_get,  \
+                        __LOCK_INIT_NONE        \
 		},				\
 		.pos = (char *) (_s)		\
 	}
@@ -97,7 +98,8 @@ bool __matchcaseprefix(const char *input, const char *pattern);
 #define FDEV_SETUP_WSTRING_READ(_s) {		\
 		.file = {			\
 			.flags = __SRD,		\
-			.get = __file_wstr_get	\
+			.get = __file_wstr_get,	\
+                        __LOCK_INIT_NONE        \
 		},				\
                 .pos = (char *) (_s),           \
                 .end = (char *) (_s)            \
@@ -106,7 +108,8 @@ bool __matchcaseprefix(const char *input, const char *pattern);
 #define FDEV_SETUP_STRING_WRITE(_s, _size) {	\
 		.file = {			\
 			.flags = __SWR,		\
-			.put = __file_str_put	\
+			.put = __file_str_put,	\
+                        __LOCK_INIT_NONE        \
 		},				\
 		.pos = (_s),			\
                 .end = (_s) + (_size),          \
@@ -115,7 +118,8 @@ bool __matchcaseprefix(const char *input, const char *pattern);
 #define FDEV_SETUP_STRING_ALLOC() {  \
 		.file = {			\
 			.flags = __SWR,		\
-			.put = __file_str_put_alloc	\
+			.put = __file_str_put_alloc,	\
+                        __LOCK_INIT_NONE        \
 		},				\
 		.pos = NULL,			\
                 .end = NULL,                    \
@@ -126,7 +130,8 @@ bool __matchcaseprefix(const char *input, const char *pattern);
 #define FDEV_SETUP_STRING_ALLOC_BUF(_buf, _size) {  \
 		.file = {			\
 			.flags = __SWR,		\
-			.put = __file_str_put_alloc	\
+			.put = __file_str_put_alloc,	\
+                        __LOCK_INIT_NONE        \
 		},				\
 		.pos = _buf,			\
                 .end = (char *) (_buf) + (_size), \
@@ -199,13 +204,49 @@ static inline int bufio_close(struct __file_bufio *bf)
     return ret;
 }
 
-#define FDEV_SETUP_POSIX(fd, buf, size, rwflags, bflags)        \
-        FDEV_SETUP_BUFIO(fd, buf, size,                         \
-                         read, write,                           \
+#define FDEV_SETUP_POSIX(fd, buf, size, rwflags, bflags)      \
+        FDEV_SETUP_BUFIO(fd, buf, size,                       \
+                         read, write,                         \
                          lseek, close, rwflags, bflags)
 
 int
 __stdio_flags (const char *mode, int *optr);
+
+#ifdef __STDIO_LOCKING
+void __flockfile_init(FILE *f);
+#define __LOCK_NONE     ((_LOCK_RECURSIVE_T) (uintptr_t) 1)
+#define __LOCK_INIT_NONE        .lock = __LOCK_NONE
+#else
+#define __LOCK_INIT_NONE
+#endif
+
+#define __funlock_return(f, v) do { __funlockfile(f); return (v); } while(0)
+
+static inline void __flockfile(FILE *f) {
+	(void) f;
+#ifdef __STDIO_LOCKING
+	if (!f->lock)
+            __flockfile_init(f);
+        if (f->lock != __LOCK_NONE)
+            __lock_acquire_recursive(f->lock);
+#endif
+}
+
+static inline void __funlockfile(FILE *f) {
+	(void) f;
+#ifdef __STDIO_LOCKING
+        if (f->lock != __LOCK_NONE)
+            __lock_release_recursive(f->lock);
+#endif
+}
+
+static inline void __flockfile_close(FILE *f) {
+	(void) f;
+#ifdef __STDIO_LOCKING
+        if (f->lock && f->lock != __LOCK_NONE)
+            __lock_close(f->lock);
+#endif
+}
 
 int	__d_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 int	__f_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);

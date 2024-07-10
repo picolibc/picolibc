@@ -40,8 +40,17 @@ putchar(int c)
 }
 
 #undef putchar_unlocked
+#ifdef __STDIO_LOCKING
+
+int
+putchar_unlocked(int c)
+{
+        return putc_unlocked(c, stdout);
+}
+#else
 #ifdef __strong_reference
 __strong_reference(putchar, putchar_unlocked);
 #else
 int putchar_unlocked(int c) { return putchar(c); }
+#endif
 #endif

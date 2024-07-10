@@ -74,7 +74,7 @@ typedef long int_scanf_t;
 # define MY_EOF          WEOF
 # define CHAR wchar_t
 # define UCHAR wchar_t
-# define GETC(s) getwc(s)
+# define GETC(s) getwc_unlocked(s)
 # define UNGETC(c,s) ungetwc(c,s)
 # define ISSPACE(c) iswspace(c)
 # define IS_EOF(c)       ((c) == WEOF)
@@ -87,7 +87,7 @@ typedef long int_scanf_t;
 # define IS_EOF(c)       ((c) < 0)
 # define CHAR char
 # define UCHAR unsigned char
-# define GETC(s) getc(s)
+# define GETC(s) getc_unlocked(s)
 # define UNGETC(c,s) ungetc(c,s)
 # define ISSPACE(c) isspace(c)
 # ifdef _NEED_IO_MBTOWIDE
@@ -592,6 +592,8 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
     INT i;
     scanf_context_t context = SCANF_CONTEXT_INIT;
 
+    __flockfile(stream);
+
     nconvs = 0;
 
     /* Initialization of stream_flags at each pass simplifies the register
@@ -848,7 +850,7 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
     if (!IS_EOF(context.unget))
         UNGETC(context.unget, stream);
 #endif
-    return nconvs;
+    __funlock_return(stream, nconvs);
 
   eof:
 #ifdef _NEED_IO_POS_ARGS
@@ -858,7 +860,7 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
     if (!IS_EOF(context.unget))
         UNGETC(context.unget, stream);
 #endif
-    return nconvs ? nconvs : EOF;
+    __funlock_return(stream, nconvs ? nconvs : EOF);
 }
 
 #undef ap

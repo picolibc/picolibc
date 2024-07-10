@@ -32,10 +32,22 @@
 #include "stdio_private.h"
 
 #undef ferror
+#undef ferror_unlocked
 
+int
+__STDIO_UNLOCKED(ferror)(FILE *stream)
+{
+	return stream->flags & __SERR;
+}
+
+#ifdef __STDIO_LOCKING
 int
 ferror(FILE *stream)
 {
-
-	return stream->flags & __SERR;
+    int ret;
+    __flockfile(stream);
+    ret = ferror_unlocked(stream);
+    __funlockfile(stream);
+    return ret;
 }
+#endif

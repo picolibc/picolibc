@@ -34,6 +34,7 @@
 int
 ungetc(int c, FILE *stream)
 {
+        __flockfile(stream);
 	/*
 	 * Streams that are not readable, or streams that already had
 	 * had an ungetc() before will cause an error.
@@ -41,12 +42,12 @@ ungetc(int c, FILE *stream)
 	 * ungetc(EOF, ...) causes an error per definitionem.
 	 */
 	if ((stream->flags & __SRD) == 0 || c == EOF)
-		return EOF;
+                __funlock_return(stream, EOF);
 
 	if (!__atomic_compare_exchange_ungetc(&stream->unget, 0, (__ungetc_t) (unsigned char) c + 1 ))
-		return EOF;
+                __funlock_return(stream, EOF);
 
         stream->flags &= ~__SEOF;
 
-	return (unsigned char) c;
+        __funlock_return(stream, (unsigned char) c);
 }

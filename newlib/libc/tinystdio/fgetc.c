@@ -31,8 +31,11 @@
 
 #include "stdio_private.h"
 
+#undef getc
+#undef getc_unlocked
+
 int
-fgetc(FILE *stream)
+__STDIO_UNLOCKED(getc)(FILE *stream)
 {
 	int rv;
 	__ungetc_t unget;
@@ -55,12 +58,26 @@ fgetc(FILE *stream)
 	return (unsigned char)rv;
 }
 
-#undef getc
-#undef getc_unlocked
-#ifdef __strong_reference
-__strong_reference(fgetc, getc);
-__strong_reference(fgetc, getc_unlocked);
+#ifdef __STDIO_LOCKING
+int
+getc(FILE *stream)
+{
+    int ret;
+    __flockfile(stream);
+    ret = getc_unlocked(stream);
+    __funlockfile(stream);
+    return ret;
+}
 #else
-int getc(FILE *stream) { return fgetc(stream); }
-int getc_unlocked(FILE *stream) { return fgetc(stream); }
+#ifdef __strong_reference
+__strong_reference(getc, getc_unlocked);
+#else
+int getc_unlocked(FILE *stream) { return getc(stream); }
+#endif
+#endif
+
+#ifdef __strong_reference
+__strong_reference(getc, fgetc);
+#else
+int fgetc(FILE *stream) { return getc(stream); }
 #endif

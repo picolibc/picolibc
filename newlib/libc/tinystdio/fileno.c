@@ -36,11 +36,12 @@
 #include "stdio_private.h"
 
 int
-fileno(FILE *file)
+fileno(FILE *stream)
 {
-        if (file->flags & __SBUF) {
-                struct __file_bufio *pf = (struct __file_bufio *) file;
-                return (int)(intptr_t)(pf->ptr);
+        __flockfile(stream);
+        if (stream->flags & __SBUF) {
+                struct __file_bufio *pf = (struct __file_bufio *) stream;
+                __funlock_return(stream, (int)(intptr_t)(pf->ptr));
         }
-	return -1;
+	__funlock_return(stream, -1);
 }

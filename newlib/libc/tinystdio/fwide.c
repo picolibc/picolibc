@@ -38,7 +38,8 @@
 int
 fwide(FILE *stream, int mode)
 {
+        __flockfile(stream);
         if (mode != 0)
                 stream->flags = (stream->flags & ~__SWIDE) | ((mode > 0) ? __SWIDE : 0);
-        return (stream->flags & __SWIDE) ? 1 : -1;
+        __funlock_return(stream, (stream->flags & __SWIDE) ? 1 : -1);
 }

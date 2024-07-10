@@ -37,12 +37,13 @@ fputws(const wchar_t *str, FILE *stream)
 	wchar_t c;
 	int rv = 0;
 
+        __flockfile(stream);
 	if ((stream->flags & __SWR) == 0)
-		return EOF;
+		__funlock_return(stream, EOF);
 
 	while ((c = *str++) != L'\0')
-		if (fputwc(c, stream) == WEOF)
+		if (putwc_unlocked(c, stream) == WEOF)
                         rv = EOF;
 
-	return rv;
+	__funlock_return(stream, rv);
 }

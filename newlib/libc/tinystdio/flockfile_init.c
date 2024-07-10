@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2024 Keith Packard
+ * Copyright © 2025 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -35,13 +35,17 @@
 
 #include "stdio_private.h"
 
-void
-funlockfile (FILE *f)
-{
 #ifdef __STDIO_LOCKING
-    __funlockfile(f);
-#else
-    (void) f;
+void
+__flockfile_init(FILE *f)
+{
+    /*
+     * Use the global C library lock to ensure this
+     * only initializes the lock once
+     */
+    __LIBC_LOCK();
+    if (!f->lock)
+	__lock_init_recursive(f->lock);
     __LIBC_UNLOCK();
-#endif
 }
+#endif

@@ -305,6 +305,7 @@ printf_percent_n = tinystdio and get_option('printf-percent-n')
 minimal_io_long_long = tinystdio and get_option('minimal-io-long-long')
 fast_bufio = tinystdio and get_option('fast-bufio')
 io_wchar = tinystdio and get_option('io-wchar')
+stdio_locking = tinystdio and get_option('stdio-locking') and not get_option('single-thread')
 
 foreach format : ['d', 'f', 'l', 'i', 'm']
 
@@ -1344,6 +1345,9 @@ if tinystdio
   conf_data.set('__ATOMIC_UNGETC',
                 atomic_ungetc,
                 description: 'Use atomics for fgetc/ungetc for re-entrancy')
+  conf_data.set('__STDIO_LOCKING',
+                stdio_locking,
+                description: 'Perform POSIX-conforming file locking for all stdio operations')
 else
   conf_data.set('__IO_NO_FLOATING_POINT', not newlib_io_float)
   conf_data.set('__IO_FLOATING_POINT', newlib_io_float)

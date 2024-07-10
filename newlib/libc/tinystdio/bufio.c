@@ -35,6 +35,18 @@
 
 #include "stdio_private.h"
 
+#ifdef __STDIO_BUFIO_LOCKING
+void
+__bufio_lock_init(FILE *f)
+{
+    struct __file_bufio *bf = (struct __file_bufio *) f;
+    __LIBC_LOCK();
+    if (!bf->lock)
+        __lock_init(bf->lock);
+    __LIBC_UNLOCK();
+}
+#endif
+
 int
 __bufio_flush_locked(FILE *f)
 {

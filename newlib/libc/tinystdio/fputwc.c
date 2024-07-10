@@ -29,8 +29,11 @@
 
 #include "stdio_private.h"
 
+#undef putwc
+#undef putwc_unlocked
+
 wint_t
-fputwc(wchar_t c, FILE *stream)
+__STDIO_UNLOCKED(putwc)(wchar_t c, FILE *stream)
 {
         union {
                 wchar_t wc;
@@ -38,21 +41,40 @@ fputwc(wchar_t c, FILE *stream)
         } u;
         unsigned i;
         
+        __flockfile(stream);
         stream->flags |= __SWIDE;
 
 	if ((stream->flags & __SWR) == 0)
-		return WEOF;
+		__funlock_return(stream, WEOF);
 
         u.wc = c;
         for (i = 0; i < sizeof(wchar_t); i++)
                 if (stream->put(u.c[i], stream) < 0)
-                        return WEOF;
+                        __funlock_return(stream, WEOF);
 
-	return (wint_t) c;
+	__funlock_return(stream, (wint_t) c);
 }
 
+#ifdef __STDIO_LOCKING
+wint_t
+putwc(wchar_t c, FILE *stream)
+{
+    wint_t ret;
+    __flockfile(stream);
+    ret = putwc_unlocked(c, stream);
+    __funlockfile(stream);
+    return ret;
+}
+#else
 #ifdef __strong_reference
-__strong_reference(fputwc, putwc);
-#elif !defined(getwc)
-wint_t putwc(wchar_t c, FILE *stream) { return fputwc(c, stream); }
+__strong_reference(putwc, putwc_unlocked);
+#else
+wint_t putwc_unlocked(wchar_t c, FILE *stream) { return putwc(c, stream); }
+#endif
+#endif
+
+#ifdef __strong_reference
+__strong_reference(putwc, fputwc);
+#else
+wint_t fputwc(wchar_t c, FILE *stream) { return putwc(c, stream); }
 #endif
