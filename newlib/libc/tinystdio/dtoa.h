@@ -36,7 +36,6 @@
 #define	DTOA_ZERO	2
 #define	DTOA_INF	4
 #define	DTOA_NAN	8
-#define	DTOA_CARRY	16	/* Carry was to most significant position. */
 
 #if __LDBL_MANT_DIG__ == 113
 #define LDTOA_MAX_DIG    34

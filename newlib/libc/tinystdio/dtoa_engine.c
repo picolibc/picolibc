@@ -189,7 +189,7 @@ __dtoa_engine(FLOAT64 x, struct dtoa *dtoa, int max_digits, bool fmode, int max_
 			 * cases, which is kinda cool
 			 */
 			/* max_decimals comes in biased by 1 to flag the 'f' case */
-			max_digits = min(max_digits, max(1, max_decimals + decexp + 1));
+			max_digits = min(max_digits, max(max_decimals<0, max_decimals + decexp + 1));
 		}
 
                 int decimals = max_digits;

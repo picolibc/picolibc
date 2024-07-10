@@ -913,20 +913,12 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                         }
                         my_putc (out, stream);
                     } while (1);
-                    if (n == exp
-                        && (dtoa.digits[0] > '5'
-                            || (dtoa.digits[0] == '5' && !(dtoa.flags & DTOA_CARRY))) )
-                    {
-                        out = '1';
-                    }
                     my_putc (out, stream);
                     if ((flags & FL_ALT) && n == -1)
 			my_putc('.', stream);
                 } else {				/* 'e(E)' format	*/
 
                     /* mantissa	*/
-                    if (dtoa.digits[0] != '1')
-                        dtoa.flags &= ~DTOA_CARRY;
                     my_putc (dtoa.digits[0], stream);
                     if (prec > 0) {
                         my_putc ('.', stream);
@@ -939,7 +931,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                     /* exponent	*/
                     my_putc (TOCASE(c), stream);
                     sign = '+';
-                    if (exp < 0 || (exp == 0 && (dtoa.flags & DTOA_CARRY) != 0)) {
+                    if (exp < 0) {
                         exp = -exp;
                         sign = '-';
                     }
