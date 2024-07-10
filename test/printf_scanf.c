@@ -84,6 +84,9 @@
 #   define BINARY_FORMAT
 #  endif
 # elif defined(PICOLIBC_FLOAT_PRINTF_SCANF) || defined(PICOLIBC_DOUBLE_PRINTF_SCANF)
+#  ifndef _IO_FLOAT_EXACT
+#   define NO_FLOAT_EXACT
+#  endif
 #  ifdef _WANT_IO_PERCENT_B
 #   define BINARY_FORMAT
 #  endif
@@ -138,6 +141,38 @@ check_vsnprintf(char *str, size_t size, const char *format, ...)
 	return i;
 }
 
+#if !defined(NO_FLOATING_POINT)
+#ifdef PICOLIBC_FLOAT_PRINTF_SCANF
+#define float_type float
+#define pow(a,b) powf((float) (a), (float) (b))
+#define nextafter(a,b) nextafterf((float)(a), (float)(b))
+#define fabs(a) fabsf(a)
+#define scanf_format "%f"
+#if (defined(TINY_STDIO) && !defined(_IO_FLOAT_EXACT))
+#define ERROR_MAX 1e-6
+#else
+#define ERROR_MAX 0
+#endif
+#else
+#define float_type double
+#define scanf_format "%lf"
+#if defined(TINY_STDIO) && !defined(_IO_FLOAT_EXACT)
+# if __SIZEOF_DOUBLE__ == 4
+#  define ERROR_MAX 1e-6
+# else
+#  define ERROR_MAX 1e-14
+# endif
+#else
+#if (!defined(TINY_STDIO) && defined(_WANT_IO_LONG_DOUBLE))
+/* __ldtoa is really broken */
+#define ERROR_MAX 1e-5
+#else
+#define ERROR_MAX 0
+#endif
+#endif
+#endif
+#endif
+
 #if defined(__PICOLIBC__) && !defined(TINYSTDIO)
 #define LEGACY_NEWLIB
 #endif
@@ -180,6 +215,54 @@ static struct {
 };
 #endif
 
+#ifndef NO_FLOATING_POINT
+
+static float_type
+int_exp10(int n)
+{
+        float_type      a = 1.0;
+        int             sign = n < 0;
+
+        if (sign)
+                n = -n;
+        while (n--)
+                a *= (float_type) 10.0;
+        if (sign)
+                a = 1/a;
+        return a;
+}
+
+#ifndef NO_FLOAT_EXACT
+
+static int
+check_float(const char *test_name, float_type a, const char *buf, const char *head, int zeros, const char *tail)
+{
+        int z;
+        int o;
+
+        if (strncmp(buf, head, strlen(head)) != 0)
+                goto fail;
+
+        o = strlen(head);
+        for (z = 0; z < zeros; z++) {
+                if (buf[o] != '0')
+                        goto fail;
+                o++;
+        }
+
+        if (strcmp(buf + o, tail) != 0)
+                goto fail;
+        return 0;
+
+fail:
+        printf("float mismatch test %s: %a %.17e \"%s\" isn't in the form \"%s\", %d zeros, \"%s\"\n",
+               test_name, printf_float(a), printf_float(a), buf, head, zeros, tail);
+        return 1;
+}
+
+#endif
+#endif
+
 int
 main(void)
 {
@@ -217,12 +300,11 @@ main(void)
             void *extra;
             int wtr = swscanf(wtest[wt].str, wtest[wt].fmt, &extra);
             if (wtr != wtest[wt].expect) {
-                wprintf(L"%d str %ls fmt %ls expected %d got %d\n", wt,
-                        wtest[wt].str, wtest[wt].fmt, wtest[wt].expect, wtr);
+                printf("%d str %ls fmt %ls expected %d got %d\n", wt,
+                       wtest[wt].str, wtest[wt].fmt, wtest[wt].expect, wtr);
                 ++errors;
             }
         }
-        wprintf(L"hello world %g\n", 1.0);
 #endif
 
 #if !defined(NO_FLOATING_POINT)
@@ -353,41 +435,79 @@ main(void)
             VERIFY("", "p");
         }
 #if !defined(NO_FLOATING_POINT)
-#ifdef PICOLIBC_FLOAT_PRINTF_SCANF
-#define float_type float
-#define pow(a,b) powf((float) a, (float) b)
-#define fabs(a) fabsf(a)
-#define scanf_format "%f"
-#if (defined(TINY_STDIO) && !defined(_IO_FLOAT_EXACT))
-#define ERROR_MAX 1e-6
-#else
-#define ERROR_MAX 0
+
+#ifndef NO_FLOAT_EXACT
+        for (x = 0; x < 37; x++) {
+                float_type m, n, a, b, c;
+                float_type pow_val = int_exp10(x);
+
+                m = 1 / pow_val;
+                n = m / (float_type) 2.0;
+
+                a = n;
+                b = n;
+                c = m;
+
+                /* Make sure the values are on the right side of the rounding value */
+                for (y = 0; y < 5; y++) {
+                        a = nextafter(a, 2.0);
+                        b = nextafter(b, 0.0);
+                        c = nextafter(c, 0.0);
+                }
+
+                /*
+                 * A value greater than 5 just past the last digit
+                 * rounds up to 0.0...1
+                 */
+                sprintf(buf, "%.*f", x, printf_float(a));
+                if (x == 0)
+                        errors += check_float(">= 0.5", a, buf, "1", x, "");
+                else
+                        errors += check_float(">= 0.5", a, buf, "0.", x-1, "1");
+
+                /*
+                 * A value greater than 5 in the last digit
+                 * rounds to 0.0...5
+                 */
+                sprintf(buf, "%.*f", x+1, printf_float(a));
+                errors += check_float(">= 0.5", a, buf, "0.", x, "5");
+
+                /*
+                 * A value less than 5 just past the last digit
+                 * rounds down to 0.0...0
+                 */
+                sprintf(buf, "%.*f", x, printf_float(b));
+                if (x == 0)
+                        errors += check_float("< 0.5", b, buf, "0", x, "");
+                else
+                        errors += check_float("< 0.5", b, buf, "0.", x, "");
+
+                /*
+                 * A value less than 5 in the last digit
+                 * rounds to 0.0...5
+                 */
+                sprintf(buf, "%.*f", x+1, printf_float(b));
+                errors += check_float("< 0.5", b, buf, "0.", x, "5");
+
+                /*
+                 * A value less than 1 in the last digit
+                 * rounds to 0.0...1
+                 */
+                sprintf(buf, "%.*f", x, printf_float(c));
+                if (x == 0)
+                        errors += check_float("< 1", c, buf, "1", x, "");
+                else
+                        errors += check_float("< 1", c, buf, "0.", x-1, "1");
+        }
 #endif
-#else
-#define float_type double
-#define scanf_format "%lf"
-#if defined(TINY_STDIO) && !defined(_IO_FLOAT_EXACT)
-# if __SIZEOF_DOUBLE__ == 4
-#  define ERROR_MAX 1e-6
-# else
-#  define ERROR_MAX 1e-14
-# endif
-#else
-#if (!defined(TINY_STDIO) && defined(_WANT_IO_LONG_DOUBLE))
-/* __ldtoa is really broken */
-#define ERROR_MAX 1e-5
-#else
-#define ERROR_MAX 0
-#endif
-#endif
-#endif
+
 	for (x = -37; x <= 37; x++)
 	{
                 float_type r;
 		unsigned t;
 		for (t = 0; t < sizeof(test_vals)/sizeof(test_vals[0]); t++) {
 
-			float_type v = (float_type) test_vals[t] * pow(10.0, (float_type) x);
+			float_type v = (float_type) test_vals[t] * int_exp10(x);
 			float_type e;
 
 			sprintf(buf, "%.55f", printf_float(v));
