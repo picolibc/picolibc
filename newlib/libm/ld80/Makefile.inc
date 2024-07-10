@@ -1,8 +1,8 @@
 %C%_lsrc = \
 	%D%/b_tgammal.c %D%/e_powl.c %D%/s_erfl.c %D%/s_exp2l.c \
 	%D%/s_expl.c %D%/s_logl.c %D%/s_sinpil.c %D%/s_cospil.c \
-	%D%/invtrig.c %D%/e_lgammal_r.c %D%/k_cosl.c %D%/k_sinl.c
-
+	%D%/invtrig.c %D%/e_lgammal_r.c %D%/k_cosl.c %D%/k_sinl.c \
+	%D%/k_tanl.c
 
 libm_a_CFLAGS_%C% = -fbuiltin -fno-math-errno
 
