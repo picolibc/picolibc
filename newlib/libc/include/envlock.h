@@ -31,7 +31,7 @@ SUCH DAMAGE.
 #ifndef _INCLUDE_ENVLOCK_H_
 #define _INCLUDE_ENVLOCK_H_
 
-#include <_ansi.h>
+#include "_ansi.h"
 #include <sys/lock.h>
 
 #define ENV_LOCK __LIBC_LOCK()

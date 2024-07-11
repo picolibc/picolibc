@@ -2,7 +2,7 @@
 #ifndef _WCTYPE_H_
 #define _WCTYPE_H_
 
-#include <_ansi.h>
+#include "_ansi.h"
 #include <sys/_types.h>
 
 #define __need_wint_t

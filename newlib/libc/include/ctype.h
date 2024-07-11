@@ -34,7 +34,7 @@ SUCH DAMAGE.
 #ifndef _CTYPE_H_
 #define _CTYPE_H_
 
-#include <_ansi.h>
+#include "_ansi.h"
 #include <sys/cdefs.h>
 #include <limits.h>
 

@@ -26,7 +26,7 @@ SUCH DAMAGE.
 #ifndef _WCHAR_H_
 #define _WCHAR_H_
 
-#include <_ansi.h>
+#include "_ansi.h"
 
 #include <stdio.h>
 
