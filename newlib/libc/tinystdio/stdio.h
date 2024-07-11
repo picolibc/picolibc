@@ -39,17 +39,10 @@
 #ifndef _STDIO_H_
 #define	_STDIO_H_ 1
 
-#include "_ansi.h"
-
-#define __need_NULL
-#define __need_size_t
-#define __need_ssize_t
-#include <sys/cdefs.h>
-#include <stddef.h>
-
 #include <inttypes.h>
 #include <stdarg.h>
-#include <sys/types.h>
+#include <sys/cdefs.h>
+#include <sys/_types.h>
 
 /*
  * This is an internal structure of the library that is subject to be
@@ -299,7 +292,32 @@ int	ferror(FILE *__stream);
 #define FILENAME_MAX 1024
 #endif
 
-__extension__ typedef _fpos_t fpos_t;
+/*
+ * Declare required C types
+ *
+ * size_t comes from stddef.h (included from cdefs.h)
+ */
+typedef _fpos_t fpos_t;
+
+#if __POSIX_VISIBLE
+/*
+ * Declare required additional POSIX types.
+ *
+ * va_list comes from stdarg.h (included above)
+ */
+
+# ifndef _OFF_T_DECLARED
+typedef	__off_t		off_t;		/* file offset */
+# define _OFF_T_DECLARED
+# endif
+
+# ifndef _SSIZE_T_DECLARED
+typedef _ssize_t ssize_t;
+# define _SSIZE_T_DECLARED
+# endif
+
+#endif
+
 int fgetpos(FILE * __restrict stream, fpos_t * __restrict pos);
 FILE *fopen(const char *path, const char *mode) __malloc_like_with_free(fclose, 1);
 FILE *freopen(const char *path, const char *mode, FILE *stream);
@@ -321,14 +339,14 @@ void setlinebuf(FILE *stream);
 int setvbuf(FILE *stream, char *buf, int mode, size_t size);
 FILE *tmpfile(void);
 char *tmpnam (char *s);
-ssize_t getline(char **__restrict lineptr, size_t *__restrict n, FILE *__restrict stream);
-ssize_t getdelim(char **__restrict lineptr, size_t *__restrict  n, int delim, FILE *__restrict stream);
+_ssize_t getline(char **__restrict lineptr, size_t *__restrict n, FILE *__restrict stream);
+_ssize_t getdelim(char **__restrict lineptr, size_t *__restrict  n, int delim, FILE *__restrict stream);
 
 #if __BSD_VISIBLE
 FILE	*funopen (const void *cookie,
-		ssize_t (*readfn)(void *cookie, void *buf,
+		_ssize_t (*readfn)(void *cookie, void *buf,
 				size_t n),
-		ssize_t (*writefn)(void *cookie, const void *buf,
+		_ssize_t (*writefn)(void *cookie, const void *buf,
 				 size_t n),
 		__off_t (*seekfn)(void *cookie, __off_t off, int whence),
 		int (*closefn)(void *cookie));

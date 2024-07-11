@@ -203,8 +203,6 @@ extern struct _glue __sglue;
 
 extern int _fwalk_sglue (int (*)(__FILE *), struct _glue *);
 
-#include <sys/_types.h>
-
 _BEGIN_STD_C
 
 #if !defined(__FILE_defined)
@@ -217,6 +215,8 @@ typedef _fpos_t fpos_t;
 typedef _fpos64_t fpos64_t;
 #endif
 
+#if __POSIX_VISIBLE
+
 #ifndef _OFF_T_DECLARED
 typedef __off_t off_t;
 #define	_OFF_T_DECLARED
@@ -225,6 +225,8 @@ typedef __off_t off_t;
 #ifndef _SSIZE_T_DECLARED
 typedef _ssize_t ssize_t;
 #define	_SSIZE_T_DECLARED
+#endif
+
 #endif
 
 #include <sys/stdio.h>
@@ -546,11 +548,13 @@ int	renameat2 (int, const char *, int, const char *, unsigned int);
 
 /* Other extensions.  */
 
+#if __BSD_VISIBLE
 int	fpurge (FILE *);
-ssize_t __getdelim (char **, size_t *, int, FILE *);
-ssize_t __getline (char **, size_t *, FILE *);
+#endif
 
 #if __MISC_VISIBLE
+_ssize_t __getdelim (char **, size_t *, int, FILE *);
+_ssize_t __getline (char **, size_t *, FILE *);
 void	clearerr_unlocked (FILE *);
 int	feof_unlocked (FILE *);
 int	ferror_unlocked (FILE *);
