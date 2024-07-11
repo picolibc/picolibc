@@ -52,7 +52,7 @@ main(void)
 {
         void *r, *q;
 	int result = 0;
-	int pow;
+	int err, pow;
 
 	errno = 0;
 	r = malloc(0);
@@ -68,6 +68,42 @@ main(void)
 	if ((uintptr_t) r & 127) {
 		printf("memalign(128, 237) unaligned (%p)\n", r);
 		result++;
+	}
+	free(r);
+
+	r = NULL;
+	err = posix_memalign(&r, 128, 237);
+	printf("posix_memalign(128, 237): %p, err=%d\n", r, err);
+	if ((uintptr_t) r & 127) {
+		printf("posix_memalign(128, 237) unaligned (%p)\n", r);
+		err++;
+	}
+	free(r);
+
+	r = NULL;
+	err = posix_memalign(&r, 0, 237);
+	printf("posix_memalign(0, 237): %p, err=%d\n", r, err);
+	if (err != EINVAL) {
+		printf("posix_memalign(0, 237) should return EINVAL\n");
+		err++;
+	}
+	free(r);
+
+	r = NULL;
+	err = posix_memalign(&r, 129, 237);
+	printf("posix_memalign(129, 237): %p, err=%d\n", r, err);
+	if (err != EINVAL) {
+		printf("posix_memalign(129, 237) should return EINVAL\n");
+		err++;
+	}
+	free(r);
+
+	r = NULL;
+	err = posix_memalign(&r, 128, PTRDIFF_MAX);
+	printf("posix_memalign(128, PTRDIFF_MAX): %p, err=%d\n", r, err);
+	if (err != ENOMEM) {
+		printf("posix_memalign(128, PTRDIFF_MAX) should return ENOMEM\n");
+		err++;
 	}
 	free(r);
 
