@@ -33,6 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <sys/cdefs.h>
+#include <sys/types.h>
 
 /* The size of the thread control block.
  * TLS relocations are generated relative to
