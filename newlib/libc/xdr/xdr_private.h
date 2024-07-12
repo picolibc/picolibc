@@ -26,6 +26,7 @@
 #include <_ansi.h>
 #include <stdarg.h>
 #include <stdint.h>
+#include <stddef.h>
 #include <sys/param.h>
 #include <sys/types.h>
 

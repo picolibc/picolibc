@@ -31,12 +31,6 @@
 #ifndef _SYS_FENV_H_
 #define _SYS_FENV_H_ 1
 
-#include <sys/cdefs.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef int fenv_t;
 typedef int fexcept_t;
 
@@ -83,10 +77,6 @@ typedef int fexcept_t;
 #else
 #include <machine/fenv-fp.h>
 #endif
-#endif
-
-#ifdef __cplusplus
-}
 #endif
 
 #endif	/* _SYS_FENV_H_ */

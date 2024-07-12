@@ -36,9 +36,8 @@ SUCH DAMAGE.
 
 #include "_ansi.h"
 #include <sys/cdefs.h>
-#include <limits.h>
 
-#if __POSIX_VISIBLE >= 200809 || __MISC_VISIBLE || defined (_LIBC)
+#if __POSIX_VISIBLE >= 200809 || __MISC_VISIBLE
 #include <sys/_locale.h>
 #endif
 
@@ -232,7 +231,7 @@ __declare_extern_inline(int) toupper_l (int c, locale_t l) { (void) l; return to
 #define _X	0100
 #define	_B	0200
 
-#if CHAR_MIN == SCHAR_MIN
+#ifndef __CHAR_UNSIGNED__
 #define ALLOW_NEGATIVE_CTYPE_INDEX
 #endif
 

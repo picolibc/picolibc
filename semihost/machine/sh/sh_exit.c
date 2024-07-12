@@ -38,7 +38,7 @@
 #include <unistd.h>
 #include "sh_semihost.h"
 
-void  _ATTRIBUTE((__noreturn__))
+_Noreturn void
 _exit(int code)
 {
 #ifdef SH_QEMU

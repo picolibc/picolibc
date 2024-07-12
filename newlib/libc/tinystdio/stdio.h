@@ -39,6 +39,9 @@
 #ifndef _STDIO_H_
 #define	_STDIO_H_ 1
 
+#define __need_NULL
+#define __need_size_t
+#include <stddef.h>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <sys/cdefs.h>
@@ -123,10 +126,14 @@ struct __file_ext {
    \c FILE is the opaque structure that is passed around between the
    various standard IO functions.
 */
+#ifndef ___FILE_DECLARED
 typedef struct __file __FILE;
-#if !defined(__FILE_defined)
-typedef __FILE FILE;
 # define __FILE_defined
+#endif
+
+#ifndef _FILE_DECLARED
+typedef __FILE FILE;
+#define _FILE_DECLARED
 #endif
 
 /**

@@ -4,8 +4,6 @@
 #ifndef	_SYS__LOCALE_H
 #define _SYS__LOCALE_H
 
-#include <sys/config.h>
-
 struct __locale_t;
 typedef struct __locale_t *locale_t;
 

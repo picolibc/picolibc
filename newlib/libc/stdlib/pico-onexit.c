@@ -37,6 +37,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/lock.h>
+#include <limits.h>
 #include "pico-onexit.h"
 #include "atexit.h"
 

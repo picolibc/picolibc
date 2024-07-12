@@ -37,7 +37,7 @@
 #include <sys/cdefs.h>
 #include <unistd.h>
 
-void  _ATTRIBUTE((__noreturn__))
+_Noreturn void
 _exit(int code)
 {
 	if (sys_semihost_feature(SH_EXT_EXIT_EXTENDED)) {

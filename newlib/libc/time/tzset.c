@@ -128,8 +128,8 @@ _tzset_unlocked (void)
       {
 	_timezone = 0;
 	_daylight = 0;
-	_tzname[0] = "GMT";
-	_tzname[1] = "GMT";
+	tzname[0] = "GMT";
+	tzname[1] = "GMT";
 	tz->__tzrule[0] = default_tzrule;
 	tz->__tzrule[1] = default_tzrule;
 	return;
@@ -138,8 +138,8 @@ _tzset_unlocked (void)
   /* default to unnamed UTC in case of error */
   _timezone = 0;
   _daylight = 0;
-  _tzname[0] = "";
-  _tzname[1] = "";
+  tzname[0] = "";
+  tzname[1] = "";
   tz->__tzrule[0] = default_tzrule;
   tz->__tzrule[1] = default_tzrule;
 
@@ -195,8 +195,8 @@ _tzset_unlocked (void)
       /* quit if no items, too few or too many chars, or no close quote '>' */
       if (sscanf (tzenv, "%11[-+0-9A-Za-z]%n", __tzname_dst, &n) <= 0 && tzenv[0] == '>')
 	{ /* No dst */
-          _tzname[0] = __tzname_std;
-          _tzname[1] = _tzname[0];
+          tzname[0] = __tzname_std;
+          tzname[1] = tzname[0];
           tz->__tzrule[0].offset = offset0;
           _timezone = offset0;
 	  return;
@@ -213,8 +213,8 @@ _tzset_unlocked (void)
       /* allow POSIX unquoted alphabetic tz abbr e.g. MESZ */
       if (sscanf (tzenv, "%11[A-Za-z]%n", __tzname_dst, &n) <= 0)
 	{ /* No dst */
-          _tzname[0] = __tzname_std;
-          _tzname[1] = _tzname[0];
+          tzname[0] = __tzname_std;
+          tzname[1] = tzname[0];
           tz->__tzrule[0].offset = offset0;
           _timezone = offset0;
 	  return;
@@ -331,8 +331,8 @@ _tzset_unlocked (void)
 
   tz->__tzrule[0].offset = offset0;
   tz->__tzrule[1].offset = offset1;
-  _tzname[0] = __tzname_std;
-  _tzname[1] = __tzname_dst;
+  tzname[0] = __tzname_std;
+  tzname[1] = __tzname_dst;
   __tzcalc_limits (tz->__tzyear);
   _timezone = tz->__tzrule[0].offset;  
   _daylight = tz->__tzrule[0].offset != tz->__tzrule[1].offset;

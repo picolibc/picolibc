@@ -18,7 +18,6 @@ is preserved.
 #define _ADD_D_TO_DOUBLE_FUNCS
 
 #include "fdlibm.h"
-#include <ieeefp.h>
 
 #undef isinff
 

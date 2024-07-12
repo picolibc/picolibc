@@ -23,14 +23,14 @@
 #ifdef LDBL_IMPLICIT_NBIT
 #define	LDBL_NBIT	0
 #define	SET_NBIT(hx)	((hx) | (1ULL << LDBL_MANH_SIZE))
-#define	HFRAC_BITS	EXT_FRACHBITS
+#define	HFRAC_BITS	LDBL_MANH_SIZE
 #else
 #define	LDBL_NBIT	0x80000000
 #define	SET_NBIT(hx)	(hx)
-#define	HFRAC_BITS	(EXT_FRACHBITS - 1)
+#define	HFRAC_BITS	(LDBL_MANH_SIZE - 1)
 #endif
 
-#define	MANL_SHIFT	(EXT_FRACLBITS - 1)
+#define	MANL_SHIFT	(LDBL_MANL_SIZE - 1)
 
 static const long double one = 1.0l, Zero[] = {0.0l, -0.0l,};
 
@@ -47,10 +47,7 @@ static const long double one = 1.0l, Zero[] = {0.0l, -0.0l,};
 long double
 fmodl(long double x, long double y)
 {
-	union {
-		long double e;
-		struct ieee_ext bits;
-	} ux, uy;
+        union IEEEl2bits ux, uy;
 	int64_t hx,hz;	/* We need a carry bit even if LDBL_MANH_SIZE is 32. */
 	uint32_t hy;
 	uint32_t lx,ly,lz;
@@ -58,7 +55,7 @@ fmodl(long double x, long double y)
 
 	ux.e = x;
 	uy.e = y;
-	sx = ux.bits.ext_sign;
+	sx = ux.bits.sign;
 
         if (isnanl_inline(x) || isnanl_inline(y))
             return x + y;
@@ -69,40 +66,40 @@ fmodl(long double x, long double y)
         if (y == 0.0L)
             return __math_invalidl(y);
 
-	if(ux.bits.ext_exp<=uy.bits.ext_exp) {
-	    if((ux.bits.ext_exp<uy.bits.ext_exp) ||
-	       (ux.bits.ext_frach<=uy.bits.ext_frach &&
-		(ux.bits.ext_frach<uy.bits.ext_frach ||
-		 ux.bits.ext_fracl<uy.bits.ext_fracl))) {
+	if(ux.bits.exp<=uy.bits.exp) {
+	    if((ux.bits.exp<uy.bits.exp) ||
+	       (ux.bits.manh<=uy.bits.manh &&
+		(ux.bits.manh<uy.bits.manh ||
+		 ux.bits.manl<uy.bits.manl))) {
 		return x;		/* |x|<|y| return x or x-y */
 	    }
-	    if(ux.bits.ext_frach==uy.bits.ext_frach &&
-		ux.bits.ext_fracl==uy.bits.ext_fracl) {
+	    if(ux.bits.manh==uy.bits.manh &&
+		ux.bits.manl==uy.bits.manl) {
 		return Zero[sx];	/* |x|=|y| return x*0*/
 	    }
 	}
 
     /* determine ix = ilogb(x) */
-	if(ux.bits.ext_exp == 0) {	/* subnormal x */
+	if(ux.bits.exp == 0) {	/* subnormal x */
 	    ux.e *= 0x1.0p512l;
-	    ix = ux.bits.ext_exp - (BIAS + 512);
+	    ix = ux.bits.exp - (BIAS + 512);
 	} else {
-	    ix = ux.bits.ext_exp - BIAS;
+	    ix = ux.bits.exp - BIAS;
 	}
 
     /* determine iy = ilogb(y) */
-	if(uy.bits.ext_exp == 0) {	/* subnormal y */
+	if(uy.bits.exp == 0) {	/* subnormal y */
 	    uy.e *= 0x1.0p512l;
-	    iy = uy.bits.ext_exp - (BIAS + 512);
+	    iy = uy.bits.exp - (BIAS + 512);
 	} else {
-	    iy = uy.bits.ext_exp - BIAS;
+	    iy = uy.bits.exp - BIAS;
 	}
 
     /* set up {hx,lx}, {hy,ly} and align y to x */
-	hx = SET_NBIT(ux.bits.ext_frach);
-	hy = SET_NBIT(uy.bits.ext_frach);
-	lx = ux.bits.ext_fracl;
-	ly = uy.bits.ext_fracl;
+	hx = SET_NBIT(ux.bits.manh);
+	hy = SET_NBIT(uy.bits.manh);
+	lx = ux.bits.manl;
+	ly = uy.bits.manl;
 
     /* fix point fmod */
 	n = ix - iy;
@@ -126,13 +123,13 @@ fmodl(long double x, long double y)
 	    hx = hx+hx+(lx>>MANL_SHIFT); lx = lx+lx;
 	    iy -= 1;
 	}
-	ux.bits.ext_frach = hx; /* The mantissa is truncated here if needed. */
-	ux.bits.ext_fracl = lx;
+	ux.bits.manh = hx; /* The mantissa is truncated here if needed. */
+	ux.bits.manl = lx;
 	if (iy < LDBL_MIN_EXP) {
-	    ux.bits.ext_exp = iy + (BIAS + 512);
+	    ux.bits.exp = iy + (BIAS + 512);
 	    ux.e *= 0x1p-512l;
 	} else {
-	    ux.bits.ext_exp = iy + BIAS;
+	    ux.bits.exp = iy + BIAS;
 	}
 	x = ux.e * one;		/* create necessary signal */
 	return x;		/* exact output */

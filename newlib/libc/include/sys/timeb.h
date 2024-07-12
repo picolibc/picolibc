@@ -35,19 +35,15 @@ SUCH DAMAGE.
    implementation of ftime.  */
 
 #ifndef _SYS_TIMEB_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define _SYS_TIMEB_H
 
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <sys/_types.h>
 
-#if !defined(__time_t_defined) && !defined(_TIME_T_DECLARED)
+__BEGIN_DECLS
+
+#ifndef _TIME_T_DECLARED
 typedef	_TIME_T_	time_t;
-#define	__time_t_defined
 #define	_TIME_T_DECLARED
 #endif
 
@@ -61,8 +57,6 @@ struct timeb
 
 extern int ftime (struct timeb *);
 
-#ifdef __cplusplus
-}
-#endif
+__END_DECLS
 
 #endif /* ! defined (_SYS_TIMEB_H) */

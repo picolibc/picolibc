@@ -23,7 +23,6 @@ set errno as normal.
 */
 
 #include <math.h>
-#include <ieeefp.h>
 #include "f_math.h"
 
 double _f_pow (double x, double y)

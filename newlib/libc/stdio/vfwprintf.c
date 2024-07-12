@@ -116,6 +116,7 @@ SEEALSO
 #include <stdint.h>
 #include <wchar.h>
 #include <sys/lock.h>
+#include <sys/types.h>
 #include <stdarg.h>
 #include "local.h"
 #include "fvwrite.h"

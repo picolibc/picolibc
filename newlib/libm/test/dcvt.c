@@ -20,7 +20,6 @@
 #include <math.h>
 #include <stdio.h>
 #include <float.h>
-#include <ieeefp.h>
 #include <stdlib.h>
 #include <string.h>
 #define _MAX_CHARS 512

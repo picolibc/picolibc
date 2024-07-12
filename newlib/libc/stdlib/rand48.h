@@ -17,6 +17,7 @@
 #define _DEFAULT_SOURCE
 #include <math.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 /*
  * rand48 family support

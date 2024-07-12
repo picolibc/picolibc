@@ -35,7 +35,7 @@
 
 #include <unistd.h>
 
-void  _ATTRIBUTE((__noreturn__))
+_Noreturn void
 _exit(int code)
 {
     (void) code;

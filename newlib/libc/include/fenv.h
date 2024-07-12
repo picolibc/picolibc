@@ -12,9 +12,10 @@
 #ifndef _FENV_H
 #define _FENV_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "_ansi.h"
+#include <sys/config.h>
+
+_BEGIN_STD_C
 
 #include <sys/fenv.h>
 
@@ -39,9 +40,11 @@ int feholdexcept(fenv_t *envp);
 int fesetenv(const fenv_t *envp);
 int feupdateenv(const fenv_t *envp);
 
+#if __GNU_VISIBLE
 int feenableexcept(int);
 int fedisableexcept(int);
 int fegetexcept(void);
+#endif
 
 /*
  * Lastly, a FE_DFL_ENV macro must be defined, representing a pointer
@@ -69,8 +72,6 @@ int fesetexcept(int excepts);
 
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
 
 #endif

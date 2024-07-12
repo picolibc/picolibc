@@ -1,12 +1,26 @@
 /* Copyright (c) 2007 Jeff Johnston  <jjohnstn@redhat.com> */
 
 #ifndef	_SYS__DEFAULT_FCNTL_H_
-#ifdef __cplusplus
-extern "C" {
-#endif
 #define	_SYS__DEFAULT_FCNTL_H_
 #include <_ansi.h>
 #include <sys/cdefs.h>
+#include <sys/_types.h>
+
+_BEGIN_STD_C
+
+#ifndef _MODE_T_DECLARED
+typedef	__mode_t	mode_t;		/* permissions */
+#define	_MODE_T_DECLARED
+#endif
+#ifndef _OFF_T_DECLARED
+typedef	__off_t		off_t;		/* file offset */
+#define	_OFF_T_DECLARED
+#endif
+#ifndef _PID_T_DECLARED
+typedef	__pid_t		pid_t;		/* process id */
+#define	_PID_T_DECLARED
+#endif
+
 #define	_FOPEN		(-1)	/* from sys/file.h, kernel use only */
 #define	_FREAD		0x0001	/* read enabled */
 #define	_FWRITE		0x0002	/* write enabled */
@@ -181,8 +195,6 @@ extern "C" {
 #define	LOCK_UN		0x08		/* unlock file */
 #endif
 
-/*#include <sys/stdtypes.h>*/
-
 #ifndef __CYGWIN__
 /* file segment locking set data type - information passed to system by user */
 struct flock {
@@ -209,9 +221,6 @@ struct eflock {
 };
 #endif	/* __MISC_VISIBLE */
 
-#include <sys/types.h>
-#include <sys/stat.h>		/* sigh. for the mode bits for open/creat */
-
 extern int open (const char *, int, ...);
 #if __ATFILE_VISIBLE
 extern int openat (int, const char *, int, ...);
@@ -220,10 +229,6 @@ extern int creat (const char *, mode_t);
 extern int fcntl (int, int, ...);
 #if __BSD_VISIBLE
 extern int flock (int, int);
-#endif
-#if __GNU_VISIBLE
-#include <sys/time.h>
-extern int futimesat (int, const char *, const struct timeval [2]);
 #endif
 
 /* Provide _<systemcall> prototypes for functions provided by some versions
@@ -236,7 +241,6 @@ extern int open64 (const char *, int, ...);
 #endif
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
+
 #endif	/* !_SYS__DEFAULT_FCNTL_H_ */

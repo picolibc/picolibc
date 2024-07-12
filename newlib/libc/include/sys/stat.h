@@ -29,15 +29,62 @@ SUCH DAMAGE.
 #ifndef	_SYS_STAT_H
 #define	_SYS_STAT_H
 
-#ifdef __cplusplus
-extern "C" {
+#include <_ansi.h>
+#include <sys/cdefs.h>
+#include <sys/_types.h>
+#include <sys/_timespec.h>
+
+_BEGIN_STD_C
+
+#ifndef _BLKCNT_T_DECLARED
+typedef	__blkcnt_t	blkcnt_t;
+#define	_BLKCNT_T_DECLARED
 #endif
 
-#include <_ansi.h>
-#include <time.h>
-#include <sys/cdefs.h>
-#include <sys/types.h>
-#include <sys/_timespec.h>
+#ifndef _BLKSIZE_T_DECLARED
+typedef	__blksize_t	blksize_t;
+#define	_BLKSIZE_T_DECLARED
+#endif
+
+#ifndef _DEV_T_DECLARED
+typedef	__dev_t		dev_t;		/* device number or struct cdev */
+#define	_DEV_T_DECLARED
+#endif
+
+#ifndef _INO_T_DECLARED
+typedef	__ino_t		ino_t;		/* inode number */
+#define	_INO_T_DECLARED
+#endif
+
+#ifndef _MODE_T_DECLARED
+typedef	__mode_t	mode_t;		/* permissions */
+#define	_MODE_T_DECLARED
+#endif
+
+#ifndef _NLINK_T_DECLARED
+typedef	__nlink_t	nlink_t;	/* link count */
+#define	_NLINK_T_DECLARED
+#endif
+
+#ifndef _UID_T_DECLARED
+typedef	__uid_t		uid_t;		/* user id */
+#define	_UID_T_DECLARED
+#endif
+
+#ifndef _GID_T_DECLARED
+typedef	__gid_t		gid_t;		/* group id */
+#define	_GID_T_DECLARED
+#endif
+
+#ifndef _OFF_T_DECLARED
+typedef	__off_t		off_t;		/* file offset */
+#define	_OFF_T_DECLARED
+#endif
+
+#ifndef _TIME_T_DECLARED
+typedef	_TIME_T_	time_t;
+#define	_TIME_T_DECLARED
+#endif
 
 /* dj's stat defines _STAT_H_ */
 #ifndef _STAT_H_
@@ -283,7 +330,7 @@ int	_fstat64 (int __fd, struct stat64 *__sbuf );
 #endif
 
 #endif /* !_STAT_H_ */
-#ifdef __cplusplus
-}
-#endif
+
+_END_STD_C
+
 #endif /* _SYS_STAT_H */

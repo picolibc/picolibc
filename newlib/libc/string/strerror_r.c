@@ -61,6 +61,7 @@ a non-empty alternate string without assigning into its third argument.
 #define _GNU_SOURCE
 #include <errno.h>
 #include <string.h>
+#include "local.h"
 #undef strerror_r
 
 /* For backwards-compatible linking, this must be the GNU signature;

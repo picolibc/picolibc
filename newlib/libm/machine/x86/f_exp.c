@@ -25,7 +25,6 @@ There is no error checking or setting of errno.
 
 
 #include <math.h>
-#include <ieeefp.h>
 #include "f_math.h"
 
 double _f_exp (double x)

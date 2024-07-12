@@ -31,13 +31,12 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
  */
-#ifndef  _MATH_H_
 
+#ifndef  _MATH_H_
 #define  _MATH_H_
 
-#include <sys/cdefs.h>
-#include <ieeefp.h>
 #include "_ansi.h"
+#include <sys/cdefs.h>
 
 _BEGIN_STD_C
 
@@ -729,10 +728,10 @@ extern int signgam;
 
 #include <machine/math.h>
 
-_END_STD_C
-
 #ifdef __FAST_MATH__
 #include <machine/fastmath.h>
 #endif
+
+_END_STD_C
 
 #endif /* _MATH_H_ */

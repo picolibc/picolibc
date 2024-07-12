@@ -43,7 +43,6 @@
 #define	_SYS_CDEFS_H_
 
 #include <machine/_default_types.h>
-#include <stddef.h>
 
 #define __PMT(args)	args
 #define __DOTS    	, ...
@@ -51,6 +50,9 @@
 
 #ifdef __GNUC__
 # define __ASMNAME(cname)  __XSTRING (__USER_LABEL_PREFIX__) cname
+# define _ASMNAME(cname)   __asm__(__ASMNAME(cname))
+#else
+# define _ASMNAME(cname)
 #endif
 
 #define __ptr_t void *

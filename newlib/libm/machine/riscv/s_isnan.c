@@ -35,7 +35,6 @@
 
 #define _DEFAULT_SOURCE
 #include <math.h>
-#include <ieeefp.h>
 
 #if defined(__RISCV_HARD_FLOAT) && __RISCV_HARD_FLOAT >= 64
 

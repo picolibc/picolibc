@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* wctrans constants */
 
-#include <_ansi.h>
 #include "../locale/setlocale.h"
 
 /* valid values for wctrans_t */

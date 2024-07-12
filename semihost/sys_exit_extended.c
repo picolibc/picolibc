@@ -36,7 +36,7 @@
 #include "semihost-private.h"
 #include <sys/cdefs.h>
 
-void  _ATTRIBUTE((__noreturn__))
+_Noreturn void
 sys_semihost_exit_extended(uintptr_t code)
 {
 	struct {

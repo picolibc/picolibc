@@ -27,6 +27,7 @@
  * SUCH DAMAGE.
  */
 
+#define _DEFAULT_SOURCE
 /* Make sure we're using fast ctype */
 #define _PICOLIBC_CTYPE_SMALL 0
 #include "ctype_.h"

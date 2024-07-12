@@ -33,12 +33,9 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include "mips-semihost.h"
 
-void  _ATTRIBUTE((__noreturn__))
+_Noreturn void
 _exit(int code)
 {
         char buf[15];

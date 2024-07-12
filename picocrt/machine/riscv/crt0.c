@@ -33,6 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stddef.h>
 #include "../../crt0.h"
 
 static void __attribute__((used)) __section(".init")

@@ -29,7 +29,6 @@
 /* This header file is a modification of mprec.h that only contains floating
    point union code. */
 
-#include <ieeefp.h>
 #include <math.h>
 #include <float.h>
 #include <errno.h>

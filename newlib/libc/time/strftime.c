@@ -1432,7 +1432,7 @@ recurse:
 	      tznam = tim_p->__TM_ZONE;
 #endif
 	      if (!tznam)
-		tznam = _tzname[tim_p->tm_isdst > 0];
+		tznam = tzname[tim_p->tm_isdst > 0];
 	      /* Note that in case of wcsftime this loop only works for
 	         timezone abbreviations using the portable codeset (aka ASCII).
 		 This seems to be the case, but if that ever changes, this

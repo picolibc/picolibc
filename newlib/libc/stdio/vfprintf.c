@@ -151,6 +151,7 @@ static char *rcsid = "$Id$";
 #include <stdint.h>
 #include <wchar.h>
 #include <sys/lock.h>
+#include <sys/types.h>
 #include <stdarg.h>
 #include "local.h"
 #include "../stdlib/local.h"

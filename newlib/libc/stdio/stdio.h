@@ -31,18 +31,28 @@
 #define	_FSTDIO			/* ``function stdio'' */
 
 #define __need_size_t
-#define __need_ssize_t
 #define __need_NULL
-#include <sys/cdefs.h>
 #include <stddef.h>
+#include <sys/cdefs.h>
 
 #include <stdarg.h>
-#include <_ansi.h>
 #include <sys/_types.h>
 
 #ifndef __machine_flock_t_defined
 #include <sys/lock.h>
 typedef _LOCK_RECURSIVE_T _flock_t;
+#endif
+
+_BEGIN_STD_C
+
+#ifndef ___FILE_DECLARED
+typedef struct __file __FILE;
+# define ___FILE_DECLARED
+#endif
+
+#ifndef _FILE_DECLARED
+typedef __FILE FILE;
+#define _FILE_DECLARED
 #endif
 
 /*
@@ -81,7 +91,14 @@ struct __sbuf {
 
 #define _REENT_SMALL_CHECK_INIT(ptr) /* nothing */
 
-struct __sFILE {
+#ifdef __CUSTOM_FILE_IO__
+
+/* Get custom _FILE definition.  */
+#include <sys/custom_file.h>
+
+#else /* !__CUSTOM_FILE_IO__ */
+#ifndef __LARGE64_FILES
+struct __file {
   unsigned char *_p;	/* current position in (some) buffer */
   int	_r;		/* read space left for getc() */
   int	_w;		/* write space left for putc() */
@@ -123,15 +140,8 @@ struct __sFILE {
   _mbstate_t _mbstate;	/* for wide char stdio functions. */
   int   _flags2;        /* for future use */
 };
-
-#ifdef __CUSTOM_FILE_IO__
-
-/* Get custom _FILE definition.  */
-#include <sys/custom_file.h>
-
-#else /* !__CUSTOM_FILE_IO__ */
-#ifdef __LARGE64_FILES
-struct __sFILE64 {
+#else
+struct __file {
   unsigned char *_p;	/* current position in (some) buffer */
   int	_r;		/* read space left for getc() */
   int	_w;		/* write space left for putc() */
@@ -175,9 +185,6 @@ struct __sFILE64 {
 #endif
   _mbstate_t _mbstate;	/* for wide char stdio functions. */
 };
-typedef struct __sFILE64 __FILE;
-#else
-typedef struct __sFILE   __FILE;
 #endif /* __LARGE64_FILES */
 #endif /* !__CUSTOM_FILE_IO__ */
 
@@ -202,13 +209,6 @@ struct _glue
 extern struct _glue __sglue;
 
 extern int _fwalk_sglue (int (*)(__FILE *), struct _glue *);
-
-_BEGIN_STD_C
-
-#if !defined(__FILE_defined)
-typedef __FILE FILE;
-# define __FILE_defined
-#endif
 
 typedef _fpos_t fpos_t;
 #ifdef __LARGE64_FILES

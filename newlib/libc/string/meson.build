@@ -97,7 +97,6 @@ srcs_string = [
     'swab.c',
     'timingsafe_bcmp.c',
     'timingsafe_memcmp.c',
-    'u_strerr.c',
     'wcpcpy.c',
     'wcpncpy.c',
     'wcscasecmp.c',

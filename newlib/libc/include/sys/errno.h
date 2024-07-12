@@ -31,28 +31,18 @@ SUCH DAMAGE.
    __errno.  */
 
 #ifndef _SYS_ERRNO_H_
-#ifdef __cplusplus
-extern "C" {
-#endif
 #define _SYS_ERRNO_H_
 
+#include "_ansi.h"
 #include <sys/config.h>
 
-/* Please don't use these variables directly.
-   Use strerror instead. */
-extern __IMPORT const char * const _sys_errlist[];
-extern __IMPORT int _sys_nerr;
+_BEGIN_STD_C
+
 #if __GNU_VISIBLE
 char *
 _user_strerror (int errnum,
                 int internal,
                 int *errptr);
-#endif
-#ifdef __CYGWIN__
-extern __IMPORT const char * const sys_errlist[];
-extern __IMPORT int sys_nerr;
-extern __IMPORT char *program_invocation_name;
-extern __IMPORT char *program_invocation_short_name;
 #endif
 
 #ifdef NEWLIB_GLOBAL_ERRNO
@@ -66,10 +56,9 @@ int *__PICOLIBC_ERRNO_FUNCTION(void);
 #define errno (*__PICOLIBC_ERRNO_FUNCTION())
 #else
 extern NEWLIB_THREAD_LOCAL_ERRNO int errno;
-#define errno		errno
+#define errno errno
 #endif
 
-#define __errno_r(ptr)	(errno)
 #define _REENT_ERRNO(r) (errno)
 
 #define	EPERM 1			/* Not owner */
@@ -235,7 +224,6 @@ extern NEWLIB_THREAD_LOCAL_ERRNO int errno;
 
 #define __ELASTERROR 2000       /* Users can add values starting here */
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
+
 #endif /* _SYS_ERRNO_H */

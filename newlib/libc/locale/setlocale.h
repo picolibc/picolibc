@@ -327,15 +327,16 @@ __get_current_time_locale (void)
 _ELIDABLE_INLINE const struct lc_messages_T *
 __get_messages_locale (struct __locale_t *locale)
 {
-  return (const struct lc_messages_T *) (locale)->lc_cat[LC_MESSAGES].ptr;
+  return (const struct lc_messages_T *) (locale)->lc_cat[_LC_MESSAGES].ptr;
 }
 
 _ELIDABLE_INLINE const struct lc_messages_T *
 __get_current_messages_locale (void)
 {
   return (const struct lc_messages_T *)
-	 _locale->lc_cat[LC_MESSAGES].ptr;
+	 _locale->lc_cat[_LC_MESSAGES].ptr;
 }
+
 #else /* ! __HAVE_LOCALE_INFO__ */
 _ELIDABLE_INLINE const struct lc_monetary_T *
 __get_monetary_locale (struct __locale_t *locale)

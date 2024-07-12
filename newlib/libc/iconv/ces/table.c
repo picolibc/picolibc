@@ -33,6 +33,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <stdio.h>
 #include <sys/iconvnls.h>
 #include "../lib/endian.h"
 #include "../lib/local.h"

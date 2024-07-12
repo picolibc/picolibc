@@ -58,6 +58,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <stdio.h>
 #include <string.h>
 #include "local.h"
+#include "../string/local.h"
 #include <errno.h>
 
 #define WRITE_STR(str) \

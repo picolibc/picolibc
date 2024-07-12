@@ -7,6 +7,7 @@
 #include <time.h>
 #include <sys/_tz_structs.h>
 #include <sys/lock.h>
+#include <stdint.h>
 
 #define SECSPERMIN	60L
 #define MINSPERHOUR	60L

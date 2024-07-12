@@ -18,6 +18,7 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  * asctime_r.c
  */
 
+#define _DEFAULT_SOURCE
 #include <stdio.h>
 #include <time.h>
 #include <errno.h>

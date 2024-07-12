@@ -10,6 +10,8 @@ This file is distributed WITHOUT ANY WARRANTY; without even the implied
 warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#include <_ansi.h>
+
 _BEGIN_STD_C
 
 #if defined(__or1k__) || defined(__or1knd__)
@@ -454,9 +456,7 @@ _END_STD_C
 #if (defined(__CYGWIN__) || defined(__rtems__)) && __POSIX_VISIBLE
 #include <signal.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+_BEGIN_STD_C
 
 /* POSIX sigsetjmp/siglongjmp macros */
 #ifdef _JBTYPE
@@ -482,7 +482,7 @@ typedef int sigjmp_buf[_JBLEN+1+(sizeof (sigset_t)/sizeof (int))];
 #ifdef __CYGWIN__
 /* Per POSIX, siglongjmp has to be implemented as function.  Cygwin
    provides functions for both, siglongjmp and sigsetjmp since 2.2.0. */
-extern void siglongjmp (sigjmp_buf, int) __attribute__ ((__noreturn__));
+_Noreturn void siglongjmp (sigjmp_buf, int);
 extern int sigsetjmp (sigjmp_buf, int);
 #endif
 
@@ -523,14 +523,13 @@ extern int sigsetjmp (sigjmp_buf, int);
    are equivalent to sigsetjmp/siglongjmp when not saving the signal mask.
    New applications should use sigsetjmp/siglongjmp instead. */
 #ifdef __CYGWIN__
-extern void _longjmp (jmp_buf, int) __attribute__ ((__noreturn__));
-extern int _setjmp (jmp_buf);
+_Noreturn void _longjmp (jmp_buf, int);
+int _setjmp (jmp_buf);
 #else
 #define _setjmp(env)		sigsetjmp ((env), 0)
 #define _longjmp(env, val)	siglongjmp ((env), (val))
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
+
 #endif /* (__CYGWIN__ or __rtems__) and __POSIX_VISIBLE */

@@ -37,6 +37,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 static bool
 near(double got, double target, double close)

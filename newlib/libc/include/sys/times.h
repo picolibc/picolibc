@@ -35,9 +35,8 @@ extern "C" {
 #include <_ansi.h>
 #include <sys/_types.h>
 
-#if !defined(__clock_t_defined) && !defined(_CLOCK_T_DECLARED)
+#ifndef _CLOCK_T_DECLARED
 typedef	_CLOCK_T_	clock_t;
-#define	__clock_t_defined
 #define	_CLOCK_T_DECLARED
 #endif
 

@@ -90,11 +90,11 @@ sys_semihost_elapsed(void);
 int
 sys_semihost_errno(void);
 
-void
-sys_semihost_exit(uintptr_t exception, uintptr_t subcode) _ATTRIBUTE((__noreturn__));
+_Noreturn void
+sys_semihost_exit(uintptr_t exception, uintptr_t subcode);
 
-void
-sys_semihost_exit_extended(uintptr_t code) _ATTRIBUTE((__noreturn__));
+_Noreturn void
+sys_semihost_exit_extended(uintptr_t code);
 
 bool
 sys_semihost_feature(uint8_t feature);

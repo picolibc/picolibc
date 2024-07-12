@@ -3,6 +3,7 @@
 #define _POSIX_C_SOURCE 200809
 #include <errno.h>
 #include <string.h>
+#include "local.h"
 
 int
 __xpg_strerror_r (int errnum,

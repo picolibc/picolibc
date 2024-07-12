@@ -35,7 +35,7 @@
 
 #include "opal.h"
 
-void _ATTRIBUTE((__noreturn__))
+_Noreturn void
 opal_cec_power_down(uint64_t request)
 {
     opal_call((void *) (intptr_t) request, NULL, NULL, OPAL_CEC_POWER_DOWN, __opal_base, __opal_entry);

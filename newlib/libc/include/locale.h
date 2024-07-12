@@ -52,23 +52,7 @@ SUCH DAMAGE.
 #define LC_MONETARY 3
 #define LC_NUMERIC  4
 #define LC_TIME     5
-#define LC_MESSAGES 6
-
-#if __POSIX_VISIBLE >= 200809 || defined (_LIBC)
-
-#include <sys/_locale.h>
-
-#define LC_ALL_MASK		(1 << LC_ALL)
-#define LC_COLLATE_MASK		(1 << LC_COLLATE)
-#define LC_CTYPE_MASK		(1 << LC_CTYPE)
-#define LC_MONETARY_MASK	(1 << LC_MONETARY)
-#define LC_NUMERIC_MASK		(1 << LC_NUMERIC)
-#define LC_TIME_MASK		(1 << LC_TIME)
-#define LC_MESSAGES_MASK	(1 << LC_MESSAGES)
-
-#define LC_GLOBAL_LOCALE	((struct __locale_t *) -1)
-
-#endif /* __POSIX_VISIBLE >= 200809 */
+#define _LC_MESSAGES    6
 
 _BEGIN_STD_C
 
@@ -100,23 +84,37 @@ struct lconv
   char int_p_sign_posn;
 };
 
-#ifndef _REENT_ONLY
-
 char *setlocale (int, const char *);
 struct lconv *localeconv (void);
 
 #if __POSIX_VISIBLE >= 200809
+
+#include <sys/_locale.h>
+
+#define LC_MESSAGES             _LC_MESSAGES
+
+#define LC_COLLATE_MASK		(1 << LC_COLLATE)
+#define LC_CTYPE_MASK		(1 << LC_CTYPE)
+#define LC_MONETARY_MASK	(1 << LC_MONETARY)
+#define LC_NUMERIC_MASK		(1 << LC_NUMERIC)
+#define LC_TIME_MASK		(1 << LC_TIME)
+#define LC_MESSAGES_MASK	(1 << LC_MESSAGES)
+
+#define LC_ALL_MASK	(LC_COLLATE_MASK | LC_CTYPE_MASK | LC_MONETARY_MASK \
+			 | LC_NUMERIC_MASK | LC_TIME_MASK | LC_MESSAGES_MASK)
+
+#define LC_GLOBAL_LOCALE	((struct __locale_t *) -1)
+
 locale_t newlocale (int, const char *, locale_t);
 void freelocale (locale_t);
 locale_t duplocale (locale_t);
 locale_t uselocale (locale_t);
-#endif /* __POSIX_VISIBLE >= 200809 */
 
-#if __POSIX_VISIBLE >= 200809 /* FIXME? Starting with issue 8 */
-const char *getlocalename_l (int, struct __locale_t *);
 #endif
 
-#endif /* _REENT_ONLY */
+#if __MISC_VISIBLE
+const char *getlocalename_l (int, struct __locale_t *);
+#endif
 
 _END_STD_C
 

@@ -29,26 +29,59 @@ SUCH DAMAGE.
 #ifndef _SYS_UNISTD_H
 #define _SYS_UNISTD_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <_ansi.h>
+
+_BEGIN_STD_C
+
 #define __need_size_t
 #define __need_ptrdiff_t
-#include <sys/cdefs.h>
-#include <sys/types.h>
-#include <sys/_types.h>
+#define __need_NULL
 #include <stddef.h>
+#include <sys/cdefs.h>
+#include <sys/_types.h>
 
+#ifndef _USECONDS_T_DECLARED
+typedef	__useconds_t	useconds_t;	/* microseconds (unsigned) */
+#define	_USECONDS_T_DECLARED
+#endif
+
+#ifndef _INTPTR_T_DECLARED
+typedef __intptr_t intptr_t;
+#define _INTPTR_T_DECLARED
+#endif
+
+#ifndef _SSIZE_T_DECLARED
+typedef _ssize_t ssize_t;
+#define	_SSIZE_T_DECLARED
+#endif
+
+#ifndef _OFF_T_DECLARED
+typedef __off_t off_t;
+#define	_OFF_T_DECLARED
+#endif
+
+#ifndef _UID_T_DECLARED
+typedef	__uid_t		uid_t;		/* user id */
+#define	_UID_T_DECLARED
+#endif
+
+#ifndef _GID_T_DECLARED
+typedef	__gid_t		gid_t;		/* group id */
+#define	_GID_T_DECLARED
+#endif
+
+#ifndef _PID_T_DECLARED
+typedef	__pid_t		pid_t;		/* process id */
+#define	_PID_T_DECLARED
+#endif
 extern char **environ;
 
-void	_exit (int __status) _ATTRIBUTE ((__noreturn__));
+_Noreturn void	_exit (int __status);
 
 int	access (const char *__path, int __amode);
 unsigned  alarm (unsigned __secs);
+int     brk(void*);
 int     chdir (const char *__path);
-int     chmod (const char *__path, mode_t __mode);
 int     chown (const char *__path, uid_t __owner, gid_t __group);
 #if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200112)
 int     chroot (const char *__path);
@@ -107,9 +140,6 @@ int	faccessat (int __dirfd, const char *__path, int __mode, int __flags);
 #endif
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4 || __POSIX_VISIBLE >= 200809
 int     fchdir (int __fildes);
-#endif
-#if __POSIX_VISIBLE >= 199309
-int     fchmod (int __fildes, mode_t __mode);
 #endif
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4 || __POSIX_VISIBLE >= 200809
 int     fchown (int __fildes, uid_t __owner, gid_t __group);
@@ -619,9 +649,7 @@ int	unlinkat (int, const char *, int);
 #define _CS_LFS_LINTFLAGS                     24
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
 
 #if __SSP_FORTIFY_LEVEL > 0
 #include <ssp/unistd.h>

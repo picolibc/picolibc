@@ -42,7 +42,7 @@ SUCH DAMAGE.
 #include <sys/cdefs.h>
 #include <sys/_sigset.h>
 #include <sys/_timeval.h>
-#include <sys/timespec.h>
+#include <sys/_timespec.h>
 
 #if !defined(_SIGSET_T_DECLARED)
 #define	_SIGSET_T_DECLARED

@@ -40,14 +40,13 @@ __stack_chk_init (void)
 }
 #endif
 
-void __stack_chk_fail (void) __attribute__((__noreturn__));
+_Noreturn void __stack_chk_fail (void);
 
 #define STACK_CHK_MSG "*** stack smashing detected ***: terminated"
 
 __typeof(__stack_chk_fail) __stack_chk_fail_weak;
 
-void
-__attribute__((__noreturn__))
+_Noreturn void
 __stack_chk_fail_weak (void)
 {
 #ifdef TINY_STDIO

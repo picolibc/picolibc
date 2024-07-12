@@ -23,9 +23,9 @@
 
 
 #ifdef LDBL_IMPLICIT_NBIT
-#define	MANH_SIZE	(EXT_FRACHBITS + 1)
+#define	MANH_SIZE	(LDBL_MANH_SIZE + 1)
 #else
-#define	MANH_SIZE	EXT_FRACHBITS
+#define	MANH_SIZE	LDBL_MANH_SIZE
 #endif
 
 static const long double huge = 1.0e300L;

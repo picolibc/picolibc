@@ -35,11 +35,9 @@ SUCH DAMAGE.
 	assert.h
 */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "_ansi.h"
+
+_BEGIN_STD_C
 
 #undef assert
 
@@ -49,10 +47,6 @@ extern "C" {
 # ifndef _ASSERT_VERBOSE
 # define assert(__e) ((__e) ? (void)0 : __assert_no_args ())
 #else
-# define assert(__e) ((__e) ? (void)0 : __assert_func (__FILE__, __LINE__, \
-						       __ASSERT_FUNC, #__e))
-#endif
-
 # ifndef __ASSERT_FUNC
   /* Use g++'s demangled names in C++.  */
 #  if defined __cplusplus && defined __GNUC__
@@ -71,20 +65,21 @@ extern "C" {
 #   define __ASSERT_FUNC ((char *) 0)
 #  endif
 # endif /* !__ASSERT_FUNC */
+
+# define assert(__e) ((__e) ? (void)0 : __assert_func (__FILE__, __LINE__, \
+						       __ASSERT_FUNC, #__e))
+#endif
+
 #endif /* !NDEBUG */
 
-void __assert (const char *, const char *, int)
-	    _ATTRIBUTE ((__noreturn__));
-void __assert_func (const char *, int, const char *, const char *)
-	    _ATTRIBUTE ((__noreturn__));
+_Noreturn void __assert (const char *, const char *, int);
 
-void __assert_no_args (void)
-	    _ATTRIBUTE ((__noreturn__));
+_Noreturn void __assert_func (const char *, int, const char *, const char *);
+
+_Noreturn void __assert_no_args (void);
 
 #if __STDC_VERSION__ >= 201112L && !defined __cplusplus
 # define static_assert _Static_assert
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C

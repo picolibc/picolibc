@@ -18,12 +18,12 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  * ctime_r.c
  */
 
+#define _DEFAULT_SOURCE
 #include <time.h>
 
 char *
 ctime_r (const time_t * tim_p,
-        char result[__restrict static __ASCTIME_SIZE])
-
+         char result[__restrict static __ASCTIME_SIZE])
 {
   struct tm tm;
   return asctime_r (localtime_r (tim_p, &tm), result);

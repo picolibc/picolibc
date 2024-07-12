@@ -105,9 +105,6 @@ PORTABILITY
 #define _GNU_SOURCE
 #include "setlocale.h"
 
-#define LC_VALID_MASK	(LC_COLLATE_MASK | LC_CTYPE_MASK | LC_MONETARY_MASK \
-			 | LC_NUMERIC_MASK | LC_TIME_MASK | LC_MESSAGES_MASK)
-
 struct __locale_t *
 newlocale (int category_mask, const char *locale,
 	      struct __locale_t *base)
@@ -122,15 +119,8 @@ newlocale (int category_mask, const char *locale,
   struct __locale_t tmp_locale, *new_locale;
   int i;
 
-  /* Convert LC_ALL_MASK to a mask containing all valid MASK values.
-     This simplifies the code below. */
-  if (category_mask & LC_ALL_MASK)
-    {
-      category_mask &= ~LC_ALL_MASK;
-      category_mask |= LC_VALID_MASK;
-    }
   /* Check for invalid mask values and valid locale ptr. */
-  if ((category_mask & ~LC_VALID_MASK) || !locale)
+  if ((category_mask & ~LC_ALL_MASK) || !locale)
     {
       _REENT_ERRNO(p) = EINVAL;
       return NULL;
@@ -138,7 +128,7 @@ newlocale (int category_mask, const char *locale,
   /* If the new locale is supposed to be all default locale, just return
      a pointer to the default locale. */
   if ((!base && category_mask == 0)
-      || (category_mask == LC_VALID_MASK
+      || (category_mask == LC_ALL_MASK
 	  && (!strcmp (locale, "C") || !strcmp (locale, "POSIX"))))
     return __get_C_locale ();
   /* Start with setting all values to the default locale values. */

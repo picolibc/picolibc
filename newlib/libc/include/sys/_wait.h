@@ -1,11 +1,6 @@
 /*
-Copyright (c) 1991, 1993
+Copyright (c) 1982, 1986, 1993
 The Regents of the University of California.  All rights reserved.
-c) UNIX System Laboratories, Inc.
-All or some portions of this file are derived from material licensed
-to the University of California by American Telephone and Telegraph
-Co. or Unix System Laboratories, Inc. and are reproduced herein with
-the permission of UNIX System Laboratories, Inc.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -31,53 +26,28 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
  */
-#ifndef _IEEEFP_H_
-#define _IEEEFP_H_
+#ifndef _SYS__WAIT_H
+#define _SYS__WAIT_H
 
-#include "_ansi.h"
-#include <machine/ieeefp.h>
-#include <sys/features.h>
+/* Common defintions needed by both stdlib.h and sys/wait.h */
 
-_BEGIN_STD_C
+#define WNOHANG 1
+#define WUNTRACED 2
 
-#if __BSD_VISIBLE
+/* A status looks like:
+      <1 byte info> <1 byte code>
 
-/* FLOATING ROUNDING */
+      <code> == 0, child has exited, info is the exit value
+      <code> == 1..7e, child has exited, info is the signal number.
+      <code> == 7f, child has stopped, info was the signal number.
+      <code> == 80, there was a core dump.
+*/
 
-typedef int fp_rnd;
-#define FP_RN 0 	/* Round to nearest 		*/
-#define FP_RM 1		/* Round down 			*/
-#define FP_RP 2		/* Round up 			*/
-#define FP_RZ 3		/* Round to zero (trunate) 	*/
+#define WIFEXITED(w)	(((w) & 0xff) == 0)
+#define WIFSIGNALED(w)	(((w) & 0x7f) > 0 && (((w) & 0x7f) < 0x7f))
+#define WIFSTOPPED(w)	(((w) & 0xff) == 0x7f)
+#define WEXITSTATUS(w)	(((w) >> 8) & 0xff)
+#define WTERMSIG(w)	((w) & 0x7f)
+#define WSTOPSIG	WEXITSTATUS
 
-fp_rnd fpgetround (void);
-fp_rnd fpsetround (fp_rnd);
-
-/* EXCEPTIONS */
-
-typedef int fp_except;
-#define FP_X_INV 0x10	/* Invalid operation 		*/
-#define FP_X_DX  0x80	/* Divide by zero		*/
-#define FP_X_OFL 0x04	/* Overflow exception		*/
-#define FP_X_UFL 0x02	/* Underflow exception		*/
-#define FP_X_IMP 0x01	/* imprecise exception		*/
-
-fp_except fpgetmask (void);
-fp_except fpsetmask (fp_except);
-fp_except fpgetsticky (void);
-fp_except fpsetsticky (fp_except);
-
-/* INTEGER ROUNDING */
-
-typedef int fp_rdi;
-#define FP_RDI_TOZ 0	/* Round to Zero 		*/
-#define FP_RDI_RD  1	/* Follow float mode		*/
-
-fp_rdi fpgetroundtoi (void);
-fp_rdi fpsetroundtoi (fp_rdi);
-
-#endif /* __BSD_VISIBLE */
-
-_END_STD_C
-
-#endif /* _IEEEFP_H_ */
+#endif

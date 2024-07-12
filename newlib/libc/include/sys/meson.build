@@ -73,7 +73,8 @@ inc_sys_headers_all = [
   '_tz_structs.h',
   'unistd.h',
   'utime.h',
-  'wait.h'
+  'wait.h',
+  '_wait.h'
 ]
 
 inc_sys_headers = []

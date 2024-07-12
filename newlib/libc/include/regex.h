@@ -37,6 +37,8 @@
 #ifndef _REGEX_H_
 #define	_REGEX_H_
 
+#define __need_ptrdiff_t
+#include <stddef.h>
 #include <sys/cdefs.h>
 
 /* types */

@@ -6,6 +6,7 @@
 #define __CCSBI_H__
 
 #include <_ansi.h>
+#include <stddef.h>
 #include "ccs.h"
 
 /*

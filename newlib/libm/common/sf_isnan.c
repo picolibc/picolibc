@@ -19,8 +19,7 @@
  */
 
 #include "fdlibm.h"
-#include <ieeefp.h>
- 
+
 #undef isnanf
 
 int

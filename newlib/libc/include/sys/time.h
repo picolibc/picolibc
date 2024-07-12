@@ -42,11 +42,20 @@
 #include <_ansi.h>
 #include <sys/cdefs.h>
 #include <sys/_timeval.h>
-#include <sys/types.h>
-#include <sys/timespec.h>
-
-#if __BSD_VISIBLE || __POSIX_VISIBLE >= 200112 || __XSI_VISIBLE
+#include <sys/_types.h>
+#include <sys/_timespec.h>
 #include <sys/select.h>
+
+_BEGIN_STD_C
+
+#ifndef _TIME_T_DECLARED
+typedef	_TIME_T_	time_t;
+#define	_TIME_T_DECLARED
+#endif
+
+#ifndef _SUSECONDS_T_DECLARED
+typedef	__suseconds_t	suseconds_t;
+#define	_SUSECONDS_T_DECLARED
 #endif
 
 struct timezone {
@@ -417,9 +426,7 @@ struct itimerval {
 };
 
 #ifndef _KERNEL
-#include <time.h>
 
-__BEGIN_DECLS
 int utimes (const char *, const struct timeval [2]);
 
 #if __BSD_VISIBLE
@@ -446,9 +453,9 @@ int futimesat (int, const char *, const struct timeval [2]);
 int _gettimeofday (struct timeval *__p, void *__tz);
 #endif
 
-__END_DECLS
-
 #endif /* !_KERNEL */
 #include <machine/_time.h>
+
+_END_STD_C
 
 #endif /* !_SYS_TIME_H_ */

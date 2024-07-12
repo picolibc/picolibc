@@ -13,15 +13,31 @@
 #ifndef _INTTYPES_H
 #define _INTTYPES_H
 
-#include <sys/config.h>
-#include <sys/_intsup.h>
 #include "_ansi.h"
 #include <stdint.h>
-#define __need_wchar_t
-#include <stddef.h>
+
+_BEGIN_STD_C
 
 #if __BSD_VISIBLE
 #include <sys/_locale.h>
+#endif
+
+typedef struct {
+  intmax_t	quot;
+  intmax_t	rem;
+} imaxdiv_t;
+
+/*
+ * Try to avoid defining wchar_t by using __WCHAR_TYPE__ when
+ * available.
+ */
+
+#ifdef __WCHAR_TYPE__
+typedef __WCHAR_TYPE__ _wchar_t;
+#else
+#define __need_wchar_t
+#include <stddef.h>
+typdef wchar_t _wchar_t;
 #endif
 
 #define __STRINGIFY(a) #a
@@ -307,32 +323,20 @@
 #define SCNuPTR		__SCNPTR(u)
 #define SCNxPTR		__SCNPTR(x)
 
-
-typedef struct {
-  intmax_t	quot;
-  intmax_t	rem;
-} imaxdiv_t;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-extern intmax_t  imaxabs(intmax_t);
-extern imaxdiv_t imaxdiv(intmax_t __numer, intmax_t __denomer);
-extern intmax_t  strtoimax(const char *__restrict, char **__restrict, int);
-extern uintmax_t strtoumax(const char *__restrict, char **__restrict, int);
-extern intmax_t  wcstoimax(const wchar_t *__restrict, wchar_t **__restrict, int);
-extern uintmax_t wcstoumax(const wchar_t *__restrict, wchar_t **__restrict, int);
+intmax_t  imaxabs(intmax_t);
+imaxdiv_t imaxdiv(intmax_t __numer, intmax_t __denomer);
+intmax_t  strtoimax(const char *__restrict, char **__restrict, int);
+uintmax_t strtoumax(const char *__restrict, char **__restrict, int);
+intmax_t  wcstoimax(const _wchar_t *__restrict, _wchar_t **__restrict, int);
+uintmax_t wcstoumax(const _wchar_t *__restrict, _wchar_t **__restrict, int);
 
 #if __BSD_VISIBLE
-extern intmax_t  strtoimax_l(const char *__restrict, char **_restrict, int, locale_t);
-extern uintmax_t strtoumax_l(const char *__restrict, char **_restrict, int, locale_t);
-extern intmax_t  wcstoimax_l(const wchar_t *__restrict, wchar_t **_restrict, int, locale_t);
-extern uintmax_t wcstoumax_l(const wchar_t *__restrict, wchar_t **_restrict, int, locale_t);
+intmax_t  strtoimax_l(const char *__restrict, char **_restrict, int, locale_t);
+uintmax_t strtoumax_l(const char *__restrict, char **_restrict, int, locale_t);
+intmax_t  wcstoimax_l(const _wchar_t *__restrict, _wchar_t **_restrict, int, locale_t);
+uintmax_t wcstoumax_l(const _wchar_t *__restrict, _wchar_t **_restrict, int, locale_t);
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
 
 #endif

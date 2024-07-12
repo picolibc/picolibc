@@ -45,6 +45,7 @@
 #include <wchar.h>
 #include <float.h>
 #include <math.h>
+#include <limits.h>
 #include <stdio-bufio.h>
 #include <sys/lock.h>
 

@@ -97,7 +97,7 @@ Exit is just a wrapper around _exit that also calls destructors and
 callbacks registered with atexit. To make it work, you'll need to
 implement the `_exit` function:
 
-	void	_exit (int status) _ATTRIBUTE ((__noreturn__));
+	_Noreturn void _exit (int status);
 
 ### malloc and free
 
