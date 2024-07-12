@@ -242,7 +242,14 @@ typedef	__suseconds_t	suseconds_t;
 #define	_SUSECONDS_T_DECLARED
 #endif
 
+#if __BSD_VISIBLE
+
+#ifndef _SBINTIME_T_DECLARED
 typedef	__int64_t	sbintime_t;
+#define _SBINTIME_T_DECLARED
+#endif
+
+#endif
 
 #include <sys/features.h>
 #include <machine/types.h>
