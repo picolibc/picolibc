@@ -33,9 +33,6 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include "sparc-semihost.h"
 
 typedef volatile uint8_t vuint8_t;

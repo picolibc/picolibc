@@ -37,6 +37,14 @@
 #define _SPARC_SEMIHOST_H_
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 int
 sparc_putc(char c, FILE *file);

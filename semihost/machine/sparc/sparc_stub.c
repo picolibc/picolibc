@@ -34,12 +34,6 @@
  */
 
 #define _GNU_SOURCE
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <string.h>
-#include <errno.h>
 #include "sparc-semihost.h"
 
 ssize_t
