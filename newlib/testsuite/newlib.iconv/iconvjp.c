@@ -916,8 +916,8 @@ int main(void)
                 CHECK(ERROR);
             }
 
-            n = iconv(descs[d++], (const char **)&(inbuf), &inbytes,
-	                          (char **)&outbuf, &outbytes);
+            n = iconv(descs[d++], &(inbuf), &inbytes,
+	                          &outbuf, &outbytes);
             if (n == (size_t)-1)
             {
 	        printf("Conversion from %s to %s FAILED - iconv() "

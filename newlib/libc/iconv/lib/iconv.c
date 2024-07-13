@@ -39,16 +39,16 @@ SYNOPSIS
 	#include <iconv.h>
 	iconv_t iconv_open (const char *<[to]>, const char *<[from]>);
 	int iconv_close (iconv_t <[cd]>);
-        size_t iconv (iconv_t <[cd]>, char **restrict <[inbuf]>, 
-	              size_t *restrict <[inbytesleft]>, 
-		      char **restrict <[outbuf]>, 
+        size_t iconv (iconv_t <[cd]>, char **restrict <[inbuf]>,
+	              size_t *restrict <[inbytesleft]>,
+		      char **restrict <[outbuf]>,
                       size_t *restrict <[outbytesleft]>);
 
 DESCRIPTION
 The function <<iconv>> converts characters from <[in]> which are in one
 encoding to characters of another encoding, outputting them to <[out]>.
 The value <[inleft]> specifies the number of input bytes to convert whereas
-the value <[outleft]> specifies the size remaining in the <[out]> buffer. 
+the value <[outleft]> specifies the size remaining in the <[out]> buffer.
 The conversion descriptor <[cd]> specifies the conversion being performed
 and is created via <<iconv_open>>.
 
@@ -99,14 +99,13 @@ No supporting OS subroutine calls are required.
  * iconv interface functions as specified by Single Unix specification.
  */
 
-#ifndef _REENT_ONLY
 iconv_t
 iconv_open (
                       const char *to,
                       const char *from)
 {
   iconv_conversion_t *ic;
-    
+
   if (to == NULL || from == NULL || *to == '\0' || *from == '\0')
     return (iconv_t)-1;
 
@@ -130,7 +129,7 @@ iconv_open (
       ic->handlers = &_iconv_null_conversion_handlers;
       ic->data = ic->handlers->open (to, from);
     }
-  else  
+  else
     {
       /* Use UCS-based conversion */
       ic->handlers = &_iconv_ucs_conversion_handlers;
@@ -149,13 +148,12 @@ iconv_open (
   return (void *)ic;
 }
 
-
 size_t
 iconv (iconv_t cd,
-              const char **__restrict inbuf,
-              size_t *__restrict inbytesleft,
-              char **__restrict outbuf,
-              size_t *__restrict outbytesleft)
+       char **__restrict inbuf,
+       size_t *__restrict inbytesleft,
+       char **__restrict outbuf,
+       size_t *__restrict outbytesleft)
 {
   iconv_conversion_t *ic = (iconv_conversion_t *)cd;
 
@@ -170,35 +168,35 @@ iconv (iconv_t cd,
   if (inbuf == NULL || *inbuf == NULL)
     {
       mbstate_t state_null = ICONV_ZERO_MB_STATE_T;
-      
+
       if (!ic->handlers->is_stateful(ic->data, 1))
         return (size_t)0;
-      
+
       if (outbuf == NULL || *outbuf == NULL)
         {
           /* Reset shift state */
           ic->handlers->set_state (ic->data, &state_null, 1);
-          
+
           return (size_t)0;
         }
-       
+
       if (outbytesleft != NULL)
         {
           mbstate_t state_save = ICONV_ZERO_MB_STATE_T;
-          
-          /* Save current shift state */          
+
+          /* Save current shift state */
           ic->handlers->get_state (ic->data, &state_save, 1);
-          
+
           /* Reset shift state */
           ic->handlers->set_state (ic->data, &state_null, 1);
 
           /* Get initial shift state sequence and it's length */
           ic->handlers->get_state (ic->data, &state_null, 1);
-          
+
           if (*outbytesleft >= (size_t) state_null.__count)
             {
               memcpy ((void *)(*outbuf), (void *)&state_null, state_null.__count);
-              
+
               *outbuf += state_null.__count;
               *outbytesleft -= state_null.__count;
 
@@ -208,17 +206,17 @@ iconv (iconv_t cd,
            /* Restore shift state if output buffer is too small */
            ic->handlers->set_state (ic->data, &state_save, 1);
         }
-       
+
       _REENT_ERRNO (rptr) = E2BIG;
       return (size_t)-1;
     }
-  
+
   if (*inbytesleft == 0)
     {
       _REENT_ERRNO (rptr) = EINVAL;
       return (size_t)-1;
     }
-   
+
   if (*outbytesleft == 0 || *outbuf == NULL)
     {
       _REENT_ERRNO (rptr) = E2BIG;
@@ -240,7 +238,7 @@ iconv_close (iconv_t cd)
 {
   int res;
   iconv_conversion_t *ic = (iconv_conversion_t *)cd;
-  
+
   if ((void *)cd == NULL || cd == (iconv_t)-1 || ic->data == NULL
        || (ic->handlers != &_iconv_null_conversion_handlers
            && ic->handlers != &_iconv_ucs_conversion_handlers))
@@ -250,9 +248,8 @@ iconv_close (iconv_t cd)
     }
 
   res = (int)ic->handlers->close (ic->data);
-  
+
   free ((void *)cd);
 
   return res;
 }
-#endif /* !_REENT_ONLY */
