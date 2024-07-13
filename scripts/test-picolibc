@@ -16,10 +16,10 @@ for arch in arm riscv; do
     $test cd $DIR
 
     echo '###################################'
-    echo '####' ../../scripts/do-$arch-configure -Dwant-math-errno=true -Dio-long-double=true
+    echo '####' ../../scripts/do-$arch-configure -Dwant-math-errno=true -Dio-long-double=true -Dwerror=true
     echo '###################################'
 
-    $test ../../scripts/do-$arch-configure -Dwant-math-errno=true -Dio-long-double=true
+    $test ../../scripts/do-$arch-configure -Dwant-math-errno=true -Dio-long-double=true -Dwerror=true
     $test ninja test install
 
     DIR=$PICOLIBC_DIR/builds/build-$arch-release
@@ -29,10 +29,10 @@ for arch in arm riscv; do
     $test cd $DIR
 
     echo '###################################'
-    echo '####' ../../scripts/do-$arch-configure -Dwant-math-errno=true -Dio-long-double=true --buildtype=release -Dbuild-type-subdir=release
+    echo '####' ../../scripts/do-$arch-configure -Dwant-math-errno=true -Dio-long-double=true --buildtype=release -Dbuild-type-subdir=release -Dwerror=true
     echo '###################################'
 
-    $test ../../scripts/do-$arch-configure -Dwant-math-errno=true -Dio-long-double=true --buildtype=release -Dbuild-type-subdir=release
+    $test ../../scripts/do-$arch-configure -Dwant-math-errno=true -Dio-long-double=true --buildtype=release -Dbuild-type-subdir=release -Dwerror=true
     $test ninja test install
 
 done
@@ -46,7 +46,7 @@ for arch in arm riscv; do
     $test cd $DIR
 
     echo '###################################'
-    echo '####' ../../picolibc/do-$arch-configure --buildtype=minsize
+    echo '####' ../../picolibc/do-$arch-configure --buildtype=minsize -Dwerror=true
     echo '###################################'
 
     $test ../../picolibc/do-$arch-configure --buildtype=minsize
@@ -59,10 +59,10 @@ for arch in arm riscv; do
     $test cd $DIR
 
     echo '###################################'
-    echo '####' ../../picolibc/do-$arch-configure --buildtype=release -Dpicolibc-buildtype=release
+    echo '####' ../../picolibc/do-$arch-configure --buildtype=release -Dpicolibc-buildtype=release -Dwerror=true
     echo '###################################'
 
-    $test ../../picolibc/do-$arch-configure --buildtype=release -Dpicolibc-buildtype=release
+    $test ../../picolibc/do-$arch-configure --buildtype=release -Dpicolibc-buildtype=release -Dwerror=true
     $test ninja test
 
 done
