@@ -295,6 +295,18 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 
 	    if (c < base) {
 		flags |= FL_ANY;
+                if (!(flags & FL_OVFL) && uintdigits > uintdigitsmax) {
+                    flags |= FL_OVFL;
+                    if (base == 10) {
+                        /* Check if overflow is >= 0.5 */
+                        if (c >= 5) {
+                            overflow = 2;
+                            /* Check if overflow might be == 0.5 */
+                            if (c == 5)
+                                c = 0;
+                        }
+                    }
+                }
 		if (flags & FL_OVFL) {
                     overflow |= (c != 0);
 		    if (!(flags & FL_DOT))
@@ -303,11 +315,8 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 		    if (flags & FL_DOT)
 			exp -= 1;
                     uint = UF_PLUS_DIGIT(UF_TIMES_BASE(uint, base), c);
-		    if (!UF_IS_ZERO(uint)) {
+		    if (!UF_IS_ZERO(uint))
 			uintdigits++;
-                        if (uintdigits > uintdigitsmax)
-                            flags |= FL_OVFL;
-		    }
 	        }
 
 	    } else if (c == (('.'-'0') & 0xff) && !(flags & FL_DOT)) {
@@ -492,6 +501,20 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
         else
 #endif
         {
+            /*
+             * Mix in overflow. Overflow has four possible values:
+             *
+             * 0: overflow == 0
+             * 1: overflow < 0.5
+             * 2: overflow == 0.5
+             * 3: overflow > 0.5
+             *
+             * We want to increment in case 2 if uint is odd
+             * and always in case 3.
+             */
+            overflow |= UF_AND_64(uint, 1);
+            uint = UF_PLUS_DIGIT(uint, (overflow + 1) >> 2);
+
 #ifdef _NEED_IO_FLOAT_LARGE
             if (CHECK_LONG_LONG() && __SIZEOF_LONG_DOUBLE__ > 8)
             {
