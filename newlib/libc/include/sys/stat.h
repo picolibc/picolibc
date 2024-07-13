@@ -299,6 +299,11 @@ int	mkfifo (const char *__path, mode_t __mode );
 int	stat (const char *__restrict __path, struct stat *__restrict __sbuf );
 mode_t	umask (mode_t __mask );
 
+#if __LARGEFILE64_VISIBLE
+int	stat64 (const char *__restrict __path, struct stat64 *__restrict __sbuf );
+int	fstat64 (int __fd, struct stat64 *__sbuf );
+#endif
+
 #if defined (__SPU__) || defined(__rtems__) || defined(__CYGWIN__)
 int	lstat (const char *__restrict __path, struct stat *__restrict __buf );
 int	mknod (const char *__path, mode_t __mode, dev_t __dev );
@@ -314,19 +319,6 @@ int	utimensat (int, const char *, const struct timespec [2], int);
 #endif
 #if __POSIX_VISIBLE >= 200809
 int	futimens (int, const struct timespec [2]);
-#endif
-
-/* Provide prototypes for most of the _<systemcall> names that are
-   provided in newlib for some compilers.  */
-#ifdef _LIBC
-int	_fstat (int __fd, struct stat *__sbuf );
-int	_stat (const char *__restrict __path, struct stat *__restrict __sbuf );
-int	_mkdir (const char *_path, mode_t __mode );
-#ifdef __LARGE64_FILES
-struct stat64;
-int	_stat64 (const char *__restrict __path, struct stat64 *__restrict __sbuf );
-int	_fstat64 (int __fd, struct stat64 *__sbuf );
-#endif
 #endif
 
 #endif /* !_STAT_H_ */
