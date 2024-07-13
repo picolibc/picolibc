@@ -702,6 +702,7 @@
     result |= test(__LINE__, "0x0p-126", "%.a", 0x1p-127);
 #endif
 #else
+    result |= test(__LINE__, "0x1.306efbp-98", "%a", 3752432815e-39);
 #ifdef NORMALIZED_A
     /* newlib legacy stdio normalizes %a format */
     result |= test(__LINE__, "0x1p-1074", "%a", 0x1p-1074);

@@ -514,8 +514,11 @@ main(void)
 			sscanf(buf, scanf_format, &r);
 			e = fabs(v-r) / v;
 			if (e > (float_type) ERROR_MAX) {
-				printf("\tf %3d: wanted %.7e got %.7e (error %.7e, buf %s)\n", x,
-				       printf_float(v), printf_float(r), printf_float(e), buf);
+				printf("\tf %3d: wanted %.7e %a got %.7e %a (error %.7e %a, buf %s)\n", x,
+				       printf_float(v), printf_float(v),
+                                       printf_float(r), printf_float(r),
+                                       printf_float(e), printf_float(e),
+                                       buf);
 				errors++;
 				fflush(stdout);
 			}

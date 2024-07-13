@@ -35,7 +35,7 @@
 
 #define TEST_F(x) ( \
 TEST(i, sscanf(# x, "%lf", &d), 1, "got %d fields, expected %d"), \
-TEST(t, d, (double)x, "%g != %g") )
+TEST(t, d, (double)x, "%a != %a") )
 
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
@@ -137,6 +137,7 @@ static int test_sscanf(void)
 	TEST_F(0.2);
 	TEST_F(0.1e-10);
 	TEST_F(0x1234p56);
+        TEST_F(3752432815e-39);
 
 #ifndef __PICOLIBC__
         /* both tinystdio and legacy stdio fail this test */
