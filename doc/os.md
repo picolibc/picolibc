@@ -189,7 +189,7 @@ picolibc configuration parameters:
  * -Dtls-model=global-dynamic makes picolibc use the default TLS model
    for GCC.
 
- * -Dmultilib-false makes picolibc build only a single library for the
+ * -Dmultilib=false makes picolibc build only a single library for the
    default GCC configuration.
 
  * -Dpicolib=false disables building the TLS and sbrk support built-in
