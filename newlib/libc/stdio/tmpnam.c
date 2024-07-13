@@ -185,7 +185,10 @@ tempnam (
     {
       if (! worker (filename, dir, prefix,
 		    getpid (), &_tls_inc))
+      {
+        free(filename);
 	return NULL;
+      }
     }
   return filename;
 }
