@@ -2,6 +2,16 @@
   * This program has been placed in the public domain.
   */
 
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wanalyzer-malloc-leak"
+#pragma GCC diagnostic ignored "-Wanalyzer-use-of-uninitialized-value"
+#pragma GCC diagnostic ignored "-Wanalyzer-out-of-bounds"
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#pragma GCC diagnostic ignored "-Wanalyzer-null-dereference"
+#endif
+
 #define _DEFAULT_SOURCE
 #include <_ansi.h>
 
@@ -1017,7 +1027,7 @@ m16m (short unsigned int a, short unsigned int *b, short unsigned int *c)
   register unsigned short *pp;
   register unsigned long carry;
   unsigned short *ps;
-  unsigned short p[NI];
+  unsigned short p[NI]= {0};
   unsigned long aa, m;
   int i;
 
@@ -1149,7 +1159,7 @@ static int
 emulm (short unsigned int *a, short unsigned int *b, LDPARMS * ldp)
 {
   unsigned short *p, *q;
-  unsigned short pprod[NI];
+  unsigned short pprod[NI] = {0};
   unsigned short j;
   int i;
   unsigned short *equot = ldp->equot;
@@ -1462,7 +1472,7 @@ static void
 eadd1 (const short unsigned int *a, const short unsigned int *b,
        short unsigned int *c, int subflg, LDPARMS * ldp)
 {
-  unsigned short ai[NI], bi[NI], ci[NI];
+  unsigned short ai[NI] = {0}, bi[NI] = {0}, ci[NI] = {0};
   int i, lost, j, k;
   long lt, lta, ltb;
 
@@ -1573,7 +1583,7 @@ static void
 ediv (const short unsigned int *a, const short unsigned int *b,
       short unsigned int *c, LDPARMS * ldp)
 {
-  unsigned short ai[NI], bi[NI];
+  unsigned short ai[NI] = {0}, bi[NI] = {0};
   int i;
   long lt, lta, ltb;
 
@@ -1679,7 +1689,7 @@ static void
 emul (const short unsigned int *a, const short unsigned int *b,
       short unsigned int *c, LDPARMS * ldp)
 {
-  unsigned short ai[NI], bi[NI];
+  unsigned short ai[NI] = {0}, bi[NI] = {0};
   int i, j;
   long lt, lta, ltb;
 
@@ -1771,7 +1781,7 @@ e113toe (short unsigned int *pe, short unsigned int *y, LDPARMS * ldp)
 {
   register unsigned short r;
   unsigned short *e, *p;
-  unsigned short yy[NI];
+  unsigned short yy[NI] = {0};
   int i;
 
   e = pe;
@@ -1896,7 +1906,7 @@ toe113 (short unsigned int *a, short unsigned int *b)
 static void
 e64toe (short unsigned int *pe, short unsigned int *y, LDPARMS * ldp)
 {
-  unsigned short yy[NI];
+  unsigned short yy[NI] = {0};
   unsigned short *p, *q, *e;
   int i;
 
@@ -2063,7 +2073,7 @@ e53toe (short unsigned int *pe, short unsigned int *y, LDPARMS * ldp)
 
   register unsigned short r;
   register unsigned short *p, *e;
-  unsigned short yy[NI];
+  unsigned short yy[NI] = {0};
   int denorm, k;
 
   e = pe;
@@ -2261,7 +2271,7 @@ e24toe (short unsigned int *pe, short unsigned int *y, LDPARMS * ldp)
 {
   register unsigned short r;
   register unsigned short *p, *e;
-  unsigned short yy[NI];
+  unsigned short yy[NI] = {0};
   int denorm, k;
 
   e = pe;
@@ -2428,7 +2438,7 @@ toe24 (short unsigned int *x, short unsigned int *y)
 static int
 ecmp (const short unsigned int *a, const short unsigned int *b)
 {
-  unsigned short ai[NI], bi[NI];
+  unsigned short ai[NI] = {0}, bi[NI] = {0};
   register unsigned short *p, *q;
   register int i;
   int msign;
@@ -2743,7 +2753,7 @@ _IO_ldtostr (x, string, ndigs, flags, fmt)
      int flags;
      char fmt;
 {
-  unsigned short w[NI];
+  unsigned short w[NI] = {0};
   char *t, *u;
   LDPARMS rnd;
   LDPARMS *ldp = &rnd;
@@ -2791,7 +2801,7 @@ char *
 __ldtoa (long double d, int mode, int ndigits,
        int *decpt, int *sign, char **rve)
 {
-  unsigned short e[NI];
+  unsigned short e[NI] = {0};
   char *s, *p;
   int i, k;
   int orig_ndigits;
@@ -2959,7 +2969,7 @@ stripspaces:
 int
 _ldcheck (long double *d)
 {
-  unsigned short e[NI];
+  unsigned short e[NI] = {0};
   LDPARMS rnd;
   LDPARMS *ldp = &rnd;
 
@@ -2995,7 +3005,7 @@ etoasc (short unsigned int *x, char *string, int ndec, int ndigits,
 	int outformat, LDPARMS * ldp)
 {
   long digit;
-  unsigned short y[NI], t[NI], u[NI], w[NI];
+  unsigned short y[NI] = {0}, t[NI] = {0}, u[NI] = {0}, w[NI] = {0};
   const unsigned short *p, *r, *ten;
   unsigned short sign;
   int i, j, k, expon, rndsav, ndigs;
@@ -3346,7 +3356,7 @@ strtold (char *s, char **se)
 static int
 asctoeg (char *ss, short unsigned int *y, int oprec, LDPARMS * ldp)
 {
-  unsigned short yy[NI], xt[NI], tt[NI];
+  unsigned short yy[NI] = {0}, xt[NI] = {0}, tt[NI] = {0};
   int esign, decflg, sgnflg, nexp, exp, prec, lost;
   int k, trail, c, rndsav;
   long lexp;
