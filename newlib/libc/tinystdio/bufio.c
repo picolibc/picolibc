@@ -307,7 +307,7 @@ __bufio_close(FILE *f)
          * FILE structs defined for stdin/stdout/stderr.
          */
         if (bf->bflags & __BFALL) {
-                bufio_close(bf);
+                ret = bufio_close(bf);
                 free(f);
         }
 	return ret;
