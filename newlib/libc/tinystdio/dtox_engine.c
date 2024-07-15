@@ -61,7 +61,7 @@
 #define SIG_MSB         0x10000000000000LL
 #define EXP_BIAS        1023
 #define ASUINT(x)       asuint64(x)
-#define DTOX_NDIGS 14
+#define DTOX_NDIGS      14
 
 #define _NEED_IO_FLOAT64
 

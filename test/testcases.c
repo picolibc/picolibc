@@ -718,6 +718,7 @@
     result |= test(__LINE__, "0X1.FFFFFFFFFFFFFP+1022", "%A", 0x1.fffffffffffffp+1022);
     result |= test(__LINE__, "0X1.23456789ABCDEP-1022", "%A", 0x1.23456789abcdep-1022);
     result |= test(__LINE__, "0X1.23456789ABCDFP-1022", "%A", 0x1.23456789abcdfp-1022);
+    result |= test(__LINE__, "0X1.D749096BB98C800P+8", "%.15A", 0x1.D749096BB98C8p+8);
 #endif
 #endif
     /* test %ls for wchar_t string */

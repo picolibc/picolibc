@@ -694,8 +694,9 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                     if (!(flags & FL_PREC))
                         prec = -1;
 
-                    prec = __float_x_engine(fval, &dtoa, prec, case_convert);
-                    ndigs = prec + 1;
+                    ndigs = 1 + __float_x_engine(fval, &dtoa, prec, case_convert);
+                    if (prec <= ndigs)
+                        prec = ndigs - 1;
                     exp = dtoa.exp;
                     ndigs_exp = 1;
                 } else
