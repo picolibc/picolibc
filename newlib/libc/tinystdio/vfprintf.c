@@ -688,6 +688,8 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #ifdef _NEED_IO_C99_FORMATS
                 if (c == 'a') {
 
+                    int init_prec = prec;
+
                     c = 'p';
                     flags |= FL_FLTEXP | FL_FLTHEX;
 
@@ -695,7 +697,15 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                         prec = -1;
 
                     prec = __float_x_engine(fval, &dtoa, prec, case_convert);
+
+                    if(prec < init_prec)         /* if dtox engine capped the precision required */
+                    prec = init_prec;
+
                     ndigs = prec + 1;
+
+                    if(ndigs > 14)              /* the max dtox ndigs */
+                    ndigs = 14;
+
                     exp = dtoa.exp;
                     ndigs_exp = 1;
                 } else
