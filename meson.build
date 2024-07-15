@@ -1021,9 +1021,9 @@ foreach target : ['default-target'] + targets
       if host_cpu_family == 'riscv'
         # ld.lld before version 15 did not support linker relaxations, disable
         # them if we are using an older version.
-        # There is no `cc.get_linker_version()` function, so we detect ld.lld
-        # version 15 by checking for a newly added linker flag.
-        if not cc.has_link_argument('--package-metadata=1')
+        # There is no `cc.get_linker_version()` function, so we just 
+        # assume lld is the same version as clang
+        if not cc.version().version_compare('>=15')
           message('Linking for RISCV with ld.lld < 15, forcing -mno-relax')
           c_args += ['-mno-relax']
         endif
