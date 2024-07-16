@@ -490,9 +490,9 @@ __loadlocale (struct __locale_t *loc, int category, char *new_locale)
   if (!strcmp (new_locale, loc->categories[category]))
     return loc->categories[category];
 
+#ifdef __CYGWIN__
   int ret = 0;
 
-#ifdef __CYGWIN__
   /* This additional code handles the case that the incoming locale string
      is not valid.  If so, it calls the function __set_locale_from_locale_alias,
      which is only available on Cygwin right now.  The function reads the
@@ -959,8 +959,10 @@ restart:
       break;
     }
 #ifdef __HAVE_LOCALE_INFO__
+#ifdef __CYGWIN__
   if (ret)
     FAIL;
+#endif
 #endif /* __HAVE_LOCALE_INFO__ */
   return strcpy(loc->categories[category], new_locale);
 }
