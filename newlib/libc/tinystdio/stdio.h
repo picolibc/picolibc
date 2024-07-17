@@ -474,6 +474,10 @@ __printf_float(float f)
 # define _HAS_IO_POS_ARGS
 # define _HAS_IO_C99_FORMATS
 # define _HAS_IO_DOUBLE
+# define _HAS_IO_WCHAR
+# ifdef _MB_CAPABLE
+#  define _HAS_IO_MBCHAR
+# endif
 # ifdef _WANT_IO_PERCENT_B
 #  define _HAS_IO_PERCENT_B
 # endif
