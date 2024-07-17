@@ -45,6 +45,8 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <wchar.h>
+#include <locale.h>
+#include <limits.h>
 
 #ifndef __PICOLIBC__
 # define printf_float(x) ((double) (x))
@@ -52,6 +54,7 @@
 # if defined(PICOLIBC_MINIMAL_PRINTF_SCANF)
 #  define NO_FLOATING_POINT
 #  define NO_POS_ARGS
+#  define NO_MULTI_BYTE
 #  if !defined(_WANT_MINIMAL_IO_LONG_LONG) && __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
 #   define NO_LONG_LONG
 #  endif
@@ -60,6 +63,7 @@
 #  endif
 # elif defined(PICOLIBC_INTEGER_PRINTF_SCANF)
 #  define NO_FLOATING_POINT
+#  define NO_MULTI_BYTE
 #  ifndef _WANT_IO_POS_ARGS
 #   define NO_POS_ARGS
 #  endif
@@ -74,6 +78,7 @@
 #  endif
 # elif defined(PICOLIBC_LONG_LONG_PRINTF_SCANF)
 #  define NO_FLOATING_POINT
+#  define NO_MULTI_BYTE
 #  ifndef _WANT_IO_POS_ARGS
 #   define NO_POS_ARGS
 #  endif
@@ -83,7 +88,18 @@
 #  ifdef _WANT_IO_PERCENT_B
 #   define BINARY_FORMAT
 #  endif
-# elif defined(PICOLIBC_FLOAT_PRINTF_SCANF) || defined(PICOLIBC_DOUBLE_PRINTF_SCANF)
+# elif defined(PICOLIBC_FLOAT_PRINTF_SCANF)
+#  define NO_MULTI_BYTE
+#  ifndef _IO_FLOAT_EXACT
+#   define NO_FLOAT_EXACT
+#  endif
+#  ifdef _WANT_IO_PERCENT_B
+#   define BINARY_FORMAT
+#  endif
+# elif defined(PICOLIBC_DOUBLE_PRINTF_SCANF)
+#  ifndef _HAS_IO_MBCHAR
+#   define NO_MULTI_BYTE
+#  endif
 #  ifndef _IO_FLOAT_EXACT
 #   define NO_FLOAT_EXACT
 #  endif
@@ -271,6 +287,12 @@ main(void)
 	char	buf[256];
 	int	errors = 0;
 
+#if !defined(__PICOLIBC__) || defined(_MB_CAPABLE)
+        if (!setlocale(LC_CTYPE, "C.UTF-8")) {
+            printf("setlocale(LC_CTYPE, \"C.UTF-8\") failed\n");
+            return 1;
+        }
+#endif
 #if 0
 	double	a;
 
@@ -305,6 +327,24 @@ main(void)
                 ++errors;
             }
         }
+#ifndef NO_MULTI_BYTE
+        {
+            wchar_t c;
+            char test_val[] = "㌰";
+            int i = sscanf(test_val, "%lc", &c);
+            if (i != 1 || c != L'㌰') {
+                printf("%d: %lc != %s or %d != 1\n", __LINE__, (wint_t) c, test_val, i);
+                ++errors;
+            }
+            wchar_t wtest_val[] = L"㌰";
+            char c_mb[MB_LEN_MAX+1] = {0};
+            i = swscanf(wtest_val, L"%c", c_mb);
+            if (i != 1 || strcmp(c_mb, test_val) != 0) {
+                printf("%d: %s != %s or %d != 1\n", __LINE__, c_mb, test_val, i);
+                ++errors;
+            }
+        }
+#endif
 #endif
 
 #if !defined(NO_FLOATING_POINT)
