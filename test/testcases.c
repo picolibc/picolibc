@@ -40,11 +40,21 @@
 # ifndef _HAS_IO_POS_ARGS
 #  define NO_POS_ARGS
 # endif
+# ifndef _HAS_IO_WCHAR
+#  define NO_WCHAR
+# endif
+# ifndef _HAS_IO_MBCHAR
+#  define NO_MBCHAR
+# endif
 # ifdef PICOLIBC_MINIMAL_PRINTF_SCANF
 #  define NO_WIDTH_PREC
 #  define NO_CASE_HEX
 # endif
 #else
+# ifndef _MB_CAPABLE
+#  define NO_WCHAR
+#  define NO_MBCHAR
+# endif
 # if __SIZEOF_DOUBLE__ == 4
 #  define LOW_FLOAT
 # endif
@@ -735,5 +745,15 @@
     /* make sure %c truncates to char */
     wb[0] = 0x34;
     result |= testw(__LINE__, wb, L"%c", wc);
+
+#ifndef NO_MBCHAR
+    wb[0] = 0x3330;
+    result |= testw(__LINE__, wb, L"%s", "㌰");
+    result |= test(__LINE__, "$㌰$", "$%lc$", 0x3330);
+#endif
+#ifndef NO_WCHAR
+    result |= test(__LINE__, "foobar", "%ls", L"foobar");
+    result |= test(__LINE__, "$c$", "$%lc$", L'c');
+#endif
 }
 #endif

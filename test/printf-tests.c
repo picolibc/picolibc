@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <math.h>
 #include <wchar.h>
+#include <locale.h>
 
 #ifndef TINY_STDIO
 #define printf_float(x) x
@@ -228,6 +229,12 @@ static int testw(int serial, wchar_t *expect, wchar_t *fmt, ...) {
 
 int main(void) {
     int result = 0;
+#if !defined(__PICOLIBC__) || defined(_MB_CAPABLE)
+    if (!setlocale(LC_CTYPE, "C.UTF-8")) {
+        printf("setlocale(LC_CTYPE, \"C.UTF-8\") failed\n");
+        return 1;
+    }
+#endif
 #include "testcases.c"
     return result;
 }
