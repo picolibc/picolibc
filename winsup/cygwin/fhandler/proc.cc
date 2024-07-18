@@ -1021,14 +1021,14 @@ format_proc_cpuinfo (void *, char *&destbuf)
       ftcprint (features1,  9, "apic"); /* APIC enabled */
       ftcprint (features1, 11, "sep");  /* sysenter/sysexit */
       ftcprint (features1, 12, "mtrr"); /* memory type range registers */
-      ftcprint (features1, 13, "pge");  /* page global extension */
+      ftcprint (features1, 13, "pge");  /* page global enable */
       ftcprint (features1, 14, "mca");  /* machine check architecture */
       ftcprint (features1, 15, "cmov"); /* conditional move */
       ftcprint (features1, 16, "pat");  /* page attribute table */
       ftcprint (features1, 17, "pse36");/* 36 bit page size extensions */
       ftcprint (features1, 18, "pn");   /* processor serial number */
       ftcprint (features1, 19, "clflush"); /* clflush instruction */
-      ftcprint (features1, 21, "dts");  /* debug store */
+      ftcprint (features1, 21, "ds");	/* debug store */
       ftcprint (features1, 22, "acpi"); /* ACPI via MSR */
       ftcprint (features1, 23, "mmx");  /* multimedia extensions */
       ftcprint (features1, 24, "fxsr"); /* fxsave/fxrstor */
@@ -1326,13 +1326,6 @@ format_proc_cpuinfo (void *, char *&destbuf)
 
 	  ftcprint (features1,  3, "epb");	/* energy perf bias */
 	}
-      /* cpuid 0x00000007:1 ebx */
-      if (maxf >= 0x00000007)
-	{
-	  cpuid (&unused, &features1, &unused, &unused, 0x00000007, 1);
-
-	  ftcprint (features1,  0, "intel_ppin"); /* Prot Proc Id No */
-	}
       /* cpuid 0x00000010 ebx */
       if (maxf >= 0x00000010)
 	{
@@ -1360,6 +1353,13 @@ format_proc_cpuinfo (void *, char *&destbuf)
 
 /*	  ftcprint (features1, 11, "pti");*//* Page Table Isolation reqd with Meltdown */
 
+      /* cpuid 0x00000007:1 ebx */
+      if (maxf >= 0x00000007)
+	{
+	  cpuid (&unused, &features1, &unused, &unused, 0x00000007, 1);
+
+	  ftcprint (features1,  0, "intel_ppin"); /* Prot Proc Id No */
+	}
       /* cpuid 0x00000010:2 ecx */
       if (maxf >= 0x00000010)
 	{
@@ -1406,8 +1406,8 @@ format_proc_cpuinfo (void *, char *&destbuf)
 /*	  ftcprint (features1,  4, "rdpru");	*//* user level rd proc reg */
 /*	  ftcprint (features1,  6, "mba");	*//* memory BW alloc */
 /*	  ftcprint (features1,  9, "wbnoinvd"); *//* wbnoinvd instruction */
-	  ftcprint (features1, 12, "ibpb");	/* ind br pred barrier */
 	  ftcprint (features1, 14, "ibrs");	/* ind br restricted spec */
+	  ftcprint (features1, 12, "ibpb");	/* ind br pred barrier */
 	  ftcprint (features1, 15, "stibp");	/* 1 thread ind br pred */
 	  ftcprint (features1, 16, "ibrs_enhanced"); /* ibrs_enhanced IBRS always on */
 /*	  ftcprint (features1, 17, "stibp_always_on"); */ /* stibp always on */
@@ -1442,14 +1442,14 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  ftcprint (features1,  3, "bmi1");         /* bit manip ext group 1 */
 	  ftcprint (features1,  4, "hle");          /* hardware lock elision */
 	  ftcprint (features1,  5, "avx2");         /* AVX ext instructions */
-/*	  ftcprint (features1,  6, "fpdx"); */	    /* "" FP data ptr upd on exc */
+/*	  ftcprint (features1,  6, "fdp_excptn_only"); *//* FP data ptr upd on exc */
 	  ftcprint (features1,  7, "smep");         /* super mode exec prot */
 	  ftcprint (features1,  8, "bmi2");         /* bit manip ext group 2 */
 	  ftcprint (features1,  9, "erms");         /* enh rep movsb/stosb */
 	  ftcprint (features1, 10, "invpcid");      /* inv proc context id */
 	  ftcprint (features1, 11, "rtm");          /* restricted txnal mem */
 	  ftcprint (features1, 12, "cqm");          /* cache QoS monitoring */
-/*	  ftcprint (features1, 13, "fpcsdsz"); */   /* "" zero FP cs/ds */
+/*	  ftcprint (features1, 13, "zero_fcs_fds");*//* zero FP CS/DS */
 	  ftcprint (features1, 14, "mpx");          /* mem prot ext */
 	  ftcprint (features1, 15, "rdt_a");        /* rsrc dir tech alloc */
 	  ftcprint (features1, 16, "avx512f");      /* vec foundation */
@@ -1541,11 +1541,11 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  ftcprint (features1,  4, "rdpru");	    /* user level rd proc reg */
 /*	  ftcprint (features1,  6, "mba"); */	    /* memory BW alloc */
 	  ftcprint (features1,  9, "wbnoinvd");     /* wbnoinvd instruction */
-/*	  ftcprint (features1, 12, "ibpb" ); */	    /* ind br pred barrier */
-/*	  ftcprint (features1, 14, "ibrs" ); */	    /* ind br restricted spec */
-/*	  ftcprint (features1, 15, "stibp"); */	    /* 1 thread ind br pred */
-/*	  ftcprint (features1, 16, "ibrs_enhanced"); */  /* ibrs_enhanced IBRS always on */
-/*	  ftcprint (features1, 17, "stibp_always_on"); */ /* stibp always on */
+/*	  ftcprint (features1, 12, "amd_ibpb" ); */ /* ind br pred barrier */
+/*	  ftcprint (features1, 14, "amd_ibrs" ); */ /* ind br restricted spec */
+/*	  ftcprint (features1, 15, "amd_stibp"); */ /* 1 thread ind br pred */
+/*	  ftcprint (features1, 16, "ibrs_enhanced");*//* ibrs_enhanced IBRS always on */
+/*	  ftcprint (features1, 17, "amd_stibp_always_on");*//* stibp always on */
 /*	  ftcprint (features1, 18, "ibrs_pref"); */ /* ibrs_pref IBRS preferred */
 	  ftcprint (features1, 23, "amd_ppin");     /* protected proc id no */
 /*	  ftcprint (features1, 24, "ssbd"); */	    /* spec store byp dis */
@@ -1572,6 +1572,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  ftcprint (features1,  9, "hwp_act_window"); /* HWP activity window */
 	  ftcprint (features1, 10, "hwp_epp");  /* HWP energy perf pref */
 	  ftcprint (features1, 11, "hwp_pkg_req"); /* HWP package level req */
+/*	  ftcprint (features1, 15, "hwp_highest_perf_change");*//* HWP highest perf change */
 	  ftcprint (features1, 19, "hfi");	/* Hardware Feedback Interface */
 	}
 
