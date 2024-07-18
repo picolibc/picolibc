@@ -1752,15 +1752,16 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  ftcprint (features1, 12, "acc_power");    /* core power reporting */
 /*	  ftcprint (features1, 13, "connstby"); */  /* connected standby */
 /*	  ftcprint (features1, 14, "rapl"); */	    /* running average power limit */
+
+	  print ("\n");
 	}
+
+      print ("\n");
 
       if (orig_affinity_mask != 0)
 	SetThreadGroupAffinity (GetCurrentThread (), &orig_group_affinity,
 				NULL);
-      print ("\n");
     }
-
-  print ("\n");
 
   destbuf = (char *) crealloc_abort (destbuf, bufptr - buf);
   memcpy (destbuf, buf, bufptr - buf);
