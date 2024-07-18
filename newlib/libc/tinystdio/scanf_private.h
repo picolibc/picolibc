@@ -97,6 +97,7 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap) __attribute__((weak));
 # define _NEED_IO_FLOAT
 #elif SCANF_LEVEL == SCANF_DBL
 # define _NEED_IO_BRACKET
+# define _NEED_IO_WCHAR
 # if __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
 #  define _NEED_IO_LONG_LONG
 # endif
@@ -111,6 +112,10 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap) __attribute__((weak));
 # endif
 #else
 # error	 "Not a known scanf level."
+#endif
+
+#if defined(WIDE_CHARS) && !defined(_NEED_IO_WCHAR)
+#define _NEED_IO_WCHAR
 #endif
 
 typedef unsigned int width_t;

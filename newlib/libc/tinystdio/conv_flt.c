@@ -61,6 +61,7 @@ static const char pstr_an[] = "an";
 # endif
 
 #define FLT_STREAM const char
+#define FLT_CONTEXT int
 
 static inline int scanf_getc(const char *s, int *lenp)
 {
@@ -70,11 +71,11 @@ static inline int scanf_getc(const char *s, int *lenp)
     return c;
 }
 
-static inline void scanf_ungetc(int c, const char *s, int *lenp)
+static inline void scanf_ungetc(int c, FLT_STREAM *s, int *lenp)
 {
     (void) c;
     (void) s;
-    *lenp = *lenp - 1;
+    --(*lenp);
 }
 
 #undef EOF
@@ -103,6 +104,10 @@ static inline void scanf_ungetc(int c, const char *s, int *lenp)
 #  define CHECK_LONG()          0
 #  define CHECK_LONG_LONG()     0
 # endif
+
+#define FLT_STREAM      FILE
+#define FLT_CONTEXT     scanf_context_t
+
 #endif
 
 #include "scanf_private.h"
@@ -193,7 +198,7 @@ static inline void scanf_ungetc(int c, const char *s, int *lenp)
 #endif
 
 static unsigned char
-conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t flags)
+conv_flt (FLT_STREAM *stream, FLT_CONTEXT *context, width_t width, void *addr, uint16_t flags)
 {
     UINTFLOAT uint;
     unsigned int overflow = 0;
@@ -203,14 +208,14 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
     const char *p;
     int exp;
 
-    i = scanf_getc (stream, lenp);		/* after scanf_ungetc()	*/
+    i = scanf_getc (stream, context);		/* after scanf_ungetc()	*/
 
     switch ((unsigned char)i) {
     case '-':
         flags |= FL_MINUS;
 	__PICOLIBC_FALLTHROUGH;
     case '+':
-	if (!CHECK_WIDTH() || (i = scanf_getc (stream, lenp)) < 0)
+	if (!CHECK_WIDTH() || (i = scanf_getc (stream, context)) < 0)
 	    return 0;
     }
 
@@ -229,10 +234,10 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 
 	    while ((c = *p++) != 0) {
 		if (CHECK_WIDTH()) {
-                    if ((i = scanf_getc (stream, lenp)) >= 0) {
+                    if ((i = scanf_getc (stream, context)) >= 0) {
                         if (TOLOWER(i) == c)
                             continue;
-                        scanf_ungetc (i, stream, lenp);
+                        scanf_ungetc (i, stream, context);
                     }
 		    if (p == pstr_nfinity + 3)
 			break;
@@ -329,7 +334,7 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 	    } else {
 		break;
 	    }
-	} while (CHECK_WIDTH() && (i = scanf_getc (stream, lenp)) >= 0);
+	} while (CHECK_WIDTH() && (i = scanf_getc (stream, context)) >= 0);
 
 	if (!(flags & FL_ANY))
 	    return 0;
@@ -351,7 +356,7 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 	    if (!CHECK_WIDTH())
                 goto no_exp;
 
-            esign = scanf_getc (stream, lenp);
+            esign = scanf_getc (stream, context);
 
 	    switch ((unsigned char)esign) {
             case '-':
@@ -359,10 +364,10 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 		__PICOLIBC_FALLTHROUGH;
             case '+':
                 if (!CHECK_WIDTH()) {
-                    scanf_ungetc(esign, stream, lenp);
+                    scanf_ungetc(esign, stream, context);
                     goto no_exp;
                 }
-		edig = scanf_getc (stream, lenp);		/* test EOF will below	*/
+		edig = scanf_getc (stream, context);		/* test EOF will below	*/
                 break;
             default:
                 edig = esign;
@@ -372,9 +377,9 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 
 	    if (!isdigit (edig))
             {
-                scanf_ungetc(edig, stream, lenp);
+                scanf_ungetc(edig, stream, context);
                 if (esign != EOF)
-                    scanf_ungetc(esign, stream, lenp);
+                    scanf_ungetc(esign, stream, context);
                 goto no_exp;
             }
 
@@ -384,7 +389,7 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 	    do {
                 if (expacc < MAX_POSSIBLE_EXP)
                     expacc = expacc * 10 + (i - '0');
-	    } while (CHECK_WIDTH() && isdigit (i = scanf_getc(stream, lenp)));
+	    } while (CHECK_WIDTH() && isdigit (i = scanf_getc(stream, context)));
 	    if (flags & FL_MEXP)
 		expacc = -expacc;
             exp += expacc;
@@ -392,7 +397,7 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 
     no_exp:
 	if (width)
-            scanf_ungetc (i, stream, lenp);
+            scanf_ungetc (i, stream, context);
 
 	if (UF_IS_ZERO(uint)) {
 	    flt = (FLOAT) 0;

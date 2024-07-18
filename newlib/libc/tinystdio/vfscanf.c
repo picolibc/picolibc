@@ -33,6 +33,7 @@
 /* $Id: vfscanf.c 2191 2010-11-05 13:45:57Z arcanum $ */
 
 #include "stdio_private.h"
+#include <wctype.h>
 #include "scanf_private.h"
 
 /*
@@ -47,41 +48,187 @@ typedef unsigned long uint_scanf_t;
 typedef long int_scanf_t;
 #endif
 
+/* Figure out which multi-byte char support we need */
+#if defined(_NEED_IO_WCHAR) && defined(_MB_CAPABLE)
+# ifdef WIDE_CHARS
+/* need to convert wide chars to multi-byte chars */
+#  define _NEED_IO_WIDETOMB
+# else
+/* need to convert multi-byte chars to wide chars */
+#  define _NEED_IO_MBTOWIDE
+# endif
+#endif
+
 #ifdef WIDE_CHARS
-#define INT wint_t
-#define CHAR wchar_t
-#define UCHAR wchar_t
-#define GETC(s) getwc(s)
-#define UNGETC(c,s) ungetwc(c,s)
-#undef vfscanf
-#define vfscanf vfwscanf
-#define IS_EOF(c)       ((c) == WEOF)
+# define INT wint_t
+# define MY_EOF          WEOF
+# define CHAR wchar_t
+# define UCHAR wchar_t
+# define GETC(s) getwc(s)
+# define UNGETC(c,s) ungetwc(c,s)
+# define ISSPACE(c) iswspace(c)
+# undef vfscanf
+# define vfscanf vfwscanf
+# define IS_EOF(c)       ((c) == WEOF)
+# define WINT            wint_t
+# define IS_WEOF(c)      ((c) == WEOF)
+# define ISWSPACE(c)     iswspace(c)
 #else
-#define INT int
-#define CHAR char
-#define UCHAR unsigned char
-#define GETC(s) getc(s)
-#define UNGETC(c,s) ungetc(c,s)
-#define IS_EOF(c)       ((c) < 0)
+# define INT int
+# define MY_EOF          EOF
+# define IS_EOF(c)       ((c) < 0)
+# define CHAR char
+# define UCHAR unsigned char
+# define GETC(s) getc(s)
+# define UNGETC(c,s) ungetc(c,s)
+# define ISSPACE(c) isspace(c)
+# ifdef _NEED_IO_MBTOWIDE
+#  define WINT            wint_t
+#  define MY_WEOF         WEOF
+#  define IS_WEOF(c)      ((c) == WEOF)
+#  define ISWSPACE(c)     iswspace(c)
+# else
+#  define WINT            int
+#  define IS_WEOF(c)      IS_EOF(c)
+#  define MY_WEOF         MY_EOF
+#  define ISWSPACE(c)     ISSPACE(c)
+# endif
+#endif
+
+#ifdef WIDE_CHARS
+typedef struct {
+    int         len;
+    INT         unget;
+} scanf_context_t;
+#define SCANF_CONTEXT_INIT { .len = 0, .unget = MY_EOF }
+#define scanf_len(context) ((context)->len)
+#else
+typedef int scanf_context_t;
+#define SCANF_CONTEXT_INIT 0
+#define scanf_len(context) (*(context))
 #endif
 
 static INT
-scanf_getc(FILE *stream, int *lenp)
+scanf_getc(FILE *stream, scanf_context_t *context)
 {
-	INT c = GETC(stream);
-	if (!IS_EOF(c))
-		++(*lenp);
-	return c;
+    INT c;
+#ifdef WIDE_CHARS
+    c = context->unget;
+    context->unget = MY_EOF;
+    if (IS_EOF(c))
+#endif
+        c = GETC(stream);
+    if (!IS_EOF(c))
+        ++scanf_len(context);
+    return c;
 }
 
-static INT
-scanf_ungetc(INT c, FILE *stream, int *lenp)
+static void
+scanf_ungetc(INT c, FILE *stream, scanf_context_t *context)
 {
-	c = UNGETC(c, stream);
-	if (!IS_EOF(c))
-		--(*lenp);
-	return c;
+    if (!IS_EOF(c))
+        --scanf_len(context);
+#ifdef WIDE_CHARS
+    (void) stream;
+    context->unget = c;
+#else
+    UNGETC(c, stream);
+#endif
 }
+
+#ifdef _NEED_IO_MBTOWIDE
+static WINT
+getmb(FILE *stream, scanf_context_t *context, mbstate_t *ps, uint16_t flags)
+{
+    INT         i;
+
+    if (flags & FL_LONG) {
+        wchar_t     ch;
+        char        mb[MB_LEN_MAX];
+        size_t      n = 0;
+        size_t      s;
+        mbstate_t   save;
+
+        while (n < MB_LEN_MAX) {
+            i = scanf_getc (stream, context);
+            if (IS_EOF(i))
+                return WEOF;
+            mb[n++] = (char) i;
+            save = *ps;
+            s = mbrtowc(&ch, mb, n, ps);
+            switch (s) {
+            case (size_t) -1:
+                return WEOF;
+            case (size_t) -2:
+                *ps = save;
+                break;
+            default:
+                return (wint_t) ch;
+            }
+        }
+        return WEOF;
+    } else {
+        i = scanf_getc(stream, context);
+        if (IS_EOF(i))
+            return MY_WEOF;
+        return (WINT) i;
+    }
+}
+#else
+#define getmb(s,c,p,f) scanf_getc(s,c)
+#endif
+
+#ifdef _NEED_IO_WIDETOMB
+static void *
+_putmb(void *addr, wint_t wi, mbstate_t *ps, uint16_t flags)
+{
+    if (flags & FL_LONG) {
+        *(wchar_t *) addr = (wchar_t) wi;
+        addr = (wchar_t *) addr + 1;
+    } else {
+        size_t  s;
+        s = wcrtomb((char *) addr, (wchar_t) wi, ps);
+        if (s == (size_t) -1)
+            return NULL;
+        addr = (char *) addr + s;
+    }
+    return addr;
+}
+#define putmb(addr, wi, ps, flags, fail) do {   \
+        if (addr) {                             \
+            addr = _putmb(addr, wi, ps, flags); \
+            if (!addr) fail;                    \
+        }                                       \
+    } while(0);
+#else
+#ifdef _NEED_IO_WCHAR
+static void *
+_putmb(void *addr, wint_t wi, uint16_t flags)
+{
+    if (flags & FL_LONG) {
+        *(wchar_t *) addr = (wchar_t) wi;
+        addr = (wchar_t *) addr + 1;
+    } else {
+        *(char *) addr = (char) wi;
+        addr = (char *) addr + 1;
+    }
+    return addr;
+}
+#define putmb(addr, wi, ps, flags, fail) do {   \
+        if (addr) {                             \
+            addr = _putmb(addr, wi, flags);     \
+            if (!addr) fail;                    \
+        }                                       \
+    } while(0)
+#else
+#define putmb(addr, wi, ps, flags, fail) do {           \
+        if (addr) {                                     \
+            *(char *) addr = (char) wi;                 \
+            addr = (char *) addr + 1;                   \
+        }                                               \
+    } while(0)
+#endif
+#endif
 
 static void
 putval (void *addr, int_scanf_t val, uint16_t flags)
@@ -103,19 +250,19 @@ putval (void *addr, int_scanf_t val, uint16_t flags)
 }
 
 static unsigned char
-conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags, unsigned int base)
+conv_int (FILE *stream, scanf_context_t *context, width_t width, void *addr, uint16_t flags, unsigned int base)
 {
     uint_scanf_t val;
     INT i;
 
-    i = scanf_getc (stream, lenp);			/* after scanf_ungetc()	*/
+    i = scanf_getc (stream, context);			/* after scanf_ungetc()	*/
 
     switch (i) {
       case '-':
         flags |= FL_MINUS;
 	__PICOLIBC_FALLTHROUGH;
       case '+':
-        if (!--width || IS_EOF(i = scanf_getc(stream, lenp)))
+        if (!--width || IS_EOF(i = scanf_getc(stream, context)))
 	    goto err;
     }
 
@@ -123,19 +270,19 @@ conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags, un
 
     /* Leading '0' digit -- check for base indication */
     if (i == '0') {
-	if (!--width || IS_EOF(i = scanf_getc (stream, lenp)))
+	if (!--width || IS_EOF(i = scanf_getc (stream, context)))
 	    goto putval;
 
         flags |= FL_ANY;
 
         if (TOLOWER(i) == 'x' && (base == 0 || base == 16)) {
             base = 16;
-            if (!--width || IS_EOF(i = scanf_getc (stream, lenp)))
+            if (!--width || IS_EOF(i = scanf_getc (stream, context)))
 		goto putval;
 #ifdef _NEED_IO_PERCENT_B
         } else if (i == 'b' && base <= 2) {
             base = 2;
-            if (!--width || IS_EOF(i = scanf_getc (stream, lenp)))
+            if (!--width || IS_EOF(i = scanf_getc (stream, context)))
 		goto putval;
 #endif
 	} else if (base == 0 || base == 8) {
@@ -147,13 +294,13 @@ conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags, un
     do {
 	unsigned int c = digit_to_val(i);
         if (c >= base) {
-            scanf_ungetc (i, stream, lenp);
+            scanf_ungetc (i, stream, context);
             break;
 	}
         flags |= FL_ANY;
         val = val * base + c;
 	if (!--width) goto putval;
-    } while (!IS_EOF(i = scanf_getc(stream, lenp)));
+    } while (!IS_EOF(i = scanf_getc(stream, context)));
     if (!(flags & FL_ANY))
         goto err;
 
@@ -168,97 +315,99 @@ conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags, un
 
 #ifdef _NEED_IO_BRACKET
 static const CHAR *
-conv_brk (FILE *stream, int *lenp, width_t width, CHAR *addr, const CHAR *fmt)
+conv_brk (FILE *stream, scanf_context_t *context, width_t width, void *addr, const CHAR *_fmt, uint16_t flags)
 {
-    unsigned char msk[32];
-    unsigned char fnegate;
-    unsigned char frange;
-    unsigned char cabove;
-    INT i;
+#if defined(_NEED_IO_MBTOWIDE) || defined(_NEED_IO_WIDETOMB)
+    mbstate_t ps = {0};
+#endif
+    const CHAR  *fmt;
+    UCHAR       f;
+    bool        fnegate = false;
+    bool        fany = false;
 
-    memset (msk, 0, sizeof(msk));
-    fnegate = 0;
-    frange = 0;
-    cabove = 0;			/* init to avoid compiler warning	*/
-
-    for (i = 0; ; i++) {
-	unsigned char c = *fmt++;
-
-	if (c == 0) {
-	    return 0;
-	} else if (c == '^' && !i) {
-	    fnegate = 1;
-	    continue;
-	} else if (i > fnegate) {
-	    if (c == ']') break;
-	    if (c == '-' && !frange) {
-		frange = 1;
-		continue;
-	    }
-	}
-
-	if (!frange) cabove = c;
-
-	for (;;) {
-	    msk[c >> 3] |= 1 << (c & 7);
-	    if (c == cabove) break;
-	    if (c < cabove)
-		c++;
-	    else
-		c--;
-	}
-
-	frange = 0;
+    (void) flags;
+    if (*_fmt == '^') {
+        fnegate = true;
+        _fmt++;
     }
-    if (frange)
-	msk['-'/8] |= 1 << ('-' & 7);
-
-    if (fnegate) {
-	unsigned char *p = msk;
-	do {
-	    unsigned char c = *p;
-	    *p++ = ~c;
-	} while (p != msk + sizeof(msk));
-    }
-
-    /* And now it is a flag of fault.	*/
-    fnegate = 1;
-
-    /* NUL ('\0') is consided as normal character. This is match to Glibc.
-       Note, there is no method to include NUL into symbol list.	*/
     do {
-	i = scanf_getc (stream, lenp);
-	if (IS_EOF(i)) break;
-	if (!((msk[(unsigned char)i >> 3] >> (i & 7)) & 1)) {
-	    scanf_ungetc (i, stream, lenp);
-	    break;
-	}
-	if (addr) *addr++ = i;
-	fnegate = 0;
-    } while (--width);
+        WINT    wi = getmb (stream, context, &ps, flags);
+        UCHAR   cbelow;
+        UCHAR   cabove = 0;
+        bool    fmatch = false;
+        bool    frange = false;
 
-    if (fnegate) {
-	return 0;
-    } else {
-	if (addr) *addr = 0;
-        return fmt;
-    }
+        /*
+         * This is comically inefficient when matching a long string
+         * as we re-scan the format string for every input
+         * character. However, converting the specified scanset to a
+         * more efficient data structure would require an allocation.
+         */
+        fmt = _fmt;
+        for (;;) {
+            /*
+             * POSIX is very clear that the format string contains
+             * bytes, not multi-byte characters. Hence all that we can
+             * match are wide characters which happen to fall in a range
+             * which can be specified by byte values.
+             *
+             * glibc appears to parse the format string as multi-byte
+             * characters, which makes sense, but appears to violate the
+             * spec.
+             */
+            f = *fmt++;
+            if (!f)
+                return NULL;
+            if (fmt != _fmt + 1) {
+                if (f == ']')
+                    break;
+                if (f == '-' && !frange) {
+                    frange = true;
+                    continue;
+                }
+            }
+            cbelow = f;
+            if (frange) {
+                cbelow = cabove;
+                frange = false;
+            }
+            cabove = f;
+            if ((WINT) cbelow <= wi && wi <= (WINT) cabove)
+                fmatch = true;
+        }
+
+        if (IS_WEOF(wi))
+            break;
+
+        if (fmatch == fnegate) {
+	    scanf_ungetc (wi, stream, context);
+            break;
+        }
+
+        fany = true;
+        putmb(addr, wi, &ps, flags, return NULL);
+        width--;
+    } while (width);
+
+    if (!fany)
+        return NULL;
+    putmb(addr, 0, &ps, flags, return NULL);
+    return fmt;
 }
 #endif	/* _NEED_IO_BRACKET */
 
 #if defined(_NEED_IO_FLOAT) || defined(_NEED_IO_DOUBLE)
-#define FLT_STREAM      FILE
 #include "conv_flt.c"
 #endif
 
-static INT skip_spaces (FILE *stream, int *lenp)
+static INT skip_spaces (FILE *stream, scanf_context_t *context)
 {
     INT i;
     do {
-	if (IS_EOF(i = scanf_getc (stream, lenp)))
+	if (IS_EOF(i = scanf_getc (stream, context)))
 	    return i;
-    } while (isspace (i));
-    scanf_ungetc (i, stream, lenp);
+    } while (ISSPACE (i));
+    scanf_ungetc (i, stream, context);
     return i;
 }
 
@@ -433,8 +582,7 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #endif
     uint16_t flags;
     INT i;
-    int scanf_len = 0;
-#define lenp (&scanf_len)
+    scanf_context_t context = SCANF_CONTEXT_INIT;
 
     nconvs = 0;
 
@@ -443,17 +591,17 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
        to the begin.	*/
     while ((c = *fmt++) != 0) {
 
-	if (isspace (c)) {
-	    skip_spaces (stream, lenp);
+	if (ISSPACE (c)) {
+	    skip_spaces (stream, &context);
 
 	} else if (c != '%'
 		   || (c = *fmt++) == '%')
 	{
 	    /* Ordinary character.	*/
-	    if (IS_EOF(i = scanf_getc (stream, lenp)))
+	    if (IS_EOF(i = scanf_getc (stream, &context)))
 		goto eof;
 	    if ((UCHAR)i != c) {
-		scanf_ungetc (i, stream, lenp);
+		scanf_ungetc (i, stream, &context);
 		break;
 	    }
 
@@ -564,33 +712,26 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 	    addr = (flags & FL_STAR) ? 0 : va_arg (ap, void *);
 
 	    if (c == 'n') {
-		putval (addr, (unsigned)(scanf_len), flags);
+		putval (addr, (unsigned)scanf_len(&context), flags);
 		continue;
 	    }
 
 	    if (c == 'c') {
 		if (!(flags & FL_WIDTH)) width = 1;
-		do {
-		    if (IS_EOF(i = scanf_getc (stream, lenp)))
-			goto eof;
-		    if (addr) {
-#ifdef WIDE_CHARS
-                            if (flags & FL_LONG) {
-                                *(wchar_t *)addr = i;
-                                addr = (wchar_t *)addr + 1;
-                            } else
+#if defined(_NEED_IO_MBTOWIDE) || defined(_NEED_IO_WIDETOMB)
+                mbstate_t ps = {0};
 #endif
-                            {
-                                *(char *)addr = i;
-                                addr = (char*)addr + 1;
-                            }
-                    }
+		do {
+                    WINT        wi = getmb (stream, &context, &ps, flags);
+                    if(IS_WEOF(wi))
+                        goto eof;
+                    putmb(addr, wi, &ps, flags, goto eof);
 		} while (--width);
 		c = 1;			/* no matter with smart GCC	*/
 
 #ifdef _NEED_IO_BRACKET
 	    } else if (c == '[') {
-		fmt = conv_brk (stream, lenp, width, addr, fmt);
+		fmt = conv_brk (stream, &context, width, addr, fmt, flags);
 		c = (fmt != 0);
 #endif
 
@@ -598,43 +739,30 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 
                 unsigned int base = 0;
 
-		if (IS_EOF(skip_spaces (stream, lenp)))
+		if (IS_EOF(skip_spaces (stream, &context)))
 		    goto eof;
 
 		switch (c) {
 
-		  case 's':
+                case 's': {
+#if defined(_NEED_IO_MBTOWIDE) || defined(_NEED_IO_WIDETOMB)
+                    mbstate_t ps = {0};
+#endif
 		    /* Now we have 1 nospace symbol.	*/
 		    do {
-			if (IS_EOF(i = scanf_getc (stream, lenp)))
+                        WINT wi = getmb(stream, &context, &ps, flags);
+			if (IS_WEOF(wi))
 			    break;
-			if (isspace (i)) {
-			    scanf_ungetc (i, stream, lenp);
+			if (ISWSPACE (wi)) {
+			    scanf_ungetc (wi, stream, &context);
 			    break;
 			}
-			if (addr) {
-#ifdef WIDE_CHARS
-                            if (flags & FL_LONG) {
-                                *(wchar_t *)addr = i;
-                                addr = (wchar_t *)addr + 1;
-                            } else
-#endif
-                            {
-                                *(char *)addr = i;
-                                addr = (char*)addr + 1;
-                            }
-			}
+                        putmb(addr, wi, &ps, flags, goto eof);
 		    } while (--width);
-                    if (addr){
-#ifdef WIDE_CHARS
-                        if (flags & FL_LONG)
-                            *(wchar_t *)addr = 0;
-                        else
-#endif
-                            *(char *)addr = 0;
-                    }
+                    putmb(addr, 0, &ps, flags, goto eof);
 		    c = 1;		/* no matter with smart GCC	*/
 		    break;
+                }
 
 #if defined(_NEED_IO_FLOAT) || defined(_NEED_IO_DOUBLE)
 	          case 'p':
@@ -662,11 +790,11 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 		    __PICOLIBC_FALLTHROUGH;
 		  case 'i':
 		  conv_int:
-                    c = conv_int (stream, lenp, width, addr, flags, base);
+                    c = conv_int (stream, &context, width, addr, flags, base);
 		    break;
 
 	          default:		/* a,A,e,E,f,F,g,G */
-		      c = conv_flt (stream, lenp, width, addr, flags);
+		      c = conv_flt (stream, &context, width, addr, flags);
 #else
 	          case 'd':
 		  case 'u':
@@ -692,7 +820,7 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 		  default:			/* p,x,X	*/
                     base = 16;
 		  conv_int:
-		    c = conv_int (stream, lenp, width, addr, flags, base);
+		    c = conv_int (stream, &context, width, addr, flags, base);
 #endif
 		}
 	    } /* else */
@@ -708,13 +836,20 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #ifdef _NEED_IO_POS_ARGS
     va_end(ap);
 #endif
+#ifdef WIDE_CHARS
+    if (!IS_EOF(context.unget))
+        UNGETC(context.unget, stream);
+#endif
     return nconvs;
 
   eof:
 #ifdef _NEED_IO_POS_ARGS
     va_end(ap);
 #endif
-#undef ap
+#ifdef WIDE_CHARS
+    if (!IS_EOF(context.unget))
+        UNGETC(context.unget, stream);
+#endif
     return nconvs ? nconvs : EOF;
 }
 
