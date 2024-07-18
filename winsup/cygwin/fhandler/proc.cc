@@ -1593,6 +1593,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  ftcprint (features1, 13, "avic");             /* virt int control */
 	  ftcprint (features1, 15, "v_vmsave_vmload");  /* virt vmsave vmload */
 	  ftcprint (features1, 16, "vgif");             /* virt glb int flag */
+	  ftcprint (features1, 18, "x2avic");           /* virt x2apic */
 	  ftcprint (features1, 20, "v_spec_ctrl");	/* virt spec ctrl support */
 	  ftcprint (features1, 25, "vnmi");             /* virt NMI */
 /*	  ftcprint (features1, 28, "svme_addr_chk");  *//* secure vmexit addr check */
@@ -1685,6 +1686,13 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  ftcprint (features2, 14, "debug_swap");   /* SEV-ES full debug state swap */
 /*	  ftcprint (features2, 15, "no_host_ibs");    *//* host IBS unsupported */
 /*	  ftcprint (features2, 16, "vte");    *//* virtual transparent encryption */
+	}
+
+      /* cpuid 0x80000022 eax */
+      if (is_amd && maxe >= 0x80000022)
+	{
+	  cpuid (&features1, &unused, &unused, &unused, 0x80000022);
+	  ftcprint (features1,  2, "amd_lbr_pmc_freeze ");/* AMD LBR & PMC Freeze */
 	}
 
       print ("\n");
