@@ -7,7 +7,7 @@ set -e
 
 #test=echo
 
-options="-Dwant-math-errno=true -Dio-long-double=true -Dwerror=true"
+options="-Dwant-math-errno=true -Dio-long-double=true -Dwerror=true -Dnewlib-mb=true"
 minoptions="$options"
 reloptions="$options --buildtype=release -Dbuild-type-subdir=release -Dwerror=true"
 
