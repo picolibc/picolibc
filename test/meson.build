@@ -41,6 +41,7 @@ plain_tests_common = ['regex', 'ungetc',
 	              'test-memset', 'test-put',
 	              'test-raise',
                       'test-sprintf-percent-n',
+                      'test-ctype',
 	      ]
 
 math_tests_common = [
