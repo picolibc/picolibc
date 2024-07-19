@@ -355,8 +355,6 @@ if(NOT DEFINED _MB_CAPABLE)
   option(_MB_CAPABLE "Enable multi-byte support" 0)
 endif()
 
-set(_MB_LEN_MAX 1 1)
-
 set(_NANO_FORMATTED_IO 0)
 
 option(_NANO_MALLOC "Use smaller malloc implementation" 1)

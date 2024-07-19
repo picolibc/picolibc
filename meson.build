@@ -1301,7 +1301,6 @@ if not tinystdio
 endif
 conf_data.set('_WANT_REENT_SMALL', get_option('newlib-reent-small'))
 conf_data.set('_MB_CAPABLE', newlib_mb)
-conf_data.set('_MB_LEN_MAX', newlib_mb ? '8' : '1')
 conf_data.set('__SINGLE_THREAD__', get_option('newlib-multithread') == false)
 conf_data.set('_ICONV_ENABLE_EXTERNAL_CCS', newlib_iconv_external_ccs)
 conf_data.set('_ELIX_LEVEL', newlib_elix_level)
