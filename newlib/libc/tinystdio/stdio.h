@@ -474,7 +474,9 @@ __printf_float(float f)
 # define _HAS_IO_POS_ARGS
 # define _HAS_IO_C99_FORMATS
 # define _HAS_IO_DOUBLE
-# define _HAS_IO_WCHAR
+# if defined(_MB_CAPABLE) || defined(_WANT_IO_WCHAR)
+#  define _HAS_IO_WCHAR
+# endif
 # ifdef _MB_CAPABLE
 #  define _HAS_IO_MBCHAR
 # endif

@@ -150,8 +150,6 @@ option('io-long-double', type: 'boolean', value: false,
        description: 'enable long double type support in IO functions printf/scanf')
 option('newlib-io-long-double', type: 'boolean', value: false,
        description: 'enable long double type support in IO functions printf/scanf')
-option('fast-bufio', type: 'boolean', value: false,
-       description: 'enable some faster buffered i/o operations')
 
 #
 # Options applying only to tinystdio
@@ -176,6 +174,10 @@ option('printf-percent-n', type: 'boolean', value: false,
        description: 'Support %n in printf format strings (default: false)')
 option('minimal-io-long-long', type: 'boolean', value: false,
        description: 'enable long long type support in minimal printf/scanf')
+option('fast-bufio', type: 'boolean', value: false,
+       description: 'enable some faster buffered i/o operations')
+option('io-wchar', type: 'boolean', value: false,
+       description: 'enable wide character support in printf/scanf even when newlib-mb is false')
 
 #
 # Options applying to only legacy stdio

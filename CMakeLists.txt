@@ -37,6 +37,15 @@ cmake_minimum_required(VERSION 3.20.0)
 
 project(Picolibc VERSION 1.8.6 LANGUAGES C ASM)
 
+# Set a default build type if none was specified
+set(default_build_type "MinSizeRel")
+
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
+  set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE
+      STRING "Choose the type of build." FORCE)
+endif()
+
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
   message(STATUS "Using ccache: ${CCACHE_PROGRAM}")
@@ -102,11 +111,11 @@ option(POSIX_CONSOLE "Use POSIX I/O for stdin/stdout/stderr" OFF)
 
 if(NOT DEFINED PREFER_SIZE_OVER_SPEED)
   if(CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")
-    set(default_prefer_size 1)
+    set(default_prefer_size ON)
   else()
-    set(default_prefer_size 0)
+    set(default_prefer_size OFF)
   endif()
-  option(PREFER_SIZE_OVER_SPEED ${default_prefer_size})
+  option(PREFER_SIZE_OVER_SPEED "Prefer smaller code size" ${default_prefer_size})
 endif()
 
 # Obsoleted. Reentrant syscalls provided for us
@@ -340,7 +349,7 @@ set(_ICONV_TO_ENCODING_WIN_1258 1)
 set(_IEEE_LIBM 1)
 
 if(NOT DEFINED _IO_FLOAT_EXACT)
-  option(_IO_FLOAT_EXACT "Provide exact binary/decimal conversion for printf/scanf" 1)
+  option(_IO_FLOAT_EXACT "Provide exact binary/decimal conversion for printf/scanf" ON)
 endif()
 
 set(_LITE_EXIT 1)
@@ -348,20 +357,24 @@ set(_LITE_EXIT 1)
 set(_PICO_EXIT 1)
 
 if(NOT DEFINED _ASSERT_VERBOSE)
-  option(_ASSERT_VERBOSE "Assert provides verbose information" 1)
+  option(_ASSERT_VERBOSE "Assert provides verbose information" ON)
+endif()
+
+if(NOT DEFINED _PICOLIBC_ATOMIC_SIGNAL)
+  option(_PICOLIBC_ATOMIC_SIGNAL "Use atomics in signal/raise" ON)
 endif()
 
 if(NOT DEFINED _MB_CAPABLE)
-  option(_MB_CAPABLE "Enable multi-byte support" 0)
+  option(_MB_CAPABLE "Enable multi-byte support" OFF)
 endif()
 
-set(_NANO_FORMATTED_IO 0)
+set(_NANO_FORMATTED_IO OFF)
 
-option(_NANO_MALLOC "Use smaller malloc implementation" 1)
+option(_NANO_MALLOC "Use smaller malloc implementation" ON)
 
-set(_REENT_GLOBAL_ATEXIT 0)
+set(_REENT_GLOBAL_ATEXIT OFF)
 
-set(_UNBUF_STREAM_OPT 0)
+set(_UNBUF_STREAM_OPT OFF)
 
 if(NOT DEFINED _WANT_IO_C99_FORMATS)
   option(_WANT_IO_C99_FORMATS "Support C99 formats in printf/scanf" ON)
@@ -383,7 +396,7 @@ if(NOT DEFINED _WANT_IO_POS_ARGS)
   option(_WANT_IO_POS_ARGS "Support positional args in integer printf/scanf" OFF)
 endif()
 
-option(__IO_FLOAT "Support floating point in printf/scanf by default" OFF)
+option(__IO_FLOAT "Support floating point in printf/scanf by default" ON)
 
 if(NOT DEFINED _PRINTF_SMALL_ULTOA)
   option(_PRINTF_SMALL_ULTOA "Avoid soft divide in printf" ON)
@@ -397,15 +410,19 @@ if(NOT DEFINED _WANT_IO_PERCENT_B)
   option(_WANT_IO_PERCENT_B "Support %b/%B formats in printf/scanf" OFF)
 endif()
 
+if(NOT DEFINED _WANT_IO_WCHAR)
+  option(_WANT_IO_WCHAR "Support %ls/%lc formats in printf even without multi-byte" OFF)
+endif()
+
 if(NOT DEFINED _FORMAT_DEFAULT_MINIMAL)
   set(_FORMAT_DEFAULT_MINIMAL ${IO_MINIMAL})
 endif()
 
 if(_FORMAT_DEFAULT_MINIMAL)
-  set(_FORMAT_DEFAULT_DOUBLE 0)
-  set(_FORMAT_DEFAULT_FLOAT 0)
-  set(_FORMAT_DEFAULT_INTEGER 0)
-  set(_FORMAT_DEFAULT_LONG_LONG 0)
+  set(_FORMAT_DEFAULT_DOUBLE OFF)
+  set(_FORMAT_DEFAULT_FLOAT OFF)
+  set(_FORMAT_DEFAULT_INTEGER OFF)
+  set(_FORMAT_DEFAULT_LONG_LONG OFF)
 endif()
 
 if(NOT DEFINED _FORMAT_DEFAULT_DOUBLE)
@@ -413,64 +430,68 @@ if(NOT DEFINED _FORMAT_DEFAULT_DOUBLE)
 endif()
 
 if(NOT DEFINED _FORMAT_DEFAULT_FLOAT)
-  set(_FORMAT_DEFAULT_FLOAT 0)
+  set(_FORMAT_DEFAULT_FLOAT OFF)
 endif()
 
 if(NOT DEFINED _FORMAT_DEFAULT_LONG_LONG)
-  set(_FORMAT_DEFAULT_LONG_LONG 0)
+  set(_FORMAT_DEFAULT_LONG_LONG OFF)
 endif()
 
 if(NOT DEFINED _FORMAT_DEFAULT_INTEGER)
   if (__IO_FLOAT)
-    set(_FORMAT_DEFAULT_INTEGER 0)
+    set(_FORMAT_DEFAULT_INTEGER OFF)
   else()
-    set(_FORMAT_DEFAULT_INTEGER 1)
+    set(_FORMAT_DEFAULT_INTEGER ON)
   endif()
 endif()
 
 # math library sets errno
-set(_WANT_MATH_ERRNO 0)
+set(_WANT_MATH_ERRNO OFF)
 
-set(_WANT_REENT_SMALL 0)
+set(_WANT_REENT_SMALL OFF)
 
-set(_WANT_REGISTER_FINI 0)
+set(_WANT_REGISTER_FINI OFF)
 
 # Obsoleted. Define time_t to long instead of using a 64-bit type
-set(_WANT_USE_LONG_TIME_T 0)
+set(_WANT_USE_LONG_TIME_T OFF)
 
-set(_WIDE_ORIENT 0)
+set(_WIDE_ORIENT OFF)
 
 # locale support
 if(NOT DEFINED __HAVE_LOCALE_INFO__)
-  option(__HAVE_LOCALE_INFO__ "Provide locale support" 0)
+  option(__HAVE_LOCALE_INFO__ "Provide locale support" OFF)
 endif()
 
 # extended locale support
 if(NOT DEFINED __HAVE_LOCALE_INFO_EXTENDED__)
-  option(__HAVE_LOCALE_INFO_EXTENDED__ "Provide even more locale support" 0)
+  option(__HAVE_LOCALE_INFO_EXTENDED__ "Provide even more locale support" OFF)
 endif()
 
 if(__HAVE_LOCALE_INFO_EXTENDED__ AND NOT __HAVE_LOCALE_INFO__)
   message(FATAL_ERROR "Must have locale support to enable extended locale support")
 endif()
 
-# Use old math code for double funcs (0 no, 1 yes)
-set(__OBSOLETE_MATH_FLOAT 1)
+if(NOT DEFINED _ELIX_LEVEL)
+  set(_ELIX_LEVEL 4)
+endif()
 
 # Use old math code for double funcs (0 no, 1 yes)
-set(__OBSOLETE_MATH_DOUBLE 1)
+set(__OBSOLETE_MATH_FLOAT ON)
+
+# Use old math code for double funcs (0 no, 1 yes)
+set(__OBSOLETE_MATH_DOUBLE ON)
 
 # Compute static memory area sizes at runtime instead of link time
-set(__PICOLIBC_CRT_RUNTIME_SIZE 0)
+set(__PICOLIBC_CRT_RUNTIME_SIZE OFF)
 
 if(NOT DEFINED __SINGLE_THREAD__)
-  option(__SINGLE_THREAD__ "Disable multithreading support" 0)
+  option(__SINGLE_THREAD__ "Disable multithreading support" OFF)
 endif()
 
 if(__SINGLE_THREAD__)
-  set(_RETARGETABLE_LOCKING 0)
+  set(_RETARGETABLE_LOCKING OFF)
 else()
-  set(_RETARGETABLE_LOCKING 1)
+  set(_RETARGETABLE_LOCKING ON)
 endif()
 
 set(NEWLIB_VERSION 4.3.0)

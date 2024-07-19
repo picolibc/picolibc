@@ -120,7 +120,9 @@
 # if __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
 #  define _NEED_IO_LONG_LONG
 # endif
-# define _NEED_IO_WCHAR
+# if defined(_HAS_IO_WCHAR) || defined(WIDE_CHARS)
+#  define _NEED_IO_WCHAR
+# endif
 # define _NEED_IO_POS_ARGS
 # define _NEED_IO_C99_FORMATS
 # ifdef _WANT_IO_PERCENT_B

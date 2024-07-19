@@ -43,6 +43,8 @@
 
 #cmakedefine _ATEXIT_DYNAMIC_ALLOC
 
+#cmakedefine _PICOLIBC_ATOMIC_SIGNAL
+
 #cmakedefine _FSEEK_OPTIMIZATION
 
 #cmakedefine _FVWRITE_IN_STREAMIO
@@ -153,8 +155,6 @@
 
 #cmakedefine _ICONV_ENABLE_EXTERNAL_CCS
 
-#cmakedefine _ICONV_FROM_ENCODING_
-
 #cmakedefine _ICONV_FROM_ENCODING_BIG5
 
 #cmakedefine _ICONV_FROM_ENCODING_CP775
@@ -254,8 +254,6 @@
 #cmakedefine _ICONV_FROM_ENCODING_WIN_1257
 
 #cmakedefine _ICONV_FROM_ENCODING_WIN_1258
-
-#cmakedefine _ICONV_TO_ENCODING_
 
 #cmakedefine _ICONV_TO_ENCODING_BIG5
 
@@ -366,6 +364,10 @@
 
 #cmakedefine _PRINTF_PERCENT_N
 
+#cmakedefine _WANT_IO_PERCENT_B
+
+#cmakedefine _WANT_IO_WCHAR
+
 #cmakedefine _LITE_EXIT
 
 #cmakedefine _MB_CAPABLE
@@ -434,6 +436,9 @@
 
 /* locale support */
 #cmakedefine __HAVE_LOCALE_INFO__
+
+/* elix level */
+#cmakedefine _ELIX_LEVEL @_ELIX_LEVEL@
 
 /* The newlib minor version number. */
 #define __NEWLIB_MINOR__ @NEWLIB_MINOR@

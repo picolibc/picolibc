@@ -307,6 +307,8 @@ printf_small_ultoa = tinystdio and get_option('printf-small-ultoa')
 printf_percent_n = tinystdio and get_option('printf-percent-n')
 minimal_io_long_long = tinystdio and get_option('minimal-io-long-long')
 fast_bufio = tinystdio and get_option('fast-bufio')
+io_wchar = tinystdio and get_option('io-wchar')
+
 
 if printf_aliases
   double_printf_compile_args=['-DPICOLIBC_DOUBLE_PRINTF_SCANF']
@@ -1258,9 +1260,9 @@ int main(void) { return foo(@0@); }
   conf_data.set('_HAVE_' + builtin[0].to_upper(), have_current_builtin, description: 'The compiler supports __' + builtin[0])
 endforeach
 
-NEWLIB_VERSION='4.1.0'
+NEWLIB_VERSION='4.3.0'
 NEWLIB_MAJOR_VERSION=4
-NEWLIB_MINOR_VERSION=1
+NEWLIB_MINOR_VERSION=3
 NEWLIB_PATCHLEVEL_VERSION=0
 
 if get_option('newlib-retargetable-locking') != get_option('newlib-multithread')
@@ -1291,6 +1293,7 @@ conf_data.set('_WANT_IO_C99_FORMATS', io_c99_formats)
 conf_data.set('_IO_FLOAT_EXACT', io_float_exact)
 conf_data.set('_WANT_IO_PERCENT_B', io_percent_b)
 conf_data.set('_WANT_IO_LONG_DOUBLE', io_long_double)
+conf_data.set('_WANT_IO_WCHAR', io_wchar)
 conf_data.set('_ASSERT_VERBOSE', get_option('assert-verbose'))
 
 if not tinystdio
