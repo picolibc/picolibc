@@ -38,8 +38,13 @@ No supporting OS subroutines are required.
 
 #include <ctype.h>
 
+#undef isblank
 int
 isblank (int c)
 {
+#if _PICOLIBC_CTYPE_SMALL
     return c == ' ' || c == '\t';
+#else
+    return(__CTYPE_PTR[c+1] & _B) || c == '\t';
+#endif
 }

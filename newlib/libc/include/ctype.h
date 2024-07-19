@@ -83,11 +83,6 @@ int toupper (int c);
 
 #if __ISO_C_VISIBLE >= 1999
 int isblank (int c);
-#ifdef __declare_extern_inline
-__declare_extern_inline(int) isblank(int c) {
-	return c == ' ' || c == '\t';
-}
-#endif
 #endif
 
 #if __MISC_VISIBLE || __XSI_VISIBLE
@@ -126,6 +121,11 @@ int toascii_l (int c, locale_t l);
 #if _PICOLIBC_CTYPE_SMALL
 
 #ifdef __declare_extern_inline
+
+__declare_extern_inline(int) isblank (int c)
+{
+    return c == ' ' || c == '\t';
+}
 
 __declare_extern_inline(int) iscntrl (int c)
 {
@@ -264,6 +264,14 @@ static __inline char __ctype_lookup(int c) { return (__CTYPE_PTR + 1)[c]; }
 #define isprint(__c)	(__ctype_lookup(__c)&(_P|_U|_L|_N|_B))
 #define	isgraph(__c)	(__ctype_lookup(__c)&(_P|_U|_L|_N))
 #define iscntrl(__c)	(__ctype_lookup(__c)&_C)
+
+#if __ISO_C_VISIBLE >= 1999
+#if defined(__GNUC__)
+#define isblank(__c)                                            \
+    __extension__ ({ __typeof__ (__c) __x = (__c);		\
+            (__ctype_lookup(__x)&_B) || (int) (__x) == '\t';})
+#endif
+#endif
 
 #if __POSIX_VISIBLE >= 200809
 #ifdef __HAVE_LOCALE_INFO__
