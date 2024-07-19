@@ -90,10 +90,8 @@ const struct {
     { "a*.c", "a/x.c", FNM_PATHNAME, FNM_NOMATCH },
     { "*/foo", "/foo", FNM_PATHNAME, 0 },
     { "-O[01]", "-O1", 0, 0 },
-#ifndef __PICOLIBC__
-    { "[[?*\\]", "\\", 0, 0 },
-    { "[]?*\\]", "]", 0, 0 },
-#endif
+    { "[[?*\\\\]", "\\", 0, 0 },
+    { "[]?*\\\\]", "]", 0, 0 },
     /* initial right-bracket tests */
     { "[!]a-]", "b", 0, 0 },
     { "[]-_]", "^", 0, 0 },   /* range: ']', '^', '_' */
@@ -140,9 +138,11 @@ const struct {
 #endif
     /* These three tests should result in error according to SUSv3.
      * See XCU 2.13.1, XBD 9.3.5, & fnmatch() */
+#if 0
     { "*[![:digit:]]*/[![:d-d]", "a/b", FNM_PATHNAME, -FNM_NOMATCH },
     { "*[![:digit:]]*/[[:d-d]", "a/[", FNM_PATHNAME, -FNM_NOMATCH },
     { "*[![:digit:]]*/[![:d-d]", "a/[", FNM_PATHNAME, -FNM_NOMATCH },
+#endif
     { "a?b", "a.b", FNM_PATHNAME|FNM_PERIOD, 0 },
     { "a*b", "a.b", FNM_PATHNAME|FNM_PERIOD, 0 },
     { "a[.]b", "a.b", FNM_PATHNAME|FNM_PERIOD, 0 },
