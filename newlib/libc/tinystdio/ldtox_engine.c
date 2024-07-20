@@ -95,7 +95,10 @@ __ldtox_engine(long double x, struct dtoa *dtoa, int prec, unsigned char case_co
     _u128 fi, s;
     int exp;
 
+    dtoa->flags = 0;
     fi = asuintld(x);
+    if (_u128_and_64(_u128_rshift(fi, LSIGN_SHIFT), 1))
+        dtoa->flags = DTOA_MINUS;
 
     exp = _u128_and_64(_u128_rshift(fi, LEXP_SHIFT), LEXP_MASK);
     s = fi = _u128_lshift(_u128_and(fi, LSIG_MASK), LSIG_SHIFT);
@@ -110,9 +113,6 @@ __ldtox_engine(long double x, struct dtoa *dtoa, int prec, unsigned char case_co
         }
         exp -= LEXP_BIAS;
     }
-    dtoa->flags = 0;
-    if (_u128_and_64(_u128_rshift(fi, LSIGN_SHIFT), 1))
-        dtoa->flags = DTOA_MINUS;
 
     if (prec < 0)
         prec = 0;
