@@ -26,6 +26,7 @@
 #include <limits.h>
 #include <locale.h>
 #include <wchar.h>
+#include <math.h>
 
 #define TEST(r, f, x, m) ( \
 ((r) = (f)) == (x) || \
@@ -41,6 +42,10 @@
 
 #define TEST_F(x) ( \
 TEST(i, sscanf(# x, "%lf", &d), 1, "got %d fields, expected %d"), \
+TEST(t, d, (double)x, "%a != %a") )
+
+#define TEST_FV(x,v) (\
+TEST(i, sscanf(v, "%lf", &d), 1, "got %d fields, expected %d"), \
 TEST(t, d, (double)x, "%a != %a") )
 
 #pragma GCC diagnostic ignored "-Wpragmas"
@@ -267,6 +272,22 @@ static int test_sscanf(void)
 	TEST_F(0.1e-10);
 	TEST_F(0x1234p56);
         TEST_F(3752432815e-39);
+        TEST(i, sscanf("nan", "%lg", &d), 1, "got %d fields, expected %d");
+        TEST(i, isnan(d), 1, "isnan %d expected %d");
+        TEST(i, !!signbit(d), 0, "signbit %d expected %d");
+        TEST(i, sscanf("-nan", "%lg", &d), 1, "got %d fields, expected %d");
+        TEST(i, isnan(d), 1, "isnan %d expected %d");
+        TEST(i, !!signbit(d), 1, "signbit %d expected %d");
+        TEST_FV(INFINITY, "inf");
+        TEST_FV(-INFINITY, "-inf");
+
+        d = 1.0;
+        TEST(i, sscanf("-inf", "%3lg", &d), 0, "got %d fields, expected %d");
+        TEST(i, d, 1.0, "%g expected %g");
+
+        TEST(i, sscanf("-inf", "%4lg", &d), 1, "got %d fields, expected %d");
+        TEST(i, isinf(d), 1, "isinf %d expected %d");
+        TEST(i, !!signbit(d), 1, "signbit %d expected %d");
 
 #ifndef __PICOLIBC__
         /* both tinystdio and legacy stdio fail this test */

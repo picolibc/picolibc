@@ -239,10 +239,10 @@ conv_flt (FLT_STREAM *stream, FLT_CONTEXT *context, width_t width, void *addr, u
                             continue;
                         scanf_ungetc (i, stream, context);
                     }
-		    if (p == pstr_nfinity + 3)
-			break;
-		    return 0;
-		}
+                }
+                if (p == pstr_nfinity + 3)
+                    break;
+                return 0;
 	    }
         }
 	break;
