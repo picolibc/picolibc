@@ -14,7 +14,7 @@
 #include <locale.h>
 
 #ifndef TINY_STDIO
-#define printf_float(x) x
+#define printf_float(x) ((double) (x))
 #ifdef _NANO_FORMATTED_IO
 #ifndef NO_FLOATING_POINT
 extern int _printf_float();
@@ -60,8 +60,16 @@ static int test(int serial, char *expect, char *fmt, ...) {
     va_copy(aap, ap);
 #endif
 #ifndef NO_FLOATING_POINT
+# ifdef _HAS_IO_FLOAT
+    uint32_t dv;
+# else
     double dv;
+# endif
+#ifndef NO_LONG_DOUBLE
+    long double ldv;
+#endif
     char *star;
+    char *long_double;
 #endif
     switch (fmt[strlen(fmt)-1]) {
     case 'e':
@@ -76,29 +84,63 @@ static int test(int serial, char *expect, char *fmt, ...) {
 	    return 0;
 #else
 	    star = strchr(fmt, '*');
+            long_double = strchr(fmt, 'L');
 	    if (star) {
 		    if (strchr(star+1, '*')) {
 			    int iv1 = va_arg(ap, int);
 			    int iv2 = va_arg(ap, int);
-			    dv = va_arg(ap, double);
-			    n = snprintf(buf, PRINTF_BUF_SIZE, fmt, iv1, iv2, printf_float(dv));
+#ifndef NO_LONG_DOUBLE
+                            if (long_double) {
+                                    ldv = va_arg(ap, long double);
+                                    n = snprintf(buf, PRINTF_BUF_SIZE, fmt, iv1, iv2, ldv);
 #ifdef TEST_ASPRINTF
-			    an = asprintf(&abuf, fmt, iv1, iv2, printf_float(dv));
+                                    an = asprintf(&abuf, fmt, iv1, iv2, ldv);
 #endif
+                            } else
+#endif
+                            {
+                                    dv = va_arg(ap, __typeof(dv));
+                                    n = snprintf(buf, PRINTF_BUF_SIZE, fmt, iv1, iv2, dv);
+#ifdef TEST_ASPRINTF
+                                    an = asprintf(&abuf, fmt, iv1, iv2, dv);
+#endif
+                            }
 		    } else  {
 			    int iv = va_arg(ap, int);
-			    dv = va_arg(ap, double);
-			    n = snprintf(buf, PRINTF_BUF_SIZE, fmt, iv, printf_float(dv));
+#ifndef NO_LONG_DOUBLE
+                            if (long_double) {
+                                    ldv = va_arg(ap, long double);
+                                    n = snprintf(buf, PRINTF_BUF_SIZE, fmt, iv, ldv);
 #ifdef TEST_ASPRINTF
-			    an = asprintf(&abuf, fmt, iv, printf_float(dv));
+                                    an = asprintf(&abuf, fmt, iv, ldv);
 #endif
+                            } else
+#endif
+                            {
+                                    dv = va_arg(ap, __typeof(dv));
+                                    n = snprintf(buf, PRINTF_BUF_SIZE, fmt, iv, dv);
+#ifdef TEST_ASPRINTF
+                                    an = asprintf(&abuf, fmt, iv, dv);
+#endif
+                            }
 		    }
 	    } else {
-		    dv = va_arg(ap, double);
-		    n = snprintf(buf, PRINTF_BUF_SIZE, fmt, printf_float(dv));
+#ifndef NO_LONG_DOUBLE
+                    if (long_double) {
+                            ldv = va_arg(ap, long double);
+                            n = snprintf(buf, PRINTF_BUF_SIZE, fmt, ldv);
 #ifdef TEST_ASPRINTF
-		    an = asprintf(&abuf, fmt, printf_float(dv));
+                            an = asprintf(&abuf, fmt, ldv);
 #endif
+                    } else
+#endif
+                    {
+                            dv = va_arg(ap, __typeof(dv));
+                            n = snprintf(buf, PRINTF_BUF_SIZE, fmt, dv);
+#ifdef TEST_ASPRINTF
+                            an = asprintf(&abuf, fmt, dv);
+#endif
+                    }
 	    }
 	    break;
 #endif
@@ -169,7 +211,11 @@ static int testw(int serial, wchar_t *expect, wchar_t *fmt, ...) {
     va_copy(aap, ap);
 #endif
 #ifndef NO_FLOATING_POINT
+# ifdef _HAS_IO_FLOAT
+    uint32_t dv;
+# else
     double dv;
+# endif
     wchar_t *star;
 #endif
     switch (fmt[wcslen(fmt)-1]) {
@@ -189,16 +235,16 @@ static int testw(int serial, wchar_t *expect, wchar_t *fmt, ...) {
 		    if (wcschr(star+1, '*')) {
 			    int iv1 = va_arg(ap, int);
 			    int iv2 = va_arg(ap, int);
-			    dv = va_arg(ap, double);
-			    n = swprintf(wbuf, PRINTF_BUF_SIZE, fmt, iv1, iv2, printf_float(dv));
+			    dv = va_arg(ap, __typeof(dv));
+			    n = swprintf(wbuf, PRINTF_BUF_SIZE, fmt, iv1, iv2, dv);
 		    } else  {
 			    int iv = va_arg(ap, int);
-			    dv = va_arg(ap, double);
-			    n = swprintf(wbuf, PRINTF_BUF_SIZE, fmt, iv, printf_float(dv));
+			    dv = va_arg(ap, __typeof(dv));
+			    n = swprintf(wbuf, PRINTF_BUF_SIZE, fmt, iv, dv);
 		    }
 	    } else {
-		    dv = va_arg(ap, double);
-		    n = swprintf(wbuf, PRINTF_BUF_SIZE, fmt, printf_float(dv));
+		    dv = va_arg(ap, __typeof(dv));
+		    n = swprintf(wbuf, PRINTF_BUF_SIZE, fmt, dv);
 	    }
 	    break;
 #endif
