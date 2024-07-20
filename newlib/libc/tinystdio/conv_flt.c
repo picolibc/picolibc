@@ -559,6 +559,30 @@ conv_flt (FLT_STREAM *stream, FLT_CONTEXT *context, width_t width, void *addr, u
 	break;
     } /* switch */
 
+#if defined(__riscv) || defined(__ARC64__) || defined(__mips)
+    /*
+     * Some processors don't preserve the sign of NAN across
+     * conversions, so we have to negate after the cast
+     */
+    if (addr) {
+	if (CHECK_LONG_LONG()) {
+            long double ld = (long double) flt;
+            if (flags & FL_MINUS)
+                ld = -ld;
+            *((long double *) addr) = ld;
+	} else if (CHECK_LONG()) {
+            double d = (double) flt;
+            if (flags & FL_MINUS)
+                d = -d;
+	    *((double *) addr) = d;
+        } else {
+            float f = (float) flt;
+            if (flags & FL_MINUS)
+                f = -f;
+	    *((float *) addr) = f;
+        }
+    }
+#else
     if (flags & FL_MINUS)
 	flt = -flt;
     if (addr) {
@@ -569,6 +593,7 @@ conv_flt (FLT_STREAM *stream, FLT_CONTEXT *context, width_t width, void *addr, u
         else
 	    *((float *) addr) = (float) flt;
     }
+#endif
     return 1;
 }
 
