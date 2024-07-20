@@ -216,6 +216,31 @@ use Picolibc:
  * Fix hex float scanning and printing. Thanks to Hana Ashour and
    Ahmed Shehab.
 
+ * Fix double rounding in %f printf. Thanks to Ahmed Shehab for
+   constructing a test case that identified the issue.
+
+ * Add mem_align to the "big" malloc version. Thanks to Simon Tatham.
+
+ * Adjust POSIX and C headers to limit symbol exposure to that
+   specified in the standards.
+
+ * Fix rounding in float scanf. This does round twice for input longer
+   than the required number of digits, but that's permitted by the C
+   specification.
+
+ * Support %a/%A in scanf. Support arbitrary precision in %a/%A
+   printf. Thanks to Ahmed Shehab.
+
+ * Provide a build-time option to enable %n in printf. This is
+   disabled by default for security concerns, but supported in case
+   someone needs strict C conformance. Thanks to Ahmed Shehab.
+
+ * Make freopen clear the unget buffer. Thanks to Mostafa Salman.
+
+ * Fix wide and multi-byte character support in printf and scanf. For
+   strict standards conformance, there's now an option that enables
+   %lc/%ls in printf even if multi-byte support is not enabled.
+
 ### Picolibc version 1.8.6
 
  * Fix some FORTITY_SOURCE issues with tinystdio
