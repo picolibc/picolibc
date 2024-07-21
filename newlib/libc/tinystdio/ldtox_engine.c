@@ -124,8 +124,24 @@ __ldtox_engine(long double x, struct dtoa *dtoa, int prec, unsigned char case_co
         _u128   mask = _u128_not(_u128_minus_64(_u128_lshift(half, 1), 1));
 
         /* round even */
-        if (_u128_gt(_u128_and(s, _u128_not(mask)), half) || _u128_and_64(_u128_rshift(s, bits), 1) != 0)
+        if (_u128_gt(_u128_and(s, _u128_not(mask)), half) || _u128_and_64(_u128_rshift(s, bits), 1) != 0) {
             s = _u128_plus(s, half);
+
+#if !defined(LSIG_MSB) && (__LDBL_MANT_DIG__ & 3) == 0
+            /*
+             * Formats without an implicit '1' for the MSB and which
+             * fill all four bits of the top digit might actually
+             * overflow when rounding. Check for that and shift right.
+             * We can do this without loss of accuracy because we just
+             * carried all the way from 'half' to the top digit of the
+             * value
+             */
+            if (_u128_ge(s, _u128_lshift(to_u128(1), __LDBL_MANT_DIG__))) {
+                s = _u128_rshift(s, 4);
+                exp += 4;
+            }
+#endif
+        }
 
         s = _u128_and(s, mask);
     }
