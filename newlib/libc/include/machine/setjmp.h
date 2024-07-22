@@ -108,9 +108,7 @@ _BEGIN_STD_C
 #endif
 
 #ifdef __i386__
-# if defined(__CYGWIN__) && !defined (_JBLEN)
-#  define _JBLEN (13 * 4)
-# elif defined(__unix__) || defined(__rtems__)
+# if   defined(__unix__) || defined(__rtems__)
 #  define _JBLEN	9
 # elif defined(__iamcu__)
 /* Intel MCU jmp_buf only covers callee-saved registers. */
@@ -121,13 +119,8 @@ _BEGIN_STD_C
 #endif
 
 #ifdef __x86_64__
-# ifdef __CYGWIN__
-#  define _JBTYPE long
-#  define _JBLEN  32
-# else
 #  define _JBTYPE long long
 #  define _JBLEN  8
-# endif
 #endif
 
 #ifdef __i960__
@@ -469,9 +462,6 @@ typedef int sigjmp_buf[_JBLEN+1+(sizeof (sigset_t)/sizeof (int))];
 #define _SAVEMASK	_JBLEN
 #define _SIGMASK	(_JBLEN+1)
 
-#ifdef __CYGWIN__
-# define _CYGWIN_WORKING_SIGSETJMP
-#endif
 
 #ifdef _POSIX_THREADS
 #define __SIGMASK_FUNC pthread_sigmask
@@ -479,12 +469,6 @@ typedef int sigjmp_buf[_JBLEN+1+(sizeof (sigset_t)/sizeof (int))];
 #define __SIGMASK_FUNC sigprocmask
 #endif
 
-#ifdef __CYGWIN__
-/* Per POSIX, siglongjmp has to be implemented as function.  Cygwin
-   provides functions for both, siglongjmp and sigsetjmp since 2.2.0. */
-_Noreturn void siglongjmp (sigjmp_buf, int);
-extern int sigsetjmp (sigjmp_buf, int);
-#endif
 
 #if defined(__GNUC__)
 
@@ -522,13 +506,8 @@ extern int sigsetjmp (sigjmp_buf, int);
 /* POSIX _setjmp/_longjmp, maintained for XSI compatibility.  These
    are equivalent to sigsetjmp/siglongjmp when not saving the signal mask.
    New applications should use sigsetjmp/siglongjmp instead. */
-#ifdef __CYGWIN__
-_Noreturn void _longjmp (jmp_buf, int);
-int _setjmp (jmp_buf);
-#else
 #define _setjmp(env)		sigsetjmp ((env), 0)
 #define _longjmp(env, val)	siglongjmp ((env), (val))
-#endif
 
 _END_STD_C
 

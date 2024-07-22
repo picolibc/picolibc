@@ -155,9 +155,6 @@ extern NEWLIB_THREAD_LOCAL_ERRNO int errno;
 #define ELIBEXEC 87		/* Attempting to exec a shared library */
 #endif
 #define ENOSYS 88		/* Function not implemented */
-#ifdef __CYGWIN__
-#define ENMFILE 89      	/* No more files */
-#endif
 #define ENOTEMPTY 90		/* Directory not empty */
 #define ENAMETOOLONG 91		/* File or path name too long */
 #define ELOOP 92		/* Too many symbolic links */

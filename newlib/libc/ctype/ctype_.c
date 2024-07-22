@@ -81,35 +81,12 @@
 #if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
 /* No static const on Cygwin since it's referenced and potentially overwritten
    for compatibility with older applications. */
-#ifndef __CYGWIN__
 const
-#endif
 char _ctype_b[128 + 256] = {
 	_CTYPE_DATA_128_255,
 	_CTYPE_DATA_0_127,
 	_CTYPE_DATA_128_255
 };
-
-#  ifdef __CYGWIN__
-/* For backward compatibility */
-char __EXPORT *__ctype_ptr__ = DEFAULT_CTYPE_PTR;
-
-#    ifdef __x86_64__
-__asm__ ("					\n\
-        .data					\n\
-	.globl  _ctype_				\n\
-	.set    _ctype_,_ctype_b+127		\n\
-	.text                                   \n\
-");
-#    else
-__asm__ ("					\n\
-        .data					\n\
-	.globl  __ctype_			\n\
-	.set    __ctype_,__ctype_b+127		\n\
-	.text                                   \n\
-");
-#    endif
-#  endif /* !__CYGWIN__ */
 
 #else	/* !ALLOW_NEGATIVE_CTYPE_INDEX */
 
@@ -124,7 +101,6 @@ const char _ctype_[1 + 256] = {
 #if defined(_MB_CAPABLE)
 /* Cygwin has its own implementation which additionally maintains backward
    compatibility with applications built under older Cygwin releases. */
-#ifndef __CYGWIN__
 void
 __set_ctype (struct __locale_t *loc, const char *charset)
 {
@@ -173,5 +149,4 @@ __set_ctype (struct __locale_t *loc, const char *charset)
   loc->ctype_ptr = ctype_ptr;
 #  endif
 }
-#endif /* !__CYGWIN__ */
 #endif /* _MB_CAPABLE */

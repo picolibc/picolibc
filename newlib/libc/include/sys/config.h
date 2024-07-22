@@ -260,9 +260,6 @@ SUCH DAMAGE.
 #define __RAND_MAX 0x7fffffff
 #endif
 
-#if defined(__CYGWIN__)
-#include <cygwin/config.h>
-#endif
 
 #if defined(__rtems__)
 #define __FILENAME_MAX__ 255

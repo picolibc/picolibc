@@ -54,9 +54,6 @@ SUCH DAMAGE.
 #include <alloca.h>
 #endif
 
-#ifdef __CYGWIN__
-#include <cygwin/stdlib.h>
-#endif
 
 #if __GNU_VISIBLE
 #include <sys/_locale.h>

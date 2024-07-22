@@ -153,14 +153,6 @@ extern const fenv_t *_fe_nomask_env;
 #define FE_NOMASK_ENV (_fe_nomask_env)
 #endif
 
-#ifdef __CYGWIN__
-
-#if __MISC_VISIBLE
-int fegetprec (void);
-int fesetprec (int __prec);
-#endif
-
-#endif /* __CYGWIN__ */
 
 #endif /* !_SOFT_FLOAT */
 

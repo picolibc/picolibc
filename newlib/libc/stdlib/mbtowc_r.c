@@ -53,7 +53,6 @@ typedef enum __packed { COPY_A, COPY_J1, COPY_J2, MAKE_A, NOOP, EMPTY, ERROR } J
  * is 2 (switch to JIS) + 2 (JIS characters) + 2 (switch back to ASCII) = 6.
  *************************************************************************************/
 
-#ifndef  __CYGWIN__
 static JIS_STATE JIS_state_table[JIS_S_NUM][JIS_C_NUM] = {
 /*              ESCAPE   DOLLAR    BRACKET   AT       B       J        NUL      JIS_CHAR  OTHER */
 /* ASCII */   { A_ESC,   ASCII,    ASCII,    ASCII,   ASCII,  ASCII,   ASCII,   ASCII,    ASCII },
@@ -75,7 +74,6 @@ static JIS_ACTION JIS_action_table[JIS_S_NUM][JIS_C_NUM] = {
 /* J_ESC */   { ERROR,   ERROR,    NOOP,     ERROR,   ERROR,   ERROR,   ERROR,   ERROR,   ERROR },
 /* J_ESC_BR */{ ERROR,   ERROR,    ERROR,    ERROR,   MAKE_A,  MAKE_A,  ERROR,   ERROR,   ERROR },
 };
-#endif /* !__CYGWIN__ */
 
 /* we override the mbstate_t __count field for more complex encodings and use it store a state value */
 #define __state __count
@@ -720,7 +718,6 @@ __utf8_mbtowc (
 
 /* Cygwin defines its own doublebyte charset conversion functions 
    because the underlying OS requires wchar_t == UTF-16. */
-#ifndef  __CYGWIN__
 int
 __sjis_mbtowc (
         wchar_t       *pwc,
@@ -959,5 +956,4 @@ __jis_mbtowc (
   state->__state = curr_state;
   return -2;  /* n < bytes needed */
 }
-#endif /* !__CYGWIN__*/
 #endif /* _MB_CAPABLE */

@@ -137,11 +137,6 @@ __sclose (
 int
 __stextmode (int fd)
 {
-#ifdef __CYGWIN__
-  extern int _cygwin_istext_for_stdio (int);
-  return _cygwin_istext_for_stdio (fd);
-#else
   return 0;
-#endif
 }
 #endif

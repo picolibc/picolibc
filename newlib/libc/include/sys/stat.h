@@ -93,12 +93,6 @@ typedef	_TIME_T_	time_t;
    sizes of any of the basic types change (short, int, long) [via a compile
    time option].  */
 
-#ifdef __CYGWIN__
-#include <cygwin/stat.h>
-#ifdef _LIBC
-#define stat64 stat
-#endif
-#else
 struct	stat 
 {
   dev_t		st_dev;
@@ -213,7 +207,6 @@ struct stat64
 #define st_mtime st_mtim.tv_sec
 #endif
 
-#endif
 
 #define	_IFMT		0170000	/* type of file */
 #define		_IFDIR	0040000	/* directory */

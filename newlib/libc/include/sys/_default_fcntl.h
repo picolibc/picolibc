@@ -38,20 +38,11 @@ typedef	__pid_t		pid_t;		/* process id */
 #define	_FNONBLOCK	0x4000	/* non blocking I/O (POSIX style) */
 #define	_FNDELAY	_FNONBLOCK	/* non blocking I/O (4.2 style) */
 #define	_FNOCTTY	0x8000	/* don't assign a ctty on this open */
-#if defined (__CYGWIN__)
-#define	_FBINARY	0x10000
-#define	_FTEXT		0x20000
-#endif
 #define	_FNOINHERIT	0x40000
 #define	_FDIRECT	0x80000
 #define	_FNOFOLLOW	0x100000
 #define	_FDIRECTORY	0x200000
 #define	_FEXECSRCH	0x400000
-#if defined (__CYGWIN__)
-#define	_FTMPFILE	0x800000
-#define	_FNOATIME	0x1000000
-#define	_FPATH		0x2000000
-#endif
 
 #define	O_ACCMODE	(O_RDONLY|O_WRONLY|O_RDWR)
 
@@ -86,19 +77,6 @@ typedef	__pid_t		pid_t;		/* process id */
 #define	O_DIRECT	_FDIRECT
 #endif
 
-#if defined (__CYGWIN__)
-#define O_BINARY	_FBINARY
-#define O_TEXT		_FTEXT
-#define O_DSYNC         _FSYNC
-#define O_RSYNC         _FSYNC
-
-/* Linux-specific flags */
-#if __GNU_VISIBLE
-#define O_TMPFILE	_FTMPFILE
-#define O_NOATIME	_FNOATIME
-#define O_PATH		_FPATH
-#endif
-#endif
 
 #if __MISC_VISIBLE
 
@@ -195,7 +173,6 @@ typedef	__pid_t		pid_t;		/* process id */
 #define	LOCK_UN		0x08		/* unlock file */
 #endif
 
-#ifndef __CYGWIN__
 /* file segment locking set data type - information passed to system by user */
 struct flock {
 	short	l_type;		/* F_RDLCK, F_WRLCK, or F_UNLCK */
@@ -205,7 +182,6 @@ struct flock {
 	short	l_pid;		/* returned with F_GETLK */
 	short	l_xxx;		/* reserved for future use */
 };
-#endif /* __CYGWIN__ */
 
 #if __MISC_VISIBLE
 /* extended file segment locking set data type */

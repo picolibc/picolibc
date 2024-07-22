@@ -493,9 +493,7 @@
 
 #if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
 
-#ifndef __CYGWIN__
 static const
-#endif
 char __ctype_cp[27][128 + 256] = {
   { _CTYPE_CP437_128_254,
     0,

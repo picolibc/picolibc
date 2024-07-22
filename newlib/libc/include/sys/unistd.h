@@ -87,12 +87,6 @@ int     chown (const char *__path, uid_t __owner, gid_t __group);
 int     chroot (const char *__path);
 #endif
 int     close (int __fildes);
-#if defined(__CYGWIN__) && (__BSD_VISIBLE || __GNU_VISIBLE)
-/* Available on FreeBSD (__BSD_VISIBLE) and Linux (__GNU_VISIBLE). */
-int     close_range (unsigned int __firstfd, unsigned int __lastfd, int __flags);
-/*      CLOSE_RANGE_UNSHARE (1 << 1) */ /* Linux-specific, not supported. */
-#define CLOSE_RANGE_CLOEXEC (1 << 2)
-#endif
 #if __POSIX_VISIBLE >= 199209
 size_t	confstr (int __name, char *__buf, size_t __len);
 #endif
@@ -267,14 +261,6 @@ int     setpgid (pid_t __pid, pid_t __pgid);
 #if __SVID_VISIBLE || __XSI_VISIBLE >= 500
 int     setpgrp (void);
 #endif
-#if defined(__CYGWIN__) && __BSD_VISIBLE
-/* Stub for Linux libbsd compatibility. */
-#define initsetproctitle(c, a, e) setproctitle_init((c), (a), (e))
-static inline void setproctitle_init (int, char *[], char *[]) {}
-
-void setproctitle (const char *, ...)
-		   _ATTRIBUTE ((__format__ (__printf__, 1, 2)));
-#endif
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4
 int	setregid (gid_t __rgid, gid_t __egid);
 int	setreuid (uid_t __ruid, uid_t __euid);
@@ -302,16 +288,10 @@ int     vhangup (void);
 #endif
 ssize_t write (int __fd, const void *__buf, size_t __nbyte);
 
-#ifdef __CYGWIN__
-# define __UNISTD_GETOPT__
-# include <getopt.h>
-# undef __UNISTD_GETOPT__
-#else
 extern char *optarg;			/* getopt(3) external variables */
 extern int optind, opterr, optopt;
 int	 getopt(int, char * const [], const char *);
 extern int optreset;			/* getopt(3) external variable */
-#endif
 
 #if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200809)
 pid_t   vfork (void);
@@ -581,13 +561,6 @@ int	unlinkat (int, const char *, int);
 #define _PC_REC_MIN_XFER_SIZE            18
 #define _PC_REC_XFER_ALIGN               19
 #define _PC_TIMESTAMP_RESOLUTION         20
-#ifdef __CYGWIN__
-/* Ask for POSIX permission bits support. */
-#define _PC_POSIX_PERMISSIONS            90
-/* Ask for full POSIX permission support including uid/gid settings. */
-#define _PC_POSIX_SECURITY               91
-#define _PC_CASE_INSENSITIVE             92
-#endif
 
 /*
  *  confstr values per IEEE Std 1003.1, 2004 Edition

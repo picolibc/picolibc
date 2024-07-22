@@ -182,13 +182,6 @@ char *nl_langinfo_l (nl_item item, struct __locale_t *locale)
 	case _NL_MONETARY_CODESET:
 		ret = (char *) __get_monetary_locale (locale)->codeset;
 		goto do_codeset;
-#ifdef __CYGWIN__
-	case _NL_COLLATE_CODESET:
-		{
-		  ret = (char *) __get_collate_locale (locale)->codeset;
-		  goto do_codeset;
-		}
-#endif /* __CYGWIN__ */
 #endif /* __HAVE_LOCALE_INFO_EXTENDED__ */
 #endif /* __HAVE_LOCALE_INFO__ */
 	case CODESET:
@@ -198,49 +191,7 @@ char *nl_langinfo_l (nl_item item, struct __locale_t *locale)
 #ifdef __HAVE_LOCALE_INFO__
 do_codeset:
 #endif
-#ifdef __CYGWIN__
-		/* Convert charset to Linux compatible codeset string. */
-		if (ret[0] == 'A'/*SCII*/)
-		  ret = "ANSI_X3.4-1968";
-		else if (ret[0] == 'E')
-		  {
-		    if (strcmp (ret, "EUCJP") == 0)
-		      ret = "EUC-JP";
-		    else if (strcmp (ret, "EUCKR") == 0)
-		      ret = "EUC-KR";
-		    else if (strcmp (ret, "EUCCN") == 0)
-		      ret = "GB2312";
-		  }
-		else if (ret[0] == 'C'/*Pxxxx*/)
-		  {
-		    if (strcmp (ret + 2, "874") == 0)
-		      ret = "TIS-620";
-		    else if (strcmp (ret + 2, "20866") == 0)
-		      ret = "KOI8-R";
-		    else if (strcmp (ret + 2, "21866") == 0)
-		      ret = "KOI8-U";
-		    else if (strcmp (ret + 2, "101") == 0)
-		      ret = "GEORGIAN-PS";
-		    else if (strcmp (ret + 2, "102") == 0)
-		      ret = "PT154";
-		    else if (strcmp (ret + 2, "103") == 0)
-		      ret = "KOI8-T";
-		  }
-		else if (ret[0] == 'S'/*JIS*/)
-		  {
-		    /* Cygwin uses MSFT's implementation of SJIS, which differs
-		       in some codepoints from the real thing, especially
-		       0x5c: yen sign instead of backslash,
-		       0x7e: overline instead of tilde.
-		       We can't use the real SJIS since otherwise Win32
-		       pathnames would become invalid.  OTOH, if we return
-		       "SJIS" here, then libiconv will do mb<->wc conversion
-		       differently to our internal functions.  Therefore we
-		       return what we really implement, CP932.  This is handled
-		       fine by libiconv. */
-		    ret = "CP932";
-		  }
-#elif !defined (_MB_CAPABLE)
+#if   !defined (_MB_CAPABLE)
 		ret = "US-ASCII";
 #endif /* __CYGWIN__ */
 		break;

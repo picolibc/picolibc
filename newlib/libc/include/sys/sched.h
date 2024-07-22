@@ -29,11 +29,7 @@ extern "C" {
 
 /* Scheduling Policies */
 /* Open Group Specifications Issue 6 */
-#if defined(__CYGWIN__)
-#define SCHED_OTHER    3
-#else
 #define SCHED_OTHER    0
-#endif
 
 #define SCHED_FIFO     1
 #define SCHED_RR       2

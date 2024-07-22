@@ -1145,15 +1145,7 @@ recurse:
 		    tzset_called = 1;
 		  }
 
-#if defined (__CYGWIN__)
-		/* Cygwin must check if the application has been built with or
-		   without the extra tm members for backward compatibility, and
-		   then use either that or the old method fetching from tzinfo.
-		   Rather than pulling in the version check infrastructure, we
-		   just call a Cygwin function. */
-		extern long __cygwin_gettzoffset (const struct tm *tmp);
-		offset = __cygwin_gettzoffset (tim_p);
-#elif defined (__TM_GMTOFF)
+#if   defined (__TM_GMTOFF)
 		offset = tim_p->__TM_GMTOFF;
 #else
 		__tzinfo_type *tz = __gettzinfo ();
@@ -1388,15 +1380,7 @@ recurse:
 		  tzset_called = 1;
 		}
 
-#if defined (__CYGWIN__)
-	      /* Cygwin must check if the application has been built with or
-		 without the extra tm members for backward compatibility, and
-		 then use either that or the old method fetching from tzinfo.
-		 Rather than pulling in the version check infrastructure, we
-		 just call a Cygwin function. */
-	      extern long __cygwin_gettzoffset (const struct tm *tmp);
-	      offset = __cygwin_gettzoffset (tim_p);
-#elif defined (__TM_GMTOFF)
+#if   defined (__TM_GMTOFF)
 	      offset = tim_p->__TM_GMTOFF;
 #else
 	      __tzinfo_type *tz = __gettzinfo ();
@@ -1424,11 +1408,7 @@ recurse:
 		  _tzset_unlocked ();
 		  tzset_called = 1;
 		}
-#if defined (__CYGWIN__)
-	      /* See above. */
-	      extern const char *__cygwin_gettzname (const struct tm *tmp);
-	      tznam = __cygwin_gettzname (tim_p);
-#elif defined (__TM_ZONE)
+#if   defined (__TM_ZONE)
 	      tznam = tim_p->__TM_ZONE;
 #endif
 	      if (!tznam)

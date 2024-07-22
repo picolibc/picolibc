@@ -47,9 +47,6 @@ extern "C" {
 typedef	__sigset_t	sigset_t;
 #endif
 
-#if defined(__CYGWIN__)
-#include <cygwin/signal.h>
-#else
 
 #if defined(_POSIX_REALTIME_SIGNALS) || __POSIX_VISIBLE >= 199309
 
@@ -153,7 +150,6 @@ struct sigaction
 	int sa_flags;
 };
 #endif /* defined(__rtems__) */
-#endif /* defined(__CYGWIN__) */
 
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4 || __POSIX_VISIBLE >= 200809
 /*
@@ -393,11 +389,6 @@ int str2sig(const char *__restrict, int *__restrict);
 }
 #endif
 
-#if defined(__CYGWIN__)
-#if __XSI_VISIBLE >= 4 || __POSIX_VISIBLE >= 200809
-#include <sys/ucontext.h>
-#endif
-#endif
 
 #ifndef _SIGNAL_H_
 /* Some applications take advantage of the fact that <sys/signal.h>

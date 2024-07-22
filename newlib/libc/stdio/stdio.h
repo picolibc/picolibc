@@ -246,9 +246,6 @@ typedef _ssize_t ssize_t;
 #define	__SNPT	0x0800		/* do not do fseek() optimisation */
 #define	__SOFF	0x1000		/* set iff _offset is in fact correct */
 #define	__SORD	0x2000		/* true => stream orientation (byte/wide) decided */
-#if defined(__CYGWIN__)
-#  define __SCLE  0x4000        /* convert line endings CR/LF <-> NL */
-#endif
 #define	__SL64	0x8000		/* is 64-bit offset large file */
 
 /* _flags2 flags */
@@ -541,9 +538,6 @@ int	vdprintf (int, const char *__restrict, va_list)
 #endif
 #if __ATFILE_VISIBLE
 int	renameat (int, const char *, int, const char *);
-# ifdef __CYGWIN__
-int	renameat2 (int, const char *, int, const char *, unsigned int);
-# endif
 #endif
 
 /* Other extensions.  */

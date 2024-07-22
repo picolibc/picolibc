@@ -41,9 +41,6 @@
 
 #include <sys/cdefs.h>
 #include <sys/types.h>
-#ifdef __CYGWIN__
-#include <cygwin/grp.h>
-#endif
 
 #if __BSD_VISIBLE
 #define	_PATH_GROUP		"/etc/group"
