@@ -106,8 +106,11 @@ typedef struct malloc_chunk {
 #define MALLOC_PAGE_ALIGN 	(0x1000)
 
 /* Minimum allocation size */
-#define MALLOC_MINSIZE		__align_up(MALLOC_HEAD + sizeof(chunk_t), MALLOC_HEAD_ALIGN)
-
+#define MALLOC_MINSIZE                                                         \
+    __align_up(MALLOC_HEAD + sizeof(chunk_t),                                  \
+               MAX(MALLOC_HEAD_ALIGN, MALLOC_CHUNK_ALIGN))
+_Static_assert((MALLOC_MINSIZE & (MALLOC_MINSIZE - 1)) == 0,
+               "must be a power of two");
 /* Maximum allocation size */
 #define MALLOC_MAXSIZE 		(SIZE_MAX - (MALLOC_HEAD + 2*MALLOC_CHUNK_ALIGN))
 
