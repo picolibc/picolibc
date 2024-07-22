@@ -263,6 +263,7 @@ Files: newlib/libm/ld/common/s_fdiml.c
  newlib/libm/ld/common/s_isnanl.c
  newlib/libm/ld/common/s_scalbl.c
  newlib/libm/ld/common/s_scalbln.c
+ newlib/libm/ld/common/s_signbitl.c
 Copyright: 2004 David Schultz <das@FreeBSD.ORG>
 License: BSD2-1
 
@@ -567,8 +568,6 @@ Files: CMakeLists.txt
  newlib/libc/signal/CMakeLists.txt
  newlib/libc/ssp/CMakeLists.txt
  newlib/libc/stdlib/CMakeLists.txt
- newlib/libc/stdlib/nano-malloc-getpagesize.c
- newlib/libc/stdlib/nano-malloc-posix_memalign.c
  newlib/libc/string/CMakeLists.txt
  newlib/libc/time/CMakeLists.txt
  newlib/libc/tinystdio/CMakeLists.txt
@@ -743,7 +742,6 @@ Files: cmake/TC-arm-none-eabi.ld
  newlib/libc/picolib/getauxval.c
  newlib/libc/picolib/machine/aarch64/tls.c
  newlib/libc/picolib/machine/arm/arm_tls.h
- newlib/libc/picolib/machine/arm/read_tp.S
  newlib/libc/posix/meson.build
  newlib/libc/stdio/nano-svfprintf.c
  newlib/libc/stdio/nano-svfscanf.c
@@ -857,6 +855,7 @@ Files: doc/printf-sample/Makefile
  newlib/libc/tinystdio/ldtox_engine.c
  newlib/libc/tinystdio/swprintf.c
  newlib/libc/tinystdio/vswprintf.c
+ newlib/testsuite/newlib.time/asctime.c
  picocrt/machine/m68k/crt0.c
  picocrt/machine/mips/crt0.c
  picocrt/machine/msp430/crt0.c
@@ -947,7 +946,6 @@ Files: dummyhost/iob.c
  newlib/libc/picolib/dso_handle.c
  newlib/libc/picolib/inittls.c
  newlib/libc/picolib/machine/arm/interrupt.c
- newlib/libc/picolib/machine/arm/tls.c
  newlib/libc/picolib/machine/riscv/tls.c
  newlib/libc/picolib/machine/sparc/interrupt.S
  newlib/libc/picolib/machine/sparc/tls.c
@@ -980,22 +978,11 @@ Files: dummyhost/iob.c
  newlib/libc/stdlib/malloc-malloc_usable_size.c
  newlib/libc/stdlib/malloc-mallopt.c
  newlib/libc/stdlib/malloc-memalign.c
+ newlib/libc/stdlib/malloc-posix_memalign.c
  newlib/libc/stdlib/malloc-pvalloc.c
  newlib/libc/stdlib/malloc-realloc.c
  newlib/libc/stdlib/malloc-valloc.c
  newlib/libc/stdlib/meson.build
- newlib/libc/stdlib/nano-malloc-calloc.c
- newlib/libc/stdlib/nano-malloc-cfree.c
- newlib/libc/stdlib/nano-malloc-free.c
- newlib/libc/stdlib/nano-malloc-mallinfo.c
- newlib/libc/stdlib/nano-malloc-malloc.c
- newlib/libc/stdlib/nano-malloc-malloc_stats.c
- newlib/libc/stdlib/nano-malloc-malloc_usable_size.c
- newlib/libc/stdlib/nano-malloc-mallopt.c
- newlib/libc/stdlib/nano-malloc-memalign.c
- newlib/libc/stdlib/nano-malloc-pvalloc.c
- newlib/libc/stdlib/nano-malloc-realloc.c
- newlib/libc/stdlib/nano-malloc-valloc.c
  newlib/libc/string/meson.build
  newlib/libc/time/meson.build
  newlib/libc/tinystdio/bufio.c
@@ -1059,11 +1046,13 @@ Files: dummyhost/iob.c
  scripts/do-arc64-configure
  scripts/do-arm-configure
  scripts/do-avr-configure
+ scripts/do-clang-aarch64-configure
  scripts/do-clang-arm-configure
  scripts/do-clang-msp430-configure
  scripts/do-clang-riscv-configure
  scripts/do-clang-rv32imafdc-configure
  scripts/do-clang-thumbv6m-configure
+ scripts/do-clang-thumbv7e+dp-configure
  scripts/do-clang-thumbv7e+fp-configure
  scripts/do-clang-thumbv7m-configure
  scripts/do-configure
@@ -1074,10 +1063,12 @@ Files: dummyhost/iob.c
  scripts/do-lx106-configure
  scripts/do-mips-configure
  scripts/do-mips-zephyr-configure
+ scripts/do-mips64-configure
  scripts/do-mipsel-configure
  scripts/do-msp430-configure
  scripts/do-msp430-unknown-elf-configure
  scripts/do-native-configure
+ scripts/do-native-m32-configure
  scripts/do-nios2-configure
  scripts/do-riscv-configure
  scripts/do-rv32imac-configure
@@ -1110,7 +1101,7 @@ Files: dummyhost/iob.c
  semihost/lseek64.c
  semihost/machine/aarch64/semihost-aarch64.S
  semihost/machine/arm/semihost-arm.S
- semihost/machine/riscv/semihost-riscv.s
+ semihost/machine/riscv/semihost-riscv.S
  semihost/meson.build
  semihost/open.c
  semihost/read.c
@@ -1248,12 +1239,34 @@ Files: newlib/empty.c
  test/on_exit.c
  test/rounding-mode-sub.c
  test/rounding-mode.c
+ test/rounding-mode.h
  test/test-memset.c
  test/test-put.c
  test/test-strchr.c
  test/timegm.c
  test/timegm.h
 Copyright: 2021 Keith Packard
+License: BSD3-1
+
+Files: newlib/libc/include/stdnoreturn.h
+ newlib/libc/include/sys/_initfini.h
+ newlib/libc/machine/m68k/machine/meson.build
+ newlib/libc/machine/sh/CMakeLists.txt
+ newlib/libc/machine/sh/machine/CMakeLists.txt
+ newlib/libc/machine/sh/machine/meson.build
+ newlib/libc/machine/sh/sys/CMakeLists.txt
+ newlib/libc/picolib/machine/m68k/interrupt.c
+ newlib/libc/picolib/machine/m68k/meson.build
+ newlib/libc/tinystdio/atomic_load.c
+ newlib/libc/tinystdio/flockfile.c
+ newlib/libc/tinystdio/ftrylockfile.c
+ newlib/libc/tinystdio/funlockfile.c
+ newlib/libc/tinystdio/funopen.c
+ newlib/libm/fenv/fenv.c
+ test/test-cplusplus.cpp
+ test/test-ctype.c
+ test/test-funopen.c
+Copyright: 2024 Keith Packard
 License: BSD3-1
 
 Files: newlib/libc/machine/aarch64/meson.build
@@ -1266,15 +1279,6 @@ Files: newlib/libc/machine/arm/machine/math.h
 Copyright: 2020 Keith Packard
  2017 embedded brains GmbH.
  2011, 2012 ARM Ltd.
-License: BSD3-1
-
-Files: newlib/libc/machine/m68k/machine/meson.build
- newlib/libc/machine/sh/CMakeLists.txt
- newlib/libc/machine/sh/machine/CMakeLists.txt
- newlib/libc/machine/sh/machine/meson.build
- newlib/libc/machine/sh/sys/CMakeLists.txt
- newlib/libm/fenv/fenv.c
-Copyright: 2024 Keith Packard,
 License: BSD3-1
 
 Files: newlib/libc/machine/m68k/meson.build
@@ -1300,6 +1304,16 @@ License: BSD3-1
 
 Files: newlib/libc/machine/xtensa/meson.build
 Copyright: 2019 Jonathan McDowell
+License: BSD3-1
+
+Files: newlib/libc/picolib/machine/arm/read_tp.S
+Copyright: 2020 Keith Packard
+ 2024 Stephen Street
+License: BSD3-1
+
+Files: newlib/libc/picolib/machine/arm/tls.c
+Copyright: 2019 Keith Packard
+ 2024 Stephen Street
 License: BSD3-1
 
 Files: newlib/libm/machine/riscv/s_copysign.c
@@ -1343,6 +1357,26 @@ Files: scripts/do-freedom-tools-package
 Copyright: 2020 SiFive Inc.
 License: BSD3-1
 
+Files: test/test-fgetc.c
+ test/test-fgets-eof.c
+Copyright: 2024, Synopsys Inc.
+License: BSD3-1
+
+Files: test/test-sprintf-percent-n.c
+ test/test-vfscanf-percent-a.c
+ test/test-wchar.c
+Copyright: 2024, Synopsys Inc.
+ 2024, Solid Sands B.V.
+License: BSD3-1
+
+Files: test/test-tmpnam.c
+Copyright: 2024 Mostafa Salmaan
+License: BSD3-1
+
+Files: test/test-ungetc-ftell.c
+Copyright: 2024 Hana Ashour
+License: BSD3-1
+
 Files: test/time-tests.c
 Copyright: 2021 R. Diez
 License: BSD3-1
@@ -1383,6 +1417,7 @@ License: BSD3-2
 
 Files: newlib/libc/include/sys/_timespec.h
  newlib/libc/include/sys/_types.h
+ newlib/libc/include/sys/_wait.h
  newlib/libc/include/sys/config.h
  newlib/libc/include/sys/dirent.h
  newlib/libc/include/sys/errno.h
@@ -1481,6 +1516,7 @@ Copyright: 1990, 1991, 1993 The Regents of the University of California.
 License: BSD3-2
 
 Files: newlib/libc/string/strtok_r.c
+ newlib/libc/string/strtok_r.h
  newlib/libc/string/wcstok.c
 Copyright: 1988 Regents of the University of California.
 License: BSD3-2
@@ -1732,7 +1768,20 @@ Files: newlib/libc/machine/arm/strlen.c
 Copyright: 2008-2015 ARM Ltd
 License: BSD3-8
 
-Files: newlib/libc/stdlib/nano-mallocr.c
+Files: newlib/libc/stdlib/nano-calloc.c
+ newlib/libc/stdlib/nano-free.c
+ newlib/libc/stdlib/nano-getpagesize.c
+ newlib/libc/stdlib/nano-mallinfo.c
+ newlib/libc/stdlib/nano-malloc-stats.c
+ newlib/libc/stdlib/nano-malloc-usable-size.c
+ newlib/libc/stdlib/nano-malloc.c
+ newlib/libc/stdlib/nano-malloc.h
+ newlib/libc/stdlib/nano-mallopt.c
+ newlib/libc/stdlib/nano-memalign.c
+ newlib/libc/stdlib/nano-posix-memalign.c
+ newlib/libc/stdlib/nano-pvalloc.c
+ newlib/libc/stdlib/nano-realloc.c
+ newlib/libc/stdlib/nano-valloc.c
 Copyright: 2012, 2013 ARM Ltd
 License: BSD3-8
 
@@ -2126,6 +2175,7 @@ Files: newlib/libc/machine/spu/fdopen.c
  newlib/libm/common/nanl.c
  newlib/libm/common/scalbnl.c
  newlib/libm/ld/s_isinfl.c
+ newlib/libm/ld/s_signbitl.c
 Copyright: IBM Corp. 2009 
 License: BSD3-23
 
@@ -2689,7 +2739,6 @@ Files: .clang-format
  .github/workflows/head
  .github/workflows/head-zephyr
  .github/workflows/linux.yml
- .github/workflows/macos.yml
  .github/workflows/make-workflow
  .github/workflows/make-workflow-zephyr
  .github/workflows/steps-head
@@ -2726,6 +2775,7 @@ Files: .clang-format
  newlib/libc/include/machine/ieee.h
  newlib/libc/include/sys/_tz_structs.h
  newlib/libc/libc.in.xml
+ newlib/libc/locale/getlocalename_l.c
  newlib/libc/machine/aarch64/sys/fcntl.h
  newlib/libc/machine/necv70/necv70.tex
  newlib/libc/machine/nvptx/clock.c
@@ -2742,6 +2792,7 @@ Files: .clang-format
  newlib/libc/stdlib/mul_overflow.h
  newlib/libc/string/wcstrings.tex
  newlib/libc/sys.tex
+ newlib/libc/sys/amdgcn/include/sys/lock.h
  newlib/libc/sys/rtems/include/README
  newlib/libc/sys/xtensa/include/unistd.h
  newlib/libc/sys/xtensa/isatty.c
@@ -2767,10 +2818,12 @@ Files: .clang-format
  scripts/cross-arm-none-eabi.txt
  scripts/cross-arm-zephyr-eabi.txt
  scripts/cross-avr.txt
+ scripts/cross-clang-aarch64-none-elf.txt
  scripts/cross-clang-msp430.txt
  scripts/cross-clang-riscv64-unknown-elf.txt
  scripts/cross-clang-rv32imafdc-unknown-elf.txt
  scripts/cross-clang-thumbv6m-none-eabi.txt
+ scripts/cross-clang-thumbv7e+dp-none-eabi.txt
  scripts/cross-clang-thumbv7e+fp-none-eabi.txt
  scripts/cross-clang-thumbv7m-none-eabi.txt
  scripts/cross-cortex-a9-none-eabi.txt
@@ -2780,6 +2833,7 @@ Files: .clang-format
  scripts/cross-microblazeel-zephyr-elf.txt
  scripts/cross-mips-linux-gnu.txt
  scripts/cross-mips-zephyr-elf.txt
+ scripts/cross-mips64-linux-gnuabi64.txt
  scripts/cross-mipsel-linux-gnu.txt
  scripts/cross-msp430-unknown-elf.txt
  scripts/cross-msp430.txt
@@ -3736,6 +3790,10 @@ Files: newlib/libc/machine/nvptx/printf.c
 Copyright: 2015-2018 Mentor Graphics.
 License: Other-8
 
+Files: newlib/libc/sys/amdgcn/lock.c
+Copyright: 2024 BayLibre.
+License: Other-8
+
 Files: newlib/libc/machine/cris/include/pthread.h
  newlib/libc/machine/cris/sys/errno.h
  newlib/libc/machine/cris/sys/fcntl.h
@@ -3878,7 +3936,6 @@ Files: newlib/libc/reent/reent.c
  newlib/libc/string/strtok.c
  newlib/libc/string/strupr.c
  newlib/libc/string/strxfrm.c
- newlib/libc/string/u_strerr.c
  newlib/libc/time/asctime.c
  newlib/libc/time/asctime_r.c
  newlib/libc/time/clock.c
@@ -4450,6 +4507,8 @@ Files: newlib/libc/machine/d10v/setjmp.S
  newlib/libc/stdio64/stdio64.c
  newlib/libc/stdio64/stdio64.tex
  newlib/libc/stdio64/tmpfile64.c
+ newlib/libc/tinystdio/fgetpos.c
+ newlib/libc/tinystdio/fsetpos.c
 Copyright: 1990 The Regents of the University of California.
 License: UCB-1
 
