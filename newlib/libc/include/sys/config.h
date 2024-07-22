@@ -266,14 +266,6 @@ SUCH DAMAGE.
 #define __DYNAMIC_REENT__
 #endif
 
-#ifndef __EXPORT
-#define __EXPORT
-#endif
-
-#ifndef __IMPORT
-#define __IMPORT
-#endif
-
 #ifndef __WCHAR_MAX__
 #if __INT_MAX__ == 32767 || defined (_WIN32)
 #define __WCHAR_MAX__ 0xffffu

@@ -236,10 +236,10 @@ __declare_extern_inline(int) toupper_l (int c, locale_t l) { (void) l; return to
 #endif
 
 #if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
-extern	__IMPORT const char	_ctype_b[];
+extern const char	_ctype_b[];
 #define _ctype_ (_ctype_b + 127)
 #else
-extern	__IMPORT const char	_ctype_[];
+extern const char	_ctype_[];
 #endif
 
 #ifdef __HAVE_LOCALE_INFO__
