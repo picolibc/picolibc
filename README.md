@@ -229,7 +229,8 @@ use Picolibc:
    specification.
 
  * Support %a/%A in scanf. Support arbitrary precision in %a/%A
-   printf. Thanks to Ahmed Shehab.
+   printf. Fix NaN/INF formatting in %a/%A printf. Thanks to Ahmed
+   Shehab.
 
  * Provide a build-time option to enable %n in printf. This is
    disabled by default for security concerns, but supported in case
