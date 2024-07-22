@@ -28,30 +28,8 @@
 
 #include "nano-malloc.h"
 
-#ifdef _MALLOC_VALIDATE
-void
-__malloc_validate_block(chunk_t *r)
-{
-    assert (__align_up(chunk_to_ptr(r), MALLOC_CHUNK_ALIGN) == chunk_to_ptr(r));
-    assert (__align_up(r, MALLOC_HEAD_ALIGN) == r);
-    assert (_size(r) >= MALLOC_MINSIZE);
-    assert (_size(r) < 0x80000000UL);
-    assert (__align_up(_size(r), MALLOC_HEAD_ALIGN) == _size(r));
-}
-
-void
-__malloc_validate(void)
-{
-    chunk_t *r;
-
-    for (r = __malloc_free_list; r; r = r->next) {
-	__malloc_validate_block(r);
-	assert (r->next == NULL || (char *) r + _size(r) <= (char *) r->next);
-    }
-}
-#endif
-
-struct mallinfo mallinfo(void)
+struct mallinfo
+mallinfo(void)
 {
     char * sbrk_now;
     chunk_t *pf;
@@ -61,10 +39,6 @@ struct mallinfo mallinfo(void)
     struct mallinfo current_mallinfo = {};
 
     MALLOC_LOCK;
-
-#ifdef _MALLOC_VALIDATE
-    __malloc_validate();
-#endif
 
     if (__malloc_sbrk_start == NULL) total_size = 0;
     else {
@@ -87,5 +61,6 @@ struct mallinfo mallinfo(void)
     current_mallinfo.uordblks = total_size - free_size;
 
     MALLOC_UNLOCK;
+
     return current_mallinfo;
 }

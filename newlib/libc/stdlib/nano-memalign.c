@@ -28,7 +28,7 @@
 
 #include "nano-malloc.h"
 
-/* Function memalign
+/*
  * Allocate memory block aligned at specific boundary.
  *   align: required alignment. Must be power of 2. Return NULL
  *          if not power of 2. Undefined behavior is bigger than
@@ -106,6 +106,7 @@ memalign(size_t align, size_t s)
     }
     return aligned_p;
 }
+
 #ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(memalign, aligned_alloc);
 #endif

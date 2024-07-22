@@ -28,7 +28,8 @@
 
 #include "nano-malloc.h"
 
-int getpagesize(void)
+int
+getpagesize(void)
 {
     return MALLOC_PAGE_ALIGN;
 }

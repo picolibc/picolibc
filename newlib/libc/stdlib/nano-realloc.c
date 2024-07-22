@@ -28,8 +28,7 @@
 
 #include "nano-malloc.h"
 
-/* Function realloc
- *
+/*
  * Implement either by merging adjacent free memory
  * or by calling malloc/memcpy
  */

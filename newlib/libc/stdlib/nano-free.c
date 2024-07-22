@@ -28,16 +28,17 @@
 
 #include "nano-malloc.h"
 
-/** Function free
-  * Implementation of libc free.
-  * Algorithm:
-  *  Maintain a global free chunk_t single link list, headed by global
-  *  variable __malloc_free_list.
-  *  When free, insert the to-be-freed chunk_t into free list. The place to
-  *  insert should make sure all chunks are sorted by address from low to
-  *  high.  Then merge with neighbor chunks if adjacent.
-  */
-void free (void * free_p)
+/*
+ * Algorithm:
+ *  Maintain a global free chunk_t single link list, headed by global
+ *  variable __malloc_free_list.
+ *  When free, insert the to-be-freed chunk_t into free list. The place to
+ *  insert should make sure all chunks are sorted by address from low to
+ *  high.  Then merge with neighbor chunks if adjacent.
+ */
+
+void
+free (void * free_p)
 {
     chunk_t     *p_to_free;
     chunk_t     **p, *r;
@@ -46,6 +47,7 @@ void free (void * free_p)
 
     p_to_free = ptr_to_chunk(free_p);
     p_to_free->next = NULL;
+
 #if MALLOC_DEBUG
     __malloc_validate_block(p_to_free);
 #endif
@@ -55,8 +57,17 @@ void free (void * free_p)
     for (p = &__malloc_free_list; (r = *p) != NULL; p = &r->next)
     {
 	/* Insert in address order */
-	if (p_to_free < r)
+	if (p_to_free <= r) {
+
+            /* Check for double free */
+            if (p_to_free == r)
+            {
+                errno = ENOMEM;
+                goto unlock;
+            }
+
 	    break;
+        }
 
 	/* Merge blocks together */
 	if (chunk_after(r) == p_to_free)
@@ -67,15 +78,8 @@ void free (void * free_p)
 	    goto no_insert;
 	}
 
-	/* Check for double free */
-	if (p_to_free == r)
-	{
-	    errno = ENOMEM;
-	    MALLOC_UNLOCK;
-	    return;
-	}
-
     }
+
     p_to_free->next = r;
     *p = p_to_free;
 
@@ -84,20 +88,29 @@ no_insert:
     /* Merge blocks together */
     if (chunk_after(p_to_free) == r)
     {
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wanalyzer-null-dereference"
+#endif
 	*_size_ref(p_to_free) += _size(r);
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 	p_to_free->next = r->next;
     }
 
+unlock:
     MALLOC_UNLOCK;
 }
+
 #ifdef _HAVE_ALIAS_ATTRIBUTE
-#pragma GCC diagnostic push
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif
 __strong_reference(free, __malloc_free);
 __strong_reference(free, cfree);
-#pragma GCC diagnostic pop
 #else
 void cfree(void * ptr)
 {

@@ -45,14 +45,15 @@
 #include <stdint.h>
 
 #if MALLOC_DEBUG
-#include <assert.h>
+void __malloc_validate(void);
+void __malloc_validate_block(chunk_t *r);
 #define MALLOC_LOCK do { __LIBC_LOCK(); __malloc_validate(); } while(0)
 #define MALLOC_UNLOCK do { __malloc_validate(); __LIBC_UNLOCK(); } while(0)
 #else
+#define __malloc_validate()
+#define __malloc_validate_block(r)
 #define MALLOC_LOCK __LIBC_LOCK()
 #define MALLOC_UNLOCK __LIBC_UNLOCK()
-#undef assert
-#define assert(x) ((void)0)
 #endif
 
 typedef union {
@@ -130,18 +131,18 @@ extern chunk_t *__malloc_free_list;
 extern char * __malloc_sbrk_start;
 extern char * __malloc_sbrk_top;
 
-/* Forward function declarations */
-void __malloc_validate(void);
-void __malloc_validate_block(chunk_t *r);
-void * __malloc_sbrk_aligned(size_t s);
+#if MALLOC_DEBUG
+#else
+#endif
+
 bool __malloc_grow_chunk(chunk_t *c, size_t new_size);
 
 /* Work around compiler optimizing away stores to 'size' field before
  * call to free.
  */
 #ifdef _HAVE_ALIAS_ATTRIBUTE
-extern void __malloc_free(void *);
-extern void *__malloc_malloc(size_t);
+void __malloc_free(void *);
+void *__malloc_malloc(size_t);
 #else
 #define __malloc_free(x) free(x)
 #define __malloc_malloc(x) malloc(x)

@@ -35,13 +35,13 @@ chunk_t *__malloc_free_list;
 char * __malloc_sbrk_start;
 char * __malloc_sbrk_top;
 
-/** Function __malloc_sbrk_aligned
-  * Algorithm:
-  *   Use sbrk() to obtain more memory and ensure the storage is
-  *   MALLOC_CHUNK_ALIGN aligned. Optimise for the case that it is
-  *   already aligned - only ask for extra padding after we know we
-  *   need it
-  */
+/*
+ * Algorithm:
+ *   Use sbrk() to obtain more memory and ensure the storage is
+ *   MALLOC_CHUNK_ALIGN aligned. Optimise for the case that it is
+ *   already aligned - only ask for extra padding after we know we
+ *   need it
+ */
 static void *
 __malloc_sbrk_aligned(size_t s)
 {
@@ -55,7 +55,7 @@ __malloc_sbrk_aligned(size_t s)
     if (d < 0 || (size_t) d != s)
 	return (void *)-1;
 #else
-    ptrdiff_t d = (ptrdiff_t)s;
+    intptr_t d = (intptr_t)s;
 
     if (d < 0)
 	return (void *)-1;
@@ -127,7 +127,8 @@ __malloc_grow_chunk(chunk_t *c, size_t new_size)
   *   Walk through the free list to find the first match. If fails to find
   *   one, call sbrk to allocate a new chunk_t.
   */
-void *malloc(size_t s)
+void *
+malloc(size_t s)
 {
     chunk_t **p, *r;
     char * ptr;
@@ -211,4 +212,31 @@ void *malloc(size_t s)
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif
 __strong_reference(malloc, __malloc_malloc);
+#endif
+
+#if MALLOC_DEBUG
+
+#include <assert.h>
+
+void
+__malloc_validate_block(chunk_t *r)
+{
+    assert (__align_up(chunk_to_ptr(r), MALLOC_CHUNK_ALIGN) == chunk_to_ptr(r));
+    assert (__align_up(r, MALLOC_HEAD_ALIGN) == r);
+    assert (_size(r) >= MALLOC_MINSIZE);
+    assert (_size(r) < 0x80000000UL);
+    assert (__align_up(_size(r), MALLOC_HEAD_ALIGN) == _size(r));
+}
+
+void
+__malloc_validate(void)
+{
+    chunk_t *r;
+
+    for (r = __malloc_free_list; r; r = r->next) {
+	__malloc_validate_block(r);
+	assert (r->next == NULL || (char *) r + _size(r) <= (char *) r->next);
+    }
+}
+
 #endif

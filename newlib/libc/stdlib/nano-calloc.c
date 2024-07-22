@@ -28,13 +28,14 @@
 
 #include "nano-malloc.h"
 #include "mul_overflow.h"
-/* Function calloc
- *
+
+/*
  * Implement calloc by multiplying sizes (with overflow check) and
- * calling malloc (which sets to zero)
+ * calling malloc (which already sets to zero)
  */
 
-void * calloc(size_t n, size_t elem)
+void *
+calloc(size_t n, size_t elem)
 {
     size_t bytes;
 
