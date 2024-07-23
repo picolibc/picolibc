@@ -69,7 +69,7 @@ C99, POSIX.1-2001.
 */
 
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <wchar.h>
 #include "local.h"
 

@@ -67,7 +67,6 @@ PORTABILITY
 #else
 #define _DEFAULT_SOURCE
 #endif
-#include <_ansi.h>
 #include <sys/cdefs.h>
 #include <stdlib.h>
 #include <stdint.h>

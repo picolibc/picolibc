@@ -29,16 +29,15 @@ SUCH DAMAGE.
 #ifndef _SYS_UNISTD_H
 #define _SYS_UNISTD_H
 
-#include <_ansi.h>
-
-_BEGIN_STD_C
-
+#include <sys/cdefs.h>
 #define __need_size_t
 #define __need_ptrdiff_t
 #define __need_NULL
 #include <stddef.h>
-#include <sys/cdefs.h>
 #include <sys/_types.h>
+
+_BEGIN_STD_C
+
 
 #ifndef _USECONDS_T_DECLARED
 typedef	__useconds_t	useconds_t;	/* microseconds (unsigned) */

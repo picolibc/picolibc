@@ -55,7 +55,7 @@ No supporting OS subroutines are required.
  *	citrus Id: wmemset.c,v 1.2 2000/12/20 14:08:31 itojun Exp
  */
 
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <wchar.h>
 
 wchar_t	*

@@ -40,7 +40,6 @@ SUCH DAMAGE.
 #ifndef _STRING_H_
 #define	_STRING_H_
 
-#include "_ansi.h"
 #include <sys/cdefs.h>
 #include <sys/features.h>
 

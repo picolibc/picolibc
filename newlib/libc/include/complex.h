@@ -12,7 +12,6 @@
 #define _Complex_I 1.0fi
 #define I _Complex_I
 
-#include "_ansi.h"
 #include <sys/cdefs.h>
 
 _BEGIN_STD_C

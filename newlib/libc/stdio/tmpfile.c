@@ -55,7 +55,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<getpid>>,
 */
 
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <stdio.h>
 #include <errno.h>
 #include <fcntl.h>

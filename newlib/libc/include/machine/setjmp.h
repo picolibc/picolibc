@@ -10,7 +10,7 @@ This file is distributed WITHOUT ANY WARRANTY; without even the implied
 warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#include <_ansi.h>
+#include <sys/cdefs.h>
 
 _BEGIN_STD_C
 

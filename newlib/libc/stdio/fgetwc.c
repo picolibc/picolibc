@@ -117,7 +117,7 @@ PORTABILITY
 */
 
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -20,7 +20,7 @@
 static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <stdio.h>
 #include <errno.h>
 #include "local.h"

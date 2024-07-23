@@ -4,7 +4,7 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
  */
 /* Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling */
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <ctype.h>
 #include <wctype.h>
 #include "local.h"

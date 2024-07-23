@@ -73,7 +73,7 @@ No supporting OS subroutines are required.
  * SUCH DAMAGE.
  */
 
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <stdlib.h>		/* div_t */
 
 div_t

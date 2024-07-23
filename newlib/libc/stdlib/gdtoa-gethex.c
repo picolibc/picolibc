@@ -30,7 +30,7 @@ THIS SOFTWARE.
  * with " at " changed at "@" and " dot " changed to ".").	*/
 
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <string.h>
 #include <locale.h>
 #include "mprec.h"

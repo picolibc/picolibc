@@ -18,7 +18,7 @@
 /* doc in vfprintf.c */
 
 #define _GNU_SOURCE
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <stdio.h>
 #include <limits.h>
 #include <stdarg.h>

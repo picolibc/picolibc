@@ -7,10 +7,9 @@
 #ifndef _ARGZ_H_
 #define _ARGZ_H_
 
+#include <sys/cdefs.h>
 #include <errno.h>
 #include <sys/types.h>
-
-#include "_ansi.h"
 
 _BEGIN_STD_C
 

@@ -29,7 +29,6 @@
 #ifndef _SETLOCALE_H_
 #define	_SETLOCALE_H_
 
-#include <_ansi.h>
 #include <sys/cdefs.h>
 #include <errno.h>
 #include <limits.h>

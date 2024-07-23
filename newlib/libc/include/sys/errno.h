@@ -33,7 +33,7 @@ SUCH DAMAGE.
 #ifndef _SYS_ERRNO_H_
 #define _SYS_ERRNO_H_
 
-#include "_ansi.h"
+#include <sys/cdefs.h>
 #include <sys/config.h>
 
 _BEGIN_STD_C

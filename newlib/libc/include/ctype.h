@@ -34,7 +34,6 @@ SUCH DAMAGE.
 #ifndef _CTYPE_H_
 #define _CTYPE_H_
 
-#include "_ansi.h"
 #include <sys/cdefs.h>
 
 #if __POSIX_VISIBLE >= 200809 || __MISC_VISIBLE

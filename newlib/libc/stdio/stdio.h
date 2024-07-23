@@ -26,14 +26,13 @@
 #ifndef _STDIO_H_
 #define	_STDIO_H_
 
-#include "_ansi.h"
+#include <sys/cdefs.h>
 
 #define	_FSTDIO			/* ``function stdio'' */
 
 #define __need_size_t
 #define __need_NULL
 #include <stddef.h>
-#include <sys/cdefs.h>
 
 #include <stdarg.h>
 #include <sys/_types.h>

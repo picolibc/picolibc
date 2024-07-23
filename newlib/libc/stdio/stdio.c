@@ -17,7 +17,7 @@
 /* No user fns here.  Pesch 15apr92. */
 
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <fcntl.h>

@@ -8,8 +8,7 @@ is preserved.
 #ifndef __F_MATH_H__
 #define __F_MATH_H__
 
-#include <_ansi.h>
-#include "fdlibm.h"
+#include "math_config.h"
 
 __inline__
 static 

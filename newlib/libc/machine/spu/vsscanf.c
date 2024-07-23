@@ -32,7 +32,7 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 #include <picolibc.h>
 
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <stdio.h>
 
 #include "c99ppe.h"

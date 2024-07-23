@@ -132,7 +132,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
  */
 
 #define _GNU_SOURCE
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>

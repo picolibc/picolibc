@@ -13,7 +13,7 @@
 #ifndef _INTTYPES_H
 #define _INTTYPES_H
 
-#include "_ansi.h"
+#include <sys/cdefs.h>
 #include <stdint.h>
 
 _BEGIN_STD_C

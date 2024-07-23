@@ -1,7 +1,7 @@
 #ifndef __SYS_LOCK_H__
 #define __SYS_LOCK_H__
 
-#include <_ansi.h>
+#include <sys/cdefs.h>
 
 typedef unsigned int _LOCK_T;
 typedef unsigned int _LOCK_RECURSIVE_T;

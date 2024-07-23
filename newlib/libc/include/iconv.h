@@ -26,7 +26,7 @@
 #ifndef _ICONV_H_
 #define _ICONV_H_
 
-#include "_ansi.h"
+#include <sys/cdefs.h>
 
 #define __need_size_t
 #include <stddef.h>

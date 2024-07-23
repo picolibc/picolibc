@@ -29,7 +29,6 @@ SUCH DAMAGE.
 #ifndef	_SYS_STAT_H
 #define	_SYS_STAT_H
 
-#include <_ansi.h>
 #include <sys/cdefs.h>
 #include <sys/_types.h>
 #include <sys/_timespec.h>

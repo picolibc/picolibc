@@ -128,7 +128,7 @@ Supporting OS subroutines required: <<getpid>>, <<mkdir>>, <<open>>, <<stat>>.
 */
 
 #define _GNU_SOURCE
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <fcntl.h>

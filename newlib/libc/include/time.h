@@ -40,7 +40,6 @@ SUCH DAMAGE.
 #ifndef _TIME_H_
 #define _TIME_H_
 
-#include "_ansi.h"
 #include <sys/cdefs.h>
 
 #define __need_size_t

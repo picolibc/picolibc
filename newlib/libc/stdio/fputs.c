@@ -72,7 +72,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 */
 
 #define _GNU_SOURCE
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <stdio.h>
 #include <string.h>
 #include "fvwrite.h"

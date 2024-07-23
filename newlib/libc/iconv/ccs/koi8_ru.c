@@ -8,7 +8,7 @@
 #if defined (ICONV_TO_UCS_CCS_KOI8_RU) \
  || defined (ICONV_FROM_UCS_CCS_KOI8_RU)
 
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <sys/types.h>
 #include <sys/param.h>
 #include "ccs.h"

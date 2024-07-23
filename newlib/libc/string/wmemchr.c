@@ -59,7 +59,7 @@ No supporting OS subroutines are required.
  */
 
 
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <wchar.h>
 
 wchar_t *

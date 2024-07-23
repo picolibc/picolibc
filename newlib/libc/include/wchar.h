@@ -26,8 +26,7 @@ SUCH DAMAGE.
 #ifndef _WCHAR_H_
 #define _WCHAR_H_
 
-#include "_ansi.h"
-
+#include <sys/cdefs.h>
 #define __need_size_t
 #define __need_wchar_t
 #define __need_wint_t
@@ -36,9 +35,7 @@ SUCH DAMAGE.
 
 /* For _mbstate_t definition. */
 #include <sys/_types.h>
-#include <sys/cdefs.h>
-/* For __STDC_ISO_10646__ */
-#include <sys/features.h>
+#define __need___va_list
 #include <stdarg.h>
 
 #ifndef WEOF
@@ -162,15 +159,15 @@ int      swscanf (const wchar_t *__restrict,
 wint_t   ungetwc (wint_t wc, __FILE *);
 #if __ISO_C_VISIBLE >= 1999 || __XSI_VISIBLE >= 500
 int      vfwprintf (__FILE *__restrict, const wchar_t *__restrict,
-                    va_list);
+                    __gnuc_va_list);
 int      vfwscanf (__FILE *__restrict, const wchar_t *__restrict,
-                   va_list);
+                   __gnuc_va_list);
 int      vswprintf (wchar_t *__restrict, size_t,
-                    const wchar_t *__restrict, va_list);
+                    const wchar_t *__restrict, __gnuc_va_list);
 int      vswscanf (const wchar_t *__restrict, const wchar_t *__restrict,
-                   va_list);
-int      vwprintf (const wchar_t *__restrict, va_list);
-int      vwscanf (const wchar_t *__restrict, va_list);
+                   __gnuc_va_list);
+int      vwprintf (const wchar_t *__restrict, __gnuc_va_list);
+int      vwscanf (const wchar_t *__restrict, __gnuc_va_list);
 #endif
 #if __POSIX_VISIBLE >= 200809
 wchar_t *wcpcpy (wchar_t *__restrict,

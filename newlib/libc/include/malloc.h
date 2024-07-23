@@ -36,12 +36,10 @@ SUCH DAMAGE.
 #ifndef _INCLUDE_MALLOC_H_
 #define _INCLUDE_MALLOC_H_
 
-#include "_ansi.h"
-
+#include <sys/cdefs.h>
 #define __need_size_t
 #include <stddef.h>
 
-#include <sys/cdefs.h>
 /* include any machine-specific extensions */
 #include <machine/malloc.h>
 

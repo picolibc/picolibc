@@ -113,7 +113,7 @@ PORTABILITY
  */
 
 #define _GNU_SOURCE
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <limits.h>
 #include <ctype.h>
 #include <errno.h>

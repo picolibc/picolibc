@@ -56,7 +56,7 @@ PORTABILITY
  *	citrus Id: wcsstr.c,v 1.2 2000/12/21 05:07:25 itojun Exp
  */
 
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <stddef.h>
 #include <wchar.h>
 

@@ -12,7 +12,7 @@
 #ifndef _FENV_H
 #define _FENV_H
 
-#include "_ansi.h"
+#include <sys/cdefs.h>
 #include <sys/config.h>
 
 _BEGIN_STD_C

@@ -87,7 +87,7 @@ QUICKREF
 #undef  __STRICT_ANSI__
 #include <string.h>
 #include <stdlib.h>
-#include <_ansi.h>
+#include <sys/cdefs.h>
 
 #ifndef _REENT_ONLY
 

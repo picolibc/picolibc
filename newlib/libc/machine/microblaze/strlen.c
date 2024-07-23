@@ -57,7 +57,7 @@ QUICKREF
 
 #include <picolibc.h>
 
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <string.h>
 #include <limits.h>
 

@@ -31,7 +31,7 @@ QUICKREF
 */
 
 #define _GNU_SOURCE
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <string.h>
 #include <limits.h>
 #include <stdint.h>

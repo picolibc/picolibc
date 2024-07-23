@@ -25,7 +25,7 @@
 #ifndef __ICONV_LIB_LOCAL_H__
 #define __ICONV_LIB_LOCAL_H__
 
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <sys/types.h>
 #include <limits.h>
 

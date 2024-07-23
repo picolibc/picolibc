@@ -9,7 +9,7 @@
 #ifndef _STDINT_H
 #define _STDINT_H
 
-#include "_ansi.h"
+#include <sys/cdefs.h>
 #include <machine/_default_types.h>
 #include <sys/_intsup.h>
 #include <sys/_stdint.h>

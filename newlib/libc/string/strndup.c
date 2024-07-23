@@ -3,7 +3,7 @@ Copyright (c) 2002 Jeff Johnston <jjohnstn@redhat.com>
  */
 
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <stdlib.h>
 #include <string.h>
 

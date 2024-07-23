@@ -4,7 +4,7 @@
 
 /* dummy lock routines for single-threaded aps */
 
-#include <_ansi.h>
+#include <sys/cdefs.h>
 
 #if !defined(_RETARGETABLE_LOCKING)
 

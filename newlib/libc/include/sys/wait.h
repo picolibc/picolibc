@@ -29,7 +29,7 @@ SUCH DAMAGE.
 #ifndef _SYS_WAIT_H
 #define _SYS_WAIT_H
 
-#include "_ansi.h"
+#include <sys/cdefs.h>
 
 _BEGIN_STD_C
 

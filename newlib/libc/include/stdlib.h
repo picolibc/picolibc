@@ -40,15 +40,13 @@ SUCH DAMAGE.
 #ifndef _STDLIB_H_
 #define _STDLIB_H_
 
+#include <sys/cdefs.h>
 #include <machine/ieeefp.h>
-#include "_ansi.h"
-
 #define __need_size_t
 #define __need_wchar_t
 #define __need_NULL
 #include <stddef.h>
 
-#include <sys/cdefs.h>
 #include <machine/stdlib.h>
 #ifndef __STRICT_ANSI__
 #include <alloca.h>

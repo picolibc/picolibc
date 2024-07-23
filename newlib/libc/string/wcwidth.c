@@ -90,7 +90,7 @@ PORTABILITY
  */
 
 #define _XOPEN_SOURCE
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <wchar.h>
 #include <stdint.h>
 #ifndef _MB_CAPABLE

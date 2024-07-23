@@ -25,7 +25,7 @@
 #ifndef __CCS_H__
 #define __CCS_H__
 
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <sys/types.h>
 #include <sys/param.h>
 

@@ -45,7 +45,6 @@ SUCH DAMAGE.
 
 #ifndef _SYS_TYPES_H
 
-#include <_ansi.h>
 #include <sys/cdefs.h>
 #include <machine/_types.h>
 

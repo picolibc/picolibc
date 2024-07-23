@@ -59,7 +59,7 @@ No supporting OS subroutines are required.
  * SUCH DAMAGE.
  */
 
-#include <_ansi.h>
+#include <sys/cdefs.h>
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)unctrl.c	8.1 (Berkeley) 6/4/93";

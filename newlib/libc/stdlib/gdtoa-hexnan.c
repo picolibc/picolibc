@@ -38,7 +38,7 @@ THIS SOFTWARE.
 /* Modified 06-21-2006 by Jeff Johnston to work with newlib.  */
 
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <string.h>
 #include "mprec.h"
 #include "gdtoa.h"

@@ -32,7 +32,7 @@ extern "C" {
 #endif
 #define	_SYS_TIMES_H
 
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <sys/_types.h>
 
 #ifndef _CLOCK_T_DECLARED

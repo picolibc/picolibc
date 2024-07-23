@@ -39,7 +39,6 @@ SUCH DAMAGE.
 #ifndef _SETJMP_H_
 #define _SETJMP_H_
 
-#include "_ansi.h"
 #include <sys/cdefs.h>
 #include <machine/setjmp.h>
 

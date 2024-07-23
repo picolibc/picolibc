@@ -27,7 +27,7 @@ PORTABILITY
 */
 
 #undef __STRICT_ANSI__
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <string.h>
 
 size_t

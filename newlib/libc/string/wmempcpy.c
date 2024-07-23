@@ -30,7 +30,7 @@ No supporting OS subroutines are required.
 */
 
 #define _GNU_SOURCE
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <string.h>
 #include <wchar.h>
 

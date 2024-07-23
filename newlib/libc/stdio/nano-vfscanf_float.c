@@ -16,7 +16,7 @@
  */
 
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <ctype.h>
 #include <wctype.h>
 #include <stdio.h>

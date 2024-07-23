@@ -17,7 +17,7 @@
 /* Doc in swscanf.c */
  
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <stdio.h>
 #include <wchar.h>
 #include <stdarg.h>

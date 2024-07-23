@@ -83,7 +83,7 @@ by the Single Unix specification.
 
 No supporting OS subroutine calls are required.
 */
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <sys/types.h>
 #include <errno.h>
 #include <string.h>

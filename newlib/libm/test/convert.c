@@ -18,7 +18,6 @@
 
 #define _GNU_SOURCE
 #include "test.h"
-//#include <_ansi.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>

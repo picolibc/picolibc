@@ -7,7 +7,7 @@
 #ifndef _NEWLIB_ALLOCA_H
 #define _NEWLIB_ALLOCA_H
 
-#include "_ansi.h"
+#include <sys/cdefs.h>
 
 #undef alloca
 

@@ -40,7 +40,6 @@ SUCH DAMAGE.
 #ifndef _LOCALE_H_
 #define _LOCALE_H_
 
-#include "_ansi.h"
 #include <sys/cdefs.h>
 
 #define __need_NULL

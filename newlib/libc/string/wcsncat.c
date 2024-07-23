@@ -58,7 +58,7 @@ No supporting OS subroutines are required.
  *	citrus Id: wcsncat.c,v 1.1 1999/12/29 21:47:45 tshiozak Exp
  */
 
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <wchar.h>
 
 wchar_t *

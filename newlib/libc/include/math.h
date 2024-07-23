@@ -35,7 +35,6 @@ SUCH DAMAGE.
 #ifndef  _MATH_H_
 #define  _MATH_H_
 
-#include "_ansi.h"
 #include <sys/cdefs.h>
 
 _BEGIN_STD_C

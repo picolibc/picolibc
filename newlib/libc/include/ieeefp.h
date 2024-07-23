@@ -34,7 +34,7 @@ SUCH DAMAGE.
 #ifndef _IEEEFP_H_
 #define _IEEEFP_H_
 
-#include "_ansi.h"
+#include <sys/cdefs.h>
 #include <machine/ieeefp.h>
 #include <sys/features.h>
 

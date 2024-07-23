@@ -27,7 +27,6 @@
 #ifndef _SPAWN_H_
 #define _SPAWN_H_
 
-#include "_ansi.h"
 #include <sys/cdefs.h>
 #include <sys/types.h>
 #include <sys/_types.h>

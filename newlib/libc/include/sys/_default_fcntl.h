@@ -2,7 +2,6 @@
 
 #ifndef	_SYS__DEFAULT_FCNTL_H_
 #define	_SYS__DEFAULT_FCNTL_H_
-#include <_ansi.h>
 #include <sys/cdefs.h>
 #include <sys/_types.h>
 

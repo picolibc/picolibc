@@ -79,7 +79,7 @@ not portable.
 
 */
 
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <stdlib.h>
 #include <malloc.h>
 #include <stdio.h>

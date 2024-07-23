@@ -35,7 +35,6 @@ SUCH DAMAGE.
 	assert.h
 */
 
-#include "_ansi.h"
 #include <sys/cdefs.h>
 
 _BEGIN_STD_C

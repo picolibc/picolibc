@@ -36,7 +36,7 @@
 /* Under Cygwin, the incoming wide character is already given in UTF due
    to the requirements of the underlying OS. */
 
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <string.h>
 #include <wctype.h>
 #include "local.h"

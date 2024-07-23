@@ -32,7 +32,7 @@ No supporting OS subroutines are directly required.
 
 #define _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
