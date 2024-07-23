@@ -1025,7 +1025,8 @@ foreach target : ['default-target'] + targets
         # them if we are using an older version.
         # There is no `cc.get_linker_version()` function, so we detect ld.lld
         # version 15 by checking for a newly added linker flag.
-        if not cc.has_link_argument('--package-metadata=1')
+        # Note: --version still checks for valid arguments so this works.
+        if not cc.has_link_argument('-Wl,--package-metadata=1,--version')
           message('Linking for RISCV with ld.lld < 15, forcing -mno-relax')
           c_args += ['-mno-relax']
         endif
