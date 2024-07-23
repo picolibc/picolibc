@@ -37,21 +37,25 @@ strcmp:
   and   a4, a4, SZREG-1
   bnez  a4, .Lmisaligned
 
+#ifndef __riscv_zbb
 #if SZREG == 4
   li a5, 0x7f7f7f7f
 #else
   ld a5, mask
 #endif
+#endif
 
   .macro check_one_word i n
     REG_L a2, \i*SZREG(a0)
     REG_L a3, \i*SZREG(a1)
-
+#ifdef __riscv_zbb
+    orc.b t0, a2
+#else
     and   t0, a2, a5
     or    t1, a2, a5
     add   t0, t0, a5
     or    t0, t0, t1
-
+#endif
     bne   t0, t2, .Lnull\i
     .if \i+1-\n
       bne   a2, a3, .Lmismatch
@@ -189,7 +193,7 @@ strcmp:
 #endif
 .size	strcmp, .-strcmp
 
-#if SZREG == 8
+#if SZREG == 8 && !defined(__riscv_zbb)
 .section .srodata.cst8,"aM",@progbits,8
 .align 3
 mask:
