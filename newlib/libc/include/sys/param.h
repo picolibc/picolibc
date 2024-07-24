@@ -33,7 +33,7 @@ SUCH DAMAGE.
 #ifndef _SYS_PARAM_H
 # define _SYS_PARAM_H
 
-#include <sys/config.h>
+#include <sys/cdefs.h>
 #include <sys/syslimits.h>
 #include <machine/endian.h>
 #include <machine/param.h>

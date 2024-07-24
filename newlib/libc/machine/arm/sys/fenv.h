@@ -31,6 +31,10 @@
 #ifndef _SYS_FENV_H_
 #define _SYS_FENV_H_ 1
 
+#include <sys/cdefs.h>
+
+_BEGIN_STD_C
+
 typedef int fenv_t;
 typedef int fexcept_t;
 
@@ -70,6 +74,8 @@ typedef int fexcept_t;
 #if !defined(__declare_fenv_inline) && defined(__declare_extern_inline)
 #define	__declare_fenv_inline(type) __declare_extern_inline(type)
 #endif
+
+_END_STD_C
 
 #ifdef __declare_fenv_inline
 #ifdef __SOFTFP__

@@ -39,12 +39,12 @@
 #ifndef _STDIO_H_
 #define	_STDIO_H_ 1
 
+#include <sys/cdefs.h>
 #define __need_NULL
 #define __need_size_t
 #include <stddef.h>
 #include <inttypes.h>
 #include <stdarg.h>
-#include <sys/cdefs.h>
 #include <sys/_types.h>
 
 /*

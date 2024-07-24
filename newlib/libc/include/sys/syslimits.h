@@ -33,6 +33,8 @@
 #ifndef _SYS_SYSLIMITS_H_
 #define _SYS_SYSLIMITS_H_
 
+#include <sys/cdefs.h>
+
 #define	ARG_MAX			65536	/* max bytes for an exec function */
 #ifndef CHILD_MAX
 #define	CHILD_MAX		   40	/* max simultaneous processes */

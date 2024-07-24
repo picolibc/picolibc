@@ -20,12 +20,11 @@
 #ifndef _SCHED_H_
 #define _SCHED_H_
 
+#include <sys/cdefs.h>
 #include <sys/types.h>
 #include <sys/sched.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+_BEGIN_STD_C
 
 #if defined(_POSIX_PRIORITY_SCHEDULING)
 /*
@@ -105,8 +104,6 @@ int sched_set_thread_affinity (void *, size_t, const cpu_set_t *);
 
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
 
 #endif /* _SCHED_H_ */

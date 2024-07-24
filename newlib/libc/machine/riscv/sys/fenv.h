@@ -12,6 +12,7 @@
 #ifndef _SYS_FENV_H
 #define _SYS_FENV_H
 
+#include <sys/cdefs.h>
 #include <stddef.h>
 
 #if defined(__riscv_flen) || defined(__riscv_zfinx)

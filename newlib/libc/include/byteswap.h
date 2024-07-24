@@ -36,6 +36,10 @@
 #ifndef __BYTESWAP_H__
 #define __BYTESWAP_H__
 
+#include <sys/cdefs.h>
+
+_BEGIN_STD_C
+
 #ifdef __GNUC__
 #define	bswap_16(_x)	__builtin_bswap16(_x)
 #define	bswap_32(_x)	__builtin_bswap32(_x)
@@ -67,5 +71,7 @@ bswap_64(__uint64_t _x)
 	    ((_x << 40) & ((__uint64_t)0xff << 48)) | ((_x << 56))));
 }
 #endif /* !__GNUC__ */
+
+_END_STD_C
 
 #endif /* __BYTESWAP_H__ */

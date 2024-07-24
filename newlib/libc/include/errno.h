@@ -34,6 +34,8 @@ SUCH DAMAGE.
 #ifndef __ERRNO_H__
 #define __ERRNO_H__
 
+#include <sys/cdefs.h>
+
 #ifndef __error_t_defined
 typedef int error_t;
 #define __error_t_defined 1

@@ -33,9 +33,9 @@ SUCH DAMAGE.
    particular system.  If there is a utime.h in libc/sys/SYSDIR/sys,
    it will override this one.  */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <sys/cdefs.h>
+
+_BEGIN_STD_C
 
 struct utimbuf 
 {
@@ -43,8 +43,6 @@ struct utimbuf
   time_t modtime; 
 };
 
-#ifdef __cplusplus
-};
-#endif
+_END_STD_C
 
 #endif /* _SYS_UTIME_H */

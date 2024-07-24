@@ -31,9 +31,9 @@
 #ifndef	_SYS_FENV_H_
 #define	_SYS_FENV_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <sys/cdefs.h>
+
+_BEGIN_STD_C
 
 #ifdef _SOFT_FLOAT
 typedef int fenv_t;
@@ -96,8 +96,6 @@ typedef	__UINT32_TYPE__	fexcept_t;
 #endif
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
 
 #endif	/* !_SYS_FENV_H_ */

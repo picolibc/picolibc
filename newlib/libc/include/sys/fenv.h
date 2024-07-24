@@ -30,6 +30,10 @@
 #ifndef _SYS_FENV_H_
 #define _SYS_FENV_H_
 
+#include <sys/cdefs.h>
+
+_BEGIN_STD_C
+
 /*******************************************************************************
  * THIS FILE IS A TEMPLATE, INTENDED TO BE USED AS A STARTING POINT FOR
  * TARGET-SPECIFIC FLOATING-POINT IMPLEMENTATIONS.  NOTES BELOW HIGHLIGHT THE
@@ -101,6 +105,8 @@
 typedef int fenv_t;
 typedef int fexcept_t;
 
+_END_STD_C
+
 #if !defined(__declare_fenv_inline) && defined(__declare_extern_inline)
 #define	__declare_fenv_inline(type) __declare_extern_inline(type)
 #endif
@@ -108,5 +114,6 @@ typedef int fexcept_t;
 #ifdef __declare_fenv_inline
 #include <machine/fenv-softfloat.h>
 #endif
+
 
 #endif /* _SYS_FENV_H_ */

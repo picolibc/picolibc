@@ -36,11 +36,13 @@
 #ifndef _PICOTLS_H_
 #define _PICOTLS_H_
 
-#include <picolibc.h>
+#include <sys/cdefs.h>
 
 #ifdef PICOLIBC_TLS
 
 #include <sys/types.h>
+
+_BEGIN_STD_C
 
 extern char __tls_size[];
 
@@ -60,6 +62,9 @@ _init_tls(void *tls);
 /* Set the TLS pointer to the specific block */
 void
 _set_tls(void *tls);
+
+_END_STD_C
+
 #endif
 
 #endif /* _PICOTLS_H_ */
