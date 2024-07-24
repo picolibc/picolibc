@@ -48,3 +48,13 @@ endforeach
 
 install_headers(inc_stdio_sys_headers,
 		install_dir: include_dir / 'sys')
+
+if enable_tests
+  foreach header : inc_stdio_sys_headers
+    test_name = 'check-cdef-sys-' + header
+    test(test_name,
+         validate_cdefs,
+         args: [meson.current_source_dir() / header] + cc.cmd_array() + c_args + inc_args,
+         suite: 'headers')
+  endforeach
+endif

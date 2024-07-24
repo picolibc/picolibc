@@ -231,7 +231,8 @@ if posix_console
   srcs_tinystdio += srcs_tinystdio_posix_console
 endif
 
-install_headers(['stdio.h', 'stdio-bufio.h'],
+inc_headers = ['stdio.h', 'stdio-bufio.h']
+install_headers(inc_headers,
 		install_dir: include_dir
 	       )
 
@@ -248,3 +249,13 @@ foreach file : srcs_tinystdio
 endforeach
 
 src_tinystdio = files(srcs_tinystdio_use)
+
+if enable_tests
+  foreach header : inc_headers
+    test_name = 'check-cdef-' + header
+    test(test_name,
+         validate_cdefs,
+         args: [meson.current_source_dir() / header] + cc.cmd_array() + c_args + inc_args,
+         suite: 'headers')
+  endforeach
+endif

@@ -260,6 +260,10 @@ if nm.found()
   duplicate_names = find_program('scripts/duplicate-names', required : true)
 endif
 
+if enable_tests
+  validate_cdefs = find_program ('scripts/validate-cdefs', required : true)
+endif
+
 # Select exit code
 picoexit = get_option('picoexit')
 
@@ -1539,6 +1543,11 @@ endif
 inc_dirs = [stdio_inc_dir, '.', 'newlib/libc/include']
 
 inc = include_directories(inc_dirs)
+
+inc_args = []
+foreach inc_dir : inc_dirs + [meson.current_build_dir()]
+  inc_args += '-I' + meson.current_source_dir() / inc_dir
+endforeach
 
 # We don't need '-fdata-sections' currently as there aren't any
 # files with data used in separate code paths. This works around

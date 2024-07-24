@@ -88,3 +88,16 @@ endforeach
 
 install_headers(inc_sys_headers,
 		install_dir: include_dir / 'sys')
+
+if enable_tests
+  ignore_headers = ['config.h', 'features.h', 'string.h', 'custom_file.h', 'dirent.h']
+  foreach header : inc_sys_headers
+    if not (header in ignore_headers) and not (header.startswith('_'))
+      test_name = 'check-cdef-sys-' + header
+      test(test_name,
+           validate_cdefs,
+           args: [meson.current_source_dir() / header] + cc.cmd_array() + c_args + inc_args,
+           suite: 'headers')
+    endif
+  endforeach
+endif

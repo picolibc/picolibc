@@ -39,3 +39,15 @@ inc_sys_headers_machine = [
 install_headers(inc_sys_headers_machine,
 		install_dir: include_dir / 'sys')
 
+if enable_tests
+  ignore_headers = []
+  foreach header : inc_sys_headers_machine
+    if not (header in ignore_headers) and not (header.startswith('_'))
+      test_name = 'check-cdef-sys-' + header
+      test(test_name,
+           validate_cdefs,
+           args: [meson.current_source_dir() / header] + cc.cmd_array() + c_args + inc_args,
+           suite: 'headers')
+    endif
+  endforeach
+endif

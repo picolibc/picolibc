@@ -33,9 +33,22 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-inc_headers = [
+inc_arpa_headers = [
   'inet.h'
 ]
 
-install_headers(inc_headers,
+install_headers(inc_arpa_headers,
 		install_dir: include_dir / 'arpa')
+
+if enable_tests
+  ignore_headers = []
+  foreach header : inc_arpa_headers
+    if not (header in ignore_headers) and not (header.startswith('_'))
+      test_name = 'check-cdef-arpa-' + header
+      test(test_name,
+           validate_cdefs,
+           args: [meson.current_source_dir() / header] + cc.cmd_array() + c_args + inc_args,
+           suite: 'headers')
+    endif
+  endforeach
+endif

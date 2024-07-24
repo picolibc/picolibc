@@ -1,0 +1,35 @@
+#!/bin/bash
+
+input="$1"
+shift
+echo '#include "'$input'"' | ("$@" -E - || exit 0) |
+    awk 'BEGIN {
+		contents = 0;
+		cdefs = 0;
+		 filename = "";
+	}
+	{
+		print $0
+		if ($1 == "#") {
+			name = $3;
+			gsub(/"/, "", name);
+			if (name ~ "^.*/newlib/libc/include/sys/cdefs.h$") {
+				if (contents && !cdefs) {
+					printf("%s: contents before cdefs: \"%s\"\n", filename, first_contents);
+					exit(1);
+				}
+				cdefs = 1;
+			}
+		} else {
+			if (NF != 0) {
+				contents = 1;
+				first_contents=$0
+			}
+		}
+	}
+	END {
+		if (!cdefs) {
+			printf("%s: cdefs never included\n", filename);
+			exit 1;
+		}
+	}' || exit 1
