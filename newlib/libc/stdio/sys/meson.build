@@ -49,7 +49,7 @@ endforeach
 install_headers(inc_stdio_sys_headers,
 		install_dir: include_dir / 'sys')
 
-if enable_tests
+if enable_cdefs_tests
   foreach header : inc_stdio_sys_headers
     test_name = 'check-cdef-sys-' + header
     test(test_name,

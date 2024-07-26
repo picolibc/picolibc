@@ -40,7 +40,7 @@ inc_arpa_headers = [
 install_headers(inc_arpa_headers,
 		install_dir: include_dir / 'arpa')
 
-if enable_tests
+if enable_cdefs_tests
   ignore_headers = []
   foreach header : inc_arpa_headers
     if not (header in ignore_headers) and not (header.startswith('_'))

@@ -130,7 +130,7 @@ if src_semihost != []
     
   endforeach
 
-  if enable_tests
+  if enable_cdefs_tests
     ignore_headers = []
     foreach header : inc_headers
 

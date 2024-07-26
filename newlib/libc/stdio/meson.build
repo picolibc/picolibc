@@ -300,7 +300,7 @@ endforeach
 
 src_stdio = files(srcs_stdio_use)
 
-if enable_tests
+if enable_cdefs_tests
   foreach header : inc_headers
     test_name = 'check-cdef-' + header
     test(test_name,

@@ -112,7 +112,7 @@ install_headers(inc_headers,
 install_headers(['bits/types/mbstate_t.h'],
 		install_dir: include_dir / 'bits/types')
 
-if enable_tests
+if enable_cdefs_tests
 
   ignore_headers = ['cpio.h', 'paths.h', 'termios.h', 'newlib.h', 'regdef.h', 'tar.h', 'utmp.h']
   foreach header : inc_headers

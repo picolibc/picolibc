@@ -250,7 +250,7 @@ endforeach
 
 src_tinystdio = files(srcs_tinystdio_use)
 
-if enable_tests
+if enable_cdefs_tests
   foreach header : inc_headers
     test_name = 'check-cdef-' + header
     test(test_name,

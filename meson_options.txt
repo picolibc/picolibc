@@ -113,6 +113,8 @@ option('native-math-tests', type: 'boolean', value: true,
        description: 'Run math tests against native libm when native-tests is enable')
 option('tests', type: 'boolean', value: false,
        description: 'Enable tests')
+option('tests-cdefs', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
+       description: 'Enable test of sys/cdefs.h. If set to auto, enable when tests are enabled')
 option('tests-enable-stack-protector', type: 'boolean', value: true,
        description: 'tests enable stack protector')
 option('tests-enable-full-malloc-stress', type: 'boolean', value: false,

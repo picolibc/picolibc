@@ -155,6 +155,11 @@ enable_picocrt = get_option('picocrt')
 enable_picocrt_lib = get_option('picocrt-lib')
 enable_semihost = get_option('semihost')
 enable_tests = get_option('tests')
+if get_option('tests-cdefs') == 'auto'
+  enable_cdefs_tests = enable_tests
+else
+  enable_cdefs_tests = get_option('tests-cdefs') == 'true'
+endif
 enable_native_tests = get_option('native-tests')
 enable_native_math_tests = enable_native_tests and get_option('native-math-tests')
 tests_enable_stack_protector = get_option('tests-enable-stack-protector')
@@ -260,7 +265,7 @@ if nm.found()
   duplicate_names = find_program('scripts/duplicate-names', required : true)
 endif
 
-if enable_tests
+if enable_cdefs_tests
   validate_cdefs = find_program ('scripts/validate-cdefs', required : true)
 endif
 
