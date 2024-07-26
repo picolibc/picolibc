@@ -1263,6 +1263,7 @@ Files: newlib/libc/include/stdnoreturn.h
  newlib/libc/tinystdio/funlockfile.c
  newlib/libc/tinystdio/funopen.c
  newlib/libm/fenv/fenv.c
+ scripts/validate-cdefs
  test/test-cplusplus.cpp
  test/test-ctype.c
  test/test-funopen.c
