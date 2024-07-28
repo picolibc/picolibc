@@ -2845,7 +2845,7 @@ Files: .clang-format
  scripts/cross-riscv64-unknown-elf.txt
  scripts/cross-riscv64-zephyr-elf.txt
  scripts/cross-rv32imac.txt
- scripts/cross-rv32imac_zicsr.txt
+ scripts/cross-rv32imac_zicsr_zbb.txt
  scripts/cross-sh-unknown-elf.txt
  scripts/cross-sparc-zephyr-elf.txt
  scripts/cross-sparc64-linux-gnu.txt
