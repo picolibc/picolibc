@@ -281,6 +281,12 @@ static int test_sscanf(void)
         TEST_FV(INFINITY, "inf");
         TEST_FV(-INFINITY, "-inf");
 
+        a[0] = '#';
+        a[1] = '\0';
+        TEST(i, sscanf(" Nan(a1)", "%lf%c", &d, a), 1, "got %d fields, expected %d");
+        TEST(i, isnan(d), 1, "isnan %d expected %d");
+        TEST_S(a, "#", "");
+
         d = 1.0;
         TEST(i, sscanf("-inf", "%3lg", &d), 0, "got %d fields, expected %d");
         TEST(i, d, 1.0, "%g expected %g");
