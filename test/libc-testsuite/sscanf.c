@@ -212,6 +212,53 @@ static int test_sscanf(void)
         /* legacy stdio fails this test */
 	TEST(i, sscanf("hello, world\n", "%8c%8c", a, b), 1, "%d fields, expected %d");
 	TEST_S(a, "hello, wX", "");
+
+    /* testing nan(n-seq-char) in the expected form */
+    a[0] = '#';
+    a[1] = '\0';
+    TEST(i, sscanf(" Nan(98b)", "%lf%c", &d, a), 1, "got %d fields, expected %d");
+    TEST(i, isnan(d), 1, "isnan %d expected %d");
+    TEST_S(a, "#", "");
+
+    /* testing nan(n-seq-char) missing closing paren */
+    a[0] = '#';
+    a[1] = '\0';
+    d = 1.0;
+    TEST(i, sscanf("NaN(abcdefg", "%lf%c", &d, a), -1, "got %d fields, expected %d");
+    TEST(i, d, 1.0, "%d expected %lf");
+    TEST_S(a, "#", "");
+
+    /* testing nan(n-seq-char) invalid character inside parens */
+    a[0] = '#';
+    a[1] = '\0';
+    d = 1.0;
+    TEST(i, sscanf("NaN(12:b)", "%lf%c", &d, a), 0, "got %d fields, expected %d");
+    TEST(i, d, 1.0, "%d expected %lf");
+    TEST_S(a, "#", "");
+    
+    /* testing nan(n-seq-char) overrunning a field width value */
+    a[0] = '#';
+    a[1] = '\0';
+    d = 1.0;
+    TEST(i, sscanf("Nan(12345)", "%9lf%c", &d, a), 0, "got %d fields, expected %d");
+    TEST(i, d, 1.0, "%d expected %lf");
+    TEST_S(a, "#", "");
+    
+    /* testing inf(n-seq-char) should 'inf' should be evaluated sperately */
+    a[0] = '#';
+    a[1] = '\0';
+    d = 1.0;
+    TEST(i, sscanf("inf(12b)", "%lf%c", &d, a), 2, "got %d fields, expected %d");
+    TEST(i, isinf(d), 1, "%d expected %d");
+    TEST_S(a, "(", "");
+
+    /* testing infinity(n-seq-char) should 'infinity' should be evaluated sperately */
+    a[0] = '#';
+    a[1] = '\0';
+    d = 1.0;
+    TEST(i, sscanf("infinity(abcd)", "%lf%c", &d, a), 2, "got %d fields, expected %d");
+    TEST(i, isinf(d), 1, "%d expected %d");
+    TEST_S(a, "(", "");
 #endif
 
 	TEST(i, sscanf("56789 0123 56a72", "%2d%d%*d %[0123456789]\n", &x, &y, a), 3, "only %d fields, expected %d");
