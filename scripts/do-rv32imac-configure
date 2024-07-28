@@ -40,7 +40,7 @@ case "$version" in
 	arch=rv32imac
 	;;
     *)
-	arch=rv32imac_zicsr
+	arch=rv32imac_zicsr_zbb
 	;;
 esac
 exec "$(dirname "$0")"/do-configure "$arch" \
