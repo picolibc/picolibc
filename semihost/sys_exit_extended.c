@@ -39,13 +39,6 @@
 _Noreturn void
 sys_semihost_exit_extended(uintptr_t code)
 {
-	struct {
-		sh_param_t	field1;
-		sh_param_t	field2;
-	} arg = {
-		.field1 = ADP_Stopped_ApplicationExit,
-		.field2 = code
-	};
-	(void) sys_semihost(SYS_EXIT_EXTENDED, (uintptr_t) &arg);
-	__unreachable();
+    (void)sys_semihost2(SYS_EXIT_EXTENDED, ADP_Stopped_ApplicationExit, code);
+    __unreachable();
 }

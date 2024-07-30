@@ -38,11 +38,5 @@
 uintptr_t
 sys_semihost_flen(int fd)
 {
-	struct {
-		sh_param_t	field1;
-	} arg = {
-		.field1 = (sh_param_t) fd,
-	};
-
-	return (uintptr_t) sys_semihost(SYS_FLEN, (uintptr_t) &arg);
+    return (uintptr_t)sys_semihost1(SYS_FLEN, fd);
 }

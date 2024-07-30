@@ -38,12 +38,5 @@
 int
 sys_semihost_seek(int fd, uintptr_t pos)
 {
-	struct {
-		sh_param_t	field1;
-		sh_param_t	field2;
-	} arg = {
-		.field1 = fd,
-		.field2 = pos
-	};
-	return (int) sys_semihost(SYS_SEEK, (uintptr_t) &arg);
+    return (int)sys_semihost2(SYS_SEEK, fd, pos);
 }

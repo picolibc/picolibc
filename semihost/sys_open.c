@@ -39,15 +39,6 @@
 int
 sys_semihost_open(const char *pathname, int semiflags)
 {
-	struct {
-		sh_param_t	field1;
-		sh_param_t	field2;
-		sh_param_t	field3;
-	} arg = {
-		.field1 = (sh_param_t) (uintptr_t) pathname,
-		.field2 = semiflags,
-		.field3 = strlen(pathname)
-	};
-
-	return (int) sys_semihost(SYS_OPEN, (uintptr_t) &arg);
+    return (int)sys_semihost3(SYS_OPEN, (sh_param_t)(uintptr_t)pathname,
+                              semiflags, strlen(pathname));
 }

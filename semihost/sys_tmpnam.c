@@ -38,15 +38,6 @@
 int
 sys_semihost_tmpnam(char *pathname, int identifier, int maxpath)
 {
-	struct {
-		sh_param_t	field1;
-		sh_param_t	field2;
-		sh_param_t	field3;
-	} arg = {
-		.field1 = (sh_param_t) (uintptr_t) pathname,
-		.field2 = identifier,
-		.field3 = maxpath
-	};
-
-	return (int) sys_semihost(SYS_TMPNAM, (uintptr_t) &arg);
+    return (int)sys_semihost3(SYS_TMPNAM, (sh_param_t)(uintptr_t)pathname,
+                              identifier, maxpath);
 }

@@ -36,17 +36,8 @@
 #include "semihost-private.h"
 
 uintptr_t
-sys_semihost_write(int fd, const void *buf, uintptr_t count)
+sys_semihost_write(int fd, const void *buf, size_t count)
 {
-	struct {
-		sh_param_t	field1;
-		sh_param_t	field2;
-		sh_param_t	field3;
-	} arg = {
-		.field1 = fd,
-		.field2 = (sh_param_t) (uintptr_t) buf,
-		.field3 = (sh_param_t) count
-	};
-
-	return sys_semihost(SYS_WRITE, (uintptr_t) &arg);
+    return sys_semihost3(SYS_WRITE, fd, (sh_param_t)(uintptr_t)buf,
+                         count);
 }

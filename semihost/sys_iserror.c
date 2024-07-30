@@ -38,10 +38,5 @@
 int
 sys_semihost_iserror(intptr_t status)
 {
-	struct {
-		sh_param_t	field1;
-	} arg = {
-		.field1 = status
-	};
-	return (int) sys_semihost(SYS_ISERROR, (uintptr_t) &arg);
+    return (int)sys_semihost1(SYS_ISERROR, status);
 }
