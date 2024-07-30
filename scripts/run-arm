@@ -64,7 +64,7 @@ case "$cpu_arch"/"$cpu_profile" in
     v6S-M/Microcontroller)
         cpu=cortex-m0
         ;;
-    v7/Application|v7/)
+    v7/Application)
         case "$fp_arch" in
             VFPv3)
                 cpu=cortex-a9
@@ -72,11 +72,27 @@ case "$cpu_arch"/"$cpu_profile" in
             VFPv3-D16)
                 cpu=cortex-a8
                 ;;
+            VFPv4)
+                cpu=cortex-a7
+                ;;
             *)
                 cpu=cortex-a7
                 ;;
         esac
-        ;;        
+        ;;
+    v7/)
+        case "$fp_arch" in
+            VFPv3)
+                cpu=cortex-r5
+                ;;
+            VFPv3-D16)
+                cpu=cortex-r5f
+                ;;
+            *)
+                cpu=cortex-r5
+                ;;
+        esac
+        ;;
     v7/Microcontroller)
         cpu=cortex-m3
         ;;
