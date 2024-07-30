@@ -155,7 +155,7 @@ int
 sys_semihost_tmpnam(char *pathname, int identifier, int maxpath);
 
 uintptr_t
-sys_semihost_write(int fd, const void *buf, uintptr_t count);
+sys_semihost_write(int fd, const void *buf, size_t count);
 
 void
 sys_semihost_write0(const char *string);

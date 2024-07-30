@@ -77,5 +77,45 @@ typedef uintptr_t sh_param_t;
 uintptr_t
 sys_semihost(uintptr_t op, uintptr_t param);
 
+/* Helper functions to simplify semihosting calls with indirect arguments. */
+static inline uintptr_t
+sys_semihost1(long op, sh_param_t arg1)
+{
+    struct {
+        sh_param_t field1;
+    } indirect_args = {
+        .field1 = arg1,
+    };
+    return sys_semihost(op, (uintptr_t)&indirect_args);
+}
+
+static inline uintptr_t
+sys_semihost2(long op, sh_param_t arg1, sh_param_t arg2)
+{
+    struct {
+        sh_param_t field1;
+        sh_param_t field2;
+    } indirect_args = {
+        .field1 = arg1,
+        .field2 = arg2,
+    };
+    return sys_semihost(op, (uintptr_t)&indirect_args);
+}
+
+static inline uintptr_t
+sys_semihost3(long op, sh_param_t arg1, sh_param_t arg2, sh_param_t arg3)
+{
+    struct {
+        sh_param_t field1;
+        sh_param_t field2;
+        sh_param_t field3;
+    } indirect_args = {
+        .field1 = arg1,
+        .field2 = arg2,
+        .field3 = arg3,
+    };
+    return sys_semihost(op, (uintptr_t)&indirect_args);
+}
+
 int
 _map_stdio(int fd);
