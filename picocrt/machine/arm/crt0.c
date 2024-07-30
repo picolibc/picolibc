@@ -250,14 +250,47 @@ _cstart(void)
 
 extern char __stack[];
 
+#define MODE_USR        (0x10)
+#define MODE_FIQ        (0x11)
+#define MODE_IRQ        (0x12)
+#define MODE_SVC        (0x13)
+#define MODE_MON        (0x16)
+#define MODE_ABT        (0x17)
+#define MODE_HYP        (0x1a)
+#define MODE_UND        (0x1b)
+#define MODE_SYS        (0x1f)
+#define I_BIT           (1 << 7)
+#define F_BIT           (1 << 6)
+
+/*
+ * Set up all of the shadow stack pointers. With Thumb 1 ISA we need
+ * to do this in ARM mode.
+ */
+#if __ARM_ARCH_ISA_THUMB == 1
+static __noinline __attribute__((target("arm"))) void
+SET_SP(uint8_t mode)
+{
+    __asm__("mov r0, %0\nmsr cpsr_c, %0" :: "r" (mode | I_BIT | F_BIT): "r0");
+    __asm__("mov sp, %0\n" : : "r" (__stack));
+}
+#else
+#define SET_SP(mode) \
+    __asm__("mov r0, %0\nmsr cpsr_c, r0" :: "r" (mode | I_BIT | F_BIT): "r0");   \
+    __asm__("mov sp, %0" : : "r" (__stack))
+#endif
+
 void __attribute__((naked)) __section(".init") __attribute__((used))
 _start(void)
 {
 	/* Generate a reference to __vector_table so we get one loaded */
 	__asm__(".equ __my_vector_table, __vector_table");
 
-	/* Initialize stack pointer */
-	__asm__("mov sp, %0" : : "r" (__stack));
+        SET_SP(MODE_IRQ);
+        SET_SP(MODE_ABT);
+        SET_SP(MODE_UND);
+        SET_SP(MODE_FIQ);
+        SET_SP(MODE_SVC);
+        SET_SP(MODE_SYS);
 
 	/* Branch to C code */
 	__asm__("b _cstart");
@@ -401,10 +434,8 @@ arm_fault(struct fault *f, int reason)
 }
 
 #define VECTOR_COMMON \
-    __asm__("mov r7, %0" : : "r" (__stack)); \
-    __asm__("mov sp, r7"); \
-    __asm__("push {lr}"); \
-    __asm__("push {r0-r6}"); \
+    __asm__("push {lr}");                               \
+    __asm__("push {r0-r6}");                            \
     __asm__("mov r0, sp")
 
 void __attribute__((naked)) __section(".init")
