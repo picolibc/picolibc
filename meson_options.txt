@@ -107,6 +107,9 @@ option('analyzer', type: 'boolean', value: false,
 option('assert-verbose', type: 'boolean', value: true,
        description: 'Assert provides verbose information')
 
+option('libgccdir', type: 'string',
+       description: 'path to picolibc libgcc dirictory')
+
 #
 # Testing options
 #
