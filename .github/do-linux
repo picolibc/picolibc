@@ -2,6 +2,8 @@
 set -e
 HERE=`dirname "$0"`
 "$HERE"/do-test arm "$@"
+"$HERE"/do-test clang-thumbv7-a "$@"
+"$HERE"/do-test clang-thumb "$@"
 "$HERE"/do-test cortex-a9 "$@"
 "$HERE"/do-test clang-thumbv7e+fp "$@"
 "$HERE"/do-test clang-thumbv7e+dp "$@"
