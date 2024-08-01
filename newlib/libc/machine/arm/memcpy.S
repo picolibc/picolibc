@@ -39,10 +39,10 @@
 #elif (__ARM_ARCH >= 7 && __ARM_ARCH_PROFILE == 'A' \
        && defined (__ARM_FEATURE_UNALIGNED))
 #include "memcpy-armv7a.S"
-
 #elif __ARM_ARCH_ISA_THUMB == 2 && !__ARM_ARCH_ISA_ARM
 #include "memcpy-armv7m.S"
-
+#elif defined (__ARM_ARCH_7A__)
+#include "aeabi_memcpy-armv7a.S"
 #else
   /* Defined in memcpy-stub.c.  */
 

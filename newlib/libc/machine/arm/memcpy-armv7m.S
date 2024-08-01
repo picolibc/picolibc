@@ -83,16 +83,6 @@
 
 #define END_UNROLL .endr
 
-.macro	ASM_ALIAS new old
-	.global	\new
-	.type	\new, %function
-#if defined (__thumb__)
-	.thumb_set	\new, \old
-#else
-	.set	\new, \old
-#endif
-.endm
-
 	.syntax unified
 	.text
 	.align	2
