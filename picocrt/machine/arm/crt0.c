@@ -442,7 +442,7 @@ void __attribute__((naked)) __section(".init")
 arm_undef_vector(void)
 {
     VECTOR_COMMON;
-    __asm__("mov r1, #" REASON(REASON_UNDEF));
+    __asm__("movs r1, #" REASON(REASON_UNDEF));
     __asm__("bl  arm_fault");
 }
 
@@ -450,7 +450,7 @@ void __attribute__((naked)) __section(".init")
 arm_prefetch_abort_vector(void)
 {
     VECTOR_COMMON;
-    __asm__("mov r1, #" REASON(REASON_UNDEF));
+    __asm__("movs r1, #" REASON(REASON_PREFETCH_ABORT));
     __asm__("bl  arm_fault");
 }
 
@@ -458,7 +458,7 @@ void __attribute__((naked)) __section(".init")
 arm_data_abort_vector(void)
 {
     VECTOR_COMMON;
-    __asm__("mov r1, #" REASON(REASON_UNDEF));
+    __asm__("movs r1, #" REASON(REASON_DATA_ABORT));
     __asm__("bl  arm_fault");
 }
 
