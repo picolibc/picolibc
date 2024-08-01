@@ -35,11 +35,10 @@
 #define MEMCPY_FALLBACK
 #elif (__ARM_ARCH >= 7 && __ARM_ARCH_PROFILE == 'A' \
        && defined (__ARM_FEATURE_UNALIGNED))
-/* Defined in memcpy.S.  */
+/* Defined in memcpy-armv7a.S.  */
 #elif __ARM_ARCH_ISA_THUMB == 2 && !__ARM_ARCH_ISA_ARM
-/* Defined in memcpy.S.  */
-#elif defined (__ARM_ARCH_7A__) && defined (__ARM_FEATURE_UNALIGNED) && \
-	(defined (__ARM_NEON__) || !defined (__SOFTFP__))
+/* Defined in memcpy-armv7m.S.  */
+#elif defined (__ARM_ARCH_7A__)
 /* Defined in aeabi_memcpy-armv7a.S */
 #else
 #define MEMCPY_FALLBACK
