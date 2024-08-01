@@ -58,7 +58,7 @@ case "$cpu_arch"/"$cpu_profile" in
     v4T/)
         cpu=ti925t
         ;;
-    v5TE/)
+    v5TE/|v5T/)
         cpu=arm926
         ;;
     v6S-M/Microcontroller)
