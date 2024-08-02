@@ -31,7 +31,11 @@ long int
 lround (double x)
 {
   long int result;
-  __asm__("fcvtas\t%x0, %d1" : "=r" (result) : "w" (x));
+  if (sizeof (result) == 8) {
+      __asm__("fcvtas\t%x0, %d1" : "=r" (result) : "w" (x));
+  } else {
+      __asm__("fcvtas\t%w0, %d1" : "=r" (result) : "w" (x));
+  }
   return result;
 }
 
