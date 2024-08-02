@@ -159,6 +159,8 @@ __asm__(
 #define TCR_IPS_BIT     32
 #define TCR_IPS_4GB     (0LL << TCR_IPS_BIT)
 
+extern const void *__vector_table[];
+
 static void __attribute((used))
 _cstart(void)
 {
@@ -226,3 +228,125 @@ _start(void)
 	/* Jump into C code */
 	__asm__("bl _cstart");
 }
+
+#ifdef CRT0_SEMIHOST
+
+/*
+ * Trap faults, print message and exit when running under semihost
+ */
+
+#include <semihost.h>
+#include <unistd.h>
+#include <stdio.h>
+
+#define _REASON(r) #r
+#define REASON(r) _REASON(r)
+
+static void aarch64_fault_write_reg(const char *prefix, uint64_t reg)
+{
+    fputs(prefix, stdout);
+
+    for (unsigned i = 0; i < 16; i++) {
+        unsigned digitval = 0xF & (reg >> (56 - 4*i));
+        char digitchr = '0' + digitval + (digitval >= 10 ? 'a'-'0'-10 : 0);
+        putchar(digitchr);
+    }
+
+    putchar('\n');
+}
+
+struct fault {
+    uint64_t    x[31];
+    uint64_t    pc;
+};
+
+static const char *const reasons[] = {
+    "sync\n",
+    "irq\n",
+    "fiq\n",
+    "serror\n"
+};
+
+#define REASON_SYNC     0
+#define REASON_IRQ      1
+#define REASON_FIQ      2
+#define REASON_SERROR   3
+
+static void __attribute__((used))
+aarch64_fault(struct fault *f, int reason)
+{
+    int r;
+    fputs("AARCH64 fault: ", stdout);
+    fputs(reasons[reason], stdout);
+    char prefix[] = "\tX##:   0x";
+    for (r = 0; r <= 30; r++) {
+        prefix[2] = '0' + r / 10;    /* overwrite # with register number */
+        prefix[3] = '0' + r % 10;    /* overwrite # with register number */
+        aarch64_fault_write_reg(prefix, f->x[r]);
+    }
+    aarch64_fault_write_reg("\tPC:    0x", f->pc);
+    _exit(1);
+}
+
+#define VECTOR_COMMON \
+    __asm__("sub sp, sp, #256"); \
+    __asm__("str x0, [sp, #0]"); \
+    __asm__("str x1, [sp, #8]"); \
+    __asm__("str x2, [sp, #16]"); \
+    __asm__("str x3, [sp, #24]"); \
+    __asm__("str x4, [sp, #32]"); \
+    __asm__("str x5, [sp, #40]"); \
+    __asm__("str x6, [sp, #48]"); \
+    __asm__("str x7, [sp, #56]"); \
+    __asm__("str x8, [sp, #64]"); \
+    __asm__("str x9, [sp, #72]"); \
+    __asm__("str x10, [sp, #80]"); \
+    __asm__("str x11, [sp, #88]"); \
+    __asm__("str x12, [sp, #96]"); \
+    __asm__("str x13, [sp, #104]"); \
+    __asm__("str x14, [sp, #112]"); \
+    __asm__("str x15, [sp, #120]"); \
+    __asm__("str x16, [sp, #128]"); \
+    __asm__("str x17, [sp, #136]"); \
+    __asm__("str x18, [sp, #144]"); \
+    __asm__("str x19, [sp, #152]"); \
+    __asm__("str x20, [sp, #160]"); \
+    __asm__("str x21, [sp, #168]"); \
+    __asm__("str x22, [sp, #176]"); \
+    __asm__("str x23, [sp, #184]"); \
+    __asm__("str x24, [sp, #192]"); \
+    __asm__("str x25, [sp, #200]"); \
+    __asm__("str x26, [sp, #208]"); \
+    __asm__("str x27, [sp, #216]"); \
+    __asm__("str x28, [sp, #224]"); \
+    __asm__("str x29, [sp, #232]"); \
+    __asm__("str x30, [sp, #240]"); \
+    __asm__("mrs x0, ELR_EL1\n"); \
+    __asm__("str x0, [sp, #248]"); \
+    __asm__("mov x0, sp")
+
+void __section(".init")
+aarch64_sync_vector(void)
+{
+    VECTOR_COMMON;
+    __asm__("mov x1, #" REASON(REASON_SYNC));
+    __asm__("b  aarch64_fault");
+}
+
+void __section(".init")
+aarch64_irq_vector(void)
+{
+    VECTOR_COMMON;
+    __asm__("mov x1, #" REASON(REASON_IRQ));
+    __asm__("b  aarch64_fault");
+}
+
+void __section(".init")
+aarch64_fiq_vector(void)
+{
+    VECTOR_COMMON;
+    __asm__("mov x1, #" REASON(REASON_FIQ));
+    __asm__("b  aarch64_fault");
+}
+
+#endif /* CRT0_SEMIHOST */
