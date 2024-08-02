@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2021 Keith Packard
+# Copyright © 2022 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,8 +33,10 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-src_picolib += files('interrupt.c')
+picolibc_sources(interrupt.c)
 
-if thread_local_storage
-  src_picolib += files('tls.c')
-endif
+if(${_HAVE_PICOLIBC_TLS_API})
+  picolibc_sources(
+    tls.c
+    )
+endif()
