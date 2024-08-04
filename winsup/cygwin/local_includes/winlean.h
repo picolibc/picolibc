@@ -53,7 +53,10 @@ details. */
 #define __undef_CRITICAL
 #endif
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
 #include <windows.h>
+#pragma GCC diagnostic pop
 #include <wincrypt.h>
 #include <lmcons.h>
 #include <ntdef.h>
