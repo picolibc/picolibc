@@ -408,6 +408,27 @@ char   *__ldtoa (long double, int, int, int *, int *, char **);
 void	__eprintf (const char *, const char *, unsigned int, const char *);
 #endif
 
+#if __STDC_WANT_LIB_EXT1__ == 1
+#include <sys/_types.h>
+
+#ifndef _ERRNO_T_DEFINED
+typedef __errno_t errno_t;
+#define _ERRNO_T_DEFINED
+#endif
+
+#ifndef _RSIZE_T_DEFINED
+typedef __rsize_t rsize_t;
+#define _RSIZE_T_DEFINED
+#endif
+
+typedef void (*constraint_handler_t)(const char *restrict msg,
+                                     void *restrict ptr, __errno_t error);
+
+constraint_handler_t set_constraint_handler_s(constraint_handler_t handler);
+void abort_handler_s(const char *restrict msg, void *restrict ptr,
+                     __errno_t error);
+#endif
+
 _END_STD_C
 
 #if __SSP_FORTIFY_LEVEL > 0

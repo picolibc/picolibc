@@ -400,6 +400,7 @@ QUICKREF
 #define _DEFAULT_SOURCE
 #include <errno.h>
 #include <string.h>
+#include "string_private.h"
 #include "local.h"
 
 extern char *_user_strerror (int, int, int *) _ATTRIBUTE((__weak__));
