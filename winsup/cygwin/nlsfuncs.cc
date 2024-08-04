@@ -319,8 +319,7 @@ locale_cmp (const void *a, const void *b)
   return strcmp (*la, *lb);
 }
 
-/* Helper function to workaround reallocs which move blocks even if they shrink.
-   Cygwin's realloc is not doing this, but tcsh's, for instance.  All lc_foo
+/* Helper function to adjust pointers inside an lc_foo buffer. All lc_foo
    structures consist entirely of pointers so they are practically pointer
    arrays.  What we do here is just treat the lc_foo pointers as char ** and
    rebase all char * pointers within, up to the given size of the structure. */
@@ -332,6 +331,28 @@ rebase_locale_buf (const void *ptrv, const void *ptrvend, const char *newbase,
   for (const char **ptrs = (const char **) ptrv; ptrs < ptrsend; ++ptrs)
     if (*ptrs >= oldbase && *ptrs < oldend)
       *ptrs += newbase - oldbase;
+}
+
+/* Helper function to shrink an lc_foo buffer, adjusting pointers */
+static int
+shrink_locale_buf (const void *ptrv, const void *ptrvend,
+		   char *oldbase, const char *oldend,
+		   char **result)
+{
+  size_t minsize = oldend - oldbase;
+  char *tmp = (char *) malloc (minsize);
+  if (!tmp)
+    {
+      free (oldbase);
+      return -1;
+    }
+
+  memcpy (tmp, oldbase, minsize);
+  rebase_locale_buf (ptrv, ptrvend, tmp, oldbase, oldend);
+  free (oldbase);
+
+  *result = tmp;
+  return 1;
 }
 
 static wchar_t *
@@ -687,19 +708,20 @@ __set_lc_time_from_win (const char *name,
 	  len += (wcslen (era->era_t_fmt) + 1) * sizeof (wchar_t);
 	  len += (wcslen (era->alt_digits) + 1) * sizeof (wchar_t);
 
-	  /* Make sure data fits into the buffer */
+	  /* If necessary, grow the buffer to ensure data fits into it */
 	  if (lc_time_ptr + len > lc_time_end)
 	    {
 	      len = lc_time_ptr + len - new_lc_time_buf;
-	      char *tmp = (char *) realloc (new_lc_time_buf, len);
+	      char *tmp = (char *) malloc (len);
 	      if (!tmp)
 		era = NULL;
 	      else
 		{
-		  if (tmp != new_lc_time_buf)
-		    rebase_locale_buf (_time_locale, _time_locale + 1, tmp,
-				       new_lc_time_buf, lc_time_ptr);
+		  memcpy (tmp, new_lc_time_buf, MAX_TIME_BUFFER_SIZE);
+		  rebase_locale_buf (_time_locale, _time_locale + 1, tmp,
+				     new_lc_time_buf, lc_time_ptr);
 		  lc_time_ptr = tmp + (lc_time_ptr - new_lc_time_buf);
+		  free(new_lc_time_buf);
 		  new_lc_time_buf = tmp;
 		  lc_time_end = new_lc_time_buf + len;
 		}
@@ -752,17 +774,9 @@ __set_lc_time_from_win (const char *name,
 	}
     }
 
-  char *tmp = (char *) realloc (new_lc_time_buf, lc_time_ptr - new_lc_time_buf);
-  if (!tmp)
-    {
-      free (new_lc_time_buf);
-      return -1;
-    }
-  if (tmp != new_lc_time_buf)
-    rebase_locale_buf (_time_locale, _time_locale + 1, tmp,
-		       new_lc_time_buf, lc_time_ptr);
-  *lc_time_buf = tmp;
-  return 1;
+  return shrink_locale_buf(_time_locale, _time_locale + 1,
+			   new_lc_time_buf, lc_time_ptr,
+			   lc_time_buf);
 }
 
 /* Called from newlib's setlocale() via __ctype_load_locale() if category
@@ -824,18 +838,9 @@ __set_lc_ctype_from_win (const char *name,
 	}
     }
 
-  char *tmp = (char *) realloc (new_lc_ctype_buf,
-				lc_ctype_ptr - new_lc_ctype_buf);
-  if (!tmp)
-    {
-      free (new_lc_ctype_buf);
-      return -1;
-    }
-  if (tmp != new_lc_ctype_buf)
-    rebase_locale_buf (_ctype_locale, _ctype_locale + 1, tmp,
-		       new_lc_ctype_buf, lc_ctype_ptr);
-  *lc_ctype_buf = tmp;
-  return 1;
+  return shrink_locale_buf(_ctype_locale, _ctype_locale + 1,
+			   new_lc_ctype_buf, lc_ctype_ptr,
+			   lc_ctype_buf);
 }
 
 /* Called from newlib's setlocale() via __numeric_load_locale() if category
@@ -900,18 +905,9 @@ __set_lc_numeric_from_win (const char *name,
   _numeric_locale->codeset = lc_numeric_ptr;
   lc_numeric_ptr = stpcpy (lc_numeric_ptr, charset) + 1;
 
-  char *tmp = (char *) realloc (new_lc_numeric_buf,
-				lc_numeric_ptr - new_lc_numeric_buf);
-  if (!tmp)
-    {
-      free (new_lc_numeric_buf);
-      return -1;
-    }
-  if (tmp != new_lc_numeric_buf)
-    rebase_locale_buf (_numeric_locale, _numeric_locale + 1, tmp,
-		       new_lc_numeric_buf, lc_numeric_ptr);
-  *lc_numeric_buf = tmp;
-  return 1;
+  return shrink_locale_buf(_numeric_locale, _numeric_locale + 1,
+			   new_lc_numeric_buf, lc_numeric_ptr,
+			   lc_numeric_buf);
 }
 
 /* Called from newlib's setlocale() via __monetary_load_locale() if category
@@ -1039,18 +1035,9 @@ __set_lc_monetary_from_win (const char *name,
   _monetary_locale->codeset = lc_monetary_ptr;
   lc_monetary_ptr = stpcpy (lc_monetary_ptr, charset) + 1;
 
-  char *tmp = (char *) realloc (new_lc_monetary_buf,
-				lc_monetary_ptr - new_lc_monetary_buf);
-  if (!tmp)
-    {
-      free (new_lc_monetary_buf);
-      return -1;
-    }
-  if (tmp != new_lc_monetary_buf)
-    rebase_locale_buf (_monetary_locale, _monetary_locale + 1, tmp,
-		       new_lc_monetary_buf, lc_monetary_ptr);
-  *lc_monetary_buf = tmp;
-  return 1;
+  return shrink_locale_buf(_monetary_locale, _monetary_locale + 1,
+			   new_lc_monetary_buf, lc_monetary_ptr,
+			   lc_monetary_buf);
 }
 
 extern "C" int
