@@ -1912,7 +1912,7 @@ freeifaddrs (struct ifaddrs *ifp)
 }
 
 int
-get_ifconf (struct ifconf *ifc, int what)
+get_ifconf (struct ifconf *ifc, unsigned int what)
 {
   __try
     {

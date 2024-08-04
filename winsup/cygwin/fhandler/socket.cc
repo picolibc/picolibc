@@ -86,7 +86,7 @@ struct __old_ifreq {
 int
 fhandler_socket::ioctl (unsigned int cmd, void *p)
 {
-  extern int get_ifconf (struct ifconf *ifc, int what); /* net.cc */
+  extern int get_ifconf (struct ifconf *ifc, unsigned int what); /* net.cc */
   int res;
   struct ifconf ifc, *ifcp;
   struct ifreq *ifrp;
