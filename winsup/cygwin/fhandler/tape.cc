@@ -894,9 +894,9 @@ mtinfo_drive::get_status (HANDLE mt, struct mtget *get)
 }
 
 int
-mtinfo_drive::set_options (HANDLE mt, int32_t options)
+mtinfo_drive::set_options (HANDLE mt, uint32_t options)
 {
-  int32_t what = (options & MT_ST_OPTIONS);
+  uint32_t what = (options & MT_ST_OPTIONS);
   bool call_setparams = false;
   bool set;
   TAPE_SET_DRIVE_PARAMETERS sdp =

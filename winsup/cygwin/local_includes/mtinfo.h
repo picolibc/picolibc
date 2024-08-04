@@ -101,7 +101,7 @@ class mtinfo_drive
   int set_compression (HANDLE mt, int32_t count);
   int set_blocksize (HANDLE mt, DWORD count);
   int get_status (HANDLE mt, struct mtget *get);
-  int set_options (HANDLE mt, int32_t options);
+  int set_options (HANDLE mt, uint32_t options);
   int async_wait (HANDLE mt, DWORD *bytes_written);
 
 public:
