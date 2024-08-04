@@ -1082,7 +1082,7 @@ child_info::proc_retry (HANDLE h)
   if (!exit_code)
     return EXITCODE_OK;
   sigproc_printf ("exit_code %y", exit_code);
-  switch (exit_code)
+  switch ((NTSTATUS) exit_code)
     {
     case STILL_ACTIVE:	/* shouldn't happen */
       sigproc_printf ("STILL_ACTIVE?  How'd we get here?");

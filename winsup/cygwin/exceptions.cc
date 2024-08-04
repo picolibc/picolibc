@@ -665,7 +665,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in,
   siginfo_t si = {};
   si.si_code = SI_KERNEL;
   /* Coerce win32 value to posix value.  */
-  switch (e->ExceptionCode)
+  switch ((NTSTATUS) e->ExceptionCode)
     {
     case STATUS_FLOAT_DIVIDE_BY_ZERO:
       si.si_signo = SIGFPE;

@@ -118,7 +118,7 @@ pinfo_init (char **envp, int envc)
 DWORD
 pinfo::status_exit (DWORD x)
 {
-  switch (x)
+  switch ((NTSTATUS) x)
     {
     case STATUS_DLL_NOT_FOUND:
       {
