@@ -2193,8 +2193,7 @@ format_proc_locale_proc (LPWSTR win_locale, DWORD info, LPARAM param)
       if (!(cp2 = wcschr (cp + 2, L'-')))
         return TRUE;
       /* Otherwise, store in iso15924 */
-      if (iso15924)
-        wcpcpy (wcpncpy (iso15924, cp, cp2 - cp), L";");
+      wcpcpy (wcpncpy (iso15924, cp, cp2 - cp), L";");
     }
   cp = wcsrchr (win_locale, L'-');
   if (cp)
