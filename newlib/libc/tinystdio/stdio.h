@@ -384,6 +384,23 @@ int	putchar_unlocked (int);
 #define putchar_unlocked(c, f) fgetc(c, stdin)
 #endif
 
+#if __STDC_WANT_LIB_EXT1__ == 1
+#include <sys/_types.h>
+
+#ifndef _ERRNO_T_DEFINED
+typedef __errno_t errno_t;
+#define _ERRNO_T_DEFINED
+#endif
+
+#ifndef _RSIZE_T_DEFINED
+typedef __rsize_t rsize_t;
+#define _RSIZE_T_DEFINED
+#endif
+
+int sprintf_s(char *__restrict __s, rsize_t __bufsize,
+              const char *__restrict __format, ...);
+#endif
+
 /*
  * The format of tmpnam names is TXXXXXX, which works with mktemp
  */

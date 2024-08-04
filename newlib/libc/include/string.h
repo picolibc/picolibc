@@ -200,6 +200,31 @@ int	 timingsafe_bcmp (const void *, const void *, size_t);
 int	 timingsafe_memcmp (const void *, const void *, size_t);
 #endif
 
+#if __STDC_WANT_LIB_EXT1__ == 1
+#include <sys/_types.h>
+
+#ifndef _ERRNO_T_DEFINED
+typedef __errno_t errno_t;
+#define _ERRNO_T_DEFINED
+#endif
+
+#ifndef _RSIZE_T_DEFINED
+typedef __rsize_t rsize_t;
+#define _RSIZE_T_DEFINED
+#endif
+
+errno_t memcpy_s(void *__restrict, rsize_t, const void *__restrict, rsize_t);
+errno_t memset_s(void *, rsize_t, int, rsize_t);
+errno_t memmove_s(void *, rsize_t, const void *, rsize_t);
+errno_t strcpy_s(char *__restrict, rsize_t, const char *__restrict);
+errno_t strcat_s(char *__restrict, rsize_t, const char *__restrict);
+errno_t strncpy_s(char *__restrict, rsize_t, const char *__restrict, rsize_t);
+errno_t strncat_s(char *__restrict, rsize_t, const char *__restrict, rsize_t);
+size_t strnlen_s(const char *, size_t);
+errno_t strerror_s(char *, rsize_t, errno_t);
+size_t strerrorlen_s(errno_t);
+#endif
+
 #include <sys/string.h>
 
 _END_STD_C

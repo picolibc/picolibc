@@ -291,6 +291,20 @@ int        timer_settime (timer_t timerid, int flags,
 
 void       tzset (void);
 
+#if __STDC_WANT_LIB_EXT1__ == 1
+#include <sys/_types.h>
+
+#ifndef _ERRNO_T_DEFINED
+typedef __errno_t errno_t;
+#define _ERRNO_T_DEFINED
+#endif
+
+#ifndef _RSIZE_T_DEFINED
+typedef __rsize_t rsize_t;
+#define _RSIZE_T_DEFINED
+#endif
+#endif
+
 _END_STD_C
 
 #endif /* _TIME_H_ */
