@@ -60,4 +60,8 @@
 #define	LINE_MAX		 2048	/* max bytes in an input line */
 #define	RE_DUP_MAX		  255	/* max RE's in interval notation */
 
+#if __POSIX_VISIBLE
+#define NSIG_MAX       __LONG_WIDTH__   /* max signal number */
+#endif
+
 #endif
