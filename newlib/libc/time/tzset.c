@@ -104,10 +104,10 @@ Supporting OS subroutine required: None
 #include <string.h>
 #include <sys/types.h>
 #include <time.h>
+#include <limits.h>
 #include "local.h"
 
 #define TZNAME_MIN	3	/* POSIX min TZ abbr size local def */
-#define TZNAME_MAX	10	/* POSIX max TZ abbr size local def */
 
 static char __tzname_std[TZNAME_MAX + 2];
 static char __tzname_dst[TZNAME_MAX + 2];
