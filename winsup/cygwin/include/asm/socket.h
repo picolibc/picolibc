@@ -17,8 +17,8 @@ details. */
 #define IOC_IN          0x80000000      /* copy in parameters */
 
 #define _IO(x,y)        (IOC_VOID|(x<<8)|y)
-#define _IOR(x,y,t)     (IOC_OUT|(((long)sizeof(t)&IOCPARM_MASK)<<16)|(x<<8)|y)
-#define _IOW(x,y,t)     (IOC_IN|(((long)sizeof(t)&IOCPARM_MASK)<<16)|(x<<8)|y)
+#define _IOR(x,y,t)     (IOC_OUT|((sizeof(t)&IOCPARM_MASK)<<16)|(x<<8)|y)
+#define _IOW(x,y,t)     (IOC_IN|((sizeof(t)&IOCPARM_MASK)<<16)|(x<<8)|y)
 
 #define SIOCATMARK  _IOR('s',  7, long)  /* at oob mark? */
 #define FIONREAD    _IOR('f', 127, long) /* get # bytes to read */
