@@ -27,10 +27,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _SYS_FENV_H_
-#define _SYS_FENV_H_
-
-#include <sys/cdefs.h>
+#ifndef _MACHINE_FENV_H_
+#define _MACHINE_FENV_H_
 
 _BEGIN_STD_C
 
@@ -115,5 +113,4 @@ _END_STD_C
 #include <machine/fenv-softfloat.h>
 #endif
 
-
-#endif /* _SYS_FENV_H_ */
+#endif /* _MACHINE_FENV_H_ */

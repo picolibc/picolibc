@@ -30,8 +30,8 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _SYS_FENV_H
-#define _SYS_FENV_H
+#ifndef _MACHINE_FENV_H
+#define _MACHINE_FENV_H
 
 /*
  * The exception macros are such that the functions to pack/unpack them

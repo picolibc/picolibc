@@ -9,8 +9,8 @@
    http://www.opensource.org/licenses.
 */
 
-#ifndef _SYS_FENV_H
-#define _SYS_FENV_H
+#ifndef _MACHINE_FENV_H
+#define _MACHINE_FENV_H
 
 #include <stddef.h>
 
@@ -89,4 +89,4 @@ typedef size_t fexcept_t;
 #endif
 #endif
 
-#endif /* _SYS_FENV_H */
+#endif /* _MACHINE_FENV_H */

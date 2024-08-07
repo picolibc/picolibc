@@ -26,8 +26,8 @@
    OF THE POSSIBILITY OF SUCH DAMAGE.  */
 
 
-#ifndef _SYS_FENV_H
-#define _SYS_FENV_H
+#ifndef _MACHINE_FENV_H
+#define _MACHINE_FENV_H
 
 
 #ifdef __cplusplus

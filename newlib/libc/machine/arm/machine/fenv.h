@@ -28,65 +28,60 @@
  * $FreeBSD$
  */
 
-#ifndef _SYS_FENV_H_
-#define _SYS_FENV_H_ 1
+#ifndef _MACHINE_FENV_H_
+#define _MACHINE_FENV_H_ 1
 
-#include <sys/_types.h>
 
 _BEGIN_STD_C
 
 typedef int fenv_t;
 typedef int fexcept_t;
 
-#ifdef __SH_FPU_ANY__
-
-#ifdef __SH2E__
-#define PICOLIBC_LONG_DOUBLE_NOROUND
-#define PICOLIBC_LONG_DOUBLE_NOEXCEPT
-#if __SIZEOF_DOUBLE__ > 4
+#if defined(__SOFTFP__) || (__ARM_FP & 0x8) == 0
 #define PICOLIBC_DOUBLE_NOROUND
 #define PICOLIBC_DOUBLE_NOEXCEPT
-#endif
-#endif
-
-#ifdef __SH4_SINGLE_ONLY__
-#define PICOLIBC_LONG_DOUBLE_NOROUND
 #define PICOLIBC_LONG_DOUBLE_NOEXCEPT
 #endif
 
-/* Exception flags */
-#define	FE_INVALID	0x0040
-#define	FE_DIVBYZERO	0x0020
-#if defined(__SH2E__)
-#define	FE_ALL_EXCEPT	(FE_DIVBYZERO | FE_INVALID)
-#else
-#define	FE_OVERFLOW	0x0010
-#define	FE_UNDERFLOW	0x0008
-#define	FE_INEXACT	0x0004
-#define	FE_ALL_EXCEPT	(FE_DIVBYZERO | FE_INEXACT | \
-    FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW)
+#if defined(__SOFTFP__) || (__ARM_FP & 0x4) == 0
+#define PICOLIBC_FLOAT_NOROUND
+#define PICOLIBC_FLOAT_NOEXCEPT
 #endif
 
+#ifndef __SOFTFP__
+
+/* Exception flags */
+#define	FE_INVALID	0x0001
+#define	FE_DIVBYZERO	0x0002
+#define	FE_OVERFLOW	0x0004
+#define	FE_UNDERFLOW	0x0008
+#define	FE_INEXACT	0x0010
+#define	FE_DENORMAL	0x0080
+#define	FE_ALL_EXCEPT	(FE_DIVBYZERO | FE_INEXACT | \
+			 FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW | FE_DENORMAL)
+
 /* Rounding modes */
-#define	FE_TONEAREST		0x0000
-#define	FE_TOWARDZERO		0x0001
+#define	FE_TONEAREST		0x00000000
+#define	FE_UPWARD		0x00400000
+#define	FE_DOWNWARD		0x00800000
+#define	FE_TOWARDZERO		0x00c00000
 
 #else
-#define	FE_TONEAREST		0x0000
+#define	FE_TONEAREST		0x00000000
 #endif
 
 #if !defined(__declare_fenv_inline) && defined(__declare_extern_inline)
 #define	__declare_fenv_inline(type) __declare_extern_inline(type)
 #endif
 
-#ifdef __declare_fenv_inline
-#ifdef __SH_FPU_ANY__
-#include <machine/fenv-fp.h>
-#else
-#include <machine/fenv-softfloat.h>
-#endif
-#endif
-
 _END_STD_C
 
-#endif	/* _SYS_FENV_H_ */ 
+#ifdef __declare_fenv_inline
+#ifdef __SOFTFP__
+#include <machine/fenv-softfloat.h>
+#else
+#include <machine/fenv-fp.h>
+#endif
+#endif
+
+#endif	/* _MACHINE_FENV_H_ */

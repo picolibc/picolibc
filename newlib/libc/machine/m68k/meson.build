@@ -40,7 +40,6 @@ srcs_machine = [
   'strlen.c',
 ]
 
-subdir('sys')
 subdir('machine')
 
 foreach target : targets

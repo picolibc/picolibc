@@ -28,8 +28,8 @@
  * $FreeBSD$
  */
 
-#ifndef	_SYS_FENV_H_
-#define	_SYS_FENV_H_
+#ifndef	_MACHINE_FENV_H_
+#define	_MACHINE_FENV_H_
 
 
 _BEGIN_STD_C
@@ -97,4 +97,4 @@ typedef	__UINT32_TYPE__	fexcept_t;
 
 _END_STD_C
 
-#endif	/* !_SYS_FENV_H_ */
+#endif	/* !_MACHINE_FENV_H_ */
