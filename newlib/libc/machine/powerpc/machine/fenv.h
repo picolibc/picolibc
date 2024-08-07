@@ -28,8 +28,8 @@
  * $FreeBSD$
  */
 
-#ifndef	_SYS_FENV_H_
-#define	_SYS_FENV_H_
+#ifndef	_MACHINE_FENV_H_
+#define	_MACHINE_FENV_H_
 
 
 #ifdef __cplusplus
@@ -129,4 +129,4 @@ union __fpscr {
 }
 #endif
 
-#endif	/* !_SYS_FENV_H_ */
+#endif	/* !_MACHINE_FENV_H_ */

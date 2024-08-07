@@ -42,7 +42,6 @@ srcs_machine = [
   'strncpy.c',
 ]
 
-subdir('sys')
 subdir('machine')
 
 src_machine = files(srcs_machine)

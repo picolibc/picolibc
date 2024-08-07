@@ -11,7 +11,7 @@
 
 #include <picolibc.h>
 
-#include <sys/asm.h>
+#include "asm.h"
 
 .section .text.strcmp
 .globl strcmp

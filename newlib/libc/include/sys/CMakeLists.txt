@@ -43,7 +43,6 @@ picolibc_headers(sys
   errno.h
   fcntl.h
   features.h
-  fenv.h
   file.h
   iconvnls.h
   _initfini.h

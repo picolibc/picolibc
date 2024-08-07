@@ -13,6 +13,7 @@
 
 #include <string.h>
 #include <stdint.h>
+#include "local.h"
 
 #undef strcpy
 
