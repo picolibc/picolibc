@@ -43,9 +43,11 @@
 #define __need_NULL
 #define __need_size_t
 #include <stddef.h>
-#include <inttypes.h>
+#define __need___va_list
 #include <stdarg.h>
 #include <sys/_types.h>
+
+_BEGIN_STD_C
 
 /*
  * This is an internal structure of the library that is subject to be
@@ -70,16 +72,16 @@
 #endif
 
 #if __PICOLIBC_UNGETC_SIZE == 4
-typedef uint32_t __ungetc_t;
+typedef __uint32_t __ungetc_t;
 #endif
 
 #if __PICOLIBC_UNGETC_SIZE == 2
-typedef uint16_t __ungetc_t;
+typedef __uint16_t __ungetc_t;
 #endif
 
 struct __file {
 	__ungetc_t unget;	/* ungetc() buffer */
-	uint8_t	flags;		/* flags, see below */
+	__uint8_t	flags;		/* flags, see below */
 #ifdef _PRINTF_PERCENT_N
         size_t buflimit;        /* buffer limit size */
 #endif
@@ -131,7 +133,7 @@ struct __file_ext {
 */
 #ifndef ___FILE_DECLARED
 typedef struct __file __FILE;
-# define __FILE_defined
+# define __FILE_DECLARED
 #endif
 
 #ifndef _FILE_DECLARED
@@ -196,10 +198,6 @@ extern FILE *const stderr;
                 .flush = (fl),                  \
 	}
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 FILE *fdevopen(int (*__put)(char, FILE*), int (*__get)(FILE*), int(*__flush)(FILE *));
 int	fclose(FILE *__stream);
 int	fflush(FILE *stream);
@@ -228,14 +226,14 @@ int	putchar(int __c);
 
 int	printf(const char *__fmt, ...) __PRINTF_ATTRIBUTE__(1, 2);
 int	fprintf(FILE *__stream, const char *__fmt, ...) __PRINTF_ATTRIBUTE__(2, 3);
-int	vprintf(const char *__fmt, va_list __ap) __PRINTF_ATTRIBUTE__(1, 0);
-int	vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __PRINTF_ATTRIBUTE__(2, 0);
+int	vprintf(const char *__fmt, __gnuc_va_list __ap) __PRINTF_ATTRIBUTE__(1, 0);
+int	vfprintf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap) __PRINTF_ATTRIBUTE__(2, 0);
 int	sprintf(char *__s, const char *__fmt, ...) __PRINTF_ATTRIBUTE__(2, 3);
 int	snprintf(char *__s, size_t __n, const char *__fmt, ...) __PRINTF_ATTRIBUTE__(3, 4);
-int	vsprintf(char *__s, const char *__fmt, va_list ap) __PRINTF_ATTRIBUTE__(2, 0);
-int	vsnprintf(char *__s, size_t __n, const char *__fmt, va_list ap) __PRINTF_ATTRIBUTE__(3, 0);
+int	vsprintf(char *__s, const char *__fmt, __gnuc_va_list ap) __PRINTF_ATTRIBUTE__(2, 0);
+int	vsnprintf(char *__s, size_t __n, const char *__fmt, __gnuc_va_list ap) __PRINTF_ATTRIBUTE__(3, 0);
 int     asprintf(char **strp, const char *fmt, ...) __PRINTF_ATTRIBUTE__(2,3);
-int     vasprintf(char **strp, const char *fmt, va_list ap) __PRINTF_ATTRIBUTE__(2,0);
+int     vasprintf(char **strp, const char *fmt, __gnuc_va_list ap) __PRINTF_ATTRIBUTE__(2,0);
 
 int	fputs(const char *__str, FILE *__stream);
 int	puts(const char *__str);
@@ -251,10 +249,10 @@ int	ungetc(int __c, FILE *__stream);
 
 int	scanf(const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 1, 2);
 int	fscanf(FILE *__stream, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 2, 3);
-int	vscanf(const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 1, 0);
-int	vfscanf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+int	vscanf(const char *__fmt, __gnuc_va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 1, 0);
+int	vfscanf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
 int	sscanf(const char *__buf, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 2, 3);
-int	vsscanf(const char *__buf, const char *__fmt, va_list ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+int	vsscanf(const char *__buf, const char *__fmt, __gnuc_va_list ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
 
 char	*fgets(char *__str, int __size, FILE *__stream);
 char	*gets(char *__str);
@@ -312,18 +310,26 @@ typedef _fpos_t fpos_t;
 #if __POSIX_VISIBLE
 /*
  * Declare required additional POSIX types.
- *
- * va_list comes from stdarg.h (included above)
  */
 
 # ifndef _OFF_T_DECLARED
 typedef	__off_t		off_t;		/* file offset */
-# define _OFF_T_DECLARED
+#  define _OFF_T_DECLARED
 # endif
 
 # ifndef _SSIZE_T_DECLARED
 typedef _ssize_t ssize_t;
-# define _SSIZE_T_DECLARED
+#  define _SSIZE_T_DECLARED
+# endif
+
+/* This needs to agree with <stdarg.h> */
+# ifdef __GNUC__
+#  ifndef _VA_LIST_DEFINED
+typedef __gnuc_va_list va_list;
+#   define _VA_LIST_DEFINED
+#  endif
+# else
+#  include <stdarg.h>
 # endif
 
 #endif
@@ -392,20 +398,18 @@ int	putchar_unlocked (int);
  * We don't have any way of knowing any underlying POSIX limits,
  * so just use a reasonably small value here
  */
+#ifndef TMP_MAX
 #define TMP_MAX         32
-
-#ifdef __cplusplus
-}
 #endif
 
 /*@}*/
 
-static __inline uint32_t
+static __inline __uint32_t
 __printf_float(float f)
 {
 	union {
 		float		f;
-		uint32_t	u;
+		__uint32_t	u;
 	} u = { .f = f };
 	return u.u;
 }
@@ -490,6 +494,8 @@ __printf_float(float f)
 #  define _HAS_IO_LONG_DOUBLE
 # endif
 #endif
+
+_END_STD_C
 
 #if __SSP_FORTIFY_LEVEL > 0
 #include <ssp/stdio.h>

@@ -3,6 +3,7 @@
 #include <sys/param.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <unistd.h>
 #include <stdio.h>
