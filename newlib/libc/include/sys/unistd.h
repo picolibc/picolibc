@@ -375,6 +375,12 @@ int	unlinkat (int, const char *, int);
 #define STDOUT_FILENO   1       /* standard output file descriptor */
 #define STDERR_FILENO   2       /* standard error file descriptor */
 
+#ifndef _POSIX2_RE_DUP_MAX
+/* The maximum number of repeated occurrences of a regular expression
+ *    permitted when using the interval notation `\{M,N\}'.  */
+#define _POSIX2_RE_DUP_MAX              255
+#endif /* _POSIX2_RE_DUP_MAX  */
+
 /*
  *  sysconf values per IEEE Std 1003.1, 2008 Edition
  */
