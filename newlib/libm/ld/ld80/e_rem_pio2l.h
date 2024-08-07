@@ -13,7 +13,6 @@
  * Optimized by Bruce D. Evans.
  */
 
-//__FBSDID("$FreeBSD: src/lib/msun/ld80/e_rem_pio2l.h,v 1.3 2011/06/18 13:56:33 benl Exp $");
 
 /* ld80 version of __ieee754_rem_pio2l(x,y)
  *

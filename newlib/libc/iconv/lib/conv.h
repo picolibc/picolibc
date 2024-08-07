@@ -26,7 +26,6 @@
 #ifndef __ICONV_CONVERSION_H__
 #define __ICONV_CONVERSION_H__
 
-#include <sys/cdefs.h>
 #include <sys/types.h>
 #include <wchar.h>
 

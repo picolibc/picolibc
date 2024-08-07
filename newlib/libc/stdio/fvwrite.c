@@ -17,7 +17,6 @@
 /* No user fns here.  Pesch 15apr92. */
 
 #define _DEFAULT_SOURCE
-#include <sys/cdefs.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

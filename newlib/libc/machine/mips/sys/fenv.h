@@ -31,7 +31,6 @@
 #ifndef	_SYS_FENV_H_
 #define	_SYS_FENV_H_
 
-#include <sys/cdefs.h>
 
 #if !defined(__mips_soft_float) && !defined(__mips_hard_float)
 #error compiler didnt set soft/hard float macros

@@ -14,7 +14,6 @@
  * and David A. Schultz.
  */
 
-//__FBSDID("$FreeBSD: src/lib/msun/src/s_cbrtl.c,v 1.1 2011/03/12 19:37:35 kargl Exp $");
 
 
 #define	BIAS	(LDBL_MAX_EXP - 1)

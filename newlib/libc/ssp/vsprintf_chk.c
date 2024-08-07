@@ -28,8 +28,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#include <sys/cdefs.h>
-__RCSID("$NetBSD: vsprintf_chk.c,v 1.6 2009/02/05 05:39:38 lukem Exp $");
 
 /*LINTLIBRARY*/
 

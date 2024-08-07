@@ -8,7 +8,6 @@ is preserved.
 #ifndef __F_MATH_H__
 #define __F_MATH_H__
 
-#include <sys/cdefs.h>
 #include "fdlibm.h"
 
 __inline__

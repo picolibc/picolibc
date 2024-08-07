@@ -31,7 +31,6 @@
 
 #include <limits.h>
 #include <stdint.h>
-#include <sys/cdefs.h>
 
 /* We use the Two-Way string matching algorithm, which guarantees
    linear complexity with constant space.  Additionally, for long

@@ -472,7 +472,6 @@ sub generate_cesbi_h($$)
   print CESBI_H "$comment_automatic\n\n";
   print CESBI_H "#ifndef __CESBI_H__\n";
   print CESBI_H "#define __CESBI_H__\n\n";
-  print CESBI_H "#include <sys/cdefs.h>\n";
   print CESBI_H "#include \"../lib/encnames.h\"\n";
   print CESBI_H "#include \"../lib/ucsconv.h\"\n\n";
   print CESBI_H "/*\n";
@@ -584,7 +583,6 @@ sub generate_aliasesbi_c($)
   or err "Can't create \"../lib/aliasesbi.c\" file for writing.\nSystem error message: $!.\n";
 
   print ALIASESBI_C "$comment_automatic\n\n";
-  print ALIASESBI_C "#include <sys/cdefs.h>\n";
   print ALIASESBI_C "#include \"encnames.h\"\n\n";
   print ALIASESBI_C "const char\n";
   print ALIASESBI_C "$var_aliases\[\] =\n";
@@ -706,7 +704,6 @@ sub generate_ccsbi_h($)
   print CCSBI_H "$comment_automatic\n\n";
   print CCSBI_H "#ifndef __CCSBI_H__\n";
   print CCSBI_H "#define __CCSBI_H__\n\n";
-  print CCSBI_H "#include <sys/cdefs.h>\n";
   print CCSBI_H "#include \"ccs.h\"\n\n";
   print CCSBI_H "/*\n";
   print CCSBI_H " * Enable CCS tables if encoding needs them.\n";
@@ -778,7 +775,6 @@ sub generate_cesbi_c($)
   or err "Can't create \"cesbi.c\" file for writing.\nSystem error message: $!.\n";
 
   print CESBI_C "$comment_automatic\n\n";
-  print CESBI_C "#include <sys/cdefs.h>\n";
   print CESBI_C "#include \"../lib/ucsconv.h\"\n";
   print CESBI_C "#include \"cesbi.h\"\n\n";
   print CESBI_C "/*\n";
@@ -860,7 +856,6 @@ sub generate_ccsbi_c($)
   or err "Can't create \"../ccs/ccsbi.c\" file for writing.\nSystem error message: $!.\n";
 
   print CESBI_C "$comment_automatic\n\n";
-  print CESBI_C "#include <sys/cdefs.h>\n";
   print CESBI_C "#include \"ccsbi.h\"\n\n";
   print CESBI_C "/*\n";
   print CESBI_C " * The following array contains the list of built-in CCS tables.\n";

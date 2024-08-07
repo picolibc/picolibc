@@ -74,7 +74,6 @@ No supporting OS subroutines are required.
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
 #include <stdlib.h>		/* ldiv_t */
 
 ldiv_t

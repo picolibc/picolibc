@@ -67,7 +67,6 @@ QUICKREF
  */
 
 #define _GNU_SOURCE
-#include <sys/cdefs.h>
 
 #include <ctype.h>
 #include <string.h>

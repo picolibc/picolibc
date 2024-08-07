@@ -23,7 +23,6 @@
 #ifndef _XDR_PRIVATE_H
 #define _XDR_PRIVATE_H
 
-#include <sys/cdefs.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <stddef.h>

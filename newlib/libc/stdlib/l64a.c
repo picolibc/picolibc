@@ -22,7 +22,6 @@
  */
 
 #define _DEFAULT_SOURCE
-#include <sys/cdefs.h>
 #include <stdlib.h>
 
 static const char R64_ARRAY[] = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";

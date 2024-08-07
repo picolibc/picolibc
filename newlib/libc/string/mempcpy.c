@@ -28,7 +28,6 @@ PORTABILITY
 	*/
 
 #define _GNU_SOURCE
-#include <sys/cdefs.h>
 #include <stddef.h>
 #include <limits.h>
 #include <string.h>

@@ -25,7 +25,6 @@
  */
 
 #define _GNU_SOURCE
-#include <sys/cdefs.h>
 
 #define ASCII_COMPATIBLE_COLLATE        /* see share/colldef */
 

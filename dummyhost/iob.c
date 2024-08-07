@@ -34,7 +34,6 @@
  */
 
 #include <stdio.h>
-#include <sys/cdefs.h>
 
 /*
  * Dummy stdio hooks. This allows programs to link without requiring

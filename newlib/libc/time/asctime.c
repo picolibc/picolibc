@@ -56,7 +56,6 @@ ANSI C requires <<asctime>>.
 */
 
 #define _DEFAULT_SOURCE
-#include <sys/cdefs.h>
 #include <time.h>
 
 static NEWLIB_THREAD_LOCAL char _asctime_buf[__ASCTIME_SIZE];

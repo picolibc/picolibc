@@ -151,7 +151,6 @@ static char *rcsid = "$Id$";
 #endif
 
 #define _DEFAULT_SOURCE
-#include <sys/cdefs.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

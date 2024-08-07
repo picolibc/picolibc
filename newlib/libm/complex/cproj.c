@@ -68,8 +68,6 @@ QUICKREF
 
 */
 
-#include <sys/cdefs.h>
-/*__RCSID("$NetBSD: cproj.c,v 1.3 2010/09/20 17:51:38 christos Exp $"); */
 
 #include <complex.h>
 #include <math.h>

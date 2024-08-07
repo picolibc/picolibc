@@ -26,9 +26,7 @@
  */
 
 #define _GNU_SOURCE
-#include <sys/cdefs.h>
 
-#include "namespace.h"
 #include "rune.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,7 +34,6 @@
 #include <errno.h>
 #include <unistd.h>
 #include "sysexits.h"
-#include "un-namespace.h"
 
 #include "collate.h"
 
@@ -178,16 +175,7 @@ __collate_strdup(u_char *s)
 void
 __collate_err(int ex, const char *f)
 {
-	const char *s;
-	int serrno = errno;
-
-	/* Be careful to change write counts if you change the strings */
-	write(STDERR_FILENO, "collate_error: ", 15);
-	write(STDERR_FILENO, f, strlen(f));
-	write(STDERR_FILENO, ": ", 2);
-	s = strerror(serrno);
-	write(STDERR_FILENO, s, strlen(s));
-	write(STDERR_FILENO, "\n", 1);
+        fprintf(stderr, "collate_error: %s: %s\n", f, strerror(errno));
 	exit(ex);
 }
 

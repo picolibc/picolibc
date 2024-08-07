@@ -91,7 +91,6 @@
 #endif
 
 #define _DEFAULT_SOURCE
-#include <sys/cdefs.h>
 #include <stdlib.h>
 #include <string.h>
 #include "mprec.h"

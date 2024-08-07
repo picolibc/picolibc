@@ -30,7 +30,6 @@ PORTABILITY
 <<wcscoll>> is ISO/IEC 9899/AMD1:1995 (ISO C).
 */
 
-#include <sys/cdefs.h>
 #include <wchar.h>
 
 int

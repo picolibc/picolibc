@@ -35,7 +35,6 @@
 
 #include <sys/auxv.h>
 #include <errno.h>
-#include <sys/cdefs.h>
 
 unsigned long getauxval(unsigned long type)
 {
