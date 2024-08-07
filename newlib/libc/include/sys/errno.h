@@ -34,7 +34,6 @@ SUCH DAMAGE.
 #define _SYS_ERRNO_H_
 
 #include <sys/cdefs.h>
-#include <sys/config.h>
 
 _BEGIN_STD_C
 

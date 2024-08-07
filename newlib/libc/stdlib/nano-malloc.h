@@ -39,7 +39,6 @@
 #include <malloc.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/config.h>
 #include <sys/lock.h>
 #include <sys/param.h>
 #include <stdint.h>

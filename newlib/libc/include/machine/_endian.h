@@ -3,8 +3,6 @@
 #error "must be included via <machine/endian.h>"
 #endif /* !__MACHINE_ENDIAN_H__ */
 
-#include <sys/config.h>
-
 #ifdef __PPC__
 /* Get rid of GCC builtin defines on PowerPC */
 #ifdef _BIG_ENDIAN

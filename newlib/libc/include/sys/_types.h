@@ -58,7 +58,6 @@ SUCH DAMAGE.
 typedef __WINT_TYPE__ wint_t;
 #endif
 
-#include <sys/config.h>
 #include <machine/_types.h>
 
 #ifndef __machine_blkcnt_t_defined
