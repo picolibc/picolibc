@@ -39,7 +39,6 @@ POSSIBILITY OF SUCH DAMAGE.
 extern "C" {
 #endif
 
-#include <sys/cdefs.h>
 #include <sys/features.h>
 #include <sys/types.h>
 

@@ -11,7 +11,6 @@
  * ====================================================
  */
 
-//__FBSDID("$FreeBSD: src/lib/msun/ld80/k_tanl.c,v 1.3 2008/02/18 15:39:52 bde Exp $");
 
 /*
  * ld80 version of k_tan.c.  See ../src/k_tan.c for most comments.

@@ -36,7 +36,6 @@
 #ifndef _SYS_FENV_H_
 #define _SYS_FENV_H_
 
-#include <sys/cdefs.h>
 
 #ifdef __cplusplus
 extern "C" {

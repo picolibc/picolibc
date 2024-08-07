@@ -43,7 +43,6 @@ QUICKREF
         memcpy ansi pure
 	*/
 
-#include <sys/cdefs.h>
 #include <string.h>
 #include "local.h"
 #include <stdint.h>

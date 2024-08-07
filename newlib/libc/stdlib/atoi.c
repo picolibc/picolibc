@@ -47,7 +47,6 @@ No supporting OS subroutines are required.
  */
 
 #include <stdlib.h>
-#include <sys/cdefs.h>
 
 #ifndef _REENT_ONLY
 int

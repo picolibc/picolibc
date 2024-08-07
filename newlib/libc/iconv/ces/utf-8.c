@@ -28,7 +28,6 @@
 #if defined (ICONV_TO_UCS_CES_UTF_8) \
  || defined (ICONV_FROM_UCS_CES_UTF_8)
 
-#include <sys/cdefs.h>
 #include <sys/types.h>
 #include "../lib/local.h"
 #include "../lib/ucsconv.h"

@@ -52,7 +52,6 @@ No supporting OS subroutines are required.
  *	citrus Id: wcsspn.c,v 1.1 1999/12/29 21:47:45 tshiozak Exp
  */
 
-#include <sys/cdefs.h>
 #include <wchar.h>
 
 size_t

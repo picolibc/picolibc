@@ -64,7 +64,6 @@ static char sccsid[] = "%W% (Berkeley) %G%";
  */
 
 #define _DEFAULT_SOURCE
-#include <sys/cdefs.h>
 #include <stdio.h>
 
 #undef getchar_unlocked

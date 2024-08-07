@@ -31,7 +31,6 @@
 #ifndef _SYS_FENV_H_
 #define _SYS_FENV_H_ 1
 
-#include <sys/cdefs.h>
 
 _BEGIN_STD_C
 

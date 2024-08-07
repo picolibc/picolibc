@@ -47,7 +47,6 @@ Supporting OS subroutines required: <<link>>, <<unlink>>, or <<rename>>.
 */
 
 #define _DEFAULT_SOURCE
-#include <sys/cdefs.h>
 #include <stdio.h>
 #include <sys/unistd.h>
 

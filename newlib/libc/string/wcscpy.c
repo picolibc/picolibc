@@ -53,7 +53,6 @@ No supporting OS subroutines are required.
  *	citrus Id: wcscpy.c,v 1.2 2000/12/21 04:51:09 itojun Exp
  */
 
-#include <sys/cdefs.h>
 #include <wchar.h>
 
 wchar_t *

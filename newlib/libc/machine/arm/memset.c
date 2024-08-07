@@ -30,7 +30,6 @@
 
 #include <stddef.h>
 #include <string.h>
-#include <sys/cdefs.h>
 
 /* According to the run-time ABI for the ARM Architecture, this
    function is allowed to corrupt only the integer core register

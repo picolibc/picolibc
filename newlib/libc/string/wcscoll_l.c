@@ -37,7 +37,6 @@ PORTABILITY
 */
 
 #define _DEFAULT_SOURCE
-#include <sys/cdefs.h>
 #include <wchar.h>
 
 int

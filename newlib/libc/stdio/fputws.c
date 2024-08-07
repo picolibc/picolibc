@@ -80,7 +80,6 @@ PORTABILITY
 */
 
 #define _GNU_SOURCE
-#include <sys/cdefs.h>
 #include <errno.h>
 #include <limits.h>
 #include <stdio.h>

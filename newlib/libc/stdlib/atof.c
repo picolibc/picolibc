@@ -58,7 +58,6 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 
 #include <stdlib.h>
-#include <sys/cdefs.h>
 
 double
 atof (const char *s)

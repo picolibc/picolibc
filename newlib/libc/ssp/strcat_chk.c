@@ -28,8 +28,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#include <sys/cdefs.h>
-__RCSID("$NetBSD: strcat_chk.c,v 1.5 2014/09/17 00:39:28 joerg Exp $");
 
 /*LINTLIBRARY*/
 

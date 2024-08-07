@@ -34,7 +34,6 @@ PORTABILITY
 */
 
 #define _GNU_SOURCE
-#include <sys/cdefs.h>
 #include <wchar.h>
 
 size_t

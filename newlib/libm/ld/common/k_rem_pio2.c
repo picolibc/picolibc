@@ -11,7 +11,6 @@
  * ====================================================
  */
 
-//__FBSDID("$FreeBSD: src/lib/msun/src/k_rem_pio2.c,v 1.11 2008/02/25 11:43:20 bde Exp $");
 
 /*
  * __kernel_rem_pio2(x,y,e0,nx,prec)

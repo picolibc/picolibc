@@ -59,7 +59,6 @@ No supporting OS subroutines are required.
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
 #include <wchar.h>
 
 int

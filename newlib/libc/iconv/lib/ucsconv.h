@@ -26,7 +26,6 @@
 #ifndef __ICONV_UCS_CONVERSION_H__
 #define __ICONV_UCS_CONVERSION_H__
 
-#include <sys/cdefs.h>
 #include <sys/types.h>
 #include <wchar.h>
 #include "local.h"
