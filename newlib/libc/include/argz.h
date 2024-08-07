@@ -8,10 +8,15 @@
 #define _ARGZ_H_
 
 #include <sys/cdefs.h>
-#include <errno.h>
-#include <sys/types.h>
+#define __need_size_t
+#include <stddef.h>
 
 _BEGIN_STD_C
+
+#ifndef _ERROR_T_DECLARED
+typedef int error_t;
+#define _ERROR_T_DECLARED
+#endif
 
 /* The newlib implementation of these functions assumes that sizeof(char) == 1. */
 error_t argz_create (char *const argv[], char **argz, size_t *argz_len);

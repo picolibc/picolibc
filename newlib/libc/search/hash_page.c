@@ -30,14 +30,6 @@
  * SUCH DAMAGE.
  */
 
-#define _DEFAULT_SOURCE
-#define __LINUX_ERRNO_EXTENSIONS__
-#include <sys/param.h>
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)hash_page.c	8.7 (Berkeley) 8/16/94";
-#endif /* LIBC_SCCS and not lint */
-#include <sys/cdefs.h>
-
 /*
  * PACKAGE:  hashing
  *
@@ -54,8 +46,9 @@ static char sccsid[] = "@(#)hash_page.c	8.7 (Berkeley) 8/16/94";
  *	open_temp
  */
 
+#define _DEFAULT_SOURCE
+#include <sys/cdefs.h>
 #include <sys/types.h>
-
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -63,9 +56,10 @@ static char sccsid[] = "@(#)hash_page.c	8.7 (Berkeley) 8/16/94";
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#ifdef DEBUG
-#include <assert.h>
+#ifndef DEBUG
+#define NDEBUG
 #endif
+#include <assert.h>
 
 #include "db_local.h"
 #include "hash.h"
@@ -826,15 +820,12 @@ __free_ovflpage(HTAB *hashp, BUFHEAD *obufp)
 
 	if (!(freep = hashp->mapp[free_page]))
 		freep = fetch_bitmap(hashp, free_page);
-#ifdef DEBUG
 	/*
 	 * This had better never happen.  It means we tried to read a bitmap
 	 * that has already had overflow pages allocated off it, and we
 	 * failed to read it from the file.
 	 */
-	if (!freep)
-		assert(0);
-#endif
+        assert(freep);
 	CLRBIT(freep, free_bit);
 #ifdef DEBUG2
 	(void)fprintf(stderr, "FREE_OVFLPAGE: ADDR: %d BIT: %d PAGE %d\n",

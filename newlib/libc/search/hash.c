@@ -31,25 +31,19 @@
  */
 
 #define _DEFAULT_SOURCE
-#define __LINUX_ERRNO_EXTENSIONS__
-#include <sys/param.h>
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)hash.c	8.9 (Berkeley) 6/16/94";
-#endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
 #include <sys/types.h>
-
 #include <sys/stat.h>
-
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#ifdef DEBUG
-#include <assert.h>
+#ifndef DEBUG
+#define NDEBUG
 #endif
+#include <assert.h>
 
 #define __DBINTERFACE_PRIVATE	/* activate prototypes from db_local.h */
 #include "db_local.h"
@@ -795,10 +789,9 @@ hash_seq(const DB *dbp,
 		} else
 			bp = (__uint16_t *)hashp->cpage->page;
 
-#ifdef DEBUG
 		assert(bp);
 		assert(bufp);
-#endif
+
 		while (bp[hashp->cndx + 1] == OVFLPAGE) {
 			bufp = hashp->cpage =
 			    __get_buf(hashp, bp[hashp->cndx], bufp, 0);
