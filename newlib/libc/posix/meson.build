@@ -44,7 +44,6 @@ srcs_posix = [
 
 if newlib_locale_info
   srcs_posix += [
-    'collate.c',
     'collcmp.c',
   ]
 endif
