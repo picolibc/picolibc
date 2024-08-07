@@ -244,29 +244,18 @@ conv_flt (FLT_STREAM *stream, FLT_CONTEXT *context, width_t width, void *addr, u
                     break;
                 return 0;
 	    }
-            if (flt != flt)
-            {
+            if (flt != flt) {
                 if (CHECK_WIDTH()) {
-                    if ((i = scanf_getc (stream, context)) == '(')
-                    {
-                        while(CHECK_WIDTH() && (i = scanf_getc (stream, context)) != ')')
-                        {
-                            if(isalnum(i) || i == '_' )
-                            {
+                    if ((i = scanf_getc (stream, context)) == '(') {
+                        while (CHECK_WIDTH() && (i = scanf_getc (stream, context)) != ')') {
+                            if (isalnum(i) || i == '_' )
                                 continue;
-                            }
                             else
-                            {
                                 break;
-                            }
                         }
-                        if(i != ')')
-                        {
+                        if (i != ')')
                             return 0;
-                        }
-                    }
-                    else
-                    {
+                    } else {
                         scanf_ungetc (i, stream, context);
                     }
                 }
