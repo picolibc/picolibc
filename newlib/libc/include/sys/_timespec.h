@@ -36,10 +36,8 @@
 #ifndef _SYS__TIMESPEC_H_
 #define	_SYS__TIMESPEC_H_
 
-#include <sys/_types.h>
-
 #ifndef _TIME_T_DECLARED
-typedef	_TIME_T_	time_t;
+typedef	__time_t	time_t;
 #define	_TIME_T_DECLARED
 #endif
 

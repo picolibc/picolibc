@@ -55,7 +55,7 @@ inc_sys_headers_all = [
   'resource.h',
   'sched.h',
   'select.h',
-  'signal.h',
+  '_select.h',
   '_sigset.h',
   'stat.h',
   '_stdint.h',

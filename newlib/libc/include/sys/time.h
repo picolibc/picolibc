@@ -40,15 +40,15 @@
 #define	_SYS_TIME_H_
 
 #include <sys/cdefs.h>
-#include <sys/_timeval.h>
 #include <sys/_types.h>
+#include <sys/_timeval.h>
 #include <sys/_timespec.h>
-#include <sys/select.h>
+#include <sys/_select.h>
 
 _BEGIN_STD_C
 
 #ifndef _TIME_T_DECLARED
-typedef	_TIME_T_	time_t;
+typedef	__time_t	time_t;
 #define	_TIME_T_DECLARED
 #endif
 
@@ -57,10 +57,38 @@ typedef	__suseconds_t	suseconds_t;
 #define	_SUSECONDS_T_DECLARED
 #endif
 
+/*
+ * Names of the interval timers, and structure
+ * defining a timer setting.
+ */
+#define	ITIMER_REAL	0
+#define	ITIMER_VIRTUAL	1
+#define	ITIMER_PROF	2
+
+struct itimerval {
+	struct	timeval it_interval;	/* timer interval */
+	struct	timeval it_value;	/* current value */
+};
+
+int getitimer (int __which, struct itimerval *__value);
+int gettimeofday (struct timeval *__restrict __p,
+			  void *__restrict __tz);
+int setitimer (int __which, const struct itimerval *__restrict __value,
+					struct itimerval *__restrict __ovalue);
+int utimes (const char *, const struct timeval [2]);
+
+#if __BSD_VISIBLE
+
 struct timezone {
 	int	tz_minuteswest;	/* minutes west of Greenwich */
 	int	tz_dsttime;	/* type of dst correction */
 };
+
+int adjtime (const struct timeval *, struct timeval *);
+int futimes (int, const struct timeval [2]);
+int lutimes (const char *, const struct timeval [2]);
+int settimeofday (const struct timeval *, const struct timezone *);
+
 #define	DST_NONE	0	/* not on dst */
 #define	DST_USA		1	/* USA style dst */
 #define	DST_AUST	2	/* Australian style dst */
@@ -68,8 +96,6 @@ struct timezone {
 #define	DST_MET		4	/* Middle European dst */
 #define	DST_EET		5	/* Eastern European dst */
 #define	DST_CAN		6	/* Canada */
-
-#if __BSD_VISIBLE
 
 #ifndef _SBINTIME_T_DECLARED
 typedef	__int64_t	sbintime_t;
@@ -382,8 +408,6 @@ tvtosbt(struct timeval _tv)
 		}							\
 	} while (0)
 
-#ifndef _KERNEL			/* NetBSD/OpenBSD compatible interfaces */
-
 #define	timerclear(tvp)		((tvp)->tv_sec = (tvp)->tv_usec = 0)
 #define	timerisset(tvp)		((tvp)->tv_sec || (tvp)->tv_usec)
 #define	timercmp(tvp, uvp, cmp)					\
@@ -408,51 +432,13 @@ tvtosbt(struct timeval _tv)
 			(vvp)->tv_usec += 1000000;			\
 		}							\
 	} while (0)
-#endif
+
 #endif /* __BSD_VISIBLE */
-
-/*
- * Names of the interval timers, and structure
- * defining a timer setting.
- */
-#define	ITIMER_REAL	0
-#define	ITIMER_VIRTUAL	1
-#define	ITIMER_PROF	2
-
-struct itimerval {
-	struct	timeval it_interval;	/* timer interval */
-	struct	timeval it_value;	/* current value */
-};
-
-#ifndef _KERNEL
-
-int utimes (const char *, const struct timeval [2]);
-
-#if __BSD_VISIBLE
-int adjtime (const struct timeval *, struct timeval *);
-int futimes (int, const struct timeval [2]);
-int lutimes (const char *, const struct timeval [2]);
-int settimeofday (const struct timeval *, const struct timezone *);
-#endif
-
-#if __MISC_VISIBLE || __XSI_VISIBLE
-int getitimer (int __which, struct itimerval *__value);
-int setitimer (int __which, const struct itimerval *__restrict __value,
-					struct itimerval *__restrict __ovalue);
-#endif
-
-int gettimeofday (struct timeval *__restrict __p,
-			  void *__restrict __tz);
 
 #if __GNU_VISIBLE
 int futimesat (int, const char *, const struct timeval [2]);
 #endif
 
-#ifdef _LIBC
-int _gettimeofday (struct timeval *__p, void *__tz);
-#endif
-
-#endif /* !_KERNEL */
 #include <machine/_time.h>
 
 _END_STD_C
