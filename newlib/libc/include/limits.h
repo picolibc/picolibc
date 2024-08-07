@@ -26,8 +26,6 @@
 #  ifndef _LIMITS_H
 #   define _LIMITS_H	1
 
-#   include <sys/config.h>
-
 /* Number of bits in a `char'.  */
 #   undef CHAR_BIT
 #   define CHAR_BIT 8

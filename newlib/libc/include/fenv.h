@@ -13,7 +13,6 @@
 #define _FENV_H
 
 #include <sys/cdefs.h>
-#include <sys/config.h>
 
 _BEGIN_STD_C
 
