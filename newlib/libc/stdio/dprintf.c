@@ -46,7 +46,6 @@ Supporting OS subroutines required: <<sbrk>>, <<write>>.
 */
 
 #define _DEFAULT_SOURCE
-#include <sys/cdefs.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdarg.h>

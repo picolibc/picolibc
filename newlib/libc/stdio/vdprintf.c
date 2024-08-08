@@ -5,7 +5,6 @@
 /* doc in dprintf.c */
 
 #define _DEFAULT_SOURCE
-#include <sys/cdefs.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

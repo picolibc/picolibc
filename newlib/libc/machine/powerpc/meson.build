@@ -57,7 +57,6 @@ srcs_machine = [
 #  'vfscanf.c',
 ]
 
-subdir('sys')
 subdir('machine')
 
 src_machine = files(srcs_machine)

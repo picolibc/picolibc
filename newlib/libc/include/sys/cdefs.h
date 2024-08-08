@@ -674,26 +674,6 @@
 
 #endif	/* __GNUC__ */
 
-#ifndef	__FBSDID
-#define	__FBSDID(s)	struct __hack
-#endif
-
-#ifndef	__RCSID
-#define	__RCSID(s)	struct __hack
-#endif
-
-#ifndef	__RCSID_SOURCE
-#define	__RCSID_SOURCE(s)	struct __hack
-#endif
-
-#ifndef	__SCCSID
-#define	__SCCSID(s)	struct __hack
-#endif
-
-#ifndef	__COPYRIGHT
-#define	__COPYRIGHT(s)	struct __hack
-#endif
-
 #ifndef	__DECONST
 #define	__DECONST(type, var)	((type)(__uintptr_t)(const void *)(var))
 #endif

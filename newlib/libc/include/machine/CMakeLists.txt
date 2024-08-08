@@ -39,6 +39,7 @@ picolibc_headers(machine
   _endian.h
   endian.h
   fastmath.h
+  fenv.h
   fenv-softfloat.h
   ieeefp.h
   malloc.h

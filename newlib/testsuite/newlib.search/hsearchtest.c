@@ -33,15 +33,6 @@
  * Test program for hsearch() et al.
  */
 
-#include <sys/cdefs.h>
-#if 0
-#if !defined(lint)
-__RCSID("$NetBSD: hsearchtest.c,v 1.4 2002/02/21 07:38:15 itojun Exp $");
-__COPYRIGHT(
-"@(#) Copyright (c) 2001 Christopher G. Demetriou.  All rights reserved.\n");
-#endif /* not lint */
-#endif
-
 #include <search.h>
 #include <stdlib.h>
 #include <stdio.h>

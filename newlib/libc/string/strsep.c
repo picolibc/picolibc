@@ -4,7 +4,6 @@
 
 #define _DEFAULT_SOURCE
 #include <string.h>
-#include <sys/cdefs.h>
 #include "strtok_r.h"
 
 char *

@@ -24,7 +24,6 @@
  * SUCH DAMAGE.
  */
 
-//__FBSDID("$FreeBSD: src/lib/msun/src/s_rintl.c,v 1.5 2008/02/22 11:59:05 bde Exp $");
 
 
 #if LDBL_MAX_EXP != 0x4000

@@ -25,8 +25,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#include <sys/cdefs.h>
-__RCSID("$NetBSD: conjl.c,v 1.4 2010/09/20 16:55:20 christos Exp $");
 
 #include <complex.h>
 #include "../common/fdlibm.h"

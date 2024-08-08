@@ -34,6 +34,7 @@
 #
 inc_machine_headers_machine = [
   'asm.h',
+  'fenv.h',
   'fenv-fp.h',
   'regdef.h',
 ]

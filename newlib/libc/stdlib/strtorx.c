@@ -30,7 +30,6 @@ THIS SOFTWARE.
  * with " at " changed at "@" and " dot " changed to ".").	*/
 
 #define _DEFAULT_SOURCE
-#include <sys/cdefs.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>

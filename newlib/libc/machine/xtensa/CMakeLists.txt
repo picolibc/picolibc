@@ -33,6 +33,8 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+add_subdirectory(machine)
+
 picolibc_sources_flags("-fno-builtin"
   memcpy.S
   memset.S
@@ -43,5 +45,3 @@ picolibc_sources_flags("-fno-builtin"
   strncpy.S
   )
 
-add_subdirectory(sys)
-add_subdirectory(machine)

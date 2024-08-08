@@ -26,10 +26,9 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _SYS_FENV_H
-#define _SYS_FENV_H 1
+#ifndef _MACHINE_FENV_H
+#define _MACHINE_FENV_H 1
 
-#include <sys/cdefs.h>
 
 #ifdef __cplusplus
 extern "C" {

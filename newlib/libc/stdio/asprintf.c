@@ -18,7 +18,6 @@
 /* doc in sprintf.c */
 
 #define _GNU_SOURCE
-#include <sys/cdefs.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <limits.h>

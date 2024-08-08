@@ -13,7 +13,6 @@
 #endif
 
 #define _DEFAULT_SOURCE
-#include <sys/cdefs.h>
 
 #ifndef _USE_GDTOA
 #include <string.h>

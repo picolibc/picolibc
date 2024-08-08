@@ -41,10 +41,8 @@
  * nobody had a copy in the office, so...
  */
 
-#include <sys/cdefs.h>
 #if 0
 #if defined(LIBC_SCCS) && !defined(lint)
-__RCSID("$NetBSD: hcreate.c,v 1.2 2001/02/19 21:26:04 ross Exp $");
 #endif /* LIBC_SCCS and not lint */
 #endif
 

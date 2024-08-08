@@ -207,9 +207,7 @@ rangematch(const char *pattern, char test, int flags, char **newp)
 
 			if (
 #ifdef __HAVE_LOCALE_INFO__
-                            __collate_load_error ?
-			    c <= test && test <= c2 :
-			       __collate_range_cmp(c, test) <= 0
+                            __collate_range_cmp(c, test) <= 0
 			    && __collate_range_cmp(test, c2) <= 0
 #else
                             c <= test && test <= c2

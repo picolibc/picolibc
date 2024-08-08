@@ -3,7 +3,6 @@
 #ifndef _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE
 #endif
-#include <sys/cdefs.h>
 #include <time.h>
 #include <sys/_tz_structs.h>
 #include <sys/lock.h>

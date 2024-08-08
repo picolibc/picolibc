@@ -63,9 +63,14 @@ foreach target : targets
     _objs = []
   endif
 
+  _lib_files=[]
+  foreach _lib : _libs
+    _lib_files += _lib.full_path()
+  endforeach
+
   _c_args = value[1] + get_variable('test_c_args_' + target, test_c_args)
-  _link_args = value[1] + get_variable('test_link_args_' + target, test_link_args)
-  _link_depends = get_variable('test_link_depends_' + target, test_link_depends)
+  _link_args = value[1] + get_variable('test_link_args_' + target, test_link_args) + _lib_files
+  _link_depends = get_variable('test_link_depends_' + target, test_link_depends) + _libs
 
   foreach t1 : libc_tests_picolibc
     t1_src = t1 + '.c'
@@ -86,7 +91,6 @@ foreach target : targets
 		    c_args: double_printf_compile_args + _c_args,
 		    link_args: double_printf_link_args + _link_args,
 		    objects: _objs,
-		    link_with: _libs,
 		    link_depends:  _link_depends,
 		    include_directories: inc),
          depends: bios_bin,

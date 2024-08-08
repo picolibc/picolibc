@@ -59,7 +59,6 @@ No supporting OS subroutines are required.
  */
 
 
-#include <sys/cdefs.h>
 #include <wchar.h>
 
 wchar_t *

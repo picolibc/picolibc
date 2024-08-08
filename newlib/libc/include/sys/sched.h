@@ -22,6 +22,7 @@
 #define _SYS_SCHED_H_
 
 #include <sys/cdefs.h>
+#include <sys/_types.h>
 #include <sys/_timespec.h>
 
 _BEGIN_STD_C

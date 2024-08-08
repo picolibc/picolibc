@@ -53,7 +53,6 @@ Supporting OS subroutines required: None.
 */
 
 #define _DEFAULT_SOURCE
-#include <sys/cdefs.h>
 #include <stdlib.h>
 #include <limits.h>
 

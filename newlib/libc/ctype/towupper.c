@@ -65,7 +65,6 @@ PORTABILITY
 No supporting OS subroutines are required.
 */
 
-#include <sys/cdefs.h>
 #include <string.h>
 #include <ctype.h>
 #include <wctype.h>

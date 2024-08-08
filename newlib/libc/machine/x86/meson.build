@@ -57,7 +57,6 @@ srcs_machine_32 = [
 
 srcs_machine = srcs_machine_common + srcs_machine_64
 
-subdir('sys')
 subdir('machine')
 
 x86_64_code = '''#ifndef __x86_64

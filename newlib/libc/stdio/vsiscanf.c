@@ -18,7 +18,6 @@
  */
 
 #define _DEFAULT_SOURCE
-#include <sys/cdefs.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>

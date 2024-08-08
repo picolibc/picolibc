@@ -18,9 +18,6 @@
 #ifndef _FVWRITE_H_
 #define _FVWRITE_H_
 
-/* %W% (Berkeley) %G% */
-#include <sys/cdefs.h>
-
 /*
  * I/O descriptors for __sfvwrite_r().
  */

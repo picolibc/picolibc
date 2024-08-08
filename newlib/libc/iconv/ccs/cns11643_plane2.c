@@ -8,7 +8,6 @@
 #if defined (ICONV_TO_UCS_CCS_CNS11643_PLANE2) \
  || defined (ICONV_FROM_UCS_CCS_CNS11643_PLANE2)
 
-#include <sys/cdefs.h>
 #include <sys/types.h>
 #include <sys/param.h>
 #include "ccs.h"

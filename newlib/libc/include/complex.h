@@ -8,11 +8,11 @@
 #ifndef	_COMPLEX_H
 #define	_COMPLEX_H
 
+#include <sys/cdefs.h>
+
 #define complex _Complex
 #define _Complex_I 1.0fi
 #define I _Complex_I
-
-#include <sys/cdefs.h>
 
 _BEGIN_STD_C
 

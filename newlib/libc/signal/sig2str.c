@@ -293,7 +293,7 @@ str2sig(const char *__restrict str, int *__restrict pnum)
   /* If str is a representation of a decimal value, save its integer value
    * in pnum. */
   if (1 <= is_valid_decimal &&
-      is_valid_decimal <= (NSIG - 1)) {
+      is_valid_decimal <= (_NSIG - 1)) {
     *pnum = is_valid_decimal;
     return 0;
   }

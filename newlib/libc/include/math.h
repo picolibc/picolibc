@@ -221,6 +221,18 @@ extern int isnan (double);
 # define FP_ILOGBNAN __INT_MAX__
 #endif
 
+#if !defined(FP_FAST_FMA) && (_HAVE_FAST_FMA || defined(__FP_FAST_FMA))
+#define FP_FAST_FMA
+#endif
+
+#if !defined(FP_FAST_FMAF) && (_HAVE_FAST_FMAF || defined(__FP_FAST_FMAF))
+#define FP_FAST_FMAF
+#endif
+
+#if !defined(FP_FAST_FMAL) && (_HAVE_FAST_FMAL || defined(__FP_FAST_FMAL))
+#define FP_FAST_FMAL
+#endif
+
 #ifndef MATH_ERRNO
 # define MATH_ERRNO 1
 #endif

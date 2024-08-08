@@ -34,9 +34,6 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-add_subdirectory(sys)
-add_subdirectory(machine)
-
 picolibc_sources_flags("-fno-builtin"
   abort.c
   longjmp.S

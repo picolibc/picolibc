@@ -55,7 +55,6 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 */
 
 #define _GNU_SOURCE
-#include <sys/cdefs.h>
 #include <stdlib.h>
 #include <string.h>
 #include "mprec.h"

@@ -34,6 +34,7 @@
 #
 picolibc_headers(machine
   _types.h
+  fenv.h
   fenv-fp.h
   math.h
   )

@@ -54,7 +54,6 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 #define _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE
-#include <sys/cdefs.h>
 #include <stdio.h>
 #include <string.h>
 #include "local.h"

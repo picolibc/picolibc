@@ -30,7 +30,6 @@
 
 #include <stddef.h>
 #include <string.h>
-#include <sys/cdefs.h>
 
 /* Support the alias for the __aeabi_memset which may
    assume memory alignment.  */

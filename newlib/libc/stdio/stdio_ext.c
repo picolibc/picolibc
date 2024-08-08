@@ -60,7 +60,6 @@ No supporting OS subroutines are required.
 #ifndef __rtems__
 
 #define _DEFAULT_SOURCE
-#include <sys/cdefs.h>
 #include <stdio.h>
 #include <stdio_ext.h>
 

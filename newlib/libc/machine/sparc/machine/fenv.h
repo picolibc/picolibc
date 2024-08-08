@@ -1,6 +1,6 @@
+/*	$NetBSD: fenv.h,v 1.2 2017/01/14 12:00:13 martin Exp $	*/
+
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
- *
  * Copyright (c) 2004-2005 David Schultz <das@FreeBSD.ORG>
  * All rights reserved.
  *
@@ -28,66 +28,73 @@
  * $FreeBSD$
  */
 
-#ifndef _SYS_FENV_H_
-#define _SYS_FENV_H_ 1
+#ifndef	_MACHINE_FENV_H_
+#define	_MACHINE_FENV_H_
 
-#include <sys/cdefs.h>
-#include <sys/_types.h>
 
 _BEGIN_STD_C
 
+#ifdef _SOFT_FLOAT
 typedef int fenv_t;
 typedef int fexcept_t;
-
-#ifdef __SH_FPU_ANY__
-
-#ifdef __SH2E__
-#define PICOLIBC_LONG_DOUBLE_NOROUND
-#define PICOLIBC_LONG_DOUBLE_NOEXCEPT
-#if __SIZEOF_DOUBLE__ > 4
-#define PICOLIBC_DOUBLE_NOROUND
-#define PICOLIBC_DOUBLE_NOEXCEPT
-#endif
-#endif
-
-#ifdef __SH4_SINGLE_ONLY__
-#define PICOLIBC_LONG_DOUBLE_NOROUND
-#define PICOLIBC_LONG_DOUBLE_NOEXCEPT
-#endif
-
-/* Exception flags */
-#define	FE_INVALID	0x0040
-#define	FE_DIVBYZERO	0x0020
-#if defined(__SH2E__)
-#define	FE_ALL_EXCEPT	(FE_DIVBYZERO | FE_INVALID)
+#define	FE_TONEAREST	0	/* round to nearest representable number */
 #else
-#define	FE_OVERFLOW	0x0010
-#define	FE_UNDERFLOW	0x0008
-#define	FE_INEXACT	0x0004
+
+#ifdef __arch64__
+typedef	__UINT64_TYPE__	fenv_t;
+typedef	__UINT64_TYPE__	fexcept_t;
+#else
+typedef	__UINT32_TYPE__	fenv_t;
+typedef	__UINT32_TYPE__	fexcept_t;
+#endif
+
+/*
+ * Exception flags
+ *
+ * Symbols are defined in such a way, to correspond to the accrued
+ * exception bits (aexc) fields of FSR.
+ */
+#define	FE_INEXACT      0x00000020	/* 0000100000 */
+#define	FE_DIVBYZERO    0x00000040	/* 0001000000 */
+#define	FE_UNDERFLOW    0x00000080	/* 0010000000 */
+#define	FE_OVERFLOW     0x00000100	/* 0100000000 */
+#define	FE_INVALID	0x00000200	/* 1000000000 */
+
 #define	FE_ALL_EXCEPT	(FE_DIVBYZERO | FE_INEXACT | \
     FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW)
-#endif
 
-/* Rounding modes */
-#define	FE_TONEAREST		0x0000
-#define	FE_TOWARDZERO		0x0001
+/*
+ * Rounding modes
+ *
+ * We can't just use the hardware bit values here, because that would
+ * make FE_UPWARD and FE_DOWNWARD negative, which is not allowed.
+ */
+#define	FE_TONEAREST	0	/* round to nearest representable number */
+#define	FE_TOWARDZERO	1	/* round to zero (truncate) */
+#define	FE_UPWARD	2	/* round toward positive infinity */
+#define	FE_DOWNWARD	3	/* round toward negative infinity */
+#define	_ROUND_MASK	(FE_TONEAREST | FE_DOWNWARD | \
+    FE_UPWARD | FE_TOWARDZERO)
+#define	_ROUND_SHIFT	30
 
-#else
-#define	FE_TONEAREST		0x0000
-#endif
+/* We need to be able to map status flag positions to mask flag positions */
+#define	_FPUSW_SHIFT	18
+#define	_ENABLE_MASK	(FE_ALL_EXCEPT << _FPUSW_SHIFT)
+
+#endif  /* !_SOFT_FLOAT */
 
 #if !defined(__declare_fenv_inline) && defined(__declare_extern_inline)
 #define	__declare_fenv_inline(type) __declare_extern_inline(type)
 #endif
 
 #ifdef __declare_fenv_inline
-#ifdef __SH_FPU_ANY__
-#include <machine/fenv-fp.h>
-#else
+#ifdef _SOFT_FLOAT
 #include <machine/fenv-softfloat.h>
+#else
+#include <machine/fenv-fp.h>
 #endif
 #endif
 
 _END_STD_C
 
-#endif	/* _SYS_FENV_H_ */ 
+#endif	/* !_MACHINE_FENV_H_ */

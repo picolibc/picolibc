@@ -290,7 +290,6 @@ if ($Source)
 #if defined ($GuardToUCS) \\
  || defined ($GuardFromUCS)
 
-#include <sys/cdefs.h>
 #include <sys/types.h>
 #include <sys/param.h>
 #include \"ccs.h\"

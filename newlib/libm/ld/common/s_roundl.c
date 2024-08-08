@@ -24,7 +24,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-//__FBSDID("$FreeBSD: src/lib/msun/src/s_roundl.c,v 1.2 2005/12/02 13:45:06 bde Exp $");
 
 #include "../math_ld.h"
 

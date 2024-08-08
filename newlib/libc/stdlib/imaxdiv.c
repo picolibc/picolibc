@@ -24,8 +24,6 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
-__FBSDID("$FreeBSD: head/lib/libc/stdlib/imaxdiv.c 301115 2016-06-01 10:14:25Z ache $");
 
 #include <inttypes.h>
 #include <stdint.h>

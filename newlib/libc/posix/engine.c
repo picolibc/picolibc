@@ -33,7 +33,6 @@
  *	@(#)engine.c	8.5 (Berkeley) 3/20/94
  */
 
-#include <sys/cdefs.h>
 
 /*
  * The matching engine and friends.  This file is #included by regexec.c

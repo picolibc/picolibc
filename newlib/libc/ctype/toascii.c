@@ -65,7 +65,6 @@ No supporting OS subroutines are required.
 */
 
 #define _GNU_SOURCE
-#include <sys/cdefs.h>
 #include <ctype.h>
 #undef toascii
 

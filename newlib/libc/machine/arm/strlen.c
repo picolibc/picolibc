@@ -29,7 +29,6 @@
 #include <picolibc.h>
 
 #include "arm_asm.h"
-#include <sys/cdefs.h>
 #include <string.h>
 #include <limits.h>
 

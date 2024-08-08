@@ -11,7 +11,6 @@
  * ====================================================
  */
 
-//__FBSDID("$FreeBSD: src/lib/msun/ld128/k_sinl.c,v 1.1 2008/02/17 07:32:31 das Exp $");
 
 /*
  * ld128 version of k_sin.c.  See ../src/k_sin.c for most comments.

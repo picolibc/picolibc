@@ -28,8 +28,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#include <sys/cdefs.h>
-__RCSID("$NetBSD: gets_chk.c,v 1.7 2013/10/04 20:49:16 christos Exp $");
 
 /*LINTLIBRARY*/
 

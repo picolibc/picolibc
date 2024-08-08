@@ -45,7 +45,6 @@ QUICKREF
 */
 
 #include <string.h>
-#include <sys/cdefs.h>
 #include <stddef.h>
 #include <limits.h>
 #include <stdint.h>

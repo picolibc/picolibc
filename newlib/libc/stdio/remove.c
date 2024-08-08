@@ -55,7 +55,6 @@ Supporting OS subroutine required: <<unlink>>.
 */
 
 #define _DEFAULT_SOURCE
-#include <sys/cdefs.h>
 #include <stdio.h>
 #include <unistd.h>
 

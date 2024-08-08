@@ -4,7 +4,6 @@ All rights reserved.
  */
 #define _DEFAULT_SOURCE
 #include <stdlib.h>
-#include <sys/cdefs.h>
 
 float
 atoff (const char *s)

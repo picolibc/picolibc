@@ -45,11 +45,10 @@ SUCH DAMAGE.
 #define __need_size_t
 #define __need_NULL
 #include <stddef.h>
+#include <sys/_types.h>
+#include <sys/_timespec.h>
 
 _BEGIN_STD_C
-
-/* Get time_t and struct timespec */
-#include <sys/_timespec.h>
 
 #ifndef _CLOCKS_PER_SEC_
 #define _CLOCKS_PER_SEC_ 1000000

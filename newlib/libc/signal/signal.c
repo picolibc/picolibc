@@ -105,23 +105,22 @@ without an operating system that can actually raise exceptions.
 
 #ifdef _USE_ATOMIC_SIGNAL
 #include <stdatomic.h>
-static _Atomic uintptr_t _sig_func[NSIG];
+static _Atomic _sig_func_ptr _sig_func[_NSIG];
 #else
-static _sig_func_ptr _sig_func[NSIG];
+static _sig_func_ptr _sig_func[_NSIG];
 #endif
 
 _sig_func_ptr
 signal (int sig, _sig_func_ptr func)
 {
-  if (sig < 0 || sig >= NSIG)
+  if (sig < 0 || sig >= _NSIG)
     {
       errno = EINVAL;
       return SIG_ERR;
     }
 
 #ifdef _USE_ATOMIC_SIGNAL
-  uintptr_t ifunc = (uintptr_t) func;
-  return (_sig_func_ptr) atomic_exchange(&_sig_func[sig], ifunc);
+  return (_sig_func_ptr) atomic_exchange(&_sig_func[sig], func);
 #else
   _sig_func_ptr old = _sig_func[sig];
   _sig_func[sig] = func;
@@ -132,7 +131,7 @@ signal (int sig, _sig_func_ptr func)
 int
 raise (int sig)
 {
-  if (sig < 0 || sig >= NSIG)
+  if (sig < 0 || sig >= _NSIG)
     {
       errno = EINVAL;
       return -1;
@@ -152,8 +151,8 @@ raise (int sig)
 #ifdef _USE_ATOMIC_SIGNAL
     /* make sure it hasn't changed in the meantime */
     if (!atomic_compare_exchange_strong(&_sig_func[sig],
-                                       (uintptr_t *) &func,
-                                        (uintptr_t) SIG_DFL))
+                                        &func,
+                                        SIG_DFL))
       continue;
 #else
     _sig_func[sig] = SIG_DFL;

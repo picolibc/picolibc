@@ -30,7 +30,6 @@ QUICKREF
 */
 
 #define _GNU_SOURCE
-#include <sys/cdefs.h>
 #include <string.h>
 #include <limits.h>
 #include <stdint.h>

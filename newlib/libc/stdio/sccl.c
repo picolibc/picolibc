@@ -18,7 +18,6 @@
 /* Split from vfscanf.c  */
 
 #define _DEFAULT_SOURCE
-#include <sys/cdefs.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include "local.h"

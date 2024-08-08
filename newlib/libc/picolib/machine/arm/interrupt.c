@@ -33,7 +33,6 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
 #include <stdint.h>
 
 #if __ARM_ARCH_PROFILE == 'M'

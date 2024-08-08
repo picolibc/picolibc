@@ -34,6 +34,7 @@
 #
 picolibc_headers(machine
   asm.h
+  fenv.h
   fenv-fp.h
   regdef.h
   )

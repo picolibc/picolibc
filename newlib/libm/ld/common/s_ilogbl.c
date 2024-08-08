@@ -10,7 +10,6 @@
  * ====================================================
  */
 
-//__FBSDID("$FreeBSD: src/lib/msun/src/s_ilogbl.c,v 1.2 2008/02/22 02:30:35 das Exp $");
 
 #include <limits.h>
 

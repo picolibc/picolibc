@@ -131,7 +131,6 @@ THIS SOFTWARE.
 /* Original file gdtoa-strtod.c Modified 06-21-2006 by Jeff Johnston to work within newlib.  */
 
 #define _GNU_SOURCE
-#include <sys/cdefs.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>

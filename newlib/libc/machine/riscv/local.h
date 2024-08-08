@@ -9,9 +9,6 @@
    http://www.opensource.org/licenses.
 */
 
-#ifndef _SYS_STRING_H
-#define _SYS_STRING_H
-
 static __inline unsigned long __libc_detect_null(unsigned long w)
 {
   unsigned long mask = 0x7f7f7f7f;
@@ -19,5 +16,3 @@ static __inline unsigned long __libc_detect_null(unsigned long w)
     mask = ((mask << 16) << 16) | mask;
   return ~(((w & mask) + mask) | w | mask);
 }
-
-#endif

@@ -29,7 +29,6 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 #include <picolibc.h>
 
-#include <sys/cdefs.h>
 #include <stdio.h>
 
 #include "c99ppe.h"

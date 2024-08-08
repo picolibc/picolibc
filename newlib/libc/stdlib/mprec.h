@@ -31,7 +31,6 @@
 #include <float.h>
 #include <errno.h>
 #include <assert.h>
-#include <sys/config.h>
 #include <sys/types.h>
 #include "../locale/setlocale.h"
 

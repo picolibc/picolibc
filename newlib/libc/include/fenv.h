@@ -13,11 +13,10 @@
 #define _FENV_H
 
 #include <sys/cdefs.h>
-#include <sys/config.h>
 
 _BEGIN_STD_C
 
-#include <sys/fenv.h>
+#include <machine/fenv.h>
 
 #ifndef FE_ALL_EXCEPT
 #define FE_ALL_EXCEPT	0

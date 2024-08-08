@@ -22,7 +22,6 @@
  * in particular, macros and private variables.
  */
 
-#include <sys/cdefs.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <unistd.h>

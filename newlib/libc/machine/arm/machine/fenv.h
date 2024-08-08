@@ -28,10 +28,9 @@
  * $FreeBSD$
  */
 
-#ifndef _SYS_FENV_H_
-#define _SYS_FENV_H_ 1
+#ifndef _MACHINE_FENV_H_
+#define _MACHINE_FENV_H_ 1
 
-#include <sys/cdefs.h>
 
 _BEGIN_STD_C
 
@@ -85,4 +84,4 @@ _END_STD_C
 #endif
 #endif
 
-#endif	/* _SYS_FENV_H_ */
+#endif	/* _MACHINE_FENV_H_ */

@@ -33,10 +33,9 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _SYS_FENV_H_
-#define _SYS_FENV_H_
+#ifndef _MACHINE_FENV_H_
+#define _MACHINE_FENV_H_
 
-#include <sys/cdefs.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -81,4 +80,4 @@ typedef int fexcept_t;
 }
 #endif
 
-#endif	/* _SYS_FENV_H_ */
+#endif	/* _MACHINE_FENV_H_ */
