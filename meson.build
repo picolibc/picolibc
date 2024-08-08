@@ -1631,30 +1631,6 @@ endif
 test_env = environment({'PICOLIBC_TEST' : '1'})
 test_env.prepend('PATH', meson.current_source_dir() / 'scripts')
 
-# CompCert needs the '-WUl,' prefix to correctly pass the --spec parameters to the linker
-specs_prefix = ''
-if cc.get_id() == 'ccomp'
-  specs_prefix = '-WUl,'
-endif
-
-if has_semihost
-  specs = picolibc_specs
-  specs_name = picolibc_specs_name
-else
-  specs = configure_file(input: 'test.specs.in',
-			 output: '@BASENAME@',
-			 configuration: specs_data,
-			 install: false)
-  specs_name = 'test.specs'
-endif
-
-# Clang does not support spec files
-specs_line = []
-if cc.get_id() != 'clang'
-  specs_line += [specs_prefix + '--specs', specs_prefix + meson.current_build_dir() / specs_name]
-endif
-test_c_args += specs_line
-
 if has_semihost
   foreach target : ['default-target'] + targets
     if target == 'default-target'
@@ -1676,18 +1652,17 @@ if has_semihost
     endif
 
     set_variable(test_link_args_variable,
-		 ['-nostdlib', '-T', picolibc_ld_string,
-		  lib_gcc] + additional_libs_list + specs_line)
+		 ['-Wl,--gc-sections', '-nostdlib', '-T', picolibc_ld_string,
+		  lib_gcc] + additional_libs_list)
 
     set_variable(test_linker_files_variable, [picolibc_ld_value])
 
     # Make sure all of the tests get re-linked if the linker scripts change.
-    set_variable(test_link_depends_variable, [picolibc_ld_value, specs])
+    set_variable(test_link_depends_variable, [picolibc_ld_value])
   endforeach
 else
-  test_link_args = specs_line
-  test_linker_files = [specs]
-  test_link_depends = [specs]
+  test_link_args = ['-Wl,--gc-sections']
+  test_link_depends = []
 endif
 
 # make sure to include semihost BEFORE picocrt!
