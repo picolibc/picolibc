@@ -34,10 +34,10 @@
  * $FreeBSD: src/lib/libc/regex/utils.h,v 1.2 2002/03/22 23:41:56 obrien Exp $
  */
 
-#include <unistd.h>     /* for _POSIX2_RE_DUP_MAX */
+#include <limits.h>     /* for RE_DUP_MAX */
 
 /* utility definitions */
-#define	DUPMAX		_POSIX2_RE_DUP_MAX	/* xxx is this right? */
+#define	DUPMAX		RE_DUP_MAX	/* xxx is this right? */
 #define	REGEX_INFINITY	(DUPMAX + 1)
 #define	NC		(CHAR_MAX - CHAR_MIN + 1)
 typedef unsigned char uch;
