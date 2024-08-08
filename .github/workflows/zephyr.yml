@@ -106,7 +106,7 @@ jobs:
       # and zephyr.
       - name: ccache
         if: matrix.test == './.github/do-zephyr'
-        uses: hendrikmuhs/ccache-action@v1.2.13
+        uses: hendrikmuhs/ccache-action@v1.2.14
         with:
           key: compilation-${{ runner.os }}-${{ github.job }}-${{ matrix.meson_flags }}-${{ env.CCACHE_SIZE }}
           max-size: ${{ env.CCACHE_SIZE }}
@@ -166,7 +166,7 @@ jobs:
       # and zephyr.
       - name: ccache
         if: matrix.test == './.github/do-zephyr'
-        uses: hendrikmuhs/ccache-action@v1.2.13
+        uses: hendrikmuhs/ccache-action@v1.2.14
         with:
           key: compilation-${{ runner.os }}-${{ github.job }}-${{ matrix.meson_flags }}-${{ env.CCACHE_SIZE }}
           max-size: ${{ env.CCACHE_SIZE }}
