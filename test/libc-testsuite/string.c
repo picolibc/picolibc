@@ -45,7 +45,7 @@
     } while(0)
 
 #define TEST_S(s, x, m) do {                                            \
-        if (strcmp((s),(x)) != 0) {                                     \
+        if (s == NULL || strcmp((s),(x)) != 0) {                        \
             printf(__FILE__ ":%d: [%s] != [%s] (%s)\n", __LINE__, s, x, m); \
             err++;                                                      \
         }                                                               \
