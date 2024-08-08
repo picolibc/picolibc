@@ -1888,6 +1888,12 @@ computejumps(struct parse *p, struct re_guts *g)
 		g->charjump[(unsigned char) g->must[mindex]] = g->mlen - mindex - 1;
 }
 
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wanalyzer-out-of-bounds"
+#endif
+
 /*
  - computematchjumps - compute match jumps for BM scan
  == static void computematchjumps(struct parse *p, struct re_guts *g);
