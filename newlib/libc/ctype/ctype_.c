@@ -35,7 +35,7 @@
 
 #define _CTYPE_DATA_0_127 \
 	_C,	_C,	_C,	_C,	_C,	_C,	_C,	_C, \
-	_C,	_C|_S, _C|_S, _C|_S,	_C|_S,	_C|_S,	_C,	_C, \
+	_C,	_C|_S|_B, _C|_S, _C|_S,	_C|_S,	_C|_S,	_C,	_C, \
 	_C,	_C,	_C,	_C,	_C,	_C,	_C,	_C, \
 	_C,	_C,	_C,	_C,	_C,	_C,	_C,	_C, \
 	_S|_B,	_P,	_P,	_P,	_P,	_P,	_P,	_P, \
