@@ -80,9 +80,9 @@ int	 scandirat(int, const char *, struct dirent ***,
 	    const struct dirent **));
 int	 versionsort(const struct dirent **, const struct dirent **);
 #endif
-#if __POSIX_VISIBLE >= 200809
+#if __POSIX_VISIBLE >= 202405
 ssize_t	posix_getdents(int, void *, size_t, int);
-#endif /* __POSIX_VISIBLE >= 200809 */
+#endif /* __POSIX_VISIBLE >= 202405 */
 __END_DECLS
 
 #endif /*_DIRENT_H_*/

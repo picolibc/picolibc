@@ -37,7 +37,7 @@ struct dirent
   char		d_name[NAME_MAX + 1];
 };
 
-#if __POSIX_VISIBLE >= 200809
+#if __POSIX_VISIBLE >= 202405
 #define DT_FORCE_TYPE	0x01	/* Suggested by SUS Base Specs Issue 8 */
 
 typedef __uint16_t reclen_t;
@@ -54,13 +54,13 @@ struct posix_dent
   __uint32_t	__d_internal1;
   char		d_name[NAME_MAX + 1];
 };
-#endif /* __POSIX_VISIBLE >= 200809 */
+#endif /* __POSIX_VISIBLE >= 202405 */
 
 #define d_fileno d_ino			/* BSD compatible definition */
 
 typedef struct __DIR DIR;
 
-#if __BSD_VISIBLE || __POSIX_VISIBLE >= 200809
+#if __BSD_VISIBLE || __POSIX_VISIBLE >= 202405
 /* File types for `d_type'.  */
 enum
 {
@@ -83,7 +83,7 @@ enum
   DT_WHT = 14
 # define DT_WHT         DT_WHT
 };
-#endif /* __BSD_VISIBLE || __POSIX_VISIBLE >= 200809 */
+#endif /* __BSD_VISIBLE || __POSIX_VISIBLE >= 202405 */
 
 #if __BSD_VISIBLE
 /* Convert between stat structure types and directory types.  */
