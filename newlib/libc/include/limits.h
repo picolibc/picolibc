@@ -131,13 +131,14 @@
 /*
  * Placing this outside of the above condition means that this will
  * get run even from another picolibc provided limits.h file down the
- * include chain.
+ * include chain. This also to see if the compiler limits.h has
+ * already been included as some clang configurations do that.
  */
-#ifdef __GNUC__
+#if defined __GNUC__ && !defined _GCC_LIMITS_H_
 #ifdef __clang__
 #ifndef __GLIBC_USE
 #define __GLIBC_USE(x) 1
 #endif
 #endif
 # include_next <limits.h>
-#endif /* __GNUC__ */
+#endif /* __GNUC__ && !_GCC_LIMITS_H_ */
