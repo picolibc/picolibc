@@ -66,6 +66,9 @@ extern "C" {
  * _POSIX_C_SOURCE >= 200809L
  *	POSIX.1-2008
  *
+ * _POSIX_C_SOURCE >= 202405L
+ *	POSIX.1-2024
+ *
  * _XOPEN_SOURCE
  *	POSIX.1-1990 and XPG4
  *
@@ -141,7 +144,7 @@ extern "C" {
 #undef _POSIX_SOURCE
 #define	_POSIX_SOURCE		1
 #undef _POSIX_C_SOURCE
-#define	_POSIX_C_SOURCE		200809L
+#define	_POSIX_C_SOURCE		202405L
 #endif
 
 #if !defined(_POSIX_SOURCE) && !defined(_POSIX_C_SOURCE) && \
@@ -192,6 +195,10 @@ extern "C" {
  *
  * __POSIX_VISIBLE >= 200809
  *	POSIX.1-2008; enabled by default, with _POSIX_C_SOURCE >= 200809L,
+ *	or _XOPEN_SOURCE >= 700.
+ *
+ * __POSIX_VISIBLE >= 202405
+ *	POSIX.1-2024; enabled by default, with _POSIX_C_SOURCE >= 202405L,
  *	or _XOPEN_SOURCE >= 700.
  *
  * __XSI_VISIBLE
@@ -296,7 +303,9 @@ extern "C" {
 #define	__MISC_VISIBLE		0
 #endif
 
-#if (_POSIX_C_SOURCE - 0) >= 200809L
+#if (_POSIX_C_SOURCE - 0) >= 202405L
+#define	__POSIX_VISIBLE		202405
+#elif (_POSIX_C_SOURCE - 0) >= 200809L
 #define	__POSIX_VISIBLE		200809
 #elif (_POSIX_C_SOURCE - 0) >= 200112L
 #define	__POSIX_VISIBLE		200112
@@ -422,7 +431,10 @@ extern "C" {
 
 #ifdef __CYGWIN__
 
-#if __POSIX_VISIBLE >= 200809
+#if __POSIX_VISIBLE >= 202405
+#define _POSIX_VERSION				202405L
+#define _POSIX2_VERSION				202405L
+#elif __POSIX_VISIBLE >= 200809
 #define _POSIX_VERSION				200809L
 #define _POSIX2_VERSION				200809L
 #elif __POSIX_VISIBLE >= 200112
