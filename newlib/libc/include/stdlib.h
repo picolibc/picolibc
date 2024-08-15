@@ -221,7 +221,7 @@ char *	ecvtbuf (double, int, int*, int*, char *);
 char *	fcvtbuf (double, int, int*, int*, char *);
 char *	ecvtf (float,int,int *,int *);
 #endif
-#ifndef __CYGWIN__
+#if !defined (__CYGWIN__) || defined (_LIBC)
 char *	__itoa (int, char *, int);
 char *	__utoa (unsigned, char *, int);
 # if __MISC_VISIBLE
