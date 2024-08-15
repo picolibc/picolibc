@@ -1140,7 +1140,12 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #ifdef _PRINTF_PERCENT_N
             } else if (c == 'n') {
                 int *n_ptr = va_arg(ap, int *);
-                *n_ptr = stream_len;
+                if (stream->flags & __SBUF) {
+                    *n_ptr = stream_len;
+                }
+                else {
+                    *n_ptr = (stream_len >= stream->buflimit) ? stream->buflimit : stream_len;
+                }
 #endif
             } else {
                 if (c == 'd' || c == 'i') {

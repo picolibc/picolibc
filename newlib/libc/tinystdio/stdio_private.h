@@ -63,6 +63,12 @@
 #define SCANF_FLT 4
 #define SCANF_DBL 5
 
+#ifdef _PRINTF_PERCENT_N
+#define PRINTF_BUF_LIMIT(size) .buflimit = (size),
+#else
+#define PRINTF_BUF_LIMIT(size)
+#endif
+
 struct __file_str {
 	struct __file file;	/* main file struct */
         char	*pos;		/* current buffer position */
@@ -119,6 +125,7 @@ bool __matchcaseprefix(const char *input, const char *pattern);
 #define FDEV_SETUP_STRING_WRITE(_s, _size) {	\
 		.file = {			\
 			.flags = __SWR,		\
+            PRINTF_BUF_LIMIT(_size)	\
 			.put = __file_str_put	\
 		},				\
 		.pos = (_s),			\
