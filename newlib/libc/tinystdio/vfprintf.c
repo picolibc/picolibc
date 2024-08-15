@@ -225,6 +225,13 @@ typedef long ultoa_signed_t;
 #define arg_to_unsigned(ap, flags, result_var) arg_to_t(ap, flags, unsigned, result_var)
 #define arg_to_signed(ap, flags, result_var) arg_to_t(ap, flags, signed, result_var)
 
+#define ASSIGN_STREAM_LEN(n_ptr, stream_len, buflimit, flags, type)            \
+    if (flags & __SBUF) {                                                      \
+        *((type *)n_ptr) = stream_len;                                         \
+    } else {                                                                   \
+        *((type *)n_ptr) = (stream_len >= buflimit) ? buflimit : stream_len;   \
+    }
+
 #include "ultoa_invert.c"
 
 /* Order is relevant here and matches order in format string */
@@ -1139,12 +1146,27 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #endif
 #ifdef _PRINTF_PERCENT_N
             } else if (c == 'n') {
-                int *n_ptr = va_arg(ap, int *);
-                if (stream->flags & __SBUF) {
-                    *n_ptr = stream_len;
-                }
-                else {
-                    *n_ptr = (stream_len >= stream->buflimit) ? stream->buflimit : stream_len;
+                void *n_ptr = NULL;
+                if (flags & FL_LONG) {
+                    if ((flags)&FL_REPD_TYPE) {
+#ifdef _NEED_IO_LONG_LONG
+                        n_ptr = va_arg(ap, long long *);
+                        ASSIGN_STREAM_LEN(n_ptr, stream_len, stream->buflimit,
+                                          stream->flags, long long);
+#else
+                        long *n_ptr = (long *)va_arg(ap, long long *);
+                        ASSIGN_STREAM_LEN(n_ptr, stream_len, stream->buflimit,
+                                          stream->flags, long);
+#endif
+                    } else {
+                        n_ptr = va_arg(ap, long *);
+                        ASSIGN_STREAM_LEN(n_ptr, stream_len, stream->buflimit,
+                                          stream->flags, long);
+                    }
+                } else {
+                    n_ptr = va_arg(ap, int *);
+                    ASSIGN_STREAM_LEN(n_ptr, stream_len, stream->buflimit,
+                                      stream->flags, int);
                 }
 #endif
             } else {
