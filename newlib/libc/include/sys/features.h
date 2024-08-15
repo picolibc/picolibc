@@ -49,22 +49,22 @@ extern "C" {
  *
  * _POSIX_SOURCE (deprecated by _POSIX_C_SOURCE=1)
  * _POSIX_C_SOURCE >= 1
- * 	POSIX.1-1990
+ *	POSIX.1-1990
  *
  * _POSIX_C_SOURCE >= 2
- * 	POSIX.2-1992
+ *	POSIX.2-1992
  *
  * _POSIX_C_SOURCE >= 199309L
- * 	POSIX.1b-1993 Real-time extensions
+ *	POSIX.1b-1993 Real-time extensions
  *
  * _POSIX_C_SOURCE >= 199506L
- * 	POSIX.1c-1995 Threads extensions
+ *	POSIX.1c-1995 Threads extensions
  *
  * _POSIX_C_SOURCE >= 200112L
- * 	POSIX.1-2001 and C99
+ *	POSIX.1-2001 and C99
  *
  * _POSIX_C_SOURCE >= 200809L
- * 	POSIX.1-2008
+ *	POSIX.1-2008
  *
  * _XOPEN_SOURCE
  *	POSIX.1-1990 and XPG4
@@ -82,13 +82,13 @@ extern "C" {
  *	SUSv4 (POSIX.1-2008 plus XSI)
  *
  * _ISOC99_SOURCE or gcc -std=c99 or g++
- * 	ISO C99
+ *	ISO C99
  *
  * _ISOC11_SOURCE or gcc -std=c11 or g++ -std=c++11
- * 	ISO C11
+ *	ISO C11
  *
  * _ISOC2x_SOURCE or gcc -std=c2x or g++ -std=c++20
- * 	ISO C11
+ *	ISO C11
  *
  * _ATFILE_SOURCE (implied by _POSIX_C_SOURCE >= 200809L)
  *	"at" functions
@@ -97,15 +97,15 @@ extern "C" {
  *	fseeko, ftello
  *
  * _GNU_SOURCE
- * 	All of the above plus GNU extensions
+ *	All of the above plus GNU extensions
  *
  * _BSD_SOURCE (deprecated by _DEFAULT_SOURCE)
  * _SVID_SOURCE (deprecated by _DEFAULT_SOURCE)
  * _DEFAULT_SOURCE (or none of the above)
- * 	POSIX-1.2008 with BSD and SVr4 extensions
+ *	POSIX-1.2008 with BSD and SVr4 extensions
  *
  * _FORTIFY_SOURCE = 1, 2 or 3
- * 	Object Size Checking function wrappers
+ *	Object Size Checking function wrappers
  */
 
 #ifdef _GNU_SOURCE
@@ -171,35 +171,35 @@ extern "C" {
  * of these headers.
  *
  * __POSIX_VISIBLE
- * 	any version of POSIX.1; enabled by default, or with _POSIX_SOURCE,
- * 	any value of _POSIX_C_SOURCE, or _XOPEN_SOURCE >= 500.
+ *	any version of POSIX.1; enabled by default, or with _POSIX_SOURCE,
+ *	any value of _POSIX_C_SOURCE, or _XOPEN_SOURCE >= 500.
  *
  * __POSIX_VISIBLE >= 2
- * 	POSIX.2-1992; enabled by default, with _POSIX_C_SOURCE >= 2,
- * 	or _XOPEN_SOURCE >= 500.
+ *	POSIX.2-1992; enabled by default, with _POSIX_C_SOURCE >= 2,
+ *	or _XOPEN_SOURCE >= 500.
  *
  * __POSIX_VISIBLE >= 199309
- * 	POSIX.1b-1993; enabled by default, with _POSIX_C_SOURCE >= 199309L,
- * 	or _XOPEN_SOURCE >= 500.
+ *	POSIX.1b-1993; enabled by default, with _POSIX_C_SOURCE >= 199309L,
+ *	or _XOPEN_SOURCE >= 500.
  *
  * __POSIX_VISIBLE >= 199506
- * 	POSIX.1c-1995; enabled by default, with _POSIX_C_SOURCE >= 199506L,
- * 	or _XOPEN_SOURCE >= 500.
+ *	POSIX.1c-1995; enabled by default, with _POSIX_C_SOURCE >= 199506L,
+ *	or _XOPEN_SOURCE >= 500.
  *
  * __POSIX_VISIBLE >= 200112
- * 	POSIX.1-2001; enabled by default, with _POSIX_C_SOURCE >= 200112L,
- * 	or _XOPEN_SOURCE >= 600.
+ *	POSIX.1-2001; enabled by default, with _POSIX_C_SOURCE >= 200112L,
+ *	or _XOPEN_SOURCE >= 600.
  *
  * __POSIX_VISIBLE >= 200809
- * 	POSIX.1-2008; enabled by default, with _POSIX_C_SOURCE >= 200809L,
- * 	or _XOPEN_SOURCE >= 700.
+ *	POSIX.1-2008; enabled by default, with _POSIX_C_SOURCE >= 200809L,
+ *	or _XOPEN_SOURCE >= 700.
  *
  * __XSI_VISIBLE
  *	XPG4 XSI extensions; enabled with any version of _XOPEN_SOURCE.
  *
  * __XSI_VISIBLE >= 4
  *	SUSv1 XSI extensions; enabled with both _XOPEN_SOURCE and
- * 	_XOPEN_SOURCE_EXTENDED together.
+ *	_XOPEN_SOURCE_EXTENDED together.
  *
  * __XSI_VISIBLE >= 500
  *	SUSv2 XSI extensions; enabled with _XOPEN_SOURCE >= 500.
@@ -211,43 +211,43 @@ extern "C" {
  *	SUSv4 XSI extensions; enabled with _XOPEN_SOURCE >= 700.
  *
  * __ISO_C_VISIBLE >= 1999
- * 	ISO C99; enabled with gcc -std=c99 or newer (on by default since GCC 5),
- * 	any version of C++, or with _ISOC99_SOURCE, _POSIX_C_SOURCE >= 200112L,
- * 	or _XOPEN_SOURCE >= 600.
+ *	ISO C99; enabled with gcc -std=c99 or newer (on by default since GCC 5),
+ *	any version of C++, or with _ISOC99_SOURCE, _POSIX_C_SOURCE >= 200112L,
+ *	or _XOPEN_SOURCE >= 600.
  *
  * __ISO_C_VISIBLE >= 2011
- * 	ISO C11; enabled with gcc -std=c11 or newer (on by default since GCC 5),
- * 	g++ -std=c++11 or newer (on by default since GCC 6), or with
- * 	_ISOC11_SOURCE.
+ *	ISO C11; enabled with gcc -std=c11 or newer (on by default since GCC 5),
+ *	g++ -std=c++11 or newer (on by default since GCC 6), or with
+ *	_ISOC11_SOURCE.
  *
  * __ISO_C_VISIBLE >= 2020
- * 	ISO C2x; enabled with gcc -std=c2x or newer,
- * 	g++ -std=c++20 or newer, or with
- * 	_ISOC2X_SOURCE.
+ *	ISO C2x; enabled with gcc -std=c2x or newer,
+ *	g++ -std=c++20 or newer, or with
+ *	_ISOC2X_SOURCE.
  *
  * __ATFILE_VISIBLE
  *	"at" functions; enabled by default, with _ATFILE_SOURCE,
- * 	_POSIX_C_SOURCE >= 200809L, or _XOPEN_SOURCE >= 700.
+ *	_POSIX_C_SOURCE >= 200809L, or _XOPEN_SOURCE >= 700.
  *
  * __LARGEFILE_VISIBLE
  *	fseeko, ftello; enabled with _LARGEFILE_SOURCE or _XOPEN_SOURCE >= 500.
  *
  * __BSD_VISIBLE
- * 	BSD extensions; enabled by default, or with _BSD_SOURCE.
+ *	BSD extensions; enabled by default, or with _BSD_SOURCE.
  *
  * __SVID_VISIBLE
- * 	SVr4 extensions; enabled by default, or with _SVID_SOURCE.
+ *	SVr4 extensions; enabled by default, or with _SVID_SOURCE.
  *
  * __MISC_VISIBLE
- * 	Extensions found in both BSD and SVr4 (shorthand for
- * 	(__BSD_VISIBLE || __SVID_VISIBLE)), or newlib-specific
- * 	extensions; enabled by default.
+ *	Extensions found in both BSD and SVr4 (shorthand for
+ *	(__BSD_VISIBLE || __SVID_VISIBLE)), or newlib-specific
+ *	extensions; enabled by default.
  *
  * __GNU_VISIBLE
- * 	GNU extensions; enabled with _GNU_SOURCE.
+ *	GNU extensions; enabled with _GNU_SOURCE.
  *
  * __SSP_FORTIFY_LEVEL
- * 	Object Size Checking; defined to 0 (off), 1, 2 or 3.
+ *	Object Size Checking; defined to 0 (off), 1, 2 or 3.
  *
  * In all cases above, "enabled by default" means either by defining
  * _DEFAULT_SOURCE, or by not defining any of the public feature test macros.
@@ -353,8 +353,8 @@ extern "C" {
 /* RTEMS adheres to POSIX -- 1003.1b with some features from annexes.  */
 
 #ifdef __rtems__
-#define _POSIX_JOB_CONTROL     		1
-#define _POSIX_SAVED_IDS       		1
+#define _POSIX_JOB_CONTROL		1
+#define _POSIX_SAVED_IDS		1
 #define _POSIX_VERSION			199309L
 #define _POSIX_ASYNCHRONOUS_IO		1
 #define _POSIX_FSYNC			1
