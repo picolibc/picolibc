@@ -32,6 +32,10 @@
 #ifndef	_SYS_TREE_H_
 #define	_SYS_TREE_H_
 
+#ifndef __PERMIT_DEPRECATED_SYS_TREE_H
+#warning "sys/tree.h is deprecated and will be removed in the future."
+#endif
+
 #include <sys/cdefs.h>
 
 /*
