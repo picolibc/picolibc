@@ -591,7 +591,7 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
     {
       DWORD nbytes_in_pipe;
       if (!writing && PeekNamedPipe (h, NULL, 0, NULL, &nbytes_in_pipe, NULL))
-	return nbytes_in_pipe > 0;
+	return nbytes_in_pipe;
       return -1;
     }
 
@@ -609,7 +609,7 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
 	 access on the write end.  */
       select_printf ("fd %d, %s, NtQueryInformationFile failed, status %y",
 		     fd, fh->get_name (), status);
-      return writing ? 1 : -1;
+      return writing ? PIPE_BUF : -1;
     }
   if (writing)
     {
@@ -644,14 +644,14 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
 	  if (!query_hdl)
 	    query_hdl = ((fhandler_pipe *) fh)->temporary_query_hdl ();
 	  if (!query_hdl)
-	    return 1; /* We cannot know actual write pipe space. */
+	    return PIPE_BUF; /* We cannot know actual write pipe space. */
 	  DWORD nbytes_in_pipe;
 	  BOOL res =
 	    PeekNamedPipe (query_hdl, NULL, 0, NULL, &nbytes_in_pipe, NULL);
 	  if (!((fhandler_pipe *) fh)->get_query_handle ())
 	    CloseHandle (query_hdl); /* Close temporary query_hdl */
 	  if (!res)
-	    return 1;
+	    return PIPE_BUF; /* We cannot know actual write pipe space. */
 	  fpli.WriteQuotaAvailable = fpli.InboundQuota - nbytes_in_pipe;
 	}
       if (fpli.WriteQuotaAvailable > 0)
@@ -659,7 +659,7 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
 	  paranoid_printf ("fd %d, %s, write: size %u, avail %u", fd,
 			   fh->get_name (), fpli.InboundQuota,
 			   fpli.WriteQuotaAvailable);
-	  return 1;
+	  return fpli.WriteQuotaAvailable;
 	}
       /* TODO: Buffer really full or non-Cygwin reader? */
     }
@@ -667,7 +667,7 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
     {
       paranoid_printf ("fd %d, %s, read avail %u", fd, fh->get_name (),
 		       fpli.ReadDataAvailable);
-      return 1;
+      return fpli.ReadDataAvailable;
     }
   if (fpli.NamedPipeState & FILE_PIPE_CLOSING_STATE)
     return -1;
@@ -761,7 +761,7 @@ out:
 	}
       int n = pipe_data_available (s->fd, fh, h, true);
       select_printf ("write: %s, n %d", fh->get_name (), n);
-      gotone += s->write_ready = n;
+      gotone += s->write_ready = (n >= PIPE_BUF);
       if (n < 0 && s->except_selected)
 	gotone += s->except_ready = true;
     }
@@ -974,7 +974,7 @@ out:
     {
       int n = pipe_data_available (s->fd, fh, fh->get_handle (), true);
       select_printf ("write: %s, n %d", fh->get_name (), n);
-      gotone += s->write_ready = n;
+      gotone += s->write_ready = (n >= PIPE_BUF);
       if (n < 0 && s->except_selected)
 	gotone += s->except_ready = true;
     }
@@ -1400,7 +1400,7 @@ out:
     {
       int n = pipe_data_available (s->fd, fh, h, true);
       select_printf ("write: %s, n %d", fh->get_name (), n);
-      gotone += s->write_ready = n;
+      gotone += s->write_ready = (n >= PIPE_BUF);
       if (n < 0 && s->except_selected)
 	gotone += s->except_ready = true;
     }
