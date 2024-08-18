@@ -35,7 +35,7 @@
 
 #define _CTYPE_DATA_0_127 \
 	_C,	_C,	_C,	_C,	_C,	_C,	_C,	_C, \
-	_C,	_C|_S|_B, _C|_S, _C|_S,	_C|_S,	_C|_S,	_C,	_C, \
+	_C,	_C|_S|_T, _C|_S, _C|_S,	_C|_S,	_C|_S,	_C,	_C, \
 	_C,	_C,	_C,	_C,	_C,	_C,	_C,	_C, \
 	_C,	_C,	_C,	_C,	_C,	_C,	_C,	_C, \
 	_S|_B,	_P,	_P,	_P,	_P,	_P,	_P,	_P, \
@@ -82,7 +82,7 @@
 /* No static const on Cygwin since it's referenced and potentially overwritten
    for compatibility with older applications. */
 const
-char _ctype_b[128 + 256] = {
+short _ctype_b[128 + 256] = {
 	_CTYPE_DATA_128_255,
 	_CTYPE_DATA_0_127,
 	_CTYPE_DATA_128_255
@@ -90,7 +90,7 @@ char _ctype_b[128 + 256] = {
 
 #else	/* !ALLOW_NEGATIVE_CTYPE_INDEX */
 
-const char _ctype_[1 + 256] = {
+const short _ctype_[1 + 256] = {
 	0,
 	_CTYPE_DATA_0_127,
 	_CTYPE_DATA_128_255
@@ -107,7 +107,7 @@ __set_ctype (struct __locale_t *loc, const char *charset)
 #if defined(_MB_EXTENDED_CHARSETS_ISO) || defined(_MB_EXTENDED_CHARSETS_WINDOWS)
   int idx;
 #endif
-  const char *ctype_ptr = NULL;
+  const short *ctype_ptr = NULL;
 
   switch (*charset)
     {
