@@ -13,6 +13,7 @@ details. */
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
+#include "select.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "pinfo.h"
@@ -433,6 +434,7 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
   NTSTATUS status = STATUS_SUCCESS;
   IO_STATUS_BLOCK io;
   HANDLE evt;
+  bool short_write_once = false;
 
   if (!len)
     return 0;
@@ -471,6 +473,7 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 	len1 = chunk;
       else
 	len1 = (ULONG) left;
+
       /* NtWriteFile returns success with # of bytes written == 0 if writing
          on a non-blocking pipe fails because the pipe buffer doesn't have
 	 sufficient space.
@@ -517,6 +520,13 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 		    }
 		  else
 		    cygwait (select_sem, 10, cw_cancel);
+		  /* If we got a timeout in the blocking case, and we already
+		     did a short write, we got a signal in the previous loop. */
+		  if (waitret == WAIT_TIMEOUT && short_write_once)
+		    {
+		      waitret = WAIT_SIGNALED;
+		      break;
+		    }
 		}
 	      /* Loop in case of blocking write or SA_RESTART */
 	      while (waitret == WAIT_TIMEOUT || waitret == WAIT_SIGNALED);
@@ -533,13 +543,39 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 		status = STATUS_THREAD_CANCELED;
 	      else if (waitret == WAIT_SIGNALED)
 		status = STATUS_THREAD_SIGNALED;
+	      else if (waitret == WAIT_TIMEOUT && io.Status == STATUS_CANCELLED)
+		status = STATUS_SUCCESS;
 	      else
 		status = io.Status;
 	    }
-	  if (!is_nonblocking () || !NT_SUCCESS (status) || io.Information > 0
-	      || len <= PIPE_BUF)
+	  if (status != STATUS_THREAD_SIGNALED && !NT_SUCCESS (status))
 	    break;
-	  len1 >>= 1;
+	  if (io.Information > 0 || len <= PIPE_BUF || short_write_once)
+	    break;
+	  /* Independent of being blocking or non-blocking, if we're here,
+	     the pipe has less space than requested.  If the pipe is a
+	     non-Cygwin pipe, just try the old strategy of trying a half
+	     write.  If the pipe has at
+	     least PIPE_BUF bytes available, try to write all matching
+	     PIPE_BUF sized blocks.  If it's less than PIPE_BUF,  try
+	     the next less power of 2 bytes.  This is not really the Linux
+	     strategy because Linux is filling the pages of a pipe buffer
+	     in a very implementation-defined way we can't emulate, but it
+	     resembles it closely enough to get useful results. */
+	  ssize_t avail = pipe_data_available (-1, this, get_handle (),
+					       PDA_WRITE);
+	  if (avail < 1)	/* error or pipe closed */
+	    break;
+	  if (avail >= len1)	/* somebody read from the pipe */
+	    avail = len1;
+	  if (avail == 1)	/* 1 byte left or non-Cygwin pipe */
+	    len1 >>= 1;
+	  else if (avail >= PIPE_BUF)
+	    len1 = avail & ~(PIPE_BUF - 1);
+	  else
+	    len1 = 1 << (31 - __builtin_clzl (avail));
+	  if (!is_nonblocking ())
+	    short_write_once = true;
 	}
       if (isclosed ())  /* A signal handler might have closed the fd. */
 	{
@@ -569,7 +605,7 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
       else
 	__seterrno_from_nt_status (status);
 
-      if (nbytes_now == 0)
+      if (nbytes_now == 0 || short_write_once)
 	break;
     }
 out:

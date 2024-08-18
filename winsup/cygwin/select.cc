@@ -584,13 +584,14 @@ no_verify (select_record *, fd_set *, fd_set *, fd_set *)
   return 0;
 }
 
-static int
-pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
+ssize_t
+pipe_data_available (int fd, fhandler_base *fh, HANDLE h, int flags)
 {
   if (fh->get_device () == FH_PIPER)
     {
       DWORD nbytes_in_pipe;
-      if (!writing && PeekNamedPipe (h, NULL, 0, NULL, &nbytes_in_pipe, NULL))
+      if (!(flags & PDA_WRITE)
+	  && PeekNamedPipe (h, NULL, 0, NULL, &nbytes_in_pipe, NULL))
 	return nbytes_in_pipe;
       return -1;
     }
@@ -609,9 +610,17 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
 	 access on the write end.  */
       select_printf ("fd %d, %s, NtQueryInformationFile failed, status %y",
 		     fd, fh->get_name (), status);
-      return writing ? PIPE_BUF : -1;
+      switch (flags)
+	{
+	case PDA_WRITE:
+	  return 1;
+	case PDA_SELECT | PDA_WRITE:
+	  return PIPE_BUF;
+	default:
+	  return -1;
+	}
     }
-  if (writing)
+  if (flags & PDA_WRITE)
     {
       /* If there is anything available in the pipe buffer then signal
         that.  This means that a pipe could still block since you could
@@ -638,20 +647,26 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
       /* Note: Do not use NtQueryInformationFile() for query_hdl because
 	 NtQueryInformationFile() seems to interfere with reading pipes
 	 in non-cygwin apps. Instead, use PeekNamedPipe() here. */
+      /* Note 2: we return the number of available bytes.  Select for writing
+         returns writable *only* if at least PIPE_BUF bytes are left in the
+	 buffer.  If we can't fetch the real number of available bytes, the
+	 number of bytes returned depends on the caller.  For select we return
+	 PIPE_BUF to fake writability, for writing we return 1 to allow
+	 handling this fact. */
       if (fh->get_device () == FH_PIPEW && fpli.WriteQuotaAvailable == 0)
 	{
 	  HANDLE query_hdl = ((fhandler_pipe *) fh)->get_query_handle ();
 	  if (!query_hdl)
 	    query_hdl = ((fhandler_pipe *) fh)->temporary_query_hdl ();
-	  if (!query_hdl)
-	    return PIPE_BUF; /* We cannot know actual write pipe space. */
+	  if (!query_hdl) /* We cannot know actual write pipe space. */
+	    return (flags & PDA_SELECT) ? PIPE_BUF : 1;
 	  DWORD nbytes_in_pipe;
 	  BOOL res =
 	    PeekNamedPipe (query_hdl, NULL, 0, NULL, &nbytes_in_pipe, NULL);
 	  if (!((fhandler_pipe *) fh)->get_query_handle ())
 	    CloseHandle (query_hdl); /* Close temporary query_hdl */
-	  if (!res)
-	    return PIPE_BUF; /* We cannot know actual write pipe space. */
+	  if (!res) /* We cannot know actual write pipe space. */
+	    return (flags & PDA_SELECT) ? PIPE_BUF : 1;
 	  fpli.WriteQuotaAvailable = fpli.InboundQuota - nbytes_in_pipe;
 	}
       if (fpli.WriteQuotaAvailable > 0)
@@ -715,10 +730,10 @@ peek_pipe (select_record *s, bool from_select)
 	  gotone = s->read_ready = true;
 	  goto out;
 	}
-      int n = pipe_data_available (s->fd, fh, h, false);
+      ssize_t n = pipe_data_available (s->fd, fh, h, PDA_SELECT);
       /* On PTY masters, check if input from the echo pipe is available. */
       if (n == 0 && fh->get_echo_handle ())
-	n = pipe_data_available (s->fd, fh, fh->get_echo_handle (), false);
+	n = pipe_data_available (s->fd, fh, fh->get_echo_handle (), PDA_SELECT);
 
       if (n < 0)
 	{
@@ -759,7 +774,7 @@ out:
 	    gotone += s->except_ready = true;
 	  return gotone;
 	}
-      int n = pipe_data_available (s->fd, fh, h, true);
+      ssize_t n = pipe_data_available (s->fd, fh, h, PDA_SELECT | PDA_WRITE);
       select_printf ("write: %s, n %d", fh->get_name (), n);
       gotone += s->write_ready = (n >= PIPE_BUF);
       if (n < 0 && s->except_selected)
@@ -972,7 +987,8 @@ peek_fifo (select_record *s, bool from_select)
 out:
   if (s->write_selected)
     {
-      int n = pipe_data_available (s->fd, fh, fh->get_handle (), true);
+      ssize_t n = pipe_data_available (s->fd, fh, fh->get_handle (),
+				       PDA_SELECT | PDA_WRITE);
       select_printf ("write: %s, n %d", fh->get_name (), n);
       gotone += s->write_ready = (n >= PIPE_BUF);
       if (n < 0 && s->except_selected)
@@ -1398,7 +1414,7 @@ out:
   HANDLE h = ptys->get_output_handle ();
   if (s->write_selected)
     {
-      int n = pipe_data_available (s->fd, fh, h, true);
+      ssize_t n = pipe_data_available (s->fd, fh, h, PDA_SELECT | PDA_WRITE);
       select_printf ("write: %s, n %d", fh->get_name (), n);
       gotone += s->write_ready = (n >= PIPE_BUF);
       if (n < 0 && s->except_selected)

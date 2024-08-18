@@ -139,4 +139,9 @@ public:
 extern "C" int cygwin_select (int , fd_set *, fd_set *, fd_set *,
 			      struct timeval *to);
 
+ssize_t pipe_data_available (int, fhandler_base *, HANDLE, int);
+
+#define PDA_WRITE	0x01
+#define PDA_SELECT	0x02
+
 #endif /* _SELECT_H_ */
