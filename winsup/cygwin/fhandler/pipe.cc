@@ -498,9 +498,16 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 				(PVOID) ptr, len1, NULL, NULL);
 	  if (status == STATUS_PENDING)
 	    {
-	      while (WAIT_TIMEOUT ==
-		     (waitret = cygwait (evt, (DWORD) 0, cw_cancel | cw_sig)))
+	      do
 		{
+		  /* To allow constant reader_closed() checking even if the
+		     signal has been set up with SA_RESTART, we're handling
+		     the signal here --> cw_sig_eintr. */
+		  waitret = cygwait (evt, (DWORD) 0, cw_cancel | cw_sig_eintr);
+		  /* Break out if no SA_RESTART. */
+		  if (waitret == WAIT_SIGNALED
+		      && !_my_tls.call_signal_handler ())
+		    break;
 		  if (reader_closed ())
 		    {
 		      CancelIo (get_handle ());
@@ -509,8 +516,10 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 		      goto out;
 		    }
 		  else
-		    cygwait (select_sem, 10);
+		    cygwait (select_sem, 10, cw_cancel);
 		}
+	      /* Loop in case of blocking write or SA_RESTART */
+	      while (waitret == WAIT_TIMEOUT || waitret == WAIT_SIGNALED);
 	      /* If io.Status is STATUS_CANCELLED after CancelIo, IO has
 		 actually been cancelled and io.Information contains the
 		 number of bytes processed so far.
