@@ -566,7 +566,7 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 					       PDA_WRITE);
 	  if (avail < 1)	/* error or pipe closed */
 	    break;
-	  if (avail >= len1)	/* somebody read from the pipe */
+	  if (avail > len1)	/* somebody read from the pipe */
 	    avail = len1;
 	  if (avail == 1)	/* 1 byte left or non-Cygwin pipe */
 	    len1 >>= 1;
