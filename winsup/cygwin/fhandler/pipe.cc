@@ -574,8 +574,7 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 	    len1 = avail & ~(PIPE_BUF - 1);
 	  else
 	    len1 = 1 << (31 - __builtin_clzl (avail));
-	  if (!is_nonblocking ())
-	    short_write_once = true;
+	  short_write_once = true;
 	}
       if (isclosed ())  /* A signal handler might have closed the fd. */
 	{
