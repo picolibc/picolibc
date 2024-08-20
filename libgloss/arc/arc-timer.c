@@ -15,6 +15,8 @@
  *
  */
 
+#include "arc-specific.h"
+
 #define ARC_TIM_BUILD		0x75
 #define ARC_TIM_BUILD_VER_MASK	0x00FF
 #define ARC_TIM_BUILD_TIM0_FL	0x0100
@@ -37,7 +39,7 @@ const unsigned int arc_timer_default = 0;
 static int
 _arc_timer_present (unsigned int tim)
 {
-  unsigned int bcr = __builtin_arc_lr (ARC_TIM_BUILD);
+  unsigned int bcr = read_aux_reg (ARC_TIM_BUILD);
   unsigned int ver = bcr & ARC_TIM_BUILD_VER_MASK;
 
   if (ver == 0)
@@ -59,9 +61,9 @@ _arc_timer_read (unsigned int tim)
   if (_arc_timer_present (tim))
     {
       if (tim == 0)
-	return __builtin_arc_lr (ARC_TIM_COUNT0);
+	return read_aux_reg (ARC_TIM_COUNT0);
       else if (tim == 1)
-	return __builtin_arc_lr (ARC_TIM_COUNT1);
+	return read_aux_reg (ARC_TIM_COUNT1);
     }
 
   return 0;
@@ -95,14 +97,14 @@ _arc_timer_reset (unsigned int tim)
 	  return;
 	}
 
-      ctrl = __builtin_arc_lr (tim_control);
+      ctrl = read_aux_reg (tim_control);
       /* Disable timer interrupt when programming.  */
-      __builtin_arc_sr (0, tim_control);
+      write_aux_reg (0, tim_control);
       /* Default limit is 24-bit, increase it to 32-bit.  */
-      __builtin_arc_sr (0xFFFFFFFF, tim_limit);
+      write_aux_reg (0xFFFFFFFF, tim_limit);
       /* Set NH bit to count only when processor is running.  */
-      __builtin_arc_sr (ctrl | ARC_TIM_CONTROL_NH_FL, tim_control);
-      __builtin_arc_sr (0, tim_count);
+      write_aux_reg (ctrl | ARC_TIM_CONTROL_NH_FL, tim_control);
+      write_aux_reg (0, tim_count);
     }
 }
 

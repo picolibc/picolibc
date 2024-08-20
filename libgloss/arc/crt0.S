@@ -41,6 +41,8 @@
    the initialization code.
 */
 
+#include "arc-symbols.h"
+
 /* Compatibility with older ARC GCC, that doesn't provide some of the
    preprocessor defines used by newlib and libgloss for ARC.  */
 #if defined (__Xbarrel_shifter) && !defined (__ARC_BARREL_SHIFTER__)
@@ -106,11 +108,11 @@ IVT_ENTRY(IRQ_20)            ; 20                       0x50    80
 #ifdef __ARC601__
 ; Startup code for the ARC601 processor
 __start:
-	mov	gp, __SDATA_BEGIN__
-	mov	sp, __stack_top	; Point to top of stack
+	mov	gp, SMALL_DATA_BASE
+	mov	sp, STACK_TOP		; Point to top of stack
 	mov	r5, 0			; Zero value
-	mov_s	r2, __sbss_start	; r2 = start of the bss section
-	sub	r3, _end, r2		; r3 = size of the bss section in bytes
+	mov_s	r2, SMALL_DATA_BSS_START	; r2 = start of the bss section
+	sub	r3, SMALL_DATA_BSS_START, r2	; r3 = size of the bss section in bytes
 
 	asr_s	r3, r3
 	asr_s	r3, r3			; r3 = size of bss in words
@@ -146,9 +148,9 @@ __start:
 	;; Initialize jli_base
 	sr	__JLI_TABLE__,[jli_base]
 #endif
-	mov	gp, __SDATA_BEGIN__
-	mov_s	r2, __sbss_start	; r2 = start of the bss section
-	sub	r3, _end, r2		; r3 = size of the bss section in bytes
+	mov	gp, SMALL_DATA_BASE
+	mov_s	r2, SMALL_DATA_BSS_START	; r2 = start of the bss section
+	sub	r3, SMALL_DATA_BSS_END, r2	; r3 = size of the bss section in bytes
 	; set up the loop counter register to the size (in words) of the bss section
 #if defined (__ARC_BARREL_SHIFTER__)
 	asr.f        lp_count, r3, 2
@@ -162,12 +164,12 @@ __start:
 	add	r3, pcl, 20
 	sr	r3, [2]			; LP_END
 	; initialize stack pointer, and this instruction has 2 words
-	mov	sp, __stack_top
+	mov	sp, STACK_TOP
 	mov_s	r3, 0
 	st.ab	r3, [r2, 4]		; zero out the word
 .Lend_zbss:
 #else
-	mov	sp, __stack_top	; initialize stack pointer
+	mov	sp, STACK_TOP	; initialize stack pointer
 	mov_s	r3,0
 	; loop to zero out the bss.  Enter loop only if lp_count != 0
 	lpnz	.Lend_zbss
