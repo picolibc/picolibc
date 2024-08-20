@@ -502,11 +502,14 @@ glob0(pattern, pglob, limit)
 	 * and the pattern did not contain any magic characters
 	 * GLOB_NOMAGIC is there just for compatibility with csh.
 	 */
-	if (pglob->gl_pathc == oldpathc &&
-	    ((pglob->gl_flags & GLOB_NOCHECK) ||
-	      ((pglob->gl_flags & GLOB_NOMAGIC) &&
-	       !(pglob->gl_flags & GLOB_MAGCHAR))))
-		return(globextend(pattern, pglob, limit));
+	if (pglob->gl_pathc == oldpathc) {
+		if ((pglob->gl_flags & GLOB_NOCHECK) ||
+		    ((pglob->gl_flags & GLOB_NOMAGIC) &&
+		    !(pglob->gl_flags & GLOB_MAGCHAR)))
+			return(globextend(pattern, pglob, limit));
+		else
+			return(GLOB_NOMATCH);
+	}
 	else if (!(pglob->gl_flags & GLOB_NOSORT))
 		qsort(pglob->gl_pathv + pglob->gl_offs + oldpathc,
 		    pglob->gl_pathc - oldpathc, sizeof(char *), compare);
