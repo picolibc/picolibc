@@ -19,7 +19,12 @@
 #define _HL_TOOLCHAIN_H
 
 #ifndef __uncached
+#if defined (__ARC64__)
+  /* TODO: Uncached attribute is not implemented for ARCv3 yet.  */
+  #define __uncached
+#else
   #define __uncached __attribute__((uncached))
+#endif
 #endif /* __uncached */
 
 #ifndef __aligned
@@ -43,7 +48,12 @@
 #endif /* __noreturn */
 
 #ifndef __longcall
+#if defined (__ARC64__)
+  /* TODO: Long call attribute is not implemented for ARCv3 yet.  */
+  #define __longcall
+#else
   #define __longcall __attribute__((long_call))
+#endif
 #endif /* __longcall */
 
 #define HL_MAX_DCACHE_LINE 256

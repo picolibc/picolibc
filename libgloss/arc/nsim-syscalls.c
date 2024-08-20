@@ -100,7 +100,12 @@ _open (const char * pathname, int flags, int mode)
 }
 
 /* Should be provided by crt0.S.  */
+#if defined (__ARC64__)
+/* TODO: long_call is not implemented yet in GCC. Fix this when implemented.  */
+extern void __attribute__((noreturn)) _exit_halt (int ret);
+#else
 extern void __attribute__((noreturn, long_call)) _exit_halt (int ret);
+#endif
 
 void
 __attribute__((noreturn))

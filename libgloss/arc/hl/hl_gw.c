@@ -15,6 +15,7 @@
  *
  */
 
+#include <stdint.h>
 #include "hl_gw.h"
 
 #define HL_VERSION 1
@@ -134,7 +135,15 @@ _hl_send (volatile __uncached void *p)
 
   _hl_pkt_init (pkt_hdr, _hl_payload_used (p));
 
+#if defined (__ARC64__)
+  /*
+   * Here we pass only low 4 bytes of the packet address (pkt_hdr).
+   * The high part of the address is obtained from __HOSTLINK__ address.
+   */
+  hdr->buf_addr = (uintptr_t) pkt_hdr & 0xFFFFFFFF;
+#else
   hdr->buf_addr = (uint32_t) pkt_hdr;
+#endif
   hdr->payload_size = _hl_payload_size ();
   hdr->host2target_addr = HL_NOADDRESS;
   hdr->version = HL_VERSION;

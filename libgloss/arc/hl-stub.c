@@ -15,6 +15,7 @@
  *
  */
 
+#include <string.h>
 #include <errno.h>
 #include <unistd.h>
 #include <sys/times.h>
@@ -43,6 +44,19 @@ _getpid (void)
 {
   return __MYPID;
 }
+
+/* We do not have 64-bit compatible hostlink fstat.  */
+#if defined (__ARC64__)
+int
+_fstat (int fd, struct stat *st)
+{
+  memset (st, 0, sizeof (*st));
+  st->st_mode = S_IFCHR;
+  st->st_blksize = 1024;
+
+  return 0;
+}
+#endif
 
 
 /* hostlink backend has only fstat(), so use fstat() in stat().  */
