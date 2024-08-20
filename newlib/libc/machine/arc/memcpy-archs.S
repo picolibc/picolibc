@@ -70,7 +70,21 @@
 # define ZOLAND			0xF
 #endif
 
-#ifdef __ARC_ALIGNED_ACCESS__
+
+;;; MEMCPY copy memory regions
+;;; Input arguments:
+;;;   r0 - output memory region
+;;;   r1 - input memory region
+;;;   r2 - size in bytes
+;;; Returns:
+;;;   r0 - pointer to the first byte of the output region
+;;; Clobber:
+;;;   r1, r2, r3, r4, r5, r6, r8r9, r10r11, lp_count
+
+#if !defined (__ARC_UNALIGNED__)
+
+;;; MEMCPY routine for the case when the CPU only accepts ALIGNED
+;;; accesses to memory.
 ENTRY (memcpy)
 	prefetch  [r1]		; Prefetch the read location
 	prefetchw [r0]		; Prefetch the write location
@@ -268,6 +282,8 @@ ENDFUNC (memcpy)
 
 #else
 
+;;; MEMCPY routine which is used by systems with unaligned memory
+;;; accesses.  This is the case for most of ARCHS CPU family.
 ENTRY(memcpy)
 	prefetch  [r1]		; Prefetch the read location
 	prefetchw [r0]		; Prefetch the write location
