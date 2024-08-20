@@ -100,7 +100,7 @@ _open (const char * pathname, int flags, int mode)
 }
 
 /* Should be provided by crt0.S.  */
-extern void __attribute__((noreturn, long_call)) _exit_halt ();
+extern void __attribute__((noreturn, long_call)) _exit_halt (int ret);
 
 void
 __attribute__((noreturn))
@@ -109,7 +109,7 @@ _exit (int ret)
   /* Doing an "exit" system call would work on nSIM with hostlink, but call to
      _exit_halt, which will do a CPU halt is more universal and will work in
      many other cases as well, including an FPGA/SoC.  */
-  _exit_halt ();
+  _exit_halt (ret);
 }
 
 /* This is a copy of newlib/libc/posix/_isatty.c.  It is needed because nSIM
