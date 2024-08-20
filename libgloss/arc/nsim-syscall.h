@@ -28,8 +28,8 @@
    POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _ASM_ARC_UNISTD_H
-#define _ASM_ARC_UNISTD_H
+#ifndef _NSIM_SYSCALL_H
+#define _NSIM_SYSCALL_H
 
 #include <stdint.h>
 
@@ -454,4 +454,4 @@ struct nsim_stat {
 	uint32_t __unused5;
 };
 
-#endif	/* _ASM_ARC_UNISTD_H */
+#endif	/* _NSIM_SYSCALL_H */
