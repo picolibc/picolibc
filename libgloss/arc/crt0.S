@@ -276,4 +276,4 @@ _exit_halt:
 	nop
 #endif
 	b	@_exit_halt
-.balign 4
+.align 4
