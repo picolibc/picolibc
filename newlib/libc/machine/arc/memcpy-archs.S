@@ -95,12 +95,12 @@ ENTRY (memcpy)
 
 ; if size <= 8
 	cmp	r2, 8
-	bls.d	@.Lsmallchunk
+	bls.d	.Lsmallchunk
 	mov.f	lp_count, r2
 
 	and.f	r4, r0, 0x03
 	rsub	lp_count, r4, 4
-	lpnz	@.Laligndestination
+	lpnz	.Laligndestination
 	; LOOP BEGIN
 	ldb.ab	r5, [r1,1]
 	sub	r2, r2, 1
@@ -109,12 +109,12 @@ ENTRY (memcpy)
 
 ; Check the alignment of the source
 	and.f	r4, r1, 0x03
-	bnz.d	@.Lsourceunaligned
+	bnz.d	.Lsourceunaligned
 
 ; CASE 0: Both source and destination are 32bit aligned
 ; Convert len to Dwords, unfold x4
 	lsr.f	lp_count, r2, ZOLSHFT
-	lpnz	@.Lcopy32_64bytes
+	lpnz	.Lcopy32_64bytes
 	; LOOP START
 	LOADX (r6, r1)
 	PREFETCH_READ (r1)
@@ -130,7 +130,7 @@ ENTRY (memcpy)
 
 	and.f	lp_count, r2, ZOLAND ;Last remaining 31 bytes
 .Lsmallchunk:
-	lpnz	@.Lcopyremainingbytes
+	lpnz	.Lcopyremainingbytes
 	; LOOP START
 	ldb.ab	r5, [r1,1]
 	stb.ab	r5, [r3,1]
@@ -141,10 +141,10 @@ ENTRY (memcpy)
 
 .Lsourceunaligned:
 	cmp	r4, 2
-	beq.d	@.LunalignedOffby2
+	beq.d	.LunalignedOffby2
 	sub	r2, r2, 1
 
-	bhi.d	@.LunalignedOffby3
+	bhi.d	.LunalignedOffby3
 	ldb.ab	r5, [r1, 1]
 
 ; CASE 1: The source is unaligned, off by 1
@@ -159,7 +159,7 @@ ENTRY (memcpy)
 	or	r5, r5, r6
 
 	; Both src and dst are aligned
-	lpnz	@.Lcopy8bytes_1
+	lpnz	.Lcopy8bytes_1
 	; LOOP START
 	ld.ab	r6, [r1, 4]
 	prefetch [r1, 28]	;Prefetch the next read location
@@ -186,7 +186,7 @@ ENTRY (memcpy)
 	stb.ab	r5, [r3, 1]
 
 	and.f	lp_count, r2, 0x07 ;Last 8bytes
-	lpnz	@.Lcopybytewise_1
+	lpnz	.Lcopybytewise_1
 	; LOOP START
 	ldb.ab	r6, [r1,1]
 	stb.ab	r6, [r3,1]
@@ -204,7 +204,7 @@ ENTRY (memcpy)
 #ifdef __BIG_ENDIAN__
 	asl.nz	r5, r5, 16
 #endif
-	lpnz	@.Lcopy8bytes_2
+	lpnz	.Lcopy8bytes_2
 	; LOOP START
 	ld.ab	r6, [r1, 4]
 	prefetch [r1, 28]	;Prefetch the next read location
@@ -229,7 +229,7 @@ ENTRY (memcpy)
 	sth.ab	r5, [r3, 2]
 
 	and.f	lp_count, r2, 0x07 ;Last 8bytes
-	lpnz	@.Lcopybytewise_2
+	lpnz	.Lcopybytewise_2
 	; LOOP START
 	ldb.ab	r6, [r1,1]
 	stb.ab	r6, [r3,1]
@@ -246,7 +246,7 @@ ENTRY (memcpy)
 #ifdef __BIG_ENDIAN__
 	asl.ne	r5, r5, 24
 #endif
-	lpnz	@.Lcopy8bytes_3
+	lpnz	.Lcopy8bytes_3
 	; LOOP START
 	ld.ab	r6, [r1, 4]
 	prefetch [r1, 28]	;Prefetch the next read location
@@ -271,7 +271,7 @@ ENTRY (memcpy)
 	stb.ab	r5, [r3, 1]
 
 	and.f	lp_count, r2, 0x07 ;Last 8bytes
-	lpnz	@.Lcopybytewise_3
+	lpnz	.Lcopybytewise_3
 	; LOOP START
 	ldb.ab	r6, [r1,1]
 	stb.ab	r6, [r3,1]
@@ -294,12 +294,12 @@ ENTRY(memcpy)
 
 ;;; if size <= 8
 	cmp	r2, 8
-	bls.d	@.Lsmallchunk
+	bls.d	.Lsmallchunk
 	mov.f	lp_count, r2
 
 ;;; Convert len to Dwords, unfold x4
 	lsr.f	lp_count, r2, ZOLSHFT
-	lpnz	@.Lcopyfast
+	lpnz	.Lcopyfast
 	;; LOOP START
 	LOADX (r6, r1)
 	PREFETCH_READ (r1)
@@ -316,7 +316,7 @@ ENTRY(memcpy)
 #ifdef __ARC_LL64__
 	and     r2, r2, ZOLAND	;Remaining 31 bytes
 	lsr.f   lp_count, r2, 3	;Convert to 64-bit words.
-	lpnz	@.Lcopy64b
+	lpnz	.Lcopy64b
 	;; LOOP START
 	ldd.ab	r6,[r1,8]
 	std.ab	r6,[r3,8]
@@ -328,7 +328,7 @@ ENTRY(memcpy)
 #endif
 
 .Lsmallchunk:
-	lpnz	@.Lcopyremainingbytes
+	lpnz	.Lcopyremainingbytes
 	;; LOOP START
 	ldb.ab	r5, [r1,1]
 	stb.ab	r5, [r3,1]

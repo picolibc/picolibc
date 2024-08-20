@@ -58,7 +58,7 @@ __mcount:
 	push	r11
 	push	r12
 	mov	r0,blink
-	jl	@_mcount_internal
+	jl	_mcount_internal
 	pop	r12
 	pop	r11
 	pop	r10

@@ -40,7 +40,7 @@
 ENTRY (strcmp)
 	or	r2, r0, r1
 	bmsk_s	r2, r2, 1
-	brne	r2, 0, @.Lcharloop
+	brne	r2, 0, .Lcharloop
 
 ; s1 and s2 are word aligned
 	ld.ab	r2, [r0, 4]

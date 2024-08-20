@@ -106,11 +106,11 @@ IVT_ENTRY(IRQ_20)            ; 20                       0x50    80
 #ifdef __ARC601__
 ; Startup code for the ARC601 processor
 __start:
-	mov	gp, @__SDATA_BEGIN__
-	mov	sp, @__stack_top	; Point to top of stack
+	mov	gp, __SDATA_BEGIN__
+	mov	sp, __stack_top	; Point to top of stack
 	mov	r5, 0			; Zero value
-	mov_s	r2, @__sbss_start	; r2 = start of the bss section
-	sub	r3, @_end, r2		; r3 = size of the bss section in bytes
+	mov_s	r2, __sbss_start	; r2 = start of the bss section
+	sub	r3, _end, r2		; r3 = size of the bss section in bytes
 
 	asr_s	r3, r3
 	asr_s	r3, r3			; r3 = size of bss in words
@@ -144,11 +144,11 @@ __start:
 
 #if defined (__ARC_CODE_DENSITY__)
 	;; Initialize jli_base
-	sr	@__JLI_TABLE__,[jli_base]
+	sr	__JLI_TABLE__,[jli_base]
 #endif
-	mov	gp, @__SDATA_BEGIN__
-	mov_s	r2, @__sbss_start	; r2 = start of the bss section
-	sub	r3, @_end, r2		; r3 = size of the bss section in bytes
+	mov	gp, __SDATA_BEGIN__
+	mov_s	r2, __sbss_start	; r2 = start of the bss section
+	sub	r3, _end, r2		; r3 = size of the bss section in bytes
 	; set up the loop counter register to the size (in words) of the bss section
 #if defined (__ARC_BARREL_SHIFTER__)
 	asr.f        lp_count, r3, 2
@@ -158,19 +158,19 @@ __start:
 #endif
 #if defined (__ARC600__)
 	; loop to zero out the bss.  Enter loop only if lp_count != 0
-	lpnz	@.Lend_zbss
+	lpnz	.Lend_zbss
 	add	r3, pcl, 20
 	sr	r3, [2]			; LP_END
 	; initialize stack pointer, and this instruction has 2 words
-	mov	sp, @__stack_top
+	mov	sp, __stack_top
 	mov_s	r3, 0
 	st.ab	r3, [r2, 4]		; zero out the word
 .Lend_zbss:
 #else
-	mov	sp, @__stack_top	; initialize stack pointer
+	mov	sp, __stack_top	; initialize stack pointer
 	mov_s	r3,0
 	; loop to zero out the bss.  Enter loop only if lp_count != 0
-	lpnz	@.Lend_zbss
+	lpnz	.Lend_zbss
 	st.ab	r3,[r2, 4]		; zero out the word
 	nop
 .Lend_zbss:
@@ -220,30 +220,30 @@ __start:
 #endif /* ARCv2 */
 
 	;; Call constructors
-	jl	@_init
+	jl	_init
 
 ;;; Setup fini routines to be called from exit
-	mov_s	r0, @_fini
-	jl	@atexit
+	mov_s	r0, _fini
+	jl	atexit
 
 #ifdef PROFILE_SUPPORT /* Defined in gcrt0.S.  */
-	mov	r0,@__start
-	mov	r1,@_etext
-	jl	@_monstartup
+	mov	r0,__start
+	mov	r1,_etext
+	jl	_monstartup
 #endif /* PROFILE_SUPPORT */
 
 ; branch to main
 	mov	fp,0			; initialize frame pointer
-	jl	@__setup_argv_and_call_main
+	jl	__setup_argv_and_call_main
 
 #ifdef PROFILE_SUPPORT
 	mov	r13, r0		; Save return code
-	jl	@_mcleanup
+	jl	_mcleanup
 	mov	r0, r13
 #endif /* PROFILE_SUPPORT */
 
 	; r0 contains exit code
-	j	@exit
+	j	exit
 	.size	__start, .-__start
 
 ;;; arc-main-helper.o object can be used to replace this function and
@@ -258,7 +258,7 @@ __setup_argv_and_call_main:
 ; Call main with argc = 0 and *argv[] = 0
 	mov	r0, 0
 	mov	r1, 0
-	jl	@main
+	jl	main
 	pop_s	blink
 	j_s	[blink]
 
@@ -275,5 +275,5 @@ _exit_halt:
 	nop
 	nop
 #endif
-	b	@_exit_halt
+	b	_exit_halt
 .align 4
