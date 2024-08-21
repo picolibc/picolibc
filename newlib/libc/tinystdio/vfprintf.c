@@ -1139,8 +1139,19 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #endif
 #ifdef _PRINTF_PERCENT_N
             } else if (c == 'n') {
-                int *n_ptr = va_arg(ap, int *);
-                *n_ptr = stream_len;
+                if (flags & FL_LONG) {
+                    if (flags & FL_REPD_TYPE)
+                        *va_arg(ap, long long *) = stream_len;
+                    else
+                        *va_arg(ap, long *) = stream_len;
+                } else if (flags & FL_SHORT) {
+                    if (flags & FL_REPD_TYPE)
+                        *va_arg(ap, char *) = stream_len;
+                    else
+                        *va_arg(ap, short *) = stream_len;
+                } else {
+                    *va_arg(ap, int *) = stream_len;
+                }
 #endif
             } else {
                 if (c == 'd' || c == 'i') {

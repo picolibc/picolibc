@@ -197,6 +197,33 @@ static int test_snprintf(void)
 #endif
 #endif
 
+#if !defined(TINY_STDIO) || defined(_PRINTF_PERCENT_N)
+        /* Tests for %hhn, %hn, %n, %ln, %lln */
+        int len;
+        short slen;
+        char clen;
+        long llen;
+	int n = 123;
+
+        TEST(i, snprintf(b, sizeof b, "%d%n456", n, &len), 6, "length for %n");
+        TEST_S(b, "123456", "incorrect output");
+        TEST(i, len, 3, "incorrect len");
+        TEST(i, snprintf(b, sizeof b, "%d%hn456", n, &slen), 6, "length for %hn");
+        TEST_S(b, "123456", "incorrect output");
+        TEST(i, slen, 3, "incorrect len");
+        TEST(i, snprintf(b, sizeof b, "%d%hhn456", n, &clen), 6, "length for %hhn");
+        TEST_S(b, "123456", "incorrect output");
+        TEST(i, clen, 3, "incorrect len");
+        TEST(i, snprintf(b, sizeof b, "%d%ln456", n, &llen), 6, "length for %ln");
+        TEST_S(b, "123456", "incorrect output");
+        TEST(i, llen, 3, "incorrect len");
+#if !defined(__PICOLIBC__) || defined(TINY_STDIO) || defined(_WANT_IO_LONG_LONG)
+        long long lllen;
+        TEST(i, snprintf(b, sizeof b, "%d%lln456", n, &lllen), 6, "length for %lln");
+        TEST_S(b, "123456", "incorrect output");
+        TEST(i, lllen, 3, "incorrect len");
+#endif
+#endif
 
 #ifndef DISABLE_SLOW_TESTS
 	errno = 0;
