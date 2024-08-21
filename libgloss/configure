@@ -722,6 +722,8 @@ CONFIG_BFIN_FALSE
 CONFIG_BFIN_TRUE
 CONFIG_ARM_FALSE
 CONFIG_ARM_TRUE
+CONFIG_ARC64_FALSE
+CONFIG_ARC64_TRUE
 CONFIG_ARC_FALSE
 CONFIG_ARC_TRUE
 CONFIG_AARCH64_FALSE
@@ -2825,8 +2827,11 @@ case "${target}" in
 	config_aarch64=true
 	config_testsuite=true
 	;;
-  arc*-*-*)
+  arc-*-* | arceb-*-*)
 	config_arc=true
+	;;
+  arc[6432]*-*-*)
+	config_arc64=true
 	;;
   csky*-*-*)
 	config_csky=true
@@ -3013,6 +3018,14 @@ fi
 else
   CONFIG_ARC_TRUE='#'
   CONFIG_ARC_FALSE=
+fi
+
+   if test x$config_arc64 = xtrue; then
+  CONFIG_ARC64_TRUE=
+  CONFIG_ARC64_FALSE='#'
+else
+  CONFIG_ARC64_TRUE='#'
+  CONFIG_ARC64_FALSE=
 fi
 
    if test x$config_arm = xtrue; then
@@ -5336,7 +5349,7 @@ case "${target}" in
   *-*-cygwin*) ;;
   a29k-amd-udi) ;;
   aarch64*-*-*) ;;
-  arc-*-*) ;;
+  arc*-*-*) ;;
   arm*-*-*) ;;
   bfin-*-*) ;;
   cris-*-* | crisv32-*-*) ;;
@@ -5802,6 +5815,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${CONFIG_ARC_TRUE}" && test -z "${CONFIG_ARC_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_ARC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${CONFIG_ARC64_TRUE}" && test -z "${CONFIG_ARC64_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_ARC64\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${CONFIG_ARM_TRUE}" && test -z "${CONFIG_ARM_FALSE}"; then

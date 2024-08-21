@@ -42,7 +42,7 @@ m4_include([libc/machine/spu/acinclude.m4])
 m4_include([libc/machine/xtensa/acinclude.m4])
 
 m4_foreach_w([MACHINE], [
-  aarch64 amdgcn arc arm
+  aarch64 amdgcn arc arc64 arm
   bfin
   cr16 cris crx csky
   d10v d30v

@@ -7,6 +7,9 @@ endif
 if HAVE_LIBC_MACHINE_ARC
 include %D%/arc/Makefile.inc
 endif
+if HAVE_LIBC_MACHINE_ARC64
+include %D%/arc64/Makefile.inc
+endif
 if HAVE_LIBC_MACHINE_ARM
 include %D%/arm/Makefile.inc
 endif

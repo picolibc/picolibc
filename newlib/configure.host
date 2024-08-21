@@ -122,8 +122,11 @@ case "${host_cpu}" in
 	libm_machine_dir=amdgcn
 	newlib_cv_initfinit_array=yes
 	;;
-  arc*)
+  arc | arceb)
 	machine_dir=arc
+	;;
+  arc64 | arc32)
+	machine_dir=arc64
 	;;
   arm*)
 	machine_dir=arm

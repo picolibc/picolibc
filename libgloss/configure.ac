@@ -51,8 +51,11 @@ case "${target}" in
 	config_aarch64=true
 	config_testsuite=true
 	;;
-  arc*-*-*)
+  arc-*-* | arceb-*-*)
 	config_arc=true
+	;;
+  arc[[6432]]*-*-*)
+	config_arc64=true
 	;;
   csky*-*-*)
 	config_csky=true
@@ -217,7 +220,7 @@ AC_SUBST(subdirs)
 dnl These subdirs have converted to non-recursive make.  Hopefully someday all
 dnl the ports above will too!
 m4_foreach_w([SUBDIR], [
-  aarch64 arc arm bfin cr16 csky d30v epiphany fr30 frv ft32 i386 i960 iq2000
+  aarch64 arc arc64 arm bfin cr16 csky d30v epiphany fr30 frv ft32 i386 i960 iq2000
   libnosys lm32
   m32r mcore microblaze mn10200 mn10300 moxie msp430
   nds32 nios2 or1k pru riscv rl78 rx sparc sparc_leon tic6x v850 visium

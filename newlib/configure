@@ -751,6 +751,8 @@ HAVE_LIBC_MACHINE_BFIN_FALSE
 HAVE_LIBC_MACHINE_BFIN_TRUE
 HAVE_LIBC_MACHINE_ARM_FALSE
 HAVE_LIBC_MACHINE_ARM_TRUE
+HAVE_LIBC_MACHINE_ARC64_FALSE
+HAVE_LIBC_MACHINE_ARC64_TRUE
 HAVE_LIBC_MACHINE_ARC_FALSE
 HAVE_LIBC_MACHINE_ARC_TRUE
 HAVE_LIBC_MACHINE_AMDGCN_FALSE
@@ -5764,6 +5766,13 @@ else
   HAVE_LIBC_MACHINE_ARC_TRUE='#'
   HAVE_LIBC_MACHINE_ARC_FALSE=
 fi
+ if test "${machine_dir}" = arc64; then
+  HAVE_LIBC_MACHINE_ARC64_TRUE=
+  HAVE_LIBC_MACHINE_ARC64_FALSE='#'
+else
+  HAVE_LIBC_MACHINE_ARC64_TRUE='#'
+  HAVE_LIBC_MACHINE_ARC64_FALSE=
+fi
  if test "${machine_dir}" = arm; then
   HAVE_LIBC_MACHINE_ARM_TRUE=
   HAVE_LIBC_MACHINE_ARM_FALSE='#'
@@ -7749,6 +7758,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_LIBC_MACHINE_ARC_TRUE}" && test -z "${HAVE_LIBC_MACHINE_ARC_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_ARC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_LIBC_MACHINE_ARC64_TRUE}" && test -z "${HAVE_LIBC_MACHINE_ARC64_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_LIBC_MACHINE_ARC64\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_LIBC_MACHINE_ARM_TRUE}" && test -z "${HAVE_LIBC_MACHINE_ARM_FALSE}"; then

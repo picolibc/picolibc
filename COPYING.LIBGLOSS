@@ -395,7 +395,7 @@ and need not follow the licensing terms described here, provided that
 the new terms are clearly indicated on the first page of each file where
 they apply.
 
-(20) - Synopsys Inc (arc-* targets)
+(20) - Synopsys Inc (arc*-* targets)
 
 Copyright (c) 2015, Synopsys, Inc. All rights reserved.
 
@@ -483,7 +483,7 @@ http://www.opensource.org/licenses.
 Copyright (C) 2020 Embecosm Limited
 SPDX-License-Identifier: BSD-2-Clause
 
-(25) - Synopsys Inc. - (arc-* targets)
+(25) - Synopsys Inc. - (arc*-* targets)
 
 Copyright (c) 2024 Synopsys Inc.
 

@@ -86,6 +86,9 @@ endif
 if CONFIG_ARC
 include arc/Makefile.inc
 endif
+if CONFIG_ARC64
+include arc64/Makefile.inc
+endif
 if CONFIG_ARM
 include arm/Makefile.inc
 endif

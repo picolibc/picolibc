@@ -3,7 +3,7 @@ case "${target}" in
   *-*-cygwin*) ;;
   a29k-amd-udi) ;;
   aarch64*-*-*) ;;
-  arc-*-*) ;;
+  arc*-*-*) ;;
   arm*-*-*) ;;
   bfin-*-*) ;;
   cris-*-* | crisv32-*-*) ;;

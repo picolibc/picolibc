@@ -337,6 +337,10 @@
 #endif
 #endif
 
+#ifdef __ARC64__
+#define __IEEE_LITTLE_ENDIAN
+#endif
+
 #ifdef __CRX__
 #define __IEEE_LITTLE_ENDIAN
 #endif

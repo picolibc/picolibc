@@ -153,22 +153,37 @@ multilibtool_PROGRAMS = $(am__EXEEXT_7)
 @CONFIG_ARC_TRUE@	arc/iotdk.ld
 
 @CONFIG_ARC_TRUE@am__append_7 = arc/crt0.S arc/gcrt0.S arc/arc-main-helper.c
-@CONFIG_ARM_TRUE@@MAY_SUPPLY_SYSCALLS_FALSE@am__append_8 = arm/crt0.o
-@CONFIG_ARM_TRUE@am__append_9 = arm/linux-crt0.o arm/redboot-crt0.o \
+@CONFIG_ARC64_TRUE@am__append_8 = arc64/libnsim.a arc64/libhl.a
+@CONFIG_ARC64_TRUE@am__append_9 = \
+@CONFIG_ARC64_TRUE@	arc64/crt0.o \
+@CONFIG_ARC64_TRUE@	arc64/crtn.o \
+@CONFIG_ARC64_TRUE@	arc64/crti.o \
+@CONFIG_ARC64_TRUE@	arc/arc-main-helper.o \
+@CONFIG_ARC64_TRUE@	arc/nsim.specs \
+@CONFIG_ARC64_TRUE@	arc/hl.specs
+
+@CONFIG_ARC64_TRUE@am__append_10 = \
+@CONFIG_ARC64_TRUE@	arc64/crt0.S \
+@CONFIG_ARC64_TRUE@	arc64/crtn.S \
+@CONFIG_ARC64_TRUE@	arc64/crti.S \
+@CONFIG_ARC64_TRUE@	arc/arc-main-helper.c
+
+@CONFIG_ARM_TRUE@@MAY_SUPPLY_SYSCALLS_FALSE@am__append_11 = arm/crt0.o
+@CONFIG_ARM_TRUE@am__append_12 = arm/linux-crt0.o arm/redboot-crt0.o \
 @CONFIG_ARM_TRUE@	arm/redboot-syscalls.o arm/rdpmon-crt0.o \
 @CONFIG_ARM_TRUE@	arm/rdimon-crt0.o arm/rdimon-crt0-v2m.o \
 @CONFIG_ARM_TRUE@	$(arm_SPECS)
-@CONFIG_ARM_TRUE@am__append_10 = arm/libgloss-linux.a arm/librdpmon.a \
+@CONFIG_ARM_TRUE@am__append_13 = arm/libgloss-linux.a arm/librdpmon.a \
 @CONFIG_ARM_TRUE@	arm/librdimon.a arm/librdimon-v2m.a
-@CONFIG_ARM_TRUE@am__append_11 = $(arm_SPECS) \
+@CONFIG_ARM_TRUE@am__append_14 = $(arm_SPECS) \
 @CONFIG_ARM_TRUE@	$(arm_cpu_initcpuinit_DATA)
 
 # Here is all of the simulator stuff.
-@CONFIG_BFIN_TRUE@am__append_12 = bfin/libsim.a bfin/libbfinbsp.a
-@CONFIG_BFIN_TRUE@am__append_13 = bfin/sim-test
+@CONFIG_BFIN_TRUE@am__append_15 = bfin/libsim.a bfin/libbfinbsp.a
+@CONFIG_BFIN_TRUE@am__append_16 = bfin/sim-test
 
 # Here is all of the development board stuff.
-@CONFIG_BFIN_TRUE@am__append_14 = \
+@CONFIG_BFIN_TRUE@am__append_17 = \
 @CONFIG_BFIN_TRUE@	bfin/crt0.o \
 @CONFIG_BFIN_TRUE@	bfin/basiccrt.o \
 @CONFIG_BFIN_TRUE@	bfin/basiccrts.o \
@@ -179,11 +194,11 @@ multilibtool_PROGRAMS = $(am__EXEEXT_7)
 # 	bfin/basiccrt60x.o \
 #	bfin/basiccrt60xs.o \
 #	bfin/basiccrt60xc1.o
-@CONFIG_BFIN_TRUE@am__append_15 = \
+@CONFIG_BFIN_TRUE@am__append_18 = \
 @CONFIG_BFIN_TRUE@	bfin/crt0.S \
 @CONFIG_BFIN_TRUE@	bfin/basiccrt.S
 
-@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_16 = \
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_19 = \
 @CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bfin-common-sc.ld bfin/bfin-common-mc.ld bfin/bfin-common-mc0.ld \
 @CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf504.ld bfin/bf506.ld \
 @CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf512.ld bfin/bf514.ld bfin/bf516.ld bfin/bf518.ld \
@@ -199,84 +214,84 @@ multilibtool_PROGRAMS = $(am__EXEEXT_7)
 @CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf609.ld bfin/bf609c0.ld bfin/bf609c1.ld bfin/bf609m.ld \
 @CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@	bfin/bf592.ld
 
-@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_17 = $(wildcard $(srcdir)/bfin/include/*.h)
-@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_18 = $(wildcard $(srcdir)/bfin/include/sys/*.h)
-@CONFIG_CR16_TRUE@am__append_19 = cr16/crti.o cr16/crtn.o cr16/crt1.o \
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_20 = $(wildcard $(srcdir)/bfin/include/*.h)
+@CONFIG_BFIN_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_21 = $(wildcard $(srcdir)/bfin/include/sys/*.h)
+@CONFIG_CR16_TRUE@am__append_22 = cr16/crti.o cr16/crtn.o cr16/crt1.o \
 @CONFIG_CR16_TRUE@	cr16/sim.ld
-@CONFIG_CR16_TRUE@am__append_20 = \
+@CONFIG_CR16_TRUE@am__append_23 = \
 @CONFIG_CR16_TRUE@	cr16/crti.S \
 @CONFIG_CR16_TRUE@	cr16/crtn.S \
 @CONFIG_CR16_TRUE@	cr16/crt1.S
 
-@CONFIG_CR16_TRUE@am__append_21 = cr16/libh.a cr16/libsim.a
-@CONFIG_CSKY_TRUE@am__append_22 = \
+@CONFIG_CR16_TRUE@am__append_24 = cr16/libh.a cr16/libsim.a
+@CONFIG_CSKY_TRUE@am__append_25 = \
 @CONFIG_CSKY_TRUE@	csky/crt0.o
 
-@CONFIG_CSKY_TRUE@am__append_23 = \
+@CONFIG_CSKY_TRUE@am__append_26 = \
 @CONFIG_CSKY_TRUE@	csky/crt0.S
 
-@CONFIG_CSKY_TRUE@am__append_24 = csky/libsemi.a
-@CONFIG_D30V_TRUE@am__append_25 = d30v/libsim.a
-@CONFIG_D30V_TRUE@am__append_26 = \
+@CONFIG_CSKY_TRUE@am__append_27 = csky/libsemi.a
+@CONFIG_D30V_TRUE@am__append_28 = d30v/libsim.a
+@CONFIG_D30V_TRUE@am__append_29 = \
 @CONFIG_D30V_TRUE@	d30v/crt0.o
 
-@CONFIG_EPIPHANY_TRUE@am__append_27 = epiphany/crt0.o
-@CONFIG_EPIPHANY_TRUE@am__append_28 = epiphany/crt0.S
-@CONFIG_EPIPHANY_TRUE@am__append_29 = epiphany/libepiphany.a
-@CONFIG_FR30_TRUE@am__append_30 = fr30/crt0.o
-@CONFIG_FR30_TRUE@am__append_31 = fr30/crt0.s
-@CONFIG_FR30_TRUE@am__append_32 = fr30/libsim.a
-@CONFIG_FRV_TRUE@am__append_33 = frv/crt0.o
-@CONFIG_FRV_TRUE@am__append_34 = frv/crt0.S
-@CONFIG_FRV_TRUE@am__append_35 = frv/libsim.a
-@CONFIG_FT32_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_36 = \
+@CONFIG_EPIPHANY_TRUE@am__append_30 = epiphany/crt0.o
+@CONFIG_EPIPHANY_TRUE@am__append_31 = epiphany/crt0.S
+@CONFIG_EPIPHANY_TRUE@am__append_32 = epiphany/libepiphany.a
+@CONFIG_FR30_TRUE@am__append_33 = fr30/crt0.o
+@CONFIG_FR30_TRUE@am__append_34 = fr30/crt0.s
+@CONFIG_FR30_TRUE@am__append_35 = fr30/libsim.a
+@CONFIG_FRV_TRUE@am__append_36 = frv/crt0.o
+@CONFIG_FRV_TRUE@am__append_37 = frv/crt0.S
+@CONFIG_FRV_TRUE@am__append_38 = frv/libsim.a
+@CONFIG_FT32_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_39 = \
 @CONFIG_FT32_TRUE@@HAVE_MULTISUBDIR_FALSE@	ft32/sim.ld
 
-@CONFIG_FT32_TRUE@am__append_37 = ft32/crt0.o
-@CONFIG_FT32_TRUE@am__append_38 = ft32/crt0.S
-@CONFIG_FT32_TRUE@am__append_39 = ft32/libsim.a
-@CONFIG_I386_TRUE@am__append_40 = i386/cygmon.ld i386/cygmon-crt0.o
-@CONFIG_I386_TRUE@am__append_41 = i386/cygmon-crt0.S
-@CONFIG_I386_TRUE@am__append_42 = i386/libcygmon.a
-@CONFIG_I960_TRUE@am__append_43 = i960/crt0.o i960/mon960.ld
-@CONFIG_I960_TRUE@am__append_44 = \
+@CONFIG_FT32_TRUE@am__append_40 = ft32/crt0.o
+@CONFIG_FT32_TRUE@am__append_41 = ft32/crt0.S
+@CONFIG_FT32_TRUE@am__append_42 = ft32/libsim.a
+@CONFIG_I386_TRUE@am__append_43 = i386/cygmon.ld i386/cygmon-crt0.o
+@CONFIG_I386_TRUE@am__append_44 = i386/cygmon-crt0.S
+@CONFIG_I386_TRUE@am__append_45 = i386/libcygmon.a
+@CONFIG_I960_TRUE@am__append_46 = i960/crt0.o i960/mon960.ld
+@CONFIG_I960_TRUE@am__append_47 = \
 @CONFIG_I960_TRUE@	i960/crt0.c
 
-@CONFIG_I960_TRUE@am__append_45 = i960/libmon960.a
-@CONFIG_IQ2000_TRUE@am__append_46 = iq2000/crt0.o iq2000/sim.ld
-@CONFIG_IQ2000_TRUE@am__append_47 = iq2000/libeval.a
-@CONFIG_IQ2000_TRUE@am__append_48 = iq2000/crt0.S iq2000/test.o
-@CONFIG_IQ2000_TRUE@am__append_49 = iq2000/test
-@CONFIG_LIBNOSYS_TRUE@am__append_50 = libnosys/nosys.specs
-@CONFIG_LIBNOSYS_TRUE@am__append_51 = libnosys/libnosys.a
-@CONFIG_LM32_TRUE@am__append_52 = lm32/crt0.o lm32/sim.ld
-@CONFIG_LM32_TRUE@am__append_53 = lm32/libgloss.a
-@CONFIG_LM32_TRUE@am__append_54 = lm32/crt0.S
-@CONFIG_M32R_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_55 = \
+@CONFIG_I960_TRUE@am__append_48 = i960/libmon960.a
+@CONFIG_IQ2000_TRUE@am__append_49 = iq2000/crt0.o iq2000/sim.ld
+@CONFIG_IQ2000_TRUE@am__append_50 = iq2000/libeval.a
+@CONFIG_IQ2000_TRUE@am__append_51 = iq2000/crt0.S iq2000/test.o
+@CONFIG_IQ2000_TRUE@am__append_52 = iq2000/test
+@CONFIG_LIBNOSYS_TRUE@am__append_53 = libnosys/nosys.specs
+@CONFIG_LIBNOSYS_TRUE@am__append_54 = libnosys/libnosys.a
+@CONFIG_LM32_TRUE@am__append_55 = lm32/crt0.o lm32/sim.ld
+@CONFIG_LM32_TRUE@am__append_56 = lm32/libgloss.a
+@CONFIG_LM32_TRUE@am__append_57 = lm32/crt0.S
+@CONFIG_M32R_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_58 = \
 @CONFIG_M32R_TRUE@@HAVE_MULTISUBDIR_FALSE@	m32r/eva.ld \
 @CONFIG_M32R_TRUE@@HAVE_MULTISUBDIR_FALSE@	m32r/eva-stub.ld \
 @CONFIG_M32R_TRUE@@HAVE_MULTISUBDIR_FALSE@	m32r/mon.specs
 
-@CONFIG_M32R_TRUE@am__append_56 = m32r/crt0.o m32r/m32r-lib.o \
+@CONFIG_M32R_TRUE@am__append_59 = m32r/crt0.o m32r/m32r-lib.o \
 @CONFIG_M32R_TRUE@	m32r/m32r-stub.o
-@CONFIG_M32R_TRUE@am__append_57 = m32r/crt0.S m32r/m32r-lib.c \
+@CONFIG_M32R_TRUE@am__append_60 = m32r/crt0.S m32r/m32r-lib.c \
 @CONFIG_M32R_TRUE@	m32r/m32r-stub.c
-@CONFIG_M32R_TRUE@am__append_58 = m32r/libgloss.a m32r/libmon.a
-@CONFIG_MCORE_TRUE@@MCORE_BUILD_ELF_TRUE@am__append_59 = \
+@CONFIG_M32R_TRUE@am__append_61 = m32r/libgloss.a m32r/libmon.a
+@CONFIG_MCORE_TRUE@@MCORE_BUILD_ELF_TRUE@am__append_62 = \
 @CONFIG_MCORE_TRUE@@MCORE_BUILD_ELF_TRUE@	mcore/cmb.ld \
 @CONFIG_MCORE_TRUE@@MCORE_BUILD_ELF_TRUE@	mcore/cmb.specs
 
-@CONFIG_MCORE_TRUE@@MCORE_BUILD_PE_TRUE@am__append_60 = \
+@CONFIG_MCORE_TRUE@@MCORE_BUILD_PE_TRUE@am__append_63 = \
 @CONFIG_MCORE_TRUE@@MCORE_BUILD_PE_TRUE@	mcore/cmb.ld \
 @CONFIG_MCORE_TRUE@@MCORE_BUILD_PE_TRUE@	mcore/cmb.specs
 
-@CONFIG_MCORE_TRUE@am__append_61 = mcore/crt0.o
-@CONFIG_MCORE_TRUE@am__append_62 = mcore/crt0.S
-@CONFIG_MCORE_TRUE@am__append_63 = mcore/libsim.a mcore/libcmb.a
-@CONFIG_MICROBLAZE_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_64 = \
+@CONFIG_MCORE_TRUE@am__append_64 = mcore/crt0.o
+@CONFIG_MCORE_TRUE@am__append_65 = mcore/crt0.S
+@CONFIG_MCORE_TRUE@am__append_66 = mcore/libsim.a mcore/libcmb.a
+@CONFIG_MICROBLAZE_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_67 = \
 @CONFIG_MICROBLAZE_TRUE@@HAVE_MULTISUBDIR_FALSE@	microblaze/xilinx.ld
 
-@CONFIG_MICROBLAZE_TRUE@am__append_65 =  \
+@CONFIG_MICROBLAZE_TRUE@am__append_68 =  \
 @CONFIG_MICROBLAZE_TRUE@	microblaze/elf-gloss-linux.specs \
 @CONFIG_MICROBLAZE_TRUE@	microblaze/crt0.o microblaze/crt1.o \
 @CONFIG_MICROBLAZE_TRUE@	microblaze/crt2.o microblaze/crt3.o \
@@ -285,7 +300,7 @@ multilibtool_PROGRAMS = $(am__EXEEXT_7)
 @CONFIG_MICROBLAZE_TRUE@	microblaze/sim-crtinit.o \
 @CONFIG_MICROBLAZE_TRUE@	microblaze/sim-pgcrtinit.o \
 @CONFIG_MICROBLAZE_TRUE@	microblaze/linux-crt0.o
-@CONFIG_MICROBLAZE_TRUE@am__append_66 = \
+@CONFIG_MICROBLAZE_TRUE@am__append_69 = \
 @CONFIG_MICROBLAZE_TRUE@	microblaze/crt0.S \
 @CONFIG_MICROBLAZE_TRUE@	microblaze/crt1.S \
 @CONFIG_MICROBLAZE_TRUE@	microblaze/crt2.S \
@@ -297,77 +312,77 @@ multilibtool_PROGRAMS = $(am__EXEEXT_7)
 @CONFIG_MICROBLAZE_TRUE@	microblaze/sim-pgcrtinit.S \
 @CONFIG_MICROBLAZE_TRUE@	microblaze/linux-crt0.S
 
-@CONFIG_MICROBLAZE_TRUE@am__append_67 = microblaze/libgloss.a \
+@CONFIG_MICROBLAZE_TRUE@am__append_70 = microblaze/libgloss.a \
 @CONFIG_MICROBLAZE_TRUE@	microblaze/libgloss-linux.a
-@CONFIG_MN10200_TRUE@am__append_68 = mn10200/eval.ld mn10200/sim.ld \
+@CONFIG_MN10200_TRUE@am__append_71 = mn10200/eval.ld mn10200/sim.ld \
 @CONFIG_MN10200_TRUE@	mn10200/crt0.o
-@CONFIG_MN10200_TRUE@am__append_69 = mn10200/crt0.S
-@CONFIG_MN10200_TRUE@am__append_70 = mn10200/libeval.a
-@CONFIG_MN10200_TRUE@am__append_71 = mn10200/test
-@CONFIG_MN10300_TRUE@am__append_72 = \
+@CONFIG_MN10200_TRUE@am__append_72 = mn10200/crt0.S
+@CONFIG_MN10200_TRUE@am__append_73 = mn10200/libeval.a
+@CONFIG_MN10200_TRUE@am__append_74 = mn10200/test
+@CONFIG_MN10300_TRUE@am__append_75 = \
 @CONFIG_MN10300_TRUE@	mn10300/eval.ld \
 @CONFIG_MN10300_TRUE@	mn10300/sim.ld
 
-@CONFIG_MN10300_TRUE@@MN10300_BUILD_LIBCYGMON_TRUE@am__append_73 = \
+@CONFIG_MN10300_TRUE@@MN10300_BUILD_LIBCYGMON_TRUE@am__append_76 = \
 @CONFIG_MN10300_TRUE@@MN10300_BUILD_LIBCYGMON_TRUE@	mn10300/asb2303.ld \
 @CONFIG_MN10300_TRUE@@MN10300_BUILD_LIBCYGMON_TRUE@	mn10300/asb2305.ld
 
-@CONFIG_MN10300_TRUE@am__append_74 = \
+@CONFIG_MN10300_TRUE@am__append_77 = \
 @CONFIG_MN10300_TRUE@	mn10300/crt0.o \
 @CONFIG_MN10300_TRUE@	mn10300/crt0_cygmon.o \
 @CONFIG_MN10300_TRUE@	mn10300/crt0_redboot.o
 
-@CONFIG_MN10300_TRUE@am__append_75 = \
+@CONFIG_MN10300_TRUE@am__append_78 = \
 @CONFIG_MN10300_TRUE@	mn10300/crt0.S \
 @CONFIG_MN10300_TRUE@	mn10300/crt0_cygmon.S \
 @CONFIG_MN10300_TRUE@	mn10300/crt0_redboot.S
 
-@CONFIG_MN10300_TRUE@am__append_76 = mn10300/libeval.a
-@CONFIG_MN10300_TRUE@@MN10300_BUILD_LIBCYGMON_TRUE@am__append_77 = mn10300/libcygmon.a
-@CONFIG_MN10300_TRUE@am__append_78 = mn10300/test
-@CONFIG_MOXIE_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_79 = \
+@CONFIG_MN10300_TRUE@am__append_79 = mn10300/libeval.a
+@CONFIG_MN10300_TRUE@@MN10300_BUILD_LIBCYGMON_TRUE@am__append_80 = mn10300/libcygmon.a
+@CONFIG_MN10300_TRUE@am__append_81 = mn10300/test
+@CONFIG_MOXIE_TRUE@@HAVE_MULTISUBDIR_FALSE@am__append_82 = \
 @CONFIG_MOXIE_TRUE@@HAVE_MULTISUBDIR_FALSE@	moxie/moxie-elf-common.ld \
 @CONFIG_MOXIE_TRUE@@HAVE_MULTISUBDIR_FALSE@	moxie/qemu.ld \
 @CONFIG_MOXIE_TRUE@@HAVE_MULTISUBDIR_FALSE@	moxie/sim.ld \
 @CONFIG_MOXIE_TRUE@@HAVE_MULTISUBDIR_FALSE@	moxie/moxiebox.ld
 
-@CONFIG_MOXIE_TRUE@@MOXIE_BUILD_CRT0_TRUE@am__append_80 = moxie/crt0.o
-@CONFIG_MOXIE_TRUE@am__append_81 = \
+@CONFIG_MOXIE_TRUE@@MOXIE_BUILD_CRT0_TRUE@am__append_83 = moxie/crt0.o
+@CONFIG_MOXIE_TRUE@am__append_84 = \
 @CONFIG_MOXIE_TRUE@	moxie/crt0.S
 
-@CONFIG_MOXIE_TRUE@am__append_82 = moxie/libsim.a moxie/libqemu.a
-@CONFIG_MSP430_TRUE@am__append_83 = msp430/msp430-sim.ld \
+@CONFIG_MOXIE_TRUE@am__append_85 = moxie/libsim.a moxie/libqemu.a
+@CONFIG_MSP430_TRUE@am__append_86 = msp430/msp430-sim.ld \
 @CONFIG_MSP430_TRUE@	msp430/msp430xl-sim.ld \
 @CONFIG_MSP430_TRUE@	msp430/intr_vectors.ld msp430/gcrt0.o \
 @CONFIG_MSP430_TRUE@	msp430/crt0.o
-@CONFIG_MSP430_TRUE@am__append_84 = \
+@CONFIG_MSP430_TRUE@am__append_87 = \
 @CONFIG_MSP430_TRUE@	msp430/gcrt0.S \
 @CONFIG_MSP430_TRUE@	msp430/crt0.S
 
-@CONFIG_MSP430_TRUE@am__append_85 = msp430/libsim.a msp430/libnosys.a \
+@CONFIG_MSP430_TRUE@am__append_88 = msp430/libsim.a msp430/libnosys.a \
 @CONFIG_MSP430_TRUE@	msp430/libcrt.a
-@CONFIG_NDS32_TRUE@am__append_86 = \
+@CONFIG_NDS32_TRUE@am__append_89 = \
 @CONFIG_NDS32_TRUE@	nds32/crt0.o \
 @CONFIG_NDS32_TRUE@	nds32/crt1.o
 
-@CONFIG_NDS32_TRUE@am__append_87 = \
+@CONFIG_NDS32_TRUE@am__append_90 = \
 @CONFIG_NDS32_TRUE@	nds32/crt0.S \
 @CONFIG_NDS32_TRUE@	nds32/crt1.S
 
-@CONFIG_NDS32_TRUE@am__append_88 = nds32/libgloss.a
-@CONFIG_NIOS2_TRUE@am__append_89 = \
+@CONFIG_NDS32_TRUE@am__append_91 = nds32/libgloss.a
+@CONFIG_NIOS2_TRUE@am__append_92 = \
 @CONFIG_NIOS2_TRUE@	nios2/qemu-hosted.ld
 
-@CONFIG_NIOS2_TRUE@am__append_90 = nios2/libnios2.a
-@CONFIG_OR1K_TRUE@am__append_91 = or1k/crt0.o
-@CONFIG_OR1K_TRUE@am__append_92 = or1k/crt0.S
-@CONFIG_OR1K_TRUE@am__append_93 = \
+@CONFIG_NIOS2_TRUE@am__append_93 = nios2/libnios2.a
+@CONFIG_OR1K_TRUE@am__append_94 = or1k/crt0.o
+@CONFIG_OR1K_TRUE@am__append_95 = or1k/crt0.S
+@CONFIG_OR1K_TRUE@am__append_96 = \
 @CONFIG_OR1K_TRUE@	or1k/include/or1k-asm.h \
 @CONFIG_OR1K_TRUE@	or1k/include/or1k-nop.h \
 @CONFIG_OR1K_TRUE@	or1k/include/or1k-sprs.h \
 @CONFIG_OR1K_TRUE@	or1k/include/or1k-support.h
 
-@CONFIG_OR1K_TRUE@am__append_94 = or1k/libor1k.a or1k/libboard-atlys.a \
+@CONFIG_OR1K_TRUE@am__append_97 = or1k/libor1k.a or1k/libboard-atlys.a \
 @CONFIG_OR1K_TRUE@	or1k/libboard-de0_nano.a \
 @CONFIG_OR1K_TRUE@	or1k/libboard-ml501.a \
 @CONFIG_OR1K_TRUE@	or1k/libboard-optimsoc.a \
@@ -376,49 +391,49 @@ multilibtool_PROGRAMS = $(am__EXEEXT_7)
 @CONFIG_OR1K_TRUE@	or1k/libboard-ordb1a3pe1500.a \
 @CONFIG_OR1K_TRUE@	or1k/libboard-ordb2a.a \
 @CONFIG_OR1K_TRUE@	or1k/libboard-orpsocrefdesign.a
-@CONFIG_PRU_TRUE@am__append_95 = \
+@CONFIG_PRU_TRUE@am__append_98 = \
 @CONFIG_PRU_TRUE@	pru/crt0.o \
 @CONFIG_PRU_TRUE@	pru/crt0-minrt.o
 
-@CONFIG_PRU_TRUE@am__append_96 = \
+@CONFIG_PRU_TRUE@am__append_99 = \
 @CONFIG_PRU_TRUE@	pru/crt0.S \
 @CONFIG_PRU_TRUE@	pru/crt0-minrt.S
 
-@CONFIG_PRU_TRUE@am__append_97 = pru/libgloss.a
-@CONFIG_RISCV_TRUE@am__append_98 = \
+@CONFIG_PRU_TRUE@am__append_100 = pru/libgloss.a
+@CONFIG_RISCV_TRUE@am__append_101 = \
 @CONFIG_RISCV_TRUE@	riscv/nano.specs \
 @CONFIG_RISCV_TRUE@	riscv/sim.specs \
 @CONFIG_RISCV_TRUE@	riscv/semihost.specs \
 @CONFIG_RISCV_TRUE@	riscv/crt0.o
 
-@CONFIG_RISCV_TRUE@am__append_99 = riscv/libgloss.a riscv/libsim.a \
+@CONFIG_RISCV_TRUE@am__append_102 = riscv/libgloss.a riscv/libsim.a \
 @CONFIG_RISCV_TRUE@	riscv/libsemihost.a
-@CONFIG_RL78_TRUE@am__append_100 = rl78/rl78.ld rl78/rl78-sim.ld \
+@CONFIG_RL78_TRUE@am__append_103 = rl78/rl78.ld rl78/rl78-sim.ld \
 @CONFIG_RL78_TRUE@	rl78/gcrt0.o rl78/crt0.o rl78/crtn.o
-@CONFIG_RL78_TRUE@am__append_101 = \
+@CONFIG_RL78_TRUE@am__append_104 = \
 @CONFIG_RL78_TRUE@	rl78/gcrt0.S \
 @CONFIG_RL78_TRUE@	rl78/crt0.S \
 @CONFIG_RL78_TRUE@	rl78/crtn.S
 
-@CONFIG_RL78_TRUE@am__append_102 = rl78/libsim.a
-@CONFIG_RX_TRUE@am__append_103 = rx/rx.ld rx/rx-sim.ld rx/gcrt0.o \
+@CONFIG_RL78_TRUE@am__append_105 = rl78/libsim.a
+@CONFIG_RX_TRUE@am__append_106 = rx/rx.ld rx/rx-sim.ld rx/gcrt0.o \
 @CONFIG_RX_TRUE@	rx/crt0.o rx/crtn.o
-@CONFIG_RX_TRUE@am__append_104 = \
+@CONFIG_RX_TRUE@am__append_107 = \
 @CONFIG_RX_TRUE@	rx/gcrt0.S \
 @CONFIG_RX_TRUE@	rx/crt0.S \
 @CONFIG_RX_TRUE@	rx/crtn.S
 
-@CONFIG_RX_TRUE@am__append_105 = rx/libsim.a
-@CONFIG_SPARC_TRUE@am__append_106 = sparc/crt0.o sparc/erc32-crt0.o
-@CONFIG_SPARC_TRUE@am__append_107 = sparc/crt0.S sparc/erc32-crt0.S
-@CONFIG_SPARC_TRUE@am__append_108 = sparc/liberc32.a
-@CONFIG_SPARC_TRUE@@SPARC_BUILD_CYGMON_TRUE@am__append_109 =  \
+@CONFIG_RX_TRUE@am__append_108 = rx/libsim.a
+@CONFIG_SPARC_TRUE@am__append_109 = sparc/crt0.o sparc/erc32-crt0.o
+@CONFIG_SPARC_TRUE@am__append_110 = sparc/crt0.S sparc/erc32-crt0.S
+@CONFIG_SPARC_TRUE@am__append_111 = sparc/liberc32.a
+@CONFIG_SPARC_TRUE@@SPARC_BUILD_CYGMON_TRUE@am__append_112 =  \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_CYGMON_TRUE@	sparc/cygmon.ld \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_CYGMON_TRUE@	sparc/cygmon-crt0.o \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_CYGMON_TRUE@	sparc/cygmon-salib.o
-@CONFIG_SPARC_TRUE@@SPARC_BUILD_CYGMON_TRUE@am__append_110 = sparc/cygmon-crt0.S
-@CONFIG_SPARC_TRUE@@SPARC_BUILD_CYGMON_TRUE@am__append_111 = sparc/libcygmon.a
-@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@am__append_112 = \
+@CONFIG_SPARC_TRUE@@SPARC_BUILD_CYGMON_TRUE@am__append_113 = sparc/cygmon-crt0.S
+@CONFIG_SPARC_TRUE@@SPARC_BUILD_CYGMON_TRUE@am__append_114 = sparc/libcygmon.a
+@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@am__append_115 = \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	sparc/ex930.ld \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	sparc/ex931.ld \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	sparc/ex934.ld \
@@ -426,64 +441,64 @@ multilibtool_PROGRAMS = $(am__EXEEXT_7)
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	sparc/elfsim.ld \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	sparc/traps.o
 
-@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@am__append_113 = \
+@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@am__append_116 = \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	sparc/libslite930.a \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	sparc/libslite931.a \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	sparc/libslite934.a \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	sparc/libslite86x.a
 
-@CONFIG_SPARC_TRUE@@SPARC_BUILD_SPLET_TRUE@am__append_114 =  \
+@CONFIG_SPARC_TRUE@@SPARC_BUILD_SPLET_TRUE@am__append_117 =  \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SPLET_TRUE@	sparc/tsc701.ld \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SPLET_TRUE@	sparc/crt0-701.S
-@CONFIG_SPARC_TRUE@@SPARC_BUILD_SPLET_TRUE@am__append_115 = sparc/crt0-701.S
-@CONFIG_SPARC_TRUE@@SPARC_BUILD_SPLET_TRUE@am__append_116 = sparc/libsplet701.a
-@CONFIG_SPARC_TRUE@am__append_117 = sparc/erc32-test sparc/ex930-test \
+@CONFIG_SPARC_TRUE@@SPARC_BUILD_SPLET_TRUE@am__append_118 = sparc/crt0-701.S
+@CONFIG_SPARC_TRUE@@SPARC_BUILD_SPLET_TRUE@am__append_119 = sparc/libsplet701.a
+@CONFIG_SPARC_TRUE@am__append_120 = sparc/erc32-test sparc/ex930-test \
 @CONFIG_SPARC_TRUE@	sparc/ex931-test sparc/ex934-test
-@CONFIG_SPARC_LEON_TRUE@am__append_118 = sparc_leon/libleonbare.a \
+@CONFIG_SPARC_LEON_TRUE@am__append_121 = sparc_leon/libleonbare.a \
 @CONFIG_SPARC_LEON_TRUE@	sparc_leon/liblbthread.a \
 @CONFIG_SPARC_LEON_TRUE@	sparc_leon/libsmall.a
-@CONFIG_SPARC_LEON_TRUE@am__append_119 = \
+@CONFIG_SPARC_LEON_TRUE@am__append_122 = \
 @CONFIG_SPARC_LEON_TRUE@	sparc_leon/crt0.o \
 @CONFIG_SPARC_LEON_TRUE@	sparc_leon/pnpinit.o \
 @CONFIG_SPARC_LEON_TRUE@	sparc_leon/pnpinit_simple.o \
 @CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_svt.o \
 @CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_mvt.o
 
-@CONFIG_SPARC_LEON_TRUE@am__append_120 = \
+@CONFIG_SPARC_LEON_TRUE@am__append_123 = \
 @CONFIG_SPARC_LEON_TRUE@	sparc_leon/crt0.S \
 @CONFIG_SPARC_LEON_TRUE@	sparc_leon/pnpinit.c \
 @CONFIG_SPARC_LEON_TRUE@	sparc_leon/pnpinit_simple.c \
 @CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_svt.S \
 @CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_mvt.S
 
-@CONFIG_TIC6X_TRUE@am__append_121 = tic6x/crt0.o
-@CONFIG_TIC6X_TRUE@am__append_122 = tic6x/crt0.S
-@CONFIG_TIC6X_TRUE@am__append_123 = tic6x/libsim.a
-@CONFIG_V850_TRUE@am__append_124 = v850/crt0.o
-@CONFIG_V850_TRUE@am__append_125 = v850/crt0.S
-@CONFIG_V850_TRUE@am__append_126 = v850/libsim.a
-@CONFIG_VISIUM_TRUE@am__append_127 = visium/crt0.o
-@CONFIG_VISIUM_TRUE@am__append_128 = visium/crt0.S
-@CONFIG_VISIUM_TRUE@am__append_129 = visium/libserial.a \
+@CONFIG_TIC6X_TRUE@am__append_124 = tic6x/crt0.o
+@CONFIG_TIC6X_TRUE@am__append_125 = tic6x/crt0.S
+@CONFIG_TIC6X_TRUE@am__append_126 = tic6x/libsim.a
+@CONFIG_V850_TRUE@am__append_127 = v850/crt0.o
+@CONFIG_V850_TRUE@am__append_128 = v850/crt0.S
+@CONFIG_V850_TRUE@am__append_129 = v850/libsim.a
+@CONFIG_VISIUM_TRUE@am__append_130 = visium/crt0.o
+@CONFIG_VISIUM_TRUE@am__append_131 = visium/crt0.S
+@CONFIG_VISIUM_TRUE@am__append_132 = visium/libserial.a \
 @CONFIG_VISIUM_TRUE@	visium/libsim.a visium/libdebug.a
-@CONFIG_WINCE_TRUE@am__append_130 = $(gdbdir)
-@CONFIG_WINCE_TRUE@am__append_131 = wince/stub.exe
-@CONFIG_XSTORMY16_TRUE@am__append_132 = xstormy16/crt0.o \
+@CONFIG_WINCE_TRUE@am__append_133 = $(gdbdir)
+@CONFIG_WINCE_TRUE@am__append_134 = wince/stub.exe
+@CONFIG_XSTORMY16_TRUE@am__append_135 = xstormy16/crt0.o \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/crti.o xstormy16/crtn.o \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/sim_high.ld \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/sim_rom.ld \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/eva_app.ld \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/eva_stub.hex
-@CONFIG_XSTORMY16_TRUE@am__append_133 = \
+@CONFIG_XSTORMY16_TRUE@am__append_136 = \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/crt0.s \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/crti.s \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/crtn.s
 
-@CONFIG_XSTORMY16_TRUE@am__append_134 = xstormy16/libsim.a \
+@CONFIG_XSTORMY16_TRUE@am__append_137 = xstormy16/libsim.a \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/libeva_app.a
-@CONFIG_XSTORMY16_TRUE@am__append_135 = xstormy16/eva_stub.elf
-@CONFIG_XSTORMY16_TRUE@am__append_136 = xstormy16/eva_stub.hex
-@CONFIG_XTENSA_TRUE@am__append_137 = \
+@CONFIG_XSTORMY16_TRUE@am__append_138 = xstormy16/eva_stub.elf
+@CONFIG_XSTORMY16_TRUE@am__append_139 = xstormy16/eva_stub.hex
+@CONFIG_XTENSA_TRUE@am__append_140 = \
 @CONFIG_XTENSA_TRUE@	xtensa/default.specs \
 @CONFIG_XTENSA_TRUE@	xtensa/nano.specs \
 @CONFIG_XTENSA_TRUE@	xtensa/sim.elf.specs \
@@ -492,29 +507,29 @@ multilibtool_PROGRAMS = $(am__EXEEXT_7)
 @CONFIG_XTENSA_TRUE@	xtensa/sys.openocd.specs \
 @CONFIG_XTENSA_TRUE@	xtensa/crt0.o
 
-@CONFIG_XTENSA_TRUE@am__append_138 = \
+@CONFIG_XTENSA_TRUE@am__append_141 = \
 @CONFIG_XTENSA_TRUE@	xtensa/crt0.S \
 @CONFIG_XTENSA_TRUE@	xtensa/crt1-sim.S \
 @CONFIG_XTENSA_TRUE@	xtensa/crt1-boards.S
 
-@CONFIG_XTENSA_TRUE@am__append_139 = xtensa/libgloss.a
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_140 = \
+@CONFIG_XTENSA_TRUE@am__append_142 = xtensa/libgloss.a
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_143 = \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/app.elf.ld \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/crt1-sim.o \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/crt1-boards.o
 
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_141 = xtensa/libsys_qemu.a \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_144 = xtensa/libsys_qemu.a \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/libsys_openocd.a
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_142 = xtensa/boards/esp32/memory.elf.ld
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_143 = xtensa/boards/esp32/board.c
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_144 = -I$(srcdir)/xtensa/boards/esp32/include
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_145 = -I$(srcdir)/xtensa/boards/esp32/include
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_146 = -I$(srcdir)/xtensa/boards/esp32/include
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_147 = xtensa/boards/esp32s3/memory.elf.ld
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_148 = xtensa/boards/esp32s3/board.c
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_149 = -I$(srcdir)/xtensa/boards/esp32s3/include
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_150 = -I$(srcdir)/xtensa/boards/esp32s3/include
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_151 = -I$(srcdir)/xtensa/boards/esp32s3/include
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_145 = xtensa/boards/esp32/memory.elf.ld
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_146 = xtensa/boards/esp32/board.c
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_147 = -I$(srcdir)/xtensa/boards/esp32/include
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_148 = -I$(srcdir)/xtensa/boards/esp32/include
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_149 = -I$(srcdir)/xtensa/boards/esp32/include
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_150 = xtensa/boards/esp32s3/memory.elf.ld
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_151 = xtensa/boards/esp32s3/board.c
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_152 = -I$(srcdir)/xtensa/boards/esp32s3/include
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_153 = -I$(srcdir)/xtensa/boards/esp32s3/include
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__append_154 = -I$(srcdir)/xtensa/boards/esp32s3/include
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../config/depstand.m4 \
@@ -652,6 +667,36 @@ arc_libuart_8250_a_LIBADD =
 @CONFIG_ARC_TRUE@	arc/arc_libuart_8250_a-sbrk.$(OBJEXT) \
 @CONFIG_ARC_TRUE@	arc/arc_libuart_8250_a-mcount.$(OBJEXT)
 arc_libuart_8250_a_OBJECTS = $(am_arc_libuart_8250_a_OBJECTS)
+arc64_libhl_a_AR = $(AR) $(ARFLAGS)
+arc64_libhl_a_LIBADD =
+@CONFIG_ARC64_TRUE@am_arc64_libhl_a_OBJECTS =  \
+@CONFIG_ARC64_TRUE@	arc/arc64_libhl_a-arc-timer.$(OBJEXT) \
+@CONFIG_ARC64_TRUE@	arc/arc64_libhl_a-hl-stub.$(OBJEXT) \
+@CONFIG_ARC64_TRUE@	arc/arc64_libhl_a-hl-setup.$(OBJEXT) \
+@CONFIG_ARC64_TRUE@	arc/arc64_libhl_a-libcfunc.$(OBJEXT) \
+@CONFIG_ARC64_TRUE@	arc/arc64_libhl_a-sbrk.$(OBJEXT) \
+@CONFIG_ARC64_TRUE@	arc/hl/arc64_libhl_a-hl_gw.$(OBJEXT) \
+@CONFIG_ARC64_TRUE@	arc/hl/arc64_libhl_a-hl_api.$(OBJEXT) \
+@CONFIG_ARC64_TRUE@	arc/hl/arc64_libhl_a-hl_open.$(OBJEXT) \
+@CONFIG_ARC64_TRUE@	arc/hl/arc64_libhl_a-hl_close.$(OBJEXT) \
+@CONFIG_ARC64_TRUE@	arc/hl/arc64_libhl_a-hl_read.$(OBJEXT) \
+@CONFIG_ARC64_TRUE@	arc/hl/arc64_libhl_a-hl_write.$(OBJEXT) \
+@CONFIG_ARC64_TRUE@	arc/hl/arc64_libhl_a-hl_lseek.$(OBJEXT) \
+@CONFIG_ARC64_TRUE@	arc/hl/arc64_libhl_a-hl_unlink.$(OBJEXT) \
+@CONFIG_ARC64_TRUE@	arc/hl/arc64_libhl_a-hl_isatty.$(OBJEXT) \
+@CONFIG_ARC64_TRUE@	arc/hl/arc64_libhl_a-hl_clock.$(OBJEXT) \
+@CONFIG_ARC64_TRUE@	arc/hl/arc64_libhl_a-hl_gettimeofday.$(OBJEXT) \
+@CONFIG_ARC64_TRUE@	arc/hl/arc64_libhl_a-hl_argc.$(OBJEXT) \
+@CONFIG_ARC64_TRUE@	arc/hl/arc64_libhl_a-hl_argv.$(OBJEXT) \
+@CONFIG_ARC64_TRUE@	arc/hl/arc64_libhl_a-hl_exit.$(OBJEXT)
+arc64_libhl_a_OBJECTS = $(am_arc64_libhl_a_OBJECTS)
+arc64_libnsim_a_AR = $(AR) $(ARFLAGS)
+arc64_libnsim_a_LIBADD =
+@CONFIG_ARC64_TRUE@am_arc64_libnsim_a_OBJECTS =  \
+@CONFIG_ARC64_TRUE@	arc/arc64_libnsim_a-libcfunc.$(OBJEXT) \
+@CONFIG_ARC64_TRUE@	arc/arc64_libnsim_a-nsim-syscalls.$(OBJEXT) \
+@CONFIG_ARC64_TRUE@	arc/arc64_libnsim_a-sbrk.$(OBJEXT)
+arc64_libnsim_a_OBJECTS = $(am_arc64_libnsim_a_OBJECTS)
 arm_libgloss_linux_a_AR = $(AR) $(ARFLAGS)
 arm_libgloss_linux_a_LIBADD =
 @CONFIG_ARM_TRUE@am_arm_libgloss_linux_a_OBJECTS =  \
@@ -884,24 +929,27 @@ libobjs_a_LIBADD =
 @CONFIG_ARC_TRUE@am__objects_3 = arc/crt0.$(OBJEXT) \
 @CONFIG_ARC_TRUE@	arc/gcrt0.$(OBJEXT) \
 @CONFIG_ARC_TRUE@	arc/arc-main-helper.$(OBJEXT)
-@CONFIG_BFIN_TRUE@am__objects_4 = bfin/crt0.$(OBJEXT) \
+@CONFIG_ARC64_TRUE@am__objects_4 = arc64/crt0.$(OBJEXT) \
+@CONFIG_ARC64_TRUE@	arc64/crtn.$(OBJEXT) arc64/crti.$(OBJEXT) \
+@CONFIG_ARC64_TRUE@	arc/arc-main-helper.$(OBJEXT)
+@CONFIG_BFIN_TRUE@am__objects_5 = bfin/crt0.$(OBJEXT) \
 @CONFIG_BFIN_TRUE@	bfin/basiccrt.$(OBJEXT)
-@CONFIG_CR16_TRUE@am__objects_5 = cr16/crti.$(OBJEXT) \
+@CONFIG_CR16_TRUE@am__objects_6 = cr16/crti.$(OBJEXT) \
 @CONFIG_CR16_TRUE@	cr16/crtn.$(OBJEXT) cr16/crt1.$(OBJEXT)
-@CONFIG_CSKY_TRUE@am__objects_6 = csky/crt0.$(OBJEXT)
-@CONFIG_EPIPHANY_TRUE@am__objects_7 = epiphany/crt0.$(OBJEXT)
-@CONFIG_FR30_TRUE@am__objects_8 = fr30/crt0.$(OBJEXT)
-@CONFIG_FRV_TRUE@am__objects_9 = frv/crt0.$(OBJEXT)
-@CONFIG_FT32_TRUE@am__objects_10 = ft32/crt0.$(OBJEXT)
-@CONFIG_I386_TRUE@am__objects_11 = i386/cygmon-crt0.$(OBJEXT)
-@CONFIG_I960_TRUE@am__objects_12 = i960/crt0.$(OBJEXT)
-@CONFIG_IQ2000_TRUE@am__objects_13 = iq2000/crt0.$(OBJEXT)
-@CONFIG_LM32_TRUE@am__objects_14 = lm32/crt0.$(OBJEXT)
-@CONFIG_M32R_TRUE@am__objects_15 = m32r/crt0.$(OBJEXT) \
+@CONFIG_CSKY_TRUE@am__objects_7 = csky/crt0.$(OBJEXT)
+@CONFIG_EPIPHANY_TRUE@am__objects_8 = epiphany/crt0.$(OBJEXT)
+@CONFIG_FR30_TRUE@am__objects_9 = fr30/crt0.$(OBJEXT)
+@CONFIG_FRV_TRUE@am__objects_10 = frv/crt0.$(OBJEXT)
+@CONFIG_FT32_TRUE@am__objects_11 = ft32/crt0.$(OBJEXT)
+@CONFIG_I386_TRUE@am__objects_12 = i386/cygmon-crt0.$(OBJEXT)
+@CONFIG_I960_TRUE@am__objects_13 = i960/crt0.$(OBJEXT)
+@CONFIG_IQ2000_TRUE@am__objects_14 = iq2000/crt0.$(OBJEXT)
+@CONFIG_LM32_TRUE@am__objects_15 = lm32/crt0.$(OBJEXT)
+@CONFIG_M32R_TRUE@am__objects_16 = m32r/crt0.$(OBJEXT) \
 @CONFIG_M32R_TRUE@	m32r/m32r-lib.$(OBJEXT) \
 @CONFIG_M32R_TRUE@	m32r/m32r-stub.$(OBJEXT)
-@CONFIG_MCORE_TRUE@am__objects_16 = mcore/crt0.$(OBJEXT)
-@CONFIG_MICROBLAZE_TRUE@am__objects_17 = microblaze/crt0.$(OBJEXT) \
+@CONFIG_MCORE_TRUE@am__objects_17 = mcore/crt0.$(OBJEXT)
+@CONFIG_MICROBLAZE_TRUE@am__objects_18 = microblaze/crt0.$(OBJEXT) \
 @CONFIG_MICROBLAZE_TRUE@	microblaze/crt1.$(OBJEXT) \
 @CONFIG_MICROBLAZE_TRUE@	microblaze/crt2.$(OBJEXT) \
 @CONFIG_MICROBLAZE_TRUE@	microblaze/crt3.$(OBJEXT) \
@@ -911,38 +959,38 @@ libobjs_a_LIBADD =
 @CONFIG_MICROBLAZE_TRUE@	microblaze/sim-crtinit.$(OBJEXT) \
 @CONFIG_MICROBLAZE_TRUE@	microblaze/sim-pgcrtinit.$(OBJEXT) \
 @CONFIG_MICROBLAZE_TRUE@	microblaze/linux-crt0.$(OBJEXT)
-@CONFIG_MN10200_TRUE@am__objects_18 = mn10200/crt0.$(OBJEXT)
-@CONFIG_MN10300_TRUE@am__objects_19 = mn10300/crt0.$(OBJEXT) \
+@CONFIG_MN10200_TRUE@am__objects_19 = mn10200/crt0.$(OBJEXT)
+@CONFIG_MN10300_TRUE@am__objects_20 = mn10300/crt0.$(OBJEXT) \
 @CONFIG_MN10300_TRUE@	mn10300/crt0_cygmon.$(OBJEXT) \
 @CONFIG_MN10300_TRUE@	mn10300/crt0_redboot.$(OBJEXT)
-@CONFIG_MOXIE_TRUE@am__objects_20 = moxie/crt0.$(OBJEXT)
-@CONFIG_MSP430_TRUE@am__objects_21 = msp430/gcrt0.$(OBJEXT) \
+@CONFIG_MOXIE_TRUE@am__objects_21 = moxie/crt0.$(OBJEXT)
+@CONFIG_MSP430_TRUE@am__objects_22 = msp430/gcrt0.$(OBJEXT) \
 @CONFIG_MSP430_TRUE@	msp430/crt0.$(OBJEXT)
-@CONFIG_NDS32_TRUE@am__objects_22 = nds32/crt0.$(OBJEXT) \
+@CONFIG_NDS32_TRUE@am__objects_23 = nds32/crt0.$(OBJEXT) \
 @CONFIG_NDS32_TRUE@	nds32/crt1.$(OBJEXT)
-@CONFIG_OR1K_TRUE@am__objects_23 = or1k/crt0.$(OBJEXT)
-@CONFIG_PRU_TRUE@am__objects_24 = pru/crt0.$(OBJEXT) \
+@CONFIG_OR1K_TRUE@am__objects_24 = or1k/crt0.$(OBJEXT)
+@CONFIG_PRU_TRUE@am__objects_25 = pru/crt0.$(OBJEXT) \
 @CONFIG_PRU_TRUE@	pru/crt0-minrt.$(OBJEXT)
-@CONFIG_RL78_TRUE@am__objects_25 = rl78/gcrt0.$(OBJEXT) \
+@CONFIG_RL78_TRUE@am__objects_26 = rl78/gcrt0.$(OBJEXT) \
 @CONFIG_RL78_TRUE@	rl78/crt0.$(OBJEXT) rl78/crtn.$(OBJEXT)
-@CONFIG_RX_TRUE@am__objects_26 = rx/gcrt0.$(OBJEXT) rx/crt0.$(OBJEXT) \
+@CONFIG_RX_TRUE@am__objects_27 = rx/gcrt0.$(OBJEXT) rx/crt0.$(OBJEXT) \
 @CONFIG_RX_TRUE@	rx/crtn.$(OBJEXT)
-@CONFIG_SPARC_TRUE@am__objects_27 = sparc/crt0.$(OBJEXT) \
+@CONFIG_SPARC_TRUE@am__objects_28 = sparc/crt0.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@	sparc/erc32-crt0.$(OBJEXT)
-@CONFIG_SPARC_TRUE@@SPARC_BUILD_CYGMON_TRUE@am__objects_28 = sparc/cygmon-crt0.$(OBJEXT)
-@CONFIG_SPARC_TRUE@@SPARC_BUILD_SPLET_TRUE@am__objects_29 = sparc/crt0-701.$(OBJEXT)
-@CONFIG_SPARC_LEON_TRUE@am__objects_30 = sparc_leon/crt0.$(OBJEXT) \
+@CONFIG_SPARC_TRUE@@SPARC_BUILD_CYGMON_TRUE@am__objects_29 = sparc/cygmon-crt0.$(OBJEXT)
+@CONFIG_SPARC_TRUE@@SPARC_BUILD_SPLET_TRUE@am__objects_30 = sparc/crt0-701.$(OBJEXT)
+@CONFIG_SPARC_LEON_TRUE@am__objects_31 = sparc_leon/crt0.$(OBJEXT) \
 @CONFIG_SPARC_LEON_TRUE@	sparc_leon/pnpinit.$(OBJEXT) \
 @CONFIG_SPARC_LEON_TRUE@	sparc_leon/pnpinit_simple.$(OBJEXT) \
 @CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_svt.$(OBJEXT) \
 @CONFIG_SPARC_LEON_TRUE@	sparc_leon/locore_mvt.$(OBJEXT)
-@CONFIG_TIC6X_TRUE@am__objects_31 = tic6x/crt0.$(OBJEXT)
-@CONFIG_V850_TRUE@am__objects_32 = v850/crt0.$(OBJEXT)
-@CONFIG_VISIUM_TRUE@am__objects_33 = visium/crt0.$(OBJEXT)
-@CONFIG_XSTORMY16_TRUE@am__objects_34 = xstormy16/crt0.$(OBJEXT) \
+@CONFIG_TIC6X_TRUE@am__objects_32 = tic6x/crt0.$(OBJEXT)
+@CONFIG_V850_TRUE@am__objects_33 = v850/crt0.$(OBJEXT)
+@CONFIG_VISIUM_TRUE@am__objects_34 = visium/crt0.$(OBJEXT)
+@CONFIG_XSTORMY16_TRUE@am__objects_35 = xstormy16/crt0.$(OBJEXT) \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/crti.$(OBJEXT) \
 @CONFIG_XSTORMY16_TRUE@	xstormy16/crtn.$(OBJEXT)
-@CONFIG_XTENSA_TRUE@am__objects_35 = xtensa/crt0.$(OBJEXT) \
+@CONFIG_XTENSA_TRUE@am__objects_36 = xtensa/crt0.$(OBJEXT) \
 @CONFIG_XTENSA_TRUE@	xtensa/crt1-sim.$(OBJEXT) \
 @CONFIG_XTENSA_TRUE@	xtensa/crt1-boards.$(OBJEXT)
 am_libobjs_a_OBJECTS = $(am__objects_3) $(am__objects_4) \
@@ -956,7 +1004,7 @@ am_libobjs_a_OBJECTS = $(am__objects_3) $(am__objects_4) \
 	$(am__objects_26) $(am__objects_27) $(am__objects_28) \
 	$(am__objects_29) $(am__objects_30) $(am__objects_31) \
 	$(am__objects_32) $(am__objects_33) $(am__objects_34) \
-	$(am__objects_35)
+	$(am__objects_35) $(am__objects_36)
 libobjs_a_OBJECTS = $(am_libobjs_a_OBJECTS)
 lm32_libgloss_a_AR = $(AR) $(ARFLAGS)
 lm32_libgloss_a_LIBADD =
@@ -965,7 +1013,7 @@ lm32_libgloss_a_LIBADD =
 lm32_libgloss_a_OBJECTS = $(am_lm32_libgloss_a_OBJECTS)
 m32r_libgloss_a_AR = $(AR) $(ARFLAGS)
 m32r_libgloss_a_LIBADD =
-@CONFIG_M32R_TRUE@am__objects_36 = m32r/chmod.$(OBJEXT) \
+@CONFIG_M32R_TRUE@am__objects_37 = m32r/chmod.$(OBJEXT) \
 @CONFIG_M32R_TRUE@	m32r/close.$(OBJEXT) m32r/exit.$(OBJEXT) \
 @CONFIG_M32R_TRUE@	m32r/fstat.$(OBJEXT) m32r/getpid.$(OBJEXT) \
 @CONFIG_M32R_TRUE@	m32r/isatty.$(OBJEXT) m32r/kill.$(OBJEXT) \
@@ -975,16 +1023,16 @@ m32r_libgloss_a_LIBADD =
 @CONFIG_M32R_TRUE@	m32r/unlink.$(OBJEXT) m32r/utime.$(OBJEXT) \
 @CONFIG_M32R_TRUE@	m32r/write.$(OBJEXT)
 @CONFIG_M32R_TRUE@am_m32r_libgloss_a_OBJECTS = m32r/trap0.$(OBJEXT) \
-@CONFIG_M32R_TRUE@	$(am__objects_36)
+@CONFIG_M32R_TRUE@	$(am__objects_37)
 m32r_libgloss_a_OBJECTS = $(am_m32r_libgloss_a_OBJECTS)
 m32r_libmon_a_AR = $(AR) $(ARFLAGS)
 m32r_libmon_a_LIBADD =
 @CONFIG_M32R_TRUE@am_m32r_libmon_a_OBJECTS = m32r/trapmon0.$(OBJEXT) \
-@CONFIG_M32R_TRUE@	$(am__objects_36)
+@CONFIG_M32R_TRUE@	$(am__objects_37)
 m32r_libmon_a_OBJECTS = $(am_m32r_libmon_a_OBJECTS)
 mcore_libcmb_a_AR = $(AR) $(ARFLAGS)
 mcore_libcmb_a_LIBADD =
-@CONFIG_MCORE_TRUE@am__objects_37 = mcore/fstat.$(OBJEXT) \
+@CONFIG_MCORE_TRUE@am__objects_38 = mcore/fstat.$(OBJEXT) \
 @CONFIG_MCORE_TRUE@	mcore/getpid.$(OBJEXT) isatty.$(OBJEXT) \
 @CONFIG_MCORE_TRUE@	mcore/kill.$(OBJEXT) mcore/raise.$(OBJEXT) \
 @CONFIG_MCORE_TRUE@	mcore/putnum.$(OBJEXT) mcore/stat.$(OBJEXT) \
@@ -996,12 +1044,12 @@ mcore_libcmb_a_LIBADD =
 @CONFIG_MCORE_TRUE@	mcore/cmb-exit.$(OBJEXT) \
 @CONFIG_MCORE_TRUE@	mcore/cmb-inbyte.$(OBJEXT) \
 @CONFIG_MCORE_TRUE@	mcore/cmb-outbyte.$(OBJEXT) \
-@CONFIG_MCORE_TRUE@	$(am__objects_37)
+@CONFIG_MCORE_TRUE@	$(am__objects_38)
 mcore_libcmb_a_OBJECTS = $(am_mcore_libcmb_a_OBJECTS)
 mcore_libsim_a_AR = $(AR) $(ARFLAGS)
 mcore_libsim_a_LIBADD =
 @CONFIG_MCORE_TRUE@am_mcore_libsim_a_OBJECTS =  \
-@CONFIG_MCORE_TRUE@	mcore/syscalls.$(OBJEXT) $(am__objects_37)
+@CONFIG_MCORE_TRUE@	mcore/syscalls.$(OBJEXT) $(am__objects_38)
 mcore_libsim_a_OBJECTS = $(am_mcore_libsim_a_OBJECTS)
 microblaze_libgloss_linux_a_AR = $(AR) $(ARFLAGS)
 microblaze_libgloss_linux_a_LIBADD =
@@ -1058,7 +1106,7 @@ mn10200_libeval_a_LIBADD =
 mn10200_libeval_a_OBJECTS = $(am_mn10200_libeval_a_OBJECTS)
 mn10300_libcygmon_a_AR = $(AR) $(ARFLAGS)
 mn10300_libcygmon_a_LIBADD =
-@CONFIG_MN10300_TRUE@am__objects_38 = mn10300/_exit.$(OBJEXT) \
+@CONFIG_MN10300_TRUE@am__objects_39 = mn10300/_exit.$(OBJEXT) \
 @CONFIG_MN10300_TRUE@	mn10300/access.$(OBJEXT) \
 @CONFIG_MN10300_TRUE@	mn10300/chmod.$(OBJEXT) \
 @CONFIG_MN10300_TRUE@	mn10300/close.$(OBJEXT) \
@@ -1077,12 +1125,12 @@ mn10300_libcygmon_a_LIBADD =
 @CONFIG_MN10300_TRUE@	mn10300/unlink.$(OBJEXT) \
 @CONFIG_MN10300_TRUE@	mn10300/utime.$(OBJEXT) \
 @CONFIG_MN10300_TRUE@	mn10300/write.$(OBJEXT)
-@CONFIG_MN10300_TRUE@@MN10300_BUILD_LIBCYGMON_TRUE@am_mn10300_libcygmon_a_OBJECTS = $(am__objects_38) \
+@CONFIG_MN10300_TRUE@@MN10300_BUILD_LIBCYGMON_TRUE@am_mn10300_libcygmon_a_OBJECTS = $(am__objects_39) \
 @CONFIG_MN10300_TRUE@@MN10300_BUILD_LIBCYGMON_TRUE@	mn10300/cygmon.$(OBJEXT)
 mn10300_libcygmon_a_OBJECTS = $(am_mn10300_libcygmon_a_OBJECTS)
 mn10300_libeval_a_AR = $(AR) $(ARFLAGS)
 mn10300_libeval_a_LIBADD =
-@CONFIG_MN10300_TRUE@am_mn10300_libeval_a_OBJECTS = $(am__objects_38) \
+@CONFIG_MN10300_TRUE@am_mn10300_libeval_a_OBJECTS = $(am__objects_39) \
 @CONFIG_MN10300_TRUE@	mn10300/trap.$(OBJEXT)
 mn10300_libeval_a_OBJECTS = $(am_mn10300_libeval_a_OBJECTS)
 moxie_libqemu_a_AR = $(AR) $(ARFLAGS)
@@ -1342,7 +1390,7 @@ riscv_libsemihost_a_LIBADD =
 riscv_libsemihost_a_OBJECTS = $(am_riscv_libsemihost_a_OBJECTS)
 riscv_libsim_a_AR = $(AR) $(ARFLAGS)
 riscv_libsim_a_LIBADD =
-@CONFIG_RISCV_TRUE@am__objects_39 =  \
+@CONFIG_RISCV_TRUE@am__objects_40 =  \
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_access.$(OBJEXT) \
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_chdir.$(OBJEXT) \
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_chmod.$(OBJEXT) \
@@ -1375,7 +1423,7 @@ riscv_libsim_a_LIBADD =
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_utime.$(OBJEXT) \
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_wait.$(OBJEXT) \
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsim_a-sys_write.$(OBJEXT)
-@CONFIG_RISCV_TRUE@am_riscv_libsim_a_OBJECTS = $(am__objects_39)
+@CONFIG_RISCV_TRUE@am_riscv_libsim_a_OBJECTS = $(am__objects_40)
 riscv_libsim_a_OBJECTS = $(am_riscv_libsim_a_OBJECTS)
 rl78_libsim_a_AR = $(AR) $(ARFLAGS)
 rl78_libsim_a_LIBADD =
@@ -1417,14 +1465,14 @@ sparc_libcygmon_a_LIBADD =
 sparc_libcygmon_a_OBJECTS = $(am_sparc_libcygmon_a_OBJECTS)
 sparc_liberc32_a_AR = $(AR) $(ARFLAGS)
 sparc_liberc32_a_LIBADD =
-@CONFIG_SPARC_TRUE@am__objects_40 = close.$(OBJEXT) fstat.$(OBJEXT) \
+@CONFIG_SPARC_TRUE@am__objects_41 = close.$(OBJEXT) fstat.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@	getpid.$(OBJEXT) isatty.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@	kill.$(OBJEXT) lseek.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@	open.$(OBJEXT) print.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@	putnum.$(OBJEXT) read.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@	sbrk.$(OBJEXT) stat.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@	unlink.$(OBJEXT) write.$(OBJEXT)
-@CONFIG_SPARC_TRUE@am_sparc_liberc32_a_OBJECTS = $(am__objects_40) \
+@CONFIG_SPARC_TRUE@am_sparc_liberc32_a_OBJECTS = $(am__objects_41) \
 @CONFIG_SPARC_TRUE@	sparc/erc32-io.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@	sparc/traps.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@	sparc/erc32-stub.$(OBJEXT) debug.$(OBJEXT) \
@@ -1432,18 +1480,18 @@ sparc_liberc32_a_LIBADD =
 sparc_liberc32_a_OBJECTS = $(am_sparc_liberc32_a_OBJECTS)
 sparc_libslite86x_a_AR = $(AR) $(ARFLAGS)
 sparc_libslite86x_a_LIBADD =
-@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@am__objects_41 =  \
-@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	$(am__objects_40) \
+@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@am__objects_42 =  \
+@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	$(am__objects_41) \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	sparc/salib.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	sparc/sparcl-stub.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	sparc/cache.$(OBJEXT)
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@am_sparc_libslite86x_a_OBJECTS =  \
-@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	$(am__objects_41)
+@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	$(am__objects_42)
 sparc_libslite86x_a_OBJECTS = $(am_sparc_libslite86x_a_OBJECTS)
 sparc_libslite930_a_AR = $(AR) $(ARFLAGS)
 sparc_libslite930_a_LIBADD =
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@am_sparc_libslite930_a_OBJECTS =  \
-@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	$(am__objects_40) \
+@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	$(am__objects_41) \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	sparc/salib.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	sparc/sparcl-stub.$(OBJEXT) \
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	sparc/cache.$(OBJEXT)
@@ -1451,12 +1499,12 @@ sparc_libslite930_a_OBJECTS = $(am_sparc_libslite930_a_OBJECTS)
 sparc_libslite931_a_AR = $(AR) $(ARFLAGS)
 sparc_libslite931_a_LIBADD =
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@am_sparc_libslite931_a_OBJECTS =  \
-@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	$(am__objects_41)
+@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	$(am__objects_42)
 sparc_libslite931_a_OBJECTS = $(am_sparc_libslite931_a_OBJECTS)
 sparc_libslite934_a_AR = $(AR) $(ARFLAGS)
 sparc_libslite934_a_LIBADD =
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@am_sparc_libslite934_a_OBJECTS =  \
-@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	$(am__objects_41)
+@CONFIG_SPARC_TRUE@@SPARC_BUILD_SLITE_TRUE@	$(am__objects_42)
 sparc_libslite934_a_OBJECTS = $(am_sparc_libslite934_a_OBJECTS)
 sparc_libsplet701_a_AR = $(AR) $(ARFLAGS)
 sparc_libsplet701_a_LIBADD =
@@ -1573,11 +1621,11 @@ v850_libsim_a_LIBADD =
 v850_libsim_a_OBJECTS = $(am_v850_libsim_a_OBJECTS)
 visium_libdebug_a_AR = $(AR) $(ARFLAGS)
 visium_libdebug_a_LIBADD =
-@CONFIG_VISIUM_TRUE@am__objects_42 = getpid.$(OBJEXT) kill.$(OBJEXT) \
+@CONFIG_VISIUM_TRUE@am__objects_43 = getpid.$(OBJEXT) kill.$(OBJEXT) \
 @CONFIG_VISIUM_TRUE@	visium/io-gdb.$(OBJEXT) \
 @CONFIG_VISIUM_TRUE@	visium/io-stubs.$(OBJEXT) \
 @CONFIG_VISIUM_TRUE@	visium/sbrk.$(OBJEXT)
-@CONFIG_VISIUM_TRUE@am_visium_libdebug_a_OBJECTS = $(am__objects_42) \
+@CONFIG_VISIUM_TRUE@am_visium_libdebug_a_OBJECTS = $(am__objects_43) \
 @CONFIG_VISIUM_TRUE@	visium/syscalls.$(OBJEXT)
 visium_libdebug_a_OBJECTS = $(am_visium_libdebug_a_OBJECTS)
 visium_libserial_a_AR = $(AR) $(ARFLAGS)
@@ -1597,7 +1645,7 @@ visium_libserial_a_LIBADD =
 visium_libserial_a_OBJECTS = $(am_visium_libserial_a_OBJECTS)
 visium_libsim_a_AR = $(AR) $(ARFLAGS)
 visium_libsim_a_LIBADD =
-@CONFIG_VISIUM_TRUE@am_visium_libsim_a_OBJECTS = $(am__objects_42) \
+@CONFIG_VISIUM_TRUE@am_visium_libsim_a_OBJECTS = $(am__objects_43) \
 @CONFIG_VISIUM_TRUE@	visium/sim-syscalls.$(OBJEXT)
 visium_libsim_a_OBJECTS = $(am_visium_libsim_a_OBJECTS)
 xstormy16_libeva_app_a_AR = $(AR) $(ARFLAGS)
@@ -1623,13 +1671,13 @@ xstormy16_libsim_a_LIBADD =
 xstormy16_libsim_a_OBJECTS = $(am_xstormy16_libsim_a_OBJECTS)
 xtensa_libgloss_a_AR = $(AR) $(ARFLAGS)
 xtensa_libgloss_a_LIBADD =
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__objects_43 = xtensa/boards/esp32/xtensa_libgloss_a-board.$(OBJEXT)
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__objects_44 = xtensa/boards/esp32s3/xtensa_libgloss_a-board.$(OBJEXT)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__objects_44 = xtensa/boards/esp32/xtensa_libgloss_a-board.$(OBJEXT)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__objects_45 = xtensa/boards/esp32s3/xtensa_libgloss_a-board.$(OBJEXT)
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am_xtensa_libgloss_a_OBJECTS = xtensa/xtensa_libgloss_a-sleep.$(OBJEXT) \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/xtensa_libgloss_a-syscalls.$(OBJEXT) \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/xtensa_libgloss_a-window-vectors.$(OBJEXT) \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__objects_43) \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__objects_44)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__objects_44) \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__objects_45)
 xtensa_libgloss_a_OBJECTS = $(am_xtensa_libgloss_a_OBJECTS)
 xtensa_libsys_openocd_a_AR = $(AR) $(ARFLAGS)
 xtensa_libsys_openocd_a_LIBADD =
@@ -1739,7 +1787,8 @@ SOURCES = $(aarch64_librdimon_a_SOURCES) \
 	$(arc_libemsdp_uart_a_SOURCES) $(arc_libemsk_uart_a_SOURCES) \
 	$(arc_libhl_a_SOURCES) $(arc_libhsdk_uart_a_SOURCES) \
 	$(arc_libiotdk_uart_a_SOURCES) $(arc_libnsim_a_SOURCES) \
-	$(arc_libuart_8250_a_SOURCES) $(arm_libgloss_linux_a_SOURCES) \
+	$(arc_libuart_8250_a_SOURCES) $(arc64_libhl_a_SOURCES) \
+	$(arc64_libnsim_a_SOURCES) $(arm_libgloss_linux_a_SOURCES) \
 	$(arm_librdimon_v2m_a_SOURCES) $(arm_librdimon_a_SOURCES) \
 	$(arm_librdpmon_a_SOURCES) $(bfin_libbfinbsp_a_SOURCES) \
 	$(bfin_libsim_a_SOURCES) $(cr16_libh_a_SOURCES) \
@@ -1874,7 +1923,7 @@ ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
 DIST_SUBDIRS = $(SUBDIRS)
-VPATH = @srcdir@ $(am__append_130)
+VPATH = @srcdir@ $(am__append_133)
 AARCH64_OBJTYPE = @AARCH64_OBJTYPE@
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
@@ -2000,49 +2049,49 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I . -I .. -I ../config
 info_TEXINFOS = $(am__append_1)
-CLEANFILES = $(am__append_4) $(am__append_11) $(am__append_136)
+CLEANFILES = $(am__append_4) $(am__append_14) $(am__append_139)
 PHONY = 
 SUBDIRS = @subdirs@ .
 srcroot = $(top_srcdir)/..
 tooldir = $(exec_prefix)/$(target_alias)
 multilibtooldir = $(tooldir)/lib$(MULTISUBDIR)
-multilibtool_DATA = $(am__append_3) $(am__append_6) $(am__append_8) \
-	$(am__append_9) $(am__append_14) $(am__append_16) \
-	$(am__append_19) $(am__append_22) $(am__append_26) \
-	$(am__append_27) $(am__append_30) $(am__append_33) \
-	$(am__append_36) $(am__append_37) $(am__append_40) \
-	$(am__append_43) $(am__append_46) $(am__append_50) \
-	$(am__append_52) $(am__append_55) $(am__append_56) \
-	$(am__append_59) $(am__append_60) $(am__append_61) \
-	$(am__append_64) $(am__append_65) $(am__append_68) \
-	$(am__append_72) $(am__append_73) $(am__append_74) \
-	$(am__append_79) $(am__append_80) $(am__append_83) \
-	$(am__append_86) $(am__append_89) $(am__append_91) \
-	$(am__append_95) $(am__append_98) $(am__append_100) \
+multilibtool_DATA = $(am__append_3) $(am__append_6) $(am__append_9) \
+	$(am__append_11) $(am__append_12) $(am__append_17) \
+	$(am__append_19) $(am__append_22) $(am__append_25) \
+	$(am__append_29) $(am__append_30) $(am__append_33) \
+	$(am__append_36) $(am__append_39) $(am__append_40) \
+	$(am__append_43) $(am__append_46) $(am__append_49) \
+	$(am__append_53) $(am__append_55) $(am__append_58) \
+	$(am__append_59) $(am__append_62) $(am__append_63) \
+	$(am__append_64) $(am__append_67) $(am__append_68) \
+	$(am__append_71) $(am__append_75) $(am__append_76) \
+	$(am__append_77) $(am__append_82) $(am__append_83) \
+	$(am__append_86) $(am__append_89) $(am__append_92) \
+	$(am__append_94) $(am__append_98) $(am__append_101) \
 	$(am__append_103) $(am__append_106) $(am__append_109) \
-	$(am__append_112) $(am__append_114) $(am__append_119) \
-	$(am__append_121) $(am__append_124) $(am__append_127) \
-	$(am__append_132) $(am__append_137) $(am__append_140) \
-	$(am__append_142) $(am__append_147)
+	$(am__append_112) $(am__append_115) $(am__append_117) \
+	$(am__append_122) $(am__append_124) $(am__append_127) \
+	$(am__append_130) $(am__append_135) $(am__append_140) \
+	$(am__append_143) $(am__append_145) $(am__append_150)
 multilibtool_LIBRARIES = $(am__append_2) $(am__append_5) \
-	$(am__append_10) $(am__append_12) $(am__append_21) \
-	$(am__append_24) $(am__append_25) $(am__append_29) \
-	$(am__append_32) $(am__append_35) $(am__append_39) \
-	$(am__append_42) $(am__append_45) $(am__append_47) \
-	$(am__append_51) $(am__append_53) $(am__append_58) \
-	$(am__append_63) $(am__append_67) $(am__append_70) \
-	$(am__append_76) $(am__append_77) $(am__append_82) \
-	$(am__append_85) $(am__append_88) $(am__append_90) \
-	$(am__append_94) $(am__append_97) $(am__append_99) \
+	$(am__append_8) $(am__append_13) $(am__append_15) \
+	$(am__append_24) $(am__append_27) $(am__append_28) \
+	$(am__append_32) $(am__append_35) $(am__append_38) \
+	$(am__append_42) $(am__append_45) $(am__append_48) \
+	$(am__append_50) $(am__append_54) $(am__append_56) \
+	$(am__append_61) $(am__append_66) $(am__append_70) \
+	$(am__append_73) $(am__append_79) $(am__append_80) \
+	$(am__append_85) $(am__append_88) $(am__append_91) \
+	$(am__append_93) $(am__append_97) $(am__append_100) \
 	$(am__append_102) $(am__append_105) $(am__append_108) \
-	$(am__append_111) $(am__append_113) $(am__append_116) \
-	$(am__append_118) $(am__append_123) $(am__append_126) \
-	$(am__append_129) $(am__append_134) $(am__append_139) \
-	$(am__append_141)
+	$(am__append_111) $(am__append_114) $(am__append_116) \
+	$(am__append_119) $(am__append_121) $(am__append_126) \
+	$(am__append_129) $(am__append_132) $(am__append_137) \
+	$(am__append_142) $(am__append_144)
 includetooldir = $(tooldir)/include
-includetool_DATA = $(am__append_17) $(am__append_93)
+includetool_DATA = $(am__append_20) $(am__append_96)
 includesystooldir = $(tooldir)/include/sys
-includesystool_DATA = $(am__append_18)
+includesystool_DATA = $(am__append_21)
 
 # These are useful for standalone object files like crt0.o.
 AM_CFLAGS = $(AM_CFLAGS_$(subst /,_,$(@D))) $(AM_CFLAGS_$(subst /,_,$(@D)_$(<F)))
@@ -2054,17 +2103,18 @@ AM_LDFLAGS = $(AM_LDFLAGS_$(subst /,_,$(@D))) $(AM_LDFLAGS_$(subst -,_,$(subst /
 # A fake library so automake will generate rules for plain objects that we want
 # to install (e.g. our crt0.o objects).
 noinst_LIBRARIES = libobjs.a
-libobjs_a_SOURCES = $(am__append_7) $(am__append_15) $(am__append_20) \
-	$(am__append_23) $(am__append_28) $(am__append_31) \
-	$(am__append_34) $(am__append_38) $(am__append_41) \
-	$(am__append_44) $(am__append_48) $(am__append_54) \
-	$(am__append_57) $(am__append_62) $(am__append_66) \
-	$(am__append_69) $(am__append_75) $(am__append_81) \
-	$(am__append_84) $(am__append_87) $(am__append_92) \
-	$(am__append_96) $(am__append_101) $(am__append_104) \
-	$(am__append_107) $(am__append_110) $(am__append_115) \
-	$(am__append_120) $(am__append_122) $(am__append_125) \
-	$(am__append_128) $(am__append_133) $(am__append_138)
+libobjs_a_SOURCES = $(am__append_7) $(am__append_10) $(am__append_18) \
+	$(am__append_23) $(am__append_26) $(am__append_31) \
+	$(am__append_34) $(am__append_37) $(am__append_41) \
+	$(am__append_44) $(am__append_47) $(am__append_51) \
+	$(am__append_57) $(am__append_60) $(am__append_65) \
+	$(am__append_69) $(am__append_72) $(am__append_78) \
+	$(am__append_84) $(am__append_87) $(am__append_90) \
+	$(am__append_95) $(am__append_99) $(am__append_104) \
+	$(am__append_107) $(am__append_110) $(am__append_113) \
+	$(am__append_118) $(am__append_123) $(am__append_125) \
+	$(am__append_128) $(am__append_131) $(am__append_136) \
+	$(am__append_141)
 FLAGS_TO_PASS = \
 	"CC=$(CC)" \
 	"CFLAGS=$(CFLAGS)" \
@@ -2165,6 +2215,35 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 @CONFIG_ARC_TRUE@arc_libemsk_uart_a_SOURCES = arc/emsk-uart-setup.c
 @CONFIG_ARC_TRUE@arc_libemsdp_uart_a_CPPFLAGS = -I$(srcdir)/arc
 @CONFIG_ARC_TRUE@arc_libemsdp_uart_a_SOURCES = arc/emsdp-uart-setup.c
+@CONFIG_ARC64_TRUE@arc64_libnsim_a_CPPFLAGS = -I$(srcdir)/arc
+@CONFIG_ARC64_TRUE@arc64_libnsim_a_SOURCES = \
+@CONFIG_ARC64_TRUE@	arc/libcfunc.c \
+@CONFIG_ARC64_TRUE@	arc/nsim-syscalls.c \
+@CONFIG_ARC64_TRUE@	arc/sbrk.c
+
+@CONFIG_ARC64_TRUE@arc64_libhl_a_CFLAGS = -mvolatile-di
+@CONFIG_ARC64_TRUE@arc64_libhl_a_CPPFLAGS = -I$(srcdir)/arc
+@CONFIG_ARC64_TRUE@arc64_libhl_a_SOURCES = \
+@CONFIG_ARC64_TRUE@	arc/arc-timer.c \
+@CONFIG_ARC64_TRUE@	arc/hl-stub.c \
+@CONFIG_ARC64_TRUE@	arc/hl-setup.c \
+@CONFIG_ARC64_TRUE@	arc/libcfunc.c \
+@CONFIG_ARC64_TRUE@	arc/sbrk.c \
+@CONFIG_ARC64_TRUE@	arc/hl/hl_gw.c \
+@CONFIG_ARC64_TRUE@	arc/hl/hl_api.c \
+@CONFIG_ARC64_TRUE@	arc/hl/hl_open.c \
+@CONFIG_ARC64_TRUE@	arc/hl/hl_close.c \
+@CONFIG_ARC64_TRUE@	arc/hl/hl_read.c \
+@CONFIG_ARC64_TRUE@	arc/hl/hl_write.c \
+@CONFIG_ARC64_TRUE@	arc/hl/hl_lseek.c \
+@CONFIG_ARC64_TRUE@	arc/hl/hl_unlink.c \
+@CONFIG_ARC64_TRUE@	arc/hl/hl_isatty.c \
+@CONFIG_ARC64_TRUE@	arc/hl/hl_clock.c \
+@CONFIG_ARC64_TRUE@	arc/hl/hl_gettimeofday.c \
+@CONFIG_ARC64_TRUE@	arc/hl/hl_argc.c \
+@CONFIG_ARC64_TRUE@	arc/hl/hl_argv.c \
+@CONFIG_ARC64_TRUE@	arc/hl/hl_exit.c
+
 @CONFIG_ARM_TRUE@arm_SPECS = arm/nano.specs arm/linux.specs \
 @CONFIG_ARM_TRUE@	arm/redboot.ld arm/redboot.specs \
 @CONFIG_ARM_TRUE@	arm/rdpmon.specs arm/rdimon.specs \
@@ -3054,15 +3133,15 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libgloss_a_SOURCES = xtensa/sleep.S \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/syscalls.c \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/window-vectors.S \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_143) \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_148)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_146) \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_151)
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libgloss_a_CPPFLAGS = $(AM_CPPFLAGS) \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_144) \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_149)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_147) \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_152)
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libsys_qemu_a_CPPFLAGS = $(AM_CPPFLAGS) \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	-DQEMU_SEMIHOSTING \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_145) \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_150)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_148) \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_153)
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libsys_qemu_a_SOURCES = \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/sim-vectors.S \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/sim-call.S \
@@ -3070,8 +3149,8 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libsys_openocd_a_CPPFLAGS = $(AM_CPPFLAGS) \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	-DOPENOCD_SEMIHOSTING \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_146) \
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_151)
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_149) \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_154)
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libsys_openocd_a_SOURCES = \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/syscalls.c
 
@@ -3082,7 +3161,7 @@ all: config.h
 .SUFFIXES: .S .c .dvi .o .obj .ps .s
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arc/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/cr16/Makefile.inc $(srcdir)/csky/Makefile.inc $(srcdir)/d30v/Makefile.inc $(srcdir)/epiphany/Makefile.inc $(srcdir)/fr30/Makefile.inc $(srcdir)/frv/Makefile.inc $(srcdir)/ft32/Makefile.inc $(srcdir)/i386/Makefile.inc $(srcdir)/i960/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/m32r/Makefile.inc $(srcdir)/mcore/Makefile.inc $(srcdir)/microblaze/Makefile.inc $(srcdir)/mn10200/Makefile.inc $(srcdir)/mn10300/Makefile.inc $(srcdir)/moxie/Makefile.inc $(srcdir)/msp430/Makefile.inc $(srcdir)/nds32/Makefile.inc $(srcdir)/nios2/Makefile.inc $(srcdir)/or1k/Makefile.inc $(srcdir)/pru/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/rl78/Makefile.inc $(srcdir)/rx/Makefile.inc $(srcdir)/sparc/Makefile.inc $(srcdir)/sparc_leon/Makefile.inc $(srcdir)/tic6x/Makefile.inc $(srcdir)/v850/Makefile.inc $(srcdir)/visium/Makefile.inc $(srcdir)/wince/Makefile.inc $(srcdir)/xstormy16/Makefile.inc $(srcdir)/xtensa/Makefile.inc $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arc/Makefile.inc $(srcdir)/arc64/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/cr16/Makefile.inc $(srcdir)/csky/Makefile.inc $(srcdir)/d30v/Makefile.inc $(srcdir)/epiphany/Makefile.inc $(srcdir)/fr30/Makefile.inc $(srcdir)/frv/Makefile.inc $(srcdir)/ft32/Makefile.inc $(srcdir)/i386/Makefile.inc $(srcdir)/i960/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/m32r/Makefile.inc $(srcdir)/mcore/Makefile.inc $(srcdir)/microblaze/Makefile.inc $(srcdir)/mn10200/Makefile.inc $(srcdir)/mn10300/Makefile.inc $(srcdir)/moxie/Makefile.inc $(srcdir)/msp430/Makefile.inc $(srcdir)/nds32/Makefile.inc $(srcdir)/nios2/Makefile.inc $(srcdir)/or1k/Makefile.inc $(srcdir)/pru/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/rl78/Makefile.inc $(srcdir)/rx/Makefile.inc $(srcdir)/sparc/Makefile.inc $(srcdir)/sparc_leon/Makefile.inc $(srcdir)/tic6x/Makefile.inc $(srcdir)/v850/Makefile.inc $(srcdir)/visium/Makefile.inc $(srcdir)/wince/Makefile.inc $(srcdir)/xstormy16/Makefile.inc $(srcdir)/xtensa/Makefile.inc $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -3104,7 +3183,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe);; \
 	esac;
-$(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arc/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/cr16/Makefile.inc $(srcdir)/csky/Makefile.inc $(srcdir)/d30v/Makefile.inc $(srcdir)/epiphany/Makefile.inc $(srcdir)/fr30/Makefile.inc $(srcdir)/frv/Makefile.inc $(srcdir)/ft32/Makefile.inc $(srcdir)/i386/Makefile.inc $(srcdir)/i960/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/m32r/Makefile.inc $(srcdir)/mcore/Makefile.inc $(srcdir)/microblaze/Makefile.inc $(srcdir)/mn10200/Makefile.inc $(srcdir)/mn10300/Makefile.inc $(srcdir)/moxie/Makefile.inc $(srcdir)/msp430/Makefile.inc $(srcdir)/nds32/Makefile.inc $(srcdir)/nios2/Makefile.inc $(srcdir)/or1k/Makefile.inc $(srcdir)/pru/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/rl78/Makefile.inc $(srcdir)/rx/Makefile.inc $(srcdir)/sparc/Makefile.inc $(srcdir)/sparc_leon/Makefile.inc $(srcdir)/tic6x/Makefile.inc $(srcdir)/v850/Makefile.inc $(srcdir)/visium/Makefile.inc $(srcdir)/wince/Makefile.inc $(srcdir)/xstormy16/Makefile.inc $(srcdir)/xtensa/Makefile.inc $(am__empty):
+$(top_srcdir)/../multilib.am $(srcdir)/doc/Makefile.inc $(srcdir)/aarch64/Makefile.inc $(srcdir)/aarch64/cpu-init/Makefile.inc $(srcdir)/arc/Makefile.inc $(srcdir)/arc64/Makefile.inc $(srcdir)/arm/Makefile.inc $(srcdir)/arm/cpu-init/Makefile.inc $(srcdir)/bfin/Makefile.inc $(srcdir)/cr16/Makefile.inc $(srcdir)/csky/Makefile.inc $(srcdir)/d30v/Makefile.inc $(srcdir)/epiphany/Makefile.inc $(srcdir)/fr30/Makefile.inc $(srcdir)/frv/Makefile.inc $(srcdir)/ft32/Makefile.inc $(srcdir)/i386/Makefile.inc $(srcdir)/i960/Makefile.inc $(srcdir)/iq2000/Makefile.inc $(srcdir)/libnosys/Makefile.inc $(srcdir)/lm32/Makefile.inc $(srcdir)/m32r/Makefile.inc $(srcdir)/mcore/Makefile.inc $(srcdir)/microblaze/Makefile.inc $(srcdir)/mn10200/Makefile.inc $(srcdir)/mn10300/Makefile.inc $(srcdir)/moxie/Makefile.inc $(srcdir)/msp430/Makefile.inc $(srcdir)/nds32/Makefile.inc $(srcdir)/nios2/Makefile.inc $(srcdir)/or1k/Makefile.inc $(srcdir)/pru/Makefile.inc $(srcdir)/riscv/Makefile.inc $(srcdir)/rl78/Makefile.inc $(srcdir)/rx/Makefile.inc $(srcdir)/sparc/Makefile.inc $(srcdir)/sparc_leon/Makefile.inc $(srcdir)/tic6x/Makefile.inc $(srcdir)/v850/Makefile.inc $(srcdir)/visium/Makefile.inc $(srcdir)/wince/Makefile.inc $(srcdir)/xstormy16/Makefile.inc $(srcdir)/xtensa/Makefile.inc $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
@@ -3322,6 +3401,63 @@ arc/libuart_8250.a: $(arc_libuart_8250_a_OBJECTS) $(arc_libuart_8250_a_DEPENDENC
 	$(AM_V_at)-rm -f arc/libuart_8250.a
 	$(AM_V_AR)$(arc_libuart_8250_a_AR) arc/libuart_8250.a $(arc_libuart_8250_a_OBJECTS) $(arc_libuart_8250_a_LIBADD)
 	$(AM_V_at)$(RANLIB) arc/libuart_8250.a
+arc/arc64_libhl_a-arc-timer.$(OBJEXT): arc/$(am__dirstamp) \
+	arc/$(DEPDIR)/$(am__dirstamp)
+arc/arc64_libhl_a-hl-stub.$(OBJEXT): arc/$(am__dirstamp) \
+	arc/$(DEPDIR)/$(am__dirstamp)
+arc/arc64_libhl_a-hl-setup.$(OBJEXT): arc/$(am__dirstamp) \
+	arc/$(DEPDIR)/$(am__dirstamp)
+arc/arc64_libhl_a-libcfunc.$(OBJEXT): arc/$(am__dirstamp) \
+	arc/$(DEPDIR)/$(am__dirstamp)
+arc/arc64_libhl_a-sbrk.$(OBJEXT): arc/$(am__dirstamp) \
+	arc/$(DEPDIR)/$(am__dirstamp)
+arc/hl/arc64_libhl_a-hl_gw.$(OBJEXT): arc/hl/$(am__dirstamp) \
+	arc/hl/$(DEPDIR)/$(am__dirstamp)
+arc/hl/arc64_libhl_a-hl_api.$(OBJEXT): arc/hl/$(am__dirstamp) \
+	arc/hl/$(DEPDIR)/$(am__dirstamp)
+arc/hl/arc64_libhl_a-hl_open.$(OBJEXT): arc/hl/$(am__dirstamp) \
+	arc/hl/$(DEPDIR)/$(am__dirstamp)
+arc/hl/arc64_libhl_a-hl_close.$(OBJEXT): arc/hl/$(am__dirstamp) \
+	arc/hl/$(DEPDIR)/$(am__dirstamp)
+arc/hl/arc64_libhl_a-hl_read.$(OBJEXT): arc/hl/$(am__dirstamp) \
+	arc/hl/$(DEPDIR)/$(am__dirstamp)
+arc/hl/arc64_libhl_a-hl_write.$(OBJEXT): arc/hl/$(am__dirstamp) \
+	arc/hl/$(DEPDIR)/$(am__dirstamp)
+arc/hl/arc64_libhl_a-hl_lseek.$(OBJEXT): arc/hl/$(am__dirstamp) \
+	arc/hl/$(DEPDIR)/$(am__dirstamp)
+arc/hl/arc64_libhl_a-hl_unlink.$(OBJEXT): arc/hl/$(am__dirstamp) \
+	arc/hl/$(DEPDIR)/$(am__dirstamp)
+arc/hl/arc64_libhl_a-hl_isatty.$(OBJEXT): arc/hl/$(am__dirstamp) \
+	arc/hl/$(DEPDIR)/$(am__dirstamp)
+arc/hl/arc64_libhl_a-hl_clock.$(OBJEXT): arc/hl/$(am__dirstamp) \
+	arc/hl/$(DEPDIR)/$(am__dirstamp)
+arc/hl/arc64_libhl_a-hl_gettimeofday.$(OBJEXT):  \
+	arc/hl/$(am__dirstamp) arc/hl/$(DEPDIR)/$(am__dirstamp)
+arc/hl/arc64_libhl_a-hl_argc.$(OBJEXT): arc/hl/$(am__dirstamp) \
+	arc/hl/$(DEPDIR)/$(am__dirstamp)
+arc/hl/arc64_libhl_a-hl_argv.$(OBJEXT): arc/hl/$(am__dirstamp) \
+	arc/hl/$(DEPDIR)/$(am__dirstamp)
+arc/hl/arc64_libhl_a-hl_exit.$(OBJEXT): arc/hl/$(am__dirstamp) \
+	arc/hl/$(DEPDIR)/$(am__dirstamp)
+arc64/$(am__dirstamp):
+	@$(MKDIR_P) arc64
+	@: > arc64/$(am__dirstamp)
+
+arc64/libhl.a: $(arc64_libhl_a_OBJECTS) $(arc64_libhl_a_DEPENDENCIES) $(EXTRA_arc64_libhl_a_DEPENDENCIES) arc64/$(am__dirstamp)
+	$(AM_V_at)-rm -f arc64/libhl.a
+	$(AM_V_AR)$(arc64_libhl_a_AR) arc64/libhl.a $(arc64_libhl_a_OBJECTS) $(arc64_libhl_a_LIBADD)
+	$(AM_V_at)$(RANLIB) arc64/libhl.a
+arc/arc64_libnsim_a-libcfunc.$(OBJEXT): arc/$(am__dirstamp) \
+	arc/$(DEPDIR)/$(am__dirstamp)
+arc/arc64_libnsim_a-nsim-syscalls.$(OBJEXT): arc/$(am__dirstamp) \
+	arc/$(DEPDIR)/$(am__dirstamp)
+arc/arc64_libnsim_a-sbrk.$(OBJEXT): arc/$(am__dirstamp) \
+	arc/$(DEPDIR)/$(am__dirstamp)
+
+arc64/libnsim.a: $(arc64_libnsim_a_OBJECTS) $(arc64_libnsim_a_DEPENDENCIES) $(EXTRA_arc64_libnsim_a_DEPENDENCIES) arc64/$(am__dirstamp)
+	$(AM_V_at)-rm -f arc64/libnsim.a
+	$(AM_V_AR)$(arc64_libnsim_a_AR) arc64/libnsim.a $(arc64_libnsim_a_OBJECTS) $(arc64_libnsim_a_LIBADD)
+	$(AM_V_at)$(RANLIB) arc64/libnsim.a
 arm/$(am__dirstamp):
 	@$(MKDIR_P) arm
 	@: > arm/$(am__dirstamp)
@@ -3843,6 +3979,15 @@ arc/crt0.$(OBJEXT): arc/$(am__dirstamp) arc/$(DEPDIR)/$(am__dirstamp)
 arc/gcrt0.$(OBJEXT): arc/$(am__dirstamp) arc/$(DEPDIR)/$(am__dirstamp)
 arc/arc-main-helper.$(OBJEXT): arc/$(am__dirstamp) \
 	arc/$(DEPDIR)/$(am__dirstamp)
+arc64/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) arc64/$(DEPDIR)
+	@: > arc64/$(DEPDIR)/$(am__dirstamp)
+arc64/crt0.$(OBJEXT): arc64/$(am__dirstamp) \
+	arc64/$(DEPDIR)/$(am__dirstamp)
+arc64/crtn.$(OBJEXT): arc64/$(am__dirstamp) \
+	arc64/$(DEPDIR)/$(am__dirstamp)
+arc64/crti.$(OBJEXT): arc64/$(am__dirstamp) \
+	arc64/$(DEPDIR)/$(am__dirstamp)
 bfin/crt0.$(OBJEXT): bfin/$(am__dirstamp) \
 	bfin/$(DEPDIR)/$(am__dirstamp)
 bfin/basiccrt.$(OBJEXT): bfin/$(am__dirstamp) \
@@ -5464,6 +5609,7 @@ mostlyclean-compile:
 	-rm -f aarch64/*.$(OBJEXT)
 	-rm -f arc/*.$(OBJEXT)
 	-rm -f arc/hl/*.$(OBJEXT)
+	-rm -f arc64/*.$(OBJEXT)
 	-rm -f arm/*.$(OBJEXT)
 	-rm -f bfin/*.$(OBJEXT)
 	-rm -f cr16/*.$(OBJEXT)
@@ -5529,6 +5675,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@aarch64/$(DEPDIR)/aarch64_librdimon_a-syscalls.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@aarch64/$(DEPDIR)/aarch64_librdimon_a-truncate.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc-main-helper.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc64_libhl_a-arc-timer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc64_libhl_a-hl-setup.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc64_libhl_a-hl-stub.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc64_libhl_a-libcfunc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc64_libhl_a-sbrk.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc64_libnsim_a-libcfunc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc64_libnsim_a-nsim-syscalls.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc64_libnsim_a-sbrk.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc_libemsdp_uart_a-emsdp-uart-setup.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc_libemsk_uart_a-emsk-uart-setup.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc_libhl_a-arc-timer.Po@am__quote@
@@ -5549,6 +5703,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/mcount.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/nsim-syscalls.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/sbrk.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/hl/$(DEPDIR)/arc64_libhl_a-hl_api.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/hl/$(DEPDIR)/arc64_libhl_a-hl_argc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/hl/$(DEPDIR)/arc64_libhl_a-hl_argv.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/hl/$(DEPDIR)/arc64_libhl_a-hl_clock.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/hl/$(DEPDIR)/arc64_libhl_a-hl_close.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/hl/$(DEPDIR)/arc64_libhl_a-hl_exit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/hl/$(DEPDIR)/arc64_libhl_a-hl_gettimeofday.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/hl/$(DEPDIR)/arc64_libhl_a-hl_gw.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/hl/$(DEPDIR)/arc64_libhl_a-hl_isatty.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/hl/$(DEPDIR)/arc64_libhl_a-hl_lseek.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/hl/$(DEPDIR)/arc64_libhl_a-hl_open.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/hl/$(DEPDIR)/arc64_libhl_a-hl_read.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/hl/$(DEPDIR)/arc64_libhl_a-hl_unlink.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/hl/$(DEPDIR)/arc64_libhl_a-hl_write.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/hl/$(DEPDIR)/arc_libhl_a-hl_api.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/hl/$(DEPDIR)/arc_libhl_a-hl_argc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/hl/$(DEPDIR)/arc_libhl_a-hl_argv.Po@am__quote@
@@ -5564,6 +5732,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@arc/hl/$(DEPDIR)/arc_libhl_a-hl_read.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/hl/$(DEPDIR)/arc_libhl_a-hl_unlink.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/hl/$(DEPDIR)/arc_libhl_a-hl_write.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc64/$(DEPDIR)/crt0.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc64/$(DEPDIR)/crti.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc64/$(DEPDIR)/crtn.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/_exit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/_kill.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/arm_librdimon_a-_exit.Po@am__quote@
@@ -6931,6 +7102,314 @@ arc/arc_libuart_8250_a-mcount.obj: arc/mcount.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/mcount.c' object='arc/arc_libuart_8250_a-mcount.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libuart_8250_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arc/arc_libuart_8250_a-mcount.obj `if test -f 'arc/mcount.c'; then $(CYGPATH_W) 'arc/mcount.c'; else $(CYGPATH_W) '$(srcdir)/arc/mcount.c'; fi`
+
+arc/arc64_libhl_a-arc-timer.o: arc/arc-timer.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/arc64_libhl_a-arc-timer.o -MD -MP -MF arc/$(DEPDIR)/arc64_libhl_a-arc-timer.Tpo -c -o arc/arc64_libhl_a-arc-timer.o `test -f 'arc/arc-timer.c' || echo '$(srcdir)/'`arc/arc-timer.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/$(DEPDIR)/arc64_libhl_a-arc-timer.Tpo arc/$(DEPDIR)/arc64_libhl_a-arc-timer.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/arc-timer.c' object='arc/arc64_libhl_a-arc-timer.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/arc64_libhl_a-arc-timer.o `test -f 'arc/arc-timer.c' || echo '$(srcdir)/'`arc/arc-timer.c
+
+arc/arc64_libhl_a-arc-timer.obj: arc/arc-timer.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/arc64_libhl_a-arc-timer.obj -MD -MP -MF arc/$(DEPDIR)/arc64_libhl_a-arc-timer.Tpo -c -o arc/arc64_libhl_a-arc-timer.obj `if test -f 'arc/arc-timer.c'; then $(CYGPATH_W) 'arc/arc-timer.c'; else $(CYGPATH_W) '$(srcdir)/arc/arc-timer.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/$(DEPDIR)/arc64_libhl_a-arc-timer.Tpo arc/$(DEPDIR)/arc64_libhl_a-arc-timer.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/arc-timer.c' object='arc/arc64_libhl_a-arc-timer.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/arc64_libhl_a-arc-timer.obj `if test -f 'arc/arc-timer.c'; then $(CYGPATH_W) 'arc/arc-timer.c'; else $(CYGPATH_W) '$(srcdir)/arc/arc-timer.c'; fi`
+
+arc/arc64_libhl_a-hl-stub.o: arc/hl-stub.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/arc64_libhl_a-hl-stub.o -MD -MP -MF arc/$(DEPDIR)/arc64_libhl_a-hl-stub.Tpo -c -o arc/arc64_libhl_a-hl-stub.o `test -f 'arc/hl-stub.c' || echo '$(srcdir)/'`arc/hl-stub.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/$(DEPDIR)/arc64_libhl_a-hl-stub.Tpo arc/$(DEPDIR)/arc64_libhl_a-hl-stub.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl-stub.c' object='arc/arc64_libhl_a-hl-stub.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/arc64_libhl_a-hl-stub.o `test -f 'arc/hl-stub.c' || echo '$(srcdir)/'`arc/hl-stub.c
+
+arc/arc64_libhl_a-hl-stub.obj: arc/hl-stub.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/arc64_libhl_a-hl-stub.obj -MD -MP -MF arc/$(DEPDIR)/arc64_libhl_a-hl-stub.Tpo -c -o arc/arc64_libhl_a-hl-stub.obj `if test -f 'arc/hl-stub.c'; then $(CYGPATH_W) 'arc/hl-stub.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl-stub.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/$(DEPDIR)/arc64_libhl_a-hl-stub.Tpo arc/$(DEPDIR)/arc64_libhl_a-hl-stub.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl-stub.c' object='arc/arc64_libhl_a-hl-stub.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/arc64_libhl_a-hl-stub.obj `if test -f 'arc/hl-stub.c'; then $(CYGPATH_W) 'arc/hl-stub.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl-stub.c'; fi`
+
+arc/arc64_libhl_a-hl-setup.o: arc/hl-setup.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/arc64_libhl_a-hl-setup.o -MD -MP -MF arc/$(DEPDIR)/arc64_libhl_a-hl-setup.Tpo -c -o arc/arc64_libhl_a-hl-setup.o `test -f 'arc/hl-setup.c' || echo '$(srcdir)/'`arc/hl-setup.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/$(DEPDIR)/arc64_libhl_a-hl-setup.Tpo arc/$(DEPDIR)/arc64_libhl_a-hl-setup.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl-setup.c' object='arc/arc64_libhl_a-hl-setup.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/arc64_libhl_a-hl-setup.o `test -f 'arc/hl-setup.c' || echo '$(srcdir)/'`arc/hl-setup.c
+
+arc/arc64_libhl_a-hl-setup.obj: arc/hl-setup.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/arc64_libhl_a-hl-setup.obj -MD -MP -MF arc/$(DEPDIR)/arc64_libhl_a-hl-setup.Tpo -c -o arc/arc64_libhl_a-hl-setup.obj `if test -f 'arc/hl-setup.c'; then $(CYGPATH_W) 'arc/hl-setup.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl-setup.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/$(DEPDIR)/arc64_libhl_a-hl-setup.Tpo arc/$(DEPDIR)/arc64_libhl_a-hl-setup.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl-setup.c' object='arc/arc64_libhl_a-hl-setup.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/arc64_libhl_a-hl-setup.obj `if test -f 'arc/hl-setup.c'; then $(CYGPATH_W) 'arc/hl-setup.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl-setup.c'; fi`
+
+arc/arc64_libhl_a-libcfunc.o: arc/libcfunc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/arc64_libhl_a-libcfunc.o -MD -MP -MF arc/$(DEPDIR)/arc64_libhl_a-libcfunc.Tpo -c -o arc/arc64_libhl_a-libcfunc.o `test -f 'arc/libcfunc.c' || echo '$(srcdir)/'`arc/libcfunc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/$(DEPDIR)/arc64_libhl_a-libcfunc.Tpo arc/$(DEPDIR)/arc64_libhl_a-libcfunc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/libcfunc.c' object='arc/arc64_libhl_a-libcfunc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/arc64_libhl_a-libcfunc.o `test -f 'arc/libcfunc.c' || echo '$(srcdir)/'`arc/libcfunc.c
+
+arc/arc64_libhl_a-libcfunc.obj: arc/libcfunc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/arc64_libhl_a-libcfunc.obj -MD -MP -MF arc/$(DEPDIR)/arc64_libhl_a-libcfunc.Tpo -c -o arc/arc64_libhl_a-libcfunc.obj `if test -f 'arc/libcfunc.c'; then $(CYGPATH_W) 'arc/libcfunc.c'; else $(CYGPATH_W) '$(srcdir)/arc/libcfunc.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/$(DEPDIR)/arc64_libhl_a-libcfunc.Tpo arc/$(DEPDIR)/arc64_libhl_a-libcfunc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/libcfunc.c' object='arc/arc64_libhl_a-libcfunc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/arc64_libhl_a-libcfunc.obj `if test -f 'arc/libcfunc.c'; then $(CYGPATH_W) 'arc/libcfunc.c'; else $(CYGPATH_W) '$(srcdir)/arc/libcfunc.c'; fi`
+
+arc/arc64_libhl_a-sbrk.o: arc/sbrk.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/arc64_libhl_a-sbrk.o -MD -MP -MF arc/$(DEPDIR)/arc64_libhl_a-sbrk.Tpo -c -o arc/arc64_libhl_a-sbrk.o `test -f 'arc/sbrk.c' || echo '$(srcdir)/'`arc/sbrk.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/$(DEPDIR)/arc64_libhl_a-sbrk.Tpo arc/$(DEPDIR)/arc64_libhl_a-sbrk.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/sbrk.c' object='arc/arc64_libhl_a-sbrk.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/arc64_libhl_a-sbrk.o `test -f 'arc/sbrk.c' || echo '$(srcdir)/'`arc/sbrk.c
+
+arc/arc64_libhl_a-sbrk.obj: arc/sbrk.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/arc64_libhl_a-sbrk.obj -MD -MP -MF arc/$(DEPDIR)/arc64_libhl_a-sbrk.Tpo -c -o arc/arc64_libhl_a-sbrk.obj `if test -f 'arc/sbrk.c'; then $(CYGPATH_W) 'arc/sbrk.c'; else $(CYGPATH_W) '$(srcdir)/arc/sbrk.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/$(DEPDIR)/arc64_libhl_a-sbrk.Tpo arc/$(DEPDIR)/arc64_libhl_a-sbrk.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/sbrk.c' object='arc/arc64_libhl_a-sbrk.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/arc64_libhl_a-sbrk.obj `if test -f 'arc/sbrk.c'; then $(CYGPATH_W) 'arc/sbrk.c'; else $(CYGPATH_W) '$(srcdir)/arc/sbrk.c'; fi`
+
+arc/hl/arc64_libhl_a-hl_gw.o: arc/hl/hl_gw.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_gw.o -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_gw.Tpo -c -o arc/hl/arc64_libhl_a-hl_gw.o `test -f 'arc/hl/hl_gw.c' || echo '$(srcdir)/'`arc/hl/hl_gw.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_gw.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_gw.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_gw.c' object='arc/hl/arc64_libhl_a-hl_gw.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_gw.o `test -f 'arc/hl/hl_gw.c' || echo '$(srcdir)/'`arc/hl/hl_gw.c
+
+arc/hl/arc64_libhl_a-hl_gw.obj: arc/hl/hl_gw.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_gw.obj -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_gw.Tpo -c -o arc/hl/arc64_libhl_a-hl_gw.obj `if test -f 'arc/hl/hl_gw.c'; then $(CYGPATH_W) 'arc/hl/hl_gw.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_gw.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_gw.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_gw.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_gw.c' object='arc/hl/arc64_libhl_a-hl_gw.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_gw.obj `if test -f 'arc/hl/hl_gw.c'; then $(CYGPATH_W) 'arc/hl/hl_gw.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_gw.c'; fi`
+
+arc/hl/arc64_libhl_a-hl_api.o: arc/hl/hl_api.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_api.o -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_api.Tpo -c -o arc/hl/arc64_libhl_a-hl_api.o `test -f 'arc/hl/hl_api.c' || echo '$(srcdir)/'`arc/hl/hl_api.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_api.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_api.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_api.c' object='arc/hl/arc64_libhl_a-hl_api.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_api.o `test -f 'arc/hl/hl_api.c' || echo '$(srcdir)/'`arc/hl/hl_api.c
+
+arc/hl/arc64_libhl_a-hl_api.obj: arc/hl/hl_api.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_api.obj -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_api.Tpo -c -o arc/hl/arc64_libhl_a-hl_api.obj `if test -f 'arc/hl/hl_api.c'; then $(CYGPATH_W) 'arc/hl/hl_api.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_api.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_api.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_api.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_api.c' object='arc/hl/arc64_libhl_a-hl_api.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_api.obj `if test -f 'arc/hl/hl_api.c'; then $(CYGPATH_W) 'arc/hl/hl_api.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_api.c'; fi`
+
+arc/hl/arc64_libhl_a-hl_open.o: arc/hl/hl_open.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_open.o -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_open.Tpo -c -o arc/hl/arc64_libhl_a-hl_open.o `test -f 'arc/hl/hl_open.c' || echo '$(srcdir)/'`arc/hl/hl_open.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_open.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_open.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_open.c' object='arc/hl/arc64_libhl_a-hl_open.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_open.o `test -f 'arc/hl/hl_open.c' || echo '$(srcdir)/'`arc/hl/hl_open.c
+
+arc/hl/arc64_libhl_a-hl_open.obj: arc/hl/hl_open.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_open.obj -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_open.Tpo -c -o arc/hl/arc64_libhl_a-hl_open.obj `if test -f 'arc/hl/hl_open.c'; then $(CYGPATH_W) 'arc/hl/hl_open.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_open.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_open.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_open.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_open.c' object='arc/hl/arc64_libhl_a-hl_open.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_open.obj `if test -f 'arc/hl/hl_open.c'; then $(CYGPATH_W) 'arc/hl/hl_open.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_open.c'; fi`
+
+arc/hl/arc64_libhl_a-hl_close.o: arc/hl/hl_close.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_close.o -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_close.Tpo -c -o arc/hl/arc64_libhl_a-hl_close.o `test -f 'arc/hl/hl_close.c' || echo '$(srcdir)/'`arc/hl/hl_close.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_close.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_close.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_close.c' object='arc/hl/arc64_libhl_a-hl_close.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_close.o `test -f 'arc/hl/hl_close.c' || echo '$(srcdir)/'`arc/hl/hl_close.c
+
+arc/hl/arc64_libhl_a-hl_close.obj: arc/hl/hl_close.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_close.obj -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_close.Tpo -c -o arc/hl/arc64_libhl_a-hl_close.obj `if test -f 'arc/hl/hl_close.c'; then $(CYGPATH_W) 'arc/hl/hl_close.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_close.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_close.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_close.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_close.c' object='arc/hl/arc64_libhl_a-hl_close.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_close.obj `if test -f 'arc/hl/hl_close.c'; then $(CYGPATH_W) 'arc/hl/hl_close.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_close.c'; fi`
+
+arc/hl/arc64_libhl_a-hl_read.o: arc/hl/hl_read.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_read.o -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_read.Tpo -c -o arc/hl/arc64_libhl_a-hl_read.o `test -f 'arc/hl/hl_read.c' || echo '$(srcdir)/'`arc/hl/hl_read.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_read.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_read.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_read.c' object='arc/hl/arc64_libhl_a-hl_read.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_read.o `test -f 'arc/hl/hl_read.c' || echo '$(srcdir)/'`arc/hl/hl_read.c
+
+arc/hl/arc64_libhl_a-hl_read.obj: arc/hl/hl_read.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_read.obj -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_read.Tpo -c -o arc/hl/arc64_libhl_a-hl_read.obj `if test -f 'arc/hl/hl_read.c'; then $(CYGPATH_W) 'arc/hl/hl_read.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_read.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_read.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_read.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_read.c' object='arc/hl/arc64_libhl_a-hl_read.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_read.obj `if test -f 'arc/hl/hl_read.c'; then $(CYGPATH_W) 'arc/hl/hl_read.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_read.c'; fi`
+
+arc/hl/arc64_libhl_a-hl_write.o: arc/hl/hl_write.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_write.o -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_write.Tpo -c -o arc/hl/arc64_libhl_a-hl_write.o `test -f 'arc/hl/hl_write.c' || echo '$(srcdir)/'`arc/hl/hl_write.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_write.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_write.c' object='arc/hl/arc64_libhl_a-hl_write.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_write.o `test -f 'arc/hl/hl_write.c' || echo '$(srcdir)/'`arc/hl/hl_write.c
+
+arc/hl/arc64_libhl_a-hl_write.obj: arc/hl/hl_write.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_write.obj -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_write.Tpo -c -o arc/hl/arc64_libhl_a-hl_write.obj `if test -f 'arc/hl/hl_write.c'; then $(CYGPATH_W) 'arc/hl/hl_write.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_write.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_write.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_write.c' object='arc/hl/arc64_libhl_a-hl_write.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_write.obj `if test -f 'arc/hl/hl_write.c'; then $(CYGPATH_W) 'arc/hl/hl_write.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_write.c'; fi`
+
+arc/hl/arc64_libhl_a-hl_lseek.o: arc/hl/hl_lseek.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_lseek.o -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_lseek.Tpo -c -o arc/hl/arc64_libhl_a-hl_lseek.o `test -f 'arc/hl/hl_lseek.c' || echo '$(srcdir)/'`arc/hl/hl_lseek.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_lseek.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_lseek.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_lseek.c' object='arc/hl/arc64_libhl_a-hl_lseek.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_lseek.o `test -f 'arc/hl/hl_lseek.c' || echo '$(srcdir)/'`arc/hl/hl_lseek.c
+
+arc/hl/arc64_libhl_a-hl_lseek.obj: arc/hl/hl_lseek.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_lseek.obj -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_lseek.Tpo -c -o arc/hl/arc64_libhl_a-hl_lseek.obj `if test -f 'arc/hl/hl_lseek.c'; then $(CYGPATH_W) 'arc/hl/hl_lseek.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_lseek.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_lseek.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_lseek.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_lseek.c' object='arc/hl/arc64_libhl_a-hl_lseek.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_lseek.obj `if test -f 'arc/hl/hl_lseek.c'; then $(CYGPATH_W) 'arc/hl/hl_lseek.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_lseek.c'; fi`
+
+arc/hl/arc64_libhl_a-hl_unlink.o: arc/hl/hl_unlink.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_unlink.o -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_unlink.Tpo -c -o arc/hl/arc64_libhl_a-hl_unlink.o `test -f 'arc/hl/hl_unlink.c' || echo '$(srcdir)/'`arc/hl/hl_unlink.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_unlink.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_unlink.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_unlink.c' object='arc/hl/arc64_libhl_a-hl_unlink.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_unlink.o `test -f 'arc/hl/hl_unlink.c' || echo '$(srcdir)/'`arc/hl/hl_unlink.c
+
+arc/hl/arc64_libhl_a-hl_unlink.obj: arc/hl/hl_unlink.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_unlink.obj -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_unlink.Tpo -c -o arc/hl/arc64_libhl_a-hl_unlink.obj `if test -f 'arc/hl/hl_unlink.c'; then $(CYGPATH_W) 'arc/hl/hl_unlink.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_unlink.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_unlink.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_unlink.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_unlink.c' object='arc/hl/arc64_libhl_a-hl_unlink.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_unlink.obj `if test -f 'arc/hl/hl_unlink.c'; then $(CYGPATH_W) 'arc/hl/hl_unlink.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_unlink.c'; fi`
+
+arc/hl/arc64_libhl_a-hl_isatty.o: arc/hl/hl_isatty.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_isatty.o -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_isatty.Tpo -c -o arc/hl/arc64_libhl_a-hl_isatty.o `test -f 'arc/hl/hl_isatty.c' || echo '$(srcdir)/'`arc/hl/hl_isatty.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_isatty.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_isatty.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_isatty.c' object='arc/hl/arc64_libhl_a-hl_isatty.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_isatty.o `test -f 'arc/hl/hl_isatty.c' || echo '$(srcdir)/'`arc/hl/hl_isatty.c
+
+arc/hl/arc64_libhl_a-hl_isatty.obj: arc/hl/hl_isatty.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_isatty.obj -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_isatty.Tpo -c -o arc/hl/arc64_libhl_a-hl_isatty.obj `if test -f 'arc/hl/hl_isatty.c'; then $(CYGPATH_W) 'arc/hl/hl_isatty.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_isatty.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_isatty.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_isatty.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_isatty.c' object='arc/hl/arc64_libhl_a-hl_isatty.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_isatty.obj `if test -f 'arc/hl/hl_isatty.c'; then $(CYGPATH_W) 'arc/hl/hl_isatty.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_isatty.c'; fi`
+
+arc/hl/arc64_libhl_a-hl_clock.o: arc/hl/hl_clock.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_clock.o -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_clock.Tpo -c -o arc/hl/arc64_libhl_a-hl_clock.o `test -f 'arc/hl/hl_clock.c' || echo '$(srcdir)/'`arc/hl/hl_clock.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_clock.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_clock.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_clock.c' object='arc/hl/arc64_libhl_a-hl_clock.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_clock.o `test -f 'arc/hl/hl_clock.c' || echo '$(srcdir)/'`arc/hl/hl_clock.c
+
+arc/hl/arc64_libhl_a-hl_clock.obj: arc/hl/hl_clock.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_clock.obj -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_clock.Tpo -c -o arc/hl/arc64_libhl_a-hl_clock.obj `if test -f 'arc/hl/hl_clock.c'; then $(CYGPATH_W) 'arc/hl/hl_clock.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_clock.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_clock.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_clock.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_clock.c' object='arc/hl/arc64_libhl_a-hl_clock.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_clock.obj `if test -f 'arc/hl/hl_clock.c'; then $(CYGPATH_W) 'arc/hl/hl_clock.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_clock.c'; fi`
+
+arc/hl/arc64_libhl_a-hl_gettimeofday.o: arc/hl/hl_gettimeofday.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_gettimeofday.o -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_gettimeofday.Tpo -c -o arc/hl/arc64_libhl_a-hl_gettimeofday.o `test -f 'arc/hl/hl_gettimeofday.c' || echo '$(srcdir)/'`arc/hl/hl_gettimeofday.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_gettimeofday.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_gettimeofday.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_gettimeofday.c' object='arc/hl/arc64_libhl_a-hl_gettimeofday.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_gettimeofday.o `test -f 'arc/hl/hl_gettimeofday.c' || echo '$(srcdir)/'`arc/hl/hl_gettimeofday.c
+
+arc/hl/arc64_libhl_a-hl_gettimeofday.obj: arc/hl/hl_gettimeofday.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_gettimeofday.obj -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_gettimeofday.Tpo -c -o arc/hl/arc64_libhl_a-hl_gettimeofday.obj `if test -f 'arc/hl/hl_gettimeofday.c'; then $(CYGPATH_W) 'arc/hl/hl_gettimeofday.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_gettimeofday.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_gettimeofday.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_gettimeofday.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_gettimeofday.c' object='arc/hl/arc64_libhl_a-hl_gettimeofday.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_gettimeofday.obj `if test -f 'arc/hl/hl_gettimeofday.c'; then $(CYGPATH_W) 'arc/hl/hl_gettimeofday.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_gettimeofday.c'; fi`
+
+arc/hl/arc64_libhl_a-hl_argc.o: arc/hl/hl_argc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_argc.o -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_argc.Tpo -c -o arc/hl/arc64_libhl_a-hl_argc.o `test -f 'arc/hl/hl_argc.c' || echo '$(srcdir)/'`arc/hl/hl_argc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_argc.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_argc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_argc.c' object='arc/hl/arc64_libhl_a-hl_argc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_argc.o `test -f 'arc/hl/hl_argc.c' || echo '$(srcdir)/'`arc/hl/hl_argc.c
+
+arc/hl/arc64_libhl_a-hl_argc.obj: arc/hl/hl_argc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_argc.obj -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_argc.Tpo -c -o arc/hl/arc64_libhl_a-hl_argc.obj `if test -f 'arc/hl/hl_argc.c'; then $(CYGPATH_W) 'arc/hl/hl_argc.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_argc.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_argc.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_argc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_argc.c' object='arc/hl/arc64_libhl_a-hl_argc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_argc.obj `if test -f 'arc/hl/hl_argc.c'; then $(CYGPATH_W) 'arc/hl/hl_argc.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_argc.c'; fi`
+
+arc/hl/arc64_libhl_a-hl_argv.o: arc/hl/hl_argv.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_argv.o -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_argv.Tpo -c -o arc/hl/arc64_libhl_a-hl_argv.o `test -f 'arc/hl/hl_argv.c' || echo '$(srcdir)/'`arc/hl/hl_argv.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_argv.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_argv.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_argv.c' object='arc/hl/arc64_libhl_a-hl_argv.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_argv.o `test -f 'arc/hl/hl_argv.c' || echo '$(srcdir)/'`arc/hl/hl_argv.c
+
+arc/hl/arc64_libhl_a-hl_argv.obj: arc/hl/hl_argv.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_argv.obj -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_argv.Tpo -c -o arc/hl/arc64_libhl_a-hl_argv.obj `if test -f 'arc/hl/hl_argv.c'; then $(CYGPATH_W) 'arc/hl/hl_argv.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_argv.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_argv.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_argv.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_argv.c' object='arc/hl/arc64_libhl_a-hl_argv.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_argv.obj `if test -f 'arc/hl/hl_argv.c'; then $(CYGPATH_W) 'arc/hl/hl_argv.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_argv.c'; fi`
+
+arc/hl/arc64_libhl_a-hl_exit.o: arc/hl/hl_exit.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_exit.o -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_exit.Tpo -c -o arc/hl/arc64_libhl_a-hl_exit.o `test -f 'arc/hl/hl_exit.c' || echo '$(srcdir)/'`arc/hl/hl_exit.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_exit.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_exit.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_exit.c' object='arc/hl/arc64_libhl_a-hl_exit.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_exit.o `test -f 'arc/hl/hl_exit.c' || echo '$(srcdir)/'`arc/hl/hl_exit.c
+
+arc/hl/arc64_libhl_a-hl_exit.obj: arc/hl/hl_exit.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -MT arc/hl/arc64_libhl_a-hl_exit.obj -MD -MP -MF arc/hl/$(DEPDIR)/arc64_libhl_a-hl_exit.Tpo -c -o arc/hl/arc64_libhl_a-hl_exit.obj `if test -f 'arc/hl/hl_exit.c'; then $(CYGPATH_W) 'arc/hl/hl_exit.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_exit.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/hl/$(DEPDIR)/arc64_libhl_a-hl_exit.Tpo arc/hl/$(DEPDIR)/arc64_libhl_a-hl_exit.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_exit.c' object='arc/hl/arc64_libhl_a-hl_exit.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_exit.obj `if test -f 'arc/hl/hl_exit.c'; then $(CYGPATH_W) 'arc/hl/hl_exit.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_exit.c'; fi`
+
+arc/arc64_libnsim_a-libcfunc.o: arc/libcfunc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libnsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arc/arc64_libnsim_a-libcfunc.o -MD -MP -MF arc/$(DEPDIR)/arc64_libnsim_a-libcfunc.Tpo -c -o arc/arc64_libnsim_a-libcfunc.o `test -f 'arc/libcfunc.c' || echo '$(srcdir)/'`arc/libcfunc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/$(DEPDIR)/arc64_libnsim_a-libcfunc.Tpo arc/$(DEPDIR)/arc64_libnsim_a-libcfunc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/libcfunc.c' object='arc/arc64_libnsim_a-libcfunc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libnsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arc/arc64_libnsim_a-libcfunc.o `test -f 'arc/libcfunc.c' || echo '$(srcdir)/'`arc/libcfunc.c
+
+arc/arc64_libnsim_a-libcfunc.obj: arc/libcfunc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libnsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arc/arc64_libnsim_a-libcfunc.obj -MD -MP -MF arc/$(DEPDIR)/arc64_libnsim_a-libcfunc.Tpo -c -o arc/arc64_libnsim_a-libcfunc.obj `if test -f 'arc/libcfunc.c'; then $(CYGPATH_W) 'arc/libcfunc.c'; else $(CYGPATH_W) '$(srcdir)/arc/libcfunc.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/$(DEPDIR)/arc64_libnsim_a-libcfunc.Tpo arc/$(DEPDIR)/arc64_libnsim_a-libcfunc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/libcfunc.c' object='arc/arc64_libnsim_a-libcfunc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libnsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arc/arc64_libnsim_a-libcfunc.obj `if test -f 'arc/libcfunc.c'; then $(CYGPATH_W) 'arc/libcfunc.c'; else $(CYGPATH_W) '$(srcdir)/arc/libcfunc.c'; fi`
+
+arc/arc64_libnsim_a-nsim-syscalls.o: arc/nsim-syscalls.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libnsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arc/arc64_libnsim_a-nsim-syscalls.o -MD -MP -MF arc/$(DEPDIR)/arc64_libnsim_a-nsim-syscalls.Tpo -c -o arc/arc64_libnsim_a-nsim-syscalls.o `test -f 'arc/nsim-syscalls.c' || echo '$(srcdir)/'`arc/nsim-syscalls.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/$(DEPDIR)/arc64_libnsim_a-nsim-syscalls.Tpo arc/$(DEPDIR)/arc64_libnsim_a-nsim-syscalls.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/nsim-syscalls.c' object='arc/arc64_libnsim_a-nsim-syscalls.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libnsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arc/arc64_libnsim_a-nsim-syscalls.o `test -f 'arc/nsim-syscalls.c' || echo '$(srcdir)/'`arc/nsim-syscalls.c
+
+arc/arc64_libnsim_a-nsim-syscalls.obj: arc/nsim-syscalls.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libnsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arc/arc64_libnsim_a-nsim-syscalls.obj -MD -MP -MF arc/$(DEPDIR)/arc64_libnsim_a-nsim-syscalls.Tpo -c -o arc/arc64_libnsim_a-nsim-syscalls.obj `if test -f 'arc/nsim-syscalls.c'; then $(CYGPATH_W) 'arc/nsim-syscalls.c'; else $(CYGPATH_W) '$(srcdir)/arc/nsim-syscalls.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/$(DEPDIR)/arc64_libnsim_a-nsim-syscalls.Tpo arc/$(DEPDIR)/arc64_libnsim_a-nsim-syscalls.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/nsim-syscalls.c' object='arc/arc64_libnsim_a-nsim-syscalls.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libnsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arc/arc64_libnsim_a-nsim-syscalls.obj `if test -f 'arc/nsim-syscalls.c'; then $(CYGPATH_W) 'arc/nsim-syscalls.c'; else $(CYGPATH_W) '$(srcdir)/arc/nsim-syscalls.c'; fi`
+
+arc/arc64_libnsim_a-sbrk.o: arc/sbrk.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libnsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arc/arc64_libnsim_a-sbrk.o -MD -MP -MF arc/$(DEPDIR)/arc64_libnsim_a-sbrk.Tpo -c -o arc/arc64_libnsim_a-sbrk.o `test -f 'arc/sbrk.c' || echo '$(srcdir)/'`arc/sbrk.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/$(DEPDIR)/arc64_libnsim_a-sbrk.Tpo arc/$(DEPDIR)/arc64_libnsim_a-sbrk.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/sbrk.c' object='arc/arc64_libnsim_a-sbrk.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libnsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arc/arc64_libnsim_a-sbrk.o `test -f 'arc/sbrk.c' || echo '$(srcdir)/'`arc/sbrk.c
+
+arc/arc64_libnsim_a-sbrk.obj: arc/sbrk.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libnsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arc/arc64_libnsim_a-sbrk.obj -MD -MP -MF arc/$(DEPDIR)/arc64_libnsim_a-sbrk.Tpo -c -o arc/arc64_libnsim_a-sbrk.obj `if test -f 'arc/sbrk.c'; then $(CYGPATH_W) 'arc/sbrk.c'; else $(CYGPATH_W) '$(srcdir)/arc/sbrk.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/$(DEPDIR)/arc64_libnsim_a-sbrk.Tpo arc/$(DEPDIR)/arc64_libnsim_a-sbrk.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/sbrk.c' object='arc/arc64_libnsim_a-sbrk.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libnsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arc/arc64_libnsim_a-sbrk.obj `if test -f 'arc/sbrk.c'; then $(CYGPATH_W) 'arc/sbrk.c'; else $(CYGPATH_W) '$(srcdir)/arc/sbrk.c'; fi`
 
 arm/arm_librdimon_v2m_a-_exit.o: arm/_exit.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arm/arm_librdimon_v2m_a-_exit.o -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_v2m_a-_exit.Tpo -c -o arm/arm_librdimon_v2m_a-_exit.o `test -f 'arm/_exit.c' || echo '$(srcdir)/'`arm/_exit.c
@@ -9494,6 +9973,8 @@ distclean-generic:
 	-rm -f arc/$(am__dirstamp)
 	-rm -f arc/hl/$(DEPDIR)/$(am__dirstamp)
 	-rm -f arc/hl/$(am__dirstamp)
+	-rm -f arc64/$(DEPDIR)/$(am__dirstamp)
+	-rm -f arc64/$(am__dirstamp)
 	-rm -f arm/$(DEPDIR)/$(am__dirstamp)
 	-rm -f arm/$(am__dirstamp)
 	-rm -f bfin/$(DEPDIR)/$(am__dirstamp)
@@ -9586,7 +10067,7 @@ clean-am: clean-aminfo clean-binPROGRAMS clean-checkPROGRAMS \
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arc/hl/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) cr16/$(DEPDIR) csky/$(DEPDIR) d30v/$(DEPDIR) epiphany/$(DEPDIR) fr30/$(DEPDIR) frv/$(DEPDIR) ft32/$(DEPDIR) i386/$(DEPDIR) i960/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) m32r/$(DEPDIR) mcore/$(DEPDIR) microblaze/$(DEPDIR) mn10200/$(DEPDIR) mn10300/$(DEPDIR) moxie/$(DEPDIR) msp430/$(DEPDIR) nds32/$(DEPDIR) nios2/$(DEPDIR) or1k/$(DEPDIR) or1k/boards/$(DEPDIR) pru/$(DEPDIR) riscv/$(DEPDIR) rl78/$(DEPDIR) rx/$(DEPDIR) sparc/$(DEPDIR) sparc_leon/$(DEPDIR) tic6x/$(DEPDIR) v850/$(DEPDIR) visium/$(DEPDIR) xstormy16/$(DEPDIR) xtensa/$(DEPDIR) xtensa/boards/esp32/$(DEPDIR) xtensa/boards/esp32s3/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arc/hl/$(DEPDIR) arc64/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) cr16/$(DEPDIR) csky/$(DEPDIR) d30v/$(DEPDIR) epiphany/$(DEPDIR) fr30/$(DEPDIR) frv/$(DEPDIR) ft32/$(DEPDIR) i386/$(DEPDIR) i960/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) m32r/$(DEPDIR) mcore/$(DEPDIR) microblaze/$(DEPDIR) mn10200/$(DEPDIR) mn10300/$(DEPDIR) moxie/$(DEPDIR) msp430/$(DEPDIR) nds32/$(DEPDIR) nios2/$(DEPDIR) or1k/$(DEPDIR) or1k/boards/$(DEPDIR) pru/$(DEPDIR) riscv/$(DEPDIR) rl78/$(DEPDIR) rx/$(DEPDIR) sparc/$(DEPDIR) sparc_leon/$(DEPDIR) tic6x/$(DEPDIR) v850/$(DEPDIR) visium/$(DEPDIR) xstormy16/$(DEPDIR) xtensa/$(DEPDIR) xtensa/boards/esp32/$(DEPDIR) xtensa/boards/esp32s3/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-local distclean-tags
@@ -9730,7 +10211,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arc/hl/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) cr16/$(DEPDIR) csky/$(DEPDIR) d30v/$(DEPDIR) epiphany/$(DEPDIR) fr30/$(DEPDIR) frv/$(DEPDIR) ft32/$(DEPDIR) i386/$(DEPDIR) i960/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) m32r/$(DEPDIR) mcore/$(DEPDIR) microblaze/$(DEPDIR) mn10200/$(DEPDIR) mn10300/$(DEPDIR) moxie/$(DEPDIR) msp430/$(DEPDIR) nds32/$(DEPDIR) nios2/$(DEPDIR) or1k/$(DEPDIR) or1k/boards/$(DEPDIR) pru/$(DEPDIR) riscv/$(DEPDIR) rl78/$(DEPDIR) rx/$(DEPDIR) sparc/$(DEPDIR) sparc_leon/$(DEPDIR) tic6x/$(DEPDIR) v850/$(DEPDIR) visium/$(DEPDIR) xstormy16/$(DEPDIR) xtensa/$(DEPDIR) xtensa/boards/esp32/$(DEPDIR) xtensa/boards/esp32s3/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arc/hl/$(DEPDIR) arc64/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) cr16/$(DEPDIR) csky/$(DEPDIR) d30v/$(DEPDIR) epiphany/$(DEPDIR) fr30/$(DEPDIR) frv/$(DEPDIR) ft32/$(DEPDIR) i386/$(DEPDIR) i960/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) m32r/$(DEPDIR) mcore/$(DEPDIR) microblaze/$(DEPDIR) mn10200/$(DEPDIR) mn10300/$(DEPDIR) moxie/$(DEPDIR) msp430/$(DEPDIR) nds32/$(DEPDIR) nios2/$(DEPDIR) or1k/$(DEPDIR) or1k/boards/$(DEPDIR) pru/$(DEPDIR) riscv/$(DEPDIR) rl78/$(DEPDIR) rx/$(DEPDIR) sparc/$(DEPDIR) sparc_leon/$(DEPDIR) tic6x/$(DEPDIR) v850/$(DEPDIR) visium/$(DEPDIR) xstormy16/$(DEPDIR) xtensa/$(DEPDIR) xtensa/boards/esp32/$(DEPDIR) xtensa/boards/esp32s3/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-aminfo \
 	maintainer-clean-generic maintainer-clean-local
