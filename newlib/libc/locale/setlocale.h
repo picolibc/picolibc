@@ -162,12 +162,14 @@ struct	lc_messages_T
   const char	*noexpr;
   const char	*yesstr;
   const char	*nostr;
-#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+#ifdef __HAVE_LOCALE_INFO__
   const char	*codeset;	 /* codeset for mbtowc conversion */
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
   const wchar_t	*wyesexpr;
   const wchar_t	*wnoexpr;
   const wchar_t	*wyesstr;
   const wchar_t	*wnostr;
+#endif
 #endif
 };
 extern const struct lc_messages_T _C_messages_locale;
