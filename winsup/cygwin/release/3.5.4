@@ -25,3 +25,6 @@ Fixes:
 
 - Fix an off-by-one in LC_MESSAGE wide character data.
   Addresses: https://sourceware.org/pipermail/newlib/2024/021271.html
+
+- Improve write pipe behaviour in case the pipe buffer is about to be
+  filled up.
