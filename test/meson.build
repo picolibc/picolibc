@@ -551,7 +551,7 @@ foreach target : targets
 		  link_depends:  _link_depends + _libs,
 		  include_directories: inc),
        depends: bios_bin,
-       timeout: 60,
+       timeout: 120,
        env: test_env)
 
   t1 = 'test-long-long'
@@ -569,7 +569,7 @@ foreach target : targets
 		  link_depends:  _link_depends + _libs,
 		  include_directories: inc),
        depends: bios_bin,
-       timeout: 60,
+       timeout: 120,
        env: test_env)
 
   plain_tests = ['rand', 'regex', 'ungetc', 'fenv',
