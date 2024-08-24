@@ -185,6 +185,7 @@ SYM (.arm_start_of.\name):
 	.align 2
 	MODE
 	.globl SYM (\name)
+	.cfi_sections .debug_frame
 	.cfi_startproc
 	TYPE (\name)
 SYM (\name):

@@ -151,7 +151,6 @@ static struct _nl_item_t
   _NLITEM (monetary, wmon_thousands_sep),
   _NLITEM (monetary, wpositive_sign),
   _NLITEM (monetary, wnegative_sign),
-  _NLITEM (messages, codeset),
   _NLITEM (messages, wyesexpr),
   _NLITEM (messages, wnoexpr),
   _NLITEM (messages, wyesstr),

@@ -2,6 +2,10 @@
 #define __SYS_LOCK_H__
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef unsigned int _LOCK_T;
 typedef unsigned int _LOCK_RECURSIVE_T;
 

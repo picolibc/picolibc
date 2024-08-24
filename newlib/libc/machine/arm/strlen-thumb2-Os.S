@@ -48,6 +48,7 @@
 
 def_fn	strlen p2align=1
 	.fnstart
+	.cfi_sections .debug_frame
 	.cfi_startproc
 	prologue
 	mov     r3, r0

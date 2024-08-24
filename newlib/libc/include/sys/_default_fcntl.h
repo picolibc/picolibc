@@ -76,6 +76,8 @@ typedef	__pid_t		pid_t;		/* process id */
 #define	O_DIRECT	_FDIRECT
 #endif
 
+#define O_DSYNC         _FSYNC
+#define O_RSYNC         _FSYNC
 
 #if __MISC_VISIBLE
 

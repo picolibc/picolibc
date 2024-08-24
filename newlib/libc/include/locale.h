@@ -111,6 +111,10 @@ locale_t uselocale (locale_t);
 
 #endif
 
+#if __POSIX_VISIBLE >= 202405
+const char *getlocalename_l (int, struct __locale_t *);
+#endif
+
 #if __MISC_VISIBLE
 const char *getlocalename_l (int, struct __locale_t *);
 #endif

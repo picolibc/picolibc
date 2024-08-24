@@ -80,6 +80,7 @@ typedef struct {
 
 #define	GLOB_NOSPACE	(-1)	/* Malloc call failed. */
 #define	GLOB_ABEND	(-2)	/* Unignored error. */
+#define	GLOB_NOMATCH	(-3)	/* No match and GLOB_NOCHECK not set. */
 
 __BEGIN_DECLS
 int	glob(const char *__restrict, int, int (*)(const char *, int), 

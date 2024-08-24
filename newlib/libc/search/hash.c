@@ -39,7 +39,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#ifndef DEBUG
+#if !defined(DEBUG) && !defined(NDEBUG)
 #define NDEBUG
 #endif
 #include <assert.h>

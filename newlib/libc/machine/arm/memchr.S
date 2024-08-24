@@ -294,6 +294,7 @@ memchr:
 	.global memchr
 	.type memchr,%function
 	.fnstart
+	.cfi_sections .debug_frame
 	.cfi_startproc
 memchr:
 	@ r0 = start of memory to scan
