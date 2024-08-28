@@ -112,12 +112,6 @@ newlocale (int category_mask, const char *locale,
   (void) category_mask;
   (void) locale;
   (void) base;
-#ifndef _MB_CAPABLE
-  return __get_C_locale ();
-#else /* _MB_CAPABLE */
-  char new_categories[_LC_LAST][ENCODING_LEN + 1];
-  struct __locale_t tmp_locale, *new_locale;
-  int i;
 
   /* Check for invalid mask values and valid locale ptr. */
   if ((category_mask & ~LC_ALL_MASK) || !locale)
@@ -131,6 +125,15 @@ newlocale (int category_mask, const char *locale,
       || (category_mask == LC_ALL_MASK
 	  && (!strcmp (locale, "C") || !strcmp (locale, "POSIX"))))
     return __get_C_locale ();
+
+#ifndef _MB_CAPABLE
+  _REENT_ERRNO(p) = EINVAL;
+  return NULL;
+#else /* _MB_CAPABLE */
+  char new_categories[_LC_LAST][ENCODING_LEN + 1];
+  struct __locale_t tmp_locale, *new_locale;
+  int i;
+  
   /* Start with setting all values to the default locale values. */
   tmp_locale = *__get_C_locale ();
   /* Fill out new category strings. */
