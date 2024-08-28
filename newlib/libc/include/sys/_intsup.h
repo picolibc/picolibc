@@ -32,6 +32,7 @@
    ?(signed|unsigned) long long == 8
    ?(signed|unsigned) long long int == 10
  */
+#if __GNUC_PREREQ (4, 4)
 #pragma push_macro("signed")
 #pragma push_macro("unsigned")
 #pragma push_macro("char")
@@ -40,6 +41,7 @@
 #pragma push_macro("__int20__")
 #pragma push_macro("int")
 #pragma push_macro("long")
+#endif
 #undef signed
 #undef unsigned
 #undef char
@@ -187,6 +189,7 @@
 #undef short
 #undef int
 #undef long
+#if __GNUC_PREREQ (4, 4)
 #pragma pop_macro("signed")
 #pragma pop_macro("unsigned")
 #pragma pop_macro("char")
@@ -195,5 +198,6 @@
 #pragma pop_macro("__int20__")
 #pragma pop_macro("int")
 #pragma pop_macro("long")
+#endif
 
 #endif /* _SYS__INTSUP_H */
