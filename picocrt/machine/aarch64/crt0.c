@@ -247,7 +247,7 @@ static void aarch64_fault_write_reg(const char *prefix, uint64_t reg)
     fputs(prefix, stdout);
 
     for (unsigned i = 0; i < 16; i++) {
-        unsigned digitval = 0xF & (reg >> (56 - 4*i));
+        unsigned digitval = 0xF & (reg >> (60 - 4*i));
         char digitchr = '0' + digitval + (digitval >= 10 ? 'a'-'0'-10 : 0);
         putchar(digitchr);
     }
