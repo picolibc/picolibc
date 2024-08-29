@@ -72,7 +72,7 @@ typedef	struct fd_set {
 #define FD_ZERO(p) do {                                                 \
                 fd_set *__p = (p);                                      \
                 __size_t __i;                                           \
-                for (__i = 0; __i < __FD_ARRAY_SIZE; i++)               \
+                for (__i = 0; __i < __FD_ARRAY_SIZE; __i++)             \
                         __p->__fds_bits[__i] = 0;                       \
         } while (0)
 
