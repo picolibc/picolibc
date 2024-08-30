@@ -22,6 +22,7 @@ multilibtool_DATA += \
 	%D%/crt1-boards.o
 
 %C%_libgloss_a_SOURCES = \
+	%D%/clibrary_init.c \
 	%D%/sleep.S \
 	%D%/syscalls.c \
 	%D%/window-vectors.S

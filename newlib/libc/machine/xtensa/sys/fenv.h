@@ -26,8 +26,8 @@
    OF THE POSSIBILITY OF SUCH DAMAGE.  */
 
 
-#ifndef _FENV_H
-#define _FENV_H
+#ifndef _SYS_FENV_H
+#define _SYS_FENV_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -85,4 +85,4 @@ int fegetexcept(void);
 }
 #endif
 
-#endif
+#endif // _SYS_FENV_H

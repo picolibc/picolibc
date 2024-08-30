@@ -2,7 +2,7 @@ AC_CACHE_CHECK([for XCHAL_HAVE_FP_SQRT], newlib_cv_xchal_have_fp_sqrt, [dnl
     AC_PREPROC_IFELSE([AC_LANG_PROGRAM(
 [[#define _LIBM
 // targ-include does not exist yet, use relative path
-#include "../sys/xtensa/include/xtensa/config/core-isa.h"
+#include "../machine/xtensa/include/xtensa/config/core-isa.h"
 #if (!XCHAL_HAVE_FP_SQRT)
 # error "Have not XCHAL_HAVE_FP_SQRT"
 #endif

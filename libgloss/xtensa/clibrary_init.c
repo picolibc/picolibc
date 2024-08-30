@@ -1,6 +1,6 @@
 /* Copyright (c) 2003-2006 Tensilica Inc.  ALL RIGHTS RESERVED.
 
-   Redistribution and use in source and binary forms, with or without
+  Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are met:
 
    1. Redistributions of source code must retain the above copyright
@@ -29,8 +29,8 @@ const char * __progname = 0;
 
 void
 __clibrary_init (int argc, char **argv, char **envp,
-		 void (*init)(void),
-		 void (*fini)(void))
+                void (*init)(void),
+                void (*fini)(void))
 {
   if (argv != 0)
     __progname = *argv;
