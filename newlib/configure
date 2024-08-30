@@ -6263,7 +6263,7 @@ else
 /* end confdefs.h.  */
 #define _LIBM
 // targ-include does not exist yet, use relative path
-#include "../sys/xtensa/include/xtensa/config/core-isa.h"
+#include "../machine/xtensa/include/xtensa/config/core-isa.h"
 #if (!XCHAL_HAVE_FP_SQRT)
 # error "Have not XCHAL_HAVE_FP_SQRT"
 #endif

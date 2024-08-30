@@ -446,6 +446,15 @@ case "${host}" in
 	sys_dir=tirtos
 	have_crt0="no"
 	;;
+  *-esp-*)
+	sys_dir=esp
+    have_crt0="no"
+	posix_dir=posix
+	newlib_cflags="${newlib_cflags} -D_NO_GLOB -D_NO_EXECVE -D_NO_GETLOGIN -D_NO_GETPWENT -D_NO_GETUT"
+	newlib_cflags="${newlib_cflags} -D_NO_GETPASS -D_NO_SIGSET -D_NO_WORDEXP -D_NO_POPEN -D_NO_POSIX_SPAWN"
+	newlib_cflags="${newlib_cflags} -DHAVE_FCNTL -DHAVE_BLKSIZE -DHAVE_OPENDIR -DHAVE_RENAME"
+	newlib_cflags="${newlib_cflags} -DGETREENT_PROVIDED -DSIGNAL_PROVIDED"
+	;;
   a29k-*-*)
 	sys_dir=a29khif
 	signal_dir=
@@ -578,9 +587,6 @@ case "${host}" in
 	;;
   w65-*-*)
 	sys_dir=w65
-	;;
-  xtensa*-*-*)
-	sys_dir=xtensa
 	;;
   z8k-*-coff)
 	sys_dir=z8ksim

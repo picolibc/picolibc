@@ -312,10 +312,10 @@ install-data-local: install-toollibLIBRARIES install-multi $(INSTALL_DATA_LOCAL)
 	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/sys/`basename $$i`; \
 	    else true; fi ; \
 	  done ; \
-	  for i in $(srcdir)/libc/machine/$(machine_dir)/include/*.h; do \
-	    if [ -f $$i ]; then \
-	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/`basename $$i`; \
-	    else true; fi ; \
+	  for i in $(call rwildcard,$(srcdir)/libc/machine/$(machine_dir)/include/,*.h); do \
+	    f=`echo $$i | sed s:^$(srcdir)/libc/machine/$(machine_dir)/::`; \
+	    $(MKDIR_P) $(DESTDIR)$(tooldir)/`dirname $$f`; \
+	    $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/`dirname $$f`; \
 	  done ; \
 	  for i in $(srcdir)/libc/sys/$(sys_dir)/sys/*.h; do \
 	    if [ -f $$i ]; then \
