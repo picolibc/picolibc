@@ -1669,8 +1669,9 @@ if has_semihost
     endif
 
     set_variable(test_link_args_variable,
-		 ['-Wl,--gc-sections', '-nostdlib', '-T', picolibc_ld_string,
-		  lib_gcc] + additional_libs_list)
+		 ['-Wl,--gc-sections', '-nostdlib', '-T', picolibc_ld_string]
+       + additional_libs_list
+       + [lib_gcc])
 
     set_variable(test_linker_files_variable, [picolibc_ld_value])
 
