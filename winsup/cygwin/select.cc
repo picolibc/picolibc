@@ -639,35 +639,29 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, int flags)
         on the writer side assumes that no space is available in the read
         side inbound buffer.
 
-        Consequentially, the only reliable information is available on the
-        read side, so fetch info from the read side via the pipe-specific
-        query handle.  Use fpli.WriteQuotaAvailable as storage for the actual
-        interesting value, which is the InboundQuote on the write side,
-        decremented by the number of bytes of data in that buffer. */
-      /* Note: Do not use NtQueryInformationFile() for query_hdl because
-	 NtQueryInformationFile() seems to interfere with reading pipes
-	 in non-cygwin apps. Instead, use PeekNamedPipe() here. */
-      /* Note 2: we return the number of available bytes.  Select for writing
-         returns writable *only* if at least PIPE_BUF bytes are left in the
-	 buffer.  If we can't fetch the real number of available bytes, the
-	 number of bytes returned depends on the caller.  For select we return
-	 PIPE_BUF to fake writability, for writing we return 1 to allow
-	 handling this fact. */
+	Consequentially, there are two possibilities when WriteQuotaAvailable
+	is 0. One is that the buffer is really full. The other is that the
+	reader is currently trying to read the pipe and it is pending.
+	In the latter case, the fact that the reader cannot read the data
+	immediately means that the pipe is empty. In the former case,
+	NtSetInformationFile() in set_pipe_non_blocking(true) will fail
+	with STATUS_PIPE_BUSY, while it succeeds in the latter case.
+	Therefore, we can distinguish these cases by calling set_pipe_non_
+	blocking(true). If it returns success, the pipe is empty, so we
+	return the pipe buffer size. Otherwise, we return 0. */
       if (fh->get_device () == FH_PIPEW && fpli.WriteQuotaAvailable == 0)
 	{
-	  HANDLE query_hdl = ((fhandler_pipe *) fh)->get_query_handle ();
-	  if (!query_hdl)
-	    query_hdl = ((fhandler_pipe *) fh)->temporary_query_hdl ();
-	  if (!query_hdl) /* We cannot know actual write pipe space. */
+	  NTSTATUS status =
+	    ((fhandler_pipe *) fh)->set_pipe_non_blocking (true);
+	  if (status == STATUS_PIPE_BUSY)
+	    return 0; /* Full */
+	  else if (!NT_SUCCESS (status))
+	    /* We cannot know actual write pipe space. */
 	    return (flags & PDA_SELECT) ? PIPE_BUF : 1;
-	  DWORD nbytes_in_pipe;
-	  BOOL res =
-	    PeekNamedPipe (query_hdl, NULL, 0, NULL, &nbytes_in_pipe, NULL);
-	  if (!((fhandler_pipe *) fh)->get_query_handle ())
-	    CloseHandle (query_hdl); /* Close temporary query_hdl */
-	  if (!res) /* We cannot know actual write pipe space. */
-	    return (flags & PDA_SELECT) ? PIPE_BUF : 1;
-	  fpli.WriteQuotaAvailable = fpli.InboundQuota - nbytes_in_pipe;
+	  /* Restore pipe mode to blocking mode */
+	  ((fhandler_pipe *) fh)->set_pipe_non_blocking (false);
+	  /* Empty */
+	  fpli.WriteQuotaAvailable = fpli.InboundQuota;
 	}
       if (fpli.WriteQuotaAvailable > 0)
 	{

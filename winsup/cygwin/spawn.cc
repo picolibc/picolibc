@@ -579,10 +579,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       int fileno_stdout = in__stdout < 0 ? 1 : in__stdout;
       int fileno_stderr = 2;
 
-      if (!iscygwin ())
-	fhandler_pipe::spawn_worker (fileno_stdin, fileno_stdout,
-				     fileno_stderr);
-
       bool no_pcon = mode != _P_OVERLAY && mode != _P_WAIT;
       term_spawn_worker.setup (iscygwin (), handle (fileno_stdin, false),
 			       runpath, no_pcon, reset_sendsig, envblock);

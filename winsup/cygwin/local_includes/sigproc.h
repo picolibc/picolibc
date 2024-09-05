@@ -24,7 +24,6 @@ enum
   __SIGSETPGRP	    = -(_NSIG + 9),
   __SIGTHREADEXIT   = -(_NSIG + 10),
   __SIGPENDINGALL   = -(_NSIG + 11),
-  __SIGNONCYGCHLD   = -(_NSIG + 12),
 };
 #endif
 

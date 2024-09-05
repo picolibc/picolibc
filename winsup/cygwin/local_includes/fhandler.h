@@ -1197,6 +1197,7 @@ class fhandler_pipe_fifo: public fhandler_base
 {
  protected:
   size_t pipe_buf_size;
+  HANDLE pipe_mtx; /* Used only in the pipe case */
   virtual void release_select_sem (const char *) {};
 
  public:
@@ -1209,15 +1210,8 @@ class fhandler_pipe_fifo: public fhandler_base
 class fhandler_pipe: public fhandler_pipe_fifo
 {
 private:
-  HANDLE read_mtx;
   pid_t popen_pid;
-  HANDLE query_hdl;
-  HANDLE hdl_cnt_mtx;
-  HANDLE query_hdl_proc;
-  HANDLE query_hdl_value;
-  HANDLE query_hdl_close_req_evt;
   void release_select_sem (const char *);
-  HANDLE get_query_hdl_per_process (OBJECT_NAME_INFORMATION *);
 public:
   fhandler_pipe ();
 
@@ -1234,13 +1228,11 @@ public:
   int open (int flags, mode_t mode = 0);
   bool open_setup (int flags);
   void fixup_after_fork (HANDLE);
-  void fixup_after_exec ();
   int dup (fhandler_base *child, int);
   void set_close_on_exec (bool val);
   int close ();
   void raw_read (void *ptr, size_t& len);
   int ioctl (unsigned int cmd, void *);
-  int fcntl (int cmd, intptr_t);
   int fstat (struct stat *buf);
   int fstatvfs (struct statvfs *buf);
   int fadvise (off_t, off_t, int);
@@ -1265,39 +1257,7 @@ public:
     fh->copy_from (this);
     return fh;
   }
-  void set_pipe_non_blocking (bool nonblocking);
-  HANDLE get_query_handle () const { return query_hdl; }
-  void close_query_handle ()
-  {
-    if (query_hdl)
-      {
-	CloseHandle (query_hdl);
-	query_hdl = NULL;
-      }
-    if (query_hdl_close_req_evt)
-      {
-	CloseHandle (query_hdl_close_req_evt);
-	query_hdl_close_req_evt = NULL;
-      }
-  }
-  bool reader_closed ();
-  HANDLE temporary_query_hdl ();
-  bool need_close_query_hdl ()
-    {
-      return query_hdl_close_req_evt ?
-	IsEventSignalled (query_hdl_close_req_evt) : false;
-    }
-  bool request_close_query_hdl ()
-    {
-      if (query_hdl_close_req_evt)
-	{
-	  SetEvent (query_hdl_close_req_evt);
-	  return true;
-	}
-      return false;
-    }
-  static void spawn_worker (int fileno_stdin, int fileno_stdout,
-			    int fileno_stderr);
+  NTSTATUS set_pipe_non_blocking (bool nonblocking);
 };
 
 #define CYGWIN_FIFO_PIPE_NAME_LEN     47
