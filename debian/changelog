@@ -1,3 +1,13 @@
+picolibc (1.8.7-1) unstable; urgency=medium
+
+  * New upstream.
+
+  * Initialize MMU on arm and aarch64 for tests. Closes: #1077452.
+
+  * Fix Vcs-Git line in debian/control. Closes: #1080065.
+
+ -- Keith Packard <keithp@keithp.com>  Fri, 06 Sep 2024 19:16:19 -0700
+
 picolibc (1.8.6-2) unstable; urgency=medium
 
   * Add pacbti variants for arm v8.1-m
