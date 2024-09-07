@@ -75,7 +75,7 @@ FILE_FN_UNLOCKED(getdelim) (char **restrict lineptr, size_t *restrict nptr,
 }
 
 #ifdef _WANT_FLOCKFILE
-int
+_ssize_t
 getdelim (char **restrict lineptr, size_t *restrict nptr,
           int delim, FILE *restrict stream)
 {
