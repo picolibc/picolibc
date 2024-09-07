@@ -1,3 +1,0 @@
-0001-picocrt-arm-Support-BTI-and-PAC-in-crt0.patch
-0002-scripts-Fix-memory-map-for-pacbti-armv8.1-m-variants.patch
-0003-scripts-Include-pacbti-arm-variants-in-build.patch
