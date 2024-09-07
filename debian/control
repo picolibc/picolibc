@@ -7,7 +7,7 @@ Standards-Version: 4.6.2
 Rules-Requires-Root: no
 Section: devel
 Homepage: https://keithp.com/picolibc
-Vcs-Git: git://keithp.com/git/picolibc.git
+Vcs-Git: git://keithp.com/git/picolibc.git -b debian
 Vcs-Browser: https://keithp.com/cgit/picolibc.git/
 
 Package: picolibc-riscv64-unknown-elf
