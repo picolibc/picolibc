@@ -242,6 +242,29 @@ use Picolibc:
    strict standards conformance, there's now an option that enables
    %lc/%ls in printf even if multi-byte support is not enabled.
 
+ * Enable MMU in picocrt on A profile ARM and AARCH64 targets when
+   present. This is required by the latest qemu which now more
+   accurately emulates this hardware. Thanks to Alex Richardson.
+
+ * Fix AARCH64 asm code in ILP32 mode.
+
+ * Parse NaN(<string>) in sscanf. This is required by the standard,
+   although picolibc doesn't do anything with <string>. Thanks to
+   Mohamed Moawad.
+
+ * Clean up header files. Picolibc tries to limit symbol definitions
+   to those specified in the C and POSIX specs.
+
+ * Add support for C's Annex K functions. These are bounds-checking
+   versions of various memory and string functions. Thanks to Mostafa
+   Salman.
+
+ * Perform locale string validation in newlocale even when _MB_CAPABLE
+   isn't defined. Thanks to Mostafa Salman.
+
+ * Place compiler-rt library after C library when linking
+   tests. Thanks to Oliver Stannard.
+
 ### Picolibc version 1.8.6
 
  * Fix some FORTITY_SOURCE issues with tinystdio
