@@ -145,7 +145,7 @@ use Picolibc:
 
 ## Releases
 
-### Picolibc release 1.8.next
+### Picolibc release 1.8.7
 
  * Support ARM v8.1-m BTI and PAC features
 

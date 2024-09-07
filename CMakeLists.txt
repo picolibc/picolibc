@@ -35,7 +35,7 @@
 
 cmake_minimum_required(VERSION 3.20.0)
 
-project(Picolibc VERSION 1.8.6 LANGUAGES C ASM)
+project(Picolibc VERSION 1.8.7 LANGUAGES C ASM)
 
 # Set a default build type if none was specified
 set(default_build_type "MinSizeRel")
