@@ -110,6 +110,8 @@ endif
 
 plain_tests_native = plain_tests_common
 
+plain_tests_native += 'test-flockfile'
+
 math_tests_native = math_tests_common
 foreach target : targets
   value = get_variable('target_' + target)
@@ -735,6 +737,22 @@ endif
 
 if enable_native_tests
 
+  native_lib = static_library('native-lib',
+                              ['native-locks.c'],
+                              c_args: native_c_args)
+
+  test_file_name_arg=['-DTEST_FILE_NAME="' + 'test-flockfile' + '.txt"']
+
+  test('test-flockfile',
+       executable('test-flockfile',
+                  'test-flockfile.c',
+                  c_args: test_c_args + test_file_name_arg,
+                  link_args: test_link_args,
+                  link_with: [native_lib, lib_c],
+                  include_directories: inc),
+       depends: bios_bin,
+       env: test_env)
+
   if have_cplusplus
     test('test-cplusplus-native',
          executable('test-cplusplus-native', 'test-cplusplus.cpp',
@@ -742,7 +760,6 @@ if enable_native_tests
 		    link_args: native_cpp_args))
   endif
 
-  
   foreach t1 : plain_tests_native
     t1_src = t1 + '.c'
     t1_name = t1 + '-native'
@@ -750,7 +767,7 @@ if enable_native_tests
 
     test(t1_name,
 	 executable(t1_name, t1_src,
-		    c_args: native_c_args,
+		    c_args: native_c_args + test_file_name_arg,
 		    link_args: native_c_args))
   endforeach
 
