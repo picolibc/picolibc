@@ -35,10 +35,12 @@
 
 #include "stdio_private.h"
 
-#ifdef _WANT_FLOCKFILE
-
 void flockfile(FILE *f) {
+#ifdef _WANT_FLOCKFILE
     __flockfile(f);
+#else
+    (void) f;
+    __LIBC_LOCK();
+#endif
 }
 
-#endif // _WANT_FLOCKFILE

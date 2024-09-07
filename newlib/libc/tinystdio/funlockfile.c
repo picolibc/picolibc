@@ -35,10 +35,13 @@
 
 #include "stdio_private.h"
 
+void funlockfile(FILE *f)
+{
 #ifdef _WANT_FLOCKFILE
-
-void funlockfile(FILE *f) {
     __funlockfile(f);
+#else
+    (void) f;
+    __LIBC_UNLOCK();
+#endif
 }
 
-#endif // _WANT_FLOCKFILE
