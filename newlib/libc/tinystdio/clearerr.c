@@ -33,7 +33,6 @@
 
 #undef clearerr
 
-FILE_FN_UNLOCKED_SPECIFIER
 void
 FILE_FN_UNLOCKED(clearerr)(FILE *stream)
 {

@@ -40,7 +40,6 @@
 #define FSEEK_TYPE long
 #endif
 
-FILE_FN_UNLOCKED_SPECIFIER
 int
 FILE_FN_UNLOCKED(FSEEK)(FILE *stream, FSEEK_TYPE offset, int whence)
 {

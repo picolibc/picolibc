@@ -225,11 +225,15 @@ __stdio_sflags (const char *mode);
 
 #ifdef _WANT_FLOCKFILE
 #define FILE_FN_UNLOCKED_SPECIFIER static inline
-#define FILE_FN_UNLOCKED(_fn) _fn##_unlocked
+#define _FILE_FN_UNLOCKED(_fn) _fn##_unlocked
+#define FILE_FN_UNLOCKED(_fn) _FILE_FN_UNLOCKED(_fn)
 
-wint_t ungetwc_unlocked(wint_t c, FILE *stream);
-int ungetc_unlocked(int c, FILE *stream);
-int fgetc_unlocked(FILE *stream);
+wint_t FILE_FN_UNLOCKED(ungetwc)(wint_t c, FILE *stream);
+int FILE_FN_UNLOCKED(ungetc)(int c, FILE *stream);
+int FILE_FN_UNLOCKED(fgetc)(FILE *stream);
+int FILE_FN_UNLOCKED(fseek)(FILE *stream, long offset, int whence);
+int FILE_FN_UNLOCKED(fseeko)(FILE *stream, off_t offset, int whence);
+void FILE_FN_UNLOCKED(clearerr)(FILE *stream);
 
 #else
 #define FILE_FN_UNLOCKED_SPECIFIER
