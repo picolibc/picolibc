@@ -127,6 +127,8 @@ endif
 
 plain_tests_native = plain_tests_common
 
+plain_tests_native += 'test-flockfile'
+
 math_tests_native = math_tests_common
 foreach params : targets
   target = params['name']
@@ -655,6 +657,22 @@ if enable_native_tests
     endif
   endif
 
+  native_lib = static_library('native-lib',
+                              ['native-locks.c'],
+                              c_args: native_c_args)
+
+  test_file_name_arg=['-DTEST_FILE_NAME="' + 'test-flockfile' + '.txt"']
+
+  test('test-flockfile',
+       executable('test-flockfile',
+                  'test-flockfile.c',
+                  c_args: test_c_args + test_file_name_arg,
+                  link_args: test_link_args,
+                  link_with: [native_lib, lib_c],
+                  include_directories: inc),
+       depends: bios_bin,
+       env: test_env)
+
   if have_cplusplus
     test('test-cplusplus-native',
          executable('test-cplusplus-native', 'test-cplusplus.cpp',
@@ -662,13 +680,13 @@ if enable_native_tests
 		    link_args: native_cpp_args))
   endif
 
-  
   foreach t1 : plain_tests_native
     t1_src = t1 + '.c'
-    test_file_name_arg=['-DTEST_FILE_NAME="' + t1 + target + '.txt"']
+    t1_name = t1 + '-native'
+    test_file_name_arg=['-DTEST_FILE_NAME="' + t1_name + '.txt"']
 
-    test(t1 + target,
-	 executable(t1 + '-native', t1_src,
+    test(t1_name,
+	 executable(t1_name, t1_src,
 		    c_args: native_c_args + ctype_c_args,
 		    link_args: native_c_args),
          env: ['LOCPATH=' + meson.current_build_dir()])
