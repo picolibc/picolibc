@@ -151,7 +151,7 @@ foreach target : targets
 		  c_args: double_printf_compile_args + _c_args,
 		  link_args: double_printf_link_args + _link_args,
 		  objects: _objs,
-		  link_depends:  _link_depends,
+		  link_depends:  _link_depends + _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -236,7 +236,7 @@ foreach target : targets
 		  c_args: double_printf_compile_args + _c_args,
 		  link_args: double_printf_link_args + _link_args,
 		  objects: _objs,
-		  link_depends: _libs,
+		  link_depends:  _link_depends + _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -253,7 +253,7 @@ foreach target : targets
 		  c_args: float_printf_compile_args + _c_args,
 		  link_args: float_printf_link_args + _link_args,
 		  objects: _objs,
-		  link_depends: _libs,
+		  link_depends:  _link_depends + _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -270,7 +270,7 @@ foreach target : targets
 		  c_args: int_printf_compile_args + _c_args,
 		  link_args: int_printf_link_args + _link_args,
 		  objects: _objs,
-		  link_depends: _libs,
+		  link_depends:  _link_depends + _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -287,7 +287,7 @@ foreach target : targets
 		  c_args: min_printf_compile_args + _c_args,
 		  link_args: min_printf_link_args + _link_args,
 		  objects: _objs,
-		  link_depends: _libs,
+		  link_depends:  _link_depends + _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -311,7 +311,7 @@ foreach target : targets
 		  c_args: int_printf_compile_args + _c_args + ['-fno-builtin'],
 		  link_args: int_printf_link_args + _link_args,
 		  objects: _objs,
-		  link_depends: _libs,
+		  link_depends:  _link_depends + _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -328,6 +328,7 @@ foreach target : targets
 		  c_args: _c_args,
 		  link_args: _link_args,
 		  objects: _objs,
+		  link_depends:  _link_depends + _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -346,6 +347,7 @@ foreach target : targets
 		  c_args: _c_args,
 		  link_args:  _link_args,
 		  objects: _objs,
+		  link_depends:  _link_depends + _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -355,6 +357,7 @@ foreach target : targets
 		  c_args: _c_args + ['-DRETVAL=1'],
 		  link_args:  _link_args,
 		  objects: _objs,
+		  link_depends:  _link_depends + _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env,
@@ -373,6 +376,7 @@ foreach target : targets
 		  c_args: _c_args,
 		  link_args:  _link_args,
 		  objects: _objs,
+		  link_depends:  _link_depends + _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env,
@@ -397,6 +401,7 @@ foreach target : targets
 		    c_args: _c_args,
 		    link_args:  _link_args,
 		    objects: _objs_minimal,
+		    link_depends:  _link_depends + _libs,
 		    include_directories: inc),
          depends: bios_bin,
 	 env: test_env)
@@ -414,6 +419,7 @@ foreach target : targets
 		  c_args: arg_fnobuiltin + _c_args,
 		  link_args: _link_args,
 		  objects: _objs,
+		  link_depends:  _link_depends + _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -430,6 +436,7 @@ foreach target : targets
 		  c_args: arg_fnobuiltin + _c_args,
 		  link_args: _link_args,
 		  objects: _objs,
+		  link_depends:  _link_depends + _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -447,7 +454,7 @@ foreach target : targets
 		  c_args: double_printf_compile_args + arg_fnobuiltin + _c_args,
 		  link_args: double_printf_link_args + _link_args,
 		  objects: _objs,
-		  link_depends:  _link_depends,
+		  link_depends:  _link_depends + _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env,
@@ -467,7 +474,7 @@ foreach target : targets
 		  c_args: double_printf_compile_args + _c_args,
 		  link_args: double_printf_link_args + _link_args,
 		  objects: _objs,
-		  link_depends:  _link_depends,
+		  link_depends:  _link_depends + _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env,
@@ -487,7 +494,7 @@ foreach target : targets
 		           c_args: _c_args,
 		           link_args: _link_args,
 		           objects: _objs,
-		           link_depends:  _link_depends,
+		           link_depends:  _link_depends + _libs,
 		           include_directories: inc)
 
     test(t1_name + '-success',
@@ -528,7 +535,7 @@ foreach target : targets
 		    c_args: c_sanitize_bounds_flags + _c_args + test_ubsan_flags,
 		    link_args: _link_args,
 		    objects: _objs,
-		    link_depends:  _link_depends,
+		    link_depends:  _link_depends + _libs,
 		    include_directories: inc),
 	 depends: bios_bin,
 	 env: test_env,
@@ -651,7 +658,7 @@ foreach target : targets
 		    c_args: double_printf_compile_args + test_file_name_arg + _c_args,
 		    link_args: double_printf_link_args + _link_args,
 		    objects: _objs,
-		    link_depends:  _link_depends,
+		    link_depends:  _link_depends + _libs,
 		    include_directories: inc),
          depends: bios_bin,
 	 timeout: 60,
@@ -671,7 +678,7 @@ foreach target : targets
                     cpp_args: _cpp_args,
 		    link_args: _cpp_args + _link_args,
 		    objects: _objs,
-		    link_depends:  _link_depends,
+		    link_depends:  _link_depends + _libs,
                     include_directories: inc))
   endif
 endforeach
