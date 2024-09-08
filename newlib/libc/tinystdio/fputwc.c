@@ -37,7 +37,7 @@ FILE_FN_UNLOCKED(fputwc)(wchar_t c, FILE *stream)
                 char c[sizeof(wchar_t)];
         } u;
         unsigned i;
-        
+
         stream->flags |= __SWIDE;
 
 	if ((stream->flags & __SWR) == 0)
@@ -51,8 +51,6 @@ FILE_FN_UNLOCKED(fputwc)(wchar_t c, FILE *stream)
 	return (wint_t) c;
 }
 
-#ifndef _FILE_INCLUDED
-
 #ifdef _WANT_FLOCKFILE
 wint_t
 fputwc(wchar_t c, FILE *stream)
@@ -63,12 +61,21 @@ fputwc(wchar_t c, FILE *stream)
     __funlockfile(stream);
     return ret;
 }
+#else
+#ifdef _HAVE_ALIAS_ATTRIBUTE
+__strong_reference(fputwc, fputwc_unlocked);
+#else
+wint_t fputwc_unlocked(wchar_t c, FILE *stream) { return fputwc(c, stream); }
 #endif
+#endif
+
+#undef putwc
+#undef putwc_unlocked
 
 #ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(fputwc, putwc);
-#elif !defined(getwc)
+__strong_reference(FILE_FN_UNLOCKED(fputwc), putwc_unlocked);
+#else
 wint_t putwc(wchar_t c, FILE *stream) { return fputwc(c, stream); }
+wint_t putwc_unlocked(wchar_t c, FILE *stream) { return FILE_FN_UNLOCKED(fputw)(c, stream); }
 #endif
-
-#endif // _FILE_INCLUDED

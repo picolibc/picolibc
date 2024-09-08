@@ -66,14 +66,20 @@ fgetc(FILE *stream)
     return ret;
 }
 #else
+#ifdef _HAVE_ALIAS_ATTRIBUTE
+__strong_reference(fgetc, fgetc_unlocked);
+#else
+int fgetc_unlocked(FILE *stream) { return fgetc(stream); }
+#endif
+#endif
+
 #undef getc
 #undef getc_unlocked
-#endif
 
 #ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(fgetc, getc);
-__strong_reference(fgetc, getc_unlocked);
+__strong_reference(FILE_FN_UNLOCKED(fgetc), getc_unlocked);
 #else
 int getc(FILE *stream) { return fgetc(stream); }
-int getc_unlocked(FILE *stream) { return fgetc(stream); }
+int getc_unlocked(FILE *stream) { return FILE_FN_UNLOCKED(fgetc)(stream); }
 #endif
