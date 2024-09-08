@@ -35,7 +35,8 @@
 
 #include "stdio_private.h"
 
-void funlockfile(FILE *f)
+void
+funlockfile (FILE *f)
 {
 #ifdef _WANT_FLOCKFILE
     __funlockfile(f);
@@ -44,4 +45,3 @@ void funlockfile(FILE *f)
     __LIBC_UNLOCK();
 #endif
 }
-

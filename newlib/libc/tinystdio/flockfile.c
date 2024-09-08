@@ -35,7 +35,9 @@
 
 #include "stdio_private.h"
 
-void flockfile(FILE *f) {
+void
+flockfile (FILE *f)
+{
 #ifdef _WANT_FLOCKFILE
     __flockfile(f);
 #else
@@ -43,4 +45,3 @@ void flockfile(FILE *f) {
     __LIBC_LOCK();
 #endif
 }
-

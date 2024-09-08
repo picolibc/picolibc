@@ -34,21 +34,16 @@
 int
 fclose(FILE *f)
 {
-	int ret = 0;
-
+        struct __file_close *cf = (struct __file_close *) f;
 #ifdef _WANT_FLOCKFILE
         fflush(f);
 	__flockfile_close(f);
 #endif
-	if (f->flags & __SCLOSE) {
+        if ((f->flags & __SCLOSE) && cf->close) {
 		/*
 		 * File has 'close' function, call it
 		 */
-		struct __file_close *cf = (struct __file_close *) f;
-		if (cf)
-			ret = (*cf->close)(f);
+		return (*cf->close)(f);
 	}
-
-
-	return ret;
+	return 0;
 }
