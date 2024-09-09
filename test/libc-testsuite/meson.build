@@ -69,7 +69,7 @@ foreach target : targets
   endforeach
 
   _c_args = value[1] + get_variable('test_c_args_' + target, test_c_args)
-  _link_args = value[1] + get_variable('test_link_args_' + target, test_link_args) + _lib_files
+  _link_args = value[1] + _lib_files + get_variable('test_link_args_' + target, test_link_args)
   _link_depends = get_variable('test_link_depends_' + target, test_link_depends) + _libs
 
   foreach t1 : libc_tests_picolibc
