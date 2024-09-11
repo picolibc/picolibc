@@ -101,18 +101,16 @@ if(CONFIG_PICOLIBC_USE_MODULE)
   # Fetch zephyr compile flags from interface
   get_property(PICOLIBC_EXTRA_COMPILE_OPTIONS TARGET zephyr_interface PROPERTY INTERFACE_COMPILE_OPTIONS)
 
-  # Enable POSIX APIs
-
-  # Link to C library and libgcc (on non-armclang toolchains)
-
-  if(${ZEPHYR_TOOLCHAIN_VARIANT} STREQUAL "armclang")
-    zephyr_link_libraries(c)
-  else()
-    zephyr_link_libraries(c -lgcc)
-  endif()
+  # Tell Zephyr about the module built picolibc library to link against.
+  # We need to construct the absolute path to picolibc in same fashion as CMake
+  # defines the library file name and location, because a generator expression
+  # cannot be used as the CMake linker rule definition doesn't supports them.
+  set_property(TARGET linker PROPERTY c_library
+      ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}c${CMAKE_STATIC_LIBRARY_SUFFIX}
+  )
+  zephyr_system_include_directories($<TARGET_PROPERTY:c,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>)
 
   # Provide an alias target for zephyr to use
-
   add_custom_target(PicolibcBuild)
   add_dependencies(PicolibcBuild c)
 endif()
