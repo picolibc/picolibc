@@ -173,7 +173,8 @@ ivln2_l  =  7.0526075433e-06; /* 0x36eca570 =1/ln2 tail*/
 	    GET_FLOAT_WORD(is,s_h);
 	    SET_FLOAT_WORD(s_h,is&0xfffff000);
 	/* t_h=ax+bp[k] High */
-	    SET_FLOAT_WORD(t_h,((ix>>1)|0x20000000)+0x0040000+(k<<21));
+        is = ((ix >> 1) & 0xfffff000U) | 0x20000000;
+        SET_FLOAT_WORD(t_h, is + 0x00400000 + (k << 21));
 	    t_l = ax - (t_h-bp[k]);
 	    s_l = v*((u-s_h*t_h)-s_h*t_l);
 	/* compute log(ax) */
