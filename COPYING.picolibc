@@ -1244,6 +1244,8 @@ Files: newlib/libc/include/stdnoreturn.h
  newlib/libc/machine/sh/machine/meson.build
  newlib/libc/picolib/machine/m68k/interrupt.c
  newlib/libc/picolib/machine/m68k/meson.build
+ newlib/libc/stdio/flockfile.c
+ newlib/libc/stdio/funlockfile.c
  newlib/libc/tinystdio/atomic_load.c
  newlib/libc/tinystdio/flockfile.c
  newlib/libc/tinystdio/ftrylockfile.c
